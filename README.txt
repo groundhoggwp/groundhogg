@@ -177,7 +177,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.1.12.3 (2020-02-31) =
+= 2.1.12.4 (2020-02-03) =
+* TWEAKED Readme
+* FIXED Url encoding sometimes wonky in simple email editor when adding links with query strings
+* FIXED Entering an invalid email address in the test email form will send test to incorrect contact record.
+
+= 2.1.12.3 (2020-01-31) =
 * ADDED Base action/benchmark classes for better LMS integrations with LifterLMS, LearnDash, TutorLMS and any others.
 * ADDED More actions/filters to extend admin pages.
 

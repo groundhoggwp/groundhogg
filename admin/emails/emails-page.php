@@ -391,25 +391,31 @@ class Emails_Page extends Admin_Page
 
             $test_email = sanitize_email( Groundhogg\get_request_var( 'test_email', wp_get_current_user()->user_email ) );
 
-            $contact = new Groundhogg\Contact( [ 'email' => $test_email ] );
+            if ( $test_email ){
 
-            $email->enable_test_mode();
+                $contact = new Groundhogg\Contact( [ 'email' => $test_email ] );
 
-            $sent = $email->send( $contact );
+                if ( $contact->exists() ){
 
-            update_user_meta( get_current_user_id(), 'preferred_test_email', $test_email );
+                    $email->enable_test_mode();
 
-            if ( ! $sent || is_wp_error( $sent ) ){
-                $error = is_wp_error( $sent ) ? $sent : new \WP_Error( 'oops', "Failed to send test." );
-                $this->add_notice( $error );
-            } else {
-                $this->add_notice(
-                    esc_attr( 'sent-test' ),
-                    sprintf( "%s %s",
-                        __( 'Sent test email to', 'groundhogg' ),
-                        $contact->get_email() ),
-                    'success'
-                );
+                    $sent = $email->send( $contact );
+
+                    update_user_meta( get_current_user_id(), 'preferred_test_email', $test_email );
+
+                    if ( ! $sent || is_wp_error( $sent ) ){
+                        $error = is_wp_error( $sent ) ? $sent : new \WP_Error( 'oops', "Failed to send test." );
+                        $this->add_notice( $error );
+                    } else {
+                        $this->add_notice(
+                            esc_attr( 'sent-test' ),
+                            sprintf( "%s %s",
+                                __( 'Sent test email to', 'groundhogg' ),
+                                $contact->get_email() ),
+                            'success'
+                        );
+                    }
+                }
             }
         }
 

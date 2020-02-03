@@ -217,6 +217,9 @@ class Tracking
         $event_id   = absint( get_query_var( 'event_id' ) );
         $target_url = get_query_var( 'target_url' );
 
+        // Clean the URL, wonky encoding sometimes...
+        $target_url = str_replace( '&#038;', '&', $target_url );
+
         // Add the tracking cookie params.
         $this->add_tracking_cookie_param( 'contact_id', $contact_id );
         $this->add_tracking_cookie_param( 'email_id', $email_id );
