@@ -14,6 +14,10 @@
     /*margin-left: 300px;*/
 }
 
+div.email-status{
+   margin: 20px;
+}
+
 .contact-picture {
     display: inline-block;
     float: left;

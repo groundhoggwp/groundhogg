@@ -530,6 +530,11 @@ class Contact extends Base_Object_With_Meta
     public function change_marketing_preference( $preference )
     {
         $old_preference = $this->get_optin_status();
+        
+        // Don't do anything if the preference didn't change
+        if ( $old_preference === $preference ){
+            return;
+        }
 
         $this->update( [ 'optin_status' => $preference ] );
 

@@ -177,6 +177,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.12.5 (2020-02-04) =
+* ADDED more filters & actions to the contact editor
+* TWEAKED Tag mapping for new contacts was a bit wonky when using a validation tool
+* TWEAKED CSS in contact editor
+
 = 2.1.12.4 (2020-02-03) =
 * TWEAKED Readme
 * FIXED Url encoding sometimes wonky in simple email editor when adding links with query strings

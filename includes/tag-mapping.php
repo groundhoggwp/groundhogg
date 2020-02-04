@@ -350,9 +350,9 @@ class Tag_Mapping extends Bulk_Job
         ];
 
         /* Marketable decision */
-        if ( $contact->is_marketable() && $contact->has_tag( $non_marketable_tag ) ){
+        if ( $contact->is_marketable() ){
             $remove_tags[] = $non_marketable_tag;
-        } else if ( ! $contact->is_marketable() && $contact->has_tag( $marketable_tag ) ){
+        } else if ( ! $contact->is_marketable() ){
             $remove_tags[] = $marketable_tag;
         }
 
@@ -364,9 +364,9 @@ class Tag_Mapping extends Bulk_Job
             $this->get_status_tag( $status ),
         ];
 
-        if ( $contact->is_marketable() && ! $contact->has_tag( $marketable_tag ) ){
+        if ( $contact->is_marketable() ){
             $add_tags[] = $marketable_tag;
-        } else if ( ! $contact->is_marketable() && ! $contact->has_tag( $non_marketable_tag ) ){
+        } else if ( ! $contact->is_marketable() ){
             $add_tags[] = $non_marketable_tag;
         }
 

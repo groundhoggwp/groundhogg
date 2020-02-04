@@ -452,6 +452,11 @@ class Contacts_Page extends Admin_Page
             $contact->add_tag(get_request_var('tags'));
         }
 
+        /**
+         * After the contact is created via the admin!
+         */
+        do_action('groundhogg/admin/contacts/add/after', $contact );
+
         $this->add_notice('created', _x("Contact created!", 'notice', 'groundhogg'), 'success');
 
         return $this->admin_url( [ 'action' => 'edit', 'contact' => $contact->get_id() ] );

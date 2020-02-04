@@ -217,6 +217,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
             <tbody>
             <tr>
                 <th><label for="email"><?php echo _x('Email', 'contact_record', 'groundhogg') ?></label></th>
+
                 <td><?php $args = array(
                         'type' => 'email',
                         'id' => 'email',
@@ -232,7 +233,10 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                 <a title="<?php esc_attr_e('Send email.', 'groundhogg'); ?>" style="text-decoration: none"
                    target="_blank" href="mailto:<?php echo $contact->get_email(); ?>"><span
                             class="dashicons dashicons-email"></span></a></span>
-                    <p class="submit"><?php echo '<b>' . _x('Email Status', 'contact_record', 'groundhogg') . ': </b>' . Plugin::$instance->preferences->get_optin_status_text($contact->get_id()); ?></p>
+                    <div class="email-status">
+                        <p><?php echo '<b>' . _x('Email Status', 'contact_record', 'groundhogg') . ': </b>' . Plugin::$instance->preferences->get_optin_status_text($contact->get_id()); ?></p>
+                        <?php do_action( 'groundhogg/contact/record/email_status/after', $contact ); ?>
+                    </div>
                     <?php if ($contact->get_optin_status() !== Preferences::UNSUBSCRIBED): ?>
                         <div id="manual-unsubscribe" style="margin-bottom: 10px;">
                             <label><input type="checkbox" name="unsubscribe"
@@ -254,7 +258,11 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                                     $('#confirmation-reason').toggleClass('hidden');
                                 });
                             });</script>
-                    <?php endif; ?>
+                    <?php endif;
+
+                    do_action( 'groundhogg/contact/record/email/after', $contact );
+
+                    ?>
                 </td>
             </tr>
             <tr>

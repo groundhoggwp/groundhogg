@@ -75,6 +75,8 @@ class Notices
                 true
             );
         }
+
+        do_action( 'groundhogg/notices/before' );
     }
 
     /**

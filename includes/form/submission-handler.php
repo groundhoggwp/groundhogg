@@ -367,13 +367,17 @@ class Submission_Handler extends Supports_Errors
                 if ( !$success_message ) {
                     $success_message = __( 'Your submission has been received!', 'groundhogg' );
                 }
-
+                
                 wp_send_json_success( [ 'message' => $success_message, ] );
 
             } else if ( $this->is_admin_submission() ) {
 
+                do_action( 'groundhogg/form/submission_handler/admin_submission', $submission, $contact, $this );
+
                 Plugin::$instance->notices->add( 'form_filled', _x( 'Form submitted', 'notice', 'groundhogg' ) );
+                
                 $admin_url = admin_url( sprintf( 'admin.php?page=gh_contacts&action=edit&contact=%d', $contact->get_id() ) );
+                
                 wp_redirect( $admin_url );
                 die();
 
