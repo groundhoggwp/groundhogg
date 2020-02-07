@@ -212,6 +212,9 @@ class Tools_Page extends Tabbed_Admin_Page
     {
         ?>
         <div id="poststuff">
+
+            <?php do_action( 'groundhogg/admin/tools/system_status/before' ); ?>
+
             <div class="postbox">
                 <h2 class="hndle"><?php _e( 'Download System Info', 'groundhogg' ); ?></h2>
                 <div class="inside">
@@ -252,6 +255,9 @@ class Tools_Page extends Tabbed_Admin_Page
                     </p>
                 </div>
             </div>
+
+            <?php do_action( 'groundhogg/admin/tools/system_status/after' ); ?>
+
         </div>
         <?php
     }

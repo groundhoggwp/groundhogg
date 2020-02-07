@@ -1160,6 +1160,40 @@ function recount_tag_contacts_count()
 }
 
 /**
+ * Create a user from a contact
+ *
+ * @param $contact Contact
+ * @param string $role string
+ * @param string $notifications string|bool
+ *
+ * @return int|false
+ */
+function create_user_from_contact( $contact, $role='subscriber', $notifications='both' ){
+
+    $user_id = wp_insert_user( [
+        'user_pass'     => wp_generate_password(),
+        'user_login'    => $contact->get_email(),
+        'user_nicename' => $contact->get_full_name(),
+        'display_name'  => $contact->get_full_name(),
+        'first_name'    => $contact->get_first_name(),
+        'last_name'     => $contact->get_last_name(),
+        'role'          => $role
+    ] );
+
+    if ( ! $user_id ){
+        return false;
+    }
+
+    if ( $notifications ){
+        wp_send_new_user_notifications( $user_id, $notifications );
+    }
+
+    $contact->update( [ 'user_id' => $user_id ] );
+
+    return $user_id;
+}
+
+/**
  * Create a contact quickly from a user account.
  *
  * @param $user \WP_User|int
@@ -2923,39 +2957,4 @@ function get_primary_user()
 function use_experimental_features()
 {
     return is_option_enabled('gh_enable_experimental_features');
-}
-
-/**
- * Create a user from a contact
- *
- * @param $contact Contact
- * @param string $role string
- * @param string $notifications string|bool
- *
- * @return int|false
- */
-function create_user_from_contact( $contact, $role='subscriber', $notifications='both' ){
-
-    $user_id = wp_insert_user( [
-        'user_pass'     => wp_generate_password(),
-        'user_login'    => $contact->get_email(),
-        'user_nicename' => $contact->get_full_name(),
-        'display_name'  => $contact->get_full_name(),
-        'first_name'    => $contact->get_first_name(),
-        'last_name'     => $contact->get_last_name(),
-        'role'          => $role
-    ] );
-
-    if ( ! $user_id ){
-        return false;
-    }
-
-    if ( $notifications ){
-        wp_send_new_user_notifications( $user_id, $notifications );
-    }
-
-    $contact->update( [ 'user_id' => $user_id ] );
-
-    return $user_id;
-
 }

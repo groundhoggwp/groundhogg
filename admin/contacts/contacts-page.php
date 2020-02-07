@@ -572,9 +572,7 @@ class Contacts_Page extends Admin_Page
         $args['first_name'] = sanitize_text_field( get_request_var('first_name' ) );
         $args['last_name'] = sanitize_text_field( get_request_var( 'last_name' ) );
         $args['owner_id'] = absint( get_request_var( 'owner_id' ) );
-        $args['user_id'] = absint( get_request_var( 'user' ) );
-
-//        wp_send_json( $args );
+        $args['user_id'] = absint( get_request_var( 'user', $contact->get_user_id() ) );
 
         $contact->update($args);
 

@@ -68,12 +68,7 @@ class Settings_Page extends Admin_Page
 
     public function get_title()
     {
-        if (is_white_labeled()) {
-            return _x('Settings', 'page_title', 'groundhogg');
-        } else {
-
-            return _x('Groundhogg Settings', 'page_title', 'groundhogg');
-        }
+        return sprintf( __( "%s Settings", 'groundhogg' ), white_labeled_name() );
     }
 
     public function get_cap()
