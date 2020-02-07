@@ -177,6 +177,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.12.6 (2020-02-07) =
+* FIXED Bug causing tags to not sync when adding/removing manually with WPFusion.
+
 = 2.1.12.5 (2020-02-04) =
 * ADDED more filters & actions to the contact editor
 * TWEAKED Tag mapping for new contacts was a bit wonky when using a validation tool
