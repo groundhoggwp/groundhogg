@@ -177,6 +177,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.12.7 (2020-02-08) =
+* FIXED Bug where hooks for user_registered were called when user was created through Groundhogg
+* FIXED Bug where optin_status tags were sometimes not being created when a new contact was created
+
 = 2.1.12.6 (2020-02-07) =
 * FIXED Bug causing tags to not sync when adding/removing manually with WPFusion.
 

@@ -15,8 +15,7 @@ if (!defined('ABSPATH')) exit;
  *
  * @return false|Contact
  */
-function get_current_contact()
-{
+function get_current_contact() {
     return get_contactdata();
 }
 
@@ -626,6 +625,11 @@ function array_to_css($atts)
 {
     $css = '';
     foreach ($atts as $key => $value) {
+
+        if ( is_array( $value ) ){
+            $value = implode( ' ', $value );
+        }
+
         $css .= sanitize_key($key) . ':' . esc_attr($value) . ';';
     }
     return $css;
@@ -1160,40 +1164,6 @@ function recount_tag_contacts_count()
 }
 
 /**
- * Create a user from a contact
- *
- * @param $contact Contact
- * @param string $role string
- * @param string $notifications string|bool
- *
- * @return int|false
- */
-function create_user_from_contact( $contact, $role='subscriber', $notifications='both' ){
-
-    $user_id = wp_insert_user( [
-        'user_pass'     => wp_generate_password(),
-        'user_login'    => $contact->get_email(),
-        'user_nicename' => $contact->get_full_name(),
-        'display_name'  => $contact->get_full_name(),
-        'first_name'    => $contact->get_first_name(),
-        'last_name'     => $contact->get_last_name(),
-        'role'          => $role
-    ] );
-
-    if ( ! $user_id ){
-        return false;
-    }
-
-    if ( $notifications ){
-        wp_send_new_user_notifications( $user_id, $notifications );
-    }
-
-    $contact->update( [ 'user_id' => $user_id ] );
-
-    return $user_id;
-}
-
-/**
  * Create a contact quickly from a user account.
  *
  * @param $user \WP_User|int
@@ -1266,6 +1236,47 @@ function create_contact_from_user($user, $sync_meta = false)
 }
 
 /**
+ * Create a user from a contact
+ *
+ * @param $contact Contact
+ * @param string $role string
+ * @param string $notifications string|bool
+ *
+ * @return int|false
+ */
+function create_user_from_contact( $contact, $role='subscriber', $notifications='both' )
+{
+    // Remove this action to avoid looping when creating a the user
+	remove_action('user_register', __NAMESPACE__ . '\convert_user_to_contact_when_user_registered' );
+
+	$user_id = wp_insert_user( [
+		'user_pass'     => wp_generate_password(),
+		'user_login'    => $contact->get_email(),
+		'user_nicename' => $contact->get_full_name(),
+		'display_name'  => $contact->get_full_name(),
+		'first_name'    => $contact->get_first_name(),
+		'last_name'     => $contact->get_last_name(),
+		'role'          => $role
+	] );
+
+	// May need this action, restore it.
+	add_action( 'user_register', __NAMESPACE__ . '\convert_user_to_contact_when_user_registered' );
+
+	if ( ! $user_id ){
+		return false;
+	}
+
+	if ( $notifications ){
+		wp_send_new_user_notifications( $user_id, $notifications );
+	}
+
+	$contact->update( [ 'user_id' => $user_id ] );
+
+	return $user_id;
+
+}
+
+/**
  * Provides a global hook not requireing the benchmark anymore.
  *
  * @param $userId int the Id of the user
@@ -1284,7 +1295,8 @@ function convert_user_to_contact_when_user_registered($userId)
         return;
     }
 
-    if (!is_admin()) {
+    // Do not run when in admin or QUEUE is proccessing
+    if ( ! is_admin() && ! Event_Queue::is_processing() ) {
 
         /* register front end which is technically an optin */
         after_form_submit_handler($contact);

@@ -24,6 +24,7 @@ class Tag_Mapping extends Bulk_Job
 
         // Listen for an explicit status change.
         add_action( 'groundhogg/contact/preferences/updated', [ $this, 'optin_status_changed' ], 10, 3 );
+        add_action( 'groundhogg/db/post_insert/contact', [ $this, 'optin_status_set' ], 10, 1 );
 
         // Contact's marketability can expire with time, but it's too costly to setup a cronjob
         // So instead we'll listen for an event failed. #goodenough
@@ -321,7 +322,26 @@ class Tag_Mapping extends Bulk_Job
         }
 
         return false;
+    }
 
+	/**
+	 * When the contact is created with an initial optin status, perform the tag mapping.
+     *
+     * @param $contact_id int
+	 */
+    public function optin_status_set( $contact_id )
+    {
+        if ( ! $contact_id ){
+            return;
+        }
+
+        $contact = get_contactdata( $contact_id );
+
+        if ( ! $contact || ! $contact->exists() ){
+            return;
+        }
+
+        $this->optin_status_changed( $contact_id, $contact->get_optin_status() );
     }
 
     /**
