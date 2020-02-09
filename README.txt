@@ -177,9 +177,15 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.12.8 (2020-02-09) =
+* TWEAKED The "Add Contacts" to funnel form now has the first step selected by default.
+* FIXED CSS of notices causing them to show behind the step settings.
+* FIXED filter and action name in the form class was the same causing an error.
+* FIXED removed redundant actions/filters from the form class.
+
 = 2.1.12.7 (2020-02-08) =
-* FIXED Bug where hooks for user_registered were called when user was created through Groundhogg
-* FIXED Bug where optin_status tags were sometimes not being created when a new contact was created
+* FIXED Bug where hooks for user_registered were called when user was created through Groundhogg.
+* FIXED Bug where optin_status tags were sometimes not being created when a new contact was created.
 
 = 2.1.12.6 (2020-02-07) =
 * FIXED Bug causing tags to not sync when adding/removing manually with WPFusion.

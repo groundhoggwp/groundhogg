@@ -206,11 +206,11 @@ class Form {
             return sprintf( "<p>%s</p>" , __( "<b>Configuration Error:</b> This form has been deleted." ) );
         }
 
-        do_action( 'groundhogg/form/embed/before', $this );
+//        do_action( 'groundhogg/form/embed/before', $this );
 
         $content = do_shortcode( $step->get_meta( 'form' ) );
 
-        do_action( 'groundhogg/form/embed/after', $this );
+//        do_action( 'groundhogg/form/embed/after', $this );
 
         if ( empty( $content ) ){
             return sprintf( "<p>%s</p>" , __( "<b>Configuration Error:</b> This form has either been deleted or has not content yet." ) );
@@ -222,7 +222,7 @@ class Form {
 
         $form .= '</div>';
 
-        $form = apply_filters( 'groundhogg/form/embed/after', $form, $this );
+        $form = apply_filters( 'groundhogg/form/embed', $form, $this );
 
         return $form;
     }
@@ -280,11 +280,11 @@ class Form {
             return sprintf( "<p>%s</p>" , __( "<b>Configuration Error:</b> This form has been deleted." ) );
         }
 
-        do_action( 'groundhogg/form/shortcode/before', $this );
+//        do_action( 'groundhogg/form/shortcode/before', $this );
 
         $content = do_replacements( do_shortcode( $step->get_meta( 'form' ) ) );
 
-        do_action( 'groundhogg/form/shortcode/after', $this );
+//        do_action( 'groundhogg/form/shortcode/after', $this );
 
         if ( empty( $content ) ){
             return sprintf( "<p>%s</p>" , __( "<b>Configuration Error:</b> This form has either been deleted or has not content yet." ) );

@@ -504,6 +504,7 @@ $funnel = new Funnel($funnel_id);
                         $options = [];
 
                         $steps = $funnel->get_steps();
+
                         foreach ($steps as $step) {
                             $options[$step->get_id()] = sprintf("%d. %s (%s)", $step->get_order(), $step->get_title(), key_to_words($step->get_type()));
                         }
@@ -513,6 +514,7 @@ $funnel = new Funnel($funnel_id);
                             'id' => 'which_step',
                             'data' => $options,
                             'multiple' => false,
+                            'option_none' => false,
                         ));
 
                         ?>

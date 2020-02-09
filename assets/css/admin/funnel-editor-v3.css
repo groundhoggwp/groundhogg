@@ -749,6 +749,7 @@ input, select, textarea{
     width: 400px;
     right: 20px;
     bottom: 20px;
+    z-index: 99999999;
 }
 
 #groundhogg-notices .notice {
