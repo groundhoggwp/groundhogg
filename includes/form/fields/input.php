@@ -15,7 +15,7 @@ abstract class Input extends Field
 
         // No sense in updating for every single visitor visit... not efficient
         if ( current_user_can( 'edit_funnels' ) ){
-            add_filter( 'groundhogg/form/shortcode', [ self::class, 'save_config' ] );
+            add_filter( 'groundhogg/form/shortcode', [ self::class, 'save_config' ], 99, 2 );
         }
 
         parent::__construct($id);
