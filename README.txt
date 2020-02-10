@@ -177,6 +177,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.12.9 (2020-02-10) =
+* FIXED The form field builder was loading on every admin page. Now only loads on funnel edit screen.
+* FIXED Form config not saving
+
 = 2.1.12.8 (2020-02-09) =
 * TWEAKED The "Add Contacts" to funnel form now has the first step selected by default.
 * FIXED CSS of notices causing them to show behind the step settings.

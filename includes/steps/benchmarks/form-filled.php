@@ -8,6 +8,7 @@ use Groundhogg\Utils\Graph;
 use function Groundhogg\encrypt;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
+use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
@@ -474,9 +475,16 @@ class Form_Filled extends Benchmark
 
     }
 
-
+    /**
+     * Load the field builder form
+     */
     public function modal_form()
     {
+        // do not load on every page.
+        if ( get_url_var( 'page' ) !== 'gh_funnels' || get_url_var( 'action' ) !== 'edit' ){
+            return;
+        }
+
         ?>
         <div id="form-field-editor" class="form-field-editor hidden">
             <form class="form-field-form" id="form-field-form" method="post" action="">

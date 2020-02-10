@@ -15,7 +15,7 @@ abstract class Input extends Field
 
         // No sense in updating for every single visitor visit... not efficient
         if ( current_user_can( 'edit_funnels' ) ){
-            add_action( 'groundhogg/form/shortcode/after', [ self::class, 'save_config' ] );
+            add_filter( 'groundhogg/form/shortcode', [ self::class, 'save_config' ] );
         }
 
         parent::__construct($id);
@@ -25,12 +25,17 @@ abstract class Input extends Field
 
     /**
      * @param $form Form
+     * @param $html string
+     *
+     * @return string
      */
-    public static function save_config( $form )
+    public static function save_config( $html, $form )
     {
         $config = self::$configurations[ $form->get_id() ];
 
         get_db( 'stepmeta' )->update_meta( $form->get_id(), 'config', $config );
+
+        return $html;
     }
 
     /**
