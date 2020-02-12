@@ -593,13 +593,15 @@ class Form_Filled extends Benchmark
                                 'id' => 'field-width',
                                 'name' => 'width',
                                 'options' => array(
+                                    '1/1' => '1/1',
                                     '1/2' => '1/2',
                                     '1/3' => '1/3',
                                     '1/4' => '1/4',
                                     '2/3' => '2/3',
                                     '3/4' => '3/4',
-                                    '1/1' => '1/1'
-                                ) ) );
+                                ),
+                                'option_none' => false
+                            ) );
                             ?><p class="description"><?php _e( 'The width of the column.', 'groundhogg' ); ?></p></td>
                     </tr>
                     <!-- END COLUMN OPTIONS -->

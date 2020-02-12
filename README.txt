@@ -177,7 +177,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.1.12.10 (2020-02-11) =
+= 2.1.13 (2020-02-12) =
+* TWEAKED [Refactored optin_status](https://help.groundhogg.io/article/323-refactored-optin-status-2020-02-12) to be 1 greater than the previous value. Ranges from 1-8 instead of 0-7. This allows better handling of the "unconfirmed" status which used to be marked with a 0 value.
+* TWEAKED better handling of row options in the contact table for optin statuses.
+* TWEAKED 1/1 will automatically be selected when choosing size for columns in the form builder.
 * FIXED Admin CSS not loading properly
 
 = 2.1.12.9 (2020-02-10) =
