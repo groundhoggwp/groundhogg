@@ -502,7 +502,7 @@ abstract class DB {
 
         do_action( 'groundhogg/db/pre_mass_update/' . $this->get_object_type(), $data );
 
-        $data = apply_filters( 'groundhogg/db/pre_mass_update/' . $this->get_object_type(), $data, $column_formats );
+        $data = apply_filters( 'groundhogg/db/mass_update/' . $this->get_object_type(), $data, $column_formats );
 
         if ( false === $wpdb->update( $this->table_name, $data, $where ) ) {
             return false;

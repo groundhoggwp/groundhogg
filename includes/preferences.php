@@ -4,14 +4,14 @@ namespace Groundhogg;
 class Preferences
 {
     // Optin Statuses
-    const UNCONFIRMED   = 0;
-    const CONFIRMED     = 1;
-    const UNSUBSCRIBED  = 2;
-    const WEEKLY        = 3;
-    const MONTHLY       = 4;
-    const HARD_BOUNCE   = 5;
-    const SPAM          = 6;
-    const COMPLAINED    = 7;
+    const UNCONFIRMED   = 1;
+    const CONFIRMED     = 2;
+    const UNSUBSCRIBED  = 3;
+    const WEEKLY        = 4;
+    const MONTHLY       = 5;
+    const HARD_BOUNCE   = 6;
+    const SPAM          = 7;
+    const COMPLAINED    = 8;
 
     public function __construct()
     {

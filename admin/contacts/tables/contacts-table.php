@@ -244,7 +244,7 @@ class Contacts_Table extends WP_List_Table {
 			'delete'     => _x( 'Delete', 'List table bulk action', 'groundhogg' ),
 		);
 
-		if ( $this->get_view() === 'spam' ) {
+		if ( in_array( $this->get_view(), [ '' ] ) ) {
 			$actions['unspam'] = _x( 'Approve', 'List table bulk action', 'groundhogg' );
 		} else {
 			$actions['spam'] = _x( 'Mark as Spam', 'List table bulk action', 'groundhogg' );
@@ -255,7 +255,7 @@ class Contacts_Table extends WP_List_Table {
 	}
 
 	protected function get_view() {
-		return ( isset( $_GET['optin_status'] ) ) ? absint( $_GET['optin_status'] ) : 10;
+		return ( isset( $_GET['optin_status'] ) ) ? absint( $_GET['optin_status'] ) : 0;
 	}
 
 	protected function get_views() {
@@ -367,9 +367,7 @@ class Contacts_Table extends WP_List_Table {
 
 		if ( is_array( $optin_status ) ){
             $query['optin_status'] = map_deep( $optin_status, 'absint' );
-        } else if ( $optin_status || ( absint( $optin_status ) === Preferences::UNCONFIRMED && isset( $_GET['optin_status'] ) && ! isset_not_empty( $_GET, 'search' ) ) ) {
-			$query['optin_status'] = $optin_status;
-		}
+        }
 
 		// Sales person can only see their own contacts...
 		if ( current_user_is( 'sales_manager' ) ) {
@@ -385,7 +383,6 @@ class Contacts_Table extends WP_List_Table {
 		$include_date_query = false;
 
 		if ( $date_before = get_request_var( 'date_before' ) ){
-//		    $date_before = sanitize_text_field( sprintf( '%s 00:00:00', $date_before ) );
 		    $date_before = sanitize_text_field( $date_before );
 		    $date_inner_query[ 'before' ] = $date_before;
 
@@ -393,7 +390,6 @@ class Contacts_Table extends WP_List_Table {
         }
 
         if ( $date_after = get_request_var( 'date_after' ) ){
-//            $date_after = sanitize_text_field( sprintf( '%s 00:00:00', $date_after ) );
             $date_after = sanitize_text_field( $date_after );
             $date_inner_query[ 'after' ] = $date_after;
 
@@ -416,12 +412,8 @@ class Contacts_Table extends WP_List_Table {
 
 		$this->query = $query;
 
-//		var_dump( $query );
-
 		$c_query = new Contact_Query();
 		$data    = $c_query->query( $query );
-//        var_dump( $c_query->request );
-//        die();
 
 		set_transient( 'groundhogg_contact_query_args', $c_query->query_vars, HOUR_IN_SECONDS );
 
@@ -477,7 +469,7 @@ class Contacts_Table extends WP_List_Table {
 			__( 'Edit' )
 		);
 
-		if ( absint( get_request_var( 'optin_status' ) ) === Preferences::SPAM ) {
+		if ( $contact->get_optin_status() === Preferences::SPAM ) {
 			$actions['unspam'] = sprintf(
 				'<a href="%s" class="unspam" aria-label="%s">%s</a>',
 				wp_nonce_url( admin_url( 'admin.php?page=gh_contacts&contact=' . $contact->get_id() . '&action=unspam' ) ),
@@ -485,7 +477,7 @@ class Contacts_Table extends WP_List_Table {
 				esc_attr( sprintf( _x( 'Mark %s as approved.', 'action', 'groundhogg' ), $title ) ),
 				__( 'Approve' )
 			);
-		} else if ( absint( get_request_var( 'optin_status' ) ) === Preferences::HARD_BOUNCE ) {
+		} else if ( $contact->get_optin_status() === Preferences::HARD_BOUNCE ) {
 			$actions['unbounce'] = sprintf(
 				'<a href="%s" class="unbounce" aria-label="%s">%s</a>',
 				wp_nonce_url( admin_url( 'admin.php?page=gh_contacts&contact=' . $contact->get_id() . '&action=unbounce' ) ),

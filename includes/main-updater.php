@@ -48,6 +48,7 @@ class Main_Updater extends Updater {
             '2.1.6.2',
             '2.1.7.1',
             '2.1.11.1',
+            '2.1.13',
         ];
     }
 
@@ -193,5 +194,33 @@ class Main_Updater extends Updater {
     public function version_2_1_11_1()
     {
         get_db( 'events' )->create_table();
+    }
+
+    /**
+     * Refactor contact optin statuses
+     */
+    public function version_2_1_13()
+    {
+
+        $contacts = get_db( 'contacts' );
+
+        $changes = [
+            7 => Preferences::COMPLAINED,
+            6 => Preferences::SPAM,
+            5 => Preferences::HARD_BOUNCE,
+            4 => Preferences::MONTHLY,
+            3 => Preferences::WEEKLY,
+            2 => Preferences::UNSUBSCRIBED,
+            1 => Preferences::CONFIRMED,
+            0 => Preferences::UNCONFIRMED
+        ];
+
+        foreach ( $changes as $old_status => $new_status ){
+            $contacts->mass_update( [
+                'optin_status' => $new_status
+            ], [
+                'optin_status' => $old_status
+            ] );
+        }
     }
 }

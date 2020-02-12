@@ -2,6 +2,7 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use Groundhogg\Preferences;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Contact_Query;
 
@@ -122,7 +123,7 @@ class Contacts extends DB {
             'last_name'      => '',
             'user_id'        => 0,
             'owner_id'       => 0,
-            'optin_status'   => 0,
+            'optin_status'   => Preferences::UNCONFIRMED,
             'date_created'   => current_time( 'mysql' ),
         );
     }
