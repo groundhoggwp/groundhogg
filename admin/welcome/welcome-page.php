@@ -141,7 +141,8 @@ class Welcome_Page extends Admin_Page
     /* Enque JS or CSS */
     public function scripts()
     {
-        wp_enqueue_style('groundhogg-admin-welcome');
+        wp_enqueue_style('groundhogg-admin' );
+        wp_enqueue_style('groundhogg-admin-welcome' );
     }
 
     /**

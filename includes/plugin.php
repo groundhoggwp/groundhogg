@@ -32,6 +32,7 @@ class Plugin {
      *
      * @since 1.0.0
      * @access public
+     *
      * @static
      *
      * @var Plugin

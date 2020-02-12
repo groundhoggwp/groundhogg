@@ -61,7 +61,9 @@ class Tools_Page extends Tabbed_Admin_Page
     // Unused functions.
     public function view(){}
 
-    public function scripts(){}
+    public function scripts(){
+        wp_enqueue_style( 'groundhogg-admin' );
+    }
 
     public function help(){}
 

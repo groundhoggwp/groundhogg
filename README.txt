@@ -177,6 +177,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.12.10 (2020-02-11) =
+* FIXED Admin CSS not loading properly
+
 = 2.1.12.9 (2020-02-10) =
 * FIXED The form field builder was loading on every admin page. Now only loads on funnel edit screen.
 * FIXED Form config not saving
