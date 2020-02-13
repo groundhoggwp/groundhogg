@@ -13,7 +13,7 @@ class Date_Time
 
     public function get_wp_offset( $in_seconds = true )
     {
-        $offset = intval( get_option( 'gmt_offset' ) );
+        $offset = floatval( get_option( 'gmt_offset' ) );
 
         if ( $in_seconds ){
             $offset = $offset * HOUR_IN_SECONDS;
