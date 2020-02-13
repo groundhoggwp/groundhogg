@@ -54,6 +54,16 @@ abstract class Updater{
     }
 
     /**
+     * Whether a certain update was performed or not.
+     *
+     * @param $version
+     * @return bool
+     */
+    public function did_update( $version ){
+        return in_array( $version, $this->get_previous_versions() );
+    }
+
+    /**
      * Set the last updated to version in the DB
      *
      * @param $version

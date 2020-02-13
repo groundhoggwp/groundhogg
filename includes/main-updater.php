@@ -201,6 +201,10 @@ class Main_Updater extends Updater {
      */
     public function version_2_1_13()
     {
+        // Prevent this updated from happening a second time.
+        if ( $this->did_update( '2.1.13' ) ){
+            return;
+        }
 
         $contacts = get_db( 'contacts' );
 
