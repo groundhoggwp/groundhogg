@@ -177,6 +177,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.13.1 (2020-02-15) =
+* ADDED Lock to the update path so two update processes cannot run.
+* ADDED Optional update to revert automatic DB update in during 2.1.13 upgrade
+* ADDED "Are you sure?" confirmation when re-performing manual updates from the tools page.
+
 = 2.1.13 (2020-02-12) =
 * TWEAKED [Refactored optin_status](https://help.groundhogg.io/article/323-refactored-optin-status-2020-02-12) to be 1 greater than the previous value. Ranges from 1-8 instead of 0-7. This allows better handling of the "unconfirmed" status which used to be marked with a 0 value.
 * TWEAKED better handling of row options in the contact table for optin statuses.

@@ -52,7 +52,18 @@ class Main_Updater extends Updater {
         ];
     }
 
-    /**
+	/**
+	 * Updates that will allow you to revert.
+	 *
+	 * @return array|string[]
+	 */
+    protected function get_optional_updates() {
+    	return [
+    		'2.1.13.revert'
+	    ];
+    }
+
+	/**
      * Update to 2.0
      *
      * 1. Convert any options.
@@ -201,10 +212,6 @@ class Main_Updater extends Updater {
      */
     public function version_2_1_13()
     {
-        // Prevent this updated from happening a second time.
-        if ( $this->did_update( '2.1.13' ) ){
-            return;
-        }
 
         $contacts = get_db( 'contacts' );
 
@@ -226,5 +233,28 @@ class Main_Updater extends Updater {
                 'optin_status' => $old_status
             ] );
         }
+    }
+
+    public function version_2_1_13_revert()
+    {
+	    $contacts = get_db( 'contacts' );
+
+	    $changes = [
+		    2 => 1,
+		    3 => 2,
+		    4 => 3,
+		    5 => 4,
+		    6 => 5,
+		    7 => 6,
+		    8 => 7,
+	    ];
+
+	    foreach ( $changes as $old_status => $new_status ){
+		    $contacts->mass_update( [
+			    'optin_status' => $new_status
+		    ], [
+			    'optin_status' => $old_status
+		    ] );
+	    }
     }
 }

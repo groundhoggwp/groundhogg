@@ -651,15 +651,36 @@ class Tools_Page extends Tabbed_Admin_Page
 
     public function updates_view()
     {
+
         ?>
         <div id="poststuff">
             <div class="postbox">
                 <h2 class="hndle"><?php _e( 'Previous Updates', 'groundhogg' ); ?></h2>
                 <div class="inside">
+                    <?php
+
+                    if ( get_request_var( 'confirm' ) === 'yes' ):
+
+	                    ?>
+                        <p class="description"><?php _e( 'WARNING: Re-performing previous updates can cause unexpected issues and should be done with caution. We recommend you backup your site, or export your contact list before proceeding.', 'groundhogg' ); ?></p>
+	                    <?php
+
+
+	                    echo html()->e( 'a', [ 'class' => 'big-button button-primary', 'href' => add_query_arg( [
+		                    'updater' => sanitize_text_field( get_request_var( 'updater' ) ),
+		                    'manual_update' => sanitize_text_field( get_request_var( 'manual_update' ) ),
+		                    'manual_update_nonce' => wp_create_nonce( 'gh_manual_update' ),
+	                    ], $_SERVER[ 'REQUEST_URI' ] ) ], sprintf( __( 'Yes, perform update %s', 'groundhogg' ), sanitize_text_field( get_request_var( 'manual_update' ) ) ) );
+
+                    else:
+
+                    ?>
                     <p class="description"><?php _e( 'Run previous update paths in case of a failed update.', 'groundhogg' ); ?></p>
                     <?php
 
                     do_action( 'groundhogg/admin/tools/updates' );
+
+                    endif;
 
                     ?>
                 </div>

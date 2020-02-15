@@ -43,6 +43,16 @@ abstract class Updater{
      */
     abstract protected function get_available_updates();
 
+	/**
+	 * Get a list of updates that do not update automatically, but will show on the updates page
+     *
+     * @return string[]
+	 */
+    protected function get_optional_updates()
+    {
+       return [];
+    }
+
     /**
      * Get the previous version which the plugin was updated to.
      *
@@ -93,15 +103,19 @@ abstract class Updater{
     {
         ?><h3><?php echo apply_filters( 'groundhogg/updater/display_name', $this->get_display_name() ); ?></h3><?php
 
-        foreach ( $this->get_available_updates() as $update ):
+        $updates = array_merge( $this->get_available_updates(), $this->get_optional_updates() );
+
+        usort( $updates, 'version_compare' );
+
+        foreach ( $updates as $update ):
 
             ?><p><?php
 
-            echo html()->e( 'a', [ 'href' => add_query_arg( [
-                'updater' => $this->get_updater_name(),
-                'manual_update' => $update,
-                'manual_update_nonce' => wp_create_nonce( 'gh_manual_update' ),
-            ], $_SERVER[ 'REQUEST_URI' ] ) ], sprintf( __( 'Version %s', 'groundhogg' ), $update ) )
+	        echo html()->e( 'a', [ 'href' => add_query_arg( [
+		        'updater' => $this->get_updater_name(),
+		        'manual_update' => $update,
+		        'confirm' => 'yes',
+	        ], $_SERVER[ 'REQUEST_URI' ] ) ], sprintf( __( 'Version %s', 'groundhogg' ), $update ) );
 
             ?></p><?php
 
@@ -120,11 +134,20 @@ abstract class Updater{
 
         $update = get_url_var( 'manual_update' );
 
-        if ( $this->update_to_version( $update ) ){
+	    $updates = array_merge( $this->get_available_updates(), $this->get_optional_updates() );
+
+	    if ( ! in_array( $update, $updates ) ){
+	        return;
+        }
+
+	    if ( $this->update_to_version( $update ) ){
             Plugin::$instance->notices->add( 'updated', sprintf( __( 'Update to version %s successful!', 'groundhogg' ), $update ) );
         } else {
             Plugin::$instance->notices->add( new \WP_Error( 'update_failed', __( 'Update failed.', 'groundhogg' ) ) );
         }
+
+	    wp_safe_redirect( admin_page_url( 'gh_tools', [ 'tab' => 'updates' ] ) );
+	    die();
     }
 
     /**
@@ -132,6 +155,14 @@ abstract class Updater{
      */
     public function do_updates()
     {
+
+	    // Check if an update lock is present.
+        if ( get_transient( 'gh_' . $this->get_updater_name() . '_doing_updates' ) ){
+            return;
+        }
+
+        // Set lock so second update process cannot be run before this one is complete.
+        set_transient( 'gh_' . $this->get_updater_name() . '_doing_updates', time(), MINUTE_IN_SECONDS );
 
         $previous_updates  = $this->get_previous_versions();
 
