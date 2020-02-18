@@ -2,11 +2,22 @@
 /.git
 /.github
 /node_modules
+/vendor
+/bin
 
+.babelrc
 .distignore
 .gitattributes
 .gitignore
-.babelrc
+.phpcs.xml.dist
+.travis.yml
+composer.json
+composer.lock
+composer.phar
 package.json
 package-lock.json
+phpunit.xml.dist
 webpack.config.js
+wp-cli.phar
+wp-cli.yml
+
