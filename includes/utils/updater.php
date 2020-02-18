@@ -1,229 +1,267 @@
 <?php
+
 namespace Groundhogg;
 
 
 /**
  * Updater
  *
- * @package     Includes
+ * @since       File available since Release 1.0.16
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 1.0.16
+ * @package     Includes
  */
-abstract class Updater{
+abstract class Updater {
 
 
-    /**
-     * WPGH_Upgrade constructor.
-     */
-    public function __construct()
-    {
-        add_action( 'init', [ $this, 'do_updates' ], 99 ); // DO LAST
-        add_action( 'groundhogg/admin/tools/updates', [ $this, 'show_manual_updates' ] ); // DO LAST
-        add_action( 'admin_init', [ $this, 'do_manual_updates' ], 99 ); // DO LAST
-    }
+	/**
+	 * WPGH_Upgrade constructor.
+	 */
+	public function __construct() {
+		add_action( 'upgrader_process_complete', [ $this, 'schedule_updates' ], 99, 2 ); // DO LAST
+		add_action( "groundhogg/{$this->get_updater_name()}/do_updates", [ $this, 'do_updates' ] );
+		add_action( 'groundhogg/admin/tools/updates', [ $this, 'show_manual_updates' ] ); // DO LAST
+		add_action( 'admin_init', [ $this, 'do_manual_updates' ], 99 ); // DO LAST
+	}
 
-    public function get_display_name()
-    {
-        return key_to_words( $this->get_updater_name() );
-    }
+	/**
+	 * Get the display name of the updater for the tools page
+	 *
+	 * @return string
+	 */
+	public function get_display_name() {
+		return key_to_words( $this->get_updater_name() );
+	}
 
-    /**
-     * A unique name for the updater to avoid conflicts
-     *
-     * @return string
-     */
-    abstract protected function get_updater_name();
+	/**
+	 * Get the plugin file for this extension
+	 *
+	 * @return string
+	 */
+	protected function get_plugin_file() {
+		return GROUNDHOGG__FILE__;
+	}
 
-    /**
-     * Get a list of updates which are available.
-     *
-     * @return string[]
-     */
-    abstract protected function get_available_updates();
+	/**
+	 * A unique name for the updater to avoid conflicts
+	 *
+	 * @return string
+	 */
+	abstract protected function get_updater_name();
+
+	/**
+	 * Get a list of updates which are available.
+	 *
+	 * @return string[]
+	 */
+	abstract protected function get_available_updates();
 
 	/**
 	 * Get a list of updates that do not update automatically, but will show on the updates page
-     *
-     * @return string[]
+	 *
+	 * @return string[]
 	 */
-    protected function get_optional_updates()
-    {
-       return [];
-    }
+	protected function get_optional_updates() {
+		return [];
+	}
 
-    /**
-     * Get the previous version which the plugin was updated to.
-     *
-     * @return string[]
-     */
-    protected function get_previous_versions()
-    {
-        return Plugin::$instance->settings->get_option( $this->get_version_option_name(), [] );
-    }
+	/**
+	 * Get the previous version which the plugin was updated to.
+	 *
+	 * @return string[]
+	 */
+	protected function get_previous_versions() {
+		return Plugin::$instance->settings->get_option( $this->get_version_option_name(), [] );
+	}
 
-    /**
-     * Whether a certain update was performed or not.
-     *
-     * @param $version
-     * @return bool
-     */
-    public function did_update( $version ){
-        return in_array( $version, $this->get_previous_versions() );
-    }
+	/**
+	 * Whether a certain update was performed or not.
+	 *
+	 * @param $version
+	 *
+	 * @return bool
+	 */
+	public function did_update( $version ) {
+		return in_array( $version, $this->get_previous_versions() );
+	}
 
-    /**
-     * Set the last updated to version in the DB
-     *
-     * @param $version
-     */
-    protected function remember_version_update( $version )
-    {
-        $versions = $this->get_previous_versions();
+	/**
+	 * Set the last updated to version in the DB
+	 *
+	 * @param $version
+	 */
+	protected function remember_version_update( $version ) {
+		$versions = $this->get_previous_versions();
 
-        if ( ! in_array( $version, $versions ) ){
-            $versions[] = $version;
-        }
+		if ( ! in_array( $version, $versions ) ) {
+			$versions[] = $version;
+		}
 
-        Plugin::$instance->settings->update_option( $this->get_version_option_name(), $versions );
-    }
+		Plugin::$instance->settings->update_option( $this->get_version_option_name(), $versions );
+	}
 
-    /**
-     * Gets the DB option name to retrieve the previous version.
-     *
-     * @return string
-     */
-    protected function get_version_option_name()
-    {
-        return sanitize_key( sprintf( '%s_version_updates', $this->get_updater_name() ) );
-    }
+	/**
+	 * Gets the DB option name to retrieve the previous version.
+	 *
+	 * @return string
+	 */
+	protected function get_version_option_name() {
+		return sanitize_key( sprintf( '%s_version_updates', $this->get_updater_name() ) );
+	}
 
-    public function show_manual_updates()
-    {
-        ?><h3><?php echo apply_filters( 'groundhogg/updater/display_name', $this->get_display_name() ); ?></h3><?php
+	/**
+	 * Show the manual updates in the tools area
+	 */
+	public function show_manual_updates() {
+		?><h3><?php echo apply_filters( 'groundhogg/updater/display_name', $this->get_display_name() ); ?></h3><?php
 
-        $updates = array_merge( $this->get_available_updates(), $this->get_optional_updates() );
+		$updates = array_merge( $this->get_available_updates(), $this->get_optional_updates() );
 
-        usort( $updates, 'version_compare' );
+		usort( $updates, 'version_compare' );
 
-        foreach ( $updates as $update ):
+		foreach ( $updates as $update ):
 
-            ?><p><?php
+			?><p><?php
 
-	        echo html()->e( 'a', [ 'href' => add_query_arg( [
-		        'updater' => $this->get_updater_name(),
-		        'manual_update' => $update,
-		        'confirm' => 'yes',
-	        ], $_SERVER[ 'REQUEST_URI' ] ) ], sprintf( __( 'Version %s', 'groundhogg' ), $update ) );
+			echo html()->e( 'a', [
+				'href' => add_query_arg( [
+					'updater'       => $this->get_updater_name(),
+					'manual_update' => $update,
+					'confirm'       => 'yes',
+				], $_SERVER['REQUEST_URI'] )
+			], sprintf( __( 'Version %s', 'groundhogg' ), $update ) );
 
-            ?></p><?php
+			?></p><?php
 
-        endforeach;
-    }
+		endforeach;
+	}
 
-    /**
-     * Manually perform a selected update routine.
-     */
-    public function do_manual_updates()
-    {
+	/**
+	 * Manually perform a selected update routine.
+	 */
+	public function do_manual_updates() {
 
-        if ( get_request_var( 'updater' ) !== $this->get_updater_name() || ! get_request_var( 'manual_update' ) || ! wp_verify_nonce( get_request_var( 'manual_update_nonce' ), 'gh_manual_update' ) || ! current_user_can( 'install_plugins' ) ){
-            return;
-        }
+		if ( get_request_var( 'updater' ) !== $this->get_updater_name() || ! get_request_var( 'manual_update' ) || ! wp_verify_nonce( get_request_var( 'manual_update_nonce' ), 'gh_manual_update' ) || ! current_user_can( 'install_plugins' ) ) {
+			return;
+		}
 
-        $update = get_url_var( 'manual_update' );
+		$update = get_url_var( 'manual_update' );
 
-	    $updates = array_merge( $this->get_available_updates(), $this->get_optional_updates() );
+		$updates = array_merge( $this->get_available_updates(), $this->get_optional_updates() );
 
-	    if ( ! in_array( $update, $updates ) ){
-	        return;
-        }
+		if ( ! in_array( $update, $updates ) ) {
+			return;
+		}
 
-	    if ( $this->update_to_version( $update ) ){
-            Plugin::$instance->notices->add( 'updated', sprintf( __( 'Update to version %s successful!', 'groundhogg' ), $update ) );
-        } else {
-            Plugin::$instance->notices->add( new \WP_Error( 'update_failed', __( 'Update failed.', 'groundhogg' ) ) );
-        }
+		if ( $this->update_to_version( $update ) ) {
+			Plugin::$instance->notices->add( 'updated', sprintf( __( 'Update to version %s successful!', 'groundhogg' ), $update ) );
+		} else {
+			Plugin::$instance->notices->add( new \WP_Error( 'update_failed', __( 'Update failed.', 'groundhogg' ) ) );
+		}
 
-	    wp_safe_redirect( admin_page_url( 'gh_tools', [ 'tab' => 'updates' ] ) );
-	    die();
-    }
+		wp_safe_redirect( admin_page_url( 'gh_tools', [ 'tab' => 'updates' ] ) );
+		die();
+	}
 
-    /**
-     * Check whether upgrades should happen or not.
-     */
-    public function do_updates()
-    {
+	/**
+	 * Schedule the automatic updates based on the file
+	 *
+	 * @param $upgrader
+	 * @param $options
+	 */
+	public function schedule_updates( $upgrader, $options ) {
+		// If an update has taken place and the updated type is plugins and the plugins element exists
+		if ( $options['action'] == 'update' && $options['type'] == 'plugin' && isset( $options['plugins'] ) ) {
+            // Schedule a cron event to run right away that will run the automatic updates
+            if ( ! wp_next_scheduled( "groundhogg/{$this->get_updater_name()}/do_updates" ) ){
+                wp_schedule_single_event( time(), "groundhogg/{$this->get_updater_name()}/do_updates" );
+            }
+		}
+	}
 
-	    // Check if an update lock is present.
-        if ( get_transient( 'gh_' . $this->get_updater_name() . '_doing_updates' ) ){
-            return;
-        }
+	/**
+	 * Check whether upgrades should happen or not.
+	 */
+	public function do_updates() {
 
-        // Set lock so second update process cannot be run before this one is complete.
-        set_transient( 'gh_' . $this->get_updater_name() . '_doing_updates', time(), MINUTE_IN_SECONDS );
+		$update_lock = 'gh_' . $this->get_updater_name() . '_doing_updates';
 
-        $previous_updates  = $this->get_previous_versions();
+		// Check if an update lock is present.
+		if ( get_transient( $update_lock ) ) {
+			return;
+		}
 
-        // installing...
-        if ( ! $previous_updates && ! get_option( 'wpgh_last_upgrade_version' ) ){
-            Plugin::$instance->settings->update_option( $this->get_version_option_name(), $this->get_available_updates() );
-            return;
-        }
+		// Set lock so second update process cannot be run before this one is complete.
+		set_transient( $update_lock, time(), MINUTE_IN_SECONDS );
 
-        $available_updates = $this->get_available_updates();
-        $missing_updates = array_diff( $available_updates, $previous_updates );
+		$previous_updates = $this->get_previous_versions();
 
-        if ( empty( $missing_updates ) ){
-            return;
-        }
+		// installing...
+		if ( ! $previous_updates || empty( $previous_updates ) ) {
+			Plugin::$instance->settings->update_option( $this->get_version_option_name(), $this->get_available_updates() );
 
-        foreach ( $missing_updates as $update ){
-            $this->update_to_version( $update );
-        }
+			return;
+		}
 
-        do_action( "groundhogg/updater/{$this->get_updater_name()}/finished" );
-    }
+		$available_updates = $this->get_available_updates();
+		$missing_updates   = array_diff( $available_updates, $previous_updates );
 
-    /**
-     * Takes the current version number and converts it to a function which can be clled to perform the upgrade requirements.
-     *
-     * @param $version string
-     * @return bool|string
-     */
-    private function convert_version_to_function( $version )
-    {
+		if ( empty( $missing_updates ) ) {
+			return;
+		}
 
-        $nums = explode( '.', $version );
-        $func = sprintf( 'version_%s', implode( '_', $nums ) );
+		foreach ( $missing_updates as $update ) {
+			$this->update_to_version( $update );
+		}
 
-        if ( method_exists( $this, $func ) ){
-            return $func;
-        }
+		do_action( "groundhogg/updater/{$this->get_updater_name()}/finished" );
+	}
 
-        return false;
+	/**
+	 * Takes the current version number and converts it to a function which can be clled to perform the upgrade requirements.
+	 *
+	 * @param $version string
+	 *
+	 * @return bool|string
+	 */
+	private function convert_version_to_function( $version ) {
 
-    }
+		$nums = explode( '.', $version );
+		$func = sprintf( 'version_%s', implode( '_', $nums ) );
 
-    private function update_to_version( $version )
-    {
-        /**
-         * Check if the version we want to update to is greater than that of the db_version
-         */
-        $func = $this->convert_version_to_function( $version );
+		if ( method_exists( $this, $func ) ) {
+			return $func;
+		}
 
-        if ( $func && method_exists( $this, $func ) ){
+		return false;
 
-            call_user_func( array( $this, $func ) );
+	}
 
-            $this->remember_version_update( $version );
+	/**
+	 * Given a version number call the related function
+	 *
+	 * @param $version
+	 *
+	 * @return bool
+	 */
+	private function update_to_version( $version ) {
+		/**
+		 * Check if the version we want to update to is greater than that of the db_version
+		 */
+		$func = $this->convert_version_to_function( $version );
 
-            do_action( "groundhogg/updater/{$this->get_updater_name()}/{$func}" );
+		if ( $func && method_exists( $this, $func ) ) {
 
-            return true;
-        }
+			call_user_func( array( $this, $func ) );
 
-        return false;
-    }
+			$this->remember_version_update( $version );
+
+			do_action( "groundhogg/updater/{$this->get_updater_name()}/{$func}" );
+
+			return true;
+		}
+
+		return false;
+	}
 }

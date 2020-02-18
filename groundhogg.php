@@ -25,7 +25,6 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 define( 'GROUNDHOGG_VERSION', '2.1.13.1' );
 define( 'GROUNDHOGG_PREVIOUS_STABLE_VERSION', '2.1.13' );
 
-
 define( 'GROUNDHOGG__FILE__', __FILE__ );
 define( 'GROUNDHOGG_PLUGIN_BASE', plugin_basename( GROUNDHOGG__FILE__ ) );
 define( 'GROUNDHOGG_PATH', plugin_dir_path( GROUNDHOGG__FILE__ ) );

@@ -1,0 +1,4 @@
+/bin/
+/vendor/
+/node_modules/
+/wp-cli.phar

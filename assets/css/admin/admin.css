@@ -216,6 +216,7 @@ input[type=range].slider:focus::-ms-fill-upper {
 }
 
 #wpbody .big-button{
+    position: relative;
     font-size: 16px;
     margin: 20px auto;
     padding: 8px 14px;
