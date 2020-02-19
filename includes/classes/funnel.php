@@ -245,7 +245,7 @@ class Funnel extends Base_Object_With_Meta {
 		$args = wp_parse_args( $args, [
 			'funnel_id'   => $this->get_id(),
 			'step_status' => 'ready',
-			'step_order'  => count( $this->get_step_ids() ),
+			'step_order'  => count( $this->get_step_ids() ) + 1,
 			'meta'        => [],
 		] );
 

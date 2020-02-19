@@ -38,6 +38,8 @@ if (!defined('ABSPATH')) exit;
 class Send_Email extends Action
 {
 
+    const TYPE = 'send_email';
+
     /**
      * @return string
      */

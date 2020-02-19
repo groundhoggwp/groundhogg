@@ -16,6 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 abstract class Action extends Funnel_Step
 {
 
+	const GROUP = 'action';
+
 	/**
 	 * @return string
 	 */
