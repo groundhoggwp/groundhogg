@@ -11,6 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 abstract class Benchmark extends Funnel_Step
 {
+	const GROUP = 'benchmark';
 
 	/**
 	 * @return string

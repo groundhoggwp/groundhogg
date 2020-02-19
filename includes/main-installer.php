@@ -6,7 +6,17 @@ use Groundhogg\DB\Manager;
 class Main_Installer extends Installer
 {
 
-    /**
+	/**
+	 * A unique name for the updater to avoid conflicts
+	 *
+	 * @return string
+	 */
+	protected function get_installer_name()
+	{
+		return 'main';
+	}
+
+	/**
      * Activate the Groundhogg plugin.
      */
     protected function activate()
@@ -42,19 +52,23 @@ class Main_Installer extends Installer
             }
         }
 
+        // Install any custom rewrites
         install_custom_rewrites();
+
+        // Store previous updates
+        Plugin::instance()->updater->save_previous_updates_when_installed();
     }
 
 	public function get_display_name() {
 		return white_labeled_name();
 	}
 
-    protected function deactivate()
+	protected function deactivate()
     {
         // TODO: Implement deactivate() method.
     }
 
-    /**
+	/**
      * The path to the main plugin file
      *
      * @return string
@@ -64,7 +78,7 @@ class Main_Installer extends Installer
         return GROUNDHOGG__FILE__;
     }
 
-    /**
+	/**
      * Get the plugin version
      *
      * @return string
@@ -72,16 +86,6 @@ class Main_Installer extends Installer
     function get_plugin_version()
     {
         return GROUNDHOGG_VERSION;
-    }
-
-    /**
-     * A unique name for the updater to avoid conflicts
-     *
-     * @return string
-     */
-    protected function get_installer_name()
-    {
-        return 'main';
     }
 
     /**

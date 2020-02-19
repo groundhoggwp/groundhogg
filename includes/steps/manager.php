@@ -1,5 +1,7 @@
 <?php
+
 namespace Groundhogg\Steps;
+
 use Groundhogg\Steps\Actions\Action;
 use Groundhogg\Steps\Actions\Admin_Notification;
 use Groundhogg\Steps\Actions\Advanced_Timer;
@@ -34,86 +36,113 @@ use function Groundhogg\is_option_enabled;
  * Date: 01-May-19
  * Time: 4:34 PM
  */
-
 class Manager {
 
-    /**
-     * Storage for the instances of the elements
-     *
-     * @var array
-     */
-    private $elements = array();
+	/**
+	 * Storage for the instances of the elements
+	 *
+	 * @var array
+	 */
+	public $elements = array();
 
-    /**
-     * Manager constructor.
-     */
-    public function __construct()
-    {
-        // RIGHT AFTER THE DBS.
-        add_action( 'setup_theme', [ $this, 'init_steps' ], 2 );
-    }
+	/**
+	 * Manager constructor.
+	 */
+	public function __construct() {
+		// RIGHT AFTER THE DBS.
+		add_action( 'setup_theme', [ $this, 'init_steps' ], 2 );
+	}
 
-    public function init_steps()
-    {
-        /* actions */
-        $this->elements[] = new Send_Email();
-        $this->elements[] = new Admin_Notification();
-        $this->elements[] = new Apply_Tag();
-        $this->elements[] = new Remove_Tag();
-        $this->elements[] = new Apply_Note();
-        $this->elements[] = new Delay_Timer();
+	/**
+	 * Initialize all the steps
+	 */
+	public function init_steps() {
 
-        /* Benchmarks */
-        $this->elements[] = new Account_Created();
-        $this->elements[] = new Form_Filled();
-        $this->elements[] = new Email_Confirmed();
-        $this->elements[] = new Link_Clicked();
+//		if ( ! empty( $this->elements ) ){
+//			return;
+//		}
 
-        // No page view if tracking is disabled.
-        $this->elements[] = new Tag_Applied();
-        $this->elements[] = new Tag_Removed();
 
-        /* Other */
-        $this->elements[] = new Error();
+		/* actions */
+		$this->add_step( new Send_Email() );
+		$this->add_step( new Admin_Notification() );
+		$this->add_step( new Apply_Tag() );
+		$this->add_step( new Remove_Tag() );
+		$this->add_step( new Apply_Note() );
+		$this->add_step( new Delay_Timer() );
 
-        do_action( 'groundhogg/steps/init', $this );
-    }
+		/* Benchmarks */
 
-    /**
-     * @param $step Funnel_Step
-     */
-    public function add_step( $step )
-    {
-        $this->elements[] = $step;
-    }
+		$this->add_step( new Form_Filled() );
+		$this->add_step( new Account_Created() );
+		$this->add_step( new Email_Confirmed() );
+		$this->add_step( new Link_Clicked() );
+		$this->add_step( new Tag_Applied() );
+		$this->add_step( new Tag_Removed() );
 
-    /**
-     * Return an array of benchmarks
-     *
-     * @return Benchmark[]
-     */
-    public function get_benchmarks()
-    {
-        return apply_filters( "groundhogg/steps/benchmarks", array() );
-    }
+		/* Other */
+		$this->add_step( new Error() );
 
-    /**
-     * Return an array of actions
-     *
-     * @return Action[]
-     */
-    public function get_actions()
-    {
-        return apply_filters( 'groundhogg/steps/actions',  array() );
-    }
+		do_action( 'groundhogg/steps/init', $this );
+	}
 
-    /**
-     * Get an array of ALL benchmarks and actions
-     *
-     * @return Funnel_Step[]
-     */
-    public function get_elements()
-    {
-        return array_merge( $this->get_actions(), $this->get_benchmarks() );
-    }
+	/**
+	 * @param $step Funnel_Step
+	 */
+	public function add_step( $step ) {
+		$this->elements[ $step->get_type() ] = $step;
+	}
+
+	/**
+	 * Return an array of benchmarks
+	 *
+	 * @return Benchmark[]
+	 */
+	public function get_benchmarks() {
+		return apply_filters( "groundhogg/steps/benchmarks", array() );
+	}
+
+	/**
+	 * Return an array of actions
+	 *
+	 * @return Action[]
+	 */
+	public function get_actions() {
+		return apply_filters( 'groundhogg/steps/actions', array() );
+	}
+
+	/**
+	 * @return array
+	 */
+	public function get_benchmark_types() {
+		$types = [];
+
+		foreach ( $this->get_benchmarks() as $benchmark ) {
+			$types[] = $benchmark->get_type();
+		}
+
+		return $types;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function get_action_types() {
+		$types = [];
+
+		foreach ( $this->get_actions() as $action ) {
+			$types[] = $action->get_type();
+		}
+
+		return $types;
+	}
+
+	/**
+	 * Get an array of ALL benchmarks and actions
+	 *
+	 * @return Funnel_Step[]
+	 */
+	public function get_elements() {
+		return array_merge( $this->get_actions(), $this->get_benchmarks() );
+	}
 }

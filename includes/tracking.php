@@ -600,7 +600,7 @@ class Tracking
      */
     public function form_filled( $contact )
     {
-        if ( is_user_logged_in() ){
+        if ( is_user_logged_in() || headers_sent() ){
             return;
         }
 

@@ -364,7 +364,7 @@ class Contact extends Base_Object_With_Meta
      */
     public function exists()
     {
-        return is_email( $this->email );
+        return (bool) is_email( $this->email );
     }
 
     /**

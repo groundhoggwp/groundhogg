@@ -1024,6 +1024,16 @@ abstract class DB {
 
     }
 
+	/**
+	 * Empty the table
+	 */
+    public function truncate()
+    {
+	    global $wpdb;
+
+	    $wpdb->query( "DELETE FROM " . $this->table_name );
+    }
+
     /**
      * Update the DB if required
      */

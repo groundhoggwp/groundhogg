@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <phpunit
-	bootstrap="tests/bootstrap.php"
+	bootstrap="tests/phpunit/bootstrap.php"
 	backupGlobals="false"
 	colors="true"
 	convertErrorsToExceptions="true"
@@ -8,9 +8,22 @@
 	convertWarningsToExceptions="true"
 	>
 	<testsuites>
-		<testsuite>
-			<directory prefix="test-" suffix=".php">./tests/</directory>
-			<exclude>./tests/test-sample.php</exclude>
+		<testsuite name="Groundhogg Test Suite">
+			<directory suffix=".php">./tests/phpunit/unit-tests</directory>
 		</testsuite>
 	</testsuites>
+	<filter>
+		<whitelist addUncoveredFilesFromWhitelist="true">
+			<directory suffix=".php">.</directory>
+			<exclude>
+				<!-- Third party library exclusions. -->
+				<directory suffix=".php">templates</directory>
+				<directory suffix=".php">vendor</directory>
+				<directory suffix=".php">node_modules</directory>
+
+				<!-- Do not load uninstall file -->
+				<file>uninstall.php</file>
+			</exclude>
+		</whitelist>
+	</filter>
 </phpunit>

@@ -89,6 +89,20 @@ class Manager
         }
     }
 
+	/**
+	 * Empty all of the dbs.
+	 */
+    public function truncate_dbs()
+    {
+	    if ( empty( $this->dbs ) ) {
+		    $this->init_dbs();
+	    }
+
+	    foreach ( $this->dbs as $db ){
+		    $db->truncate();
+	    }
+    }
+
     /**
      * Drop all the DBs
      */

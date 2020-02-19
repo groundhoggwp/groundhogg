@@ -19,10 +19,11 @@ abstract class Updater {
 	 * WPGH_Upgrade constructor.
 	 */
 	public function __construct() {
-		add_action( 'upgrader_process_complete', [ $this, 'schedule_updates' ], 99, 2 ); // DO LAST
+		add_action( 'upgrader_process_complete', [ $this, 'plugin_upgrader_listener' ], 99, 2 );
 		add_action( "groundhogg/{$this->get_updater_name()}/do_updates", [ $this, 'do_updates' ] );
-		add_action( 'groundhogg/admin/tools/updates', [ $this, 'show_manual_updates' ] ); // DO LAST
-		add_action( 'admin_init', [ $this, 'do_manual_updates' ], 99 ); // DO LAST
+		add_action( 'groundhogg/admin/tools/updates', [ $this, 'show_manual_updates' ] );
+		add_action( 'admin_init', [ $this, 'do_manual_updates' ], 99 );
+		add_action( 'activated_plugin', [ $this, 'save_previous_updates_when_installed' ], 99 );
 	}
 
 	/**
@@ -71,7 +72,7 @@ abstract class Updater {
 	 *
 	 * @return string[]
 	 */
-	protected function get_previous_versions() {
+	public function get_previous_versions() {
 		return Plugin::$instance->settings->get_option( $this->get_version_option_name(), [] );
 	}
 
@@ -90,6 +91,8 @@ abstract class Updater {
 	 * Set the last updated to version in the DB
 	 *
 	 * @param $version
+	 *
+	 * @return bool
 	 */
 	protected function remember_version_update( $version ) {
 		$versions = $this->get_previous_versions();
@@ -98,7 +101,26 @@ abstract class Updater {
 			$versions[] = $version;
 		}
 
-		Plugin::$instance->settings->update_option( $this->get_version_option_name(), $versions );
+		return update_option( $this->get_version_option_name(), $versions );
+	}
+
+	/**
+	 * Remove a version from the previous versions so that the updater will perform that version update
+	 *
+	 * @param $version
+	 *
+	 * @return bool
+	 */
+	public function forget_version_update( $version ) {
+		$versions = $this->get_previous_versions();
+
+		if ( ! in_array( $version, $versions ) ) {
+			return false;
+		}
+
+		unset( $versions[ array_search( $version, $versions ) ] );
+
+		return update_option( $this->get_version_option_name(), $versions );
 	}
 
 	/**
@@ -107,7 +129,7 @@ abstract class Updater {
 	 * @return string
 	 */
 	protected function get_version_option_name() {
-		return sanitize_key( sprintf( '%s_version_updates', $this->get_updater_name() ) );
+		return sanitize_key( sprintf( 'gh_%s_version_updates', $this->get_updater_name() ) );
 	}
 
 	/**
@@ -126,9 +148,9 @@ abstract class Updater {
 
 			echo html()->e( 'a', [
 				'href' => add_query_arg( [
-					'updater'       => $this->get_updater_name(),
+					'updater' => $this->get_updater_name(),
 					'manual_update' => $update,
-					'confirm'       => 'yes',
+					'confirm' => 'yes',
 				], $_SERVER['REQUEST_URI'] )
 			], sprintf( __( 'Version %s', 'groundhogg' ), $update ) );
 
@@ -170,14 +192,33 @@ abstract class Updater {
 	 * @param $upgrader
 	 * @param $options
 	 */
-	public function schedule_updates( $upgrader, $options ) {
+	public function plugin_upgrader_listener( $upgrader, $options ) {
+
 		// If an update has taken place and the updated type is plugins and the plugins element exists
-		if ( $options['action'] == 'update' && $options['type'] == 'plugin' && isset( $options['plugins'] ) ) {
+        if ( $options['action'] == 'update' && $options['type'] == 'plugin' && isset( $options['plugins'] ) ) {
+
             // Schedule a cron event to run right away that will run the automatic updates
-            if ( ! wp_next_scheduled( "groundhogg/{$this->get_updater_name()}/do_updates" ) ){
-                wp_schedule_single_event( time(), "groundhogg/{$this->get_updater_name()}/do_updates" );
-            }
+			if ( ! wp_next_scheduled( "groundhogg/{$this->get_updater_name()}/do_updates" ) ) {
+				wp_schedule_single_event( time(), "groundhogg/{$this->get_updater_name()}/do_updates" );
+			}
 		}
+	}
+
+	/**
+	 * When the plugin is installed save the initial versions.
+	 * Do not overwrite older versions.
+	 *
+	 * @return bool
+	 */
+	public function save_previous_updates_when_installed() {
+
+		$updates = $this->get_previous_versions();
+
+		if ( ! empty( $updates ) ) {
+			return false;
+		}
+
+		return update_option( $this->get_version_option_name(), $this->get_available_updates() );
 	}
 
 	/**
@@ -189,7 +230,7 @@ abstract class Updater {
 
 		// Check if an update lock is present.
 		if ( get_transient( $update_lock ) ) {
-			return;
+			return false;
 		}
 
 		// Set lock so second update process cannot be run before this one is complete.
@@ -197,18 +238,16 @@ abstract class Updater {
 
 		$previous_updates = $this->get_previous_versions();
 
-		// installing...
-		if ( ! $previous_updates || empty( $previous_updates ) ) {
-			Plugin::$instance->settings->update_option( $this->get_version_option_name(), $this->get_available_updates() );
-
-			return;
+		// No previous updates, if this is the case something has gone wrong...
+		if ( empty( $previous_updates ) ) {
+			return false;
 		}
 
 		$available_updates = $this->get_available_updates();
 		$missing_updates   = array_diff( $available_updates, $previous_updates );
 
 		if ( empty( $missing_updates ) ) {
-			return;
+			return false;
 		}
 
 		foreach ( $missing_updates as $update ) {
@@ -216,6 +255,8 @@ abstract class Updater {
 		}
 
 		do_action( "groundhogg/updater/{$this->get_updater_name()}/finished" );
+
+		return true;
 	}
 
 	/**
@@ -235,7 +276,6 @@ abstract class Updater {
 		}
 
 		return false;
-
 	}
 
 	/**
@@ -246,9 +286,8 @@ abstract class Updater {
 	 * @return bool
 	 */
 	private function update_to_version( $version ) {
-		/**
-		 * Check if the version we want to update to is greater than that of the db_version
-		 */
+
+		// Check if the version we want to update to is greater than that of the db_version
 		$func = $this->convert_version_to_function( $version );
 
 		if ( $func && method_exists( $this, $func ) ) {

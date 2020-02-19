@@ -67,15 +67,15 @@ abstract class Funnel_Step extends Supports_Errors
      */
     public function __construct()
     {
+	    add_filter("groundhogg/steps/{$this->get_group()}s", [$this, 'register']);
 
-        if ( is_admin() && ( $this->is_editing_screen() || wp_doing_ajax() ) ) {
+	    if ( is_admin() && ( $this->is_editing_screen() || wp_doing_ajax() ) ) {
 
             /**
              * New filters/actions for better usability and extendability
              *
              * @since 1.1
              */
-            add_filter("groundhogg/steps/{$this->get_group()}s", [$this, 'register']);
 
 	        add_action("groundhogg/steps/{$this->get_type()}/sortable", [$this, 'pre_html'], 1 );
 	        add_action("groundhogg/steps/{$this->get_type()}/sortable", [$this, 'sortable_item'] );
