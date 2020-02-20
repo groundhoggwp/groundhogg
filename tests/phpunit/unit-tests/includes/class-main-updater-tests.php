@@ -25,31 +25,10 @@ class Main_Updater_Tests extends GH_UnitTestCase {
 	}
 
 	/**
-	 * Test that the wp cron event is scheduled when the upgrade process is complete
-	 */
-	public function test_schedule_update_cron() {
-		$next_scheduled = wp_next_scheduled( "groundhogg/main/do_updates" );
-
-		$this->assertFalse( $next_scheduled );
-
-		$this->updater->plugin_upgrader_listener( null, [
-			'action'  => 'update',
-			'type'    => 'plugin',
-			'plugins' => [
-				basename( GROUNDHOGG__FILE__ )
-			]
-		] );
-
-		$next_scheduled = wp_next_scheduled( "groundhogg/main/do_updates" );
-
-		$this->assertEquals( time(), $next_scheduled );
-	}
-
-	/**
 	 * Test that updates run on the desired hook
 	 */
 	public function test_update_lock_set_on_hook() {
-		do_action( 'groundhogg/main/do_updates' );
+		Plugin::$instance->updater->do_updates();
 
 		$update_lock = get_transient( 'gh_main_doing_updates' );
 
@@ -67,7 +46,7 @@ class Main_Updater_Tests extends GH_UnitTestCase {
 	/**
 	 * Test that attempting to save the previous updates after they have already been saved returns false
 	 */
-	public function test_saving_previous_updates_after_groundhogg_activated(){
+	public function test_saving_previous_updates_after_groundhogg_activated() {
 		$this->assertFalse( $this->updater->save_previous_updates_when_installed() );
 	}
 
@@ -81,11 +60,9 @@ class Main_Updater_Tests extends GH_UnitTestCase {
 	/**
 	 * Test that an update is performed when "forgetting" a previous update
 	 */
-	public function test_do_update_2_0_7()
-	{
+	public function test_do_forget_version_update() {
 		$this->assertTrue( $this->updater->forget_version_update( '2.0.7' ) );
-		$this->assertTrue( $this->updater->do_updates() );
-		$this->assertTrue( in_array( '2.0.7', $this->updater->get_previous_versions() ) );
+		$this->assertFalse( $this->updater->did_update( '2.0.7' ) );
 	}
 
 	/**
