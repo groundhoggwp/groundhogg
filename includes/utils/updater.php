@@ -14,6 +14,10 @@ namespace Groundhogg;
  */
 abstract class Updater {
 
+	/**
+	 * @var bool if updates were done during the request
+	 */
+	protected $did_updates = false;
 
 	/**
 	 * WPGH_Upgrade constructor.
@@ -22,7 +26,7 @@ abstract class Updater {
 
 		// Show updates are required
 		add_action( 'admin_init', [ $this, 'listen_for_updates' ], 9 );
-		add_action( 'admin_init', [ $this, 'updates_notice' ], 12 );
+		add_action( 'groundhogg/notices/before', [ $this, 'updates_notice' ] );
 
 		// Show updates path in tools area
 		add_action( 'groundhogg/admin/tools/updates', [ $this, 'show_manual_updates' ] );
@@ -33,13 +37,6 @@ abstract class Updater {
 		// Save previous updates when plugin installed.
 		add_action( 'activated_plugin', [ $this, 'save_previous_updates_when_installed' ], 99 );
 	}
-
-	/**
-	 * A unique name for the updater to avoid conflicts
-	 *
-	 * @return string
-	 */
-	abstract protected function get_updater_name();
 
 	/**
 	 * Remove a version from the previous versions so that the updater will perform that version update
@@ -79,6 +76,13 @@ abstract class Updater {
 	}
 
 	/**
+	 * A unique name for the updater to avoid conflicts
+	 *
+	 * @return string
+	 */
+	abstract protected function get_updater_name();
+
+	/**
 	 * Show the manual updates in the tools area
 	 */
 	public function show_manual_updates() {
@@ -92,7 +96,7 @@ abstract class Updater {
 
 			?><p><?php
 
-		$text = sprintf( __( 'Version %s', 'groundhogg' ), $update );
+			$text = sprintf( __( 'Version %s', 'groundhogg' ), $update );
 
 			echo html()->e( 'a', [
 				'href' => add_query_arg( [
@@ -103,7 +107,7 @@ abstract class Updater {
 			], $text );
 
 
-			if ( $this->get_update_description( $update ) ){
+			if ( $this->get_update_description( $update ) ) {
 				echo ' - ' . esc_html( $this->get_update_description( $update ) );
 			}
 
@@ -134,6 +138,26 @@ abstract class Updater {
 	 * @return string[]
 	 */
 	protected function get_optional_updates() {
+		return [];
+	}
+
+	/**
+	 * Get a description of a certain update.
+	 *
+	 * @param $update
+	 *
+	 * @return string
+	 */
+	private function get_update_description( $update ) {
+		return get_array_var( $this->get_update_descriptions(), $update );
+	}
+
+	/**
+	 * Associative array of versions to descriptions
+	 *
+	 * @return string[]
+	 */
+	protected function get_update_descriptions() {
 		return [];
 	}
 
@@ -219,9 +243,16 @@ abstract class Updater {
 	protected function remember_version_update( $version ) {
 		$versions = $this->get_previous_versions();
 
+		$date_of_updates = get_option( $this->get_version_option_name() . '_dates', [] );
+
 		if ( ! in_array( $version, $versions ) ) {
 			$versions[] = $version;
 		}
+
+		$date_of_updates[ $version ] = time();
+
+		// Save the date updated for this version
+		update_option( $this->get_version_option_name() . '_dates', $date_of_updates );
 
 		return update_option( $this->get_version_option_name(), $versions );
 	}
@@ -257,7 +288,7 @@ abstract class Updater {
 		$previous_updates = $this->get_previous_versions();
 
 		// No previous updates, if this is the case something has gone wrong...
-		if ( empty( $previous_updates ) ) {
+		if ( empty( $previous_updates ) || $this->did_updates ) {
 			return;
 		}
 
@@ -270,7 +301,7 @@ abstract class Updater {
 
 		$action = 'gh_' . $this->get_updater_name() . '_do_updates';
 
-		$action_url = action_url( $action );
+		$action_url = action_url( $action, [ 'page' => 'groundhogg' ] );
 
 		$update_button = html()->e( 'a', [
 			'href'  => $action_url,
@@ -345,6 +376,8 @@ abstract class Updater {
 			}
 		}
 
+		$this->did_updates = true;
+
 		do_action( "groundhogg/updater/{$this->get_updater_name()}/finished" );
 
 		return true;
@@ -359,26 +392,6 @@ abstract class Updater {
 	 */
 	public function did_update( $version ) {
 		return in_array( $version, $this->get_previous_versions() );
-	}
-
-	/**
-	 * Associative array of versions to descriptions
-	 *
-	 * @return string[]
-	 */
-	protected function get_update_descriptions() {
-		return [];
-	}
-
-	/**
-	 * Get a description of a certain update.
-	 *
-	 * @param $update
-	 *
-	 * @return string
-	 */
-	private function get_update_description( $update ) {
-		return get_array_var( $this->get_update_descriptions(), $update );
 	}
 
 	/**
