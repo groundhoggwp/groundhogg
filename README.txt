@@ -177,6 +177,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.13.2 (2020-02-21) =
+* TWEAKED Update path will no longer run automatically. Instead a notice will show that there are required updates which will need an administrators attention.
+
 = 2.1.13.1 (2020-02-15) =
 * ADDED Lock to the update path so two update processes cannot run.
 * ADDED Optional update to revert automatic DB update in during 2.1.13 upgrade
