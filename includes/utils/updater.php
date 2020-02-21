@@ -306,12 +306,12 @@ abstract class Updater {
 		$update_button = html()->e( 'a', [
 			'href'  => $action_url,
 			'class' => 'button button-secondary'
-		], __( 'Upgrade Now!', 'groundhogg' ) );
+		], __( 'Upgrade Database Now!', 'groundhogg' ) );
 
 		$update_descriptions = "";
 
 		foreach ( $missing_updates as $missing_update ) {
-			$update_descriptions .= sprintf( '<li><b>%1$s</b> - %2$s</li>', $missing_update, $this->get_update_description( $missing_update ) );
+			$update_descriptions .= sprintf( '<li style="margin-left: 10px"><b>%1$s</b> - %2$s</li>', $missing_update, $this->get_update_description( $missing_update ) );
 		}
 
 		if ( ! empty( $update_descriptions ) ) {
@@ -320,7 +320,7 @@ abstract class Updater {
 
 		$notice = sprintf( __( "%s requires a database upgrade. Consider backing up your site before upgrading. </p>%s<p>%s", 'groundhogg' ), white_labeled_name(), $update_descriptions, $update_button );
 
-		notices()->add( 'updates_required', $notice, 'info' );
+		notices()->add( 'updates_required', $notice, 'info', 'manage_options', true );
 	}
 
 	/**
