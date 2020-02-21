@@ -177,9 +177,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.1.13.3 (2020-02-21) =
+
+= 2.1.13.4 & 2.1.13.3 (2020-02-21) =
 * TWEAKED Fixed UI compatibility issues for BadgeOS and Post Affiliate PRO in the funnel builder.
 * FIXED Groundhogg update notice not showing site wide.
+* FIXED left test update version in code.
 
 = 2.1.13.2 (2020-02-21) =
 * TWEAKED Update path will no longer run automatically. Instead a notice will show that there are required updates which will need an administrators attention.
