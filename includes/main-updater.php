@@ -237,7 +237,7 @@ class Main_Updater extends Updater {
 			'2.1.7.1',
 			'2.1.11.1',
 			'2.1.13',
-			'2.1.13.2',
+//			'2.1.13.2',
 		];
 	}
 
@@ -245,7 +245,7 @@ class Main_Updater extends Updater {
 		return [
 			'2.1.13'        => __( 'Refactor contact optin statuses to meet new format.', 'groundhogg' ),
 			'2.1.13.revert' => __( 'Revert update 2.1.13 if rogue updated refactored optin status moe than once.' ),
-			'2.1.13.2'      => __( 'Just a test', 'groundhogg' ),
+//			'2.1.13.2'      => __( 'Just a test', 'groundhogg' ),
 		];
 	}
 
