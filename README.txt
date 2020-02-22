@@ -177,6 +177,8 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.13.5 =
+* FIXED Removed version 2.0.8.1 from the db upgrade path. Redundant upgrade.
 
 = 2.1.13.4 & 2.1.13.3 (2020-02-21) =
 * TWEAKED Fixed UI compatibility issues for BadgeOS and Post Affiliate PRO in the funnel builder.
