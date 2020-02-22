@@ -68,7 +68,7 @@ class Event_Store_Tests extends GH_UnitTestCase {
 
 		$events = [];
 
-		foreach ( $ids as $id ){
+		foreach ( $ids as $id ) {
 			$events[] = new \Groundhogg\Event( $id );
 		}
 
