@@ -805,6 +805,7 @@ abstract class DB {
 		$offset              = $query_vars['offset'] ? sprintf( 'OFFSET %d', absint( $query_vars['offset'] ) ) : '';
 		$orderby             = $query_vars['orderby'] && in_array( $query_vars['orderby'], $this->get_allowed_columns() ) ? sprintf( 'ORDER BY %s', $query_vars['orderby'] ) : '';
 		$groupby             = $query_vars['groupby'] && in_array( $query_vars['groupby'], $this->get_allowed_columns() ) ? sprintf( 'GROUP BY %s', $query_vars['groupby'] ) : '';
+
 		$query_vars['order'] = strtoupper( $query_vars['order'] );
 		$order               = in_array( $query_vars['order'], [ 'ASC', 'DESC' ] ) ? $query_vars['order'] : '';
 

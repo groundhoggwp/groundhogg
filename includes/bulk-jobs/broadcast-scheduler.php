@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Bulk_Jobs;
 
+use Groundhogg\Broadcast;
 use Groundhogg\Contact_Query;
 use Groundhogg\Event;
 use function Groundhogg\get_request_query;
@@ -32,13 +33,6 @@ class Broadcast_Scheduler extends Bulk_Job {
 	 * @var int
 	 */
 	protected $emails_scheduled = 0;
-
-	/**
-	 * The offset based on the total number of email scheduled.
-	 *
-	 * @var int
-	 */
-	protected $send_time_offset = 0;
 
 	/**
 	 * Get the action reference.
@@ -126,7 +120,7 @@ class Broadcast_Scheduler extends Bulk_Job {
 		$args = [
 			'time'       => $local_time,
 			'contact_id' => $id,
-			'funnel_id'  => 1,
+			'funnel_id'  => Broadcast::FUNNEL_ID,
 			'step_id'    => $this->broadcast_id,
 			'status'     => 'waiting',
 			'event_type' => Event::BROADCAST
@@ -135,17 +129,13 @@ class Broadcast_Scheduler extends Bulk_Job {
 		Plugin::$instance->dbs->get_db( 'events' )->add( $args );
 
 		$this->emails_scheduled += 1;
-
-		if ( $this->emails_scheduled % $this->get_max_emails_per_minute() === 0 ) {
-			$this->send_time_offset += MINUTE_IN_SECONDS;
-		}
 	}
 
 	/**
 	 * @return int
 	 */
 	protected function get_send_time() {
-		return $this->send_time + $this->send_time_offset;
+		return $this->send_time;
 	}
 
 	/**
@@ -181,7 +171,6 @@ class Broadcast_Scheduler extends Bulk_Job {
 		$this->send_now         = filter_var( $config['send_now'], FILTER_VALIDATE_BOOLEAN );
 		$this->send_in_timezone = filter_var( $config['send_in_local_time'], FILTER_VALIDATE_BOOLEAN );
 
-		$this->send_time_offset = absint( get_transient( 'gh_send_time_offset' ) );
 		$this->emails_scheduled = absint( get_transient( 'gh_emails_scheduled' ) );
 	}
 
@@ -192,7 +181,6 @@ class Broadcast_Scheduler extends Bulk_Job {
 	 */
 	protected function post_loop() {
 		set_transient( 'gh_emails_scheduled', $this->emails_scheduled, HOUR_IN_SECONDS );
-		set_transient( 'gh_send_time_offset', $this->send_time_offset, HOUR_IN_SECONDS );
 	}
 
 	/**
@@ -202,7 +190,6 @@ class Broadcast_Scheduler extends Bulk_Job {
 	 */
 	protected function send_response( $response ) {
 		$response['total']  = $this->emails_scheduled;
-		$response['offset'] = $this->send_time_offset;
 
 		parent::send_response( $response );
 	}
@@ -214,7 +201,6 @@ class Broadcast_Scheduler extends Bulk_Job {
 	 */
 	protected function clean_up() {
 		delete_transient( 'gh_get_broadcast_config' );
-		delete_transient( 'gh_send_time_offset' );
 		delete_transient( 'gh_emails_scheduled' );
 	}
 

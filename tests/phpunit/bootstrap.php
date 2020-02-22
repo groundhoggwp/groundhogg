@@ -49,6 +49,7 @@ function _load_framework_additions() {
 	require dirname( __FILE__ ) . '/framework/class-gh-unittest-factory-for-contact.php';
 	require dirname( __FILE__ ) . '/framework/class-gh-unittest-factory-for-funnel.php';
 	require dirname( __FILE__ ) . '/framework/class-gh-unittest-factory-for-step.php';
+	require dirname( __FILE__ ) . '/framework/class-gh-unittest-factory-for-event.php';
 	require dirname( __FILE__ ) . '/framework/class-gh-unittest-factory.php';
 	require dirname( __FILE__ ) . '/framework/class-gh-unittestcase.php';
 }

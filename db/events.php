@@ -211,6 +211,7 @@ class Events extends DB {
         KEY contact_id (contact_id),
         KEY funnel_id (funnel_id),
         KEY step_id (step_id)
+        KEY priority (priority)
 		) {$this->get_charset_collate()};";
 
 		dbDelta( $sql );
