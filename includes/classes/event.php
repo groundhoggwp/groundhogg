@@ -115,6 +115,14 @@ class Event extends Base_Object
     }
 
 	/**
+	 * @return int
+	 */
+    public function get_priority()
+    {
+    	return absint( $this->priority );
+    }
+
+	/**
 	 * @return string
 	 */
     public function get_claim()
