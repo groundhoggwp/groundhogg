@@ -127,7 +127,7 @@ class Events extends DB {
 			'error_code'     => '',
 			'error_message'  => '',
 			'status'         => 'waiting',
-			'priority'       => 100,
+			'priority'       => 10,
 			'claim'          => '',
 		);
 	}
@@ -210,7 +210,7 @@ class Events extends DB {
         KEY time_scheduled (time_scheduled),
         KEY contact_id (contact_id),
         KEY funnel_id (funnel_id),
-        KEY step_id (step_id)
+        KEY step_id (step_id),
         KEY priority (priority)
 		) {$this->get_charset_collate()};";
 

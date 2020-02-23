@@ -2,7 +2,6 @@
 
 namespace Groundhogg;
 
-
 /**
  * Updater
  *
@@ -179,7 +178,7 @@ abstract class Updater {
 		}
 
 		if ( $this->update_to_version( $update ) ) {
-			Plugin::$instance->notices->add( 'updated', sprintf( __( 'Update to version %s successful!', 'groundhogg' ), $update ) );
+			Plugin::$instance->notices->add( 'updated', sprintf( __( 'Update to version %s successful!', 'groundhogg' ), $update ), 'success', 'manage_options' );
 		} else {
 			Plugin::$instance->notices->add( new \WP_Error( 'update_failed', __( 'Update failed.', 'groundhogg' ) ) );
 		}
@@ -335,7 +334,7 @@ abstract class Updater {
 		}
 
 		if ( $this->do_updates() ) {
-			notices()->add( 'updated', sprintf( __( "%s upgraded successfully!", 'groundhogg' ), white_labeled_name() ) );
+			notices()->add( 'updated', sprintf( __( "%s upgraded successfully!", 'groundhogg' ), white_labeled_name() ), 'success', 'manage_options', true );
 		}
 	}
 

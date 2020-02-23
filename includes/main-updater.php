@@ -207,6 +207,25 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Add priority column to events db
+	 */
+	public function version_2_1_14(){
+		$events = get_db( 'events' );
+
+		$events->create_table();
+
+		global $wpdb;
+
+		$wpdb->query( "UPDATE {$events->get_table_name()}
+		SET `priority` = 10
+		WHERE `funnel_id` != 1" );
+
+		$wpdb->query( "UPDATE {$events->get_table_name()}
+		SET `priority` = 100
+		WHERE `funnel_id` = 1" );
+	}
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -236,13 +255,15 @@ class Main_Updater extends Updater {
 			'2.1.7.1',
 			'2.1.11.1',
 			'2.1.13',
+			'2.1.14',
 		];
 	}
 
 	protected function get_update_descriptions() {
 		return [
 			'2.1.13'        => __( 'Refactor contact optin statuses to meet new format.', 'groundhogg' ),
-			'2.1.13.revert' => __( 'Revert update 2.1.13 if rogue updated refactored optin status moe than once.' ),
+			'2.1.13.revert' => __( 'Revert update 2.1.13 if rogue updated refactored optin status more than once.', 'groundhogg' ),
+			'2.1.14'        => __( 'Give funnel events higher priority than broadcast events.', 'groundhogg' ),
 		];
 	}
 

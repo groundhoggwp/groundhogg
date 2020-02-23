@@ -1381,6 +1381,7 @@ function send_email_notification( $email_id, $contact_id_or_email, $time = 0 ) {
 		'step_id'    => $email->get_id(),
 		'contact_id' => $contact->get_id(),
 		'event_type' => Event::EMAIL_NOTIFICATION,
+        'priority'   => 5,
 		'status'     => 'waiting',
 	];
 
@@ -1487,39 +1488,6 @@ function email_is_same_domain( $email ) {
 }
 
 /**
- * Notify the admin when credits run low.
- *
- * @param $credits
- */
-function gh_ss_notify_low_credit( $credits ) {
-	if ( $credits > 1000 ) {
-		return;
-	}
-
-	$message = false;
-	$subject = false;
-
-	switch ( $credits ) {
-		case 1000:
-		case 500:
-		case 300:
-		case 100:
-		case 0:
-			$subject = sprintf( "Low on Email credits!" );
-			$message = sprintf( "You are running low on credits! Only %s credits remaining. Top up on credits &rarr; https://www.groundhogg.io/downloads/credits/", $credits );
-			break;
-	}
-
-	if ( $message && $subject ) {
-		wp_mail( get_bloginfo( 'admin_email' ), $subject, $message );
-	}
-
-}
-
-add_action( 'groundhogg/ghss/credits_used', __NAMESPACE__ . '\gh_ss_notify_low_credit' );
-
-
-/**
  * Send event failure notification.
  *
  * @param $event Event
@@ -1596,7 +1564,6 @@ function get_items_from_csv( $file_path = '' ) {
 	return $data;
 
 }
-
 
 /**
  * Get a list of mappable fields as well as extra fields
@@ -1903,6 +1870,13 @@ function scheduled_time( $time ) {
 	return $time;
 }
 
+/**
+ * Get products from the Groundhogg store.
+ *
+ * @param array $args
+ *
+ * @return mixed|string
+ */
 function get_store_products( $args = [] ) {
 	$args = wp_parse_args( $args, array(
 		//'category' => 'templates',
@@ -2398,7 +2372,7 @@ function file_access_url( $path, $download = false ) {
 
 	$url = managed_page_url( 'uploads/' . ltrim( $path, '/' ) );
 
-	// WP Engine file download links to not work if forward slash is not present.
+	// WP Engine file download links do not work if forward slash is not present.
 	if ( ! is_wpengine() ) {
 		$url = untrailingslashit( $url );
 	}
@@ -2588,8 +2562,6 @@ function action_url( $action, $args = [] ) {
 
 	return add_query_arg( urlencode_deep( $url_args ), admin_url( 'admin.php' ) );
 }
-
-global $groundhogg_mobile_validator;
 
 /**
  * Get the default country code of the site.

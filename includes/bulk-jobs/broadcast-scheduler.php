@@ -122,8 +122,9 @@ class Broadcast_Scheduler extends Bulk_Job {
 			'contact_id' => $id,
 			'funnel_id'  => Broadcast::FUNNEL_ID,
 			'step_id'    => $this->broadcast_id,
+			'event_type' => Event::BROADCAST,
 			'status'     => 'waiting',
-			'event_type' => Event::BROADCAST
+			'priority'   => 100,
 		];
 
 		Plugin::$instance->dbs->get_db( 'events' )->add( $args );

@@ -2,6 +2,7 @@
     "require": {
         "phpunit/phpunit": "7.1.4",
         "wp-cli/wp-cli-bundle": "v2.1.0",
-      "ext-imap": "*"
+      "ext-imap": "*",
+      "ext-json": "*"
     }
 }
