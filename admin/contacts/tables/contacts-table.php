@@ -25,13 +25,13 @@ use Groundhogg\Contact_Query;
  *
  * This class shows the data table for accessing information about a customer.
  *
- * @package     Admin
- * @subpackage  Admin/Contacts
+ * @since       File available since Release 0.1
+ * @see         WP_List_Table, contact-editor.php
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @see         WP_List_Table, contact-editor.php
- * @since       File available since Release 0.1
+ * @package     Admin
+ * @subpackage  Admin/Contacts
  */
 
 // Exit if accessed directly
@@ -65,8 +65,109 @@ class Contacts_Table extends WP_List_Table {
 	}
 
 	/**
-	 * @return array An associative array containing column information.
+	 * Prepares the list of items for displaying.
+	 * @global $wpdb \wpdb
+	 * @uses $this->_column_headers
+	 * @uses $this->items
+	 * @uses $this->get_columns()
+	 * @uses $this->get_sortable_columns()
+	 * @uses $this->get_pagenum()
+	 * @uses $this->set_pagination_args()
+	 */
+	function prepare_items() {
+
+
+		$columns  = $this->get_columns();
+		$hidden   = array(); // No hidden columns
+		$sortable = $this->get_sortable_columns();
+
+		$this->_column_headers = array( $columns, $hidden, $sortable );
+
+		$per_page = absint( get_url_var( 'limit', get_screen_option( 'per_page' ) ) );
+		$paged    = $this->get_pagenum();
+		$offset   = $per_page * ( $paged - 1 );
+		$search   = get_url_var( 's' );
+		$order    = get_url_var( 'order', 'DESC' );
+		$orderby  = get_url_var( 'orderby', 'ID' );
+
+		$query = get_request_query();
+
+		// Since unconfirmed is 0 (aside maybe we should change that) we need to specify we actually want it still.
+		$optin_status = get_request_var( 'optin_status' );
+
+		if ( is_array( $optin_status ) ) {
+			$query['optin_status'] = map_deep( $optin_status, 'absint' );
+		}
+
+		// Sales person can only see their own contacts...
+		if ( current_user_is( 'sales_manager' ) ) {
+			$query['owner'] = get_current_user_id();
+		}
+
+		$date_query = [
+			'relation' => 'AND'
+		];
+
+		$date_inner_query = [ 'inclusive' => true ];
+
+		$include_date_query = false;
+
+		if ( $date_before = get_request_var( 'date_before' ) ) {
+			$date_before                = sanitize_text_field( $date_before );
+			$date_inner_query['before'] = $date_before;
+
+			$include_date_query = true;
+		}
+
+		if ( $date_after = get_request_var( 'date_after' ) ) {
+			$date_after                = sanitize_text_field( $date_after );
+			$date_inner_query['after'] = $date_after;
+
+			$include_date_query = true;
+		}
+
+		$date_query[] = $date_inner_query;
+
+		if ( $include_date_query ) {
+			$query['date_query'] = $date_query;
+		}
+
+		$query['number']  = $per_page;
+		$query['offset']  = $offset;
+		$query['orderby'] = $orderby;
+		$query['search']  = $search;
+		$query['order']   = $order;
+
+		$query = apply_filters( 'groundhogg/admin/contacts/search_query', $query );
+
+		$this->query = $query;
+
+		$c_query = new Contact_Query();
+		$data    = $c_query->query( $query );
+
+		set_transient( 'groundhogg_contact_query_args', $c_query->query_vars, HOUR_IN_SECONDS );
+
+		// Unset number for the count full count
+		unset( $query['number'] );
+
+		$total = get_db( 'contacts' )->count( $query );
+
+		$this->items = $data;
+
+		// Add condition to be sure we don't divide by zero.
+		// If $this->per_page is 0, then set total pages to 1.
+		$total_pages = $per_page ? ceil( (int) $total / (int) $per_page ) : 1;
+
+		$this->set_pagination_args( array(
+			'total_items' => $total,
+			'per_page'    => $per_page,
+			'total_pages' => $total_pages,
+		) );
+	}
+
+	/**
 	 * @see WP_List_Table::::single_row_columns()
+	 * @return array An associative array containing column information.
 	 */
 	public function get_columns() {
 		$columns = array(
@@ -102,6 +203,106 @@ class Contacts_Table extends WP_List_Table {
 		);
 
 		return apply_filters( 'groundhogg_contact_sortable_columns', $sortable_columns );
+	}
+
+	/**
+	 * @param object|Contact $contact
+	 * @param int            $level
+	 */
+	public function single_row( $contact, $level = 0 ) {
+
+		if ( ! $contact instanceof Contact ) {
+			$contact = Plugin::$instance->utils->get_contact( absint( $contact->ID ) );
+		}
+
+		if ( ! $contact ) {
+			return;
+		}
+
+		?>
+        <tr id="contact-<?php echo $contact->get_id(); ?>">
+			<?php $this->single_row_columns( $contact ); ?>
+        </tr>
+		<?php
+	}
+
+	/**
+	 * Outputs the hidden row displayed when inline editing
+	 *
+	 * @global string $mode List table view mode.
+	 */
+	public function inline_edit() {
+		?>
+        <table style="display: none">
+            <tbody id="inlineedit">
+            <tr id="inline-edit"
+                class="inline-edit-row inline-edit-row-contact quick-edit-row quick-edit-row-contact inline-edit-contact inline-editor"
+                style="display: none">
+                <td colspan="<?php echo $this->get_column_count(); ?>" class="colspanchange">
+                    <fieldset class="inline-edit-col-left">
+                        <legend class="inline-edit-legend"><?php echo __( 'Quick Edit' ); ?></legend>
+                        <div class="inline-edit-col">
+                            <label>
+                                <span class="title"><?php _e( 'Email' ); ?></span>
+                                <span class="input-text-wrap"><input type="text" name="email"
+                                                                     class="cemail regular-text" value=""/></span>
+                            </label>
+                            <label>
+                                <span class="title"><?php _e( 'First Name', 'groundhogg' ); ?></span>
+                                <span class="input-text-wrap"><input type="text" name="first_name"
+                                                                     class="cfirst_name regular-text" value=""/></span>
+                            </label>
+                            <label>
+                                <span class="title"><?php _e( 'Last Name', 'groundhogg' ); ?></span>
+                                <span class="input-text-wrap"><input type="text" name="last_name"
+                                                                     class="clast_name regular-text" value=""/></span>
+                            </label>
+                            <label>
+                                <span class="title"><?php _e( 'Owner', 'groundhogg' ); ?></span>
+                                <span class="input-text-wrap">
+                                    <?php $args = array(
+	                                    'show_option_none' => __( 'Select an owner' ),
+	                                    'id'               => 'owner',
+	                                    'name'             => 'owner',
+	                                    'role'             => 'administrator',
+	                                    'class'            => 'cowner'
+                                    ); ?>
+                                    <?php wp_dropdown_users( $args ) ?>
+                                </span>
+                            </label>
+                            <label>
+                                <input type="checkbox"
+                                       name="unsubscribe"><?php _ex( 'Unsubscribe this contact.', 'action', 'groundhogg' ); ?>
+                            </label>
+                        </div>
+                    </fieldset>
+                    <fieldset class="inline-edit-col-right">
+                        <div class="inline-edit-col">
+                            <label class="inline-edit-tags">
+                                <span class="title"><?php _e( 'Tags' ); ?></span>
+                            </label>
+							<?php echo Plugin::$instance->utils->html->dropdown( array(
+								'id'   => 'tags',
+								'name' => 'tags[]'
+							) ); ?>
+                        </div>
+                    </fieldset>
+                    <div class="submit inline-edit-save">
+                        <button type="button" class="button cancel alignleft"><?php _e( 'Cancel' ); ?></button>
+						<?php wp_nonce_field( 'inlineeditnonce', '_inline_edit' ); ?>
+                        <button type="button"
+                                class="button button-primary save alignright"><?php _e( 'Update' ); ?></button>
+                        <span class="spinner"></span>
+                        <br class="clear"/>
+                        <div class="notice notice-error notice-alt inline hidden">
+                            <p class="error"></p>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+		<?php
 	}
 
 	/**
@@ -204,7 +405,7 @@ class Contacts_Table extends WP_List_Table {
 	/**
 	 * Get default column value.
 	 *
-	 * @param object $contact A singular item (one full row's worth of data).
+	 * @param object $contact     A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string Text or HTML to be placed inside the column <td>.
@@ -261,50 +462,50 @@ class Contacts_Table extends WP_List_Table {
 	protected function get_views() {
 
 		$views = [
-			'all'         => [
+			'all'          => [
 				'id'    => 'all',
 				'name'  => __( 'All', 'groundhogg' ),
 				'query' => []
 			],
-			'unconfirmed' => [
+			'unconfirmed'  => [
 				'id'    => 'unconfirmed',
 				'name'  => __( 'Unconfirmed', 'groundhogg' ),
 				'query' => [ 'optin_status' => Preferences::UNCONFIRMED ]
 			],
-			'confirmed'   => [
+			'confirmed'    => [
 				'id'    => 'confirmed',
 				'name'  => __( 'Confirmed', 'groundhogg' ),
 				'query' => [ 'optin_status' => Preferences::CONFIRMED ],
 			],
-			'weekly'      => [
+			'weekly'       => [
 				'id'    => 'weekly',
 				'name'  => __( 'Weekly', 'groundhogg' ),
 				'query' => [ 'optin_status' => Preferences::WEEKLY ],
 			],
-	        'monthly' => [
-		        'id'    => 'monthly',
-		        'name'  => __( 'Monthly', 'groundhogg' ),
-		        'query' => ['optin_status' => Preferences::MONTHLY],
-            ],
+			'monthly'      => [
+				'id'    => 'monthly',
+				'name'  => __( 'Monthly', 'groundhogg' ),
+				'query' => [ 'optin_status' => Preferences::MONTHLY ],
+			],
 			'unsubscribed' => [
 				'id'    => 'unsubscribed',
 				'name'  => __( 'Unsubscribed', 'groundhogg' ),
-				'query' => ['optin_status' => Preferences::UNSUBSCRIBED],
+				'query' => [ 'optin_status' => Preferences::UNSUBSCRIBED ],
 			],
-			'spam' => [
+			'spam'         => [
 				'id'    => 'spam',
 				'name'  => __( 'Spam', 'groundhogg' ),
-				'query' => ['optin_status' => Preferences::SPAM],
+				'query' => [ 'optin_status' => Preferences::SPAM ],
 			],
-			'bounced' => [
+			'bounced'      => [
 				'id'    => 'bounced',
 				'name'  => __( 'Bounced', 'groundhogg' ),
-				'query' => ['optin_status' => Preferences::HARD_BOUNCE],
+				'query' => [ 'optin_status' => Preferences::HARD_BOUNCE ],
 			],
-			'complained' => [
+			'complained'   => [
 				'id'    => 'complained',
 				'name'  => __( 'Complained', 'groundhogg' ),
-				'query' => ['optin_status' => Preferences::COMPLAINED],
+				'query' => [ 'optin_status' => Preferences::COMPLAINED ],
 			],
 		];
 
@@ -318,129 +519,28 @@ class Contacts_Table extends WP_List_Table {
 				'id'    => '',
 			] );
 
-			$view[ 'query' ][ 'view' ] = $view[ 'id' ];
+			$view['query']['view'] = $view['id'];
 
 			$parsed[] = html()->e( 'a', [
 				'href'  => admin_page_url( 'gh_contacts', $view['query'] ),
-				'class' => get_url_var( 'view' ) === $view[ 'id' ] ? 'current' : '',
+				'class' => get_url_var( 'view' ) === $view['id'] ? 'current' : '',
 			], sprintf(
-			        '%s <span class="count">(%d)</span>',
-                    $view[ 'name' ],
-                    absint( get_db( 'contacts' )->count( $view['query'] ) )
-                )
-            );
+					'%s <span class="count">(%d)</span>',
+					$view['name'],
+					absint( get_db( 'contacts' )->count( $view['query'] ) )
+				)
+			);
 		}
 
 		return $parsed;
 	}
 
 	/**
-	 * Prepares the list of items for displaying.
-	 * @global $wpdb \wpdb
-	 * @uses $this->_column_headers
-	 * @uses $this->items
-	 * @uses $this->get_columns()
-	 * @uses $this->get_sortable_columns()
-	 * @uses $this->get_pagenum()
-	 * @uses $this->set_pagination_args()
-	 */
-	function prepare_items() {
-
-
-		$columns  = $this->get_columns();
-		$hidden   = array(); // No hidden columns
-		$sortable = $this->get_sortable_columns();
-
-		$this->_column_headers = array( $columns, $hidden, $sortable );
-
-		$per_page = absint( get_url_var( 'limit', get_screen_option( 'per_page' ) ) );
-		$paged    = $this->get_pagenum();
-		$offset   = $per_page * ( $paged - 1 );
-		$search   = get_url_var( 's' );
-		$order    = get_url_var( 'order', 'DESC' );
-		$orderby  = get_url_var( 'orderby', 'ID' );
-
-		$query = get_request_query();
-
-		// Since unconfirmed is 0 (aside maybe we should change that) we need to specify we actually want it still.
-		$optin_status = get_request_var( 'optin_status' );
-
-		if ( is_array( $optin_status ) ){
-            $query['optin_status'] = map_deep( $optin_status, 'absint' );
-        }
-
-		// Sales person can only see their own contacts...
-		if ( current_user_is( 'sales_manager' ) ) {
-			$query['owner'] = get_current_user_id();
-		}
-
-		$date_query = [
-            'relation' => 'AND'
-        ];
-		
-		$date_inner_query = [ 'inclusive' => true ];
-
-		$include_date_query = false;
-
-		if ( $date_before = get_request_var( 'date_before' ) ){
-		    $date_before = sanitize_text_field( $date_before );
-		    $date_inner_query[ 'before' ] = $date_before;
-
-		    $include_date_query = true;
-        }
-
-        if ( $date_after = get_request_var( 'date_after' ) ){
-            $date_after = sanitize_text_field( $date_after );
-            $date_inner_query[ 'after' ] = $date_after;
-
-            $include_date_query = true;
-        }
-
-        $date_query[] = $date_inner_query;
-
-        if ( $include_date_query ){
-            $query[ 'date_query' ] = $date_query;
-        }
-
-		$query['number']  = $per_page;
-		$query['offset']  = $offset;
-		$query['orderby'] = $orderby;
-		$query['search']  = $search;
-		$query['order']   = $order;
-
-		$query = apply_filters( 'groundhogg/admin/contacts/search_query', $query );
-
-		$this->query = $query;
-
-		$c_query = new Contact_Query();
-		$data    = $c_query->query( $query );
-
-		set_transient( 'groundhogg_contact_query_args', $c_query->query_vars, HOUR_IN_SECONDS );
-
-		// Unset number for the count full count
-		unset( $query['number'] );
-
-		$total = get_db( 'contacts' )->count( $query );
-
-		$this->items = $data;
-
-		// Add condition to be sure we don't divide by zero.
-		// If $this->per_page is 0, then set total pages to 1.
-		$total_pages = $per_page ? ceil( (int) $total / (int) $per_page ) : 1;
-
-		$this->set_pagination_args( array(
-			'total_items' => $total,
-			'per_page'    => $per_page,
-			'total_pages' => $total_pages,
-		) );
-	}
-
-	/**
 	 * Generates and displays row action links.
 	 *
-	 * @param $contact Contact Contact being acted upon.
+	 * @param        $contact     Contact Contact being acted upon.
 	 * @param string $column_name Current column name.
-	 * @param string $primary Primary column name.
+	 * @param string $primary     Primary column name.
 	 *
 	 * @return string Row steps output for posts.
 	 */
@@ -507,43 +607,22 @@ class Contacts_Table extends WP_List_Table {
 	}
 
 	/**
-	 * @param object|Contact $contact
-	 * @param int $level
-	 */
-	public function single_row( $contact, $level = 0 ) {
-
-		if ( ! $contact instanceof Contact ) {
-			$contact = Plugin::$instance->utils->get_contact( absint( $contact->ID ) );
-		}
-
-		if ( ! $contact ) {
-			return;
-		}
-
-		?>
-        <tr id="contact-<?php echo $contact->get_id(); ?>">
-			<?php $this->single_row_columns( $contact ); ?>
-        </tr>
-		<?php
-	}
-
-
-	/**
 	 * @param string $which
 	 */
 	protected function extra_tablenav( $which ) {
 		if ( $which === 'top' ) : ?>
             <script>
-                jQuery(function ($) {
-                    $('#bulk-action-selector-top,#bulk-action-selector-bottom').on('change', function () {
-                        var $bulk = $(this);
-                        if ($bulk.val() === 'apply_tag' || $bulk.val() === 'remove_tag') {
-                            $('.bulk-tag-action').removeClass('hidden');
-                        } else {
-                            $('.bulk-tag-action').addClass('hidden');
+                jQuery( function ( $ ){
+                    $( '#bulk-action-selector-top,#bulk-action-selector-bottom' ).on( 'change', function (){
+                        var $bulk = $( this )
+                        if ( $bulk.val() === 'apply_tag' || $bulk.val() === 'remove_tag' ) {
+                            $( '.bulk-tag-action' ).removeClass( 'hidden' )
                         }
-                    })
-                });
+                        else {
+                            $( '.bulk-tag-action' ).addClass( 'hidden' )
+                        }
+                    } )
+                } )
             </script>
             <div class="alignleft gh-actions bulk-tag-action hidden">
                 <div style="width: 300px;display: inline-block;margin: 0 20px 5px 0"><?php echo Plugin::$instance->utils->html->tag_picker( [
@@ -565,92 +644,19 @@ class Contacts_Table extends WP_List_Table {
 
 			unset( $export_query['number'] );
 			unset( $export_query['limit'] );
+			unset( $export_query['offset'] );
 
-			$export_url = Plugin::$instance->bulk_jobs->export_contacts->get_start_url( $export_query );
+			$export_url = admin_page_url( 'gh_tools', [
+				'tab'    => 'export',
+				'action' => 'choose_columns',
+				'query'  => $export_query,
+			] );
+
 			?>
             <a class="button action export-contacts"
                href="<?php echo esc_url( $export_url ); ?>"><?php printf( _nx( 'Export %s contact', 'Export %s contacts', $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?></a>
         </div><?php
 
 		do_action( 'groundhogg/admin/contacts/table/extra_tablenav', $this );
-	}
-
-	/**
-	 * Outputs the hidden row displayed when inline editing
-	 *
-	 * @global string $mode List table view mode.
-	 */
-	public function inline_edit() {
-		?>
-        <table style="display: none">
-            <tbody id="inlineedit">
-            <tr id="inline-edit"
-                class="inline-edit-row inline-edit-row-contact quick-edit-row quick-edit-row-contact inline-edit-contact inline-editor"
-                style="display: none">
-                <td colspan="<?php echo $this->get_column_count(); ?>" class="colspanchange">
-                    <fieldset class="inline-edit-col-left">
-                        <legend class="inline-edit-legend"><?php echo __( 'Quick Edit' ); ?></legend>
-                        <div class="inline-edit-col">
-                            <label>
-                                <span class="title"><?php _e( 'Email' ); ?></span>
-                                <span class="input-text-wrap"><input type="text" name="email"
-                                                                     class="cemail regular-text" value=""/></span>
-                            </label>
-                            <label>
-                                <span class="title"><?php _e( 'First Name', 'groundhogg' ); ?></span>
-                                <span class="input-text-wrap"><input type="text" name="first_name"
-                                                                     class="cfirst_name regular-text" value=""/></span>
-                            </label>
-                            <label>
-                                <span class="title"><?php _e( 'Last Name', 'groundhogg' ); ?></span>
-                                <span class="input-text-wrap"><input type="text" name="last_name"
-                                                                     class="clast_name regular-text" value=""/></span>
-                            </label>
-                            <label>
-                                <span class="title"><?php _e( 'Owner', 'groundhogg' ); ?></span>
-                                <span class="input-text-wrap">
-                                    <?php $args = array(
-	                                    'show_option_none' => __( 'Select an owner' ),
-	                                    'id'               => 'owner',
-	                                    'name'             => 'owner',
-	                                    'role'             => 'administrator',
-	                                    'class'            => 'cowner'
-                                    ); ?>
-                                    <?php wp_dropdown_users( $args ) ?>
-                                </span>
-                            </label>
-                            <label>
-                                <input type="checkbox"
-                                       name="unsubscribe"><?php _ex( 'Unsubscribe this contact.', 'action', 'groundhogg' ); ?>
-                            </label>
-                        </div>
-                    </fieldset>
-                    <fieldset class="inline-edit-col-right">
-                        <div class="inline-edit-col">
-                            <label class="inline-edit-tags">
-                                <span class="title"><?php _e( 'Tags' ); ?></span>
-                            </label>
-							<?php echo Plugin::$instance->utils->html->dropdown( array(
-								'id'   => 'tags',
-								'name' => 'tags[]'
-							) ); ?>
-                        </div>
-                    </fieldset>
-                    <div class="submit inline-edit-save">
-                        <button type="button" class="button cancel alignleft"><?php _e( 'Cancel' ); ?></button>
-						<?php wp_nonce_field( 'inlineeditnonce', '_inline_edit' ); ?>
-                        <button type="button"
-                                class="button button-primary save alignright"><?php _e( 'Update' ); ?></button>
-                        <span class="spinner"></span>
-                        <br class="clear"/>
-                        <div class="notice notice-error notice-alt inline hidden">
-                            <p class="error"></p>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-		<?php
 	}
 }

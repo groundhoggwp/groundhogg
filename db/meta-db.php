@@ -230,7 +230,7 @@ abstract class Meta_DB extends DB {
         global $wpdb;
 
         $keys = $wpdb->get_col(
-            "SELECT DISTINCT meta_key FROM $this->table_name ORDER BY meta_key DESC"
+            "SELECT DISTINCT meta_key FROM $this->table_name ORDER BY meta_key ASC"
         );
 
         $key_array = array_combine( $keys, $keys );

@@ -179,6 +179,7 @@ class Welcome_Page extends Admin_Page
     public function view()
     {
         ?>
+
         <div id="welcome-page" class="welcome-page">
             <div id="poststuff">
                 <div class="welcome-header">

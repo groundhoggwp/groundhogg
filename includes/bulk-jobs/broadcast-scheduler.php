@@ -104,11 +104,18 @@ class Broadcast_Scheduler extends Bulk_Job {
 
 		$id = absint( $item );
 
+		$contact = Plugin::$instance->utils->get_contact( $id );
+
+		// No point in sending an email to a contact that is not marketable.
+		if ( ! $contact->is_marketable() ) {
+			$this->skip_item( $item );
+
+			return;
+		}
+
 		$local_time = $this->get_send_time();
 
 		if ( $this->send_in_timezone && ! $this->send_now ) {
-
-			$contact = Plugin::$instance->utils->get_contact( $id );
 
 			$local_time = $contact->get_local_time_in_utc_0( $this->send_time );
 
@@ -190,7 +197,7 @@ class Broadcast_Scheduler extends Bulk_Job {
 	 * @param $response
 	 */
 	protected function send_response( $response ) {
-		$response['total']  = $this->emails_scheduled;
+		$response['total'] = $this->emails_scheduled;
 
 		parent::send_response( $response );
 	}

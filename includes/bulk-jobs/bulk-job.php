@@ -25,6 +25,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 abstract class Bulk_Job {
 
 	/**
+	 * keep track of skipped items.
+	 *
+	 * @var int
+	 */
+	protected $skipped = 0;
+
+	/**
 	 * WPGH_Bulk_Jon constructor.
 	 */
 	public function __construct() {
@@ -101,6 +108,15 @@ abstract class Bulk_Job {
 	}
 
 	/**
+	 * Do something when an item is skipped
+	 *
+	 * @param $item
+	 */
+	protected function skip_item( $item ){
+		$this->skipped++;
+	}
+
+	/**
 	 * Process the bulk job.
 	 */
 	public function process() {
@@ -133,9 +149,16 @@ abstract class Bulk_Job {
 		$end  = microtime( true );
 		$diff = round( $end - $start, 2 );
 
+		if ( $this->skipped > 0 ){
+			$msg = sprintf( __( 'Processed %d items in %s seconds. Skipped %s items.', 'groundhogg' ), $completed, $diff, $this->skipped );
+		} else {
+			$msg = sprintf( __( 'Processed %d items in %s seconds.', 'groundhogg' ), $completed, $diff );
+		}
+
 		$response = [
-			'complete' => $completed,
-			'message'  => esc_html( sprintf( __( 'Processed %d items in %s seconds.', 'groundhogg' ), $completed, $diff ) ),
+			'complete' => $completed - $this->skipped,
+			'skipped'  => $this->skipped,
+			'message'  => esc_html( $msg ),
 		];
 
 		$the_end = get_post_var( 'the_end', false );

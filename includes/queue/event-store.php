@@ -14,35 +14,6 @@ use function Groundhogg\get_db;
 class Event_Store {
 
 	/**
-	 * @return Events
-	 */
-	public function db() {
-		return get_db( 'events' );
-	}
-
-	/**
-	 * Get a number of queued events.
-	 *
-	 * @param $count
-	 *
-	 * @return array
-	 */
-	public function get_queued_event_ids( $count=100 ) {
-		global $wpdb;
-
-		$now = time();
-
-		$SQL = "SELECT ID FROM {$this->db()->get_table_name()}
-		WHERE `status` = 'waiting' AND `time` <= {$now} AND `claim` = ''
-		ORDER BY `priority` ASC, `time` ASC
-		LIMIT {$count}";
-
-		$queued_events = $wpdb->get_results( $SQL );
-
-		return wp_parse_id_list( wp_list_pluck( $queued_events, 'ID' ) );
-	}
-
-	/**
 	 * Get a number of events by a claim ID
 	 *
 	 * @param $claim
@@ -64,6 +35,13 @@ class Event_Store {
 	}
 
 	/**
+	 * @return Events
+	 */
+	public function db() {
+		return get_db( 'events' );
+	}
+
+	/**
 	 * Stake a claim in the DB
 	 *
 	 * @param int $count
@@ -76,6 +54,46 @@ class Event_Store {
 		$this->claim_events( $events, $claim );
 
 		return $claim;
+	}
+
+	/**
+	 * Generate a claim ID.
+	 *
+	 * @return bool|string
+	 */
+	public function generate_claim_id() {
+		$claim_id = md5( microtime( true ) . rand( 0, 1000 ) );
+
+		return substr( $claim_id, 0, 20 ); // to fit in db field with 20 char limit
+	}
+
+	/**
+	 * Get a number of queued events.
+	 *
+	 * @param $count
+	 *
+	 * @return array
+	 */
+	public function get_queued_event_ids( $count = 100 ) {
+
+		global $wpdb;
+
+		$count = absint( $count );
+
+		if ( ! $count ) {
+			return [];
+		}
+
+		$now = time();
+
+		$SQL = "SELECT ID FROM {$this->db()->get_table_name()}
+		WHERE `status` = 'waiting' AND `time` <= {$now} AND `claim` = ''
+		ORDER BY `priority` ASC, `time` ASC
+		LIMIT {$count}";
+
+		$queued_events = $wpdb->get_results( $SQL );
+
+		return wp_parse_id_list( wp_list_pluck( $queued_events, 'ID' ) );
 	}
 
 	/**
@@ -96,17 +114,6 @@ class Event_Store {
 		$result = $wpdb->query( $wpdb->prepare( "UPDATE {$this->db()->get_table_name()} SET claim = %s WHERE ID IN ( $ids )", $claim ) );
 
 		return $result;
-	}
-
-	/**
-	 * Generate a claim ID.
-	 *
-	 * @return bool|string
-	 */
-	public function generate_claim_id() {
-		$claim_id = md5( microtime( true ) . rand( 0, 1000 ) );
-
-		return substr( $claim_id, 0, 20 ); // to fit in db field with 20 char limit
 	}
 
 	/**

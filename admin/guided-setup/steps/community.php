@@ -70,13 +70,7 @@ class Community extends Step
 
     }
 
-    public function save()
-    {
-
-        if ( get_request_var( 'enable_tracking' ) ){
-            Plugin::$instance->stats_collection->stats_tracking_optin();
-        }
-
+    public function save() {
         return true;
     }
 
