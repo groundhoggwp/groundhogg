@@ -12,6 +12,7 @@ use Groundhogg\Admin\Funnels\Funnels_Page;
 use Groundhogg\Admin\Guided_Setup\Guided_Setup;
 use Groundhogg\Admin\Help\Help_Page;
 use Groundhogg\Admin\Pro\Pro_Page;
+use Groundhogg\Admin\Reports\Reports_Page;
 use Groundhogg\Admin\Settings\Settings_Page;
 use Groundhogg\Admin\Tags\Tags_Page;
 use Groundhogg\Admin\Tools\Tools_Page;
@@ -66,7 +67,8 @@ class Admin_Menu
         $this->settings = new Settings_Page();
         $this->bulk_jobs = new Bulk_Job_Page();
 
-        $this->dashboard = new Dashboard_Widgets();
+//        $this->dashboard = new Dashboard_Widgets();
+	    $this->reporting = new Reports_Page();
 
         if ( ! is_white_labeled() ) {
             $this->guided_setup = new Guided_Setup();
