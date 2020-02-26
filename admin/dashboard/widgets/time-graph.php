@@ -96,4 +96,49 @@ abstract class Time_Graph extends Line_Graph
 
         return $data;
     }
+
+
+
+
+	public function get_data_chart() {
+
+    	$data = $this->get_data();
+
+		$mydata = [];
+		$label_chart = [];
+
+
+		foreach ( $data[ 0 ][ 'data' ] as $item ) {
+			$label_chart[] = date( 'Y-m-d' , $item[0]/1000 );
+		}
+
+		foreach ( $data as $d ) {
+
+			$values = [];
+
+			foreach ( $d[ 'data' ] as $v ) {
+				$values[] = [
+					't' => date( 'Y-m-d' , $v[0]/1000 ),
+					'y' => $v[ 1 ]
+				];
+
+			}
+
+
+			$mydata[] = [
+				'label' => $d[ 'label' ],
+				'data'  => $values
+			];
+
+		}
+
+		return [
+			'labels' => $label_chart,
+			'datasets'=>$mydata
+		];
+
+	}
+
+
+
 }

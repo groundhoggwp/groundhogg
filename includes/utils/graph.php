@@ -48,6 +48,7 @@ class Graph
     public function enqueue_scripts()
     {
        wp_enqueue_script( 'jquery-flot' );
+       wp_enqueue_script( 'chart-js' );
 
        switch ( $this->mode )
        {

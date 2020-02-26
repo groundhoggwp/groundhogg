@@ -100,6 +100,10 @@ class Scripts
         wp_register_script('jquery-flot-time', GROUNDHOGG_ASSETS_URL . 'lib/flot/jquery.flot.time' . $dot_min . '.js', [ 'jquery-flot' ] );
         wp_register_script('jquery-flot-categories', GROUNDHOGG_ASSETS_URL . 'lib/flot/jquery.flot.categories' . $dot_min . '.js', [ 'jquery-flot' ]);
 
+
+        //chartjs
+	    wp_register_script('chart-js', GROUNDHOGG_ASSETS_URL . 'lib/chart/Chart.bundle.min.min.js' );
+
         // Basic Admin Scripts
         wp_register_script('groundhogg-admin', GROUNDHOGG_ASSETS_URL . 'js/admin/admin' . $dot_min . '.js', ['jquery', 'select2', 'jquery-ui-autocomplete'], GROUNDHOGG_VERSION, true);
         wp_register_script('groundhogg-admin-functions', GROUNDHOGG_ASSETS_URL . 'js/admin/functions' . $dot_min . '.js', ['jquery', 'select2', 'jquery-ui-autocomplete'], GROUNDHOGG_VERSION, true);

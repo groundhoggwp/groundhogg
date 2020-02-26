@@ -2,7 +2,9 @@
 
 namespace Groundhogg\Admin\Reports;
 
+use Groundhogg\Admin\Reports\Views\Overview;
 use Groundhogg\Admin\Tabbed_Admin_Page;
+use Groundhogg\Plugin;
 
 class Reports_Page extends Tabbed_Admin_Page
 {
@@ -126,4 +128,12 @@ class Reports_Page extends Tabbed_Admin_Page
 		<?php
 
 	}
+
+
+	public function overview_view()
+    {
+
+
+	}
+
 }
