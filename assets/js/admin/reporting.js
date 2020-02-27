@@ -13,7 +13,7 @@
 
         initCalendar: function (){
 
-            var self = this
+            var self = this;
 
             this.calendar = new Calendar( {
                 element: $( '#groundhogg-datepicker' ),
@@ -52,7 +52,7 @@
                 callback: function (){
                     self.refresh( this )
                 },
-            } )
+            } );
 
             // run it with defaults
             this.calendar.calendarSaveDates()
@@ -60,12 +60,12 @@
 
         refresh: function ( calendar ){
 
-            var self = this
+            var self = this;
 
-            self.showLoader()
+            self.showLoader();
 
             var start = moment( calendar.start_date ).format( 'LL' ),
-                end = moment( calendar.end_date ).format( 'LL' )
+                end = moment( calendar.end_date ).format( 'LL' );
 
             $.ajax( {
                 type: 'post',
@@ -79,9 +79,9 @@
                 },
                 success: function ( json ){
 
-                    self.hideLoader()
+                    self.hideLoader();
 
-                    self.data = json.data.reports
+                    self.data = json.data.reports;
 
                     self.renderReports();
 
@@ -99,8 +99,8 @@
 
             for ( var i = 0; i < this.reports.length; i++ ) {
 
-                var report_id = this.reports[i]
-                var report_data = this.data[report_id]
+                var report_id = this.reports[i];
+                var report_data = this.data[report_id];
 
                 // console.log( report_id, report_data )
 
@@ -112,7 +112,7 @@
 
         renderReport: function ( report_id, report_data ){
 
-            var $report = $( '#' + report_id )
+            var $report = $( '#' + report_id );
 
             var type = report_data.type;
 
@@ -121,7 +121,7 @@
                     this.renderQuickStatReport( $report, report_data );
                     break;
                 case 'chart':
-                    this.renderChartReport( $report, report_data.chart )
+                    this.renderChartReport( $report, report_data.chart );
                     break;
             }
 
@@ -132,15 +132,15 @@
             // console.log( report_data )
 
             $report.find( '.groundhogg-quick-stat-number' ).
-                html( report_data.number )
+                html( report_data.number );
             $report.find( '.groundhogg-quick-stat-previous' ).
                 removeClass( 'green red' ).
-                addClass( report_data.compare.arrow.color )
+                addClass( report_data.compare.arrow.color );
             $report.find( '.groundhogg-quick-stat-compare' ).
-                html( report_data.compare.text )
+                html( report_data.compare.text );
             $report.find( '.groundhogg-quick-stat-arrow' ).
                 removeClass( 'up down' ).
-                addClass( report_data.compare.arrow.direction )
+                addClass( report_data.compare.arrow.direction );
             $report.find( '.groundhogg-quick-stat-prev-percent' ).
                 html( report_data.compare.percent )
 
@@ -152,19 +152,19 @@
         },
 
         showLoader: function (){
-            $( '.gh-loader-overlay' ).show()
-            $( '.gh-loader' ).show()
+            $( '.gh-loader-overlay' ).show();
+            $( '.gh-loader' ).show();
         },
 
         hideLoader: function (){
-            $( '.gh-loader-overlay' ).hide()
-            $( '.gh-loader' ).hide()
+            $( '.gh-loader-overlay' ).hide();
+            $( '.gh-loader' ).hide();
         },
 
-    } )
+    } );
 
     $( function (){
         reporting.init()
     } )
 
-} )( GroundhoggReporting, jQuery, groundhogg_nonces )
+} )( GroundhoggReporting, jQuery, groundhogg_nonces );

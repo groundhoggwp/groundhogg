@@ -182,14 +182,9 @@ abstract class Line_Graph extends Dashboard_Widget {
                 <!--                <div id="graph---><?php //echo $this->get_id();
 				?><!--" style="width:auto;height: 250px;"></div>-->
 
-                <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+
                 <canvas id="chart-<?php echo $this->get_id(); ?>" style="width:auto;height: 250px;"></canvas>
                 <script>
-
-                    //console.log(<?php //echo $this->get_id(); ?>//);
-                    //console.log(<?php //echo $data_chart;?>// );
-
-
                     var ctx = document.getElementById('<?php echo 'chart-' . $this->get_id();  ?>').getContext('2d');
                     var myChart = new Chart(ctx, {
                         type: 'line',

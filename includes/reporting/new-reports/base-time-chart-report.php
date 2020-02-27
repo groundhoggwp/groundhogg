@@ -3,36 +3,10 @@
 namespace Groundhogg\Reporting\New_Reports;
 
 use Groundhogg\Contact_Query;
+use Groundhogg\Plugin;
+use function Groundhogg\isset_not_empty;
 
-abstract class Base_Time_Chart_Report extends Base_Chart_Report{
-
-	/**
-	 * Query the results
-	 *
-	 * @param $start int
-	 * @param $end   int
-	 *
-	 * @return mixed
-	 */
-	abstract  protected function query( $start, $end );
-
-	/**
-	 * @return array[]
-	 */
-	protected function get_datasets() {
-
-		$current_contacts = $this->query( $this->start, $this->end );
-
-		return [
-			[
-				'label' => 'Monday',
-				'data'  => [
-					'x' => 10,
-					'y' => 10
-				]
-			],
-		];
-	}
+abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 
 	/**
 	 * @return string[]
@@ -46,23 +20,31 @@ abstract class Base_Time_Chart_Report extends Base_Chart_Report{
 			'responsive' => true,
 			'scales'     => [
 				'xAxes' => [
-					'type' => 'time',
-					'time' => [
-						'parser'        => 'YYYY-MM-DD HH:mm:ss',
-						'tooltipFormat' => "1 HH:mm"
-					],
-					'scaleLabel' => [
-						'display'     => true,
-						'labelString' => 'Date',
+					0 => [
+						'type'       => 'time',
+						'time'       => [
+							'parser'        => "YYY-MM-DD HH:mm:ss",
+							'tooltipFormat' => "l HH:mm"
+						],
+						'scaleLabel' => [
+							'display'     => true,
+							'labelString' => 'Date',
+						]
 					]
 				],
 				'yAxes' => [
-					'scaleLabel' => [
-						'display'     => true,
-						'labelString' => 'Date',
+					0 => [
+						'scaleLabel' => [
+							'display'     => true,
+							'labelString' => 'Date',
+						]
 					]
 				]
 			]
 		];
 	}
+
+
+
+
 }

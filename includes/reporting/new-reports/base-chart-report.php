@@ -17,29 +17,12 @@ abstract class Base_Chart_Report extends Base_Report {
 	/**
 	 * @return string
 	 */
-	protected function get_type() {
-		return 'line';
-	}
+	abstract protected function get_type();
 
 	/**
-	 *
+	 * @return array[]
 	 */
-	protected function get_options() {
-		return [
-			'responsive' => true,
-			'scales'     => [
-				'yAxes' => [
-					'ticks'      => [
-						'beginAtZero' => true,
-					],
-					'scaleLabel' => [
-						'display'     => true,
-						'labelString' => 'value',
-					]
-				]
-			]
-		];
-	}
+	abstract protected function get_options();
 
 	/**
 	 * Get the report data
