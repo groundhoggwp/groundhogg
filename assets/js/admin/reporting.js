@@ -102,7 +102,7 @@
                 var report_id = this.reports[i]
                 var report_data = this.data[report_id]
 
-                console.log( report_id, report_data )
+                // console.log( report_id, report_data )
 
                 this.renderReport( report_id, report_data )
 
@@ -118,15 +118,18 @@
 
             switch ( type ) {
                 case 'quick_stat':
-                    this.renderQuickStartReport( $report, report_data );
+                    this.renderQuickStatReport( $report, report_data );
+                    break;
+                case 'chart':
+                    this.renderChartReport( $report, report_data.chart )
                     break;
             }
 
         },
 
-        renderQuickStartReport: function ( $report, report_data ){
+        renderQuickStatReport: function ( $report, report_data ){
 
-            console.log( report_data )
+            // console.log( report_data )
 
             $report.find( '.groundhogg-quick-stat-number' ).
                 html( report_data.number )
@@ -141,6 +144,11 @@
             $report.find( '.groundhogg-quick-stat-prev-percent' ).
                 html( report_data.compare.percent )
 
+        },
+
+        renderChartReport: function ( $report, report_data ){
+            var ctx = $report[0].getContext('2d');
+            var myChart = new Chart(ctx, report_data);
         },
 
         showLoader: function (){

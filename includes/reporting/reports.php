@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Reporting\New_Reports\Chart_New_Contacts;
 use Groundhogg\Reporting\New_Reports\Email_Click_Rate;
 use Groundhogg\Reporting\New_Reports\Email_Open_Rate;
 use Groundhogg\Reporting\New_Reports\Total_Active_Contacts;
@@ -84,6 +85,10 @@ class Reports {
 			[
 				'id'       => 'email_click_rate',
 				'callback' => [ $this, 'email_click_rate' ]
+			],
+			[
+				'id'       => 'chart_new_contacts',
+				'callback' => [ $this, 'chart_new_contacts' ]
 			],
 
 		];
@@ -209,5 +214,11 @@ class Reports {
 		return $report->get_data();
 	}
 
-
+	/**
+	 * @return mixed
+	 */
+	public function chart_new_contacts(){
+		$report = new Chart_New_Contacts( $this->start, $this->end );
+		return $report->get_data();
+	}
 }

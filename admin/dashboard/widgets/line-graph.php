@@ -291,7 +291,6 @@ abstract class Line_Graph extends Dashboard_Widget {
 
 	}
 
-
 	public function get_bg_color( $i ) {
 		$items = [
 			"rgba(232, 116, 59 , 0.5 )",

@@ -96,6 +96,8 @@ class Reports_Page extends Tabbed_Admin_Page {
             case 'overview':
 
                 $reports = [
+                    'chart_new_contacts',
+
                     'total_new_contacts',
                     'total_confirmed_contacts',
 	                'total_engaged_contacts',

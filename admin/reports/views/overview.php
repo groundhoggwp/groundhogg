@@ -34,9 +34,7 @@ function quick_stat_report( $args = [] ) {
 ?>
 <div class="groundhogg-report">
     <h2 class="title"><?php _e( 'New Contacts', 'groundhogg' ); ?></h2>
-    <div id="chart-new-contacts">
-        <img src="<?php get_img_url( 'new-contacts.PNG' ); ?>">
-    </div>
+    <canvas id="chart_new_contacts"></canvas>
 </div>
 
 <div class="groundhogg-quick-stats">
