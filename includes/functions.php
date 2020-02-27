@@ -444,12 +444,14 @@ function words_to_key( $words ) {
 /**
  * Return the percentage to the second degree.
  *
- * @param $a
- * @param $b
+ * @param     $a
+ * @param     $b
+ *
+ * @param int $precision
  *
  * @return float
  */
-function percentage( $a, $b ) {
+function percentage( $a, $b, $precision=2 ) {
 	$a = intval( $a );
 	$b = intval( $b );
 
@@ -457,7 +459,7 @@ function percentage( $a, $b ) {
 		return 0;
 	}
 
-	return round( ( $b / $a ) * 100, 2 );
+	return round( ( $b / $a ) * 100, $precision );
 }
 
 function sort_by_string_in_array( $key ) {
@@ -1233,8 +1235,8 @@ function create_contact_from_user( $user, $sync_meta = false ) {
 	}
 
 	/**
-     * Runs after the contact is created from the create user function
-     *
+	 * Runs after the contact is created from the create user function
+	 *
 	 * @param $contact Contact
 	 * @param $user    \WP_User
 	 */
@@ -1280,10 +1282,10 @@ function create_user_from_contact( $contact, $role = 'subscriber', $notification
 	$contact->update( [ 'user_id' => $user_id ] );
 
 	/**
-     * Runs after a user is successfully registered.
-     *
+	 * Runs after a user is successfully registered.
+	 *
 	 * @param $user_id int
-     * @param $contact Contact
+	 * @param $contact Contact
 	 */
 	do_action( 'groundhogg/create_user_from_contact', $user_id, $contact );
 
@@ -1381,7 +1383,7 @@ function send_email_notification( $email_id, $contact_id_or_email, $time = 0 ) {
 		'step_id'    => $email->get_id(),
 		'contact_id' => $contact->get_id(),
 		'event_type' => Event::EMAIL_NOTIFICATION,
-        'priority'   => 5,
+		'priority'   => 5,
 		'status'     => 'waiting',
 	];
 
@@ -1575,41 +1577,42 @@ function get_items_from_csv( $file_path = '' ) {
 function get_mappable_fields( $extra = [] ) {
 
 	$defaults = [
-		'full_name'               => __( 'Full Name' ),
-		'first_name'              => __( 'First Name' ),
-		'last_name'               => __( 'Last Name' ),
-		'email'                   => __( 'Email Address' ),
-		'optin_status'            => __( 'Optin Status' ),
-		'user_id'                 => __( 'User Id' ),
-		'owner_id'                => __( 'Owner Id' ),
-		'date_created'            => __( 'Date Created' ),
-		'birthday'                => __( 'Birthday' ),
-		'primary_phone'           => __( 'Phone Number' ),
-		'primary_phone_extension' => __( 'Phone Number Extension' ),
-		'street_address_1'        => __( 'Street Address 1' ),
-		'street_address_2'        => __( 'Street Address 2' ),
-		'city'                    => __( 'City' ),
-		'postal_zip'              => __( 'Postal/Zip' ),
-		'region'                  => __( 'Province/State/Region' ),
-		'country'                 => __( 'Country' ),
-		'company_name'            => __( 'Company Name' ),
-		'company_address'         => __( 'Full Company Address' ),
-		'job_title'               => __( 'Job Title' ),
-		'time_zone'               => __( 'Time Zone' ),
-		'ip_address'              => __( 'IP Address' ),
-		'lead_source'             => __( 'Lead Source' ),
-		'source_page'             => __( 'Source Page' ),
-		'terms_agreement'         => __( 'Terms Agreement' ),
-		'gdpr_consent'            => __( 'GDPR Consent' ),
-		'notes'                   => __( 'Add To Notes' ),
-		'tags'                    => __( 'Apply Value as Tag' ),
-		'meta'                    => __( 'Add as Custom Meta' ),
-		'file'                    => __( 'Upload File' ),
-		'utm_campaign'            => __( 'UTM Campaign' ),
-		'utm_content'             => __( 'UTM Content' ),
-		'utm_medium'              => __( 'UTM Medium' ),
-		'utm_term'                => __( 'UTM Term' ),
-		'utm_source'              => __( 'UTM Source' ),
+		'full_name'                 => __( 'Full Name' ),
+		'first_name'                => __( 'First Name' ),
+		'last_name'                 => __( 'Last Name' ),
+		'email'                     => __( 'Email Address' ),
+		'optin_status'              => __( 'Optin Status' ),
+		'user_id'                   => __( 'User Id' ),
+		'owner_id'                  => __( 'Owner Id' ),
+		'date_created'              => __( 'Date Created' ),
+		'date_optin_status_changed' => __( 'Date Optin Status Changed' ),
+		'birthday'                  => __( 'Birthday' ),
+		'primary_phone'             => __( 'Phone Number' ),
+		'primary_phone_extension'   => __( 'Phone Number Extension' ),
+		'street_address_1'          => __( 'Street Address 1' ),
+		'street_address_2'          => __( 'Street Address 2' ),
+		'city'                      => __( 'City' ),
+		'postal_zip'                => __( 'Postal/Zip' ),
+		'region'                    => __( 'Province/State/Region' ),
+		'country'                   => __( 'Country' ),
+		'company_name'              => __( 'Company Name' ),
+		'company_address'           => __( 'Full Company Address' ),
+		'job_title'                 => __( 'Job Title' ),
+		'time_zone'                 => __( 'Time Zone' ),
+		'ip_address'                => __( 'IP Address' ),
+		'lead_source'               => __( 'Lead Source' ),
+		'source_page'               => __( 'Source Page' ),
+		'terms_agreement'           => __( 'Terms Agreement' ),
+		'gdpr_consent'              => __( 'GDPR Consent' ),
+		'notes'                     => __( 'Add To Notes' ),
+		'tags'                      => __( 'Apply Value as Tag' ),
+		'meta'                      => __( 'Add as Custom Meta' ),
+		'file'                      => __( 'Upload File' ),
+		'utm_campaign'              => __( 'UTM Campaign' ),
+		'utm_content'               => __( 'UTM Content' ),
+		'utm_medium'                => __( 'UTM Medium' ),
+		'utm_term'                  => __( 'UTM Term' ),
+		'utm_source'                => __( 'UTM Source' ),
 	];
 
 	$fields = array_merge( $defaults, $extra );
@@ -1658,6 +1661,7 @@ function generate_contact_with_map( $fields, $map ) {
 				$args[ $field ] = sanitize_email( $value );
 				break;
 			case 'date_created':
+			case 'date_optin_status_changed':
 				$args[ $field ] = date( 'Y-m-d H:i:s', strtotime( $value ) );
 				break;
 			case 'optin_status':
@@ -2798,9 +2802,9 @@ add_action( 'admin_menu', function () {
 
 add_action( 'admin_print_styles', function () {
 
-    if ( is_white_labeled() ){
-        return;
-    }
+	if ( is_white_labeled() ) {
+		return;
+	}
 
 	?>
     <style>

@@ -4,10 +4,16 @@ namespace Groundhogg\Admin\Reports;
 
 use Groundhogg\Admin\Reports\Views\Overview;
 use Groundhogg\Admin\Tabbed_Admin_Page;
+use Groundhogg\Contact_Query;
+use Groundhogg\Reports;
+use function Groundhogg\get_post_var;
+use function Groundhogg\get_request_var;
+use function Groundhogg\groundhogg_logo;
+use function Groundhogg\is_white_labeled;
+use function Groundhogg\white_labeled_name;
 use Groundhogg\Plugin;
 
-class Reports_Page extends Tabbed_Admin_Page
-{
+class Reports_Page extends Tabbed_Admin_Page {
 
 	/**
 	 * Add Ajax actions...
@@ -15,7 +21,7 @@ class Reports_Page extends Tabbed_Admin_Page
 	 * @return mixed
 	 */
 	protected function add_ajax_actions() {
-		// TODO: Implement add_ajax_actions() method.
+		add_action( 'wp_ajax_groundhogg_refresh_dashboard_reports', [ $this, 'refresh_report_data' ] );
 	}
 
 	/**
@@ -71,8 +77,42 @@ class Reports_Page extends Tabbed_Admin_Page
 	 * Enqueue any scripts
 	 */
 	public function scripts() {
-		// TODO: Implement scripts() method.
+		wp_enqueue_style( 'groundhogg-admin-reporting' );
+		wp_enqueue_style( 'groundhogg-admin-loader' );
+		wp_enqueue_style( 'baremetrics-calendar' );
+//	    wp_enqueue_script( 'moment-js' );
+//		wp_enqueue_script( 'baremetrics-calendar' );
+		wp_enqueue_script( 'groundhogg-admin-reporting' );
+
+		wp_localize_script( 'groundhogg-admin-reporting', 'GroundhoggReporting', [
+			'reports' => $this->get_reports_per_tab()
+		] );
 	}
+
+	protected function get_reports_per_tab() {
+
+	    switch ( $this->get_current_tab() ){
+
+            case 'overview':
+
+                $reports = [
+                    'total_new_contacts',
+                    'total_confirmed_contacts',
+	                'total_engaged_contacts',
+                    'total_unsubscribes',
+
+	                'total_emails_sent',
+	                'email_open_rate',
+                    'email_click_rate',
+                ];
+
+                break;
+
+        }
+
+        return $reports;
+
+    }
 
 	/**
 	 * Add any help items
@@ -98,42 +138,87 @@ class Reports_Page extends Tabbed_Admin_Page
 		];
 	}
 
+	protected function get_title_actions() {
+		return [];
+	}
+
 	public function page() {
 
 		do_action( "groundhogg/admin/{$this->get_slug()}", $this );
 		do_action( "groundhogg/admin/{$this->get_slug()}/{$this->get_current_tab()}", $this );
 
 		?>
-		<div class="wrap">
-			<h1 class="wp-heading-inline"><?php echo $this->get_title(); ?></h1>
+        <div class="loader-wrap">
+            <div class="gh-loader-overlay" style="display:none;"></div>
+            <div class="gh-loader" style="display: none"></div>
+        </div>
+        <div class="wrap">
+			<?php if ( ! is_white_labeled() ): ?>
+                <h1 class="wp-heading-inline"><?php groundhogg_logo( 'black' ); ?></h1>
+			<?php else: ?>
+                <h1 class="wp-heading-inline"><?php echo esc_html( white_labeled_name() ); ?></h1>
+			<?php endif; ?>
 			<?php $this->do_title_actions(); ?>
+			<?php $this->range_picker(); ?>
 			<?php $this->notices(); ?>
-			<hr class="wp-header-end">
+            <hr class="wp-header-end">
 			<?php $this->do_page_tabs(); ?>
 			<?php
 
 			$method = sprintf( '%s_%s', $this->get_current_tab(), $this->get_current_action() );
 			$backup_method = sprintf( '%s_%s', $this->get_current_tab(), 'view' );
 
-			if ( method_exists( $this, $method ) ){
+			if ( method_exists( $this, $method ) ) {
 				call_user_func( [ $this, $method ] );
-			} else if ( has_action( "groundhogg/admin/{$this->get_slug()}/display/{$method}" ) ){
+			} else if ( has_action( "groundhogg/admin/{$this->get_slug()}/display/{$method}" ) ) {
 				do_action( "groundhogg/admin/{$this->get_slug()}/display/{$method}", $this );
 			} else if ( method_exists( $this, $backup_method ) ) {
 				call_user_func( [ $this, $backup_method ] );
 			}
 
 			?>
-		</div>
+        </div>
 		<?php
 
 	}
 
-
-	public function overview_view()
-    {
-
-
+	/**
+	 * Output the date range picker
+	 */
+	protected function range_picker() {
+		?>
+        <div id="groundhogg-datepicker-wrap">
+            <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker"></div>
+        </div>
+		<?php
 	}
 
+	/**
+	 * Overview
+	 */
+	public function overview_view() {
+		include dirname( __FILE__ ) . '/views/overview.php';
+	}
+
+	public function refresh_report_data() {
+
+		$start = strtotime( sanitize_text_field( get_post_var( 'start' ) ) );
+		$end   = strtotime( sanitize_text_field( get_post_var( 'end' ) ) );
+
+		$reports = map_deep( get_post_var( 'reports' ), 'sanitize_key' );
+
+		$reporting = new Reports( $start, $end );
+
+		$results = [];
+
+		foreach ( $reports as $report_id ){
+		    $results[ $report_id ] = $reporting->get_data( $report_id );
+        }
+
+		wp_send_json_success( [
+			'start'   => $start,
+			'end'     => $end,
+			'reports' => $results
+		] );
+	}
 }

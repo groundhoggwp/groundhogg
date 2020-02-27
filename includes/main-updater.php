@@ -210,6 +210,9 @@ class Main_Updater extends Updater {
 	 * Add priority column to events db
 	 */
 	public function version_2_1_14(){
+
+		get_db( 'contacts' )->create_table();
+
 		$events = get_db( 'events' );
 
 		$events->create_table();

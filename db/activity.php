@@ -131,8 +131,7 @@ class Activity extends DB  {
         return $this->insert( $args );
     }
 
-    public function get_date_key()
-    {
+    public function get_date_key() {
         return 'timestamp';
     }
 
