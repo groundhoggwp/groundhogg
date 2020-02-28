@@ -54,4 +54,13 @@ abstract class Base_Line_Chart_Report extends Base_Report {
 			]
 		];
 	}
+
+
+	protected function random_color_part() {
+		return str_pad( dechex( mt_rand( 0, 255 ) ), 2, '0', STR_PAD_LEFT);
+	}
+
+	function get_random_color() {
+		return  '#'. $this->random_color_part() . $this->random_color_part() . $this->random_color_part();
+	}
 }
