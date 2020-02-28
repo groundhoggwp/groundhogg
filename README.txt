@@ -180,6 +180,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 = 2.1.13.6 =
 * TWEAKED Make usage tracking GDPR compliant.
 * TWEAKED Funnel events are given higher priority than broadcast events in the event queue.
+* TWEAKED The marketable status of a contact will be checked before scheduling any broadcast emails.
 * FIXED Ajax Form Submission not working.
 * FIXED checkbox required attribute not added in HTML.
 

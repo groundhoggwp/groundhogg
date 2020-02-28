@@ -38,25 +38,6 @@ abstract class Updater {
 	}
 
 	/**
-	 * Remove a version from the previous versions so that the updater will perform that version update
-	 *
-	 * @param $version
-	 *
-	 * @return bool
-	 */
-	public function forget_version_update( $version ) {
-		$versions = $this->get_previous_versions();
-
-		if ( ! in_array( $version, $versions ) ) {
-			return false;
-		}
-
-		unset( $versions[ array_search( $version, $versions ) ] );
-
-		return update_option( $this->get_version_option_name(), $versions );
-	}
-
-	/**
 	 * Get the previous version which the plugin was updated to.
 	 *
 	 * @return string[]
@@ -257,6 +238,25 @@ abstract class Updater {
 	}
 
 	/**
+	 * Remove a version from the previous versions so that the updater will perform that version update
+	 *
+	 * @param $version
+	 *
+	 * @return bool
+	 */
+	public function forget_version_update( $version ) {
+		$versions = $this->get_previous_versions();
+
+		if ( ! in_array( $version, $versions ) ) {
+			return false;
+		}
+
+		unset( $versions[ array_search( $version, $versions ) ] );
+
+		return update_option( $this->get_version_option_name(), $versions );
+	}
+
+	/**
 	 * When the plugin is installed save the initial versions.
 	 * Do not overwrite older versions.
 	 *
@@ -370,9 +370,9 @@ abstract class Updater {
 		foreach ( $missing_updates as $update ) {
 
 			// Failsafe check for doing the update?
-			if ( ! $this->did_update( $update ) ) {
+//			if ( ! $this->did_update( $update ) ) {
 				$this->update_to_version( $update );
-			}
+//			}
 		}
 
 		$this->did_updates = true;
