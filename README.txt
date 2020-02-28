@@ -177,8 +177,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.1.14 =
+= 2.1.13.6 =
+* TWEAKED Make usage tracking GDPR compliant.
 * TWEAKED Funnel events are given higher priority than broadcast events in the event queue.
+* FIXED Ajax Form Submission not working.
+* FIXED checkbox required attribute not added in HTML.
 
 = 2.1.13.5 =
 * FIXED Removed version 2.0.8.1 from the db upgrade path. Redundant upgrade.
