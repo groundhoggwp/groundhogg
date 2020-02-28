@@ -41,9 +41,11 @@
             // var data = $form.serializeFormJSON();
 
             var data = new FormData($form[0]);
-            data._ghnonce = gh._ghnonce;
+            // data._ghnonce = gh._ghnonce;
+            data.append( '_ghnonce', gh._ghnonce );
             // data.form_data = $form.serializeArray();
-            data.action = 'groundhogg_ajax_form_submit';
+            // data.action = 'groundhogg_ajax_form_submit';
+            data.append( 'action', 'groundhogg_ajax_form_submit' );
 
             // console.log(data);
 
