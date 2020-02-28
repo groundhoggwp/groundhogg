@@ -4,6 +4,7 @@
 /node_modules export-ignore
 /vendor export-ignore
 /bin export-ignore
+/tests export-ignore
 
 # Files
 /.babelrc export-ignore
