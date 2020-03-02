@@ -2719,6 +2719,7 @@ function get_upload_wp_error( $file ) {
 		case UPLOAD_ERR_CANT_WRITE:
 			$message = "Failed to write file to disk";
 			break;
+
 		case UPLOAD_ERR_EXTENSION:
 			$message = "File upload stopped by extension";
 			break;
