@@ -11,7 +11,6 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 
 	protected function get_datasets() {
 
-
 		$new      = $this->get_new_contacts();
 		$previous = $this->get_previous_new_contact();
 
@@ -21,36 +20,31 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 
 		for ( $i = 0; $i < count( $new ); $i ++ ) {
 
-			$n[]     = [
-				't' => $new[ $i ][ 't' ],
-				'label' => sprintf( " %s (%s): %s" , __('Contacts' , 'groundhogg' ) , date(  get_option( 'date_format' ) ." ". get_option( 'time_format' ) , strtotime( $new[ $i ][ 't' ]  ) ) , $new[ $i ][ 'y' ] ),
+			$n[] = [
+				't'     => $new[ $i ][ 't' ],
+				'label' => sprintf( " %s (%s): %s", __( 'Contacts', 'groundhogg' ), date( get_option( 'date_format' ) . " " . get_option( 'time_format' ), strtotime( $new[ $i ][ 't' ] ) ), $new[ $i ][ 'y' ] ),
 				'y'     => $new[ $i ][ 'y' ]
 			];
 
 			$p[] = [
-				't' => $new[ $i ][ 't' ],
-				'label' => sprintf( " %s (%s): %s" , __('Contacts' , 'groundhogg' ) ,   date(  get_option( 'date_format' ) ." ". get_option( 'time_format' ) , strtotime( $previous[ $i ][ 't' ]  )) ,$previous[ $i ][ 'y' ] ),
+				't'     => $new[ $i ][ 't' ],
+				'label' => sprintf( " %s (%s): %s", __( 'Contacts', 'groundhogg' ), date( get_option( 'date_format' ) . " " . get_option( 'time_format' ), strtotime( $previous[ $i ][ 't' ] ) ), $previous[ $i ][ 'y' ] ),
 				'y'     => $previous[ $i ][ 'y' ],
 			];
 
 		}
 
-
 		return [
 
 			'datasets' => [
-				[
-					'label'       => __( 'This period', 'groundhogg' ),
-					"borderColor" => $this->get_random_color(),
-					'data'        => $n,
-					"fill"        => false
-				],
-				[
-					'label'       => __( 'Previous period', 'groundhogg' ),
-					"borderColor" => $this->get_random_color(),
-					'data'        => $p,
-					"fill"        => false
-				]
+				array_merge( [
+					'label' => __( sprintf( "This Period( %s - %s)", date( get_option( 'date_format' ), $this->start ), date( get_option( 'date_format' ), $this->end ) ), 'groundhogg' ),
+					'data'  => $n,
+				], $this->get_line_style() ),
+				array_merge( [
+					'label' => __( sprintf( "Previous Period( %s - %s)", date( get_option( 'date_format' ), $this->compare_start ), date( get_option( 'date_format' ), $this->compare_end ) ), 'groundhogg' ),
+					'data'  => $p,
+				], $this->get_line_style() )
 			]
 		];
 
@@ -61,8 +55,6 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 //			]
 //		];
 
-
-		// TODO retrive data
 	}
 
 
@@ -147,10 +139,18 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 
 		return [
 			'responsive' => true,
-			'tooltips' => [
-				'callbacks' => [
-					'label' => 'new_contacts_tool_tip',
+			'tooltips'   => [
+				'callbacks'       => [
+					'label' => 'tool_tip_label',
+					'title' =>  'tool_tip_title',
 				],
+				'mode'            => 'index',
+				'intersect'       => false,
+				'backgroundColor' => '#FFF',
+				'bodyFontColor'   => '#000',
+				'borderColor'     => '#727272',
+				'borderWidth'     => 2,
+
 			],
 			'scales'     => [
 				'xAxes' => [
@@ -171,12 +171,11 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 						'scaleLabel' => [
 							'display'     => true,
 							'labelString' => 'Numbers',
-						]
-					]
+						],
+					],
+
 				]
 			]
 		];
 	}
-
-
 }

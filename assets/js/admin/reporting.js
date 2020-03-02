@@ -1,6 +1,13 @@
-function new_contacts_tool_tip(tooltipItem, data) {
-    // console.log(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].label);
-    return data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].label;
+function tool_tip_label(tooltipItem, data) {
+    if (data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].label) {
+        return data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].label;
+    } else {
+        return  data.datasets[tooltipItem.datasetIndex].label + ": " + data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].y;
+    }
+}
+
+function tool_tip_title() {
+    return '';
 }
 
 (function (reporting, $, nonces) {
@@ -140,18 +147,51 @@ function new_contacts_tool_tip(tooltipItem, data) {
 
         renderChartReport: function ($report, report_data) {
 
-            if ( typeof report_data.options.tooltips !== 'undefined' ){
+            if (typeof report_data.options.tooltips !== 'undefined') {
                 var funcName = report_data.options.tooltips.callbacks.label;
-                report_data.options.tooltips.callbacks.label = window[ funcName ];
+                report_data.options.tooltips.callbacks.label = window[funcName];
+            }
+
+            if (typeof report_data.options.tooltips !== 'undefined') {
+                var funcName = report_data.options.tooltips.callbacks.title;
+                report_data.options.tooltips.callbacks.title = window[funcName];
             }
 
             // console.log( report_data );
 
             var ctx = $report[0].getContext('2d');
 
-            ctx.clearRect(0, 0,  $report[0].width,  $report[0].height);
-
+            ctx.clearRect(0, 0, $report[0].width, $report[0].height);
             var myChart = new Chart(ctx, report_data);
+
+            // draw Hover line in the graph
+
+            var draw_line = Chart.controllers.line.prototype.draw;
+            Chart.helpers.extend(Chart.controllers.line.prototype, {
+                draw: function () {
+                    draw_line.apply(this, arguments);
+                    if (this.chart.tooltip._active && this.chart.tooltip._active.length) {
+                        var ap = this.chart.tooltip._active[0];
+                        var ctx = this.chart.ctx;
+                        var x = ap.tooltipPosition().x;
+                        var topy = this.chart.scales['y-axis-0'].top;
+                        var bottomy = this.chart.scales['y-axis-0'].bottom;
+
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.moveTo(x, topy);
+                        ctx.lineTo(x, bottomy);
+                        ctx.lineWidth = 1;
+                        ctx.strokeStyle = '#727272';
+                        ctx.setLineDash([10, 10]);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                }
+
+            });
+
+
         },
 
         showLoader: function () {
