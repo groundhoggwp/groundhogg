@@ -12,7 +12,7 @@ class GH_UnitTest_Factory_For_Event extends GH_UnitTest_Factory_For_Thing {
 	public function __construct( $factory = null ) {
 		parent::__construct( $factory );
 		$this->default_generation_definitions = array(
-			'time'           => time(),
+			'time'           => new GH_UnitTest_Time_Generator(),
 			'time_scheduled' => time(),
 			'funnel_id'      => 1,
 			'step_id'        => 1,
