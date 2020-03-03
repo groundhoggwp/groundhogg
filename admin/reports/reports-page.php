@@ -122,7 +122,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 				break;
             case 'funnels':
                 $reports = [
-	                'chart_email_activity'
+	                'chart_funnel_breakdown'
                 ];
 
 		}

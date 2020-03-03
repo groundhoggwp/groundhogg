@@ -65,6 +65,12 @@ function tool_tip_title() {
             this.calendar.calendarSaveDates()
         },
 
+        initFunnels : function() {
+
+
+        },
+
+
         refresh: function (calendar) {
 
             var self = this;
@@ -148,12 +154,12 @@ function tool_tip_title() {
 
         renderChartReport: function ($report, report_data) {
 
-            if (typeof report_data.options.tooltips !== 'undefined') {
+            if (typeof report_data.options.tooltips.callbacks !== 'undefined') {
                 var funcName = report_data.options.tooltips.callbacks.label;
                 report_data.options.tooltips.callbacks.label = window[funcName];
             }
 
-            if (typeof report_data.options.tooltips !== 'undefined') {
+            if (typeof report_data.options.tooltips.callbacks !== 'undefined') {
                 var funcName = report_data.options.tooltips.callbacks.title;
                 report_data.options.tooltips.callbacks.title = window[funcName];
             }
