@@ -3,10 +3,6 @@
 namespace Groundhogg\Reporting\New_Reports;
 
 use Groundhogg\Contact_Query;
-use Groundhogg\Plugin;
-use function Groundhogg\get_request_var;
-use function Groundhogg\isset_not_empty;
-
 class Chart_New_Contacts extends Base_Time_Chart_Report {
 
 	protected function get_datasets() {
@@ -17,7 +13,9 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 		$n = [];
 		$p = [];
 
-
+		/**
+		 * adds labels in the data set to display during the hover action
+		 */
 		for ( $i = 0; $i < count( $new ); $i ++ ) {
 
 			$n[] = [
@@ -34,8 +32,11 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 
 		}
 
-		return [
+		/**
+		 * Create a valid data set to plot in chart
+		 */
 
+		return [
 			'datasets' => [
 				array_merge( [
 					'label' => __( sprintf( "This Period( %s - %s)", date( get_option( 'date_format' ), $this->start ), date( get_option( 'date_format' ), $this->end ) ), 'groundhogg' ),
@@ -47,18 +48,12 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 				], $this->get_line_style() )
 			]
 		];
-
-//		return [
-//			'datasets' => [
-//				$this->get_new_contacts(),
-//				$this->get_previous_new_contact()
-//			]
-//		];
-
 	}
 
 
 	/**
+	 * Used to find date field form the list of array.
+	 *
 	 * @param $datum
 	 *
 	 * @return int
@@ -67,7 +62,11 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 		return strtotime( $datum->date_created );
 	}
 
-
+	/**
+	 * Gets contact data for the current time period
+	 *
+	 * @return array
+	 */
 	public function get_new_contacts() {
 		$query = new Contact_Query();
 
@@ -78,29 +77,19 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 			]
 		] );
 
-		$result = $this->group_by_time( $data );
+		$grouped_data = $this->group_by_time( $data );
 
-		$values = [];
-		foreach ( $result as $d ) {
-			$values[] = [
-				't' => $d[ 2 ],
-				'y' => $d[ 1 ]
-			];
-		}
+		return $this->normalize_data($grouped_data);
 
-		return $values;
-//
-//		return [
-//			'label'           => __( 'New Contacts', 'groundhogg' ),
-//			"borderColor"     => $this->get_random_color(),
-//			'data'            => $values,
-//			"fill"            =>false
-//		];
 	}
 
 
+	/**
+	 * Gets the contacts for the previous time period
+	 *
+	 * @return array
+	 */
 	public function get_previous_new_contact() {
-
 
 		$query = new Contact_Query();
 
@@ -111,71 +100,9 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 			]
 		] );
 
-		$result = $this->group_by_time( $data, true );
+		$grouped_data = $this->group_by_time( $data, true );
 
-		$values = [];
-		foreach ( $result as $d ) {
-			$values[] = [
-				't' => $d[ 2 ],
-				'y' => $d[ 1 ]
-			];
-		}
+		return $this->normalize_data($grouped_data);
 
-		return $values;
-
-//
-//		return [
-//			'label'           => __( 'Previous Contacts', 'groundhogg' ),
-//			"borderColor"     => $this->get_random_color(),
-//			'data'            => $values,
-//			"fill"            =>false
-//		];
-
-
-	}
-
-
-	protected function get_options() {
-
-		return [
-			'responsive' => true,
-			'tooltips'   => [
-				'callbacks'       => [
-					'label' => 'tool_tip_label',
-					'title' =>  'tool_tip_title',
-				],
-				'mode'            => 'index',
-				'intersect'       => false,
-				'backgroundColor' => '#FFF',
-				'bodyFontColor'   => '#000',
-				'borderColor'     => '#727272',
-				'borderWidth'     => 2,
-
-			],
-			'scales'     => [
-				'xAxes' => [
-					0 => [
-						'type'       => 'time',
-						'time'       => [
-							'parser'        => "YYY-MM-DD HH:mm:ss",
-							'tooltipFormat' => "l HH:mm"
-						],
-						'scaleLabel' => [
-							'display'     => true,
-							'labelString' => 'Date',
-						]
-					]
-				],
-				'yAxes' => [
-					0 => [
-						'scaleLabel' => [
-							'display'     => true,
-							'labelString' => 'Numbers',
-						],
-					],
-
-				]
-			]
-		];
 	}
 }

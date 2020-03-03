@@ -91,30 +91,45 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 	protected function get_reports_per_tab() {
 
-	    switch ( $this->get_current_tab() ){
+		switch ( $this->get_current_tab() ) {
 
-            case 'overview':
+			case 'overview':
 
+				$reports = [
+					'chart_new_contacts',
+
+					'total_new_contacts',
+					'total_confirmed_contacts',
+					'total_engaged_contacts',
+					'total_unsubscribes',
+
+					'total_emails_sent',
+					'email_open_rate',
+					'email_click_rate',
+				];
+
+				break;
+			case 'contacts' :
+				$reports = [
+					'chart_new_contacts',
+				];
+				break;
+			case 'email':
+				$reports = [
+					'chart_email_activity'
+				];
+
+				break;
+            case 'funnels':
                 $reports = [
-                    'chart_new_contacts',
-
-                    'total_new_contacts',
-                    'total_confirmed_contacts',
-	                'total_engaged_contacts',
-                    'total_unsubscribes',
-
-	                'total_emails_sent',
-	                'email_open_rate',
-                    'email_click_rate',
+	                'chart_email_activity'
                 ];
 
-                break;
+		}
 
-        }
+		return $reports;
 
-        return $reports;
-
-    }
+	}
 
 	/**
 	 * Add any help items
@@ -136,7 +151,20 @@ class Reports_Page extends Tabbed_Admin_Page {
 			[
 				'name' => __( 'Overview', 'groundhogg' ),
 				'slug' => 'overview'
-			]
+			],
+			[
+				'name' => __( 'Contacts', 'groundhogg' ),
+				'slug' => 'contacts'
+			],
+			[
+				'name' => __( 'Email', 'groundhogg' ),
+				'slug' => 'email'
+			],
+			[
+				'name' => __( 'Funnels', 'groundhogg' ),
+				'slug' => 'funnels'
+			],
+
 		];
 	}
 
@@ -167,7 +195,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 			<?php $this->do_page_tabs(); ?>
 			<?php
 
-			$method = sprintf( '%s_%s', $this->get_current_tab(), $this->get_current_action() );
+			$method        = sprintf( '%s_%s', $this->get_current_tab(), $this->get_current_action() );
 			$backup_method = sprintf( '%s_%s', $this->get_current_tab(), 'view' );
 
 			if ( method_exists( $this, $method ) ) {
@@ -202,6 +230,32 @@ class Reports_Page extends Tabbed_Admin_Page {
 		include dirname( __FILE__ ) . '/views/overview.php';
 	}
 
+
+	/**
+	 * Contacts
+	 */
+	public function contacts_view() {
+		include dirname( __FILE__ ) . '/views/contacts.php';
+	}
+
+
+	/**
+	 * Email
+	 */
+	public function email_view() {
+		include dirname( __FILE__ ) . '/views/email.php';
+	}
+
+
+	/**
+	 * Contacts
+	 */
+	public function funnels_view() {
+		include dirname( __FILE__ ) . '/views/funnels.php';
+	}
+
+
+
 	public function refresh_report_data() {
 
 		$start = strtotime( sanitize_text_field( get_post_var( 'start' ) ) );
@@ -213,9 +267,9 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 		$results = [];
 
-		foreach ( $reports as $report_id ){
-		    $results[ $report_id ] = $reporting->get_data( $report_id );
-        }
+		foreach ( $reports as $report_id ) {
+			$results[ $report_id ] = $reporting->get_data( $report_id );
+		}
 
 		wp_send_json_success( [
 			'start'   => $start,

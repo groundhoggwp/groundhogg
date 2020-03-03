@@ -18,6 +18,19 @@ abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 	protected function get_options() {
 		return [
 			'responsive' => true,
+			'tooltips'   => [
+				'callbacks'       => [
+					'label' => 'tool_tip_label',
+					'title' => 'tool_tip_title',
+				],
+				'mode'            => 'index',
+				'intersect'       => false,
+				'backgroundColor' => '#FFF',
+				'bodyFontColor'   => '#000',
+				'borderColor'     => '#727272',
+				'borderWidth'     => 2,
+
+			],
 			'scales'     => [
 				'xAxes' => [
 					0 => [
@@ -37,8 +50,9 @@ abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 						'scaleLabel' => [
 							'display'     => true,
 							'labelString' => 'Numbers',
-						]
-					]
+						],
+					],
+
 				]
 			]
 		];
@@ -58,14 +72,28 @@ abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 		if ( $range <= DAY_IN_SECONDS ) {
 			return HOUR_IN_SECONDS;
 		} else if ( $range <= WEEK_IN_SECONDS ) {
-			return DAY_IN_SECONDS;
+			return HOUR_IN_SECONDS;
 		} else if ( $range <= MONTH_IN_SECONDS ) {
-			return WEEK_IN_SECONDS;
+			return DAY_IN_SECONDS;
 		} else if ( $range <= 2 * YEAR_IN_SECONDS ) {
 			return MONTH_IN_SECONDS;
 		}
 
 		return YEAR_IN_SECONDS;
+
+//
+//		if ( $range <= DAY_IN_SECONDS ) {
+//			return HOUR_IN_SECONDS;
+//		} else if ( $range <= WEEK_IN_SECONDS ) {
+//			return DAY_IN_SECONDS;
+//		} else if ( $range <= MONTH_IN_SECONDS ) {
+//			return WEEK_IN_SECONDS;
+//		} else if ( $range <= 2 * YEAR_IN_SECONDS ) {
+//			return MONTH_IN_SECONDS;
+//		}
+//
+//		return YEAR_IN_SECONDS;
+
 	}
 
 
@@ -91,7 +119,13 @@ abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 
 	}
 
-
+	/**
+	 * Get various start time and end time values.
+	 *
+	 * @param bool $previous
+	 *
+	 * @return array
+	 */
 	protected function get_values( $previous = false  ) {
 
 		if ($previous) {
@@ -145,6 +179,26 @@ abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 		}
 
 		return array_values( $times );
+	}
+
+	/**
+	 * Return valid array to display in chart
+	 *
+	 * @param $data array
+	 *
+	 * @return array
+	 */
+	public function normalize_data( $data )
+	{
+
+		$values = [];
+		foreach ( $data as $d ) {
+			$values[] = [
+				't' => $d[ 2 ],
+				'y' => $d[ 1 ]
+			];
+		}
+		return $values;
 	}
 
 }

@@ -16,6 +16,7 @@ function tool_tip_title() {
 
         data: {},
         calendar: null,
+        myChart : null,
 
         init: function () {
 
@@ -157,15 +158,15 @@ function tool_tip_title() {
                 report_data.options.tooltips.callbacks.title = window[funcName];
             }
 
-            // console.log( report_data );
+
+            if(this.myChart!=null){
+                this.myChart.destroy();
+            }
 
             var ctx = $report[0].getContext('2d');
-
-            ctx.clearRect(0, 0, $report[0].width, $report[0].height);
-            var myChart = new Chart(ctx, report_data);
+            this.myChart = new Chart(ctx, report_data) ;
 
             // draw Hover line in the graph
-
             var draw_line = Chart.controllers.line.prototype.draw;
             Chart.helpers.extend(Chart.controllers.line.prototype, {
                 draw: function () {
