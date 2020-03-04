@@ -1,8 +1,15 @@
 {
-    "require": {
-        "phpunit/phpunit": "7.1.4",
-        "wp-cli/wp-cli-bundle": "v2.1.0",
-      "ext-imap": "*",
-      "ext-json": "*"
+  "name": "groundhogg/groundhogg",
+  "description": "simplify consolidate and automate your sales and marketing.",
+  "minimum-stability": "stable",
+  "license": "GPLv3",
+  "authors": [
+    {
+      "name": "Groundhogg Inc.",
+      "email": "info@groundhogg.io"
     }
+  ],
+  "require": {
+    "phpunit/phpunit": "7.5.20"
+  }
 }
