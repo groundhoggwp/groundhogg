@@ -10,28 +10,33 @@ use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\isset_not_empty;
 
-class Chart_Funnel_Breakdown extends Base_Line_Chart_Report {
+class Chart_Funnel_Breakdown extends Base_Chart_Report {
 
 	protected function get_datasets() {
 
-		$labels = [] ;
-		foreach( $this->get_complete_activity()['data'] as $item )
-		{
-			$labels [] = $item ['x'];
-		}
+		$data = $this->get_complete_activity();
+
 		return [
-			'labels' => $labels ,
+			'labels'   => $data[ 'label' ],
 			'datasets' => [
-				$this->get_complete_activity(),
-				$this->get_waiting_activity()
+				[
+					'label'           => __( 'Completed', 'groundhogg' ),
+					'data'            => $data[ 'data' ],
+					'backgroundColor' => $this->get_random_color()
+				]
+//				$this->get_waiting_activity()
 			]
 		];
 
 	}
 
-	protected function get_funnel_id()
-	{
-		return 91;
+
+	protected function get_type() {
+		return 'bar';
+	}
+
+	protected function get_funnel_id() {
+		return get_request_var('data')['funnel_id'];
 	}
 
 	protected function get_complete_activity() {
@@ -42,11 +47,16 @@ class Chart_Funnel_Breakdown extends Base_Line_Chart_Report {
 			return [];
 		}
 
-		$steps   = $funnel->get_steps();
+		$steps   = $funnel->get_steps( [
+			'step_group' => 'benchmark'
+		] );
+
+
 		$dataset = [];
+
 		foreach ( $steps as $i => $step ) {
-			$query     = new Contact_Query();
-			$args      = array(
+			$query = new Contact_Query();
+			$args  = array(
 				'report' => array(
 					'funnel' => $funnel->get_id(),
 					'step'   => $step->get_id(),
@@ -55,62 +65,107 @@ class Chart_Funnel_Breakdown extends Base_Line_Chart_Report {
 					'end'    => $this->end,
 				)
 			);
-			$count     = count( $query->query( $args ) );
-			$dataset[] = [
-				'x' => ( $i + 1 ) . '. ' . $step->get_title(),
-				'y' => $count
-			];
+			$count = count( $query->query( $args ) );
+
+//			var_dump($count);
+
+//			$dataset[] = [
+//				'x' => ( $i + 1 ) . '. ' . $step->get_title(),
+//				'y' => $count,
+//
+//			];
+
+			$label[]   = $step->get_title();
+			$dataset[] = $count;
+
 		}
 
 
- 	return array_merge( [
-			'label' => __( 'Complete Funnel Activity', 'groundhogg' ),
+		return [
+			'label' => $label,
 			'data'  => $dataset,
-
-		], $this->get_line_style() );
-
+		];
 
 
 	}
 
-	protected function get_waiting_activity() {
+	/**
+	 * @return array[]
+	 */
+	protected function get_options() {
+		return [
 
-		$funnel = new Funnel( $this->get_funnel_id() );
-
-		if ( ! $funnel->exists() ){
-			return [];
-		}
-
-		$steps = $funnel->get_steps();
-		$dataset = [];
-
-		foreach ( $steps as $i => $step ) {
-			$query = new Contact_Query();
-			$args = array(
-				'report' => array(
-					'funnel' => $funnel->get_id(),
-					'step'   => $step->get_id(),
-					'status' => 'waiting',
-					'start'  => $this->start,
-					'end'    => $this->end,
-				)
-			);
-			$count = count($query->query($args));
-			$dataset[] = [
-				'x' => ( $i + 1 ) . '. ' . $step->get_title(),
-				'y' => $count
-			];
-		}
-
-
-		return array_merge( [
-			'label' => __( 'Waiting Funnel Activity', 'groundhogg' ),
-			'data'  => $dataset,
-
-		], $this->get_line_style() );
-
-
+			'responsive' => true,
+			'tooltips'   => [
+				'backgroundColor' => '#FFF',
+				'bodyFontColor'   => '#000',
+				'borderColor'     => '#727272',
+				'borderWidth'     => 2,
+				'titleFontColor'  => '#000'
+			],
+			'scales'     => [
+				'xAxes' => [
+					0 => [
+						'maxBarThickness' =>100
+					]
+				],
+				'yAxes' => [
+					0 => [
+						'ticks'      => [
+							'beginAtZero' => true,
+						],
+//						'scaleLabel' => [
+//							'display'     => true,
+//							'labelString' => 'value',
+//						]
+					]
+				]
+			]
+		];
 	}
 
+
+//	protected function get_waiting_activity() {
+//
+//		$funnel = new Funnel( $this->get_funnel_id() );
+//
+//		if ( ! $funnel->exists() ) {
+//			return [];
+//		}
+//
+//		$steps = $funnel->get_steps( [
+//			'step_group' => 'benchmark'
+//		] );
+//
+//
+//		$dataset = [];
+//
+//		foreach ( $steps as $i => $step ) {
+//			$query     = new Contact_Query();
+//			$args      = array(
+//				'report' => array(
+//					'funnel' => $funnel->get_id(),
+//					'step'   => $step->get_id(),
+//					'status' => 'waiting',
+//					'start'  => $this->start,
+//					'end'    => $this->end,
+//				)
+//			);
+//			$count     = count( $query->query( $args ) );
+//			$dataset[] = [
+//				'x' => ( $i + 1 ) . '. ' . $step->get_title(),
+//				'y' => $count
+//			];
+//		}
+//
+//
+//		return array_merge( [
+//			'label' => __( 'Waiting Funnel Activity', 'groundhogg' ),
+//			'data'  => $dataset,
+//
+//		], $this->get_line_style() );
+//
+//
+//	}
 
 }

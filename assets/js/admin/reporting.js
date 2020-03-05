@@ -16,11 +16,12 @@ function tool_tip_title() {
 
         data: {},
         calendar: null,
-        myChart : null,
+        myChart : [],
 
         init: function () {
 
-            this.initCalendar()
+            this.initCalendar();
+            this.initFunnels();
 
         },
 
@@ -67,7 +68,11 @@ function tool_tip_title() {
 
         initFunnels : function() {
 
+            var self = this;
 
+            $( '#funnel-id' ).change(function () {
+                self.refresh(self.calendar);
+            });
         },
 
 
@@ -89,6 +94,7 @@ function tool_tip_title() {
                     reports: self.reports,
                     start: start,
                     end: end,
+                    data: self.get_other_data()
                 },
                 success: function (json) {
 
@@ -106,6 +112,12 @@ function tool_tip_title() {
                 },
             })
 
+        },
+
+        get_other_data : function(){
+            return {
+                funnel_id: $( '#funnel-id' ).val()
+            };
         },
 
         renderReports: function () {
@@ -165,12 +177,12 @@ function tool_tip_title() {
             }
 
 
-            if(this.myChart!=null){
-                this.myChart.destroy();
+            if(this.myChart[$report.selector] !=null){
+                this.myChart[$report.selector].destroy();
             }
 
             var ctx = $report[0].getContext('2d');
-            this.myChart = new Chart(ctx, report_data) ;
+            this.myChart[$report.selector] = new Chart(ctx, report_data) ;
 
             // draw Hover line in the graph
             var draw_line = Chart.controllers.line.prototype.draw;

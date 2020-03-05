@@ -11,10 +11,6 @@ use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 
-function get_img_url( $img ) {
-	echo esc_url( GROUNDHOGG_ASSETS_URL . 'images/reports/' . $img );
-}
-
 function get_funnel_id() {
      if(get_request_var( 'funnel' )) {
          return absint(get_request_var( 'funnel' ));
@@ -55,6 +51,6 @@ foreach ( $funnels as $funnel ) {
 
 
 <div class="groundhogg-report">
-    <h2 class="title"><?php _e( 'Email Activity', 'groundhogg' ); ?></h2>
+    <h2 class="title"><?php _e( 'Funnel Breakdown', 'groundhogg' ); ?></h2>
     <canvas id="chart_funnel_breakdown"></canvas>
 </div>

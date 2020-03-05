@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Reporting\New_Reports\Chart_Contacts_By_Optin_Status;
 use Groundhogg\Reporting\New_Reports\Chart_Email_Activity;
 use Groundhogg\Reporting\New_Reports\Chart_Funnel_Breakdown;
 use Groundhogg\Reporting\New_Reports\Chart_New_Contacts;
@@ -99,12 +100,16 @@ class Reports {
 			[
 				'id'       => 'chart_funnel_breakdown',
 				'callback' => [ $this, 'chart_funnel_breakdown' ]
+			],
+			[
+				'id'       => 'chart_contacts_by_optin_status',
+				'callback' => [ $this, 'chart_contacts_by_optin_status' ]
 			]
 
 		];
 
 		foreach ( $default_reports as $report ) {
-			$this->add( $report['id'], $report['callback'] );
+			$this->add( $report[ 'id' ], $report[ 'callback' ] );
 		}
 
 		do_action( 'groundhogg/reports/setup_default_reports/after', $this );
@@ -160,6 +165,7 @@ class Reports {
 	 */
 	public function total_new_contacts() {
 		$report = new Total_New_Contacts( $this->start, $this->end );
+
 		return $report->get_data();
 	}
 
@@ -170,6 +176,7 @@ class Reports {
 	 */
 	public function total_confirmed_contacts() {
 		$report = new Total_Confirmed_Contacts( $this->start, $this->end );
+
 		return $report->get_data();
 	}
 
@@ -178,8 +185,9 @@ class Reports {
 	 *
 	 * @return array
 	 */
-	public function total_engaged_contacts(){
+	public function total_engaged_contacts() {
 		$report = new Total_Active_Contacts( $this->start, $this->end );
+
 		return $report->get_data();
 	}
 
@@ -188,8 +196,9 @@ class Reports {
 	 *
 	 * @return array
 	 */
-	public function total_unsubscribed_contacts(){
+	public function total_unsubscribed_contacts() {
 		$report = new Total_Unsubscribed_Contacts( $this->start, $this->end );
+
 		return $report->get_data();
 	}
 
@@ -198,8 +207,9 @@ class Reports {
 	 *
 	 * @return array
 	 */
-	public function total_emails_sent(){
+	public function total_emails_sent() {
 		$report = new Total_Emails_Sent( $this->start, $this->end );
+
 		return $report->get_data();
 	}
 
@@ -208,8 +218,9 @@ class Reports {
 	 *
 	 * @return array
 	 */
-	public function email_open_rate(){
+	public function email_open_rate() {
 		$report = new Email_Open_Rate( $this->start, $this->end );
+
 		return $report->get_data();
 	}
 
@@ -219,16 +230,18 @@ class Reports {
 	 *
 	 * @return array
 	 */
-	public function email_click_rate(){
+	public function email_click_rate() {
 		$report = new Email_Click_Rate( $this->start, $this->end );
+
 		return $report->get_data();
 	}
 
 	/**
 	 * @return mixed
 	 */
-	public function chart_new_contacts(){
+	public function chart_new_contacts() {
 		$report = new Chart_New_Contacts( $this->start, $this->end );
+
 		return $report->get_data();
 	}
 
@@ -236,8 +249,9 @@ class Reports {
 	/**
 	 * @return mixed
 	 */
-	public function chart_email_activity(){
+	public function chart_email_activity() {
 		$report = new Chart_Email_Activity( $this->start, $this->end );
+
 		return $report->get_data();
 	}
 
@@ -245,8 +259,22 @@ class Reports {
 	/**
 	 * @return mixed
 	 */
-	public function chart_funnel_breakdown(){
+	public function chart_funnel_breakdown() {
 		$report = new Chart_Funnel_Breakdown( $this->start, $this->end );
+
 		return $report->get_data();
 	}
+
+
+	/**
+	 * @return mixed
+	 */
+	public function chart_contacts_by_optin_status() {
+
+		$report = new Chart_Contacts_By_Optin_Status( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
+
 }

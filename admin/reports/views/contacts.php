@@ -32,6 +32,8 @@ function quick_stat_report( $args = [] ) {
 }
 
 ?>
+
+
 <div class="groundhogg-report">
     <h2 class="title"><?php _e( 'New Contacts', 'groundhogg' ); ?></h2>
     <canvas id="chart_new_contacts"></canvas>
@@ -64,25 +66,14 @@ function quick_stat_report( $args = [] ) {
 
 <div class="groundhogg-quick-stats">
     <div class="groundhogg-report">
+        <div class="groundhogg-quick-stat" style="width: auto;">
+            <h2 class="title"><?php _e( 'opt-in Status', 'groundhogg' ); ?></h2>
+            <canvas id="chart_contacts_by_optin_status"></canvas>
+        </div>
+        <div class="groundhogg-quick-stat" style="width: auto;">
+            <h2 class="title"><?php _e( 'New Contacts', 'groundhogg' ); ?></h2>
+            <p class="title"><?php _e( 'please download lead source plugin', 'groundhogg' ); ?></p>
 
-		<?php quick_stat_report( [
-			'id' => 'total_emails_sent',
-			'title' => __( 'Emails Sent', 'groundhogg' )
-		] ); ?>
-
-		<?php quick_stat_report( [
-			'id' => 'email_open_rate',
-			'title' => __( 'Open Rate', 'groundhogg' ),
-		] ); ?>
-
-		<?php quick_stat_report( [
-			'id' => 'email_click_rate',
-			'title' => __( 'Click Rate', 'groundhogg' ),
-		] ); ?>
-
-<!--		--><?php //quick_stat_report( [
-//			'id' => 'unsubscribes',
-//			'title' => __( 'Unsubscribes', 'groundhogg' ),
-//		] ); ?>
+        </div>
     </div>
 </div>
