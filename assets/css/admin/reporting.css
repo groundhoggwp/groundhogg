@@ -136,6 +136,15 @@ img {
     display: inline-block;
 }
 
+.groundhogg-chart {
+    width: 50%;
+    position: relative;
+    padding: 17px 20px 15px;
+    border-left: 1px solid #ccd0d4;;
+    background: #FFF;
+}
+
+
 @media only screen and (max-width: 1280px) {
     .groundhogg-quick-stat .groundhogg-quick-stat-number,
     .groundhogg-quick-stat .groundhogg-quick-stat-previous,

@@ -4,6 +4,8 @@ namespace Groundhogg\Admin\Reports\Views;
 
 // Overview
 
+use Groundhogg\Plugin;
+
 function get_img_url( $img ) {
 	echo esc_url( GROUNDHOGG_ASSETS_URL . 'images/reports/' . $img );
 }
@@ -18,8 +20,8 @@ function quick_stat_report( $args = [] ) {
 
 	?>
 
-    <div class="groundhogg-quick-stat" id="<?php esc_attr_e( $args['id'] ); ?>">
-        <div class="groundhogg-quick-stat-title"><?php esc_html_e( $args['title'] ) ?></div>
+    <div class="groundhogg-quick-stat" id="<?php esc_attr_e( $args[ 'id' ] ); ?>">
+        <div class="groundhogg-quick-stat-title"><?php esc_html_e( $args[ 'title' ] ) ?></div>
         <div class="groundhogg-quick-stat-info"></div>
         <div class="groundhogg-quick-stat-number">1234</div>
         <div class="groundhogg-quick-stat-previous green">
@@ -43,37 +45,61 @@ function quick_stat_report( $args = [] ) {
     <div class="groundhogg-report">
 
 		<?php quick_stat_report( [
-		        'id' => 'total_new_contacts',
-                'title' => __( 'New Contacts', 'groundhogg' )
-        ] ); ?>
+			'id'    => 'total_new_contacts',
+			'title' => __( 'New Contacts', 'groundhogg' )
+		] ); ?>
 
 		<?php quick_stat_report( [
-		        'id' => 'total_confirmed_contacts',
-		        'title' => __( 'Confirmed Contacts', 'groundhogg' ),
-        ] ); ?>
+			'id'    => 'total_confirmed_contacts',
+			'title' => __( 'Confirmed Contacts', 'groundhogg' ),
+		] ); ?>
 
 		<?php quick_stat_report( [
-		        'id' => 'total_engaged_contacts',
-		        'title' => __( 'Engaged Contacts', 'groundhogg' ),
-        ] ); ?>
+			'id'    => 'total_engaged_contacts',
+			'title' => __( 'Engaged Contacts', 'groundhogg' ),
+		] ); ?>
 
 		<?php quick_stat_report( [
-		        'id' => 'total_unsubscribes',
-		        'title' => __( 'Unsubscribes', 'groundhogg' ),
+			'id'    => 'total_unsubscribes',
+			'title' => __( 'Unsubscribes', 'groundhogg' ),
 		] ); ?>
     </div>
 </div>
 
 <div class="groundhogg-quick-stats">
     <div class="groundhogg-report">
-        <div class="groundhogg-quick-stat" style="width: auto;">
-            <h2 class="title"><?php _e( 'opt-in Status', 'groundhogg' ); ?></h2>
+        <div class="groundhogg-chart">
+            <h2 class="title"><?php _e( 'Opt-in Status', 'groundhogg' ); ?></h2>
             <canvas id="chart_contacts_by_optin_status"></canvas>
         </div>
-        <div class="groundhogg-quick-stat" style="width: auto;">
-            <h2 class="title"><?php _e( 'New Contacts', 'groundhogg' ); ?></h2>
-            <p class="title"><?php _e( 'please download lead source plugin', 'groundhogg' ); ?></p>
+        <div class="groundhogg-chart">
+            <h2 class="title"><?php _e( 'Lead Score', 'groundhogg' ); ?></h2>
+            <p class="title"><?php _e( 'please download lead score plugin', 'groundhogg' ); ?></p>
+        </div>
+    </div>
+</div>
 
+<div class="groundhogg-quick-stats">
+    <div class="groundhogg-report">
+        <div class="groundhogg-chart">
+            <h2 class="title"><?php _e( 'Contacts By Country', 'groundhogg' ); ?></h2>
+            <canvas id="chart_contacts_by_country"></canvas>
+        </div>
+        <div class="groundhogg-chart">
+            <h2 class="title"><?php _e( 'Contacts By Region', 'groundhogg' ); ?></h2>
+            <?php
+
+            $args = array(
+	            'name'      => 'country',
+	            'id'        => 'country',
+	            'data'       => Plugin::$instance->utils->location->get_countries_list(),
+	            'selected'      => [ Plugin::$instance->utils->location->site_country_code()],
+	            'option_none'   => false,
+            );
+            echo Plugin::$instance->utils->html->select2( $args );
+
+            ?>
+            <canvas id="chart_contacts_by_region"></canvas>
         </div>
     </div>
 </div>

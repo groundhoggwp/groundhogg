@@ -22,6 +22,7 @@ function tool_tip_title() {
 
             this.initCalendar();
             this.initFunnels();
+            this.initCountry();
 
         },
 
@@ -75,6 +76,14 @@ function tool_tip_title() {
             });
         },
 
+        initCountry : function() {
+
+            var self = this;
+
+            $( '#country' ).change(function () {
+                self.refresh(self.calendar);
+            });
+        },
 
         refresh: function (calendar) {
 
@@ -116,7 +125,8 @@ function tool_tip_title() {
 
         get_other_data : function(){
             return {
-                funnel_id: $( '#funnel-id' ).val()
+                funnel_id: $( '#funnel-id' ).val(),
+                country: $('#country').val()
             };
         },
 

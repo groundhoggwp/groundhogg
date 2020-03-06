@@ -2,7 +2,9 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Reporting\New_Reports\Chart_Contacts_By_country;
 use Groundhogg\Reporting\New_Reports\Chart_Contacts_By_Optin_Status;
+use Groundhogg\Reporting\New_Reports\Chart_Contacts_By_Region;
 use Groundhogg\Reporting\New_Reports\Chart_Email_Activity;
 use Groundhogg\Reporting\New_Reports\Chart_Funnel_Breakdown;
 use Groundhogg\Reporting\New_Reports\Chart_New_Contacts;
@@ -104,6 +106,14 @@ class Reports {
 			[
 				'id'       => 'chart_contacts_by_optin_status',
 				'callback' => [ $this, 'chart_contacts_by_optin_status' ]
+			],
+			[
+				'id'       => 'chart_contacts_by_region',
+				'callback' => [ $this, 'chart_contacts_by_region' ]
+			],
+			[
+				'id'       => 'chart_contacts_by_country',
+				'callback' => [ $this, 'chart_contacts_by_country' ]
 			]
 
 		];
@@ -272,6 +282,27 @@ class Reports {
 	public function chart_contacts_by_optin_status() {
 
 		$report = new Chart_Contacts_By_Optin_Status( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function chart_contacts_by_region() {
+
+		$report = new Chart_Contacts_By_Region( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
+	/**
+	 * @return mixed
+	 */
+	public function chart_contacts_by_country() {
+
+		$report = new Chart_Contacts_By_Country( $this->start, $this->end );
 
 		return $report->get_data();
 

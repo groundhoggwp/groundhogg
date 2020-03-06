@@ -118,7 +118,9 @@ class Reports_Page extends Tabbed_Admin_Page {
 					'total_engaged_contacts',
 					'total_unsubscribes',
 
-                    'chart_contacts_by_optin_status'
+                    'chart_contacts_by_optin_status',
+                    'chart_contacts_by_region',
+                    'chart_contacts_by_country'
 
 				];
 				break;
@@ -129,6 +131,8 @@ class Reports_Page extends Tabbed_Admin_Page {
                     'total_emails_sent',
 					'email_open_rate',
 					'email_click_rate',
+
+
 				];
 
 				break;
