@@ -118,28 +118,30 @@ class Reports_Page extends Tabbed_Admin_Page {
 					'total_engaged_contacts',
 					'total_unsubscribes',
 
-                    'chart_contacts_by_optin_status',
-                    'chart_contacts_by_region',
-                    'chart_contacts_by_country'
+					'chart_contacts_by_optin_status',
+					'chart_contacts_by_region',
+					'chart_contacts_by_country',
 
+					'table_contacts_by_lead_source',
 				];
 				break;
 			case 'email':
 				$reports = [
 					'chart_email_activity',
 
-                    'total_emails_sent',
+					'total_emails_sent',
 					'email_open_rate',
 					'email_click_rate',
 
+					'chart_last_broadcast'
 
 				];
 
 				break;
-            case 'funnels':
-                $reports = [
-	                'chart_funnel_breakdown'
-                ];
+			case 'funnels':
+				$reports = [
+					'chart_funnel_breakdown'
+				];
 
 		}
 
@@ -269,7 +271,6 @@ class Reports_Page extends Tabbed_Admin_Page {
 	public function funnels_view() {
 		include dirname( __FILE__ ) . '/views/funnels.php';
 	}
-
 
 
 	public function refresh_report_data() {

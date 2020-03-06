@@ -66,3 +66,17 @@ function quick_stat_report( $args = [] ) {
 //				] ); ?>
     </div>
 </div>
+
+
+<div class="groundhogg-quick-stats">
+    <div class="groundhogg-report">
+        <div class="groundhogg-chart">
+            <h2 class="title"><?php _e( 'Opt-in Status', 'groundhogg' ); ?></h2>
+            <canvas id="chart_last_broadcast"></canvas>
+        </div>
+        <div class="groundhogg-chart">
+            <h2 class="title"><?php _e( 'To be decided', 'groundhogg' ); ?></h2>
+            <p class="title"><?php _e( 'Something here......', 'groundhogg' ); ?></p>
+        </div>
+    </div>
+</div>

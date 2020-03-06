@@ -85,5 +85,6 @@ abstract class Base_Report {
 		return '#' . $this->random_color_part() . $this->random_color_part() . $this->random_color_part();
 	}
 
+	abstract public function get_data();
 
 }

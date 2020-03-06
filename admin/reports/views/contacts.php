@@ -103,3 +103,18 @@ function quick_stat_report( $args = [] ) {
         </div>
     </div>
 </div>
+
+
+
+<div class="groundhogg-quick-stats">
+    <div class="groundhogg-report">
+        <div class="groundhogg-table-box " >
+<!--        <div class="groundhogg-chart">-->
+            <h2 class="title"><?php _e( 'TABLE', 'groundhogg' ); ?></h2>
+            <div id="table_contacts_by_lead_source"></div>
+<!--        </div>       -->
+        </div>
+    </div>
+</div>
+
+

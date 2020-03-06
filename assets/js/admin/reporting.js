@@ -158,6 +158,9 @@ function tool_tip_title() {
                 case 'chart':
                     this.renderChartReport($report, report_data.chart);
                     break;
+                case 'table':
+                    this.renderTable($report, report_data)
+                    break;
             }
 
         },
@@ -222,6 +225,39 @@ function tool_tip_title() {
 
 
         },
+
+        renderTable : function ($report , report_data) {
+
+            var html = "<table width='100%'>";
+
+            var length  = report_data.data.length ;
+
+            html = html + '<tr class="groundhogg-table-list-item">';
+            for (var key in report_data.data[0] ) {
+                html = html + '<th class="groundhogg-reports-list-text" >' + key  + '</th>';
+            }
+            html = html + '</tr>';
+
+
+            for(var i=0 ; i<length ; i++ )
+            {
+
+                html = html + '<tr class="groundhogg-table-list-item">';
+                for (var key in report_data.data[i] ) {
+                    // console.log("Key: " + key);
+
+                    html = html + '<td class="groundhogg-reports-list-text">' + report_data.data[i][key]  + '</td>';
+                    // console.log("Value: " + report_data.data[i][key]);
+                }
+
+                html = html + '</tr>';
+
+            }
+            html = html + '</table>';
+
+            $report.replaceWith( html );
+        },
+
 
         showLoader: function () {
             $('.gh-loader-overlay').show();

@@ -144,6 +144,45 @@ img {
     background: #FFF;
 }
 
+.groundhogg-table-list-item:nth-child(odd) {
+     background-color: #f9fbff;
+}
+
+.groundhogg-table-list-item {
+    padding: 12px 20px;
+    min-height: 43px;
+    font-size: 15px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+}
+.groundhogg-table-list-item .groundhogg-reports-list-text {
+    color: #393f4c;
+    white-space: pre;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    vertical-align: middle;
+    display: inline-block;
+    width: 100%;
+    padding: 1px;
+    margin: -1px;
+}
+
+.groundhogg-table-box {
+    border: 1px solid #d6e2ed;
+    background: #fff;
+    width: 100%;
+    margin-left: 20px;
+    padding-top: 18px;
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-flow: column;
+    flex-flow: column;
+}
 
 @media only screen and (max-width: 1280px) {
     .groundhogg-quick-stat .groundhogg-quick-stat-number,
