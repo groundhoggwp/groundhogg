@@ -177,6 +177,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.13.7 (2020-03-06) =
+* FIXED Bug in the broadcast scheduler sometimes causing it to fail when checking for the marketable status of a contact.
+* FIXED getting items from CSV will pad array if header size is large than the row
+* TWEAKED bulk job will now retry 3 times before failing.
+
 = 2.1.13.6 (2020-03-02) =
 * TWEAKED Make usage tracking GDPR compliant.
 * TWEAKED Funnel events are given higher priority than broadcast events in the event queue.

@@ -11,7 +11,7 @@ class GH_UnitTest_Factory_For_Contact extends GH_UnitTest_Factory_For_Thing {
 		$this->default_generation_definitions = array(
 			'first_name' => new WP_UnitTest_Generator_Sequence( 'First %s' ),
 			'last_name'  => new WP_UnitTest_Generator_Sequence( 'Last %s' ),
-			'email'      => new WP_UnitTest_Generator_Sequence( 'user_%s@example.org' ),
+			'email'      => new WP_UnitTest_Generator_Sequence( 'contact_%s@example.org' ),
 		);
 	}
 

@@ -1550,9 +1550,11 @@ function get_items_from_csv( $file_path = '' ) {
 			} else {
 
 				if ( count( $row ) > $header_count ) {
+
 					$row = array_slice( $row, 0, $header_count );
 				} else if ( count( $row ) < $header_count ) {
-					$row = array_pad( $row, $header_count - count( $row ) + 1, null );
+
+					$row = array_pad( $row, $header_count, '' );
 				}
 
 				$data[] = array_combine( $header, $row );
