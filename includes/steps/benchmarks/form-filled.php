@@ -708,6 +708,10 @@ class Form_Filled extends Benchmark
         $this->save_setting( 'success_page', sanitize_text_field( $this->get_posted_data( 'success_page' ) ) );
         $this->save_setting( 'success_message', sanitize_textarea_field( $this->get_posted_data( 'success_message' ) ) );
         $this->save_setting( 'enable_ajax', absint( $this->get_posted_data( 'enable_ajax' ) ) );
+
+        // Render the config quietly
+        $form = do_shortcode( sprintf( "[gh_form id=%d]", $step->get_id() ) );
+
     }
 
     /**
