@@ -11,7 +11,11 @@ use Groundhogg\Reporting\New_Reports\Chart_Last_Broadcast;
 use Groundhogg\Reporting\New_Reports\Chart_New_Contacts;
 use Groundhogg\Reporting\New_Reports\Email_Click_Rate;
 use Groundhogg\Reporting\New_Reports\Email_Open_Rate;
+use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Country;
 use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Lead_Source;
+use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Search_Engine;
+use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Search_Engines;
+use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Source_Pages;
 use Groundhogg\Reporting\New_Reports\Total_Active_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Confirmed_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Emails_Sent;
@@ -125,6 +129,19 @@ class Reports {
 				'id'       => 'table_contacts_by_lead_source',
 				'callback' => [ $this, 'table_contacts_by_lead_source' ]
 			],
+			[
+				'id'       => 'table_contacts_by_search_engines',
+				'callback' => [ $this, 'table_contacts_by_search_engines' ]
+			],
+			[
+				'id'       => 'table_contacts_by_source_page',
+				'callback' => [ $this, 'table_contacts_by_source_page' ]
+			],
+			[
+				'id'       => 'table_contacts_by_countries',
+				'callback' => [ $this, 'table_contacts_by_countries' ]
+			],
+
 
 		];
 
@@ -307,6 +324,7 @@ class Reports {
 		return $report->get_data();
 
 	}
+
 	/**
 	 * @return mixed
 	 */
@@ -335,6 +353,39 @@ class Reports {
 	public function table_contacts_by_lead_source() {
 
 		$report = new Table_Contacts_By_Lead_Source( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function table_contacts_by_search_engines() {
+
+		$report = new Table_Contacts_By_Search_Engines( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function table_contacts_by_source_page() {
+
+		$report = new Table_Contacts_By_Source_Pages( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function table_contacts_by_countries() {
+
+		$report = new Table_Contacts_By_Country( $this->start, $this->end );
 
 		return $report->get_data();
 

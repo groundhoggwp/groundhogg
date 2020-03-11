@@ -228,13 +228,43 @@ function tool_tip_title() {
 
         renderTable : function ($report , report_data) {
 
-            var html = "<table width='100%'>";
+            // var html = "<table width='100%' class='groundhogg-report-table'>";
+            //
+            // var length  = report_data.data.length ;
+            //
+            // html = html + '<tr class="groundhogg-table-list-item">';
+            // for (var key in report_data.data[0] ) {
+            //     html = html + '<th class="groundhogg-reports-list-text" >' + key  + '</th>';
+            // }
+            // html = html + '</tr>';
+            //
+            //
+            // for(var i=0 ; i<length ; i++ )
+            // {
+            //
+            //     html = html + '<tr class="groundhogg-table-list-item">';
+            //     for (var key in report_data.data[i] ) {
+            //         // console.log("Key: " + key);
+            //
+            //         html = html + '<td class="groundhogg-reports-list-text">' + report_data.data[i][key]  + '</td>';
+            //         // console.log("Value: " + report_data.data[i][key]);
+            //     }
+            //
+            //     html = html + '</tr>';
+            //
+            // }
+            // html = html + '</table>';
+            //
+            // $report.replaceWith( html );
+
+
+            var html = "<table width='100%' class='groundhogg-report-table'>";
 
             var length  = report_data.data.length ;
 
-            html = html + '<tr class="groundhogg-table-list-item">';
+            html = html + '<tr>';
             for (var key in report_data.data[0] ) {
-                html = html + '<th class="groundhogg-reports-list-text" >' + key  + '</th>';
+                html = html + '<th  >' + key  + '</th>';
             }
             html = html + '</tr>';
 
@@ -242,11 +272,11 @@ function tool_tip_title() {
             for(var i=0 ; i<length ; i++ )
             {
 
-                html = html + '<tr class="groundhogg-table-list-item">';
+                html = html + '<tr >';
                 for (var key in report_data.data[i] ) {
                     // console.log("Key: " + key);
 
-                    html = html + '<td class="groundhogg-reports-list-text">' + report_data.data[i][key]  + '</td>';
+                    html = html + '<td style="word-wrap: break-word" >' + report_data.data[i][key]  + '</td>';
                     // console.log("Value: " + report_data.data[i][key]);
                 }
 

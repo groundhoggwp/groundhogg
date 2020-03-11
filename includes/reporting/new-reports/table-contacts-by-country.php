@@ -8,7 +8,7 @@ use function Groundhogg\get_db;
 use function Groundhogg\html;
 use function Groundhogg\percentage;
 
-class Table_Contacts_By_Lead_Source extends  Base_Table_Report
+class Table_Contacts_By_Country extends  Base_Table_Report
 {
 	function only_show_top_10() {
 		return true ;
@@ -49,7 +49,7 @@ class Table_Contacts_By_Lead_Source extends  Base_Table_Report
 
 		$rows = get_db( 'contactmeta' )->query( [
 			'contact_id' =>$contacts,
-			'meta_key' => 'lead_source'
+			'meta_key' => 'country'
 		], false );
 
 
@@ -59,15 +59,6 @@ class Table_Contacts_By_Lead_Source extends  Base_Table_Report
 		$counts = array_count_values( $values );
 
 		$data  = $this->normalize_data($counts );
-
-
-//		return $data;
-
-		// normalize data
-//		foreach ( $counts as $key => $datum ) {
-//			$data[] = $this->normalize_datum( $key, $datum );
-//
-//		}
 
 
 		$total = array_sum( wp_list_pluck( $data, 'data' ) );
@@ -98,10 +89,18 @@ class Table_Contacts_By_Lead_Source extends  Base_Table_Report
 	 */
 	protected function normalize_datum($item_key, $item_data)
 	{
+
+		$label = ! empty( $item_key ) ? Plugin::$instance->utils->location->get_countries_list( $item_key ): __( 'Unknown' );
+		$data  = $item_data;
+		$url   = ! empty( $item_key ) ? admin_url( sprintf( 'admin.php?page=gh_contacts&meta_key=country&meta_value=%s', $item_key ) ) : '#';
+
+
+
+
 		return [
-			'label' => Plugin::$instance->utils->html->wrap( $item_key, 'a', [ 'href' => $item_key, 'target' => '_blank' ] ),
-			'data' => $item_data,
-			'url'  => admin_url( 'admin.php?page=gh_contacts&meta_value=lead_source&meta_value=' . urlencode( $item_key ) )
+			'label' => $label,
+			'data' => $data,
+			'url'  => $url
 		];
 	}
 

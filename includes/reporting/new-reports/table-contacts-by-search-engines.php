@@ -8,7 +8,7 @@ use function Groundhogg\get_db;
 use function Groundhogg\html;
 use function Groundhogg\percentage;
 
-class Table_Contacts_By_Lead_Source extends  Base_Table_Report
+class Table_Contacts_By_Search_Engines extends  Base_Table_Report
 {
 	function only_show_top_10() {
 		return true ;
@@ -53,22 +53,30 @@ class Table_Contacts_By_Lead_Source extends  Base_Table_Report
 		], false );
 
 
-
 		$values = wp_list_pluck( $rows, 'meta_value'  );
 
 		$counts = array_count_values( $values );
 
-		$data  = $this->normalize_data($counts );
+
+		$search_engines = $this->get_search_engines();
+
+		$return = [];
+
+		foreach ( $counts as $datum => $num_contacts ){
+			if ( filter_var( $datum, FILTER_VALIDATE_URL ) ){
+				$test_lead_source = parse_url( $datum, PHP_URL_HOST );
+				$test_lead_source = str_replace( 'www.', '', $test_lead_source );
+				foreach ( $search_engines as $engine_name => $atts ){
+					$urls = $atts[0]['urls'];
+					if ( $this->in_urls( $test_lead_source, $urls ) ) {
+						$return[ $engine_name ] = $num_contacts;
+					}
+				}
+			}
+		}
 
 
-//		return $data;
-
-		// normalize data
-//		foreach ( $counts as $key => $datum ) {
-//			$data[] = $this->normalize_datum( $key, $datum );
-//
-//		}
-
+		$data  = $this->normalize_data($return );
 
 		$total = array_sum( wp_list_pluck( $data, 'data' ) );
 
@@ -105,6 +113,47 @@ class Table_Contacts_By_Lead_Source extends  Base_Table_Report
 		];
 	}
 
+
+	/**
+	 * Setup the search_engines array from the yaml file in lib
+	 */
+	public function get_search_engines()
+	{
+		if ( ! class_exists( 'Spyc' ) ){
+			include_once GROUNDHOGG_PATH . 'includes/lib/yaml/Spyc.php';
+		}
+
+		Return \Spyc::YAMLLoad( GROUNDHOGG_PATH . 'includes/lib/potential-known-leadsources/SearchEngines.yml' );
+	}
+
+
+
+	/**
+	 * Special search function for comparing lead sources to potential search engine matches.
+	 *
+	 * @param $search string the URL in question
+	 * @param $urls array list of string potential matches...
+	 *
+	 * @return bool
+	 */
+	private function in_urls( $search, $urls )
+	{
+
+		foreach ( $urls as $url ){
+
+			/* Given YAML dataset uses .{} as sequence for match all expression, convert into regex friendly */
+			$url = str_replace( '.{}', '\.{1,3}', $url );
+			$url = str_replace( '{}.', '.{1,}?\.?', $url );
+			$pattern = '#' . $url . '#';
+//            var_dump( $pattern );
+			if ( preg_match( $pattern, $search ) ){
+				return true;
+			}
+
+		}
+
+		return false;
+	}
 
 
 }

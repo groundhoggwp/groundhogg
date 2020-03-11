@@ -87,32 +87,46 @@ function quick_stat_report( $args = [] ) {
         </div>
         <div class="groundhogg-chart">
             <h2 class="title"><?php _e( 'Contacts By Region', 'groundhogg' ); ?></h2>
-            <?php
+			<?php
 
-            $args = array(
-	            'name'      => 'country',
-	            'id'        => 'country',
-	            'data'       => Plugin::$instance->utils->location->get_countries_list(),
-	            'selected'      => [ Plugin::$instance->utils->location->site_country_code()],
-	            'option_none'   => false,
-            );
-            echo Plugin::$instance->utils->html->select2( $args );
+			$args = array(
+				'name'        => 'country',
+				'id'          => 'country',
+				'data'        => Plugin::$instance->utils->location->get_countries_list(),
+				'selected'    => [ Plugin::$instance->utils->location->site_country_code() ],
+				'option_none' => false,
+			);
+			echo Plugin::$instance->utils->html->select2( $args );
 
-            ?>
+			?>
             <canvas id="chart_contacts_by_region"></canvas>
         </div>
     </div>
 </div>
 
+<div class="groundhogg-quick-stats">
+    <div class="groundhogg-report">
+        <div class="groundhogg-chart">
+            <h2 class="title"><?php _e( 'Top Search Engines', 'groundhogg' ); ?></h2>
+            <div id="table_contacts_by_search_engines"></div>
+        </div>
+        <div class="groundhogg-chart">
+            <h2 class="title"><?php _e( 'Top Source Pages', 'groundhogg' ); ?></h2>
+            <div id="table_contacts_by_source_page"></div>
+        </div>
+    </div>
+</div>
 
 
 <div class="groundhogg-quick-stats">
     <div class="groundhogg-report">
-        <div class="groundhogg-table-box " >
-<!--        <div class="groundhogg-chart">-->
-            <h2 class="title"><?php _e( 'TABLE', 'groundhogg' ); ?></h2>
+        <div class="groundhogg-chart">
+            <h2 class="title"><?php _e( 'Top Countries', 'groundhogg' ); ?></h2>
+            <div id="table_contacts_by_countries"></div>
+        </div>
+        <div class="groundhogg-chart">
+            <h2 class="title"><?php _e( 'Top lead Sources', 'groundhogg' ); ?></h2>
             <div id="table_contacts_by_lead_source"></div>
-<!--        </div>       -->
         </div>
     </div>
 </div>

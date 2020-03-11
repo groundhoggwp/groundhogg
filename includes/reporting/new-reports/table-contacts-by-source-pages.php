@@ -8,7 +8,7 @@ use function Groundhogg\get_db;
 use function Groundhogg\html;
 use function Groundhogg\percentage;
 
-class Table_Contacts_By_Lead_Source extends  Base_Table_Report
+class Table_Contacts_By_Source_Pages extends  Base_Table_Report
 {
 	function only_show_top_10() {
 		return true ;
@@ -49,7 +49,7 @@ class Table_Contacts_By_Lead_Source extends  Base_Table_Report
 
 		$rows = get_db( 'contactmeta' )->query( [
 			'contact_id' =>$contacts,
-			'meta_key' => 'lead_source'
+			'meta_key' => 'source_page'
 		], false );
 
 
@@ -59,15 +59,6 @@ class Table_Contacts_By_Lead_Source extends  Base_Table_Report
 		$counts = array_count_values( $values );
 
 		$data  = $this->normalize_data($counts );
-
-
-//		return $data;
-
-		// normalize data
-//		foreach ( $counts as $key => $datum ) {
-//			$data[] = $this->normalize_datum( $key, $datum );
-//
-//		}
 
 
 		$total = array_sum( wp_list_pluck( $data, 'data' ) );
