@@ -66,69 +66,63 @@ function quick_stat_report( $args = [] ) {
     </div>
 </div>
 
-<div class="groundhogg-quick-stats">
-    <div class="groundhogg-report">
-        <div class="groundhogg-chart">
-            <h2 class="title"><?php _e( 'Opt-in Status', 'groundhogg' ); ?></h2>
-            <canvas id="chart_contacts_by_optin_status"></canvas>
-        </div>
-        <div class="groundhogg-chart">
-            <h2 class="title"><?php _e( 'Lead Score', 'groundhogg' ); ?></h2>
-            <p class="title"><?php _e( 'please download lead score plugin', 'groundhogg' ); ?></p>
-        </div>
+<div class="groundhogg-chart-wrapper">
+    <div class="groundhogg-chart">
+        <h2 class="title"><?php _e( 'Opt-in Status', 'groundhogg' ); ?></h2>
+        <canvas id="chart_contacts_by_optin_status"></canvas>
+    </div>
+    <div class="groundhogg-chart">
+        <h2 class="title"><?php _e( 'Lead Score', 'groundhogg' ); ?></h2>
+        <p class="title"><?php _e( 'please download lead score plugin', 'groundhogg' ); ?></p>
     </div>
 </div>
 
-<div class="groundhogg-quick-stats">
-    <div class="groundhogg-report">
-        <div class="groundhogg-chart">
-            <h2 class="title"><?php _e( 'Contacts By Country', 'groundhogg' ); ?></h2>
-            <canvas id="chart_contacts_by_country"></canvas>
-        </div>
-        <div class="groundhogg-chart">
-            <h2 class="title"><?php _e( 'Contacts By Region', 'groundhogg' ); ?></h2>
-			<?php
-
-			$args = array(
-				'name'        => 'country',
-				'id'          => 'country',
-				'data'        => Plugin::$instance->utils->location->get_countries_list(),
-				'selected'    => [ Plugin::$instance->utils->location->site_country_code() ],
-				'option_none' => false,
-			);
-			echo Plugin::$instance->utils->html->select2( $args );
-
-			?>
-            <canvas id="chart_contacts_by_region"></canvas>
-        </div>
+<div class="groundhogg-chart-wrapper">
+    <div class="groundhogg-chart">
+        <h2 class="title"><?php _e( 'Contacts By Country', 'groundhogg' ); ?></h2>
+        <canvas id="chart_contacts_by_country"></canvas>
     </div>
+    <div class="groundhogg-chart">
+        <h2 class="title"><?php _e( 'Contacts By Region', 'groundhogg' ); ?></h2>
+		<?php
+
+		$args = array(
+			'name'        => 'country',
+			'id'          => 'country',
+			'data'        => Plugin::$instance->utils->location->get_countries_list(),
+			'selected'    => [ Plugin::$instance->utils->location->site_country_code() ],
+			'option_none' => false,
+		);
+		echo Plugin::$instance->utils->html->select2( $args );
+
+		?>
+        <canvas id="chart_contacts_by_region"></canvas>
+    </div>
+
 </div>
 
-<div class="groundhogg-quick-stats">
-    <div class="groundhogg-report">
-        <div class="groundhogg-chart">
-            <h2 class="title"><?php _e( 'Top Search Engines', 'groundhogg' ); ?></h2>
-            <div id="table_contacts_by_search_engines"></div>
-        </div>
-        <div class="groundhogg-chart">
-            <h2 class="title"><?php _e( 'Top Source Pages', 'groundhogg' ); ?></h2>
-            <div id="table_contacts_by_source_page"></div>
-        </div>
+<div class="groundhogg-chart-wrapper">
+    <div class="groundhogg-chart-no-padding">
+        <h2 class="title"><?php _e( 'Top Search Engines', 'groundhogg' ); ?></h2>
+        <div id="table_contacts_by_search_engines"></div>
+    </div>
+    <div class="groundhogg-chart-no-padding">
+        <h2 class="title"><?php _e( 'Top Source Pages', 'groundhogg' ); ?></h2>
+        <div id="table_contacts_by_source_page"></div>
     </div>
 </div>
 
 
-<div class="groundhogg-quick-stats">
-    <div class="groundhogg-report">
-        <div class="groundhogg-chart">
-            <h2 class="title"><?php _e( 'Top Countries', 'groundhogg' ); ?></h2>
-            <div id="table_contacts_by_countries"></div>
-        </div>
-        <div class="groundhogg-chart">
-            <h2 class="title"><?php _e( 'Top lead Sources', 'groundhogg' ); ?></h2>
-            <div id="table_contacts_by_lead_source"></div>
-        </div>
+<div class="groundhogg-chart-wrapper">
+    <div class="groundhogg-chart-no-padding">
+        <h2 class="title"><?php _e( 'Top Countries', 'groundhogg' ); ?></h2>
+        <div id="table_contacts_by_countries"></div>
     </div>
+    <div class="groundhogg-chart-no-padding">
+        <h2 class="title"><?php _e( 'Top lead Sources', 'groundhogg' ); ?></h2>
+        <div id="table_contacts_by_lead_source"></div>
+    </div>
+
 </div>
 
 

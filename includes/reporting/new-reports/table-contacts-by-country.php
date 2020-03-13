@@ -19,23 +19,29 @@ class Table_Contacts_By_Country extends  Base_Table_Report
 	}
 
 	/**
-	 *
-	 *
-	 *
 	 * @return array
-	 *
 	 */
 	public function get_data()
 	{
 		return [
 			'type'=> 'table',
+			'label'=> $this->get_label(),
 			'data' =>
-				$this->get_lead_score()
+				$this->get_by_country()
 		];
 	}
 
+	public function get_label() {
+		return [
+			__( 'Country', 'groundhogg' ),
+			__( 'Contacts', 'groundhogg' ),
+		];
 
-	protected function get_lead_score() {
+	}
+
+
+
+	protected function get_by_country() {
 
 		$contacts = get_db( 'contacts' )->query( [
 			'date_query' => [

@@ -19,20 +19,26 @@ class Table_Contacts_By_Lead_Source extends  Base_Table_Report
 	}
 
 	/**
-	 *
-	 *
-	 *
 	 * @return array
-	 *
 	 */
-	public function get_data()
-	{
+	public function get_data() {
 		return [
-			'type'=> 'table',
-			'data' =>
+			'type'  => 'table',
+			'label' => $this->get_label(),
+			'data'  =>
 				$this->get_lead_score()
 		];
 	}
+
+
+	public function get_label() {
+		return [
+			__( 'Lead Source', 'groundhogg' ),
+			__( 'Total', 'groundhogg' ),
+		];
+
+	}
+
 
 
 	protected function get_lead_score() {
@@ -59,16 +65,6 @@ class Table_Contacts_By_Lead_Source extends  Base_Table_Report
 		$counts = array_count_values( $values );
 
 		$data  = $this->normalize_data($counts );
-
-
-//		return $data;
-
-		// normalize data
-//		foreach ( $counts as $key => $datum ) {
-//			$data[] = $this->normalize_datum( $key, $datum );
-//
-//		}
-
 
 		$total = array_sum( wp_list_pluck( $data, 'data' ) );
 

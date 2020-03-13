@@ -2,7 +2,7 @@ function tool_tip_label(tooltipItem, data) {
     if (data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].label) {
         return data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].label;
     } else {
-        return  data.datasets[tooltipItem.datasetIndex].label + ": " + data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].y;
+        return data.datasets[tooltipItem.datasetIndex].label + ": " + data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].y;
     }
 }
 
@@ -16,7 +16,7 @@ function tool_tip_title() {
 
         data: {},
         calendar: null,
-        myChart : [],
+        myChart: [],
 
         init: function () {
 
@@ -67,20 +67,20 @@ function tool_tip_title() {
             this.calendar.calendarSaveDates()
         },
 
-        initFunnels : function() {
+        initFunnels: function () {
 
             var self = this;
 
-            $( '#funnel-id' ).change(function () {
+            $('#funnel-id').change(function () {
                 self.refresh(self.calendar);
             });
         },
 
-        initCountry : function() {
+        initCountry: function () {
 
             var self = this;
 
-            $( '#country' ).change(function () {
+            $('#country').change(function () {
                 self.refresh(self.calendar);
             });
         },
@@ -123,9 +123,9 @@ function tool_tip_title() {
 
         },
 
-        get_other_data : function(){
+        get_other_data: function () {
             return {
-                funnel_id: $( '#funnel-id' ).val(),
+                funnel_id: $('#funnel-id').val(),
                 country: $('#country').val()
             };
         },
@@ -190,12 +190,12 @@ function tool_tip_title() {
             }
 
 
-            if(this.myChart[$report.selector] !=null){
+            if (this.myChart[$report.selector] != null) {
                 this.myChart[$report.selector].destroy();
             }
 
             var ctx = $report[0].getContext('2d');
-            this.myChart[$report.selector] = new Chart(ctx, report_data) ;
+            this.myChart[$report.selector] = new Chart(ctx, report_data);
 
             // draw Hover line in the graph
             var draw_line = Chart.controllers.line.prototype.draw;
@@ -226,66 +226,39 @@ function tool_tip_title() {
 
         },
 
-        renderTable : function ($report , report_data) {
+        renderTable: function ($report, report_data) {
 
-            // var html = "<table width='100%' class='groundhogg-report-table'>";
-            //
-            // var length  = report_data.data.length ;
-            //
-            // html = html + '<tr class="groundhogg-table-list-item">';
-            // for (var key in report_data.data[0] ) {
-            //     html = html + '<th class="groundhogg-reports-list-text" >' + key  + '</th>';
-            // }
-            // html = html + '</tr>';
-            //
-            //
-            // for(var i=0 ; i<length ; i++ )
-            // {
-            //
-            //     html = html + '<tr class="groundhogg-table-list-item">';
-            //     for (var key in report_data.data[i] ) {
-            //         // console.log("Key: " + key);
-            //
-            //         html = html + '<td class="groundhogg-reports-list-text">' + report_data.data[i][key]  + '</td>';
-            //         // console.log("Value: " + report_data.data[i][key]);
-            //     }
-            //
-            //     html = html + '</tr>';
-            //
-            // }
-            // html = html + '</table>';
-            //
-            // $report.replaceWith( html );
+            var html = "<table class='groundhogg-report-table'>";
 
-
-            var html = "<table width='100%' class='groundhogg-report-table'>";
-
-            var length  = report_data.data.length ;
+            var length = report_data.data.length;
 
             html = html + '<tr>';
-            for (var key in report_data.data[0] ) {
-                html = html + '<th  >' + key  + '</th>';
-            }
-            html = html + '</tr>';
 
-
-            for(var i=0 ; i<length ; i++ )
-            {
-
-                html = html + '<tr >';
-                for (var key in report_data.data[i] ) {
-                    // console.log("Key: " + key);
-
-                    html = html + '<td style="word-wrap: break-word" >' + report_data.data[i][key]  + '</td>';
-                    // console.log("Value: " + report_data.data[i][key]);
+                if (report_data.label) {
+                    for (var key in report_data.label) {
+                        html = html + '<th>' + report_data.label[key] + '</th>';
+                    }
+                } else {
+                    for (var key in report_data.data[0]) {
+                        html = html + '<th>' + key + '</th>';
+                    }
                 }
 
-                html = html + '</tr>';
+            html = html + '</tr>';
 
-            }
+                for (var i = 0; i < length; i++) {
+
+                    html = html + '<tr >';
+                        for (var key in report_data.data[i]) {
+                            html = html + '<td>' +  report_data.data[i][key] +  '</td>';
+                        }
+                    html = html + '</tr>';
+
+                }
+
             html = html + '</table>';
 
-            $report.replaceWith( html );
+            $report.html(html);
         },
 
 

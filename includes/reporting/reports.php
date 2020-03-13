@@ -16,6 +16,8 @@ use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Lead_Source;
 use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Search_Engine;
 use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Search_Engines;
 use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Source_Pages;
+use Groundhogg\Reporting\New_Reports\Table_Top_Performing_Broadcasts;
+use Groundhogg\Reporting\New_Reports\Table_Top_Performing_Emails;
 use Groundhogg\Reporting\New_Reports\Total_Active_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Confirmed_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Emails_Sent;
@@ -140,6 +142,14 @@ class Reports {
 			[
 				'id'       => 'table_contacts_by_countries',
 				'callback' => [ $this, 'table_contacts_by_countries' ]
+			],
+			[
+				'id'       => 'table_top_performing_emails',
+				'callback' => [ $this, 'table_top_performing_emails' ]
+			],
+			[
+				'id'       => 'table_top_performing_broadcasts',
+				'callback' => [ $this, 'table_top_performing_broadcasts' ]
 			],
 
 
@@ -386,6 +396,28 @@ class Reports {
 	public function table_contacts_by_countries() {
 
 		$report = new Table_Contacts_By_Country( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function table_top_performing_emails() {
+
+		$report = new Table_Top_Performing_Emails( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function table_top_performing_broadcasts() {
+
+		$report = new Table_Top_Performing_Broadcasts( $this->start, $this->end );
 
 		return $report->get_data();
 

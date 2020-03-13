@@ -2,7 +2,7 @@
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
 }
 
-.gh-loader-overlay{
+.gh-loader-overlay {
     position: absolute;
     top: 0;
     right: 0;
@@ -13,7 +13,7 @@
     z-index: 9999;
 }
 
-.gh-loader{
+.gh-loader {
     top: 50vh;
     margin: 0 !important;
     left: 50%;
@@ -26,17 +26,17 @@ img {
     max-width: 100%;
 }
 
-#groundhogg-datepicker-wrap{
+#groundhogg-datepicker-wrap {
     max-width: 450px;
     float: right;
     margin-top: 25px;
 }
 
-#screen-meta-links{
+#screen-meta-links {
     display: none;
 }
 
-.nav-tab-wrapper{
+.nav-tab-wrapper {
     margin-bottom: 20px !important;
 }
 
@@ -44,37 +44,44 @@ img {
     border-radius: 5px;
     background: #FFF;
     border: 1px solid #ccd0d4;
-    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
 }
 
-.groundhogg-report h2.title{
+.groundhogg-report h2.title {
     padding: 0 20px;
     font-size: 18px;
     /*border-bottom: 1px solid #ccd0d4;*/
+
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre;
+    line-height: 1.2;
+    font-weight: bold;
 }
 
 .groundhogg-report .inside {
     padding: 20px;
 }
 
-.groundhogg-quick-stats{
+.groundhogg-quick-stats {
     margin-top: 20px;
 }
 
-.groundhogg-quick-stats .groundhogg-report{
+.groundhogg-quick-stats .groundhogg-report {
     display: flex;
 }
 
-.groundhogg-quick-stats .groundhogg-quick-stat:first-child{
+.groundhogg-quick-stats .groundhogg-quick-stat:first-child {
     border-left: none;
     border-radius: 5px 0 0 5px;
 }
 
-.groundhogg-quick-stats .groundhogg-quick-stat:last-child{
+.groundhogg-quick-stats .groundhogg-quick-stat:last-child {
     border-radius: 0 5px 5px 0;
 }
 
-.groundhogg-quick-stats .groundhogg-quick-stat{
+.groundhogg-quick-stats .groundhogg-quick-stat {
     width: 25%;
     position: relative;
     padding: 17px 20px 15px;
@@ -82,7 +89,7 @@ img {
     background: #FFF;
 }
 
-.groundhogg-quick-stat .groundhogg-quick-stat-title{
+.groundhogg-quick-stat .groundhogg-quick-stat-title {
     font-size: 18px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -92,43 +99,43 @@ img {
     margin-bottom: 10px;
 }
 
-.groundhogg-quick-stat .groundhogg-quick-stat-number{
+.groundhogg-quick-stat .groundhogg-quick-stat-number {
     font-size: 40px;
     display: inline-block;
     float: left;
     margin-top: 10px;
 }
 
-.groundhogg-quick-stat .groundhogg-quick-stat-previous{
+.groundhogg-quick-stat .groundhogg-quick-stat-previous {
     /*margin: 10px 0 0 0;*/
     font-size: 16px;
     float: right;
 }
 
-.groundhogg-quick-stat .groundhogg-quick-stat-previous.red{
+.groundhogg-quick-stat .groundhogg-quick-stat-previous.red {
     color: #d73638;
 }
 
-.groundhogg-quick-stat .groundhogg-quick-stat-previous.green{
+.groundhogg-quick-stat .groundhogg-quick-stat-previous.green {
     color: #5cc0a5;
 }
 
-.groundhogg-quick-stat .groundhogg-quick-stat-arrow:before{
+.groundhogg-quick-stat .groundhogg-quick-stat-arrow:before {
     display: inline-block;
     content: '\279C';
     font-size: 16px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 
-.groundhogg-quick-stat-arrow.up:before{
+.groundhogg-quick-stat-arrow.up:before {
     transform: rotate(-90deg);
 }
 
-.groundhogg-quick-stat-arrow.down:before{
+.groundhogg-quick-stat-arrow.down:before {
     transform: rotate(90deg);
 }
 
-.groundhogg-quick-stat .groundhogg-quick-stat-compare{
+.groundhogg-quick-stat .groundhogg-quick-stat-compare {
     clear: right;
     float: right;
     font-size: 12px;
@@ -139,96 +146,108 @@ img {
 .groundhogg-chart {
     width: 50%;
     position: relative;
-    padding: 17px 20px 15px;
-    border-left: 1px solid #ccd0d4;;
+    /*padding: 17px 20px 15px;*/
+    /*border-left: 1px solid #ccd0d4;;*/
     background: #FFF;
-}
-
-.groundhogg-table-list-item:nth-child(odd) {
-     background-color: #f9fbff;
-}
-
-.groundhogg-table-list-item {
-    padding: 12px 20px;
-    min-height: 43px;
-    font-size: 15px;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-}
-.groundhogg-table-list-item .groundhogg-reports-list-text {
-    color: #393f4c;
-    white-space: pre;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    vertical-align: middle;
-    display: inline-block;
-    width: 100%;
-    padding: 1px;
-    margin: -1px;
-}
-
-.groundhogg-table-box {
+    padding: 20px;
     border: 1px solid #d6e2ed;
-    background: #fff;
-    width: 100%;
-    margin-left: 20px;
-    padding-top: 18px;
-    position: relative;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    -ms-flex-flow: column;
-    flex-flow: column;
-}
-
-
-table.groundhogg-report-table {
-    border: 1px solid #1C6EA4;
-    width: 100%;
-    height: 200px;
-    text-align: left;
-    border-collapse: collapse;
-}
-table.groundhogg-report-table td, table.groundhogg-report-table th {
-    border: 1px solid #AAAAAA;
-    padding: 3px 2px;
-}
-table.groundhogg-report-table tr:nth-child(even) {
-    background: #D0E4F5;
-}
-table.groundhogg-report-table thead {
-    background: #1C6EA4;
-    background: -moz-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
-    background: -webkit-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
-    background: linear-gradient(to bottom, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
-}
-table.groundhogg-report-table thead th {
-    font-size: 15px;
-    font-weight: bold;
-    color: #FFFFFF;
-}
-table.groundhogg-report-table tfoot td {
-    font-size: 14px;
-}
-table.groundhogg-report-table tfoot .links {
-    text-align: right;
-}
-table.groundhogg-report-table tfoot .links a{
-    display: inline-block;
-    background: #1C6EA4;
-    color: #FFFFFF;
-    padding: 2px 8px;
     border-radius: 5px;
 }
 
+.groundhogg-chart-no-padding {
+    width: 50%;
+    position: relative;
+    /*padding: 17px 20px 15px;*/
+    /*border-left: 1px solid #ccd0d4;;*/
+    background: #FFF;
+    border: 1px solid #d6e2ed;
+    border-radius: 5px;
+}
+
+.groundhogg-chart-no-padding h2.title {
+    margin-top: 15px;
+    margin-bottom: 20px;
+    padding-left: 15px;
+
+    font-size: 18px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre;
+    line-height: 1.2;
+    font-weight: bold;
+
+}
+
+.groundhogg-chart:first-child, .groundhogg-chart-no-padding:first-child {
+    margin-right: 15px;
+}
+
+.groundhogg-chart-wrapper {
+    margin-bottom: 15px;
+    margin-top: 15px;
+    display: flex;
+    border-radius: 5px;
+}
 
 @media only screen and (max-width: 1280px) {
     .groundhogg-quick-stat .groundhogg-quick-stat-number,
     .groundhogg-quick-stat .groundhogg-quick-stat-previous,
-    .groundhogg-quick-stat .groundhogg-quick-stat-compare{
+    .groundhogg-quick-stat .groundhogg-quick-stat-compare {
         float: none;
     }
 }
+
+
+/* NEW CSS FOR TABLE */
+table.groundhogg-report-table tr:nth-child(odd) {
+    background-color: #fbfbfb;
+}
+
+.groundhogg-table-box {
+    width: 100%;
+    margin: 0 auto;
+}
+
+table.groundhogg-report-table {
+
+    table-layout: fixed;
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    overflow: hidden;
+}
+
+table.groundhogg-report-table a {
+    text-decoration: none;
+}
+
+table.groundhogg-report-table th {
+    line-height: 1.2;
+    display: table-cell;
+    padding: 15px;
+    font-weight: bold;
+}
+
+table.groundhogg-report-table td {
+    font-size: 15px;
+    color: #666666;
+    line-height: 1.2;
+    font-weight: unset !important;
+    border-bottom: 1px solid #f2f2f2;
+    display: table-cell;
+    padding: 15px;
+    text-decoration: none;
+    /*word-break: break-word;*/
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 75px;
+}
+
+table.groundhogg-report-table th:last-child,
+table.groundhogg-report-table td:last-child{
+    width: 100px;
+}
+

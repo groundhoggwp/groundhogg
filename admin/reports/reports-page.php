@@ -137,14 +137,17 @@ class Reports_Page extends Tabbed_Admin_Page {
 					'email_open_rate',
 					'email_click_rate',
 
-					'chart_last_broadcast'
+					'chart_last_broadcast',
 
+					'table_top_performing_emails',
+					'table_top_performing_broadcasts'
 				];
 
 				break;
 			case 'funnels':
 				$reports = [
-					'chart_funnel_breakdown'
+					'chart_funnel_breakdown',
+					'table_top_performing_emails',
 				];
 
 		}

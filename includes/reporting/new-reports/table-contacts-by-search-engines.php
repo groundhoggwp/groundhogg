@@ -19,23 +19,28 @@ class Table_Contacts_By_Search_Engines extends  Base_Table_Report
 	}
 
 	/**
-	 *
-	 *
-	 *
 	 * @return array
-	 *
 	 */
 	public function get_data()
 	{
 		return [
 			'type'=> 'table',
+			'label'=> $this->get_label(),
 			'data' =>
-				$this->get_lead_score()
+				$this->get_search_engine_data()
 		];
 	}
 
+	public function get_label() {
+		return [
+			__( 'Search Engines', 'groundhogg' ),
+			__( 'Contacts', 'groundhogg' ),
+		];
 
-	protected function get_lead_score() {
+	}
+
+
+	protected function get_search_engine_data() {
 
 		$contacts = get_db( 'contacts' )->query( [
 			'date_query' => [

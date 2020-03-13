@@ -17,72 +17,11 @@ abstract class Base_Table_Report extends Base_Report
     protected $dataset;
 
     /**
-     * @return string
-     */
-    abstract function column_title();
-
-    protected function column_data_title()
-    {
-        return __( 'Contacts', 'groundhogg' );
-    }
-
-    /**
      * @return bool
      */
     abstract function only_show_top_10() ;
 
-//    /**
-//     * Output the widget HTML
-//     */
-//    public function widget()
-//    {
-//        /*
-//         * Get Data from the Override method.
-//         */
-//        $data = $this->get_data();
-//
-//        $html = Plugin::$instance->utils->html;
-//
-//        $total = array_sum( wp_list_pluck( $data, 'data' ) );
-//
-//        if ( $total ):
-//
-//            foreach ( $data as $i => $datum )
-//            {
-//
-//                $sub_tal = $datum[ 'data' ];
-//                $percentage = ' (' . percentage( $total, $sub_tal ) . '%)';
-//
-//                $datum[ 'data' ] = $html->wrap( $datum[ 'data' ] . $percentage, 'a', [ 'href' => $datum[ 'url' ], 'class' => 'number-total' ] );
-//                unset( $datum['url'] );
-//                $data[ $i ] = $datum;
-//            }
-//
-//            $html->list_table(
-//                [],
-//                [
-//                    $this->column_title(),
-//                    $this->column_data_title(),
-//                ],
-//                $data,
-//                false
-//            );
-//
-//            $this->extra_widget_info();
-//
-//        else:
-//
-//            echo Plugin::$instance->utils->html->description( __( 'No data to show yet.', 'groundhogg' ) );
-//
-//        endif;
-//    }
-
-    /**
-     * Any additional information needed for the widget.
-     *
-     * @return void
-     */
-//    abstract protected function extra_widget_info();
+    abstract function get_label();
 
     /**
      * Normalize a datum

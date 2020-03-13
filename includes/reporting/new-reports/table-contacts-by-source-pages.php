@@ -19,23 +19,29 @@ class Table_Contacts_By_Source_Pages extends  Base_Table_Report
 	}
 
 	/**
-	 *
-	 *
-	 *
 	 * @return array
-	 *
 	 */
-	public function get_data()
-	{
+	public function get_data() {
 		return [
-			'type'=> 'table',
-			'data' =>
-				$this->get_lead_score()
+			'type'  => 'table',
+			'label' => $this->get_label(),
+			'data'  =>
+				$this->get_lead_score_page()
 		];
 	}
 
 
-	protected function get_lead_score() {
+	public function get_label() {
+		return [
+			__( 'Lead Source', 'groundhogg' ),
+			__( 'Total', 'groundhogg' ),
+		];
+
+	}
+
+
+
+	protected function get_lead_score_page() {
 
 		$contacts = get_db( 'contacts' )->query( [
 			'date_query' => [
