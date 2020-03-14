@@ -1,4 +1,5 @@
 <?php
+
 namespace Groundhogg\Steps\Actions;
 
 use Groundhogg\Contact;
@@ -7,7 +8,9 @@ use Groundhogg\Plugin;
 use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Step;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Delay Timer
@@ -15,224 +18,218 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * This allows the adition of an event which "does nothing" but runs at the specified time according to the time provided.
  * Essentially delaying proceeding events.
  *
- * @package     Elements
+ * @since       File available since Release 0.9
  * @subpackage  Elements/Actions
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.9
+ * @package     Elements
  */
-class Delay_Timer extends Action
-{
-    /**
-     * @return string
-     */
-    public function get_help_article()
-    {
-        return 'https://docs.groundhogg.io/docs/builder/actions/delay-timer/';
-    }
+class Delay_Timer extends Action {
 
-    /**
-     * Get the element name
-     *
-     * @return string
-     */
-    public function get_name()
-    {
-        return _x( 'Delay Timer', 'step_name', 'groundhogg' );
-    }
+	const TYPE = 'delay_timer';
 
-    /**
-     * Get the element type
-     *
-     * @return string
-     */
-    public function get_type()
-    {
-        return 'delay_timer';
-    }
+	/**
+	 * @return string
+	 */
+	public function get_help_article() {
+		return 'https://docs.groundhogg.io/docs/builder/actions/delay-timer/';
+	}
 
-    /**
-     * Get the description
-     *
-     * @return string
-     */
-    public function get_description()
-    {
-        return _x( 'Pause for the specified amount of time.', 'step_description', 'groundhogg' );
-    }
+	/**
+	 * Get the element name
+	 *
+	 * @return string
+	 */
+	public function get_name() {
+		return _x( 'Delay Timer', 'step_name', 'groundhogg' );
+	}
 
-    /**
-     * Get the icon URL
-     *
-     * @return string
-     */
-    public function get_icon()
-    {
-        return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/delay-timer.png';
-    }
+	/**
+	 * Get the element type
+	 *
+	 * @return string
+	 */
+	public function get_type() {
+		return 'delay_timer';
+	}
 
-    public function admin_scripts()
-    {
-        wp_enqueue_script( 'groundhogg-funnel-delay-timer' );
-    }
+	/**
+	 * Get the description
+	 *
+	 * @return string
+	 */
+	public function get_description() {
+		return _x( 'Pause for the specified amount of time.', 'step_description', 'groundhogg' );
+	}
 
-    /**
-     * @param $step Step
-     */
-    public function settings( $step )
-    {
+	/**
+	 * Get the icon URL
+	 *
+	 * @return string
+	 */
+	public function get_icon() {
+		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/delay-timer.png';
+	}
 
-        $html = Plugin::$instance->utils->html;
+	public function admin_scripts() {
+		wp_enqueue_script( 'groundhogg-funnel-delay-timer' );
+	}
 
-        $html->start_form_table();
+	/**
+	 * @param $step Step
+	 */
+	public function settings( $step ) {
 
-        $html->start_row();
+		$html = Plugin::$instance->utils->html;
 
-        $html->th( __( 'Wait at least:', 'groundhogg' ) );
+		$html->start_form_table();
 
-        $html->td( [
-            // DELAY AMOUNT
-            $html->number( [
-                'class'         => 'input',
-                'name'          => $this->setting_name_prefix( 'delay_amount' ),
-                'id'            => $this->setting_id_prefix( 'delay_amount' ),
-                'value'         => $this->get_setting( 'delay_amount', 3 ),
-                'placeholder'   => 3,
-            ] ),
-            // DELAY TYPE
-            $html->dropdown( [
-                'name'          => $this->setting_name_prefix( 'delay_type' ),
-                'id'            => $this->setting_id_prefix( 'delay_type' ),
-                'options'       => [
-                    'minutes'   => __( 'Minutes' ),
-                    'hours'     => __( 'Hours' ),
-                    'days'      => __( 'Days' ),
-                    'weeks'     => __( 'Weeks' ),
-                    'months'    => __( 'Months' ),
-                ],
-                'selected'      => $this->get_setting( 'delay_type', 'minutes' ),
-                'option_none'   => false,
-            ] ),
-        ] );
+		$html->start_row();
 
-        $html->end_row();
-        $html->start_row();
+		$html->th( __( 'Wait at least:', 'groundhogg' ) );
 
-        $html->th( __( 'And run:', 'groundhogg' ) );
+		$html->td( [
+			// DELAY AMOUNT
+			$html->number( [
+				'class'       => 'input',
+				'name'        => $this->setting_name_prefix( 'delay_amount' ),
+				'id'          => $this->setting_id_prefix( 'delay_amount' ),
+				'value'       => $this->get_setting( 'delay_amount', 3 ),
+				'placeholder' => 3,
+			] ),
+			// DELAY TYPE
+			$html->dropdown( [
+				'name'        => $this->setting_name_prefix( 'delay_type' ),
+				'id'          => $this->setting_id_prefix( 'delay_type' ),
+				'options'     => [
+					'minutes' => __( 'Minutes' ),
+					'hours'   => __( 'Hours' ),
+					'days'    => __( 'Days' ),
+					'weeks'   => __( 'Weeks' ),
+					'months'  => __( 'Months' ),
+				],
+				'selected'    => $this->get_setting( 'delay_type', 'minutes' ),
+				'option_none' => false,
+			] ),
+		] );
 
-        $html->td( [
-            // RUN WHEN
-            $html->dropdown( [
-                'name'          => $this->setting_name_prefix( 'run_when' ),
-                'id'            => $this->setting_id_prefix( 'run_when' ),
-                'class'         => 'run_when',
-                'options'       => [
-                    'now'   => __( 'Immediately', 'groundhogg' ),
-                    'later' => __( 'At time of day', 'groundhogg' ),
-                ],
-                'selected'      => $this->get_setting( 'run_when', 'now' ),
-                'option_none'   => false,
-            ] ),
-            // RUN TIME
-            $html->input( [
-                'type'  => 'time',
-                'class' => ( 'now' === $this->get_setting( 'run_when', 'now' ) ) ? 'input run_time hidden' : 'run_time input',
-                'name'  => $this->setting_name_prefix( 'run_time' ),
-                'id'    => $this->setting_id_prefix(   'run_time' ),
-                'value' => $this->get_setting( 'run_time', "09:00:00" ),
-            ] ),
-            // LOCAL TIME
-            $html->wrap(
-                $html->checkbox( [
-                    'label'         => _x( "Run in the contact's local time.", 'action', 'groundhogg' ),
-                    'name'          => $this->setting_name_prefix( 'send_in_timezone' ),
-                    'id'            => $this->setting_id_prefix(   'send_in_timezone' ),
-                    'value'         => '1',
-                    'checked'       => (bool) $this->get_setting( 'send_in_timezone' ),
-                    'title'         => __( "Run in the contact's local time.", 'groundhogg' ),
-                    'required'      => false,
-                ] ),
-                'div',
-                [
-                    'id' => $this->setting_id_prefix( 'local_time_div' )
-                ]
-            )
-        ] );
+		$html->end_row();
+		$html->start_row();
 
-        $html->end_row();
-        $html->end_form_table();
-    }
+		$html->th( __( 'And run:', 'groundhogg' ) );
 
-    /**
-     * Save the step settings
-     *
-     * @param $step Step
-     */
-    public function save( $step )
-    {
-        $this->save_setting( 'delay_amount', absint( $this->get_posted_data( 'delay_amount' ) ) );
-        $this->save_setting( 'delay_type', sanitize_text_field( $this->get_posted_data( 'delay_type' ) ) );
-        $this->save_setting( 'run_when', sanitize_text_field( $this->get_posted_data( 'run_when' ) ) );
-        $this->save_setting( 'run_time', sanitize_text_field( $this->get_posted_data( 'run_time' ) ) );
+		$html->td( [
+			// RUN WHEN
+			$html->dropdown( [
+				'name'        => $this->setting_name_prefix( 'run_when' ),
+				'id'          => $this->setting_id_prefix( 'run_when' ),
+				'class'       => 'run_when',
+				'options'     => [
+					'now'   => __( 'Immediately', 'groundhogg' ),
+					'later' => __( 'At time of day', 'groundhogg' ),
+				],
+				'selected'    => $this->get_setting( 'run_when', 'now' ),
+				'option_none' => false,
+			] ),
+			// RUN TIME
+			$html->input( [
+				'type'  => 'time',
+				'class' => ( 'now' === $this->get_setting( 'run_when', 'now' ) ) ? 'input run_time hidden' : 'run_time input',
+				'name'  => $this->setting_name_prefix( 'run_time' ),
+				'id'    => $this->setting_id_prefix( 'run_time' ),
+				'value' => $this->get_setting( 'run_time', "09:00:00" ),
+			] ),
+			// LOCAL TIME
+			$html->wrap(
+				$html->checkbox( [
+					'label'    => _x( "Run in the contact's local time.", 'action', 'groundhogg' ),
+					'name'     => $this->setting_name_prefix( 'send_in_timezone' ),
+					'id'       => $this->setting_id_prefix( 'send_in_timezone' ),
+					'value'    => '1',
+					'checked'  => (bool) $this->get_setting( 'send_in_timezone' ),
+					'title'    => __( "Run in the contact's local time.", 'groundhogg' ),
+					'required' => false,
+				] ),
+				'div',
+				[
+					'id' => $this->setting_id_prefix( 'local_time_div' )
+				]
+			)
+		] );
 
-        $send_in_timezone = $this->get_posted_data( 'send_in_timezone', false );
-        $this->save_setting( 'send_in_timezone', (bool) $send_in_timezone );
-    }
+		$html->end_row();
+		$html->end_form_table();
+	}
 
-    /**
-     * Override the parent and set the run time of this function to the settings
-     *
-     * @param Step $step
-     * @return int
-     */
-    public function enqueue( $step )
-    {
+	/**
+	 * Save the step settings
+	 *
+	 * @param $step Step
+	 */
+	public function save( $step ) {
+		$this->save_setting( 'delay_amount', absint( $this->get_posted_data( 'delay_amount' ) ) );
+		$this->save_setting( 'delay_type', sanitize_text_field( $this->get_posted_data( 'delay_type' ) ) );
+		$this->save_setting( 'run_when', sanitize_text_field( $this->get_posted_data( 'run_when' ) ) );
+		$this->save_setting( 'run_time', sanitize_text_field( $this->get_posted_data( 'run_time' ) ) );
 
-        $amount     = absint( $this->get_setting( 'delay_amount' ) );
-        $type       = $this->get_setting( 'delay_type' );
-        $run_time   = $this->get_setting( 'run_time', '09:00:00' );
-        $run_when   = $this->get_setting( 'run_when', 'now' );
-        $send_in_timezone = $this->get_setting( 'send_in_timezone', false );
+		$send_in_timezone = $this->get_posted_data( 'send_in_timezone', false );
+		$this->save_setting( 'send_in_timezone', (bool) $send_in_timezone );
+	}
 
-        if ( $run_when == 'now' ){
-            $time_string = '+ ' . $amount . ' ' . $type;
-            $final_time = strtotime( $time_string );
-        } else {
-            $time_string = '+ ' . $amount . ' ' . $type;
-            $base_time = strtotime( $time_string );
-            $formatted_date = date( 'Y-m-d', $base_time );
-            $time_string = $formatted_date . ' ' . $run_time;
-            if ( strtotime( $time_string ) < time() ){
-                $formatted_date = date( 'Y-m-d', strtotime( 'tomorrow' ) );
-                $time_string = $formatted_date . ' ' . $run_time;
-            }
+	/**
+	 * Override the parent and set the run time of this function to the settings
+	 *
+	 * @param Step $step
+	 *
+	 * @return int
+	 */
+	public function enqueue( $step ) {
 
-            /* convert to utc */
-            $final_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $time_string ) );
+		$amount           = absint( $this->get_setting( 'delay_amount' ) );
+		$type             = $this->get_setting( 'delay_type' );
+		$run_time         = $this->get_setting( 'run_time', '09:00:00' );
+		$run_when         = $this->get_setting( 'run_when', 'now' );
+		$send_in_timezone = $this->get_setting( 'send_in_timezone', false );
 
-            /* Modify according to the contacts timezone */
-            if ( $send_in_timezone && Event_Queue::is_processing()  ){
-                $final_time = Plugin::$instance->event_queue->get_current_contact()->get_local_time_in_utc_0( $final_time );
-                if ( $final_time < time() ){
-                    $final_time+=DAY_IN_SECONDS;
-                }
-            }
-        }
+		if ( $run_when == 'now' ) {
+			$time_string = '+ ' . $amount . ' ' . $type;
+			$final_time  = strtotime( $time_string );
+		} else {
+			$time_string    = '+ ' . $amount . ' ' . $type;
+			$base_time      = strtotime( $time_string );
+			$formatted_date = date( 'Y-m-d', $base_time );
+			$time_string    = $formatted_date . ' ' . $run_time;
+			if ( strtotime( $time_string ) < time() ) {
+				$formatted_date = date( 'Y-m-d', strtotime( 'tomorrow' ) );
+				$time_string    = $formatted_date . ' ' . $run_time;
+			}
 
-        return $final_time;
-    }
-    /**
-     * Process the apply tag step...
-     *
-     * @param $contact Contact
-     * @param $event Event
-     *
-     * @return true
-     */
-    public function run( $contact, $event )
-    {
-        //do nothing
-        return true;
-    }
+			/* convert to utc */
+			$final_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $time_string ) );
+
+			/* Modify according to the contacts timezone */
+			if ( $send_in_timezone && Event_Queue::is_processing() ) {
+				$final_time = Plugin::$instance->event_queue->get_current_contact()->get_local_time_in_utc_0( $final_time );
+				if ( $final_time < time() ) {
+					$final_time += DAY_IN_SECONDS;
+				}
+			}
+		}
+
+		return $final_time;
+	}
+
+	/**
+	 * Process the apply tag step...
+	 *
+	 * @param $contact Contact
+	 * @param $event   Event
+	 *
+	 * @return true
+	 */
+	public function run( $contact, $event ) {
+		//do nothing
+		return true;
+	}
 }

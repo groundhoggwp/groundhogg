@@ -431,7 +431,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return $this->get_id() . '_' . esc_attr( $name );
 	}
 
-
 	/**
 	 * Do the event when being processed from the event queue...
 	 *
@@ -467,6 +466,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		return $result;
 	}
+
 
 	/**
 	 * Output the HTML of a step.
@@ -619,5 +619,26 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 				switch_to_blog( $blog_id );
 			}
 		}
+	}
+
+	/**
+	 * Needs to handle the moving of contacts to another step...
+	 *
+	 * @return bool
+	 */
+	public function delete() {
+
+		// Maybe Move contacts forward...
+
+		$next_step = $this->get_next_action();
+
+		if ( $next_step && $next_step->is_active() ){
+			$contacts = $this->get_waiting_contacts();
+			foreach ( $contacts as $contact ){
+				$next_step->enqueue( $contact );
+			}
+		}
+
+		return parent::delete();
 	}
 }
