@@ -13,12 +13,13 @@ function quick_stat_report( $args = [] ) {
 	$args = wp_parse_args( $args, [
 		'id'    => uniqid( 'groundhogg_' ),
 		'title' => 'Report',
-		'info'  => 'Some interesting data...'
+		'info'  => 'Some interesting data...' ,
+        'style' => ''
 	] );
 
 	?>
 
-    <div class="groundhogg-quick-stat" id="<?php esc_attr_e( $args[ 'id' ] ); ?>">
+    <div class="groundhogg-quick-stat" id="<?php esc_attr_e( $args[ 'id' ] ); ?>" style="<?php esc_attr_e( $args[ 'style' ] ); ?>">
         <div class="groundhogg-quick-stat-title"><?php esc_html_e( $args[ 'title' ] ) ?></div>
         <div class="groundhogg-quick-stat-info"></div>
         <div class="groundhogg-quick-stat-number">1234</div>
@@ -30,7 +31,6 @@ function quick_stat_report( $args = [] ) {
     </div>
 	<?php
 }
-
 
 ?>
 
@@ -59,18 +59,39 @@ function quick_stat_report( $args = [] ) {
 			'title' => __( 'Click Rate', 'groundhogg' ),
 		] ); ?>
 
-        <!--        		--><?php //quick_stat_report( [
-		//					'id' => 'unsubscribes',
-		//					'title' => __( 'Unsubscribes', 'groundhogg' ),
-		//				] );
+		<?php quick_stat_report( [
+			'id'    => 'unsubscribes',
+			'title' => __( 'Unsubscribes', 'groundhogg' ),
+		] );
 		?>
     </div>
 </div>
+<div class="groundhogg-quick-stats">
+    <div class="groundhogg-report">
 
+		<?php quick_stat_report( [
+			'id'    => 'total_spam_contacts',
+			'title' => __( 'Spam', 'groundhogg' ),
+            'style' =>'width:33%;'
+		] ); ?>
 
+		<?php quick_stat_report( [
+			'id'    => 'total_bounces_contacts',
+			'title' => __( 'Bounces', 'groundhogg' ),
+			'style' =>'width:33%;'
+		] ); ?>
+
+		<?php quick_stat_report( [
+			'id'    => 'total_complaints_contacts',
+			'title' => __( 'Complaints', 'groundhogg' ),
+			'style' =>'width:33%;'
+		] ); ?>
+
+    </div>
+</div>
 <div class="groundhogg-chart-wrapper">
     <div class="groundhogg-chart">
-        <h2 class="title"><?php _e( 'Opt-in Status', 'groundhogg' ); ?></h2>
+        <h2 class="title"><?php _e( 'Last Broadcast', 'groundhogg' ); ?></h2>
         <canvas id="chart_last_broadcast"></canvas>
     </div>
     <div class="groundhogg-chart">
@@ -78,7 +99,6 @@ function quick_stat_report( $args = [] ) {
         <p class="title"><?php _e( 'Something here......', 'groundhogg' ); ?></p>
     </div>
 </div>
-
 
 <div class="groundhogg-chart-wrapper">
     <div class="groundhogg-chart-no-padding">
@@ -90,7 +110,9 @@ function quick_stat_report( $args = [] ) {
         <div id="table_top_performing_broadcasts"></div>
     </div>
 </div>
-
-
-
-
+<div class="groundhogg-chart-wrapper">
+    <div class="groundhogg-chart-no-padding" style="width: 100% ; margin-right: 0px;">
+        <h2 class="title"><?php _e( 'Funnel Emails Needing Improvement', 'groundhogg' ); ?></h2>
+        <div id="table_worst_performing_emails"></div>
+    </div>
+</div>

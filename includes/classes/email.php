@@ -919,7 +919,8 @@ class Email extends Base_Object_With_Meta {
 	}
 
 
-	public function get_report( $start = 0, $end = 0 ) {
+
+	public function get_email_stats( $start , $end  ) {
 
 		$steps = get_db( 'stepmeta' )->query( [
 			'meta_key'   => 'email_id',
@@ -931,28 +932,56 @@ class Email extends Base_Object_With_Meta {
 
 		if ( ! empty( $steps_ids ) ) {
 
-			if ( $start && $end ) {
-				$count = get_db( 'events' )->count( [
-					'step_id' => $steps_ids,
-					'status'  => 'complete'
 
-				] );
-			}
+			$where_events = [
+				'relationship' => "AND",
+				[ 'col' => 'step_id', 'val' => $steps_ids, 'compare' => '=' ],
+				[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
+				[ 'col' => 'time', 'val' => $start, 'compare' => '>=' ],
+				[ 'col' => 'time', 'val' => $end, 'compare' => '<=' ],
+			];
+
+			$count = get_db( 'events' )->count( [
+				'where' => $where_events,
+			] );
+
+
+			$where_opened = [
+				'relationship' => "AND",
+				[ 'col' => 'email_id', 'val' => $this->get_id(), 'compare' => '=' ],
+				[ 'col' => 'activity_type', 'val' => Activity::EMAIL_OPENED, 'compare' => '=' ],
+				[ 'col' => 'timestamp', 'val' => $start, 'compare' => '>=' ],
+				[ 'col' => 'timestamp', 'val' => $end, 'compare' => '<=' ],
+			];
 
 			$opened = get_db( 'activity' )->count( [
-				'email_id'      => $this->get_id(),
-				'activity_type' => Activity::EMAIL_OPENED,
-
+				'where' => $where_opened
 			] );
-		} else {
-			$count  = 0;
-			$opened = 0;
 
+
+			$where_clicked = [
+				'relationship' => "AND",
+				[ 'col' => 'email_id', 'val' => $this->get_id() , 'compare' => '=' ],
+				[ 'col' => 'activity_type', 'val' => Activity::EMAIL_CLICKED, 'compare' => '=' ],
+				[ 'col' => 'timestamp', 'val' => $start, 'compare' => '>=' ],
+				[ 'col' => 'timestamp', 'val' => $end, 'compare' => '<=' ],
+			];
+
+			$clicked = get_db( 'activity' )->count( [
+				'where' => $where_clicked
+			] );
+
+
+		} else {
+			$count   = 0;
+			$opened  = 0;
+			$clicked = 0;
 		}
 
 		return [
-			'total'  => $count,
-			'opened' => $opened
+			'total'   => $count,
+			'opened'  => $opened,
+			'clicked' => $clicked
 		];
 	}
 

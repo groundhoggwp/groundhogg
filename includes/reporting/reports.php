@@ -18,10 +18,14 @@ use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Search_Engines;
 use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Source_Pages;
 use Groundhogg\Reporting\New_Reports\Table_Top_Performing_Broadcasts;
 use Groundhogg\Reporting\New_Reports\Table_Top_Performing_Emails;
+use Groundhogg\Reporting\New_Reports\Table_Worst_Performing_Emails;
 use Groundhogg\Reporting\New_Reports\Total_Active_Contacts;
+use Groundhogg\Reporting\New_Reports\Total_Bounces_Contacts;
+use Groundhogg\Reporting\New_Reports\Total_Complaints_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Confirmed_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Emails_Sent;
 use Groundhogg\Reporting\New_Reports\Total_New_Contacts;
+use Groundhogg\Reporting\New_Reports\Total_Spam_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Unsubscribed_Contacts;
 
 class Reports {
@@ -148,8 +152,24 @@ class Reports {
 				'callback' => [ $this, 'table_top_performing_emails' ]
 			],
 			[
+				'id'       => 'table_worst_performing_emails',
+				'callback' => [ $this, 'table_worst_performing_emails' ]
+			],
+			[
 				'id'       => 'table_top_performing_broadcasts',
 				'callback' => [ $this, 'table_top_performing_broadcasts' ]
+			],
+			[
+				'id'       => 'total_spam_contacts',
+				'callback' => [ $this, 'total_spam_contacts' ]
+			],
+			[
+				'id'       => 'total_bounces_contacts',
+				'callback' => [ $this, 'total_bounces_contacts' ]
+			],
+			[
+				'id'       => 'total_complaints_contacts',
+				'callback' => [ $this, 'total_complaints_contacts' ]
 			],
 
 
@@ -415,6 +435,17 @@ class Reports {
 	/**
 	 * @return mixed
 	 */
+	public function table_worst_performing_emails() {
+
+		$report = new Table_Worst_Performing_Emails( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
+
+	/**
+	 * @return mixed
+	 */
 	public function table_top_performing_broadcasts() {
 
 		$report = new Table_Top_Performing_Broadcasts( $this->start, $this->end );
@@ -423,5 +454,40 @@ class Reports {
 
 	}
 
+
+	/**
+	 * @return mixed
+	 */
+	public function total_complaints_contacts() {
+
+		$report = new Total_Complaints_Contacts( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
+
+
+	/**
+	 * @return mixed
+	 */
+	public function total_bounces_contacts() {
+
+		$report = new Total_Bounces_Contacts( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
+
+
+	/**
+	 * @return mixed
+	 */
+	public function total_spam_contacts() {
+
+		$report = new Total_Spam_Contacts( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
 
 }

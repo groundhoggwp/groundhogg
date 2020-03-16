@@ -106,6 +106,13 @@ class Reports_Page extends Tabbed_Admin_Page {
 					'total_emails_sent',
 					'email_open_rate',
 					'email_click_rate',
+
+					'chart_contacts_by_optin_status',
+
+					'table_top_performing_emails',
+
+					'table_contacts_by_countries',
+					'table_contacts_by_lead_source',
 				];
 
 				break;
@@ -137,9 +144,16 @@ class Reports_Page extends Tabbed_Admin_Page {
 					'email_open_rate',
 					'email_click_rate',
 
+					'total_unsubscribes',
+					'total_spam_contacts',
+					'total_bounces_contacts',
+					'total_complaints_contacts',
+
+
 					'chart_last_broadcast',
 
 					'table_top_performing_emails',
+					'table_worst_performing_emails',
 					'table_top_performing_broadcasts'
 				];
 

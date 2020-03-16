@@ -12,11 +12,11 @@ use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use function Groundhogg\percentage;
 
-class Table_Top_Performing_Emails extends Base_Table_Report {
+class Table_Worst_Performing_Emails extends Base_Table_Report {
 
 
 	function only_show_top_10() {
-		return true;
+		return true ;
 	}
 
 	function column_title() {
@@ -32,7 +32,7 @@ class Table_Top_Performing_Emails extends Base_Table_Report {
 			'type'  => 'table',
 			'label' => $this->get_label(),
 			'data'  =>
-				$this->get_top_emails()
+				$this->get_worst_emails()
 		];
 	}
 
@@ -52,7 +52,7 @@ class Table_Top_Performing_Emails extends Base_Table_Report {
 	}
 
 
-	protected function get_top_emails() {
+	protected function get_worst_emails() {
 
 
 		$funnel_id = absint( $this->get_funnel_id() );
@@ -98,13 +98,20 @@ class Table_Top_Performing_Emails extends Base_Table_Report {
 			$report = $email->get_email_stats( $this->start, $this->end );
 
 			$title = $email->get_title();
+
+
 			if ( $report[ 'total' ] > 0 ) {
-				$list[] = [
-					'data'    => percentage( $report[ 'total' ], $report[ 'opened' ] ),
-					'label'   => $title,
-					'url'     => admin_url( sprintf( 'admin.php?page=gh_emails&action=edit&email=%s', $email->ID ) ),
-					'clicked' => percentage( $report [ 'opened' ], $report [ 'clicked' ] )
-				];
+
+				if ( ( percentage( $report[ 'total' ], $report[ 'opened' ] ) < 20.0 ) || ( percentage( $report [ 'opened' ], $report [ 'clicked' ] ) < 20.0 ) ) {
+
+					$list[] = [
+						'data'    => percentage( $report[ 'total' ], $report[ 'opened' ] ),
+						'label'   => $title,
+						'url'     => admin_url( sprintf( 'admin.php?page=gh_emails&action=edit&email=%s', $email->ID ) ),
+						'clicked' => percentage( $report [ 'opened' ], $report [ 'clicked' ] )
+					];
+				}
+
 			}
 
 		}
@@ -137,17 +144,28 @@ class Table_Top_Performing_Emails extends Base_Table_Report {
 	 *
 	 * @return array
 	 */
-	protected function normalize_datum( $item_key, $item_data ) {
-
+	protected
+	function normalize_datum(		$item_key, $item_data	) {
 		return [
 			'label'   => $item_data [ 'label' ],
 			'data'    => $item_data [ 'data' ],
 			'url'     => $item_data [ 'url' ],
-			'clicked' => $item_data [ 'clicked' ]
-//			'opened' => $item_data [ 'opened' ]
+			'clicked' => $item_data [ 'clicked' ],
+
 		];
 	}
 
 
+	/**
+	 * Sort stuff
+	 *
+	 * @param $a
+	 * @param $b
+	 *
+	 * @return mixed
+	 */
+	public function sort( $a, $b ) {
+		return $a[ 'data' ] - $b[ 'data' ];
+	}
 
 }

@@ -66,7 +66,7 @@ abstract class Base_Table_Report extends Base_Report
             ];
 
             $other = array_slice( $dataset, 10 );
-            $dataset = array_slice( $dataset, 0, 10);
+            $dataset = array_slice( $dataset, 0, 10 );
 
             foreach ( $other as $c_data ){
                 $other_dataset[ 'data' ] += $c_data[ 'data' ];
