@@ -134,7 +134,7 @@ class Event_Queue extends Supports_Errors {
 	 */
 	public function run_queue() {
 
-		if ( ! $this->is_enabled() ){
+		if ( ! $this->is_enabled() ) {
 			return 0;
 		}
 

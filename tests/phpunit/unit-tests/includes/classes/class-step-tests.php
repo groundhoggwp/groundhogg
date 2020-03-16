@@ -55,7 +55,7 @@ class Step_Tests extends GH_UnitTestCase {
 	}
 
 	public function test_step_delete_do_not_move_contacts() {
-// Clear existing data
+		// Clear existing data
 		$this->factory()->truncate();
 
 		$contact = $this->factory()->contacts->create();
@@ -99,11 +99,6 @@ class Step_Tests extends GH_UnitTestCase {
 		$step1->delete();
 
 		$this->assertCount( 0, $step2->get_waiting_contacts() );
-	}
-
-	public function test_step_delete_do_not_move_contacts_end_of_funnel() {
-
-
 	}
 
 }

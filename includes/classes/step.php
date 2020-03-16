@@ -17,11 +17,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Step is used to provide information about any kind of funnel step, benchmark, or action.
  *
- * @package     Includes
+ * @since       File available since Release 0.9
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.9
+ * @package     Includes
  */
 class Step extends Base_Object_With_Meta implements Event_Process {
 	const BENCHMARK = 'benchmark';
@@ -365,9 +365,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function contact_in_funnel( $contact ) {
 		return $this->get_events_db()->count( [
-			'funnel_id'  => $this->get_funnel_id(),
-			'contact_id' => $contact->get_id()
-		] ) > 0;
+				'funnel_id'  => $this->get_funnel_id(),
+				'contact_id' => $contact->get_id()
+			] ) > 0;
 	}
 
 	/**
@@ -422,10 +422,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Return the name given with the ID prefixed for easy access in the $_POST variable
 	 *
+	 * @deprecated since 2.0
+	 *
 	 * @param $name
 	 *
 	 * @return string
-	 * @deprecated since 2.0
 	 */
 	public function prefix( $name ) {
 		return $this->get_id() . '_' . esc_attr( $name );
@@ -435,7 +436,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * Do the event when being processed from the event queue...
 	 *
 	 * @param $contact Contact
-	 * @param $event Event
+	 * @param $event   Event
 	 *
 	 * @return bool|\WP_Error whether it was successful or not
 	 */
@@ -629,12 +630,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	public function delete() {
 
 		// Maybe Move contacts forward...
-
 		$next_step = $this->get_next_action();
 
-		if ( $next_step && $next_step->is_active() ){
+		if ( $next_step && $next_step->is_active() ) {
 			$contacts = $this->get_waiting_contacts();
-			foreach ( $contacts as $contact ){
+			foreach ( $contacts as $contact ) {
 				$next_step->enqueue( $contact );
 			}
 		}

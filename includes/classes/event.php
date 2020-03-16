@@ -1,4 +1,5 @@
 <?php
+
 namespace Groundhogg;
 
 use Groundhogg\DB\DB;
@@ -7,481 +8,447 @@ use Groundhogg\Queue\Email_Notification;
 
 use WP_Error;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Event
  *
  * This is an event from the event queue. it contains info about the step, broadcast, funnel, contact etc... that is necessary for processing the event.
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
-class Event extends Base_Object
-{
+class Event extends Base_Object {
 
-    /** @var string Event statuses */
-    const COMPLETE = 'complete';
-    const CANCELLED = 'cancelled';
-    const SKIPPED = 'skipped';
-    const WAITING = 'waiting';
-    const FAILED = 'failed';
-    const IN_PROGRESS = 'in_progress';
-    const PAUSED = 'paused';
+	/** @var string Event statuses */
+	const COMPLETE = 'complete';
+	const CANCELLED = 'cancelled';
+	const SKIPPED = 'skipped';
+	const WAITING = 'waiting';
+	const FAILED = 'failed';
+	const IN_PROGRESS = 'in_progress';
+	const PAUSED = 'paused';
 
-    /**
-     * Supported Event Types
-     */
-    const FUNNEL = 1;
-    const BROADCAST = 2;
-    const EMAIL_NOTIFICATION = 3;
+	/**
+	 * Supported Event Types
+	 */
+	const FUNNEL = 1;
+	const BROADCAST = 2;
+	const EMAIL_NOTIFICATION = 3;
 
-    /**
-     * @var Contact
-     */
-    protected $contact;
+	/**
+	 * @var Contact
+	 */
+	protected $contact;
 
-    /**
-     * @var Step
-     */
-    protected $step;
+	/**
+	 * @var Step
+	 */
+	protected $step;
 
-    /**
-     * @var Funnel
-     */
-    protected $funnel;
+	/**
+	 * @var Funnel
+	 */
+	protected $funnel;
 
-    /**
-     * Return the DB instance that is associated with items of this type.
-     *
-     * @return Events
-     */
-    protected function get_db()
-    {
-        return get_db('events' );
-    }
+	/**
+	 * Return the DB instance that is associated with items of this type.
+	 *
+	 * @return Events
+	 */
+	protected function get_db() {
+		return get_db( 'events' );
+	}
 
-    /**
-     * A string to represent the object type
-     *
-     * @return string
-     */
-    protected function get_object_type()
-    {
-        return 'event';
-    }
-
-    /**
-     * @return int
-     */
-    public function get_id()
-    {
-        return absint( $this->ID );
-    }
-
-    /**
-     * @return int
-     */
-    public function get_time()
-    {
-        return absint($this->time);
-    }
-
-    /**
-     * @return int
-     */
-    public function get_time_scheduled()
-    {
-        return absint($this->time_scheduled);
-    }
-
-    /**
-     * @return int
-     */
-    public function get_event_type()
-    {
-        return absint($this->event_type);
-    }
-
-    /**
-     * @return string
-     */
-    public function get_status()
-    {
-        return $this->status;
-    }
+	/**
+	 * A string to represent the object type
+	 *
+	 * @return string
+	 */
+	protected function get_object_type() {
+		return 'event';
+	}
 
 	/**
 	 * @return int
 	 */
-    public function get_priority()
-    {
-    	return absint( $this->priority );
-    }
+	public function get_id() {
+		return absint( $this->ID );
+	}
+
+	/**
+	 * @return int
+	 */
+	public function get_time() {
+		return absint( $this->time );
+	}
+
+	/**
+	 * @return int
+	 */
+	public function get_time_scheduled() {
+		return absint( $this->time_scheduled );
+	}
+
+	/**
+	 * @return int
+	 */
+	public function get_event_type() {
+		return absint( $this->event_type );
+	}
 
 	/**
 	 * @return string
 	 */
-    public function get_claim()
-    {
-    	return $this->claim;
-    }
+	public function get_status() {
+		return $this->status;
+	}
 
-    /**
-     * @return int
-     */
-    public function get_funnel_id()
-    {
-        return absint( $this->funnel_id );
-    }
+	/**
+	 * @return int
+	 */
+	public function get_priority() {
+		return absint( $this->priority );
+	}
 
-    /**
-     * @return Funnel
-     */
-    public function get_funnel()
-    {
-        return $this->funnel;
-    }
+	/**
+	 * @return string
+	 */
+	public function get_claim() {
+		return $this->claim;
+	}
 
-    /**
-     * @return int
-     */
-    public function get_contact_id()
-    {
-        return absint( $this->contact_id );
-    }
+	/**
+	 * @return int
+	 */
+	public function get_funnel_id() {
+		return absint( $this->funnel_id );
+	}
 
-    /**
-     * @return String
-     */
-    public function get_failure_reason()
-    {
-        return $this->get_error_code() . ': ' .$this->get_error_message();
-    }
+	/**
+	 * @return Funnel
+	 */
+	public function get_funnel() {
+		return $this->funnel;
+	}
 
-    /**
-     * @return Contact
-     */
-    public function get_contact()
-    {
-        return $this->contact;
-    }
+	/**
+	 * @return int
+	 */
+	public function get_contact_id() {
+		return absint( $this->contact_id );
+	}
 
-    /**
-     * @return int
-     */
-    public function get_step_id()
-    {
-        return absint( $this->step_id );
-    }
+	/**
+	 * @return String
+	 */
+	public function get_failure_reason() {
+		return $this->get_error_code() . ': ' . $this->get_error_message();
+	}
 
-    /**
-     * @return Step|Email_Notification|Broadcast
-     */
-    public function get_step()
-    {
-        return $this->step;
-    }
+	/**
+	 * @return Contact
+	 */
+	public function get_contact() {
+		return $this->contact;
+	}
 
-    /**
-     * Get the email of an event.
-     *
-     * @return bool|Email
-     */
-    public function get_email()
-    {
-        switch ( $this->get_event_type() ){
-            case Event::FUNNEL;
-                return new Email( absint( $this->get_step()->get_meta( 'email_id' ) ) );
-                break;
-            case Event::EMAIL_NOTIFICATION;
-                return new Email( $this->get_step()->get_id() );
-                break;
-            case Event::BROADCAST;
-                return new Email( $this->get_step()->get_object_id() );
-                break;
-        }
+	/**
+	 * @return int
+	 */
+	public function get_step_id() {
+		return absint( $this->step_id );
+	}
 
-        return false;
-    }
+	/**
+	 * @return Step|Email_Notification|Broadcast
+	 */
+	public function get_step() {
+		return $this->step;
+	}
 
-    /**
-     * @return string
-     */
-    public function get_error_code()
-    {
-        return $this->error_code;
-    }
+	/**
+	 * Get the email of an event.
+	 *
+	 * @return bool|Email
+	 */
+	public function get_email() {
+		switch ( $this->get_event_type() ) {
+			case Event::FUNNEL;
+				return new Email( absint( $this->get_step()->get_meta( 'email_id' ) ) );
+				break;
+			case Event::EMAIL_NOTIFICATION;
+				return new Email( $this->get_step()->get_id() );
+				break;
+			case Event::BROADCAST;
+				return new Email( $this->get_step()->get_object_id() );
+				break;
+		}
 
-    /**
-     * @return string
-     */
-    public function get_error_message()
-    {
-        return $this->error_message;
-    }
+		return false;
+	}
 
+	/**
+	 * @return string
+	 */
+	public function get_error_code() {
+		return $this->error_code;
+	}
 
-    /**
-     * Do any post setup actions.
-     *
-     * @return void
-     */
-    protected function post_setup()
-    {
-
-        $this->contact = Plugin::$instance->utils->get_contact( $this->get_contact_id() );
-
-        switch ( $this->get_event_type() ){
-            case self::FUNNEL:
-                $this->step = Plugin::$instance->utils->get_step( $this->get_step_id() );
-                break;
-            case self::EMAIL_NOTIFICATION:
-                $this->step = new Email_Notification( $this->get_step_id() );
-                break;
-            case self::BROADCAST:
-                $this->step = new Broadcast( $this->get_step_id() );
-                break;
-	        default:
-	        	$class = apply_filters( 'groundhogg/event/post_setup/step_class', false, $this );
-
-	        	if ( class_exists( $class ) ){
-                    $this->step = new $class( $this->get_step_id() );
-                }
-
-	        	break;
-        }
-
-        do_action( 'groundhogg/event/post_setup', $this );
-    }
-
-    /**
-     * Return whether the event is a funnel (automated) event.
-     *
-     * @since 1.2
-     * @return bool
-     */
-    public function is_funnel_event()
-    {
-        return $this->get_event_type() === self::FUNNEL;
-    }
-
-    /**
-     * Return whether the event is a broadcast event
-     *
-     * @return bool
-     */
-    public function is_broadcast_event()
-    {
-        return $this->get_event_type() === self::BROADCAST;
-    }
+	/**
+	 * @return string
+	 */
+	public function get_error_message() {
+		return $this->error_message;
+	}
 
 
+	/**
+	 * Do any post setup actions.
+	 *
+	 * @return void
+	 */
+	protected function post_setup() {
 
-    /**
-     * @return string
-     */
-    public function get_step_title()
-    {
-        if ( $this->get_step() ){
-            return $this->get_step()->get_step_title(); //todo
-        }
+		$this->contact = Plugin::$instance->utils->get_contact( $this->get_contact_id() );
 
-        return __( 'Unknown', 'groundhogg' );
-    }
+		switch ( $this->get_event_type() ) {
+			case self::FUNNEL:
+				$this->step = Plugin::$instance->utils->get_step( $this->get_step_id() );
+				break;
+			case self::EMAIL_NOTIFICATION:
+				$this->step = new Email_Notification( $this->get_step_id() );
+				break;
+			case self::BROADCAST:
+				$this->step = new Broadcast( $this->get_step_id() );
+				break;
+			default:
+				$class = apply_filters( 'groundhogg/event/post_setup/step_class', false, $this );
 
-    /**
-     * @return string
-     */
-    public function get_funnel_title()
-    {
-        if ( $this->get_step() ){
-            return $this->get_step()->get_funnel_title();
-        }
+				if ( class_exists( $class ) ) {
+					$this->step = new $class( $this->get_step_id() );
+				}
 
-        return __( 'Unknown', 'groundhogg' );
-    }
+				break;
+		}
 
-    /**
-     * Run the event
-     *
-     * Wrapper function for the step call in WPGH_Step
-     */
-    public function run()
-    {
-    	if ( ! $this->get_claim() ){
-    		return false;
-	    }
+		do_action( 'groundhogg/event/post_setup', $this );
+	}
 
-        do_action('groundhogg/event/run/before', $this);
+	/**
+	 * Return whether the event is a funnel (automated) event.
+	 *
+	 * @since 1.2
+	 * @return bool
+	 */
+	public function is_funnel_event() {
+		return $this->get_event_type() === self::FUNNEL;
+	}
 
-        $this->in_progress();
+	/**
+	 * Return whether the event is a broadcast event
+	 *
+	 * @return bool
+	 */
+	public function is_broadcast_event() {
+		return $this->get_event_type() === self::BROADCAST;
+	}
 
-        if ( ! $this->get_step() ){
-            return false;
-        }
 
-        $result = $this->get_step()->run( $this->get_contact(), $this );
+	/**
+	 * @return string
+	 */
+	public function get_step_title() {
+		if ( $this->get_step() ) {
+			return $this->get_step()->get_step_title(); //todo
+		}
 
-        // Soft fail when return false
-        if ( ! $result ){
+		return __( 'Unknown', 'groundhogg' );
+	}
 
-            $this->skip();
+	/**
+	 * @return string
+	 */
+	public function get_funnel_title() {
+		if ( $this->get_step() ) {
+			return $this->get_step()->get_funnel_title();
+		}
 
-            return apply_filters( 'groundhogg/event/run/skipped_result', false, $this );
-        }
+		return __( 'Unknown', 'groundhogg' );
+	}
 
-        // Hard fail when WP Error
-        if ( is_wp_error( $result ) ) {
-            /* handle event failure */
-            $this->add_error( $result );
+	/**
+	 * Run the event
+	 *
+	 * Wrapper function for the step call in WPGH_Step
+	 */
+	public function run() {
+		// If the claim has not been set by the queue we should quit now
+		if ( ! $this->get_claim() || $this->is_waiting() ) {
+			return false;
+		}
 
-            $this->fail();
+		do_action( 'groundhogg/event/run/before', $this );
 
-            return apply_filters( 'groundhogg/event/run/failed_result', false, $this );
-        }
+		$this->in_progress();
 
-        $this->complete();
+		if ( ! $this->get_step() ) {
+			return false;
+		}
 
-        do_action('groundhogg/event/run/after', $this );
+		$result = $this->get_step()->run( $this->get_contact(), $this );
 
-        return true;
-    }
+		// Soft fail when return false
+		if ( ! $result ) {
 
-    /**
-     * Due to the nature of WP and cron, let's DOUBLE check that at the time of running this event has not been run by another instance of the queue.
-     *
-     * @return bool whether the event has run or not
-     */
-    public function has_run()
-    {
-        return $this->get_status() !== self::WAITING;
-    }
+			$this->skip();
 
-    /**
-     * Return whether this event is in the appropriate time range to be executed
-     *
-     * @return bool
-     */
-    public function is_time()
-    {
-        return $this->get_time() <= time();
-    }
+			return apply_filters( 'groundhogg/event/run/skipped_result', false, $this );
+		}
 
-    /**
-     * Is the current status 'waiting'
-     *
-     * @return bool;
-     */
-    public function is_waiting()
-    {
-        return $this->get_status() === self::WAITING;
-    }
+		// Hard fail when WP Error
+		if ( is_wp_error( $result ) ) {
+			/* handle event failure */
+			$this->add_error( $result );
 
-    /**
-     * Reset the status to waiting so that it may be re-enqueud
-     */
-    public function queue()
-    {
-        do_action( 'groundhogg/event/queued', $this );
+			$this->fail();
 
-        return $this->update( [
-            'status' => self::WAITING
-        ] );
-    }
+			return apply_filters( 'groundhogg/event/run/failed_result', false, $this );
+		}
 
-    /**
-     * Mark the event as cancelled
-     */
-    public function cancel()
-    {
-        do_action( 'groundhogg/event/cancelled', $this );
+		$this->complete();
 
-        return $this->update( [
-            'status' => self::CANCELLED,
-            'time'   => time(),
-        ] );
-    }
+		do_action( 'groundhogg/event/run/after', $this );
 
-    /**
-     * @return bool
-     */
-    public function fail()
-    {
-        $args = [
-            'status' => self::FAILED
-        ];
+		return true;
+	}
 
-        /**
-         * Report a failure reason for better debugging.
-         *
-         * @since 1.2
-         */
-        if ( $this->has_errors() ){
-            $args[ 'error_code' ] = $this->get_last_error()->get_error_code();
-            $args[ 'error_message' ] = $this->get_last_error()->get_error_message();
-        }
+	/**
+	 * Due to the nature of WP and cron, let's DOUBLE check that at the time of running this event has not been run by another instance of the queue.
+	 *
+	 * @return bool whether the event has run or not
+	 */
+	public function has_run() {
+		return $this->get_status() !== self::WAITING;
+	}
 
-        $updated = $this->update( $args );
+	/**
+	 * Return whether this event is in the appropriate time range to be executed
+	 *
+	 * @return bool
+	 */
+	public function is_time() {
+		return $this->get_time() <= time();
+	}
 
-        do_action( 'groundhogg/event/failed', $this );
+	/**
+	 * Is the current status 'waiting'
+	 *
+	 * @return bool;
+	 */
+	public function is_waiting() {
+		return $this->get_status() === self::WAITING;
+	}
 
-        return $updated;
-    }
+	/**
+	 * Reset the status to waiting so that it may be re-enqueud
+	 */
+	public function queue() {
+		do_action( 'groundhogg/event/queued', $this );
 
-    /**
-     * Mark the event as skipped
-     */
-    public function skip()
-    {
-        do_action( 'groundhogg/event/skipped', $this );
+		return $this->update( [
+			'status' => self::WAITING
+		] );
+	}
 
-        return $this->update( [
-            'status' => self::SKIPPED,
-            'time'   => time(),
-        ] );
-    }
+	/**
+	 * Mark the event as cancelled
+	 */
+	public function cancel() {
+		do_action( 'groundhogg/event/cancelled', $this );
 
-    /**
-     * Mark the event as skipped
-     */
-    public function in_progress()
-    {
-        do_action( 'groundhogg/event/in_progress', $this );
+		return $this->update( [
+			'status' => self::CANCELLED,
+			'time'   => time(),
+		] );
+	}
 
-        return $this->update( [
-            'status' => self::IN_PROGRESS
-        ] );
-    }
+	/**
+	 * @return bool
+	 */
+	public function fail() {
+		$args = [
+			'status' => self::FAILED
+		];
 
-    /**
-     * Mark the event as paused
-     */
-    public function pause()
-    {
-        do_action( 'groundhogg/event/pause', $this );
+		/**
+		 * Report a failure reason for better debugging.
+		 *
+		 * @since 1.2
+		 */
+		if ( $this->has_errors() ) {
+			$args['error_code']    = $this->get_last_error()->get_error_code();
+			$args['error_message'] = $this->get_last_error()->get_error_message();
+		}
 
-        return $this->update( [
-            'status' => self::PAUSED
-        ] );
-    }
+		$updated = $this->update( $args );
 
-    /**
-     * Mark the event as complete
-     */
-    public function complete()
-    {
+		do_action( 'groundhogg/event/failed', $this );
 
-        do_action( 'groundhogg/event/complete', $this );
+		return $updated;
+	}
 
-        return $this->update( [
-            'status' => self::COMPLETE,
-            'time' => time(),
-            'error_code' => '',
-            'error_message' => '',
-        ] );
-    }
+	/**
+	 * Mark the event as skipped
+	 */
+	public function skip() {
+		do_action( 'groundhogg/event/skipped', $this );
+
+		return $this->update( [
+			'status' => self::SKIPPED,
+			'time'   => time(),
+		] );
+	}
+
+	/**
+	 * Mark the event as skipped
+	 */
+	public function in_progress() {
+		do_action( 'groundhogg/event/in_progress', $this );
+
+		return $this->update( [
+			'status' => self::IN_PROGRESS
+		] );
+	}
+
+	/**
+	 * Mark the event as paused
+	 */
+	public function pause() {
+		do_action( 'groundhogg/event/pause', $this );
+
+		return $this->update( [
+			'status' => self::PAUSED
+		] );
+	}
+
+	/**
+	 * Mark the event as complete
+	 */
+	public function complete() {
+
+		do_action( 'groundhogg/event/complete', $this );
+
+		return $this->update( [
+			'status'        => self::COMPLETE,
+			'time'          => time(),
+			'error_code'    => '',
+			'error_message' => '',
+		] );
+	}
 }

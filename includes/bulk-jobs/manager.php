@@ -41,6 +41,7 @@ class Manager
         $this->migrate_form_impressions = new Migrate_Form_Impressions();
         $this->add_contacts_to_funnel = new Add_Contacts_To_Funnel();
         $this->create_users = new Create_Users();
+        $this->process_events = new Process_Events();
 
         do_action( 'groundhogg/bulk_jobs/init', $this );
     }
