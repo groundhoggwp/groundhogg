@@ -671,7 +671,8 @@ class Email extends Base_Object_With_Meta
     {
         /* Use default mail-server */
         $headers = [];
-        $headers['from'] = 'From: ' . $this->get_from_name() . ' <' . $this->get_from_email() . '>';
+//        $headers['from'] = 'From: ' . $this->get_from_name() . ' <' . $this->get_from_email() . '>';
+	    $headers[ 'from' ]     = 'From: ' . htmlspecialchars_decode( $this->get_from_name()  ). ' <' . $this->get_from_email() . '>';
         $headers['reply_to'] = 'Reply-To: ' . $this->get_reply_to_address();
 
         $return_path_email = get_return_path_email();
