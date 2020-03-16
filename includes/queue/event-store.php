@@ -62,8 +62,7 @@ class Event_Store {
 	 * @return bool|string
 	 */
 	public function generate_claim_id() {
-		$claim_id = md5( microtime( true ) . rand( 0, 1000 ) );
-
+		$claim_id = md5( uniqid( microtime( true ) ) );
 		return substr( $claim_id, 0, 20 ); // to fit in db field with 20 char limit
 	}
 
@@ -97,6 +96,8 @@ class Event_Store {
 	}
 
 	/**
+	 *
+	 *
 	 * @param $event_ids
 	 * @param $claim
 	 *
@@ -111,7 +112,8 @@ class Event_Store {
 			return false;
 		}
 
-		$result = $wpdb->query( $wpdb->prepare( "UPDATE {$this->db()->get_table_name()} SET claim = %s WHERE ID IN ( $ids )", $claim ) );
+		// Double check claim is empty, because it it's not, bail.
+		$result = $wpdb->query( $wpdb->prepare( "UPDATE {$this->db()->get_table_name()} SET claim = %s WHERE ID IN ( $ids ) AND claim = ''", $claim ) );
 
 		return $result;
 	}
