@@ -179,7 +179,8 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 = 2.1.13.8 (2020-03-16) =
 * TWEAKED processing events manually now goes through the bulk processor rather than while reloading the page.
-* FIXED decode special chars in from name
+* FIXED When claiming events, double check the claim is empty to avoid creating a new claim for one already in progress.
+* FIXED decode special chars in from name.
 * FIXED test email sent to customer on list if providing an invalid test email address.
 * FIXED weird behavior when deleting steps with active contacts.
 

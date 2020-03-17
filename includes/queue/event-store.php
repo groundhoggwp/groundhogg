@@ -51,6 +51,11 @@ class Event_Store {
 	public function stake_claim( $count = 100 ) {
 		$claim  = $this->generate_claim_id();
 		$events = $this->get_queued_event_ids( $count );
+
+		if ( empty( $events ) ) {
+			return false;
+		}
+
 		$this->claim_events( $events, $claim );
 
 		return $claim;

@@ -178,10 +178,32 @@ class Event_Queue extends Supports_Errors {
 
 		$max_events = apply_filters( 'groundhogg/event_queue/max_events', 50 );
 
-		$claim     = $this->store->stake_claim( $max_events );
+		$claim = $this->store->stake_claim( $max_events );
+
+		// no events to complete
+		if ( ! $claim ) {
+			return $completed_events;
+		}
+
 		$event_ids = $this->store->get_events_by_claim( $claim );
 
+		// If this happens it means we are in a parallel queue processing situation,
+		// so let's just try and make another claim.
 		if ( empty( $event_ids ) ) {
+
+			$claim = $this->store->stake_claim( $max_events );
+
+			// no events to complete
+			if ( ! $claim ) {
+				return $completed_events;
+			}
+
+			$event_ids = $this->store->get_events_by_claim( $claim );
+
+		}
+
+		// Definitely no events, let's bail.
+		if ( ! $event_ids ) {
 			return $completed_events;
 		}
 
