@@ -17,7 +17,7 @@ class GH_UnitTest_Factory_For_Event extends GH_UnitTest_Factory_For_Thing {
 			'funnel_id'      => 1,
 			'step_id'        => 1,
 			'contact_id'     => 1,
-			'event_type'     => Event::FUNNEL,
+			'event_type'     => Event::TEST_SUCCESS,
 			'error_code'     => '',
 			'error_message'  => '',
 			'status'         => 'waiting',

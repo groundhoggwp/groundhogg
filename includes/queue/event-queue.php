@@ -203,7 +203,7 @@ class Event_Queue extends Supports_Errors {
 		}
 
 		// Definitely no events, let's bail.
-		if ( ! $event_ids ) {
+		if ( empty( $event_ids ) ) {
 			return $completed_events;
 		}
 
@@ -366,6 +366,12 @@ class Event_Queue extends Supports_Errors {
 	 * @return bool
 	 */
 	protected function limits_exceeded( $processed_actions ) {
+
+		// check if doing unit tests.
+		if ( defined( 'DOING_GROUNDHOGG_TESTS' ) && DOING_GROUNDHOGG_TESTS ){
+			return false;
+		}
+
 		return $this->memory_exceeded() || $this->time_likely_to_be_exceeded( $processed_actions );
 	}
 

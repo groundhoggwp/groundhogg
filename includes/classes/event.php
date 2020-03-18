@@ -6,6 +6,8 @@ use Groundhogg\DB\DB;
 use Groundhogg\DB\Events;
 use Groundhogg\Queue\Email_Notification;
 
+use Groundhogg\Queue\Test_Event_Failure;
+use Groundhogg\Queue\Test_Event_Success;
 use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -40,6 +42,8 @@ class Event extends Base_Object {
 	const FUNNEL = 1;
 	const BROADCAST = 2;
 	const EMAIL_NOTIFICATION = 3;
+	const TEST_SUCCESS = 98;
+	const TEST_FAILURE = 99;
 
 	/**
 	 * @var Contact
@@ -227,6 +231,12 @@ class Event extends Base_Object {
 			case self::BROADCAST:
 				$this->step = new Broadcast( $this->get_step_id() );
 				break;
+			case self::TEST_SUCCESS:
+				$this->step = new Test_Event_Success();
+				break;
+			case self::TEST_FAILURE:
+				$this->step = new Test_Event_Failure();
+				break;
 			default:
 				$class = apply_filters( 'groundhogg/event/post_setup/step_class', false, $this );
 
@@ -289,7 +299,7 @@ class Event extends Base_Object {
 	 */
 	public function run() {
 		// If the claim has not been set by the queue we should quit now
-		if ( ! $this->get_claim() || $this->is_waiting() ) {
+		if ( ! $this->get_claim() || ! $this->is_waiting() ) {
 			return false;
 		}
 

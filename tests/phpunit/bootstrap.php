@@ -58,3 +58,5 @@ function _load_framework_additions() {
 }
 
 _load_framework_additions();
+
+define( 'DOING_GROUNDHOGG_TESTS', true );

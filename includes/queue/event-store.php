@@ -52,11 +52,9 @@ class Event_Store {
 		$claim  = $this->generate_claim_id();
 		$events = $this->get_queued_event_ids( $count );
 
-		if ( empty( $events ) ) {
+		if ( empty( $events ) || ! $this->claim_events( $events, $claim ) ) {
 			return false;
 		}
-
-		$this->claim_events( $events, $claim );
 
 		return $claim;
 	}
@@ -118,9 +116,7 @@ class Event_Store {
 		}
 
 		// Double check claim is empty, because it it's not, bail.
-		$result = $wpdb->query( $wpdb->prepare( "UPDATE {$this->db()->get_table_name()} SET claim = %s WHERE ID IN ( $ids ) AND claim = ''", $claim ) );
-
-		return $result;
+		return $wpdb->query( $wpdb->prepare( "UPDATE {$this->db()->get_table_name()} SET `claim` = %s WHERE `ID` IN ( $ids ) AND `claim` = ''", $claim ) );
 	}
 
 	/**

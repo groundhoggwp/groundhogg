@@ -38,7 +38,8 @@ class Process_Events extends Bulk_Job {
 
 		$num_queued_events = $wpdb->get_var( $SQL );
 
-		$requests = ceil( $num_queued_events / 25 );
+		// Max 3 minutes
+		$requests = ceil( $num_queued_events / 18 );
 
 		$items = [];
 
