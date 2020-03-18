@@ -11,9 +11,10 @@ use Groundhogg\Reporting\New_Reports\Chart_Last_Broadcast;
 use Groundhogg\Reporting\New_Reports\Chart_New_Contacts;
 use Groundhogg\Reporting\New_Reports\Email_Click_Rate;
 use Groundhogg\Reporting\New_Reports\Email_Open_Rate;
+use Groundhogg\Reporting\New_Reports\Table_Broadcast_Link_Clicked;
+use Groundhogg\Reporting\New_Reports\Table_Broadcast_Stats;
 use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Country;
 use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Lead_Source;
-use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Search_Engine;
 use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Search_Engines;
 use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Source_Pages;
 use Groundhogg\Reporting\New_Reports\Table_Top_Performing_Broadcasts;
@@ -191,7 +192,14 @@ class Reports {
 				'id'       => 'total_abandonment_rate',
 				'callback' => [ $this, 'total_abandonment_rate' ]
 			],
-
+			[
+				'id'       => 'table_broadcast_stats',
+				'callback' => [ $this, 'table_broadcast_stats' ]
+			],
+			[
+				'id'       => 'table_broadcast_link_clicked',
+				'callback' => [ $this, 'table_broadcast_link_clicked' ]
+			],
 
 		];
 
@@ -555,6 +563,28 @@ class Reports {
 	}
 
 
+
+	/**
+	 * @return mixed
+	 */
+	public function table_broadcast_stats() {
+
+		$report = new Table_Broadcast_Stats( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function table_broadcast_link_clicked() {
+
+		$report = new Table_Broadcast_Link_Clicked( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
 
 
 }

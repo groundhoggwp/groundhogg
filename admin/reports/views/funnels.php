@@ -56,11 +56,9 @@ function quick_stat_report( $args = [] ) {
 }
 
 ?>
-<div class="actions">
-    <!--    <form method="get" action="">-->
-	<?php
-	//		echo html()->hidden_GET_inputs();
+<div class="actions" style="margin-bottom: 25px; float: right">
 
+	<?php
 	$args = array(
 		'name'        => 'funnel-id',
 		'id'          => 'funnel-id',
@@ -70,9 +68,8 @@ function quick_stat_report( $args = [] ) {
 	);
 	echo Plugin::$instance->utils->html->dropdown( $args );
 	?>
-    <!--    </form>-->
 </div>
-
+<div style="clear: both;"></div>
 
 <div class="groundhogg-report">
     <h2 class="title"><?php _e( 'Funnel Breakdown', 'groundhogg' ); ?></h2>

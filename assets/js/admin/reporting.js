@@ -23,6 +23,7 @@ function tool_tip_title() {
             this.initCalendar();
             this.initFunnels();
             this.initCountry();
+            this.initBroadcast();
 
         },
 
@@ -72,6 +73,15 @@ function tool_tip_title() {
             var self = this;
 
             $('#funnel-id').change(function () {
+                self.refresh(self.calendar);
+            });
+        },
+
+        initBroadcast: function () {
+
+            var self = this;
+
+            $('#broadcast-id').change(function () {
                 self.refresh(self.calendar);
             });
         },
@@ -126,6 +136,7 @@ function tool_tip_title() {
         get_other_data: function () {
             return {
                 funnel_id: $('#funnel-id').val(),
+                broadcast_id: $('#broadcast-id').val(),
                 country: $('#country').val()
             };
         },

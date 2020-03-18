@@ -164,11 +164,20 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 					'total_funnel_conversion_rate',
 
-                    'total_benchmark_conversion_rate',
-                    'total_abandonment_rate',
+					'total_benchmark_conversion_rate',
+					'total_abandonment_rate',
 
-                    'total_contacts_in_funnel',
+					'total_contacts_in_funnel',
 				];
+				break;
+			case 'broadcasts' :
+
+				$reports = [
+					'chart_last_broadcast',
+					'table_broadcast_stats',
+					'table_broadcast_link_clicked',
+				];
+				break;
 
 		}
 
@@ -208,6 +217,10 @@ class Reports_Page extends Tabbed_Admin_Page {
 			[
 				'name' => __( 'Funnels', 'groundhogg' ),
 				'slug' => 'funnels'
+			],
+			[
+				'name' => __( 'Broadcasts', 'groundhogg' ),
+				'slug' => 'broadcasts'
 			],
 
 		];
@@ -297,6 +310,13 @@ class Reports_Page extends Tabbed_Admin_Page {
 	 */
 	public function funnels_view() {
 		include dirname( __FILE__ ) . '/views/funnels.php';
+	}
+
+	/**
+	 * Broadcasts
+	 */
+	public function broadcasts_view() {
+		include dirname( __FILE__ ) . '/views/broadcasts.php';
 	}
 
 
