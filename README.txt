@@ -177,7 +177,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.1.13.8 (2020-03-16) =
+= 2.1.13.9 (2020-03-18) =
+* HOT FIX for queue processing issue.
+
+= 2.1.13.8 (2020-03-18) =
 * ADDED Reporting link to row actions in broadcast table.
 * TWEAKED processing events manually now goes through the bulk processor rather than while reloading the page.
 * FIXED When claiming events, double check the claim is empty to avoid creating a new claim for one already in progress.
