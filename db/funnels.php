@@ -72,6 +72,7 @@ class Funnels extends DB  {
             'status'        => '%s',
             'date_created'  => '%s',
             'last_updated'  => '%s',
+	        'conversion_step' => '%d'
         );
     }
 
@@ -89,6 +90,7 @@ class Funnels extends DB  {
             'status'        => 'inactive',
             'date_created'  => current_time( 'mysql' ),
             'last_updated'  => current_time( 'mysql' ),
+	        'conversion_step' => 0
         );
     }
 
@@ -132,6 +134,7 @@ class Funnels extends DB  {
         active_contacts bigint(20) unsigned NOT NULL,
         last_updated datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
         date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+        conversion_step bigint(20) unsigned NOT NULL,
         PRIMARY KEY (ID)
 		) {$this->get_charset_collate()};";
 

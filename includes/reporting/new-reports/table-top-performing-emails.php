@@ -67,9 +67,11 @@ class Table_Top_Performing_Emails extends Base_Table_Report {
 
 
 			if ( empty( $steps ) ) {
-				return [];
+				return [
+					'label' => [],
+					'data' => []
+				];
 			}
-
 
 			$email_ids = [];
 
@@ -144,10 +146,8 @@ class Table_Top_Performing_Emails extends Base_Table_Report {
 			'data'    => $item_data [ 'data' ],
 			'url'     => $item_data [ 'url' ],
 			'clicked' => $item_data [ 'clicked' ]
-//			'opened' => $item_data [ 'opened' ]
+
 		];
 	}
-
-
 
 }

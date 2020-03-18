@@ -29,6 +29,32 @@ foreach ( $funnels as $funnel ) {
 	$options[ $funnel->get_id() ] = $funnel->get_title();
 }
 
+
+function quick_stat_report( $args = [] ) {
+
+	$args = wp_parse_args( $args, [
+		'id'    => uniqid( 'groundhogg_' ),
+		'title' => 'Report',
+		'info'  => 'Some interesting data...',
+		'style' => ''
+	] );
+
+	?>
+
+    <div class="groundhogg-quick-stat" id="<?php esc_attr_e( $args[ 'id' ] ); ?>"
+         style="<?php esc_attr_e( $args[ 'style' ] ); ?>">
+        <div class="groundhogg-quick-stat-title"><?php esc_html_e( $args[ 'title' ] ) ?></div>
+        <div class="groundhogg-quick-stat-info"></div>
+        <div class="groundhogg-quick-stat-number">1234</div>
+        <div class="groundhogg-quick-stat-previous green">
+            <span class="groundhogg-quick-stat-arrow up"></span>
+            <span class="groundhogg-quick-stat-prev-percent">25%</span>
+        </div>
+        <div class="groundhogg-quick-stat-compare">vs. Previous 30 Days</div>
+    </div>
+	<?php
+}
+
 ?>
 <div class="actions">
     <!--    <form method="get" action="">-->
@@ -52,7 +78,31 @@ foreach ( $funnels as $funnel ) {
     <h2 class="title"><?php _e( 'Funnel Breakdown', 'groundhogg' ); ?></h2>
     <canvas id="chart_funnel_breakdown"></canvas>
 </div>
+<div class="groundhogg-quick-stats">
+    <div class="groundhogg-report">
 
+		<?php quick_stat_report( [
+			'id'    => 'total_contacts_in_funnel',
+			'title' => __( 'Active Contacts', 'groundhogg' )
+		] ); ?>
+
+		<?php quick_stat_report( [
+			'id'    => 'total_funnel_conversion_rate',
+			'title' => __( 'Funnel Conversion Rate', 'groundhogg' ),
+		] ); ?>
+
+		<?php quick_stat_report( [
+			'id'    => 'total_benchmark_conversion_rate',
+			'title' => __( 'Benchmark Conversion Rate', 'groundhogg' ),
+		] ); ?>
+
+		<?php quick_stat_report( [
+			'id'    => 'total_abandonment_rate' ,
+			'title' => __( 'Abandonment Rate', 'groundhogg' ),
+		] );
+		?>
+    </div>
+</div>
 
 <div class="groundhogg-chart-wrapper">
     <div class="groundhogg-chart-no-padding">
@@ -75,4 +125,3 @@ foreach ( $funnels as $funnel ) {
 
     </div>
 </div>
-

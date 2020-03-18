@@ -19,11 +19,15 @@ use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Source_Pages;
 use Groundhogg\Reporting\New_Reports\Table_Top_Performing_Broadcasts;
 use Groundhogg\Reporting\New_Reports\Table_Top_Performing_Emails;
 use Groundhogg\Reporting\New_Reports\Table_Worst_Performing_Emails;
+use Groundhogg\Reporting\New_Reports\Total_Abandonment_Rate;
 use Groundhogg\Reporting\New_Reports\Total_Active_Contacts;
+use Groundhogg\Reporting\New_Reports\Total_Benchmark_Conversion_Rate;
 use Groundhogg\Reporting\New_Reports\Total_Bounces_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Complaints_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Confirmed_Contacts;
+use Groundhogg\Reporting\New_Reports\Total_Contacts_In_Funnel;
 use Groundhogg\Reporting\New_Reports\Total_Emails_Sent;
+use Groundhogg\Reporting\New_Reports\Total_Funnel_Conversion_Rate;
 use Groundhogg\Reporting\New_Reports\Total_New_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Spam_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Unsubscribed_Contacts;
@@ -170,6 +174,22 @@ class Reports {
 			[
 				'id'       => 'total_complaints_contacts',
 				'callback' => [ $this, 'total_complaints_contacts' ]
+			],
+			[
+				'id'       => 'total_contacts_in_funnel',
+				'callback' => [ $this, 'total_contacts_in_funnel' ]
+			],
+			[
+				'id'       => 'total_funnel_conversion_rate',
+				'callback' => [ $this, 'total_funnel_conversion_rate' ]
+			],
+			[
+				'id'       => 'total_benchmark_conversion_rate',
+				'callback' => [ $this, 'total_benchmark_conversion_rate' ]
+			],
+			[
+				'id'       => 'total_abandonment_rate',
+				'callback' => [ $this, 'total_abandonment_rate' ]
 			],
 
 
@@ -489,5 +509,52 @@ class Reports {
 		return $report->get_data();
 
 	}
+
+	/**
+	 * @return mixed
+	 */
+	public function total_funnel_conversion_rate() {
+
+		$report = new Total_Funnel_Conversion_Rate( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function total_contacts_in_funnel() {
+
+		$report = new Total_Contacts_In_Funnel( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function total_benchmark_conversion_rate() {
+
+		$report = new Total_Benchmark_Conversion_Rate( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function total_abandonment_rate() {
+
+		$report = new Total_Abandonment_Rate( $this->start, $this->end );
+
+		return $report->get_data();
+
+	}
+
+
+
 
 }

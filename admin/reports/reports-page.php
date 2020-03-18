@@ -149,7 +149,6 @@ class Reports_Page extends Tabbed_Admin_Page {
 					'total_bounces_contacts',
 					'total_complaints_contacts',
 
-
 					'chart_last_broadcast',
 
 					'table_top_performing_emails',
@@ -162,6 +161,13 @@ class Reports_Page extends Tabbed_Admin_Page {
 				$reports = [
 					'chart_funnel_breakdown',
 					'table_top_performing_emails',
+
+					'total_funnel_conversion_rate',
+
+                    'total_benchmark_conversion_rate',
+                    'total_abandonment_rate',
+
+                    'total_contacts_in_funnel',
 				];
 
 		}

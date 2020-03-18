@@ -39,11 +39,11 @@ abstract class Base_Report {
 	 */
 	public function __construct( $start, $end ) {
 
-		if ( is_string( $start ) ){
+		if ( is_string( $start ) ) {
 			$start = strtotime( $start );
 		}
 
-		if ( is_string( $end ) ){
+		if ( is_string( $end ) ) {
 			$end = strtotime( $end );
 		}
 
@@ -56,7 +56,7 @@ abstract class Base_Report {
 	/**
 	 * Set the appropriate time interval for the comparison period.
 	 */
-	protected function set_compare_dates(){
+	protected function set_compare_dates() {
 		// Calculate the difference in days
 		$date_diff = $this->end - $this->start;
 		$num_days  = floor( $date_diff / DAY_IN_SECONDS ) + 1;
@@ -81,9 +81,31 @@ abstract class Base_Report {
 		return str_pad( dechex( mt_rand( 0, 255 ) ), 2, '0', STR_PAD_LEFT );
 	}
 
+
+	protected $count = 0;
+
 	function get_random_color() {
+
+		if ( $this->count < 8 ) {
+			$arr   = [
+				'#F18F01',
+				'#006E90',
+				'#99C24D',
+				'#F46036',
+				'#41BBD9',
+				'#ADCAD6',
+				'#336699',
+				'#2F4858'
+			];
+			$color = $arr [ $this->count ];
+			$this->count ++;
+
+			return $color;
+		}
+
 		return '#' . $this->random_color_part() . $this->random_color_part() . $this->random_color_part();
 	}
+
 
 	abstract public function get_data();
 

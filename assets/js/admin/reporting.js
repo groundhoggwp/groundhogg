@@ -228,11 +228,14 @@ function tool_tip_title() {
 
         renderTable: function ($report, report_data) {
 
-            var html = "<table class='groundhogg-report-table'>";
+            var html = '' ;
+            if (report_data.data) {
 
-            var length = report_data.data.length;
+                html = html +  "<table class='groundhogg-report-table'>";
 
-            html = html + '<tr>';
+                var length = report_data.data.length;
+
+                html = html + '<tr>';
 
                 if (report_data.label) {
                     for (var key in report_data.label) {
@@ -244,20 +247,23 @@ function tool_tip_title() {
                     }
                 }
 
-            html = html + '</tr>';
+                html = html + '</tr>';
 
                 for (var i = 0; i < length; i++) {
 
                     html = html + '<tr >';
-                        for (var key in report_data.data[i]) {
-                            html = html + '<td>' +  report_data.data[i][key] +  '</td>';
-                        }
+                    for (var key in report_data.data[i]) {
+                        html = html + '<td>' + report_data.data[i][key] + '</td>';
+                    }
                     html = html + '</tr>';
 
                 }
 
-            html = html + '</table>';
+                html = html + '</table>';
+            } else {
 
+                html = "<p> No Data Found. </p>";
+            }
             $report.html(html);
         },
 

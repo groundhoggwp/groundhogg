@@ -80,7 +80,11 @@ class Chart_Contacts_By_Region extends Base_Chart_Report {
 		$contacts = array_intersect( $contacts, $contacts_in_country );
 
 		if (empty($contacts)) {
-			return [] ;
+			return [
+				'label' => [],
+				'data'  => [],
+				'color' => []
+			] ;
 		}
 
 		$rows = get_db( 'contactmeta' )->query( [

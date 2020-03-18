@@ -62,6 +62,19 @@ class Funnel extends Base_Object_With_Meta {
 		return $this->get_status() === 'active';
 	}
 
+	public function get_conversion_step()
+	{
+		return absint( $this->conversion_step );
+	}
+
+	public function get_first_step()
+	{
+		return   $this->get_steps( [
+			'step_order' => 1
+		] )[0] ->get_id();
+	}
+
+
 	/**
 	 * Get the step IDs associate with this funnel
 	 *

@@ -76,10 +76,10 @@ abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 		} else if ( $range <= MONTH_IN_SECONDS ) {
 			return DAY_IN_SECONDS;
 		} else if ( $range <= 2 * YEAR_IN_SECONDS ) {
-			return MONTH_IN_SECONDS;
+			return WEEK_IN_SECONDS;
 		}
 
-		return YEAR_IN_SECONDS;
+		return MONTH_IN_SECONDS;
 
 //
 //		if ( $range <= DAY_IN_SECONDS ) {

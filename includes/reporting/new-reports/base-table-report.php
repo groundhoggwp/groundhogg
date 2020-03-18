@@ -59,20 +59,7 @@ abstract class Base_Table_Report extends Base_Report
         /* Pair down the results to largest 10 */
         if ( count( $dataset ) > 10 && $this->only_show_top_10() ){
 
-            $other_dataset = [
-                'label' => __( 'Other' ),
-                'data' => 0,
-                'url'  => '#'
-            ];
-
-            $other = array_slice( $dataset, 10 );
             $dataset = array_slice( $dataset, 0, 10 );
-
-            foreach ( $other as $c_data ){
-                $other_dataset[ 'data' ] += $c_data[ 'data' ];
-            }
-
-            $dataset[] = $other_dataset;
 
         }
 

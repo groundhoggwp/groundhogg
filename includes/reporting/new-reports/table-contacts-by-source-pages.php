@@ -34,7 +34,7 @@ class Table_Contacts_By_Source_Pages extends  Base_Table_Report
 	public function get_label() {
 		return [
 			__( 'Lead Source', 'groundhogg' ),
-			__( 'Total', 'groundhogg' ),
+			__( 'Contacts', 'groundhogg' ),
 		];
 
 	}
