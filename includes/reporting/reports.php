@@ -11,6 +11,7 @@ use Groundhogg\Reporting\New_Reports\Chart_Last_Broadcast;
 use Groundhogg\Reporting\New_Reports\Chart_New_Contacts;
 use Groundhogg\Reporting\New_Reports\Email_Click_Rate;
 use Groundhogg\Reporting\New_Reports\Email_Open_Rate;
+use Groundhogg\Reporting\New_Reports\Table_Benchmark_Conversion_Rate;
 use Groundhogg\Reporting\New_Reports\Table_Broadcast_Link_Clicked;
 use Groundhogg\Reporting\New_Reports\Table_Broadcast_Stats;
 use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Country;
@@ -199,6 +200,10 @@ class Reports {
 			[
 				'id'       => 'table_broadcast_link_clicked',
 				'callback' => [ $this, 'table_broadcast_link_clicked' ]
+			],
+[
+				'id'       => 'table_benchmark_conversion_rate',
+				'callback' => [ $this, 'table_benchmark_conversion_rate' ]
 			],
 
 		];
@@ -582,6 +587,16 @@ class Reports {
 
 		$report = new Table_Broadcast_Link_Clicked( $this->start, $this->end );
 
+		return $report->get_data();
+
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function table_benchmark_conversion_rate() {
+
+		$report = new Table_Benchmark_Conversion_Rate( $this->start, $this->end );
 		return $report->get_data();
 
 	}

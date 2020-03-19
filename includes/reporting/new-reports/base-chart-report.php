@@ -38,4 +38,21 @@ abstract class Base_Chart_Report extends Base_Report {
 	}
 
 
+	public function get_pie_chart_options() {
+		return [
+			'legend' => [
+				'display' => false
+			],
+//			'responsive' => true,
+			'tooltips'   => [
+				'backgroundColor' => '#FFF',
+				'bodyFontColor'   => '#000',
+				'borderColor'     => '#727272',
+				'borderWidth'     => 2,
+				'titleFontColor'  => '#000'
+			]
+		];
+	}
+
+
 }

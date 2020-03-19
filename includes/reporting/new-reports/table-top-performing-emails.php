@@ -57,8 +57,7 @@ class Table_Top_Performing_Emails extends Base_Table_Report {
 
 		$funnel_id = absint( $this->get_funnel_id() );
 
-		if ( $this->get_funnel_id() ) {
-
+		if ( $funnel_id ) {
 
 			$steps = get_db( 'steps' )->query( [
 				'funnel_id' => $funnel_id,
@@ -66,18 +65,17 @@ class Table_Top_Performing_Emails extends Base_Table_Report {
 			] );
 
 
-			if ( empty( $steps ) ) {
-				return [
-					'label' => [],
-					'data' => []
-				];
-			}
 
+			if (empty( $steps )) {
+				return [];
+			}
 			$email_ids = [];
 
 			foreach ( $steps as $step ) {
 				$email_ids[] = absint( get_db( 'stepmeta' )->get_meta( $step->ID, 'email_id', true ) );
 			}
+
+
 
 			$emails = get_db( 'emails' )->query( [
 				'status' => 'ready',
@@ -100,7 +98,7 @@ class Table_Top_Performing_Emails extends Base_Table_Report {
 			$report = $email->get_email_stats( $this->start, $this->end );
 
 			$title = $email->get_title();
-			if ( $report[ 'total' ] > 0 ) {
+			if ( ( $report[ 'total' ] > 0 ) || $funnel_id) {
 				$list[] = [
 					'data'    => percentage( $report[ 'total' ], $report[ 'opened' ] ),
 					'label'   => $title,

@@ -168,6 +168,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 					'total_abandonment_rate',
 
 					'total_contacts_in_funnel',
+                    'table_benchmark_conversion_rate'
 				];
 				break;
 			case 'broadcasts' :

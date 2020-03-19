@@ -64,6 +64,12 @@ class Table_Top_Performing_Broadcasts extends Base_Table_Report {
 			'where' => $where,
 		] );
 
+		if (empty($broadcasts)){
+
+			return [
+
+			] ;
+		}
 
 		$list = [];
 
@@ -76,7 +82,6 @@ class Table_Top_Performing_Broadcasts extends Base_Table_Report {
 			$list[] = [
 
 				'data'   => percentage( $report[ 'sent' ], $report[ 'opened' ] ),
-//				'data'   => $report[ 'sent' ],
 				'opened' => $report [ 'opened' ],
 				'label'  => $broadcast->get_title(),
 				'click_through_rate' =>  percentage( $report[ 'opened' ], $report[ 'clicked' ] ),

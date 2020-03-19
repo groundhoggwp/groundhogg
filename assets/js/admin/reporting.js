@@ -160,6 +160,7 @@ function tool_tip_title() {
 
             var $report = $('#' + report_id);
 
+
             var type = report_data.type;
 
             switch (type) {
@@ -167,10 +168,10 @@ function tool_tip_title() {
                     this.renderQuickStatReport($report, report_data);
                     break;
                 case 'chart':
-                    this.renderChartReport($report, report_data.chart);
+                    this.renderChartReport($report, report_data.chart, report_id);
                     break;
                 case 'table':
-                    this.renderTable($report, report_data)
+                    this.renderTable($report, report_data);
                     break;
             }
 
@@ -188,7 +189,7 @@ function tool_tip_title() {
 
         },
 
-        renderChartReport: function ($report, report_data) {
+        renderChartReport: function ($report, report_data, report_id) {
 
             if (typeof report_data.options.tooltips.callbacks !== 'undefined') {
                 var funcName = report_data.options.tooltips.callbacks.label;
@@ -207,6 +208,7 @@ function tool_tip_title() {
 
             var ctx = $report[0].getContext('2d');
             this.myChart[$report.selector] = new Chart(ctx, report_data);
+
 
             // draw Hover line in the graph
             var draw_line = Chart.controllers.line.prototype.draw;
@@ -234,15 +236,49 @@ function tool_tip_title() {
 
             });
 
+            console.log(report_data);
+
+            Chart.plugins.register({
+                afterDraw: function(chart) {
+                    if (chart.data.datasets.length === 0) {
+                        // No data is present
+                        var ctx = chart.chart.ctx;
+                        var width = chart.chart.width;
+                        var height = chart.chart.height
+                        chart.clear();
+
+                        ctx.save();
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.font = "16px normal 'Helvetica Nueue'";
+                        ctx.fillText('No data to display', width / 2, height / 2);
+                        ctx.restore();
+                    }
+                }
+            });
+
+            // legend on the side in the pie chart
+            $('#' + report_id + '_legend').html(this.myChart[$report.selector].generateLegend());
+
+            // var chart_pi = this.myChart[$report.selector];
+            $('#' + report_id + '_legend' + " > ul > li").on("click", this.myChart[$report.selector], function (e) {
+                var index = $(this).index();
+                $(this).toggleClass("strike");
+                var ci = e.data.chart;
+                var meta  = Object.values(ci.data.datasets[0]._meta) [0] ;
+                var curr = meta.data[index];
+                curr.hidden = !curr.hidden;
+                ci.update();
+            });
 
         },
 
         renderTable: function ($report, report_data) {
 
-            var html = '' ;
-            if (report_data.data) {
+            var html = '';
+            if (report_data.data && report_data.data.length > 0  ) {
 
-                html = html +  "<table class='groundhogg-report-table'>";
+                html = html + "<table class='groundhogg-report-table'>";
 
                 var length = report_data.data.length;
 
@@ -273,7 +309,7 @@ function tool_tip_title() {
                 html = html + '</table>';
             } else {
 
-                html = "<p> No Data Found. </p>";
+                html = "<p class='notice-no-data' > No Data Found. </p>";
             }
             $report.html(html);
         },

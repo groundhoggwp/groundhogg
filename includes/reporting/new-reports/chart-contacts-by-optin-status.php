@@ -35,16 +35,7 @@ class Chart_Contacts_By_Optin_Status extends Base_Chart_Report {
 	}
 
 	protected function get_options() {
-		return [
-			'responsive' => true,
-			'tooltips'   => [
-				'backgroundColor' => '#FFF',
-				'bodyFontColor'   => '#000',
-				'borderColor'     => '#727272',
-				'borderWidth'     => 2,
-				'titleFontColor'  => '#000'
-			]
-		];
+		return $this->get_pie_chart_options();
 	}
 
 

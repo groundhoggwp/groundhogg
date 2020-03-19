@@ -87,8 +87,8 @@ class Chart_Funnel_Breakdown extends Base_Chart_Report {
 	 */
 	protected function get_options() {
 		return [
-
 			'responsive' => true,
+			'maintainAspectRatio' => false,
 			'tooltips'   => [
 				'backgroundColor' => '#FFF',
 				'bodyFontColor'   => '#000',

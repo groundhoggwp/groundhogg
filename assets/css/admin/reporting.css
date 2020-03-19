@@ -251,3 +251,36 @@ table.groundhogg-report-table td:last-child{
     width: 100px;
 }
 
+
+
+.chart-legend li span{
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 5px;
+}
+
+.chart-legend{
+    height:250px;
+    overflow:auto;
+}
+
+.chart-legend li{
+    cursor:pointer;
+}
+
+.strike{
+    text-decoration: line-through !important;
+}
+
+.float-left{
+    float:left;
+}
+
+.notice-no-data{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%)
+}

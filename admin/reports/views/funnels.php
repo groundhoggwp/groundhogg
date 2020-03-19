@@ -73,7 +73,9 @@ function quick_stat_report( $args = [] ) {
 
 <div class="groundhogg-report">
     <h2 class="title"><?php _e( 'Funnel Breakdown', 'groundhogg' ); ?></h2>
-    <canvas id="chart_funnel_breakdown"></canvas>
+    <div style="height: 400px">
+        <canvas id="chart_funnel_breakdown"></canvas>
+    </div>
 </div>
 <div class="groundhogg-quick-stats">
     <div class="groundhogg-report">
@@ -94,7 +96,7 @@ function quick_stat_report( $args = [] ) {
 		] ); ?>
 
 		<?php quick_stat_report( [
-			'id'    => 'total_abandonment_rate' ,
+			'id'    => 'total_abandonment_rate',
 			'title' => __( 'Abandonment Rate', 'groundhogg' ),
 		] );
 		?>
@@ -107,18 +109,16 @@ function quick_stat_report( $args = [] ) {
         <div id="table_top_performing_emails"></div>
     </div>
     <div class="groundhogg-chart-no-padding">
-        <h2 class="title"><?php _e( 'Gaps in Funnel', 'groundhogg' ); ?></h2>
-        <!--            <div id="table_top_performing_broadcasts"></div>-->
-    </div>
-</div>
-
-<div class="groundhogg-chart-wrapper">
-    <div class="groundhogg-chart-no-padding">
         <h2 class="title"><?php _e( 'Benchmark Conversion Rate', 'groundhogg' ); ?></h2>
-
-    </div>
-    <div class="groundhogg-chart-no-padding">
-        <h2 class="title"><?php _e( 'Benchmark Conversion Rate 2', 'groundhogg' ); ?></h2>
-
+        <div id="table_benchmark_conversion_rate"></div>
     </div>
 </div>
+
+<!--<div class="groundhogg-chart-wrapper">-->
+<!--    <div class="groundhogg-chart-no-padding">-->
+<!--        <h2 class="title"> title </h2>-->
+<!--    </div>-->
+<!--    <div class="groundhogg-chart-no-padding">-->
+<!--        <h2 class="title">title</h2>-->
+<!--    </div>-->
+<!--</div>-->
