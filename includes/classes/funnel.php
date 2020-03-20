@@ -22,14 +22,14 @@ class Funnel extends Base_Object_With_Meta {
 	 * @return Funnels
 	 */
 	protected function get_db() {
-		return Plugin::instance()->dbs->get_db( 'funnels' );
+		return get_db( 'funnels' );
 	}
 
 	/**
 	 * @return Steps
 	 */
 	protected function get_steps_db() {
-		return Plugin::instance()->dbs->get_db( 'steps' );
+		return get_db( 'steps' );
 	}
 
 	protected function get_meta_db() {

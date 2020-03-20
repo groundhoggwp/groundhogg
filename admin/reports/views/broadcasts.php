@@ -37,7 +37,14 @@ foreach ( $broadcasts as $broadcast ) {
 <div class="groundhogg-chart-wrapper">
     <div class="groundhogg-chart">
         <h2 class="title"><?php _e( 'Broadcast Stats', 'groundhogg' ); ?></h2>
-        <canvas id="chart_last_broadcast"></canvas>
+        <div style="width: 100%; padding: ">
+            <div class="float-left" style="width:60%">
+                <canvas id="chart_last_broadcast"></canvas>
+            </div>
+            <div class="float-left" style="width:40%">
+                <div id="chart_last_broadcast_legend" class="chart-legend"></div>
+            </div>
+        </div>
     </div>
     <div class="groundhogg-chart-no-padding">
         <h2 class="title"><?php _e( 'Broadcast Stats', 'groundhogg' ); ?></h2>

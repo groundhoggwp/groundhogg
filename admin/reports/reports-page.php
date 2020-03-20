@@ -113,6 +113,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 					'table_contacts_by_countries',
 					'table_contacts_by_lead_source',
+                    'table_top_converting_funnels'
 				];
 
 				break;

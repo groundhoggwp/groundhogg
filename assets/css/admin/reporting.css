@@ -162,6 +162,7 @@ img {
     background: #FFF;
     border: 1px solid #d6e2ed;
     border-radius: 5px;
+    min-height: 200px;
 }
 
 .groundhogg-chart-no-padding h2.title {
