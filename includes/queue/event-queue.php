@@ -4,6 +4,7 @@ namespace Groundhogg\Queue;
 
 use Groundhogg\Contact;
 use Groundhogg\Event;
+use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
@@ -147,10 +148,20 @@ class Event_Queue extends Supports_Errors {
 		Compatibility::raise_memory_limit();
 		Compatibility::raise_time_limit( $this->get_time_limit() );
 
+		$thread_id = uniqid( time() . '_' );
+
+		$this->log( sprintf( '%s - Starting queue!', $thread_id ) );
+
 		$result = $this->process();
 
 		$end          = microtime( true );
 		$process_time = $end - $this->started;
+
+		if ( $result > 0 ) {
+			$this->log( sprintf( "%s - %d events have been completed in %s seconds.", $thread_id, $result, $process_time ) );
+		} else {
+			$this->log( sprintf( '%s - No events completed.', $thread_id ) );
+		}
 
 		$times_executed         = intval( $settings->get_option( 'queue_times_executed', 0 ) );
 		$average_execution_time = floatval( $settings->get_option( 'average_execution_time', 0.0 ) );
@@ -368,7 +379,7 @@ class Event_Queue extends Supports_Errors {
 	protected function limits_exceeded( $processed_actions ) {
 
 		// check if doing unit tests.
-		if ( defined( 'DOING_GROUNDHOGG_TESTS' ) && DOING_GROUNDHOGG_TESTS ){
+		if ( defined( 'DOING_GROUNDHOGG_TESTS' ) && DOING_GROUNDHOGG_TESTS ) {
 			return false;
 		}
 
@@ -457,5 +468,17 @@ class Event_Queue extends Supports_Errors {
 	public function get_total_executions() {
 		return Plugin::$instance->settings->get_option( 'queue_times_executed' );
 	}
+
+	/**
+	 * Log queue messages
+	 *
+	 * @param string $message
+	 */
+	public function log( $message = "" ) {
+		$file    = Plugin::instance()->utils->files->get_uploads_dir( 'logs', 'queue', true );
+		$message = sprintf( "\n%s: %s", date( get_date_time_format(), time() ), $message );
+		error_log( $message, 3, $file );
+	}
+
 
 }
