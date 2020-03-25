@@ -12,8 +12,10 @@ use function Groundhogg\get_url_var;
 use function Groundhogg\groundhogg_url;
 use Groundhogg\Plugin;
 use function Groundhogg\is_sms_plugin_active;
+use function Groundhogg\isset_not_empty;
 use function Groundhogg\scheduled_time;
 use \WP_List_Table;
+use function Groundhogg\use_experimental_features;
 
 /**
  * The table for Broadcasts
@@ -263,7 +265,18 @@ class Broadcasts_Table extends WP_List_Table {
 
 		$stats = $broadcast->get_report_data();
 
-		$html = sprintf(
+		$html = "";
+
+		// Show the speed of a broadcast
+		if ( isset_not_empty( $stats, 'speed' ) ){
+			$html .= sprintf(
+				"%s: <strong>%s/s</strong><br/>",
+				_x( "Speed", 'stats', 'groundhogg' ),
+				$stats['speed']
+			);
+		}
+
+		$html .= sprintf(
 			"%s: <strong><a href='%s'>%d</a></strong><br/>",
 			_x( "Sent", 'stats', 'groundhogg' ),
 			add_query_arg(
@@ -430,7 +443,6 @@ class Broadcasts_Table extends WP_List_Table {
 
 			];
 		}
-
 
 		$args = array(
 			'where'   => $where,

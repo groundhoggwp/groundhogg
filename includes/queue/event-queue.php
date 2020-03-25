@@ -148,7 +148,7 @@ class Event_Queue extends Supports_Errors {
 		Compatibility::raise_memory_limit();
 		Compatibility::raise_time_limit( $this->get_time_limit() );
 
-		$thread_id = uniqid( time() . '_' );
+		$thread_id = uniqid();
 
 		$this->log( sprintf( '%s - Starting queue!', $thread_id ) );
 
@@ -475,8 +475,16 @@ class Event_Queue extends Supports_Errors {
 	 * @param string $message
 	 */
 	public function log( $message = "" ) {
+
+		$use_log = apply_filters( 'groundhogg/queue/enable_logging', false );
+
+		if ( ! $use_log ){
+			return;
+		}
+
 		$file    = Plugin::instance()->utils->files->get_uploads_dir( 'logs', 'queue', true );
-		$message = sprintf( "\n%s: %s", date( get_date_time_format(), time() ), $message );
+		$message = sprintf( "\n%s: %s", time(), $message );
+
 		error_log( $message, 3, $file );
 	}
 

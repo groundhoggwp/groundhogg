@@ -1,4 +1,5 @@
 <?php
+
 namespace Groundhogg;
 
 use Groundhogg\Classes\Activity;
@@ -6,8 +7,9 @@ use Groundhogg\DB\Broadcasts;
 use Groundhogg\DB\DB;
 
 
-
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Broadcast
@@ -21,267 +23,283 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.1
  */
-class Broadcast extends Base_Object implements Event_Process
-{
+class Broadcast extends Base_Object implements Event_Process {
 
-    const TYPE_SMS = 'sms';
-    const TYPE_EMAIL = 'email';
-    const FUNNEL_ID = 1;
+	const TYPE_SMS = 'sms';
+	const TYPE_EMAIL = 'email';
+	const FUNNEL_ID = 1;
 
-    /**
-     * @var SMS|Email
-     */
-    protected $object;
+	/**
+	 * @var SMS|Email
+	 */
+	protected $object;
 
-    /**
-     * Do any post setup actions.
-     *
-     * @return void
-     */
-    protected function post_setup()
-    {
-        switch ( $this->get_broadcast_type() ) {
-            case self::TYPE_EMAIL:
-                $this->object = Plugin::$instance->utils->get_email( $this->get_object_id() );
-                break;
-            case self::TYPE_SMS:
+	/**
+	 * Do any post setup actions.
+	 *
+	 * @return void
+	 */
+	protected function post_setup() {
+		switch ( $this->get_broadcast_type() ) {
+			case self::TYPE_EMAIL:
+				$this->object = Plugin::$instance->utils->get_email( $this->get_object_id() );
+				break;
+			case self::TYPE_SMS:
 
-                if ( is_sms_plugin_active() ){
-                    $this->object = Plugin::$instance->utils->get_sms( $this->get_object_id() );
-                }
+				if ( is_sms_plugin_active() ) {
+					$this->object = Plugin::$instance->utils->get_sms( $this->get_object_id() );
+				}
 
-                break;
-        }
-    }
+				break;
+		}
+	}
 
-    /**
-     * Return the DB instance that is associated with items of this type.
-     *
-     * @return Broadcasts
-     */
-    protected function get_db()
-    {
-        return Plugin::$instance->dbs->get_db( 'broadcasts' );
-    }
+	/**
+	 * Return the DB instance that is associated with items of this type.
+	 *
+	 * @return Broadcasts
+	 */
+	protected function get_db() {
+		return Plugin::$instance->dbs->get_db( 'broadcasts' );
+	}
 
-    /**
-     * @return int
-     */
-    public function get_id()
-    {
-        return absint( $this->ID );
-    }
+	/**
+	 * @return int
+	 */
+	public function get_id() {
+		return absint( $this->ID );
+	}
 
-    /**
-     * A string to represent the object type
-     *
-     * @return string
-     */
-    protected function get_object_type()
-    {
-        return 'broadcast';
-    }
-
-    /**
-     * @return string|void
-     */
-    public function get_funnel_title()
-    {
-        if ( $this->is_email() ){
-            return __( 'Broadcast Email', 'groundhogg' );
-        } else {
-            return __( 'Broadcast SMS', 'groundhogg' );
-        }
-    }
-
-    /**
-     * @return string
-     */
-    public function get_step_title()
-    {
-        return $this->get_title();
-    }
-
-    /**
+	/**
+	 * A string to represent the object type
+	 *
 	 * @return string
 	 */
-    public function get_broadcast_type()
-    {
-    	return $this->object_type;
-    }
+	protected function get_object_type() {
+		return 'broadcast';
+	}
 
-    /**
-     * @return int
-     */
-    public function get_object_id()
-    {
-        return absint( $this->object_id );
-    }
+	/**
+	 * @return string|void
+	 */
+	public function get_funnel_title() {
+		if ( $this->is_email() ) {
+			return __( 'Broadcast Email', 'groundhogg' );
+		} else {
+			return __( 'Broadcast SMS', 'groundhogg' );
+		}
+	}
 
-    /**
+	/**
+	 * @return string
+	 */
+	public function get_step_title() {
+		return $this->get_title();
+	}
+
+	/**
+	 * @return string
+	 */
+	public function get_broadcast_type() {
+		return $this->object_type;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function get_object_id() {
+		return absint( $this->object_id );
+	}
+
+	/**
 	 * Whether the broadcast is sending an sms
 	 *
 	 * @return bool
 	 */
-    public function is_sms()
-    {
-        return $this->get_broadcast_type() === self::TYPE_SMS;
-    }
+	public function is_sms() {
+		return $this->get_broadcast_type() === self::TYPE_SMS;
+	}
 
-    /**
+	/**
 	 * Whether the broadcast is sending an email
 	 *
 	 * @return bool
 	 */
-    public function is_email()
-    {
-    	return $this->get_broadcast_type() === self::TYPE_EMAIL;
-    }
+	public function is_email() {
+		return $this->get_broadcast_type() === self::TYPE_EMAIL;
+	}
 
-    /**
-     * @return Email|SMS|null
-     */
-    public function get_object()
-    {
-        return $this->object;
-    }
+	/**
+	 * @return Email|SMS|null
+	 */
+	public function get_object() {
+		return $this->object;
+	}
 
-    public function get_send_time()
-    {
-        return absint( $this->send_time );
-    }
+	public function get_send_time() {
+		return absint( $this->send_time );
+	}
 
-    public function get_scheduled_by_id()
-    {
-        return absint( $this->scheduled_by );
-    }
+	public function get_scheduled_by_id() {
+		return absint( $this->scheduled_by );
+	}
 
-    public function get_funnel_id()
-    {
-        return self::FUNNEL_ID;
-    }
+	public function get_funnel_id() {
+		return self::FUNNEL_ID;
+	}
 
-    public function get_status()
-    {
-        return $this->status;
-    }
+	public function get_status() {
+		return $this->status;
+	}
 
-    public function is_sent()
-    {
-        return $this->get_status() === 'sent';
-    }
+	public function is_sent() {
+		return $this->get_status() === 'sent';
+	}
 
-    public function get_date_scheduled()
-    {
-        return $this->date_scheduled;
-    }
+	public function get_date_scheduled() {
+		return $this->date_scheduled;
+	}
 
-    /**
+	/**
 	 * Get the column row title for the broadcast.
 	 *
 	 * @return string
 	 */
-    public function get_title()
-    {
+	public function get_title() {
 
-    	if ( ! $this->get_object() || ! $this->get_object()->exists() ){
-    		return __( '(The associated Email or SMS was deleted.)', 'groundhogg' );
-	    }
+		if ( ! $this->get_object() || ! $this->get_object()->exists() ) {
+			return __( '(The associated Email or SMS was deleted.)', 'groundhogg' );
+		}
 
-    	return $this->get_object()->get_title();
+		return $this->get_object()->get_title();
 
-    }
+	}
 
-    /**
-     * Cancel the broadcast
-     */
-    public function cancel()
-    {
+	/**
+	 * Cancel the broadcast
+	 */
+	public function cancel() {
 
-        if ( Plugin::$instance->dbs->get_db( 'events' )->mass_update(
-            [
-                'status' => Event::CANCELLED
-            ],
-            [
-                'step_id'   => $this->get_id(),
-                'event_type' => Event::BROADCAST
-            ]
-        ) ){
-            $this->update( [ 'status' => 'cancelled' ] );
-        }
+		if ( Plugin::$instance->dbs->get_db( 'events' )->mass_update(
+			[
+				'status' => Event::CANCELLED
+			],
+			[
+				'step_id'    => $this->get_id(),
+				'event_type' => Event::BROADCAST
+			]
+		) ) {
+			$this->update( [ 'status' => 'cancelled' ] );
+		}
 
-    }
+	}
 
-    /**
-     * Send the associated object to the given contact
-     *
-     * @param $contact Contact
-     * @param $event Event
-     *
-     * @return bool|\WP_Error whether the email sent or not.
-     */
-    public function run( $contact, $event = null )
-    {
+	/**
+	 * Send the associated object to the given contact
+	 *
+	 * @param $contact Contact
+	 * @param $event Event
+	 *
+	 * @return bool|\WP_Error whether the email sent or not.
+	 */
+	public function run( $contact, $event = null ) {
 
-	    do_action( "groundhogg/broadcast/{$this->get_broadcast_type()}/before", $this, $contact, $event );
+		do_action( "groundhogg/broadcast/{$this->get_broadcast_type()}/before", $this, $contact, $event );
 
-        $result = $this->get_object()->send( $contact, $event );
+		$result = $this->get_object()->send( $contact, $event );
 
-        do_action( "groundhogg/broadcast/{$this->get_broadcast_type()}/after", $this, $contact, $event );
+		do_action( "groundhogg/broadcast/{$this->get_broadcast_type()}/after", $this, $contact, $event );
 
-        if ( ! $this->is_sent() ){
-            $this->update( [ 'status' => 'sent' ] );
-        }
+		if ( ! $this->is_sent() ) {
+			$this->update( [ 'status' => 'sent' ] );
+		}
 
-        return $result;
-    }
+		return $result;
+	}
 
-    /**
-     * Just return true for now cuz I'm lazy...
-     *
-     * @return bool
-     */
-    public function can_run()
-    {
-        return true;
-    }
+	/**
+	 * Just return true for now cuz I'm lazy...
+	 *
+	 * @return bool
+	 */
+	public function can_run() {
+		return true;
+	}
 
-    /**
-     * @return array
-     */
-    public function get_report_data()
-    {
-        $data = [];
+	/**
+	 * @return array
+	 */
+	public function get_report_data() {
+		$data = [];
 
-        if ( $this->is_sent() ){
+		if ( $this->is_sent() ) {
 
-            $data[ 'id' ]   = $this->get_id();
-            $data[ 'sent' ] = get_db( 'events' )->count( [ 'step_id' => $this->get_id(), 'event_type' => Event::BROADCAST, 'status' => Event::COMPLETE ] );
+			$data['id']   = $this->get_id();
 
-            if ( ! $this->is_sms() ){
-                $data[ 'waiting' ]      = get_db( 'events' )->count( [ 'step_id' => $this->get_id(), 'event_type' => Event::BROADCAST, 'status' => Event::WAITING ] );
-                $data[ 'opened' ]       = get_db( 'activity' )->count( [ 'funnel_id' => $this->get_funnel_id(), 'step_id' => $this->get_id(), 'activity_type' => Activity::EMAIL_OPENED ] );
-                $data[ 'open_rate' ]    = percentage( $data[ 'sent' ], $data[ 'opened' ] );
-                $data[ 'clicked' ]      = get_db( 'activity' )->count( [ 'funnel_id' => $this->get_funnel_id(), 'step_id' => $this->get_id(), 'activity_type' => Activity::EMAIL_CLICKED ] );
-                $data[ 'click_through_rate' ] = percentage( $data[ 'clicked' ], $data[ 'opened' ] );
-                $data[ 'unopened' ] = $data[ 'sent' ] - $data[ 'opened' ];
-                $data[ 'opened_not_clicked' ] = $data[ 'opened' ] - $data[ 'clicked' ];
-            }
+			$data['sent'] = get_db( 'events' )->count( [
+				'step_id'    => $this->get_id(),
+				'event_type' => Event::BROADCAST,
+				'status'     => Event::COMPLETE
+			] );
 
-        }
+			if ( ! $this->is_sms() ) {
 
-        return $data;
-    }
+				$data['waiting']            = get_db( 'events' )->count( [
+					'step_id'    => $this->get_id(),
+					'event_type' => Event::BROADCAST,
+					'status'     => Event::WAITING
+				] );
+				$data['opened']             = get_db( 'activity' )->count( [
+					'funnel_id'     => $this->get_funnel_id(),
+					'step_id'       => $this->get_id(),
+					'activity_type' => Activity::EMAIL_OPENED
+				] );
+				$data['open_rate']          = percentage( $data['sent'], $data['opened'] );
+				$data['clicked']            = get_db( 'activity' )->count( [
+					'funnel_id'     => $this->get_funnel_id(),
+					'step_id'       => $this->get_id(),
+					'activity_type' => Activity::EMAIL_CLICKED
+				] );
+				$data['click_through_rate'] = percentage( $data['clicked'], $data['opened'] );
+				$data['unopened']           = $data['sent'] - $data['opened'];
+				$data['opened_not_clicked'] = $data['opened'] - $data['clicked'];
 
-    /**
-     * @return array
-     */
-    public function get_as_array()
-    {
-        return [
-            'data' => $this->data,
-            'title' => $this->get_title(),
-            'report' => $this->get_report_data(),
-        ];
-    }
+			}
+
+			// only if broadcast was actually sent and experimental is enabled.
+			if ( use_experimental_features() && $data[ 'sent' ] > 0 ){
+
+				$last_event = get_db( 'events' )->query( [
+					'step_id'    => $this->get_id(),
+					'event_type' => Event::BROADCAST,
+					'status'     => Event::COMPLETE,
+					'orderby'    => 'time',
+					'order'      => 'DESC',
+					'limit'      => 1
+				] );
+
+				$last_event = $last_event[ 0 ];
+
+				// in seconds
+				$period = absint( $last_event->time ) - $this->get_send_time();
+
+				// Speed = total sent / ( time_end - time_start )
+				$data[ 'speed' ] = round( $data[ 'sent' ] / $period, 2 );
+			}
+
+		}
+
+		return $data;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function get_as_array() {
+		return [
+			'data'   => $this->data,
+			'title'  => $this->get_title(),
+			'report' => $this->get_report_data(),
+		];
+	}
 }
