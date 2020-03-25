@@ -88,7 +88,7 @@ class Funnel extends Base_Object_With_Meta {
 		$steps = [];
 
 		foreach ( $raw_step_ids as $raw_step_id ) {
-			$steps[] = Plugin::$instance->utils->get_step( $raw_step_id );
+			$steps[] = new Step( $raw_step_id );
 		}
 
 		usort( $steps, function ( Step $a, Step $b ) {

@@ -628,7 +628,6 @@ class Funnels_Page extends Admin_Page {
 				ob_start();
 				$step->html_v2();
 				$html .= ob_get_clean();
-
 			}
 
 		}
