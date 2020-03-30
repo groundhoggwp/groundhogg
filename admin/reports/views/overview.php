@@ -45,6 +45,8 @@ function quick_stat_report($args = [])
     </div>
 </div>
 
+
+
 <div class="groundhogg-quick-stats">
     <div class="groundhogg-report">
 
@@ -98,10 +100,10 @@ function quick_stat_report($args = [])
     <div class="groundhogg-chart">
         <h2 class="title"><?php _e('Opt-in Status', 'groundhogg'); ?></h2>
         <div style="width: 100%">
-            <div class="float-left" style="width:60%">
+            <div class="float-left" style="width:60%; display:inline-block">
                 <canvas id="chart_contacts_by_optin_status"></canvas>
             </div>
-            <div class="float-left" style="width:40%">
+            <div class="float-left" style="width:40%;display: inline-block">
                 <div id="chart_contacts_by_optin_status_legend" class="chart-legend"></div>
             </div>
 
@@ -109,6 +111,9 @@ function quick_stat_report($args = [])
     </div>
     <div class="groundhogg-chart">
         <h2 class="title"><?php _e('Lead Score', 'groundhogg'); ?></h2>
+        <?php if ( has_action( 'groundhogg/admin/report/lead_score' )) : ?>
+	    <?php  do_action( 'groundhogg/admin/report/lead_score'   ); ?>
+	    <?php else :  ?>
         <p class="notice-no-data">
             <?php _e('Please Enable Lead Scoring Plugin to view this data.', 'groundhogg');
             if (!is_white_labeled()) {
@@ -116,6 +121,7 @@ function quick_stat_report($args = [])
             }
             ?>
         </p>
+        <?php endif; ?>
     </div>
 </div>
 

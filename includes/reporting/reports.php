@@ -41,12 +41,12 @@ class Reports
     /**
      * @var int
      */
-    protected $start;
+    public $start;
 
     /**
      * @var int
      */
-    protected $end;
+    public $end;
 
     /**
      * Report data

@@ -91,10 +91,10 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 	protected function get_reports_per_tab() {
 
+	    $case  = '';
 		switch ( $this->get_current_tab() ) {
 
 			case 'overview':
-
 				$reports = [
 					'chart_new_contacts',
 
@@ -113,8 +113,11 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 					'table_contacts_by_countries',
 					'table_contacts_by_lead_source',
-                    'table_top_converting_funnels'
+                    'table_top_converting_funnels',
+
+
 				];
+				$case = 'overview';
 
 				break;
 			case 'contacts' :
@@ -136,6 +139,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 					'table_contacts_by_countries',
 
 				];
+				$case = 'contacts';
 				break;
 			case 'email':
 				$reports = [
@@ -156,7 +160,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 					'table_worst_performing_emails',
 					'table_top_performing_broadcasts'
 				];
-
+				$case = 'email';
 				break;
 			case 'funnels':
 				$reports = [
@@ -171,6 +175,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 					'total_contacts_in_funnel',
                     'table_benchmark_conversion_rate'
 				];
+				$case = 'funnels';
 				break;
 			case 'broadcasts' :
 
@@ -179,9 +184,12 @@ class Reports_Page extends Tabbed_Admin_Page {
 					'table_broadcast_stats',
 					'table_broadcast_link_clicked',
 				];
+				$case = 'broadcasts';
 				break;
 
 		}
+
+		$reports = apply_filters( 'groundhogg/admin/reports/tab' , $reports, $case ) ;
 
 		return $reports;
 

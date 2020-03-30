@@ -199,6 +199,59 @@ img {
 }
 
 
+@media only screen and (max-width: 700px) {
+    .groundhogg-quick-stats .groundhogg-report {
+        display: inherit;
+    }
+
+
+    .groundhogg-chart-wrapper {
+        display: inline-block;
+        margin-bottom: 0px;
+        margin-top: 0px;
+        width: 100%;
+
+    }
+    .groundhogg-quick-stats .groundhogg-quick-stat {
+        width: 90%;
+    }
+
+    .groundhogg-chart-no-padding {
+        width: 100%;
+        margin-top: 15px;
+        position: relative;
+        /* padding: 17px 20px 15px; */
+        background: #FFF;
+        border: 1px solid #d6e2ed;
+        border-radius: 5px;
+        min-height: 200px;
+    }
+
+    .groundhogg-chart {
+        width: 100%;
+        margin-top: 15px;
+        position: relative;
+        /*padding: 17px 20px 15px;*/
+        background: #FFF;
+        border: 1px solid #d6e2ed;
+        border-radius: 5px;
+        min-height: 250px;
+        padding: 0px;
+        float: left;
+    }
+
+    .groundhogg-chart > h2.title {
+        padding-left: 15px;
+    }
+
+    #groundhogg-datepicker-wrap {
+        width: 100%;
+         float: unset;
+         margin-top: 0px;
+    }
+
+}
+
 /* NEW CSS FOR TABLE */
 table.groundhogg-report-table tr:nth-child(odd) {
     background-color: #fbfbfb;
@@ -248,37 +301,36 @@ table.groundhogg-report-table td {
 }
 
 table.groundhogg-report-table th:last-child,
-table.groundhogg-report-table td:last-child{
+table.groundhogg-report-table td:last-child {
     width: 100px;
 }
 
 
-
-.chart-legend li span{
+.chart-legend li span {
     display: inline-block;
     width: 12px;
     height: 12px;
     margin-right: 5px;
 }
 
-.chart-legend{
-    height:250px;
-    overflow:auto;
+.chart-legend {
+    max-height: 250px;
+    overflow: auto;
 }
 
-.chart-legend li{
-    cursor:pointer;
+.chart-legend li {
+    cursor: pointer;
 }
 
-.strike{
+.strike {
     text-decoration: line-through !important;
 }
 
-.float-left{
-    float:left;
+.float-left {
+    float: left;
 }
 
-.notice-no-data{
+.notice-no-data {
     position: absolute;
     top: 50%;
     left: 50%;
