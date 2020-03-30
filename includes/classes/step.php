@@ -280,12 +280,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function can_complete( $contact = null ) {
 		// Actions cannot be completed.
-		if ( $this->is_action() ) {
-			return false;
-		}
-
-		// Check if active
-		if ( ! $this->is_active() ) {
+		if ( $this->is_action()  || ! $this->is_active() ) {
 			return false;
 		}
 
@@ -295,7 +290,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		}
 
 		// If inner step, check if contact is at a step before this one.
-		if ( $this->is_inner() ) {
+		else if ( $this->is_inner() ) {
 
 			// get the current funnel step
 			$current_order = $this->get_current_funnel_step_order( $contact );
@@ -341,7 +336,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'contact_id' => $contact->get_id(),
 			'status'     => Event::COMPLETE,
 			'order'      => 'DESC',
-			'orderby'    => 'time'
+			'orderby'    => 'time',
+			'limit'      => 1,
 		] );
 
 		if ( ! empty( $events ) ) {
@@ -422,11 +418,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Return the name given with the ID prefixed for easy access in the $_POST variable
 	 *
-	 * @deprecated since 2.0
-	 *
 	 * @param $name
 	 *
 	 * @return string
+	 * @deprecated since 2.0
+	 *
 	 */
 	public function prefix( $name ) {
 		return $this->get_id() . '_' . esc_attr( $name );

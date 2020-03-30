@@ -41,6 +41,10 @@ class Process_Events extends Bulk_Job {
 		// Max 3 minutes
 		$requests = ceil( $num_queued_events / 18 );
 
+		if ( $requests < 1 ){
+			$requests = 1;
+		}
+
 		$items = [];
 
 		for ( $i = 0; $i < $requests; $i ++ ) {

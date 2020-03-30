@@ -343,7 +343,7 @@ abstract class Funnel_Step extends Supports_Errors {
 	 * @param string $val
 	 */
 	protected function save_setting( $setting = '', $val = '' ) {
-		if ( ! $val ) {
+		if ( empty( $val ) ) {
 			$this->get_current_step()->delete_meta( $setting );
 		} else {
 			$this->get_current_step()->update_meta( $setting, $val );

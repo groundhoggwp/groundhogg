@@ -177,6 +177,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.13.11 (2020-03-27) =
+* FIXED Bug causing tag related benchmarks to not properly import tags when importing a funnel template.
+* TWEAKED Remove non word characters from the export file name when exporting funnels.
+
 = 2.1.13.10 (2020-03-25) =
 * ADDED New experimental feature, broadcast send speed.
 * FIXED Bug causing duplicate date timers to appear in the funnel editor.

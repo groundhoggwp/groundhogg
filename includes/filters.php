@@ -33,8 +33,14 @@ add_filter( 'retrieve_password_message', __NAMESPACE__ . '\fix_html_pw_reset_lin
  */
 function sender_email( $original_email_address ) {
 
-    // Get the site domain and get rid of www.
-    $sitename = strtolower( $_SERVER['SERVER_NAME'] );
+	// Might not be set.
+	if ( ! isset_not_empty( $_SERVER, 'SERVER_NAME' ) ){
+		return $original_email_address;
+	}
+
+	// Get the site domain and get rid of www.
+	$sitename = strtolower( $_SERVER['SERVER_NAME'] );
+
     if ( substr( $sitename, 0, 4 ) == 'www.' ) {
         $sitename = substr( $sitename, 4 );
     }
