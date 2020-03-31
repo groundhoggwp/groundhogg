@@ -200,7 +200,7 @@ class Delay_Timer extends Action {
 			$base_time      = strtotime( $time_string );
 			$formatted_date = date( 'Y-m-d', $base_time );
 			$time_string    = $formatted_date . ' ' . $run_time;
-			if ( strtotime( $time_string ) < time() ) {
+			if ( strtotime( $time_string ) < Plugin::$instance->utils->date_time->convert_to_local_time( time() ) ) {
 				$formatted_date = date( 'Y-m-d', strtotime( 'tomorrow' ) );
 				$time_string    = $formatted_date . ' ' . $run_time;
 			}
