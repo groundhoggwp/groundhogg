@@ -3,7 +3,7 @@ Contributors: trainingbusinesspros, groundhogg, dhrumit
 Tags: crm, email marketing, email, marketing automation, automation
 Donate link: https://www.groundhogg.io/try/
 Requires at least: 4.9
-Tested up to: 5.3
+Tested up to: 5.4
 Requires PHP: 5.6
 Stable tag: trunk
 License: GPLv3
