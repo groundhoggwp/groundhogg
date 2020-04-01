@@ -276,7 +276,7 @@ function groundhogg_tools_sysinfo_get() {
 	}
 
 	$return .= "\n" . '-- WPDB' . "\n\n";
-	$return .= 'Tables:                     ' . implode( ', ', $wpdb->tables() ) . "\n";
+	$return .= implode( PHP_EOL, $wpdb->tables() ) . "\n";
 
 	$return .= "\n" . '-- Rewrites' . "\n\n";
 

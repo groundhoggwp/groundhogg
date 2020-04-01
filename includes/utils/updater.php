@@ -27,6 +27,9 @@ abstract class Updater {
 		add_action( 'admin_init', [ $this, 'listen_for_updates' ], 9 );
 		add_action( 'groundhogg/notices/before', [ $this, 'updates_notice' ] );
 
+		// Do automatic updates
+		add_action( 'init', [ $this, 'do_automatic_updates' ], 8 );
+
 		// Show updates path in tools area
 		add_action( 'groundhogg/admin/tools/updates', [ $this, 'show_manual_updates' ] );
 
@@ -118,6 +121,15 @@ abstract class Updater {
 	 * @return string[]
 	 */
 	protected function get_optional_updates() {
+		return [];
+	}
+
+	/**
+	 * List of updates which will run automatically
+	 *
+	 * @return string[]
+	 */
+	protected function get_automatic_updates() {
 		return [];
 	}
 
@@ -368,11 +380,52 @@ abstract class Updater {
 		}
 
 		foreach ( $missing_updates as $update ) {
+			$this->update_to_version( $update );
+		}
 
-			// Failsafe check for doing the update?
-//			if ( ! $this->did_update( $update ) ) {
-				$this->update_to_version( $update );
-//			}
+		$this->did_updates = true;
+
+		do_action( "groundhogg/updater/{$this->get_updater_name()}/finished" );
+
+		return true;
+	}
+
+	/**
+	 * Do any automatic updates required by GH
+	 *
+	 * @return bool
+	 */
+	public function do_automatic_updates() {
+
+		$previous_updates = $this->get_previous_versions();
+
+		// No previous updates, if this is the case something has gone wrong...
+		if ( empty( $previous_updates ) ) {
+			return false;
+		}
+
+		$available_updates = $this->get_automatic_updates();
+		$missing_updates   = array_diff( $available_updates, $previous_updates );
+
+//		var_dump( $available_updates, $previous_updates, $missing_updates);
+//		wp_die();
+
+		if ( empty( $missing_updates ) ) {
+			return false;
+		}
+
+		$update_lock = 'gh_' . $this->get_updater_name() . '_doing_updates';
+
+		// Check if an update lock is present.
+		if ( get_transient( $update_lock ) ) {
+			return false;
+		}
+
+		// Set lock so second update process cannot be run before this one is complete.
+		set_transient( $update_lock, time(), MINUTE_IN_SECONDS );
+
+		foreach ( $missing_updates as $update ) {
+			$this->update_to_version( $update );
 		}
 
 		$this->did_updates = true;

@@ -320,7 +320,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'funnel_id'  => $this->get_funnel_id(),
 			'contact_id' => $contact->get_id(),
 			'status'     => Event::WAITING
-		] );
+		], null, false );
 
 		if ( ! empty( $events ) ) {
 			$event = array_shift( $events );
@@ -338,7 +338,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'order'      => 'DESC',
 			'orderby'    => 'time',
 			'limit'      => 1,
-		] );
+		], null, false );
 
 		if ( ! empty( $events ) ) {
 			// get top element.

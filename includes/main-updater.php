@@ -219,6 +219,15 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Add micro_time column
+	 *
+	 * Automatic update!
+	 */
+	public function version_2_1_13_11() {
+		get_db( 'events' )->create_table();
+	}
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -249,14 +258,32 @@ class Main_Updater extends Updater {
 			'2.1.11.1',
 			'2.1.13',
 			'2.1.13.6',
+			'2.1.13.11',
 		];
 	}
 
+	/**
+	 * Automatic updates
+	 *
+	 * @return array|string[]
+	 */
+	protected function get_automatic_updates() {
+		return [
+			'2.1.13.11',
+		];
+	}
+
+	/**
+	 * Show any required update descriptions.
+	 *
+	 * @return array|string[]
+	 */
 	protected function get_update_descriptions() {
 		return [
 			'2.1.13'        => __( 'Refactor contact optin statuses to meet new format.', 'groundhogg' ),
 			'2.1.13.revert' => __( 'Revert update 2.1.13 if rogue updated refactored optin status more than once.', 'groundhogg' ),
 			'2.1.13.6'      => __( 'Give funnel events higher priority than broadcast events.', 'groundhogg' ),
+			'2.1.13.11'     => __( 'Add micro_time column to events table for better display of events order.', 'groundhogg' ),
 		];
 	}
 

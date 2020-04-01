@@ -178,8 +178,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 == Changelog ==
 
 = 2.1.13.11 (2020-03-27) =
-* FIXED Bug causing tag related benchmarks to not properly import tags when importing a funnel template.
+* TWEAKED Add method for automatic updates and non-automatic updates at the same time.
 * TWEAKED Remove non word characters from the export file name when exporting funnels.
+* TWEAKED Store micro_time of event completion to better show events in the order they were completed in.
+* FIXED Bug causing tag related benchmarks to not properly import tags when importing a funnel template.
+* FIXED Delay timer bug caused by difference between localtime and system time.
+* FIXED Bug allowing contacts to move backwards in a funnel if a benchmark is completed during the same queue process as the step which triggered it.
 
 = 2.1.13.10 (2020-03-25) =
 * ADDED New experimental feature, broadcast send speed.

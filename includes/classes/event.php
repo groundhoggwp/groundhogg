@@ -253,8 +253,8 @@ class Event extends Base_Object {
 	/**
 	 * Return whether the event is a funnel (automated) event.
 	 *
-	 * @since 1.2
 	 * @return bool
+	 * @since 1.2
 	 */
 	public function is_funnel_event() {
 		return $this->get_event_type() === self::FUNNEL;
@@ -457,6 +457,7 @@ class Event extends Base_Object {
 		return $this->update( [
 			'status'        => self::COMPLETE,
 			'time'          => time(),
+			'micro_time'    => micro_seconds(),
 			'error_code'    => '',
 			'error_message' => '',
 		] );
