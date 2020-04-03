@@ -2803,6 +2803,10 @@ add_action( 'admin_menu', function () {
 
 	$groundhogg = get_array_var( $submenu, 'groundhogg' );
 
+	if ( ! $groundhogg ){
+	    return;
+    }
+
 	foreach ( $groundhogg as &$li ) {
 		$li[4] = $li[2];
 	}
