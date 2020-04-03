@@ -177,7 +177,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.1.13.11 (2020-03-27) =
+= 2.1.13.12 (2020-04-03) =
+* TWEAKED Updated responsive email template to perform better on Windows 10 Mail, IOS mobile devices and Outlook Mobile
+* FIXED Optin status search using incorrect optin status for the selected option.
+
+= 2.1.13.11 (2020-04-02) =
 * TWEAKED Add method for automatic updates and non-automatic updates at the same time.
 * TWEAKED Remove non word characters from the export file name when exporting funnels.
 * TWEAKED Store micro_time of event completion to better show events in the order they were completed in.
