@@ -38,7 +38,7 @@ $wrapper = apply_filters( 'groundhogg/email_template/wrapper_css', [
 	'mso-table-lspace' => '0pt',
 	'mso-table-rspace' => '0pt',
 	'width'            => '100%',
-	'max-width'        => $email_width . 'px',
+//	'max-width'        => $email_width . 'px',
 	'background-color' => '#FFFFFF'
 ] );
 
@@ -168,9 +168,8 @@ $email_width          = $is_showing_in_iframe ? '100%' : $email_width;
 <body class="email" style="<?php echo $body; ?>">
 <table border="0" cellpadding="0" cellspacing="0" class="body" style="<?php echo $wrapper; ?>">
     <tr>
-        <td class="container" style="<?php echo $template_container; ?>"
-            align="<?php echo $alignment; ?>">
-            <table border="0" cellpadding="0" cellspacing="0" class="body">
+        <td class="container" style="<?php echo $template_container; ?>" align="<?php echo $alignment; ?>">
+            <table border="0" cellpadding="0" cellspacing="0" class="body" style="max-width: <?php echo $email_width;?>px">
                 <tr>
                     <td align="center">
                         <div class="content" style="<?php echo $template_content; ?>">
