@@ -385,6 +385,8 @@ class Plugin {
         require  GROUNDHOGG_PATH . '/includes/functions.php';
         require  GROUNDHOGG_PATH . '/includes/filters.php';
         require  GROUNDHOGG_PATH . '/includes/tools.php';
+        require  GROUNDHOGG_PATH . '/vendor/autoload.php';
+
     }
 }
 

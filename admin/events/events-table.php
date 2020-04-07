@@ -220,6 +220,10 @@ class Events_Table extends WP_List_Table {
                 <a class="button action"
                    href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'purge' ], $_SERVER['REQUEST_URI'] ), 'purge' ); ?>"><?php _ex( 'Purge failed events', 'action', 'groundhogg' ); ?></a>
 			<?php endif; ?>
+
+
+            <a class="button action"
+               href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'process_test' ], $_SERVER['REQUEST_URI'] ), 'process_test' ); ?>"><?php _ex( 'test pp', 'action', 'groundhogg' ); ?></a>
         </div>
 		<?php
 	}

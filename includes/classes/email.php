@@ -638,9 +638,12 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function get_headers() {
 		/* Use default mail-server */
-		$headers = [];
+		$headers             = [];
 		$headers['from']     = 'From: ' . wp_specialchars_decode( $this->get_from_name() ) . ' <' . $this->get_from_email() . '>';
 		$headers['reply_to'] = 'Reply-To: ' . $this->get_reply_to_address();
+		if ( $this->get_event() ) {
+			$headers['gh_event_id'] = $this->get_event()->get_id();
+		}
 
 		$return_path_email = get_return_path_email();
 

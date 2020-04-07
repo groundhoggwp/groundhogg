@@ -314,7 +314,7 @@ class Event extends Base_Object {
 		$result = $this->get_step()->run( $this->get_contact(), $this );
 
 		// Soft fail when return false
-		if ( ! $result ) {
+		if ( ! $result && ! is_array( $result ) ) {
 
 			$this->skip();
 
@@ -331,9 +331,12 @@ class Event extends Base_Object {
 			return apply_filters( 'groundhogg/event/run/failed_result', false, $this );
 		}
 
-		$this->complete();
+		if ( ! is_array( $result ) ) {
+			$this->complete();
+		}
 
 		do_action( 'groundhogg/event/run/after', $this );
+
 
 		return true;
 	}

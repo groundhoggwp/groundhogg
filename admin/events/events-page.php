@@ -2,8 +2,30 @@
 
 namespace Groundhogg\Admin\Events;
 
+
+use function Amp\ParallelFunctions\parallelMap;
+use function Amp\Promise\wait;
+
+
+
+use Amp\Parallel\Worker\DefaultPool;
+
+
+
+use Amp\Parallel\Worker\CallableTask;
+use Amp\Parallel\Worker\DefaultWorkerFactory;
+
+use Amp\Parallel\Worker;
+use Amp\Promise;
+
+use Amp\Loop;
+use function Amp\call;
+
+
+
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Event;
+use function Amp\delay;
 use function Groundhogg\get_db;
 use Groundhogg\Plugin;
 use function Groundhogg\get_request_var;
@@ -177,6 +199,129 @@ class Events_Page extends Admin_Page
 
         return false;
     }
+
+
+    public function process_process_test()
+    {
+
+	    function asyncMultiply($x)
+	    {
+		    // Create a new promisor
+		    $deferred = new \Amp\Deferred;
+
+		    // Resolve the async result one second from now
+		    Loop::delay(rand ( 0 ,  1000 )  , function () use ($deferred, $x) {
+
+
+		        echo $x . "<br/>";
+
+//
+//		        if ( $x / 5  == 0) {
+//		            $deferred ->fail( "s" );
+//		        }
+//
+			    $deferred->resolve( true );
+//
+//
+
+		    });
+
+
+		    return $deferred->promise();
+	    }
+
+
+	    function nl($x)
+        {
+            delay(1000);
+	        echo $x . "<br/>";
+        }
+
+
+
+	    $start = microtime(true);
+
+	    for ($i=0 ;$i< 100 ; $i++ )
+        {
+	        $promise[] = asyncMultiply($i ) ;
+
+        }
+
+	    $result = \Amp\Promise\wait(Promise\all( $promise ));
+
+
+	    echo "special loop ". $time_elapsed_secs = microtime(true) - $start;
+
+	    $start1 = microtime(true);
+
+	    for ($i=0 ;$i< 100 ; $i++ )
+	    {
+
+		    nl($i);
+	    }
+
+	    echo  'Normal loop' . $time_elapsed_secs1 = microtime(true) - $start1;
+
+
+	    $uris = [
+		    "https://google.com/",
+		    "https://github.com/",
+		    "https://stackoverflow.com/",
+	    ];
+
+	    $results = [];
+	    foreach ($uris as $uri) {
+		    var_dump("fetching $uri..");
+		    $results[$uri] = file_get_contents($uri);
+		    var_dump("done fetching $uri.");
+	    }
+
+	    foreach ($results as $uri => $result) {
+		    var_dump("uri : $uri");
+		    var_dump("result : " . strlen($result));
+	    }
+
+
+
+
+//	    $urls = [
+//		    'https://secure.php.net',
+//		    'https://amphp.org',
+//		    'https://github.com',
+//	    ];
+//
+//	    $promises = [];
+//	    foreach ($urls as $url) {
+//		    $promises[$url] = Worker\enqueueCallable('file_get_contents', $url);
+//	    }
+//
+//	    $responses = Promise\wait(Promise\all($promises));
+//
+//	    foreach ($responses as $url => $response) {
+//		    \printf("Read %d bytes from %s\n", \strlen($response), $url);
+//	    }
+
+
+
+
+	    $start = \microtime(true);
+
+// sleep() is executed in child processes, the results are sent back to the parent.
+//
+// All communication is non-blocking and can be used in an event loop. Amp\Promise\wait() can be used to use the library
+// in a traditional synchronous environment.
+	    wait(parallelMap([1, 2, 3], 'sleep'));
+
+	    print 'Took ' . (\microtime(true) - $start) . ' seconds.' . \PHP_EOL;
+
+
+	    wp_die( 'here ' );
+
+
+    }
+
+
+
 
     /**
      * Executes the event
