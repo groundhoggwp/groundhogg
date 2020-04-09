@@ -209,7 +209,7 @@ class Limits {
 	public static function limits_exceeded( $processed_actions ) {
 
 		// check if doing unit tests.
-		if ( defined( 'DOING_MAILHAWK_TESTS' ) && DOING_MAILHAWK_TESTS ) {
+		if ( defined( 'DOING_GROUNDHOGG_TESTS' ) && DOING_GROUNDHOGG_TESTS ) {
 			return false;
 		}
 
