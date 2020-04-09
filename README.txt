@@ -177,6 +177,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.13.13 (2020-04-05) =
+* FIXED Bug causing email alignment to not work.
+
 = 2.1.13.12 (2020-04-03) =
 * TWEAKED Updated responsive email template to perform better on Windows 10 Mail, IOS mobile devices and Outlook Mobile
 * FIXED Optin status search using incorrect optin status for the selected option.
