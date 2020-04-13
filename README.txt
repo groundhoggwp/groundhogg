@@ -177,6 +177,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.13.14 (2020-04-13) =
+* FIXED Permalink conflict when home URL (frontend) is different that site url (backend).
+
 = 2.1.13.13 (2020-04-05) =
 * FIXED Bug causing email alignment to not work.
 

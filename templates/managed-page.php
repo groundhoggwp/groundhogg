@@ -1,15 +1,17 @@
 <?php
+
 namespace Groundhogg;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 define( 'MANAGED_PAGE_WIDTH', 500 );
 
 /**
  * Enqueue and dequeue relevant scripts.
  */
-function enqueue_managed_page_styles()
-{
+function enqueue_managed_page_styles() {
 	dequeue_theme_css_compat();
 	dequeue_wc_css_compat();
 
@@ -26,8 +28,7 @@ function enqueue_managed_page_styles()
 /**
  * Enqueue any required JS.
  */
-function enqueue_managed_page_scripts()
-{
+function enqueue_managed_page_scripts() {
 	wp_enqueue_script( 'fullframe' );
 
 	/**
@@ -39,29 +40,28 @@ function enqueue_managed_page_scripts()
 /**
  * Use the site logo.
  */
-function ensure_logo_is_there()
-{
+function ensure_logo_is_there() {
 	if ( has_custom_logo() ) :
 
 		$image = wp_get_attachment_image_src( get_theme_mod( 'custom_logo' ), 'full' );
 
 		// Resize image
-		if ( $image[ 1 ] > MANAGED_PAGE_WIDTH ){
-			$aspect_ratio = MANAGED_PAGE_WIDTH / $image[ 1 ];
-			$image[ 1 ] = MANAGED_PAGE_WIDTH;
-			$image[ 2 ] = $image[2] * $aspect_ratio;
+		if ( $image[1] > MANAGED_PAGE_WIDTH ) {
+			$aspect_ratio = MANAGED_PAGE_WIDTH / $image[1];
+			$image[1]     = MANAGED_PAGE_WIDTH;
+			$image[2]     = $image[2] * $aspect_ratio;
 		}
 
 		?>
-		<style type="text/css">
-			#main h1 a {
-				background-image: url(<?php echo esc_url( $image[0] ); ?>);
-				-webkit-background-size: <?php echo absint( $image[1] )?>px;
-				background-size: <?php echo absint( $image[1] ) ?>px;
-				height: <?php echo absint( $image[2] ) ?>px;
-				width: <?php echo absint( $image[1] ) ?>px;
-			}
-		</style>
+        <style type="text/css">
+            #main h1 a {
+                background-image: url(<?php echo esc_url( $image[0] ); ?>);
+                -webkit-background-size: <?php echo absint( $image[1] )?>px;
+                background-size: <?php echo absint( $image[1] ) ?>px;
+                height: <?php echo absint( $image[2] ) ?>px;
+                width: <?php echo absint( $image[1] ) ?>px;
+            }
+        </style>
 	<?php
 	endif;
 }
@@ -72,8 +72,7 @@ function ensure_logo_is_there()
  * @param string $title
  * @param string $action
  */
-function managed_page_head( $title='', $action='' )
-{
+function managed_page_head( $title = '', $action = '' ) {
 	add_action( 'wp_print_styles', 'Groundhogg\enqueue_managed_page_styles' );
 	add_action( 'wp_enqueue_scripts', 'Groundhogg\enqueue_managed_page_scripts' );
 
@@ -82,8 +81,8 @@ function managed_page_head( $title='', $action='' )
 	add_action( 'wp_head', 'Groundhogg\ensure_logo_is_there' );
 
 	status_header( 200 );
-    header( 'Content-Type: text/html; charset=utf-8' );
-    nocache_headers();
+	header( 'Content-Type: text/html; charset=utf-8' );
+	nocache_headers();
 
 	$mp_title = get_bloginfo( 'name', 'display' );
 
@@ -99,8 +98,8 @@ function managed_page_head( $title='', $action='' )
 		$header_url   = network_home_url();
 		$header_title = get_network()->site_name;
 	} else {
-		$header_url   = site_url();
-		$header_title = sprintf( __( 'Powered by %s', 'groundhogg' ),  white_labeled_name()) ;
+		$header_url   = home_url();
+		$header_title = sprintf( __( 'Powered by %s', 'groundhogg' ), white_labeled_name() );
 	}
 
 	/*
@@ -114,24 +113,25 @@ function managed_page_head( $title='', $action='' )
 	}
 
 	?><!DOCTYPE html>
-	<html <?php language_attributes(); ?>>
-	<head>
-		<meta charset="<?php bloginfo( 'charset' ); ?>">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="profile" href="http://gmpg.org/xfn/11">
-		<title><?php echo $mp_title; ?></title>
+    <html <?php language_attributes(); ?>>
+    <head>
+        <meta charset="<?php bloginfo( 'charset' ); ?>">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="profile" href="http://gmpg.org/xfn/11">
+        <title><?php echo $mp_title; ?></title>
 		<?php wp_head(); ?>
-	</head>
-	<body class="managed-page <?php echo esc_attr( implode( ' ', $classes ) ); ?>">
-	<div id="main">
+    </head>
+    <body class="managed-page <?php echo esc_attr( implode( ' ', $classes ) ); ?>">
+    <div id="main">
 	<?php if ( has_custom_logo() ): ?>
-	<h1><a href="<?php echo esc_url( $header_url ); ?>" title="<?php echo esc_attr( $header_title ); ?>"><?php echo $header_text; ?></a></h1>
-<?php endif;
+        <h1><a href="<?php echo esc_url( $header_url ); ?>"
+               title="<?php echo esc_attr( $header_title ); ?>"><?php echo $header_text; ?></a></h1>
+	<?php endif;
 
-Plugin::$instance->notices->print_notices();
+	Plugin::$instance->notices->print_notices();
 
-?>
-	<div id="content">
+	?>
+    <div id="content">
 	<?php
 }
 
@@ -149,14 +149,14 @@ function managed_page_footer() {
 	] );
 
 	?>
-	</div>
-	<p id="extralinks"><?php echo $html; ?></p>
-	</div>
+    </div>
+    <p id="extralinks"><?php echo $html; ?></p>
+    </div>
 	<?php
 	wp_footer();
 	?>
-	<div class="clear"></div>
-	</body>
-	</html>
+    <div class="clear"></div>
+    </body>
+    </html>
 	<?php
 }

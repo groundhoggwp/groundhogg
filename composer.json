@@ -10,6 +10,7 @@
     }
   ],
   "require": {
-    "phpunit/phpunit": "7.5.20"
+    "phpunit/phpunit": "7.5.20",
+    "ext-json": "*"
   }
 }

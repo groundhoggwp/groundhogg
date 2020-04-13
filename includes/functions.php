@@ -566,7 +566,7 @@ function enqueue_groundhogg_modal() {
  * @return string|string[]|null
  */
 function search_and_replace_domain( $string ) {
-	return preg_replace( '#https?:\/\/[^\\/\s]+#', site_url(), $string );
+	return preg_replace( '#https?:\/\/[^\\/\s]+#', home_url(), $string );
 }
 
 /**
@@ -1489,7 +1489,7 @@ function after_form_submit_handler( &$contact ) {
  */
 function email_is_same_domain( $email ) {
 	$email_domain = substr( $email, strrpos( $email, '@' ) + 1 );
-	$site_domain  = site_url();
+	$site_domain  = home_url();
 	$is_same      = strpos( $site_domain, $email_domain ) !== false;
 
 	return apply_filters( 'groundhogg/email_is_same_domain', $is_same, $email, $site_domain );
@@ -2075,7 +2075,7 @@ function get_managed_page_name() {
  * @return string|void
  */
 function managed_page_url( $url = '' ) {
-	return trailingslashit( rtrim( site_url( get_managed_page_name() ), '/' ) . '/' . ltrim( $url, '/' ) );
+	return trailingslashit( rtrim( home_url( get_managed_page_name() ), '/' ) . '/' . ltrim( $url, '/' ) );
 }
 
 /**
@@ -2601,7 +2601,7 @@ function get_default_country_code() {
 	}
 
 	// Get the IP of the site wherever it's being hosted
-	$parse_url = wp_parse_url( site_url(), PHP_URL_HOST );
+	$parse_url = wp_parse_url( home_url(), PHP_URL_HOST );
 
 	if ( $parse_url ) {
 		$ip = gethostbyname( $parse_url );

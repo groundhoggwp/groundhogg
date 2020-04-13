@@ -522,7 +522,7 @@ class Location
 
             $ipdat = wp_remote_get( "http://www.geoplugin.net/json.gp?ip=" . $ip, [
                 'headers' => [
-                    'Referer' => site_url()
+                    'Referer' => home_url()
                 ]
             ] );
 

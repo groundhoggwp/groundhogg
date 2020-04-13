@@ -130,7 +130,7 @@ We appreciate your help, enjoy!
 	}
 
 	protected function generate_site_key() {
-		return md5( str_replace( 'www.', '', parse_url( site_url(), PHP_URL_HOST ) ) );
+		return md5( str_replace( 'www.', '', parse_url( home_url(), PHP_URL_HOST ) ) );
 	}
 
 	/**

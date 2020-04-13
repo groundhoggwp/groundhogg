@@ -277,7 +277,7 @@ class Form_Filled extends Benchmark
                         'id'        => $this->setting_id_prefix( 'success_page' ),
                         'name'      => $this->setting_name_prefix( 'success_page' ),
                         'title'     => __( 'Thank You Page' ),
-                        'value'     => $this->get_setting( 'success_page', site_url( 'thank-you/' ) )
+                        'value'     => $this->get_setting( 'success_page', home_url( 'thank-you/' ) )
                     );
 
                     echo Plugin::$instance->utils->html->link_picker( $args ); ?>
