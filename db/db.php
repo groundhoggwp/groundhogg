@@ -102,14 +102,7 @@ abstract class DB {
 	public function get_table_name() {
 		global $wpdb;
 
-		if ( ! isset( $this->table_name ) ) {
-			if ( ! $this->is_global_multisite() ) {
-				$this->table_name = $wpdb->prefix . $this->db_suffix;
-			} else {
-				$this->table_name = $wpdb->base_prefix . $this->db_suffix;
-			}
-		}
-
+		$this->table_name = $wpdb->prefix . $this->db_suffix;
 		return $this->table_name;
 	}
 
@@ -117,17 +110,11 @@ abstract class DB {
 	 * Check if the site is global multisite enabled
 	 *
 	 * @return bool
+	 *
+	 * @deprecated
 	 */
 	private function is_global_multisite() {
-		if ( ! is_multisite() ) {
-			return false;
-		}
-
-		if ( is_multisite() && ! get_site_option( 'gh_global_db_enabled' ) ) {
-			return false;
-		}
-
-		return true;
+		return false;
 	}
 
 	/**
