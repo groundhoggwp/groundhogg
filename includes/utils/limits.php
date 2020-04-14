@@ -14,6 +14,8 @@ class Limits {
 	 */
 	public static function start() {
 		self::$start_time = time();
+
+		return self::$start_time;
 	}
 
 	/**
@@ -97,6 +99,12 @@ class Limits {
 	 * @param int The time limit in seconds.
 	 */
 	public static function raise_time_limit( $limit = 0 ) {
+
+		if ( ! $limit ){
+			$limit = self::get_time_limit();
+		}
+
+
 		if ( $limit < ini_get( 'max_execution_time' ) ) {
 			return;
 		}
