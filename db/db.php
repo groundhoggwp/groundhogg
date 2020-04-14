@@ -5,9 +5,6 @@ namespace Groundhogg\DB;
 // Exit if accessed directly
 use function Groundhogg\get_array_var;
 use function Groundhogg\isset_not_empty;
-use function Groundhogg\multi_implode;
-use Groundhogg\Plugin;
-
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
