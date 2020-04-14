@@ -97,7 +97,7 @@ class Bounce_Checker
      */
     public function get_mail_server()
     {
-        return Plugin::$instance->settings->get_option('bounce_inbox_host', wp_parse_url(site_url(), PHP_URL_HOST));
+        return Plugin::$instance->settings->get_option('bounce_inbox_host', wp_parse_url(home_url(), PHP_URL_HOST));
     }
 
     /**

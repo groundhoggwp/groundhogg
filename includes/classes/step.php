@@ -17,11 +17,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Step is used to provide information about any kind of funnel step, benchmark, or action.
  *
- * @package     Includes
+ * @since       File available since Release 0.9
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.9
+ * @package     Includes
  */
 class Step extends Base_Object_With_Meta implements Event_Process {
 	const BENCHMARK = 'benchmark';
@@ -280,12 +280,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function can_complete( $contact = null ) {
 		// Actions cannot be completed.
-		if ( $this->is_action() ) {
-			return false;
-		}
-
-		// Check if active
-		if ( ! $this->is_active() ) {
+		if ( $this->is_action()  || ! $this->is_active() ) {
 			return false;
 		}
 
@@ -295,7 +290,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		}
 
 		// If inner step, check if contact is at a step before this one.
-		if ( $this->is_inner() ) {
+		else if ( $this->is_inner() ) {
 
 			// get the current funnel step
 			$current_order = $this->get_current_funnel_step_order( $contact );
@@ -325,7 +320,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'funnel_id'  => $this->get_funnel_id(),
 			'contact_id' => $contact->get_id(),
 			'status'     => Event::WAITING
-		] );
+		], null, false );
 
 		if ( ! empty( $events ) ) {
 			$event = array_shift( $events );
@@ -341,8 +336,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'contact_id' => $contact->get_id(),
 			'status'     => Event::COMPLETE,
 			'order'      => 'DESC',
-			'orderby'    => 'time'
-		] );
+			'orderby'    => 'time',
+			'limit'      => 1,
+		], null, false );
 
 		if ( ! empty( $events ) ) {
 			// get top element.
@@ -365,9 +361,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function contact_in_funnel( $contact ) {
 		return $this->get_events_db()->count( [
-			'funnel_id'  => $this->get_funnel_id(),
-			'contact_id' => $contact->get_id()
-		] ) > 0;
+				'funnel_id'  => $this->get_funnel_id(),
+				'contact_id' => $contact->get_id()
+			] ) > 0;
 	}
 
 	/**
@@ -426,17 +422,17 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 *
 	 * @return string
 	 * @deprecated since 2.0
+	 *
 	 */
 	public function prefix( $name ) {
 		return $this->get_id() . '_' . esc_attr( $name );
 	}
 
-
 	/**
 	 * Do the event when being processed from the event queue...
 	 *
 	 * @param $contact Contact
-	 * @param $event Event
+	 * @param $event   Event
 	 *
 	 * @return bool|\WP_Error whether it was successful or not
 	 */
@@ -467,6 +463,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		return $result;
 	}
+
 
 	/**
 	 * Output the HTML of a step.
@@ -619,5 +616,25 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 				switch_to_blog( $blog_id );
 			}
 		}
+	}
+
+	/**
+	 * Needs to handle the moving of contacts to another step...
+	 *
+	 * @return bool
+	 */
+	public function delete() {
+
+		// Maybe Move contacts forward...
+		$next_step = $this->get_next_action();
+
+		if ( $next_step && $next_step->is_active() ) {
+			$contacts = $this->get_waiting_contacts();
+			foreach ( $contacts as $contact ) {
+				$next_step->enqueue( $contact );
+			}
+		}
+
+		return parent::delete();
 	}
 }

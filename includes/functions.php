@@ -568,7 +568,7 @@ function enqueue_groundhogg_modal() {
  * @return string|string[]|null
  */
 function search_and_replace_domain( $string ) {
-	return preg_replace( '#https?:\/\/[^\\/\s]+#', site_url(), $string );
+	return preg_replace( '#https?:\/\/[^\\/\s]+#', home_url(), $string );
 }
 
 /**
@@ -725,12 +725,13 @@ function get_return_path_email() {
  * @since      1.2.10
  * @deprecated 2.1.11
  *
+ * @param string       $subject     Email subject
+ * @param string       $message     Message contents
+ *
  * @param string|array $headers     Optional. Additional headers.
  * @param string|array $attachments Optional. Files to attach.
  *
  * @param string|array $to          Array or comma-separated list of email addresses to send message.
- * @param string       $subject     Email subject
- * @param string       $message     Message contents
  *
  * @return bool Whether the email contents were sent successfully.
  */
@@ -744,6 +745,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	 *
 	 * @param array $args A compacted array of wp_mail() arguments, including the "to" email,
 	 *                    subject, message, headers, and attachments values.
+	 *
 	 */
 	$atts = apply_filters( 'wp_mail', compact( 'to', 'subject', 'message', 'headers', 'attachments' ) );
 
@@ -914,6 +916,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	 * @since 2.2.0
 	 *
 	 * @param string $from_email Email address to send from.
+	 *
 	 */
 	$from_email = apply_filters( 'wp_mail_from', $from_email );
 
@@ -923,6 +926,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	 * @since 2.3.0
 	 *
 	 * @param string $from_name Name associated with the "from" email address.
+	 *
 	 */
 	$from_name = apply_filters( 'wp_mail_from_name', $from_name );
 
@@ -992,6 +996,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	 * @since 2.3.0
 	 *
 	 * @param string $content_type Default wp_mail() content type.
+	 *
 	 */
 	$content_type = apply_filters( 'wp_mail_content_type', $content_type );
 
@@ -1020,6 +1025,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	 * @since 2.3.0
 	 *
 	 * @param string $charset Default email charset.
+	 *
 	 */
 	$phpmailer->CharSet = apply_filters( 'wp_mail_charset', $charset );
 
@@ -1050,6 +1056,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	 * @since 2.2.0
 	 *
 	 * @param \PHPMailer $phpmailer The PHPMailer instance (passed by reference).
+	 *
 	 */
 	do_action_ref_array( 'phpmailer_init', array( &$phpmailer ) );
 
@@ -1086,6 +1093,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 		 *
 		 * @param WP_Error $error A WP_Error object with the phpmailerException message, and an array
 		 *                        containing the mail recipient, subject, message, headers, and attachments.
+		 *
 		 */
 		do_action( 'wp_mail_failed', new WP_Error( 'wp_mail_failed', $e->getMessage(), $mail_error_data ) );
 
@@ -1483,7 +1491,7 @@ function after_form_submit_handler( &$contact ) {
  */
 function email_is_same_domain( $email ) {
 	$email_domain = substr( $email, strrpos( $email, '@' ) + 1 );
-	$site_domain  = site_url();
+	$site_domain  = home_url();
 	$is_same      = strpos( $site_domain, $email_domain ) !== false;
 
 	return apply_filters( 'groundhogg/email_is_same_domain', $is_same, $email, $site_domain );
@@ -1552,9 +1560,11 @@ function get_items_from_csv( $file_path = '' ) {
 			} else {
 
 				if ( count( $row ) > $header_count ) {
+
 					$row = array_slice( $row, 0, $header_count );
 				} else if ( count( $row ) < $header_count ) {
-					$row = array_pad( $row, $header_count - count( $row ) + 1, null );
+
+					$row = array_pad( $row, $header_count, '' );
 				}
 
 				$data[] = array_combine( $header, $row );
@@ -2069,7 +2079,7 @@ function get_managed_page_name() {
  * @return string|void
  */
 function managed_page_url( $url = '' ) {
-	return trailingslashit( rtrim( site_url( get_managed_page_name() ), '/' ) . '/' . ltrim( $url, '/' ) );
+	return trailingslashit( rtrim( home_url( get_managed_page_name() ), '/' ) . '/' . ltrim( $url, '/' ) );
 }
 
 /**
@@ -2161,9 +2171,10 @@ function install_custom_rewrites() {
  *
  * @since 2.0.4
  *
- * @param int|string $action    Optional. Nonce action name. Default -1.
  * @param string     $name      Optional. Nonce name. Default '_wpnonce'.
  * @param string     $actionurl URL to add nonce action.
+ *
+ * @param int|string $action    Optional. Nonce action name. Default -1.
  *
  * @return string
  */
@@ -2594,7 +2605,7 @@ function get_default_country_code() {
 	}
 
 	// Get the IP of the site wherever it's being hosted
-	$parse_url = wp_parse_url( site_url(), PHP_URL_HOST );
+	$parse_url = wp_parse_url( home_url(), PHP_URL_HOST );
 
 	if ( $parse_url ) {
 		$ip = gethostbyname( $parse_url );
@@ -2723,6 +2734,7 @@ function get_upload_wp_error( $file ) {
 		case UPLOAD_ERR_CANT_WRITE:
 			$message = "Failed to write file to disk";
 			break;
+
 		case UPLOAD_ERR_EXTENSION:
 			$message = "File upload stopped by extension";
 			break;
@@ -2787,9 +2799,17 @@ function is_pro_features_active() {
 
 add_action( 'admin_menu', function () {
 
+	if ( ! current_user_can( 'edit_contacts' ) ) {
+		return;
+	}
+
 	global $submenu;
 
 	$groundhogg = get_array_var( $submenu, 'groundhogg' );
+
+	if ( ! $groundhogg ){
+	    return;
+    }
 
 	foreach ( $groundhogg as &$li ) {
 		$li[4] = $li[2];
@@ -2936,4 +2956,28 @@ function get_primary_user() {
  */
 function use_experimental_features() {
 	return is_option_enabled( 'gh_enable_experimental_features' );
+}
+
+/**
+ * Return the micro seconds of micro time as a float.
+ *
+ * @return float
+ */
+function micro_seconds() {
+	$secs = explode( ' ', microtime() );
+	$secs = floatval( $secs[0] );
+
+	return $secs;
+}
+
+/**
+ * @param bool $formatted if true will add 'px' to end
+ *
+ * @return mixed|void
+ */
+function get_default_email_width( $formatted = false ) {
+	$width = absint( apply_filters( 'groundhogg/email_template/width', get_option( 'get_default_email_width', 580 ) ) );
+	$width = ! $formatted ? $width : $width . 'px';
+
+	return $width;
 }

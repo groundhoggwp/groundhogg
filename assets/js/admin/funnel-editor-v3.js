@@ -1,241 +1,245 @@
-( function ( $, funnel, modal, charts ){
+( function ($, funnel, modal, charts) {
 
-    $.extend( funnel, {
+    $.extend(funnel, {
 
         sortables: null,
         reportData: null,
 
-        getSteps: function (){
-            return $( '#step-sortable' )
+        getSteps: function () {
+            return $('#step-sortable');
         },
 
-        getSettings: function (){
-            return $( '.step-settings' )
+        getSettings: function () {
+            return $('.step-settings');
         },
 
-        init: function (){
+        init: function () {
 
-            var self = this
+            var self = this;
 
-            var $document = $( document )
-            var $form = $( '#funnel-form' )
-            var $steps = self.getSteps()
-            var $settings = self.getSettings()
+            var $document = $(document);
+            var $form = $('#funnel-form');
+            var $steps = self.getSteps();
+            var $settings = self.getSettings();
 
-            $document.on( 'change input', '.step-title-large', function (){
-                var $title = $( this )
-                var id = $title.attr( 'data-id' )
-                var $step = $( '#' + id )
-                $step.find( '.step-title' ).text( $title.val() )
-            } )
+            $document.on('change input', '.step-title-large', function () {
+                var $title = $(this);
+                var id = $title.attr('data-id');
+                var $step = $('#' + id);
+                $step.find('.step-title').text($title.val());
+            });
 
-            $document.on( 'click', '#postbox-container-1 .step', function ( e ){
-                self.makeActive( this.id, e )
-            } )
+            $document.on('click', '#postbox-container-1 .step', function (e) {
+                self.makeActive(this.id, e);
+            });
 
-            $document.on( 'click', 'td.step-icon', function ( e ){
+            $document.on('click', 'td.step-icon', function (e) {
 
-                var $activeStep = $steps.find( '.active' )
-                $( '<div class="replace-me"></div>' ).
-                    insertAfter( $activeStep )
+                var $activeStep = $steps.find('.active');
+                $('<div class="replace-me"></div>').
+                    insertAfter($activeStep);
 
-                var $icon = $( this )
-                var $type = $icon.find( '.wpgh-element' )
-                var type = $type.attr( 'id' )
-                var order = $steps.index( $activeStep ) + 1
+                var $icon = $(this);
+                var $type = $icon.find('.wpgh-element');
+                var type = $type.attr('id');
+                var order = $steps.index($activeStep) + 1;
 
                 var data = {
                     action: 'wpgh_get_step_html',
                     step_type: type,
-                    after_step: $activeStep.attr( 'id' ),
+                    after_step: $activeStep.attr('id'),
                     funnel_id: self.id,
                     version: 2,
-                }
+                };
 
-                self.getStepHtml( data )
+                self.getStepHtml(data);
 
-            } )
+            });
 
             /* Bind Delete */
-            $document.on( 'click', 'button.delete-step', function ( e ){
-                self.deleteStep( this.parentNode.parentNode.id )
-            } )
+            $document.on('click', 'button.delete-step', function (e) {
+                self.deleteStep(this.parentNode.parentNode.id);
+            });
 
             /* Bind Duplicate */
-            $document.on( 'click', 'button.duplicate-step', function ( e ){
-                self.duplicateStep( this.parentNode.parentNode.id )
-            } )
+            $document.on('click', 'button.duplicate-step', function (e) {
+                self.duplicateStep(this.parentNode.parentNode.id);
+            });
 
             /* Activate Spinner */
-            $form.on( 'submit', function ( e ){
-                e.preventDefault()
-                self.save( $form )
-            } )
+            $form.on('submit', function (e) {
+                e.preventDefault();
+                self.save($form);
+            });
 
             /* Auto save */
-            $document.on( 'change', '.auto-save', function ( e ){
-                e.preventDefault()
-                self.save( $form )
-            } )
+            $document.on('change', '.auto-save', function (e) {
+                e.preventDefault();
+                self.save($form);
+            });
 
             /* Auto save */
-            $document.on( 'auto-save', function ( e ){
-                e.preventDefault()
-                self.save( $form )
-            } )
+            $document.on('auto-save', function (e) {
+                e.preventDefault();
+                self.save($form);
+            });
 
             // Funnel Title
-            $document.on( 'click', '.title-view .title', function ( e ){
-                $( '.title-view' ).hide()
-                $( '.title-edit' ).show().removeClass( 'hidden' )
-                $( '#title' ).focus()
-            } )
+            $document.on('click', '.title-view .title', function (e) {
+                $('.title-view').hide();
+                $('.title-edit').show().removeClass('hidden');
+                $('#title').focus();
+            });
 
-            $document.on( 'blur change', '#title', function ( e ){
+            $document.on('blur change', '#title', function (e) {
 
-                var title = $( this ).val()
+                var title = $(this).val();
 
-                $( '.title-view' ).find( '.title' ).text( title )
-                $( '.title-view' ).show()
-                $( '.title-edit' ).hide()
-            } )
+                $('.title-view').find('.title').text(title);
+                $('.title-view').show();
+                $('.title-edit').hide();
+            });
 
             // Step Title
-            $document.on( 'click', '.step-title-view .title', function ( e ){
+            $document.on('click', '.step-title-view .title', function (e) {
 
-                var $step = $( this ).closest( '.step' )
+                var $step = $(this).closest('.step');
 
-                $step.find( '.step-title-view' ).hide()
-                $step.find( '.step-title-edit' ).show().removeClass( 'hidden' )
-                $step.find( '.step-title-edit .edit-title' ).focus()
-            } )
+                $step.find('.step-title-view').hide();
+                $step.find('.step-title-edit').show().removeClass('hidden');
+                $step.find('.step-title-edit .edit-title').focus();
+            });
 
-            $document.on( 'blur change', '.edit-title', function ( e ){
+            $document.on('blur change', '.edit-title', function (e) {
 
-                var $step = $( this ).closest( '.step' )
+                var $step = $(this).closest('.step');
 
-                var title = $( this ).val()
+                var title = $(this).val();
 
-                $step.find( '.step-title-view' ).find( '.title' ).text( title )
-                $step.find( '.step-title-view' ).show()
-                $step.find( '.step-title-edit' ).hide()
-            } )
+                $step.find('.step-title-view').find('.title').text(title);
+                $step.find('.step-title-view').show();
+                $step.find('.step-title-edit').hide();
+            });
 
-            $document.on( 'click', '#enter-full-screen', function ( e ){
-                $( 'html' ).toggleClass( 'full-screen' )
-            } )
+            $document.on('click', '#enter-full-screen', function (e) {
+                $('html').toggleClass('full-screen');
+            });
 
-            if ( window.innerWidth > 600 ) {
-                this.makeSortable()
+            if (window.innerWidth > 600) {
+                this.makeSortable();
             }
 
-            this.initReporting()
+            this.initReporting();
 
-            $( '#add-contacts-button' ).click( function (){
-                self.addContacts()
-            } )
+            $('#add-contacts-button').click(function () {
+                self.addContacts();
+            });
 
-            $( '#copy-share-link' ).click( function ( e ){
-                e.preventDefault()
-                prompt( 'Copy this link.', $( '#share-link' ).val() )
-            } )
+            $('#copy-share-link').click(function (e) {
+                e.preventDefault();
+                prompt('Copy this link.', $('#share-link').val());
+            });
 
         },
 
-        initReporting: function (){
+        initReporting: function () {
 
-            var $reporting = $( '#reporting-toggle' )
+            var $reporting = $('#reporting-toggle');
 
-            $reporting.on( 'input', function (){
-                if ( $( this ).is( ':checked' ) ) {
-                    $( 'html' ).addClass( 'reporting-enabled' )
+            $reporting.on('input', function () {
+                if ($(this).is(':checked')) {
+                    $('html').addClass('reporting-enabled');
                 }
                 else {
-                    $( 'html' ).removeClass( 'reporting-enabled' )
+                    $('html').removeClass('reporting-enabled');
                 }
-            } )
+            });
 
-            $( '#custom_date_range_start' ).datepicker( {
+            $('#custom_date_range_start').datepicker({
                 changeMonth: true,
                 changeYear: true,
                 maxDate: 0,
                 dateFormat: 'd-m-yy',
-            } )
+            });
 
-            $( '#custom_date_range_end' ).datepicker( {
+            $('#custom_date_range_end').datepicker({
                 changeMonth: true,
                 changeYear: true,
                 maxDate: 0,
                 dateFormat: 'd-m-yy',
-            } )
+            });
 
-            $( '#date_range' ).change( function (){
-                if ( $( this ).val() === 'custom' ) {
-                    $( '#custom_date_range_end' ).removeClass( 'hidden' )
-                    $( '#custom_date_range_start' ).removeClass( 'hidden' )
+            $('#date_range').change(function () {
+                if ($(this).val() === 'custom') {
+                    $('#custom_date_range_end').removeClass('hidden');
+                    $('#custom_date_range_start').removeClass('hidden');
                 }
                 else {
-                    $( '#custom_date_range_end' ).addClass( 'hidden' )
-                    $( '#custom_date_range_start' ).addClass( 'hidden' )
+                    $('#custom_date_range_end').addClass('hidden');
+                    $('#custom_date_range_start').addClass('hidden');
                 }
-            } )
+            });
         },
 
-        save: function ( $form ){
+        save: function ($form) {
 
-            var self = this
+            if (typeof $form === 'undefined') {
+                $form = $('#funnel-form');
+            }
 
-            var $saveButton = $( '.save-button' )
+            var self = this;
 
-            $( 'body' ).addClass( 'saving' )
+            var $saveButton = $('.save-button');
 
-            $saveButton.html( self.saving_text )
-            $saveButton.addClass( 'spin' )
+            $('body').addClass('saving');
 
-            var fd = $form.serialize()
-            fd = fd + '&action=gh_save_funnel_via_ajax&version=2'
+            $saveButton.html(self.saving_text);
+            $saveButton.addClass('spin');
 
-            adminAjaxRequest( fd, function ( response ){
-                handleNotices( response.data.notices )
+            var fd = $form.serialize();
+            fd = fd + '&action=gh_save_funnel_via_ajax&version=2';
 
-                setTimeout( function (){
-                    $( '.notice-success' ).fadeOut()
-                }, 3000 )
+            adminAjaxRequest(fd, function (response) {
+                handleNotices(response.data.notices);
 
-                $saveButton.removeClass( 'spin' )
-                $saveButton.html( self.save_text )
+                setTimeout(function () {
+                    $('.notice-success').fadeOut();
+                }, 3000);
 
-                self.getSettings().html( response.data.data.settings )
-                self.getSteps().html( response.data.data.sortable )
+                $saveButton.removeClass('spin');
+                $saveButton.html(self.save_text);
 
-                console.log( response )
+                self.getSettings().html(response.data.data.settings);
+                self.getSteps().html(response.data.data.sortable);
 
-                charts.data = response.data.data.chartData
+                console.log(response);
 
-                if ( !$( '#funnel-chart' ).hasClass( 'hidden' ) ) {
-                    charts.draw()
+                charts.data = response.data.data.chartData;
+
+                if (!$('#funnel-chart').hasClass('hidden')) {
+                    charts.draw();
                 }
 
-                $( document ).trigger( 'new-step' )
+                $(document).trigger('new-step');
 
-                $( 'body' ).removeClass( 'saving' )
-            } )
+                $('body').removeClass('saving');
+            });
         },
 
-        makeSortable: function (){
-            this.sortables = $( '.ui-sortable' ).sortable( {
+        makeSortable: function () {
+            this.sortables = $('.ui-sortable').sortable({
                 placeholder: 'sortable-placeholder',
                 connectWith: '.ui-sortable',
                 axis: 'y',
-                start: function ( e, ui ){
-                    ui.helper.css( 'left',
-                        ( ui.item.parent().width() - ui.item.width() ) / 2 )
-                    ui.placeholder.height( ui.item.height() )
-                    ui.placeholder.width( ui.item.width() )
+                start: function (e, ui) {
+                    ui.helper.css('left',
+                        ( ui.item.parent().width() - ui.item.width() ) / 2);
+                    ui.placeholder.height(ui.item.height());
+                    ui.placeholder.width(ui.item.width());
                 },
-            } )
+            });
 
-            this.sortables.disableSelection()
+            this.sortables.disableSelection();
         },
 
         /**
@@ -243,29 +247,33 @@
          *
          * @param id int
          */
-        deleteStep: function ( id ){
+        deleteStep: function (id) {
 
-            showSpinner()
+            var self = this;
 
-            var $step = $( '#' + id )
+            showSpinner();
+
+            var $step = $('#' + id);
 
             var result = confirm(
-                'Are you sure you want to delete this step? Any contacts currently waiting will be moved to the next action.' )
+                'Are you sure you want to delete this step? Any contacts currently waiting will be moved to the next action.');
 
-            if ( result ) {
+            if (result) {
                 adminAjaxRequest(
                     { action: 'wpgh_delete_funnel_step', step_id: id },
-                    function ( result ){
-                        hideSpinner()
-                        $step.remove()
-                        var sid = '#settings-' + id
-                        var $step_settings = $( sid )
-                        $step_settings.remove()
-                        $( 'html' ).removeClass( 'active-step' )
-                    } )
+                    function (result) {
+                        hideSpinner();
+                        $step.remove();
+                        var sid = '#settings-' + id;
+                        var $step_settings = $(sid);
+                        $step_settings.remove();
+                        $('html').removeClass('active-step');
+
+                        self.save();
+                    });
             }
             else {
-                hideSpinner()
+                hideSpinner();
             }
         },
 
@@ -275,15 +283,15 @@
          *
          * @param id int
          */
-        duplicateStep: function ( id ){
-            var $step = $( '#' + id )
-            $( '<div class="replace-me"></div>' ).insertAfter( $step )
+        duplicateStep: function (id) {
+            var $step = $('#' + id);
+            $('<div class="replace-me"></div>').insertAfter($step);
             var data = {
                 action: 'wpgh_duplicate_funnel_step',
                 step_id: id,
                 version: 2,
-            }
-            this.getStepHtml( data )
+            };
+            this.getStepHtml(data);
         },
 
         /**
@@ -291,28 +299,28 @@
          *
          * @param obj
          */
-        getStepHtml: function ( obj ){
-            var self = this
-            var $steps = self.getSteps()
-            var $settings = self.getSettings()
-            showSpinner()
-            adminAjaxRequest( obj, function ( response ){
+        getStepHtml: function (obj) {
+            var self = this;
+            var $steps = self.getSteps();
+            var $settings = self.getSettings();
+            showSpinner();
+            adminAjaxRequest(obj, function (response) {
 
-                var $replaceable = $steps.find( '.replace-me' )
+                var $replaceable = $steps.find('.replace-me');
 
-                if ( $replaceable.length > 0 ) {
-                    $replaceable.replaceWith( response.data.data.sortable )
+                if ($replaceable.length > 0) {
+                    $replaceable.replaceWith(response.data.data.sortable);
                 }
                 else {
-                    $steps.append( response.data.data.sortable )
+                    $steps.append(response.data.data.sortable);
                 }
 
-                $settings.append( response.data.data.settings )
-                self.makeActive( response.data.data.id )
-                modal.close()
-                hideSpinner()
-                $( document ).trigger( 'new-step' )
-            } )
+                $settings.append(response.data.data.settings);
+                self.makeActive(response.data.data.id);
+                modal.close();
+                hideSpinner();
+                $(document).trigger('new-step');
+            });
         },
 
         /**
@@ -321,65 +329,65 @@
          * @param id string
          * @param e object
          */
-        makeActive: function ( id, e ){
-            var self = this
+        makeActive: function (id, e) {
+            var self = this;
 
-            if ( typeof e == 'undefined' ) {
-                e = false
+            if (typeof e == 'undefined') {
+                e = false;
             }
 
-            var $steps = self.getSteps()
-            var $settings = self.getSettings()
-            var $html = $( 'html' )
+            var $steps = self.getSteps();
+            var $settings = self.getSettings();
+            var $html = $('html');
 
-            var $step = $( '#' + id )
+            var $step = $('#' + id);
 
-            var was_active = $step.hasClass( 'active' )
+            var was_active = $step.hasClass('active');
 
             // Remove active from the active step
 
-            var make_inactive = true
+            var make_inactive = true;
 
-            if ( e ) {
-                var $target = $( e.target )
+            if (e) {
+                var $target = $(e.target);
 
                 // console.log( e.target );
 
-                if ( was_active &&
-                    ( $target.hasClass( 'dashicons' ) ||
-                        $target.hasClass( 'add-step' ) ) ) {
+                if (was_active &&
+                    ( $target.hasClass('dashicons') ||
+                        $target.hasClass('add-step') )) {
                     // console.log( e )
-                    make_inactive = false
+                    make_inactive = false;
                 }
             }
 
-            if ( make_inactive ) {
-                $settings.find( '.step' ).addClass( 'hidden' )
-                $settings.find( '.step' ).removeClass( 'active' )
-                $steps.find( '.step' ).removeClass( 'active' )
-                $steps.find( '.is_active' ).val( null )
-                $html.removeClass( 'active-step' )
+            if (make_inactive) {
+                $settings.find('.step').addClass('hidden');
+                $settings.find('.step').removeClass('active');
+                $steps.find('.step').removeClass('active');
+                $steps.find('.is_active').val(null);
+                $html.removeClass('active-step');
             }
 
             // Make the clicked step active
-            if ( !was_active ) {
-                $step.addClass( 'active' )
-                $step.find( '.is_active' ).val( 1 )
+            if (!was_active) {
+                $step.addClass('active');
+                $step.find('.is_active').val(1);
 
-                var sid = '#settings-' + $step.attr( 'id' )
-                var $step_settings = $( sid )
+                var sid = '#settings-' + $step.attr('id');
+                var $step_settings = $(sid);
 
-                $step_settings.removeClass( 'hidden' )
-                $step_settings.addClass( 'active' )
-                $html.addClass( 'active-step' )
+                $step_settings.removeClass('hidden');
+                $step_settings.addClass('active');
+                $html.addClass('active-step');
 
-                $( document ).trigger( 'step-active' )
+                $(document).trigger('step-active');
             }
         },
-    } )
+    });
 
-    $( function (){
-        funnel.init()
-    } )
+    $(function () {
+        funnel.init();
+    });
 
-} )( jQuery, Funnel, GroundhoggModal, FunnelChart )
+} )(jQuery, Funnel, GroundhoggModal, FunnelChart);

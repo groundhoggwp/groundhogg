@@ -5,9 +5,6 @@ namespace Groundhogg\DB;
 // Exit if accessed directly
 use function Groundhogg\get_array_var;
 use function Groundhogg\isset_not_empty;
-use function Groundhogg\multi_implode;
-use Groundhogg\Plugin;
-
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -72,8 +69,10 @@ abstract class DB {
 	 * @since   2.1
 	 */
 	public function __construct() {
+
 		$this->db_suffix  = $this->get_db_suffix();
-		$this->table_name = $this->get_table_name();
+
+		$this->render_table_name();
 
 		$this->primary_key = $this->get_primary_key();
 		$this->version     = $this->get_db_version();
@@ -85,6 +84,18 @@ abstract class DB {
 		 * Register the table...
 		 */
 		$this->register_table();
+
+		// If the blog is switched, re-render the table name to provide the correct table name.
+		add_action( 'switch_blog', [ $this, 'render_table_name' ] );
+	}
+
+	/**
+	 * Build the table name from the wpdb
+	 */
+	public function render_table_name(){
+		global $wpdb;
+
+		$this->table_name = $wpdb->prefix . $this->db_suffix;
 	}
 
 	/**
@@ -100,16 +111,6 @@ abstract class DB {
 	 * @return string
 	 */
 	public function get_table_name() {
-		global $wpdb;
-
-		if ( ! isset( $this->table_name ) ) {
-			if ( ! $this->is_global_multisite() ) {
-				$this->table_name = $wpdb->prefix . $this->db_suffix;
-			} else {
-				$this->table_name = $wpdb->base_prefix . $this->db_suffix;
-			}
-		}
-
 		return $this->table_name;
 	}
 
@@ -117,17 +118,11 @@ abstract class DB {
 	 * Check if the site is global multisite enabled
 	 *
 	 * @return bool
+	 *
+	 * @deprecated
 	 */
 	private function is_global_multisite() {
-		if ( ! is_multisite() ) {
-			return false;
-		}
-
-		if ( is_multisite() && ! get_site_option( 'gh_global_db_enabled' ) ) {
-			return false;
-		}
-
-		return true;
+		return false;
 	}
 
 	/**
@@ -158,8 +153,7 @@ abstract class DB {
 	/**
 	 * Option to add additional actions following construct.
 	 */
-	protected function add_additional_actions() {
-	}
+	protected function add_additional_actions() {}
 
 	/**
 	 * Register the table with $wpdb so the metadata api can find it
@@ -238,8 +232,8 @@ abstract class DB {
 	 * Whitelist of columns
 	 *
 	 * @access  public
-	 * @since   2.1
 	 * @return  array
+	 * @since   2.1
 	 */
 	public function get_columns() {
 		return [];
@@ -248,7 +242,7 @@ abstract class DB {
 	/**
 	 * Create a where clause given an array
 	 *
-	 * @param array  $args
+	 * @param array $args
 	 * @param string $operator
 	 *
 	 * @return string
@@ -301,8 +295,8 @@ abstract class DB {
 	 * Retrieve a row by the primary key
 	 *
 	 * @access  public
-	 * @since   2.1
 	 * @return  object
+	 * @since   2.1
 	 */
 	public function get( $row_id ) {
 		global $wpdb;
@@ -314,8 +308,8 @@ abstract class DB {
 	 * Retrieve a row by a specific column / value
 	 *
 	 * @access  public
-	 * @since   2.1
 	 * @return  object
+	 * @since   2.1
 	 */
 	public function get_by( $column, $row_id ) {
 		global $wpdb;
@@ -328,8 +322,8 @@ abstract class DB {
 	 * Retrieve a specific column's value by the primary key
 	 *
 	 * @access  public
-	 * @since   2.1
 	 * @return  string
+	 * @since   2.1
 	 */
 	public function get_column( $column, $row_id ) {
 		global $wpdb;
@@ -358,8 +352,8 @@ abstract class DB {
 	 * Default column values
 	 *
 	 * @access  public
-	 * @since   2.1
 	 * @return  array
+	 * @since   2.1
 	 */
 	public function get_column_defaults() {
 		return [];
@@ -369,8 +363,8 @@ abstract class DB {
 	 * Insert a new row
 	 *
 	 * @access  public
-	 * @since   2.1
 	 * @return  int
+	 * @since   2.1
 	 */
 	public function insert( $data ) {
 		global $wpdb;
@@ -430,8 +424,8 @@ abstract class DB {
 	 * Update a row
 	 *
 	 * @access  public
-	 * @since   2.1
 	 * @return  bool
+	 * @since   2.1
 	 */
 	public function update( $row_id = 0, $data = [], $where = [] ) {
 
@@ -539,8 +533,8 @@ abstract class DB {
 	 * Delete a row identified by the primary key
 	 *
 	 * @access  public
-	 * @since   2.1
 	 * @return  bool
+	 * @since   2.1
 	 */
 	public function delete( $row_id = 0 ) {
 
@@ -596,9 +590,9 @@ abstract class DB {
 	}
 
 	/**
-	 * @param array        $data
+	 * @param array $data
 	 * @param string|false $ORDER_BY
-	 * @param bool         $from_cache
+	 * @param bool $from_cache
 	 *
 	 * @return array|bool|null|object
 	 */
@@ -688,7 +682,7 @@ abstract class DB {
 	 * New and improved query function to access DB in more complex and interesting ways.
 	 *
 	 * @param array $query_vars
-	 * @param bool  $from_cache
+	 * @param bool $from_cache
 	 *
 	 * @return object[]|array[]|int
 	 */
@@ -803,10 +797,10 @@ abstract class DB {
 			$select = sprintf( '%s( %s %s)', strtoupper( $query_vars['func'] ), $distinct, $select );
 		}
 
-		$limit               = $query_vars['limit'] ? sprintf( 'LIMIT %d', absint( $query_vars['limit'] ) ) : '';
-		$offset              = $query_vars['offset'] ? sprintf( 'OFFSET %d', absint( $query_vars['offset'] ) ) : '';
-		$orderby             = $query_vars['orderby'] && in_array( $query_vars['orderby'], $this->get_allowed_columns() ) ? sprintf( 'ORDER BY %s', $query_vars['orderby'] ) : '';
-		$groupby             = $query_vars['groupby'] && in_array( $query_vars['groupby'], $this->get_allowed_columns() ) ? sprintf( 'GROUP BY %s', $query_vars['groupby'] ) : '';
+		$limit   = $query_vars['limit'] ? sprintf( 'LIMIT %d', absint( $query_vars['limit'] ) ) : '';
+		$offset  = $query_vars['offset'] ? sprintf( 'OFFSET %d', absint( $query_vars['offset'] ) ) : '';
+		$orderby = $query_vars['orderby'] && in_array( $query_vars['orderby'], $this->get_allowed_columns() ) ? sprintf( 'ORDER BY %s', $query_vars['orderby'] ) : '';
+		$groupby = $query_vars['groupby'] && in_array( $query_vars['groupby'], $this->get_allowed_columns() ) ? sprintf( 'GROUP BY %s', $query_vars['groupby'] ) : '';
 
 		$query_vars['order'] = strtoupper( $query_vars['order'] );
 		$order               = in_array( $query_vars['order'], [ 'ASC', 'DESC' ] ) ? $query_vars['order'] : '';
@@ -978,8 +972,8 @@ abstract class DB {
 	 * Retrieve a specific column's value by the the specified column / value
 	 *
 	 * @access  public
-	 * @since   2.1
 	 * @return  string
+	 * @since   2.1
 	 */
 	public function get_column_by( $column, $column_where, $column_value ) {
 		global $wpdb;
@@ -1046,8 +1040,8 @@ abstract class DB {
 	/**
 	 * Check if the table was ever installed
 	 *
-	 * @since  2.4
 	 * @return bool Returns if the contacts table was installed and upgrade routine run
+	 * @since  2.4
 	 */
 	public function installed() {
 		return $this->table_exists( $this->table_name );
@@ -1056,11 +1050,11 @@ abstract class DB {
 	/**
 	 * Check if the given table exists
 	 *
-	 * @since  2.4
-	 *
 	 * @param string $table The table name
 	 *
 	 * @return bool          If the table name exists
+	 * @since  2.4
+	 *
 	 */
 	public function table_exists( $table ) {
 		global $wpdb;

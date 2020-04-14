@@ -57,13 +57,13 @@ do_action( 'groundhogg/templates/email/footer/before' );
 
 $footer_info = [
     html()->e( 'a', [
-        'href' => apply_filters( 'groundhogg/email_template/preferences_link', site_url() ),
+        'href' => apply_filters( 'groundhogg/email_template/preferences_link', home_url() ),
     ], apply_filters( 'groundhogg/email_template/preferences_text', __( "Change preferences", 'groundhogg' ) ) ) . '.',
     html()->e( 'span', [], [
         apply_filters( 'groundhogg/email_template/pre_unsubscribe_text', __( "Don't want these emails?", 'groundhogg' )),
         " ",
         html()->e( 'a', [
-            'href' => apply_filters( 'groundhogg/email_template/unsubscribe_link', site_url() ),
+            'href' => apply_filters( 'groundhogg/email_template/unsubscribe_link', home_url() ),
         ], apply_filters( 'groundhogg/email_template/unsubscribe_text', __( "Unsubscribe", 'groundhogg' ) ) ) . '.'
     ] ),
 ];

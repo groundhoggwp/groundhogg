@@ -1,16 +1,19 @@
 <?php
 
+use function Groundhogg\convert_user_to_contact_when_user_registered;
+use function Groundhogg\create_user_from_contact;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 
-class Function_Tests extends GH_UnitTestCase
-{
+class Function_Tests extends GH_UnitTestCase {
 
 	/**
 	 * Test that contacts are created when users are registered
+	 *
+	 * @see create_user_from_contact()
+	 * @see convert_user_to_contact_when_user_registered()
 	 */
-	public function test_create_contact_when_user_registered_hook()
-	{
+	public function test_create_contact_when_user_registered_hook() {
 		// Remove excess contact records.
 		$this->factory()->contacts->get_db()->truncate();
 
@@ -18,7 +21,7 @@ class Function_Tests extends GH_UnitTestCase
 
 		$this->assertEquals( 3, get_db( 'contacts' )->count() );
 
-		foreach ( $user_ids as $user_id ){
+		foreach ( $user_ids as $user_id ) {
 			$contact = get_contactdata( $user_id, true );
 
 			$this->assertNotFalse( $contact );
@@ -27,6 +30,25 @@ class Function_Tests extends GH_UnitTestCase
 
 			$this->assertEquals( $user_id, $contact->get_user_id() );
 		}
+	}
+
+	/**
+	 * Test that the appropriate tags are added to a contact when the new account is created.
+	 *
+	 * @see create_user_from_contact()
+	 * @see convert_user_to_contact_when_user_registered()
+	 */
+	public function test_contact_has_tags_when_new_user_is_registered() {
+
+		$this->factory()->contacts->get_db()->truncate();
+
+		$user_id  = $this->factory()->user->create( [
+			'role' => 'subscriber'
+		] );
+
+		$contact = get_contactdata( $user_id, true );
+
+		$this->assertTrue( $contact->has_tag( 'subscriber' ) );
 	}
 
 }

@@ -4,6 +4,7 @@ namespace Groundhogg\DB;
 
 // Exit if accessed directly
 use Groundhogg\Event;
+use function Groundhogg\get_array_var;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -47,7 +48,7 @@ class Events extends DB {
 	 * @return mixed
 	 */
 	public function get_db_version() {
-		return '2.0';
+		return '2.1';
 	}
 
 	/**
@@ -76,6 +77,7 @@ class Events extends DB {
 		return array(
 			'ID'             => '%d',
 			'time'           => '%d',
+			'micro_time'     => '%s',
 			'time_scheduled' => '%d',
 			'funnel_id'      => '%d',
 			'step_id'        => '%d',
@@ -86,6 +88,30 @@ class Events extends DB {
 			'status'         => '%s',
 			'priority'       => '%d',
 			'claim'          => '%s',
+		);
+	}
+
+	/**
+	 * Get default column values
+	 *
+	 * @access  public
+	 * @since   2.1
+	 */
+	public function get_column_defaults() {
+		return array(
+			'ID'             => 0,
+			'time'           => time(),
+			'micro_time'     => 0,
+			'time_scheduled' => time(),
+			'funnel_id'      => 0,
+			'step_id'        => 0,
+			'contact_id'     => 0,
+			'event_type'     => Event::FUNNEL,
+			'error_code'     => '',
+			'error_message'  => '',
+			'status'         => 'waiting',
+			'priority'       => 10,
+			'claim'          => '',
 		);
 	}
 
@@ -107,29 +133,6 @@ class Events extends DB {
 		}
 
 		return $this->insert( $args );
-	}
-
-	/**
-	 * Get default column values
-	 *
-	 * @access  public
-	 * @since   2.1
-	 */
-	public function get_column_defaults() {
-		return array(
-			'ID'             => 0,
-			'time'           => time(),
-			'time_scheduled' => time(),
-			'funnel_id'      => 0,
-			'step_id'        => 0,
-			'contact_id'     => 0,
-			'event_type'     => Event::FUNNEL,
-			'error_code'     => '',
-			'error_message'  => '',
-			'status'         => 'waiting',
-			'priority'       => 10,
-			'claim'          => '',
-		);
 	}
 
 	/**
@@ -181,6 +184,26 @@ class Events extends DB {
 	}
 
 	/**
+	 * Add micro time to table ordering.
+	 *
+	 * @param array $query_vars
+	 *
+	 * @return string|string[]
+	 */
+	public function get_sql( $query_vars = [] ) {
+
+		$sql = parent::get_sql( $query_vars );
+
+		// Double compare to better display completion order
+		if ( $query_vars[ 'orderby' ] === 'time' ){
+			$sql = str_replace(  'ORDER BY time DESC',  'ORDER BY `time` DESC, `micro_time` DESC', $sql );
+			$sql = str_replace(  'ORDER BY time ASC',  'ORDER BY `time` ASC, `micro_time` ASC', $sql );
+		}
+
+		return $sql;
+	}
+
+	/**
 	 * Create the table
 	 *
 	 * @access  public
@@ -195,6 +218,7 @@ class Events extends DB {
 		$sql = "CREATE TABLE " . $this->table_name . " (
         ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
         time bigint(20) unsigned NOT NULL,
+        micro_time float(8) unsigned NOT NULL,
         time_scheduled bigint(20) unsigned NOT NULL,
         contact_id bigint(20) unsigned NOT NULL,
         funnel_id bigint(20) unsigned NOT NULL,

@@ -312,11 +312,11 @@ class Email extends Base_Object_With_Meta {
 		$alignment = $this->get_meta( 'alignment', true );
 
 		if ( $alignment === 'left' ) {
-			$css[ 'margin-left' ]  = '0';
-			$css[ 'margin-right' ] = 'auto';
+			$css['margin-left']  = '0';
+			$css['margin-right'] = 'auto';
 		} else {
-			$css[ 'margin-left' ]  = 'auto';
-			$css[ 'margin-right' ] = 'auto';
+			$css['margin-left']  = 'auto';
+			$css['margin-right'] = 'auto';
 		}
 
 		return $css;
@@ -427,7 +427,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function tracking_link_callback( $matches ) {
-		return $matches[ 1 ] . $this->get_click_tracking_link() . base64_encode( str_replace( '&amp;', '&', $matches[ 2 ] ) ) . $matches[ 3 ];
+		return $matches[1] . $this->get_click_tracking_link() . base64_encode( str_replace( '&amp;', '&', $matches[2] ) ) . $matches[3];
 	}
 
 	/**
@@ -639,9 +639,9 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function get_headers() {
 		/* Use default mail-server */
-		$headers               = [];
-		$headers[ 'from' ]     = 'From: ' . $this->get_from_name() . ' <' . $this->get_from_email() . '>';
-		$headers[ 'reply_to' ] = 'Reply-To: ' . $this->get_reply_to_address();
+		$headers = [];
+		$headers['from']     = 'From: ' . wp_specialchars_decode( $this->get_from_name() ) . ' <' . $this->get_from_email() . '>';
+		$headers['reply_to'] = 'Reply-To: ' . $this->get_reply_to_address();
 
 		$return_path_email = get_return_path_email();
 
@@ -649,9 +649,9 @@ class Email extends Base_Object_With_Meta {
 			$return_path_email = $this->get_from_email();
 		}
 
-		$headers[ 'return_path' ]  = 'Return-Path: ' . $return_path_email;
-		$headers[ 'content_type' ] = 'Content-Type: text/html; charset=UTF-8';
-		$headers[ 'unsub' ]        = sprintf( 'List-Unsubscribe: <mailto:%s?subject=Unsubscribe %s from %s>,<%s>', get_bloginfo( 'admin_email' ), $this->get_to_address(), get_bloginfo(), $this->click_tracking_link( $this->get_unsubscribe_link() ) );
+		$headers['return_path']  = 'Return-Path: ' . $return_path_email;
+		$headers['content_type'] = 'Content-Type: text/html; charset=UTF-8';
+		$headers['unsub']        = sprintf( 'List-Unsubscribe: <mailto:%s?subject=Unsubscribe %s from %s>,<%s>', get_bloginfo( 'admin_email' ), $this->get_to_address(), get_bloginfo(), $this->click_tracking_link( $this->get_unsubscribe_link() ) );
 
 		return apply_filters( "groundhogg/email/headers", $headers );
 	}
@@ -691,7 +691,7 @@ class Email extends Base_Object_With_Meta {
 	 * Send the email
 	 *
 	 * @param $contact_id_or_email Contact|int|string
-	 * @param $event Event|int the of the associated event
+	 * @param $event               Event|int the of the associated event
 	 *
 	 * @return bool|WP_Error
 	 */
@@ -917,8 +917,6 @@ class Email extends Base_Object_With_Meta {
 
 		return $buffer;
 	}
-
-
 
 	public function get_email_stats( $start , $end  ) {
 

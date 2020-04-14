@@ -204,7 +204,10 @@ class Rewrites
                 }
 
                 $export_string = wp_json_encode( $funnel->get_as_array() );
-                $filename = 'funnel-' . $funnel->get_title() . '-'. date("Y-m-d_H-i", time() );
+
+                $funnel_export_name = strtolower( preg_replace( '/[^A-z0-9]/', '-', $funnel->get_title() ) );
+
+                $filename = 'funnel-' . $funnel_export_name . '-'. date("Y-m-d_H-i", time() );
 
                 header("Content-type: text/plain");
                 header( "Content-disposition: attachment; filename=".$filename.".funnel");

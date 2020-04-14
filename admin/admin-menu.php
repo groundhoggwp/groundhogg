@@ -67,8 +67,8 @@ class Admin_Menu
         $this->settings = new Settings_Page();
         $this->bulk_jobs = new Bulk_Job_Page();
 
-        $this->dashboard = new Dashboard_Widgets();
 	    $this->reporting = new Reports_Page();
+//        $this->dashboard = new Dashboard_Widgets();
 
         if ( ! is_white_labeled() ) {
             $this->guided_setup = new Guided_Setup();

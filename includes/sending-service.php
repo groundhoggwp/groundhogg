@@ -306,7 +306,7 @@ class Sending_Service
     {
 
         if ( ! $domain ){
-            $domain = site_url();
+            $domain = home_url();
         }
 
         /* Use filters to retrieve the UID and TOKEN if whitelabel solution */
@@ -376,7 +376,7 @@ class Sending_Service
         ];
 
         $post = [
-            'domain'    => site_url(),
+            'domain'    => home_url(),
             'user_id'   => $gh_uid,
         ];
 

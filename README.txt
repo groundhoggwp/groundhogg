@@ -3,7 +3,7 @@ Contributors: trainingbusinesspros, groundhogg, dhrumit
 Tags: crm, email marketing, email, marketing automation, automation
 Donate link: https://www.groundhogg.io/try/
 Requires at least: 4.9
-Tested up to: 5.3
+Tested up to: 5.4
 Requires PHP: 5.6
 Stable tag: trunk
 License: GPLv3
@@ -177,8 +177,53 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.1.14 =
+= 2.1.13.15 (2020-04-14) =
+* FIXED Bug causing Groundhogg tables to be deleted on main site when deleting a subsite in some cases (only on multisite).
+
+= 2.1.13.14 (2020-04-13) =
+* FIXED Permalink conflict when home URL (frontend) is different that site url (backend).
+
+= 2.1.13.13 (2020-04-05) =
+* FIXED Bug causing email alignment to not work.
+
+= 2.1.13.12 (2020-04-03) =
+* TWEAKED Updated responsive email template to perform better on Windows 10 Mail, IOS mobile devices and Outlook Mobile
+* FIXED Optin status search using incorrect optin status for the selected option.
+
+= 2.1.13.11 (2020-04-02) =
+* TWEAKED Add method for automatic updates and non-automatic updates at the same time.
+* TWEAKED Remove non word characters from the export file name when exporting funnels.
+* TWEAKED Store micro_time of event completion to better show events in the order they were completed in.
+* FIXED Bug causing tag related benchmarks to not properly import tags when importing a funnel template.
+* FIXED Delay timer bug caused by difference between localtime and system time.
+* FIXED Bug allowing contacts to move backwards in a funnel if a benchmark is completed during the same queue process as the step which triggered it.
+
+= 2.1.13.10 (2020-03-25) =
+* ADDED New experimental feature, broadcast send speed.
+* FIXED Bug causing duplicate date timers to appear in the funnel editor.
+
+= 2.1.13.9 (2020-03-18) =
+* HOT FIX for queue processing issue.
+
+= 2.1.13.8 (2020-03-18) =
+* ADDED Reporting link to row actions in broadcast table.
+* TWEAKED processing events manually now goes through the bulk processor rather than while reloading the page.
+* FIXED When claiming events, double check the claim is empty to avoid creating a new claim for one already in progress.
+* FIXED decode special chars in from name.
+* FIXED test email sent to customer on list if providing an invalid test email address.
+* FIXED weird behavior when deleting steps with active contacts.
+
+= 2.1.13.7 (2020-03-06) =
+* TWEAKED bulk job will now retry 3 times before failing.
+* FIXED Bug in the broadcast scheduler sometimes causing it to fail when checking for the marketable status of a contact.
+* FIXED getting items from CSV will pad array if header size is large than the row
+
+= 2.1.13.6 (2020-03-02) =
+* TWEAKED Make usage tracking GDPR compliant.
 * TWEAKED Funnel events are given higher priority than broadcast events in the event queue.
+* TWEAKED The marketable status of a contact will be checked before scheduling any broadcast emails.
+* FIXED Ajax Form Submission not working.
+* FIXED checkbox required attribute not added in HTML.
 
 = 2.1.13.5 =
 * FIXED Removed version 2.0.8.1 from the db upgrade path. Redundant upgrade.

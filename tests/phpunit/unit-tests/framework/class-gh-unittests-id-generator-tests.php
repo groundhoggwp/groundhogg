@@ -18,11 +18,10 @@ class GH_UnitTests_ID_Generator_Tests extends GH_UnitTestCase {
 
 		$activity = $this->factory()->activity->create_many( 10 );
 
-		var_dump( $activity );
+		$this->assertNotEmpty( $activity );
 
 		foreach ( $activity as $i => $activity_id ){
 			$activity = new \Groundhogg\Classes\Activity( $activity_id );
-
 			$this->assertEquals( $i+1, $activity->get_step_id() );
 		}
 

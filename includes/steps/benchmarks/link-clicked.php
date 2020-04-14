@@ -82,7 +82,7 @@ class Link_Clicked extends Benchmark
         $this->add_control( 'redirect_to', [
             'label'         => __( 'Redirect To:', 'groundhogg' ),
             'type'          => HTML::LINK_PICKER,
-            'default'       => site_url(),
+            'default'       => home_url(),
             'description'   => __( 'Contacts will be redirected to this link.', 'groundhogg' ),
         ] );
 
@@ -96,7 +96,7 @@ class Link_Clicked extends Benchmark
      */
     public function save( $step )
     {
-        $this->save_setting( 'redirect_to', sanitize_text_field( $this->get_posted_data( 'redirect_to', site_url() ) ) );
+        $this->save_setting( 'redirect_to', sanitize_text_field( $this->get_posted_data( 'redirect_to', home_url() ) ) );
     }
 
     /**

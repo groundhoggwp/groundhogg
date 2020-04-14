@@ -5,6 +5,7 @@ namespace Groundhogg\Bulk_Jobs;
 use Groundhogg\Broadcast;
 use Groundhogg\Contact_Query;
 use Groundhogg\Event;
+use function Groundhogg\get_contactdata;
 use function Groundhogg\get_request_query;
 use Groundhogg\Plugin;
 
@@ -98,16 +99,17 @@ class Broadcast_Scheduler extends Bulk_Job {
 	 * @return void
 	 */
 	protected function process_item( $item ) {
+
 		if ( ! current_user_can( 'schedule_broadcasts' ) ) {
 			return;
 		}
 
 		$id = absint( $item );
 
-		$contact = Plugin::$instance->utils->get_contact( $id );
+		$contact = get_contactdata( $id );
 
-		// No point in sending an email to a contact that is not marketable.
-		if ( ! $contact->is_marketable() ) {
+		// No point in scheduling an email to a contact that is not marketable.
+		if ( ! $contact || ! $contact->is_marketable() ) {
 			$this->skip_item( $item );
 
 			return;
