@@ -129,6 +129,24 @@ class Event_Queue extends Supports_Errors {
 	}
 
 	/**
+	 * If the event queue failed for whatever reason, fix events which are still in progress.
+	 * Update status back to waiting
+	 * Delete the claim
+	 * Only for events which were scheduled to be complete but never did.
+	 */
+	protected function cleanup_unprocessed_events(){
+		global $wpdb;
+
+		$events = get_db( 'events' );
+
+		// 5 minute window.
+		$time = time() - ( MINUTE_IN_SECONDS * 5 );
+
+		$wpdb->query( "UPDATE {$events->get_table_name()} SET claim = '' WHERE `claim` <> '' AND `time` < {$time}" );
+		$wpdb->query( "UPDATE {$events->get_table_name()} SET status = 'waiting' WHERE status = 'in_progress' AND `time` < {$time}" );
+	}
+
+	/**
 	 * Run any scheduled events.
 	 *
 	 * @return int
@@ -138,6 +156,8 @@ class Event_Queue extends Supports_Errors {
 		if ( ! $this->is_enabled() ) {
 			return 0;
 		}
+
+		$this->cleanup_unprocessed_events();
 
 		$this->store = new Event_Store();
 
