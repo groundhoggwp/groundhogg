@@ -29,3 +29,14 @@
 .start-search{
     padding-left: 15px;
 }
+
+.wp-list-table #first_name,
+.wp-list-table #user_id,
+.wp-list-table #owner_id,
+.wp-list-table #last_name{
+    width: 125px;
+}
+
+.wp-list-table #date_created{
+    width: 200px;
+}

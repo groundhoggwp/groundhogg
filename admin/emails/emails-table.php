@@ -9,6 +9,7 @@ use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
 use Groundhogg\Plugin;
 use WP_List_Table;
+use function Groundhogg\scheduled_time_column;
 
 /**
  * Emails Table Class
@@ -248,18 +249,8 @@ class Emails_Table extends WP_List_Table {
 	 * @return string
 	 */
 	protected function column_date_created( $email ) {
-		$dc_time     = mysql2date( 'U', $email->get_date_created() );
-		$cur_time    = (int) current_time( 'timestamp' );
-		$time_diff   = $dc_time - $cur_time;
-		$time_prefix = __( 'Created' );
-
-		if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ) {
-			$time = date_i18n( 'Y/m/d \@ h:i A', intval( $dc_time ) );
-		} else {
-			$time = sprintf( "%s ago", human_time_diff( $dc_time, $cur_time ) );
-		}
-
-		return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $dc_time ) ) . '">' . $time . '</abbr>';
+		$ds_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $email->get_date_created() ) );
+		return scheduled_time_column( $ds_time, false, false, false );
 	}
 
 	/**
@@ -268,18 +259,8 @@ class Emails_Table extends WP_List_Table {
 	 * @return string
 	 */
 	protected function column_last_updated( $email ) {
-		$lu_time     = mysql2date( 'U', $email->get_last_updated() );
-		$cur_time    = (int) current_time( 'timestamp' );
-		$time_diff   = $lu_time - $cur_time;
-		$time_prefix = __( 'Updated', 'groundhogg' );
-
-		if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ) {
-			$time = date_i18n( 'Y/m/d \@ h:i A', intval( $lu_time ) );
-		} else {
-			$time = sprintf( "%s ago", human_time_diff( $lu_time, $cur_time ) );
-		}
-
-		return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $lu_time ) ) . '">' . $time . '</abbr>';
+		$ds_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $email->get_last_updated() ) );
+		return scheduled_time_column( $ds_time, false, false, false );
 	}
 
 	/**

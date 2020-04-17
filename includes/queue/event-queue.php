@@ -147,11 +147,12 @@ class Event_Queue extends Supports_Errors {
 	 */
 	public function run_queue() {
 
-		if ( ! $this->is_enabled() ) {
+		// Let's make sure we are not over doing it.
+		if ( ! $this->is_enabled() || Limits::limits_exceeded() ) {
 			return 0;
 		}
 
-		$start = Limits::start();
+		Limits::start();
 
 		Limits::raise_memory_limit();
 		Limits::raise_time_limit();
@@ -167,8 +168,8 @@ class Event_Queue extends Supports_Errors {
 
 		$result = $this->process();
 
-		$end          = microtime( true );
-		$process_time = $end - $start;
+		$process_time = round( Limits::time_elapsed(), 2 );
+		Limits::stop();
 
 		if ( $result > 0 ) {
 			$this->log( sprintf( "%s - %d events have been completed in %s seconds.", $thread_id, $result, $process_time ) );
@@ -195,6 +196,8 @@ class Event_Queue extends Supports_Errors {
 	 * Recursive, Iterate through the list of events and process them via the EVENTS api
 	 * completes successive events quite since WP-Cron only happens once every 5 or 10 minutes depending on
 	 * the amount of traffic.
+	 *
+	 * @param int $completed_events
 	 *
 	 * @return int the number of events process, 0 if no events.
 	 */
@@ -263,8 +266,9 @@ class Event_Queue extends Supports_Errors {
 			}
 
 			$completed_events += 1;
+			Limits::processed_action();
 
-		} while ( ! empty( $event_ids ) && ! Limits::limits_exceeded( $completed_events ) );
+		} while ( ! empty( $event_ids ) && ! Limits::limits_exceeded() );
 
 		$this->store->release_events( $claim );
 

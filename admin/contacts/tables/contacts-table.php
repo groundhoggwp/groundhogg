@@ -18,6 +18,7 @@ use \WP_List_Table;
 use Groundhogg\Plugin;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
+use function Groundhogg\scheduled_time_column;
 
 
 /**
@@ -177,7 +178,7 @@ class Contacts_Table extends WP_List_Table {
 			'last_name'    => _x( 'Last Name', 'Column label', 'groundhogg' ),
 			'user_id'      => _x( 'Username', 'Column label', 'groundhogg' ),
 			'owner_id'     => _x( 'Owner', 'Column label', 'groundhogg' ),
-			'date_created' => _x( 'Date', 'Column label', 'groundhogg' ),
+			'date_created' => _x( 'Date Created', 'Column label', 'groundhogg' ),
 		);
 
 		return apply_filters( 'groundhogg_contact_columns', $columns );
@@ -390,16 +391,9 @@ class Contacts_Table extends WP_List_Table {
 	 */
 	protected function column_date_created( $contact ) {
 		$dc_time     = mysql2date( 'U', $contact->get_date_created() );
-		$cur_time    = (int) current_time( 'timestamp' );
-		$time_diff   = $dc_time - $cur_time;
-		$time_prefix = __( 'Created', 'groundhogg' );
-		if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ) {
-			$time = date_i18n( get_date_time_format(), intval( $dc_time ) );
-		} else {
-			$time = sprintf( "%s ago", human_time_diff( $dc_time, $cur_time ) );
-		}
+		$dc_time     = Plugin::instance()->utils->date_time->convert_to_utc_0( $dc_time );
 
-		return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $dc_time ) ) . '">' . $time . '</abbr>';
+		return scheduled_time_column( $dc_time, false, false, false );
 	}
 
 	/**

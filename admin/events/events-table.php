@@ -13,6 +13,7 @@ use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
 use function Groundhogg\scheduled_time;
 use \WP_List_Table;
+use function Groundhogg\scheduled_time_column;
 
 /**
  * Events Table Class
@@ -178,15 +179,7 @@ class Events_Table extends WP_List_Table {
 				break;
 		}
 
-		$time = scheduled_time( $event->get_time() );
-
-		$html = $time_prefix . '&nbsp;<abbr title="' . date_i18n( get_date_time_format(), intval( $event->get_time() ) ) . '">' . $time . '</abbr>';
-
-		if ( $event->get_contact() && $event->get_contact()->exists() ) {
-			$html .= sprintf( '<br><i>(%s %s)', date_i18n( get_option( 'time_format' ), $event->get_contact()->get_local_time( $event->get_time() ) ), __( 'local time' ) ) . '</i>';
-		}
-
-		return $html;
+		return $time_prefix . '&nbsp;' . scheduled_time_column( $event->get_time(), true, $event->get_contact() );
 	}
 
 	/**

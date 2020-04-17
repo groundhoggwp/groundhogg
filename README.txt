@@ -177,6 +177,13 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.1.13.16 (2020-04-16) =
+* ADDED Option to enable beta versions of Groundhogg extensions!
+* TWEAKED Updated limits utils class to allow for multiple synchronous processes.
+* TWEAKED Auto cleanup the events table to allow for "stuck" events to be completed.
+* TWEAKED Sending speed statistic shows more accurate speed now.
+* FIXED tools debug log throwing a time limit error.
+
 = 2.1.13.15 (2020-04-14) =
 * FIXED Bug causing Groundhogg tables to be deleted on main site when deleting a subsite in some cases (only on multisite).
 

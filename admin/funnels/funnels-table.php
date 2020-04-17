@@ -1,4 +1,5 @@
 <?php
+
 namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Funnel;
@@ -16,6 +17,7 @@ use Groundhogg\Admin\Funnels\Funnels_Page;
 use Groundhogg\Manager;
 
 use function Groundhogg\get_request_var;
+use function Groundhogg\scheduled_time_column;
 
 
 /**
@@ -31,346 +33,330 @@ use function Groundhogg\get_request_var;
  */
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 // WP_List_Table is not loaded automatically so we need to load it in our application
-if( ! class_exists( 'WP_List_Table' ) ) {
-    require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
+if ( ! class_exists( 'WP_List_Table' ) ) {
+	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
 class Funnels_Table extends WP_List_Table {
 
-    /**
-     * TT_Example_List_Table constructor.
-     *
-     * REQUIRED. Set up a constructor that references the parent constructor. We
-     * use the parent reference to set some default configs.
-     */
-    public function __construct() {
-        // Set parent defaults.
-        parent::__construct( array(
-            'singular' => 'funnel',     // Singular name of the listed records.
-            'plural'   => 'funnels',    // Plural name of the listed records.
-            'ajax'     => false,       // Does this table support ajax?
-        ) );
-    }
-    /**
-     * Get a list of columns. The format is:
-     * 'internal-name' => 'Title'
-     *
-     * bulk steps or checkboxes, simply leave the 'cb' entry out of your array.
-     *
-     * @see WP_List_Table::::single_row_columns()
-     * @return array An associative array containing column information.
-     */
-    public function get_columns() {
-
-        $columns = array(
-            'cb'                => '<input type="checkbox" />', // Render a checkbox instead of text.
-            'title'             => _x( 'Title', 'Column label', 'groundhogg' ),
-            'active_contacts'   => _x( 'Active Contacts', 'Column label', 'groundhogg' ),
-            'last_updated'      => _x( 'Last Updated', 'Column label', 'groundhogg' ),
-            'date_created'      => _x( 'Date Created', 'Column label', 'groundhogg' ),
-        );
-
-        return apply_filters( 'groundhogg_funnels_get_columns', $columns );
-    }
-    /**
-     * Get a list of sortable columns. The format is:
-     * 'internal-name' => 'orderby'
-     * or
-     * 'internal-name' => array( 'orderby', true )
-     *
-     * @return array An associative array containing all the columns that should be sortable.
-     */
-    protected function get_sortable_columns() {
-
-        $sortable_columns = array(
-            'title'             => array( 'title', false ),
-            'active_contacts'   => array( 'active_contacts', false ),
-            'last_updated'      => array( 'last_updated', false ),
-            'date_created'      => array( 'date_created', false )
-        );
-
-        return apply_filters( 'groundhogg_funnels_get_sortable_columns', $sortable_columns );
-    }
-
-    /**
-     * Get the views for the emails, all, ready, unready, trash
-     *
-     * @return array
-     */
-    protected function get_views()
-    {
-        $views =  array();
-
-        $count = array(
-            'active'    => Plugin::$instance->dbs->get_db('funnels')->count( array( 'status' => 'active' ) ),
-            'inactive'  => Plugin::$instance->dbs->get_db('funnels')->count( array( 'status' => 'inactive' ) ),
-            'archived'  => Plugin::$instance->dbs->get_db('funnels')->count( array( 'status' => 'archived' ) )
-        );
-
-        $views['active'] = "<a class='" .  print_r( ( $this->get_view() === 'active' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&status=active' ) . "'>" . _x( 'Active', 'view', 'groundhogg'  ) . " <span class='count'>(" . $count[ 'active' ] . ")</span>" . "</a>";
-        $views['inactive'] = "<a class='" .  print_r( ( $this->get_view() === 'inactive' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&status=inactive' ) . "'>" . _x( 'Inactive', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'inactive' ] . ")</span>" . "</a>";
-        $views['archived'] = "<a class='" .  print_r( ( $this->get_view() === 'archived' )? 'current' : '' , true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&status=archived' ) . "'>" . _x( 'Archived', 'view', 'groundhogg' ) . " <span class='count'>(" . $count[ 'archived' ] . ")</span>" . "</a>";
-
-        return apply_filters(  'groundhogg_funnel_views', $views );
-    }
-
-    protected function get_view()
-    {
-        return sanitize_text_field( get_request_var( 'status', 'active' ) );
-    }
+	/**
+	 * TT_Example_List_Table constructor.
+	 *
+	 * REQUIRED. Set up a constructor that references the parent constructor. We
+	 * use the parent reference to set some default configs.
+	 */
+	public function __construct() {
+		// Set parent defaults.
+		parent::__construct( array(
+			'singular' => 'funnel',     // Singular name of the listed records.
+			'plural'   => 'funnels',    // Plural name of the listed records.
+			'ajax'     => false,       // Does this table support ajax?
+		) );
+	}
 
 	/**
-     * Get default row steps...
-     *
-     * @param $funnel Funnel
-     * @return string a list of steps
-     */
-    protected function handle_row_actions( $funnel, $column_name, $primary )
-    {
-        if ( $primary !== $column_name ) {
-            return '';
-        }
+	 * Get a list of columns. The format is:
+	 * 'internal-name' => 'Title'
+	 *
+	 * bulk steps or checkboxes, simply leave the 'cb' entry out of your array.
+	 *
+	 * @return array An associative array containing column information.
+	 * @see WP_List_Table::::single_row_columns()
+	 */
+	public function get_columns() {
 
-        $actions = array();
-        $id = $funnel->get_id();
+		$columns = array(
+			'cb'              => '<input type="checkbox" />', // Render a checkbox instead of text.
+			'title'           => _x( 'Title', 'Column label', 'groundhogg' ),
+			'active_contacts' => _x( 'Active Contacts', 'Column label', 'groundhogg' ),
+			'last_updated'    => _x( 'Last Updated', 'Column label', 'groundhogg' ),
+			'date_created'    => _x( 'Date Created', 'Column label', 'groundhogg' ),
+		);
 
-        $editUrl = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel->ID );
+		return apply_filters( 'groundhogg_funnels_get_columns', $columns );
+	}
 
-        $editUrlClassic = add_query_arg( [
-            'version' => 1
-        ], $editUrl );
+	/**
+	 * Get a list of sortable columns. The format is:
+	 * 'internal-name' => 'orderby'
+	 * or
+	 * 'internal-name' => array( 'orderby', true )
+	 *
+	 * @return array An associative array containing all the columns that should be sortable.
+	 */
+	protected function get_sortable_columns() {
 
-        if ( $this->get_view() === 'archived' ) {
-            $actions[ 'restore' ] = "<span class='restore'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=restore&funnel='. $id ), 'restore'  ). "'>" . _x( 'Restore', 'action', 'groundhogg'  ) . "</a></span>";
-            $actions[ 'delete' ] = "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=archived&action=delete&funnel='. $id ), 'delete'  ). "'>" . _x( 'Delete Permanently', 'action', 'groundhogg'  ) . "</a></span>";
-        } else {
+		$sortable_columns = array(
+			'title'           => array( 'title', false ),
+			'active_contacts' => array( 'active_contacts', false ),
+			'last_updated'    => array( 'last_updated', false ),
+			'date_created'    => array( 'date_created', false )
+		);
 
-            if ( ! is_option_enabled( 'gh_use_classic_builder' ) ){
-                $actions[ 'edit' ] = "<span class='edit'><a href='" . $editUrl . "'>" . __( 'Build' ) . "</a></span>";
-            } else {
-                $actions[ 'edit' ] = "<span class='edit'><a href='" . $editUrlClassic . "'>" . __( 'Build' ) . "</a></span>";
-                $actions[ 'edit-v2' ] = "<span class='edit'><a href='" . $editUrl . "'>" . __( 'Build (v2)' ) . "</a></span>";
-            }
+		return apply_filters( 'groundhogg_funnels_get_sortable_columns', $sortable_columns );
+	}
 
-            $actions[ 'duplicate' ] = "<span class='duplicate'><a href='" .  wp_nonce_url(admin_url( 'admin.php?page=gh_funnels&action=duplicate&funnel='. $id ), 'duplicate' ). "'>" . _x( 'Duplicate', 'action', 'groundhogg' ) . "</a></span>";
-            $actions[ 'export' ] = "<span class='export'><a href='" . $funnel->export_url() . "'>" . _x( 'Export', 'action', 'groundhogg' ) . "</a></span>";
-            $actions[ 'trash' ] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=archive&funnel='. $id ), 'archive' ). "'>" . __( 'Archive', 'action', 'groundhogg' ) . "</a></span>";
-        }
+	/**
+	 * Get the views for the emails, all, ready, unready, trash
+	 *
+	 * @return array
+	 */
+	protected function get_views() {
+		$views = array();
 
-        return $this->row_actions( apply_filters( 'groundhogg_funnel_row_actions', $actions, $funnel, $column_name ) );
-    }
+		$count = array(
+			'active'   => Plugin::$instance->dbs->get_db( 'funnels' )->count( array( 'status' => 'active' ) ),
+			'inactive' => Plugin::$instance->dbs->get_db( 'funnels' )->count( array( 'status' => 'inactive' ) ),
+			'archived' => Plugin::$instance->dbs->get_db( 'funnels' )->count( array( 'status' => 'archived' ) )
+		);
 
-    protected function column_title( $funnel )
-    {
-        $subject = ( ! $funnel->title )? '(' . __( 'no title' ) . ')' : $funnel->title ;
+		$views['active']   = "<a class='" . print_r( ( $this->get_view() === 'active' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&status=active' ) . "'>" . _x( 'Active', 'view', 'groundhogg' ) . " <span class='count'>(" . $count['active'] . ")</span>" . "</a>";
+		$views['inactive'] = "<a class='" . print_r( ( $this->get_view() === 'inactive' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&status=inactive' ) . "'>" . _x( 'Inactive', 'view', 'groundhogg' ) . " <span class='count'>(" . $count['inactive'] . ")</span>" . "</a>";
+		$views['archived'] = "<a class='" . print_r( ( $this->get_view() === 'archived' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&status=archived' ) . "'>" . _x( 'Archived', 'view', 'groundhogg' ) . " <span class='count'>(" . $count['archived'] . ")</span>" . "</a>";
 
-        $editUrl = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel->ID );
+		return apply_filters( 'groundhogg_funnel_views', $views );
+	}
 
-        if ( is_option_enabled( 'gh_use_classic_builder' ) ) {
-            $editUrl = add_query_arg( [
-                'version' => 1
-            ], $editUrl );
-        }
+	protected function get_view() {
+		return sanitize_text_field( get_request_var( 'status', 'active' ) );
+	}
 
-        if ( $this->get_view() === 'archived' ){
-            $html = "<strong>{$subject}</strong>";
-        } else {
-            $html = "<strong>";
+	/**
+	 * Get default row steps...
+	 *
+	 * @param $funnel Funnel
+	 *
+	 * @return string a list of steps
+	 */
+	protected function handle_row_actions( $funnel, $column_name, $primary ) {
+		if ( $primary !== $column_name ) {
+			return '';
+		}
 
-            $html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
+		$actions = array();
+		$id      = $funnel->get_id();
 
-            if ( $funnel->status === 'inactive' ){
-                $html .= " &#x2014; " . "<span class='post-state'>(" . _x( 'Inactive', 'status', 'groundhogg' ) . ")</span>";
-            }
-        }
-        $html .= "</strong>";
+		$editUrl = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel->ID );
 
-        return $html;
-    }
+		$editUrlClassic = add_query_arg( [
+			'version' => 1
+		], $editUrl );
 
-    /**
-     * @param $funnel Funnel
-     * @return string
-     */
-    protected function column_active_contacts( $funnel )
-    {
+		if ( $this->get_view() === 'archived' ) {
+			$actions['restore'] = "<span class='restore'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=restore&funnel=' . $id ), 'restore' ) . "'>" . _x( 'Restore', 'action', 'groundhogg' ) . "</a></span>";
+			$actions['delete']  = "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=archived&action=delete&funnel=' . $id ), 'delete' ) . "'>" . _x( 'Delete Permanently', 'action', 'groundhogg' ) . "</a></span>";
+		} else {
 
-        $query  = new Contact_Query();
+			if ( ! is_option_enabled( 'gh_use_classic_builder' ) ) {
+				$actions['edit'] = "<span class='edit'><a href='" . $editUrl . "'>" . __( 'Build' ) . "</a></span>";
+			} else {
+				$actions['edit']    = "<span class='edit'><a href='" . $editUrlClassic . "'>" . __( 'Build' ) . "</a></span>";
+				$actions['edit-v2'] = "<span class='edit'><a href='" . $editUrl . "'>" . __( 'Build (v2)' ) . "</a></span>";
+			}
 
-        $query_args = [
-            'report' => array(
-                'funnel'    => $funnel->get_id(),
-                'status'    => 'waiting'
-            )
-        ];
+			$actions['duplicate'] = "<span class='duplicate'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&action=duplicate&funnel=' . $id ), 'duplicate' ) . "'>" . _x( 'Duplicate', 'action', 'groundhogg' ) . "</a></span>";
+			$actions['export']    = "<span class='export'><a href='" . $funnel->export_url() . "'>" . _x( 'Export', 'action', 'groundhogg' ) . "</a></span>";
+			$actions['trash']     = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=all&action=archive&funnel=' . $id ), 'archive' ) . "'>" . __( 'Archive', 'action', 'groundhogg' ) . "</a></span>";
+		}
 
+		return $this->row_actions( apply_filters( 'groundhogg_funnel_row_actions', $actions, $funnel, $column_name ) );
+	}
 
-        $count = $query->query( array_merge( [ 'count' => true ], $query_args ) );
+	protected function column_title( $funnel ) {
+		$subject = ( ! $funnel->title ) ? '(' . __( 'no title' ) . ')' : $funnel->title;
 
-        $queryUrl = admin_page_url( 'gh_contacts', $query_args );
+		$editUrl = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel->ID );
 
-        return "<a href='$queryUrl'>$count</a>";
-    }
+		if ( is_option_enabled( 'gh_use_classic_builder' ) ) {
+			$editUrl = add_query_arg( [
+				'version' => 1
+			], $editUrl );
+		}
+
+		if ( $this->get_view() === 'archived' ) {
+			$html = "<strong>{$subject}</strong>";
+		} else {
+			$html = "<strong>";
+
+			$html .= "<a class='row-title' href='$editUrl'>{$subject}</a>";
+
+			if ( $funnel->status === 'inactive' ) {
+				$html .= " &#x2014; " . "<span class='post-state'>(" . _x( 'Inactive', 'status', 'groundhogg' ) . ")</span>";
+			}
+		}
+		$html .= "</strong>";
+
+		return $html;
+	}
 
 	/**
 	 * @param $funnel Funnel
 	 *
 	 * @return string
 	 */
-    protected function column_last_updated( $funnel )
-    {
-        $lu_time = mysql2date( 'U', $funnel->last_updated );
-        $cur_time = (int) current_time( 'timestamp' );
-        $time_diff = $lu_time - $cur_time;
-        $time_prefix = _x( 'Updated', 'status', 'groundhogg' );
-        if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
-            $time = date_i18n( 'Y/m/d \@ h:i A', intval( $lu_time ) );
-        } else {
-            $time = sprintf( _x( "%s ago" , 'status', 'groundhogg'), human_time_diff( $lu_time, $cur_time ) );
-        }
-        return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $lu_time ) ) . '">' . $time . '</abbr>';
-    }
+	protected function column_active_contacts( $funnel ) {
+
+		$query = new Contact_Query();
+
+		$query_args = [
+			'report' => array(
+				'funnel' => $funnel->get_id(),
+				'status' => 'waiting'
+			)
+		];
+
+
+		$count = $query->query( array_merge( [ 'count' => true ], $query_args ) );
+
+		$queryUrl = admin_page_url( 'gh_contacts', $query_args );
+
+		return "<a href='$queryUrl'>$count</a>";
+	}
 
 	/**
 	 * @param $funnel Funnel
 	 *
 	 * @return string
 	 */
-    protected function column_date_created( $funnel )
-    {
-        $dc_time = mysql2date( 'U', $funnel->date_created );
-        $cur_time = (int) current_time( 'timestamp' );
-        $time_diff = $dc_time - $cur_time;
-        $time_prefix = _x( 'Created', 'status', 'created' );
-        if ( absint( $time_diff ) > 24 * HOUR_IN_SECONDS ){
-            $time = date_i18n( 'Y/m/d \@ h:i A', intval( $dc_time ) );
-        } else {
-            $time = sprintf(  _x( "%s ago" , 'status', 'groundhogg'), human_time_diff( $dc_time, $cur_time ) );
-        }
-        return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $dc_time ) ) . '">' . $time . '</abbr>';
-    }
+	protected function column_last_updated( $funnel ) {
+		$ds_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $funnel->last_updated ) );
+		return scheduled_time_column( $ds_time, false, false, false );
+	}
 
-    /**
-     * For more detailed insight into how columns are handled, take a look at
-     * WP_List_Table::single_row_columns()
-     *
-     * @param object $funnel        A singular item (one full row's worth of data).
-     * @param string $column_name The name/slug of the column to be processed.
-     * @return string Text or HTML to be placed inside the column <td>.
-     */
-    protected function column_default( $funnel, $column_name ) {
+	/**
+	 * @param $funnel Funnel
+	 *
+	 * @return string
+	 */
+	protected function column_date_created( $funnel ) {
+		$ds_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $funnel->date_created ) );
+		return scheduled_time_column( $ds_time, false, false, false );
+	}
 
-        do_action( 'groundhogg_funnels_custom_column', $funnel, $column_name );
+	/**
+	 * For more detailed insight into how columns are handled, take a look at
+	 * WP_List_Table::single_row_columns()
+	 *
+	 * @param object $funnel A singular item (one full row's worth of data).
+	 * @param string $column_name The name/slug of the column to be processed.
+	 *
+	 * @return string Text or HTML to be placed inside the column <td>.
+	 */
+	protected function column_default( $funnel, $column_name ) {
 
-        return '';
+		do_action( 'groundhogg_funnels_custom_column', $funnel, $column_name );
 
-    }
+		return '';
 
-    /**
-     * Get value for checkbox column.
-     *
-     * @param  $funnel Funnel A singular item (one full row's worth of data).
-     * @return string Text to be placed inside the column <td>.
-     */
-    protected function column_cb( $funnel ) {
-        return sprintf(
-            '<input type="checkbox" name="%1$s[]" value="%2$s" />',
-            $this->_args['singular'],  // Let's simply repurpose the table's singular label ("movie").
-            $funnel->get_id()                // The value of the checkbox should be the record's ID.
-        );
-    }
+	}
 
-    /**
-     * Get an associative array ( option_name => option_title ) with the list
-     * of bulk steps available on this table.
-     *
-     * @return array An associative array containing all the bulk steps.
-     */
-    protected function get_bulk_actions() {
+	/**
+	 * Get value for checkbox column.
+	 *
+	 * @param  $funnel Funnel A singular item (one full row's worth of data).
+	 *
+	 * @return string Text to be placed inside the column <td>.
+	 */
+	protected function column_cb( $funnel ) {
+		return sprintf(
+			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
+			$this->_args['singular'],  // Let's simply repurpose the table's singular label ("movie").
+			$funnel->get_id()                // The value of the checkbox should be the record's ID.
+		);
+	}
 
-        if ( $this->get_view() === 'archived' )
-        {
-            $actions = array(
-                'delete' => _x( 'Delete Permanently', 'List table bulk action', 'groundhogg' ),
-                'restore' => _x( 'Restore', 'List table bulk action', 'groundhogg' )
-            );
+	/**
+	 * Get an associative array ( option_name => option_title ) with the list
+	 * of bulk steps available on this table.
+	 *
+	 * @return array An associative array containing all the bulk steps.
+	 */
+	protected function get_bulk_actions() {
 
-        } else {
-            $actions = array(
-                'archive' => _x( 'Archive', 'List table bulk action', 'groundhogg' )
-            );
-        }
+		if ( $this->get_view() === 'archived' ) {
+			$actions = array(
+				'delete'  => _x( 'Delete Permanently', 'List table bulk action', 'groundhogg' ),
+				'restore' => _x( 'Restore', 'List table bulk action', 'groundhogg' )
+			);
 
-        return apply_filters( 'groundhogg_email_bulk_actions', $actions );
-    }
+		} else {
+			$actions = array(
+				'archive' => _x( 'Archive', 'List table bulk action', 'groundhogg' )
+			);
+		}
 
-    /**
-     * Prepares the list of items for displaying.
-     *
-     * REQUIRED! This is where you prepare your data for display. This method will
-     *
-     * @global $wpdb \wpdb
-     * @uses $this->_column_headers
-     * @uses $this->items
-     * @uses $this->get_columns()
-     * @uses $this->get_sortable_columns()
-     * @uses $this->get_pagenum()
-     * @uses $this->set_pagination_args()
-     */
-    function prepare_items() {
+		return apply_filters( 'groundhogg_email_bulk_actions', $actions );
+	}
 
-        $columns  = $this->get_columns();
-        $hidden   = array(); // No hidden columns
-        $sortable = $this->get_sortable_columns();
+	/**
+	 * Prepares the list of items for displaying.
+	 *
+	 * REQUIRED! This is where you prepare your data for display. This method will
+	 *
+	 * @global $wpdb \wpdb
+	 * @uses $this->_column_headers
+	 * @uses $this->items
+	 * @uses $this->get_columns()
+	 * @uses $this->get_sortable_columns()
+	 * @uses $this->get_pagenum()
+	 * @uses $this->set_pagination_args()
+	 */
+	function prepare_items() {
 
-        $this->_column_headers = array( $columns, $hidden, $sortable );
+		$columns  = $this->get_columns();
+		$hidden   = array(); // No hidden columns
+		$sortable = $this->get_sortable_columns();
 
-        $per_page = absint( get_url_var( 'limit', get_screen_option( 'per_page' ) ) );
-        $paged   = $this->get_pagenum();
-        $offset  = $per_page * ( $paged - 1 );
-        $search  = get_url_var( 's' );
-        $order   = get_url_var( 'order', 'DESC' );
-        $orderby = get_url_var( 'orderby', 'ID' );
+		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $where = [
-            'relationship' => "AND",
-            [ 'col' => 'status', 'val' => $this->get_view(), 'compare' => '=' ],
-        ];
+		$per_page = absint( get_url_var( 'limit', get_screen_option( 'per_page' ) ) );
+		$paged    = $this->get_pagenum();
+		$offset   = $per_page * ( $paged - 1 );
+		$search   = get_url_var( 's' );
+		$order    = get_url_var( 'order', 'DESC' );
+		$orderby  = get_url_var( 'orderby', 'ID' );
 
-        $args = array(
-            'where'   => $where,
-            'search'  => $search,
-            'limit'   => $per_page,
-            'offset'  => $offset,
-            'order'   => $order,
-            'orderby' => $orderby,
-        );
+		$where = [
+			'relationship' => "AND",
+			[ 'col' => 'status', 'val' => $this->get_view(), 'compare' => '=' ],
+		];
 
-        $events = get_db( 'funnels' )->query( $args );
-        $total = get_db( 'funnels' )->count( $args );
+		$args = array(
+			'where'   => $where,
+			'search'  => $search,
+			'limit'   => $per_page,
+			'offset'  => $offset,
+			'order'   => $order,
+			'orderby' => $orderby,
+		);
 
-        $this->items = $events;
+		$events = get_db( 'funnels' )->query( $args );
+		$total  = get_db( 'funnels' )->count( $args );
 
-        // Add condition to be sure we don't divide by zero.
-        // If $this->per_page is 0, then set total pages to 1.
-        $total_pages = $per_page ? ceil( (int) $total / (int) $per_page ) : 1;
+		$this->items = $events;
 
-        $this->set_pagination_args( array(
-            'total_items' => $total,
-            'per_page'    => $per_page,
-            'total_pages' => $total_pages,
-        ) );
-    }
+		// Add condition to be sure we don't divide by zero.
+		// If $this->per_page is 0, then set total pages to 1.
+		$total_pages = $per_page ? ceil( (int) $total / (int) $per_page ) : 1;
 
-    /**
-     * @param object $item
-     */
-    public function single_row( $item ) {
-        echo '<tr>';
-        $this->single_row_columns( new Funnel( $item->ID ) );
-        echo '</tr>';
-    }
+		$this->set_pagination_args( array(
+			'total_items' => $total,
+			'per_page'    => $per_page,
+			'total_pages' => $total_pages,
+		) );
+	}
+
+	/**
+	 * @param object $item
+	 */
+	public function single_row( $item ) {
+		echo '<tr>';
+		$this->single_row_columns( new Funnel( $item->ID ) );
+		echo '</tr>';
+	}
 }

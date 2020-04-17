@@ -557,6 +557,20 @@ class Settings_Page extends Admin_Page
                     'value' => 'on',
                 ),
             ),
+            'gh_get_beta_versions' => array(
+                'id' => 'gh_get_beta_versions',
+                'section' => 'misc_info',
+                'label' => _x('Get updates for pre-release versions of extensions!', 'settings', 'groundhogg'),
+                'desc' => _x('This will show automatic updates or extensions which may have experimental features.', 'settings', 'groundhogg'),
+                'type' => 'checkbox',
+                'atts' => array(
+                    'label' => __('Enable'),
+                    //keep brackets for backwards compat
+                    'name' => 'gh_get_beta_versions',
+                    'id' => 'gh_get_beta_versions',
+                    'value' => 'on',
+                ),
+            ),
             'gh_affiliate_id' => array(
                 'id' => 'gh_affiliate_id',
                 'section' => 'affiliate',

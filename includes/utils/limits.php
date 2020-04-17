@@ -2,20 +2,74 @@
 
 namespace Groundhogg\Utils;
 
+use function Groundhogg\micro_seconds;
+
 class Limits {
 
 	/**
 	 * @var int
 	 */
 	protected static $start_time = 0;
+	protected static $processed_actions = 0;
+	protected static $total_processed_actions = 0;
+	protected static $total_time_elapsed = 0;
+	protected static $limits_exceeded = false;
+
 
 	/**
 	 * Start the function to prevent limits exceeding.
 	 */
 	public static function start() {
-		self::$start_time = time();
+
+		// Only set once.
+		if ( ! self::$start_time ) {
+			self::$start_time = microtime( true );
+		}
 
 		return self::$start_time;
+	}
+
+	/**
+	 * Store the elapsed time and reset variables.
+	 */
+	public static function stop() {
+
+		self::$total_time_elapsed += self::time_elapsed();
+
+		self::$processed_actions = 0;
+		self::$start_time        = 0;
+	}
+
+	/**
+	 * Increment the process actions variable.
+	 */
+	public static function processed_action() {
+		self::$processed_actions ++;
+		self::$total_processed_actions ++;
+	}
+
+	/**
+	 * The total time since limits was started.
+	 *
+	 * @return float|int
+	 */
+	public static function total_time_elapsed() {
+		return self::$total_time_elapsed + self::time_elapsed();
+	}
+
+
+	/**
+	 * Return the time elapsed from the moment Limits was started.
+	 *
+	 * @return float|int|string
+	 */
+	public static function time_elapsed() {
+
+		if ( ! self::$start_time ) {
+			return 0;
+		}
+
+		return microtime( true ) - self::$start_time;
 	}
 
 	/**
@@ -27,6 +81,7 @@ class Limits {
 	 * @link https://secure.php.net/manual/en/faq.using.php#faq.using.shorthandbytes
 	 *
 	 * @param string $value A (PHP ini) byte value, either shorthand or ordinary.
+	 *
 	 * @return int An integer byte value.
 	 */
 	public static function convert_hr_to_bytes( $value ) {
@@ -66,7 +121,7 @@ class Limits {
 		$current_limit     = @ini_get( 'memory_limit' );
 		$current_limit_int = self::convert_hr_to_bytes( $current_limit );
 
-		if ( -1 === $current_limit_int ) {
+		if ( - 1 === $current_limit_int ) {
 			return false;
 		}
 
@@ -75,19 +130,20 @@ class Limits {
 		$filtered_limit     = apply_filters( 'admin_memory_limit', $wp_max_limit );
 		$filtered_limit_int = self::convert_hr_to_bytes( $filtered_limit );
 
-		if ( -1 === $filtered_limit_int || ( $filtered_limit_int > $wp_max_limit_int && $filtered_limit_int > $current_limit_int ) ) {
+		if ( - 1 === $filtered_limit_int || ( $filtered_limit_int > $wp_max_limit_int && $filtered_limit_int > $current_limit_int ) ) {
 			if ( false !== @ini_set( 'memory_limit', $filtered_limit ) ) {
 				return $filtered_limit;
 			} else {
 				return false;
 			}
-		} elseif ( -1 === $wp_max_limit_int || $wp_max_limit_int > $current_limit_int ) {
+		} elseif ( - 1 === $wp_max_limit_int || $wp_max_limit_int > $current_limit_int ) {
 			if ( false !== @ini_set( 'memory_limit', $wp_max_limit ) ) {
 				return $wp_max_limit;
 			} else {
 				return false;
 			}
 		}
+
 		return false;
 	}
 
@@ -100,10 +156,9 @@ class Limits {
 	 */
 	public static function raise_time_limit( $limit = 0 ) {
 
-		if ( ! $limit ){
+		if ( ! $limit ) {
 			$limit = self::get_time_limit();
 		}
-
 
 		if ( $limit < ini_get( 'max_execution_time' ) ) {
 			return;
@@ -122,7 +177,9 @@ class Limits {
 	 * @return int The number of seconds.
 	 */
 	public static function get_execution_time() {
-		$execution_time = microtime( true ) - self::$start_time;
+
+		// Sum up all the process if self::stop() is used.
+		$execution_time = self::total_time_elapsed();
 
 		// Get the CPU time if the hosting environment uses it rather than wall-clock time to calculate a process's execution time.
 		if ( function_exists( 'getrusage' ) && apply_filters( 'action_scheduler_use_cpu_execution_time', defined( 'PANTHEON_ENVIRONMENT' ) ) ) {
@@ -140,19 +197,20 @@ class Limits {
 	/**
 	 * Check if the host's max execution time is (likely) to be exceeded if processing more actions.
 	 *
-	 * @param int $processed_actions The number of actions processed so far - used to determine the likelihood of exceeding the time limit if processing another action
-	 *
 	 * @return bool
 	 */
-	public static function time_likely_to_be_exceeded( $processed_actions ) {
+	public static function time_likely_to_be_exceeded() {
 
-		$execution_time        = self::get_execution_time();
-		$max_execution_time    = self::get_time_limit();
-		$time_per_action       = $execution_time / $processed_actions;
-		$estimated_time        = $execution_time + ( $time_per_action * 3 );
-		$likely_to_be_exceeded = $estimated_time > $max_execution_time;
+		if ( ! self::$total_processed_actions ) {
+			return false;
+		}
 
-		return $likely_to_be_exceeded;
+		$execution_time     = self::get_execution_time();
+		$max_execution_time = self::get_time_limit();
+		$time_per_action    = $execution_time / self::$total_processed_actions ?: 1;
+		$estimated_time     = $execution_time + ( $time_per_action * 3 );
+
+		return $estimated_time > $max_execution_time;
 	}
 
 	/**
@@ -197,11 +255,10 @@ class Limits {
 	 */
 	public static function memory_exceeded() {
 
-		$memory_limit    = self::get_memory_limit() * 0.90;
-		$current_memory  = memory_get_usage( true );
-		$memory_exceeded = $current_memory >= $memory_limit;
+		$memory_limit   = self::get_memory_limit() * 0.90;
+		$current_memory = memory_get_usage( true );
 
-		return $memory_exceeded;
+		return $current_memory >= $memory_limit;
 	}
 
 	/**
@@ -214,14 +271,24 @@ class Limits {
 	 *
 	 * @return bool
 	 */
-	public static function limits_exceeded( $processed_actions ) {
+	public static function limits_exceeded( $processed_actions = 0 ) {
+
+		if ( self::$limits_exceeded ) {
+			return true;
+		}
+
+		if ( $processed_actions ) {
+			self::$processed_actions = $processed_actions;
+		}
 
 		// check if doing unit tests.
-		if ( defined( 'DOING_GROUNDHOGG_TESTS' ) && DOING_GROUNDHOGG_TESTS ) {
+		if ( ( defined( 'DOING_GROUNDHOGG_TESTS' ) && DOING_GROUNDHOGG_TESTS ) ) {
 			return false;
 		}
 
-		return self::memory_exceeded() || self::time_likely_to_be_exceeded( $processed_actions );
+		self::$limits_exceeded = self::memory_exceeded() || self::time_likely_to_be_exceeded();
+
+		return self::$limits_exceeded;
 	}
 
 }
