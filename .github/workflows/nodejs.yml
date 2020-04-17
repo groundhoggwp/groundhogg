@@ -3,6 +3,8 @@ on:
   push:
     tags-ignore:
       - "*.dev"
+      - "*.beta"
+      - "*.alpha"
 jobs:
   tag:
     name: New tag
