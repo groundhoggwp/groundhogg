@@ -229,11 +229,17 @@ class Main_Updater extends Updater {
 
 	/**
 	 * Add index on `claim`
+	 * create new event_queue table
+	 * migrate waiting events to the new queue
 	 *
 	 * Automatic update!
 	 */
 	public function version_2_1_14_1() {
 		get_db( 'events' )->create_table();
+//		get_db( 'event_queue' )->create_table();
+
+		// flag the upgrade notice
+		update_option( 'gh_migrate_waiting_events', 1 );
 	}
 
 	/**
@@ -284,6 +290,17 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Updates that will allow you to revert.
+	 *
+	 * @return array|string[]
+	 */
+	protected function get_optional_updates() {
+		return [
+			'2.1.13.revert'
+		];
+	}
+
+	/**
 	 * Show any required update descriptions.
 	 *
 	 * @return array|string[]
@@ -295,17 +312,6 @@ class Main_Updater extends Updater {
 			'2.1.13.6'      => __( 'Give funnel events higher priority than broadcast events.', 'groundhogg' ),
 			'2.1.13.11'     => __( 'Add micro_time column to events table for better display of events order.', 'groundhogg' ),
 			'2.1.14.1'     => __( 'Add missing index on `claim` column.', 'groundhogg' ),
-		];
-	}
-
-	/**
-	 * Updates that will allow you to revert.
-	 *
-	 * @return array|string[]
-	 */
-	protected function get_optional_updates() {
-		return [
-			'2.1.13.revert'
 		];
 	}
 }

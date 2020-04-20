@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @package     Includes
  */
-class Events_Queue_Table extends DB {
+class Event_Queue extends DB {
 
 	/**
 	 * Get the DB suffix
@@ -30,7 +30,7 @@ class Events_Queue_Table extends DB {
 	 * @return string
 	 */
 	public function get_db_suffix() {
-		return 'gh_events';
+		return 'gh_event_queue';
 	}
 
 	/**
@@ -57,7 +57,7 @@ class Events_Queue_Table extends DB {
 	 * @return string
 	 */
 	public function get_object_type() {
-		return 'event';
+		return 'event_queue_item';
 	}
 
 	/**

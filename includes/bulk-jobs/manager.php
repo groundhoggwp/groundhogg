@@ -39,6 +39,7 @@ class Manager
 
         $this->sync_contacts        = new Sync_Contacts();
         $this->migrate_form_impressions = new Migrate_Form_Impressions();
+        $this->migrate_waiting_events = new Migrate_Waiting_Events();
         $this->add_contacts_to_funnel = new Add_Contacts_To_Funnel();
         $this->create_users = new Create_Users();
         $this->process_events = new Process_Events();
