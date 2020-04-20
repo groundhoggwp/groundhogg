@@ -67,6 +67,9 @@ class Manager
         $this->submissionmeta = new Submission_Meta();
         $this->form_impressions = new Form_Impressions();
 
+        //new queue table
+	    $this->event_queue_table = new Events_Queue_Table();
+
         /**
          * Runs when the DB Manager is setup and all the standard DBs have been initialized.
          */
