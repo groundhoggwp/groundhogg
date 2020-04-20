@@ -71,6 +71,9 @@ class Event_Queue extends Supports_Errors {
 	 */
 	protected $event_ids = [];
 
+	protected $max_events = 50;
+	protected $logging_enabled = false;
+
 	/**
 	 * Setup the cron jobs
 	 * Add new short term schedule
@@ -82,10 +85,17 @@ class Event_Queue extends Supports_Errors {
 		add_action( self::WP_CRON_HOOK, [ $this, 'run_queue' ] );
 
 		// no need if gh-cron.php is installed.
-		if ( ! gh_cron_installed() ){
+		if ( ! gh_cron_installed() ) {
 			add_action( 'init', [ $this, 'setup_cron_jobs' ] );
 		}
 
+		add_action( 'init', [ $this, 'init' ] );
+
+	}
+
+	public function init(){
+		$this->max_events = apply_filters( 'groundhogg/event_queue/max_events', 50 );
+		$this->logging_enabled = apply_filters( 'groundhogg/queue/enable_logging', false );
 	}
 
 	/**
@@ -135,7 +145,7 @@ class Event_Queue extends Supports_Errors {
 	 * Delete the claim
 	 * Only for events which were scheduled to be complete but never did.
 	 */
-	protected function cleanup_unprocessed_events(){
+	protected function cleanup_unprocessed_events() {
 		global $wpdb;
 
 		$events = get_db( 'events' );
@@ -162,12 +172,12 @@ class Event_Queue extends Supports_Errors {
 		Limits::start();
 
 		Limits::raise_memory_limit();
-		Limits::raise_time_limit();
+		Limits::raise_time_limit( 10 );
 
 		$this->cleanup_unprocessed_events();
 
 		$this->store = new Event_Store();
-		$settings = Plugin::$instance->settings;
+		$settings    = Plugin::$instance->settings;
 
 		$thread_id = uniqid();
 
@@ -196,8 +206,22 @@ class Event_Queue extends Supports_Errors {
 		$settings->update_option( 'queue_times_executed', $times_executed );
 		$settings->update_option( 'average_execution_time', $average_execution_time );
 
+//		if ( $result > 0 ) {
+//
+//			$r_process_time = number_format( $process_time, 2 );
+//			$r_avg_time     = number_format( $process_time / $result, 2 );
+//
+//			wp_send_json( [
+//				'count'              => $result,
+//				'total-time'         => $r_process_time,
+//				'time-per-event' => $r_avg_time,
+//			] );
+//		}
+
 		return $result;
 	}
+
+	protected $time_per_event = [];
 
 	/**
 	 * Recursive, Iterate through the list of events and process them via the EVENTS api
@@ -210,14 +234,13 @@ class Event_Queue extends Supports_Errors {
 	 */
 	protected function process( $completed_events = 0 ) {
 
-		$max_events = apply_filters( 'groundhogg/event_queue/max_events', 50 );
-
-		$claim = $this->store->stake_claim( $max_events );
+		$claim = $this->store->stake_claim( $this->max_events );
 
 		// no events to complete
 		if ( ! $claim ) {
 			return $completed_events;
 		}
+
 
 		$event_ids = $this->store->get_events_by_claim( $claim );
 
@@ -225,7 +248,7 @@ class Event_Queue extends Supports_Errors {
 		// so let's just try and make another claim.
 		if ( empty( $event_ids ) ) {
 
-			$claim = $this->store->stake_claim( $max_events );
+			$claim = $this->store->stake_claim( $this->max_events );
 
 			// no events to complete
 			if ( ! $claim ) {
@@ -241,11 +264,12 @@ class Event_Queue extends Supports_Errors {
 			return $completed_events;
 		}
 
-		do_action( 'groundhogg/event_queue/process/before', $event_ids );
+//		do_action( 'groundhogg/event_queue/process/before', $event_ids );
 
 		self::set_is_processing( true );
 
 		do {
+
 			$event_id = array_pop( $event_ids );
 
 			$event = new Event( $event_id );
@@ -281,7 +305,7 @@ class Event_Queue extends Supports_Errors {
 
 		self::set_is_processing( false );
 
-		do_action( 'groundhogg/event_queue/process/after', $this );
+//		do_action( 'groundhogg/event_queue/process/after', $this );
 
 		if ( Limits::limits_exceeded( $completed_events ) ) {
 			return $completed_events;
@@ -364,9 +388,7 @@ class Event_Queue extends Supports_Errors {
 	 */
 	public function log( $message = "" ) {
 
-		$use_log = apply_filters( 'groundhogg/queue/enable_logging', false );
-
-		if ( ! $use_log ){
+		if ( ! $this->logging_enabled ) {
 			return;
 		}
 

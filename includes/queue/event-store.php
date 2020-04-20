@@ -27,6 +27,7 @@ class Event_Store {
 				[ 'col' => 'claim', 'val' => $claim, 'compare' => '=' ],
 			],
 			'orderby' => 'time',
+			'select' => 'ID'
 		], false );
 
 		$ids = wp_parse_id_list( wp_list_pluck( $queued_events, 'ID' ) );

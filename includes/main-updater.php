@@ -294,7 +294,7 @@ class Main_Updater extends Updater {
 			'2.1.13.revert' => __( 'Revert update 2.1.13 if rogue updated refactored optin status more than once.', 'groundhogg' ),
 			'2.1.13.6'      => __( 'Give funnel events higher priority than broadcast events.', 'groundhogg' ),
 			'2.1.13.11'     => __( 'Add micro_time column to events table for better display of events order.', 'groundhogg' ),
-			'2.1.13.17'     => __( 'Add missing index on `claim` column.', 'groundhogg' ),
+			'2.1.14.1'     => __( 'Add missing index on `claim` column.', 'groundhogg' ),
 		];
 	}
 

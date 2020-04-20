@@ -312,7 +312,7 @@ abstract class Updater {
 
 		$action = 'gh_' . $this->get_updater_name() . '_do_updates';
 
-		$action_url = action_url( $action, [ 'page' => 'groundhogg' ] );
+		$action_url = action_url( $action );
 
 		$update_button = html()->e( 'a', [
 			'href'  => $action_url,
@@ -348,6 +348,9 @@ abstract class Updater {
 		if ( $this->do_updates() ) {
 			notices()->add( 'updated', sprintf( __( "%s upgraded successfully!", 'groundhogg' ), white_labeled_name() ), 'success', 'manage_options', true );
 		}
+
+		wp_safe_redirect( wp_get_referer() );
+		die();
 	}
 
 	/**
@@ -356,6 +359,8 @@ abstract class Updater {
 	public function do_updates() {
 
 		$update_lock = 'gh_' . $this->get_updater_name() . '_doing_updates';
+
+		delete_transient( $update_lock );
 
 		// Check if an update lock is present.
 		if ( get_transient( $update_lock ) ) {
