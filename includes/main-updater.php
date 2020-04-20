@@ -235,11 +235,29 @@ class Main_Updater extends Updater {
 	 * Automatic update!
 	 */
 	public function version_2_1_14_1() {
-		get_db( 'events' )->create_table();
-//		get_db( 'event_queue' )->create_table();
 
-		// flag the upgrade notice
-		update_option( 'gh_migrate_waiting_events', 1 );
+		global $wpdb;
+
+		// Update the current events table
+		get_db( 'events' )->create_table();
+		// Create the new event queue table
+		get_db( 'event_queue' )->create_table();
+
+		// Move waiting events from the legacy queue to new queue
+		$event_queue = get_db( 'event_queue' )->get_table_name();
+		$events      = get_db( 'events' )->get_table_name();
+
+		$columns = get_db( 'event_queue' )->get_columns();
+		unset( $columns['ID'] );
+		$columns = implode( ',', array_keys( $columns ) );
+
+		// Move the events to the event queue
+		$wpdb->query( "INSERT INTO {$event_queue} ($columns) 
+			SELECT $columns 
+			FROM {$events} 
+			WHERE `status` = 'waiting';
+		DELETE FROM {$events} WHERE  `status` = 'waiting';"
+		);
 	}
 
 	/**

@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin\Events;
 
+use cli\Table;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Event;
 use function Groundhogg\get_db;
@@ -9,7 +10,9 @@ use Groundhogg\Plugin;
 use function Groundhogg\get_request_var;
 
 // Exit if accessed directly
-if ( !defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * View Events
@@ -25,210 +28,263 @@ if ( !defined( 'ABSPATH' ) ) exit;
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.1
  */
-class Events_Page extends Admin_Page
-{
+class Events_Page extends Admin_Page {
 
-    //UNUSED FUNCTIONS
-    protected function add_ajax_actions() {}
-    public function help() {}
-    protected function add_additional_actions() {}
-    public function scripts() {
-        wp_enqueue_style( 'groundhogg-admin' );
-    }
+	//UNUSED FUNCTIONS
+	protected function add_ajax_actions() {
+	}
 
-    public function get_slug()
-    {
-       return 'gh_events';
-    }
+	public function help() {
+	}
 
-    public function get_name()
-    {
-        return _x( 'Events', 'page_title', 'groundhogg' );
-    }
+	protected function add_additional_actions() {
+	}
 
-    public function get_cap()
-    {
-        return 'view_events';
-    }
+	public function scripts() {
+		wp_enqueue_style( 'groundhogg-admin' );
+	}
 
-    public function get_item_type()
-    {
-        return 'event';
-    }
+	public function get_slug() {
+		return 'gh_events';
+	}
 
-    public function get_priority()
-    {
-        return 40;
-    }
+	public function get_name() {
+		return _x( 'Events', 'page_title', 'groundhogg' );
+	}
 
-    protected function get_title_actions()
-    {
-        return [];
-    }
+	public function get_cap() {
+		return 'view_events';
+	}
 
-    /**
-     *  Sets the title of the page
-     * @return string
-     */
-    public function get_title()
-    {
-        switch ( $this->get_current_action() ) {
-            case 'view':
-            default:
-                return _x( 'Events', 'page_title', 'groundhogg' );
-                break;
-        }
-    }
+	public function get_item_type() {
+		return 'event';
+	}
 
-    /**
-     * Cancels scheduled broadcast
-     *
-     * @return bool
-     */
-    public function process_cancel()
-    {
-        if ( !current_user_can( 'cancel_events' ) ) {
-            $this->wp_die_no_access();
-        }
+	public function get_priority() {
+		return 40;
+	}
 
-        foreach ( $this->get_items() as $eid ) {
-            Plugin::$instance->dbs->get_db( 'events' )->update(
-                absint( $eid ),
-                array(
-                    'status' => 'cancelled'
-                )
-            );
-        }
+	protected function get_title_actions() {
+		return [];
+	}
 
-        $this->add_notice( 'cancelled', sprintf( _nx( '%d event cancelled', '%d events cancelled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
+	/**
+	 *  Sets the title of the page
+	 * @return string
+	 */
+	public function get_title() {
+		switch ( $this->get_current_action() ) {
+			case 'view':
+			default:
+				return _x( 'Events', 'page_title', 'groundhogg' );
+				break;
+		}
+	}
 
-        if ( $contact_id = absint( get_request_var( 'return_to_contact' ) ) ) {
-            return admin_url('admin.php?page=gh_contacts&action=edit&tab=activity&contact=' . $contact_id);
-        }
+	/**
+	 * Cancels scheduled broadcast
+	 *
+	 * @return bool
+	 */
+	public function process_cancel() {
 
-        //false return users to the main page
-        return false;
-    }
+		if ( ! current_user_can( 'cancel_events' ) ) {
+			$this->wp_die_no_access();
+		}
 
-    /**
-     * Clean up the events DB if something goes wrong.
-     *
-     * @return bool
-     */
-    public function process_cleanup()
-    {
-        if ( !current_user_can( 'execute_events' ) ) {
-            $this->wp_die_no_access();
-        }
+		global $wpdb;
 
-        global $wpdb;
+		$event_queue = get_db( 'event_queue' )->get_table_name();
+		$events      = get_db( 'events' )->get_table_name();
+		$event_ids   = implode( ',', $this->get_items() );
 
-        $events = get_db( 'events' );
+		$columns = get_db( 'event_queue' )->get_columns();
+		unset( $columns['ID'] );
+		$columns = implode( ',', array_keys( $columns ) );
+		$cancelled = Event::CANCELLED;
 
-        $wpdb->query( "UPDATE {$events->get_table_name()} SET claim = '' WHERE claim <> ''" );
-        $wpdb->query( "UPDATE {$events->get_table_name()} SET status = 'complete' WHERE status = 'in_progress'" );
+		// Update the time
+		$wpdb->query( "UPDATE {$event_queue} SET `status` = '$cancelled' WHERE `ID` in ({$event_ids})" );
+		// Move the events to the event queue
+		$wpdb->query( "INSERT INTO {$events} ($columns) 
+			SELECT $columns 
+			FROM {$event_queue} 
+			WHERE `ID` in ({$event_ids});" );
 
-        return false;
-    }
+		// Delete the events from the historical data
+		$wpdb->query( "DELETE FROM {$events} WHERE `ID` in ($event_ids);" );
 
-    public function process_purge()
-    {
-        if ( !current_user_can( 'cancel_events' ) ) {
-            $this->wp_die_no_access();
-        }
+		$this->add_notice( 'cancelled', sprintf( _nx( '%d event cancelled', '%d events cancelled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
 
-        global $wpdb;
-        $events = get_db( 'events' );
-        $result = $wpdb->delete( $events->get_table_name(), [
-            'status' => Event::FAILED
-        ] );
+		if ( $contact_id = absint( get_request_var( 'return_to_contact' ) ) ) {
+			return admin_url( 'admin.php?page=gh_contacts&action=edit&tab=activity&contact=' . $contact_id );
+		}
 
-        if ( $result ){
-            $this->add_notice( 'events_purged', __( 'Purged failed events!' ) );
-        }
-    }
+		//false return users to the main page
+		return false;
+	}
 
-    /**
-     * Clean up the events DB if something goes wrong.
-     *
-     * @return bool
-     */
-    public function process_process_queue()
-    {
-        if ( !current_user_can( 'execute_events' ) ) {
-            $this->wp_die_no_access();
-        }
+	/**
+	 * Clean up the events DB if something goes wrong.
+	 *
+	 * @return bool
+	 */
+	public function process_cleanup() {
+		if ( ! current_user_can( 'execute_events' ) ) {
+			$this->wp_die_no_access();
+		}
 
-        $queue = Plugin::$instance->event_queue;
+		global $wpdb;
 
-        Plugin::$instance->notices->add( 'queue-complete', sprintf( "%d events have been completed in %s seconds.", $queue->run_queue(), $queue->get_last_execution_time() ) );
+		$events = get_db( 'event_queue' );
 
-        if ( $queue->has_errors() ){
-            Plugin::$instance->notices->add( 'queue-errors', sprintf( "%d events failed to complete. Please see the following errors.", count( $queue->get_errors() ) ), 'warning' );
+		$wpdb->query( "UPDATE {$events->get_table_name()} SET claim = '' WHERE claim <> ''" );
+		$wpdb->query( "UPDATE {$events->get_table_name()} SET status = 'complete' WHERE status = 'in_progress'" );
 
-            foreach ( $queue->get_errors() as $error ){
-                Plugin::instance()->notices->add( $error );
-            }
-        }
+		return false;
+	}
 
-        if ( $contact_id = absint( get_request_var( 'return_to_contact' ) ) ){
-            return admin_url( 'admin.php?page=gh_contacts&action=edit&tab=activity&contact=' . $contact_id );
-        }
+	/**
+	 * Delete any failed or cancelled events.
+	 */
+	public function process_purge() {
+		if ( ! current_user_can( 'cancel_events' ) ) {
+			$this->wp_die_no_access();
+		}
 
-        return false;
-    }
+		global $wpdb;
 
-    /**
-     * Executes the event
-     *
-     * @return bool
-     */
-    public function process_execute()
-    {
-        if ( !current_user_can( 'execute_events' ) ) {
-            $this->wp_die_no_access();
-        }
+		$events = get_db( 'events' );
 
-        foreach ( $this->get_items() as $eid ) {
-            Plugin::$instance->dbs->get_db( 'events' )->update(
-                $eid,
-                array(
-                    'status' => 'waiting',
-                    'time' => time()
-                )
-            );
-        }
+		$result = $wpdb->query( "DELETE FROM {$events->get_table_name()} WHERE `status` in ( 'waiting', 'failed' )" );
 
-        $this->add_notice( 'scheduled', sprintf( _nx( '%d event rescheduled', '%d events rescheduled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
+		if ( $result !== false ) {
+			$this->add_notice( 'events_purged', __( 'Purged failed events!' ) );
+		}
+	}
 
-        if ( $contact_id = absint( get_request_var( 'return_to_contact' ) ) ){
-            return admin_url( 'admin.php?page=gh_contacts&action=edit&tab=activity&contact=' . $contact_id );
-        }
+	/**
+	 * Reschedule events if running now in the waiting table.
+	 *
+	 * @return bool
+	 */
+	public function process_execute_now() {
+		if ( ! current_user_can( 'execute_events' ) ) {
+			$this->wp_die_no_access();
+		}
 
-        return false;
-    }
+		global $wpdb;
 
-    public function view()
-    {
-        if ( !current_user_can( 'view_events' ) ) {
-            $this->wp_die_no_access();
-        }
+		$event_queue = get_db( 'event_queue' );
+		$event_ids   = implode( ',', $this->get_items() );
+		$time        = time();
 
-        if ( !class_exists( 'Events_Table' ) ) {
-            include dirname( __FILE__ ) . '/events-table.php';
-        }
+		$wpdb->query( "UPDATE {$event_queue->get_table_name()} SET `time` = {$time} WHERE `ID` in ({$event_ids})" );
 
-        $events_table = new Events_Table();
+		$this->add_notice( 'scheduled', sprintf( _nx( '%d event rescheduled', '%d events rescheduled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
 
-        $events_table->views();
-        ?>
+		if ( $contact_id = absint( get_request_var( 'return_to_contact' ) ) ) {
+			return admin_url( 'admin.php?page=gh_contacts&action=edit&tab=activity&contact=' . $contact_id );
+		}
+
+		return false;
+	}
+
+	/**
+	 * Executes the event
+	 *
+	 * @return bool
+	 */
+	public function process_execute_again() {
+		if ( ! current_user_can( 'execute_events' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		global $wpdb;
+
+		$event_queue = get_db( 'event_queue' )->get_table_name();
+		$events      = get_db( 'events' )->get_table_name();
+		$event_ids   = implode( ',', $this->get_items() );
+		$time        = time();
+
+		$columns = get_db( 'event_queue' )->get_columns();
+		unset( $columns['ID'] );
+		$columns = implode( ',', array_keys( $columns ) );
+
+		// Update the time
+		$wpdb->query( "UPDATE {$events} SET `time` = {$time}, `status` = 'waiting' WHERE `ID` in ({$event_ids})" );
+		// Move the events to the event queue
+		$wpdb->query( "INSERT INTO {$event_queue} ($columns) 
+			SELECT $columns 
+			FROM {$events} 
+			WHERE `ID` in ($event_ids);" );
+
+		// Delete the events from the historical data
+		$wpdb->query( "DELETE FROM {$events} WHERE `ID` in ($event_ids);" );
+
+		$this->add_notice( 'scheduled', sprintf( _nx( '%d event rescheduled', '%d events rescheduled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
+
+		if ( $contact_id = absint( get_request_var( 'return_to_contact' ) ) ) {
+			return admin_url( 'admin.php?page=gh_contacts&action=edit&tab=activity&contact=' . $contact_id );
+		}
+
+		return false;
+	}
+
+	/**
+	 * Clean up the events DB if something goes wrong.
+	 *
+	 * @return bool
+	 */
+	public function process_process_queue() {
+		if ( ! current_user_can( 'execute_events' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$queue = Plugin::$instance->event_queue;
+
+		Plugin::$instance->notices->add( 'queue-complete', sprintf( "%d events have been completed in %s seconds.", $queue->run_queue(), $queue->get_last_execution_time() ) );
+
+		if ( $queue->has_errors() ) {
+			Plugin::$instance->notices->add( 'queue-errors', sprintf( "%d events failed to complete. Please see the following errors.", count( $queue->get_errors() ) ), 'warning' );
+
+			foreach ( $queue->get_errors() as $error ) {
+				Plugin::instance()->notices->add( $error );
+			}
+		}
+
+		if ( $contact_id = absint( get_request_var( 'return_to_contact' ) ) ) {
+			return admin_url( 'admin.php?page=gh_contacts&action=edit&tab=activity&contact=' . $contact_id );
+		}
+
+		return false;
+	}
+
+	/**
+	 * Show the main view
+	 *
+	 * @return mixed|void
+	 */
+	public function view() {
+		if ( ! current_user_can( 'view_events' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		if ( ! class_exists( 'Events_Table' ) ) {
+			include dirname( __FILE__ ) . '/events-table.php';
+		}
+
+		$events_table = new Events_Table();
+
+		$events_table->views();
+		?>
         <form method="post" class="search-form wp-clearfix">
             <!-- search form -->
-            <?php $events_table->prepare_items(); ?>
-            <?php $events_table->display(); ?>
+			<?php $events_table->prepare_items(); ?>
+			<?php $events_table->display(); ?>
         </form>
 
-        <?php
-    }
+		<?php
+	}
 
 }
