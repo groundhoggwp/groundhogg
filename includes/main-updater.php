@@ -219,11 +219,20 @@ class Main_Updater extends Updater {
 	}
 
 	/**
-	 * Add micro_time column
+	 * Add `micro_time` column
 	 *
 	 * Automatic update!
 	 */
 	public function version_2_1_13_11() {
+		get_db( 'events' )->create_table();
+	}
+
+	/**
+	 * Add index on `claim`
+	 *
+	 * Automatic update!
+	 */
+	public function version_2_1_14_1() {
 		get_db( 'events' )->create_table();
 	}
 
@@ -258,7 +267,7 @@ class Main_Updater extends Updater {
 			'2.1.11.1',
 			'2.1.13',
 			'2.1.13.6',
-			'2.1.13.11',
+			'2.1.14.1',
 		];
 	}
 
@@ -270,6 +279,7 @@ class Main_Updater extends Updater {
 	protected function get_automatic_updates() {
 		return [
 			'2.1.13.11',
+			'2.1.13.17',
 		];
 	}
 
@@ -284,6 +294,7 @@ class Main_Updater extends Updater {
 			'2.1.13.revert' => __( 'Revert update 2.1.13 if rogue updated refactored optin status more than once.', 'groundhogg' ),
 			'2.1.13.6'      => __( 'Give funnel events higher priority than broadcast events.', 'groundhogg' ),
 			'2.1.13.11'     => __( 'Add micro_time column to events table for better display of events order.', 'groundhogg' ),
+			'2.1.13.17'     => __( 'Add missing index on `claim` column.', 'groundhogg' ),
 		];
 	}
 

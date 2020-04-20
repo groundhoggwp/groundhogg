@@ -11,6 +11,7 @@ use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 use Groundhogg\Supports_Errors;
+use function Groundhogg\gh_cron_installed;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -76,9 +77,15 @@ class Event_Queue extends Supports_Errors {
 	 * setup the action for the cron job
 	 */
 	public function __construct() {
+
 		add_filter( 'cron_schedules', [ $this, 'add_cron_schedules' ] );
-		add_action( 'init', [ $this, 'setup_cron_jobs' ] );
 		add_action( self::WP_CRON_HOOK, [ $this, 'run_queue' ] );
+
+		// no need if gh-cron.php is installed.
+		if ( ! gh_cron_installed() ){
+			add_action( 'init', [ $this, 'setup_cron_jobs' ] );
+		}
+
 	}
 
 	/**
@@ -117,7 +124,7 @@ class Event_Queue extends Supports_Errors {
 	 * @since 1.0.20.1 Added notice to check if there is something wrong with the cron system.
 	 */
 	public function setup_cron_jobs() {
-		if ( ! wp_next_scheduled( self::WP_CRON_HOOK ) ) {
+		if ( ! wp_next_scheduled( self::WP_CRON_HOOK ) && ! gh_cron_installed() ) {
 			wp_schedule_event( time(), apply_filters( 'groundhogg/event_queue/queue_interval', self::WP_CRON_INTERVAL ), self::WP_CRON_HOOK );
 		}
 	}

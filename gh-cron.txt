@@ -1,0 +1,50 @@
+<?php
+/**
+ * This file can be used to process the event queue directly without the overhead of other WordPress tasks.
+ * Call this file directly from a sever Cron
+ *
+ * @package WordPress
+ */
+
+ignore_user_abort( true );
+
+/* Don't make the request block till we finish, if possible. */
+if ( function_exists( 'fastcgi_finish_request' ) && version_compare( phpversion(), '7.0.16', '>=' ) ) {
+    if ( ! headers_sent() ) {
+        header( 'Expires: Wed, 11 Jan 1984 05:00:00 GMT' );
+        header( 'Cache-Control: no-cache, must-revalidate, max-age=0' );
+    }
+
+    fastcgi_finish_request();
+}
+
+if ( ! empty( $_POST ) || defined( 'DOING_AJAX' ) || defined( 'DOING_CRON' ) ) {
+    die();
+}
+
+/**
+ * Optional password lock to avoid expensive DDOS attacks
+ */
+# define( 'GH_CRON_PASS', 'your_password' );
+#
+# if ( $_GET[ 'pass' ] !== GH_CRON_PASS ){
+#    die();
+# }
+
+/**
+ * Tell WordPress we are doing the CRON task.
+ *
+ * Keep for compatibility
+ *
+ * @var bool
+ */
+define( 'DOING_CRON', true );
+
+if ( ! defined( 'ABSPATH' ) ) {
+    /** Set up WordPress environment */
+    require_once( dirname( __FILE__ ) . '/wp-load.php' );
+}
+
+do_action( 'groundhogg_process_queue' );
+
+die();

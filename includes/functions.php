@@ -3051,3 +3051,12 @@ function set_user_test_email( $email = '', $user_id = 0 ) {
 
 	return update_user_meta( $user_id, 'preferred_test_email', $email );
 }
+
+/**
+ * Whether the gh-cron file was installed
+ *
+ * @return bool
+ */
+function gh_cron_installed(){
+    return file_exists( ABSPATH . 'gh-cron.php' );
+}

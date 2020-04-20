@@ -346,7 +346,7 @@ class Broadcasts_Table extends WP_List_Table {
 	 */
 	protected function column_send_time( $broadcast ) {
 
-		$prefix = $broadcast->is_sent() ? __( 'Sent', 'groundhogg' ): __( 'Sending on', 'groundhogg' );
+		$prefix = $broadcast->is_sent() ? __( 'Sent', 'groundhogg' ): __( 'Sending', 'groundhogg' );
 		return $prefix . ' ' . scheduled_time_column( $broadcast->get_send_time() );
 	}
 

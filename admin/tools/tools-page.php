@@ -7,6 +7,7 @@ use Groundhogg\Bulk_Jobs\Create_Users;
 use Groundhogg\Bulk_Jobs\Delete_Contacts;
 use Groundhogg\Extension_Upgrader;
 use Groundhogg\License_Manager;
+use Groundhogg\Queue\Event_Queue;
 use function Groundhogg\action_input;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
@@ -167,24 +168,24 @@ class Tools_Page extends Tabbed_Admin_Page {
 				'slug' => 'export',
 			],
 			[
-				'name' => __( 'Sync Users & Contacts' ),
-				'slug' => 'sync',
+				'name' => __( 'Sync/Create Users' ),
+				'slug' => 'sync_create_users',
 			],
 			[
-				'name' => __( 'Create Users' ),
-				'slug' => 'create_users',
-			],
-			[
-				'name' => __( 'Bulk Delete Contacts' ),
+				'name' => __( 'Bulk Delete', 'groundhogg' ),
 				'slug' => 'delete',
 			],
 			[
-				'name' => __( 'Updates' ),
+				'name' => __( 'Updates', 'groundhogg' ),
 				'slug' => 'updates'
 			],
 			[
-				'name' => __( 'Install' ),
+				'name' => __( 'Install', 'groundhogg' ),
 				'slug' => 'install'
+			],
+			[
+				'name' => __( 'Advanced Cron Setup', 'groundhogg' ),
+				'slug' => 'advanced_cron'
 			],
 		];
 
@@ -276,119 +277,118 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 	####### SYNC TAB FUNCTIONS #########
 
-	public function sync_view() {
+	public function sync_create_users_view() {
 		?>
-        <div class="show-upload-view">
-            <div class="upload-plugin-wrap">
-                <div class="upload-plugin">
-                    <p class="install-help"><?php _e( 'Sync Users & Contacts', 'groundhogg' ); ?></p>
-                    <form method="post" class="wp-upload-form">
-						<?php wp_nonce_field(); ?>
-						<?php echo Plugin::$instance->utils->html->input( [
-							'type'  => 'hidden',
-							'name'  => 'action',
-							'value' => 'bulk_sync',
-						] ); ?>
-                        <p><?php _e( 'The sync process will create new contact records for all users in the database. If a contact records already exists then the association will be updated.' ); ?></p>
-                        <p>
-							<?php echo html()->checkbox( [
-								'label' => __( 'Sync all user meta.', 'groundhogg' ),
-								'value' => 1,
-								'name'  => 'sync_user_meta'
+        <div class="tools-left">
+            <div class="show-upload-view">
+                <div class="upload-plugin-wrap">
+                    <div class="upload-plugin">
+                        <p class="install-help"><?php _e( 'Sync Users & Contacts', 'groundhogg' ); ?></p>
+                        <form method="post" class="gh-tools-box">
+							<?php wp_nonce_field(); ?>
+							<?php echo Plugin::$instance->utils->html->input( [
+								'type'  => 'hidden',
+								'name'  => 'action',
+								'value' => 'bulk_sync',
 							] ); ?>
-                        </p>
-                        <p class="submit" style="text-align: center;padding-bottom: 0;margin: 0;">
-                            <button style="width: 100%" class="button-primary" name="sync_users"
-                                    value="sync"><?php _ex( 'Start Sync Process', 'action', 'groundhogg' ); ?></button>
-                        </p>
-                    </form>
+                            <p><?php _e( 'The sync process will create new contact records for all users in the database. If a contact records already exists then the association will be updated.' ); ?></p>
+                            <p>
+								<?php echo html()->checkbox( [
+									'label' => __( 'Sync all user meta.', 'groundhogg' ),
+									'value' => 1,
+									'name'  => 'sync_user_meta'
+								] ); ?>
+                            </p>
+                            <p class="submit" style="text-align: center;padding-bottom: 0;margin: 0;">
+                                <button style="width: 100%" class="button-primary" name="sync_users"
+                                        value="sync"><?php _ex( 'Start Sync Process', 'action', 'groundhogg' ); ?></button>
+                            </p>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
+        <div class="tools-right">
+            <div class="show-upload-view">
+                <div class="upload-plugin-wrap">
+                    <div class="upload-plugin">
+                        <p class="install-help"><?php _e( 'Create Users', 'groundhogg' ); ?></p>
+                        <form method="post" class="gh-tools-box">
+							<?php wp_nonce_field(); ?>
+							<?php echo Plugin::$instance->utils->html->input( [
+								'type'  => 'hidden',
+								'name'  => 'action',
+								'value' => 'start',
+							] );
+
+							echo html()->e( 'p', [], [
+								__( 'Select contacts to create accounts for.', 'groundhogg' ),
+								html()->tag_picker( [
+									'name' => 'tags_include[]',
+									'id'   => 'tags_include',
+								] ),
+							] );
+
+							echo html()->e( 'p', [], [
+								__( 'Exclude these contacts.', 'groundhogg' ),
+								html()->tag_picker( [
+									'name' => 'tags_exclude[]',
+									'id'   => 'tags_exclude',
+								] ),
+							] );
+
+							echo html()->e( 'p', [], [
+								__( 'Choose role.', 'groundhogg' ),
+								html()->dropdown( [
+									'name'     => 'role',
+									'id'       => 'role',
+									'options'  => Plugin::$instance->roles->get_roles_for_select(),
+									'selected' => 'subscriber',
+									'style'    => [ 'width' => '100%' ]
+								] ),
+							] );
+
+							echo html()->e( 'p', [], [
+								html()->checkbox( [
+									'label'   => __( 'Send email notification to user.', 'groundhogg' ),
+									'name'    => 'send_email_notification',
+									'value'   => '1',
+									'checked' => false,
+								] ),
+								'<br/>',
+								html()->e( 'i', [], sprintf( ' (%s)', __( 'Much slower' ) ) )
+							] );
+
+							?>
+                            <p class="submit" style="text-align: center;padding-bottom: 0;margin: 0;">
+                                <button style="width: 100%" class="button-primary" name="start"
+                                        value="start"><?php _ex( 'Create Users', 'action', 'groundhogg' ); ?></button>
+                            </p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="wp-clearfix"></div>
+
 		<?php
 	}
 
 	/**
-	 * Delete all them contacts.
+	 * Sync all the users and contacts
 	 */
-	public function process_sync_bulk_sync() {
+	public function process_sync_create_users_bulk_sync() {
 		if ( get_request_var( 'sync_user_meta' ) ) {
 			set_transient( 'gh_sync_user_meta', true, HOUR_IN_SECONDS );
 		}
 
-		$this->syncer->start(); //todo
-	}
-
-	####### CREATE USER FUNCTIONS #########
-
-	public function create_users_view() {
-		?>
-        <div class="show-upload-view">
-            <div class="upload-plugin-wrap">
-                <div class="upload-plugin">
-                    <p class="install-help"><?php _e( 'Create Users', 'groundhogg' ); ?></p>
-                    <form method="post" class="wp-upload-form">
-						<?php wp_nonce_field(); ?>
-						<?php echo Plugin::$instance->utils->html->input( [
-							'type'  => 'hidden',
-							'name'  => 'action',
-							'value' => 'start',
-						] );
-
-						echo html()->e( 'p', [], [
-							__( 'Select contacts to create accounts for.', 'groundhogg' ),
-							html()->tag_picker( [
-								'name' => 'tags_include[]',
-								'id'   => 'tags_include',
-							] ),
-						] );
-
-						echo html()->e( 'p', [], [
-							__( 'Exclude these contacts.', 'groundhogg' ),
-							html()->tag_picker( [
-								'name' => 'tags_exclude[]',
-								'id'   => 'tags_exclude',
-							] ),
-						] );
-
-						echo html()->e( 'p', [], [
-							__( 'Choose role.', 'groundhogg' ),
-							html()->dropdown( [
-								'name'     => 'role',
-								'id'       => 'role',
-								'options'  => Plugin::$instance->roles->get_roles_for_select(),
-								'selected' => 'subscriber',
-								'style'    => [ 'width' => '100%' ]
-							] ),
-						] );
-
-						echo html()->e( 'p', [], [
-							html()->checkbox( [
-								'label'   => __( 'Send email notification to user.', 'groundhogg' ),
-								'name'    => 'send_email_notification',
-								'value'   => '1',
-								'checked' => false,
-							] ),
-							'<br/>',
-							html()->e( 'i', [], sprintf( ' (%s)', __( 'Much slower' ) ) )
-						] );
-
-						?>
-                        <p class="submit" style="text-align: center;padding-bottom: 0;margin: 0;">
-                            <button style="width: 100%" class="button-primary" name="start"
-                                    value="start"><?php _ex( 'Create Users', 'action', 'groundhogg' ); ?></button>
-                        </p>
-                    </form>
-                </div>
-            </div>
-        </div>
-		<?php
+		$this->syncer->start();
 	}
 
 	/**
-	 * Delete all them contacts.
+	 * Create users for contact records
 	 */
-	public function process_create_users_start() {
+	public function process_sync_create_users_start() {
 
 		if ( ! current_user_can( 'add_users' ) ) {
 			$this->wp_die_no_access();
@@ -406,7 +406,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 		$this->create_users->start( [
 			'tags_include' => wp_parse_id_list( get_request_var( 'tags_include' ) ),
 			'tags_exclude' => wp_parse_id_list( get_request_var( 'tags_exclude' ) ),
-		] ); //todo
+		] );
 	}
 
 	####### IMPORT TAB FUNCTIONS #########
@@ -688,17 +688,17 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 					?></p>
                 <script>
-                    ( function ( $ ){
+                    (function ($) {
 
-                        $( '.select-all-meta' ).click( function ( e ){
-                            $( '.meta.header' ).attr( 'checked', 'checked' )
-                        } )
+                        $('.select-all-meta').click(function (e) {
+                            $('.meta.header').attr('checked', 'checked')
+                        })
 
-                        $( '.deselect-all-meta' ).click( function ( e ){
-                            $( '.meta.header' ).attr( 'checked', false )
-                        } )
+                        $('.deselect-all-meta').click(function (e) {
+                            $('.meta.header').attr('checked', false)
+                        })
 
-                    } )( jQuery )
+                    })(jQuery)
                 </script>
                 <table>
 					<?php
@@ -858,7 +858,7 @@ class Tools_Page extends Tabbed_Admin_Page {
             <div class="upload-plugin-wrap">
                 <div class="upload-plugin">
                     <p class="install-help"><?php _e( 'Delete Contacts in Bulk by Tag', 'groundhogg' ); ?></p>
-                    <form method="post" class="wp-upload-form">
+                    <form method="post" class="gh-tools-box">
 						<?php wp_nonce_field(); ?>
 						<?php echo Plugin::$instance->utils->html->input( [
 							'type'  => 'hidden',
@@ -896,6 +896,64 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	public function get_priority() {
 		return 98;
+	}
+
+	########### ADVANCED SETUP ###########
+
+	public function advanced_cron_view(){
+	    include __DIR__ . '/advanced-setup.php';
+    }
+
+	/**
+	 * Install the gh-cron.php file
+	 *
+	 * @return bool|\WP_Error
+	 */
+	public function process_advanced_cron_install_gh_cron(){
+
+		$gh_cron_php = file_get_contents( GROUNDHOGG_PATH . 'gh-cron.txt' );
+		$bytes = file_put_contents( ABSPATH . 'gh-cron.php', $gh_cron_php );
+
+		if ( ! $bytes ){
+			return new \WP_Error( 'error', __( 'Unable to install gh-cron.php file. Please install is manually.', 'groundhogg' ) );
+		} else {
+			$this->add_notice( 'success', __( 'Installed gh-cron.php successfully!', 'groundhogg' ) );
+		}
+
+		return false;
+	}
+
+	/**
+	 * Download the gh-cron.txt file.
+	 *
+	 * @return void
+	 */
+	public function process_advanced_cron_install_gh_cron_manually(){
+
+		$gh_cron_php = file_get_contents( GROUNDHOGG_PATH . 'gh-cron.txt' );
+
+		nocache_headers();
+
+		header( 'Content-Type: text/plain' );
+		header( 'Content-Disposition: attachment; filename="gh-cron.txt"' );
+
+		echo $gh_cron_php;
+		die();
+	}
+
+	/**
+     * Unschedule Groundhogg from WP Cron.
+     *
+	 * @return bool|WP_Error
+	 */
+	public function process_advanced_cron_unschedule_gh_cron(){
+	    if ( wp_unschedule_hook( Event_Queue::WP_CRON_HOOK ) === false ){
+		    return new \WP_Error( 'error', __( 'Something went wrong.', 'groundhogg' ) );
+        } else {
+		    $this->add_notice( 'success', __( 'Unhooked Groundhogg from WP Cron.', 'groundhogg' ) );
+	    }
+
+		return false;
 	}
 
 	########### OTHER ###########
