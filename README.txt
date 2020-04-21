@@ -177,9 +177,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.1.14.1 (2020-04-20) =
-* ADDED Tab in tools to show how to enable the gh-cron.php file
-* TWEAKED Create an index on the event claim
+= 2.1.14.1 (2020-04-21) =
+* ADDED Tab in tools to show how to enable the gh-cron.php file.
+* TWEAKED Create an index on the event claim.
+* FIXED Broadcast SMS causing error.
 
 = 2.1.14 (2020-04-16) =
 * ADDED Option to enable beta versions of Groundhogg extensions!

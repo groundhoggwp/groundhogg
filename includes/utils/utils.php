@@ -2,6 +2,8 @@
 
 namespace Groundhogg;
 
+use GroundhoggSMS\Classes\SMS;
+
 class Utils {
 	/**
 	 * @var Location
@@ -155,6 +157,7 @@ class Utils {
 	 * @param bool $get_from_cache
 	 *
 	 * @return Sms
+	 * @deprecated 2.1.14
 	 */
 	public function get_sms( $id, $get_from_cache = true ) {
 		return $this->get_object( $id, 'ID', 'sms', $get_from_cache );

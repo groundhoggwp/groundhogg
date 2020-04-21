@@ -98,7 +98,7 @@ class Step_Tests extends GH_UnitTestCase {
 
 		$step1->delete();
 
-		$this->assertCount( 0, $step2->get_waiting_contacts() );
+		$this->assertEmpty( $step2->get_waiting_contacts() );
 	}
 
 }

@@ -5,6 +5,7 @@ namespace Groundhogg;
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Broadcasts;
 use Groundhogg\DB\DB;
+use GroundhoggSMS\Classes\SMS;
 
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -47,7 +48,7 @@ class Broadcast extends Base_Object implements Event_Process {
 			case self::TYPE_SMS:
 
 				if ( is_sms_plugin_active() ) {
-					$this->object = Plugin::$instance->utils->get_sms( $this->get_object_id() );
+					$this->object = new SMS( $this->get_object_id() );
 				}
 
 				break;
@@ -206,7 +207,11 @@ class Broadcast extends Base_Object implements Event_Process {
 
 		do_action( "groundhogg/broadcast/{$this->get_broadcast_type()}/before", $this, $contact, $event );
 
-		$result = $this->get_object()->send( $contact, $event );
+		if ( is_object( $this->get_object() ) ){
+			$result = $this->get_object()->send( $contact, $event );
+		} else {
+			$result = new \WP_Error( 'error', 'Email or SMS not provided.' );
+		}
 
 		do_action( "groundhogg/broadcast/{$this->get_broadcast_type()}/after", $this, $contact, $event );
 
