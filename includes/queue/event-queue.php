@@ -234,15 +234,39 @@ class Event_Queue extends Supports_Errors {
 		return $result;
 	}
 
+	/**
+	 * dump events from event_queue table to the events table
+	 */
 	public function clean_events() {
+
 		//code to clear the events from the event queue table
+		$time = time() - ( MINUTE_IN_SECONDS );
+
+
 		global $wpdb;
-		$events = get_db( 'event_queue' );
-//
-//		// 5 minute window.
-		$time = time() - ( MINUTE_IN_SECONDS * 5 );
-//
-		$wpdb->query( "DELETE FROM {$events->get_table_name()} WHERE status= 'complete' OR status= 'skipped' OR status= 'failed' OR status= 'cancelled' AND `time` < {$time}" );
+		// Move waiting events from the legacy queue to new queue
+		$event_queue = get_db( 'event_queue' )->get_table_name();
+		$events      = get_db( 'events' )->get_table_name();
+		$columns     = get_db( 'events' )->get_columns();
+
+		unset( $columns['ID'] );
+
+		$columns = implode( ',', array_keys( $columns ) );
+
+		// added two diffrent query because single query was not working on my localhost(says: ERROR in your SQL statement please review it.)
+
+		$sql  = "INSERT INTO {$events} ($columns)
+			SELECT $columns
+			FROM {$event_queue}
+			WHERE status= 'complete' OR status= 'skipped' OR status = 'failed' OR status= 'cancelled' AND `time` < {$time};
+			"  ;
+
+
+		// Move the events to the event queue
+		$wpdb->query( $sql);
+
+		$wpdb->query("DELETE FROM {$event_queue} WHERE `status` = 'complete' OR `status` = 'skipped' OR `status` = 'failed' OR `status` = 'cancelled'  AND `time` < {$time};" );
+
 
 	}
 

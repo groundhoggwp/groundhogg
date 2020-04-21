@@ -413,9 +413,6 @@ class Event extends Base_Object {
 			'time'   => time(),
 		] );
 
-		//create failed event dump in the event table
-		$this->event_dump();
-
 		return $cancel;
 
 	}
@@ -440,9 +437,6 @@ class Event extends Base_Object {
 
 		$updated = $this->update( $args );
 
-		//create failed event dump in the event table
-		$this->event_dump();
-
 		do_action( 'groundhogg/event/failed', $this );
 
 		return $updated;
@@ -459,7 +453,6 @@ class Event extends Base_Object {
 			'time'   => time(),
 		] );
 
-		$this->event_dump();
 		return $skip;
 	}
 
@@ -501,32 +494,8 @@ class Event extends Base_Object {
 			'error_message' => '',
 		] );
 
-		$this->event_dump();
 		return $update;
-
-
 	}
 
-	/**
-	 * Creates the event in the event database and dumps the data
-	 */
-	protected function event_dump()
-	{
-		// add new completed event in the events table
-
-		$event = new Event( [
-			'time'           => $this->get_time(),
-			'micro_time'     => $this->get_micro_time(),
-			'time_scheduled' => $this->get_time_scheduled(),
-			'funnel_id'      => $this->get_funnel_id(),
-			'step_id'        => $this->get_step_id(),
-			'contact_id'     => $this->get_contact_id(),
-			'event_type'     => $this->get_event_type(),
-			'error_code'     => $this->get_error_code(),
-			'error_message'  => $this->get_error_message(),
-			'status'         => $this->get_status(),
-			'priority'       => $this->get_priority(),
-		], 'events' );
-	}
 
 }
