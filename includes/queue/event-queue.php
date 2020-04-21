@@ -36,10 +36,21 @@ class Event_Queue extends Supports_Errors {
 	 */
 	const WP_CRON_HOOK = 'groundhogg_process_queue';
 
+
+	/**
+	 * The Cron Hook
+	 */
+	const WP_CLEAN_HOOK = 'groundhogg_clean_queue';
+
 	/**
 	 * The Cron Interval
 	 */
 	const WP_CRON_INTERVAL = 'every_minute';
+
+	/**
+	 * The Cron Interval
+	 */
+	const WP_CLEAN_INTERVAL = 'every_five_minutes';
 
 	/**
 	 * @var Contact the current contact in the event
@@ -93,8 +104,8 @@ class Event_Queue extends Supports_Errors {
 
 	}
 
-	public function init(){
-		$this->max_events = apply_filters( 'groundhogg/event_queue/max_events', 50 );
+	public function init() {
+		$this->max_events      = apply_filters( 'groundhogg/event_queue/max_events', 50 );
 		$this->logging_enabled = apply_filters( 'groundhogg/queue/enable_logging', false );
 	}
 
@@ -137,6 +148,7 @@ class Event_Queue extends Supports_Errors {
 		if ( ! wp_next_scheduled( self::WP_CRON_HOOK ) && ! gh_cron_installed() ) {
 			wp_schedule_event( time(), apply_filters( 'groundhogg/event_queue/queue_interval', self::WP_CRON_INTERVAL ), self::WP_CRON_HOOK );
 		}
+
 	}
 
 	/**
@@ -148,7 +160,7 @@ class Event_Queue extends Supports_Errors {
 	protected function cleanup_unprocessed_events() {
 		global $wpdb;
 
-		$events = get_db( 'events' );
+		$events = get_db( 'event_queue' );
 
 		// 5 minute window.
 		$time = time() - ( MINUTE_IN_SECONDS * 5 );
@@ -175,6 +187,7 @@ class Event_Queue extends Supports_Errors {
 		Limits::raise_time_limit( 10 );
 
 		$this->cleanup_unprocessed_events();
+		$this->clean_events();
 
 		$this->store = new Event_Store();
 		$settings    = Plugin::$instance->settings;
@@ -219,6 +232,18 @@ class Event_Queue extends Supports_Errors {
 //		}
 
 		return $result;
+	}
+
+	public function clean_events() {
+		//code to clear the events from the event queue table
+		global $wpdb;
+		$events = get_db( 'event_queue' );
+//
+//		// 5 minute window.
+		$time = time() - ( MINUTE_IN_SECONDS * 5 );
+//
+		$wpdb->query( "DELETE FROM {$events->get_table_name()} WHERE status= 'complete' OR status= 'skipped' OR status= 'failed' OR status= 'cancelled' AND `time` < {$time}" );
+
 	}
 
 	protected $time_per_event = [];
@@ -272,7 +297,7 @@ class Event_Queue extends Supports_Errors {
 
 			$event_id = array_pop( $event_ids );
 
-			$event = new Event( $event_id );
+			$event = new Event( $event_id, 'event_queue' );
 			$this->set_current_event( $event );
 
 			$contact = $event->get_contact();

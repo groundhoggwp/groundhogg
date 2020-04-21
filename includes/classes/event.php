@@ -72,7 +72,7 @@ class Event extends Base_Object {
 	 * @param null $field
 	 * @param string $db allow for the passing of the db name, this allows the reference of the event_queue table OR the regular events table.
 	 */
-	public function __construct( $identifier_or_args = 0, $db='events', $field = null ) {
+	public function __construct( $identifier_or_args = 0, $db = 'events', $field = null ) {
 
 		$this->db_name = $db;
 		parent::__construct( $identifier_or_args, $field );
@@ -108,6 +108,14 @@ class Event extends Base_Object {
 	 */
 	public function get_time() {
 		return absint( $this->time );
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function get_micro_time() {
+		return $this->micro_time ;
 	}
 
 	/**
@@ -400,10 +408,16 @@ class Event extends Base_Object {
 	public function cancel() {
 		do_action( 'groundhogg/event/cancelled', $this );
 
-		return $this->update( [
+		$cancel =  $this->update( [
 			'status' => self::CANCELLED,
 			'time'   => time(),
 		] );
+
+		//create failed event dump in the event table
+		$this->event_dump();
+
+		return $cancel;
+
 	}
 
 	/**
@@ -426,6 +440,9 @@ class Event extends Base_Object {
 
 		$updated = $this->update( $args );
 
+		//create failed event dump in the event table
+		$this->event_dump();
+
 		do_action( 'groundhogg/event/failed', $this );
 
 		return $updated;
@@ -437,10 +454,13 @@ class Event extends Base_Object {
 	public function skip() {
 		do_action( 'groundhogg/event/skipped', $this );
 
-		return $this->update( [
+		$skip =  $this->update( [
 			'status' => self::SKIPPED,
 			'time'   => time(),
 		] );
+
+		$this->event_dump();
+		return $skip;
 	}
 
 	/**
@@ -472,12 +492,41 @@ class Event extends Base_Object {
 
 		do_action( 'groundhogg/event/complete', $this );
 
-		return $this->update( [
+
+		$update = $this->update( [
 			'status'        => self::COMPLETE,
 			'time'          => time(),
 			'micro_time'    => micro_seconds(),
 			'error_code'    => '',
 			'error_message' => '',
 		] );
+
+		$this->event_dump();
+		return $update;
+
+
 	}
+
+	/**
+	 * Creates the event in the event database and dumps the data
+	 */
+	protected function event_dump()
+	{
+		// add new completed event in the events table
+
+		$event = new Event( [
+			'time'           => $this->get_time(),
+			'micro_time'     => $this->get_micro_time(),
+			'time_scheduled' => $this->get_time_scheduled(),
+			'funnel_id'      => $this->get_funnel_id(),
+			'step_id'        => $this->get_step_id(),
+			'contact_id'     => $this->get_contact_id(),
+			'event_type'     => $this->get_event_type(),
+			'error_code'     => $this->get_error_code(),
+			'error_message'  => $this->get_error_message(),
+			'status'         => $this->get_status(),
+			'priority'       => $this->get_priority(),
+		], 'events' );
+	}
+
 }

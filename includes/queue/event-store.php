@@ -36,10 +36,10 @@ class Event_Store {
 	}
 
 	/**
-	 * @return Events
+	 * @return Event_Queue
 	 */
 	public function db() {
-		return get_db( 'events' );
+		return get_db( 'event_queue' );
 	}
 
 	/**
@@ -78,6 +78,8 @@ class Event_Store {
 	 * @return array
 	 */
 	public function get_queued_event_ids( $count = 100 ) {
+
+
 
 		global $wpdb;
 

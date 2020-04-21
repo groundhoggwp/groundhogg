@@ -3060,3 +3060,14 @@ function set_user_test_email( $email = '', $user_id = 0 ) {
 function gh_cron_installed(){
     return file_exists( ABSPATH . 'gh-cron.php' );
 }
+
+
+//code to run evvent queue
+
+//function test()
+//{
+//    Plugin::$instance->event_queue->run_queue() ;
+//
+//}
+//
+//    add_action( 'init' , __NAMESPACE__ . '\test' );
