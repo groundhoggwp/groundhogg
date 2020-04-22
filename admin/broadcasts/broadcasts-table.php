@@ -229,7 +229,7 @@ class Broadcasts_Table extends WP_List_Table {
 	 */
 	protected function column_sending_to( $broadcast ) {
 
-		$num = Plugin::$instance->dbs->get_db( 'events' )->count( [
+		$num = Plugin::$instance->dbs->get_db( 'event_queue' )->count( [
 			'step_id'    => $broadcast->get_id(),
 			'status'     => 'waiting',
 			'event_type' => Event::BROADCAST
