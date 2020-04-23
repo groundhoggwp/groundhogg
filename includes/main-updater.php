@@ -227,14 +227,25 @@ class Main_Updater extends Updater {
 		get_db( 'events' )->create_table();
 	}
 
+
 	/**
 	 * Add index on `claim`
-	 * create new event_queue table
-	 * migrate waiting events to the new queue
 	 *
 	 * Automatic update!
 	 */
 	public function version_2_1_14_1() {
+		get_db( 'events' )->create_table();
+	}
+
+	/**
+	 * Add index on `claim`
+	 * create new event_queue table
+	 * migrate waiting events to the new queue
+	 * add queued_id column
+	 *
+	 * Automatic update!
+	 */
+	public function version_2_1_15() {
 
 		global $wpdb;
 
@@ -255,9 +266,14 @@ class Main_Updater extends Updater {
 		$wpdb->query( "INSERT INTO {$event_queue} ($columns) 
 			SELECT $columns 
 			FROM {$events} 
-			WHERE `status` = 'waiting';
-		DELETE FROM {$events} WHERE  `status` = 'waiting';"
+			WHERE `status` = 'waiting';"
 		);
+
+		$wpdb->query( "DELETE FROM {$events} WHERE `status` = 'waiting';" );
+
+		if ( $wpdb->last_error ){
+			wp_die( $wpdb->last_error );
+		}
 	}
 
 	/**
@@ -292,6 +308,7 @@ class Main_Updater extends Updater {
 			'2.1.13',
 			'2.1.13.6',
 			'2.1.14.1',
+			'2.1.15',
 		];
 	}
 
@@ -329,7 +346,8 @@ class Main_Updater extends Updater {
 			'2.1.13.revert' => __( 'Revert update 2.1.13 if rogue updated refactored optin status more than once.', 'groundhogg' ),
 			'2.1.13.6'      => __( 'Give funnel events higher priority than broadcast events.', 'groundhogg' ),
 			'2.1.13.11'     => __( 'Add micro_time column to events table for better display of events order.', 'groundhogg' ),
-			'2.1.14.1'     => __( 'Add missing index on `claim` column.', 'groundhogg' ),
+			'2.1.14.1'      => __( 'Add missing index on `claim` column.', 'groundhogg' ),
+			'2.1.15'        => __( 'Create seperate event queue DB table and move waiting events to this table.', 'groundhogg' ),
 		];
 	}
 }

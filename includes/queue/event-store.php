@@ -36,7 +36,7 @@ class Event_Store {
 	}
 
 	/**
-	 * @return Event_Queue
+	 * @return \Groundhogg\DB\Event_Queue
 	 */
 	public function db() {
 		return get_db( 'event_queue' );

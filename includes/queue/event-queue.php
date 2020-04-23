@@ -36,21 +36,10 @@ class Event_Queue extends Supports_Errors {
 	 */
 	const WP_CRON_HOOK = 'groundhogg_process_queue';
 
-
-	/**
-	 * The Cron Hook
-	 */
-	const WP_CLEAN_HOOK = 'groundhogg_clean_queue';
-
 	/**
 	 * The Cron Interval
 	 */
 	const WP_CRON_INTERVAL = 'every_minute';
-
-	/**
-	 * The Cron Interval
-	 */
-	const WP_CLEAN_INTERVAL = 'every_five_minutes';
 
 	/**
 	 * @var Contact the current contact in the event
@@ -145,7 +134,7 @@ class Event_Queue extends Supports_Errors {
 	 * @since 1.0.20.1 Added notice to check if there is something wrong with the cron system.
 	 */
 	public function setup_cron_jobs() {
-		if ( ! wp_next_scheduled( self::WP_CRON_HOOK ) && ! gh_cron_installed() ) {
+		if ( ! gh_cron_installed() && ! wp_next_scheduled( self::WP_CRON_HOOK ) ) {
 			wp_schedule_event( time(), apply_filters( 'groundhogg/event_queue/queue_interval', self::WP_CRON_INTERVAL ), self::WP_CRON_HOOK );
 		}
 
@@ -170,6 +159,40 @@ class Event_Queue extends Supports_Errors {
 	}
 
 	/**
+	 * dump events from event_queue table to the events table
+	 *
+	 * @param array $ids list of event Ids to move from the event queue to the event history table
+	 */
+	public function move_events_to_history_table( $ids = [] ) {
+
+		global $wpdb;
+
+		// Move waiting events from the legacy queue to new queue
+		$event_queue = get_db( 'event_queue' )->get_table_name();
+		$events      = get_db( 'events' )->get_table_name();
+
+		$history_columns = get_db( 'events' )->get_columns(); // queue_id will be last
+		$queue_columns   = get_db( 'event_queue' )->get_columns();
+
+		unset( $history_columns['ID'] );
+		unset( $queue_columns['ID'] );
+
+		$history_columns = implode( ',', array_keys( $history_columns ) );
+		$queue_columns   = implode( ',', array_keys( $queue_columns ) );
+		$IDs             = implode( ',', $ids );
+
+		// added two different query because single query was not working on my localhost(says: ERROR in your SQL statement please review it.)
+		// Move the events to the event queue
+		$wpdb->query( "INSERT INTO {$events} ($history_columns)
+			SELECT $queue_columns,ID
+			FROM {$event_queue}
+			WHERE `ID` in ( $IDs );" );
+		$wpdb->query( "DELETE FROM {$event_queue} WHERE `ID` in ( $IDs );" );
+
+
+	}
+
+	/**
 	 * Run any scheduled events.
 	 *
 	 * @return int
@@ -187,7 +210,6 @@ class Event_Queue extends Supports_Errors {
 		Limits::raise_time_limit( 10 );
 
 		$this->cleanup_unprocessed_events();
-		$this->clean_events();
 
 		$this->store = new Event_Store();
 		$settings    = Plugin::$instance->settings;
@@ -219,55 +241,21 @@ class Event_Queue extends Supports_Errors {
 		$settings->update_option( 'queue_times_executed', $times_executed );
 		$settings->update_option( 'average_execution_time', $average_execution_time );
 
-//		if ( $result > 0 ) {
-//
-//			$r_process_time = number_format( $process_time, 2 );
-//			$r_avg_time     = number_format( $process_time / $result, 2 );
-//
-//			wp_send_json( [
-//				'count'              => $result,
-//				'total-time'         => $r_process_time,
-//				'time-per-event' => $r_avg_time,
-//			] );
-//		}
+		if ( $result > 0 ) {
+
+			$r_process_time = number_format( $process_time, 4 );
+			$r_avg_time     = number_format( $process_time / $result, 4 );
+			$r_eps          = number_format( $result / $process_time, 4 );
+
+			wp_send_json( [
+				'count'             => $result,
+				'total-time'        => $r_process_time,
+				'time-per-event'    => $r_avg_time,
+				'events-per-second' => $r_eps
+			] );
+		}
 
 		return $result;
-	}
-
-	/**
-	 * dump events from event_queue table to the events table
-	 */
-	public function clean_events() {
-
-		//code to clear the events from the event queue table
-		$time = time() - ( MINUTE_IN_SECONDS );
-
-
-		global $wpdb;
-		// Move waiting events from the legacy queue to new queue
-		$event_queue = get_db( 'event_queue' )->get_table_name();
-		$events      = get_db( 'events' )->get_table_name();
-		$columns     = get_db( 'events' )->get_columns();
-
-		unset( $columns['ID'] );
-
-		$columns = implode( ',', array_keys( $columns ) );
-
-		// added two diffrent query because single query was not working on my localhost(says: ERROR in your SQL statement please review it.)
-
-		$sql  = "INSERT INTO {$events} ($columns)
-			SELECT $columns
-			FROM {$event_queue}
-			WHERE status= 'complete' OR status= 'skipped' OR status = 'failed' OR status= 'cancelled' AND `time` < {$time};
-			"  ;
-
-
-		// Move the events to the event queue
-		$wpdb->query( $sql);
-
-		$wpdb->query("DELETE FROM {$event_queue} WHERE `status` = 'complete' OR `status` = 'skipped' OR `status` = 'failed' OR `status` = 'cancelled'  AND `time` < {$time};" );
-
-
 	}
 
 	protected $time_per_event = [];
@@ -291,7 +279,8 @@ class Event_Queue extends Supports_Errors {
 		}
 
 
-		$event_ids = $this->store->get_events_by_claim( $claim );
+		$event_ids           = $this->store->get_events_by_claim( $claim );
+		$processed_event_ids = [];
 
 		// If this happens it means we are in a parallel queue processing situation,
 		// so let's just try and make another claim.
@@ -312,8 +301,6 @@ class Event_Queue extends Supports_Errors {
 		if ( empty( $event_ids ) ) {
 			return $completed_events;
 		}
-
-//		do_action( 'groundhogg/event_queue/process/before', $event_ids );
 
 		self::set_is_processing( true );
 
@@ -345,22 +332,23 @@ class Event_Queue extends Supports_Errors {
 				}
 			}
 
-			$completed_events += 1;
+			$processed_event_ids[] = $event_id;
+			$completed_events      += 1;
 			Limits::processed_action();
 
 		} while ( ! empty( $event_ids ) && ! Limits::limits_exceeded() );
 
 		$this->store->release_events( $claim );
+		$this->move_events_to_history_table( $processed_event_ids );
 
 		self::set_is_processing( false );
-
-//		do_action( 'groundhogg/event_queue/process/after', $this );
 
 		if ( Limits::limits_exceeded( $completed_events ) ) {
 			return $completed_events;
 		}
 
 		return $this->process( $completed_events );
+//		return $completed_events;
 	}
 
 	/**

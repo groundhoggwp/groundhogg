@@ -3,7 +3,9 @@
 namespace Groundhogg;
 
 class Library extends Supports_Errors {
+
 	const PROXY_URL = 'https://library.groundhogg.io/wp-json/gh/v3/';
+	static $user_agent = 'Groundhogg/' . GROUNDHOGG_VERSION . ' library-manager';
 
 	/**
 	 * Flush cache templates

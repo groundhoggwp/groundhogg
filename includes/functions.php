@@ -2347,7 +2347,9 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
 		'headers'     => $headers,
 		'body'        => $body,
 		'data_format' => 'body',
-		'sslverify'   => true
+		'sslverify'   => true,
+		'user-agent'  => 'Groundhogg/' . GROUNDHOGG_VERSION . '; ' . home_url()
+
 	];
 
 	if ( $method === 'GET' ) {
