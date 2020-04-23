@@ -75,6 +75,9 @@ class Event extends Base_Object {
 	public function __construct( $identifier_or_args = 0, $db = 'events', $field = null ) {
 
 		$this->db_name = $db;
+		if ( ($field !== null) && ! $this->get_from_db( $field, $identifier_or_args ) ){
+			$field = null;
+		}
 		parent::__construct( $identifier_or_args, $field );
 	}
 
