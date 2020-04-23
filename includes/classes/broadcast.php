@@ -45,7 +45,6 @@ class Broadcast extends Base_Object implements Event_Process {
 				$this->object = Plugin::$instance->utils->get_email( $this->get_object_id() );
 				break;
 			case self::TYPE_SMS:
-
 				if ( is_sms_plugin_active() ) {
 					$this->object = Plugin::$instance->utils->get_sms( $this->get_object_id() );
 				}
@@ -234,7 +233,7 @@ class Broadcast extends Base_Object implements Event_Process {
 
 		if ( $this->is_sent() ) {
 
-			$data['id']   = $this->get_id();
+			$data['id'] = $this->get_id();
 
 			$data['sent'] = get_db( 'events' )->count( [
 				'step_id'    => $this->get_id(),
@@ -267,24 +266,25 @@ class Broadcast extends Base_Object implements Event_Process {
 			}
 
 			// only if broadcast was actually sent and experimental is enabled.
-			if ( use_experimental_features() && $data[ 'sent' ] > 0 ){
+			if ( use_experimental_features() && $data['sent'] > 0 ) {
 
-				$last_event = get_db( 'events' )->query( [
+				$events = get_db( 'events' )->query( [
+					'select'     => 'count(ID)',
 					'step_id'    => $this->get_id(),
 					'event_type' => Event::BROADCAST,
 					'status'     => Event::COMPLETE,
-					'orderby'    => 'time',
-					'order'      => 'DESC',
-					'limit'      => 1
+					'groupby'    => 'time',
+					'orderby'    => false,
+					'order'      => false,
 				] );
 
-				$last_event = $last_event[ 0 ];
+				$counts = wp_list_pluck( $events, 'count(ID)' );
 
-				// in seconds
-				$period = absint( $last_event->time ) - $this->get_send_time();
+				$total = array_sum( $counts );
+				$count = count( $counts );
 
 				// Speed = total sent / ( time_end - time_start )
-				$data[ 'speed' ] = round( $data[ 'sent' ] / $period, 2 );
+				$data['speed'] = round( $total / $count, 2 );
 			}
 
 		}

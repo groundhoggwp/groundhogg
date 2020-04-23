@@ -307,3 +307,12 @@ input[type=range].slider:focus::-ms-fill-upper {
     margin: 30px auto;
     max-width: 380px;
 }
+
+.tools-left{
+    float: left;
+    width: 50%;
+}
+.tools-right{
+    float: right;
+    width: 50%;
+}

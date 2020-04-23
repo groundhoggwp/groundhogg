@@ -609,7 +609,6 @@ abstract class DB {
 			'order'   => 'desc',
 			'select'  => '*',
 			'search'  => false,
-			'func'    => false,
 		] );
 
 		$where = [ 'relationship' => 'AND' ];

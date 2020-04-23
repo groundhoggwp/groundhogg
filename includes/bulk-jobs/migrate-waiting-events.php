@@ -4,14 +4,17 @@ namespace Groundhogg\Bulk_Jobs;
 
 use Groundhogg\Classes\Activity;
 use Groundhogg\Contact_Query;
+use Groundhogg\Event;
 use function Groundhogg\get_db;
 use Groundhogg\Plugin;
+use function Groundhogg\html;
+use function Groundhogg\white_labeled_name;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Migrate_Form_Impressions extends Bulk_Job {
+class Migrate_Waiting_Events extends Bulk_Job {
 
 	public function __construct() {
 		add_action( 'admin_init', [ $this, 'show_upgrade_prompt' ] );
@@ -19,9 +22,18 @@ class Migrate_Form_Impressions extends Bulk_Job {
 	}
 
 	public function show_upgrade_prompt() {
-		if ( get_option( 'gh_migrate_form_impressions' ) && current_user_can( 'manage_options' ) ) {
-			Plugin::$instance->notices->add( 'db-update', "<a href='{$this->get_start_url()}'>" . __( 'Thank you for updating to 2.0! Please click here to update your database.', 'groundhogg' ) . "</a>" );
+		if ( ! get_option( 'gh_migrate_waiting_events' ) || ! current_user_can( 'perform_bulk_actions' ) ) {
+			return;
 		}
+
+		$update_button = html()->e( 'a', [
+			'href'  => $this->get_start_url(),
+			'class' => 'button button-secondary'
+		], __( 'Migrate now!', 'groundhogg' ) );
+
+		$notice = sprintf( __( "%s requires a database migration. Consider backing up your site before migrating. </p><p>%s", 'groundhogg' ), white_labeled_name(), $update_button );
+
+		Plugin::$instance->notices->add( 'db-update', $notice );
 	}
 
 	/**
@@ -30,7 +42,7 @@ class Migrate_Form_Impressions extends Bulk_Job {
 	 * @return string
 	 */
 	function get_action() {
-		return 'migrate_impressions';
+		return 'migrate_waiting_events';
 	}
 
 	/**
@@ -41,11 +53,11 @@ class Migrate_Form_Impressions extends Bulk_Job {
 	 * @return array
 	 */
 	public function query( $items ) {
-		if ( ! current_user_can( 'edit_funnels' ) ) {
+		if ( ! current_user_can( 'perform_bulk_actions' ) ) {
 			return $items;
 		}
 
-		$query = get_db( 'activity' )->query( [ 'activity_type' => Activity::FORM_IMPRESSION ] );
+		$query = get_db( 'events' )->query( [ 'status' => Event::WAITING ] );
 		$ids   = wp_list_pluck( $query, 'ID' );
 
 		return $ids;
@@ -60,10 +72,6 @@ class Migrate_Form_Impressions extends Bulk_Job {
 	 * @return int
 	 */
 	public function max_items( $max, $items ) {
-		if ( ! current_user_can( 'edit_funnels' ) ) {
-			return $max;
-		}
-
 		return min( 100, intval( ini_get( 'max_input_vars' ) ) );
 	}
 
@@ -75,15 +83,20 @@ class Migrate_Form_Impressions extends Bulk_Job {
 	 * @return void
 	 */
 	protected function process_item( $item ) {
-		$item = absint( $item );
-		$activity = new Activity( $item );
-		if ( $activity->exists() ) {
-			get_db( 'form_impressions' )->add( [
-				'timestamp' => $activity->get_timestamp(),
-				'form_id'   => $activity->get_step_id()
-			] );
-			$activity->delete();
-		}
+		$id = absint( $item );
+
+		// Get the waiting event from the existing events table
+		$event = new Event( $id, 'events' );
+
+		// get the raw data
+		$event_data = $event->get_data();
+		unset( $event_data['ID'] );
+
+		// Create the event in the queue
+		get_db( 'event_queue' )->add( $event_data );
+
+		// Delete the event from the history table
+		$event->delete();
 	}
 
 	/**
@@ -108,7 +121,7 @@ class Migrate_Form_Impressions extends Bulk_Job {
 	 * @return void
 	 */
 	protected function clean_up() {
-		delete_option( 'gh_migrate_form_impressions' );
+		delete_option( 'gh_migrate_waiting_events' );
 	}
 
 	/**

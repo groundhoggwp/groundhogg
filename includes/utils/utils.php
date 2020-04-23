@@ -153,6 +153,7 @@ class Utils {
 	/**
 	 * @param      $id
 	 * @param bool $get_from_cache
+	 * @deprecated 2.1.14
 	 *
 	 * @return Sms
 	 */

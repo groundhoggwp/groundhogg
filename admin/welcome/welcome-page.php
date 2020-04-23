@@ -34,6 +34,10 @@ class Welcome_Page extends Admin_Page {
 	protected function add_ajax_actions() {
 	}
 
+	public function process_action() {
+	    return;
+	}
+
 	/**
 	 * Get the menu order between 1 - 99
 	 *

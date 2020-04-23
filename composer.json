@@ -11,6 +11,7 @@
   ],
   "require": {
     "phpunit/phpunit": "7.5.20",
-    "ext-json": "*"
+    "ext-json": "*",
+    "ext-mysqli": "*"
   }
 }

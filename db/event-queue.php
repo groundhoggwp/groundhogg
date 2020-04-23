@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @package     Includes
  */
-class Events extends DB {
+class Event_Queue extends DB {
 
 	/**
 	 * Get the DB suffix
@@ -30,7 +30,7 @@ class Events extends DB {
 	 * @return string
 	 */
 	public function get_db_suffix() {
-		return 'gh_events';
+		return 'gh_event_queue';
 	}
 
 	/**
@@ -57,7 +57,7 @@ class Events extends DB {
 	 * @return string
 	 */
 	public function get_object_type() {
-		return 'event';
+		return 'event_queue_item';
 	}
 
 	/**
@@ -88,7 +88,6 @@ class Events extends DB {
 			'status'         => '%s',
 			'priority'       => '%d',
 			'claim'          => '%s',
-			'queued_id'      => '%d',
 		);
 	}
 
@@ -113,7 +112,6 @@ class Events extends DB {
 			'status'         => 'waiting',
 			'priority'       => 10,
 			'claim'          => '',
-			'queued_id'      => 0,
 		);
 	}
 
@@ -197,9 +195,9 @@ class Events extends DB {
 		$sql = parent::get_sql( $query_vars );
 
 		// Double compare to better display completion order
-		if ( $query_vars['orderby'] === 'time' ) {
-			$sql = str_replace( 'ORDER BY time DESC', 'ORDER BY `time` DESC, `micro_time` DESC', $sql );
-			$sql = str_replace( 'ORDER BY time ASC', 'ORDER BY `time` ASC, `micro_time` ASC', $sql );
+		if ( $query_vars[ 'orderby' ] === 'time' ){
+			$sql = str_replace(  'ORDER BY time DESC',  'ORDER BY `time` DESC, `micro_time` DESC', $sql );
+			$sql = str_replace(  'ORDER BY time ASC',  'ORDER BY `time` ASC, `micro_time` ASC', $sql );
 		}
 
 		return $sql;
@@ -222,7 +220,6 @@ class Events extends DB {
         time bigint(20) unsigned NOT NULL,
         micro_time float(8) unsigned NOT NULL,
         time_scheduled bigint(20) unsigned NOT NULL,
-        queued_id bigint(20) unsigned NOT NULL,
         contact_id bigint(20) unsigned NOT NULL,
         funnel_id bigint(20) unsigned NOT NULL,
         step_id bigint(20) unsigned NOT NULL,
@@ -236,10 +233,8 @@ class Events extends DB {
         KEY time (time),
         KEY time_scheduled (time_scheduled),
         KEY contact_id (contact_id),
-        KEY queued_id (queued_id),
         KEY funnel_id (funnel_id),
         KEY step_id (step_id),
-        KEY claim (claim),
         KEY priority (priority)
 		) {$this->get_charset_collate()};";
 

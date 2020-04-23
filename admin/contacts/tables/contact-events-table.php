@@ -29,182 +29,185 @@ use Groundhogg\Event;
  */
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 // WP_List_Table is not loaded automatically so we need to load it in our application
-if( ! class_exists( 'WP_List_Table' ) ) {
-    require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
+if ( ! class_exists( 'WP_List_Table' ) ) {
+	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
 class Contact_Events_Table extends Events\Events_Table {
 
-    /**
-     * The data concerning the contact
-     *
-     * @var array
-     */
-    public $data;
+	/**
+	 * The data concerning the contact
+	 *
+	 * @var array
+	 */
+	public $data;
 
-    /**
-     * @var string
-     */
-    public $status;
+	/**
+	 * @var string
+	 */
+	public $status;
 
-    public function __construct( $status='waiting' )
-    {
-        $this->status = $status;
 
-        parent::__construct( array(
-            'singular' => 'event',     // Singular name of the listed records.
-            'plural'   => 'events',    // Plural name of the listed records.
-            'ajax'     => false,       // Does this table support ajax?
-        ) );
-    }
+	public function __construct( $status = 'waiting' ) {
+		$this->status = $status;
 
-    /**
-     * @see WP_List_Table::::single_row_columns()
-     * @return array An associative array containing column information.
-     */
-    public function get_columns() {
-        $columns = array(
-            'funnel'    => _x( 'Funnel', 'Column label', 'wp-funnels' ),
-            'step'      => _x( 'Step', 'Column label', 'wp-funnels' ),
-            'time'      => _x( 'Time', 'Column label', 'wp-funnels' ),
-            'actions'   => _x( 'Actions', 'Column label', 'wp-funnels' ),
-        );
+		parent::__construct( array(
+			'singular' => 'event',     // Singular name of the listed records.
+			'plural'   => 'events',    // Plural name of the listed records.
+			'ajax'     => false,       // Does this table support ajax?
+		) );
+	}
 
-        return apply_filters( 'wpgh_event_columns', $columns );
-    }
+	/**
+	 * @return array An associative array containing column information.
+	 * @see WP_List_Table::::single_row_columns()
+	 */
+	public function get_columns() {
+		$columns = array(
+			'funnel'  => _x( 'Funnel', 'Column label', 'wp-funnels' ),
+			'step'    => _x( 'Step', 'Column label', 'wp-funnels' ),
+			'time'    => _x( 'Time', 'Column label', 'wp-funnels' ),
+			'actions' => _x( 'Actions', 'Column label', 'wp-funnels' ),
+		);
 
-    public function display_tablenav($which)
-    {
-        if ( $which === 'top' ):
+		return apply_filters( 'wpgh_event_columns', $columns );
+	}
 
-        ?>
-        <div class="tablenav <?php echo esc_attr( $which ); ?>">
-            <?php $this->extra_tablenav( $which ); ?>
-            <br class="clear" />
-        </div>
-    <?php
-    endif;
-    }
+	public function display_tablenav( $which ) {
+		if ( $which === 'top' ):
 
-    public function extra_tablenav($which)
-    {
-        $contact_id = absint( get_request_var( 'contact' ) );
+			?>
+            <div class="tablenav <?php echo esc_attr( $which ); ?>">
+				<?php $this->extra_tablenav( $which ); ?>
+                <br class="clear"/>
+            </div>
+		<?php
+		endif;
+	}
 
-        ?>
+	public function extra_tablenav( $which ) {
+		$contact_id = absint( get_request_var( 'contact' ) );
+
+		?>
         <div class="alignleft gh-actions">
-        <a class="button button-secondary" href="<?php echo admin_url('admin.php?page=gh_events&contact_id=' . $contact_id . '&status=' . $this->status ); ?>"><?php _ex( 'View All Events', 'contact_record', 'groundhogg' ); ?></a>
-        <?php if ( $this->status === 'waiting' ): ?>
-            <a class="button action" href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'process_queue' ], admin_url( 'admin.php?page=gh_events&return_to_contact=' . $contact_id ) ), 'process_queue' ); ?>"><?php _ex( 'Process Events', 'action', 'groundhogg' ); ?></a>
-        <?php endif; ?>
+            <a class="button button-secondary"
+               href="<?php echo admin_url( 'admin.php?page=gh_events&contact_id=' . $contact_id . '&status=' . $this->status ); ?>"><?php _ex( 'View All Events', 'contact_record', 'groundhogg' ); ?></a>
+			<?php if ( $this->status === 'waiting' ): ?>
+                <a class="button action"
+                   href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'process_queue' ], admin_url( 'admin.php?page=gh_events&return_to_contact=' . $contact_id ) ), 'process_queue' ); ?>"><?php _ex( 'Process Events', 'action', 'groundhogg' ); ?></a>
+			<?php endif; ?>
         </div>
-        <?php
-    }
+		<?php
+	}
 
-    public function get_views()
-    {
-        __return_false();
-    }
+	public function get_views() {
+		__return_false();
+	}
 
-    /**
-     * @param $event Event
-     * @param string $column_name
-     * @param string $primary
-     * @return string
-     */
-    public function handle_row_actions($event, $column_name, $primary)
-    {
+	/**
+	 * @param $event Event
+	 * @param string $column_name
+	 * @param string $primary
+	 *
+	 * @return string
+	 */
+	public function handle_row_actions( $event, $column_name, $primary ) {
 
-        $actions = [];
+		$actions = [];
 
-        if ( $column_name === 'funnel' ){
-            if ( $event->is_funnel_event() ){
-                $actions['edit'] = sprintf("<a class='edit' href='%s' aria-label='%s'>%s</a>",
-                    admin_url('admin.php?page=gh_funnels&action=edit&funnel=' . $event->get_funnel_id()),
-                    esc_attr(_x('Edit Funnel', 'action', 'groundhogg')),
-                    _x('Edit Funnel', 'action', 'groundhogg')
-                );
-            }
+		if ( $column_name === 'funnel' ) {
+			if ( $event->is_funnel_event() ) {
+				$actions['edit'] = sprintf( "<a class='edit' href='%s' aria-label='%s'>%s</a>",
+					admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $event->get_funnel_id() ),
+					esc_attr( _x( 'Edit Funnel', 'action', 'groundhogg' ) ),
+					_x( 'Edit Funnel', 'action', 'groundhogg' )
+				);
+			}
 
-        } else if ( $column_name === 'step' ){
-            if ( $event->is_funnel_event() ){
-                $actions['edit'] = sprintf("<a class='edit' href='%s' aria-label='%s'>%s</a>",
-                    admin_url( sprintf( 'admin.php?page=gh_funnels&action=edit&funnel=%d#%d', $event->get_funnel_id(), $event->get_step_id() ) ),
-                    esc_attr(_x('Edit Step', 'action', 'groundhogg')),
-                    _x('Edit Step', 'action', 'groundhogg')
-                );
-            }
-        }
+		} else if ( $column_name === 'step' ) {
+			if ( $event->is_funnel_event() ) {
+				$actions['edit'] = sprintf( "<a class='edit' href='%s' aria-label='%s'>%s</a>",
+					admin_url( sprintf( 'admin.php?page=gh_funnels&action=edit&funnel=%d#%d', $event->get_funnel_id(), $event->get_step_id() ) ),
+					esc_attr( _x( 'Edit Step', 'action', 'groundhogg' ) ),
+					_x( 'Edit Step', 'action', 'groundhogg' )
+				);
+			}
+		}
 
 
-        return $this->row_actions( apply_filters( 'wpgh_event_row_actions', $actions, $event, $column_name ) );
-    }
+		return $this->row_actions( apply_filters( 'wpgh_event_row_actions', $actions, $event, $column_name ) );
+	}
 
-    /**
-     * @param $event Event
-     * @return string
-     */
-    protected function column_actions( $event )
-    {
-        $run = esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->get_id() . '&action=execute&return_to_contact=' . $event->get_contact_id() ), 'execute' ) );
-        $cancel = esc_url( wp_nonce_url( admin_url('admin.php?page=gh_events&event='. $event->get_id() . '&action=cancel&return_to_contact=' . $event->get_contact_id() ), 'cancel' ) );
-        $actions = array();
+	/**
+	 * @param $event Event
+	 *
+	 * @return string
+	 */
+	protected function column_actions( $event ) {
+		$run     = esc_url( wp_nonce_url( admin_url( 'admin.php?page=gh_events&event=' . $event->get_id() . '&action=execute&return_to_contact=' . $event->get_contact_id() ), 'execute' ) );
+		$cancel  = esc_url( wp_nonce_url( admin_url( 'admin.php?page=gh_events&event=' . $event->get_id() . '&action=cancel&return_to_contact=' . $event->get_contact_id() ), 'cancel' ) );
+		$actions = array();
 
-        if ( $event->is_waiting() ){
-            $actions[] = sprintf( "<span class=\"run\"><a href=\"%s\" class=\"run\">%s</a></span>", $run, _x( 'Run Now', 'action', 'groundhogg' ) );
-            $actions[] = sprintf( "<span class=\"delete\"><a href=\"%s\" class=\"delete\">%s</a></span>", $cancel, _x( 'Cancel', 'action', 'groundhogg' ) );
-        } else {
-            $actions[] = sprintf( "<span class=\"run\"><a href=\"%s\" class=\"run\">%s</a></span>", $run, _x( 'Run Again', 'action', 'groundhogg' ) );
-        }
+		if ( $event->is_waiting() ) {
+			$actions[] = sprintf( "<span class=\"run\"><a href=\"%s\" class=\"run\">%s</a></span>", $run, _x( 'Run Now', 'action', 'groundhogg' ) );
+			$actions[] = sprintf( "<span class=\"delete\"><a href=\"%s\" class=\"delete\">%s</a></span>", $cancel, _x( 'Cancel', 'action', 'groundhogg' ) );
+		} else {
+			$actions[] = sprintf( "<span class=\"run\"><a href=\"%s\" class=\"run\">%s</a></span>", $run, _x( 'Run Again', 'action', 'groundhogg' ) );
+		}
 
-        return $this->row_actions( $actions );
-    }
+		return $this->row_actions( $actions );
+	}
 
-    /**
-     * Prepares the list of items for displaying
-     */
-    function prepare_items() {
-	    $columns  = $this->get_columns();
-	    $hidden   = array(); // No hidden columns
-	    $sortable = $this->get_sortable_columns();
+	/**
+	 * Prepares the list of items for displaying
+	 */
+	function prepare_items() {
+		$columns  = $this->get_columns();
+		$hidden   = array(); // No hidden columns
+		$sortable = $this->get_sortable_columns();
 
-	    $this->_column_headers = array( $columns, $hidden, $sortable );
+		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-	    $per_page = absint( get_url_var( 'limit', 10 ) );
-	    $paged   = $this->get_pagenum();
-	    $offset  = $per_page * ( $paged - 1 );
-	    $order   = get_url_var( 'order', 'DESC' );
-	    $orderby = get_url_var( 'orderby', 'time' );
+		$per_page = absint( get_url_var( 'limit', 10 ) );
+		$paged    = $this->get_pagenum();
+		$offset   = $per_page * ( $paged - 1 );
+		$order    = get_url_var( 'order', 'DESC' );
+		$orderby  = get_url_var( 'orderby', 'time' );
 
-	    $where = [
-		    'relationship' => "AND",
-		    [ 'col' => 'status', 'val' => $this->status, 'compare' => '=' ],
-		    [ 'col' => 'contact_id', 'val' => absint( get_url_var( 'contact' ) ), 'compare' => '=' ],
-	    ];
+		$where = [
+			'relationship' => "AND",
+			[ 'col' => 'status', 'val' => $this->status, 'compare' => '=' ],
+			[ 'col' => 'contact_id', 'val' => absint( get_url_var( 'contact' ) ), 'compare' => '=' ],
+		];
 
-	    $args = array(
-		    'where'   => $where,
-		    'limit'   => $per_page,
-		    'offset'  => $offset,
-		    'order'   => $order,
-		    'orderby' => $orderby,
-	    );
+		$args = array(
+			'where'   => $where,
+			'limit'   => $per_page,
+			'offset'  => $offset,
+			'order'   => $order,
+			'orderby' => $orderby,
+		);
 
-	    $events = get_db( 'events' )->query( $args );
-	    $total = get_db( 'events' )->count( $args );
+		$this->table = ($this->status === Event::WAITING ) ? 'event_queue' : 'events';
 
-	    $this->items = $events;
+		$events = get_db( $this->table )->query( $args );
+		$total  = get_db( $this->table )->count( $args );
 
-	    // Add condition to be sure we don't divide by zero.
-	    // If $this->per_page is 0, then set total pages to 1.
-	    $total_pages = $per_page ? ceil( (int) $total / (int) $per_page ) : 1;
+		$this->items = $events;
 
-	    $this->set_pagination_args( array(
-		    'total_items' => $total,
-		    'per_page'    => $per_page,
-		    'total_pages' => $total_pages,
-	    ) );
-    }
+		// Add condition to be sure we don't divide by zero.
+		// If $this->per_page is 0, then set total pages to 1.
+		$total_pages = $per_page ? ceil( (int) $total / (int) $per_page ) : 1;
+
+		$this->set_pagination_args( array(
+			'total_items' => $total,
+			'per_page'    => $per_page,
+			'total_pages' => $total_pages,
+		) );
+	}
 }

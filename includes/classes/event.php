@@ -61,12 +61,30 @@ class Event extends Base_Object {
 	protected $funnel;
 
 	/**
+	 * @var string
+	 */
+	protected $db_name = 'events';
+
+	/**
+	 * Event constructor.
+	 *
+	 * @param int $identifier_or_args
+	 * @param null $field
+	 * @param string $db allow for the passing of the db name, this allows the reference of the event_queue table OR the regular events table.
+	 */
+	public function __construct( $identifier_or_args = 0, $db = 'events', $field = null ) {
+
+		$this->db_name = $db;
+		parent::__construct( $identifier_or_args, $field );
+	}
+
+	/**
 	 * Return the DB instance that is associated with items of this type.
 	 *
 	 * @return Events
 	 */
 	protected function get_db() {
-		return get_db( 'events' );
+		return get_db( $this->db_name );
 	}
 
 	/**
@@ -90,6 +108,14 @@ class Event extends Base_Object {
 	 */
 	public function get_time() {
 		return absint( $this->time );
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function get_micro_time() {
+		return $this->micro_time ;
 	}
 
 	/**
@@ -382,10 +408,13 @@ class Event extends Base_Object {
 	public function cancel() {
 		do_action( 'groundhogg/event/cancelled', $this );
 
-		return $this->update( [
+		$cancel =  $this->update( [
 			'status' => self::CANCELLED,
 			'time'   => time(),
 		] );
+
+		return $cancel;
+
 	}
 
 	/**
@@ -419,10 +448,12 @@ class Event extends Base_Object {
 	public function skip() {
 		do_action( 'groundhogg/event/skipped', $this );
 
-		return $this->update( [
+		$skip =  $this->update( [
 			'status' => self::SKIPPED,
 			'time'   => time(),
 		] );
+
+		return $skip;
 	}
 
 	/**
@@ -454,12 +485,17 @@ class Event extends Base_Object {
 
 		do_action( 'groundhogg/event/complete', $this );
 
-		return $this->update( [
+
+		$update = $this->update( [
 			'status'        => self::COMPLETE,
 			'time'          => time(),
 			'micro_time'    => micro_seconds(),
 			'error_code'    => '',
 			'error_message' => '',
 		] );
+
+		return $update;
 	}
+
+
 }

@@ -27,6 +27,7 @@ class Event_Store {
 				[ 'col' => 'claim', 'val' => $claim, 'compare' => '=' ],
 			],
 			'orderby' => 'time',
+			'select' => 'ID'
 		], false );
 
 		$ids = wp_parse_id_list( wp_list_pluck( $queued_events, 'ID' ) );
@@ -35,10 +36,10 @@ class Event_Store {
 	}
 
 	/**
-	 * @return Events
+	 * @return \Groundhogg\DB\Event_Queue
 	 */
 	public function db() {
-		return get_db( 'events' );
+		return get_db( 'event_queue' );
 	}
 
 	/**
@@ -77,6 +78,8 @@ class Event_Store {
 	 * @return array
 	 */
 	public function get_queued_event_ids( $count = 100 ) {
+
+
 
 		global $wpdb;
 

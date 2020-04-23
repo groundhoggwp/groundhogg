@@ -15,6 +15,7 @@ use function Groundhogg\is_sms_plugin_active;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\scheduled_time;
 use \WP_List_Table;
+use function Groundhogg\scheduled_time_column;
 use function Groundhogg\use_experimental_features;
 
 /**
@@ -228,7 +229,7 @@ class Broadcasts_Table extends WP_List_Table {
 	 */
 	protected function column_sending_to( $broadcast ) {
 
-		$num = Plugin::$instance->dbs->get_db( 'events' )->count( [
+		$num = Plugin::$instance->dbs->get_db( 'event_queue' )->count( [
 			'step_id'    => $broadcast->get_id(),
 			'status'     => 'waiting',
 			'event_type' => Event::BROADCAST
@@ -270,10 +271,18 @@ class Broadcasts_Table extends WP_List_Table {
 		// Show the speed of a broadcast
 		if ( isset_not_empty( $stats, 'speed' ) ){
 			$html .= sprintf(
-				"%s: <strong>%s/s</strong><br/>",
+				"%s: <strong title='%s'>%s/s</strong><br/>",
 				_x( "Speed", 'stats', 'groundhogg' ),
+				esc_attr( "Emails per second", 'stats', 'groundhogg' ),
 				$stats['speed']
 			);
+
+//			$html .= sprintf(
+//				"%s: <strong title='%s'>%ss</strong><br/>",
+//				_x( "Time", 'stats', 'groundhogg' ),
+//				esc_attr( "Total time elapsed", 'stats', 'groundhogg' ),
+//				$stats['time_elapsed']
+//			);
 		}
 
 		$html .= sprintf(
@@ -336,10 +345,9 @@ class Broadcasts_Table extends WP_List_Table {
 	 * @return string
 	 */
 	protected function column_send_time( $broadcast ) {
-		$time        = scheduled_time( $broadcast->get_send_time() );
-		$time_prefix = $broadcast->get_send_time() > time() ? __( 'Sending', 'groundhogg' ) : __( 'Sent', 'groundhogg' );
 
-		return $time_prefix . '<br><abbr title="' . date_i18n( DATE_ISO8601, intval( $broadcast->get_send_time() ) ) . '">' . $time . '</abbr>';
+		$prefix = $broadcast->is_sent() ? __( 'Sent', 'groundhogg' ): __( 'Sending', 'groundhogg' );
+		return $prefix . ' ' . scheduled_time_column( $broadcast->get_send_time() );
 	}
 
 	/**
@@ -349,9 +357,7 @@ class Broadcasts_Table extends WP_List_Table {
 	 */
 	protected function column_date_scheduled( $broadcast ) {
 		$ds_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $broadcast->get_date_scheduled() ) );
-		$time    = scheduled_time( $ds_time );
-
-		return __( 'Scheduled', 'groundhogg' ) . '<br><abbr title="' . date_i18n( DATE_ISO8601, $ds_time ) . '">' . $time . '</abbr>';
+		return scheduled_time_column( $ds_time, false, false, false );
 	}
 
 	/**
