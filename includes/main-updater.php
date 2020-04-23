@@ -244,12 +244,16 @@ class Main_Updater extends Updater {
 	 * create new event_queue table
 	 * migrate waiting events to the new queue
 	 * add queued_id column
+	 * add optin_status_changed column
 	 *
 	 * Automatic update!
 	 */
 	public function version_2_1_15() {
 
 		global $wpdb;
+
+		// Add optin_status_changed column
+		get_db( 'contacts' )->create_table();
 
 		// Update the current events table
 		get_db( 'events' )->create_table();

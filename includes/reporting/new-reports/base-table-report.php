@@ -14,9 +14,14 @@ use Groundhogg\Plugin;
  */
 abstract class Base_Table_Report extends Base_Report {
 	/**
+	 * @deprecated
 	 * @return bool
 	 */
 	abstract function only_show_top_10();
+
+    function get_num_results(){
+    	return 10;
+	}
 
 	abstract function get_label();
 
@@ -53,8 +58,8 @@ abstract class Base_Table_Report extends Base_Report {
 		usort( $dataset, array( $this, 'sort' ) );
 
 		/* Pair down the results to largest 10 */
-		if ( count( $dataset ) > 10 && $this->only_show_top_10() ) {
-			$dataset = array_slice( $dataset, 0, 10 );
+		if ( count( $dataset ) > $this->get_num_results() ) {
+			$dataset = array_slice( $dataset, 0, $this->get_num_results() );
 		}
 
 		usort( $dataset, array( $this, 'sort' ) );

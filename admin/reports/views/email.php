@@ -48,44 +48,47 @@ function quick_stat_report( $args = [] ) {
 
 		<?php quick_stat_report( [
 			'id'    => 'total_emails_sent',
-			'title' => __( 'Emails Sent', 'groundhogg' )
+			'title' => __( 'Emails Sent', 'groundhogg' ),
+			'style' => 'width:33%;'
 		] ); ?>
 
 		<?php quick_stat_report( [
 			'id'    => 'email_open_rate',
 			'title' => __( 'Open Rate', 'groundhogg' ),
+			'style' => 'width:33%;'
 		] ); ?>
 
 		<?php quick_stat_report( [
 			'id'    => 'email_click_rate',
 			'title' => __( 'Click Rate', 'groundhogg' ),
+			'style' => 'width:33%;'
 		] ); ?>
-
-		<?php quick_stat_report( [
-			'id'    => 'unsubscribes',
-			'title' => __( 'Unsubscribes', 'groundhogg' ),
-		] );
-		?>
     </div>
 </div>
 <div class="groundhogg-quick-stats">
     <div class="groundhogg-report">
+	    <?php quick_stat_report( [
+		    'id'    => 'total_unsubscribed_contacts',
+		    'title' => __( 'Unsubscribes', 'groundhogg' ),
+		    'style' => 'width:25%;'
+	    ] );
+	    ?>
 		<?php quick_stat_report( [
 			'id'    => 'total_spam_contacts',
 			'title' => __( 'Spam', 'groundhogg' ),
-			'style' => 'width:33%;'
+			'style' => 'width:25%;'
 		] ); ?>
 
 		<?php quick_stat_report( [
 			'id'    => 'total_bounces_contacts',
 			'title' => __( 'Bounces', 'groundhogg' ),
-			'style' => 'width:33%;'
+			'style' => 'width:25%;'
 		] ); ?>
 
 		<?php quick_stat_report( [
 			'id'    => 'total_complaints_contacts',
 			'title' => __( 'Complaints', 'groundhogg' ),
-			'style' => 'width:33%;'
+			'style' => 'width:25%;'
 		] ); ?>
 
     </div>

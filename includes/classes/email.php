@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Api\V3\Unsubscribe_Api;
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Email_Meta;
 use Groundhogg\DB\Emails;
@@ -639,7 +640,7 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function get_headers() {
 		/* Use default mail-server */
-		$headers = [];
+		$headers             = [];
 		$headers['from']     = 'From: ' . wp_specialchars_decode( $this->get_from_name() ) . ' <' . $this->get_from_email() . '>';
 		$headers['reply_to'] = 'Reply-To: ' . $this->get_reply_to_address();
 
@@ -649,9 +650,18 @@ class Email extends Base_Object_With_Meta {
 			$return_path_email = $this->get_from_email();
 		}
 
-		$headers['return_path']  = 'Return-Path: ' . $return_path_email;
-		$headers['content_type'] = 'Content-Type: text/html; charset=UTF-8';
-		$headers['unsub']        = sprintf( 'List-Unsubscribe: <mailto:%s?subject=Unsubscribe %s from %s>,<%s>', get_bloginfo( 'admin_email' ), $this->get_to_address(), get_bloginfo(), $this->click_tracking_link( $this->get_unsubscribe_link() ) );
+		$headers['return_path']      = 'Return-Path: ' . $return_path_email;
+		$headers['content_type']     = 'Content-Type: text/html; charset=UTF-8';
+		$headers['unsub']            = sprintf(
+			'List-Unsubscribe: <%s>,<mailto:%s?subject=Unsubscribe %s from %s>',
+			add_query_arg( [
+				'contact' => encrypt( $this->get_contact()->get_email() )
+			], rest_url( Unsubscribe_Api::NAME_SPACE . '/unsubscribe' ) ),
+			get_bloginfo( 'admin_email' ),
+			$this->get_to_address(),
+			get_bloginfo()
+		);
+		$headers['unsub-one-click'] = 'List-Unsubscribe-Post: List-Unsubscribe=One-Click';
 
 		return apply_filters( "groundhogg/email/headers", $headers );
 	}
@@ -918,7 +928,15 @@ class Email extends Base_Object_With_Meta {
 		return $buffer;
 	}
 
-	public function get_email_stats( $start , $end  ) {
+	/**
+	 * Get related email statistics
+	 *
+	 * @param $start
+	 * @param $end
+	 *
+	 * @return array
+	 */
+	public function get_email_stats( $start, $end ) {
 
 		$steps = get_db( 'stepmeta' )->query( [
 			'meta_key'   => 'email_id',
@@ -927,9 +945,7 @@ class Email extends Base_Object_With_Meta {
 
 		$steps_ids = wp_parse_id_list( wp_list_pluck( $steps, 'step_id' ) );
 
-
 		if ( ! empty( $steps_ids ) ) {
-
 
 			$where_events = [
 				'relationship' => "AND",
@@ -956,10 +972,9 @@ class Email extends Base_Object_With_Meta {
 				'where' => $where_opened
 			] );
 
-
 			$where_clicked = [
 				'relationship' => "AND",
-				[ 'col' => 'email_id', 'val' => $this->get_id() , 'compare' => '=' ],
+				[ 'col' => 'email_id', 'val' => $this->get_id(), 'compare' => '=' ],
 				[ 'col' => 'activity_type', 'val' => Activity::EMAIL_CLICKED, 'compare' => '=' ],
 				[ 'col' => 'timestamp', 'val' => $start, 'compare' => '>=' ],
 				[ 'col' => 'timestamp', 'val' => $end, 'compare' => '<=' ],

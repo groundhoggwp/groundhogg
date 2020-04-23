@@ -54,7 +54,6 @@ class Table_Top_Performing_Emails extends Base_Table_Report {
 
 	protected function get_top_emails() {
 
-
 		$funnel_id = absint( $this->get_funnel_id() );
 
 		if ( $funnel_id ) {
@@ -64,18 +63,15 @@ class Table_Top_Performing_Emails extends Base_Table_Report {
 				'step_type' => 'send_email'
 			] );
 
-
-
 			if (empty( $steps )) {
 				return [];
 			}
+
 			$email_ids = [];
 
 			foreach ( $steps as $step ) {
 				$email_ids[] = absint( get_db( 'stepmeta' )->get_meta( $step->ID, 'email_id', true ) );
 			}
-
-
 
 			$emails = get_db( 'emails' )->query( [
 				'status' => 'ready',
@@ -89,7 +85,6 @@ class Table_Top_Performing_Emails extends Base_Table_Report {
 			] );
 		}
 
-
 		$list = [];
 
 		foreach ( $emails as $email ) {
@@ -100,9 +95,9 @@ class Table_Top_Performing_Emails extends Base_Table_Report {
 			$title = $email->get_title();
 			if ( ( $report[ 'total' ] > 0 ) || $funnel_id) {
 				$list[] = [
-					'data'    => percentage( $report[ 'total' ], $report[ 'opened' ] ),
 					'label'   => $title,
 					'url'     => admin_url( sprintf( 'admin.php?page=gh_emails&action=edit&email=%s', $email->ID ) ),
+					'data'    => percentage( $report[ 'total' ], $report[ 'opened' ] ),
 					'clicked' => percentage( $report [ 'opened' ], $report [ 'clicked' ] )
 				];
 			}
@@ -115,7 +110,8 @@ class Table_Top_Performing_Emails extends Base_Table_Report {
 
 			$datum[ 'label' ]   = html()->wrap( $datum[ 'label' ], 'a', [
 				'href'  => $datum[ 'url' ],
-				'class' => 'number-total'
+				'class' => 'number-total',
+				'title' => $datum[ 'label' ],
 			] );
 			$datum[ 'data' ]    = $datum[ 'data' ] . '%';
 			$datum[ 'clicked' ] = $datum[ 'clicked' ] . '%';
@@ -126,6 +122,23 @@ class Table_Top_Performing_Emails extends Base_Table_Report {
 
 		return $data;
 
+	}
+
+	/**
+	 * Sort by multiple args
+	 *
+	 * @param $a
+	 * @param $b
+	 *
+	 * @return mixed
+	 */
+	public function sort( $a, $b ) {
+
+		if ( $a[ 'data' ] === $b[ 'data' ] ){
+			return $b[ 'clicked' ] - $a[ 'clicked' ];
+		}
+
+		return $b[ 'data' ] - $a[ 'data' ];
 	}
 
 

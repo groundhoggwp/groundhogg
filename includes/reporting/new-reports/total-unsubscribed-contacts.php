@@ -3,9 +3,10 @@
 namespace Groundhogg\Reporting\New_Reports;
 
 use Groundhogg\Contact_Query;
+use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 
-class Total_Unsubscribed_Contacts extends Base_Quick_Stat {
+class Total_Unsubscribed_Contacts extends Base_Negative_Quick_Stat {
 
 	/**
 	 * Query the results
@@ -20,6 +21,9 @@ class Total_Unsubscribed_Contacts extends Base_Quick_Stat {
 		$query = new Contact_Query();
 
 		$query->set_date_key( 'date_optin_status_changed' );
+
+		$start = Plugin::instance()->utils->date_time->convert_to_local_time( $start );
+		$end   = Plugin::instance()->utils->date_time->convert_to_local_time( $end );
 
 		return $query->query( [
 			'count'        => true,

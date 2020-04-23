@@ -101,7 +101,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 					'total_new_contacts',
 					'total_confirmed_contacts',
 					'total_engaged_contacts',
-					'total_unsubscribes',
+					'total_unsubscribed_contacts',
 
 					'total_emails_sent',
 					'email_open_rate',
@@ -149,7 +149,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 					'email_open_rate',
 					'email_click_rate',
 
-					'total_unsubscribes',
+					'total_unsubscribed_contacts',
 					'total_spam_contacts',
 					'total_bounces_contacts',
 					'total_complaints_contacts',
@@ -333,7 +333,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 	public function refresh_report_data() {
 
 		$start = strtotime( sanitize_text_field( get_post_var( 'start' ) ) );
-		$end   = strtotime( sanitize_text_field( get_post_var( 'end' ) ) );
+		$end   = strtotime( sanitize_text_field( get_post_var( 'end' ) ) ) + ( DAY_IN_SECONDS - 1 );
 
 		$reports = map_deep( get_post_var( 'reports' ), 'sanitize_key' );
 

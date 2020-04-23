@@ -413,6 +413,8 @@ class Contacts extends DB {
 		PRIMARY KEY (ID),
 		UNIQUE KEY email (email),
 		KEY user (user_id),
+		KEY owner_id (owner_id),
+		KEY optin_status (optin_status),
 		KEY date_created (date_created),
 		KEY date_optin_status_changed (date_optin_status_changed)
 		) {$this->get_charset_collate()};";

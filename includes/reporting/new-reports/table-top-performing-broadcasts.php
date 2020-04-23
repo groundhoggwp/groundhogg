@@ -16,6 +16,10 @@ class Table_Top_Performing_Broadcasts extends Base_Table_Report {
 		return true;
 	}
 
+	public function get_num_results() {
+		return 5;
+	}
+
 	function column_title() {
 		// TODO: Implement column_title() method.
 	}
@@ -29,28 +33,23 @@ class Table_Top_Performing_Broadcasts extends Base_Table_Report {
 	 */
 	public function get_data() {
 		return [
-			'type' => 'table',
+			'type'  => 'table',
 			'label' => $this->get_label(),
-			'data' =>
+			'data'  =>
 				$this->get_broadcasts()
 		];
 	}
 
 
-	public function get_label()
-	{
+	public function get_label() {
 		return [
-			__('Emails' , 'groundhogg' ),
-			__('Open Rate' , 'groundhogg' ),
-			__( 'Click Thorough Rate' , 'groundhogg'  )
-		] ;
-
+			__( 'Emails', 'groundhogg' ),
+			__( 'Open Rate', 'groundhogg' ),
+			__( 'Click Thorough Rate', 'groundhogg' )
+		];
 	}
 
-
-
 	protected function get_broadcasts() {
-
 
 		$where = [
 			'relationship' => "AND",
@@ -64,11 +63,11 @@ class Table_Top_Performing_Broadcasts extends Base_Table_Report {
 			'where' => $where,
 		] );
 
-		if (empty($broadcasts)){
+		if ( empty( $broadcasts ) ) {
 
 			return [
 
-			] ;
+			];
 		}
 
 		$list = [];
@@ -80,13 +79,11 @@ class Table_Top_Performing_Broadcasts extends Base_Table_Report {
 			$report = $broadcast->get_report_data();
 
 			$list[] = [
-
-				'data'   => percentage( $report[ 'sent' ], $report[ 'opened' ] ),
-				'opened' => $report [ 'opened' ],
-				'label'  => $broadcast->get_title(),
-				'click_through_rate' =>  percentage( $report[ 'opened' ], $report[ 'clicked' ] ),
-				'url'    => admin_url( sprintf( 'admin.php?page=gh_broadcasts&action=report&broadcast=%s', $broadcast->get_id() ) ),
-
+				'data'               => percentage( $report['sent'], $report['opened'] ),
+				'opened'             => $report ['opened'],
+				'label'              => $broadcast->get_title(),
+				'click_through_rate' => percentage( $report['opened'], $report['clicked'] ),
+				'url'                => admin_url( sprintf( 'admin.php?page=gh_broadcasts&action=report&broadcast=%s', $broadcast->get_id() ) ),
 			];
 
 		}
@@ -94,16 +91,14 @@ class Table_Top_Performing_Broadcasts extends Base_Table_Report {
 		$list = $this->normalize_data( $list );
 
 		foreach ( $list as $i => $datum ) {
-
-
-			$datum[ 'label' ] = html()->wrap(  $datum[ 'label' ] , 'a', [
-				'href'  => $datum[ 'url' ],
+			$datum['label']              = html()->wrap( $datum['label'], 'a', [
+				'href'  => $datum['url'],
 				'class' => 'number-total'
 			] );
-			$datum[ 'data' ] =  $datum[ 'data' ] . '%';
-			$datum[ 'click_through_rate' ] =  $datum[ 'click_through_rate' ] . '%';
+			$datum['data']               = $datum['data'] . '%';
+			$datum['click_through_rate'] = $datum['click_through_rate'] . '%';
 
-			unset( $datum[ 'url' ] );
+			unset( $datum['url'] );
 			$data[ $i ] = $datum;
 		}
 
@@ -123,10 +118,10 @@ class Table_Top_Performing_Broadcasts extends Base_Table_Report {
 	protected function normalize_datum( $item_key, $item_data ) {
 
 		return [
-			'label'  => $item_data [ 'label' ],
-			'data'   => $item_data [ 'data' ],
-			'click_through_rate' => $item_data [ 'click_through_rate' ],
-			'url'    => $item_data [ 'url' ],
+			'label'              => $item_data ['label'],
+			'data'               => $item_data ['data'],
+			'click_through_rate' => $item_data ['click_through_rate'],
+			'url'                => $item_data ['url'],
 		];
 	}
 
