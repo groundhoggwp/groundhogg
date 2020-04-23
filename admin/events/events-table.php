@@ -214,9 +214,7 @@ class Events_Table extends WP_List_Table {
 	protected function column_default( $event, $column_name ) {
 
 		do_action( 'groundhogg_events_custom_column', $event, $column_name );
-
 		return '';
-
 	}
 
 	/**

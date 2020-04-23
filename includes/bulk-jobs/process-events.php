@@ -31,7 +31,7 @@ class Process_Events extends Bulk_Job {
 
 		$now = time();
 
-		$db = get_db( 'events' );
+		$db = get_db( 'event_queue' );
 
 		$SQL = "SELECT COUNT(ID) FROM {$db->get_table_name()}
 		WHERE `status` = 'waiting' AND `time` <= {$now} AND `claim` = ''";

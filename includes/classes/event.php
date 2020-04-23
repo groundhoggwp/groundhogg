@@ -72,12 +72,15 @@ class Event extends Base_Object {
 	 * @param null $field
 	 * @param string $db allow for the passing of the db name, this allows the reference of the event_queue table OR the regular events table.
 	 */
-	public function __construct( $identifier_or_args = 0, $db = 'events', $field = null ) {
+	public function __construct( $identifier_or_args = 0, $db = 'events', $field = 'ID' ) {
 
 		$this->db_name = $db;
-		if ( ($field !== null) && ! $this->get_from_db( $field, $identifier_or_args ) ){
-			$field = null;
+
+		// Backwards compat for missing 'queued_id'
+		if ( $field === 'queued_id' && ! $this->get_db()->exists( [ $field => $identifier_or_args ] ) ){
+			$field = 'ID';
 		}
+
 		parent::__construct( $identifier_or_args, $field );
 	}
 
@@ -112,7 +115,6 @@ class Event extends Base_Object {
 	public function get_time() {
 		return absint( $this->time );
 	}
-
 
 	/**
 	 * @return int
@@ -239,7 +241,6 @@ class Event extends Base_Object {
 	public function get_error_message() {
 		return $this->error_message;
 	}
-
 
 	/**
 	 * Do any post setup actions.
@@ -487,7 +488,6 @@ class Event extends Base_Object {
 	public function complete() {
 
 		do_action( 'groundhogg/event/complete', $this );
-
 
 		$update = $this->update( [
 			'status'        => self::COMPLETE,

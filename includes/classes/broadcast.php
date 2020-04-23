@@ -179,7 +179,7 @@ class Broadcast extends Base_Object implements Event_Process {
 	 */
 	public function cancel() {
 
-		if ( Plugin::$instance->dbs->get_db( 'events' )->mass_update(
+		if ( get_db( 'event_queue' )->mass_update(
 			[
 				'status' => Event::CANCELLED
 			],
@@ -241,13 +241,13 @@ class Broadcast extends Base_Object implements Event_Process {
 				'status'     => Event::COMPLETE
 			] );
 
-			if ( ! $this->is_sms() ) {
+			$data['waiting']            = get_db( 'event_queue' )->count( [
+				'step_id'    => $this->get_id(),
+				'event_type' => Event::BROADCAST,
+				'status'     => Event::WAITING
+			] );
 
-				$data['waiting']            = get_db( 'events' )->count( [
-					'step_id'    => $this->get_id(),
-					'event_type' => Event::BROADCAST,
-					'status'     => Event::WAITING
-				] );
+			if ( ! $this->is_sms() ) {
 				$data['opened']             = get_db( 'activity' )->count( [
 					'funnel_id'     => $this->get_funnel_id(),
 					'step_id'       => $this->get_id(),

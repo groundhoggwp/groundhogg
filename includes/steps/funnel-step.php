@@ -6,6 +6,7 @@ use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use function Groundhogg\dashicon;
 use function Groundhogg\ensure_array;
+use function Groundhogg\get_db;
 use function Groundhogg\html;
 use Groundhogg\Event;
 use function Groundhogg\get_array_var;
@@ -616,7 +617,7 @@ abstract class Funnel_Step extends Supports_Errors {
 		$args  = [ 'step_type' => $this->get_type(), 'step_group' => $this->get_group() ];
 		$query = array_merge( $query, $args );
 
-		$raw_steps = Plugin::$instance->dbs->get_db( 'steps' )->query( $query );
+		$raw_steps = get_db( 'steps' )->query( $query );
 
 		$steps = [];
 

@@ -231,7 +231,7 @@ class Broadcasts_Table extends WP_List_Table {
 
 		$num = Plugin::$instance->dbs->get_db( 'event_queue' )->count( [
 			'step_id'    => $broadcast->get_id(),
-			'status'     => 'waiting',
+			'status'     => Event::WAITING,
 			'event_type' => Event::BROADCAST
 		] );
 

@@ -452,7 +452,7 @@ function words_to_key( $words ) {
  *
  * @return float
  */
-function percentage( $a, $b, $precision=2 ) {
+function percentage( $a, $b, $precision = 2 ) {
 	$a = intval( $a );
 	$b = intval( $b );
 
@@ -1368,13 +1368,14 @@ function get_form_list() {
 /**
  * Schedule a 1 off email notification
  *
- * @param     $email_id            int the ID of the email to send
- * @param     $contact_id_or_email int|string the ID of the contact to send to
+ * @param int $email_id the ID of the email to send
+ * @param int|string $contact_id_or_email the ID of the contact to send to
  * @param int $time time time to send at, defaults to time()
  *
  * @return bool whether the scheduling was successful.
  */
 function send_email_notification( $email_id, $contact_id_or_email, $time = 0 ) {
+
 	$contact = Plugin::$instance->utils->get_contact( $contact_id_or_email );
 	$email   = Plugin::$instance->utils->get_email( $email_id );
 
@@ -1393,10 +1394,10 @@ function send_email_notification( $email_id, $contact_id_or_email, $time = 0 ) {
 		'contact_id' => $contact->get_id(),
 		'event_type' => Event::EMAIL_NOTIFICATION,
 		'priority'   => 5,
-		'status'     => 'waiting',
+		'status'     => Event::WAITING,
 	];
 
-	if ( Plugin::$instance->dbs->get_db( 'events' )->add( $event ) ) {
+	if ( get_db( 'event_queue' )->add( $event ) ) {
 		return true;
 	}
 
@@ -1868,7 +1869,7 @@ endif;
  *
  * @return string
  */
-function scheduled_time( $time, $date_prefix='on' ) {
+function scheduled_time( $time, $date_prefix = 'on' ) {
 	// convert to local time.
 	$p_time = Plugin::$instance->utils->date_time->convert_to_local_time( $time );
 
@@ -1879,11 +1880,11 @@ function scheduled_time( $time, $date_prefix='on' ) {
 
 	if ( absint( $time_diff ) > DAY_IN_SECONDS ) {
 
-	    if ( $date_prefix ){
-		    $time = sprintf( "%s %s", $date_prefix, date_i18n( get_date_time_format(), intval( $p_time ) ) );
-	    } else {
-		    $time = date_i18n( get_date_time_format(), intval( $p_time ) );
-	    }
+		if ( $date_prefix ) {
+			$time = sprintf( "%s %s", $date_prefix, date_i18n( get_date_time_format(), intval( $p_time ) ) );
+		} else {
+			$time = date_i18n( get_date_time_format(), intval( $p_time ) );
+		}
 
 	} else {
 		$format = $time_diff <= 0 ? _x( "%s ago", 'status', 'groundhogg' ) : _x( "in %s", 'status', 'groundhogg' );
@@ -1903,18 +1904,18 @@ function scheduled_time( $time, $date_prefix='on' ) {
  *
  * @return string
  */
-function scheduled_time_column( $time = 0, $show_local_time = false, $contact = false, $date_prefix='on' ) {
+function scheduled_time_column( $time = 0, $show_local_time = false, $contact = false, $date_prefix = 'on' ) {
 
-    if ( is_string( $time ) ){
-        $time = strtotime( $time );
-    }
+	if ( is_string( $time ) ) {
+		$time = strtotime( $time );
+	}
 
 	$s_time = scheduled_time( $time, $date_prefix );
 	$l_time = Plugin::instance()->utils->date_time->convert_to_local_time( $time );
 
 	$html = '<abbr title="' . date_i18n( get_date_time_format(), $l_time ) . '">' . $s_time . '</abbr>';
 
-	if ( $show_local_time && is_a( $contact, 'Groundhogg\Contact' ) ){
+	if ( $show_local_time && is_a( $contact, 'Groundhogg\Contact' ) ) {
 		$html .= sprintf( '<br><i>(%s %s)', date_i18n( get_option( 'time_format' ), $contact->get_local_time( $time ) ), __( 'local time', 'groundhogg' ) ) . '</i>';
 	}
 
@@ -3063,8 +3064,8 @@ function set_user_test_email( $email = '', $user_id = 0 ) {
  *
  * @return bool
  */
-function gh_cron_installed(){
-    return file_exists( ABSPATH . 'gh-cron.php' );
+function gh_cron_installed() {
+	return file_exists( ABSPATH . 'gh-cron.php' );
 }
 
 /**
@@ -3074,15 +3075,15 @@ function gh_cron_installed(){
  *
  * @return bool|Event
  */
-function get_event_by_queued_id( $queued_id ){
+function get_event_by_queued_id( $queued_id ) {
 
-    $event = new Event( absint( $queued_id ), 'events', 'queued_id' );
+	$event = new Event( absint( $queued_id ), 'events', 'queued_id' );
 
-    if ( ! $event->exists() ){
-        return false;
-    }
+	if ( ! $event->exists() ) {
+		return false;
+	}
 
-    return $event;
+	return $event;
 }
 
 /**
@@ -3092,11 +3093,11 @@ function get_event_by_queued_id( $queued_id ){
  *
  * @return bool|Event
  */
-function get_queued_event_by_id( $event_id ){
+function get_queued_event_by_id( $event_id ) {
 
 	$event = new Event( absint( $event_id ), 'event_queue', 'ID' );
 
-	if ( ! $event->exists() ){
+	if ( ! $event->exists() ) {
 		return false;
 	}
 

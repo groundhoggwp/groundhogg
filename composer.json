@@ -12,6 +12,7 @@
   "require": {
     "phpunit/phpunit": "7.5.20",
     "ext-json": "*",
-    "ext-mysqli": "*"
+    "ext-mysqli": "*",
+    "ext-imap": "*"
   }
 }

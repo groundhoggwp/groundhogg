@@ -14,11 +14,9 @@ use function Groundhogg\percentage;
 
 class Total_Funnel_Conversion_Rate extends Base_Quick_Stat_Percent {
 
-
 	protected function get_funnel_id() {
-		return absint( get_request_var( 'data' )[ 'funnel_id' ] );
+		return absint( get_request_var( 'data' )['funnel_id'] );
 	}
-
 
 	/**
 	 * Query the results
@@ -30,13 +28,12 @@ class Total_Funnel_Conversion_Rate extends Base_Quick_Stat_Percent {
 	 */
 	protected function query( $start, $end ) {
 
-
 		$funnel = new Funnel( $this->get_funnel_id() );
 
-		$conversion_step  = $funnel->get_conversion_step();
+		$conversion_step = $funnel->get_conversion_step();
 
-		if (! $conversion_step ) {
-			$conversion_step =  $funnel->get_first_step();
+		if ( ! $conversion_step ) {
+			$conversion_step = $funnel->get_first_step();
 		}
 
 		$where_events = [
@@ -48,7 +45,7 @@ class Total_Funnel_Conversion_Rate extends Base_Quick_Stat_Percent {
 		];
 
 		$num_of_conversions = get_db( 'events' )->count( [
-			'where' => $where_events,
+			'where'  => $where_events,
 			'select' => 'DISTINCT contact_id'
 		] );
 
@@ -67,22 +64,21 @@ class Total_Funnel_Conversion_Rate extends Base_Quick_Stat_Percent {
 	 */
 	protected function query_vs( $start, $end ) {
 
-		$start = $start - MONTH_IN_SECONDS ;
-
+		$start = $start - MONTH_IN_SECONDS;
 
 		$funnel = new Funnel( $this->get_funnel_id() );
 
-		$first_step =  absint( $funnel->get_first_step() );
+		$first_step = absint( $funnel->get_first_step() );
 
 		$cquery = new Contact_Query();
 
 		$num_events_completed = $cquery->query( [
-			'count' => true,
+			'count'  => true,
 			'report' => [
-				'start' => $start,
-				'end'   => $end,
-				'step'  => $first_step,
-				'status'=> 'complete'
+				'start'  => $start,
+				'end'    => $end,
+				'step'   => $first_step,
+				'status' => 'complete'
 			]
 		] );
 
