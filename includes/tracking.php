@@ -338,7 +338,9 @@ class Tracking {
 	public function get_current_event() {
 		$id = absint( $this->get_tracking_cookie_param( 'event_id' ) );
 
-		return Plugin::$instance->utils->get_event( $id );
+		// It's likely that the event is being set by an email link click,
+		// so reference the `queued_id` rather than the actual event `ID`
+		return get_event_by_queued_id( $id );
 	}
 
 	/**
@@ -492,7 +494,7 @@ class Tracking {
 	 */
 	public function email_opened() {
 		$event_id = $this->get_tracking_cookie_param( 'event_id' );
-		$event    = Plugin::$instance->utils->get_event( $event_id );
+		$event    = get_event_by_queued_id( $event_id );
 
 		if ( ! $event || ! $event->exists() ) {
 			if ( $this->doing_open ) {
@@ -537,7 +539,7 @@ class Tracking {
 		$this->email_opened();
 
 		$event_id = $this->get_tracking_cookie_param( 'event_id' );
-		$event    = Plugin::$instance->utils->get_event( $event_id );
+		$event    = get_event_by_queued_id( $event_id );
 
 		$redirect = add_query_arg( [ 'key' => wp_create_nonce() ], $target );
 

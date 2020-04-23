@@ -682,12 +682,14 @@ class Email extends Base_Object_With_Meta {
 	/**
 	 * Set Event
 	 *
+	 * This is PROBABLY a queued event...
+	 *
 	 * @param $event Event|int
 	 */
 	public function set_event( $event ) {
 		if ( ! is_object( $event ) ) {
 			$event = absint( $event );
-			$event = Plugin::$instance->utils->get_event( $event );
+			$event = get_queued_event_by_id( $event );
 
 			if ( ! $event ) {
 				$event = new Event( 0 );

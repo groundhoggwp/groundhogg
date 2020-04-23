@@ -3067,13 +3067,38 @@ function gh_cron_installed(){
     return file_exists( ABSPATH . 'gh-cron.php' );
 }
 
+/**
+ * Get an event from the event history table by referencing it's ID from the event queue
+ *
+ * @param $queued_id int
+ *
+ * @return bool|Event
+ */
+function get_event_by_queued_id( $queued_id ){
 
-//code to run evvent queue
+    $event = new Event( absint( $queued_id ), 'events', 'queued_id' );
 
-//function test()
-//{
-//    Plugin::$instance->event_queue->run_queue() ;
-//
-//}
-//
-//    add_action( 'init' , __NAMESPACE__ . '\test' );
+    if ( ! $event->exists() ){
+        return false;
+    }
+
+    return $event;
+}
+
+/**
+ * Get an event from the event history table by referencing it's ID from the event queue
+ *
+ * @param $event_id int
+ *
+ * @return bool|Event
+ */
+function get_queued_event_by_id( $event_id ){
+
+	$event = new Event( absint( $event_id ), 'event_queue', 'ID' );
+
+	if ( ! $event->exists() ){
+		return false;
+	}
+
+	return $event;
+}
