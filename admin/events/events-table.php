@@ -3,12 +3,14 @@
 namespace Groundhogg\Admin\Events;
 
 use Groundhogg\Event;
+use function Groundhogg\action_url;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
+use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
 use function Groundhogg\scheduled_time;
@@ -214,6 +216,7 @@ class Events_Table extends WP_List_Table {
 	protected function column_default( $event, $column_name ) {
 
 		do_action( 'groundhogg_events_custom_column', $event, $column_name );
+
 		return '';
 	}
 
@@ -250,6 +253,8 @@ class Events_Table extends WP_List_Table {
 			case 'complete':
 			case 'skipped':
 			case 'cancelled':
+				$actions['uncancel'] = _x( 'Uncancel', 'List table bulk action', 'wp-funnels' );
+				break;
 			case 'failed':
 				$actions['execute_again'] = _x( 'Run Again', 'List table bulk action', 'wp-funnels' );
 				break;
@@ -301,34 +306,30 @@ class Events_Table extends WP_List_Table {
 
 			$actions = array();
 
-			switch ( $event->status ) {
-				case 'waiting':
-					$actions['execute'] = sprintf(
-						'<a href="%s" class="edit" aria-label="%s">%s</a>',
-						/* translators: %s: title */
-						esc_url( wp_nonce_url( admin_url( 'admin.php?page=gh_events&event=' . $event->get_id() . '&action=execute' ) ) ),
-						esc_attr( _x( 'Execute', 'action', 'groundhogg' ) ),
-						_x( 'Run Now', 'action', 'groundhogg' )
-					);
-					$actions['delete']  = sprintf(
-						'<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-						esc_url( wp_nonce_url( admin_url( 'admin.php?page=gh_events&event=' . $event->get_id() . '&action=cancel' ) ) ),
-						/* translators: %s: title */
-						esc_attr( _x( 'Cancel', 'action', 'groundhogg' ) ),
-						_x( 'Cancel', 'action', 'groundhogg' )
-					);
-					break;
+			switch ( $this->get_view() ) {
 				default:
-					$actions['re_execute'] = sprintf(
-						'<a href="%s" class="edit" aria-label="%s">%s</a>',
-						/* translators: %s: title */
-						esc_url( wp_nonce_url( admin_url( 'admin.php?page=gh_events&event=' . $event->get_id() . '&action=execute' ) ) ),
-						esc_attr( _x( 'Run Again', 'action', 'groundhogg' ) ),
-						_x( 'Run Again', 'action', 'groundhogg' )
-					);
+				case 'waiting':
+					$actions['execute_now'] = html()->e( 'a', [
+						'href' => action_url( 'execute_now', [ 'event' => $event->get_id() ] ),
+					], __( 'Run now', 'groundhogg' ) );
+					$actions['cancel']      = html()->e( 'a', [
+						'href' => action_url( 'cancel', [ 'event' => $event->get_id() ] ),
+					], __( 'Cancel', 'groundhogg' ) );
 					break;
-
+				case 'cancelled':
+					$actions['uncancel'] = html()->e( 'a', [
+						'href' => action_url( 'uncancel', [ 'event' => $event->get_id() ] ),
+					], __( 'Uncancel', 'groundhogg' ) );
+					break;
+				case 'complete':
+				case 'skipped':
+				case 'failed':
+					$actions['execute_again'] = html()->e( 'a', [
+						'href' => action_url( 'execute_again', [ 'event' => $event->get_id(), 'status' => $this->get_view() ] ),
+					], __( 'Run Again', 'groundhogg' ) );
+					break;
 			}
+
 
 			if ( $event->get_contact() && $event->get_contact()->exists() ) {
 				$actions['view'] = sprintf( "<a class='edit' href='%s' aria-label='%s'>%s</a>",

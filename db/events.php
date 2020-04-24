@@ -142,8 +142,9 @@ class Events extends DB {
 	 * Move events from this table to the event queue
 	 *
 	 * @param array $where
+	 * @param bool $delete_from_history whether to delete the records from the history table
 	 */
-	public function move_events_to_queue( $where = [] ) {
+	public function move_events_to_queue( $where = [], $delete_from_history=false ) {
 
 		global $wpdb;
 
@@ -155,8 +156,8 @@ class Events extends DB {
 		$history_columns = $this->get_columns(); // queue_id will be last
 
 		unset( $history_columns['ID'] );
+		unset( $history_columns['queued_id'] );
 		unset( $queue_columns['ID'] );
-		unset( $queue_columns['queued_id'] );
 
 		$history_columns = implode( ',', array_keys( $history_columns ) );
 		$queue_columns   = implode( ',', array_keys( $queue_columns ) );
@@ -170,9 +171,11 @@ class Events extends DB {
 			FROM $events
 			WHERE $where" );
 
-		// Dont delete these events for backwards compatibility...
+		// Optionally delete these events for backwards compatibility...
 		// this way we can retain a record of retires as well...
-//		$wpdb->query( "DELETE FROM $events WHERE $where;" );
+		if ( $delete_from_history === true ){
+			$wpdb->query( "DELETE FROM $events WHERE $where;" );
+		}
 	}
 
 	/**

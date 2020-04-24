@@ -259,10 +259,10 @@ abstract class DB {
 
 					foreach ( $value as $item ) {
 
-						if ( is_string( $item ) ) {
-							$ORS[] = "'" . $item . "'";
-						} else {
+						if ( is_numeric( $item ) ) {
 							$ORS[] = $item;
+						} else if ( is_string( $item ) ) {
+							$ORS[] = "'" . $item . "'";
 						}
 
 					}

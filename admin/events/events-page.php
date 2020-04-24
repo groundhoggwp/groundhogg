@@ -193,16 +193,55 @@ class Events_Page extends Admin_Page {
 		global $wpdb;
 
 		$events      = get_db( 'events' )->get_table_name();
+		$event_queue = get_db( 'event_queue' )->get_table_name();
 		$event_ids   = implode( ',', $this->get_items() );
 		$time        = time();
+		$waiting     = Event::WAITING;
 
-		// Update the time
-		$wpdb->query( "UPDATE {$events} SET `time` = {$time}, `status` = 'waiting' WHERE `ID` in ({$event_ids})" );
+		$claim = substr( md5( wp_json_encode( $this->get_items() ) ), 0, 20 );
 
-		// Move the events over...
-		get_db( 'events' )->move_events_to_queue( [ 'ID' => $this->get_items() ] );
+		// Update the claim column
+		$wpdb->query( "UPDATE {$events} SET `claim` = '$claim' WHERE `ID` in ({$event_ids});" );
+
+		// Move the events over... only delete if the status is not complete
+		get_db( 'events' )->move_events_to_queue( [ 'claim' => $claim ], get_request_var( 'status' ) === Event::COMPLETE ? false : true );
+
+		// Update claim, status, and time...
+		$wpdb->query( "UPDATE {$event_queue} SET `claim` = '', `status` = '$waiting', `time` = $time WHERE `claim` = '$claim';" );
 
 		$this->add_notice( 'scheduled', sprintf( _nx( '%d event rescheduled', '%d events rescheduled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
+
+		if ( $contact_id = absint( get_request_var( 'return_to_contact' ) ) ) {
+			return admin_url( 'admin.php?page=gh_contacts&action=edit&tab=activity&contact=' . $contact_id );
+		}
+
+		return false;
+	}
+
+	/**
+	 * Uncancels any cancelled events...
+	 *
+	 * @return bool
+	 */
+	public function process_uncancel() {
+		if ( ! current_user_can( 'execute_events' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		global $wpdb;
+
+		$events      = get_db( 'events' )->get_table_name();
+		$event_ids   = implode( ',', $this->get_items() );
+		$cancelled   = Event::CANCELLED;
+		$waiting     = Event::WAITING;
+
+		// Update the status back to waiting...
+		$wpdb->query( "UPDATE {$events} SET `status` = '$waiting' WHERE `ID` in ({$event_ids}) AND `status` = '$cancelled';" );
+
+		// Move the events over...
+		get_db( 'events' )->move_events_to_queue( [ 'ID' => $this->get_items(), 'status' => $waiting ], true );
+
+		$this->add_notice( 'scheduled', sprintf( _nx( '%d event uncancelled', '%d events uncancelled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
 
 		if ( $contact_id = absint( get_request_var( 'return_to_contact' ) ) ) {
 			return admin_url( 'admin.php?page=gh_contacts&action=edit&tab=activity&contact=' . $contact_id );
