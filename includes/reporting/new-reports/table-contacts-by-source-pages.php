@@ -21,7 +21,7 @@ class Table_Contacts_By_Source_Pages extends Base_Table_Report {
 		];
 	}
 
-	protected function get_chart_data() {
+	protected function get_table_data() {
 
 		$ids  = $this->get_new_contact_ids_in_time_period();
 		$rows = get_db( 'contactmeta' )->query( [

@@ -22,7 +22,7 @@ abstract class Base_Table_Report extends Base_Report {
 		return [
 			'type'  => 'table',
 			'label' => $this->get_label(),
-			'data'  => $this->get_chart_data()
+			'data'  => $this->get_table_data()
 		];
 	}
 
@@ -49,7 +49,7 @@ abstract class Base_Table_Report extends Base_Report {
 	/**
 	 * @return mixed
 	 */
-	abstract protected function get_chart_data();
+	abstract protected function get_table_data();
 
 	/**
 	 * Normalize a datum

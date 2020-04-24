@@ -14,45 +14,19 @@ use function Groundhogg\percentage;
 
 class Table_Top_Performing_Emails extends Base_Table_Report {
 
-
-	function only_show_top_10() {
-		return true;
-	}
-
-	function column_title() {
-		// TODO: Implement column_title() method.
-	}
-
-
-	/**
-	 * @return array
-	 */
-	public function get_data() {
-		return [
-			'type'  => 'table',
-			'label' => $this->get_label(),
-			'data'  =>
-				$this->get_top_emails()
-		];
-	}
-
-
 	public function get_label() {
 		return [
 			__( 'Emails', 'groundhogg' ),
 			__( 'Open Rate', 'groundhogg' ),
 			__( 'Click Thorough Rate', 'groundhogg' )
 		];
-
 	}
-
 
 	protected function get_funnel_id() {
 		return get_request_var( 'data' )[ 'funnel_id' ];
 	}
 
-
-	protected function get_top_emails() {
+	protected function get_table_data() {
 
 		$funnel_id = absint( $this->get_funnel_id() );
 

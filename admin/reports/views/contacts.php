@@ -150,20 +150,19 @@ function quick_stat_report( $args = [] ) {
         <div id="table_contacts_by_search_engines"></div>
     </div>
     <div class="groundhogg-chart-no-padding">
-        <h2 class="title"><?php _e( 'Top Source Pages', 'groundhogg' ); ?></h2>
-        <div id="table_contacts_by_source_page"></div>
+        <h2 class="title"><?php _e( 'Top Social Networks', 'groundhogg' ); ?></h2>
+        <div id="table_contacts_by_social_media"></div>
     </div>
 </div>
 <div class="groundhogg-chart-wrapper">
     <div class="groundhogg-chart-no-padding">
-        <h2 class="title"><?php _e( 'Top Social Networks', 'groundhogg' ); ?></h2>
-        <div id="table_contacts_by_social_media"></div>
+        <h2 class="title"><?php _e( 'Top Source Pages', 'groundhogg' ); ?></h2>
+        <div id="table_contacts_by_source_page"></div>
     </div>
     <div class="groundhogg-chart-no-padding">
         <h2 class="title"><?php _e( 'Top lead Sources', 'groundhogg' ); ?></h2>
         <div id="table_contacts_by_lead_source"></div>
     </div>
-
 </div>
 
 

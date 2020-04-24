@@ -21,7 +21,7 @@ class Table_Contacts_By_Country extends Base_Table_Report {
 	/**
 	 * @return array
 	 */
-	protected function get_chart_data() {
+	protected function get_table_data() {
 
 		$rows = get_db( 'contactmeta' )->query( [
 			'contact_id' => $this->get_new_contact_ids_in_time_period(),
