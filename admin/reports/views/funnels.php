@@ -7,6 +7,7 @@ namespace Groundhogg\Admin\Reports\Views;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
+use function Groundhogg\dashicon;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
@@ -67,7 +68,12 @@ function quick_stat_report( $args = [] ) {
 		'option_none' => false,
 	);
 	echo Plugin::$instance->utils->html->dropdown( $args );
+
 	?>
+        <a href="<?php echo admin_url( sprintf( 'admin.php?page=gh_funnels&action=edit&funnel=%s', get_funnel_id() ) ); ?> " class="button">
+<!--            <span title="--><?php //esc_attr_e( 'Copy share link', 'groundhogg' ) ?><!--" class="dashicons dashicons-filter" style="width: auto;height: auto;vertical-align: middle;font-size: 14px;margin-right: 3px;"></span> -->
+	        <?php _e( 'View Funnel', 'groundhogg' ); ?></a>
+
 </div>
 <div style="clear: both;"></div>
 
