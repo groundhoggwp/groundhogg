@@ -14,146 +14,115 @@ use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use function Groundhogg\percentage;
 
-class Table_Top_Converting_Funnels extends Base_Table_Report
-{
+class Table_Top_Converting_Funnels extends Base_Table_Report {
+
+	public function get_label() {
+		return [
+			__( 'Funnel', 'groundhogg' ),
+			__( 'Conversion Rate', 'groundhogg' )
+		];
+
+	}
+
+	protected function get_table_data() {
+
+		//  get list of funnels and plot it conversion rate
+		$funnels = get_db( 'funnels' )->query( [] );
+		if ( empty( $funnels ) ) {
+			return [];
+		}
+
+		$list = [];
+		foreach ( $funnels as $funnel ) {
+			$list [] = [
+				'label' => $funnel->title,
+				'data'  => $this->get_conversion_rate( $funnel->ID ),
+				'url'   => admin_url( sprintf( 'admin.php?page=gh_funnels&action=edit&funnel=%s', $funnel->ID ) ),
+			];
+		}
 
 
-    function only_show_top_10()
-    {
-        return true;
-    }
+		$list = $this->normalize_data( $list );
 
-    function column_title()
-    {
-        // TODO: Implement column_title() method.
-    }
+		foreach ( $list as $i => $datum ) {
 
 
-    /**
-     * @return array
-     */
-    public function get_data()
-    {
-        return [
-            'type' => 'table',
-            'label' => $this->get_label(),
-            'data' => $this->funnel_conversion_rate()
-        ];
-    }
+			$datum['label'] = html()->wrap( $datum['label'], 'a', [
+				'href'  => $datum['url'],
+				'class' => 'number-total'
+			] );
+			$datum['data']  = $datum['data'] . '%';
+
+			unset( $datum['url'] );
+			$data[ $i ] = $datum;
+		}
+
+		return $data;
+
+	}
 
 
-    public function get_label()
-    {
-        return [
-            __('Funnel', 'groundhogg'),
-            __('Conversion Rate', 'groundhogg')
-        ];
+	/**
+	 * Normalize a datum
+	 *
+	 * @param $item_key
+	 * @param $item_data
+	 *
+	 * @return array
+	 */
+	protected function normalize_datum( $item_key, $item_data ) {
 
-    }
-
-
-    protected function funnel_conversion_rate()
-    {
-
-        //  get list of funnels and plot it conversion rate
-        $funnels = get_db('funnels')->query([]);
-        if (empty($funnels)) {
-            return [];
-        }
-
-        $list = [];
-        foreach ($funnels as $funnel) {
-            $list [] = [
-                'label' => $funnel->title,
-                'data' => $this->get_conversion_rate($funnel->ID),
-                'url' => admin_url(sprintf('admin.php?page=gh_funnels&action=edit&funnel=%s', $funnel->ID)),
-            ];
-        }
+		return [
+			'label' => $item_data ['label'],
+			'data'  => $item_data ['data'],
+			'url'   => $item_data ['url'],
+		];
+	}
 
 
-        $list = $this->normalize_data( $list );
+	protected function get_conversion_rate( $funnel_id ) {
 
-        foreach ( $list as $i => $datum ) {
+		$funnel = new Funnel( $funnel_id );
 
+		$conversion_step = $funnel->get_conversion_step();
 
-            $datum[ 'label' ] = html()->wrap(  $datum[ 'label' ] , 'a', [
-                'href'  => $datum[ 'url' ],
-                'class' => 'number-total'
-            ] );
-            $datum[ 'data' ] =  $datum[ 'data' ] . '%';
+		if ( ! $conversion_step ) {
+			$conversion_step = $funnel->get_first_step();
+		}
 
-            unset( $datum[ 'url' ] );
-            $data[ $i ] = $datum;
-        }
+		$where_events = [
+			'relationship' => "AND",
+			[ 'col' => 'step_id', 'val' => $conversion_step, 'compare' => '=' ],
+			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
+			[ 'col' => 'time', 'val' => $this->start, 'compare' => '>=' ],
+			[ 'col' => 'time', 'val' => $this->end, 'compare' => '<=' ],
+		];
 
-        return $data;
+		$num_of_conversions = get_db( 'events' )->count( [
+			'where'  => $where_events,
+			'select' => 'DISTINCT contact_id'
+		] );
 
-    }
+		$start = $this->start - MONTH_IN_SECONDS;
 
+		$first_step = absint( $funnel->get_first_step() );
 
-    /**
-     * Normalize a datum
-     *
-     * @param $item_key
-     * @param $item_data
-     *
-     * @return array
-     */
-    protected function normalize_datum( $item_key, $item_data ) {
+		$cquery = new Contact_Query();
 
-        return [
-            'label'  => $item_data [ 'label' ],
-            'data'   => $item_data [ 'data' ],
-            'url'    => $item_data [ 'url' ],
-        ];
-    }
+		$num_events_completed = $cquery->query( [
+			'count'  => true,
+			'report' => [
+				'start'  => $start,
+				'end'    => $this->end,
+				'step'   => $first_step,
+				'status' => 'complete'
+			]
+		] );
 
-
-    protected function get_conversion_rate($funnel_id)
-    {
-
-
-        $funnel = new Funnel($funnel_id);
-
-        $conversion_step = $funnel->get_conversion_step();
-
-        if (!$conversion_step) {
-            $conversion_step = $funnel->get_first_step();
-        }
-
-        $where_events = [
-            'relationship' => "AND",
-            ['col' => 'step_id', 'val' => $conversion_step, 'compare' => '='],
-            ['col' => 'status', 'val' => 'complete', 'compare' => '='],
-            ['col' => 'time', 'val' => $this->start, 'compare' => '>='],
-            ['col' => 'time', 'val' => $this->end, 'compare' => '<='],
-        ];
-
-        $num_of_conversions = get_db('events')->count([
-            'where' => $where_events,
-            'select' => 'DISTINCT contact_id'
-        ]);
-
-        $start = $this->start - MONTH_IN_SECONDS;
-
-        $first_step = absint($funnel->get_first_step());
-
-        $cquery = new Contact_Query();
-
-        $num_events_completed = $cquery->query([
-            'count' => true,
-            'report' => [
-                'start' => $start,
-                'end' => $this->end,
-                'step' => $first_step,
-                'status' => 'complete'
-            ]
-        ]);
-
-        return percentage($num_events_completed, $num_of_conversions);
+		return percentage( $num_events_completed, $num_of_conversions );
 
 
-    }
+	}
 
 
 }

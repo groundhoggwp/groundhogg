@@ -11,35 +11,9 @@ use function Groundhogg\percentage;
 
 class Table_Top_Performing_Broadcasts extends Base_Table_Report {
 
-
-	function only_show_top_10() {
-		return true;
-	}
-
 	public function get_num_results() {
 		return 5;
 	}
-
-	function column_title() {
-		// TODO: Implement column_title() method.
-	}
-
-	/**
-	 *
-	 *
-	 *
-	 * @return array
-	 *
-	 */
-	public function get_data() {
-		return [
-			'type'  => 'table',
-			'label' => $this->get_label(),
-			'data'  =>
-				$this->get_broadcasts()
-		];
-	}
-
 
 	public function get_label() {
 		return [
@@ -49,7 +23,7 @@ class Table_Top_Performing_Broadcasts extends Base_Table_Report {
 		];
 	}
 
-	protected function get_broadcasts() {
+	protected function get_table_data() {
 
 		$where = [
 			'relationship' => "AND",

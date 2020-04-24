@@ -6,47 +6,27 @@ namespace Groundhogg\Reporting\New_Reports;
 use Groundhogg\Broadcast;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Plugin;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use function Groundhogg\percentage;
 
 class Table_Broadcast_Link_Clicked extends Base_Table_Report {
-	function only_show_top_10() {
-		return false;
-	}
 
-	function column_title() {
-		// TODO: Implement column_title() method.
-	}
-
-	/**
-	 * @return array
-	 */
-	public function get_data() {
-		return [
-			'type'  => 'table',
-			'label' => $this->get_label(),
-			'data'  =>
-				$this->get_by_country()
-		];
-	}
 
 	public function get_label() {
 		return [
 			__( 'Link', 'groundhogg' ),
 			__( 'Clicks', 'groundhogg' ),
 		];
-
 	}
-
 
 	protected function get_broadcast_id() {
-		return get_request_var( 'data' )[ 'broadcast_id' ];
+		return get_array_var( get_request_var( 'data', [] ), 'broadcast_id' );
 	}
 
-	protected function get_by_country() {
-
+	protected function get_table_data() {
 
 		$broadcast = new Broadcast( $this->get_broadcast_id() );
 

@@ -14,38 +14,13 @@ use function Groundhogg\key_to_words;
 use function Groundhogg\percentage;
 
 class Table_Broadcast_Stats extends Base_Table_Report {
-	function get_label() {
-
-		return [];
-	}
-
-	function only_show_top_10() {
-		return false;
-	}
-
-	function column_title() {
-		// TODO: Implement column_title() method.
-	}
-
-	/**
-	 * @return array
-	 */
-	public function get_data() {
-		return [
-			'type'  => 'table',
-			'label' => $this->get_label(),
-			'data'  =>
-				$this->get_broadcast_stats()
-		];
-	}
 
 
 	protected function get_broadcast_id() {
 		return get_request_var( 'data' )[ 'broadcast_id' ];
 	}
 
-
-	protected function get_broadcast_stats() {
+	protected function get_table_data() {
 
 		$broadcast = new Broadcast( $this->get_broadcast_id() );
 		$stats     = $broadcast->get_report_data();
@@ -90,5 +65,7 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 		// TODO: Implement normalize_datum() method.
 	}
 
-
+	function get_label() {
+		// TODO: Implement get_label() method.
+	}
 }

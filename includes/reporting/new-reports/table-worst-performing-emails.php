@@ -14,51 +14,23 @@ use function Groundhogg\percentage;
 
 class Table_Worst_Performing_Emails extends Base_Table_Report {
 
-
-	function only_show_top_10() {
-		return true ;
-	}
-
-	function column_title() {
-		// TODO: Implement column_title() method.
-	}
-
-
-	/**
-	 * @return array
-	 */
-	public function get_data() {
-		return [
-			'type'  => 'table',
-			'label' => $this->get_label(),
-			'data'  =>
-				$this->get_worst_emails()
-		];
-	}
-
-
 	public function get_label() {
 		return [
 			__( 'Emails', 'groundhogg' ),
 			__( 'Open Rate', 'groundhogg' ),
 			__( 'Click Thorough Rate', 'groundhogg' )
 		];
-
 	}
-
 
 	protected function get_funnel_id() {
-		return get_request_var( 'data' )[ 'funnel_id' ];
+		return get_request_var( 'data' )['funnel_id'];
 	}
 
-
-	protected function get_worst_emails() {
-
+	protected function get_table_data() {
 
 		$funnel_id = absint( $this->get_funnel_id() );
 
 		if ( $this->get_funnel_id() ) {
-
 
 			$steps = get_db( 'steps' )->query( [
 				'funnel_id' => $funnel_id,
@@ -100,15 +72,15 @@ class Table_Worst_Performing_Emails extends Base_Table_Report {
 			$title = $email->get_title();
 
 
-			if ( $report[ 'total' ] > 0 ) {
+			if ( $report['total'] > 0 ) {
 
-				if ( ( percentage( $report[ 'total' ], $report[ 'opened' ] ) < 20.0 ) || ( percentage( $report [ 'opened' ], $report [ 'clicked' ] ) < 20.0 ) ) {
+				if ( ( percentage( $report['total'], $report['opened'] ) < 20.0 ) || ( percentage( $report ['opened'], $report ['clicked'] ) < 20.0 ) ) {
 
 					$list[] = [
-						'data'    => percentage( $report[ 'total' ], $report[ 'opened' ] ),
+						'data'    => percentage( $report['total'], $report['opened'] ),
 						'label'   => $title,
 						'url'     => admin_url( sprintf( 'admin.php?page=gh_emails&action=edit&email=%s', $email->ID ) ),
-						'clicked' => percentage( $report [ 'opened' ], $report [ 'clicked' ] )
+						'clicked' => percentage( $report ['opened'], $report ['clicked'] )
 					];
 				}
 
@@ -120,14 +92,14 @@ class Table_Worst_Performing_Emails extends Base_Table_Report {
 
 		foreach ( $list as $i => $datum ) {
 
-			$datum[ 'label' ]   = html()->wrap( $datum[ 'label' ], 'a', [
-				'href'  => $datum[ 'url' ],
+			$datum['label']   = html()->wrap( $datum['label'], 'a', [
+				'href'  => $datum['url'],
 				'class' => 'number-total'
 			] );
-			$datum[ 'data' ]    = $datum[ 'data' ] . '%';
-			$datum[ 'clicked' ] = $datum[ 'clicked' ] . '%';
+			$datum['data']    = $datum['data'] . '%';
+			$datum['clicked'] = $datum['clicked'] . '%';
 
-			unset( $datum[ 'url' ] );
+			unset( $datum['url'] );
 			$data[ $i ] = $datum;
 		}
 
@@ -145,12 +117,14 @@ class Table_Worst_Performing_Emails extends Base_Table_Report {
 	 * @return array
 	 */
 	protected
-	function normalize_datum(		$item_key, $item_data	) {
+	function normalize_datum(
+		$item_key, $item_data
+	) {
 		return [
-			'label'   => $item_data [ 'label' ],
-			'data'    => $item_data [ 'data' ],
-			'url'     => $item_data [ 'url' ],
-			'clicked' => $item_data [ 'clicked' ],
+			'label'   => $item_data ['label'],
+			'data'    => $item_data ['data'],
+			'url'     => $item_data ['url'],
+			'clicked' => $item_data ['clicked'],
 
 		];
 	}
@@ -165,7 +139,7 @@ class Table_Worst_Performing_Emails extends Base_Table_Report {
 	 * @return mixed
 	 */
 	public function sort( $a, $b ) {
-		return $a[ 'data' ] - $b[ 'data' ];
+		return $a['data'] - $b['data'];
 	}
 
 }
