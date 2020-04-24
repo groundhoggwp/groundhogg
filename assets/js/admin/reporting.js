@@ -148,9 +148,7 @@ function tool_tip_title() {
                 var report_id = this.reports[i];
                 var report_data = this.data[report_id];
 
-                // console.log( report_id, report_data )
-
-                this.renderReport(report_id, report_data)
+                this.renderReport(report_id, report_data);
 
             }
 
@@ -178,8 +176,6 @@ function tool_tip_title() {
         },
 
         renderQuickStatReport: function ($report, report_data) {
-
-            // console.log( report_data )
 
             $report.find('.groundhogg-quick-stat-number').html(report_data.number);
             $report.find('.groundhogg-quick-stat-previous').removeClass('green red').addClass(report_data.compare.arrow.color);
@@ -236,15 +232,13 @@ function tool_tip_title() {
 
             });
 
-            console.log(report_data);
-
             Chart.plugins.register({
                 afterDraw: function(chart) {
                     if (chart.data.datasets.length === 0) {
                         // No data is present
                         var ctx = chart.chart.ctx;
                         var width = chart.chart.width;
-                        var height = chart.chart.height
+                        var height = chart.chart.height;
                         chart.clear();
 
                         ctx.save();

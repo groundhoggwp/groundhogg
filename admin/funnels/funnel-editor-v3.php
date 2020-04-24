@@ -162,6 +162,12 @@ $funnel = new Funnel($funnel_id);
                         })
                     });
                 </script>
+                <div style="position:absolute;top: 0;padding: 8px;right: 8px;">
+                    <a href="<?php echo admin_url( sprintf( 'admin.php?page=gh_reporting&tab=funnels&funnel=%s', $funnel_id ) ); ?> "
+                       class="button"><span
+                                title="<?php esc_attr_e( 'Copy share link', 'groundhogg' ) ?>"
+                                class="dashicons dashicons-welcome-widgets-menus" style="width: auto;height: auto;vertical-align: middle;font-size: 14px;margin-right: 3px;"></span> <?php _e( 'View funnel stats', 'groundhogg' ); ?></a>
+                </div>
             </div>
             <div class="toolbar-buttons">
                 <div>

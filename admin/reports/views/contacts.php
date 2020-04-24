@@ -64,7 +64,7 @@ function quick_stat_report( $args = [] ) {
 		] ); ?>
 
 		<?php quick_stat_report( [
-			'id'    => 'total_unsubscribes',
+			'id'    => 'total_unsubscribed_contacts',
 			'title' => __( 'Unsubscribes', 'groundhogg' ),
 		] ); ?>
     </div>
