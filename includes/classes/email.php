@@ -260,7 +260,7 @@ class Email extends Base_Object_With_Meta {
 		return managed_page_url( sprintf(
 			"tracking/email/open/%s/%s/%s/",
 			dechex( $this->get_contact()->get_id() ),
-			! $this->is_testing() ? dechex( $this->get_event()->get_id() ) : 0,
+			! $this->is_testing() ? dechex( $this->get_event()->get_id( true ) ) : 0,
 			dechex( $this->get_id() )
 		) );
 	}
@@ -274,7 +274,7 @@ class Email extends Base_Object_With_Meta {
 		return managed_page_url(
 			sprintf( 'tracking/email/click/%s/%s/%s/',
 				dechex( $this->get_contact()->get_id() ),
-				! $this->is_testing() ? dechex( $this->get_event()->get_id() ) : 0,
+				! $this->is_testing() ? dechex( $this->get_event()->get_id( true ) ) : 0,
 				dechex( $this->get_id() )
 			)
 		);

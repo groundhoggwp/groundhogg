@@ -103,9 +103,20 @@ class Event extends Base_Object {
 	}
 
 	/**
+	 * Get the event ID
+	 * May return the queued_id if present.
+	 *
+	 * @param bool $use_queued Use the queued_id for backwards compatibility
+	 *
 	 * @return int
 	 */
-	public function get_id() {
+	public function get_id( $use_queued=false ) {
+
+		// Return the queued_id instead for backwards compatibility
+		if ( $use_queued && $this->get_queued_id() > 0 ){
+			return $this->get_queued_id();
+		}
+
 		return absint( $this->ID );
 	}
 
@@ -198,6 +209,13 @@ class Event extends Base_Object {
 	 */
 	public function get_step_id() {
 		return absint( $this->step_id );
+	}
+
+	/**
+	 * @return int
+	 */
+	public function get_queued_id(){
+		return absint( $this->queued_id );
 	}
 
 	/**

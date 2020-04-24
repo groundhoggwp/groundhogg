@@ -110,7 +110,6 @@ class Broadcasts_Table extends WP_List_Table {
 	 * @return array
 	 */
 	protected function get_views() {
-		//todo
 		$count = array(
 			'scheduled' => Plugin::$instance->dbs->get_db( 'broadcasts' )->count( [ 'status' => 'scheduled' ] ),
 			'sent'      => Plugin::$instance->dbs->get_db( 'broadcasts' )->count( [ 'status' => 'sent' ] ),

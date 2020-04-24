@@ -16,7 +16,6 @@ if ( ! $email ){
 $email->set_contact( get_contactdata() );
 $email->set_event( Plugin::$instance->tracking->get_current_event() );
 
-
 status_header( 200 );
 header( 'Content-Type: text/html; charset=utf-8' );
 nocache_headers();
