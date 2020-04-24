@@ -16,34 +16,12 @@ use function Groundhogg\percentage;
 class Table_Benchmark_Conversion_Rate extends Base_Table_Report {
 
 
-	function only_show_top_10() {
-		return false;
-	}
-
-	function column_title() {
-		// TODO: Implement column_title() method.
-	}
-
-
-	/**
-	 * @return array
-	 */
-	public function get_data() {
-		return [
-			'type'  => 'table',
-			'label' => $this->get_label(),
-			'data'  => $this->benchmark_conversion_rate()
-		];
-	}
-
-
 	public function get_label() {
 		return [
 			__( 'Benchmark', 'groundhogg' ),
 			__( 'Benchmark', 'groundhogg' ),
 			__( 'Conversion Rate', 'groundhogg' )
 		];
-
 	}
 
 
@@ -52,7 +30,7 @@ class Table_Benchmark_Conversion_Rate extends Base_Table_Report {
 	}
 
 
-	protected function benchmark_conversion_rate() {
+	protected function get_table_data() {
 		//get list of benchmark
 		$funnel = new Funnel( $this->get_funnel_id() );
 
