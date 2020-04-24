@@ -443,7 +443,7 @@ class Contact_Query {
 
 		$last_changed = $this->gh_db_contacts->get_last_changed();
 
-		$cache_key   = "query:$key:$last_changed";
+		$cache_key   = "query:$key:$last_changed:$this->date_key";
 		$cache_value = wp_cache_get( $cache_key, $this->cache_group );
 
 		if ( false === $cache_value ) {

@@ -3,6 +3,7 @@
 namespace Groundhogg\Reporting\New_Reports;
 
 
+use Groundhogg\Contact_Query;
 use Groundhogg\Plugin;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
@@ -36,24 +37,41 @@ class Table_Contacts_By_Lead_Source extends Base_Table_Report {
 
 	}
 
+	/**
+	 * Lead source
+	 *
+	 * @return array
+	 */
 	protected function get_lead_source() {
 
-		$this->start = Plugin::instance()->utils->date_time->convert_to_local_time( $this->end );
+		$this->start = Plugin::instance()->utils->date_time->convert_to_local_time( $this->start );
 		$this->end   = Plugin::instance()->utils->date_time->convert_to_local_time( $this->end );
 
-		$contacts = get_db( 'contacts' )->query( [
+		$query   = new Contact_Query();
+
+		$contacts = $query->query( [
 			'date_query' => [
 				'after'  => date( 'Y-m-d H:i:s', $this->start ),
 				'before' => date( 'Y-m-d H:i:s', $this->end ),
 			]
-		] );
+		]  );
 
 		$contacts = wp_parse_id_list( wp_list_pluck( $contacts, 'ID' ) );
 
-		$rows = get_db( 'contactmeta' )->query( [
-			'contact_id' => $contacts,
-			'meta_key'   => 'lead_source'
-		], false );
+		$rows = [];
+
+		if ( count( $contacts ) > 0 ){
+			$rows = get_db( 'contactmeta' )->query( [
+				'relationship' => 'AND',
+				'where' => [
+					[ 'col' => 'contact_id', 'compare' => 'IN', 'val' => $contacts ],
+					[ 'col' => 'meta_key', 'compare' => '=', 'val' => 'lead_source' ],
+					[ 'col' => 'meta_value', 'compare' => '!=', 'val' => '' ],
+				],
+				'contact_id' => $contacts,
+				'meta_key'   => 'lead_source'
+			] );
+		}
 
 		$values = wp_list_pluck( $rows, 'meta_value' );
 		$counts = array_count_values( $values );

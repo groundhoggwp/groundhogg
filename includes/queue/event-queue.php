@@ -159,38 +159,6 @@ class Event_Queue extends Supports_Errors {
 	}
 
 	/**
-	 * dump events from event_queue table to the events table
-	 *
-	 * @param array $ids list of event Ids to move from the event queue to the event history table
-	 */
-	public function move_events_to_history_table( $ids = [] ) {
-
-		global $wpdb;
-
-		// Move waiting events from the legacy queue to new queue
-		$event_queue = get_db( 'event_queue' )->get_table_name();
-		$events      = get_db( 'events' )->get_table_name();
-
-		$history_columns = get_db( 'events' )->get_columns(); // queue_id will be last
-		$queue_columns   = get_db( 'event_queue' )->get_columns();
-
-		unset( $history_columns['ID'] );
-		unset( $queue_columns['ID'] );
-
-		$history_columns = implode( ',', array_keys( $history_columns ) );
-		$queue_columns   = implode( ',', array_keys( $queue_columns ) );
-		$IDs             = implode( ',', $ids );
-
-		// added two different query because single query was not working on my localhost(says: ERROR in your SQL statement please review it.)
-		// Move the events to the event queue
-		$wpdb->query( "INSERT INTO {$events} ($history_columns)
-			SELECT $queue_columns,ID
-			FROM {$event_queue}
-			WHERE `ID` in ( $IDs );" );
-		$wpdb->query( "DELETE FROM {$event_queue} WHERE `ID` in ( $IDs );" );
-	}
-
-	/**
 	 * Run any scheduled events.
 	 *
 	 * @return int
@@ -337,7 +305,7 @@ class Event_Queue extends Supports_Errors {
 		} while ( ! empty( $event_ids ) && ! Limits::limits_exceeded() );
 
 		$this->store->release_events( $claim );
-		$this->move_events_to_history_table( $processed_event_ids );
+		get_db( 'event_queue' )->move_events_to_history( [ 'ID' => $processed_event_ids ] );
 
 		self::set_is_processing( false );
 
