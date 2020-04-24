@@ -5,6 +5,7 @@ namespace Groundhogg\DB;
 // Exit if accessed directly
 use Groundhogg\Event;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_db;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -66,6 +67,40 @@ class Event_Queue extends DB {
 	public function get_date_key() {
 		return 'time';
 	}
+
+	/**
+	 * Move events from the queue to the history table
+	 *
+	 * @param array $where
+	 */
+	public function move_events_to_history( $where = [] ) {
+
+		global $wpdb;
+
+		// Move waiting events from the legacy queue to new queue
+		$event_queue = $this->get_table_name();
+		$events      = get_db( 'events' )->get_table_name();
+
+		$queue_columns   = $this->get_columns();
+		$history_columns = get_db( 'events' )->get_columns(); // queue_id will be last
+
+		unset( $history_columns['ID'] );
+		unset( $queue_columns['ID'] );
+
+		$history_columns = implode( ',', array_keys( $history_columns ) );
+		$queue_columns   = implode( ',', array_keys( $queue_columns ) ) . ',ID'; // Tack on ID at the end to update `queued_id`
+
+		$where = $this->generate_where( $where );
+
+		// added two different query because single query was not working on my localhost(says: ERROR in your SQL statement please review it.)
+		// Move the events to the event queue
+		$wpdb->query( "INSERT INTO $events ($history_columns)
+			SELECT $queue_columns
+			FROM $event_queue
+			WHERE $where" );
+		$wpdb->query( "DELETE FROM $event_queue WHERE $where;" );
+	}
+
 
 	/**
 	 * Get columns and formats
@@ -195,9 +230,9 @@ class Event_Queue extends DB {
 		$sql = parent::get_sql( $query_vars );
 
 		// Double compare to better display completion order
-		if ( $query_vars[ 'orderby' ] === 'time' ){
-			$sql = str_replace(  'ORDER BY time DESC',  'ORDER BY `time` DESC, `micro_time` DESC', $sql );
-			$sql = str_replace(  'ORDER BY time ASC',  'ORDER BY `time` ASC, `micro_time` ASC', $sql );
+		if ( $query_vars['orderby'] === 'time' ) {
+			$sql = str_replace( 'ORDER BY time DESC', 'ORDER BY `time` DESC, `micro_time` DESC', $sql );
+			$sql = str_replace( 'ORDER BY time ASC', 'ORDER BY `time` ASC, `micro_time` ASC', $sql );
 		}
 
 		return $sql;

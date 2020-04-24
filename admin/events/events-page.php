@@ -95,24 +95,14 @@ class Events_Page extends Admin_Page {
 		global $wpdb;
 
 		$event_queue = get_db( 'event_queue' )->get_table_name();
-		$events      = get_db( 'events' )->get_table_name();
 		$event_ids   = implode( ',', $this->get_items() );
-
-		$columns = get_db( 'event_queue' )->get_columns();
-		unset( $columns['ID'] );
-		$columns = implode( ',', array_keys( $columns ) );
 		$cancelled = Event::CANCELLED;
 
 		// Update the time
 		$wpdb->query( "UPDATE {$event_queue} SET `status` = '$cancelled' WHERE `ID` in ({$event_ids})" );
-		// Move the events to the event queue
-		$wpdb->query( "INSERT INTO {$events} ($columns) 
-			SELECT $columns 
-			FROM {$event_queue} 
-			WHERE `ID` in ({$event_ids});" );
 
-		// Delete the events from the historical data
-		$wpdb->query( "DELETE FROM {$events} WHERE `ID` in ($event_ids);" );
+		// Move the items over...
+		get_db( 'event_queue' )->move_events_to_history( [ 'ID' =>  $this->get_items() ] );
 
 		$this->add_notice( 'cancelled', sprintf( _nx( '%d event cancelled', '%d events cancelled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
 
@@ -202,25 +192,15 @@ class Events_Page extends Admin_Page {
 
 		global $wpdb;
 
-		$event_queue = get_db( 'event_queue' )->get_table_name();
 		$events      = get_db( 'events' )->get_table_name();
 		$event_ids   = implode( ',', $this->get_items() );
 		$time        = time();
 
-		$columns = get_db( 'event_queue' )->get_columns();
-		unset( $columns['ID'] );
-		$columns = implode( ',', array_keys( $columns ) );
-
 		// Update the time
 		$wpdb->query( "UPDATE {$events} SET `time` = {$time}, `status` = 'waiting' WHERE `ID` in ({$event_ids})" );
-		// Move the events to the event queue
-		$wpdb->query( "INSERT INTO {$event_queue} ($columns) 
-			SELECT $columns 
-			FROM {$events} 
-			WHERE `ID` in ($event_ids);" );
 
-		// Delete the events from the historical data
-		$wpdb->query( "DELETE FROM {$events} WHERE `ID` in ($event_ids);" );
+		// Move the events over...
+		get_db( 'events' )->move_events_to_queue( [ 'ID' => $this->get_items() ] );
 
 		$this->add_notice( 'scheduled', sprintf( _nx( '%d event rescheduled', '%d events rescheduled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
 

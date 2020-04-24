@@ -5,6 +5,7 @@ namespace Groundhogg\DB;
 // Exit if accessed directly
 use Groundhogg\Event;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_db;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -138,18 +139,40 @@ class Events extends DB {
 	}
 
 	/**
-	 * Get all the queued events
+	 * Move events from this table to the event queue
+	 *
+	 * @param array $where
 	 */
-	public function get_queued_event_ids() {
+	public function move_events_to_queue( $where = [] ) {
+
 		global $wpdb;
 
-		$results = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * FROM $this->table_name WHERE time <= %d AND status = %s"
-				, time(), 'waiting' )
-		);
+		// Move waiting events from the legacy queue to new queue
+		$event_queue = get_db( 'event_queue' )->get_table_name();
+		$events      = $this->get_table_name();
 
-		return wp_parse_id_list( wp_list_pluck( $results, 'ID' ) );
+		$queue_columns   = get_db( 'event_queue' )->get_columns();
+		$history_columns = $this->get_columns(); // queue_id will be last
+
+		unset( $history_columns['ID'] );
+		unset( $queue_columns['ID'] );
+		unset( $queue_columns['queued_id'] );
+
+		$history_columns = implode( ',', array_keys( $history_columns ) );
+		$queue_columns   = implode( ',', array_keys( $queue_columns ) );
+
+		$where = $this->generate_where( $where );
+
+		// added two different query because single query was not working on my localhost(says: ERROR in your SQL statement please review it.)
+		// Move the events to the event queue
+		$wpdb->query( "INSERT INTO $event_queue ($queue_columns)
+			SELECT $history_columns
+			FROM $events
+			WHERE $where" );
+
+		// Dont delete these events for backwards compatibility...
+		// this way we can retain a record of retires as well...
+//		$wpdb->query( "DELETE FROM $events WHERE $where;" );
 	}
 
 	/**
