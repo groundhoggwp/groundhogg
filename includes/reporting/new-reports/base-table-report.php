@@ -3,6 +3,7 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
+use function Groundhogg\html;
 use function Groundhogg\percentage;
 use Groundhogg\Plugin;
 
@@ -13,17 +14,42 @@ use Groundhogg\Plugin;
  * Time: 9:13 AM
  */
 abstract class Base_Table_Report extends Base_Report {
-	/**
-	 * @deprecated
-	 * @return bool
-	 */
-	abstract function only_show_top_10();
 
-    function get_num_results(){
-    	return 10;
+	/**
+	 * @return array
+	 */
+	public function get_data() {
+		return [
+			'type'  => 'table',
+			'label' => $this->get_label(),
+			'data'  => $this->get_chart_data()
+		];
 	}
 
+	/**
+	 * @return bool
+	 * @deprecated
+	 */
+	function only_show_top_10() {
+		return false;
+	}
+
+	/**
+	 * @return int
+	 */
+	function get_num_results() {
+		return 10;
+	}
+
+	/**
+	 * @return mixed
+	 */
 	abstract function get_label();
+
+	/**
+	 * @return mixed
+	 */
+	abstract protected function get_chart_data();
 
 	/**
 	 * Normalize a datum
@@ -68,6 +94,48 @@ abstract class Base_Table_Report extends Base_Report {
 	}
 
 	/**
+	 * Parse meta rows...
+	 *
+	 * @param $rows
+	 *
+	 * @return array
+	 */
+	protected function parse_meta_records( $rows ) {
+		$values = wp_list_pluck( $rows, 'meta_value' );
+		return $this->parse_table_data( $values );
+	}
+
+	/**
+	 * Build table data
+	 *
+	 * @param $values
+	 *
+	 * @return array
+	 */
+	protected function parse_table_data( $values ){
+		$counts = array_count_values( $values );
+		$data   = $this->normalize_data( $counts );
+		$total  = array_sum( wp_list_pluck( $data, 'data' ) );
+
+		foreach ( $data as $i => $datum ) {
+
+			$sub_tal    = $datum['data'];
+			$percentage = ' (' . percentage( $total, $sub_tal ) . '%)';
+
+			$datum['data'] = html()->e( 'a', [
+				'href'  => $datum['url'],
+				'class' => 'number-total',
+				'title' => $datum['url'],
+			], $datum['data'] . $percentage );
+
+			unset( $datum['url'] );
+			$data[ $i ] = $datum;
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Sort stuff
 	 *
 	 * @param $a
@@ -76,6 +144,6 @@ abstract class Base_Table_Report extends Base_Report {
 	 * @return mixed
 	 */
 	public function sort( $a, $b ) {
-		return $b[ 'data' ] - $a[ 'data' ];
+		return $b['data'] - $a['data'];
 	}
 }

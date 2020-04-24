@@ -9,11 +9,7 @@ use function Groundhogg\get_db;
 use function Groundhogg\html;
 use function Groundhogg\percentage;
 
-class Table_Contacts_By_Search_Engines extends Base_Table_Report {
-
-	function column_title() {
-		// TODO: Implement column_title() method.
-	}
+class Table_Contacts_By_Social_Media extends Base_Table_Report {
 
 	public function get_label() {
 		return [
@@ -29,29 +25,26 @@ class Table_Contacts_By_Search_Engines extends Base_Table_Report {
 			'meta_key'   => 'lead_source'
 		], false );
 
-		$values         = wp_list_pluck( $rows, 'meta_value' );
-		$counts         = array_count_values( $values );
-		$search_engines = $this->get_search_engines();
-		$return         = [];
+		$values   = wp_list_pluck( $rows, 'meta_value' );
+		$counts   = array_count_values( $values );
+		$networks = $this->get_social_sites();
+		$return   = [];
 
 		foreach ( $counts as $datum => $num_contacts ) {
 			if ( filter_var( $datum, FILTER_VALIDATE_URL ) ) {
-				$test_lead_source = wp_parse_url( $datum, PHP_URL_HOST );
+				$test_lead_source = parse_url( $datum, PHP_URL_HOST );
 				$test_lead_source = str_replace( 'www.', '', $test_lead_source );
-				foreach ( $search_engines as $engine_name => $atts ) {
-					$urls = $atts[0]['urls'];
-					if ( $this->in_urls( $test_lead_source, $urls ) ) {
-						if ( isset( $return[ $engine_name ] ) ){
-							$return[ $engine_name ] += $num_contacts;
+				foreach ( $networks as $network => $urls ) {
+					if ( in_array( $test_lead_source, $urls ) ) {
+						if ( isset( $return[ $network ] ) ) {
+							$return[ $network ] += $num_contacts;
 						} else {
-							$return[ $engine_name ] = $num_contacts;
+							$return[ $network ] = $num_contacts;
 						}
 					}
 				}
 			}
 		}
-
-//		$this->parse_table_data();
 
 		$data  = $this->normalize_data( $return );
 		$total = array_sum( wp_list_pluck( $data, 'data' ) );
@@ -95,12 +88,12 @@ class Table_Contacts_By_Search_Engines extends Base_Table_Report {
 	/**
 	 * Setup the search_engines array from the yaml file in lib
 	 */
-	public function get_search_engines() {
+	public function get_social_sites() {
 		if ( ! class_exists( 'Spyc' ) ) {
 			include_once GROUNDHOGG_PATH . 'includes/lib/yaml/Spyc.php';
 		}
 
-		Return \Spyc::YAMLLoad( GROUNDHOGG_PATH . 'includes/lib/potential-known-leadsources/SearchEngines.yml' );
+		Return \Spyc::YAMLLoad( GROUNDHOGG_PATH . 'includes/lib/potential-known-leadsources/Socials.yml' );
 	}
 
 	/**

@@ -12,44 +12,11 @@ use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\isset_not_empty;
 
-class Chart_Contacts_By_Optin_Status extends Base_Chart_Report {
+class Chart_Contacts_By_Optin_Status extends Base_Doughnut_Chart_Report {
 
-	protected function get_type() {
-		return 'doughnut';
-	}
+	protected function get_chart_data() {
 
-	protected function get_datasets() {
-
-		$data = $this->get_optin_status();
-
-		return [
-			'labels'   => $data[ 'label' ],
-			'datasets' => [
-				[
-					'data'            => $data[ 'data' ],
-					'backgroundColor' => $data[ 'color' ]
-				]
-			]
-		];
-
-	}
-
-	protected function get_options() {
-		return $this->get_pie_chart_options();
-	}
-
-
-	protected function get_optin_status() {
-
-		$rows = get_db( 'contacts' )->query( [
-			'date_query' => [
-				'after'  => date( 'Y-m-d H:i:s', $this->start ),
-				'before' => date( 'Y-m-d H:i:s', $this->end ),
-			],
-
-		], false );
-
-		$values = wp_list_pluck( $rows, 'optin_status' );
+		$values = wp_list_pluck( $this->get_new_contacts_in_time_period(), 'optin_status' );
 		$counts = array_count_values( $values );
 
 		$data  = [];
@@ -59,10 +26,9 @@ class Chart_Contacts_By_Optin_Status extends Base_Chart_Report {
 		// normalize data
 		foreach ( $counts as $key => $datum ) {
 			$normalized = $this->normalize_datum( $key, $datum );
-			$label []    = $normalized [ 'label' ];
-			$data[]    = $normalized [ 'data' ];
-			$color[]    = $normalized [ 'color' ];
-
+			$label []   = $normalized ['label'];
+			$data[]     = $normalized ['data'];
+			$color[]    = $normalized ['color'];
 		}
 
 		return [
@@ -108,5 +74,4 @@ class Chart_Contacts_By_Optin_Status extends Base_Chart_Report {
 			'color' => $this->get_random_color()
 		];
 	}
-
 }

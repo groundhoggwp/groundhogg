@@ -17,6 +17,7 @@ use Groundhogg\Reporting\New_Reports\Table_Broadcast_Stats;
 use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Country;
 use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Lead_Source;
 use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Search_Engines;
+use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Social_Media;
 use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Source_Pages;
 use Groundhogg\Reporting\New_Reports\Table_Top_Converting_Funnels;
 use Groundhogg\Reporting\New_Reports\Table_Top_Performing_Broadcasts;
@@ -147,6 +148,10 @@ class Reports {
 				'callback' => [ $this, 'table_contacts_by_search_engines' ]
 			],
 			[
+				'id'       => 'table_contacts_by_social_media',
+				'callback' => [ $this, 'table_contacts_by_social_media' ]
+			],
+			[
 				'id'       => 'table_contacts_by_source_page',
 				'callback' => [ $this, 'table_contacts_by_source_page' ]
 			],
@@ -206,7 +211,6 @@ class Reports {
 				'id'       => 'table_benchmark_conversion_rate',
 				'callback' => [ $this, 'table_benchmark_conversion_rate' ]
 			],
-
 			[
 				'id'       => 'table_top_converting_funnels',
 				'callback' => [ $this, 'table_top_converting_funnels' ]
@@ -436,6 +440,16 @@ class Reports {
 
 		return $report->get_data();
 
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function table_contacts_by_social_media() {
+
+		$report = new Table_Contacts_By_Social_Media( $this->start, $this->end );
+
+		return $report->get_data();
 	}
 
 	/**

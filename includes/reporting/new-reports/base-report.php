@@ -2,6 +2,8 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
+use Groundhogg\Contact_Query;
+use Groundhogg\Plugin;
 use function Groundhogg\percentage;
 
 abstract class Base_Report {
@@ -106,7 +108,53 @@ abstract class Base_Report {
 		return '#' . $this->random_color_part() . $this->random_color_part() . $this->random_color_part();
 	}
 
-
+	/**
+	 * Ge the chart data
+	 *
+	 * @return mixed
+	 */
 	abstract public function get_data();
+
+	/**
+	 * List of contact ids created in this timer period
+	 *
+	 * @return array
+	 */
+	protected function get_new_contact_ids_in_time_period() {
+		$this->start = Plugin::instance()->utils->date_time->convert_to_local_time( $this->start );
+		$this->end   = Plugin::instance()->utils->date_time->convert_to_local_time( $this->end );
+
+		$query = new Contact_Query();
+
+		$contacts = $query->query( [
+			'date_query' => [
+				'after'  => date( 'Y-m-d H:i:s', $this->start ),
+				'before' => date( 'Y-m-d H:i:s', $this->end ),
+			]
+		] );
+
+		return wp_parse_id_list( wp_list_pluck( $contacts, 'ID' ) );
+	}
+
+	/**
+	 * List of contact ids created in this timer period
+	 *
+	 * @return array
+	 */
+	protected function get_new_contacts_in_time_period() {
+		$this->start = Plugin::instance()->utils->date_time->convert_to_local_time( $this->start );
+		$this->end   = Plugin::instance()->utils->date_time->convert_to_local_time( $this->end );
+
+		$query = new Contact_Query();
+
+		$contacts = $query->query( [
+			'date_query' => [
+				'after'  => date( 'Y-m-d H:i:s', $this->start ),
+				'before' => date( 'Y-m-d H:i:s', $this->end ),
+			]
+		] );
+
+		return $contacts;
+	}
 
 }

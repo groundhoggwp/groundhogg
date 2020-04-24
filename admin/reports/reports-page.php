@@ -136,7 +136,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 					'table_contacts_by_lead_source',
 					'table_contacts_by_search_engines',
 					'table_contacts_by_source_page',
-					'table_contacts_by_countries',
+					'table_contacts_by_social_media',
 
 				];
 				$case = 'contacts';

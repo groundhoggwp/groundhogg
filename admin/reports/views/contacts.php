@@ -22,8 +22,8 @@ function quick_stat_report( $args = [] ) {
 
 	?>
 
-    <div class="groundhogg-quick-stat" id="<?php esc_attr_e( $args[ 'id' ] ); ?>">
-        <div class="groundhogg-quick-stat-title"><?php esc_html_e( $args[ 'title' ] ) ?></div>
+    <div class="groundhogg-quick-stat" id="<?php esc_attr_e( $args['id'] ); ?>">
+        <div class="groundhogg-quick-stat-title"><?php esc_html_e( $args['title'] ) ?></div>
         <div class="groundhogg-quick-stat-info"></div>
         <div class="groundhogg-quick-stat-number">1234</div>
         <div class="groundhogg-quick-stat-previous green">
@@ -36,8 +36,6 @@ function quick_stat_report( $args = [] ) {
 }
 
 ?>
-
-
 <div class="groundhogg-report">
     <h2 class="title"><?php _e( 'New Contacts', 'groundhogg' ); ?></h2>
     <div style="height: 400px;">
@@ -86,18 +84,18 @@ function quick_stat_report( $args = [] ) {
     </div>
 
     <div class="groundhogg-chart">
-        <h2 class="title"><?php _e('Lead Score', 'groundhogg'); ?></h2>
-	    <?php if ( has_action( 'groundhogg/admin/report/lead_score' )) : ?>
-		    <?php  do_action( 'groundhogg/admin/report/lead_score'   ); ?>
-	    <?php else :  ?>
+        <h2 class="title"><?php _e( 'Lead Score', 'groundhogg' ); ?></h2>
+		<?php if ( has_action( 'groundhogg/admin/report/lead_score' ) ) : ?>
+			<?php do_action( 'groundhogg/admin/report/lead_score' ); ?>
+		<?php else : ?>
             <p class="notice-no-data">
-			    <?php _e('Please Enable Lead Scoring Plugin to view this data.', 'groundhogg');
-			    if (!is_white_labeled()) {
-				    echo html()->wrap('Click Here To Download', 'a', ['href' => 'https://www.groundhogg.io/downloads/lead-scoring/']);
-			    }
-			    ?>
+				<?php _e( 'Please Enable Lead Scoring Plugin to view this data.', 'groundhogg' );
+				if ( ! is_white_labeled() ) {
+					echo html()->wrap( 'Click Here To Download', 'a', [ 'href' => 'https://www.groundhogg.io/downloads/lead-scoring/' ] );
+				}
+				?>
             </p>
-	    <?php endif; ?>
+		<?php endif; ?>
     </div>
 </div>
 
@@ -119,15 +117,16 @@ function quick_stat_report( $args = [] ) {
             <div class="actions" style="float:left;width: 50%;">
                 <h2 class="title"><?php _e( 'Contacts By Region', 'groundhogg' ); ?></h2>
             </div>
-            <div class="actions" style="float: right ; width: 50%;  margin-block-start: 0.83em;margin-block-end: 0.83em;" >
+            <div class="actions"
+                 style="float: right ; width: 50%;  margin-block-start: 0.83em;margin-block-end: 0.83em;">
 				<?php
 				$args = array(
 					'name'        => 'country',
 					'id'          => 'country',
-					'data'        => Plugin::$instance->utils->location->get_countries_list(),
+					'data'        => Plugin::$instance->utils->location->get_countries_list( '', true ),
 					'selected'    => [ Plugin::$instance->utils->location->site_country_code() ],
 					'option_none' => false,
-
+					'style'       => false
 				);
 				echo Plugin::$instance->utils->html->select2( $args );
 				?>
@@ -157,8 +156,8 @@ function quick_stat_report( $args = [] ) {
 </div>
 <div class="groundhogg-chart-wrapper">
     <div class="groundhogg-chart-no-padding">
-        <h2 class="title"><?php _e( 'Top Countries', 'groundhogg' ); ?></h2>
-        <div id="table_contacts_by_countries"></div>
+        <h2 class="title"><?php _e( 'Top Social Networks', 'groundhogg' ); ?></h2>
+        <div id="table_contacts_by_social_media"></div>
     </div>
     <div class="groundhogg-chart-no-padding">
         <h2 class="title"><?php _e( 'Top lead Sources', 'groundhogg' ); ?></h2>

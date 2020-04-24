@@ -18,23 +18,11 @@ class Table_Contacts_By_Lead_Source extends Base_Table_Report {
 		// TODO: Implement column_title() method.
 	}
 
-	/**
-	 * @return array
-	 */
-	public function get_data() {
-		return [
-			'type'  => 'table',
-			'label' => $this->get_label(),
-			'data'  => $this->get_lead_source()
-		];
-	}
-
 	public function get_label() {
 		return [
 			__( 'Lead Source', 'groundhogg' ),
 			__( 'Contacts', 'groundhogg' ),
 		];
-
 	}
 
 	/**
@@ -42,60 +30,19 @@ class Table_Contacts_By_Lead_Source extends Base_Table_Report {
 	 *
 	 * @return array
 	 */
-	protected function get_lead_source() {
+	protected function get_chart_data() {
 
-		$this->start = Plugin::instance()->utils->date_time->convert_to_local_time( $this->start );
-		$this->end   = Plugin::instance()->utils->date_time->convert_to_local_time( $this->end );
+		$ids  = $this->get_new_contact_ids_in_time_period();
+		$rows = get_db( 'contactmeta' )->query( [
+			'relationship' => 'AND',
+			'where'        => [
+				[ 'col' => 'contact_id', 'compare' => 'IN', 'val' => $ids ],
+				[ 'col' => 'meta_key', 'compare' => '=', 'val' => 'lead_source' ],
+				[ 'col' => 'meta_value', 'compare' => '!=', 'val' => '' ],
+			],
+		] );
 
-		$query   = new Contact_Query();
-
-		$contacts = $query->query( [
-			'date_query' => [
-				'after'  => date( 'Y-m-d H:i:s', $this->start ),
-				'before' => date( 'Y-m-d H:i:s', $this->end ),
-			]
-		]  );
-
-		$contacts = wp_parse_id_list( wp_list_pluck( $contacts, 'ID' ) );
-
-		$rows = [];
-
-		if ( count( $contacts ) > 0 ){
-			$rows = get_db( 'contactmeta' )->query( [
-				'relationship' => 'AND',
-				'where' => [
-					[ 'col' => 'contact_id', 'compare' => 'IN', 'val' => $contacts ],
-					[ 'col' => 'meta_key', 'compare' => '=', 'val' => 'lead_source' ],
-					[ 'col' => 'meta_value', 'compare' => '!=', 'val' => '' ],
-				],
-				'contact_id' => $contacts,
-				'meta_key'   => 'lead_source'
-			] );
-		}
-
-		$values = wp_list_pluck( $rows, 'meta_value' );
-		$counts = array_count_values( $values );
-		$data = $this->normalize_data( $counts );
-		$total = array_sum( wp_list_pluck( $data, 'data' ) );
-
-		foreach ( $data as $i => $datum ) {
-
-			$sub_tal    = $datum['data'];
-			$percentage = ' (' . percentage( $total, $sub_tal ) . '%)';
-
-			$datum['data'] = html()->e( 'a', [
-				'href'  => $datum['url'],
-				'class' => 'number-total',
-				'title' => $datum['url'],
-			], $datum['data'] . $percentage );
-
-			unset( $datum['url'] );
-			$data[ $i ] = $datum;
-		}
-
-		return $data;
-
-
+		return $this->parse_meta_records( $rows );
 	}
 
 
