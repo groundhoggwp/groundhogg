@@ -84,10 +84,10 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 
 		$funnel = new Funnel( $funnel_id );
 
-		$conversion_step = $funnel->get_conversion_step();
+		$conversion_step = $funnel->get_conversion_step_id();
 
 		if ( ! $conversion_step ) {
-			$conversion_step = $funnel->get_first_step();
+			$conversion_step = $funnel->get_first_step_id();
 		}
 
 		$where_events = [
@@ -105,7 +105,7 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 
 		$start = $this->start - MONTH_IN_SECONDS;
 
-		$first_step = absint( $funnel->get_first_step() );
+		$first_step = absint( $funnel->get_first_step_id() );
 
 		$cquery = new Contact_Query();
 

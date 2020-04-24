@@ -68,13 +68,10 @@ class Total_Benchmark_Conversion_Rate extends Base_Quick_Stat {
 			[ 'col' => 'time', 'val' => $end, 'compare' => '<=' ],
 		];
 
-		$num_of_contacts = get_db( 'events' )->count( [
+		return get_db( 'events' )->count( [
 			'where'  => $where_events,
 			'select' => 'DISTINCT contact_id'
 		] );
-
-
-		return $num_of_contacts;
 	}
 
 }

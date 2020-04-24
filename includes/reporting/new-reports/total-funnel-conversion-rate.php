@@ -30,13 +30,9 @@ class Total_Funnel_Conversion_Rate extends Base_Quick_Stat_Percent {
 
 		$funnel = new Funnel( $this->get_funnel_id() );
 
-		$conversion_step = $funnel->get_conversion_step();
+		$conversion_step = $funnel->get_conversion_step_id();
 
-		if ( ! $conversion_step ) {
-			$conversion_step = $funnel->get_first_step();
-		}
-
-		$where_events = [
+		$where = [
 			'relationship' => "AND",
 			[ 'col' => 'step_id', 'val' => $conversion_step, 'compare' => '=' ],
 			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
@@ -45,10 +41,9 @@ class Total_Funnel_Conversion_Rate extends Base_Quick_Stat_Percent {
 		];
 
 		$num_of_conversions = get_db( 'events' )->count( [
-			'where'  => $where_events,
+			'where'  => $where,
 			'select' => 'DISTINCT contact_id'
 		] );
-
 
 		return $num_of_conversions;
 
@@ -64,25 +59,18 @@ class Total_Funnel_Conversion_Rate extends Base_Quick_Stat_Percent {
 	 */
 	protected function query_vs( $start, $end ) {
 
-		$start = $start - MONTH_IN_SECONDS;
-
 		$funnel = new Funnel( $this->get_funnel_id() );
-
-		$first_step = absint( $funnel->get_first_step() );
-
 		$cquery = new Contact_Query();
 
-		$num_events_completed = $cquery->query( [
+		return $cquery->query( [
 			'count'  => true,
 			'report' => [
-				'start'  => $start,
-				'end'    => $end,
-				'step'   => $first_step,
-				'status' => 'complete'
+				'funnel_id' => $funnel->get_id(),
+				'start'     => $start,
+				'end'       => $end,
+				'status'    => Event::COMPLETE
 			]
 		] );
-
-		return $num_events_completed;
 
 	}
 

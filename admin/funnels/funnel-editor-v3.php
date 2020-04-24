@@ -185,7 +185,7 @@ $funnel = new Funnel($funnel_id);
                         'name' => 'conversion-step',
                         'id' => 'conversion-step',
                         'options' => $options,
-                        'selected' => $funnel->get_conversion_step(),
+                        'selected' => $funnel->get_conversion_step_id(),
                         'option_none' => false,
                     ];
                     echo Plugin::$instance->utils->html->dropdown($args);

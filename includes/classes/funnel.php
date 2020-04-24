@@ -62,16 +62,35 @@ class Funnel extends Base_Object_With_Meta {
 		return $this->get_status() === 'active';
 	}
 
-	public function get_conversion_step()
-	{
-		return absint( $this->conversion_step );
+	/**
+	 * Get the ID of the conversion step...
+	 * This can be defined, or is assumed the last benchmark in the funnel...
+	 *
+	 * @return int
+	 */
+	public function get_conversion_step_id() {
+		$conversion_step_id = absint( $this->conversion_step );
+
+		if ( ! $conversion_step_id ){
+			$steps = $this->get_steps( [
+				'step_group' => Step::BENCHMARK,
+			] );
+
+			$last = array_pop( $steps );
+
+			return $last->get_id();
+		}
+
+		return $conversion_step_id;
 	}
 
-	public function get_first_step()
-	{
-		return   $this->get_steps( [
+	/**
+	 * @return int
+	 */
+	public function get_first_step_id() {
+		return $this->get_steps( [
 			'step_order' => 1
-		] )[0] ->get_id();
+		] )[0]->get_id();
 	}
 
 

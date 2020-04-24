@@ -2,22 +2,11 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
-use Groundhogg\Classes\Activity;
-use Groundhogg\Contact_Query;
-use Groundhogg\Event;
+
 use Groundhogg\Funnel;
-use Groundhogg\Step;
 use function Groundhogg\get_db;
-use function Groundhogg\get_request_var;
-use function Groundhogg\percentage;
 
-class Total_Abandonment_Rate extends Base_Quick_Stat_Percent {
-
-
-	protected function get_funnel_id() {
-		return absint( get_request_var( 'data' )[ 'funnel_id' ] );
-	}
-
+class Total_Abandonment_Rate extends Base_Funnel_Quick_Stat_Report {
 
 	/**
 	 * Query the results
@@ -29,33 +18,18 @@ class Total_Abandonment_Rate extends Base_Quick_Stat_Percent {
 	 */
 	protected function query( $start, $end ) {
 
-		$funnel = new Funnel( $this->get_funnel_id() );
+		$conversion_step = $this->get_funnel()->get_conversion_step_id();
+		$first_step      = $this->get_funnel()->get_first_step_id();
+		$num_contacts    = $this->get_num_contacts_by_step( $conversion_step, $start, $end );
 
-		$conversion_step = $funnel->get_conversion_step();
-
-		if ( ! $conversion_step ) {
-			$conversion_step = $funnel->get_first_step();
-		}
-
-		$where_events = [
-			'relationship' => "AND",
-			[ 'col' => 'step_id', 'val' => $conversion_step, 'compare' => '=' ],
-			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
-			[ 'col' => 'time', 'val' => $start, 'compare' => '>=' ],
-			[ 'col' => 'time', 'val' => $end, 'compare' => '<=' ],
-		];
-
-		$num_of_conversions = get_db( 'events' )->count( [
-			'where'  => $where_events,
-			'select' => 'DISTINCT contact_id'
-		] );
-
-		return absint( $this->get_total( $start, $end ) ) - absint( $num_of_conversions );
+		return $this->get_num_contacts_by_step( $first_step, $start, $end ) - $num_contacts;
 
 	}
 
 	/**
 	 * Query the vs results
+	 *
+	 * So we are comparing to the number of contacts which completed the first step
 	 *
 	 * @param $start
 	 * @param $end
@@ -63,30 +37,24 @@ class Total_Abandonment_Rate extends Base_Quick_Stat_Percent {
 	 * @return mixed
 	 */
 	protected function query_vs( $start, $end ) {
-
-		return $this->get_total( $start, $end );
+		return $this->get_num_contacts_by_step( $this->get_funnel()->get_first_step_id(), $start, $end );
 	}
 
+	protected function get_arrow_properties( $current_data, $compare_data ) {
+		$direction = '';
+		$color     = '';
 
-	protected function get_total( $start, $end ) {
+		if ( $current_data < $compare_data ) {
+			$direction = 'up';
+			$color     = 'green';
+		} else if ( $current_data > $compare_data  ) {
+			$direction = 'down';
+			$color     = 'red';
+		}
 
-		$funnel = new Funnel( $this->get_funnel_id() );
-
-		$where_events = [
-			'relationship' => "AND",
-			[ 'col' => 'step_id', 'val' => $funnel->get_first_step(), 'compare' => '=' ],
-			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
-			[ 'col' => 'time', 'val' => $start, 'compare' => '>=' ],
-			[ 'col' => 'time', 'val' => $end, 'compare' => '<=' ],
-		];
-
-		$num_of_contacts = get_db( 'events' )->count( [
-			'where'  => $where_events,
-			'select' => 'DISTINCT contact_id'
-		] );
-
-
-		return $num_of_contacts;
-	}
+		return [
+			'direction' => $direction,
+			'color'     => $color,
+		];	}
 
 }
