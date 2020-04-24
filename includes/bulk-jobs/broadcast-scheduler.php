@@ -5,6 +5,7 @@ namespace Groundhogg\Bulk_Jobs;
 use Groundhogg\Broadcast;
 use Groundhogg\Contact_Query;
 use Groundhogg\Event;
+use function Groundhogg\enqueue_event;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
@@ -137,7 +138,7 @@ class Broadcast_Scheduler extends Bulk_Job {
 			'priority'   => 100,
 		];
 
-		get_db( 'event_queue' )->add( $args );
+		enqueue_event( $args );
 		$this->emails_scheduled += 1;
 	}
 

@@ -5,6 +5,7 @@ namespace Groundhogg\Bulk_Jobs;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Contact_Query;
 use Groundhogg\Event;
+use function Groundhogg\enqueue_event;
 use function Groundhogg\get_db;
 use Groundhogg\Plugin;
 use function Groundhogg\html;
@@ -93,7 +94,7 @@ class Migrate_Waiting_Events extends Bulk_Job {
 		unset( $event_data['ID'] );
 
 		// Create the event in the queue
-		get_db( 'event_queue' )->add( $event_data );
+		enqueue_event( $event_data );
 
 		// Delete the event from the history table
 		$event->delete();

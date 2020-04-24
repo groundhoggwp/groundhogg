@@ -1397,7 +1397,7 @@ function send_email_notification( $email_id, $contact_id_or_email, $time = 0 ) {
 		'status'     => Event::WAITING,
 	];
 
-	if ( get_db( 'event_queue' )->add( $event ) ) {
+	if ( enqueue_event( $event ) ) {
 		return true;
 	}
 
@@ -3102,4 +3102,21 @@ function get_queued_event_by_id( $event_id ) {
 	}
 
 	return $event;
+}
+
+/**
+ * Add an event to the event queue.
+ *
+ * @param $args
+ *
+ * @return bool|Event
+ */
+function enqueue_event( $args ){
+	$event_id = get_db( 'event_queue' )->add( $args );
+
+    if ( ! $event_id ){
+        return false;
+    }
+
+    return get_queued_event_by_id( $event_id );
 }

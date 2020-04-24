@@ -308,7 +308,7 @@ class Tracking {
 			}
 		}
 
-		return Plugin::$instance->utils->get_contact( $id_or_email );
+		return get_contactdata( $id_or_email );
 	}
 
 	/**
@@ -382,14 +382,7 @@ class Tracking {
 
 		$expiry = apply_filters( 'groundhogg/tracking/cookie_expiry', self::COOKIE_EXPIRY ) * DAY_IN_SECONDS;
 
-		return setcookie(
-			self::TRACKING_COOKIE,
-			$cookie,
-			time() + $expiry,
-			COOKIEPATH,
-			COOKIE_DOMAIN,
-			is_ssl()
-		);
+		return set_cookie( self::TRACKING_COOKIE, $cookie, $expiry );
 	}
 
 	/**
@@ -419,8 +412,7 @@ class Tracking {
 	 */
 	public function stop_tracking() {
 		if ( isset( $_COOKIE[ self::TRACKING_COOKIE ] ) ) {
-			unset( $_COOKIE[ self::TRACKING_COOKIE ] );
-			setcookie( self::TRACKING_COOKIE, null, time() - DAY_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
+			delete_cookie( self::TRACKING_COOKIE );
 		}
 	}
 
@@ -450,6 +442,7 @@ class Tracking {
 	 * @return void
 	 */
 	public function parse_utm() {
+
 		$utm_defaults = array(
 			'utm_campaign' => '',
 			'utm_content'  => '',
@@ -462,20 +455,33 @@ class Tracking {
 
 		$has_utm = array_filter( array_values( $utm_defaults ) );
 
-		if ( ! $has_utm || ! $this->get_current_contact() ) {
+		if ( ! $has_utm ) {
 			return;
 		}
 
-		foreach ( $utm as $utm_var => $utm_val ) {
-			if ( ! empty( $utm_val ) ) {
-				$this->get_current_contact()->update_meta(
-					$utm_var,
-					sanitize_text_field( $utm_val )
-				);
+		if ( $this->get_current_contact() ){
+
+			// If there is a contact, update their UTM stats to the one provided by the campaign
+			foreach ( $utm as $utm_var => $utm_val ) {
+				if ( ! empty( $utm_val ) ) {
+					$this->get_current_contact()->update_meta(
+						$utm_var,
+						sanitize_text_field( $utm_val )
+					);
+				}
 			}
+		} else {
+
+			// Save the UTM stuff as a cookie for future use.
+			set_cookie( 'groundhogg_utm_tacking', wp_json_encode( $utm ), MONTH_IN_SECONDS );
+
 		}
+
 	}
 
+	/**
+	 * Output the tracking image for the browser
+	 */
 	protected function output_tracking_image() {
 		/* thanks for coming! */
 		$file = GROUNDHOGG_ASSETS_PATH . 'images/email-open.png';
@@ -554,7 +560,6 @@ class Tracking {
 		 */
 		if ( ! $event ) {
 			wp_redirect( $redirect );
-
 			return;
 		}
 
