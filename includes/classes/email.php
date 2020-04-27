@@ -729,7 +729,7 @@ class Email extends Base_Object_With_Meta {
 		}
 
 		/* Skip if testing */
-		if ( ! $this->is_testing() && ! $contact->is_marketable() ) {
+		if ( ! $this->is_testing() && ! $contact->is_marketable()  && $this->get_meta( 'message_type')  !== 'transactional' ) {
 			return new WP_Error( 'non_marketable', __( 'Contact is not marketable.' ) );
 		}
 

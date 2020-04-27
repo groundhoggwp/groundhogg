@@ -34,19 +34,21 @@ abstract class Base_Line_Chart_Report extends Base_Chart_Report{
 							'beginAtZero' => true,
 						],
 						'scaleLabel' => [
-							'display'     => true,
+							'display'     => false,
 							'labelString' => 'value',
 						]
 					]
-				]
+				],
+
 			]
 		];
 	}
 
 	protected function get_line_style() {
 
+		$color =   $this->get_random_color() ;
 		return [
-			"fill"                      => false,
+//			"fill"                      => false,
 			'lineTension'               => 0,
 			'fillOpacity'               => 0.2,
 			'pointRadius'               => 4,
@@ -55,7 +57,10 @@ abstract class Base_Line_Chart_Report extends Base_Chart_Report{
 			'pointHoverBackgroundColor' => '#FFF',
 			'pointHoverBorderWidth'     => 4,
 			'pointHoverRadius'          => 6,
-			"borderColor"               => $this->get_random_color(),
+			"borderColor"               => $color,
+			'backgroundColor'           => $color . '1A',
+			'fill'                      => true
+
 		];
 	}
 }

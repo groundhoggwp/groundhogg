@@ -360,6 +360,7 @@ class Emails_Page extends Admin_Page {
 			return new \WP_Error( 'unable_to_update_email', 'Unable to update email!' );
 		}
 
+		$email->update_meta( 'message_type', sanitize_text_field( Groundhogg\get_request_var( 'message_type' ) ) );
 		$email->update_meta( 'alignment', sanitize_text_field( Groundhogg\get_request_var( 'email_alignment' ) ) );
 		$email->update_meta( 'browser_view', boolval( Groundhogg\get_request_var( 'browser_view' ) ) );
 		$email->update_meta( 'reply_to_override', sanitize_email( Groundhogg\get_request_var( 'reply_to_override' ) ) );

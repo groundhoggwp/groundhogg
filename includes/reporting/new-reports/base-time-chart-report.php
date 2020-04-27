@@ -41,7 +41,7 @@ abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 							'tooltipFormat' => "l HH:mm"
 						],
 						'scaleLabel' => [
-							'display'     => true,
+							'display'     => false,
 							'labelString' => 'Date',
 						]
 					]
@@ -49,7 +49,7 @@ abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 				'yAxes' => [
 					0 => [
 						'scaleLabel' => [
-							'display'     => true,
+							'display'     => false,
 							'labelString' => 'Numbers',
 						],
 					],
