@@ -649,7 +649,7 @@ class Contact extends Base_Object_With_Meta {
 
 		// Return site timezone offset if no timezone in contact record?
 		if ( ! $this->get_time_zone() ) {
-			Plugin::$instance->utils->date_time->get_wp_offset();
+			return Plugin::$instance->utils->date_time->get_wp_offset();
 		}
 
 		try {

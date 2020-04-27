@@ -623,6 +623,11 @@ function array_to_atts( $atts ) {
  * @return string
  */
 function array_to_css( $atts ) {
+
+    if ( ! is_array( $atts ) ){
+        return $atts;
+    }
+
 	$css = '';
 	foreach ( $atts as $key => $value ) {
 
@@ -1515,9 +1520,13 @@ function send_event_failure_notification( $event ) {
 	$message .= sprintf( "\nManage Failed Events: %s", admin_url( 'admin.php?page=gh_events&view=status&status=failed' ) );
 	$to      = Plugin::$instance->settings->get_option( 'event_failure_notification_email', get_option( 'admin_email' ) );
 
+	do_action( 'groundhogg/send_event_failure_notification/before' );
+
 	if ( wp_mail( $to, $subject, $message ) ) {
 		set_transient( 'gh_hold_failed_event_notification', true, MINUTE_IN_SECONDS );
 	}
+
+	do_action( 'groundhogg/send_event_failure_notification/after' );
 }
 
 add_action( 'groundhogg/event/failed', __NAMESPACE__ . '\send_event_failure_notification' );
@@ -3119,4 +3128,11 @@ function enqueue_event( $args ){
     }
 
     return get_queued_event_by_id( $event_id );
+}
+
+/**
+ * @param $event_id
+ */
+function run_single_event( $event_id ) {
+
 }

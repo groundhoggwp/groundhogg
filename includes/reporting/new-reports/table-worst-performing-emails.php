@@ -17,8 +17,9 @@ class Table_Worst_Performing_Emails extends Base_Table_Report {
 	public function get_label() {
 		return [
 			__( 'Emails', 'groundhogg' ),
+			__( 'Sent', 'groundhogg' ),
 			__( 'Open Rate', 'groundhogg' ),
-			__( 'Click Thorough Rate', 'groundhogg' )
+			__( 'Click Thru Rate', 'groundhogg' )
 		];
 	}
 
@@ -72,15 +73,16 @@ class Table_Worst_Performing_Emails extends Base_Table_Report {
 			$title = $email->get_title();
 
 
-			if ( $report['total'] > 0 ) {
+			if ( $report['sent'] > 10 ) {
 
-				if ( ( percentage( $report['total'], $report['opened'] ) < 20.0 ) || ( percentage( $report ['opened'], $report ['clicked'] ) < 20.0 ) ) {
+				if ( ( percentage( $report['sent'], $report['opened'] ) < 20.0 ) || ( percentage( $report ['opened'], $report ['clicked'] ) < 20.0 ) ) {
 
 					$list[] = [
-						'data'    => percentage( $report['total'], $report['opened'] ),
+						'data'    => percentage( $report['sent'], $report['opened'] ),
 						'label'   => $title,
 						'url'     => admin_url( sprintf( 'admin.php?page=gh_emails&action=edit&email=%s', $email->ID ) ),
-						'clicked' => percentage( $report ['opened'], $report ['clicked'] )
+						'clicked' => percentage( $report['opened'], $report['clicked'] ),
+						'sent'    => $report['sent'],
 					];
 				}
 
@@ -89,6 +91,8 @@ class Table_Worst_Performing_Emails extends Base_Table_Report {
 		}
 
 		$list = $this->normalize_data( $list );
+
+		$data = [];
 
 		foreach ( $list as $i => $datum ) {
 
@@ -116,16 +120,13 @@ class Table_Worst_Performing_Emails extends Base_Table_Report {
 	 *
 	 * @return array
 	 */
-	protected
-	function normalize_datum(
-		$item_key, $item_data
-	) {
+	protected function normalize_datum( $item_key, $item_data ) {
 		return [
-			'label'   => $item_data ['label'],
-			'data'    => $item_data ['data'],
-			'url'     => $item_data ['url'],
-			'clicked' => $item_data ['clicked'],
-
+			'label'   => $item_data['label'],
+			'url'     => $item_data['url'],
+			'sent'    => $item_data['sent'],
+			'data'    => $item_data['data'],
+			'clicked' => $item_data['clicked'],
 		];
 	}
 

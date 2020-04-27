@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Broadcasts;
 use Groundhogg\Broadcast;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Event;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_screen_option;
@@ -166,7 +167,7 @@ class Broadcasts_Table extends WP_List_Table {
 		}
 
 		if ( $broadcast->is_sent() ){
-			$actions['report'] = "<span class='edit'><a href='" . esc_url( admin_url( 'admin.php?page=gh_broadcasts&action=report&broadcast=' . $broadcast->get_id() ) ) . "'>" . _x( 'Reporting', 'action', 'groundhogg' ) . "</a></span>";
+			$actions['report'] = "<a href='" . esc_url( admin_page_url( 'gh_reporting', [ 'tab' => 'broadcasts', 'broadcast' => $broadcast->get_id() ] ) ) . "'>" . _x( 'Reporting', 'action', 'groundhogg' ) . "</a>";
 		}
 
 		return $this->row_actions( apply_filters( 'groundhogg/admin/broadcasts/table/handle_row_actions', $actions, $broadcast, $column_name ) );

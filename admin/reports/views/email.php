@@ -38,7 +38,7 @@ function quick_stat_report( $args = [] ) {
 
 <div class="groundhogg-report">
     <h2 class="title"><?php _e( 'Email Activity', 'groundhogg' ); ?></h2>
-    <div style="height: 400px">
+    <div class="big-chart-wrap">
         <canvas id="chart_email_activity"></canvas>
     </div>
 </div>
@@ -60,7 +60,7 @@ function quick_stat_report( $args = [] ) {
 
 		<?php quick_stat_report( [
 			'id'    => 'email_click_rate',
-			'title' => __( 'Click Rate', 'groundhogg' ),
+			'title' => __( 'Click Thru Rate', 'groundhogg' ),
 			'style' => 'width:33%;'
 		] ); ?>
     </div>
@@ -96,7 +96,7 @@ function quick_stat_report( $args = [] ) {
 <div class="groundhogg-chart-wrapper">
     <div class="groundhogg-chart-no-padding">
         <h2 class="title"><?php _e( 'Last Broadcast', 'groundhogg' ); ?></h2>
-        <div style="width: 100%; padding: ">
+        <div style="width: 100%;">
             <div class="float-left" style="width:60%">
                 <canvas id="chart_last_broadcast"></canvas>
             </div>
@@ -104,26 +104,22 @@ function quick_stat_report( $args = [] ) {
                 <div id="chart_last_broadcast_legend" class="chart-legend"></div>
             </div>
         </div>
+        <div class="wp-clearfix"></div>
+        <div id="table_broadcast_stats" style="margin-top: 10px"></div>
     </div>
     <div class="groundhogg-chart-no-padding">
         <h2 class="title"><?php _e( 'Top Performing Broadcasts', 'groundhogg' ); ?></h2>
-        <div id="table_top_performing_broadcasts"></div>
+        <div id="table_top_performing_broadcasts" class="emails-list"></div>
     </div>
 </div>
 
 <div class="groundhogg-chart-wrapper">
     <div class="groundhogg-chart-no-padding">
         <h2 class="title"><?php _e( 'Top Performing Funnel Emails', 'groundhogg' ); ?></h2>
-        <div id="table_top_performing_emails"></div>
+        <div id="table_top_performing_emails" class="emails-list"></div>
     </div>
     <div class="groundhogg-chart-no-padding">
         <h2 class="title"><?php _e( 'Funnel Emails Needing Improvement', 'groundhogg' ); ?></h2>
-        <div id="table_worst_performing_emails"></div>
+        <div id="table_worst_performing_emails" class="emails-list"></div>
     </div>
 </div>
-<!--<div class="groundhogg-chart-wrapper">-->
-<!--    <div class="groundhogg-chart-no-padding" style="width: 100% ; margin-right: 0px;">-->
-<!--        <h2 class="title">Funnel Emails Needing Improvement</h2>-->
-<!--        <div id="table_worst_performing_emails"></div>-->
-<!--    </div>-->
-<!--</div>-->

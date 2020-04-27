@@ -158,7 +158,8 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 					'table_top_performing_emails',
 					'table_worst_performing_emails',
-					'table_top_performing_broadcasts'
+					'table_top_performing_broadcasts',
+                    'table_broadcast_stats'
 				];
 				$case = 'email';
 				break;
@@ -250,7 +251,7 @@ class Reports_Page extends Tabbed_Admin_Page {
             <div class="gh-loader-overlay" style="display:none;"></div>
             <div class="gh-loader" style="display: none"></div>
         </div>
-        <div class="wrap">
+        <div class="wrap blurred">
 			<?php if ( ! is_white_labeled() ): ?>
                 <h1 class="wp-heading-inline"><?php groundhogg_logo( 'black' ); ?></h1>
 			<?php else: ?>
@@ -288,6 +289,9 @@ class Reports_Page extends Tabbed_Admin_Page {
         <div id="groundhogg-datepicker-wrap">
             <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker"></div>
         </div>
+<!--        <div id="groundhogg-datepicker-wrap">-->
+<!--            <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker-compare"></div>-->
+<!--        </div>-->
 		<?php
 	}
 

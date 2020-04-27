@@ -38,7 +38,7 @@ function quick_stat_report( $args = [] ) {
 ?>
 <div class="groundhogg-report">
     <h2 class="title"><?php _e( 'New Contacts', 'groundhogg' ); ?></h2>
-    <div style="height: 400px;">
+    <div class="big-chart-wrap">
         <canvas id="chart_new_contacts"></canvas>
     </div>
 </div>

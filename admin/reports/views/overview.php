@@ -38,7 +38,7 @@ function quick_stat_report( $args = [] ) {
 ?>
 <div class="groundhogg-report">
     <h2 class="title"><?php _e( 'New Contacts', 'groundhogg' ); ?></h2>
-    <div style="height: 400px">
+    <div class="big-chart-wrap">
         <canvas id="chart_new_contacts"></canvas>
     </div>
 </div>
@@ -86,7 +86,7 @@ function quick_stat_report( $args = [] ) {
 
 		<?php quick_stat_report( [
 			'id'    => 'email_click_rate',
-			'title' => __( 'Click Rate', 'groundhogg' ),
+			'title' => __( 'Click Thru Rate', 'groundhogg' ),
 			'style' => 'width:33%;'
 		] ); ?>
 
@@ -129,7 +129,7 @@ function quick_stat_report( $args = [] ) {
     </div>
     <div class="groundhogg-chart-no-padding">
         <h2 class="title"><?php _e( 'Top Performing Funnel Emails', 'groundhogg' ); ?></h2>
-        <div id="table_top_performing_emails" class="inner"></div>
+        <div id="table_top_performing_emails" class="inner emails-list"></div>
     </div>
 </div>
 

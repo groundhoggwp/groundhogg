@@ -3,11 +3,13 @@
 namespace Groundhogg\Reporting\New_Reports;
 
 use Groundhogg\Contact_Query;
+use Groundhogg\Plugin;
+
 class Chart_New_Contacts extends Base_Time_Chart_Report {
 
 	protected function get_datasets() {
 
-		$new      = $this->get_new_contacts();
+		$new      = $this->normalize_data( $this->group_by_time( $this->get_new_contacts_in_time_period() ) );
 		$previous = $this->get_previous_new_contact();
 
 		$n = [];
@@ -63,28 +65,6 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 	}
 
 	/**
-	 * Gets contact data for the current time period
-	 *
-	 * @return array
-	 */
-	public function get_new_contacts() {
-		$query = new Contact_Query();
-
-		$data = $query->query( [
-			'date_query' => [
-				'after'  => date( 'Y-m-d H:i:s', $this->start ),
-				'before' => date( 'Y-m-d H:i:s', $this->end ),
-			]
-		] );
-
-		$grouped_data = $this->group_by_time( $data );
-
-		return $this->normalize_data($grouped_data);
-
-	}
-
-
-	/**
 	 * Gets the contacts for the previous time period
 	 *
 	 * @return array
@@ -93,6 +73,12 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 
 		$query = new Contact_Query();
 
+//		$data = $query->query( [
+//			'date_query' => [
+//				'after'  => date( 'Y-m-d H:i:s', Plugin::instance()->utils->date_time->convert_to_local_time( $this->compare_start ) ),
+//				'before' => date( 'Y-m-d H:i:s', Plugin::instance()->utils->date_time->convert_to_local_time( $this->compare_end ) ),
+//			]
+//		] );
 		$data = $query->query( [
 			'date_query' => [
 				'after'  => date( 'Y-m-d H:i:s', $this->compare_start ),

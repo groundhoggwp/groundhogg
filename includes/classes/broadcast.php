@@ -185,6 +185,7 @@ class Broadcast extends Base_Object implements Event_Process {
 			],
 			[
 				'step_id'    => $this->get_id(),
+				'funnel_id'  => Broadcast::FUNNEL_ID,
 				'event_type' => Event::BROADCAST
 			]
 		) ) {
@@ -241,7 +242,7 @@ class Broadcast extends Base_Object implements Event_Process {
 				'status'     => Event::COMPLETE
 			] );
 
-			$data['waiting']            = get_db( 'event_queue' )->count( [
+			$data['waiting'] = get_db( 'event_queue' )->count( [
 				'step_id'    => $this->get_id(),
 				'event_type' => Event::BROADCAST,
 				'status'     => Event::WAITING

@@ -74,8 +74,8 @@ abstract class Base_Report {
 		$previous_end   = date_sub( $enddate, date_interval_create_from_date_string( $num_days . " days" ) );
 
 		// previous period
-		$this->compare_start = $previous_start->format( 'U' );
-		$this->compare_end   = $previous_end->format( 'U' );
+		$this->compare_start = absint( $previous_start->format( 'U' ) );
+		$this->compare_end   = absint( $previous_end->format( 'U' ) );
 	}
 
 

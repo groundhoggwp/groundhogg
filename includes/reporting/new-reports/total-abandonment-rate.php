@@ -18,11 +18,11 @@ class Total_Abandonment_Rate extends Base_Funnel_Quick_Stat_Report {
 	 */
 	protected function query( $start, $end ) {
 
-		$conversion_step = $this->get_funnel()->get_conversion_step_id();
-		$first_step      = $this->get_funnel()->get_first_step_id();
-		$num_contacts    = $this->get_num_contacts_by_step( $conversion_step, $start, $end );
+		$conversion_step        = $this->get_funnel()->get_conversion_step_id();
+		$first_step             = $this->get_funnel()->get_first_step_id();
+		$num_contacts_converted = $this->get_num_contacts_by_step( $conversion_step, $start, $end );
 
-		return $this->get_num_contacts_by_step( $first_step, $start, $end ) - $num_contacts;
+		return $this->get_num_contacts_by_step( $first_step, $start, $end ) - $num_contacts_converted;
 
 	}
 
@@ -40,21 +40,30 @@ class Total_Abandonment_Rate extends Base_Funnel_Quick_Stat_Report {
 		return $this->get_num_contacts_by_step( $this->get_funnel()->get_first_step_id(), $start, $end );
 	}
 
+	/**
+	 * Override the arrow props
+	 *
+	 * @param int $current_data
+	 * @param int $compare_data
+	 *
+	 * @return array
+	 */
 	protected function get_arrow_properties( $current_data, $compare_data ) {
 		$direction = '';
 		$color     = '';
 
 		if ( $current_data < $compare_data ) {
-			$direction = 'up';
-			$color     = 'green';
-		} else if ( $current_data > $compare_data  ) {
 			$direction = 'down';
+			$color     = 'green';
+		} else if ( $current_data > $compare_data ) {
+			$direction = 'up';
 			$color     = 'red';
 		}
 
 		return [
 			'direction' => $direction,
 			'color'     => $color,
-		];	}
+		];
+	}
 
 }

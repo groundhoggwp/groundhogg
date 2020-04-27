@@ -55,7 +55,7 @@ abstract class Base_Quick_Stat_Percent extends Base_Quick_Stat {
 					'direction' => $arrow[ 'direction' ],
 					'color'     => $arrow[ 'color' ],
 				],
-				'percent' => intval( $percentage ) . '%',
+				'percent' => absint( $percentage ) . '%',
 				'text'    => sprintf( __( '.vs Previous %s Days', 'groundhogg' ), $this->num_days )
 			],
 			'data' => [

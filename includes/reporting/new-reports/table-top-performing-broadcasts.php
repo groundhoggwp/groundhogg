@@ -5,21 +5,19 @@ namespace Groundhogg\Reporting\New_Reports;
 
 use Groundhogg\Broadcast;
 use Groundhogg\Plugin;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
 use function Groundhogg\percentage;
 
 class Table_Top_Performing_Broadcasts extends Base_Table_Report {
 
-	public function get_num_results() {
-		return 5;
-	}
-
 	public function get_label() {
 		return [
 			__( 'Emails', 'groundhogg' ),
+			__( 'Sent', 'groundhogg' ),
 			__( 'Open Rate', 'groundhogg' ),
-			__( 'Click Thorough Rate', 'groundhogg' )
+			__( 'Click Thru Rate', 'groundhogg' )
 		];
 	}
 
@@ -53,11 +51,12 @@ class Table_Top_Performing_Broadcasts extends Base_Table_Report {
 			$report = $broadcast->get_report_data();
 
 			$list[] = [
+				'sent'               => $report['sent'],
 				'data'               => percentage( $report['sent'], $report['opened'] ),
 				'opened'             => $report ['opened'],
 				'label'              => $broadcast->get_title(),
 				'click_through_rate' => percentage( $report['opened'], $report['clicked'] ),
-				'url'                => admin_url( sprintf( 'admin.php?page=gh_broadcasts&action=report&broadcast=%s', $broadcast->get_id() ) ),
+				'url'                => admin_page_url( 'gh_reporting', [ 'tab' => 'broadcasts', 'broadcast' => $broadcast->get_id() ] ),
 			];
 
 		}
@@ -93,9 +92,10 @@ class Table_Top_Performing_Broadcasts extends Base_Table_Report {
 
 		return [
 			'label'              => $item_data ['label'],
+			'url'                => $item_data ['url'],
+			'sent'               => $item_data ['sent'],
 			'data'               => $item_data ['data'],
 			'click_through_rate' => $item_data ['click_through_rate'],
-			'url'                => $item_data ['url'],
 		];
 	}
 

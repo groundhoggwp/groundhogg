@@ -5,6 +5,7 @@ use Groundhogg\Broadcast;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use function Groundhogg\get_db;
+use function Groundhogg\get_url_var;
 
 
 $broadcasts = get_db( 'broadcasts' );
@@ -22,8 +23,9 @@ foreach ( $broadcasts as $broadcast ) {
 <div class="actions" style="float: right">
     <?php
 	$args = array(
-		'name'        => 'broadcast-id',
+		'name'        => 'broadcast_id',
 		'id'          => 'broadcast-id',
+		'selected'    => absint( get_url_var( 'broadcast' ) ),
 		'options'     => $options,
 		'option_none' => false,
 	);

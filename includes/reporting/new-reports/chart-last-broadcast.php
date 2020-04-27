@@ -26,11 +26,11 @@ class Chart_Last_Broadcast extends Base_Chart_Report {
 		$data = $this->get_last_broadcast_details();
 
 		return [
-			'labels'   => $data[ 'label' ],
+			'labels'   => $data['label'],
 			'datasets' => [
 				[
-					'data'            => $data[ 'data' ],
-					'backgroundColor' => $data[ 'color' ]
+					'data'            => $data['data'],
+					'backgroundColor' => $data['color']
 				]
 			]
 		];
@@ -41,7 +41,7 @@ class Chart_Last_Broadcast extends Base_Chart_Report {
 	}
 
 	protected function get_broadcast_id() {
-		return get_request_var( 'data' )[ 'broadcast_id' ];
+		return get_request_var( 'data' )['broadcast_id'];
 	}
 
 	protected function get_last_broadcast_details() {
@@ -61,9 +61,9 @@ class Chart_Last_Broadcast extends Base_Chart_Report {
 			// normalize data
 			foreach ( $counts as $key => $datum ) {
 
-				$label [] = $datum [ 'label' ];
-				$data[]   = $datum [ 'data' ];
-				$color[]  = $datum [ 'color' ];
+				$label [] = $datum ['label'];
+				$data[]   = $datum ['data'];
+				$color[]  = $datum ['color'];
 
 			}
 
@@ -80,7 +80,9 @@ class Chart_Last_Broadcast extends Base_Chart_Report {
 
 	}
 
-
+	/**
+	 * @return bool|Broadcast
+	 */
 	public function get_broadcast() {
 
 		if ( $this->get_broadcast_id() ) {
@@ -91,7 +93,7 @@ class Chart_Last_Broadcast extends Base_Chart_Report {
 			'status'  => 'sent',
 			'orderby' => 'send_time',
 			'order'   => 'desc',
-			'limit'   => 10
+			'limit'   => 1
 		] );
 
 		if ( empty( $all_broadcasts ) ) {
@@ -101,9 +103,7 @@ class Chart_Last_Broadcast extends Base_Chart_Report {
 		$last_broadcast    = array_shift( $all_broadcasts );
 		$last_broadcast_id = absint( $last_broadcast->ID );
 
-		$broadcast = new Broadcast( $last_broadcast_id );
-
-		return $broadcast;
+		return new Broadcast( $last_broadcast_id );
 	}
 
 
@@ -120,12 +120,12 @@ class Chart_Last_Broadcast extends Base_Chart_Report {
 
 		$dataset[] = array(
 			'label' => _x( 'Opened', 'stats', 'groundhogg' ),
-			'data'  => $stats[ 'opened' ] - $stats[ 'clicked' ],
+			'data'  => $stats['opened'] - $stats['clicked'],
 			'url'   => add_query_arg(
 				[
 					'activity' => [
 						'activity_type' => Activity::EMAIL_OPENED,
-						'step_id'       => $stats[ 'id' ],
+						'step_id'       => $stats['id'],
 						'funnel_id'     => Broadcast::FUNNEL_ID
 					]
 				],
@@ -136,12 +136,12 @@ class Chart_Last_Broadcast extends Base_Chart_Report {
 
 		$dataset[] = array(
 			'label' => _x( 'Clicked', 'stats', 'groundhogg' ),
-			'data'  => $stats[ 'clicked' ],
+			'data'  => $stats['clicked'],
 			'url'   => add_query_arg(
 				[
 					'activity' => [
 						'activity_type' => Activity::EMAIL_CLICKED,
-						'step_id'       => $stats[ 'id' ],
+						'step_id'       => $stats['id'],
 						'funnel_id'     => Broadcast::FUNNEL_ID
 					]
 				],
@@ -152,7 +152,7 @@ class Chart_Last_Broadcast extends Base_Chart_Report {
 
 		$dataset[] = array(
 			'label' => _x( 'Unopened', 'stats', 'groundhogg' ),
-			'data'  => $stats[ 'unopened' ],
+			'data'  => $stats['unopened'],
 			'url'   => '#',
 			'color' => $this->get_random_color()
 		);

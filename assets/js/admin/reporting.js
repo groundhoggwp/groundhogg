@@ -54,8 +54,13 @@ function tool_tip_title() {
                         label: 'Last 3 months',
                         start: moment(this.latest_date).subtract(3, 'month').startOf('month'),
                         end: moment(this.latest_date).subtract(1, 'month').endOf('month'),
-                    }],
-                earliest_date: 'January 1, 2006',
+                    }, {
+                        label: 'This year',
+                        start: moment().startOf('year'),
+                        end: moment().endOf('year'),
+                    }
+                    ],
+                earliest_date: 'January 1, 2017',
                 latest_date: moment(),
                 start_date: moment().subtract(29, 'days'),
                 end_date: moment(),
@@ -117,11 +122,10 @@ function tool_tip_title() {
                 },
                 success: function (json) {
 
-                    self.hideLoader();
-
                     self.data = json.data.reports;
-
                     self.renderReports();
+                    self.hideLoader();
+                    $( '.wrap' ).removeClass( 'blurred' );
 
                 },
                 failure: function (response) {
@@ -276,35 +280,41 @@ function tool_tip_title() {
 
                 var length = report_data.data.length;
 
-                html = html + '<tr>';
+                if ( report_data.label.length > 0  ) {
 
-                if (report_data.label) {
+                    html += '<tr>';
+
                     for (var key in report_data.label) {
-                        html = html + '<th>' + report_data.label[key] + '</th>';
+                        html += '<th>' + report_data.label[key] + '</th>';
                     }
-                } else {
-                    for (var key in report_data.data[0]) {
-                        html = html + '<th>' + key + '</th>';
-                    }
+
+                    html += '</tr>';
                 }
 
-                html = html + '</tr>';
+                // } else {
+                //     for (var key in report_data.data[0]) {
+                //         html = html + '<th>' + key + '</th>';
+                //     }
+                // }
 
                 for (var i = 0; i < length; i++) {
 
-                    html = html + '<tr >';
+                    html += '<tr >';
                     for (var key in report_data.data[i]) {
                         html = html + '<td>' + report_data.data[i][key] + '</td>';
                     }
-                    html = html + '</tr>';
+                    html += '</tr>';
 
                 }
 
-                html = html + '</table>';
+                html += '</table>';
+
             } else {
 
                 html = "<p class='notice-no-data' > No Data Found. </p>";
+
             }
+
             $report.html(html);
         },
 

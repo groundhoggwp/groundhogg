@@ -19,7 +19,7 @@ abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 		return [
 //			'responsive' => true,
 			'maintainAspectRatio' => false,
-			'tooltips'   => [
+			'tooltips'            => [
 				'callbacks'       => [
 					'label' => 'tool_tip_label',
 					'title' => 'tool_tip_title',
@@ -32,7 +32,7 @@ abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 				'borderWidth'     => 2,
 
 			],
-			'scales'     => [
+			'scales'              => [
 				'xAxes' => [
 					0 => [
 						'type'       => 'time',
@@ -70,30 +70,34 @@ abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 	 */
 	protected function get_time_diff( $range ) {
 
-		if ( $range <= DAY_IN_SECONDS ) {
-			return HOUR_IN_SECONDS;
-		} else if ( $range <= WEEK_IN_SECONDS ||  $range <= WEEK_IN_SECONDS * 2 ) {
-			return HOUR_IN_SECONDS;
-		} else if ( $range <= MONTH_IN_SECONDS || $range <= MONTH_IN_SECONDS * 4  ) {
-			return DAY_IN_SECONDS;
-		} else if ( $range <= 2 * YEAR_IN_SECONDS ) {
-			return WEEK_IN_SECONDS;
-		}
-
-		return MONTH_IN_SECONDS;
-
-//
 //		if ( $range <= DAY_IN_SECONDS ) {
 //			return HOUR_IN_SECONDS;
-//		} else if ( $range <= WEEK_IN_SECONDS ) {
+//		} else if ( $range <= WEEK_IN_SECONDS || $range <= WEEK_IN_SECONDS * 2 ) {
+//			return HOUR_IN_SECONDS;
+//		} else if ( $range <= MONTH_IN_SECONDS || $range <= MONTH_IN_SECONDS * 4 ) {
 //			return DAY_IN_SECONDS;
-//		} else if ( $range <= MONTH_IN_SECONDS ) {
-//			return WEEK_IN_SECONDS;
 //		} else if ( $range <= 2 * YEAR_IN_SECONDS ) {
-//			return MONTH_IN_SECONDS;
+//			return WEEK_IN_SECONDS;
 //		}
 //
-//		return YEAR_IN_SECONDS;
+//		return MONTH_IN_SECONDS;
+
+		// Account for extra day
+		$range -= DAY_IN_SECONDS;
+
+		if ( $range <= DAY_IN_SECONDS ) {
+			return HOUR_IN_SECONDS;
+		} else if ( $range <= WEEK_IN_SECONDS ) {
+			return DAY_IN_SECONDS;
+		} else if ( $range <= MONTH_IN_SECONDS + DAY_IN_SECONDS ) {
+			return DAY_IN_SECONDS * 3;
+		} else if ( $range <= 6 * MONTH_IN_SECONDS + ( DAY_IN_SECONDS * 6 ) ) {
+			return WEEK_IN_SECONDS;
+		} else if ( $range <= 2 * YEAR_IN_SECONDS ) {
+			return MONTH_IN_SECONDS;
+		}
+
+		return YEAR_IN_SECONDS;
 
 	}
 
@@ -105,10 +109,10 @@ abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 	 */
 	public function get_date_points( $previous ) {
 
-		$values = $this->get_values($previous);
-		$points = $values [ 'points' ];
-		$start  = $values[ 'start'];
-		$diff = $values ['difference'];
+		$values = $this->get_values( $previous );
+		$points = $values['points'];
+		$start  = $values['start'];
+		$diff   = $values['difference'];
 
 		for ( $i = 0; $i < $points; $i ++ ) {
 			$start                 = Plugin::$instance->utils->date_time->round_to( $start, $diff );
@@ -127,20 +131,18 @@ abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 	 *
 	 * @return array
 	 */
-	protected function get_values( $previous = false  ) {
+	protected function get_values( $previous = false ) {
 
-		if ($previous) {
+		if ( $previous ) {
 			$start = Plugin::$instance->utils->date_time->round_to_day( $this->compare_start );
 			$end   = Plugin::$instance->utils->date_time->round_to_day( $this->compare_end + DAY_IN_SECONDS - 1 );
 			$range = $end - $start;
 
-		}else {
-
+		} else {
 			$start = Plugin::$instance->utils->date_time->round_to_day( $this->start );
 			$end   = Plugin::$instance->utils->date_time->round_to_day( $this->end + DAY_IN_SECONDS - 1 );
 			$range = $end - $start;
 		}
-
 
 		return [
 			'start'      => $start,
@@ -159,9 +161,9 @@ abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 	 *
 	 * @return array
 	 */
-	public function group_by_time( $data , $previous  =  false  ) {
+	public function group_by_time( $data, $previous = false ) {
 
-		$values = $this->get_values( $previous);
+		$values = $this->get_values( $previous );
 
 		$times = $this->get_date_points( $previous );
 
@@ -169,13 +171,13 @@ abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 		foreach ( $data as $datum ) {
 			$date_point = Plugin::$instance->utils->date_time->round_to(
 				$this->get_time_from_datum( $datum ),
-				$values [ 'difference' ],
+				$values ['difference'],
 				false
 			);
 
 
 			if ( isset_not_empty( $times, $date_point ) ) {
-				$times[ $date_point ][ 1 ] ++;
+				$times[ $date_point ][1] ++;
 			}
 		}
 
@@ -189,16 +191,16 @@ abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 	 *
 	 * @return array
 	 */
-	public function normalize_data( $data )
-	{
+	public function normalize_data( $data ) {
 
 		$values = [];
 		foreach ( $data as $d ) {
 			$values[] = [
-				't' => $d[ 2 ],
-				'y' => $d[ 1 ]
+				't' => $d[2],
+				'y' => $d[1]
 			];
 		}
+
 		return $values;
 	}
 

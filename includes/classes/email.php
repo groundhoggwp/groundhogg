@@ -650,9 +650,9 @@ class Email extends Base_Object_With_Meta {
 			$return_path_email = $this->get_from_email();
 		}
 
-		$headers['return_path']      = 'Return-Path: ' . $return_path_email;
-		$headers['content_type']     = 'Content-Type: text/html; charset=UTF-8';
-		$headers['unsub']            = sprintf(
+		$headers['return_path']     = 'Return-Path: ' . $return_path_email;
+		$headers['content_type']    = 'Content-Type: text/html; charset=UTF-8';
+		$headers['unsub']           = sprintf(
 			'List-Unsubscribe: <%s>,<mailto:%s?subject=Unsubscribe %s from %s>',
 			add_query_arg( [
 				'contact' => encrypt( $this->get_contact()->get_email() )
@@ -700,6 +700,15 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Check if the message is transactional
+	 *
+	 * @return bool
+	 */
+	public function is_transactional(){
+		return $this->get_meta( 'message_type')  === 'transactional';
+	}
+
+	/**
 	 * Send the email
 	 *
 	 * @param $contact_id_or_email Contact|int|string
@@ -728,8 +737,8 @@ class Email extends Base_Object_With_Meta {
 			$this->set_event( $event );
 		}
 
-		/* Skip if testing */
-		if ( ! $this->is_testing() && ! $contact->is_marketable()  && $this->get_meta( 'message_type')  !== 'transactional' ) {
+		// Ignore if testing or the message is transactional
+		if ( ! $contact->is_marketable() && ! $this->is_testing() && ! $this->is_transactional() ) {
 			return new WP_Error( 'non_marketable', __( 'Contact is not marketable.' ) );
 		}
 
@@ -961,7 +970,6 @@ class Email extends Base_Object_With_Meta {
 				'where' => $where_events,
 			] );
 
-
 			$where_opened = [
 				'relationship' => "AND",
 				[ 'col' => 'email_id', 'val' => $this->get_id(), 'compare' => '=' ],
@@ -986,7 +994,6 @@ class Email extends Base_Object_With_Meta {
 				'where' => $where_clicked
 			] );
 
-
 		} else {
 			$count   = 0;
 			$opened  = 0;
@@ -994,7 +1001,7 @@ class Email extends Base_Object_With_Meta {
 		}
 
 		return [
-			'total'   => $count,
+			'sent'    => $count,
 			'opened'  => $opened,
 			'clicked' => $clicked
 		];

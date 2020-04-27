@@ -2,6 +2,10 @@
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
 }
 
+.wrap.blurred{
+    filter: blur( 3px );
+}
+
 .gh-loader-overlay {
     position: absolute;
     top: 0;
@@ -38,6 +42,11 @@ img {
 
 .nav-tab-wrapper {
     margin-bottom: 20px !important;
+}
+
+.big-chart-wrap{
+    height: 400px;
+    padding: 10px;
 }
 
 .groundhogg-report {
@@ -165,7 +174,13 @@ img {
     min-height: 200px;
 }
 
-.groundhogg-chart-no-padding h2.title {
+.groundhogg-chart-no-padding.full-width{
+    width: 100%;
+    margin: 0;
+}
+
+.groundhogg-chart-no-padding h2.title,
+.groundhogg-chart h2.title {
     margin-top: 15px;
     margin-bottom: 20px;
     padding-left: 15px;
@@ -176,6 +191,12 @@ img {
     white-space: pre;
     line-height: 1.2;
     font-weight: bold;
+}
+
+.groundhogg-chart h2.title{
+    margin-top: 0;
+    padding-left: 0;
+
 }
 
 .groundhogg-chart:first-child, .groundhogg-chart-no-padding:first-child {
@@ -290,16 +311,26 @@ table.groundhogg-report-table th {
     vertical-align: top;
 }
 
+table.groundhogg-report-table th,
+table.groundhogg-report-table td{
+    text-align: center;
+}
+
 table.groundhogg-report-table th:last-child,
 table.groundhogg-report-table td:last-child{
     text-align: right;
+}
+
+table.groundhogg-report-table th:first-child,
+table.groundhogg-report-table td:first-child{
+    text-align: left;
 }
 
 table.groundhogg-report-table td {
     font-size: 15px;
     color: #666666;
     line-height: 1.2;
-    font-weight: unset !important;
+    /*font-weight: unset !important;*/
     border-bottom: 1px solid #f2f2f2;
     display: table-cell;
     padding: 15px;
@@ -311,20 +342,27 @@ table.groundhogg-report-table td {
     white-space: nowrap;
 }
 
+#table_broadcast_stats table.groundhogg-report-table td:last-child {
+    width: auto;
+}
+
+#table_broadcast_stats table.groundhogg-report-table td:first-child{
+    width: 120px;
+    font-weight: bold;
+}
+
 table.groundhogg-report-table th:last-child,
 table.groundhogg-report-table td:last-child {
     width: 100px;
 }
 
-#table_top_performing_emails table th:nth-child(2),
-#table_top_performing_emails table td:nth-child(2){
-    text-align: center;
-}
-
-#table_top_performing_emails table th:nth-child(3),
-#table_top_performing_emails table td:nth-child(3),
-#table_top_performing_emails table th:nth-child(2),
-#table_top_performing_emails table td:nth-child(2){
+/* Sent, Opens, Clicks */
+.emails-list table th:nth-child(4),
+.emails-list table td:nth-child(4),
+.emails-list table th:nth-child(3),
+.emails-list table td:nth-child(3),
+.emails-list table th:nth-child(2),
+.emails-list table td:nth-child(2){
     width: 70px;
 }
 
