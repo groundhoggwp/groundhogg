@@ -10,11 +10,6 @@ use function Groundhogg\get_request_var;
 
 class Total_Contacts_In_Funnel extends Base_Quick_Stat {
 
-
-	protected function get_funnel_id() {
-		return absint( get_request_var( 'data' )[ 'funnel_id' ] );
-	}
-
 	/**
 	 * Query the results
 	 *

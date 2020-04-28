@@ -182,6 +182,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * ADDED Ability to distinguish emails as transactional or marketing. Transactional emails will ignore marketability.
 * ADDED 1 click unsubscribe support for Gmail & Yahoo.
 * TWEAKED Event queue is now a separate table 'gh_event_queue' for faster processing, completed events are moved to the 'gh_events' table.
+* TWEAKED Updated the managed page style to reflect modern WordPress.
+* TWEAKED Improved form impression tracking
+* TEAKED Added form name attribute to forms for GA compatibility
 * FIXED Bug causing broadcast events to be deleted if a funnel step with the same ID was deleted.
 * FIXED Bug causing the contacts' time zone to be UTC-0 if one was not provided.
 

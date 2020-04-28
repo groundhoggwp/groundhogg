@@ -10,6 +10,7 @@ use Groundhogg\Plugin;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\array_to_css;
 use function Groundhogg\dashicon;
+use function Groundhogg\get_cookie;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
@@ -79,7 +80,7 @@ function quick_stat_report( $args = [] ) {
 			'name'        => 'funnel',
 			'id'          => 'funnel-id',
 			'options'     => $options,
-			'selected'    => absint( get_request_var( 'funnel' ) ),
+			'selected'    => absint( get_request_var( 'funnel', get_cookie( 'gh_reporting_funnel_id' ) ) ),
 			'option_none' => false,
 		);
 
@@ -97,7 +98,7 @@ function quick_stat_report( $args = [] ) {
 
 <div class="groundhogg-report">
     <h2 class="title"><?php _e( 'Funnel Breakdown', 'groundhogg' ); ?></h2>
-    <div style="height: 400px">
+    <div class="big-chart-wrap">
         <canvas id="chart_funnel_breakdown"></canvas>
     </div>
 </div>
@@ -133,19 +134,24 @@ function quick_stat_report( $args = [] ) {
 <div class="groundhogg-chart-wrapper">
     <div class="groundhogg-chart-no-padding">
         <h2 class="title"><?php _e( 'Top Performing Emails in Funnel', 'groundhogg' ); ?></h2>
-        <div id="table_top_performing_emails"></div>
+        <div id="table_top_performing_emails" class="emails-list"></div>
     </div>
     <div class="groundhogg-chart-no-padding">
+        <h2 class="title"><?php _e( 'Emails Needing Improvement', 'groundhogg' ); ?></h2>
+        <div id="table_worst_performing_emails" class="emails-list"></div>
+    </div>
+</div>
+
+<div class="groundhogg-chart-wrapper">
+    <div class="groundhogg-chart-no-padding full-width">
         <h2 class="title"><?php _e( 'Benchmark Conversion Rate', 'groundhogg' ); ?></h2>
         <div id="table_benchmark_conversion_rate"></div>
     </div>
 </div>
 
-<!--<div class="groundhogg-chart-wrapper">-->
-<!--    <div class="groundhogg-chart-no-padding">-->
-<!--        <h2 class="title"> title </h2>-->
-<!--    </div>-->
-<!--    <div class="groundhogg-chart-no-padding">-->
-<!--        <h2 class="title">title</h2>-->
-<!--    </div>-->
-<!--</div>-->
+<div class="groundhogg-chart-wrapper">
+    <div class="groundhogg-chart-no-padding full-width">
+        <h2 class="title"><?php _e( 'Forms', 'groundhogg' ); ?></h2>
+        <div id="table_form_activity"></div>
+    </div>
+</div>

@@ -18,18 +18,17 @@ class Table_Benchmark_Conversion_Rate extends Base_Table_Report {
 
 	public function get_label() {
 		return [
-			__( 'Benchmark', 'groundhogg' ),
-			__( 'Benchmark', 'groundhogg' ),
+			__( 'From', 'groundhogg' ),
+			__( '# Contacts', 'groundhogg' ),
+			__( 'To', 'groundhogg' ),
+			__( '# Contacts', 'groundhogg' ),
 			__( 'Conversion Rate', 'groundhogg' )
 		];
 	}
 
-
-	protected function get_funnel_id() {
-		return get_request_var( 'data' )[ 'funnel_id' ];
-	}
-
-
+	/**
+	 * @return array|mixed
+	 */
 	protected function get_table_data() {
 		//get list of benchmark
 		$funnel = new Funnel( $this->get_funnel_id() );
@@ -50,23 +49,33 @@ class Table_Benchmark_Conversion_Rate extends Base_Table_Report {
 
 				$current_step  = new Step( $steps[ $i ] );
 				$previous_step = new Step( $steps[ $i - 1 ] );
+
+				$total1 = $this->get_num_of_completed_contacts( $steps[ $i ], $this->start, $this->end );
+				$total2 = $this->get_num_of_completed_contacts( $steps[ $i - 1 ], $this->start - WEEK_IN_SECONDS, $this->end );
+
 				$data []       = [
-					'label1' => $current_step->get_step_title(),
-					'label2' => $previous_step->get_step_title(),
-					'data'   => percentage( $this->get_total( $steps[ $i ], $this->start, $this->end ), $this->get_total( $steps[ $i - 1 ], $this->start - WEEK_IN_SECONDS, $this->end ) ) .'%'
+					'from'   => $current_step->get_step_title(),
+					'total1' => $total1,
+					'to'     => $previous_step->get_step_title(),
+					'total2' => $total2,
+					'scr'    => percentage( $total1, $total2 ) . '%'
 				];
 			}
 
-			return array_reverse($data);
+			return array_reverse( $data );
 		} else {
 
-			$current_step = new Step( $steps[ 0 ] );
+			$current_step = new Step( $steps[0] );
+
+			$total = $this->get_num_of_completed_contacts( $steps[0], $this->start, $this->end );
 
 			return [
 				[
-					'label1' => $current_step->get_step_title(),
-					'label2' => $current_step->get_step_title(),
-					'data'   => percentage( $this->get_total( $steps[ 0 ], $this->start, $this->end ), $this->get_total( $steps[ 0 ], $this->start - WEEK_IN_SECONDS, $this->end ) ) .'%'
+					'from'   => $current_step->get_step_title(),
+					'total1' => $total,
+					'to'     => '',
+					'total2' => '',
+					'scr'    => percentage( $total, $total ) . '%'
 				]
 			];
 
@@ -90,7 +99,7 @@ class Table_Benchmark_Conversion_Rate extends Base_Table_Report {
 	}
 
 
-	protected function get_total( $step_id, $start, $end ) {
+	protected function get_num_of_completed_contacts( $step_id, $start, $end ) {
 
 		$where_events = [
 			'relationship' => "AND",
@@ -104,7 +113,6 @@ class Table_Benchmark_Conversion_Rate extends Base_Table_Report {
 			'where'  => $where_events,
 			'select' => 'DISTINCT contact_id'
 		] );
-
 
 		return $num_of_contacts;
 	}

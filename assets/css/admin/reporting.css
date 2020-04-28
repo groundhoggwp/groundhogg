@@ -171,12 +171,12 @@ img {
     background: #FFF;
     border: 1px solid #ccd0d4;
     border-radius: 5px;
-    min-height: 200px;
+    /*min-height: 200px;*/
 }
 
 .groundhogg-chart-no-padding.full-width{
     width: 100%;
-    margin: 0;
+    margin: 0 !important;
 }
 
 .groundhogg-chart-no-padding h2.title,
@@ -196,7 +196,10 @@ img {
 .groundhogg-chart h2.title{
     margin-top: 0;
     padding-left: 0;
+}
 
+.groundhogg-chart-no-padding .notice{
+    margin: 10px;
 }
 
 .groundhogg-chart:first-child, .groundhogg-chart-no-padding:first-child {
@@ -331,7 +334,7 @@ table.groundhogg-report-table td {
     color: #666666;
     line-height: 1.2;
     /*font-weight: unset !important;*/
-    border-bottom: 1px solid #f2f2f2;
+    border-top: 1px solid #f2f2f2;
     display: table-cell;
     padding: 15px;
     text-decoration: none;
@@ -342,6 +345,18 @@ table.groundhogg-report-table td {
     white-space: nowrap;
 }
 
+table.groundhogg-report-table tr:last-child td{
+    border-bottom: none;
+}
+
+table.groundhogg-report-table tr:last-child td:first-child{
+    border-radius: 0 0 0 5px;
+}
+
+table.groundhogg-report-table tr:last-child td:last-child{
+    border-radius: 0 0 5px 0;
+}
+
 #table_broadcast_stats table.groundhogg-report-table td:last-child {
     width: auto;
 }
@@ -350,7 +365,7 @@ table.groundhogg-report-table td {
     width: 120px;
     font-weight: bold;
 }
-
+#table_broadcast_link_clicked table.groundhogg-report-table th:nth-child(2),
 table.groundhogg-report-table th:last-child,
 table.groundhogg-report-table td:last-child {
     width: 100px;

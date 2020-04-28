@@ -2,6 +2,8 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Classes\Activity;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -91,6 +93,7 @@ class Tracking {
 		add_action( 'template_redirect', [ $this, 'template_redirect' ] );
 
 		add_action( 'groundhogg/after_form_submit', [ $this, 'form_filled' ], 10, 1 );
+		add_action( 'groundhogg/contact/preferences/unsubscribed', [ $this, 'contact_unsubscribed' ], 10, 1 );
 
 		add_action( 'groundhogg/preferences/erase_profile', [ $this, 'remove_tracking_cookie' ] );
 
@@ -515,7 +518,7 @@ class Tracking {
 			'funnel_id'     => $event->get_funnel_id(),
 			'step_id'       => $event->get_step_id(),
 			'email_id'      => $this->get_tracking_cookie_param( 'email_id', 0 ),
-			'activity_type' => 'email_opened',
+			'activity_type' => Activity::EMAIL_OPENED,
 			'event_id'      => $event->get_id(),
 			'referer'       => ''
 		);
@@ -569,7 +572,7 @@ class Tracking {
 			'funnel_id'     => $event->get_funnel_id(),
 			'step_id'       => $event->get_step_id(),
 			'email_id'      => $this->get_tracking_cookie_param( 'email_id', 0 ),
-			'activity_type' => 'email_link_click',
+			'activity_type' => Activity::EMAIL_CLICKED,
 			'event_id'      => $event->get_id(),
 			'referer'       => $target
 		);
@@ -600,6 +603,34 @@ class Tracking {
 			$this->add_tracking_cookie_param( 'contact_id', $contact->get_id() );
 			$this->build_tracking_cookie();
 		}
+	}
+
+	/**
+	 * Track the activity if the contact unsubscribed
+	 *
+	 * @param $contact_id
+	 */
+	public function contact_unsubscribed( $contact_id ){
+
+		// Check if we have an email ID/step ID that we can attribute it too...
+
+		$event = $this->get_current_event();
+
+		if ( ! $event || ! $event->exists() ){
+			return;
+		}
+
+		$args = array(
+			'timestamp'     => time(),
+			'contact_id'    => $contact_id,
+			'funnel_id'     => $event->get_funnel_id(),
+			'step_id'       => $event->get_step_id(),
+			'email_id'      => $this->get_tracking_cookie_param( 'email_id', 0 ),
+			'activity_type' => Activity::UNSUBSCRIBED,
+			'event_id'      => $event->get_id(),
+		);
+
+		get_db( 'activity' )->add( $args );
 	}
 
 }

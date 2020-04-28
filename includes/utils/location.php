@@ -22,7 +22,7 @@ class Location {
 	 *
 	 * @return array|string
 	 */
-	public function get_countries_list( $country_code = '', $existing_data=false ) {
+	public function get_countries_list( $country_code = '', $existing_data = false ) {
 		$countries = array(
 			'AF' => 'Afghanistan',
 			'AX' => 'Aland Islands',
@@ -275,15 +275,15 @@ class Location {
 			return $countries[ $country_code ];
 		}
 
-		if ( $existing_data ){
-			$meta = get_db( 'contactmeta' )->query( [ 'meta_key' => 'country' ] );
+		if ( $existing_data ) {
+			$meta          = get_db( 'contactmeta' )->query( [ 'meta_key' => 'country' ] );
 			$country_codes = array_unique( wp_list_pluck( $meta, 'meta_value' ) );
 
 			$existing = [];
 
-			foreach ( $country_codes as $country_code ){
+			foreach ( $country_codes as $country_code ) {
 
-				if ( ! $country_code ){
+				if ( ! $country_code ) {
 					continue;
 				}
 

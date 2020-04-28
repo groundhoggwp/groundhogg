@@ -6,10 +6,12 @@ use Groundhogg\Admin\Reports\Views\Overview;
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Contact_Query;
 use Groundhogg\Reports;
+use function Groundhogg\get_cookie;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\groundhogg_logo;
 use function Groundhogg\is_white_labeled;
+use function Groundhogg\set_cookie;
 use function Groundhogg\white_labeled_name;
 use Groundhogg\Plugin;
 
@@ -17,8 +19,6 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 	/**
 	 * Add Ajax actions...
-	 *
-	 * @return mixed
 	 */
 	protected function add_ajax_actions() {
 		add_action( 'wp_ajax_groundhogg_refresh_dashboard_reports', [ $this, 'refresh_report_data' ] );
@@ -26,11 +26,8 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 	/**
 	 * Adds additional actions.
-	 *
-	 * @return mixed
 	 */
 	protected function add_additional_actions() {
-		// TODO: Implement add_additional_actions() method.
 	}
 
 	/**
@@ -66,11 +63,8 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 	/**
 	 * Get the item type for this page
-	 *
-	 * @return mixed
 	 */
 	public function get_item_type() {
-		// TODO: Implement get_item_type() method.
 	}
 
 	/**
@@ -80,117 +74,115 @@ class Reports_Page extends Tabbed_Admin_Page {
 		wp_enqueue_style( 'groundhogg-admin-reporting' );
 		wp_enqueue_style( 'groundhogg-admin-loader' );
 		wp_enqueue_style( 'baremetrics-calendar' );
-//	    wp_enqueue_script( 'moment-js' );
-//		wp_enqueue_script( 'baremetrics-calendar' );
 		wp_enqueue_script( 'groundhogg-admin-reporting' );
 
+		$dates = sanitize_text_field( get_cookie( 'groundhogg_reporting_dates', '' ) );
+
+		if ( ! $dates ) {
+			$dates = [
+				'start_date' => date( 'Y-m-d', time() - MONTH_IN_SECONDS ),
+				'end_date'   => date( 'Y-m-d', time() ),
+			];
+		} else {
+			$dates = explode( '|', $dates );
+
+			$dates = [
+				'start_date' => $dates[0],
+				'end_date'   => $dates[1],
+			];
+		}
+
 		wp_localize_script( 'groundhogg-admin-reporting', 'GroundhoggReporting', [
-			'reports' => $this->get_reports_per_tab()
+			'reports' => $this->get_reports_per_tab(),
+			'dates'   => $dates
 		] );
 	}
 
 	protected function get_reports_per_tab() {
 
-	    $case  = '';
-		switch ( $this->get_current_tab() ) {
+		$case = '';
 
+		switch ( $this->get_current_tab() ) {
+			default;
 			case 'overview':
 				$reports = [
 					'chart_new_contacts',
-
 					'total_new_contacts',
 					'total_confirmed_contacts',
 					'total_engaged_contacts',
 					'total_unsubscribed_contacts',
-
 					'total_emails_sent',
 					'email_open_rate',
 					'email_click_rate',
-
 					'chart_contacts_by_optin_status',
-
 					'table_top_performing_emails',
-
 					'table_contacts_by_countries',
 					'table_contacts_by_lead_source',
-                    'table_top_converting_funnels',
-
-
+					'table_top_converting_funnels',
 				];
-				$case = 'overview';
-
 				break;
 			case 'contacts' :
 				$reports = [
 					'chart_new_contacts',
-
 					'total_new_contacts',
 					'total_confirmed_contacts',
 					'total_engaged_contacts',
 					'total_unsubscribed_contacts',
-
 					'chart_contacts_by_optin_status',
 					'chart_contacts_by_region',
 					'chart_contacts_by_country',
-
 					'table_contacts_by_lead_source',
 					'table_contacts_by_search_engines',
 					'table_contacts_by_source_page',
 					'table_contacts_by_social_media',
-
 				];
-				$case = 'contacts';
 				break;
 			case 'email':
 				$reports = [
 					'chart_email_activity',
-
 					'total_emails_sent',
 					'email_open_rate',
 					'email_click_rate',
-
 					'total_unsubscribed_contacts',
 					'total_spam_contacts',
 					'total_bounces_contacts',
 					'total_complaints_contacts',
-
 					'chart_last_broadcast',
-
 					'table_top_performing_emails',
 					'table_worst_performing_emails',
 					'table_top_performing_broadcasts',
-                    'table_broadcast_stats'
+					'table_broadcast_stats'
 				];
-				$case = 'email';
 				break;
 			case 'funnels':
 				$reports = [
 					'chart_funnel_breakdown',
 					'table_top_performing_emails',
-
+					'table_worst_performing_emails',
 					'total_funnel_conversion_rate',
-
 					'total_benchmark_conversion_rate',
 					'total_abandonment_rate',
-
 					'total_contacts_in_funnel',
-                    'table_benchmark_conversion_rate'
+					'table_benchmark_conversion_rate',
+					'table_form_activity',
 				];
-				$case = 'funnels';
 				break;
 			case 'broadcasts' :
-
 				$reports = [
 					'chart_last_broadcast',
 					'table_broadcast_stats',
 					'table_broadcast_link_clicked',
 				];
-				$case = 'broadcasts';
+				break;
+			case 'forms' :
+				$reports = [
+					'table_form_activity',
+				];
 				break;
 
 		}
 
-		$reports = apply_filters( 'groundhogg/admin/reports/tab' , $reports, $case ) ;
+		$reports = apply_filters( 'groundhogg/admin/reports/tab', $reports, $this->get_current_tab() );
 
 		return $reports;
 
@@ -198,11 +190,8 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 	/**
 	 * Add any help items
-	 *
-	 * @return mixed
 	 */
 	public function help() {
-		// TODO: Implement help() method.
 	}
 
 	/**
@@ -232,6 +221,10 @@ class Reports_Page extends Tabbed_Admin_Page {
 			[
 				'name' => __( 'Broadcasts', 'groundhogg' ),
 				'slug' => 'broadcasts'
+			],
+            [
+				'name' => __( 'Forms', 'groundhogg' ),
+				'slug' => 'forms'
 			],
 
 		];
@@ -289,9 +282,9 @@ class Reports_Page extends Tabbed_Admin_Page {
         <div id="groundhogg-datepicker-wrap">
             <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker"></div>
         </div>
-<!--        <div id="groundhogg-datepicker-wrap">-->
-<!--            <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker-compare"></div>-->
-<!--        </div>-->
+        <!--        <div id="groundhogg-datepicker-wrap">-->
+        <!--            <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker-compare"></div>-->
+        <!--        </div>-->
 		<?php
 	}
 
@@ -333,11 +326,25 @@ class Reports_Page extends Tabbed_Admin_Page {
 		include dirname( __FILE__ ) . '/views/broadcasts.php';
 	}
 
+	/**
+	 * Forms
+	 */
+	public function forms_view() {
+		include dirname( __FILE__ ) . '/views/forms.php';
+	}
+
 
 	public function refresh_report_data() {
 
 		$start = strtotime( sanitize_text_field( get_post_var( 'start' ) ) );
 		$end   = strtotime( sanitize_text_field( get_post_var( 'end' ) ) ) + ( DAY_IN_SECONDS - 1 );
+
+		$saved = [
+			'start_date' => date_i18n( 'Y-m-d', $start ),
+			'end_date'   => date_i18n( 'Y-m-d', $end ),
+		];
+
+		set_cookie( 'groundhogg_reporting_dates', implode( '|', $saved ) );
 
 		$reports = map_deep( get_post_var( 'reports' ), 'sanitize_key' );
 

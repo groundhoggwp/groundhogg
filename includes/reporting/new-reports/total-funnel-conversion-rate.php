@@ -14,10 +14,6 @@ use function Groundhogg\percentage;
 
 class Total_Funnel_Conversion_Rate extends Base_Quick_Stat_Percent {
 
-	protected function get_funnel_id() {
-		return absint( get_request_var( 'data' )['funnel_id'] );
-	}
-
 	/**
 	 * Query the results
 	 *

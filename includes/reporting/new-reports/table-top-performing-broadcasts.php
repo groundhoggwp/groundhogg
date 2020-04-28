@@ -2,102 +2,90 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
-
 use Groundhogg\Broadcast;
-use Groundhogg\Plugin;
+use Groundhogg\Email;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
-use function Groundhogg\html;
 use function Groundhogg\percentage;
 
-class Table_Top_Performing_Broadcasts extends Base_Table_Report {
-
-	public function get_label() {
-		return [
-			__( 'Emails', 'groundhogg' ),
-			__( 'Sent', 'groundhogg' ),
-			__( 'Open Rate', 'groundhogg' ),
-			__( 'Click Thru Rate', 'groundhogg' )
-		];
-	}
-
-	protected function get_table_data() {
-
-		$where = [
-			'relationship' => "AND",
-			[ 'col' => 'status', 'val' => 'sent', 'compare' => '=' ],
-			[ 'col' => 'object_type', 'val' => 'email', 'compare' => '=' ],
-			[ 'col' => 'send_time', 'val' => $this->start, 'compare' => '>=' ],
-			[ 'col' => 'send_time', 'val' => $this->end, 'compare' => '<=' ],
-		];
-
-		$broadcasts = get_db( 'broadcasts' )->query( [
-			'where' => $where,
-		] );
-
-		if ( empty( $broadcasts ) ) {
-
-			return [
-
-			];
-		}
-
-		$list = [];
-
-		foreach ( $broadcasts as $broadcast ) {
-
-			$broadcast = new Broadcast( $broadcast->ID );
-
-			$report = $broadcast->get_report_data();
-
-			$list[] = [
-				'sent'               => $report['sent'],
-				'data'               => percentage( $report['sent'], $report['opened'] ),
-				'opened'             => $report ['opened'],
-				'label'              => $broadcast->get_title(),
-				'click_through_rate' => percentage( $report['opened'], $report['clicked'] ),
-				'url'                => admin_page_url( 'gh_reporting', [ 'tab' => 'broadcasts', 'broadcast' => $broadcast->get_id() ] ),
-			];
-
-		}
-
-		$list = $this->normalize_data( $list );
-
-		foreach ( $list as $i => $datum ) {
-			$datum['label']              = html()->wrap( $datum['label'], 'a', [
-				'href'  => $datum['url'],
-				'class' => 'number-total'
-			] );
-			$datum['data']               = $datum['data'] . '%';
-			$datum['click_through_rate'] = $datum['click_through_rate'] . '%';
-
-			unset( $datum['url'] );
-			$data[ $i ] = $datum;
-		}
-
-		return $data;
-
-	}
-
+class Table_Top_Performing_Broadcasts extends Base_Email_Performance_Table_Report {
 
 	/**
-	 * Normalize a datum
-	 *
-	 * @param $item_key
-	 * @param $item_data
+	 * Get email IDs from broadcasts...
 	 *
 	 * @return array
 	 */
-	protected function normalize_datum( $item_key, $item_data ) {
+	protected function get_email_ids_of_sent_emails() {
 
-		return [
-			'label'              => $item_data ['label'],
-			'url'                => $item_data ['url'],
-			'sent'               => $item_data ['sent'],
-			'data'               => $item_data ['data'],
-			'click_through_rate' => $item_data ['click_through_rate'],
-		];
+		$broadcasts = get_db( 'broadcasts' )->query( [
+			'where' => [
+				'relationship' => "AND",
+				[ 'col' => 'status', 'val' => 'sent', 'compare' => '=' ],
+				[ 'col' => 'object_type', 'val' => 'email', 'compare' => '=' ],
+				[ 'col' => 'send_time', 'val' => $this->start, 'compare' => '>=' ],
+				[ 'col' => 'send_time', 'val' => $this->end, 'compare' => '<=' ],
+			],
+		] );
+
+		return wp_parse_id_list( wp_list_pluck( $broadcasts, 'ID' ) );
+
 	}
 
+	protected function should_include( $sent, $opened, $clicked ) {
+		return $sent > 10 && percentage( $sent, $opened ) > 20 && percentage( $opened, $clicked ) > 10;
+	}
 
+	protected function get_table_data() {
+		$emails = $this->get_email_ids_of_sent_emails();
+
+		$list = [];
+
+		foreach ( $emails as $email ) {
+
+			$email_id = is_object( $email ) ? $email->ID : $email;
+
+			$email  = new Broadcast( $email_id );
+			$report = $email->get_report_data();
+
+			$title = $email->get_title();
+
+			if ( $this->should_include( $report['sent'], $report['opened'], $report ['clicked'] ) ) {
+				$list[] = [
+					'label'   => $title,
+					'url'     => admin_page_url( 'gh_emails', [
+						'action' => 'edit',
+						'email'  => $email->get_id()
+					] ),
+					'sent'    => $report['sent'],
+					'opened'  => percentage( $report['sent'], $report['opened'] ),
+					'clicked' => percentage( $report['opened'], $report['clicked'] ),
+				];
+
+			}
+
+		}
+
+		return $this->normalize_data( $list );
+	}
+
+	/**
+	 * Sort by multiple args
+	 *
+	 * @param $a
+	 * @param $b
+	 *
+	 * @return mixed
+	 */
+	public function sort( $a, $b ) {
+		if ( $a['sent'] === $b['sent'] ) {
+
+			if ( $a['opened'] === $b['opened'] ) {
+				return $b['clicked'] - $a['clicked'];
+			}
+
+			return $b['opened'] - $a['opened'];
+		}
+
+		return $b['sent'] - $a['sent'];
+	}
 }

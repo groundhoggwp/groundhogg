@@ -3,6 +3,9 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use function Groundhogg\generate_referer_hash;
+use function Groundhogg\isset_not_empty;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -82,9 +85,9 @@ class Activity extends DB {
 			'contact_id'    => '%d',
 			'email_id'      => '%d',
 			'event_id'      => '%d',
-//            'event_type'    => '%d',
 			'activity_type' => '%s',
 			'referer'       => '%s',
+			'referer_hash'  => '%s',
 		];
 	}
 
@@ -97,15 +100,15 @@ class Activity extends DB {
 	public function get_column_defaults() {
 		return array(
 			'ID'            => 0,
-			'timestamp'     => 0,
+			'timestamp'     => time(),
 			'funnel_id'     => 0,
 			'step_id'       => 0,
 			'contact_id'    => 0,
 			'email_id'      => 0,
 			'event_id'      => 0,
-//            'event_type'    => 0,
 			'activity_type' => '',
 			'referer'       => '',
+			'referer_hash'  => '',
 		);
 	}
 
@@ -115,18 +118,34 @@ class Activity extends DB {
 	 * @access  public
 	 * @since   2.1
 	 */
-	public function add( $data = array() ) {
+	public function add( $data = [] ) {
 
 		$args = wp_parse_args(
 			$data,
 			$this->get_column_defaults()
 		);
 
-		if ( empty( $args['timestamp'] ) ) {
-			return false;
+		if ( isset_not_empty( $data, 'referer' ) ) {
+			$data['referer_hash'] = generate_referer_hash( $data[ 'referer' ] );
 		}
 
 		return $this->insert( $args );
+	}
+
+	/**
+	 * @param int $row_id
+	 * @param array $data
+	 * @param array $where
+	 *
+	 * @return bool
+	 */
+	public function update( $row_id = 0, $data = [], $where = [] ) {
+
+		if ( isset_not_empty( $data, 'referer' ) ) {
+			$data['referer_hash'] =  generate_referer_hash( $data[ 'referer' ] );
+		}
+
+		return parent::update( $row_id, $data, $where );
 	}
 
 	public function get_date_key() {
@@ -167,6 +186,14 @@ class Activity extends DB {
 	}
 
 	/**
+	 * Set the referer hash as aan easier method to search thru the activity
+	 */
+	public function update_2_2(){
+		global $wpdb;
+		$result = $wpdb->query( "UPDATE `{$this->get_table_name()}` SET `referer_hash` = SUBSTR( MD5(`referer`), 1, 20) WHERE `referer` != '';" );
+	}
+
+	/**
 	 * Create the table
 	 *
 	 * @access  public
@@ -190,11 +217,13 @@ class Activity extends DB {
         email_id bigint(20) unsigned NOT NULL,
         event_id bigint(20) unsigned NOT NULL,
         referer text NOT NULL,
+        referer_hash varchar(20) NOT NULL,
         PRIMARY KEY (ID),
         KEY timestamp (timestamp),
         KEY funnel_id (funnel_id),
         KEY step_id (step_id),
-        KEY event_id (event_id)
+        KEY event_id (event_id),
+        KEY referer_hash (referer_hash)
 		) $charset_collate;";
 
 		dbDelta( $sql );

@@ -37,7 +37,7 @@ class Table_Contacts_By_Country extends Base_Table_Report {
 			$sub_tal    = $datum['data'];
 			$percentage = ' (' . percentage( $total, $sub_tal ) . '%)';
 
-			$datum['data'] = html()->wrap( $datum['data'] . $percentage, 'a', [
+			$datum['data'] = html()->wrap( $datum['data'], 'a', [
 				'href'  => $datum['url'],
 				'class' => 'number-total'
 			] );

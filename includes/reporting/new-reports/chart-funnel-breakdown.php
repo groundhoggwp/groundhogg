@@ -35,10 +35,6 @@ class Chart_Funnel_Breakdown extends Base_Chart_Report {
 		return 'bar';
 	}
 
-	protected function get_funnel_id() {
-		return get_request_var('data')['funnel_id'];
-	}
-
 	protected function get_complete_activity() {
 
 		$funnel = new Funnel( $this->get_funnel_id() );

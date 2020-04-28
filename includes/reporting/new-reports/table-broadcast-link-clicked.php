@@ -6,6 +6,7 @@ namespace Groundhogg\Reporting\New_Reports;
 use Groundhogg\Broadcast;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Plugin;
+use function Groundhogg\generate_referer_hash;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
@@ -18,6 +19,7 @@ class Table_Broadcast_Link_Clicked extends Base_Table_Report {
 	public function get_label() {
 		return [
 			__( 'Link', 'groundhogg' ),
+			__( 'Uniques', 'groundhogg' ),
 			__( 'Clicks', 'groundhogg' ),
 		];
 	}
@@ -33,17 +35,26 @@ class Table_Broadcast_Link_Clicked extends Base_Table_Report {
 		$activity = get_db( 'activity' )->query( [
 			'funnel_id'     => $broadcast->get_funnel_id(),
 			'step_id'       => $broadcast->get_id(),
-			'activity_type' => Activity::EMAIL_CLICKED
+			'activity_type' => Activity::EMAIL_CLICKED,
 		] );
 
 		$links = [];
 
 		foreach ( $activity as $event ) {
-			if ( isset( $links[ $event->referer ] ) ) {
-				$links[ $event->referer ] += 1;
-			} else {
-				$links[ $event->referer ] = 1;
+
+			if ( ! isset( $links[ $event->referer_hash ] ) ) {
+				$links[ $event->referer_hash ] = [
+					'referer'  => $event->referer,
+					'hash'     => $event->referer_hash,
+					'contacts' => [],
+					'uniques'  => 0,
+					'clicks'   => 0,
+				];
 			}
+
+			$links[ $event->referer_hash ]['clicks'] ++;
+			$links[ $event->referer_hash ]['contacts'][] = $event->contact_id;
+			$links[ $event->referer_hash ]['uniques']    = count( array_unique( $links[ $event->referer_hash ]['contacts'] ) );
 		}
 
 		if ( empty( $links ) ) {
@@ -52,23 +63,29 @@ class Table_Broadcast_Link_Clicked extends Base_Table_Report {
 
 
 		$data = [];
-		foreach ( $links as $link => $clicks ) {
+		foreach ( $links as $hash => $link ) {
 			$data[] = [
-				'label' => html()->wrap( $link, 'a', [ 'href' => $link, 'class' => 'number-total' ] ),
-				'data'  => html()->wrap( $clicks, 'a', [
-					'href'  => add_query_arg(
+				'label'   => html()->wrap( $link['referer'], 'a', [
+					'href'  => $link['referer'],
+					'class' => 'number-total',
+					'title' => $link['referer'],
+					'target' => '_blank',
+				] ),
+				'uniques' => html()->wrap( $link['uniques'], 'a', [
+					'href'   => add_query_arg(
 						[
 							'activity' => [
 								'activity_type' => Activity::EMAIL_CLICKED,
 								'step_id'       => $broadcast->get_id(),
 								'funnel_id'     => $broadcast->get_funnel_id(),
-								'referer'       => $link
+								'referer_hash'  => $hash,
 							]
 						],
 						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
 					),
-					'class' => 'number-total'
+					'class'  => 'number-total'
 				] ),
+				'clicks'  => html()->wrap( $link['clicks'], 'span', [ 'class' => 'number-total' ] ),
 			];
 		}
 

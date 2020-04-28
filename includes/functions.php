@@ -624,9 +624,9 @@ function array_to_atts( $atts ) {
  */
 function array_to_css( $atts ) {
 
-    if ( ! is_array( $atts ) ){
-        return $atts;
-    }
+	if ( ! is_array( $atts ) ) {
+		return $atts;
+	}
 
 	$css = '';
 	foreach ( $atts as $key => $value ) {
@@ -1355,11 +1355,8 @@ function get_form_list() {
 	] );
 
 	$form_options = array();
-	$default      = 0;
+
 	foreach ( $forms as $form ) {
-		if ( ! $default ) {
-			$default = $form->ID;
-		}
 		$step = Plugin::$instance->utils->get_step( $form->ID );
 		if ( $step->is_active() ) {
 			$form_options[ $form->ID ] = $form->step_title;
@@ -3120,19 +3117,23 @@ function get_queued_event_by_id( $event_id ) {
  *
  * @return bool|Event
  */
-function enqueue_event( $args ){
+function enqueue_event( $args ) {
 	$event_id = get_db( 'event_queue' )->add( $args );
 
-    if ( ! $event_id ){
-        return false;
-    }
+	if ( ! $event_id ) {
+		return false;
+	}
 
-    return get_queued_event_by_id( $event_id );
+	return get_queued_event_by_id( $event_id );
 }
 
 /**
- * @param $event_id
+ * Generate a referer hash string
+ *
+ * @param $referer
+ *
+ * @return false|string
  */
-function run_single_event( $event_id ) {
-
+function generate_referer_hash( $referer ) {
+	return substr( md5( $referer ), 0, 20 );
 }

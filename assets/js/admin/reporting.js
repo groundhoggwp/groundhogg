@@ -62,8 +62,8 @@ function tool_tip_title() {
                     ],
                 earliest_date: 'January 1, 2017',
                 latest_date: moment(),
-                start_date: moment().subtract(29, 'days'),
-                end_date: moment(),
+                start_date: self.dates.start_date,
+                end_date: self.dates.end_date,
                 callback: function () {
                     self.refresh(this)
                 },
@@ -311,7 +311,7 @@ function tool_tip_title() {
 
             } else {
 
-                html = "<p class='notice-no-data' > No Data Found. </p>";
+                html = report_data.no_data;
 
             }
 

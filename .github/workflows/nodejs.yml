@@ -4,7 +4,9 @@ on:
     tags-ignore:
       - "*.dev"
       - "*.beta"
+      - "*.beta.*"
       - "*.alpha"
+      - "*.alpha.*"
 jobs:
   tag:
     name: New tag

@@ -5,6 +5,7 @@ namespace Groundhogg\Reporting\New_Reports;
 
 use Groundhogg\Contact_Query;
 use Groundhogg\Plugin;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
 use function Groundhogg\percentage;
@@ -56,12 +57,17 @@ class Table_Contacts_By_Lead_Source extends Base_Table_Report {
 	 */
 	protected function normalize_datum( $item_key, $item_data ) {
 		return [
-			'label' => Plugin::$instance->utils->html->wrap( $item_key, 'a', [
+			'label' => html()->wrap( $item_key, 'a', [
 				'href'   => $item_key,
-				'target' => '_blank'
+				'target' => '_blank',
+				'title'  => $item_key
 			] ),
 			'data'  => $item_data,
-			'url'   => admin_url( 'admin.php?page=gh_contacts&meta_value=lead_source&meta_value=' . urlencode( $item_key ) )
+			'url'   => admin_page_url( 'gh_contacts', [
+				'meta_key'     => 'lead_source',
+				'meta_value'   => $item_key,
+				'meta_compare' => 'RLIKE',
+			] ),
 		];
 	}
 

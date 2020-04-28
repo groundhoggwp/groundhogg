@@ -3,6 +3,8 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
+use function Groundhogg\get_array_var;
+use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use function Groundhogg\percentage;
 use Groundhogg\Plugin;
@@ -20,10 +22,20 @@ abstract class Base_Table_Report extends Base_Report {
 	 */
 	public function get_data() {
 		return [
-			'type'  => 'table',
-			'label' => $this->get_label(),
-			'data'  => $this->get_table_data()
+			'type'    => 'table',
+			'label'   => $this->get_label(),
+			'data'    => $this->get_table_data(),
+			'no_data' => $this->no_data_notice(),
 		];
+	}
+
+	/**
+	 * Text to display if no data is available...
+	 */
+	protected function no_data_notice() {
+		return html()->e( 'div', [ 'class' => 'notice notice-warning' ], [
+			html()->e( 'p', [], __( 'No information available.', 'groundhogg' ) )
+		] );
 	}
 
 	/**
@@ -102,6 +114,7 @@ abstract class Base_Table_Report extends Base_Report {
 	 */
 	protected function parse_meta_records( $rows ) {
 		$values = wp_list_pluck( $rows, 'meta_value' );
+
 		return $this->parse_table_data( $values );
 	}
 
@@ -112,7 +125,7 @@ abstract class Base_Table_Report extends Base_Report {
 	 *
 	 * @return array
 	 */
-	protected function parse_table_data( $values ){
+	protected function parse_table_data( $values ) {
 		$counts = array_count_values( $values );
 		$data   = $this->normalize_data( $counts );
 		$total  = array_sum( wp_list_pluck( $data, 'data' ) );
@@ -126,7 +139,7 @@ abstract class Base_Table_Report extends Base_Report {
 				'href'  => $datum['url'],
 				'class' => 'number-total',
 				'title' => $datum['url'],
-			], $datum['data'] . $percentage );
+			], $datum['data'] );
 
 			unset( $datum['url'] );
 			$data[ $i ] = $datum;

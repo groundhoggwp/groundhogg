@@ -245,39 +245,33 @@ class Main_Updater extends Updater {
 	 * migrate waiting events to the new queue
 	 * add queued_id column
 	 * add optin_status_changed column
+	 * add ip_address & views columns to form impressions table
 	 *
 	 * Automatic update!
 	 */
-	public function version_2_1_15() {
+	public function version_2_2() {
 
 		global $wpdb;
 
 		// Add optin_status_changed column
 		get_db( 'contacts' )->create_table();
 
+		// Add IP Address/Views columns
+		get_db( 'form_impressions' )->create_table();
+		// Move `count` to `views`
+		get_db( 'form_impressions' )->update_2_2();
+
+		// Add `referer_hash` col
+		get_db( 'activity' )->create_table();
+		// Update `referer_hash` col
+		get_db( 'activity' )->update_2_2();
+
 		// Update the current events table
-		get_db( 'events' )->create_table();
-		// Create the new event queue table
-		get_db( 'event_queue' )->create_table();
+		get_db( 'events' )->move_events_to_queue( [
+			'status' => Event::WAITING
+		], true );
 
-		// Move waiting events from the legacy queue to new queue
-		$event_queue = get_db( 'event_queue' )->get_table_name();
-		$events      = get_db( 'events' )->get_table_name();
-
-		$columns = get_db( 'event_queue' )->get_columns();
-		unset( $columns['ID'] );
-		$columns = implode( ',', array_keys( $columns ) );
-
-		// Move the events to the event queue
-		$wpdb->query( "INSERT INTO {$event_queue} ($columns) 
-			SELECT $columns 
-			FROM {$events} 
-			WHERE `status` = 'waiting';"
-		);
-
-		$wpdb->query( "DELETE FROM {$events} WHERE `status` = 'waiting';" );
-
-		if ( $wpdb->last_error ){
+		if ( $wpdb->last_error ) {
 			wp_die( $wpdb->last_error );
 		}
 	}
@@ -314,7 +308,7 @@ class Main_Updater extends Updater {
 			'2.1.13',
 			'2.1.13.6',
 			'2.1.14.1',
-			'2.1.15',
+			'2.2',
 		];
 	}
 
@@ -353,7 +347,7 @@ class Main_Updater extends Updater {
 			'2.1.13.6'      => __( 'Give funnel events higher priority than broadcast events.', 'groundhogg' ),
 			'2.1.13.11'     => __( 'Add micro_time column to events table for better display of events order.', 'groundhogg' ),
 			'2.1.14.1'      => __( 'Add missing index on `claim` column.', 'groundhogg' ),
-			'2.1.15'        => __( 'Create seperate event queue DB table and move waiting events to this table.', 'groundhogg' ),
+			'2.2'           => __( 'Event queue performance improvements.', 'groundhogg' ),
 		];
 	}
 }
