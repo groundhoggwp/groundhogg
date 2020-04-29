@@ -57,24 +57,6 @@ $funnel = new Funnel( $funnel_id );
                 </div>
             </div>
             <div class="status-options">
-                <div id="mode">
-                    <div>
-                        <a href="<?php echo admin_url( sprintf( 'admin.php?page=gh_reporting&tab=funnels&funnel=%s', $funnel_id ) ); ?> "
-                           class="button button-secondary" style="font-size: 18px;
-                           margin-left: 10px;
-                           font-weight: 600;
-                           position: relative;
-                           height: auto;
-                           padding: 2px 14px 2px 14px;
-                          "><span
-                                    title="<?php esc_attr_e( 'Reports', 'groundhogg' ) ?>"
-                                    class="dashicons dashicons-welcome-widgets-menus"
-                                    style="width: auto;height: auto;vertical-align: middle;font-size: 20px;margin-right: 3px;"></span> <?php _e( 'Reports', 'groundhogg' ); ?>
-                        </a>
-
-
-                    </div>
-                </div>
 
 
                 <div id="status">
@@ -177,6 +159,13 @@ $funnel = new Funnel( $funnel_id );
                     <a href="<?php echo esc_url( $funnel->export_url() ); ?>" class="button"><span
                                 title="<?php esc_attr_e( 'Export', 'groundhogg' ) ?>"
                                 class="dashicons dashicons-download"></span> <?php _e( 'Export', 'groundhogg' ); ?></a>
+                </div>
+                <div id="report">
+                    <a href="<?php echo admin_url( sprintf( 'admin.php?page=gh_reporting&tab=funnels&funnel=%s', $funnel_id ) );?>" class="button"><span
+                                title="<?php esc_attr_e( 'Reports', 'groundhogg' ) ?>"
+                                class="dashicons dashicons-chart-area"
+                                style="width: auto;height: auto;vertical-align: middle;font-size: 20px;margin-right: 3px;"></span> <?php _e( 'Reports', 'groundhogg' ); ?>
+                    </a>
                 </div>
             </div>
         </div>
