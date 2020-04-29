@@ -144,7 +144,7 @@ class Events extends DB {
 	 * @param array $where
 	 * @param bool $delete_from_history whether to delete the records from the history table
 	 */
-	public function move_events_to_queue( $where = [], $delete_from_history=false ) {
+	public function move_events_to_queue( $where = [], $delete_from_history = false ) {
 
 		global $wpdb;
 
@@ -173,7 +173,7 @@ class Events extends DB {
 
 		// Optionally delete these events for backwards compatibility...
 		// this way we can retain a record of retires as well...
-		if ( $delete_from_history === true ){
+		if ( $delete_from_history === true ) {
 			$wpdb->query( "DELETE FROM $events WHERE $where;" );
 		}
 	}
@@ -224,7 +224,7 @@ class Events extends DB {
 		$sql = parent::get_sql( $query_vars );
 
 		// Double compare to better display completion order
-		if ( $query_vars['orderby'] === 'time' ) {
+		if ( get_array_var( $query_vars, 'orderby' ) === 'time' ) {
 			$sql = str_replace( 'ORDER BY time DESC', 'ORDER BY `time` DESC, `micro_time` DESC', $sql );
 			$sql = str_replace( 'ORDER BY time ASC', 'ORDER BY `time` ASC, `micro_time` ASC', $sql );
 		}
