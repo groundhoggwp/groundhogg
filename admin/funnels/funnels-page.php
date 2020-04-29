@@ -132,6 +132,8 @@ class Funnels_Page extends Admin_Page {
 	public function scripts() {
 		if ($this->get_current_action() === 'edit') {
 
+		    wp_enqueue_script('chart-js');
+
 			wp_enqueue_style('editor-buttons');
 			wp_enqueue_style('jquery-ui');
 
@@ -705,7 +707,7 @@ class Funnels_Page extends Admin_Page {
 
 			$url = add_query_arg($args, admin_url('admin.php?page=gh_contacts'));
 
-			$dataset2[] = array(($i + 1) . '. ' . $step->get_title(), $count, $url);
+			$dataset2[] =  array(($i + 1) . '. ' . $step->get_title(), $count, $url);
 
 		}
 
@@ -720,6 +722,49 @@ class Funnels_Page extends Admin_Page {
 		);
 
 		$this->chart_data = $ds;
+
+
+		$dataset_c1 = [];
+		$dataset_c2 = [];
+
+		foreach ( $steps as $i => $step ) {
+			$query = new Contact_Query();
+			$args  = array(
+				'report' => array(
+					'funnel' => $funnel->get_id(),
+					'step'   => $step->get_id(),
+					'status' => 'complete',
+					'start'  => $this->get_reporting_start_time(),
+					'end'    => $this->get_reporting_end_time(),
+				)
+			);
+			$count = count( $query->query( $args ) );
+
+
+			$label[]   = $step->get_title();
+			$dataset_c1[] = $count;
+
+			$args = array(
+				'report' => array(
+					'funnel' => intval($_REQUEST['funnel']),
+					'step'   => $step->ID,
+					'status' => 'waiting'
+				)
+			);
+
+			$count = count($query->query($args));
+
+			$dataset_c2[] = $count;
+
+
+		}
+
+
+		return [
+			'label' => $label,
+			'complete'  => $dataset_c1,
+            'waiting' =>  $dataset_c2
+		];
 
 		return $ds;
 	}

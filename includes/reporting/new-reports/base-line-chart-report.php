@@ -17,7 +17,8 @@ abstract class Base_Line_Chart_Report extends Base_Chart_Report{
 	protected function get_options() {
 		return [
 
-			'responsive' => true,
+//			'responsive' => true,
+			'maintainAspectRatio' => false,
 			'tooltips'   => [
 				'mode'            => 'index',
 				'intersect'       => false,

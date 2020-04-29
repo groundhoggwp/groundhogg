@@ -4,6 +4,7 @@ namespace Groundhogg\Steps\Actions;
 
 use Groundhogg\Classes\Activity;
 use Groundhogg\Email;
+use Groundhogg\Reporting\New_Reports\Chart_Draw;
 use Groundhogg\Reporting\Reporting;
 use Groundhogg\Utils\Graph;
 use function Groundhogg\get_array_var;
@@ -293,17 +294,60 @@ class Send_Email extends Action {
 			'mode' => 'time'
 		], $data );
 
-		if ( $graph->has_data() ):
 
-			?>
-            <div class="chart">
-                <div class="inside">
-					<?php $graph->render(); ?>
-                </div>
+		$line_chart = new Chart_Draw( 0, 0 );
+
+//		if ( $graph->has_data() ):
+
+		?>
+        <div class="chart">
+            <div class="inside" style="height: 250px;">
+				<?php $graph->render(); ?>
+
+	            <canvas id="action_email_send" ></canvas>
+
+                <script>
+                    //(function ($) {
+                    //    var myChart;
+					//
+                    //    var chart = $('#action_email_send');
+					//
+                    //    if (myChart != null) {
+                    //        myChart.destroy();
+                    //    }
+					//
+                    //    var ctx = chart[0].getContext('2d');
+                    //    myChart = new Chart(ctx, {
+                    //        "type": "line",
+                    //        "data": {
+					//
+                    //            "datasets": <?php // echo json_encode( [
+					//				array_merge( [
+					//					'label' => __( 'sent', 'groundhogg' ),
+					//					'data'  => $sent,
+					//
+					//				], $line_chart->get_line_style() ),
+					//				array_merge( [
+					//					'label' => __( 'Open', 'groundhogg' ),
+					//					'data'  => $opens,
+					//
+					//				], $line_chart->get_line_style() ),
+					//				array_merge( [
+					//					'label' => __( 'clicked', 'groundhogg' ),
+					//					'data'  => $clicks,
+					//
+					//				], $line_chart->get_line_style() ),
+					//			] );  ?>
+                    //        },
+                    //        "options": <?php //echo json_encode( $line_chart->get_options() ); ?>
+                    //    });
+                    //})(jQuery);
+                </script>
             </div>
+        </div>
 		<?php
 
-		endif;
+//		endif;
 
 		?>
         <h3><?php _e( 'Activity', 'groundhogg' ); ?></h3>
