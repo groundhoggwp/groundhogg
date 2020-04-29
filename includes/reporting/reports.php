@@ -19,6 +19,8 @@ use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Lead_Source;
 use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Search_Engines;
 use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Social_Media;
 use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Source_Pages;
+use Groundhogg\Reporting\New_Reports\Table_Email_Links_Clicked;
+use Groundhogg\Reporting\New_Reports\Table_Email_Stats;
 use Groundhogg\Reporting\New_Reports\Table_Form_Activity;
 use Groundhogg\Reporting\New_Reports\Table_Top_Converting_Funnels;
 use Groundhogg\Reporting\New_Reports\Table_Top_Performing_Broadcasts;
@@ -220,7 +222,14 @@ class Reports {
 				'id'       => 'table_form_activity',
 				'callback' => [ $this, 'table_form_activity' ]
 			],
-
+			[
+				'id'       => 'table_email_stats',
+				'callback' => [ $this, 'table_email_stats' ]
+			],
+			[
+				'id'       => 'table_email_links_clicked',
+				'callback' => [ $this, 'table_email_links_clicked' ]
+			]
 		];
 
 		foreach ( $default_reports as $report ) {
@@ -633,6 +642,18 @@ class Reports {
 
 	public function table_form_activity(){
 		$report = new Table_Form_Activity( $this->start, $this->end );
+
+		return $report->get_data();
+	}
+
+	public function table_email_stats(){
+		$report = new Table_Email_Stats( $this->start, $this->end );
+
+		return $report->get_data();
+	}
+
+	public function table_email_links_clicked(){
+		$report = new Table_Email_Links_Clicked( $this->start, $this->end );
 
 		return $report->get_data();
 	}

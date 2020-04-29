@@ -180,4 +180,18 @@ abstract class Base_Report {
 		return new Funnel( $this->get_funnel_id() );
 	}
 
+	/**
+	 * @return mixed
+	 */
+	protected function get_email_id() {
+		return absint( get_array_var( get_request_var( 'data', [] ), 'email_id' ) );
+	}
+
+	/**
+	 * @return mixed
+	 */
+	protected function get_step_id() {
+		return absint( get_array_var( get_request_var( 'data', [] ), 'step_id' ) );
+	}
+
 }

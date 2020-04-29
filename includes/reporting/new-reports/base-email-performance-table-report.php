@@ -97,9 +97,9 @@ abstract class Base_Email_Performance_Table_Report extends Base_Table_Report {
 
 			$email_id = is_object( $email ) ? $email->ID : $email;
 
-			$email  = new Email( $email_id );
+			$email = new Email( $email_id );
 
-			if ( ! $email->exists() ){
+			if ( ! $email->exists() ) {
 				continue;
 			}
 
@@ -110,9 +110,9 @@ abstract class Base_Email_Performance_Table_Report extends Base_Table_Report {
 			if ( $this->should_include( $report['sent'], $report['opened'], $report ['clicked'] ) ) {
 				$list[] = [
 					'label'   => $title,
-					'url'     => admin_page_url( 'gh_emails', [
-						'action' => 'edit',
-						'email'  => $email->get_id()
+					'url'     => admin_page_url( 'gh_reporting', [
+						'tab'   => 'email_step',
+						'email' => $email->get_id()
 					] ),
 					'sent'    => $report['sent'],
 					'opened'  => percentage( $report['sent'], $report['opened'] ),

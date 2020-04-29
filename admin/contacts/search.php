@@ -18,6 +18,116 @@ use function Groundhogg\html;
 				'value' => 'on',
 			] ); ?>
 			<?php html()->hidden_GET_inputs(); ?>
+
+            <div class="first-name-search inline-block search-param">
+
+				<?php
+
+				echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Filter By First Name', 'groundhogg' ) );
+				?>
+                <p><?php
+
+		            echo html()->dropdown( [
+			            'name'        => 'first_name_compare',
+			            'class'       => 'first-name-compare',
+			            'options'     => [
+				            '='          => __( 'Equals', 'groundhogg' ),
+				            '!='         => __( 'Not Equals', 'groundhogg' ),
+				            '>'          => __( 'Greater than', 'groundhogg' ),
+				            '<'          => __( 'Less than', 'groundhogg' ),
+				            'REGEXP'     => __( 'Contains', 'groundhogg' ),
+				            'NOT REGEXP' => __( 'Does not contain', 'groundhogg' ),
+			            ],
+			            'selected'    => sanitize_text_field( get_url_var( 'first_name_compare' ) ),
+			            'option_none' => false,
+			            'id'          => '',
+		            ] );
+		            ?></p>
+                <p><?php
+
+					echo html()->input( [
+						'name'        => 'first_name',
+						'value'       => sanitize_text_field( get_url_var( 'first_name' ) ),
+						'class'       => 'input first-name',
+						'placeholder' => __( 'John' )
+					] );
+					?></p>
+            </div>
+
+            <div class="last-name-search inline-block search-param">
+
+		        <?php
+
+		        echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Filter By Last Name', 'groundhogg' ) );
+		        ?>
+                <p><?php
+
+		            echo html()->dropdown( [
+			            'name'        => 'last_name_compare',
+			            'class'       => 'last-name-compare',
+			            'options'     => [
+				            '='          => __( 'Equals', 'groundhogg' ),
+				            '!='         => __( 'Not Equals', 'groundhogg' ),
+				            '>'          => __( 'Greater than', 'groundhogg' ),
+				            '<'          => __( 'Less than', 'groundhogg' ),
+				            'REGEXP'     => __( 'Contains', 'groundhogg' ),
+				            'NOT REGEXP' => __( 'Does not contain', 'groundhogg' ),
+			            ],
+			            'selected'    => sanitize_text_field( get_url_var( 'last_name_compare' ) ),
+			            'option_none' => false,
+			            'id'          => '',
+		            ] );
+		            ?></p>
+                <p><?php
+
+
+			        echo html()->input( [
+				        'name'        => 'last_name',
+				        'value'       => sanitize_text_field( get_url_var( 'last_name' ) ),
+				        'class'       => 'input last-name',
+				        'placeholder' => __( 'Doe' )
+			        ] );
+			        ?></p>
+            </div>
+
+            <div class="email-search inline-block search-param">
+
+		        <?php
+
+		        echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Filter By Email', 'groundhogg' ) );
+		        ?>
+                <p><?php
+
+
+		            echo html()->dropdown( [
+			            'name'        => 'email_compare',
+			            'class'       => 'email-compare',
+			            'options'     => [
+				            '='          => __( 'Equals', 'groundhogg' ),
+				            '!='         => __( 'Not Equals', 'groundhogg' ),
+				            '>'          => __( 'Greater than', 'groundhogg' ),
+				            '<'          => __( 'Less than', 'groundhogg' ),
+				            'REGEXP'     => __( 'Contains', 'groundhogg' ),
+				            'NOT REGEXP' => __( 'Does not contain', 'groundhogg' ),
+			            ],
+			            'selected'    => sanitize_text_field( get_url_var( 'email_compare' ) ),
+			            'option_none' => false,
+			            'id'          => '',
+		            ] );
+		            ?></p>
+                <p><?php
+
+			        echo html()->input( [
+				        'name'        => 'email',
+				        'value'       => sanitize_text_field( get_url_var( 'email' ) ),
+				        'class'       => 'input email',
+				        'placeholder' => __( 'example@mydomain.com' )
+			        ] );
+			        ?></p>
+                <p>
+            </div>
+
+
             <div class="tags-include inline-block search-param">
 				<?php
 
@@ -136,7 +246,7 @@ use function Groundhogg\html;
 							'NOT REGEXP' => __( 'Does not contain', 'groundhogg' ),
 						],
 						'selected'    => sanitize_text_field( get_url_var( 'meta_compare' ) ),
-						'option_none' => __( 'Comparison', 'gorundhogg' ),
+						'option_none' => false,
 						'id'          => '',
 					] );
 					?></p>

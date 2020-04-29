@@ -59,7 +59,7 @@ function tool_tip_title() {
                         start: moment().startOf('year'),
                         end: moment().endOf('year'),
                     }
-                    ],
+                ],
                 earliest_date: 'January 1, 2017',
                 latest_date: moment(),
                 start_date: self.dates.start_date,
@@ -125,7 +125,7 @@ function tool_tip_title() {
                     self.data = json.data.reports;
                     self.renderReports();
                     self.hideLoader();
-                    $( '.wrap' ).removeClass( 'blurred' );
+                    $('.wrap').removeClass('blurred');
 
                 },
                 failure: function (response) {
@@ -141,7 +141,8 @@ function tool_tip_title() {
             return {
                 funnel_id: $('#funnel-id').val(),
                 broadcast_id: $('#broadcast-id').val(),
-                country: $('#country').val()
+                country: $('#country').val(),
+                email_id: $('#email_id').val(),
             };
         },
 
@@ -237,7 +238,7 @@ function tool_tip_title() {
             });
 
             Chart.plugins.register({
-                afterDraw: function(chart) {
+                afterDraw: function (chart) {
                     if (chart.data.datasets.length === 0) {
                         // No data is present
                         var ctx = chart.chart.ctx;
@@ -263,7 +264,7 @@ function tool_tip_title() {
                 var index = $(this).index();
                 $(this).toggleClass("strike");
                 var ci = e.data.chart;
-                var meta  = Object.values(ci.data.datasets[0]._meta) [0] ;
+                var meta = Object.values(ci.data.datasets[0]._meta) [0];
                 var curr = meta.data[index];
                 curr.hidden = !curr.hidden;
                 ci.update();
@@ -274,13 +275,13 @@ function tool_tip_title() {
         renderTable: function ($report, report_data) {
 
             var html = '';
-            if (report_data.data && report_data.data.length > 0  ) {
+            if (report_data.data && report_data.data.length > 0) {
 
                 html = html + "<table class='groundhogg-report-table'>";
 
                 var length = report_data.data.length;
 
-                if ( report_data.label.length > 0  ) {
+                if (report_data.label.length > 0) {
 
                     html += '<tr>';
 

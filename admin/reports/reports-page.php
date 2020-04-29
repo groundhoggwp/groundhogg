@@ -174,6 +174,13 @@ class Reports_Page extends Tabbed_Admin_Page {
 					'table_broadcast_link_clicked',
 				];
 				break;
+            case 'email_step' :
+				$reports = [
+//					'chart_last_broadcast',
+					'table_email_stats',
+					'table_email_links_clicked',
+				];
+				break;
 			case 'forms' :
 				$reports = [
 					'table_form_activity',
@@ -292,7 +299,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 	 * Overview
 	 */
 	public function overview_view() {
-		include dirname( __FILE__ ) . '/views/overview.php';
+		include __DIR__ . '/views/overview.php';
 	}
 
 
@@ -300,7 +307,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 	 * Contacts
 	 */
 	public function contacts_view() {
-		include dirname( __FILE__ ) . '/views/contacts.php';
+		include __DIR__ . '/views/contacts.php';
 	}
 
 
@@ -308,7 +315,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 	 * Email
 	 */
 	public function email_view() {
-		include dirname( __FILE__ ) . '/views/email.php';
+		include __DIR__ . '/views/email.php';
 	}
 
 
@@ -316,22 +323,26 @@ class Reports_Page extends Tabbed_Admin_Page {
 	 * Contacts
 	 */
 	public function funnels_view() {
-		include dirname( __FILE__ ) . '/views/funnels.php';
+		include __DIR__ . '/views/funnels.php';
 	}
 
 	/**
 	 * Broadcasts
 	 */
 	public function broadcasts_view() {
-		include dirname( __FILE__ ) . '/views/broadcasts.php';
+		include __DIR__ . '/views/broadcasts.php';
 	}
 
 	/**
 	 * Forms
 	 */
 	public function forms_view() {
-		include dirname( __FILE__ ) . '/views/forms.php';
+		include __DIR__ . '/views/forms.php';
 	}
+	
+	public function email_step_view() {
+	    include __DIR__ . '/views/email-step.php';
+    }
 
 
 	public function refresh_report_data() {

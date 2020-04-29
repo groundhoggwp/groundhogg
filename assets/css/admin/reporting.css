@@ -357,14 +357,13 @@ table.groundhogg-report-table tr:last-child td:last-child{
     border-radius: 0 0 5px 0;
 }
 
-#table_broadcast_stats table.groundhogg-report-table td:last-child {
-    width: auto;
-}
 
-#table_broadcast_stats table.groundhogg-report-table td:first-child{
-    width: 120px;
+#table_broadcast_stats table.groundhogg-report-table td:first-child,
+#table_email_stats table.groundhogg-report-table td:first-child{
+    width: 40px;
     font-weight: bold;
 }
+
 #table_broadcast_link_clicked table.groundhogg-report-table th:nth-child(2),
 table.groundhogg-report-table th:last-child,
 table.groundhogg-report-table td:last-child {
