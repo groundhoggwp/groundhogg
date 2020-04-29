@@ -78,7 +78,7 @@ class Funnels_Page extends Admin_Page {
 	}
 
 	protected function add_additional_actions() {
-		$this->setup_reporting();
+//		$this->setup_reporting();
 
 		if ( $this->is_current_page() && $this->get_current_action() === 'view' ) {
 			add_action( 'admin_init', [ $this, 'redirect_to_add' ] );
@@ -206,13 +206,13 @@ class Funnels_Page extends Admin_Page {
 			)
 		);
 
-		$screen->add_help_tab(
-			array(
-				'id'      => 'gh_reporting',
-				'title'   => __( 'Reporting' ),
-				'content' => '<p>' . __( 'To view funnel reporting, simply go to the editing screen of any funnel, and then toggle the Reporting/Editing switch in the reporting box. You can select the time range which you would like to view by using the dropdown on the left and click the filter button.', 'groundhogg' ) . '</p>'
-			)
-		);
+//		$screen->add_help_tab(
+//			array(
+//				'id'      => 'gh_reporting',
+//				'title'   => __( 'Reporting' ),
+//				'content' => '<p>' . __( 'To view funnel reporting, simply go to the editing screen of any funnel, and then toggle the Reporting/Editing switch in the reporting box. You can select the time range which you would like to view by using the dropdown on the left and click the filter button.', 'groundhogg' ) . '</p>'
+//			)
+//		);
 
 	}
 
@@ -588,13 +588,14 @@ class Funnels_Page extends Admin_Page {
 
 		$result = $this->process_edit();
 
+
 		if ( is_wp_error( $result ) ) {
 			$this->add_notice( $result );
 		}
 
 		$result = [];
 
-		$result['chartData'] = $this->get_chart_data();
+//		$result['chartData'] = $this->get_chart_data();
 
 //		if ( ! $this->is_v2() ) {
 //			$result['steps'] = $this->get_step_html();
@@ -644,79 +645,79 @@ class Funnels_Page extends Admin_Page {
 		return $html;
 	}
 
-	/**
-	 * Chart Data
-	 *
-	 * @var array
-	 */
-	protected $chart_data = [];
+//	/**
+//	 * Chart Data
+//	 *
+//	 * @var array
+//	 */
+//	protected $chart_data = [];
 
-	/**
-	 * The chart data
-	 *
-	 * @return array
-	 */
-	public function get_chart_data() {
-		if ( ! empty( $this->chart_data ) ) {
-			return $this->chart_data;
-		}
-
-		$funnel = new Funnel( absint( get_request_var( 'funnel' ) ) );
-		$steps  = $funnel->get_steps();
-
-		$dataset1 = array();
-		$dataset2 = array();
-
-		foreach ( $steps as $i => $step ) {
-
-			$query = new Contact_Query();
-
-			$args = array(
-				'report' => array(
-					'funnel' => $funnel->get_id(),
-					'step'   => $step->get_id(),
-					'status' => 'complete',
-					'start'  => $this->get_reporting_start_time(),
-					'end'    => $this->get_reporting_end_time(),
-				)
-			);
-
-			$count = count( $query->query( $args ) );
-
-			$url = add_query_arg( $args, admin_url( 'admin.php?page=gh_contacts' ) );
-
-			$dataset1[] = array( ( $i + 1 ) . '. ' . $step->get_title(), $count, $url );
-
-			$args = array(
-				'report' => array(
-					'funnel' => intval( $_REQUEST['funnel'] ),
-					'step'   => $step->ID,
-					'status' => 'waiting'
-				)
-			);
-
-			$count = count( $query->query( $args ) );
-
-			$url = add_query_arg( $args, admin_url( 'admin.php?page=gh_contacts' ) );
-
-			$dataset2[] = array( ( $i + 1 ) . '. ' . $step->get_title(), $count, $url );
-
-		}
-
-		$ds[] = array(
-			'label' => _x( 'Completed Events', 'stats', 'groundhogg' ),
-			'data'  => $dataset1
-		);
-
-		$ds[] = array(
-			'label' => __( 'Waiting Contacts', 'stats', 'groundhogg' ),
-			'data'  => $dataset2
-		);
-
-		$this->chart_data = $ds;
-
-		return $ds;
-	}
+//	/**
+//	 * The chart data
+//	 *
+//	 * @return array
+//	 */
+//	public function get_chart_data() {
+//		if ( ! empty( $this->chart_data ) ) {
+//			return $this->chart_data;
+//		}
+//
+//		$funnel = new Funnel( absint( get_request_var( 'funnel' ) ) );
+//		$steps  = $funnel->get_steps();
+//
+//		$dataset1 = array();
+//		$dataset2 = array();
+//
+//		foreach ( $steps as $i => $step ) {
+//
+//			$query = new Contact_Query();
+//
+//			$args = array(
+//				'report' => array(
+//					'funnel' => $funnel->get_id(),
+//					'step'   => $step->get_id(),
+//					'status' => 'complete',
+//					'start'  => $this->get_reporting_start_time(),
+//					'end'    => $this->get_reporting_end_time(),
+//				)
+//			);
+//
+//			$count = count( $query->query( $args ) );
+//
+//			$url = add_query_arg( $args, admin_url( 'admin.php?page=gh_contacts' ) );
+//
+//			$dataset1[] = array( ( $i + 1 ) . '. ' . $step->get_title(), $count, $url );
+//
+//			$args = array(
+//				'report' => array(
+//					'funnel' => intval( $_REQUEST['funnel'] ),
+//					'step'   => $step->ID,
+//					'status' => 'waiting'
+//				)
+//			);
+//
+//			$count = count( $query->query( $args ) );
+//
+//			$url = add_query_arg( $args, admin_url( 'admin.php?page=gh_contacts' ) );
+//
+//			$dataset2[] = array( ( $i + 1 ) . '. ' . $step->get_title(), $count, $url );
+//
+//		}
+//
+//		$ds[] = array(
+//			'label' => _x( 'Completed Events', 'stats', 'groundhogg' ),
+//			'data'  => $dataset1
+//		);
+//
+//		$ds[] = array(
+//			'label' => __( 'Waiting Contacts', 'stats', 'groundhogg' ),
+//			'data'  => $dataset2
+//		);
+//
+//		$this->chart_data = $ds;
+//
+//		return $ds;
+//	}
 
 	/**
 	 * Save the funnel

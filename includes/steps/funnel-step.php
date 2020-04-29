@@ -858,9 +858,7 @@ abstract class Funnel_Step extends Supports_Errors {
             <!-- INSIDE -->
             <div class="inside">
                 <!-- SETTINGS -->
-				<?php //TODO Reporting enabled?
-				?>
-                <div class="step-edit <?php echo Plugin::$instance->admin->get_page( 'funnels' )->is_reporting_enabled() ? 'hidden' : ''; ?>">
+                <div class="step-edit">
                     <div class="custom-settings">
 						<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step ); ?>
 						<?php do_action( 'groundhogg/steps/settings/before', $this ); ?>
