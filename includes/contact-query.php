@@ -271,7 +271,9 @@ class Contact_Query {
 			'email'                  => '',
 			'search'                 => '',
 			'first_name'             => '',
+			'first_name_compare'     => '',
 			'last_name'              => '',
+			'last_name_compare'      => '',
 			'search_columns'         => array(),
 			'meta_key'               => '',
 			'meta_value'             => '',
@@ -661,14 +663,9 @@ class Contact_Query {
 			$where['owner'] = "owner_id IN ( {$this->query_vars['owner']} )";
 		}
 
-		if ( ! empty( $this->query_vars['email'] ) ) {
-			if ( is_array( $this->query_vars['email'] ) ) {
-				$email_placeholders = implode( ', ', array_fill( 0, count( $this->query_vars['email'] ), '%s' ) );
-
-				$where['email'] = "email IN( $email_placeholders )";
-			} else {
-				$where['email'] = $wpdb->prepare( "( ( email_mt.meta_key = 'additional_email' AND email_mt.meta_value = %s ) OR email = %s )", $this->query_vars['email'], $this->query_vars['email'] );
-			}
+		if ( strlen( $this->query_vars['email'] ) ) {
+			$search_email = $this->compare_string( $this->query_vars[ 'email' ], $this->query_vars[ 'email_compare' ] );
+			$where['email'] = $this->get_search_sql( $search_email, array( 'email' ) );
 		}
 
 		if ( $this->query_vars['report'] && is_array( $this->query_vars['report'] ) ) {
@@ -781,11 +778,14 @@ class Contact_Query {
 		}
 
 		if ( strlen( $this->query_vars['first_name'] ) ) {
-			$where['first_name'] = $this->get_search_sql( $this->query_vars['first_name'], array( 'first_name' ) );
+
+			$search_first = $this->compare_string( $this->query_vars[ 'first_name' ], $this->query_vars[ 'first_name_compare' ] );
+			$where['first_name'] = $this->get_search_sql( $search_first, array( 'first_name' ) );
 		}
 
 		if ( strlen( $this->query_vars['last_name'] ) ) {
-			$where['last_name'] = $this->get_search_sql( $this->query_vars['last_name'], array( 'last_name' ) );
+			$search_last = $this->compare_string( $this->query_vars[ 'last_name' ], $this->query_vars[ 'last_name_compare' ] );
+			$where['last_name'] = $this->get_search_sql( $search_last, array( 'last_name' ) );
 		}
 
 
@@ -904,7 +904,9 @@ class Contact_Query {
 	protected function get_search_sql( $string, $columns ) {
 		global $wpdb;
 
-		if ( false !== strpos( $string, '*' ) ) {
+		if ( false !== strpos( $string, '**' ) ) {
+			$like = str_replace( '**', '%', $string );
+		} else if ( false !== strpos( $string, '*' ) ) {
 			$like = '%' . implode( '%', array_map( array( $wpdb, 'esc_like' ), explode( '*', $string ) ) ) . '%';
 		} else {
 			$like = '%' . $wpdb->esc_like( $string ) . '%';
@@ -916,6 +918,31 @@ class Contact_Query {
 		}
 
 		return '(' . implode( ' OR ', $searches ) . ')';
+	}
+
+	/**
+	 * @param $val
+	 * @param $compare_type
+	 *
+	 * @return string
+	 */
+	protected function compare_string( $val, $compare_type ){
+		switch ( $compare_type ){
+			case '':
+			case 'equals':
+				break;
+			case 'contains':
+				$val = '**' . $val . '**';
+				break;
+			case 'starts_with':
+				$val = $val . '**';
+				break;
+			case 'ends_with':
+				$val = '**' . $val;
+				break;
+		}
+
+		return $val;
 	}
 
 	/**
