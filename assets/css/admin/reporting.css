@@ -415,3 +415,17 @@ table.groundhogg-report-table td:last-child {
     margin-right: -50%;
     transform: translate(-50%, -50%)
 }
+
+.step-icon {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 47px;
+    border: solid #f2f2f2;
+    border-width: 0 1px 0 0;
+}
+
+#table_funnel_stats table td:first-child{
+    position: relative;
+    padding-left: 65px;
+}

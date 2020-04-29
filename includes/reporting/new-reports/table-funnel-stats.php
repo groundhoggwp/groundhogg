@@ -6,12 +6,15 @@ namespace Groundhogg\Reporting\New_Reports;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Contact_Query;
 use Groundhogg\Email;
+use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
+use function Groundhogg\key_to_words;
 use function Groundhogg\percentage;
 
 class Table_Funnel_Stats extends Base_Table_Report {
@@ -20,8 +23,8 @@ class Table_Funnel_Stats extends Base_Table_Report {
 	public function get_label() {
 		return [
 			__( 'Steps', 'groundhogg' ),
-			__( 'Completed Contacts', 'groundhogg' ),
-			__( 'Waiting Contacts', 'groundhogg' ),
+			__( 'Completed', 'groundhogg' ),
+			__( 'Waiting', 'groundhogg' ),
 		];
 	}
 
@@ -43,7 +46,7 @@ class Table_Funnel_Stats extends Base_Table_Report {
 				'report' => array(
 					'funnel' => $funnel->get_id(),
 					'step'   => $step->get_id(),
-					'status' => 'complete',
+					'status' => Event::COMPLETE,
 					'start'  => $this->start,
 					'end'    => $this->end,
 				)
@@ -51,14 +54,13 @@ class Table_Funnel_Stats extends Base_Table_Report {
 
 			$count_completed = count( $query->query( $args ) );
 
-			$url_completed = add_query_arg( $args, admin_url( 'admin.php?page=gh_contacts' ) );
-
+			$url_completed = admin_page_url( 'gh_contacts', $args );
 
 			$args = array(
 				'report' => array(
-					'funnel' => intval( $_REQUEST['funnel'] ),
-					'step'   => $step->ID,
-					'status' => 'waiting',
+					'funnel' => $funnel->get_id(),
+					'step'   => $step->get_id(),
+					'status' => Event::WAITING,
 					'start'  => $this->start,
 					'end'    => $this->end,
 				)
@@ -66,10 +68,9 @@ class Table_Funnel_Stats extends Base_Table_Report {
 
 			$count_waiting = count( $query->query( $args ) );
 
-			$url_waiting  = add_query_arg( $args, admin_url( 'admin.php?page=gh_contacts' ) );
+			$url_waiting  = admin_page_url( 'gh_contacts', $args );
 
-			$title = ($i + 1 ) . '. ' . $step->get_title();
-
+			$title = sprintf( '<img src="%s" class="step-icon"> <b>%s</b> (%s)', $step->icon(), $step->get_title(), key_to_words( $step->get_type() ) );
 
 			$data[] =[
 				'step' => $title,

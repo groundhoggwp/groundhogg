@@ -109,6 +109,7 @@ abstract class Funnel_Step extends Supports_Errors {
 		add_filter( "groundhogg/steps/{$this->get_type()}/enqueue", [ $this, 'enqueue' ] );
 		add_filter( "groundhogg/steps/{$this->get_type()}/run", [ $this, 'pre_run' ], 1, 2 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/run", [ $this, 'run' ], 10, 2 );
+		add_filter( "groundhogg/steps/{$this->get_type()}/icon", [ $this, 'get_icon' ] );
 		add_action( "wp_enqueue_scripts", [ $this, 'frontend_scripts' ] );
 
 		$this->add_additional_actions();

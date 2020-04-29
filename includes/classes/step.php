@@ -500,6 +500,20 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * Output icon html
+	 */
+	public function icon() {
+
+		$icon = false;
+
+		if ( has_filter( "groundhogg/steps/{$this->get_type()}/icon" ) ) {
+			$icon = apply_filters( "groundhogg/steps/{$this->get_type()}/icon", $this );
+		}
+
+		return $icon ?: GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/no-icon.png';
+	}
+
+	/**
 	 * Output the HTML of a step.
 	 */
 	public function html_v2() {
