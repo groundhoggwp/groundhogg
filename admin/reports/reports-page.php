@@ -179,6 +179,10 @@ class Reports_Page extends Tabbed_Admin_Page {
 //					'chart_last_broadcast',
 					'table_email_stats',
 					'table_email_links_clicked',
+                    'total_emails_sent',
+					'email_open_rate',
+					'email_click_rate',
+					'chart_donut_email_stats',
 				];
 				break;
 			case 'forms' :
@@ -194,6 +198,8 @@ class Reports_Page extends Tabbed_Admin_Page {
 		return $reports;
 
 	}
+
+
 
 	/**
 	 * Add any help items
@@ -245,6 +251,8 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 		do_action( "groundhogg/admin/{$this->get_slug()}", $this );
 		do_action( "groundhogg/admin/{$this->get_slug()}/{$this->get_current_tab()}", $this );
+
+		include __DIR__ . '/views/functions.php';
 
 		?>
         <div class="loader-wrap">

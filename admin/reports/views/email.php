@@ -2,40 +2,7 @@
 
 namespace Groundhogg\Admin\Reports\Views;
 
-// Overview
-
-use Groundhogg\Classes\Activity;
-use function Groundhogg\get_db;
-
-
-function quick_stat_report( $args = [] ) {
-
-	$args = wp_parse_args( $args, [
-		'id'    => uniqid( 'groundhogg_' ),
-		'title' => 'Report',
-		'info'  => 'Some interesting data...',
-		'style' => ''
-	] );
-
-	?>
-
-    <div class="groundhogg-quick-stat" id="<?php esc_attr_e( $args[ 'id' ] ); ?>"
-         style="<?php esc_attr_e( $args[ 'style' ] ); ?>">
-        <div class="groundhogg-quick-stat-title"><?php esc_html_e( $args[ 'title' ] ) ?></div>
-        <div class="groundhogg-quick-stat-info"></div>
-        <div class="groundhogg-quick-stat-number">1234</div>
-        <div class="groundhogg-quick-stat-previous green">
-            <span class="groundhogg-quick-stat-arrow up"></span>
-            <span class="groundhogg-quick-stat-prev-percent">25%</span>
-        </div>
-        <div class="groundhogg-quick-stat-compare">vs. Previous 30 Days</div>
-    </div>
-	<?php
-}
-
 ?>
-
-
 <div class="groundhogg-report">
     <h2 class="title"><?php _e( 'Email Activity', 'groundhogg' ); ?></h2>
     <div class="big-chart-wrap">
