@@ -5,6 +5,7 @@ namespace Groundhogg;
 use Groundhogg\Reporting\New_Reports\Chart_Contacts_By_country;
 use Groundhogg\Reporting\New_Reports\Chart_Contacts_By_Optin_Status;
 use Groundhogg\Reporting\New_Reports\Chart_Contacts_By_Region;
+use Groundhogg\Reporting\New_Reports\Chart_Donut_Email_Stats;
 use Groundhogg\Reporting\New_Reports\Chart_Email_Activity;
 use Groundhogg\Reporting\New_Reports\Chart_Funnel_Breakdown;
 use Groundhogg\Reporting\New_Reports\Chart_Last_Broadcast;
@@ -230,6 +231,10 @@ class Reports {
 			[
 				'id'       => 'table_email_links_clicked',
 				'callback' => [ $this, 'table_email_links_clicked' ]
+			],
+			[
+				'id'       => 'chart_donut_email_stats',
+				'callback' => [ $this, 'chart_donut_email_stats' ]
 			],
 			[
 				'id'       => 'table_funnel_stats',
@@ -659,6 +664,12 @@ class Reports {
 
 	public function table_email_links_clicked(){
 		$report = new Table_Email_Links_Clicked( $this->start, $this->end );
+
+		return $report->get_data();
+	}
+
+	public function chart_donut_email_stats(){
+		$report = new Chart_Donut_Email_Stats( $this->start, $this->end );
 
 		return $report->get_data();
 	}

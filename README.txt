@@ -179,6 +179,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 = 2.2 =
 * ADDED Brand new reporting dashboard. The old dashboard reports have been removed.
+* ADDED New search filters for contact search
 * ADDED Ability to distinguish emails as transactional or marketing. Transactional emails will ignore marketability.
 * ADDED 1 click unsubscribe support for Gmail & Yahoo.
 * TWEAKED Event queue is now a separate table 'gh_event_queue' for faster processing, completed events are moved to the 'gh_events' table.

@@ -18,7 +18,8 @@ class Bulk_Job_Page extends Admin_Page {
 		return 99;
 	}
 
-	public function scripts() {}
+	public function scripts() {
+	}
 
 	protected function add_additional_actions() {
 	}
@@ -60,7 +61,7 @@ class Bulk_Job_Page extends Admin_Page {
 	}
 
 	protected function get_parent_slug() {
-		return 'options.php';
+		return null;
 	}
 
 	/**
@@ -133,9 +134,9 @@ class Bulk_Job_Page extends Admin_Page {
 		echo Plugin::$instance->utils->html->progress_bar( [ 'id' => 'bulk-job', 'hidden' => false ] );
 
 		$bp_args = [
-            'num_retries'   => 3,
-            'error_message' => sprintf( __( 'Something went wrong. Please contact %s support.', 'groundhogg' ), white_labeled_name() ),
-        ];
+			'num_retries'   => 3,
+			'error_message' => sprintf( __( 'Something went wrong. Please contact %s support.', 'groundhogg' ), white_labeled_name() ),
+		];
 
 		if ( use_experimental_features() ) {
 			$bp_args['experimental_features'] = true;
@@ -174,9 +175,9 @@ class Bulk_Job_Page extends Admin_Page {
         <script>
             var BulkProcessor = <?php echo wp_json_encode( $bp_args ); ?>;
 
-            ( function ( $, bp, items ){
+            (function ($, bp, items) {
 
-                Object.assign( bp, {
+                Object.assign(bp, {
 
                     items: 0,
                     complete: 0,
@@ -186,83 +187,81 @@ class Bulk_Job_Page extends Admin_Page {
                     bulk_action: '<?php echo $this->get_current_action(); ?>',
                     bar: null,
                     total: null,
-                    title: '',
+                    title: "",
                     log: null,
                     current_request: {},
                     retries: 0,
 
-                    init: function (){
+                    init: function () {
 
-                        this.items = items
-                        this.all = items.length
-                        this.bar = $( '#bulk-job' )
-                        this.log = $( '#bulk-log' )
-                        this.progress = $( '#bulk-job-percentage' )
-                        this.total = $( '#total-complete' )
-                        this.remaining = $( '#total-remaining' )
-                        this.title = document.title
+                        this.items = items;
+                        this.all = items.length;
+                        this.bar = $("#bulk-job");
+                        this.log = $("#bulk-log");
+                        this.progress = $("#bulk-job-percentage");
+                        this.total = $("#total-complete");
+                        this.remaining = $("#total-remaining");
+                        this.title = document.title;
 
-                        if ( typeof this.experimental_features != 'undefined' ) {
-                            this.experimental()
-                        }
-                        else {
-                            this.send()
+                        if (typeof this.experimental_features != "undefined") {
+                            this.experimental();
+                        } else {
+                            this.send();
                         }
 
                     },
 
-                    experimental: function (){
-                        var threshold = 10000
-                        var processes = Math.ceil( items.length / threshold )
+                    experimental: function () {
+                        var threshold = 10000;
+                        var processes = Math.ceil(items.length / threshold);
                         // console.log( processes );
 
-                        for ( var i = 0; i < processes; i++ ) {
-                            this.send()
+                        for (var i = 0; i < processes; i++) {
+                            this.send();
                         }
                     },
 
-                    getItems: function (){
-                        var end = this.size
+                    getItems: function () {
+                        var end = this.size;
 
-                        if ( this.items.length < this.size ) {
-                            end = this.items.length
+                        if (this.items.length < this.size) {
+                            end = this.items.length;
                         }
 
-                        return this.items.splice( 0, end )
+                        return this.items.splice(0, end);
                     },
 
-                    isLastOfThem: function (){
-                        return this.items.length === 0
+                    isLastOfThem: function () {
+                        return this.items.length === 0;
                     },
 
-                    updateProgress: function (){
+                    updateProgress: function () {
 
-                        var p = ( this.complete / this.all ) * 100
+                        var p = (this.complete / this.all) * 100;
 
-                        p = p.toFixed( 2 )
+                        p = p.toFixed(2);
 
                         // this.bar.animate( { 'width': p + '%' } );
-                        this.bar.css( 'width', p + '%' )
-                        this.progress.text( p + '%' )
-                        document.title = '(' + p + '%) ' + this.title
-                        this.total.text( this.complete )
-                        this.remaining.text( this.all - this.complete )
+                        this.bar.css("width", p + "%");
+                        this.progress.text(p + "%");
+                        document.title = "(" + p + "%) " + this.title;
+                        this.total.text(this.complete);
+                        this.remaining.text(this.all - this.complete);
 
-                        if ( this.complete === this.all ) {
-                            $( '#job-complete' ).removeClass( 'hidden' )
-                            this.progress.removeClass( 'spinner' )
+                        if (this.complete === this.all) {
+                            $("#job-complete").removeClass("hidden");
+                            this.progress.removeClass("spinner");
                         }
-
                     },
 
-                    error: function ( response ){
+                    error: function (response) {
 
-                        console.log( response )
+                        console.log(response);
 
                         // retry
-                        if ( this.retries > 0 ){
+                        if (this.retries > 0) {
 
-                            console.log( 'Job failed. Retrying...' );
+                            console.log("Job failed. Retrying...");
 
                             this.retries -= 1;
                             this.send_ajax();
@@ -271,85 +270,84 @@ class Bulk_Job_Page extends Admin_Page {
 
                         var message = this.error_message;
 
-                        if ( typeof response.data != 'undefined' ) {
-                            message = response.data[0].message
+                        if (typeof response.data != "undefined") {
+                            message = response.data[0].message;
                         }
 
-                        bp.bar.css( 'background-color', '#f70000' )
+                        bp.bar.css("background-color", "#f70000");
 
-                        this.progress.removeClass( 'spinner' )
+                        this.progress.removeClass("spinner");
 
-                        alert( message )
+                        alert(message);
                     },
 
-                    clean: function ( obj ){
+                    clean: function (obj) {
 
-                        if ( typeof obj !== 'object' || obj === null ) {
-                            return
+                        if (typeof obj !== "object" || obj === null) {
+                            return;
                         }
 
-                        var propNames = Object.getOwnPropertyNames( obj )
-                        for ( var i = 0; i < propNames.length; i++ ) {
-                            var propName = propNames[i]
-                            if ( obj[propName] === null || obj[propName] === undefined || obj[propName] === '' ) {
-                                delete obj[propName]
+                        var propNames = Object.getOwnPropertyNames(obj);
+                        for (var i = 0; i < propNames.length; i++) {
+                            var propName = propNames[i];
+                            if (obj[propName] === null || obj[propName] === undefined || obj[propName] === "") {
+                                delete obj[propName];
                             }
                         }
                     },
 
-                    send_ajax: function (){
+                    send_ajax: function () {
 
                         var self = this;
 
-                        $.ajax( {
-                            type: 'post',
+                        $.ajax({
+                            type: "post",
                             url: ajaxurl,
-                            dataType: 'json',
+                            dataType: "json",
                             data: self.current_request,
-                            success: function ( response ){
+                            success: function (response) {
 
-                                console.log( response );
+                                console.log(response);
 
-                                if ( typeof response.complete !== 'undefined' ) {
-                                    self.complete += response.complete
-                                    self.updateProgress()
+                                if (typeof response.complete !== "undefined") {
+                                    self.complete += response.complete;
+                                    self.updateProgress();
 
-                                    self.log.val( self.log.val() + '\n' + response.message )
-                                    self.log.scrollTop( self.log[0].scrollHeight )
+                                    self.log.val(self.log.val() + "\n" + response.message);
+                                    self.log.scrollTop(self.log[0].scrollHeight);
 
-                                    if ( self.items.length > 0 ) {
-                                        self.send()
+                                    if (self.items.length > 0) {
+                                        self.send();
                                     }
 
-                                    if ( response.return_url !== undefined ) {
+                                    if (response.return_url !== undefined) {
 
-                                        setTimeout( function (){
-                                            window.location.replace( response.return_url );
-                                        }, 1000 )
+                                        setTimeout(function () {
+                                            window.location.replace(response.return_url);
+                                        }, 1000);
                                     }
 
-                                }
-                                else {
-                                    self.error( response )
+                                } else {
+                                    self.error(response);
                                 }
 
                             },
-                            error: function ( response ){
-                                self.error( response )
-                            },
-                        } );
+                            error: function (response) {
+                                self.error(response);
+                            }
+                        });
                     },
 
-                    send: function (){
+                    send: function () {
 
                         var self = this;
 
                         self.current_request = {
-                            action: 'bulk_action_listener',
+                            action: "bulk_action_listener",
                             bulk_action: self.bulk_action,
                             bulk_action_nonce: self.bulk_action_nonce,
                             items: this.getItems(),
-                            the_end: this.isLastOfThem(),
+                            the_end: this.isLastOfThem()
                         };
 
                         // Reset the number ofn allow retires
@@ -357,15 +355,15 @@ class Bulk_Job_Page extends Admin_Page {
 
                         this.send_ajax();
 
-                    },
+                    }
 
-                } )
+                });
 
-                $( function (){
-                    bp.init()
-                } )
+                $(function () {
+                    bp.init();
+                });
 
-            } )( jQuery, BulkProcessor, <?php echo wp_json_encode( $items ); ?> )
+            })(jQuery, BulkProcessor, <?php echo wp_json_encode( $items ); ?> );
         </script>
 		<?php
 	}

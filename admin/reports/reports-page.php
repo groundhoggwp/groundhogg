@@ -6,11 +6,13 @@ use Groundhogg\Admin\Reports\Views\Overview;
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Contact_Query;
 use Groundhogg\Reports;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_cookie;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\groundhogg_logo;
 use function Groundhogg\is_white_labeled;
+use function Groundhogg\isset_not_empty;
 use function Groundhogg\set_cookie;
 use function Groundhogg\white_labeled_name;
 use Groundhogg\Plugin;
@@ -100,101 +102,115 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 	protected function get_reports_per_tab() {
 
-		$case = '';
+		$reports_to_load = [
+			'overview'   => [
+				'chart_new_contacts',
+				'total_new_contacts',
+				'total_confirmed_contacts',
+				'total_engaged_contacts',
+				'total_unsubscribed_contacts',
+				'total_emails_sent',
+				'email_open_rate',
+				'email_click_rate',
+				'chart_contacts_by_optin_status',
+				'table_top_performing_emails',
+				'table_contacts_by_countries',
+				'table_contacts_by_lead_source',
+				'table_top_converting_funnels',
+			],
+			'contacts'   => [
+				'chart_new_contacts',
+				'total_new_contacts',
+				'total_confirmed_contacts',
+				'total_engaged_contacts',
+				'total_unsubscribed_contacts',
+				'chart_contacts_by_optin_status',
+				'chart_contacts_by_region',
+				'chart_contacts_by_country',
+				'table_contacts_by_lead_source',
+				'table_contacts_by_search_engines',
+				'table_contacts_by_source_page',
+				'table_contacts_by_social_media',
+			],
+			'email'      => [
+				'chart_email_activity',
+				'total_emails_sent',
+				'email_open_rate',
+				'email_click_rate',
+				'total_unsubscribed_contacts',
+				'total_spam_contacts',
+				'total_bounces_contacts',
+				'total_complaints_contacts',
+				'chart_last_broadcast',
+				'table_top_performing_emails',
+				'table_worst_performing_emails',
+				'table_top_performing_broadcasts',
+				'table_broadcast_stats'
+			],
+			'funnels'    => [
+				'chart_funnel_breakdown',
+				'table_top_performing_emails',
+				'table_worst_performing_emails',
+				'total_funnel_conversion_rate',
+				'total_benchmark_conversion_rate',
+				'total_abandonment_rate',
+				'total_contacts_in_funnel',
+				'table_benchmark_conversion_rate',
+				'table_form_activity',
+			],
+			'broadcasts' => [
+				'chart_last_broadcast',
+				'table_broadcast_stats',
+				'table_broadcast_link_clicked',
+			],
+			'email_step' => [
+				'table_email_stats',
+				'table_email_links_clicked',
+				'total_emails_sent',
+				'email_open_rate',
+				'email_click_rate',
+				'chart_donut_email_stats',
+			],
+			'forms'      => [
+				'table_form_activity',
+			]
+		];
 
-		switch ( $this->get_current_tab() ) {
-			default;
-			case 'overview':
-				$reports = [
-					'chart_new_contacts',
-					'total_new_contacts',
-					'total_confirmed_contacts',
-					'total_engaged_contacts',
-					'total_unsubscribed_contacts',
-					'total_emails_sent',
-					'email_open_rate',
-					'email_click_rate',
-					'chart_contacts_by_optin_status',
-					'table_top_performing_emails',
-					'table_contacts_by_countries',
-					'table_contacts_by_lead_source',
-					'table_top_converting_funnels',
-				];
-				break;
-			case 'contacts' :
-				$reports = [
-					'chart_new_contacts',
-					'total_new_contacts',
-					'total_confirmed_contacts',
-					'total_engaged_contacts',
-					'total_unsubscribed_contacts',
-					'chart_contacts_by_optin_status',
-					'chart_contacts_by_region',
-					'chart_contacts_by_country',
-					'table_contacts_by_lead_source',
-					'table_contacts_by_search_engines',
-					'table_contacts_by_source_page',
-					'table_contacts_by_social_media',
-				];
-				break;
-			case 'email':
-				$reports = [
-					'chart_email_activity',
-					'total_emails_sent',
-					'email_open_rate',
-					'email_click_rate',
-					'total_unsubscribed_contacts',
-					'total_spam_contacts',
-					'total_bounces_contacts',
-					'total_complaints_contacts',
-					'chart_last_broadcast',
-					'table_top_performing_emails',
-					'table_worst_performing_emails',
-					'table_top_performing_broadcasts',
-					'table_broadcast_stats'
-				];
-				break;
-			case 'funnels':
-				$reports = [
-					'chart_funnel_breakdown',
-					'table_top_performing_emails',
-					'table_worst_performing_emails',
-					'total_funnel_conversion_rate',
-					'total_benchmark_conversion_rate',
-					'total_abandonment_rate',
-					'total_contacts_in_funnel',
-					'table_benchmark_conversion_rate',
-					'table_form_activity',
-					'table_funnel_stats',
-				];
-				break;
-			case 'broadcasts' :
-				$reports = [
-					'chart_last_broadcast',
-					'table_broadcast_stats',
-					'table_broadcast_link_clicked',
-				];
-				break;
-            case 'email_step' :
-				$reports = [
-//					'chart_last_broadcast',
-					'table_email_stats',
-					'table_email_links_clicked',
-				];
-				break;
-			case 'forms' :
-				$reports = [
-					'table_form_activity',
-				];
-				break;
+		$reports_to_load = apply_filters( 'groundhogg/admin/reports/tab', $reports_to_load );
 
-		}
-
-		$reports = apply_filters( 'groundhogg/admin/reports/tab', $reports, $this->get_current_tab() );
-
-		return $reports;
+		return get_array_var( $reports_to_load, $this->get_current_tab(), [] );
 
 	}
+
+	/**
+	 * @var array
+	 */
+	protected $custom_tabs = [];
+
+	/**
+	 * Add a custom report tab
+	 *
+	 * @param $args
+	 * @return bool
+	 */
+	public function add_custom_report_tab( $args ) {
+
+		$args = wp_parse_args( $args, [
+			'name'     => '',
+			'slug'     => '',
+			'reports'  => [],
+			'callback' => ''
+		] );
+
+		if ( ! is_callable( $args['callback'] ) || ! $args[ 'slug' ] ) {
+			return false;
+		}
+
+		$this->custom_tabs[ $args['slug'] ] = $args;
+
+		return true;
+	}
+
 
 	/**
 	 * Add any help items
@@ -234,8 +250,17 @@ class Reports_Page extends Tabbed_Admin_Page {
 				'name' => __( 'Forms', 'groundhogg' ),
 				'slug' => 'forms'
 			],
-
 		];
+
+		// Add the custom registered tabs...
+		foreach ( $this->custom_tabs as $custom_tab ) {
+			$tabs[] = [
+				'name' => $custom_tab['name'],
+				'slug' => $custom_tab['slug']
+			];
+		}
+
+		return apply_filters( 'groundhogg/admin/reporting/tabs', $tabs );
 	}
 
 	protected function get_title_actions() {
@@ -246,6 +271,8 @@ class Reports_Page extends Tabbed_Admin_Page {
 
 		do_action( "groundhogg/admin/{$this->get_slug()}", $this );
 		do_action( "groundhogg/admin/{$this->get_slug()}/{$this->get_current_tab()}", $this );
+
+		include __DIR__ . '/views/functions.php';
 
 		?>
         <div class="loader-wrap">
@@ -268,12 +295,23 @@ class Reports_Page extends Tabbed_Admin_Page {
 			$method        = sprintf( '%s_%s', $this->get_current_tab(), $this->get_current_action() );
 			$backup_method = sprintf( '%s_%s', $this->get_current_tab(), 'view' );
 
-			if ( method_exists( $this, $method ) ) {
+			if ( isset_not_empty( $this->custom_tabs, $this->get_current_tab() ) ) {
+				// Callback for custom tabs
+				$tab_args = get_array_var( $this->custom_tabs, $this->get_current_tab() );
+				call_user_func( $tab_args['callback'] );
+
+			} else if ( method_exists( $this, $method ) ) {
+				// Standard method
 				call_user_func( [ $this, $method ] );
+
 			} else if ( has_action( "groundhogg/admin/{$this->get_slug()}/display/{$method}" ) ) {
+				// Action
 				do_action( "groundhogg/admin/{$this->get_slug()}/display/{$method}", $this );
+
 			} else if ( method_exists( $this, $backup_method ) ) {
+				// Backup method
 				call_user_func( [ $this, $backup_method ] );
+
 			}
 
 			?>

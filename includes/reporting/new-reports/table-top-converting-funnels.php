@@ -9,6 +9,7 @@ use Groundhogg\Email;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
@@ -37,7 +38,7 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 			$list [] = [
 				'label' => $funnel->title,
 				'data'  => $this->get_conversion_rate( $funnel->ID ),
-				'url'   => admin_url( sprintf( 'admin.php?page=gh_funnels&action=edit&funnel=%s', $funnel->ID ) ),
+				'url'   => admin_page_url( 'gh_reporting', [ 'tab' => 'funnels', 'funnel' => $funnel->ID ] ),
 			];
 		}
 
