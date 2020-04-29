@@ -292,12 +292,6 @@ function tool_tip_title() {
                     html += '</tr>';
                 }
 
-                // } else {
-                //     for (var key in report_data.data[0]) {
-                //         html = html + '<th>' + key + '</th>';
-                //     }
-                // }
-
                 for (var i = 0; i < length; i++) {
 
                     html += '<tr >';
