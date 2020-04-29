@@ -437,6 +437,7 @@ abstract class Funnel_Step extends Supports_Errors {
 	 * Most steps will use the default step reporting given here...
 	 *
 	 * @param $step Step
+     * @deprecated  Version 2.2 use Dashboard APi to add graphs
 	 */
 	public function reporting_v2( $step ) {
 
@@ -769,13 +770,13 @@ abstract class Funnel_Step extends Supports_Errors {
                     </div>
                 </div>
                 <!-- REPORTING  -->
-                <div class="step-reporting">
-					<?php do_action( "groundhogg/steps/{$this->get_type()}/reporting/before", $step ); ?>
-					<?php do_action( 'groundhogg/steps/reporting/before', $step ); ?>
-					<?php $this->reporting_v2( $step ); ?>
-					<?php do_action( "groundhogg/steps/{$this->get_type()}/reporting/after", $step ); ?>
-					<?php do_action( 'groundhogg/steps/reporting/after', $step ); ?>
-                </div>
+<!--                <div class="step-reporting">-->
+<!--					--><?php //do_action( "groundhogg/steps/{$this->get_type()}/reporting/before", $step ); ?>
+<!--					--><?php //do_action( 'groundhogg/steps/reporting/before', $step ); ?>
+<!--					--><?php //$this->reporting_v2( $step ); ?>
+<!--					--><?php //do_action( "groundhogg/steps/{$this->get_type()}/reporting/after", $step ); ?>
+<!--					--><?php //do_action( 'groundhogg/steps/reporting/after', $step ); ?>
+<!--                </div>-->
             </div>
         </div>
 		<?php
@@ -871,13 +872,13 @@ abstract class Funnel_Step extends Supports_Errors {
                 <!-- REPORTING  -->
 				<?php //TODO Reporting enabled?
 				?>
-                <div class="step-reporting <?php echo Plugin::$instance->admin->get_page( 'funnels' )->is_reporting_enabled() ? '' : 'hidden'; ?>">
-					<?php do_action( "groundhogg/steps/{$this->get_type()}/reporting/before", $step ); ?>
-					<?php do_action( 'groundhogg/steps/reporting/before', $step ); ?>
-					<?php $this->reporting( $step ); ?>
-					<?php do_action( "groundhogg/steps/{$this->get_type()}/reporting/after", $step ); ?>
-					<?php do_action( 'groundhogg/steps/reporting/after', $step ); ?>
-                </div>
+<!--                <div class="step-reporting --><?php //echo Plugin::$instance->admin->get_page( 'funnels' )->is_reporting_enabled() ? '' : 'hidden'; ?><!--">-->
+<!--					--><?php //do_action( "groundhogg/steps/{$this->get_type()}/reporting/before", $step ); ?>
+<!--					--><?php //do_action( 'groundhogg/steps/reporting/before', $step ); ?>
+<!--					--><?php //$this->reporting( $step ); ?>
+<!--					--><?php //do_action( "groundhogg/steps/{$this->get_type()}/reporting/after", $step ); ?>
+<!--					--><?php //do_action( 'groundhogg/steps/reporting/after', $step ); ?>
+<!--                </div>-->
             </div>
         </div>
 		<?php

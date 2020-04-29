@@ -165,6 +165,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 					'total_contacts_in_funnel',
 					'table_benchmark_conversion_rate',
 					'table_form_activity',
+					'table_funnel_stats',
 				];
 				break;
 			case 'broadcasts' :

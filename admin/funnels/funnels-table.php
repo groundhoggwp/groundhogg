@@ -152,12 +152,12 @@ class Funnels_Table extends WP_List_Table {
 			$actions['delete']  = "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=archived&action=delete&funnel=' . $id ), 'delete' ) . "'>" . _x( 'Delete Permanently', 'action', 'groundhogg' ) . "</a></span>";
 		} else {
 
-			if ( ! is_option_enabled( 'gh_use_classic_builder' ) ) {
+//			if ( ! is_option_enabled( 'gh_use_classic_builder' ) ) {
 				$actions['edit'] = "<span class='edit'><a href='" . $editUrl . "'>" . __( 'Build' ) . "</a></span>";
-			} else {
-				$actions['edit']    = "<span class='edit'><a href='" . $editUrlClassic . "'>" . __( 'Build' ) . "</a></span>";
-				$actions['edit-v2'] = "<span class='edit'><a href='" . $editUrl . "'>" . __( 'Build (v2)' ) . "</a></span>";
-			}
+//			} else {
+//				$actions['edit']    = "<span class='edit'><a href='" . $editUrlClassic . "'>" . __( 'Build' ) . "</a></span>";
+//				$actions['edit-v2'] = "<span class='edit'><a href='" . $editUrl . "'>" . __( 'Build (v2)' ) . "</a></span>";
+//			}
 
 			$actions['duplicate'] = "<span class='duplicate'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&action=duplicate&funnel=' . $id ), 'duplicate' ) . "'>" . _x( 'Duplicate', 'action', 'groundhogg' ) . "</a></span>";
 			$actions['export']    = "<span class='export'><a href='" . $funnel->export_url() . "'>" . _x( 'Export', 'action', 'groundhogg' ) . "</a></span>";
@@ -172,11 +172,11 @@ class Funnels_Table extends WP_List_Table {
 
 		$editUrl = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel->ID );
 
-		if ( is_option_enabled( 'gh_use_classic_builder' ) ) {
-			$editUrl = add_query_arg( [
-				'version' => 1
-			], $editUrl );
-		}
+//		if ( is_option_enabled( 'gh_use_classic_builder' ) ) {
+//			$editUrl = add_query_arg( [
+//				'version' => 1
+//			], $editUrl );
+//		}
 
 		if ( $this->get_view() === 'archived' ) {
 			$html = "<strong>{$subject}</strong>";

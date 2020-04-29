@@ -235,6 +235,7 @@ class Send_Email extends Action {
 
 	/**
 	 * @param Step $step Reporting v2
+     * @deprecated  version 2.2 use Dashbord APi for adding graphs
 	 */
 	public function reporting_v2( $step ) {
 		parent::reporting_v2( $step );
