@@ -9,6 +9,56 @@ function get_img_url( $img ) {
 }
 
 /**
+ * Table chart
+ *
+ * @param array $args
+ */
+function table_chart_report($args = [] ){
+	$args = wp_parse_args( $args, [
+		'id'    => uniqid( 'groundhogg_' ),
+		'title' => 'Report',
+		'info'  => 'Some interesting data...',
+		'class' => false,
+	] );
+
+	?>
+	<div class="groundhogg-chart-wrapper">
+		<div class="groundhogg-chart-no-padding <?php esc_attr_e( $args['class'] ); ?>">
+			<h2 class="title"><?php esc_html_e( $args['title'] ); ?></h2>
+			<div id="<?php esc_attr_e( $args['id'] ); ?>"></div>
+		</div>
+	</div
+	<?php
+}
+
+/**
+ * Donut chart
+ *
+ * @param array $args
+ */
+function donut_chart_report( $args = [] ){
+	$args = wp_parse_args( $args, [
+		'id'    => uniqid( 'groundhogg_' ),
+		'title' => 'Report',
+		'info'  => 'Some interesting data...',
+	] );
+
+	?>
+	<div class="groundhogg-chart">
+		<h2 class="title"><?php esc_html_e( $args['title'] ); ?></h2>
+		<div style="width: 100%; padding: ">
+			<div class="float-left donut-chart-left">
+				<canvas id="<?php esc_attr_e( $args['id'] ); ?>"></canvas>
+			</div>
+			<div class="float-left donut-chart-right">
+				<div id="<?php esc_attr_e( $args['id'] ); ?>_legend" class="chart-legend"></div>
+			</div>
+		</div>
+	</div>
+	<?php
+}
+
+/**
  * Output html for a quick stat report
  *
  * @param array $args

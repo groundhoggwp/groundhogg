@@ -177,9 +177,14 @@ class Reports_Page extends Tabbed_Admin_Page {
 			]
 		];
 
-		$reports_to_load = apply_filters( 'groundhogg/admin/reports/tab', $reports_to_load );
+		$custom_tab     = get_array_var( $this->custom_tabs, $this->get_current_tab() );
+		$custom_reports = get_array_var( $custom_tab, 'reports', [] );
 
-		return get_array_var( $reports_to_load, $this->get_current_tab(), [] );
+		$reports = get_array_var( $reports_to_load, $this->get_current_tab(), [] );
+		$reports = array_unique( array_merge( $custom_reports, $reports ) );
+		$reports = apply_filters( 'groundhogg/admin/reports/tab', $reports );
+
+		return $reports;
 
 	}
 
@@ -192,6 +197,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 	 * Add a custom report tab
 	 *
 	 * @param $args
+	 *
 	 * @return bool
 	 */
 	public function add_custom_report_tab( $args ) {
@@ -203,7 +209,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 			'callback' => ''
 		] );
 
-		if ( ! is_callable( $args['callback'] ) || ! $args[ 'slug' ] ) {
+		if ( ! is_callable( $args['callback'] ) || ! $args['slug'] ) {
 			return false;
 		}
 
@@ -247,7 +253,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 				'name' => __( 'Broadcasts', 'groundhogg' ),
 				'slug' => 'broadcasts'
 			],
-            [
+			[
 				'name' => __( 'Forms', 'groundhogg' ),
 				'slug' => 'forms'
 			],
@@ -379,10 +385,10 @@ class Reports_Page extends Tabbed_Admin_Page {
 	public function forms_view() {
 		include __DIR__ . '/views/forms.php';
 	}
-	
+
 	public function email_step_view() {
-	    include __DIR__ . '/views/email-step.php';
-    }
+		include __DIR__ . '/views/email-step.php';
+	}
 
 
 	public function refresh_report_data() {

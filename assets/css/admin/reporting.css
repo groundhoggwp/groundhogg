@@ -429,3 +429,12 @@ table.groundhogg-report-table td:last-child {
     position: relative;
     padding-left: 65px;
 }
+
+.donut-chart-left{
+    width: 60%;
+}
+
+
+.donut-chart-right{
+    width: 40%;
+}
