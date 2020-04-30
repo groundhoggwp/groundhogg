@@ -98,31 +98,16 @@ $funnel = new Funnel( $funnel_id );
 
             <div class="toolbar-buttons">
                 <div>
-					<?php
-
-					_e( 'Conversion Benchmark: ', 'groundhogg' );
-
-					$steps = $funnel->get_steps( [
-						'step_group' => 'benchmark',
-						'funnel_id'  => $funnel_id
-					] );
-
-					$options = [];
-
-					foreach ( $steps as $step ) {
-						$step                       = new Step( absint( $step->ID ) );
-						$options[ $step->get_id() ] = $step->get_title();
-					}
-
-					$args = [
-						'name'        => 'conversion-step',
-						'id'          => 'conversion-step',
-						'options'     => $options,
-						'selected'    => $funnel->get_conversion_step_id(),
-						'option_none' => false,
-					];
-					echo Plugin::$instance->utils->html->dropdown( $args );
-					?>
+					<?php echo Plugin::$instance->utils->html->modal_link( array(
+						'title'              => __( 'Settings', 'groundhogg' ),
+						'text'               => dashicon( 'admin-generic' ) . __( 'Settings', 'groundhogg' ),
+						'id'                 => 'settings',
+						'class'              => 'no-padding settings settings-button button-secondary',
+						'source'             => admin_page_url( 'gh_funnels', [ 'action' => 'funnel_settings', 'funnel' => $funnel_id ] ),
+						'height'             => 500,
+						'width'              => 900,
+						'footer_button_text' => __( 'Close' ),
+					) ); ?>
                 </div>
                 <div>
 					<?php echo Plugin::$instance->utils->html->modal_link( array(
@@ -161,7 +146,8 @@ $funnel = new Funnel( $funnel_id );
                                 class="dashicons dashicons-download"></span> <?php _e( 'Export', 'groundhogg' ); ?></a>
                 </div>
                 <div id="report">
-                    <a href="<?php echo admin_url( sprintf( 'admin.php?page=gh_reporting&tab=funnels&funnel=%s', $funnel_id ) );?>" class="button"><span
+                    <a href="<?php echo admin_url( sprintf( 'admin.php?page=gh_reporting&tab=funnels&funnel=%s', $funnel_id ) ); ?>"
+                       class="button"><span
                                 title="<?php esc_attr_e( 'Reports', 'groundhogg' ) ?>"
                                 class="dashicons dashicons-chart-area"
                                 style="width: auto;height: auto;vertical-align: middle;font-size: 20px;margin-right: 3px;"></span> <?php _e( 'Reports', 'groundhogg' ); ?>
@@ -254,7 +240,7 @@ $funnel = new Funnel( $funnel_id );
     </div>
 </form>
 <?php if ( $step_active ): ?>
-    <script>jQuery('html').addClass('active-step');</script>
+    <script>jQuery("html").addClass("active-step");</script>
 <?php endif; ?>
 <div class="hidden" id="steps">
     <div class="steps-select">
@@ -338,28 +324,28 @@ $funnel = new Funnel( $funnel_id );
 <script>
     jQuery(function ($) {
 
-        var $benchmarks = $('#benchmarks');
-        var $actions = $('#actions');
-        var $tabs = $('.nav-tab');
+        var $benchmarks = $("#benchmarks");
+        var $actions = $("#actions");
+        var $tabs = $(".nav-tab");
 
-        $('#actions-tab').on('click', function (e) {
+        $("#actions-tab").on("click", function (e) {
             e.preventDefault();
 
-            $tabs.removeClass('nav-tab-active');
-            $(this).addClass('nav-tab-active');
+            $tabs.removeClass("nav-tab-active");
+            $(this).addClass("nav-tab-active");
 
-            $benchmarks.addClass('hidden');
-            $actions.removeClass('hidden');
+            $benchmarks.addClass("hidden");
+            $actions.removeClass("hidden");
         });
 
-        $('#benchmarks-tab').on('click', function (e) {
+        $("#benchmarks-tab").on("click", function (e) {
             e.preventDefault();
 
-            $tabs.removeClass('nav-tab-active');
-            $(this).addClass('nav-tab-active');
+            $tabs.removeClass("nav-tab-active");
+            $(this).addClass("nav-tab-active");
 
-            $actions.addClass('hidden');
-            $benchmarks.removeClass('hidden');
+            $actions.addClass("hidden");
+            $benchmarks.removeClass("hidden");
         });
 
     });
