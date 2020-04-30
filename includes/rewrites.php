@@ -1,296 +1,293 @@
 <?php
+
 namespace Groundhogg;
 
-class Rewrites
-{
-    /**
-     * Rewrites constructor.
-     */
-    public function __construct()
-    {
-        add_action( 'init', [ $this, 'add_rewrite_rules' ] );
-        add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
-        add_filter( 'request', [ $this, 'parse_query' ] );
-        add_filter( 'template_include', [ $this, 'template_include' ] );
-        add_action( 'template_redirect', [ $this, 'template_redirect' ] );
-    }
+class Rewrites {
+	/**
+	 * Rewrites constructor.
+	 */
+	public function __construct() {
+		add_action( 'init', [ $this, 'add_rewrite_rules' ] );
+		add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
+		add_filter( 'request', [ $this, 'parse_query' ] );
+		add_filter( 'template_include', [ $this, 'template_include' ] );
+		add_action( 'template_redirect', [ $this, 'template_redirect' ] );
+	}
 
-    /**
-     * Add the rewrite rules required for the Preferences center.
-     */
-    public function add_rewrite_rules()
-    {
-        // View Emails
-        add_managed_rewrite_rule(
-            'browser-view/emails/([^/]*)/?$',
-            'subpage=browser_view&email_id=$matches[1]'
-        );
+	/**
+	 * Add the rewrite rules required for the Preferences center.
+	 */
+	public function add_rewrite_rules() {
+		// View Emails
+		add_managed_rewrite_rule(
+			'browser-view/emails/([^/]*)/?$',
+			'subpage=browser_view&email_id=$matches[1]'
+		);
 
-        // View Emails
-        add_managed_rewrite_rule(
-            'emails/([^/]*)/?$',
-            'subpage=emails&email_id=$matches[1]'
-        );
+		// View Emails
+		add_managed_rewrite_rule(
+			'emails/([^/]*)/?$',
+			'subpage=emails&email_id=$matches[1]'
+		);
 
-        // Benchmark links
-        add_managed_rewrite_rule(
-            'link/click/([^/]*)/?$',
-            'subpage=benchmark_link&link_id=$matches[1]'
-        );
+		// Benchmark links
+		add_managed_rewrite_rule(
+			'link/click/([^/]*)/?$',
+			'subpage=benchmark_link&link_id=$matches[1]'
+		);
 
-        // Funnel Download/Export
-        add_managed_rewrite_rule(
-            'funnels/export/([^/]*)/?$',
-            'subpage=funnels&action=export&enc_funnel_id=$matches[1]'
-        );
+		// Funnel Download/Export
+		add_managed_rewrite_rule(
+			'funnels/export/([^/]*)/?$',
+			'subpage=funnels&action=export&enc_funnel_id=$matches[1]'
+		);
 
-        // File download
-        add_managed_rewrite_rule(
-            'uploads/([^/]*)/?$',
-             'subpage=files&action=download&file_path=$matches[1]'
-        );
+		// File download
+		add_managed_rewrite_rule(
+			'uploads/([^/]*)/?$',
+			'subpage=files&action=download&file_path=$matches[1]'
+		);
 
-        // File view with basename.
-        add_managed_rewrite_rule(
-            'uploads/(.*)',
-            'subpage=files&action=download&file_path=$matches[1]'
-        );
+		// File view with basename.
+		add_managed_rewrite_rule(
+			'uploads/(.*)',
+			'subpage=files&action=download&file_path=$matches[1]'
+		);
 
-        add_managed_rewrite_rule(
-            'forms/([^/]*)/submit/?$',
-            'subpage=form_submit&form_id=$matches[1]'
-        );
+		add_managed_rewrite_rule(
+			'forms/([^/]*)/submit/?$',
+			'subpage=form_submit&form_id=$matches[1]'
+		);
 
-        // Forms Iframe Script
-        add_managed_rewrite_rule(
-            'forms/iframe/([^/]*)/?$',
-            'subpage=forms_iframe&form_id=$matches[1]'
-        );
+		// Forms Iframe Script
+		add_managed_rewrite_rule(
+			'forms/iframe/([^/]*)/?$',
+			'subpage=forms_iframe&form_id=$matches[1]'
+		);
 
-        // Forms Iframe Template
-        add_managed_rewrite_rule(
-            'forms/([^/]*)/?$',
-            'subpage=forms&form_id=$matches[1]'
-        );
+		// Forms Iframe Template
+		add_managed_rewrite_rule(
+			'forms/([^/]*)/?$',
+			'subpage=forms&form_id=$matches[1]'
+		);
 
-    }
+	}
 
-    /**
-     * Add the query vars needed to manage the request.
-     *
-     * @param $vars
-     * @return array
-     */
-    public function add_query_vars( $vars )
-    {
-        $vars[] = 'subpage';
-        $vars[] = 'action';
-        $vars[] = 'file_path';
-        $vars[] = 'funnel_id';
-        $vars[] = 'enc_funnel_id';
-        $vars[] = 'enc_form_id';
-        $vars[] = 'form_id';
-        $vars[] = 'email_id';
-        $vars[] = 'link_id';
-        return $vars;
-    }
+	/**
+	 * Add the query vars needed to manage the request.
+	 *
+	 * @param $vars
+	 *
+	 * @return array
+	 */
+	public function add_query_vars( $vars ) {
+		$vars[] = 'subpage';
+		$vars[] = 'action';
+		$vars[] = 'file_path';
+		$vars[] = 'funnel_id';
+		$vars[] = 'enc_funnel_id';
+		$vars[] = 'enc_form_id';
+		$vars[] = 'form_id';
+		$vars[] = 'email_id';
+		$vars[] = 'link_id';
 
-    /**
-     * Maps a function to a specific query var.
-     *
-     * @param $query
-     * @return mixed
-     */
-    public function parse_query( $query )
-    {
-        $this->map_query_var( $query, 'link_id', 'absint' );
-        $this->map_query_var( $query, 'email_id', 'absint' );
+		return $vars;
+	}
 
-        // form
-        $this->map_query_var( $query, 'form_id', 'urldecode' );
-        $this->map_query_var( $query, 'form_id', '\Groundhogg\decrypt' );
-        $this->map_query_var( $query, 'form_id', 'absint' );
-        return $query;
-    }
+	/**
+	 * Maps a function to a specific query var.
+	 *
+	 * @param $query
+	 *
+	 * @return mixed
+	 */
+	public function parse_query( $query ) {
+		$this->map_query_var( $query, 'link_id', 'absint' );
+		$this->map_query_var( $query, 'email_id', 'absint' );
 
-    /**
-     * @return Template_Loader
-     */
-    public function get_template_loader()
-    {
-        return new Template_Loader();
-    }
+		// form
+		$this->map_query_var( $query, 'form_id', 'urldecode' );
+		$this->map_query_var( $query, 'form_id', '\Groundhogg\decrypt' );
+		$this->map_query_var( $query, 'form_id', 'absint' );
 
-    /**
-     * Overwrite the existing template with the manage preferences template.
-     *
-     * @param $template
-     * @return string
-     */
-    public function template_include( $template )
-    {
-        if ( ! is_managed_page() ){
-            return $template;
-        }
+		return $query;
+	}
 
-        $subpage = get_query_var( 'subpage' );
-        $template_loader = $this->get_template_loader();
+	/**
+	 * @return Template_Loader
+	 */
+	public function get_template_loader() {
+		return new Template_Loader();
+	}
 
-        switch ( $subpage ){
-            case 'browser_view':
-                $template = $template_loader->get_template_part( 'emails/browser-view', '', false );
-                break;
-            case 'emails':
-                $template = $template_loader->get_template_part( 'emails/email', '', false );
-                break;
-            case 'forms':
-                $template = $template_loader->get_template_part( 'form/form', '', false );
-                break;
-            case 'form_submit':
-                $template = $template_loader->get_template_part( 'form/submit', '', false );
-                break;
-        }
+	/**
+	 * Overwrite the existing template with the manage preferences template.
+	 *
+	 * @param $template
+	 *
+	 * @return string
+	 */
+	public function template_include( $template ) {
+		if ( ! is_managed_page() ) {
+			return $template;
+		}
 
-        return $template;
-    }
+		$subpage         = get_query_var( 'subpage' );
+		$template_loader = $this->get_template_loader();
 
-    /**
-     * Perform Superlink/link click benchmark stuff.
-     *
-     * @param string $template
-     */
-    public function template_redirect( $template='' )
-    {
+		switch ( $subpage ) {
+			case 'browser_view':
+				$template = $template_loader->get_template_part( 'emails/browser-view', '', false );
+				break;
+			case 'emails':
+				$template = $template_loader->get_template_part( 'emails/email', '', false );
+				break;
+			case 'forms':
+				$template = $template_loader->get_template_part( 'form/form', '', false );
+				break;
+			case 'form_submit':
+				$template = $template_loader->get_template_part( 'form/submit', '', false );
+				break;
+		}
 
-        if ( ! is_managed_page() ){
-            return;
-        }
+		return $template;
+	}
 
-        $subpage = get_query_var( 'subpage' );
-        $template_loader = $this->get_template_loader();
+	/**
+	 * Perform Superlink/link click benchmark stuff.
+	 *
+	 * @param string $template
+	 */
+	public function template_redirect( $template = '' ) {
 
-        switch ( $subpage ){
-            case 'benchmark_link':
+		if ( ! is_managed_page() ) {
+			return;
+		}
 
-                $link_id = absint( get_query_var( 'link_id' ) );
-                $contact = get_contactdata();
+		$subpage         = get_query_var( 'subpage' );
+		$template_loader = $this->get_template_loader();
 
-                $step = Plugin::$instance->utils->get_step( $link_id );
+		switch ( $subpage ) {
+			case 'benchmark_link':
 
-                if ( ! $step ) {
-                    return;
-                }
+				$link_id = absint( get_query_var( 'link_id' ) );
+				$contact = get_contactdata();
 
-                $target_url = $step->get_meta( 'redirect_to' );
+				$step = Plugin::$instance->utils->get_step( $link_id );
 
-                if ( $contact ){
-                    do_action( 'groundhogg/rewrites/benchmark_link/clicked', $contact, $step );
-                    $target_url = do_replacements( $target_url, $contact->get_id() );
-                }
+				if ( ! $step ) {
+					return;
+				}
 
-                wp_redirect( $target_url );
-                die();
+				$target_url = $step->get_meta( 'redirect_to' );
 
-                break;
-            case 'funnels':
-                // Export the funnel from special rewrite link...
-                status_header( 200 );
-                nocache_headers();
+				if ( $contact ) {
+					do_action( 'groundhogg/rewrites/benchmark_link/clicked', $contact, $step );
+					$target_url = do_replacements( $target_url, $contact->get_id() );
+				}
 
-                $funnel_id = absint( Plugin::$instance->utils->encrypt_decrypt( get_query_var( 'enc_funnel_id' ), 'd' ) );
-                $funnel = new Funnel( $funnel_id );
-                if ( ! $funnel->exists() ){
-                    wp_die( 'The requested funnel was not found.', 'Funnel not found.', [ 'status' => 404 ] );
-                }
+				wp_redirect( $target_url );
+				die();
 
-                $export_string = wp_json_encode( $funnel->get_as_array() );
+				break;
+			case 'funnels':
+				// Export the funnel from special rewrite link...
+				status_header( 200 );
+				nocache_headers();
 
-                $funnel_export_name = strtolower( preg_replace( '/[^A-z0-9]/', '-', $funnel->get_title() ) );
+				$funnel_id = absint( Plugin::$instance->utils->encrypt_decrypt( get_query_var( 'enc_funnel_id' ), 'd' ) );
+				$funnel    = new Funnel( $funnel_id );
+				if ( ! $funnel->exists() ) {
+					wp_die( 'The requested funnel was not found.', 'Funnel not found.', [ 'status' => 404 ] );
+				}
 
-                $filename = 'funnel-' . $funnel_export_name . '-'. date("Y-m-d_H-i", time() );
+				$export_string = wp_json_encode( $funnel->get_as_array() );
 
-                header("Content-type: text/plain");
-                header( "Content-disposition: attachment; filename=".$filename.".funnel");
-                $file = fopen('php://output', 'w');
-                fputs( $file, $export_string );
-                fclose($file);
-                exit();
-                break;
+				$funnel_export_name = strtolower( preg_replace( '/[^A-z0-9]/', '-', $funnel->get_title() ) );
 
-            case 'files':
-                $file_path = get_query_var( 'file_path' );
-                $groundhogg_path = Plugin::$instance->utils->files->get_base_uploads_dir();
-                $file_path = wp_normalize_path( $groundhogg_path . DIRECTORY_SEPARATOR . $file_path );
+				$filename = 'funnel-' . $funnel_export_name . '-' . date( "Y-m-d_H-i", time() );
 
-                if ( ! $file_path || ! file_exists( $file_path ) || ! is_file( $file_path ) ){
-                    wp_die( 'The requested file was not found.', 'File not found.', [ 'status' => 404 ] );
-                }
+				header( "Content-type: text/plain" );
+				header( "Content-disposition: attachment; filename=" . $filename . ".funnel" );
+				$file = fopen( 'php://output', 'w' );
+				fputs( $file, $export_string );
+				fclose( $file );
+				exit();
+				break;
 
-                $subfolder = basename( dirname( $file_path ) );
-                $contact = get_contactdata();
+			case 'files':
+				$file_path       = get_query_var( 'file_path' );
+				$groundhogg_path = Plugin::$instance->utils->files->get_base_uploads_dir();
+				$file_path       = wp_normalize_path( $groundhogg_path . DIRECTORY_SEPARATOR . $file_path );
 
-                $admin_read_access = current_user_can( 'download_files' );
+				if ( ! $file_path || ! file_exists( $file_path ) || ! is_file( $file_path ) ) {
+					wp_die( 'The requested file was not found.', 'File not found.', [ 'status' => 404 ] );
+				}
 
-                $nonce = get_url_var( 'key' );
-                $nonce_read_access = $nonce && wp_verify_nonce( $nonce );
+				$subfolder = basename( dirname( $file_path ) );
+				$contact   = get_contactdata();
 
-                $contact_read_access = $contact && $contact->get_upload_folder_basename() === $subfolder && $nonce_read_access;
+				$admin_read_access = current_user_can( 'download_files' );
 
-                $unrestricted = is_option_enabled( 'gh_allow_unrestricted_file_access' );
+				$nonce             = get_url_var( 'key' );
+				$nonce_read_access = $nonce && wp_verify_nonce( $nonce );
 
-                if ( ! $unrestricted ){
-                    if ( ! $admin_read_access && ! $contact_read_access ){
-                        wp_die( 'You do not have permission to view this file.', 'Access denied.', [ 'status' => 403 ] );
-                    }
-                }
+				$contact_read_access = $contact && $contact->get_upload_folder_basename() === $subfolder && $nonce_read_access;
 
-                $mime = wp_check_filetype( $file_path );
-                $mime = $mime[ 'type' ];
+				$unrestricted = is_option_enabled( 'gh_allow_unrestricted_file_access' );
 
-                if ( ! $mime ){
-                    wp_die( 'The request file type is unrecognized and has been blocked for your protection.', 'Access denied.', [ 'status' => 403 ] );
-                }
+				if ( ! $unrestricted ) {
+					if ( ! $admin_read_access && ! $contact_read_access ) {
+						wp_die( 'You do not have permission to view this file.', 'Access denied.', [ 'status' => 403 ] );
+					}
+				}
 
-                $content_type = sprintf( "Content-Type: %s", $mime );
-                $content_size = sprintf( "Content-Length: %s", filesize( $file_path ) );
+				$mime = wp_check_filetype( $file_path );
+				$mime = $mime['type'];
 
-                header( $content_type );
-                header( $content_size );
+				if ( ! $mime ) {
+					wp_die( 'The request file type is unrecognized and has been blocked for your protection.', 'Access denied.', [ 'status' => 403 ] );
+				}
 
-                if ( get_request_var( 'download' ) ){
-                    $content_disposition = sprintf( "Content-disposition: attachment; filename=%s", basename( $file_path ) );
-                } else {
-                    $content_disposition = sprintf( "Content-disposition: inline; filename=%s", basename( $file_path ) );
-                }
+				$content_type = sprintf( "Content-Type: %s", $mime );
+				$content_size = sprintf( "Content-Length: %s", filesize( $file_path ) );
 
-                header( $content_disposition );
+				header( $content_type );
+				header( $content_size );
 
-                status_header( 200 );
-                nocache_headers();
+				if ( get_request_var( 'download' ) ) {
+					$content_disposition = sprintf( "Content-disposition: attachment; filename=%s", basename( $file_path ) );
+				} else {
+					$content_disposition = sprintf( "Content-disposition: inline; filename=%s", basename( $file_path ) );
+				}
 
-                readfile( $file_path );
-                exit();
-                break;
-            case 'forms_iframe':
-                $template = $template_loader->get_template_part( 'form/iframe.js', '', true );
-                exit();
-                break;
-        }
-    }
+				header( $content_disposition );
 
-    /**
-     * @param $array
-     * @param $key
-     * @param $func
-     */
-    public function map_query_var(&$array, $key, $func )
-    {
-        if ( ! function_exists( $func ) ){
-            return;
-        }
+				status_header( 200 );
+				nocache_headers();
 
-        if ( isset_not_empty( $array, $key ) ){
-            $array[ $key ] = call_user_func( $func, $array[ $key ] );
-        }
-    }
+				readfile( $file_path );
+				exit();
+				break;
+			case 'forms_iframe':
+				$template = $template_loader->get_template_part( 'form/iframe.js', '', true );
+				exit();
+				break;
+		}
+	}
+
+	/**
+	 * @param $array
+	 * @param $key
+	 * @param $func
+	 */
+	public function map_query_var( &$array, $key, $func ) {
+		if ( ! function_exists( $func ) ) {
+			return;
+		}
+
+		if ( isset_not_empty( $array, $key ) ) {
+			$array[ $key ] = call_user_func( $func, $array[ $key ] );
+		}
+	}
 }

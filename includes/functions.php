@@ -3083,6 +3083,10 @@ function gh_cron_installed() {
  */
 function get_event_by_queued_id( $queued_id ) {
 
+    if ( ! $queued_id ){
+        return false;
+    }
+
 	$event = new Event( absint( $queued_id ), 'events', 'queued_id' );
 
 	if ( ! $event->exists() ) {

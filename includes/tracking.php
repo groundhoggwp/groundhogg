@@ -347,6 +347,37 @@ class Tracking {
 	}
 
 	/**
+	 * @return bool|int
+	 */
+	public function get_current_step_id(){
+
+		if ( ! $this->get_current_event() ){
+			return false;
+		}
+
+		return $this->get_current_event()->get_step_id();
+	}
+
+	/**
+	 * @return bool|int
+	 */
+	public function get_current_funnel_id(){
+
+		if ( ! $this->get_current_event() ){
+			return false;
+		}
+
+		return $this->get_current_event()->get_funnel_id();
+	}
+
+	/**
+	 * @return int
+	 */
+	public function get_current_email_id(){
+		return absint( $this->get_tracking_cookie_param( 'email_id' ) );
+	}
+
+	/**
 	 * For some reason emails are being sent out with http instead of https...
 	 * Redirect to ssl if https is in the url.
 	 */
