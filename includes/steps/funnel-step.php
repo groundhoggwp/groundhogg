@@ -784,32 +784,20 @@ abstract class Funnel_Step extends Supports_Errors {
 
                 </div>
             </div>
-            <!-- INSIDE -->
-<!--            <div class="step-background " style="margin-top: 10px">-->
-<!--                <div class="step-title-wrap">-->
-<!--                    <img class="step-icon"-->
-<!--                         src="--><?php //echo $this->get_icon() ? $this->get_icon() : $this->get_default_icon(); ?><!--">-->
-<!---->
-<!--                    <div class="step-title-view">-->
-<!--						--><?php //_e( 'Notes', 'groundhogg' ); ?>
-<!--                    </div>-->
-<!--                </div>-->
-                <div class="step-notes">
-                    <div class="step-notes" style="margin-top: 10px">
-						<?php
-						echo html()->textarea( [
-							'id'          => $this->setting_id_prefix( 'step-notes' ),
-							'name'        => $this->setting_name_prefix( 'step_notes' ),
-							'value'       => $step->get_step_notes(),
-							'placeholder' => __( 'You can use this area to store custom notes about the step.', 'groundhogg' ),
-                            'class' => 'step-notes-textarea'
-						] );
-						?>
-                    </div>
+            <div class="step-notes">
+                <div class="step-notes" style="margin-top: 10px;padding-bottom: 30px">
+					<?php
+					echo html()->textarea( [
+						'id'          => $this->setting_id_prefix( 'step-notes' ),
+						'name'        => $this->setting_name_prefix( 'step_notes' ),
+						'value'       => $step->get_step_notes(),
+						'placeholder' => __( 'You can use this area to store custom notes about the step.', 'groundhogg' ),
+						'class'       => 'step-notes-textarea'
+					] );
+					?>
                 </div>
             </div>
-<!--        </div>-->
-
+        </div>
 		<?php
 	}
 
