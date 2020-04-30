@@ -311,6 +311,10 @@ class Tracking {
 			}
 		}
 
+		if ( ! $id_or_email ){
+			return false;
+		}
+
 		return get_contactdata( $id_or_email );
 	}
 
