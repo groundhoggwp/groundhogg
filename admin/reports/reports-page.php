@@ -226,7 +226,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 	 */
 	protected function get_tabs() {
 
-		return [
+		$tabs = [
 			[
 				'name' => __( 'Overview', 'groundhogg' ),
 				'slug' => 'overview'
