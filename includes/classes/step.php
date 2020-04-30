@@ -555,6 +555,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return $this->get_title();
 	}
 
+	public function get_step_notes()
+	{
+		return $this->get_meta('step_notes');
+	}
+
 	/**
 	 * @return string
 	 */
