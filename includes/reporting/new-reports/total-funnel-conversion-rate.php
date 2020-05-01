@@ -62,6 +62,7 @@ class Total_Funnel_Conversion_Rate extends Base_Quick_Stat_Percent {
 			'count'  => true,
 			'report' => [
 				'funnel_id' => $funnel->get_id(),
+				'step_id'   => $funnel->get_first_step_id(),
 				'start'     => $start,
 				'end'       => $end,
 				'status'    => Event::COMPLETE

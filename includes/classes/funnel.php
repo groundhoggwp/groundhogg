@@ -71,7 +71,7 @@ class Funnel extends Base_Object_With_Meta {
 	public function get_conversion_step_id() {
 		$conversion_step_id = absint( $this->conversion_step );
 
-		if ( ! $conversion_step_id ){
+		if ( ! $conversion_step_id ) {
 			$steps = $this->get_steps( [
 				'step_group' => Step::BENCHMARK,
 			] );
@@ -84,13 +84,23 @@ class Funnel extends Base_Object_With_Meta {
 		return $conversion_step_id;
 	}
 
+	public function get_first_action_id() {
+		$actions = $this->get_step_ids( [
+			'step_group' => Step::ACTION,
+		] );
+
+		return array_shift( $actions );
+	}
+
 	/**
 	 * @return int
 	 */
 	public function get_first_step_id() {
-		return $this->get_steps( [
-			'step_order' => 1
-		] )[0]->get_id();
+		$actions = $this->get_step_ids( [
+			'step_group' => Step::BENCHMARK,
+		] );
+
+		return array_shift( $actions );
 	}
 
 
@@ -102,7 +112,11 @@ class Funnel extends Base_Object_With_Meta {
 	 * @return array
 	 */
 	public function get_step_ids( $query = [] ) {
-		$query = array_merge( $query, [ 'funnel_id' => $this->get_id() ] );
+		$query = array_merge( $query, [
+			'funnel_id' => $this->get_id(),
+			'orderby'   => 'step_order',
+			'order'     => 'ASC',
+		] );
 
 		return wp_parse_id_list( wp_list_pluck( $this->get_steps_db()->get_steps( $query ), 'ID' ) );
 	}
@@ -122,14 +136,6 @@ class Funnel extends Base_Object_With_Meta {
 		foreach ( $raw_step_ids as $raw_step_id ) {
 			$steps[] = new Step( $raw_step_id );
 		}
-
-		usort( $steps, function ( Step $a, Step $b ) {
-			if ( $a->get_order() == $b->get_order() ) {
-				return 0;
-			}
-
-			return ( $a->get_order() < $b->get_order() ) ? - 1 : 1;
-		} );
 
 		return $steps;
 	}

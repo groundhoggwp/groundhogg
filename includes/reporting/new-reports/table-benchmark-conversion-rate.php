@@ -32,42 +32,37 @@ class Table_Benchmark_Conversion_Rate extends Base_Table_Report {
 	protected function get_table_data() {
 		//get list of benchmark
 		$funnel = new Funnel( $this->get_funnel_id() );
-
-		$steps = get_db( 'steps' )->query( [
-			'step_group' => 'benchmark',
-			'orderby '   => 'step_order',
-			'funnel_id'  => $funnel->get_id()
+		$steps  = $funnel->get_steps( [
+			'step_group' => Step::BENCHMARK
 		] );
-
-		$steps = wp_parse_id_list( wp_list_pluck( $steps, 'ID' ) );
 
 		if ( count( $steps ) > 1 ) {
 
 			$data = [];
 
-			for ( $i = 1; $i < count( $steps ); $i ++ ) {
+			for ( $i = 0; $i < count( $steps ) - 1; $i ++ ) {
 
-				$current_step  = new Step( $steps[ $i ] );
-				$previous_step = new Step( $steps[ $i - 1 ] );
+				$current_step = $steps[ $i ];
+				$next_step    = $steps[ $i + 1 ];
 
-				$total1 = $this->get_num_of_completed_contacts( $steps[ $i ], $this->start, $this->end );
-				$total2 = $this->get_num_of_completed_contacts( $steps[ $i - 1 ], $this->start - WEEK_IN_SECONDS, $this->end );
+				$total1 = $this->get_num_of_completed_contacts( $current_step->get_id(), $this->start, $this->end );
+				$total2 = $this->get_num_of_completed_contacts( $next_step->get_id(), $this->start - WEEK_IN_SECONDS, $this->end );
 
-				$data []       = [
+				$data [] = [
 					'from'   => $current_step->get_step_title(),
 					'total1' => $total1,
-					'to'     => $previous_step->get_step_title(),
+					'to'     => $next_step->get_step_title(),
 					'total2' => $total2,
 					'scr'    => percentage( $total1, $total2 ) . '%'
 				];
 			}
 
-			return array_reverse( $data );
+			return $data;
 		} else {
 
-			$current_step = new Step( $steps[0] );
+			$current_step = $steps[0];
 
-			$total = $this->get_num_of_completed_contacts( $steps[0], $this->start, $this->end );
+			$total = $this->get_num_of_completed_contacts( $current_step->get_id(), $this->start, $this->end );
 
 			return [
 				[

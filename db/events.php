@@ -262,6 +262,7 @@ class Events extends DB {
         PRIMARY KEY (ID),
         KEY time (time),
         KEY time_scheduled (time_scheduled),
+        KEY time_and_micro_time (time, micro_time),
         KEY contact_id (contact_id),
         KEY queued_id (queued_id),
         KEY funnel_id (funnel_id),

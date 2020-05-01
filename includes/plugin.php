@@ -327,7 +327,7 @@ class Plugin {
 
         if( ! is_white_labeled() ) {
             new Reviews();
-            new Upgrade_Notice();
+//            new Upgrade_Notice();
         }
 
         new Extension_Upgrader();

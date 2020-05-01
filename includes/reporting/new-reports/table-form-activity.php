@@ -77,16 +77,21 @@ class Table_Form_Activity extends Base_Table_Report {
 				'after'   => $this->start
 			] ) );
 
-			$form_stats[ 'submissions' ] = html()->e( 'a', [
-				'href' => admin_page_url( 'gh_contacts', [
-					'report' => [
-						'step_id' => $form_id,
-						'status'  => Event::COMPLETE,
-						'before'  => $this->end,
-						'after'   => $this->start,
-					]
-				] ),
-			], $submissions ?: '0' );
+			if ( $submissions > 0 ){
+				$form_stats[ 'submissions' ] = html()->e( 'a', [
+					'href' => admin_page_url( 'gh_contacts', [
+						'report' => [
+							'step_id' => $form_id,
+							'status'  => Event::COMPLETE,
+							'before'  => $this->end,
+							'after'   => $this->start,
+						]
+					] ),
+				], $submissions ?: '0', false );
+			} else {
+				$form_stats[ 'submissions' ] = 0;
+			}
+
 
 			$conversion_rate = percentage( $unique_impressions, $submissions, 2 );
 
@@ -109,7 +114,7 @@ class Table_Form_Activity extends Base_Table_Report {
 	 * @return mixed
 	 */
 	public function sort( $a, $b ) {
-		return $b[ 'conversion_rate' ] - $a[ 'conversion_rate' ];
+		return absint( $b[ 'conversion_rate' ] ) - absint( $a[ 'conversion_rate' ] );
 	}
 
 	protected function normalize_datum( $item_key, $item_data ) {
