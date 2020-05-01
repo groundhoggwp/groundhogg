@@ -3141,3 +3141,12 @@ function enqueue_event( $args ) {
 function generate_referer_hash( $referer ) {
 	return substr( md5( $referer ), 0, 20 );
 }
+
+/**
+ * @param $time
+ *
+ * @return int
+ */
+function convert_to_local_time( $time ){
+    return Plugin::$instance->utils->date_time->convert_to_local_time( $time );
+}
