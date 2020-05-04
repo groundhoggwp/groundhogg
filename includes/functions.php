@@ -1274,6 +1274,7 @@ function create_user_from_contact( $contact, $role = 'subscriber', $notification
 
 	$user_id = wp_insert_user( [
 		'user_pass'     => wp_generate_password(),
+		'user_email'    => $contact->get_email(),
 		'user_login'    => $contact->get_email(),
 		'user_nicename' => $contact->get_full_name(),
 		'display_name'  => $contact->get_full_name(),
@@ -3083,9 +3084,9 @@ function gh_cron_installed() {
  */
 function get_event_by_queued_id( $queued_id ) {
 
-    if ( ! $queued_id ){
-        return false;
-    }
+	if ( ! $queued_id ) {
+		return false;
+	}
 
 	$event = new Event( absint( $queued_id ), 'events', 'queued_id' );
 
@@ -3147,6 +3148,6 @@ function generate_referer_hash( $referer ) {
  *
  * @return int
  */
-function convert_to_local_time( $time ){
-    return Plugin::$instance->utils->date_time->convert_to_local_time( $time );
+function convert_to_local_time( $time ) {
+	return Plugin::$instance->utils->date_time->convert_to_local_time( $time );
 }
