@@ -110,7 +110,7 @@ class Contact_Activity_Table extends WP_List_Table {
 	 */
 	protected function column_open( $event ) {
 
-		$activity = Plugin::$instance->dbs->get_db( 'activity' )->query( [
+		$activity = get_db( 'activity' )->query( [
 			'event_id'      => $event->get_id(),
 			'step_id'       => $event->get_step_id(),
 			'activity_type' => 'email_opened',
@@ -134,7 +134,7 @@ class Contact_Activity_Table extends WP_List_Table {
 	 */
 	protected function column_click( $event ) {
 
-		$activity = Plugin::$instance->dbs->get_db( 'activity' )->query( [
+		$activity = get_db( 'activity' )->query( [
 			'event_id'      => $event->get_id(),
 			'step_id'       => $event->get_step_id(),
 			'activity_type' => 'email_link_click',

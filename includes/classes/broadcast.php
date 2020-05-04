@@ -206,6 +206,10 @@ class Broadcast extends Base_Object implements Event_Process {
 
 		do_action( "groundhogg/broadcast/{$this->get_broadcast_type()}/before", $this, $contact, $event );
 
+		if ( ! $this->get_object() || ! $this->get_object()->exists() ){
+			return new \WP_Error( 'object_error', 'Could not find email or SMS to send.' );
+		}
+
 		$result = $this->get_object()->send( $contact, $event );
 
 		do_action( "groundhogg/broadcast/{$this->get_broadcast_type()}/after", $this, $contact, $event );

@@ -95,6 +95,7 @@ class Pointers {
 	 */
 	public function add_scripts() {
 
+//	    return;
 
 		$pointers = get_array_var( $this->valid, 'pointers' );
 

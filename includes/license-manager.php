@@ -477,7 +477,7 @@ class License_Manager {
 		) );
 
 		if ( is_wp_error( $products ) ) {
-			Plugin::$instance->notices->add( $products );
+			notices()->add( $products );
 
 			return [];
 		}

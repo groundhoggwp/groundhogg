@@ -219,26 +219,6 @@ class Event_Queue extends DB {
 	}
 
 	/**
-	 * Add micro time to table ordering.
-	 *
-	 * @param array $query_vars
-	 *
-	 * @return string|string[]
-	 */
-	public function get_sql( $query_vars = [] ) {
-
-		$sql = parent::get_sql( $query_vars );
-
-		// Double compare to better display completion order
-		if ( $query_vars['orderby'] === 'time' ) {
-			$sql = str_replace( 'ORDER BY time DESC', 'ORDER BY `time` DESC, `micro_time` DESC', $sql );
-			$sql = str_replace( 'ORDER BY time ASC', 'ORDER BY `time` ASC, `micro_time` ASC', $sql );
-		}
-
-		return $sql;
-	}
-
-	/**
 	 * Create the table
 	 *
 	 * @access  public

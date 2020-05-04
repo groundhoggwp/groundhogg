@@ -489,7 +489,7 @@ abstract class Extension {
 	 * @return string
 	 */
 	public function __toString() {
-		$content = "<div style='width: 400px;margin:10px 10px 10px 0;display: inline-block;vertical-align: top' class='postbox'>";
+		$content = "<div class='postbox'>";
 		$content .= "<h2 class='hndle'>{$this->get_display_name()}</h2>";
 		$content .= "<div class=\"inside\">";
 		$content .= "<p>" . $this->get_display_description() . "</p>";

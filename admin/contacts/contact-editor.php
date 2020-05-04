@@ -10,7 +10,6 @@ use function Groundhogg\get_db;
 use function Groundhogg\get_form_list;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
-use function Groundhogg\multi_implode;
 use Groundhogg\Plugin;
 use Groundhogg\Contact;
 use Groundhogg\Preferences;
@@ -78,8 +77,6 @@ if ( current_user_is( 'sales_manager' ) ) {
 
 /* Auto link the account before we see the create account form. */
 $contact->auto_link_account();
-
-$title = ! empty( $contact->get_first_name() ) ? $contact->get_full_name() : $contact->get_email();
 
 $tabs = array(
 	'general'      => _x( 'General Info', 'contact_record_tab', 'groundhogg' ),
@@ -209,6 +206,8 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 	 * Contact Info
 	 *
 	 * @param $contact Contact
+	 *
+	 * @throws \Exception
 	 */
 	function contact_record_general_info( $contact ) {
 		?>
@@ -1053,5 +1052,5 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
     </div>
 <?php endif;
 
-do_action( 'groundhogg/contact/record/after/', $contact );
+do_action( 'groundhogg/contact/record/after', $contact );
 ?>
