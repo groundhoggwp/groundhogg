@@ -6,6 +6,7 @@ namespace Groundhogg\Reporting\New_Reports;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Contact_Query;
 use Groundhogg\Email;
+use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
@@ -27,8 +28,12 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 
 	protected function get_table_data() {
 
-		//  get list of funnels and plot it conversion rate
-		$funnels = get_db( 'funnels' )->query( [] );
+		// Get list of funnels and plot it conversion rate
+		// Only include active funnels
+		$funnels = get_db( 'funnels' )->query( [
+			'status' => 'active'
+		] );
+
 		if ( empty( $funnels ) ) {
 			return [];
 		}
@@ -84,14 +89,9 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 	protected function get_conversion_rate( $funnel_id ) {
 
 		$funnel = new Funnel( $funnel_id );
-
 		$conversion_step = $funnel->get_conversion_step_id();
 
-		if ( ! $conversion_step ) {
-			$conversion_step = $funnel->get_first_step_id();
-		}
-
-		$where_events = [
+		$where = [
 			'relationship' => "AND",
 			[ 'col' => 'step_id', 'val' => $conversion_step, 'compare' => '=' ],
 			[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
@@ -100,28 +100,24 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 		];
 
 		$num_of_conversions = get_db( 'events' )->count( [
-			'where'  => $where_events,
+			'where'  => $where,
 			'select' => 'DISTINCT contact_id'
 		] );
-
-		$start = $this->start - MONTH_IN_SECONDS;
-
-		$first_step = absint( $funnel->get_first_step_id() );
 
 		$cquery = new Contact_Query();
 
 		$num_events_completed = $cquery->query( [
 			'count'  => true,
 			'report' => [
-				'start'  => $start,
-				'end'    => $this->end,
-				'step'   => $first_step,
-				'status' => 'complete'
+				'funnel_id' => $funnel->get_id(),
+				'step_id'   => $funnel->get_first_step_id(),
+				'start'     => $this->start,
+				'end'       => $this->end,
+				'status'    => Event::COMPLETE
 			]
 		] );
 
 		return percentage( $num_events_completed, $num_of_conversions );
-
 
 	}
 
