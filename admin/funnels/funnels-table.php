@@ -93,7 +93,7 @@ class Funnels_Table extends WP_List_Table {
 
 		$sortable_columns = array(
 			'title'           => array( 'title', false ),
-			'active_contacts' => array( 'active_contacts', false ),
+//			'active_contacts' => array( 'active_contacts', false ),
 			'last_updated'    => array( 'last_updated', false ),
 			'date_created'    => array( 'date_created', false )
 		);

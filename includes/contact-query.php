@@ -714,7 +714,9 @@ class Contact_Query {
 
 			}
 
-			$sql = get_db( 'events' )->get_sql( [
+			$table = get_array_var(  $this->query_vars[ 'report' ], 'status' ) === Event::WAITING ? 'event_queue' : 'events';
+
+			$sql = get_db( $table )->get_sql( [
 				'where'   => $subwhere,
 				'select'  => 'contact_id',
 				'orderby' => false,
