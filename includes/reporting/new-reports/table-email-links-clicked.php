@@ -72,6 +72,8 @@ class Table_Email_Links_Clicked extends Base_Table_Report {
 								'activity_type' => Activity::EMAIL_CLICKED,
 								'email_id'      => $email->get_id(),
 								'referer_hash'  => $hash,
+								'before'        => $this->end,
+								'after'         => $this->start
 							]
 						],
 						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )

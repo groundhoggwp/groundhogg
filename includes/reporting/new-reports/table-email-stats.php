@@ -90,10 +90,6 @@ class Table_Email_Stats extends Base_Table_Report {
 				'label' => __( 'Click Thru Rate', 'groundhogg' ),
 				'data'  => percentage( $stats['opened'], $stats['clicked'] ) . '%'
 			],
-//			[
-//				'label' => __( 'Unopened', 'groundhogg' ),
-//				'data'  => $stats['unopened'] . ' (' . percentage( $stats['sent'], $stats['unopened'] ) . '%)'
-//			],
 
 		];
 
