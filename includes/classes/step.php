@@ -322,7 +322,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return bool|int
 	 */
 	public function get_current_funnel_step_order( $contact ) {
-		// Todo, possible to make this more efficient?
 
 		// Search waiting events, automatically the current event.
 		$events = $this->get_event_queue_db()->query( [
@@ -333,8 +332,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		if ( ! empty( $events ) ) {
 			$event = array_shift( $events );
-			$event = new Event( absint( $event->ID ) );
-			if ( $event->exists() ) {
+			$event = new Event( absint( $event->ID ), 'event_queue' );
+			// Double check step exists...
+			if ( $event->exists() && $event->get_step() && $event->get_step()->exists() ) {
 				return $event->get_step()->get_order();
 			}
 		}
@@ -353,7 +353,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			// get top element.
 			$event = array_shift( $events );
 			$event = new Event( absint( $event->ID ) );
-			if ( $event->exists() ) {
+
+			// Double check step exists...
+			if ( $event->exists() && $event->get_step() && $event->get_step()->exists() ) {
 				return $event->get_step()->get_order();
 			}
 		}
