@@ -177,6 +177,8 @@ class Reports_Page extends Tabbed_Admin_Page {
 			]
 		];
 
+		$reports_to_load = apply_filters( 'groundhogg/admin/reports/reports_to_load', $reports_to_load );
+
 		$custom_tab     = get_array_var( $this->custom_tabs, $this->get_current_tab() );
 		$custom_reports = get_array_var( $custom_tab, 'reports', [] );
 
