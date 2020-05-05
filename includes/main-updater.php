@@ -266,6 +266,9 @@ class Main_Updater extends Updater {
 		// Update `referer_hash` col
 		get_db( 'activity' )->update_2_2();
 
+		// Create the new event queue table
+		get_db( 'event_queue' )->create_table();
+
 		// Update the current events table
 		get_db( 'events' )->move_events_to_queue( [
 			'status' => Event::WAITING
