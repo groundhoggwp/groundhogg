@@ -78,7 +78,12 @@ class Funnel extends Base_Object_With_Meta {
 
 			$last = array_pop( $steps );
 
-			return $last->get_id();
+			if ($last){
+
+				return $last->get_id();
+			}
+			return 0;
+
 		}
 
 		return $conversion_step_id;

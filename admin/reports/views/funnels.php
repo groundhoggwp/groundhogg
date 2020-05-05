@@ -122,10 +122,4 @@ foreach ( $funnels as $funnel ) {
         <h2 class="title"><?php _e( 'Forms', 'groundhogg' ); ?></h2>
         <div id="table_form_activity"></div>
     </div>
-</div>
-<div class="groundhogg-chart-wrapper">
-    <div class="groundhogg-chart-no-padding full-width">
-        <h2 class="title"><?php _e( 'Activity', 'groundhogg' ); ?></h2>
-        <div id="table_funnel_stats"></div>
-    </div>
-</div>
+</div>as

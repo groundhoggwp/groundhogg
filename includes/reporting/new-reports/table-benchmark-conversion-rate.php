@@ -62,17 +62,25 @@ class Table_Benchmark_Conversion_Rate extends Base_Table_Report {
 
 			$current_step = $steps[0];
 
-			$total = $this->get_num_of_completed_contacts( $current_step->get_id(), $this->start, $this->end );
+			if( $current_step ) {
 
-			return [
-				[
-					'from'   => $current_step->get_step_title(),
-					'total1' => $total,
-					'to'     => '',
-					'total2' => '',
-					'scr'    => percentage( $total, $total ) . '%'
-				]
-			];
+
+				$total = $this->get_num_of_completed_contacts( $current_step->get_id(), $this->start, $this->end );
+
+				return [
+					[
+						'from'   => $current_step->get_step_title(),
+						'total1' => $total,
+						'to'     => '',
+						'total2' => '',
+						'scr'    => percentage( $total, $total ) . '%'
+					]
+				];
+			} else {
+
+				return [];
+
+			}
 
 
 		}
