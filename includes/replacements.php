@@ -374,6 +374,13 @@ class Replacements {
 			return $default;
 		}
 
+		$cache_key   = 'key:' . md5( serialize( $parts ) . '|' . $this->contact_id );
+		$cache_value = wp_cache_get( $cache_key, 'replacements' );
+
+		if ( $cache_value ) {
+			return $cache_value;
+		}
+
 		// Access contact fields.
 		if ( substr( $code, 0, 1 ) === '_' ) {
 			$field = substr( $code, 1 );
@@ -388,7 +395,10 @@ class Replacements {
 			$text = $default;
 		}
 
-		return apply_filters( "groundhogg/replacements/{$code}", $text );
+		$value = apply_filters( "groundhogg/replacements/{$code}", $text );
+		wp_cache_set( $cache_key, $value, 'replacements' );
+
+		return $value;
 
 	}
 
