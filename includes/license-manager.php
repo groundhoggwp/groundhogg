@@ -173,6 +173,14 @@ class License_Manager {
 	 * @return bool|\WP_Error
 	 */
 	public static function activate_license_quietly( $license, $item_id ) {
+
+		$existing_license = self::get_license( $item_id );
+
+		// If there is no change in the license...
+		if ( $existing_license === $license ){
+			return true;
+		}
+
 		$api_params = array(
 			'edd_action' => 'activate_license',
 			'license'    => $license,
@@ -241,6 +249,13 @@ class License_Manager {
 	}
 
 	public static function activate_license( $license, $item_id ) {
+
+	    $existing_license = self::get_license( $item_id );
+
+	    // If there is no change in the license...
+	    if ( $existing_license === $license ){
+	        return true;
+        }
 
 		$api_params = array(
 			'edd_action' => 'activate_license',

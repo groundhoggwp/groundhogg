@@ -441,7 +441,7 @@ abstract class Extension {
 	 * @return bool|string
 	 */
 	public function get_expiry() {
-		return get_array_var( $this->get_extension_details(), 'expiry' );
+		return date_i18n( get_date_time_format(), strtotime( get_array_var( $this->get_extension_details(), 'expiry' ) ) );
 	}
 
 	/**
