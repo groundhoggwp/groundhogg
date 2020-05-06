@@ -196,10 +196,14 @@ class Broadcasts_Table extends WP_List_Table {
 
 			case 'sent':
 
-				$edit_url = groundhogg_url( 'broadcasts', [
-					'action'    => 'report',
-					'broadcast' => $broadcast->get_id()
-				] );
+				if ( $broadcast->is_email() ){
+					$edit_url = admin_page_url( 'gh_reporting', [ 'tab' => 'broadcasts', 'broadcast' => $broadcast->get_id() ] );
+				} else {
+					$edit_url = groundhogg_url( 'broadcasts', [
+						'action'    => 'report',
+						'broadcast' => $broadcast->get_id()
+					] );
+				}
 
 				$html = sprintf( "<strong><a class='row-title' href='%s'>%s</a></strong>", $edit_url, $broadcast->get_title() );
 

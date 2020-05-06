@@ -104,7 +104,14 @@ class Form_Impressions extends DB {
 			$this->get_column_defaults()
 		);
 
-		if ( $records = $this->query( [ 'ip_address' => $args['ip_address'], 'form_id' => $args['form_id'] ] ) ) {
+		$records = $this->query( [
+			'ip_address' => $args['ip_address'],
+			'form_id'    => $args['form_id'],
+			'before'     => time(),
+			'after'      => time() - DAY_IN_SECONDS
+		] );
+
+		if ( ! empty( $records ) ) {
 
 			$record = array_shift( $records );
 			$id     = absint( $record->ID );
@@ -125,7 +132,7 @@ class Form_Impressions extends DB {
 	/**
 	 * Set the referer hash as aan easier method to search thru the activity
 	 */
-	public function update_2_2(){
+	public function update_2_2() {
 		global $wpdb;
 		$result = $wpdb->query( "UPDATE `{$this->get_table_name()}` SET `views` = `count` WHERE `count` > 0 ;" );
 		$result = $wpdb->query( "ALTER TABLE `{$this->get_table_name()}` DROP `count`;" );

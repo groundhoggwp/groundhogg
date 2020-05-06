@@ -20,12 +20,12 @@ abstract class Base_Negative_Quick_Stat extends Base_Quick_Stat {
 		$direction = '';
 		$color     = '';
 
-		if ( $current_data < $compare_data ) {
+		if ( $current_data > $compare_data ) {
 			$direction = 'up';
-			$color     = 'green';
-		} else if ( $current_data > $compare_data  ) {
-			$direction = 'down';
 			$color     = 'red';
+		} else if ( $current_data < $compare_data  ) {
+			$direction = 'down';
+			$color     = 'green';
 		}
 
 		return [

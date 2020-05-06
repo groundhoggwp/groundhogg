@@ -189,7 +189,8 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * TEAKED Contact submissions table now shows link to form instead of form ID
 * FIXED Bug causing broadcast events to be deleted if a funnel step with the same ID was deleted.
 * FIXED Bug causing the contacts' time zone to be UTC-0 if one was not provided.
-* FIXED `create_user_from_contact()` missing user's email address
+* FIXED `create_user_from_contact()` missing user's email address.
+* FIXED Newline characters appearing in tag names when bulk editing.
 
 = 2.1.14.1 (2020-04-20) =
 * ADDED Tab in tools to show how to enable the gh-cron.php file
