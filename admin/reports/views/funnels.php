@@ -46,8 +46,9 @@ foreach ( $funnels as $funnel ) {
 		] );
 
 		$args = array(
-			'name'        => 'funnel',
+			'name'        => 'funnel_id',
 			'id'          => 'funnel-id',
+			'class'       => 'post-data',
 			'options'     => $options,
 			'selected'    => absint( get_request_var( 'funnel', get_cookie( 'gh_reporting_funnel_id' ) ) ),
 			'option_none' => false,

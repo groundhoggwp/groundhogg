@@ -1,12 +1,12 @@
 <?php
 
 namespace Groundhogg\Admin\Reports\Views;
+
 use Groundhogg\Broadcast;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use function Groundhogg\get_db;
 use function Groundhogg\get_url_var;
-
 
 $broadcasts = get_db( 'broadcasts' );
 $broadcasts = $broadcasts->query( [ 'status' => 'sent' ] );
@@ -21,10 +21,11 @@ foreach ( $broadcasts as $broadcast ) {
 
 ?>
 <div class="actions" style="float: right">
-    <?php
+	<?php
 	$args = array(
 		'name'        => 'broadcast_id',
 		'id'          => 'broadcast-id',
+		'class'       => 'post-data',
 		'selected'    => absint( get_url_var( 'broadcast' ) ),
 		'options'     => $options,
 		'option_none' => false,

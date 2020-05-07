@@ -138,12 +138,16 @@ function tool_tip_title() {
         },
 
         get_other_data: function () {
-            return {
-                funnel_id: $('#funnel-id').val(),
-                broadcast_id: $('#broadcast-id').val(),
-                country: $('#country').val(),
-                email_id: $('#email_id').val(),
-            };
+
+            var self = this;
+            var data = {};
+
+            $( '.post-data' ).each( function ( i ) {
+                var $this = $(this);
+                data[ $this.attr( 'name' ) ] = $this.val();
+            });
+
+            return data;
         },
 
         renderReports: function () {

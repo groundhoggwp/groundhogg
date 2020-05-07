@@ -9,6 +9,7 @@ echo html()->input( [
 	'type'  => 'hidden',
 	'name'  => 'email_id',
 	'id'    => 'email_id',
+	'class' => 'post-data',
 	'value' => absint( get_url_var( 'email' ) )
 ] )
 

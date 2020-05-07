@@ -96,6 +96,7 @@ use function Groundhogg\is_white_labeled;
 				$args = array(
 					'name'        => 'country',
 					'id'          => 'country',
+					'class'       => 'post-data',
 					'data'        => Plugin::$instance->utils->location->get_countries_list( '', true ),
 					'selected'    => [ Plugin::$instance->utils->location->site_country_code() ],
 					'option_none' => false,
