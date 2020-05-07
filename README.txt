@@ -185,12 +185,13 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * TWEAKED Event queue is now a separate table `gh_event_queue` for faster processing, completed events are moved to the `gh_events` table.
 * TWEAKED Updated the managed page style to reflect modern WordPress.
 * TWEAKED Improved form impression tracking
-* TEAKED Added form name attribute to forms for GA compatibility
-* TEAKED Contact submissions table now shows link to form instead of form ID
+* TWEAKED Added form name attribute to forms for GA compatibility
+* TWEAKED Contact submissions table now shows link to form instead of form ID
 * FIXED Bug causing broadcast events to be deleted if a funnel step with the same ID was deleted.
 * FIXED Bug causing the contacts' time zone to be UTC-0 if one was not provided.
 * FIXED `create_user_from_contact()` missing user's email address.
 * FIXED Newline characters appearing in tag names when bulk editing.
+* REMOVED the `do_api_benchmark` REST endpoint and moved it to the advanced features extension.
 
 = 2.1.14.1 (2020-04-20) =
 * ADDED Tab in tools to show how to enable the gh-cron.php file

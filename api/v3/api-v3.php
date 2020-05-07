@@ -1,4 +1,5 @@
 <?php
+
 namespace Groundhogg\Api\V3;
 
 /**
@@ -7,81 +8,73 @@ namespace Groundhogg\Api\V3;
  * Date: 12/12/2018
  * Time: 4:18 PM
  */
+class API_V3 {
 
-class API_V3
-{
-
-    /**
-     * @var BASE[]
-     */
-    public $apis = [];
+	/**
+	 * @var BASE[]
+	 */
+	public $apis = [];
 
 
-    public function __construct()
-    {
-        define( 'DOING_GROUNDHOGG_REST_REQUEST', true );
+	public function __construct() {
+		define( 'DOING_GROUNDHOGG_REST_REQUEST', true );
 
-        /**
-         * Use this action to declare extension endpoints...
-         */
-        do_action( 'groundhogg/api/v3/pre_init', $this );
+		/**
+		 * Use this action to declare extension endpoints...
+		 */
+		do_action( 'groundhogg/api/v3/pre_init', $this );
 
-        $this->declare_base_endpoints();
+		$this->declare_base_endpoints();
 
-        do_action( 'groundhogg/api/v3/init', $this );
+		do_action( 'groundhogg/api/v3/init', $this );
 
-    }
+	}
 
-    /**
-     * Declare the initial endpoints.
-     */
-    public function declare_base_endpoints()
-    {
-        $this->contacts = new Contacts_Api();
-        $this->authentication = new Authentication_Api();
-        $this->tags     = new Tags_Api();
-        $this->emails   = new Email_Api();
-        $this->tracking = new Tracking_Api();
-        $this->data     = new Data_Api();
-        $this->reports  = new Reports_Api();
-        $this->broadcasts = new Broadcasts_Api();
-        $this->bulk_job = new Bulk_Job_Api();
-//        $this->forms    = new Forms_Api();
-        $this->plugin_api = new Plugin_Api();
-        $this->unsubscribe_api = new Unsubscribe_Api();
+	/**
+	 * Declare the initial endpoints.
+	 */
+	public function declare_base_endpoints() {
+		$this->contacts        = new Contacts_Api();
+		$this->authentication  = new Authentication_Api();
+		$this->tags            = new Tags_Api();
+		$this->emails          = new Email_Api();
+		$this->tracking        = new Tracking_Api();
+		$this->data            = new Data_Api();
+		$this->reports         = new Reports_Api();
+		$this->broadcasts      = new Broadcasts_Api();
+		$this->bulk_job        = new Bulk_Job_Api();
+		$this->unsubscribe_api = new Unsubscribe_Api();
+	}
 
-    }
+	/**
+	 * Get API class
+	 *
+	 * @param $name
+	 *
+	 * @return mixed | BASE
+	 */
+	public function __get( $name ) {
+		if ( property_exists( $this, $name ) ) {
 
-    /**
-     * Get API class
-     *
-     * @param $name
-     * @return mixed | BASE
-     */
-    public function __get($name)
-    {
-        if ( property_exists( $this, $name ) ){
+			return $this->$name;
 
-            return $this->$name;
+		} else if ( isset( $this->apis[ $name ] ) ) {
 
-        } else if ( isset( $this->apis[ $name ] ) ){
+			return $this->apis[ $name ];
 
-            return $this->apis[ $name ];
+		} else {
+			return false;
+		}
+	}
 
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Set extension apis
-     *
-     * @param $name
-     * @param $value
-     */
-    public function __set( $name, $value )
-    {
-        $this->apis[ $name ] = $value;
-    }
+	/**
+	 * Set extension apis
+	 *
+	 * @param $name
+	 * @param $value
+	 */
+	public function __set( $name, $value ) {
+		$this->apis[ $name ] = $value;
+	}
 
 }
