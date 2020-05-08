@@ -308,9 +308,7 @@ class Replacements {
 			return $content;
 		}
 
-		$new_content = preg_replace_callback( "/{([^{}]+)}/s", array( $this, 'do_replacement' ), $content );
-
-		return $new_content;
+		return preg_replace_callback( "/{([^{}]+)}/s", array( $this, 'do_replacement' ), $content );
 	}
 
 	/**
@@ -374,7 +372,7 @@ class Replacements {
 			return $default;
 		}
 
-		$cache_key   = 'key:' . md5( serialize( $parts ) . '|' . $this->contact_id );
+		$cache_key   = 'key:' . $this->contact_id . ':' . md5( serialize( $parts ) );
 		$cache_value = wp_cache_get( $cache_key, 'replacements' );
 
 		if ( $cache_value ) {
