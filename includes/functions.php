@@ -1643,12 +1643,19 @@ function get_mappable_fields( $extra = [] ) {
 /**
  * Generate a contact from given associative array and a field map.
  *
- * @param $fields
- * @param $map
+ * @param $fields array the raw data from the source
+ * @param $map array map of field_ids to contact keys
  *
  * @return Contact|false
+ * @throws \Exception
  */
-function generate_contact_with_map( $fields, $map ) {
+function generate_contact_with_map( $fields, $map = [] ) {
+
+	if ( empty( $map ) ) {
+		$keys = array_keys( $fields );
+		$map  = array_combine( $keys, $keys );
+	}
+
 	$meta  = [];
 	$tags  = [];
 	$notes = [];
