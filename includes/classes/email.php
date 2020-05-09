@@ -704,8 +704,8 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return bool
 	 */
-	public function is_transactional(){
-		return $this->get_meta( 'message_type')  === 'transactional';
+	public function is_transactional() {
+		return $this->get_meta( 'message_type' ) === 'transactional';
 	}
 
 	/**
@@ -956,11 +956,17 @@ class Email extends Base_Object_With_Meta {
 
 		$steps_ids = wp_parse_id_list( wp_list_pluck( $steps, 'step_id' ) );
 
+		$count        = 0;
+		$opened       = 0;
+		$clicked      = 0;
+		$all_clicked  = 0;
+		$unsubscribed = 0;
+
 		if ( ! empty( $steps_ids ) ) {
 
 			$where_events = [
 				'relationship' => "AND",
-				[ 'col' => 'step_id', 'val' => $steps_ids, 'compare' => '=' ],
+				[ 'col' => 'step_id', 'val' => $steps_ids, 'compare' => 'IN' ],
 				[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
 				[ 'col' => 'time', 'val' => $start, 'compare' => '>=' ],
 				[ 'col' => 'time', 'val' => $end, 'compare' => '<=' ],
@@ -991,19 +997,30 @@ class Email extends Base_Object_With_Meta {
 			];
 
 			$clicked = get_db( 'activity' )->count( [
+				'select' => 'DISTINCT contact_id',
+				'where'  => $where_clicked
+			] );
+
+			$all_clicked = get_db( 'activity' )->count( [
 				'where' => $where_clicked
 			] );
 
-		} else {
-			$count   = 0;
-			$opened  = 0;
-			$clicked = 0;
+			$unsubscribed = get_db( 'activity' )->count( [
+				'email_id'      => $this->get_id(),
+				'activity_type' => Activity::UNSUBSCRIBED,
+				'before'        => $end,
+				'after'         => $start,
+			] );
+
 		}
 
 		return [
-			'sent'    => $count,
-			'opened'  => $opened,
-			'clicked' => $clicked
+			'steps'        => $steps_ids,
+			'sent'         => $count,
+			'opened'       => $opened,
+			'clicked'      => $clicked,
+			'all_clicks'   => $all_clicked,
+			'unsubscribed' => $unsubscribed,
 		];
 	}
 

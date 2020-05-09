@@ -20,6 +20,7 @@ use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Lead_Source;
 use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Search_Engines;
 use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Social_Media;
 use Groundhogg\Reporting\New_Reports\Table_Contacts_By_Source_Pages;
+use Groundhogg\Reporting\New_Reports\Table_Email_Funnels_Used_In;
 use Groundhogg\Reporting\New_Reports\Table_Email_Links_Clicked;
 use Groundhogg\Reporting\New_Reports\Table_Email_Stats;
 use Groundhogg\Reporting\New_Reports\Table_Form_Activity;
@@ -239,6 +240,10 @@ class Reports {
 			[
 				'id'       => 'table_funnel_stats',
 				'callback' => [ $this, 'table_funnel_stats' ]
+			],
+			[
+				'id'       => 'table_email_funnels_used_in',
+				'callback' => [ $this, 'table_email_funnels_used_in' ]
 			]
 		];
 
@@ -676,6 +681,12 @@ class Reports {
 
 	public function table_funnel_stats(){
 		$report = new Table_Funnel_Stats( $this->start, $this->end );
+
+		return $report->get_data();
+	}
+
+	public function table_email_funnels_used_in(){
+		$report = new Table_Email_Funnels_Used_In( $this->start, $this->end );
 
 		return $report->get_data();
 	}

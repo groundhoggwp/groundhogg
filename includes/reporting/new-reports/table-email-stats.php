@@ -41,6 +41,7 @@ class Table_Email_Stats extends Base_Table_Report {
 					'href'  => add_query_arg(
 						[
 							'report' => [
+								'step'   => $stats[ 'steps' ],
 								'type'   => Event::FUNNEL,
 								'status' => Event::COMPLETE,
 								'before' => $this->end,
@@ -70,7 +71,13 @@ class Table_Email_Stats extends Base_Table_Report {
 				] )
 			],
 			[
-				'label' => __( 'Clicks', 'groundhogg' ),
+				'label' => __( 'Total Clicks', 'groundhogg' ),
+				'data'  => html()->wrap( $stats['all_clicks'], 'span', [
+					'class' => 'number-total'
+				] )
+			],
+			[
+				'label' => __( 'Unique Clicks', 'groundhogg' ),
 				'data'  => html()->wrap( $stats['clicked'] . ' (' . percentage( $stats['sent'], $stats['clicked'] ) . '%)', 'a', [
 					'href'  => add_query_arg(
 						[
@@ -90,7 +97,23 @@ class Table_Email_Stats extends Base_Table_Report {
 				'label' => __( 'Click Thru Rate', 'groundhogg' ),
 				'data'  => percentage( $stats['opened'], $stats['clicked'] ) . '%'
 			],
-
+			[
+				'label' => __( 'Unsubscribed', 'groundhogg' ),
+				'data'  => html()->wrap( $stats['unsubscribed'] . ' (' . percentage( $stats['sent'], $stats['unsubscribed'] ) . '%)', 'a', [
+					'href'  => add_query_arg(
+						[
+							'activity' => [
+								'activity_type' => Activity::UNSUBSCRIBED,
+								'email_id'      => $email->get_id(),
+								'after'         => $this->start,
+								'before'        => $this->end
+							]
+						],
+						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
+					),
+					'class' => 'number-total'
+				] )
+			],
 		];
 
 	}

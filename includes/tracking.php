@@ -555,7 +555,6 @@ class Tracking {
 			'email_id'      => $this->get_tracking_cookie_param( 'email_id', 0 ),
 			'activity_type' => Activity::EMAIL_OPENED,
 			'event_id'      => $event->get_id(),
-			'referer'       => ''
 		);
 
 		if ( ! get_db( 'activity' )->exists( $args ) ) {
@@ -609,7 +608,8 @@ class Tracking {
 			'email_id'      => $this->get_tracking_cookie_param( 'email_id', 0 ),
 			'activity_type' => Activity::EMAIL_CLICKED,
 			'event_id'      => $event->get_id(),
-			'referer'       => $target
+			'referer'       => $target,
+			'referer_hash'  => generate_referer_hash( $target )
 		);
 
 		if ( get_db( 'activity' )->add( $args ) ) {

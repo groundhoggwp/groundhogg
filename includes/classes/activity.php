@@ -11,7 +11,7 @@ class Activity extends Base_Object {
 	const EMAIL_CLICKED   = 'email_link_click';
 	const FORM_IMPRESSION = 'form_impression';
 	const FORM_SUBMISSION = 'form_submission';
-	const UNSUBSCRIBED    = 'unsubsribed';
+	const UNSUBSCRIBED    = 'unsubscribed';
 	const PAGE_VIEW       = 'page_view';
 
 	/**

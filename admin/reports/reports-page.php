@@ -171,6 +171,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 				'email_open_rate',
 				'email_click_rate',
 				'chart_donut_email_stats',
+                'table_email_funnels_used_in'
 			],
 			'forms'      => [
 				'table_form_activity',

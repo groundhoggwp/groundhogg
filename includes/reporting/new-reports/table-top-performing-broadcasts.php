@@ -52,9 +52,9 @@ class Table_Top_Performing_Broadcasts extends Base_Email_Performance_Table_Repor
 			if ( $this->should_include( $report['sent'], $report['opened'], $report ['clicked'] ) ) {
 				$list[] = [
 					'label'   => $title,
-					'url'     => admin_page_url( 'gh_emails', [
-						'action' => 'edit',
-						'email'  => $email->get_id()
+					'url'     => admin_page_url( 'gh_reporting', [
+						'tab' => 'broadcasts',
+						'broadcast'  => $email->get_id()
 					] ),
 					'sent'    => $report['sent'],
 					'opened'  => percentage( $report['sent'], $report['opened'] ),

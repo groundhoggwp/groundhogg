@@ -116,6 +116,10 @@ class Activity extends DB {
 	 * Add a activity
 	 *
 	 * @access  public
+	 *
+	 * @param array $data
+	 *
+	 * @return int
 	 * @since   2.1
 	 */
 	public function add( $data = [] ) {

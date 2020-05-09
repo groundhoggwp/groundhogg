@@ -529,7 +529,7 @@ class Submission_Handler extends Supports_Errors {
 		}
 
 		// Prevent spam campaign First: artyukhaGuarmrenXK Last: DumuroGuarmrenXK
-		if ( preg_match( '/XK$/', $first ) && preg_match( '/XK$/', $last ) ) {
+		if ( preg_match( '/XK$/', $first ) || preg_match( '/XK$/', $last ) ) {
 			return true;
 		}
 

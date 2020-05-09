@@ -206,7 +206,7 @@ class Broadcast extends Base_Object implements Event_Process {
 
 		do_action( "groundhogg/broadcast/{$this->get_broadcast_type()}/before", $this, $contact, $event );
 
-		if ( ! $this->get_object() || ! $this->get_object()->exists() ){
+		if ( ! $this->get_object() || ! $this->get_object()->exists() ) {
 			return new \WP_Error( 'object_error', 'Could not find email or SMS to send.' );
 		}
 
@@ -254,15 +254,27 @@ class Broadcast extends Base_Object implements Event_Process {
 
 			if ( ! $this->is_sms() ) {
 				$data['opened']             = get_db( 'activity' )->count( [
+					'select'        => 'DISTINCT contact_id',
 					'funnel_id'     => $this->get_funnel_id(),
 					'step_id'       => $this->get_id(),
 					'activity_type' => Activity::EMAIL_OPENED
 				] );
 				$data['open_rate']          = percentage( $data['sent'], $data['opened'] );
 				$data['clicked']            = get_db( 'activity' )->count( [
+					'select'        => 'DISTINCT contact_id',
 					'funnel_id'     => $this->get_funnel_id(),
 					'step_id'       => $this->get_id(),
 					'activity_type' => Activity::EMAIL_CLICKED
+				] );
+				$data['all_clicks']      = get_db( 'activity' )->count( [
+					'funnel_id'     => $this->get_funnel_id(),
+					'step_id'       => $this->get_id(),
+					'activity_type' => Activity::EMAIL_CLICKED
+				] );
+				$data['unsubscribed']       = get_db( 'activity' )->count( [
+					'funnel_id'     => $this->get_funnel_id(),
+					'step_id'       => $this->get_id(),
+					'activity_type' => Activity::UNSUBSCRIBED
 				] );
 				$data['click_through_rate'] = percentage( $data['clicked'], $data['opened'] );
 				$data['unopened']           = $data['sent'] - $data['opened'];

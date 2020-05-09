@@ -59,3 +59,9 @@ echo html()->input( [
         <div id="table_email_links_clicked"></div>
     </div>
 </div
+<div class="groundhogg-chart-wrapper">
+    <div class="groundhogg-chart-no-padding full-width">
+        <h2 class="title"><?php _e( 'Funnels', 'groundhogg' ); ?></h2>
+        <div id="table_email_funnels_used_in"></div>
+    </div>
+</div

@@ -9,6 +9,7 @@ use Groundhogg\Event;
 use Groundhogg\Plugin;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
@@ -23,7 +24,7 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 	protected function get_broadcast_id() {
 		$id = absint( get_array_var( get_request_var( 'data', [] ), 'broadcast_id' ) );
 
-		if ( ! $id ){
+		if ( ! $id ) {
 
 			$broadcasts = get_db( 'broadcasts' )->query( [
 				'status'  => 'sent',
@@ -32,7 +33,7 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 				'limit'   => 1
 			] );
 
-			if ( ! empty( $broadcasts) ){
+			if ( ! empty( $broadcasts ) ) {
 				$id = absint( array_shift( $broadcasts )->ID );
 			}
 		}
@@ -51,10 +52,17 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 			[
 				'label' => __( 'Subject', 'groundhogg' ),
 				'data'  => html()->wrap( $title, 'a', [
-					'href'  => admin_page_url( 'gh_reporting', [ 'tab' => 'broadcasts', 'broadcast' => $broadcast->get_id() ] ),
+					'href'  => admin_page_url( 'gh_reporting', [
+						'tab'       => 'broadcasts',
+						'broadcast' => $broadcast->get_id()
+					] ),
 					'title' => $title,
 					'class' => 'number-total'
 				] )
+			],
+			[
+				'label' => __( 'Sent', 'groundhogg' ),
+				'data'  => date_i18n( get_date_time_format(), $broadcast->get_send_time() ),
 			],
 			[
 				'label' => __( 'Total Delivered', 'groundhogg' ),
@@ -89,7 +97,13 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 				] )
 			],
 			[
-				'label' => __( 'Clicks', 'groundhogg' ),
+				'label' => __( 'Total Clicks', 'groundhogg' ),
+				'data'  => html()->wrap( $stats['all_clicks'], 'span', [
+					'class' => 'number-total'
+				] )
+			],
+			[
+				'label' => __( 'Unique Clicks', 'groundhogg' ),
 				'data'  => html()->wrap( $stats['clicked'] . ' (' . percentage( $stats['sent'], $stats['clicked'] ) . '%)', 'a', [
 					'href'  => add_query_arg(
 						[
@@ -111,6 +125,22 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 			[
 				'label' => __( 'Unopened', 'groundhogg' ),
 				'data'  => $stats['unopened'] . ' (' . percentage( $stats['sent'], $stats['unopened'] ) . '%)'
+			],
+			[
+				'label' => __( 'Unsubscribed', 'groundhogg' ),
+				'data'  => html()->wrap( $stats['unsubscribed'] . ' (' . percentage( $stats['sent'], $stats['unsubscribed'] ) . '%)', 'a', [
+					'href'  => add_query_arg(
+						[
+							'activity' => [
+								'activity_type' => Activity::UNSUBSCRIBED,
+								'step_id'       => $broadcast->get_id(),
+								'funnel_id'     => $broadcast->get_funnel_id()
+							]
+						],
+						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
+					),
+					'class' => 'number-total'
+				] )
 			],
 
 		];

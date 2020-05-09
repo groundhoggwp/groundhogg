@@ -22,13 +22,14 @@ class Email_Click_Rate extends Base_Quick_Stat_Percent {
 		$db = get_db( 'activity' );
 
 		$query = [
+			'select'        => 'DISTINCT contact_id',
 			'activity_type' => Activity::EMAIL_CLICKED,
-			'before' => $end,
-			'after' => $start
+			'before'        => $end,
+			'after'         => $start
 		];
 
-		if ( $this->get_email_id() ){
-			$query[ 'email_id' ] = $this->get_email_id();
+		if ( $this->get_email_id() ) {
+			$query['email_id'] = $this->get_email_id();
 		}
 
 		return $db->count( $query );
@@ -47,13 +48,14 @@ class Email_Click_Rate extends Base_Quick_Stat_Percent {
 		$db = get_db( 'activity' );
 
 		$query = [
+			'select'        => 'DISTINCT contact_id',
 			'activity_type' => Activity::EMAIL_OPENED,
-			'before' => $end,
-			'after' => $start
+			'before'        => $end,
+			'after'         => $start
 		];
 
-		if ( $this->get_email_id() ){
-			$query[ 'email_id' ] = $this->get_email_id();
+		if ( $this->get_email_id() ) {
+			$query['email_id'] = $this->get_email_id();
 		}
 
 		return $db->count( $query );
