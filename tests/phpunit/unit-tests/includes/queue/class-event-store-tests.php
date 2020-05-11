@@ -11,16 +11,16 @@ class Event_Store_Tests extends GH_UnitTestCase {
 		$store = new \Groundhogg\Queue\Event_Store();
 
 		// Should be first
-		$this->factory()->events->create_many( 5, [ 'priority' => 10 ] );
+		$this->factory()->event_queue->create_many( 5, [ 'priority' => 10 ] );
 		// Should be ignored
-		$this->factory()->events->create_many( 5, [ 'priority' => 10, 'time' => time() + MINUTE_IN_SECONDS ] );
+		$this->factory()->event_queue->create_many( 5, [ 'priority' => 10, 'time' => time() + MINUTE_IN_SECONDS ] );
 		// Should be last
-		$this->factory()->events->create_many( 10, [ 'priority' => 100 ] );
+		$this->factory()->event_queue->create_many( 10, [ 'priority' => 100 ] );
 
 		$ids = $store->get_queued_event_ids();
 
-		$top_event    = new \Groundhogg\Event( array_shift( $ids ) );
-		$bottom_event = new \Groundhogg\Event( array_pop( $ids ) );
+		$top_event    = new \Groundhogg\Event( array_shift( $ids ), 'event_queue' );
+		$bottom_event = new \Groundhogg\Event( array_pop( $ids ), 'event_queue' );
 
 		$this->assertEquals( 10, $top_event->get_priority() );
 		$this->assertEquals( 100, $bottom_event->get_priority() );
@@ -37,28 +37,28 @@ class Event_Store_Tests extends GH_UnitTestCase {
 		$base_time = time();
 
 		// Should be last
-		$this->factory()->events->create_many( 1, [
+		$this->factory()->event_queue->create_many( 1, [
 			'time'      => $base_time - HOUR_IN_SECONDS,
 			'priority'  => 100,
 			'funnel_id' => 1,
 		] );
 
 		// Should be third
-		$this->factory()->events->create_many( 1, [
+		$this->factory()->event_queue->create_many( 1, [
 			'time'      => $base_time - WEEK_IN_SECONDS,
 			'priority'  => 50,
 			'funnel_id' => 4,
 		] );
 
 		// Should be second
-		$this->factory()->events->create_many( 1, [
+		$this->factory()->event_queue->create_many( 1, [
 			'time'      => $base_time - MINUTE_IN_SECONDS,
 			'priority'  => 10,
 			'funnel_id' => 2,
 		] );
 
 		// Should be first
-		$this->factory()->events->create_many( 1, [
+		$this->factory()->event_queue->create_many( 1, [
 			'time'      => $base_time - DAY_IN_SECONDS,
 			'priority'  => 10,
 			'funnel_id' => 3,
@@ -69,7 +69,7 @@ class Event_Store_Tests extends GH_UnitTestCase {
 		$events = [];
 
 		foreach ( $ids as $id ) {
-			$events[] = new \Groundhogg\Event( $id );
+			$events[] = new \Groundhogg\Event( $id, 'event_queue' );
 		}
 
 		$this->assertEquals( 3, $events[0]->get_funnel_id() );

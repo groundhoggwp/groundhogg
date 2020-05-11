@@ -341,12 +341,12 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Compliance', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'marketing'
 			),
-			'sendwp'            => [
-				'id'       => 'sendwp',
-				'title'    => _x( 'SendWP', 'settings_sections', 'groundhogg' ),
-				'tab'      => 'email',
-				'callback' => [ SendWp::instance(), 'settings_connect_ui' ],
-			],
+//			'sendwp'            => [
+//				'id'       => 'sendwp',
+//				'title'    => _x( 'SendWP', 'settings_sections', 'groundhogg' ),
+//				'tab'      => 'email',
+//				'callback' => [ SendWp::instance(), 'settings_connect_ui' ],
+//			],
 			'overrides'         => [
 				'id'    => 'overrides',
 				'title' => _x( 'Overrides', 'settings_sections', 'groundhogg' ),

@@ -192,6 +192,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * FIXED `create_user_from_contact()` missing user's email address.
 * FIXED Newline characters appearing in tag names when bulk editing.
 * REMOVED the `do_api_benchmark` REST endpoint and moved it to the advanced features extension.
+* REMOVED SendWP promotion.
 
 = 2.1.14.1 (2020-04-20) =
 * ADDED Tab in tools to show how to enable the gh-cron.php file

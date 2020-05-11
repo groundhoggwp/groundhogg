@@ -69,8 +69,8 @@ class Event extends Base_Object {
 	 * Event constructor.
 	 *
 	 * @param int $identifier_or_args
-	 * @param null $field
 	 * @param string $db allow for the passing of the db name, this allows the reference of the event_queue table OR the regular events table.
+	 * @param string $field the field to identify when querying the DB
 	 */
 	public function __construct( $identifier_or_args = 0, $db = 'events', $field = 'ID' ) {
 

@@ -186,6 +186,13 @@ class Email extends Base_Object_With_Meta {
 	/**
 	 * @return bool
 	 */
+	public function is_ready() {
+		return $this->get_status() === 'ready';
+	}
+
+	/**
+	 * @return bool
+	 */
 	public function has_custom_alt_body() {
 		return boolval( $this->get_meta( 'use_custom_alt_body' ) );
 	}
@@ -720,7 +727,7 @@ class Email extends Base_Object_With_Meta {
 		// Clear any old previous errors.
 		$this->clear_errors();
 
-		if ( $this->is_draft() && ! $this->is_testing() ) {
+		if ( ! $this->is_ready() && ! $this->is_testing() ) {
 			return new WP_Error( 'email_not_ready', sprintf( __( 'Emails cannot be sent in %s mode.', 'groundhogg' ), $this->get_status() ) );
 		}
 

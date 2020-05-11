@@ -16,7 +16,7 @@ class Event_Queue_Tests extends GH_UnitTestCase {
 
 		$this->factory()->truncate();
 
-		$this->factory()->events->create_many( 10 );
+		$this->factory()->event_queue->create_many( 10 );
 
 		$count = Plugin::instance()->event_queue->run_queue();
 

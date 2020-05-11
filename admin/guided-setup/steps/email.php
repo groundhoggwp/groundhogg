@@ -17,105 +17,80 @@ use function Groundhogg\isset_not_empty;
  * Date: 2019-02-27
  * Time: 11:03 AM
  */
-class Email extends Step
-{
+class Email extends Step {
 
-    public function get_title()
-    {
-        return _x('Sending Email', 'guided_setup', 'groundhogg');
-    }
+	public function get_title() {
+		return _x( 'Sending Email', 'guided_setup', 'groundhogg' );
+	}
 
-    public function get_slug()
-    {
-        return 'email_info';
-    }
+	public function get_slug() {
+		return 'email_info';
+	}
 
-    public function scripts()
-    {
-        wp_enqueue_script( 'groundhogg-sendwp' );
-    }
+	public function scripts() {
+		wp_enqueue_script( 'groundhogg-sendwp' );
+	}
 
-    protected function step_nav(){}
+	protected function step_nav() {
+	}
 
-    public function get_description()
-    {
-        if (!Plugin::$instance->sending_service->has_dns_records()):
-            return _x('See below to setup the Groundhogg Sending Service.', 'guided_setup', 'groundhogg');
-        else:
-            return _x('There are different ways to send email with Groundhogg! Choose one below.', 'guided_setup', 'groundhogg');
-        endif;
-    }
+	public function get_description() {
+		return _x( 'There are different ways to send email with Groundhogg! We recommend using a trusted sending service like SendGrid or AWS. Luckily, we provide integration for both!', 'guided_setup', 'groundhogg' );
+	}
 
-    public function get_content()
-    {
+	public function get_content() {
 
-        /* Will check to see if they've gone through the process */
-        if (Plugin::$instance->sending_service->has_dns_records()):
-            Plugin::$instance->sending_service->get_dns_table();
-            return;
+		$downloads = License_Manager::get_store_products( [
+			'tag' => 'sending-service'
+		] );
 
-        endif;
+		foreach ( $downloads->products as $download ):
+			$extension = (object) $download;
 
-        SendWp::instance()->output_css();
+			?>
+			<div class="postbox">
+				<div class="card-top">
+					<h3 class="extension-title">
+						<?php esc_html_e( $download->info->title ); ?>
+						<img class="thumbnail" src="<?php echo esc_url( $extension->info->thumbnail ); ?>"
+						     alt="<?php esc_attr_e( $extension->info->title ); ?>">
+					</h3>
+					<p class="extension-description">
+						<?php esc_html_e( $extension->info->excerpt ); ?>
+					</p>
+				</div>
+				<div class="install-actions">
 
-        ?>
-        <style type="text/css">
-            #groundhogg-sendwp-connect {
-                display: block;
-                margin: 20px auto 20px auto;
-                padding: 8px 14px;
-            }
-            #connect-send-wp h3{
-                text-align: center;
-            }
-            #connect-send-wp p{
-                font-size: 14px;
-            }
-            #connect-send-wp{
-                margin: 60px auto;
-            }
-        </style>
+					<?php
 
-        <div id="connect-send-wp">
-            <h3 id="connect-send-wp-h3"><?php _e( 'Never worry about email deliverability again!' ); ?></h3>
-            <?php
+					echo html()->e( 'a', [
+						'href' => $extension->info->link,
+						'class' => 'button',
+						'target' => '_blank'
+					], __( 'Integrate this service!' ) );
 
-            SendWp::instance()->output_connect_button();
-            SendWp::instance()->output_js();
-            ?>
-            <p id="connect-send-wp-p"><?php _e( '<a href="https://sendwp.com/" target="_blank">SendWP</a> makes WordPress email delivery as simple as a few clicks. Send unlimited email, just <b>$9/month</b>.', 'groundhogg' ); ?></p>
-        </div>
-        <h3><?php _e( 'Alternatives' ); ?></h3>
-        <style>
-            .premium-smtp-plugins .postbox {
-                width: 49%;
-                display: inline-block;
-            }
-        </style>
-        <div class="premium-smtp-plugins">
-            <?php
+					?>
 
-            $smtp_plugins = License_Manager::get_store_products(array(
-                'tag' => [150],
-            ));
+					<?php echo html()->e( 'a', [
+						'href'   => $extension->info->link,
+						'target' => '_blank',
+						'class'  => 'more-details',
+					], __( 'More details' ) ); ?>
+				</div>
+			</div>
 
-            foreach ($smtp_plugins->products as $plugin) {
-                License_Manager::extension_to_html($plugin);
-            }
+		<?php
+		endforeach;
 
-            ?>
-        </div>
-        <?php
-    }
+	}
 
-    /**
-     * Listen for the que to redirect to Groundhogg's Oauth Method.
-     *
-     * @return bool
-     */
-    public function save()
-    {
-        return true;
-    }
+	/**
+	 * Listen for the que to redirect to Groundhogg's Oauth Method.
+	 *
+	 * @return bool
+	 */
+	public function save() {
+		return true;
+	}
 
 }

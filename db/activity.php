@@ -116,15 +116,11 @@ class Activity extends DB {
 	 * Add a activity
 	 *
 	 * @access  public
-	 *
-	 * @param array $data
-	 *
-	 * @return int
 	 * @since   2.1
 	 */
 	public function add( $data = [] ) {
 
-		$args = wp_parse_args(
+		$data = wp_parse_args(
 			$data,
 			$this->get_column_defaults()
 		);
@@ -133,7 +129,7 @@ class Activity extends DB {
 			$data['referer_hash'] = generate_referer_hash( $data[ 'referer' ] );
 		}
 
-		return $this->insert( $args );
+		return $this->insert( $data );
 	}
 
 	/**

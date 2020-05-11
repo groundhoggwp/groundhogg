@@ -663,9 +663,13 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		if ( $next_step && $next_step->is_active() ) {
 			$contacts = $this->get_waiting_contacts();
-			foreach ( $contacts as $contact ) {
-				$next_step->enqueue( $contact );
+
+			if ( $contacts ){
+				foreach ( $contacts as $contact ) {
+					$next_step->enqueue( $contact );
+				}
 			}
+
 		}
 
 		return parent::delete();

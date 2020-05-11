@@ -209,19 +209,19 @@ class Event_Queue extends Supports_Errors {
 		$settings->update_option( 'queue_times_executed', $times_executed );
 		$settings->update_option( 'average_execution_time', $average_execution_time );
 
-		if ( $result > 0 ) {
-
-			$r_process_time = number_format( $process_time, 4 );
-			$r_avg_time     = number_format( $process_time / $result, 4 );
-			$r_eps          = number_format( $result / $process_time, 4 );
-
-			wp_send_json( [
-				'count'             => $result,
-				'total-time'        => $r_process_time,
-				'time-per-event'    => $r_avg_time,
-				'events-per-second' => $r_eps
-			] );
-		}
+//		if ( $result > 0 ) {
+//
+//			$r_process_time = number_format( $process_time, 4 );
+//			$r_avg_time     = number_format( $process_time / $result, 4 );
+//			$r_eps          = number_format( $result / $process_time, 4 );
+//
+//			wp_send_json( [
+//				'count'             => $result,
+//				'total-time'        => $r_process_time,
+//				'time-per-event'    => $r_avg_time,
+//				'events-per-second' => $r_eps
+//			] );
+//		}
 
 		return $result;
 	}

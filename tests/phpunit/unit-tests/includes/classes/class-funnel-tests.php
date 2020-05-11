@@ -43,34 +43,34 @@ class Funnel_Tests extends GH_UnitTestCase {
 
 	}
 
-	public function test_contact_cant_move_backwards() {
-
-		Plugin::$instance->dbs->truncate_dbs();
-
-		$tags = [
-			'Start',
-			'Stop',
-			'Add',
-			'Remove'
-		];
-
-		$tags = get_db( 'tags' )->validate( $tags );
-
-		$funnel = new Funnel( [
-			'title' => 'test funnel'
-		] );
-
-		// Tag Applied at start of funnel
-		$start = $funnel->add_step( [
-			'step_type'  => Tag_Applied::TYPE,
-			'step_group' => Step::BENCHMARK,
-			'step_title' => 'tag-applied',
-			'meta' => [
-				'tags' => $tags[ 0 ],
-			]
-		] );
-
-	}
+//	public function test_contact_cant_move_backwards() {
+//
+//		Plugin::$instance->dbs->truncate_dbs();
+//
+//		$tags = [
+//			'Start',
+//			'Stop',
+//			'Add',
+//			'Remove'
+//		];
+//
+//		$tags = get_db( 'tags' )->validate( $tags );
+//
+//		$funnel = new Funnel( [
+//			'title' => 'test funnel'
+//		] );
+//
+//		// Tag Applied at start of funnel
+//		$start = $funnel->add_step( [
+//			'step_type'  => Tag_Applied::TYPE,
+//			'step_group' => Step::BENCHMARK,
+//			'step_title' => 'tag-applied',
+//			'meta' => [
+//				'tags' => $tags[ 0 ],
+//			]
+//		] );
+//
+//	}
 
 
 }
