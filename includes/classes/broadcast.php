@@ -5,7 +5,7 @@ namespace Groundhogg;
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Broadcasts;
 use Groundhogg\DB\DB;
-
+use GroundhoggSMS\Classes\SMS;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -47,7 +47,7 @@ class Broadcast extends Base_Object implements Event_Process {
 			case self::TYPE_SMS:
 
 				if ( is_sms_plugin_active() ) {
-					$this->object = Plugin::$instance->utils->get_sms( $this->get_object_id() );
+					$this->object = new SMS( $this->get_object_id() );
 				}
 
 				break;
@@ -60,7 +60,7 @@ class Broadcast extends Base_Object implements Event_Process {
 	 * @return Broadcasts
 	 */
 	protected function get_db() {
-		return Plugin::$instance->dbs->get_db( 'broadcasts' );
+		return get_db( 'broadcasts' );
 	}
 
 	/**
