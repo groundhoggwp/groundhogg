@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Groundhogg\n"
-"POT-Creation-Date: 2020-05-11 08:39-0400\n"
+"POT-Creation-Date: 2020-05-11 08:44-0400\n"
 "PO-Revision-Date: 2019-11-15 10:49-0500\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -21,6 +21,11 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.min.js\n"
 "X-Poedit-SearchPathExcluded-1: node_modules\n"
+"X-Poedit-SearchPathExcluded-2: vendor\n"
+"X-Poedit-SearchPathExcluded-3: tests\n"
+"X-Poedit-SearchPathExcluded-4: bin\n"
+"X-Poedit-SearchPathExcluded-5: .idea\n"
+"X-Poedit-SearchPathExcluded-6: *.js\n"
 
 #: admin/admin-page.php:182
 msgid "Per page"
@@ -4955,14 +4960,6 @@ msgstr ""
 msgid "Select a Form"
 msgstr ""
 
-#: blocks/gutenberg/form/index.js:16
-msgid "form"
-msgstr ""
-
-#: blocks/gutenberg/form/index.js:16
-msgid "optin"
-msgstr ""
-
 #. Plugin Name of the plugin/theme
 #: blocks/gutenberg/gutenberg.php:45
 msgid "Groundhogg"
@@ -7412,62 +7409,6 @@ msgstr ""
 msgid ""
 "Further interactions with our site may be interpreted as re-subscribing to "
 "our list and will result in further communication."
-msgstr ""
-
-#. translators: placeholder is blog name
-#. translators: placeholder is user supplied title
-#: vendor/wp-cli/core-command/src/Core_Command.php:465
-#: vendor/wp-cli/core-command/src/Core_Command.php:539
-#, php-format
-msgctxt "Default network name"
-msgid "%s Sites"
-msgstr ""
-
-#: vendor/wp-cli/core-command/src/Core_Command.php:700
-msgid "Wildcard DNS may not be configured correctly."
-msgstr ""
-
-#: vendor/wp-cli/entity-command/src/Site_Command.php:125
-msgid "Uncategorized"
-msgstr ""
-
-#. translators: Default category slug
-#: vendor/wp-cli/entity-command/src/Site_Command.php:128
-msgctxt "Default category slug"
-msgid "Uncategorized"
-msgstr ""
-
-#: vendor/wp-cli/export-command/src/WP_Export_File_Writer.php:32
-#: vendor/wp-cli/export-command/src/WP_Export_Split_Files_Writer.php:51
-msgid "WP Export: error writing to export file."
-msgstr ""
-
-#: vendor/wp-cli/export-command/src/WP_Export_XML_Over_HTTP.php:20
-#: vendor/wp-cli/export-command/src/WP_Export_XML_Over_HTTP.php:25
-msgid "Export Error"
-msgstr ""
-
-#: vendor/wp-cli/extension-command/src/WP_CLI/CommandWithUpgrade.php:651
-msgid " Try again"
-msgstr ""
-
-#: vendor/wp-cli/extension-command/src/WP_CLI/CommandWithUpgrade.php:657
-msgid "API error. Try Again."
-msgstr ""
-
-#: vendor/wp-cli/media-command/src/Media_Command.php:145
-msgid "image"
-msgid_plural "images"
-msgstr[0] ""
-msgstr[1] ""
-
-#: vendor/wp-cli/wp-cli/php/utils-wp.php:196
-msgid "Inactive Widgets"
-msgstr ""
-
-#: vendor/wp-cli/wp-cli/php/utils-wp.php:199
-msgid ""
-"Drag widgets here to remove them from the sidebar but keep their settings."
 msgstr ""
 
 #. Plugin URI of the plugin/theme
