@@ -83,22 +83,11 @@ class Step_Tests extends GH_UnitTestCase {
 			'step_title' => 'test step 2',
 		] );
 
-		$step3 = $funnel->add_step( [
-			'step_type'  => Delay_Timer::TYPE,
-			'step_group' => Step::ACTION,
-			'step_title' => 'test step 3',
-			'meta'       => [
-				'delay_amount' => '3',
-				'delay_type'   => 'days',
-				'run_when'     => 'now',
-			]
-		] );
-
 		$step1->enqueue( $contact );
 
 		$step1->delete();
 
-		$this->assertEmpty( $step2->get_waiting_contacts() );
+		$this->assertCount( 0, $step2->get_waiting_contacts() );
 	}
 
 }

@@ -2,6 +2,8 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Api\V3\Unsubscribe_Api;
+use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Email_Meta;
 use Groundhogg\DB\Emails;
 use WP_Error;
@@ -21,11 +23,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * You may add your own email templates by defining, email-template.php in your theme.
  * The default template is email-default.php
  *
- * @since       File available since Release 0.1
+ * @package     Includes
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @package     Includes
+ * @since       File available since Release 0.1
  */
 class Email extends Base_Object_With_Meta {
 	/**
@@ -184,6 +186,13 @@ class Email extends Base_Object_With_Meta {
 	/**
 	 * @return bool
 	 */
+	public function is_ready() {
+		return $this->get_status() === 'ready';
+	}
+
+	/**
+	 * @return bool
+	 */
 	public function has_custom_alt_body() {
 		return boolval( $this->get_meta( 'use_custom_alt_body' ) );
 	}
@@ -258,7 +267,7 @@ class Email extends Base_Object_With_Meta {
 		return managed_page_url( sprintf(
 			"tracking/email/open/%s/%s/%s/",
 			dechex( $this->get_contact()->get_id() ),
-			! $this->is_testing() ? dechex( $this->get_event()->get_id() ) : 0,
+			! $this->is_testing() ? dechex( $this->get_event()->get_id( true ) ) : 0,
 			dechex( $this->get_id() )
 		) );
 	}
@@ -272,7 +281,7 @@ class Email extends Base_Object_With_Meta {
 		return managed_page_url(
 			sprintf( 'tracking/email/click/%s/%s/%s/',
 				dechex( $this->get_contact()->get_id() ),
-				! $this->is_testing() ? dechex( $this->get_event()->get_id() ) : 0,
+				! $this->is_testing() ? dechex( $this->get_event()->get_id( true ) ) : 0,
 				dechex( $this->get_id() )
 			)
 		);
@@ -638,7 +647,7 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function get_headers() {
 		/* Use default mail-server */
-		$headers = [];
+		$headers             = [];
 		$headers['from']     = 'From: ' . wp_specialchars_decode( $this->get_from_name() ) . ' <' . $this->get_from_email() . '>';
 		$headers['reply_to'] = 'Reply-To: ' . $this->get_reply_to_address();
 
@@ -648,9 +657,18 @@ class Email extends Base_Object_With_Meta {
 			$return_path_email = $this->get_from_email();
 		}
 
-		$headers['return_path']  = 'Return-Path: ' . $return_path_email;
-		$headers['content_type'] = 'Content-Type: text/html; charset=UTF-8';
-		$headers['unsub']        = sprintf( 'List-Unsubscribe: <mailto:%s?subject=Unsubscribe %s from %s>,<%s>', get_bloginfo( 'admin_email' ), $this->get_to_address(), get_bloginfo(), $this->click_tracking_link( $this->get_unsubscribe_link() ) );
+		$headers['return_path']     = 'Return-Path: ' . $return_path_email;
+		$headers['content_type']    = 'Content-Type: text/html; charset=UTF-8';
+		$headers['unsub']           = sprintf(
+			'List-Unsubscribe: <%s>,<mailto:%s?subject=Unsubscribe %s from %s>',
+			add_query_arg( [
+				'contact' => encrypt( $this->get_contact()->get_email() )
+			], rest_url( Unsubscribe_Api::NAME_SPACE . '/unsubscribe' ) ),
+			get_bloginfo( 'admin_email' ),
+			$this->get_to_address(),
+			get_bloginfo()
+		);
+		$headers['unsub-one-click'] = 'List-Unsubscribe-Post: List-Unsubscribe=One-Click';
 
 		return apply_filters( "groundhogg/email/headers", $headers );
 	}
@@ -671,12 +689,14 @@ class Email extends Base_Object_With_Meta {
 	/**
 	 * Set Event
 	 *
+	 * This is PROBABLY a queued event...
+	 *
 	 * @param $event Event|int
 	 */
 	public function set_event( $event ) {
 		if ( ! is_object( $event ) ) {
 			$event = absint( $event );
-			$event = Plugin::$instance->utils->get_event( $event );
+			$event = get_queued_event_by_id( $event );
 
 			if ( ! $event ) {
 				$event = new Event( 0 );
@@ -684,6 +704,15 @@ class Email extends Base_Object_With_Meta {
 		}
 
 		$this->event = $event;
+	}
+
+	/**
+	 * Check if the message is transactional
+	 *
+	 * @return bool
+	 */
+	public function is_transactional() {
+		return $this->get_meta( 'message_type' ) === 'transactional';
 	}
 
 	/**
@@ -698,7 +727,7 @@ class Email extends Base_Object_With_Meta {
 		// Clear any old previous errors.
 		$this->clear_errors();
 
-		if ( $this->is_draft() && ! $this->is_testing() ) {
+		if ( ! $this->is_ready() && ! $this->is_testing() ) {
 			return new WP_Error( 'email_not_ready', sprintf( __( 'Emails cannot be sent in %s mode.', 'groundhogg' ), $this->get_status() ) );
 		}
 
@@ -715,8 +744,8 @@ class Email extends Base_Object_With_Meta {
 			$this->set_event( $event );
 		}
 
-		/* Skip if testing */
-		if ( ! $this->is_testing() && ! $contact->is_marketable() ) {
+		// Ignore if testing or the message is transactional
+		if ( ! $contact->is_marketable() && ! $this->is_testing() && ! $this->is_transactional() ) {
 			return new WP_Error( 'non_marketable', __( 'Contact is not marketable.' ) );
 		}
 
@@ -916,4 +945,91 @@ class Email extends Base_Object_With_Meta {
 
 		return $buffer;
 	}
+
+	/**
+	 * Get related email statistics
+	 *
+	 * @param $start
+	 * @param $end
+	 *
+	 * @return array
+	 */
+	public function get_email_stats( $start, $end ) {
+
+		$steps = get_db( 'stepmeta' )->query( [
+			'meta_key'   => 'email_id',
+			'meta_value' => $this->get_id()
+		] );
+
+		$steps_ids = wp_parse_id_list( wp_list_pluck( $steps, 'step_id' ) );
+
+		$count        = 0;
+		$opened       = 0;
+		$clicked      = 0;
+		$all_clicked  = 0;
+		$unsubscribed = 0;
+
+		if ( ! empty( $steps_ids ) ) {
+
+			$where_events = [
+				'relationship' => "AND",
+				[ 'col' => 'step_id', 'val' => $steps_ids, 'compare' => 'IN' ],
+				[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
+				[ 'col' => 'time', 'val' => $start, 'compare' => '>=' ],
+				[ 'col' => 'time', 'val' => $end, 'compare' => '<=' ],
+			];
+
+			$count = get_db( 'events' )->count( [
+				'where' => $where_events,
+			] );
+
+			$where_opened = [
+				'relationship' => "AND",
+				[ 'col' => 'email_id', 'val' => $this->get_id(), 'compare' => '=' ],
+				[ 'col' => 'activity_type', 'val' => Activity::EMAIL_OPENED, 'compare' => '=' ],
+				[ 'col' => 'timestamp', 'val' => $start, 'compare' => '>=' ],
+				[ 'col' => 'timestamp', 'val' => $end, 'compare' => '<=' ],
+			];
+
+			$opened = get_db( 'activity' )->count( [
+				'where' => $where_opened
+			] );
+
+			$where_clicked = [
+				'relationship' => "AND",
+				[ 'col' => 'email_id', 'val' => $this->get_id(), 'compare' => '=' ],
+				[ 'col' => 'activity_type', 'val' => Activity::EMAIL_CLICKED, 'compare' => '=' ],
+				[ 'col' => 'timestamp', 'val' => $start, 'compare' => '>=' ],
+				[ 'col' => 'timestamp', 'val' => $end, 'compare' => '<=' ],
+			];
+
+			$clicked = get_db( 'activity' )->count( [
+				'select' => 'DISTINCT contact_id',
+				'where'  => $where_clicked
+			] );
+
+			$all_clicked = get_db( 'activity' )->count( [
+				'where' => $where_clicked
+			] );
+
+			$unsubscribed = get_db( 'activity' )->count( [
+				'email_id'      => $this->get_id(),
+				'activity_type' => Activity::UNSUBSCRIBED,
+				'before'        => $end,
+				'after'         => $start,
+			] );
+
+		}
+
+		return [
+			'steps'        => $steps_ids,
+			'sent'         => $count,
+			'opened'       => $opened,
+			'clicked'      => $clicked,
+			'all_clicks'   => $all_clicked,
+			'unsubscribed' => $unsubscribed,
+		];
+	}
+
+
 }

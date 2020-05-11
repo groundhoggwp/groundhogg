@@ -3,6 +3,7 @@
 namespace Groundhogg;
 
 use Groundhogg\DB\DB;
+use Groundhogg\DB\Event_Queue;
 use Groundhogg\DB\Events;
 use Groundhogg\DB\Meta_DB;
 use Groundhogg\DB\Step_Meta;
@@ -51,7 +52,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return Step_Meta
 	 */
 	protected function get_meta_db() {
-		return Plugin::$instance->dbs->get_db( 'stepmeta' );
+		return get_db( 'stepmeta' );
 	}
 
 	/**
@@ -60,7 +61,14 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return Events
 	 */
 	protected function get_events_db() {
-		return Plugin::$instance->dbs->get_db( 'events' );
+		return get_db( 'events' );
+	}
+
+	/**
+	 * @return Event_Queue
+	 */
+	protected function get_event_queue_db() {
+		return get_db( 'event_queue' );
 	}
 
 	/**
@@ -138,7 +146,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return Event[]|false
 	 */
 	public function get_waiting_events() {
-		$events = $this->get_events_db()->query( [
+
+		$events = $this->get_event_queue_db()->query( [
 			'status'    => Event::WAITING,
 			'step_id'   => $this->get_id(),
 			'funnel_id' => $this->get_funnel_id(),
@@ -151,7 +160,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		}
 
 		foreach ( $events as $event ) {
-			$prepped[] = Plugin::$instance->utils->get_event( $event->ID );
+			$prepped[] = get_queued_event_by_id( $event->ID );
 		}
 
 		return $prepped;
@@ -247,7 +256,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	public function enqueue( $contact ) {
 		$this->enqueued_contact = $contact;
 
-		$this->get_events_db()->mass_update(
+		// Update any events to skipped...
+		$this->get_event_queue_db()->mass_update(
 			[
 				'status' => Event::SKIPPED
 			],
@@ -259,6 +269,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			]
 		);
 
+		// Setup the new event args
 		$event = [
 			'time'       => $this->get_delay_time(),
 			'funnel_id'  => $this->get_funnel_id(),
@@ -268,7 +279,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'priority'   => 10,
 		];
 
-		return (bool) $this->get_events_db()->add( $event );
+		return (bool) $this->get_event_queue_db()->add( $event );
 	}
 
 	/**
@@ -280,16 +291,14 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function can_complete( $contact = null ) {
 		// Actions cannot be completed.
-		if ( $this->is_action()  || ! $this->is_active() ) {
+		if ( $this->is_action() || ! $this->is_active() ) {
 			return false;
 		}
 
 		// Check if starting
 		if ( $this->is_starting() ) {
 			return true;
-		}
-
-		// If inner step, check if contact is at a step before this one.
+		} // If inner step, check if contact is at a step before this one.
 		else if ( $this->is_inner() ) {
 
 			// get the current funnel step
@@ -313,10 +322,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return bool|int
 	 */
 	public function get_current_funnel_step_order( $contact ) {
-		// Todo, possible to make this more efficient?
 
 		// Search waiting events, automatically the current event.
-		$events = $this->get_events_db()->query( [
+		$events = $this->get_event_queue_db()->query( [
 			'funnel_id'  => $this->get_funnel_id(),
 			'contact_id' => $contact->get_id(),
 			'status'     => Event::WAITING
@@ -324,8 +332,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		if ( ! empty( $events ) ) {
 			$event = array_shift( $events );
-			$event = new Event( absint( $event->ID ) );
-			if ( $event->exists() ) {
+			$event = new Event( absint( $event->ID ), 'event_queue' );
+			// Double check step exists...
+			if ( $event->exists() && $event->get_step() && $event->get_step()->exists() ) {
 				return $event->get_step()->get_order();
 			}
 		}
@@ -344,7 +353,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			// get top element.
 			$event = array_shift( $events );
 			$event = new Event( absint( $event->ID ) );
-			if ( $event->exists() ) {
+
+			// Double check step exists...
+			if ( $event->exists() && $event->get_step() && $event->get_step()->exists() ) {
 				return $event->get_step()->get_order();
 			}
 		}
@@ -363,7 +374,10 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return $this->get_events_db()->count( [
 				'funnel_id'  => $this->get_funnel_id(),
 				'contact_id' => $contact->get_id()
-			] ) > 0;
+			] ) > 0 || $this->get_event_queue_db()->count( [
+				'funnel_id'  => $this->get_funnel_id(),
+				'contact_id' => $contact->get_id()
+			] );
 	}
 
 	/**
@@ -488,6 +502,20 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * Output icon html
+	 */
+	public function icon() {
+
+		$icon = false;
+
+		if ( has_filter( "groundhogg/steps/{$this->get_type()}/icon" ) ) {
+			$icon = apply_filters( "groundhogg/steps/{$this->get_type()}/icon", $this );
+		}
+
+		return $icon ?: GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/no-icon.png';
+	}
+
+	/**
 	 * Output the HTML of a step.
 	 */
 	public function html_v2() {
@@ -527,6 +555,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function get_step_title() {
 		return $this->get_title();
+	}
+
+	public function get_step_notes()
+	{
+		return $this->get_meta('step_notes');
 	}
 
 	/**
@@ -630,9 +663,13 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		if ( $next_step && $next_step->is_active() ) {
 			$contacts = $this->get_waiting_contacts();
-			foreach ( $contacts as $contact ) {
-				$next_step->enqueue( $contact );
+
+			if ( $contacts ){
+				foreach ( $contacts as $contact ) {
+					$next_step->enqueue( $contact );
+				}
 			}
+
 		}
 
 		return parent::delete();

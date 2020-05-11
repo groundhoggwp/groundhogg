@@ -167,8 +167,8 @@ class Contacts_Table extends WP_List_Table {
 	}
 
 	/**
-	 * @see WP_List_Table::::single_row_columns()
 	 * @return array An associative array containing column information.
+	 * @see WP_List_Table::::single_row_columns()
 	 */
 	public function get_columns() {
 		$columns = array(
@@ -208,7 +208,7 @@ class Contacts_Table extends WP_List_Table {
 
 	/**
 	 * @param object|Contact $contact
-	 * @param int            $level
+	 * @param int $level
 	 */
 	public function single_row( $contact, $level = 0 ) {
 
@@ -390,8 +390,8 @@ class Contacts_Table extends WP_List_Table {
 	 * @return string
 	 */
 	protected function column_date_created( $contact ) {
-		$dc_time     = mysql2date( 'U', $contact->get_date_created() );
-		$dc_time     = Plugin::instance()->utils->date_time->convert_to_utc_0( $dc_time );
+		$dc_time = mysql2date( 'U', $contact->get_date_created() );
+		$dc_time = Plugin::instance()->utils->date_time->convert_to_utc_0( $dc_time );
 
 		return scheduled_time_column( $dc_time, false, false, false );
 	}
@@ -399,7 +399,7 @@ class Contacts_Table extends WP_List_Table {
 	/**
 	 * Get default column value.
 	 *
-	 * @param object $contact     A singular item (one full row's worth of data).
+	 * @param object $contact A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string Text or HTML to be placed inside the column <td>.
@@ -434,17 +434,11 @@ class Contacts_Table extends WP_List_Table {
 	protected function get_bulk_actions() {
 		$actions = array(
 			'apply_tag'  => _x( 'Apply Tag', 'List table bulk action', 'groundhogg' ),
-//            'export' => _x( 'Export', 'List table bulk action', 'groundhogg' ),
 			'remove_tag' => _x( 'Remove Tag', 'List table bulk action', 'groundhogg' ),
 			'delete'     => _x( 'Delete', 'List table bulk action', 'groundhogg' ),
+			'spam'       => _x( 'Spam', 'List table bulk action', 'groundhogg' ),
+			'unspam'     => _x( 'Unspam', 'List table bulk action', 'groundhogg' ),
 		);
-
-		if ( in_array( $this->get_view(), [ '' ] ) ) {
-			$actions['unspam'] = _x( 'Approve', 'List table bulk action', 'groundhogg' );
-		} else {
-			$actions['spam'] = _x( 'Mark as Spam', 'List table bulk action', 'groundhogg' );
-		}
-
 
 		return apply_filters( 'groundhogg_contact_bulk_actions', $actions );
 	}
@@ -534,7 +528,7 @@ class Contacts_Table extends WP_List_Table {
 	 *
 	 * @param        $contact     Contact Contact being acted upon.
 	 * @param string $column_name Current column name.
-	 * @param string $primary     Primary column name.
+	 * @param string $primary Primary column name.
 	 *
 	 * @return string Row steps output for posts.
 	 */
@@ -606,17 +600,16 @@ class Contacts_Table extends WP_List_Table {
 	protected function extra_tablenav( $which ) {
 		if ( $which === 'top' ) : ?>
             <script>
-                jQuery( function ( $ ){
-                    $( '#bulk-action-selector-top,#bulk-action-selector-bottom' ).on( 'change', function (){
-                        var $bulk = $( this )
-                        if ( $bulk.val() === 'apply_tag' || $bulk.val() === 'remove_tag' ) {
-                            $( '.bulk-tag-action' ).removeClass( 'hidden' )
+                jQuery(function ($) {
+                    $("#bulk-action-selector-top,#bulk-action-selector-bottom").on("change", function () {
+                        var $bulk = $(this);
+                        if ($bulk.val() === "apply_tag" || $bulk.val() === "remove_tag") {
+                            $(".bulk-tag-action").removeClass("hidden");
+                        } else {
+                            $(".bulk-tag-action").addClass("hidden");
                         }
-                        else {
-                            $( '.bulk-tag-action' ).addClass( 'hidden' )
-                        }
-                    } )
-                } )
+                    });
+                });
             </script>
             <div class="alignleft gh-actions bulk-tag-action hidden">
                 <div style="width: 300px;display: inline-block;margin: 0 20px 5px 0"><?php echo Plugin::$instance->utils->html->tag_picker( [

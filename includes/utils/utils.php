@@ -127,6 +127,7 @@ class Utils {
 	 * @param bool $get_from_cache
 	 *
 	 * @return Event
+	 * @deprecated Use Event object new Event()
 	 */
 	public function get_event( $id, $get_from_cache = true ) {
 		return $this->get_object( $id, 'ID', 'event', $get_from_cache );
@@ -155,6 +156,7 @@ class Utils {
 	/**
 	 * @param      $id
 	 * @param bool $get_from_cache
+	 * @deprecated 2.1.14
 	 *
 	 * @return Sms
 	 * @deprecated 2.1.14

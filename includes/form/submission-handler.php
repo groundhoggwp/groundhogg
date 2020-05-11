@@ -98,10 +98,14 @@ class Submission_Handler extends Supports_Errors {
 		}
 
 		// Set a step
-		$this->step = Plugin::$instance->utils->get_step( $this->get_form_id() );
+		$this->step = new Step( $this->get_form_id() );
 
 		if ( ! $this->step ) {
 			$this->add_error( 'invalid_form', __( "This form does not exist.", 'groundhogg' ) );
+
+			return;
+		} else if ( ! $this->step->is_active() ) {
+			$this->add_error( 'inactive', __( 'This form is not accepting submissions.', 'groundhogg' ) );
 
 			return;
 		}
@@ -509,23 +513,26 @@ class Submission_Handler extends Supports_Errors {
 	 *
 	 * @return bool true if spam, false otherwise.
 	 */
-	public function check_first_and_last( $first='', $last='' ){
+	public function check_first_and_last( $first = '', $last = '' ) {
 
-		if ( empty( $first ) ){
+		if ( empty( $first ) ) {
 			$first = $this->get_posted_data( 'first_name' );
 		}
 
-		if ( empty( $last ) ){
+		if ( empty( $last ) ) {
 			$last = $this->get_posted_data( 'last_name' );
 		}
 
 		// Prevent spam campaign First: swusafmeenisckkGP Last: xwusaymepnwpxioGP
-	    if ( ( strlen( $first ) === 17 && preg_match( '/GP$/', $first ) ) || ( strlen( $last ) === 17 && preg_match( '/GP$/', $last ) ) ){
+		if ( ( strlen( $first ) === 17 && preg_match( '/GP$/', $first ) ) || ( strlen( $last ) === 17 && preg_match( '/GP$/', $last ) ) ) {
+			return true;
+		}
+
+		// Prevent spam campaign First: artyukhaGuarmrenXK Last: DumuroGuarmrenXK
+		if ( preg_match( '/XK$/', $first ) || preg_match( '/XK$/', $last ) ) {
 			return true;
 		}
 
 		return false;
 	}
-
-
 }

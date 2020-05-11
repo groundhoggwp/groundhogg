@@ -125,10 +125,14 @@ class Dashboard_Widgets
             'custom_date_range_end' => esc_attr( get_request_var( 'custom_date_range_end' ) )
         ) );
 
+
         wp_enqueue_script( 'jquery-flot' );
         wp_enqueue_script( 'jquery-flot-pie' );
         wp_enqueue_script( 'jquery-flot-categories' );
         wp_enqueue_script( 'jquery-flot-time' );
+
+	    wp_enqueue_script( 'chart-js' );
+
     }
 
     /**

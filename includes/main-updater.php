@@ -203,6 +203,8 @@ class Main_Updater extends Updater {
 	 * Add priority column to events db
 	 */
 	public function version_2_1_13_6() {
+
+		get_db( 'contacts' )->create_table();
 		$events = get_db( 'events' );
 
 		$events->create_table();
@@ -227,6 +229,7 @@ class Main_Updater extends Updater {
 		get_db( 'events' )->create_table();
 	}
 
+
 	/**
 	 * Add index on `claim`
 	 *
@@ -234,6 +237,46 @@ class Main_Updater extends Updater {
 	 */
 	public function version_2_1_14_1() {
 		get_db( 'events' )->create_table();
+	}
+
+	/**
+	 * Add index on `claim`
+	 * create new event_queue table
+	 * migrate waiting events to the new queue
+	 * add queued_id column
+	 * add optin_status_changed column
+	 * add ip_address & views columns to form impressions table
+	 *
+	 * Automatic update!
+	 */
+	public function version_2_2() {
+
+		global $wpdb;
+
+		// Add optin_status_changed column
+		get_db( 'contacts' )->create_table();
+
+		// Add IP Address/Views columns
+		get_db( 'form_impressions' )->create_table();
+		// Move `count` to `views`
+		get_db( 'form_impressions' )->update_2_2();
+
+		// Add `referer_hash` col
+		get_db( 'activity' )->create_table();
+		// Update `referer_hash` col
+		get_db( 'activity' )->update_2_2();
+
+		// Create the new event queue table
+		get_db( 'event_queue' )->create_table();
+
+		// Update the current events table
+		get_db( 'events' )->move_events_to_queue( [
+			'status' => Event::WAITING
+		], true );
+
+		if ( $wpdb->last_error ) {
+			wp_die( $wpdb->last_error );
+		}
 	}
 
 	/**
@@ -268,6 +311,7 @@ class Main_Updater extends Updater {
 			'2.1.13',
 			'2.1.13.6',
 			'2.1.14.1',
+			'2.2',
 		];
 	}
 
@@ -284,6 +328,17 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Updates that will allow you to revert.
+	 *
+	 * @return array|string[]
+	 */
+	protected function get_optional_updates() {
+		return [
+			'2.1.13.revert'
+		];
+	}
+
+	/**
 	 * Show any required update descriptions.
 	 *
 	 * @return array|string[]
@@ -294,18 +349,8 @@ class Main_Updater extends Updater {
 			'2.1.13.revert' => __( 'Revert update 2.1.13 if rogue updated refactored optin status more than once.', 'groundhogg' ),
 			'2.1.13.6'      => __( 'Give funnel events higher priority than broadcast events.', 'groundhogg' ),
 			'2.1.13.11'     => __( 'Add micro_time column to events table for better display of events order.', 'groundhogg' ),
-			'2.1.14.1'     => __( 'Add missing index on `claim` column.', 'groundhogg' ),
-		];
-	}
-
-	/**
-	 * Updates that will allow you to revert.
-	 *
-	 * @return array|string[]
-	 */
-	protected function get_optional_updates() {
-		return [
-			'2.1.13.revert'
+			'2.1.14.1'      => __( 'Add missing index on `claim` column.', 'groundhogg' ),
+			'2.2'           => __( 'Event queue performance improvements.', 'groundhogg' ),
 		];
 	}
 }

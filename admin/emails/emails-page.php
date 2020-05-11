@@ -135,9 +135,14 @@ class Emails_Page extends Admin_Page {
 	 */
 	protected function get_title_actions() {
 		$broadcast_args = [ 'action' => 'add', 'type' => 'email' ];
+		$reporting_args = [ 'tab' => 'email' ];
 
 		if ( $email = Groundhogg\get_request_var( 'email' ) ) {
 			$broadcast_args['email'] = absint( $email );
+			$reporting_args = [
+                'tab' => 'email_step',
+                'email' => $email,
+            ];
 		}
 
 		return [
@@ -150,7 +155,12 @@ class Emails_Page extends Admin_Page {
 				'link'   => Plugin::$instance->admin->get_page( 'broadcasts' )->admin_url( $broadcast_args ),
 				'action' => __( 'Broadcast', 'groundhogg' ),
 				'target' => '_self',
-			]
+			],
+			[
+				'link'   => Groundhogg\admin_page_url( 'gh_reporting', $reporting_args ),
+				'action' => __( 'Reporting', 'groundhogg' ),
+				'target' => '_self',
+			],
 		];
 	}
 
@@ -360,6 +370,7 @@ class Emails_Page extends Admin_Page {
 			return new \WP_Error( 'unable_to_update_email', 'Unable to update email!' );
 		}
 
+		$email->update_meta( 'message_type', sanitize_text_field( Groundhogg\get_request_var( 'message_type' ) ) );
 		$email->update_meta( 'alignment', sanitize_text_field( Groundhogg\get_request_var( 'email_alignment' ) ) );
 		$email->update_meta( 'browser_view', boolval( Groundhogg\get_request_var( 'browser_view' ) ) );
 		$email->update_meta( 'reply_to_override', sanitize_email( Groundhogg\get_request_var( 'reply_to_override' ) ) );

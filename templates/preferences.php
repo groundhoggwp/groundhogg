@@ -8,19 +8,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 include GROUNDHOGG_PATH . 'templates/managed-page.php';
 
-/**
- * The header for our theme
- *
- * This is the template that displays all of the <head> section and everything up until <div id="content">
- *
- * @link https://developer.wordpress.org/themes/basics/template-files/#template-partials
- *
- * @package WordPress
- * @subpackage Twenty_Seventeen
- * @since 1.0
- * @version 1.0
- */
-
 if ( ! function_exists( 'obfuscate_email' ) ):
 	/**
 	 * Obfuscate an email address
@@ -210,7 +197,7 @@ switch ( $action ):
 		?>
         <form action="" id="preferences" method="post">
             <p>
-                <b><?php printf( __( 'Update information for %s (%s).', 'groundhogg' ), $contact->get_full_name(), obfuscate_email( $contact->get_email() ) ) ?></b>
+                <b><?php printf( __( 'Update information for <span class="contact-name">%s (%s)</span>.', 'groundhogg' ), $contact->get_full_name(), obfuscate_email( $contact->get_email() ) ) ?></b>
             </p>
             <p><?php _e( 'Use the form below to update your information to the most current.', 'groundhogg' ) ?></p>
 			<?php wp_nonce_field( 'update_contact_profile' ); ?>
@@ -320,7 +307,7 @@ switch ( $action ):
 		?>
         <form action="" id="preferences" method="post">
             <p>
-                <b><?php printf( __( 'Managing preferences for %s (%s).', 'groundhogg' ), $contact->get_full_name(), obfuscate_email( $contact->get_email() ) ) ?></b>
+                <b><?php printf( __( 'Managing preferences for <span class="contact-name">%s (%s)</span>.', 'groundhogg' ), $contact->get_full_name(), obfuscate_email( $contact->get_email() ) ) ?></b>
             </p>
 			<?php wp_nonce_field( 'manage_email_preferences' ); ?>
             <?php do_action( 'groundhogg/preferences/manage/form/inside' ); ?>

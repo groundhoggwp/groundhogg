@@ -22,14 +22,14 @@ class Funnel extends Base_Object_With_Meta {
 	 * @return Funnels
 	 */
 	protected function get_db() {
-		return Plugin::instance()->dbs->get_db( 'funnels' );
+		return get_db( 'funnels' );
 	}
 
 	/**
 	 * @return Steps
 	 */
 	protected function get_steps_db() {
-		return Plugin::instance()->dbs->get_db( 'steps' );
+		return get_db( 'steps' );
 	}
 
 	protected function get_meta_db() {
@@ -63,6 +63,53 @@ class Funnel extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Get the ID of the conversion step...
+	 * This can be defined, or is assumed the last benchmark in the funnel...
+	 *
+	 * @return int
+	 */
+	public function get_conversion_step_id() {
+		$conversion_step_id = absint( $this->conversion_step );
+
+		if ( ! $conversion_step_id ) {
+			$steps = $this->get_steps( [
+				'step_group' => Step::BENCHMARK,
+			] );
+
+			$last = array_pop( $steps );
+
+			if ($last){
+
+				return $last->get_id();
+			}
+			return 0;
+
+		}
+
+		return $conversion_step_id;
+	}
+
+	public function get_first_action_id() {
+		$actions = $this->get_step_ids( [
+			'step_group' => Step::ACTION,
+		] );
+
+		return array_shift( $actions );
+	}
+
+	/**
+	 * @return int
+	 */
+	public function get_first_step_id() {
+		$actions = $this->get_step_ids( [
+			'step_group' => Step::BENCHMARK,
+		] );
+
+		return array_shift( $actions );
+	}
+
+
+	/**
 	 * Get the step IDs associate with this funnel
 	 *
 	 * @param array $query
@@ -70,7 +117,11 @@ class Funnel extends Base_Object_With_Meta {
 	 * @return array
 	 */
 	public function get_step_ids( $query = [] ) {
-		$query = array_merge( $query, [ 'funnel_id' => $this->get_id() ] );
+		$query = array_merge( $query, [
+			'funnel_id' => $this->get_id(),
+			'orderby'   => 'step_order',
+			'order'     => 'ASC',
+		] );
 
 		return wp_parse_id_list( wp_list_pluck( $this->get_steps_db()->get_steps( $query ), 'ID' ) );
 	}
@@ -90,14 +141,6 @@ class Funnel extends Base_Object_With_Meta {
 		foreach ( $raw_step_ids as $raw_step_id ) {
 			$steps[] = new Step( $raw_step_id );
 		}
-
-		usort( $steps, function ( Step $a, Step $b ) {
-			if ( $a->get_order() == $b->get_order() ) {
-				return 0;
-			}
-
-			return ( $a->get_order() < $b->get_order() ) ? - 1 : 1;
-		} );
 
 		return $steps;
 	}

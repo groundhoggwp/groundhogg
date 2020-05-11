@@ -5,7 +5,6 @@ namespace Groundhogg;
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Broadcasts;
 use Groundhogg\DB\DB;
-use GroundhoggSMS\Classes\SMS;
 
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -48,7 +47,7 @@ class Broadcast extends Base_Object implements Event_Process {
 			case self::TYPE_SMS:
 
 				if ( is_sms_plugin_active() ) {
-					$this->object = new SMS( $this->get_object_id() );
+					$this->object = Plugin::$instance->utils->get_sms( $this->get_object_id() );
 				}
 
 				break;
@@ -181,12 +180,13 @@ class Broadcast extends Base_Object implements Event_Process {
 	 */
 	public function cancel() {
 
-		if ( Plugin::$instance->dbs->get_db( 'events' )->mass_update(
+		if ( get_db( 'event_queue' )->mass_update(
 			[
 				'status' => Event::CANCELLED
 			],
 			[
 				'step_id'    => $this->get_id(),
+				'funnel_id'  => Broadcast::FUNNEL_ID,
 				'event_type' => Event::BROADCAST
 			]
 		) ) {
@@ -207,11 +207,11 @@ class Broadcast extends Base_Object implements Event_Process {
 
 		do_action( "groundhogg/broadcast/{$this->get_broadcast_type()}/before", $this, $contact, $event );
 
-		if ( is_object( $this->get_object() ) ){
-			$result = $this->get_object()->send( $contact, $event );
-		} else {
-			$result = new \WP_Error( 'error', 'Email or SMS not provided.' );
+		if ( ! $this->get_object() || ! $this->get_object()->exists() ) {
+			return new \WP_Error( 'object_error', 'Could not find email or SMS to send.' );
 		}
+
+		$result = $this->get_object()->send( $contact, $event );
 
 		do_action( "groundhogg/broadcast/{$this->get_broadcast_type()}/after", $this, $contact, $event );
 
@@ -247,23 +247,35 @@ class Broadcast extends Base_Object implements Event_Process {
 				'status'     => Event::COMPLETE
 			] );
 
-			if ( ! $this->is_sms() ) {
+			$data['waiting'] = get_db( 'event_queue' )->count( [
+				'step_id'    => $this->get_id(),
+				'event_type' => Event::BROADCAST,
+				'status'     => Event::WAITING
+			] );
 
-				$data['waiting']            = get_db( 'events' )->count( [
-					'step_id'    => $this->get_id(),
-					'event_type' => Event::BROADCAST,
-					'status'     => Event::WAITING
-				] );
+			if ( ! $this->is_sms() ) {
 				$data['opened']             = get_db( 'activity' )->count( [
+					'select'        => 'DISTINCT contact_id',
 					'funnel_id'     => $this->get_funnel_id(),
 					'step_id'       => $this->get_id(),
 					'activity_type' => Activity::EMAIL_OPENED
 				] );
 				$data['open_rate']          = percentage( $data['sent'], $data['opened'] );
 				$data['clicked']            = get_db( 'activity' )->count( [
+					'select'        => 'DISTINCT contact_id',
 					'funnel_id'     => $this->get_funnel_id(),
 					'step_id'       => $this->get_id(),
 					'activity_type' => Activity::EMAIL_CLICKED
+				] );
+				$data['all_clicks']      = get_db( 'activity' )->count( [
+					'funnel_id'     => $this->get_funnel_id(),
+					'step_id'       => $this->get_id(),
+					'activity_type' => Activity::EMAIL_CLICKED
+				] );
+				$data['unsubscribed']       = get_db( 'activity' )->count( [
+					'funnel_id'     => $this->get_funnel_id(),
+					'step_id'       => $this->get_id(),
+					'activity_type' => Activity::UNSUBSCRIBED
 				] );
 				$data['click_through_rate'] = percentage( $data['clicked'], $data['opened'] );
 				$data['unopened']           = $data['sent'] - $data['opened'];

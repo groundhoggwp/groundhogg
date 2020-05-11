@@ -42,53 +42,58 @@ $email = new Email( $email_id );
 	$test_email = get_user_meta( get_current_user_id(), 'preferred_test_email', true );
 	$test_email = $test_email ? $test_email : wp_get_current_user()->user_email;
 
-    echo Plugin::$instance->utils->html->input( [ 'type' => 'hidden', 'id' => 'test-email', 'value' => $test_email ] ); ?>
+	echo Plugin::$instance->utils->html->input( [ 'type'  => 'hidden',
+	                                              'id'    => 'test-email',
+	                                              'value' => $test_email
+	] ); ?>
     <div id='poststuff'>
-        <div id="post-body" class="metabox-holder columns-2  <?php if ( $email->get_meta( 'alignment' ) === 'center' ) echo 'align-email-center'; ?>" style="clear: both">
+        <div id="post-body" class="metabox-holder columns-2  <?php if ( $email->get_meta( 'alignment' ) === 'center' ) {
+			echo 'align-email-center';
+		} ?>" style="clear: both">
             <div id="postbox-container-1" class="postbox-container sidebar">
                 <div id="save" class="postbox">
                     <span class="spinner"></span>
                     <h2><?php _e( 'Save & Preview', 'groundhogg' ); ?></h2>
                     <div class="inside">
-                        <?php submit_button( __( 'Update', 'groundhogg' ), 'primary', 'update', false ); ?>
-	                    <?php submit_button( __( 'Update & Test', 'groundhogg' ), 'secondary', 'update_and_test', false ); ?>
-	                    <?php echo html()->modal_link( [
-		                    'title'     => __( 'Mobile Preview' ),
-		                    'text'      => '<span class="dashicons dashicons-smartphone"></span>',
-		                    'footer_button_text' => __( 'Close' ),
-		                    'id'        => '',
-		                    'class'     => 'button button-secondary dash-button',
-		                    'source'    => managed_page_url( 'emails/' . $email->get_id() ),
-		                    'height'    => 580,
-		                    'width'     => 340,
-		                    'footer'    => 'true',
-		                    'preventSave'    => 'true',
-	                    ] ); ?>
-	                    <?php echo html()->modal_link( [
-		                    'title'     => __( 'Desktop Preview' ),
-		                    'text'      => '<span class="dashicons dashicons-desktop"></span>',
-		                    'footer_button_text' => __( 'Close' ),
-		                    'id'        => '',
-		                    'class'     => 'button button-secondary dash-button',
-		                    'source'    => managed_page_url( 'emails/' . $email->get_id() ),
-		                    'height'    => 600,
-		                    'width'     => 700,
-		                    'footer'    => 'true',
-		                    'preventSave'    => 'true',
-	                    ] ); ?>
+						<?php submit_button( __( 'Update', 'groundhogg' ), 'primary', 'update', false ); ?>
+						<?php submit_button( __( 'Update & Test', 'groundhogg' ), 'secondary', 'update_and_test', false ); ?>
+						<?php echo html()->modal_link( [
+							'title'              => __( 'Mobile Preview' ),
+							'text'               => '<span class="dashicons dashicons-smartphone"></span>',
+							'footer_button_text' => __( 'Close' ),
+							'id'                 => '',
+							'class'              => 'button button-secondary dash-button',
+							'source'             => managed_page_url( 'emails/' . $email->get_id() ),
+							'height'             => 580,
+							'width'              => 340,
+							'footer'             => 'true',
+							'preventSave'        => 'true',
+						] ); ?>
+						<?php echo html()->modal_link( [
+							'title'              => __( 'Desktop Preview' ),
+							'text'               => '<span class="dashicons dashicons-desktop"></span>',
+							'footer_button_text' => __( 'Close' ),
+							'id'                 => '',
+							'class'              => 'button button-secondary dash-button',
+							'source'             => managed_page_url( 'emails/' . $email->get_id() ),
+							'height'             => 600,
+							'width'              => 700,
+							'footer'             => 'true',
+							'preventSave'        => 'true',
+						] ); ?>
                     </div>
                 </div>
 
                 <h3><?php _e( 'Status', 'groundhogg' ); ?></h3>
                 <p>
-	                <?php echo Plugin::$instance->utils->html->toggle( [
-		                'name'          => 'email_status',
-		                'id'            => 'status-toggle',
-		                'value'         => 'ready',
-		                'checked'       => $email->get_status() === 'ready',
-		                'on'            => 'Ready',
-		                'off'           => 'Draft',
-	                ]); ?>
+					<?php echo Plugin::$instance->utils->html->toggle( [
+						'name'    => 'email_status',
+						'id'      => 'status-toggle',
+						'value'   => 'ready',
+						'checked' => $email->get_status() === 'ready',
+						'on'      => 'Ready',
+						'off'     => 'Draft',
+					] ); ?>
                 </p>
                 <h3><?php _e( 'From', 'groundhogg' ); ?></h3>
 				<?php $args = array(
@@ -99,7 +104,7 @@ $email = new Email( $email_id );
 					'style'       => [ 'max-width' => '100%' ]
 				); ?>
                 <p><?php echo Plugin::$instance->utils->html->dropdown_owners( $args ); ?></p>
-	            <?php echo html()->description( __( 'Choose who this email comes from.' ) ); ?>
+				<?php echo html()->description( __( 'Choose who this email comes from.' ) ); ?>
 
                 <h3><?php _e( 'Reply To', 'groundhogg' ); ?></h3>
 				<?php $args = [
@@ -123,36 +128,52 @@ $email = new Email( $email_id );
 						} ?>><?php _e( 'Center' ); ?></option>
                     </select>
                 </p>
+
+                <h3><?php _e( 'Message Type' ); ?></h3>
+				<?php $args = [
+					'type'   => 'email',
+					'name'   => 'message_type',
+					'id'     => 'message-type',
+					'options' => [
+						'marketing'     => __('Marketing', 'groundhogg'),
+						'transactional' => __('Transactional','groundhogg')
+					],
+                    'selected' => $email->get_meta('message_type')?:'marketing',
+                    'required' => true,
+					'option_none'       => '',
+					'option_none_value' => '',
+				]; ?>
+                <p><?php echo Plugin::$instance->utils->html->dropdown( $args ); ?></p>
                 <h3><?php _e( 'Additional' ); ?></h3>
                 <p>
-		            <?php echo Plugin::$instance->utils->html->checkbox( [
-			            'label'   => __('Enable browser view', 'groundhogg' ),
-			            'name'    => 'browser_view',
-			            'id'      => 'browser_view',
-			            'class'   => '',
-			            'value'   => '1',
-			            'checked' => $email->browser_view_enabled( false ),
-		            ] ); ?>
+					<?php echo Plugin::$instance->utils->html->checkbox( [
+						'label'   => __( 'Enable browser view', 'groundhogg' ),
+						'name'    => 'browser_view',
+						'id'      => 'browser_view',
+						'class'   => '',
+						'value'   => '1',
+						'checked' => $email->browser_view_enabled( false ),
+					] ); ?>
                 </p>
                 <p>
-		            <?php echo Plugin::$instance->utils->html->checkbox( [
-			            'label'   => __( 'Save as template', 'groundhogg' ),
-			            'name'    => 'save_as_template',
-			            'id'      => 'save_as_template',
-			            'class'   => '',
-			            'value'   => '1',
-			            'checked' => $email->is_template(),
-		            ] ); ?>
+					<?php echo Plugin::$instance->utils->html->checkbox( [
+						'label'   => __( 'Save as template', 'groundhogg' ),
+						'name'    => 'save_as_template',
+						'id'      => 'save_as_template',
+						'class'   => '',
+						'value'   => '1',
+						'checked' => $email->is_template(),
+					] ); ?>
                 </p>
                 <p>
-                    <?php echo Plugin::$instance->utils->html->checkbox( [
-                        'label'   => __( 'Use custom Alt-Body', 'groundhogg' ),
-                        'name'    => 'use_custom_alt_body',
-                        'id'      => 'use_custom_alt_body',
-                        'class'   => '',
-                        'value'   => '1',
-                        'checked' => $email->has_custom_alt_body(),
-                    ] ); ?>
+					<?php echo Plugin::$instance->utils->html->checkbox( [
+						'label'   => __( 'Use custom Alt-Body', 'groundhogg' ),
+						'name'    => 'use_custom_alt_body',
+						'id'      => 'use_custom_alt_body',
+						'class'   => '',
+						'value'   => '1',
+						'checked' => $email->has_custom_alt_body(),
+					] ); ?>
                 </p>
             </div>
             <div id="post-body-content">
@@ -182,32 +203,33 @@ $email = new Email( $email_id );
                 <div id="content-wrap">
 					<?php
 
-                    add_filter( 'tiny_mce_before_init', function ( $mceinit ){
-                        global $email;
-                        $mceinit[ 'body_class' ] .= $email->get_meta( 'alignment' ) === 'center' ? ' align-email-center' : '';
-                        return $mceinit;
-                    } );
+					add_filter( 'tiny_mce_before_init', function ( $mceinit ) {
+						global $email;
+						$mceinit['body_class'] .= $email->get_meta( 'alignment' ) === 'center' ? ' align-email-center' : '';
 
-                    echo html()->editor( [
+						return $mceinit;
+					} );
+
+					echo html()->editor( [
 						'id'                  => 'email_content',
 						'content'             => $email->get_content(),
 						'settings'            => [
-                            'editor_height' => 500,
-                        ],
+							'editor_height' => 500,
+						],
 						'replacements_button' => true,
 					] ); ?>
                 </div>
 
-                <?php if ($email->has_custom_alt_body()) :?>
-                <div id="alt-wrap">
-                    <h3><?php _e( 'Alt-Body', 'groundhogg' ); ?></h3>
-                    <textarea id="alt-body-input" name="alt_body" style="width: 100%" rows="16"><?php
-                        $alt_body = $email->get_alt_body();
-                        esc_html_e( $alt_body );
-                        ?></textarea>
-                    <p class="description"><?php printf( __( 'Having a custom Alt-Body will improve the deliverability of your emails. %s automatically generates one for you but if you want full control over it you can define it below.', 'groundhogg' ), white_labeled_name() ); ?></p>
-                </div>
-                <?php endif; ?>
+				<?php if ( $email->has_custom_alt_body() ) : ?>
+                    <div id="alt-wrap">
+                        <h3><?php _e( 'Alt-Body', 'groundhogg' ); ?></h3>
+                        <textarea id="alt-body-input" name="alt_body" style="width: 100%" rows="16"><?php
+							$alt_body = $email->get_alt_body();
+							esc_html_e( $alt_body );
+							?></textarea>
+                        <p class="description"><?php printf( __( 'Having a custom Alt-Body will improve the deliverability of your emails. %s automatically generates one for you but if you want full control over it you can define it below.', 'groundhogg' ), white_labeled_name() ); ?></p>
+                    </div>
+				<?php endif; ?>
             </div>
         </div>
     </div>

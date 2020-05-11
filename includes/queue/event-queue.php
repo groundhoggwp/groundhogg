@@ -93,8 +93,8 @@ class Event_Queue extends Supports_Errors {
 
 	}
 
-	public function init(){
-		$this->max_events = apply_filters( 'groundhogg/event_queue/max_events', 50 );
+	public function init() {
+		$this->max_events      = apply_filters( 'groundhogg/event_queue/max_events', 50 );
 		$this->logging_enabled = apply_filters( 'groundhogg/queue/enable_logging', false );
 	}
 
@@ -134,9 +134,10 @@ class Event_Queue extends Supports_Errors {
 	 * @since 1.0.20.1 Added notice to check if there is something wrong with the cron system.
 	 */
 	public function setup_cron_jobs() {
-		if ( ! wp_next_scheduled( self::WP_CRON_HOOK ) && ! gh_cron_installed() ) {
+		if ( ! gh_cron_installed() && ! wp_next_scheduled( self::WP_CRON_HOOK ) ) {
 			wp_schedule_event( time(), apply_filters( 'groundhogg/event_queue/queue_interval', self::WP_CRON_INTERVAL ), self::WP_CRON_HOOK );
 		}
+
 	}
 
 	/**
@@ -148,7 +149,7 @@ class Event_Queue extends Supports_Errors {
 	protected function cleanup_unprocessed_events() {
 		global $wpdb;
 
-		$events = get_db( 'events' );
+		$events = get_db( 'event_queue' );
 
 		// 5 minute window.
 		$time = time() - ( MINUTE_IN_SECONDS * 5 );
@@ -168,6 +169,8 @@ class Event_Queue extends Supports_Errors {
 		if ( ! $this->is_enabled() || Limits::limits_exceeded() ) {
 			return 0;
 		}
+
+		$this->cleanup_unprocessed_events();
 
 		Limits::start();
 
@@ -208,20 +211,20 @@ class Event_Queue extends Supports_Errors {
 
 //		if ( $result > 0 ) {
 //
-//			$r_process_time = number_format( $process_time, 2 );
-//			$r_avg_time     = number_format( $process_time / $result, 2 );
+//			$r_process_time = number_format( $process_time, 4 );
+//			$r_avg_time     = number_format( $process_time / $result, 4 );
+//			$r_eps          = number_format( $result / $process_time, 4 );
 //
 //			wp_send_json( [
-//				'count'              => $result,
-//				'total-time'         => $r_process_time,
-//				'time-per-event' => $r_avg_time,
+//				'count'             => $result,
+//				'total-time'        => $r_process_time,
+//				'time-per-event'    => $r_avg_time,
+//				'events-per-second' => $r_eps
 //			] );
 //		}
 
 		return $result;
 	}
-
-	protected $time_per_event = [];
 
 	/**
 	 * Recursive, Iterate through the list of events and process them via the EVENTS api
@@ -242,7 +245,8 @@ class Event_Queue extends Supports_Errors {
 		}
 
 
-		$event_ids = $this->store->get_events_by_claim( $claim );
+		$event_ids           = $this->store->get_events_by_claim( $claim );
+		$processed_event_ids = [];
 
 		// If this happens it means we are in a parallel queue processing situation,
 		// so let's just try and make another claim.
@@ -264,15 +268,13 @@ class Event_Queue extends Supports_Errors {
 			return $completed_events;
 		}
 
-//		do_action( 'groundhogg/event_queue/process/before', $event_ids );
-
 		self::set_is_processing( true );
 
 		do {
 
 			$event_id = array_pop( $event_ids );
 
-			$event = new Event( $event_id );
+			$event = new Event( $event_id, 'event_queue' );
 			$this->set_current_event( $event );
 
 			$contact = $event->get_contact();
@@ -296,22 +298,23 @@ class Event_Queue extends Supports_Errors {
 				}
 			}
 
-			$completed_events += 1;
+			$processed_event_ids[] = $event_id;
+			$completed_events      += 1;
 			Limits::processed_action();
 
 		} while ( ! empty( $event_ids ) && ! Limits::limits_exceeded() );
 
 		$this->store->release_events( $claim );
+		get_db( 'event_queue' )->move_events_to_history( [ 'ID' => $processed_event_ids ] );
 
 		self::set_is_processing( false );
-
-//		do_action( 'groundhogg/event_queue/process/after', $this );
 
 		if ( Limits::limits_exceeded( $completed_events ) ) {
 			return $completed_events;
 		}
 
 		return $this->process( $completed_events );
+//		return $completed_events;
 	}
 
 	/**

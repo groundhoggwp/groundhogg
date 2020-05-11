@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Broadcasts;
 use Groundhogg\Broadcast;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Event;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_screen_option;
@@ -110,7 +111,6 @@ class Broadcasts_Table extends WP_List_Table {
 	 * @return array
 	 */
 	protected function get_views() {
-		//todo
 		$count = array(
 			'scheduled' => Plugin::$instance->dbs->get_db( 'broadcasts' )->count( [ 'status' => 'scheduled' ] ),
 			'sent'      => Plugin::$instance->dbs->get_db( 'broadcasts' )->count( [ 'status' => 'sent' ] ),
@@ -167,7 +167,7 @@ class Broadcasts_Table extends WP_List_Table {
 		}
 
 		if ( $broadcast->is_sent() ){
-			$actions['report'] = "<span class='edit'><a href='" . esc_url( admin_url( 'admin.php?page=gh_broadcasts&action=report&broadcast=' . $broadcast->get_id() ) ) . "'>" . _x( 'Reporting', 'action', 'groundhogg' ) . "</a></span>";
+			$actions['report'] = "<a href='" . esc_url( admin_page_url( 'gh_reporting', [ 'tab' => 'broadcasts', 'broadcast' => $broadcast->get_id() ] ) ) . "'>" . _x( 'Reporting', 'action', 'groundhogg' ) . "</a>";
 		}
 
 		return $this->row_actions( apply_filters( 'groundhogg/admin/broadcasts/table/handle_row_actions', $actions, $broadcast, $column_name ) );
@@ -196,10 +196,14 @@ class Broadcasts_Table extends WP_List_Table {
 
 			case 'sent':
 
-				$edit_url = groundhogg_url( 'broadcasts', [
-					'action'    => 'report',
-					'broadcast' => $broadcast->get_id()
-				] );
+				if ( $broadcast->is_email() ){
+					$edit_url = admin_page_url( 'gh_reporting', [ 'tab' => 'broadcasts', 'broadcast' => $broadcast->get_id() ] );
+				} else {
+					$edit_url = groundhogg_url( 'broadcasts', [
+						'action'    => 'report',
+						'broadcast' => $broadcast->get_id()
+					] );
+				}
 
 				$html = sprintf( "<strong><a class='row-title' href='%s'>%s</a></strong>", $edit_url, $broadcast->get_title() );
 
@@ -229,9 +233,9 @@ class Broadcasts_Table extends WP_List_Table {
 	 */
 	protected function column_sending_to( $broadcast ) {
 
-		$num = Plugin::$instance->dbs->get_db( 'events' )->count( [
+		$num = Plugin::$instance->dbs->get_db( 'event_queue' )->count( [
 			'step_id'    => $broadcast->get_id(),
-			'status'     => 'waiting',
+			'status'     => Event::WAITING,
 			'event_type' => Event::BROADCAST
 		] );
 

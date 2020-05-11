@@ -1,5 +1,5 @@
 #step-sortable .step.benchmark:after,
-#step-sortable .step.benchmark:before{
+#step-sortable .step.benchmark:before {
     content: "";
     position: absolute;
     display: inline-block;
@@ -13,14 +13,14 @@
     z-index: 998;
 }
 
-#step-sortable .step.benchmark:before{
+#step-sortable .step.benchmark:before {
     left: 24px;
     bottom: -11px;
     border-width: 11px 11px 0 11px;
     border-color: #b8daff transparent transparent transparent;
 }
 
-#step-sortable  .step.benchmark.active:before{
+#step-sortable .step.benchmark.active:before {
     left: 23px;
     bottom: -12px;
     /*border-color: #b0deff transparent transparent transparent;*/
@@ -28,12 +28,12 @@
     border-width: 12px 12px 0 12px;
 }
 
-#post-body{
+#post-body {
     min-height: 100vh;
 }
 
 
-#poststuff #post-body.columns-2{
+#poststuff #post-body.columns-2 {
     margin-left: 400px;
     margin-right: 0 !important;
     border-left: 1px solid #ccd0d4;
@@ -48,27 +48,27 @@
 /* Full Screen */
 #adminmenumain,
 #wpfooter,
-#wpadminbar{
+#wpadminbar {
     display: none !important;
 }
 
-html{
+html {
     padding: 0 !important;
 }
 
 /* END Full Screen */
 
-#screen-meta-links{
+#screen-meta-links {
     display: none;
 }
 
 /* NEW STUFF */
-#wpbody-content{
+#wpbody-content {
     /*height: 100vh;*/
     padding-bottom: 0;
 }
 
-.trigger-popup{
+.trigger-popup {
     font-weight: normal;
 }
 
@@ -93,13 +93,13 @@ html{
 }
 
 .replacements-button,
-.add-contacts-link{
+.add-contacts-link {
     display: inline-block;
     text-decoration: none;
 }
 
-.header-wrap{
-    width:100%;
+.header-wrap {
+    width: 100%;
 }
 
 /*#post-body.columns-2 #postbox-container-1 {*/
@@ -108,17 +108,17 @@ html{
 /*    width: 300px;*/
 /*}*/
 
-#change_reporting{
+#change_reporting {
     margin: 1px 2px;
 }
 
-#postbox-container-1{
+#postbox-container-1 {
     background: #fff;
     min-height: 100vh;
     padding-bottom: 20px;
 }
 
-#postbox-container-1 .step{
+#postbox-container-1 .step {
     /*border: none;*/
     box-shadow: none;
     border: 1px solid #ccd0d4;
@@ -126,28 +126,48 @@ html{
     /*margin: 0;*/
 }
 
-#postbox-container-1 .step h2{
+#postbox-container-1 .step h2 {
     border: none;
 }
 
-#postbox-container-2-inner{
+#postbox-container-2-inner {
     position: fixed;
     left: 401px;
-    width: calc( 100% - 400px );
-    height: calc( 100vh - 79px );
+    width: calc(100% - 400px);
+    height: calc(100vh - 79px);
     overflow: auto;
     background: #6B6B6B;
 }
 
 #postbox-container-2-inner .step {
     /*max-width: 800px;*/
+    /*background: #F1F1F1;*/
+    /*box-shadow: 0 0 10px rgba(0,0,0,0.3);*/
+    /*padding: 10px;*/
+}
+
+.step-notes-textarea {
+    width: 100%;
+    background: #0000001A;
+    border: solid 1px #ccc;
+    color: #ffffff;
+    border-radius: 0px;
+    font-weight: 400;
+}
+
+.step-notes-textarea::placeholder{
+    color: #ffffff80;
+}
+
+.step-background {
+    /*max-width: 800px;*/
     background: #F1F1F1;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     /*padding: 10px;*/
 }
 
 .reporting-results,
-.custom-settings{
+.custom-settings {
     padding: 20px;
 }
 
@@ -156,11 +176,11 @@ html{
     position: relative;
 }
 
-#wpcontent{
+#wpcontent {
     margin-left: 0;
 }
 
-.funnel-editor-header{
+.funnel-editor-header {
     z-index: 999;
     top: 0;
     left: 0;
@@ -174,40 +194,40 @@ html{
     width: inherit;
 }
 
-.funnel-editor-header.sub-header{
+.funnel-editor-header.sub-header {
     top: 60px;
     height: 47px;
     background: #f7f7f7;
 }
 
-.funnel-editor-header div{
+.funnel-editor-header div {
     display: inline-block;
     vertical-align: top;
 }
 
-.funnel-editor-header div.hidden{
+.funnel-editor-header div.hidden {
     display: none;
 }
 
-.funnel-editor-header .status-options{
+.funnel-editor-header .status-options {
     position: absolute;
     top: 0;
     padding: 8px;
     right: 65px;
 }
 
-.reporting-enabled .toolbar-buttons{
+.reporting-enabled .toolbar-buttons {
     display: none;
 }
 
-.toolbar-buttons{
+.toolbar-buttons {
     position: absolute;
     top: 0;
     right: 0;
     padding: 8px;
 }
 
-.toolbar-buttons .dashicons{
+.toolbar-buttons .dashicons {
     width: auto;
     height: auto;
     vertical-align: middle;
@@ -215,26 +235,26 @@ html{
     margin-right: 3px;
 }
 
-.funnel-editor-header #title{
+.funnel-editor-header #title {
     width: 300px;
     font-size: 20px;
     font-weight: 600;
 }
 
-.title-section{
+.title-section {
     width: 100%;
     /*text-align: center;*/
 }
 
 .step-title-view,
-.title-view{
+.title-view {
     line-height: 44px;
     font-size: 20px;
     font-weight: 400;
 }
 
 .step-title-view .title,
-.title-view .title{
+.title-view .title {
     font-weight: 600;
     padding: 8px;
     line-height: 1em;
@@ -250,7 +270,7 @@ button.button.save-button {
     padding: 2px 14px 2px 32px;
 }
 
-.save-button .dashicons{
+.save-button .dashicons {
     position: absolute;
     font-size: 24px;
     top: 10px;
@@ -260,26 +280,40 @@ button.button.save-button {
 }
 
 @-moz-keyframes spin {
-    from { -moz-transform: rotate(0deg); }
-    to { -moz-transform: rotate(360deg); }
-}
-@-webkit-keyframes spin {
-    from { -webkit-transform: rotate(0deg); }
-    to { -webkit-transform: rotate(360deg); }
-}
-@keyframes spin {
-    from {transform:rotate(0deg);}
-    to {transform:rotate(360deg);}
+    from {
+        -moz-transform: rotate(0deg);
+    }
+    to {
+        -moz-transform: rotate(360deg);
+    }
 }
 
-.save-button.spin .dashicons{
+@-webkit-keyframes spin {
+    from {
+        -webkit-transform: rotate(0deg);
+    }
+    to {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.save-button.spin .dashicons {
     animation: spin;
     animation-duration: 2s;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
 }
 
-.exit{
+.exit {
     display: inline-block;
     position: absolute;
     top: 0;
@@ -293,34 +327,34 @@ button.button.save-button {
     padding: 15px 15px 0 15px;
 }
 
-.exit .dashicons{
+.exit .dashicons {
     font-size: 32px;
     height: auto;
     width: auto;
 }
 
-#reporting{
+#reporting {
     display: none;
 }
 
-.reporting-filters{
+.reporting-filters {
     line-height: 30px;
     font-weight: 600;
 }
 
 
-.reporting-enabled #reporting{
+.reporting-enabled #reporting {
     display: inline-block;
     text-align: center;
     width: 100%;
 }
 
-#reporting select{
+#reporting select {
     vertical-align: top;
 }
 
 /* END NEW STUFF */
-.form-buttons .button{
+.form-buttons .button {
     margin: 2px;
 }
 
@@ -337,28 +371,29 @@ button.button.save-button {
     position: absolute;
 }
 
-.full-width{
+.full-width {
     width: 100%;
 }
 
-.wpgh-element{
+.wpgh-element {
     /*height: 112px;*/
     text-align: center;
 }
 
-.step-icon img{
+.step-icon img {
     margin: 0 auto 0 auto;
-    width:80%;
+    width: 80%;
 }
 
-.wpgh-element div{
+.wpgh-element div {
     box-sizing: border-box;
     display: inline-block;
     width: 100%;
     /*padding-top: 10px;*/
     /*padding-bottom: 70px;*/
 }
-.wpgh-element p{
+
+.wpgh-element p {
     font-size: 16px;
     margin: -12px 0 0 0;
 }
@@ -367,7 +402,7 @@ button.button.save-button {
     margin: 0 10px 0 0;
 }
 
-.step-reporting .chart{
+.step-reporting .chart {
     background: #FFF;
     width: 100%;
     box-sizing: border-box;
@@ -388,14 +423,14 @@ button.button.save-button {
 }
 
 #actions table,
-#benchmarks table{
+#benchmarks table {
     box-sizing: border-box;
     width: 100%;
     border-spacing: 7px;
 }
 
 #actions table td,
-#benchmarks table td{
+#benchmarks table td {
     text-align: center;
 }
 
@@ -410,41 +445,41 @@ button.button.save-button {
     margin: 0;
 }
 
-#postbox-container-1 .step.action{
+#postbox-container-1 .step.action {
     /*border-color: rgb(241, 253, 243);*/
     /*border-bottom-color: #dbe6dc;*/
 }
 
-#postbox-container-1 .step.action.active{
+#postbox-container-1 .step.action.active {
     border-color: #44ea1f;
 }
 
-.step.action .hndle{
+.step.action .hndle {
     background-color: rgb(241, 253, 243);
 }
 
-#postbox-container-1 .step.active{
+#postbox-container-1 .step.active {
     border-width: 2px 2px 2px 2px;
     border-style: dashed;
     transition: 0.4s;
 }
 
-#postbox-container-1 .step.benchmark{
+#postbox-container-1 .step.benchmark {
     color: #004085;
     background-color: #cce5ff;
     /*border-color: #cce5ff;*/
     /*border-bottom-color: #b8daff;*/
 }
 
-#postbox-container-1 .step.benchmark h2{
+#postbox-container-1 .step.benchmark h2 {
     color: #004085;
 }
 
-#postbox-container-1 .step.benchmark .step-title{
+#postbox-container-1 .step.benchmark .step-title {
     border-bottom-color: #b8daff;
 }
 
-#postbox-container-1 .step.benchmark.active{
+#postbox-container-1 .step.benchmark.active {
     border-color: #0d79e5;
 }
 
@@ -457,11 +492,11 @@ button.button.save-button {
 }
 
 .step span.actions,
-.reporting-enabled .step:hover span.actions{
+.reporting-enabled .step:hover span.actions {
     visibility: hidden;
 }
 
-.step:hover span.actions{
+.step:hover span.actions {
     visibility: visible;
 }
 
@@ -493,7 +528,7 @@ button.button.save-button {
     vertical-align: middle;
 }
 
-#postbox-container-2{
+#postbox-container-2 {
     /*padding: 10px 20px;*/
     box-sizing: border-box;
     overflow: auto;
@@ -503,46 +538,46 @@ button.button.save-button {
 /*    opacity: 0.5;*/
 /*}*/
 
-.step-settings{
+.step-settings {
     padding: 30px;
 }
 
-#funnel-chart{
+#funnel-chart {
     background: #FFF;
     padding: 20px;
     border-bottom: 1px solid #e5e5e5;
     box-sizing: border-box;
 }
 
-.steps-select{
+.steps-select {
     background: #f1f1f1;
     min-height: 100%;
 }
 
-.steps-select .inside{
+.steps-select .inside {
     padding: 0 25px
 }
 
-.steps-select .description{
+.steps-select .description {
     padding: 10px;
 }
 
-.steps-select .nav-tab-wrapper{
+.steps-select .nav-tab-wrapper {
     text-align: center;
 }
 
-.steps-select .nav-tab{
+.steps-select .nav-tab {
     float: none;
     display: inline-block;
 }
 
-.steps-select .nav-tab-wrapper .nav-tab{
+.steps-select .nav-tab-wrapper .nav-tab {
     font-size: 20px;
     padding: 5px 15px;
     /*font-weight: bold;*/
 }
 
-.step-select-header{
+.step-select-header {
     background: #f9f9f9;
     padding: 10px;
     border-width: 1px 0 1px 0;
@@ -550,7 +585,7 @@ button.button.save-button {
     border-color: #ddd;
 }
 
-td.step-icon{
+td.step-icon {
     border: 1px #ccd0d4 solid;
     background: #ffffff;
     height: 115px;
@@ -558,13 +593,13 @@ td.step-icon{
     padding: 5px;
 }
 
-td.step-icon:hover{
+td.step-icon:hover {
     background: #f9f9f9;
     cursor: pointer;
 }
 
 .reporting-enabled .step-reporting,
-.reporting-enabled #reporting-wrap{
+.reporting-enabled #reporting-wrap {
     display: inline-block;
 }
 
@@ -574,7 +609,7 @@ td.step-icon:hover{
 .active-step #intro,
 #reporting-wrap,
 .reporting-enabled .step-edit
-/*.reporting-enabled .step-settings */
+    /*.reporting-enabled .step-settings */
 
 {
     display: none;
@@ -597,17 +632,17 @@ td.step-icon:hover{
     font-weight: 500;
 }
 
-#postbox-container-1 .step .hndle{
+#postbox-container-1 .step .hndle {
     padding: 12px 12px;
 }
 
-.add-step-bottom-wrap{
+.add-step-bottom-wrap {
     box-sizing: border-box;
     width: 100%;
     padding: 10px;
 }
 
-.add-step-bottom-wrap .add-step{
+.add-step-bottom-wrap .add-step {
     width: 100%;
     box-sizing: border-box;
     font-size: 14px;
@@ -625,7 +660,7 @@ td.step-icon:hover{
     vertical-align: top;
 }
 
-.hndle .hndle-icon{
+.hndle .hndle-icon {
     /*border-radius: 100%;*/
     /*background: #FFF;*/
     float: left;
@@ -636,15 +671,15 @@ td.step-icon:hover{
     /*border: 1px solid #e5e5e5;*/
 }
 
-.reporting-view-wrap{
+.reporting-view-wrap {
     padding: 20px;
 }
 
-table.embed-options td{
+table.embed-options td {
     padding: 0 !important;
 }
 
-.step-title-wrap{
+.step-title-wrap {
     background: #FFF;
     border-bottom: 1px solid #ccd0d4;
     padding: 8px 70px;
@@ -652,7 +687,7 @@ table.embed-options td{
     position: relative;
 }
 
-.step-title-wrap .step-icon{
+.step-title-wrap .step-icon {
 
     position: absolute;
     top: 0;
@@ -672,7 +707,7 @@ table.embed-options td{
     overflow: hidden;
 }
 
-.back-to-admin{
+.back-to-admin {
     position: fixed;
     display: inline-block;
     left: 5px;
@@ -686,12 +721,12 @@ table.embed-options td{
     font-weight: 600;
 }
 
-.step.closed .hndle .hndle-icon{
+.step.closed .hndle .hndle-icon {
     margin-top: -3px;
     margin-bottom: -8px;
 }
 
-.step .handlediv{
+.step .handlediv {
     float: right;
     background: none;
     color: #5c5c5c;
@@ -701,19 +736,19 @@ table.embed-options td{
     padding: 8px 4px;
 }
 
-.step .handlediv:hover{
+.step .handlediv:hover {
     opacity: 0.9;
 }
 
-.row-actions{
+.row-actions {
     margin: 3px 0 0 3px;
 }
 
-.row-actions a{
+.row-actions a {
     text-decoration: none;
 }
 
-.add-contact-form{
+.add-contact-form {
     width: 100%;
     margin-top: 30px;
 }
@@ -726,7 +761,7 @@ table.embed-options td{
     width: 160px;
 }
 
-input, select, textarea{
+input, select, textarea {
     max-width: 100% !important;
 }
 
@@ -737,14 +772,14 @@ input, select, textarea{
     padding: 8px 14px;
 }
 
-#add-step-bottom .dashicons{
+#add-step-bottom .dashicons {
     /*vertical-align: middle;*/
     font-size: 22px;
     vertical-align: middle;
     margin-right: 10px;
 }
 
-#groundhogg-notices{
+#groundhogg-notices {
     position: fixed;
     width: 400px;
     right: 20px;
@@ -758,30 +793,30 @@ input, select, textarea{
     border-width: 0 0 0 5px;
 }
 
-.step-error{
- font-size: 24px;
+.step-error {
+    font-size: 24px;
 }
 
-.demo-video{
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+.demo-video {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     margin: 40px auto;
     margin-top: 250px;
     max-width: 722px;
     display: block;
 }
 
-.demo-video img{
+.demo-video img {
     vertical-align: middle;
 }
 
-.actions-links-arrow{
+.actions-links-arrow {
     position: absolute;
     top: 0;
     right: 0;
 }
 
-.select-a-step-arrow{
+.select-a-step-arrow {
     position: absolute;
-    top:0;
-    left:0;
+    top: 0;
+    left: 0;
 }

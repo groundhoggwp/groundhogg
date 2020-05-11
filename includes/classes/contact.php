@@ -510,7 +510,10 @@ class Contact extends Base_Object_With_Meta {
 			return;
 		}
 
-		$this->update( [ 'optin_status' => $preference ] );
+		$this->update( [
+			'optin_status'              => $preference,
+			'date_optin_status_changed' => current_time( 'mysql' )
+		] );
 
 		$this->update_meta( 'preferences_changed', time() );
 
@@ -646,7 +649,7 @@ class Contact extends Base_Object_With_Meta {
 
 		// Return site timezone offset if no timezone in contact record?
 		if ( ! $this->get_time_zone() ) {
-			Plugin::$instance->utils->date_time->get_wp_offset();
+			return Plugin::$instance->utils->date_time->get_wp_offset();
 		}
 
 		try {
@@ -798,10 +801,11 @@ class Contact extends Base_Object_With_Meta {
 
 		return apply_filters(
 			"groundhogg/{$this->get_object_type()}/get_as_array",
-			[ 'data'  => $contact,
-			  'meta'  => $this->get_meta(),
-			  'tags'  => $this->get_tags(),
-			  'files' => $this->get_files()
+			[
+				'data'  => $contact,
+				'meta'  => $this->get_meta(),
+				'tags'  => $this->get_tags(),
+				'files' => $this->get_files()
 			]
 		);
 	}

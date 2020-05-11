@@ -308,9 +308,7 @@ class Replacements {
 			return $content;
 		}
 
-		$new_content = preg_replace_callback( "/{([^{}]+)}/s", array( $this, 'do_replacement' ), $content );
-
-		return $new_content;
+		return preg_replace_callback( "/{([^{}]+)}/s", array( $this, 'do_replacement' ), $content );
 	}
 
 	/**
@@ -374,6 +372,13 @@ class Replacements {
 			return $default;
 		}
 
+		$cache_key   = 'key:' . $this->contact_id . ':' . md5( serialize( $parts ) );
+		$cache_value = wp_cache_get( $cache_key, 'replacements' );
+
+		if ( $cache_value ) {
+			return $cache_value;
+		}
+
 		// Access contact fields.
 		if ( substr( $code, 0, 1 ) === '_' ) {
 			$field = substr( $code, 1 );
@@ -388,7 +393,10 @@ class Replacements {
 			$text = $default;
 		}
 
-		return apply_filters( "groundhogg/replacements/{$code}", $text );
+		$value = apply_filters( "groundhogg/replacements/{$code}", $text );
+		wp_cache_set( $cache_key, $value, 'replacements' );
+
+		return $value;
 
 	}
 

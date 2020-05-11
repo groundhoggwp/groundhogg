@@ -3,6 +3,7 @@
 namespace Groundhogg\Form;
 
 use Groundhogg\Form\Fields\Birthday;
+use Groundhogg\Step;
 use function Groundhogg\array_to_atts;
 use function Groundhogg\do_replacements;
 use function Groundhogg\encrypt;
@@ -41,278 +42,276 @@ use function Groundhogg\managed_page_url;
  * Date: 2019-05-10
  * Time: 9:51 AM
  */
-
 class Form {
 
-    protected $attributes = [];
+	protected $attributes = [];
+	protected $step;
 
-    /**
-     * Manager constructor.
-     */
-    public function __construct( $atts )
-    {
-        $this->attributes = shortcode_atts( [
-            'class'     => '',
-            'id'        => 0
-        ], $atts);
+	/**
+	 * Manager constructor.
+	 */
+	public function __construct( $atts ) {
+		$this->attributes = shortcode_atts( [
+			'class' => '',
+			'id'    => 0
+		], $atts );
 
-        $this->init_fields();
-    }
+		$this->step = new Step( $atts[ 'id' ] );
+		$this->init_fields();
+	}
 
-    /**
-     * @return int
-     */
-    public function get_id()
-    {
-        return absint( get_array_var( $this->attributes, 'id' ) );
-    }
-    
-    /**
-     * Setup the base Fields for the plugin
-     */
-    protected function init_fields()
-    {
-        $this->column = new Column( $this->get_id() );
-        $this->row = new Row( $this->get_id() );
-        $this->text = new Text( $this->get_id() );
-        $this->textarea = new Textarea( $this->get_id());
-        $this->first = new First($this->get_id());
-        $this->last = new Last($this->get_id());
-        $this->email = new Email($this->get_id());
-        $this->phone = new Phone($this->get_id());
-        $this->number = new Number($this->get_id());
-        $this->date = new Date($this->get_id());
-        $this->time = new Time($this->get_id());
-        $this->file = new File($this->get_id());
-        $this->select = new Dropdown($this->get_id());
-        $this->radio = new Radio($this->get_id());
-        $this->checkbox = new Checkbox($this->get_id());
-        $this->terms = new Terms($this->get_id());
-        $this->gdpr = new GDPR($this->get_id());
-        $this->address = new Address( $this->get_id());
-        $this->recaptcha = new Recaptcha($this->get_id());
-        $this->submit = new Submit($this->get_id());
-        $this->birthday = new Birthday($this->get_id());
+	/**
+	 * @return int
+	 */
+	public function get_id() {
+		return absint( get_array_var( $this->attributes, 'id' ) );
+	}
 
-        do_action( 'groundhogg/form/fields/init', $this );
-    }
+	/**
+	 * Setup the base Fields for the plugin
+	 */
+	protected function init_fields() {
+		$this->column    = new Column( $this->get_id() );
+		$this->row       = new Row( $this->get_id() );
+		$this->text      = new Text( $this->get_id() );
+		$this->textarea  = new Textarea( $this->get_id() );
+		$this->first     = new First( $this->get_id() );
+		$this->last      = new Last( $this->get_id() );
+		$this->email     = new Email( $this->get_id() );
+		$this->phone     = new Phone( $this->get_id() );
+		$this->number    = new Number( $this->get_id() );
+		$this->date      = new Date( $this->get_id() );
+		$this->time      = new Time( $this->get_id() );
+		$this->file      = new File( $this->get_id() );
+		$this->select    = new Dropdown( $this->get_id() );
+		$this->radio     = new Radio( $this->get_id() );
+		$this->checkbox  = new Checkbox( $this->get_id() );
+		$this->terms     = new Terms( $this->get_id() );
+		$this->gdpr      = new GDPR( $this->get_id() );
+		$this->address   = new Address( $this->get_id() );
+		$this->recaptcha = new Recaptcha( $this->get_id() );
+		$this->submit    = new Submit( $this->get_id() );
+		$this->birthday  = new Birthday( $this->get_id() );
 
-
-    /**
-     * List of fields
-     *
-     * @var Field[]
-     */
-    protected $fields = [];
-    
-    /**
-     * Set the data to the given value
-     *
-     * @param $key string
-     * @return Field
-     */
-    public function get_field( $key ){
-        return $this->$key;
-    }
-
-    /**
-     * Magic get method
-     *
-     * @param $key string
-     * @return Field|false
-     */
-    public function __get( $key )
-    {
-        if ( isset_not_empty( $this->fields, $key ) ){
-            return $this->fields[ $key ];
-        }
-
-        return false;
-    }
+		do_action( 'groundhogg/form/fields/init', $this );
+	}
 
 
-    /**
-     * Set the data to the given value
-     *
-     * @param $key string
-     * @param $value Field
-     */
-    public function __set( $key, $value )
-    {
-        $this->fields[ $key ] = $value;
-    }
+	/**
+	 * List of fields
+	 *
+	 * @var Field[]
+	 */
+	protected $fields = [];
 
-    public function get_shortcode()
-    {
-        return sprintf('[gh_form id="%d"]', $this->get_id() );
-    }
+	/**
+	 * Set the data to the given value
+	 *
+	 * @param $key string
+	 *
+	 * @return Field
+	 */
+	public function get_field( $key ) {
+		return $this->$key;
+	}
 
-    public function get_iframe_embed_code()
-    {
-        $form_iframe_url = managed_page_url( sprintf( 'forms/iframe/%s/', urlencode( encrypt( $this->get_id() ) ) ) );
-        $script = sprintf('<script id="%s" type="text/javascript" src="%s"></script>', 'groundhogg_form_' . $this->get_id(), $form_iframe_url );
+	/**
+	 * Magic get method
+	 *
+	 * @param $key string
+	 *
+	 * @return Field|false
+	 */
+	public function __get( $key ) {
+		if ( isset_not_empty( $this->fields, $key ) ) {
+			return $this->fields[ $key ];
+		}
 
-        return $script;
-    }
+		return false;
+	}
 
-    public function get_submission_url()
-    {
-        return managed_page_url( sprintf( 'forms/%s/submit/', urlencode( encrypt( $this->get_id() ) ) ) );
-    }
 
-    protected function get_honey_pot_code()
-    {
-        // Honey Pot validation.
-        $honeypot = html()->input( [
-            'type'          => 'password',
-            'name'          => 'your_password',
-            'id'            => 'your_password',
-            'title'         => 'Password',
-            'class'         => '',
-            'value'         => '',
-            'autocomplete'  => 'off',
-            'tabindex'      => '-1'
-        ] );
+	/**
+	 * Set the data to the given value
+	 *
+	 * @param $key string
+	 * @param $value Field
+	 */
+	public function __set( $key, $value ) {
+		$this->fields[ $key ] = $value;
+	}
 
-        $honeypot = html()->wrap( $honeypot, 'div', [ 'class' => 'your-password h0n3yp0t', 'style' => [ 'display' => 'none' ] ] );
+	public function get_shortcode() {
+		return sprintf( '[gh_form id="%d"]', $this->get_id() );
+	}
 
-        return $honeypot;
-    }
+	public function get_iframe_embed_code() {
+		$form_iframe_url = managed_page_url( sprintf( 'forms/iframe/%s/', urlencode( encrypt( $this->get_id() ) ) ) );
+		$script          = sprintf( '<script id="%s" type="text/javascript" src="%s"></script>', 'groundhogg_form_' . $this->get_id(), $form_iframe_url );
 
-    public function get_html_embed_code()
-    {
-        $form = html()->e( 'link', [ 'rel' => 'stylesheet', 'href' => GROUNDHOGG_ASSETS_URL . 'css/frontend/form.css' ] );
+		return $script;
+	}
 
-        $form .= '<div class="gh-form-wrapper">';
+	public function get_submission_url() {
+		return managed_page_url( sprintf( 'forms/%s/submit/', urlencode( encrypt( $this->get_id() ) ) ) );
+	}
 
-        $atts = [
-            'method' => 'post',
-            'class'  => 'gh-form ' . $this->attributes[ 'class' ],
-            'target' => '_parent',
-            'action' => $this->get_submission_url(),
-            'enctype' => 'multipart/form-data'
-        ];
+	protected function get_honey_pot_code() {
+		// Honey Pot validation.
+		$honeypot = html()->input( [
+			'type'         => 'password',
+			'name'         => 'your_password',
+			'id'           => 'your_password',
+			'title'        => 'Password',
+			'class'        => '',
+			'value'        => '',
+			'autocomplete' => 'off',
+			'tabindex'     => '-1'
+		] );
 
-        $form .= sprintf( "<form %s>", array_to_atts( $atts ) );
+		$honeypot = html()->wrap( $honeypot, 'div', [
+			'class' => 'your-password h0n3yp0t',
+			'style' => [ 'display' => 'none' ]
+		] );
 
-        if ( ! empty( $this->attributes[ 'id' ] ) ){
-            $form .= "<input type='hidden' name='gh_submit_form_key' value='" . encrypt( $this->get_id() ) . "'>";
-            $form .= "<input type='hidden' name='gh_submit_form' value='" . $this->get_id(). "'>";
-        }
+		return $honeypot;
+	}
 
-        $step = Plugin::$instance->utils->get_step( $this->get_id() );
+	public function get_html_embed_code() {
+		$form = html()->e( 'link', [
+			'rel'  => 'stylesheet',
+			'href' => GROUNDHOGG_ASSETS_URL . 'css/frontend/form.css'
+		] );
 
-        if ( ! $step ){
-            return sprintf( "<p>%s</p>" , __( "<b>Configuration Error:</b> This form has been deleted." ) );
-        }
+		$form .= '<div class="gh-form-wrapper">';
+
+		$atts = [
+			'method'  => 'post',
+			'class'   => 'gh-form ' . $this->attributes['class'],
+			'target'  => '_parent',
+			'action'  => $this->get_submission_url(),
+			'enctype' => 'multipart/form-data',
+			'name'    => $this->step->get_step_title()
+		];
+
+		$form .= sprintf( "<form %s>", array_to_atts( $atts ) );
+
+		if ( ! empty( $this->attributes['id'] ) ) {
+			$form .= "<input type='hidden' name='gh_submit_form_key' value='" . encrypt( $this->get_id() ) . "'>";
+			$form .= "<input type='hidden' name='gh_submit_form' value='" . $this->get_id() . "'>";
+		}
+
+		$step = Plugin::$instance->utils->get_step( $this->get_id() );
+
+		if ( ! $step ) {
+			return sprintf( "<p>%s</p>", __( "<b>Configuration Error:</b> This form has been deleted." ) );
+		}
 
 //        do_action( 'groundhogg/form/embed/before', $this );
 
-        $content = do_shortcode( $step->get_meta( 'form' ) );
+		$content = do_shortcode( $step->get_meta( 'form' ) );
 
 //        do_action( 'groundhogg/form/embed/after', $this );
 
-        if ( empty( $content ) ){
-            return sprintf( "<p>%s</p>" , __( "<b>Configuration Error:</b> This form has either been deleted or has not content yet." ) );
-        }
+		if ( empty( $content ) ) {
+			return sprintf( "<p>%s</p>", __( "<b>Configuration Error:</b> This form has either been deleted or has not content yet." ) );
+		}
 
-        $form .= $content;
+		$form .= $content;
 
-        $form .= '</form>';
+		$form .= '</form>';
 
-        $form .= '</div>';
+		$form .= '</div>';
 
-        $form = apply_filters( 'groundhogg/form/embed', $form, $this );
+		$form = apply_filters( 'groundhogg/form/embed', $form, $this );
 
-        return $form;
-    }
+		return $form;
+	}
 
 
-    /**
-     * Do the shortcode
-     *
-     * @param $atts
-     * @param $content
-     * @return string
-     */
-    public function shortcode()
-    {
+	/**
+	 * Do the shortcode
+	 *
+	 * @param $atts
+	 * @param $content
+	 *
+	 * @return string
+	 */
+	public function shortcode() {
 
-        wp_enqueue_style( 'groundhogg-form' );
+		wp_enqueue_style( 'groundhogg-form' );
 
-        $form = '<div class="gh-form-wrapper">';
+		$form = '<div class="gh-form-wrapper">';
 
-        /* Errors from a previous submission */
-        $form .= form_errors( true );
+		/* Errors from a previous submission */
+		$form .= form_errors( true );
 
-        $step = Plugin::$instance->utils->get_step( $this->get_id() );
+		if ( ! $this->step->exists() ) {
+			return false;
+		}
 
-        if ( ! $step ){
-            return false;
-        }
+		$submit_via_ajax = $this->step->get_meta( 'enable_ajax' );
 
-        $submit_via_ajax = $step->get_meta( 'enable_ajax' );
+		if ( $submit_via_ajax ) {
+			wp_enqueue_script( 'groundhogg-ajax-form' );
+			wp_enqueue_style( 'groundhogg-loader' );
+		}
 
-        if ( $submit_via_ajax ){
-            wp_enqueue_script( 'groundhogg-ajax-form' );
-            wp_enqueue_style( 'groundhogg-loader' );
-        }
+		$atts = [
+			'method'  => 'post',
+			'class'   => 'gh-form ' . $this->attributes['class'] . ( $submit_via_ajax ? ' ajax-submit' : '' ),
+			'target'  => '_parent',
+			'enctype' => 'multipart/form-data',
+			'name'    => $this->step->get_step_title()
+		];
 
-        $atts = [
-            'method' => 'post',
-            'class'  => 'gh-form ' . $this->attributes[ 'class' ] . ( $submit_via_ajax ? ' ajax-submit' : '' ),
-            'target' => '_parent',
-            'enctype' => 'multipart/form-data'
-        ];
+		if ( get_query_var( 'doing_iframe' ) ) {
+			$atts['action'] = $this->get_submission_url();
+		}
 
-        if ( get_query_var( 'doing_iframe' ) ){
-            $atts[ 'action' ] = $this->get_submission_url();
-        }
+		$form .= sprintf( "<form %s>", array_to_atts( $atts ) );
 
-        $form .= sprintf( "<form %s>", array_to_atts( $atts ) );
+		if ( ! empty( $this->attributes['id'] ) ) {
+			$form .= "<input type='hidden' name='gh_submit_form_key' value='" . encrypt( $this->get_id() ) . "'>";
+			$form .= "<input type='hidden' name='gh_submit_form' value='" . $this->get_id() . "'>";
+		}
 
-        if ( ! empty( $this->attributes[ 'id' ] ) ){
-            $form .= "<input type='hidden' name='gh_submit_form_key' value='" . encrypt( $this->get_id() ) . "'>";
-            $form .= "<input type='hidden' name='gh_submit_form' value='" . $this->get_id(). "'>";
-        }
-
-        if ( ! $step ){
-            return sprintf( "<p>%s</p>" , __( "<b>Configuration Error:</b> This form has been deleted." ) );
-        }
+		if ( ! $this->step ) {
+			return sprintf( "<p>%s</p>", __( "<b>Configuration Error:</b> This form has been deleted." ) );
+		}
 
 //        do_action( 'groundhogg/form/shortcode/before', $this );
 
-        $content = do_replacements( do_shortcode( $step->get_meta( 'form' ) ) );
+		$content = do_replacements( do_shortcode( $this->step->get_meta( 'form' ) ) );
 
 //        do_action( 'groundhogg/form/shortcode/after', $this );
 
-        if ( empty( $content ) ){
-            return sprintf( "<p>%s</p>" , __( "<b>Configuration Error:</b> This form has either been deleted or has not content yet." ) );
-        }
+		if ( empty( $content ) ) {
+			return sprintf( "<p>%s</p>", __( "<b>Configuration Error:</b> This form has either been deleted or has not content yet." ) );
+		}
 
-        $form .= $content;
+		$form .= $content;
 
-        $form .= '</form>';
+		$form .= '</form>';
 
-        if ( is_user_logged_in() && current_user_can( 'edit_funnels' ) ){
-            $form .= sprintf( "<div class='gh-form-edit-link'><a href='%s'>%s</a></div>", admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $step->get_funnel_id() ), __( '(Edit Form)' ) );
-        }
+		if ( is_user_logged_in() && current_user_can( 'edit_funnels' ) ) {
+			$form .= sprintf( "<div class='gh-form-edit-link'><a href='%s'>%s</a></div>", admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $this->step->get_funnel_id() ), __( '(Edit Form)' ) );
+		}
 
-        $form .= '</div>';
+		$form .= '</div>';
 
-        $form = apply_filters( 'groundhogg/form/shortcode', $form, $this );
+		$form = apply_filters( 'groundhogg/form/shortcode', $form, $this );
 
-        return $form;
-    }
+		return $form;
+	}
 
-    /**
-     * Just return the shortcode
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->shortcode();
-    }
-    
+	/**
+	 * Just return the shortcode
+	 *
+	 * @return string
+	 */
+	public function __toString() {
+		return $this->shortcode();
+	}
+
 }

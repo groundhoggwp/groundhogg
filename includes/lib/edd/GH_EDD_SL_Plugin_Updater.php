@@ -332,6 +332,12 @@ class GH_EDD_SL_Plugin_Updater {
      * @return array
      */
     private function convert_object_to_array( $data ) {
+
+    	if ( empty( $data ) ){
+    		return [];
+	    }
+
+    	$data = (object) $data;
         $new_data = array();
         foreach ( $data as $key => $value ) {
             $new_data[ $key ] = $value;

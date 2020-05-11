@@ -259,10 +259,10 @@ abstract class DB {
 
 					foreach ( $value as $item ) {
 
-						if ( is_string( $item ) ) {
-							$ORS[] = "'" . $item . "'";
-						} else {
+						if ( is_numeric( $item ) ) {
 							$ORS[] = $item;
+						} else if ( is_string( $item ) ) {
+							$ORS[] = "'" . $item . "'";
 						}
 
 					}
@@ -790,8 +790,10 @@ abstract class DB {
 			$select = implode( ',', $select );
 		}
 
+		$distinct = isset_not_empty( $query_vars, 'distinct' ) ? 'DISTINCT' : '' ;
+
 		if ( $query_vars['func'] ) {
-			$select = sprintf( '%s(%s)', strtoupper( $query_vars['func'] ), $select );
+			$select = sprintf( '%s( %s %s)', strtoupper( $query_vars['func'] ), $distinct, $select );
 		}
 
 		$limit   = $query_vars['limit'] ? sprintf( 'LIMIT %d', absint( $query_vars['limit'] ) ) : '';
@@ -804,10 +806,10 @@ abstract class DB {
 
 		$clauses = [
 			'where'   => $where,
+			'groupby' => $groupby,
 			'orderby' => $orderby,
 			'order'   => $order,
 			'limit'   => $limit,
-			'groupby' => $groupby,
 			'offset'  => $offset,
 		];
 
@@ -874,6 +876,7 @@ abstract class DB {
 					'value'  => 'val',
 					'key'    => 'col',
 					'column' => 'col',
+					'comp'   => 'compare'
 				];
 
 				foreach ( $normalize_keys as $from => $to ) {

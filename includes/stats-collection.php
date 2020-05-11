@@ -15,7 +15,7 @@ class Stats_Collection {
 	public function init() {
 		if ( $this->is_enabled() ) {
 			add_action( 'admin_init', [ $this, 'init_cron' ] );
-			add_action( self::ACTION, [ $this, 'send_stats' ] );
+			add_action( 'gh_do_stats_collection', [ $this, 'send_stats' ] );
 		}
 
 		if ( is_admin() && get_request_var( 'action' ) === 'opt_in_to_stats' ) {

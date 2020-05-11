@@ -445,12 +445,14 @@ function words_to_key( $words ) {
 /**
  * Return the percentage to the second degree.
  *
- * @param $a
- * @param $b
+ * @param     $a
+ * @param     $b
+ *
+ * @param int $precision
  *
  * @return float
  */
-function percentage( $a, $b ) {
+function percentage( $a, $b, $precision = 2 ) {
 	$a = intval( $a );
 	$b = intval( $b );
 
@@ -458,7 +460,7 @@ function percentage( $a, $b ) {
 		return 0;
 	}
 
-	return round( ( $b / $a ) * 100, 2 );
+	return round( ( $b / $a ) * 100, $precision );
 }
 
 function sort_by_string_in_array( $key ) {
@@ -621,6 +623,11 @@ function array_to_atts( $atts ) {
  * @return string
  */
 function array_to_css( $atts ) {
+
+	if ( ! is_array( $atts ) ) {
+		return $atts;
+	}
+
 	$css = '';
 	foreach ( $atts as $key => $value ) {
 
@@ -1267,6 +1274,7 @@ function create_user_from_contact( $contact, $role = 'subscriber', $notification
 
 	$user_id = wp_insert_user( [
 		'user_pass'     => wp_generate_password(),
+		'user_email'    => $contact->get_email(),
 		'user_login'    => $contact->get_email(),
 		'user_nicename' => $contact->get_full_name(),
 		'display_name'  => $contact->get_full_name(),
@@ -1348,11 +1356,8 @@ function get_form_list() {
 	] );
 
 	$form_options = array();
-	$default      = 0;
+
 	foreach ( $forms as $form ) {
-		if ( ! $default ) {
-			$default = $form->ID;
-		}
 		$step = Plugin::$instance->utils->get_step( $form->ID );
 		if ( $step->is_active() ) {
 			$form_options[ $form->ID ] = $form->step_title;
@@ -1366,13 +1371,14 @@ function get_form_list() {
 /**
  * Schedule a 1 off email notification
  *
- * @param     $email_id            int the ID of the email to send
- * @param     $contact_id_or_email int|string the ID of the contact to send to
+ * @param int $email_id the ID of the email to send
+ * @param int|string $contact_id_or_email the ID of the contact to send to
  * @param int $time time time to send at, defaults to time()
  *
  * @return bool whether the scheduling was successful.
  */
 function send_email_notification( $email_id, $contact_id_or_email, $time = 0 ) {
+
 	$contact = Plugin::$instance->utils->get_contact( $contact_id_or_email );
 	$email   = Plugin::$instance->utils->get_email( $email_id );
 
@@ -1391,10 +1397,10 @@ function send_email_notification( $email_id, $contact_id_or_email, $time = 0 ) {
 		'contact_id' => $contact->get_id(),
 		'event_type' => Event::EMAIL_NOTIFICATION,
 		'priority'   => 5,
-		'status'     => 'waiting',
+		'status'     => Event::WAITING,
 	];
 
-	if ( Plugin::$instance->dbs->get_db( 'events' )->add( $event ) ) {
+	if ( enqueue_event( $event ) ) {
 		return true;
 	}
 
@@ -1512,9 +1518,13 @@ function send_event_failure_notification( $event ) {
 	$message .= sprintf( "\nManage Failed Events: %s", admin_url( 'admin.php?page=gh_events&view=status&status=failed' ) );
 	$to      = Plugin::$instance->settings->get_option( 'event_failure_notification_email', get_option( 'admin_email' ) );
 
+	do_action( 'groundhogg/send_event_failure_notification/before' );
+
 	if ( wp_mail( $to, $subject, $message ) ) {
 		set_transient( 'gh_hold_failed_event_notification', true, MINUTE_IN_SECONDS );
 	}
+
+	do_action( 'groundhogg/send_event_failure_notification/after' );
 }
 
 add_action( 'groundhogg/event/failed', __NAMESPACE__ . '\send_event_failure_notification' );
@@ -1586,41 +1596,42 @@ function get_items_from_csv( $file_path = '' ) {
 function get_mappable_fields( $extra = [] ) {
 
 	$defaults = [
-		'full_name'               => __( 'Full Name' ),
-		'first_name'              => __( 'First Name' ),
-		'last_name'               => __( 'Last Name' ),
-		'email'                   => __( 'Email Address' ),
-		'optin_status'            => __( 'Optin Status' ),
-		'user_id'                 => __( 'User Id' ),
-		'owner_id'                => __( 'Owner Id' ),
-		'date_created'            => __( 'Date Created' ),
-		'birthday'                => __( 'Birthday' ),
-		'primary_phone'           => __( 'Phone Number' ),
-		'primary_phone_extension' => __( 'Phone Number Extension' ),
-		'street_address_1'        => __( 'Street Address 1' ),
-		'street_address_2'        => __( 'Street Address 2' ),
-		'city'                    => __( 'City' ),
-		'postal_zip'              => __( 'Postal/Zip' ),
-		'region'                  => __( 'Province/State/Region' ),
-		'country'                 => __( 'Country' ),
-		'company_name'            => __( 'Company Name' ),
-		'company_address'         => __( 'Full Company Address' ),
-		'job_title'               => __( 'Job Title' ),
-		'time_zone'               => __( 'Time Zone' ),
-		'ip_address'              => __( 'IP Address' ),
-		'lead_source'             => __( 'Lead Source' ),
-		'source_page'             => __( 'Source Page' ),
-		'terms_agreement'         => __( 'Terms Agreement' ),
-		'gdpr_consent'            => __( 'GDPR Consent' ),
-		'notes'                   => __( 'Add To Notes' ),
-		'tags'                    => __( 'Apply Value as Tag' ),
-		'meta'                    => __( 'Add as Custom Meta' ),
-		'file'                    => __( 'Upload File' ),
-		'utm_campaign'            => __( 'UTM Campaign' ),
-		'utm_content'             => __( 'UTM Content' ),
-		'utm_medium'              => __( 'UTM Medium' ),
-		'utm_term'                => __( 'UTM Term' ),
-		'utm_source'              => __( 'UTM Source' ),
+		'full_name'                 => __( 'Full Name' ),
+		'first_name'                => __( 'First Name' ),
+		'last_name'                 => __( 'Last Name' ),
+		'email'                     => __( 'Email Address' ),
+		'optin_status'              => __( 'Optin Status' ),
+		'user_id'                   => __( 'User Id' ),
+		'owner_id'                  => __( 'Owner Id' ),
+		'date_created'              => __( 'Date Created' ),
+		'date_optin_status_changed' => __( 'Date Optin Status Changed' ),
+		'birthday'                  => __( 'Birthday' ),
+		'primary_phone'             => __( 'Phone Number' ),
+		'primary_phone_extension'   => __( 'Phone Number Extension' ),
+		'street_address_1'          => __( 'Street Address 1' ),
+		'street_address_2'          => __( 'Street Address 2' ),
+		'city'                      => __( 'City' ),
+		'postal_zip'                => __( 'Postal/Zip' ),
+		'region'                    => __( 'Province/State/Region' ),
+		'country'                   => __( 'Country' ),
+		'company_name'              => __( 'Company Name' ),
+		'company_address'           => __( 'Full Company Address' ),
+		'job_title'                 => __( 'Job Title' ),
+		'time_zone'                 => __( 'Time Zone' ),
+		'ip_address'                => __( 'IP Address' ),
+		'lead_source'               => __( 'Lead Source' ),
+		'source_page'               => __( 'Source Page' ),
+		'terms_agreement'           => __( 'Terms Agreement' ),
+		'gdpr_consent'              => __( 'GDPR Consent' ),
+		'notes'                     => __( 'Add To Notes' ),
+		'tags'                      => __( 'Apply Value as Tag' ),
+		'meta'                      => __( 'Add as Custom Meta' ),
+		'file'                      => __( 'Upload File' ),
+		'utm_campaign'              => __( 'UTM Campaign' ),
+		'utm_content'               => __( 'UTM Content' ),
+		'utm_medium'                => __( 'UTM Medium' ),
+		'utm_term'                  => __( 'UTM Term' ),
+		'utm_source'                => __( 'UTM Source' ),
 	];
 
 	$fields = array_merge( $defaults, $extra );
@@ -1632,12 +1643,19 @@ function get_mappable_fields( $extra = [] ) {
 /**
  * Generate a contact from given associative array and a field map.
  *
- * @param $fields
- * @param $map
+ * @param $fields array the raw data from the source
+ * @param $map array map of field_ids to contact keys
  *
  * @return Contact|false
+ * @throws \Exception
  */
-function generate_contact_with_map( $fields, $map ) {
+function generate_contact_with_map( $fields, $map = [] ) {
+
+	if ( empty( $map ) ) {
+		$keys = array_keys( $fields );
+		$map  = array_combine( $keys, $keys );
+	}
+
 	$meta  = [];
 	$tags  = [];
 	$notes = [];
@@ -1669,6 +1687,7 @@ function generate_contact_with_map( $fields, $map ) {
 				$args[ $field ] = sanitize_email( $value );
 				break;
 			case 'date_created':
+			case 'date_optin_status_changed':
 				$args[ $field ] = date( 'Y-m-d H:i:s', strtotime( $value ) );
 				break;
 			case 'optin_status':
@@ -1864,7 +1883,7 @@ endif;
  *
  * @return string
  */
-function scheduled_time( $time, $date_prefix='on' ) {
+function scheduled_time( $time, $date_prefix = 'on' ) {
 	// convert to local time.
 	$p_time = Plugin::$instance->utils->date_time->convert_to_local_time( $time );
 
@@ -1875,11 +1894,11 @@ function scheduled_time( $time, $date_prefix='on' ) {
 
 	if ( absint( $time_diff ) > DAY_IN_SECONDS ) {
 
-	    if ( $date_prefix ){
-		    $time = sprintf( "%s %s", $date_prefix, date_i18n( get_date_time_format(), intval( $p_time ) ) );
-	    } else {
-		    $time = date_i18n( get_date_time_format(), intval( $p_time ) );
-	    }
+		if ( $date_prefix ) {
+			$time = sprintf( "%s %s", $date_prefix, date_i18n( get_date_time_format(), intval( $p_time ) ) );
+		} else {
+			$time = date_i18n( get_date_time_format(), intval( $p_time ) );
+		}
 
 	} else {
 		$format = $time_diff <= 0 ? _x( "%s ago", 'status', 'groundhogg' ) : _x( "in %s", 'status', 'groundhogg' );
@@ -1899,18 +1918,18 @@ function scheduled_time( $time, $date_prefix='on' ) {
  *
  * @return string
  */
-function scheduled_time_column( $time = 0, $show_local_time = false, $contact = false, $date_prefix='on' ) {
+function scheduled_time_column( $time = 0, $show_local_time = false, $contact = false, $date_prefix = 'on' ) {
 
-    if ( is_string( $time ) ){
-        $time = strtotime( $time );
-    }
+	if ( is_string( $time ) ) {
+		$time = strtotime( $time );
+	}
 
 	$s_time = scheduled_time( $time, $date_prefix );
 	$l_time = Plugin::instance()->utils->date_time->convert_to_local_time( $time );
 
 	$html = '<abbr title="' . date_i18n( get_date_time_format(), $l_time ) . '">' . $s_time . '</abbr>';
 
-	if ( $show_local_time && is_a( $contact, 'Groundhogg\Contact' ) ){
+	if ( $show_local_time && is_a( $contact, 'Groundhogg\Contact' ) ) {
 		$html .= sprintf( '<br><i>(%s %s)', date_i18n( get_option( 'time_format' ), $contact->get_local_time( $time ) ), __( 'local time', 'groundhogg' ) ) . '</i>';
 	}
 
@@ -2347,7 +2366,9 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
 		'headers'     => $headers,
 		'body'        => $body,
 		'data_format' => 'body',
-		'sslverify'   => true
+		'sslverify'   => true,
+		'user-agent'  => 'Groundhogg/' . GROUNDHOGG_VERSION . '; ' . home_url()
+
 	];
 
 	if ( $method === 'GET' ) {
@@ -3057,6 +3078,83 @@ function set_user_test_email( $email = '', $user_id = 0 ) {
  *
  * @return bool
  */
-function gh_cron_installed(){
-    return file_exists( ABSPATH . 'gh-cron.php' );
+function gh_cron_installed() {
+	return file_exists( ABSPATH . 'gh-cron.php' );
+}
+
+/**
+ * Get an event from the event history table by referencing it's ID from the event queue
+ *
+ * @param $queued_id int
+ *
+ * @return bool|Event
+ */
+function get_event_by_queued_id( $queued_id ) {
+
+	if ( ! $queued_id ) {
+		return false;
+	}
+
+	$event = new Event( absint( $queued_id ), 'events', 'queued_id' );
+
+	if ( ! $event->exists() ) {
+		return false;
+	}
+
+	return $event;
+}
+
+/**
+ * Get an event from the event history table by referencing it's ID from the event queue
+ *
+ * @param $event_id int
+ *
+ * @return bool|Event
+ */
+function get_queued_event_by_id( $event_id ) {
+
+	$event = new Event( absint( $event_id ), 'event_queue', 'ID' );
+
+	if ( ! $event->exists() ) {
+		return false;
+	}
+
+	return $event;
+}
+
+/**
+ * Add an event to the event queue.
+ *
+ * @param $args
+ *
+ * @return bool|Event
+ */
+function enqueue_event( $args ) {
+	$event_id = get_db( 'event_queue' )->add( $args );
+
+	if ( ! $event_id ) {
+		return false;
+	}
+
+	return get_queued_event_by_id( $event_id );
+}
+
+/**
+ * Generate a referer hash string
+ *
+ * @param $referer
+ *
+ * @return false|string
+ */
+function generate_referer_hash( $referer ) {
+	return substr( md5( $referer ), 0, 20 );
+}
+
+/**
+ * @param $time
+ *
+ * @return int
+ */
+function convert_to_local_time( $time ) {
+	return Plugin::$instance->utils->date_time->convert_to_local_time( $time );
 }

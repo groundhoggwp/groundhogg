@@ -6,6 +6,7 @@ use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use function Groundhogg\dashicon;
 use function Groundhogg\ensure_array;
+use function Groundhogg\get_db;
 use function Groundhogg\html;
 use Groundhogg\Event;
 use function Groundhogg\get_array_var;
@@ -108,6 +109,7 @@ abstract class Funnel_Step extends Supports_Errors {
 		add_filter( "groundhogg/steps/{$this->get_type()}/enqueue", [ $this, 'enqueue' ] );
 		add_filter( "groundhogg/steps/{$this->get_type()}/run", [ $this, 'pre_run' ], 1, 2 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/run", [ $this, 'run' ], 10, 2 );
+		add_filter( "groundhogg/steps/{$this->get_type()}/icon", [ $this, 'get_icon' ] );
 		add_action( "wp_enqueue_scripts", [ $this, 'frontend_scripts' ] );
 
 		$this->add_additional_actions();
@@ -436,6 +438,8 @@ abstract class Funnel_Step extends Supports_Errors {
 	 * Most steps will use the default step reporting given here...
 	 *
 	 * @param $step Step
+	 *
+	 * @deprecated  Version 2.2 use Dashboard APi to add graphs
 	 */
 	public function reporting_v2( $step ) {
 
@@ -616,7 +620,7 @@ abstract class Funnel_Step extends Supports_Errors {
 		$args  = [ 'step_type' => $this->get_type(), 'step_group' => $this->get_group() ];
 		$query = array_merge( $query, $args );
 
-		$raw_steps = Plugin::$instance->dbs->get_db( 'steps' )->query( $query );
+		$raw_steps = get_db( 'steps' )->query( $query );
 
 		$steps = [];
 
@@ -734,46 +738,63 @@ abstract class Funnel_Step extends Supports_Errors {
         <div data-id="<?php echo $step->get_id(); ?>" data-type="<?php esc_attr_e( $this->get_type() ); ?>"
              title="<?php echo $step->get_title() ?>" id="settings-<?php echo $step->get_id(); ?>"
              class="step <?php echo $step->get_group(); ?> <?php echo $step->get_type(); ?> <?php echo ( $step->get_meta( 'is_active' ) ) ? 'active' : 'hidden'; ?>">
-            <!-- INSIDE -->
-            <div class="inside">
-                <!-- SETTINGS -->
-                <div class="step-edit">
-                    <div class="step-title-wrap">
-                        <img class="step-icon"
-                             src="<?php echo $this->get_icon() ? $this->get_icon() : $this->get_default_icon(); ?>">
-                        <div class="step-title-edit hidden">
-							<?php
-							$args = array(
-								'id'      => $this->setting_id_prefix( 'title' ),
-								'name'    => $this->setting_name_prefix( 'title' ),
-								'value'   => __( $step->get_title(), 'groundhogg' ),
-								'title'   => __( 'Step Title', 'groundhogg' ),
-								'class'   => 'step-title-large edit-title',
-								'data-id' => $step->get_id(),
-							);
 
-							echo Plugin::$instance->utils->html->input( $args );
-							?>
+            <div class="step-background">
+                <div class="inside">
+                    <!-- SETTINGS -->
+                    <div class="step-edit">
+                        <div class="step-title-wrap">
+                            <img class="step-icon"
+                                 src="<?php echo $this->get_icon() ? $this->get_icon() : $this->get_default_icon(); ?>">
+                            <div class="step-title-edit hidden">
+								<?php
+								$args = array(
+									'id'      => $this->setting_id_prefix( 'title' ),
+									'name'    => $this->setting_name_prefix( 'title' ),
+									'value'   => __( $step->get_title(), 'groundhogg' ),
+									'title'   => __( 'Step Title', 'groundhogg' ),
+									'class'   => 'step-title-large edit-title',
+									'data-id' => $step->get_id(),
+								);
+
+								echo Plugin::$instance->utils->html->input( $args );
+								?>
+                            </div>
+                            <div class="step-title-view">
+								<?php echo html()->e( 'span', [ 'class' => 'title' ], $step->get_step_title() ); ?>
+                            </div>
                         </div>
-                        <div class="step-title-view">
-							<?php echo html()->e( 'span', [ 'class' => 'title' ], $step->get_step_title() ); ?>
+                        <div class="custom-settings">
+							<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step ); ?>
+							<?php do_action( 'groundhogg/steps/settings/before', $this ); ?>
+							<?php $this->settings( $step ); ?>
+							<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/after", $step ); ?>
+							<?php do_action( 'groundhogg/steps/settings/after', $this ); ?>
                         </div>
                     </div>
-                    <div class="custom-settings">
-						<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step ); ?>
-						<?php do_action( 'groundhogg/steps/settings/before', $this ); ?>
-						<?php $this->settings( $step ); ?>
-						<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/after", $step ); ?>
-						<?php do_action( 'groundhogg/steps/settings/after', $this ); ?>
-                    </div>
+                    <!-- REPORTING  -->
+                    <!--                <div class="step-reporting">-->
+                    <!--					--><?php //do_action( "groundhogg/steps/{$this->get_type()}/reporting/before", $step ); ?>
+                    <!--					--><?php //do_action( 'groundhogg/steps/reporting/before', $step ); ?>
+                    <!--					--><?php //$this->reporting_v2( $step ); ?>
+                    <!--					--><?php //do_action( "groundhogg/steps/{$this->get_type()}/reporting/after", $step ); ?>
+                    <!--					--><?php //do_action( 'groundhogg/steps/reporting/after', $step ); ?>
+                    <!--                </div>-->
+
+
                 </div>
-                <!-- REPORTING  -->
-                <div class="step-reporting">
-					<?php do_action( "groundhogg/steps/{$this->get_type()}/reporting/before", $step ); ?>
-					<?php do_action( 'groundhogg/steps/reporting/before', $step ); ?>
-					<?php $this->reporting_v2( $step ); ?>
-					<?php do_action( "groundhogg/steps/{$this->get_type()}/reporting/after", $step ); ?>
-					<?php do_action( 'groundhogg/steps/reporting/after', $step ); ?>
+            </div>
+            <div class="step-notes">
+                <div class="step-notes" style="margin-top: 10px;padding-bottom: 30px">
+					<?php
+					echo html()->textarea( [
+						'id'          => $this->setting_id_prefix( 'step-notes' ),
+						'name'        => $this->setting_name_prefix( 'step_notes' ),
+						'value'       => $step->get_step_notes(),
+						'placeholder' => __( 'You can use this area to store custom notes about the step.', 'groundhogg' ),
+						'class'       => 'step-notes-textarea'
+					] );
+					?>
                 </div>
             </div>
         </div>
@@ -856,9 +877,7 @@ abstract class Funnel_Step extends Supports_Errors {
             <!-- INSIDE -->
             <div class="inside">
                 <!-- SETTINGS -->
-				<?php //TODO Reporting enabled?
-				?>
-                <div class="step-edit <?php echo Plugin::$instance->admin->get_page( 'funnels' )->is_reporting_enabled() ? 'hidden' : ''; ?>">
+                <div class="step-edit">
                     <div class="custom-settings">
 						<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step ); ?>
 						<?php do_action( 'groundhogg/steps/settings/before', $this ); ?>
@@ -870,13 +889,14 @@ abstract class Funnel_Step extends Supports_Errors {
                 <!-- REPORTING  -->
 				<?php //TODO Reporting enabled?
 				?>
-                <div class="step-reporting <?php echo Plugin::$instance->admin->get_page( 'funnels' )->is_reporting_enabled() ? '' : 'hidden'; ?>">
-					<?php do_action( "groundhogg/steps/{$this->get_type()}/reporting/before", $step ); ?>
-					<?php do_action( 'groundhogg/steps/reporting/before', $step ); ?>
-					<?php $this->reporting( $step ); ?>
-					<?php do_action( "groundhogg/steps/{$this->get_type()}/reporting/after", $step ); ?>
-					<?php do_action( 'groundhogg/steps/reporting/after', $step ); ?>
-                </div>
+                <!--                <div class="step-reporting -->
+				<?php //echo Plugin::$instance->admin->get_page( 'funnels' )->is_reporting_enabled() ? '' : 'hidden'; ?><!--">-->
+                <!--					--><?php //do_action( "groundhogg/steps/{$this->get_type()}/reporting/before", $step ); ?>
+                <!--					--><?php //do_action( 'groundhogg/steps/reporting/before', $step ); ?>
+                <!--					--><?php //$this->reporting( $step ); ?>
+                <!--					--><?php //do_action( "groundhogg/steps/{$this->get_type()}/reporting/after", $step ); ?>
+                <!--					--><?php //do_action( 'groundhogg/steps/reporting/after', $step ); ?>
+                <!--                </div>-->
             </div>
         </div>
 		<?php
@@ -898,6 +918,8 @@ abstract class Funnel_Step extends Supports_Errors {
 		);
 
 		$step->update( $args );
+
+		$step->update_meta( 'step_notes', sanitize_textarea_field( $this->get_posted_data( 'step_notes' ) ) );
 
 		if ( $this->get_posted_data( 'blog_id', false ) ) {
 			$step->update_meta( 'blog_id', absint( $this->get_posted_data( 'blog_id', false ) ) );

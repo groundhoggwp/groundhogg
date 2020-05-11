@@ -5,6 +5,7 @@ namespace Groundhogg\DB;
 // Exit if accessed directly
 use Groundhogg\Event;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_db;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -88,6 +89,7 @@ class Events extends DB {
 			'status'         => '%s',
 			'priority'       => '%d',
 			'claim'          => '%s',
+			'queued_id'      => '%d',
 		);
 	}
 
@@ -112,6 +114,7 @@ class Events extends DB {
 			'status'         => 'waiting',
 			'priority'       => 10,
 			'claim'          => '',
+			'queued_id'      => 0,
 		);
 	}
 
@@ -136,18 +139,43 @@ class Events extends DB {
 	}
 
 	/**
-	 * Get all the queued events
+	 * Move events from this table to the event queue
+	 *
+	 * @param array $where
+	 * @param bool $delete_from_history whether to delete the records from the history table
 	 */
-	public function get_queued_event_ids() {
+	public function move_events_to_queue( $where = [], $delete_from_history = false ) {
+
 		global $wpdb;
 
-		$results = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * FROM $this->table_name WHERE time <= %d AND status = %s"
-				, time(), 'waiting' )
-		);
+		// Move waiting events from the legacy queue to new queue
+		$event_queue = get_db( 'event_queue' )->get_table_name();
+		$events      = $this->get_table_name();
 
-		return wp_parse_id_list( wp_list_pluck( $results, 'ID' ) );
+		$queue_columns   = get_db( 'event_queue' )->get_columns();
+		$history_columns = $this->get_columns(); // queue_id will be last
+
+		unset( $history_columns['ID'] );
+		unset( $history_columns['queued_id'] );
+		unset( $queue_columns['ID'] );
+
+		$history_columns = implode( ',', array_keys( $history_columns ) );
+		$queue_columns   = implode( ',', array_keys( $queue_columns ) );
+
+		$where = $this->generate_where( $where );
+
+		// added two different query because single query was not working on my localhost(says: ERROR in your SQL statement please review it.)
+		// Move the events to the event queue
+		$wpdb->query( "INSERT INTO $event_queue ($queue_columns)
+			SELECT $history_columns
+			FROM $events
+			WHERE $where" );
+
+		// Optionally delete these events for backwards compatibility...
+		// this way we can retain a record of retires as well...
+		if ( $delete_from_history === true ) {
+			$wpdb->query( "DELETE FROM $events WHERE $where;" );
+		}
 	}
 
 	/**
@@ -158,7 +186,7 @@ class Events extends DB {
 	 * @return false|int
 	 */
 	public function contact_deleted( $id ) {
-		return $this->bulk_delete( array( 'contact_id' => $id ) );
+		return $this->bulk_delete( [ 'contact_id' => $id ] );
 	}
 
 	/**
@@ -169,7 +197,7 @@ class Events extends DB {
 	 * @return false|int
 	 */
 	public function funnel_deleted( $id ) {
-		return $this->bulk_delete( array( 'funnel_id' => $id ) );
+		return $this->bulk_delete( [ 'funnel_id' => $id ] );
 	}
 
 	/**
@@ -180,7 +208,8 @@ class Events extends DB {
 	 * @return false|int
 	 */
 	public function step_deleted( $id ) {
-		return $this->bulk_delete( array( 'step_id' => $id ) );
+		// This is only used when funnel steps are deleted...
+		return $this->bulk_delete( [ 'step_id' => $id, 'event_type' => Event::FUNNEL ] );
 	}
 
 	/**
@@ -195,9 +224,9 @@ class Events extends DB {
 		$sql = parent::get_sql( $query_vars );
 
 		// Double compare to better display completion order
-		if ( $query_vars[ 'orderby' ] === 'time' ){
-			$sql = str_replace(  'ORDER BY time DESC',  'ORDER BY `time` DESC, `micro_time` DESC', $sql );
-			$sql = str_replace(  'ORDER BY time ASC',  'ORDER BY `time` ASC, `micro_time` ASC', $sql );
+		if ( get_array_var( $query_vars, 'orderby' ) === 'time' ) {
+			$sql = str_replace( 'ORDER BY time DESC', 'ORDER BY `time` DESC, `micro_time` DESC', $sql );
+			$sql = str_replace( 'ORDER BY time ASC', 'ORDER BY `time` ASC, `micro_time` ASC', $sql );
 		}
 
 		return $sql;
@@ -220,6 +249,7 @@ class Events extends DB {
         time bigint(20) unsigned NOT NULL,
         micro_time float(8) unsigned NOT NULL,
         time_scheduled bigint(20) unsigned NOT NULL,
+        queued_id bigint(20) unsigned NOT NULL,
         contact_id bigint(20) unsigned NOT NULL,
         funnel_id bigint(20) unsigned NOT NULL,
         step_id bigint(20) unsigned NOT NULL,
@@ -232,7 +262,9 @@ class Events extends DB {
         PRIMARY KEY (ID),
         KEY time (time),
         KEY time_scheduled (time_scheduled),
+        KEY time_and_micro_time (time, micro_time),
         KEY contact_id (contact_id),
+        KEY queued_id (queued_id),
         KEY funnel_id (funnel_id),
         KEY step_id (step_id),
         KEY claim (claim),

@@ -26,6 +26,10 @@
     /*border: 1px solid #e5e5e5;*/
 }
 
+.search-param select{
+    max-width: 100%;
+}
+
 .start-search{
     padding-left: 15px;
 }

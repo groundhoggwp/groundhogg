@@ -177,10 +177,26 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.1.14.1 (2020-04-21) =
-* ADDED Tab in tools to show how to enable the gh-cron.php file.
-* TWEAKED Create an index on the event claim.
-* FIXED Broadcast SMS causing error.
+= 2.2 =
+* ADDED Brand new reporting dashboard. The old dashboard reports have been removed.
+* ADDED New search filters for contact search
+* ADDED Ability to distinguish emails as transactional or marketing. Transactional emails will ignore marketability.
+* ADDED 1 click unsubscribe support for Gmail & Yahoo.
+* TWEAKED Event queue is now a separate table `gh_event_queue` for faster processing, completed events are moved to the `gh_events` table.
+* TWEAKED Updated the managed page style to reflect modern WordPress.
+* TWEAKED Improved form impression tracking
+* TWEAKED Added form name attribute to forms for GA compatibility
+* TWEAKED Contact submissions table now shows link to form instead of form ID
+* FIXED Bug causing broadcast events to be deleted if a funnel step with the same ID was deleted.
+* FIXED Bug causing the contacts' time zone to be UTC-0 if one was not provided.
+* FIXED `create_user_from_contact()` missing user's email address.
+* FIXED Newline characters appearing in tag names when bulk editing.
+* REMOVED the `do_api_benchmark` REST endpoint and moved it to the advanced features extension.
+* REMOVED SendWP promotion.
+
+= 2.1.14.1 (2020-04-20) =
+* ADDED Tab in tools to show how to enable the gh-cron.php file
+* TWEAKED Create an index on the event claim
 
 = 2.1.14 (2020-04-16) =
 * ADDED Option to enable beta versions of Groundhogg extensions!

@@ -2,21 +2,14 @@
 namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Plugin;
-/**
- * Created by PhpStorm.
- * User: atty
- * Date: 11/23/2018
- * Time: 4:18 PM
- */
 
 ?>
 <div id="funnel-chart" class="step-reporting" style="margin-bottom: 0;width: 100%;">
-    <div class="inside">
+    <div class="inside" ">
         <script type="text/javascript">
-
             var FunnelChart = {};
 
-            (function ($,chart) {
+            (function ($, chart) {
 
                 var previousPoint = null, previousLabel = null;
 
@@ -32,7 +25,7 @@ use Groundhogg\Plugin;
                                 var y = item.datapoint[1];
 
                                 var color = item.series.color;
-                                showTooltip(item.pageX, item.pageY, color, "<strong>" + item.series.label + "</strong>: " + y );
+                                showTooltip(item.pageX, item.pageY, color, "<strong>" + item.series.label + "</strong>: " + y);
                             }
                         } else {
                             $("#tooltip").remove();
@@ -57,7 +50,7 @@ use Groundhogg\Plugin;
                     }).appendTo("body").fadeIn(200);
                 }
 
-                $.extend( chart, {
+                $.extend(chart, {
 
                     data: <?php echo wp_json_encode( Plugin::$instance->admin->get_page( 'funnels' )->get_chart_data() ); ?>,
                     options: {
@@ -71,33 +64,32 @@ use Groundhogg\Plugin;
                         grid: {
                             hoverable: true
                         },
-                        xaxes: [ { mode: 'categories' } ],
+                        xaxes: [{mode: 'categories'}],
 
                     },
 
-                    init: function()
-                    {
+                    init: function () {
                         this.draw();
                     },
 
-                    draw : function () {
+                    draw: function () {
 
                         var $chart = $("#reporting-chart");
 
-                        if ( $chart.is(':visible') ){
-                            $chart.plot( this.data, this.options);
+                        if ($chart.is(':visible')) {
+                            $chart.plot(this.data, this.options);
                             $chart.UseTooltip();
                         }
 
                     }
 
-                } );
+                });
 
-                $( '#reporting-toggle' ).on( 'change', function (e) {
-                    if ( $(this).is( ':checked' ) && $( '#funnel-chart' ).is( ':visible' ) ){
+                $('#reporting-toggle').on('change', function (e) {
+                    if ($(this).is(':checked') && $('#funnel-chart').is(':visible')) {
                         chart.draw();
                     }
-                } );
+                });
 
             })(jQuery, FunnelChart);
         </script>

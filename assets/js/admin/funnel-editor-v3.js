@@ -1,9 +1,8 @@
-( function ($, funnel, modal, charts) {
+( function ($, funnel, modal) {
 
     $.extend(funnel, {
 
         sortables: null,
-        reportData: null,
 
         getSteps: function () {
             return $('#step-sortable');
@@ -129,8 +128,6 @@
                 this.makeSortable();
             }
 
-            this.initReporting();
-
             $('#add-contacts-button').click(function () {
                 self.addContacts();
             });
@@ -142,44 +139,7 @@
 
         },
 
-        initReporting: function () {
 
-            var $reporting = $('#reporting-toggle');
-
-            $reporting.on('input', function () {
-                if ($(this).is(':checked')) {
-                    $('html').addClass('reporting-enabled');
-                }
-                else {
-                    $('html').removeClass('reporting-enabled');
-                }
-            });
-
-            $('#custom_date_range_start').datepicker({
-                changeMonth: true,
-                changeYear: true,
-                maxDate: 0,
-                dateFormat: 'd-m-yy',
-            });
-
-            $('#custom_date_range_end').datepicker({
-                changeMonth: true,
-                changeYear: true,
-                maxDate: 0,
-                dateFormat: 'd-m-yy',
-            });
-
-            $('#date_range').change(function () {
-                if ($(this).val() === 'custom') {
-                    $('#custom_date_range_end').removeClass('hidden');
-                    $('#custom_date_range_start').removeClass('hidden');
-                }
-                else {
-                    $('#custom_date_range_end').addClass('hidden');
-                    $('#custom_date_range_start').addClass('hidden');
-                }
-            });
-        },
 
         save: function ($form) {
 
@@ -211,14 +171,6 @@
 
                 self.getSettings().html(response.data.data.settings);
                 self.getSteps().html(response.data.data.sortable);
-
-                console.log(response);
-
-                charts.data = response.data.data.chartData;
-
-                if (!$('#funnel-chart').hasClass('hidden')) {
-                    charts.draw();
-                }
 
                 $(document).trigger('new-step');
 
@@ -390,4 +342,4 @@
         funnel.init();
     });
 
-} )(jQuery, Funnel, GroundhoggModal, FunnelChart);
+} )(jQuery, Funnel, GroundhoggModal);

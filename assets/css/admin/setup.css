@@ -65,3 +65,47 @@
     animation-iteration-count: infinite;
     animation-timing-function: linear;
 }
+
+/* EMAIL STEP */
+
+.email_info img.thumbnail {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 175px;
+    border-radius: 5px;
+}
+
+.email_info .inside .postbox h3.extension-title,
+.email_info .inside .postbox p.extension-description{
+    margin-left: 225px;
+    margin-right: 20px;
+}
+
+.email_info .inside .postbox{
+    position: relative;
+}
+
+.postbox .card-top{
+    min-height: 135px;
+}
+
+.postbox .install-actions{
+    clear: both;
+    padding: 12px 20px;
+    background-color: #fafafa;
+    border-top: 1px solid #ddd;
+    overflow: hidden;
+}
+
+.quiet-install{
+    display: inline-block;
+}
+
+.more-details{
+    float: right;
+}
+
+.email_info hr{
+    display: none;
+}

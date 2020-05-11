@@ -2,6 +2,8 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Classes\Activity;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -91,6 +93,7 @@ class Tracking {
 		add_action( 'template_redirect', [ $this, 'template_redirect' ] );
 
 		add_action( 'groundhogg/after_form_submit', [ $this, 'form_filled' ], 10, 1 );
+		add_action( 'groundhogg/contact/preferences/unsubscribed', [ $this, 'contact_unsubscribed' ], 10, 1 );
 
 		add_action( 'groundhogg/preferences/erase_profile', [ $this, 'remove_tracking_cookie' ] );
 
@@ -308,7 +311,11 @@ class Tracking {
 			}
 		}
 
-		return Plugin::$instance->utils->get_contact( $id_or_email );
+		if ( ! $id_or_email ){
+			return false;
+		}
+
+		return get_contactdata( $id_or_email );
 	}
 
 	/**
@@ -338,7 +345,40 @@ class Tracking {
 	public function get_current_event() {
 		$id = absint( $this->get_tracking_cookie_param( 'event_id' ) );
 
-		return Plugin::$instance->utils->get_event( $id );
+		// It's likely that the event is being set by an email link click,
+		// so reference the `queued_id` rather than the actual event `ID`
+		return get_event_by_queued_id( $id );
+	}
+
+	/**
+	 * @return bool|int
+	 */
+	public function get_current_step_id(){
+
+		if ( ! $this->get_current_event() ){
+			return false;
+		}
+
+		return $this->get_current_event()->get_step_id();
+	}
+
+	/**
+	 * @return bool|int
+	 */
+	public function get_current_funnel_id(){
+
+		if ( ! $this->get_current_event() ){
+			return false;
+		}
+
+		return $this->get_current_event()->get_funnel_id();
+	}
+
+	/**
+	 * @return int
+	 */
+	public function get_current_email_id(){
+		return absint( $this->get_tracking_cookie_param( 'email_id' ) );
 	}
 
 	/**
@@ -380,14 +420,7 @@ class Tracking {
 
 		$expiry = apply_filters( 'groundhogg/tracking/cookie_expiry', self::COOKIE_EXPIRY ) * DAY_IN_SECONDS;
 
-		return setcookie(
-			self::TRACKING_COOKIE,
-			$cookie,
-			time() + $expiry,
-			COOKIEPATH,
-			COOKIE_DOMAIN,
-			is_ssl()
-		);
+		return set_cookie( self::TRACKING_COOKIE, $cookie, $expiry );
 	}
 
 	/**
@@ -417,8 +450,7 @@ class Tracking {
 	 */
 	public function stop_tracking() {
 		if ( isset( $_COOKIE[ self::TRACKING_COOKIE ] ) ) {
-			unset( $_COOKIE[ self::TRACKING_COOKIE ] );
-			setcookie( self::TRACKING_COOKIE, null, time() - DAY_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
+			delete_cookie( self::TRACKING_COOKIE );
 		}
 	}
 
@@ -448,6 +480,7 @@ class Tracking {
 	 * @return void
 	 */
 	public function parse_utm() {
+
 		$utm_defaults = array(
 			'utm_campaign' => '',
 			'utm_content'  => '',
@@ -460,20 +493,33 @@ class Tracking {
 
 		$has_utm = array_filter( array_values( $utm_defaults ) );
 
-		if ( ! $has_utm || ! $this->get_current_contact() ) {
+		if ( ! $has_utm ) {
 			return;
 		}
 
-		foreach ( $utm as $utm_var => $utm_val ) {
-			if ( ! empty( $utm_val ) ) {
-				$this->get_current_contact()->update_meta(
-					$utm_var,
-					sanitize_text_field( $utm_val )
-				);
+		if ( $this->get_current_contact() ){
+
+			// If there is a contact, update their UTM stats to the one provided by the campaign
+			foreach ( $utm as $utm_var => $utm_val ) {
+				if ( ! empty( $utm_val ) ) {
+					$this->get_current_contact()->update_meta(
+						$utm_var,
+						sanitize_text_field( $utm_val )
+					);
+				}
 			}
+		} else {
+
+			// Save the UTM stuff as a cookie for future use.
+			set_cookie( 'groundhogg_utm_tacking', wp_json_encode( $utm ), MONTH_IN_SECONDS );
+
 		}
+
 	}
 
+	/**
+	 * Output the tracking image for the browser
+	 */
 	protected function output_tracking_image() {
 		/* thanks for coming! */
 		$file = GROUNDHOGG_ASSETS_PATH . 'images/email-open.png';
@@ -492,7 +538,7 @@ class Tracking {
 	 */
 	public function email_opened() {
 		$event_id = $this->get_tracking_cookie_param( 'event_id' );
-		$event    = Plugin::$instance->utils->get_event( $event_id );
+		$event    = get_event_by_queued_id( $event_id );
 
 		if ( ! $event || ! $event->exists() ) {
 			if ( $this->doing_open ) {
@@ -507,9 +553,8 @@ class Tracking {
 			'funnel_id'     => $event->get_funnel_id(),
 			'step_id'       => $event->get_step_id(),
 			'email_id'      => $this->get_tracking_cookie_param( 'email_id', 0 ),
-			'activity_type' => 'email_opened',
+			'activity_type' => Activity::EMAIL_OPENED,
 			'event_id'      => $event->get_id(),
-			'referer'       => ''
 		);
 
 		if ( ! get_db( 'activity' )->exists( $args ) ) {
@@ -537,7 +582,7 @@ class Tracking {
 		$this->email_opened();
 
 		$event_id = $this->get_tracking_cookie_param( 'event_id' );
-		$event    = Plugin::$instance->utils->get_event( $event_id );
+		$event    = get_event_by_queued_id( $event_id );
 
 		$redirect = add_query_arg( [ 'key' => wp_create_nonce() ], $target );
 
@@ -552,7 +597,6 @@ class Tracking {
 		 */
 		if ( ! $event ) {
 			wp_redirect( $redirect );
-
 			return;
 		}
 
@@ -562,9 +606,10 @@ class Tracking {
 			'funnel_id'     => $event->get_funnel_id(),
 			'step_id'       => $event->get_step_id(),
 			'email_id'      => $this->get_tracking_cookie_param( 'email_id', 0 ),
-			'activity_type' => 'email_link_click',
+			'activity_type' => Activity::EMAIL_CLICKED,
 			'event_id'      => $event->get_id(),
-			'referer'       => $target
+			'referer'       => $target,
+			'referer_hash'  => generate_referer_hash( $target )
 		);
 
 		if ( get_db( 'activity' )->add( $args ) ) {
@@ -593,6 +638,34 @@ class Tracking {
 			$this->add_tracking_cookie_param( 'contact_id', $contact->get_id() );
 			$this->build_tracking_cookie();
 		}
+	}
+
+	/**
+	 * Track the activity if the contact unsubscribed
+	 *
+	 * @param $contact_id
+	 */
+	public function contact_unsubscribed( $contact_id ){
+
+		// Check if we have an email ID/step ID that we can attribute it too...
+
+		$event = $this->get_current_event();
+
+		if ( ! $event || ! $event->exists() ){
+			return;
+		}
+
+		$args = array(
+			'timestamp'     => time(),
+			'contact_id'    => $contact_id,
+			'funnel_id'     => $event->get_funnel_id(),
+			'step_id'       => $event->get_step_id(),
+			'email_id'      => $this->get_tracking_cookie_param( 'email_id', 0 ),
+			'activity_type' => Activity::UNSUBSCRIBED,
+			'event_id'      => $event->get_id(),
+		);
+
+		get_db( 'activity' )->add( $args );
 	}
 
 }
