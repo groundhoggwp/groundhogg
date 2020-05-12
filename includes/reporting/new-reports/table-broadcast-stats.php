@@ -8,6 +8,7 @@ use Groundhogg\Classes\Activity;
 use Groundhogg\Event;
 use Groundhogg\Plugin;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\convert_to_local_time;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
@@ -62,7 +63,7 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 			],
 			[
 				'label' => __( 'Sent', 'groundhogg' ),
-				'data'  => date_i18n( get_date_time_format(), $broadcast->get_send_time() ),
+				'data'  => date_i18n( get_date_time_format(), convert_to_local_time( $broadcast->get_send_time() ) ),
 			],
 			[
 				'label' => __( 'Total Delivered', 'groundhogg' ),

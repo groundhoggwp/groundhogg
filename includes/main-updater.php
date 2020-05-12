@@ -267,6 +267,7 @@ class Main_Updater extends Updater {
 		get_db( 'activity' )->update_2_2();
 
 		// Create the new event queue table
+		get_db( 'events' )->create_table();
 		get_db( 'event_queue' )->create_table();
 
 		// Update the current events table
@@ -277,6 +278,10 @@ class Main_Updater extends Updater {
 		if ( $wpdb->last_error ) {
 			wp_die( $wpdb->last_error );
 		}
+	}
+
+	public function version_2_2_2() {
+		get_db( 'events' )->create_table();
 	}
 
 	/**
@@ -324,6 +329,7 @@ class Main_Updater extends Updater {
 		return [
 			'2.1.13.11',
 			'2.1.13.17',
+			'2.2.2',
 		];
 	}
 
@@ -351,6 +357,7 @@ class Main_Updater extends Updater {
 			'2.1.13.11'     => __( 'Add micro_time column to events table for better display of events order.', 'groundhogg' ),
 			'2.1.14.1'      => __( 'Add missing index on `claim` column.', 'groundhogg' ),
 			'2.2'           => __( 'Event queue performance improvements.', 'groundhogg' ),
+			'2.2.2'         => __( 'Fix missing column in events table.', 'groundhogg' ),
 		];
 	}
 }

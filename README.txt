@@ -177,6 +177,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.2 =
+* HOT FIX `queued_id` column not added to events table in some installations.
+* FIXED Broadcast send time showing in UTC0 in new dashboard.
+
 = 2.2 =
 * ADDED Brand new reporting dashboard. The old dashboard reports have been removed.
 * ADDED New search filters for contact search
