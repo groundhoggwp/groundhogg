@@ -177,6 +177,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.3 =
+* HOT FIX Funnels can't be added to the database.
+
 = 2.2.2 =
 * HOT FIX `queued_id` column not added to events table in some installations.
 * FIXED Broadcast send time showing in UTC0 in new dashboard.

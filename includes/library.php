@@ -70,7 +70,6 @@ class Library extends Supports_Errors {
 	 */
 	public function get_funnel_template( $id ) {
 		$response = $this->request( 'funnels/get', [ 'id' => $id ], 'GET' );
-
 		return get_array_var( $response, 'funnel', [] );
 	}
 

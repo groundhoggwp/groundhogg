@@ -50,7 +50,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
 			$object = array_shift( $query );
 
-			if ( $object && ! empty( $object ) ) {
+			if ( $object && ! empty( $object ) && is_object( $object ) ) {
 
 				$this->setup_object( $object );
 
@@ -69,7 +69,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
 			$object = $this->get_from_db( $field, $identifier_or_args );
 
-			if ( ! $object || empty( $object ) ) {
+			if ( ! $object || empty( $object ) || ! is_object( $object ) ) {
 				return false;
 			}
 
@@ -122,13 +122,12 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 * @return bool
 	 */
 	protected function setup_object( $object ) {
-		$object = (object) $object;
+		$object     = (object) $object;
+		$identifier = $this->get_identifier_key();
 
-		if ( ! is_object( $object ) ) {
+		if ( ! is_object( $object ) || ! isset( $object->$identifier ) ) {
 			return false;
 		}
-
-		$identifier = $this->get_identifier_key();
 
 		$this->set_id( absint( $object->$identifier ) );
 

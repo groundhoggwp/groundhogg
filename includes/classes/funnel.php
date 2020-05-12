@@ -198,15 +198,18 @@ class Funnel extends Base_Object_With_Meta {
 
 	/**
 	 * Import a funnel
-	 **
+	 *
+	 * @param $import
+	 *
 	 * @return bool|int|\WP_Error
 	 */
 	public function import( $import ) {
+
 		if ( is_string( $import ) ) {
 			$import = json_decode( $import, true );
 		}
 
-		if ( ! is_array( $import ) ) {
+		if ( ! is_array( $import ) || empty( $import ) ) {
 			return new \WP_Error( 'invalid_funnel', 'Invalid funnel markup.' );
 		}
 

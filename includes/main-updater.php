@@ -253,22 +253,10 @@ class Main_Updater extends Updater {
 
 		global $wpdb;
 
-		// Add optin_status_changed column
-		get_db( 'contacts' )->create_table();
+		Plugin::$instance->dbs->install_dbs();
 
-		// Add IP Address/Views columns
-		get_db( 'form_impressions' )->create_table();
-		// Move `count` to `views`
 		get_db( 'form_impressions' )->update_2_2();
-
-		// Add `referer_hash` col
-		get_db( 'activity' )->create_table();
-		// Update `referer_hash` col
 		get_db( 'activity' )->update_2_2();
-
-		// Create the new event queue table
-		get_db( 'events' )->create_table();
-		get_db( 'event_queue' )->create_table();
 
 		// Update the current events table
 		get_db( 'events' )->move_events_to_queue( [
@@ -280,8 +268,8 @@ class Main_Updater extends Updater {
 		}
 	}
 
-	public function version_2_2_2() {
-		get_db( 'events' )->create_table();
+	public function version_2_2_3() {
+		Plugin::$instance->dbs->install_dbs();
 	}
 
 	/**
@@ -329,7 +317,7 @@ class Main_Updater extends Updater {
 		return [
 			'2.1.13.11',
 			'2.1.13.17',
-			'2.2.2',
+			'2.2.3',
 		];
 	}
 
@@ -357,7 +345,7 @@ class Main_Updater extends Updater {
 			'2.1.13.11'     => __( 'Add micro_time column to events table for better display of events order.', 'groundhogg' ),
 			'2.1.14.1'      => __( 'Add missing index on `claim` column.', 'groundhogg' ),
 			'2.2'           => __( 'Event queue performance improvements.', 'groundhogg' ),
-			'2.2.2'         => __( 'Fix missing column in events table.', 'groundhogg' ),
+			'2.2.3'         => __( 'Reformat all tables.', 'groundhogg' ),
 		];
 	}
 }

@@ -503,7 +503,7 @@ class Funnels_Page extends Admin_Page {
 			$library     = new Library();
 			$template    = $library->get_funnel_template( $template_id );
 			$json        = json_encode( $template->import_json );
-			$funnel_id   = $this->import_funnel( json_decode( $json, true ) );
+			$funnel_id   = $this->import_funnel( $json );
 
 		} else if ( isset( $_POST['funnel_id'] ) ) {
 
@@ -584,9 +584,8 @@ class Funnels_Page extends Admin_Page {
 		}
 
 		$funnel = new Funnel();
-		$id     = $funnel->import( $import );
 
-		return $id;
+		return $funnel->import( $import );
 	}
 
 	/**
