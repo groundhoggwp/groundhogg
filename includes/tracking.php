@@ -43,6 +43,12 @@ class Tracking {
 	 */
 	protected $cookie = [];
 
+	/**
+	 * Arbitrary data
+	 *
+	 * @var array
+	 */
+	protected $data = [];
 
 	/**
 	 * @var string the referring url
@@ -65,6 +71,11 @@ class Tracking {
 	private $doing_open = false;
 	private $doing_click = false;
 	private $doing_confirmation = false;
+
+	/**
+	 * @var bool|Event
+	 */
+	private $event;
 
 	/**
 	 * WPGH_Tracking constructor.
@@ -311,7 +322,7 @@ class Tracking {
 			}
 		}
 
-		if ( ! $id_or_email ){
+		if ( ! $id_or_email ) {
 			return false;
 		}
 
@@ -338,24 +349,54 @@ class Tracking {
 	}
 
 	/**
+	 * @param $name
+	 * @param $value
+	 */
+	public function __set( $name, $value ) {
+		$this->data[ $name ] = $value;
+	}
+
+	/**
+	 * @param $name
+	 *
+	 * @return mixed
+	 */
+	public function __get( $name ) {
+		return get_array_var( $this->data, $name );
+	}
+
+	/**
 	 * Get the contact which is currently being tracked.
 	 *
 	 * @return Event|false
 	 */
 	public function get_current_event() {
+
 		$id = absint( $this->get_tracking_cookie_param( 'event_id' ) );
+
+		if ( $this->event && $this->event->get_id() === $id ){
+			return $this->event;
+		}
 
 		// It's likely that the event is being set by an email link click,
 		// so reference the `queued_id` rather than the actual event `ID`
-		return get_event_by_queued_id( $id );
+		$event = get_event_by_queued_id( $id );
+
+		if ( ! $event || ! $event->exists() ){
+			return false;
+		}
+
+		$this->event = $event;
+
+		return $event;
 	}
 
 	/**
 	 * @return bool|int
 	 */
-	public function get_current_step_id(){
+	public function get_current_step_id() {
 
-		if ( ! $this->get_current_event() ){
+		if ( ! $this->get_current_event() ) {
 			return false;
 		}
 
@@ -365,9 +406,9 @@ class Tracking {
 	/**
 	 * @return bool|int
 	 */
-	public function get_current_funnel_id(){
+	public function get_current_funnel_id() {
 
-		if ( ! $this->get_current_event() ){
+		if ( ! $this->get_current_event() ) {
 			return false;
 		}
 
@@ -377,7 +418,7 @@ class Tracking {
 	/**
 	 * @return int
 	 */
-	public function get_current_email_id(){
+	public function get_current_email_id() {
 		return absint( $this->get_tracking_cookie_param( 'email_id' ) );
 	}
 
@@ -497,7 +538,7 @@ class Tracking {
 			return;
 		}
 
-		if ( $this->get_current_contact() ){
+		if ( $this->get_current_contact() ) {
 
 			// If there is a contact, update their UTM stats to the one provided by the campaign
 			foreach ( $utm as $utm_var => $utm_val ) {
@@ -537,8 +578,8 @@ class Tracking {
 	 * When an email is opened this function will be called at the INIT stage
 	 */
 	public function email_opened() {
-		$event_id = $this->get_tracking_cookie_param( 'event_id' );
-		$event    = get_event_by_queued_id( $event_id );
+
+		$event = $this->get_current_event();
 
 		if ( ! $event || ! $event->exists() ) {
 			if ( $this->doing_open ) {
@@ -581,9 +622,7 @@ class Tracking {
 		/* track every click as an open */
 		$this->email_opened();
 
-		$event_id = $this->get_tracking_cookie_param( 'event_id' );
-		$event    = get_event_by_queued_id( $event_id );
-
+		$event    = $this->get_current_event();
 		$redirect = add_query_arg( [ 'key' => wp_create_nonce() ], $target );
 
 		/**
@@ -595,8 +634,9 @@ class Tracking {
 		 * Event Ids can go missing for a variety of reason, its unreasonable to assume the data wil remain integral
 		 * always.
 		 */
-		if ( ! $event ) {
+		if ( ! $event || ! $event->exists() ) {
 			wp_redirect( $redirect );
+
 			return;
 		}
 
@@ -645,13 +685,13 @@ class Tracking {
 	 *
 	 * @param $contact_id
 	 */
-	public function contact_unsubscribed( $contact_id ){
+	public function contact_unsubscribed( $contact_id ) {
 
 		// Check if we have an email ID/step ID that we can attribute it too...
 
 		$event = $this->get_current_event();
 
-		if ( ! $event || ! $event->exists() ){
+		if ( ! $event || ! $event->exists() ) {
 			return;
 		}
 

@@ -177,6 +177,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.4 =
+* TWEAKED Optimized tracking to perform fewer queries when accessing events table
+
 = 2.2.3 =
 * HOT FIX Funnels can't be added to the database.
 

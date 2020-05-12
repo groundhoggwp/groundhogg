@@ -77,7 +77,7 @@ class Event extends Base_Object {
 		$this->db_name = $db;
 
 		// Backwards compat for missing 'queued_id'
-		if ( $field === 'queued_id' && ! $this->get_db()->exists( [ $field => $identifier_or_args ] ) ){
+		if ( $field === 'queued_id' && is_int( $identifier_or_args ) && ! $this->get_db()->exists( [ 'queued_id' => $identifier_or_args ] ) ){
 			$field = 'ID';
 		}
 

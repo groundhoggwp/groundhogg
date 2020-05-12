@@ -293,7 +293,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function click_tracking_link( $link ) {
-		return sprintf( "{$this->get_click_tracking_link()}/%s", base64_encode( $link ) );
+		return sprintf( "{$this->get_click_tracking_link()}/%s/", base64_encode( $link ) );
 	}
 
 	/**
@@ -435,7 +435,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function tracking_link_callback( $matches ) {
-		return $matches[1] . $this->get_click_tracking_link() . base64_encode( str_replace( '&amp;', '&', $matches[2] ) ) . $matches[3];
+		return $matches[1] . trailingslashit( $this->get_click_tracking_link() . base64_encode( str_replace( '&amp;', '&', $matches[2] ) ) ) . $matches[3];
 	}
 
 	/**
