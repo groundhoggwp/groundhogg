@@ -267,7 +267,7 @@ class Event extends Base_Object {
 	 */
 	protected function post_setup() {
 
-		$this->contact = Plugin::$instance->utils->get_contact( $this->get_contact_id() );
+		$this->contact = get_contactdata( $this->get_contact_id() );
 
 		switch ( $this->get_event_type() ) {
 			case self::FUNNEL:
@@ -355,8 +355,14 @@ class Event extends Base_Object {
 
 		$this->in_progress();
 
-		if ( ! $this->get_step() ) {
-			return false;
+		// No step or not contact?
+		if ( ! $this->get_step() || ! $this->get_contact() || ! $this->get_contact()->exists() ) {
+
+			$this->add_error( new \WP_Error( 'missing', 'Could not locate contact or step record.' ) );
+
+			$this->fail();
+
+			return apply_filters( 'groundhogg/event/run/failed_result', false, $this );
 		}
 
 		$result = $this->get_step()->run( $this->get_contact(), $this );

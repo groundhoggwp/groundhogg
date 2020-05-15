@@ -193,6 +193,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
             <a href="javascript:void(0)" class="nav-tab <?php echo $active_tab == $id ? 'nav-tab-active' : ''; ?>"
                id="<?php echo 'tab_' . esc_attr( $id ); ?>"><?php _e( $tab, 'groundhogg' ); ?></a>
 		<?php endforeach; ?>
+		<?php do_action( 'groundhogg/contact/record/nav/inside', $contact ); ?>
     </h2>
 
 	<?php do_action( 'groundhogg/contact/record/nav/after', $contact ); ?>
@@ -259,8 +260,8 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                             </div>
                         </div>
                         <script>jQuery(function ($) {
-                                $('#manual-confirm').on('change', function () {
-                                    $('#confirmation-reason').toggleClass('hidden');
+                                $("#manual-confirm").on("change", function () {
+                                    $("#confirmation-reason").toggleClass("hidden");
                                 });
                             });</script>
 					<?php endif;
@@ -980,7 +981,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 				$row[] = html()->e( 'a', [
 					'href' => admin_page_url( 'gh_funnels', [
 						'action' => 'edit',
-                        'funnel' => $step->get_funnel_id()
+						'funnel' => $step->get_funnel_id()
 					] )
 				], $step->get_step_title() );
 				$row[] = $submission->get_date_created();
@@ -1016,7 +1017,14 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
     <div class="tab-content-wrapper <?php if ( $tab !== $active_tab ) {
 		echo 'hidden';
 	}; ?>" id="<?php echo 'tab_' . esc_attr( $tab ) . '_content'; ?>">
-		<?php do_action( "groundhogg/admin/contact/record/tab/{$tab}", $contact ); ?>
+		<?php
+
+
+		/**
+		 * @param $contact Contact the contact
+		 * @param $tab     string if of the current tab
+		 */
+		do_action( "groundhogg/admin/contact/record/tab/{$tab}", $contact, $tab ); ?>
         </div><?php
 
 	endforeach;

@@ -40,7 +40,7 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 		return Plugin::$instance->tracking->get_current_contact();
 	}
 
-	return Plugin::$instance->utils->get_contact( $contact_id_or_email, $by_user_id );
+	return new Contact( $contact_id_or_email, $by_user_id );
 }
 
 /**

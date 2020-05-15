@@ -278,6 +278,7 @@ class Event_Queue extends Supports_Errors {
 			$this->set_current_event( $event );
 
 			$contact = $event->get_contact();
+
 			$this->set_current_contact( $contact );
 
 			if ( $event->run() ) {
@@ -290,7 +291,6 @@ class Event_Queue extends Supports_Errors {
 						$next_step->enqueue( $event->get_contact() );
 					}
 				}
-
 
 			} else {
 				if ( $event->has_errors() ) {

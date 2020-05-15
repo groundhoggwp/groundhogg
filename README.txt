@@ -178,7 +178,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 == Changelog ==
 
 = 2.2.4 =
-* TWEAKED Optimized tracking to perform fewer queries when accessing events table
+* ADDED Additional hooks to the contact editor screen.
+* TWEAKED Optimized tracking to perform fewer queries when accessing events table.
+* FIXED Bug causing queue to fail when a contact is not available in the DB for processing.
 
 = 2.2.3 =
 * HOT FIX Funnels can't be added to the database.
