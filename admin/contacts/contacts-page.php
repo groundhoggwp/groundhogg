@@ -121,7 +121,8 @@ class Contacts_Page extends Admin_Page {
 				$contact    = Plugin::$instance->utils->get_contact( absint( $contact_id ) );
 
 				if ( $contact ) {
-					$admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", $contact->get_full_name(), __( 'Edit' ), $admin_title );
+				    $prefix = $contact->get_first_name()? $contact->get_full_name() : $contact->get_email();
+					$admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", $prefix, __( 'Edit' ), $admin_title );
 				}
 
 				break;

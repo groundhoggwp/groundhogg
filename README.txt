@@ -177,6 +177,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.5 =
+* ADDED additional arguments to filters in the email class
+* TWEAKED display style for meta replacement codes
+* FIXED tab title missing on bulk processing screen
+* FIXED tab title missing on contact editor screen when name is not available
+
 = 2.2.4 =
 * ADDED Additional hooks to the contact editor screen.
 * TWEAKED Optimized tracking to perform fewer queries when accessing events table.
