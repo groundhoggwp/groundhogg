@@ -964,7 +964,7 @@ class Contacts_Page extends Admin_Page {
 		$contact = get_contactdata( absint( get_url_var( 'contact' ) ) );
 
 		if ( ! $contact ) {
-			return new \WP_Error( 'error', 'The given contact does nto exist.' );
+			return new \WP_Error( 'error', 'The given contact does not exist.' );
 		}
 
 		$folders = $contact->get_uploads_folder();
@@ -973,7 +973,7 @@ class Contacts_Page extends Admin_Page {
 		$file_path = wp_normalize_path( $path . DIRECTORY_SEPARATOR . $file_name );
 
 		if ( ! file_exists( $file_path ) ) {
-			return new \WP_Error( 'error', 'The requested file does nto exist.' );
+			return new \WP_Error( 'error', 'The requested file does not exist.' );
 		}
 
 		unlink( $file_path );
