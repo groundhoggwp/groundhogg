@@ -82,6 +82,10 @@ class Bulk_Job_Page extends Admin_Page {
 		return __( 'Processing...', 'groundhogg' );
 	}
 
+	public function admin_title( $admin_title, $title ) {
+		return sprintf( "%s %s", $this->get_title(), $admin_title );
+	}
+
 	/**
 	 * Minimum access cap
 	 *

@@ -883,7 +883,11 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                     <tr id="meta-<?php esc_attr_e( $meta_key ) ?>">
                         <th>
 							<?php esc_html_e( $meta_key ); ?>
-                            <p class="description">{_<?php esc_html_e( $meta_key ); ?>}</p>
+                            <p>
+                                <code class="meta-replacement-code" title="<?php esc_attr_e( 'Replacement code', 'groundhogg' );?>">
+                                    {_<?php esc_html_e( $meta_key ); ?>}
+                                </code>
+                            </p>
                         </th>
                         <td>
 							<?php

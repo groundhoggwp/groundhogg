@@ -69,3 +69,11 @@ div.email-status{
 {
     width: 60px;
 }
+
+th p{
+    margin-bottom: 0;
+}
+
+code.meta-replacement-code{
+    font-weight: 400;
+}

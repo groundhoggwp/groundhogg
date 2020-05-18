@@ -45,6 +45,11 @@ if ( ! defined( 'ABSPATH' ) ) {
     require_once( dirname( __FILE__ ) . '/wp-load.php' );
 }
 
+// Check if Groundhogg is active...
+if ( ! defined( 'GROUNDHOGG_VERSION' ) ){
+    die();
+}
+
 do_action( 'groundhogg_process_queue' );
 
 die();

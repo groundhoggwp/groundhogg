@@ -670,7 +670,14 @@ class Email extends Base_Object_With_Meta {
 		);
 		$headers['unsub-one-click'] = 'List-Unsubscribe-Post: List-Unsubscribe=One-Click';
 
-		return apply_filters( "groundhogg/email/headers", $headers );
+		/**
+		 * Filter the headers to maybe add additional recipients...
+		 *
+		 * @param $headers array
+		 * @param $email   Email
+		 * @param $contact Contact
+		 */
+		return apply_filters( "groundhogg/email/headers", $headers, $this, $this->contact );
 	}
 
 	/**
