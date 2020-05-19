@@ -232,12 +232,18 @@ class Tracking {
 		// Clean the URL, wonky encoding sometimes...
 		$target_url = str_replace( '&#038;', '&', $target_url );
 
+		if ( empty( $target_url ) ){
+			$target_url = home_url();
+		}
+
 		// Add the tracking cookie params.
 		$this->add_tracking_cookie_param( 'contact_id', $contact_id );
 		$this->add_tracking_cookie_param( 'email_id', $email_id );
 		$this->add_tracking_cookie_param( 'event_id', $event_id );
 		$this->add_tracking_cookie_param( 'source', $tracking_via );
 		$this->add_tracking_cookie_param( 'action', $tracking_action );
+
+		apply_filters( 'groundhogg/tracking/target_url', $target_url );
 
 		switch ( $tracking_via ) {
 			case 'email':

@@ -177,6 +177,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.7 =
+* FIXED Bug causing looping 302 redirect if target url not available during a tracking link redirect.
+
 = 2.2.6 =
 * ADDED *Advanced Custom Meta Fields* to list of supported downloads via the extension upgrader.
 * FIXED `get_contactdata` not returning false if contact does not exist.
