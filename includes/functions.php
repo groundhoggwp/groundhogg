@@ -40,7 +40,13 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 		return Plugin::$instance->tracking->get_current_contact();
 	}
 
-	return new Contact( $contact_id_or_email, $by_user_id );
+	$contact = new Contact( $contact_id_or_email, $by_user_id );
+
+	if ( $contact->exists() ){
+	    return $contact;
+    }
+
+	return false;
 }
 
 /**

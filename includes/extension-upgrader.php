@@ -61,6 +61,7 @@ class Extension_Upgrader {
 		39872 => 'groundhogg-add-to-calendar/groundhogg-add-to-calendar.php',
 		45632 => 'groundhogg-sms77/groundhogg-sms77.php',
 		48864 => 'groundhogg-sendgrid/groundhogg-sendgrid.php',
+		49869 => 'groundhogg-better-meta/groundhogg-better-meta.php',
 	];
 
 	/**

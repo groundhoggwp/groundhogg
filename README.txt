@@ -177,6 +177,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.6 =
+* ADDED *Advanced Custom Meta Fields* to list of supported downloads via the extension upgrader.
+* FIXED `get_contactdata` not returning false if contact does not exist.
+
 = 2.2.5 =
 * ADDED additional arguments to filters in the email class
 * TWEAKED display style for meta replacement codes
