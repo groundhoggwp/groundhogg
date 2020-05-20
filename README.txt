@@ -177,7 +177,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.2.7 (2020-05-20) =
+= 2.2.8 (2020-05-20) =
 * TWEAKED Checkmark will show next to applied updates in the tools section.
 * FIXED CSS issue when importing a funnel.
 * FIXED CSS issue for responsive grid.
