@@ -252,7 +252,7 @@ input[type=range].slider:focus::-ms-fill-upper {
 
 @media only screen and (max-width: 1300px) and (min-width: 800px) {
     .post-box-grid .postbox {
-        width: calc(50% - 16px);
+        width: calc(50% - 8px);
     }
 
     .post-box-grid .postbox:nth-child(2n+1){
@@ -268,7 +268,7 @@ input[type=range].slider:focus::-ms-fill-upper {
 
 @media only screen and (min-width: 1300px) and (max-width: 1800px){
     .post-box-grid .postbox {
-        width: calc(33% - 16px);
+        width: calc(33% - 10px);
     }
 
     .post-box-grid .postbox:nth-child(3n+1){

@@ -177,32 +177,38 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.2.7 =
+= 2.2.7 (2020-05-20) =
+* TWEAKED Checkmark will show next to applied updates in the tools section.
+* FIXED CSS issue when importing a funnel.
+* FIXED CSS issue for responsive grid.
+* FIXED Bug in safari causing calendar not to show at full height when embedded.
+
+= 2.2.7 (2020-05-19) =
 * FIXED Bug causing looping 302 redirect if target url not available during a tracking link redirect.
 
-= 2.2.6 =
+= 2.2.6 (2020-05-19) =
 * ADDED *Advanced Custom Meta Fields* to list of supported downloads via the extension upgrader.
 * FIXED `get_contactdata` not returning false if contact does not exist.
 
-= 2.2.5 =
+= 2.2.5 (2020-05-18) =
 * ADDED additional arguments to filters in the email class
 * TWEAKED display style for meta replacement codes
 * FIXED tab title missing on bulk processing screen
 * FIXED tab title missing on contact editor screen when name is not available
 
-= 2.2.4 =
+= 2.2.4 (2020-05-15) =
 * ADDED Additional hooks to the contact editor screen.
 * TWEAKED Optimized tracking to perform fewer queries when accessing events table.
 * FIXED Bug causing queue to fail when a contact is not available in the DB for processing.
 
-= 2.2.3 =
+= 2.2.3 (2020-05-12) =
 * HOT FIX Funnels can't be added to the database.
 
-= 2.2.2 =
+= 2.2.2 (2020-05-12) =
 * HOT FIX `queued_id` column not added to events table in some installations.
 * FIXED Broadcast send time showing in UTC0 in new dashboard.
 
-= 2.2 =
+= 2.2 (2020-05-11) =
 * ADDED Brand new reporting dashboard. The old dashboard reports have been removed.
 * ADDED New search filters for contact search
 * ADDED Ability to distinguish emails as transactional or marketing. Transactional emails will ignore marketability.

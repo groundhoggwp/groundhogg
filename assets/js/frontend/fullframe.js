@@ -69,6 +69,6 @@
     addEvent( 'resize', resizeAllFrames );
     addEvent( 'load', resizeAllFrames );
 
-    initAllFrames();
+    $(initAllFrames);
 
 })(jQuery);

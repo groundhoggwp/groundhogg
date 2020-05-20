@@ -139,7 +139,7 @@ if ( get_url_var( 'flush' ) ){
         <div class="upload-plugin-wrap">
             <div class="upload-plugin">
                 <p class="install-help"><?php _e( 'If you have a funnel import file (ends in .funnel) you can upload it here!', 'groundhogg' ); ?></p>
-                <form method="post" enctype="multipart/form-data" class="wp-upload-form">
+                <form method="post" enctype="multipart/form-data" class="gh-tools-box">
                     <?php wp_nonce_field(); ?>
                     <p class="description"><?php _e( 'Upload a .funnel export file.', 'groundhogg' ); ?></p>
                     <hr/>
@@ -148,7 +148,7 @@ if ( get_url_var( 'flush' ) ){
                             value="import"><?php _ex( 'Import Funnel', 'action', 'groundhogg' ); ?></button>
                     <div class="wp-clearfix"></div>
                 </form>
-                <form method="post" class="wp-upload-form">
+                <form method="post" class="gh-tools-box">
                     <?php wp_nonce_field(); ?>
                     <p class="description"><?php _e( 'Copy and paste JSON from a .funnel export file if you are having issue uploading.', 'groundhogg' ); ?></p>
                     <hr/>

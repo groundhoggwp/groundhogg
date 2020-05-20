@@ -81,6 +81,10 @@ abstract class Updater {
 
 			$text = sprintf( __( 'Version %s', 'groundhogg' ), $update );
 
+			if ( $this->did_update( $update ) ){
+			    echo '<span style="color: green">&#x2705;</span>&nbsp;';
+            }
+
 			echo html()->e( 'a', [
 				'href' => add_query_arg( [
 					'updater'       => $this->get_updater_name(),
