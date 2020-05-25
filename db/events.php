@@ -190,6 +190,25 @@ class Events extends DB {
 	}
 
 	/**
+	 * For some reason, queued_id is getting duplicated on large installs
+	 * So let's order the table by ID DESC so we get the most recent event...
+	 *
+	 * @access  public
+	 *
+	 * @param $column
+	 * @param $row_id
+	 *
+	 * @return  object
+	 * @since   2.1
+	 */
+	public function get_by( $column, $row_id ) {
+		global $wpdb;
+		$column = esc_sql( $column );
+		$results = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $this->table_name WHERE `$column` = %s ORDER BY `ID` DESC LIMIT 1;", $row_id ) );
+		return apply_filters( 'groundhogg/db/get/' . $this->get_object_type(), $results );
+	}
+
+	/**
 	 * Delete events for a funnel that was just deleted...
 	 *
 	 * @param $id

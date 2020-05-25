@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin\Guided_Setup\Steps;
 
+use Groundhogg\Mailhawk;
 use Groundhogg\SendWp;
 use function Groundhogg\dashicon;
 use function Groundhogg\dashicon_e;
@@ -39,6 +40,35 @@ class Email extends Step {
 	}
 
 	public function get_content() {
+	    
+	    ?>
+		<style type="text/css">
+			#groundhogg-mailhawk-connect {
+				display: block;
+				margin: 20px auto 20px auto;
+				padding: 8px 14px;
+			}
+			#connect-mailhawk h3{
+				text-align: center;
+			}
+			#connect-mailhawk p{
+				font-size: 14px;
+			}
+			#connect-mailhawk{
+				margin: 60px auto;
+			}
+		</style>
+
+		<div id="connect-mailhawk">
+			<h3 id="connect-mailhawk-h3"><?php _e( 'Never worry about email deliverability again!' ); ?></h3>
+			<?php
+
+			Mailhawk::instance()->output_connect_button();
+			Mailhawk::instance()->output_js();
+			?>
+			<p id="connect-mailhawk"><?php _e( '<a href="https://mailhawk.com/" target="_blank">MailHawl</a> makes WordPress email delivery as simple as a few clicks, starting at <b>$14.97/month</b>.', 'groundhogg' ); ?></p>
+		</div>
+		<?php
 
 		$downloads = License_Manager::get_store_products( [
 			'tag' => 'sending-service'

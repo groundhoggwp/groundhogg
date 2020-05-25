@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Settings;
 
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Extension;
+use Groundhogg\Mailhawk;
 use Groundhogg\SendWp;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
@@ -347,6 +348,12 @@ class Settings_Page extends Admin_Page {
 //				'tab'      => 'email',
 //				'callback' => [ SendWp::instance(), 'settings_connect_ui' ],
 //			],
+			'mailhawk'            => [
+				'id'       => 'mailhawk',
+				'title'    => _x( 'MailHawk', 'settings_sections', 'groundhogg' ),
+				'tab'      => 'email',
+				'callback' => [ Mailhawk::instance(), 'settings_connect_ui' ],
+			],
 			'overrides'         => [
 				'id'    => 'overrides',
 				'title' => _x( 'Overrides', 'settings_sections', 'groundhogg' ),

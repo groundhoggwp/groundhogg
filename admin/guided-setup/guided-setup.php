@@ -36,166 +36,158 @@ use function Groundhogg\show_groundhogg_branding;
  * @since       File available since Release 0.9
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-class Guided_Setup extends Admin_Page
-{
+class Guided_Setup extends Admin_Page {
 
-    protected $steps = [];
+	protected $steps = [];
 
-    /**
-     * Add Ajax actions...
-     *
-     * @return void
-     */
-    protected function add_ajax_actions(){}
+	/**
+	 * Add Ajax actions...
+	 *
+	 * @return void
+	 */
+	protected function add_ajax_actions() {
+	}
 
-    public function screen_options(){}
+	public function screen_options() {
+	}
 
-    /**
-     * Adds additional actions.
-     *
-     * @return void
-     */
-    protected function add_additional_actions()
-    {
-        $this->init_steps();
-    }
+	/**
+	 * Adds additional actions.
+	 *
+	 * @return void
+	 */
+	protected function add_additional_actions() {
+		$this->init_steps();
+	}
 
-    public function init_steps()
-    {
-        $steps = [];
-        $steps[] = new Start();
-        $steps[] = new Business_Info();
-        $steps[] = new Compliance();
-        $steps[] = new Email();
-        $steps[] = new Tracking();
-        $steps[] = new Premium();
-        $steps[] = new Finished();
+	public function init_steps() {
+		$steps   = [];
+		$steps[] = new Start();
+		$steps[] = new Business_Info();
+		$steps[] = new Compliance();
+		$steps[] = new Email();
+		$steps[] = new Tracking();
+		$steps[] = new Premium();
+		$steps[] = new Finished();
 
-        $this->steps = $steps;
-    }
+		$this->steps = $steps;
+	}
 
-    /**
-     * Get the page slug
-     *
-     * @return string
-     */
-    public function get_slug()
-    {
-        return 'gh_guided_setup';
-    }
+	/**
+	 * Get the page slug
+	 *
+	 * @return string
+	 */
+	public function get_slug() {
+		return 'gh_guided_setup';
+	}
 
-    /**
-     * Get the menu name
-     *
-     * @return string
-     */
-    public function get_name()
-    {
-        return __( 'Guided Setup', 'groundhogg' );
-    }
+	/**
+	 * Get the menu name
+	 *
+	 * @return string
+	 */
+	public function get_name() {
+		return __( 'Guided Setup', 'groundhogg' );
+	}
 
-    /**
-     * The required minimum capability required to load the page
-     *
-     * @return string
-     */
-    public function get_cap()
-    {
-        return 'manage_options';
-    }
+	/**
+	 * The required minimum capability required to load the page
+	 *
+	 * @return string
+	 */
+	public function get_cap() {
+		return 'manage_options';
+	}
 
-    /**
-     * Get the item type for this page
-     *
-     * @return mixed
-     */
-    public function get_item_type()
-    {
-        return 'step';
-    }
+	/**
+	 * Get the item type for this page
+	 *
+	 * @return mixed
+	 */
+	public function get_item_type() {
+		return 'step';
+	}
 
-    /**
-     * Output the basic view.
-     *
-     * @return void
-     */
-    public function view()
-    {
-        _e( 'Look away!' );
-    }
+	/**
+	 * Output the basic view.
+	 *
+	 * @return void
+	 */
+	public function view() {
+		_e( 'Look away!' );
+	}
 
-    /**
-     * Just use the step process...
-     */
-    public function process_view()
-    {
-        $this->get_current_step()->go_to_next();
-    }
+	/**
+	 * Just use the step process...
+	 */
+	public function process_view() {
+		$this->get_current_step()->go_to_next();
+	}
 
-    /**
-     * @return string
-     */
-    public function get_parent_slug()
-    {
-        return 'options.php';
-    }
+	/**
+	 * @return string
+	 */
+	public function get_parent_slug() {
+		return 'options.php';
+	}
 
-    /**
-     * @return int
-     */
-    public function get_current_step_id()
-    {
-        return absint( get_request_var( 'step', 0 ) );
-    }
+	/**
+	 * @return int
+	 */
+	public function get_current_step_id() {
+		return absint( get_request_var( 'step', 0 ) );
+	}
 
-    /**
-     * @return bool|Step
-     */
-    public function get_current_step()
-    {
-        return get_array_var( $this->steps, $this->get_current_step_id() );
-    }
+	/**
+	 * @return bool|Step
+	 */
+	public function get_current_step() {
+		return get_array_var( $this->steps, $this->get_current_step_id() );
+	}
 
-    /**
-     * The main output
-     */
-    public function page()
-    {
-        ?>
+	/**
+	 * The main output
+	 */
+	public function page() {
+		?>
         <div class="wrap">
-        <?php if ( show_groundhogg_branding() ):
-            floating_phil();
-        endif; ?>
+		<?php if ( show_groundhogg_branding() ):
+			floating_phil();
+		endif; ?>
         <form action="" method="post" id="poststuff">
-            <?php wp_nonce_field(); ?>
+			<?php wp_nonce_field(); ?>
             <div style="max-width: 600px;margin: auto;">
-                <?php $this->get_current_step()->view(); ?>
+				<?php $this->get_current_step()->view(); ?>
             </div>
-            <?php
-        ?></form>
+			<?php
+			?></form>
         </div><?php
-    }
+	}
 
-    /**
-     * Enqueue any scripts
-     */
-    public function scripts(){
-        wp_enqueue_style( 'groundhogg-admin' );
-        wp_enqueue_style( 'groundhogg-admin' );
-        wp_enqueue_style( 'groundhogg-admin-guided-setup' );
-        wp_enqueue_script( 'groundhogg-admin-guided-setup' );
-        wp_localize_script( 'groundhogg-admin-guided-setup', 'GroundhoggSetupObject', [
-            'saving_text' => dashicon( 'admin-generic' ) . __( 'Working...', 'groundhogg' ),
-        ] );
-    }
+	/**
+	 * Enqueue any scripts
+	 */
+	public function scripts() {
+		wp_enqueue_style( 'groundhogg-admin' );
+		wp_enqueue_style( 'groundhogg-admin' );
+		wp_enqueue_style( 'groundhogg-admin-guided-setup' );
+		wp_enqueue_script( 'groundhogg-admin-guided-setup' );
+		wp_localize_script( 'groundhogg-admin-guided-setup', 'GroundhoggSetupObject', [
+			'saving_text' => dashicon( 'admin-generic' ) . __( 'Working...', 'groundhogg' ),
+		] );
+	}
 
-    /**
-     * Add any help items
-     *
-     * @return mixed
-     */
-    public function help(){}
+	/**
+	 * Add any help items
+	 *
+	 * @return mixed
+	 */
+	public function help() {
+	}
 
 }
