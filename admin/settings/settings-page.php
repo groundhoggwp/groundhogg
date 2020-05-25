@@ -812,7 +812,7 @@ class Settings_Page extends Admin_Page {
 				'id'      => 'gh_override_from_name',
 				'section' => 'overrides',
 				'label'   => _x( 'Default From Name', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'Override the default wp_mail from name.', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'Override the default <code>wp_mail</code> from name.', 'settings', 'groundhogg' ),
 				'type'    => 'input',
 				'atts'    => array(
 					'name'        => 'gh_override_from_name',
@@ -824,7 +824,7 @@ class Settings_Page extends Admin_Page {
 				'id'      => 'gh_override_from_email',
 				'section' => 'overrides',
 				'label'   => _x( 'Default From Email', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'Override the default wp_mail from email.', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'Override the default <code>wp_mail</code> from email.', 'settings', 'groundhogg' ),
 				'type'    => 'input',
 				'atts'    => array(
 					'type'        => 'email',

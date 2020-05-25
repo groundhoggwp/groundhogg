@@ -177,6 +177,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.9 (2020-05-25) =
+* ADDED [MailHawk](https://mailhawk.io) as a recommended email service.
+* TWEAKED `get_by()` in the events table will sort `DESC` instead of `ASC`
+* FIXED Minor CSS issues
+* FIXED Typo in spanish translation file
+
 = 2.2.8 (2020-05-20) =
 * TWEAKED Checkmark will show next to applied updates in the tools section.
 * FIXED CSS issue when importing a funnel.

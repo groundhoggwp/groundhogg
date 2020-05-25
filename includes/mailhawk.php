@@ -206,7 +206,7 @@ class Mailhawk {
 
 		}
 
-		echo sprintf( '<button type="button" class="button button-primary" id="groundhogg-mailhawk-connect">%s %s</button>', dashicon( 'email-alt' ), __( 'Connect MailHawk' ) );
+		echo sprintf( '<button type="button" class="button button-primary big-button" id="groundhogg-mailhawk-connect">%s %s</button>', dashicon( 'email-alt' ), __( 'Connect MailHawk' ) );
 	}
 
 	/**

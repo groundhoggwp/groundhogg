@@ -36,38 +36,45 @@ class Email extends Step {
 	}
 
 	public function get_description() {
-		return _x( 'There are different ways to send email with Groundhogg! We recommend using a trusted sending service like SendGrid or AWS. Luckily, we provide integration for both!', 'guided_setup', 'groundhogg' );
+		return _x( 'There are different ways to send email with Groundhogg! We recommend using a trusted sending service like MailHawk, SendGrid or AWS. Luckily, we provide integrations for all of them!', 'guided_setup', 'groundhogg' );
 	}
 
 	public function get_content() {
 	    
 	    ?>
-		<style type="text/css">
-			#groundhogg-mailhawk-connect {
-				display: block;
-				margin: 20px auto 20px auto;
-				padding: 8px 14px;
-			}
-			#connect-mailhawk h3{
-				text-align: center;
-			}
-			#connect-mailhawk p{
-				font-size: 14px;
-			}
-			#connect-mailhawk{
-				margin: 60px auto;
-			}
-		</style>
+        <div class="postbox">
+            <div class="card-top">
+                <h3 class="extension-title">
+					MailHawk
+                    <img class="thumbnail" src="<?php echo esc_url( GROUNDHOGG_ASSETS_URL . 'images/recommended/mailhawk.png' ); ?>"
+                         alt="MailHawk">
+                </h3>
+                <p class="extension-description">
+	                <?php _e( '<a href="https://mailhawk.com/" target="_blank">MailHawk</a> makes WordPress email delivery as simple as a few clicks, starting at <b>$14.97/month</b>.', 'groundhogg' ); ?>
+                </p>
+            </div>
+            <div class="install-actions">
 
-		<div id="connect-mailhawk">
-			<h3 id="connect-mailhawk-h3"><?php _e( 'Never worry about email deliverability again!' ); ?></h3>
-			<?php
+				<?php
 
-			Mailhawk::instance()->output_connect_button();
-			Mailhawk::instance()->output_js();
-			?>
-			<p id="connect-mailhawk"><?php _e( '<a href="https://mailhawk.com/" target="_blank">MailHawl</a> makes WordPress email delivery as simple as a few clicks, starting at <b>$14.97/month</b>.', 'groundhogg' ); ?></p>
-		</div>
+				echo html()->e( 'a', [
+					'href' => '#',
+					'id' => 'groundhogg-mailhawk-connect',
+					'class' => 'button',
+				], __( 'Integrate this service!' ) );
+
+				?>
+
+				<?php echo html()->e( 'a', [
+					'href'   => 'https://mailhawk.io',
+					'target' => '_blank',
+					'class'  => 'more-details',
+				], __( 'More details' ) ); ?>
+            </div>
+        </div>
+
+        <?php Mailhawk::instance()->output_js(); ?>
+
 		<?php
 
 		$downloads = License_Manager::get_store_products( [
