@@ -46,7 +46,7 @@ foreach ( $funnels as $funnel ) {
 		] );
 
 		$args = array(
-			'name'        => 'funnel_id',
+			'name'        => 'funnel',
 			'id'          => 'funnel-id',
 			'class'       => 'post-data',
 			'options'     => $options,

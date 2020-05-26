@@ -60,8 +60,12 @@ class Funnels_Page extends Admin_Page {
 				break;
 			case 'edit':
 				$funnel_id   = get_request_var( 'funnel' );
-				$funnel      = Plugin::$instance->utils->get_funnel( absint( $funnel_id ) );
-				$admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", $funnel->get_title(), __( 'Edit' ), $admin_title );
+				$funnel      =new Funnel( absint( $funnel_id ) );
+
+				if ( $funnel->exists() ){
+					$admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", $funnel->get_title(), __( 'Edit' ), $admin_title );
+				}
+
 				break;
 		}
 

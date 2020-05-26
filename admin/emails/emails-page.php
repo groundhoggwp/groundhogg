@@ -390,6 +390,7 @@ class Emails_Page extends Admin_Page {
 			}
 
 			$test_email = sanitize_email( Groundhogg\get_request_var( 'test_email', wp_get_current_user()->user_email ) );
+			$test_email = apply_filters( 'groundhogg/admin/emails/test_email', $test_email );
 
 			if ( $test_email && is_email( $test_email ) ) {
 

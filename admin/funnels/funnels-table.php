@@ -92,10 +92,10 @@ class Funnels_Table extends WP_List_Table {
 	protected function get_sortable_columns() {
 
 		$sortable_columns = array(
-			'title'           => array( 'title', false ),
+			'title'        => array( 'title', false ),
 //			'active_contacts' => array( 'active_contacts', false ),
-			'last_updated'    => array( 'last_updated', false ),
-			'date_created'    => array( 'date_created', false )
+			'last_updated' => array( 'last_updated', false ),
+			'date_created' => array( 'date_created', false )
 		);
 
 		return apply_filters( 'groundhogg_funnels_get_sortable_columns', $sortable_columns );
@@ -152,12 +152,14 @@ class Funnels_Table extends WP_List_Table {
 			$actions['delete']  = "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&view=archived&action=delete&funnel=' . $id ), 'delete' ) . "'>" . _x( 'Delete Permanently', 'action', 'groundhogg' ) . "</a></span>";
 		} else {
 
-//			if ( ! is_option_enabled( 'gh_use_classic_builder' ) ) {
-				$actions['edit'] = "<span class='edit'><a href='" . $editUrl . "'>" . __( 'Build' ) . "</a></span>";
-//			} else {
-//				$actions['edit']    = "<span class='edit'><a href='" . $editUrlClassic . "'>" . __( 'Build' ) . "</a></span>";
-//				$actions['edit-v2'] = "<span class='edit'><a href='" . $editUrl . "'>" . __( 'Build (v2)' ) . "</a></span>";
-//			}
+			$actions['edit'] = "<span class='edit'><a href='" . $editUrl . "'>" . __( 'Build' ) . "</a></span>";
+
+			if ( $funnel->is_active() ) {
+				$actions['report'] = "<a href='" . esc_url( admin_page_url( 'gh_reporting', [
+						'tab'    => 'funnels',
+						'funnel' => $id,
+					] ) ) . "'>" . __( 'Report', 'groundhogg' ) . "</a>";
+			}
 
 			$actions['duplicate'] = "<span class='duplicate'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_funnels&action=duplicate&funnel=' . $id ), 'duplicate' ) . "'>" . _x( 'Duplicate', 'action', 'groundhogg' ) . "</a></span>";
 			$actions['export']    = "<span class='export'><a href='" . $funnel->export_url() . "'>" . _x( 'Export', 'action', 'groundhogg' ) . "</a></span>";
@@ -225,6 +227,7 @@ class Funnels_Table extends WP_List_Table {
 	 */
 	protected function column_last_updated( $funnel ) {
 		$ds_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $funnel->last_updated ) );
+
 		return scheduled_time_column( $ds_time, false, false, false );
 	}
 
@@ -235,6 +238,7 @@ class Funnels_Table extends WP_List_Table {
 	 */
 	protected function column_date_created( $funnel ) {
 		$ds_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $funnel->date_created ) );
+
 		return scheduled_time_column( $ds_time, false, false, false );
 	}
 

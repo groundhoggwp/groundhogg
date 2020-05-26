@@ -177,6 +177,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.10 (2020-05-26) =
+* ADDED Reporting links in email & funnels table for easy access to reports.
+* FIXED "View Funnel" link on the funnel report page causing fatal error because of incorrect field name.
+
 = 2.2.9 (2020-05-25) =
 * ADDED [MailHawk](https://mailhawk.io) as a recommended email service.
 * ADDED Support for tracking bounces from MailHawk.

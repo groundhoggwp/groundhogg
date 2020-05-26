@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Emails;
 
 use Groundhogg\Email;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_screen_option;
@@ -164,11 +165,19 @@ class Emails_Table extends WP_List_Table {
 		$id      = $email->get_id();
 
 		if ( $this->get_view() === 'trash' ) {
-			$actions['restore'] = "<span class='restore'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=all&action=restore&email=' . $id ), 'restore' ) . "'>" . __( 'Restore' ) . "</a></span>";
-			$actions['delete']  = "<span class='delete'><a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=archived&action=delete&email=' . $id ), 'delete' ) . "'>" . __( 'Delete Permanently' ) . "</a></span>";
+			$actions['restore'] = "<a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=all&action=restore&email=' . $id ), 'restore' ) . "'>" . __( 'Restore' ) . "</a>";
+			$actions['delete']  = "<a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=archived&action=delete&email=' . $id ), 'delete' ) . "'>" . __( 'Delete Permanently' ) . "</a>";
 		} else {
-			$actions['edit']  = "<span class='edit'><a href='" . admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $id ) . "'>" . __( 'Edit' ) . "</a></span>";
-			$actions['trash'] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=all&action=trash&email=' . $id ), 'trash' ) . "'>" . __( 'Trash' ) . "</a></span>";
+			$actions['edit']   = "<a href='" . admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $id ) . "'>" . __( 'Edit' ) . "</a>";
+
+			if ( $email->is_ready() ){
+				$actions['report'] = "<a href='" . esc_url( admin_page_url( 'gh_reporting', [
+						'tab' => 'email_step',
+						'email' => $id,
+					] ) ) . "'>" . __( 'Report', 'groundhogg' ) . "</a>";
+			}
+
+			$actions['delete'] = "<a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=all&action=trash&email=' . $id ), 'trash' ) . "'>" . __( 'Trash' ) . "</a>";
 		}
 
 		return $this->row_actions( apply_filters( 'groundhogg/admin/emails/table/row_actions', $actions, $email, $column_name ) );
@@ -250,6 +259,7 @@ class Emails_Table extends WP_List_Table {
 	 */
 	protected function column_date_created( $email ) {
 		$ds_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $email->get_date_created() ) );
+
 		return scheduled_time_column( $ds_time, false, false, false );
 	}
 
@@ -260,6 +270,7 @@ class Emails_Table extends WP_List_Table {
 	 */
 	protected function column_last_updated( $email ) {
 		$ds_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $email->get_last_updated() ) );
+
 		return scheduled_time_column( $ds_time, false, false, false );
 	}
 

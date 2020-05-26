@@ -144,7 +144,14 @@ function tool_tip_title() {
 
             $( '.post-data' ).each( function ( i ) {
                 var $this = $(this);
-                data[ $this.attr( 'name' ) ] = $this.val();
+                var name = $this.attr( 'name' );
+
+                // Backwards compat for the funnel area, but also want the form to work...
+                if ( name === 'funnel' ){
+                    name = 'funnel_id';
+                }
+
+                data[ name ] = $this.val();
             });
 
             return data;
