@@ -11,7 +11,7 @@
                 // iFrames[i].style.height = $(iFrames[i].contentWindow.document.body.offsetHeight) ;
 
                 //replaced function with assignment in case it fix it..
-                iFrames[i].style.height = $(iFrames[i].contentWindow.document.body.scrollHeight)+"px";
+                iFrames[i].style.height = $(iFrames[i].contentWindow.document.body.offsetHeight)+"px";
                 // iFrames[i].height($(iFrames[i].contentWindow.document).height());
             }
         }
