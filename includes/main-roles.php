@@ -189,6 +189,7 @@ class Main_Roles extends Roles {
 			'delete_contacts',
 			'edit_contacts',
 			'view_contacts',
+			'view_all_contacts',
 			'import_contacts',
 			'export_contacts'
 		);
@@ -391,6 +392,6 @@ class Main_Roles extends Roles {
 	 * @return mixed
 	 */
 	protected function get_admin_cap_check() {
-		return 'view_contacts';
+		return 'view_all_contacts';
 	}
 }

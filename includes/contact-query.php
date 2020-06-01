@@ -286,6 +286,11 @@ class Contact_Query {
 			'no_found_rows'          => true,
 		);
 
+		// Only show contacts associated with the current owner...
+		if ( current_user_can( 'view_contacts' ) && ! current_user_can( 'view_all_contacts' ) ){
+			$this->query_var_defaults[ 'owner' ] = get_current_user_id();
+		}
+
 		if ( ! empty( $query ) ) {
 			$this->query( $query );
 		}

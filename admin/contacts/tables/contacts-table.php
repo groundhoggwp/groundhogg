@@ -100,11 +100,6 @@ class Contacts_Table extends WP_List_Table {
 			$query['optin_status'] = map_deep( $optin_status, 'absint' );
 		}
 
-		// Sales person can only see their own contacts...
-		if ( current_user_is( 'sales_manager' ) ) {
-			$query['owner'] = get_current_user_id();
-		}
-
 		$date_query = [
 			'relation' => 'AND'
 		];
