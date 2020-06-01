@@ -427,6 +427,7 @@ class Contacts_Table extends WP_List_Table {
 	 * @return array An associative array containing all the bulk steps.
 	 */
 	protected function get_bulk_actions() {
+
 		$actions = array(
 			'apply_tag'  => _x( 'Apply Tag', 'List table bulk action', 'groundhogg' ),
 			'remove_tag' => _x( 'Remove Tag', 'List table bulk action', 'groundhogg' ),
@@ -434,6 +435,11 @@ class Contacts_Table extends WP_List_Table {
 			'spam'       => _x( 'Spam', 'List table bulk action', 'groundhogg' ),
 			'unspam'     => _x( 'Unspam', 'List table bulk action', 'groundhogg' ),
 		);
+
+		// Sales reps/managers can't delete contacts...
+		if ( ! current_user_can( 'delete_contacts' ) ){
+			unset( $actions[ 'delete' ] );
+        }
 
 		return apply_filters( 'groundhogg_contact_bulk_actions', $actions );
 	}
@@ -622,23 +628,29 @@ class Contacts_Table extends WP_List_Table {
         <div class="alignleft gh-actions">
 			<?php
 
-			$export_query = $this->query;
+			if ( current_user_can( 'export_contacts' ) ) {
+				$export_query = $this->query;
 
-			unset( $export_query['number'] );
-			unset( $export_query['limit'] );
-			unset( $export_query['offset'] );
 
-			$export_url = admin_page_url( 'gh_tools', [
-				'tab'    => 'export',
-				'action' => 'choose_columns',
-				'query'  => $export_query,
-			] );
+				unset( $export_query['number'] );
+				unset( $export_query['limit'] );
+				unset( $export_query['offset'] );
 
-			?>
-            <a class="button action export-contacts"
-               href="<?php echo esc_url( $export_url ); ?>"><?php printf( _nx( 'Export %s contact', 'Export %s contacts', $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?></a>
-        </div><?php
+				$export_url = admin_page_url( 'gh_tools', [
+					'tab'    => 'export',
+					'action' => 'choose_columns',
+					'query'  => $export_query,
+				] );
 
-		do_action( 'groundhogg/admin/contacts/table/extra_tablenav', $this );
+				?>
+                <a class="button action export-contacts"
+                   href="<?php echo esc_url( $export_url ); ?>"><?php printf( _nx( 'Export %s contact', 'Export %s contacts', $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?></a>
+				<?php
+			}
+
+			do_action( 'groundhogg/admin/contacts/table/extra_tablenav', $this );
+
+			?></div><?php
+
 	}
 }
