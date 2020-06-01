@@ -177,6 +177,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.12 (2020-06-01) =
+* ADDED `{owner_signature}` replacement code and signature text box in profile editor.
+* FIXED Users with `sales_rep` role not showing in the owner dropdown.
+
 = 2.2.11 (2020-06-01) =
 * FIXED Compatibility issue with Oxygen builder
 * FIXED JS safari issue regarding the `fullframe.js` file

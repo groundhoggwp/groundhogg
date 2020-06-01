@@ -16,6 +16,7 @@ use Groundhogg\Admin\Reports\Reports_Page;
 use Groundhogg\Admin\Settings\Settings_Page;
 use Groundhogg\Admin\Tags\Tags_Page;
 use Groundhogg\Admin\Tools\Tools_Page;
+use Groundhogg\Admin\User\Admin_User;
 use Groundhogg\Admin\Welcome\Welcome_Page;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\is_pro_features_active;
@@ -76,6 +77,8 @@ class Admin_Menu {
 			}
 		}
 
+		// user profile edits...
+		new Admin_User();
 
 		do_action( 'groundhogg/admin/init', $this );
 	}

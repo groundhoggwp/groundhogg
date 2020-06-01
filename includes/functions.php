@@ -3169,3 +3169,12 @@ function generate_referer_hash( $referer ) {
 function convert_to_local_time( $time ) {
 	return Plugin::$instance->utils->date_time->convert_to_local_time( $time );
 }
+
+/**
+ * Get an array of all the valid owners on the site
+ *
+ * @return \WP_User[]
+ */
+function get_owners(){
+	return get_users( array( 'role__in' => Main_Roles::get_owner_roles() ) );
+}

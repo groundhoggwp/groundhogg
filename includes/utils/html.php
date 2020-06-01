@@ -685,7 +685,7 @@ class HTML {
 		) );
 
 		if ( empty( $a['options'] ) ) {
-			$owners = get_users( array( 'role__in' => array( 'administrator', 'marketer', 'sales_manager' ) ) );
+			$owners = get_owners();
 
 			/**
 			 * @var $owner \WP_User

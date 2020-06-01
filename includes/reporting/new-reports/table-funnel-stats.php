@@ -61,8 +61,6 @@ class Table_Funnel_Stats extends Base_Table_Report {
 					'funnel' => $funnel->get_id(),
 					'step'   => $step->get_id(),
 					'status' => Event::WAITING,
-					'start'  => $this->start,
-					'end'    => $this->end,
 				)
 			);
 

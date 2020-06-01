@@ -362,6 +362,14 @@ JS;
 // Add the phone to the contact methods!
 add_filter( 'user_contactmethods', __NAMESPACE__ . '\add_phone_contact_method', 99, 2 );
 
+/**
+ * Add a user contact method
+ *
+ * @param $methods
+ * @param $user
+ *
+ * @return mixed
+ */
 function add_phone_contact_method( $methods, $user ) {
 	$methods['phone'] = __( 'Phone', 'groundhogg' );
 

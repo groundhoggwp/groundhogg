@@ -21,6 +21,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Main_Roles extends Roles {
 
 	/**
+	 * Valid owner roles..
+	 *
+	 * @var array
+	 */
+	public static $owner_roles = [
+		'administrator',
+		'marketer',
+		'sales_manager',
+		'sales_rep'
+	];
+
+	/**
+	 * Get the list of valid owner roles...
+	 *
+	 * @return mixed|void
+	 */
+	public static function get_owner_roles (){
+		return apply_filters( 'groundhogg/owner_roles', self::$owner_roles );
+	}
+
+	/**
 	 * Returns an array  of role => [
 	 *  'role' => '',
 	 *  'name' => '',

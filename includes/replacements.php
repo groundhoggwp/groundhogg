@@ -179,6 +179,11 @@ class Replacements {
 				'description' => _x( 'The contact owner\'s phone number.', 'replacement', 'groundhogg' ),
 			),
 			array(
+				'code'        => 'owner_signature',
+				'callback'    => [ $this, 'replacement_owner_signature' ],
+				'description' => _x( 'The contact owner\'s signature.', 'replacement', 'groundhogg' ),
+			),
+			array(
 				'code'        => 'confirmation_link',
 				'callback'    => [ $this, 'replacement_confirmation_link' ],
 				'description' => _x( 'A link to confirm the email address of a contact.', 'replacement', 'groundhogg' ),
@@ -704,6 +709,29 @@ class Replacements {
 		}
 
 		return $user->phone;
+	}
+
+	/**
+	 * Return the owner's signature
+	 *
+	 * @param int $user_id
+	 * @param int $contact_id
+	 *
+	 * @return mixed|string
+	 */
+	function replacement_owner_signature( $user_id=0, $contact_id=0 ) {
+
+	    $user_id = absint( $user_id );
+
+	    // If a specific user ID was passed
+	    if ( $user_id > 0 && $contact_id > 0 ){
+	        $user = get_userdata( $user_id );
+        } else {
+	        // Use contact's actual owner...
+		    $user = $this->get_current_contact()->get_ownerdata();
+	    }
+
+		return $user->signature;
 	}
 
 	/**
