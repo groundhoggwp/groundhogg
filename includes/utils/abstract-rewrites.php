@@ -6,6 +6,7 @@ use function Groundhogg\isset_not_empty;
 use Groundhogg\Template_Loader;
 
 abstract class Abstract_Rewrites {
+
 	/**
 	 * Rewrites constructor.
 	 */
@@ -13,7 +14,9 @@ abstract class Abstract_Rewrites {
 		add_action( 'init', [ $this, 'add_rewrite_rules' ] );
 		add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
 		add_filter( 'request', [ $this, 'parse_query' ] );
-		add_filter( 'template_include', [ $this, 'template_include' ] );
+
+		// Give precedence over page builders...
+		add_filter( 'template_include', [ $this, 'template_include' ], 99 );
 		add_action( 'template_redirect', [ $this, 'template_redirect' ] );
 	}
 

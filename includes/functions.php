@@ -2812,6 +2812,11 @@ function get_upload_wp_error( $file ) {
  * @return mixed
  */
 function guided_setup_finished() {
+
+    if ( is_white_labeled() ){
+        return true;
+    }
+
 	return (bool) Plugin::$instance->settings->get_option( 'gh_guided_setup_finished', false );
 }
 

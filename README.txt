@@ -177,6 +177,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.11 (2020-06-01) =
+* FIXED Compatibility issue with Oxygen builder
+* FIXED JS safari issue regarding the `fullframe.js` file
+* FIXED Import action redirecting users to the guided setup if not complete if the white label extension is installed and active.
+
 = 2.2.10 (2020-05-26) =
 * ADDED Reporting links in email & funnels table for easy access to reports.
 * FIXED "View Funnel" link on the funnel report page causing fatal error because of incorrect field name.
