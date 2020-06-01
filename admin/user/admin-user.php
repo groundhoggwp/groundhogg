@@ -20,6 +20,12 @@ class Admin_User {
 	 * @param $profile_user \WP_User
 	 */
 	public function show_fields( $profile_user ) {
+
+	    // Do nto show for non relevant users...
+	    if ( ! user_can( $profile_user, 'view_contacts' ) ){
+	        return;
+        }
+
 		?>
         <h2><?php _e( 'Groundhogg', 'groundhogg' ); ?></h2>
         <table class="form-table">
