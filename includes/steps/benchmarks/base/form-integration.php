@@ -1,4 +1,5 @@
 <?php
+
 namespace Groundhogg\Steps\Benchmarks;
 
 use function Groundhogg\after_form_submit_handler;
@@ -16,211 +17,210 @@ use Groundhogg\Step;
  * Date: 2018-09-04
  * Time: 10:19 AM
  */
+abstract class Form_Integration extends Benchmark {
 
-abstract class Form_Integration extends Benchmark
-{
+	public function add_additional_actions() {
+		add_action( "wp_ajax_get_form_integration_map_{$this->get_type()}", [ $this, 'get_map_ajax' ] );
+	}
 
-    public function add_additional_actions()
-    {
-        add_action( "wp_ajax_get_form_integration_map_{$this->get_type()}", [ $this, 'get_map_ajax' ] );
-    }
+	public function admin_scripts() {
+		wp_enqueue_script( 'groundhogg-funnel-form-integration' );
+	}
 
-    public function admin_scripts()
-    {
-        wp_enqueue_script( 'groundhogg-funnel-form-integration' );
-    }
+	/**
+	 * Get the html for the field map when the form ID is changed.
+	 *
+	 * @return void
+	 */
+	public function get_map_ajax() {
+		if ( ! wp_doing_ajax() ) {
+			return;
+		}
 
-    /**
-     * Get the html for the field map when the form ID is changed.
-     *
-     * @return void
-     */
-    public function get_map_ajax()
-    {
-        if ( ! wp_doing_ajax() ){
-            return;
-        }
+		$step_id = absint( get_request_var( 'step_id' ) );
+		$form_id = absint( get_request_var( 'form_id' ) );
 
-        $step_id = absint( get_request_var( 'step_id' ) );
-        $form_id = absint( get_request_var( 'form_id' ) );
+		$this->set_current_step( new Step( $step_id ) );
 
-        $this->set_current_step( new Step( $step_id ) );
+		$table = $this->field_map_table( $form_id );
 
-        $table = $this->field_map_table( $form_id );
+		wp_send_json_success( [ 'map' => $table ] );
+	}
 
-        wp_send_json_success( [ 'map' => $table  ] );
-    }
-
-    /**
+	/**
 	 * Output the settings for the step, dropdown of all available contact forms...
 	 *
 	 * @param $step Step
 	 */
-	public function settings( $step )
-	{
+	public function settings( $step ) {
 
 		html()->start_form_table();
 		html()->start_row();
 		html()->th( __( 'Run when this form is submitted', 'groundhogg' ) );
 		html()->td( [
-            html()->select2( [
-                'id' => $this->setting_id_prefix( 'form_id' ),
-                'name' => $this->setting_name_prefix( 'form_id' ),
-                'data' => $this->get_forms_for_select_2(),
-                'selected' => $this->get_setting( 'form_id' ),
-                'class' => 'gh-select2 form-integration-picker'
-            ] ),
-            html()->wrap( [
-                html()->modal_link( [
-                    'title'     => __( 'Map Fields', 'groundhogg' ),
-                    'text'      => __( 'Map Fields', 'groundhogg' ),
-                    'footer_button_text' => __( 'Save Changes' ),
-                    'id'        => '',
-                    'class'     => 'button button-primary no-padding',
-                    'source'    => $this->setting_id_prefix( 'field_map' ),
-                    'height'    => 600,
-                    'width'     => 600,
-                    'footer'    => 'true',
-                    'preventSave' => 'true',
-                ] ),
-                html()->e( 'span', [ 'class' => 'spinner' ], '', false )],
-                'div',
-                [ 'class' => 'row-actions' ]
-            ),
-            html()->wrap( $this->field_map_table( $this->get_setting( 'form_id' ) ), 'div', [
-                'class' => 'hidden field-map-wrapper',
-                'id' => $this->setting_id_prefix( 'field_map' )
-            ] )
-        ] );
+			html()->select2( [
+				'id'       => $this->setting_id_prefix( 'form_id' ),
+				'name'     => $this->setting_name_prefix( 'form_id' ),
+				'data'     => $this->get_forms_for_select_2(),
+				'selected' => $this->get_setting( 'form_id' ),
+				'class'    => 'gh-select2 form-integration-picker'
+			] ),
+			html()->wrap( [
+				html()->modal_link( [
+					'title'              => __( 'Map Fields', 'groundhogg' ),
+					'text'               => __( 'Map Fields', 'groundhogg' ),
+					'footer_button_text' => __( 'Save Changes' ),
+					'id'                 => '',
+					'class'              => 'button button-primary no-padding',
+					'source'             => $this->setting_id_prefix( 'field_map' ),
+					'height'             => 600,
+					'width'              => 600,
+					'footer'             => 'true',
+					'preventSave'        => 'true',
+				] ),
+				html()->e( 'span', [ 'class' => 'spinner' ], '', false )
+			],
+				'div',
+				[ 'class' => 'row-actions' ]
+			),
+			html()->wrap( $this->field_map_table( $this->get_setting( 'form_id' ) ), 'div', [
+				'class' => 'hidden field-map-wrapper',
+				'id'    => $this->setting_id_prefix( 'field_map' )
+			] )
+		] );
 		html()->end_row();
 		html()->end_form_table();
 	}
 
-    /**
-     * Get the forms for a select2 picker.
-     *
-     * @return array
-     */
+	/**
+	 * Get the forms for a select2 picker.
+	 *
+	 * @return array
+	 */
 	abstract protected function get_forms_for_select_2();
 
-    /**
-     * Returns an array of Ids => Labels for easy mapping.
-     *
-     * @param $form_id
-     * @return array
-     */
-    abstract protected  function get_form_fields( $form_id );
+	/**
+	 * Returns an array of Ids => Labels for easy mapping.
+	 *
+	 * @param $form_id
+	 *
+	 * @return array
+	 */
+	abstract protected function get_form_fields( $form_id );
 
-    /**
-     * Parse the filed into a normalize array.
-     *
-     * @param $key int|string
-     * @param $field array|string
-     * @return array
-     */
-    abstract protected function normalize_field( $key, $field );
+	/**
+	 * Parse the filed into a normalize array.
+	 *
+	 * @param $key int|string
+	 * @param $field array|string
+	 *
+	 * @return array
+	 */
+	abstract protected function normalize_field( $key, $field );
 
-    /**
-     * @param $form_id
-     * @return string
-     */
-	protected function field_map_table( $form_id )
-    {
+	/**
+	 * @param $form_id
+	 *
+	 * @return string
+	 */
+	protected function field_map_table( $form_id ) {
 
-        $field_map = $this->get_setting( 'field_map' );
-        $fields = $this->get_form_fields( $form_id );
+		$field_map = $this->get_setting( 'field_map' );
+		$fields    = $this->get_form_fields( $form_id );
 
-        if  ( ! $fields ){
-            return __( 'Please select a valid form and update first.', 'groundhogg' );
-        }
+		if ( ! $fields ) {
+			return __( 'Please select a valid form and update first.', 'groundhogg' );
+		}
 
-        $rows = [];
+		$rows = [];
 
-        foreach ( $fields as $key => $field ){
+		foreach ( $fields as $key => $field ) {
 
-            $row = $this->normalize_field( $key, $field );
+			$row = $this->normalize_field( $key, $field );
 
-            $rows[] = [
-                $row[ 'id' ],
-                $row[ 'label' ],
-                html()->dropdown( [
-                    'option_none'  => '* Do Not Map *',
-                    'options'      => get_mappable_fields(),
-                    'selected'     => get_array_var( $field_map, $row[ 'id' ] ),
-                    'name'         => $this->setting_name_prefix( 'field_map' ) . sprintf( '[%s]', $row[ 'id' ] ),
-                ] )
-            ];
+			// If there is no row Id we cannot serve the field
+			if ( ! $row[ 'id' ] ){
+				continue;
+			}
 
-        }
+			$rows[] = [
+				$row['id'],
+				$row['label'],
+				html()->dropdown( [
+					'option_none' => '* Do Not Map *',
+					'options'     => get_mappable_fields(),
+					'selected'    => get_array_var( $field_map, $row['id'] ),
+					'name'        => $this->setting_name_prefix( 'field_map' ) . sprintf( '[%s]', $row['id'] ),
+				] )
+			];
 
-        ob_start();
+		}
 
-        html()->list_table(
-            [
-                'class'=>'field-map'
-            ],
-            [
-                __( 'Field ID', 'groundhogg' ),
-                __( 'Field Label', 'groundhogg' ),
-                __( 'Map To', 'groundhogg' ),
-            ],
-            $rows
-        );
+		ob_start();
 
-        return ob_get_clean();
-    }
+		html()->list_table(
+			[
+				'class' => 'field-map'
+			],
+			[
+				__( 'Field ID', 'groundhogg' ),
+				__( 'Field Label', 'groundhogg' ),
+				__( 'Map To', 'groundhogg' ),
+			],
+			$rows
+		);
 
-    /**
-     * Save the given step
-     *
-     * @param $step Step
-     */
-    public function save( $step )
-    {
-        $this->save_setting( 'form_id', absint( $this->get_posted_data( 'form_id' ) ) );
+		return ob_get_clean();
+	}
 
-        $field_map = map_deep( $this->get_posted_data( 'field_map', [] ), 'sanitize_key' );
+	/**
+	 * Save the given step
+	 *
+	 * @param $step Step
+	 */
+	public function save( $step ) {
+		$this->save_setting( 'form_id', absint( $this->get_posted_data( 'form_id' ) ) );
 
-        if ( ! array_filter( $field_map ) ){
-            $this->add_error( 'invalid_field_map', __( 'Your form map configuration is invalid.', 'groundhogg' ) );
-        }
+		$field_map = map_deep( $this->get_posted_data( 'field_map', [] ), 'sanitize_key' );
 
-        $this->save_setting( 'field_map', $field_map );
-    }
+		if ( ! array_filter( $field_map ) ) {
+			$this->add_error( 'invalid_field_map', __( 'Your form map configuration is invalid.', 'groundhogg' ) );
+		}
 
-    /**
-     * Generate a contact from the map.
-     *
-     * @return false|Contact
-     */
-    public function get_the_contact()
-    {
-        // SKIP if not the right form.
-        if ( ! $this->can_complete_step() ){
-            return false;
-        }
+		$this->save_setting( 'field_map', $field_map );
+	}
 
-        $posted_data    = $this->get_data( 'posted_data' );
-        $field_map      = $this->get_setting( 'field_map' );
+	/**
+	 * Generate a contact from the map.
+	 *
+	 * @return false|Contact
+	 */
+	public function get_the_contact() {
+		// SKIP if not the right form.
+		if ( ! $this->can_complete_step() ) {
+			return false;
+		}
 
-        $contact = generate_contact_with_map( $posted_data, $field_map );
+		$posted_data = $this->get_data( 'posted_data' );
+		$field_map   = $this->get_setting( 'field_map' );
 
-        if ( ! $contact || is_wp_error( $contact ) ){
-            return false;
-        }
+		$contact = generate_contact_with_map( $posted_data, $field_map );
 
-        after_form_submit_handler( $contact );
+		if ( ! $contact || is_wp_error( $contact ) ) {
+			return false;
+		}
 
-        return $contact;
-    }
+		after_form_submit_handler( $contact );
 
-    /**
-     * Compare the Form ID is the only requirement.
-     *
-     * @return bool
-     */
-    public function can_complete_step()
-    {
-        return absint( $this->get_data( 'form_id' ) ) === absint( $this->get_setting( 'form_id' ) );
-    }
+		return $contact;
+	}
+
+	/**
+	 * Compare the Form ID is the only requirement.
+	 *
+	 * @return bool
+	 */
+	public function can_complete_step() {
+		return absint( $this->get_data( 'form_id' ) ) === absint( $this->get_setting( 'form_id' ) );
+	}
 }

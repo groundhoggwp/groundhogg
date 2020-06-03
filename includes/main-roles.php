@@ -140,7 +140,7 @@ class Main_Roles extends Roles {
 		return [
 			'edit_contacts',
 			'view_contacts',
-			'view_own_contacts',
+			'view_all_contacts',
 			'import_contacts',
 			'send_emails',
 			'view_events',
@@ -162,7 +162,8 @@ class Main_Roles extends Roles {
 			'import_contacts',
 			'send_emails',
 			'view_events',
-			'manage_tags'
+			'manage_tags',
+			'download_contact_files'
 		];
 	}
 
@@ -310,6 +311,11 @@ class Main_Roles extends Roles {
 		return apply_filters( 'groundhogg/roles/caps/events', $caps );
 	}
 
+	/**
+	 * Roles for managing contact files
+	 *
+	 * @return array
+	 */
 	public function get_file_caps() {
 		return [
 			'download_files',
@@ -341,8 +347,10 @@ class Main_Roles extends Roles {
 	 * @return string[]
 	 */
 	public function get_other_caps() {
+
 		$caps = array(
 			'perform_bulk_actions',
+			'manage_gh_licenses',
 		);
 
 		return apply_filters( 'groundhogg/roles/caps/other', $caps );

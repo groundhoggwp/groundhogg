@@ -94,7 +94,7 @@ class HTML {
 			'class' => ''
 		] );
 
-		$args['class'] .= 'wp-list-table widefat fixed striped';
+		$args['class'] .= ' wp-list-table widefat fixed striped';
 
 		?>
         <table <?php echo array_to_atts( $args ); ?> >

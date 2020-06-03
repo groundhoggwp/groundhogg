@@ -34,3 +34,18 @@
 #poststuff .dash-button{
     padding: 0 5px 1px;
 }
+
+.wp-editor-expand #wp-email_content-editor-tools {
+    z-index: 1000;
+    border-bottom: 1px solid #ccd0d4;
+}
+#wp-email_content-editor-tools {
+    background-color: #f1f1f1;
+    padding-top: 20px;
+}
+
+#poststuff #post-body #save .spinner{
+    float: right;
+    margin: 10px 10px 0 0;
+    /*visibility: visible;*/
+}

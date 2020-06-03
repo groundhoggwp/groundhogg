@@ -42,9 +42,9 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 
 	$contact = new Contact( $contact_id_or_email, $by_user_id );
 
-	if ( $contact->exists() ){
-	    return $contact;
-    }
+	if ( $contact->exists() ) {
+		return $contact;
+	}
 
 	return false;
 }
@@ -1680,6 +1680,30 @@ function generate_contact_with_map( $fields, $map = [] ) {
 		$field = $map[ $column ];
 
 		switch ( $field ) {
+			default:
+
+				/**
+				 * Default filter for unknown contact fields
+				 *
+				 * @param $field string the field in question
+				 * @param $value mixed the value to store
+				 * @param &$args array general contact information
+				 * @param &$meta array list of contact data
+				 * @param &$tags array list of tags to add to the contact
+				 * @param &$notes array add notes to the contact
+				 * @param &$files array files to upload to the contact record
+				 */
+				do_action_ref_array( 'groundhogg/generate_contact_with_map/default', [
+					$field,
+					$value,
+					&$args,
+					&$meta,
+					&$tags,
+					&$notes,
+					&$files
+				] );
+
+				break;
 			case 'full_name':
 				$parts              = split_name( $value );
 				$args['first_name'] = sanitize_text_field( $parts[0] );
@@ -1843,6 +1867,13 @@ function generate_contact_with_map( $fields, $map = [] ) {
 	}
 
 	$contact->update_meta( 'last_optin', time() );
+
+	/**
+	 * @param $contact Contact the contact record
+	 * @param $map array the map of given data to contact data
+	 * @param $fields array the values of the given fields
+	 */
+	do_action( 'groundhogg/generate_contact_with_map/after', $contact, $map, $fields );
 
 	return $contact;
 }
@@ -2813,9 +2844,9 @@ function get_upload_wp_error( $file ) {
  */
 function guided_setup_finished() {
 
-    if ( is_white_labeled() ){
-        return true;
-    }
+	if ( is_white_labeled() ) {
+		return true;
+	}
 
 	return (bool) Plugin::$instance->settings->get_option( 'gh_guided_setup_finished', false );
 }
@@ -3175,6 +3206,6 @@ function convert_to_local_time( $time ) {
  *
  * @return \WP_User[]
  */
-function get_owners(){
+function get_owners() {
 	return get_users( array( 'role__in' => Main_Roles::get_owner_roles() ) );
 }

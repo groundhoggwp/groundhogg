@@ -167,6 +167,7 @@ class Scripts {
 			'groundhogg-admin-modal'
 		], GROUNDHOGG_VERSION, true );
 		wp_register_script( 'groundhogg-admin-simple-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/simple-editor' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
+		wp_register_script( 'groundhogg-admin-email-editor-expand', GROUNDHOGG_ASSETS_URL . 'js/admin/email-editor-expand' . $dot_min . '.js', [ 'jquery', 'underscore' ], GROUNDHOGG_VERSION );
 		wp_register_script( 'groundhogg-admin-guided-setup', GROUNDHOGG_ASSETS_URL . 'js/admin/setup' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
 
 		// Funnel Elements

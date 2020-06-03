@@ -39,7 +39,7 @@ class Mailhawk {
 		 * @since 3.36.1
 		 *
 		 */
-		if ( apply_filters( 'gorundhogg/disable_mailhawk', false ) ) {
+		if ( apply_filters( 'groundhogg/disable_mailhawk', false ) ) {
 			return;
 		}
 
@@ -104,8 +104,8 @@ class Mailhawk {
 		return array(
 			'partner_id'   => self::PARTNER_ID,
 			'register_url' => esc_url( trailingslashit( MAILHAWK_LICENSE_SERVER_URL ) ),
-			'client_state' => esc_url( \MailHawk\Keys::instance()->state() ),
 			'redirect_uri' => esc_url( $redirect ),
+			'client_state' => esc_attr( \MailHawk\Keys::instance()->state() ),
 		);
 
 	}

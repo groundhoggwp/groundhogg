@@ -407,7 +407,7 @@ class Replacements {
 
 	public function get_table() {
 		?>
-        <table class="wp-list-table widefat fixed striped">
+        <table class="wp-list-table widefat fixed striped replacements-table">
             <thead>
             <tr>
                 <th><?php _e( 'Replacement Code' ); ?></th>

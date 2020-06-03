@@ -42,7 +42,7 @@ $funnel = new Funnel( $funnel_id );
 
 				echo Plugin::$instance->utils->html->dropdown( $args );
 
-				echo html()->description( __( 'This is used to calculate the conversion rate of a funnel in a report. By default it is assumed the last step should be used.', 'groundhogg' ) )
+				echo html()->description( __( 'This is used to calculate the conversion rate of a funnel in a report. By default it is assumed the last benchmark should be used.', 'groundhogg' ) )
 
 				?></td>
 		</tr>

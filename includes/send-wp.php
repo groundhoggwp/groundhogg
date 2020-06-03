@@ -38,7 +38,7 @@ class SendWp {
          *
          * @param bool $disabled Whether or not this class is disabled.
          */
-        if ( apply_filters( 'gorundhogg/disable_sendwp', false ) ) {
+        if ( apply_filters( 'groundhogg/disable_sendwp', false ) ) {
             return;
         }
 

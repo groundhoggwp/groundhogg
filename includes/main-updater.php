@@ -278,7 +278,7 @@ class Main_Updater extends Updater {
 	/**
 	 * Ensure roles/caps are added...
 	 */
-	public function version_2_2_12(){
+	public function version_2_2_13(){
 		Plugin::instance()->roles->add_roles();
 		Plugin::instance()->roles->add_caps();
 	}
@@ -329,7 +329,7 @@ class Main_Updater extends Updater {
 			'2.1.13.11',
 			'2.1.13.17',
 			'2.2.3',
-			'2.2.12',
+			'2.2.13',
 		];
 	}
 

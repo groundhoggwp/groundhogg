@@ -6,6 +6,7 @@ use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Extension;
 use Groundhogg\Mailhawk;
 use Groundhogg\SendWp;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use function Groundhogg\is_white_labeled;
@@ -41,7 +42,7 @@ class Settings_Page extends Admin_Page {
 	}
 
 	public function scripts() {
-	    wp_enqueue_style( 'groundhogg-admin' );
+		wp_enqueue_style( 'groundhogg-admin' );
 	}
 
 	/**
@@ -155,7 +156,8 @@ class Settings_Page extends Admin_Page {
 
 				endif;
 
-				?><div class="post-box-grid"><?php
+				?>
+                <div class="post-box-grid"><?php
 
 				foreach ( $extensions as $extension ):
 					echo $extension;
@@ -284,10 +286,11 @@ class Settings_Page extends Admin_Page {
 			),
 		];
 
-		if ( ! is_white_labeled() || ! is_multisite() || \Groundhogg\is_main_blog() ) {
+		if ( ! is_white_labeled() || ! is_multisite() || is_main_site() ) {
 			$tabs['extensions'] = [
 				'id'    => 'extensions',
-				'title' => _x( 'Licenses', 'settings_tabs', 'groundhogg' )
+				'title' => _x( 'Licenses', 'settings_tabs', 'groundhogg' ),
+				'cap'   => 'manage_gh_licenses'
 			];
 		}
 
@@ -348,7 +351,7 @@ class Settings_Page extends Admin_Page {
 //				'tab'      => 'email',
 //				'callback' => [ SendWp::instance(), 'settings_connect_ui' ],
 //			],
-			'mailhawk'            => [
+			'mailhawk'          => [
 				'id'       => 'mailhawk',
 				'title'    => _x( 'MailHawk', 'settings_sections', 'groundhogg' ),
 				'tab'      => 'email',
@@ -1129,10 +1132,41 @@ class Settings_Page extends Admin_Page {
 	 *
 	 * @return bool
 	 */
-	private function tab_has_settings( $tab ) {
+	private function tab_has_settings( $tab='' ) {
+
+	    if ( ! $tab ){
+	        $tab = $this->active_tab();
+        }
+
 		global $wp_settings_sections;
 
 		return isset( $wp_settings_sections[ 'gh_' . $tab ] );
+	}
+
+	/**
+     * If a cap is specific for the tab, check to see if the user has the required permissions...
+     *
+	 * @param $tab
+	 *
+	 * @return bool
+	 */
+	private function user_can_access_tab( $tab='' ){
+
+		if ( ! $tab ){
+			$tab = $this->active_tab();
+		}
+
+	    $tab = get_array_var( $this->tabs, $tab );
+
+		// Check for cap restriction on the tab...
+		$cap = get_array_var( $tab, 'cap' );
+
+		// ignore if there is no cap, but if there is one check if the user has require privileges...
+		if ( $cap && ! current_user_can( $cap ) ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -1154,7 +1188,18 @@ class Settings_Page extends Admin_Page {
 
                 <!-- BEGIN TABS -->
                 <h2 class="nav-tab-wrapper">
-					<?php foreach ( $this->tabs as $id => $tab ): ?>
+					<?php foreach ( $this->tabs as $id => $tab ):
+
+						// Check for cap restriction on the tab...
+						$cap = get_array_var( $tab, 'cap' );
+
+						// ignore if there is no cap, but if there is one check if the user has require privileges...
+						if ( $cap && ! current_user_can( $cap ) ) {
+							continue;
+						}
+
+						?>
+
                         <a href="?page=gh_settings&tab=<?php echo $tab['id']; ?>"
                            class="nav-tab <?php echo $this->active_tab() == $tab['id'] ? 'nav-tab-active' : ''; ?>"><?php _e( $tab['title'], 'groundhogg' ); ?></a>
 					<?php endforeach; ?>
@@ -1163,7 +1208,7 @@ class Settings_Page extends Admin_Page {
 
                 <!-- BEGIN SETTINGS -->
 				<?php
-				if ( $this->tab_has_settings( $this->active_tab() ) ) {
+				if ( $this->tab_has_settings() && $this->user_can_access_tab() ) {
 
 					settings_fields( 'gh_' . $this->active_tab() );
 					do_settings_sections( 'gh_' . $this->active_tab() );

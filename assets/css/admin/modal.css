@@ -87,6 +87,10 @@
     /*height: 400px;*/
 }
 
+.popup-content table.wp-list-table.striped {
+    border: none;
+}
+
 .select2-dropdown{
     z-index: 999999 !important;
 }

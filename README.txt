@@ -178,7 +178,17 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 == Changelog ==
 
 = 2.2.13 (2020-06-02) =
-* FIXED Do not show signature field for non relevant users.
+* ADDED Ability to restrict tabs in the settings by user capabilities
+* ADDED Additional caps to Admin and Marketer role for managing licenses
+* TWEAKED Additional hooks/filters to the field mapping API.
+* TWEAKED Modal table CSS to make it look nicer.
+* TWEAKED Made the email WYSIWYG editor toolbar sticky when email is longer than the screen.
+* TWEAKED CSS issue on simple email page when the pipeline extension is installed.
+* TWEAKED If Groundhogg is white labelled remove the instructional video in the funnel builder when no step is selected.
+* TWEAKED Updated the instructional video to match the current version of the funnel builder.
+* FIXED Do not show signature field in user profile for non relevant users.
+* FIXED MailHawk connection failing because of incorrect use of esc_url.
+* REMOVED Duplicate benchmark file.
 
 = 2.2.12 (2020-06-01) =
 * ADDED `{owner_signature}` replacement code and signature text box in profile editor.

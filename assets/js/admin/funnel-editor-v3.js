@@ -206,6 +206,15 @@
             showSpinner();
 
             var $step = $('#' + id);
+            var $prev_step = $step.prev();
+
+            if ( ! $prev_step.attr( 'id' ) ){
+                $prev_step = $step.next();
+
+                if ( ! $prev_step.attr( 'id' ) ){
+                    $prev_step = false;
+                }
+            }
 
             var result = confirm(
                 'Are you sure you want to delete this step? Any contacts currently waiting will be moved to the next action.');
@@ -220,6 +229,10 @@
                         var $step_settings = $(sid);
                         $step_settings.remove();
                         $('html').removeClass('active-step');
+
+                        if ( $prev_step !== false ){
+                            self.makeActive( $prev_step.attr( 'id' ) );
+                        }
 
                         self.save();
                     });
@@ -294,10 +307,15 @@
 
             var $step = $('#' + id);
 
+            // If the click step was already active...
             var was_active = $step.hasClass('active');
 
-            // Remove active from the active step
+            // In some cases we do not want to allow deselecting a step...
+            if ( self.disable_deselect_step ){
+                was_active = false;
+            }
 
+            // Remove active from the active step
             var make_inactive = true;
 
             if (e) {

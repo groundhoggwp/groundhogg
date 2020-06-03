@@ -296,7 +296,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 			<?php if ( ! is_white_labeled() ): ?>
                 <h1 class="wp-heading-inline"><?php groundhogg_logo( 'black' ); ?></h1>
 			<?php else: ?>
-                <h1 class="wp-heading-inline"><?php echo esc_html( white_labeled_name() ); ?></h1>
+                <h1 class="wp-heading-inline"><?php printf( "%s Reporting", esc_html( white_labeled_name() ) ); ?></h1>
 			<?php endif; ?>
 			<?php $this->do_title_actions(); ?>
 			<?php $this->range_picker(); ?>

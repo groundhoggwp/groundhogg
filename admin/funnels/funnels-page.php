@@ -18,6 +18,7 @@ use function Groundhogg\is_option_enabled;
 use Groundhogg\Plugin;
 use Groundhogg\Contact_Query;
 use Groundhogg\Step;
+use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
 
 // Exit if accessed directly
@@ -59,10 +60,10 @@ class Funnels_Page extends Admin_Page {
 				$admin_title = sprintf( "%s &lsaquo; %s", __( 'Add' ), $admin_title );
 				break;
 			case 'edit':
-				$funnel_id   = get_request_var( 'funnel' );
-				$funnel      =new Funnel( absint( $funnel_id ) );
+				$funnel_id = get_request_var( 'funnel' );
+				$funnel    = new Funnel( absint( $funnel_id ) );
 
-				if ( $funnel->exists() ){
+				if ( $funnel->exists() ) {
 					$admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", $funnel->get_title(), __( 'Edit' ), $admin_title );
 				}
 
@@ -177,10 +178,11 @@ class Funnels_Page extends Admin_Page {
 			wp_enqueue_style( 'groundhogg-admin-funnel-editor-v2' );
 			wp_enqueue_script( 'groundhogg-admin-funnel-editor-v2' );
 			wp_localize_script( 'groundhogg-admin-funnel-editor-v2', 'Funnel', [
-				'id'              => absint( get_request_var( 'funnel' ) ),
-				'save_text'       => dashicon( 'yes' ) . __( 'Save', 'groundhogg' ),
-				'saving_text'     => dashicon( 'admin-generic' ) . __( 'Saving...', 'groundhogg' ),
-				'add_step_button' => html()->modal_link( [
+				'id'                    => absint( get_request_var( 'funnel' ) ),
+				'save_text'             => dashicon( 'yes' ) . __( 'Save', 'groundhogg' ),
+				'saving_text'           => dashicon( 'admin-generic' ) . __( 'Saving...', 'groundhogg' ),
+				'disable_deselect_step' => is_white_labeled(),
+				'add_step_button'       => html()->modal_link( [
 					'title'              => __( 'Add Step' ),
 					'text'               => dashicon( 'plus' ),
 					'footer_button_text' => __( 'Cancel' ),
@@ -192,14 +194,6 @@ class Funnels_Page extends Admin_Page {
 					'preventSave'        => 'true',
 				] )
 			] );
-
-//				wp_enqueue_style('groundhogg-admin-funnel-editor');
-//				wp_enqueue_script('groundhogg-admin-funnel-editor');
-//				wp_localize_script('groundhogg-admin-funnel-editor', 'Funnel', [
-//					'id' => absint(get_request_var('funnel'))
-//				]);
-//			wp_enqueue_script( 'jquery-flot' );
-//			wp_enqueue_script( 'jquery-flot-categories' );
 
 			wp_enqueue_script( 'groundhogg-admin-replacements' );
 
@@ -1067,7 +1061,7 @@ class Funnels_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		$funnel_id           = absint( get_request_var( 'funnel' ) );
+		$funnel_id          = absint( get_request_var( 'funnel' ) );
 		$conversion_step_id = absint( get_post_var( 'conversion_step_id' ) );
 
 		$funnel = new Funnel( $funnel_id );

@@ -461,7 +461,7 @@ button.button.save-button {
 #postbox-container-1 .step.active {
     border-width: 2px 2px 2px 2px;
     border-style: dashed;
-    transition: 0.4s;
+    /*transition: 0.4s;*/
 }
 
 #postbox-container-1 .step.benchmark {
@@ -800,7 +800,7 @@ input, select, textarea {
 .demo-video {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     margin: 40px auto;
-    margin-top: 250px;
+    /*margin-top: 250px;*/
     max-width: 722px;
     display: block;
 }

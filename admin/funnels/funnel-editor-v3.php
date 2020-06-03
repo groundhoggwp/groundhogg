@@ -7,6 +7,7 @@ use Groundhogg\Step;
 use function Groundhogg\Admin\Reports\Views\get_funnel_id;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon;
+use function Groundhogg\is_white_labeled;
 use function Groundhogg\key_to_words;
 use Groundhogg\Plugin;
 use function Groundhogg\get_request_var;
@@ -57,8 +58,6 @@ $funnel = new Funnel( $funnel_id );
                 </div>
             </div>
             <div class="status-options">
-
-
                 <div id="status">
 					<?php echo Plugin::$instance->utils->html->toggle( [
 						'name'    => 'funnel_status',
@@ -103,7 +102,10 @@ $funnel = new Funnel( $funnel_id );
 						'text'               => dashicon( 'admin-generic' ) . __( 'Settings', 'groundhogg' ),
 						'id'                 => 'settings',
 						'class'              => 'no-padding settings settings-button button-secondary',
-						'source'             => admin_page_url( 'gh_funnels', [ 'action' => 'funnel_settings', 'funnel' => $funnel_id ] ),
+						'source'             => admin_page_url( 'gh_funnels', [
+							'action' => 'funnel_settings',
+							'funnel' => $funnel_id
+						] ),
 						'height'             => 500,
 						'width'              => 900,
 						'footer_button_text' => __( 'Close' ),
@@ -186,37 +188,37 @@ $funnel = new Funnel( $funnel_id );
 					<?php Plugin::$instance->notices->print_notices(); ?>
                     <div id="intro">
 						<?php
-						echo html()->e( 'img', [
-							'src'   => GROUNDHOGG_ASSETS_URL . 'images/funnel-intro/select-a-step-to-edit.png',
-							'class' => 'select-a-step-arrow'
-						] );
 
-						echo html()->e( 'img', [
-							'src'   => GROUNDHOGG_ASSETS_URL . 'images/funnel-intro/actions-links-arrow.png',
-							'class' => 'actions-links-arrow'
-						] );
+						if ( ! is_white_labeled() ) :
 
-						echo html()->modal_link( [
-							'title'              => __( 'Funnel Builder Tour', 'groundhogg' ),
-							'text'               => html()->e( 'img', [
-								'src' => GROUNDHOGG_ASSETS_URL . 'images/funnel-intro/funnel-builder-guided-tour.png'
-							] ),
-							'footer_button_text' => __( 'Close' ),
-							'source'             => 'funnel-builder-guided-tour',
-							'class'              => 'img-link no-padding demo-video',
-							'height'             => 555,
-							'width'              => 800,
-							'footer'             => 'true',
-							'preventSave'        => 'true',
-						] );
+							// Output image to show the link to the youtube video!
+							echo html()->modal_link( [
+								'title'              => __( 'Funnel Builder Tour', 'groundhogg' ),
+								'text'               => html()->e( 'img', [
+									'src' => GROUNDHOGG_ASSETS_URL . 'images/funnel-intro/funnel-builder-guided-tour.png'
+								] ),
+								'footer_button_text' => __( 'Close' ),
+								'source'             => 'funnel-builder-guided-tour',
+								'class'              => 'img-link no-padding demo-video',
+								'height'             => 555,
+								'width'              => 800,
+								'footer'             => 'true',
+								'preventSave'        => 'true',
+							] );
 
-						?>
-                        <div class="hidden" id="funnel-builder-guided-tour">
-                            <iframe width="800" height="450" src="https://www.youtube.com/embed/Bof5kMEpXrY"
-                                    frameborder="0"
-                                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                                    allowfullscreen></iframe>
-                        </div>
+							?>
+                            <div class="hidden" id="funnel-builder-guided-tour">
+                                <iframe width="800" height="450" src="https://www.youtube.com/embed/Bof5kMEpXrY"
+                                        frameborder="0"
+                                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen></iframe>
+                            </div>
+						<?php else:
+
+							// White labeled option
+                            do_action( 'groundhogg/admin/funnel_builder/white_labeled', $funnel );
+
+						endif; ?>
                     </div>
                     <div class="step-settings">
 						<?php

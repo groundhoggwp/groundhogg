@@ -30,11 +30,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+global $pagenow,
+       $is_lynx, $is_gecko, $is_winIE, $is_macIE, $is_opera, $is_NS4, $is_safari, $is_chrome, $is_iphone, $is_IE, $is_edge,
+       $is_apache, $is_IIS, $is_iis7, $is_nginx;
+
 $email_id = absint( get_request_var( 'email' ) );
 global $email;
 $email = new Email( $email_id );
 
+$_content_editor_dfw = true;
+$_wp_editor_expand   = true;
+
+$_wp_editor_expand_class = '';
+if ( $_wp_editor_expand ) {
+	$_wp_editor_expand_class = ' wp-editor-expand';
+}
+
+wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
+//wp_enqueue_script( 'editor-expand' );
+
 ?>
+<style>
+</style>
 <form method="post" id="email-form">
     <!-- Before-->
 	<?php wp_nonce_field( 'edit' );
@@ -42,9 +59,10 @@ $email = new Email( $email_id );
 	$test_email = get_user_meta( get_current_user_id(), 'preferred_test_email', true );
 	$test_email = $test_email ? $test_email : wp_get_current_user()->user_email;
 
-	echo Plugin::$instance->utils->html->input( [ 'type'  => 'hidden',
-	                                              'id'    => 'test-email',
-	                                              'value' => $test_email
+	echo Plugin::$instance->utils->html->input( [
+		'type'  => 'hidden',
+		'id'    => 'test-email',
+		'value' => $test_email
 	] ); ?>
     <div id='poststuff'>
         <div id="post-body" class="metabox-holder columns-2  <?php if ( $email->get_meta( 'alignment' ) === 'center' ) {
@@ -131,15 +149,15 @@ $email = new Email( $email_id );
 
                 <h3><?php _e( 'Message Type' ); ?></h3>
 				<?php $args = [
-					'type'   => 'email',
-					'name'   => 'message_type',
-					'id'     => 'message-type',
-					'options' => [
-						'marketing'     => __('Marketing', 'groundhogg'),
-						'transactional' => __('Transactional','groundhogg')
+					'type'              => 'email',
+					'name'              => 'message_type',
+					'id'                => 'message-type',
+					'options'           => [
+						'marketing'     => __( 'Marketing', 'groundhogg' ),
+						'transactional' => __( 'Transactional', 'groundhogg' )
 					],
-                    'selected' => $email->get_meta('message_type')?:'marketing',
-                    'required' => true,
+					'selected'          => $email->get_meta( 'message_type' ) ?: 'marketing',
+					'required'          => true,
 					'option_none'       => '',
 					'option_none_value' => '',
 				]; ?>
@@ -201,23 +219,37 @@ $email = new Email( $email_id );
                 </div>
 
                 <div id="content-wrap">
-					<?php
+                    <div id="postdivrich" class="postarea<?php echo $_wp_editor_expand_class; ?>">
 
-					add_filter( 'tiny_mce_before_init', function ( $mceinit ) {
-						global $email;
-						$mceinit['body_class'] .= $email->get_meta( 'alignment' ) === 'center' ? ' align-email-center' : '';
+						<?php
 
-						return $mceinit;
-					} );
+						add_filter( 'tiny_mce_before_init', function ( $mceinit ) {
+							global $email;
+							$mceinit['body_class'] .= $email->get_meta( 'alignment' ) === 'center' ? ' align-email-center' : '';
 
-					echo html()->editor( [
-						'id'                  => 'email_content',
-						'content'             => $email->get_content(),
-						'settings'            => [
-							'editor_height' => 500,
-						],
-						'replacements_button' => true,
-					] ); ?>
+							return $mceinit;
+						} );
+
+                        add_action( 'media_buttons', [
+                            \Groundhogg\Plugin::$instance->replacements,
+                            'show_replacements_button'
+                        ] );
+
+						wp_editor( $email->get_content(), 'email_content', [
+							'_content_editor_dfw' => $_content_editor_dfw,
+							'drag_drop_upload'    => true,
+							'tabfocus_elements'   => 'content-html,save-post',
+							'editor_height'       => 500,
+							'tinymce'             => array(
+								'resize'                  => false,
+								'wp_autoresize_on'        => $_wp_editor_expand,
+								'add_unload_trigger'      => false,
+								'wp_keep_scroll_position' => ! $is_IE,
+							),
+						] );
+
+						?>
+                    </div>
                 </div>
 
 				<?php if ( $email->has_custom_alt_body() ) : ?>
