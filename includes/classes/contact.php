@@ -50,7 +50,7 @@ class Contact extends Base_Object_With_Meta {
 	 * Contact constructor.
 	 *
 	 * @param bool|int|string|array $_id_or_email_or_args
-	 * @param bool                  $by_user_id
+	 * @param bool $by_user_id
 	 */
 	public function __construct( $_id_or_email_or_args = false, $by_user_id = false ) {
 		$field = false;
@@ -185,6 +185,15 @@ class Contact extends Base_Object_With_Meta {
 		}
 
 		return $return;
+	}
+
+	public function get_notes_array() {
+		return \Groundhogg\get_db( 'contactnotes' )->query(
+			[
+				'contact_id' => $this->get_id(),
+				'orderby'    => 'timestamp'
+			]
+		);
 	}
 
 
@@ -353,28 +362,43 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * Add a note to the contact
+	 * Adds nots to the contact
 	 *
-	 * @param $note
+	 * @param String $note
+	 * @param string $context
 	 *
 	 * @return bool
 	 */
-	public function add_note( $note ) {
+	public function add_note( $note, $context = 'system' ) {
 		if ( ! $note || ! is_string( $note ) ) {
 			return false;
 		}
 
-		$note = sanitize_textarea_field( $note );
 
-		$current_notes = $this->get_meta( 'notes' );
+		//code to ad notes into the db..
+//		$note = sanitize_textarea_field( $note );
+//
+//		$current_notes = $this->get_meta( 'notes' );
+//
+//		$new_notes = sprintf( "===== %s =====\n\n", date_i18n( get_option( 'date_format' ) ) );
+//		$new_notes .= sprintf( "%s\n\n", $note );
+//		$new_notes .= $current_notes;
+//
+//		$new_notes = sanitize_textarea_field( $new_notes );
+//
+//		$this->update_meta( 'notes', $new_notes );
 
-		$new_notes = sprintf( "===== %s =====\n\n", date_i18n( get_option( 'date_format' ) ) );
-		$new_notes .= sprintf( "%s\n\n", $note );
-		$new_notes .= $current_notes;
+		$notes = [
+			'contact_id' => $this->get_id(),
+			'context'    => $context,
+			'content'    => sanitize_textarea_field( $note )
+		];
 
-		$new_notes = sanitize_textarea_field( $new_notes );
+		if ( $context == 'user' ) {
+			$notes['user_id'] = get_current_user_id();
+		}
 
-		$this->update_meta( 'notes', $new_notes );
+		\Groundhogg\get_db( 'contactnotes' )->add( $notes );
 
 		do_action( 'groundhogg/contact/note/added', $this->ID, $note, $this );
 
