@@ -31,7 +31,7 @@
     padding: 10px;
     /*border: 1px solid #e5e5e5;*/
 }
-
+.search-param input,
 .search-param select{
     max-width: 100%;
 }

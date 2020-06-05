@@ -2,10 +2,9 @@
 
 namespace Groundhogg\Admin\Contacts;
 
-use function Groundhogg\admin_page_url;
-use function Groundhogg\get_array_var;
+use Groundhogg\Saved_Searches;
+use function Groundhogg\action_input;
 use function Groundhogg\get_db;
-use function Groundhogg\get_request_query;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 
@@ -311,9 +310,11 @@ use function Groundhogg\html;
     </form>
     <div class="saved-search-form">
         <div class="inline-block search-param">
-            <form method="get">
-
+            <form method="post">
 				<?php
+
+				wp_nonce_field( 'load_search' );
+				action_input( 'load_search' );
 
 				echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Saved Searches', 'groundhogg' ) );
 
@@ -322,38 +323,59 @@ use function Groundhogg\html;
 					echo html()->dropdown( [
 						'name'     => 'saved_search',
 						'class'    => 'saved-search',
-						'options'  => '',
-						'selected' => get_url_var( 'saved_search' ),
+						'options'  => Saved_Searches::instance()->get_for_select(),
+						'selected' => get_url_var( 'saved_search_id' ),
 					] );
 
 					?></p>
-				<?php submit_button( __( 'Load Search' ), 'secondary', 'submit', false ); ?>
+				<?php submit_button( __( 'Load Search', 'groundhogg' ), 'secondary', 'submit', false ); ?>
             </form>
         </div>
-        <div class="inline-block search-param">
-            <form method="post" class="save-this-search">
-				<?php
 
-                $query = get_request_query();
+		<?php if ( get_url_var( 'search' ) === 'on' ): ?>
+            <div class="inline-block search-param">
+                <form method="post" class="save-this-search">
+					<?php
 
-                echo html()->input( [
-                    'type' => 'hidden',
-                    'name' => 'search_query',
-                    'value' => base64_encode( wp_json_encode( $query ) )
-                ] );
+					wp_nonce_field( 'save_this_search' );
+					action_input( 'save_this_search' );
 
-				echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Save This Search', 'groundhogg' ) );
+					echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Save This Search', 'groundhogg' ) );
 
-				?><p><?php
+					?><p><?php
+
+						echo html()->input( [
+							'name'        => 'saved_search_name',
+							'placeholder' => __( 'My search name...', 'groundhogg' ),
+						] );
+
+						?></p>
+					<?php submit_button( __( 'Save Search', 'groundhogg' ), 'secondary', 'submit', false ); ?>
+                </form>
+            </div>
+		<?php endif; ?>
+		<?php
+		$search_id = get_url_var( 'saved_search_id' );
+        if ( $search_id && Saved_Searches::instance()->get( $search_id ) ): ?>
+            <div class="inline-block search-param">
+                <form method="post" class="delete-search">
+					<?php
+
+					wp_nonce_field( 'delete_search' );
+					action_input( 'delete_search' );
 
 					echo html()->input( [
-						'name'        => 'saved_search_name',
-						'placeholder' => __( 'My search name...', 'groundhogg' ),
-					] );
+                        'type' => 'hidden',
+                        'name' => 'saved_search',
+                        'value' => $search_id
+                    ] );
 
-					?></p>
-				<?php submit_button( __( 'Save Search' ), 'secondary', 'submit', false ); ?>
-            </form>
-        </div>
+					echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Delete Current Search', 'groundhogg' ) ); ?>
+                    <p>
+						<?php submit_button( __( 'Delete Search', 'groundhogg' ), 'secondary', 'submit', false ); ?>
+                    </p>
+                </form>
+            </div>
+		<?php endif; ?>
     </div>
 </div>

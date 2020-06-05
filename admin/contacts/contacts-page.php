@@ -3,13 +3,14 @@
 namespace Groundhogg\Admin\Contacts;
 
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Saved_Searches;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
-use function Groundhogg\get_db;
+use function Groundhogg\get_post_var;
+use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
-use function Groundhogg\groundhogg_url;
 use function Groundhogg\normalize_files;
 use Groundhogg\Plugin;
 use Groundhogg\Contact;
@@ -121,7 +122,7 @@ class Contacts_Page extends Admin_Page {
 				$contact    = Plugin::$instance->utils->get_contact( absint( $contact_id ) );
 
 				if ( $contact ) {
-				    $prefix = $contact->get_first_name()? $contact->get_full_name() : $contact->get_email();
+					$prefix      = $contact->get_first_name() ? $contact->get_full_name() : $contact->get_email();
 					$admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", $prefix, __( 'Edit' ), $admin_title );
 				}
 
@@ -984,6 +985,78 @@ class Contacts_Page extends Admin_Page {
 		return admin_page_url( 'gh_contacts', [ 'action' => 'edit', 'contact' => $contact->get_id() ] );
 
 	}
+
+	/**
+	 * Save the search
+	 */
+	public function process_save_this_search() {
+		if ( ! current_user_can( 'view_contacts' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		if ( get_url_var( 'search' ) !== 'on' ) {
+			return new \WP_Error( 'error', __( 'Invalid search' ) );
+		}
+
+		$name     = sanitize_text_field( get_post_var( 'saved_search_name' ) );
+		$query_id = uniqid( sanitize_title( $name ) . '-' );
+		$query    = get_request_query();
+
+		Saved_Searches::instance()->add( $query_id, [
+			'name'  => $name,
+			'id'    => $query_id,
+			'query' => $query,
+		] );
+
+		$this->add_notice( 'saved', __( 'Search saved!', 'groundhogg' ) );
+
+		// stay on page...
+		return true;
+	}
+
+	/**
+     * Load the search!
+     *
+	 * @return string|\WP_Error
+	 */
+	public function process_load_search(){
+		if ( ! current_user_can( 'view_contacts' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$search_id = sanitize_text_field( get_post_var( 'saved_search' ) );
+
+		$search = Saved_Searches::instance()->get( $search_id );
+
+		if ( ! $search ){
+			return new \WP_Error( 'error', __( 'Invalid search' ) );
+        }
+
+		$query = $search[ 'query' ];
+		$query[ 'saved_search_id' ] = $search_id;
+
+		return admin_page_url( 'gh_contacts', $query );
+    }
+
+	/**
+     * Delete the current search
+     *
+	 * @return bool
+	 */
+    public function process_delete_search(){
+
+	    if ( ! current_user_can( 'view_contacts' ) ) {
+		    $this->wp_die_no_access();
+	    }
+
+	    $search_id = sanitize_text_field( get_post_var( 'saved_search' ) );
+
+	    Saved_Searches::instance()->delete( $search_id );
+
+	    $this->add_notice( 'deleted', __( 'Search deleted!', 'groundhogg' ) );
+
+	    return true;
+    }
 
 	/**
 	 * Display the contact table
