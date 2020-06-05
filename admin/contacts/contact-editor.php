@@ -673,7 +673,9 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
         </table>
 		<?php
 		$notes = $contact->get_notes_array();
+
 		if ( $notes ) {
+
 			foreach ( $notes as $note ) {
 
 				$context = key_to_words( $note->context );
@@ -682,42 +684,36 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 					$context = sprintf( '%s %s', $user->first_name, $user->last_name );
 				}
 
-				$label = __("Added" , 'groundhogg');
-				if(  $note->date_created !== date ('Y-m-d H:i:s' , convert_to_local_time(absint( $note->timestamp) ))) {
-				    $label =__('Last edited' , 'groundhogg' );
-                }
-
-//				echo sprintf( "<div class='gh-notes-container'><p>%s</p><span class='notes-time-right'>%s</span></div>", $note->content, __('Added By ' . $context . ' on ' . date( get_date_time_format(), absint( convert_to_local_time( absint( $note->timestamp ) ) ) ) ,'groundhogg') );
-//				echo sprintf( "<div class='gh-notes-container'><p>%s</p><span class='notes-time-right'>%s</span></div>", $note->content, __('Added By ' . $context . ' on ' . date( get_date_time_format(), absint( convert_to_local_time( absint( $note->timestamp ) ) ) ) ,'groundhogg') );
+				$label = __( "Added", 'groundhogg' );
+				if ( $note->date_created !== date( 'Y-m-d H:i:s', convert_to_local_time( absint( $note->timestamp ) ) ) ) {
+					$label = __( 'Last edited', 'groundhogg' );
+				}
 
 				?>
-
-                <div class='gh-notes-container'>
-                    <p class='display-notes' data-note-id="<?php echo $note->ID ?>">
-						<?php _e( $note->content ) ?>
-                    </p>
-                    <div class="edit-note-module"></div>
+                <div class="gh-notes-wrap">
+                    <div class='gh-notes-container'>
+						<?php echo wpautop( esc_html( $note->content ) ); ?>
+                        <div class="edit-note-module"></div>
+                    </div>
                     <div class='notes-time-right'>
                         <span class="note-date">
-                            <?php _e( sprintf( '%s By %s on %s' , $label , $context, date( get_date_time_format(), absint( convert_to_local_time( absint( $note->timestamp ) ) ) ) ), 'groundhogg' ) ?>
+                            <?php _e( sprintf( '%s By %s on %s', $label, $context, date( get_date_time_format(), absint( convert_to_local_time( absint( $note->timestamp ) ) ) ) ), 'groundhogg' ) ?>
                         </span>
                         &nbsp;|&nbsp;
-<!--                        <span class="row-actions">-->
-                            <span class="edit-notes">
+                        <span class="edit-notes">
                                 <a style="text-decoration: none" href="javascript:void(0)">
                                     <span class="dashicons dashicons-edit"></span>
                                 </a>
                             </span>
-                            &nbsp;|&nbsp;
-                            <span class="delete-note">
+                        &nbsp;|&nbsp;
+                        <span class="delete-note">
                                 <a style="text-decoration: none" href="javascript:void(0)">
                                     <span class="dashicons dashicons-trash delete"></span>
                                 </a>
                             </span>
-<!--                        </span>-->
                     </div>
+                    <div class="wp-clearfix"></div>
                 </div>
-
 				<?php
 			}
 		}

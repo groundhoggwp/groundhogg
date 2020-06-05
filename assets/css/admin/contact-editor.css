@@ -77,3 +77,25 @@ th p{
 code.meta-replacement-code{
     font-weight: 400;
 }
+
+.gh-notes-wrap{
+    max-width: 700px;
+}
+.gh-notes-container {
+    border: 1px solid #ccd0d4;
+    background-color: #FFFFFF;
+    border-radius: 1px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.gh-notes-container::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.notes-time-right {
+    float: right;
+    color: #aaa;
+}

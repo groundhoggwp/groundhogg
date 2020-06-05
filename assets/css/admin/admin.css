@@ -351,23 +351,3 @@ table.wp-list-table.funnels th.column-active_contacts,
 table.wp-list-table.funnels td.column-active_contacts {
     text-align: center;
 }
-
-.gh-notes-container {
-    border: 2px solid #dedede;
-    background-color: #f1f1f1;
-    border-radius: 5px;
-    padding: 10px;
-    margin: 10px 0;
-    max-width: 800px;
-}
-
-.gh-notes-container::after {
-    content: "";
-    clear: both;
-    display: table;
-}
-
-.notes-time-right {
-    float: right;
-    color: #aaa;
-}
