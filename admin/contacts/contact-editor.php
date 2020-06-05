@@ -659,18 +659,29 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
             <tr>
                 <th><?php _ex( 'Add Note', 'contact_record', 'groundhogg' ); ?></th>
                 <td><?php $args = array(
-						'id'         => 'add_note',
-						'name'       => 'add_note',
+						'id'         => 'add-new-note',
+						'name'       => 'add_new_note',
 						'value'      => '',
 						'rows'       => 3,
 						'cols'       => 64,
 						'attributes' => ''
 					);
-					echo Plugin::$instance->utils->html->textarea( $args ); ?>
-					<?php submit_button( _x( 'Add Note', 'action', 'groundhogg' ), 'secondary', 'add_new_note' ); ?>
+					echo html()->textarea( $args );
+
+
+					echo html()->wrap( html()->button( [
+						'id'    => 'add-note',
+						'name'  => 'add_note',
+						'text' => __( 'Add Note', 'groundhogg' ),
+
+					] ), 'p' );
+
+					?>
                 </td>
             </tr>
         </table>
+        <div class="add-new-notes"></div>
+
 		<?php
 		$notes = $contact->get_notes_array();
 
@@ -691,10 +702,13 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 
 				?>
                 <div class="gh-notes-wrap">
-                    <div class='gh-notes-container'>
+
+                    <div class="display-notes gh-notes-container" data-note-id="<?php echo $note->ID; ?>">
 						<?php echo wpautop( esc_html( $note->content ) ); ?>
-                        <div class="edit-note-module"></div>
                     </div>
+
+
+                    <div class="edit-note-module "></div>
                     <div class='notes-time-right'>
                         <span class="note-date">
                             <?php _e( sprintf( '%s By %s on %s', $label, $context, date( get_date_time_format(), absint( convert_to_local_time( absint( $note->timestamp ) ) ) ) ), 'groundhogg' ) ?>

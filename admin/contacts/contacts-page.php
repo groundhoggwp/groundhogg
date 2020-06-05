@@ -53,6 +53,7 @@ class Contacts_Page extends Admin_Page {
 		add_action( 'wp_ajax_wpgh_inline_save_contacts', array( $this, 'save_inline' ) );
 		add_action( 'wp_ajax_groundhogg_edit_notes', [ $this, 'edit_note_ajax' ] );
 		add_action( 'wp_ajax_groundhogg_delete_notes', [ $this, 'delete_note_ajax' ] );
+		add_action( 'wp_ajax_groundhogg_add_notes', [ $this, 'add_note_ajax' ] );
 
 	}
 
@@ -683,7 +684,7 @@ class Contacts_Page extends Admin_Page {
 		}
 
 		if ( get_request_var( 'add_new_note' ) ) {
-			$contact->add_note( get_request_var( 'add_note' ), 'user' );
+//			$contact->add_note( get_request_var( 'add_note' ), 'user' );
 		}
 
 		if ( isset( $_POST['send_email'] ) && isset( $_POST['email_id'] ) && current_user_can( 'send_emails' ) ) {
@@ -901,8 +902,73 @@ class Contacts_Page extends Admin_Page {
 		}
 
 		wp_send_json_success( [
-			'note'      => $note,
+			'note'      =>  wpautop( esc_html( $note ) ) ,
 			'date_text' => __( sprintf( 'Last edited By %s on %s ', $context, date( get_date_time_format(), absint( convert_to_local_time( absint( $time ) ) ) ) ), 'groundhogg' )
+		] );
+	}
+
+
+
+	public function add_note_ajax() {
+
+		if ( ! wp_doing_ajax() ) {
+			return;
+		}
+		if ( ! current_user_can( 'edit_contacts' ) ) {
+			wp_send_json_error();
+		}
+
+
+		$time = time();
+		$note    = sanitize_textarea_field( get_request_var( 'note' ) );
+
+		$id  = get_db( 'contactnotes' )->add( [
+
+			'contact_id'   => absint(get_request_var( 'contact')),
+			'context'      => 'user',
+			'user_id'      => get_current_user_id(),
+			'content'      => $note,
+		] );
+
+		if ( get_current_user_id() ) {
+			$user    = get_userdata( absint( get_current_user_id() ) );
+			$context = sprintf( '%s %s', $user->first_name, $user->last_name );
+		}
+		ob_start();
+		?>
+        <div class="gh-notes-wrap">
+
+            <div class="display-notes gh-notes-container" data-note-id="<?php echo $id; ?>">
+				<?php echo wpautop( esc_html( $note ) ); ?>
+            </div>
+
+
+            <div class="edit-note-module "></div>
+            <div class='notes-time-right'>
+                        <span class="note-date">
+                            <?php _e( sprintf( 'Added By %s on %s' ,$context, date( get_date_time_format(), absint( convert_to_local_time( absint( $time ) ) ) ), 'groundhogg' ) ); ?>
+                        </span>
+                &nbsp;|&nbsp;
+                <span class="edit-notes">
+                                <a style="text-decoration: none" href="javascript:void(0)">
+                                    <span class="dashicons dashicons-edit"></span>
+                                </a>
+                            </span>
+                &nbsp;|&nbsp;
+                <span class="delete-note">
+                                <a style="text-decoration: none" href="javascript:void(0)">
+                                    <span class="dashicons dashicons-trash delete"></span>
+                                </a>
+                            </span>
+            </div>
+            <div class="wp-clearfix"></div>
+        </div>
+        <?php
+		$html = ob_get_clean();
+
+
+		wp_send_json_success( [
+			'note'  =>  $html ,
 		] );
 	}
 

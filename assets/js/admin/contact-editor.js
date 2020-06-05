@@ -53,37 +53,37 @@ var ContactEditor = {};
 
                 $(".edit-note-module").html("");
 
-                note = $(e.target).closest(".gh-notes-container").find(".display-notes");
+                note = $(e.target).closest(".gh-notes-wrap").find(".display-notes");
 
-                note_module = $(e.target).closest(".gh-notes-container").find(".edit-note-module");
+                note_module = $(e.target).closest(".gh-notes-wrap").find(".edit-note-module");
 
 
                 note.hide();
 
-                var note_text = note.text().replace("\n", "").replace(/\s{2,}/g, " ").trim()
+                var note_text = note.find("p").text().replace("\n", "").replace(/\s{2,}/g, " ").trim();
 
                 note_module.html(
                     "<p>" +
-                    "<textarea class=\"new-note\" name=\"add_note\" id=\"_note\" cols=\"64\" rows=\"3\"> "+ note_text +" </textarea>" +
+                    "<textarea  class=\"edit-note gh-notes-container\" style='width: 100%' name=\"edit_note\" id=\"_note\"  rows=\"3\"> " + note_text + " </textarea>" +
                     "</p>" +
                     "<p>" +
                     "<input type=\"button\" id=\"save-notes\" value = \"save\" class=\"button save-notes\"/>" +
                     "<span id=\"delete-link\" class='cancel-notes'><a class=\"delete\"\n" + "href=\"javascript:void (0)\">Cancel</a></span>" +
                     "</p>");
 
-
+                $(e.target).closest(".gh-notes-wrap").find(".edit-note").focus();
                 $(".save-notes").click(function (event) {
                     adminAjaxRequest(
                         {
                             action: "groundhogg_edit_notes",
-                            note: $(e.target).closest(".gh-notes-container").find(".new-note").val(),
-                            note_id: note.data("note-id") ,
+                            note: $(e.target).closest(".gh-notes-wrap").find(".edit-note").val(),
+                            note_id: note.data("note-id"),
                         },
                         function callback(response) {
 
                             // Handler
                             if (response.success) {
-                                note.text(response.data.note);
+                                note.html(response.data.note);
                                 $(e.target).closest(".notes-time-right").find(".note-date").text(response.data.date_text);
                                 note_module.html("");
                                 note.show();
@@ -97,25 +97,21 @@ var ContactEditor = {};
                 $(".cancel-notes").click(function (event) {
                     note_module.html("");
                     note.show();
-
                 });
             });
 
             $(".delete-note").click(function (e) {
                 if (confirm("Are you sure you want to delete this note?")) {
-                    note = $(e.target).closest(".gh-notes-container").find(".display-notes");
+                    note = $(e.target).closest(".gh-notes-wrap").find(".display-notes");
                     adminAjaxRequest(
                         {
                             action: "groundhogg_delete_notes",
-                            note_id: note.data("note-id") ,
+                            note_id: note.data("note-id"),
                         },
                         function callback(response) {
                             // Handler
                             if (response.success) {
-
-                                $(e.target).closest(".gh-notes-container").replaceWith("");
-                                alert( response.data.msg);
-
+                                $(e.target).closest(".gh-notes-wrap").replaceWith("");
                             } else {
                                 alert(response.data);
                             }
@@ -123,6 +119,33 @@ var ContactEditor = {};
                     );
                 }
             });
+
+            $("#add-note").click(function (event) {
+
+                var params = new window.URLSearchParams(window.location.search);
+                adminAjaxRequest(
+                    {
+                        action: "groundhogg_add_notes",
+                        note: $("#add-new-note").val(),
+                        contact : params.get('contact')
+                    },
+                    function callback(response) {
+                        // Handler
+                        if (response.success) {
+                            $("#add-new-note").val("");
+                            note  = $(".add-new-notes");
+                            note_text  =note.html();
+                            note.html("");
+                            note.html(response.data.note + note_text );
+                            editor.init();
+                        } else {
+                            alert(response.data);
+                        }
+                    }
+                );
+            });
+
+
 
         }
     });
