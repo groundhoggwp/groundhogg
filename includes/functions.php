@@ -264,7 +264,8 @@ function get_request_query( $default = [], $force = [], $accepted_keys = [] ) {
 		'tab',
 		'action',
 		'bulk_action',
-		'_wpnonce'
+		'_wpnonce',
+        'submit'
 	] );
 
 	foreach ( $ignore as $key ) {

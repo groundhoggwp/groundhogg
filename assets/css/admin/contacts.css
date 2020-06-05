@@ -15,6 +15,12 @@
     margin-top: 20px;
 }
 
+#search-filters .saved-search-form{
+    border-top: 1px solid #ccd0d4;
+    margin-top: 20px;
+    padding-top: 10px;
+}
+
 .search-param {
     display: inline-block;
     margin: 5px;
