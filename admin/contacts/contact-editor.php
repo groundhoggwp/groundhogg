@@ -733,6 +733,8 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 		}
 		if ( $contact->get_meta( 'notes' ) ) {
 			?>
+
+
             <table>
                 <tbody>
                 <tr>
