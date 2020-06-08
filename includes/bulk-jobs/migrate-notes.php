@@ -2,15 +2,20 @@
 
 namespace Groundhogg\Bulk_Jobs;
 
+use Groundhogg\Classes\Activity;
+use Groundhogg\Contact;
 use Groundhogg\Plugin;
+use function Groundhogg\convert_to_local_time;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
+use function Groundhogg\html;
+use function Groundhogg\white_labeled_name;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Migrate_Waiting_Events extends Bulk_Job {
+class Migrate_Notes extends Bulk_Job {
 
 
 	public function __construct() {
@@ -20,25 +25,42 @@ class Migrate_Waiting_Events extends Bulk_Job {
 
 
 	public function show_upgrade_prompt() {
-		if ( get_option( 'gh_migrate_form_impressions' ) && current_user_can( 'edit_contacts' ) ) {
-			Plugin::$instance->notices->add( 'db-update', "<a href='{$this->get_start_url()}'>" . __( 'Thank you for updating to 2.0! Please click here to update your database.', 'groundhogg' ) . "</a>" );
+
+		if ( ! get_option( 'gh_migrate_notes' ) || ! current_user_can( 'perform_bulk_actions' ) ) {
+			return;
 		}
+
+
+		$update_button = html()->e( 'a', [
+			'href'  => $this->get_start_url(),
+			'class' => 'button button-secondary'
+		], __( 'Migrate now!', 'groundhogg' ) );
+
+		$notice = sprintf( __( "%s requires a database migration. Consider backing up your site before migrating. </p><p>%s", 'groundhogg' ), white_labeled_name(), $update_button );
+
+		Plugin::$instance->notices->add( 'db-update', $notice );
 	}
 
 
 	public function get_action() {
-		return 'migrate-notes';;
+		return 'migrate-notes';
 	}
 
 	public function query( $items ) {
-		// TODO: Implement query() method.
+		if ( ! current_user_can( 'edit_contacts' ) ) {
+			return $items;
+		}
 
-		//get all the meta
+		$query = get_db( 'contactmeta' )->query(
+			[ 'meta_key' => 'notes' ] );
+		$ids   = wp_list_pluck( $query, 'contact_id' );
+
+		return $ids;
 
 	}
 
 	public function max_items( $max, $items ) {
-		if ( ! current_user_can( 'edit_funnels' ) ) {
+		if ( ! current_user_can( 'edit_contacts' ) ) {
 			return $max;
 		}
 
@@ -50,10 +72,11 @@ class Migrate_Waiting_Events extends Bulk_Job {
 	}
 
 	protected function process_item( $item ) {
-		// TODO: Implement process_item() method.
 
-
-		$contact = get_contactdata($item);
+		$contact = new Contact( $item );
+		if ( ! $contact->exists() ) {
+			return;
+		}
 
 		$note = $contact->get_meta( 'notes' );
 
@@ -71,11 +94,12 @@ class Migrate_Waiting_Events extends Bulk_Job {
 
 				if ( $note && $date ) {
 					$final_array[] = [
-						'contact_id' => $contact->get_id(), //todo
-						'context'    => 'system',
+						'contact_id'   => $contact->get_id(), //todo
+						'context'      => 'system',
 						'content'      => $note,
-						'date_created' => $date,
-						'timestamp'    => strtotime( $date ),
+						'date_created' => date( 'Y-m-d H:i:s', Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $date ) ) ),
+						'timestamp'    => Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $date ) ),
+
 					];
 				}
 
@@ -91,20 +115,18 @@ class Migrate_Waiting_Events extends Bulk_Job {
 		}
 
 		$final_array[] = [
-			'contact_id' => $contact->get_id(), //todo
-			'context'    => 'system',
+			'contact_id'   => $contact->get_id(), //todo
+			'context'      => 'system',
 			'content'      => $note,
-			'date_created' => $date,
-			'timestamp'    => strtotime( $date ),
+			'date_created' => date( 'Y-m-d H:i:s', Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $date ) ) ),
+			'timestamp'    => Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $date ) ),
 		];
 
-		foreach ( array_reverse($final_array ) as $item)
-		{
-//			get_db('contactnotes')->add($item);
+		foreach ( array_reverse( $final_array ) as $item ) {
+			get_db( 'contactnotes' )->add( $item );
 		}
 
-
-		// code to
+		$contact->delete_meta( 'notes' );
 
 	}
 
@@ -113,6 +135,6 @@ class Migrate_Waiting_Events extends Bulk_Job {
 	}
 
 	protected function clean_up() {
-		// TODO: Implement clean_up() method.
+		delete_option( 'gh_migrate_notes' );
 	}
 }
