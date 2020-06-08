@@ -629,9 +629,9 @@ class Contacts_Api extends Base
             return $contact;
         }
 
-        $note = $request->get_param( 'note' );
+        $note = sanitize_textarea_field($request->get_param( 'note' ));
 
-        if ( ! $contact->add_note( $note ) ){
+        if ( ! $contact->add_note( $note , 'API' ) ){
             return self::ERROR_403( 'bad_note', 'Could not add the given note.' );
         }
 
