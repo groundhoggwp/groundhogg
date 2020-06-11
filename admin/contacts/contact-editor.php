@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin\Contacts;
 
 use function Groundhogg\admin_page_url;
+use function Groundhogg\convert_to_local_time;
 use function Groundhogg\current_user_is;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_cookie;
@@ -15,6 +16,7 @@ use Groundhogg\Contact;
 use Groundhogg\Preferences;
 use Groundhogg\Step;
 use Groundhogg\Submission;
+use function Groundhogg\key_to_words;
 
 /**
  * Edit a contact record via the Admin
@@ -657,35 +659,101 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
             <tr>
                 <th><?php _ex( 'Add Note', 'contact_record', 'groundhogg' ); ?></th>
                 <td><?php $args = array(
-						'id'         => 'add_note',
-						'name'       => 'add_note',
+						'id'         => 'add-new-note',
+						'name'       => 'add_new_note',
 						'value'      => '',
 						'rows'       => 3,
 						'cols'       => 64,
 						'attributes' => ''
 					);
-					echo Plugin::$instance->utils->html->textarea( $args ); ?>
-					<?php submit_button( _x( 'Add Note', 'action', 'groundhogg' ), 'secondary', 'add_new_note' ); ?>
+					echo html()->textarea( $args );
+
+
+					echo html()->wrap( html()->button( [
+						'id'    => 'add-note',
+						'name'  => 'add_note',
+						'text' => __( 'Add Note', 'groundhogg' ),
+
+					] ), 'p' );
+
+					?>
                 </td>
             </tr>
         </table>
-        <table>
-            <tbody>
-            <tr>
-                <td>
-					<?php $args = array(
-						'id'       => 'notes',
-						'name'     => 'notes',
-						'value'    => $contact->get_meta( 'notes' ),
-						'rows'     => 30,
-						'readonly' => true,
-					);
-					echo Plugin::$instance->utils->html->textarea( $args ); ?>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="add-new-notes"></div>
+
 		<?php
+		$notes = $contact->get_notes_array();
+
+		if ( $notes ) {
+
+			foreach ( $notes as $note ) {
+
+				$context = key_to_words( $note->context );
+				if ( absint( $note->user_id ) ) {
+					$user    = get_userdata( absint( $note->user_id ) );
+					$context = sprintf( '%s %s', $user->first_name, $user->last_name );
+				}
+
+				$label = __( "Added", 'groundhogg' );
+				if ( $note->date_created !== date( 'Y-m-d H:i:s', convert_to_local_time( absint( $note->timestamp ) ) ) ) {
+					$label = __( 'Last edited', 'groundhogg' );
+				}
+
+				?>
+                <div class="gh-notes-wrap">
+
+                    <div class="display-notes gh-notes-container" data-note-id="<?php echo $note->ID; ?>">
+						<?php echo wpautop( esc_html( $note->content ) ); ?>
+                    </div>
+
+
+                    <div class="edit-note-module "></div>
+                    <div class='notes-time-right'>
+                        <span class="note-date">
+                            <?php _e( sprintf( '%s By %s on %s', $label, $context, date( get_date_time_format(), absint( convert_to_local_time( absint( $note->timestamp ) ) ) ) ), 'groundhogg' ) ?>
+                        </span>
+                        &nbsp;|&nbsp;
+                        <span class="edit-notes">
+                                <a style="text-decoration: none" href="javascript:void(0)">
+                                    <span class="dashicons dashicons-edit"></span>
+                                </a>
+                            </span>
+                        &nbsp;|&nbsp;
+                        <span class="delete-note">
+                                <a style="text-decoration: none" href="javascript:void(0)">
+                                    <span class="dashicons dashicons-trash delete"></span>
+                                </a>
+                            </span>
+                    </div>
+                    <div class="wp-clearfix"></div>
+                </div>
+				<?php
+			}
+		}
+		if ( $contact->get_meta( 'notes' ) ) {
+			?>
+
+
+            <table>
+                <tbody>
+                <tr>
+                    <td>
+						<?php $args = array(
+							'id'       => 'notes',
+							'name'     => 'notes',
+							'value'    => $contact->get_meta( 'notes' ),
+							'rows'     => 30,
+							'readonly' => true,
+							'style'    => [ 'width' => '820px' ]
+						);
+						echo Plugin::$instance->utils->html->textarea( $args ); ?>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+			<?php
+		}
 	}
 
 	add_action( 'groundhogg/admin/contact/record/tab/actions', '\Groundhogg\Admin\Contacts\contact_record_section_actions' );
@@ -884,7 +952,8 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                         <th>
 							<?php esc_html_e( $meta_key ); ?>
                             <p>
-                                <code class="meta-replacement-code" title="<?php esc_attr_e( 'Replacement code', 'groundhogg' );?>">
+                                <code class="meta-replacement-code"
+                                      title="<?php esc_attr_e( 'Replacement code', 'groundhogg' ); ?>">
                                     {_<?php esc_html_e( $meta_key ); ?>}
                                 </code>
                             </p>
