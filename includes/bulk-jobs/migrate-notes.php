@@ -9,6 +9,7 @@ use function Groundhogg\convert_to_local_time;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
+use function Groundhogg\notices;
 use function Groundhogg\white_labeled_name;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -30,33 +31,38 @@ class Migrate_Notes extends Bulk_Job {
 			return;
 		}
 
-
 		$update_button = html()->e( 'a', [
 			'href'  => $this->get_start_url(),
 			'class' => 'button button-secondary'
-		], __( 'Migrate now!', 'groundhogg' ) );
+		], __( 'Migrate notes now!', 'groundhogg' ) );
 
-		$notice = sprintf( __( "%s requires a database migration. Consider backing up your site before migrating. </p><p>%s", 'groundhogg' ), white_labeled_name(), $update_button );
+		$notice = sprintf( __( "Contact notes have been updated and must be migrated, consider backing up your site before migrating.</p><p>%s", 'groundhogg' ), $update_button );
 
-		Plugin::$instance->notices->add( 'db-update', $notice );
+		notices()->add( 'migrate-notes', $notice );
 	}
 
-
+	/**
+	 * @return string
+	 */
 	public function get_action() {
 		return 'migrate-notes';
 	}
 
+	/**
+	 * @param array $items
+	 *
+	 * @return array
+	 */
 	public function query( $items ) {
 		if ( ! current_user_can( 'edit_contacts' ) ) {
 			return $items;
 		}
 
-		$query = get_db( 'contactmeta' )->query(
-			[ 'meta_key' => 'notes' ] );
-		$ids   = wp_list_pluck( $query, 'contact_id' );
+		$query = get_db( 'contactmeta' )->query( [
+			'meta_key' => 'notes'
+		] );
 
-		return $ids;
-
+		return wp_list_pluck( $query, 'contact_id' );
 	}
 
 	public function max_items( $max, $items ) {
@@ -74,56 +80,30 @@ class Migrate_Notes extends Bulk_Job {
 	protected function process_item( $item ) {
 
 		$contact = new Contact( $item );
+
 		if ( ! $contact->exists() ) {
 			return;
 		}
 
-		$note = $contact->get_meta( 'notes' );
+		$old_notes = $contact->get_meta( 'notes' );
+		preg_match_all( "/===== ([^=]+) =====([^=]+)/m", $old_notes, $matches );
 
+		$dates = $matches[1];
+		$notes = $matches[2];
 
-		$your_array = explode( "\n", $note );
+		for ( $i = 0; $i < count( $notes ); $i ++ ) {
 
-		$final_array = [];
+			$time = strtotime( $dates[$i] );
 
-		$note = "";
-		$date = "";
+			$note_to_add = [
+				'contact_id'   => $item,
+				'context'      => 'system',
+				'content'      => sanitize_textarea_field( $notes[ $i ] ),
+				'date_created' => date( 'Y-m-d H:i:s', $time ),
+				'timestamp'    => $time,
+			];
 
-		foreach ( $your_array as $line ) {
-			if ( strpos( $line, "=====" ) !== false ) {
-
-
-				if ( $note && $date ) {
-					$final_array[] = [
-						'contact_id'   => $contact->get_id(), //todo
-						'context'      => 'system',
-						'content'      => $note,
-						'date_created' => date( 'Y-m-d H:i:s', Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $date ) ) ),
-						'timestamp'    => Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $date ) ),
-
-					];
-				}
-
-
-				$date = substr( $line, 5, strpos( $line, "=====", 5 ) - 5 );
-
-				$note = "";
-
-			} else {
-
-				$note = $note . $line . "\n";
-			}
-		}
-
-		$final_array[] = [
-			'contact_id'   => $contact->get_id(), //todo
-			'context'      => 'system',
-			'content'      => $note,
-			'date_created' => date( 'Y-m-d H:i:s', Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $date ) ) ),
-			'timestamp'    => Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $date ) ),
-		];
-
-		foreach ( array_reverse( $final_array ) as $item ) {
-			get_db( 'contactnotes' )->add( $item );
+			get_db( 'contactnotes' )->add( $note_to_add );
 		}
 
 		$contact->delete_meta( 'notes' );
@@ -136,5 +116,6 @@ class Migrate_Notes extends Bulk_Job {
 
 	protected function clean_up() {
 		delete_option( 'gh_migrate_notes' );
+		notices()->remove( 'migrate-notes' );
 	}
 }

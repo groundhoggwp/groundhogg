@@ -285,9 +285,11 @@ class Main_Updater extends Updater {
 
 	/**
 	 * Notes db added.
+	 * Migrate notes
 	 */
-	public function version_2_2_14(){
+	public function version_2_2_15(){
 		Plugin::$instance->dbs->install_dbs();
+		update_option( 'gh_migrate_notes', 1 );
 	}
 
 	/**
@@ -338,7 +340,7 @@ class Main_Updater extends Updater {
 			'2.1.13.17',
 			'2.2.3',
 			'2.2.13',
-			'2.2.14'
+			'2.2.15'
 		];
 	}
 
