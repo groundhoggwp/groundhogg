@@ -670,8 +670,8 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 
 
 					echo html()->wrap( html()->button( [
-						'id'    => 'add-note',
-						'name'  => 'add_note',
+						'id'   => 'add-note',
+						'name' => 'add_note',
 						'text' => __( 'Add Note', 'groundhogg' ),
 
 					] ), 'p' );
@@ -680,61 +680,20 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                 </td>
             </tr>
         </table>
-        <div class="add-new-notes"></div>
-
+        <div id="gh-notes">
 		<?php
-		$notes = $contact->get_notes_array();
 
-		if ( $notes ) {
+		$notes = $contact->get_all_notes();
 
-			foreach ( $notes as $note ) {
-
-				$context = key_to_words( $note->context );
-				if ( absint( $note->user_id ) ) {
-					$user    = get_userdata( absint( $note->user_id ) );
-					$context = sprintf( '%s %s', $user->first_name, $user->last_name );
-				}
-
-				$label = __( "Added", 'groundhogg' );
-				if ( $note->date_created !== date( 'Y-m-d H:i:s', convert_to_local_time( absint( $note->timestamp ) ) ) ) {
-					$label = __( 'Last edited', 'groundhogg' );
-				}
-
-				?>
-                <div class="gh-notes-wrap">
-
-                    <div class="display-notes gh-notes-container" data-note-id="<?php echo $note->ID; ?>">
-						<?php echo wpautop( esc_html( $note->content ) ); ?>
-                    </div>
-
-
-                    <div class="edit-note-module "></div>
-                    <div class='notes-time-right'>
-                        <span class="note-date">
-                            <?php _e( sprintf( '%s By %s on %s', $label, $context, date( get_date_time_format(), absint( convert_to_local_time( absint( $note->timestamp ) ) ) ) ), 'groundhogg' ) ?>
-                        </span>
-                        &nbsp;|&nbsp;
-                        <span class="edit-notes">
-                                <a style="text-decoration: none" href="javascript:void(0)">
-                                    <span class="dashicons dashicons-edit"></span>
-                                </a>
-                            </span>
-                        &nbsp;|&nbsp;
-                        <span class="delete-note">
-                                <a style="text-decoration: none" href="javascript:void(0)">
-                                    <span class="dashicons dashicons-trash delete"></span>
-                                </a>
-                            </span>
-                    </div>
-                    <div class="wp-clearfix"></div>
-                </div>
-				<?php
-			}
+		foreach ( $notes as $note ) {
+			include __DIR__ . '/note.php';
 		}
+
+		?></div><?php
+
+		// Legacy notes...
 		if ( $contact->get_meta( 'notes' ) ) {
 			?>
-
-
             <table>
                 <tbody>
                 <tr>

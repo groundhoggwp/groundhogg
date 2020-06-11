@@ -1,154 +1,174 @@
-var ContactEditor = {};
-
 (function ($, editor) {
 
     $.extend(editor, {
 
         init: function () {
 
-            $('#meta-table').click(function (e) {
-                if ($(e.target).closest('.deletemeta').length) {
-                    $(e.target).closest('tr').remove();
+            $("#meta-table").click(function (e) {
+                if ($(e.target).closest(".deletemeta").length) {
+                    $(e.target).closest("tr").remove();
                 }
             });
 
-            $('.addmeta').click(function () {
+            $(".addmeta").click(function () {
 
                 var $newMeta = "<tr>" +
                     "<th>" +
-                    "<input type='text' class='input' name='newmetakey[]' placeholder='" + $('.metakeyplaceholder').text() + "'>" +
+                    "<input type='text' class='input' name='newmetakey[]' placeholder='" + $(".metakeyplaceholder").text() + "'>" +
                     "</th>" +
                     "<td>" +
-                    "<input type='text' class='regular-text' name='newmetavalue[]' placeholder='" + $('.metavalueplaceholder').text() + "'>" +
+                    "<input type='text' class='regular-text' name='newmetavalue[]' placeholder='" + $(".metavalueplaceholder").text() + "'>" +
                     " <span class=\"row-actions\"><span class=\"delete\"><a style=\"text-decoration: none\" href=\"javascript:void(0)\" class=\"deletemeta\"><span class=\"dashicons dashicons-trash\"></span></a></span></span>\n" +
                     "</td>" +
                     "</tr>";
-                $('#meta-table').find('tbody').prepend($newMeta);
+                $("#meta-table").find("tbody").prepend($newMeta);
 
             });
 
-            $('.create-user-account').click(function () {
-                $('#create-user-form').submit();
+            $(".create-user-account").click(function () {
+                $("#create-user-form").submit();
             });
 
-
-            $('.nav-tab').click(function (e) {
+            $(".nav-tab").click(function (e) {
 
                 var $tab = $(this);
 
-                $('.nav-tab').removeClass('nav-tab-active');
-                $tab.addClass('nav-tab-active');
+                $(".nav-tab").removeClass("nav-tab-active");
+                $tab.addClass("nav-tab-active");
 
-                $('.tab-content-wrapper').addClass('hidden');
-                $('#' + $tab.attr('id') + '_content').removeClass('hidden');
+                $(".tab-content-wrapper").addClass("hidden");
+                $("#" + $tab.attr("id") + "_content").removeClass("hidden");
 
-                $('#active-tab').val($tab.attr('id').replace('tab_', ''));
-                document.cookie = "gh_contact_tab=" + $tab.attr('id') + ";path=/;";
+                $("#active-tab").val($tab.attr("id").replace("tab_", ""));
+                document.cookie = "gh_contact_tab=" + $tab.attr("id") + ";path=/;";
 
             });
 
-            $(".edit-notes").click(function (e) {
-
-                $(".display-notes").show();
-
-                $(".edit-note-module").html("");
-
-                note = $(e.target).closest(".gh-notes-wrap").find(".display-notes");
-
-                note_module = $(e.target).closest(".gh-notes-wrap").find(".edit-note-module");
-
-
-                note.hide();
-
-                var note_text = note.find("p").text().replace("\n", "").replace(/\s{2,}/g, " ").trim();
-
-                note_module.html(
-                    "<p>" +
-                    "<textarea  class=\"edit-note gh-notes-container\" style='width: 100%' name=\"edit_note\" id=\"_note\"  rows=\"3\"> " + note_text + " </textarea>" +
-                    "</p>" +
-                    "<p>" +
-                    "<input type=\"button\" id=\"save-notes\" value = \"save\" class=\"button save-notes\"/>" +
-                    "<span id=\"delete-link\" class='cancel-notes'><a class=\"delete\"\n" + "href=\"javascript:void (0)\">Cancel</a></span>" +
-                    "</p>");
-
-                $(e.target).closest(".gh-notes-wrap").find(".edit-note").focus();
-                $(".save-notes").click(function (event) {
-                    adminAjaxRequest(
-                        {
-                            action: "groundhogg_edit_notes",
-                            note: $(e.target).closest(".gh-notes-wrap").find(".edit-note").val(),
-                            note_id: note.data("note-id"),
-                        },
-                        function callback(response) {
-
-                            // Handler
-                            if (response.success) {
-                                note.html(response.data.note);
-                                $(e.target).closest(".notes-time-right").find(".note-date").text(response.data.date_text);
-                                note_module.html("");
-                                note.show();
-
-                            } else {
-                                alert(response.data);
-                            }
-                        }
-                    );
-                });
-                $(".cancel-notes").click(function (event) {
-                    note_module.html("");
-                    note.show();
-                });
+            $(document).on( 'click', ".edit-notes", function (e) {
+                var $note = get_note(e.target);
+                $note.find( '.gh-note-view' ).hide();
+                $note.find( '.gh-note-edit' ).show();
             });
 
-            $(".delete-note").click(function (e) {
-                if (confirm("Are you sure you want to delete this note?")) {
-                    note = $(e.target).closest(".gh-notes-wrap").find(".display-notes");
-                    adminAjaxRequest(
-                        {
-                            action: "groundhogg_delete_notes",
-                            note_id: note.data("note-id"),
-                        },
-                        function callback(response) {
-                            // Handler
-                            if (response.success) {
-                                $(e.target).closest(".gh-notes-wrap").replaceWith("");
-                            } else {
-                                alert(response.data);
-                            }
-                        }
-                    );
-                }
+            $(document).on( 'click', ".cancel-note-edit", function (e) {
+                var $note = get_note(e.target);
+                $note.find( '.gh-note-edit' ).hide();
+                $note.find( '.gh-note-view' ).show();
+            });
+
+            $(document).on( 'click', ".save-note", function (e) {
+                var $note = get_note(e.target);
+                var note_id = $note.attr("id");
+                save_note(note_id);
+            });
+
+            $(document).on("click", ".delete-note", function (e) {
+                var $note = get_note(e.target);
+                var note_id = $note.attr("id");
+                delete_note(note_id);
             });
 
             $("#add-note").click(function (event) {
-
-                var params = new window.URLSearchParams(window.location.search);
-                adminAjaxRequest(
-                    {
-                        action: "groundhogg_add_notes",
-                        note: $("#add-new-note").val(),
-                        contact : params.get('contact')
-                    },
-                    function callback(response) {
-                        // Handler
-                        if (response.success) {
-                            $("#add-new-note").val("");
-                            note  = $(".add-new-notes");
-                            note_text  =note.html();
-                            note.html("");
-                            note.html(response.data.note + note_text );
-                            editor.init();
-                        } else {
-                            alert(response.data);
-                        }
-                    }
-                );
+                add_note();
             });
-
-
 
         }
     });
+
+    /**
+     * Add a new note
+     */
+    function add_note() {
+
+        var $newNote = $("#add-new-note");
+        var $notes = $("#gh-notes");
+
+        adminAjaxRequest(
+            {
+                action: "groundhogg_add_notes",
+                note: $newNote.val(),
+                contact: editor.contact_id
+            },
+            function callback(response) {
+                // Handler
+                if (response.success) {
+                    $newNote.val("");
+                    $notes.prepend(response.data.note);
+                } else {
+                    alert(response.data);
+                }
+            }
+        );
+    }
+
+    /**
+     * Save the edited note...
+     *
+     * @param note_id
+     */
+    function save_note( note_id ) {
+
+        var $note = $("#" + note_id);
+        var new_note_text = $note.find(".edited-note-text").val();
+        showSpinner();
+
+        adminAjaxRequest(
+            {
+                action: "groundhogg_edit_notes",
+                note: new_note_text,
+                note_id: note_id
+            },
+            function callback(response) {
+                // Handler
+                hideSpinner();
+                if (response.success) {
+                    $note.replaceWith( response.data.note );
+                } else {
+                    alert(response.data);
+                }
+            }
+        );
+    }
+
+    /**
+     * Delete a note
+     *
+     * @param note_id
+     */
+    function delete_note(note_id) {
+
+        if (!confirm(editor.delete_note_text)) {
+            return;
+        }
+
+        var $note = $("#" + note_id);
+
+        adminAjaxRequest(
+            {
+                action: "groundhogg_delete_notes",
+                note_id: note_id
+            },
+            function callback(response) {
+                // Handler
+                if (response.success) {
+                    $note.remove();
+                } else {
+                    alert(response.data);
+                }
+            }
+        );
+    }
+
+    /**
+     *
+     * Get the note
+     *
+     * @param e
+     * @returns {any | Element | jQuery}
+     */
+    function get_note(e) {
+        return $(e).closest(".gh-note");
+    }
 
     $(function () {
         editor.init();

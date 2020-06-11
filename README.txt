@@ -177,9 +177,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.15 (2020-06-05) =
+* ADDED Saved Searches.
+
 = 2.2.13 (2020-06-02) =
-* ADDED Ability to restrict tabs in the settings by user capabilities
-* ADDED Additional caps to Admin and Marketer role for managing licenses
+* ADDED Ability to restrict tabs in the settings by user capabilities.
+* ADDED Additional caps to Admin and Marketer role for managing licenses.
 * TWEAKED Additional hooks/filters to the field mapping API.
 * TWEAKED Modal table CSS to make it look nicer.
 * TWEAKED Made the email WYSIWYG editor toolbar sticky when email is longer than the screen.

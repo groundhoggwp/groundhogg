@@ -3,6 +3,7 @@
 namespace Groundhogg;
 
 // Exit if accessed directly
+use Groundhogg\Classes\Note;
 use Groundhogg\DB\DB;
 use Groundhogg\DB\Meta_DB;
 use Groundhogg\DB\Tag_Relationships;
@@ -187,13 +188,24 @@ class Contact extends Base_Object_With_Meta {
 		return $return;
 	}
 
-	public function get_notes_array() {
-		return \Groundhogg\get_db( 'contactnotes' )->query(
-			[
-				'contact_id' => $this->get_id(),
-				'orderby'    => 'timestamp'
-			]
-		);
+	/**
+	 * Get all the notes...
+	 *
+	 * @return Note[]
+	 */
+	public function get_all_notes() {
+		$raw = get_db( 'contactnotes' )->query( [
+			'contact_id' => $this->get_id(),
+			'orderby'    => 'timestamp'
+		] );
+
+		$notes = [];
+
+		foreach ( $raw as $note ){
+			$notes[] = new Note( absint( $note->ID ) );
+		}
+
+		return $notes;
 	}
 
 
@@ -398,7 +410,7 @@ class Contact extends Base_Object_With_Meta {
 			$notes['user_id'] = get_current_user_id();
 		}
 
-		\Groundhogg\get_db( 'contactnotes' )->add( $notes );
+		get_db( 'contactnotes' )->add( $notes );
 
 		do_action( 'groundhogg/contact/note/added', $this->ID, $note, $this );
 

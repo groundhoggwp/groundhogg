@@ -78,15 +78,20 @@ code.meta-replacement-code{
     font-weight: 400;
 }
 
-.gh-notes-wrap{
+#gh-notes{
     max-width: 700px;
-}
-.gh-notes-container {
     border: 1px solid #ccd0d4;
     background-color: #FFFFFF;
     border-radius: 1px;
-    padding: 10px;
     margin: 10px 0;
+}
+
+.gh-note{
+    padding: 10px 10px;
+}
+
+.gh-note:not(:last-child){
+    border-bottom: 1px solid #ccd0d4;
 }
 
 .gh-notes-container::after {
@@ -95,7 +100,21 @@ code.meta-replacement-code{
     display: table;
 }
 
-.notes-time-right {
+.note-actions {
     float: right;
     color: #aaa;
+    margin: 0 0 10px 10px;
+}
+
+.gh-note p{
+    margin: 0;
+}
+
+.gh-note p:not(:last-child){
+    margin-bottom: 5px;
+}
+
+.gh-note .edited-note-text{
+    width: 100%;
+    box-sizing: border-box;
 }

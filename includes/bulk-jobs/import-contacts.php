@@ -128,13 +128,6 @@ class Import_Contacts extends Bulk_Job {
 	 * @return string
 	 */
 	protected function get_return_url() {
-		$url = admin_page_url( 'gh_contacts' );
-
-		// Return to guided setup if it's not yet complete.
-		if ( ! guided_setup_finished() ) {
-			$url = admin_page_url( 'gh_guided_setup', [ 'step' => 4 ] );
-		}
-
-		return $url;
+		return admin_page_url( 'gh_contacts' );
 	}
 }

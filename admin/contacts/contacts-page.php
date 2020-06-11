@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Contacts;
 
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Classes\Note;
 use Groundhogg\Saved_Searches;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\convert_to_local_time;
@@ -110,6 +111,10 @@ class Contacts_Page extends Admin_Page {
 		if ( $this->get_current_action() === 'edit' || $this->get_current_action() === 'add' || $this->get_current_action() === 'form' ) {
 			wp_enqueue_style( 'groundhogg-admin-contact-editor' );
 			wp_enqueue_script( 'groundhogg-admin-contact-editor' );
+			wp_localize_script( 'groundhogg-admin-contact-editor', 'ContactEditor', [
+				'contact_id'       => absint( get_url_var( 'contact' ) ),
+				'delete_note_text' => __( 'Are you sure you want to delete this note?', 'groundhogg' ),
+            ] );
 		} else {
 			wp_enqueue_style( 'select2' );
 			wp_enqueue_script( 'select2' );
@@ -877,100 +882,65 @@ class Contacts_Page extends Admin_Page {
 		return false;
 	}
 
-
+	/**
+	 * Edit a note...
+	 */
 	public function edit_note_ajax() {
 
 		if ( ! wp_doing_ajax() ) {
 			return;
-		}
-		if ( ! current_user_can( 'edit_contacts' ) ) {
+		} elseif ( ! current_user_can( 'edit_contacts' ) ) {
 			wp_send_json_error();
 		}
 
 		$note_id = absint( get_request_var( 'note_id' ) );
-		$note    = sanitize_textarea_field( get_request_var( 'note' ) );
-
-		$time = time();
-		get_db( 'contactnotes' )->update( $note_id, [
-			'timestamp' => $time,
-			'content'   => $note,
+		$content = sanitize_textarea_field( get_request_var( 'note' ) );
+		$note = new Note( $note_id );
+		$note->update( [
+			'timestamp' => time(),
+			'content'   => $content,
 			'context'   => 'user',
 			'user_id'   => get_current_user_id(),
 		] );
 
-		if ( get_current_user_id() ) {
-			$user    = get_userdata( absint( get_current_user_id() ) );
-			$context = sprintf( '%s %s', $user->first_name, $user->last_name );
-		}
+		ob_start();
+		include __DIR__ . '/note.php';
+		$html = ob_get_clean();
 
 		wp_send_json_success( [
-			'note'      =>  wpautop( esc_html( $note ) ) ,
-			'date_text' => __( sprintf( 'Last edited By %s on %s ', $context, date( get_date_time_format(), absint( convert_to_local_time( absint( $time ) ) ) ) ), 'groundhogg' )
+			'note' => $html,
 		] );
 	}
 
-
-
+	/**
+	 * Add a new note
+	 */
 	public function add_note_ajax() {
 
 		if ( ! wp_doing_ajax() ) {
 			return;
-		}
-		if ( ! current_user_can( 'edit_contacts' ) ) {
+		} elseif ( ! current_user_can( 'edit_contacts' ) ) {
 			wp_send_json_error();
 		}
 
+		$note = sanitize_textarea_field( get_post_var( 'note' ) );
+		$contact_id = absint( get_post_var( 'contact' ) );
 
-		$time = time();
-		$note    = sanitize_textarea_field( get_request_var( 'note' ) );
-
-		$id  = get_db( 'contactnotes' )->add( [
-
-			'contact_id'   => absint(get_request_var( 'contact')),
-			'context'      => 'user',
-			'user_id'      => get_current_user_id(),
-			'content'      => $note,
+		$id = get_db( 'contactnotes' )->add( [
+			'contact_id' => $contact_id,
+			'context'    => 'user',
+			'user_id'    => get_current_user_id(),
+			'content'    => $note,
 		] );
 
-		if ( get_current_user_id() ) {
-			$user    = get_userdata( absint( get_current_user_id() ) );
-			$context = sprintf( '%s %s', $user->first_name, $user->last_name );
-		}
+		$note = new Note( $id );
+
 		ob_start();
-		?>
-        <div class="gh-notes-wrap">
-
-            <div class="display-notes gh-notes-container" data-note-id="<?php echo $id; ?>">
-				<?php echo wpautop( esc_html( $note ) ); ?>
-            </div>
-
-
-            <div class="edit-note-module "></div>
-            <div class='notes-time-right'>
-                        <span class="note-date">
-                            <?php _e( sprintf( 'Added By %s on %s' ,$context, date( get_date_time_format(), absint( convert_to_local_time( absint( $time ) ) ) ), 'groundhogg' ) ); ?>
-                        </span>
-                &nbsp;|&nbsp;
-                <span class="edit-notes">
-                                <a style="text-decoration: none" href="javascript:void(0)">
-                                    <span class="dashicons dashicons-edit"></span>
-                                </a>
-                            </span>
-                &nbsp;|&nbsp;
-                <span class="delete-note">
-                                <a style="text-decoration: none" href="javascript:void(0)">
-                                    <span class="dashicons dashicons-trash delete"></span>
-                                </a>
-                            </span>
-            </div>
-            <div class="wp-clearfix"></div>
-        </div>
-        <?php
+		include __DIR__ . '/note.php';
 		$html = ob_get_clean();
 
-
 		wp_send_json_success( [
-			'note'  =>  $html ,
+			'note' => $html,
 		] );
 	}
 
@@ -989,7 +959,7 @@ class Contacts_Page extends Admin_Page {
 		get_db( 'contactnotes' )->delete( $note_id );
 
 		wp_send_json_success( [
-			'msg'      => __( 'Note deleted successfully.' , 'groundhogg' )
+			'msg' => __( 'Note deleted successfully.', 'groundhogg' )
 		] );
 	}
 
@@ -1138,11 +1108,11 @@ class Contacts_Page extends Admin_Page {
 	}
 
 	/**
-     * Load the search!
-     *
+	 * Load the search!
+	 *
 	 * @return string|\WP_Error
 	 */
-	public function process_load_search(){
+	public function process_load_search() {
 		if ( ! current_user_can( 'view_contacts' ) ) {
 			$this->wp_die_no_access();
 		}
@@ -1151,35 +1121,35 @@ class Contacts_Page extends Admin_Page {
 
 		$search = Saved_Searches::instance()->get( $search_id );
 
-		if ( ! $search ){
+		if ( ! $search ) {
 			return new \WP_Error( 'error', __( 'Invalid search' ) );
-        }
+		}
 
-		$query = $search[ 'query' ];
-		$query[ 'saved_search_id' ] = $search_id;
+		$query                    = $search['query'];
+		$query['saved_search_id'] = $search_id;
 
 		return admin_page_url( 'gh_contacts', $query );
-    }
+	}
 
 	/**
-     * Delete the current search
-     *
+	 * Delete the current search
+	 *
 	 * @return bool
 	 */
-    public function process_delete_search(){
+	public function process_delete_search() {
 
-	    if ( ! current_user_can( 'view_contacts' ) ) {
-		    $this->wp_die_no_access();
-	    }
+		if ( ! current_user_can( 'view_contacts' ) ) {
+			$this->wp_die_no_access();
+		}
 
-	    $search_id = sanitize_text_field( get_post_var( 'saved_search' ) );
+		$search_id = sanitize_text_field( get_post_var( 'saved_search' ) );
 
-	    Saved_Searches::instance()->delete( $search_id );
+		Saved_Searches::instance()->delete( $search_id );
 
-	    $this->add_notice( 'deleted', __( 'Search deleted!', 'groundhogg' ) );
+		$this->add_notice( 'deleted', __( 'Search deleted!', 'groundhogg' ) );
 
-	    return true;
-    }
+		return true;
+	}
 
 	/**
 	 * Display the contact table
