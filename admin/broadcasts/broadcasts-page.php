@@ -39,7 +39,7 @@ class Broadcasts_Page extends Admin_Page {
 	/**
 	 * @var Broadcast_Scheduler
 	 */
-//	public $scheduler;
+	public $scheduler;
 
 	protected function add_ajax_actions() {
 	}
@@ -48,7 +48,7 @@ class Broadcasts_Page extends Admin_Page {
 	}
 
 	protected function add_additional_actions() {
-//		$this->scheduler = new Broadcast_Scheduler();
+		$this->scheduler = new Broadcast_Scheduler();
 	}
 
 	/**
@@ -213,10 +213,15 @@ class Broadcasts_Page extends Admin_Page {
 
 		$this->add_notice( 'review', __( 'Review your broadcast before scheduling!', 'groundhogg' ), 'warning' );
 
-		return admin_page_url( 'gh_broadcasts', [
-			'action'    => 'preview',
-			'broadcast' => $broadcast_id,
-		] );
+		// Go through the preview step...
+		if ( $config['object_type'] === 'email' ){
+			return admin_page_url( 'gh_broadcasts', [
+				'action'    => 'preview',
+				'broadcast' => $broadcast_id,
+			] );
+		}
+
+		return $this->scheduler->get_start_url();
 	}
 
 	/**
