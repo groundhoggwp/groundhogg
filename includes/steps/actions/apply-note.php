@@ -112,7 +112,8 @@ class Apply_Note extends Action {
 
 		$finished_note = sanitize_textarea_field( Plugin::$instance->replacements->process( $note, $contact->get_id() ) );
 
-		$contact->add_note( $finished_note );
+		// Add funnel context
+		$contact->add_note( $finished_note, 'funnel', $event->get_funnel_id() );
 
 		return true;
 

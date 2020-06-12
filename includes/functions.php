@@ -1850,7 +1850,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 	// Add notes
 	if ( ! empty( $notes ) ) {
 		foreach ( $notes as $note ) {
-			$contact->add_note( $note );
+			$contact->add_note( $note, 'system' );
 		}
 	}
 

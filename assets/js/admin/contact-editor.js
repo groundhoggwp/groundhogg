@@ -47,6 +47,7 @@
             $(document).on( 'click', ".edit-notes", function (e) {
                 var $note = get_note(e.target);
                 $note.find( '.gh-note-view' ).hide();
+                $note.find(' .edited-note-text' ).height( $note.find( '.gh-note-view' ).height() );
                 $note.find( '.gh-note-edit' ).show();
             });
 

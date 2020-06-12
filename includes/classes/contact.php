@@ -378,35 +378,23 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @param String $note
 	 * @param string $context
+	 * @param bool|int $user_id
 	 *
 	 * @return bool
 	 */
-	public function add_note( $note, $context = 'system' ) {
+	public function add_note( $note, $context = 'system', $user_id=false ) {
 		if ( ! $note || ! is_string( $note ) ) {
 			return false;
 		}
 
-
-		//code to ad notes into the db..
-//		$note = sanitize_textarea_field( $note );
-//
-//		$current_notes = $this->get_meta( 'notes' );
-//
-//		$new_notes = sprintf( "===== %s =====\n\n", date_i18n( get_option( 'date_format' ) ) );
-//		$new_notes .= sprintf( "%s\n\n", $note );
-//		$new_notes .= $current_notes;
-//
-//		$new_notes = sanitize_textarea_field( $new_notes );
-//
-//		$this->update_meta( 'notes', $new_notes );
-
 		$notes = [
 			'contact_id' => $this->get_id(),
 			'context'    => $context,
-			'content'    => sanitize_textarea_field( $note )
+			'content'    => sanitize_textarea_field( $note ),
+			'user_id'    => $user_id,
 		];
 
-		if ( $context == 'user' ) {
+		if ( $context == 'user' && ! $user_id ) {
 			$notes['user_id'] = get_current_user_id();
 		}
 
