@@ -177,10 +177,15 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.2.15 (2020-06-05) =
-* ADDED Saved Searches
-* ADDED Edit/Delete notes
-* ADDED Notes context
+= 2.2.14 (2020-06-05) =
+* ADDED Saved searches.
+* ADDED Edit/Delete notes.
+* ADDED Notes context.
+* ADDED Transactional email support for broadcasts.
+* ADDED View Query action for broadcasts.
+* ADDED Review broadcast step before it goes live.
+* TWEAKED Better email device preview.
+* TWEAKED Changed `Apply Note` to `Add Note`
 
 = 2.2.13 (2020-06-02) =
 * ADDED Ability to restrict tabs in the settings by user capabilities.

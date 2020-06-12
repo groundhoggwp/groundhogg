@@ -30,12 +30,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-global $pagenow,
-       $is_lynx, $is_gecko, $is_winIE, $is_macIE, $is_opera, $is_NS4, $is_safari, $is_chrome, $is_iphone, $is_IE, $is_edge,
-       $is_apache, $is_IIS, $is_iis7, $is_nginx;
+global $email, $is_IE;
 
 $email_id = absint( get_request_var( 'email' ) );
-global $email;
 $email = new Email( $email_id );
 
 $_content_editor_dfw = true;
@@ -75,29 +72,15 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
                     <div class="inside">
 						<?php submit_button( __( 'Update', 'groundhogg' ), 'primary', 'update', false ); ?>
 						<?php submit_button( __( 'Update & Test', 'groundhogg' ), 'secondary', 'update_and_test', false ); ?>
-						<?php echo html()->modal_link( [
+						<?php echo html()->button( [
 							'title'              => __( 'Mobile Preview' ),
 							'text'               => '<span class="dashicons dashicons-smartphone"></span>',
-							'footer_button_text' => __( 'Close' ),
-							'id'                 => '',
-							'class'              => 'button button-secondary dash-button',
-							'source'             => managed_page_url( 'emails/' . $email->get_id() ),
-							'height'             => 580,
-							'width'              => 340,
-							'footer'             => 'true',
-							'preventSave'        => 'true',
+							'class'              => 'button button-secondary dash-button show-email-preview',
 						] ); ?>
-						<?php echo html()->modal_link( [
+						<?php echo html()->button( [
 							'title'              => __( 'Desktop Preview' ),
 							'text'               => '<span class="dashicons dashicons-desktop"></span>',
-							'footer_button_text' => __( 'Close' ),
-							'id'                 => '',
-							'class'              => 'button button-secondary dash-button',
-							'source'             => managed_page_url( 'emails/' . $email->get_id() ),
-							'height'             => 600,
-							'width'              => 700,
-							'footer'             => 'true',
-							'preventSave'        => 'true',
+							'class'              => 'button button-secondary dash-button show-email-preview',
 						] ); ?>
                     </div>
                 </div>
@@ -266,3 +249,4 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
         </div>
     </div>
 </form>
+<?php include __DIR__ . '/preview.php'; ?>

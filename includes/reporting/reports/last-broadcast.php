@@ -1,4 +1,5 @@
 <?php
+
 namespace Groundhogg\Reporting\Reports;
 
 
@@ -15,59 +16,57 @@ use Groundhogg\Reporting\Reporting;
  * Date: 2019-01-03
  * Time: 3:24 PM
  */
+class Last_Broadcast extends Report {
+	/**
+	 * Get the report ID
+	 *
+	 * @return string
+	 */
+	public function get_id() {
+		return 'last_broadcast';
+	}
 
-class Last_Broadcast extends Report
-{
-    /**
-     * Get the report ID
-     *
-     * @return string
-     */
-    public function get_id()
-    {
-        return 'last_broadcast';
-    }
+	/**
+	 * Get the report name
+	 *
+	 * @return string
+	 */
+	public function get_name() {
+		return __( 'Last Broadcast', 'groundhogg' );
+	}
 
-    /**
-     * Get the report name
-     *
-     * @return string
-     */
-    public function get_name()
-    {
-        return __( 'Last Broadcast', 'groundhogg' );
-    }
+	public function get_broadcast() {
+		$all_broadcasts = get_db( 'broadcasts' )->query( [ 'status'  => 'sent',
+		                                                   'orderby' => 'send_time',
+		                                                   'order'   => 'desc',
+		                                                   'limit'   => 10
+		] );
 
-    public function get_broadcast()
-    {
-        $all_broadcasts = get_db( 'broadcasts' )->query( [ 'status' => 'sent', 'orderby' => 'send_time', 'order' => 'desc', 'limit' => 10 ] );
+		if ( empty( $all_broadcasts ) ) {
+			return false;
+		}
 
-        if ( empty( $all_broadcasts ) ){
-            return false;
-        }
+		$last_broadcast    = array_shift( $all_broadcasts );
+		$last_broadcast_id = absint( $last_broadcast->ID );
 
-        $last_broadcast = array_shift( $all_broadcasts );
-        $last_broadcast_id = absint( $last_broadcast->ID );
+		$broadcast = new Broadcast( $last_broadcast_id );
 
-        $broadcast = new Broadcast( $last_broadcast_id );
+		return $broadcast;
+	}
 
-        return $broadcast;
-    }
+	/**
+	 * Get the report data
+	 *
+	 * @return array
+	 */
+	public function get_data() {
 
-    /**
-     * Get the report data
-     *
-     * @return array
-     */
-    public function get_data()
-    {
+		$broadcast = $this->get_broadcast();
 
-        $broadcast = $this->get_broadcast();
+		if ( $broadcast && $broadcast->exists() ) {
+			return $broadcast->get_report_data();
+		}
 
-        if ( $broadcast && $broadcast->exists() ){
-            return $broadcast->get_report_data();
-        }
-
-        return [];
-    }
+		return [];
+	}
 }

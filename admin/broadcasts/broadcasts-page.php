@@ -1,14 +1,23 @@
 <?php
-namespace  Groundhogg\Admin\Broadcasts;
+
+namespace Groundhogg\Admin\Broadcasts;
+
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Broadcast;
 use Groundhogg\Bulk_Jobs\Broadcast_Scheduler;
 use Groundhogg\Plugin;
+use Groundhogg\Preferences;
+use function Groundhogg\admin_page_url;
+use function Groundhogg\get_db;
+use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\is_sms_plugin_active;
+use function Groundhogg\validate_tags;
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * The page gh_broadcasts
@@ -25,276 +34,293 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.1
  */
+class Broadcasts_Page extends Admin_Page {
 
-class Broadcasts_Page extends Admin_Page
-{
+	/**
+	 * @var Broadcast_Scheduler
+	 */
+//	public $scheduler;
 
-    /**
-     * @var Broadcast_Scheduler
-     */
-    public $scheduler;
+	protected function add_ajax_actions() {
+	}
 
-    protected function add_ajax_actions() {}
-    public function help() {}
+	public function help() {
+	}
 
-    protected function add_additional_actions()
-    {
-        $this->scheduler = new Broadcast_Scheduler();
-    }
+	protected function add_additional_actions() {
+//		$this->scheduler = new Broadcast_Scheduler();
+	}
 
-    /**
-     * enqueue editor scripts
-     */
-    public function scripts(){
-        wp_enqueue_script('jquery-flot' );
-        wp_enqueue_script('jquery-flot-pie' );
-    }
+	/**
+	 * enqueue editor scripts
+	 */
+	public function scripts() {
+	    wp_enqueue_style( 'groundhogg-admin' );
+		wp_enqueue_style( 'groundhogg-admin-email-preview' );
+		wp_enqueue_script( 'groundhogg-admin-email-preview' );
+	}
 
-    public function get_priority()
-    {
-        return 25;
-    }
+	public function get_priority() {
+		return 25;
+	}
 
-    public function get_slug()
-    {
-        return 'gh_broadcasts';
-    }
+	public function get_slug() {
+		return 'gh_broadcasts';
+	}
 
-    public function get_name()
-    {
-        return _x( 'Broadcasts', 'page_title', 'groundhogg' );
-    }
+	public function get_name() {
+		return _x( 'Broadcasts', 'page_title', 'groundhogg' );
+	}
 
-    public function get_cap()
-    {
-        return 'view_broadcasts';
-    }
+	public function get_cap() {
+		return 'view_broadcasts';
+	}
 
-    public function get_item_type()
-    {
-        return 'broadcast';
-    }
+	public function get_item_type() {
+		return 'broadcast';
+	}
 
-    /**
-     * Get the current screen title
-     */
-    function get_title()
-    {
-        switch ($this->get_current_action()) {
-            case 'add':
-                return _x('Schedule Broadcast', 'page_title', 'groundhogg');
-                break;
-            default:
-                return _x('Broadcasts', 'page_title', 'groundhogg');
-                break;
-        }
-    }
+	/**
+	 * Get the current screen title
+	 */
+	function get_title() {
+		switch ( $this->get_current_action() ) {
+			case 'add':
+				return _x( 'Schedule Broadcast', 'page_title', 'groundhogg' );
+				break;
+			default:
+				return _x( 'Broadcasts', 'page_title', 'groundhogg' );
+				break;
+		}
+	}
 
 
-    public function process_cancel()
-    {
-        if (!current_user_can('cancel_broadcasts')) {
-            $this->wp_die_no_access();
-        }
+	public function process_cancel() {
+		if ( ! current_user_can( 'cancel_broadcasts' ) ) {
+			$this->wp_die_no_access();
+		}
 
-        foreach ($this->get_items() as $id) {
+		foreach ( $this->get_items() as $id ) {
 
-            $broadcast = new Broadcast( $id );
-            $broadcast->cancel();
-        }
+			$broadcast = new Broadcast( $id );
+			$broadcast->cancel();
+		}
 
-        $this->add_notice('cancelled', sprintf(_nx('%d broadcasts cancelled', '%d broadcast cancelled', count($this->get_items()), 'notice', 'groundhogg'), count($this->get_items())));
+		$this->add_notice( 'cancelled', sprintf( _nx( '%d broadcasts cancelled', '%d broadcast cancelled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
 
-        return false;
-    }
+		return false;
+	}
 
-    /**
-     * Schedule a new broadcast
-     */
-    public function process_add()
-    {
-        if (!current_user_can('schedule_broadcasts')) {
-            $this->wp_die_no_access();
-        }
+	/**
+	 * Schedule a new broadcast
+	 */
+	public function process_add() {
+		if ( ! current_user_can( 'schedule_broadcasts' ) ) {
+			$this->wp_die_no_access();
+		}
 
-        $config = [];
+		$config = [];
 
-        $object_id = isset($_POST['object_id']) ? intval($_POST['object_id']) : null;
-        if (!$object_id) {
-            return new \WP_Error( 'unable_to_add_tags', __( 'Please select an email or SMS to send.' ,'groundhogg'));
-        }
+		$object_id = isset( $_POST['object_id'] ) ? intval( $_POST['object_id'] ) : null;
+		if ( ! $object_id ) {
+			return new \WP_Error( 'unable_to_add_tags', __( 'Please select an email or SMS to send.', 'groundhogg' ) );
+		}
 
-        /* Set the object  */
-        $config['object_id'] = $object_id;
-        $config['object_type'] = isset( $_REQUEST[ 'type' ] ) && $_REQUEST[ 'type' ] === 'sms' ? 'sms' : 'email';
+		/* Set the object  */
+		$config['object_id']   = $object_id;
+		$config['object_type'] = isset( $_REQUEST['type'] ) && $_REQUEST['type'] === 'sms' ? 'sms' : 'email';
 
-        if ( $config[ 'object_type' ] === 'email' ){
+		if ( $config['object_type'] === 'email' ) {
 
-            $email = Plugin::$instance->utils->get_email($object_id);
-            if ( $email->is_draft() ){
-                return new \WP_Error( 'email_in_draft_mode', __( 'You cannot schedule an email while it is in draft mode.' ,'groundhogg'));
-            }
-        }
+			$email = Plugin::$instance->utils->get_email( $object_id );
 
-        $tags = isset($_POST['tags']) ? Plugin::$instance->dbs->get_db('tags')->validate( wp_unslash($_POST['tags'])) : [];
-        if (empty($tags) || !is_array($tags)) {
-             return new \WP_Error( 'email_in_draft_mode', __( 'You cannot schedule an email while it is in draft mode.' ,'groundhogg'));
-        }
+			if ( $email->is_draft() ) {
+				return new \WP_Error( 'email_in_draft_mode', __( 'You cannot schedule an email while it is in draft mode.', 'groundhogg' ) );
+			}
+		}
 
-        $exclude_tags = isset($_POST['exclude_tags']) ?  Plugin::$instance->dbs->get_db('tags' )->validate( wp_unslash( $_POST['exclude_tags'] ) ) : [];
+		$include_tags = validate_tags( get_post_var( 'tags', [] ) );
+		$exclude_tags = validate_tags( get_post_var( 'exclude_tags', [] ) );
 
-        $contact_sum = 0;
+		$send_date = isset( $_POST['date'] ) ? sanitize_text_field( $_POST['date'] ) : date( 'Y-m-d', strtotime( 'tomorrow' ) );
+		$send_time = isset( $_POST['time'] ) ? sanitize_text_field( $_POST['time'] ) : '09:30';
 
-        foreach ($tags as $tag) {
-            $tag = Plugin::$instance->dbs->get_db('tags')->get(intval( $tag ));
-            if ($tag) {
-                $contact_sum += $tag->contact_count;
-            }
-        }
+		$time_string = $send_date . ' ' . $send_time;
 
-        if ($contact_sum === 0) {
-             return new \WP_Error( 'no_contacts', __( 'Please select a tag with at least 1 contact','groundhogg'));
-        }
+		/* convert to UTC */
+		$send_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $time_string ) );
 
-        $send_date = isset($_POST['date']) ? sanitize_text_field( $_POST['date'] ): date('Y-m-d', strtotime('tomorrow'));
-        $send_time = isset($_POST['time']) ? sanitize_text_field( $_POST['time'] ): '09:30';
+		if ( isset( $_POST['send_now'] ) ) {
+			$config['send_now'] = true;
+			$send_time          = time() + 10;
+		}
 
-        $time_string = $send_date . ' ' . $send_time;
+		if ( $send_time < time() ) {
+			return new \WP_Error( 'invalid_date', __( 'Please select a time in the future', 'groundhogg' ) );
+		}
 
-        /* convert to UTC */
-        $send_time = Plugin::$instance->utils->date_time->convert_to_utc_0(strtotime($time_string));
+		/* Set the email */
+		$config['send_time'] = $send_time;
 
-        if (isset($_POST['send_now'])) {
-            $config['send_now'] = true;
-            $send_time = time() + 10;
-        }
+		$query = array(
+			'tags_include'           => $include_tags,
+			'tags_exclude'           => $exclude_tags,
+			'tags_include_needs_all' => absint( get_request_var( 'tags_include_needs_all' ) ),
+			'tags_exclude_needs_all' => absint( get_request_var( 'tags_exclude_needs_all' ) )
+		);
 
-        if ($send_time < time()) {
-            return new \WP_Error( 'invalid_date', __( 'Please select a time in the future','groundhogg'));
-        }
+		// Assume marketing by default...
+		$config[ 'is_transactional' ] = false;
 
-        /* Set the email */
-        $config['send_time'] = $send_time;
+		// if the email is not a transactional email we will by add the relevant optin statuses to the query
+		if ( $config['object_type'] === 'email' && isset( $email ) && ! $email->is_transactional() ){
 
-        $args = array(
-            'object_id' => $object_id,
-            'object_type' => $config[ 'object_type' ],
-            'tags' => $tags,
-            'send_time' => $send_time,
-            'scheduled_by' => get_current_user_id(),
-            'status' => 'scheduled',
-        );
+			// Add marketable statuses
+			$query[ 'optin_status' ] = [
+				Preferences::CONFIRMED,
+				Preferences::UNCONFIRMED,
+			];
 
-        $broadcast_id = Plugin::$instance->dbs->get_db('broadcasts')->add($args);
+			$config[ 'is_transactional' ] = true;
+		}
 
-        if (!$broadcast_id) {
-            return new \WP_Error( 'unable_to_add_broadcast', __( 'Something went wrong while adding the broadcast.','groundhogg'));
-        }
+		$query = array_filter( $query );
 
-        $config['broadcast_id'] = $broadcast_id;
+		$args = array(
+			'object_id'    => $object_id,
+			'object_type'  => $config['object_type'],
+			'send_time'    => $send_time,
+			'scheduled_by' => get_current_user_id(),
+			'status'       => 'scheduled',
+			'query'        => $query,
+		);
 
-        $query = array(
-            'tags_include' => $tags,
-            'tags_exclude' => $exclude_tags,
-            'tags_include_needs_all' => absint( get_request_var( 'tags_include_needs_all' ) ),
-            'tags_exclude_needs_all' => absint( get_request_var( 'tags_exclude_needs_all' ) )
-        );
+		$broadcast_id = get_db( 'broadcasts' )->add( $args );
 
-        $query = array_filter( $query );
+		if ( ! $broadcast_id ) {
+			return new \WP_Error( 'unable_to_add_broadcast', __( 'Something went wrong while adding the broadcast.', 'groundhogg' ) );
+		}
 
-        $config['contact_query'] = $query;
+		$config['broadcast_id'] = $broadcast_id;
 
-        if (isset($_POST['send_in_timezone'])) {
-            $config['send_in_local_time'] = true;
-        }
+		$config['contact_query'] = $query;
 
-        set_transient('gh_get_broadcast_config', $config, HOUR_IN_SECONDS);
+		if ( isset( $_POST['send_in_timezone'] ) ) {
+			$config['send_in_local_time'] = true;
+		}
 
-        $this->scheduler->start( $query );
+		set_transient( 'gh_get_broadcast_config', $config, HOUR_IN_SECONDS );
 
-        return false;
-    }
+		$this->add_notice( 'review', __( 'Review your broadcast before scheduling!', 'groundhogg' ), 'warning' );
 
-    /**
-     * Resend a broadcast to anyone who has not opened it. Schedule as a new broadcast.
-     */
-    public function process_resend_to_unopened()
-    {
-        if (!current_user_can('schedule_broadcasts')) {
-            $this->wp_die_no_access();
-        }
+		return admin_page_url( 'gh_broadcasts', [
+			'action'    => 'preview',
+			'broadcast' => $broadcast_id,
+		] );
+	}
 
-        do_action( 'groundhogg/admin/broadcasts/process_resend_to_unopened' );
-    }
+	/**
+	 * Resend a broadcast to anyone who has not opened it. Schedule as a new broadcast.
+	 */
+	public function process_resend_to_unopened() {
+		if ( ! current_user_can( 'schedule_broadcasts' ) ) {
+			$this->wp_die_no_access();
+		}
 
-    /**
-     * @return array|array[]
-     */
-    protected function get_title_actions()
-    {
-        $actions = [
-            [
-                'link' => $this->admin_url( [ 'action' => 'add'  , 'type' => 'email' ] ),
-                'action' => __( 'Schedule Email Broadcast', 'groundhogg' ),
-                'target' => '_self',
-            ]
-        ];
+		do_action( 'groundhogg/admin/broadcasts/process_resend_to_unopened' );
+	}
 
-        if (is_sms_plugin_active()) {
-            $actions[] = [
-                'link' => $this->admin_url( [ 'action' => 'add'  , 'type' => 'sms' ] ),
-                'action' => __( 'Schedule SMS Broadcast', 'groundhogg' ),
-                'target' => '_self',
-            ];
-        }
+	/**
+     * Delete
+     *
+	 * @return bool|\WP_Error
+	 */
+	public function process_delete() {
+		if ( ! current_user_can( 'schedule_broadcasts' ) ) {
+			$this->wp_die_no_access();
+		}
 
-        return $actions;
-    }
+		foreach ( $this->get_items() as $id ) {
+			if ( ! get_db( 'broadcasts' )->delete( $id ) ) {
+				return new \WP_Error( 'unable_to_delete_broadcast', "Something went wrong while deleting the broadcast.", 'groundhogg' );
+			}
+		}
 
-    /**
-     * Display the table
-     */
-    public function view()
-    {
-        $broadcasts_table = new Broadcasts_Table();
+		$this->add_notice(
+			esc_attr( 'deleted' ),
+			sprintf( _nx( 'Deleted %d broadcast', 'Deleted %d broadcasts', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
+			'success'
+		);
 
-        $broadcasts_table->views(); ?>
+		return false;
+	}
+
+	/**
+	 * @return array|array[]
+	 */
+	protected function get_title_actions() {
+		$actions = [
+			[
+				'link'   => $this->admin_url( [ 'action' => 'add', 'type' => 'email' ] ),
+				'action' => __( 'Schedule Email Broadcast', 'groundhogg' ),
+				'target' => '_self',
+			]
+		];
+
+		if ( is_sms_plugin_active() ) {
+			$actions[] = [
+				'link'   => $this->admin_url( [ 'action' => 'add', 'type' => 'sms' ] ),
+				'action' => __( 'Schedule SMS Broadcast', 'groundhogg' ),
+				'target' => '_self',
+			];
+		}
+
+		return $actions;
+	}
+
+	/**
+	 * Display the table
+	 */
+	public function view() {
+		$broadcasts_table = new Broadcasts_Table();
+
+		$broadcasts_table->views(); ?>
         <form method="post" class="search-form wp-clearfix">
             <!-- search form -->
             <p class="search-box">
                 <label class="screen-reader-text"
-                       for="post-search-input"><?php _ex('Search Broadcasts', 'search', 'groundhogg'); ?>:&nbsp;</label>
+                       for="post-search-input"><?php _ex( 'Search Broadcasts', 'search', 'groundhogg' ); ?>
+                    :&nbsp;</label>
                 <input type="search" id="post-search-input" name="s" value="">
                 <input type="submit" id="search-submit" class="button"
-                       value="<?php _ex('Search Broadcasts', 'search', 'groundhogg'); ?>">
+                       value="<?php _ex( 'Search Broadcasts', 'search', 'groundhogg' ); ?>">
             </p>
-            <?php $broadcasts_table->prepare_items();  ?>
-            <?php $broadcasts_table->display(); ?>
+			<?php $broadcasts_table->prepare_items(); ?>
+			<?php $broadcasts_table->display(); ?>
         </form>
 
-        <?php
-    }
+		<?php
+	}
 
-    /**
-     * Display the scheduling page
-     */
-    public function add()
-    {
-        if (!current_user_can('schedule_broadcasts')) {
-            $this->wp_die_no_access();
-        }
-        include dirname(__FILE__) . '/add.php';
-    }
+	/**
+	 * Display the scheduling page
+	 */
+	public function add() {
+		if ( ! current_user_can( 'schedule_broadcasts' ) ) {
+			$this->wp_die_no_access();
+		}
 
-    /**
-     * Display the reporting page
-     */
-    public function report()
-    {
-        if (!current_user_can('view_broadcasts')) {
-           $this->wp_die_no_access();
-        }
-        include dirname(__FILE__) . '/report.php';
-    }
+		include __DIR__ . '/add.php';
+	}
 
+	/**
+	 * Display the scheduling page
+	 */
+	public function preview() {
+		if ( ! current_user_can( 'schedule_broadcasts' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		include __DIR__ . '/preview.php';
+	}
 }

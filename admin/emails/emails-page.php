@@ -97,6 +97,9 @@ class Emails_Page extends Admin_Page {
 
 			wp_enqueue_script( 'groundhogg-admin-iframe' );
 			wp_enqueue_style( 'groundhogg-admin-iframe' );
+
+			wp_enqueue_style( 'groundhogg-admin-email-preview' );
+			wp_enqueue_script( 'groundhogg-admin-email-preview' );
 		}
 
 		remove_editor_styles();

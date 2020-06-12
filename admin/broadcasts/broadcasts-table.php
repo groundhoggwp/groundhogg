@@ -12,6 +12,7 @@ use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
 use function Groundhogg\groundhogg_url;
 use Groundhogg\Plugin;
+use function Groundhogg\html;
 use function Groundhogg\is_sms_plugin_active;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\scheduled_time;
@@ -69,19 +70,29 @@ class Broadcasts_Table extends WP_List_Table {
 	 *
 	 * bulk steps or checkboxes, simply leave the 'cb' entry out of your array.
 	 *
-	 * @see WP_List_Table::::single_row_columns()
 	 * @return array An associative array containing column information.
+	 * @see WP_List_Table::::single_row_columns()
 	 */
 	public function get_columns() {
 		$columns = array(
 			'cb'             => '<input type="checkbox" />', // Render a checkbox instead of text.
 			'object_id'      => _x( 'Email/SMS', 'Column label', 'groundhogg' ),
 			'from_user'      => _x( 'Scheduled By', 'Column label', 'groundhogg' ),
+//			'query'          => _x( 'Query', 'Column label', 'groundhogg' ),
 			'send_time'      => _x( 'Scheduled Run Date', 'Column label', 'groundhogg' ),
 			'sending_to'     => _x( 'Sending To', 'Column label', 'groundhogg' ),
 			'stats'          => _x( 'Stats', 'Column label', 'groundhogg' ),
 			'date_scheduled' => _x( 'Date Scheduled', 'Column label', 'groundhogg' ),
 		);
+
+		if ( $this->get_view() === 'cancelled' ) {
+			unset( $columns['send_time'] );
+			unset( $columns['sending_to'] );
+			unset( $columns['stats'] );
+			unset( $columns['query'] );
+		} else if ( $this->get_view() === 'scheduled' ) {
+			unset( $columns['stats'] );
+		}
 
 		return apply_filters( 'groundhogg/admin/broadcasts/table/columns', $columns );
 	}
@@ -98,7 +109,7 @@ class Broadcasts_Table extends WP_List_Table {
 		$sortable_columns = array(
 			'object_id'      => array( 'object_id', false ),
 			'from_user'      => array( 'from_user', false ),
-			'send_time'      => array( 'send_at', false ),
+			'send_time'      => array( 'send_time', false ),
 			'date_scheduled' => array( 'date_scheduled', false )
 		);
 
@@ -147,27 +158,38 @@ class Broadcasts_Table extends WP_List_Table {
 	 * @return string a list of steps
 	 */
 	protected function handle_row_actions( $broadcast, $column_name, $primary ) {
-		if ( $primary !== $column_name ) {
+		if ( $primary !== $column_name || $this->get_view() === 'cancelled' ) {
 			return '';
 		}
 
-		$actions = array();
-
-		if ( $this->get_view() !== 'cancelled' ) {
-
-			if ( $broadcast->is_email() ) {
-				$actions['edit'] = "<span class='edit'><a href='" . esc_url( admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $broadcast->get_object_id() ) ) . "'>" . _x( 'Edit Email', 'action', 'groundhogg' ) . "</a></span>";
-			} else {
-				$actions['edit'] = "<span class='edit'><a href='" . esc_url( admin_url( 'admin.php?page=gh_sms&action=edit&sms=' . $broadcast->get_object_id() ) ) . "'>" . _x( 'Edit SMS', 'action', 'groundhogg' ) . "</a></span>";
-			}
-
-			if ( $broadcast->get_send_time() > time() ) {
-				$actions['trash'] = "<span class='delete'><a class='submitdelete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_broadcasts&view=all&action=cancel&broadcast=' . $broadcast->get_id() ), 'cancel' ) . "'>" . _x( 'Cancel', 'action', 'groundhogg' ) . "</a></span>";
-			}
+		if ( $broadcast->is_sent() ) {
+			$actions['report'] = "<a href='" . esc_url( admin_page_url( 'gh_reporting', [
+					'tab'       => 'broadcasts',
+					'broadcast' => $broadcast->get_id()
+				] ) ) . "'>" . _x( 'Reporting', 'action', 'groundhogg' ) . "</a>";
 		}
 
-		if ( $broadcast->is_sent() ){
-			$actions['report'] = "<a href='" . esc_url( admin_page_url( 'gh_reporting', [ 'tab' => 'broadcasts', 'broadcast' => $broadcast->get_id() ] ) ) . "'>" . _x( 'Reporting', 'action', 'groundhogg' ) . "</a>";
+		if ( $broadcast->is_email() ) {
+			$actions['edit'] = "<a href='" . esc_url( admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $broadcast->get_object_id() ) ) . "'>" . _x( 'Edit Email', 'action', 'groundhogg' ) . "</a>";
+		} else {
+			$actions['edit'] = "<a href='" . esc_url( admin_url( 'admin.php?page=gh_sms&action=edit&sms=' . $broadcast->get_object_id() ) ) . "'>" . _x( 'Edit SMS', 'action', 'groundhogg' ) . "</a>";
+		}
+
+		// Add query action
+		$query = $broadcast->get_query();
+
+		if ( ! empty( $query ) && is_array( $query ) ){
+			$query[ 'search' ] = 'on';
+
+			$actions[ 'query' ] = html()->e( 'a', [
+				'href' => admin_page_url( 'gh_contacts', $query )
+			], 'View Query' );
+		}
+
+		$report_data = $broadcast->get_report_data();
+
+		if ( $broadcast->get_send_time() > time() && $report_data[ 'waiting' ] > 0 ) {
+			$actions['trash'] = "<a class='delete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_broadcasts&view=all&action=cancel&broadcast=' . $broadcast->get_id() ), 'cancel' ) . "'>" . _x( 'Cancel', 'action', 'groundhogg' ) . "</a>";
 		}
 
 		return $this->row_actions( apply_filters( 'groundhogg/admin/broadcasts/table/handle_row_actions', $actions, $broadcast, $column_name ) );
@@ -196,8 +218,11 @@ class Broadcasts_Table extends WP_List_Table {
 
 			case 'sent':
 
-				if ( $broadcast->is_email() ){
-					$edit_url = admin_page_url( 'gh_reporting', [ 'tab' => 'broadcasts', 'broadcast' => $broadcast->get_id() ] );
+				if ( $broadcast->is_email() ) {
+					$edit_url = admin_page_url( 'gh_reporting', [
+						'tab'       => 'broadcasts',
+						'broadcast' => $broadcast->get_id()
+					] );
 				} else {
 					$edit_url = groundhogg_url( 'broadcasts', [
 						'action'    => 'report',
@@ -231,6 +256,21 @@ class Broadcasts_Table extends WP_List_Table {
 	 *
 	 * @return string
 	 */
+	protected function column_query( $broadcast ){
+
+		$query = $broadcast->get_query();
+		$query[ 'search' ] = 'on';
+
+		return html()->e( 'a', [
+			'href' => admin_page_url( 'gh_contacts', $query )
+		], 'View contacts' );
+	}
+
+	/**
+	 * @param $broadcast Broadcast
+	 *
+	 * @return string
+	 */
 	protected function column_sending_to( $broadcast ) {
 
 		$num = Plugin::$instance->dbs->get_db( 'event_queue' )->count( [
@@ -243,15 +283,16 @@ class Broadcasts_Table extends WP_List_Table {
 			return '&#x2014;';
 		}
 
-		$link = sprintf( "<a href='%s'>%s %s</a>",
-			admin_url( sprintf( 'admin.php?page=gh_contacts&%s', http_build_query( [
-				'report' => [
-					'type' => Event::BROADCAST,
-					'step' => $broadcast->get_id(),
-				]
-			] ) ) ),
-			$num,
-			__( 'Contacts', 'groundhogg' )
+		$link = admin_page_url( 'gh_contacts', [
+			'report' => [
+				'type' => Event::BROADCAST,
+				'step' => $broadcast->get_id(),
+			]
+		] );
+
+		$link = sprintf( "<a href='%s'>%S</a>",
+			$link,
+			number_format_i18n( $num )
 		);
 
 		return $link;
@@ -273,7 +314,7 @@ class Broadcasts_Table extends WP_List_Table {
 		$html = "";
 
 		// Show the speed of a broadcast
-		if ( isset_not_empty( $stats, 'speed' ) ){
+		if ( isset_not_empty( $stats, 'speed' ) ) {
 			$html .= sprintf(
 				"%s: <strong title='%s'>%s/s</strong><br/>",
 				_x( "Speed", 'stats', 'groundhogg' ),
@@ -302,7 +343,7 @@ class Broadcasts_Table extends WP_List_Table {
 				],
 				admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
 			),
-			$stats['sent']
+			number_format_i18n( $stats['sent'] )
 		);
 
 		if ( ! $broadcast->is_sms() ) {
@@ -320,7 +361,7 @@ class Broadcasts_Table extends WP_List_Table {
 					],
 					admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
 				),
-				$stats['opened']
+				number_format_i18n( $stats['opened'] )
 			);
 
 			$html .= sprintf(
@@ -336,7 +377,7 @@ class Broadcasts_Table extends WP_List_Table {
 					],
 					admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
 				),
-				$stats['clicked']
+				number_format_i18n( $stats['clicked'] )
 			);
 		}
 
@@ -350,7 +391,8 @@ class Broadcasts_Table extends WP_List_Table {
 	 */
 	protected function column_send_time( $broadcast ) {
 
-		$prefix = $broadcast->is_sent() ? __( 'Sent', 'groundhogg' ): __( 'Sending', 'groundhogg' );
+		$prefix = $broadcast->is_sent() ? __( 'Sent', 'groundhogg' ) : __( 'Sending', 'groundhogg' );
+
 		return $prefix . ' ' . scheduled_time_column( $broadcast->get_send_time() );
 	}
 
@@ -361,6 +403,7 @@ class Broadcasts_Table extends WP_List_Table {
 	 */
 	protected function column_date_scheduled( $broadcast ) {
 		$ds_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $broadcast->get_date_scheduled() ) );
+
 		return scheduled_time_column( $ds_time, false, false, false );
 	}
 
@@ -368,7 +411,7 @@ class Broadcasts_Table extends WP_List_Table {
 	 * For more detailed insight into how columns are handled, take a look at
 	 * WP_List_Table::single_row_columns()
 	 *
-	 * @param object $broadcast   A singular item (one full row's worth of data).
+	 * @param object $broadcast A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string Text or HTML to be placed inside the column <td>.
@@ -401,12 +444,18 @@ class Broadcasts_Table extends WP_List_Table {
 	 * @return array An associative array containing all the bulk steps.
 	 */
 	protected function get_bulk_actions() {
-		if ( $this->get_view() !== 'cancelled' ) {
-			$actions = array(
-				'cancel' => _x( 'Cancel', 'List table bulk action', 'groundhogg' ),
-			);
-		} else {
-			$actions = array();
+
+		$actions = [];
+
+		switch ( $this->get_view() ) {
+			default:
+			case 'scheduled':
+				$actions['cancel'] = _x( 'Cancel', 'List table bulk action', 'groundhogg' );
+				break;
+			case 'cancelled':
+			case 'sent':
+				$actions['delete'] = _x( 'Delete', 'List table bulk action', 'groundhogg' );
+				break;
 		}
 
 		return apply_filters( 'wpgh_broadcast_bulk_actions', $actions );
@@ -447,7 +496,7 @@ class Broadcasts_Table extends WP_List_Table {
 		];
 
 		if ( is_sms_plugin_active() ) {
-			$where = [
+			$where[] = [
 				'relationship' => "AND",
 				[ 'col' => 'status', 'val' => $this->get_view(), 'compare' => '=' ],
 

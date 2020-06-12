@@ -287,7 +287,7 @@ class Main_Updater extends Updater {
 	 * Notes db added.
 	 * Migrate notes
 	 */
-	public function version_2_2_15(){
+	public function version_2_2_14(){
 		Plugin::$instance->dbs->install_dbs();
 		update_option( 'gh_migrate_notes', 1 );
 	}
@@ -325,6 +325,7 @@ class Main_Updater extends Updater {
 			'2.1.13.6',
 			'2.1.14.1',
 			'2.2',
+			'2.2.14',
 
 		];
 	}
@@ -340,7 +341,7 @@ class Main_Updater extends Updater {
 			'2.1.13.17',
 			'2.2.3',
 			'2.2.13',
-			'2.2.15'
+			'2.2.14'
 		];
 	}
 
@@ -370,7 +371,7 @@ class Main_Updater extends Updater {
 			'2.1.14.1'      => __( 'Add missing index on `claim` column.', 'groundhogg' ),
 			'2.2'           => __( 'Event queue performance improvements.', 'groundhogg' ),
 			'2.2.3'         => __( 'Reformat all tables.', 'groundhogg' ),
-
+			'2.2.14'        => __( 'Migrate notes and update broadcasts table.', 'gorundhogg' ),
 		];
 	}
 }

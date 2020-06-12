@@ -351,3 +351,11 @@ table.wp-list-table.funnels th.column-active_contacts,
 table.wp-list-table.funnels td.column-active_contacts {
     text-align: center;
 }
+
+#wpbody .dash-button{
+    padding: 0 5px 1px;
+}
+
+#wpbody .dash-button .dashicons{
+    vertical-align: middle;
+}

@@ -96,14 +96,14 @@ $type = isset($_REQUEST['type']) && $_REQUEST['type'] === 'sms' ? 'sms' : 'email
                     $tag_args = array();
                     $tag_args['id'] = 'tags';
                     $tag_args['name'] = 'tags[]';
-                    $tag_args['required'] = true;
+//                    $tag_args['required'] = true;
 
                     _e( ' of ', 'groundhogg' );
 
                     echo Plugin::$instance->utils->html->tag_picker($tag_args);
 
                     ?>
-                    <p class="description"><?php _e('This broadcast will be sent to contacts with these tags.', 'groundhogg'); ?></p>
+                    <p class="description"><?php _e('This broadcast will be sent to contacts with these tags. If left empty the broadcast will attempt to be sent to all contacts.', 'groundhogg'); ?></p>
                 <?php else:
                     $query = new Contact_Query();
                     $num = count($query->query(get_request_query()));

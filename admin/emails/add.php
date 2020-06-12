@@ -24,9 +24,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-function get_dummy_text()
-{
-    return "Hi {first}!
+global $is_IE;
+
+$_content_editor_dfw = true;
+$_wp_editor_expand   = true;
+
+$_wp_editor_expand_class = '';
+if ( $_wp_editor_expand ) {
+	$_wp_editor_expand_class = ' wp-editor-expand';
+}
+
+wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
+
+function get_dummy_text() {
+	return "Hi {first}!
     
     This is where you write the content of your email. Your email can include as much content as you want.
     
@@ -38,7 +49,7 @@ function get_dummy_text()
     
     Sincerely,
     
-    The Groundhogg Team" ;
+    The Groundhogg Team";
 }
 
 ?>
@@ -49,7 +60,11 @@ function get_dummy_text()
 	$test_email = get_user_meta( get_current_user_id(), 'preferred_test_email', true );
 	$test_email = $test_email ? $test_email : wp_get_current_user()->user_email;
 
-    echo Plugin::$instance->utils->html->input( [ 'type' => 'hidden', 'id' => 'test-email', 'value' => $test_email ] ); ?>
+	echo Plugin::$instance->utils->html->input( [
+		'type'  => 'hidden',
+		'id'    => 'test-email',
+		'value' => $test_email
+	] ); ?>
     <div id='poststuff'>
         <div id="post-body" class="metabox-holder columns-2  align-email-center" style="clear: both">
             <div id="postbox-container-1" class="postbox-container sidebar">
@@ -57,20 +72,20 @@ function get_dummy_text()
                     <span class="spinner"></span>
                     <h2><?php _e( 'Save', 'groundhogg' ); ?></h2>
                     <div class="inside">
-	                    <?php submit_button( __( 'Create', 'groundhogg' ), 'primary', 'update', false ); ?>
+						<?php submit_button( __( 'Create', 'groundhogg' ), 'primary', 'update', false ); ?>
                     </div>
                 </div>
 
                 <h3><?php _e( 'Status', 'groundhogg' ); ?></h3>
                 <p>
-	                <?php echo Plugin::$instance->utils->html->toggle( [
-		                'name'          => 'email_status',
-		                'id'            => 'status-toggle',
-		                'value'         => 'ready',
-		                'checked'       => false,
-		                'on'            => 'Ready',
-		                'off'           => 'Draft',
-	                ]); ?>
+					<?php echo Plugin::$instance->utils->html->toggle( [
+						'name'    => 'email_status',
+						'id'      => 'status-toggle',
+						'value'   => 'ready',
+						'checked' => false,
+						'on'      => 'Ready',
+						'off'     => 'Draft',
+					] ); ?>
                 </p>
                 <h3><?php _e( 'From', 'groundhogg' ); ?></h3>
 				<?php $args = array(
@@ -81,7 +96,7 @@ function get_dummy_text()
 					'style'       => [ 'max-width' => '100%' ]
 				); ?>
                 <p><?php echo Plugin::$instance->utils->html->dropdown_owners( $args ); ?></p>
-	            <?php echo html()->description( __( 'Choose who this email comes from.' ) ); ?>
+				<?php echo html()->description( __( 'Choose who this email comes from.' ) ); ?>
 
                 <h3><?php _e( 'Reply To', 'groundhogg' ); ?></h3>
 				<?php $args = [
@@ -100,33 +115,48 @@ function get_dummy_text()
                         <option value="center"><?php _e( 'Center' ); ?></option>
                     </select>
                 </p>
+                <h3><?php _e( 'Message Type' ); ?></h3>
+				<?php $args = [
+					'type'              => 'email',
+					'name'              => 'message_type',
+					'id'                => 'message-type',
+					'options'           => [
+						'marketing'     => __( 'Marketing', 'groundhogg' ),
+						'transactional' => __( 'Transactional', 'groundhogg' )
+					],
+					'selected'          => 'marketing',
+					'required'          => true,
+					'option_none'       => '',
+					'option_none_value' => '',
+				]; ?>
+                <p><?php echo Plugin::$instance->utils->html->dropdown( $args ); ?></p>
                 <h3><?php _e( 'Additional' ); ?></h3>
                 <p>
-		            <?php echo Plugin::$instance->utils->html->checkbox( [
-			            'label'   => __('Enable browser view', 'groundhogg' ),
-			            'name'    => 'browser_view',
-			            'id'      => 'browser_view',
-			            'class'   => '',
-			            'value'   => '1',
-		            ] ); ?>
+					<?php echo Plugin::$instance->utils->html->checkbox( [
+						'label' => __( 'Enable browser view', 'groundhogg' ),
+						'name'  => 'browser_view',
+						'id'    => 'browser_view',
+						'class' => '',
+						'value' => '1',
+					] ); ?>
                 </p>
                 <p>
-		            <?php echo Plugin::$instance->utils->html->checkbox( [
-			            'label'   => __( 'Save as template', 'groundhogg' ),
-			            'name'    => 'save_as_template',
-			            'id'      => 'save_as_template',
-			            'class'   => '',
-			            'value'   => '1',
-		            ] ); ?>
+					<?php echo Plugin::$instance->utils->html->checkbox( [
+						'label' => __( 'Save as template', 'groundhogg' ),
+						'name'  => 'save_as_template',
+						'id'    => 'save_as_template',
+						'class' => '',
+						'value' => '1',
+					] ); ?>
                 </p>
                 <p>
-                    <?php echo Plugin::$instance->utils->html->checkbox( [
-                        'label'   => __( 'Use custom Alt-Body', 'groundhogg' ),
-                        'name'    => 'use_custom_alt_body',
-                        'id'      => 'use_custom_alt_body',
-                        'class'   => '',
-                        'value'   => '1',
-                    ] ); ?>
+					<?php echo Plugin::$instance->utils->html->checkbox( [
+						'label' => __( 'Use custom Alt-Body', 'groundhogg' ),
+						'name'  => 'use_custom_alt_body',
+						'id'    => 'use_custom_alt_body',
+						'class' => '',
+						'value' => '1',
+					] ); ?>
                 </p>
             </div>
             <div id="post-body-content">
@@ -153,16 +183,30 @@ function get_dummy_text()
                            autocomplete="off">
                 </div>
                 <div id="content-wrap">
-					<?php
+                    <div id="postdivrich" class="postarea<?php echo $_wp_editor_expand_class; ?>">
+						<?php
 
-                    echo html()->editor( [
-						'id'                  => 'email_content',
-						'content'             => wpautop( get_dummy_text() ),
-						'settings'            => [
-                            'editor_height' => 500,
-                        ],
-						'replacements_button' => true,
-					] ); ?>
+						add_action( 'media_buttons', [
+							\Groundhogg\Plugin::$instance->replacements,
+							'show_replacements_button'
+						] );
+
+						wp_editor( wpautop( get_dummy_text() ), 'email_content', [
+							'_content_editor_dfw' => $_content_editor_dfw,
+							'drag_drop_upload'    => true,
+							'tabfocus_elements'   => 'content-html,save-post',
+							'editor_height'       => 500,
+							'tinymce'             => array(
+								'resize'                  => false,
+								'wp_autoresize_on'        => $_wp_editor_expand,
+								'add_unload_trigger'      => false,
+								'wp_keep_scroll_position' => ! $is_IE,
+							),
+						] );
+
+
+						?>
+                    </div>
                 </div>
             </div>
         </div>

@@ -67,7 +67,7 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 			],
 			[
 				'label' => __( 'Total Delivered', 'groundhogg' ),
-				'data'  => html()->wrap( $stats['sent'], 'a', [
+				'data'  => html()->wrap( number_format_i18n( $stats['sent'] ), 'a', [
 					'href'  => add_query_arg(
 						[
 							'report' => [
@@ -83,7 +83,7 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 			],
 			[
 				'label' => __( 'Opens', 'groundhogg' ),
-				'data'  => html()->wrap( $stats['opened'] . ' (' . percentage( $stats['sent'], $stats['opened'] ) . '%)', 'a', [
+				'data'  => html()->wrap( number_format_i18n( $stats['opened'] ) . ' (' . percentage( $stats['sent'], $stats['opened'] ) . '%)', 'a', [
 					'href'  => add_query_arg(
 						[
 							'activity' => [
@@ -99,13 +99,13 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 			],
 			[
 				'label' => __( 'Total Clicks', 'groundhogg' ),
-				'data'  => html()->wrap( $stats['all_clicks'], 'span', [
+				'data'  => html()->wrap( number_format_i18n( $stats['all_clicks'] ), 'span', [
 					'class' => 'number-total'
 				] )
 			],
 			[
 				'label' => __( 'Unique Clicks', 'groundhogg' ),
-				'data'  => html()->wrap( $stats['clicked'] . ' (' . percentage( $stats['sent'], $stats['clicked'] ) . '%)', 'a', [
+				'data'  => html()->wrap( number_format_i18n( $stats['clicked'] ) . ' (' . percentage( $stats['sent'], $stats['clicked'] ) . '%)', 'a', [
 					'href'  => add_query_arg(
 						[
 							'activity' => [
@@ -125,11 +125,11 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 			],
 			[
 				'label' => __( 'Unopened', 'groundhogg' ),
-				'data'  => $stats['unopened'] . ' (' . percentage( $stats['sent'], $stats['unopened'] ) . '%)'
+				'data'  => number_format_i18n( $stats['unopened'] ) . ' (' . percentage( $stats['sent'], $stats['unopened'] ) . '%)'
 			],
 			[
 				'label' => __( 'Unsubscribed', 'groundhogg' ),
-				'data'  => html()->wrap( $stats['unsubscribed'] . ' (' . percentage( $stats['sent'], $stats['unsubscribed'] ) . '%)', 'a', [
+				'data'  => html()->wrap( number_format_i18n( $stats['unsubscribed'] ) . ' (' . percentage( $stats['sent'], $stats['unsubscribed'] ) . '%)', 'a', [
 					'href'  => add_query_arg(
 						[
 							'activity' => [

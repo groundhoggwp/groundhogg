@@ -23,12 +23,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Broadcasts extends DB {
 
-	protected function add_additional_actions() {
-		add_filter( 'groundhogg/db/pre_insert/broadcast', [ $this, 'serialize_tags' ] );
-		add_filter( 'groundhogg/db/pre_update/broadcast', [ $this, 'serialize_tags' ] );
-		add_filter( 'groundhogg/db/get/broadcast', [ $this, 'unserialize_tags' ] );
-	}
-
 	/**
 	 * Get the DB suffix
 	 *
@@ -78,7 +72,7 @@ class Broadcasts extends DB {
 			'object_type'    => '%s',
 			'scheduled_by'   => '%d',
 			'send_time'      => '%d',
-			'tags'           => '%s',
+			'query'          => '%s',
 			'status'         => '%s',
 			'date_scheduled' => '%s',
 		];
@@ -97,40 +91,31 @@ class Broadcasts extends DB {
 			'object_type'    => 'email',
 			'scheduled_by'   => 0,
 			'send_time'      => 0,
-			'tags'           => '',
+			'query'          => [],
 			'status'         => 'scheduled',
 			'date_scheduled' => current_time( 'mysql' ),
 		];
 	}
 
 	/**
-	 * Given a data set, if tags are present make sure the end up serialized
-	 *
 	 * @param array $data
 	 *
-	 * @return array
+	 * @return int
 	 */
-	public function serialize_tags( $data = [] ) {
-		if ( isset_not_empty( $data, 'tags' ) ) {
-			$data['tags'] = maybe_serialize( $data['tags'] );
-		}
-
-		return $data;
+	public function add( $data = array() ) {
+		$data[ 'query' ] = maybe_serialize( $data[ 'query' ] );
+		return parent::add( $data );
 	}
 
 	/**
-	 * Given a data set, if tags are present make sure they end up unserialized
+	 * @param $row_id
 	 *
-	 * @param null $obj
-	 *
-	 * @return null
+	 * @return object
 	 */
-	public function unserialize_tags( $obj = null ) {
-		if ( is_object( $obj ) && isset( $obj->tags ) ) {
-			$obj->tags = maybe_unserialize( $obj->tags );
-		}
-
-		return $obj;
+	public function get( $row_id ) {
+		$data = parent::get( $row_id );
+		$data->query = maybe_unserialize( $data->query );
+		return $data;
 	}
 
 	/**
@@ -151,10 +136,11 @@ class Broadcasts extends DB {
         object_type VARCHAR(20) NOT NULL,
         scheduled_by bigint(20) unsigned NOT NULL,
         send_time bigint(20) unsigned NOT NULL,
-        tags longtext NOT NULL,
+        query longtext NOT NULL,
         status VARCHAR(20) NOT NULL,
         date_scheduled datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-        PRIMARY KEY (ID)
+        PRIMARY KEY (ID),
+        KEY send_time (send_time)
 		) {$this->get_charset_collate()};";
 
 		dbDelta( $sql );

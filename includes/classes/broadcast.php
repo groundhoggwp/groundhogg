@@ -40,6 +40,9 @@ class Broadcast extends Base_Object implements Event_Process {
 	 * @return void
 	 */
 	protected function post_setup() {
+
+		$this->query = maybe_unserialize( $this->query );
+
 		switch ( $this->get_broadcast_type() ) {
 			case self::TYPE_EMAIL:
 				$this->object = Plugin::$instance->utils->get_email( $this->get_object_id() );
@@ -95,6 +98,15 @@ class Broadcast extends Base_Object implements Event_Process {
 	 */
 	public function get_step_title() {
 		return $this->get_title();
+	}
+
+	/**
+	 * The query object
+	 *
+	 * @return array
+	 */
+	public function get_query(){
+		return $this->query;
 	}
 
 	/**
@@ -231,26 +243,33 @@ class Broadcast extends Base_Object implements Event_Process {
 		return true;
 	}
 
+	protected $report_data = [];
+
 	/**
 	 * @return array
 	 */
 	public function get_report_data() {
+
+		if ( ! empty( $this->report_data ) ){
+			return $this->report_data;
+		}
+
 		$data = [];
 
-		if ( $this->is_sent() ) {
+		$data['waiting'] = get_db( 'event_queue' )->count( [
+			'step_id'    => $this->get_id(),
+			'event_type' => Event::BROADCAST,
+			'status'     => Event::WAITING
+		] );
 
-			$data['id'] = $this->get_id();
+		$data['id'] = $this->get_id();
+
+		if ( $this->is_sent() ) {
 
 			$data['sent'] = get_db( 'events' )->count( [
 				'step_id'    => $this->get_id(),
 				'event_type' => Event::BROADCAST,
 				'status'     => Event::COMPLETE
-			] );
-
-			$data['waiting'] = get_db( 'event_queue' )->count( [
-				'step_id'    => $this->get_id(),
-				'event_type' => Event::BROADCAST,
-				'status'     => Event::WAITING
 			] );
 
 			if ( ! $this->is_sms() ) {
@@ -306,6 +325,8 @@ class Broadcast extends Base_Object implements Event_Process {
 			}
 
 		}
+
+		$this->report_data = $data;
 
 		return $data;
 	}

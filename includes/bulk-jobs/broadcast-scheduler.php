@@ -36,6 +36,7 @@ class Broadcast_Scheduler extends Bulk_Job {
 	 * @var int
 	 */
 	protected $emails_scheduled = 0;
+	private $is_transactional;
 
 	/**
 	 * Get the action reference.
@@ -111,7 +112,7 @@ class Broadcast_Scheduler extends Bulk_Job {
 		$contact = get_contactdata( $id );
 
 		// No point in scheduling an email to a contact that is not marketable.
-		if ( ! $contact || ! $contact->is_marketable() ) {
+		if ( ! $contact || ( ! $this->is_transactional && ! $contact->is_marketable() ) ) {
 			$this->skip_item( $item );
 
 			return;
@@ -181,6 +182,7 @@ class Broadcast_Scheduler extends Bulk_Job {
 		$this->send_time        = absint( $config['send_time'] );
 		$this->send_now         = filter_var( $config['send_now'], FILTER_VALIDATE_BOOLEAN );
 		$this->send_in_timezone = filter_var( $config['send_in_local_time'], FILTER_VALIDATE_BOOLEAN );
+		$this->is_transactional = filter_var( $config['is_transactional'], FILTER_VALIDATE_BOOLEAN );
 
 		$this->emails_scheduled = absint( get_transient( 'gh_emails_scheduled' ) );
 	}
