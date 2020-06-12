@@ -79,14 +79,20 @@ class Contact extends Base_Object_With_Meta {
 	 * @return false|string
 	 */
 	public function get_profile_picture() {
+
 		if ( $this->profile_picture ) {
-			return apply_filters( 'groundhogg/contact/profile_picture', $this->profile_picture );
+			$profile_pic = $this->profile_picture;
+		} else {
+			$profile_pic = get_avatar_url( $this->get_email(), [ 'size' => 300 ] );
+			$this->update_meta( 'profile_picture', $profile_pic );
 		}
 
-		$profile_pic = get_avatar_url( $this->get_email(), [ 'size' => 300 ] );
-		$this->update_meta( 'profile_picture', $profile_pic );
-		return apply_filters( 'groundhogg/contact/profile_picture', $profile_pic );
-
+		/**
+		 * @param $profile_picture string link to the current profile picture
+		 * @param $contact_id int the contact id
+		 * @param $contact Contact the contact
+		 */
+		return apply_filters( 'groundhogg/contact/profile_picture', $profile_pic, $this->get_id(), $this );
 	}
 
 	/**
