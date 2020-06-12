@@ -38,7 +38,7 @@ class Apply_Note extends Action {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Apply Note', 'step_name', 'groundhogg' );
+		return _x( 'Add Note', 'step_name', 'groundhogg' );
 	}
 
 	/**
