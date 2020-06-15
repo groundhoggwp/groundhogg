@@ -132,6 +132,7 @@ class Settings_Page extends Admin_Page {
 		$api_keys_table = new API_Keys_Table();
 		$api_keys_table->prepare_items();
 		?>
+        <h3><?php _e( 'API Keys', 'groundhogg' ); ?></h3>
         <div style="max-width: 900px;"><?php
 		$api_keys_table->display();
 		?></div><?php
@@ -368,11 +369,11 @@ class Settings_Page extends Admin_Page {
 				'tab'      => 'email',
 				'callback' => [ Plugin::$instance->bounce_checker, 'test_connection_ui' ],
 			),
-			'api_settings'      => array(
-				'id'    => 'api_settings',
-				'title' => _x( 'API Settings', 'settings_sections', 'groundhogg' ),
-				'tab'   => 'api_tab'
-			),
+//			'api_settings'      => array(
+//				'id'    => 'api_settings',
+//				'title' => _x( 'API Settings', 'settings_sections', 'groundhogg' ),
+//				'tab'   => 'api_tab'
+//			),
 			'optin_status_tags' => [
 				'id'       => 'optin_status_tags',
 				'title'    => _x( 'Optin Status Tags', 'settings_sections', 'groundhogg' ),
@@ -846,8 +847,8 @@ class Settings_Page extends Admin_Page {
 					'name'        => 'gh_email_footer_alignment',
 					'id'          => 'gh_email_footer_alignment',
 					'options'     => [
+						'left'   => __( 'Left' ),
 						'center' => __( 'Center' ),
-						'left'   => __( 'Left' )
 					],
 					'option_none' => false,
 				),
@@ -861,19 +862,19 @@ class Settings_Page extends Admin_Page {
 				'args'    => [ 'sanitize_callback' => 'wp_kses_post' ],
 				'atts'    => [ 'replacements_button' => true ],
 			],
-			'gh_disable_api'                         => array(
-				'id'      => 'gh_disable_api',
-				'section' => 'api_settings',
-				'label'   => sprintf( _x( 'Disable the %s API', 'settings', 'groundhogg' ), white_labeled_name() ),
-				'desc'    => _x( 'Disabling the API will prevent other platforms from accessing information on this site. Functionality in some extensions may be affected as well.', 'settings', 'groundhogg' ),
-				'type'    => 'checkbox',
-				'atts'    => array(
-					'label' => __( 'Disable' ),
-					'name'  => 'gh_disable_api',
-					'id'    => 'gh_disable_api',
-					'value' => 'on',
-				),
-			),
+//			'gh_disable_api'                         => array(
+//				'id'      => 'gh_disable_api',
+//				'section' => 'api_settings',
+//				'label'   => sprintf( _x( 'Disable the %s API', 'settings', 'groundhogg' ), white_labeled_name() ),
+//				'desc'    => _x( 'Disabling the API will prevent other platforms from accessing information on this site. Functionality in some extensions may be affected as well.', 'settings', 'groundhogg' ),
+//				'type'    => 'checkbox',
+//				'atts'    => array(
+//					'label' => __( 'Disable' ),
+//					'name'  => 'gh_disable_api',
+//					'id'    => 'gh_disable_api',
+//					'value' => 'on',
+//				),
+//			),
 			'gh_confirmed_tag'                       => [
 				'id'      => 'gh_confirmed_tag',
 				'section' => 'optin_status_tags',

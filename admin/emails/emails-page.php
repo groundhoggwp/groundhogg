@@ -346,12 +346,12 @@ class Emails_Page extends Admin_Page {
 
 		$from_user = absint( Groundhogg\get_request_var( 'from_user' ) );
 
-		if ( $from_user > 0 ) {
-			$user = get_userdata( $from_user );
-			if ( ! Groundhogg\email_is_same_domain( $user->user_email ) ) { //todo
-				$this->add_notice( 'email-cross-domain-warning', sprintf( __( 'You are sending this email from an email address (%s) which does not belong to this server. This may cause deliverability issues and harm your sender reputation.', 'groundhogg' ), $user->user_email ), 'warning' );
-			}
-		}
+//		if ( $from_user > 0 ) {
+//			$user = get_userdata( $from_user );
+//			if ( ! Groundhogg\email_is_same_domain( $user->user_email ) ) { //todo
+//				$this->add_notice( 'email-cross-domain-warning', sprintf( __( 'You are sending this email from an email address (%s) which does not belong to this server. This may cause deliverability issues and harm your sender reputation.', 'groundhogg' ), $user->user_email ), 'warning' );
+//			}
+//		}
 
 		$subject    = sanitize_text_field( Groundhogg\get_request_var( 'subject' ) );
 		$pre_header = sanitize_text_field( Groundhogg\get_request_var( 'pre_header' ) );

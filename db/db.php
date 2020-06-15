@@ -706,6 +706,8 @@ abstract class DB {
 
 		switch ( $func ) {
 			case 'count':
+				$results = absint( $wpdb->get_var( $sql ) );
+				break;
 			case 'sum':
 			case 'avg':
 				$results = $wpdb->get_var( $sql );

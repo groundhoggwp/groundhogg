@@ -206,7 +206,7 @@ class Mailhawk {
 
 		}
 
-		echo sprintf( '<button type="button" class="button button-primary big-button" id="groundhogg-mailhawk-connect">%s %s</button>', dashicon( 'email-alt' ), __( 'Connect MailHawk' ) );
+		echo sprintf( '<button type="button" class="button button-primary" id="groundhogg-mailhawk-connect">%s %s</button>', dashicon( 'email-alt' ), __( 'Connect MailHawk' ) );
 	}
 
 	/**
@@ -219,21 +219,17 @@ class Mailhawk {
 	public function output_css() {
 		?>
         <style type="text/css">
-            #groundhogg-mailhawk-connect {
+            #wpbody #groundhogg-mailhawk-connect {
                 font-size: 16px;
                 height: auto;
                 margin: 0 0 6px;
                 padding: 8px 14px;
             }
 
-            #groundhogg-mailhawk-connect .fa {
-                margin-right: 4px;
-            }
-
             #groundhogg-mailhawk-connect .dashicons {
                 /*vertical-align: middle;*/
                 font-size: 26px;
-                margin-right: 10px;
+                margin: 5px 10px 0 0;
             }
         </style>
 		<?php

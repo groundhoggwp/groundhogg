@@ -44,6 +44,8 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 
 class Funnels_Table extends WP_List_Table {
 
+	protected $default_view = 'active';
+
 	/**
 	 * TT_Example_List_Table constructor.
 	 *
@@ -78,6 +80,10 @@ class Funnels_Table extends WP_List_Table {
 			'date_created'    => _x( 'Date Created', 'Column label', 'groundhogg' ),
 		);
 
+		if ( $this->get_view() !== 'active' ){
+			unset( $columns[ 'active_contacts' ] );
+		}
+
 		return apply_filters( 'groundhogg_funnels_get_columns', $columns );
 	}
 
@@ -110,10 +116,15 @@ class Funnels_Table extends WP_List_Table {
 		$views = array();
 
 		$count = array(
-			'active'   => Plugin::$instance->dbs->get_db( 'funnels' )->count( array( 'status' => 'active' ) ),
-			'inactive' => Plugin::$instance->dbs->get_db( 'funnels' )->count( array( 'status' => 'inactive' ) ),
-			'archived' => Plugin::$instance->dbs->get_db( 'funnels' )->count( array( 'status' => 'archived' ) )
+			'active'   => get_db( 'funnels' )->count( array( 'status' => 'active' ) ),
+			'inactive' => get_db( 'funnels' )->count( array( 'status' => 'inactive' ) ),
+			'archived' => get_db( 'funnels' )->count( array( 'status' => 'archived' ) )
 		);
+
+		// If there are no scheduled broadcasts, go to the sent view
+		if ( $count[ 'active' ] === 0 && $this->get_view() === 'active' ){
+			$this->default_view = 'inactive';
+		}
 
 		$views['active']   = "<a class='" . print_r( ( $this->get_view() === 'active' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&status=active' ) . "'>" . _x( 'Active', 'view', 'groundhogg' ) . " <span class='count'>(" . $count['active'] . ")</span>" . "</a>";
 		$views['inactive'] = "<a class='" . print_r( ( $this->get_view() === 'inactive' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&status=inactive' ) . "'>" . _x( 'Inactive', 'view', 'groundhogg' ) . " <span class='count'>(" . $count['inactive'] . ")</span>" . "</a>";
@@ -122,8 +133,13 @@ class Funnels_Table extends WP_List_Table {
 		return apply_filters( 'groundhogg_funnel_views', $views );
 	}
 
+	/**
+	 * Get the current view
+	 *
+	 * @return string
+	 */
 	protected function get_view() {
-		return sanitize_text_field( get_request_var( 'status', 'active' ) );
+		return sanitize_text_field( get_url_var( 'status', $this->default_view ) );
 	}
 
 	/**

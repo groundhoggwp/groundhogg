@@ -49,6 +49,8 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 
 class Broadcasts_Table extends WP_List_Table {
 
+	protected $default_view = 'scheduled';
+
 	/**
 	 * TT_Example_List_Table constructor.
 	 *
@@ -123,10 +125,15 @@ class Broadcasts_Table extends WP_List_Table {
 	 */
 	protected function get_views() {
 		$count = array(
-			'scheduled' => Plugin::$instance->dbs->get_db( 'broadcasts' )->count( [ 'status' => 'scheduled' ] ),
-			'sent'      => Plugin::$instance->dbs->get_db( 'broadcasts' )->count( [ 'status' => 'sent' ] ),
-			'cancelled' => Plugin::$instance->dbs->get_db( 'broadcasts' )->count( [ 'status' => 'cancelled' ] ),
+			'scheduled' => get_db( 'broadcasts' )->count( [ 'status' => 'scheduled' ] ),
+			'sent'      => get_db( 'broadcasts' )->count( [ 'status' => 'sent' ] ),
+			'cancelled' => get_db( 'broadcasts' )->count( [ 'status' => 'cancelled' ] ),
 		);
+
+		// If there are no scheduled broadcasts, go to the sent view
+		if ( $count[ 'scheduled' ] === 0 && $this->get_view() === 'scheduled' ){
+			$this->default_view = 'sent';
+		}
 
 		$views['scheduled'] = "<a class='" . print_r( ( $this->get_view() === 'scheduled' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&status=scheduled' ) . "'>" . _x( 'Scheduled', 'view', 'groundhogg' ) . " <span class='count'>(" . $count['scheduled'] . ")</span>" . "</a>";
 		$views['sent']      = "<a class='" . print_r( ( $this->get_view() === 'sent' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&status=sent' ) . "'>" . _x( 'Sent', 'view', 'groundhogg' ) . " <span class='count'>(" . $count['sent'] . ")</span>" . "</a>";
@@ -135,8 +142,13 @@ class Broadcasts_Table extends WP_List_Table {
 		return apply_filters( 'groundhogg/admin/broadcasts/table/get_views', $views );
 	}
 
+	/**
+	 * Get the current view
+	 *
+	 * @return mixed
+	 */
 	protected function get_view() {
-		return get_url_var( 'status', 'scheduled' );
+		return get_url_var( 'status', $this->default_view );
 	}
 
 	/**

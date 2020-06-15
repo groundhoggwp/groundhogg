@@ -3,6 +3,7 @@
 namespace Groundhogg;
 
 use Groundhogg\Bulk_Jobs\Manager;
+use Groundhogg\Bulk_Jobs\Migrate_Notes;
 use Groundhogg\DB\Activity;
 
 /**
@@ -288,8 +289,13 @@ class Main_Updater extends Updater {
 	 * Migrate notes
 	 */
 	public function version_2_2_14(){
+
 		Plugin::$instance->dbs->install_dbs();
-		update_option( 'gh_migrate_notes', 1 );
+
+		add_action( 'groundhogg/updater/main/finished', function (){
+			$migrate_notes = new Migrate_Notes();
+			$migrate_notes->start();
+		} );
 	}
 
 	/**

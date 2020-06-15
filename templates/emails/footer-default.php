@@ -9,11 +9,12 @@
  * @since       File available since Release 0.1
  */
 
+use function Groundhogg\array_to_css;
 use function Groundhogg\html;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-$footer_alignment = get_option( 'gh_email_footer_alignment', 'center' );
+$footer_alignment = get_option( 'gh_email_footer_alignment', 'left' );
 
 $footer = apply_filters( 'groundhogg/email_template/footer_css', [
     'clear' => 'both',
@@ -22,7 +23,7 @@ $footer = apply_filters( 'groundhogg/email_template/footer_css', [
     'width' => '100%',
 ] );
 
-$footer = \Groundhogg\array_to_css( $footer );
+$footer = array_to_css( $footer );
 
 $footer_container = apply_filters( 'groundhogg/email_template/footer_container_css', [
     'border-collapse' => 'separate',
@@ -31,34 +32,31 @@ $footer_container = apply_filters( 'groundhogg/email_template/footer_container_c
     'width' => '100%',
 ] );
 
-$footer_container = \Groundhogg\array_to_css( $footer_container );
+$footer_container = array_to_css( $footer_container );
 
 $footer_css = apply_filters( 'groundhogg/email_template/footer_content_css', [
     'font-family' => 'sans-serif',
     'vertical-align' => 'top',
     'padding-bottom' => '10px',
     'padding-top' => '10px',
-    'font-size' => '13px',
+    'font-size' => '12px',
     'color' => '#999999',
     'text-align' => $footer_alignment
 ] );
 
-$footer_css = \Groundhogg\array_to_css( $footer_css );
+$footer_css = array_to_css( $footer_css );
 
 $apple_link = apply_filters( 'groundhogg/email_template/apple_link_css', [
     'color' => '#999999',
-    'font-size' => '13px',
+    'font-size' => '12px',
     'text-align' => $footer_alignment
 ]);
 
-$apple_link = \Groundhogg\array_to_css( $apple_link );
+$apple_link = array_to_css( $apple_link );
 
 do_action( 'groundhogg/templates/email/footer/before' );
 
 $footer_info = [
-    html()->e( 'a', [
-        'href' => apply_filters( 'groundhogg/email_template/preferences_link', home_url() ),
-    ], apply_filters( 'groundhogg/email_template/preferences_text', __( "Change preferences", 'groundhogg' ) ) ) . '.',
     html()->e( 'span', [], [
         apply_filters( 'groundhogg/email_template/pre_unsubscribe_text', __( "Don't want these emails?", 'groundhogg' )),
         " ",

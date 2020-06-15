@@ -628,7 +628,7 @@ class Contacts_Table extends WP_List_Table {
         <div class="alignleft gh-actions">
 			<?php
 
-			if ( current_user_can( 'export_contacts' ) ) {
+			if ( current_user_can( 'export_contacts' ) && $this->get_pagination_arg( 'total_items' ) > 0 ) {
 				$export_query = $this->query;
 
 

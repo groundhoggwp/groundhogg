@@ -177,15 +177,22 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.2.14 (2020-06-05) =
-* ADDED Saved searches.
-* ADDED Edit/Delete notes.
-* ADDED Notes context.
+= 2.2.14 (2020-06-15) =
+* ADDED Saved searches, custom searches can be saved and loaded.
+* ADDED Ability to edit/delete contact notes.
+* ADDED Notes context, when the note was created/last edited and by whom.
 * ADDED Transactional email support for broadcasts.
 * ADDED View Query action for broadcasts.
 * ADDED Review broadcast step before it goes live.
+* ADDED Warning if permalinks are set to plain.
 * TWEAKED Better email device preview.
-* TWEAKED Changed `Apply Note` to `Add Note`
+* TWEAKED Changed `Apply Note` to `Add Note`.
+* TWEAKED Broadcasts table view will default to sent if there are no scheduled broadcasts.
+* TWEAKED Funnels table view will default to inactive if there are no active funnels.
+* FIXED Do not show export contacts button for queries with no results.
+* REMOVED Option to disable the API. Disables critical functionality.
+* REMOVED `Change Preferences` link from email footer.
+* REMOVED Domain mismatch warning, there are many use cases where this warning is not relevant.
 
 = 2.2.13 (2020-06-02) =
 * ADDED Ability to restrict tabs in the settings by user capabilities.
