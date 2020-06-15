@@ -680,16 +680,19 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                 </td>
             </tr>
         </table>
-        <div id="gh-notes">
 		<?php
 
 		$notes = $contact->get_all_notes();
 
-		foreach ( $notes as $note ) {
-			include __DIR__ . '/note.php';
+		if ( $notes ) {
+			echo "<div id='gh-notes'>";
+			foreach ( $notes as $note ) {
+				include __DIR__ . '/note.php';
+			}
+			echo "</div>";
 		}
-
-		?></div><?php
+		?>
+		<?php
 
 		// Legacy notes...
 		if ( $contact->get_meta( 'notes' ) ) {
