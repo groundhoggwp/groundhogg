@@ -172,15 +172,17 @@ class Broadcasts_Page extends Admin_Page {
 		// Assume marketing by default...
 		$config[ 'is_transactional' ] = false;
 
-		// if the email is not a transactional email we will by add the relevant optin statuses to the query
-		if ( $config['object_type'] === 'email' && isset( $email ) && ! $email->is_transactional() ){
+		// Add marketable statuses
+		$query[ 'optin_status' ] = [
+			Preferences::CONFIRMED,
+			Preferences::UNCONFIRMED,
+		];
 
-			// Add marketable statuses
-			$query[ 'optin_status' ] = [
-				Preferences::CONFIRMED,
-				Preferences::UNCONFIRMED,
-			];
-
+		// if the email is a transactional email we will remove the optin statuses from the query
+		if ( $config['object_type'] === 'email' && isset( $email ) && $email->is_transactional() ){
+			// ignore marketable statuses...
+			unset( $query[ 'optin_status' ] );
+			// make transactional
 			$config[ 'is_transactional' ] = true;
 		}
 

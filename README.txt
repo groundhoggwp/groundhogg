@@ -177,6 +177,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.15.1 (2020-06-16) =
+* HOT FIX Cancelled broadcasts are not moved out of the event queue.
+* HOT FIX Contact marketability is not checked while scheduling the broadcast for non transactional emails.
+
 = 2.2.15 (2020-06-16) =
 * TWEAKED Some contact editor CSS.
 * TWEAKED Replaced all occurrences `dirname( __FILE__ )` with `__DIR__`.
