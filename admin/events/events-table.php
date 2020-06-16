@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Events;
 
 use Groundhogg\Event;
+use function Groundhogg\_nf;
 use function Groundhogg\action_url;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
@@ -281,11 +282,11 @@ class Events_Table extends WP_List_Table {
 		);
 
 		return apply_filters( 'gh_event_views', array(
-			'waiting'   => "<a class='" . ( $view === 'waiting' ? 'current' : '' ) . "' href='" . $base_url . "waiting" . "'>" . _x( 'Waiting', 'view', 'groundhogg' ) . ' <span class="count">(' . $count['waiting'] . ')</span>' . "</a>",
-			'completed' => "<a class='" . ( $view === 'complete' ? 'current' : '' ) . "' href='" . $base_url . "complete" . "'>" . _x( 'Completed', 'view', 'groundhogg' ) . ' <span class="count">(' . $count['completed'] . ')</span>' . "</a>",
-			'skipped'   => "<a class='" . ( $view === 'skipped' ? 'current' : '' ) . "' href='" . $base_url . "skipped" . "'>" . _x( 'Skipped', 'view', 'groundhogg' ) . ' <span class="count">(' . $count['skipped'] . ')</span>' . "</a>",
-			'cancelled' => "<a class='" . ( $view === 'cancelled' ? 'current' : '' ) . "' href='" . $base_url . "cancelled" . "'>" . _x( 'Cancelled', 'view', 'groundhogg' ) . ' <span class="count">(' . $count['cancelled'] . ')</span>' . "</a>",
-			'failed'    => "<a class='" . ( $view === 'failed' ? 'current' : '' ) . "' href='" . $base_url . "failed" . "'>" . _x( 'Failed', 'view', 'groundhogg' ) . ' <span class="count">(' . $count['failed'] . ')</span>' . "</a>"
+			'waiting'   => "<a class='" . ( $view === 'waiting' ? 'current' : '' ) . "' href='" . $base_url . "waiting" . "'>" . _x( 'Waiting', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['waiting'] ) . ')</span>' . "</a>",
+			'completed' => "<a class='" . ( $view === 'complete' ? 'current' : '' ) . "' href='" . $base_url . "complete" . "'>" . _x( 'Completed', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['completed'] ) . ')</span>' . "</a>",
+			'skipped'   => "<a class='" . ( $view === 'skipped' ? 'current' : '' ) . "' href='" . $base_url . "skipped" . "'>" . _x( 'Skipped', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['skipped'] ) . ')</span>' . "</a>",
+			'cancelled' => "<a class='" . ( $view === 'cancelled' ? 'current' : '' ) . "' href='" . $base_url . "cancelled" . "'>" . _x( 'Cancelled', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['cancelled'] ) . ')</span>' . "</a>",
+			'failed'    => "<a class='" . ( $view === 'failed' ? 'current' : '' ) . "' href='" . $base_url . "failed" . "'>" . _x( 'Failed', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['failed'] ) . ')</span>' . "</a>"
 		) );
 	}
 
@@ -325,7 +326,9 @@ class Events_Table extends WP_List_Table {
 				case 'skipped':
 				case 'failed':
 					$actions['execute_again'] = html()->e( 'a', [
-						'href' => action_url( 'execute_again', [ 'event' => $event->get_id(), 'status' => $this->get_view() ] ),
+						'href' => action_url( 'execute_again', [ 'event'  => $event->get_id(),
+						                                         'status' => $this->get_view()
+						] ),
 					], __( 'Run Again', 'groundhogg' ) );
 					break;
 			}

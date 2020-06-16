@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Funnel;
+use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
@@ -126,9 +127,9 @@ class Funnels_Table extends WP_List_Table {
 			$this->default_view = 'inactive';
 		}
 
-		$views['active']   = "<a class='" . print_r( ( $this->get_view() === 'active' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&status=active' ) . "'>" . _x( 'Active', 'view', 'groundhogg' ) . " <span class='count'>(" . $count['active'] . ")</span>" . "</a>";
-		$views['inactive'] = "<a class='" . print_r( ( $this->get_view() === 'inactive' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&status=inactive' ) . "'>" . _x( 'Inactive', 'view', 'groundhogg' ) . " <span class='count'>(" . $count['inactive'] . ")</span>" . "</a>";
-		$views['archived'] = "<a class='" . print_r( ( $this->get_view() === 'archived' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&status=archived' ) . "'>" . _x( 'Archived', 'view', 'groundhogg' ) . " <span class='count'>(" . $count['archived'] . ")</span>" . "</a>";
+		$views['active']   = "<a class='" . print_r( ( $this->get_view() === 'active' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&status=active' ) . "'>" . _x( 'Active', 'view', 'groundhogg' ) . " <span class='count'>(" . _nf( $count['active'] ) . ")</span>" . "</a>";
+		$views['inactive'] = "<a class='" . print_r( ( $this->get_view() === 'inactive' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&status=inactive' ) . "'>" . _x( 'Inactive', 'view', 'groundhogg' ) . " <span class='count'>(" . _nf( $count['inactive'] ) . ")</span>" . "</a>";
+		$views['archived'] = "<a class='" . print_r( ( $this->get_view() === 'archived' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_funnels&status=archived' ) . "'>" . _x( 'Archived', 'view', 'groundhogg' ) . " <span class='count'>(" . _nf( $count['archived'] ) . ")</span>" . "</a>";
 
 		return apply_filters( 'groundhogg_funnel_views', $views );
 	}
@@ -229,7 +230,7 @@ class Funnels_Table extends WP_List_Table {
 		];
 
 
-		$count = $query->query( array_merge( [ 'count' => true ], $query_args ) );
+		$count = _nf( $query->query( array_merge( [ 'count' => true ], $query_args ) ) );
 
 		$queryUrl = admin_page_url( 'gh_contacts', $query_args );
 

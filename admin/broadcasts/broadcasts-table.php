@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Broadcasts;
 use Groundhogg\Broadcast;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Event;
+use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
@@ -110,7 +111,7 @@ class Broadcasts_Table extends WP_List_Table {
 	protected function get_sortable_columns() {
 		$sortable_columns = array(
 			'object_id'      => array( 'object_id', false ),
-			'from_user'      => array( 'from_user', false ),
+			'from_user'      => array( 'scheduled_by', false ),
 			'send_time'      => array( 'send_time', false ),
 			'date_scheduled' => array( 'date_scheduled', false )
 		);
@@ -130,14 +131,30 @@ class Broadcasts_Table extends WP_List_Table {
 			'cancelled' => get_db( 'broadcasts' )->count( [ 'status' => 'cancelled' ] ),
 		);
 
+		$titles = [
+			'scheduled' => _x( 'Scheduled', 'view', 'groundhogg' ),
+			'sent'      => _x( 'Sent', 'view', 'groundhogg' ),
+			'cancelled' => _x( 'Cancelled', 'view', 'groundhogg' ),
+		];
+
 		// If there are no scheduled broadcasts, go to the sent view
-		if ( $count[ 'scheduled' ] === 0 && $this->get_view() === 'scheduled' ){
+		if ( $count['scheduled'] === 0 && $this->get_view() === 'scheduled' ) {
 			$this->default_view = 'sent';
 		}
 
-		$views['scheduled'] = "<a class='" . print_r( ( $this->get_view() === 'scheduled' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&status=scheduled' ) . "'>" . _x( 'Scheduled', 'view', 'groundhogg' ) . " <span class='count'>(" . $count['scheduled'] . ")</span>" . "</a>";
-		$views['sent']      = "<a class='" . print_r( ( $this->get_view() === 'sent' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&status=sent' ) . "'>" . _x( 'Sent', 'view', 'groundhogg' ) . " <span class='count'>(" . $count['sent'] . ")</span>" . "</a>";
-		$views['cancelled'] = "<a class='" . print_r( ( $this->get_view() === 'cancelled' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_broadcasts&status=cancelled' ) . "'>" . _x( 'Cancelled', 'view', 'groundhogg' ) . " <span class='count'>(" . $count['cancelled'] . ")</span>" . "</a>";
+		$views = [];
+
+		foreach ( $count as $c => $num ) {
+
+			$view_content = $titles[ $c ];
+			$view_content .= " <span class='count'>(" . _nf( $count[ $c ] ) . ")</span>";
+
+			$views[ $c ] = html()->e( 'a', [
+				'href'  => admin_page_url( 'gh_broadcasts', [ 'status' => $c ] ),
+				'class' => $this->get_view() === $c ? 'current' : ''
+			], $view_content );
+
+		}
 
 		return apply_filters( 'groundhogg/admin/broadcasts/table/get_views', $views );
 	}
@@ -190,17 +207,17 @@ class Broadcasts_Table extends WP_List_Table {
 		// Add query action
 		$query = $broadcast->get_query();
 
-		if ( ! empty( $query ) && is_array( $query ) ){
-			$query[ 'search' ] = 'on';
+		if ( ! empty( $query ) && is_array( $query ) ) {
+			$query['search'] = 'on';
 
-			$actions[ 'query' ] = html()->e( 'a', [
+			$actions['query'] = html()->e( 'a', [
 				'href' => admin_page_url( 'gh_contacts', $query )
 			], 'View Query' );
 		}
 
 		$report_data = $broadcast->get_report_data();
 
-		if ( $broadcast->get_send_time() > time() && $report_data[ 'waiting' ] > 0 ) {
+		if ( $broadcast->get_send_time() > time() && $report_data['waiting'] > 0 ) {
 			$actions['trash'] = "<a class='delete' href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_broadcasts&view=all&action=cancel&broadcast=' . $broadcast->get_id() ), 'cancel' ) . "'>" . _x( 'Cancel', 'action', 'groundhogg' ) . "</a>";
 		}
 
@@ -268,10 +285,10 @@ class Broadcasts_Table extends WP_List_Table {
 	 *
 	 * @return string
 	 */
-	protected function column_query( $broadcast ){
+	protected function column_query( $broadcast ) {
 
-		$query = $broadcast->get_query();
-		$query[ 'search' ] = 'on';
+		$query           = $broadcast->get_query();
+		$query['search'] = 'on';
 
 		return html()->e( 'a', [
 			'href' => admin_page_url( 'gh_contacts', $query )
@@ -302,7 +319,7 @@ class Broadcasts_Table extends WP_List_Table {
 			]
 		] );
 
-		$link = sprintf( "<a href='%s'>%S</a>",
+		$link = sprintf( "<a href='%s'>%s</a>",
 			$link,
 			number_format_i18n( $num )
 		);
@@ -325,25 +342,8 @@ class Broadcasts_Table extends WP_List_Table {
 
 		$html = "";
 
-		// Show the speed of a broadcast
-		if ( isset_not_empty( $stats, 'speed' ) ) {
-			$html .= sprintf(
-				"%s: <strong title='%s'>%s/s</strong><br/>",
-				_x( "Speed", 'stats', 'groundhogg' ),
-				esc_attr( "Emails per second", 'stats', 'groundhogg' ),
-				$stats['speed']
-			);
-
-//			$html .= sprintf(
-//				"%s: <strong title='%s'>%ss</strong><br/>",
-//				_x( "Time", 'stats', 'groundhogg' ),
-//				esc_attr( "Total time elapsed", 'stats', 'groundhogg' ),
-//				$stats['time_elapsed']
-//			);
-		}
-
 		$html .= sprintf(
-			"%s: <strong><a href='%s'>%d</a></strong><br/>",
+			"%s: <strong><a href='%s'>%s</a></strong><br/>",
 			_x( "Sent", 'stats', 'groundhogg' ),
 			add_query_arg(
 				[
@@ -355,13 +355,13 @@ class Broadcasts_Table extends WP_List_Table {
 				],
 				admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
 			),
-			number_format_i18n( $stats['sent'] )
+			_nf( $stats['sent'] )
 		);
 
 		if ( ! $broadcast->is_sms() ) {
 
 			$html .= sprintf(
-				"%s: <strong><a href='%s'>%d</a></strong><br/>",
+				"%s: <strong><a href='%s'>%s</a></strong><br/>",
 				_x( "Opened", 'stats', 'groundhogg' ),
 				add_query_arg(
 					[
@@ -373,11 +373,11 @@ class Broadcasts_Table extends WP_List_Table {
 					],
 					admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
 				),
-				number_format_i18n( $stats['opened'] )
+				_nf( $stats['opened'] )
 			);
 
 			$html .= sprintf(
-				"%s: <strong><a href='%s'>%d</a></strong><br/>",
+				"%s: <strong><a href='%s'>%s</a></strong><br/>",
 				_x( "Clicked", 'stats', 'groundhogg' ),
 				add_query_arg(
 					[
@@ -389,7 +389,7 @@ class Broadcasts_Table extends WP_List_Table {
 					],
 					admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
 				),
-				number_format_i18n( $stats['clicked'] )
+				_nf( $stats['clicked'] )
 			);
 		}
 
