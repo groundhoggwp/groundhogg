@@ -10,6 +10,7 @@ use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
@@ -72,11 +73,11 @@ class Table_Funnel_Stats extends Base_Table_Report {
 
 			$data[] =[
 				'step' => $title,
-				'completed' =>  html()->wrap( $count_completed, 'a', [
+				'completed' =>  html()->wrap( _nf( $count_completed ), 'a', [
 					'href'  => $url_completed,
 					'class' => 'number-total'
 				] ),
-				'waiting' => html()->wrap( $count_waiting, 'a', [
+				'waiting' => html()->wrap( _nf( $count_waiting ), 'a', [
 					'href'  => $url_waiting,
 					'class' => 'number-total'
 				] )

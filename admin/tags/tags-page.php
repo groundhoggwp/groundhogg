@@ -218,7 +218,7 @@ class Tags_Page extends Admin_Page {
 
 	public function view() {
 		if ( ! class_exists( 'Tags_Table' ) ) {
-			include dirname( __FILE__ ) . '/tags-table.php';
+			include __DIR__ . '/tags-table.php';
 		}
 
 		$tags_table = new Tags_Table();
@@ -294,6 +294,6 @@ class Tags_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		include dirname( __FILE__ ) . '/edit.php';
+		include __DIR__ . '/edit.php';
 	}
 }

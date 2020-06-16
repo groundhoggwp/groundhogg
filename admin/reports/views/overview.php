@@ -76,20 +76,8 @@ use function Groundhogg\is_white_labeled;
 
         </div>
     </div>
-    <div class="groundhogg-chart">
-        <h2 class="title"><?php _e( 'Lead Score', 'groundhogg' ); ?></h2>
-		<?php if ( has_action( 'groundhogg/admin/report/lead_score' ) ) : ?>
-			<?php do_action( 'groundhogg/admin/report/lead_score' ); ?>
-		<?php else : ?>
-            <p class="notice-no-data">
-				<?php _e( 'Please Enable Lead Scoring Plugin to view this data.', 'groundhogg' );
-				if ( ! is_white_labeled() ) {
-					echo html()->wrap( 'Click Here To Download', 'a', [ 'href' => 'https://www.groundhogg.io/downloads/lead-scoring/' ] );
-				}
-				?>
-            </p>
-		<?php endif; ?>
-    </div>
+
+	<?php include __DIR__ . '/leadscoring.php'; ?>
 </div>
 
 <div class="groundhogg-chart-wrapper">

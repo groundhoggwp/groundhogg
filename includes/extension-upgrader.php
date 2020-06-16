@@ -120,7 +120,7 @@ class Extension_Upgrader {
 			$data = get_plugin_data( $file_path );
 
 			if ( ! class_exists( '\GH_EDD_SL_Plugin_Updater' ) ) {
-				require_once dirname( __FILE__ ) . '/lib/edd/GH_EDD_SL_Plugin_Updater.php';
+				require_once __DIR__ . '/lib/edd/GH_EDD_SL_Plugin_Updater.php';
 			}
 
 			$updater = new \GH_EDD_SL_Plugin_Updater( License_Manager::$storeUrl, $file_path, [

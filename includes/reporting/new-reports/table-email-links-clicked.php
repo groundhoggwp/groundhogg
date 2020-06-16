@@ -5,6 +5,7 @@ namespace Groundhogg\Reporting\New_Reports;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Email;
 use Groundhogg\Plugin;
+use function Groundhogg\_nf;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
 
@@ -65,7 +66,7 @@ class Table_Email_Links_Clicked extends Base_Table_Report {
 					'title'  => $link['referer'],
 					'target' => '_blank',
 				] ),
-				'uniques' => html()->wrap( $link['uniques'], 'a', [
+				'uniques' => html()->wrap( _nf( $link['uniques'] ), 'a', [
 					'href'  => add_query_arg(
 						[
 							'activity' => [
@@ -80,7 +81,7 @@ class Table_Email_Links_Clicked extends Base_Table_Report {
 					),
 					'class' => 'number-total'
 				] ),
-				'clicks'  => html()->wrap( $link['clicks'], 'span', [ 'class' => 'number-total' ] ),
+				'clicks'  => html()->wrap( _nf( $link['clicks'] ), 'span', [ 'class' => 'number-total' ] ),
 			];
 		}
 
@@ -88,7 +89,6 @@ class Table_Email_Links_Clicked extends Base_Table_Report {
 
 
 	}
-
 
 	/**
 	 * Normalize a datum
@@ -99,17 +99,7 @@ class Table_Email_Links_Clicked extends Base_Table_Report {
 	 * @return array
 	 */
 	protected function normalize_datum( $item_key, $item_data ) {
-
-		$label = ! empty( $item_key ) ? Plugin::$instance->utils->location->get_countries_list( $item_key ) : __( 'Unknown' );
-		$data  = $item_data;
-		$url   = ! empty( $item_key ) ? admin_url( sprintf( 'admin.php?page=gh_contacts&meta_key=country&meta_value=%s', $item_key ) ) : '#';
-
-
-		return [
-			'label' => $label,
-			'data'  => $data,
-			'url'   => $url
-		];
+		return $item_data;
 	}
 
 

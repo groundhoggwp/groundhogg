@@ -451,7 +451,7 @@ abstract class Extension {
 	 */
 	public function get_edd_updater() {
 		if ( ! class_exists( '\GH_EDD_SL_Plugin_Updater' ) ) {
-			require_once dirname( __FILE__ ) . '/lib/edd/GH_EDD_SL_Plugin_Updater.php';
+			require_once __DIR__ . '/lib/edd/GH_EDD_SL_Plugin_Updater.php';
 		}
 
 		return new \GH_EDD_SL_Plugin_Updater( License_Manager::$storeUrl, $this->get_plugin_file(), [

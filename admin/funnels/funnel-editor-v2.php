@@ -192,7 +192,7 @@ $funnel = new Funnel($funnel_id);
                 <div id="postbox-container-2-inner">
                     <?php Plugin::$instance->notices->print_notices(); ?>
                     <div style="width: 100%" id="reporting-wrap">
-                        <?php include_once dirname(__FILE__) . '/reporting.php'; ?>
+                        <?php include_once __DIR__ . '/reporting.php'; ?>
                         <div class="reporting-view-wrap">
                             <?php
 

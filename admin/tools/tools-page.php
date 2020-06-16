@@ -416,7 +416,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	public function import_view() {
 		if ( ! class_exists( 'WPGH_Imports_Table' ) ) {
-			require_once dirname( __FILE__ ) . '/imports-table.php';
+			require_once __DIR__ . '/imports-table.php';
 		}
 
 		$table = new Imports_Table(); ?>
@@ -431,14 +431,14 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 * Add new import view
 	 */
 	public function import_add() {
-		include dirname( __FILE__ ) . '/add-import.php';
+		include __DIR__ . '/add-import.php';
 	}
 
 	/**
 	 * Map import view
 	 */
 	public function import_map() {
-		include dirname( __FILE__ ) . '/map-import.php';
+		include __DIR__ . '/map-import.php';
 	}
 
 	/**
@@ -600,7 +600,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	public function export_view() {
 		if ( ! class_exists( 'Exports_Table' ) ) {
-			require_once dirname( __FILE__ ) . '/exports-table.php';
+			require_once __DIR__ . '/exports-table.php';
 		}
 
 		$table = new Exports_Table(); ?>

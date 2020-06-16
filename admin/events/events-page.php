@@ -290,7 +290,7 @@ class Events_Page extends Admin_Page {
 		}
 
 		if ( ! class_exists( 'Events_Table' ) ) {
-			include dirname( __FILE__ ) . '/events-table.php';
+			include __DIR__ . '/events-table.php';
 		}
 
 		$events_table = new Events_Table();

@@ -1,13 +1,16 @@
 <?php
+
 namespace Groundhogg\Admin\Contacts\Tables;
 
 use Groundhogg\Admin\Events;
+use function Groundhogg\action_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use Groundhogg\Plugin;
 use \WP_List_Table;
 use Groundhogg\Event;
+use function Groundhogg\html;
 
 /**
  * Contact Events table view
@@ -149,15 +152,35 @@ class Contact_Events_Table extends Events\Events_Table {
 	 * @return string
 	 */
 	protected function column_actions( $event ) {
-		$run     = esc_url( wp_nonce_url( admin_url( 'admin.php?page=gh_events&event=' . $event->get_id() . '&action=execute&return_to_contact=' . $event->get_contact_id() ), 'execute' ) );
-		$cancel  = esc_url( wp_nonce_url( admin_url( 'admin.php?page=gh_events&event=' . $event->get_id() . '&action=cancel&return_to_contact=' . $event->get_contact_id() ), 'cancel' ) );
 		$actions = array();
 
+		$contact_id = $event->get_contact_id();
+
 		if ( $event->is_waiting() ) {
-			$actions[] = sprintf( "<span class=\"run\"><a href=\"%s\" class=\"run\">%s</a></span>", $run, _x( 'Run Now', 'action', 'groundhogg' ) );
-			$actions[] = sprintf( "<span class=\"delete\"><a href=\"%s\" class=\"delete\">%s</a></span>", $cancel, _x( 'Cancel', 'action', 'groundhogg' ) );
+
+			$actions['execute_now'] = html()->e( 'a', [
+				'href' => action_url( 'execute_now', [
+					'page'              => 'gh_events',
+					'event'             => $event->get_id(),
+					'return_to_contact' => $contact_id
+				] ),
+			], __( 'Run now', 'groundhogg' ) );
+			$actions['delete']      = html()->e( 'a', [
+				'href' => action_url( 'cancel', [
+					'page'              => 'gh_events',
+					'event'             => $event->get_id(),
+					'return_to_contact' => $contact_id
+				] ),
+			], __( 'Cancel', 'groundhogg' ) );
 		} else {
-			$actions[] = sprintf( "<span class=\"run\"><a href=\"%s\" class=\"run\">%s</a></span>", $run, _x( 'Run Again', 'action', 'groundhogg' ) );
+			$actions['delete'] = html()->e( 'a', [
+				'href' => action_url( 'execute_again', [
+					'page'              => 'gh_events',
+					'event'             => $event->get_id(),
+					'status'            => $this->get_view(),
+					'return_to_contact' => $contact_id
+				] ),
+			], __( 'Run Again', 'groundhogg' ) );
 		}
 
 		return $this->row_actions( $actions );
@@ -193,7 +216,7 @@ class Contact_Events_Table extends Events\Events_Table {
 			'orderby' => $orderby,
 		);
 
-		$this->table = ($this->status === Event::WAITING ) ? 'event_queue' : 'events';
+		$this->table = ( $this->status === Event::WAITING ) ? 'event_queue' : 'events';
 
 		$events = get_db( $this->table )->query( $args );
 		$total  = get_db( $this->table )->count( $args );

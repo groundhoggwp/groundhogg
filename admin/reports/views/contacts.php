@@ -46,7 +46,7 @@ use function Groundhogg\is_white_labeled;
 <div class="groundhogg-chart-wrapper">
     <div class="groundhogg-chart">
         <h2 class="title"><?php _e( 'Opt-in Status', 'groundhogg' ); ?></h2>
-        <div style="width: 100%">
+        <div class="gh-donut-chart-wrap">
             <div class="float-left" style="width:60%">
                 <canvas id="chart_contacts_by_optin_status"></canvas>
             </div>
@@ -56,26 +56,13 @@ use function Groundhogg\is_white_labeled;
         </div>
     </div>
 
-    <div class="groundhogg-chart">
-        <h2 class="title"><?php _e( 'Lead Score', 'groundhogg' ); ?></h2>
-		<?php if ( has_action( 'groundhogg/admin/report/lead_score' ) ) : ?>
-			<?php do_action( 'groundhogg/admin/report/lead_score' ); ?>
-		<?php else : ?>
-            <p class="notice-no-data">
-				<?php _e( 'Please Enable Lead Scoring Plugin to view this data.', 'groundhogg' );
-				if ( ! is_white_labeled() ) {
-					echo html()->wrap( 'Click Here To Download', 'a', [ 'href' => 'https://www.groundhogg.io/downloads/lead-scoring/' ] );
-				}
-				?>
-            </p>
-		<?php endif; ?>
-    </div>
+    <?php include __DIR__ . '/leadscoring.php'; ?>
 </div>
 
 <div class="groundhogg-chart-wrapper">
     <div class="groundhogg-chart">
         <h2 class="title"><?php _e( 'Contacts By Country', 'groundhogg' ); ?></h2>
-        <div style="width: 100%">
+        <div class="gh-donut-chart-wrap">
             <div class="float-left" style="width:60%">
                 <canvas id="chart_contacts_by_country"></canvas>
             </div>
@@ -90,8 +77,7 @@ use function Groundhogg\is_white_labeled;
             <div class="actions" style="float:left;width: 50%;">
                 <h2 class="title"><?php _e( 'Contacts By Region', 'groundhogg' ); ?></h2>
             </div>
-            <div class="actions"
-                 style="float: right ; width: 50%;  margin-block-start: 0.83em;margin-block-end: 0.83em;">
+            <div class="actions" style="float: right ; width: 50%;  margin-block-start: 0.83em;margin-block-end: 0.83em;">
 				<?php
 				$args = array(
 					'name'        => 'country',
@@ -102,12 +88,16 @@ use function Groundhogg\is_white_labeled;
 					'option_none' => false,
 					'style'       => false
 				);
-				echo Plugin::$instance->utils->html->select2( $args );
+
+				if ( ! empty( $args[ 'data' ] ) ){
+					echo Plugin::$instance->utils->html->select2( $args );
+				}
+
 				?>
             </div>
-
+            <div class="wp-clearfix"></div>
         </div>
-        <div style="width: 100%">
+        <div class="gh-donut-chart-wrap">
             <div class="float-left" style="width:60%">
                 <canvas id="chart_contacts_by_region"></canvas>
             </div>

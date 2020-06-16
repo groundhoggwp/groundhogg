@@ -794,7 +794,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 
 	/* Use the GH SS Mailer class instead */
 	if ( ! ( $phpmailer instanceof GH_SS_Mailer ) ) {
-//        require_once dirname(__FILE__) . '/gh-ss-mailer.php';
+//        require_once __DIR__ . '/gh-ss-mailer.php';
 		$phpmailer = new GH_SS_Mailer( true );
 	}
 
@@ -2665,7 +2665,7 @@ function action_url( $action, $args = [] ) {
 		'_wpnonce' => wp_create_nonce( $action )
 	];
 
-	$url_args = array_filter( array_merge( $url_args, $args ) );
+	$url_args = array_filter( wp_parse_args( $args, $url_args ) );
 
 	return add_query_arg( urlencode_deep( $url_args ), admin_url( 'admin.php' ) );
 }

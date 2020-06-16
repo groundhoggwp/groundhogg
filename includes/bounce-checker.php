@@ -119,7 +119,7 @@ class Bounce_Checker
         if (!$this->bounce_handler) {
 
             if (!class_exists('\BounceHandler')) {
-                include_once dirname(__FILE__) . '/lib/PHP-Bounce-Handler-master/bounce_driver.class.php';
+                include_once __DIR__ . '/lib/PHP-Bounce-Handler-master/bounce_driver.class.php';
             }
 
             $this->bounce_handler = new \BounceHandler();

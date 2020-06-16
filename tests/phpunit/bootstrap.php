@@ -25,7 +25,7 @@ require_once $_tests_dir . '/includes/functions.php';
  * Manually load the plugin being tested.
  */
 function _manually_load_plugin() {
-	require dirname( dirname( dirname( __FILE__ ) ) ) . '/groundhogg.php';
+	require dirname( dirname( __DIR__ ) ) . '/groundhogg.php';
 }
 
 /**
@@ -45,17 +45,17 @@ require $_tests_dir . '/includes/bootstrap.php';
  * Load framework additions
  */
 function _load_framework_additions() {
-	require dirname( __FILE__ ) . '/framework/class-gh-unittest-factory-for-thing.php';
-	require dirname( __FILE__ ) . '/framework/class-gh-unittest-factory-for-contact.php';
-	require dirname( __FILE__ ) . '/framework/class-gh-unittest-factory-for-funnel.php';
-	require dirname( __FILE__ ) . '/framework/class-gh-unittest-factory-for-step.php';
-	require dirname( __FILE__ ) . '/framework/class-gh-unittest-factory-for-event.php';
-	require dirname( __FILE__ ) . '/framework/class-gh-unittest-factory-for-event-queue.php';
-	require dirname( __FILE__ ) . '/framework/class-gh-unittest-factory-for-activity.php';
-	require dirname( __FILE__ ) . '/framework/class-gh-unittest-factory.php';
-	require dirname( __FILE__ ) . '/framework/class-gh-unittest-id-generator.php';
-	require dirname( __FILE__ ) . '/framework/class-gh-unittest-time-generator.php';
-	require dirname( __FILE__ ) . '/framework/class-gh-unittestcase.php';
+	require __DIR__ . '/framework/class-gh-unittest-factory-for-thing.php';
+	require __DIR__ . '/framework/class-gh-unittest-factory-for-contact.php';
+	require __DIR__ . '/framework/class-gh-unittest-factory-for-funnel.php';
+	require __DIR__ . '/framework/class-gh-unittest-factory-for-step.php';
+	require __DIR__ . '/framework/class-gh-unittest-factory-for-event.php';
+	require __DIR__ . '/framework/class-gh-unittest-factory-for-event-queue.php';
+	require __DIR__ . '/framework/class-gh-unittest-factory-for-activity.php';
+	require __DIR__ . '/framework/class-gh-unittest-factory.php';
+	require __DIR__ . '/framework/class-gh-unittest-id-generator.php';
+	require __DIR__ . '/framework/class-gh-unittest-time-generator.php';
+	require __DIR__ . '/framework/class-gh-unittestcase.php';
 }
 
 _load_framework_additions();
