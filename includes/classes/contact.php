@@ -149,6 +149,11 @@ class Contact extends Base_Object_With_Meta {
 		$this->tags  = wp_parse_id_list( $this->get_tag_rel_db()->get_relationships( $this->ID ) );
 		$this->user  = get_userdata( $this->get_user_id() );
 		$this->owner = get_userdata( $this->get_owner_id() );
+
+		$this->ID           = absint( $this->ID );
+		$this->user_id      = absint( $this->user_id );
+		$this->owner_id     = absint( $this->owner_id );
+		$this->optin_status = absint( $this->optin_status );
 	}
 
 	/**
@@ -200,7 +205,7 @@ class Contact extends Base_Object_With_Meta {
 
 		$notes = [];
 
-		foreach ( $raw as $note ){
+		foreach ( $raw as $note ) {
 			$notes[] = new Note( absint( $note->ID ) );
 		}
 
@@ -381,7 +386,7 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @return bool
 	 */
-	public function add_note( $note, $context = 'system', $user_id=false ) {
+	public function add_note( $note, $context = 'system', $user_id = false ) {
 		if ( ! $note || ! is_string( $note ) ) {
 			return false;
 		}
@@ -816,15 +821,15 @@ class Contact extends Base_Object_With_Meta {
 	 * @return array
 	 */
 	public function get_as_array() {
-		$contact = $this->get_data();
-
-		$contact['ID']       = (string) $this->get_id();
+		$contact             = $this->get_data();
+		$contact['ID']       = $this->get_id();
 		$contact['gravatar'] = $this->get_profile_picture();
 		$contact['age']      = $this->get_age();
 
 		return apply_filters(
 			"groundhogg/{$this->get_object_type()}/get_as_array",
 			[
+				'ID'    => $this->get_id(),
 				'data'  => $contact,
 				'meta'  => $this->get_meta(),
 				'tags'  => $this->get_tags(),

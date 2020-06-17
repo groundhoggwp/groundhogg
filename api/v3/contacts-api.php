@@ -10,8 +10,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use function Groundhogg\current_user_is;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use Groundhogg\Plugin;
+use function Groundhogg\get_db;
 use function Groundhogg\sort_by_string_in_array;
 use WP_REST_Server;
 use WP_REST_Request;
@@ -30,25 +32,33 @@ class Contacts_Api extends Base {
 				'callback'            => [ $this, 'get_contacts' ],
 				'permission_callback' => $auth_callback,
 				'args'                => [
-					'query'   => [
+					'query'       => [
 						'required'    => false,
 						'description' => _x( 'An array of query args. See WPGH_Contact_Query for acceptable arguments.', 'api', 'groundhogg' ),
 					],
-					'select'  => [
+					'select'      => [
 						'required'    => false,
 						'description' => _x( 'Whether to retrieve as available for a select input.', 'api', 'groundhogg' ),
 					],
-					'select2' => [
+					'select2'     => [
 						'required'    => false,
 						'description' => _x( 'Whether to retrieve as available for an ajax select2 input.', 'api', 'groundhogg' ),
 					],
-					'search'  => [
+					'search'      => [
 						'required'    => false,
 						'description' => _x( 'Search string for tag name.', 'api', 'groundhogg' ),
 					],
-					'q'       => [
+					'q'           => [
 						'required'    => false,
 						'description' => _x( 'Shorthand for search.', 'api', 'groundhogg' ),
+					],
+					'id_or_email' => [
+						'required'    => false,
+						'description' => _x( 'The ID or email of the contact you want to get.', 'api', 'groundhogg' ),
+					],
+					'by_user_id'  => [
+						'required'    => false,
+						'description' => _x( 'Search using the user ID.', 'api', 'groundhogg' ),
 					],
 				]
 			],
@@ -58,7 +68,7 @@ class Contacts_Api extends Base {
 				'permission_callback' => $auth_callback,
 				'args'                => [
 					'contact' => [
-						'required'    => true,
+						'required'    => false,
 						'description' => _x( 'Contains list of contact arguments. Please visit www.groundhogg.io for full list of accepted arguments.', 'api', 'groundhogg' )
 					]
 				]
@@ -290,17 +300,23 @@ class Contacts_Api extends Base {
 
 		$contact_query = new Contact_Query();
 
-		// Sales person can only see their own contacts...
-		if ( current_user_is( 'sales_manager' ) ) {
-			$query['owner'] = get_current_user_id();
+		$default_query_limit = $request->get_param( 'limit' ) ?: 100;
+		$default_offset      = $request->get_param( 'offset' ) ?: 0;
+
+		$query = wp_parse_args( $query, [
+			'limit'  => $default_query_limit,
+			'offset' => $default_offset,
+		] );
+
+		if ( $is_for_select2 || $is_for_select ) {
+			$query['orderby'] = 'last_name';
+			$query['order']   = 'ASC';
 		}
 
 		$contacts = $contact_query->query( $query );
 
 		if ( $is_for_select2 ) {
 			$json = array();
-
-			usort( $contacts, sort_by_string_in_array( 'last_name' ) );
 
 			foreach ( $contacts as $i => $contact ) {
 
@@ -325,13 +341,10 @@ class Contacts_Api extends Base {
 			$contacts = $response_contacts;
 
 		} else {
-
 			$response_contacts = [];
 
 			foreach ( $contacts as $contact ) {
-
-				$id = absint( $contact->ID );
-
+				$id                       = absint( $contact->ID );
 				$response_contacts[ $id ] = $this->get_contact_for_rest_response( $id );
 			}
 
@@ -361,29 +374,18 @@ class Contacts_Api extends Base {
 			return self::ERROR_INVALID_PERMISSIONS();
 		}
 
-		$args = (array) $request->get_param( 'contact' );
+		$args = (array) $request->get_param( 'contact' ) ?: (array) $request->get_params();
 
-		$meta = null;
-
-		if ( $args['meta'] ) {
-			$meta = $args['meta'];
-			unset( $args['meta'] );
-		}
-
-		$tags = null;
-
-		if ( $args['tags'] ) {
-			$tags = $args['tags'];
-			unset( $args['tags'] );
-		}
+		$meta = get_array_var( $args, 'meta', [] );
+		$tags = get_array_var( $args, 'tags', [] );
 
 		if ( ! isset( $args['email'] ) || ! is_email( $args['email'] ) ) {
 			return self::ERROR_400( 'invalid_email', _x( 'Please provide a valid email address.', 'api', 'groundhogg' ) );
 		}
 
-		$args = array_map( 'sanitize_text_field', $args );
+		$args = map_deep( $args, 'sanitize_text_field' );
 
-		$contact_id = Plugin::$instance->dbs->get_db( 'contacts' )->add( $args );
+		$contact_id = get_db( 'contacts' )->add( $args );
 
 		if ( ! $contact_id ) {
 			return self::ERROR_400( 'error', 'Unable to add contact.' );
@@ -391,12 +393,12 @@ class Contacts_Api extends Base {
 
 		$contact = get_contactdata( $contact_id );
 
-		if ( $meta ) {
-			foreach ( $meta as $key => $value ) {
-				$contact->update_meta( sanitize_key( $key ), sanitize_text_field( $value ) );
-			}
+		// Add any meta data
+		foreach ( $meta as $key => $value ) {
+			$contact->update_meta( sanitize_key( $key ), sanitize_text_field( $value ) );
 		}
 
+		// Add any tags
 		if ( ! empty( $tags ) ) {
 			$contact->add_tag( $tags );
 		}
@@ -428,43 +430,47 @@ class Contacts_Api extends Base {
 			return $contact;
 		}
 
-		$args = (array) $request->get_param( 'contact' );
+		$args = (array) $request->get_param( 'contact' ) ?: (array) $request->get_params();
 
-		/* UPDATE CONTACT */
-		$meta = null;
-
-		if ( $args['meta'] ) {
-			$meta = $args['meta'];
-			unset( $args['meta'] );
-		}
+		$meta        = get_array_var( $args, 'meta', [] );
+		$meta_delete = get_array_var( $args, 'meta_delete', [] );
+		$tags        = get_array_var( $args, 'tags', [] );
+		$tags_remove = get_array_var( $args, 'tags_remove', [] );
 
 		if ( isset( $args['email'] ) && ! is_email( $args['email'] ) ) {
 			return self::ERROR_400( 'invalid_email', _x( 'Please provide a valid email address.', 'api', 'groundhogg' ) );
 		}
 
-		if ( isset( $args['email'] ) && $args['email'] !== $contact->get_email() && Plugin::$instance->dbs->get_db( 'contacts' )->exists( $args['email'] ) ) {
+		if ( isset( $args['email'] ) && $args['email'] !== $contact->get_email() && get_db( 'contacts' )->exists( $args['email'] ) ) {
 			return self::ERROR_400( 'email_in_use', _x( 'This email address already belongs to another contact.', 'api', 'groundhogg' ) );
 		}
 
-		if ( isset( $args['optin_status'] ) && intval( $args['optin_status'] ) !== $contact->get_optin_status() ) {
-			$contact->change_marketing_preference( intval( $args['optin_status'] ) );
+		if ( isset( $args['optin_status'] ) && absint( $args['optin_status'] ) !== $contact->get_optin_status() ) {
+			$contact->change_marketing_preference( absint( $args['optin_status'] ) );
+			unset( $args['optin_status'] );
 		}
 
-		//  ---------------  Insert operation --------
-		$args = array_map( 'sanitize_text_field', $args );
+		$args = map_deep( $args, 'sanitize_text_field' );
 
 		//adding data in contact table
 		$contact->update( $args );
 
 		// insert data in contact meta table if users send meta data
-		if ( $meta ) {
-			foreach ( $meta as $key => $value ) {
-				if ( $key === 'notes' ) {
-					$contact->update_meta( sanitize_key( $key ), sanitize_textarea_field( $value ) );
-				} else {
-					$contact->update_meta( sanitize_key( $key ), sanitize_text_field( $value ) );
-				}
-			}
+		foreach ( $meta as $key => $value ) {
+			$contact->update_meta( sanitize_key( $key ), sanitize_text_field( $value ) );
+		}
+
+		foreach ( $meta_delete as $key ) {
+			$contact->delete_meta( sanitize_key( $key ) );
+		}
+
+		// Add any tags
+		if ( ! empty( $tags ) ) {
+			$contact->add_tag( $tags );
+		}
+
+		if ( ! empty( $tags_remove ) ) {
+			$contact->remove_tag( $tags_remove );
 		}
 
 		$contact = $this->get_contact_for_rest_response( $contact->ID );
@@ -492,9 +498,7 @@ class Contacts_Api extends Base {
 			return $contact;
 		}
 
-		$yes = Plugin::$instance->dbs->get_db( 'contacts' )->delete( $contact->get_id() );
-
-		if ( ! $yes ) {
+		if ( ! $contact->delete() ) {
 			return self::ERROR_UNKNOWN();
 		}
 
@@ -603,7 +607,12 @@ class Contacts_Api extends Base {
 			return $contact;
 		}
 
-		$notes = $contact->get_meta( 'notes' );
+		$notes = $contact->get_all_notes();
+		$response = [];
+
+		foreach ( $notes as $note ){
+			$response[] = $note->get_as_array();
+		}
 
 		return self::SUCCESS_RESPONSE( [ 'notes' => $notes ] );
 	}
@@ -632,9 +641,7 @@ class Contacts_Api extends Base {
 			return self::ERROR_403( 'bad_note', 'Could not add the given note.' );
 		}
 
-		$notes = $contact->get_meta( 'notes' );
-
-		return self::SUCCESS_RESPONSE( [ 'notes' => $notes ] );
+		return self::SUCCESS_RESPONSE();
 	}
 
 }

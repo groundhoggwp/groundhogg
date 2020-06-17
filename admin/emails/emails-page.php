@@ -331,29 +331,13 @@ class Emails_Page extends Admin_Page {
 	 * @return bool|\WP_Error
 	 */
 	public function process_edit() {
+
 		if ( ! current_user_can( 'edit_emails' ) ) {
 			$this->wp_die_no_access();
 		}
 
-
 		$id    = absint( Groundhogg\get_request_var( 'email' ) );
 		$email = Plugin::$instance->utils->get_email( $id );
-
-		$headers = [];
-
-		$headers_key   = Groundhogg\get_request_var( 'header_key' );
-		$headers_value = Groundhogg\get_request_var( 'header_value' );
-
-		if ( $headers_key && $headers_value ) {
-			for ( $i = 0; $i < count( $headers_key ); $i ++ ) {
-			    if ($headers_key [$i]) {
-				    $headers [ sanitize_text_field( $headers_key [ $i ] ) ] = sanitize_text_field( $headers_value[ $i ] );
-			    }
-			}
-		}
-
-		$email->update_meta( 'custom_headers', $headers );
-
 
 		$args = array();
 
@@ -364,14 +348,6 @@ class Emails_Page extends Admin_Page {
 		}
 
 		$from_user = absint( Groundhogg\get_request_var( 'from_user' ) );
-
-//		if ( $from_user > 0 ) {
-//			$user = get_userdata( $from_user );
-//			if ( ! Groundhogg\email_is_same_domain( $user->user_email ) ) { //todo
-//				$this->add_notice( 'email-cross-domain-warning', sprintf( __( 'You are sending this email from an email address (%s) which does not belong to this server. This may cause deliverability issues and harm your sender reputation.', 'groundhogg' ), $user->user_email ), 'warning' );
-//			}
-//		}
-
 
 		$subject    = sanitize_text_field( Groundhogg\get_request_var( 'subject' ) );
 		$pre_header = sanitize_text_field( Groundhogg\get_request_var( 'pre_header' ) );
@@ -405,6 +381,50 @@ class Emails_Page extends Admin_Page {
 			$email->delete_meta( 'use_custom_alt_body' );
 			$email->delete_meta( 'alt_body' );
 		}
+
+		$headers = [];
+
+		$headers_key   = Groundhogg\get_request_var( 'header_key' );
+		$headers_value = Groundhogg\get_request_var( 'header_value' );
+
+		if ( $headers_key && $headers_value ) {
+			for ( $i = 0; $i < count( $headers_key ); $i ++ ) {
+				if ( $headers_key[ $i ] ) {
+					$header_key   = strtolower( sanitize_key( $headers_key[ $i ] ) );
+					$header_value = $headers_value[ $i ];
+
+					switch ( $header_key ) {
+						case 'from':
+						    // If only the email is provided
+						    if ( is_email($header_value) ){
+							    $headers[ $header_key ] = sanitize_email( $header_value );
+						    } else if ( preg_match( '/([^<]+) <([^>]+)>/', $header_value, $matches ) ) {
+						        $email_address = sanitize_email( $matches[2] );
+						        $name  = sanitize_text_field( $matches[1] );
+							    $headers[ $header_key ] = sprintf( '%s <%s>', $name, $email_address );
+                            } else {
+							    $headers[ $header_key ] = '';
+                            }
+						    break;
+						case 'bcc':
+						case 'cc':
+						case 'return-path':
+						case 'reply-to':
+							$emails                 = explode( ',', $header_value );
+							$emails                 = map_deep( $emails, 'trim' );
+							$emails                 = map_deep( $emails, 'sanitize_email' );
+							$emails                 = implode( ',', array_filter( $emails ) );
+							$headers[ $header_key ] = $emails;
+							break;
+						default:
+							$headers[ $header_key ] = sanitize_text_field( $header_value );
+							break;
+					}
+				}
+			}
+		}
+
+		$email->update_meta( 'custom_headers', $headers );
 
 		if ( Groundhogg\get_request_var( 'test_email' ) ) {
 

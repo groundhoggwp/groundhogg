@@ -177,6 +177,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.16 (2020-06-17) =
+* ADDED Custom headers support to the email editor.
+* TWEAKED Contact API to support limits,
+
 = 2.2.15.1 (2020-06-16) =
 * HOT FIX Cancelled broadcasts are not moved out of the event queue.
 * HOT FIX Contact marketability is not checked while scheduling the broadcast for non transactional emails.

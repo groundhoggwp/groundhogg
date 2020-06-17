@@ -49,3 +49,11 @@
     margin: 10px 10px 0 0;
     /*visibility: visible;*/
 }
+
+#headers-table th:last-child{
+    width: 100px;
+}
+
+#headers-table td input{
+    width: 100%;
+}

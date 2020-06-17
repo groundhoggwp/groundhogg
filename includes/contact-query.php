@@ -353,6 +353,9 @@ class Contact_Query {
 
 		if ( ! empty( $this->query_vars['tags_include'] ) || ! empty( $this->query_vars['tags_exclude'] ) || ! empty( $this->query_vars['tag_query'] ) ) {
 
+			$this->query_vars['tags_include'] = validate_tags( $this->query_vars['tags_include'] );
+			$this->query_vars['tags_exclude'] = validate_tags( $this->query_vars['tags_exclude'] );
+
 			$backup_query = [
 				'relation' => $this->query_vars['tags_relation'],
 			];

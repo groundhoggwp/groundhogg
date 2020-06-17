@@ -439,6 +439,9 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 * @return array
 	 */
 	public function get_as_array() {
-		return apply_filters( "groundhogg/{$this->get_object_type()}/get_as_array", [ 'data' => $this->data ] );
+		return apply_filters( "groundhogg/{$this->get_object_type()}/get_as_array", [
+			'ID'    => $this->get_id(),
+			'data' => $this->data
+		] );
 	}
 }

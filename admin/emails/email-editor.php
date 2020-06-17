@@ -245,8 +245,7 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
                     </div>
 				<?php endif; ?>
                 <div id="header-wrap">
-
-                    <h3><?php _e( 'Headers', 'groundhogg-pro' ); ?></h3>
+                    <h3><?php _e( 'Custom Headers', 'groundhogg-pro' ); ?></h3>
 					<?php
 					$headers        = [];
 					$custom_headers = $email->get_meta( 'custom_headers', true );
@@ -254,6 +253,7 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 					if ( ! $custom_headers ) {
 						$custom_headers = [ '' ];
 					}
+
 					foreach ( $custom_headers as $key => $value ):
 
 						$headers[] = [

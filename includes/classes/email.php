@@ -647,20 +647,22 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function get_headers() {
 		/* Use default mail-server */
-		$headers             = [];
-		$headers['from']     = 'From: ' . wp_specialchars_decode( $this->get_from_name() ) . ' <' . $this->get_from_email() . '>';
-		$headers['reply_to'] = 'Reply-To: ' . $this->get_reply_to_address();
+		$headers = [];
 
-		$return_path_email = get_return_path_email();
+		$custom_headers = $this->get_meta( 'custom_headers' );
 
-		if ( ! is_email( $return_path_email ) ) {
-			$return_path_email = $this->get_from_email();
+		foreach ( $custom_headers as $custom_header => $custom_header_value ) {
+
+			if ( empty( $custom_header_value ) ){
+				continue;
+			}
+
+			$key             = strtolower( $custom_header );
+			$headers[ $key ] = $custom_header_value;
 		}
 
-		$headers['return_path']     = 'Return-Path: ' . $return_path_email;
-		$headers['content_type']    = 'Content-Type: text/html; charset=UTF-8';
-		$headers['unsub']           = sprintf(
-			'List-Unsubscribe: <%s>,<mailto:%s?subject=Unsubscribe %s from %s>',
+		$list_unsub_header = sprintf(
+			'<%s>,<mailto:%s?subject=Unsubscribe %s from %s>',
 			add_query_arg( [
 				'contact' => encrypt( $this->get_contact()->get_email() )
 			], rest_url( Unsubscribe_Api::NAME_SPACE . '/unsubscribe' ) ),
@@ -668,7 +670,22 @@ class Email extends Base_Object_With_Meta {
 			$this->get_to_address(),
 			get_bloginfo()
 		);
-		$headers['unsub-one-click'] = 'List-Unsubscribe-Post: List-Unsubscribe=One-Click';
+
+		$defaults = [
+			'from'                  => sprintf( '%s <%s>', wp_specialchars_decode( $this->get_from_name() ), $this->get_from_email() ),
+			'reply-to'              => $this->get_reply_to_address(),
+			'return-path'           => is_email( get_return_path_email() ) ? get_return_path_email() : $this->get_from_email(),
+			'content-type'          => 'text/html; charset=UTF-8',
+			'list-unsubscribe'      => $list_unsub_header,
+			'list-unsubscribe-post' => 'List-Unsubscribe=One-Click'
+		];
+
+		// Merge the custom headers with the defaults...
+		$headers = wp_parse_args( $headers, $defaults );
+
+		foreach ( $headers as $header_key => &$header_value ){
+			$header_value = sprintf( "%s: %s", $header_key, $header_value );
+		}
 
 		/**
 		 * Filter the headers to maybe add additional recipients...

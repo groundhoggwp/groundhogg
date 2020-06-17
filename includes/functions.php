@@ -266,7 +266,7 @@ function get_request_query( $default = [], $force = [], $accepted_keys = [] ) {
 		'action',
 		'bulk_action',
 		'_wpnonce',
-        'submit'
+		'submit'
 	] );
 
 	foreach ( $ignore as $key ) {
@@ -1836,8 +1836,19 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 	}
 
-	$contact = new Contact();
-	$id      = $contact->create( $args );
+	// No point in trying if there is no email field
+	if ( isset_not_empty( $args, 'email' ) ) {
+		$contact = new Contact();
+		$id      = $contact->create( $args );
+	} else {
+
+		// Is there an active contact record?
+		$contact = get_contactdata();
+		// Update based on the current args...
+		$contact->update( $args );
+		$id = $contact->get_id();
+	}
+
 
 	if ( ! $id ) {
 		return false;
@@ -3220,29 +3231,6 @@ function get_owners() {
  *
  * @return string
  */
-function _nf( $number, $decimals=0 ){
+function _nf( $number, $decimals = 0 ) {
 	return number_format_i18n( $number, $decimals );
 }
-
-
-
-
-/**
- * adds custom headers
- *
- * @param $headers array
- * @param $email Email
- * @param $contact Contact
- *
- * @return array
- */
-function add_custom_headers($headers, $email, $contact)
-{
-	if ($email->get_meta( 'custom_headers' ) ){
-	    return array_merge( $headers , $email->get_meta( 'custom_headers' ,true ));
-
-    }
-	return $headers;
-
-}
-add_filter("groundhogg/email/headers", __NAMESPACE__ . '\add_custom_headers' , 10 , 3);
