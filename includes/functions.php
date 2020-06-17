@@ -6,12 +6,12 @@ use Groundhogg\Lib\Mobile\Iso3166;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
 use WP_Error;
-use function foo\func;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
 
 /**
  * Wrapper function
@@ -3210,3 +3210,26 @@ function convert_to_local_time( $time ) {
 function get_owners() {
 	return get_users( array( 'role__in' => Main_Roles::get_owner_roles() ) );
 }
+
+
+
+
+/**
+ * adds custom headers
+ *
+ * @param $headers array
+ * @param $email Email
+ * @param $contact Contact
+ *
+ * @return array
+ */
+function add_custom_headers($headers, $email, $contact)
+{
+	if ($email->get_meta( 'custom_headers' ) ){
+	    return array_merge( $headers , $email->get_meta( 'custom_headers' ,true ));
+
+    }
+	return $headers;
+
+}
+add_filter("groundhogg/email/headers", __NAMESPACE__ . '\add_custom_headers' , 10 , 3);

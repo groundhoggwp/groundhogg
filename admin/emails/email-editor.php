@@ -33,7 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 global $email, $is_IE;
 
 $email_id = absint( get_request_var( 'email' ) );
-$email = new Email( $email_id );
+$email    = new Email( $email_id );
 
 $_content_editor_dfw = true;
 $_wp_editor_expand   = true;
@@ -73,14 +73,14 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 						<?php submit_button( __( 'Update', 'groundhogg' ), 'primary', 'update', false ); ?>
 						<?php submit_button( __( 'Update & Test', 'groundhogg' ), 'secondary', 'update_and_test', false ); ?>
 						<?php echo html()->button( [
-							'title'              => __( 'Mobile Preview' ),
-							'text'               => '<span class="dashicons dashicons-smartphone"></span>',
-							'class'              => 'button button-secondary dash-button show-email-preview',
+							'title' => __( 'Mobile Preview' ),
+							'text'  => '<span class="dashicons dashicons-smartphone"></span>',
+							'class' => 'button button-secondary dash-button show-email-preview',
 						] ); ?>
 						<?php echo html()->button( [
-							'title'              => __( 'Desktop Preview' ),
-							'text'               => '<span class="dashicons dashicons-desktop"></span>',
-							'class'              => 'button button-secondary dash-button show-email-preview',
+							'title' => __( 'Desktop Preview' ),
+							'text'  => '<span class="dashicons dashicons-desktop"></span>',
+							'class' => 'button button-secondary dash-button show-email-preview',
 						] ); ?>
                     </div>
                 </div>
@@ -200,7 +200,6 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
                            value="<?php echo esc_attr( $email->get_pre_header() ); ?>" id="pre_header" spellcheck="true"
                            autocomplete="off">
                 </div>
-
                 <div id="content-wrap">
                     <div id="postdivrich" class="postarea<?php echo $_wp_editor_expand_class; ?>">
 
@@ -213,10 +212,10 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 							return $mceinit;
 						} );
 
-                        add_action( 'media_buttons', [
-                            \Groundhogg\Plugin::$instance->replacements,
-                            'show_replacements_button'
-                        ] );
+						add_action( 'media_buttons', [
+							\Groundhogg\Plugin::$instance->replacements,
+							'show_replacements_button'
+						] );
 
 						wp_editor( $email->get_content(), 'email_content', [
 							'_content_editor_dfw' => $_content_editor_dfw,
@@ -245,6 +244,64 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
                         <p class="description"><?php printf( __( 'Having a custom Alt-Body will improve the deliverability of your emails. %s automatically generates one for you but if you want full control over it you can define it below.', 'groundhogg' ), white_labeled_name() ); ?></p>
                     </div>
 				<?php endif; ?>
+                <div id="header-wrap">
+
+                    <h3><?php _e( 'Headers', 'groundhogg-pro' ); ?></h3>
+		            <?php
+		            $headers = [];
+		            $meta    = $email->get_meta( 'custom_headers', true );
+
+		            if ( ! $meta ) {
+			            $meta = [''];
+		            }
+		            foreach ( $meta as $meta_key => $value ):
+
+			            $headers[] = [
+				            html()->input( [
+					            'name'  => 'meta_key[]',
+					            'class' => 'input',
+					            'value' => $meta_key
+				            ] ),
+				            html()->input( [
+					            'name'  => 'meta_value[]',
+					            'class' => 'input',
+					            'value' => $value
+				            ] ),
+				            "<span class=\"row-actions\">
+                        <span class=\"add\"><a style=\"text-decoration: none\" href=\"javascript:void(0)\" class=\"addmeta\"><span class=\"dashicons dashicons-plus\"></span></a></span> |
+                        <span class=\"delete\"><a style=\"text-decoration: none\" href=\"javascript:void(0)\" class=\"deletemeta\"><span class=\"dashicons dashicons-trash\"></span></a></span>
+                    </span>"
+			            ];
+		            endforeach;
+
+		            html()->list_table( [ 'id' => 'headers-table' ], [
+			            __( 'Key' ),
+			            __( 'Value' ),
+			            __( 'Actions' )
+		            ], $headers, false );
+		            ?>
+
+                    <script>
+                        jQuery(function ($) {
+                            function operation(table) {
+
+                                table.click(function (e) {
+                                    var el = $(e.target);
+                                    if (el.closest('.addmeta').length) {
+                                        el.closest('tr').last().clone().appendTo(el.closest('tr').parent());
+                                        el.closest('tr').parent().children().last().find(':input').val('');
+                                    } else if (el.closest('.deletemeta').length) {
+                                        el.closest('tr').remove();
+                                    }
+                                });
+                            }
+
+                            var meta_table = $("#headers-table");
+                            operation(meta_table);
+
+                        });
+                    </script>
+                </div>
             </div>
         </div>
     </div>

@@ -6,6 +6,7 @@ use Groundhogg;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Email;
 use Groundhogg\Plugin;
+use function Groundhogg\get_url_var;
 use function Groundhogg\managed_page_url;
 use function Groundhogg\set_user_test_email;
 
@@ -100,6 +101,7 @@ class Emails_Page extends Admin_Page {
 
 			wp_enqueue_style( 'groundhogg-admin-email-preview' );
 			wp_enqueue_script( 'groundhogg-admin-email-preview' );
+
 		}
 
 		remove_editor_styles();
@@ -142,10 +144,10 @@ class Emails_Page extends Admin_Page {
 
 		if ( $email = Groundhogg\get_request_var( 'email' ) ) {
 			$broadcast_args['email'] = absint( $email );
-			$reporting_args = [
-                'tab' => 'email_step',
-                'email' => $email,
-            ];
+			$reporting_args          = [
+				'tab'   => 'email_step',
+				'email' => $email,
+			];
 		}
 
 		return [
@@ -333,8 +335,25 @@ class Emails_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
+
 		$id    = absint( Groundhogg\get_request_var( 'email' ) );
 		$email = Plugin::$instance->utils->get_email( $id );
+
+		$headers = [];
+
+		$headers_key   = Groundhogg\get_request_var( 'meta_key' );
+		$headers_value = Groundhogg\get_request_var( 'meta_value' );
+
+		if ( $headers_key && $headers_value ) {
+			for ( $i = 0; $i < count( $headers_key ); $i ++ ) {
+			    if ($headers_key [$i]) {
+				    $headers [ sanitize_text_field( $headers_key [ $i ] ) ] = sanitize_text_field( $headers_value[ $i ] );
+			    }
+			}
+		}
+
+		$email->update_meta( 'custom_headers', $headers );
+
 
 		$args = array();
 
@@ -352,6 +371,7 @@ class Emails_Page extends Admin_Page {
 //				$this->add_notice( 'email-cross-domain-warning', sprintf( __( 'You are sending this email from an email address (%s) which does not belong to this server. This may cause deliverability issues and harm your sender reputation.', 'groundhogg' ), $user->user_email ), 'warning' );
 //			}
 //		}
+
 
 		$subject    = sanitize_text_field( Groundhogg\get_request_var( 'subject' ) );
 		$pre_header = sanitize_text_field( Groundhogg\get_request_var( 'pre_header' ) );
