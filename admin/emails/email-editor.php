@@ -247,60 +247,39 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
                 <div id="header-wrap">
 
                     <h3><?php _e( 'Headers', 'groundhogg-pro' ); ?></h3>
-		            <?php
-		            $headers = [];
-		            $meta    = $email->get_meta( 'custom_headers', true );
+					<?php
+					$headers        = [];
+					$custom_headers = $email->get_meta( 'custom_headers', true );
 
-		            if ( ! $meta ) {
-			            $meta = [''];
-		            }
-		            foreach ( $meta as $meta_key => $value ):
+					if ( ! $custom_headers ) {
+						$custom_headers = [ '' ];
+					}
+					foreach ( $custom_headers as $key => $value ):
 
-			            $headers[] = [
-				            html()->input( [
-					            'name'  => 'meta_key[]',
-					            'class' => 'input',
-					            'value' => $meta_key
-				            ] ),
-				            html()->input( [
-					            'name'  => 'meta_value[]',
-					            'class' => 'input',
-					            'value' => $value
-				            ] ),
-				            "<span class=\"row-actions\">
+						$headers[] = [
+							html()->input( [
+								'name'  => 'header_key[]',
+								'class' => 'input',
+								'value' => $key
+							] ),
+							html()->input( [
+								'name'  => 'header_value[]',
+								'class' => 'input',
+								'value' => $value
+							] ),
+							"<span class=\"row-actions\">
                         <span class=\"add\"><a style=\"text-decoration: none\" href=\"javascript:void(0)\" class=\"addmeta\"><span class=\"dashicons dashicons-plus\"></span></a></span> |
                         <span class=\"delete\"><a style=\"text-decoration: none\" href=\"javascript:void(0)\" class=\"deletemeta\"><span class=\"dashicons dashicons-trash\"></span></a></span>
                     </span>"
-			            ];
-		            endforeach;
+						];
+					endforeach;
 
-		            html()->list_table( [ 'id' => 'headers-table' ], [
-			            __( 'Key' ),
-			            __( 'Value' ),
-			            __( 'Actions' )
-		            ], $headers, false );
-		            ?>
-
-                    <script>
-                        jQuery(function ($) {
-                            function operation(table) {
-
-                                table.click(function (e) {
-                                    var el = $(e.target);
-                                    if (el.closest('.addmeta').length) {
-                                        el.closest('tr').last().clone().appendTo(el.closest('tr').parent());
-                                        el.closest('tr').parent().children().last().find(':input').val('');
-                                    } else if (el.closest('.deletemeta').length) {
-                                        el.closest('tr').remove();
-                                    }
-                                });
-                            }
-
-                            var meta_table = $("#headers-table");
-                            operation(meta_table);
-
-                        });
-                    </script>
+					html()->list_table( [ 'id' => 'headers-table' ], [
+						__( 'Key' ),
+						__( 'Value' ),
+						__( 'Actions' )
+					], $headers, false );
+					?>
                 </div>
             </div>
         </div>

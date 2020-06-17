@@ -341,8 +341,8 @@ class Emails_Page extends Admin_Page {
 
 		$headers = [];
 
-		$headers_key   = Groundhogg\get_request_var( 'meta_key' );
-		$headers_value = Groundhogg\get_request_var( 'meta_value' );
+		$headers_key   = Groundhogg\get_request_var( 'header_key' );
+		$headers_value = Groundhogg\get_request_var( 'header_value' );
 
 		if ( $headers_key && $headers_value ) {
 			for ( $i = 0; $i < count( $headers_key ); $i ++ ) {
