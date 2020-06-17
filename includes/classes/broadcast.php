@@ -191,8 +191,7 @@ class Broadcast extends Base_Object implements Event_Process {
 	 * Cancel the broadcast
 	 */
 	public function cancel() {
-
-		if ( get_db( 'event_queue' )->mass_update(
+		get_db( 'event_queue' )->mass_update(
 			[
 				'status' => Event::CANCELLED
 			],
@@ -201,10 +200,13 @@ class Broadcast extends Base_Object implements Event_Process {
 				'funnel_id'  => Broadcast::FUNNEL_ID,
 				'event_type' => Event::BROADCAST
 			]
-		) ) {
-			$this->update( [ 'status' => 'cancelled' ] );
-		}
+		);
 
+		get_db( 'event_queue' )->move_events_to_history( [
+			'status' => Event::CANCELLED,
+		] );
+
+		$this->update( [ 'status' => 'cancelled' ] );
 	}
 
 	/**

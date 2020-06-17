@@ -10,6 +10,7 @@ use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
@@ -104,7 +105,7 @@ class Table_Email_Funnels_Used_In extends Base_Table_Report {
 							'after'     => $this->start
 						]
 					] ),
-				], $sent ),
+				], _nf( $sent ) ),
 				// Opens
 				html()->e( 'a', [
 					'href' => admin_page_url( 'gh_contacts', [

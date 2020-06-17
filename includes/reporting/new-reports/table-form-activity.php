@@ -9,6 +9,7 @@ use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_form_list;
@@ -58,7 +59,7 @@ class Table_Form_Activity extends Base_Table_Report {
 				'after'   => $this->start
 			]);
 
-			$form_stats[ 'unique_impressions' ] = number_format_i18n( $unique_impressions );
+			$form_stats[ 'unique_impressions' ] = _nf( $unique_impressions );
 
 			$total_impressions = get_db( 'form_impressions' )->query([
 				'select'  => 'views',
@@ -68,7 +69,7 @@ class Table_Form_Activity extends Base_Table_Report {
 				'after'   => $this->start
 			]);
 
-			$form_stats[ 'total_impressions' ] = number_format_i18n( absint( $total_impressions ) );
+			$form_stats[ 'total_impressions' ] = _nf( absint( $total_impressions ) );
 
 			$submissions = absint( get_db('events' )->count( [
 				'step_id' => $form_id,
@@ -87,7 +88,7 @@ class Table_Form_Activity extends Base_Table_Report {
 							'after'   => $this->start,
 						]
 					] ),
-				], number_format_i18n( $submissions ) ?: '0', false );
+				], _nf( $submissions ) ?: '0', false );
 			} else {
 				$form_stats[ 'submissions' ] = 0;
 			}

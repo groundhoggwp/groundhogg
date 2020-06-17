@@ -229,7 +229,7 @@ if ( ! is_option_enabled( 'gh_use_builder_version_2' ) ){
             </div>
             <?php Plugin::$instance->notices->print_notices(); ?>
             <div style="width: 100%">
-                <?php include_once dirname( __FILE__ ) . '/reporting.php'; ?>
+                <?php include_once __DIR__ . '/reporting.php'; ?>
             </div>
             <div class="funnel-saving hidden"></div>
             <div  id="postbox-container-2" class="postbox-container funnel-editor">

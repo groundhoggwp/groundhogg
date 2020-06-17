@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Emails;
 
 use Groundhogg\Email;
+use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
@@ -69,7 +70,6 @@ class Emails_Table extends WP_List_Table {
 			'from_user'    => _x( 'From User', 'Column label', 'groundhogg' ),
 			'author'       => _x( 'Author', 'Column label', 'groundhogg' ),
 			'last_updated' => _x( 'Last Updated', 'Column label', 'groundhogg' ),
-			//'date_created' => _x( 'Date Created', 'Column label', 'groundhogg' ),
 		);
 
 		return apply_filters( 'wpgh_email_columns', $columns );
@@ -89,7 +89,6 @@ class Emails_Table extends WP_List_Table {
 			'from_user'    => array( 'from_user', false ),
 			'author'       => array( 'author', false ),
 			'last_updated' => array( 'last_updated', false ),
-			//'date_created' => array( 'date_created', false )
 		);
 
 		return apply_filters( 'wpgh_email_sortable_columns', $sortable_columns );
@@ -120,10 +119,10 @@ class Emails_Table extends WP_List_Table {
 		$count_trash = Plugin::$instance->dbs->get_db( 'emails' )->count( array( 'status' => 'trash' ) );
 		$count_all   = $count_ready + $count_draft;
 
-		$views['all']   = "<a class='" . print_r( ( $this->get_view() === 'all' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_emails' ) . "'>" . __( 'All' ) . " <span class='count'>(" . $count_all . ")</span>" . "</a>";
-		$views['ready'] = "<a class='" . print_r( ( $this->get_view() === 'ready' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&status=ready' ) . "'>" . __( 'Ready' ) . " <span class='count'>(" . $count_ready . ")</span>" . "</a>";
-		$views['draft'] = "<a class='" . print_r( ( $this->get_view() === 'draft' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&status=draft' ) . "'>" . __( 'Draft' ) . " <span class='count'>(" . $count_draft . ")</span>" . "</a>";
-		$views['trash'] = "<a class='" . print_r( ( $this->get_view() === 'trash' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&status=trash' ) . "'>" . __( 'Trash' ) . " <span class='count'>(" . $count_trash . ")</span>" . "</a>";
+		$views['all']   = "<a class='" . print_r( ( $this->get_view() === 'all' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_emails' ) . "'>" . __( 'All' ) . " <span class='count'>(" . _nf( $count_all ) . ")</span>" . "</a>";
+		$views['ready'] = "<a class='" . print_r( ( $this->get_view() === 'ready' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&status=ready' ) . "'>" . __( 'Ready' ) . " <span class='count'>(" . _nf( $count_ready ) . ")</span>" . "</a>";
+		$views['draft'] = "<a class='" . print_r( ( $this->get_view() === 'draft' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&status=draft' ) . "'>" . __( 'Draft' ) . " <span class='count'>(" . _nf( $count_draft ) . ")</span>" . "</a>";
+		$views['trash'] = "<a class='" . print_r( ( $this->get_view() === 'trash' ) ? 'current' : '', true ) . "' href='" . admin_url( 'admin.php?page=gh_emails&status=trash' ) . "'>" . __( 'Trash' ) . " <span class='count'>(" . _nf( $count_trash ) . ")</span>" . "</a>";
 
 		return apply_filters( 'groundhogg/admin/emails/table/views', $views );
 	}

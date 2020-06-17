@@ -5,7 +5,7 @@ use Gamajo_Template_Loader;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 if ( ! class_exists( 'Gamajo_Template_Loader' ) ){
-    include_once dirname( __FILE__ ) . '/lib/gamajo-template-loader.php';
+    include_once __DIR__ . '/lib/gamajo-template-loader.php';
 }
 
 class Template_Loader extends Gamajo_Template_Loader {

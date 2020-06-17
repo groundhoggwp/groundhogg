@@ -8,6 +8,7 @@ use Groundhogg\Email;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use function Groundhogg\_nf;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
@@ -50,9 +51,9 @@ class Table_Benchmark_Conversion_Rate extends Base_Table_Report {
 
 				$data [] = [
 					'from'   => $current_step->get_step_title(),
-					'total1' => $total1,
+					'total1' => _nf( $total1 ),
 					'to'     => $next_step->get_step_title(),
-					'total2' => $total2,
+					'total2' => _nf( $total2 ),
 					'scr'    => percentage( $total1, $total2 ) . '%'
 				];
 			}
@@ -70,7 +71,7 @@ class Table_Benchmark_Conversion_Rate extends Base_Table_Report {
 				return [
 					[
 						'from'   => $current_step->get_step_title(),
-						'total1' => $total,
+						'total1' => _nf( $total ),
 						'to'     => '',
 						'total2' => '',
 						'scr'    => percentage( $total, $total ) . '%'

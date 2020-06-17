@@ -177,6 +177,21 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.15.1 (2020-06-16) =
+* HOT FIX Cancelled broadcasts are not moved out of the event queue.
+* HOT FIX Contact marketability is not checked while scheduling the broadcast for non transactional emails.
+
+= 2.2.15 (2020-06-16) =
+* TWEAKED Some contact editor CSS.
+* TWEAKED Replaced all occurrences `dirname( __FILE__ )` with `__DIR__`.
+* TWEAKED Added number internationalization for all tables and admin screens.
+* TWEAKED Added number internationalization for new reports.
+* TWEAKED Updated translations file.
+* TWEAKED Show `no data` available notice for charts with no results.
+* TWEAKED the lead scoring report ad to look prettier.
+* FIXED Number internationalization on broadcasts screen.
+* FIXED Event actions not working on the contact activity screen.
+
 = 2.2.14 (2020-06-15) =
 * ADDED Saved searches, custom searches can be saved and loaded.
 * ADDED Ability to edit/delete contact notes.

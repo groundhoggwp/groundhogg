@@ -27,7 +27,7 @@ use Groundhogg\Queue\Event_Queue;
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) exit;
 
 // Load WPGH file.
-include_once dirname(__FILE__) . '/groundhogg.php';
+include_once __DIR__ . '/groundhogg.php';
 
 global $wpdb;
 

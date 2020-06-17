@@ -8,6 +8,7 @@ use Groundhogg\Email;
 use Groundhogg\Event;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
@@ -114,7 +115,7 @@ abstract class Base_Email_Performance_Table_Report extends Base_Table_Report {
 						'tab'   => 'email_step',
 						'email' => $email->get_id()
 					] ),
-					'sent'    => $report['sent'],
+					'sent'    => _nf( $report['sent'] ),
 					'opened'  => percentage( $report['sent'], $report['opened'] ),
 					'clicked' => percentage( $report['opened'], $report['clicked'] ),
 				];

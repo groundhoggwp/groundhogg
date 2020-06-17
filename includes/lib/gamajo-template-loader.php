@@ -50,7 +50,7 @@ if ( ! class_exists( 'Gamajo_Template_Loader' ) ) {
          *
          * Can either be a defined constant, or a relative reference from where the subclass lives.
          *
-         * e.g. YOUR_PLUGIN_TEMPLATE or plugin_dir_path( dirname( __FILE__ ) ); etc.
+         * e.g. YOUR_PLUGIN_TEMPLATE or plugin_dir_path( __DIR__ ); etc.
          *
          * @since 1.0.0
          *

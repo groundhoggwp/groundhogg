@@ -203,7 +203,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
     <!-- END TABS -->
 	<?php
 
-	add_action( 'groundhogg/admin/contact/record/tab/general', '\Groundhogg\Admin\Contacts\contact_record_general_info' );
+	add_action( 'groundhogg/admin/contact/record/tab/general', __NAMESPACE__ . '\contact_record_general_info' );
 
 	/**
 	 * Contact Info
@@ -572,7 +572,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 		<?php
 	}
 
-	add_action( 'groundhogg/admin/contact/record/tab/segmentation', '\Groundhogg\Admin\Contacts\contact_record_section_segmentation' );
+	add_action( 'groundhogg/admin/contact/record/tab/segmentation', __NAMESPACE__ . '\contact_record_section_segmentation' );
 
 	/**
 	 * @param $contact Contact
@@ -646,7 +646,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 		<?php
 	}
 
-	add_action( 'groundhogg/admin/contact/record/tab/notes', '\Groundhogg\Admin\Contacts\contact_record_section_notes' );
+	add_action( 'groundhogg/admin/contact/record/tab/notes', __NAMESPACE__ . '\contact_record_section_notes' );
 
 	/**
 	 * @param $contact Contact
@@ -680,19 +680,15 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                 </td>
             </tr>
         </table>
-		<?php
+        <div id="gh-notes"><?php
 
 		$notes = $contact->get_all_notes();
 
-		if ( $notes ) {
-			echo "<div id='gh-notes'>";
-			foreach ( $notes as $note ) {
-				include __DIR__ . '/note.php';
-			}
-			echo "</div>";
+		foreach ( $notes as $note ) {
+			include __DIR__ . '/note.php';
 		}
-		?>
-		<?php
+
+		?></div><?php
 
 		// Legacy notes...
 		if ( $contact->get_meta( 'notes' ) ) {
@@ -718,7 +714,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 		}
 	}
 
-	add_action( 'groundhogg/admin/contact/record/tab/actions', '\Groundhogg\Admin\Contacts\contact_record_section_actions' );
+	add_action( 'groundhogg/admin/contact/record/tab/actions', __NAMESPACE__ . '\contact_record_section_actions' );
 
 	/**
 	 * @param $contact contact
@@ -809,7 +805,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 		<?php
 	}
 
-	add_action( 'groundhogg/admin/contact/record/tab/files', '\Groundhogg\Admin\Contacts\contact_record_section_files' );
+	add_action( 'groundhogg/admin/contact/record/tab/files', __NAMESPACE__ . '\contact_record_section_files' );
 
 	/**
 	 * @param $contact Contact
@@ -877,7 +873,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 		<?php
 	}
 
-	add_action( 'groundhogg/admin/contact/record/tab/meta_data', '\Groundhogg\Admin\Contacts\contact_record_section_custom_meta' );
+	add_action( 'groundhogg/admin/contact/record/tab/meta_data', __NAMESPACE__ . '\contact_record_section_custom_meta' );
 
 	/**
 	 * @param $contact Contact
@@ -962,7 +958,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 		<?php
 	}
 
-	add_action( 'groundhogg/admin/contact/record/tab/activity', '\Groundhogg\Admin\Contacts\contact_record_section_activity' );
+	add_action( 'groundhogg/admin/contact/record/tab/activity', __NAMESPACE__ . '\contact_record_section_activity' );
 
 
 	/**

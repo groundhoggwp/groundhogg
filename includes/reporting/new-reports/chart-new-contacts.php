@@ -41,11 +41,11 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 		return [
 			'datasets' => [
 				array_merge( [
-					'label' => __( sprintf( "This Period( %s - %s)", date( get_option( 'date_format' ), $this->start ), date( get_option( 'date_format' ), $this->end ) ), 'groundhogg' ),
+					'label' => __( sprintf( "%s - %s", date( get_option( 'date_format' ), $this->start ), date( get_option( 'date_format' ), $this->end ) ), 'groundhogg' ),
 					'data'  => $n,
 				], $this->get_line_style() ),
 				array_merge( [
-					'label' => __( sprintf( "Previous Period( %s - %s)", date( get_option( 'date_format' ), $this->compare_start ), date( get_option( 'date_format' ), $this->compare_end ) ), 'groundhogg' ),
+					'label' => __( sprintf( "%s - %s", date( get_option( 'date_format' ), $this->compare_start ), date( get_option( 'date_format' ), $this->compare_end ) ), 'groundhogg' ),
 					'data'  => $p,
 				], $this->get_line_style() )
 			]

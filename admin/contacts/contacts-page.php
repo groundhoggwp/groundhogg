@@ -1155,7 +1155,7 @@ class Contacts_Page extends Admin_Page {
 
 		$contacts_table = new Tables\Contacts_Table();
 
-		include dirname( __FILE__ ) . '/search.php';
+		include __DIR__ . '/search.php';
 
 		$this->search_form( __( 'Search Contacts', 'groundhogg' ) );
 
@@ -1181,7 +1181,7 @@ class Contacts_Page extends Admin_Page {
 		if ( ! current_user_can( 'view_contacts' ) ) {
 			$this->wp_die_no_access();
 		}
-		include dirname( __FILE__ ) . '/contact-editor.php';
+		include __DIR__ . '/contact-editor.php';
 	}
 
 	/**
@@ -1191,20 +1191,20 @@ class Contacts_Page extends Admin_Page {
 		if ( ! current_user_can( 'add_contacts' ) ) {
 			$this->wp_die_no_access();
 		}
-		include dirname( __FILE__ ) . '/add-contact.php';
+		include __DIR__ . '/add-contact.php';
 	}
 
 	function search() {
 		if ( ! current_user_can( 'view_contacts' ) ) {
 			$this->wp_die_no_access();
 		}
-		include dirname( __FILE__ ) . '/search.php';
+		include __DIR__ . '/search.php';
 	}
 
 	public function form() {
 		if ( ! current_user_can( 'edit_contacts' ) ) {
 			$this->wp_die_no_access();
 		}
-		include dirname( __FILE__ ) . '/form-admin-submit.php';
+		include __DIR__ . '/form-admin-submit.php';
 	}
 }

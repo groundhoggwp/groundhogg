@@ -86,6 +86,10 @@ code.meta-replacement-code{
     margin: 10px 0;
 }
 
+#gh-notes:empty{
+    display: none;
+}
+
 .gh-note{
     padding: 10px 10px;
 }

@@ -448,7 +448,7 @@ class Emails_Page extends Admin_Page {
 
 	public function view() {
 		if ( ! class_exists( 'Emails_Table' ) ) {
-			include dirname( __FILE__ ) . '/emails-table.php';
+			include __DIR__ . '/emails-table.php';
 		}
 
 		$emails_table = new Emails_Table();
@@ -470,7 +470,7 @@ class Emails_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		include dirname( __FILE__ ) . '/add-new.php';
+		include __DIR__ . '/add-new.php';
 	}
 
 	public function edit() {
@@ -478,7 +478,7 @@ class Emails_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		include dirname( __FILE__ ) . '/email-editor.php';
+		include __DIR__ . '/email-editor.php';
 	}
 
 

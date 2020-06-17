@@ -18,7 +18,7 @@ class Blocks
 
     public function init_gutenberg()
     {
-        include dirname( __FILE__ ) . '/gutenberg/gutenberg.php';
+        include __DIR__ . '/gutenberg/gutenberg.php';
     }
 
     public function init_elementor_blocks()

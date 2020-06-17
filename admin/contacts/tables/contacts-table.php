@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin\Contacts\Tables;
 
+use function Groundhogg\_nf;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\current_user_is;
 use function Groundhogg\get_date_time_format;
@@ -514,9 +515,9 @@ class Contacts_Table extends WP_List_Table {
 				'href'  => admin_page_url( 'gh_contacts', $view['query'] ),
 				'class' => get_url_var( 'view' ) === $view['id'] ? 'current' : '',
 			], sprintf(
-					'%s <span class="count">(%d)</span>',
+					'%s <span class="count">(%s)</span>',
 					$view['name'],
-					absint( get_db( 'contacts' )->count( $view['query'] ) )
+					_nf( get_db( 'contacts' )->count( $view['query'] ) )
 				)
 			);
 		}

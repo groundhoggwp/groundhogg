@@ -203,6 +203,10 @@ function tool_tip_title() {
 
         renderChartReport: function ($report, report_data, report_id) {
 
+            if ( report_data.data.labels && report_data.data.labels.length === 0 ){
+                $report.closest( '.gh-donut-chart-wrap' ).html( report_data.no_data )
+            }
+
             if (typeof report_data.options.tooltips.callbacks !== 'undefined') {
                 var funcName = report_data.options.tooltips.callbacks.label;
                 report_data.options.tooltips.callbacks.label = window[funcName];

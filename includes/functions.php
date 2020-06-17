@@ -6,6 +6,7 @@ use Groundhogg\Lib\Mobile\Iso3166;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
 use WP_Error;
+use function foo\func;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -3209,6 +3210,18 @@ function convert_to_local_time( $time ) {
  */
 function get_owners() {
 	return get_users( array( 'role__in' => Main_Roles::get_owner_roles() ) );
+}
+
+/**
+ * Shorthand for number formatting
+ *
+ * @param $number
+ * @param int $decimals
+ *
+ * @return string
+ */
+function _nf( $number, $decimals=0 ){
+	return number_format_i18n( $number, $decimals );
 }
 
 

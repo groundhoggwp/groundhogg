@@ -3,6 +3,7 @@
 namespace Groundhogg\Bulk_Jobs;
 
 // Exit if accessed directly
+use function Groundhogg\_nf;
 use function Groundhogg\get_post_var;
 use Groundhogg\Plugin;
 use function Groundhogg\isset_not_empty;
@@ -112,8 +113,8 @@ abstract class Bulk_Job {
 	 *
 	 * @param $item
 	 */
-	protected function skip_item( $item ){
-		$this->skipped++;
+	protected function skip_item( $item ) {
+		$this->skipped ++;
 	}
 
 	/**
@@ -149,16 +150,18 @@ abstract class Bulk_Job {
 		$end  = microtime( true );
 		$diff = round( $end - $start, 2 );
 
-		if ( $this->skipped > 0 ){
-			$msg = sprintf( __( 'Processed %d items in %s seconds. Skipped %s items.', 'groundhogg' ), $completed, $diff, $this->skipped );
+		if ( $this->skipped > 0 ) {
+			$msg = sprintf( __( 'Processed %s items in %s seconds. Skipped %s items.', 'groundhogg' ), _nf( $completed ), _nf( $diff, 2 ), _nf( $this->skipped ) );
 		} else {
-			$msg = sprintf( __( 'Processed %d items in %s seconds.', 'groundhogg' ), $completed, $diff );
+			$msg = sprintf( __( 'Processed %s items in %s seconds.', 'groundhogg' ), _nf( $completed ), _nf( $diff, 2 ) );
 		}
 
 		$response = [
-			'complete' => $completed - $this->skipped,
-			'skipped'  => $this->skipped,
-			'message'  => esc_html( $msg ),
+			'complete'    => $completed - $this->skipped,
+			'skipped'     => $this->skipped,
+			'complete_nf' => _nf( $completed - $this->skipped ),
+			'skipped_nf'  => _nf( $this->skipped ),
+			'message'     => esc_html( $msg ),
 		];
 
 		$the_end = get_post_var( 'the_end', false );
@@ -234,6 +237,9 @@ abstract class Bulk_Job {
 		return _x( 'Job finished!', 'notice', 'groundhogg' );
 	}
 
+	/**
+	 * @param $response
+	 */
 	protected function send_response( $response ) {
 		wp_send_json( apply_filters( "groundhogg/bulk_job/{$this->get_action()}/send_response", $response ) );
 	}

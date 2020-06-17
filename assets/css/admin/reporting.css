@@ -409,11 +409,11 @@ table.groundhogg-report-table td:last-child {
 }
 
 .notice-no-data {
+    text-align: center;
     position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-right: -50%;
-    transform: translate(-50%, -50%)
+    top: 40%;
+    left: 0;
+    right: 0;
 }
 
 .step-icon {
@@ -434,7 +434,16 @@ table.groundhogg-report-table td:last-child {
     width: 60%;
 }
 
-
 .donut-chart-right{
     width: 40%;
+}
+
+#leadscore-ad {
+    width: 100%;
+    filter: blur(3px);
+    opacity: 0.3;
+}
+
+.gh-donut-chart-wrap{
+    width: 100%;
 }
