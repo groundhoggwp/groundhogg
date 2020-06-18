@@ -26,6 +26,7 @@ abstract class Updater {
 		// Show updates are required
 		add_action( 'admin_init', [ $this, 'listen_for_updates' ], 9 );
 		add_action( 'groundhogg/notices/before', [ $this, 'updates_notice' ] );
+		add_action( 'groundhogg/force_updates', [ $this, 'do_updates' ] );
 
 		// Do automatic updates
 		add_action( 'init', [ $this, 'do_automatic_updates' ], 8 );
