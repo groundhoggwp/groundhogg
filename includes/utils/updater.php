@@ -337,6 +337,8 @@ abstract class Updater {
 		$notice = sprintf( __( "%s requires a database upgrade. Consider backing up your site before upgrading. </p>%s<p>%s", 'groundhogg' ), white_labeled_name(), $update_descriptions, $update_button );
 
 		notices()->add( 'updates_required', $notice, 'info', 'manage_options', true );
+
+		do_action( 'groundhogg/has_required_updates', $this->get_updater_name(), $missing_updates );
 	}
 
 	/**
