@@ -298,6 +298,16 @@ class Main_Updater extends Updater {
 		} );
 	}
 
+	public function version_2_2_18()
+	{
+		add_action( 'groundhogg/updater/main/finished', function (){
+			$migrate_notes = new Migrate_Notes();
+			$migrate_notes->start();
+		} );
+	}
+
+
+
 	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
@@ -332,6 +342,8 @@ class Main_Updater extends Updater {
 			'2.1.14.1',
 			'2.2',
 			'2.2.14',
+			'2.2.18',
+			'2.2.19'
 
 		];
 	}

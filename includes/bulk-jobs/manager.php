@@ -41,6 +41,7 @@ class Manager {
 		$this->create_users             = new Create_Users();
 		$this->process_events           = new Process_Events();
 		$this->migrate_notes            = new Migrate_Notes();
+		$this->update_subsites          = new Update_subsites();
 
 		do_action( 'groundhogg/bulk_jobs/init', $this );
 	}
