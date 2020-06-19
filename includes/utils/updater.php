@@ -338,7 +338,6 @@ abstract class Updater {
 
 		notices()->add( 'updates_required', $notice, 'info', 'manage_options', true );
 
-		do_action( 'groundhogg/has_required_updates', $this->get_updater_name(), $missing_updates );
 	}
 
 	/**
