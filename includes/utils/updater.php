@@ -2,8 +2,6 @@
 
 namespace Groundhogg;
 
-use function MailHawk\is_mailhawk_network_active;
-
 /**
  * Updater
  *
