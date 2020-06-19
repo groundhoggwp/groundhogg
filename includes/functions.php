@@ -3234,3 +3234,22 @@ function get_owners() {
 function _nf( $number, $decimals = 0 ) {
 	return number_format_i18n( $number, $decimals );
 }
+
+/**
+ * Whether Groundhogg is network active or not.
+ *
+ * @return bool
+ */
+function is_groundhogg_network_active() {
+	if ( ! is_multisite() ) {
+		return false;
+	}
+
+	$plugins = get_site_option( 'active_sitewide_plugins' );
+
+	if ( isset( $plugins['groundhogg/groundhogg.php'] ) ) {
+		return true;
+	}
+
+	return false;
+}

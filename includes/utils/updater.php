@@ -2,6 +2,8 @@
 
 namespace Groundhogg;
 
+use function MailHawk\is_mailhawk_network_active;
+
 /**
  * Updater
  *
@@ -26,7 +28,7 @@ abstract class Updater {
 		// Show updates are required
 		add_action( 'admin_init', [ $this, 'listen_for_updates' ], 9 );
 		add_action( 'groundhogg/notices/before', [ $this, 'updates_notice' ] );
-		add_action( 'groundhogg/force_updates', [ $this, 'do_updates' ] );
+		add_action( "groundhogg/updater/{$this->get_updater_name()}/force_updates", [ $this, 'force_updates' ] );
 
 		// Do automatic updates
 		add_action( 'init', [ $this, 'do_automatic_updates' ], 8 );
@@ -82,9 +84,9 @@ abstract class Updater {
 
 			$text = sprintf( __( 'Version %s', 'groundhogg' ), $update );
 
-			if ( $this->did_update( $update ) ){
-			    echo '<span style="color: green">&#x2705;</span>&nbsp;';
-            }
+			if ( $this->did_update( $update ) ) {
+				echo '<span style="color: green">&#x2705;</span>&nbsp;';
+			}
 
 			echo html()->e( 'a', [
 				'href' => add_query_arg( [
@@ -315,9 +317,12 @@ abstract class Updater {
 			return;
 		}
 
-		$action = 'gh_' . $this->get_updater_name() . '_do_updates';
-
-		$action_url = action_url( $action );
+		if ( is_multisite() && is_main_site() && is_groundhogg_network_active() ) {
+			$action_url = Plugin::instance()->bulk_jobs->update_subsites->get_start_url( [ 'updater' => $this->get_updater_name() ] );
+		} else {
+			$action     = 'gh_' . $this->get_updater_name() . '_do_updates';
+			$action_url = action_url( $action );
+		}
 
 		$update_button = html()->e( 'a', [
 			'href'  => $action_url,
@@ -360,13 +365,25 @@ abstract class Updater {
 	}
 
 	/**
+     * Remove the update lock before running the upgrade path...
+     *
+	 * @return bool
+	 */
+	public function force_updates(){
+
+	    // Remove the update lock...
+		$update_lock = 'gh_' . $this->get_updater_name() . '_doing_updates';
+		delete_transient( $update_lock );
+
+	    return $this->do_updates();
+    }
+
+	/**
 	 * Check whether upgrades should happen or not.
 	 */
 	public function do_updates() {
 
 		$update_lock = 'gh_' . $this->get_updater_name() . '_doing_updates';
-
-		delete_transient( $update_lock );
 
 		// Check if an update lock is present.
 		if ( get_transient( $update_lock ) ) {
@@ -417,9 +434,6 @@ abstract class Updater {
 
 		$available_updates = $this->get_automatic_updates();
 		$missing_updates   = array_diff( $available_updates, $previous_updates );
-
-//		var_dump( $available_updates, $previous_updates, $missing_updates);
-//		wp_die();
 
 		if ( empty( $missing_updates ) ) {
 			return false;

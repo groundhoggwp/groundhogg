@@ -279,7 +279,7 @@ class Main_Updater extends Updater {
 	/**
 	 * Ensure roles/caps are added...
 	 */
-	public function version_2_2_13(){
+	public function version_2_2_13() {
 		Plugin::instance()->roles->add_roles();
 		Plugin::instance()->roles->add_caps();
 	}
@@ -288,25 +288,14 @@ class Main_Updater extends Updater {
 	 * Notes db added.
 	 * Migrate notes
 	 */
-	public function version_2_2_14(){
-
+	public function version_2_2_14() {
 		Plugin::$instance->dbs->install_dbs();
-
-		add_action( 'groundhogg/updater/main/finished', function (){
-			$migrate_notes = new Migrate_Notes();
-			$migrate_notes->start();
-		} );
+		update_option( 'gh_migrate_notes', 1 );
 	}
 
-	public function version_2_2_18()
-	{
-		add_action( 'groundhogg/updater/main/finished', function (){
-			$migrate_notes = new Migrate_Notes();
-			$migrate_notes->start();
-		} );
+	public function version_2_2_16_test_3() {
+		notices()->add( 'upgraded', 'Groundhogg updated network wide' );
 	}
-
-
 
 	/**
 	 * A unique name for the updater to avoid conflicts
@@ -342,9 +331,7 @@ class Main_Updater extends Updater {
 			'2.1.14.1',
 			'2.2',
 			'2.2.14',
-			'2.2.18',
-			'2.2.19'
-
+			'2.2.16.test.3'
 		];
 	}
 
