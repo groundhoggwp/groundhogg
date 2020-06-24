@@ -267,19 +267,39 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 * @return bool
 	 */
 	public function update( $data = [] ) {
+
 		if ( empty( $data ) ) {
 			return false;
 		}
 
 		$data = $this->sanitize_columns( $data );
 
-		do_action( "groundhogg/{$this->get_object_type()}/pre_update", $this->get_id(), $data, $this );
+		$old_data = $this->data;
+
+		/**
+		 * Fires before the object is updated...
+		 *
+		 * @param int $object_id the ID of the object
+		 * @param mixed[] $new_data the new data being saved
+		 * @param Base_Object $object the object class
+		 * @param mixed[] $old_data the current data
+		 */
+		do_action( "groundhogg/{$this->get_object_type()}/pre_update", $this->get_id(), $data, $this, $old_data );
 
 		if ( $updated = $this->get_db()->update( $this->get_id(), $data, $this->get_identifier_key() ) ) {
 
 			$object = $this->get_from_db( $this->get_identifier_key(), $this->get_id() );
 			$this->setup_object( $object );
-			do_action( "groundhogg/{$this->get_object_type()}/post_update", $this->get_id(), $data, $this );
+
+			/**
+			 * Fires after the object is updated...
+			 *
+			 * @param int $object_id the ID of the object
+			 * @param mixed[] $new_data the new data being saved
+			 * @param Base_Object $object the object class
+			 * @param mixed[] $old_data the current data
+			 */
+			do_action( "groundhogg/{$this->get_object_type()}/post_update", $this->get_id(), $data, $this, $old_data );
 
 		}
 
@@ -300,6 +320,13 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
 		$data = $this->sanitize_columns( $data );
 
+		/**
+		 * Fires before the object is created...
+		 *
+		 * @param int $object_id the ID of the object
+		 * @param mixed[] $new_data the new data being saved
+		 * @param Base_Object $object the object class, at this point it's pretty useless though
+		 */
 		do_action( "groundhogg/{$this->get_object_type()}/pre_create", $data, $this );
 
 		if ( $id = $this->get_db()->add( $data ) ) {
@@ -312,6 +339,13 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
 			$this->setup_object( $object );
 
+			/**
+			 * Fires after the object is created...
+			 *
+			 * @param int $object_id the ID of the object
+			 * @param mixed[] $new_data the new data being saved
+			 * @param Base_Object $object the object class
+			 */
 			do_action( "groundhogg/{$this->get_object_type()}/post_create", $this->get_id(), $data, $this );
 
 		}
@@ -436,11 +470,26 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	}
 
 	/**
+	 * Wrapper function for returning an array of the object...
+	 *
+	 * @return array
+	 */
+	public function toArray(){
+		return $this->get_as_array();
+	}
+
+	/**
 	 * @return array
 	 */
 	public function get_as_array() {
+
+		/**
+		 * Filters the array function...
+		 *
+		 * @param mixed[] $array the array of args fot the object...
+		 */
 		return apply_filters( "groundhogg/{$this->get_object_type()}/get_as_array", [
-			'ID'    => $this->get_id(),
+			'ID'   => $this->get_id(),
 			'data' => $this->data
 		] );
 	}

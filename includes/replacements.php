@@ -129,6 +129,11 @@ class Replacements {
 				'description' => _x( 'The contact\'s company address.', 'replacement', 'groundhogg' ),
 			),
 			array(
+				'code'        => 'notes',
+				'callback'    => [ $this, 'replacement_notes' ],
+				'description' => _x( 'The contact\'s notes.', 'replacement', 'groundhogg' ),
+			),
+			array(
 				'code'        => 'meta',
 				'callback'    => [ $this, 'replacement_meta' ],
 				'description' => _x( 'Any meta data related to the contact. Usage: {meta.attribute}', 'replacement', 'groundhogg' ),
@@ -182,6 +187,11 @@ class Replacements {
 				'code'        => 'owner_signature',
 				'callback'    => [ $this, 'replacement_owner_signature' ],
 				'description' => _x( 'The contact owner\'s signature.', 'replacement', 'groundhogg' ),
+			),
+			array(
+				'code'        => 'owner',
+				'callback'    => [ $this, 'replacement_owner' ],
+				'description' => _x( 'Any data related to the contact\'s linked owner. Usage: {owner.attribute}', 'replacement', 'groundhogg' ),
 			),
 			array(
 				'code'        => 'confirmation_link',
@@ -623,6 +633,27 @@ class Replacements {
 	}
 
 	/**
+	 * Get the contact notes
+	 *
+	 * @param $contact_id
+	 *
+	 * @return mixed
+	 */
+	function replacement_notes( $contact_id ){
+        $notes = $this->get_current_contact()->get_all_notes();
+
+        $return = "";
+
+        foreach ( $notes as $note ){
+            $return .= sprintf( "\n\n===== %s =====", date( get_date_time_format(), $note->timestamp ) );
+            $return .= sprintf( "\n\n%s", $note->content );
+            $return .= sprintf( "\n\n%s", $note->content );
+        }
+
+        return $return;
+    }
+
+	/**
 	 * Get the job title of a contact
 	 *
 	 * @param $contact_id
@@ -732,6 +763,25 @@ class Replacements {
 	    }
 
 		return $user->signature;
+	}
+
+	/**
+	 * Return the owner's signature
+	 *
+	 * @param mixed $attr the attribute to fetch...
+	 * @param int $contact_id
+	 *
+	 * @return mixed|string
+	 */
+	function replacement_owner( $attr, $contact_id=0 ) {
+
+		$user = $this->get_current_contact()->get_ownerdata();
+
+		if ( ! $user ) {
+			return false;
+		}
+
+		return $user->$attr;
 	}
 
 	/**

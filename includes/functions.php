@@ -329,7 +329,7 @@ function validate_tags( $maybe_tags ) {
  * Replacements Wrapper.
  *
  * @param string $content
- * @param int $contact_id
+ * @param int|Contact $contact_id
  *
  * @return string
  */

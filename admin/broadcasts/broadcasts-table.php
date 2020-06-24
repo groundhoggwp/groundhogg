@@ -500,19 +500,14 @@ class Broadcasts_Table extends WP_List_Table {
 		$order    = get_url_var( 'order', 'DESC' );
 		$orderby  = get_url_var( 'orderby', 'ID' );
 
-
 		$where = [
 			'relationship' => "AND",
 			[ 'col' => 'status', 'val' => $this->get_view(), 'compare' => '=' ],
-			[ 'col' => 'object_type', 'val' => 'email', 'compare' => '=' ],
 		];
 
-		if ( is_sms_plugin_active() ) {
-			$where[] = [
-				'relationship' => "AND",
-				[ 'col' => 'status', 'val' => $this->get_view(), 'compare' => '=' ],
-
-			];
+		// Only look for emails.
+		if ( ! is_sms_plugin_active() ) {
+			$where[] = [ 'col' => 'object_type', 'val' => 'email', 'compare' => '=' ];
 		}
 
 		$args = array(

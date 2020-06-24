@@ -1,26 +1,37 @@
-.gh-extension{
-    background: #FFFFFF;
-    width: 400px;
-    /*height: 450px;*/
-    vertical-align: top;
-    padding: 10px;
-    box-sizing: border-box;
-    margin: 20px 0 0 20px;
-    /*box-shadow: 0 0 5px #c4c4c4;*/
+img.thumbnail {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 175px;
+    border-radius: 5px;
+}
+
+.post-box-grid .postbox h3.extension-title,
+.post-box-grid .postbox p.extension-description{
+    margin-left: 225px;
+    margin-right: 20px;
+}
+
+.post-box-grid .postbox{
+    position: relative;
+}
+
+.postbox .card-top{
+    min-height: 135px;
+}
+
+.postbox .install-actions{
+    clear: both;
+    padding: 12px 20px;
+    background-color: #fafafa;
+    border-top: 1px solid #ddd;
+    overflow: hidden;
+}
+
+.quiet-install{
     display: inline-block;
 }
 
-.gh-image-container{
-    box-sizing: border-box;
-}
-
-.gh-extension-image{
-    box-sizing: border-box;
-    width: 100%;
-    border: 1px solid #dddddd;
-}
-
-.gh-description-container{
-    padding: 10px;
-    box-sizing: border-box;
+.more-details{
+    float: right;
 }

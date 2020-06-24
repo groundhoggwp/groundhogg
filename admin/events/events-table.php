@@ -184,6 +184,10 @@ class Events_Table extends WP_List_Table {
 				break;
 		}
 
+		if ( $event->get_time() < time() && $event->is_waiting() ){
+			return '<abbr title="' . date_i18n( get_date_time_format(), $event->get_time() ) . '">' . __( 'Running now...', 'groundhogg' ) . '</abbr>';
+		}
+
 		return $time_prefix . '&nbsp;' . scheduled_time_column( $event->get_time(), true, $event->get_contact() );
 	}
 

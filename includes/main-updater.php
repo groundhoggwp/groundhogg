@@ -293,10 +293,6 @@ class Main_Updater extends Updater {
 		update_option( 'gh_migrate_notes', 1 );
 	}
 
-	public function version_2_2_16_test_3() {
-		notices()->add( 'upgraded', 'Groundhogg updated network wide' );
-	}
-
 	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
@@ -331,7 +327,6 @@ class Main_Updater extends Updater {
 			'2.1.14.1',
 			'2.2',
 			'2.2.14',
-			'2.2.16.test.3'
 		];
 	}
 

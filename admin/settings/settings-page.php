@@ -43,6 +43,7 @@ class Settings_Page extends Admin_Page {
 
 	public function scripts() {
 		wp_enqueue_style( 'groundhogg-admin' );
+		wp_enqueue_style( 'groundhogg-admin-extensions' );
 	}
 
 	/**
@@ -147,7 +148,7 @@ class Settings_Page extends Admin_Page {
 			<?php wp_nonce_field(); ?>
 			<?php
 
-			if ( ! empty( $extensions ) ) {
+			if ( ! empty( $extensions ) ) :
 
 				if ( ! is_white_labeled() ):
 
@@ -165,7 +166,7 @@ class Settings_Page extends Admin_Page {
 				endforeach;
 
 				?></div><?php
-			} else {
+			else:
 				?>
                 <style>
                     .masonry {
@@ -193,14 +194,10 @@ class Settings_Page extends Admin_Page {
                 <p><?php _e( 'You have no extensions installed. Want some?', 'groundhogg' ); ?> <a
                             href="https://groundhogg.io/pricing/"><?php _e( 'Get your first extension!', 'groundhogg' ) ?></a>
                 </p>
-                <div class="masonry">
-					<?php
-					foreach ( License_Manager::get_extensions( 99 ) as $extension ):
-						License_Manager::extension_to_html( $extension );
-					endforeach; ?>
+                <div class="extensions">
+					<?php include __DIR__ . '/extensions.php'; ?>
                 </div>
-				<?php
-			} ?>
+			<?php endif; ?>
         </div>
 		<?php
 	}
@@ -333,7 +330,7 @@ class Settings_Page extends Admin_Page {
 			),
 			'captcha'           => array(
 				'id'    => 'captcha',
-				'title' => _x( 'Captcha', 'settings_sections', 'groundhogg' ),
+				'title' => _x( 'Google reCAPTCHA', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
 			),
 			'event_notices'     => [
@@ -742,7 +739,7 @@ class Settings_Page extends Admin_Page {
 			'gh_recaptcha_site_key'                  => array(
 				'id'      => 'gh_recaptcha_site_key',
 				'section' => 'captcha',
-				'label'   => _x( 'Recaptcha Site Key', 'settings', 'groundhogg' ),
+				'label'   => _x( 'reCAPTCHA Site Key', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'This is the key which faces the users on the front-end', 'settings', 'groundhogg' ),
 				'type'    => 'input',
 				'atts'    => array(
@@ -753,12 +750,43 @@ class Settings_Page extends Admin_Page {
 			'gh_recaptcha_secret_key'                => array(
 				'id'      => 'gh_recaptcha_secret_key',
 				'section' => 'captcha',
-				'label'   => _x( 'Recaptcha Secret Key', 'settings', 'groundhogg' ),
+				'label'   => _x( 'reCAPTCHA Secret Key', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'Never ever ever share this with anyone!', 'settings', 'groundhogg' ),
 				'type'    => 'input',
 				'atts'    => array(
 					'name' => 'gh_recaptcha_secret_key',
 					'id'   => 'gh_recaptcha_secret_key',
+				),
+			),
+			'gh_recaptcha_version'                => array(
+				'id'      => 'gh_recaptcha_version',
+				'section' => 'captcha',
+				'label'   => _x( 'reCAPTCHA Version', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'Which version of reCAPTCHA you want to use.', 'settings', 'groundhogg' ),
+				'type'    => 'dropdown',
+				'atts'    => array(
+					'name' => 'gh_recaptcha_version',
+					'id'   => 'gh_recaptcha_version',
+                    'options' => [
+                        'v2' => 'V2',
+                        'v3' => 'V3'
+                    ],
+                    'option_none' => false
+				),
+			),
+			'gh_recaptcha_v3_score_threshold'                => array(
+				'id'      => 'gh_recaptcha_v3_score_threshold',
+				'section' => 'captcha',
+				'label'   => _x( 'reCAPTCHA v3 Score Threshold', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'The score threshold to block form submissions. <code>0.5</code> by default.', 'settings', 'groundhogg' ),
+				'type'    => 'number',
+				'atts'    => array(
+					'name' => 'gh_recaptcha_v3_score_threshold',
+					'id'   => 'gh_recaptcha_v3_score_threshold',
+					'min'  => 0,
+					'max'  => 1,
+					'step' => '0.1',
+                    'placeholder' => '0.5'
 				),
 			),
 			'gh_bounce_inbox'                        => array(
@@ -1133,11 +1161,11 @@ class Settings_Page extends Admin_Page {
 	 *
 	 * @return bool
 	 */
-	private function tab_has_settings( $tab='' ) {
+	private function tab_has_settings( $tab = '' ) {
 
-	    if ( ! $tab ){
-	        $tab = $this->active_tab();
-        }
+		if ( ! $tab ) {
+			$tab = $this->active_tab();
+		}
 
 		global $wp_settings_sections;
 
@@ -1145,19 +1173,19 @@ class Settings_Page extends Admin_Page {
 	}
 
 	/**
-     * If a cap is specific for the tab, check to see if the user has the required permissions...
-     *
+	 * If a cap is specific for the tab, check to see if the user has the required permissions...
+	 *
 	 * @param $tab
 	 *
 	 * @return bool
 	 */
-	private function user_can_access_tab( $tab='' ){
+	private function user_can_access_tab( $tab = '' ) {
 
-		if ( ! $tab ){
+		if ( ! $tab ) {
 			$tab = $this->active_tab();
 		}
 
-	    $tab = get_array_var( $this->tabs, $tab );
+		$tab = get_array_var( $this->tabs, $tab );
 
 		// Check for cap restriction on the tab...
 		$cap = get_array_var( $tab, 'cap' );

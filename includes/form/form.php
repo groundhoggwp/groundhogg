@@ -46,6 +46,7 @@ class Form {
 
 	protected $attributes = [];
 	protected $step;
+	protected $uniqid;
 
 	/**
 	 * Manager constructor.
@@ -57,6 +58,7 @@ class Form {
 		], $atts );
 
 		$this->step = new Step( $atts[ 'id' ] );
+		$this->uniqid = uniqid( 'form_' );
 		$this->init_fields();
 	}
 
@@ -262,7 +264,8 @@ class Form {
 			'class'   => 'gh-form ' . $this->attributes['class'] . ( $submit_via_ajax ? ' ajax-submit' : '' ),
 			'target'  => '_parent',
 			'enctype' => 'multipart/form-data',
-			'name'    => $this->step->get_step_title()
+			'name'    => $this->step->get_step_title(),
+			'id'      => $this->uniqid
 		];
 
 		if ( get_query_var( 'doing_iframe' ) ) {

@@ -47,7 +47,9 @@ abstract class Admin_Page extends Supports_Errors {
 			add_action( 'admin_enqueue_scripts', [ $this, 'scripts' ] );
 			add_action( 'admin_enqueue_scripts', [ $this, 'register_pointers' ] );
 			add_filter( 'admin_title', [ $this, 'admin_title' ], 10, 2 );
-			add_filter( 'set-screen-option', [ $this, 'set_screen_options' ], 10, 3 );
+
+			add_filter( "set-screen-option", [ $this, 'set_screen_options' ], 10, 3 );
+			add_filter( "set_screen_option_{$this->get_slug()}_per_page", [ $this, 'set_screen_option_per_page' ], 10, 3 );
 
 			add_action( 'admin_init', [ $this, 'process_action' ] );
 
@@ -178,6 +180,7 @@ abstract class Admin_Page extends Supports_Errors {
 	 * Add some screen options
 	 */
 	public function screen_options() {
+
 		$args = array(
 			'label'   => __( 'Per page', 'groundhogg' ),
 			'default' => 20,
@@ -191,18 +194,32 @@ abstract class Admin_Page extends Supports_Errors {
 	}
 
 	/**
+	 * @param $keep
+	 * @param $option
+	 * @param $value
+	 *
+	 * @return mixed
+	 */
+	public function set_screen_options( $keep, $option, $value ){
+
+	    if ( $this->get_slug() . '_per_page' === $option ){
+	        return $value;
+        }
+
+	    return $keep;
+    }
+
+	/**
 	 * Save screen option per page
 	 *
-	 * @param $status
+	 * @param $keep
 	 * @param $option
 	 * @param $value
 	 *
 	 * @return mixed|void
 	 */
-	public function set_screen_options( $status, $option, $value ) {
-		if ( $this->get_slug() . '_per_page' == $option ) {
-			return $value;
-		}
+	public function set_screen_option_per_page( $keep, $option, $value ) {
+		return absint( $value );
 	}
 
 	/**

@@ -168,7 +168,7 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
                 </p>
                 <p>
 					<?php echo Plugin::$instance->utils->html->checkbox( [
-						'label'   => __( 'Use custom Alt-Body', 'groundhogg' ),
+						'label'   => __( 'Enable custom plain text version', 'groundhogg' ),
 						'name'    => 'use_custom_alt_body',
 						'id'      => 'use_custom_alt_body',
 						'class'   => '',
@@ -236,17 +236,18 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 
 				<?php if ( $email->has_custom_alt_body() ) : ?>
                     <div id="alt-wrap">
-                        <h3><?php _e( 'Alt-Body', 'groundhogg' ); ?></h3>
-                        <textarea id="alt-body-input" name="alt_body" style="width: 100%" rows="16"><?php
+                        <h3><?php _e( 'Alternate Plain Text Version', 'groundhogg' ); ?></h3>
+                        <p><?php printf( __( 'Having a custom plain text version will improve the deliverability of your emails. %s automatically generates one for you but if you want full control over it you can define it below.', 'groundhogg' ), white_labeled_name() ); ?></p>
+                        <textarea id="alt-body-input" name="alt_body" style="width: 100%" rows="8"><?php
 							$alt_body = $email->get_alt_body();
 							esc_html_e( $alt_body );
 							?></textarea>
-                        <p class="description"><?php printf( __( 'Having a custom Alt-Body will improve the deliverability of your emails. %s automatically generates one for you but if you want full control over it you can define it below.', 'groundhogg' ), white_labeled_name() ); ?></p>
                     </div>
 				<?php endif; ?>
                 <div id="header-wrap">
                     <h3><?php _e( 'Custom Headers', 'groundhogg-pro' ); ?></h3>
-					<?php
+                    <p><?php printf( __( 'You can define custom email headers and override existing ones. For example <code>X-Custom-Header</code> <code>From</code> <code>Bcc</code> <code>Cc</code>', 'groundhogg' ), white_labeled_name() ); ?></p>
+                    <?php
 					$headers        = [];
 					$custom_headers = $email->get_meta( 'custom_headers', true );
 

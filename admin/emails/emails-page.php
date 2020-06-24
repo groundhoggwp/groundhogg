@@ -174,8 +174,7 @@ class Emails_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		foreach ( $this->get_items() as $id ) //todo
-		{
+		foreach ( $this->get_items() as $id ) {
 			Plugin::$instance->dbs->get_db( 'emails' )->update( $id, [ 'status' => 'draft' ] );
 		}
 
@@ -395,17 +394,17 @@ class Emails_Page extends Admin_Page {
 
 					switch ( $header_key ) {
 						case 'from':
-						    // If only the email is provided
-						    if ( is_email($header_value) ){
-							    $headers[ $header_key ] = sanitize_email( $header_value );
-						    } else if ( preg_match( '/([^<]+) <([^>]+)>/', $header_value, $matches ) ) {
-						        $email_address = sanitize_email( $matches[2] );
-						        $name  = sanitize_text_field( $matches[1] );
-							    $headers[ $header_key ] = sprintf( '%s <%s>', $name, $email_address );
-                            } else {
-							    $headers[ $header_key ] = '';
-                            }
-						    break;
+							// If only the email is provided
+							if ( is_email( $header_value ) ) {
+								$headers[ $header_key ] = sanitize_email( $header_value );
+							} else if ( preg_match( '/([^<]+) <([^>]+)>/', $header_value, $matches ) ) {
+								$email_address          = sanitize_email( $matches[2] );
+								$name                   = sanitize_text_field( $matches[1] );
+								$headers[ $header_key ] = sprintf( '%s <%s>', $name, $email_address );
+							} else {
+								$headers[ $header_key ] = '';
+							}
+							break;
 						case 'bcc':
 						case 'cc':
 						case 'return-path':

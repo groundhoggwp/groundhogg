@@ -330,7 +330,11 @@ abstract class Updater {
 		$update_descriptions = "";
 
 		foreach ( $missing_updates as $missing_update ) {
-			$update_descriptions .= sprintf( '<li style="margin-left: 10px"><b>%1$s</b> - %2$s</li>', $missing_update, $this->get_update_description( $missing_update ) );
+		    if ( $this->get_update_description( $missing_update ) ){
+			    $update_descriptions .= sprintf( '<li style="margin-left: 10px"><b>%1$s</b> - %2$s</li>', $missing_update, $this->get_update_description( $missing_update ) );
+		    } else {
+			    $update_descriptions .= sprintf( '<li style="margin-left: 10px"><b>%1$s</b></li>', $missing_update );
+		    }
 		}
 
 		if ( ! empty( $update_descriptions ) ) {
@@ -338,9 +342,7 @@ abstract class Updater {
 		}
 
 		$notice = sprintf( __( "%s requires a database upgrade. Consider backing up your site before upgrading. </p>%s<p>%s", 'groundhogg' ), white_labeled_name(), $update_descriptions, $update_button );
-
 		notices()->add( 'updates_required', $notice, 'info', 'manage_options', true );
-
 	}
 
 	/**
@@ -353,6 +355,8 @@ abstract class Updater {
 		if ( ! current_user_can( 'manage_options' ) || ! get_url_var( 'action' ) === $action || ! wp_verify_nonce( get_url_var( '_wpnonce' ), $action ) ) {
 			return;
 		}
+
+		$this->unlock_updates();
 
 		if ( $this->do_updates() ) {
 			notices()->add( 'updated', sprintf( __( "%s upgraded successfully!", 'groundhogg' ), white_labeled_name() ), 'success', 'manage_options', true );
@@ -370,8 +374,7 @@ abstract class Updater {
 	public function force_updates(){
 
 	    // Remove the update lock...
-		$update_lock = 'gh_' . $this->get_updater_name() . '_doing_updates';
-		delete_transient( $update_lock );
+		$this->unlock_updates();
 
 	    return $this->do_updates();
     }
@@ -381,15 +384,14 @@ abstract class Updater {
 	 */
 	public function do_updates() {
 
-		$update_lock = 'gh_' . $this->get_updater_name() . '_doing_updates';
-
 		// Check if an update lock is present.
-		if ( get_transient( $update_lock ) ) {
+		if ( $this->are_updates_locked() ) {
+		    wp_send_json_error( 'updates are locked' );
 			return false;
 		}
 
 		// Set lock so second update process cannot be run before this one is complete.
-		set_transient( $update_lock, time(), MINUTE_IN_SECONDS );
+		$this->lock_updates();
 
 		$previous_updates = $this->get_previous_versions();
 
@@ -437,15 +439,13 @@ abstract class Updater {
 			return false;
 		}
 
-		$update_lock = 'gh_' . $this->get_updater_name() . '_doing_updates';
-
 		// Check if an update lock is present.
-		if ( get_transient( $update_lock ) ) {
+		if ( $this->are_updates_locked() ) {
 			return false;
 		}
 
 		// Set lock so second update process cannot be run before this one is complete.
-		set_transient( $update_lock, time(), MINUTE_IN_SECONDS );
+		$this->lock_updates();
 
 		foreach ( $missing_updates as $update ) {
 			$this->update_to_version( $update );
@@ -476,5 +476,21 @@ abstract class Updater {
 	 */
 	protected function get_plugin_file() {
 		return GROUNDHOGG__FILE__;
+	}
+
+	protected function get_update_lock_name(){
+		return 'gh_' . $this->get_updater_name() . '_doing_updates';
+	}
+
+	protected function lock_updates(){
+		return set_transient( $this->get_update_lock_name(), time(), MINUTE_IN_SECONDS );
+	}
+
+	protected function unlock_updates(){
+		return delete_transient( $this->get_update_lock_name() );
+	}
+
+	protected function are_updates_locked(){
+		return time() - get_transient( $this->get_update_lock_name() ) < MINUTE_IN_SECONDS;
 	}
 }

@@ -526,6 +526,15 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Change the owner of the contact...
+	 *
+	 * @param $user WP_User|int
+	 */
+	public function change_owner( $user ){
+
+	}
+
+	/**
 	 * Change the marketing preferences of a contact.
 	 *
 	 * @param $preference

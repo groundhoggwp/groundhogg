@@ -649,16 +649,16 @@ class Email extends Base_Object_With_Meta {
 		/* Use default mail-server */
 		$headers = [];
 
-		$custom_headers = $this->get_meta( 'custom_headers' );
+		$custom_headers = $this->get_meta( 'custom_headers' ) ?: [];
 
 		foreach ( $custom_headers as $custom_header => $custom_header_value ) {
 
-			if ( empty( $custom_header_value ) ){
+			if ( empty( $custom_header_value ) ) {
 				continue;
 			}
 
 			$key             = strtolower( $custom_header );
-			$headers[ $key ] = $custom_header_value;
+			$headers[ $key ] = do_replacements( $custom_header_value, $this->get_contact() );
 		}
 
 		$list_unsub_header = sprintf(
@@ -683,7 +683,8 @@ class Email extends Base_Object_With_Meta {
 		// Merge the custom headers with the defaults...
 		$headers = wp_parse_args( $headers, $defaults );
 
-		foreach ( $headers as $header_key => &$header_value ){
+		// Format the headers as they would have been formatted before.
+		foreach ( $headers as $header_key => &$header_value ) {
 			$header_value = sprintf( "%s: %s", $header_key, $header_value );
 		}
 

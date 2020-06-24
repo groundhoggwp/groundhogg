@@ -361,7 +361,7 @@ class Form_Filled extends Benchmark {
 									'class' => 'button button-secondary file'
 								),
 								array(
-									'text'  => __( 'ReCaptcha', 'groundhogg' ),
+									'text'  => __( 'ReCAPTCHA', 'groundhogg' ),
 									'class' => 'button button-secondary recaptcha'
 								),
 								array(
@@ -665,32 +665,34 @@ class Form_Filled extends Benchmark {
                     <!-- END COLUMN OPTIONS -->
 
                     <!-- BEGIN CAPTCHA OPTIONS -->
-                    <tr id="gh-field-captcha-theme">
-                        <th><?php _e( 'Theme', 'groundhogg' ) ?></th>
-                        <td><?php
-							echo Plugin::$instance->utils->html->dropdown( array(
-								'id'      => 'field-theme',
-								'name'    => 'captcha-theme',
-								'options' => array(
-									'light' => 'Light',
-									'dark'  => 'Dark',
-								)
-							) );
-							?><p class="description"><?php _e( 'The Captcha Theme.', 'groundhogg' ) ?></p></td>
-                    </tr>
-                    <tr id="gh-field-captcha-size">
-                        <th><?php _e( 'Theme', 'groundhogg' ) ?></th>
-                        <td><?php
-							echo Plugin::$instance->utils->html->dropdown( array(
-								'id'      => 'field-captcha-size',
-								'name'    => 'captcha-size',
-								'options' => array(
-									'normal'  => 'Normal',
-									'compact' => 'Compact',
-								)
-							) );
-							?><p class="description"><?php _e( 'The Captcha Size.', 'groundhogg' ) ?></p></td>
-                    </tr>
+					<?php if ( Form\Fields\Recaptcha::get_version() !== 'v3' ): ?>
+                        <tr id="gh-field-captcha-theme">
+                            <th><?php _e( 'Theme', 'groundhogg' ) ?></th>
+                            <td><?php
+								echo Plugin::$instance->utils->html->dropdown( array(
+									'id'      => 'field-theme',
+									'name'    => 'captcha-theme',
+									'options' => array(
+										'light' => 'Light',
+										'dark'  => 'Dark',
+									)
+								) );
+								?><p class="description"><?php _e( 'The CAPTCHA Theme.', 'groundhogg' ) ?></p></td>
+                        </tr>
+                        <tr id="gh-field-captcha-size">
+                            <th><?php _e( 'Size', 'groundhogg' ) ?></th>
+                            <td><?php
+								echo Plugin::$instance->utils->html->dropdown( array(
+									'id'      => 'field-captcha-size',
+									'name'    => 'captcha-size',
+									'options' => array(
+										'normal'  => 'Normal',
+										'compact' => 'Compact',
+									)
+								) );
+								?><p class="description"><?php _e( 'The CAPTCHA Size.', 'groundhogg' ) ?></p></td>
+                        </tr>
+					<?php endif; ?>
                     <!-- END CAPTCHA OPTIONS -->
 
                     <!-- BEGIN DATE OPTIONS -->

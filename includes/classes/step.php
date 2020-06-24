@@ -254,7 +254,21 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return bool
 	 */
 	public function enqueue( $contact ) {
+
 		$this->enqueued_contact = $contact;
+
+		/**
+		 * @param bool $enqueue whether the step can be enqueued or not...
+		 * @param Contact Contact
+		 * @param Step Step the step being enqueued
+		 *
+		 * @return bool whether the step can be enqueued or not...
+		 */
+		$can_enqueue = apply_filters( 'groundhogg/steps/enqueue', true, $contact, $this );
+
+		if ( ! $can_enqueue ) {
+			return false;
+		}
 
 		// Update any events to skipped...
 		$this->get_event_queue_db()->mass_update(

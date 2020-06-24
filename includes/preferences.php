@@ -60,7 +60,7 @@ class Preferences {
 			return $template;
 		}
 
-		$loader = Plugin::$instance->rewrites->get_template_loader();
+		$loader       = Plugin::$instance->rewrites->get_template_loader();
 		$new_template = $loader->get_template_part( 'preferences', '', false );
 
 		if ( file_exists( $new_template ) ) {
@@ -130,38 +130,32 @@ class Preferences {
 	}
 
 	/**
+	 * Get all the preference names
+	 *
+	 * @return array
+	 */
+	public static function get_preference_names(){
+		return [
+			self::UNCONFIRMED  => _x( 'Unconfirmed', 'optin_status', 'groundhogg' ),
+			self::CONFIRMED    => _x( 'Confirmed', 'optin_status', 'groundhogg' ),
+			self::UNSUBSCRIBED => _x( 'Unsubscribed', 'optin_status', 'groundhogg' ),
+			self::WEEKLY       => _x( 'Subscribed Weekly', 'optin_status', 'groundhogg' ),
+			self::MONTHLY      => _x( 'Subscribed Monthly', 'optin_status', 'groundhogg' ),
+			self::HARD_BOUNCE  => _x( 'Bounced', 'optin_status', 'groundhogg' ),
+			self::SPAM         => _x( 'Spam', 'optin_status', 'groundhogg' ),
+			self::COMPLAINED   => _x( 'Complained', 'optin_status', 'groundhogg' ),
+		];
+	}
+
+	/**
+	 * Get a specifc preference name
+	 *
 	 * @param $preference int
 	 *
 	 * @return string
 	 */
 	public static function get_preference_pretty_name( $preference ) {
-		switch ( $preference ) {
-			default:
-			case self::UNCONFIRMED:
-				return _x( 'Unconfirmed', 'optin_status', 'groundhogg' );
-				break;
-			case self::CONFIRMED:
-				return _x( 'Confirmed', 'optin_status', 'groundhogg' );
-				break;
-			case self::UNSUBSCRIBED:
-				return _x( 'Unsubscribed', 'optin_status', 'groundhogg' );
-				break;
-			case self::WEEKLY:
-				return _x( 'Subscribed Weekly', 'optin_status', 'groundhogg' );
-				break;
-			case self::MONTHLY:
-				return _x( 'Subscribed Monthly', 'optin_status', 'groundhogg' );
-				break;
-			case self::HARD_BOUNCE:
-				return _x( 'Bounced', 'optin_status', 'groundhogg' );
-				break;
-			case self::SPAM:
-				return _x( 'Spam', 'optin_status', 'groundhogg' );
-				break;
-			case self::COMPLAINED:
-				return _x( 'Complained', 'optin_status', 'groundhogg' );
-				break;
-		}
+		return get_array_var( self::get_preference_names(), $preference, false );
 	}
 
 	/**
