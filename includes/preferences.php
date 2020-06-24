@@ -134,7 +134,7 @@ class Preferences {
 	 *
 	 * @return array
 	 */
-	public static function get_preference_names(){
+	public static function get_preference_names() {
 		return [
 			self::UNCONFIRMED  => _x( 'Unconfirmed', 'optin_status', 'groundhogg' ),
 			self::CONFIRMED    => _x( 'Confirmed', 'optin_status', 'groundhogg' ),
@@ -145,6 +145,39 @@ class Preferences {
 			self::SPAM         => _x( 'Spam', 'optin_status', 'groundhogg' ),
 			self::COMPLAINED   => _x( 'Complained', 'optin_status', 'groundhogg' ),
 		];
+	}
+
+	/**
+	 * Map a string to an email preference
+	 *
+	 * @param string $string a string representation of a preference
+	 *
+	 * @return int
+	 */
+	public static function string_to_preference( $string ) {
+
+		if ( ! is_string( $string ) ){
+			return self::UNCONFIRMED;
+		}
+
+		$string_map = [
+			'unconfirm'    => self::UNCONFIRMED,
+			'unconfirmed'  => self::UNCONFIRMED,
+			'confirm'      => self::CONFIRMED,
+			'confirmed'    => self::CONFIRMED,
+			'unsubscribe'  => self::UNSUBSCRIBED,
+			'unsubscribed' => self::UNSUBSCRIBED,
+			'weekly'       => self::WEEKLY,
+			'monthly'      => self::MONTHLY,
+			'hard_bounce'  => self::HARD_BOUNCE,
+			'bounce'       => self::HARD_BOUNCE,
+			'bounced'      => self::HARD_BOUNCE,
+			'complain'     => self::COMPLAINED,
+			'complaint'    => self::COMPLAINED,
+			'complained'   => self::COMPLAINED,
+		];
+
+		return get_array_var( $string_map, $string, self::UNCONFIRMED );
 	}
 
 	/**

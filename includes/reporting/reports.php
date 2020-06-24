@@ -25,6 +25,7 @@ use Groundhogg\Reporting\New_Reports\Table_Email_Links_Clicked;
 use Groundhogg\Reporting\New_Reports\Table_Email_Stats;
 use Groundhogg\Reporting\New_Reports\Table_Form_Activity;
 use Groundhogg\Reporting\New_Reports\Table_Funnel_Stats;
+use Groundhogg\Reporting\New_Reports\Table_List_Engagement;
 use Groundhogg\Reporting\New_Reports\Table_Top_Converting_Funnels;
 use Groundhogg\Reporting\New_Reports\Table_Top_Performing_Broadcasts;
 use Groundhogg\Reporting\New_Reports\Table_Top_Performing_Emails;
@@ -244,6 +245,10 @@ class Reports {
 			[
 				'id'       => 'table_email_funnels_used_in',
 				'callback' => [ $this, 'table_email_funnels_used_in' ]
+			],
+			[
+				'id'       => 'table_list_engagement',
+				'callback' => [ $this, 'table_list_engagement' ]
 			]
 		];
 
@@ -687,6 +692,12 @@ class Reports {
 
 	public function table_email_funnels_used_in(){
 		$report = new Table_Email_Funnels_Used_In( $this->start, $this->end );
+
+		return $report->get_data();
+	}
+
+	public function table_list_engagement(){
+		$report = new Table_List_Engagement( $this->start, $this->end );
 
 		return $report->get_data();
 	}

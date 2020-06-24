@@ -266,6 +266,7 @@ class Contact_Query {
 			'tags_relation'          => 'AND',
 			'tag_query'              => [],
 			'optin_status'           => 'any',
+			'optin_status_exclude'   => false,
 			'owner'                  => 0,
 			'report'                 => false,
 			'activity'               => false,
@@ -287,8 +288,8 @@ class Contact_Query {
 		);
 
 		// Only show contacts associated with the current owner...
-		if ( current_user_can( 'view_contacts' ) && ! current_user_can( 'view_all_contacts' ) ){
-			$this->query_var_defaults[ 'owner' ] = get_current_user_id();
+		if ( current_user_can( 'view_contacts' ) && ! current_user_can( 'view_all_contacts' ) ) {
+			$this->query_var_defaults['owner'] = get_current_user_id();
 		}
 
 		if ( ! empty( $query ) ) {
@@ -670,7 +671,18 @@ class Contact_Query {
 				$this->query_vars['optin_status'] = absint( $this->query_vars['optin_status'] );
 			}
 
-			$where['optin_status'] = "optin_status in ( {$this->query_vars['optin_status']} )";
+			$where['optin_status'] = "optin_status IN ( {$this->query_vars['optin_status']} )";
+		}
+
+		if ( $this->query_vars['optin_status_exclude'] !== false ) {
+
+			if ( is_array( $this->query_vars['optin_status_exclude'] ) ) {
+				$this->query_vars['optin_status_exclude'] = implode( ',', wp_parse_id_list( $this->query_vars['optin_status_exclude'] ) );
+			} else {
+				$this->query_vars['optin_status_exclude'] = absint( $this->query_vars['optin_status_exclude'] );
+			}
+
+			$where['optin_status_exclude'] = "optin_status NOT IN ( {$this->query_vars['optin_status_exclude']} )";
 		}
 
 		if ( $this->query_vars['owner'] ) {
@@ -722,7 +734,7 @@ class Contact_Query {
 
 			}
 
-			$table = get_array_var( $this->query_vars[ 'report' ], 'status' ) === Event::WAITING ? 'event_queue' : 'events';
+			$table = get_array_var( $this->query_vars['report'], 'status' ) === Event::WAITING ? 'event_queue' : 'events';
 
 			$sql = get_db( $table )->get_sql( [
 				'where'   => $subwhere,
@@ -731,7 +743,9 @@ class Contact_Query {
 				'order'   => ''
 			] );
 
-			$where['report'] = "$this->table_name.$this->primary_key IN ( $sql )";
+			$in = isset_not_empty( $this->query_vars['report'], 'exclude' ) ? 'NOT IN' : 'IN';
+
+			$where['report'] = "$this->table_name.$this->primary_key $in ( $sql )";
 		}
 
 		if ( $this->query_vars['activity'] && is_array( $this->query_vars['activity'] ) ) {
@@ -740,7 +754,7 @@ class Contact_Query {
 				'step'   => 'step_id',
 				'funnel' => 'funnel_id',
 				'start'  => 'after',
-				'end'    => 'before'
+				'end'    => 'before',
 			];
 
 			foreach ( $map as $old_key => $new_key ) {
@@ -780,7 +794,9 @@ class Contact_Query {
 				'order'   => ''
 			] );
 
-			$where['activity'] = "$this->table_name.$this->primary_key IN ( $sql )";
+			$in = isset_not_empty( $this->query_vars['activity'], 'exclude' ) ? 'NOT IN' : 'IN';
+
+			$where['activity'] = "$this->table_name.$this->primary_key $in ( $sql )";
 		}
 
 		if ( strlen( $this->query_vars['search'] ) ) {

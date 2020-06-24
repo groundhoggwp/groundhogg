@@ -180,8 +180,16 @@ class Broadcasts_Page extends Admin_Page {
 
 		// if the email is a transactional email we will remove the optin statuses from the query
 		if ( $config['object_type'] === 'email' && isset( $email ) && $email->is_transactional() ){
-			// ignore marketable statuses...
-			unset( $query[ 'optin_status' ] );
+
+		    // Include additional statuses
+            unset( $query[ 'optin_status' ] );
+
+			$query[ 'optin_status_exclude' ] = [
+                Preferences::SPAM,
+                Preferences::HARD_BOUNCE,
+                Preferences::COMPLAINED
+            ];
+
 			// make transactional
 			$config[ 'is_transactional' ] = true;
 		}

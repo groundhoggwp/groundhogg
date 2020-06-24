@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Composer\Repository\PackageRepository;
 use Groundhogg\Api\V3\Unsubscribe_Api;
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Email_Meta;
@@ -769,8 +770,14 @@ class Email extends Base_Object_With_Meta {
 			$this->set_event( $event );
 		}
 
+		$do_not_send = [
+			Preferences::COMPLAINED,
+			Preferences::HARD_BOUNCE,
+			Preferences::SPAM
+		];
+
 		// Ignore if testing or the message is transactional
-		if ( ! $this->is_testing() && ! $this->is_transactional() && ! $contact->is_marketable() ) {
+		if ( ! $this->is_testing() && ! $this->is_transactional() && ! $contact->is_marketable() && ! in_array( $contact->get_optin_status(), $do_not_send ) ) {
 			return new WP_Error( 'non_marketable', __( 'Contact is not marketable.' ) );
 		}
 
@@ -840,24 +847,6 @@ class Email extends Base_Object_With_Meta {
 	 * @param $error WP_Error
 	 */
 	public function mail_failed( $error ) {
-		$message = sprintf(
-			__( "Email failed to send.\n
-            Send time: %s\n
-            To: %s\n
-            Subject: %s\n
-            Error Code: %s\n
-            Error Message", 'groundhogg' ),
-			date_i18n( 'F j Y H:i:s', current_time( 'timestamp' ) ),
-			$this->get_contact()->get_email(),
-			$this->get_merged_subject_line(),
-			$error->get_error_code(),
-			$error->get_error_message()
-		);
-
-		$this->get_contact()->add_note(
-			$message
-		);
-
 		$this->add_error( $error );
 	}
 

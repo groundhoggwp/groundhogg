@@ -128,5 +128,9 @@ use function Groundhogg\is_white_labeled;
         <div id="table_contacts_by_lead_source"></div>
     </div>
 </div>
-
-
+<div class="groundhogg-chart-wrapper">
+    <div class="groundhogg-chart-no-padding full-width">
+        <h2 class="title"><?php _e( 'Engagement', 'groundhogg' ); ?></h2>
+        <div id="table_list_engagement"></div>
+    </div>
+</div

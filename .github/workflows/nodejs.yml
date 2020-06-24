@@ -3,6 +3,7 @@ on:
   push:
     tags-ignore:
       - "*.dev"
+      - "*.dev.*"
       - "*.beta"
       - "*.beta.*"
       - "*.alpha"
