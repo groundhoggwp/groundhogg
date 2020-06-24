@@ -184,7 +184,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * ADDED additional filter to the step enqueue method for logic compatibility.
 * ADDED Support for Google reCAPTCHA v3.
 * TWEAKED Contacts API endpoint now support `limit` and `offset`.
-* TWEAKED improved the extensions shop in the settings if no extensions are activated.
+* TWEAKED improved the UI of the extensions shop in the settings if no extensions are activated.
 * FIXED Screen options no longer saving due to breaking change in WP `5.4.2`
 * FIXED SMS Broadcasts not showing in the scheduled list.
 
