@@ -363,7 +363,7 @@ $funnel = new Funnel( $funnel_id );
                 <tbody>
                 <tr>
                     <th>
-						<?php _e( 'Select contacts to add into funnel:', 'groundhogg' ); ?>
+						<?php _e( 'Add contacts with these tags:', 'groundhogg' ); ?>
                     </th>
                 </tr>
                 <tr>
@@ -389,11 +389,12 @@ $funnel = new Funnel( $funnel_id );
 						) );
 
 						?>
+                        <p class="description"><?php _e( 'Select one or more tags, contacts that have these tags will be added to the funnel.', 'groundhogg' ); ?></p>
                     </td>
                 </tr>
                 <tr>
                     <th>
-						<?php _e( 'Exclude these contacts:', 'groundhogg' ); ?>
+						<?php _e( 'Exclude contacts with these tags:', 'groundhogg' ); ?>
                     </th>
                 </tr>
                 <tr>
@@ -419,6 +420,7 @@ $funnel = new Funnel( $funnel_id );
 						) );
 
 						?>
+                        <p class="description"><?php _e( 'Any contacts with the tags will not be added.', 'groundhogg' ); ?></p>
                     </td>
                 </tr>
                 <tr>
@@ -447,6 +449,7 @@ $funnel = new Funnel( $funnel_id );
 						) );
 
 						?>
+                        <p class="description"><?php _e( 'Select which step you want these contacts to start from.', 'groundhogg' ); ?></p>
                     </td>
                 </tr>
                 </tbody>
