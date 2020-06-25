@@ -177,7 +177,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.2.16 (2020-06-17) =
+= 2.2.16 (2020-06-25) =
 * ADDED Custom headers support to the simple email editor. Useful for adding `Cc` `Bcc` `From` or other email headers.
 * ADDED Central DB updates for WaaS multisite installs.
 * ADDED `{notes}` replacement code for the new notes format.
@@ -186,6 +186,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * ADDED Support for Google reCAPTCHA v3.
 * ADDED `optin_status_exclude` filter to the contact query object.
 * ADDED Contact engagement report. Filter engaged & unengaged contacts.
+* ADDED Filter when rendering the table name.
 * TWEAKED Contacts API endpoint now support `limit` and `offset`.
 * TWEAKED Improved the UI of the extensions shop in the settings if no extensions are activated.
 * FIXED Screen options no longer saving due to breaking change in WP `5.4.2`

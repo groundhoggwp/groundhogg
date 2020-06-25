@@ -94,8 +94,15 @@ abstract class DB {
 	 */
 	public function render_table_name(){
 		global $wpdb;
+		$table_name = $wpdb->prefix . $this->db_suffix;
 
-		$this->table_name = $wpdb->prefix . $this->db_suffix;
+		/**
+		 * Filter the table name...
+		 *
+		 * @param string $table_name
+		 * @param DB $db
+		 */
+		$this->table_name = apply_filters( 'groundhogg/db/render_table_name', $table_name, $this );
 	}
 
 	/**

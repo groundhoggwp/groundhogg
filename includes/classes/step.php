@@ -130,7 +130,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$events   = $this->get_waiting_events();
 
 		if ( ! $events ) {
-			return false;
+			return [];
 		}
 
 		foreach ( $events as $event ) {
@@ -678,7 +678,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		if ( $next_step && $next_step->is_active() ) {
 			$contacts = $this->get_waiting_contacts();
 
-			if ( $contacts ){
+			if ( ! empty( $contacts ) ){
 				foreach ( $contacts as $contact ) {
 					$next_step->enqueue( $contact );
 				}
