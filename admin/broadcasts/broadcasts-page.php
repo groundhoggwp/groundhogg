@@ -221,6 +221,14 @@ class Broadcasts_Page extends Admin_Page {
 
 		set_transient( 'gh_get_broadcast_config', $config, HOUR_IN_SECONDS );
 
+		/**
+         * Fires after the broadcast is added to the DB but before the user is redirected to the scheduler
+         *
+		 * @param int $broadcast_id the ID of the broadcast
+         * @param array $config the config object which is passed to the scheduler
+		 */
+		do_action( 'groundhogg/admin/broadcast/scheduled', $broadcast_id, $config );
+
 		$this->add_notice( 'review', __( 'Review your broadcast before scheduling!', 'groundhogg' ), 'warning' );
 
 		// Go through the preview step...
