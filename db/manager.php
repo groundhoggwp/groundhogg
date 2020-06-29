@@ -49,6 +49,7 @@ class Manager {
 	public function init_dbs() {
 		$this->activity          = new Activity();
 		$this->broadcasts        = new Broadcasts();
+		$this->broadcastmeta     = new Broadcast_Meta();
 		$this->contactmeta       = new Contact_Meta();
 		$this->contacts          = new Contacts();
 		$this->emailmeta         = new Email_Meta();

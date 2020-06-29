@@ -34,8 +34,8 @@ $type = isset($_REQUEST['type']) && $_REQUEST['type'] === 'sms' ? 'sms' : 'email
 <form name="edittag" id="edittag" method="post" action="">
     <?php wp_nonce_field(); ?>
     <table class="form-table">
-        <?php if ($type === 'email'): ?>
         <tbody>
+        <?php if ($type === 'email'): ?>
         <tr class="form-field term-email-wrap">
             <th scope="row"><label for="email_id"><?php _e('Select an email to send.', 'groundhogg') ?></label></th>
             <td><?php $args = array();
@@ -56,6 +56,7 @@ $type = isset($_REQUEST['type']) && $_REQUEST['type'] === 'sms' ? 'sms' : 'email
                 <p class="description"><?php _e('The Broadcast tool uses your global emails.', 'groundhogg') ?></p>
             </td>
         </tr>
+        <?php do_action( 'groundhogg/admin/broadcast/add/after/email_dropdown' ); ?>
         <?php else : ?>
             <tr class="form-field term-sms-wrap">
                 <th scope="row"><label for="sms_id"><?php _e('Select an SMS to send.', 'groundhogg') ?></label></th>
