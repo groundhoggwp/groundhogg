@@ -77,7 +77,7 @@ class Event extends Base_Object {
 		$this->db_name = $db;
 
 		// Backwards compat for missing 'queued_id'
-		if ( $field === 'queued_id' && is_int( $identifier_or_args ) && ! $this->get_db()->exists( [ 'queued_id' => $identifier_or_args ] ) ){
+		if ( $field === 'queued_id' && is_int( $identifier_or_args ) && ! $this->get_db()->exists( [ 'queued_id' => $identifier_or_args ] ) ) {
 			$field = 'ID';
 		}
 
@@ -110,10 +110,10 @@ class Event extends Base_Object {
 	 *
 	 * @return int
 	 */
-	public function get_id( $use_queued=false ) {
+	public function get_id( $use_queued = false ) {
 
 		// Return the queued_id instead for backwards compatibility
-		if ( $use_queued && $this->get_queued_id() > 0 ){
+		if ( $use_queued && $this->get_queued_id() > 0 ) {
 			return $this->get_queued_id();
 		}
 
@@ -131,7 +131,7 @@ class Event extends Base_Object {
 	 * @return int
 	 */
 	public function get_micro_time() {
-		return $this->micro_time ;
+		return $this->micro_time;
 	}
 
 	/**
@@ -177,6 +177,15 @@ class Event extends Base_Object {
 	}
 
 	/**
+	 * returns the email id of the
+	 * @return int
+	 */
+	public function get_email_id() {
+		return absint( $this->email_id );
+
+	}
+
+	/**
 	 * @return Funnel
 	 */
 	public function get_funnel() {
@@ -214,7 +223,7 @@ class Event extends Base_Object {
 	/**
 	 * @return int
 	 */
-	public function get_queued_id(){
+	public function get_queued_id() {
 		return absint( $this->queued_id );
 	}
 
@@ -436,7 +445,7 @@ class Event extends Base_Object {
 	public function cancel() {
 		do_action( 'groundhogg/event/cancelled', $this );
 
-		$cancel =  $this->update( [
+		$cancel = $this->update( [
 			'status' => self::CANCELLED,
 			'time'   => time(),
 		] );
@@ -476,7 +485,7 @@ class Event extends Base_Object {
 	public function skip() {
 		do_action( 'groundhogg/event/skipped', $this );
 
-		$skip =  $this->update( [
+		$skip = $this->update( [
 			'status' => self::SKIPPED,
 			'time'   => time(),
 		] );

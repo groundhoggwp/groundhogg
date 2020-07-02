@@ -29,6 +29,9 @@ class Broadcast_Scheduler extends Bulk_Job {
 	protected $send_time;
 	protected $send_now;
 	protected $send_in_timezone;
+	protected $is_email;
+	protected $object_id;
+
 
 	/**
 	 * The number of emails which have been scheduled so far.
@@ -139,6 +142,11 @@ class Broadcast_Scheduler extends Bulk_Job {
 			'priority'   => 100,
 		];
 
+		if ( $this->is_email ) {
+			$args['email_id'] = $this->object_id;
+		}
+
+		$args = apply_filters( 'groundhogg/admin/bulkjobs/broadcast/schedule_broadcast/args' , $args );
 		enqueue_event( $args );
 		$this->emails_scheduled += 1;
 	}
@@ -178,6 +186,15 @@ class Broadcast_Scheduler extends Bulk_Job {
 		$this->config = $config;
 
 		$this->broadcast_id = absint( $config['broadcast_id'] );
+		$broadcast          = new Broadcast( absint( $config['broadcast_id'] ) );
+
+		if ( $broadcast->get_broadcast_type() === Broadcast::TYPE_EMAIL ) {
+			$this->is_email = true;
+		} else {
+			$this->is_email = false;
+		}
+
+		$this->object_id = $broadcast->get_object_id();
 
 		$this->send_time        = absint( $config['send_time'] );
 		$this->send_now         = filter_var( $config['send_now'], FILTER_VALIDATE_BOOLEAN );

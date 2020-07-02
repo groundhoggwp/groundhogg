@@ -3,8 +3,10 @@
 namespace Groundhogg;
 
 use Groundhogg\Classes\Activity;
+use Groundhogg\DB\Broadcast_Meta;
 use Groundhogg\DB\Broadcasts;
 use Groundhogg\DB\DB;
+use Groundhogg\DB\Meta_DB;
 use GroundhoggSMS\Classes\SMS;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.1
  */
-class Broadcast extends Base_Object implements Event_Process {
+class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 	const TYPE_SMS = 'sms';
 	const TYPE_EMAIL = 'email';
@@ -67,6 +69,15 @@ class Broadcast extends Base_Object implements Event_Process {
 	}
 
 	/**
+	 * Returns meta db for the Broadcast
+	 *
+	 * @return Broadcast_Meta
+	 */
+	protected function get_meta_db() {
+		return get_db( 'broadcastmeta' );
+	}
+
+	/**
 	 * @return int
 	 */
 	public function get_id() {
@@ -105,7 +116,7 @@ class Broadcast extends Base_Object implements Event_Process {
 	 *
 	 * @return array
 	 */
-	public function get_query(){
+	public function get_query() {
 		return $this->query;
 	}
 
@@ -234,7 +245,7 @@ class Broadcast extends Base_Object implements Event_Process {
 		 * @param Email|SMS $object
 		 * @param Broadcast $broadcast
 		 */
-		$object = apply_filters( "groundhogg/broadcast/{$this->get_broadcast_type()}/object", $this->get_object(), $this );
+		$object = apply_filters( "groundhogg/broadcast/{$this->get_broadcast_type()}/object", $this->get_object(), $this, $contact, $event );
 
 		if ( ! $object || ! $object->exists() ) {
 			return new \WP_Error( 'object_error', 'Could not find email or SMS to send.' );
@@ -272,28 +283,36 @@ class Broadcast extends Base_Object implements Event_Process {
 	/**
 	 * @return array
 	 */
-	public function get_report_data() {
+	public function get_report_data( $email_id = 0 ) {
 
-		if ( ! empty( $this->report_data ) ){
+		if ( ! empty( $this->report_data ) ) {
 			return $this->report_data;
 		}
+
+		if ( ! $email_id ) {
+			$email_id = $this->get_object_id();
+		}
+
 
 		$data = [];
 
 		$data['waiting'] = get_db( 'event_queue' )->count( [
 			'step_id'    => $this->get_id(),
 			'event_type' => Event::BROADCAST,
-			'status'     => Event::WAITING
+			'status'     => Event::WAITING,
+			'email_id'   => $email_id
 		] );
 
 		$data['id'] = $this->get_id();
+		$data[ 'email_id' ] = $email_id ;
 
 		if ( $this->is_sent() ) {
 
 			$data['sent'] = get_db( 'events' )->count( [
 				'step_id'    => $this->get_id(),
 				'event_type' => Event::BROADCAST,
-				'status'     => Event::COMPLETE
+				'status'     => Event::COMPLETE,
+				'email_id' => $email_id
 			] );
 
 			if ( ! $this->is_sms() ) {
@@ -310,7 +329,7 @@ class Broadcast extends Base_Object implements Event_Process {
 					'step_id'       => $this->get_id(),
 					'activity_type' => Activity::EMAIL_CLICKED
 				] );
-				$data['all_clicks']      = get_db( 'activity' )->count( [
+				$data['all_clicks']         = get_db( 'activity' )->count( [
 					'funnel_id'     => $this->get_funnel_id(),
 					'step_id'       => $this->get_id(),
 					'activity_type' => Activity::EMAIL_CLICKED
@@ -365,4 +384,6 @@ class Broadcast extends Base_Object implements Event_Process {
 			'report' => $this->get_report_data(),
 		];
 	}
+
+
 }

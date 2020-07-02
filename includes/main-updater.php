@@ -294,6 +294,14 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Notes db added.
+	 * Migrate notes
+	 */
+	public function version_2_2_17() {
+		Plugin::$instance->dbs->install_dbs();
+	}
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -327,6 +335,7 @@ class Main_Updater extends Updater {
 			'2.1.14.1',
 			'2.2',
 			'2.2.14',
+			'2.2.17'
 		];
 	}
 
@@ -341,7 +350,7 @@ class Main_Updater extends Updater {
 			'2.1.13.17',
 			'2.2.3',
 			'2.2.13',
-			'2.2.14'
+			'2.2.14',
 		];
 	}
 
@@ -372,6 +381,7 @@ class Main_Updater extends Updater {
 			'2.2'           => __( 'Event queue performance improvements.', 'groundhogg' ),
 			'2.2.3'         => __( 'Reformat all tables.', 'groundhogg' ),
 			'2.2.14'        => __( 'Migrate notes and update broadcasts table.', 'gorundhogg' ),
+			'2.2.17'        => __( 'Added Broadcast meta table.' , 'groundhogg' )
 		];
 	}
 }
