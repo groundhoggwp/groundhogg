@@ -18,6 +18,7 @@ use Groundhogg\Admin\Tags\Tags_Page;
 use Groundhogg\Admin\Tools\Tools_Page;
 use Groundhogg\Admin\User\Admin_User;
 use Groundhogg\Admin\Welcome\Welcome_Page;
+use function Groundhogg\has_premium_features;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\is_pro_features_active;
 use function Groundhogg\is_white_labeled;
@@ -72,7 +73,7 @@ class Admin_Menu {
 			$this->guided_setup = new Guided_Setup();
 			$this->help         = new Help_Page();
 
-			if ( ! is_pro_features_active() ) {
+			if ( ! has_premium_features() ) {
 				$this->pro = new Pro_Page();
 			}
 		}

@@ -2912,6 +2912,18 @@ function is_pro_features_active() {
 	return defined( 'GROUNDHOGG_PRO_VERSION' );
 }
 
+/**
+ * If the current customer has access to premium features...
+ *
+ * Will return true if the `Groundhogg - Helper` is installed (has a plan license)
+ * or if `Groundhogg - Advanced Features` is installed (probably has a license)
+ *
+ * @return bool
+ */
+function has_premium_features(){
+    return defined( 'GROUNDHOGG_HELPER_VERSION' ) || defined( 'GROUNDHOGG_PRO_VERSION' );
+}
+
 add_action( 'admin_menu', function () {
 
 	if ( ! current_user_can( 'edit_contacts' ) ) {

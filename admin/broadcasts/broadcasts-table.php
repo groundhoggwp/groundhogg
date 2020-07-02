@@ -77,6 +77,7 @@ class Broadcasts_Table extends WP_List_Table {
 	 * @see WP_List_Table::::single_row_columns()
 	 */
 	public function get_columns() {
+
 		$columns = array(
 			'cb'             => '<input type="checkbox" />', // Render a checkbox instead of text.
 			'object_id'      => _x( 'Email/SMS', 'Column label', 'groundhogg' ),
@@ -97,7 +98,13 @@ class Broadcasts_Table extends WP_List_Table {
 			unset( $columns['stats'] );
 		}
 
-		return apply_filters( 'groundhogg/admin/broadcasts/table/columns', $columns );
+		/**
+		 * Filter the columns
+		 *
+		 * @param $columns array the columns for the given view
+		 * @param $view string the current view of the table
+		 */
+		return apply_filters( 'groundhogg/admin/broadcasts/table/columns', $columns, $this->get_view() );
 	}
 
 	/**
@@ -109,6 +116,7 @@ class Broadcasts_Table extends WP_List_Table {
 	 * @return array An associative array containing all the columns that should be sortable.
 	 */
 	protected function get_sortable_columns() {
+
 		$sortable_columns = array(
 			'object_id'      => array( 'object_id', false ),
 			'from_user'      => array( 'scheduled_by', false ),
@@ -116,7 +124,13 @@ class Broadcasts_Table extends WP_List_Table {
 			'date_scheduled' => array( 'date_scheduled', false )
 		);
 
-		return apply_filters( 'groundhogg/admin/broadcast/table/sortable_columns', $sortable_columns );
+		/**
+		 * Filter the columns
+		 *
+		 * @param $columns array the columns for the given view
+		 * @param $view string the current view of the table
+		 */
+		return apply_filters( 'groundhogg/admin/broadcast/table/sortable_columns', $sortable_columns, $this->get_view() );
 	}
 
 	/**
