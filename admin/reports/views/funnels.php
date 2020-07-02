@@ -130,3 +130,5 @@ foreach ( $funnels as $funnel ) {
         <div id="table_funnel_stats"></div>
     </div>
 </div>
+
+<?php do_action(  'groundhogg/admin/reports/pages/funnels/after_reports' ); ?>

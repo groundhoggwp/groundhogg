@@ -968,14 +968,18 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return array
 	 */
-	public function get_email_stats( $start, $end ) {
+	public function get_email_stats( $start, $end , $steps_ids = [] ) {
 
-		$steps = get_db( 'stepmeta' )->query( [
-			'meta_key'   => 'email_id',
-			'meta_value' => $this->get_id()
-		] );
 
-		$steps_ids = wp_parse_id_list( wp_list_pluck( $steps, 'step_id' ) );
+		if (empty( $steps_ids ) ) {
+
+			$steps = get_db( 'stepmeta' )->query( [
+				'meta_key'   => 'email_id',
+				'meta_value' => $this->get_id()
+			] );
+
+			$steps_ids = wp_parse_id_list( wp_list_pluck( $steps, 'step_id' ) );
+		}
 
 		$count        = 0;
 		$opened       = 0;

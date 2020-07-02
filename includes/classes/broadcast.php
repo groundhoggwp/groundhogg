@@ -283,28 +283,36 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * @return array
 	 */
-	public function get_report_data() {
+	public function get_report_data( $email_id = 0 ) {
 
 		if ( ! empty( $this->report_data ) ) {
 			return $this->report_data;
 		}
+
+		if ( ! $email_id ) {
+			$email_id = $this->get_object_id();
+		}
+
 
 		$data = [];
 
 		$data['waiting'] = get_db( 'event_queue' )->count( [
 			'step_id'    => $this->get_id(),
 			'event_type' => Event::BROADCAST,
-			'status'     => Event::WAITING
+			'status'     => Event::WAITING,
+			'email_id'   => $email_id
 		] );
 
 		$data['id'] = $this->get_id();
+		$data[ 'email_id' ] = $email_id ;
 
 		if ( $this->is_sent() ) {
 
 			$data['sent'] = get_db( 'events' )->count( [
 				'step_id'    => $this->get_id(),
 				'event_type' => Event::BROADCAST,
-				'status'     => Event::COMPLETE
+				'status'     => Event::COMPLETE,
+				'email_id' => $email_id
 			] );
 
 			if ( ! $this->is_sms() ) {
