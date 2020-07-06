@@ -102,3 +102,8 @@ if ( $broadcast->is_email() ):
     <a class="button button-primary" href="<?php echo esc_url( $confirm_link ); ?>"><?php _e( $text ); ?></a>
     <span id="delete-link"><a class="delete" href="<?php echo esc_url( $cancel_url ); ?>">Cancel</a></span>
 </form>
+<script>
+	window.onbeforeunload = function() {
+		return '<?php esc_attr_e( 'Your broadcast will not be scheduled.', 'groundhogg' ); ?>';
+	};
+</script>
