@@ -177,7 +177,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
-= 2.2.16.1 (2020-07-06) =
+= 2.2.17.1 (2020-07-06) =
+* HOT FIX Broadcast report using email_id for the events table although it's not ready yet.
+
+= 2.2.17 (2020-07-06) =
 * ADDED Additional filters and hooks for split testing capability down the road.
 * ADDED New broadcast meta db table.
 * FIXED Minor bugs
