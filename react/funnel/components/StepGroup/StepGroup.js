@@ -1,0 +1,80 @@
+import React from 'react';
+import './component.scss';
+import { SortableSteps } from '../SortableSteps/SortableSteps';
+import { GroupControls } from './GroupControls/GroupControls';
+
+export class StepGroup extends React.Component {
+
+	constructor (props) {
+		super(props);
+
+		this.state = {
+			showControls: false,
+		};
+
+		this.handleOnMouseEnter = this.handleOnMouseEnter.bind(this);
+		this.handleMouseLeave = this.handleMouseLeave.bind(this);
+	}
+
+	handleOnMouseEnter (e) {
+		this.setState({
+			showControls: true,
+		});
+	}
+
+	handleMouseLeave (e) {
+		this.setState({
+			showControls: false,
+		});
+	}
+
+	render () {
+
+		const groupType = this.props.steps[0].group;
+
+		const classes = [
+			groupType + '-group-container',
+			groupType === 'benchmark' ? 'gh-box' : 'clear-box',
+			'rounded-borders'
+		].join(' ');
+		const innerClasses = [groupType + '-group'];
+
+		let explanation;
+
+		if (groupType === 'action') {
+			explanation = 'Then do the following...';
+		}
+		else {
+			explanation = (
+				<span>
+					{ this.props.isFirst &&
+					'Start the funnel when the following benchmarks are triggered...' }
+					{ this.props.isLast &&
+					'End the funnel when the following benchmarks are triggered...' }
+					{ !this.props.isLast && !this.props.isFirst &&
+					'Skip to this point when the following benchmarks are triggered...' }
+				</span>
+			);
+		}
+
+		return (
+			<div className={ classes }
+			     onMouseEnter={ this.handleOnMouseEnter }
+			     onMouseLeave={ this.handleMouseLeave }
+			>
+				<div className="explanation round-borders">
+					{ explanation }
+				</div>
+				<div className={ innerClasses }>
+					<SortableSteps
+						steps={ this.props.steps }
+					    group={ groupType }
+						setList={this.props.setList}
+					/>
+				</div>
+				{ this.state.showControls && <GroupControls group={groupType}/> }
+			</div>
+		);
+	}
+
+}

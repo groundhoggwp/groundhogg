@@ -907,7 +907,7 @@ msgstr ""
 
 #: admin/contacts/contact-editor.php:741
 msgctxt "contact_record"
-msgid "Add To Funnel"
+msgid "Add To FunnelStepsContainer"
 msgstr ""
 
 #: admin/contacts/contact-editor.php:770
@@ -987,7 +987,7 @@ msgstr ""
 
 #: admin/contacts/contact-editor.php:979
 msgctxt "contact_record"
-msgid "Recent Funnel History"
+msgid "Recent FunnelStepsContainer History"
 msgstr ""
 
 #: admin/contacts/contact-editor.php:980
@@ -1316,7 +1316,7 @@ msgstr ""
 #: admin/contacts/note.php:27
 #: includes/reporting/new-reports/table-email-funnels-used-in.php:24
 #: includes/reporting/new-reports/table-top-converting-funnels.php:23
-msgid "Funnel"
+msgid "FunnelStepsContainer"
 msgstr ""
 
 #: admin/contacts/note.php:31
@@ -1533,7 +1533,7 @@ msgstr ""
 #: admin/contacts/tables/contact-events-table.php:75
 #: admin/events/events-table.php:71
 msgctxt "Column label"
-msgid "Funnel"
+msgid "FunnelStepsContainer"
 msgstr ""
 
 #: admin/contacts/tables/contact-events-table.php:76
@@ -1568,7 +1568,7 @@ msgstr ""
 #: admin/contacts/tables/contact-events-table.php:131
 #: admin/events/events-table.php:353 admin/events/events-table.php:354
 msgctxt "action"
-msgid "Edit Funnel"
+msgid "Edit FunnelStepsContainer"
 msgstr ""
 
 #: admin/contacts/tables/contact-events-table.php:139
@@ -1801,7 +1801,7 @@ msgstr ""
 
 #: admin/dashboard/widgets/funnel-breakdown.php:41
 #: admin/reports/views/funnels.php:70
-msgid "Funnel Breakdown"
+msgid "FunnelStepsContainer Breakdown"
 msgstr ""
 
 #: admin/dashboard/widgets/funnel-breakdown.php:153
@@ -2386,12 +2386,12 @@ msgstr ""
 
 #: admin/funnels/add-funnel.php:36
 msgctxt "add_funnel_tab"
-msgid "Funnel Templates"
+msgid "FunnelStepsContainer Templates"
 msgstr ""
 
 #: admin/funnels/add-funnel.php:38
 msgctxt "add_funnel_tab"
-msgid "Import Funnel"
+msgid "Import FunnelStepsContainer"
 msgstr ""
 
 #: admin/funnels/add-funnel.php:57
@@ -2425,7 +2425,7 @@ msgstr ""
 
 #: admin/funnels/add-funnel.php:148 admin/funnels/add-funnel.php:158
 msgctxt "action"
-msgid "Import Funnel"
+msgid "Import FunnelStepsContainer"
 msgstr ""
 
 #: admin/funnels/add-funnel.php:153
@@ -2440,7 +2440,7 @@ msgstr ""
 
 #: admin/funnels/funnel-editor-v2.php:45 admin/funnels/funnel-editor-v3.php:54
 #: admin/funnels/funnel-editor.php:59
-msgid "Enter Funnel Name Here"
+msgid "Enter FunnelStepsContainer Name Here"
 msgstr ""
 
 #: admin/funnels/funnel-editor-v2.php:97 admin/funnels/funnel-editor.php:104
@@ -2503,11 +2503,11 @@ msgid "Add Step"
 msgstr ""
 
 #: admin/funnels/funnel-editor-v2.php:231
-msgid "Funnel Builder V2 (BETA)"
+msgid "FunnelStepsContainer Builder V2 (BETA)"
 msgstr ""
 
 #: admin/funnels/funnel-editor-v2.php:232
-msgid "Welcome to version 2 of the Funnel Builder!"
+msgid "Welcome to version 2 of the FunnelStepsContainer Builder!"
 msgstr ""
 
 #: admin/funnels/funnel-editor-v2.php:233
@@ -2546,7 +2546,7 @@ msgstr ""
 
 #: admin/funnels/funnel-editor-v2.php:468
 #: admin/funnels/funnel-editor-v3.php:454 admin/funnels/funnel-editor.php:318
-msgid "Add Contacts to Funnel"
+msgid "Add Contacts to FunnelStepsContainer"
 msgstr ""
 
 #: admin/funnels/funnel-editor-v2.php:474
@@ -2573,11 +2573,11 @@ msgid "Reports"
 msgstr ""
 
 #: admin/funnels/funnel-editor-v3.php:196
-msgid "Funnel Builder Tour"
+msgid "FunnelStepsContainer Builder Tour"
 msgstr ""
 
 #: admin/funnels/funnel-editor.php:39
-msgid "The new and improved Funnel Builder has Arrived!"
+msgid "The new and improved FunnelStepsContainer Builder has Arrived!"
 msgstr ""
 
 #: admin/funnels/funnel-editor.php:39
@@ -2596,17 +2596,17 @@ msgstr ""
 
 #: admin/funnels/funnels-page.php:82
 msgctxt "page_title"
-msgid "Add Funnel"
+msgid "Add FunnelStepsContainer"
 msgstr ""
 
 #: admin/funnels/funnels-page.php:85
 msgctxt "page_title"
-msgid "Edit Funnel"
+msgid "Edit FunnelStepsContainer"
 msgstr ""
 
 #: admin/funnels/funnels-page.php:88
 msgctxt "page_title"
-msgid "Funnel Settings"
+msgid "FunnelStepsContainer Settings"
 msgstr ""
 
 #: admin/funnels/funnels-page.php:92 admin/funnels/funnels-page.php:141
@@ -2643,7 +2643,7 @@ msgid ""
 msgstr ""
 
 #: admin/funnels/funnels-page.php:223
-msgid "Add A Funnel"
+msgid "Add A FunnelStepsContainer"
 msgstr ""
 
 #: admin/funnels/funnels-page.php:224
@@ -2656,7 +2656,7 @@ msgstr ""
 
 #: admin/funnels/funnels-page.php:232
 msgid ""
-"When editing a funnel you can add Funnel Steps. Funnel Steps are either "
+"When editing a funnel you can add FunnelStepsContainer Steps. FunnelStepsContainer Steps are either "
 "Benchmarks or Actions. Benchmarks are whenever a Contact \"does\" something, "
 "while Actions are doing thing to a contact such as sending an email. Simply "
 "drag in the desired funnel steps in any order."
@@ -2700,7 +2700,7 @@ msgstr[1] ""
 
 #: admin/funnels/funnels-page.php:439
 msgctxt "notice"
-msgid "Funnel duplicated"
+msgid "FunnelStepsContainer duplicated"
 msgstr ""
 
 #: admin/funnels/funnels-page.php:473
@@ -2717,7 +2717,7 @@ msgstr ""
 
 #: admin/funnels/funnels-page.php:559
 msgctxt "notice"
-msgid "Funnel created"
+msgid "FunnelStepsContainer created"
 msgstr ""
 
 #: admin/funnels/funnels-page.php:762
@@ -2740,7 +2740,7 @@ msgstr ""
 
 #: admin/funnels/funnels-page.php:812
 msgctxt "notice"
-msgid "Funnel updated"
+msgid "FunnelStepsContainer updated"
 msgstr ""
 
 #: admin/funnels/funnels-page.php:906
@@ -3406,15 +3406,15 @@ msgid "Top Performing Broadcasts"
 msgstr ""
 
 #: admin/reports/views/email.php:85 admin/reports/views/overview.php:89
-msgid "Top Performing Funnel Emails"
+msgid "Top Performing FunnelStepsContainer Emails"
 msgstr ""
 
 #: admin/reports/views/email.php:89
-msgid "Funnel Emails Needing Improvement"
+msgid "FunnelStepsContainer Emails Needing Improvement"
 msgstr ""
 
 #: admin/reports/views/funnels.php:62
-msgid "View Funnel"
+msgid "View FunnelStepsContainer"
 msgstr ""
 
 #: admin/reports/views/funnels.php:80
@@ -3434,7 +3434,7 @@ msgid "Abandonment Rate"
 msgstr ""
 
 #: admin/reports/views/funnels.php:106
-msgid "Top Performing Emails in Funnel"
+msgid "Top Performing Emails in FunnelStepsContainer"
 msgstr ""
 
 #: admin/reports/views/funnels.php:110
@@ -4880,7 +4880,7 @@ msgid "Create your first funnel!"
 msgstr ""
 
 #: admin/welcome/welcome-page.php:343
-msgid "Create your first Funnel!"
+msgid "Create your first FunnelStepsContainer!"
 msgstr ""
 
 #: admin/welcome/welcome-page.php:366
@@ -6302,7 +6302,7 @@ msgid "Custom Range"
 msgstr ""
 
 #: includes/reporting/reports/complete-funnel-activity.php:41
-msgid "Complete Funnel Activity"
+msgid "Complete FunnelStepsContainer Activity"
 msgstr ""
 
 #: includes/reporting/reports/contacts-by-lead-source.php:27
@@ -6338,7 +6338,7 @@ msgid "Form Submissions"
 msgstr ""
 
 #: includes/reporting/reports/waiting-funnel-activity.php:41
-msgid "Waiting Funnel Activity"
+msgid "Waiting FunnelStepsContainer Activity"
 msgstr ""
 
 #: includes/reviews.php:24
@@ -6592,7 +6592,7 @@ msgstr ""
 
 #: includes/steps/actions/base/lms-enroll.php:60
 #: includes/steps/benchmarks/base/lms-integration.php:149
-msgid "Action"
+msgid "Step"
 msgstr ""
 
 #: includes/steps/actions/base/lms-enroll.php:69
@@ -6792,7 +6792,7 @@ msgid "Your form map configuration is invalid."
 msgstr ""
 
 #: includes/steps/benchmarks/base/lms-integration.php:113
-msgid "LMS Action"
+msgid "LMS Step"
 msgstr ""
 
 #: includes/steps/benchmarks/base/lms-integration.php:123

@@ -1,0 +1,35 @@
+.benchmark-group-container{
+
+  margin: 20px;
+
+  &.gh-box{
+    background: #f9f9f9;
+  }
+
+  .benchmark-group{
+    color: blue;
+    border-top: 1px solid #e5e5e5;
+  }
+
+  .explanation{
+    padding: 10px;
+    background: #FFFFFF;
+  }
+
+  .group-controls{
+    margin: 10px;
+  }
+
+}
+
+.action-group-container{
+
+  .explanation{
+    margin: 0 30px;
+  }
+
+  .group-controls{
+    margin: 0 30px;
+  }
+
+}

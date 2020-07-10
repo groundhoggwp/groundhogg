@@ -1,38 +1,17 @@
 const path = require( 'path' );
 const webpack = require( 'webpack' );
-const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 // Set different CSS extraction for editor only and common block styles
-const blocksCSSPlugin = new ExtractTextPlugin( {
-    filename: './assets/css/blocks.style.css',
+const funnelCSS = new MiniCssExtractPlugin( {
+    filename: './react/funnel/src/build.css',
 } );
-const editBlocksCSSPlugin = new ExtractTextPlugin( {
-    filename: './assets/css/blocks.editor.css',
-} );
-
-// Configuration for the ExtractTextPlugin.
-const extractConfig = {
-    use: [
-        { loader: 'raw-loader' },
-        {
-            loader: 'postcss-loader',
-            options: {
-                plugins: [ require( 'autoprefixer' ) ],
-            },
-        },
-        {
-            loader: 'sass-loader',
-            query: {
-                outputStyle:
-                    'production' === process.env.NODE_ENV ? 'compressed' : 'nested',
-            },
-        },
-    ],
-};
 
 module.exports = {
+    mode: 'development',
     entry: {
-        './blocks/gutenberg/js/blocks' : './blocks/gutenberg/index.js',
+        // './blocks/gutenberg/js/blocks' : './blocks/gutenberg/index.js',
+        './react/funnel/src/build' : './react/funnel/index.js',
     },
     output: {
         path: path.resolve( __dirname ),
@@ -50,17 +29,18 @@ module.exports = {
                 },
             },
             {
-                test: /style\.s?css$/,
-                use: blocksCSSPlugin.extract( extractConfig ),
-            },
-            {
-                test: /editor\.s?css$/,
-                use: editBlocksCSSPlugin.extract( extractConfig ),
+                test: /\.s?css$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    'css-loader',
+                    'sass-loader',
+                ]
             },
         ],
     },
     plugins: [
-        blocksCSSPlugin,
-        editBlocksCSSPlugin,
+        new MiniCssExtractPlugin({
+            filename: './react/funnel/src/build.css'
+        })
     ],
 };

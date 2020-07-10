@@ -1,0 +1,26 @@
+.groundhogg-exit-button{
+
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  vertical-align: middle;
+  top: 0;
+  right: 0;
+  box-sizing: border-box;
+  padding: 15px;
+
+  a {
+    color: #5c5c5c;
+    text-decoration: none;
+
+    &:hover{
+      color: #0d79e5;
+    }
+
+    .dashicons{
+      height: 30px;
+      width: 30px;
+      font-size: 30px;
+    }
+  }
+}

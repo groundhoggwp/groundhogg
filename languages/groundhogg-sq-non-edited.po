@@ -877,7 +877,7 @@ msgstr "Dërgoni SMS"
 #: admin/contacts/contact-editor.php:613
 #, fuzzy
 msgctxt "contact_record"
-msgid "Add To Funnel"
+msgid "Add To FunnelStepsContainer"
 msgstr "Shtoni në gyp"
 
 #: admin/contacts/contact-editor.php:638
@@ -953,7 +953,7 @@ msgstr ""
 #: admin/contacts/contact-editor.php:845
 #, fuzzy
 msgctxt "contact_record"
-msgid "Recent Funnel History"
+msgid "Recent FunnelStepsContainer History"
 msgstr "Historia e fundit e gypave"
 
 #: admin/contacts/contact-editor.php:846
@@ -1476,7 +1476,7 @@ msgstr "Koha lokale"
 #: admin/events/events-table.php:60
 #, fuzzy
 msgctxt "Column label"
-msgid "Funnel"
+msgid "FunnelStepsContainer"
 msgstr "gyp"
 
 #: admin/contacts/tables/contact-events-table.php:69
@@ -1513,7 +1513,7 @@ msgstr "Ngjarjet e procesit"
 #: admin/events/events-table.php:405 admin/events/events-table.php:406
 #, fuzzy
 msgctxt "action"
-msgid "Edit Funnel"
+msgid "Edit FunnelStepsContainer"
 msgstr "Redaktoni gypin"
 
 #: admin/contacts/tables/contact-events-table.php:131
@@ -1811,7 +1811,7 @@ msgstr "Shkalla e konvertimit (%)"
 
 #: admin/dashboard/widgets/funnel-breakdown.php:40
 #, fuzzy
-msgid "Funnel Breakdown"
+msgid "FunnelStepsContainer Breakdown"
 msgstr "Prishja e gypave"
 
 #: admin/dashboard/widgets/funnel-breakdown.php:158
@@ -2687,7 +2687,7 @@ msgstr "Shikoni Kontaktin"
 #: admin/funnels/add-funnel.php:31
 #, fuzzy
 msgctxt "add_funnel_tab"
-msgid "Funnel Templates"
+msgid "FunnelStepsContainer Templates"
 msgstr "Modelet e gypave"
 
 #: admin/funnels/add-funnel.php:33
@@ -2699,7 +2699,7 @@ msgstr "Marketplace"
 #: admin/funnels/add-funnel.php:35
 #, fuzzy
 msgctxt "add_funnel_tab"
-msgid "Import Funnel"
+msgid "Import FunnelStepsContainer"
 msgstr "Gyp importi"
 
 #: admin/funnels/add-funnel.php:58
@@ -2740,12 +2740,12 @@ msgstr ""
 #: admin/funnels/add-funnel.php:142
 #, fuzzy
 msgctxt "action"
-msgid "Import Funnel"
+msgid "Import FunnelStepsContainer"
 msgstr "Gyp importi"
 
 #: admin/funnels/funnel-editor-v2.php:43 admin/funnels/funnel-editor.php:55
 #, fuzzy
-msgid "Enter Funnel Name Here"
+msgid "Enter FunnelStepsContainer Name Here"
 msgstr "Vendos këtu emrin e gypit"
 
 #: admin/funnels/funnel-editor-v2.php:95 admin/funnels/funnel-editor.php:100
@@ -2800,12 +2800,12 @@ msgstr "Zgjidhni ku të filloni:"
 
 #: admin/funnels/funnel-editor-v2.php:351 admin/funnels/funnel-editor.php:314
 #, fuzzy
-msgid "Add Contacts to Funnel"
-msgstr "Shtoni Kontakte në Funnel"
+msgid "Add Contacts to FunnelStepsContainer"
+msgstr "Shtoni Kontakte në FunnelStepsContainer"
 
 #: admin/funnels/funnel-editor.php:39
 #, fuzzy
-msgid "The new and improved Funnel Builder has Arrived!"
+msgid "The new and improved FunnelStepsContainer Builder has Arrived!"
 msgstr "Ka mbërritur Ndërtuesi i ri dhe i përmirësuar i gypave!"
 
 #: admin/funnels/funnel-editor.php:39
@@ -2857,7 +2857,7 @@ msgstr ""
 
 #: admin/funnels/funnels-page.php:187
 #, fuzzy
-msgid "Add A Funnel"
+msgid "Add A FunnelStepsContainer"
 msgstr "Shtoni një gyp"
 
 #: admin/funnels/funnels-page.php:188
@@ -2877,7 +2877,7 @@ msgstr ""
 #: admin/funnels/funnels-page.php:196
 #, fuzzy
 msgid ""
-"When editing a funnel you can add Funnel Steps. Funnel Steps are either "
+"When editing a funnel you can add FunnelStepsContainer Steps. FunnelStepsContainer Steps are either "
 "Benchmarks or Actions. Benchmarks are whenever a Contact \"does\" something, "
 "while Actions are doing thing to a contact such as sending an email. Simply "
 "drag in the desired funnel steps in any order."
@@ -2941,13 +2941,13 @@ msgstr ""
 #: admin/funnels/funnels-page.php:357
 #, fuzzy
 msgctxt "page_title"
-msgid "Add Funnel"
+msgid "Add FunnelStepsContainer"
 msgstr "Shtoni gyp"
 
 #: admin/funnels/funnels-page.php:360
 #, fuzzy
 msgctxt "page_title"
-msgid "Edit Funnel"
+msgid "Edit FunnelStepsContainer"
 msgstr "Redaktoni gypin"
 
 #: admin/funnels/funnels-page.php:380
@@ -2969,7 +2969,7 @@ msgstr[1] "Fshihen% d gypa"
 #: admin/funnels/funnels-page.php:429
 #, fuzzy
 msgctxt "notice"
-msgid "Funnel duplicated"
+msgid "FunnelStepsContainer duplicated"
 msgstr "Gyp kopjuar"
 
 #: admin/funnels/funnels-page.php:464
@@ -2988,7 +2988,7 @@ msgstr "Ju lutemi zgjidhni një model ..."
 #: admin/funnels/funnels-page.php:518
 #, fuzzy
 msgctxt "notice"
-msgid "Funnel created"
+msgid "FunnelStepsContainer created"
 msgstr "Gyp krijuar"
 
 #: admin/funnels/funnels-page.php:664
@@ -3031,7 +3031,7 @@ msgstr "Gypat duhet të fillojnë me 1 ose më shumë standarde"
 #: admin/funnels/funnels-page.php:744
 #, fuzzy
 msgctxt "notice"
-msgid "Funnel updated"
+msgid "FunnelStepsContainer updated"
 msgstr "Azhurnimi i azhurnuar"
 
 #: admin/funnels/funnels-page.php:840
@@ -3936,14 +3936,14 @@ msgstr ""
 #: admin/settings/settings-page.php:532
 #, fuzzy
 msgctxt "settings"
-msgid "Enable Funnel Builder V2 (Beta)"
+msgid "Enable FunnelStepsContainer Builder V2 (Beta)"
 msgstr "Aktivizo ndërtuesin e gypave V2 (Beta)"
 
 #: admin/settings/settings-page.php:533
 #, fuzzy
 msgctxt "settings"
-msgid "Use the new version of the Funnel Builder."
-msgstr "Përdorni versionin e ri të Funnel Builder."
+msgid "Use the new version of the FunnelStepsContainer Builder."
+msgstr "Përdorni versionin e ri të FunnelStepsContainer Builder."
 
 #: admin/settings/settings-page.php:545 includes/classes/email.php:473
 #: templates/managed-page.php:148
@@ -6676,7 +6676,7 @@ msgstr "Gama e personalizuar"
 
 #: includes/reporting/reports/complete-funnel-activity.php:41
 #, fuzzy
-msgid "Complete Funnel Activity"
+msgid "Complete FunnelStepsContainer Activity"
 msgstr "Aktiviteti i plotë i gypave"
 
 #: includes/reporting/reports/contacts-by-country.php:27
@@ -6752,7 +6752,7 @@ msgstr "Transmetimi i fundit"
 
 #: includes/reporting/reports/waiting-funnel-activity.php:41
 #, fuzzy
-msgid "Waiting Funnel Activity"
+msgid "Waiting FunnelStepsContainer Activity"
 msgstr "Aktiviteti i pritjes së gypit"
 
 #: includes/reviews.php:28
@@ -8217,7 +8217,7 @@ msgstr "Harta %s"
 #: templates/assets/email-templates.php:39
 #, fuzzy
 msgctxt "email_template_name"
-msgid "Call To Action"
+msgid "Call To Step"
 msgstr "Thirrje për veprim"
 
 #: templates/assets/email-templates.php:40

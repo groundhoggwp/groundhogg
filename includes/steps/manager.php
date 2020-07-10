@@ -111,6 +111,43 @@ class Manager {
 		return apply_filters( 'groundhogg/steps/actions', array() );
 	}
 
+	public function get_actions_as_array() {
+		$actions = $this->get_actions();
+
+		$array = [];
+
+		foreach ( $actions as $action ) {
+			$array[] = [
+				'icon'        => $action->get_icon(),
+				'type'        => $action->get_type(),
+				'group'       => $action->get_group(),
+				'name'        => $action->get_name(),
+				'description' => $action->get_description(),
+			];
+		}
+
+		return $array;
+	}
+
+
+	public function get_benchmarks_as_array() {
+		$benchmarks = $this->get_benchmarks();
+
+		$array = [];
+
+		foreach ( $benchmarks as $benchmark ) {
+			$array[] = [
+				'icon'        => $benchmark->get_icon(),
+				'type'        => $benchmark->get_type(),
+				'group'       => $benchmark->get_group(),
+				'name'        => $benchmark->get_name(),
+				'description' => $benchmark->get_description(),
+			];
+		}
+
+		return $array;
+	}
+
 	/**
 	 * @return array
 	 */

@@ -78,10 +78,11 @@ class Funnel extends Base_Object_With_Meta {
 
 			$last = array_pop( $steps );
 
-			if ($last){
+			if ( $last ) {
 
 				return $last->get_id();
 			}
+
 			return 0;
 
 		}
@@ -151,9 +152,11 @@ class Funnel extends Base_Object_With_Meta {
 	 * @return array|bool
 	 */
 	public function get_as_array() {
-		$export          = [];
-		$export['title'] = sprintf( "%s - Copy", $this->get_title() );
-		$export['steps'] = [];
+		$export           = [];
+		$export['id']     = $this->get_id();
+		$export['status'] = $this->get_status();
+		$export['title']  = $this->get_title();
+		$export['steps']  = [];
 
 		$steps = $this->get_steps();
 
@@ -162,20 +165,102 @@ class Funnel extends Base_Object_With_Meta {
 		}
 
 		foreach ( $steps as $i => $step ) {
-
 			$export['steps'][ $i ]          = [];
+			$export['steps'][ $i ]['id']    = $step->get_id();
 			$export['steps'][ $i ]['title'] = $step->get_title();
 			$export['steps'][ $i ]['group'] = $step->get_group();
 			$export['steps'][ $i ]['order'] = $step->get_order();
 			$export['steps'][ $i ]['type']  = $step->get_type();
 			$export['steps'][ $i ]['meta']  = $step->get_meta();
 			$export['steps'][ $i ]['args']  = $step->export();
+			$export['steps'][ $i ]['icon']  = $step->icon();
 		}
-
 
 		$export = apply_filters( 'groundhogg/funnel/export', $export, $this );
 
 		return $export;
+	}
+
+	/**
+	 * Group benchmarks together...
+	 */
+	public function get_for_react_editor() {
+
+		$export           = [];
+		$export['id']     = $this->get_id();
+		$export['status'] = $this->get_status();
+		$export['title']  = $this->get_title();
+		$export['groups']  = [];
+
+		$steps = $this->get_steps();
+
+		if ( ! $steps ) {
+			return false;
+		}
+
+		$benchmark_group = [
+			'id'    => uniqid(),
+			'type' => 'benchmark_group',
+			'steps' => []
+		];
+
+		$action_group = [
+			'id'    => uniqid(),
+			'type' => 'action_group',
+			'steps' => []
+		];
+
+		foreach ( $steps as $i => $step ) {
+
+			$step_config = [
+				'id'    => $step->get_id(),
+				'title' => $step->get_title(),
+				'group' => $step->get_group(),
+				'order' => $step->get_order(),
+				'type'  => $step->get_type(),
+				'meta'  => $step->get_meta(),
+				'args'  => $step->export(),
+				'icon'  => $step->icon(),
+			];
+
+			if ( $step->is_benchmark() ) {
+				$benchmark_group['steps'][] = $step_config;
+
+				// If the next step is an action or we have reached the end of the funnel
+				if ( $i + 1 === count( $steps ) || ! $steps[ $i + 1 ]->is_benchmark() ) {
+
+					// Add the benchmark group to the steps
+					$export['groups'][] = $benchmark_group;
+
+					// Reset the benchmark grouping
+					$benchmark_group = [
+						'id'    => uniqid(),
+						'type' => 'benchmark_group',
+						'steps' => []
+					];
+				}
+			} else if ( $step->is_action() ) {
+				$action_group['steps'][] = $step_config;
+
+				// If the next step is a benchmark or we have reached the end of the funnel
+				if ( $i + 1 === count( $steps ) || ! $steps[ $i + 1 ]->is_action() ) {
+
+					// Add the action group to the steps
+					$export['groups'][] = $action_group;
+
+					// Reset the action grouping
+					$action_group = [
+						'id'    => uniqid(),
+						'type' => 'action_group',
+						'steps' => []
+					];
+				}
+			}
+
+		}
+
+		return $export;
+
 	}
 
 	/**
@@ -268,7 +353,7 @@ class Funnel extends Base_Object_With_Meta {
 			$step->import( $import_args );
 
 			// The screen will be blank, so set the first step to active
-			if ( $i === 0 && is_white_labeled() ){
+			if ( $i === 0 && is_white_labeled() ) {
 				$step->update_meta( 'is_active', true );
 			}
 

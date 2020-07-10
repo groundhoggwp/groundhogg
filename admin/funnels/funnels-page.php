@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Funnels;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Funnel;
 use Groundhogg\Library;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
@@ -13,6 +14,7 @@ use function Groundhogg\get_store_products;
 use function Groundhogg\enqueue_groundhogg_modal;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_upload_wp_error;
+use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use function Groundhogg\is_option_enabled;
 use Groundhogg\Plugin;
@@ -157,49 +159,32 @@ class Funnels_Page extends Admin_Page {
 	 * enqueue editor scripts
 	 */
 	public function scripts() {
+
 		if ( $this->get_current_action() === 'edit' ) {
 
-			wp_enqueue_script( 'chart-js' );
+			$funnel_id = absint( get_url_var( 'funnel' ) );
+			$funnel    = new Funnel( $funnel_id );
 
-			wp_enqueue_style( 'editor-buttons' );
-			wp_enqueue_style( 'jquery-ui' );
-
-			wp_enqueue_editor();
-			wp_enqueue_script( 'wplink' );
-
-			wp_enqueue_script( 'jquery-ui-sortable' );
-			wp_enqueue_script( 'jquery-ui-draggable' );
-			wp_enqueue_script( 'jquery-ui-datepicker' );
-
-//           wp_enqueue_script( 'groundhogg-admin-link-picker' );
-			wp_enqueue_script( 'sticky-sidebar' );
-
-
-			wp_enqueue_style( 'groundhogg-admin-funnel-editor-v2' );
-			wp_enqueue_script( 'groundhogg-admin-funnel-editor-v2' );
-			wp_localize_script( 'groundhogg-admin-funnel-editor-v2', 'Funnel', [
-				'id'                    => absint( get_request_var( 'funnel' ) ),
-				'save_text'             => dashicon( 'yes' ) . __( 'Save', 'groundhogg' ),
-				'saving_text'           => dashicon( 'admin-generic' ) . __( 'Saving...', 'groundhogg' ),
-				'disable_deselect_step' => is_white_labeled(),
-				'add_step_button'       => html()->modal_link( [
-					'title'              => __( 'Add Step' ),
-					'text'               => dashicon( 'plus' ),
-					'footer_button_text' => __( 'Cancel' ),
-					'class'              => 'add-step button button-secondary no-padding',
-					'source'             => 'steps',
-					'height'             => 700,
-					'width'              => 500,
-					'footer'             => 'true',
-					'preventSave'        => 'true',
-				] )
+			wp_enqueue_script( 'groundhogg-funnel-react' );
+			wp_localize_script( 'groundhogg-funnel-react', 'ghEditor', [
+				'funnel' => $funnel->get_as_array(),
+				'exit'   => admin_page_url( 'gh_funnels' ),
+				'groups' => [
+					'actions'    => Plugin::instance()->step_manager->get_actions_as_array(),
+					'benchmarks' => Plugin::instance()->step_manager->get_benchmarks_as_array()
+				]
 			] );
 
 			wp_enqueue_script( 'groundhogg-admin-replacements' );
+			wp_enqueue_style( 'bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css' );
+			wp_enqueue_style( 'groundhogg-admin-funnel-react' );
+
 
 		} else if ( $this->get_current_action() === 'funnel_settings' ) {
+
 			wp_enqueue_script( 'groundhogg-admin-iframe' );
 			wp_enqueue_style( 'groundhogg-admin-iframe' );
+
 		}
 
 		wp_enqueue_style( 'groundhogg-admin' );
@@ -363,21 +348,6 @@ class Funnels_Page extends Admin_Page {
 			],
 		];
 	}
-//	public function get_reporting_start_time() {
-//		return Plugin::$instance->reporting->get_start_time();
-//	}
-//
-//	public function get_reporting_end_time() {
-//		return Plugin::$instance->reporting->get_end_time();
-//	}
-//
-//	private function setup_reporting() {
-//
-//		if ( get_request_var( 'reporting_on' ) ) {
-//			$this->reporting_enabled = true;
-//		}
-
-//	}
 
 	public function process_delete() {
 		if ( ! current_user_can( 'delete_funnels' ) ) {
@@ -656,80 +626,6 @@ class Funnels_Page extends Admin_Page {
 
 		return $html;
 	}
-
-//	/**
-//	 * Chart Data
-//	 *
-//	 * @var array
-//	 */
-//	protected $chart_data = [];
-
-//	/**
-//	 * The chart data
-//	 *
-//	 * @return array
-//	 */
-//	public function get_chart_data() {
-//		if ( ! empty( $this->chart_data ) ) {
-//			return $this->chart_data;
-//		}
-//
-//		$funnel = new Funnel( absint( get_request_var( 'funnel' ) ) );
-//		$steps  = $funnel->get_steps();
-//
-//		$dataset1 = array();
-//		$dataset2 = array();
-//
-//		foreach ( $steps as $i => $step ) {
-//
-//			$query = new Contact_Query();
-//
-//			$args = array(
-//				'report' => array(
-//					'funnel' => $funnel->get_id(),
-//					'step'   => $step->get_id(),
-//					'status' => 'complete',
-//					'start'  => $this->get_reporting_start_time(),
-//					'end'    => $this->get_reporting_end_time(),
-//				)
-//			);
-//
-//			$count = count( $query->query( $args ) );
-//
-//			$url = add_query_arg( $args, admin_url( 'admin.php?page=gh_contacts' ) );
-//
-//			$dataset1[] = array( ( $i + 1 ) . '. ' . $step->get_title(), $count, $url );
-//
-//			$args = array(
-//				'report' => array(
-//					'funnel' => intval( $_REQUEST['funnel'] ),
-//					'step'   => $step->ID,
-//					'status' => 'waiting'
-//				)
-//			);
-//
-//			$count = count( $query->query( $args ) );
-//
-//			$url = add_query_arg( $args, admin_url( 'admin.php?page=gh_contacts' ) );
-//
-//			$dataset2[] = array( ( $i + 1 ) . '. ' . $step->get_title(), $count, $url );
-//
-//		}
-//
-//		$ds[] = array(
-//			'label' => _x( 'Completed Events', 'stats', 'groundhogg' ),
-//			'data'  => $dataset1
-//		);
-//
-//		$ds[] = array(
-//			'label' => __( 'Waiting Contacts', 'stats', 'groundhogg' ),
-//			'data'  => $dataset2
-//		);
-//
-//		$this->chart_data = $ds;
-//
-//		return $ds;
-//	}
 
 	/**
 	 * Save the funnel
@@ -1010,14 +906,7 @@ class Funnels_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-//		if ( $this->is_v2() ) {
-		include __DIR__ . '/funnel-editor-v3.php';
-
-//			return;
-//		}
-//
-//		include __DIR__ . '/funnel-editor.php';
-
+		echo '<div id="root"></div>';
 	}
 
 	public function add() {

@@ -1,0 +1,17 @@
+.step {
+  height: 54px;
+}
+
+.action{
+  margin: 10px 30px;
+  padding: 10px;
+}
+
+.benchmark{
+  margin: 10px 10px 0 10px;
+  padding: 10px;
+
+  &:last-child{
+    margin-bottom: 10px;
+  }
+}

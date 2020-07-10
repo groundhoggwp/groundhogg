@@ -47,7 +47,7 @@ Go ahead, compare Groundhogg to any SaaS product side by side! The savings alone
 * **Deep WordPress Integration** — Being a WordPress plugin, we are deeply integrated with WP so that setup is minimal.
 * **Unlimited Custom Fields** — Collect an unlimited amount of data about your customers to help you make crucial decisions about your business.
 * **Drag & Drop Email Builder** — Our email builder allows you to create beautiful looking emails that can be viewed without issue in every email client including the oldest versions of outlook.
-* **Automated Funnel Builder** — *La piece de resistance,* Our funnel builder is the ultimate tool that will allow you to design high converting customer journeys that integrate with your favorite WordPress tools.
+* **Automated FunnelStepsContainer Builder** — *La piece de resistance,* Our funnel builder is the ultimate tool that will allow you to design high converting customer journeys that integrate with your favorite WordPress tools.
 * **Import & Export EVERYTHING** — Everything in Groundhogg can be exported and imported into any other website in seconds! Emails, Funnels, Contacts, Settings, EVERYTHING! This makes sharing strategies with customers or clients a breeze.
 * **Share Marketing Strategies** — Push your funnels from one site to another. Groundhogg makes sharing strategies with customers or clients a breeze.
 
@@ -258,7 +258,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 = 2.2.10 (2020-05-26) =
 * ADDED Reporting links in email & funnels table for easy access to reports.
-* FIXED "View Funnel" link on the funnel report page causing fatal error because of incorrect field name.
+* FIXED "View FunnelStepsContainer" link on the funnel report page causing fatal error because of incorrect field name.
 
 = 2.2.9 (2020-05-25) =
 * ADDED [MailHawk](https://mailhawk.io) as a recommended email service.
@@ -369,7 +369,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 = 2.1.13.6 (2020-03-02) =
 * TWEAKED Make usage tracking GDPR compliant.
-* TWEAKED Funnel events are given higher priority than broadcast events in the event queue.
+* TWEAKED FunnelStepsContainer events are given higher priority than broadcast events in the event queue.
 * TWEAKED The marketable status of a contact will be checked before scheduling any broadcast emails.
 * FIXED Ajax Form Submission not working.
 * FIXED checkbox required attribute not added in HTML.
@@ -524,7 +524,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 = 2.1.7 (2019-12-03) =
 * TWEAKED Whole new welcome page UI. Goodbye to the BG image and docs/extensions. New welcome page is just focused on education.
-* TWEAKED Funnel builder UI now takes over the whole screen for the best editing experience.
+* TWEAKED FunnelStepsContainer builder UI now takes over the whole screen for the best editing experience.
 * TWEAKED Overall improvement of the layout of the funnel builder and js event management.
 * TWEAKED {files} will not longer take any parameters, just simply list the files in the filebox.
 * TWEAKED Re-designed the guided setup onboarding experience.
@@ -610,7 +610,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * ADDED Template library to replace builtin templates.
 * TWEAKED Better guided setup onboarding experience.
 * FIXED Some special characters not being accepted in first & last name fields.
-* REMOVED SMS, Superlinks, Advanced Email Editor, Advanced Funnel Steps.
+* REMOVED SMS, Superlinks, Advanced Email Editor, Advanced FunnelStepsContainer Steps.
 
 = 2.0.12.2 (2019-10-22) =
 * FIXED Bounce checker running even if settings are not setup
@@ -748,7 +748,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * FIXED Bug where nested replacements caused fatal error.
 
 = 2.0.9.7 (2019-09-06) =
-* ADDED Action to reset tags in the event of a failed install.
+* ADDED Step to reset tags in the event of a failed install.
 * FIXED Various recommendations from the WP Plugin team
 * FIXED Import function for contacts not working.
 
@@ -982,7 +982,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * ADDED Pie chart of optin status report
 * ADDED Tools menu item.
 * ADDED Admin menu base class for use in extensions.
-* TWEAKED Funnel Breakdown will now also feature a line chart of contact progress
+* TWEAKED FunnelStepsContainer Breakdown will now also feature a line chart of contact progress
 * TWEAKED Emails sent using the Groundhogg Sending Service will not longer use wp_mail as backup for error reporting purposes
 * TWEAKED The Groundhogg Sending Service url is now aws.groundhogg.io to improve the speed of requests.
 * FIXED Confirmation emails not skipping if email is already confirmed.
@@ -1018,7 +1018,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 = 1.1.4 =
 * ADDED Search form to welcome page for docs help
-* ADDED Distinct helper methods to Funnel Parent Class
+* ADDED Distinct helper methods to FunnelStepsContainer Parent Class
 * TWEAKED Welcome page now queries docs direct from documentation site
 * TWEAKED Welcome page now queries extensions direct from store
 * TWEAKED Stats collection will retrieve display_name
@@ -1289,7 +1289,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * TWEAKED added new code for the default form.
 
 = 1.0.11 =
-* ADDED New Funnel Reporting Graph at top of funnel when in reporting mode.
+* ADDED New FunnelStepsContainer Reporting Graph at top of funnel when in reporting mode.
 * ADDED compatibility for modal outside of funnel editor.
 * TWEAKED New form build improvements. Popup UI for adding fields in the form builder.
 
@@ -1366,7 +1366,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * TWEAKED if global multisite setting is enabled you can choose to only run an event if the associated step can be run by the current blog.
 
 = 1.0.6 =
-* Added Funnel updates automatically when the modal closes.
+* Added FunnelStepsContainer updates automatically when the modal closes.
 * Added Contacts which have unconfirmed emails will show as (Unconfirmed) int he table view
 * Added new wpgh_get_contact( $id_or_email ) function instead of new WPGH_Contact
 * Fixed removed console.log() calls.
@@ -1401,14 +1401,14 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 = 1.0.2 =
 * Added WPGH_Form instance to wpgh_form_code filter
-* Added Columns and Rows to the Funnel Form Editor
+* Added Columns and Rows to the FunnelStepsContainer Form Editor
 * Added base class CSS for frontend forms
 * Fixed text editor bar is now sticky when scrolling.
 
 = 1.0.1 =
 * Changed to a vastly superior layout in the funnel editor.
 * Fixed load funnel editor scripts in head rather than in footer.
-* Changed editing view for emails to make similar to new Funnel Editor layout.
+* Changed editing view for emails to make similar to new FunnelStepsContainer Editor layout.
 * Fixed load email editor scripts in head instead of footer.
 
 = 1.0 =
@@ -1467,7 +1467,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * Added last_optin to submission
 
 = 0.9.9 =
-* Finished implementing the Create User Action.
+* Finished implementing the Create User Step.
 * Fixed bug where add from previous emails gives a warning.
 * Tracking now uses the Logged in user as a contact if it exists so that if you're logged in replacement codes
 among other functionality will work on the front end.

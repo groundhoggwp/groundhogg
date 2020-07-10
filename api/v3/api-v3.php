@@ -44,6 +44,7 @@ class API_V3 {
 		$this->broadcasts      = new Broadcasts_Api();
 		$this->bulk_job        = new Bulk_Job_Api();
 		$this->unsubscribe_api = new Unsubscribe_Api();
+		$this->funnels_api     = new Funnels_Api();
 	}
 
 	/**
