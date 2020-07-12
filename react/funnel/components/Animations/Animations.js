@@ -1,13 +1,16 @@
 import React from 'react';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import './component.scss';
-import { bounce, slideInRight } from 'react-animations';
+import { fadeIn, fadeOut, slideInRight} from "react-animations";
 import Radium, { StyleRoot } from 'radium';
 
 const styles = {
-	bounce: {
+	fadeIn: {
 		animation: 'x 1s',
-		animationName: Radium.keyframes(bounce, 'bounce'),
+		animationName: Radium.keyframes(fadeIn, 'fadeIn'),
+	},
+	fadeOut: {
+		animation: 'x 500ms',
+		animationName: Radium.keyframes(fadeOut, 'fadeOut'),
 	},
 	slideInRight: {
 		animation: 'x 1s',
@@ -17,15 +20,21 @@ const styles = {
 
 export const FadeIn = (props) => {
 	return (
-		<ReactCSSTransitionGroup
-			transitionName="fadeIn"
-			transitionAppear={ true }
-			transitionAppearTimeout={ 100 }
-			transitionEnter={ false }
-			transitionLeave={ false }
-		>
-			{ props.children }
-		</ReactCSSTransitionGroup>
+		<StyleRoot>
+			<div style={styles.fadeIn} className={'animated'}>
+				{props.children}
+			</div>
+		</StyleRoot>
+	);
+};
+
+export const FadeOut = (props) => {
+	return (
+		<StyleRoot>
+			<div style={styles.fadeOut} className={'animated'} onAnimationEnd={props.then}>
+				{props.children}
+			</div>
+		</StyleRoot>
 	);
 };
 

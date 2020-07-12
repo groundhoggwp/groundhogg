@@ -1,17 +1,29 @@
+@import '../../master';
+
 .step {
   height: 54px;
-}
 
-.action{
-  margin: 10px 30px;
-  padding: 10px;
-}
+  &.action{
+    margin: 10px 30px;
+    padding: 10px;
+    background-color: #FFFFFF;
 
-.benchmark{
-  margin: 10px 10px 0 10px;
-  padding: 10px;
+    .step-icon{
+      background: $action-color;
+    }
+  }
 
-  &:last-child{
-    margin-bottom: 10px;
+  &.benchmark{
+    margin: 10px 10px 0 10px;
+    padding: 10px;
+    background-color: #FFFFFF;
+
+    .step-icon{
+      background: $benchmark-color;
+    }
+
+    &:last-child{
+      margin-bottom: 10px;
+    }
   }
 }

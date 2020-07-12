@@ -1,0 +1,21 @@
+@import '../../master';
+
+.add-new-step {
+
+  .inner {
+    background: #f7f7f7;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .add-new-step-choices {
+    //z-index: 99999;
+    overflow-y: auto;
+    padding: 70px 10px 10px 10px;
+    background-color: $background-color;
+  }
+
+  .fixed-top {
+    position: absolute;
+  }
+}

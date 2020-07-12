@@ -1,3 +1,32 @@
+@import "../../../master";
+
 .step-controls{
   float: right;
+
+  .sortable-handle{
+
+    .dashicons{
+      font-size: 33px;
+      height: 33px;
+      width: 33px;
+      margin: 0 10px;
+
+      color: $border-color;
+    }
+
+    &:hover{
+      .dashicons{
+        color: $border-hover-color;
+        cursor: grab;
+      }
+    }
+
+    &:active{
+      .dashicons{
+        cursor: grabbing;
+      }
+    }
+
+  }
+
 }

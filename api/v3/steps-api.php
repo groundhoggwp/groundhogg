@@ -8,8 +8,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Groundhogg\Admin\Dashboard\Dashboard_Widgets;
+use Groundhogg\Funnel;
+use Groundhogg\Step;
 use function Groundhogg\get_db;
 use Groundhogg\Plugin;
+use function Groundhogg\get_request_var;
 use function Groundhogg\show_groundhogg_branding;
 use WP_REST_Server;
 use WP_REST_Request;
@@ -67,20 +70,81 @@ class Steps_Api extends Base {
 	 *  - order
 	 *
 	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
 	 */
 	public function create( WP_REST_Request $request ) {
 
+		$after     = absint( $request->get_param( 'after' ) );
+		$funnel_id = absint( $request->get_param( 'funnel_id' ) );
+		$type      = sanitize_key( $request->get_param( 'type' ) );
+
+		// Reorder the steps which will be coming after this new step
+		$funnel = new Funnel( $funnel_id );
+
+		if ( ! $funnel->exists() ){
+			return self::ERROR_404( 'error', 'funnel not found' );
+		}
+
+		$after_step = new Step( $after );
+		$step_order = $after_step->get_order() + 1;
+
+		$all_steps = $funnel->get_steps();
+
+		foreach ( $all_steps as $step ){
+			if ( $step->get_order() < $step_order ){
+				continue;
+			}
+
+			$step->update( [
+				'step_order' => $step->get_order() + 1
+			] );
+		}
+
+		$elements = Plugin::$instance->step_manager->get_elements();
+
+		$title      = $elements[ $type ]->get_name();
+		$step_group = $elements[ $type ]->get_group();
+
+		$step = new Step([
+			'funnel_id'  => $funnel_id,
+			'step_title' => $title,
+			'step_type'  => $type,
+			'step_group' => $step_group,
+			'step_order' => $step_order,
+		]);
+
+		// reorder the steps.
+		return self::SUCCESS_RESPONSE( [ 'step' => $step->get_as_array() ] );
 	}
 
-	public function read( WP_REST_Request $request ){
+	public function read( WP_REST_Request $request ) {
 
 	}
 
-	public function update( WP_REST_Request $request ){
+	public function update( WP_REST_Request $request ) {
 
 	}
 
-	public function delete( WP_REST_Request $request ){
+	public function delete( WP_REST_Request $request ) {
+		$step_id = absint( $request->get_param( 'step_id' ) );
+
+		$step = new Step( $step_id );
+
+		if ( ! $step->exists() ){
+			return self::ERROR_404( 'error', 'step does not exist.' );
+		}
+
+		$funnel = $step->get_funnel();
+
+		$step->delete();
+
+		// Reorder the steps
+		foreach ( $funnel->get_steps() as $i => $step ){
+			$step->update( [ 'step_order' => $i+1 ] );
+		}
+
+		return self::SUCCESS_RESPONSE();
 
 	}
 

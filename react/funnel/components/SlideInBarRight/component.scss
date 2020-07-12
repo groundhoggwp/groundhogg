@@ -1,0 +1,26 @@
+.slide-in-bar-right {
+
+  position: fixed;
+  z-index: 999999;
+
+  .overlay{
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #5c5c5c;
+    opacity: 0.5;
+  }
+
+  .container{
+    position: fixed;
+    max-width: 720px;
+    width: 720px;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    padding:0
+  }
+
+}

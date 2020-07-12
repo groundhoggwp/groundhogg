@@ -1,12 +1,13 @@
 .step-icon-wrap{
 
   position: absolute;
-  left: 0;
-  top: 0;
+  left: -1px;
+  top: -1px;
 
   img.step-icon{
     height: 54px;
     width: 54px;
+    //border-radius: 3px 0 0 3px;
   }
 
 }

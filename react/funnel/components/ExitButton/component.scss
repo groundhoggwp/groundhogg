@@ -7,11 +7,13 @@
   top: 0;
   right: 0;
   box-sizing: border-box;
-  padding: 15px;
 
-  a {
+  button {
     color: #5c5c5c;
     text-decoration: none;
+    border: none;
+    background: none;
+    padding: 15px;
 
     &:hover{
       color: #0d79e5;

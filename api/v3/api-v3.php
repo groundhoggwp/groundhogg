@@ -45,6 +45,7 @@ class API_V3 {
 		$this->bulk_job        = new Bulk_Job_Api();
 		$this->unsubscribe_api = new Unsubscribe_Api();
 		$this->funnels_api     = new Funnels_Api();
+		$this->steps_api       = new Steps_Api();
 	}
 
 	/**

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dashicon } from '../../../Dashicon/Dashicon';
 import Button from 'react-bootstrap/Button';
-import { showAddStepForm } from '../../../Editor/Editor';
+import {showAddStepForm} from "../../../AddStep/AddStep";
 
 export class AddStep extends React.Component {
 
@@ -13,7 +13,7 @@ export class AddStep extends React.Component {
 
 	handleOnClick(e){
 		console.debug( e );
-		showAddStepForm( this.props.group )
+		showAddStepForm( this.props.group, this.props.after );
 	}
 
 	render () {

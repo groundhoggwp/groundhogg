@@ -12,6 +12,7 @@ use WP_REST_Server;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
+use function Groundhogg\get_db;
 
 class Funnels_Api extends Base {
 
@@ -102,6 +103,18 @@ class Funnels_Api extends Base {
 		}
 
 		$funnel->update( $args );
+
+		// Update the step order
+		$steps = $request->get_param( 'steps' );
+
+		if ( ! empty( $steps ) ){
+			$ids = wp_list_pluck( $steps, 'id' );
+
+			// handle the re-ordering of the steps
+			foreach ( $ids as $i => $id ){
+				get_db( 'steps' )->update( $id, [ 'step_order' => $i+1 ] );
+			}
+		}
 
 		return self::SUCCESS_RESPONSE( [ 'funnel' => $funnel->get_as_array() ] );
 	}

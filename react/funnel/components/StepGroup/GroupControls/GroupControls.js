@@ -10,7 +10,7 @@ export const GroupControls = (props) => {
 	return (
 		<div className={ classes }>
 			<FadeIn>
-				<AddStep group={props.group}/>
+				<AddStep group={props.group} after={props.after}/>
 			</FadeIn>
 		</div>
 	);

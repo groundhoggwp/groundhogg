@@ -1,3 +1,5 @@
+@import "../../../master";
+
 .add-step-control{
   margin: 10px;
   position: relative;
@@ -5,20 +7,50 @@
   display: inline-block;
   width: 320px;
   vertical-align: top;
-  text-overflow: ellipsis;
-  overflow: hidden;
+  //text-overflow: ellipsis;
+  //overflow: hidden;
 
-  .step-icon{
+  &.step{
+    background: $white;
+  }
+
+  &.active,
+  &:hover{
+    background: $background-hover-color-light;
+    border-color: $border-hover-color;
+    cursor: pointer;
+    transition: 0.4s;
+  }
+
+  .step-icon-wrap{
     position: absolute;
-    top: 0;
-    left: 0;
+    display: inline-block;
+    top: -1px;
+    left: -1px;
     width: 100px;
     height: 100px;
-    border-right: 1px solid #e5e5e5;
+    padding: 10px;
+
+    .step-icon{
+      width: 100%;
+      height: auto;
+    }
+  }
+
+  &.action {
+    .step-icon-wrap{
+      background: $action-color;
+    }
+  }
+
+  &.benchmark{
+    .step-icon-wrap{
+      background: $benchmark-color;
+    }
   }
 
   .details{
-    padding-left: 100px;
+    padding: 10px 10px 10px 120px;
 
     .description{
       font-style: normal;
@@ -26,7 +58,25 @@
     }
 
     .step-name{
-      font-size: 20px;
+      font-size: 16px;
     }
+  }
+
+  &.active {
+    .spinner-border{
+      height: 5rem;
+      width: 5rem;
+      margin: auto;
+      position: absolute;
+      left: 10px;
+      top: 10px;
+    }
+  }
+}
+
+.step-chosen{
+  .add-step-control:not(.active){
+    filter: blur(3px);
+    transition: 0.4s ease-in-out;
   }
 }

@@ -1,0 +1,36 @@
+$border-color: #ccd0d4;
+$border-hover-color: #b6babe;
+$background-color: #f1f1f1;
+$background-color-light: #f9f9f9;
+$background-hover-color-light: #f0f0f5;
+$white: #FFFFFF;
+$font-color: #23282d;
+$action-color: #5cc0a5;
+$benchmark-color: #00a0d2;
+
+#screen-meta-links{
+  display: none;
+}
+
+#wpcontent{
+  padding: 0 !important;
+}
+
+#wpwrap{
+  background-color: $background-color;
+}
+
+.gh-box {
+  position: relative;
+  border: 1px solid $border-color;
+  //box-shadow: 0 1px 1px rgba(0,0,0,.04);
+  background-color: $background-color-light;
+
+  //-moz-background-clip: padding;
+  //-webkit-background-clip: padding-box;
+  //background-clip: padding-box;
+}
+
+.round-borders{
+  border-radius: 3px;
+}

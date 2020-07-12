@@ -30,12 +30,15 @@ export class StepGroup extends React.Component {
 
 	render () {
 
+		if ( this.props.steps.length === 0 ){
+			return <div></div>;
+		}
+
 		const groupType = this.props.steps[0].group;
 
 		const classes = [
 			groupType + '-group-container',
 			groupType === 'benchmark' ? 'gh-box' : 'clear-box',
-			'rounded-borders'
 		].join(' ');
 		const innerClasses = [groupType + '-group'];
 
@@ -57,22 +60,24 @@ export class StepGroup extends React.Component {
 			);
 		}
 
+		const steps = this.props.steps;
+		const lastStep = steps[steps.length-1];
+
 		return (
 			<div className={ classes }
 			     onMouseEnter={ this.handleOnMouseEnter }
 			     onMouseLeave={ this.handleMouseLeave }
 			>
-				<div className="explanation round-borders">
+				<div className="explanation">
 					{ explanation }
 				</div>
 				<div className={ innerClasses }>
 					<SortableSteps
 						steps={ this.props.steps }
 					    group={ groupType }
-						setList={this.props.setList}
 					/>
 				</div>
-				{ this.state.showControls && <GroupControls group={groupType}/> }
+				{ this.state.showControls && <GroupControls group={groupType} after={lastStep.id}/> }
 			</div>
 		);
 	}

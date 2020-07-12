@@ -1,60 +1,110 @@
-import React from 'react';
-import { AddStepControl } from './AddStepControl/AddStepControl';
-import Spinner from 'react-bootstrap/Spinner';
+import React from "react";
+import {AddStepControl} from "./AddStepControl/AddStepControl";
+import Spinner from "react-bootstrap/Spinner";
 
-import './component.scss';
-import { Navbar } from 'react-bootstrap';
-import { ExitButton } from '../ExitButton/ExitButton';
-import { FadeIn, SlideInRight } from '../Animations/Animations';
+import "./component.scss";
+import {Navbar} from "react-bootstrap";
+import {ExitButton} from "../ExitButton/ExitButton";
+import {SlideInBarRight} from "../SlideInBarRight/SlideInBarRight";
+import axios from "axios";
+import {reloadEditor} from "../Editor/Editor";
+
+export function showAddStepForm ( group, after ) {
+    console.debug(group);
+    const event = new CustomEvent('groundhogg-add-step', { detail : { group: group, after: after } } );
+    // Dispatch the event.
+    document.dispatchEvent(event);
+}
 
 export class AddStep extends React.Component {
 
-	constructor (props) {
-		super(props);
+    constructor(props) {
+        super(props);
 
-		this.state = {
-			steps: [],
-			isLoading: false,
-		};
-	}
+        this.state = {
+            isLoading: false,
+            isShowing: false,
+            group: 'action',
+            after: 0,
+        };
 
-	componentDidMount () {
-		this.setState({
-			steps: this.props.group === 'actions'
-				? ghEditor.groups.actions
-				: ghEditor.groups.benchmarks,
-		});
-	}
+        this.handleAddStep = this.handleAddStep.bind(this);
+        this.handleExit = this.handleExit.bind(this);
+        this.handleStepChosen = this.handleStepChosen.bind(this);
+    }
 
-	render () {
+    handleAddStep(e){
+        this.setState({
+            isShowing: true,
+            stepChosen: false,
+            group: e.detail.group,
+            after: e.detail.after
+        });
+    }
 
-		if (!this.state.steps.length) {
-			return <Spinner animation={ 'border' }/>;
-		}
+    handleExit(){
+        this.setState({
+            isShowing: false,
+            stepChosen: false
+        });
+    }
 
-		return (
-			<div className={ 'add-new-step-container' }>
-				<div className={ 'add-new-step-overlay' }></div>
-				<div className={ 'add-new-step-inner-container' }>
-					<SlideInRight>
-						<div className={ 'add-new-step-inner' }
-						>
-							<Navbar bg="white" expand="sm" fixed="top">
-								<Navbar.Brand>
-									{ 'Add Step' }
-								</Navbar.Brand>
-								<Navbar.Toggle
-									aria-controls="basic-navbar-nav"/>
-								<ExitButton/>
-							</Navbar>
-							<div className={ 'add-new-step-choices' }>
-								{ this.state.steps.map(
-									step => <AddStepControl step={ step }/>) }
-							</div>
-						</div>
-					</SlideInRight>
-				</div>
-			</div>
-		);
-	}
-};
+    handleAdded(result){
+        reloadEditor();
+        this.handleExit();
+    }
+
+    handleStepChosen( type ){
+
+        this.setState({
+            stepChosen: true
+        });
+
+        axios.post(groundhogg_endpoints.steps, {
+            funnel_id: ghEditor.funnel.id,
+            after: this.state.after,
+            type: type
+        }).then( result => this.handleAdded(result) );
+    }
+
+    componentDidMount () {
+        document.addEventListener('groundhogg-add-step', this.handleAddStep );
+    }
+
+    render() {
+
+        if ( ! this.state.isShowing ){
+            return <div className={'hidden-step-adder'}></div>
+        }
+
+        const steps = this.state.group === 'action' ? ghEditor.groups.actions : ghEditor.groups.benchmarks;
+        const classes = [
+            "add-new-step-choices"
+        ];
+
+        if ( this.state.stepChosen ){
+            classes.push( 'step-chosen' );
+        }
+
+        return (
+            <div className={"add-new-step"}>
+                <SlideInBarRight onOverlayClick={this.handleExit}>
+                    <div className={"inner"}>
+                        <Navbar bg="white" expand="sm" fixed="top">
+                            <Navbar.Brand>
+                                {"Add Step"}
+                            </Navbar.Brand>
+                            <Navbar.Toggle
+                                aria-controls="basic-navbar-nav"/>
+                            <ExitButton onExit={this.handleExit}/>
+                        </Navbar>
+                        <div className={classes.join(' ')}>
+                            {steps.map(
+                                step => <AddStepControl step={step} stepChosen={this.handleStepChosen}/>)}
+                        </div>
+                    </div>
+                </SlideInBarRight>
+            </div>
+        );
+    }
+}

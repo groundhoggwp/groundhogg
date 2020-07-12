@@ -6,7 +6,12 @@ import './component.scss';
 import { FunnelTitleInput } from './FunnelTitle/FunnelTitleInput';
 import { FunnelStatus } from './FunnelStatus/FunnelStatus';
 
+function exit() {
+	window.location = ghEditor.exit;
+}
+
 export function Header (props) {
+
 	return (
 		<Navbar bg="white" expand="sm" sticky="top">
 			<Navbar.Brand>
@@ -16,7 +21,7 @@ export function Header (props) {
 			<Navbar.Collapse id="basic-navbar-nav" className="justify-content-end groundhogg-nav" >
 				<FunnelStatus />
 			</Navbar.Collapse>
-			<ExitButton />
+			<ExitButton onExit={exit}/>
 		</Navbar>
 	)
 }

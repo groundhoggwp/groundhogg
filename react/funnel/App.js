@@ -5,7 +5,7 @@ import {Editor} from './components/Editor/Editor';
 
 axios.defaults.headers.common['X-WP-Nonce'] = groundhogg_nonces._wprest;
 
-import './style.css';
+import './master.scss';
 
 function App() {
 	return (

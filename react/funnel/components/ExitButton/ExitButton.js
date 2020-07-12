@@ -18,6 +18,8 @@ export class ExitButton extends React.Component {
 		this.setState({
 			exiting: true,
 		});
+
+		this.props.onExit();
 	}
 
 	render () {
@@ -25,9 +27,9 @@ export class ExitButton extends React.Component {
 			<div className="groundhogg-exit-button">
 				{
 					!this.state.exiting &&
-					<a href={ ghEditor.exit } className="exit-link" onClick={this.handleClick}>
+					<button className="exit-link" onClick={this.handleClick}>
 						<span className="dashicons dashicons-no"></span>
-					</a> }
+					</button> }
 				{
 					this.state.exiting &&
 					<Spinner animation="border" variant="secondary"/>
