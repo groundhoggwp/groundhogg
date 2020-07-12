@@ -1,3 +1,5 @@
+@import "../../master";
+
 .benchmark-group-container{
 
   margin: 20px;
@@ -7,8 +9,7 @@
   }
 
   .benchmark-group{
-    color: blue;
-    border-top: 1px solid #e5e5e5;
+    border-top: 1px solid $border-color;
   }
 
   .explanation{

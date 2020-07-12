@@ -32,12 +32,17 @@ export class SortableSteps extends React.Component {
 	render () {
 		return (
 			<ReactSortable
-				group={this.props.group}
+				// group={this.props.group}
+				group={'steps'}
 				animation={150}
 				list={this.state.steps}
 				setList={this.handleSetList}
 				onEnd={this.handleOnEnd}
 				handle={'.sortable-handle'}
+				// scroll={true}
+				// scrollSensitivity={100}
+				swapThreshold={0.75}
+				forceFallback={true}
 			>
 				{ this.state.steps.map(step=><Step key={step.id} step={step}/>) }
 			</ReactSortable>

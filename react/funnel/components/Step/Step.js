@@ -92,7 +92,7 @@ export class Step extends React.Component {
     render() {
 
         if (this.state.deleted) {
-            return <div className={'step-deleted'}></div>;
+            return <div className={"step-deleted"}></div>;
         }
 
         const step = this.props.step;
@@ -107,19 +107,21 @@ export class Step extends React.Component {
         const controls = (
             <div
                 key={this.props.key}
-                id={step.id}
-                className={classes.join(" ")}
                 onMouseEnter={this.handleOnMouseEnter}
                 onMouseLeave={this.handleMouseLeave}
+                className={'step-wrap'}
             >
-                <StepIcon type={step.type} group={step.group}
-                          src={step.icon}/>
-                <StepTitle title={step.title}/>
-                {this.state.showControls && <StepControls
-                    handleSelect={this.handleControlAction}
-                    handleClick={this.handleClickAction}
-                />}
-                <div className={"wp-clearfix"}></div>
+                { step.group === 'action' && <div className={'delay'}>{'Wait at least 3 days then...'}</div> }
+                <div id={step.id} className={classes.join(" ")}>
+                    <StepIcon type={step.type} group={step.group}
+                              src={step.icon}/>
+                    <StepTitle title={step.title}/>
+                    {this.state.showControls && <StepControls
+                        handleSelect={this.handleControlAction}
+                        handleClick={this.handleClickAction}
+                    />}
+                    <div className={"wp-clearfix"}></div>
+                </div>
             </div>
         );
 

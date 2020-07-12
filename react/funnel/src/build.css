@@ -36,16 +36,33 @@
   margin: 0; }
 
 .groundhogg-funnel-editor {
-  display: inline-block;
+  max-width: 1000px;
+  margin: auto;
   width: 100%; }
+
+#screen-meta-links {
+  display: none; }
+
+#wpcontent {
+  padding: 0 !important; }
+
+#wpwrap {
+  background-color: #f1f1f1; }
+
+.gh-box {
+  position: relative;
+  border: 1px solid #ccd0d4;
+  background-color: #f9f9f9; }
+
+.round-borders {
+  border-radius: 3px; }
 
 .benchmark-group-container {
   margin: 20px; }
   .benchmark-group-container.gh-box {
     background: #f9f9f9; }
   .benchmark-group-container .benchmark-group {
-    color: blue;
-    border-top: 1px solid #e5e5e5; }
+    border-top: 1px solid #ccd0d4; }
   .benchmark-group-container .explanation {
     padding: 10px;
     background: #FFFFFF; }
@@ -107,23 +124,6 @@
   transform: translate(-100%);
   transition: transform 500ms ease-in-out; }
 
-#screen-meta-links {
-  display: none; }
-
-#wpcontent {
-  padding: 0 !important; }
-
-#wpwrap {
-  background-color: #f1f1f1; }
-
-.gh-box {
-  position: relative;
-  border: 1px solid #ccd0d4;
-  background-color: #f9f9f9; }
-
-.round-borders {
-  border-radius: 3px; }
-
 .step-controls {
   float: right; }
   .step-controls .sortable-handle .dashicons {
@@ -149,56 +149,25 @@
     height: 54px;
     width: 54px; }
 
-#screen-meta-links {
-  display: none; }
+.step-wrap .delay {
+  margin: 10px 30px; }
 
-#wpcontent {
-  padding: 0 !important; }
-
-#wpwrap {
-  background-color: #f1f1f1; }
-
-.gh-box {
-  position: relative;
-  border: 1px solid #ccd0d4;
-  background-color: #f9f9f9; }
-
-.round-borders {
-  border-radius: 3px; }
-
-.step {
+.step-wrap .step {
   height: 54px; }
-  .step.action {
+  .step-wrap .step.action {
     margin: 10px 30px;
     padding: 10px;
     background-color: #FFFFFF; }
-    .step.action .step-icon {
+    .step-wrap .step.action .step-icon {
       background: #5cc0a5; }
-  .step.benchmark {
+  .step-wrap .step.benchmark {
     margin: 10px 10px 0 10px;
     padding: 10px;
     background-color: #FFFFFF; }
-    .step.benchmark .step-icon {
+    .step-wrap .step.benchmark .step-icon {
       background: #00a0d2; }
-    .step.benchmark:last-child {
+    .step-wrap .step.benchmark:last-child {
       margin-bottom: 10px; }
-
-#screen-meta-links {
-  display: none; }
-
-#wpcontent {
-  padding: 0 !important; }
-
-#wpwrap {
-  background-color: #f1f1f1; }
-
-.gh-box {
-  position: relative;
-  border: 1px solid #ccd0d4;
-  background-color: #f9f9f9; }
-
-.round-borders {
-  border-radius: 3px; }
 
 .add-step-control {
   margin: 10px;
@@ -248,23 +217,6 @@
   filter: blur(3px);
   transition: 0.4s ease-in-out; }
 
-#screen-meta-links {
-  display: none; }
-
-#wpcontent {
-  padding: 0 !important; }
-
-#wpwrap {
-  background-color: #f1f1f1; }
-
-.gh-box {
-  position: relative;
-  border: 1px solid #ccd0d4;
-  background-color: #f9f9f9; }
-
-.round-borders {
-  border-radius: 3px; }
-
 .add-new-step .inner {
   background: #f7f7f7;
   height: 100vh;
@@ -298,23 +250,6 @@
     bottom: 0;
     padding: 0; }
 
-#screen-meta-links {
-  display: none; }
-
-#wpcontent {
-  padding: 0 !important; }
-
-#wpwrap {
-  background-color: #f1f1f1; }
-
-.gh-box {
-  position: relative;
-  border: 1px solid #ccd0d4;
-  background-color: #f9f9f9; }
-
-.round-borders {
-  border-radius: 3px; }
-
 .add-new-step .inner {
   background: #f7f7f7;
   height: 100vh;
@@ -329,20 +264,4 @@
   position: absolute; }
 
 
-#screen-meta-links {
-  display: none; }
-
-#wpcontent {
-  padding: 0 !important; }
-
-#wpwrap {
-  background-color: #f1f1f1; }
-
-.gh-box {
-  position: relative;
-  border: 1px solid #ccd0d4;
-  background-color: #f9f9f9; }
-
-.round-borders {
-  border-radius: 3px; }
 

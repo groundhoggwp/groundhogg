@@ -77,7 +77,8 @@ export class StepGroup extends React.Component {
 					    group={ groupType }
 					/>
 				</div>
-				{ this.state.showControls && <GroupControls group={groupType} after={lastStep.id}/> }
+				{/*{ this.state.showControls && <GroupControls group={groupType} after={lastStep.id}/> }*/}
+				<GroupControls group={groupType} after={lastStep.id}/>
 			</div>
 		);
 	}

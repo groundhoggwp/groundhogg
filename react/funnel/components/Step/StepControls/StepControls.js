@@ -5,6 +5,7 @@ import {FadeIn} from "../../Animations/Animations";
 import {Dashicon} from "../../Dashicon/Dashicon";
 
 import "./component.scss";
+import Button from "react-bootstrap/Button";
 
 export const StepControls = (props) => {
     return (
@@ -13,7 +14,12 @@ export const StepControls = (props) => {
                 <SplitButton
                     id={"step-controls"}
                     variant={"secondary"}
-                    title={"Edit"}
+                    title={
+                        <span>
+                            <Dashicon icon={"admin-generic"}/>
+                            { ' Edit' }
+                        </span>
+                    }
                     size={"sm"}
                     onSelect={props.handleSelect}
                     onClick={props.handleClick}
