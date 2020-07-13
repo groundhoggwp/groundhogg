@@ -69,11 +69,12 @@
   .benchmark-group-container .group-controls {
     margin: 10px; }
 
-.action-group-container .explanation {
-  margin: 0 30px; }
-
-.action-group-container .group-controls {
-  margin: 0 30px; }
+.action-group-container {
+  margin: 0px 10px; }
+  .action-group-container .explanation {
+    margin: 0 30px; }
+  .action-group-container .group-controls {
+    margin: 0 30px; }
 
 .fadeIn-appear {
   opacity: 0.01; }
@@ -149,13 +150,33 @@
     height: 54px;
     width: 54px; }
 
+.step-wrap .edit-step-controls {
+  display: inline-block; }
+
+.step-wrap .line-left {
+  border-left: 2px solid #ccd0d4;
+  margin-left: 10px; }
+
 .step-wrap .delay {
-  margin: 10px 30px; }
+  font-size: 16px; }
+  .step-wrap .delay .delay-text {
+    cursor: pointer; }
+  .step-wrap .delay .dashicons {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    margin-right: 10px; }
+  .step-wrap .delay .edit-delay-controls {
+    display: inline-block; }
+    .step-wrap .delay .edit-delay-controls input, .step-wrap .delay .edit-delay-controls select {
+      vertical-align: middle;
+      font-size: 14px;
+      height: auto; }
 
 .step-wrap .step {
   height: 54px; }
   .step-wrap .step.action {
-    margin: 10px 30px;
+    margin: 10px 22px;
     padding: 10px;
     background-color: #FFFFFF; }
     .step-wrap .step.action .step-icon {

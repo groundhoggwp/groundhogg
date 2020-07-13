@@ -10,6 +10,8 @@ import {EditStep, showEditStepForm} from "../EditStep/EditStep";
 import axios from "axios";
 import {reloadEditor} from "../Editor/Editor";
 import {FadeOut} from "../Animations/Animations";
+import {Dashicon} from "../Dashicon/Dashicon";
+import {DelayControl} from "./DelayControl/DelayControl";
 
 export class Step extends React.Component {
 
@@ -111,16 +113,18 @@ export class Step extends React.Component {
                 onMouseLeave={this.handleMouseLeave}
                 className={'step-wrap'}
             >
-                { step.group === 'action' && <div className={'delay'}>{'Wait at least 3 days then...'}</div> }
-                <div id={step.id} className={classes.join(" ")}>
-                    <StepIcon type={step.type} group={step.group}
-                              src={step.icon}/>
-                    <StepTitle title={step.title}/>
-                    {this.state.showControls && <StepControls
-                        handleSelect={this.handleControlAction}
-                        handleClick={this.handleClickAction}
-                    />}
-                    <div className={"wp-clearfix"}></div>
+                { step.group === 'action' && <DelayControl step={step}/> }
+                <div className={step.group === 'action' ? 'line-left' : 'no-line' }>
+                    <div id={step.id} className={classes.join(" ")}>
+                        <StepIcon type={step.type} group={step.group}
+                                  src={step.icon}/>
+                        <StepTitle title={step.title}/>
+                        {this.state.showControls && <StepControls
+                            handleSelect={this.handleControlAction}
+                            handleClick={this.handleClickAction}
+                        />}
+                        <div className={"wp-clearfix"}></div>
+                    </div>
                 </div>
             </div>
         );

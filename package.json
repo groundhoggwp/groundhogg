@@ -32,6 +32,8 @@
   "dependencies": {
     "axios": "^0.19.2",
     "bootstrap": "^4.5.0",
+    "dateformat": "^3.0.3",
+    "moment": "^2.27.0",
     "react": "^16.13.1",
     "react-addons-css-transition-group": "^15.6.2",
     "react-animations": "^1.0.0",

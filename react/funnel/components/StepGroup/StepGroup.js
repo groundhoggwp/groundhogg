@@ -68,9 +68,7 @@ export class StepGroup extends React.Component {
 			     onMouseEnter={ this.handleOnMouseEnter }
 			     onMouseLeave={ this.handleMouseLeave }
 			>
-				<div className="explanation">
-					{ explanation }
-				</div>
+				{ groupType === 'benchmark' && <div className="explanation">{ explanation }</div> }
 				<div className={ innerClasses }>
 					<SortableSteps
 						steps={ this.props.steps }

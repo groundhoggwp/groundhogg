@@ -174,6 +174,14 @@ class Funnel extends Base_Object_With_Meta {
 			$export['steps'][ $i ]['meta']  = $step->get_meta();
 			$export['steps'][ $i ]['args']  = $step->export();
 			$export['steps'][ $i ]['icon']  = $step->icon();
+
+			// Todo set dynamically
+			$export['steps'][ $i ]['delay'] = [
+				'type' => 'fixed',
+				'period' => 3,
+				'interval' => 'days',
+				'time' => '08:00:00'
+			];
 		}
 
 		$export = apply_filters( 'groundhogg/funnel/export', $export, $this );

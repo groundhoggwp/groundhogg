@@ -2,15 +2,47 @@
 
 .step-wrap{
 
+  .edit-step-controls{
+    display: inline-block;
+  }
+
+  .line-left{
+    border-left: 2px solid $border-color;
+    margin-left: 10px;
+  }
+
   .delay{
-    margin: 10px 30px;
+    //margin: 10px 30px;
+    font-size: 16px;
+
+    .delay-text{
+      cursor: pointer;
+    }
+
+    .dashicons {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+      margin-right: 10px;
+    }
+
+    .edit-delay-controls{
+
+      display: inline-block;
+
+      input,select{
+        vertical-align: middle;
+        font-size: 14px;
+        height: auto;
+      }
+    }
   }
 
   .step {
     height: 54px;
 
     &.action{
-      margin: 10px 30px;
+      margin: 10px 22px;
       padding: 10px;
       background-color: #FFFFFF;
 
@@ -31,6 +63,12 @@
       &:last-child{
         margin-bottom: 10px;
       }
+    }
+  }
+
+  &:last-child{
+    .line-left{
+      //border-left-color: transparent;
     }
   }
 }
