@@ -1,116 +1,132 @@
-import React from "react";
-import {Form, FormControl, InputGroup} from "react-bootstrap";
-import Button from "react-bootstrap/Button";
+import React from 'react';
+import { Form, FormControl, InputGroup } from 'react-bootstrap';
+import Button from 'react-bootstrap/Button';
+import { GroundhoggModal } from '../../../Modal/Modal';
+import { FixedDelay } from './FixedDelay';
+
+import './component.scss';
+import { DateDelay } from './DateDelay';
+import { DisplayDelay } from '../DisplayDelay/DisplayDelay';
+import { Dashicon } from '../../../Dashicon/Dashicon';
 
 export class EditDelayControl extends React.Component {
 
-    constructor(props) {
-        super(props);
+	constructor (props) {
+		super(props);
 
-        const delay = props.delay;
+		const delay = props.delay;
 
-        this.state = {
-            type: delay.type,
-            interval: delay.interval,
-            period: delay.period,
-            date: delay.date,
-            time: delay.time,
-            field: delay.field
-        };
+		this.state = props.delay;
 
-        this.handleTypeChange = this.handleTypeChange.bind(this);
-        this.handleInputChange = this.handleInputChange.bind(this);
-        this.handleDone = this.handleDone.bind(this);
-    }
+		this.handleTypeChange = this.handleTypeChange.bind(this);
+		this.handleDone = this.handleDone.bind(this);
+		this.handleDelayControlUpdated = this.handleDelayControlUpdated.bind(
+			this);
+	}
 
-    handleTypeChange(e) {
-        this.setState({
-            type: e.target.value
-        });
-    }
+	handleTypeChange (e) {
+		this.setState({
+			type: e.target.value,
+		});
+	}
 
-    handleInputChange(e){
-        const target = e.target;
-        const name = target.name;
-        const value = target.value;
+	/**
+	 * Update a control value
+	 *
+	 * @param name
+	 * @param value
+	 */
+	handleDelayControlUpdated (name, value) {
+		this.setState({
+			[name]: value,
+		});
+	}
 
-        this.setState({
-            [name]: value
-        });
-    }
+	handleDone (e) {
+		this.props.save( this.state );
+	}
 
-    handleDone(e){
-        this.props.done(this.state);
-    }
+	render () {
 
-    render() {
+		const controls = [];
 
-        const controls = [];
+		switch (this.state.type) {
+			case 'fixed':
+				controls.push(
+					<FixedDelay
+						handleInputChange={ this.handleDelayControlUpdated }
+						period={ this.state.period }
+						interval={ this.state.interval }
+						runOn={ this.state.run_on }
+						daysOfWeek={ this.state.days_of_week }
+						daysOfWeekType={ this.state.days_of_week_type }
+						daysOfMonth={ this.state.days_of_month }
+						monthsOfYear={ this.state.months_of_year }
+						monthsOfYearType={ this.state.months_of_year_type }
+						runAt={ this.state.run_at }
+						time={ this.state.time }
+						timeTo={ this.state.time_to }
+					/>,
+				);
 
-        controls.push(
-            <select
-                name={'type'}
-                value={this.state.type}
-                onChange={this.handleTypeChange}
-            >
-                <option value={"instant"}>Instant</option>
-                <option value={"fixed"}>Fixed delay</option>
-                <option value={"date"}>Date delay</option>
-                <option value={"dynamic"}>Dynamic delay</option>
-            </select>
-        );
+				break;
+			case 'date':
+				controls.push(
+					<DateDelay
+						handleInputChange={ this.handleDelayControlUpdated }
+						runOn={ this.state.run_on }
+						date={ this.state.date }
+						dateTo={ this.state.date_to }
+						runAt={ this.state.run_at }
+						time={ this.state.time }
+						timeTo={ this.state.time_to }
+					/>,
+				);
+				break;
+			case 'dynamic':
+				// timeDisplay = "Wait until the contact's {0} then run at
+				// {2}...".format(step.delay.field, step.delay.time);
+				break;
+		}
 
-        switch (this.state.type) {
-            case "fixed":
-                controls.push(
-                    " Wait at least ",
-                    <input
-                        name={'period'}
-                        className={"period"}
-                        value={this.state.period}
-                        min={0}
-                        type={"number"}
-                        onChange={this.handleInputChange}
-                    />,
-                    " ",
-                    <select
-                        name={'interval'}
-                        className={"interval"}
-                        value={this.state.interval}
-                        onChange={this.handleInputChange}
-                    >
-                        <option value={'minutes'}>Minutes</option>
-                        <option value={'hours'}>Hours</option>
-                        <option value={'days'}>Days</option>
-                        <option value={'weeks'}>Weeks</option>
-                        <option value={'months'}>Months</option>
-                    </select>,
-                    " then run at ",
-                    <input
-                        name={'time'}
-                        type={"time"}
-                        value={this.state.time}
-                        onChange={this.handleInputChange}
-                    />
-                );
-                break;
-            case "date":
-                // timeDisplay = "Wait until {0} then run at {2}...".format(step.delay.date, step.delay.time);
-                break;
-            case "dynamic":
-                // timeDisplay = "Wait until the contact's {0} then run at {2}...".format(step.delay.field, step.delay.time);
-                break;
-        }
+		const delayTypes = [
+			{ value: 'instant', label: 'Instant' },
+			{ value: 'fixed', label: 'Fixed delay' },
+			{ value: 'date', label: 'Date delay' },
+			{ value: 'dynamic', label: 'Dynamic delay' },
+		];
 
-        controls.push(
-            " ",
-            <Button variant={"primary"} size={"sm"} onClick={this.handleDone}>{"Done"}</Button>
-        );
-
-        return (
-            <div className={"edit-delay-controls"}>
-                {controls}
-            </div>);
-    }
+		return (
+			<GroundhoggModal
+				show={ this.props.show }
+				heading={ 'Edit delay' }
+				onSave={ this.handleDone }
+				onHide={ this.props.cancel }
+				closeText={ 'Save' }
+			>
+				<div className={ 'edit-delay-controls' }>
+					<div className={ 'delay-text'}>
+						<Dashicon icon={'clock'}/> <DisplayDelay delay={this.state}/>
+					</div>
+					<div className={ 'delay-type' }>
+						{ 'What kind of delay is this? ' }
+						<select
+							name={ 'type' }
+							value={ this.state.type }
+							onChange={ this.handleTypeChange }
+						>
+							{ delayTypes.map(type => <option
+								value={ type.value }>{ type.label }</option>) }
+						</select>
+					</div>
+					{ controls.length > 0 &&
+					<div className={ 'edit-delay-controls-inner' }>
+						{ controls }
+					</div>
+					}
+				</div>
+			</GroundhoggModal>
+		);
+	}
 
 }

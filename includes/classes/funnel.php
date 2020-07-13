@@ -177,10 +177,18 @@ class Funnel extends Base_Object_With_Meta {
 
 			// Todo set dynamically
 			$export['steps'][ $i ]['delay'] = [
-				'type' => 'fixed',
-				'period' => 3,
-				'interval' => 'days',
-				'time' => '08:00:00'
+				'type'                => 'fixed',
+				'period'              => 3,
+				'interval'            => 'days',
+				'run_on'              => 'any',
+				'days_of_week_type'   => 'any',
+				'days_of_week'        => [],
+				'months_of_year_type' => 'any',
+				'months_of_year'      => [],
+				'days_of_month'       => [],
+				'run_at'              => 'any',
+				'time'                => '09:00:00',
+				'time_to'             => '17:00:00',
 			];
 		}
 
@@ -198,7 +206,7 @@ class Funnel extends Base_Object_With_Meta {
 		$export['id']     = $this->get_id();
 		$export['status'] = $this->get_status();
 		$export['title']  = $this->get_title();
-		$export['groups']  = [];
+		$export['groups'] = [];
 
 		$steps = $this->get_steps();
 
@@ -208,13 +216,13 @@ class Funnel extends Base_Object_With_Meta {
 
 		$benchmark_group = [
 			'id'    => uniqid(),
-			'type' => 'benchmark_group',
+			'type'  => 'benchmark_group',
 			'steps' => []
 		];
 
 		$action_group = [
 			'id'    => uniqid(),
-			'type' => 'action_group',
+			'type'  => 'action_group',
 			'steps' => []
 		];
 
@@ -243,7 +251,7 @@ class Funnel extends Base_Object_With_Meta {
 					// Reset the benchmark grouping
 					$benchmark_group = [
 						'id'    => uniqid(),
-						'type' => 'benchmark_group',
+						'type'  => 'benchmark_group',
 						'steps' => []
 					];
 				}
@@ -259,7 +267,7 @@ class Funnel extends Base_Object_With_Meta {
 					// Reset the action grouping
 					$action_group = [
 						'id'    => uniqid(),
-						'type' => 'action_group',
+						'type'  => 'action_group',
 						'steps' => []
 					];
 				}

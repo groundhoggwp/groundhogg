@@ -166,12 +166,6 @@
     width: 24px;
     height: 24px;
     margin-right: 10px; }
-  .step-wrap .delay .edit-delay-controls {
-    display: inline-block; }
-    .step-wrap .delay .edit-delay-controls input, .step-wrap .delay .edit-delay-controls select {
-      vertical-align: top;
-      font-size: 14px;
-      height: auto; }
 
 .step-wrap .step {
   height: 54px; }
@@ -283,6 +277,52 @@
 
 .add-new-step .fixed-top {
   position: absolute; }
+
+.groundhogg.modal {
+  z-index: 999999; }
+  .groundhogg.modal .modal-body {
+    padding: 0; }
+
+.groundhogg.modal-backdrop {
+  z-index: 99999; }
+
+.groundhogg.modal .edit-delay-controls .edit-delay-controls-inner {
+  border-top: 1px solid #ccd0d4; }
+
+.groundhogg.modal .edit-delay-controls .delay-text,
+.groundhogg.modal .edit-delay-controls .delay-type {
+  padding: 20px; }
+
+.groundhogg.modal .edit-delay-controls .delay-text {
+  border-bottom: 1px solid #ccd0d4; }
+
+.groundhogg.modal .edit-delay-controls input, .groundhogg.modal .edit-delay-controls select {
+  vertical-align: top;
+  font-size: 14px;
+  height: auto; }
+
+.groundhogg.modal .edit-delay-controls .col-controls {
+  margin-top: 10px; }
+  .groundhogg.modal .edit-delay-controls .col-controls .control {
+    margin-bottom: 5px; }
+
+.groundhogg.modal .edit-delay-controls .interval-period input.period {
+  width: 60px; }
+
+.groundhogg.modal .edit-delay-controls .interval-period .period {
+  border-right: none;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0; }
+
+.groundhogg.modal .edit-delay-controls .interval-period .interval {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0; }
+
+.groundhogg.modal .edit-delay-controls .row .col, .groundhogg.modal .edit-delay-controls .row .col-5 {
+  padding: 20px;
+  border-right: 1px solid #ccd0d4; }
+  .groundhogg.modal .edit-delay-controls .row .col:last-child, .groundhogg.modal .edit-delay-controls .row .col-5:last-child {
+    border-right: none; }
 
 
 
