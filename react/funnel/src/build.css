@@ -169,7 +169,7 @@
   .step-wrap .delay .edit-delay-controls {
     display: inline-block; }
     .step-wrap .delay .edit-delay-controls input, .step-wrap .delay .edit-delay-controls select {
-      vertical-align: middle;
+      vertical-align: top;
       font-size: 14px;
       height: auto; }
 

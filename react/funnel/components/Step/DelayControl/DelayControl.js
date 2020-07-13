@@ -1,7 +1,7 @@
 import React from "react";
 import {Dashicon} from "../../Dashicon/Dashicon";
 import {EditDelayControl} from "./EditDelayControl/EditDelayControl";
-import dateFormat from 'dateformat';
+import moment from 'moment';
 
 export class DelayControl extends React.Component {
 
@@ -44,7 +44,7 @@ export class DelayControl extends React.Component {
                 timeDisplay = "Run immediately...";
                 break;
             case "fixed":
-                timeDisplay = "Wait at least {0} {1} then run at {2}...".format(delay.period, delay.interval, delay.time );
+                timeDisplay = "Wait at least {0} {1} then run at {2}...".format(delay.period, delay.interval, moment(delay.time, 'HH:mm' ).format( 'H:mm a' ) );
                 break;
             case "date":
                 timeDisplay = "Wait until {0} then run at {2}...".format(delay.date, delay.time );
