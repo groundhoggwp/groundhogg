@@ -3,10 +3,8 @@
 namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
-use function Groundhogg\get_array_var;
 use Groundhogg\HTML;
 use function Groundhogg\get_db;
-use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 use Groundhogg\Tag;
@@ -211,5 +209,15 @@ class Tag_Applied extends Benchmark {
 		}
 
 		return $has_tags;
+	}
+
+	/**
+	 * Display the settings based on the given ID
+	 *
+	 * @param $step Step
+	 *
+	 */
+	public function register_controls() {
+		$this->add_control();
 	}
 }

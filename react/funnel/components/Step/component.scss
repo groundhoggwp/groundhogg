@@ -29,6 +29,8 @@
 
   .step {
     height: 54px;
+    display: flex;
+    align-items: center;
 
     &.action{
       margin: 10px 22px;

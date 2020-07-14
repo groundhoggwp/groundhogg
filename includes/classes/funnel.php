@@ -174,22 +174,7 @@ class Funnel extends Base_Object_With_Meta {
 			$export['steps'][ $i ]['meta']  = $step->get_meta();
 			$export['steps'][ $i ]['args']  = $step->export();
 			$export['steps'][ $i ]['icon']  = $step->icon();
-
-			// Todo set dynamically
-			$export['steps'][ $i ]['delay'] = [
-				'type'                => 'fixed',
-				'period'              => 3,
-				'interval'            => 'days',
-				'run_on'              => 'any',
-				'days_of_week_type'   => 'any',
-				'days_of_week'        => [],
-				'months_of_year_type' => 'any',
-				'months_of_year'      => [],
-				'days_of_month'       => [],
-				'run_at'              => 'any',
-				'time'                => '09:00:00',
-				'time_to'             => '17:00:00',
-			];
+			$export['steps'][ $i ]['delay'] = $step->get_delay_config();
 		}
 
 		$export = apply_filters( 'groundhogg/funnel/export', $export, $this );

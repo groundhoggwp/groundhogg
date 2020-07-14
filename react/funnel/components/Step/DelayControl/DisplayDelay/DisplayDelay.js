@@ -34,9 +34,16 @@ function TimeDelayFragment ({ delay }) {
  * @constructor
  */
 function ItemsCommaOrList ({ items }) {
+
+	if ( ! items ){
+		return <></>;
+	}
+
 	return ( <>{ items.map(
-		(item, i) => <><b>{ item.label }</b>{ i < items.length - 2 ? ',' : i ===
-		items.length - 2 ? ' or' : '' } </>) }</>
+			(item, i) => <><b>{ item.label }</b>{ i < items.length - 2
+				? ','
+				: i ===
+				items.length - 2 ? ' or' : '' } </>) }</>
 	);
 }
 
@@ -68,20 +75,31 @@ function FixedDelay ({ delay }) {
 
 				text.push(delay.days_of_week_type === 'any'
 					? ' on any '
-					: ( <>{ ' on the' } <b>{ delay.days_of_week_type }</b> </> ),
+					: ( <>{ ' on the' }
+						<b>{ delay.days_of_week_type }</b> </> ),
 				);
 
 				const days = delay.days_of_week;
 
-				text.push( <ItemsCommaOrList items={ delay.days_of_week }/> );
+				text.push(<ItemsCommaOrList items={ delay.days_of_week }/>);
 
 				if (delay.months_of_year_type !== 'any') {
-					text.push(' of ', <ItemsCommaOrList items={ delay.months_of_year }/> );
+					text.push(' of ', <ItemsCommaOrList
+						items={ delay.months_of_year }/>);
 				}
 
 				break;
 			case 'day_of_month':
-				text.push(' on a ', <b>{ 'weekend' }</b>);
+
+				text.push(' on the ');
+
+				text.push(<ItemsCommaOrList items={ delay.days_of_month }/>);
+
+				if (delay.months_of_year_type !== 'any') {
+					text.push(' of ', <ItemsCommaOrList
+						items={ delay.months_of_year }/>);
+				}
+
 				break;
 		}
 
@@ -89,6 +107,9 @@ function FixedDelay ({ delay }) {
 
 	if (!text.length) {
 		text.push('Run');
+	}
+	else if (delay.run_on === 'any') {
+		text.push(' then run');
 	}
 
 	text.push(<TimeDelayFragment delay={ delay }/>);

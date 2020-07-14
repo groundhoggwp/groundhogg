@@ -66,11 +66,23 @@ class Error extends Funnel_Step {
 	/**
 	 * @param Step $step
 	 *
+	 * @param      $settings
+	 *
 	 * @return bool
 	 */
-	public function save( $step ) {
+	public function save( $step, $settings ) {
 		$this->add_error( new \WP_Error( 'invalid_step_type', $this->get_error_message( $step ) ) );
 
 		return false;
+	}
+
+	/**
+	 * Display the settings based on the given ID
+	 *
+	 * @param $step Step
+	 *
+	 */
+	public function register_controls() {
+		// TODO: Implement register_controls() method.
 	}
 }

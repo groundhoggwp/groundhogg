@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Groundhogg\Admin\Dashboard\Dashboard_Widgets;
 use Groundhogg\Funnel;
 use Groundhogg\Step;
+use phpDocumentor\Reflection\Types\Self_;
 use function Groundhogg\get_db;
 use Groundhogg\Plugin;
 use function Groundhogg\get_request_var;
@@ -82,7 +83,7 @@ class Steps_Api extends Base {
 		// Reorder the steps which will be coming after this new step
 		$funnel = new Funnel( $funnel_id );
 
-		if ( ! $funnel->exists() ){
+		if ( ! $funnel->exists() ) {
 			return self::ERROR_404( 'error', 'funnel not found' );
 		}
 
@@ -91,8 +92,8 @@ class Steps_Api extends Base {
 
 		$all_steps = $funnel->get_steps();
 
-		foreach ( $all_steps as $step ){
-			if ( $step->get_order() < $step_order ){
+		foreach ( $all_steps as $step ) {
+			if ( $step->get_order() < $step_order ) {
 				continue;
 			}
 
@@ -106,13 +107,13 @@ class Steps_Api extends Base {
 		$title      = $elements[ $type ]->get_name();
 		$step_group = $elements[ $type ]->get_group();
 
-		$step = new Step([
+		$step = new Step( [
 			'funnel_id'  => $funnel_id,
 			'step_title' => $title,
 			'step_type'  => $type,
 			'step_group' => $step_group,
 			'step_order' => $step_order,
-		]);
+		] );
 
 		// reorder the steps.
 		return self::SUCCESS_RESPONSE( [ 'step' => $step->get_as_array() ] );
@@ -120,18 +121,65 @@ class Steps_Api extends Base {
 
 	public function read( WP_REST_Request $request ) {
 
+		$step_id = absint( $request->get_param( 'step_id' ) );
+		$step    = new Step( $step_id );
+
+		if ( ! $step->exists() ) {
+			return self::ERROR_404( 'error', 'Step not found.' );
+		}
+
+		return self::SUCCESS_RESPONSE( [ 'step' => $step->get_as_array() ] );
 	}
 
+	/**
+	 * Update a step
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
 	public function update( WP_REST_Request $request ) {
 
+		$step_id = absint( $request->get_param( 'step_id' ) );
+		$step    = new Step( $step_id );
+
+		if ( ! $step->exists() ) {
+			return self::ERROR_404( 'error', 'Step not found.' );
+		}
+
+		// Update any root level arguments
+		$args = $request->get_param( 'args' );
+
+		if ( $args ) {
+			$args = map_deep( $args, 'sanitize_text_field' );
+			$step->update( $args );
+		}
+
+		// Update the step delay
+		$delay = $request->get_param( 'delay' );
+
+		if ( $delay ) {
+			$delay = map_deep( $delay, 'sanitize_text_field' );
+			$step->update_delay( $delay );
+		}
+
+		// Update the step delay
+		$settings = $request->get_param( 'settings' );
+
+		if ( ! empty( $settings ) ) {
+			$step->save( $settings );
+		}
+
+		return self::SUCCESS_RESPONSE( [ 'step' => $step->get_as_array() ] );
 	}
 
 	public function delete( WP_REST_Request $request ) {
+
 		$step_id = absint( $request->get_param( 'step_id' ) );
 
 		$step = new Step( $step_id );
 
-		if ( ! $step->exists() ){
+		if ( ! $step->exists() ) {
 			return self::ERROR_404( 'error', 'step does not exist.' );
 		}
 
@@ -140,8 +188,8 @@ class Steps_Api extends Base {
 		$step->delete();
 
 		// Reorder the steps
-		foreach ( $funnel->get_steps() as $i => $step ){
-			$step->update( [ 'step_order' => $i+1 ] );
+		foreach ( $funnel->get_steps() as $i => $step ) {
+			$step->update( [ 'step_order' => $i + 1 ] );
 		}
 
 		return self::SUCCESS_RESPONSE();

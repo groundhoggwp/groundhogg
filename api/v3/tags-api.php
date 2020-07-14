@@ -11,6 +11,7 @@ use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use function Groundhogg\get_contactdata;
 use Groundhogg\Plugin;
+use function Groundhogg\get_db;
 use function Groundhogg\sort_by_string_in_array;
 use WP_REST_Server;
 use WP_REST_Request;
@@ -146,13 +147,19 @@ class Tags_Api extends Base {
 			return self::ERROR_INVALID_PERMISSIONS();
 		}
 
-		$search = $request->get_param( 'q' ) ? $request->get_param( 'q' ) : $request->get_param( 'search' );
+		$search = $request->get_param( 'q' ) ?: $request->get_param( 'search' );
 		$search = sanitize_text_field( stripslashes( $search ) );
 
 		$is_for_select  = filter_var( $request->get_param( 'select' ), FILTER_VALIDATE_BOOLEAN );
 		$is_for_select2 = filter_var( $request->get_param( 'select2' ), FILTER_VALIDATE_BOOLEAN );
+		$is_for_axios   = filter_var( $request->get_param( 'axios' ), FILTER_VALIDATE_BOOLEAN );
 
-		$tags = Plugin::$instance->dbs->get_db( 'tags' )->search( $search );
+		$tags = get_db( 'tags' )->query( [
+			'search'  => $search,
+			'orderby' => 'tag_name',
+			'order'   => 'asc',
+			'limit'   => 100
+		] );
 
 		if ( $is_for_select2 ) {
 			$json = array();
@@ -167,6 +174,21 @@ class Tags_Api extends Base {
 			}
 
 			$results = array( 'results' => $json, 'more' => false );
+
+			return rest_ensure_response( $results );
+		}
+
+		if ( $is_for_axios ) {
+			$json = array();
+
+			foreach ( $tags as $i => $tag ) {
+				$json[] = array(
+					'value' => $tag->tag_id,
+					'label' => sprintf( "%s", $tag->tag_name )
+				);
+			}
+
+			$results = array( 'tags' => $json );
 
 			return rest_ensure_response( $results );
 		}

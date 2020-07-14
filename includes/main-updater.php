@@ -297,7 +297,7 @@ class Main_Updater extends Updater {
 	 * Notes db added.
 	 * Migrate notes
 	 */
-	public function version_2_2_17() {
+	public function version_2_2_18_1() {
 		Plugin::$instance->dbs->install_dbs();
 	}
 
@@ -335,7 +335,6 @@ class Main_Updater extends Updater {
 			'2.1.14.1',
 			'2.2',
 			'2.2.14',
-			'2.2.17'
 		];
 	}
 
@@ -351,6 +350,7 @@ class Main_Updater extends Updater {
 			'2.2.3',
 			'2.2.13',
 			'2.2.14',
+			'2.2.18.1'
 		];
 	}
 

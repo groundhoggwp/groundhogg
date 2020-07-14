@@ -14,14 +14,12 @@ export class EditDelayControl extends React.Component {
 	constructor (props) {
 		super(props);
 
-		const delay = props.delay;
-
 		this.state = props.delay;
 
 		this.handleTypeChange = this.handleTypeChange.bind(this);
 		this.handleDone = this.handleDone.bind(this);
-		this.handleDelayControlUpdated = this.handleDelayControlUpdated.bind(
-			this);
+		this.handleCancel = this.handleCancel.bind(this);
+		this.handleDelayControlUpdated = this.handleDelayControlUpdated.bind(this);
 	}
 
 	handleTypeChange (e) {
@@ -44,6 +42,11 @@ export class EditDelayControl extends React.Component {
 
 	handleDone (e) {
 		this.props.save( this.state );
+	}
+
+	handleCancel(e) {
+		this.setState(this.props.delay);
+		this.props.cancel()
 	}
 
 	render () {
@@ -99,9 +102,9 @@ export class EditDelayControl extends React.Component {
 		return (
 			<GroundhoggModal
 				show={ this.props.show }
-				heading={ 'Edit delay' }
+				heading={ 'Edit step delay' }
 				onSave={ this.handleDone }
-				onHide={ this.props.cancel }
+				onHide={ this.handleCancel }
 				closeText={ 'Save' }
 			>
 				<div className={ 'edit-delay-controls' }>

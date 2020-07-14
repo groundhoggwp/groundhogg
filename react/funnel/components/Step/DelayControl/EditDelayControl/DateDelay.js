@@ -31,6 +31,7 @@ export function DateDelay (props) {
 								e.target.value) }
 						>
 							{ runOnTypes.map(type => <option
+								key={type.value}
 								value={ type.value }>{ type.label }</option>) }
 						</select>
 						<div className={ 'run-at col-controls' }>

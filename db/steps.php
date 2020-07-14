@@ -12,12 +12,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * store steps that belong to funnels
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @subpackage  includes/DB
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
 class Steps extends DB {
 
@@ -79,13 +79,16 @@ class Steps extends DB {
 	 */
 	public function get_columns() {
 		return array(
-			'ID'          => '%d',
-			'funnel_id'   => '%d',
-			'step_title'  => '%s',
-			'step_status' => '%s',
-			'step_type'   => '%s',
-			'step_group'  => '%s',
-			'step_order'  => '%d',
+			'ID'             => '%d',
+			'funnel_id'      => '%d',
+			'step_title'     => '%s',
+			'step_status'    => '%s',
+			'step_type'      => '%s',
+			'step_group'     => '%s',
+			'step_order'     => '%d',
+			'last_edited_by' => '%s',
+			'last_edited'    => '%s',
+			'date_created'   => '%s',
 		);
 	}
 
@@ -97,13 +100,16 @@ class Steps extends DB {
 	 */
 	public function get_column_defaults() {
 		return array(
-			'ID'          => 0,
-			'funnel_id'   => 0,
-			'step_title'  => __( 'New Step' ),
-			'step_status' => 'ready',
-			'step_type'   => 'send_email',
-			'step_group'  => 'action',
-			'step_order'  => 0,
+			'ID'             => 0,
+			'funnel_id'      => 0,
+			'step_title'     => __( 'New Step' ),
+			'step_status'    => 'ready',
+			'step_type'      => 'send_email',
+			'step_group'     => 'action',
+			'step_order'     => 0,
+			'last_edited_by' => '',
+			'last_edited'    => current_time( 'mysql' ),
+			'date_created'   => current_time( 'mysql' ),
 		);
 	}
 
@@ -168,11 +174,13 @@ class Steps extends DB {
 	 *
 	 * @access public
 	 *
+	 * @since  2.3
+	 *
+	 * @param mixed  $value The Customer ID or email to search
+	 *
 	 * @param string $field id or email
-	 * @param mixed $value The Customer ID or email to search
 	 *
 	 * @return mixed          Upon success, an object of the step. Upon failure, NULL
-	 * @since  2.3
 	 */
 	public function get_step_by( $field = 'ID', $value = 0 ) {
 
@@ -237,9 +245,7 @@ class Steps extends DB {
 	 * @since   2.1
 	 */
 	public function count( $args = array() ) {
-
 		return count( $this->get_steps( $args ) );
-
 	}
 
 	/**
@@ -261,7 +267,10 @@ class Steps extends DB {
 		step_type varchar(50) NOT NULL,
 		step_group varchar(20) NOT NULL,
 		step_status varchar(20) NOT NULL,
+		last_edited_by varchar(20) NOT NULL,
 		step_order int unsigned NOT NULL,
+		date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+		last_edited datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		PRIMARY KEY  (ID)
 		) {$this->get_charset_collate()};";
 
