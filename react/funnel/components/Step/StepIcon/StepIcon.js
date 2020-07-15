@@ -1,17 +1,13 @@
 import React from 'react';
 import './component.scss'
 
-export class StepIcon extends React.Component{
+export function StepIcon({type, group, src}) {
+	const classes = [ type + '-icon', group + '-icon', 'step-icon' ].join( ' ' );
+	const wrapperClasses = [ type + '-icon-wrap', group + '-icon-wrap', 'step-icon-wrap' ].join( ' ' );
 
-	render () {
-
-		const classes = [ this.props.type + '-icon', this.props.group + '-icon', 'step-icon' ].join( ' ' );
-
-		return (
-			<div className="step-icon-wrap">
-				<img className={ classes } src={ this.props.src }/>
-			</div>
-		)
-	}
-
+	return (
+		<div className={wrapperClasses}>
+			<img className={ classes } src={ src }/>
+		</div>
+	)
 }

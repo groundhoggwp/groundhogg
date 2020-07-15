@@ -220,7 +220,7 @@ class Scripts {
 
 		wp_localize_script( 'groundhogg-admin', 'groundhogg_endpoints', [
 			'tags'     => rest_url( 'gh/v3/tags' ),
-			'emails'   => rest_url( 'gh/v3/emails?select2=true&status[]=ready&status[]=draft' ),
+			'emails'   => rest_url( 'gh/v3/emails' ),
 			'sms'      => rest_url( 'gh/v3/sms?select2=true' ),
 			'contacts' => rest_url( 'gh/v3/contacts?select2=true' ),
 			'funnels'  => rest_url( 'gh/v3/funnels' ),

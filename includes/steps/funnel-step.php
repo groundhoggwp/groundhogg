@@ -9,6 +9,7 @@ use Groundhogg\Event;
 use function Groundhogg\get_array_var;
 use Groundhogg\Step;
 use Groundhogg\Supports_Errors;
+use function Groundhogg\isset_not_empty;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -38,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 abstract class Funnel_Step extends Supports_Errors {
 
-    protected static $step_properties = [];
+	protected static $step_properties = [];
 
 	/**
 	 * The current step
@@ -47,7 +48,9 @@ abstract class Funnel_Step extends Supports_Errors {
 	 */
 	protected $current_step = null;
 	protected $current_contact = null;
+
 	protected $controls = [];
+	protected $control_sections = [];
 
 	/**
 	 * @var array
@@ -64,7 +67,7 @@ abstract class Funnel_Step extends Supports_Errors {
 	 */
 	public function __construct() {
 
-	    add_filter( "groundhogg/steps/{$this->get_group()}s", [ $this, 'register' ] );
+		add_filter( "groundhogg/steps/{$this->get_group()}s", [ $this, 'register' ] );
 
 		add_action( "groundhogg/steps/{$this->get_type()}/save", [ $this, 'pre_save' ], 1, 2 );
 		add_action( "groundhogg/steps/{$this->get_type()}/save", [ $this, 'save' ], 11, 2 );
@@ -155,65 +158,84 @@ abstract class Funnel_Step extends Supports_Errors {
 		return $array;
 	}
 
+	protected $current_section = [];
+
 	/**
+	 * Start a new controls section
+	 *
+	 * @param $section_id
+	 * @param $args
+	 */
+	protected function start_controls_section( $section_id, $args ) {
+
+		if ( ! $section_id ){
+			return;
+		}
+
+		$args = wp_parse_args( $args, [
+			'id'       => $section_id,
+			'label'    => '',
+			'controls' => []
+		] );
+
+		$this->current_section = $args;
+	}
+
+	/**
+	 * Add the controls section to the controls list
+	 */
+	protected function end_controls_section(){
+		$this->controls[] = $this->current_section;
+		$this->current_section = [];
+	}
+
+	/**
+	 * Register a controls
+	 *
 	 * @param string $setting
-	 * @param array  $args
+	 * @param array $args
 	 */
 	protected function add_control( $setting = '', $args = [] ) {
 
-	    $args = wp_parse_args( $args, [
-            'id'          => $setting,
-		    'type'        => '',
-		    'label'       => '',
+		if ( ! isset_not_empty( $this->current_section, 'id' ) || ! $setting ){
+			return;
+		}
+
+		$args = wp_parse_args( $args, [
+			'id'          => $setting,
+			'type'        => '',
+			'label'       => '',
 			'default'     => '',
 			'options'     => [],
 			'description' => '',
 		] );
 
-	    $this->controls[] = $args;
+		$this->current_section[ 'controls' ][] = $args;
 	}
 
 	/**
-	 * @deprecated
-	 *
-	 * @param string $setting
-	 *
-	 * @return string
+	 * Register the controls for this step
 	 *
 	 */
-	protected function setting_id_prefix( $setting = '' ) {
-		if ( empty( $setting ) ) {
-			$setting = uniqid();
-		}
-
-		return sprintf( 'step_%d_%s', $this->get_current_step()->get_id(), $setting );
-	}
+	abstract public function register_controls();
 
 	/**
-	 * Return the name structure for settings within the step settings
+	 * Get the controls
 	 *
-	 * @deprecated
-	 *
-	 * @param string $setting
-	 *
-	 * @return string
-	 *
+	 * @return array
 	 */
-	protected function setting_name_prefix( $setting = '' ) {
-		return sprintf( 'steps[%d][%s]', $this->get_current_step()->get_id(), $setting );
+	public function get_controls() {
+		return $this->controls;
 	}
 
 	/**
 	 * Retrieves a setting from the settings array provide by the step meta.
 	 *
-	 * @deprecated
-	 *
-	 * @param bool   $default
+	 * @param bool $default
 	 *
 	 * @param string $key
 	 *
 	 * @return mixed
-	 *
 	 */
 	protected function get_setting( $key = '', $default = false ) {
 		$val = $this->get_current_step()->get_meta( $key );
@@ -239,9 +261,9 @@ abstract class Funnel_Step extends Supports_Errors {
 	/**
 	 * Get a normalized array of data for saving the step.
 	 *
-	 * @deprecated
 	 * @return array
 	 *
+	 * @deprecated
 	 */
 	protected function get_posted_settings() {
 		return $this->posted_settings;
@@ -250,7 +272,7 @@ abstract class Funnel_Step extends Supports_Errors {
 	/**
 	 * Retrieves a setting from the posted settings when saving.
 	 *
-	 * @param bool   $default
+	 * @param bool $default
 	 *
 	 * @param string $key
 	 *
@@ -288,16 +310,6 @@ abstract class Funnel_Step extends Supports_Errors {
 	protected function get_current_contact() {
 		return $this->current_contact;
 	}
-
-	public function get_controls(){
-		return $this->controls;
-	}
-
-	/**
-	 * Register the controls for this step
-	 *
-	 */
-	abstract public function register_controls();
 
 	/**
 	 * Initialize the posted settings array

@@ -142,11 +142,17 @@ class Apply_Tag extends Action {
 	 */
 	public function register_controls() {
 
+		$this->start_controls_section( 'general', [
+			'label' => __( 'Tags', 'groundhogg' )
+		] );
+
 		$this->add_control( 'tags', [
 			'label'       => __( 'Apply These Tags:', 'groundhogg' ),
 			'type'        => 'tag_picker',
 			'description' => __( 'Add new tags by hitting [enter] or by typing a [comma].', 'groundhogg' ),
 		] );
+
+		$this->end_controls_section();
 	}
 
 }

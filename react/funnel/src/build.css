@@ -146,6 +146,10 @@
   position: absolute;
   left: -1px;
   top: -1px; }
+  .step-icon-wrap.action-icon-wrap {
+    background: #5cc0a5; }
+  .step-icon-wrap.benchmark-icon-wrap {
+    background: #00a0d2; }
   .step-icon-wrap img.step-icon {
     height: 54px;
     width: 54px; }
@@ -273,33 +277,58 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  padding-left: 0; }
+  padding-left: 0;
+  vertical-align: bottom; }
 
 .edit-step .inner {
-  background: #f7f7f7;
+  background: #f1f1f1;
   height: 100vh;
   overflow-y: auto; }
 
 .edit-step .step-settings {
   overflow-y: auto;
-  padding: 70px 10px 10px 10px;
+  padding: 80px 20px 20px 20px;
   height: 100%; }
 
 .edit-step .last-edited {
   margin-right: 15px;
   color: #b4b9be; }
 
+.edit-step .edit-nav-bar {
+  padding-left: 70px; }
+  .edit-step .edit-nav-bar .step-icon-wrap {
+    left: 0; }
+    .edit-step .edit-nav-bar .step-icon-wrap img.step-icon {
+      height: 60px;
+      width: 60px; }
+
 .edit-step .fixed-top {
   position: absolute; }
+
+.edit-step .controls-section {
+  background-color: #f9f9f9;
+  border: 1px solid #ccd0d4; }
+  .edit-step .controls-section .controls-section-title {
+    padding: 10px 15px;
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #ccd0d4; }
+    .edit-step .controls-section .controls-section-title h4 {
+      font-size: 20px;
+      margin: 0; }
+  .edit-step .controls-section:hover {
+    border-color: #b6babe; }
 
 .edit-step .step-setting-control.row {
   margin: 0;
   padding-top: 15px;
-  border: 1px solid #ccd0d4;
-  background: #f9f9f9; }
-  .edit-step .step-setting-control.row:hover {
-    border: 1px solid #b6babe;
-    background: #f0f0f5; }
+  padding-bottom: 15px; }
+
+.edit-step .btn-control-group {
+  margin-top: 10px; }
+  .edit-step .btn-control-group .btn {
+    margin-right: 10px; }
+    .edit-step .btn-control-group .btn:last-child {
+      margin: 0; }
 
 .groundhogg.modal {
   z-index: 999999; }

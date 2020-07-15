@@ -27,22 +27,26 @@ class Email_Api extends Base {
 				'callback'            => [ $this, 'get_emails' ],
 				'permission_callback' => $auth_callback,
 				'args'                => [
-					'query'   => [
+					'query'        => [
 						'description' => _x( 'Any search parameters.', 'api', 'groundhogg' )
 					],
-					'select'  => [
+					'select'       => [
 						'required'    => false,
 						'description' => _x( 'Whether to retrieve as available for a select input.', 'api', 'groundhogg' ),
 					],
-					'select2' => [
+					'selectReact' => [
 						'required'    => false,
 						'description' => _x( 'Whether to retrieve as available for an ajax select2 input.', 'api', 'groundhogg' ),
 					],
-					'search'  => [
+					'select2'      => [
+						'required'    => false,
+						'description' => _x( 'Whether to retrieve as available for an ajax select2 input.', 'api', 'groundhogg' ),
+					],
+					'search'       => [
 						'required'    => false,
 						'description' => _x( 'Search string for tag name.', 'api', 'groundhogg' ),
 					],
-					'q'       => [
+					'q'            => [
 						'required'    => false,
 						'description' => _x( 'Shorthand for search.', 'api', 'groundhogg' ),
 					],
@@ -95,6 +99,7 @@ class Email_Api extends Base {
 
 		$is_for_select  = filter_var( $request->get_param( 'select' ), FILTER_VALIDATE_BOOLEAN );
 		$is_for_select2 = filter_var( $request->get_param( 'select2' ), FILTER_VALIDATE_BOOLEAN );
+		$is_for_select_react = filter_var( $request->get_param( 'selectReact' ), FILTER_VALIDATE_BOOLEAN );
 
 		$emails = Plugin::$instance->dbs->get_db( 'emails' )->query( $query, 'ID' );
 
@@ -117,9 +122,7 @@ class Email_Api extends Base {
 			$results = array( 'results' => $json, 'more' => false );
 
 			return rest_ensure_response( $results );
-		}
-
-		if ( $is_for_select ) {
+		} else if ( $is_for_select ) {
 
 			$response_emails = [];
 
@@ -129,6 +132,19 @@ class Email_Api extends Base {
 
 			$emails = $response_emails;
 
+		} else if ( $is_for_select_react ){
+			$json = array();
+
+			foreach ( $emails as $i => $email ) {
+				$json[] = array(
+					'value' => $email->ID,
+					'label' => sprintf( "%s (%s)", $email->title ?: $email->subject, $email->status )
+				);
+			}
+
+			$results = array( 'emails' => $json );
+
+			return rest_ensure_response( $results );
 		}
 
 		return self::SUCCESS_RESPONSE( [ 'emails' => $emails ] );
