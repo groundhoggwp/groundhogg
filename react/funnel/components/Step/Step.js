@@ -19,37 +19,18 @@ export class Step extends React.Component {
         super(props);
 
         this.state = {
-            showControls: false,
             deleting: false,
             deleted: false
         };
 
-        this.handleOnMouseEnter = this.handleOnMouseEnter.bind(this);
-        this.handleMouseLeave = this.handleMouseLeave.bind(this);
         this.handleControlAction = this.handleControlAction.bind(this);
         this.handleClickAction = this.handleClickAction.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
         this.afterFadeOut = this.afterFadeOut.bind(this);
     }
 
-    handleOnMouseEnter(e) {
-        this.setState({
-            showControls: true
-        });
-    }
-
-    handleMouseLeave(e) {
-        this.setState({
-            showControls: false
-        });
-    }
-
     handleClickAction(e) {
         showEditStepForm(this.props.step);
-    }
-
-    handleDuplicate() {
-
     }
 
     afterFadeOut() {
@@ -67,7 +48,6 @@ export class Step extends React.Component {
             }
         }).then(result => this.setState({
             deleting: true,
-            showControls: false
         }));
     }
 
@@ -118,11 +98,14 @@ export class Step extends React.Component {
                     <div id={step.id} className={classes.join(" ")}>
                         <StepIcon type={step.type} group={step.group}
                                   src={step.icon}/>
-                        <StepTitle title={step.title}/>
-                        {this.state.showControls && <StepControls
+                        <StepTitle
+                            title={step.title}
+                            handleClick={this.handleClickAction}
+                        />
+                        <StepControls
                             handleSelect={this.handleControlAction}
                             handleClick={this.handleClickAction}
-                        />}
+                        />
                         <div className={"wp-clearfix"}></div>
                     </div>
                 </div>

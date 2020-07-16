@@ -55,6 +55,23 @@
         margin-bottom: 10px;
       }
     }
+
+    .step-controls{
+      visibility: hidden;
+      opacity: 0;
+      transition: visibility 0s, opacity 0.5s linear;
+    }
+
+    &:hover{
+
+      border-color: $border-hover-color;
+
+      .step-controls{
+        visibility: visible;
+        opacity: 1;
+        transition: visibility 0s, opacity 0.5s linear;
+      }
+    }
   }
 
   &:last-child{

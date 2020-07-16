@@ -88,7 +88,7 @@ export class AddStep extends React.Component {
 
         return (
             <div className={"add-new-step"}>
-                <SlideInBarRight onOverlayClick={this.handleExit}>
+	            <SlideInBarRight show={this.state.isShowing} onOverlayClick={this.handleExit}>
                     <div className={"inner"}>
                         <Navbar bg="white" expand="sm" fixed="top">
                             <Navbar.Brand>

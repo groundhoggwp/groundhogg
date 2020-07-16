@@ -5,15 +5,15 @@ import Radium, { StyleRoot } from 'radium';
 
 const styles = {
 	fadeIn: {
-		animation: 'x 1s',
+		animation: 'x 750ms',
 		animationName: Radium.keyframes(fadeIn, 'fadeIn'),
 	},
 	fadeOut: {
-		animation: 'x 500ms',
+		animation: 'x 250ms',
 		animationName: Radium.keyframes(fadeOut, 'fadeOut'),
 	},
 	slideInRight: {
-		animation: 'x 1s',
+		animation: 'x 750ms',
 		animationName: Radium.keyframes(slideInRight, 'slideInRight'),
 	},
 };

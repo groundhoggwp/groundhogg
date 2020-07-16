@@ -3,13 +3,23 @@
 .edit-step {
 
   .step-title {
-    display: inline-block;
-    max-width: 300px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    padding-left: 0;
-    vertical-align: bottom;
+
+    &.title-input-editing{
+      margin: -4px 0;
+      text-align: left;
+      padding-left: 8px;
+    }
+
+    &:not(.title-input-editing) {
+      display: inline-block;
+      max-width: 300px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      padding-left: 0;
+      vertical-align: bottom;
+    }
+
   }
 
   .inner {
@@ -52,6 +62,7 @@
   .controls-section {
     background-color: $background-color-light;
     border: 1px solid $border-color;
+    margin-bottom: 20px;
 
     .controls-section-title {
 
@@ -60,7 +71,7 @@
       border-bottom: 1px solid $border-color;
 
       h4 {
-        font-size: 20px;
+        font-size: 16px;
         margin: 0;
       }
     }
@@ -68,24 +79,39 @@
     &:hover {
       border-color: $border-hover-color;
     }
+
+    &:last-child{
+      margin: 0;
+    }
   }
 
   .step-setting-control.row {
     margin: 0;
     padding-top: 15px;
     padding-bottom: 15px;
+
+    label{
+      font-weight: 500;
+    }
   }
 
-  .btn-control-group{
+  .btn-control-group {
 
     margin-top: 10px;
 
-    .btn{
+    .btn {
       margin-right: 10px;
 
-      &:last-child{
+      &:last-child {
         margin: 0;
       }
+    }
+  }
+
+  .textarea-control-wrap{
+    textarea{
+      width: 100%;
+      height: 100px;
     }
   }
 }

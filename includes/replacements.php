@@ -291,6 +291,25 @@ class Replacements {
 		return $this->replacement_codes;
 	}
 
+	public function get_codes(){
+	    return wp_list_pluck( array_values( $this->replacement_codes ), 'code' );
+    }
+
+	/**
+	 * @return array
+	 */
+    public function get_codes_with_pretty_name(){
+	    $codes =  $this->get_codes();
+
+	    $return = [];
+
+	    foreach ( $codes as $code ){
+	        $return[] = [ 'code' => $code, 'name' => key_to_words( $code ) ];
+        }
+
+	    return $return;
+    }
+
 	/**
 	 * Process the codes based on the given contact ID
 	 *

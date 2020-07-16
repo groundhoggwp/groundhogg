@@ -38,3 +38,21 @@ export function dispatchEvent( hook, args ){
 export function listenForEvent( hook, callback ){
 	document.addEventListener(hook, callback );
 }
+
+/**
+ * Disable body scrolling
+ */
+export function disableBodyScrolling () {
+	jQuery(function ($) {
+		$('body').addClass('disable-scrolling');
+	});
+}
+
+/**
+ * Enable body scrolling
+ */
+export function enableBodyScrolling () {
+	jQuery(function ($) {
+		$('body').removeClass('disable-scrolling');
+	});
+}

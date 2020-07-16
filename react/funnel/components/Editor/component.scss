@@ -1,5 +1,11 @@
 @import "../../master";
 
+body.disable-scrolling {
+  height: 100vh;
+  overflow-y: hidden;
+  padding-right: 15px;
+}
+
 .groundhogg-funnel-editor{
   max-width: 1000px;
   margin: auto;

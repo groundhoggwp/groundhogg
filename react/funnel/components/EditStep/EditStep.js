@@ -9,6 +9,8 @@ import moment from "moment";
 import "./component.scss";
 import {ControlsSection} from "./controls/ControlsSection";
 import {StepIcon} from "../Step/StepIcon/StepIcon";
+import { disableBodyScrolling, enableBodyScrolling } from '../../App';
+import { StepTitleInput } from './StepTitleInput';
 
 export function showEditStepForm(step) {
     const event = new CustomEvent("groundhogg-edit-step",
@@ -54,6 +56,8 @@ export class EditStep extends React.Component {
         this.setState({
             isShowing: false
         });
+
+        enableBodyScrolling();
     }
 
     /**
@@ -101,6 +105,8 @@ export class EditStep extends React.Component {
             settings: result.data.step.settings,
             isShowing: true
         }));
+
+        disableBodyScrolling();
     }
 
     componentDidMount() {
@@ -118,7 +124,7 @@ export class EditStep extends React.Component {
 
         return (
             <div className={"edit-step"}>
-                <SlideInBarRight onOverlayClick={this.handleExit}>
+                <SlideInBarRight show={this.state.isShowing} onOverlayClick={this.handleExit}>
                     <div className={"inner"}>
                         <Navbar bg="white" expand="sm" fixed="top" className={'edit-nav-bar'}>
                             <StepIcon
@@ -127,10 +133,10 @@ export class EditStep extends React.Component {
                                 type={step.data.step_type}
                             />
                             <Navbar.Brand>
-                                <div className={"step-title"}>
-                                    {"Edit "}
-                                    <b>{step.data.step_title}</b>
-                                </div>
+                                <StepTitleInput
+                                    title={step.data.step_title}
+                                    stepId={step.ID}
+                                />
                             </Navbar.Brand>
                             <Navbar.Toggle
                                 aria-controls="basic-navbar-nav"/>

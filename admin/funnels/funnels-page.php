@@ -172,7 +172,8 @@ class Funnels_Page extends Admin_Page {
 				'groups' => [
 					'actions'    => Plugin::instance()->step_manager->get_actions_as_array(),
 					'benchmarks' => Plugin::instance()->step_manager->get_benchmarks_as_array()
-				]
+				],
+                'replacements' => Plugin::instance()->replacements->get_codes_with_pretty_name()
 			] );
 
 			wp_enqueue_script( 'groundhogg-admin-replacements' );

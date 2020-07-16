@@ -167,14 +167,14 @@ class Send_Email extends Action {
 			'type'  => 'email_picker',
 		] );
 
-		$this->add_control( 'skip_if_confirmed', [
-			'label'       => __( 'Send this email', 'groundhogg' ),
-			'type'        => 'on_off_toggle',
-			'condition'   => [
-				'is_confirmation_email' => true,
-			],
-			'description' => __( 'Skip to next <b>Email Confirmed</b> benchmark if email is already confirmed.', 'groundhogg' )
-		] );
+//		$this->add_control( 'skip_if_confirmed', [
+//			'label'       => __( 'Skip if confirmed?', 'groundhogg' ),
+//			'type'        => 'yes_no_toggle',
+//			'condition'   => [
+//				'is_confirmation_email' => true,
+//			],
+//			'description' => __( 'Skip to next <b>Email Confirmed</b> benchmark if email is already confirmed.', 'groundhogg' )
+//		] );
 
 		$this->end_controls_section();
 	}

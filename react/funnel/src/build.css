@@ -35,6 +35,11 @@
 .funnel-status .mb-2 {
   margin: 0; }
 
+body.disable-scrolling {
+  height: 100vh;
+  overflow-y: hidden;
+  padding-right: 15px; }
+
 .groundhogg-funnel-editor {
   max-width: 1000px;
   margin: auto;
@@ -140,7 +145,8 @@
     cursor: grabbing; }
 
 .step-title {
-  padding-left: 60px; }
+  padding-left: 60px;
+  cursor: pointer; }
 
 .step-icon-wrap {
   position: absolute;
@@ -189,6 +195,16 @@
       background: #00a0d2; }
     .step-wrap .step.benchmark:last-child {
       margin-bottom: 10px; }
+  .step-wrap .step .step-controls {
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.5s linear; }
+  .step-wrap .step:hover {
+    border-color: #b6babe; }
+    .step-wrap .step:hover .step-controls {
+      visibility: visible;
+      opacity: 1;
+      transition: visibility 0s, opacity 0.5s linear; }
 
 .add-step-control {
   margin: 10px;
@@ -269,9 +285,31 @@
     top: 0;
     right: 0;
     bottom: 0;
-    padding: 0; }
+    padding: 0;
+    z-index: 9999; }
 
-.edit-step .step-title {
+.replacements.dropdown-menu {
+  max-height: 400px;
+  overflow-y: auto; }
+
+.textarea-control-wrap .replacements-wrap {
+  margin-bottom: 10px; }
+  .textarea-control-wrap .replacements-wrap .replacements {
+    float: right; }
+
+input[type="email"].email-address {
+  width: 100%; }
+  input[type="email"].email-address.invalid {
+    border-color: #cc0000;
+    box-shadow: 0 0 0 1px #cc0000;
+    outline: 2px solid transparent; }
+
+.edit-step .step-title.title-input-editing {
+  margin: -4px 0;
+  text-align: left;
+  padding-left: 8px; }
+
+.edit-step .step-title:not(.title-input-editing) {
   display: inline-block;
   max-width: 300px;
   white-space: nowrap;
@@ -307,21 +345,26 @@
 
 .edit-step .controls-section {
   background-color: #f9f9f9;
-  border: 1px solid #ccd0d4; }
+  border: 1px solid #ccd0d4;
+  margin-bottom: 20px; }
   .edit-step .controls-section .controls-section-title {
     padding: 10px 15px;
     background-color: #FFFFFF;
     border-bottom: 1px solid #ccd0d4; }
     .edit-step .controls-section .controls-section-title h4 {
-      font-size: 20px;
+      font-size: 16px;
       margin: 0; }
   .edit-step .controls-section:hover {
     border-color: #b6babe; }
+  .edit-step .controls-section:last-child {
+    margin: 0; }
 
 .edit-step .step-setting-control.row {
   margin: 0;
   padding-top: 15px;
   padding-bottom: 15px; }
+  .edit-step .step-setting-control.row label {
+    font-weight: 500; }
 
 .edit-step .btn-control-group {
   margin-top: 10px; }
@@ -329,6 +372,10 @@
     margin-right: 10px; }
     .edit-step .btn-control-group .btn:last-child {
       margin: 0; }
+
+.edit-step .textarea-control-wrap textarea {
+  width: 100%;
+  height: 100px; }
 
 .groundhogg.modal {
   z-index: 999999; }
