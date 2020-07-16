@@ -49,14 +49,14 @@ export class FunnelStatus extends Component {
 						onClick={ this.setStateActive }
 						variant={ this.state.status === 'active'
 							? 'primary'
-							: 'light' }
+							: 'outline-primary' }
 					>
 						{ 'Active' }
 					</Button>
 					<Button
 						onClick={ this.setStateInactive }
 						variant={ this.state.status === 'active'
-							? 'light'
+							? 'outline-secondary'
 							: 'secondary' }
 					>
 						{ 'Inactive' }

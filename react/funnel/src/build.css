@@ -298,7 +298,8 @@ body.disable-scrolling {
     float: right; }
 
 input[type="email"].email-address {
-  width: 100%; }
+  width: 100%;
+  background: #FFFFFF; }
   input[type="email"].email-address.invalid {
     border-color: #cc0000;
     box-shadow: 0 0 0 1px #cc0000;

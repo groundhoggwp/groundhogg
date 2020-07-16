@@ -13,6 +13,7 @@
 input[type="email"].email-address{
 
   width: 100%;
+  background: $white;
 
   &.invalid{
     border-color: $error-red;
