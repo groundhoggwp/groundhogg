@@ -4,7 +4,6 @@ import Spinner from "react-bootstrap/Spinner";
 import {StepGroup} from "../StepGroup/StepGroup";
 import {AddStep} from "../AddStep/AddStep";
 import axios from "axios";
-import {EditStep} from "../EditStep/EditStep";
 
 export function reloadEditor() {
     const event = new CustomEvent('groundhogg-reload-editor' );
@@ -107,7 +106,6 @@ export class Editor extends React.Component {
                 </div>
                 <div className={"editor-controls"}>
                     <AddStep/>
-                    <EditStep/>
                 </div>
             </div>
         );

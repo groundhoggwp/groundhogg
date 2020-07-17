@@ -1,0 +1,36 @@
+@import "../../master";
+
+.textarea-control-wrap{
+  .replacements-wrap{
+    margin-bottom: 10px;
+
+    .replacements{
+      float:right;
+    }
+  }
+}
+
+input[type="email"].email-address{
+
+  width: 100%;
+  background: $white;
+
+  &.invalid{
+    border-color: $error-red;
+    box-shadow: 0 0 0 1px $error-red;
+    outline: 2px solid transparent;
+  }
+}
+
+.btn-control-group {
+
+  margin-top: 10px;
+
+  .btn {
+    margin-right: 10px;
+
+    &:last-child {
+      margin: 0;
+    }
+  }
+}

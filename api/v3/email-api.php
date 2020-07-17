@@ -138,7 +138,7 @@ class Email_Api extends Base {
 			foreach ( $emails as $i => $email ) {
 				$json[] = array(
 					'value' => $email->ID,
-					'label' => sprintf( "%s (%s)", $email->title ?: $email->subject, $email->status )
+					'label' => esc_html( $email->title ) ?: esc_html( $email->subject )
 				);
 			}
 

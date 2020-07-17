@@ -165,16 +165,17 @@ class Funnel extends Base_Object_With_Meta {
 		}
 
 		foreach ( $steps as $i => $step ) {
-			$export['steps'][ $i ]          = [];
-			$export['steps'][ $i ]['id']    = $step->get_id();
-			$export['steps'][ $i ]['title'] = $step->get_title();
-			$export['steps'][ $i ]['group'] = $step->get_group();
-			$export['steps'][ $i ]['order'] = $step->get_order();
-			$export['steps'][ $i ]['type']  = $step->get_type();
-			$export['steps'][ $i ]['meta']  = $step->get_meta();
-			$export['steps'][ $i ]['args']  = $step->export();
-			$export['steps'][ $i ]['icon']  = $step->icon();
-			$export['steps'][ $i ]['delay'] = $step->get_delay_config();
+			$export['steps'][ $i ]             = [];
+			$export['steps'][ $i ]['id']       = $step->get_id();
+			$export['steps'][ $i ]['title']    = $step->get_title();
+			$export['steps'][ $i ]['group']    = $step->get_group();
+			$export['steps'][ $i ]['order']    = $step->get_order();
+			$export['steps'][ $i ]['type']     = $step->get_type();
+			$export['steps'][ $i ]['meta']     = $step->get_meta();
+			$export['steps'][ $i ]['settings'] = $step->get_meta();
+			$export['steps'][ $i ]['args']     = $step->export();
+			$export['steps'][ $i ]['icon']     = $step->icon();
+			$export['steps'][ $i ]['delay']    = $step->get_delay_config();
 		}
 
 		$export = apply_filters( 'groundhogg/funnel/export', $export, $this );

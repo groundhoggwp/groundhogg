@@ -26,9 +26,11 @@ function insertAtCursor(myFieldId, myValue) {
 	} else {
 		myField.value += myValue;
 	}
+
+	return myField.value;
 }
 
-export function ReplacementsButton({insertTargetId}) {
+export function ReplacementsButton({insertTargetId, onInsert}) {
 
 	const [value, setValue] = useState('');
 
@@ -36,7 +38,12 @@ export function ReplacementsButton({insertTargetId}) {
 
 	const onSelect = (key,e) => {
 		console.debug(key,e);
-		insertAtCursor(insertTargetId,'{' + key + '}')
+
+		let newVal = insertAtCursor(insertTargetId,'{' + key + '}');
+
+		if ( typeof onInsert === 'function' ){
+			onInsert(newVal);
+		}
 	};
 
 	return (

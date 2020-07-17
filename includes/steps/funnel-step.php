@@ -49,9 +49,6 @@ abstract class Funnel_Step extends Supports_Errors {
 	protected $current_step = null;
 	protected $current_contact = null;
 
-	protected $controls = [];
-	protected $control_sections = [];
-
 	/**
 	 * @var array
 	 */
@@ -82,12 +79,14 @@ abstract class Funnel_Step extends Supports_Errors {
 		add_filter( "groundhogg/steps/{$this->get_type()}/run", [ $this, 'pre_run' ], 1, 2 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/run", [ $this, 'run' ], 10, 2 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/icon", [ $this, 'get_icon' ] );
-		add_filter( "groundhogg/steps/{$this->get_type()}/controls", [ $this, 'get_controls' ] );
 		add_action( "wp_enqueue_scripts", [ $this, 'frontend_scripts' ] );
 
 		$this->add_additional_actions();
 
-		$this->register_controls();
+	}
+
+	public static function step_props(){
+		return self::$step_properties;
 	}
 
 	protected function add_additional_actions() {
@@ -137,7 +136,6 @@ abstract class Funnel_Step extends Supports_Errors {
 		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/no-icon.png';
 	}
 
-
 	/**
 	 * Register the this action/benchmark with the globals...
 	 *
@@ -153,79 +151,10 @@ abstract class Funnel_Step extends Supports_Errors {
 			'name'        => $this->get_name(),
 			'description' => $this->get_description(),
 			'icon'        => $this->get_icon(),
+			'group'       => $this->get_group(),
 		];
 
 		return $array;
-	}
-
-	protected $current_section = [];
-
-	/**
-	 * Start a new controls section
-	 *
-	 * @param $section_id
-	 * @param $args
-	 */
-	protected function start_controls_section( $section_id, $args ) {
-
-		if ( ! $section_id ){
-			return;
-		}
-
-		$args = wp_parse_args( $args, [
-			'id'       => $section_id,
-			'label'    => '',
-			'controls' => []
-		] );
-
-		$this->current_section = $args;
-	}
-
-	/**
-	 * Add the controls section to the controls list
-	 */
-	protected function end_controls_section(){
-		$this->controls[] = $this->current_section;
-		$this->current_section = [];
-	}
-
-	/**
-	 * Register a controls
-	 *
-	 * @param string $setting
-	 * @param array $args
-	 */
-	protected function add_control( $setting = '', $args = [] ) {
-
-		if ( ! isset_not_empty( $this->current_section, 'id' ) || ! $setting ){
-			return;
-		}
-
-		$args = wp_parse_args( $args, [
-			'id'          => $setting,
-			'type'        => '',
-			'label'       => '',
-			'default'     => '',
-			'options'     => [],
-			'description' => '',
-		] );
-
-		$this->current_section[ 'controls' ][] = $args;
-	}
-
-	/**
-	 * Register the controls for this step
-	 *
-	 */
-	abstract public function register_controls();
-
-	/**
-	 * Get the controls
-	 *
-	 * @return array
-	 */
-	public function get_controls() {
-		return $this->controls;
 	}
 
 	/**

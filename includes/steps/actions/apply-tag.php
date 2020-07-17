@@ -7,7 +7,9 @@ use Groundhogg\Event;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use Groundhogg\Tag;
 use function Groundhogg\get_db;
+use function Groundhogg\get_tag_name;
 use function Groundhogg\validate_tags;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -78,7 +80,14 @@ class Apply_Tag extends Action {
 	 * @param $settings
 	 */
 	public function save( $step, $settings ) {
-		$this->save_setting( 'tags', validate_tags( $this->get_posted_data( 'tags', [] ) ) );
+		$tag_ids = validate_tags( $this->get_posted_data( 'tags', [] ) );
+		$this->save_setting( 'tags', $tag_ids );
+
+		$reactSelectCompat = array_map( function( $tag_id ){
+			return [ 'value' => $tag_id, 'label' => get_db( 'tags' )->get( $tag_id )->tag_name ];
+		}, $tag_ids );
+
+		$this->save_setting( 'tags_display', $reactSelectCompat );
 	}
 
 	/**
@@ -135,24 +144,6 @@ class Apply_Tag extends Action {
 		}
 
 		return $args;
-	}
-
-	/**
-	 * Controls
-	 */
-	public function register_controls() {
-
-		$this->start_controls_section( 'general', [
-			'label' => __( 'Tags', 'groundhogg' )
-		] );
-
-		$this->add_control( 'tags', [
-			'label'       => __( 'Apply These Tags:', 'groundhogg' ),
-			'type'        => 'tag_picker',
-			'description' => __( 'Add new tags by hitting [enter] or by typing a [comma].', 'groundhogg' ),
-		] );
-
-		$this->end_controls_section();
 	}
 
 }

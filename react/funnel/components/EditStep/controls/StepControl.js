@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Col, Row } from 'react-bootstrap';
-import { basicControls } from './basicControls';
+import { basicControls } from '../basicControls';
 
 export function StepControl ({ control, update, value }) {
 

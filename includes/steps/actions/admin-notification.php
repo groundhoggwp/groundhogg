@@ -145,6 +145,15 @@ class Admin_Notification extends Action {
 			'description' => __( 'The email address which you want to send email from.', 'groundhogg' )
 		] );
 
+		$this->add_control( 'reply_to', [
+			'label'       => __( 'Reply to', 'groundhogg' ),
+			'type'        => 'email_address',
+			'options'     => [
+				'default' => '{email}'
+			],
+			'description' => __( 'The email address replies are sent to.', 'groundhogg' )
+		] );
+
 		$this->add_control( 'hide_admin_links', [
 			'label'       => __( 'Hide admin links?', 'groundhogg' ),
 			'type'        => 'yes_no_toggle',
@@ -155,6 +164,13 @@ class Admin_Notification extends Action {
 
 		$this->start_controls_section( 'content', [
 			'label' => __( 'Notification Content', 'groundhogg' ),
+		] );
+
+		$this->add_control( 'subject', [
+			'label'       => __( 'Subject line', 'groundhogg' ),
+			'type'        => HTML::INPUT,
+			'default'     => "Admin notification for {full_name} ({email})",
+			'description' => __( 'The subject line for the email notification.', 'groundhogg' )
 		] );
 
 		$this->add_control( 'note_text', [

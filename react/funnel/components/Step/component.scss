@@ -2,6 +2,15 @@
 
 .step-wrap{
 
+  .step-title{
+    padding-left: 60px;
+    cursor:pointer;
+
+    b{
+      font-weight: 500;
+    }
+  }
+
   .edit-step-controls{
     display: inline-block;
   }

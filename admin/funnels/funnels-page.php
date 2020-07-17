@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Funnels;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Funnel;
 use Groundhogg\Library;
+use Groundhogg\Steps\Funnel_Step;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon;
 use function Groundhogg\get_array_var;
@@ -173,6 +174,7 @@ class Funnels_Page extends Admin_Page {
 					'actions'    => Plugin::instance()->step_manager->get_actions_as_array(),
 					'benchmarks' => Plugin::instance()->step_manager->get_benchmarks_as_array()
 				],
+                'steps' => Funnel_Step::step_props(),
                 'replacements' => Plugin::instance()->replacements->get_codes_with_pretty_name()
 			] );
 

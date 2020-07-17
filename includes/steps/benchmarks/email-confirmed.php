@@ -66,23 +66,6 @@ class Email_Confirmed extends Benchmark {
 	}
 
 	/**
-	 * Register the controls for this step
-	 *
-	 */
-	public function register_controls() {
-		$this->start_controls_section( 'general', [
-			'label' => __( 'Conditions', 'groundhogg' )
-		] );
-
-		$this->add_control( 'skip_to', [
-			'label'       => __( 'Skip to this step?', 'groundhogg' ),
-			'type'        => 'yes_no_toggle',
-			'description' => __( 'Skip to this step if the contact has already confirmed their email address.', 'groundhogg' )
-		] );
-
-		$this->end_controls_section();	}
-
-	/**
 	 * Save the step settings
 	 *
 	 * @param $step Step

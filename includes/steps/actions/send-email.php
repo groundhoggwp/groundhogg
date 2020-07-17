@@ -2,22 +2,13 @@
 
 namespace Groundhogg\Steps\Actions;
 
-use Groundhogg\Classes\Activity;
 use Groundhogg\Email;
-use Groundhogg\Reporting\New_Reports\Chart_Draw;
-use Groundhogg\Reporting\Reporting;
-use Groundhogg\Utils\Graph;
 use function Groundhogg\get_array_var;
 use Groundhogg\Preferences;
 use Groundhogg\Contact;
-use Groundhogg\Contact_Query;
 use Groundhogg\Event;
-use function Groundhogg\get_db;
 use function Groundhogg\isset_not_empty;
-use Groundhogg\HTML;
-use function Groundhogg\html;
 use Groundhogg\Plugin;
-use function Groundhogg\percentage;
 use function Groundhogg\search_and_replace_domain;
 use Groundhogg\Step;
 
@@ -86,100 +77,6 @@ class Send_Email extends Action {
 	}
 
 	/**
-	 * Display the settings
-	 *
-	 * @param $step Step
-	 */
-	public function settings( $step ) {
-
-		$html = Plugin::$instance->utils->html;
-
-		$email_id = $this->get_setting( 'email_id' );
-		$email    = Plugin::$instance->utils->get_email( $email_id );
-
-		$html->start_form_table();
-
-		$html->start_row();
-
-		$html->th( __( 'Select an email to send:', 'groundhogg' ) );
-		$html->td( [
-			// EMAIL ID DROPDOWN
-			$html->dropdown_emails( [
-				'name'     => $this->setting_name_prefix( 'email_id' ),
-				'id'       => $this->setting_id_prefix( 'email_id' ),
-				'selected' => $this->get_setting( 'email_id' ),
-			] ),
-			// ROW ACTIONS
-			"<div class=\"row-actions\">",
-			// EDIT EMAIL
-			$html->button( [
-				'title' => 'Edit Email',
-				'text'  => _x( 'Edit Email', 'action', 'groundhogg' ),
-				'class' => 'button button-primary edit-email',
-			] ),
-			'&nbsp;',
-			// ADD NEW EMAIL
-			$html->button( [
-				'title' => 'Create New Email',
-				'text'  => _x( 'Create New Email', 'action', 'groundhogg' ),
-				'class' => 'button button-secondary add-email',
-			] ),
-			"</div>",
-			// ADD EMAIL OVERRIDE
-			$html->input( [
-				'type'  => 'hidden',
-				'name'  => $this->setting_name_prefix( 'add_email_override' ),
-				'id'    => $this->setting_id_prefix( 'add_email_override' ),
-				'class' => 'add-email-override',
-			] )
-		] );
-
-		$html->end_row();
-
-		if ( $email && $email->is_confirmation_email() ) {
-			$html->add_form_control( [
-				'label'       => __( 'Skip if confirmed?', 'groundhogg' ),
-				'type'        => HTML::CHECKBOX,
-				'field'       => [
-					'name'    => $this->setting_name_prefix( 'skip_if_confirmed' ),
-					'id'      => $this->setting_id_prefix( 'skip_if_confirmed' ),
-					'label'   => __( 'Enable', 'groundhogg' ),
-					'checked' => (bool) $this->get_setting( 'skip_if_confirmed' )
-				],
-				'description' => __( 'Skip to next <b>Email Confirmed</b> benchmark if email is already confirmed.', 'groundhogg' ),
-			] );
-		}
-
-		$html->end_form_table();
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function register_controls() {
-
-		$this->start_controls_section( 'general', [
-			'label' => __( 'Email', 'groundhogg' )
-		] );
-
-		$this->add_control( 'email_id', [
-			'label' => __( 'Send this email', 'groundhogg' ),
-			'type'  => 'email_picker',
-		] );
-
-//		$this->add_control( 'skip_if_confirmed', [
-//			'label'       => __( 'Skip if confirmed?', 'groundhogg' ),
-//			'type'        => 'yes_no_toggle',
-//			'condition'   => [
-//				'is_confirmation_email' => true,
-//			],
-//			'description' => __( 'Skip to next <b>Email Confirmed</b> benchmark if email is already confirmed.', 'groundhogg' )
-//		] );
-
-		$this->end_controls_section();
-	}
-
-	/**
 	 * Save the settings
 	 *
 	 * @param $step Step
@@ -191,14 +88,9 @@ class Send_Email extends Action {
 
 		$email = new Email( $this->get_setting( 'email_id' ) );
 
-		if ( ! $email->exists() ) {
-			$this->add_error( 'email_dne', __( 'You have not selected an email to send in one of your steps.', 'groundhogg' ) );
-		}
+		$email_display = [ 'value' => $email->get_id(), 'label' => $email->get_title() ];
 
-		if ( ( $email->is_draft() && $step->get_funnel()->is_active() ) ) {
-			$this->add_error( 'email_in_draft_mode', __( 'You still have emails in draft mode! These emails will not be sent and will cause automation to stop.' ) );
-		}
-
+		$this->save_setting( 'email_display', $email_display );
 		$this->save_setting( 'is_confirmation_email', $email->is_confirmation_email() );
 		$this->save_setting( 'skip_if_confirmed', ( bool ) $this->get_posted_data( 'skip_if_confirmed', false ) );
 	}

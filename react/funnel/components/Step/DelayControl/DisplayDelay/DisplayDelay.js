@@ -1,6 +1,6 @@
 import React from 'react';
 import moment from 'moment';
-import { Dashicon } from '../../../Dashicon/Dashicon';
+import { ItemsCommaOrList } from '../../../BasicControls/basicControls';
 
 function TimeDelayFragment ({ delay }) {
 
@@ -17,34 +17,13 @@ function TimeDelayFragment ({ delay }) {
 			break;
 		case 'between':
 			text.push(' between ', <b>{ moment(delay.time, 'HH:mm').
-				format('hh:mm a') }</b>, ' and ', <b>{ moment(delay.time_to,
+				format('LT') }</b>, ' and ', <b>{ moment(delay.time_to,
 				'HH:mm').format('LT') }</b>);
 			break;
 
 	}
 
 	return <>{ text }</>;
-}
-
-/**
- * Creates a pretty list based on the select results...
- *
- * @param items
- * @returns {*}
- * @constructor
- */
-function ItemsCommaOrList ({ items }) {
-
-	if ( ! items ){
-		return <></>;
-	}
-
-	return ( <>{ items.map(
-			(item, i) => <><b>{ item.label }</b>{ i < items.length - 2
-				? ','
-				: i ===
-				items.length - 2 ? ' or' : '' } </>) }</>
-	);
 }
 
 function FixedDelay ({ delay }) {
@@ -81,7 +60,7 @@ function FixedDelay ({ delay }) {
 
 				const days = delay.days_of_week;
 
-				text.push(<ItemsCommaOrList items={ delay.days_of_week }/>);
+				text.push(<ItemsCommaOrList items={ delay.days_of_week.map( item=>item.label ) }/>);
 
 				if (delay.months_of_year_type !== 'any') {
 					text.push(' of ', <ItemsCommaOrList
@@ -93,11 +72,11 @@ function FixedDelay ({ delay }) {
 
 				text.push(' on the ');
 
-				text.push(<ItemsCommaOrList items={ delay.days_of_month }/>);
+				text.push(<ItemsCommaOrList items={ delay.days_of_month.map( item=>item.label ) }/>);
 
 				if (delay.months_of_year_type !== 'any') {
 					text.push(' of ', <ItemsCommaOrList
-						items={ delay.months_of_year }/>);
+						items={ delay.months_of_year.map( item=>item.label ) }/>);
 				}
 
 				break;

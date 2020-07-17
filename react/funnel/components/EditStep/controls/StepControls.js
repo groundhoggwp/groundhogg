@@ -5,11 +5,11 @@ export function StepControls({controls, initialSettings, update}) {
 
     return (
         <>
-            {controls.map(control => <StepControl
-				control={control}
-				update={update}
-				value={initialSettings[control.id] || ""}
-			/>)}
+            {/*{controls.map(control => <StepControl*/}
+			{/*	control={control}*/}
+			{/*	update={update}*/}
+			{/*	value={initialSettings[control.id] || ""}*/}
+			{/*/>)}*/}
         </>
     );
 
