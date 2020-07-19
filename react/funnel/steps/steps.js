@@ -100,10 +100,11 @@ StepTitle.StepEdit = {
  * @param commit
  * @param children
  * @param modalProps
+ * @param modalBodyProps
  * @returns {*}
  * @constructor
  */
-export function SimpleEditModal({title, done, commit, children, modalProps}) {
+export function SimpleEditModal({title, done, commit, children, modalProps, modalBodyProps}) {
 
     const [show, setShow] = useState(true);
 
@@ -124,7 +125,7 @@ export function SimpleEditModal({title, done, commit, children, modalProps}) {
         <Modal
             aria-labelledby="contained-modal-title-vcenter"
             className={"simple-edit-modal"}
-            bsPrefix={'groundhogg modal'}
+            bsPrefix={"groundhogg modal"}
             centered
             show={show}
             onHide={handleHide}
@@ -136,7 +137,7 @@ export function SimpleEditModal({title, done, commit, children, modalProps}) {
                     {title}
                 </Modal.Title>
             </Modal.Header>
-            <Modal.Body>
+            <Modal.Body {...modalBodyProps}>
                 {children}
             </Modal.Body>
             <Modal.Footer>
@@ -159,8 +160,9 @@ SimpleEditModal.defaultProps = {
     },
     children: [],
     modalProps: {
-        size: 'md'
-    }
+        size: "md"
+    },
+    modalBodyProps: {}
 };
 
 import "./actions/ApplyTag";

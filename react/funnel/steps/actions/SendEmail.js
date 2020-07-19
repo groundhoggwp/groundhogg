@@ -1,6 +1,7 @@
 import React from "react";
 import {EmailPicker} from "../../components/BasicControls/basicControls";
 import {registerStepType, SimpleEditModal} from "../steps";
+import {Col, Row} from "react-bootstrap";
 
 registerStepType("send_email", {
 
@@ -31,12 +32,23 @@ registerStepType("send_email", {
                 title={"Send email..."}
                 done={done}
                 commit={commit}
+                modalBodyProps={{
+                    className: "no-padding"
+                }}
             >
-                <EmailPicker
-                    id={"email"}
-                    value={(context &&
-                        context.email_display) || false}
-                    update={emailChanged}/>
+                <Row className={'no-margins'}>
+                    <Col>
+                        <EmailPicker
+                            id={"email"}
+                            value={(context &&
+                                context.email_display) || false}
+                            update={emailChanged}/>
+                    </Col>
+                </Row>
+                <iframe
+                    src={context.email_url_base + settings.email_id}
+                    className={"email-preview"}
+                />
             </SimpleEditModal>
         );
     }

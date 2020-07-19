@@ -10,6 +10,7 @@ use Groundhogg\Event;
 use function Groundhogg\get_db;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
+use function Groundhogg\managed_page_url;
 use function Groundhogg\search_and_replace_domain;
 use Groundhogg\Step;
 
@@ -114,6 +115,8 @@ class Send_Email extends Action {
 			'label' => $email->get_title(),
 			'value' => $email->get_id(),
 		];
+
+		$context[ 'email_url_base' ] = managed_page_url( 'emails' );
 
 		return $context;
 	}
