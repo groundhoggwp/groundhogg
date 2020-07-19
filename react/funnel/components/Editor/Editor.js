@@ -48,7 +48,7 @@ export class Editor extends React.Component {
 
         steps.each(function () {
             id = jQuery(this).attr("id");
-            newStepOrder.push(self.state.steps.find(step => step.id == id));
+            newStepOrder.push(self.state.steps.find(step => step.ID == id));
         });
 
         this.setState({steps: newStepOrder});
@@ -76,7 +76,10 @@ export class Editor extends React.Component {
         const inner = [];
 
         const groups = this.state.steps.reduce(function (prev, curr) {
-            if (prev.length && curr.group === prev[prev.length - 1][0].group) {
+
+            console.debug(prev, curr);
+
+            if (prev.length && curr.data.step_group === prev[prev.length - 1][0].data.step_group) {
                 prev[prev.length - 1].push(curr);
             } else {
                 prev.push([curr]);

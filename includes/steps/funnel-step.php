@@ -66,19 +66,33 @@ abstract class Funnel_Step extends Supports_Errors {
 
 		add_filter( "groundhogg/steps/{$this->get_group()}s", [ $this, 'register' ] );
 
+		// Actions for saving
 		add_action( "groundhogg/steps/{$this->get_type()}/save", [ $this, 'pre_save' ], 1, 2 );
-		add_action( "groundhogg/steps/{$this->get_type()}/save", [ $this, 'save' ], 11, 2 );
+		add_action( "groundhogg/steps/{$this->get_type()}/save", [ $this, 'save' ], 11 );
 		add_action( "groundhogg/steps/{$this->get_type()}/save", [ $this, 'after_save' ], 99, 2 );
 
+		// Filters for additional step context
+		add_filter( "groundhogg/steps/{$this->get_type()}/context", [ $this, 'pre_export' ], 1, 2 );
+		add_filter( "groundhogg/steps/{$this->get_type()}/context", [ $this, 'context' ], 10, 2 );
+
+		// Actions for importing
 		add_action( "groundhogg/steps/{$this->get_type()}/import", [ $this, 'pre_import' ], 1, 2 );
 		add_action( "groundhogg/steps/{$this->get_type()}/import", [ $this, 'import' ], 10, 2 );
+
+		// Actions for exporting
 		add_filter( "groundhogg/steps/{$this->get_type()}/export", [ $this, 'pre_export' ], 1, 2 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/export", [ $this, 'export' ], 10, 2 );
+
+		// Filters for enqueuing
 		add_filter( "groundhogg/steps/{$this->get_type()}/enqueue", [ $this, 'pre_enqueue' ], 1 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/enqueue", [ $this, 'enqueue' ] );
+
+		// Filters for running
 		add_filter( "groundhogg/steps/{$this->get_type()}/run", [ $this, 'pre_run' ], 1, 2 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/run", [ $this, 'run' ], 10, 2 );
+
 		add_filter( "groundhogg/steps/{$this->get_type()}/icon", [ $this, 'get_icon' ] );
+
 		add_action( "wp_enqueue_scripts", [ $this, 'frontend_scripts' ] );
 
 		$this->add_additional_actions();
@@ -258,9 +272,8 @@ abstract class Funnel_Step extends Supports_Errors {
 	 * Save the step based on the given ID
 	 *
 	 * @param $step Step
-	 * @param $settings
 	 */
-	abstract public function save( $step, $settings );
+	abstract public function save( $step );
 
 	/**
 	 * @param $step Step
@@ -369,5 +382,18 @@ abstract class Funnel_Step extends Supports_Errors {
 	public function export( $args, $step ) {
 		//silence is golden
 		return $args;
+	}
+
+	/**
+	 * Provide additional step context
+	 * Useful for steps using React Select and providing formatted arrays is required.
+	 *
+	 * @param $context mixed[]
+	 * @param $step Step
+	 *
+	 * @return array
+	 */
+	public function context( $context, $step ){
+		return $context;
 	}
 }

@@ -23,6 +23,8 @@ export class Step extends React.Component {
 			deleted: false,
 			settings: props.step.settings,
 			tempSettings: {},
+			context: props.step.context,
+			tempContext: {},
 			data: props.step.data,
 		};
 
@@ -37,10 +39,12 @@ export class Step extends React.Component {
 
 	handleEdit (e) {
 		const originalSettings = this.state.settings;
+		const originalContext = this.state.context;
 
 		this.setState({
 			editing: true,
 			tempSettings: originalSettings,
+			tempContext: originalContext,
 		});
 	}
 
@@ -61,22 +65,27 @@ export class Step extends React.Component {
 	handleDelete () {
 		axios.delete(groundhogg_endpoints.steps, {
 			data: {
-				step_id: this.props.step.id,
+				step_id: this.props.step.ID,
 			},
 		}).then(result => this.setState({
 			deleting: true,
 		}));
 	}
 
-	updateSettings (newSettings) {
+	updateSettings (newSettings, newContext) {
 
 		const currentSettings = this.state.tempSettings;
+		const currentContext = this.state.tempContext;
 
 		this.setState({
 			tempSettings: {
 				...currentSettings,
 				...newSettings,
 			},
+			tempContext: {
+				...currentContext,
+				...newContext,
+			}
 		});
 	}
 
@@ -85,10 +94,11 @@ export class Step extends React.Component {
 		this.setState({ saving: true });
 
 		axios.patch(groundhogg_endpoints.steps, {
-			step_id: this.props.step.id,
+			step_id: this.props.step.ID,
 			settings: this.state.tempSettings,
 		}).then(result => this.setState({
 			settings: result.data.step.settings,
+			context: result.data.step.context,
 			step: result.data.step,
 			saving: false,
 		})).catch(error => this.setState({
@@ -108,10 +118,10 @@ export class Step extends React.Component {
 				this.handleDelete();
 				break;
 			case 'add_action':
-				showAddStepForm('action', this.props.step.id);
+				showAddStepForm('action', this.props.step.ID);
 				break;
 			case 'add_benchmark':
-				showAddStepForm('benchmark', this.props.step.id);
+				showAddStepForm('benchmark', this.props.step.ID);
 				break;
 
 		}
@@ -124,9 +134,11 @@ export class Step extends React.Component {
 		}
 
 		const step = this.props.step;
+		const type = step.data.step_type;
+		const group = step.data.step_group;
 		const classes = [
-			step.group,
-			step.type,
+			step.data.step_group,
+			step.data.step_type,
 			'step',
 			'gh-box',
 			// 'round-borders'
@@ -137,18 +149,19 @@ export class Step extends React.Component {
 				key={ this.props.key }
 				className={ 'step-wrap' }
 			>
-				{ step.group === 'action' && <DelayControl step={ step }/> }
-				<div className={ step.group === 'action'
+				{ group === 'action' && <DelayControl step={ step }/> }
+				<div className={ group === 'action'
 					? 'line-left'
 					: 'no-line' }>
-					<div id={ step.id } className={ classes.join(' ') }>
-						<StepIcon type={ step.type } group={ step.group }
+					<div id={ step.ID } className={ classes.join(' ') }>
+						<StepIcon type={ type } group={ group }
 						          src={ step.icon }/>
 						<span className={ 'step-title' }
 						      onClick={ this.handleEdit }>
 							<StepTitle
-								type={ step.type }
+								type={ type }
 								data={ this.state.data }
+								context={ this.state.context }
 								settings={ this.state.settings }
 							/>
 						</span>
@@ -160,9 +173,10 @@ export class Step extends React.Component {
 					</div>
 				</div>
 				{ this.state.editing && <StepEdit
-					type={ step.type }
+					type={ type }
 					settings={ this.state.tempSettings }
 					data={ this.state.data }
+					context={ this.state.tempContext }
 					updateSettings={ this.updateSettings }
 					commit={ this.commitSettings }
 					done={ this.stopEditing }

@@ -168,14 +168,15 @@ class Funnels_Page extends Admin_Page {
 
 			wp_enqueue_script( 'groundhogg-funnel-react' );
 			wp_localize_script( 'groundhogg-funnel-react', 'ghEditor', [
-				'funnel' => $funnel->get_as_array(),
-				'exit'   => admin_page_url( 'gh_funnels' ),
-				'groups' => [
+				'funnel'       => $funnel->get_as_array(),
+				'exit'         => admin_page_url( 'gh_funnels' ),
+				'groups'       => [
 					'actions'    => Plugin::instance()->step_manager->get_actions_as_array(),
 					'benchmarks' => Plugin::instance()->step_manager->get_benchmarks_as_array()
 				],
-                'steps' => Funnel_Step::step_props(),
-                'replacements' => Plugin::instance()->replacements->get_codes_with_pretty_name()
+				'steps'        => Funnel_Step::step_props(),
+				'replacements' => Plugin::instance()->replacements->get_codes_with_pretty_name(),
+				'roles'        => Plugin::instance()->roles->get_roles_for_react_select()
 			] );
 
 			wp_enqueue_script( 'groundhogg-admin-replacements' );

@@ -64,7 +64,7 @@ class Manager {
 
 		/* actions */
 		$this->add_step( new Send_Email() );
-		$this->add_step( new Admin_Notification() );
+//		$this->add_step( new Admin_Notification() );
 		$this->add_step( new Apply_Tag() );
 		$this->add_step( new Remove_Tag() );
 		$this->add_step( new Apply_Note() );
@@ -73,7 +73,7 @@ class Manager {
 		/* Benchmarks */
 
 //		$this->add_step( new Form_Filled() );
-//		$this->add_step( new Account_Created() );
+		$this->add_step( new Account_Created() );
 		$this->add_step( new Email_Confirmed() );
 //		$this->add_step( new Link_Clicked() );
 //		$this->add_step( new Tag_Applied() );

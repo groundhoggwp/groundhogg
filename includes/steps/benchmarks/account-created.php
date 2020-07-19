@@ -46,7 +46,7 @@ class Account_Created extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'New User', 'step_name', 'groundhogg' );
+		return _x( 'New WordPress User', 'step_name', 'groundhogg' );
 
 	}
 
@@ -65,7 +65,7 @@ class Account_Created extends Benchmark {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( 'Runs whenever a WordPress account is created. Will create a contact if one does not exist.', 'step_description', 'groundhogg' );
+		return _x( 'Runs whenever a WordPress account is created.', 'step_description', 'groundhogg' );
 	}
 
 	/**
@@ -78,32 +78,28 @@ class Account_Created extends Benchmark {
 	}
 
 	/**
-	 * @param $step Step
-	 */
-	public function settings( $step ) {
-		$this->start_controls_section();
-
-		$this->add_control( 'role', [
-			'label'       => __( 'User Role(s):', 'groundhogg' ),
-			'type'        => HTML::SELECT2,
-			'default'     => 'subscriber',
-			'description' => __( 'New users with these roles will trigger this benchmark.', 'groundhogg' ),
-			'field'       => [
-				'multiple' => true,
-				'data'     => Plugin::$instance->roles->get_roles_for_select(),
-			],
-		] );
-
-		$this->end_controls_section();
-	}
-
-	/**
 	 * Save the step settings
 	 *
 	 * @param $step Step
 	 */
 	public function save( $step ) {
 		$this->save_setting( 'role', array_map( 'sanitize_text_field', $this->get_posted_data( 'role', [ 'subscriber' ] ) ) );
+	}
+
+	/**
+	 * @param mixed[] $context
+	 * @param Step $step
+	 *
+	 * @return array|void
+	 */
+	public function context( $context, $step ) {
+		$roles = $this->get_setting( 'role' );
+		$context[ 'roles_display' ] = map_deep( $roles, function ( $role ){
+			global $wp_roles;
+			return [ 'value' => $role, 'label' => translate_user_role( $wp_roles->roles[ $role ][ 'name' ] ) ];
+		} );
+
+		return $context;
 	}
 
 	/**

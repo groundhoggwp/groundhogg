@@ -7,6 +7,7 @@ use function Groundhogg\get_array_var;
 use Groundhogg\Preferences;
 use Groundhogg\Contact;
 use Groundhogg\Event;
+use function Groundhogg\get_db;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
 use function Groundhogg\search_and_replace_domain;
@@ -81,7 +82,7 @@ class Send_Email extends Action {
 	 *
 	 * @param $step Step
 	 */
-	public function save( $step, $settings ) {
+	public function save( $step ) {
 		$email_id = absint( $this->get_posted_data( 'add_email_override', $this->get_posted_data( 'email_id' ) ) );
 
 		$this->save_setting( 'email_id', $email_id );
@@ -93,6 +94,28 @@ class Send_Email extends Action {
 		$this->save_setting( 'email_display', $email_display );
 		$this->save_setting( 'is_confirmation_email', $email->is_confirmation_email() );
 		$this->save_setting( 'skip_if_confirmed', ( bool ) $this->get_posted_data( 'skip_if_confirmed', false ) );
+	}
+
+	/**
+	 * Provide the additional edit context
+	 *
+	 * @param mixed[] $context
+	 * @param Step $step
+	 *
+	 * @return array|mixed[]
+	 */
+	public function context( $context, $step ) {
+
+		$email_id = $this->get_setting( 'email_id' );
+
+		$email = new Email( $email_id );
+
+		$context[ 'email_display' ] = [
+			'label' => $email->get_title(),
+			'value' => $email->get_id(),
+		];
+
+		return $context;
 	}
 
 	/**

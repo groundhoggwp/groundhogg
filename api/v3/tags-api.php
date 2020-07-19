@@ -168,7 +168,7 @@ class Tags_Api extends Base {
 
 			foreach ( $tags as $i => $tag ) {
 				$json[] = array(
-					'id'   => $tag->tag_id,
+					'id'   => absint( $tag->tag_id ),
 					'text' => sprintf( "%s (%s)", $tag->tag_name, $tag->contact_count )
 				);
 			}
@@ -183,8 +183,8 @@ class Tags_Api extends Base {
 
 			foreach ( $tags as $i => $tag ) {
 				$json[] = array(
-					'value' => $tag->tag_id,
-					'label' => sprintf( "%s", $tag->tag_name )
+					'value' => absint( $tag->tag_id ),
+					'label' => $tag->tag_name
 				);
 			}
 
@@ -198,7 +198,7 @@ class Tags_Api extends Base {
 			$response_tags = [];
 
 			foreach ( $tags as $i => $tag ) {
-				$response_tags[ $tag->tag_id ] = sprintf( "%s (%s)", $tag->tag_name, $tag->contact_count );
+				$response_tags[ absint( $tag->tag_id ) ] = sprintf( "%s (%s)", $tag->tag_name, $tag->contact_count );
 			}
 
 			$tags = $response_tags;

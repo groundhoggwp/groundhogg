@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-// import 'bootstrap/dist/css/bootstrap.min.css';
 
 // First, checks if it isn't implemented yet.
 if (!String.prototype.format) {

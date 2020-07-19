@@ -1,0 +1,19 @@
+@import "../master";
+
+input[type='text'].note-title{
+  width: 100%;
+}
+
+textarea.note-content{
+  width: 100%;
+  height: 100px;
+}
+
+.modal-body{
+
+  input,
+  textarea{
+    font-size: 16px;
+  }
+
+}

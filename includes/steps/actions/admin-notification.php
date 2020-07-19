@@ -271,9 +271,8 @@ class Admin_Notification extends Action {
 	 * Save the step settings
 	 *
 	 * @param $step Step
-	 * @param $settings
 	 */
-	public function save( $step, $settings ) {
+	public function save( $step ) {
 		$send_to = $this->get_posted_data( 'send_to' );
 
 		if ( $send_to ) {

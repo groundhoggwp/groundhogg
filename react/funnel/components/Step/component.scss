@@ -17,7 +17,8 @@
 
   .line-left{
     border-left: 2px solid $border-color;
-    margin-left: 10px;
+    margin: 5px 0 5px 10px;
+    padding: 10px 0 10px 22px;
   }
 
   .delay{
@@ -42,7 +43,7 @@
     align-items: center;
 
     &.action{
-      margin: 10px 22px;
+      //margin: 10px 22px;
       padding: 10px;
       background-color: #FFFFFF;
 

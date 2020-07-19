@@ -77,17 +77,30 @@ class Apply_Tag extends Action {
 	 * Save the step settings
 	 *
 	 * @param $step Step
-	 * @param $settings
 	 */
-	public function save( $step, $settings ) {
+	public function save( $step ) {
 		$tag_ids = validate_tags( $this->get_posted_data( 'tags', [] ) );
 		$this->save_setting( 'tags', $tag_ids );
+	}
+
+	/**
+	 * Provide the additional edit context
+	 *
+	 * @param mixed[] $context
+	 * @param Step $step
+	 *
+	 * @return array|mixed[]
+	 */
+	public function context( $context, $step ) {
+		$tag_ids = wp_parse_id_list( $this->get_setting( 'tags' ) );
 
 		$reactSelectCompat = array_map( function( $tag_id ){
 			return [ 'value' => $tag_id, 'label' => get_db( 'tags' )->get( $tag_id )->tag_name ];
 		}, $tag_ids );
 
-		$this->save_setting( 'tags_display', $reactSelectCompat );
+		$context[ 'tags_display' ] = $reactSelectCompat;
+
+		return $context;
 	}
 
 	/**

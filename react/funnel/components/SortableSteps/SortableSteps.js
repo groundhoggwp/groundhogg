@@ -44,7 +44,7 @@ export class SortableSteps extends React.Component {
 				swapThreshold={0.75}
 				forceFallback={true}
 			>
-				{ this.state.steps.map(step=><Step key={step.id} step={step}/>) }
+				{ this.state.steps.map(step=><Step key={step.ID} step={step}/>) }
 			</ReactSortable>
 		);
 	}

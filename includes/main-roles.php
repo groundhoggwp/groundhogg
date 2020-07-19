@@ -395,6 +395,24 @@ class Main_Roles extends Roles {
 	}
 
 	/**
+	 * Returns an array of roles used for select elements.
+	 *
+	 * @return array[]
+	 */
+	public function get_roles_for_react_select() {
+		$editable_roles = array_reverse( get_editable_roles() );
+
+		$roles = [];
+
+		foreach ( $editable_roles as $role => $details ) {
+			$name           = translate_user_role( $details['name'] );
+			$roles[] = [ 'value' => $role, 'label' => $name ];
+		}
+
+		return $roles;
+	}
+
+	/**
 	 * Return a cap to check against the admin to ensure caps are also installed.
 	 *
 	 * @return mixed

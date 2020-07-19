@@ -34,7 +34,7 @@ export class StepGroup extends React.Component {
 			return <div></div>;
 		}
 
-		const groupType = this.props.steps[0].group;
+		const groupType = this.props.steps[0].data.step_group;
 
 		const classes = [
 			groupType + '-group-container',
@@ -76,7 +76,7 @@ export class StepGroup extends React.Component {
 					/>
 				</div>
 				{/*{ this.state.showControls && <GroupControls group={groupType} after={lastStep.id}/> }*/}
-				<GroupControls group={groupType} after={lastStep.id}/>
+				<GroupControls group={groupType} after={lastStep.ID}/>
 			</div>
 		);
 	}

@@ -71,7 +71,7 @@ class Email_Confirmed extends Benchmark {
 	 * @param $step Step
 	 * @param $settings array
 	 */
-	public function save( $step, $settings ) {
+	public function save( $step ) {
 		$this->save_setting( 'skip_to', (bool) $this->get_posted_data( 'skip_to', false ) );
 	}
 

@@ -69,33 +69,12 @@ class Apply_Note extends Action {
 	}
 
 	/**
-	 * Register the controls for this step
-	 *
-	 */
-	public function register_controls() {
-		$this->start_controls_section( 'general', [
-			'label' => __( 'Note Settings', 'groundhogg' )
-		] );
-
-		$this->add_control( 'note_text', [
-			'label' => __( 'Note Content', 'groundhogg' ),
-			'type'  => 'textarea',
-			'options' => [
-				'has_replacements' => true
-			],
-			'description' => __( 'The content will be merged with the contacts existing details.', 'groundhogg' ),
-		] );
-
-		$this->end_controls_section();	}
-
-
-	/**
 	 * Save the step settings
 	 *
 	 * @param $step Step
-	 * @param $settings
 	 */
-	public function save( $step, $settings ) {
+	public function save( $step ) {
+		$this->save_setting( 'note_title', sanitize_text_field( $this->get_posted_data( 'note_title', "" ) ) );
 		$this->save_setting( 'note_text', sanitize_textarea_field( $this->get_posted_data( 'note_text', "" ) ) );
 	}
 
