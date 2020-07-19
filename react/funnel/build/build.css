@@ -168,7 +168,7 @@ body.disable-scrolling {
 .step-wrap .line-left {
   border-left: 2px solid #ccd0d4;
   margin: 5px 0 5px 10px;
-  padding: 10px 0 10px 22px; }
+  padding: 10px 10px 10px 22px; }
 
 .step-wrap .delay {
   font-size: 16px; }
