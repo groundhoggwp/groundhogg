@@ -154,8 +154,12 @@ class Form {
 		return $script;
 	}
 
-	public function get_submission_url() {
+	public function get_hosted_url() {
 		return managed_page_url( sprintf( 'forms/%s/submit/', urlencode( encrypt( $this->get_id() ) ) ) );
+	}
+
+	public function get_submission_url() {
+		return managed_page_url( sprintf( 'forms/%s/', urlencode( encrypt( $this->get_id() ) ) ) );
 	}
 
 	protected function get_honey_pot_code() {
@@ -191,7 +195,7 @@ class Form {
 			'method'  => 'post',
 			'class'   => 'gh-form ' . $this->attributes['class'],
 			'target'  => '_parent',
-			'action'  => $this->get_submission_url(),
+			'action'  => $this->get_hosted_url(),
 			'enctype' => 'multipart/form-data',
 			'name'    => $this->step->get_step_title()
 		];
@@ -269,7 +273,7 @@ class Form {
 		];
 
 		if ( get_query_var( 'doing_iframe' ) ) {
-			$atts['action'] = $this->get_submission_url();
+			$atts['action'] = $this->get_hosted_url();
 		}
 
 		$form .= sprintf( "<form %s>", array_to_atts( $atts ) );

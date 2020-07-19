@@ -3271,3 +3271,45 @@ function is_groundhogg_network_active() {
 
 	return false;
 }
+
+/**
+ * Get's the shortcode tag...
+ *
+ * @param $shortcode
+ *
+ * @return mixed
+ */
+function extract_shortcode_tag( $shortcode ){
+    preg_match( '/\[(?!\/)([^ ]+)/', $shortcode, $matches );
+    return $matches[1];
+}
+
+/**
+ * Convert a form shortcode to JSON for compat with new editor...
+ *
+ * @param $code string the form's shortcode
+ *
+ * @return array
+ */
+function convert_form_shortcode_to_json( $code ){
+
+	$json = [];
+
+	$code  = trim( $code, " \t\n\r" );
+	$code  = preg_replace( '/(\])\s*(\[)/', "$1$2", $code );
+	$code  = preg_replace( '/(\])/', "$1" . PHP_EOL, $code );
+	$codes = explode( PHP_EOL, $code );
+
+	foreach ( $codes as $code ){
+
+	    $tag = extract_shortcode_tag( $code );
+		$attributes = shortcode_parse_atts( $code );
+
+		$formatted = [
+            'type' => $tag,
+            'attributes' => $attributes
+        ];
+
+    }
+
+}

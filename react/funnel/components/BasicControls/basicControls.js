@@ -4,6 +4,7 @@ import AsyncSelect from "react-select/async";
 import CreatableSelect from "react-select/creatable";
 import Select from "react-select";
 import axios from "axios";
+import Autocomplete from 'react-autocomplete'
 import {Button} from "react-bootstrap";
 import {Dashicon} from "../Dashicon/Dashicon";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
@@ -288,6 +289,106 @@ TextArea.defaultProps = {
     value: '',
     options: {},
 };
+
+/**
+ * Build a link picker
+ *
+ * @param id
+ * @param update
+ * @param value
+ * @param options
+ * @returns {*}
+ * @constructor
+ */
+export function LinkPicker({id, update, value, options}) {
+
+    const [items, setItems] = useState([]);
+
+    const getItemsAsync = (search) => {
+
+        var bodyFormData = new FormData();
+        bodyFormData.set('action', 'wp-link-ajax');
+        bodyFormData.set('_ajax_linking_nonce', groundhogg_nonces._ajax_linking_nonce);
+        bodyFormData.set('term', search);
+
+        axios({
+            method: 'post',
+            url: ajaxurl,
+            data: bodyFormData,
+            headers: {'Content-Type': 'multipart/form-data' }
+        }).then( (result) => {
+            if ( result.data ){
+                setItems( result.data.map( (item) => { return { value: item.permalink, label: item.title + ' (' + item.info + ')' } } ) )
+            } else {
+                setItems( [] );
+            }
+        } );
+    };
+
+    const handleOnChange = (e) => {
+        const _search = e.target.value;
+        update( _search );
+        getItemsAsync( _search );
+    };
+
+    return <Autocomplete
+        inputProps={{
+            className: 'input',
+            type: 'url',
+        }}
+        getItemValue={(item) => item.value}
+        items={items}
+        renderItem={(item, isHighlighted) =>
+            <div style={{ background: isHighlighted ? 'lightgray' : 'white', padding: 5 }}>
+                {item.label}
+            </div>
+        }
+        value={value}
+        onChange={handleOnChange}
+        onSelect={(val) => update(val)}
+        wrapperStyle={{
+            display: 'block'
+        }}
+        menuStyle={{
+            borderRadius: '3px',
+            boxShadow: '0 2px 12px rgba(0, 0, 0, 0.1)',
+            background: 'rgba(255, 255, 255, 0.9)',
+            padding: '2px 2px',
+            fontSize: '90%',
+            position: 'fixed',
+            overflowY: 'auto',
+            maxHeight: 200,
+        }}
+    />
+}
+
+LinkPicker.defaultProps = {
+    id: '',
+    update: function (v) {},
+    value: '',
+    options: {},
+};
+
+/**
+ * Copy readonly input
+ *
+ * @param content
+ * @param options
+ * @returns {*}
+ * @constructor
+ */
+export function CopyInput( {content, options} ) {
+    return (
+        <input
+            type={'text'}
+            className={"code"}
+            value={content}
+            readOnly={true}
+            onFocus={(e)=> e.target.select()}
+            {...options}
+        />
+    )
+}
 
 /**
  * Creates a pretty list based on the select results...

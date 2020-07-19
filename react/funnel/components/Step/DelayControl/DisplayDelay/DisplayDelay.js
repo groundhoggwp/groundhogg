@@ -54,7 +54,7 @@ function FixedDelay ({ delay }) {
 
 				text.push(delay.days_of_week_type === 'any'
 					? ' on any '
-					: ( <>{ ' on the' }
+					: ( <>{ ' on the ' }
 						<b>{ delay.days_of_week_type }</b> </> ),
 				);
 

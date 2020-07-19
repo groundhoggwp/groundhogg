@@ -18,7 +18,7 @@ export function GroundhoggModal(props) {
 					{props.heading}
 				</Modal.Title>
 			</Modal.Header>
-			<Modal.Body>
+			<Modal.Body className={'no-padding'}>
 				{props.children}
 			</Modal.Body>
 			<Modal.Footer>

@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 
-import './component.scss';
+import "./component.scss";
 
 /**
  * Register a new step type through the step type API
@@ -18,28 +18,28 @@ export function registerStepType(type, attributes) {
         };
     }
 
-    if ( typeof ghEditor.stepComponents === 'undefined' ){
+    if (typeof ghEditor.stepComponents === "undefined") {
         ghEditor.stepComponents = {};
     }
 
     ghEditor.stepComponents[type] = attributes;
 }
 
-function stepTypeExists( type ) {
-    return typeof ghEditor.stepComponents[type] !== 'undefined';
+function stepTypeExists(type) {
+    return typeof ghEditor.stepComponents[type] !== "undefined";
 }
 
-function getStepType( type ) {
-    return stepTypeExists( type ) ? ghEditor.stepComponents[type] : false;
+function getStepType(type) {
+    return stepTypeExists(type) ? ghEditor.stepComponents[type] : false;
 }
 
 export function StepTitle({type, data, context, settings}) {
     let contr0l;
 
-    if (! stepTypeExists( type ) ) {
+    if (!stepTypeExists(type)) {
         contr0l = <div>{data.step_title || type}</div>;
     } else {
-        contr0l = React.createElement( getStepType( type ).title, {
+        contr0l = React.createElement(getStepType(type).title, {
             data: data,
             settings: settings,
             context: context
@@ -66,7 +66,7 @@ export function StepEdit({type, data, context, settings, updateSettings, commit,
 
         return <></>;
     } else {
-        contr0l = React.createElement( getStepType(type).edit, {
+        contr0l = React.createElement(getStepType(type).edit, {
             data: data,
             settings: settings,
             context: context,
@@ -99,10 +99,11 @@ StepTitle.StepEdit = {
  * @param done
  * @param commit
  * @param children
+ * @param modalProps
  * @returns {*}
  * @constructor
  */
-export function SimpleEditModal({title, done, commit, children}) {
+export function SimpleEditModal({title, done, commit, children, modalProps}) {
 
     const [show, setShow] = useState(true);
 
@@ -121,13 +122,14 @@ export function SimpleEditModal({title, done, commit, children}) {
 
     return (
         <Modal
-            size="md"
             aria-labelledby="contained-modal-title-vcenter"
             className={"simple-edit-modal"}
+            bsPrefix={'groundhogg modal'}
             centered
             show={show}
             onHide={handleHide}
             onExited={handleExited}
+            {...modalProps}
         >
             <Modal.Header closeButton>
                 <Modal.Title id="contained-modal-title-vcenter">
@@ -149,10 +151,26 @@ export function SimpleEditModal({title, done, commit, children}) {
     );
 }
 
-import './actions/ApplyTag';
-import './actions/RemoveTag';
-import './actions/SendEmail';
-import './actions/ApplyNote';
+SimpleEditModal.defaultProps = {
+    title: "",
+    done: function () {
+    },
+    commit: function () {
+    },
+    children: [],
+    modalProps: {
+        size: 'md'
+    }
+};
 
-import './benchmarks/EmailConfirmed';
-import './benchmarks/AccountCreated';
+import "./actions/ApplyTag";
+import "./actions/RemoveTag";
+import "./actions/SendEmail";
+import "./actions/ApplyNote";
+
+import "./benchmarks/EmailConfirmed";
+import "./benchmarks/AccountCreated";
+import "./benchmarks/TagApplied";
+import "./benchmarks/TagRemoved";
+import "./benchmarks/LinkClicked";
+import "./benchmarks/FormFilled";
