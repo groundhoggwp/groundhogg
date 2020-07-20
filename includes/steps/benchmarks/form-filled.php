@@ -5,6 +5,8 @@ namespace Groundhogg\Steps\Benchmarks;
 use Groundhogg\Contact;
 use Groundhogg\Reporting\Reporting;
 use Groundhogg\Utils\Graph;
+use function Groundhogg\convert_form_shortcode_to_json;
+use function Groundhogg\convert_shortcode_to_json;
 use function Groundhogg\encrypt;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
@@ -821,7 +823,7 @@ class Form_Filled extends Benchmark {
 		$this->save_setting( 'enable_ajax', absint( $this->get_posted_data( 'enable_ajax' ) ) );
 
 		// Render the config quietly
-		$form = do_shortcode( sprintf( "[gh_form id=%d]", $step->get_id() ) );
+//		$form = do_shortcode( sprintf( "[gh_form id=%d]", $step->get_id() ) );
 
 	}
 
@@ -838,6 +840,7 @@ class Form_Filled extends Benchmark {
 
 		$context[ 'embed' ] = $embed;
 		$context[ 'url' ] = esc_url( $form->get_submission_url() );
+		$context[ 'as_json' ] = convert_form_shortcode_to_json( $this->get_setting( 'form' ) );
 
 		return $context;
 	}

@@ -37,7 +37,7 @@ registerStepType("account_created", {
                     update={rolesChanged}
                 />
                 <p className={"description"}>
-                    {"Runs when a user is created with any of the following roles."}
+                    {"Runs when a user is created with any of the given roles."}
                 </p>
             </SimpleEditModal>
         );

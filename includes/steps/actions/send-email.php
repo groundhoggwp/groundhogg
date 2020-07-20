@@ -109,14 +109,13 @@ class Send_Email extends Action {
 
 		$email_id = $this->get_setting( 'email_id' );
 
+		if ( ! $email_id ){
+			return $context;
+		}
+
 		$email = new Email( $email_id );
 
-		$context[ 'email_display' ] = [
-			'label' => $email->get_title(),
-			'value' => $email->get_id(),
-		];
-
-		$context[ 'email_url_base' ] = managed_page_url( 'emails' );
+		$context[ 'email' ] = $email->get_as_array();
 
 		return $context;
 	}

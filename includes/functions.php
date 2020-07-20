@@ -72,7 +72,7 @@ function current_user_is( $role = 'subscriber' ) {
  * Internal URL builder.
  *
  * @param string $page
- * @param array $args
+ * @param array  $args
  *
  * @return string
  */
@@ -97,8 +97,8 @@ function admin_page_url( $page, $args = [] ) {
 /**
  * Similar to wp_list_pluck in that we take the ID and the title and match them up.
  *
- * @param array $data array[]
- * @param string $id_col string
+ * @param array  $data      array[]
+ * @param string $id_col    string
  * @param string $title_col string
  *
  * @return array
@@ -189,8 +189,8 @@ function isset_not_empty( $array, $key = '' ) {
  * Get a variable from the $_REQUEST global
  *
  * @param string $key
- * @param bool $default
- * @param bool $post_only
+ * @param bool   $default
+ * @param bool   $post_only
  *
  * @return mixed
  */
@@ -214,7 +214,7 @@ function set_request_var( $key, $value ) {
  * Get a variable from the $_POST global
  *
  * @param string $key
- * @param bool $default
+ * @param bool   $default
  *
  * @return mixed
  */
@@ -226,7 +226,7 @@ function get_post_var( $key = '', $default = false ) {
  * Get a variable from the $_GET global
  *
  * @param string $key
- * @param bool $default
+ * @param bool   $default
  *
  * @return mixed
  */
@@ -238,7 +238,7 @@ function get_url_var( $key = '', $default = false ) {
  * Get a variable from the $_GET global
  *
  * @param string $key
- * @param bool $default
+ * @param bool   $default
  *
  * @return mixed
  */
@@ -249,8 +249,8 @@ function get_url_param( $key = '', $default = false ) {
 /**
  * Get a db query from the URL.
  *
- * @param array $default a default query if the given is empty
- * @param array $force for the query to include the given
+ * @param array $default       a default query if the given is empty
+ * @param array $force         for the query to include the given
  * @param array $accepted_keys for the query to include the given
  *
  * @return array|string
@@ -328,7 +328,7 @@ function validate_tags( $maybe_tags ) {
 /**
  * Replacements Wrapper.
  *
- * @param string $content
+ * @param string      $content
  * @param int|Contact $contact_id
  *
  * @return string
@@ -373,7 +373,7 @@ function decrypt( $data ) {
  *
  * @param        $array
  * @param string $key
- * @param bool $default
+ * @param bool   $default
  *
  * @return mixed
  */
@@ -561,9 +561,9 @@ function dequeue_wc_css_compat() {
 /**
  * Enqueues the modal scripts
  *
+ * @since 1.0.5
  * @return Modal
  *
- * @since 1.0.5
  */
 function enqueue_groundhogg_modal() {
 	return Modal::instance();
@@ -653,7 +653,7 @@ function array_to_css( $atts ) {
  * Get a cookie value
  *
  * @param string $cookie
- * @param bool $default
+ * @param bool   $default
  *
  * @return mixed
  */
@@ -665,8 +665,8 @@ function get_cookie( $cookie = '', $default = false ) {
  * Set a cookie the WP way
  *
  * @param string $cookie
- * @param mixed $value
- * @param int $expiration
+ * @param mixed  $value
+ * @param int    $expiration
  *
  * @return bool
  */
@@ -734,20 +734,21 @@ function get_return_path_email() {
  * Overwrite the regular WP_Mail with an identical function but use our modified PHPMailer class instead
  * which sends the email to the Groundhogg Sending Service.
  *
- * @param string $subject Email subject
- * @param string $message Message contents
- *
- * @param string|array $headers Optional. Additional headers.
- * @param string|array $attachments Optional. Files to attach.
- *
- * @param string|array $to Array or comma-separated list of email addresses to send message.
- *
- * @return bool Whether the email contents were sent successfully.
  * @throws \Exception
  *
  * @since      1.2.10
  * @deprecated 2.1.11
  *
+ * @param string|array $attachments Optional. Files to attach.
+ *
+ * @param string|array $to          Array or comma-separated list of email addresses to send message.
+ *
+ * @param string       $subject     Email subject
+ * @param string       $message     Message contents
+ *
+ * @param string|array $headers     Optional. Additional headers.
+ *
+ * @return bool Whether the email contents were sent successfully.
  */
 function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = array() ) {
 	// Compact the input, apply the filters, and extract them back out
@@ -755,10 +756,10 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the wp_mail() arguments.
 	 *
+	 * @since 2.2.0
+	 *
 	 * @param array $args A compacted array of wp_mail() arguments, including the "to" email,
 	 *                    subject, message, headers, and attachments values.
-	 *
-	 * @since 2.2.0
 	 *
 	 */
 	$atts = apply_filters( 'wp_mail', compact( 'to', 'subject', 'message', 'headers', 'attachments' ) );
@@ -927,9 +928,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the email address to send from.
 	 *
-	 * @param string $from_email Email address to send from.
-	 *
 	 * @since 2.2.0
+	 *
+	 * @param string $from_email Email address to send from.
 	 *
 	 */
 	$from_email = apply_filters( 'wp_mail_from', $from_email );
@@ -937,9 +938,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the name to associate with the "from" email address.
 	 *
-	 * @param string $from_name Name associated with the "from" email address.
-	 *
 	 * @since 2.3.0
+	 *
+	 * @param string $from_name Name associated with the "from" email address.
 	 *
 	 */
 	$from_name = apply_filters( 'wp_mail_from_name', $from_name );
@@ -1007,9 +1008,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the wp_mail() content type.
 	 *
-	 * @param string $content_type Default wp_mail() content type.
-	 *
 	 * @since 2.3.0
+	 *
+	 * @param string $content_type Default wp_mail() content type.
 	 *
 	 */
 	$content_type = apply_filters( 'wp_mail_content_type', $content_type );
@@ -1036,9 +1037,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the default wp_mail() charset.
 	 *
-	 * @param string $charset Default email charset.
-	 *
 	 * @since 2.3.0
+	 *
+	 * @param string $charset Default email charset.
 	 *
 	 */
 	$phpmailer->CharSet = apply_filters( 'wp_mail_charset', $charset );
@@ -1067,9 +1068,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Fires after PHPMailer is initialized.
 	 *
-	 * @param \PHPMailer $phpmailer The PHPMailer instance (passed by reference).
-	 *
 	 * @since 2.2.0
+	 *
+	 * @param \PHPMailer $phpmailer The PHPMailer instance (passed by reference).
 	 *
 	 */
 	do_action_ref_array( 'phpmailer_init', array( &$phpmailer ) );
@@ -1103,10 +1104,10 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 		/**
 		 * Fires after a phpmailerException is caught.
 		 *
+		 * @since 4.4.0
+		 *
 		 * @param WP_Error $error A WP_Error object with the phpmailerException message, and an array
 		 *                        containing the mail recipient, subject, message, headers, and attachments.
-		 *
-		 * @since 4.4.0
 		 *
 		 */
 		do_action( 'wp_mail_failed', new WP_Error( 'wp_mail_failed', $e->getMessage(), $mail_error_data ) );
@@ -1271,7 +1272,7 @@ function create_contact_from_user( $user, $sync_meta = false ) {
  * Create a user from a contact
  *
  * @param        $contact       Contact
- * @param string $role string
+ * @param string $role          string
  * @param string $notifications string|bool
  *
  * @return int|false
@@ -1379,9 +1380,9 @@ function get_form_list() {
 /**
  * Schedule a 1 off email notification
  *
- * @param int $email_id the ID of the email to send
+ * @param int        $email_id            the ID of the email to send
  * @param int|string $contact_id_or_email the ID of the contact to send to
- * @param int $time time time to send at, defaults to time()
+ * @param int        $time                time time to send at, defaults to time()
  *
  * @return bool whether the scheduling was successful.
  */
@@ -1651,11 +1652,13 @@ function get_mappable_fields( $extra = [] ) {
 /**
  * Generate a contact from given associative array and a field map.
  *
+ * @throws \Exception
+ *
+ * @param $map    array map of field_ids to contact keys
+ *
  * @param $fields array the raw data from the source
- * @param $map array map of field_ids to contact keys
  *
  * @return Contact|false
- * @throws \Exception
  */
 function generate_contact_with_map( $fields, $map = [] ) {
 
@@ -1687,11 +1690,11 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				/**
 				 * Default filter for unknown contact fields
 				 *
-				 * @param $field string the field in question
-				 * @param $value mixed the value to store
-				 * @param &$args array general contact information
-				 * @param &$meta array list of contact data
-				 * @param &$tags array list of tags to add to the contact
+				 * @param $field  string the field in question
+				 * @param $value  mixed the value to store
+				 * @param &$args  array general contact information
+				 * @param &$meta  array list of contact data
+				 * @param &$tags  array list of tags to add to the contact
 				 * @param &$notes array add notes to the contact
 				 * @param &$files array files to upload to the contact record
 				 */
@@ -1724,10 +1727,10 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				break;
 			case 'optin_status':
 
-			    // Will default to unconfirmed
-			    if ( ! is_numeric( $value ) ){
-			        $value = Preferences::string_to_preference( $value );
-                }
+				// Will default to unconfirmed
+				if ( ! is_numeric( $value ) ) {
+					$value = Preferences::string_to_preference( $value );
+				}
 
 				$args[ $field ] = absint( $value );
 				break;
@@ -1889,8 +1892,8 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 	/**
 	 * @param $contact Contact the contact record
-	 * @param $map array the map of given data to contact data
-	 * @param $fields array the values of the given fields
+	 * @param $map     array the map of given data to contact data
+	 * @param $fields  array the values of the given fields
 	 */
 	do_action( 'groundhogg/generate_contact_with_map/after', $contact, $map, $fields );
 
@@ -1933,7 +1936,7 @@ endif;
 /**
  * Get a time string representing when something should be completed.
  *
- * @param $time
+ * @param        $time
  *
  * @param string $date_prefix
  *
@@ -1967,10 +1970,10 @@ function scheduled_time( $time, $date_prefix = 'on' ) {
 /**
  * Render html for a time column with an associated contact
  *
- * @param int $time the time to display
- * @param bool $show_local_time whether to also show local time
- * @param bool|Contact $contact the contact to get the local time from.
- * @param string $date_prefix
+ * @param int          $time            the time to display
+ * @param bool         $show_local_time whether to also show local time
+ * @param bool|Contact $contact         the contact to get the local time from.
+ * @param string       $date_prefix
  *
  * @return string
  */
@@ -2045,7 +2048,7 @@ function floating_phil() {
  * Show the logo.
  *
  * @param string $color
- * @param int $width
+ * @param int    $width
  *
  * @return string|bool
  */
@@ -2242,11 +2245,11 @@ function add_managed_rewrite_rule( $regex = '', $query = '', $after = 'top' ) {
 }
 
 /**
+ * @deprecated since 2.0.9.2
+ *
  * @param string $string
  *
  * @return string
- * @deprecated since 2.0.9.2
- *
  */
 function managed_rewrite_rule( $string = '' ) {
 	return sprintf( 'index.php?pagename=%s&', get_managed_page_name() ) . $string;
@@ -2277,14 +2280,15 @@ function install_custom_rewrites() {
 /**
  * Retrieve URL with nonce added to URL query.
  *
- * @param string $name Optional. Nonce name. Default '_wpnonce'.
- * @param string $actionurl URL to add nonce action.
- *
- * @param int|string $action Optional. Nonce action name. Default -1.
- *
- * @return string
  * @since 2.0.4
  *
+ * @param string     $actionurl URL to add nonce action.
+ *
+ * @param int|string $action    Optional. Nonce action name. Default -1.
+ *
+ * @param string     $name      Optional. Nonce name. Default '_wpnonce'.
+ *
+ * @return string
  */
 function nonce_url_no_amp( $actionurl, $action = - 1, $name = '_wpnonce' ) {
 	return add_query_arg( $name, wp_create_nonce( $action ), $actionurl );
@@ -2295,7 +2299,7 @@ function nonce_url_no_amp( $actionurl, $action = - 1, $name = '_wpnonce' ) {
  *
  * @param        $icon
  * @param string $wrap
- * @param array $atts
+ * @param array  $atts
  *
  * @return string
  */
@@ -2320,7 +2324,7 @@ function dashicon( $icon, $wrap = 'span', $atts = [], $echo = false ) {
  *
  * @param        $icon
  * @param string $wrap
- * @param array $atts
+ * @param array  $atts
  */
 function dashicon_e( $icon, $wrap = 'span', $atts = [] ) {
 	dashicon( $icon, $wrap, $atts, true );
@@ -2394,10 +2398,10 @@ function is_main_blog() {
  * Glorified wp_remote_post wrapper
  *
  * @param string $url
- * @param array $body
+ * @param array  $body
  * @param string $method
- * @param array $headers
- * @param bool $as_array
+ * @param array  $headers
+ * @param bool   $as_array
  *
  * @return array|bool|WP_Error|object
  */
@@ -2512,9 +2516,9 @@ function file_access_url( $path, $download = false ) {
 /**
  * Triggers the API benchmark
  *
- * @param string $call_name the name you wish to call
+ * @param string $call_name   the name you wish to call
  * @param string $id_or_email id or email of the contact
- * @param bool $by_user_id whether the ID is the ID of a WP user
+ * @param bool   $by_user_id  whether the ID is the ID of a WP user
  */
 function do_api_trigger( $call_name = '', $id_or_email = '', $by_user_id = false ) {
 	do_action( 'groundhogg/steps/benchmarks/api', $call_name, $id_or_email, $by_user_id );
@@ -2525,7 +2529,7 @@ function do_api_trigger( $call_name = '', $id_or_email = '', $by_user_id = false
  *
  * @param string $call_name
  * @param string $id_or_email
- * @param bool $by_user_id
+ * @param bool   $by_user_id
  */
 function do_api_benchmark( $call_name = '', $id_or_email = '', $by_user_id = false ) {
 	do_api_trigger( $call_name, $id_or_email, $by_user_id );
@@ -2651,7 +2655,7 @@ function parse_inline_styles( $style ) {
  * echo an action input, similar to wp_nonce_field
  *
  * @param string $action
- * @param bool $echo
+ * @param bool   $echo
  *
  * @return bool|string
  */
@@ -2749,7 +2753,7 @@ function mobile_validator() {
  *
  * @param        $number       string
  * @param string $country_code the country code of the supposed contact
- * @param bool $with_plus whether to return with the + or not
+ * @param bool   $with_plus    whether to return with the + or not
  *
  * @return bool|string
  */
@@ -2920,8 +2924,8 @@ function is_pro_features_active() {
  *
  * @return bool
  */
-function has_premium_features(){
-    return defined( 'GROUNDHOGG_HELPER_VERSION' ) || defined( 'GROUNDHOGG_PRO_VERSION' );
+function has_premium_features() {
+	return defined( 'GROUNDHOGG_HELPER_VERSION' ) || defined( 'GROUNDHOGG_PRO_VERSION' );
 }
 
 add_action( 'admin_menu', function () {
@@ -3130,7 +3134,7 @@ function get_user_test_email( $user_id = 0 ) {
  * Update a user's preferred test email address.
  *
  * @param string $email
- * @param int $user_id
+ * @param int    $user_id
  *
  * @return bool|int
  */
@@ -3244,7 +3248,7 @@ function get_owners() {
 /**
  * Shorthand for number formatting
  *
- * @param $number
+ * @param     $number
  * @param int $decimals
  *
  * @return string
@@ -3273,43 +3277,109 @@ function is_groundhogg_network_active() {
 }
 
 /**
- * Get's the shortcode tag...
+ * Parse shortcodes and return an array
  *
- * @param $shortcode
- *
- * @return mixed
- */
-function extract_shortcode_tag( $shortcode ){
-    preg_match( '/\[(?!\/)([^ ]+)/', $shortcode, $matches );
-    return $matches[1];
-}
-
-/**
- * Convert a form shortcode to JSON for compat with new editor...
- *
- * @param $code string the form's shortcode
+ * @param $content string
  *
  * @return array
  */
-function convert_form_shortcode_to_json( $code ){
+function convert_shortcode_to_json( $content ) {
+
+	if ( ! $content ) {
+		return [];
+	}
+
+	// Remove newlines and whitespace...
+//	$content = preg_replace( '/(\])\s*(\[)/', "$1$2", $content );
+
+	// Find all registered tag names in $content.
+	preg_match_all( '@\[([^<>&/\[\]\x00-\x20=]++)@', $content, $matches );
+	$tagnames = $matches[1];
+
+	if ( empty( $tagnames ) ) {
+		return [];
+	}
+
+	$pattern = get_shortcode_regex( $tagnames );
+
+	preg_match_all( "/$pattern/", $content, $matches2 );
 
 	$json = [];
 
-	$code  = trim( $code, " \t\n\r" );
-	$code  = preg_replace( '/(\])\s*(\[)/', "$1$2", $code );
-	$code  = preg_replace( '/(\])/', "$1" . PHP_EOL, $code );
-	$codes = explode( PHP_EOL, $code );
+	foreach ( $matches2[2] as $i => $tag ) {
 
-	foreach ( $codes as $code ){
+		// add the tag to the json output...
+		$json[] = array_filter( [
+			'type'       => $tag,
+			'attributes' => shortcode_parse_atts( $matches2[3][ $i ] ),
+			'children'   => convert_shortcode_to_json( $matches2[5][ $i ] ),
+		] );
 
-	    $tag = extract_shortcode_tag( $code );
-		$attributes = shortcode_parse_atts( $code );
+	}
 
-		$formatted = [
-            'type' => $tag,
-            'attributes' => $attributes
-        ];
+	return $json;
+}
 
-    }
+/**
+ * Ensure a column is returned.
+ *
+ * @param $column
+ *
+ * @return array
+ */
+function validate_form_column( $column ) {
 
+	if ( $column['type'] !== 'col' ) {
+		$column = [
+			'type'       => 'row',
+			'attributes' => [],
+			'children'   => $column
+		];
+	}
+
+	return $column;
+
+}
+
+/**
+ * Ensure a row is returned
+ *
+ * @param $row
+ *
+ * @return array
+ */
+function validate_form_row( $row ) {
+
+	if ( $row['type'] !== 'row' ) {
+		$row = [
+			'type'       => 'row',
+			'attributes' => [],
+			'children'   => $row
+		];
+	}
+
+	$row['content'] = array_map( __NAMESPACE__ . '\validate_form_column', $row['content'] ?: [] );
+
+	return $row;
+
+}
+
+/**
+ * Validate the form markup
+ *
+ * @param $json
+ *
+ * @return array
+ */
+function validate_form_json( $json ) {
+	return array_map( __NAMESPACE__ . '\validate_form_row', $json );
+}
+
+/**
+ * @param $form
+ *
+ * @return array
+ */
+function convert_form_shortcode_to_json( $form ) {
+	return validate_form_json( convert_shortcode_to_json( $form ) );
 }

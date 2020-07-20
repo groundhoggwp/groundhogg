@@ -93,7 +93,7 @@ class Account_Created extends Benchmark {
 	 * @return array|void
 	 */
 	public function context( $context, $step ) {
-		$roles = $this->get_setting( 'role' );
+		$roles = $this->get_setting( 'role', [ 'subscriber' ] );
 		$context[ 'roles_display' ] = map_deep( $roles, function ( $role ){
 			global $wp_roles;
 			return [ 'value' => $role, 'label' => translate_user_role( $wp_roles->roles[ $role ][ 'name' ] ) ];

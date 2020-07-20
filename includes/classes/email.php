@@ -1049,5 +1049,11 @@ class Email extends Base_Object_With_Meta {
 		];
 	}
 
+	public function get_as_array() {
+		$array = parent::get_as_array();
+		$array['url'] = managed_page_url('emails/' . $this->get_id() );
+		return $array;
+	}
+
 
 }
