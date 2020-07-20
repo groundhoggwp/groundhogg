@@ -3311,6 +3311,7 @@ function convert_shortcode_to_json( $content ) {
 		// add the tag to the json output...
 		$json[] = array_filter( [
 			'type'       => $tag,
+			'id'         => uniqid( 'field_' ),
 			'attributes' => shortcode_parse_atts( $matches2[3][ $i ] ),
 			'children'   => convert_shortcode_to_json( $matches2[5][ $i ] ),
 		] );

@@ -138,6 +138,13 @@ registerStepType('form_fill', {
 	},
 });
 
+function parseArgs (given, defaults) {
+	return {
+		...defaults,
+		...given,
+	};
+}
+
 function prettifyForm (form) {
 
 	form = form.trim().
@@ -181,14 +188,18 @@ function prettifyForm (form) {
 
 function FormBuilder ({ formJSON }) {
 
-
+	const [fields, setFields] = useState(formJSON);
 
 	return (
 		<Row className={ 'no-margins no-padding' }>
 			<Col className={ 'no-padding' }>
 				<div className={ 'form-builder-wrap' }>
-					<ReactSortable>
-						{ formJSON.map((field) => renderField(field)) }
+					<ReactSortable
+						list={ fields }
+						setList={ setFields }
+						group={ 'rows' }
+					>
+						{ fields.map((field) => renderField(field)) }
 					</ReactSortable>
 				</div>
 			</Col>
@@ -197,72 +208,36 @@ function FormBuilder ({ formJSON }) {
 
 }
 
-function InputFieldGroup ({ type, attributes, inputProps }) {
-
-	attributes = parseArgs(attributes, {
-		showLabel: true,
-	});
-
-	const input = <input
-		type={ type }
-		id={ attributes.id }
-		className={ ['gh-input', attributes.class].join(' ') }
-		name={ attributes.name }
-		value={ attributes.value }
-		placeholder={ attributes.value }
-		title={ attributes.title }
-		required={ attributes.required }
-		disabled={ true }
-		{ ...inputProps }
-	/>;
-
-	if (attributes.showLabel) {
-		return (
-			<label className={ 'gh-input-label' }>
-				{ attributes.label }
-				{ input }
-			</label>
-		);
-	}
-
-	return input;
-}
-
 InputFieldGroup.defaultProps = {
 	type: 'text',
 	attributes: {},
 };
-
-function parseArgs (given, defaults) {
-	return {
-		...defaults,
-		...given,
-	};
-}
-
-function renderField (field) {
-	return React.createElement(FieldTypes[field.type].render, {
-		attributes: field.attributes || {},
-		children: field.children || [],
-	});
-}
 
 const FieldTypes = {
 	row: {
 		shortcode: 'row',
 		name: 'Row',
 		attributes: ['id', 'class'],
-		render: function ({ attributes, children }) {
+		render: function ({ id, attributes, children }) {
+
+			const [fields, setFields] = useState(children);
+
 			return (
-				<div
-					id={ attributes.id }
-					className={ [
-						'gh-form-row',
-						'clearfix',
-						attributes.class,
-					].join(' ') }
+				<div key={ id }
+				     id={ attributes.id }
+				     className={ [
+					     'gh-form-row',
+					     'clearfix',
+					     attributes.class,
+				     ].join(' ') }
 				>
-					{ children.map((field) => renderField(field)) }
+					<ReactSortable
+						list={ fields }
+						setList={ setFields }
+						group={ 'cols' }
+					>
+						{ fields.map((field) => renderField(field)) }
+					</ReactSortable>
 				</div> );
 		},
 	},
@@ -270,7 +245,9 @@ const FieldTypes = {
 		shortcode: 'col',
 		name: 'Col',
 		attributes: ['id', 'class'],
-		render: function ({ attributes, children }) {
+		render: function ({ id, attributes, children }) {
+
+			const [fields, setFields] = useState(children);
 
 			let width = attributes.width;
 
@@ -283,12 +260,18 @@ const FieldTypes = {
 				'3/4': 'col-3-of-4',
 			};
 
-			return <div id={ attributes.id } className={ [
+			return <div key={ id } id={ attributes.id } className={ [
 				'gh-form-column',
 				widthMap[width],
 				attributes.class,
 			].join(' ') }>
-				{ children.map((field) => renderField(field)) }
+				<ReactSortable
+					list={ fields }
+					setList={ setFields }
+					group={ 'inputs' }
+				>
+					{ fields.map((field) => renderField(field)) }
+				</ReactSortable>
 			</div>;
 		},
 	},
@@ -517,6 +500,45 @@ const FieldTypes = {
 		],
 	},
 };
+
+function renderField (field) {
+	return React.createElement(FieldTypes[field.type].render, {
+		id: field.id,
+		attributes: field.attributes || {},
+		children: field.children || [],
+	});
+}
+
+function InputFieldGroup ({ type, attributes, inputProps }) {
+
+	attributes = parseArgs(attributes, {
+		showLabel: true,
+	});
+
+	const input = <input
+		type={ type }
+		id={ attributes.id }
+		className={ ['gh-input', attributes.class].join(' ') }
+		name={ attributes.name }
+		value={ attributes.value }
+		placeholder={ attributes.value }
+		title={ attributes.title }
+		required={ attributes.required }
+		disabled={ true }
+		{ ...inputProps }
+	/>;
+
+	if (attributes.showLabel) {
+		return (
+			<label className={ 'gh-input-label' }>
+				{ attributes.label }
+				{ input }
+			</label>
+		);
+	}
+
+	return input;
+}
 
 const fieldAttributes = {
 	required: {
