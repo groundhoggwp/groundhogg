@@ -56,3 +56,23 @@ export function enableBodyScrolling () {
 		$('body').removeClass('disable-scrolling');
 	});
 }
+
+export function parseArgs (given, defaults) {
+
+	// remove null or empty values from given
+	Object.keys(given).forEach((key) => (given[key] == null || given[key] === '') && delete given[key]);
+
+	return {
+		...defaults,
+		...given,
+	};
+}
+
+export function uniqId (prefix = '') {
+	return prefix + Math.random().toString(36).substring(2, 15) +
+		Math.random().toString(36).substring(2, 15);
+}
+
+export function objEquals (obj1, obj2) {
+	return JSON.stringify(obj1) === JSON.stringify(obj2);
+}

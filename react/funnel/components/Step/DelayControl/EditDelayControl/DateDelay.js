@@ -20,7 +20,7 @@ export function DateDelay (props) {
 	return (
 		<div className={ 'date-delay' }>
 			<Container>
-				<Row>
+				<Row className={'no-padding'}>
 					<Col>
 						{ 'Run ' }
 						<select

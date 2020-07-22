@@ -1,76 +1,78 @@
-import React from "react";
+import React from 'react';
 import {
-    ItemsCommaAndList,
-    ItemsCommaOrList,
-    TagPicker,
-    YesNoToggle
-} from "../../components/BasicControls/basicControls";
-import {registerStepType, SimpleEditModal} from "../steps";
-import {Col, Row} from "react-bootstrap";
+	ItemsCommaAndList,
+	ItemsCommaOrList,
+	TagPicker, TagSpan,
+} from '../../components/BasicControls/basicControls';
+import { registerStepType, SimpleEditModal } from '../steps';
 
-registerStepType("tag_removed", {
+const { __, _x, _n, _nx } = wp.i18n;
 
-    icon: ghEditor.steps.tag_removed.icon,
-    group: ghEditor.steps.tag_removed.group,
+registerStepType('tag_removed', {
 
-    title: ({data, context, settings}) => {
+	icon: ghEditor.steps.tag_removed.icon,
+	group: ghEditor.steps.tag_removed.group,
 
-        if (!context || !context.tags_display ||
-            !context.tags_display.length) {
-            return <>{"Select tag requirements..."}</>;
-        }
+	title: ({ data, context, settings }) => {
 
-        if (settings.condition === "any") {
-            return <>{"When"} <ItemsCommaOrList
-                items={context.tags_display.map(tag => tag.label)}/> {"are removed"}</>;
-        } else {
-            return <>{"When"} <ItemsCommaAndList
-                items={context.tags_display.map(tag => tag.label)}/> {"are removed"}</>;
-        }
-    },
+		if (!context || !context.tags_display ||
+			!context.tags_display.length) {
+			return <>{ __('Select tag requirements...', 'groundhogg') }</>;
+		}
 
-    edit: ({data, context, settings, updateSettings, commit, done}) => {
+		return <>{ _x('When', 'tag step title', 'groundhogg') }
+			<ItemsCommaOrList
+				separator={ '' }
+				use={ settings.condition === 'any'
+					? __('or', 'groundhogg')
+					: __('and', 'groundhogg') }
+				items={ context.tags_display.map(tag => <TagSpan
+					tagName={ tag.label }
+				/>) }/> { _x('are removed', 'tag step title',
+				'groundhogg') }</>;
+	},
 
-        const tagsChanged = (values) => {
-            updateSettings({
-                tags: values.map(tag => tag.value)
-            }, {
-                tags_display: values
-            });
-        };
+	edit: ({ data, context, settings, updateSettings, commit, done }) => {
 
-        const conditionChanged = (e) => {
-            updateSettings({
-                condition: e.target.value
-            });
-        };
+		const tagsChanged = (values) => {
+			updateSettings({
+				tags: values.map(tag => tag.value),
+			}, {
+				tags_display: values,
+			});
+		};
 
-        const conditions = [
-            {value: "any", label: "Any"},
-            {value: "all", label: "All"}
-        ];
+		const conditionChanged = (e) => {
+			updateSettings({
+				condition: e.target.value,
+			});
+		};
 
-        return (
-            <SimpleEditModal
-                title={"Tag removed..."}
-                done={done}
-                commit={commit}
-            >
-                <div><p>{"Runs when"} <select
-                    value={settings.condition}
-                    onChange={conditionChanged}>
-                    {conditions.map(condition => <option
-                        value={condition.value}>{condition.label}</option>)}
-                </select> {"of the following tags are are removed..."}
-                </p></div>
-                <TagPicker
-                    id={"tags"}
-                    value={(context && context.tags_display) || false}
-                    update={tagsChanged}
-                />
-                <p className={"description"}>{"Add new tags by hitting [enter] or [tab]"}</p>
-            </SimpleEditModal>
-        );
-    }
+		const conditions = [
+			{ value: 'any', label: 'Any' },
+			{ value: 'all', label: 'All' },
+		];
+
+		return (
+			<SimpleEditModal
+				title={ __( 'Tag removed...', 'groundhogg' ) }
+				done={ done }
+				commit={ commit }
+			>
+				<div><p>{ _x( 'Runs when', 'tag step setting', 'groundhogg' ) } <select
+					value={ settings.condition }
+					onChange={ conditionChanged }>
+					{ conditions.map(condition => <option
+						value={ condition.value }>{ condition.label }</option>) }
+				</select> { __( 'of the following tags are are removed...' ) }
+				</p></div>
+				<TagPicker
+					id={ 'tags' }
+					value={ ( context && context.tags_display ) || false }
+					update={ tagsChanged }
+				/>
+			</SimpleEditModal>
+		);
+	},
 
 });

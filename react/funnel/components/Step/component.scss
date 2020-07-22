@@ -1,31 +1,35 @@
 @import '../../master';
 
-.step-wrap{
+.step-wrap {
 
-  .step-title{
+  .step-title {
     padding-left: 60px;
-    cursor:pointer;
+    cursor: pointer;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: calc(100% - 140px);
 
-    b{
+    b {
       font-weight: 500;
     }
   }
 
-  .edit-step-controls{
+  .edit-step-controls {
     display: inline-block;
   }
 
-  .line-left{
+  .line-left {
     border-left: 2px solid $border-color;
     margin: 5px 0 5px 10px;
     padding: 10px 10px 10px 22px;
   }
 
-  .delay{
+  .delay {
     //margin: 10px 30px;
     font-size: 16px;
 
-    .delay-text{
+    .delay-text {
       cursor: pointer;
 
       b {
@@ -46,41 +50,41 @@
     display: flex;
     align-items: center;
 
-    &.action{
+    &.action {
       //margin: 10px 22px;
       padding: 10px;
       background-color: #FFFFFF;
 
-      .step-icon{
+      .step-icon {
         background: $action-color;
       }
     }
 
-    &.benchmark{
+    &.benchmark {
       margin: 10px 10px 0 10px;
       padding: 10px;
       background-color: #FFFFFF;
 
-      .step-icon{
+      .step-icon {
         background: $benchmark-color;
       }
 
-      &:last-child{
+      &:last-child {
         margin-bottom: 10px;
       }
     }
 
-    .step-controls{
+    .step-controls {
       visibility: hidden;
       opacity: 0;
       transition: visibility 0s, opacity 0.5s linear;
     }
 
-    &:hover{
+    &:hover {
 
       border-color: $border-hover-color;
 
-      .step-controls{
+      .step-controls {
         visibility: visible;
         opacity: 1;
         transition: visibility 0s, opacity 0.5s linear;
@@ -88,9 +92,22 @@
     }
   }
 
-  &:last-child{
-    .line-left{
+  &:last-child {
+    .line-left {
       //border-left-color: transparent;
     }
   }
 }
+
+.delay-text {
+  .gh-highlight {
+    color: #1c271c;
+    font-weight: 500;
+    font-size: 15px;
+    background: rgba(92, 192, 165, 0.11);
+    display: inline-block;
+    padding: 0 7px;
+    border-radius: 6px;
+  }
+}
+

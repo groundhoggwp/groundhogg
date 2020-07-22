@@ -205,7 +205,8 @@ class Scripts {
 		wp_register_script( 'groundhogg-funnel-react', GROUNDHOGG_URL . 'react/funnel/build/build.js', [
 			'jquery',
 			'wp-element',
-			'groundhogg-admin'
+			'groundhogg-admin',
+			'wp-i18n'
 		], null, true );
 
 		wp_register_script( 'groundhogg-admin-reporting', GROUNDHOGG_ASSETS_URL . 'js/admin/reporting' . $dot_min . '.js', [
@@ -218,14 +219,18 @@ class Scripts {
 
 		wp_enqueue_script( 'groundhogg-admin-functions' );
 
-		wp_localize_script( 'groundhogg-admin', 'groundhogg_endpoints', [
-			'tags'     => rest_url( 'gh/v3/tags' ),
-			'emails'   => rest_url( 'gh/v3/emails' ),
-			'sms'      => rest_url( 'gh/v3/sms?select2=true' ),
-			'contacts' => rest_url( 'gh/v3/contacts?select2=true' ),
-			'funnels'  => rest_url( 'gh/v3/funnels' ),
-			'steps'    => rest_url( 'gh/v3/steps' ),
-		] );
+		$endpoints = [
+			'tags'      => rest_url( 'gh/v3/tags' ),
+			'emails'    => rest_url( 'gh/v3/emails' ),
+			'contacts'  => rest_url( 'gh/v3/contacts' ),
+			'funnels'   => rest_url( 'gh/v3/funnels' ),
+			'steps'     => rest_url( 'gh/v3/steps' ),
+			'meta_keys' => rest_url( 'gh/v3/contacts/meta-keys' ),
+		];
+
+		$endpoints = apply_filters( 'groundhogg/scripts/admin_rest_endpoints', $endpoints );
+
+		wp_localize_script( 'groundhogg-admin', 'groundhogg_endpoints', $endpoints );
 
 		wp_localize_script( 'groundhogg-admin', 'groundhogg_nonces', [
 			'_wpnonce'            => wp_create_nonce(),

@@ -77,7 +77,7 @@ export class Editor extends React.Component {
 
         const groups = this.state.steps.reduce(function (prev, curr) {
 
-            console.debug(prev, curr);
+            // console.debug(prev, curr);
 
             if (prev.length && curr.data.step_group === prev[prev.length - 1][0].data.step_group) {
                 prev[prev.length - 1].push(curr);
@@ -91,13 +91,14 @@ export class Editor extends React.Component {
 
         groups.forEach(function (group, i) {
             inner.push(<StepGroup
+                key={i}
                 steps={group}
                 isFirst={i === 0}
                 isLast={i === groups.length - 1}
             />);
         });
 
-        console.debug(groups);
+        // console.debug(groups);
 
         return (
             <div

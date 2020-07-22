@@ -3311,7 +3311,6 @@ function convert_shortcode_to_json( $content ) {
 		// add the tag to the json output...
 		$json[] = array_filter( [
 			'type'       => $tag,
-			'id'         => uniqid( 'field_' ),
 			'attributes' => shortcode_parse_atts( $matches2[3][ $i ] ),
 			'children'   => convert_shortcode_to_json( $matches2[5][ $i ] ),
 		] );
@@ -3373,7 +3372,29 @@ function validate_form_row( $row ) {
  * @return array
  */
 function validate_form_json( $json ) {
-	return array_map( __NAMESPACE__ . '\validate_form_row', $json );
+	$rows = array_map( __NAMESPACE__ . '\validate_form_row', $json );
+
+	//formatted to be row=>col=>field, now need to format to just field
+	$formatted = [];
+
+	foreach ( $rows as $row ){
+
+	    $cols = get_array_var( $row, 'children', [] );
+
+		foreach ( $cols as $col ) {
+
+			$width      = get_array_var( $col['attributes'], 'width', '1/1' );
+			$fields     = get_array_var( $col, 'children', [] );
+
+			foreach ( $fields as $field ) {
+				$field['width'] = $width;
+				$field['id']    = uniqid( 'field_' );
+				$formatted[]       = $field;
+			}
+		}
+	}
+
+	return $formatted;
 }
 
 /**

@@ -1,5 +1,9 @@
 import React from "react";
-import {ItemsCommaOrList, RolesPicker} from "../../components/BasicControls/basicControls";
+import {
+    ItemsCommaAndList,
+    ItemsCommaOrList,
+    RolesPicker, TagSpan,
+} from '../../components/BasicControls/basicControls';
 import {registerStepType, SimpleEditModal} from "../steps";
 
 registerStepType("account_created", {
@@ -13,7 +17,8 @@ registerStepType("account_created", {
         }
 
         return <>{"When"} <ItemsCommaOrList
-            items={context.roles_display.map(role => role.label)}/> {"is registered"}</>;
+            separator={ '' }
+            items={context.roles_display.map(role => <TagSpan icon={'admin-users'} tagName={role.label}/> )}/> {"is registered"}</>;
     },
 
     edit: ({data, context, settings, updateSettings, commit, done}) => {

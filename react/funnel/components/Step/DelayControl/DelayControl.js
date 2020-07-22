@@ -33,7 +33,7 @@ export class DelayControl extends React.Component {
 
 	doneEditing (delay) {
 		axios.patch(groundhogg_endpoints.steps, {
-			step_id: this.props.step.id,
+			step_id: this.props.step.ID,
 			delay: delay,
 		}).then(result => this.setState({
 			delay: result.data.step.delay,

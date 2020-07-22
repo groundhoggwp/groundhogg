@@ -1,7 +1,9 @@
 import React from 'react';
 import { Dashicon } from '../../../Dashicon/Dashicon';
 import Button from 'react-bootstrap/Button';
-import {showAddStepForm} from "../../../AddStep/AddStep";
+import { showAddStepForm } from '../../../AddStep/AddStep';
+
+const { __, _x, _n, _nx } = wp.i18n;
 
 export class AddStep extends React.Component {
 
@@ -11,22 +13,22 @@ export class AddStep extends React.Component {
 		this.handleOnClick = this.handleOnClick.bind(this);
 	}
 
-	handleOnClick(e){
-		console.debug( e );
-		showAddStepForm( this.props.group, this.props.after );
+	handleOnClick (e) {
+		// console.debug( e );
+		showAddStepForm(this.props.group, this.props.after);
 	}
 
 	render () {
 		return (
 			<Button
 				variant="outline-secondary"
-			    size="sm"
-				onClick={this.handleOnClick}
+				size="sm"
+				onClick={ this.handleOnClick }
 			>
 				<Dashicon icon={ 'plus' }/>
 				{ this.props.group === 'action'
-					? ' Add Action'
-					: ' Add Benchmark' }
+					? __(' Add Action', 'groundhogg')
+					: __(' Add Benchmark', 'groundhogg') }
 			</Button>
 		);
 	}

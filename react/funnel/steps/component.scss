@@ -4,7 +4,7 @@ input[type='text'].note-title {
   width: 100%;
 }
 
-.aligncenter{
+.aligncenter {
   text-align: center;
 }
 
@@ -13,7 +13,7 @@ textarea.note-content {
   height: 100px;
 }
 
-.main-preview-wrap{
+.main-preview-wrap {
   padding: 20px;
   vertical-align: bottom;
 
@@ -24,10 +24,10 @@ textarea.note-content {
     vertical-align: top;
     overflow: hidden;
 
-    .email-item-details{
+    .email-item-details {
       padding: 10px;
 
-      .subject-line{
+      .subject-line {
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
@@ -43,7 +43,7 @@ iframe.email-preview {
   vertical-align: bottom;
   overflow: hidden;
 
-  &.main-preview{
+  &.main-preview {
     overflow-y: auto;
   }
 }
@@ -63,7 +63,10 @@ iframe.email-preview {
     //font-size: 18px;
   }
 
-  input,
+  input[type='text'],
+  input[type='email'],
+  input[type='tel'],
+  input[type='password'],
   textarea {
     font-size: 16px;
     width: 100%;
@@ -108,11 +111,11 @@ iframe.email-preview {
     border-bottom: 1px solid $border-color;
   }
 
-  .grid-item{
+  .grid-item {
     padding: 20px;
   }
 
-  .emails-grid{
+  .emails-grid {
     padding: 20px;
     display: inline-block;
     max-height: 68vh;
@@ -132,14 +135,14 @@ iframe.email-preview {
     //cursor: pointer;
     position: relative;
 
-    .selectable{
+    .selectable {
       display: none;
     }
 
-    .email-item-details{
+    .email-item-details {
       padding: 10px;
 
-      .subject-line{
+      .subject-line {
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
@@ -151,7 +154,7 @@ iframe.email-preview {
       border-color: transparent;
       transition: 150ms;
 
-      .selectable{
+      .selectable {
         display: block;
         position: absolute;
         top: 0;
@@ -162,7 +165,7 @@ iframe.email-preview {
         color: $white;
         z-index: 99999;
 
-        .selectable-actions{
+        .selectable-actions {
           width: 250px;
           text-align: center;
           position: absolute;
@@ -170,7 +173,7 @@ iframe.email-preview {
           transform: translateY(-50%) translateX(-50%);
           left: 50%;
 
-          .btn-outline-light:not(:hover){
+          .btn-outline-light:not(:hover) {
             background: rgba(92, 92, 92, 0.8);
           }
         }
@@ -181,33 +184,128 @@ iframe.email-preview {
 
 .modal-90w {
   width: 90%;
-  max-width: none!important;
+  max-width: none !important;
 }
 
-.form-builder-wrap{
+.modal-80w {
+  width: 80%;
+  max-width: none !important;
+}
+
+.modal-70w {
+  width: 70%;
+  max-width: none !important;
+}
+
+.form-preview {
 
   padding: 20px;
-  border: 1px solid $border-color;
+  border-left: 1px solid $border-color-light;
 
-  label{
+  label {
     display: block;
+
+    input[type='text'],
+    input[type='email'],
+    input[type='tel'],
+    input[type='password'],
+    //input[type='password'],
+    textarea,
+    select{
+      font-weight: normal;
+    }
+
   }
 
-  .gh-form-row{
+  .gh-form-column {
     padding: 15px;
-    border: 1px dashed $border-color-light;
 
-    &:hover{
+    &:hover {
+      border-color: $border-hover-color;
+    }
+  }
+
+  .gh-form-row {
+    padding: 15px;
+
+    &:hover {
+      border-color: $border-hover-color;
+    }
+  }
+}
+
+.form-name-wrap {
+
+  width: 500px;
+  margin: auto;
+
+  input.form-name {
+    width: 300px;
+  }
+}
+
+.form-builder-wrap {
+  padding: 20px;
+
+  .add-field-wrap {
+    margin-top: 20px;
+    text-align: center;
+  }
+}
+
+.form-fields {
+
+  margin-top: 20px;
+
+  .field-attributes {
+    margin: 0 10px 0 10px;
+    border: solid $border-color;
+    border-width: 0 1px 1px 1px;
+    padding: 15px;
+  }
+
+  .field-sortable-item {
+    margin: 10px 10px 0 10px;
+    padding: 15px;
+    border: 1px solid $border-color;
+    background-color: $background-color-light;
+    font-size: 16px;
+    position: relative;
+    cursor: pointer;
+
+    &:hover {
       border-color: $border-hover-color;
     }
 
-    .gh-form-column{
-      padding: 15px;
-      border: 1px dashed $border-color-light;
+    .edit-field-button,
+    .delete-field-button {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background: transparent;
+      border: none;
+      border-left: 1px solid $border-color;
+      width: 55px;
 
-      &:hover{
-        border-color: $border-hover-color;
+      .dashicons {
+        font-size: 22px;
+        vertical-align: text-top;
+        height: 22px;
+        width: 22px;
       }
     }
+  }
+}
+
+.modal-dialog.form {
+  .nav-tabs .nav-item {
+    border-top: none !important;
+    border-radius: 0;
+  }
+
+  .nav-tabs {
+    margin-bottom: 0;
+    background-color: $background-color-light;
   }
 }

@@ -10,6 +10,7 @@ import { reloadEditor } from '../Editor/Editor';
 import { FadeOut } from '../Animations/Animations';
 import { DelayControl } from './DelayControl/DelayControl';
 import { StepEdit, StepTitle } from '../../steps/steps';
+import { objEquals } from '../../App';
 
 export class Step extends React.Component {
 

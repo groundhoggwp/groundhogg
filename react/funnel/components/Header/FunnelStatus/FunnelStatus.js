@@ -5,6 +5,8 @@ import Button from 'react-bootstrap/Button';
 
 import './component.scss';
 
+const { __, _x, _n, _nx } = wp.i18n;
+
 export class FunnelStatus extends Component {
 
 	constructor (props) {
@@ -51,7 +53,7 @@ export class FunnelStatus extends Component {
 							? 'primary'
 							: 'outline-primary' }
 					>
-						{ 'Active' }
+						{ __( 'Active', 'status', 'groundhogg' ) }
 					</Button>
 					<Button
 						onClick={ this.setStateInactive }
@@ -59,7 +61,7 @@ export class FunnelStatus extends Component {
 							? 'outline-secondary'
 							: 'secondary' }
 					>
-						{ 'Inactive' }
+						{ __( 'Inactive', 'status', 'groundhogg' ) }
 					</Button>
 				</ButtonGroup>
 			</div>

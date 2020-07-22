@@ -3,6 +3,9 @@ import { registerStepType, SimpleEditModal } from '../steps';
 import { Button, Col, Row, Alert, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 import { Dashicon } from '../../components/Dashicon/Dashicon';
+import { TagSpan } from '../../components/BasicControls/basicControls';
+
+const { __, _x, _n, _nx } = wp.i18n;
 
 registerStepType('send_email', {
 
@@ -12,10 +15,10 @@ registerStepType('send_email', {
 	title: ({ data, context, settings }) => {
 
 		if (!context || !context.email) {
-			return <>{ 'Select and email to send...' }</>;
+			return <>{ __( 'Select and email to send...', 'groundhogg' ) }</>;
 		}
 
-		return <>{ 'Send' } <b>{ context.email.data.title }</b></>;
+		return <>{ _x( 'Send', 'email step title', 'groundhogg' ) } <TagSpan icon={'email-alt'} tagName={context.email.data.title}/></>;
 	},
 
 	edit: ({ data, context, settings, updateSettings, commit, done }) => {
@@ -31,8 +34,8 @@ registerStepType('send_email', {
 		return (
 			<SimpleEditModal
 				title={ settings.email_id
-					? 'Send email...'
-					: 'Select an email to send...' }
+					? __( 'Send email...', 'groundhogg' )
+					: __( 'Select an email to send...', 'groundhogg' ) }
 				done={ done }
 				commit={ commit }
 				showFooter={ typeof settings.email_id !== 'undefined' }
@@ -54,10 +57,10 @@ registerStepType('send_email', {
 						<Button
 							variant={ 'outline-secondary' }
 							onClick={ () => emailChanged(
-								false) }>{ 'Change Email' }</Button>
+								false) }>{ __( 'Change Email', 'groundhogg' ) }</Button>
 						<Button
 							variant={ 'outline-primary' }
-						>{ 'Edit Email' }</Button>
+						>{ __( 'Edit Email', 'groundhogg' ) }</Button>
 					</div>
 					<div className={ 'main-preview-wrap' }>
 						<EmailPreview
@@ -122,14 +125,14 @@ function EmailSelector ({ onSelect }) {
 				<Row className={ 'no-margins' }>
 					<Col sm={ 8 }>
 						<input
-							placeholder={ 'Search for an email...' }
+							placeholder={ __( 'Search for an email...', 'groundhogg' ) }
 							type={ 'search' }
 							value={ search }
 							onChange={ (e) => searchForEmails(e.target.value) }
 						/>
 					</Col>
 					<Col sm={ 4 }>
-						<Button className={'alignright'} variant={'outline-primary'}>{ 'Create New Email' }</Button>
+						<Button className={'alignright'} variant={'outline-primary'}>{ __( 'Create New Email', 'groundhogg' ) }</Button>
 					</Col>
 				</Row>
 			</div>
@@ -162,8 +165,7 @@ function EmailGridItem ({ email, onSelect }) {
 						<Button
 							variant={ 'outline-light' }
 						    onClick={ selected }
-							size={'lg'}
-						>{ 'Use Email' }</Button>
+						>{ __( 'Use Email', 'groundhogg' ) }</Button>
 						{/*<Button variant={ 'outline-light' }><Dashicon*/}
 						{/*	icon={ 'visibility' }/>{ 'Preview' }</Button>*/}
 					</div>

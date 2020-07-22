@@ -1,6 +1,5 @@
 import React from "react";
 import {AddStepControl} from "./AddStepControl/AddStepControl";
-import Spinner from "react-bootstrap/Spinner";
 
 import "./component.scss";
 import {Navbar} from "react-bootstrap";
@@ -9,8 +8,10 @@ import {SlideInBarRight} from "../SlideInBarRight/SlideInBarRight";
 import axios from "axios";
 import {reloadEditor} from "../Editor/Editor";
 
+const { __, _x, _n, _nx } = wp.i18n;
+
 export function showAddStepForm ( group, after ) {
-    console.debug(group);
+    // console.debug(group);
     const event = new CustomEvent('groundhogg-add-step', { detail : { group: group, after: after } } );
     // Dispatch the event.
     document.dispatchEvent(event);
@@ -92,7 +93,7 @@ export class AddStep extends React.Component {
                     <div className={"inner"}>
                         <Navbar bg="white" expand="sm" fixed="top">
                             <Navbar.Brand>
-                                {"Add Step"}
+                                { __( "Add Step", 'groundhogg' ) }
                             </Navbar.Brand>
                             <Navbar.Toggle
                                 aria-controls="basic-navbar-nav"/>

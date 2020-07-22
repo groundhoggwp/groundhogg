@@ -34,7 +34,7 @@ export function FixedDelay (props) {
 	return (
 		<div className={ 'fixed-delay' }>
 			<Container>
-				<Row>
+				<Row className={'no-padding'}>
 					<Col>
 						{ 'Wait at least...' }
 						<div className={ 'interval-period col-controls' }>

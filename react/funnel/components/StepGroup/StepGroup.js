@@ -3,6 +3,8 @@ import './component.scss';
 import { SortableSteps } from '../SortableSteps/SortableSteps';
 import { GroupControls } from './GroupControls/GroupControls';
 
+const { __, _x, _n, _nx } = wp.i18n;
+
 export class StepGroup extends React.Component {
 
 	constructor (props) {
@@ -44,18 +46,15 @@ export class StepGroup extends React.Component {
 
 		let explanation;
 
-		if (groupType === 'action') {
-			explanation = 'Then do the following...';
-		}
-		else {
+		if (groupType === 'benchmark') {
 			explanation = (
-				<span>
+				<span className={'group-explanation'}>
 					{ this.props.isFirst &&
-					'Start the funnel when the following benchmarks are triggered...' }
+					__( 'Start the funnel when any of the following benchmarks are triggered...', 'groundhogg' ) }
 					{ this.props.isLast &&
-					'End the funnel when the following benchmarks are triggered...' }
+					__( 'End the funnel when any of the following benchmarks are triggered...', 'groundhogg' ) }
 					{ !this.props.isLast && !this.props.isFirst &&
-					'Skip to this point when the following benchmarks are triggered...' }
+					__( 'Skip to this point when any of the following benchmarks are triggered...', 'groundhogg' ) }
 				</span>
 			);
 		}
@@ -75,7 +74,6 @@ export class StepGroup extends React.Component {
 					    group={ groupType }
 					/>
 				</div>
-				{/*{ this.state.showControls && <GroupControls group={groupType} after={lastStep.id}/> }*/}
 				<GroupControls group={groupType} after={lastStep.ID}/>
 			</div>
 		);

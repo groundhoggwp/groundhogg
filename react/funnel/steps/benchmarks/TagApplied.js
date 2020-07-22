@@ -2,11 +2,11 @@ import React from "react";
 import {
     ItemsCommaAndList,
     ItemsCommaOrList,
-    TagPicker,
-    YesNoToggle
-} from "../../components/BasicControls/basicControls";
+    TagPicker, TagSpan,
+} from '../../components/BasicControls/basicControls';
 import {registerStepType, SimpleEditModal} from "../steps";
-import {Col, Row} from "react-bootstrap";
+
+const { __, _x, _n, _nx } = wp.i18n;
 
 registerStepType("tag_applied", {
 
@@ -20,13 +20,13 @@ registerStepType("tag_applied", {
             return <>{"Select tag requirements..."}</>;
         }
 
-        if (settings.condition === "any") {
-            return <>{"When"} <ItemsCommaOrList
-                items={context.tags_display.map(tag => tag.label)}/> {"are applied"}</>;
-        } else {
-            return <>{"When"} <ItemsCommaAndList
-                items={context.tags_display.map(tag => tag.label)}/> {"are applied"}</>;
-        }
+        return <>{"When"} <ItemsCommaOrList
+            separator={ '' }
+            use={settings.condition === "any" ? __('or', 'groundhogg') : __('and', 'groundhogg') }
+            items={context.tags_display.map(tag => <TagSpan
+                tagName={tag.label}
+            />)}/> {"are applied"}</>;
+
     },
 
     edit: ({data, context, settings, updateSettings, commit, done}) => {

@@ -1,6 +1,4 @@
-import React from 'react';
-import { Form, FormControl, InputGroup } from 'react-bootstrap';
-import Button from 'react-bootstrap/Button';
+import React, { Fragment } from 'react';
 import { GroundhoggModal } from '../../../Modal/Modal';
 import { FixedDelay } from './FixedDelay';
 
@@ -119,12 +117,12 @@ export class EditDelayControl extends React.Component {
 							onChange={ this.handleTypeChange }
 						>
 							{ delayTypes.map(type => <option
-								value={ type.value }>{ type.label }</option>) }
+								key={type.value} value={ type.value }>{ type.label }</option>) }
 						</select>
 					</div>
 					{ controls.length > 0 &&
 					<div className={ 'edit-delay-controls-inner' }>
-						{ controls }
+						return <>{ controls.map( (item,i) => <Fragment key={i}>{item}</Fragment>) }</>;
 					</div>
 					}
 				</div>

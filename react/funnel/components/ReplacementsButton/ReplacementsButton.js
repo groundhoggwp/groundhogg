@@ -37,7 +37,7 @@ export function ReplacementsButton({insertTargetId, onInsert}) {
 	const codes = ghEditor.replacements;
 
 	const onSelect = (key,e) => {
-		console.debug(key,e);
+		// console.debug(key,e);
 
 		let newVal = insertAtCursor(insertTargetId,'{' + key + '}');
 

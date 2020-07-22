@@ -204,7 +204,11 @@ body.disable-scrolling {
 
 .step-wrap .step-title {
   padding-left: 60px;
-  cursor: pointer; }
+  cursor: pointer;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: calc(100% - 140px); }
   .step-wrap .step-title b {
     font-weight: 500; }
 
@@ -255,6 +259,15 @@ body.disable-scrolling {
       visibility: visible;
       opacity: 1;
       transition: visibility 0s, opacity 0.5s linear; }
+
+.delay-text .gh-highlight {
+  color: #1c271c;
+  font-weight: 500;
+  font-size: 15px;
+  background: rgba(92, 192, 165, 0.11);
+  display: inline-block;
+  padding: 0 7px;
+  border-radius: 6px; }
 
 .add-step-control {
   margin: 10px;
@@ -410,6 +423,24 @@ input[type="email"].email-address {
     .btn-control-group .btn:last-child {
       margin: 0; }
 
+.gh-tag-span {
+  color: #464646;
+  font-weight: 500;
+  font-size: 16px;
+  background: #e3e3e3;
+  display: inline-block;
+  padding: 0 7px 0 26px;
+  border-radius: 6px;
+  position: relative; }
+  .gh-tag-span .dashicons {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+    vertical-align: text-bottom; }
+
 input[type='text'].note-title {
   width: 100%; }
 
@@ -424,7 +455,7 @@ textarea.note-content {
   padding: 20px;
   vertical-align: bottom; }
   .main-preview-wrap .email-item {
-    border: 1px solid #e2e6ea;
+    border: 1px solid #dee2e6;
     background: #f7f7f7;
     border-radius: 5px;
     vertical-align: top;
@@ -454,7 +485,10 @@ iframe.email-preview {
 .modal-body label {
   font-weight: 500; }
 
-.modal-body input,
+.modal-body input[type='text'],
+.modal-body input[type='email'],
+.modal-body input[type='tel'],
+.modal-body input[type='password'],
 .modal-body textarea {
   font-size: 16px;
   width: 100%; }
@@ -495,7 +529,7 @@ iframe.email-preview {
   vertical-align: bottom; }
 
 .email-selector .email-item {
-  border: 1px solid #e2e6ea;
+  border: 1px solid #dee2e6;
   background: #f7f7f7;
   border-radius: 5px;
   overflow: hidden;
@@ -537,21 +571,88 @@ iframe.email-preview {
   width: 90%;
   max-width: none !important; }
 
-.form-builder-wrap {
+.modal-80w {
+  width: 80%;
+  max-width: none !important; }
+
+.modal-70w {
+  width: 70%;
+  max-width: none !important; }
+
+.form-preview {
   padding: 20px;
-  border: 1px solid #ccd0d4; }
-  .form-builder-wrap label {
+  border-left: 1px solid #dee2e6; }
+  .form-preview label {
     display: block; }
-  .form-builder-wrap .gh-form-row {
-    padding: 15px;
-    border: 1px dashed #e2e6ea; }
-    .form-builder-wrap .gh-form-row:hover {
+    .form-preview label input[type='text'],
+    .form-preview label input[type='email'],
+    .form-preview label input[type='tel'],
+    .form-preview label input[type='password'],
+    .form-preview label textarea,
+    .form-preview label select {
+      font-weight: normal; }
+  .form-preview .gh-form-column {
+    padding: 15px; }
+    .form-preview .gh-form-column:hover {
       border-color: #b6babe; }
-    .form-builder-wrap .gh-form-row .gh-form-column {
-      padding: 15px;
-      border: 1px dashed #e2e6ea; }
-      .form-builder-wrap .gh-form-row .gh-form-column:hover {
-        border-color: #b6babe; }
+  .form-preview .gh-form-row {
+    padding: 15px; }
+    .form-preview .gh-form-row:hover {
+      border-color: #b6babe; }
+
+.form-name-wrap {
+  width: 500px;
+  margin: auto; }
+  .form-name-wrap input.form-name {
+    width: 300px; }
+
+.form-builder-wrap {
+  padding: 20px; }
+  .form-builder-wrap .add-field-wrap {
+    margin-top: 20px;
+    text-align: center; }
+
+.form-fields {
+  margin-top: 20px; }
+  .form-fields .field-attributes {
+    margin: 0 10px 0 10px;
+    border: solid #ccd0d4;
+    border-width: 0 1px 1px 1px;
+    padding: 15px; }
+  .form-fields .field-sortable-item {
+    margin: 10px 10px 0 10px;
+    padding: 15px;
+    border: 1px solid #ccd0d4;
+    background-color: #f9f9f9;
+    font-size: 16px;
+    position: relative;
+    cursor: pointer; }
+    .form-fields .field-sortable-item:hover {
+      border-color: #b6babe; }
+    .form-fields .field-sortable-item .edit-field-button,
+    .form-fields .field-sortable-item .delete-field-button {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background: transparent;
+      border: none;
+      border-left: 1px solid #ccd0d4;
+      width: 55px; }
+      .form-fields .field-sortable-item .edit-field-button .dashicons,
+      .form-fields .field-sortable-item .delete-field-button .dashicons {
+        font-size: 22px;
+        vertical-align: text-top;
+        height: 22px;
+        width: 22px; }
+
+.modal-dialog.form .nav-tabs .nav-item {
+  border-top: none !important;
+  border-radius: 0; }
+
+.modal-dialog.form .nav-tabs {
+  margin-bottom: 0;
+  background-color: #f9f9f9; }
 
 .gh-form-wrapper * {
   box-sizing: border-box; }

@@ -1,29 +1,44 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import moment from 'moment';
 import { ItemsCommaOrList } from '../../../BasicControls/basicControls';
+
+const { __, _x, _n, _nx } = wp.i18n;
+
+function Highlight ({children}) {
+	return <span className={'gh-highlight'}>{children}</span>
+}
+
+function wrapInSpace (text) {
+	return text.padStart( text.length + 1 ).padEnd( text.length + 2 );
+}
 
 function TimeDelayFragment ({ delay }) {
 
 	const text = [];
 
+	const at = wrapInSpace( _x( 'at', 'step delay', 'groundhogg' ) );
+	const and = wrapInSpace( _x( 'and', 'step delay', 'groundhogg' ) );
+	const between = wrapInSpace( _x( 'between', 'step delay', 'groundhogg' ) );
+	const anyTime = _x( 'any time', 'step delay', 'groundhogg' );
+
 	switch (delay.run_at) {
 		default:
 		case 'any':
-			text.push(' at ', <b>{ 'any time' }</b>);
+			text.push( at, <Highlight>{ anyTime }</Highlight>);
 			break;
 		case 'specific':
-			text.push(' at ', <b>{ moment(delay.time, 'HH:mm').
-				format('hh:mm a') }</b>);
+			text.push( at, <Highlight>{ moment(delay.time, 'HH:mm').
+				format('hh:mm a') }</Highlight>);
 			break;
 		case 'between':
-			text.push(' between ', <b>{ moment(delay.time, 'HH:mm').
-				format('LT') }</b>, ' and ', <b>{ moment(delay.time_to,
-				'HH:mm').format('LT') }</b>);
+			text.push(between, <Highlight>{ moment(delay.time, 'HH:mm').
+				format('LT') }</Highlight>, and, <Highlight>{ moment(delay.time_to,
+				'HH:mm').format('LT') }</Highlight>);
 			break;
 
 	}
 
-	return <>{ text }</>;
+	return <>{ text.map( (item,i) => <Fragment key={i}>{item}</Fragment>) }</>;
 }
 
 function FixedDelay ({ delay }) {
@@ -31,7 +46,7 @@ function FixedDelay ({ delay }) {
 	const text = [];
 
 	if (delay.interval !== 'none') {
-		text.push('Wait at least ', <b>{ delay.period } { delay.interval }</b>);
+		text.push('Wait at least ', <Highlight>{ delay.period } { delay.interval }</Highlight>);
 	}
 
 	if (delay.run_on !== 'any') {
@@ -45,26 +60,29 @@ function FixedDelay ({ delay }) {
 
 		switch (delay.run_on) {
 			case 'weekday':
-				text.push(' on a ', <b>{ 'weekday' }</b>);
+				text.push(' on a ', <Highlight>{ 'weekday' }</Highlight>);
 				break;
 			case 'weekend':
-				text.push(' on a ', <b>{ 'weekend' }</b>);
+				text.push(' on a ', <Highlight>{ 'weekend' }</Highlight>);
 				break;
 			case 'day_of_week':
 
 				text.push(delay.days_of_week_type === 'any'
-					? ' on any '
+					? ' on '
 					: ( <>{ ' on the ' }
-						<b>{ delay.days_of_week_type }</b> </> ),
+						<Highlight>{ delay.days_of_week_type }</Highlight> </> ),
 				);
 
 				const days = delay.days_of_week;
 
-				text.push(<ItemsCommaOrList items={ delay.days_of_week.map( item=>item.label ) }/>);
+				text.push(<Highlight><ItemsCommaOrList
+					items={ delay.days_of_week.map( item=>item.label ) }
+				/></Highlight>);
 
 				if (delay.months_of_year_type !== 'any') {
-					text.push(' of ', <ItemsCommaOrList
-						items={ delay.months_of_year }/>);
+					text.push(' of ', <Highlight><ItemsCommaOrList
+						items={ delay.months_of_year.map( item=>item.label ) }
+					/></Highlight>);
 				}
 
 				break;
@@ -93,7 +111,7 @@ function FixedDelay ({ delay }) {
 
 	text.push(<TimeDelayFragment delay={ delay }/>);
 
-	return <>{ text }</>;
+	return <>{ text.map( (item,i) => <Fragment key={i}>{item}</Fragment>) }</>;
 }
 
 function DateDelay ({ delay }) {
@@ -115,7 +133,7 @@ function DateDelay ({ delay }) {
 
 	text.push(<TimeDelayFragment delay={ delay }/>);
 
-	return <>{ text }</>;
+	return <>{ text.map( (item,i) => <Fragment key={i}>{item}</Fragment>) }</>;
 }
 
 export function DisplayDelay (props) {
@@ -127,7 +145,7 @@ export function DisplayDelay (props) {
 	switch (delay.type) {
 		default:
 		case 'instant':
-			timeDisplay = 'Run immediately...';
+			timeDisplay = __( 'Run immediately...', 'groundhogg' );
 			break;
 		case 'fixed':
 			timeDisplay = <FixedDelay delay={ delay }/>;

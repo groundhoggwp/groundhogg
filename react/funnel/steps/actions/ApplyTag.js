@@ -1,47 +1,59 @@
-import React from "react";
-import {ItemsCommaAndList, TagPicker} from "../../components/BasicControls/basicControls";
-import {registerStepType, SimpleEditModal} from "../steps";
+import React from 'react';
+import {
+	ItemsCommaAndList,
+	TagPicker,
+	TagSpan,
+} from '../../components/BasicControls/basicControls';
+import { registerStepType, SimpleEditModal } from '../steps';
+import { Dashicon } from '../../components/Dashicon/Dashicon';
 
-registerStepType("apply_tag", {
+const { __, _x, _n, _nx } = wp.i18n;
 
-    icon: ghEditor.steps.apply_tag.icon,
-    group: ghEditor.steps.apply_tag.group,
+registerStepType('apply_tag', {
 
-    title: ({data, context, settings}) => {
+	icon: ghEditor.steps.apply_tag.icon,
+	group: ghEditor.steps.apply_tag.group,
 
-        if (!context || !context.tags_display ||
-            !context.tags_display.length) {
-            return <>{"Select tags to add..."}</>;
-        }
+	title: ({ data, context, settings }) => {
 
-        return <>{"Apply"} <ItemsCommaAndList
-            items={context.tags_display.map(tag => tag.label)}/></>;
-    },
+		if (!context || !context.tags_display ||
+			!context.tags_display.length) {
+			return <>{ __('Select tags to add...', 'groundhogg') }</>;
+		}
 
-    edit: ({data, context, settings, updateSettings, commit, done}) => {
+		return <>{ _x('Apply', 'tag step title', 'groundhogg') } <ItemsCommaAndList
+			separator={ '' }
+			items={ context.tags_display.map(tag => <TagSpan
+				tagName={ tag.label }
+			/>) }/></>;
+	},
 
-        const tagsChanged = (values) => {
-            updateSettings({
-                tags: values.map(tag => tag.value),
-            }, {
-                tags_display: values
-            } );
-        };
+	edit: ({ data, context, settings, updateSettings, commit, done }) => {
 
-        return (
-            <SimpleEditModal
-                title={"Apply tags..."}
-                done={done}
-                commit={commit}
-            >
-                <TagPicker
-                    id={"tags"}
-                    value={(context && context.tags_display) || false}
-                    update={tagsChanged}
-                />
-                <p className={"description"}>{"Add new tags by hitting [enter] or [tab]"}</p>
-            </SimpleEditModal>
-        );
-    }
+		const tagsChanged = (values) => {
+			updateSettings({
+				tags: values.map(tag => tag.value),
+			}, {
+				tags_display: values,
+			});
+		};
+
+		return (
+			<SimpleEditModal
+				title={ __('Apply tags...', 'groundhogg') }
+				done={ done }
+				commit={ commit }
+			>
+				<TagPicker
+					id={ 'tags' }
+					value={ ( context && context.tags_display ) || false }
+					update={ tagsChanged }
+				/>
+				<p className={ 'description' }>{ __(
+					'Create a new tag by entering the name and pressing [enter]',
+					'groundhogg') }</p>
+			</SimpleEditModal>
+		);
+	},
 
 });

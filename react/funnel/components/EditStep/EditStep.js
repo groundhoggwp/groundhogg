@@ -84,7 +84,7 @@ export class EditStep extends React.Component {
 
         this.setState({saving: true});
 
-        console.debug(this.state);
+        // console.debug(this.state);
 
         axios.patch(groundhogg_endpoints.steps, {
             step_id: this.state.step.ID,

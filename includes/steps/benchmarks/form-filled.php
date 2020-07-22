@@ -131,7 +131,7 @@ class Form_Filled extends Benchmark {
 	}
 
 	public function get_default_form() {
-		return "[row][col width=\"1/2\"][first required=\"true\" label=\"First Name *\" placeholder=\"John\"][/col][col width=\"1/2\"][last required=\"true\" label=\"Last Name *\" placeholder=\"Doe\"][/col][/row][row][col width=\"1/1\"][email required=\"true\" label=\"Email *\" placeholder=\"email@example.com\"][/col][/row][row][col width=\"1/1\"][submit text=\"Submit\"][/col][/row]";
+		return "[row][col width=\"1/2\"][first required=\"true\" label=\"First Name\" placeholder=\"John\"][/col][col width=\"1/2\"][last required=\"true\" label=\"Last Name\" placeholder=\"Doe\"][/col][/row][row][col width=\"1/1\"][email required=\"true\" label=\"Email\" placeholder=\"email@example.com\"][/col][/row][row][col width=\"1/1\"][submit text=\"Submit\"][/col][/row]";
 	}
 
 	/**
@@ -818,6 +818,7 @@ class Form_Filled extends Benchmark {
 	public function save( $step ) {
 		$this->save_setting( 'form_name', sanitize_text_field( $this->get_posted_data( 'form_name' ) ) );
 		$this->save_setting( 'form', wp_kses_post( $this->get_posted_data( 'form' ) ) );
+		$this->save_setting( 'form_json', $this->get_posted_data( 'form_json', [] ) );
 		$this->save_setting( 'success_page', sanitize_text_field( $this->get_posted_data( 'success_page' ) ) );
 		$this->save_setting( 'success_message', sanitize_textarea_field( $this->get_posted_data( 'success_message' ) ) );
 		$this->save_setting( 'enable_ajax', absint( $this->get_posted_data( 'enable_ajax' ) ) );
@@ -840,7 +841,7 @@ class Form_Filled extends Benchmark {
 
 		$context[ 'embed' ] = $embed;
 		$context[ 'url' ] = esc_url( $form->get_submission_url() );
-		$context[ 'as_json' ] = convert_form_shortcode_to_json( $this->get_setting( 'form' ) );
+		$context[ 'default_form_json' ] = convert_form_shortcode_to_json( $this->get_setting( 'form', $this->get_default_form() ) );
 
 		return $context;
 	}

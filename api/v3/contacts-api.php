@@ -246,6 +246,14 @@ class Contacts_Api extends Base {
 			]
 		] );
 
+		register_rest_route( self::NAME_SPACE, '/contacts/meta-keys', [
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'get_meta_keys' ],
+				'permission_callback' => $auth_callback,
+			],
+		] );
+
 
 	}
 
@@ -642,6 +650,25 @@ class Contacts_Api extends Base {
 		}
 
 		return self::SUCCESS_RESPONSE();
+	}
+
+	/**
+	 * Get meta keys
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function get_meta_keys( WP_REST_Request $request ){
+		if ( ! current_user_can( 'view_contacts' ) ) {
+			return self::ERROR_INVALID_PERMISSIONS();
+		}
+
+		$search = $request->get_param( 'search' )?: $request->get_param( 's' );
+
+		$keys = get_db( 'contactmeta' )->get_keys( sanitize_text_field( $search ) );
+
+		return self::SUCCESS_RESPONSE( $keys );
 	}
 
 }
