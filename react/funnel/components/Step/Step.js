@@ -10,7 +10,6 @@ import { reloadEditor } from '../Editor/Editor';
 import { FadeOut } from '../Animations/Animations';
 import { DelayControl } from './DelayControl/DelayControl';
 import { StepEdit, StepTitle } from '../../steps/steps';
-import { objEquals } from '../../App';
 
 export class Step extends React.Component {
 
@@ -27,6 +26,7 @@ export class Step extends React.Component {
 			context: props.step.context,
 			tempContext: {},
 			data: props.step.data,
+			delay: props.step.delay,
 		};
 
 		this.handleControlAction = this.handleControlAction.bind(this);
@@ -36,6 +36,7 @@ export class Step extends React.Component {
 		this.afterFadeOut = this.afterFadeOut.bind(this);
 		this.updateSettings = this.updateSettings.bind(this);
 		this.commitSettings = this.commitSettings.bind(this);
+		this.updateDelay = this.updateDelay.bind(this);
 	}
 
 	handleEdit (e) {
@@ -90,6 +91,15 @@ export class Step extends React.Component {
 		});
 	}
 
+	updateDelay(newDelay) {
+		this.setState( {
+			delay: {
+				...this.state.delay,
+				...newDelay
+			}
+		}, this.commitSettings );
+	}
+
 	commitSettings () {
 
 		this.setState({ saving: true });
@@ -97,8 +107,10 @@ export class Step extends React.Component {
 		axios.patch(groundhogg_endpoints.steps, {
 			step_id: this.props.step.ID,
 			settings: this.state.tempSettings,
+			delay: this.state.delay,
 		}).then(result => this.setState({
 			settings: result.data.step.settings,
+			delay: result.data.step.delay,
 			context: result.data.step.context,
 			step: result.data.step,
 			saving: false,
@@ -150,7 +162,11 @@ export class Step extends React.Component {
 				key={ this.props.key }
 				className={ 'step-wrap' }
 			>
-				{ group === 'action' && <DelayControl step={ step }/> }
+				{ group === 'action' && <DelayControl
+					delay={ this.state.delay }
+					updateDelay={ this.updateDelay }
+					commit={ this.commitSettings }
+				/> }
 				<div className={ group === 'action'
 					? 'line-left'
 					: 'no-line' }>

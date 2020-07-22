@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import moment from 'moment';
 import { ItemsCommaOrList } from '../../../BasicControls/basicControls';
+import { parseArgs } from '../../../../App';
 
 const { __, _x, _n, _nx } = wp.i18n;
 
@@ -44,6 +45,14 @@ function TimeDelayFragment ({ delay }) {
 function FixedDelay ({ delay }) {
 
 	const text = [];
+
+	delay = parseArgs( delay, {
+		period: 0,
+		interval: 'none',
+		run_on: 'any',
+		days_of_week: [],
+		months_of_year: []
+	} );
 
 	if (delay.interval !== 'none') {
 		text.push('Wait at least ', <Highlight>{ delay.period } { delay.interval }</Highlight>);

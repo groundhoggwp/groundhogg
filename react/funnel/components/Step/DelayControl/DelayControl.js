@@ -1,65 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dashicon } from '../../Dashicon/Dashicon';
 import { EditDelayControl } from './EditDelayControl/EditDelayControl';
 import { DisplayDelay } from './DisplayDelay/DisplayDelay';
-import axios from 'axios';
 
-export class DelayControl extends React.Component {
+export function DelayControl ({ delay, updateDelay }) {
 
-	constructor (props) {
-		super(props);
+	const [show, setShow] = useState(false);
+	const [tempDelay, setTempDelay] = useState(delay);
 
-		this.state = {
-			editing: false,
-			delay: props.step.delay,
-		};
-
-		this.handleClick = this.handleClick.bind(this);
-		this.cancelEditing = this.cancelEditing.bind(this);
-		this.doneEditing = this.doneEditing.bind(this);
-	}
-
-	handleClick (e) {
-		this.setState({
-			editing: true,
+	const updateTempDelay = (newTempDelay) => {
+		setTempDelay({
+			...tempDelay,
+			...newTempDelay
 		});
-	}
+	};
 
-	cancelEditing () {
-		this.setState({
-			editing: false,
-		});
-	}
+	const saveChanges = () => {
+		updateDelay(tempDelay);
+		setShow(false);
+	};
 
-	doneEditing (delay) {
-		axios.patch(groundhogg_endpoints.steps, {
-			step_id: this.props.step.ID,
-			delay: delay,
-		}).then(result => this.setState({
-			delay: result.data.step.delay,
-			editing: false,
-		})).catch(error => this.setState({
-			error: error,
-			editing: false,
-		}));
-	}
+	const cancelChanges = () => {
+		setTempDelay(delay);
+		setShow(false);
+	};
 
-	render () {
-		const delay = this.state.delay;
-
-		return (
-			<div className={ 'delay' }>
-				<Dashicon icon={ 'clock' }/>
-				<span className={ 'delay-text' } onClick={ this.handleClick }>
-                    <DisplayDelay delay={ delay }/>
-                </span>
-				<EditDelayControl
-					show={ this.state.editing }
-					delay={ delay }
-					save={ this.doneEditing }
-					cancel={ this.cancelEditing }/>
-			</div>
-		);
-	}
+	return (
+		<div className={ 'delay' }>
+			<Dashicon icon={ 'clock' }/>
+			<span className={ 'delay-text' } onClick={ () => setShow(true) }>
+                <DisplayDelay delay={ delay }/>
+            </span>
+			<EditDelayControl
+				show={ show }
+				delay={ tempDelay }
+				updateDelay={ updateTempDelay }
+				save={ saveChanges }
+				cancel={ cancelChanges }/>
+		</div>
+	);
 
 }
