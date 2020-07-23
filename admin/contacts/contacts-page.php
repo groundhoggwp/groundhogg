@@ -1100,7 +1100,8 @@ class Contacts_Page extends Admin_Page {
 		$this->add_notice( 'saved', __( 'Search saved!', 'groundhogg' ) );
 
 		// stay on page...
-		return true;
+
+		return admin_page_url( 'gh_contacts', $query );
 	}
 
 	/**

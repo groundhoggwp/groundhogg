@@ -121,7 +121,7 @@ class Broadcasts_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		$config = [];
+		$meta = [];
 
 		$object_id = isset( $_POST['object_id'] ) ? intval( $_POST['object_id'] ) : null;
 		if ( ! $object_id ) {
@@ -129,10 +129,10 @@ class Broadcasts_Page extends Admin_Page {
 		}
 
 		/* Set the object  */
-		$config['object_id']   = $object_id;
-		$config['object_type'] = isset( $_REQUEST['type'] ) && $_REQUEST['type'] === 'sms' ? 'sms' : 'email';
+		$meta['object_id']   = $object_id;
+		$meta['object_type'] = isset( $_REQUEST['type'] ) && $_REQUEST['type'] === 'sms' ? 'sms' : 'email';
 
-		if ( $config['object_type'] === 'email' ) {
+		if ( $meta['object_type'] === 'email' ) {
 
 			$email = Plugin::$instance->utils->get_email( $object_id );
 
@@ -150,7 +150,7 @@ class Broadcasts_Page extends Admin_Page {
 		$send_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $time_string ) );
 
 		if ( isset( $_POST['send_now'] ) ) {
-			$config['send_now'] = true;
+			$meta['send_now'] = true;
 			$send_time          = time() + 10;
 		}
 
@@ -159,7 +159,7 @@ class Broadcasts_Page extends Admin_Page {
 		}
 
 		/* Set the email */
-		$config['send_time'] = $send_time;
+		$meta['send_time'] = $send_time;
 
 		$include_tags = validate_tags( get_post_var( 'tags', [] ) );
 		$exclude_tags = validate_tags( get_post_var( 'exclude_tags', [] ) );
@@ -192,10 +192,10 @@ class Broadcasts_Page extends Admin_Page {
 		] );
 
 		// Assume marketing by default...
-		$config['is_transactional'] = false;
+		$meta['is_transactional'] = false;
 
 		// if the email is a transactional email we will remove the optin statuses from the query
-		if ( $config['object_type'] === 'email' && isset( $email ) && $email->is_transactional() ) {
+		if ( $meta['object_type'] === 'email' && isset( $email ) && $email->is_transactional() ) {
 
 			// Include additional statuses
 			unset( $query['optin_status'] );
@@ -207,17 +207,17 @@ class Broadcasts_Page extends Admin_Page {
 			];
 
 			// make transactional
-			$config['is_transactional'] = true;
+			$meta['is_transactional'] = true;
 		}
 
 		$query = array_filter( $query );
 
 		$args = array(
 			'object_id'    => $object_id,
-			'object_type'  => $config['object_type'],
+			'object_type'  => $meta['object_type'],
 			'send_time'    => $send_time,
 			'scheduled_by' => get_current_user_id(),
-			'status'       => 'scheduled',
+			'status'       => 'pending',
 			'query'        => $query,
 		);
 
@@ -233,35 +233,45 @@ class Broadcasts_Page extends Admin_Page {
 			return new \WP_Error( 'unable_to_add_broadcast', __( 'Something went wrong while adding the broadcast.', 'groundhogg' ) );
 		}
 
-		$config['broadcast_id'] = $broadcast_id;
-
-		$config['contact_query'] = $query;
-
 		if ( isset( $_POST['send_in_timezone'] ) ) {
-			$config['send_in_local_time'] = true;
+			$meta['send_in_local_time'] = true;
 		}
 
-		set_transient( 'gh_get_broadcast_config', $config, HOUR_IN_SECONDS );
+		$broadcast = new Broadcast( $broadcast_id );
+
+		foreach ( $meta as $key => $value ) {
+			$broadcast->update_meta( $key, $value );
+        }
+
+		set_transient( 'gh_get_broadcast_config', $meta, HOUR_IN_SECONDS );
 
 		/**
 		 * Fires after the broadcast is added to the DB but before the user is redirected to the scheduler
 		 *
 		 * @param int $broadcast_id the ID of the broadcast
-		 * @param array $config the config object which is passed to the scheduler
+		 * @param array $meta the config object which is passed to the scheduler
 		 */
-		do_action( 'groundhogg/admin/broadcast/scheduled', $broadcast_id, $config );
+		do_action( 'groundhogg/admin/broadcast/scheduled', $broadcast_id, $meta );
 
 		$this->add_notice( 'review', __( 'Review your broadcast before scheduling!', 'groundhogg' ), 'warning' );
 
 		// Go through the preview step...
-		if ( $config['object_type'] === 'email' ) {
+		if ( $meta['object_type'] === 'email' ) {
 			return admin_page_url( 'gh_broadcasts', [
 				'action'    => 'preview',
 				'broadcast' => $broadcast_id,
 			] );
 		}
 
-		return $this->scheduler->get_start_url();
+		return $this->scheduler->get_start_url( [ 'broadcast' => $broadcast_id ] );
+	}
+
+	public function process_confirm_send(){
+		if ( ! current_user_can( 'schedule_broadcasts' ) ) {
+			$this->wp_die_no_access();
+		}
+
+
 	}
 
 	/**

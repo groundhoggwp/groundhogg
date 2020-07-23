@@ -3,9 +3,11 @@
 namespace Groundhogg\Admin\Broadcasts;
 
 use Groundhogg\Broadcast;
+use Groundhogg\Bulk_Jobs\Broadcast_Scheduler;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Event;
 use function Groundhogg\_nf;
+use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
@@ -73,8 +75,8 @@ class Broadcasts_Table extends WP_List_Table {
 	 *
 	 * bulk steps or checkboxes, simply leave the 'cb' entry out of your array.
 	 *
-	 * @return array An associative array containing column information.
 	 * @see WP_List_Table::::single_row_columns()
+	 * @return array An associative array containing column information.
 	 */
 	public function get_columns() {
 
@@ -96,13 +98,17 @@ class Broadcasts_Table extends WP_List_Table {
 			unset( $columns['query'] );
 		} else if ( $this->get_view() === 'scheduled' ) {
 			unset( $columns['stats'] );
+		} else if ( $this->get_view() === 'pending' ) {
+			unset( $columns['stats'] );
+			unset( $columns['sending_to'] );
+			$columns[ 'process_schedule' ] = _x( 'Finish Scheduling', 'Column label', 'groundhogg' );
 		}
 
 		/**
 		 * Filter the columns
 		 *
 		 * @param $columns array the columns for the given view
-		 * @param $view string the current view of the table
+		 * @param $view    string the current view of the table
 		 */
 		return apply_filters( 'groundhogg/admin/broadcasts/table/columns', $columns, $this->get_view() );
 	}
@@ -128,7 +134,7 @@ class Broadcasts_Table extends WP_List_Table {
 		 * Filter the columns
 		 *
 		 * @param $columns array the columns for the given view
-		 * @param $view string the current view of the table
+		 * @param $view    string the current view of the table
 		 */
 		return apply_filters( 'groundhogg/admin/broadcast/table/sortable_columns', $sortable_columns, $this->get_view() );
 	}
@@ -143,12 +149,14 @@ class Broadcasts_Table extends WP_List_Table {
 			'scheduled' => get_db( 'broadcasts' )->count( [ 'status' => 'scheduled' ] ),
 			'sent'      => get_db( 'broadcasts' )->count( [ 'status' => 'sent' ] ),
 			'cancelled' => get_db( 'broadcasts' )->count( [ 'status' => 'cancelled' ] ),
+			'pending'   => get_db( 'broadcasts' )->count( [ 'status' => 'pending' ] ),
 		);
 
 		$titles = [
 			'scheduled' => _x( 'Scheduled', 'view', 'groundhogg' ),
 			'sent'      => _x( 'Sent', 'view', 'groundhogg' ),
 			'cancelled' => _x( 'Cancelled', 'view', 'groundhogg' ),
+			'pending'   => _x( 'Pending', 'view', 'groundhogg' ),
 		];
 
 		// If there are no scheduled broadcasts, go to the sent view
@@ -434,10 +442,27 @@ class Broadcasts_Table extends WP_List_Table {
 	}
 
 	/**
+	 * @param $broadcast Broadcast
+	 *
+	 * @return string
+	 */
+	protected function column_process_schedule( $broadcast ){
+		$confirm_link = admin_page_url( 'gh_broadcasts', [
+			'action'    => 'preview',
+			'broadcast' => $broadcast->get_id(),
+		] );
+
+		return html()->e( 'a', [
+			'href' => $confirm_link,
+			'class' => 'button'
+		], __( 'Finish Scheduling' ) );
+	}
+
+	/**
 	 * For more detailed insight into how columns are handled, take a look at
 	 * WP_List_Table::single_row_columns()
 	 *
-	 * @param object $broadcast A singular item (one full row's worth of data).
+	 * @param object $broadcast   A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string Text or HTML to be placed inside the column <td>.

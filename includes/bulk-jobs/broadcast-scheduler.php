@@ -10,6 +10,7 @@ use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
 use Groundhogg\Plugin;
+use function Groundhogg\get_url_var;
 
 /**
  * Created by PhpStorm.
@@ -62,17 +63,11 @@ class Broadcast_Scheduler extends Bulk_Job {
 			return $items;
 		}
 
+		$broadcast = new Broadcast( absint( get_url_var( 'broadcast' ) ) );
+
 		$query = new Contact_Query();
-		$args  = get_request_query();
 
-		if ( empty( $args ) ) {
-			$config = get_transient( 'gh_get_broadcast_config' );
-			if ( $config ) {
-				$args = $config['contact_query'];
-			}
-		}
-
-		$contacts = $query->query( $args );
+		$contacts = $query->query( $broadcast->get_query() );
 
 		$ids = wp_list_pluck( $contacts, 'ID' );
 
@@ -174,6 +169,7 @@ class Broadcast_Scheduler extends Bulk_Job {
 	 * @return void
 	 */
 	protected function pre_loop() {
+
 		$config = get_transient( 'gh_get_broadcast_config' );
 
 		$config = wp_parse_args( $config, [
