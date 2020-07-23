@@ -1,6 +1,6 @@
 {
   "name": "groundhogg",
-  "version": "2.1.8",
+  "version": "2.2.18",
   "license": "MIT",
   "main": "blocks/gutenberg/index.js",
   "scripts": {
