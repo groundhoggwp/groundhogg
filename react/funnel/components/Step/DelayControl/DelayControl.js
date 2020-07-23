@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Dashicon } from '../../Dashicon/Dashicon';
-import { EditDelayControl } from './EditDelayControl/EditDelayControl';
-import { DisplayDelay } from './DisplayDelay/DisplayDelay';
+import { EditDelayModal } from './EditDelayControl/EditDelayModal';
+import { parseArgs } from '../../../App';
+import { RenderDelay } from './EditDelayControl/delay'
 
 export function DelayControl ({ delay, updateDelay }) {
 
@@ -11,7 +12,7 @@ export function DelayControl ({ delay, updateDelay }) {
 	const updateTempDelay = (newTempDelay) => {
 		setTempDelay({
 			...tempDelay,
-			...newTempDelay
+			...newTempDelay,
 		});
 	};
 
@@ -25,15 +26,26 @@ export function DelayControl ({ delay, updateDelay }) {
 		setShow(false);
 	};
 
+	const mergedDelay = parseArgs(tempDelay, {
+		period: 0,
+		type: 'instant',
+		interval: 'none',
+		run_on: 'any',
+		days_of_week_type: 'any',
+		months_of_year_type: 'any',
+		days_of_week: [],
+		months_of_year: [],
+	});
+
 	return (
 		<div className={ 'delay' }>
 			<Dashicon icon={ 'clock' }/>
 			<span className={ 'delay-text' } onClick={ () => setShow(true) }>
-                <DisplayDelay delay={ delay }/>
+                <RenderDelay delay={ mergedDelay }/>
             </span>
-			<EditDelayControl
+			<EditDelayModal
 				show={ show }
-				delay={ tempDelay }
+				delay={ mergedDelay }
 				updateDelay={ updateTempDelay }
 				save={ saveChanges }
 				cancel={ cancelChanges }/>

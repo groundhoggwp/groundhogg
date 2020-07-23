@@ -668,7 +668,7 @@ class Contacts_Api extends Base {
 
 		$keys = get_db( 'contactmeta' )->get_keys( sanitize_text_field( $search ) );
 
-		return self::SUCCESS_RESPONSE( $keys );
+		return self::SUCCESS_RESPONSE( [ 'keys' => $keys ] );
 	}
 
 }

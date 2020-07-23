@@ -55,6 +55,15 @@ class Main_Installer extends Installer {
 
 		// Store previous updates
 		Plugin::instance()->updater->save_previous_updates_when_installed();
+
+		$user = wp_get_current_user();
+
+		get_db( 'contacts' )->add( [
+			'first_name' => $user->first_name,
+			'last_name'  => $user->last_name,
+			'email'      => $user->user_email,
+			'user_id'    => $user->ID
+		] );
 	}
 
 	public function get_display_name() {
@@ -100,7 +109,7 @@ class Main_Installer extends Installer {
 	public function plugin_activated( $plugin ) {
 
 		// Ignore the redirect if quietly activating.
-		if ( doing_rest() || wp_doing_ajax() || wp_doing_cron() || get_url_var( 'action' ) !== 'activate' ){
+		if ( doing_rest() || wp_doing_ajax() || wp_doing_cron() || get_url_var( 'action' ) !== 'activate' ) {
 			return;
 		}
 

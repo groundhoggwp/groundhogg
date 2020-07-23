@@ -3,7 +3,7 @@ import { registerStepType, SimpleEditModal } from '../steps';
 import { Button, Col, Row, Tab, Tabs } from 'react-bootstrap';
 import {
 	ClearFix,
-	CopyInput,
+	CopyInput, CustomFieldPicker,
 	LinkPicker, TagSpan,
 	TextArea,
 	YesNoToggle,
@@ -22,7 +22,9 @@ registerStepType('form_fill', {
 	group: ghEditor.steps.form_fill.group,
 
 	title: ({ data, context, settings }) => {
-		return <>{ _x( 'When', 'form step title', 'groundhogg' ) } <TagSpan icon={'editor-table'} tagName={settings.form_name}/> { _x( 'is filled', 'form step title', 'groundhogg' ) }</>;
+		return <>{ _x('When', 'form step title', 'groundhogg') } <TagSpan
+			icon={ 'editor-table' } tagName={ settings.form_name }/> { _x(
+			'is filled', 'form step title', 'groundhogg') }</>;
 	},
 
 	edit: ({ data, context, settings, updateSettings, commit, done }) => {
@@ -71,7 +73,7 @@ function renderTab (
 	});
 
 	return (
-		<Tab eventKey={ tab } title={ editFormTabs[tab].title }>
+		<Tab key={ tab } eventKey={ tab } title={ editFormTabs[tab].title }>
 			{ tabContent }
 		</Tab>
 	);
@@ -80,7 +82,7 @@ function renderTab (
 const editFormTabs = {
 	form: {
 		id: 'form',
-		title: __( 'Form', 'tab name', 'groundhogg' ),
+		title: __('Form', 'tab name', 'groundhogg'),
 		render: ({ context, settings, updateSettings, updateSetting }) => {
 
 			const formUpdated = (newJson) => {
@@ -105,14 +107,17 @@ const editFormTabs = {
 	},
 	submit: {
 		id: 'submit',
-		title: __( 'Submit', 'tab name', 'groundhogg' ),
+		title: __('Submit', 'tab name', 'groundhogg'),
 		render: ({ settings, updateSetting }) => {
 			return (
 				<>
 					<Row className={ 'step-setting-control no-margins' }>
 						<Col sm={ 4 }>
-							<label>{ __( 'Stay on page after submit?', 'groundhogg' ) }</label>
-							<p className={ 'description' }>{ __( 'This will prevent the contact from being redirected after submitting the form.', 'groundogg' ) }</p>
+							<label>{ __('Stay on page after submit?',
+								'groundhogg') }</label>
+							<p className={ 'description' }>{ __(
+								'This will prevent the contact from being redirected after submitting the form.',
+								'groundogg') }</p>
 						</Col>
 						<Col sm={ 8 }>
 							<YesNoToggle
@@ -153,7 +158,7 @@ const editFormTabs = {
 	},
 	embed: {
 		id: 'embed',
-		title: __( 'Embed', 'groundhogg' ),
+		title: __('Embed', 'groundhogg'),
 		render: ({ context }) => {
 			return ( <>
 				<Row className={ 'step-setting-control no-margins' }>
@@ -292,6 +297,7 @@ function FieldsEditor ({ fields, formUpdated }) {
 				className={ 'form-fields' }
 			>
 				{ fields.map(field => <FieldSortable
+					key={ field.id }
 					field={ field }
 					onDelete={ deleteField }
 					onEdit={ editField }
@@ -326,7 +332,6 @@ function FieldSortable ({ field, onDelete, onEdit }) {
 
 	return (
 		<div
-			key={ field.id }
 			className={ 'field-sortable-item form-field' }
 			onClick={ (e) => onEdit(field.id) }
 		>
@@ -377,10 +382,12 @@ function FieldEditor ({ field, onEdit, updateField }) {
 						        e.target.value) }>
 						{ Object.values(FieldTypes).
 							map(type => <option
+								key={type.type}
 								value={ type.type }>{ type.name }</option>) }
 					</select>
 				</BasicAttributeControlGroup>
 				{ attrs.map(attr => <FieldAttribute
+					key={ attr }
 					type={ attr }
 					value={ attributes[attr] }
 					updateAttribute={ updateAttribute }
@@ -393,6 +400,7 @@ function FieldEditor ({ field, onEdit, updateField }) {
 						        e.target.value) }>
 						{ Object.keys(widthMap).
 							map(width => <option
+								key={width}
 								value={ width }>{ width }</option>) }
 					</select>
 				</BasicAttributeControlGroup>
@@ -505,10 +513,10 @@ const fieldAttributes = {
 				<BasicAttributeControlGroup
 					label={ 'Custom Field Name' }
 				>
-					<textarea
+					<CustomFieldPicker
 						value={ value }
-						onChange={ (e) => updateAttribute('text',
-							e.target.value) }
+						update={ (value) => updateAttribute('name',
+							value) }
 					/>
 				</BasicAttributeControlGroup>
 			);
@@ -539,7 +547,8 @@ const fieldAttributes = {
 					<Col>
 						<YesNoToggle
 							value={ value }
-							update={ (value) => updateAttribute('showDescription',
+							update={ (value) => updateAttribute(
+								'showDescription',
 								value) }
 						/>
 					</Col>
@@ -722,12 +731,12 @@ const FieldTypes = {
 				label: 'I consent...',
 			});
 
-			attributes = parseArgs( {
+			attributes = parseArgs({
 				name: 'gdpr_consent',
 				id: 'gdpr_consent',
 				required: true,
 				value: 'yes',
-			}, attributes );
+			}, attributes);
 
 			return <CheckboxFieldGroup
 				attributes={ attributes }
@@ -746,11 +755,11 @@ const FieldTypes = {
 				required: true,
 			});
 
-			attributes = parseArgs( {
+			attributes = parseArgs({
 				name: 'agree_terms',
 				id: 'agree_terms',
 				value: 'yes',
-			}, attributes );
+			}, attributes);
 
 			return <CheckboxFieldGroup
 				attributes={ attributes }
@@ -815,9 +824,9 @@ const FieldTypes = {
 		],
 		render: function ({ attributes }) {
 			return <BasicFieldGroup
-				label={attributes.label}
-				hideLabel={attributes.hideLabel}
-				isRequired={attributes.required}
+				label={ attributes.label }
+				hideLabel={ attributes.hideLabel }
+				isRequired={ attributes.required }
 			>
 				<textarea
 					id={ attributes.id }
@@ -847,10 +856,10 @@ const FieldTypes = {
 			return <InputFieldGroup
 				type={ 'number' }
 				attributes={ attributes }
-				inputProps={{
+				inputProps={ {
 					min: attributes.min,
 					max: attributes.max,
-				}}
+				} }
 			/>;
 		},
 	},
@@ -973,17 +982,17 @@ function renderField (field) {
 
 }
 
-function BasicFieldGroup ({hideLabel, label, isRequired, children}) {
+function BasicFieldGroup ({ hideLabel, label, isRequired, children }) {
 
 	if (hideLabel) {
-		return <>{children}</>;
+		return <>{ children }</>;
 	}
 
 	return (
 		<label className={ 'gh-input-label' }>
 			{ label } { isRequired &&
 		<span className={ 'is-required' }>*</span> }
-			{children}
+			{ children }
 		</label>
 	);
 }
