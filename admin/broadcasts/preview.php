@@ -46,7 +46,21 @@ $num_contacts = get_db( 'contacts' )->count( $query );
         </tr>
         <tr>
             <th><?php _e( 'Subject Line', 'groundhogg' ); ?></th>
-            <td><?php esc_html_e( $object->get_subject_line() ); ?></td>
+            <td><p><?php esc_html_e( $object->get_subject_line() ); ?></p>
+                <p>
+	            <?php echo html()->button( [
+		            'title' => __( 'Mobile Preview' ),
+		            'text'  => '<span class="dashicons dashicons-smartphone"></span>',
+		            'class' => 'button button-secondary dash-button show-email-preview',
+	            ] ); ?>
+	            <?php echo html()->button( [
+		            'title' => __( 'Desktop Preview' ),
+		            'text'  => '<span class="dashicons dashicons-desktop"></span>',
+		            'class' => 'button button-secondary dash-button show-email-preview',
+	            ] ); ?>
+                </p>
+                <p class="description"><?php _e( 'Preview your email on different size devices before sending.', 'groundhogg' ); ?></p>
+            </td>
         </tr>
 	<?php elseif ( $broadcast->is_sms() ): ?>
         <tr>
@@ -72,23 +86,6 @@ $num_contacts = get_db( 'contacts' )->count( $query );
             <p class="description"><?php _e( 'The approximate number of people this email will be sent to.', 'groundhogg' ); ?></p>
         </td>
     </tr>
-	<?php if ( $broadcast->is_email() ): ?>
-        <tr>
-            <th><?php _e( 'Preview', 'groundhogg' ); ?></th>
-            <td><?php echo html()->button( [
-					'title' => __( 'Mobile Preview' ),
-					'text'  => '<span class="dashicons dashicons-smartphone"></span>',
-					'class' => 'button button-secondary dash-button show-email-preview',
-				] ); ?>
-				<?php echo html()->button( [
-					'title' => __( 'Desktop Preview' ),
-					'text'  => '<span class="dashicons dashicons-desktop"></span>',
-					'class' => 'button button-secondary dash-button show-email-preview',
-				] ); ?>
-                <p class="description"><?php _e( 'Preview your email on different size devices before sending.', 'groundhogg' ); ?></p>
-            </td>
-        </tr>
-	<?php endif; ?>
 </table>
 <?php
 
