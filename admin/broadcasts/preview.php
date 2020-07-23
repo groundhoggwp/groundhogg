@@ -99,11 +99,21 @@ if ( $broadcast->is_email() ):
 	] )
 
 	?>
-    <a class="button button-primary" href="<?php echo esc_url( $confirm_link ); ?>"><?php _e( $text ); ?></a>
+    <a id="confirm-send" class="button button-primary"
+       href="<?php echo esc_url( $confirm_link ); ?>"><?php _e( $text ); ?></a>
     <span id="delete-link"><a class="delete" href="<?php echo esc_url( $cancel_url ); ?>">Cancel</a></span>
 </form>
 <script>
-	window.onbeforeunload = function() {
-		return '<?php esc_attr_e( 'Your broadcast will not be scheduled.', 'groundhogg' ); ?>';
-	};
+    (function ($) {
+
+        var confirmed = false;
+
+        $("#confirm-send").click(function (e) {
+            confirmed = true;
+        });
+
+        $(window).bind("beforeunload", function (event) {
+            if (!confirmed) return "Your broadcast has not been scheduled!";
+        });
+    })(jQuery);
 </script>

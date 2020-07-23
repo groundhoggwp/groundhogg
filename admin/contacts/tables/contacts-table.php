@@ -649,6 +649,28 @@ class Contacts_Table extends WP_List_Table {
 				<?php
 			}
 
+			if ( current_user_can( 'schedule_broadcasts' ) && $this->get_pagination_arg( 'total_items' ) > 0  ){
+
+				$broadcast_query = $this->query;
+
+				unset( $broadcast_query['number'] );
+				unset( $broadcast_query['limit'] );
+				unset( $broadcast_query['offset'] );
+
+				$broadcast_url = admin_page_url( 'gh_broadcasts', [
+					'action' => 'add',
+					'type'   => 'email',
+					'query'  => $broadcast_query,
+				] );
+
+				?>
+                <a class="button action broadcast-contacts"
+                   href="<?php echo esc_url( $broadcast_url ); ?>">
+                    <?php printf( _nx( 'Send a broadcast to %s contact', 'Send a broadcast to %s contacts', $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?>
+                </a>
+				<?php
+            }
+
 			do_action( 'groundhogg/admin/contacts/table/extra_tablenav', $this );
 
 			?></div><?php

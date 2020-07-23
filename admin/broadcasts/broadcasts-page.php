@@ -5,8 +5,10 @@ namespace Groundhogg\Admin\Broadcasts;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Broadcast;
 use Groundhogg\Bulk_Jobs\Broadcast_Scheduler;
+use Groundhogg\Contact_Query;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
+use Groundhogg\Saved_Searches;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
@@ -55,7 +57,7 @@ class Broadcasts_Page extends Admin_Page {
 	 * enqueue editor scripts
 	 */
 	public function scripts() {
-	    wp_enqueue_style( 'groundhogg-admin' );
+		wp_enqueue_style( 'groundhogg-admin' );
 		wp_enqueue_style( 'groundhogg-admin-email-preview' );
 		wp_enqueue_script( 'groundhogg-admin-email-preview' );
 	}
@@ -139,9 +141,6 @@ class Broadcasts_Page extends Admin_Page {
 			}
 		}
 
-		$include_tags = validate_tags( get_post_var( 'tags', [] ) );
-		$exclude_tags = validate_tags( get_post_var( 'exclude_tags', [] ) );
-
 		$send_date = isset( $_POST['date'] ) ? sanitize_text_field( $_POST['date'] ) : date( 'Y-m-d', strtotime( 'tomorrow' ) );
 		$send_time = isset( $_POST['time'] ) ? sanitize_text_field( $_POST['time'] ) : '09:30';
 
@@ -162,6 +161,9 @@ class Broadcasts_Page extends Admin_Page {
 		/* Set the email */
 		$config['send_time'] = $send_time;
 
+		$include_tags = validate_tags( get_post_var( 'tags', [] ) );
+		$exclude_tags = validate_tags( get_post_var( 'exclude_tags', [] ) );
+
 		$query = array(
 			'tags_include'           => $include_tags,
 			'tags_exclude'           => $exclude_tags,
@@ -169,29 +171,43 @@ class Broadcasts_Page extends Admin_Page {
 			'tags_exclude_needs_all' => absint( get_request_var( 'tags_exclude_needs_all' ) )
 		);
 
-		// Assume marketing by default...
-		$config[ 'is_transactional' ] = false;
+		// Use a saved search instead.
+		if ( $saved_search = sanitize_text_field( get_post_var( 'saved_search' ) ) ) {
+			$search = Saved_Searches::instance()->get( $saved_search );
+			if ( $search ) {
+				$query = $search['query'];
+			}
+		} else if ( $custom_query = get_post_var( 'custom_query' ) ) {
+			$query = map_deep( json_decode( $custom_query, true ), 'sanitize_text_field' );
+		}
 
-		// Add marketable statuses
-		$query[ 'optin_status' ] = [
-			Preferences::CONFIRMED,
-			Preferences::UNCONFIRMED,
-		];
+		// Unset the search param from the query...
+		unset( $query[ 'search' ] );
+
+		$query = wp_parse_args( $query, [
+			'optin_status' => [
+				Preferences::CONFIRMED,
+				Preferences::UNCONFIRMED,
+			]
+		] );
+
+		// Assume marketing by default...
+		$config['is_transactional'] = false;
 
 		// if the email is a transactional email we will remove the optin statuses from the query
-		if ( $config['object_type'] === 'email' && isset( $email ) && $email->is_transactional() ){
+		if ( $config['object_type'] === 'email' && isset( $email ) && $email->is_transactional() ) {
 
-		    // Include additional statuses
-            unset( $query[ 'optin_status' ] );
+			// Include additional statuses
+			unset( $query['optin_status'] );
 
-			$query[ 'optin_status_exclude' ] = [
-                Preferences::SPAM,
-                Preferences::HARD_BOUNCE,
-                Preferences::COMPLAINED
-            ];
+			$query['optin_status_exclude'] = [
+				Preferences::SPAM,
+				Preferences::HARD_BOUNCE,
+				Preferences::COMPLAINED
+			];
 
 			// make transactional
-			$config[ 'is_transactional' ] = true;
+			$config['is_transactional'] = true;
 		}
 
 		$query = array_filter( $query );
@@ -204,6 +220,12 @@ class Broadcasts_Page extends Admin_Page {
 			'status'       => 'scheduled',
 			'query'        => $query,
 		);
+
+		$num_contacts = get_db( 'contacts' )->count( $query );
+
+		if ( $num_contacts === 0 ) {
+			return new \WP_Error( 'error', __( 'No contacts match the given filters.', 'groundhogg' ) );
+		}
 
 		$broadcast_id = get_db( 'broadcasts' )->add( $args );
 
@@ -222,17 +244,17 @@ class Broadcasts_Page extends Admin_Page {
 		set_transient( 'gh_get_broadcast_config', $config, HOUR_IN_SECONDS );
 
 		/**
-         * Fires after the broadcast is added to the DB but before the user is redirected to the scheduler
-         *
+		 * Fires after the broadcast is added to the DB but before the user is redirected to the scheduler
+		 *
 		 * @param int $broadcast_id the ID of the broadcast
-         * @param array $config the config object which is passed to the scheduler
+		 * @param array $config the config object which is passed to the scheduler
 		 */
 		do_action( 'groundhogg/admin/broadcast/scheduled', $broadcast_id, $config );
 
 		$this->add_notice( 'review', __( 'Review your broadcast before scheduling!', 'groundhogg' ), 'warning' );
 
 		// Go through the preview step...
-		if ( $config['object_type'] === 'email' ){
+		if ( $config['object_type'] === 'email' ) {
 			return admin_page_url( 'gh_broadcasts', [
 				'action'    => 'preview',
 				'broadcast' => $broadcast_id,
@@ -254,8 +276,8 @@ class Broadcasts_Page extends Admin_Page {
 	}
 
 	/**
-     * Delete
-     *
+	 * Delete
+	 *
 	 * @return bool|\WP_Error
 	 */
 	public function process_delete() {
