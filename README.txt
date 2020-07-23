@@ -177,6 +177,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.18 (2020-07-23) =
+* ADDED New broadcast status of pending for broadcasts which have not been fully scheduled.
+* ADDED New broadcast support for saved searches and custom search form the contacts table.
+* TWEAKED SMS broadcasts will also go through the confirmation page.
+* FIXED Bug causing browser modal confirm when confirm to send a broadcast.
+
 = 2.2.17.1 (2020-07-06) =
 * HOT FIX Broadcast report using email_id for the events table although it's not ready yet.
 

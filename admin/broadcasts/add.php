@@ -87,11 +87,11 @@ $type = isset( $_REQUEST['type'] ) && $_REQUEST['type'] === 'sms' ? 'sms' : 'ema
 
 				if ( ! isset_not_empty( $_GET, 'query' ) ):
 
-					?><h4><?php
+					?><h3><?php
 
 					_e( 'Select contacts by tags.', 'groundhogg' );
 
-					?></h4><p><?php
+					?></h3><p><?php
 					$condition = html()->dropdown( [
 						'name'        => 'tags_include_needs_all',
 						'id'          => 'tags_include_needs_all',
@@ -142,7 +142,7 @@ $type = isset( $_REQUEST['type'] ) && $_REQUEST['type'] === 'sms' ? 'sms' : 'ema
 						?></p>
                         <h3><?php
 
-						_e( 'Or use a Saved Search!', 'groundhogg' );
+						_e( 'Or, use a Saved Search!', 'groundhogg' );
 
 	                        ?></h3><p><?php
 

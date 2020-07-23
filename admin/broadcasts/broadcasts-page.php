@@ -29,12 +29,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * These are made private for good reason as the broadcasts function was decided to be kept a closed process.
  * If you are a developer, simply BUGGER OFF!
  *
- * @package     Admin
+ * @since       File available since Release 0.1
  * @subpackage  Admin/Broadcasts
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Admin
  */
 class Broadcasts_Page extends Admin_Page {
 
@@ -151,7 +151,7 @@ class Broadcasts_Page extends Admin_Page {
 
 		if ( isset( $_POST['send_now'] ) ) {
 			$meta['send_now'] = true;
-			$send_time          = time() + 10;
+			$send_time        = time() + 10;
 		}
 
 		if ( $send_time < time() ) {
@@ -182,7 +182,7 @@ class Broadcasts_Page extends Admin_Page {
 		}
 
 		// Unset the search param from the query...
-		unset( $query[ 'search' ] );
+		unset( $query['search'] );
 
 		$query = wp_parse_args( $query, [
 			'optin_status' => [
@@ -241,37 +241,47 @@ class Broadcasts_Page extends Admin_Page {
 
 		foreach ( $meta as $key => $value ) {
 			$broadcast->update_meta( $key, $value );
-        }
-
-		set_transient( 'gh_get_broadcast_config', $meta, HOUR_IN_SECONDS );
+		}
 
 		/**
 		 * Fires after the broadcast is added to the DB but before the user is redirected to the scheduler
 		 *
-		 * @param int $broadcast_id the ID of the broadcast
-		 * @param array $meta the config object which is passed to the scheduler
+		 * @param int   $broadcast_id the ID of the broadcast
+		 * @param array $meta         the config object which is passed to the scheduler
 		 */
-		do_action( 'groundhogg/admin/broadcast/scheduled', $broadcast_id, $meta );
+		do_action( 'groundhogg/admin/broadcast/scheduled', $broadcast_id, $meta, $broadcast );
 
-		$this->add_notice( 'review', __( 'Review your broadcast before scheduling!', 'groundhogg' ), 'warning' );
+        $this->add_notice( 'review', __( 'Review your broadcast before scheduling!', 'groundhogg' ), 'warning' );
 
-		// Go through the preview step...
-		if ( $meta['object_type'] === 'email' ) {
-			return admin_page_url( 'gh_broadcasts', [
-				'action'    => 'preview',
-				'broadcast' => $broadcast_id,
-			] );
-		}
+        return admin_page_url( 'gh_broadcasts', [
+            'action'    => 'preview',
+            'broadcast' => $broadcast_id,
+        ] );
+    }
 
-		return $this->scheduler->get_start_url( [ 'broadcast' => $broadcast_id ] );
-	}
-
-	public function process_confirm_send(){
+	/**
+	 * Confirm from the preview page
+	 *
+	 * @return string
+	 */
+	public function process_confirm_send() {
 		if ( ! current_user_can( 'schedule_broadcasts' ) ) {
 			$this->wp_die_no_access();
 		}
 
+		$broadcast_id = absint( get_request_var( 'broadcast' ) );
 
+		$broadcast = new Broadcast( $broadcast_id );
+
+		if ( ! $broadcast->exists() ) {
+			return false;
+		}
+
+		$broadcast->update( [ 'status' => 'scheduled' ] );
+
+		set_transient( 'gh_current_broadcast_id', $broadcast_id, DAY_IN_SECONDS );
+
+		return $this->scheduler->get_start_url( [ 'broadcast' => $broadcast_id ] );
 	}
 
 	/**

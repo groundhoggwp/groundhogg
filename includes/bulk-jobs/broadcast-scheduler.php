@@ -141,7 +141,7 @@ class Broadcast_Scheduler extends Bulk_Job {
 			$args['email_id'] = $this->object_id;
 		}
 
-		$args = apply_filters( 'groundhogg/admin/bulkjobs/broadcast/schedule_broadcast/args' , $args );
+		$args = apply_filters( 'groundhogg/admin/bulkjobs/broadcast/schedule_broadcast/args', $args );
 		enqueue_event( $args );
 		$this->emails_scheduled += 1;
 	}
@@ -170,10 +170,11 @@ class Broadcast_Scheduler extends Bulk_Job {
 	 */
 	protected function pre_loop() {
 
-		$config = get_transient( 'gh_get_broadcast_config' );
 
-		$config = wp_parse_args( $config, [
-			'broadcast_id'       => 0,
+		$broadcast_id = absint( get_transient( 'gh_current_broadcast_id' ) );
+		$broadcast    = new Broadcast( $broadcast_id );
+
+		$config = wp_parse_args( $broadcast->get_all_meta(), [
 			'send_time'          => time(),
 			'send_now'           => false,
 			'send_in_local_time' => false
@@ -181,8 +182,7 @@ class Broadcast_Scheduler extends Bulk_Job {
 
 		$this->config = $config;
 
-		$this->broadcast_id = absint( $config['broadcast_id'] );
-		$broadcast          = new Broadcast( absint( $config['broadcast_id'] ) );
+		$this->broadcast_id = $broadcast_id;
 
 		if ( $broadcast->get_broadcast_type() === Broadcast::TYPE_EMAIL ) {
 			$this->is_email = true;
@@ -226,7 +226,7 @@ class Broadcast_Scheduler extends Bulk_Job {
 	 * @return void
 	 */
 	protected function clean_up() {
-		delete_transient( 'gh_get_broadcast_config' );
+		delete_transient( 'gh_current_broadcast_id' );
 		delete_transient( 'gh_emails_scheduled' );
 	}
 
