@@ -276,7 +276,7 @@ function get_request_query( $default = [], $force = [], $accepted_keys = [] ) {
 	$query = urldecode_deep( $query );
 
 	if ( $search = get_request_var( 's' ) ) {
-		$query['search'] = $search;
+		$query[ 'search' ] = $search;
 	}
 
 	$query = array_merge( $query, $force );
@@ -512,7 +512,7 @@ function get_json_error( $json ) {
  */
 function normalize_files( &$files ) {
 	$_files       = [];
-	$_files_count = count( $files['name'] );
+	$_files_count = count( $files[ 'name' ] );
 	$_files_keys  = array_keys( $files );
 
 	for ( $i = 0; $i < $_files_count; $i ++ ) {
@@ -764,28 +764,28 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	 */
 	$atts = apply_filters( 'wp_mail', compact( 'to', 'subject', 'message', 'headers', 'attachments' ) );
 
-	if ( isset( $atts['to'] ) ) {
-		$to = $atts['to'];
+	if ( isset( $atts[ 'to' ] ) ) {
+		$to = $atts[ 'to' ];
 	}
 
 	if ( ! is_array( $to ) ) {
 		$to = explode( ',', $to );
 	}
 
-	if ( isset( $atts['subject'] ) ) {
-		$subject = $atts['subject'];
+	if ( isset( $atts[ 'subject' ] ) ) {
+		$subject = $atts[ 'subject' ];
 	}
 
-	if ( isset( $atts['message'] ) ) {
-		$message = $atts['message'];
+	if ( isset( $atts[ 'message' ] ) ) {
+		$message = $atts[ 'message' ];
 	}
 
-	if ( isset( $atts['headers'] ) ) {
-		$headers = $atts['headers'];
+	if ( isset( $atts[ 'headers' ] ) ) {
+		$headers = $atts[ 'headers' ];
 	}
 
-	if ( isset( $atts['attachments'] ) ) {
-		$attachments = $atts['attachments'];
+	if ( isset( $atts[ 'attachments' ] ) ) {
+		$attachments = $atts[ 'attachments' ];
 	}
 
 	if ( ! is_array( $attachments ) ) {
@@ -822,7 +822,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 				if ( strpos( $header, ':' ) === false ) {
 					if ( false !== stripos( $header, 'boundary=' ) ) {
 						$parts    = preg_split( '/boundary=/i', trim( $header ) );
-						$boundary = trim( str_replace( array( "'", '"' ), '', $parts[1] ) );
+						$boundary = trim( str_replace( array( "'", '"' ), '', $parts[ 1 ] ) );
 					}
 					continue;
 				}
@@ -917,7 +917,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 
 	if ( ! isset( $from_email ) ) {
 		// Get the site domain and get rid of www.
-		$sitename = strtolower( $_SERVER['SERVER_NAME'] );
+		$sitename = strtolower( $_SERVER[ 'SERVER_NAME' ] );
 		if ( substr( $sitename, 0, 4 ) == 'www.' ) {
 			$sitename = substr( $sitename, 4 );
 		}
@@ -948,10 +948,10 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	try {
 		$phpmailer->setFrom( $from_email, $from_name, false );
 	} catch ( \phpmailerException $e ) {
-		$mail_error_data                             = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
-		$mail_error_data['set_from_name']            = $from_name;
-		$mail_error_data['set_from_email']           = $from_email;
-		$mail_error_data['phpmailer_exception_code'] = $e->getCode();
+		$mail_error_data                               = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
+		$mail_error_data[ 'set_from_name' ]            = $from_name;
+		$mail_error_data[ 'set_from_email' ]           = $from_email;
+		$mail_error_data[ 'phpmailer_exception_code' ] = $e->getCode();
 
 		/** This filter is documented in wp-includes/pluggable.php */
 		do_action( 'wp_mail_failed', new WP_Error( 'wp_mail_failed', $e->getMessage(), $mail_error_data ) );
@@ -974,8 +974,8 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 
 				if ( preg_match( '/(.*)<(.+)>/', $address, $matches ) ) {
 					if ( count( $matches ) == 3 ) {
-						$recipient_name = $matches[1];
-						$address        = $matches[2];
+						$recipient_name = $matches[ 1 ];
+						$address        = $matches[ 2 ];
 					}
 				}
 
@@ -1089,16 +1089,16 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 
 	} catch ( \phpmailerException $e ) {
 
-		$mail_error_data                             = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
-		$mail_error_data['phpmailer_exception_code'] = $e->getCode();
-		$mail_error_data['mime_message']             = $phpmailer->getSentMIMEMessage();
-		$mail_error_data['set_from_name']            = $from_name;
-		$mail_error_data['set_from_email']           = $from_email;
+		$mail_error_data                               = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
+		$mail_error_data[ 'phpmailer_exception_code' ] = $e->getCode();
+		$mail_error_data[ 'mime_message' ]             = $phpmailer->getSentMIMEMessage();
+		$mail_error_data[ 'set_from_name' ]            = $from_name;
+		$mail_error_data[ 'set_from_email' ]           = $from_email;
 
 		if ( Plugin::$instance->sending_service->has_errors() ) {
-			$mail_error_data['orig_error_data']    = Plugin::$instance->sending_service->get_last_error()->get_error_data();
-			$mail_error_data['orig_error_message'] = Plugin::$instance->sending_service->get_last_error()->get_error_message();
-			$mail_error_data['orig_error_code']    = Plugin::$instance->sending_service->get_last_error()->get_error_code();
+			$mail_error_data[ 'orig_error_data' ]    = Plugin::$instance->sending_service->get_last_error()->get_error_data();
+			$mail_error_data[ 'orig_error_message' ] = Plugin::$instance->sending_service->get_last_error()->get_error_message();
+			$mail_error_data[ 'orig_error_code' ]    = Plugin::$instance->sending_service->get_last_error()->get_error_code();
 		}
 
 		/**
@@ -1128,13 +1128,13 @@ function listen_for_complaint_and_bounce_emails( $error ) {
 		return;
 	}
 
-	$code = $data['orig_error_code'];
-	$data = $data['orig_error_data'];
+	$code = $data[ 'orig_error_code' ];
+	$data = $data[ 'orig_error_data' ];
 
 	if ( $code === 'invalid_recipients' ) {
 
 		/* handle bounces */
-		$bounces = isset_not_empty( $data, 'bounces' ) ? $data['bounces'] : [];
+		$bounces = isset_not_empty( $data, 'bounces' ) ? $data[ 'bounces' ] : [];
 
 		if ( ! empty( $bounces ) ) {
 			foreach ( $bounces as $email ) {
@@ -1145,7 +1145,7 @@ function listen_for_complaint_and_bounce_emails( $error ) {
 
 		}
 
-		$complaints = isset_not_empty( $data, 'complaints' ) ? $data['complaints'] : [];
+		$complaints = isset_not_empty( $data, 'complaints' ) ? $data[ 'complaints' ] : [];
 
 		if ( ! empty( $complaints ) ) {
 			foreach ( $complaints as $email ) {
@@ -1165,11 +1165,11 @@ add_action( 'wp_mail_failed', __NAMESPACE__ . '\listen_for_complaint_and_bounce_
  * @return string
  */
 function wpgh_get_referer() {
-	if ( ! isset( $_POST['_wp_http_referer'] ) ) {
+	if ( ! isset( $_POST[ '_wp_http_referer' ] ) ) {
 		return wp_get_referer();
 	}
 
-	return ( is_ssl() ? "https" : "http" ) . "://{$_SERVER['HTTP_HOST']}" . $_REQUEST['_wp_http_referer'];
+	return ( is_ssl() ? "https" : "http" ) . "://{$_SERVER['HTTP_HOST']}" . $_REQUEST[ '_wp_http_referer' ];
 }
 
 /**
@@ -1231,8 +1231,8 @@ function create_contact_from_user( $user, $sync_meta = false ) {
 		'optin_status' => Preferences::UNCONFIRMED
 	);
 
-	if ( empty( $args['first_name'] ) ) {
-		$args['first_name'] = $user->display_name;
+	if ( empty( $args[ 'first_name' ] ) ) {
+		$args[ 'first_name' ] = $user->display_name;
 	}
 
 	$contact = new Contact();
@@ -1439,11 +1439,11 @@ function parse_email_headers( $headers ) {
 	$map = [];
 
 	if ( $parsed->sender && ! is_array( $parsed->sender ) ) {
-		$map['sender'] = sprintf( '%s@%s', $parsed->sender->mailbox, $parsed->sender->host );
-		$map['from']   = $parsed->sender->personal;
+		$map[ 'sender' ] = sprintf( '%s@%s', $parsed->sender->mailbox, $parsed->sender->host );
+		$map[ 'from' ]   = $parsed->sender->personal;
 	} else if ( is_array( $parsed->sender ) ) {
-		$map['sender'] = sprintf( '%s@%s', $parsed->sender[0]->mailbox, $parsed->sender[0]->host );
-		$map['from']   = $parsed->sender[0]->personal;
+		$map[ 'sender' ] = sprintf( '%s@%s', $parsed->sender[ 0 ]->mailbox, $parsed->sender[ 0 ]->host );
+		$map[ 'from' ]   = $parsed->sender[ 0 ]->personal;
 	}
 
 	return $map;
@@ -1710,9 +1710,9 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 				break;
 			case 'full_name':
-				$parts              = split_name( $value );
-				$args['first_name'] = sanitize_text_field( $parts[0] );
-				$args['last_name']  = sanitize_text_field( $parts[1] );
+				$parts                = split_name( $value );
+				$args[ 'first_name' ] = sanitize_text_field( $parts[ 0 ] );
+				$args[ 'last_name' ]  = sanitize_text_field( $parts[ 1 ] );
 				break;
 			case 'first_name':
 			case 'last_name':
@@ -1782,15 +1782,15 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			// Only checks whether value is not empty.
 			case 'terms_agreement':
 				if ( ! empty( $value ) ) {
-					$meta['terms_agreement']      = 'yes';
-					$meta['terms_agreement_date'] = date_i18n( get_date_time_format() );
+					$meta[ 'terms_agreement' ]      = 'yes';
+					$meta[ 'terms_agreement_date' ] = date_i18n( get_date_time_format() );
 				}
 				break;
 			// Only checks whether value is not empty.
 			case 'gdpr_consent':
 				if ( ! empty( $value ) ) {
-					$meta['gdpr_consent']      = 'yes';
-					$meta['gdpr_consent_date'] = date_i18n( get_date_time_format() );
+					$meta[ 'gdpr_consent' ]      = 'yes';
+					$meta[ 'gdpr_consent_date' ] = date_i18n( get_date_time_format() );
 				}
 				break;
 			case 'country':
@@ -1836,10 +1836,10 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				$date  = date( 'Y-m-d', strtotime( $value ) );
 				$parts = map_deep( explode( '-', $date ), 'absint' );
 
-				$meta['birthday_year']  = $parts[0];
-				$meta['birthday_month'] = $parts[1];
-				$meta['birthday_day']   = $parts[2];
-				$meta['birthday']       = $date;
+				$meta[ 'birthday_year' ]  = $parts[ 0 ];
+				$meta[ 'birthday_month' ] = $parts[ 1 ];
+				$meta[ 'birthday_day' ]   = $parts[ 2 ];
+				$meta[ 'birthday' ]       = $date;
 				break;
 		}
 
@@ -1853,9 +1853,11 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 		// Is there an active contact record?
 		$contact = get_contactdata();
-		// Update based on the current args...
-		$contact->update( $args );
-		$id = $contact->get_id();
+		if ( $contact && $contact !== false ) // Update based on the current args...
+		{
+			$contact->update( $args );
+			$id = $contact->get_id();
+		}
 	}
 
 
@@ -2308,7 +2310,7 @@ function dashicon( $icon, $wrap = 'span', $atts = [], $echo = false ) {
 		'class' => 'dashicons dashicons-'
 	] );
 
-	$atts['class'] .= $icon;
+	$atts[ 'class' ] .= $icon;
 
 	$html = html()->e( $wrap, $atts, '', false );
 
@@ -2409,7 +2411,7 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
 	$method = strtoupper( $method );
 
 	if ( ! isset_not_empty( $headers, 'Content-type' ) ) {
-		$headers['Content-type'] = sprintf( 'application/json; charset=%s', get_bloginfo( 'charset' ) );
+		$headers[ 'Content-type' ] = sprintf( 'application/json; charset=%s', get_bloginfo( 'charset' ) );
 	}
 
 	switch ( $method ) {
@@ -2456,10 +2458,10 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
 
 		$data = (array) $error->get_error_data();
 
-		$data['url']     = $url;
-		$data['method']  = $method;
-		$data['headers'] = $headers;
-		$data['body']    = json_decode( $body );
+		$data[ 'url' ]     = $url;
+		$data[ 'method' ]  = $method;
+		$data[ 'headers' ] = $headers;
+		$data[ 'body' ]    = json_decode( $body );
 
 		$error->add_data( $data );
 
@@ -2569,7 +2571,7 @@ if ( ! function_exists( __NAMESPACE__ . '\get_email_top_image_url' ) ):
 			return 'https://via.placeholder.com/350x150';
 		}
 
-		return $image[0];
+		return $image[ 0 ];
 	}
 
 endif;
@@ -2597,16 +2599,16 @@ function get_tag_attributes( $tag ) {
 		return false;
 	}
 
-	$tag = $matches[0];
+	$tag = $matches[ 0 ];
 
 	preg_match_all( "/([a-z\-]+)(=\"([^\"]+)\")/", $tag, $all_atts );
 
-	$attributes = map_deep( $all_atts[1], 'sanitize_key' );
-	$values     = $all_atts[3];
+	$attributes = map_deep( $all_atts[ 1 ], 'sanitize_key' );
+	$values     = $all_atts[ 3 ];
 	$attributes = array_combine( $attributes, $values );
 
 	if ( isset_not_empty( $attributes, 'style' ) ) {
-		$attributes['style'] = parse_inline_styles( $attributes['style'] );
+		$attributes[ 'style' ] = parse_inline_styles( $attributes[ 'style' ] );
 	}
 
 	return $attributes;
@@ -2625,7 +2627,7 @@ function get_tag_name( $tag ) {
 	}
 	preg_match( '/<([^\W]+)/', $tag, $matches );
 
-	return $matches[1];
+	return $matches[ 1 ];
 }
 
 /**
@@ -2643,8 +2645,8 @@ function parse_inline_styles( $style ) {
 	foreach ( $bits as $bit ) {
 
 		$rule              = explode( ':', $bit );
-		$attribute         = sanitize_key( $rule[0] );
-		$value             = trim( $rule[1] );
+		$attribute         = sanitize_key( $rule[ 0 ] );
+		$value             = trim( $rule[ 1 ] );
 		$css[ $attribute ] = $value;
 	}
 
@@ -2774,7 +2776,7 @@ function validate_mobile_number( $number, $country_code = '', $with_plus = false
 
 	// Number may come from validator meaning it will be in array
 	if ( is_array( $number ) ) {
-		$number = $number[0];
+		$number = $number[ 0 ];
 	}
 
 	// Add plus to string if not there
@@ -2821,15 +2823,15 @@ function get_upload_wp_error( $file ) {
 	}
 
 	// no Error
-	if ( absint( $file['error'] ) === UPLOAD_ERR_OK ) {
+	if ( absint( $file[ 'error' ] ) === UPLOAD_ERR_OK ) {
 		return false;
 	}
 
-	if ( ! is_uploaded_file( $file['tmp_name'] ) ) {
+	if ( ! is_uploaded_file( $file[ 'tmp_name' ] ) ) {
 		return new WP_Error( 'upload_error', 'File is not uploaded.' );
 	}
 
-	switch ( $file['error'] ) {
+	switch ( $file[ 'error' ] ) {
 		case UPLOAD_ERR_INI_SIZE:
 			$message = "The uploaded file exceeds the upload_max_filesize directive in php.ini";
 			break;
@@ -2943,10 +2945,10 @@ add_action( 'admin_menu', function () {
 	}
 
 	foreach ( $groundhogg as &$li ) {
-		$li[4] = $li[2];
+		$li[ 4 ] = $li[ 2 ];
 	}
 
-	$submenu['groundhogg'] = $groundhogg;
+	$submenu[ 'groundhogg' ] = $groundhogg;
 
 }, 99999999 );
 
@@ -3014,7 +3016,7 @@ function allow_funnel_uploads() {
  * @return mixed
  */
 function _allow_funnel_uploads( $mimes ) {
-	$mimes['funnel'] = 'text/plain';
+	$mimes[ 'funnel' ] = 'text/plain';
 
 	return $mimes;
 }
@@ -3096,7 +3098,7 @@ function use_experimental_features() {
  */
 function micro_seconds() {
 	$secs = explode( ' ', microtime() );
-	$secs = floatval( $secs[0] );
+	$secs = floatval( $secs[ 0 ] );
 
 	return $secs;
 }
@@ -3269,7 +3271,7 @@ function is_groundhogg_network_active() {
 
 	$plugins = get_site_option( 'active_sitewide_plugins' );
 
-	if ( isset( $plugins['groundhogg/groundhogg.php'] ) ) {
+	if ( isset( $plugins[ 'groundhogg/groundhogg.php' ] ) ) {
 		return true;
 	}
 

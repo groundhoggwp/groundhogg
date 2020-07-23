@@ -4,6 +4,7 @@ namespace Groundhogg\Steps\Benchmarks;
 
 use function Groundhogg\after_form_submit_handler;
 use Groundhogg\Contact;
+use function Groundhogg\array_flatten;
 use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_mappable_fields;
@@ -139,18 +140,18 @@ abstract class Form_Integration extends Benchmark {
 			$row = $this->normalize_field( $key, $field );
 
 			// If there is no row Id we cannot serve the field
-			if ( ! $row[ 'id' ] ){
+			if ( ! $row[ 'id' ] ) {
 				continue;
 			}
 
 			$rows[] = [
-				$row['id'],
-				$row['label'],
+				$row[ 'id' ],
+				$row[ 'label' ],
 				html()->dropdown( [
 					'option_none' => '* Do Not Map *',
 					'options'     => get_mappable_fields(),
-					'selected'    => get_array_var( $field_map, $row['id'] ),
-					'name'        => $this->setting_name_prefix( 'field_map' ) . sprintf( '[%s]', $row['id'] ),
+					'selected'    => get_array_var( $field_map, $row[ 'id' ] ),
+					'name'        => $this->setting_name_prefix( 'field_map' ) . sprintf( '[%s]', $row[ 'id' ] ),
 				] )
 			];
 
@@ -204,7 +205,22 @@ abstract class Form_Integration extends Benchmark {
 		$posted_data = $this->get_data( 'posted_data' );
 		$field_map   = $this->get_setting( 'field_map' );
 
-		$contact = generate_contact_with_map( $posted_data, $field_map );
+		if ( is_array( $posted_data ) ) {
+			$sanitized_array = [];
+			foreach ( $posted_data as $key => $value ) {
+				$sanitized_array[ $key ] = is_array( $value ) ? implode( ',', $value ) : $value;
+			}
+		} else {
+			$sanitized_array = $posted_data;
+		}
+		/**
+		 * Did not work need to test
+		*/
+//		$sanitized_array = map_deep( $posted_data, function ( $item ){
+//			return is_array( $item ) ? implode( ',', array_flatten( $item ) ) : $item;
+//		} );
+
+		$contact = generate_contact_with_map( $sanitized_array, $field_map );
 
 		if ( ! $contact || is_wp_error( $contact ) ) {
 			return false;
@@ -220,7 +236,8 @@ abstract class Form_Integration extends Benchmark {
 	 *
 	 * @return bool
 	 */
-	public function can_complete_step() {
+	public
+	function can_complete_step() {
 		return absint( $this->get_data( 'form_id' ) ) === absint( $this->get_setting( 'form_id' ) );
 	}
 }

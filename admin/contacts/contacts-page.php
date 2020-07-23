@@ -446,6 +446,8 @@ class Contacts_Page extends Admin_Page {
 
 		$contact->update_meta( 'primary_phone', sanitize_text_field( get_request_var( 'primary_phone' ) ) );
 		$contact->update_meta( 'primary_phone_extension', sanitize_text_field( get_request_var( 'primary_phone_extension' ) ) );
+		$contact->add_note(  get_request_var( 'notes' ) );
+
 
 		if ( get_request_var( 'tags' ) ) {
 			$contact->add_tag( get_request_var( 'tags' ) );
@@ -1098,7 +1100,8 @@ class Contacts_Page extends Admin_Page {
 		$this->add_notice( 'saved', __( 'Search saved!', 'groundhogg' ) );
 
 		// stay on page...
-		return true;
+
+		return admin_page_url( 'gh_contacts', $query );
 	}
 
 	/**
