@@ -412,6 +412,9 @@ body.disable-scrolling {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0; }
 
+.groundhogg.modal .edit-delay-controls .replacement-controls {
+  margin-top: 10px; }
+
 .groundhogg.modal .edit-delay-controls .row .col, .groundhogg.modal .edit-delay-controls .row .col-5, .groundhogg.modal .edit-delay-controls .row .col-4 {
   padding: 20px;
   border-right: 1px solid #ccd0d4; }

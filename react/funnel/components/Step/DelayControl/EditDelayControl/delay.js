@@ -311,7 +311,81 @@ export const DelayTypes = {
     name: _x('Dynamic Delay', 'step delay', 'groundhogg'),
     icon: 'groups',
     render: () => {
-      return <></>
+      const text = [
+        'Wait until'
+      ]
+
+      if (delay.interval !== 'none') {
+        text.push(
+          <Highlight>{ delay.period } { delay.interval } {delay.wait_type}</Highlight>
+        );
+      }
+
+      if (delay.run_on !== 'any') {
+
+        if (!text.length) {
+          text.push('Run')
+        }
+        else {
+          text.push(' then run')
+        }
+
+        switch (delay.run_on) {
+          case 'weekday':
+            text.push(' on a ', <Highlight>{ 'weekday' }</Highlight>)
+            break
+          case 'weekend':
+            text.push(' on a ', <Highlight>{ 'weekend' }</Highlight>)
+            break
+          case 'day_of_week':
+
+            text.push(delay.days_of_week_type === 'any'
+              ? ' on '
+              : ( <>{ ' on the ' }
+                <Highlight>{ delay.days_of_week_type }</Highlight> </> ),
+            )
+
+            const days = delay.days_of_week
+
+            text.push(<Highlight><ItemsCommaOrList
+              items={ delay.days_of_week.map(item => item.label) }
+            /></Highlight>)
+
+            if (delay.months_of_year_type !== 'any') {
+              text.push(' of ', <Highlight><ItemsCommaOrList
+                items={ delay.months_of_year.map(item => item.label) }
+              /></Highlight>)
+            }
+
+            break
+          case 'day_of_month':
+
+            text.push(' on the ')
+
+            text.push(<ItemsCommaOrList
+              items={ delay.days_of_month.map(item => item.label) }/>)
+
+            if (delay.months_of_year_type !== 'any') {
+              text.push(' of ', <ItemsCommaOrList
+                items={ delay.months_of_year.map(item => item.label) }/>)
+            }
+
+            break
+        }
+
+      }
+
+      if (!text.length) {
+        text.push('Run')
+      }
+      else if (delay.run_on === 'any') {
+        text.push(' then run')
+      }
+
+      text.push(<DisplayTimeDelayFragment delay={ delay }/>)
+
+      return <>{ text.map(
+        (item, i) => <Fragment key={ i }>{ item }</Fragment>) }</>
     },
     edit: ({ delay, updateDelay }) => {
       return (
