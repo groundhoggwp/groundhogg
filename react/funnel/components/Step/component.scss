@@ -111,3 +111,22 @@
   }
 }
 
+.delay-types.btn-group {
+  .btn {
+
+    position: relative;
+    padding-left: 30px;
+
+    .dashicons {
+      position: absolute;
+      left: 6px;
+      top: 8px;
+    }
+  }
+}
+
+.edit-delay-controls{
+  input,select{
+    font-size: 16px;
+  }
+}

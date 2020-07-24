@@ -10,6 +10,16 @@
   }
 }
 
+.dynamic-delay{
+  .replacements-wrap{
+    margin-top: 10px;
+
+    .replacements{
+      float:right;
+    }
+  }
+}
+
 input[type="email"].email-address{
 
   width: 100%;

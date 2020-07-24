@@ -1,5 +1,9 @@
 <?php
 
+/**
+ *
+ */
+
 namespace Groundhogg;
 
 class Settings {

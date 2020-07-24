@@ -8,11 +8,14 @@ import {
   RunAt,
 } from './components'
 import {
+  ClearFix,
   ItemsCommaOrList,
   SimpleSelect,
 } from '../../../BasicControls/basicControls'
 import moment from 'moment'
 import { parseArgs } from '../../../../App'
+import { Dashicon } from '../../../Dashicon/Dashicon'
+import { ReplacementsButton } from '../../../ReplacementsButton/ReplacementsButton'
 
 const { __, _x, _n, _nx } = wp.i18n
 
@@ -25,6 +28,17 @@ export function RenderDelay ({ delay }) {
   }
 
   return <><code>{ 'render()' }</code> { 'method not implemented.' }</>
+}
+
+export function DelayIcon ({ type }) {
+
+  let icon = 'editor-help'
+
+  if (DelayTypes.hasOwnProperty(type)) {
+    icon = DelayTypes[type].icon
+  }
+
+  return <Dashicon icon={ icon }/>
 }
 
 export function EditDelay ({ delay, updateDelay }) {
@@ -57,16 +71,6 @@ export const DelayTypes = {
     icon: 'clock',
     render: ({ delay }) => {
       const text = []
-
-      delay = parseArgs(delay, {
-        period: 0,
-        interval: 'none',
-        run_on: 'any',
-        days_of_week_type: 'any',
-        months_of_year_type: 'any',
-        days_of_week: [],
-        months_of_year: [],
-      })
 
       if (delay.interval !== 'none') {
         text.push('Wait at least ',
@@ -306,11 +310,85 @@ export const DelayTypes = {
     type: 'dynamic',
     name: _x('Dynamic Delay', 'step delay', 'groundhogg'),
     icon: 'groups',
-    edit: () => {
-      return <></>
-    },
     render: () => {
       return <></>
+    },
+    edit: ({ delay, updateDelay }) => {
+      return (
+        <div className={ 'dynamic-delay' }>
+          <Container>
+            <Row className={ 'no-padding' }>
+              <Col>
+                { _x('Wait until...', 'step delay', 'groundhogg') }
+                <div className={ 'interval-period wait-type col-controls' }>
+                  <input
+                    name={ 'period' }
+                    className={ 'period' }
+                    value={ delay.period }
+                    min={ 1 }
+                    type={ 'number' }
+                    disabled={ delay.interval === 'none' }
+                    onChange={ (e) => updateDelay(
+                      { period: e.target.value }) }
+                  />
+                  <SimpleSelect
+                    name={ 'interval' }
+                    className={ 'interval' }
+                    value={ delay.interval }
+                    onChange={ (e) => updateDelay(
+                      { interval: e.target.value }) }
+                    options={ intervalTypes }
+                  />
+                  <SimpleSelect
+                    name={ 'wait_type' }
+                    className={ 'wait_type' }
+                    value={ delay.wait_type }
+                    disabled={ delay.interval === 'none' }
+                    onChange={ (e) => updateDelay(
+                      { wait_type: e.target.value }) }
+                    options={ waitTypes }
+                  />
+                </div>
+              </Col>
+              <Col xs={ 4 }>
+                { _x('Replacement Code ', 'step delay', 'groundhogg') }
+                <div className={'replacement-controls'}>
+                  <input
+                    id={'replacement-dynamic-delay'}
+                    name={ 'replacement' }
+                    className={ 'replacement w100' }
+                    value={ delay.replacement }
+                    type={ 'text' }
+                    onChange={ (e) => updateDelay(
+                      { replacement: e.target.value }) }
+                  />
+                  <div className={ 'replacements-wrap' }>
+                    <ReplacementsButton
+                      onInsert={(v) => updateDelay(
+                        { replacement: v })}
+                    />
+                    <ClearFix/>
+                  </div>
+                  <p className={ 'description' }>{
+                    __(
+                      'Insert a replacement code that is expected to return a date. If a non-valid date is given the action will be run instantly.',
+                      'groundhogg')
+                  }</p>
+                </div>
+
+              </Col>
+              <Col xs={ 4 }>
+                <RunAt
+                  time={ delay.time }
+                  timeTo={ delay.time_to }
+                  type={ delay.run_at }
+                  updateDelay={ updateDelay }
+                />
+              </Col>
+            </Row>
+          </Container>
+        </div>
+      )
     },
   },
 }
@@ -333,6 +411,11 @@ const dateRunOnTypes = [
 const runAtTypes = [
   { value: 'any', label: 'Any time' },
   { value: 'specific', label: 'Specific time' },
+]
+
+const waitTypes = [
+  { value: 'before', label: 'Before' },
+  { value: 'after', label: 'After' },
 ]
 
 const intervalTypes = [

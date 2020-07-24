@@ -3,13 +3,13 @@ import { GroundhoggModal } from '../../../Modal/Modal'
 
 import './component.scss'
 import { Dashicon } from '../../../Dashicon/Dashicon'
-import { DelayTypes, EditDelay, RenderDelay } from './delay'
+import { DelayIcon, DelayTypes, EditDelay, RenderDelay } from './delay'
 import { Button, ButtonGroup } from 'react-bootstrap'
 
 export function EditDelayModal ({ show, delay, updateDelay, save, cancel }) {
 
-  const delayTypes = Object.values(DelayTypes);
-  const chosen = delay.type;
+  const delayTypes = Object.values(DelayTypes)
+  const chosen = delay.type
 
   return (
     <GroundhoggModal
@@ -21,19 +21,21 @@ export function EditDelayModal ({ show, delay, updateDelay, save, cancel }) {
     >
       <div className={ 'edit-delay-controls' }>
         <div className={ 'delay-text' }>
-          <Dashicon icon={ 'clock' }/> <RenderDelay
-          delay={ delay }
-        />
+          <DelayIcon type={ chosen }/>
+            &nbsp;
+          <RenderDelay
+            delay={ delay }
+          />
         </div>
         <div className={ 'delay-type' }>
-          <ButtonGroup aria-label="delay-types">
+          <ButtonGroup aria-label="delay-types" className={ 'delay-types' }>
             { delayTypes.map((delayType) =>
               <Button
-                key={delayType.type}
-                variant={ chosen === delayType.type ? 'primary' : 'outline-primary' }
-                onClick={(e) => updateDelay({type: delayType.type}) }
+                key={ delayType.type }
+                variant={ chosen === delayType.type ? 'info' : 'outline-info' }
+                onClick={ (e) => updateDelay({ type: delayType.type }) }
               >
-                {delayType.name}
+                <Dashicon icon={ delayType.icon }/> { delayType.name }
               </Button>) }
           </ButtonGroup>
         </div>

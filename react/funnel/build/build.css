@@ -269,6 +269,17 @@ body.disable-scrolling {
   padding: 0 7px;
   border-radius: 6px; }
 
+.delay-types.btn-group .btn {
+  position: relative;
+  padding-left: 30px; }
+  .delay-types.btn-group .btn .dashicons {
+    position: absolute;
+    left: 6px;
+    top: 8px; }
+
+.edit-delay-controls input, .edit-delay-controls select {
+  font-size: 16px; }
+
 .add-step-control {
   margin: 10px;
   position: relative;
@@ -393,10 +404,18 @@ body.disable-scrolling {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0; }
 
-.groundhogg.modal .edit-delay-controls .row .col, .groundhogg.modal .edit-delay-controls .row .col-5 {
+.groundhogg.modal .edit-delay-controls .interval-period.wait-type .interval {
+  border-radius: 0; }
+
+.groundhogg.modal .edit-delay-controls .interval-period.wait-type .wait_type {
+  border-left: none;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0; }
+
+.groundhogg.modal .edit-delay-controls .row .col, .groundhogg.modal .edit-delay-controls .row .col-5, .groundhogg.modal .edit-delay-controls .row .col-4 {
   padding: 20px;
   border-right: 1px solid #ccd0d4; }
-  .groundhogg.modal .edit-delay-controls .row .col:last-child, .groundhogg.modal .edit-delay-controls .row .col-5:last-child {
+  .groundhogg.modal .edit-delay-controls .row .col:last-child, .groundhogg.modal .edit-delay-controls .row .col-5:last-child, .groundhogg.modal .edit-delay-controls .row .col-4:last-child {
     border-right: none; }
 
 .replacements.dropdown-menu {
@@ -406,6 +425,11 @@ body.disable-scrolling {
 .textarea-control-wrap .replacements-wrap {
   margin-bottom: 10px; }
   .textarea-control-wrap .replacements-wrap .replacements {
+    float: right; }
+
+.dynamic-delay .replacements-wrap {
+  margin-top: 10px; }
+  .dynamic-delay .replacements-wrap .replacements {
     float: right; }
 
 input[type="email"].email-address {

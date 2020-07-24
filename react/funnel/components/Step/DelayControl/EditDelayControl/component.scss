@@ -48,11 +48,23 @@
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
       }
+
+      &.wait-type{
+        .interval{
+          border-radius: 0;
+        }
+
+        .wait_type{
+          border-left: none;
+          border-top-left-radius: 0;
+          border-bottom-left-radius: 0;
+        }
+      }
     }
 
 
     .row{
-      .col,.col-5{
+      .col,.col-5,.col-4{
         padding: 20px;
         border-right: 1px solid $border-color;
 
