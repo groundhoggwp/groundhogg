@@ -35,6 +35,7 @@ export function DelayControl ({ delay, updateDelay }) {
     months_of_year_type: 'any',
     days_of_week: [],
     months_of_year: [],
+    wait_type: 'after',
   })
 
   return (

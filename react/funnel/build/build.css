@@ -415,10 +415,16 @@ body.disable-scrolling {
 .groundhogg.modal .edit-delay-controls .replacement-controls {
   margin-top: 10px; }
 
-.groundhogg.modal .edit-delay-controls .row .col, .groundhogg.modal .edit-delay-controls .row .col-5, .groundhogg.modal .edit-delay-controls .row .col-4 {
+.groundhogg.modal .edit-delay-controls .row .col,
+.groundhogg.modal .edit-delay-controls .row .col-5,
+.groundhogg.modal .edit-delay-controls .row .col-4,
+.groundhogg.modal .edit-delay-controls .row .col-3 {
   padding: 20px;
   border-right: 1px solid #ccd0d4; }
-  .groundhogg.modal .edit-delay-controls .row .col:last-child, .groundhogg.modal .edit-delay-controls .row .col-5:last-child, .groundhogg.modal .edit-delay-controls .row .col-4:last-child {
+  .groundhogg.modal .edit-delay-controls .row .col:last-child,
+  .groundhogg.modal .edit-delay-controls .row .col-5:last-child,
+  .groundhogg.modal .edit-delay-controls .row .col-4:last-child,
+  .groundhogg.modal .edit-delay-controls .row .col-3:last-child {
     border-right: none; }
 
 .replacements.dropdown-menu {

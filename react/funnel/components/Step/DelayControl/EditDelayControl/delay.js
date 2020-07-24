@@ -10,7 +10,7 @@ import {
 import {
   ClearFix,
   ItemsCommaOrList,
-  SimpleSelect,
+  SimpleSelect, YesNoToggle,
 } from '../../../BasicControls/basicControls'
 import moment from 'moment'
 import { parseArgs } from '../../../../App'
@@ -59,7 +59,7 @@ export const DelayTypes = {
     name: _x('Instant', 'step delay', 'groundhogg'),
     icon: 'marker',
     render: ({ delay }) => {
-      return <>{ _x('Run instantly', 'step delay', 'groundhogg') }</>
+      return <>{ _x('Run', 'step delay', 'groundhogg') } <Highlight>{_x( 'instantly!', 'step delay', 'groundhogg' )}</Highlight></>
     },
     edit: () => {
       return <></>
@@ -74,7 +74,8 @@ export const DelayTypes = {
 
       if (delay.interval !== 'none') {
         text.push('Wait at least ',
-          <Highlight>{ delay.period } { delay.interval }</Highlight>)
+          <Highlight>{ delay.period } { intervalTranslate(delay.interval,
+            delay.period) }</Highlight>)
       }
 
       if (delay.run_on !== 'any') {
@@ -310,77 +311,28 @@ export const DelayTypes = {
     type: 'dynamic',
     name: _x('Dynamic Delay', 'step delay', 'groundhogg'),
     icon: 'groups',
-    render: () => {
+    render: ({ delay }) => {
+
       const text = [
-        'Wait until'
+        'Wait until ',
       ]
 
       if (delay.interval !== 'none') {
         text.push(
-          <Highlight>{ delay.period } { delay.interval } {delay.wait_type}</Highlight>
-        );
+          <Highlight>{ delay.period } { intervalTranslate(delay.interval,
+            delay.period) } { translate[delay.wait_type] }</Highlight>,
+        )
       }
 
-      if (delay.run_on !== 'any') {
+      text.push('the ')
 
-        if (!text.length) {
-          text.push('Run')
-        }
-        else {
-          text.push(' then run')
-        }
-
-        switch (delay.run_on) {
-          case 'weekday':
-            text.push(' on a ', <Highlight>{ 'weekday' }</Highlight>)
-            break
-          case 'weekend':
-            text.push(' on a ', <Highlight>{ 'weekend' }</Highlight>)
-            break
-          case 'day_of_week':
-
-            text.push(delay.days_of_week_type === 'any'
-              ? ' on '
-              : ( <>{ ' on the ' }
-                <Highlight>{ delay.days_of_week_type }</Highlight> </> ),
-            )
-
-            const days = delay.days_of_week
-
-            text.push(<Highlight><ItemsCommaOrList
-              items={ delay.days_of_week.map(item => item.label) }
-            /></Highlight>)
-
-            if (delay.months_of_year_type !== 'any') {
-              text.push(' of ', <Highlight><ItemsCommaOrList
-                items={ delay.months_of_year.map(item => item.label) }
-              /></Highlight>)
-            }
-
-            break
-          case 'day_of_month':
-
-            text.push(' on the ')
-
-            text.push(<ItemsCommaOrList
-              items={ delay.days_of_month.map(item => item.label) }/>)
-
-            if (delay.months_of_year_type !== 'any') {
-              text.push(' of ', <ItemsCommaOrList
-                items={ delay.months_of_year.map(item => item.label) }/>)
-            }
-
-            break
-        }
-
+      if (delay.use_next_occurrence) {
+        text.push('next ')
       }
 
-      if (!text.length) {
-        text.push('Run')
-      }
-      else if (delay.run_on === 'any') {
-        text.push(' then run')
-      }
+      text.push(<Highlight>{ delay.replacement }</Highlight>)
+
+      text.push(' then run')
 
       text.push(<DisplayTimeDelayFragment delay={ delay }/>)
 
@@ -424,11 +376,11 @@ export const DelayTypes = {
                   />
                 </div>
               </Col>
-              <Col xs={ 4 }>
+              <Col xs={ 5 }>
                 { _x('Replacement Code ', 'step delay', 'groundhogg') }
-                <div className={'replacement-controls'}>
+                <div className={ 'replacement-controls' }>
                   <input
-                    id={'replacement-dynamic-delay'}
+                    id={ 'replacement-dynamic-delay' }
                     name={ 'replacement' }
                     className={ 'replacement w100' }
                     value={ delay.replacement }
@@ -438,8 +390,8 @@ export const DelayTypes = {
                   />
                   <div className={ 'replacements-wrap' }>
                     <ReplacementsButton
-                      onInsert={(v) => updateDelay(
-                        { replacement: v })}
+                      onInsert={ (v) => updateDelay(
+                        { replacement: v }) }
                     />
                     <ClearFix/>
                   </div>
@@ -449,9 +401,23 @@ export const DelayTypes = {
                       'groundhogg')
                   }</p>
                 </div>
-
+                <div className={ 'replacement-controls' }>
+                  <p>
+                    { 'Use next occurrence?' }
+                    <div className={ 'alignright' }><YesNoToggle
+                      value={ delay.use_next_occurrence }
+                      update={ (v) => updateDelay(
+                        { use_next_occurrence: v }) }
+                    /></div>
+                  </p>
+                  <p className={ 'description' }>{
+                    __(
+                      'If enabled, the year from the date will be ignored.',
+                      'groundhogg')
+                  }</p>
+                </div>
               </Col>
-              <Col xs={ 4 }>
+              <Col xs={ 3 }>
                 <RunAt
                   time={ delay.time }
                   timeTo={ delay.time_to }
@@ -501,3 +467,46 @@ const intervalTypes = [
   { value: 'years', label: 'Years' },
   { value: 'none', label: 'No delay' },
 ]
+
+const intervalTranslate = (interval, period) => {
+
+  if (!intervalTranslations.hasOwnProperty(interval)) {
+    return interval
+  }
+
+  return parseInt(period) === 1
+    ? intervalTranslations[interval].single
+    : intervalTranslations[interval].plural
+}
+
+const intervalTranslations = {
+  minutes: {
+    single: _x('minutes', 'step delay', 'groundhogg'),
+    plural: _x('minutes', 'step delay', 'groundhogg'),
+  },
+  hours: {
+    single: _x('hour', 'step delay', 'groundhogg'),
+    plural: _x('hours', 'step delay', 'groundhogg'),
+  },
+  days: {
+    single: _x('day', 'step delay', 'groundhogg'),
+    plural: _x('days', 'step delay', 'groundhogg'),
+  },
+  weeks: {
+    single: _x('week', 'step delay', 'groundhogg'),
+    plural: _x('weeks', 'step delay', 'groundhogg'),
+  },
+  months: {
+    single: _x('month', 'step delay', 'groundhogg'),
+    plural: _x('months', 'step delay', 'groundhogg'),
+  },
+  years: {
+    single: _x('year', 'step delay', 'groundhogg'),
+    plural: _x('years', 'step delay', 'groundhogg'),
+  },
+}
+
+const translate = {
+  before: _x('before', 'step delay', 'groundhogg'),
+  after: _x('after', 'step delay', 'groundhogg'),
+}
