@@ -18,6 +18,7 @@ use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use Groundhogg\Plugin;
 use \WP_Error;
+use function Groundhogg\is_groundhogg_network_active;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\key_to_words;
@@ -688,17 +689,17 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 					?></p>
                 <script>
-                    (function ($) {
+                  ( function ($) {
 
-                        $('.select-all-meta').click(function (e) {
-                            $('.meta.header').attr('checked', 'checked')
-                        })
+                    $('.select-all-meta').click(function (e) {
+                      $('.meta.header').attr('checked', 'checked')
+                    })
 
-                        $('.deselect-all-meta').click(function (e) {
-                            $('.meta.header').attr('checked', false)
-                        })
+                    $('.deselect-all-meta').click(function (e) {
+                      $('.meta.header').attr('checked', false)
+                    })
 
-                    })(jQuery)
+                  } )(jQuery)
                 </script>
                 <table>
 					<?php
@@ -820,6 +821,20 @@ class Tools_Page extends Tabbed_Admin_Page {
 					?>
                 </div>
             </div>
+			<?php
+			if ( is_multisite() && is_main_site() && is_groundhogg_network_active() ) : ?>
+                <div class="postbox">
+                    <h2 class="hndle"><?php _e( 'Network Upgrades', 'groundhogg' ); ?></h2>
+                    <div class="inside">
+                        <p class="description"><?php _e( 'Process database upgrades network wide so they do not have to be done by each subsite owner.' ); ?></p>
+						<?php
+
+						do_action( 'groundhogg/admin/tools/network_updates' );
+
+                        ?>
+                    </div>
+                </div>
+			<?php endif; ?>
         </div>
 		<?php
 	}
@@ -900,21 +915,21 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 	########### ADVANCED SETUP ###########
 
-	public function advanced_cron_view(){
-	    include __DIR__ . '/advanced-setup.php';
-    }
+	public function advanced_cron_view() {
+		include __DIR__ . '/advanced-setup.php';
+	}
 
 	/**
 	 * Install the gh-cron.php file
 	 *
 	 * @return bool|\WP_Error
 	 */
-	public function process_advanced_cron_install_gh_cron(){
+	public function process_advanced_cron_install_gh_cron() {
 
 		$gh_cron_php = file_get_contents( GROUNDHOGG_PATH . 'gh-cron.txt' );
-		$bytes = file_put_contents( ABSPATH . 'gh-cron.php', $gh_cron_php );
+		$bytes       = file_put_contents( ABSPATH . 'gh-cron.php', $gh_cron_php );
 
-		if ( ! $bytes ){
+		if ( ! $bytes ) {
 			return new \WP_Error( 'error', __( 'Unable to install gh-cron.php file. Please install is manually.', 'groundhogg' ) );
 		} else {
 			$this->add_notice( 'success', __( 'Installed gh-cron.php successfully!', 'groundhogg' ) );
@@ -928,7 +943,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 *
 	 * @return void
 	 */
-	public function process_advanced_cron_install_gh_cron_manually(){
+	public function process_advanced_cron_install_gh_cron_manually() {
 
 		$gh_cron_php = file_get_contents( GROUNDHOGG_PATH . 'gh-cron.txt' );
 
@@ -942,16 +957,16 @@ class Tools_Page extends Tabbed_Admin_Page {
 	}
 
 	/**
-     * Unschedule Groundhogg from WP Cron.
-     *
+	 * Unschedule Groundhogg from WP Cron.
+	 *
 	 * @return bool|WP_Error
 	 */
-	public function process_advanced_cron_unschedule_gh_cron(){
-	    if ( wp_unschedule_hook( Event_Queue::WP_CRON_HOOK ) === false ){
-		    return new \WP_Error( 'error', __( 'Something went wrong.', 'groundhogg' ) );
-        } else {
-		    $this->add_notice( 'success', __( 'Unhooked Groundhogg from WP Cron.', 'groundhogg' ) );
-	    }
+	public function process_advanced_cron_unschedule_gh_cron() {
+		if ( wp_unschedule_hook( Event_Queue::WP_CRON_HOOK ) === false ) {
+			return new \WP_Error( 'error', __( 'Something went wrong.', 'groundhogg' ) );
+		} else {
+			$this->add_notice( 'success', __( 'Unhooked Groundhogg from WP Cron.', 'groundhogg' ) );
+		}
 
 		return false;
 	}

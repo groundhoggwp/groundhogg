@@ -1083,7 +1083,7 @@ class Contacts_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		if ( get_url_var( 'search' ) !== 'on' ) {
+		if ( get_url_var( 'is_searching' ) !== 'on' ) {
 			return new \WP_Error( 'error', __( 'Invalid search' ) );
 		}
 

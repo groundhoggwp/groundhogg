@@ -9,11 +9,11 @@ use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 
 ?>
-<div id="search-filters" class="postbox <?php echo ( get_url_var( 'search' ) ) ? '' : 'hidden'; ?>">
+<div id="search-filters" class="postbox <?php echo ( get_url_var( 'is_searching' ) ) ? '' : 'hidden'; ?>">
     <form method="get">
 		<?php echo html()->input( [
 			'type'  => 'hidden',
-			'name'  => 'search',
+			'name'  => 'is_searching',
 			'value' => 'on',
 		] ); ?>
 		<?php html()->hidden_GET_inputs(); ?>
@@ -332,7 +332,7 @@ use function Groundhogg\html;
             </form>
         </div>
 
-		<?php if ( get_url_var( 'search' ) === 'on' ): ?>
+		<?php if ( get_url_var( 'is_searching' ) === 'on' ): ?>
             <div class="inline-block search-param">
                 <form method="post" class="save-this-search">
 					<?php
