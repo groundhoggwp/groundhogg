@@ -253,10 +253,12 @@ abstract class Meta_DB extends DB {
 
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
+		$max_index_length = $this->get_charset() === 'utf8mb4' ? 191 : 255;
+
 		$sql = "CREATE TABLE {$this->table_name} (
 		meta_id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 		{$this->get_object_id_col()} bigint(20) unsigned NOT NULL,
-		meta_key varchar(255) DEFAULT NULL,
+		meta_key varchar($max_index_length) DEFAULT NULL,
 		meta_value longtext,
 		PRIMARY KEY  (meta_id),
 		KEY {$this->get_object_id_col()} ({$this->get_object_id_col()}),
