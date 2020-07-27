@@ -177,6 +177,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.18.2 (2020-07-27) =
+* FIXED DB error while importing contacts causing import to fail in some cases.
+
 = 2.2.18.1 (2020-07-23) =
 * ADDED Panel in the tools > updates screen to process updates across the whole network.
 * FIXED Quick search for contacts was not working when sending a broadcast through the new quick broadcast tool.

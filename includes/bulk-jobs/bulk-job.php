@@ -147,6 +147,9 @@ abstract class Bulk_Job {
 
 		$this->post_loop();
 
+		// Clean up any output like DB errors.
+		$output = ob_get_clean();
+
 		$end  = microtime( true );
 		$diff = round( $end - $start, 2 );
 
@@ -162,6 +165,7 @@ abstract class Bulk_Job {
 			'complete_nf' => _nf( $completed - $this->skipped ),
 			'skipped_nf'  => _nf( $this->skipped ),
 			'message'     => esc_html( $msg ),
+			'output'      => $output,
 		];
 
 		$the_end = get_post_var( 'the_end', false );

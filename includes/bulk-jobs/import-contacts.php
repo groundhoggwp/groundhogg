@@ -3,6 +3,7 @@
 namespace Groundhogg\Bulk_Jobs;
 
 use function Groundhogg\admin_page_url;
+use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_items_from_csv;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
@@ -77,9 +78,10 @@ class Import_Contacts extends Bulk_Job {
 	 * @param $item mixed
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
 	protected function process_item( $item ) {
-		$contact = \Groundhogg\generate_contact_with_map( $item, $this->field_map );
+		$contact = generate_contact_with_map( $item, $this->field_map );
 
 		if ( $contact ) {
 			$contact->apply_tag( $this->import_tags );
