@@ -182,7 +182,7 @@ class Broadcasts_Page extends Admin_Page {
 		}
 
 		// Unset the search param from the query...
-		unset( $query['search'] );
+		unset( $query['is_searching'] );
 
 		$query = wp_parse_args( $query, [
 			'optin_status' => [

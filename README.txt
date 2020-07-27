@@ -177,6 +177,14 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.18.2 (2020-07-27) =
+* FIXED DB error while importing contacts causing import to fail in some cases.
+
+= 2.2.18.1 (2020-07-23) =
+* ADDED Panel in the tools > updates screen to process updates across the whole network.
+* FIXED Quick search for contacts was not working when sending a broadcast through the new quick broadcast tool.
+* FIXED meta_key index length of 255 is too long when charset is utf8mb4, set to 191.
+
 = 2.2.18 (2020-07-23) =
 * ADDED New broadcast status of pending for broadcasts which have not been fully scheduled.
 * ADDED New broadcast support for saved searches and custom search form the contacts table.

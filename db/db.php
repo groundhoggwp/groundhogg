@@ -158,6 +158,28 @@ abstract class DB {
 	}
 
 	/**
+	 * Get the charset
+	 *
+	 * @return string
+	 */
+	public function get_charset() {
+		global $wpdb;
+
+		return $wpdb->charset;
+	}
+
+	/**
+	 * Get the charset
+	 *
+	 * @return string
+	 */
+	public function get_collate() {
+		global $wpdb;
+
+		return $wpdb->collate;
+	}
+
+	/**
 	 * Option to add additional actions following construct.
 	 */
 	protected function add_additional_actions() {}

@@ -35,7 +35,7 @@ class Update_Subsites extends Bulk_Job {
 	}
 
 	public function max_items( $max, $items ) {
-		return min( 1, intval( ini_get( 'max_input_vars' ) ) );
+		return 1;
 	}
 
 	protected function pre_loop() {

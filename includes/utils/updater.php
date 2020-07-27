@@ -33,6 +33,7 @@ abstract class Updater {
 
 		// Show updates path in tools area
 		add_action( 'groundhogg/admin/tools/updates', [ $this, 'show_manual_updates' ] );
+		add_action( 'groundhogg/admin/tools/network_updates', [ $this, 'show_network_updates' ] );
 
 		// Do the manual update
 		add_action( 'admin_init', [ $this, 'do_manual_updates' ], 99 );
@@ -102,6 +103,24 @@ abstract class Updater {
 			?></p><?php
 
 		endforeach;
+	}
+
+	/**
+	 * Show all the network updates
+	 */
+	public function show_network_updates(){
+		$action_url = Plugin::instance()->bulk_jobs->update_subsites->get_start_url( [ 'updater' => $this->get_updater_name() ] );
+
+		?>
+        <h3><?php echo $this->get_display_name(); ?></h3>
+        <p><?php
+
+		echo html()->e( 'a', [
+			'class' => 'button',
+			'href'  => $action_url
+		], __( 'Run Network Upgrade', 'groundhogg' ) )
+
+		?></p><?php
 	}
 
 	/**
@@ -400,7 +419,7 @@ abstract class Updater {
 			return false;
 		}
 
-		$available_updates = $this->get_available_updates();
+		$available_updates = array_merge( $this->get_available_updates(), $this->get_automatic_updates() );
 		$missing_updates   = array_diff( $available_updates, $previous_updates );
 
 		if ( empty( $missing_updates ) ) {

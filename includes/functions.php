@@ -1845,23 +1845,41 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 	}
 
+	$contact = false;
+
 	// No point in trying if there is no email field
-	if ( isset_not_empty( $args, 'email' ) ) {
-		$contact = new Contact();
-		$id      = $contact->create( $args );
-	} else {
+	if ( isset( $args['email'] ) ) {
+
+		if ( ! is_email( $args['email'] ) ) {
+			return false;
+		}
+
+		$contact = get_contactdata( $args['email'] );
+
+		// update existing
+		if ( $contact !== false && $contact->exists() ) {
+			$contact->update( $args );
+			// create new
+		} else {
+			$contact = new Contact( $args );
+		}
+
+		// We do NOT want to process this in the event the user is logged is as
+		// a GH user
+		// There is no email field in this case!
+	} else if ( ! current_user_can( 'view_contacts' ) ) {
 
 		// Is there an active contact record?
 		$contact = get_contactdata();
-		if ( $contact && $contact !== false ) // Update based on the current args...
-		{
+
+		// Update based on the current args...
+		if ( $contact !== false && $contact->exists() ) {
 			$contact->update( $args );
-			$id = $contact->get_id();
 		}
 	}
 
 
-	if ( ! $id ) {
+	if ( ! $contact ) {
 		return false;
 	}
 
@@ -3276,6 +3294,27 @@ function is_groundhogg_network_active() {
 	}
 
 	return false;
+}
+
+/**
+ * Do an action after a contact has been created or updated
+ *
+ * @param int|Contact|Email $contact
+ * @param string $hook
+ *
+ * @return bool
+ */
+function contact_action( $contact = 0, $hook = 'created' ) {
+
+	if ( ! $contact ) {
+		return false;
+	} else if ( ! $contact instanceof Contact ) {
+		$contact = get_contactdata( $contact );
+	}
+
+	do_action( "groundhogg/contact/{$hook}", $contact );
+
+	return true;
 }
 
 /**

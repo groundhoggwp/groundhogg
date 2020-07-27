@@ -230,7 +230,7 @@ class Broadcasts_Table extends WP_List_Table {
 		$query = $broadcast->get_query();
 
 		if ( ! empty( $query ) && is_array( $query ) ) {
-			$query['search'] = 'on';
+			$query['is_searching'] = 'on';
 
 			$actions['query'] = html()->e( 'a', [
 				'href' => admin_page_url( 'gh_contacts', $query )
@@ -310,7 +310,7 @@ class Broadcasts_Table extends WP_List_Table {
 	protected function column_query( $broadcast ) {
 
 		$query           = $broadcast->get_query();
-		$query['search'] = 'on';
+		$query['is_searching'] = 'on';
 
 		return html()->e( 'a', [
 			'href' => admin_page_url( 'gh_contacts', $query )
