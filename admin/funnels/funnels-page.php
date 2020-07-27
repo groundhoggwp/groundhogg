@@ -166,6 +166,10 @@ class Funnels_Page extends Admin_Page {
 			$funnel_id = absint( get_url_var( 'funnel' ) );
 			$funnel    = new Funnel( $funnel_id );
 
+			if ( ! $funnel->exists() ){
+			    $this->wp_die_no_access();
+            }
+
 			wp_enqueue_script( 'groundhogg-funnel-react' );
 			wp_localize_script( 'groundhogg-funnel-react', 'ghEditor', [
 				'funnel'       => $funnel->get_as_array(),
