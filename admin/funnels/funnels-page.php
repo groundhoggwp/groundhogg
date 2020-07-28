@@ -173,7 +173,11 @@ class Funnels_Page extends Admin_Page {
 			wp_enqueue_script( 'groundhogg-funnel-react' );
 			wp_localize_script( 'groundhogg-funnel-react', 'ghEditor', [
 				'funnel'       => $funnel->get_as_array(),
-				'exit'         => admin_page_url( 'gh_funnels' ),
+				'actions'      => [
+				    'export_url' => esc_url( $funnel->export_url() ),
+					'reporting'  => esc_url( admin_page_url( 'gh_reporting', [ 'tab' => 'funnels', 'funnel' => $funnel->get_id() ] ) )
+                ],
+				'exit'         => esc_url( admin_page_url( 'gh_funnels' ) ),
 				'groups'       => [
 					'actions'    => Plugin::instance()->step_manager->get_actions_as_array(),
 					'benchmarks' => Plugin::instance()->step_manager->get_benchmarks_as_array()

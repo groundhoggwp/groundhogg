@@ -319,7 +319,7 @@ function FieldLabel ({ field }) {
   if (FieldTypes.hasOwnProperty(field.type) &&
     FieldTypes[field.type].hasOwnProperty('renderName')) {
     // console.debug( field );
-    name = FieldTypes[field.type].renderName(field.attributes)
+    name = FieldTypes[field.type].renderName({ attributes: field.attributes })
   } else {
     name = field.attributes.label
   }
@@ -354,15 +354,15 @@ function FieldEditor ({ field, onEdit, updateField }) {
 
   const updateAttribute = (attr, value) => {
 
-  	if ( typeof attr === 'object' && attr !== null ){
-  		updateField(fieldId, 'attributes', {
-  			...attributes,
-				...attr
-			} );
-		} else {
-			attributes[attr] = value
-			updateField(fieldId, 'attributes', attributes)
-		}
+    if (typeof attr === 'object' && attr !== null) {
+      updateField(fieldId, 'attributes', {
+        ...attributes,
+        ...attr
+      })
+    } else {
+      attributes[attr] = value
+      updateField(fieldId, 'attributes', attributes)
+    }
   }
 
   return (
@@ -729,6 +729,9 @@ const FieldTypes = {
     type: 'gdpr',
     name: 'GDPR',
     attributes: ['label', 'tag', 'id', 'class'],
+    renderName: ({ attributes }) => {
+      return __('GDPR Consent', 'groundhogg')
+    },
     render: function ({ attributes }) {
 
       attributes = parseArgs(attributes, {
@@ -752,6 +755,9 @@ const FieldTypes = {
     type: 'terms',
     name: 'Terms',
     attributes: ['label', 'tag', 'id', 'class'],
+    renderName: ({ attributes }) => {
+      return __('Terms Agreement', 'groundhogg')
+    },
     render: function ({ attributes }) {
 
       attributes = parseArgs(attributes, {
@@ -774,13 +780,19 @@ const FieldTypes = {
   recaptcha: {
     type: 'recaptcha',
     name: 'reCaptcha',
-    attributes: ['captcha-theme', 'captcha-size', 'id', 'class']
+    attributes: ['captcha-theme', 'captcha-size', 'id', 'class'],
+    renderName: ({ attributes }) => {
+      return 'reCaptcha'
+    },
+    render: ({ attributes }) => {
+      return <div className={'gh-recaptcha'}></div>
+    }
   },
   submit: {
     type: 'submit',
     name: 'Submit',
     attributes: ['text', 'id', 'class'],
-    renderName: (attributes) => {
+    renderName: ({ attributes }) => {
       return attributes.text
     },
     render: function ({ attributes }) {
@@ -903,11 +915,6 @@ const FieldTypes = {
     name: 'Radio',
     attributes: ['required', 'label', 'name', 'options', 'id', 'class'],
     render: function ({ attributes }) {
-
-      parseArgs(attributes, {
-        options: []
-      })
-
       return <RadioFieldGroup attributes={attributes}/>
     }
   },
@@ -1017,10 +1024,10 @@ const widthMap = {
 
 function renderField (field) {
 
-  if (!FieldTypes.hasOwnProperty(field.type)) {
-
-    return <div className={'nor-implemented'}>{'not implemented'}</div>
+  if (!FieldTypes.hasOwnProperty(field.type) || !FieldTypes[field.type].hasOwnProperty('render')) {
+    return <div className={'not-implemented'}>{'not implemented'}</div>
   }
+
   const input = React.createElement(FieldTypes[field.type].render, {
     attributes: field.attributes || {},
     children: field.children || []
@@ -1053,6 +1060,11 @@ function BasicFieldGroup ({ hideLabel, label, isRequired, children }) {
 }
 
 function RadioFieldGroup ({ attributes }) {
+
+  parseArgs(attributes, {
+    options: []
+  })
+
   return (
     <>
       <label className={'gh-input-label'}>

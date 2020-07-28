@@ -324,7 +324,7 @@ export const DelayTypes = {
         )
       }
 
-      text.push('the ')
+      text.push(' the ')
 
       if (delay.use_next_occurrence) {
         text.push('next ')

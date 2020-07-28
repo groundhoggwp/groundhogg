@@ -64,7 +64,7 @@ class Manager {
 
 		/* actions */
 		$this->add_step( new Send_Email() );
-//		$this->add_step( new Admin_Notification() );
+		$this->add_step( new Admin_Notification() );
 		$this->add_step( new Apply_Tag() );
 		$this->add_step( new Remove_Tag() );
 		$this->add_step( new Apply_Note() );

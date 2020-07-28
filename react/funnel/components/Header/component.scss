@@ -3,10 +3,17 @@
   .navbar{
     min-height: 60px;
     border-bottom: 1px solid #e5e5e5;
-  }
 
-  .groundhogg-nav {
-    padding-right: 50px;
+    .title-input-editing{
+      margin-top: -.3125rem;
+      margin-bottom: -.3125rem;
+      width: 400px;
+      max-width: 100%;
+    }
+
+    .groundhogg-nav {
+      padding-right: 50px;
+    }
   }
 
   .sticky-top{
@@ -18,5 +25,6 @@
       margin: 13px;
     }
   }
+
 
 }
