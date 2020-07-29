@@ -6,6 +6,7 @@ use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Funnel;
 use Groundhogg\Library;
 use Groundhogg\Steps\Funnel_Step;
+use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon;
 use function Groundhogg\get_array_var;
@@ -123,7 +124,7 @@ class Funnels_Page extends Admin_Page {
 
 		if ( $this->is_current_page() && $this->get_current_action() === 'edit' ) {
 //		    add_action('admin_head')
-		    add_action( 'admin_init', [ $this, 'edit' ] );
+			add_action( 'admin_init', [ $this, 'edit' ] );
 			add_action( 'in_admin_header', array( $this, 'prevent_notices' ) );
 			/* just need to enqueue it... */
 			enqueue_groundhogg_modal();
@@ -165,7 +166,7 @@ class Funnels_Page extends Admin_Page {
 
 		if ( $this->get_current_action() === 'edit' ) {
 
-		    // Todo
+			// Todo
 
 		} else if ( $this->get_current_action() === 'funnel_settings' ) {
 
@@ -896,7 +897,7 @@ class Funnels_Page extends Admin_Page {
 		$funnel_id = absint( get_url_var( 'funnel' ) );
 		$funnel    = new Funnel( $funnel_id );
 
-		if ( ! $funnel->exists() ){
+		if ( ! $funnel->exists() ) {
 			$this->wp_die_no_access();
 		}
 
@@ -906,10 +907,11 @@ class Funnels_Page extends Admin_Page {
 		wp_localize_script( 'groundhogg-funnel-react', 'ghEditor', [
 			'funnel'       => $funnel->get_as_array(),
 			'actions'      => [
-				'export_url' => esc_url( $funnel->export_url() ),
-				'reporting'  => esc_url( admin_page_url( 'gh_reporting', [ 'tab' => 'funnels', 'funnel' => $funnel->get_id() ] ) )
+				'export_url' => $funnel->export_url(),
+				'reporting'  => admin_page_url( 'gh_reporting', [ 'tab' => 'funnels', 'funnel' => $funnel->get_id() ] ),
+				'delete'     => action_url( 'delete', [ 'funnel' => $funnel->get_id() ] )
 			],
-			'exit'         => esc_url( admin_page_url( 'gh_funnels' ) ),
+			'exit'         => admin_page_url( 'gh_funnels' ),
 			'groups'       => [
 				'actions'    => Plugin::instance()->step_manager->get_actions_as_array(),
 				'benchmarks' => Plugin::instance()->step_manager->get_benchmarks_as_array()
@@ -930,34 +932,34 @@ class Funnels_Page extends Admin_Page {
 		exit;
 	}
 
-	protected function edit_header(){
+	protected function edit_header() {
 		?>
         <!DOCTYPE html>
         <html <?php language_attributes(); ?>>
         <head>
-            <meta name="viewport" content="width=device-width" />
-            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <meta name="viewport" content="width=device-width"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
             <title><?php esc_html_e( 'Groundhogg &rsaquo; Funnel Editor', 'groundhogg' ); ?></title>
 			<?php do_action( 'admin_print_styles' ); ?>
 			<?php do_action( 'admin_head' ); ?>
         </head>
         <body class="groundhogg groundhogg-funnel">
 		<?php
-    }
+	}
 
-    protected function edit_content(){
-	    ?>
+	protected function edit_content() {
+		?>
         <div id="root"></div>
-        <?php
-    }
+		<?php
+	}
 
-    protected function edit_footer(){
-	    ?>
+	protected function edit_footer() {
+		?>
         </body>
-	    <?php wp_print_scripts( 'groundhogg-funnel-react' ); ?>
+		<?php wp_print_scripts( 'groundhogg-funnel-react' ); ?>
         </html>
-	    <?php
-    }
+		<?php
+	}
 
 	public function add() {
 		if ( ! current_user_can( 'add_funnels' ) ) {

@@ -1,6 +1,6 @@
 import React from 'react';
 import './component.scss';
-import { fadeIn, fadeOut, slideInRight} from "react-animations";
+import { fadeIn, fadeOut, slideInRight, slideOutRight } from 'react-animations'
 import Radium, { StyleRoot } from 'radium';
 
 const styles = {
@@ -15,6 +15,10 @@ const styles = {
 	slideInRight: {
 		animation: 'x 750ms',
 		animationName: Radium.keyframes(slideInRight, 'slideInRight'),
+	},
+	slideOutRight: {
+		animation: 'x 250ms',
+		animationName: Radium.keyframes(slideOutRight, 'slideOutRight'),
 	},
 };
 
@@ -42,6 +46,16 @@ export const SlideInRight = (props) => {
 	return (
 		<StyleRoot>
 			<div style={styles.slideInRight} className={'animated'}>
+				{props.children}
+			</div>
+		</StyleRoot>
+	);
+};
+
+export const SlideOutRight = (props) => {
+	return (
+		<StyleRoot>
+			<div style={styles.slideOutRight} className={'animated'} onAnimationEnd={props.then}>
 				{props.children}
 			</div>
 		</StyleRoot>

@@ -1,72 +1,83 @@
-import React, { Component } from 'react';
-import axios from 'axios';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
-import Button from 'react-bootstrap/Button';
+import React, { Component } from 'react'
+import axios from 'axios'
+import ButtonGroup from 'react-bootstrap/ButtonGroup'
+import Button from 'react-bootstrap/Button'
 
-import './component.scss';
+import './component.scss'
 
-const { __, _x, _n, _nx } = wp.i18n;
+const { __, _x, _n, _nx } = wp.i18n
 
 export class FunnelStatus extends Component {
 
-	constructor (props) {
-		super(props);
+  constructor (props) {
+    super(props)
 
-		this.state = {
-			status: ghEditor.funnel.status,
-			error: false,
-		};
+    this.state = {
+      status: ghEditor.funnel.status,
+      error: false,
+    }
 
-		this.setStateActive = this.setStateActive.bind(this);
-		this.setStateInactive = this.setStateInactive.bind(this);
-	}
+    this.setStateActive = this.setStateActive.bind(this)
+    this.setStateInactive = this.setStateInactive.bind(this)
+  }
 
-	setStateActive () {
-		this.updateStatus('active');
-	}
+  setStateActive () {
+    this.updateStatus('active')
+  }
 
-	setStateInactive () {
-		this.updateStatus('inactive');
-	}
+  setStateInactive () {
 
-	updateStatus (newStatus) {
-		axios.patch(groundhogg_endpoints.funnels, {
-			funnel_id: ghEditor.funnel.id,
-			args: {
-				status: newStatus,
-			},
-		}).then(result => this.setState({
-			status: result.data.funnel.status,
-		})).catch(error => this.setState({
-			error,
-		}));
-	}
+    if (confirm(__(
+      'Are you sure you want to deactivate this funnel? Any contacts currently active within the funnel will be paused.',
+      'groundhogg'))) {
+      this.updateStatus('inactive')
+    }
+  }
 
-	render () {
+  updateStatus (newStatus) {
 
-		return (
-			<div className={ 'funnel-status' }>
-				<ButtonGroup>
-					<Button
-						onClick={ this.setStateActive }
-						variant={ this.state.status === 'active'
-							? 'primary'
-							: 'outline-primary' }
-					>
-						{ __( 'Active', 'status', 'groundhogg' ) }
-					</Button>
-					<Button
-						onClick={ this.setStateInactive }
-						variant={ this.state.status === 'active'
-							? 'outline-secondary'
-							: 'secondary' }
-					>
-						{ __( 'Inactive', 'status', 'groundhogg' ) }
-					</Button>
-				</ButtonGroup>
-			</div>
+    // Do not do anything if the status hasn't changed
+    if (newStatus === this.state.status) {
+      return
+    }
 
-		);
-	}
+    axios.patch(groundhogg_endpoints.funnels, {
+      funnel_id: ghEditor.funnel.id,
+      args: {
+        status: newStatus,
+      },
+    }).then(result => this.setState({
+      status: result.data.funnel.status,
+    })).catch(error => this.setState({
+      error,
+    }))
+  }
+
+  render () {
+
+    return (
+      <div className={ 'funnel-status' }>
+        <ButtonGroup>
+          <Button
+            onClick={ this.setStateActive }
+            variant={ this.state.status === 'active'
+              ? 'primary'
+              : 'outline-primary' }
+          >
+            { __('Active', 'status', 'groundhogg') }
+          </Button>
+          <Button
+            onClick={ this.setStateInactive }
+            variant={ this.state.status === 'active'
+              ? 'outline-secondary'
+              : 'secondary' }
+          >
+            { __('Inactive', 'status', 'groundhogg') }
+          </Button>
+        </ButtonGroup>
+      </div>
+
+    )
+  }
 
 }

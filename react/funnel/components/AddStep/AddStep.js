@@ -39,9 +39,6 @@ export class AddStep extends React.Component {
   }
 
   handleAddStep (e) {
-
-    disableBodyScrolling()
-
     this.setState({
       isShowing: true,
       stepChosen: false,
@@ -52,9 +49,6 @@ export class AddStep extends React.Component {
   }
 
   handleExit () {
-
-    enableBodyScrolling()
-
     this.setState({
       isShowing: false,
       stepChosen: false,
@@ -91,10 +85,6 @@ export class AddStep extends React.Component {
   }
 
   render () {
-
-    if (!this.state.isShowing) {
-      return <div className={ 'hidden-step-adder' }></div>
-    }
 
     const search = this.state.search
     const group = this.state.group

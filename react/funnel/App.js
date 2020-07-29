@@ -1,6 +1,5 @@
 import React from 'react';
 import axios from 'axios';
-import { Header } from './components/Header/Header';
 import {Editor} from './components/Editor/Editor';
 
 axios.defaults.headers.common['X-WP-Nonce'] = groundhogg_nonces._wprest;
@@ -10,7 +9,6 @@ import './master.scss';
 function App() {
 	return (
 		<div className="Groundhogg">
-			<Header/>
 			<Editor/>
 		</div>
 	);
@@ -88,4 +86,23 @@ if (!String.prototype.format) {
 				;
 		});
 	};
+}
+
+/**
+ * Build a simple get request
+ *
+ * @param uri
+ * @param params
+ * @returns {string}
+ */
+export function getRequest ( uri, params ) {
+
+	const esc = encodeURIComponent
+	const query = Object.keys(params).
+		map(k => esc(k) + '=' + esc(params[k])).
+		join('&')
+
+	let join = uri.match(/\?/gi) ? '&' : '?'
+
+	return uri + join + query;
 }

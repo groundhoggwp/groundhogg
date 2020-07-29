@@ -152,107 +152,21 @@ class Funnel extends Base_Object_With_Meta {
 	 * @return array|bool
 	 */
 	public function get_as_array() {
-		$export           = [];
-		$export['id']     = $this->get_id();
-		$export['status'] = $this->get_status();
-		$export['title']  = $this->get_title();
-		$export['steps']  = [];
-
-		$steps = $this->get_steps();
+		$array          = parent::get_as_array();
+		$steps          = $this->get_steps();
+		$array['steps'] = [];
 
 		if ( ! $steps ) {
-			return false;
+			return $array;
 		}
 
-		foreach ( $steps as $step ){
-			$export['steps'][] = $step->get_as_array();
+		foreach ( $steps as $step ) {
+			$array['steps'][] = $step->get_as_array();
 		}
 
-		$export = apply_filters( 'groundhogg/funnel/export', $export, $this );
+		$array = apply_filters( 'groundhogg/funnel/export', $array, $this );
 
-		return $export;
-	}
-
-	/**
-	 * Group benchmarks together...
-	 */
-	public function get_for_react_editor() {
-
-		$export           = [];
-		$export['id']     = $this->get_id();
-		$export['status'] = $this->get_status();
-		$export['title']  = $this->get_title();
-		$export['groups'] = [];
-
-		$steps = $this->get_steps();
-
-		if ( ! $steps ) {
-			return false;
-		}
-
-		$benchmark_group = [
-			'id'    => uniqid(),
-			'type'  => 'benchmark_group',
-			'steps' => []
-		];
-
-		$action_group = [
-			'id'    => uniqid(),
-			'type'  => 'action_group',
-			'steps' => []
-		];
-
-		foreach ( $steps as $i => $step ) {
-
-			$step_config = [
-				'id'    => $step->get_id(),
-				'title' => $step->get_title(),
-				'group' => $step->get_group(),
-				'order' => $step->get_order(),
-				'type'  => $step->get_type(),
-				'meta'  => $step->get_meta(),
-				'args'  => $step->export(),
-				'icon'  => $step->icon(),
-			];
-
-			if ( $step->is_benchmark() ) {
-				$benchmark_group['steps'][] = $step_config;
-
-				// If the next step is an action or we have reached the end of the funnel
-				if ( $i + 1 === count( $steps ) || ! $steps[ $i + 1 ]->is_benchmark() ) {
-
-					// Add the benchmark group to the steps
-					$export['groups'][] = $benchmark_group;
-
-					// Reset the benchmark grouping
-					$benchmark_group = [
-						'id'    => uniqid(),
-						'type'  => 'benchmark_group',
-						'steps' => []
-					];
-				}
-			} else if ( $step->is_action() ) {
-				$action_group['steps'][] = $step_config;
-
-				// If the next step is a benchmark or we have reached the end of the funnel
-				if ( $i + 1 === count( $steps ) || ! $steps[ $i + 1 ]->is_action() ) {
-
-					// Add the action group to the steps
-					$export['groups'][] = $action_group;
-
-					// Reset the action grouping
-					$action_group = [
-						'id'    => uniqid(),
-						'type'  => 'action_group',
-						'steps' => []
-					];
-				}
-			}
-
-		}
-
-		return $export;
-
+		return $array;
 	}
 
 	/**

@@ -108,7 +108,7 @@ class Funnels_Api extends Base {
 		$steps = $request->get_param( 'steps' );
 
 		if ( ! empty( $steps ) ){
-			$ids = wp_list_pluck( $steps, 'id' );
+			$ids = wp_list_pluck( $steps, 'ID' );
 
 			// handle the re-ordering of the steps
 			foreach ( $ids as $i => $id ){
