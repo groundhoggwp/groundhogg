@@ -122,6 +122,8 @@ class Funnels_Page extends Admin_Page {
 		}
 
 		if ( $this->is_current_page() && $this->get_current_action() === 'edit' ) {
+//		    add_action('admin_head')
+		    add_action( 'admin_init', [ $this, 'edit' ] );
 			add_action( 'in_admin_header', array( $this, 'prevent_notices' ) );
 			/* just need to enqueue it... */
 			enqueue_groundhogg_modal();
@@ -163,34 +165,7 @@ class Funnels_Page extends Admin_Page {
 
 		if ( $this->get_current_action() === 'edit' ) {
 
-			$funnel_id = absint( get_url_var( 'funnel' ) );
-			$funnel    = new Funnel( $funnel_id );
-
-			if ( ! $funnel->exists() ){
-			    $this->wp_die_no_access();
-            }
-
-			wp_enqueue_script( 'groundhogg-funnel-react' );
-			wp_localize_script( 'groundhogg-funnel-react', 'ghEditor', [
-				'funnel'       => $funnel->get_as_array(),
-				'actions'      => [
-				    'export_url' => esc_url( $funnel->export_url() ),
-					'reporting'  => esc_url( admin_page_url( 'gh_reporting', [ 'tab' => 'funnels', 'funnel' => $funnel->get_id() ] ) )
-                ],
-				'exit'         => esc_url( admin_page_url( 'gh_funnels' ) ),
-				'groups'       => [
-					'actions'    => Plugin::instance()->step_manager->get_actions_as_array(),
-					'benchmarks' => Plugin::instance()->step_manager->get_benchmarks_as_array()
-				],
-				'steps'        => Funnel_Step::step_props(),
-				'replacements' => Plugin::instance()->replacements->get_codes_with_pretty_name(),
-				'roles'        => Plugin::instance()->roles->get_roles_for_react_select()
-			] );
-
-			wp_enqueue_script( 'groundhogg-admin-replacements' );
-			wp_enqueue_style( 'bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css' );
-			wp_enqueue_style( 'groundhogg-admin-funnel-react' );
-
+		    // Todo
 
 		} else if ( $this->get_current_action() === 'funnel_settings' ) {
 
@@ -914,12 +889,75 @@ class Funnels_Page extends Admin_Page {
 	}
 
 	public function edit() {
-		if ( ! current_user_can( 'edit_funnels' ) ) {
+		if ( ! current_user_can( 'edit_funnels' ) || get_url_var( 'action' ) !== 'edit' ) {
 			$this->wp_die_no_access();
 		}
 
-		echo '<div id="root"></div>';
+		$funnel_id = absint( get_url_var( 'funnel' ) );
+		$funnel    = new Funnel( $funnel_id );
+
+		if ( ! $funnel->exists() ){
+			$this->wp_die_no_access();
+		}
+
+		Plugin::instance()->scripts->register_admin_scripts();
+		Plugin::instance()->scripts->register_admin_styles();
+
+		wp_localize_script( 'groundhogg-funnel-react', 'ghEditor', [
+			'funnel'       => $funnel->get_as_array(),
+			'actions'      => [
+				'export_url' => esc_url( $funnel->export_url() ),
+				'reporting'  => esc_url( admin_page_url( 'gh_reporting', [ 'tab' => 'funnels', 'funnel' => $funnel->get_id() ] ) )
+			],
+			'exit'         => esc_url( admin_page_url( 'gh_funnels' ) ),
+			'groups'       => [
+				'actions'    => Plugin::instance()->step_manager->get_actions_as_array(),
+				'benchmarks' => Plugin::instance()->step_manager->get_benchmarks_as_array()
+			],
+			'steps'        => Funnel_Step::step_props(),
+			'replacements' => Plugin::instance()->replacements->get_codes_with_pretty_name(),
+			'roles'        => Plugin::instance()->roles->get_roles_for_react_select()
+		] );
+
+		wp_enqueue_style( 'bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css' );
+		wp_enqueue_style( 'groundhogg-admin-funnel-react' );
+
+		ob_start();
+
+		$this->edit_header();
+		$this->edit_content();
+		$this->edit_footer();
+		exit;
 	}
+
+	protected function edit_header(){
+		?>
+        <!DOCTYPE html>
+        <html <?php language_attributes(); ?>>
+        <head>
+            <meta name="viewport" content="width=device-width" />
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <title><?php esc_html_e( 'Groundhogg &rsaquo; Funnel Editor', 'groundhogg' ); ?></title>
+			<?php do_action( 'admin_print_styles' ); ?>
+			<?php do_action( 'admin_head' ); ?>
+        </head>
+        <body class="groundhogg groundhogg-funnel">
+		<?php
+    }
+
+    protected function edit_content(){
+	    ?>
+        <div id="root"></div>
+        <?php
+    }
+
+    protected function edit_footer(){
+	    ?>
+        </body>
+	    <?php wp_print_scripts( 'groundhogg-funnel-react' ); ?>
+        </html>
+	    <?php
+    }
 
 	public function add() {
 		if ( ! current_user_can( 'add_funnels' ) ) {

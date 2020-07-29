@@ -13,12 +13,16 @@
 
     .groundhogg-nav {
       padding-right: 50px;
+
+      .funnel-actions{
+        margin-right: 10px;
+      }
     }
   }
 
-  .sticky-top{
-    top: 32px;
-  }
+  //.sticky-top{
+  //  top: 32px;
+  //}
 
   .groundhogg-exit-button{
     .spinner-border{

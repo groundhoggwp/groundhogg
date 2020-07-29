@@ -96,11 +96,11 @@ iframe.email-preview {
 
 .groundhogg {
   &.simple-edit-modal.modal {
-    z-index: 999999;
+    //z-index: 999999;
   }
 
   &.simple-edit-modal.modal-backdrop {
-    z-index: 99999;
+    //z-index: 99999;
   }
 }
 

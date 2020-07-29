@@ -5,7 +5,7 @@
   position: relative;
   height: 100px;
   display: inline-block;
-  width: 320px;
+  width: calc(100% - 20px);
   vertical-align: top;
   //text-overflow: ellipsis;
   //overflow: hidden;
@@ -16,7 +16,7 @@
 
   &.active,
   &:hover{
-    background: $background-hover-color-light;
+    background: $white;
     border-color: $border-hover-color;
     cursor: pointer;
     transition: 0.4s;

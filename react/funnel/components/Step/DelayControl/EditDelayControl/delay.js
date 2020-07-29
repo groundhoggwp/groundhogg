@@ -16,6 +16,7 @@ import moment from 'moment'
 import { parseArgs } from '../../../../App'
 import { Dashicon } from '../../../Dashicon/Dashicon'
 import { ReplacementsButton } from '../../../ReplacementsButton/ReplacementsButton'
+import { Tooltip } from '../../../Tooltip/Tooltip'
 
 const { __, _x, _n, _nx } = wp.i18n
 
@@ -377,7 +378,14 @@ export const DelayTypes = {
                 </div>
               </Col>
               <Col xs={ 5 }>
-                { _x('Replacement Code ', 'step delay', 'groundhogg') }
+                { _x('Replacement Code', 'step delay', 'groundhogg') }
+                <Tooltip
+                  content={ __(
+                    'Insert a replacement code that is expected to return a date. If a non-valid date is given the action will be run instantly.',
+                    'groundhogg')}
+                  id={'delay-replacement-code'}
+                  placement={'right'}
+                />
                 <div className={ 'replacement-controls' }>
                   <input
                     id={ 'replacement-dynamic-delay' }
@@ -395,26 +403,23 @@ export const DelayTypes = {
                     />
                     <ClearFix/>
                   </div>
-                  <p className={ 'description' }>{
-                    __(
-                      'Insert a replacement code that is expected to return a date. If a non-valid date is given the action will be run instantly.',
-                      'groundhogg')
-                  }</p>
                 </div>
-                <div className={ 'replacement-controls' }>
+                <div className={ 'replacement-controls' } style={{marginTop:20}}>
                   <p>
                     { 'Use next occurrence?' }
+                    <Tooltip
+                      content={__(
+                        'If enabled, the year from the date will be ignored.',
+                        'groundhogg')}
+                      id={'use-next-occurrence'}
+                      placement={'right'}
+                    />
                     <div className={ 'alignright' }><YesNoToggle
                       value={ delay.use_next_occurrence }
                       update={ (v) => updateDelay(
                         { use_next_occurrence: v }) }
                     /></div>
                   </p>
-                  <p className={ 'description' }>{
-                    __(
-                      'If enabled, the year from the date will be ignored.',
-                      'groundhogg')
-                  }</p>
                 </div>
               </Col>
               <Col xs={ 3 }>
