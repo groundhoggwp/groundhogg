@@ -906,6 +906,9 @@ class Funnels_Page extends Admin_Page {
 
 		wp_localize_script( 'groundhogg-funnel-react', 'ghEditor', [
 			'funnel'       => $funnel->get_as_array(),
+			'assets'       => [
+                'bigG' => GROUNDHOGG_ASSETS_URL . '/images/big-g.png'
+			],
 			'actions'      => [
 				'export_url' => $funnel->export_url(),
 				'reporting'  => admin_page_url( 'gh_reporting', [ 'tab' => 'funnels', 'funnel' => $funnel->get_id() ] ),

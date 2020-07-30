@@ -56,3 +56,4 @@ export class FunnelTitleInput extends Component {
 	}
 
 }
+

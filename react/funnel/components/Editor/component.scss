@@ -11,7 +11,7 @@ body.disable-scrolling {
   margin: auto;
   margin-top: 20px;
   width: 100%;
-  padding-bottom: 40px
+  padding-bottom: 40px;
 }
 
 #screen-meta-links{
@@ -106,5 +106,20 @@ body.disable-scrolling {
   .items-grid .grid-item:nth-child(4n) {
     width: 25%;
     margin-right: 0;
+  }
+}
+
+.alert-warning.edit-while-active{
+
+  border-radius: 0;
+
+  p{
+    margin: 0;
+  }
+}
+
+.Groundhogg{
+  .progress{
+    border-radius: 0;
   }
 }

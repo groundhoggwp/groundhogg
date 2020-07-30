@@ -8,7 +8,7 @@ import './master.scss';
 
 function App() {
 	return (
-		<div className="Groundhogg">
+		<div className="Groundhogg editor groundhogg-editor">
 			<Editor/>
 		</div>
 	);

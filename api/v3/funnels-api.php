@@ -93,7 +93,7 @@ class Funnels_Api extends Base {
 
 		$funnel_id = absint( $request->get_param( 'funnel_id' ) );
 
-		$args = $request->get_param( 'args' );
+		$args = $request->get_param( 'data' );
 		$args = map_deep( $args, 'sanitize_text_field' );
 
 		$funnel = new Funnel( $funnel_id );
@@ -101,6 +101,8 @@ class Funnels_Api extends Base {
 		if ( ! $funnel->exists() ){
 			return self::ERROR_404( 'error', 'Funnel not found.' );
 		}
+
+		$args[ 'last_updated' ] = current_time( 'mysql' );
 
 		$funnel->update( $args );
 

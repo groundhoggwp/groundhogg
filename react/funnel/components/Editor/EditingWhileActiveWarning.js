@@ -8,7 +8,7 @@ export function EditingWhileActiveWarning() {
 
   if (show) {
     return (
-      <Alert variant="warning" onClose={() => setShow(false)} dismissible>
+      <Alert variant="warning" className={'edit-while-active'} onClose={() => setShow(false)} dismissible>
         <p>
           { __( 'Making changes while the funnel is active is not recommended. Deactivate the funnel first, then make your changes.', 'groundhogg' ) }
         </p>

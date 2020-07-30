@@ -31,6 +31,8 @@
 
     .delay-text {
       cursor: pointer;
+      background: $background-color;
+      padding: 0 4px;
 
       b {
         font-weight: 500;

@@ -34,9 +34,6 @@ class Steps_Api extends Base {
 				'permission_callback' => $callback,
 				'callback'            => [ $this, 'create' ],
 				'args'                => [
-					'type'      => [
-						'required' => true,
-					],
 					'funnel_id' => [
 						'required' => true,
 					],
@@ -76,8 +73,9 @@ class Steps_Api extends Base {
 	 */
 	public function create( WP_REST_Request $request ) {
 
-		$after     = absint( $request->get_param( 'after' ) );
 		$funnel_id = absint( $request->get_param( 'funnel_id' ) );
+		$duplicate = absint( $request->get_param( 'duplicate' ) );
+		$after     = absint( $request->get_param( 'after' ) );
 		$type      = sanitize_key( $request->get_param( 'type' ) );
 
 		// Reorder the steps which will be coming after this new step
@@ -102,18 +100,37 @@ class Steps_Api extends Base {
 			] );
 		}
 
-		$elements = Plugin::$instance->step_manager->get_elements();
+		if ( $duplicate && $duplicate === $after_step->get_id() ){
 
-		$title      = $elements[ $type ]->get_name();
-		$step_group = $elements[ $type ]->get_group();
+			$step = new Step([
+				'funnel_id'   => $after_step->get_funnel_id(),
+				'step_title'  => sprintf( __( '%s - (copy)', 'groundhogg' ), $after_step->get_title() ),
+				'step_type'   => $after_step->get_type(),
+				'step_group'  => $after_step->get_group(),
+				'step_status' => 'ready',
+				'step_order'  => $step_order,
+			]);
 
-		$step = new Step( [
-			'funnel_id'  => $funnel_id,
-			'step_title' => $title,
-			'step_type'  => $type,
-			'step_group' => $step_group,
-			'step_order' => $step_order,
-		] );
+			$meta = $after_step->get_all_meta();
+
+			foreach ( $meta as $key => $value ) {
+				$step->update_meta( $key, $value );
+			}
+
+		} else {
+			$elements = Plugin::$instance->step_manager->get_elements();
+
+			$title      = $elements[ $type ]->get_name();
+			$step_group = $elements[ $type ]->get_group();
+
+			$step = new Step( [
+				'funnel_id'  => $funnel_id,
+				'step_title' => $title,
+				'step_type'  => $type,
+				'step_group' => $step_group,
+				'step_order' => $step_order,
+			] );
+		}
 
 		// reorder the steps.
 		return self::SUCCESS_RESPONSE( [ 'step' => $step->get_as_array() ] );

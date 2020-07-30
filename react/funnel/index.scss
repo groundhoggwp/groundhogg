@@ -1,7 +1,12 @@
 @import "master";
 
+$grid-color: #eeeff3;
+
 body {
   background-color: $background-color;
+  background-attachment: fixed;
+  background-image: linear-gradient($grid-color 1px, transparent 1px), linear-gradient(90deg, $grid-color 1px, transparent 1px);
+  background-size: 3em 3em;
 }
 
 input[type="text"],

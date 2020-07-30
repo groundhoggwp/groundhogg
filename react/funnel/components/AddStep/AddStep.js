@@ -68,7 +68,7 @@ export class AddStep extends React.Component {
     })
 
     axios.post(groundhogg_endpoints.steps, {
-      funnel_id: ghEditor.funnel.id,
+      funnel_id: ghEditor.funnel.ID,
       after: this.state.after,
       type: type,
     }).then(result => this.handleAdded(result))

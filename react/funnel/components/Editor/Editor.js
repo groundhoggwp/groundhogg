@@ -1,12 +1,13 @@
 import React from 'react'
 import './component.scss'
-import Spinner from 'react-bootstrap/Spinner'
 import { StepGroup } from '../StepGroup/StepGroup'
 import { AddStep } from '../AddStep/AddStep'
 import axios from 'axios'
 import { EditingWhileActiveWarning } from './EditingWhileActiveWarning'
 import { Header } from '../Header/Header'
-import { getRequest } from '../../App'
+import { getRequest, objEquals, parseArgs } from '../../App'
+import { FadeIn } from '../Animations/Animations'
+import { ProgressBar } from 'react-bootstrap'
 
 const { __, _x, _n, _nx } = wp.i18n
 
@@ -16,13 +17,15 @@ export class Editor extends React.Component {
     super(props)
 
     this.state = {
-      data: [],
-      steps: [],
+      data: ghEditor.funnel.data,
+      steps: ghEditor.funnel.steps,
+      saving: false,
     }
 
     // this.handleSetList = this.handleSetList.bind(this);
     this.handleStepsSorted = this.handleStepsSorted.bind(this)
     this.handleReloadEditor = this.handleReloadEditor.bind(this)
+    this.handleUpdateFunnel = this.handleUpdateFunnel.bind(this)
   }
 
   componentDidMount () {
@@ -32,11 +35,6 @@ export class Editor extends React.Component {
       this.handleStepsSorted)
     document.addEventListener('groundhogg-reload-editor',
       this.handleReloadEditor)
-
-    this.setState({
-      data: ghEditor.funnel.data,
-      steps: ghEditor.funnel.steps,
-    })
   }
 
   handleStepsSorted (e) {
@@ -53,12 +51,17 @@ export class Editor extends React.Component {
       newStepOrder.push(self.state.steps.find(step => step.ID == id))
     })
 
-    this.setState({ steps: newStepOrder })
+    this.setState({
+      steps: newStepOrder,
+      saving: true,
+    })
 
     axios.patch(groundhogg_endpoints.funnels, {
       funnel_id: ghEditor.funnel.ID,
       steps: newStepOrder,
-    })
+    }).then(result => this.setState({
+      saving: false,
+    }))
   }
 
   /**
@@ -69,14 +72,29 @@ export class Editor extends React.Component {
    */
   handleUpdateFunnel (newData) {
 
-    const curData = this.state.data;
+    const curData = this.state.data
+    const updatedData = parseArgs(newData, curData)
+
+    // No need to update if nothing changed
+    if (objEquals(curData, updatedData)) {
+      return
+    }
 
     this.setState({
       data: {
         ...curData,
-        ...newData
+        ...newData,
       },
-    });
+      saving: true,
+    })
+
+    axios.patch(groundhogg_endpoints.funnels, {
+      funnel_id: ghEditor.funnel.ID,
+      data: newData,
+    }).then(result => this.setState({
+      data: result.data.funnel.data,
+      saving: false,
+    }))
 
   }
 
@@ -93,7 +111,7 @@ export class Editor extends React.Component {
 
   render () {
 
-    const status = this.state.funnel.status
+    const status = this.state.data.status
 
     const rawGroups = reduceStepsToGroups(this.state.steps)
     const groups = rawGroups.map((group, i) => <StepGroup
@@ -106,14 +124,19 @@ export class Editor extends React.Component {
     return (
       <>
         <Header
-          updateFunnel={ }
+          updateFunnel={ this.handleUpdateFunnel }
+          data={ this.state.data }
+          isSaving={this.state.saving}
         />
+        {
+          status === 'active' && <FadeIn>
+            <EditingWhileActiveWarning/>
+          </FadeIn>
+        }
         <div
           id="groundhogg-funnel-editor"
           className="groundhogg-funnel-editor"
-        > {
-          status === 'active' && <EditingWhileActiveWarning/>
-        }
+        >
           <div className={ 'step-groups' }>
             { groups }
           </div>

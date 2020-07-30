@@ -7,77 +7,47 @@ import './component.scss'
 
 const { __, _x, _n, _nx } = wp.i18n
 
-export class FunnelStatus extends Component {
+export const FunnelStatus = ({ status, onChange }) => {
 
-  constructor (props) {
-    super(props)
-
-    this.state = {
-      status: ghEditor.funnel.status,
-      error: false,
-    }
-
-    this.setStateActive = this.setStateActive.bind(this)
-    this.setStateInactive = this.setStateInactive.bind(this)
+  const setActive = () => {
+    onChange('active')
   }
 
-  setStateActive () {
-    this.updateStatus('active')
-  }
+  const setInactive = () => {
 
-  setStateInactive () {
-
-    if (confirm(__(
+    const message = __(
       'Are you sure you want to deactivate this funnel? Any contacts currently active within the funnel will be paused.',
-      'groundhogg'))) {
-      this.updateStatus('inactive')
-    }
-  }
+      'groundhogg')
 
-  updateStatus (newStatus) {
-
-    // Do not do anything if the status hasn't changed
-    if (newStatus === this.state.status) {
+    if (!confirm(message)) {
       return
     }
 
-    axios.patch(groundhogg_endpoints.funnels, {
-      funnel_id: ghEditor.funnel.id,
-      args: {
-        status: newStatus,
-      },
-    }).then(result => this.setState({
-      status: result.data.funnel.status,
-    })).catch(error => this.setState({
-      error,
-    }))
+    onChange('inactive')
   }
 
-  render () {
+  return (
+    <div className={ 'funnel-status' }>
+      <ButtonGroup>
+        <Button
+          onClick={ setActive }
+          variant={ status === 'active'
+            ? 'primary'
+            : 'outline-primary' }
+        >
+          { __('Active', 'status', 'groundhogg') }
+        </Button>
+        <Button
+          onClick={ setInactive }
+          variant={ status === 'active'
+            ? 'outline-secondary'
+            : 'secondary' }
+        >
+          { __('Inactive', 'status', 'groundhogg') }
+        </Button>
+      </ButtonGroup>
+    </div>
 
-    return (
-      <div className={ 'funnel-status' }>
-        <ButtonGroup>
-          <Button
-            onClick={ this.setStateActive }
-            variant={ this.state.status === 'active'
-              ? 'primary'
-              : 'outline-primary' }
-          >
-            { __('Active', 'status', 'groundhogg') }
-          </Button>
-          <Button
-            onClick={ this.setStateInactive }
-            variant={ this.state.status === 'active'
-              ? 'outline-secondary'
-              : 'secondary' }
-          >
-            { __('Inactive', 'status', 'groundhogg') }
-          </Button>
-        </ButtonGroup>
-      </div>
-
-    )
-  }
+  )
 
 }

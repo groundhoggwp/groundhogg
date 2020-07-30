@@ -26,23 +26,14 @@ export function DelayControl ({ delay, updateDelay }) {
     setShow(false)
   }
 
-  const mergedDelay = parseArgs(tempDelay, {
-    period: 0,
-    type: 'instant',
-    interval: 'none',
-    run_on: 'any',
-    days_of_week_type: 'any',
-    months_of_year_type: 'any',
-    days_of_week: [],
-    months_of_year: [],
-    wait_type: 'after',
-  })
+  const mergedDelay = mergeDelayDefaults( tempDelay );
+  const displayDelay = mergeDelayDefaults( delay )
 
   return (
     <div className={ 'delay' }>
-      <DelayIcon type={ tempDelay.type }/>
+      <DelayIcon type={ displayDelay.type }/>
       <span className={ 'delay-text' } onClick={ () => setShow(true) }>
-                <RenderDelay delay={ mergedDelay }/>
+                <RenderDelay delay={ displayDelay }/>
             </span>
       <EditDelayModal
         show={ show }
@@ -53,4 +44,18 @@ export function DelayControl ({ delay, updateDelay }) {
     </div>
   )
 
+}
+
+function mergeDelayDefaults ( delay ) {
+  return parseArgs(delay, {
+    period: 0,
+    type: 'instant',
+    interval: 'none',
+    run_on: 'any',
+    days_of_week_type: 'any',
+    months_of_year_type: 'any',
+    days_of_week: [],
+    months_of_year: [],
+    wait_type: 'after',
+  });
 }

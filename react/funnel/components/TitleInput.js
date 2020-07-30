@@ -1,79 +1,60 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
-export class TitleInput extends React.Component {
+export const TitleInput = ({ title, onChange, className, preText }) => {
 
-  constructor (props) {
-    super(props)
+  const [editing, setEditing] = useState(false)
+  const [tempTitle, setTempTitle] = useState(title)
+  const titleInputEl = useRef(null)
 
-    this.state = {
-      editing: false
-    }
-
-    this.handleChange = this.handleChange.bind(this)
-    this.handleBlur = this.handleBlur.bind(this)
-    this.handleClick = this.handleClick.bind(this)
-    this.handleKeyDown = this.handleKeyDown.bind(this)
-
-    this.titleInput = React.createRef()
+  const handleChange = (e) => {
+    setTempTitle(e.target.value)
   }
 
-  handleChange (e) {
-
-    const name = e.target.value
-    this.props.onChange(name)
+  const handleBlur = (e) => {
+    setEditing(false)
+    onChange(tempTitle)
   }
 
-  handleBlur (e) {
-    this.setState({ editing: false })
-    const name = e.target.value
-    this.props.onBlur(name)
-  }
-
-  handleKeyDown (e) {
-    if (e.keyCode === 13) {
-      this.setState({ editing: false })
-      const name = e.target.value
-      this.props.onBlur(name)
+  const handleKeyDown = (e) => {
+    switch (e.keyCode) {
+      case 13:
+        handleBlur(e)
+        break
+      case 27:
+        setTempTitle(title)
+        setEditing(false)
+        break
     }
   }
 
-  handleClick (e) {
-    this.setState({ editing: true })
+  const handleClick = (e) => {
+    setEditing(true)
   }
 
-  componentDidMount () {
-    if (this.state.editing) {
-      this.titleInput.current.focus()
+  useEffect(() => {
+    if ( editing ){
+      titleInputEl.current.focus()
     }
-  }
+  }, [editing])
 
-  componentDidUpdate (prevProps, prevState, snapshot) {
-    if (this.state.editing) {
-      this.titleInput.current.focus()
-    }
-  }
+  return ( <>
+    { ! editing && <span
+      className={ className +
+      ' title-input title-input-reading' }
+      onClick={ handleClick }>
+    { preText || 'Now editing ' }
+      <b>{ title }</b>
+    </span> }
+    { editing && <input
+      type={ 'text' }
+      ref={ titleInputEl }
+      className={ className +
+      ' title-input title-input-editing' }
+      value={ tempTitle }
+      onChange={ handleChange }
+      onBlur={ handleBlur }
+      onKeyDown={ handleKeyDown }
+    /> }
+  </> )
 
-  render () {
-
-    if (this.state.editing) {
-      return <input
-        type={'text'}
-        ref={this.titleInput}
-        className={this.props.className +
-        ' title-input title-input-editing'}
-        value={this.props.title}
-        onChange={this.handleChange}
-        onBlur={this.handleBlur}
-        onKeyDown={this.handleKeyDown}
-      />
-    }
-
-    return (<span
-      className={this.props.className +
-      ' title-input title-input-reading'}
-      onClick={this.handleClick}>
-			{this.props.preText || 'Now editing '}
-      <b>{this.props.title}</b>
-        </span>)
-  }
 }
