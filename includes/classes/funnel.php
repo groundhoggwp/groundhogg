@@ -36,7 +36,6 @@ class Funnel extends Base_Object_With_Meta {
 		return Plugin::instance()->dbs->get_db( 'funnelmeta' );
 	}
 
-
 	/**
 	 * A string to represent the object type
 	 *
@@ -45,6 +44,7 @@ class Funnel extends Base_Object_With_Meta {
 	protected function get_object_type() {
 		return 'funnel';
 	}
+
 
 	public function get_id() {
 		return absint( $this->ID );
@@ -109,7 +109,6 @@ class Funnel extends Base_Object_With_Meta {
 		return array_shift( $actions );
 	}
 
-
 	/**
 	 * Get the step IDs associate with this funnel
 	 *
@@ -126,6 +125,7 @@ class Funnel extends Base_Object_With_Meta {
 
 		return wp_parse_id_list( wp_list_pluck( $this->get_steps_db()->get_steps( $query ), 'ID' ) );
 	}
+
 
 	/**
 	 * Get a bunch of steps
@@ -266,6 +266,28 @@ class Funnel extends Base_Object_With_Meta {
 		}
 
 		return $funnel_id;
+	}
+
+	public function isValidFunnel() {
+
+		$steps = $this->get_steps();
+
+		foreach ( $steps as $step ){
+
+			$step->validate();
+
+			if ( $step->has_errors() ){
+
+				foreach ( $step->get_errors() as $error ){
+					$error->add_data( $step->get_id(), 'step_id' );
+					$this->add_error( $error );
+				}
+
+			}
+
+		}
+
+		return ! $this->has_errors();
 	}
 
 	/**

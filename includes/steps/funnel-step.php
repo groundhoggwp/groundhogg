@@ -72,6 +72,11 @@ abstract class Funnel_Step extends Supports_Errors {
 		add_action( "groundhogg/steps/{$this->get_type()}/save", [ $this, 'after_save' ], 99, 2 );
 
 		// Filters for additional step context
+		add_action( "groundhogg/steps/{$this->get_type()}/validate", [ $this, 'pre_validate' ], 1, 1 );
+		add_action( "groundhogg/steps/{$this->get_type()}/validate", [ $this, 'validate' ], 10 );
+		add_action( "groundhogg/steps/{$this->get_type()}/validate", [ $this, 'post_validate' ], 11 );
+
+		// Filters for additional step context
 		add_filter( "groundhogg/steps/{$this->get_type()}/context", [ $this, 'pre_export' ], 1, 2 );
 		add_filter( "groundhogg/steps/{$this->get_type()}/context", [ $this, 'context' ], 10, 2 );
 
@@ -395,5 +400,35 @@ abstract class Funnel_Step extends Supports_Errors {
 	 */
 	public function context( $context, $step ){
 		return $context;
+	}
+
+	/**
+	 * Set the step and handle any pre-validation stuff
+	 *
+	 * @param $step
+	 */
+	public function pre_validate( $step ){
+		$this->set_current_step( $step );
+	}
+
+	public function validate(){
+		// check settings and handle errors
+	}
+
+	/**
+	 * Handle errors after the validation
+	 *
+	 * Basically just moves all the errors to the step
+	 */
+	public function post_validate(){
+
+		if ( $this->has_errors() ){
+
+			foreach ( $this->get_errors() as $error ){
+				$this->get_current_step()->add_error( $error );
+			}
+
+			$this->clear_errors();
+		}
 	}
 }

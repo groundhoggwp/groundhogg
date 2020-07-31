@@ -261,11 +261,9 @@ body.disable-scrolling {
   height: 100px;
   display: inline-block;
   width: calc(100% - 20px);
-  vertical-align: top; }
-  .add-step-control.step {
-    background: #FFFFFF; }
+  vertical-align: top;
+  background-color: #FFFFFF !important; }
   .add-step-control.active, .add-step-control:hover {
-    background: #FFFFFF;
     border-color: #b6babe;
     cursor: pointer;
     transition: 0.4s; }

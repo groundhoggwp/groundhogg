@@ -144,7 +144,6 @@ class Funnels_Api extends Base {
 		$funnel_id = absint( $request->get_param( 'funnel_id' ) );
 
 		$args = $request->get_param( 'data' );
-		$args = map_deep( $args, 'sanitize_text_field' );
 
 		$funnel = new Funnel( $funnel_id );
 
@@ -152,9 +151,16 @@ class Funnels_Api extends Base {
 			return self::ERROR_404( 'error', 'Funnel not found.' );
 		}
 
+		if ( $funnel->isValidFunnel() ) {
+
+			$funnel->update( [
+				'status' => ''
+			] );
+
+			return self::SUCCESS_RESPONSE( [ 'funnel' => $funnel->get_as_array() ] );
+		}
 
 
-		return self::SUCCESS_RESPONSE( [ 'funnel' => $funnel->get_as_array() ] );
 	}
 
 

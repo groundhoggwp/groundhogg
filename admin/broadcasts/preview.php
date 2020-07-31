@@ -108,7 +108,7 @@ $cancel_url   = action_url( 'cancel', [
 <p class="submit">
     <a id="confirm-send" class="button button-primary"
        href="<?php echo esc_url( $confirm_link ); ?>"><?php _e( $text ); ?></a>
-    <span id="delete-link"><a class="delete" href="<?php echo esc_url( $cancel_url ); ?>">Cancel</a></span>
+    <span id="delete-link"><a class="delete" href="<?php echo esc_url( $cancel_url ); ?>"><?php _e( 'Cancel', 'groundhogg' ) ?></a></span>
 </p>
 <script>
 	( function ($) {

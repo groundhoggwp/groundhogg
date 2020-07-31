@@ -7,16 +7,10 @@
   display: inline-block;
   width: calc(100% - 20px);
   vertical-align: top;
-  //text-overflow: ellipsis;
-  //overflow: hidden;
-
-  &.step{
-    background: $white;
-  }
+  background-color: $white !important;
 
   &.active,
   &:hover{
-    background: $white;
     border-color: $border-hover-color;
     cursor: pointer;
     transition: 0.4s;

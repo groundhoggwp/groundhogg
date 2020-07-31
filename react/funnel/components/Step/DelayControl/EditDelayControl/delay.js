@@ -98,7 +98,7 @@ export const DelayTypes = {
           case 'days_of_week':
 
             text.push(delay.days_of_week_type === 'any'
-              ? ' on '
+              ? ' on any '
               : ( <>{ ' on the ' }
                 <Highlight>{ delay.days_of_week_type }</Highlight> </> ),
             )
@@ -417,6 +417,10 @@ export const DelayTypes = {
                     onChange={ (e) => updateDelay(
                       { replacement: e.target.value }) }
                   />
+                  <DelayAttrIsValid
+                    isValid={ !!delay.replacement }
+                    errMsg={ commonErrors.invalidReplacementCode }
+                  />
                   <div className={ 'replacements-wrap' }>
                     <ReplacementsButton
                       onInsert={ (v) => updateDelay(
@@ -540,6 +544,7 @@ const translate = {
 export const commonErrors = {
   invalidDate: __('Please select a valid date.', 'groundhogg'),
   invalidTime: __('Please select a valid time.', 'groundhogg'),
+  invalidReplacementCode: __('Please select a valid replacement code.', 'groundhogg'),
   invalidDelayPeriod: __('The delay period must be at least 1.', 'groundhogg'),
   invalidDaysOfWeek: __('Please select at least one day of the week.',
     'groundhogg'),

@@ -72,16 +72,15 @@
 
     function buildPickers() {
         picker(".gh-select2", {});
-        apiPicker(".gh-tag-picker", endpoints.tags, true, true);
-        apiPicker(".gh-single-tag-picker", endpoints.tags, false, false);
-        apiPicker(".gh-single-tag-picker", endpoints.tags, false, false);
-        apiPicker(".gh-email-picker", endpoints.emails, false, false);
-        apiPicker(".gh-email-picker-multiple", endpoints.emails, true, false);
-        apiPicker(".gh-sms-picker", endpoints.sms, false, false);
-        apiPicker(".gh-contact-picker", endpoints.contacts, false, false);
-        apiPicker(".gh-contact-picker-multiple", endpoints.contacts, true, false);
-        apiPicker(".gh-benchmark-picker", endpoints.benchmarks, false, false);
-        apiPicker(".gh-metakey-picker", endpoints.metakeys, false, false);
+        apiPicker(".gh-tag-picker", endpoints.tags + '?select2=true', true, true);
+        apiPicker(".gh-single-tag-picker", endpoints.tags + '?select2=true', false, false);
+        apiPicker(".gh-email-picker", endpoints.emails + '?select2=true', false, false);
+        apiPicker(".gh-email-picker-multiple", endpoints.emails + '?select2=true', true, false);
+        apiPicker(".gh-sms-picker", endpoints.sms + '?select2=true', false, false);
+        apiPicker(".gh-contact-picker", endpoints.contacts + '?select2=true', false, false);
+        apiPicker(".gh-contact-picker-multiple", endpoints.contacts + '?select2=true', true, false);
+        apiPicker(".gh-benchmark-picker", endpoints.benchmarks + '?select2=true', false, false);
+        apiPicker(".gh-metakey-picker", endpoints.metakeys + '?select2=true', false, false);
         linkPicker(".gh-link-picker");
     }
 

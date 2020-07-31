@@ -165,13 +165,13 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return $prepped;
 	}
 
-
 	/**
 	 * @return bool whether the step is a benchmark
 	 */
 	public function is_benchmark() {
 		return $this->get_group() === self::BENCHMARK;
 	}
+
 
 	/**
 	 * @return bool whether the step is an action
@@ -498,13 +498,19 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function get_context() {
 
-		$controls = [];
+		$context = [];
 
 		if ( has_filter( "groundhogg/steps/{$this->get_type()}/context" ) ) {
-			$controls = apply_filters( "groundhogg/steps/{$this->get_type()}/context", [], $this );
+			$context = apply_filters( "groundhogg/steps/{$this->get_type()}/context", [], $this );
 		}
 
-		return $controls;
+		return $context;
+	}
+
+	public function validate() {
+		if ( has_action( "groundhogg/steps/{$this->get_type()}/validate" ) ) {
+			do_action( "groundhogg/steps/{$this->get_type()}/validate", [], $this );
+		}
 	}
 
 	public function update( $data = [] ) {
