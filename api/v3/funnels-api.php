@@ -43,10 +43,17 @@ class Funnels_Api extends Base {
 			],
 		] );
 
+		register_rest_route( self::NAME_SPACE, '/funnels/activate', [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'permission_callback' => $callback,
+				'callback'            => [ $this, 'activate' ],
+			]
+		] );
 	}
 
 	/**
-	 * Create a new step!
+	 * Create a new funnel!
 	 *
 	 * Requires:
 	 *  - step_type
@@ -69,13 +76,13 @@ class Funnels_Api extends Base {
 	 *
 	 * @return WP_Error|WP_REST_Response
 	 */
-	public function read( WP_REST_Request $request ){
+	public function read( WP_REST_Request $request ) {
 
 		$funnel_id = absint( $request->get_param( 'funnel_id' ) );
 
 		$funnel = new Funnel( $funnel_id );
 
-		if ( ! $funnel->exists() ){
+		if ( ! $funnel->exists() ) {
 			return self::ERROR_404( 'error', 'Funnel not found.' );
 		}
 
@@ -89,7 +96,7 @@ class Funnels_Api extends Base {
 	 *
 	 * @return WP_Error|WP_REST_Response
 	 */
-	public function update( WP_REST_Request $request ){
+	public function update( WP_REST_Request $request ) {
 
 		$funnel_id = absint( $request->get_param( 'funnel_id' ) );
 
@@ -98,31 +105,56 @@ class Funnels_Api extends Base {
 
 		$funnel = new Funnel( $funnel_id );
 
-		if ( ! $funnel->exists() ){
+		if ( ! $funnel->exists() ) {
 			return self::ERROR_404( 'error', 'Funnel not found.' );
 		}
 
-		$args[ 'last_updated' ] = current_time( 'mysql' );
+		$args['last_updated'] = current_time( 'mysql' );
 
 		$funnel->update( $args );
 
 		// Update the step order
 		$steps = $request->get_param( 'steps' );
 
-		if ( ! empty( $steps ) ){
+		if ( ! empty( $steps ) ) {
 			$ids = wp_list_pluck( $steps, 'ID' );
 
 			// handle the re-ordering of the steps
-			foreach ( $ids as $i => $id ){
-				get_db( 'steps' )->update( $id, [ 'step_order' => $i+1 ] );
+			foreach ( $ids as $i => $id ) {
+				get_db( 'steps' )->update( $id, [ 'step_order' => $i + 1 ] );
 			}
 		}
 
 		return self::SUCCESS_RESPONSE( [ 'funnel' => $funnel->get_as_array() ] );
 	}
 
-	public function delete( WP_REST_Request $request ){
+	public function delete( WP_REST_Request $request ) {
 		return self::ERROR_403( 'error', 'endpoint not in service' );
+	}
+
+	/**
+	 * Activate a funnel
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function activate( WP_REST_Request $request ) {
+
+		$funnel_id = absint( $request->get_param( 'funnel_id' ) );
+
+		$args = $request->get_param( 'data' );
+		$args = map_deep( $args, 'sanitize_text_field' );
+
+		$funnel = new Funnel( $funnel_id );
+
+		if ( ! $funnel->exists() ) {
+			return self::ERROR_404( 'error', 'Funnel not found.' );
+		}
+
+
+
+		return self::SUCCESS_RESPONSE( [ 'funnel' => $funnel->get_as_array() ] );
 	}
 
 

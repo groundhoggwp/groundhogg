@@ -19,6 +19,20 @@
       background: #f9f9f9;
     }
 
+    .delay-attr-error{
+      margin: 4px 0;
+      //background: $white;
+      color: $error-red;
+      padding: 4px 8px 4px 25px;
+      font-size: 14px;
+      position: relative;
+
+      .dashicons{
+        position: absolute;
+        left: 0;
+      }
+    }
+
     input,select{
       vertical-align: top;
       font-size: 14px;

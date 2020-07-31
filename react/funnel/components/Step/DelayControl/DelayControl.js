@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { Dashicon } from '../../Dashicon/Dashicon'
 import { EditDelayModal } from './EditDelayControl/EditDelayModal'
 import { parseArgs } from '../../../App'
 import { DelayIcon, RenderDelay } from './EditDelayControl/delay'
@@ -13,7 +12,7 @@ export function DelayControl ({ delay, updateDelay }) {
     setTempDelay({
       ...tempDelay,
       ...newTempDelay,
-    })
+    });
   }
 
   const saveChanges = () => {
@@ -56,6 +55,7 @@ function mergeDelayDefaults ( delay ) {
     months_of_year_type: 'any',
     days_of_week: [],
     months_of_year: [],
+    days_of_month: [],
     wait_type: 'after',
   });
 }

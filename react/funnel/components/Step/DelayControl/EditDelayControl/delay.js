@@ -1,8 +1,8 @@
 import React, { Fragment } from 'react'
-import { Col, Container, Row } from 'react-bootstrap'
+import { Alert, Col, Container, Row } from 'react-bootstrap'
 import {
   DayOfMonthPicker,
-  DayPicker, DisplayTimeDelayFragment,
+  DayPicker, DelayAttrIsValid, DisplayTimeDelayFragment,
   Highlight,
   MonthPicker,
   RunAt,
@@ -13,7 +13,6 @@ import {
   SimpleSelect, YesNoToggle,
 } from '../../../BasicControls/basicControls'
 import moment from 'moment'
-import { parseArgs } from '../../../../App'
 import { Dashicon } from '../../../Dashicon/Dashicon'
 import { ReplacementsButton } from '../../../ReplacementsButton/ReplacementsButton'
 import { Tooltip } from '../../../Tooltip/Tooltip'
@@ -60,7 +59,8 @@ export const DelayTypes = {
     name: _x('Instant', 'step delay', 'groundhogg'),
     icon: 'marker',
     render: ({ delay }) => {
-      return <>{ _x('Run', 'step delay', 'groundhogg') } <Highlight>{_x( 'instantly!', 'step delay', 'groundhogg' )}</Highlight></>
+      return <>{ _x('Run', 'step delay', 'groundhogg') } <Highlight>{ _x(
+        'instantly!', 'step delay', 'groundhogg') }</Highlight></>
     },
     edit: () => {
       return <></>
@@ -95,7 +95,7 @@ export const DelayTypes = {
           case 'weekend':
             text.push(' on a ', <Highlight>{ 'weekend' }</Highlight>)
             break
-          case 'day_of_week':
+          case 'days_of_week':
 
             text.push(delay.days_of_week_type === 'any'
               ? ' on '
@@ -116,16 +116,18 @@ export const DelayTypes = {
             }
 
             break
-          case 'day_of_month':
+          case 'days_of_month':
 
             text.push(' on the ')
 
-            text.push(<ItemsCommaOrList
-              items={ delay.days_of_month.map(item => item.label) }/>)
+            text.push(<Highlight><ItemsCommaOrList
+              items={ delay.days_of_month.map(
+                item => item.label) }/></Highlight>)
 
             if (delay.months_of_year_type !== 'any') {
-              text.push(' of ', <ItemsCommaOrList
-                items={ delay.months_of_year.map(item => item.label) }/>)
+              text.push(' of ', <Highlight><ItemsCommaOrList
+                items={ delay.months_of_year.map(
+                  item => item.label) }/></Highlight>)
             }
 
             break
@@ -172,6 +174,10 @@ export const DelayTypes = {
                       { interval: e.target.value }) }
                     options={ intervalTypes }
                   />
+                  <DelayAttrIsValid
+                    isValid={ delay.interval === 'any' || delay.period > 0 }
+                    errMsg={ commonErrors.invalidDelayPeriod }
+                  />
                 </div>
               </Col>
               <Col xs={ 5 }>
@@ -184,7 +190,7 @@ export const DelayTypes = {
                   options={ fixedRunOnTypes }
                 />
                 <div className={ 'col-controls run-on' }>
-                  { delay.run_on === 'day_of_week' && (
+                  { delay.run_on === 'days_of_week' && (
                     <>
 
                       <DayPicker
@@ -199,7 +205,7 @@ export const DelayTypes = {
                       />
                     </>
                   ) }
-                  { delay.run_on === 'day_of_month' && (
+                  { delay.run_on === 'days_of_month' && (
                     <>
 
                       <DayOfMonthPicker
@@ -282,16 +288,27 @@ export const DelayTypes = {
                     value={ delay.date || '' }
                     onChange={ (e) => updateDelay({ date: e.target.value }) }
                   />
+                  <DelayAttrIsValid
+                    isValid={ moment(delay.date).isAfter() }
+                    errMsg={ commonErrors.invalidDate }
+                  />
                 </div>
                 <div className={ 'run-at col-controls' }>
                   { ['between'].includes(delay.run_on) &&
-                  <input
-                    name={ 'date_to' }
-                    min={ delay.date }
-                    type={ 'date' }
-                    value={ delay.date_to || '' }
-                    onChange={ (e) => updateDelay({ date_to: e.target.value }) }
-                  /> }
+                  <>
+                    <input
+                      name={ 'date_to' }
+                      min={ delay.date }
+                      type={ 'date' }
+                      value={ delay.date_to || '' }
+                      onChange={ (e) => updateDelay(
+                        { date_to: e.target.value }) }
+                    />
+                    <DelayAttrIsValid
+                      isValid={ moment(delay.date_to).isSameOrAfter(delay.date) }
+                      errMsg={ commonErrors.invalidDate }
+                    />
+                  </> }
                 </div>
               </Col>
               <Col>
@@ -375,6 +392,10 @@ export const DelayTypes = {
                       { wait_type: e.target.value }) }
                     options={ waitTypes }
                   />
+                  <DelayAttrIsValid
+                    isValid={ delay.interval === 'any' || delay.period > 0 }
+                    errMsg={ commonErrors.invalidDelayPeriod }
+                  />
                 </div>
               </Col>
               <Col xs={ 5 }>
@@ -382,9 +403,9 @@ export const DelayTypes = {
                 <Tooltip
                   content={ __(
                     'Insert a replacement code that is expected to return a date. If a non-valid date is given the action will be run instantly.',
-                    'groundhogg')}
-                  id={'delay-replacement-code'}
-                  placement={'right'}
+                    'groundhogg') }
+                  id={ 'delay-replacement-code' }
+                  placement={ 'right' }
                 />
                 <div className={ 'replacement-controls' }>
                   <input
@@ -404,15 +425,16 @@ export const DelayTypes = {
                     <ClearFix/>
                   </div>
                 </div>
-                <div className={ 'replacement-controls' } style={{marginTop:20}}>
+                <div className={ 'replacement-controls' }
+                     style={ { marginTop: 20 } }>
                   <p>
                     { 'Use next occurrence?' }
                     <Tooltip
-                      content={__(
+                      content={ __(
                         'If enabled, the year from the date will be ignored.',
-                        'groundhogg')}
-                      id={'use-next-occurrence'}
-                      placement={'right'}
+                        'groundhogg') }
+                      id={ 'use-next-occurrence' }
+                      placement={ 'right' }
                     />
                     <div className={ 'alignright' }><YesNoToggle
                       value={ delay.use_next_occurrence }
@@ -437,15 +459,14 @@ export const DelayTypes = {
     },
   },
 }
-
 // Todo: Translate the below
 
 const fixedRunOnTypes = [
   { value: 'any', label: _x('Any day', 'step delay', 'groundhogg') },
   { value: 'weekday', label: 'Weekday' },
   { value: 'weekend', label: 'Weekend' },
-  { value: 'day_of_week', label: 'Day of week' },
-  { value: 'day_of_month', label: 'Day of Month' },
+  { value: 'days_of_week', label: 'Day of week' },
+  { value: 'days_of_month', label: 'Day of Month' },
 ]
 
 const dateRunOnTypes = [
@@ -514,4 +535,16 @@ const intervalTranslations = {
 const translate = {
   before: _x('before', 'step delay', 'groundhogg'),
   after: _x('after', 'step delay', 'groundhogg'),
+}
+
+export const commonErrors = {
+  invalidDate: __('Please select a valid date.', 'groundhogg'),
+  invalidTime: __('Please select a valid time.', 'groundhogg'),
+  invalidDelayPeriod: __('The delay period must be at least 1.', 'groundhogg'),
+  invalidDaysOfWeek: __('Please select at least one day of the week.',
+    'groundhogg'),
+  invalidDaysOfMonth: __('Please select at least one day of the month.',
+    'groundhogg'),
+  invalidMonthsOfYear: __('Please select at least one month of the year.',
+    'groundhogg'),
 }

@@ -374,6 +374,16 @@ body.disable-scrolling {
   border-bottom: 1px solid #ccd0d4;
   background: #f9f9f9; }
 
+.groundhogg.modal .edit-delay-controls .delay-attr-error {
+  margin: 4px 0;
+  color: #cc0000;
+  padding: 4px 8px 4px 25px;
+  font-size: 14px;
+  position: relative; }
+  .groundhogg.modal .edit-delay-controls .delay-attr-error .dashicons {
+    position: absolute;
+    left: 0; }
+
 .groundhogg.modal .edit-delay-controls input, .groundhogg.modal .edit-delay-controls select {
   vertical-align: top;
   font-size: 14px;
@@ -906,10 +916,7 @@ ul.gh-form-errors {
 
 
 body {
-  background-color: #f8f9fa;
-  background-attachment: fixed;
-  background-image: linear-gradient(#eeeff3 1px, transparent 1px), linear-gradient(90deg, #eeeff3 1px, transparent 1px);
-  background-size: 3em 3em; }
+  background-color: #f8f9fa; }
 
 input[type="text"],
 input[type="url"],

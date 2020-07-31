@@ -2,9 +2,11 @@ import React, { Fragment } from 'react'
 import Select from 'react-select'
 import { SimpleSelect } from '../../../BasicControls/basicControls'
 import moment from 'moment'
+import { Dashicon } from '../../../Dashicon/Dashicon'
+import { commonErrors } from './delay'
 
 // Todo: translate
-const { __, _x, _n, _nx } = wp.i18n;
+const { __, _x, _n, _nx } = wp.i18n
 
 const daysOfWeek = [
   { value: 'monday', label: 'Monday' },
@@ -50,6 +52,14 @@ const runAtTypes = [
   { value: 'between', label: 'Between' },
 ]
 
+export const DelayAttrIsValid = ({ isValid, errMsg }) => {
+  if (!isValid) {
+    return <div className={ 'delay-attr-error' }><Dashicon
+      icon={ 'warning' }/> { errMsg }</div>
+  }
+  return <></>
+}
+
 export function DayPicker ({ days, type, updateDelay }) {
 
   return ( <>
@@ -67,6 +77,10 @@ export function DayPicker ({ days, type, updateDelay }) {
         isMulti={ true }
         name={ 'days_of_week' }
         value={ days }
+      />
+      <DelayAttrIsValid
+        isValid={ days && days.length > 0 }
+        errMsg={ commonErrors.invalidDaysOfWeek }
       />
     </>
   )
@@ -91,6 +105,10 @@ export function DayOfMonthPicker ({ days, updateDelay }) {
         name={ 'days_of_month' }
         value={ days }
       />
+      <DelayAttrIsValid
+        isValid={ days && days.length > 0 }
+        errMsg={ commonErrors.invalidDaysOfMonth }
+      />
     </>
   )
 }
@@ -106,15 +124,21 @@ export function MonthPicker ({ months, type, updateDelay }) {
         options={ monthsOfYearTypes }
       />
       { type === 'specific' &&
-      <Select
-        className={ 'control' }
-        options={ monthsOfYear }
-        onChange={ (v) => updateDelay({ months_of_year: v }) }
-        isMulti={ true }
-        isSearchable={ true }
-        name={ 'months_of_year' }
-        value={ months }
-      />
+      <>
+        <Select
+          className={ 'control' }
+          options={ monthsOfYear }
+          onChange={ (v) => updateDelay({ months_of_year: v }) }
+          isMulti={ true }
+          isSearchable={ true }
+          name={ 'months_of_year' }
+          value={ months }
+        />
+        <DelayAttrIsValid
+          isValid={ months && months.length > 0 }
+          errMsg={ commonErrors.invalidMonthsOfYear }
+        />
+      </>
       }
     </>
   )
@@ -133,10 +157,6 @@ export function MonthPicker ({ months, type, updateDelay }) {
  */
 export function RunAt ({ time, timeTo, type, updateDelay, showBetween }) {
 
-  if ( ! showBetween ){
-
-  }
-
   return (
     <>
       { 'Run at ' }
@@ -149,62 +169,74 @@ export function RunAt ({ time, timeTo, type, updateDelay, showBetween }) {
       />
       <div className={ 'run-at col-controls' }>
         { ['specific', 'between'].includes(type) &&
-        <input
+        <><input
           name={ 'time' }
           type={ 'time' }
           value={ time || '' }
           onChange={ (e) => updateDelay({ time: e.target.value }) }
-        /> }
+        />
+          <DelayAttrIsValid
+            isValid={ moment(time, 'HH:mm:ss').isValid() }
+            errMsg={ commonErrors.invalidTime }
+          />
+        </> }
       </div>
       <div className={ 'run-at col-controls' }>
         { ['between'].includes(type) &&
-        <input
-          name={ 'time_to' }
-          min={ time }
-          type={ 'time' }
-          value={ timeTo || '' }
-          onChange={ (e) => updateDelay({ time_to: e.target.value }) }
-        /> }
+        <>
+          <input
+            name={ 'time_to' }
+            min={ time }
+            type={ 'time' }
+            value={ timeTo || '' }
+            onChange={ (e) => updateDelay({ time_to: e.target.value }) }
+          />
+          <DelayAttrIsValid
+            isValid={ moment(timeTo, 'HH:mm:ss').isAfter( moment(time, 'HH:mm:ss') ) }
+            errMsg={ commonErrors.invalidTime }
+          />
+        </>
+        }
       </div>
 
     </>
   )
 }
 
-export function Highlight ({children}) {
-  return <span className={'gh-highlight'}>{children}</span>
+export function Highlight ({ children }) {
+  return <span className={ 'gh-highlight' }>{ children }</span>
 }
 
 function wrapInSpace (text) {
-  return text.padStart( text.length + 1 ).padEnd( text.length + 2 );
+  return text.padStart(text.length + 1).padEnd(text.length + 2)
 }
-
 
 export function DisplayTimeDelayFragment ({ delay }) {
 
-  const text = [];
+  const text = []
 
-  const at = wrapInSpace( _x( 'at', 'step delay', 'groundhogg' ) );
-  const and = wrapInSpace( _x( 'and', 'step delay', 'groundhogg' ) );
-  const between = wrapInSpace( _x( 'between', 'step delay', 'groundhogg' ) );
-  const anyTime = _x( 'any time', 'step delay', 'groundhogg' );
+  const at = wrapInSpace(_x('at', 'step delay', 'groundhogg'))
+  const and = wrapInSpace(_x('and', 'step delay', 'groundhogg'))
+  const between = wrapInSpace(_x('between', 'step delay', 'groundhogg'))
+  const anyTime = _x('any time', 'step delay', 'groundhogg')
 
   switch (delay.run_at) {
     default:
     case 'any':
-      text.push( at, <Highlight>{ anyTime }</Highlight>);
-      break;
+      text.push(at, <Highlight>{ anyTime }</Highlight>)
+      break
     case 'specific':
-      text.push( at, <Highlight>{ moment(delay.time, 'HH:mm').
-        format('hh:mm a') }</Highlight>);
-      break;
+      text.push(at, <Highlight>{ moment(delay.time, 'HH:mm').
+        format('hh:mm a') }</Highlight>)
+      break
     case 'between':
       text.push(between, <Highlight>{ moment(delay.time, 'HH:mm').
         format('LT') }</Highlight>, and, <Highlight>{ moment(delay.time_to,
-        'HH:mm').format('LT') }</Highlight>);
-      break;
+        'HH:mm').format('LT') }</Highlight>)
+      break
 
   }
 
-  return <>{ text.map( (item,i) => <Fragment key={i}>{item}</Fragment>) }</>;
+  return <>{ text.map(
+    (item, i) => <Fragment key={ i }>{ item }</Fragment>) }</>
 }

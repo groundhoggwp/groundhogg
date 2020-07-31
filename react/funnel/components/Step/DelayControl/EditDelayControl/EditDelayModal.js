@@ -3,7 +3,13 @@ import { GroundhoggModal } from '../../../Modal/Modal'
 
 import './component.scss'
 import { Dashicon } from '../../../Dashicon/Dashicon'
-import { DelayIcon, DelayTypes, EditDelay, RenderDelay } from './delay'
+import {
+  DelayIcon,
+  delayIsValid,
+  DelayTypes,
+  EditDelay,
+  RenderDelay,
+} from './delay'
 import { Button, ButtonGroup } from 'react-bootstrap'
 
 export function EditDelayModal ({ show, delay, updateDelay, save, cancel }) {

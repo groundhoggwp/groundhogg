@@ -27,7 +27,3 @@ export function GroundhoggModal(props) {
 		</Modal>
 	);
 }
-
-export function EditStepModal ({stepTitle, children}) {
-
-}

@@ -569,6 +569,7 @@ TagSpan.defaultProps = {
 export function SimpleSelect (props) {
 
   const { options } = props
+  // delete props['options'];
 
   // if ( props.hasOwnProperty('options')){
   //   delete props.options;
