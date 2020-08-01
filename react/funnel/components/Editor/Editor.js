@@ -19,7 +19,8 @@ export class Editor extends React.Component {
     this.state = {
       data: ghEditor.funnel.data,
       steps: ghEditor.funnel.steps,
-      saving: false,
+      validationErrors: null,
+      saving: false
     }
 
     // this.handleSetList = this.handleSetList.bind(this);
@@ -53,14 +54,14 @@ export class Editor extends React.Component {
 
     this.setState({
       steps: newStepOrder,
-      saving: true,
+      saving: true
     })
 
     axios.patch(groundhogg_endpoints.funnels, {
       funnel_id: ghEditor.funnel.ID,
-      steps: newStepOrder,
+      steps: newStepOrder
     }).then(result => this.setState({
-      saving: false,
+      saving: false
     }))
   }
 
@@ -80,20 +81,39 @@ export class Editor extends React.Component {
       return
     }
 
+    if (typeof newData.status !== 'undefined' && newData.status === 'active') {
+      // todo, run validation and activation script.
+      console.log('Activating funnel!')
+
+      this.setState({
+        saving: true
+      })
+
+      axios.patch(groundhogg_endpoints.funnels + '/activate/', {
+        funnel_id: ghEditor.funnel.ID
+      }).then(result => this.setState({
+        saving: false,
+        validationErrors: result.data.errors,
+        data: result.data.funnel.data,
+      }))
+
+      return
+    }
+
     this.setState({
       data: {
         ...curData,
-        ...newData,
+        ...newData
       },
-      saving: true,
+      saving: true
     })
 
     axios.patch(groundhogg_endpoints.funnels, {
       funnel_id: ghEditor.funnel.ID,
-      data: newData,
+      data: newData
     }).then(result => this.setState({
       data: result.data.funnel.data,
-      saving: false,
+      saving: false
     }))
 
   }
@@ -101,11 +121,11 @@ export class Editor extends React.Component {
   handleReloadEditor (e) {
     axios.get(getRequest(groundhogg_endpoints.funnels,
       {
-        funnel_id: ghEditor.funnel.ID,
-      }),
+        funnel_id: ghEditor.funnel.ID
+      })
     ).then(result => this.setState({
       steps: result.data.funnel.steps,
-      funnel: result.data.funnel,
+      funnel: result.data.funnel
     }))
   }
 
@@ -115,17 +135,17 @@ export class Editor extends React.Component {
 
     const rawGroups = reduceStepsToGroups(this.state.steps)
     const groups = rawGroups.map((group, i) => <StepGroup
-      key={ i }
-      steps={ group }
-      isFirst={ i === 0 }
-      isLast={ i === rawGroups.length - 1 }
+      key={i}
+      steps={group}
+      isFirst={i === 0}
+      isLast={i === rawGroups.length - 1}
     />)
 
     return (
       <>
         <Header
-          updateFunnel={ this.handleUpdateFunnel }
-          data={ this.state.data }
+          updateFunnel={this.handleUpdateFunnel}
+          data={this.state.data}
           isSaving={this.state.saving}
         />
         {
@@ -137,10 +157,10 @@ export class Editor extends React.Component {
           id="groundhogg-funnel-editor"
           className="groundhogg-funnel-editor"
         >
-          <div className={ 'step-groups' }>
-            { groups }
+          <div className={'step-groups'}>
+            {groups}
           </div>
-          <div className={ 'editor-controls' }>
+          <div className={'editor-controls'}>
             <AddStep/>
           </div>
         </div>
@@ -165,8 +185,7 @@ function reduceStepsToGroups (steps) {
     if (prev.length && curr.data.step_group ===
       prev[prev.length - 1][0].data.step_group) {
       prev[prev.length - 1].push(curr)
-    }
-    else {
+    } else {
       prev.push([curr])
     }
     return prev

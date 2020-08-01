@@ -509,7 +509,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 	public function validate() {
 		if ( has_action( "groundhogg/steps/{$this->get_type()}/validate" ) ) {
-			do_action( "groundhogg/steps/{$this->get_type()}/validate", [], $this );
+			do_action( "groundhogg/steps/{$this->get_type()}/validate", $this );
 		}
 	}
 

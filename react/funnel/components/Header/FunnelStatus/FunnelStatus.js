@@ -7,7 +7,7 @@ import './component.scss'
 
 const { __, _x, _n, _nx } = wp.i18n
 
-export const FunnelStatus = ({ status, onChange }) => {
+export const FunnelStatus = ({ status, onChange, isDisabled }) => {
 
   const setActive = () => {
     onChange('active')
@@ -30,6 +30,7 @@ export const FunnelStatus = ({ status, onChange }) => {
     <div className={ 'funnel-status' }>
       <ButtonGroup>
         <Button
+          disabled={ isDisabled }
           onClick={ setActive }
           variant={ status === 'active'
             ? 'primary'
@@ -38,6 +39,7 @@ export const FunnelStatus = ({ status, onChange }) => {
           { __('Active', 'status', 'groundhogg') }
         </Button>
         <Button
+          disabled={ isDisabled }
           onClick={ setInactive }
           variant={ status === 'active'
             ? 'outline-secondary'

@@ -45,7 +45,7 @@ class Funnels_Api extends Base {
 
 		register_rest_route( self::NAME_SPACE, '/funnels/activate', [
 			[
-				'methods'             => WP_REST_Server::CREATABLE,
+				'methods'             => WP_REST_Server::EDITABLE,
 				'permission_callback' => $callback,
 				'callback'            => [ $this, 'activate' ],
 			]
@@ -143,7 +143,7 @@ class Funnels_Api extends Base {
 
 		$funnel_id = absint( $request->get_param( 'funnel_id' ) );
 
-		$args = $request->get_param( 'data' );
+//		$args = $request->get_param( 'data' );
 
 		$funnel = new Funnel( $funnel_id );
 
@@ -154,13 +154,16 @@ class Funnels_Api extends Base {
 		if ( $funnel->isValidFunnel() ) {
 
 			$funnel->update( [
-				'status' => ''
+				'status' => 'active'
 			] );
 
 			return self::SUCCESS_RESPONSE( [ 'funnel' => $funnel->get_as_array() ] );
 		}
 
-
+		return rest_ensure_response( [
+			'errors' => $funnel->get_errors(),
+			'funnel' => $funnel->get_as_array(),
+		] );
 	}
 
 

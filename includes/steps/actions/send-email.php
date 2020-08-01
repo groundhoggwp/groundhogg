@@ -90,9 +90,6 @@ class Send_Email extends Action {
 
 		$email = new Email( $this->get_setting( 'email_id' ) );
 
-		$email_display = [ 'value' => $email->get_id(), 'label' => $email->get_title() ];
-
-		$this->save_setting( 'email_display', $email_display );
 		$this->save_setting( 'is_confirmation_email', $email->is_confirmation_email() );
 		$this->save_setting( 'skip_if_confirmed', ( bool ) $this->get_posted_data( 'skip_if_confirmed', false ) );
 	}
@@ -109,13 +106,13 @@ class Send_Email extends Action {
 
 		$email_id = $this->get_setting( 'email_id' );
 
-		if ( ! $email_id ){
+		if ( ! $email_id ) {
 			return $context;
 		}
 
 		$email = new Email( $email_id );
 
-		$context[ 'email' ] = $email->get_as_array();
+		$context['email'] = $email->get_as_array();
 
 		return $context;
 	}
@@ -209,5 +206,13 @@ class Send_Email extends Action {
 		$args['content']    = $email->get_content();
 
 		return $args;
+	}
+
+	public function validate() {
+
+		if ( ! $this->get_setting( 'email_id' ) ) {
+			$this->add_error( new \WP_Error( 'invalid_email_id', __( 'Please select an email to send.', 'groundhogg' ) ) );
+		}
+
 	}
 }

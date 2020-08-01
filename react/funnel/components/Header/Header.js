@@ -56,6 +56,7 @@ export function Header ({ data, updateFunnel, isSaving }) {
         <FunnelStatus
           status={ data.status }
           onChange={ updateStatus }
+          isDisabled={isSaving}
         />
       </Navbar.Collapse>
       <ExitButton onExit={ exit }/>
