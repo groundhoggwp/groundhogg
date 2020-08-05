@@ -323,7 +323,7 @@ export function LinkPicker ({ id, update, value, options }) {
 
     axios({
       method: 'post',
-      url: ajaxurl,
+      url: ghEditor.ajaxurl,
       data: bodyFormData,
       headers: { 'Content-Type': 'multipart/form-data' },
     }).then((result) => {
@@ -483,7 +483,7 @@ export function CopyInput ({ content, options }) {
   return (
     <input
       type={ 'text' }
-      className={ 'code' }
+      className={ 'code w100' }
       value={ content }
       readOnly={ true }
       onFocus={ (e) => e.target.select() }
@@ -587,4 +587,12 @@ export function SimpleSelect (props) {
                                   value={ item.value }>{ item.label }</option>) }
     </select>
   )
+}
+
+export const IsValidError = ({ isValid, errMsg }) => {
+  if (!isValid) {
+    return <div className={ 'is-valid-error' }><Dashicon
+      icon={ 'warning' }/> { errMsg }</div>
+  }
+  return <></>
 }

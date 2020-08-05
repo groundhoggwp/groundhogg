@@ -69,3 +69,17 @@ input[type="email"].email-address{
 .w100{
   width: 100%;
 }
+
+.is-valid-error{
+  margin: 4px 0;
+  //background: $white;
+  color: $error-red;
+  padding: 4px 8px 4px 25px;
+  font-size: 14px;
+  position: relative;
+
+  .dashicons{
+    position: absolute;
+    left: 0;
+  }
+}

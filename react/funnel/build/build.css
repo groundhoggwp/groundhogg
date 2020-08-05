@@ -489,6 +489,16 @@ input[type="email"].email-address {
 .w100 {
   width: 100%; }
 
+.is-valid-error {
+  margin: 4px 0;
+  color: #cc0000;
+  padding: 4px 8px 4px 25px;
+  font-size: 14px;
+  position: relative; }
+  .is-valid-error .dashicons {
+    position: absolute;
+    left: 0; }
+
 .tooltip-wrap {
   margin-left: 6px;
   cursor: pointer; }
@@ -631,6 +641,8 @@ iframe.email-preview {
 .form-preview {
   padding: 20px;
   border-left: 1px solid #dee2e6; }
+  .form-preview .is-required {
+    color: #cc0000; }
   .form-preview label {
     display: block; }
     .form-preview label input[type='text'],

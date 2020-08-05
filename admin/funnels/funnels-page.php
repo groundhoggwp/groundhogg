@@ -906,6 +906,7 @@ class Funnels_Page extends Admin_Page {
 
 		wp_localize_script( 'groundhogg-funnel-react', 'ghEditor', [
 			'funnel'       => $funnel->get_as_array(),
+			'ajaxurl'      => admin_url( 'admin-ajax.php' ),
 			'assets'       => [
                 'bigG' => GROUNDHOGG_ASSETS_URL . '/images/big-g.png'
 			],

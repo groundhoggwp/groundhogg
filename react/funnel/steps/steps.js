@@ -27,6 +27,8 @@ export function registerStepType (type, attributes) {
       icon: ghEditor.steps[type].icon,
       description: ghEditor.steps[type].description,
       group: ghEditor.steps[type].group,
+      defaultSettings: {},
+      defaultContext: {},
       type: type,
 	    keywords: [],
     })
@@ -54,6 +56,10 @@ export function StepTitle ({ type, data, context, settings }) {
     contr0l = <div>{ data.step_title || type }</div>
   }
   else {
+
+    settings = parseArgs( settings, getStepType(type).defaultSettings )
+    context = parseArgs( context, getStepType(type).defaultContext )
+
     contr0l = React.createElement(getStepType(type).title, {
       data: data,
       settings: settings,
@@ -82,6 +88,10 @@ export function StepEdit ({ type, data, context, settings, updateSettings, commi
     return <></>
   }
   else {
+
+    settings = parseArgs( settings, getStepType(type).defaultSettings )
+    context = parseArgs( context, getStepType(type).defaultContext )
+
     contr0l = React.createElement(getStepType(type).edit, {
       data: data,
       settings: settings,

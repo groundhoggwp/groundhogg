@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { registerStepType, SimpleEditModal } from '../steps'
-import { Button, Col, Row, Tab, Tabs } from 'react-bootstrap'
+import { Button, ButtonGroup, Col, Row, Tab, Tabs } from 'react-bootstrap'
 import {
   ClearFix,
-  CopyInput, CustomFieldPicker,
+  CopyInput, CustomFieldPicker, IsValidError,
   LinkPicker, SimpleSelect, TagPicker, TagSpan,
   TextArea,
   YesNoToggle,
@@ -12,7 +12,7 @@ import {
 import '../../../../assets/css/frontend/form.css'
 import { ReactSortable } from 'react-sortablejs'
 import { Dashicon } from '../../components/Dashicon/Dashicon'
-import { parseArgs, uniqId } from '../../App'
+import { isValidUrl, parseArgs, uniqId } from '../../App'
 import { Tooltip } from '../../components/Tooltip/Tooltip'
 
 const { __, _x, _n, _nx } = wp.i18n
@@ -21,6 +21,10 @@ registerStepType('form_fill', {
 
   icon: ghEditor.steps.form_fill.icon,
   group: ghEditor.steps.form_fill.group,
+
+  defaultSettings: {
+    form_name: __( 'Web Form', 'groundhogg' )
+  },
 
   title: ({ data, context, settings }) => {
     return <>{ _x('When', 'form step title', 'groundhogg') } <TagSpan
@@ -139,6 +143,9 @@ const editFormTabs = {
                 id={ 'success_message' }
                 value={ settings.success_message }
                 hasReplacements={ true }
+                options={ {
+                  className: 'w100',
+                } }
                 update={ (v) => updateSetting(
                   'success_message', v) }/>
             </Col>
@@ -153,6 +160,10 @@ const editFormTabs = {
               <LinkPicker value={ settings.success_page }
                           update={ (v) => updateSetting(
                             'success_page', v) }/>
+              <IsValidError
+                isValid={ isValidUrl(settings.success_page) }
+                errMsg={ __('Please provide a valid url!', 'groundhogg') }
+              />
             </Col>
           </Row> }
         </>
@@ -258,7 +269,8 @@ function FieldsEditor ({ fields, formUpdated }) {
       id: uniqId('field_'),
       width: '1/1',
       attributes: {
-        label: 'my field',
+        name: 'new_custom_field_name',
+        label: __('New Field', 'groundhogg'),
       },
     })
 
@@ -393,9 +405,11 @@ function FieldEditor ({ field, onEdit, updateField }) {
         <BasicAttributeControlGroup
           label={ 'Field Type' }
         >
-          <select value={ field.type }
-                  onChange={ (e) => updateField(fieldId, 'type',
-                    e.target.value) }>
+          <select
+            className={ 'w100' }
+            value={ field.type }
+            onChange={ (e) => updateField(fieldId, 'type',
+              e.target.value) }>
             { Object.values(FieldTypes).map(type => <option
               key={ type.type }
               value={ type.type }>{ type.name }</option>) }
@@ -411,13 +425,32 @@ function FieldEditor ({ field, onEdit, updateField }) {
         <BasicAttributeControlGroup
           label={ 'Column Width' }
         >
-          <select value={ field.width }
-                  onChange={ (e) => updateField(fieldId, 'width',
-                    e.target.value) }>
-            { Object.keys(widthMap).map(width => <option
-              key={ width }
-              value={ width }>{ width }</option>) }
-          </select>
+          <ButtonGroup vertical>
+            <ButtonGroup aria-label="field-width" className={ 'field-width' }>
+              { Object.keys(widthMap).splice(0, 3).map((width) =>
+                <Button
+                  key={ width }
+                  variant={ field.width === width
+                    ? 'primary'
+                    : 'outline-secondary' }
+                  onClick={ (e) => updateField(fieldId, 'width', width) }
+                >
+                  { width }
+                </Button>) }
+            </ButtonGroup>
+            <ButtonGroup aria-label="field-width" className={ 'field-width' }>
+              { Object.keys(widthMap).splice(3, 3).map((width) =>
+                <Button
+                  key={ width }
+                  variant={ field.width === width
+                    ? 'primary'
+                    : 'outline-secondary' }
+                  onClick={ (e) => updateField(fieldId, 'width', width) }
+                >
+                  { width }
+                </Button>) }
+            </ButtonGroup>
+          </ButtonGroup>
         </BasicAttributeControlGroup>
       </div>
     </>
@@ -481,6 +514,7 @@ const fieldAttributes = {
             <input
               type={ 'text' }
               value={ value }
+              className={ 'w100' }
               onChange={ (e) => updateAttribute('label',
                 e.target.value) }
             />
@@ -498,6 +532,7 @@ const fieldAttributes = {
           <input
             type={ 'text' }
             value={ value }
+            className={ 'w100' }
             onChange={ (e) => updateAttribute('text',
               e.target.value) }
           />
@@ -546,6 +581,7 @@ const fieldAttributes = {
         >
 					<textarea
             value={ value }
+            className={ 'w100' }
             onChange={ (e) => updateAttribute('text',
               e.target.value) }
           />
@@ -583,6 +619,7 @@ const fieldAttributes = {
             <input
               type={ 'text' }
               value={ value }
+              className={ 'w100' }
               onChange={ (e) => updateAttribute('placeholder',
                 e.target.value) }
             />
@@ -593,6 +630,12 @@ const fieldAttributes = {
   },
   id: {
     edit: ({ value, updateAttribute }) => {
+
+      const updateCssID = (v) => {
+        v = v.replace(/[^A-z0-9-_]/, '')
+        updateAttribute({ id: v })
+      }
+
       return (
         <Row className={ 'field-attribute-control' }>
           <Col>
@@ -602,8 +645,8 @@ const fieldAttributes = {
             <input
               type={ 'text' }
               value={ value }
-              onChange={ (e) => updateAttribute('ID',
-                e.target.value) }
+              className={ 'w100' }
+              onChange={ (e) => updateCssID(e.target.value) }
             />
           </Col>
         </Row>
@@ -612,6 +655,12 @@ const fieldAttributes = {
   },
   class: {
     edit: ({ value, updateAttribute }) => {
+
+      const updateCssClass = (v) => {
+        v = v.replace(/[^A-z0-9-_]/, '')
+        updateAttribute({ class: v })
+      }
+
       return (
         <Row className={ 'field-attribute-control' }>
           <Col>
@@ -621,8 +670,8 @@ const fieldAttributes = {
             <input
               type={ 'text' }
               value={ value }
-              onChange={ (e) => updateAttribute('class',
-                e.target.value) }
+              className={ 'w100' }
+              onChange={ (e) => updateCssClass(e.target.value) }
             />
           </Col>
         </Row>
@@ -640,12 +689,12 @@ const fieldAttributes = {
         },
       ]
 
-      if ( value.length === 0 ){
-        value.push( {
+      if (value.length === 0) {
+        value.push({
           value: '',
           label: '',
           tag: null,
-        } )
+        })
       }
 
       const addOption = () => {
@@ -680,43 +729,45 @@ const fieldAttributes = {
 
       return (
         <div className={ 'field-attribute-control attribute-options' }>
-            <Row className={ 'attribute-option no-margins' }>
-              <Col sm={ 3 }>
-                <label>
-                  { __('Option Value', 'groundhogg') }
-                </label>
-              </Col>
-              <Col>
-                <label>
-                  { __('Option Label', 'groundhogg') }
-                </label>
-              </Col>
-              <Col sm={ 3 }>
-                <label>
-                  { __('Tag', 'groundhogg') }
-                  <Tooltip
-                    content={ __( 'You can select a tag to be applied when a user picks a specific option.', 'groundhogg' ) }
-                  />
-                </label>
-              </Col>
-              <Col sm={ 1 }>
-                <button className={ 'alignright clear-button' }
-                        onClick={ addOption }>
-                  <Dashicon icon={ 'plus' }/>
-                </button>
-              </Col>
-            </Row>
-            {
-              curOptions && curOptions.map((option, i) => <AttrOptionControl
-                key={ i }
-                index={ i }
-                value={ option.value }
-                label={ option.label }
-                tag={ option.tag }
-                onUpdate={ updateOption }
-                onDelete={ deleteOption }
-              />)
-            }
+          <Row className={ 'attribute-option no-margins' }>
+            <Col sm={ 3 }>
+              <label>
+                { __('Option Value', 'groundhogg') }
+              </label>
+            </Col>
+            <Col>
+              <label>
+                { __('Option Label', 'groundhogg') }
+              </label>
+            </Col>
+            <Col sm={ 3 }>
+              <label>
+                { __('Tag', 'groundhogg') }
+                <Tooltip
+                  content={ __(
+                    'You can select a tag to be applied when a user picks a specific option.',
+                    'groundhogg') }
+                />
+              </label>
+            </Col>
+            <Col sm={ 1 }>
+              <button className={ 'alignright clear-button' }
+                      onClick={ addOption }>
+                <Dashicon icon={ 'plus' }/>
+              </button>
+            </Col>
+          </Row>
+          {
+            curOptions && curOptions.map((option, i) => <AttrOptionControl
+              key={ i }
+              index={ i }
+              value={ option.value }
+              label={ option.label }
+              tag={ option.tag }
+              onUpdate={ updateOption }
+              onDelete={ deleteOption }
+            />)
+          }
         </div>
       )
     },
@@ -750,6 +801,51 @@ const fieldAttributes = {
               value={ value }
               onChange={ (e) => updateAttribute({ default: e.target.value }) }
               options={ allAttributes.options || [] }
+              className={ 'w100' }
+            />
+          </Col>
+        </Row>
+      )
+    },
+  },
+  value: {
+    edit: ({ value, updateAttribute }) => {
+      return (
+        <Row className={ 'field-attribute-control' }>
+          <Col>
+            <label>{ 'Value' } <Tooltip
+              content={ __('This is what will be saved to the custom field.',
+                'groundhogg') }/></label>
+          </Col>
+          <Col>
+            <input
+              type={ 'text' }
+              value={ value }
+              className={ 'w100' }
+              onChange={ (e) => updateAttribute({ value: e.target.value }) }
+            />
+          </Col>
+        </Row>
+      )
+    },
+  },
+  tag: {
+    edit: ({ value, updateAttribute }) => {
+      return (
+        <Row className={ 'field-attribute-control' }>
+          <Col>
+            <label>{ 'Apply a tag' } <Tooltip
+              content={ __(
+                'This tag will be applied if the checkbox is selected.',
+                'groundhogg') }/></label>
+          </Col>
+          <Col>
+            <TagPicker
+              value={ value }
+              update={ (v) => updateAttribute({ tag: v }) }
+              options={ {
+                isMulti: false,
+              } }
             />
           </Col>
         </Row>

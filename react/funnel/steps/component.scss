@@ -202,6 +202,10 @@ iframe.email-preview {
   padding: 20px;
   border-left: 1px solid $border-color-light;
 
+  .is-required{
+    color: $error-red;
+  }
+
   label {
     display: block;
 
