@@ -20,7 +20,7 @@ export class Editor extends React.Component {
       data: ghEditor.funnel.data,
       steps: ghEditor.funnel.steps,
       validationErrors: null,
-      saving: false
+      saving: false,
     }
 
     // this.handleSetList = this.handleSetList.bind(this);
@@ -54,14 +54,14 @@ export class Editor extends React.Component {
 
     this.setState({
       steps: newStepOrder,
-      saving: true
+      saving: true,
     })
 
     axios.patch(groundhogg_endpoints.funnels, {
       funnel_id: ghEditor.funnel.ID,
-      steps: newStepOrder
+      steps: newStepOrder,
     }).then(result => this.setState({
-      saving: false
+      saving: false,
     }))
   }
 
@@ -86,11 +86,11 @@ export class Editor extends React.Component {
       console.log('Activating funnel!')
 
       this.setState({
-        saving: true
+        saving: true,
       })
 
       axios.patch(groundhogg_endpoints.funnels + '/activate/', {
-        funnel_id: ghEditor.funnel.ID
+        funnel_id: ghEditor.funnel.ID,
       }).then(result => this.setState({
         saving: false,
         validationErrors: result.data.errors,
@@ -103,30 +103,37 @@ export class Editor extends React.Component {
     this.setState({
       data: {
         ...curData,
-        ...newData
+        ...newData,
       },
-      saving: true
+      saving: true,
     })
 
     axios.patch(groundhogg_endpoints.funnels, {
       funnel_id: ghEditor.funnel.ID,
-      data: newData
+      data: newData,
     }).then(result => this.setState({
       data: result.data.funnel.data,
-      saving: false
+      saving: false,
     }))
 
   }
 
+  /**
+   * Reloads the funnel state and steps from the API
+   * Useful when making arbitrary changes to the steps API
+   *
+   * @param e
+   */
   handleReloadEditor (e) {
+
     axios.get(getRequest(groundhogg_endpoints.funnels,
       {
-        funnel_id: ghEditor.funnel.ID
-      })
+        funnel_id: ghEditor.funnel.ID,
+      }),
     ).then(result => this.setState({
       steps: result.data.funnel.steps,
-      funnel: result.data.funnel
-    }))
+      funnel: result.data.funnel,
+    })).then(e.detail.callback)
   }
 
   render () {
@@ -135,18 +142,18 @@ export class Editor extends React.Component {
 
     const rawGroups = reduceStepsToGroups(this.state.steps)
     const groups = rawGroups.map((group, i) => <StepGroup
-      key={i}
-      steps={group}
-      isFirst={i === 0}
-      isLast={i === rawGroups.length - 1}
+      key={ i }
+      steps={ group }
+      isFirst={ i === 0 }
+      isLast={ i === rawGroups.length - 1 }
     />)
 
     return (
       <>
         <Header
-          updateFunnel={this.handleUpdateFunnel}
-          data={this.state.data}
-          isSaving={this.state.saving}
+          updateFunnel={ this.handleUpdateFunnel }
+          data={ this.state.data }
+          isSaving={ this.state.saving }
         />
         {
           status === 'active' && <FadeIn>
@@ -157,10 +164,10 @@ export class Editor extends React.Component {
           id="groundhogg-funnel-editor"
           className="groundhogg-funnel-editor"
         >
-          <div className={'step-groups'}>
-            {groups}
+          <div className={ 'step-groups' }>
+            { groups }
           </div>
-          <div className={'editor-controls'}>
+          <div className={ 'editor-controls' }>
             <AddStep/>
           </div>
         </div>
@@ -185,14 +192,27 @@ function reduceStepsToGroups (steps) {
     if (prev.length && curr.data.step_group ===
       prev[prev.length - 1][0].data.step_group) {
       prev[prev.length - 1].push(curr)
-    } else {
+    }
+    else {
       prev.push([curr])
     }
     return prev
   }, [])
 }
 
-export function reloadEditor () {
-  const event = new CustomEvent('groundhogg-reload-editor')
+/**
+ * Reloads the editor steps with the most updated information.
+ * Kind of hacky but not sure what other methods to deploy
+ * Will do better in the future.
+ *
+ * @param callback a callback function
+ */
+export function reloadEditor (callback) {
+  const event = new CustomEvent('groundhogg-reload-editor', {
+    detail: {
+      callback: callback,
+    },
+  })
+
   document.dispatchEvent(event)
 }

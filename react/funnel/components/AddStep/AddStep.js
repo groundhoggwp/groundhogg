@@ -52,18 +52,29 @@ export class AddStep extends React.Component {
     this.setState({
       isShowing: false,
       stepChosen: false,
+      selectedType: null,
     })
   }
 
   handleAdded (result) {
-    reloadEditor()
-    this.handleExit()
+    reloadEditor(this.handleExit)
   }
 
+  /**
+   * Handle when the step is selected.
+   *
+   * @param type
+   */
   handleStepChosen (type) {
+
+    // Ignore if already chose a step
+    if (this.state.stepChosen) {
+      return
+    }
 
     this.setState({
       stepChosen: true,
+      selectedType: type,
       search: '',
     })
 
@@ -124,8 +135,11 @@ export class AddStep extends React.Component {
                 value={ this.state.search }
                 onChange={ this.handleSearchChange }/>
               { steps.map(
-                step => <AddStepControl step={ step }
-                                        stepChosen={ this.handleStepChosen }/>) }
+                step => <AddStepControl
+                  step={ step }
+                  onSelect={ this.handleStepChosen }
+                  isChosen={ step.type === this.state.selectedType }
+                />) }
             </div>
           </div>
         </SlideInBarRight>

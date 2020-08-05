@@ -19,3 +19,9 @@ export const Tooltip = ({ id, placement, content }) => {
     </OverlayTrigger>
   )
 }
+
+Tooltip.defaultProps = {
+  placement: 'right',
+  id: 'mytooltip',
+  content: ''
+}

@@ -29,7 +29,7 @@ class API_V3 {
 		do_action( 'groundhogg/api/v3/init', $this );
 
 		// Todo remove this after done testing
-		sleep(2);
+		sleep(1);
 
 	}
 

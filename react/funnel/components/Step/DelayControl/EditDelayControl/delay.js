@@ -175,7 +175,7 @@ export const DelayTypes = {
                     options={ intervalTypes }
                   />
                   <DelayAttrIsValid
-                    isValid={ delay.interval === 'any' || delay.period > 0 }
+                    isValid={ delay.interval === 'none' || delay.period > 0 }
                     errMsg={ commonErrors.invalidDelayPeriod }
                   />
                 </div>
@@ -393,7 +393,7 @@ export const DelayTypes = {
                     options={ waitTypes }
                   />
                   <DelayAttrIsValid
-                    isValid={ delay.interval === 'any' || delay.period > 0 }
+                    isValid={ delay.interval === 'none' || delay.period > 0 }
                     errMsg={ commonErrors.invalidDelayPeriod }
                   />
                 </div>

@@ -11,6 +11,7 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import { ReplacementsButton } from '../ReplacementsButton/ReplacementsButton'
 
 import './component.scss'
+import { parseArgs } from '../../App'
 
 const { __, _x, _n, _nx } = wp.i18n
 
@@ -22,6 +23,14 @@ function Text ({ id, options, update, value }) {
 
 export function TagPicker ({ id, options, update, value }) {
 
+  options = parseArgs( options || {}, {
+    cacheOptions: true,
+    isMulti: true,
+    ignoreCase: true,
+    isClearable: true,
+    defaultOptions: [],
+  } )
+
   const promiseOptions = inputValue => new Promise(resolve => {
     axios.get(groundhogg_endpoints.tags + '?axios=1&q=' + inputValue).
       then(result => {
@@ -32,15 +41,10 @@ export function TagPicker ({ id, options, update, value }) {
   return (
     <AsyncCreatableSelect
       id={ id }
-      cacheOptions
-      defaultOptions
-      isMulti
-      isClearable
-      ignoreCase={ true }
+      { ...options }
       loadOptions={ promiseOptions }
       onChange={ update }
       value={ value }
-      { ...options }
     />
   )
 }

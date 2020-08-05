@@ -175,6 +175,18 @@ body.disable-scrolling {
     height: 54px;
     width: 54px; }
 
+.step-wrap.deleting {
+  opacity: 0;
+  transition: 0.5s;
+  transition-timing-function: ease-in-out; }
+  .step-wrap.deleting .step {
+    border-color: #cc0000;
+    color: #cc0000;
+    background-color: #F8D7DA; }
+
+.step-wrap.deleted {
+  display: none; }
+
 .step-wrap .step-title {
   padding-left: 60px;
   cursor: pointer;
@@ -691,6 +703,28 @@ iframe.email-preview {
   margin-bottom: 0;
   background-color: #f9f9f9; }
 
+label.block {
+  display: block; }
+
+.field-attribute-control.attribute-options {
+  padding: 16px 0 6px 0;
+  margin-top: 10px; }
+  .field-attribute-control.attribute-options .attribute-option .col,
+  .field-attribute-control.attribute-options .attribute-option .col-sm-2,
+  .field-attribute-control.attribute-options .attribute-option .col-sm-3,
+  .field-attribute-control.attribute-options .attribute-option .col-sm-4,
+  .field-attribute-control.attribute-options .attribute-option .col-sm-1 {
+    padding: 0 8px 0 0; }
+  .field-attribute-control.attribute-options .attribute-option input {
+    width: 100%; }
+
+.clear-button {
+  background: transparent;
+  border: none; }
+
+.delete-button {
+  color: #cc0000; }
+
 .gh-form-wrapper * {
   box-sizing: border-box; }
 
@@ -842,7 +876,7 @@ ul.gh-form-errors {
   .Groundhogg .navbar .groundhogg-nav {
     padding-right: 50px; }
     .Groundhogg .navbar .groundhogg-nav .funnel-actions {
-      margin-right: 10px; }
+      margin-left: 10px; }
   .Groundhogg .navbar .last-updated,
   .Groundhogg .navbar .saving {
     opacity: 0.5;

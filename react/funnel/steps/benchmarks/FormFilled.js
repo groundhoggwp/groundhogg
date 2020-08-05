@@ -4,15 +4,16 @@ import { Button, Col, Row, Tab, Tabs } from 'react-bootstrap'
 import {
   ClearFix,
   CopyInput, CustomFieldPicker,
-  LinkPicker, SimpleSelect, TagSpan,
+  LinkPicker, SimpleSelect, TagPicker, TagSpan,
   TextArea,
-  YesNoToggle
+  YesNoToggle,
 } from '../../components/BasicControls/basicControls'
 
 import '../../../../assets/css/frontend/form.css'
 import { ReactSortable } from 'react-sortablejs'
 import { Dashicon } from '../../components/Dashicon/Dashicon'
 import { parseArgs, uniqId } from '../../App'
+import { Tooltip } from '../../components/Tooltip/Tooltip'
 
 const { __, _x, _n, _nx } = wp.i18n
 
@@ -22,16 +23,16 @@ registerStepType('form_fill', {
   group: ghEditor.steps.form_fill.group,
 
   title: ({ data, context, settings }) => {
-    return <>{_x('When', 'form step title', 'groundhogg')} <TagSpan
-      icon={'editor-table'} tagName={settings.form_name}/> {_x(
-      'is filled', 'form step title', 'groundhogg')}</>
+    return <>{ _x('When', 'form step title', 'groundhogg') } <TagSpan
+      icon={ 'editor-table' } tagName={ settings.form_name }/> { _x(
+      'is filled', 'form step title', 'groundhogg') }</>
   },
 
   edit: ({ data, context, settings, updateSettings, commit, done }) => {
 
     const updateSetting = (name, value) => {
       updateSettings({
-        [name]: value
+        [name]: value,
       })
     }
 
@@ -39,26 +40,27 @@ registerStepType('form_fill', {
 
     return (
       <SimpleEditModal
-        title={'Form Filled...'}
-        done={done}
-        commit={commit}
-        modalProps={{
+        title={ 'Form Filled...' }
+        done={ done }
+        commit={ commit }
+        modalProps={ {
           size: 'lg',
           dialogClassName: tab === 'form'
             ? 'modal-90w form'
-            : 'modal-md form'
-        }}
-        modalBodyProps={{
-          className: 'no-padding'
-        }}
+            : 'modal-md form',
+        } }
+        modalBodyProps={ {
+          className: 'no-padding',
+        } }
       >
-        <Tabs activeKey={tab} onSelect={(t) => setTab(t)}>
-          {Object.keys(editFormTabs).map(tab => renderTab(tab, data, settings, context,
-            updateSettings, updateSetting))}
+        <Tabs activeKey={ tab } onSelect={ (t) => setTab(t) }>
+          { Object.keys(editFormTabs).
+            map(tab => renderTab(tab, data, settings, context,
+              updateSettings, updateSetting)) }
         </Tabs>
       </SimpleEditModal>
     )
-  }
+  },
 })
 
 function renderTab (
@@ -68,12 +70,12 @@ function renderTab (
     settings: settings,
     context: context,
     updateSettings: updateSettings,
-    updateSetting: updateSetting
+    updateSetting: updateSetting,
   })
 
   return (
-    <Tab key={tab} eventKey={tab} title={editFormTabs[tab].title}>
-      {tabContent}
+    <Tab key={ tab } eventKey={ tab } title={ editFormTabs[tab].title }>
+      { tabContent }
     </Tab>
   )
 }
@@ -86,7 +88,7 @@ const editFormTabs = {
 
       const formUpdated = (newJson) => {
         updateSettings({
-          form_json: newJson
+          form_json: newJson,
         })
       }
 
@@ -95,14 +97,14 @@ const editFormTabs = {
       return (
         <>
           <FormBuilder
-            formJSON={formJSON}
-            formUpdated={formUpdated}
-            settings={settings}
-            updateSetting={updateSetting}
+            formJSON={ formJSON }
+            formUpdated={ formUpdated }
+            settings={ settings }
+            updateSetting={ updateSetting }
           />
         </>
       )
-    }
+    },
   },
   submit: {
     id: 'submit',
@@ -110,131 +112,136 @@ const editFormTabs = {
     render: ({ settings, updateSetting }) => {
       return (
         <>
-          <Row className={'step-setting-control no-margins'}>
-            <Col sm={4}>
-              <label>{__('Stay on page after submit?',
-                'groundhogg')}</label>
-              <p className={'description'}>{__(
+          <Row className={ 'step-setting-control no-margins' }>
+            <Col sm={ 4 }>
+              <label>{ __('Stay on page after submit?',
+                'groundhogg') }</label>
+              <p className={ 'description' }>{ __(
                 'This will prevent the contact from being redirected after submitting the form.',
-                'groundogg')}</p>
+                'groundogg') }</p>
             </Col>
-            <Col sm={8}>
+            <Col sm={ 8 }>
               <YesNoToggle
-                value={settings.enable_ajax}
-                update={(v) => updateSetting('enable_ajax',
-                  v)}
+                value={ settings.enable_ajax }
+                update={ (v) => updateSetting('enable_ajax',
+                  v) }
               />
             </Col>
           </Row>
-          {settings.enable_ajax && <Row className={'no-margins'}>
-            <Col sm={4}>
-              <label>{'Success message'}</label>
-              <p className={'description'}>{'Message displayed when the contact submits the form.'}</p>
+          { settings.enable_ajax && <Row className={ 'no-margins' }>
+            <Col sm={ 4 }>
+              <label>{ 'Success message' }</label>
+              <p
+                className={ 'description' }>{ 'Message displayed when the contact submits the form.' }</p>
             </Col>
-            <Col sm={8}>
+            <Col sm={ 8 }>
               <TextArea
-                id={'success_message'}
-                value={settings.success_message}
-                hasReplacements={true}
-                update={(v) => updateSetting(
-                  'success_message', v)}/>
+                id={ 'success_message' }
+                value={ settings.success_message }
+                hasReplacements={ true }
+                update={ (v) => updateSetting(
+                  'success_message', v) }/>
             </Col>
-          </Row>}
-          {!settings.enable_ajax && <Row className={'no-margins'}>
-            <Col sm={4}>
-              <label>{'Success page'}</label>
-              <p className={'description'}>{'Where the contact will be directed upon submitting the form.'}</p>
+          </Row> }
+          { !settings.enable_ajax && <Row className={ 'no-margins' }>
+            <Col sm={ 4 }>
+              <label>{ 'Success page' }</label>
+              <p
+                className={ 'description' }>{ 'Where the contact will be directed upon submitting the form.' }</p>
             </Col>
-            <Col sm={8}>
-              <LinkPicker value={settings.success_page}
-                          update={(v) => updateSetting(
-                            'success_page', v)}/>
+            <Col sm={ 8 }>
+              <LinkPicker value={ settings.success_page }
+                          update={ (v) => updateSetting(
+                            'success_page', v) }/>
             </Col>
-          </Row>}
+          </Row> }
         </>
       )
-    }
+    },
   },
   embed: {
     id: 'embed',
     title: __('Embed', 'groundhogg'),
     render: ({ context }) => {
-      return (<>
-        <Row className={'step-setting-control no-margins'}>
-          <Col sm={4}>
-            <label>{'Shortcode'}</label>
-            <p className={'description'}>{'Insert anywhere WordPress shortcodes are accepted.'}</p>
-          </Col>
-          <Col sm={8}>
-            <CopyInput
-              content={context.embed.shortcode}
-            />
-          </Col>
-        </Row>
-        <Row className={'step-setting-control no-margins'}>
-          <Col sm={4}>
-            <label>{'iFrame'}</label>
-            <p className={'description'}>{'For use when embedding forms on none WordPress sites.'}</p>
-          </Col>
-          <Col sm={8}>
-            <CopyInput
-              content={context.embed.iframe}
-            />
-          </Col>
-        </Row>
-        <Row className={'step-setting-control no-margins'}>
-          <Col sm={4}>
-            <label>{'Raw HTML'}</label>
+      return ( <>
+        <Row className={ 'step-setting-control no-margins' }>
+          <Col sm={ 4 }>
+            <label>{ 'Shortcode' }</label>
             <p
-              className={'description'}>{'For use when embedding forms on none WordPress sites and HTML web form integrations (Thrive).'}</p>
+              className={ 'description' }>{ 'Insert anywhere WordPress shortcodes are accepted.' }</p>
           </Col>
-          <Col sm={8}>
+          <Col sm={ 8 }>
             <CopyInput
-              content={context.embed.html}
+              content={ context.embed.shortcode }
             />
           </Col>
         </Row>
-        <Row className={'step-setting-control no-margins'}>
-          <Col sm={4}>
-            <label>{'Hosted URL'}</label>
-            <p className={'description'}>{'Direct link to the web form.'}</p>
+        <Row className={ 'step-setting-control no-margins' }>
+          <Col sm={ 4 }>
+            <label>{ 'iFrame' }</label>
+            <p
+              className={ 'description' }>{ 'For use when embedding forms on none WordPress sites.' }</p>
           </Col>
-          <Col sm={8}>
+          <Col sm={ 8 }>
             <CopyInput
-              content={context.embed.hosted}
+              content={ context.embed.iframe }
             />
           </Col>
         </Row>
-      </>)
-    }
-  }
+        <Row className={ 'step-setting-control no-margins' }>
+          <Col sm={ 4 }>
+            <label>{ 'Raw HTML' }</label>
+            <p
+              className={ 'description' }>{ 'For use when embedding forms on none WordPress sites and HTML web form integrations (Thrive).' }</p>
+          </Col>
+          <Col sm={ 8 }>
+            <CopyInput
+              content={ context.embed.html }
+            />
+          </Col>
+        </Row>
+        <Row className={ 'step-setting-control no-margins' }>
+          <Col sm={ 4 }>
+            <label>{ 'Hosted URL' }</label>
+            <p
+              className={ 'description' }>{ 'Direct link to the web form.' }</p>
+          </Col>
+          <Col sm={ 8 }>
+            <CopyInput
+              content={ context.embed.hosted }
+            />
+          </Col>
+        </Row>
+      </> )
+    },
+  },
 }
 
 function FormBuilder ({ formJSON, formUpdated, settings, updateSetting }) {
 
   return (
-    <Row className={'no-margins no-padding'}>
-      <Col className={'no-padding form-builder-wrap'}>
-        <div className={'form-builder-wrap'}>
-          <div className={'form-name-wrap'}>
-            <label>{'Form Name'}</label>
+    <Row className={ 'no-margins no-padding' }>
+      <Col className={ 'no-padding form-builder-wrap' }>
+        <div className={ 'form-builder-wrap' }>
+          <div className={ 'form-name-wrap' }>
+            <label>{ 'Form Name' }</label>
             <input
-              type={'text'}
-              value={settings.form_name}
-              className={'form-name alignright'}
-              onChange={e => updateSetting('form_name',
-                e.target.value)}
+              type={ 'text' }
+              value={ settings.form_name }
+              className={ 'form-name alignright' }
+              onChange={ e => updateSetting('form_name',
+                e.target.value) }
             />
             <ClearFix/>
           </div>
           <FieldsEditor
-            fields={formJSON}
-            formUpdated={formUpdated}
+            fields={ formJSON }
+            formUpdated={ formUpdated }
           />
         </div>
       </Col>
-      <Col className={'form-preview'}>
-        {formJSON.map((field) => renderField(field))}
+      <Col className={ 'form-preview' }>
+        { formJSON.map((field) => renderField(field)) }
         <ClearFix/>
       </Col>
     </Row>
@@ -251,8 +258,8 @@ function FieldsEditor ({ fields, formUpdated }) {
       id: uniqId('field_'),
       width: '1/1',
       attributes: {
-        label: 'my field'
-      }
+        label: 'my field',
+      },
     })
 
     formUpdated(fields)
@@ -279,11 +286,11 @@ function FieldsEditor ({ fields, formUpdated }) {
 
   if (active) {
     return (
-      <div className={'form-fields'}>
+      <div className={ 'form-fields' }>
         <FieldEditor
-          field={active}
-          updateField={updateField}
-          onEdit={doneEditing}
+          field={ active }
+          updateField={ updateField }
+          onEdit={ doneEditing }
         />
       </div>
     )
@@ -292,21 +299,21 @@ function FieldsEditor ({ fields, formUpdated }) {
   return (
     <>
       <ReactSortable
-        list={fields}
-        setList={formUpdated}
-        className={'form-fields'}
+        list={ fields }
+        setList={ formUpdated }
+        className={ 'form-fields' }
       >
-        {fields.map(field => <FieldSortable
-          key={field.id}
-          field={field}
-          onDelete={deleteField}
-          onEdit={editField}
-        />)}
+        { fields.map(field => <FieldSortable
+          key={ field.id }
+          field={ field }
+          onDelete={ deleteField }
+          onEdit={ editField }
+        />) }
       </ReactSortable>
-      <div className={'add-field-wrap'}>
-        <Button variant={'outline-secondary'} onClick={addField}>
-          <Dashicon icon={'plus'}/>
-          {'Add Field'}
+      <div className={ 'add-field-wrap' }>
+        <Button variant={ 'outline-secondary' } onClick={ addField }>
+          <Dashicon icon={ 'plus' }/>
+          { 'Add Field' }
         </Button>
       </div>
     </>
@@ -320,26 +327,27 @@ function FieldLabel ({ field }) {
     FieldTypes[field.type].hasOwnProperty('renderName')) {
     // console.debug( field );
     name = FieldTypes[field.type].renderName({ attributes: field.attributes })
-  } else {
+  }
+  else {
     name = field.attributes.label
   }
 
-  return <span className={'field-label'}>{name}</span>
+  return <span className={ 'field-label' }>{ name }</span>
 }
 
 function FieldSortable ({ field, onDelete, onEdit }) {
 
   return (
     <div
-      className={'field-sortable-item form-field'}
-      onClick={(e) => onEdit(field.id)}
+      className={ 'field-sortable-item form-field' }
+      onClick={ (e) => onEdit(field.id) }
     >
-      <FieldLabel field={field}/>
+      <FieldLabel field={ field }/>
       <button
-        className={'delete-field-button'}
-        onClick={(e) => onDelete(field.id, e)}
+        className={ 'delete-field-button' }
+        onClick={ (e) => onDelete(field.id, e) }
       >
-        <Dashicon icon={'no-alt'}/>
+        <Dashicon icon={ 'no-alt' }/>
       </button>
     </div>
   )
@@ -357,9 +365,10 @@ function FieldEditor ({ field, onEdit, updateField }) {
     if (typeof attr === 'object' && attr !== null) {
       updateField(fieldId, 'attributes', {
         ...attributes,
-        ...attr
+        ...attr,
       })
-    } else {
+    }
+    else {
       attributes[attr] = value
       updateField(fieldId, 'attributes', attributes)
     }
@@ -368,45 +377,46 @@ function FieldEditor ({ field, onEdit, updateField }) {
   return (
     <>
       <div
-        key={field.id}
-        className={'field-sortable-item form-field'}
-        onClick={onEdit}
+        key={ field.id }
+        className={ 'field-sortable-item form-field' }
+        onClick={ onEdit }
       >
-        <FieldLabel field={field}/>
+        <FieldLabel field={ field }/>
         <button
-          onClick={onEdit}
-          className={'edit-field-button'}
+          onClick={ onEdit }
+          className={ 'edit-field-button' }
         >
-          <Dashicon icon={'yes'}/>
+          <Dashicon icon={ 'yes' }/>
         </button>
       </div>
-      <div className={'field-attributes'}>
+      <div className={ 'field-attributes' }>
         <BasicAttributeControlGroup
-          label={'Field Type'}
+          label={ 'Field Type' }
         >
-          <select value={field.type}
-                  onChange={(e) => updateField(fieldId, 'type',
-                    e.target.value)}>
-            {Object.values(FieldTypes).map(type => <option
-              key={type.type}
-              value={type.type}>{type.name}</option>)}
+          <select value={ field.type }
+                  onChange={ (e) => updateField(fieldId, 'type',
+                    e.target.value) }>
+            { Object.values(FieldTypes).map(type => <option
+              key={ type.type }
+              value={ type.type }>{ type.name }</option>) }
           </select>
         </BasicAttributeControlGroup>
-        {attrs.map(attr => <FieldAttribute
-          key={attr}
-          type={attr}
-          value={attributes[attr]}
-          updateAttribute={updateAttribute}
-        />)}
+        { attrs.map(attr => <FieldAttribute
+          key={ attr }
+          type={ attr }
+          value={ attributes[attr] }
+          updateAttribute={ updateAttribute }
+          allAttributes={ attributes }
+        />) }
         <BasicAttributeControlGroup
-          label={'Column Width'}
+          label={ 'Column Width' }
         >
-          <select value={field.width}
-                  onChange={(e) => updateField(fieldId, 'width',
-                    e.target.value)}>
-            {Object.keys(widthMap).map(width => <option
-              key={width}
-              value={width}>{width}</option>)}
+          <select value={ field.width }
+                  onChange={ (e) => updateField(fieldId, 'width',
+                    e.target.value) }>
+            { Object.keys(widthMap).map(width => <option
+              key={ width }
+              value={ width }>{ width }</option>) }
           </select>
         </BasicAttributeControlGroup>
       </div>
@@ -414,27 +424,28 @@ function FieldEditor ({ field, onEdit, updateField }) {
   )
 }
 
-function FieldAttribute ({ type, value, updateAttribute }) {
+function FieldAttribute ({ type, value, updateAttribute, allAttributes }) {
 
   if (!fieldAttributes.hasOwnProperty(type)) {
-    return <div className={'not-implemented'}>{'Not implemented'}</div>
+    return <div className={ 'not-implemented' }>{ 'Not implemented' }</div>
   }
 
   return React.createElement(fieldAttributes[type].edit, {
     value: value,
-    updateAttribute: updateAttribute
+    updateAttribute: updateAttribute,
+    allAttributes: allAttributes,
   })
 
 }
 
 function BasicAttributeControlGroup ({ label, children }) {
   return (
-    <Row className={'field-attribute-control'}>
+    <Row className={ 'field-attribute-control' }>
       <Col>
-        <label>{label}</label>
+        <label>{ label }</label>
       </Col>
       <Col>
-        {children}
+        { children }
       </Col>
     </Row>
   )
@@ -444,180 +455,350 @@ const fieldAttributes = {
   required: {
     edit: ({ value, updateAttribute }) => {
       return (
-        <Row className={'field-attribute-control'}>
+        <Row className={ 'field-attribute-control' }>
           <Col>
-            <label>{'Is this field required?'}</label>
+            <label>{ 'Is this field required?' }</label>
           </Col>
           <Col>
             <YesNoToggle
-              value={value}
-              update={(value) => updateAttribute('required',
-                value)}
+              value={ value }
+              update={ (value) => updateAttribute('required',
+                value) }
             />
           </Col>
         </Row>
       )
-    }
+    },
   },
   label: {
     edit: ({ value, updateAttribute }) => {
       return (
-        <Row className={'field-attribute-control'}>
+        <Row className={ 'field-attribute-control' }>
           <Col>
-            <label>{'Field Label'}</label>
+            <label>{ 'Field Label' }</label>
           </Col>
           <Col>
             <input
-              type={'text'}
-              value={value}
-              onChange={(e) => updateAttribute('label',
-                e.target.value)}
+              type={ 'text' }
+              value={ value }
+              onChange={ (e) => updateAttribute('label',
+                e.target.value) }
             />
           </Col>
         </Row>
       )
-    }
+    },
   },
   text: {
     edit: ({ value, updateAttribute }) => {
       return (
         <BasicAttributeControlGroup
-          label={'Button Text'}
+          label={ 'Button Text' }
         >
           <input
-            type={'text'}
-            value={value}
-            onChange={(e) => updateAttribute('text',
-              e.target.value)}
+            type={ 'text' }
+            value={ value }
+            onChange={ (e) => updateAttribute('text',
+              e.target.value) }
           />
         </BasicAttributeControlGroup>
       )
-    }
+    },
   },
   hideLabel: {
     edit: ({ value, updateAttribute }) => {
       return (
-        <Row className={'field-attribute-control'}>
+        <Row className={ 'field-attribute-control' }>
           <Col>
-            <label>{'Hide field label?'}</label>
+            <label>{ 'Hide field label?' }</label>
           </Col>
           <Col>
             <YesNoToggle
-              value={value}
-              update={(value) => updateAttribute('hideLabel',
-                value)}
+              value={ value }
+              update={ (value) => updateAttribute('hideLabel',
+                value) }
             />
           </Col>
         </Row>
       )
-    }
+    },
   },
   name: {
     edit: ({ value, updateAttribute }) => {
       return (
         <BasicAttributeControlGroup
-          label={'Custom Field Name'}
+          label={ 'Custom Field Name' }
         >
           <CustomFieldPicker
-            value={value}
-            update={(value) => updateAttribute('name',
-              value)}
+            value={ value }
+            update={ (value) => updateAttribute('name',
+              value) }
           />
         </BasicAttributeControlGroup>
       )
-    }
+    },
   },
   description: {
     edit: ({ value, updateAttribute }) => {
       return (
         <BasicAttributeControlGroup
-          label={'Field Description'}
+          label={ 'Field Description' }
         >
 					<textarea
-            value={value}
-            onChange={(e) => updateAttribute('text',
-              e.target.value)}
+            value={ value }
+            onChange={ (e) => updateAttribute('text',
+              e.target.value) }
           />
         </BasicAttributeControlGroup>
       )
-    }
+    },
   },
   showDescription: {
     edit: ({ value, updateAttribute }) => {
       return (
-        <Row className={'field-attribute-control'}>
+        <Row className={ 'field-attribute-control' }>
           <Col>
-            <label>{'Show description?'}</label>
+            <label>{ 'Show description?' }</label>
           </Col>
           <Col>
             <YesNoToggle
-              value={value}
-              update={(value) => updateAttribute(
+              value={ value }
+              update={ (value) => updateAttribute(
                 'showDescription',
-                value)}
+                value) }
             />
           </Col>
         </Row>
       )
-    }
+    },
   },
   placeholder: {
     edit: ({ value, updateAttribute }) => {
       return (
-        <Row className={'field-attribute-control'}>
+        <Row className={ 'field-attribute-control' }>
           <Col>
-            <label>{'Placeholder'}</label>
+            <label>{ 'Placeholder' }</label>
           </Col>
           <Col>
             <input
-              type={'text'}
-              value={value}
-              onChange={(e) => updateAttribute('placeholder',
-                e.target.value)}
+              type={ 'text' }
+              value={ value }
+              onChange={ (e) => updateAttribute('placeholder',
+                e.target.value) }
             />
           </Col>
         </Row>
       )
-    }
+    },
   },
   id: {
     edit: ({ value, updateAttribute }) => {
       return (
-        <Row className={'field-attribute-control'}>
+        <Row className={ 'field-attribute-control' }>
           <Col>
-            <label>{'CSS ID'}</label>
+            <label>{ 'CSS ID' }</label>
           </Col>
           <Col>
             <input
-              type={'text'}
-              value={value}
-              onChange={(e) => updateAttribute('ID',
-                e.target.value)}
+              type={ 'text' }
+              value={ value }
+              onChange={ (e) => updateAttribute('ID',
+                e.target.value) }
             />
           </Col>
         </Row>
       )
-    }
+    },
   },
   class: {
     edit: ({ value, updateAttribute }) => {
       return (
-        <Row className={'field-attribute-control'}>
+        <Row className={ 'field-attribute-control' }>
           <Col>
-            <label>{'CSS Class'}</label>
+            <label>{ 'CSS Class' }</label>
           </Col>
           <Col>
             <input
-              type={'text'}
-              value={value}
-              onChange={(e) => updateAttribute('class',
-                e.target.value)}
+              type={ 'text' }
+              value={ value }
+              onChange={ (e) => updateAttribute('class',
+                e.target.value) }
             />
           </Col>
         </Row>
       )
-    }
+    },
+  },
+  options: {
+    edit: ({ value, updateAttribute }) => {
+
+      const curOptions = value || [
+        {
+          value: '',
+          label: '',
+          tag: null,
+        },
+      ]
+
+      if ( value.length === 0 ){
+        value.push( {
+          value: '',
+          label: '',
+          tag: null,
+        } )
+      }
+
+      const addOption = () => {
+        const newOptions = [
+          ...curOptions,
+          {
+            value: '',
+            label: '',
+            tag: null,
+          },
+        ]
+
+        updateAttribute({
+          options: newOptions,
+        })
+
+      }
+
+      const updateOption = (i, newAttr) => {
+        curOptions[i] = { ...curOptions[i], ...newAttr }
+        updateAttribute({
+          options: curOptions,
+        })
+      }
+
+      const deleteOption = (index) => {
+        curOptions.splice(index, 1)
+        updateAttribute({
+          options: curOptions,
+        })
+      }
+
+      return (
+        <div className={ 'field-attribute-control attribute-options' }>
+            <Row className={ 'attribute-option no-margins' }>
+              <Col sm={ 3 }>
+                <label>
+                  { __('Option Value', 'groundhogg') }
+                </label>
+              </Col>
+              <Col>
+                <label>
+                  { __('Option Label', 'groundhogg') }
+                </label>
+              </Col>
+              <Col sm={ 3 }>
+                <label>
+                  { __('Tag', 'groundhogg') }
+                  <Tooltip
+                    content={ __( 'You can select a tag to be applied when a user picks a specific option.', 'groundhogg' ) }
+                  />
+                </label>
+              </Col>
+              <Col sm={ 1 }>
+                <button className={ 'alignright clear-button' }
+                        onClick={ addOption }>
+                  <Dashicon icon={ 'plus' }/>
+                </button>
+              </Col>
+            </Row>
+            {
+              curOptions && curOptions.map((option, i) => <AttrOptionControl
+                key={ i }
+                index={ i }
+                value={ option.value }
+                label={ option.label }
+                tag={ option.tag }
+                onUpdate={ updateOption }
+                onDelete={ deleteOption }
+              />)
+            }
+        </div>
+      )
+    },
+  },
+  multiple: {
+    edit: ({ value, updateAttribute }) => {
+      return (
+        <Row className={ 'field-attribute-control' }>
+          <Col>
+            <label>{ 'Select multiple?' }</label>
+          </Col>
+          <Col>
+            <YesNoToggle
+              value={ value }
+              update={ (value) => updateAttribute({ multiple: value }) }
+            />
+          </Col>
+        </Row>
+      )
+    },
+  },
+  default: {
+    edit: ({ value, updateAttribute, allAttributes }) => {
+      return (
+        <Row className={ 'field-attribute-control' }>
+          <Col>
+            <label>{ 'Default Selection' }</label>
+          </Col>
+          <Col>
+            <SimpleSelect
+              value={ value }
+              onChange={ (e) => updateAttribute({ default: e.target.value }) }
+              options={ allAttributes.options || [] }
+            />
+          </Col>
+        </Row>
+      )
+    },
+  },
+}
+
+const AttrOptionControl = ({ index, value, label, tag, onUpdate, onDelete }) => {
+
+  const handleChange = (newAttr) => {
+    onUpdate(index, newAttr)
   }
+
+  return (
+    <Row className={ 'attribute-option no-margins' }>
+      <Col sm={ 3 }>
+        <input
+          type={ 'text' }
+          value={ value }
+          placeholder={ __('Value', 'form editor', 'groundhogg') }
+          onChange={ (e) => handleChange({ value: e.target.value }) }
+        />
+      </Col>
+      <Col>
+        <input
+          type={ 'text' }
+          value={ label }
+          placeholder={ __('Label', 'form editor', 'groundhogg') }
+          onChange={ (e) => handleChange({ label: e.target.value }) }
+        />
+      </Col>
+      <Col sm={ 3 }>
+        <TagPicker
+          value={ tag }
+          options={ {
+            isMulti: false,
+          } }
+          update={ (v) => handleChange({ tag: v }) }
+        />
+      </Col>
+      <Col sm={ 1 }>
+        <button className={ 'alignright clear-button delete-button' }
+                onClick={ () => onDelete(index) }>
+          <Dashicon icon={ 'no' }/>
+        </button>
+      </Col>
+    </Row>
+  )
 }
 
 const FieldTypes = {
@@ -630,24 +811,24 @@ const FieldTypes = {
       'required',
       'placeholder',
       'id',
-      'class'
+      'class',
     ],
     render: function ({ attributes }) {
 
       attributes = parseArgs(attributes, {
         label: 'First Name',
-        required: true
+        required: true,
       })
 
       attributes = parseArgs({
-        name: 'first_name'
+        name: 'first_name',
       }, attributes)
 
       return <InputFieldGroup
-        type={'text'}
-        attributes={attributes}
+        type={ 'text' }
+        attributes={ attributes }
       />
-    }
+    },
   },
   last: {
     type: 'last',
@@ -658,24 +839,24 @@ const FieldTypes = {
       'required',
       'placeholder',
       'id',
-      'class'
+      'class',
     ],
     render: function ({ attributes }) {
 
       attributes = parseArgs(attributes, {
         label: 'Last Name',
-        required: true
+        required: true,
       })
 
       attributes = parseArgs({
-        name: 'last_name'
+        name: 'last_name',
       }, attributes)
 
       return <InputFieldGroup
-        type={'text'}
-        attributes={attributes}
+        type={ 'text' }
+        attributes={ attributes }
       />
-    }
+    },
   },
   email: {
     type: 'email',
@@ -685,24 +866,24 @@ const FieldTypes = {
       'hideLabel',
       'placeholder',
       'id',
-      'class'
+      'class',
     ],
     render: function ({ attributes }) {
 
       attributes = parseArgs(attributes, {
-        label: 'Email'
+        label: 'Email',
       })
 
       attributes = parseArgs({
         name: 'email',
-        required: true
+        required: true,
       }, attributes)
 
       return <InputFieldGroup
-        type={'email'}
-        attributes={attributes}
+        type={ 'email' }
+        attributes={ attributes }
       />
-    }
+    },
   },
   phone: {
     type: 'phone',
@@ -712,18 +893,18 @@ const FieldTypes = {
 
       attributes = parseArgs(attributes, {
         label: 'Phone',
-        required: true
+        required: true,
       })
 
       attributes = parseArgs({
-        name: 'primary_phone'
+        name: 'primary_phone',
       }, attributes)
 
       return <InputFieldGroup
-        type={'tel'}
-        attributes={attributes}
+        type={ 'tel' }
+        attributes={ attributes }
       />
-    }
+    },
   },
   gdpr: {
     type: 'gdpr',
@@ -736,20 +917,20 @@ const FieldTypes = {
 
       attributes = parseArgs(attributes, {
         class: 'gh-gdpr',
-        label: 'I consent...'
+        label: 'I consent...',
       })
 
       attributes = parseArgs({
         name: 'gdpr_consent',
         id: 'gdpr_consent',
         required: true,
-        value: 'yes'
+        value: 'yes',
       }, attributes)
 
       return <CheckboxFieldGroup
-        attributes={attributes}
+        attributes={ attributes }
       />
-    }
+    },
   },
   terms: {
     type: 'terms',
@@ -762,20 +943,20 @@ const FieldTypes = {
 
       attributes = parseArgs(attributes, {
         class: 'gh-terms',
-        label: <>{'I agree to the'} <i>{'terms of service'}</i></>,
-        required: true
+        label: <>{ 'I agree to the' } <i>{ 'terms of service' }</i></>,
+        required: true,
       })
 
       attributes = parseArgs({
         name: 'agree_terms',
         id: 'agree_terms',
-        value: 'yes'
+        value: 'yes',
       }, attributes)
 
       return <CheckboxFieldGroup
-        attributes={attributes}
+        attributes={ attributes }
       />
-    }
+    },
   },
   recaptcha: {
     type: 'recaptcha',
@@ -785,8 +966,8 @@ const FieldTypes = {
       return 'reCaptcha'
     },
     render: ({ attributes }) => {
-      return <div className={'gh-recaptcha'}></div>
-    }
+      return <div className={ 'gh-recaptcha' }>[reCaptcha]</div>
+    },
   },
   submit: {
     type: 'submit',
@@ -798,17 +979,17 @@ const FieldTypes = {
     render: function ({ attributes }) {
 
       attributes = parseArgs(attributes, {
-        text: 'Submit'
+        text: 'Submit',
       })
 
-      return (<div className={'gh-button-wrapper'}>
-        <button type={'submit'} id={attributes.id}
-                className={['gh-submit-button', attributes.class].join(
-                  ' ')}>
-          {attributes.text}
+      return ( <div className={ 'gh-button-wrapper' }>
+        <button type={ 'submit' } id={ attributes.id }
+                className={ ['gh-submit-button button', attributes.class].join(
+                  ' ') }>
+          { attributes.text }
         </button>
-      </div>)
-    }
+      </div> )
+    },
   },
   text: {
     type: 'text',
@@ -819,14 +1000,14 @@ const FieldTypes = {
       'placeholder',
       'name',
       'id',
-      'class'
+      'class',
     ],
     render: function ({ attributes }) {
       return <InputFieldGroup
-        type={'text'}
-        attributes={attributes}
+        type={ 'text' }
+        attributes={ attributes }
       />
-    }
+    },
   },
   textarea: {
     type: 'textarea',
@@ -837,25 +1018,25 @@ const FieldTypes = {
       'placeholder',
       'name',
       'id',
-      'class'
+      'class',
     ],
     render: function ({ attributes }) {
       return <BasicFieldGroup
-        label={attributes.label}
-        hideLabel={attributes.hideLabel}
-        isRequired={attributes.required}
+        label={ attributes.label }
+        hideLabel={ attributes.hideLabel }
+        isRequired={ attributes.required }
       >
 				<textarea
-          id={attributes.id}
-          className={['gh-input', attributes.class].join(' ')}
-          name={attributes.name}
-          value={attributes.value}
-          placeholder={attributes.placeholder}
-          title={attributes.title}
-          required={attributes.required}
+          id={ attributes.id }
+          className={ ['gh-input', attributes.class].join(' ') }
+          name={ attributes.name }
+          value={ attributes.value }
+          placeholder={ attributes.placeholder }
+          title={ attributes.title }
+          required={ attributes.required }
         />
       </BasicFieldGroup>
-    }
+    },
   },
   number: {
     type: 'number',
@@ -867,18 +1048,18 @@ const FieldTypes = {
       'min',
       'max',
       'id',
-      'class'
+      'class',
     ],
     render: function ({ attributes }) {
       return <InputFieldGroup
-        type={'number'}
-        attributes={attributes}
-        inputProps={{
+        type={ 'number' }
+        attributes={ attributes }
+        inputProps={ {
           min: attributes.min,
-          max: attributes.max
-        }}
+          max: attributes.max,
+        } }
       />
-    }
+    },
   },
   dropdown: {
     type: 'dropdown',
@@ -887,36 +1068,57 @@ const FieldTypes = {
       'required',
       'label',
       'name',
-      'default',
       'options',
+      'default',
       'multiple',
       'id',
-      'class'
+      'class',
     ],
     render: function ({ attributes }) {
       return <BasicFieldGroup
-        label={attributes.label}
-        hideLabel={attributes.hideLabel}
-        isRequired={attributes.required}
+        label={ attributes.label }
+        hideLabel={ attributes.hideLabel }
+        isRequired={ attributes.required }
       >
         <SimpleSelect
-          id={attributes.id}
-          className={['gh-input', attributes.class].join(' ')}
-          name={attributes.name}
-          value={attributes.default}
-          multiple={attributes.multiple}
-          options={attributes.options || []}
+          id={ attributes.id }
+          className={ ['gh-input', attributes.class].join(' ') }
+          name={ attributes.name }
+          value={ attributes.default }
+          multiple={ attributes.multiple }
+          options={ attributes.options || [] }
         />
       </BasicFieldGroup>
-    }
+    },
   },
   radio: {
     type: 'radio',
     name: 'Radio',
     attributes: ['required', 'label', 'name', 'options', 'id', 'class'],
     render: function ({ attributes }) {
-      return <RadioFieldGroup attributes={attributes}/>
-    }
+
+      parseArgs(attributes, {
+        options: [],
+      })
+
+      return (
+        <>
+          <label className={ 'gh-input-label' }>
+            { attributes.label } { attributes.required &&
+          <span className={ 'is-required' }>*</span> }
+          </label>
+
+          { attributes.options && attributes.options.map((option, i) => <label>
+            <input
+              type={ 'radio' }
+              className={ 'gh-radio ' + attributes.class }
+              key={ i }
+              name={ attributes.name }
+              value={ option.value }/> { option.label }
+          </label>) }
+        </>
+      )
+    },
   },
   checkbox: {
     type: 'checkbox',
@@ -928,23 +1130,23 @@ const FieldTypes = {
       'value',
       'tag',
       'id',
-      'class'
+      'class',
     ],
     render: function ({ attributes }) {
       return <CheckboxFieldGroup
-        attributes={attributes}
+        attributes={ attributes }
       />
-    }
+    },
   },
   address: {
     type: 'address',
     name: 'Address',
-    attributes: ['required', 'label', 'id', 'class']
+    attributes: ['required', 'label', 'id', 'class'],
   },
   birthday: {
     type: 'birthday',
     name: 'Birthday',
-    attributes: ['required', 'label', 'id', 'class']
+    attributes: ['required', 'label', 'id', 'class'],
   },
   date: {
     type: 'date',
@@ -956,18 +1158,18 @@ const FieldTypes = {
       'min_date',
       'max_date',
       'id',
-      'class'
+      'class',
     ],
     render: function ({ attributes }) {
       return <InputFieldGroup
-        type={'date'}
-        attributes={attributes}
-        inputProps={{
+        type={ 'date' }
+        attributes={ attributes }
+        inputProps={ {
           min: attributes.min_date,
-          max: attributes.max_date
-        }}
+          max: attributes.max_date,
+        } }
       />
-    }
+    },
   },
   time: {
     type: 'time',
@@ -979,18 +1181,18 @@ const FieldTypes = {
       'min_time',
       'max_time',
       'id',
-      'class'
+      'class',
     ],
     render: function ({ attributes }) {
       return <InputFieldGroup
-        type={'time'}
-        attributes={attributes}
-        inputProps={{
+        type={ 'time' }
+        attributes={ attributes }
+        inputProps={ {
           min: attributes.min_time,
-          max: attributes.max_time
-        }}
+          max: attributes.max_time,
+        } }
       />
-    }
+    },
   },
   file: {
     type: 'file',
@@ -1002,15 +1204,15 @@ const FieldTypes = {
       'max_file_size',
       'file_types',
       'id',
-      'class'
+      'class',
     ],
     render: function ({ attributes }) {
       return <InputFieldGroup
-        type={'file'}
-        attributes={attributes}
+        type={ 'file' }
+        attributes={ attributes }
       />
-    }
-  }
+    },
+  },
 }
 
 const widthMap = {
@@ -1019,26 +1221,27 @@ const widthMap = {
   '1/3': 'col-1-of-3',
   '1/4': 'col-1-of-4',
   '2/3': 'col-2-of-3',
-  '3/4': 'col-3-of-4'
+  '3/4': 'col-3-of-4',
 }
 
 function renderField (field) {
 
-  if (!FieldTypes.hasOwnProperty(field.type) || !FieldTypes[field.type].hasOwnProperty('render')) {
-    return <div className={'not-implemented'}>{'not implemented'}</div>
+  if (!FieldTypes.hasOwnProperty(field.type) ||
+    !FieldTypes[field.type].hasOwnProperty('render')) {
+    return <div className={ 'not-implemented' }>{ 'not implemented' }</div>
   }
 
   const input = React.createElement(FieldTypes[field.type].render, {
     attributes: field.attributes || {},
-    children: field.children || []
+    children: field.children || [],
   })
 
   return (
-    <div key={field.id} className={[
+    <div key={ field.id } className={ [
       'gh-form-column',
-      widthMap[field.width]
-    ].join(' ')}>
-      {input}
+      widthMap[field.width],
+    ].join(' ') }>
+      { input }
     </div>
   )
 
@@ -1047,40 +1250,15 @@ function renderField (field) {
 function BasicFieldGroup ({ hideLabel, label, isRequired, children }) {
 
   if (hideLabel) {
-    return <>{children}</>
+    return <>{ children }</>
   }
 
   return (
-    <label className={'gh-input-label'}>
-      {label} {isRequired &&
-    <span className={'is-required'}>*</span>}
-      {children}
+    <label className={ 'gh-input-label' }>
+      { label } { isRequired &&
+    <span className={ 'is-required' }>*</span> }
+      { children }
     </label>
-  )
-}
-
-function RadioFieldGroup ({ attributes }) {
-
-  parseArgs(attributes, {
-    options: []
-  })
-
-  return (
-    <>
-      <label className={'gh-input-label'}>
-        {attributes.label} {attributes.required &&
-      <span className={'is-required'}>*</span>}
-      </label>
-
-      {attributes.options.map((option, i) => <label>
-        <input
-          type={'checkbox'}
-          className={'gh-checkbox ' + attributes.class}
-          key={option.value}
-          name={attributes.name}
-          value={option.value}/> {option.label}
-      </label>)}
-    </>
   )
 }
 
@@ -1095,19 +1273,19 @@ function RadioFieldGroup ({ attributes }) {
 function InputFieldGroup ({ type, attributes, inputProps }) {
 
   attributes = parseArgs(attributes, {
-    hideLabel: false
+    hideLabel: false,
   })
 
   const input = <input
-    type={type}
-    id={attributes.id}
-    className={['gh-input', attributes.class].join(' ')}
-    name={attributes.name}
-    value={attributes.value}
-    placeholder={attributes.placeholder}
-    title={attributes.title}
-    required={attributes.required}
-    {...inputProps}
+    type={ type }
+    id={ attributes.id }
+    className={ ['gh-input', attributes.class].join(' ') }
+    name={ attributes.name }
+    value={ attributes.value }
+    placeholder={ attributes.placeholder }
+    title={ attributes.title }
+    required={ attributes.required }
+    { ...inputProps }
   />
 
   if (attributes.hideLabel) {
@@ -1115,10 +1293,10 @@ function InputFieldGroup ({ type, attributes, inputProps }) {
   }
 
   return (
-    <label className={'gh-input-label'}>
-      {attributes.label} {attributes.required &&
-    <span className={'is-required'}>*</span>}
-      {input}
+    <label className={ 'gh-input-label' }>
+      { attributes.label } { attributes.required &&
+    <span className={ 'is-required' }>*</span> }
+      { input }
     </label>
   )
 }
@@ -1133,63 +1311,25 @@ function InputFieldGroup ({ type, attributes, inputProps }) {
 function CheckboxFieldGroup ({ attributes, inputProps }) {
 
   const input = <input
-    type={'checkbox'}
-    id={attributes.id}
-    className={['gh-checkbox', attributes.class].join(' ')}
-    name={attributes.name}
-    value={attributes.value}
-    title={attributes.title}
-    required={attributes.required}
-    {...inputProps}
+    type={ 'checkbox' }
+    id={ attributes.id }
+    className={ ['gh-checkbox', attributes.class].join(' ') }
+    name={ attributes.name }
+    value={ attributes.value }
+    title={ attributes.title }
+    required={ attributes.required }
+    { ...inputProps }
   />
 
   return (
     <label
-      className={'gh-checkbox-label'}>{input} {attributes.label} {attributes.required &&
-    <span className={'is-required'}>*</span>}
+      className={ 'gh-checkbox-label' }>{ input } { attributes.label } { attributes.required &&
+    <span className={ 'is-required' }>*</span> }
     </label>
   )
 }
 
 InputFieldGroup.defaultProps = {
   type: 'text',
-  attributes: {}
-}
-
-function prettifyForm (form) {
-
-  form = form.trim().replace(/(\])\s*(\[)/gm, '$1$2').replace(/(\])/gm, '$1\n')
-
-  // form = form.trim().replace(/(\])\s*(\[)/gm, "$1$2").replace(/(\])/gm,
-  let codes = form.split('\n')
-  // console.debug(codes);
-
-  let depth = 0
-
-  let pretty = ''
-  codes.forEach(function (shortcode, i) {
-
-    shortcode = shortcode.trim()
-
-    if (!shortcode) {
-
-      return
-    }
-    if (shortcode.match(/\[(col|row)\b[^\]]*\]/)) {
-
-      pretty += ' '.repeat(4).repeat(depth) + shortcode
-      depth++
-    } else if (shortcode.match(/\[\/(col|row)\]/)) {
-      depth--
-      pretty += ' '.repeat(4).repeat(depth) + shortcode
-    } else {
-      pretty += ' '.repeat(4).repeat(depth) + shortcode
-    }
-    pretty += '\n'
-
-    // "$1\n");
-  })
-
-  return pretty
-
+  attributes: {},
 }

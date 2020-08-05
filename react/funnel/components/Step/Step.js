@@ -7,7 +7,6 @@ import './component.scss'
 import { showAddStepForm } from '../AddStep/AddStep'
 import axios from 'axios'
 import { reloadEditor } from '../Editor/Editor'
-import { FadeOut } from '../Animations/Animations'
 import { DelayControl } from './DelayControl/DelayControl'
 import { StepEdit, StepTitle } from '../../steps/steps'
 import { objEquals } from '../../App'
@@ -34,7 +33,7 @@ export class Step extends React.Component {
     this.handleEdit = this.handleEdit.bind(this)
     this.stopEditing = this.stopEditing.bind(this)
     this.handleDelete = this.handleDelete.bind(this)
-    this.afterFadeOut = this.afterFadeOut.bind(this)
+    // this.afterFadeOut = this.afterFadeOut.bind(this)
     this.updateSettings = this.updateSettings.bind(this)
     this.commitSettings = this.commitSettings.bind(this)
     this.updateDelay = this.updateDelay.bind(this)
@@ -59,41 +58,27 @@ export class Step extends React.Component {
     })
   }
 
-  afterFadeOut () {
-    reloadEditor()
-    this.setState({
-      deleted: true,
-      deleting: false,
-    })
-  }
-
   handleDelete () {
+
+    this.setState({
+      deleting: true,
+    })
+
     axios.delete(groundhogg_endpoints.steps, {
       data: {
         step_id: this.props.step.ID,
       },
     }).then(result => this.setState({
-      deleting: true,
-    }))
+      deleted: true,
+    })).then( reloadEditor )
   }
 
-  updateSettings (newSettings, newContext) {
-
-    const currentSettings = this.state.tempSettings
-    const currentContext = this.state.tempContext
-
-    this.setState({
-      tempSettings: {
-        ...currentSettings,
-        ...newSettings,
-      },
-      tempContext: {
-        ...currentContext,
-        ...newContext,
-      },
-    })
-  }
-
+  /**
+   * Update the step action delay if applicable
+   * Passed to the delay controls
+   *
+   * @param newDelay
+   */
   updateDelay (newDelay) {
 
     const curDelay = this.state.delay
@@ -111,6 +96,10 @@ export class Step extends React.Component {
     }, this.commitDelay)
   }
 
+  /**
+   * Once satisfied with the delay settings this function
+   * will commit the settings via the api and save them
+   */
   commitDelay () {
 
     this.setState({
@@ -129,6 +118,35 @@ export class Step extends React.Component {
     }))
   }
 
+  /**
+   * While editing the step, updated settings will be stored
+   * to the temp settings property, same goes for any temporary context
+   * which is required for tag based steps.
+   *
+   * @param newSettings
+   * @param newContext
+   */
+  updateSettings (newSettings, newContext) {
+
+    const currentSettings = this.state.tempSettings
+    const currentContext = this.state.tempContext
+
+    this.setState({
+      tempSettings: {
+        ...currentSettings,
+        ...newSettings,
+      },
+      tempContext: {
+        ...currentContext,
+        ...newContext,
+      },
+    })
+  }
+
+  /**
+   * When ready to save the step, the settings are committed to the API
+   * where they are saved.
+   */
   commitSettings () {
 
     const newSettings = this.state.tempSettings
@@ -196,10 +214,6 @@ export class Step extends React.Component {
 
   render () {
 
-    if (this.state.deleted) {
-      return <div className={ 'step-deleted' }></div>
-    }
-
     const step = this.props.step
     const type = step.data.step_type
     const group = step.data.step_group
@@ -211,10 +225,16 @@ export class Step extends React.Component {
       // 'round-borders'
     ]
 
-    const controls = (
+    const wrapClasses = [
+      'step-wrap',
+      this.state.deleting && 'deleting',
+      this.state.deleted && 'deleted'
+    ]
+
+    return (
       <div
         key={ this.props.key }
-        className={ 'step-wrap' }
+        className={ wrapClasses.join( ' ' ) }
       >
         { group === 'action' && <DelayControl
           delay={ this.state.delay }
@@ -254,16 +274,6 @@ export class Step extends React.Component {
         /> }
       </div>
     )
-
-    if (this.state.deleting) {
-      return (
-        <FadeOut then={ this.afterFadeOut }>
-          { controls }
-        </FadeOut>
-      )
-    }
-
-    return controls
   }
 
 }

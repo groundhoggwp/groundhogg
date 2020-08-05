@@ -2,6 +2,22 @@
 
 .step-wrap {
 
+  &.deleting {
+    opacity: 0;
+    transition: 0.5s;
+    transition-timing-function: ease-in-out;
+
+    .step{
+      border-color: $error-red;
+      color: $error-red;
+      background-color: $error-red-background;
+    }
+  }
+
+  &.deleted{
+    display: none;
+  }
+
   .step-title {
     padding-left: 60px;
     cursor: pointer;

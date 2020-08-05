@@ -52,12 +52,12 @@ export function Header ({ data, updateFunnel, isSaving }) {
               moment(data.last_updated).fromNow() }
             </div>
         }
-        <FunnelAction/>
         <FunnelStatus
           status={ data.status }
           onChange={ updateStatus }
           isDisabled={isSaving}
         />
+        <FunnelAction/>
       </Navbar.Collapse>
       <ExitButton onExit={ exit }/>
     </Navbar>
