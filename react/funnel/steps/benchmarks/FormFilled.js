@@ -23,7 +23,7 @@ registerStepType('form_fill', {
   group: ghEditor.steps.form_fill.group,
 
   defaultSettings: {
-    form_name: __( 'Web Form', 'groundhogg' )
+    form_name: __('Web Form', 'groundhogg'),
   },
 
   title: ({ data, context, settings }) => {
@@ -78,8 +78,11 @@ function renderTab (
   })
 
   return (
-    <Tab key={ tab } eventKey={ tab } title={ editFormTabs[tab].title }>
-      { tabContent }
+    <Tab key={ tab } eventKey={ tab } title={ editFormTabs[tab].title }
+         tabClassName={ tab }>
+      <div className={ tab + ' tab-content-inner' }>
+        { tabContent }
+      </div>
     </Tab>
   )
 }
@@ -113,18 +116,36 @@ const editFormTabs = {
   submit: {
     id: 'submit',
     title: __('Submit', 'tab name', 'groundhogg'),
-    render: ({ settings, updateSetting }) => {
+    render: ({ settings, updateSetting, context }) => {
       return (
         <>
+          { context.recaptcha_is_v3 &&
           <Row className={ 'step-setting-control no-margins' }>
-            <Col sm={ 4 }>
+            <Col sm={ 5 }>
+              <label>{ __('Enable reCaptcha V3?',
+                'groundhogg') }</label>
+              <p className={ 'description' }>{ __(
+                'Enable Google reCaptcha V3 on this form to prevent spam.',
+                'groundogg') }</p>
+            </Col>
+            <Col>
+              <YesNoToggle
+                value={ settings.enable_recaptcha_v3 }
+                update={ (v) => updateSetting('enable_recaptcha_v3',
+                  v) }
+              />
+            </Col>
+          </Row>
+          }
+          <Row className={ 'step-setting-control no-margins' }>
+            <Col sm={ 5 }>
               <label>{ __('Stay on page after submit?',
                 'groundhogg') }</label>
               <p className={ 'description' }>{ __(
                 'This will prevent the contact from being redirected after submitting the form.',
                 'groundogg') }</p>
             </Col>
-            <Col sm={ 8 }>
+            <Col>
               <YesNoToggle
                 value={ settings.enable_ajax }
                 update={ (v) => updateSetting('enable_ajax',
@@ -133,12 +154,12 @@ const editFormTabs = {
             </Col>
           </Row>
           { settings.enable_ajax && <Row className={ 'no-margins' }>
-            <Col sm={ 4 }>
+            <Col sm={ 5 }>
               <label>{ 'Success message' }</label>
               <p
                 className={ 'description' }>{ 'Message displayed when the contact submits the form.' }</p>
             </Col>
-            <Col sm={ 8 }>
+            <Col>
               <TextArea
                 id={ 'success_message' }
                 value={ settings.success_message }
@@ -151,12 +172,12 @@ const editFormTabs = {
             </Col>
           </Row> }
           { !settings.enable_ajax && <Row className={ 'no-margins' }>
-            <Col sm={ 4 }>
+            <Col sm={ 5 }>
               <label>{ 'Success page' }</label>
               <p
                 className={ 'description' }>{ 'Where the contact will be directed upon submitting the form.' }</p>
             </Col>
-            <Col sm={ 8 }>
+            <Col>
               <LinkPicker value={ settings.success_page }
                           update={ (v) => updateSetting(
                             'success_page', v) }/>
@@ -176,48 +197,48 @@ const editFormTabs = {
     render: ({ context }) => {
       return ( <>
         <Row className={ 'step-setting-control no-margins' }>
-          <Col sm={ 4 }>
+          <Col sm={ 5 }>
             <label>{ 'Shortcode' }</label>
             <p
               className={ 'description' }>{ 'Insert anywhere WordPress shortcodes are accepted.' }</p>
           </Col>
-          <Col sm={ 8 }>
+          <Col>
             <CopyInput
               content={ context.embed.shortcode }
             />
           </Col>
         </Row>
         <Row className={ 'step-setting-control no-margins' }>
-          <Col sm={ 4 }>
+          <Col sm={ 5 }>
             <label>{ 'iFrame' }</label>
             <p
               className={ 'description' }>{ 'For use when embedding forms on none WordPress sites.' }</p>
           </Col>
-          <Col sm={ 8 }>
+          <Col>
             <CopyInput
               content={ context.embed.iframe }
             />
           </Col>
         </Row>
         <Row className={ 'step-setting-control no-margins' }>
-          <Col sm={ 4 }>
+          <Col sm={ 5 }>
             <label>{ 'Raw HTML' }</label>
             <p
               className={ 'description' }>{ 'For use when embedding forms on none WordPress sites and HTML web form integrations (Thrive).' }</p>
           </Col>
-          <Col sm={ 8 }>
+          <Col>
             <CopyInput
               content={ context.embed.html }
             />
           </Col>
         </Row>
         <Row className={ 'step-setting-control no-margins' }>
-          <Col sm={ 4 }>
+          <Col sm={ 5 }>
             <label>{ 'Hosted URL' }</label>
             <p
               className={ 'description' }>{ 'Direct link to the web form.' }</p>
           </Col>
-          <Col sm={ 8 }>
+          <Col>
             <CopyInput
               content={ context.embed.hosted }
             />
@@ -229,6 +250,22 @@ const editFormTabs = {
 }
 
 function FormBuilder ({ formJSON, formUpdated, settings, updateSetting }) {
+
+  let formRowsJSON = formJSON.reduce((prev, curr) => {
+
+    // get sum of previous rows width
+    let prevWidth = prev.length ? prev[prev.length - 1].reduce(
+      (acc, cur) => acc + widthMap[cur.width].value, 0) : 0
+
+    if (prev.length && prevWidth + widthMap[curr.width].value <= 1) {
+      prev[prev.length - 1].push(curr)
+    }
+    else {
+      prev.push([curr])
+    }
+    return prev
+
+  }, [])
 
   return (
     <Row className={ 'no-margins no-padding' }>
@@ -252,8 +289,12 @@ function FormBuilder ({ formJSON, formUpdated, settings, updateSetting }) {
         </div>
       </Col>
       <Col className={ 'form-preview' }>
-        { formJSON.map((field) => renderField(field)) }
-        <ClearFix/>
+        { formRowsJSON.map((row) =>
+          <div className={ 'gh-form-row' }>
+            { row.map((field) => renderField(field)) }
+            <ClearFix/>
+          </div>,
+        ) }
       </Col>
     </Row>
   )
@@ -562,7 +603,9 @@ const fieldAttributes = {
     edit: ({ value, updateAttribute }) => {
       return (
         <BasicAttributeControlGroup
-          label={ 'Custom Field Name' }
+          label={ <>{ 'Custom Field ID' } <Tooltip content={ __(
+            'This is the ID of the custom field the value will be saved to.',
+            'groundhogg') }/></> }
         >
           <CustomFieldPicker
             value={ value }
@@ -574,7 +617,12 @@ const fieldAttributes = {
     },
   },
   description: {
-    edit: ({ value, updateAttribute }) => {
+    edit: ({ value, updateAttribute, allAttributes }) => {
+
+      if (!allAttributes.showDescription) {
+        return <></>
+      }
+
       return (
         <BasicAttributeControlGroup
           label={ 'Field Description' }
@@ -582,7 +630,7 @@ const fieldAttributes = {
 					<textarea
             value={ value }
             className={ 'w100' }
-            onChange={ (e) => updateAttribute('text',
+            onChange={ (e) => updateAttribute('description',
               e.target.value) }
           />
         </BasicAttributeControlGroup>
@@ -689,7 +737,7 @@ const fieldAttributes = {
         },
       ]
 
-      if (value.length === 0) {
+      if (curOptions.length === 0) {
         value.push({
           value: '',
           label: '',
@@ -852,6 +900,96 @@ const fieldAttributes = {
       )
     },
   },
+  captchaTheme: {
+    edit: ({ value, updateAttribute, allAttributes }) => {
+
+      const captchaThemes = [
+        { value: 'light', label: 'Light' },
+        { value: 'dark', label: 'Dark' },
+      ]
+
+      return (
+        <Row className={ 'field-attribute-control' }>
+          <Col>
+            <label>{ 'reCaptcha Theme' }</label>
+          </Col>
+          <Col>
+            <SimpleSelect
+              value={ value }
+              onChange={ (e) => updateAttribute(
+                { captchaTheme: e.target.value }) }
+              options={ captchaThemes }
+              className={ 'w100' }
+            />
+          </Col>
+        </Row>
+      )
+    },
+  },
+  captchaSize: {
+    edit: ({ value, updateAttribute }) => {
+
+      const captchaSizes = [
+        { value: 'normal', label: 'Normal' },
+        { value: 'compact', label: 'Compact' },
+      ]
+
+      return (
+        <Row className={ 'field-attribute-control' }>
+          <Col>
+            <label>{ 'reCaptcha Size' }</label>
+          </Col>
+          <Col>
+            <SimpleSelect
+              value={ value }
+              onChange={ (e) => updateAttribute(
+                { captchaSize: e.target.value }) }
+              options={ captchaSizes }
+              className={ 'w100' }
+            />
+          </Col>
+        </Row>
+      )
+    },
+  },
+  min: {
+    edit: ({ value, updateAttribute }) => {
+      return (
+        <BasicAttributeControlGroup
+          label={ <>{ 'Min' } <Tooltip content={ __(
+            'The minimum value which can be chosen.',
+            'groundhogg') }/></> }
+        >
+          <input
+            type={'number'}
+            value={value}
+            className={'w100'}
+            onChange={(e) => updateAttribute({min: e.target.value})}
+          />
+        </BasicAttributeControlGroup>
+      )
+    },
+  },
+  max: {
+    edit: ({ value, updateAttribute, allAttributes }) => {
+      return (
+        <BasicAttributeControlGroup
+          label={ <>{ 'Max' } <Tooltip content={ __(
+            'The maximum value which can be chosen.',
+            'groundhogg') }/></> }
+        >
+          <input
+            type={'number'}
+            value={value}
+            min={allAttributes.min}
+            className={'w100'}
+            onChange={(e) => updateAttribute({max: e.target.value})}
+          />
+        </BasicAttributeControlGroup>
+      )
+    },
+  },
+
 }
 
 const AttrOptionControl = ({ index, value, label, tag, onUpdate, onDelete }) => {
@@ -906,6 +1044,8 @@ const FieldTypes = {
       'hideLabel',
       'required',
       'placeholder',
+      'showDescription',
+      'description',
       'id',
       'class',
     ],
@@ -934,6 +1074,8 @@ const FieldTypes = {
       'hideLabel',
       'required',
       'placeholder',
+      'showDescription',
+      'description',
       'id',
       'class',
     ],
@@ -961,6 +1103,8 @@ const FieldTypes = {
       'label',
       'hideLabel',
       'placeholder',
+      'showDescription',
+      'description',
       'id',
       'class',
     ],
@@ -984,7 +1128,10 @@ const FieldTypes = {
   phone: {
     type: 'phone',
     name: 'Phone',
-    attributes: ['required', 'label', 'placeholder', 'id', 'class'],
+    attributes: [
+      'required', 'label', 'placeholder', 'showDescription',
+      'description', 'id', 'class',
+    ],
     render: function ({ attributes }) {
 
       attributes = parseArgs(attributes, {
@@ -1056,13 +1203,15 @@ const FieldTypes = {
   },
   recaptcha: {
     type: 'recaptcha',
-    name: 'reCaptcha',
-    attributes: ['captcha-theme', 'captcha-size', 'id', 'class'],
+    name: 'reCaptcha V2',
+    attributes: ['captchaTheme', 'captchaSize'],
     renderName: ({ attributes }) => {
-      return 'reCaptcha'
+      return 'reCaptcha V2'
     },
     render: ({ attributes }) => {
-      return <div className={ 'gh-recaptcha' }>[reCaptcha]</div>
+      return <div className={ 'gh-recaptcha' }>{ __(
+        'The reCaptcha field will be rendered on the frontend.',
+        'groundhogg') }</div>
     },
   },
   submit: {
@@ -1080,7 +1229,10 @@ const FieldTypes = {
 
       return ( <div className={ 'gh-button-wrapper' }>
         <button type={ 'submit' } id={ attributes.id }
-                className={ ['gh-submit-button button', attributes.class].join(
+                className={ [
+                  'gh-submit-button btn btn-outline-primary button',
+                  attributes.class,
+                ].join(
                   ' ') }>
           { attributes.text }
         </button>
@@ -1095,6 +1247,8 @@ const FieldTypes = {
       'label',
       'placeholder',
       'name',
+      'showDescription',
+      'description',
       'id',
       'class',
     ],
@@ -1113,6 +1267,8 @@ const FieldTypes = {
       'label',
       'placeholder',
       'name',
+      'showDescription',
+      'description',
       'id',
       'class',
     ],
@@ -1143,6 +1299,8 @@ const FieldTypes = {
       'name',
       'min',
       'max',
+      'showDescription',
+      'description',
       'id',
       'class',
     ],
@@ -1167,6 +1325,8 @@ const FieldTypes = {
       'options',
       'default',
       'multiple',
+      'showDescription',
+      'description',
       'id',
       'class',
     ],
@@ -1190,7 +1350,10 @@ const FieldTypes = {
   radio: {
     type: 'radio',
     name: 'Radio',
-    attributes: ['required', 'label', 'name', 'options', 'id', 'class'],
+    attributes: [
+      'required', 'label', 'name', 'options', 'showDescription',
+      'description', 'id', 'class',
+    ],
     render: function ({ attributes }) {
 
       parseArgs(attributes, {
@@ -1225,6 +1388,8 @@ const FieldTypes = {
       'name',
       'value',
       'tag',
+      'showDescription',
+      'description',
       'id',
       'class',
     ],
@@ -1238,6 +1403,59 @@ const FieldTypes = {
     type: 'address',
     name: 'Address',
     attributes: ['required', 'label', 'id', 'class'],
+    render: function ({ attributes }) {
+
+      attributes = parseArgs( attributes, {
+        show: [
+          'street_address',
+          'city',
+          'state',
+          'country',
+          'zip',
+        ]
+      } );
+
+      const fields = [];
+
+      // street address 1
+      // street address 2
+
+      if ( attributes.show.includes( 'street_address' ) ){
+        fields.push( <FormRow>
+          <FormColumn
+            width={'3/4'}
+          >
+            <input
+              type={'text'}
+              className={'gh-input'}
+              placeholder={ __( 'Street Address', 'groundhogg' ) }
+              name={'street_address_1'}
+            />
+          </FormColumn>
+          <FormColumn
+            width={'1/4'}
+          >
+            <input
+              type={'text'}
+              className={'gh-input'}
+              placeholder={ __( 'Unit/Apartment #', 'groundhogg' ) }
+              name={'street_address_2'}
+            />
+          </FormColumn>
+        </FormRow>);
+      }
+
+      // city
+      // state
+      // country
+      // zip code
+      return (
+        <div className={'address-fields'}>
+          {fields}
+        </div>
+      )
+
+    },
   },
   birthday: {
     type: 'birthday',
@@ -1253,6 +1471,8 @@ const FieldTypes = {
       'name',
       'min_date',
       'max_date',
+      'showDescription',
+      'description',
       'id',
       'class',
     ],
@@ -1312,12 +1532,12 @@ const FieldTypes = {
 }
 
 const widthMap = {
-  '1/1': 'col-1-of-1',
-  '1/2': 'col-1-of-2',
-  '1/3': 'col-1-of-3',
-  '1/4': 'col-1-of-4',
-  '2/3': 'col-2-of-3',
-  '3/4': 'col-3-of-4',
+  '1/1': { className: 'col-1-of-1', value: 1 },
+  '1/2': { className: 'col-1-of-2', value: 0.5 },
+  '1/3': { className: 'col-1-of-3', value: 1 / 3 },
+  '1/4': { className: 'col-1-of-4', value: 0.25 },
+  '2/3': { className: 'col-2-of-3', value: 2 / 3 },
+  '3/4': { className: 'col-3-of-4', value: 0.75 },
 }
 
 function renderField (field) {
@@ -1335,7 +1555,7 @@ function renderField (field) {
   return (
     <div key={ field.id } className={ [
       'gh-form-column',
-      widthMap[field.width],
+      widthMap[field.width].className,
     ].join(' ') }>
       { input }
     </div>
@@ -1389,11 +1609,32 @@ function InputFieldGroup ({ type, attributes, inputProps }) {
   }
 
   return (
-    <label className={ 'gh-input-label' }>
-      { attributes.label } { attributes.required &&
-    <span className={ 'is-required' }>*</span> }
-      { input }
-    </label>
+    <>
+      <label className={ 'gh-input-label' }>
+        { attributes.label } { attributes.required &&
+      <span className={ 'is-required' }>*</span> }
+        { input }
+      </label>
+      { attributes.showDescription &&
+      <p className={ 'description' }>{ attributes.description }</p> }
+    </>
+  )
+}
+
+const FormRow = ({children}) => {
+  return (
+    <div className={'gh-form-row'}>
+      {children}
+      <ClearFix/>
+    </div>
+  )
+}
+
+const FormColumn = ({width, children}) => {
+  return (
+    <div className={'gh-form-column ' + widthMap[width].className}>
+      {children}
+    </div>
   )
 }
 

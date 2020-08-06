@@ -653,13 +653,28 @@ iframe.email-preview {
     .form-preview label select {
       font-weight: normal; }
   .form-preview .gh-form-column {
-    padding: 15px; }
+    padding: 15px;
+    border: dashed #dee2e6;
+    border-width: 0 0 0 1px; }
     .form-preview .gh-form-column:hover {
-      border-color: #b6babe; }
+      border-color: #b6babe;
+      margin: -1px 0 -1px 0;
+      border-width: 1px 1px 1px 1px; }
+    .form-preview .gh-form-column:nth-last-child(2) {
+      border-right-width: 1px; }
+    .form-preview .gh-form-column p.description {
+      margin: 0; }
+  .form-preview .address-fields .gh-form-row,
+  .form-preview .address-fields .gh-form-column {
+    padding: 0;
+    margin: 0;
+    border: none; }
   .form-preview .gh-form-row {
-    padding: 15px; }
-    .form-preview .gh-form-row:hover {
-      border-color: #b6babe; }
+    border: dashed #dee2e6;
+    border-width: 1px 0 0 0;
+    display: flex; }
+    .form-preview .gh-form-row:last-child {
+      border-bottom-width: 1px; }
 
 .form-name-wrap {
   width: 500px;
@@ -736,6 +751,9 @@ label.block {
 
 .delete-button {
   color: #cc0000; }
+
+.tab-content-inner.submit, .tab-content-inner.embed {
+  padding: 15px; }
 
 .gh-form-wrapper * {
   box-sizing: border-box; }

@@ -1,6 +1,8 @@
 <?php
+
 namespace Groundhogg;
 
+use Groundhogg\Admin\React_App;
 use Groundhogg\Api\Api_Loader;
 use Groundhogg\DB\Manager as DB_Manager;
 use Groundhogg\Admin\Admin_Menu;
@@ -10,7 +12,9 @@ use Groundhogg\Reporting\Reporting;
 use Groundhogg\Steps\Manager as Step_Manager;
 use Groundhogg\Bulk_Jobs\Manager as Bulk_Job_Manager;
 
-if ( ! defined( 'ABSPATH' ) ) {exit;}
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Groundhogg plugin.
@@ -22,367 +26,367 @@ if ( ! defined( 'ABSPATH' ) ) {exit;}
  */
 class Plugin {
 
-    /**
-     * Instance.
-     *
-     * Holds the plugin instance.
-     *
-     * @since 1.0.0
-     * @access public
-     *
-     * @static
-     *
-     * @var Plugin
-     */
-    public static $instance = null;
+	/**
+	 * Instance.
+	 *
+	 * Holds the plugin instance.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 *
+	 * @static
+	 *
+	 * @var Plugin
+	 */
+	public static $instance = null;
 
-    /**
-     * Database.
-     *
-     * Holds the plugin databases.
-     *
-     * @since 2.0.0
-     * @access public
-     *
-     * @var DB_Manager
-     */
-    public $dbs;
+	/**
+	 * Database.
+	 *
+	 * Holds the plugin databases.
+	 *
+	 * @since  2.0.0
+	 * @access public
+	 *
+	 * @var DB_Manager
+	 */
+	public $dbs;
 
-    /**
-     * @var Api\Api_Loader
-     */
-    public $api;
+	/**
+	 * @var Api\Api_Loader
+	 */
+	public $api;
 
-    /**
-     * Holds plugin specific notices.
-     *
-     * @var Notices
-     */
-    public $notices;
+	/**
+	 * Holds plugin specific notices.
+	 *
+	 * @var Notices
+	 */
+	public $notices;
 
-    /**
-     * @var Pointers
-     */
-    public $pointers;
+	/**
+	 * @var Pointers
+	 */
+	public $pointers;
 
-    /**
-     * Inits the admin screens.
-     *
-     * @var Admin_Menu
-     */
-    public $admin;
+	/**
+	 * Inits the admin screens.
+	 *
+	 * @var Admin_Menu
+	 */
+	public $admin;
 
-    /**
-     * @var Utils
-     */
-    public $utils;
+	/**
+	 * @var Utils
+	 */
+	public $utils;
 
-    /**
-     * @var Scripts
-     */
-    public $scripts;
+	/**
+	 * @var Scripts
+	 */
+	public $scripts;
 
-    /**
-     * @var Main_Roles
-     */
-    public $roles;
+	/**
+	 * @var Main_Roles
+	 */
+	public $roles;
 
-    /**
-     * Utils for compliance management
-     *
-     * @var Preferences
-     */
-    public $preferences;
-    
-    /**
-     * Settings.
-     *
-     * Holds the plugin settings.
-     *
-     * @since 1.0.0
-     * @access public
-     *
-     * @var Settings
-     */
-    public $settings;
+	/**
+	 * Utils for compliance management
+	 *
+	 * @var Preferences
+	 */
+	public $preferences;
 
-    /**
-     * @var Main_Installer
-     */
-    public $installer;
+	/**
+	 * Settings.
+	 *
+	 * Holds the plugin settings.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 *
+	 * @var Settings
+	 */
+	public $settings;
 
-    /**
-     * @var Main_Updater
-     */
-    public $updater;
+	/**
+	 * @var Main_Installer
+	 */
+	public $installer;
 
-    /**
-     * @var Replacements
-     */
-    public $replacements;
+	/**
+	 * @var Main_Updater
+	 */
+	public $updater;
 
-    /**
-     * @var Sending_Service
-     */
-    public $sending_service;
+	/**
+	 * @var Replacements
+	 */
+	public $replacements;
 
-    /**
-     * @var Proxy_Service
-     */
-    public $proxy_service;
+	/**
+	 * @var Sending_Service
+	 */
+	public $sending_service;
 
-    /**
-     * @var Stats_Collection
-     */
-    public $stats_collection;
+	/**
+	 * @var Proxy_Service
+	 */
+	public $proxy_service;
 
-    /**
-     * @var Event_Queue
-     */
-    public $event_queue;
+	/**
+	 * @var Stats_Collection
+	 */
+	public $stats_collection;
 
-    /**
-     * @var Tracking
-     */
-    public $tracking;
+	/**
+	 * @var Event_Queue
+	 */
+	public $event_queue;
 
-    /**
-     * @var Rewrites
-     */
-    public $rewrites;
+	/**
+	 * @var Tracking
+	 */
+	public $tracking;
 
-    /**
-     * @var Tag_Mapping
-     */
-    public $tag_mapping;
+	/**
+	 * @var Rewrites
+	 */
+	public $rewrites;
 
-    /**
-     * @var Submission_Handler
-     */
-    public $submission_handler;
+	/**
+	 * @var Tag_Mapping
+	 */
+	public $tag_mapping;
 
-    /**
-     * @var Shortcodes
-     */
-    public $shortcodes;
+	/**
+	 * @var Submission_Handler
+	 */
+	public $submission_handler;
 
-    /**
-     * @var Bounce_Checker
-     */
-    public $bounce_checker;
+	/**
+	 * @var Shortcodes
+	 */
+	public $shortcodes;
 
-    /**
-     * @var Step_Manager
-     */
-    public $step_manager;
+	/**
+	 * @var Bounce_Checker
+	 */
+	public $bounce_checker;
 
-    /**
-     * @var Bulk_Job_Manager
-     */
-    public $bulk_jobs;
+	/**
+	 * @var Step_Manager
+	 */
+	public $step_manager;
 
-    /**
-     * @var Reporting
-     */
-    public $reporting;
+	/**
+	 * @var Bulk_Job_Manager
+	 */
+	public $bulk_jobs;
+
+	/**
+	 * @var Reporting
+	 */
+	public $reporting;
 
 	/**
 	 * @var Library
 	 */
-    public $library;
+	public $library;
 
-    /**
-     * Clone.
-     *
-     * Disable class cloning and throw an error on object clone.
-     *
-     * The whole idea of the singleton design pattern is that there is a single
-     * object. Therefore, we don't want the object to be cloned.
-     *
-     * @access public
-     * @since 1.0.0
-     */
-    public function __clone() {
-        // Cloning instances of the class is forbidden.
-        _doing_it_wrong( __FUNCTION__, esc_html__( 'Something went wrong.', 'groundhogg' ), '2.0.0' );
-    }
+	/**
+	 * Clone.
+	 *
+	 * Disable class cloning and throw an error on object clone.
+	 *
+	 * The whole idea of the singleton design pattern is that there is a single
+	 * object. Therefore, we don't want the object to be cloned.
+	 *
+	 * @access public
+	 * @since  1.0.0
+	 */
+	public function __clone() {
+		// Cloning instances of the class is forbidden.
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Something went wrong.', 'groundhogg' ), '2.0.0' );
+	}
 
-    /**
-     * Wakeup.
-     *
-     * Disable unserializing of the class.
-     *
-     * @access public
-     * @since 1.0.0
-     */
-    public function __wakeup() {
-        // Unserializing instances of the class is forbidden.
-        _doing_it_wrong( __FUNCTION__, esc_html__( 'Something went wrong.', 'groundhogg' ), '2.0.0' );
-    }
+	/**
+	 * Wakeup.
+	 *
+	 * Disable unserializing of the class.
+	 *
+	 * @access public
+	 * @since  1.0.0
+	 */
+	public function __wakeup() {
+		// Unserializing instances of the class is forbidden.
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Something went wrong.', 'groundhogg' ), '2.0.0' );
+	}
 
-    /**
-     * Instance.
-     *
-     * Ensures only one instance of the plugin class is loaded or can be loaded.
-     *
-     * @since 1.0.0
-     * @access public
-     * @static
-     *
-     * @return Plugin An instance of the class.
-     */
-    public static function instance() {
-        if ( is_null( self::$instance ) ) {
-            self::$instance = new self();
-        }
+	/**
+	 * Instance.
+	 *
+	 * Ensures only one instance of the plugin class is loaded or can be loaded.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @static
+	 *
+	 * @return Plugin An instance of the class.
+	 */
+	public static function instance() {
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
+		}
 
-        return self::$instance;
-    }
+		return self::$instance;
+	}
 
-    /**
-     * Init.
-     *
-     * Initialize Groundhogg Plugin. Register Groundhogg support for all the
-     * supported post types and initialize Groundhogg components.
-     *
-     * @since 1.0.0
-     * @access public
-     */
-    public function init() {
+	/**
+	 * Init.
+	 *
+	 * Initialize Groundhogg Plugin. Register Groundhogg support for all the
+	 * supported post types and initialize Groundhogg components.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 */
+	public function init() {
 
-        $this->includes();
-        $this->init_components();
+		$this->includes();
+		$this->init_components();
 
-        /**
-         * Groundhogg init.
-         *
-         * Fires on Groundhogg init, after Groundhogg has finished loading but
-         * before any headers are sent.
-         *
-         * @since 1.0.0
-         */
-        do_action( 'groundhogg/init/v2' );
-    }
+		/**
+		 * Groundhogg init.
+		 *
+		 * Fires on Groundhogg init, after Groundhogg has finished loading but
+		 * before any headers are sent.
+		 *
+		 * @since 1.0.0
+		 */
+		do_action( 'groundhogg/init/v2' );
+	}
 
-    /**
-     * Init components.
-     *
-     * Initialize Groundhogg components. Register actions, run setting manager,
-     * initialize all the components that run groundhogg, and if in admin page
-     * initialize admin components.
-     *
-     * @since 1.0.0
-     * @access private
-     */
-    private function init_components() {
+	/**
+	 * Init components.
+	 *
+	 * Initialize Groundhogg components. Register actions, run setting manager,
+	 * initialize all the components that run groundhogg, and if in admin page
+	 * initialize admin components.
+	 *
+	 * @since  1.0.0
+	 * @access private
+	 */
+	private function init_components() {
 
-        // Settings & DBS needs to go first...
-        $this->settings     = new Settings();
-        $this->roles        = new Main_Roles();
-        $this->dbs          = new DB_Manager();
+		new React_App();
 
-        // Modules
-        $this->preferences  = new Preferences();
-        $this->tracking     = new Tracking();
-        $this->utils        = new Utils();
-        $this->scripts      = new Scripts();
-        $this->notices      = new Notices();
-        $this->rewrites     = new Rewrites();
+		// Settings & DBS needs to go first...
+		$this->settings = new Settings();
+		$this->roles    = new Main_Roles();
+		$this->dbs      = new DB_Manager();
 
-        // Back Compat...
-        new Backwards_Compatibility();
+		// Modules
+		$this->preferences = new Preferences();
+		$this->tracking    = new Tracking();
+		$this->utils       = new Utils();
+		$this->scripts     = new Scripts();
+		$this->notices     = new Notices();
+		$this->rewrites    = new Rewrites();
 
-        $this->replacements = new Replacements();
-        $this->tag_mapping  = new Tag_Mapping();
-        $this->step_manager = new Step_Manager();
-        $this->bulk_jobs    = new Bulk_Job_Manager();
-        $this->reporting    = new Reporting();
+		// Back Compat...
+		new Backwards_Compatibility();
 
-        $this->bounce_checker   = new Bounce_Checker();
-        $this->sending_service  = new Sending_Service();
-        $this->proxy_service    = new Proxy_Service();
-        $this->stats_collection = new Stats_Collection();
+		$this->replacements = new Replacements();
+		$this->tag_mapping  = new Tag_Mapping();
+		$this->step_manager = new Step_Manager();
+		$this->bulk_jobs    = new Bulk_Job_Manager();
+		$this->reporting    = new Reporting();
 
-        $this->event_queue  = new Event_Queue();
+		$this->bounce_checker   = new Bounce_Checker();
+		$this->sending_service  = new Sending_Service();
+		$this->proxy_service    = new Proxy_Service();
+		$this->stats_collection = new Stats_Collection();
 
-        if ( is_admin() ) {
-            $this->admin   = new Admin_Menu();
-        }
+		$this->event_queue = new Event_Queue();
 
-        // Goes last to ensure everything is installed before running...
-        $this->installer    = new Main_Installer();
-        $this->updater      = new Main_Updater();
+		if ( is_admin() ) {
+			$this->admin = new Admin_Menu();
+		}
 
-        $this->api = new Api_Loader();
+		// Goes last to ensure everything is installed before running...
+		$this->installer = new Main_Installer();
+		$this->updater   = new Main_Updater();
 
-        $this->shortcodes = new Shortcodes();
-        $this->submission_handler = new Submission_Handler();
+		$this->api = new Api_Loader();
 
-        $this->library = new Library();
+		$this->shortcodes         = new Shortcodes();
+		$this->submission_handler = new Submission_Handler();
 
-        new Blocks\Blocks();
+		$this->library = new Library();
 
-        if( ! is_white_labeled() ) {
-            new Reviews();
+		new Blocks\Blocks();
+
+		if ( ! is_white_labeled() ) {
+			new Reviews();
 //            new Upgrade_Notice();
-        }
+		}
 
-        new Extension_Upgrader();
-        new Plugin_Compatibility();
+		new Extension_Upgrader();
+		new Plugin_Compatibility();
 
-        // Partner
-        SendWp::instance();
-    }
+		// Partner
+		SendWp::instance();
+	}
 
-    /**
-     * Register autoloader.
-     *
-     * Groundhogg autoloader loads all the classes needed to run the plugin.
-     *
-     * @since 1.6.0
-     * @access private
-     */
-    private function register_autoloader() {
-        require GROUNDHOGG_PATH . 'includes/autoloader.php';
+	/**
+	 * Register autoloader.
+	 *
+	 * Groundhogg autoloader loads all the classes needed to run the plugin.
+	 *
+	 * @since  1.6.0
+	 * @access private
+	 */
+	private function register_autoloader() {
+		require GROUNDHOGG_PATH . 'includes/autoloader.php';
 
-        Autoloader::run();
-    }
+		Autoloader::run();
+	}
 
-    /**
-     * Plugin constructor.
-     *
-     * Initializing Groundhogg plugin.
-     *
-     * @since 1.0.0
-     * @access private
-     */
-    private function __construct() {
+	/**
+	 * Plugin constructor.
+	 *
+	 * Initializing Groundhogg plugin.
+	 *
+	 * @since  1.0.0
+	 * @access private
+	 */
+	private function __construct() {
 
-        $this->register_autoloader();
-        $this->load_immediate();
+		$this->register_autoloader();
+		$this->load_immediate();
 
-        if ( did_action( 'plugins_loaded' ) ){
-            $this->init();
-        } else {
-            add_action( 'plugins_loaded', [ $this, 'init' ], 0 );
-        }
+		if ( did_action( 'plugins_loaded' ) ) {
+			$this->init();
+		} else {
+			add_action( 'plugins_loaded', [ $this, 'init' ], 0 );
+		}
 
-    }
+	}
 
-    protected function load_immediate()
-    {
-        require  GROUNDHOGG_PATH . '/includes/pluggable.php';
-    }
+	protected function load_immediate() {
+		require GROUNDHOGG_PATH . '/includes/pluggable.php';
+	}
 
-    /**
-     * Include other files
-     */
-    private function includes()
-    {
-        require  GROUNDHOGG_PATH . '/includes/functions.php';
-        require  GROUNDHOGG_PATH . '/includes/filters.php';
-        require  GROUNDHOGG_PATH . '/includes/tools.php';
-    }
+	/**
+	 * Include other files
+	 */
+	private function includes() {
+		require GROUNDHOGG_PATH . '/includes/functions.php';
+		require GROUNDHOGG_PATH . '/includes/filters.php';
+		require GROUNDHOGG_PATH . '/includes/tools.php';
+	}
 }
 
 Plugin::instance();

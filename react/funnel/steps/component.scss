@@ -202,7 +202,7 @@ iframe.email-preview {
   padding: 20px;
   border-left: 1px solid $border-color-light;
 
-  .is-required{
+  .is-required {
     color: $error-red;
   }
 
@@ -213,9 +213,9 @@ iframe.email-preview {
     input[type='email'],
     input[type='tel'],
     input[type='password'],
-    //input[type='password'],
+      //input[type='password'],
     textarea,
-    select{
+    select {
       font-weight: normal;
     }
 
@@ -224,16 +224,41 @@ iframe.email-preview {
   .gh-form-column {
     padding: 15px;
 
+    border: dashed $border-color-light;
+    border-width: 0 0 0 1px;
+
     &:hover {
       border-color: $border-hover-color;
+      margin: -1px 0 -1px 0;
+      border-width: 1px 1px 1px 1px;
+    }
+
+    &:nth-last-child(2) {
+      border-right-width: 1px;
+    }
+
+    p.description {
+      margin: 0;
+    }
+  }
+
+  .address-fields{
+    .gh-form-row,
+    .gh-form-column {
+      padding: 0;
+      margin: 0;
+      border: none;
     }
   }
 
   .gh-form-row {
-    padding: 15px;
 
-    &:hover {
-      border-color: $border-hover-color;
+    border: dashed $border-color-light;
+    border-width: 1px 0 0 0;
+    display: flex;
+
+    &:last-child {
+      border-bottom-width: 1px;
     }
   }
 }
@@ -318,7 +343,7 @@ label.block {
   display: block;
 }
 
-.field-attribute-control.attribute-options{
+.field-attribute-control.attribute-options {
 
   //background: $background-color-light;
   //border-width: 1px 0;
@@ -333,7 +358,7 @@ label.block {
     .col-sm-2,
     .col-sm-3,
     .col-sm-4,
-    .col-sm-1{
+    .col-sm-1 {
       padding: 0 8px 0 0;
     }
 
@@ -343,11 +368,19 @@ label.block {
   }
 }
 
-.clear-button{
+.clear-button {
   background: transparent;
   border: none;
 }
 
-.delete-button{
+.delete-button {
   color: $error-red;
+}
+
+.tab-content-inner {
+
+  &.submit,
+  &.embed {
+    padding: 15px;
+  }
 }

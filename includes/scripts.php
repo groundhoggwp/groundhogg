@@ -209,6 +209,13 @@ class Scripts {
 			'wp-i18n'
 		], null, true );
 
+		wp_register_script( 'groundhogg-react', GROUNDHOGG_URL . 'react/build/build.js', [
+			'jquery',
+			'wp-element',
+			'groundhogg-admin',
+			'wp-i18n'
+		], null, true );
+
 		wp_register_script( 'groundhogg-admin-reporting', GROUNDHOGG_ASSETS_URL . 'js/admin/reporting' . $dot_min . '.js', [
 			'jquery',
 			'moment-js',
@@ -279,6 +286,7 @@ class Scripts {
 
 		wp_register_style( 'groundhogg-form', GROUNDHOGG_ASSETS_URL . 'css/frontend/form.css', [], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-funnel-react', GROUNDHOGG_URL . 'react/funnel/build/build.css', [], GROUNDHOGG_VERSION );
+		wp_register_style( 'groundhogg-admin-react', GROUNDHOGG_URL . 'react/build/build.css', [], GROUNDHOGG_VERSION );
 
 		do_action( 'groundhogg/scripts/after_register_admin_styles' );
 	}

@@ -2,16 +2,11 @@ const path = require( 'path' );
 const webpack = require( 'webpack' );
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-// Set different CSS extraction for editor only and common block styles
-const funnelCSS = new MiniCssExtractPlugin( {
-    filename: './react/funnel/build/build.css',
-} );
-
 module.exports = {
     mode: 'development',
     entry: {
         // './blocks/gutenberg/js/blocks' : './blocks/gutenberg/index.js',
-        './react/funnel/build/build' : './react/funnel/index.js',
+        './react/build/build' : './react/index.js',
     },
     output: {
         path: path.resolve( __dirname ),
@@ -40,7 +35,7 @@ module.exports = {
     },
     plugins: [
         new MiniCssExtractPlugin({
-            filename: './react/funnel/build/build.css'
+            filename: './react/build/build.css'
         })
     ],
 };

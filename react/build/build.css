@@ -1,0 +1,34 @@
+/* The side navigation menu */
+.groundhogg-sidebar {
+  margin: 0;
+  padding: 0;
+  width: 200px;
+  background-color: #fff;
+  position: fixed;
+  height: calc(100% - 65px);
+  top: 65px;
+  overflow: auto;
+  border-right: 1px solid #ccd0d4;
+  transition: 0.2s; }
+  .groundhogg-sidebar:not(.expanded) {
+    transition: 0.2s;
+    width: 55px; }
+    .groundhogg-sidebar:not(.expanded) .nav-text {
+      display: none; }
+  .groundhogg-sidebar .nav-item {
+    display: block;
+    padding: 10px;
+    font-size: 24px; }
+    .groundhogg-sidebar .nav-item.active {
+      background-color: rgba(219, 116, 26, 0.22); }
+    .groundhogg-sidebar .nav-item:hover:not(.active) {
+      background-color: rgba(219, 116, 26, 0.14); }
+    .groundhogg-sidebar .nav-item .nav-icon {
+      display: inline-block;
+      width: 35px;
+      color: #48515b;
+      text-align: center; }
+
+.groundhogg-app {
+  overflow: hidden; }
+

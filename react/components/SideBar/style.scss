@@ -1,0 +1,45 @@
+@import "../../colors";
+
+/* The side navigation menu */
+.groundhogg-sidebar {
+  margin: 0;
+  padding: 0;
+  width: 200px;
+  background-color: #fff;
+  position: fixed;
+  height: calc(100% - 65px);
+  top: 65px;
+  overflow: auto;
+  border-right: 1px solid $border-color;
+  transition: 0.2s;
+
+  &:not(.expanded) {
+    transition: 0.2s;
+    width: 55px;
+
+    .nav-text {
+      display: none;
+    }
+  }
+
+  .nav-item {
+    display: block;
+    padding: 10px;
+    font-size: 24px;
+
+    &.active{
+      background-color: $background-color-active;
+    }
+
+    &:hover:not(.active){
+      background-color: $background-color-hover;
+    }
+
+    .nav-icon {
+      display: inline-block;
+      width: 35px;
+      color: $font-color;
+      text-align: center;
+    }
+  }
+}

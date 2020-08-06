@@ -842,6 +842,7 @@ class Form_Filled extends Benchmark {
 		$context[ 'embed' ] = $embed;
 		$context[ 'url' ] = esc_url( $form->get_submission_url() );
 		$context[ 'default_form_json' ] = convert_form_shortcode_to_json( $this->get_setting( 'form', $this->get_default_form() ) );
+		$context[ 'recaptcha_is_v3' ] = get_option( 'gh_recaptcha_version', 'v2' ) ?: 'v2' === 'v3';
 
 		return $context;
 	}
