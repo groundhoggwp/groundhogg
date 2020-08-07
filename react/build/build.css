@@ -2,11 +2,11 @@
 .groundhogg-sidebar {
   margin: 0;
   padding: 0;
-  width: 200px;
+  width: 150px;
   background-color: #fff;
   position: fixed;
-  height: calc(100% - 65px);
-  top: 65px;
+  float: left;
+  height: 100%;
   overflow: auto;
   border-right: 1px solid #ccd0d4;
   transition: 0.2s; }
@@ -17,8 +17,11 @@
       display: none; }
   .groundhogg-sidebar .nav-item {
     display: block;
-    padding: 10px;
-    font-size: 24px; }
+    padding: 7px;
+    font-size: 22px;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden; }
     .groundhogg-sidebar .nav-item.active {
       background-color: rgba(219, 116, 26, 0.22); }
     .groundhogg-sidebar .nav-item:hover:not(.active) {
@@ -28,6 +31,26 @@
       width: 35px;
       color: #48515b;
       text-align: center; }
+    .groundhogg-sidebar .nav-item .nav-text {
+      margin-left: 5px;
+      font-size: 16px;
+      font-weight: 500;
+      color: #48515b; }
+  .groundhogg-sidebar .expand-control {
+    position: absolute;
+    bottom: 0;
+    white-space: nowrap;
+    overflow: hidden; }
+    .groundhogg-sidebar .expand-control .nav-icon {
+      display: inline-block;
+      width: 35px;
+      color: #48515b;
+      text-align: center; }
+    .groundhogg-sidebar .expand-control .nav-text {
+      margin-left: 5px;
+      font-size: 16px;
+      font-weight: 500;
+      color: #48515b; }
 
 .groundhogg-app {
   overflow: hidden; }

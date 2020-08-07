@@ -4,11 +4,11 @@
 .groundhogg-sidebar {
   margin: 0;
   padding: 0;
-  width: 200px;
+  width: 150px;
   background-color: #fff;
   position: fixed;
-  height: calc(100% - 65px);
-  top: 65px;
+  float: left;
+  height: 100%;
   overflow: auto;
   border-right: 1px solid $border-color;
   transition: 0.2s;
@@ -24,8 +24,11 @@
 
   .nav-item {
     display: block;
-    padding: 10px;
-    font-size: 24px;
+    padding: 7px;
+    font-size: 22px;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
 
     &.active{
       background-color: $background-color-active;
@@ -40,6 +43,34 @@
       width: 35px;
       color: $font-color;
       text-align: center;
+    }
+
+    .nav-text {
+      margin-left: 5px;
+      font-size: 16px;
+      font-weight: 500;
+      color: $font-color;
+    }
+  }
+
+  .expand-control{
+    position: absolute;
+    bottom: 0;
+    white-space: nowrap;
+    overflow: hidden;
+
+    .nav-icon {
+      display: inline-block;
+      width: 35px;
+      color: $font-color;
+      text-align: center;
+    }
+
+    .nav-text {
+      margin-left: 5px;
+      font-size: 16px;
+      font-weight: 500;
+      color: $font-color;
     }
   }
 }
