@@ -11,6 +11,13 @@
       border-radius: 50%;
     }
   }
+
+
+  .page-actions{
+    .btn:not(:last-child){
+      margin-right: 10px;
+    }
+  }
 }
 
 .contact-table-actions {
@@ -43,11 +50,18 @@
         min-width: 200px;
         margin-right: 10px;
       }
+
+      .input-group-append{
+        .form-control{
+          border-top-left-radius: 0;
+          border-bottom-left-radius: 0;
+        }
+      }
     }
 
     .quick-search {
 
-      width: 300px;
+      width: 200px;
       position: relative;
 
       input[type="search"] {
@@ -69,6 +83,5 @@
       }
     }
   }
-
 
 }

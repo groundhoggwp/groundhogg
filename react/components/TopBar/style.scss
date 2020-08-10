@@ -1,7 +1,8 @@
 @import "../../colors";
 
 .groundhogg-top-bar {
-  height: 55px;
+  min-height: 55px;
+  padding: 4px 8px;
   position: fixed;
   top: 0;
   left: 0;
@@ -25,5 +26,39 @@
       margin: 10px;
     }
 
+  }
+
+  .search-and-quick-add,
+  .topbar-actions{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    .btn:not(:last-child){
+      margin-right: 10px;
+    }
+
+    .quick-search {
+      position: relative;
+
+      input[type="search"] {
+        padding-left: 42px;
+      }
+
+      &:before {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+
+        display: inline-block;
+        font: normal normal normal 14px/1 FontAwesome;
+        font-size: 1.171875rem;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+
+        content: "\f002";
+        z-index: 1003;
+      }
+    }
   }
 }

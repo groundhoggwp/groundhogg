@@ -2,7 +2,7 @@
 
 .page-content{
 
-  padding-top: 55px;
+  padding-top: 63px;
 
   &.collapsed{
     margin-left: 55px;
@@ -18,7 +18,7 @@
   header {
 
     &.with-padding{
-      padding: 15px 20px;
+      padding: 15px 8px;
     }
 
     display: flex;
@@ -31,7 +31,7 @@
   }
 
   .page-with-padding {
-    padding: 15px 20px;
+    padding: 15px 8px;
   }
 
 }

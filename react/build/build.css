@@ -34,7 +34,7 @@
       background-color: rgba(219, 116, 26, 0.2);
       transition: 0.1s; }
       .groundhogg-sidebar .nav-item.active .nav-text {
-        font-weight: 500; }
+        font-weight: 600; }
     .groundhogg-sidebar .nav-item:hover:not(.active) {
       background-color: rgba(219, 116, 26, 0.1);
       transition: 0.1s; }
@@ -80,7 +80,8 @@
   width: 20px; }
 
 .groundhogg-top-bar {
-  height: 55px;
+  min-height: 55px;
+  padding: 4px 8px;
   position: fixed;
   top: 0;
   left: 0;
@@ -95,9 +96,35 @@
   .groundhogg-top-bar .logo .logo-black {
     height: 35px;
     margin: 10px; }
+  .groundhogg-top-bar .search-and-quick-add,
+  .groundhogg-top-bar .topbar-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center; }
+    .groundhogg-top-bar .search-and-quick-add .btn:not(:last-child),
+    .groundhogg-top-bar .topbar-actions .btn:not(:last-child) {
+      margin-right: 10px; }
+    .groundhogg-top-bar .search-and-quick-add .quick-search,
+    .groundhogg-top-bar .topbar-actions .quick-search {
+      position: relative; }
+      .groundhogg-top-bar .search-and-quick-add .quick-search input[type="search"],
+      .groundhogg-top-bar .topbar-actions .quick-search input[type="search"] {
+        padding-left: 42px; }
+      .groundhogg-top-bar .search-and-quick-add .quick-search:before,
+      .groundhogg-top-bar .topbar-actions .quick-search:before {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        display: inline-block;
+        font: normal normal normal 14px/1 FontAwesome;
+        font-size: 1.171875rem;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        content: "\f002";
+        z-index: 1003; }
 
 .page-content {
-  padding-top: 55px; }
+  padding-top: 63px; }
   .page-content.collapsed {
     margin-left: 55px;
     transition: 0.2s; }
@@ -109,11 +136,11 @@
     flex-direction: row;
     justify-content: space-between; }
     .page-content header.with-padding {
-      padding: 15px 20px; }
+      padding: 15px 8px; }
     .page-content header h2 {
       font-weight: 400; }
   .page-content .page-with-padding {
-    padding: 15px 20px; }
+    padding: 15px 8px; }
 
 .getting-started {
   display: flex;
@@ -156,7 +183,7 @@ table.list-table thead th {
   position: -webkit-sticky;
   position: sticky;
   background: white;
-  top: 54px;
+  top: 63px;
   box-shadow: 0 2px 0 #dee2e6;
   border-bottom: none; }
 
@@ -176,6 +203,9 @@ table.list-table td.loading-animation div {
 .contacts .list-table .gravatar {
   width: 40px;
   border-radius: 50%; }
+
+.contacts .page-actions .btn:not(:last-child) {
+  margin-right: 10px; }
 
 .contact-table-actions {
   display: flex;
@@ -198,8 +228,11 @@ table.list-table td.loading-animation div {
     .contact-table-actions .filters .filter:not(:last-child) {
       min-width: 200px;
       margin-right: 10px; }
+    .contact-table-actions .filters .filter .input-group-append .form-control {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0; }
     .contact-table-actions .filters .quick-search {
-      width: 300px;
+      width: 200px;
       position: relative; }
       .contact-table-actions .filters .quick-search input[type="search"] {
         padding-left: 32px; }

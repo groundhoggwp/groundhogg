@@ -11,7 +11,7 @@ import {
 } from '../../actions/contactListActions'
 import { ListTable } from '../../components/ListTable/ListTable'
 import { FaIcon, TagPicker } from '../../components/basic-components'
-import { Badge, Button, Form } from 'react-bootstrap'
+import { Badge, Button, Form, InputGroup } from 'react-bootstrap'
 import moment from 'moment'
 import Select from 'react-select'
 import './style.scss'
@@ -37,6 +37,21 @@ const optinStatusFilters = [
   { label: 'Bounced', value: 6 },
   { label: 'Spam', value: 7 },
   { label: 'Complained', value: 8 },
+]
+
+const sortFilters = [
+  { value: 'ID', label: 'Contact ID' },
+  { value: 'first_name', label: 'First Name' },
+  { value: 'last_name', label: 'Last Name' },
+  { value: 'email', label: 'Email Address' },
+  { value: 'optin_status', label: 'Optin Status' },
+  { value: 'date_created', label: 'Date Added' },
+  { value: 'user_id', label: 'User ID' },
+]
+
+const orderFilters = [
+  { value: 'ASC', label: 'ASC' },
+  { value: 'DESC', label: 'DESC' },
 ]
 
 const columns = [
@@ -127,7 +142,8 @@ const columns = [
     id: 'actions',
     name: 'Actions',
     render: ({ item }) => {
-      return <Button size={'sm'} variant={'outline-secondary'}>{'Email'}</Button>
+      return <Button size={ 'sm' }
+                     variant={ 'outline-secondary' }>{ 'Email' }</Button>
     },
   },
 ]
@@ -208,9 +224,32 @@ const ContactsList = ({
       <div className={ 'contact-table-actions' }>
         <div className={ 'total-contacts' }>
           { totalContacts > 0 &&
-          <span className={ 'number' }>{ number_format(totalContacts) }</span> }
+          <><span className={ 'number' }>{ number_format(
+            totalContacts) }</span> { 'Contacts' }</> }
         </div>
         <div className={ 'filters' }>
+          <div className={ 'sort filter' }>
+            <InputGroup>
+              <Form.Control
+                as="select"
+                value={ query.orderby }
+                onChange={ (e) => updateFilters({ orderby: e.target.value }) }
+              >
+                { sortFilters.map((filter, i) => <option key={ i }
+                                                         value={ filter.value }>{ filter.label }</option>) }
+              </Form.Control>
+              <InputGroup.Append>
+                <Form.Control
+                  as="select"
+                  value={ query.order }
+                  onChange={ (e) => updateFilters({ order: e.target.value }) }
+                >
+                  { orderFilters.map((filter, i) => <option key={ i }
+                                                            value={ filter.value }>{ filter.label }</option>) }
+                </Form.Control>
+              </InputGroup.Append>
+            </InputGroup>
+          </div>
           <div className={ 'tag-filter filter' }>
             <TagPicker
               selectProps={ {
@@ -249,6 +288,7 @@ const ContactsList = ({
         items={ contacts }
         columns={ columns }
         fetchData={ loadMoreContacts }
+        noItems={ 'No contacts...' }
       />
     </div>
   )
@@ -277,7 +317,7 @@ const ConnectedContactsList = connect(mapStateToProps,
 
 export default {
   path: '/contacts',
-  icon: 'user',
+  icon: 'user-circle-o',
   title: 'Contacts',
   capabilities: [],
   exact: true,
@@ -285,10 +325,27 @@ export default {
     <header className={ 'with-padding' }>
       <h2>{ 'Contacts' }</h2>
       <div className={ 'page-actions' }>
-        <IconButton
-          icon={ 'plus-circle' }
-          variant={ 'icon-only' }
-        />
+        <Button variant={ 'light' } size={ 'lg' }>
+          <FaIcon
+            classes={ [
+              'plus',
+            ] }
+          />
+        </Button>
+        <Button variant={ 'light' } size={ 'lg' }>
+          <FaIcon
+            classes={ [
+              'upload',
+            ] }
+          />
+        </Button>
+        <Button variant={ 'light' } size={ 'lg' }>
+          <FaIcon
+            classes={ [
+              'filter',
+            ] }
+          />
+        </Button>
       </div>
     </header>
     <ConnectedContactsList/>

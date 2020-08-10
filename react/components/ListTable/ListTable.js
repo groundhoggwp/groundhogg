@@ -11,32 +11,42 @@ export const ListTable = ({
   items, // the actual table items
   totalItems,
   fetchData,
-  columns // the columns themselves, structured with name and render information
+  columns, // the columns themselves, structured with name and render information
+  noItems
 }) => {
 
   return (
     <>
       <InfiniteScroll
-        style={{overflow:'visible'}}
-        next={fetchData}
-        hasMore={totalItems !== items.length}
-        loader={<></>}
-        dataLength={items.length}
+        style={ { overflow: 'visible' } }
+        next={ fetchData }
+        hasMore={ totalItems !== items.length }
+        loader={ <></> }
+        dataLength={ items.length }
       >
-        <Table {...tableProps} className={'list-table'}>
+        <Table { ...tableProps } className={ 'list-table' }>
           <thead>
           <tr>
-            {columns.map(column => <ListTableTH {...column} />)}
+            { columns.map(column => <ListTableTH { ...column } />) }
           </tr>
           </thead>
           <tbody>
-          {items.length > 0 &&
-          items.map(item => <ListTableItemRow item={item} columns={columns}/>)}
-          {isLoading && range(10).map(i => <ListTableRowLoading columns={columns}/>)}
+          {
+
+            items.length > 0 ?
+              items.map(
+                item => <ListTableItemRow item={ item } columns={ columns }/>)
+              : ! isLoading ? <ListTableRowEmpty
+                colSpan={columns.length}
+                noItems={noItems}
+              /> : <></>
+          }
+          { isLoading &&
+          range(10).map(i => <ListTableRowLoading columns={ columns }/>) }
           </tbody>
           <tfoot>
           <tr>
-            {columns.map(column => <ListTableTH {...column} />)}
+            { columns.map(column => <ListTableTH { ...column } />) }
           </tr>
           </tfoot>
         </Table>
@@ -48,31 +58,42 @@ export const ListTable = ({
 }
 
 const ListTableTH = ({ id, name, sortable }) => {
-
   return (
-    <th id={id}>
-      {sortable ? <button className={'list-table-order-button'}>{name}</button> : name}
+    <th id={ id }>
+      { sortable ? <button
+        className={ 'list-table-order-button' }>{ name }</button> : name }
     </th>
   )
-
 }
 
 const ListTableRowLoading = ({ columns }) => {
   return (
-    <tr className={'list-table-item-row'}>
-      {columns.map(column => <td className={'loading-animation'}>
+    <tr className={ 'list-table-item-row' }>
+      { columns.map(column => <td className={ 'loading-animation' }>
         <div></div>
-      </td>)}
+      </td>) }
     </tr>
   )
 }
 
 const ListTableItemRow = ({ item, columns }) => {
   return (
-    <tr className={'list-table-item-row'}>
-      {columns.map(column => <td>
-        <column.render item={item}/>
-      </td>)}
+    <tr className={ 'list-table-item-row' }>
+      { columns.map(column => <td>
+        <column.render item={ item }/>
+      </td>) }
+    </tr>
+  )
+}
+
+const ListTableRowEmpty = ({ colSpan, noItems }) => {
+  return (
+    <tr className={ 'list-table-item-row' }>
+      <td
+        colSpan={colSpan}
+      >
+        {noItems}
+      </td>
     </tr>
   )
 }
