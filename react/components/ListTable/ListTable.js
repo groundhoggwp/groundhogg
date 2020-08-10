@@ -23,7 +23,7 @@ export const ListTable = ({
         loader={<></>}
         dataLength={items.length}
       >
-        <Table striped hover {...tableProps} className={'list-table'}>
+        <Table {...tableProps} className={'list-table'}>
           <thead>
           <tr>
             {columns.map(column => <ListTableTH {...column} />)}
