@@ -351,9 +351,7 @@ class Contact_Query {
 	protected function parse_query() {
 		$this->query_vars = wp_parse_args( $this->query_vars, $this->query_var_defaults );
 
-		$this->query_vars['number'] = absint( $this->query_vars['number'] );
-
-		if ( $this->query_vars['number'] < 1 ) {
+		if ( intval( $this->query_vars['number'] ) < 1 ) {
 			$this->query_vars['number'] = false;
 		}
 
@@ -681,7 +679,7 @@ class Contact_Query {
 			$where['users_exclude'] = "user_id NOT IN ( $users_exclude_ids )";
 		}
 
-		if ( $this->query_vars['optin_status'] !== 'any' ) {
+		if ( $this->query_vars['optin_status'] && $this->query_vars['optin_status'] !== 'any' ) {
 
 			if ( is_array( $this->query_vars['optin_status'] ) ) {
 				$this->query_vars['optin_status'] = implode( ',', wp_parse_id_list( $this->query_vars['optin_status'] ) );

@@ -30,47 +30,23 @@
 
       li {
 
-        margin: 3px;
-        padding: 8px 12px;
-        border-radius: 5px;
-        transition: 0.2s;
-        background-color: $background-color-groundhogg;
+        //margin: 3px;
+        //padding: 8px 12px;
+        //border-radius: 5px;
+        //transition: 0.2s;
+        //background-color: $background-color-groundhogg;
 
-        &:hover{
-          background-color: $background-color-hover;
-          transition: 0.2s;
-        }
-
-        a {
-          //color: $font-color;
-          color: $font-color-groundhogg;
-          text-decoration: none;
-        }
+      //  &:hover{
+      //    background-color: $background-color-hover;
+      //    transition: 0.2s;
+      //  }
+      //
+      //  a {
+      //    //color: $font-color;
+      //    color: $font-color-groundhogg;
+      //    text-decoration: none;
+      //  }
       }
-    }
-  }
-
-  .courses{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-
-    .course-card{
-      &:not(:last-child) {
-        margin-right: 20px;
-      }
-    }
-
-    .course-details{
-      opacity: 0.7;
-    }
-
-    .card-text{
-      padding: 20px;
-    }
-
-    .course-image{
-      width: 100%;
     }
   }
 
@@ -78,38 +54,7 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-
     .video-card {
-      border: 1px solid $border-color;
-      border-radius: 10px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: 0.2s;
-
-      &:hover{
-        border-color: $border-hover-color;
-        transition: 0.2s;
-      }
-
-      .vid-img {
-        width: 100%;
-      }
-
-      .card-text {
-        padding: 20px;
-
-        h3 {
-          font-size: 20px;
-          text-align: center;
-        }
-
-        p {
-          margin: 0;
-          font-size: 16px;
-          text-align: center;
-        }
-      }
-
       &:not(:last-child) {
         margin-right: 20px;
       }

@@ -4,6 +4,8 @@ import { openVideoModal } from '../../actions/videoModalActions'
 import { connect } from 'react-redux'
 import { Dashicon } from '../../funnel/components/Dashicon/Dashicon'
 import { FaIcon } from '../../components/basic-components'
+import Card from 'react-bootstrap/Card'
+import Button from 'react-bootstrap/Button'
 
 const { user, assets } = groundhogg
 
@@ -84,15 +86,18 @@ const menuLinks = [
 ]
 
 const CourseCard = ({ title, description, details, link, img }) => {
+
   return (
-    <div className={'course-card gh-card'}>
-      <img className={'course-image'} src={img}/>
-      <div className={'card-text'}>
-        <h3>{title}</h3>
-        <div className={'course-details'}>{details}</div>
-        <p>{description}</p>
-      </div>
-    </div>
+    <Card className={'video-card'}>
+      <Card.Img variant="top" src={img} />
+      <Card.Body>
+        <Card.Title>{title}</Card.Title>
+        <Card.Text>
+          <div className={'course-details'}>{details}</div>
+          {description}
+        </Card.Text>
+      </Card.Body>
+    </Card>
   )
 }
 
@@ -103,22 +108,24 @@ const VideoCard = ({ title, description, link, img, openVideoModal }) => {
   }
 
   return (
-    <div className={'video-card'} onClick={handleOnClick}>
-      <img className={'vid-img'} src={img}/>
-      <div className={'card-text'}>
-        <h3>{title}</h3>
-        <p>{description}</p>
-      </div>
-    </div>
+    <Card onClick={handleOnClick} className={'video-card'}>
+      <Card.Img variant="top" src={img} />
+      <Card.Body>
+        <Card.Title>{title}</Card.Title>
+        <Card.Text>
+          {description}
+        </Card.Text>
+      </Card.Body>
+    </Card>
   )
 }
 
 const MenuItem = ({ link, name, icon }) => {
   return (
     <li className={'menu-item'}>
-      <a href={link} target={'_blank'}>
-        <FaIcon classes={[icon]}/> <span className={'menu-item-tex'}>{name}</span>
-      </a>
+      <Button href={link} variant={'light'} target={'_blank'}>
+        <FaIcon classes={[icon]}/> <span className={'menu-item-text'}>{name}</span>
+      </Button>
     </li>
   )
 }
@@ -146,7 +153,7 @@ export default {
       <section className={'welcome-section welcome-videos'}>
         {welcomeVideos.map(item => <VideoCardConnected {...item}/>)}
       </section>
-      <section className={'welcome-section courses'}>
+      <section className={'welcome-section  welcome-videos'}>
         {courseVideos.map(item => <CourseCard {...item}/>)}
       </section>
     </div>

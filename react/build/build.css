@@ -13,7 +13,8 @@
   transition: 0.2s;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; }
+  justify-content: space-between;
+  z-index: 1000; }
   .groundhogg-sidebar:not(.expanded) {
     transition: 0.2s;
     width: 55px; }
@@ -88,7 +89,8 @@
   background-color: #fff;
   display: flex;
   flex-direction: row;
-  justify-content: space-between; }
+  justify-content: space-between;
+  z-index: 1001; }
   .groundhogg-top-bar .logo .big-g,
   .groundhogg-top-bar .logo .logo-black {
     height: 35px;
@@ -131,56 +133,12 @@
       flex-direction: row;
       flex-wrap: nowrap;
       justify-content: space-between; }
-      .getting-started .welcome-nav ul li {
-        margin: 3px;
-        padding: 8px 12px;
-        border-radius: 5px;
-        transition: 0.2s;
-        background-color: rgba(235, 131, 26, 0.05); }
-        .getting-started .welcome-nav ul li:hover {
-          background-color: rgba(219, 116, 26, 0.1);
-          transition: 0.2s; }
-        .getting-started .welcome-nav ul li a {
-          color: #bf6b15;
-          text-decoration: none; }
-  .getting-started .courses {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between; }
-    .getting-started .courses .course-card:not(:last-child) {
-      margin-right: 20px; }
-    .getting-started .courses .course-details {
-      opacity: 0.7; }
-    .getting-started .courses .card-text {
-      padding: 20px; }
-    .getting-started .courses .course-image {
-      width: 100%; }
   .getting-started .welcome-videos {
     display: flex;
     flex-direction: row;
     justify-content: space-between; }
-    .getting-started .welcome-videos .video-card {
-      border: 1px solid #e5e9ed;
-      border-radius: 10px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: 0.2s; }
-      .getting-started .welcome-videos .video-card:hover {
-        border-color: #b6babe;
-        transition: 0.2s; }
-      .getting-started .welcome-videos .video-card .vid-img {
-        width: 100%; }
-      .getting-started .welcome-videos .video-card .card-text {
-        padding: 20px; }
-        .getting-started .welcome-videos .video-card .card-text h3 {
-          font-size: 20px;
-          text-align: center; }
-        .getting-started .welcome-videos .video-card .card-text p {
-          margin: 0;
-          font-size: 16px;
-          text-align: center; }
-      .getting-started .welcome-videos .video-card:not(:last-child) {
-        margin-right: 20px; }
+    .getting-started .welcome-videos .video-card:not(:last-child) {
+      margin-right: 20px; }
 
 .icon-button.icon-only {
   background: transparent;
@@ -199,7 +157,6 @@ table.list-table thead th {
   position: sticky;
   background: white;
   top: 54px;
-  z-index: 2;
   box-shadow: 0 2px 0 #dee2e6;
   border-bottom: none; }
 
@@ -213,8 +170,49 @@ table.list-table td.loading-animation div {
   animation-timing-function: linear;
   animation-fill-mode: forwards; }
 
-.contacts .list-table td:first-child, .contacts .list-table th:first-child {
+.contacts .list-table td, .contacts .list-table th {
   vertical-align: middle; }
+
+.contacts .list-table .gravatar {
+  width: 40px;
+  border-radius: 50%; }
+
+.contact-table-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
+  padding: 10px 20px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e5e9ed; }
+  .contact-table-actions .total-contacts {
+    vertical-align: middle; }
+    .contact-table-actions .total-contacts .number {
+      font-weight: 500;
+      font-size: 24px; }
+  .contact-table-actions .filters {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    min-width: 40%; }
+    .contact-table-actions .filters .filter:not(:last-child) {
+      min-width: 200px;
+      margin-right: 10px; }
+    .contact-table-actions .filters .quick-search {
+      width: 300px;
+      position: relative; }
+      .contact-table-actions .filters .quick-search input[type="search"] {
+        padding-left: 32px; }
+      .contact-table-actions .filters .quick-search:before {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        display: inline-block;
+        font: normal normal normal 14px/1 FontAwesome;
+        font-size: inherit;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        content: "\f002"; }
 
 .video-container {
   position: relative;

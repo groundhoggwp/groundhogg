@@ -3,9 +3,72 @@
 .contacts {
   .list-table {
     td, th {
-      &:first-child {
-        vertical-align: middle;
+      vertical-align: middle;
+    }
+
+    .gravatar {
+      width: 40px;
+      border-radius: 50%;
+    }
+  }
+}
+
+.contact-table-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
+  padding: 10px 20px;
+  background-color: $background-color;
+  border-top: 1px solid $border-color;
+
+  .total-contacts{
+    vertical-align: middle;
+
+    .number{
+      font-weight: 500;
+      font-size: 24px;
+    }
+  }
+
+  .filters {
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    min-width: 40%;
+
+    .filter {
+      &:not(:last-child) {
+        min-width: 200px;
+        margin-right: 10px;
+      }
+    }
+
+    .quick-search {
+
+      width: 300px;
+      position: relative;
+
+      input[type="search"] {
+        padding-left: 32px;
+      }
+
+      &:before {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+
+        display: inline-block;
+        font: normal normal normal 14px/1 FontAwesome;
+        font-size: inherit;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+
+        content: "\f002";
       }
     }
   }
+
+
 }

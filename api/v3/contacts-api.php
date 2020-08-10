@@ -322,6 +322,9 @@ class Contacts_Api extends Base {
 		}
 
 		$contacts = $contact_query->query( $query );
+
+		$orig_query = $contact_query->query_vars;
+
 		$count    = $contact_query->count( $query );
 
 		if ( $is_for_select2 ) {
@@ -358,7 +361,7 @@ class Contacts_Api extends Base {
 		$response = [
 			'contacts' => $contacts,
 			'count'    => $count,
-			'query'    => $contact_query->query_vars
+			'query'    => $orig_query
 		];
 
 		if ( $request->get_param( 'show_sql' ) ) {

@@ -102,3 +102,7 @@ export function enableBodyScrolling () {
     $('body').removeClass('disable-scrolling')
   })
 }
+
+export function number_format ( number ) {
+  return new Intl.NumberFormat().format(number)
+}

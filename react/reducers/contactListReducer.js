@@ -3,12 +3,16 @@ import {
   FETCH_CONTACTS_REQUEST,
   FETCH_CONTACTS_SUCCESS,
   CHANGE_QUERY,
-  FETCH_MORE_CONTACTS_SUCCESS, CLEAR_ITEMS
+  FETCH_MORE_CONTACTS_SUCCESS,
+  CLEAR_ITEMS,
+  CHANGE_CONTEXT,
+  CLEAR_STATE,
 } from '../actions/types'
 
 const initialState = {
   fetching: false,
-  count: 0,
+  total: 0,
+  context: {},
   query: {
     number: 20,
     offset: 0,
@@ -21,6 +25,14 @@ const initialState = {
 
 export default function (state = initialState, action ) {
   switch (action.type) {
+    case CHANGE_CONTEXT:
+      return {
+        ...state,
+        context: {
+          ...state.context,
+          ...action.payload
+        }
+      }
     case CHANGE_QUERY:
       return {
         ...state,
@@ -28,6 +40,11 @@ export default function (state = initialState, action ) {
           ...state.query,
           ...action.payload
         }
+      }
+    case CLEAR_STATE:
+      return {
+        ...state,
+        ...initialState
       }
     case FETCH_CONTACTS_REQUEST:
       return {
@@ -38,7 +55,8 @@ export default function (state = initialState, action ) {
       return {
         ...state,
         fetching: false,
-        data: action.payload,
+        data: action.payload.contacts,
+        total: action.payload.total,
         error: {}
       }
     case FETCH_MORE_CONTACTS_SUCCESS:

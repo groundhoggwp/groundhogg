@@ -36,7 +36,7 @@ class React_App {
 
 		wp_localize_script( 'groundhogg-react', 'groundhogg', $react_init_obj );
 
-		wp_enqueue_style( 'bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css' );
+		wp_enqueue_style( 'bootstrap', GROUNDHOGG_ASSETS_URL . 'css/bootstrap.min.css' );
 		wp_enqueue_style( 'fa-icons', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css' );
 		wp_enqueue_style( 'groundhogg-admin-react' );
 
