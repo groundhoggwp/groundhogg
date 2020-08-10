@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function parseArgs (given, defaults) {
 
   // remove null or empty values from given

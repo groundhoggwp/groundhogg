@@ -2,30 +2,41 @@
 .groundhogg-sidebar {
   margin: 0;
   padding: 0;
-  width: 150px;
+  width: 200px;
   background-color: #fff;
   position: fixed;
   float: left;
-  height: 100%;
+  height: calc( 100% - 55px);
+  top: 55px;
   overflow: auto;
-  border-right: 1px solid #ccd0d4;
-  transition: 0.2s; }
+  border-right: 1px solid #e5e9ed;
+  transition: 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; }
   .groundhogg-sidebar:not(.expanded) {
     transition: 0.2s;
     width: 55px; }
-    .groundhogg-sidebar:not(.expanded) .nav-text {
-      display: none; }
+    .groundhogg-sidebar:not(.expanded) .nav-item .nav-text {
+      opacity: 0;
+      visibility: hidden; }
   .groundhogg-sidebar .nav-item {
     display: block;
     padding: 7px;
     font-size: 22px;
     text-decoration: none;
     white-space: nowrap;
-    overflow: hidden; }
+    overflow: hidden;
+    margin: 3px;
+    border-radius: 5px; }
     .groundhogg-sidebar .nav-item.active {
-      background-color: rgba(219, 116, 26, 0.22); }
+      background-color: rgba(219, 116, 26, 0.2);
+      transition: 0.1s; }
+      .groundhogg-sidebar .nav-item.active .nav-text {
+        font-weight: 500; }
     .groundhogg-sidebar .nav-item:hover:not(.active) {
-      background-color: rgba(219, 116, 26, 0.14); }
+      background-color: rgba(219, 116, 26, 0.1);
+      transition: 0.1s; }
     .groundhogg-sidebar .nav-item .nav-icon {
       display: inline-block;
       width: 35px;
@@ -34,24 +45,186 @@
     .groundhogg-sidebar .nav-item .nav-text {
       margin-left: 5px;
       font-size: 16px;
-      font-weight: 500;
-      color: #48515b; }
+      font-weight: 400;
+      color: #48515b;
+      visibility: visible;
+      opacity: 1;
+      transition-timing-function: ease-in-out; }
   .groundhogg-sidebar .expand-control {
-    position: absolute;
-    bottom: 0;
+    cursor: pointer;
+    padding: 7px;
+    font-size: 22px;
+    text-decoration: none;
     white-space: nowrap;
-    overflow: hidden; }
-    .groundhogg-sidebar .expand-control .nav-icon {
+    overflow: hidden;
+    margin: 3px; }
+    .groundhogg-sidebar .expand-control .expand-icon {
       display: inline-block;
       width: 35px;
       color: #48515b;
       text-align: center; }
-    .groundhogg-sidebar .expand-control .nav-text {
-      margin-left: 5px;
-      font-size: 16px;
-      font-weight: 500;
-      color: #48515b; }
 
-.groundhogg-app {
-  overflow: hidden; }
+.gh-card {
+  border: 1px solid #e5e9ed;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: 0.2s; }
+  .gh-card:hover {
+    border-color: #b6babe;
+    transition: 0.2s; }
+
+.big-checkbox {
+  height: 20px;
+  width: 20px; }
+
+.groundhogg-top-bar {
+  height: 55px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  border-bottom: 1px solid #e5e9ed;
+  background-color: #fff;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between; }
+  .groundhogg-top-bar .logo .big-g,
+  .groundhogg-top-bar .logo .logo-black {
+    height: 35px;
+    margin: 10px; }
+
+.page-content {
+  padding-top: 55px; }
+  .page-content.collapsed {
+    margin-left: 55px;
+    transition: 0.2s; }
+  .page-content.expanded {
+    margin-left: 200px;
+    transition: 0.2s; }
+  .page-content header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between; }
+    .page-content header.with-padding {
+      padding: 15px 20px; }
+    .page-content header h2 {
+      font-weight: 400; }
+  .page-content .page-with-padding {
+    padding: 15px 20px; }
+
+.getting-started {
+  display: flex;
+  flex-direction: column; }
+  .getting-started .welcome-message {
+    padding: 40px 0 20px 0;
+    margin: auto; }
+  .getting-started .welcome-section {
+    max-width: 1000px;
+    width: 100%;
+    margin: auto;
+    margin-bottom: 30px; }
+  .getting-started .welcome-nav {
+    width: 100%; }
+    .getting-started .welcome-nav ul {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: space-between; }
+      .getting-started .welcome-nav ul li {
+        margin: 3px;
+        padding: 8px 12px;
+        border-radius: 5px;
+        transition: 0.2s;
+        background-color: rgba(235, 131, 26, 0.05); }
+        .getting-started .welcome-nav ul li:hover {
+          background-color: rgba(219, 116, 26, 0.1);
+          transition: 0.2s; }
+        .getting-started .welcome-nav ul li a {
+          color: #bf6b15;
+          text-decoration: none; }
+  .getting-started .courses {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between; }
+    .getting-started .courses .course-card:not(:last-child) {
+      margin-right: 20px; }
+    .getting-started .courses .course-details {
+      opacity: 0.7; }
+    .getting-started .courses .card-text {
+      padding: 20px; }
+    .getting-started .courses .course-image {
+      width: 100%; }
+  .getting-started .welcome-videos {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between; }
+    .getting-started .welcome-videos .video-card {
+      border: 1px solid #e5e9ed;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: 0.2s; }
+      .getting-started .welcome-videos .video-card:hover {
+        border-color: #b6babe;
+        transition: 0.2s; }
+      .getting-started .welcome-videos .video-card .vid-img {
+        width: 100%; }
+      .getting-started .welcome-videos .video-card .card-text {
+        padding: 20px; }
+        .getting-started .welcome-videos .video-card .card-text h3 {
+          font-size: 20px;
+          text-align: center; }
+        .getting-started .welcome-videos .video-card .card-text p {
+          margin: 0;
+          font-size: 16px;
+          text-align: center; }
+      .getting-started .welcome-videos .video-card:not(:last-child) {
+        margin-right: 20px; }
+
+.icon-button.icon-only {
+  background: transparent;
+  border: transparent; }
+  .icon-button.icon-only:hover {
+    background: #f8f9fa; }
+
+@-webkit-keyframes moving-gradient {
+  0% {
+    background-position: -250px 0; }
+  100% {
+    background-position: 250px 0; } }
+
+table.list-table thead th {
+  position: -webkit-sticky;
+  position: sticky;
+  background: white;
+  top: 54px;
+  z-index: 2;
+  box-shadow: 0 2px 0 #dee2e6;
+  border-bottom: none; }
+
+table.list-table td.loading-animation div {
+  height: 30px;
+  background: linear-gradient(to right, #eee 20%, #ddd 50%, #eee 80%);
+  background-size: 500px 100px;
+  animation-name: moving-gradient;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards; }
+
+.contacts .list-table td:first-child, .contacts .list-table th:first-child {
+  vertical-align: middle; }
+
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; }
+  .video-container .video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0; }
 

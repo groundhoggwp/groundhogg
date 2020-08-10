@@ -1,0 +1,11 @@
+@import "../../colors";
+
+.contacts {
+  .list-table {
+    td, th {
+      &:first-child {
+        vertical-align: middle;
+      }
+    }
+  }
+}

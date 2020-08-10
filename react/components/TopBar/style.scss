@@ -1,0 +1,27 @@
+@import "../../colors";
+
+.groundhogg-top-bar {
+  height: 55px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  border-bottom: 1px solid $border-color;
+  background-color: #fff;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  .logo{
+
+    //background-color: #212529;
+
+    .big-g,
+    .logo-black{
+      height: 35px;
+      margin: 10px;
+    }
+
+  }
+}

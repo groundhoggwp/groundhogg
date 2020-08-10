@@ -1,0 +1,17 @@
+@import "../../colors";
+
+.icon-button{
+
+  &.icon-only {
+
+    background: transparent;
+    border: transparent;
+
+    &:hover{
+      background: $background-color;
+    }
+
+  }
+
+}
+

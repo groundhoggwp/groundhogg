@@ -842,7 +842,8 @@ class Contact extends Base_Object_With_Meta {
 				'data'  => $contact,
 				'meta'  => $this->get_meta(),
 				'tags'  => $this->get_tags(),
-				'files' => $this->get_files()
+				'files' => $this->get_files(),
+				'user'  => $this->user
 			]
 		);
 	}

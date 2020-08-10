@@ -318,6 +318,22 @@ class Contact_Query {
 	}
 
 	/**
+	 * Auto set count vars
+	 *
+	 * @param $query
+	 *
+	 * @return array|int
+	 */
+	public function count( $query ) {
+
+		$query['count']  = true;
+		$query['offset'] = 0;
+		$query['number'] = - 1;
+
+		return $this->query( $query );
+	}
+
+	/**
 	 * Set the date key
 	 *
 	 * @param $key
@@ -334,6 +350,8 @@ class Contact_Query {
 	 */
 	protected function parse_query() {
 		$this->query_vars = wp_parse_args( $this->query_vars, $this->query_var_defaults );
+
+		$this->query_vars['number'] = absint( $this->query_vars['number'] );
 
 		if ( $this->query_vars['number'] < 1 ) {
 			$this->query_vars['number'] = false;

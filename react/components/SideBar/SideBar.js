@@ -15,11 +15,13 @@ const SideBar = ({ routes, status, expandSidebar, collapseSidebar }) => {
 
   return (
     <div className={ 'groundhogg-sidebar ' + status }>
-      <Nav routes={ routes }/>
-      <ExpandControl
-        onClick={toggleStatus}
-        status={status}
-      />
+      <div className={'sidebar-inner'}>
+        <ExpandControl
+          onClick={toggleStatus}
+          status={status}
+        />
+        <Nav routes={ routes }/>
+      </div>
     </div>
   )
 
@@ -37,25 +39,18 @@ const mapStateToProps = state => ({
 })
 
 const ExpandControl = ({onClick, status}) => {
+
+  const icon = status === 'collapsed' ? 'bars' : 'times'
+
   return (
     <div className={ 'expand-control' } onClick={onClick}>
-      { status === 'collapsed' ? <span className={ 'nav-icon' }>
-          <FaIcon
-            classes={ [
-              'arrow-circle-right'
-            ] }
-          />
-        </span> :
-        <><span className={ 'nav-icon' }>
-          <FaIcon
-            classes={ [
-              'arrow-circle-left'
-            ] }
-          />
-        </span>
-        <span className={ 'nav-text' }>
-          { 'Collapse' }
-        </span></> }
+      <span className={ 'expand-icon' }>
+        <FaIcon
+          classes={ [
+            icon
+          ] }
+        />
+      </span>
     </div>
   )
 }

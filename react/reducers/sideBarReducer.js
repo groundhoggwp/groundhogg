@@ -1,7 +1,7 @@
 import { EXPAND_SIDEBAR, COLLAPSE_SIDEBAR } from '../actions/types'
 
 const initialState = {
-  status: ''
+  status: 'collapsed'
 }
 
 export default function (state = initialState, action ) {

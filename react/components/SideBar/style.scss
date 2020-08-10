@@ -4,21 +4,29 @@
 .groundhogg-sidebar {
   margin: 0;
   padding: 0;
-  width: 150px;
+  width: 200px;
   background-color: #fff;
   position: fixed;
   float: left;
-  height: 100%;
+  height: calc( 100% - 55px );
+  top: 55px;
   overflow: auto;
   border-right: 1px solid $border-color;
   transition: 0.2s;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 
   &:not(.expanded) {
     transition: 0.2s;
     width: 55px;
 
-    .nav-text {
-      display: none;
+    .nav-item{
+      .nav-text {
+        opacity: 0;
+        visibility: hidden;
+      }
     }
   }
 
@@ -29,13 +37,21 @@
     text-decoration: none;
     white-space: nowrap;
     overflow: hidden;
+    margin: 3px;
+    border-radius: 5px;
 
     &.active{
       background-color: $background-color-active;
+      transition: 0.1s;
+
+      .nav-text{
+        font-weight: 500;
+      }
     }
 
     &:hover:not(.active){
       background-color: $background-color-hover;
+      transition: 0.1s;
     }
 
     .nav-icon {
@@ -48,29 +64,29 @@
     .nav-text {
       margin-left: 5px;
       font-size: 16px;
-      font-weight: 500;
+      font-weight: 400;
       color: $font-color;
+      visibility: visible;
+      opacity: 1;
+      transition-timing-function: ease-in-out;
     }
   }
 
   .expand-control{
-    position: absolute;
-    bottom: 0;
+    cursor: pointer;
+    padding: 7px;
+    font-size: 22px;
+    text-decoration: none;
     white-space: nowrap;
     overflow: hidden;
+    margin: 3px;
 
-    .nav-icon {
+    .expand-icon{
       display: inline-block;
       width: 35px;
       color: $font-color;
       text-align: center;
     }
 
-    .nav-text {
-      margin-left: 5px;
-      font-size: 16px;
-      font-weight: 500;
-      color: $font-color;
-    }
   }
 }

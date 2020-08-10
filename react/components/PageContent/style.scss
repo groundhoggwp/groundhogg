@@ -1,0 +1,37 @@
+@import "../../colors";
+
+.page-content{
+
+  padding-top: 55px;
+
+  &.collapsed{
+    margin-left: 55px;
+    transition: 0.2s;
+  }
+
+
+  &.expanded{
+    margin-left: 200px;
+    transition: 0.2s;
+  }
+
+  header {
+
+    &.with-padding{
+      padding: 15px 20px;
+    }
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    h2 {
+      font-weight: 400;
+    }
+  }
+
+  .page-with-padding {
+    padding: 15px 20px;
+  }
+
+}

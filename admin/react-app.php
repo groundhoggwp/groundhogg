@@ -4,6 +4,7 @@ namespace Groundhogg\Admin;
 
 use Groundhogg\Plugin;
 use function Groundhogg\get_url_var;
+use function Groundhogg\groundhogg_logo;
 
 class React_App {
 
@@ -13,11 +14,14 @@ class React_App {
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_nonces' ] );
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_ajax_url' ] );
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_rest_base' ] );
+		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_assets' ] );
+		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_userdata' ] );
+//		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_api_endpoints' ] );
 	}
 
 	public function maybe_render() {
 
-		if ( get_url_var( 'page' !== 'groundhogg' ) ) {
+		if ( get_url_var( 'page' ) !== 'groundhogg' ) {
 			return;
 		}
 
@@ -81,7 +85,7 @@ class React_App {
 		?>
         </body>
 		<?php do_action( 'groundhogg_footer' ); ?>
-        <?php wp_print_scripts( 'groundhogg-react' ) ?>
+		<?php wp_print_scripts( 'groundhogg-react' ) ?>
         </html>
 		<?php
 	}
@@ -129,6 +133,60 @@ class React_App {
 	public function register_ajax_url( $obj ) {
 
 		$obj['ajax_url'] = admin_url( 'admin-ajax.php' );
+
+		return $obj;
+	}
+
+	/**
+	 * Make the rest API base accessible
+	 *
+	 * @param $obj
+	 *
+	 * @return mixed
+	 */
+	public function register_assets( $obj ) {
+
+		$obj['assets'] = [
+			'bigG'      => GROUNDHOGG_ASSETS_URL . '/images/big-g.png',
+			'logoBlack' => GROUNDHOGG_ASSETS_URL . '/images/logo-black-1000x182.png',
+			'welcome'   => [
+				'import'    => GROUNDHOGG_ASSETS_URL . 'images/welcome/import-your-contact-list-with-groundhogg.png',
+				'funnel'    => GROUNDHOGG_ASSETS_URL . 'images/welcome/create-your-first-funnel-with-groundhogg.png',
+				'broadcast' => GROUNDHOGG_ASSETS_URL . 'images/welcome/send-your-first-broadcast-with-groundhogg.png',
+				'cron'      => GROUNDHOGG_ASSETS_URL . 'images/welcome/correctly-configure-wp-cron-for-groundhogg.png',
+				'course'      => GROUNDHOGG_ASSETS_URL . 'images/welcome/official-quickstart-course-for-groundhogg.png',
+			],
+		];
+
+		return $obj;
+	}
+
+	/**
+	 * Make the rest API base accessible
+	 *
+	 * @param $obj
+	 *
+	 * @return mixed
+	 */
+	public function register_api_endpoints( $obj ) {
+
+		$obj['api'] = [
+			''
+		];
+
+		return $obj;
+	}
+
+	/**
+	 * Make the rest API base accessible
+	 *
+	 * @param $obj
+	 *
+	 * @return mixed
+	 */
+	public function register_userdata( $obj ) {
+
+		$obj['user'] = wp_get_current_user();
 
 		return $obj;
 	}
