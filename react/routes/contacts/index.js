@@ -113,9 +113,11 @@ const ContactsList = ({ fetching, query, contacts, error, fetchContacts, resetQu
   }
 
   useEffect(() => {
-    clearItems()
-    resetQuery()
     fetchContacts()
+    return () => {
+      clearItems()
+      resetQuery()
+    }
   }, [])
 
   return (
