@@ -106,7 +106,8 @@
       margin-right: 10px; }
     .groundhogg-top-bar .search-and-quick-add .quick-search,
     .groundhogg-top-bar .topbar-actions .quick-search {
-      position: relative; }
+      position: relative;
+      min-width: 500px; }
       .groundhogg-top-bar .search-and-quick-add .quick-search input[type="search"],
       .groundhogg-top-bar .topbar-actions .quick-search input[type="search"] {
         padding-left: 42px; }

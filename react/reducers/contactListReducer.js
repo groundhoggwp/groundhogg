@@ -6,11 +6,12 @@ import {
   FETCH_MORE_CONTACTS_SUCCESS,
   CLEAR_ITEMS,
   CHANGE_CONTEXT,
-  CLEAR_STATE,
+  CLEAR_STATE, SHOW_CONTACT_FILTERS,
 } from '../actions/types'
 
 const initialState = {
   fetching: false,
+  showFilters: false,
   total: 0,
   context: {},
   query: {
@@ -80,6 +81,11 @@ export default function (state = initialState, action ) {
       return {
         ...state,
         data: [],
+      }
+    case SHOW_CONTACT_FILTERS:
+      return {
+        ...state,
+        showFilters: true
       }
     default:
       return state;

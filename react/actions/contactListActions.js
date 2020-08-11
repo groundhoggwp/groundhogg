@@ -3,7 +3,7 @@ import {
   FETCH_CONTACTS_FAILED,
   FETCH_CONTACTS_REQUEST,
   FETCH_CONTACTS_SUCCESS,
-  FETCH_MORE_CONTACTS_SUCCESS,
+  FETCH_MORE_CONTACTS_SUCCESS, SHOW_CONTACT_FILTERS,
 } from './types'
 import axios from 'axios'
 
@@ -67,6 +67,11 @@ export const clearState = () => (dispatch) => {
   })
 }
 
+export const showContactFilters = () => (dispatch) => {
+  dispatch({
+    type: SHOW_CONTACT_FILTERS,
+  })
+}
 
 export const resetQuery = () => (dispatch) => {
   dispatch(changeQuery({
