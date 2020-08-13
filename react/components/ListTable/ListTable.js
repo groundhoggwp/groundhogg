@@ -27,7 +27,7 @@ export const ListTable = ({
         <Table { ...tableProps } className={ 'list-table' }>
           <thead>
           <tr>
-            { columns.map(column => <ListTableTH { ...column } />) }
+            { columns.map((column,i) => <ListTableTH key={i} { ...column } />) }
           </tr>
           </thead>
           <tbody>
@@ -35,18 +35,18 @@ export const ListTable = ({
 
             items.length > 0 ?
               items.map(
-                item => <ListTableItemRow item={ item } columns={ columns }/>)
+                (item,i) => <ListTableItemRow key={i} item={ item } columns={ columns }/>)
               : ! isLoading ? <ListTableRowEmpty
                 colSpan={columns.length}
                 noItems={noItems}
               /> : <></>
           }
           { isLoading &&
-          range(10).map(i => <ListTableRowLoading columns={ columns }/>) }
+          range(10).map(i => <ListTableRowLoading key={i} columns={ columns }/>) }
           </tbody>
           <tfoot>
           <tr>
-            { columns.map(column => <ListTableTH { ...column } />) }
+            { columns.map((column,i) => <ListTableTH key={i} { ...column } />) }
           </tr>
           </tfoot>
         </Table>
@@ -69,7 +69,7 @@ const ListTableTH = ({ id, name, sortable }) => {
 const ListTableRowLoading = ({ columns }) => {
   return (
     <tr className={ 'list-table-item-row' }>
-      { columns.map(column => <td className={ 'loading-animation' }>
+      { columns.map((column,i) => <td key={i} className={ 'loading-animation' }>
         <div></div>
       </td>) }
     </tr>
@@ -79,7 +79,7 @@ const ListTableRowLoading = ({ columns }) => {
 const ListTableItemRow = ({ item, columns }) => {
   return (
     <tr className={ 'list-table-item-row' }>
-      { columns.map(column => <td>
+      { columns.map((column,i) => <td key={i} >
         <column.render item={ item }/>
       </td>) }
     </tr>

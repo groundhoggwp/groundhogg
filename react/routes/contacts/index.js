@@ -7,7 +7,8 @@ import {
   fetchMoreContacts,
   changeContext,
   resetQuery,
-  updateQuery, clearState,
+  updateQuery,
+  clearState,
 } from '../../actions/contactListActions'
 import { ListTable } from '../../components/ListTable/ListTable'
 import { FaIcon, TagPicker } from '../../components/basic-components'
@@ -16,6 +17,11 @@ import moment from 'moment'
 import Select from 'react-select'
 import './style.scss'
 import { number_format } from '../../functions'
+import {
+  deselectAllItems, deselectItem, deselectSomeItems,
+  selectAllItems, selectItem, selectSomeItems, shiftKeyDown, shiftKeyUp,
+} from '../../actions/selectionActions'
+import { useKeyDown, useKeyPress, useKeyUp } from '../../hooks'
 
 const optinStatusMap = {
   1: <Badge variant={ 'secondary' }>{ 'Unconfirmed' }</Badge>,
@@ -54,22 +60,85 @@ const orderFilters = [
   { value: 'DESC', label: 'DESC' },
 ]
 
+const SelectAllCheckbox = ({ allSelected, selectAllItems, deselectAllItems }) => {
+
+  const handleChange = (e) => {
+    e.target.checked ? selectAllItems() : deselectAllItems()
+  }
+
+  return (
+    <input
+      type={ 'checkbox' }
+      className={ 'big-checkbox' }
+      checked={ allSelected }
+      onChange={ handleChange }
+    />
+  )
+}
+
+const ConnectedSelectAllCheckbox = connect(
+  state => ( { allSelected: state.itemSelection.allSelected } ),
+  { selectAllItems, deselectAllItems })(SelectAllCheckbox)
+
+const SelectItemCheckbox = ({
+  item,
+  allItems,
+  isShiftKeyDown,
+  lastSelected,
+  allSelected,
+  selectedItems,
+  selectItem,
+  deselectItem,
+  selectSomeItems,
+  deselectSomeItems,
+}) => {
+
+  const handleChange = (e) => {
+
+    if (isShiftKeyDown && lastSelected) {
+      let end = allItems.indexOf(item)
+      let start = allItems.indexOf(lastSelected)
+      let selection = allItems.slice(Math.min(start, end),
+        Math.max(start, end) + 1)
+      console.log({ selection })
+      e.target.checked ?
+        selectSomeItems(selection, item) :
+        deselectSomeItems(selection, item)
+    }
+    else {
+      e.target.checked ? selectItem(item) : deselectItem(item)
+    }
+  }
+
+  return (
+    <input
+      type={ 'checkbox' }
+      className={ 'big-checkbox' }
+      checked={ selectedItems.includes(item) || allSelected }
+      onChange={ handleChange }
+    />
+  )
+}
+
+const ConnectedSelectItemCheckbox = connect(state => ( {
+  allSelected: state.itemSelection.allSelected,
+  selectedItems: state.itemSelection.selected,
+  lastSelected: state.itemSelection.lastSelection,
+  isShiftKeyDown: state.itemSelection.isShiftKeyDown,
+  allItems: state.contactList.data.map(item => parseInt(item.ID)),
+} ), {
+  selectItem,
+  deselectItem,
+  selectSomeItems,
+  deselectSomeItems,
+})(SelectItemCheckbox)
+
 const columns = [
   {
     id: 'id',
-    name: <input
-      type={ 'checkbox' }
-      className={ 'big-checkbox' }
-      name={ 'ID[]' }
-      readOnly={ true }
-    />,
+    name: <ConnectedSelectAllCheckbox/>,
     render: ({ item }) => {
-      return <input
-        type={ 'checkbox' }
-        className={ 'big-checkbox' }
-        name={ 'ID[' + item.ID + ']' }
-        readOnly={ true }
-      />
+      return <ConnectedSelectItemCheckbox item={ parseInt(item.ID) }/>
     },
   },
   {
@@ -161,7 +230,11 @@ const ContactsList = ({
   fetchMoreContacts,
   updateQuery,
   clearItems,
+  shiftKeyUp,
+  shiftKeyDown,
 }) => {
+
+  const shiftPressed = useKeyPress(16, shiftKeyDown, shiftKeyUp)
 
   let timer = useRef(null)
 
@@ -312,8 +385,9 @@ const ConnectedContactsList = connect(mapStateToProps,
     clearItems,
     changeContext,
     clearState,
-  })(
-  ContactsList)
+    shiftKeyUp,
+    shiftKeyDown,
+  })(ContactsList)
 
 export default {
   path: '/contacts',

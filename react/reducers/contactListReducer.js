@@ -6,7 +6,11 @@ import {
   FETCH_MORE_CONTACTS_SUCCESS,
   CLEAR_ITEMS,
   CHANGE_CONTEXT,
-  CLEAR_STATE, SHOW_CONTACT_FILTERS,
+  CLEAR_STATE,
+  SHOW_CONTACT_FILTERS,
+  SELECT_ALL_ITEMS,
+  SELECT_ITEM,
+  SELECT_SOME_ITEMS
 } from '../actions/types'
 
 const initialState = {
@@ -14,6 +18,7 @@ const initialState = {
   showFilters: false,
   total: 0,
   context: {},
+  selected: [],
   query: {
     number: 20,
     offset: 0,
