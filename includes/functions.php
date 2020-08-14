@@ -3312,3 +3312,14 @@ function contact_action( $contact = 0, $hook = 'created' ) {
 
 	return true;
 }
+
+/**
+ * Whether the content has replacements in it.
+ *
+ * @param $content
+ *
+ * @return false|int
+ */
+function has_replacements( $content ){
+    return preg_match( '/{([^{}]+)}/', $content );
+}

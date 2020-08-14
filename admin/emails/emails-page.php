@@ -7,6 +7,7 @@ use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Email;
 use Groundhogg\Plugin;
 use function Groundhogg\get_url_var;
+use function Groundhogg\has_replacements;
 use function Groundhogg\managed_page_url;
 use function Groundhogg\set_user_test_email;
 
@@ -21,12 +22,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Allow the user to view & edit the emails
  * Contains add, save, delete, etc for the admin functions...
  *
- * @package     Admin
+ * @since       File available since Release 0.1
  * @subpackage  Admin/Emails
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Admin
  */
 class Emails_Page extends Admin_Page {
 
@@ -396,9 +397,9 @@ class Emails_Page extends Admin_Page {
 						case 'from':
 							// If only the email is provided
 							if ( is_email( $header_value ) ) {
-								$headers[ $header_key ] = sanitize_email( $header_value );
+								$headers[ $header_key ] = has_replacements( $header_value ) ? sanitize_text_field( $header_value ) : sanitize_email( $header_value );
 							} else if ( preg_match( '/([^<]+) <([^>]+)>/', $header_value, $matches ) ) {
-								$email_address          = sanitize_email( $matches[2] );
+								$email_address          = has_replacements( $matches[2] ) ? sanitize_text_field($matches[2]) : sanitize_email( $matches[2] );
 								$name                   = sanitize_text_field( $matches[1] );
 								$headers[ $header_key ] = sprintf( '%s <%s>', $name, $email_address );
 							} else {
@@ -411,7 +412,13 @@ class Emails_Page extends Admin_Page {
 						case 'reply-to':
 							$emails                 = explode( ',', $header_value );
 							$emails                 = map_deep( $emails, 'trim' );
-							$emails                 = map_deep( $emails, 'sanitize_email' );
+							$emails                 = map_deep( $emails, function ( $email ) {
+								if ( has_replacements( $email ) ) {
+									return sanitize_text_field( $email );
+								} else {
+									return sanitize_email( $email );
+								}
+							} );
 							$emails                 = implode( ',', array_filter( $emails ) );
 							$headers[ $header_key ] = $emails;
 							break;

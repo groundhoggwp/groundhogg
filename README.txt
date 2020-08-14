@@ -177,6 +177,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.18.3 (2020-08-14) =
+* ADDED new function `has_replacements()` to check if specific content has Groundhogg replacement codes.
+* TWEAKED Custom email headers in simple editor now support replacement codes for the CC, BCC, and FROM email headers.
+* FIXED Advanced email preferences extension had invalid ID causing inability to install remotely.
+
 = 2.2.18.2 (2020-07-27) =
 * FIXED DB error while importing contacts causing import to fail in some cases.
 
