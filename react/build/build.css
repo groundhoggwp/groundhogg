@@ -125,7 +125,8 @@
         z-index: 1003; }
 
 .page-content {
-  padding-top: 63px; }
+  padding-top: 63px;
+  position: relative; }
   .page-content.collapsed {
     margin-left: 55px;
     transition: 0.2s; }
@@ -198,6 +199,11 @@ table.list-table td.loading-animation div {
   animation-timing-function: linear;
   animation-fill-mode: forwards; }
 
+.contact-bulk-actions .total-selected {
+  font-weight: bold;
+  color: #DB741A;
+  font-size: 42px; }
+
 .contacts .list-table td, .contacts .list-table th {
   vertical-align: middle; }
 
@@ -247,6 +253,37 @@ table.list-table td.loading-animation div {
         text-rendering: auto;
         -webkit-font-smoothing: antialiased;
         content: "\f002"; }
+
+.groundhogg-bottom-bar {
+  min-height: 55px;
+  padding: 12px;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  border-top: 1px solid #e5e9ed;
+  background-color: #fff;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  z-index: 1001;
+  box-shadow: 0 -1px 6px #e5e5e5; }
+  .groundhogg-bottom-bar.sidebar-expanded {
+    left: 200px; }
+  .groundhogg-bottom-bar.sidebar-collapsed {
+    left: 55px; }
+
+.bottomBar-enter {
+  opacity: 0; }
+  .bottomBar-enter .bottomBar-enter-active {
+    opacity: 1;
+    transition: opacity 5s ease-in; }
+
+.bottomBar-leave {
+  bottom: 0; }
+  .bottomBar-leave .bottomBar-leave-active {
+    bottom: -100px;
+    transition: 0.2s ease-in-out; }
 
 .video-container {
   position: relative;

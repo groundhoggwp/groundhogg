@@ -1,0 +1,47 @@
+@import "../../colors";
+@import "../../sizes";
+
+.groundhogg-bottom-bar {
+  min-height: 55px;
+  padding: 12px;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  border-top: 1px solid $border-color;
+  background-color: #fff;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 1001;
+
+  box-shadow: 0 -1px 6px #e5e5e5;
+
+  &.sidebar-expanded {
+    left: $sidebar-width-expanded;
+  }
+
+  &.sidebar-collapsed {
+    left: $sidebar-width-collapsed;
+  }
+}
+
+.bottomBar-enter {
+  opacity: 0;
+
+  .bottomBar-enter-active {
+    opacity: 1;
+    transition: opacity 5s ease-in;
+  }
+}
+
+.bottomBar-leave {
+  bottom: 0;
+
+  .bottomBar-leave-active {
+    bottom: -100px;
+    transition: 0.2s ease-in-out;
+  }
+}

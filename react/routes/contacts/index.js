@@ -21,7 +21,8 @@ import {
   deselectAllItems, deselectItem, deselectSomeItems,
   selectAllItems, selectItem, selectSomeItems, shiftKeyDown, shiftKeyUp,
 } from '../../actions/selectionActions'
-import { useKeyDown, useKeyPress, useKeyUp } from '../../hooks'
+import { useKeyPress } from '../../hooks'
+import BulkActionBar from './BulkActionBar'
 
 const optinStatusMap = {
   1: <Badge variant={ 'secondary' }>{ 'Unconfirmed' }</Badge>,
@@ -232,9 +233,11 @@ const ContactsList = ({
   clearItems,
   shiftKeyUp,
   shiftKeyDown,
+  selectedItems,
+  allSelected,
 }) => {
 
-  const shiftPressed = useKeyPress(16, shiftKeyDown, shiftKeyUp)
+  useKeyPress(16, shiftKeyDown, shiftKeyUp)
 
   let timer = useRef(null)
 
@@ -363,6 +366,7 @@ const ContactsList = ({
         fetchData={ loadMoreContacts }
         noItems={ 'No contacts...' }
       />
+      <BulkActionBar/>
     </div>
   )
 }
@@ -374,6 +378,8 @@ const mapStateToProps = state => ( {
   error: state.contactList.error,
   context: state.contactList.context,
   totalContacts: state.contactList.total,
+  allSelected: state.itemSelection.allSelected,
+  selectedItems: state.itemSelection.selected,
 } )
 
 const ConnectedContactsList = connect(mapStateToProps,

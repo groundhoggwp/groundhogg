@@ -1,17 +1,18 @@
 @import "../../colors";
+@import "../../sizes";
 
 .page-content{
 
   padding-top: 63px;
+  position: relative;
 
   &.collapsed{
-    margin-left: 55px;
+    margin-left: $sidebar-width-collapsed;
     transition: 0.2s;
   }
 
-
   &.expanded{
-    margin-left: 200px;
+    margin-left: $sidebar-width-expanded;
     transition: 0.2s;
   }
 

@@ -1,5 +1,13 @@
 @import "../../colors";
 
+.contact-bulk-actions{
+  .total-selected{
+    font-weight: bold;
+    color: $groundhogg;
+    font-size: 42px;
+  }
+}
+
 .contacts {
   .list-table {
     td, th {

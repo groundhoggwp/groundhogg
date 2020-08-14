@@ -26,9 +26,9 @@ const VideoModal = ({ src, title, show, closeVideoModal }) => {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <div className={'video-container'}>
+        <div className={'embed-responsive embed-responsive-16by9'}>
           <iframe
-            className={'video'}
+            className={'embed-responsive-item'}
             src={src} frameBorder="0"
             allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen/>
