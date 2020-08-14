@@ -200,9 +200,14 @@ table.list-table td.loading-animation div {
   animation-fill-mode: forwards; }
 
 .contact-bulk-actions .total-selected {
-  font-weight: bold;
-  color: #DB741A;
-  font-size: 42px; }
+  margin-right: 30px; }
+  .contact-bulk-actions .total-selected .num {
+    font-weight: bold;
+    color: #DB741A;
+    font-size: 24px; }
+
+.contact-bulk-actions .actions .btn:not(:last-child) {
+  margin-right: 10px; }
 
 .contacts .list-table td, .contacts .list-table th {
   vertical-align: middle; }
@@ -256,7 +261,7 @@ table.list-table td.loading-animation div {
 
 .groundhogg-bottom-bar {
   min-height: 55px;
-  padding: 12px;
+  padding: 25px 12px;
   position: fixed;
   right: 0;
   bottom: 0;
@@ -274,16 +279,16 @@ table.list-table td.loading-animation div {
     left: 55px; }
 
 .bottomBar-enter {
-  opacity: 0; }
-  .bottomBar-enter .bottomBar-enter-active {
-    opacity: 1;
-    transition: opacity 5s ease-in; }
+  bottom: -100px; }
+  .bottomBar-enter.bottomBar-enter-active {
+    bottom: 0;
+    transition: bottom 0.75s ease-out; }
 
 .bottomBar-leave {
   bottom: 0; }
-  .bottomBar-leave .bottomBar-leave-active {
+  .bottomBar-leave.bottomBar-leave-active {
     bottom: -100px;
-    transition: 0.2s ease-in-out; }
+    transition: 0.5s ease-in-out; }
 
 .video-container {
   position: relative;

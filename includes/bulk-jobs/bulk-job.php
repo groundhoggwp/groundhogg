@@ -4,6 +4,7 @@ namespace Groundhogg\Bulk_Jobs;
 
 // Exit if accessed directly
 use function Groundhogg\_nf;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_post_var;
 use Groundhogg\Plugin;
 use function Groundhogg\isset_not_empty;
@@ -32,6 +33,10 @@ abstract class Bulk_Job {
 	 */
 	protected $skipped = 0;
 
+	protected static $is_rest = false;
+
+	protected $rest_args = null;
+
 	/**
 	 * WPGH_Bulk_Jon constructor.
 	 */
@@ -39,6 +44,39 @@ abstract class Bulk_Job {
 		add_filter( "groundhogg/bulk_job/{$this->get_action()}/max_items", [ $this, 'max_items' ], 10, 2 );
 		add_filter( "groundhogg/bulk_job/{$this->get_action()}/query", [ $this, 'query' ] );
 		add_action( "groundhogg/bulk_job/{$this->get_action()}/ajax", [ $this, 'process' ] );
+
+		add_action( "groundhogg/bulk_job/{$this->get_action()}/rest", [ $this, 'rest_handler' ], 10, 3 );
+	}
+
+	protected static function is_rest() {
+		return self::$is_rest;
+	}
+
+	/**
+	 * @param $items
+	 * @param $the_end
+	 * @param $context
+	 */
+	public function rest_handler( $items, $the_end, $context ) {
+		self::$is_rest = true;
+
+		$this->rest_args = [
+			'items'   => $items,
+			'the_end' => $the_end,
+			'context' => $context,
+		];
+
+		$this->process();
+	}
+
+	/**
+	 * @param $key
+	 * @param $default
+	 *
+	 * @return mixed
+	 */
+	protected function get_rest_param( $key, $default ) {
+		return $key ? get_array_var( $this->rest_args, $key, $default ) : $default;
 	}
 
 	/**
@@ -103,7 +141,7 @@ abstract class Bulk_Job {
 	 * @return mixed
 	 */
 	public function is_then_end() {
-		$the_end = get_post_var( 'the_end', false );
+		$the_end = self::is_rest() ? $this->get_rest_param( 'the_end', false ) : get_post_var( 'the_end', false );
 
 		return filter_var( $the_end, FILTER_VALIDATE_BOOLEAN );
 	}
@@ -124,7 +162,7 @@ abstract class Bulk_Job {
 
 		$start = microtime( true );
 
-		if ( ! key_exists( 'the_end', $_POST ) ) {
+		if ( ! key_exists( 'the_end', $_POST ) && ! key_exists( 'the_end', $this->rest_args ) ) {
 
 			$error = new \WP_Error(
 				'error',
@@ -189,7 +227,9 @@ abstract class Bulk_Job {
 	 * @return array
 	 */
 	public function get_items() {
-		return isset_not_empty( $_POST, 'items' ) ? $_POST['items'] : [];
+		return self::is_rest() ?
+			$this->get_rest_param( 'items', [] ) :
+			isset_not_empty( $_POST, 'items' ) ? $_POST['items'] : [];
 	}
 
 	/**

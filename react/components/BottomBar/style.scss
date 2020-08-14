@@ -3,7 +3,7 @@
 
 .groundhogg-bottom-bar {
   min-height: 55px;
-  padding: 12px;
+  padding: 25px 12px;
   position: fixed;
   right: 0;
   bottom: 0;
@@ -29,19 +29,19 @@
 }
 
 .bottomBar-enter {
-  opacity: 0;
+  bottom: -100px;
 
-  .bottomBar-enter-active {
-    opacity: 1;
-    transition: opacity 5s ease-in;
+  &.bottomBar-enter-active {
+    bottom: 0;
+    transition: bottom 0.75s ease-out;
   }
 }
 
 .bottomBar-leave {
   bottom: 0;
 
-  .bottomBar-leave-active {
+  &.bottomBar-leave-active {
     bottom: -100px;
-    transition: 0.2s ease-in-out;
+    transition: 0.5s ease-in-out;
   }
 }

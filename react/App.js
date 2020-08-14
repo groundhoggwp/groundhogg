@@ -11,6 +11,7 @@ import PageContent from './components/PageContent/PageContent'
 import routes from './routes/routes'
 import VideoModal from './components/VideoModal/VideoModal'
 import * as Qs from 'qs'
+import BulkJob from './components/BulkJob/BulkJob'
 
 axios.defaults.headers.common['X-WP-Nonce'] = groundhogg.nonces._wprest
 
@@ -51,6 +52,7 @@ export function App () {
         </HashRouter>
       </div>
       <VideoModal/>
+      <BulkJob/>
     </Provider>
   )
 }

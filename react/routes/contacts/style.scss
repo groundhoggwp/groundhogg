@@ -1,10 +1,23 @@
 @import "../../colors";
 
 .contact-bulk-actions{
-  .total-selected{
-    font-weight: bold;
-    color: $groundhogg;
-    font-size: 42px;
+  .total-selected {
+
+    margin-right: 30px;
+
+    .num{
+      font-weight: bold;
+      color: $groundhogg;
+      font-size: 24px;
+    }
+  }
+
+  .actions{
+    .btn{
+      &:not(:last-child){
+        margin-right: 10px;
+      }
+    }
   }
 }
 
