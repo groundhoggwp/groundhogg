@@ -13,6 +13,7 @@ const initialState = {
   actionName: '',
   numComplete: 0,
   numRemaining: 0,
+  numItemsPerRequest: 10,
   context: {},
   lastResponse: null,
   error: null,

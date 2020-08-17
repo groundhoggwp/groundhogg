@@ -35,7 +35,7 @@ abstract class Bulk_Job {
 
 	protected static $is_rest = false;
 
-	protected $rest_args = null;
+	protected $rest_args = [];
 
 	/**
 	 * WPGH_Bulk_Jon constructor.
@@ -52,13 +52,18 @@ abstract class Bulk_Job {
 		return self::$is_rest;
 	}
 
+	protected static function set_is_rest( $is_rest ){
+		return self::$is_rest = $is_rest;
+	}
+
 	/**
 	 * @param $items
 	 * @param $the_end
 	 * @param $context
 	 */
 	public function rest_handler( $items, $the_end, $context ) {
-		self::$is_rest = true;
+
+		self::set_is_rest( true );
 
 		$this->rest_args = [
 			'items'   => $items,
@@ -75,8 +80,8 @@ abstract class Bulk_Job {
 	 *
 	 * @return mixed
 	 */
-	protected function get_rest_param( $key, $default ) {
-		return $key ? get_array_var( $this->rest_args, $key, $default ) : $default;
+	protected function get_rest_param( $key='', $default=false ) {
+		return get_array_var( $this->rest_args, $key, $default );
 	}
 
 	/**
@@ -140,7 +145,7 @@ abstract class Bulk_Job {
 	 *
 	 * @return mixed
 	 */
-	public function is_then_end() {
+	public function is_the_end() {
 		$the_end = self::is_rest() ? $this->get_rest_param( 'the_end', false ) : get_post_var( 'the_end', false );
 
 		return filter_var( $the_end, FILTER_VALIDATE_BOOLEAN );
@@ -206,9 +211,7 @@ abstract class Bulk_Job {
 			'output'      => $output,
 		];
 
-		$the_end = get_post_var( 'the_end', false );
-
-		if ( filter_var( $the_end, FILTER_VALIDATE_BOOLEAN ) ) {
+		if ( $this->is_the_end() ) {
 
 			$this->clean_up();
 
@@ -228,8 +231,8 @@ abstract class Bulk_Job {
 	 */
 	public function get_items() {
 		return self::is_rest() ?
-			$this->get_rest_param( 'items', [] ) :
-			isset_not_empty( $_POST, 'items' ) ? $_POST['items'] : [];
+			get_array_var( $this->rest_args, 'items' ) :
+			get_post_var( 'items', [] );
 	}
 
 	/**

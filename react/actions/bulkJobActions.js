@@ -4,7 +4,6 @@ import {
   BULK_JOB_PROCESSED_ITEMS,
 } from './types'
 import axios from 'axios'
-import { parseArgs } from '../functions'
 
 const {
   rest_base
@@ -29,10 +28,12 @@ export const bulkJobProcessItems = () => (dispatch, getState) => {
     onError
   } = getState().bulkJob
 
-  console.debug( getState().bulkJob )
+  // console.debug( getState().bulkJob )
 
   const sendRequest = () => {
     let itemsToComplete = items.splice(0, numItemsPerRequest)
+
+    console.debug( items, itemsToComplete )
 
     axios.post(rest_base + '/bulkjob/' + action, {
       items: itemsToComplete,

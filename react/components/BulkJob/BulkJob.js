@@ -10,7 +10,7 @@ const BulkJob = ({
   show,
   start,
   numRemaining,
-  numCompleted,
+  numComplete,
   actionName,
   bulkJobProcessItems
 }) => {
@@ -21,7 +21,7 @@ const BulkJob = ({
     }
   }, [start])
 
-  const totalItems = numRemaining + numCompleted;
+  const totalItems = numRemaining + numComplete;
 
   return (
 
@@ -38,9 +38,9 @@ const BulkJob = ({
       <Modal.Body>
         <ProgressBar
           animated
-          now={ (  numCompleted / totalItems ) * 100 }
+          now={ (  numComplete / totalItems ) * 100 }
           variant={ 'success' }/>
-        <p>Complete: { numCompleted }</p>
+        <p>Complete: { numComplete }</p>
         <p>Remaining: { numRemaining }</p>
         <Alert variant={ 'warning' }>
           <Alert.Heading>
@@ -59,8 +59,9 @@ export default connect( state => ({
   show: state.bulkJob.show,
   start: state.bulkJob.start,
   numRemaining: state.bulkJob.numRemaining,
-  numCompleted: state.bulkJob.numCompleted,
+  numComplete: state.bulkJob.numComplete,
   actionName: state.bulkJob.actionName,
 }), {
-  bulkJobProcessItems
+  bulkJobProcessItems,
+
 } )(BulkJob)

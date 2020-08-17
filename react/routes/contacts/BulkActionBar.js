@@ -5,22 +5,33 @@ import { number_format } from '../../functions'
 import Button from 'react-bootstrap/Button'
 import { bulkJobInit } from '../../actions/bulkJobActions'
 
-const BulkActionBar = ({ totalContacts, itemsSelected, allSelected, bulkJobInit }) => {
+const BulkActionBar = ({
+  totalContacts,
+  itemsSelected,
+  allSelected,
+  bulkJobInit,
+  fetchContacts
+}) => {
 
   const handleDelete = () => {
-    bulkJobInit( {
+    bulkJobInit({
       action: 'gh_delete_contacts',
       actionName: 'Delete contacts...',
       items: itemsSelected,
-    } )
+      onFinish: (result) => {
+
+      },
+    })
   }
 
   return (
     <BottomBar className={ 'contact-bulk-actions' }
                show={ itemsSelected.length > 0 || allSelected }>
       <div className={ 'total-selected' }>
-        <span className={'num'}>{ allSelected ? number_format(totalContacts) : number_format(
-          itemsSelected.length) }</span> { 'Contacts' }
+        <span className={ 'num' }>{ allSelected
+          ? number_format(totalContacts)
+          : number_format(
+            itemsSelected.length) }</span> { 'Contacts' }
       </div>
       <div className={ 'actions' }>
         <Button variant={ 'outline-secondary' }>
@@ -38,7 +49,7 @@ const BulkActionBar = ({ totalContacts, itemsSelected, allSelected, bulkJobInit 
         <Button variant={ 'outline-secondary' }>
           { 'Start Funnel' }
         </Button>
-        <Button onClick={handleDelete} variant={ 'outline-danger' }>
+        <Button onClick={ handleDelete } variant={ 'outline-danger' }>
           { 'Delete' }
         </Button>
       </div>
@@ -51,5 +62,5 @@ export default connect(state => ( {
   itemsSelected: state.itemSelection.selected,
   allSelected: state.itemSelection.allSelected,
 } ), {
-  bulkJobInit
+  bulkJobInit,
 })(BulkActionBar)
