@@ -13,11 +13,13 @@ const BottomBar = ({ show, expandedStatus, children, className }) => {
 
   return (
     <CSSTransitionGroup
-      transitionName={'bottomBar'}
-      transitionEnterTimeout={750}
-      transitionLeaveTimeout={500}
+      transitionName={ 'bottomBar' }
+      transitionEnterTimeout={ 750 }
+      transitionLeaveTimeout={ 500 }
+      className={ show && 'bottom-bar-wrap' }
+      component={ 'div' }
     >
-      { show && <div key={'groundhogg-bottom-bar'} className={ classes }>
+      { show && <div key={ 'groundhogg-bottom-bar' } className={ classes }>
         { children }
       </div> }
     </CSSTransitionGroup>

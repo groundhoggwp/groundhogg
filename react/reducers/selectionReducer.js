@@ -16,8 +16,6 @@ const initialState = {
 
 export default function (state = initialState, action) {
 
-  // console.debug({ prevState: state, action: action })
-
   switch (action.type) {
     case SELECT_ALL_ITEMS:
       return {
@@ -26,21 +24,15 @@ export default function (state = initialState, action) {
         lastSelection: null,
       }
     case SELECT_SOME_ITEMS:
-
-      console.debug( action )
-
       return {
         ...state,
         selected: [
           ...state.selected,
-          ...action.payload,
+          ...action.payload.filter( item => ! state.selected.includes( item ) ),
         ],
         lastSelection: action.selected,
       }
     case SELECT_ITEM:
-
-      console.debug( action )
-
       return {
         ...state,
         selected: [
@@ -57,9 +49,6 @@ export default function (state = initialState, action) {
         lastSelection: null,
       }
     case DESELECT_SOME_ITEMS:
-
-      console.debug( action )
-
       return {
         ...state,
         selected: state.selected.filter(

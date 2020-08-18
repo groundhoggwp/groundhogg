@@ -51,7 +51,19 @@ export const clearItems = () => (dispatch) => {
 }
 
 export const updateQuery = (queryVars) => (dispatch) => {
-  dispatch(changeQuery(queryVars))
+  dispatch({
+    type: CHANGE_QUERY,
+    payload: queryVars,
+  })
+}
+
+export const resetQuery = () => (dispatch) => {
+  dispatch(changeQuery({
+    number: 20,
+    offset: 0,
+    orderby: 'ID',
+    order: 'DESC',
+  }))
 }
 
 export const changeContext = (context) => (dispatch) => {
@@ -71,15 +83,6 @@ export const showContactFilters = () => (dispatch) => {
   dispatch({
     type: SHOW_CONTACT_FILTERS,
   })
-}
-
-export const resetQuery = () => (dispatch) => {
-  dispatch(changeQuery({
-    number: 20,
-    offset: 0,
-    orderby: 'ID',
-    order: 'DESC',
-  }))
 }
 
 export const fetchContacts = () => (dispatch, getState) => {

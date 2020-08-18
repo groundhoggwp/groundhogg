@@ -10,7 +10,6 @@ const {
 } = groundhogg;
 
 export const bulkJobInit = (init) => dispatch => {
-
   dispatch({
     type: BULK_JOB_INIT,
     payload: init,
@@ -20,37 +19,30 @@ export const bulkJobInit = (init) => dispatch => {
 export const bulkJobProcessItems = () => (dispatch, getState) => {
 
   const {
-    items,
-    context,
     action,
+    context,
     numItemsPerRequest,
     onFinish,
     onError
   } = getState().bulkJob
 
-  // console.debug( getState().bulkJob )
+  let itemsOffset = 0;
 
   const sendRequest = () => {
-    let itemsToComplete = items.splice(0, numItemsPerRequest)
-
-    console.debug( items, itemsToComplete )
 
     axios.post(rest_base + '/bulkjob/' + action, {
-      items: itemsToComplete,
-      the_end: items.length === 0,
+      items_per_request: numItemsPerRequest,
+      items_offset: itemsOffset,
       context: context,
     }).then(response => {
 
+      itemsOffset += numItemsPerRequest;
+
       dispatch({
         type: BULK_JOB_PROCESSED_ITEMS,
-        payload: {
-          lastResponse: response.data,
-          completed: itemsToComplete,
-          remaining: items,
-        },
       })
 
-      if ( items.length > 0 ){
+      if ( ! response.data.finished ){
         sendRequest();
       } else {
         dispatch({

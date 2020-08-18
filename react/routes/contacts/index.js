@@ -235,6 +235,7 @@ const ContactsList = ({
   shiftKeyDown,
   selectedItems,
   allSelected,
+  deselectAllItems
 }) => {
 
   useKeyPress(16, shiftKeyDown, shiftKeyUp)
@@ -263,6 +264,7 @@ const ContactsList = ({
     timer.current = setTimeout(() => {
       fetchContacts()
       clearItems()
+      deselectAllItems()
     }, 1000)
   }
 
@@ -393,6 +395,7 @@ const ConnectedContactsList = connect(mapStateToProps,
     clearState,
     shiftKeyUp,
     shiftKeyDown,
+    deselectAllItems
   })(ContactsList)
 
 export default {

@@ -35,7 +35,9 @@ abstract class Bulk_Job {
 
 	protected static $is_rest = false;
 
-	protected $rest_args = [];
+	protected $items_per_request;
+	protected $items_offset;
+	protected $context;
 
 	/**
 	 * WPGH_Bulk_Jon constructor.
@@ -52,36 +54,36 @@ abstract class Bulk_Job {
 		return self::$is_rest;
 	}
 
-	protected static function set_is_rest( $is_rest ){
+	protected static function set_is_rest( $is_rest ) {
 		return self::$is_rest = $is_rest;
 	}
 
 	/**
-	 * @param $items
-	 * @param $the_end
-	 * @param $context
+	 * @param $items_per_request int the number of items to be processed during this request
+	 * @param $items_offset      int the offset, the number of items processed so far
+	 * @param $context           array will contain relevant information about the request for the items
 	 */
-	public function rest_handler( $items, $the_end, $context ) {
+	public function rest_handler( $items_per_request, $items_offset, $context ) {
 
 		self::set_is_rest( true );
 
-		$this->rest_args = [
-			'items'   => $items,
-			'the_end' => $the_end,
-			'context' => $context,
-		];
+		$this->items_per_request = absint( $items_per_request );
+		$this->items_offset      = absint( $items_offset );
+		$this->context           = $context;
 
 		$this->process();
 	}
 
 	/**
+	 * Get a value from the context
+	 *
 	 * @param $key
 	 * @param $default
 	 *
 	 * @return mixed
 	 */
-	protected function get_rest_param( $key='', $default=false ) {
-		return get_array_var( $this->rest_args, $key, $default );
+	protected function get_context( $key = '', $default = false ) {
+		return get_array_var( $this->context, $key, $default );
 	}
 
 	/**
@@ -141,17 +143,6 @@ abstract class Bulk_Job {
 	abstract public function max_items( $max, $items );
 
 	/**
-	 * Check to see if the current process will be the final one.
-	 *
-	 * @return mixed
-	 */
-	public function is_the_end() {
-		$the_end = self::is_rest() ? $this->get_rest_param( 'the_end', false ) : get_post_var( 'the_end', false );
-
-		return filter_var( $the_end, FILTER_VALIDATE_BOOLEAN );
-	}
-
-	/**
 	 * Do something when an item is skipped
 	 *
 	 * @param $item
@@ -167,7 +158,7 @@ abstract class Bulk_Job {
 
 		$start = microtime( true );
 
-		if ( ! key_exists( 'the_end', $_POST ) && ! key_exists( 'the_end', $this->rest_args ) ) {
+		if ( ! self::is_rest() && ! key_exists( 'the_end', $_POST ) ) {
 
 			$error = new \WP_Error(
 				'error',
@@ -209,6 +200,7 @@ abstract class Bulk_Job {
 			'skipped_nf'  => _nf( $this->skipped ),
 			'message'     => esc_html( $msg ),
 			'output'      => $output,
+			'finished'    => false
 		];
 
 		if ( $this->is_the_end() ) {
@@ -216,6 +208,7 @@ abstract class Bulk_Job {
 			$this->clean_up();
 
 			$response['return_url'] = $this->get_return_url();
+			$response['finished']   = true;
 
 			Plugin::instance()->notices->add( 'finished', $this->get_finished_notice() );
 
@@ -231,8 +224,42 @@ abstract class Bulk_Job {
 	 */
 	public function get_items() {
 		return self::is_rest() ?
-			get_array_var( $this->rest_args, 'items' ) :
+			$this->get_items_restfully() :
 			get_post_var( 'items', [] );
+	}
+
+	/**
+	 * Get items restfully.
+	 *
+	 * @return array
+	 */
+	public function get_items_restfully() {
+		_doing_it_wrong( __METHOD__, 'this method should be implemented', GROUNDHOGG_VERSION );
+
+		return [];
+	}
+
+	/**
+	 * Check to see if the current process will be the final one.
+	 *
+	 * @return mixed
+	 */
+	public function is_the_end() {
+
+		if ( self::is_rest() ) {
+			return $this->is_the_end_restfully();
+		}
+
+		return filter_var( get_post_var( 'the_end', false ), FILTER_VALIDATE_BOOLEAN );
+	}
+
+	/**
+	 * Check whether the the end has been reached restfully/
+	 */
+	public function is_the_end_restfully() {
+		_doing_it_wrong( __METHOD__, 'this method should be implemented', GROUNDHOGG_VERSION );
+
+		return false;
 	}
 
 	/**

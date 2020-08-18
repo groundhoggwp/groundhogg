@@ -5,13 +5,13 @@
   margin: 0;
   padding: 0;
   width: 200px;
-  background-color: #fff;
   position: fixed;
   float: left;
   height: calc( 100% - 55px );
   top: 55px;
   overflow: auto;
   border-right: 1px solid $border-color;
+  background-color: #f9f9f9;
   transition: 0.2s;
 
   display: flex;

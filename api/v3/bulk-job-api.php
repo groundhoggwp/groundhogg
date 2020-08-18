@@ -52,11 +52,11 @@ class Bulk_Job_Api extends Base {
 			] );
 		}
 
-		$items   = $request->get_param( 'items' );
-		$the_end = $request->get_param( 'the_end' );
-		$context = $request->get_param( 'context' );
+		$items_per_request = $request->get_param( 'items_per_request' );
+		$items_offset      = $request->get_param( 'items_offset' );
+		$context           = $request->get_param( 'context' );
 
-		do_action( $action, $items, $the_end, $context );
+		do_action( $action, $items_per_request, $items_offset, $context );
 
 		return self::ERROR_403( 'invalid_action', 'Invalid bulk action provided.' );
 

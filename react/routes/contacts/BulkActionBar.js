@@ -4,24 +4,60 @@ import { connect } from 'react-redux'
 import { number_format } from '../../functions'
 import Button from 'react-bootstrap/Button'
 import { bulkJobInit } from '../../actions/bulkJobActions'
+import {
+  fetchContacts,
+  resetQuery,
+  updateQuery,
+} from '../../actions/contactListActions'
 
 const BulkActionBar = ({
+  query,
   totalContacts,
   itemsSelected,
   allSelected,
   bulkJobInit,
-  fetchContacts
+  fetchContacts,
+  updateQuery,
+  resetQuery,
 }) => {
 
-  const handleDelete = () => {
+  const startBulkDeleteContacts = (query, totalItems) => {
+
     bulkJobInit({
       action: 'gh_delete_contacts',
       actionName: 'Delete contacts...',
-      items: itemsSelected,
+      totalItems: totalItems,
+      context: {
+        query: query,
+      },
       onFinish: (result) => {
+        updateQuery({
+          offset: 0,
+        })
 
+        setTimeout(fetchContacts, 500)
       },
     })
+  }
+
+  const handleDelete = () => {
+
+    if (allSelected) {
+
+      const newQuery = {
+        ...query,
+        offset: 0,
+        number: -1,
+      }
+
+      startBulkDeleteContacts(newQuery, totalContacts)
+    }
+    else {
+      startBulkDeleteContacts({
+        include: itemsSelected,
+      }, itemsSelected.length)
+    }
+
   }
 
   return (
@@ -58,9 +94,13 @@ const BulkActionBar = ({
 }
 
 export default connect(state => ( {
+  query: state.contactList.query,
   totalContacts: state.contactList.total,
   itemsSelected: state.itemSelection.selected,
   allSelected: state.itemSelection.allSelected,
 } ), {
   bulkJobInit,
+  updateQuery,
+  resetQuery,
+  fetchContacts,
 })(BulkActionBar)

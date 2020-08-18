@@ -61,6 +61,41 @@ class Delete_Contacts extends Bulk_Job {
 	}
 
 	/**
+	 * Get the items from a restful request
+	 *
+	 * @return array
+	 */
+	public function get_items_restfully() {
+
+		$query = $this->get_context( 'query', [] );
+
+		$query[ 'number' ] = $this->items_per_request;
+		$query[ 'offset' ] = $this->items_offset;
+
+		$query = new Contact_Query( $query );
+
+		return wp_parse_id_list( wp_list_pluck( $query->items, 'ID' ) );
+	}
+
+	/**
+	 * Then end has been reached once no more contacts match the query
+	 *
+	 * @return bool
+	 */
+	public function is_the_end_restfully() {
+
+		$query = $this->get_context( 'query', [] );
+
+		$query[ 'number' ] = -1;
+		$query[ 'offset' ] = 0;
+
+		$c_query = new Contact_Query();
+		$count = $c_query->count( $query );
+
+		return $count === 0;
+	}
+
+	/**
 	 * Process an item
 	 *
 	 * @param $item mixed

@@ -3,13 +3,13 @@
   margin: 0;
   padding: 0;
   width: 200px;
-  background-color: #fff;
   position: fixed;
   float: left;
   height: calc( 100% - 55px);
   top: 55px;
   overflow: auto;
   border-right: 1px solid #e5e9ed;
+  background-color: #f9f9f9;
   transition: 0.2s;
   display: flex;
   flex-direction: column;
@@ -87,7 +87,7 @@
   left: 0;
   width: 100%;
   border-bottom: 1px solid #e5e9ed;
-  background-color: #fff;
+  background-color: #f9f9f9;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -289,6 +289,9 @@ table.list-table td.loading-animation div {
   .bottomBar-leave.bottomBar-leave-active {
     bottom: -100px;
     transition: 0.5s ease-in-out; }
+
+.bottom-bar-wrap {
+  margin-top: 100px; }
 
 .video-container {
   position: relative;

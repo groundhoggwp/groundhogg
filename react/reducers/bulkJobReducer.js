@@ -8,12 +8,12 @@ import {
 const initialState = {
   show: false,
   start: false,
-  items: [],
   action: '',
   actionName: '',
   numComplete: 0,
   numRemaining: 0,
   numItemsPerRequest: 10,
+  totalItems: 0,
   context: {},
   lastResponse: null,
   error: null,
@@ -43,9 +43,8 @@ export default function (state = initialState, action) {
       return {
         ...state,
         start: false,
-        numComplete: state.numComplete + action.payload.completed.length,
-        items: action.payload.remaining,
-        numRemaining: action.payload.remaining.length,
+        numComplete: state.numComplete + state.numItemsPerRequest,
+        numRemaining: state.totalItems - state.numItemsPerRequest,
       }
     case BULK_JOB_INIT:
       return {
@@ -55,7 +54,6 @@ export default function (state = initialState, action) {
         start: true,
         error: null,
         complete: false,
-        numRemaining: action.payload.items.length,
       }
     default:
       return state
