@@ -6,11 +6,18 @@ module.exports = {
     mode: 'development',
     entry: {
         // './blocks/gutenberg/js/blocks' : './blocks/gutenberg/index.js',
-        './react/build/build' : './react/index.js',
+        // './react/build/build' : './react/index.js',
+        index : './react/index.js',
+        contacts : './react/contacts/index.js',
     },
     output: {
-        path: path.resolve( __dirname ),
-        filename: '[name].js',
+        path: path.resolve( __dirname, 'react/dist' ),
+        filename: '[name].bundle.js',
+    },
+    optimization: {
+        splitChunks:{
+            chunks: 'all',
+        }
     },
     watch: true,
     devtool: 'cheap-eval-source-map',
