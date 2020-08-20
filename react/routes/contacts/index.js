@@ -362,6 +362,7 @@ const ContactsList = ({
         </div>
       </div>
       <ListTable
+        striped
         isLoading={ fetching }
         items={ contacts }
         columns={ columns }

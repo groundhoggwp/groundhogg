@@ -1,28 +1,38 @@
 @import "../../colors";
+@import "../../sizes";
 
 /* The side navigation menu */
 .groundhogg-sidebar {
   margin: 0;
   padding: 0;
-  width: 200px;
   position: fixed;
   float: left;
-  height: calc( 100% - 55px );
-  top: 55px;
+  height: 100%;
   overflow: auto;
   border-right: 1px solid $border-color;
-  background-color: #f9f9f9;
+  background-color: #212529;
   transition: 0.2s;
 
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  //justify-content: space-between;
 
   z-index: 1000;
 
+  .logo{
+    //background: #212529;
+
+    img{
+      width: $sidebar-width-collapsed - 20px;
+      margin: 10px;
+    }
+  }
+
+  width: $sidebar-width-expanded;
+
   &:not(.expanded) {
     transition: 0.2s;
-    width: 55px;
+    width: $sidebar-width-collapsed;
 
     .nav-item{
       .nav-text {
@@ -32,18 +42,28 @@
     }
   }
 
+  &.collapsed{
+
+    .nav-item{
+      text-align: center;
+    }
+
+  }
+
+  &.expanded{
+
+  }
+
   .nav-item {
     display: block;
-    padding: 7px;
     font-size: 22px;
     text-decoration: none;
     white-space: nowrap;
     overflow: hidden;
     margin: 3px;
-    border-radius: 5px;
 
     &.active{
-      background-color: $background-color-active;
+      background-color: $groundhogg;
       transition: 0.1s;
 
       .nav-text{
@@ -52,24 +72,25 @@
     }
 
     &:hover:not(.active){
-      background-color: $background-color-hover;
+      //background-color: $background-color-hover;
       transition: 0.1s;
     }
 
     .nav-icon {
       display: inline-block;
       width: 35px;
-      color: $font-color;
+      color: $white;
+      opacity: 0.7;
       text-align: center;
     }
 
     .nav-text {
+      opacity: 0.7;
       margin-left: 5px;
       font-size: 16px;
       font-weight: 400;
-      color: $font-color;
+      color: $white;
       visibility: visible;
-      opacity: 1;
       transition-timing-function: ease-in-out;
     }
   }
@@ -86,8 +107,9 @@
     .expand-icon{
       display: inline-block;
       width: 35px;
-      color: $font-color;
+      color: $white;
       text-align: center;
+      opacity: 0.7;
     }
 
   }

@@ -23,6 +23,13 @@
 
 .contacts {
   .list-table {
+
+    .list-table-item-row{
+      td{
+        background-color: #fdfdfd;
+      }
+    }
+
     td, th {
       vertical-align: middle;
     }
@@ -47,7 +54,7 @@
   justify-content: space-between;
   align-items: stretch;
   padding: 10px 20px;
-  background-color: $background-color;
+  background-color: $white;
   border-top: 1px solid $border-color;
 
   .total-contacts{

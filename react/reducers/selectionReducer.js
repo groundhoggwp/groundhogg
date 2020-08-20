@@ -33,6 +33,7 @@ export default function (state = initialState, action) {
         lastSelection: action.selected,
       }
     case SELECT_ITEM:
+
       return {
         ...state,
         selected: [

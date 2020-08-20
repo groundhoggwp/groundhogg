@@ -7,6 +7,11 @@ import { expandSidebar, collapseSidebar } from '../../actions/sidebarActions'
 
 import './style.scss'
 
+const {
+  bigG,
+  logoBlack,
+} = groundhogg.assets
+
 const SideBar = ({ routes, status, expandSidebar, collapseSidebar }) => {
 
   const toggleStatus = () => {
@@ -15,6 +20,9 @@ const SideBar = ({ routes, status, expandSidebar, collapseSidebar }) => {
 
   return (
     <div className={ 'groundhogg-sidebar ' + status }>
+      <div className={'logo'}>
+        <img src={bigG} alt={'big-g'} />
+      </div>
       <div className={'sidebar-inner'}>
         <ExpandControl
           onClick={toggleStatus}

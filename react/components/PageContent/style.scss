@@ -3,8 +3,8 @@
 
 .page-content{
 
-  padding-top: 63px;
   position: relative;
+  background-color: $background-color;
 
   &.collapsed{
     margin-left: $sidebar-width-collapsed;

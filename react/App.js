@@ -33,7 +33,6 @@ export function App () {
     <Provider store={store}>
       <div className="groundhogg groundhogg-app">
         <HashRouter>
-          <TopBar/>
           <SideBar routes={ routes }/>
           <PageContent>
             <Switch>

@@ -2,54 +2,55 @@
 .groundhogg-sidebar {
   margin: 0;
   padding: 0;
-  width: 200px;
   position: fixed;
   float: left;
-  height: calc( 100% - 55px);
-  top: 55px;
+  height: 100%;
   overflow: auto;
   border-right: 1px solid #e5e9ed;
-  background-color: #f9f9f9;
+  background-color: #212529;
   transition: 0.2s;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  z-index: 1000; }
+  z-index: 1000;
+  width: 200px; }
+  .groundhogg-sidebar .logo img {
+    width: 40px;
+    margin: 10px; }
   .groundhogg-sidebar:not(.expanded) {
     transition: 0.2s;
-    width: 55px; }
+    width: 60px; }
     .groundhogg-sidebar:not(.expanded) .nav-item .nav-text {
       opacity: 0;
       visibility: hidden; }
+  .groundhogg-sidebar.collapsed .nav-item {
+    text-align: center; }
   .groundhogg-sidebar .nav-item {
     display: block;
-    padding: 7px;
     font-size: 22px;
     text-decoration: none;
     white-space: nowrap;
     overflow: hidden;
-    margin: 3px;
-    border-radius: 5px; }
+    margin: 3px; }
     .groundhogg-sidebar .nav-item.active {
-      background-color: rgba(219, 116, 26, 0.2);
+      background-color: #DB741A;
       transition: 0.1s; }
       .groundhogg-sidebar .nav-item.active .nav-text {
         font-weight: 600; }
     .groundhogg-sidebar .nav-item:hover:not(.active) {
-      background-color: rgba(219, 116, 26, 0.1);
       transition: 0.1s; }
     .groundhogg-sidebar .nav-item .nav-icon {
       display: inline-block;
       width: 35px;
-      color: #48515b;
+      color: #FFFFFF;
+      opacity: 0.7;
       text-align: center; }
     .groundhogg-sidebar .nav-item .nav-text {
+      opacity: 0.7;
       margin-left: 5px;
       font-size: 16px;
       font-weight: 400;
-      color: #48515b;
+      color: #FFFFFF;
       visibility: visible;
-      opacity: 1;
       transition-timing-function: ease-in-out; }
   .groundhogg-sidebar .expand-control {
     cursor: pointer;
@@ -62,8 +63,9 @@
     .groundhogg-sidebar .expand-control .expand-icon {
       display: inline-block;
       width: 35px;
-      color: #48515b;
-      text-align: center; }
+      color: #FFFFFF;
+      text-align: center;
+      opacity: 0.7; }
 
 .gh-card {
   border: 1px solid #e5e9ed;
@@ -87,7 +89,7 @@
   left: 0;
   width: 100%;
   border-bottom: 1px solid #e5e9ed;
-  background-color: #f9f9f9;
+  background-color: #fff;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -125,10 +127,10 @@
         z-index: 1003; }
 
 .page-content {
-  padding-top: 63px;
-  position: relative; }
+  position: relative;
+  background-color: #F8F9FA; }
   .page-content.collapsed {
-    margin-left: 55px;
+    margin-left: 60px;
     transition: 0.2s; }
   .page-content.expanded {
     margin-left: 200px;
@@ -173,7 +175,7 @@
   background: transparent;
   border: transparent; }
   .icon-button.icon-only:hover {
-    background: #f8f9fa; }
+    background: #F8F9FA; }
 
 @-webkit-keyframes moving-gradient {
   0% {
@@ -209,6 +211,9 @@ table.list-table td.loading-animation div {
 .contact-bulk-actions .actions .btn:not(:last-child) {
   margin-right: 10px; }
 
+.contacts .list-table .list-table-item-row td {
+  background-color: #fdfdfd; }
+
 .contacts .list-table td, .contacts .list-table th {
   vertical-align: middle; }
 
@@ -225,7 +230,7 @@ table.list-table td.loading-animation div {
   justify-content: space-between;
   align-items: stretch;
   padding: 10px 20px;
-  background-color: #f8f9fa;
+  background-color: #FFFFFF;
   border-top: 1px solid #e5e9ed; }
   .contact-table-actions .total-contacts {
     vertical-align: middle; }
@@ -276,7 +281,7 @@ table.list-table td.loading-animation div {
   .groundhogg-bottom-bar.sidebar-expanded {
     left: 200px; }
   .groundhogg-bottom-bar.sidebar-collapsed {
-    left: 55px; }
+    left: 60px; }
 
 .bottomBar-enter {
   bottom: -100px; }
