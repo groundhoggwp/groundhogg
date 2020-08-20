@@ -14,6 +14,7 @@ use function Groundhogg\get_request_query;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
+use function Groundhogg\load_react_module;
 use function Groundhogg\normalize_files;
 use Groundhogg\Plugin;
 use Groundhogg\Contact;
@@ -39,12 +40,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * When saving custom information or doing something else. Runs after the admin saves a contact via the admin screen.
  *
- * @package     Admin
+ * @since       File available since Release 0.1
  * @subpackage  Admin/Contacts
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Admin
  */
 class Contacts_Page extends React_Admin_Page {
 
@@ -85,8 +86,11 @@ class Contacts_Page extends React_Admin_Page {
 	 */
 	public function view() {
 
+		?>
+        <div id="groundhogg-app-contacts"></div>
+		<?php
 
-
+		load_react_module( 'contacts' );
 	}
 
 }

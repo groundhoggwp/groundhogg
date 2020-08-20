@@ -133,19 +133,6 @@ abstract class React_Admin_Page extends Supports_Errors {
 	 */
 	public function page() {
 
-		?>
-            <div id="groundhogg-app"></div>
-		<?php
-
-		wp_localize_script( 'groundhogg-react', 'groundhogg', [
-			'current_app' => $this->get_slug()
-		] );
-
-		wp_enqueue_script( 'groundhogg-react' );
-		wp_enqueue_style( 'groundhogg-react' );
-
-		// any additional scripts/actions
-
 		$action = get_url_var( 'action', 'view' );
 
 		// enqueue relevant scripts etc...

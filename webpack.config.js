@@ -7,17 +7,13 @@ module.exports = {
     entry: {
         // './blocks/gutenberg/js/blocks' : './blocks/gutenberg/index.js',
         // './react/build/build' : './react/index.js',
-        index : './react/index.js',
+        // index : './react/index.js',
         contacts : './react/contacts/index.js',
+        funnels : './react/funnels/index.js',
     },
     output: {
+        filename: '[name]/bundle.js',
         path: path.resolve( __dirname, 'react/dist' ),
-        filename: '[name].bundle.js',
-    },
-    optimization: {
-        splitChunks:{
-            chunks: 'all',
-        }
     },
     watch: true,
     devtool: 'cheap-eval-source-map',
@@ -42,7 +38,8 @@ module.exports = {
     },
     plugins: [
         new MiniCssExtractPlugin({
-            filename: './react/build/build.css'
+            filename: '[name]/bundle.css',
+            path: path.resolve( __dirname, 'react/dist' ),
         })
     ],
 };

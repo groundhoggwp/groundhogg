@@ -209,7 +209,7 @@ class Scripts {
 			'wp-i18n'
 		], null, true );
 
-		wp_register_script( 'groundhogg-react', GROUNDHOGG_URL . 'dist/index.bundle.js', [
+		wp_register_script( 'groundhogg-react', GROUNDHOGG_URL . 'react/dist/index.bundle.js', [
 			'jquery',
 			'wp-element',
 			'groundhogg-admin',

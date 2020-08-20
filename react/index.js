@@ -16,13 +16,20 @@ const apps = {
   },
 }
 
-const {
-  current_app,
-} = groundhogg
+// const {
+//   current_app,
+// } = groundhogg
+
+// const current_app = 'contacts';
 
 function renderApp (app) {
 
+  console.debug(app)
+
   if (apps[app]) {
+
+    console.debug({ rendering: app })
+
     apps[app].render().then(App => {
       ReactDOM.render(
         <React.StrictMode>
@@ -34,4 +41,6 @@ function renderApp (app) {
   }
 }
 
-renderApp( current_app )
+renderApp('contacts')
+
+console.debug('hello? Is anybody out there!')

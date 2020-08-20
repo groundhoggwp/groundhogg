@@ -3300,7 +3300,7 @@ function is_groundhogg_network_active() {
  * Do an action after a contact has been created or updated
  *
  * @param int|Contact|Email $contact
- * @param string $hook
+ * @param string            $hook
  *
  * @return bool
  */
@@ -3446,4 +3446,27 @@ function validate_form_json( $json ) {
  */
 function convert_form_shortcode_to_json( $form ) {
 	return validate_form_json( convert_shortcode_to_json( $form ) );
+}
+
+/**
+ * Loads a react module with the required dependencies
+ *
+ * @param $module
+ *
+ * @return string
+ */
+function load_react_module( $module ) {
+
+	$script_name = "groundhogg-{$module}-react";
+
+	wp_enqueue_script( $script_name, GROUNDHOGG_URL . "react/dist/$module/bundle.js", [
+		'jquery',
+		'wp-element',
+		'groundhogg-admin',
+		'wp-i18n'
+	], null, true );
+
+	wp_enqueue_style( $script_name, GROUNDHOGG_URL . "react/dist/$module/bundle.css" );
+
+	return $script_name;
 }
