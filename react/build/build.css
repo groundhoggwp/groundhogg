@@ -372,6 +372,52 @@ table.groundhogg-report-table {
   padding: 10px 10px;
   margin-top: 10px; }
 
+.groundhogg-stat-card-body {
+  position: relative;
+  padding: 17px 20px 15px;
+  background: #FFF; }
+  .groundhogg-stat-card-body :first-child {
+    border-left: none;
+    border-radius: 5px 0 0 5px; }
+  .groundhogg-stat-card-body :last-child {
+    border-radius: 0 5px 5px 0; }
+  .groundhogg-stat-card-body .groundhogg-quick-stat-title {
+    font-size: 18px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre;
+    line-height: 1.2;
+    font-weight: bold;
+    margin-bottom: 10px; }
+  .groundhogg-stat-card-body .groundhogg-quick-stat-number {
+    font-size: 40px;
+    display: inline-block;
+    float: left;
+    margin-top: 10px; }
+  .groundhogg-stat-card-body .groundhogg-quick-stat-previous {
+    /*margin: 10px 0 0 0;*/
+    font-size: 16px;
+    float: right; }
+  .groundhogg-stat-card-body .groundhogg-quick-stat-previous.red {
+    color: #d73638; }
+  .groundhogg-stat-card-body .groundhogg-quick-stat-previous.green {
+    color: #5cc0a5; }
+  .groundhogg-stat-card-body .groundhogg-quick-stat-arrow:before {
+    display: inline-block;
+    content: '\279C';
+    font-size: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif; }
+  .groundhogg-stat-card-body .groundhogg-quick-stat-arrow.up:before {
+    transform: rotate(-90deg); }
+  .groundhogg-stat-card-body .groundhogg-quick-stat-arrow.down:before {
+    transform: rotate(90deg); }
+  .groundhogg-stat-card-body .groundhogg-quick-stat-compare {
+    clear: right;
+    float: right;
+    font-size: 12px;
+    color: #acbdc9;
+    display: inline-block; }
+
 .groundhogg-report-nav {
   width: 100%;
   background: #f8f9fa;

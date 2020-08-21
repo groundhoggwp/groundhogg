@@ -60,19 +60,23 @@ abstract class Base_Quick_Stat extends Base_Report {
 		$arrow        = $this->get_arrow_properties( $current_data, $compare_data );
 
 		return [
-			'type'    => 'quick_stat',
-			'number'  => _nf( $current_data ),
-			'compare' => [
-				'arrow'   => [
-					'direction' => $arrow['direction'],
-					'color'     => $arrow['color'],
+			"type" =>'quick_stat',
+			"title" => $this->get_title(),
+			"chart" => [
+				'type'    => 'quick_stat',
+				'number'  => _nf( $current_data ),
+				'compare' => [
+					'arrow'   => [
+						'direction' => $arrow[ 'direction' ],
+						'color'     => $arrow[ 'color' ],
+					],
+					'percent' => absint( $percentage ) . '%',
+					'text'    => sprintf( __( '.vs Previous %s Days', 'groundhogg' ), $this->num_days )
 				],
-				'percent' => absint( $percentage ) . '%',
-				'text'    => sprintf( __( '.vs Previous %s Days', 'groundhogg' ), $this->num_days )
-			],
-			'data'    => [
-				'current' => _nf( $current_data ),
-				'compare' => _nf( $compare_data )
+				'data'    => [
+					'current' => _nf( $current_data ),
+					'compare' => _nf( $compare_data )
+				]
 			]
 		];
 

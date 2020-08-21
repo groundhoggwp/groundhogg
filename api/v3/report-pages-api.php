@@ -161,7 +161,7 @@ class Report_Pages_Api extends Base {
 							[
 								[
 									'id'   => 'total_new_contacts',
-									'type' => 'state',
+									'type' => 'stats',
 									'lg'   => 3,
 									'md'   => 6,
 									'sm'   => 12
@@ -169,19 +169,19 @@ class Report_Pages_Api extends Base {
 
 								[
 									'id'   => 'total_confirmed_contacts',
-									'type' => 'state',
+									'type' => 'stats',
 									'lg'   => 3,
 									'md'   => 6,
 									'sm'   => 12
 								],[
 									'id'   => 'total_engaged_contacts',
-									'type' => 'state',
+									'type' => 'stats',
 									'lg'   => 3,
 									'md'   => 6,
 									'sm'   => 12
 								],[
 									'id'   => 'total_unsubscribed_contacts',
-									'type' => 'state',
+									'type' => 'stats',
 									'lg'   => 3,
 									'md'   => 6,
 									'sm'   => 12
@@ -190,19 +190,19 @@ class Report_Pages_Api extends Base {
 							[
 								[
 									'id'   => 'total_emails_sent',
-									'type' => 'state',
+									'type' => 'stats',
 									'lg'   => 4,
 									'md'   => 6,
 									'sm'   => 12
 								],[
 									'id'   => 'email_open_rate',
-									'type' => 'state',
+									'type' => 'stats',
 									'lg'   => 4,
 									'md'   => 6,
 									'sm'   => 12
 								],[
 									'id'   => 'email_click_rate',
-									'type' => 'state',
+									'type' => 'stats',
 									'lg'   => 4,
 									'md'   => 6,
 									'sm'   => 12

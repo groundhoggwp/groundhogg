@@ -6,6 +6,7 @@ import {changeSelectedNav} from "../../../actions/reportNavBarActions";
 import  {Row,Col} from "react-bootstrap";
 import LineChart from "../LineChart/LineChart";
 import CustomizedTables from "../CustomizedTable/CustomizedTables";
+import Stats from "../Stats/Stats";
 
 
 
@@ -21,6 +22,9 @@ export class Report extends React.Component {
                 return (<CustomizedTables classes={this.props.classes} id={this.props.id} start = {this.props.start} end = {this.props.end}  />);
             case 'line-chart' :
                 return (<LineChart classes={this.props.classes} id={this.props.id} start = {this.props.start} end = {this.props.end}/>);
+            case 'stats' :
+                return (<Stats classes={this.props.classes} id={this.props.id} start = {this.props.start} end = {this.props.end}/>);
+
             // case  'pie' :
             //     return  (<PieChart classes={this.props.classes} id={this.props.id} start = {this.props.start} end = {this.props.end}/>);
 

@@ -24,9 +24,7 @@ abstract class Base_Chart_Report extends Base_Report {
 	/**
 	 * @return string
 	 */
-	protected function get_title() {
-		return  'STATIC TITLE';
-	}
+
 
 	/**
 	 * Get the report data
