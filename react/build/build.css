@@ -293,6 +293,125 @@ table.list-table td.loading-animation div {
 .bottom-bar-wrap {
   margin-top: 100px; }
 
+@-webkit-keyframes moving-gradient {
+  0% {
+    background-position: -250px 0; }
+  100% {
+    background-position: 250px 0; } }
+
+table.list-table thead th {
+  position: -webkit-sticky;
+  position: sticky;
+  background: white;
+  top: 63px;
+  box-shadow: 0 2px 0 #dee2e6;
+  border-bottom: none; }
+
+table.list-table td.loading-animation div {
+  height: 30px;
+  background: linear-gradient(to right, #eee 20%, #ddd 50%, #eee 80%);
+  background-size: 500px 100px;
+  animation-name: moving-gradient;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards; }
+
+table.groundhogg-report-table {
+  table-layout: fixed;
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  overflow: hidden; }
+  table.groundhogg-report-table a {
+    text-decoration: none; }
+  table.groundhogg-report-table th {
+    line-height: 1.2;
+    display: table-cell;
+    padding: 15px;
+    font-weight: bold;
+    font-size: 15px;
+    vertical-align: top; }
+  table.groundhogg-report-table th,
+  table.groundhogg-report-table td {
+    text-align: center; }
+  table.groundhogg-report-table th:last-child,
+  table.groundhogg-report-table td:last-child {
+    text-align: right; }
+  table.groundhogg-report-table th:first-child,
+  table.groundhogg-report-table td:first-child {
+    text-align: left; }
+  table.groundhogg-report-table td {
+    font-size: 15px;
+    color: #666666;
+    line-height: 1.2;
+    /*font-weight: unset !important;*/
+    border-top: 1px solid #f2f2f2;
+    display: table-cell;
+    padding: 15px;
+    text-decoration: none;
+    /*word-break: break-word;*/
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 75px;
+    white-space: nowrap; }
+  table.groundhogg-report-table tr:last-child td {
+    border-bottom: none; }
+  table.groundhogg-report-table tr:last-child td:first-child {
+    border-radius: 0 0 0 5px; }
+  table.groundhogg-report-table tr:last-child td:last-child {
+    border-radius: 0 0 5px 0; }
+
+.groundhogg-report-nav {
+  width: 100%;
+  background: #f8f9fa;
+  border-top: 1px solid #DB741A;
+  border-bottom: 1px solid #DB741A;
+  padding: 10px 10px;
+  margin-top: 10px; }
+  .groundhogg-report-nav .nav-link {
+    color: #48515b !important; }
+  .groundhogg-report-nav .nav-link.active {
+    font-weight: 700;
+    border-bottom: 2px solid #fff;
+    border-bottom-color: #DB741A; }
+  .groundhogg-report-nav .navbar-brand {
+    color: #DB741A !important; }
+  @media (max-width: 990px) {
+    .groundhogg-report-nav .nav-link.active {
+      border: none;
+      color: #DB741A; } }
+
+.groundhogg-report-card {
+  background-color: #fff !important;
+  min-width: 100%;
+  max-width: 100%;
+  width: 100% !important;
+  height: 100% !important;
+  padding: 10px; }
+  .groundhogg-report-card .groundhogg-report-card-header {
+    background-color: #ffffff !important;
+    border-bottom: none !important; }
+    .groundhogg-report-card .groundhogg-report-card-header .h6 {
+      margin-top: 15px;
+      margin-bottom: 20px;
+      padding-left: 15px;
+      font-size: 18px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: pre;
+      line-height: 1.2;
+      font-weight: bold; }
+  .groundhogg-report-card .groundhogg-report-card-body {
+    padding: 0; }
+  .groundhogg-report-card .groundhogg-report-chart-wrapper {
+    min-height: 300px;
+    height: inherit;
+    max-height: 400px; }
+
 .video-container {
   position: relative;
   width: 100%;

@@ -1,5 +1,6 @@
 import React from 'react'
 
+
 export default {
   path: '/emails',
   icon: 'envelope-o',

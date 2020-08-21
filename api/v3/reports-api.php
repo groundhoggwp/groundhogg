@@ -8,6 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Groundhogg\Admin\Dashboard\Dashboard_Widgets;
+use Groundhogg\Reports;
 use function Groundhogg\get_db;
 use Groundhogg\Plugin;
 use function Groundhogg\show_groundhogg_branding;
@@ -21,12 +22,13 @@ use Groundhogg\Admin\Dashboard\Widgets;
 class Reports_Api extends Base {
 
 	public function register_routes() {
-		$callback = $this->get_auth_callback();
+//		$callback = $this->get_auth_callback();
+
 
 		register_rest_route( self::NAME_SPACE, '/reports', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
-				'permission_callback' => $callback,
+//				'permission_callback' => $callback,
 				'callback'            => [ $this, 'get_report' ],
 				'args'                => [
 					'report'       => [
@@ -42,10 +44,29 @@ class Reports_Api extends Base {
 			],
 		] );
 
+		register_rest_route( self::NAME_SPACE, '/reports', [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+//				'permission_callback' => $callback,
+				'callback'            => [ $this, 'get_report_react' ],
+				'args'                => [
+//					'report'       => [
+//						'required' => true
+//					],
+//					'range'        => [
+//						'required' => true
+//					],
+//					'chart_format' => [
+//						'required' => false
+//					]
+				]
+			],
+		] );
+
 		register_rest_route( self::NAME_SPACE, '/reports/dashboard', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
-				'permission_callback' => $callback,
+//				'permission_callback' => $callback,
 				'callback'            => [ $this, 'get_dashboard_reports' ],
 				'args'                => [
 					'reports' => [
@@ -139,6 +160,43 @@ class Reports_Api extends Base {
 
 		return self::SUCCESS_RESPONSE( $response );
 
+
+
+
 	}
+
+
+
+
+	/**
+	 *
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function get_report_react( WP_REST_Request $request ) {
+
+
+		$start_date = $request->get_param( 'start_date' );
+
+		if ( is_string( $start_date ) ) {
+			$start_date = strtotime( $start_date );
+		}
+
+		$end_date = $request->get_param( 'end_date' );
+
+		if ( is_string( $end_date ) ) {
+			$end_date = strtotime( $end_date );
+		}
+
+		$report_id = $request->get_param( 'id' );
+
+		$reporting = new Reports( $start_date, $end_date );
+
+		return self::SUCCESS_RESPONSE( $reporting->get_data( $report_id ) );
+
+	}
+
 
 }

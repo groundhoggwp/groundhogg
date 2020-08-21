@@ -21,6 +21,12 @@ abstract class Base_Chart_Report extends Base_Report {
 	 */
 	abstract protected function get_options();
 
+	/**
+	 * @return string
+	 */
+	protected function get_title() {
+		return  'STATIC TITLE';
+	}
 
 	/**
 	 * Get the report data
@@ -31,6 +37,7 @@ abstract class Base_Chart_Report extends Base_Report {
 
 		return [
 			'type'  => 'chart',
+			'title' => $this->get_title(),
 			'chart' => [
 				'type'    => $this->get_type(),
 				'data'    => $this->get_datasets(),
