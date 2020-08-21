@@ -365,6 +365,13 @@ table.groundhogg-report-table {
   table.groundhogg-report-table tr:last-child td:last-child {
     border-radius: 0 0 5px 0; }
 
+.groundhogg-no-data-notice {
+  background: #f8f9fa;
+  border-top: 1px solid #e5e9ed;
+  border-bottom: 1px solid #f8f9fa;
+  padding: 10px 10px;
+  margin-top: 10px; }
+
 .groundhogg-report-nav {
   width: 100%;
   background: #f8f9fa;

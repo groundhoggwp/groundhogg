@@ -1,7 +1,7 @@
 import React from 'react'
 
 // import DatePicker from "../../report/conponent/DatePicker/DatePicker";
-import NavBar from "../../report/conponent/NavBar/NavBar";
+import NavBar from "../../report/component/NavBar/NavBar";
 import './style.scss';
 
 export default {
