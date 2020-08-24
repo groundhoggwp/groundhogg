@@ -7,6 +7,8 @@ import  {Row,Col} from "react-bootstrap";
 import LineChart from "../LineChart/LineChart";
 import CustomizedTables from "../CustomizedTable/CustomizedTables";
 import Stats from "../Stats/Stats";
+import PieChart from "../PieChart/PieChart";
+import {Loading} from "../Loading/Loading";
 
 
 
@@ -24,43 +26,10 @@ export class Report extends React.Component {
                 return (<LineChart classes={this.props.classes} id={this.props.id} start = {this.props.start} end = {this.props.end}/>);
             case 'stats' :
                 return (<Stats classes={this.props.classes} id={this.props.id} start = {this.props.start} end = {this.props.end}/>);
-
-            // case  'pie' :
-            //     return  (<PieChart classes={this.props.classes} id={this.props.id} start = {this.props.start} end = {this.props.end}/>);
-
+            case  'pie' :
+                return  (<PieChart classes={this.props.classes} id={this.props.id} start = {this.props.start} end = {this.props.end}/>);
             default:
-
-                var stats = {
-                    label: "Posts",
-                    value: "2,390",
-                    percentage: "4.7%",
-                    increase: true,
-                    chartLabels: [null, null, null, null, null, null, null],
-                    attrs: { md: "6", sm: "6" },
-                    datasets: [
-                        {
-                            label: "Today",
-                            fill: "start",
-                            borderWidth: 1.5,
-                            backgroundColor: "rgba(0, 184, 216, 0.1)",
-                            borderColor: "rgb(0, 184, 216)",
-                            data: [1, 2, 1, 3, 5, 4, 7]
-                        }
-                    ]
-                };
                 return  (<h1> default case</h1>);
-
-                // return  <SmallStats
-                //     id={`small-stats-1`}
-                //     variation="1"
-                //     chartData={stats.datasets}
-                //     chartLabels={stats.chartLabels}
-                //     label={stats.label}
-                //     value={stats.value}
-                //     percentage={stats.percentage}
-                //     increase={stats.increase}
-                //     decrease={stats.decrease}
-                // />
 
         }
     }
@@ -122,7 +91,7 @@ export class Pages extends React.Component {
                 </Container>
             );
         } else {
-            return <h1> loading... </h1>;
+            return <Loading />;
         }
 
 

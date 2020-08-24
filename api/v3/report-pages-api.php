@@ -40,11 +40,10 @@ class Report_Pages_Api extends Base {
 		$pages = [
 			"pages" => [
 				"overview"   => "Overview",
-				"contacts"   => "Courses",
+				"contacts"   => "Contacts",
 				"email"      => "Email",
 				"broadcasts" => "Broadcasts",
 				"forms"      => 'Forms'
-
 			]
 		];
 
@@ -78,7 +77,118 @@ class Report_Pages_Api extends Base {
 						],
 						[
 							[
-								'id'   => 'line-chart',
+								'id'   => 'total_new_contacts',
+								'type' => 'stats',
+								'lg'   => 3,
+								'md'   => 6,
+								'sm'   => 12
+							],
+
+							[
+								'id'   => 'total_confirmed_contacts',
+								'type' => 'stats',
+								'lg'   => 3,
+								'md'   => 6,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'total_engaged_contacts',
+								'type' => 'stats',
+								'lg'   => 3,
+								'md'   => 6,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'total_unsubscribed_contacts',
+								'type' => 'stats',
+								'lg'   => 3,
+								'md'   => 6,
+								'sm'   => 12
+							],
+						],
+						[
+							[
+								'id'   => 'total_emails_sent',
+								'type' => 'stats',
+								'lg'   => 4,
+								'md'   => 6,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'email_open_rate',
+								'type' => 'stats',
+								'lg'   => 4,
+								'md'   => 6,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'email_click_rate',
+								'type' => 'stats',
+								'lg'   => 4,
+								'md'   => 6,
+								'sm'   => 12
+							],
+						],
+						[
+							[
+								'id'   => 'chart_contacts_by_optin_status',
+								'type' => 'pie',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							],
+							[
+								'id'   => '',
+								'type' => 'pie',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							]
+						],
+
+						[
+							[
+								'id'   => 'table_top_converting_funnels',
+								'type' => 'table',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'table_top_performing_emails',
+								'type' => 'table',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							]
+						],
+
+						[
+							[
+								'id'   => 'table_contacts_by_countries',
+								'type' => 'table',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'table_contacts_by_lead_source',
+								'type' => 'table',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							]
+						],
+					]
+				]
+			],
+			"contacts" => [
+				"page"    => $page,
+				"reports" => [
+					"rows" => [
+						[
+							[
+								'id'   => 'chart_new_contacts',
 								'type' => 'line-chart',
 								'lg'   => 12,
 								'md'   => 12,
@@ -87,319 +197,277 @@ class Report_Pages_Api extends Base {
 						],
 						[
 							[
-								"id "  => 'state_new_enrollments',
-								"type" => 'stats',
-								"lg"   => 3,
-								"md"   => 6,
-								"sm"   => 12,
-								"xs"   => 12
+								'id'   => 'total_new_contacts',
+								'type' => 'stats',
+								'lg'   => 3,
+								'md'   => 6,
+								'sm'   => 12
 							],
 
 							[
-								"id "  => 'state_new_users',
-								"type" => 'stats',
-								"lg"   => 3,
-								"md"   => 6,
-								"sm"   => 12,
-								"xs"   => 12
+								'id'   => 'total_confirmed_contacts',
+								'type' => 'stats',
+								'lg'   => 3,
+								'md'   => 6,
+								'sm'   => 12
 							],
 							[
-								"id "  => 'state_course_completed',
-								"type" => 'stats',
-								"lg"   => 3,
-								"md"   => 6,
-								"sm"   => 12,
-								"xs"   => 12
+								'id'   => 'total_engaged_contacts',
+								'type' => 'stats',
+								'lg'   => 3,
+								'md'   => 6,
+								'sm'   => 12
 							],
 							[
-								"id "  => 'state_course_completion_rate',
-								"type" => 'stats',
-								"lg"   => 3,
-								"md"   => 6,
-								"sm"   => 12,
-								"xs"   => 12
+								'id'   => 'total_unsubscribed_contacts',
+								'type' => 'stats',
+								'lg'   => 3,
+								'md'   => 6,
+								'sm'   => 12
 							],
-
-
 						],
 						[
 							[
-								'id'   => 'table_most_popular_courses',
-								'type' => 'table',
-								'lg'   => 12,
+								'id'   => 'chart_contacts_by_optin_status',
+								'type' => 'pie',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							],
+							[
+								'id'   => '',
+								'type' => 'pie',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							]
+						],[
+							[
+								'id'   => 'chart_contacts_by_country',
+								'type' => 'pie',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'chart_contacts_by_region',
+								'type' => 'pie',
+								'lg'   => 6,
 								'md'   => 12,
 								'sm'   => 12
 							]
 						],
+						[
+							[
+								'id'   => 'table_contacts_by_search_engines',
+								'type' => 'table',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'table_contacts_by_social_media',
+								'type' => 'table',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							]
+						],[
+							[
+								'id'   => 'table_contacts_by_source_page',
+								'type' => 'table',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'table_contacts_by_lead_source',
+								'type' => 'table',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							]
+						],[
+							[
+								'id'   => 'table_list_engagement',
+								'type' => 'table',
+								'lg'   => 12,
+								'md'   => 12,
+								'sm'   => 12
+							],
+
+						],
 
 					]
-				]
+				],
 			],
-			"contacts",
-			"email",
-			"broadcasts",
-			"forms",
+			"email" =>[
+				"page"    => $page,
+				"reports" => [
+					"rows" => [
+						[
+							[
+								'id'   => 'chart_email_activity',
+								'type' => 'line-chart',
+								'lg'   => 12,
+								'md'   => 12,
+								'sm'   => 12
+							],
+						],
+						[
+							[
+								'id'   => 'total_emails_sent',
+								'type' => 'stats',
+								'lg'   => 4,
+								'md'   => 6,
+								'sm'   => 12
+							],
+
+							[
+								'id'   => 'email_open_rate',
+								'type' => 'stats',
+								'lg'   => 4,
+								'md'   => 6,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'email_click_rate',
+								'type' => 'stats',
+								'lg'   => 4,
+								'md'   => 6,
+								'sm'   => 12
+							],
+
+						],[
+							[
+								'id'   => 'total_unsubscribed_contacts',
+								'type' => 'stats',
+								'lg'   => 3,
+								'md'   => 6,
+								'sm'   => 12
+							],
+
+							[
+								'id'   => 'total_spam_contacts',
+								'type' => 'stats',
+								'lg'   => 3,
+								'md'   => 6,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'total_bounces_contacts',
+								'type' => 'stats',
+								'lg'   => 3,
+								'md'   => 6,
+								'sm'   => 12
+							],[
+								'id'   => 'total_complaints_contacts',
+								'type' => 'stats',
+								'lg'   => 3,
+								'md'   => 6,
+								'sm'   => 12
+							],
+
+						],
+						[
+							[
+								'id'   => 'table_broadcast_stats',
+								'type' => 'table',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'table_top_performing_broadcasts',
+								'type' => 'table',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							]
+						],
+						[
+							[
+								'id'   => 'table_top_performing_emails',
+								'type' => 'table',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'table_worst_performing_emails',
+								'type' => 'table',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							]
+						],
+					]
+				],
+			],
+			"broadcasts" => [
+				"page"    => $page,
+				"reports" => [
+					"rows" => [
+
+						[
+							[
+								'id'   => 'chart_last_broadcast',
+								'type' => 'pie',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'table_broadcast_stats',
+								'type' => 'table',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							]
+						],
+						[
+							[
+								'id'   => 'table_broadcast_link_clicked',
+								'type' => 'table',
+								'lg'   => 12,
+								'md'   => 12,
+								'sm'   => 12
+							],
+
+						],
+					]
+				],
+			],
+			"forms" => [
+				"page"    => $page,
+				"reports" => [
+					"rows" => [
+						[
+							[
+								'id'   => 'table_form_activity',
+								'type' => 'table',
+								'lg'   => 12,
+								'md'   => 12,
+								'sm'   => 12
+							],
+
+						],
+					]
+				],
+			],
 
 		];
 
+		if ($page_array[$page]) {
 
-		switch ( $page ) {
-			case 'overview':
-				$data = [
-					"page"    => $page,
-					"reports" => [
-						"rows" => [
-							[
-								[
-									'id'   => 'chart_new_contacts',
-									'type' => 'line-chart',
-									'lg'   => 12,
-									'md'   => 12,
-									'sm'   => 12
-								],
-							],
-							[
-								[
-									'id'   => 'total_new_contacts',
-									'type' => 'stats',
-									'lg'   => 3,
-									'md'   => 6,
-									'sm'   => 12
-								],
-
-								[
-									'id'   => 'total_confirmed_contacts',
-									'type' => 'stats',
-									'lg'   => 3,
-									'md'   => 6,
-									'sm'   => 12
-								],[
-									'id'   => 'total_engaged_contacts',
-									'type' => 'stats',
-									'lg'   => 3,
-									'md'   => 6,
-									'sm'   => 12
-								],[
-									'id'   => 'total_unsubscribed_contacts',
-									'type' => 'stats',
-									'lg'   => 3,
-									'md'   => 6,
-									'sm'   => 12
-								],
-							],
-							[
-								[
-									'id'   => 'total_emails_sent',
-									'type' => 'stats',
-									'lg'   => 4,
-									'md'   => 6,
-									'sm'   => 12
-								],[
-									'id'   => 'email_open_rate',
-									'type' => 'stats',
-									'lg'   => 4,
-									'md'   => 6,
-									'sm'   => 12
-								],[
-									'id'   => 'email_click_rate',
-									'type' => 'stats',
-									'lg'   => 4,
-									'md'   => 6,
-									'sm'   => 12
-								],
-							],
-							[
-								[
-									'id'   => 'chart_contacts_by_optin_status',
-									'type' => 'pie',
-									'lg'   => 6,
-									'md'   => 12,
-									'sm'   => 12
-								],
-								[
-									'id'   => '',
-									'type' => 'pie',
-									'lg'   => 6,
-									'md'   => 12,
-									'sm'   => 12
-								]
-							],
-
-							[
-								[
-									'id'   => 'table_top_converting_funnels',
-									'type' => 'table',
-									'lg'   => 6,
-									'md'   => 12,
-									'sm'   => 12
-								],
-								[
-									'id'   => 'table_top_performing_emails',
-									'type' => 'table',
-									'lg'   => 6,
-									'md'   => 12,
-									'sm'   => 12
-								]
-							],
-
-							[
-								[
-									'id'   => 'table_contacts_by_countries',
-									'type' => 'table',
-									'lg'   => 6,
-									'md'   => 12,
-									'sm'   => 12
-								],
-								[
-									'id'   => 'table_contacts_by_lead_source',
-									'type' => 'table',
-									'lg'   => 6,
-									'md'   => 12,
-									'sm'   => 12
-								]
-							],
-						]
-					]
-				];
-				break;
-			case 'courses' :
-				$data = [
-					"page"    => $page,
-					"reports" => [
-						"rows" => [
-
-							[
-								[
-									'id'   => 'line',
-									'type' => 'line-chart',
-									'lg'   => 12,
-									'md'   => 12,
-									'sm'   => 12
-								],
-								[
-									'id'   => 'bar',
-									'type' => 'bar-chart',
-									'lg'   => 6,
-									'md'   => 12,
-									'sm'   => 12
-
-								],
-
-							],
-							[
-								[
-									'id'   => 'table',
-									'type' => 'table',
-									'lg'   => 6,
-									'md'   => 12,
-									'sm'   => 12
-								],
-
-							],
-							[
-								[
-									"id "  => 'stats1',
-									"type" => 'stats',
-									"lg"   => 3,
-									"md"   => 6,
-									"sm"   => 12,
-									"xs"   => 12
-								],
-
-								[
-									"id "  => 'stats2',
-									"type" => 'stats2',
-									"lg"   => 3,
-									"md"   => 6,
-									"sm"   => 12,
-									"xs"   => 12
-								],
-								[
-									"id "  => 'stats3',
-									"type" => 'stats3',
-									"lg"   => 3,
-									"md"   => 6,
-									"sm"   => 12,
-									"xs"   => 12
-								],
-
-
-							],
-						]
-					]
-				];
-				break;
-			case 'test-page' :
-				$data = [
-					"page"    => $page,
-					"reports" => [
-						"rows" => [
-
-							[
-								[
-									'id'   => 'line',
-									'type' => 'line-chart',
-									'lg'   => 6,
-									'md'   => 12,
-									'sm'   => 12
-								],
-								[
-									'id'   => 'bar',
-									'type' => 'bar-chart',
-									'lg'   => 6,
-									'md'   => 12,
-									'sm'   => 12
-
-								],
-
-							],
-							[
-								[
-									'id'   => 'table',
-									'type' => 'table',
-									'lg'   => 6,
-									'md'   => 12,
-									'sm'   => 12
-								],
-
-								[
-									"id "  => 'stats1',
-									"type" => 'stats',
-									"lg"   => 6,
-									"md"   => 12,
-									"sm"   => 12,
-									"xs"   => 12
-								],
-
-								[
-									"id "  => 'stats2',
-									"type" => 'stats2',
-									"lg"   => 3,
-									"md"   => 12,
-									"sm"   => 12,
-									"xs"   => 12
-								],
-								[
-									"id "  => 'stats3',
-									"type" => 'stats3',
-									"lg"   => 3,
-									"md"   => 12,
-									"sm"   => 12,
-									"xs"   => 12
-								],
-
-
-							],
-							[
-
-
-							],
-						]
-					]
-				];
-				break;
-
+			$data = $page_array [$page];
+		} else
+		{
+			$data = [
+				'error' =>  'page Not found'
+			];
 		}
+
 
 		return self::SUCCESS_RESPONSE( $data );
 	}

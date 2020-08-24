@@ -5,6 +5,7 @@ import {Navbar, Nav} from "react-bootstrap";
 import {connect} from 'react-redux';
 import {fetchNavBar, changeSelectedNav} from "../../../actions/reportNavBarActions";
 import './style.scss';
+import {Loading} from "../Loading/Loading";
 
 class NavBar extends Component {
 
@@ -15,7 +16,7 @@ class NavBar extends Component {
 
     componentDidMount() {
         this.props.fetchNavBar();
-        this.props.changeSelectedNav(this.props.navBar.pageSelected);
+        // this.props.changeSelectedNav(this.props.navBar.pageSelected);
     }
 
     handleSelected(selectedKey) {
@@ -23,8 +24,6 @@ class NavBar extends Component {
     }
 
     render() {
-
-        // console.log(this.props);
 
         if (this.props.hasOwnProperty("navBar") &&
             this.props.navBar.hasOwnProperty("pageList") &&
@@ -49,7 +48,7 @@ class NavBar extends Component {
                 </div>
             );
         } else {
-            return <h1> Loading </h1>;
+           return <Loading />;
         }
     }
 }

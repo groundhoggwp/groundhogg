@@ -71,7 +71,7 @@ class CustomizedTables extends React.Component {
                             {report.data.chart.data.map(row =>
                                 <tr >
                                     {Object.keys(row).map(key => <td
-                                        key={key}>{require('html-react-parser')(row[key])}</td>)}
+                                        key={key}>{require('html-react-parser')(String(row[key]))}</td>)}
                                 </tr>)
                             }
                             </tbody>

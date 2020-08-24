@@ -22,10 +22,16 @@ export const fetchNavBar = () => dispatch => {
 };
 
 export const changeSelectedNav = (selected) => (dispatch) => {
+  console.log("change Selected nav called" + selected );
     dispatch({
         type: SELECTED_REPORT_NAVBAR_CHANGE,
         payload: selected,
 
+    });
+
+    dispatch({
+        type: FETCH_REPORTS_IN_PAGE,
+        payload: {},
     });
 
     getPages(dispatch,selected);
@@ -33,6 +39,7 @@ export const changeSelectedNav = (selected) => (dispatch) => {
 }
 
 const getPages = (dispatch ,selected ) =>{
+
     axios.post(groundhogg.rest_base  + '/pages', {
         page: selected
     }).then(

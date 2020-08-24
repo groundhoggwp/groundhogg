@@ -27,9 +27,6 @@ const getReport = (dispatch, reportId, startDate, endDate) => {
         }).then(
             (response) => {
                 if (response.data.hasOwnProperty('chart')) {
-
-                    // console.log("table"  + response.data);
-
                     dispatch({
                         type: FETCH_REPORT,
                         payload: {
@@ -54,7 +51,6 @@ const getReport = (dispatch, reportId, startDate, endDate) => {
                 }
             }
         ).catch((e) => {
-            console.log(e);
             dispatch({
                 type: FETCH_REPORT,
                 payload: {
