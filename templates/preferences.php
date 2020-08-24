@@ -252,8 +252,14 @@ switch ( $action ):
 
 		if ( wp_verify_nonce( get_request_var( '_wpnonce' ), 'manage_email_preferences' ) ) {
 
+			if ( ! Plugin::$instance->preferences->current_contact_can_modify_preferences() ) {
+				notices()->add( 'error', __( "You can't do that now.", 'groundhogg' ) );
+				wp_redirect( managed_page_url( 'preferences/profile/' ) );
+				die();
+			}
+
 			$preference = get_request_var( 'preference' );
-			$redirect = false;
+			$redirect   = false;
 
 			switch ( $preference ) {
 				case 'unsubscribe':
@@ -275,7 +281,7 @@ switch ( $action ):
 
 			do_action( 'groundhogg/preferences/manage/preferences_updated', $contact, $preference );
 
-			if ( $redirect ){
+			if ( $redirect ) {
 				wp_redirect( $redirect );
 				die();
 			}
@@ -310,12 +316,12 @@ switch ( $action ):
                 <b><?php printf( __( 'Managing preferences for <span class="contact-name">%s (%s)</span>.', 'groundhogg' ), $contact->get_full_name(), obfuscate_email( $contact->get_email() ) ) ?></b>
             </p>
 			<?php wp_nonce_field( 'manage_email_preferences' ); ?>
-            <?php do_action( 'groundhogg/preferences/manage/form/inside' ); ?>
+			<?php do_action( 'groundhogg/preferences/manage/form/inside' ); ?>
             <ul class="preferences">
 				<?php foreach ( $preferences as $preference => $text ): ?>
                     <li><label><input type="radio" name="preference" value="<?php esc_attr_e( $preference ); ?>"
                                       class="preference-<?php esc_attr_e( $preference ); ?>"
-                                      ><?php echo $text; ?></label></li>
+                            ><?php echo $text; ?></label></li>
 				<?php endforeach; ?>
             </ul>
             <p>
@@ -336,6 +342,10 @@ switch ( $action ):
 
 		if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), 'unsubscribe' ) ) {
 			wp_redirect( managed_page_url( 'preferences/manage/' ) );
+			die();
+		} else if ( ! Plugin::$instance->preferences->current_contact_can_modify_preferences() ) {
+			notices()->add( 'error', __( "You can't do that now.", 'groundhogg' ) );
+			wp_redirect( managed_page_url( 'preferences/profile/' ) );
 			die();
 		}
 
@@ -390,6 +400,10 @@ switch ( $action ):
 	case 'erase':
 
 		if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), 'erase_profile' ) ) {
+			wp_redirect( managed_page_url( 'preferences/profile/' ) );
+			die();
+		} else if ( ! Plugin::$instance->preferences->current_contact_can_modify_preferences() ) {
+			notices()->add( 'error', __( "You can't do that now.", 'groundhogg' ) );
 			wp_redirect( managed_page_url( 'preferences/profile/' ) );
 			die();
 		}

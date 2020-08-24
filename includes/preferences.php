@@ -19,6 +19,58 @@ class Preferences {
 
 		// Do last so precedence is given to Groundhogg
 		add_filter( 'template_include', [ $this, 'template_include' ], 99 );
+		add_action( 'groundhogg/tracking/email/click', [ $this, 'set_temp_preferences_permissions_cookie' ] );
+	}
+
+	/**
+	 * If the current state of things allows a user to change their email preferences...
+	 *
+	 * @return bool
+	 */
+	public function current_contact_can_modify_preferences(){
+
+		$permissions_hash = get_cookie( 'gh-preferences-permission' );
+
+		if ( ! $permissions_hash ){
+			return false;
+		}
+
+		$tracking = Plugin::$instance->tracking;
+
+		// get the current state of things...
+		$parts = array_filter( [
+			$tracking->get_current_contact_id(),
+			$tracking->get_current_email_id(),
+			$tracking->get_current_funnel_id(),
+			$tracking->get_current_event() ? $tracking->get_current_event()->get_id() : false,
+		] );
+
+		$value = wp_hash( encrypt( implode( '|', $parts ) ) );
+
+		if ( $value !== $permissions_hash ){
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Set a cookie which grants temp permissions to change the email preferences of a contact...
+	 *
+	 * @param $tracking Tracking
+	 */
+	public function set_temp_preferences_permissions_cookie( $tracking ) {
+
+		$parts = array_filter( [
+			$tracking->get_current_contact_id(),
+			$tracking->get_current_email_id(),
+			$tracking->get_current_funnel_id(),
+			$tracking->get_current_event() ? $tracking->get_current_event()->get_id() : false,
+		] );
+
+		$value = wp_hash( encrypt( implode( '|', $parts ) ) );
+
+		set_cookie( 'gh-preferences-permission', $value, 5 * MINUTE_IN_SECONDS );
 	}
 
 	/**
