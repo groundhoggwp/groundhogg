@@ -1,8 +1,9 @@
 import {FETCH_REPORT} from './types'
 import axios from "axios";
 
-export const fetchReport = (reportId, startDate, endDate) => dispatch => {
-    getReport(dispatch, reportId, startDate, endDate);
+export const fetchReport = (reportId, startDate, endDate) => (dispatch,useState ) => {
+
+    getReport(dispatch, reportId, useState().reportDate.start, useState().reportDate.end);
 };
 
 const getReport = (dispatch, reportId, startDate, endDate) => {
@@ -22,8 +23,8 @@ const getReport = (dispatch, reportId, startDate, endDate) => {
 
         axios.post(groundhogg.rest_base  + '/reports', {
             id: reportId,
-            start_date: ' July 21, 2020',
-            end_date: 'August 20, 2020'
+            start_date: startDate.format('MMMM D, YYYY'),
+            end_date: endDate.format('MMMM D, YYYY')
         }).then(
             (response) => {
                 if (response.data.hasOwnProperty('chart')) {

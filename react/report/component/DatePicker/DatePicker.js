@@ -1,105 +1,82 @@
-import React from 'react';
+import React, {useState} from 'react';
 import moment from 'moment';
-import DayPickerInput from 'react-day-picker/DayPickerInput';
-import 'react-day-picker/lib/style.css';
-import {formatDate, parseDate} from 'react-day-picker/moment';
+import DateRangePicker from 'react-bootstrap-daterangepicker';
+
+import {dateChanged} from "../../../actions/reportDateActions";
+
+import {connect} from 'react-redux';
+import 'bootstrap-daterangepicker/daterangepicker.css';
 import './style.scss';
-import {connect} from "react-redux";
-// import {dateChanged} from "../../../actions/reportNavBarActions";
+
 
 
 class DatePicker extends React.Component {
+
     constructor(props) {
         super(props);
-        this.handleFromChange = this.handleFromChange.bind(this);
-        this.handleToChange = this.handleToChange.bind(this);
-        this.state = {
-            from: undefined,
-            to: undefined,
-        };
+        this.handleCallback = this.handleCallback.bind(this);
     }
 
-    showFromMonth() {
-        const {from, to} = this.state;
-        if (!from) {
-            return;
-        }
-        if (moment(to).diff(moment(from), 'months') < 2) {
-            this.to.getDayPicker().showMonth(from);
-        }
-    }
-
-    handleFromChange(from) {
-        // Change the from date and focus the "to" input field
-        // this.setState({from});
-
-        // this.props.dateChanged( {from} ,  '' );
-
-        console.log(from);
-    }
-
-    handleToChange(to) {
-
-        // this.setState({to}, this.showFromMonth);
-
-        // this.props.dateChanged( '' , to ) ;
-        console.log(to);
+    handleCallback(start, end) {
+        this.props.dateChanged(start,end);
     }
 
     render() {
-        const {from, to} = this.props;
-        const modifiers = {start: from, end: to};
+        const {start, end} = this.props.date;
+        const label = start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY');
         return (
-            <div className={"owlytik-datepicker"}>
-                <DayPickerInput
-                    inputProps={{ className: 'form-control' }}
-                    value={from}
-                    placeholder="Start Date"
-                    format="LL"
-                    formatDate={formatDate}
-                    parseDate={parseDate}
-                    dayPickerProps={{
-                        selectedDays: [from, {from, to}],
-                        disabledDays: {after: to},
-                        toMonth: to,
-                        modifiers,
-                        numberOfMonths: 2,
-                        onDayClick: () => this.to.getInput().focus(),
-                    }}
-                    onDayChange={this.handleFromChange}
-                />
-
-                <DayPickerInput
-                    inputProps={{ className: 'form-control' }}
-                    ref={el => (this.to = el)}
-                    value={to}
-                    placeholder="End Date"
-                    format="LL"
-                    formatDate={formatDate}
-                    parseDate={parseDate}
-                    dayPickerProps={{
-                        selectedDays: [from, {from, to}],
-                        disabledDays: {before: from},
-                        modifiers,
-                        month: from,
-                        fromMonth: from,
-                        numberOfMonths: 2,
-                    }}
-                    onDayChange={this.handleToChange}
-                />
-            </div>
-
+            <DateRangePicker
+                initialSettings={{
+                    startDate: start.toDate(),
+                    endDate: end.toDate(),
+                    ranges: {
+                        Today: [moment().toDate(), moment().toDate()],
+                        Yesterday: [
+                            moment().subtract(1, 'days').toDate(),
+                            moment().subtract(1, 'days').toDate(),
+                        ],
+                        'Last 7 Days': [
+                            moment().subtract(6, 'days').toDate(),
+                            moment().toDate(),
+                        ],
+                        'Last 30 Days': [
+                            moment().subtract(29, 'days').toDate(),
+                            moment().toDate(),
+                        ],
+                        'This Month': [
+                            moment().startOf('month').toDate(),
+                            moment().endOf('month').toDate(),
+                        ],
+                        'Last Month': [
+                            moment().subtract(1, 'month').startOf('month').toDate(),
+                            moment().subtract(1, 'month').endOf('month').toDate(),
+                        ],
+                        'This Year': [
+                            moment().startOf('year').toDate(),
+                            moment().toDate(),
+                        ],
+                    },
+                }}
+                onCallback={this.handleCallback}>
+                <div
+                    id="reportrange"
+                    className={"col-sm-12 col-md-6 col-lg-3 form-control groundhogg-report-datepicker "}>
+                    <i className="fa fa-calendar"></i>&nbsp;
+                    <span>{label}</span>
+                </div>
+            </DateRangePicker>
         );
     }
 }
 
 
+
+
 const mapStateToProps = (state) => {
     return {
-        date: state.date
+        date: state.reportDate
     };
 };
 
 
-
-export default connect(mapStateToProps, { dateChanged})(DatePicker);
+export default connect(mapStateToProps, {dateChanged})(DatePicker);

@@ -1,6 +1,6 @@
 import React from 'react'
 
-// import DatePicker from "../../report/conponent/DatePicker/DatePicker";
+import DatePicker from "../../report/component/DatePicker/DatePicker";
 import NavBar from "../../report/component/NavBar/NavBar";
 import './style.scss';
 
@@ -10,8 +10,8 @@ export default {
   title: 'Reports',
   capabilities: [],
   exact: true,
-  render: () => <div>
-    {/*<DatePicker className={"olwytik-datepicker"}/>*/}
+  render: () => <div className={"groundhogg-report-page"}>
+    <DatePicker />
     <NavBar />
 
   </div>,

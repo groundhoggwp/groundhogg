@@ -39,7 +39,7 @@ class NavBar extends Component {
                                 className="justify-content-center"
                                 onSelect={this.handleSelected}>
                                 {Object.entries(this.props.navBar.pageList).map((value, key) => {
-                                    return <Nav.Link eventKey={value[0]}>{value[1]}</Nav.Link>
+                                    return <Nav.Link key={key} eventKey={value[0]}>{value[1]}</Nav.Link>
                                 })}
                             </Nav>
                         </Navbar.Collapse>

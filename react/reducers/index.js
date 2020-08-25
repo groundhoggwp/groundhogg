@@ -6,6 +6,7 @@ import selectionReducer from './selectionReducer'
 import bulkJobReducer from './bulkJobReducer'
 import reportNavBarReducer from "./reportNavBarReducer";
 import reportReducer from "./reportReducer";
+import reportDateReducer from "./reportDateReducer";
 
 export default combineReducers({
   sideBar: sideBarReducer,
@@ -14,5 +15,6 @@ export default combineReducers({
   itemSelection: selectionReducer,
   bulkJob: bulkJobReducer,
   reportNavBar : reportNavBarReducer,
-  reports : reportReducer
+  reports : reportReducer,
+  reportDate : reportDateReducer
 })

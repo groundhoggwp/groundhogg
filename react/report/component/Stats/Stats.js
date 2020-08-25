@@ -40,7 +40,7 @@ class Stats extends React.Component {
                             <hr/>
 
                             <div className="groundhogg-quick-stat-previous green">
-                                <span className="groundhogg-quick-stat-arrow up"></span>
+                                <span className={"groundhogg-quick-stat-arrow up"}></span>
                                 <span className="groundhogg-quick-stat-prev-percent">{report.data.chart.compare.percent}</span>
                             </div>
                             <div className="groundhogg-quick-stat-compare">{report.data.chart.compare.text}</div>

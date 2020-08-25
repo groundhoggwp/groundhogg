@@ -1,5 +1,5 @@
 import React from 'react' ;
-import {Card, Table ,Alert} from "react-bootstrap";
+import {Card, Table, Alert} from "react-bootstrap";
 import {connect} from "react-redux";
 import {fetchReport} from "../../../actions/reportActions";
 import {Loading} from "../Loading/Loading";
@@ -35,18 +35,14 @@ class CustomizedTables extends React.Component {
             if (!report.data.chart.data.length) {
 
                 return (
-                    <Card className="groundhogg-report-card"style={{padding:0}}>
+                    <Card className="groundhogg-report-card" style={{padding: 0}}>
                         <Card.Header className="groundhogg-report-card-header">
-                            <h6>{(report.data.title) ? report.title : "No title"}</h6>
+                            <h6>{(report.data.title) ? report.title : ""}</h6>
                         </Card.Header>
-                        <Card.Body className={"groundhogg-report-card-body"} >
-                            <Table className={'list-table'}>
-                                <tbody>
-                                <div className={"groundhogg-no-data-notice"}>
-                                        {require('html-react-parser')(report.data.no_data)}
-                                </div>
-                                </tbody>
-                            </Table>
+                        <Card.Body className={"groundhogg-report-card-body"}>
+                            <div className={"groundhogg-no-data-notice"}>
+                                {require('html-react-parser')(report.data.no_data)}
+                            </div>
                         </Card.Body>
                     </Card>
                 );
@@ -54,22 +50,22 @@ class CustomizedTables extends React.Component {
             }
 
             return (
-                <Card className="groundhogg-report-card" style={{padding:0}}>
+                <Card className="groundhogg-report-card" style={{padding: 0}}>
                     <Card.Header className="groundhogg-report-card-header">
-                        <h6>{(report.data.title) ? report.title : "No title"}</h6>
+                        <h6>{(report.data.title) ? report.title : ""}</h6>
                     </Card.Header>
                     <Card.Body className={"groundhogg-report-card-body"}>
                         <Table className={'groundhogg-report-table'}>
                             <thead>
                             <tr>
-                                {report.data.chart.label.map((label) => {
-                                    return <th> {label} </th>;
+                                {report.data.chart.label.map((label, index) => {
+                                    return <th key={index}> {label} </th>;
                                 })}
                             </tr>
                             </thead>
                             <tbody>
-                            {report.data.chart.data.map(row =>
-                                <tr >
+                            {report.data.chart.data.map( (row ,index) =>
+                                <tr key={index}>
                                     {Object.keys(row).map(key => <td
                                         key={key}>{require('html-react-parser')(String(row[key]))}</td>)}
                                 </tr>)

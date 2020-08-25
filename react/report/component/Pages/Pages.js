@@ -50,8 +50,8 @@ export class ReportRows extends React.Component {
         if (this.props.row instanceof Array) {
             return (
                 <Row >
-                    {this.props.row.map((objects) =>
-                        <ReportRows  row={objects} />)}
+                    {this.props.row.map((objects ,index) =>
+                        <ReportRows key={index} row={objects} />)}
                 </Row>
             );
         } else {
@@ -84,9 +84,9 @@ export class Pages extends React.Component {
         ) {
             return (
                 <Container fluid style={{paddingTop : 15}}>
-                    {this.props.navBar.pages.rows.map((row) => {
+                    {this.props.navBar.pages.rows.map((row,index) => {
                         // return (<div>{this.handleRow(row)}</div>);
-                        return <ReportRows row={row}/>
+                        return <ReportRows key={index} row={row}/>
                     })}
                 </Container>
             );
@@ -97,31 +97,6 @@ export class Pages extends React.Component {
 
     }
 }
-//
-// const Pages = (props) => {
-//
-//     useEffect(() => {
-//         changeSelectedNav(props.navBar.pageSelected);
-//     });
-//     if (
-//
-//         props.page.hasOwnProperty("reports") &&
-//         props.page.reports.hasOwnProperty("rows")
-//     ) {
-//         return (
-//             <Container fluid>
-//                 {props.page.reports.rows.map((row) => {
-//                     // return (<div>{this.handleRow(row)}</div>);
-//                     return <ReportRows row={row}/>
-//                 })}
-//             </Container>
-//         );
-//     } else {
-//         return <h1> loading... </h1>;
-//     }
-//
-// }
-
 
 const mapStateToProps = (state) => {
     return {

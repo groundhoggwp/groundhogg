@@ -59,7 +59,7 @@ const Nav = ({ routes }) => {
 
   return (
     <nav className={ 'groundhogg-siderbar-nav' }>
-      { routes && routes.map(route => <NavItem route={ route }/>) }
+      { routes && routes.map( (route, index ) => <NavItem key={index} route={ route }/>) }
     </nav>
   )
 }
