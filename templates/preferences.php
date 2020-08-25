@@ -2,6 +2,8 @@
 
 namespace Groundhogg;
 
+use function foo\func;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -92,6 +94,19 @@ if ( ! function_exists( 'mail_gdpr_data' ) ) {
 
 }
 
+//function changing_preferences() {
+//	$contact         = get_contactdata();
+//	$permissions_key = get_cookie( 'gh-permissions-key' );
+//
+//	if ( ! is_a_contact( $contact ) || ! $permissions_key ) {
+//		wp_die( 'oops' );
+//	} else if ( ! check_permissions_key( $permissions_key, $contact ) ) {
+//		wp_die( 'oops' );
+//	}
+//
+//	return true;
+//}
+
 add_action( 'enqueue_managed_page_styles', function () {
 	wp_enqueue_style( 'manage-preferences' );
 } );
@@ -104,42 +119,35 @@ $contact = get_contactdata();
 $action  = get_query_var( 'action', 'profile' );
 
 // Compat for erase action which will be true because there will be no contact.
-if ( ! $contact && $action !== 'erase' ) {
-	$action = 'no_email';
+//if ( ! $contact && $action !== 'erase' ) {
+//	$action = 'no_email';
+//}
+
+// check for the permissions_key and set it as a cookie
+if ( $permissions_key = get_url_var( 'pk' ) ) {
+	set_cookie( 'gh-permissions-key', $permissions_key, HOUR_IN_SECONDS );
+} else {
+	$permissions_key = get_cookie( 'gh-permissions-key' );
+}
+
+// if the permissions key is not set and is not valid then show the unidentified page...
+// we will allow logged in users to manage their preferences without a key
+if ( ! is_user_logged_in() && ! check_permissions_key( $permissions_key, $contact ) ) {
+	$action = 'unidentified';
 }
 
 switch ( $action ):
 
-	default:
-	case 'no_email':
-
-		if ( wp_verify_nonce( get_request_var( '_wpnonce' ), 'identify_yourself' ) ) {
-
-			$email = sanitize_email( get_request_var( 'email' ) );
-
-			if ( is_email( $email ) ) {
-				$contact = get_contactdata( $email );
-
-				if ( $contact ) {
-					// Start tracking this contact
-					after_form_submit_handler( $contact );
-					die( wp_redirect( managed_page_url( 'preferences/profile/' ) ) );
-				}
-			}
-		}
-
+	case 'unidentified':
 		managed_page_head( __( 'Manage Preferences', 'groundhogg' ), 'manage' );
-
 		?>
-        <form action="" id="emailaddress" method="post">
-			<?php wp_nonce_field( 'identify_yourself' ); ?>
-            <p><?php _e( 'Please enter your email address to manage your preferences.', 'groundhogg' ); ?></p>
-            <p><input type="email" name="email" id="email"
-                      placeholder="<?php esc_attr_e( "your.name@domain.com", 'groundhogg' ); ?>" required></p>
+        <div id="unidentified" class="box">
+            <p><?php _e( 'Whoops! We were unable to confirm your identity. If you are trying to change your email preferences please click the unsubscribe link in the footer of any email.', 'groundhogg' ); ?></p>
             <p>
-                <input id="submit" type="submit" class="button" value="<?php esc_attr_e( 'Submit', 'groundhogg' ); ?>">
+                <a id="gotosite" class="button"
+                   href="<?php echo esc_url( home_url() ); ?>"><?php printf( __( 'Return to %s', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ); ?></a>
             </p>
-        </form>
+        </div>
 		<?php
 
 		managed_page_footer();
@@ -161,12 +169,12 @@ switch ( $action ):
 			} else {
 				Plugin::$instance->notices->add( new \WP_Error( 'failed', __( 'Something went wrong sending your email.', 'groundhogg' ) ) );
 			}
-
 		}
 
 		wp_redirect( managed_page_url( 'preferences/profile/' ) );
 		die();
 
+	default:
 	case 'profile':
 
 		if ( wp_verify_nonce( get_request_var( '_wpnonce' ), 'update_contact_profile' ) ) {
@@ -251,12 +259,6 @@ switch ( $action ):
 		do_action( 'groundhogg/preferences/manage/before' );
 
 		if ( wp_verify_nonce( get_request_var( '_wpnonce' ), 'manage_email_preferences' ) ) {
-
-			if ( ! Plugin::$instance->preferences->current_contact_can_modify_preferences() ) {
-				notices()->add( 'error', __( "You can't do that now.", 'groundhogg' ) );
-				wp_redirect( managed_page_url( 'preferences/profile/' ) );
-				die();
-			}
 
 			$preference = get_request_var( 'preference' );
 			$redirect   = false;
@@ -343,10 +345,6 @@ switch ( $action ):
 		if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), 'unsubscribe' ) ) {
 			wp_redirect( managed_page_url( 'preferences/manage/' ) );
 			die();
-		} else if ( ! Plugin::$instance->preferences->current_contact_can_modify_preferences() ) {
-			notices()->add( 'error', __( "You can't do that now.", 'groundhogg' ) );
-			wp_redirect( managed_page_url( 'preferences/profile/' ) );
-			die();
 		}
 
 		$contact->unsubscribe();
@@ -377,6 +375,11 @@ switch ( $action ):
 		}
 
 		$contact->change_marketing_preference( Preferences::CONFIRMED );
+		$redirect_to = esc_url_raw( sanitize_text_field( get_url_var( 'redirect_to' ) ) );
+
+		if ( $redirect_to ) {
+			die( wp_redirect( $redirect_to ) );
+		}
 
 		managed_page_head( __( 'Confirmed', 'groundhogg' ), 'confirm' );
 
@@ -400,10 +403,6 @@ switch ( $action ):
 	case 'erase':
 
 		if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), 'erase_profile' ) ) {
-			wp_redirect( managed_page_url( 'preferences/profile/' ) );
-			die();
-		} else if ( ! Plugin::$instance->preferences->current_contact_can_modify_preferences() ) {
-			notices()->add( 'error', __( "You can't do that now.", 'groundhogg' ) );
 			wp_redirect( managed_page_url( 'preferences/profile/' ) );
 			die();
 		}

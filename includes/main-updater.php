@@ -293,19 +293,19 @@ class Main_Updater extends Updater {
 		update_option( 'gh_migrate_notes', 1 );
 	}
 
-	/**
-	 * Notes db added.
-	 * Migrate notes
-	 */
 	public function version_2_2_17() {
 		Plugin::$instance->dbs->install_dbs();
 	}
 
-	/**
-	 * Notes db added.
-	 * Migrate notes
-	 */
 	public function version_2_2_18() {
+		Plugin::$instance->dbs->install_dbs();
+	}
+
+	/**
+	 * Added permission keys
+	 */
+	public function version_2_2_19() {
+		// Add the new permissions_keys dbs...
 		Plugin::$instance->dbs->install_dbs();
 	}
 
@@ -344,7 +344,8 @@ class Main_Updater extends Updater {
 			'2.2',
 			'2.2.14',
 			'2.2.17',
-			'2.2.18'
+			'2.2.18',
+			'2.2.19',
 		];
 	}
 
@@ -361,6 +362,7 @@ class Main_Updater extends Updater {
 			'2.2.13',
 			'2.2.14',
 			'2.2.18',
+			'2.2.19',
 		];
 	}
 
@@ -391,8 +393,8 @@ class Main_Updater extends Updater {
 			'2.2'           => __( 'Event queue performance improvements.', 'groundhogg' ),
 			'2.2.3'         => __( 'Reformat all tables.', 'groundhogg' ),
 			'2.2.14'        => __( 'Migrate notes and update broadcasts table.', 'gorundhogg' ),
-			'2.2.17'        => __( 'Added Broadcast meta table.' , 'groundhogg' ),
-			'2.2.18'        => __( 'Add email_id column to events tables.' , 'groundhogg' ),
+			'2.2.17'        => __( 'Added Broadcast meta table.', 'groundhogg' ),
+			'2.2.18'        => __( 'Add email_id column to events tables.', 'groundhogg' ),
 		];
 	}
 }

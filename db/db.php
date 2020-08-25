@@ -70,7 +70,7 @@ abstract class DB {
 	 */
 	public function __construct() {
 
-		$this->db_suffix  = $this->get_db_suffix();
+		$this->db_suffix = $this->get_db_suffix();
 
 		$this->render_table_name();
 
@@ -92,7 +92,7 @@ abstract class DB {
 	/**
 	 * Build the table name from the wpdb
 	 */
-	public function render_table_name(){
+	public function render_table_name() {
 		global $wpdb;
 		$table_name = $wpdb->prefix . $this->db_suffix;
 
@@ -100,7 +100,7 @@ abstract class DB {
 		 * Filter the table name...
 		 *
 		 * @param string $table_name
-		 * @param DB $db
+		 * @param DB     $db
 		 */
 		$this->table_name = apply_filters( 'groundhogg/db/render_table_name', $table_name, $this );
 	}
@@ -124,9 +124,9 @@ abstract class DB {
 	/**
 	 * Check if the site is global multisite enabled
 	 *
+	 * @deprecated
 	 * @return bool
 	 *
-	 * @deprecated
 	 */
 	private function is_global_multisite() {
 		return false;
@@ -182,7 +182,8 @@ abstract class DB {
 	/**
 	 * Option to add additional actions following construct.
 	 */
-	protected function add_additional_actions() {}
+	protected function add_additional_actions() {
+	}
 
 	/**
 	 * Register the table with $wpdb so the metadata api can find it
@@ -261,8 +262,8 @@ abstract class DB {
 	 * Whitelist of columns
 	 *
 	 * @access  public
-	 * @return  array
 	 * @since   2.1
+	 * @return  array
 	 */
 	public function get_columns() {
 		return [];
@@ -271,7 +272,7 @@ abstract class DB {
 	/**
 	 * Create a where clause given an array
 	 *
-	 * @param array $args
+	 * @param array  $args
 	 * @param string $operator
 	 *
 	 * @return string
@@ -324,8 +325,8 @@ abstract class DB {
 	 * Retrieve a row by the primary key
 	 *
 	 * @access  public
-	 * @return  object
 	 * @since   2.1
+	 * @return  object
 	 */
 	public function get( $row_id ) {
 		global $wpdb;
@@ -337,8 +338,8 @@ abstract class DB {
 	 * Retrieve a row by a specific column / value
 	 *
 	 * @access  public
-	 * @return  object
 	 * @since   2.1
+	 * @return  object
 	 */
 	public function get_by( $column, $row_id ) {
 		global $wpdb;
@@ -351,8 +352,8 @@ abstract class DB {
 	 * Retrieve a specific column's value by the primary key
 	 *
 	 * @access  public
-	 * @return  string
 	 * @since   2.1
+	 * @return  string
 	 */
 	public function get_column( $column, $row_id ) {
 		global $wpdb;
@@ -381,8 +382,8 @@ abstract class DB {
 	 * Default column values
 	 *
 	 * @access  public
-	 * @return  array
 	 * @since   2.1
+	 * @return  array
 	 */
 	public function get_column_defaults() {
 		return [];
@@ -392,8 +393,8 @@ abstract class DB {
 	 * Insert a new row
 	 *
 	 * @access  public
-	 * @return  int
 	 * @since   2.1
+	 * @return  int
 	 */
 	public function insert( $data ) {
 		global $wpdb;
@@ -453,8 +454,8 @@ abstract class DB {
 	 * Update a row
 	 *
 	 * @access  public
-	 * @return  bool
 	 * @since   2.1
+	 * @return  bool
 	 */
 	public function update( $row_id = 0, $data = [], $where = [] ) {
 
@@ -562,8 +563,8 @@ abstract class DB {
 	 * Delete a row identified by the primary key
 	 *
 	 * @access  public
-	 * @return  bool
 	 * @since   2.1
+	 * @return  bool
 	 */
 	public function delete( $row_id = 0 ) {
 
@@ -619,9 +620,9 @@ abstract class DB {
 	}
 
 	/**
-	 * @param array $data
+	 * @param array        $data
 	 * @param string|false $ORDER_BY
-	 * @param bool $from_cache
+	 * @param bool         $from_cache
 	 *
 	 * @return array|bool|null|object
 	 */
@@ -710,7 +711,7 @@ abstract class DB {
 	 * New and improved query function to access DB in more complex and interesting ways.
 	 *
 	 * @param array $query_vars
-	 * @param bool $from_cache
+	 * @param bool  $from_cache
 	 *
 	 * @return object[]|array[]|int
 	 */
@@ -821,7 +822,7 @@ abstract class DB {
 			$select = implode( ',', $select );
 		}
 
-		$distinct = isset_not_empty( $query_vars, 'distinct' ) ? 'DISTINCT' : '' ;
+		$distinct = isset_not_empty( $query_vars, 'distinct' ) ? 'DISTINCT' : '';
 
 		if ( $query_vars['func'] ) {
 			$select = sprintf( '%s( %s %s)', strtoupper( $query_vars['func'] ), $distinct, $select );
@@ -907,7 +908,10 @@ abstract class DB {
 					'value'  => 'val',
 					'key'    => 'col',
 					'column' => 'col',
-					'comp'   => 'compare'
+					'comp'   => 'compare',
+					0        => 'col',
+					1        => 'compare',
+					2        => 'val'
 				];
 
 				foreach ( $normalize_keys as $from => $to ) {
@@ -1002,8 +1006,8 @@ abstract class DB {
 	 * Retrieve a specific column's value by the the specified column / value
 	 *
 	 * @access  public
-	 * @return  string
 	 * @since   2.1
+	 * @return  string
 	 */
 	public function get_column_by( $column, $column_where, $column_value ) {
 		global $wpdb;
@@ -1070,8 +1074,8 @@ abstract class DB {
 	/**
 	 * Check if the table was ever installed
 	 *
-	 * @return bool Returns if the contacts table was installed and upgrade routine run
 	 * @since  2.4
+	 * @return bool Returns if the contacts table was installed and upgrade routine run
 	 */
 	public function installed() {
 		return $this->table_exists( $this->table_name );
@@ -1080,11 +1084,11 @@ abstract class DB {
 	/**
 	 * Check if the given table exists
 	 *
+	 * @since  2.4
+	 *
 	 * @param string $table The table name
 	 *
 	 * @return bool          If the table name exists
-	 * @since  2.4
-	 *
 	 */
 	public function table_exists( $table ) {
 		global $wpdb;

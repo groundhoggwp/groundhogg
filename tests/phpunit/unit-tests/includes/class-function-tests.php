@@ -4,10 +4,11 @@ use function Groundhogg\convert_user_to_contact_when_user_registered;
 use function Groundhogg\create_user_from_contact;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
+use function Groundhogg\preg_quote_except;
 
 class Function_Tests extends GH_UnitTestCase {
 
-	public function test_generate_referer_hash(){
+	public function test_generate_referer_hash() {
 		$hash = \Groundhogg\generate_referer_hash( 'https://www.groundhogg.io/my/custom/path/' );
 		$this->assertEquals( 20, strlen( $hash ) );
 	}
@@ -47,7 +48,7 @@ class Function_Tests extends GH_UnitTestCase {
 
 		$this->factory()->contacts->get_db()->truncate();
 
-		$user_id  = $this->factory()->user->create( [
+		$user_id = $this->factory()->user->create( [
 			'role' => 'subscriber'
 		] );
 
@@ -55,5 +56,30 @@ class Function_Tests extends GH_UnitTestCase {
 
 		$this->assertTrue( $contact->has_tag( 'subscriber' ) );
 	}
+
+	public function test_preg_quote_except() {
+
+		// string, except, expected
+		$tests = [
+			[ '/my-path/$', [ '$', '-' ], '/my-path/$' ],
+			[ '/my-path/$', [ '-' ], '/my-path/\$' ],
+			[ 'https://wordpress.org/$', [ '$' ], 'https\://wordpress\.org/$' ],
+			[ 'https://wordpress.org/$', [ '.', ':' ], 'https://wordpress.org/\$' ],
+			[ 'https://wordpress.(org)/', [ ':' ], 'https://wordpress\.\(org\)/' ],
+		];
+
+		foreach ( $tests as $test ) {
+			$this->assertEquals( preg_quote_except( $test[0], $test[1] ), $test[2] );
+		}
+	}
+
+//	public function test_url_exclusions(){
+//
+//		// url, expected
+//		$tests = [
+//
+//		];
+//
+//	}
 
 }

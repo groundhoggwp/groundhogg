@@ -77,7 +77,7 @@ class Preferences {
 	 * Add the rewrite rules required for the Preferences center.
 	 */
 	public function add_rewrite_rules() {
-		add_managed_rewrite_rule( 'preferences/([^/?]*)', 'subpage=preferences&action=$matches[1]', 'top' );
+		add_managed_rewrite_rule( 'preferences(/?([^/?]*))?', 'subpage=preferences&action=$matches[2]', 'top' );
 	}
 
 	/**

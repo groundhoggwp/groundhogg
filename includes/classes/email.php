@@ -436,7 +436,15 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function tracking_link_callback( $matches ) {
-		return $matches[1] . trailingslashit( $this->get_click_tracking_link() . base64_encode( str_replace( '&amp;', '&', $matches[2] ) ) ) . $matches[3];
+
+		$clean_url = str_replace( '&amp;', '&', $matches[2] );
+
+		// If the url is not to be tracked leave it alone.
+		if ( is_url_excluded_from_tracking( $clean_url) ){
+			return $matches[1] . $clean_url . $matches[3];
+		}
+
+		return $matches[1] . trailingslashit( $this->get_click_tracking_link() . base64_encode( $clean_url ) ) . $matches[3];
 	}
 
 	/**
@@ -490,6 +498,7 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function get_unsubscribe_link( $url = '' ) {
 		$url = managed_page_url( 'preferences/manage' );
+		$url = permissions_key_url( $url, $this->get_contact() );
 
 		return $url;
 	}
