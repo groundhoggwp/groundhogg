@@ -9,6 +9,7 @@ import CustomizedTables from "../CustomizedTable/CustomizedTables";
 import Stats from "../Stats/Stats";
 import PieChart from "../PieChart/PieChart";
 import {Loading} from "../Loading/Loading";
+import BarChart from "../BarChart/BarChart";
 
 
 
@@ -28,6 +29,8 @@ export class Report extends React.Component {
                 return (<Stats classes={this.props.classes} id={this.props.id} start = {this.props.start} end = {this.props.end}/>);
             case  'pie' :
                 return  (<PieChart classes={this.props.classes} id={this.props.id} start = {this.props.start} end = {this.props.end}/>);
+          case  'bar-chart' :
+                return  (<BarChart classes={this.props.classes} id={this.props.id} start = {this.props.start} end = {this.props.end}/>);
             default:
                 return  (<h1> default case</h1>);
 

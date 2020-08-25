@@ -42,6 +42,7 @@ class Report_Pages_Api extends Base {
 				"overview"   => "Overview",
 				"contacts"   => "Contacts",
 				"email"      => "Email",
+				"funnels"    => "Funnels",
 				"broadcasts" => "Broadcasts",
 				"forms"      => 'Forms'
 			]
@@ -62,7 +63,7 @@ class Report_Pages_Api extends Base {
 		$page = $request->get_param( 'page' );
 
 		$page_array = [
-			"overview" => [
+			"overview"   => [
 				"page"    => $page,
 				"reports" => [
 					"rows" => [
@@ -182,7 +183,7 @@ class Report_Pages_Api extends Base {
 					]
 				]
 			],
-			"contacts" => [
+			"contacts"   => [
 				"page"    => $page,
 				"reports" => [
 					"rows" => [
@@ -241,7 +242,8 @@ class Report_Pages_Api extends Base {
 								'md'   => 12,
 								'sm'   => 12
 							]
-						],[
+						],
+						[
 							[
 								'id'   => 'chart_contacts_by_country',
 								'type' => 'pie',
@@ -272,7 +274,8 @@ class Report_Pages_Api extends Base {
 								'md'   => 12,
 								'sm'   => 12
 							]
-						],[
+						],
+						[
 							[
 								'id'   => 'table_contacts_by_source_page',
 								'type' => 'table',
@@ -287,7 +290,8 @@ class Report_Pages_Api extends Base {
 								'md'   => 12,
 								'sm'   => 12
 							]
-						],[
+						],
+						[
 							[
 								'id'   => 'table_list_engagement',
 								'type' => 'table',
@@ -301,7 +305,7 @@ class Report_Pages_Api extends Base {
 					]
 				],
 			],
-			"email" =>[
+			"email"      => [
 				"page"    => $page,
 				"reports" => [
 					"rows" => [
@@ -338,7 +342,8 @@ class Report_Pages_Api extends Base {
 								'sm'   => 12
 							],
 
-						],[
+						],
+						[
 							[
 								'id'   => 'total_unsubscribed_contacts',
 								'type' => 'stats',
@@ -360,7 +365,8 @@ class Report_Pages_Api extends Base {
 								'lg'   => 3,
 								'md'   => 6,
 								'sm'   => 12
-							],[
+							],
+							[
 								'id'   => 'total_complaints_contacts',
 								'type' => 'stats',
 								'lg'   => 3,
@@ -404,6 +410,93 @@ class Report_Pages_Api extends Base {
 					]
 				],
 			],
+			"funnels"    => [
+				"page"    => $page,
+				"reports" => [
+					"rows" => [
+						[
+							[
+								'id'   => 'chart_funnel_breakdown',
+								'type' => 'bar-chart',
+								'lg'   => 12,
+								'md'   => 12,
+								'sm'   => 12
+							],
+						],
+						[
+							[
+								'id'   => 'total_contacts_in_funnel',
+								'type' => 'stats',
+								'lg'   => 4,
+								'md'   => 6,
+								'sm'   => 12
+							],
+
+							[
+								'id'   => 'total_funnel_conversion_rate',
+								'type' => 'stats',
+								'lg'   => 4,
+								'md'   => 6,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'total_abandonment_rate',
+								'type' => 'stats',
+								'lg'   => 4,
+								'md'   => 6,
+								'sm'   => 12
+							],
+
+						],
+						[
+							[
+								'id'   => 'table_top_performing_emails',
+								'type' => 'table',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'table_worst_performing_emails',
+								'type' => 'table',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							]
+						],
+						[
+							[
+								'id'   => 'table_benchmark_conversion_rate',
+								'type' => 'table',
+								'lg'   => 12,
+								'md'   => 12,
+								'sm'   => 12
+							],
+
+						],
+						[
+							[
+								'id'   => 'table_form_activity',
+								'type' => 'table',
+								'lg'   => 12,
+								'md'   => 12,
+								'sm'   => 12
+							],
+
+						],
+						[
+							[
+								'id'   => 'table_funnel_stats',
+								'type' => 'table',
+								'lg'   => 12,
+								'md'   => 12,
+								'sm'   => 12
+							],
+
+						],
+					]
+				],
+			],
 			"broadcasts" => [
 				"page"    => $page,
 				"reports" => [
@@ -438,7 +531,7 @@ class Report_Pages_Api extends Base {
 					]
 				],
 			],
-			"forms" => [
+			"forms"      => [
 				"page"    => $page,
 				"reports" => [
 					"rows" => [
@@ -458,13 +551,12 @@ class Report_Pages_Api extends Base {
 
 		];
 
-		if ($page_array[$page]) {
+		if ( $page_array[ $page ] ) {
 
-			$data = $page_array [$page];
-		} else
-		{
+			$data = $page_array [ $page ];
+		} else {
 			$data = [
-				'error' =>  'page Not found'
+				'error' => 'page Not found'
 			];
 		}
 
