@@ -89,7 +89,7 @@ class BarChart extends Component {
 
     componentDidMount() {
         // get the data for the line chart from the id
-        this.props.fetchReport(this.props.id, this.props.start, this.props.end);
+        this.props.fetchReport(this.props.id);
     }
 
 }

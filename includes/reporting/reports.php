@@ -10,6 +10,7 @@ use Groundhogg\Reporting\New_Reports\Chart_Email_Activity;
 use Groundhogg\Reporting\New_Reports\Chart_Funnel_Breakdown;
 use Groundhogg\Reporting\New_Reports\Chart_Last_Broadcast;
 use Groundhogg\Reporting\New_Reports\Chart_New_Contacts;
+use Groundhogg\Reporting\New_Reports\Ddl_Funnels;
 use Groundhogg\Reporting\New_Reports\Email_Click_Rate;
 use Groundhogg\Reporting\New_Reports\Email_Open_Rate;
 use Groundhogg\Reporting\New_Reports\Table_Benchmark_Conversion_Rate;
@@ -249,11 +250,16 @@ class Reports {
 			[
 				'id'       => 'table_list_engagement',
 				'callback' => [ $this, 'table_list_engagement' ]
+			],
+			[
+				'id'       => 'ddl_funnels',
+				'callback' => [ $this, 'ddl_funnels' ]
 			]
+
 		];
 
 		foreach ( $default_reports as $report ) {
-			$this->add( $report['id'], $report['callback'] );
+			$this->add( $report[ 'id' ], $report[ 'callback' ] );
 		}
 
 		do_action( 'groundhogg/reports/setup_default_reports/after', $this );
@@ -297,7 +303,7 @@ class Reports {
 			return false;
 		}
 
-		$results = call_user_func( $this->reports[ $report_id ]['callback'] );
+		$results = call_user_func( $this->reports[ $report_id ][ 'callback' ] );
 
 		return $results;
 	}
@@ -660,44 +666,50 @@ class Reports {
 		return $report->get_data();
 	}
 
-	public function table_form_activity(){
+	public function table_form_activity() {
 		$report = new Table_Form_Activity( $this->start, $this->end );
 
 		return $report->get_data();
 	}
 
-	public function table_email_stats(){
+	public function table_email_stats() {
 		$report = new Table_Email_Stats( $this->start, $this->end );
 
 		return $report->get_data();
 	}
 
-	public function table_email_links_clicked(){
+	public function table_email_links_clicked() {
 		$report = new Table_Email_Links_Clicked( $this->start, $this->end );
 
 		return $report->get_data();
 	}
 
-	public function chart_donut_email_stats(){
+	public function chart_donut_email_stats() {
 		$report = new Chart_Donut_Email_Stats( $this->start, $this->end );
 
 		return $report->get_data();
 	}
 
-	public function table_funnel_stats(){
+	public function table_funnel_stats() {
 		$report = new Table_Funnel_Stats( $this->start, $this->end );
 
 		return $report->get_data();
 	}
 
-	public function table_email_funnels_used_in(){
+	public function table_email_funnels_used_in() {
 		$report = new Table_Email_Funnels_Used_In( $this->start, $this->end );
 
 		return $report->get_data();
 	}
 
-	public function table_list_engagement(){
+	public function table_list_engagement() {
 		$report = new Table_List_Engagement( $this->start, $this->end );
+
+		return $report->get_data();
+	}
+
+	public function ddl_funnels() {
+		$report = new Ddl_Funnels( $this->start, $this->end );
 
 		return $report->get_data();
 	}

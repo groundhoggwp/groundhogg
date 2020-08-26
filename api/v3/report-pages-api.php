@@ -414,6 +414,16 @@ class Report_Pages_Api extends Base {
 				"page"    => $page,
 				"reports" => [
 					"rows" => [
+
+						[
+							[
+								'id'   => 'ddl_funnels',
+								'type' => 'ddl',
+								'lg'   => 4,
+								'md'   => 6,
+								'sm'   => 12
+							]
+						],
 						[
 							[
 								'id'   => 'chart_funnel_breakdown',

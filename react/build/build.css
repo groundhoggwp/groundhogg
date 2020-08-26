@@ -773,6 +773,10 @@ table.groundhogg-report-table {
     color: #acbdc9;
     display: inline-block; }
 
+.groundhogg-report-dropdown-wrapper {
+  float: right;
+  background-color: #0c6251; }
+
 .groundhogg-report-nav {
   width: 100%;
   background: #fff;

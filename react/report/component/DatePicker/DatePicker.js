@@ -1,12 +1,10 @@
 import React, {useState} from 'react';
 import moment from 'moment';
 import DateRangePicker from 'react-bootstrap-daterangepicker';
-
-import {dateChanged} from "../../../actions/reportDateActions";
-
 import {connect} from 'react-redux';
 import 'bootstrap-daterangepicker/daterangepicker.css';
 import './style.scss';
+import {dateChanged} from "../../../actions/reportDataActions";
 
 
 
@@ -71,10 +69,9 @@ class DatePicker extends React.Component {
 
 
 
-
 const mapStateToProps = (state) => {
     return {
-        date: state.reportDate
+        date: state.reportData
     };
 };
 
