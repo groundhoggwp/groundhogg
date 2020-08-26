@@ -320,7 +320,7 @@ class Tracking {
 		// Override if the user is logged in.
 		if ( function_exists( 'is_user_logged_in' ) && is_user_logged_in() ) {
 
-			$ignore_user_precedence = apply_filters( 'groundhogg/tracking/ignore_user_precedence', is_option_enabled( 'gh_ignore_user_precedence' ) );
+			$ignore_user_precedence = is_ignore_user_tracking_precedence_enabled();
 
 			// You can have user precedence if the id_or_email is false and the user is logged in or if the disable option is not enabled.
 			if ( ! $ignore_user_precedence || ! $id_or_email ) {
@@ -333,6 +333,25 @@ class Tracking {
 		}
 
 		return get_contactdata( $id_or_email );
+	}
+
+	/**
+	 * Set the current contact
+	 *
+	 * @param $contact Contact
+	 *
+	 * @return bool
+	 */
+	public function set_current_contact( $contact ){
+
+		if ( ! is_a_contact( $contact ) ){
+			return false;
+		}
+
+		$this->add_tracking_cookie_param( 'contact_id', $contact->get_id() );
+		$this->build_tracking_cookie();
+
+		return true;
 	}
 
 	/**

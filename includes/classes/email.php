@@ -498,7 +498,11 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function get_unsubscribe_link( $url = '' ) {
 		$url = managed_page_url( 'preferences/manage' );
-		$url = permissions_key_url( $url, $this->get_contact() );
+
+		// only add permissions key if this is a real email being sent.
+		if ( ! $this->is_testing() && ! is_user_logged_in() ){
+			$url = permissions_key_url( $url, $this->get_contact() );
+		}
 
 		return $url;
 	}

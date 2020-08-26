@@ -205,6 +205,13 @@ abstract class DB {
 	abstract public function get_object_type();
 
 	/**
+	 * Gets the max index length
+	 */
+	public function get_max_index_length(){
+		return $this->get_charset() === 'utf8mb4' ? 191 : 255;
+	}
+
+	/**
 	 * Flush the cache...
 	 */
 	public static function flush_cache() {

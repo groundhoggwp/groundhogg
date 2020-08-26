@@ -6,7 +6,6 @@ use Groundhogg\Lib\Mobile\Iso3166;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
 use WP_Error;
-use function foo\func;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -165,6 +164,13 @@ function html() {
  */
 function notices() {
 	return Plugin::$instance->notices;
+}
+
+/**
+ * @return Tracking
+ */
+function tracking(){
+    return Plugin::$instance->tracking;
 }
 
 /**
@@ -3334,7 +3340,18 @@ function has_replacements( $content ) {
  * @return bool
  */
 function is_a_contact( $contact ) {
-	return $contact && $contact instanceof $contact && $contact->exists();
+	return $contact && $contact instanceof Contact && $contact->exists();
+}
+
+/**
+ * Whether the given user is a user
+ *
+ * @param $user
+ *
+ * @return bool
+ */
+function is_a_user( $user ){
+    return $user && $user instanceof \WP_User;
 }
 
 /**
@@ -3348,12 +3365,22 @@ function generate_permissions_key( $contact ) {
 		return false;
 	}
 
+	// If a key was already created for the given contact within the current runtime
+	// use it instead of creating a new one
+	if ( $found = wp_cache_get( $contact->get_id(), 'permissions_keys' ) ) {
+		return $found;
+	}
+
 	$key = wp_generate_password( 20, false );
 
+	// Generate the permissions_key
 	get_db( 'permissions_keys' )->add( [
 		'contact_id'      => $contact->get_id(),
 		'permissions_key' => wp_hash_password( $key )
 	] );
+
+	// set the key for the given contact in the cache
+	wp_cache_set( $contact->get_id(), $key, 'permissions_keys' );
 
 	return $key;
 }
@@ -3460,5 +3487,57 @@ function is_url_excluded_from_tracking( $url, $exclusions = [] ) {
 		$exclusions_regex = implode( '|', $exclusions );
 	}
 
-	return preg_match( "@$exclusions_regex@", $url );
+	return apply_filters( 'groundhogg/is_url_excluded_from_tracking', preg_match( "@$exclusions_regex@", $url ), $url, $exclusions_regex );
+}
+
+/**
+ * Whether the tracking precedence option is enabled.
+ *
+ * @return mixed|void
+ */
+function is_ignore_user_tracking_precedence_enabled(){
+	return apply_filters( 'groundhogg/tracking/ignore_user_precedence', is_option_enabled( 'gh_ignore_user_precedence' ) );
+}
+
+/**
+ * Check if a contact and a user match
+ *
+ * @param $contact Contact|int
+ * @param $user \WP_User|int
+ *
+ * @return bool
+ */
+function contact_and_user_match( $contact, $user ){
+
+    if ( is_int( $contact ) ){
+        $contact = get_contactdata( $contact );
+    }
+
+    if ( ! is_a_contact( $contact ) ){
+        return false;
+    }
+
+    if ( is_int( $user ) ){
+        $user = get_userdata( $user );
+    }
+
+    if ( ! is_a_user( $user ) ){
+        return false;
+    }
+
+    return $contact->get_email() === $user->user_email;
+}
+
+/**
+ * Whether the current user matches the current contact with the same email address.
+ *
+ * @return bool
+ */
+function current_contact_and_logged_in_user_match(){
+
+    if ( ! is_user_logged_in() || ! get_contactdata() ) {
+	    return false;
+    }
+
+    return contact_and_user_match( get_contactdata(), wp_get_current_user() );
 }

@@ -177,6 +177,17 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.19 (2020-08-26) =
+* ADDED filters to exclude certain links in emails from being re-written to tracking links.
+ * You can exclude URLs from the Email settings tab.
+* TWEAKED email preferences center.
+ * Visitors will be asked to confirm their identify via email in the event their contact tracking cookie is not present.
+ * Contacts are issued a `permissions key` in every email which will be passed to the preferences center enabling the contact to make changes to their preferences.
+ * If no `permissions key` is provided, the preferences center will be locked and the visitor will be direct to the home page.
+ * A `permissions key` will not be required if the contact is logged in to the site.
+ * `Permissions keys` will expire after 24 hours, they can be used multiple times in a single session within the 24 hour period.
+ * Expired keys will be automatically removed from the database.
+
 = 2.2.18.3 (2020-08-14) =
 * ADDED new function `has_replacements()` to check if specific content has Groundhogg replacement codes.
 * TWEAKED Custom email headers in simple editor now support replacement codes for the CC, BCC, and FROM email headers.
