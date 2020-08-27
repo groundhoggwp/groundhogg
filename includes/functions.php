@@ -3475,7 +3475,12 @@ function is_url_excluded_from_tracking( $url, $exclusions = [] ) {
 	static $exclusions_regex;
 
 	if ( ! $exclusions_regex ) {
-		$exclusions = explode( PHP_EOL, get_option( 'gh_url_tracking_exclusions', $exclusions ) );
+
+	    $exclusions = get_option( 'gh_url_tracking_exclusions', $exclusions );
+
+	    if ( ! is_array( $exclusions ) ){
+		    $exclusions = explode( PHP_EOL, get_option( 'gh_url_tracking_exclusions', $exclusions ) );
+	    }
 
 		if ( empty( $exclusions ) ) {
 			return $url;

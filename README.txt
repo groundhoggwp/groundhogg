@@ -177,6 +177,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.19.1 (2020-08-27) =
+* FIXED E_WARNING when URL exclusions is empty.
+
 = 2.2.19 (2020-08-26) =
 * ADDED filters to exclude certain links in emails from being re-written to tracking links.
  * You can exclude URLs from the Email settings tab.
