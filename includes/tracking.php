@@ -348,8 +348,7 @@ class Tracking {
 			return false;
 		}
 
-		$this->add_tracking_cookie_param( 'contact_id', $contact->get_id() );
-		$this->build_tracking_cookie();
+		$this->start_tracking( $contact );
 
 		return true;
 	}

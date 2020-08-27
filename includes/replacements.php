@@ -203,6 +203,11 @@ class Replacements {
 				'callback'    => [ $this, 'replacement_confirmation_link_raw' ],
 				'description' => _x( 'A link to confirm the email address of a contact which can be placed in a button or link.', 'replacement', 'groundhogg' ),
 			),
+            array(
+				'code'        => 'unsubscribe_link',
+				'callback'    => [ $this, 'replacement_unsubscribe_link' ],
+				'description' => _x( 'A link that will unsubscribe the contact.', 'replacement', 'groundhogg' ),
+			),
 			array(
 				'code'        => 'date',
 				'callback'    => [ $this, 'replacement_date' ],
@@ -796,7 +801,7 @@ class Replacements {
 
 		$link_text = apply_filters( 'groundhogg/replacements/confirmation_text', Plugin::$instance->settings->get_option( 'confirmation_text', __( 'Confirm your email.', 'groundhogg' ) ) );
 
-		$link_url  = $this->replacement_confirmation_link_raw( $redirect_to );
+		$link_url = $this->replacement_confirmation_link_raw( $redirect_to );
 
 		return sprintf( "<a href=\"%s\" target=\"_blank\">%s</a>", $link_url, $link_text );
 	}
@@ -811,13 +816,11 @@ class Replacements {
 	 */
 	function replacement_confirmation_link_raw( $redirect_to ) {
 
-	    $link_url = managed_page_url( 'preferences/confirm/' );
+		$link_url = managed_page_url( 'preferences/confirm/' );
 
-		if ( ! is_user_logged_in() && ! is_admin() ) {
-			$link_url = permissions_key_url( $link_url, $this->get_current_contact()->get_id() );
-		}
+		$link_url = permissions_key_url( $link_url, $this->get_current_contact() );
 
-		$redirect_to = is_string( $redirect_to) ? esc_url_raw( $redirect_to ) : false;
+		$redirect_to = is_string( $redirect_to ) ? esc_url_raw( $redirect_to ) : false;
 
 		if ( $redirect_to && is_string( $redirect_to ) ) {
 			$link_url = add_query_arg( [
@@ -827,6 +830,12 @@ class Replacements {
 
 		return $link_url;
 	}
+
+	function replacement_unsubscribe_link(){
+		$link_url = managed_page_url( 'preferences/unsubscribe/' );
+		$link_url = permissions_key_url( $link_url, $this->get_current_contact() );
+		return $link_url;
+    }
 
 	/**
 	 * @return string

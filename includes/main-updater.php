@@ -310,6 +310,13 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Flush rewrites
+	 */
+	public function version_2_2_19_2() {
+		install_custom_rewrites();
+	}
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -346,6 +353,7 @@ class Main_Updater extends Updater {
 			'2.2.17',
 			'2.2.18',
 			'2.2.19',
+			'2.2.19.2',
 		];
 	}
 
@@ -363,6 +371,7 @@ class Main_Updater extends Updater {
 			'2.2.14',
 			'2.2.18',
 			'2.2.19',
+			'2.2.19.2',
 		];
 	}
 

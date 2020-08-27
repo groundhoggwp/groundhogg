@@ -177,6 +177,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.19.2 (2020-08-27) =
+* ADDED Unsubscribe link replacement code.
+* FIXED added `content-type: text/plain` header explicitly to admin notifications.
+* HOT FIX empty tracking exclusions causing all urls not to be tracked.
+* HOT FIX permissions key not being added to confirmation link.
+
 = 2.2.19.1 (2020-08-27) =
 * FIXED E_WARNING when URL exclusions is empty.
 

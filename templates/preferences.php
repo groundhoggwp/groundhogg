@@ -175,13 +175,14 @@ if ( $permissions_key = get_url_var( 'pk' ) ) {
 	$permissions_key = get_cookie( 'gh-permissions-key' );
 }
 
-if ( $enc_identity = get_url_var( 'identity' ) && $permissions_key) {
-	$identity = decrypt( sanitize_text_field( $enc_identity ) );
+if ( $permissions_key && ( $enc_identity = get_url_var( 'identity' ) ) ) {
+	$identity = decrypt( $enc_identity );
 	$contact  = get_contactdata( $identity );
 
 	// If the identity passed is valid and we can validate the permissions key we're good!
 	if ( is_a_contact( $contact ) && check_permissions_key( $permissions_key, $contact ) ) {
-		tracking()->set_current_contact( $contact );
+		tracking()->start_tracking( $contact );
+		wp_redirect( managed_page_url( 'preferences/manage' ) );
 	}
 }
 
@@ -191,7 +192,7 @@ $action  = get_query_var( 'action', 'profile' );
 if ( ! is_ignore_user_tracking_precedence_enabled() ) {
 	// If the user takes precedence of the tracking cookie
 	// => The current user is logged in
-	// => the pk is valid
+	// => the pk is validk
 	$can_edit_preferences = is_user_logged_in() || check_permissions_key( $permissions_key, $contact );
 } else {
 	// if the contact takes precedence over the tracking cookie
@@ -204,7 +205,7 @@ if ( ! is_ignore_user_tracking_precedence_enabled() ) {
 $can_edit_preferences = apply_filters( 'groundhogg/can_edit_preferences', $can_edit_preferences );
 
 // if the visitor can't change the preferences show a default message.
-if ( ! $can_edit_preferences ) {
+if ( ! $can_edit_preferences || ! is_a_contact( $contact ) ) {
 	$action = 'unidentified';
 }
 

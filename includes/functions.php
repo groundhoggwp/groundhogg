@@ -169,8 +169,8 @@ function notices() {
 /**
  * @return Tracking
  */
-function tracking(){
-    return Plugin::$instance->tracking;
+function tracking() {
+	return Plugin::$instance->tracking;
 }
 
 /**
@@ -3350,8 +3350,8 @@ function is_a_contact( $contact ) {
  *
  * @return bool
  */
-function is_a_user( $user ){
-    return $user && $user instanceof \WP_User;
+function is_a_user( $user ) {
+	return $user && $user instanceof \WP_User;
 }
 
 /**
@@ -3366,8 +3366,10 @@ function generate_permissions_key( $contact ) {
 	}
 
 	// If a key was already created for the given contact within the current runtime
+	$found = wp_cache_get( $contact->get_id(), 'permissions_keys' );
+
 	// use it instead of creating a new one
-	if ( $found = wp_cache_get( $contact->get_id(), 'permissions_keys' ) ) {
+	if ( $found ) {
 		return $found;
 	}
 
@@ -3476,14 +3478,14 @@ function is_url_excluded_from_tracking( $url, $exclusions = [] ) {
 
 	if ( ! $exclusions_regex ) {
 
-	    $exclusions = get_option( 'gh_url_tracking_exclusions', $exclusions );
+		$exclusions = get_option( 'gh_url_tracking_exclusions', $exclusions );
 
-	    if ( ! is_array( $exclusions ) ){
-		    $exclusions = explode( PHP_EOL, $exclusions );
-	    }
+		if ( ! is_array( $exclusions ) ) {
+			$exclusions = explode( PHP_EOL, $exclusions );
+		}
 
 		if ( empty( $exclusions ) ) {
-			return $url;
+			return false;
 		}
 
 		$exclusions       = array_map( function ( $exclusion ) {
@@ -3491,6 +3493,11 @@ function is_url_excluded_from_tracking( $url, $exclusions = [] ) {
 		}, $exclusions );
 		$exclusions_regex = implode( '|', $exclusions );
 	}
+
+	// No exclusions? Exit.
+	if ( empty( $exclusions_regex ) ){
+	    return false;
+    }
 
 	return apply_filters( 'groundhogg/is_url_excluded_from_tracking', preg_match( "@$exclusions_regex@", $url ), $url, $exclusions_regex );
 }
@@ -3500,7 +3507,7 @@ function is_url_excluded_from_tracking( $url, $exclusions = [] ) {
  *
  * @return mixed|void
  */
-function is_ignore_user_tracking_precedence_enabled(){
+function is_ignore_user_tracking_precedence_enabled() {
 	return apply_filters( 'groundhogg/tracking/ignore_user_precedence', is_option_enabled( 'gh_ignore_user_precedence' ) );
 }
 
@@ -3508,29 +3515,29 @@ function is_ignore_user_tracking_precedence_enabled(){
  * Check if a contact and a user match
  *
  * @param $contact Contact|int
- * @param $user \WP_User|int
+ * @param $user    \WP_User|int
  *
  * @return bool
  */
-function contact_and_user_match( $contact, $user ){
+function contact_and_user_match( $contact, $user ) {
 
-    if ( is_int( $contact ) ){
-        $contact = get_contactdata( $contact );
-    }
+	if ( is_int( $contact ) ) {
+		$contact = get_contactdata( $contact );
+	}
 
-    if ( ! is_a_contact( $contact ) ){
-        return false;
-    }
+	if ( ! is_a_contact( $contact ) ) {
+		return false;
+	}
 
-    if ( is_int( $user ) ){
-        $user = get_userdata( $user );
-    }
+	if ( is_int( $user ) ) {
+		$user = get_userdata( $user );
+	}
 
-    if ( ! is_a_user( $user ) ){
-        return false;
-    }
+	if ( ! is_a_user( $user ) ) {
+		return false;
+	}
 
-    return $contact->get_email() === $user->user_email;
+	return $contact->get_email() === $user->user_email;
 }
 
 /**
@@ -3538,11 +3545,33 @@ function contact_and_user_match( $contact, $user ){
  *
  * @return bool
  */
-function current_contact_and_logged_in_user_match(){
+function current_contact_and_logged_in_user_match() {
 
-    if ( ! is_user_logged_in() || ! get_contactdata() ) {
-	    return false;
-    }
+	if ( ! is_user_logged_in() || ! get_contactdata() ) {
+		return false;
+	}
 
-    return contact_and_user_match( get_contactdata(), wp_get_current_user() );
+	return contact_and_user_match( get_contactdata(), wp_get_current_user() );
+}
+
+/**
+ * Fix nested P tags caused by formatted replacements.
+ *
+ * @param $content
+ *
+ * @return string|string[]|null
+ */
+function fix_nested_p( $content ) {
+
+    $patterns = [
+        '@(<p[^>]*>)([^>]*)(<p[^>]*>)@m', // opening tags
+        '@(<\/p[^>]*>)([^>]*)(<\/p[^>]*>)@m' // closing tags
+    ];
+
+    $replacements = [
+        '$1$2',
+        '$2$3',
+    ];
+
+    return preg_replace( $patterns, $replacements, $content );
 }
