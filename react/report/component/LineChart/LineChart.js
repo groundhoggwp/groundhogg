@@ -124,19 +124,19 @@ class LineChart extends Component {
         } else {
             this.drawToolTipLine();
             return (
-                <Card className="groundhogg-report-card">
-                    <Card.Header className="groundhogg-report-card-header">
-                        <h6>{report.data.title}</h6>
-                    </Card.Header>
-                    <Card.Body className={"groundhogg-report-card-body"}>
+                // <Card className="groundhogg-report-card">
+                //     <Card.Header className="groundhogg-report-card-header">
+                //         <h6>{report.data.title}</h6>
+                //     </Card.Header>
+                //     <Card.Body className={"groundhogg-report-card-body"}>
                         <div className={"groundhogg-report-chart-wrapper"}>
                             <Line id={reportId}
                                   data={report.data.chart.data}
                                   options={this.getLineChartOptions(report.data.chart.options)}
                             />
                         </div>
-                    </Card.Body>
-                </Card>
+                //     </Card.Body>
+                // </Card>
             );
         }
     }

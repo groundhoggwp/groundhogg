@@ -1,15 +1,21 @@
-import {FETCH_REPORT, REPORT_DROPDOWN_CHANGE} from './types'
+import {FETCH_REPORT, FETCH_REPORTS_IN_PAGE, REPORT_DROPDOWN_CHANGE} from './types'
 import axios from "axios";
+import {getPages} from "./reportNavBarActions";
 
-export const fetchReport = (reportId, type = '') => (dispatch, useState) => {
+export const fetchReport = (reportId, type = '') => (dispatch, useState ,getState) => {
 
     if (useState().reportData.data[reportId]){
         type ='' ;
     }
-    getReport(dispatch, reportId, useState().reportData.start, useState().reportData.end, type);
+    getReport(dispatch, reportId, type ,useState);
 };
 
-const getReport = (dispatch, reportId, startDate, endDate, type) => {
+const getReport = (dispatch, reportId, type ,useState ,getState  ) => {
+
+    let startDate = useState().reportData.start;
+    let endDate = useState().reportData.end;
+    let data = useState().reportData.data;
+    let selected = useState().reportNavBar.pageSelected;
 
     dispatch({
         type: FETCH_REPORT,
@@ -18,7 +24,6 @@ const getReport = (dispatch, reportId, startDate, endDate, type) => {
             isLoading: true,
             data: {},
             isFailed: false
-
         }
     });
 
@@ -27,7 +32,8 @@ const getReport = (dispatch, reportId, startDate, endDate, type) => {
         axios.post(groundhogg.rest_base + '/reports', {
             id: reportId,
             start_date: startDate.format('MMMM D, YYYY'),
-            end_date: endDate.format('MMMM D, YYYY')
+            end_date: endDate.format('MMMM D, YYYY'),
+            data : data
         }).then(
             (response) => {
                 if (response.data.hasOwnProperty('chart')) {
@@ -51,8 +57,14 @@ const getReport = (dispatch, reportId, startDate, endDate, type) => {
                                 value: Object.keys(response.data.chart)[0],
                             }
                         });
-                    }
 
+                        dispatch({
+                            type: FETCH_REPORTS_IN_PAGE,
+                            payload: {},
+                        });
+
+                        getPages(dispatch,selected);
+                    }
 
                 } else {
                     dispatch({

@@ -35,26 +35,26 @@ class CustomizedTables extends React.Component {
             if (!report.data.chart.data.length) {
 
                 return (
-                    <Card className="groundhogg-report-card" style={{padding: 0}}>
-                        <Card.Header className="groundhogg-report-card-header">
-                            <h6>{(report.data.title) ? report.title : ""}</h6>
-                        </Card.Header>
-                        <Card.Body className={"groundhogg-report-card-body"}>
+                    // <Card className="groundhogg-report-card" style={{padding: 0}}>
+                    //     <Card.Header className="groundhogg-report-card-header">
+                    //         <h6>{(report.data.title) ? report.title : ""}</h6>
+                    //     </Card.Header>
+                    //     <Card.Body className={"groundhogg-report-card-body"}>
                             <div className={"groundhogg-no-data-notice"}>
                                 {require('html-react-parser')(report.data.no_data)}
                             </div>
-                        </Card.Body>
-                    </Card>
+                        // </Card.Body>
+                    // </Card>
                 );
 
             }
 
             return (
-                <Card className="groundhogg-report-card" style={{padding: 0}}>
-                    <Card.Header className="groundhogg-report-card-header">
-                        <h6>{(report.data.title) ? report.title : ""}</h6>
-                    </Card.Header>
-                    <Card.Body className={"groundhogg-report-card-body"}>
+                // <Card className="groundhogg-report-card" style={{padding: 0}}>
+                //     <Card.Header className="groundhogg-report-card-header">
+                //         <h6>{(report.data.title) ? report.title : ""}</h6>
+                //     </Card.Header>
+                //     <Card.Body className={"groundhogg-report-card-body"}>
                         <Table className={'groundhogg-report-table'}>
                             <thead>
                             <tr>
@@ -72,8 +72,8 @@ class CustomizedTables extends React.Component {
                             }
                             </tbody>
                         </Table>
-                    </Card.Body>
-                </Card>
+                //     </Card.Body>
+                // </Card>
             );
         }
     }

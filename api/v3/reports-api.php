@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Groundhogg\Admin\Dashboard\Dashboard_Widgets;
 use Groundhogg\Reports;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use Groundhogg\Plugin;
 use function Groundhogg\show_groundhogg_branding;
@@ -27,10 +28,10 @@ class Reports_Api extends Base {
 
 		register_rest_route( self::NAME_SPACE, '/reports', [
 			[
-				'methods'             => WP_REST_Server::READABLE,
+				'methods'  => WP_REST_Server::READABLE,
 //				'permission_callback' => $callback,
-				'callback'            => [ $this, 'get_report' ],
-				'args'                => [
+				'callback' => [ $this, 'get_report' ],
+				'args'     => [
 					'report'       => [
 						'required' => true
 					],
@@ -46,10 +47,10 @@ class Reports_Api extends Base {
 
 		register_rest_route( self::NAME_SPACE, '/reports', [
 			[
-				'methods'             => WP_REST_Server::CREATABLE,
+				'methods'  => WP_REST_Server::CREATABLE,
 //				'permission_callback' => $callback,
-				'callback'            => [ $this, 'get_report_react' ],
-				'args'                => [
+				'callback' => [ $this, 'get_report_react' ],
+				'args'     => [
 //					'report'       => [
 //						'required' => true
 //					],
@@ -65,10 +66,10 @@ class Reports_Api extends Base {
 
 		register_rest_route( self::NAME_SPACE, '/reports/dashboard', [
 			[
-				'methods'             => WP_REST_Server::READABLE,
+				'methods'  => WP_REST_Server::READABLE,
 //				'permission_callback' => $callback,
-				'callback'            => [ $this, 'get_dashboard_reports' ],
-				'args'                => [
+				'callback' => [ $this, 'get_dashboard_reports' ],
+				'args'     => [
 					'reports' => [
 						'required' => true,
 					],
@@ -161,11 +162,7 @@ class Reports_Api extends Base {
 		return self::SUCCESS_RESPONSE( $response );
 
 
-
-
 	}
-
-
 
 
 	/**
@@ -186,13 +183,15 @@ class Reports_Api extends Base {
 
 		$end_date = $request->get_param( 'end_date' );
 
-		if ( is_string( $end_date ) ) {
-			$end_date = strtotime( $end_date );
-		}
+		/**
+		 * Get extra Data for fetching the contact
+		 */
+		$data = $request->get_param( 'data' );
 
 		$report_id = $request->get_param( 'id' );
 
-		$reporting = new Reports( $start_date, $end_date );
+
+		$reporting = new Reports( $start_date, $end_date, $data );
 
 		return self::SUCCESS_RESPONSE( $reporting->get_data( $report_id ) );
 

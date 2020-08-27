@@ -27,6 +27,8 @@ export const dateChanged = (startDate, endDate) => (dispatch, getState) => {
 
 export const dropDownChanged = (reportId, value) => (dispatch, getState) => {
     //set dates in the state
+
+    console.log("Here in the drop down change ");
     dispatch({
         type: REPORT_DROPDOWN_CHANGE,
         payload: {
@@ -42,6 +44,7 @@ export const dropDownChanged = (reportId, value) => (dispatch, getState) => {
 
     getPages(dispatch,getState().reportNavBar.pageSelected);
 };
+
 
 
 
