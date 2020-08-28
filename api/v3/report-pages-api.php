@@ -69,133 +69,120 @@ class Report_Pages_Api extends Base {
 					"rows" => [
 						[
 							[
-								'type' => 'multi-report',
-								'lg'   => 6,
-								'md'   => 12,
-								'sm'   => 12,
-								"reports" => [
-									[
-										'id'    => 'chart_new_contacts',
-										'title' => 'New Contacts',
-										'type'  => 'line-chart',
-										'lg'    => 6,
-										'md'    => 12,
-										'sm'    => 12
-									],
-									[
-										'id'   => 'table_contacts_by_countries',
-										'type' => 'table',
-										'lg'   => 6,
-										'md'   => 12,
-										'sm'   => 12
-									],
-								]
+
+								'id'    => 'chart_new_contacts',
+								'title' => 'New Contacts',
+								'type'  => 'line-chart',
+								'lg'    => 12,
+								'md'    => 12,
+								'sm'    => 12
+
 							]
 						],
-//						[
-//							[
-//								'id'   => 'total_new_contacts',
-//								'type' => 'stats',
-//								'lg'   => 3,
-//								'md'   => 6,
-//								'sm'   => 12
-//							],
-//
-//							[
-//								'id'   => 'total_confirmed_contacts',
-//								'type' => 'stats',
-//								'lg'   => 3,
-//								'md'   => 6,
-//								'sm'   => 12
-//							],
-//							[
-//								'id'   => 'total_engaged_contacts',
-//								'type' => 'stats',
-//								'lg'   => 3,
-//								'md'   => 6,
-//								'sm'   => 12
-//							],
-//							[
-//								'id'   => 'total_unsubscribed_contacts',
-//								'type' => 'stats',
-//								'lg'   => 3,
-//								'md'   => 6,
-//								'sm'   => 12
-//							],
-//						],
-//						[
-//							[
-//								'id'   => 'total_emails_sent',
-//								'type' => 'stats',
-//								'lg'   => 4,
-//								'md'   => 6,
-//								'sm'   => 12
-//							],
-//							[
-//								'id'   => 'email_open_rate',
-//								'type' => 'stats',
-//								'lg'   => 4,
-//								'md'   => 6,
-//								'sm'   => 12
-//							],
-//							[
-//								'id'   => 'email_click_rate',
-//								'type' => 'stats',
-//								'lg'   => 4,
-//								'md'   => 6,
-//								'sm'   => 12
-//							],
-//						],
-//						[
-//							[
-//								'id'   => 'chart_contacts_by_optin_status',
-//								'type' => 'pie',
-//								'lg'   => 6,
-//								'md'   => 12,
-//								'sm'   => 12
-//							],
-//							[
-//								'id'   => '',
-//								'type' => 'pie',
-//								'lg'   => 6,
-//								'md'   => 12,
-//								'sm'   => 12
-//							]
-//						],
-//
-//						[
-//							[
-//								'id'   => 'table_top_converting_funnels',
-//								'type' => 'table',
-//								'lg'   => 6,
-//								'md'   => 12,
-//								'sm'   => 12
-//							],
-//							[
-//								'id'   => 'table_top_performing_emails',
-//								'type' => 'table',
-//								'lg'   => 6,
-//								'md'   => 12,
-//								'sm'   => 12
-//							]
-//						],
-//
-//						[
-//							[
-//								'id'   => 'table_contacts_by_countries',
-//								'type' => 'table',
-//								'lg'   => 6,
-//								'md'   => 12,
-//								'sm'   => 12
-//							],
-//							[
-//								'id'   => 'table_contacts_by_lead_source',
-//								'type' => 'table',
-//								'lg'   => 6,
-//								'md'   => 12,
-//								'sm'   => 12
-//							]
-//						],
+						[
+							[
+								'id'   => 'total_new_contacts',
+								'type' => 'stats',
+								'lg'   => 3,
+								'md'   => 6,
+								'sm'   => 12
+							],
+
+							[
+								'id'   => 'total_confirmed_contacts',
+								'type' => 'stats',
+								'lg'   => 3,
+								'md'   => 6,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'total_engaged_contacts',
+								'type' => 'stats',
+								'lg'   => 3,
+								'md'   => 6,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'total_unsubscribed_contacts',
+								'type' => 'stats',
+								'lg'   => 3,
+								'md'   => 6,
+								'sm'   => 12
+							],
+						],
+						[
+							[
+								'id'   => 'total_emails_sent',
+								'type' => 'stats',
+								'lg'   => 4,
+								'md'   => 6,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'email_open_rate',
+								'type' => 'stats',
+								'lg'   => 4,
+								'md'   => 6,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'email_click_rate',
+								'type' => 'stats',
+								'lg'   => 4,
+								'md'   => 6,
+								'sm'   => 12
+							],
+						],
+						[
+							[
+								'id'   => 'chart_contacts_by_optin_status',
+								'type' => 'pie',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							],
+							[
+								'id'   => '',
+								'type' => 'pie',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							]
+						],
+
+						[
+							[
+								'id'   => 'table_top_converting_funnels',
+								'type' => 'table',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'table_top_performing_emails',
+								'type' => 'table',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							]
+						],
+
+						[
+							[
+								'id'   => 'table_contacts_by_countries',
+								'type' => 'table',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							],
+							[
+								'id'   => 'table_contacts_by_lead_source',
+								'type' => 'table',
+								'lg'   => 6,
+								'md'   => 12,
+								'sm'   => 12
+							]
+						],
 					]
 				]
 			],
