@@ -17,6 +17,7 @@ class Chart_Contacts_By_Country extends Base_Doughnut_Chart_Report {
 
 	protected function get_chart_data() {
 
+		
 		$rows = get_db( 'contactmeta' )->query( [
 			'contact_id' => $this->get_new_contact_ids_in_time_period(),
 			'meta_key'   => 'country'

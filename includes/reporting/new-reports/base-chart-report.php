@@ -56,11 +56,12 @@ abstract class Base_Chart_Report extends Base_Report {
 
 	public function get_pie_chart_options() {
 		return [
+			'maintainAspectRatio' => false,
 			'legend' => [
-//				'display' => false
-				'position' => 'right'
+				'display' => false
+//				'position' => 'right'
 			],
-//			'responsive' => true,
+			'responsive' => false,
 			'tooltips'   => [
 				'backgroundColor' => '#FFF',
 				'bodyFontColor'   => '#000',

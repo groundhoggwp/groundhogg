@@ -1,27 +1,11 @@
 import React, {Component} from 'react' ;
-import {Chart, Doughnut, Line} from 'react-chartjs-2';
-import {Card} from "react-bootstrap";
+import {Doughnut} from 'react-chartjs-2';
 import {connect} from "react-redux";
 import {fetchReport} from "../../../actions/reportActions";
 import {Loading} from "../Loading/Loading";
 import {NotFound} from "../NotFound/NotFound";
-import {mergeDeep} from "../../../functions";
+import './style.scss';
 
-//
-// var ChartLegend = React.createClass({
-//
-//     render: function () {
-//         var datasets = _.map(this.props.datasets, function (ds) {
-//             return <li><span className="legend-color-box" style={{ backgroundColor: ds.strokeColor }}></span> { ds.label }</li>;
-//         });
-//
-//         return (
-//             <ul className={ this.props.title + "-legend" }>
-//                 { datasets }
-//             </ul>
-//         );
-//     }
-// });
 
 /**
  * Renders a table
@@ -34,70 +18,41 @@ class PieChart extends Component {
     }
 
 
-    getLineChartOptions(options = {}) {
-        let declaredOptions = {
-            maintainAspectRatio: false,
-            tooltips: {
-                callbacks: {
-                    label: (tooltipItem, data) => {
-                        if (data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].label) {
-                            return data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].label;
-                        } else {
-                            return data.datasets[tooltipItem.datasetIndex].label + ": " + data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].y;
-                        }
-                    },
-                    title: () => {
-                        return '';
-                    }
-                },
-                mode: "index",
-                intersect: false,
-                backgroundColor: "#FFF",
-                bodyFontColor: "#000",
-                borderColor: "#727272",
-                borderWidth: 2
-            },
-            scales: {
-                xAxes: [{
-                    type: "time",
-                    time: {
-                        parser: "YYY-MM-DD HH:mm:ss",
-                        tooltipFormat: "l HH:mm"
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: "Date"
-                    },
-                    gridLines: {display: false},
-                }],
-                yAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: "Numbers"
-                    }
-                }]
-            },
-            labels: {
-                generateLabels: function (chart) {
-                    return chart.data.datasets.map(function (dataset, i) {
-                        return {
-                            text: dataset.label,
-                            lineCap: dataset.borderCapStyle,
-                            // lineDash:[],
-                            lineDashOffset: 0,
-                            lineJoin: dataset.borderJoinStyle,
-                            fillStyle: dataset.borderColor,
-                            strokeStyle: dataset.borderColor,
-                            lineWidth: dataset.pointBorderWidth,
-                            // lineDash:dataset.borderDash,
-                        }
-                    })
-                },
+    handleLegendClick(e, index, ref) {
+        const ci = ref.chartInstance;
+        var meta = Object.values(ci.data.datasets[0]._meta) [0];
+        var curr = meta.data[index];
+        curr.hidden = !curr.hidden;
+        ci.update();
+        this.forceUpdate();
+    }
 
-            },
-        };
-        // return Object.assign(declaredOptions,options);
-        return mergeDeep(declaredOptions , options);
+    draw(ref) {
+        let legend = ref.chartInstance.legend.legendItems;
+        return (
+
+            <ul className="legend-scroll mt-8">
+                {legend.length && legend.map((item) => {
+                    return (
+                        <li key={item.text}
+                            className={item.hidden ? "groundhogg-report-pie-chart-listitem strike" : "groundhogg-report-pie-chart-listitem "}
+                            onClick={(e) => {
+                                this.handleLegendClick(e, item.index, ref)
+                            }}>
+                            <div
+                                style={{
+                                    marginRight: "8px",
+                                    width: "20px",
+                                    height: "20px",
+                                    backgroundColor: item.fillStyle
+                                }}
+                            />
+                            {item.text}
+                        </li>
+                    );
+                })}
+            </ul>
+        );
     }
 
     render() {
@@ -109,27 +64,41 @@ class PieChart extends Component {
         }
 
         let report = this.props.reports[reportId];
+
         if (report.isFailed) {
-            // return <h1>Chart not found</h1>;
             return <NotFound/>;
         } else {
-            // var legend = this.refs.chart.getChart().generateLegend();
 
+            if (!report.data.chart.data.datasets[0].data.length) {
+                return (
+                    <div className={"groundhogg-no-data-notice"}>
+                        {require('html-react-parser')(String(report.data.chart.no_data))}
+                    </div>
+                );
+            }
             return (
                 // <Card className="groundhogg-report-card">
                 //     <Card.Header className="groundhogg-report-card-header">
                 //         <h6>{report.data.title}</h6>
                 //     </Card.Header>
                 //     <Card.Body className={"groundhogg-report-card-body"}>
-                        <div className={"groundhogg-report-chart-wrapper"}>
-                            <Doughnut
-                                id={reportId}
-                                  data={report.data.chart.data}
-                                  options={report.data.chart.options}
-                                ref={this.chartReference}
-                            />
-                        </div>
-                //     </Card.Body>
+                <div className={"groundhogg-report-chart-wrapper row"} style={{minHeight: 200 ,maxHeight: "auto"}}>
+                    <div className={"groundhogg-report-pie-chart col-sm-12 col-md-4 col-lg-4"}>
+                        <Doughnut
+                            id={reportId}
+                            data={report.data.chart.data}
+                            options={report.data.chart.options}
+                            ref={this.chartReference}
+                            height={200}
+                            width={200}
+                        />
+                    </div>
+                    <div className={"groundhogg-report-pie-chart-legend col-sm-12 col-md-8 col-lg-8"}>
+
+                        {(this.chartReference.current !== null) ? this.draw(this.chartReference.current) : ''}
+                    </div>
+                </div>
+                // </Card.Body>
                 // </Card>
             );
         }
@@ -138,9 +107,6 @@ class PieChart extends Component {
     componentDidMount() {
         // get the data for the line chart from the id
         this.props.fetchReport(this.props.id, this.props.start, this.props.end);
-
-
-
     }
 
 }

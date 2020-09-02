@@ -22,10 +22,15 @@ class Chart_Contacts_By_Region extends Base_Doughnut_Chart_Report {
 	 * @return mixed|string
 	 */
 	protected function get_country_code() {
-		$country_code = get_array_var( get_request_var( 'data', [] ), 'country' );
-		$country_code = strtoupper( substr( $country_code, 0, 2 ) );
+//		$country_code = get_array_var( get_request_var( 'data', [] ), 'country' );
+//		$country_code = strtoupper( substr( $country_code, 0, 2 ) );
+//
+//		return $country_code;
 
-		return $country_code;
+		return get_array_var($this->request_data, 'ddl_region' );
+
+
+
 	}
 
 	/**
@@ -34,6 +39,7 @@ class Chart_Contacts_By_Region extends Base_Doughnut_Chart_Report {
 	 * @return array
 	 */
 	protected function get_chart_data() {
+
 
 		$country_meta = get_db( 'contactmeta' )->query( [
 			'meta_key'   => 'country',

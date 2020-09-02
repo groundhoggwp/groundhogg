@@ -255,11 +255,23 @@ class Report_Pages_Api extends Base {
 								'sm'   => 12
 							],
 							[
-								'id'   => 'chart_contacts_by_region',
-								'type' => 'pie',
+
+								'type' => 'multi-report',
+								'title' => 'Contacts By region',
 								'lg'   => 6,
 								'md'   => 12,
-								'sm'   => 12
+								'sm'   => 12,
+								'reports' => [
+									[
+										'id'   => 'ddl_region',
+										'type' => 'ddl',
+									],
+									[
+										'id'   => 'chart_contacts_by_region',
+										'type' => 'pie',
+									]
+
+								]
 							]
 						],
 						[
@@ -515,6 +527,15 @@ class Report_Pages_Api extends Base {
 				"reports" => [
 					"rows" => [
 
+						[
+							[
+								'id'   => 'ddl_broadcasts',
+								'type' => 'ddl',
+								'lg'   => 4,
+								'md'   => 6,
+								'sm'   => 12
+							]
+						],
 						[
 							[
 								'id'   => 'chart_last_broadcast',

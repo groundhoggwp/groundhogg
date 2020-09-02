@@ -49,7 +49,7 @@ const getReport = (dispatch, reportId, type ,useState ,getState  ) => {
                         }
                     });
 
-                    if (type === 'ddl') {
+                    if (type === 'ddl' && Object.keys(response.data.chart)[0]) {
                         dispatch({
                             type: REPORT_DROPDOWN_CHANGE,
                             payload: {

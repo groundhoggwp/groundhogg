@@ -10,7 +10,9 @@ use Groundhogg\Reporting\New_Reports\Chart_Email_Activity;
 use Groundhogg\Reporting\New_Reports\Chart_Funnel_Breakdown;
 use Groundhogg\Reporting\New_Reports\Chart_Last_Broadcast;
 use Groundhogg\Reporting\New_Reports\Chart_New_Contacts;
+use Groundhogg\Reporting\New_Reports\Ddl_Broadcasts;
 use Groundhogg\Reporting\New_Reports\Ddl_Funnels;
+use Groundhogg\Reporting\New_Reports\Ddl_Region;
 use Groundhogg\Reporting\New_Reports\Email_Click_Rate;
 use Groundhogg\Reporting\New_Reports\Email_Open_Rate;
 use Groundhogg\Reporting\New_Reports\Table_Benchmark_Conversion_Rate;
@@ -260,6 +262,15 @@ class Reports {
 			[
 				'id'       => 'ddl_funnels',
 				'callback' => [ $this, 'ddl_funnels' ]
+			],
+			[
+				'id'       => 'ddl_region',
+				'callback' => [ $this, 'ddl_region' ]
+			],
+
+[
+				'id'       => 'ddl_broadcasts',
+				'callback' => [ $this, 'ddl_broadcasts' ]
 			]
 
 		];
@@ -716,6 +727,18 @@ class Reports {
 
 	public function ddl_funnels() {
 		$report = new Ddl_Funnels( $this->start, $this->end, $this->request_data );
+
+		return $report->get_data();
+	}
+
+	public function ddl_region() {
+		$report = new Ddl_Region( $this->start, $this->end, $this->request_data );
+
+		return $report->get_data();
+	}
+
+	public function ddl_broadcasts() {
+		$report = new Ddl_Broadcasts( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}

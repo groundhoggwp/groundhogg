@@ -28,21 +28,22 @@ export const dateChanged = (startDate, endDate) => (dispatch, getState) => {
 export const dropDownChanged = (reportId, value) => (dispatch, getState) => {
     //set dates in the state
 
-    console.log("Here in the drop down change ");
-    dispatch({
-        type: REPORT_DROPDOWN_CHANGE,
-        payload: {
-            id: reportId,
-            value: value,
-        }
-    });
+    if (value) {
 
-    dispatch({
-        type: FETCH_REPORTS_IN_PAGE,
-        payload: {},
-    });
+        dispatch({
+            type: REPORT_DROPDOWN_CHANGE,
+            payload: {
+                id: reportId,
+                value: value,
+            }
+        });
+        dispatch({
+            type: FETCH_REPORTS_IN_PAGE,
+            payload: {},
+        });
 
-    getPages(dispatch,getState().reportNavBar.pageSelected);
+        getPages(dispatch,getState().reportNavBar.pageSelected);
+    }
 };
 
 
