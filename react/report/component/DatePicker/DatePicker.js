@@ -58,7 +58,7 @@ class DatePicker extends React.Component {
                 onCallback={this.handleCallback}>
                 <div
                     id="reportrange"
-                    className={"col-sm-12 col-md-6 col-lg-3 form-control groundhogg-report-datepicker "}>
+                    className={"col-sm-12 col-md-6 col-lg-4 form-control groundhogg-report-datepicker "}>
                     <i className="fa fa-calendar"></i>&nbsp;
                     <span>{label}</span>
                 </div>

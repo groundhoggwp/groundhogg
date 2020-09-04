@@ -123,6 +123,7 @@ class LineChart extends Component {
             return <NotFound/>;
         } else {
             this.drawToolTipLine();
+            report.data = report;
             return (
                 // <Card className="groundhogg-report-card">
                 //     <Card.Header className="groundhogg-report-card-header">
@@ -141,10 +142,10 @@ class LineChart extends Component {
         }
     }
 
-    componentDidMount() {
-        // get the data for the line chart from the id
-        this.props.fetchReport(this.props.id);
-    }
+    // componentDidMount() {
+    //     // get the data for the line chart from the id
+    //     this.props.fetchReport(this.props.id);
+    // }
 
 }
 

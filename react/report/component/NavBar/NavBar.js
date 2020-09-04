@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import PropType from 'prop-types';
 import Pages from "../Pages/Pages";
-import {Navbar, Nav} from "react-bootstrap";
+import {Navbar, Nav , Card} from "react-bootstrap";
 import {connect} from 'react-redux';
 import {fetchNavBar, changeSelectedNav} from "../../../actions/reportNavBarActions";
 import './style.scss';
@@ -48,7 +48,7 @@ class NavBar extends Component {
                 </div>
             );
         } else {
-           return <Loading />;
+            return <Loading /> ;
         }
     }
 }

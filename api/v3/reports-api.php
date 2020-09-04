@@ -31,17 +31,17 @@ class Reports_Api extends Base {
 				'methods'  => WP_REST_Server::READABLE,
 //				'permission_callback' => $callback,
 				'callback' => [ $this, 'get_report' ],
-				'args'     => [
-					'report'       => [
-						'required' => true
-					],
-					'range'        => [
-						'required' => true
-					],
-					'chart_format' => [
-						'required' => false
-					]
-				]
+//				'args'     => [
+//					'report'       => [
+//						'required' => true
+//					],
+//					'range'        => [
+//						'required' => true
+//					],
+//					'chart_format' => [
+//						'required' => false
+//					]
+//				]
 			],
 		] );
 
@@ -165,6 +165,42 @@ class Reports_Api extends Base {
 	}
 
 
+//	/**
+//	 *
+//	 *
+//	 * @param WP_REST_Request $request
+//	 *
+//	 * @return WP_Error|WP_REST_Response
+//	 */
+//	public function get_report_react( WP_REST_Request $request ) {
+//
+//
+//		$start_date = $request->get_param( 'start_date' );
+//
+//		if ( is_string( $start_date ) ) {
+//			$start_date = strtotime( $start_date );
+//		}
+//
+//		$end_date = $request->get_param( 'end_date' );
+//
+//		/**
+//		 * Get extra Data for fetching the contact
+//		 */
+//		$data = $request->get_param( 'data' );
+//
+//		$report_id = $request->get_param( 'id' );
+//
+//
+//		$reporting = new Reports( $start_date, $end_date, $data );
+//
+//		return self::SUCCESS_RESPONSE( $reporting->get_data( $report_id ) );
+//
+//	}
+
+
+
+
+
 	/**
 	 *
 	 *
@@ -173,6 +209,10 @@ class Reports_Api extends Base {
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function get_report_react( WP_REST_Request $request ) {
+
+
+
+
 
 
 		$start_date = $request->get_param( 'start_date' );
@@ -190,12 +230,21 @@ class Reports_Api extends Base {
 
 		$report_id = $request->get_param( 'id' );
 
+		$reports = $request->get_param( 'reports' );
 
-		$reporting = new Reports( $start_date, $end_date, $data );
 
-		return self::SUCCESS_RESPONSE( $reporting->get_data( $report_id ) );
+		$reporting = new Reports( $start_date, $end_date , $data );
+
+
+		$results = [] ;
+		foreach ( $reports as $report_id ) {
+			$results[ $report_id ] = $reporting->get_data( $report_id );
+		}
+
+		return self::SUCCESS_RESPONSE( $results);
 
 	}
+
 
 
 }

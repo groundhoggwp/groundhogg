@@ -256,11 +256,11 @@ class Report_Pages_Api extends Base {
 							],
 							[
 
-								'type' => 'multi-report',
-								'title' => 'Contacts By region',
-								'lg'   => 6,
-								'md'   => 12,
-								'sm'   => 12,
+								'type'    => 'multi-report',
+								'title'   => 'Contacts By region',
+								'lg'      => 6,
+								'md'      => 12,
+								'sm'      => 12,
 								'reports' => [
 									[
 										'id'   => 'ddl_region',
@@ -582,7 +582,6 @@ class Report_Pages_Api extends Base {
 					]
 				],
 			],
-
 		];
 
 		if ( $page_array[ $page ] ) {

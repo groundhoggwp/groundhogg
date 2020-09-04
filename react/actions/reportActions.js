@@ -2,7 +2,14 @@ import {FETCH_REPORT, FETCH_REPORTS_IN_PAGE, REPORT_DROPDOWN_CHANGE} from './typ
 import axios from "axios";
 import {getPages} from "./reportNavBarActions";
 
-export const fetchReport = (reportId, type = '') => (dispatch, useState ,getState) => {
+
+/**
+ *  Fetches the single report
+ * @param reportId
+ * @param type
+ * @returns {function(*=, *=, *): void}
+ */
+export const fetchReport = (reportId, type = '') => (dispatch, useState ) => {
 
     if (useState().reportData.data[reportId]){
         type ='' ;
@@ -10,7 +17,14 @@ export const fetchReport = (reportId, type = '') => (dispatch, useState ,getStat
     getReport(dispatch, reportId, type ,useState);
 };
 
-const getReport = (dispatch, reportId, type ,useState ,getState  ) => {
+/**
+ *
+ * @param dispatch
+ * @param reportId
+ * @param type
+ * @param useState
+ */
+const getReport = (dispatch, reportId, type ,useState  ) => {
 
     let startDate = useState().reportData.start;
     let endDate = useState().reportData.end;
@@ -63,7 +77,7 @@ const getReport = (dispatch, reportId, type ,useState ,getState  ) => {
                             payload: {},
                         });
 
-                        getPages(dispatch,selected);
+                        getPages(dispatch,selected ,useState);
                     }
 
                 } else {
@@ -95,4 +109,3 @@ const getReport = (dispatch, reportId, type ,useState ,getState  ) => {
     }
 
 };
-

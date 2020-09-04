@@ -1,7 +1,7 @@
 import {getPages} from "./reportNavBarActions";
 import { FETCH_REPORTS_IN_PAGE, REPORT_DATE_CHANGE, REPORT_DROPDOWN_CHANGE} from './types';
 
-export const dateChanged = (startDate, endDate) => (dispatch, getState) => {
+export const dateChanged = (startDate, endDate) => (dispatch,useState) => {
 
     //set dates in the state
     dispatch({
@@ -13,23 +13,21 @@ export const dateChanged = (startDate, endDate) => (dispatch, getState) => {
     });
 
 
-    // set reports to null
-    dispatch({
-        type: FETCH_REPORTS_IN_PAGE,
-        payload: {},
-    });
+    // // set reports to null
+    // dispatch({
+    //     type: FETCH_REPORTS_IN_PAGE,
+    //     payload: {},
+    // });
 
     // reset reports
-    getPages(dispatch,getState().reportNavBar.pageSelected);
+    getPages(dispatch,useState().reportNavBar.pageSelected ,useState );
 
 };
 
 
-export const dropDownChanged = (reportId, value) => (dispatch, getState) => {
+export const dropDownChanged = (reportId, value) => (dispatch, useState) => {
     //set dates in the state
-
     if (value) {
-
         dispatch({
             type: REPORT_DROPDOWN_CHANGE,
             payload: {
@@ -37,19 +35,6 @@ export const dropDownChanged = (reportId, value) => (dispatch, getState) => {
                 value: value,
             }
         });
-        dispatch({
-            type: FETCH_REPORTS_IN_PAGE,
-            payload: {},
-        });
-
-        getPages(dispatch,getState().reportNavBar.pageSelected);
+        getPages(dispatch,useState().reportNavBar.pageSelected ,useState);
     }
 };
-
-
-
-
-
-
-
-

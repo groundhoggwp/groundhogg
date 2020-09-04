@@ -13,17 +13,27 @@ class Stats extends React.Component {
         super(props);
     }
 
-    componentDidMount() {
-        // get the data for the line chart from the id
-        this.props.fetchReport(this.props.id, this.props.start, this.props.end);
-    }
+    // componentDidMount() {
+    //     // get the data for the line chart from the id
+    //     this.props.fetchReport(this.props.id, this.props.start, this.props.end);
+    // }
 
     render() {
 
         let reportId = this.props.id;
 
         if ((!this.props.reports || !this.props.reports[reportId]) || this.props.reports[reportId].isLoading) {
-            return <Loading/>;
+            return (
+                <Card className="groundhogg-state-card">
+                    <Card.Body className={"groundhogg-stat-card-body"}>
+                        <div className="groundhogg-quick-stat">
+                            <div className="groundhogg-quick-stat-title"><Loading/></div>
+                            <div className="groundhogg-quick-stat-number"><Loading/></div>
+                            <div className="groundhogg-quick-stat-compare"><Loading/></div>
+                        </div>
+                    </Card.Body>
+                </Card>
+            );
         }
 
         let report = this.props.reports[reportId];
@@ -32,42 +42,33 @@ class Stats extends React.Component {
             return <NotFound/>;
         } else {
 
+            report.data = report;
+
             let arrow = 'groundhogg-quick-stat-arrow';
-            if(report.data.chart.compare.arrow.direction){
-                arrow = arrow + ' ' +  report.data.chart.compare.arrow.direction;
+            if (report.data.chart.compare.arrow.direction) {
+                arrow = arrow + ' ' + report.data.chart.compare.arrow.direction;
             }
 
             let arrow_color = 'groundhogg-quick-stat-previous';
-            if(report.data.chart.compare.arrow.color){
+            if (report.data.chart.compare.arrow.color) {
                 arrow_color = arrow_color + ' ' + report.data.chart.compare.arrow.color;
             }
 
             return (
                 <Card className="groundhogg-state-card">
                     <Card.Body className={"groundhogg-stat-card-body"}>
-                        <div className="groundhogg-quick-stat" >
+                        <div className="groundhogg-quick-stat">
                             <div className="groundhogg-quick-stat-title">{report.data.title} </div>
                             <div className="groundhogg-quick-stat-number">{report.data.chart.number}</div>
                             <div className={arrow_color}>
-                                <span className={arrow} />
-                                <span className="groundhogg-quick-stat-prev-percent">{report.data.chart.compare.percent}</span>
+                                <span className={arrow}/>
+                                <span
+                                    className="groundhogg-quick-stat-prev-percent">{report.data.chart.compare.percent}</span>
                             </div>
                             <div className="groundhogg-quick-stat-compare">{report.data.chart.compare.text}</div>
                         </div>
                     </Card.Body>
                 </Card>
-                //
-                // <div className="groundhogg-quick-stat">
-                //     <div className="groundhogg-quick-stat-title">Title</div>
-                //     <div className="groundhogg-quick-stat-info">info</div>
-                //     <div className="groundhogg-quick-stat-number">1234</div>
-                //     <div className="groundhogg-quick-stat-previous green">
-                //         <span className="groundhogg-quick-stat-arrow up"></span>
-                //         <span className="groundhogg-quick-stat-prev-percent">25%</span>
-                //     </div>
-                //     <div className="groundhogg-quick-stat-compare">vs. Previous 30 Days</div>
-                // </div>
-
             );
         }
     }

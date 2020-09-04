@@ -17,10 +17,10 @@ class DropDown extends React.Component {
         this.selectionChange = this.selectionChange.bind(this);
     }
 
-    componentDidMount() {
-        // console.log(this.props.type);
-        this.props.fetchReport(this.props.id , this.props.type);
-    }
+    // componentDidMount() {
+    //     // console.log(this.props.type);
+    //     this.props.fetchReport(this.props.id , this.props.type);
+    // }
 
     selectionChange(e) {
         this.props.dropDownChanged(this.props.id, e.target.value);
@@ -39,6 +39,7 @@ class DropDown extends React.Component {
             return <NotFound/>;
         } else {
 
+            report.data = report;
             return (
                 <select className={"form-control"} style={{float: "right"}} onChange={this.selectionChange}
                         value={this.props.data[reportId]}>

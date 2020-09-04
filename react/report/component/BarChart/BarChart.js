@@ -69,6 +69,7 @@ class BarChart extends Component {
             // return <h1>Chart not found</h1>;
             return <NotFound/>;
         } else {
+            report.data = report;
             return (
                 // <Card className="groundhogg-report-card">
                 //     <Card.Header className="groundhogg-report-card-header">
@@ -87,10 +88,10 @@ class BarChart extends Component {
         }
     }
 
-    componentDidMount() {
-        // get the data for the line chart from the id
-        this.props.fetchReport(this.props.id);
-    }
+    // componentDidMount() {
+    //     // get the data for the line chart from the id
+    //     this.props.fetchReport(this.props.id);
+    // }
 
 }
 

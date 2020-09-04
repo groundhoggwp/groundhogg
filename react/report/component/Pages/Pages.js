@@ -107,7 +107,6 @@ export class ReportRows extends React.Component {
                             {this.props.row.reports.map((report, index) =>
                                 <Report classes={classes} key={index} id={report.id}
                                         type={report.type}/>)}
-
                         </Card.Body>
                     </Card>
                 </Col>);
@@ -140,41 +139,40 @@ export class ReportRows extends React.Component {
 
 export class Pages extends React.Component {
 
-    componentDidMount() {
-        this.props.changeSelectedNav(this.props.navBar.pageSelected);
-    }
+    // componentDidMount() {
+    //     this.props.changeSelectedNav(this.props.navBar.pageSelected);
+    // }
 
     render() {
 
+        // console.log("page main render method") ;
         if (
+            this.props.navBar.pageSelected &&
             this.props.navBar.hasOwnProperty("pages") &&
-            this.props.navBar.pages.hasOwnProperty("rows")
+            this.props.navBar.pages.hasOwnProperty( this.props.navBar.pageSelected ) &&
+            this.props.navBar.pages[ this.props.navBar.pageSelected].hasOwnProperty('rows')
         ) {
+            let pageRows = this.props.navBar.pages[ this.props.navBar.pageSelected].rows ;
             return (
                 <Container fluid style={{paddingTop: 15}}>
-                    {this.props.navBar.pages.rows.map((row, index) => {
+                    {pageRows.map((row, index) => {
                         // return (<div>{this.handleRow(row)}</div>);
                         return <ReportRows key={index} row={row}/>
                     })}
                 </Container>
             );
         } else {
-            return <Loading/>;
+            return  <Card className="groundhogg-report-card" > <Loading height={ 500 }/> </Card> ;
         }
-
-
     }
 }
 
 const mapStateToProps = (state) => {
     return {
-        navBar: state.reportNavBar
+        navBar: state.reportNavBar,
+        reports : state.reports
     };
 };
 
 
 export default connect(mapStateToProps, {changeSelectedNav})(Pages);
-
-
-
-

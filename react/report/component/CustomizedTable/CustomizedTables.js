@@ -13,10 +13,10 @@ class CustomizedTables extends React.Component {
         super(props);
     }
 
-    componentDidMount() {
-        // get the data for the line chart from the id
-        this.props.fetchReport(this.props.id);
-    }
+    // componentDidMount() {
+    //     // get the data for the line chart from the id
+    //     this.props.fetchReport(this.props.id);
+    // }
 
     render() {
 
@@ -31,7 +31,7 @@ class CustomizedTables extends React.Component {
             // return <h1>Chart not found</h1>;
             return <NotFound/>;
         } else {
-
+            report.data=report;
             if (!report.data.chart.data.length) {
 
                 return (
@@ -48,6 +48,7 @@ class CustomizedTables extends React.Component {
                 );
 
             }
+
 
             return (
                 // <Card className="groundhogg-report-card" style={{padding: 0}}>
