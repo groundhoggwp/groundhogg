@@ -123,12 +123,12 @@ class Tags_Page extends Admin_Page {
 		} else {
 
 			$tag_name = trim( sanitize_text_field( get_post_var( 'tag_name' ) ) );
-			if ( $tag_name && strlen( $tag_name ) > 50 ) {
-				return new \WP_Error( 'too_long', __( "Maximum length for tag name is 50 characters.", 'groundhogg' ) );
+			if ( $tag_name && strlen( $tag_name ) > get_db( 'tags'  )->get_max_index_length() ) {
+				return new \WP_Error( 'too_long', __( sprintf(  "Maximum length for tag name is %d characters."  ,  get_db( 'tags' )->get_max_index_length()  )  , 'groundhogg' ) );
 			}
 
 			$tag_desc = sanitize_textarea_field( get_post_var( 'tag_description' ) );
-			$id       = Plugin::$instance->dbs->get_db( 'tags' )->add( [
+			$id       = get_db( 'tags' )->add( [
 				'tag_name'        => $tag_name,
 				'tag_description' => $tag_desc
 			] );
@@ -159,8 +159,8 @@ class Tags_Page extends Admin_Page {
 
 		$tag_name        = sanitize_text_field( get_post_var( 'name' ) );
 		$tag_description = sanitize_textarea_field( get_post_var( 'description' ) );
-		if ( strlen( $tag_name ) > 50 ) {
-			return new \WP_Error( 'too_long', __( "Maximum length for tag name is 50 characters.", 'groundhogg' ) );
+		if ( strlen( $tag_name ) > get_db( 'tags' )->get_max_index_length() ) {
+			return new \WP_Error( 'too_long', __( sprintf(  "Maximum length for tag name is %d characters."  ,  get_db( 'tags' )->get_max_index_length()  )  , 'groundhogg' ) );
 		}
 		$args = array(
 			'tag_name'        => $tag_name,

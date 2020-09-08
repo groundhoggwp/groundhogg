@@ -376,7 +376,7 @@ class Tags extends DB
 
         $sql = "CREATE TABLE " . $this->table_name . " (
         tag_id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-        tag_slug varchar(50) NOT NULL,
+        tag_slug varchar({$this->get_max_index_length()}) NOT NULL,
         tag_name mediumtext NOT NULL,
         tag_description text NOT NULL,
         contact_count bigint(20) unsigned NOT NULL,
