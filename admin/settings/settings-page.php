@@ -664,6 +664,20 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				),
 			),
+			'gh_hide_tooltips'                 => array(
+				'id'      => 'gh_hide_tooltips',
+				'section' => 'misc_info',
+				'label'   => _x( 'Hide Tooltips', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'This will hides the tooltips user see in new installations.', 'settings', 'groundhogg' ),
+				'type'    => 'checkbox',
+				'atts'    => array(
+					'label' => __( 'Enable' ),
+					//keep brackets for backwards compat
+					'name'  => 'gh_hide_tooltips',
+					'id'    => 'gh_hide_tooltips',
+					'value' => 'on',
+				),
+			),
 			'gh_privacy_policy'                      => array(
 				'id'      => 'gh_privacy_policy',
 				'section' => 'compliance',
