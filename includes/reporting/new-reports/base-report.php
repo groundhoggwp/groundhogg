@@ -91,19 +91,23 @@ abstract class Base_Report {
 	protected $count = 0;
 
 	function get_random_color() {
+		$predefined_colors = [
+			'#F18F01',
+			'#006E90',
+			'#99C24D',
+			'#F46036',
+			'#41BBD9',
+			'#ADCAD6',
+			'#336699',
+			'#2F4858'
+		];
 
-		if ( $this->count < 8 ) {
-			$arr   = [
-				'#F18F01',
-				'#006E90',
-				'#99C24D',
-				'#F46036',
-				'#41BBD9',
-				'#ADCAD6',
-				'#336699',
-				'#2F4858'
-			];
-			$color = $arr [ $this->count ];
+		// added filter to customize the Chart colors
+		$predefined_colors = apply_filters( 'groundhogg/admin/reports/predefined_colors', $predefined_colors );
+
+		if ( $this->count < count( $predefined_colors ) ) {
+
+			$color = $predefined_colors [ $this->count ];
 			$this->count ++;
 
 			return $color;
