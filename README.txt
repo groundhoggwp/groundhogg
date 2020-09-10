@@ -177,6 +177,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.19.3 (2020-09-10) =
+* ADDED Setting to dismiss tooltips under `Settings > Misc`
+* ADDED Filter `groundhogg/admin/reports/predefined_colors` to change the colors used in the reporting charts.
+* TWEAKED Tag names are no longer limited to 50 characters. Depending on DB collation its now 191 or 255.
+* FIXED Iframe sizing script not compatible with new jQuery version
+
 = 2.2.19.2 (2020-08-27) =
 * ADDED Unsubscribe link replacement code.
 * FIXED added `content-type: text/plain` header explicitly to admin notifications.

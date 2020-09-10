@@ -317,10 +317,9 @@ class Main_Updater extends Updater {
 	}
 
 	/**
-	 * Added permission keys
+	 * Update tag_slug col to support larger tag names
 	 */
 	public function version_2_2_19_3() {
-		// Add the new permissions_keys dbs...
 		Plugin::$instance->dbs->install_dbs();
 	}
 
@@ -415,8 +414,7 @@ class Main_Updater extends Updater {
 			'2.2.14'        => __( 'Migrate notes and update broadcasts table.', 'gorundhogg' ),
 			'2.2.17'        => __( 'Added Broadcast meta table.', 'groundhogg' ),
 			'2.2.18'        => __( 'Add email_id column to events tables.', 'groundhogg' ),
-			'2.2.19.3'      => __( 'Increased tag name limit. Tag name can be 191 to 255 characters based on your hosted server.', 'groundhogg' ),
-
+			'2.2.19.3'      => __( 'Increased tag name size. Tag name can be 191 to 255 characters based on your hosted server.', 'groundhogg' ),
 		];
 	}
 }
