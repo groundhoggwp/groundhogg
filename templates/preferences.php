@@ -132,7 +132,7 @@ if ( ! function_exists( __NAMESPACE__ . '\send_email_preferences_link' ) ) {
 		}
 
 		$preferences_link = managed_page_url( 'preferences/manage' );
-		$preferences_link = permissions_key_url( $preferences_link, $contact );
+		$preferences_link = permissions_key_url( $preferences_link, $contact, 'preferences' );
 		$preferences_link = add_query_arg( 'identity', encrypt( $email ), $preferences_link );
 
 		$message = __( 'Someone has requested to manage your email preferences:' ) . "\r\n\r\n";
@@ -168,19 +168,14 @@ add_action( 'enqueue_managed_page_scripts', function () {
 	wp_enqueue_script( 'manage-preferences' );
 } );
 
-// check for the permissions_key and set it as a cookie
-if ( $permissions_key = get_url_var( 'pk' ) ) {
-	set_cookie( 'gh-permissions-key', $permissions_key, HOUR_IN_SECONDS );
-} else {
-	$permissions_key = get_cookie( 'gh-permissions-key' );
-}
+$permissions_key = get_permissions_key();
 
 if ( $permissions_key && ( $enc_identity = get_url_var( 'identity' ) ) ) {
 	$identity = decrypt( $enc_identity );
 	$contact  = get_contactdata( $identity );
 
 	// If the identity passed is valid and we can validate the permissions key we're good!
-	if ( is_a_contact( $contact ) && check_permissions_key( $permissions_key, $contact ) ) {
+	if ( is_a_contact( $contact ) && check_permissions_key( $permissions_key, $contact, 'preferences' ) ) {
 		tracking()->start_tracking( $contact );
 		wp_redirect( managed_page_url( 'preferences/manage' ) );
 	}
@@ -193,13 +188,13 @@ if ( ! is_ignore_user_tracking_precedence_enabled() ) {
 	// If the user takes precedence of the tracking cookie
 	// => The current user is logged in
 	// => the pk is validk
-	$can_edit_preferences = is_user_logged_in() || check_permissions_key( $permissions_key, $contact );
+	$can_edit_preferences = is_user_logged_in() || check_permissions_key( $permissions_key, $contact, 'preferences' );
 } else {
 	// if the contact takes precedence over the tracking cookie
 	// => current user and contact match
 	// => it's a site admin and they can edit contacts
 	// => the pk is valid
-	$can_edit_preferences = current_user_can( 'edit_contacts' ) || current_contact_and_logged_in_user_match() || check_permissions_key( $permissions_key, $contact );
+	$can_edit_preferences = current_user_can( 'edit_contacts' ) || current_contact_and_logged_in_user_match() || check_permissions_key( $permissions_key, $contact, 'preferences' );
 }
 
 $can_edit_preferences = apply_filters( 'groundhogg/can_edit_preferences', $can_edit_preferences );

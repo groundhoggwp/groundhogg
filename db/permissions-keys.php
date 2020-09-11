@@ -19,7 +19,7 @@ class Permissions_Keys extends DB {
 	/**
 	 * Setup the cron job to remove old permissions keys
 	 */
-	public function setup_cron(){
+	public function setup_cron() {
 		if ( ! wp_next_scheduled( 'gh_purge_expired_permissions_keys' ) ) {
 			wp_schedule_event( time(), 'daily', 'gh_purge_expired_permissions_keys' );
 		}
@@ -69,11 +69,13 @@ class Permissions_Keys extends DB {
 	 */
 	public function get_columns() {
 		return array(
-			'ID'              => '%d',
-			'contact_id'      => '%d',
-			'permissions_key' => '%s',
-			'date_created'    => '%s',
-			'expiration_date' => '%s',
+			'ID'               => '%d',
+			'contact_id'       => '%d',
+			'permissions_key'  => '%s',
+			'usage_type'       => '%s',
+			'date_created'     => '%s',
+			'delete_after_use' => '%d',
+			'expiration_date'  => '%s',
 		);
 	}
 
@@ -86,11 +88,13 @@ class Permissions_Keys extends DB {
 	public function get_column_defaults() {
 
 		return array(
-			'ID'              => 0,
-			'contact_id'      => 0,
-			'permissions_key' => '',
-			'date_created'    => date( 'Y-m-d H:i:s' ),
-			'expiration_date' => date( 'Y-m-d H:i:s', time() + DAY_IN_SECONDS ),
+			'ID'               => 0,
+			'contact_id'       => 0,
+			'permissions_key'  => '',
+			'usage_type'       => 'preferences',
+			'delete_after_use' => 0,
+			'date_created'     => date( 'Y-m-d H:i:s' ),
+			'expiration_date'  => date( 'Y-m-d H:i:s', time() + DAY_IN_SECONDS ),
 		);
 	}
 
@@ -107,7 +111,9 @@ class Permissions_Keys extends DB {
 		$sql = "CREATE TABLE " . $this->table_name . " (
 		ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 		contact_id bigint(20) unsigned NOT NULL,
+		delete_after_use tinyint unsigned NOT NULL,
 		permissions_key varchar({$this->get_max_index_length()}) NOT NULL,
+		usage_type varchar({$this->get_max_index_length()}) NOT NULL,
 		date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		expiration_date datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		PRIMARY KEY  (ID),
@@ -119,7 +125,7 @@ class Permissions_Keys extends DB {
 		update_option( $this->table_name . '_db_version', $this->version );
 	}
 
-	public function purge_old_permission_keys(){
+	public function purge_old_permission_keys() {
 		global $wpdb;
 
 		$wpdb->query( $wpdb->prepare( "DELETE FROM $this->table_name WHERE `expiration_date` < %s", date( 'Y-m-d H:i:s' ) ) );

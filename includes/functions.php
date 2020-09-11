@@ -6,6 +6,7 @@ use Groundhogg\Lib\Mobile\Iso3166;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
 use WP_Error;
+use function foo\func;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -3355,11 +3356,15 @@ function is_a_user( $user ) {
 }
 
 /**
- * @param $contact Contact
+ * @param      $usage
+ * @param bool $contact      Contact
+ * @param      $delete_after bool
  *
  * @return bool
  */
-function generate_permissions_key( $contact ) {
+function generate_permissions_key( $contact = false, $usage = 'preferences', $delete_after = false ) {
+
+	$contact = $contact ?: get_contactdata();
 
 	if ( ! is_a_contact( $contact ) ) {
 		return false;
@@ -3377,8 +3382,10 @@ function generate_permissions_key( $contact ) {
 
 	// Generate the permissions_key
 	get_db( 'permissions_keys' )->add( [
-		'contact_id'      => $contact->get_id(),
-		'permissions_key' => wp_hash_password( $key )
+		'contact_id'       => $contact->get_id(),
+		'usage_type'       => sanitize_key( $usage ),
+		'permissions_key'  => wp_hash_password( $key ),
+		'delete_after_use' => $delete_after,
 	] );
 
 	// set the key for the given contact in the cache
@@ -3388,12 +3395,15 @@ function generate_permissions_key( $contact ) {
 }
 
 /**
- * @param $key     string
- * @param $contact Contact
+ * @param        $key     string
+ * @param string $usage   string
+ * @param bool   $contact Contact
  *
  * @return bool
  */
-function check_permissions_key( $key, $contact ) {
+function check_permissions_key( $key, $contact = false, $usage = 'preferences' ) {
+
+	$contact = $contact ?: get_contactdata();
 
 	if ( ! is_a_contact( $contact ) || empty( $key ) || ! is_string( $key ) ) {
 		return false;
@@ -3402,6 +3412,7 @@ function check_permissions_key( $key, $contact ) {
 	$keys = get_db( 'permissions_keys' )->query( [
 		'where' => [
 			[ 'contact_id', '=', $contact->get_id() ],
+			[ 'usage_type', '=', $usage ],
 			[ 'expiration_date', '>', date( 'Y-m-d H:i:s' ) ],
 		]
 	] );
@@ -3410,7 +3421,7 @@ function check_permissions_key( $key, $contact ) {
 		return false;
 	}
 
-	$keys = wp_list_pluck( $keys, 'permissions_key' );
+//	$keys = wp_list_pluck( $keys, 'permissions_key' );
 
 	if ( empty( $wp_hasher ) ) {
 		require_once ABSPATH . WPINC . '/class-phpass.php';
@@ -3418,7 +3429,13 @@ function check_permissions_key( $key, $contact ) {
 	}
 
 	foreach ( $keys as $permissions_key ) {
-		if ( $wp_hasher->CheckPassword( $key, $permissions_key ) ) {
+		if ( $wp_hasher->CheckPassword( $key, $permissions_key->permissions_key ) ) {
+
+			// Maybe delete after
+			if ( $permissions_key->delete_after_use ) {
+				get_db( 'permissions_keys' )->delete( $permissions_key->ID );
+			}
+
 			return true;
 		}
 	}
@@ -3429,15 +3446,36 @@ function check_permissions_key( $key, $contact ) {
 /**
  * Generate a url with the permissions key on it.
  *
- * @param $url
- * @param $contact
+ * @param        $url
+ * @param        $contact
+ *
+ * @param string $usage
+ * @param bool   $delete_after
  *
  * @return string
  */
-function permissions_key_url( $url, $contact ) {
+function permissions_key_url( $url, $contact, $usage = 'preferences', $delete_after = false ) {
 	return add_query_arg( [
-		'pk' => generate_permissions_key( $contact ),
+		'pk' => generate_permissions_key( $contact, $usage, $delete_after ),
 	], $url );
+}
+
+/**
+ * Get the permissions key
+ * if one is not available return false
+ * Will set the permissions key cookie if the key is found in the URL
+ *
+ * @return string|false
+ */
+function get_permissions_key() {
+	// check for the permissions_key and set it as a cookie
+	if ( $permissions_key = get_url_var( 'pk' ) ) {
+		set_cookie( 'gh-permissions-key', $permissions_key, HOUR_IN_SECONDS );
+	} else {
+		$permissions_key = get_cookie( 'gh-permissions-key' );
+	}
+
+	return $permissions_key;
 }
 
 /**
@@ -3495,9 +3533,9 @@ function is_url_excluded_from_tracking( $url, $exclusions = [] ) {
 	}
 
 	// No exclusions? Exit.
-	if ( empty( $exclusions_regex ) ){
-	    return false;
-    }
+	if ( empty( $exclusions_regex ) ) {
+		return false;
+	}
 
 	return apply_filters( 'groundhogg/is_url_excluded_from_tracking', preg_match( "@$exclusions_regex@", $url ), $url, $exclusions_regex );
 }
@@ -3563,15 +3601,15 @@ function current_contact_and_logged_in_user_match() {
  */
 function fix_nested_p( $content ) {
 
-    $patterns = [
-        '@(<p[^>]*>)([^>]*)(<p[^>]*>)@m', // opening tags
-        '@(<\/p[^>]*>)([^>]*)(<\/p[^>]*>)@m' // closing tags
-    ];
+	$patterns = [
+		'@(<p[^>]*>)([^>]*)(<p[^>]*>)@m', // opening tags
+		'@(<\/p[^>]*>)([^>]*)(<\/p[^>]*>)@m' // closing tags
+	];
 
-    $replacements = [
-        '$1$2',
-        '$2$3',
-    ];
+	$replacements = [
+		'$1$2',
+		'$2$3',
+	];
 
-    return preg_replace( $patterns, $replacements, $content );
+	return preg_replace( $patterns, $replacements, $content );
 }

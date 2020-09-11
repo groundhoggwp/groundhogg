@@ -501,7 +501,7 @@ class Email extends Base_Object_With_Meta {
 
 		// only add permissions key if this is a real email being sent.
 		if ( ! $this->is_testing() && ! is_user_logged_in() ){
-			$url = permissions_key_url( $url, $this->get_contact() );
+			$url = permissions_key_url( $url, $this->get_contact(), 'preferences' );
 		}
 
 		return $url;

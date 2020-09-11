@@ -203,10 +203,15 @@ class Replacements {
 				'callback'    => [ $this, 'replacement_confirmation_link_raw' ],
 				'description' => _x( 'A link to confirm the email address of a contact which can be placed in a button or link.', 'replacement', 'groundhogg' ),
 			),
-            array(
+			array(
 				'code'        => 'unsubscribe_link',
 				'callback'    => [ $this, 'replacement_unsubscribe_link' ],
 				'description' => _x( 'A link that will unsubscribe the contact.', 'replacement', 'groundhogg' ),
+			),
+			array(
+				'code'        => 'auto_login_link',
+				'callback'    => [ $this, 'replacement_auto_login_link' ],
+				'description' => _x( 'Automatically login the contact if they have a user account.', 'replacement', 'groundhogg' ),
 			),
 			array(
 				'code'        => 'date',
@@ -306,10 +311,6 @@ class Replacements {
 	 */
 	public function process( $content, $contact_id_or_email = false ) {
 
-		if ( ! preg_match( '/{([^{}]+)}/', $content ) ) {
-			return $content;
-		}
-
 		if ( $contact_id_or_email instanceof Contact ) {
 			$contact = $contact_id_or_email;
 		} else {
@@ -323,13 +324,28 @@ class Replacements {
 		$this->contact_id      = $contact->get_id();
 		$this->current_contact = $contact;
 
+		return $this->tackle_replacements( $content );
+	}
+
+	/**
+     * Recursive function to tackle nested replacement codes until no more replacements are found.
+     *
+	 * @param $content
+	 *
+	 * @return mixed
+	 */
+	public function tackle_replacements( $content ){
+
+	    if ( ! preg_match( '/{([^{}]+)}/', $content ) ) {
+			return $content;
+		}
 		// Check if there is at least one tag added
-		if ( empty( $this->replacement_codes ) || ! is_array( $this->replacement_codes ) ) {
+		else if ( empty( $this->replacement_codes ) || ! is_array( $this->replacement_codes ) ) {
 			return $content;
 		}
 
-		return preg_replace_callback( "/{([^{}]+)}/s", array( $this, 'do_replacement' ), $content );
-	}
+		return $this->tackle_replacements( preg_replace_callback( "/{([^{}]+)}/s", array( $this, 'do_replacement' ), $content ) );
+    }
 
 	/**
 	 * @return Contact
@@ -818,7 +834,7 @@ class Replacements {
 
 		$link_url = managed_page_url( 'preferences/confirm/' );
 
-		$link_url = permissions_key_url( $link_url, $this->get_current_contact() );
+		$link_url = permissions_key_url( $link_url, $this->get_current_contact(), 'preferences' );
 
 		$redirect_to = is_string( $redirect_to ) ? esc_url_raw( $redirect_to ) : false;
 
@@ -831,11 +847,44 @@ class Replacements {
 		return $link_url;
 	}
 
-	function replacement_unsubscribe_link(){
-		$link_url = managed_page_url( 'preferences/unsubscribe/' );
-		$link_url = permissions_key_url( $link_url, $this->get_current_contact() );
+	/**
+	 * Autologin the user
+	 *
+	 * @param $redirect_to
+	 *
+	 * @return string|void
+	 */
+	function replacement_auto_login_link( $redirect_to ) {
+
+		$link_url = managed_page_url( 'auto-login' );
+		$redirect_to = is_string( $redirect_to ) ? esc_url_raw( $redirect_to ) : false;
+
+		if ( ! $this->get_current_contact()->get_userdata() ) {
+			return $redirect_to;
+		}
+
+		$link_url = permissions_key_url( $link_url, $this->get_current_contact(), 'auto_login', true );
+
+		if ( $redirect_to && is_string( $redirect_to ) ) {
+			$link_url = add_query_arg( [
+				'redirect_to' => $redirect_to
+			], $link_url );
+		}
+
 		return $link_url;
-    }
+	}
+
+	/**
+	 * Merge in the unsubscribe link
+	 *
+	 * @return string|void
+	 */
+	function replacement_unsubscribe_link() {
+		$link_url = managed_page_url( 'preferences/unsubscribe/' );
+		$link_url = permissions_key_url( $link_url, $this->get_current_contact(), 'preferences' );
+
+		return $link_url;
+	}
 
 	/**
 	 * @return string
