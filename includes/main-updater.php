@@ -426,7 +426,7 @@ class Main_Updater extends Updater {
 			'2.2.17'        => __( 'Added Broadcast meta table.', 'groundhogg' ),
 			'2.2.18'        => __( 'Add email_id column to events tables.', 'groundhogg' ),
 			'2.2.19.3'      => __( 'Increased tag name size. Tag name can be 191 to 255 characters based on your hosted server.', 'groundhogg' ),
-			'2.2.19.4'      => __( 'Update the permission keys table to support new options.', 'groundhogg' ),
+			'2.2.19.4'      => __( 'Update the permission keys table to support new usage.', 'groundhogg' ),
 		];
 	}
 }

@@ -177,6 +177,13 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.19.4 (2020-09-15) =
+* ADDED Auto login link replacement code. Allows 1 time use auto login links for contacts that have linked user accounts.
+* TWEAKED The delimiter for importing CSV files will be extrapolated from the CSV rather than enforcing using  `,`.
+* TWEAKED The permissions keys are can now be given specific usage so that they can be used in multiple contexts without given broad access.
+* FIXED Bulk add tags page still imposing 50 character limit, now fixed.
+* FIXED Tags list only showing one tag after adding a tag manually.
+
 = 2.2.19.3 (2020-09-10) =
 * ADDED Setting to dismiss tooltips under `Settings > Misc`
 * ADDED Filter `groundhogg/admin/reports/predefined_colors` to change the colors used in the reporting charts.

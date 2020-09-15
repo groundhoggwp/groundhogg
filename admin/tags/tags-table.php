@@ -19,12 +19,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Tags Table
  *
- * @package     Admin
+ * @since       File available since Release 0.1
  * @subpackage  Admin/Tags
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Admin
  */
 
 
@@ -50,8 +50,8 @@ class Tags_Table extends WP_List_Table {
 	}
 
 	/**
-	 * @return array An associative array containing column information.
 	 * @see WP_List_Table::::single_row_columns()
+	 * @return array An associative array containing column information.
 	 */
 	public function get_columns() {
 		$columns = array(
@@ -91,9 +91,9 @@ class Tags_Table extends WP_List_Table {
 	/**
 	 * Generates content for a single row of the table
 	 *
-	 * @param object $item The current item
-	 *
 	 * @since 3.1.0
+	 *
+	 * @param object $item The current item
 	 *
 	 */
 	public function single_row( $item ) {
@@ -137,7 +137,7 @@ class Tags_Table extends WP_List_Table {
 	/**
 	 * Get default column value.
 	 *
-	 * @param object $tag A singular item (one full row's worth of data).
+	 * @param object $tag         A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string Text or HTML to be placed inside the column <td>.
@@ -206,10 +206,10 @@ class Tags_Table extends WP_List_Table {
 			'orderby' => $orderby,
 		);
 
-		$events = get_db( 'tags' )->query( $args );
-		$total  = get_db( 'tags' )->count( $args );
+		$items = get_db( 'tags' )->query( $args );
+		$total = get_db( 'tags' )->count( $args );
 
-		$this->items = $events;
+		$this->items = $items;
 
 		// Add condition to be sure we don't divide by zero.
 		// If $this->per_page is 0, then set total pages to 1.
@@ -225,9 +225,9 @@ class Tags_Table extends WP_List_Table {
 	/**
 	 * Generates and displays row actions.
 	 *
-	 * @param $tag Tag      Contact being acted upon.
+	 * @param        $tag         Tag      Contact being acted upon.
 	 * @param string $column_name Current column name.
-	 * @param string $primary Primary column name.
+	 * @param string $primary     Primary column name.
 	 *
 	 * @return string Row steps output for posts.
 	 */

@@ -17,12 +17,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * View Tags
  *
- * @package     Admin
+ * @since       File available since Release 0.1
  * @subpackage  Admin/Tags
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Admin
  */
 class Tags_Page extends Admin_Page {
 	// UNUSED FUNCTIONS
@@ -100,16 +100,13 @@ class Tags_Page extends Admin_Page {
 			$ids = [];
 
 			foreach ( $tag_names as $name ) {
-				if ( $name && strlen( $name ) < 50 ) {
-					$id = get_db( 'tags' )->add( [ 'tag_name' => $name ] );
+				$id = get_db( 'tags' )->add( [ 'tag_name' => $name ] );
 
-					if ( $id ) {
-						$ids[] = $id;
+				if ( $id ) {
+					$ids[] = $id;
 
-						do_action( 'groundhogg/admin/tags/add', $id );
-					}
+					do_action( 'groundhogg/admin/tags/add', $id );
 				}
-
 			}
 
 			if ( empty( $ids ) ) {
@@ -118,13 +115,11 @@ class Tags_Page extends Admin_Page {
 
 			$this->add_notice( 'new-tags', sprintf( _nx( '%d tag created', '%d tags created', count( $tag_names ), 'notice', 'groundhogg' ), count( $tag_names ) ) );
 
-			return true;
-
 		} else {
 
 			$tag_name = trim( sanitize_text_field( get_post_var( 'tag_name' ) ) );
-			if ( $tag_name && strlen( $tag_name ) > get_db( 'tags'  )->get_max_index_length() ) {
-				return new \WP_Error( 'too_long', __( sprintf(  "Maximum length for tag name is %d characters."  ,  get_db( 'tags' )->get_max_index_length()  )  , 'groundhogg' ) );
+			if ( $tag_name && strlen( $tag_name ) > get_db( 'tags' )->get_max_index_length() ) {
+				return new \WP_Error( 'too_long', __( sprintf( "Maximum length for tag name is %d characters.", get_db( 'tags' )->get_max_index_length() ), 'groundhogg' ) );
 			}
 
 			$tag_desc = sanitize_textarea_field( get_post_var( 'tag_description' ) );
@@ -143,7 +138,7 @@ class Tags_Page extends Admin_Page {
 
 		}
 
-		return true;
+		return false;
 	}
 
 	/**
@@ -160,7 +155,7 @@ class Tags_Page extends Admin_Page {
 		$tag_name        = sanitize_text_field( get_post_var( 'name' ) );
 		$tag_description = sanitize_textarea_field( get_post_var( 'description' ) );
 		if ( strlen( $tag_name ) > get_db( 'tags' )->get_max_index_length() ) {
-			return new \WP_Error( 'too_long', __( sprintf(  "Maximum length for tag name is %d characters."  ,  get_db( 'tags' )->get_max_index_length()  )  , 'groundhogg' ) );
+			return new \WP_Error( 'too_long', __( sprintf( "Maximum length for tag name is %d characters.", get_db( 'tags' )->get_max_index_length() ), 'groundhogg' ) );
 		}
 		$args = array(
 			'tag_name'        => $tag_name,
@@ -255,19 +250,20 @@ class Tags_Page extends Admin_Page {
                                 </label>
                             </div>
                             <script>
-                                jQuery(function ($) {
-                                    $("#tag-bulk-toggle").change(function () {
-                                        if ($(this).is(":checked")) {
-                                            $(".term-name-wrap").addClass("hidden");
-                                            $(".term-description-wrap").addClass("hidden");
-                                            $(".term-bulk-wrap").removeClass("hidden");
-                                        } else {
-                                            $(".term-name-wrap").removeClass("hidden");
-                                            $(".term-description-wrap").removeClass("hidden");
-                                            $(".term-bulk-wrap").addClass("hidden");
-                                        }
-                                    });
-                                });
+                              jQuery(function ($) {
+                                $('#tag-bulk-toggle').change(function () {
+                                  if ($(this).is(':checked')) {
+                                    $('.term-name-wrap').addClass('hidden')
+                                    $('.term-description-wrap').addClass('hidden')
+                                    $('.term-bulk-wrap').removeClass('hidden')
+                                  }
+                                  else {
+                                    $('.term-name-wrap').removeClass('hidden')
+                                    $('.term-description-wrap').removeClass('hidden')
+                                    $('.term-bulk-wrap').addClass('hidden')
+                                  }
+                                })
+                              })
                             </script>
 
 							<?php do_action( 'groundhogg/admin/tags/add/form' ); ?>

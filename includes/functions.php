@@ -1562,23 +1562,68 @@ function split_name( $name ) {
 }
 
 /**
+ * Detect the CSV delimiter of a CSV file.
+ *
+ * @param $file_path
+ *
+ * @return string
+ */
+function get_csv_delimiter( $file_path ) {
+
+	$handle = fopen( $file_path, 'r' );
+
+	if ( ! $handle ){
+	    return ',';
+    }
+
+	$delimiters = [ "\t", ";", "|", "," ];
+	$data_1     = [];
+	$data_2     = [];
+	$delimiter  = $delimiters[0];
+
+	foreach ( $delimiters as $d ) {
+		$data_1 = fgetcsv( $handle, 4096, $d );
+
+		if ( count( $data_1 ) > count( $data_2 ) ) {
+			$delimiter = $d;
+			$data_2    = $data_1;
+		}
+
+		rewind( $handle );
+	}
+
+	fclose( $handle );
+
+	return $delimiter;
+
+}
+
+/**
  * Get a list of items from a file path, if file does not exist of there are no items return an empty array.
  *
  * @param string $file_path
  *
+ * @param bool   $delimiter
+ *
  * @return array
  */
-function get_items_from_csv( $file_path = '' ) {
+function get_items_from_csv( $file_path = '', $delimiter=false ) {
 
 	if ( ! file_exists( $file_path ) ) {
 		return [];
 	}
 
+	// If a delimiter is not provided, make a guess.
+	if ( ! $delimiter ){
+		$delimiter = get_csv_delimiter( $file_path ) ?: ',';
+	}
+
 	$header       = null;
 	$header_count = 0;
 	$data         = array();
+
 	if ( ( $handle = fopen( $file_path, 'r' ) ) !== false ) {
-		while ( ( $row = fgetcsv( $handle, 0, ',' ) ) !== false ) {
+		while ( ( $row = fgetcsv( $handle, 0, $delimiter ) ) !== false ) {
 			if ( ! $header ) {
 				$header       = $row;
 				$header_count = count( $header );
