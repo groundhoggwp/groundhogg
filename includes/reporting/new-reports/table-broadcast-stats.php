@@ -40,6 +40,10 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 			}
 		}
 
+		if (get_array_var( $this->request_data , 'ddl_broadcasts' ) ) {
+			$id  = absint(get_array_var( $this->request_data , 'ddl_broadcasts' ) );
+		}
+
 		return $id;
 	}
 

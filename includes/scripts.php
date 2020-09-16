@@ -233,6 +233,8 @@ class Scripts {
 			'funnels'   => rest_url( 'gh/v3/funnels' ),
 			'steps'     => rest_url( 'gh/v3/steps' ),
 			'meta_keys' => rest_url( 'gh/v3/contacts/meta-keys' ),
+			'pages'     => rest_url( 'gh/v3/pages' ),
+
 		];
 
 		$endpoints = apply_filters( 'groundhogg/scripts/admin_rest_endpoints', $endpoints );

@@ -10,6 +10,9 @@ use Groundhogg\Reporting\New_Reports\Chart_Email_Activity;
 use Groundhogg\Reporting\New_Reports\Chart_Funnel_Breakdown;
 use Groundhogg\Reporting\New_Reports\Chart_Last_Broadcast;
 use Groundhogg\Reporting\New_Reports\Chart_New_Contacts;
+use Groundhogg\Reporting\New_Reports\Ddl_Broadcasts;
+use Groundhogg\Reporting\New_Reports\Ddl_Funnels;
+use Groundhogg\Reporting\New_Reports\Ddl_Region;
 use Groundhogg\Reporting\New_Reports\Email_Click_Rate;
 use Groundhogg\Reporting\New_Reports\Email_Open_Rate;
 use Groundhogg\Reporting\New_Reports\Table_Benchmark_Conversion_Rate;
@@ -56,6 +59,11 @@ class Reports {
 	public $end;
 
 	/**
+	 * @var array
+	 */
+	public $request_data;
+
+	/**
 	 * Report data
 	 *
 	 * @var array[]
@@ -68,7 +76,7 @@ class Reports {
 	 * @param $start int unix timestamps
 	 * @param $end   int unix timestamps
 	 */
-	public function __construct( $start, $end ) {
+	public function __construct( $start, $end, $request_data = [] ) {
 
 		if ( is_string( $start ) ) {
 			$start = strtotime( $start );
@@ -78,8 +86,9 @@ class Reports {
 			$end = strtotime( $end );
 		}
 
-		$this->start = absint( $start );
-		$this->end   = absint( $end );
+		$this->start        = absint( $start );
+		$this->end          = absint( $end );
+		$this->request_data = $request_data;
 
 		$this->setup_default_reports();
 
@@ -249,11 +258,25 @@ class Reports {
 			[
 				'id'       => 'table_list_engagement',
 				'callback' => [ $this, 'table_list_engagement' ]
+			],
+			[
+				'id'       => 'ddl_funnels',
+				'callback' => [ $this, 'ddl_funnels' ]
+			],
+			[
+				'id'       => 'ddl_region',
+				'callback' => [ $this, 'ddl_region' ]
+			],
+
+[
+				'id'       => 'ddl_broadcasts',
+				'callback' => [ $this, 'ddl_broadcasts' ]
 			]
+
 		];
 
 		foreach ( $default_reports as $report ) {
-			$this->add( $report['id'], $report['callback'] );
+			$this->add( $report[ 'id' ], $report[ 'callback' ] );
 		}
 
 		do_action( 'groundhogg/reports/setup_default_reports/after', $this );
@@ -297,7 +320,7 @@ class Reports {
 			return false;
 		}
 
-		$results = call_user_func( $this->reports[ $report_id ]['callback'] );
+		$results = call_user_func( $this->reports[ $report_id ][ 'callback' ] );
 
 		return $results;
 	}
@@ -308,7 +331,7 @@ class Reports {
 	 * @return array
 	 */
 	public function total_new_contacts() {
-		$report = new Total_New_Contacts( $this->start, $this->end );
+		$report = new Total_New_Contacts( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
@@ -319,7 +342,7 @@ class Reports {
 	 * @return array
 	 */
 	public function total_confirmed_contacts() {
-		$report = new Total_Confirmed_Contacts( $this->start, $this->end );
+		$report = new Total_Confirmed_Contacts( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
@@ -330,7 +353,7 @@ class Reports {
 	 * @return array
 	 */
 	public function total_engaged_contacts() {
-		$report = new Total_Active_Contacts( $this->start, $this->end );
+		$report = new Total_Active_Contacts( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
@@ -341,7 +364,7 @@ class Reports {
 	 * @return array
 	 */
 	public function total_unsubscribed_contacts() {
-		$report = new Total_Unsubscribed_Contacts( $this->start, $this->end );
+		$report = new Total_Unsubscribed_Contacts( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
@@ -352,7 +375,7 @@ class Reports {
 	 * @return array
 	 */
 	public function total_emails_sent() {
-		$report = new Total_Emails_Sent( $this->start, $this->end );
+		$report = new Total_Emails_Sent( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
@@ -363,7 +386,7 @@ class Reports {
 	 * @return array
 	 */
 	public function email_open_rate() {
-		$report = new Email_Open_Rate( $this->start, $this->end );
+		$report = new Email_Open_Rate( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
@@ -375,7 +398,7 @@ class Reports {
 	 * @return array
 	 */
 	public function email_click_rate() {
-		$report = new Email_Click_Rate( $this->start, $this->end );
+		$report = new Email_Click_Rate( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
@@ -384,7 +407,7 @@ class Reports {
 	 * @return mixed
 	 */
 	public function chart_new_contacts() {
-		$report = new Chart_New_Contacts( $this->start, $this->end );
+		$report = new Chart_New_Contacts( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
@@ -394,7 +417,7 @@ class Reports {
 	 * @return mixed
 	 */
 	public function chart_email_activity() {
-		$report = new Chart_Email_Activity( $this->start, $this->end );
+		$report = new Chart_Email_Activity( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
@@ -404,7 +427,7 @@ class Reports {
 	 * @return mixed
 	 */
 	public function chart_funnel_breakdown() {
-		$report = new Chart_Funnel_Breakdown( $this->start, $this->end );
+		$report = new Chart_Funnel_Breakdown( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
@@ -415,7 +438,7 @@ class Reports {
 	 */
 	public function chart_contacts_by_optin_status() {
 
-		$report = new Chart_Contacts_By_Optin_Status( $this->start, $this->end );
+		$report = new Chart_Contacts_By_Optin_Status( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 
@@ -426,7 +449,7 @@ class Reports {
 	 */
 	public function chart_contacts_by_region() {
 
-		$report = new Chart_Contacts_By_Region( $this->start, $this->end );
+		$report = new Chart_Contacts_By_Region( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 
@@ -437,7 +460,7 @@ class Reports {
 	 */
 	public function chart_contacts_by_country() {
 
-		$report = new Chart_Contacts_By_Country( $this->start, $this->end );
+		$report = new Chart_Contacts_By_Country( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 
@@ -448,7 +471,7 @@ class Reports {
 	 */
 	public function chart_last_broadcast() {
 
-		$report = new Chart_Last_Broadcast( $this->start, $this->end );
+		$report = new Chart_Last_Broadcast( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 
@@ -459,7 +482,7 @@ class Reports {
 	 */
 	public function table_contacts_by_lead_source() {
 
-		$report = new Table_Contacts_By_Lead_Source( $this->start, $this->end );
+		$report = new Table_Contacts_By_Lead_Source( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 
@@ -470,7 +493,7 @@ class Reports {
 	 */
 	public function table_contacts_by_search_engines() {
 
-		$report = new Table_Contacts_By_Search_Engines( $this->start, $this->end );
+		$report = new Table_Contacts_By_Search_Engines( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 
@@ -481,7 +504,7 @@ class Reports {
 	 */
 	public function table_contacts_by_social_media() {
 
-		$report = new Table_Contacts_By_Social_Media( $this->start, $this->end );
+		$report = new Table_Contacts_By_Social_Media( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
@@ -491,7 +514,7 @@ class Reports {
 	 */
 	public function table_contacts_by_source_page() {
 
-		$report = new Table_Contacts_By_Source_Pages( $this->start, $this->end );
+		$report = new Table_Contacts_By_Source_Pages( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 
@@ -502,7 +525,7 @@ class Reports {
 	 */
 	public function table_contacts_by_countries() {
 
-		$report = new Table_Contacts_By_Country( $this->start, $this->end );
+		$report = new Table_Contacts_By_Country( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 
@@ -513,7 +536,7 @@ class Reports {
 	 */
 	public function table_top_performing_emails() {
 
-		$report = new Table_Top_Performing_Emails( $this->start, $this->end );
+		$report = new Table_Top_Performing_Emails( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 
@@ -524,7 +547,7 @@ class Reports {
 	 */
 	public function table_worst_performing_emails() {
 
-		$report = new Table_Worst_Performing_Emails( $this->start, $this->end );
+		$report = new Table_Worst_Performing_Emails( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 
@@ -535,7 +558,7 @@ class Reports {
 	 */
 	public function table_top_performing_broadcasts() {
 
-		$report = new Table_Top_Performing_Broadcasts( $this->start, $this->end );
+		$report = new Table_Top_Performing_Broadcasts( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 
@@ -547,7 +570,7 @@ class Reports {
 	 */
 	public function total_complaints_contacts() {
 
-		$report = new Total_Complaints_Contacts( $this->start, $this->end );
+		$report = new Total_Complaints_Contacts( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 
@@ -559,7 +582,7 @@ class Reports {
 	 */
 	public function total_bounces_contacts() {
 
-		$report = new Total_Bounces_Contacts( $this->start, $this->end );
+		$report = new Total_Bounces_Contacts( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 
@@ -571,7 +594,7 @@ class Reports {
 	 */
 	public function total_spam_contacts() {
 
-		$report = new Total_Spam_Contacts( $this->start, $this->end );
+		$report = new Total_Spam_Contacts( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 
@@ -582,7 +605,7 @@ class Reports {
 	 */
 	public function total_funnel_conversion_rate() {
 
-		$report = new Total_Funnel_Conversion_Rate( $this->start, $this->end );
+		$report = new Total_Funnel_Conversion_Rate( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 
@@ -593,7 +616,7 @@ class Reports {
 	 */
 	public function total_contacts_in_funnel() {
 
-		$report = new Total_Contacts_In_Funnel( $this->start, $this->end );
+		$report = new Total_Contacts_In_Funnel( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 
@@ -604,7 +627,7 @@ class Reports {
 	 */
 	public function total_benchmark_conversion_rate() {
 
-		$report = new Total_Benchmark_Conversion_Rate( $this->start, $this->end );
+		$report = new Total_Benchmark_Conversion_Rate( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 
@@ -615,7 +638,7 @@ class Reports {
 	 */
 	public function total_abandonment_rate() {
 
-		$report = new Total_Abandonment_Rate( $this->start, $this->end );
+		$report = new Total_Abandonment_Rate( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 
@@ -627,7 +650,7 @@ class Reports {
 	 */
 	public function table_broadcast_stats() {
 
-		$report = new Table_Broadcast_Stats( $this->start, $this->end );
+		$report = new Table_Broadcast_Stats( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 
@@ -637,7 +660,7 @@ class Reports {
 	 * @return mixed
 	 */
 	public function table_broadcast_link_clicked() {
-		$report = new Table_Broadcast_Link_Clicked( $this->start, $this->end );
+		$report = new Table_Broadcast_Link_Clicked( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
@@ -646,7 +669,7 @@ class Reports {
 	 * @return mixed
 	 */
 	public function table_benchmark_conversion_rate() {
-		$report = new Table_Benchmark_Conversion_Rate( $this->start, $this->end );
+		$report = new Table_Benchmark_Conversion_Rate( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
@@ -655,52 +678,69 @@ class Reports {
 	 * @return mixed
 	 */
 	public function table_top_converting_funnels() {
-		$report = new Table_Top_Converting_Funnels( $this->start, $this->end );
+		$report = new Table_Top_Converting_Funnels( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
 
-	public function table_form_activity(){
-		$report = new Table_Form_Activity( $this->start, $this->end );
+	public function table_form_activity() {
+		$report = new Table_Form_Activity( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
 
-	public function table_email_stats(){
-		$report = new Table_Email_Stats( $this->start, $this->end );
+	public function table_email_stats() {
+		$report = new Table_Email_Stats( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
 
-	public function table_email_links_clicked(){
-		$report = new Table_Email_Links_Clicked( $this->start, $this->end );
+	public function table_email_links_clicked() {
+		$report = new Table_Email_Links_Clicked( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
 
-	public function chart_donut_email_stats(){
-		$report = new Chart_Donut_Email_Stats( $this->start, $this->end );
+	public function chart_donut_email_stats() {
+		$report = new Chart_Donut_Email_Stats( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
 
-	public function table_funnel_stats(){
-		$report = new Table_Funnel_Stats( $this->start, $this->end );
+	public function table_funnel_stats() {
+		$report = new Table_Funnel_Stats( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
 
-	public function table_email_funnels_used_in(){
-		$report = new Table_Email_Funnels_Used_In( $this->start, $this->end );
+	public function table_email_funnels_used_in() {
+		$report = new Table_Email_Funnels_Used_In( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
 
-	public function table_list_engagement(){
-		$report = new Table_List_Engagement( $this->start, $this->end );
+	public function table_list_engagement() {
+		$report = new Table_List_Engagement( $this->start, $this->end, $this->request_data );
 
 		return $report->get_data();
 	}
 
+	public function ddl_funnels() {
+		$report = new Ddl_Funnels( $this->start, $this->end, $this->request_data );
+
+		return $report->get_data();
+	}
+
+	public function ddl_region() {
+		$report = new Ddl_Region( $this->start, $this->end, $this->request_data );
+
+		return $report->get_data();
+	}
+
+	public function ddl_broadcasts() {
+		$report = new Ddl_Broadcasts( $this->start, $this->end, $this->request_data );
+
+		return $report->get_data();
+	}
 
 }

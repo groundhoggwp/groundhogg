@@ -24,15 +24,15 @@ abstract class Base_Quick_Stat_Percent extends Base_Quick_Stat {
 	 */
 	public function get_data() {
 
-    	// Get the new data
-		$current_data = $this->query( $this->start, $this->end );
+		// Get the new data
+		$current_data    = $this->query( $this->start, $this->end );
 		$current_data_vs = $this->query_vs( $this->start, $this->end );
 
 		// Calc percentage
 		$current_percentage = percentage( $current_data_vs, $current_data, 0 );
 
 		// Get the old data
-		$compare_data = $this->query( $this->compare_start, $this->compare_end );
+		$compare_data    = $this->query( $this->compare_start, $this->compare_end );
 		$compare_data_vs = $this->query_vs( $this->compare_start, $this->compare_end );
 
 		// Calc percentage
@@ -47,20 +47,24 @@ abstract class Base_Quick_Stat_Percent extends Base_Quick_Stat {
 		// Get arrow props
 		$arrow = $this->get_arrow_properties( $current_percentage, $compare_percentage );
 
-		return  [
-			'type' => 'quick_stat',
-			'number'  => esc_html( number_format_i18n( $current_percentage ) . '%' ) ,
-			'compare' => [
-				'arrow'   => [
-					'direction' => $arrow[ 'direction' ],
-					'color'     => $arrow[ 'color' ],
+		return [
+			"type"  => 'quick_stat',
+			"title" => $this->get_title(),
+			"chart" => [
+				'type'    => 'quick_stat',
+				'number'  => esc_html( number_format_i18n( $current_percentage ) . '%' ),
+				'compare' => [
+					'arrow'   => [
+						'direction' => $arrow[ 'direction' ],
+						'color'     => $arrow[ 'color' ],
+					],
+					'percent' => absint( $percentage ) . '%',
+					'text'    => sprintf( __( '.vs Previous %s Days', 'groundhogg' ), $this->num_days )
 				],
-				'percent' => absint( $percentage ) . '%',
-				'text'    => sprintf( __( '.vs Previous %s Days', 'groundhogg' ), $this->num_days )
-			],
-			'data' => [
-				'current' => $current_percentage,
-				'compare' => $compare_percentage,
+				'data'    => [
+					'current' => $current_percentage,
+					'compare' => $compare_percentage,
+				]
 			]
 		];
 

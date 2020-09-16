@@ -25,7 +25,11 @@ class Table_Broadcast_Link_Clicked extends Base_Table_Report {
 	}
 
 	protected function get_broadcast_id() {
-		return get_array_var( get_request_var( 'data', [] ), 'broadcast_id' );
+//		return get_array_var( get_request_var( 'data', [] ), 'broadcast_id' );
+		if (get_array_var( $this->request_data , 'ddl_broadcasts' ) ) {
+			$id  = absint(get_array_var( $this->request_data , 'ddl_broadcasts' ) );
+		}
+		return $id;
 	}
 
 	protected function get_table_data() {

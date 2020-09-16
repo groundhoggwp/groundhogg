@@ -94,9 +94,6 @@ class Chart_Funnel_Breakdown extends Base_Chart_Report {
 			],
 			'scales'              => [
 				'xAxes' => [
-					0 => [
-						'maxBarThickness' => 100
-					]
 				],
 				'yAxes' => [
 					0 => [

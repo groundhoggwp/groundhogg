@@ -20,10 +20,10 @@ abstract class Base_Time_Chart_Report extends Base_Line_Chart_Report {
 //			'responsive' => true,
 			'maintainAspectRatio' => false,
 			'tooltips'            => [
-				'callbacks'       => [
-					'label' => 'tool_tip_label',
-					'title' => 'tool_tip_title',
-				],
+//				'callbacks'       => [
+//					'label' => 'tool_tip_label',
+//					'title' => 'tool_tip_title',
+//				],
 				'mode'            => 'index',
 				'intersect'       => false,
 				'backgroundColor' => '#FFF',

@@ -23,6 +23,11 @@ abstract class Base_Report {
 	protected $end;
 
 	/**
+	 * @var array
+	 */
+	protected $request_data ;
+
+	/**
 	 * @var int
 	 */
 	protected $compare_start;
@@ -43,7 +48,7 @@ abstract class Base_Report {
 	 * @param $start int unix timestamps
 	 * @param $end int unix timestamps
 	 */
-	public function __construct( $start, $end ) {
+	public function __construct( $start, $end  ,$request_data = [] ) {
 
 		if ( is_string( $start ) ) {
 			$start = strtotime( $start );
@@ -55,6 +60,7 @@ abstract class Base_Report {
 
 		$this->start = absint( $start );
 		$this->end   = absint( $end );
+		$this->request_data = $request_data;
 
 		$this->set_compare_dates();
 	}
@@ -167,10 +173,14 @@ abstract class Base_Report {
 	 * @return mixed
 	 */
 	protected function get_funnel_id() {
-		$funnel_id = absint( get_array_var( get_request_var( 'data', [] ), 'funnel_id' ) );
-		set_cookie( 'gh_reporting_funnel_id', $funnel_id, MINUTE_IN_SECONDS );
 
-		return $funnel_id;
+//		$funnel_id = absint( get_array_var( get_request_var( 'data', [] ), 'funnel_id' ) );
+//		set_cookie( 'gh_reporting_funnel_id', $funnel_id, MINUTE_IN_SECONDS );
+
+
+		return absint( get_array_var( $this->request_data , 'ddl_funnels' ));
+
+
 	}
 
 	/**
@@ -193,5 +203,10 @@ abstract class Base_Report {
 	protected function get_step_id() {
 		return absint( get_array_var( get_request_var( 'data', [] ), 'step_id' ) );
 	}
+
+	protected function get_title() {
+		return  'STATIC TITLE';
+	}
+
 
 }

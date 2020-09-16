@@ -21,6 +21,10 @@ abstract class Base_Chart_Report extends Base_Report {
 	 */
 	abstract protected function get_options();
 
+	/**
+	 * @return string
+	 */
+
 
 	/**
 	 * Get the report data
@@ -31,6 +35,7 @@ abstract class Base_Chart_Report extends Base_Report {
 
 		return [
 			'type'  => 'chart',
+			'title' => $this->get_title(),
 			'chart' => [
 				'type'    => $this->get_type(),
 				'data'    => $this->get_datasets(),
@@ -51,10 +56,12 @@ abstract class Base_Chart_Report extends Base_Report {
 
 	public function get_pie_chart_options() {
 		return [
+			'maintainAspectRatio' => false,
 			'legend' => [
 				'display' => false
+//				'position' => 'right'
 			],
-//			'responsive' => true,
+			'responsive' => false,
 			'tooltips'   => [
 				'backgroundColor' => '#FFF',
 				'bodyFontColor'   => '#000',

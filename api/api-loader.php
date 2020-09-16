@@ -21,6 +21,7 @@ class Api_Loader {
 	 * WPGH_API_LOADER constructor.
 	 */
 	public function __construct() {
+
 		add_action( 'rest_api_init', [ $this, 'load_api' ] );
 	}
 

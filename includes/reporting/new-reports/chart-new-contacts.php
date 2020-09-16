@@ -6,6 +6,10 @@ use Groundhogg\Contact_Query;
 use Groundhogg\Plugin;
 
 class Chart_New_Contacts extends Base_Time_Chart_Report {
+	protected function get_title() {
+		return 'New Contacts';
+	}
+
 
 	protected function get_datasets() {
 
