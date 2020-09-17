@@ -1,6 +1,6 @@
-=== Groundhogg — Marketing Automation & CRM for WordPress ===
-Contributors: trainingbusinesspros, groundhogg, dhrumit
-Tags: crm, email marketing, email, marketing automation, automation
+=== CRM, Email & Marketing Automation for WordPress - Groundhogg ===
+Contributors: trainingbusinesspros, Groundhogg, Dhrumit, Adrian Tobey
+Tags: crm, email, marketing, automation, newsletters
 Donate link: https://www.groundhogg.io/try/
 Requires at least: 4.9
 Tested up to: 5.5
@@ -9,7 +9,7 @@ Stable tag: trunk
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
-Say hello to the easiest way to Simplify, Consolidate & Automate your Sales & Marketing in WordPress.
+Create funnels, email campaigns, newsletters, marketing automation and have a CRM all within your WordPress website.
 
 == Description ==
 
@@ -27,13 +27,15 @@ Groundhogg is the only open source Marketing Automation tool of its kind, built 
 
 ### GROUNDHOGG IS PERFECT FOR:
 
-* Capturing Leads
-* Sending Personalized Emails and text messages
+* Capturing leads and learning more about your customers
+* Creating marketing automation strategies
+* Sending personalized email and text messages
 * Collecting unlimited customer data
 * Profiling subscribers
 * Automating the customer journey
-* Improving E-commerce sales
+* Improving e-commerce sales
 * Increasing membership retention
+* Sending newsletters to your list
 * And so much more...
 
 Groundhogg is the perfect alternative to [Infusionsoft, HubSpot, Actionetics, ActiveCampaign, ConvertKit, MailChimp and many other expensive third-party apps](https://www.groundhogg.io/comparison/).
