@@ -25,6 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package     Includes
  */
 class Step extends Base_Object_With_Meta implements Event_Process {
+
 	const BENCHMARK = 'benchmark';
 	const ACTION = 'action';
 
@@ -79,6 +80,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return void
 	 */
 	protected function post_setup() {
+		// Unserialize the children & parent nodes
+		$this->node_parents  = maybe_unserialize( $this->node_parents );
+		$this->node_children = maybe_unserialize( $this->node_children );
 	}
 
 	/**
@@ -94,22 +98,43 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return absint( $this->ID );
 	}
 
+	/**
+	 * @return bool|mixed
+	 */
+	public function get_node_id() {
+		return $this->node_id;
+	}
+
 	public function get_title() {
 		return $this->step_title;
 	}
 
+	/**
+	 * @deprecated since 3.0
+	 *
+	 * @return int
+	 */
 	public function get_order() {
 		return absint( $this->step_order );
 	}
 
+	/**
+	 * @return bool|mixed
+	 */
 	public function get_type() {
 		return $this->step_type;
 	}
 
+	/**
+	 * @return bool|mixed
+	 */
 	public function get_group() {
 		return $this->step_group;
 	}
 
+	/**
+	 * @return int
+	 */
 	public function get_funnel_id() {
 		return absint( $this->funnel_id );
 	}
@@ -118,7 +143,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return Funnel
 	 */
 	public function get_funnel() {
-		return Plugin::$instance->utils->get_funnel( $this->get_funnel_id() );
+		return new Funnel( $this->get_funnel_id() );
 	}
 
 	/**
@@ -139,7 +164,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		return $contacts;
 	}
-
 
 	/**
 	 * Get an array of waiting events
@@ -181,54 +205,69 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
-	 * Get the next step in the order
+	 * Gets the child steps based on the node_children
+	 *
+	 * @return Step[]
+	 */
+	public function get_child_steps() {
+
+		$steps = [];
+
+		foreach ( $this->node_children as $child_node_id ) {
+			$steps[] = new Step( [
+				'funnel_id' => $this->get_funnel_id(),
+				'node_id'   => $child_node_id
+			] );
+		}
+
+		return $steps;
+	}
+
+	/**
+	 * Gets the parent step based on node_parents
+	 *
+	 * @return array
+	 */
+	public function get_parent_steps() {
+		$steps = [];
+
+		foreach ( $this->node_parents as $parent_node_id ) {
+			$steps[] = new Step( [
+				'funnel_id' => $this->get_funnel_id(),
+				'node_id'   => $parent_node_id
+			] );
+		}
+
+		return $steps;
+	}
+
+	/**
+	 * Get the next step in the automation
+	 *
+	 * Here are the rules:
+	 *  - a step cannot have multiple step types as children, only either benchmarks or actions
+	 *  - if a benchmark is detected, our work is done and we return false.
 	 *
 	 * @return Step|false
 	 */
 	public function get_next_action() {
 
-		/* this will give an array of objects ordered by appearance in the funnel builder */
-		$items = $this->get_funnel()->get_steps();
+		$child_steps = $this->get_child_steps();
 
-		if ( empty( $items ) ) {
-			/* something went wrong or there are no more steps*/
+		if ( empty( $child_steps ) || $child_steps[0]->is_benchmark() ) {
+			// either there are no subsequent actions or the linked node is a benchmark.
 			return false;
+		} else if ( count( $child_steps ) === 1 ) {
+			// There is only one action
+			return $child_steps[0];
 		}
 
-		$i = $this->get_order();
+		// if there is more than 1 action (at most 2) we have to retrieve the conditional
+		// logic from the current step to determine which node to return.
 
-		if ( $i >= count( $items ) ) {
-
-			/* This is the last step. */
-			return false;
-		}
-
-		if ( $items[ $i ]->get_group() === self::ACTION ) {
-
-			/* regardless of whether the current step is an action
-			or a benchmark we can run the next step if it's an action */
-			return $items[ $i ];
-
-		}
-
-		if ( $this->is_benchmark() ) {
-
-			while ( $i < count( $items ) ) {
-
-				if ( $items[ $i ]->get_group() === self::ACTION ) {
-
-					return $items[ $i ];
-
-				}
-
-				$i ++;
-
-			}
-
-		}
+		// todo, use conditional logic to determine the correct action to return
 
 		return false;
-
 	}
 
 	/**
@@ -446,11 +485,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Return the name given with the ID prefixed for easy access in the $_POST variable
 	 *
+	 * @deprecated since 2.0
+	 *
 	 * @param $name
 	 *
 	 * @return string
-	 * @deprecated since 2.0
-	 *
 	 */
 	public function prefix( $name ) {
 		return $this->get_id() . '_' . esc_attr( $name );
@@ -571,9 +610,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return $this->get_title();
 	}
 
-	public function get_step_notes()
-	{
-		return $this->get_meta('step_notes');
+	public function get_step_notes() {
+		return $this->get_meta( 'step_notes' );
 	}
 
 	/**
@@ -678,7 +716,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		if ( $next_step && $next_step->is_active() ) {
 			$contacts = $this->get_waiting_contacts();
 
-			if ( ! empty( $contacts ) ){
+			if ( ! empty( $contacts ) ) {
 				foreach ( $contacts as $contact ) {
 					$next_step->enqueue( $contact );
 				}

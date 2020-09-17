@@ -3658,3 +3658,20 @@ function fix_nested_p( $content ) {
 
 	return preg_replace( $patterns, $replacements, $content );
 }
+
+/**
+ * Map a function to a specific key in the data
+ *
+ * @param $data object|array
+ * @param $attr string
+ * @param $func callable
+ */
+function map_fun_to_attr( &$data, $attr, $func ){
+    if ( isset_not_empty( $data, $attr ) ){
+        if ( is_object( $data ) ){
+            $data->$attr = call_user_func( $func, $data->$attr );
+        } else {
+	        $data[ $attr ] = call_user_func( $func, $data[ $attr ] );
+        }
+    }
+}
