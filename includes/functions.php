@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Classes\Activity;
 use Groundhogg\Lib\Mobile\Iso3166;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
@@ -172,6 +173,13 @@ function notices() {
  */
 function tracking() {
 	return Plugin::$instance->tracking;
+}
+
+/**
+ * @return Event_Queue
+ */
+function event_queue() {
+	return Plugin::instance()->event_queue;
 }
 
 /**
@@ -1572,9 +1580,9 @@ function get_csv_delimiter( $file_path ) {
 
 	$handle = fopen( $file_path, 'r' );
 
-	if ( ! $handle ){
-	    return ',';
-    }
+	if ( ! $handle ) {
+		return ',';
+	}
 
 	$delimiters = [ "\t", ";", "|", "," ];
 	$data_1     = [];
@@ -1607,14 +1615,14 @@ function get_csv_delimiter( $file_path ) {
  *
  * @return array
  */
-function get_items_from_csv( $file_path = '', $delimiter=false ) {
+function get_items_from_csv( $file_path = '', $delimiter = false ) {
 
 	if ( ! file_exists( $file_path ) ) {
 		return [];
 	}
 
 	// If a delimiter is not provided, make a guess.
-	if ( ! $delimiter ){
+	if ( ! $delimiter ) {
 		$delimiter = get_csv_delimiter( $file_path ) ?: ',';
 	}
 
@@ -3657,4 +3665,81 @@ function fix_nested_p( $content ) {
 	];
 
 	return preg_replace( $patterns, $replacements, $content );
+}
+
+/**
+ * Track activity that happens on site caused by a human.
+ * Use the tracking cookie to populate the main arguments.
+ *
+ * @param $type
+ * @param $details
+ */
+function track_live_activity( $type, $details=[] ){
+
+	// Use tracked contact
+	$contact = get_contactdata();
+
+	// If there is not one available, skip
+	if ( ! is_a_contact( $contact ) ) {
+		return;
+	}
+
+	$args = [
+		'funnel_id'     => tracking()->get_current_funnel_id(),
+		'contact_id'    => tracking()->get_current_contact_id(),
+		'email_id'      => tracking()->get_current_email_id(),
+		'event_id'      => tracking()->get_current_event()->get_id(),
+		'referer'       => tracking()->get_leadsource(),
+    ];
+
+	track_activity( $type, $args, $details, $contact );
+}
+
+/**
+ * Log an activity conducted by the contact while they are performing actions on the site.
+ * Uses the cookie details for reporting.
+ *
+ * @param string  $type    string, an activity identifier
+ * @param array   $args    the details for the activity
+ * @param array   $details details about that activity
+ * @param Contact $contact the contact to track
+ */
+function track_activity( $contact, $type, $args, $details=[] ) {
+
+	// If there is not one available, skip
+	if ( ! is_a_contact( $contact ) ) {
+		return;
+	}
+
+	// use tracking cookies to generate information for the activity log
+	$defaults = [
+		'activity_type' => $type,
+		'timestamp'     => time(),
+	];
+
+	// Merge overrides with args
+	$args = wp_parse_args( $defaults, $args );
+	$args = apply_filters( 'groundhogg/track_live_activity/args', $args, $contact );
+
+	// Add the activity to the DB
+	$id = get_db( 'activity' )->add( $args );
+
+	if ( ! $id ) {
+		return;
+	}
+
+	$activity = new Activity( $id );
+
+	// Add any details to the activity meta
+	foreach ( $details as $detail_key => $value ) {
+		$activity->update_meta( $detail_key, $value );
+	}
+
+	/**
+	 * Fires after some activity is tracked
+	 *
+	 * @param $activity Activity
+	 * @param $contact  Contact
+	 */
+	do_action( 'groundhogg/track_activity', $activity, $contact );
 }
