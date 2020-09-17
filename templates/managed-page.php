@@ -2,9 +2,14 @@
 
 namespace Groundhogg;
 
+use function Groundhogg\Notices\add_notice;
+use function Groundhogg\Notices\print_notices;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+include __DIR__ . '/notices.php';
 
 define( 'MANAGED_PAGE_WIDTH', 500 );
 
@@ -128,7 +133,11 @@ function managed_page_head( $title = '', $action = '' ) {
                title="<?php echo esc_attr( $header_title ); ?>"><?php echo $header_text; ?></a></h1>
 	<?php endif;
 
-	Plugin::$instance->notices->print_notices();
+	if ( $notice = get_url_var( 'notice' ) ){
+	    add_notice( sanitize_key( $notice ) );
+    }
+
+	print_notices();
 
 	?>
     <div id="content">

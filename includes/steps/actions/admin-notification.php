@@ -307,7 +307,6 @@ class Admin_Notification extends Action {
 
 		$reply_to = $this->get_posted_data( 'reply_to' );
 
-
 		if ( $reply_to ) {
 			$reply_to = sanitize_text_field( $reply_to );
 
@@ -350,12 +349,10 @@ class Admin_Notification extends Action {
 		if ( ! $is_sms ) {
 
 			if ( ! $hide_admin_links ) {
-
 				$finished_note .= sprintf( "\n\n======== %s ========\nEdit: %s\nReply: %s", __( 'Manage Contact', 'groundhogg' ),
 					admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->get_id() ),
 					$contact->get_email()
 				);
-
 			}
 
 			$subject = $this->get_setting( 'subject' );
@@ -379,14 +376,15 @@ class Admin_Notification extends Action {
 			$from_email = is_email( $from ) ? $from : get_default_from_name();
 
 			$headers = [
-				sprintf( 'From: %s <%s>', get_default_from_name(), $from_email )
+				sprintf( 'From: %s <%s>', get_default_from_name(), $from_email ),
+				"Content-Type: text/plain"
 			];
 
 			if ( is_email( $reply_to ) ) {
 				$headers[] = sprintf( 'Reply-To: %s', $reply_to );
 			}
 
-			$sent = wp_mail( $send_to, $subject, $finished_note, $headers );
+			$sent = wp_mail( $send_to, wp_specialchars_decode($subject ), $finished_note, $headers );
 
 			remove_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
 		} else {

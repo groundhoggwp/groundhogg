@@ -44,7 +44,7 @@ class Extension_Upgrader {
 		16557 => 'groundhogg-divi/groundhogg-divi.php',
 		17321 => 'groundhogg-smtp/groundhogg-smtp.php',
 		18312 => 'groundhogg-birthday/groundhogg-birthday.php',
-		19378 => 'groundhogg-advanced-preferences/groundhogg-advanced-preferences.php',
+		19738 => 'groundhogg-advanced-preferences/groundhogg-advanced-preferences.php',
 		20158 => 'groundhogg-thrivecart/groundhogg-thrivecart.php',
 		22198 => 'groundhogg-elementor/groundhogg-elementor.php',
 		22397 => 'groundhogg-pro/groundhogg-pro.php',

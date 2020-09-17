@@ -13,6 +13,7 @@
     "phpunit/phpunit": "7.5.20",
     "ext-json": "*",
     "ext-mysqli": "*",
-    "ext-imap": "*"
+    "ext-imap": "*",
+    "ext-openssl": "*"
   }
 }

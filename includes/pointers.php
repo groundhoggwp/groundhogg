@@ -25,6 +25,10 @@ class Pointers {
 			return;
 		}
 
+		if (is_option_enabled( 'gh_hide_tooltips' )) {
+		   return;
+        }
+
 		$screen          = get_current_screen();
 		$this->screen_id = $screen->id;
 

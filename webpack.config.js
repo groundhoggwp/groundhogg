@@ -9,8 +9,8 @@ module.exports = {
         './react/build/build' : './react/index.js',
     },
     output: {
-        path: path.resolve( __dirname ),
-        filename: '[name].js',
+        path: path.resolve(__dirname),
+        filename: './react/build/[hash].js',
     },
     watch: true,
     devtool: 'cheap-eval-source-map',
@@ -37,5 +37,5 @@ module.exports = {
         new MiniCssExtractPlugin({
             filename: './react/build/build.css'
         })
-    ],
+    ]
 };

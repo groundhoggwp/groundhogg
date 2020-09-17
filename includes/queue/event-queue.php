@@ -306,6 +306,7 @@ class Event_Queue extends Supports_Errors {
 
 		$this->store->release_events( $claim );
 		get_db( 'event_queue' )->move_events_to_history( [ 'ID' => $processed_event_ids ] );
+		get_db( 'event_queue' )->move_events_to_history( [ 'status' => 'skipped' ] );
 
 		self::set_is_processing( false );
 

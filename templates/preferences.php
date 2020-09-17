@@ -2,11 +2,14 @@
 
 namespace Groundhogg;
 
+use function Groundhogg\Notices\add_notice;
+use function Groundhogg\Notices\wp_redirect_with_notice;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-include GROUNDHOGG_PATH . 'templates/managed-page.php';
+include __DIR__ . '/managed-page.php';
 
 if ( ! function_exists( 'obfuscate_email' ) ):
 	/**
@@ -32,7 +35,7 @@ if ( ! function_exists( 'obfuscate_email' ) ):
 
 endif;
 
-if ( ! function_exists( 'mail_gdpr_data' ) ) {
+if ( ! function_exists( __NAMESPACE__ . '\mail_gdpr_data' ) ) {
 
 	/**
 	 * Mail the contact profile to the contact which requested it.
@@ -46,12 +49,13 @@ if ( ! function_exists( 'mail_gdpr_data' ) ) {
 
 		$contact = get_contactdata( $contact_id );
 
-		$message = __( "You are receiving this message because you have requested an audit of your personal information. This message contains all current information about your contact profile.\n", 'groundhogg' );
+		$message = __( "You are receiving this message because you have requested an audit of your personal information. This message contains all current information about your contact profile.", 'groundhogg' );
+		$message .= "\r\n";
 
 		$contact_data = apply_filters( 'groundhogg/preferences/contact_data', $contact->get_as_array() );
 
 		// Basic Information
-		$message .= sprintf( "\n======== %s =========\n", __( 'Basic Information', 'groundhogg' ) );
+		$message .= sprintf( "\r\n======== %s =========\r\n", __( 'Basic Information', 'groundhogg' ) );
 
 		foreach ( $contact_data['data'] as $key => $contact_datum ) {
 			$message .= sprintf( "%s: %s\n", key_to_words( $key ), $contact_datum );
@@ -59,7 +63,7 @@ if ( ! function_exists( 'mail_gdpr_data' ) ) {
 
 		// Custom Information
 		if ( isset_not_empty( $contact_data, 'meta' ) ) {
-			$message .= sprintf( "\n======== %s =========\n", __( 'Other Information', 'groundhogg' ) );
+			$message .= sprintf( "\r\n======== %s =========\r\n", __( 'Other Information', 'groundhogg' ) );
 			foreach ( $contact_data['meta'] as $key => $contact_datum ) {
 				$message .= sprintf( "%s: %s\n", key_to_words( $key ), $contact_datum );
 			}
@@ -67,7 +71,7 @@ if ( ! function_exists( 'mail_gdpr_data' ) ) {
 
 		// Custom Information
 		if ( isset_not_empty( $contact_data, 'tags' ) ) {
-			$message .= sprintf( "\n======== %s =========\n", __( 'Profile Tags', 'groundhogg' ) );
+			$message .= sprintf( "\r\n======== %s =========\r\n", __( 'Profile Tags', 'groundhogg' ) );
 
 			$tag_names = [];
 
@@ -80,16 +84,80 @@ if ( ! function_exists( 'mail_gdpr_data' ) ) {
 
 		// Files
 		if ( isset_not_empty( $contact_data, 'files' ) ) {
-			$message .= sprintf( "\n======== %s =========\n", __( 'Files', 'groundhogg' ) );
+			$message .= sprintf( "\r\n======== %s =========\r\n", __( 'Files', 'groundhogg' ) );
 
 			foreach ( $contact_data['files'] as $file_data ) {
 				$message .= sprintf( "%s: %s\n", $file_data['file_name'], $file_data['file_url'] );
 			}
 		}
 
-		return wp_mail( $contact->get_email(), sprintf( __( 'Your personal profile audit with %s', 'groundhogg' ), get_bloginfo( 'title' ) ), esc_html( $message ) );
-	}
+		$subject_line = sprintf( __( '[%s] Your personal profile audit', 'groundhogg' ), get_bloginfo( 'title' ) );
 
+		/**
+		 * Filters the GDPR audit subject line
+		 */
+		$subject_line = apply_filters( 'groundhogg/preferences/gdpr_audit_subject_line', $subject_line );
+
+		/**
+		 * Filters the message
+		 */
+		$message = apply_filters( 'groundhogg/preferences/gdpr_audit_message', $message );
+
+		return wp_mail( $contact->get_email(), wp_specialchars_decode( $subject_line ), $message, [
+			'Content-Type: text/plain'
+		] );
+	}
+}
+
+if ( ! function_exists( __NAMESPACE__ . '\send_email_preferences_link' ) ) {
+
+	/**
+	 * Send an email notification to the contact with a link that will allow them to access the preferences center.
+	 *
+	 * @return bool
+	 */
+	function send_email_preferences_link() {
+
+		$email = get_post_var( 'email' );
+		$email = sanitize_email( $email );
+
+		if ( ! $email ) {
+			return false;
+		}
+
+		$contact = get_contactdata( $email );
+
+		if ( ! is_a_contact( $contact ) ) {
+			return false;
+		}
+
+		$preferences_link = managed_page_url( 'preferences/manage' );
+		$preferences_link = permissions_key_url( $preferences_link, $contact, 'preferences' );
+		$preferences_link = add_query_arg( 'identity', encrypt( $email ), $preferences_link );
+
+		$message = __( 'Someone has requested to manage your email preferences:' ) . "\r\n\r\n";
+		/* translators: %s: Site name. */
+		$message .= sprintf( __( 'Site Name: %s', 'groundhogg' ), get_bloginfo( 'name' ) ) . "\r\n\r\n";
+		$message .= __( 'If this was a mistake, just ignore this email and nothing will happen.', 'groundhogg' ) . "\r\n\r\n";
+		$message .= __( 'To manage your preferences, visit the following address:', 'groundhogg' ) . "\r\n\r\n";
+		$message .= $preferences_link;
+
+		$subject = sprintf( _x( '[%s] Manage your preferences', 'subject line', 'groundhogg' ), get_bloginfo( 'name' ) );
+
+		/**
+		 * Filters the subject
+		 */
+		$subject = apply_filters( 'groundhogg/preferences/send_preferences_link_subject_line', $subject, $contact );
+
+		/**
+		 * Filters the emssage
+		 */
+		$message = apply_filters( 'groundhogg/preferences/send_preferences_link_message', $message, $contact );
+
+		return wp_mail( $contact->get_email(), wp_specialchars_decode( $subject ), $message, [
+			'Content-Type: text/plain'
+		] );
+	}
 }
 
 add_action( 'enqueue_managed_page_styles', function () {
@@ -100,44 +168,69 @@ add_action( 'enqueue_managed_page_scripts', function () {
 	wp_enqueue_script( 'manage-preferences' );
 } );
 
+$permissions_key = get_permissions_key();
+
+if ( $permissions_key && ( $enc_identity = get_url_var( 'identity' ) ) ) {
+	$identity = decrypt( $enc_identity );
+	$contact  = get_contactdata( $identity );
+
+	// If the identity passed is valid and we can validate the permissions key we're good!
+	if ( is_a_contact( $contact ) && check_permissions_key( $permissions_key, $contact, 'preferences' ) ) {
+		tracking()->start_tracking( $contact );
+		wp_redirect( managed_page_url( 'preferences/manage' ) );
+	}
+}
+
 $contact = get_contactdata();
 $action  = get_query_var( 'action', 'profile' );
 
-// Compat for erase action which will be true because there will be no contact.
-if ( ! $contact && $action !== 'erase' ) {
-	$action = 'no_email';
+if ( ! is_ignore_user_tracking_precedence_enabled() ) {
+	// If the user takes precedence of the tracking cookie
+	// => The current user is logged in
+	// => the pk is validk
+	$can_edit_preferences = is_user_logged_in() || check_permissions_key( $permissions_key, $contact, 'preferences' );
+} else {
+	// if the contact takes precedence over the tracking cookie
+	// => current user and contact match
+	// => it's a site admin and they can edit contacts
+	// => the pk is valid
+	$can_edit_preferences = current_user_can( 'edit_contacts' ) || current_contact_and_logged_in_user_match() || check_permissions_key( $permissions_key, $contact, 'preferences' );
+}
+
+$can_edit_preferences = apply_filters( 'groundhogg/can_edit_preferences', $can_edit_preferences );
+
+// if the visitor can't change the preferences show a default message.
+if ( ! $can_edit_preferences || ! is_a_contact( $contact ) ) {
+	$action = 'unidentified';
 }
 
 switch ( $action ):
+	case 'unidentified':
 
-	default:
-	case 'no_email':
+		if ( wp_verify_nonce( get_post_var( '_wpnonce' ), 'request_email_confirmation' ) ) {
 
-		if ( wp_verify_nonce( get_request_var( '_wpnonce' ), 'identify_yourself' ) ) {
-
-			$email = sanitize_email( get_request_var( 'email' ) );
-
-			if ( is_email( $email ) ) {
-				$contact = get_contactdata( $email );
-
-				if ( $contact ) {
-					// Start tracking this contact
-					after_form_submit_handler( $contact );
-					die( wp_redirect( managed_page_url( 'preferences/profile/' ) ) );
-				}
+			if ( send_email_preferences_link() ) {
+				add_notice( 'notice_preferences_link_sent' );
+			} else {
+				add_notice( 'notice_general_issue_message' );
 			}
+
 		}
 
 		managed_page_head( __( 'Manage Preferences', 'groundhogg' ), 'manage' );
-
 		?>
-        <form action="" id="emailaddress" method="post">
-			<?php wp_nonce_field( 'identify_yourself' ); ?>
-            <p><?php _e( 'Please enter your email address to manage your preferences.', 'groundhogg' ); ?></p>
-            <p><input type="email" name="email" id="email"
-                      placeholder="<?php esc_attr_e( "your.name@domain.com", 'groundhogg' ); ?>" required></p>
+        <form method="post">
+			<?php wp_nonce_field( 'request_email_confirmation' ); ?>
+            <h3><?php _e( 'Whoops! We were unable to confirm your identity.', 'groundhogg' ); ?></h3>
+            <p><?php _e( 'This may have occurred if you clicked an expired link or your browser is blocking cookies.', 'groundhogg' ); ?></p>
+            <p><?php _e( 'If you are trying to change your email preferences please enter your email address and we will send you an email with a special link.', 'groundhogg' ); ?></p>
             <p>
-                <input id="submit" type="submit" class="button" value="<?php esc_attr_e( 'Submit', 'groundhogg' ); ?>">
+                <label><?php _e( 'Your Email Address', 'groundhogg' ); ?>
+                    <input type="email" name="email" required>
+                </label>
+            </p>
+            <p>
+                <button type="submit" class="button"><?php _e( 'Submit' ) ?></button>
             </p>
         </form>
 		<?php
@@ -149,7 +242,8 @@ switch ( $action ):
 
 		if ( wp_verify_nonce( get_request_var( '_wpnonce' ), 'download_profile' ) ) {
 			if ( mail_gdpr_data( $contact->get_id() ) ) {
-				Plugin::$instance->notices->add( 'sent', sprintf( __( 'Profile information sent to your inbox %s!', 'groundhogg' ), obfuscate_email( $contact->get_email() ) ) );
+
+				$notice = 'notice_gdpr_email_sent';
 
 				/**
 				 * After the request is made to download the profile
@@ -159,33 +253,31 @@ switch ( $action ):
 				do_action( 'groundhogg/preferences/download_profile', $contact );
 
 			} else {
-				Plugin::$instance->notices->add( new \WP_Error( 'failed', __( 'Something went wrong sending your email.', 'groundhogg' ) ) );
+				$notice = 'notice_general_issue_message';
 			}
-
 		}
 
-		wp_redirect( managed_page_url( 'preferences/profile/' ) );
+		wp_redirect_with_notice( managed_page_url( 'preferences/profile/' ), $notice );
 		die();
 
+	default:
 	case 'profile':
 
 		if ( wp_verify_nonce( get_request_var( '_wpnonce' ), 'update_contact_profile' ) ) {
 
 			$email = sanitize_email( get_request_var( 'email' ) );
 			if ( ! $email || $email !== $contact->get_email() ) {
-				Plugin::$instance->notices->add( new \WP_Error( 'bad_email', __( 'You must verify your email address.', 'groundhogg' ) ) );
-
+				add_notice( 'notice_email_verification_required' );
 			} else {
 				$args = [
 					'first_name' => sanitize_text_field( get_request_var( 'first_name' ) ),
 					'last_name'  => sanitize_text_field( get_request_var( 'last_name' ) ),
-//                'email' => sanitize_email( get_request_var( 'email' ) ) ,
 				];
 
 				$args = apply_filters( 'groundhogg/preferences/update_profile', $args, $contact );
 
 				if ( $contact->update( $args ) ) {
-					Plugin::$instance->notices->add( 'updated', __( 'Profile updated!', 'groundhogg' ) );
+					add_notice( 'notice_profile_updated' );
 				}
 
 				apply_filters( 'groundhogg/preferences/update_profile', $args, $contact );
@@ -253,7 +345,7 @@ switch ( $action ):
 		if ( wp_verify_nonce( get_request_var( '_wpnonce' ), 'manage_email_preferences' ) ) {
 
 			$preference = get_request_var( 'preference' );
-			$redirect = false;
+			$redirect   = false;
 
 			switch ( $preference ) {
 				case 'unsubscribe':
@@ -275,14 +367,12 @@ switch ( $action ):
 
 			do_action( 'groundhogg/preferences/manage/preferences_updated', $contact, $preference );
 
-			if ( $redirect ){
-				wp_redirect( $redirect );
+			if ( $redirect ) {
+				wp_redirect_with_notice( $redirect, 'notice_preferences_updated' );
 				die();
 			}
 
-			Plugin::$instance->notices->add( 'updated', __( 'Preferences saved!', 'groundhogg' ) );
-
-			wp_redirect( managed_page_url( 'preferences/profile/' ) );
+			wp_redirect_with_notice( managed_page_url( 'preferences/profile/' ), 'notice_preferences_updated' );
 			die();
 
 		}
@@ -310,12 +400,12 @@ switch ( $action ):
                 <b><?php printf( __( 'Managing preferences for <span class="contact-name">%s (%s)</span>.', 'groundhogg' ), $contact->get_full_name(), obfuscate_email( $contact->get_email() ) ) ?></b>
             </p>
 			<?php wp_nonce_field( 'manage_email_preferences' ); ?>
-            <?php do_action( 'groundhogg/preferences/manage/form/inside' ); ?>
+			<?php do_action( 'groundhogg/preferences/manage/form/inside' ); ?>
             <ul class="preferences">
 				<?php foreach ( $preferences as $preference => $text ): ?>
                     <li><label><input type="radio" name="preference" value="<?php esc_attr_e( $preference ); ?>"
                                       class="preference-<?php esc_attr_e( $preference ); ?>"
-                                      ><?php echo $text; ?></label></li>
+                            ><?php echo $text; ?></label></li>
 				<?php endforeach; ?>
             </ul>
             <p>
@@ -367,6 +457,12 @@ switch ( $action ):
 		}
 
 		$contact->change_marketing_preference( Preferences::CONFIRMED );
+		$redirect_to = esc_url_raw( sanitize_text_field( get_url_var( 'redirect_to' ) ) );
+		$redirect_to = apply_filters( 'groundhogg/confirmed/redirect_to', $redirect_to, $contact );
+
+		if ( $redirect_to ) {
+			die( wp_redirect( $redirect_to ) );
+		}
 
 		managed_page_head( __( 'Confirmed', 'groundhogg' ), 'confirm' );
 

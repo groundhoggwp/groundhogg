@@ -1,15 +1,15 @@
-=== Groundhogg — Marketing Automation & CRM for WordPress ===
-Contributors: trainingbusinesspros, groundhogg, dhrumit
-Tags: crm, email marketing, email, marketing automation, automation
+=== CRM, Email & Marketing Automation for WordPress - Groundhogg ===
+Contributors: trainingbusinesspros, Groundhogg, Dhrumit, Adrian Tobey
+Tags: crm, email, marketing, automation, newsletters
 Donate link: https://www.groundhogg.io/try/
 Requires at least: 4.9
-Tested up to: 5.4
+Tested up to: 5.5
 Requires PHP: 5.6
 Stable tag: trunk
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
-Say hello to the easiest way to Simplify, Consolidate & Automate your Sales & Marketing in WordPress.
+Create funnels, email campaigns, newsletters, marketing automation and have a CRM all within your WordPress website.
 
 == Description ==
 
@@ -27,13 +27,15 @@ Groundhogg is the only open source Marketing Automation tool of its kind, built 
 
 ### GROUNDHOGG IS PERFECT FOR:
 
-* Capturing Leads
-* Sending Personalized Emails and text messages
+* Capturing leads and learning more about your customers
+* Creating marketing automation strategies
+* Sending personalized email and text messages
 * Collecting unlimited customer data
 * Profiling subscribers
 * Automating the customer journey
-* Improving E-commerce sales
+* Improving e-commerce sales
 * Increasing membership retention
+* Sending newsletters to your list
 * And so much more...
 
 Groundhogg is the perfect alternative to [Infusionsoft, HubSpot, Actionetics, ActiveCampaign, ConvertKit, MailChimp and many other expensive third-party apps](https://www.groundhogg.io/comparison/).
@@ -176,6 +178,44 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 Well, that's up to you! We'll never say Groundhogg is better than anyone, but it is **different.** And sometimes different is better than better.
 
 == Changelog ==
+
+= 2.2.19.4 (2020-09-15) =
+* ADDED Auto login link replacement code. Allows 1 time use auto login links for contacts that have linked user accounts.
+* TWEAKED The delimiter for importing CSV files will be extrapolated from the CSV rather than enforcing using  `,`.
+* TWEAKED The permissions keys are can now be given specific usage so that they can be used in multiple contexts without given broad access.
+* FIXED Bulk add tags page still imposing 50 character limit, now fixed.
+* FIXED Tags list only showing one tag after adding a tag manually.
+
+= 2.2.19.3 (2020-09-10) =
+* ADDED Setting to dismiss tooltips under `Settings > Misc`
+* ADDED Filter `groundhogg/admin/reports/predefined_colors` to change the colors used in the reporting charts.
+* TWEAKED Tag names are no longer limited to 50 characters. Depending on DB collation its now 191 or 255.
+* FIXED Iframe sizing script not compatible with new jQuery version
+
+= 2.2.19.2 (2020-08-27) =
+* ADDED Unsubscribe link replacement code.
+* FIXED added `content-type: text/plain` header explicitly to admin notifications.
+* HOT FIX empty tracking exclusions causing all urls not to be tracked.
+* HOT FIX permissions key not being added to confirmation link.
+
+= 2.2.19.1 (2020-08-27) =
+* FIXED E_WARNING when URL exclusions is empty.
+
+= 2.2.19 (2020-08-26) =
+* ADDED filters to exclude certain links in emails from being re-written to tracking links.
+ * You can exclude URLs from the Email settings tab.
+* TWEAKED email preferences center.
+ * Visitors will be asked to confirm their identify via email in the event their contact tracking cookie is not present.
+ * Contacts are issued a `permissions key` in every email which will be passed to the preferences center enabling the contact to make changes to their preferences.
+ * If no `permissions key` is provided, the preferences center will be locked and the visitor will be direct to the home page.
+ * A `permissions key` will not be required if the contact is logged in to the site.
+ * `Permissions keys` will expire after 24 hours, they can be used multiple times in a single session within the 24 hour period.
+ * Expired keys will be automatically removed from the database.
+
+= 2.2.18.3 (2020-08-14) =
+* ADDED new function `has_replacements()` to check if specific content has Groundhogg replacement codes.
+* TWEAKED Custom email headers in simple editor now support replacement codes for the CC, BCC, and FROM email headers.
+* FIXED Advanced email preferences extension had invalid ID causing inability to install remotely.
 
 = 2.2.18.2 (2020-07-27) =
 * FIXED DB error while importing contacts causing import to fail in some cases.

@@ -12,11 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * The inspiration for this class came from EDD_Email_Tags by easy digital downloads.
  * But ours is better because it allows for dynamic arguments passed with the replacements code.
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
 class Replacements {
 
@@ -204,6 +204,16 @@ class Replacements {
 				'description' => _x( 'A link to confirm the email address of a contact which can be placed in a button or link.', 'replacement', 'groundhogg' ),
 			),
 			array(
+				'code'        => 'unsubscribe_link',
+				'callback'    => [ $this, 'replacement_unsubscribe_link' ],
+				'description' => _x( 'A link that will unsubscribe the contact.', 'replacement', 'groundhogg' ),
+			),
+			array(
+				'code'        => 'auto_login_link',
+				'callback'    => [ $this, 'replacement_auto_login_link' ],
+				'description' => _x( 'Automatically login the contact if they have a user account.', 'replacement', 'groundhogg' ),
+			),
+			array(
 				'code'        => 'date',
 				'callback'    => [ $this, 'replacement_date' ],
 				'description' => _x( 'Insert a dynamic date. Usage {date.format|time}. Example: {date.Y-m-d|+2 days}', 'replacement', 'groundhogg' ),
@@ -232,8 +242,8 @@ class Replacements {
 	/**
 	 * Add a replacement code
 	 *
-	 * @param $code string the code
-	 * @param $callback string|array the callback function
+	 * @param        $code        string the code
+	 * @param        $callback    string|array the callback function
 	 * @param string $description string description of the code
 	 *
 	 * @return bool
@@ -260,9 +270,9 @@ class Replacements {
 	/**
 	 * Remove a replacement code
 	 *
-	 * @param string $code to remove
-	 *
 	 * @since 1.9
+	 *
+	 * @param string $code to remove
 	 *
 	 */
 	public function remove( $code ) {
@@ -283,9 +293,9 @@ class Replacements {
 	/**
 	 * Returns a list of all replacement codes
 	 *
-	 * @return array
 	 * @since 1.9
 	 *
+	 * @return array
 	 */
 	public function get_replacements() {
 		return $this->replacement_codes;
@@ -320,10 +330,6 @@ class Replacements {
 	 */
 	public function process( $content, $contact_id_or_email = false ) {
 
-		if ( ! preg_match( '/{([^{}]+)}/', $content ) ) {
-			return $content;
-		}
-
 		if ( $contact_id_or_email instanceof Contact ) {
 			$contact = $contact_id_or_email;
 		} else {
@@ -337,13 +343,28 @@ class Replacements {
 		$this->contact_id      = $contact->get_id();
 		$this->current_contact = $contact;
 
+		return $this->tackle_replacements( $content );
+	}
+
+	/**
+     * Recursive function to tackle nested replacement codes until no more replacements are found.
+     *
+	 * @param $content
+	 *
+	 * @return mixed
+	 */
+	public function tackle_replacements( $content ){
+
+	    if ( ! preg_match( '/{([^{}]+)}/', $content ) ) {
+			return $content;
+		}
 		// Check if there is at least one tag added
-		if ( empty( $this->replacement_codes ) || ! is_array( $this->replacement_codes ) ) {
+		else if ( empty( $this->replacement_codes ) || ! is_array( $this->replacement_codes ) ) {
 			return $content;
 		}
 
-		return preg_replace_callback( "/{([^{}]+)}/s", array( $this, 'do_replacement' ), $content );
-	}
+		return $this->tackle_replacements( preg_replace_callback( "/{([^{}]+)}/s", array( $this, 'do_replacement' ), $content ) );
+    }
 
 	/**
 	 * @return Contact
@@ -491,7 +512,7 @@ class Replacements {
 	 * Return the contact meta
 	 *
 	 * @param $contact_id int
-	 * @param $arg string the meta key
+	 * @param $arg        string the meta key
 	 *
 	 * @return mixed|string
 	 */
@@ -507,7 +528,7 @@ class Replacements {
 	 * Return the contact meta
 	 *
 	 * @param $contact_id int
-	 * @param $arg string the meta key
+	 * @param $arg        string the meta key
 	 *
 	 * @return mixed|string
 	 */
@@ -658,19 +679,19 @@ class Replacements {
 	 *
 	 * @return mixed
 	 */
-	function replacement_notes( $contact_id ){
-        $notes = $this->get_current_contact()->get_all_notes();
+	function replacement_notes( $contact_id ) {
+		$notes = $this->get_current_contact()->get_all_notes();
 
-        $return = "";
+		$return = "";
 
-        foreach ( $notes as $note ){
-            $return .= sprintf( "\n\n===== %s =====", date( get_date_time_format(), $note->timestamp ) );
-            $return .= sprintf( "\n\n%s", $note->content );
-            $return .= sprintf( "\n\n%s", $note->content );
-        }
+		foreach ( $notes as $note ) {
+			$return .= sprintf( "\n\n===== %s =====", date( get_date_time_format(), $note->timestamp ) );
+			$return .= sprintf( "\n\n%s", $note->content );
+			$return .= sprintf( "\n\n%s", $note->content );
+		}
 
-        return $return;
-    }
+		return $return;
+	}
 
 	/**
 	 * Get the job title of a contact
@@ -769,17 +790,17 @@ class Replacements {
 	 *
 	 * @return mixed|string
 	 */
-	function replacement_owner_signature( $user_id=0, $contact_id=0 ) {
+	function replacement_owner_signature( $user_id = 0, $contact_id = 0 ) {
 
-	    $user_id = absint( $user_id );
+		$user_id = absint( $user_id );
 
-	    // If a specific user ID was passed
-	    if ( $user_id > 0 && $contact_id > 0 ){
-	        $user = get_userdata( $user_id );
-        } else {
-	        // Use contact's actual owner...
-		    $user = $this->get_current_contact()->get_ownerdata();
-	    }
+		// If a specific user ID was passed
+		if ( $user_id > 0 && $contact_id > 0 ) {
+			$user = get_userdata( $user_id );
+		} else {
+			// Use contact's actual owner...
+			$user = $this->get_current_contact()->get_ownerdata();
+		}
 
 		return $user->signature;
 	}
@@ -788,11 +809,11 @@ class Replacements {
 	 * Return the owner's signature
 	 *
 	 * @param mixed $attr the attribute to fetch...
-	 * @param int $contact_id
+	 * @param int   $contact_id
 	 *
 	 * @return mixed|string
 	 */
-	function replacement_owner( $attr, $contact_id=0 ) {
+	function replacement_owner( $attr, $contact_id = 0 ) {
 
 		$user = $this->get_current_contact()->get_ownerdata();
 
@@ -807,11 +828,15 @@ class Replacements {
 	 * Return a confirmation link for the contact
 	 * This just gets the Optin Page link for now.
 	 *
+	 * @param $redirect_to string
+	 *
 	 * @return string the optin link
 	 */
-	function replacement_confirmation_link() {
+	function replacement_confirmation_link( $redirect_to ) {
+
 		$link_text = apply_filters( 'groundhogg/replacements/confirmation_text', Plugin::$instance->settings->get_option( 'confirmation_text', __( 'Confirm your email.', 'groundhogg' ) ) );
-		$link_url  = managed_page_url( 'preferences/confirm/' );
+
+		$link_url = $this->replacement_confirmation_link_raw( $redirect_to );
 
 		return sprintf( "<a href=\"%s\" target=\"_blank\">%s</a>", $link_url, $link_text );
 	}
@@ -820,10 +845,62 @@ class Replacements {
 	 * Return a raw confirmation link for the contact that can be placed in a button.
 	 * This just gets the Optin Page link for now.
 	 *
+	 * @param $redirect_to
+	 *
 	 * @return string the optin link
 	 */
-	function replacement_confirmation_link_raw() {
+	function replacement_confirmation_link_raw( $redirect_to ) {
+
 		$link_url = managed_page_url( 'preferences/confirm/' );
+
+		$link_url = permissions_key_url( $link_url, $this->get_current_contact(), 'preferences' );
+
+		$redirect_to = is_string( $redirect_to ) ? esc_url_raw( $redirect_to ) : false;
+
+		if ( $redirect_to && is_string( $redirect_to ) ) {
+			$link_url = add_query_arg( [
+				'redirect_to' => $redirect_to
+			], $link_url );
+		}
+
+		return $link_url;
+	}
+
+	/**
+	 * Autologin the user
+	 *
+	 * @param $redirect_to
+	 *
+	 * @return string|void
+	 */
+	function replacement_auto_login_link( $redirect_to ) {
+
+		$link_url = managed_page_url( 'auto-login' );
+		$redirect_to = is_string( $redirect_to ) ? esc_url_raw( $redirect_to ) : false;
+
+		if ( ! $this->get_current_contact()->get_userdata() ) {
+			return $redirect_to;
+		}
+
+		$link_url = permissions_key_url( $link_url, $this->get_current_contact(), 'auto_login', true );
+
+		if ( $redirect_to && is_string( $redirect_to ) ) {
+			$link_url = add_query_arg( [
+				'redirect_to' => $redirect_to
+			], $link_url );
+		}
+
+		return $link_url;
+	}
+
+	/**
+	 * Merge in the unsubscribe link
+	 *
+	 * @return string|void
+	 */
+	function replacement_unsubscribe_link() {
+		$link_url = managed_page_url( 'preferences/unsubscribe/' );
+		$link_url = permissions_key_url( $link_url, $this->get_current_contact(), 'preferences' );
 
 		return $link_url;
 	}
@@ -911,7 +988,7 @@ class Replacements {
 	/**
 	 * Get a file download link from a contact record.
 	 *
-	 * @param $key string|int the key for the file
+	 * @param $key        string|int the key for the file
 	 * @param $contact_id int
 	 *
 	 * @return string

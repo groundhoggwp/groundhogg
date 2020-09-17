@@ -75,6 +75,12 @@ class Rewrites {
 			'subpage=forms&form_id=$matches[1]'
 		);
 
+		// Forms Iframe Template
+		add_managed_rewrite_rule(
+			'auto-login/?$',
+			'subpage=auto_login'
+		);
+
 	}
 
 	/**
@@ -276,6 +282,43 @@ class Rewrites {
 			case 'forms_iframe':
 				$template = $template_loader->get_template_part( 'form/iframe.js', '', true );
 				exit();
+				break;
+			case 'auto_login':
+
+				$contact = get_contactdata();
+				$permissions_key = get_permissions_key();
+
+				if ( ! is_user_logged_in() ){
+
+					// If the contact or permissions key is not available, checkout now.
+					if ( ! $contact || ! $permissions_key || ! check_permissions_key( $permissions_key, $contact, 'auto_login' ) ){
+						exit( wp_redirect( home_url() ) );
+					}
+
+					$user = $contact->get_userdata();
+
+					// If there is no user account, send to the home page
+					if ( ! $user ){
+						exit( wp_redirect( home_url() ) );
+					}
+
+					wp_set_current_user( $user->ID );
+					wp_set_auth_cookie( $user->ID );
+
+					/**
+					 * Compat for things tracking logins
+					 *
+					 * @param string
+					 * @param \WP_User
+					 */
+					do_action( 'wp_login', $user->user_login, $user );
+				}
+
+				$target_fallback_page = get_option( 'gh_auto_login_fallback_page', site_url() );
+				$redirect_to = apply_filters( 'groundhogg/auto_login/redirect_to', get_url_var( 'redirect_to', $target_fallback_page ) );
+
+				exit( wp_redirect( $redirect_to ) );
+
 				break;
 		}
 	}

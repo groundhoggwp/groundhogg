@@ -65,6 +65,7 @@ class Manager {
 		$this->submissionmeta    = new Submission_Meta();
 		$this->form_impressions  = new Form_Impressions();
 		$this->contactnotes      = new Contact_Notes();
+		$this->permissions_keys  = new Permissions_Keys();
 
 		//new queue table
 		$this->event_queue = new Event_Queue();
@@ -170,7 +171,7 @@ class Manager {
 	/**
 	 * Set the data to the given value
 	 *
-	 * @param $key string
+	 * @param $key   string
 	 * @param $value DB|Meta_DB
 	 */
 	public function __set( $key, $value ) {

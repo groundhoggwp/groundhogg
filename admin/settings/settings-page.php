@@ -25,12 +25,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * This  is your fairly typical settigns page.
  * It's a BIT of a mess, but I digress.
  *
- * @package     Admin
+ * @since       File available since Release 0.1
  * @subpackage  Admin/Settings
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Admin
  */
 class Settings_Page extends Admin_Page {
 
@@ -360,6 +360,11 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Overrides', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'email'
 			],
+			'tracking'          => array(
+				'id'    => 'tracking',
+				'title' => _x( 'Tracking', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'email',
+			),
 			'bounces'           => array(
 				'id'       => 'bounces',
 				'title'    => _x( 'Email Bounces', 'settings_sections', 'groundhogg' ),
@@ -659,6 +664,20 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				),
 			),
+			'gh_hide_tooltips'                 => array(
+				'id'      => 'gh_hide_tooltips',
+				'section' => 'misc_info',
+				'label'   => _x( 'Hide Tooltips', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'This will hides the tooltips user see in new installations.', 'settings', 'groundhogg' ),
+				'type'    => 'checkbox',
+				'atts'    => array(
+					'label' => __( 'Enable' ),
+					//keep brackets for backwards compat
+					'name'  => 'gh_hide_tooltips',
+					'id'    => 'gh_hide_tooltips',
+					'value' => 'on',
+				),
+			),
 			'gh_privacy_policy'                      => array(
 				'id'      => 'gh_privacy_policy',
 				'section' => 'compliance',
@@ -758,35 +777,35 @@ class Settings_Page extends Admin_Page {
 					'id'   => 'gh_recaptcha_secret_key',
 				),
 			),
-			'gh_recaptcha_version'                => array(
+			'gh_recaptcha_version'                   => array(
 				'id'      => 'gh_recaptcha_version',
 				'section' => 'captcha',
 				'label'   => _x( 'reCAPTCHA Version', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'Which version of reCAPTCHA you want to use.', 'settings', 'groundhogg' ),
 				'type'    => 'dropdown',
 				'atts'    => array(
-					'name' => 'gh_recaptcha_version',
-					'id'   => 'gh_recaptcha_version',
-                    'options' => [
-                        'v2' => 'V2',
-                        'v3' => 'V3'
-                    ],
-                    'option_none' => false
+					'name'        => 'gh_recaptcha_version',
+					'id'          => 'gh_recaptcha_version',
+					'options'     => [
+						'v2' => 'V2',
+						'v3' => 'V3'
+					],
+					'option_none' => false
 				),
 			),
-			'gh_recaptcha_v3_score_threshold'                => array(
+			'gh_recaptcha_v3_score_threshold'        => array(
 				'id'      => 'gh_recaptcha_v3_score_threshold',
 				'section' => 'captcha',
 				'label'   => _x( 'reCAPTCHA v3 Score Threshold', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'The score threshold to block form submissions. <code>0.5</code> by default.', 'settings', 'groundhogg' ),
 				'type'    => 'number',
 				'atts'    => array(
-					'name' => 'gh_recaptcha_v3_score_threshold',
-					'id'   => 'gh_recaptcha_v3_score_threshold',
-					'min'  => 0,
-					'max'  => 1,
-					'step' => '0.1',
-                    'placeholder' => '0.5'
+					'name'        => 'gh_recaptcha_v3_score_threshold',
+					'id'          => 'gh_recaptcha_v3_score_threshold',
+					'min'         => 0,
+					'max'         => 1,
+					'step'        => '0.1',
+					'placeholder' => '0.5'
 				),
 			),
 			'gh_bounce_inbox'                        => array(
@@ -1023,6 +1042,17 @@ class Settings_Page extends Admin_Page {
 					'class' => 'gh-single-tag-picker'
 				),
 			],
+			'gh_url_tracking_exclusions'             => [
+				'id'      => 'gh_url_tracking_exclusions',
+				'section' => 'tracking',
+				'label'   => _x( 'Tracking URL Exclusions', 'settings', 'groundhogg' ),
+				'desc'    => sprintf( _x( 'URLs containing these strings will not be tracked. For example, adding <code>/my-page/</code> would exclude <code>%s/my-page/download/</code>. You can also enter full URLs and URLs of other domains such as <code>https://wordpress.org</code>. To match an exact path use <code>$</code> at the end of the path.', 'settings', 'groundhogg' ), site_url() ),
+				'type'    => 'textarea',
+				'atts'    => array(
+					'name'  => 'gh_url_tracking_exclusions',
+					'id'    => 'gh_url_tracking_exclusions',
+				),
+			]
 		);
 
 		if ( ! defined( 'DISABLE_WP_CRON' ) || defined( 'GH_SHOW_DISABLE_WP_CRON_OPTION' ) ) {
@@ -1071,7 +1101,7 @@ class Settings_Page extends Admin_Page {
 	/**
 	 * Add a tab to the settings page
 	 *
-	 * @param string $id if of the tab
+	 * @param string $id    if of the tab
 	 * @param string $title title of the tab
 	 *
 	 * @return bool
@@ -1093,9 +1123,9 @@ class Settings_Page extends Admin_Page {
 	/**
 	 * Add a section to a tab
 	 *
-	 * @param string $id id of the section
+	 * @param string $id    id of the section
 	 * @param string $title title of the section
-	 * @param string $tab the tab
+	 * @param string $tab   the tab
 	 *
 	 * @return bool
 	 */

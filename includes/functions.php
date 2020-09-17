@@ -168,6 +168,13 @@ function notices() {
 }
 
 /**
+ * @return Tracking
+ */
+function tracking() {
+	return Plugin::$instance->tracking;
+}
+
+/**
  * Return if a value in an array isset and is not empty
  *
  * @param $array
@@ -760,6 +767,8 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	 *
 	 * @param array $args A compacted array of wp_mail() arguments, including the "to" email,
 	 *                    subject, message, headers, and attachments values.
+	 *
+	 * @since 2.2.0
 	 *
 	 */
 	$atts = apply_filters( 'wp_mail', compact( 'to', 'subject', 'message', 'headers', 'attachments' ) );
@@ -1555,23 +1564,68 @@ function split_name( $name ) {
 }
 
 /**
+ * Detect the CSV delimiter of a CSV file.
+ *
+ * @param $file_path
+ *
+ * @return string
+ */
+function get_csv_delimiter( $file_path ) {
+
+	$handle = fopen( $file_path, 'r' );
+
+	if ( ! $handle ){
+	    return ',';
+    }
+
+	$delimiters = [ "\t", ";", "|", "," ];
+	$data_1     = [];
+	$data_2     = [];
+	$delimiter  = $delimiters[0];
+
+	foreach ( $delimiters as $d ) {
+		$data_1 = fgetcsv( $handle, 4096, $d );
+
+		if ( count( $data_1 ) > count( $data_2 ) ) {
+			$delimiter = $d;
+			$data_2    = $data_1;
+		}
+
+		rewind( $handle );
+	}
+
+	fclose( $handle );
+
+	return $delimiter;
+
+}
+
+/**
  * Get a list of items from a file path, if file does not exist of there are no items return an empty array.
  *
  * @param string $file_path
  *
+ * @param bool   $delimiter
+ *
  * @return array
  */
-function get_items_from_csv( $file_path = '' ) {
+function get_items_from_csv( $file_path = '', $delimiter=false ) {
 
 	if ( ! file_exists( $file_path ) ) {
 		return [];
 	}
 
+	// If a delimiter is not provided, make a guess.
+	if ( ! $delimiter ){
+		$delimiter = get_csv_delimiter( $file_path ) ?: ',';
+	}
+
 	$header       = null;
 	$header_count = 0;
 	$data         = array();
+
 	if ( ( $handle = fopen( $file_path, 'r' ) ) !== false ) {
-		while ( ( $row = fgetcsv( $handle, 0, ',' ) ) !== false ) {
+		while ( ( $row = fgetcsv( $handle, 0, $delimiter ) ) !== false ) {
 			if ( ! $header ) {
 				$header       = $row;
 				$header_count = count( $header );
@@ -3300,7 +3354,7 @@ function is_groundhogg_network_active() {
  * Do an action after a contact has been created or updated
  *
  * @param int|Contact|Email $contact
- * @param string $hook
+ * @param string            $hook
  *
  * @return bool
  */
@@ -3315,6 +3369,296 @@ function contact_action( $contact = 0, $hook = 'created' ) {
 	do_action( "groundhogg/contact/{$hook}", $contact );
 
 	return true;
+}
+
+/**
+ * Whether the content has replacements in it.
+ *
+ * @param $content
+ *
+ * @return false|int
+ */
+function has_replacements( $content ) {
+	return preg_match( '/{([^{}]+)}/', $content );
+}
+
+/**
+ * @param $contact Contact|mixed
+ *
+ * @return bool
+ */
+function is_a_contact( $contact ) {
+	return $contact && $contact instanceof Contact && $contact->exists();
+}
+
+/**
+ * Whether the given user is a user
+ *
+ * @param $user
+ *
+ * @return bool
+ */
+function is_a_user( $user ) {
+	return $user && $user instanceof \WP_User;
+}
+
+/**
+ * @param      $usage
+ * @param bool $contact      Contact
+ * @param      $delete_after bool
+ *
+ * @return bool
+ */
+function generate_permissions_key( $contact = false, $usage = 'preferences', $delete_after = false ) {
+
+	$contact = $contact ?: get_contactdata();
+
+	if ( ! is_a_contact( $contact ) ) {
+		return false;
+	}
+
+	// If a key was already created for the given contact within the current runtime
+	$found = wp_cache_get( $contact->get_id(), 'permissions_keys' );
+
+	// use it instead of creating a new one
+	if ( $found ) {
+		return $found;
+	}
+
+	$key = wp_generate_password( 20, false );
+
+	// Generate the permissions_key
+	get_db( 'permissions_keys' )->add( [
+		'contact_id'       => $contact->get_id(),
+		'usage_type'       => sanitize_key( $usage ),
+		'permissions_key'  => wp_hash_password( $key ),
+		'delete_after_use' => $delete_after,
+	] );
+
+	// set the key for the given contact in the cache
+	wp_cache_set( $contact->get_id(), $key, 'permissions_keys' );
+
+	return $key;
+}
+
+/**
+ * @param        $key     string
+ * @param string $usage   string
+ * @param bool   $contact Contact
+ *
+ * @return bool
+ */
+function check_permissions_key( $key, $contact = false, $usage = 'preferences' ) {
+
+	$contact = $contact ?: get_contactdata();
+
+	if ( ! is_a_contact( $contact ) || empty( $key ) || ! is_string( $key ) ) {
+		return false;
+	}
+
+	$keys = get_db( 'permissions_keys' )->query( [
+		'where' => [
+			[ 'contact_id', '=', $contact->get_id() ],
+			[ 'usage_type', '=', $usage ],
+			[ 'expiration_date', '>', date( 'Y-m-d H:i:s' ) ],
+		]
+	] );
+
+	if ( empty( $keys ) ) {
+		return false;
+	}
+
+//	$keys = wp_list_pluck( $keys, 'permissions_key' );
+
+	if ( empty( $wp_hasher ) ) {
+		require_once ABSPATH . WPINC . '/class-phpass.php';
+		$wp_hasher = new \PasswordHash( 8, true );
+	}
+
+	foreach ( $keys as $permissions_key ) {
+		if ( $wp_hasher->CheckPassword( $key, $permissions_key->permissions_key ) ) {
+
+			// Maybe delete after
+			if ( $permissions_key->delete_after_use ) {
+				get_db( 'permissions_keys' )->delete( $permissions_key->ID );
+			}
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Generate a url with the permissions key on it.
+ *
+ * @param        $url
+ * @param        $contact
+ *
+ * @param string $usage
+ * @param bool   $delete_after
+ *
+ * @return string
+ */
+function permissions_key_url( $url, $contact, $usage = 'preferences', $delete_after = false ) {
+	return add_query_arg( [
+		'pk' => generate_permissions_key( $contact, $usage, $delete_after ),
+	], $url );
+}
+
+/**
+ * Get the permissions key
+ * if one is not available return false
+ * Will set the permissions key cookie if the key is found in the URL
+ *
+ * @return string|false
+ */
+function get_permissions_key() {
+	// check for the permissions_key and set it as a cookie
+	if ( $permissions_key = get_url_var( 'pk' ) ) {
+		set_cookie( 'gh-permissions-key', $permissions_key, HOUR_IN_SECONDS );
+	} else {
+		$permissions_key = get_cookie( 'gh-permissions-key' );
+	}
+
+	return $permissions_key;
+}
+
+/**
+ * Same as preg_quote but not some characters
+ *
+ * @param       $str
+ * @param array $except
+ * @param null  $delim
+ *
+ * @return mixed|string
+ */
+function preg_quote_except( $str, $except = [], $delim = null ) {
+	$str = preg_quote( $str, $delim );
+
+	if ( empty( $except ) ) {
+		return $str;
+	}
+
+	for ( $i = 0; $i < count( $except ); $i ++ ) {
+		$from[] = '\\' . $except[ $i ];
+		$to[]   = $except[ $i ];
+	}
+
+	return str_replace( $from, $to, $str );
+}
+
+/**
+ * Check whether a specific URL is to be excluded from click tracking.
+ *
+ * @param       $url
+ *
+ * @param array $exclusions
+ *
+ * @return false|int
+ */
+function is_url_excluded_from_tracking( $url, $exclusions = [] ) {
+	static $exclusions_regex;
+
+	if ( ! $exclusions_regex ) {
+
+		$exclusions = get_option( 'gh_url_tracking_exclusions', $exclusions );
+
+		if ( ! is_array( $exclusions ) ) {
+			$exclusions = explode( PHP_EOL, $exclusions );
+		}
+
+		if ( empty( $exclusions ) ) {
+			return false;
+		}
+
+		$exclusions       = array_map( function ( $exclusion ) {
+			return preg_quote_except( $exclusion, [ '$', '^' ] );
+		}, $exclusions );
+		$exclusions_regex = implode( '|', $exclusions );
+	}
+
+	// No exclusions? Exit.
+	if ( empty( $exclusions_regex ) ) {
+		return false;
+	}
+
+	return apply_filters( 'groundhogg/is_url_excluded_from_tracking', preg_match( "@$exclusions_regex@", $url ), $url, $exclusions_regex );
+}
+
+/**
+ * Whether the tracking precedence option is enabled.
+ *
+ * @return mixed|void
+ */
+function is_ignore_user_tracking_precedence_enabled() {
+	return apply_filters( 'groundhogg/tracking/ignore_user_precedence', is_option_enabled( 'gh_ignore_user_precedence' ) );
+}
+
+/**
+ * Check if a contact and a user match
+ *
+ * @param $contact Contact|int
+ * @param $user    \WP_User|int
+ *
+ * @return bool
+ */
+function contact_and_user_match( $contact, $user ) {
+
+	if ( is_int( $contact ) ) {
+		$contact = get_contactdata( $contact );
+	}
+
+	if ( ! is_a_contact( $contact ) ) {
+		return false;
+	}
+
+	if ( is_int( $user ) ) {
+		$user = get_userdata( $user );
+	}
+
+	if ( ! is_a_user( $user ) ) {
+		return false;
+	}
+
+	return $contact->get_email() === $user->user_email;
+}
+
+/**
+ * Whether the current user matches the current contact with the same email address.
+ *
+ * @return bool
+ */
+function current_contact_and_logged_in_user_match() {
+
+	if ( ! is_user_logged_in() || ! get_contactdata() ) {
+		return false;
+	}
+
+	return contact_and_user_match( get_contactdata(), wp_get_current_user() );
+}
+
+/**
+ * Fix nested P tags caused by formatted replacements.
+ *
+ * @param $content
+ *
+ * @return string|string[]|null
+ */
+function fix_nested_p( $content ) {
+
+	$patterns = [
+		'@(<p[^>]*>)([^>]*)(<p[^>]*>)@m', // opening tags
+		'@(<\/p[^>]*>)([^>]*)(<\/p[^>]*>)@m' // closing tags
+	];
+
+	$replacements = [
+		'$1$2',
+		'$2$3',
+	];
+
+	return preg_replace( $patterns, $replacements, $content );
 }
 
 /**
