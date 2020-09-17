@@ -631,7 +631,7 @@ table.list-table td.loading-animation div {
   margin-bottom: 15px; }
 
 .daterangepicker td.in-range {
-  background-color: #f8f9fa !important;
+  background-color: #F8F9FA !important;
   border-color: transparent;
   color: #000;
   border-radius: 0; }
@@ -735,9 +735,9 @@ table.groundhogg-report-table {
     border-radius: 0 0 5px 0; }
 
 .groundhogg-no-data-notice {
-  background: #f8f9fa;
+  background: #F8F9FA;
   border-top: 1px solid #e5e9ed;
-  border-bottom: 1px solid #f8f9fa;
+  border-bottom: 1px solid #F8F9FA;
   padding: 10px 10px;
   margin-top: 10px; }
 
