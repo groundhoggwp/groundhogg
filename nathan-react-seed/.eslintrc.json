@@ -1,0 +1,49 @@
+/* {
+	"parser": "babel-eslint",
+	"extends": ["plugin:jsx-a11y/recommended"],
+	"plugins": ["jsx-a11y"],
+	"parserOptions": {
+		"ecmaVersion": 2016,
+		"sourceType": "module",
+		"ecmaFeatures": {
+			"jsx": true
+		}
+	},
+	"env": {
+		"es6": true,
+		"browser": true,
+		"node": true,
+		"commonjs": true
+	},
+	"globals": {
+		"test": true,
+    "describe": true,
+		"expect": true
+	},
+	"rules": {
+		"linebreak-style": 0,
+		"indent": ["error", 2],
+		"no-const-assign": "error",
+		"no-this-before-super": "error",
+		"no-undef": "error",
+		"no-unreachable": "error",
+		"comma-dangle": "off",
+		"constructor-super": "error",
+		"valid-typeof": "error",
+		"no-mixed-spaces-and-tabs": "error",
+		"no-lonely-if": "error",
+		"react/prefer-stateless-function": [0, "off"]
+	},
+	"settings": {
+		"flowtype": {
+			"onlyFilesWithFlowAnnotation": false
+		},
+
+		"react": {
+			"createClass": "createReactClass",
+			"pragma": "React",
+			"version": "15.6"
+		},
+		"propWrapperFunctions": ["forbidExtraProps"]
+	}
+} */

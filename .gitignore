@@ -1,5 +1,6 @@
 /vendor/
 /node_modules/
+/nathan-react-seed/node_modules/
 /wp-cli.phar
 /composer.phar
 /.idea/

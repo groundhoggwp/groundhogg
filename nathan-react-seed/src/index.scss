@@ -1,0 +1,9 @@
+@import "./styles/_vars.scss";
+@import "./styles/_mixins.scss";
+@import "./styles/_global.scss";
+
+// pages
+@import "./pages/Home/_Home.scss";
+
+//components
+@import "./components/App/_App.scss";
