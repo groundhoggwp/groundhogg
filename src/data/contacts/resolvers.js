@@ -12,8 +12,7 @@ import { setError, setItems } from './actions';
 import { fetchWithHeaders } from '../controls';
 
 export function* getItems( itemType, query ) {
-	const endpoint =
-		itemType === 'categories' ? 'products/categories' : itemType;
+	const endpoint = 'contacts';
 	try {
 		const url = addQueryArgs( `${ NAMESPACE }/${ endpoint }`, query );
 		const isUnboundedRequest = query.per_page === -1;
