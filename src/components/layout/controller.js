@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 // import { Spinner } from '../core-ui'; @todo: No spinner component exists yet
 
 const Dashboard = lazy( () =>
-	import( /* webpackChunkName: "dashboard" */ 'dashboard' )
+	import( /* webpackChunkName: "dashboard" */ './pages/dashboard' )
 );
 
 export const PAGES_FILTER = 'groundhogg_navigation';

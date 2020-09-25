@@ -14,7 +14,7 @@ import PropTypes from 'prop-types';
  */
 import './style.scss';
 import { Controller, getPages, PAGES_FILTER } from './controller';
-import TopBar from './top-bar';
+import TopBar from "./top-bar";
 import BottomBar from './bottom-bar';
 import Notices from './notices';
 import { getHistory } from '../../utils/navigation';

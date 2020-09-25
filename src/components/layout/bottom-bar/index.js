@@ -1,26 +1,30 @@
-import React from 'react'
-import { CSSTransitionGroup } from 'react-transition-group'
-import './style.scss'
+import { useState } from '@wordpress/element'
+import { makeStyles } from '@material-ui/core/styles'
+import BottomNavigation from '@material-ui/core/BottomNavigation'
+import BottomNavigationAction from '@material-ui/core/BottomNavigationAction'
 
-export const BottomBar = ({ show, expandedStatus, children, className }) => {
+const useStyles = makeStyles({
+  root: {
+    width: 500,
+  },
+});
 
-  const classes = [
-    'groundhogg-bottom-bar',
-    'sidebar-' + expandedStatus,
-    className,
-  ].join(' ')
+export default function BottomBar() {
+  const classes = useStyles();
+  const [value, setValue] = useState(0);
 
   return (
-    <CSSTransitionGroup
-      transitionName={ 'bottomBar' }
-      transitionEnterTimeout={ 750 }
-      transitionLeaveTimeout={ 500 }
-      className={ show && 'bottom-bar-wrap' }
-      component={ 'div' }
+    <BottomNavigation
+      value={value}
+      onChange={(event, newValue) => {
+        setValue(newValue);
+      } }
+      showLabels
+      className={classes.root}
     >
-      { show && <div key={ 'groundhogg-bottom-bar' } className={ classes }>
-        { children }
-      </div> }
-    </CSSTransitionGroup>
-  )
+      <BottomNavigationAction label="Recents" icon={<RestoreIcon />} />
+      <BottomNavigationAction label="Favorites" icon={<FavoriteIcon />} />
+      <BottomNavigationAction label="Nearby" icon={<LocationOnIcon />} />
+    </BottomNavigation>
+  );
 }
