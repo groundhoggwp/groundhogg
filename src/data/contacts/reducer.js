@@ -2,71 +2,8 @@
  * Internal dependencies
  */
 import TYPES from './action-types';
-import { getResourceName } from '../utils';
 
-const reducer = (
-	state = {
-		items: {},
-		errors: {},
-		data: {},
-	},
-	{ type, itemType, query, items, totalCount, error }
-) => {
-	switch ( type ) {
-		case TYPES.SET_ITEMS:
-			const ids = [];
-			const nextItems = items.reduce( ( result, item ) => {
-				ids.push( item.id );
-				result[ item.id ] = item;
-				return result;
-			}, {} );
-			const resourceName = getResourceName( itemType, query );
-			return {
-				...state,
-				items: {
-					...state.items,
-					[ resourceName ]: { data: ids, totalCount },
-				},
-				data: {
-					...state.data,
-					[ itemType ]: {
-						...state.data[ itemType ],
-						...nextItems,
-					},
-				},
-			};
-		case TYPES.SET_ERROR:
-			return {
-				...state,
-				errors: {
-					...state.errors,
-					[ getResourceName( itemType, query ) ]: error,
-				},
-			};
-		default:
-			return state;
-	}
-};
-
-export default reducer;
-
-// OLD
-import {
-	FETCH_CONTACTS_FAILED,
-	FETCH_CONTACTS_REQUEST,
-	FETCH_CONTACTS_SUCCESS,
-	CHANGE_QUERY,
-	FETCH_MORE_CONTACTS_SUCCESS,
-	CLEAR_ITEMS,
-	CHANGE_CONTEXT,
-	CLEAR_STATE,
-	SHOW_CONTACT_FILTERS,
-	SELECT_ALL_ITEMS,
-	SELECT_ITEM,
-	SELECT_SOME_ITEMS
-  } from '../actions/types'
-
-  const initialState = {
+const initialState = {
 	fetching: false,
 	showFilters: false,
 	total: 0,
@@ -80,11 +17,11 @@ import {
 	},
 	data: [],
 	error: {},
-  }
+}
 
   export default function (state = initialState, action ) {
 	switch (action.type) {
-	  case CHANGE_CONTEXT:
+	  case TYPES.CHANGE_CONTEXT:
 		return {
 		  ...state,
 		  context: {
@@ -92,7 +29,7 @@ import {
 			...action.payload
 		  }
 		}
-	  case CHANGE_QUERY:
+	  case TYPES.CHANGE_QUERY:
 		return {
 		  ...state,
 		  query: {
@@ -100,17 +37,17 @@ import {
 			...action.payload
 		  }
 		}
-	  case CLEAR_STATE:
+	  case TYPES.CLEAR_STATE:
 		return {
 		  ...state,
 		  ...initialState
 		}
-	  case FETCH_CONTACTS_REQUEST:
+	  case TYPES.FETCH_CONTACTS_REQUEST:
 		return {
 		  ...state,
 		  fetching: true,
 		}
-	  case FETCH_CONTACTS_SUCCESS:
+	  case TYPES.FETCH_CONTACTS_SUCCESS:
 		return {
 		  ...state,
 		  fetching: false,
@@ -118,7 +55,7 @@ import {
 		  total: action.payload.total,
 		  error: {}
 		}
-	  case FETCH_MORE_CONTACTS_SUCCESS:
+	  case TYPES.FETCH_MORE_CONTACTS_SUCCESS:
 		return {
 		  ...state,
 		  fetching: false,
@@ -128,19 +65,19 @@ import {
 		  ],
 		  error: {}
 		}
-	  case FETCH_CONTACTS_FAILED:
+	  case TYPES.FETCH_CONTACTS_FAILED:
 		return {
 		  ...state,
 		  fetching: false,
 		  data: [],
 		  error: action.payload
 		}
-	  case CLEAR_ITEMS:
+	  case TYPES.CLEAR_ITEMS:
 		return {
 		  ...state,
 		  data: [],
 		}
-	  case SHOW_CONTACT_FILTERS:
+	  case TYPES.SHOW_CONTACT_FILTERS:
 		return {
 		  ...state,
 		  showFilters: true

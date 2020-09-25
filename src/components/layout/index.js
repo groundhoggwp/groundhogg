@@ -14,11 +14,11 @@ import PropTypes from 'prop-types';
  */
 import './style.scss';
 import { Controller, getPages, PAGES_FILTER } from './controller';
-import { TopBar } from './top-bar';
-import { BottomBar } from './bottom-bar';
+import TopBar from './top-bar';
+import BottomBar from './bottom-bar';
 import Notices from './notices';
-import { getHistory } from '../../navigation/utils/';
-import { withOptionsHydration } from '../../data';
+import { getHistory } from '../../utils/navigation';
+import { withSettingsHydration } from '../../data';
 
 export class PrimaryLayout extends Component {
 	render() {
@@ -116,9 +116,9 @@ export const PageLayout = compose(
 	// Use the withFilters HoC so PageLayout is re-rendered when filters are used to add new pages or reports
 	withFilters( PAGES_FILTER ),
 	withFilters( REPORTS_FILTER ),
-	window.ghSettings.preloadOptions
-		? withOptionsHydration( {
-				...window.ghSettings.preloadOptions,
+	window.ghSettings.preloadSettings
+		? withSettingsHydration( {
+				...window.ghSettings.preloadSettings,
 		  } )
 		: identity
 )( _PageLayout );

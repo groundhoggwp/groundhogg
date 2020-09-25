@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { Spinner } from '../core-ui';
+// import { Spinner } from '../core-ui'; @todo: No spinner component exists yet
 
 const Dashboard = lazy( () =>
 	import( /* webpackChunkName: "dashboard" */ 'dashboard' )

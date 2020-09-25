@@ -1,13 +1,3 @@
-import {
-	BULK_JOB_ERROR, BULK_JOB_FINISHED,
-	BULK_JOB_INIT,
-	BULK_JOB_PROCESSED_ITEMS,
-  } from './types'
-
-  const {
-	rest_base
-  } = groundhogg;
-
 /**
  * External dependencies
  */
@@ -50,14 +40,14 @@ export const bulkJobProcessItems = () => (dispatch, getState) => {
 			itemsOffset += numItemsPerRequest;
 
 			dispatch({
-				type: BULK_JOB_PROCESSED_ITEMS,
+				type: TYPES.BULK_JOB_PROCESSED_ITEMS,
 			})
 
 			if ( ! response.data.finished ){
 				sendRequest();
 			} else {
 				dispatch({
-				type: BULK_JOB_FINISHED,
+				type: TYPES.BULK_JOB_FINISHED,
 				})
 
 				onFinish( response.data )
@@ -65,7 +55,7 @@ export const bulkJobProcessItems = () => (dispatch, getState) => {
 
 		}).catch(error => {
 			dispatch({
-				type: BULK_JOB_ERROR,
+				type: TYPES.BULK_JOB_ERROR,
 				payload: error,
 			})
 

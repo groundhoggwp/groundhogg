@@ -1,1 +1,1 @@
-export const BROADCAST_STORE_NAME = '';
+export const BROADCASTS_STORE_NAME = '';

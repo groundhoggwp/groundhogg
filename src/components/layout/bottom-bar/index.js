@@ -1,9 +1,8 @@
 import React from 'react'
-import { connect } from 'react-redux'
 import { CSSTransitionGroup } from 'react-transition-group'
 import './style.scss'
 
-const BottomBar = ({ show, expandedStatus, children, className }) => {
+export const BottomBar = ({ show, expandedStatus, children, className }) => {
 
   const classes = [
     'groundhogg-bottom-bar',
@@ -25,7 +24,3 @@ const BottomBar = ({ show, expandedStatus, children, className }) => {
     </CSSTransitionGroup>
   )
 }
-
-export default connect(state => ( {
-  expandedStatus: state.sideBar.status,
-} ), null)(BottomBar)

@@ -43,9 +43,6 @@ export { FUNNELS_STORE_NAME } from './funnels';
 /**	Import */
 export { IMPORT_STORE_NAME } from './import';
 
-/**	Onboarding */
-export { ONBOARDING_STORE_NAME } from './onboarding';
-
 /**	Reports */
 export { REPORTS_STORE_NAME } from './reports';
 
