@@ -1,0 +1,1 @@
+export const FUNNELS_STORE_NAME = '';

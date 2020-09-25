@@ -1,0 +1,1 @@
+export const STEPS_STORE_NAME = '';

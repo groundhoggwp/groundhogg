@@ -1,0 +1,1 @@
+export const TAGS_STORE_NAME = '';
