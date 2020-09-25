@@ -1,0 +1,115 @@
+@import "../../colors";
+
+.contact-bulk-actions{
+  .total-selected {
+
+    margin-right: 30px;
+
+    .num{
+      font-weight: bold;
+      color: $groundhogg;
+      font-size: 24px;
+    }
+  }
+
+  .actions{
+    .btn{
+      &:not(:last-child){
+        margin-right: 10px;
+      }
+    }
+  }
+}
+
+.contacts {
+  .list-table {
+
+    .list-table-item-row{
+      td{
+        background-color: #fdfdfd;
+      }
+    }
+
+    td, th {
+      vertical-align: middle;
+    }
+
+    .gravatar {
+      width: 40px;
+      border-radius: 50%;
+    }
+  }
+
+
+  .page-actions{
+    .btn:not(:last-child){
+      margin-right: 10px;
+    }
+  }
+}
+
+.contact-table-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
+  padding: 10px 20px;
+  background-color: $white;
+  border-top: 1px solid $border-color;
+
+  .total-contacts{
+    vertical-align: middle;
+
+    .number{
+      font-weight: 500;
+      font-size: 24px;
+    }
+  }
+
+  .filters {
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    min-width: 40%;
+
+    .filter {
+      &:not(:last-child) {
+        min-width: 200px;
+        margin-right: 10px;
+      }
+
+      .input-group-append{
+        .form-control{
+          border-top-left-radius: 0;
+          border-bottom-left-radius: 0;
+        }
+      }
+    }
+
+    .quick-search {
+
+      width: 200px;
+      position: relative;
+
+      input[type="search"] {
+        padding-left: 32px;
+      }
+
+      &:before {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+
+        display: inline-block;
+        font: normal normal normal 14px/1 FontAwesome;
+        font-size: inherit;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+
+        content: "\f002";
+      }
+    }
+  }
+
+}
