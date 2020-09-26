@@ -14,9 +14,9 @@ import { TAGS_STORE_NAME } from '../../../../data';
 class Dashboard extends Component {
 
 	render() {
-		const { tags, isTagsUpdating, isUpdateRequesting } = this.props;
-		console.log( 'props' );
-		console.log( tags, isTagsUpdating, isUpdateRequesting );
+		const { getTags, isUpdateRequesting } = this.props;
+
+		console.log( getTags() );
 		return ( <p>Dashboard!</p> );
 	}
 }
@@ -24,11 +24,11 @@ class Dashboard extends Component {
 // default export
 export default compose(
 	withSelect( ( select ) => {
-		const { getTag, isTagsUpdating } = select( TAGS_STORE_NAME );
+		const { getTags, isTagsUpdating } = select( TAGS_STORE_NAME );
+		console.log( select( TAGS_STORE_NAME ) );
 		const isUpdateRequesting = isTagsUpdating();
-		const tags = getTag();
 
-		return { tags, isTagsUpdating, isUpdateRequesting };
+		return { getTags, isUpdateRequesting };
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { updateTags } = dispatch( TAGS_STORE_NAME );

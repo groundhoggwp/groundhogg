@@ -9,6 +9,16 @@ export const getTag = ( state, name ) => {
 };
 
 /**
+ * Get tag from state tree.
+ *
+ * @param {Object} state - Reducer state
+ * @param {Array} name - Option name
+ */
+export const getTags = ( state ) => {
+	return state;
+};
+
+/**
  * Determine if an tags request resulted in an error.
  *
  * @param {Object} state - Reducer state
