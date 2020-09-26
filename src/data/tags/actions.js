@@ -16,11 +16,10 @@ export function receiveTags( tags ) {
 	};
 }
 
-export function setRequestingError( error, name ) {
+export function setRequestingError( error ) {
 	return {
 		type: TYPES.SET_REQUESTING_ERROR,
-		error,
-		name,
+		error
 	};
 }
 
@@ -40,7 +39,7 @@ export function setIsUpdating( isUpdating ) {
 
 export function* updateTags( data ) {
 	yield setIsUpdating( true );
-	yield receiveOptions( data );
+	yield receiveTags( data );
 
 	try {
 		const results = yield apiFetch( {

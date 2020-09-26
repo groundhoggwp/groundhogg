@@ -2,30 +2,25 @@
  * Internal dependencies
  */
 import { receiveTags, setRequestingError } from './actions';
-import { batchFetch } from './controls';
+import { NAMESPACE } from '../constants';
 
 /**
- * Request a tag value.
- *
- * @param {string} name - Tag name
+ * External dependencies
  */
-export function* getTag( name ) {
-	try {
-		const result = yield batchFetch( name );
-		yield receiveTags( result );
-	} catch ( error ) {
-		yield setRequestingError( error, name );
-	}
-}
+import { apiFetch } from '@wordpress/data-controls';
 
 /**
  * Request all tags.
  */
 export function* getTags() {
 	try {
-		const result = yield batchFetch();
+		const url = NAMESPACE + '/tags/';
+		const result = yield apiFetch( {
+			path: url,
+			method: 'GET',
+		} );
 		yield receiveTags( result );
 	} catch ( error ) {
-		yield setRequestingError( error, name );
+		yield setRequestingError( error );
 	}
 }

@@ -1,10 +1,12 @@
 /**
  * External dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import TextField from '@material-ui/core/TextField';
+import { castArray } from 'lodash';
 
 /**
  * Internal dependencies
@@ -13,27 +15,72 @@ import { TAGS_STORE_NAME } from '../../../../data';
 
 class Dashboard extends Component {
 
-	render() {
-		const { getTags, isUpdateRequesting } = this.props;
+	constructor() {
+		super( ...arguments );
+		this.onSubmit = this.onSubmit.bind( this );
+		this.setValue = this.setValue.bind( this );
+		this.state = { value : '' };
+	}
 
-		console.log( getTags() );
-		return ( <p>Dashboard!</p> );
+	setValue( event ) {
+		this.setState( {
+			value : event.target.value
+		} )
+	}
+
+	async onSubmit() {
+		const {
+			value
+		} = this.state;
+
+		const {
+			updateTags
+		} = this.props;
+
+		updateTags( { tags : value } )
+	}
+
+	render() {
+
+		const tags = castArray( this.props.tags.tags );
+
+		return (
+				<Fragment>
+					<h2>Dashboard</h2>
+					<ol>
+					{
+						tags.map( ( tag ) => {
+							return( <li>{tag.tag_name}</li> )
+						} )
+					}
+					</ol>
+					<TextField id="outlined-basic" label="Add Tags" variant="outlined" onKeyUp={ this.setValue } />
+					<p onClick={this.onSubmit}>Add</p>
+				</Fragment>
+		);
 	}
 }
 
 // default export
 export default compose(
 	withSelect( ( select ) => {
-		const { getTags, isTagsUpdating } = select( TAGS_STORE_NAME );
-		console.log( select( TAGS_STORE_NAME ) );
-		const isUpdateRequesting = isTagsUpdating();
+		const {
+			getTags,
+			isTagsUpdating
+		} = select( TAGS_STORE_NAME );
 
-		return { getTags, isUpdateRequesting };
+		const isUpdateRequesting = isTagsUpdating();
+		const tags = getTags();
+
+		return {
+			tags,
+			isUpdateRequesting
+		};
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { updateTags } = dispatch( TAGS_STORE_NAME );
 		return {
-			updateTags,
+			updateTags
 		};
 	} )
 )( Dashboard );

@@ -4,7 +4,11 @@
 import TYPES from './action-types';
 
 const tagsReducer = (
-	state = { isUpdating: false, requestingErrors: {} },
+	state = {
+		isUpdating: false,
+		tags: [],
+		requestingErrors: {}
+	},
 	{ type, tags, error, isUpdating, name }
 ) => {
 	switch ( type ) {
@@ -17,6 +21,7 @@ const tagsReducer = (
 		case TYPES.SET_IS_UPDATING:
 			state = {
 				...state,
+				...tags,
 				isUpdating,
 			};
 			break;
