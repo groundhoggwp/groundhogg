@@ -14,4 +14,4 @@ export const QUERY_DEFAULTS = {
  * Could pull this from groundhogg.rest_base, but as the API base isn't _necessarily_ what we
  * want for a datastore namespace, keeping separate for now.
  */
-export const NAMESPACE = '/gh/v3';
+export const NAMESPACE = 'gh/v3';

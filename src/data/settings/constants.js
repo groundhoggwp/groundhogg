@@ -3,4 +3,5 @@
  *
  * @todo: Note: this API endpoint does not currently exist.
  */
-export const STORE_NAME = `${groundhogg.rest_base}/settings`;
+import { NAMESPACE } from '../constants';
+export const STORE_NAME = `${NAMESPACE}/settings`;

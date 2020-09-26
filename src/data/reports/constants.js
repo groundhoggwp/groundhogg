@@ -1,4 +1,6 @@
 /**
  * Internal dependencies
  */
-export const STORE_NAME = `${groundhogg.rest_base}/reports`;
+import { NAMESPACE } from '../constants';
+
+export const STORE_NAME = `${NAMESPACE}/reports`;

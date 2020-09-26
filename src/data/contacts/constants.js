@@ -1,1 +1,3 @@
-export const STORE_NAME = `${groundhogg.rest_base}/contacts`;
+import { NAMESPACE } from '../constants';
+
+export const STORE_NAME = `${NAMESPACE}/contacts`;
