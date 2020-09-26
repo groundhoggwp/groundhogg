@@ -7,7 +7,6 @@ import { render } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import './assets/app.scss';
 import { PageLayout } from './components/layout';
 
 import {
@@ -18,11 +17,11 @@ import {
 
 const appRoot = document.getElementById( 'root' );
 const settingsGroup = SETTINGS_STORE_NAME;
-const hydrateUser = window.ghSettings.currentUserData;
+const hydrateUser = window.groundhogg.user;
 
 let HydratedPageLayout = withSettingsHydration(
 	settingsGroup,
-	window.ghSettings
+	window.groundhogg
 )( PageLayout );
 
 if ( hydrateUser ) {

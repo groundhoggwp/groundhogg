@@ -9,11 +9,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-// import { Spinner } from '../core-ui'; @todo: No spinner component exists yet
-
-const Dashboard = lazy( () =>
-	import( /* webpackChunkName: "dashboard" */ './pages/dashboard' )
-);
+import { Spinner } from '../../components';
+import { default as Dashboard } from './pages/dashboard';
 
 export const PAGES_FILTER = 'groundhogg_navigation';
 
@@ -23,7 +20,7 @@ export const getPages = () => {
 	/** @TODO: parse/hydrate PHP-registered nav items for app navigation */
 	pages.push( {
 		container: Dashboard,
-		path: '/dashboard',
+		path: '/',
 	} );
 
 	return applyFilters( PAGES_FILTER, pages );

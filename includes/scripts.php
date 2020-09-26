@@ -202,19 +202,24 @@ class Scripts {
 			'groundhogg-admin-modal'
 		], GROUNDHOGG_VERSION, true );
 
-		wp_register_script( 'groundhogg-funnel-react', GROUNDHOGG_URL . 'react/funnel/build/build.js', [
+		wp_register_script( 'groundhogg-funnel-react', GROUNDHOGG_URL . 'src/__funnel/build/build.js', [
 			'jquery',
 			'wp-element',
 			'groundhogg-admin',
 			'wp-i18n'
 		], null, true );
 
-		wp_register_script( 'groundhogg-react', GROUNDHOGG_URL . 'react/build/build.js', [
-			'jquery',
-			'wp-element',
-			'groundhogg-admin',
-			'wp-i18n'
-		], null, true );
+		$asset_file = include( GROUNDHOGG_PATH . 'build/index.asset.php' );
+
+		wp_register_script(
+			'groundhogg-react',
+			GROUNDHOGG_URL . 'build/index.js',
+			array_merge( [
+				'wp-core-data',
+				'groundhogg-admin'
+			], $asset_file['dependencies'] ),
+			$asset_file['version']
+		);
 
 		wp_register_script( 'groundhogg-admin-reporting', GROUNDHOGG_ASSETS_URL . 'js/admin/reporting' . $dot_min . '.js', [
 			'jquery',
@@ -287,8 +292,7 @@ class Scripts {
 		wp_register_style( 'groundhogg-admin-loader', GROUNDHOGG_ASSETS_URL . 'css/admin/loader.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
 
 		wp_register_style( 'groundhogg-form', GROUNDHOGG_ASSETS_URL . 'css/frontend/form.css', [], GROUNDHOGG_VERSION );
-		wp_register_style( 'groundhogg-admin-funnel-react', GROUNDHOGG_URL . 'react/funnel/build/build.css', [], GROUNDHOGG_VERSION );
-		wp_register_style( 'groundhogg-admin-react', GROUNDHOGG_URL . 'react/build/build.css', [], GROUNDHOGG_VERSION );
+		wp_register_style( 'groundhogg-admin-funnel-react', GROUNDHOGG_URL . 'src/__funnel/build/build.css', [], GROUNDHOGG_VERSION );
 
 		do_action( 'groundhogg/scripts/after_register_admin_styles' );
 	}

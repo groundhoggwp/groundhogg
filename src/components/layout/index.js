@@ -49,7 +49,6 @@ class Layout extends Component {
 	render() {
 		const { ...restProps } = this.props;
 		const { location, page } = this.props;
-		const { breadcrumbs } = page;
 		const query = this.getQuery( location && location.search );
 
 		return (
@@ -113,12 +112,11 @@ class _PageLayout extends Component {
 }
 
 export const PageLayout = compose(
-	// Use the withFilters HoC so PageLayout is re-rendered when filters are used to add new pages or reports
+	// Use the withFilters HoC so PageLayout is re-rendered when filters are used to add new pages
 	withFilters( PAGES_FILTER ),
-	withFilters( REPORTS_FILTER ),
-	window.ghSettings.preloadSettings
+	window.groundhogg.preloadSettings
 		? withSettingsHydration( {
-				...window.ghSettings.preloadSettings,
+				...window.groundhogg.preloadSettings,
 		  } )
 		: identity
 )( _PageLayout );

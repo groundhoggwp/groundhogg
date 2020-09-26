@@ -16,6 +16,7 @@ class React_App {
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_rest_base' ] );
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_assets' ] );
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_userdata' ] );
+		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_settings' ] );
 //		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_api_endpoints' ] );
 	}
 
@@ -147,9 +148,9 @@ class React_App {
 	public function register_assets( $obj ) {
 
 		$obj['assets'] = [
-			'bigG'      => GROUNDHOGG_ASSETS_URL . '/images/big-g.png',
-			'logoBlack' => GROUNDHOGG_ASSETS_URL . '/images/logo-black-1000x182.png',
-			'logoWhite' => GROUNDHOGG_ASSETS_URL . '/images/logo-white-1000x182.png',
+			'bigG'      => GROUNDHOGG_ASSETS_URL . 'images/big-g.png',
+			'logoBlack' => GROUNDHOGG_ASSETS_URL . 'images/logo-black-1000x182.png',
+			'logoWhite' => GROUNDHOGG_ASSETS_URL . 'images/logo-white-1000x182.png',
 			'welcome'   => [
 				'import'    => GROUNDHOGG_ASSETS_URL . 'images/welcome/import-your-contact-list-with-groundhogg.png',
 				'funnel'    => GROUNDHOGG_ASSETS_URL . 'images/welcome/create-your-first-funnel-with-groundhogg.png',
@@ -188,6 +189,21 @@ class React_App {
 	public function register_userdata( $obj ) {
 
 		$obj['user'] = wp_get_current_user();
+
+		return $obj;
+	}
+
+	/**
+	 * Make the settings accessible
+	 *
+	 * @param $obj
+	 *
+	 * @return mixed
+	 */
+	public function register_settings( $obj ) {
+
+		// @todo: Create or find proper getter for all settings key-value pairs
+		$obj['preloadSettings'] = Plugin::$instance->settings;
 
 		return $obj;
 	}

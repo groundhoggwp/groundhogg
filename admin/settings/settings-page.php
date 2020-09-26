@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Plugin Settings
  *
- * This  is your fairly typical settigns page.
+ * This is your fairly typical settigns page.
  * It's a BIT of a mess, but I digress.
  *
  * @since       File available since Release 0.1
