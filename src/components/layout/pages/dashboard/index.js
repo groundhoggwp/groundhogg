@@ -19,30 +19,44 @@ class Dashboard extends Component {
 		super( ...arguments );
 		this.onSubmit = this.onSubmit.bind( this );
 		this.setValue = this.setValue.bind( this );
-		this.state = { value : '' };
+		this.state = {
+			tagValue : '',
+			tags : []
+		};
 	}
 
 	setValue( event ) {
 		this.setState( {
-			value : event.target.value
+			tagValue : event.target.value
 		} )
 	}
 
 	async onSubmit() {
 		const {
-			value
+			tagValue
 		} = this.state;
 
 		const {
-			updateTags
+			updateTags,
+			tags
 		} = this.props;
 
-		updateTags( { tags : value } )
+		if ( tags.tags.length ) {
+			this.setState( { tags : tags } );
+		}
+
+		const updatingTags = updateTags( { tags : tagValue } )
+
+		console.log(updatingTags);
+
+		this.setState( { tags : updatingTags } );
 	}
 
 	render() {
 
 		const tags = castArray( this.props.tags.tags );
+
+		console.log( this.props );
 
 		return (
 				<Fragment>
