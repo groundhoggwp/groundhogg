@@ -179,6 +179,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 == Changelog ==
 
+= 2.2.19.5 (2020-09-28) =
+* TWEAKED Merged autocomplete meta picker from ACMF extension into core.
+
 = 2.2.19.4 (2020-09-15) =
 * ADDED Auto login link replacement code. Allows 1 time use auto login links for contacts that have linked user accounts.
 * TWEAKED The delimiter for importing CSV files will be extrapolated from the CSV rather than enforcing using  `,`.
