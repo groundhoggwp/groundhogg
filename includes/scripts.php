@@ -35,14 +35,17 @@ class Scripts {
 		wp_register_script( 'fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
 
 		$google_recaptcha_api_url = 'https://www.google.com/recaptcha/api.js';
-		$site_key = get_option( 'gh_recaptcha_site_key' );
+		$site_key                 = get_option( 'gh_recaptcha_site_key' );
 
-		if ( get_option( 'gh_recaptcha_version' ) === 'v3' ){
+		if ( get_option( 'gh_recaptcha_version' ) === 'v3' ) {
 			$google_recaptcha_api_url = add_query_arg( [ 'render' => $site_key ], $google_recaptcha_api_url );
 		}
 
 		wp_register_script( 'google-recaptcha', $google_recaptcha_api_url );
-		wp_register_script( 'groundhogg-google-recaptcha', GROUNDHOGG_ASSETS_URL . 'js/frontend/reCAPTCHA' . $dot_min . '.js', [ 'jquery', 'google-recaptcha' ], GROUNDHOGG_VERSION, true);
+		wp_register_script( 'groundhogg-google-recaptcha', GROUNDHOGG_ASSETS_URL . 'js/frontend/reCAPTCHA' . $dot_min . '.js', [
+			'jquery',
+			'google-recaptcha'
+		], GROUNDHOGG_VERSION, true );
 		wp_localize_script( 'groundhogg-google-recaptcha', 'ghReCAPTCHA', [
 			'site_key' => $site_key
 		] );
@@ -218,6 +221,7 @@ class Scripts {
 
 		wp_localize_script( 'groundhogg-admin', 'groundhogg_nonces', [
 			'_wpnonce'            => wp_create_nonce(),
+			'_meta_nonce'         => wp_create_nonce( 'meta-picker' ),
 			'_wprest'             => wp_create_nonce( 'wp_rest' ),
 			'_adminajax'          => wp_create_nonce( 'admin_ajax' ),
 			'_ajax_linking_nonce' => wp_create_nonce( 'internal-linking' ),

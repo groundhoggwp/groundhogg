@@ -520,9 +520,9 @@ class Form_Filled extends Benchmark {
                         </td>
                     </tr>
                     <tr id="gh-field-name">
-                        <th><?php _e( 'Name', 'groundhogg' ) ?></th>
+                        <th><?php _e( 'Meta name', 'groundhogg' ) ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->input( array(
+							echo Plugin::$instance->utils->html->meta_picker( array(
 								'id'   => 'field-name',
 								'name' => 'name'
 							) );
