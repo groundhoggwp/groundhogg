@@ -7,6 +7,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import TextField from '@material-ui/core/TextField';
 import { castArray } from 'lodash';
+import Spinner from '../../../core-ui/spinner';
 
 /**
  * Internal dependencies
@@ -54,9 +55,8 @@ class Dashboard extends Component {
 
 	render() {
 
+		const { isUpdateRequesting } = this.props;
 		const tags = castArray( this.props.tags.tags );
-
-		console.log( this.props );
 
 		return (
 				<Fragment>
@@ -68,13 +68,15 @@ class Dashboard extends Component {
 						} )
 					}
 					</ol>
-					<TextField id="outlined-basic" label="Add Tags" variant="outlined" onKeyUp={ this.setValue } />
+					<TextField id="outlined-basic" label="Add Tags" variant="outlined" />
 					<p onClick={this.onSubmit}>Add</p>
+					{ ( isUpdateRequesting ) && (
+						<Spinner />
+					) }
 				</Fragment>
 		);
 	}
 }
-
 // default export
 export default compose(
 	withSelect( ( select ) => {
