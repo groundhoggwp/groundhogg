@@ -46,7 +46,7 @@ class Dashboard extends Component {
 
 		return (
 				<Fragment>
-					<h2>Dashboard</h2>
+					<h2>Dashbosard</h2>
 					<ol>
 					{
 						tags.map( ( tag ) => {
@@ -54,7 +54,7 @@ class Dashboard extends Component {
 						} )
 					}
 					</ol>
-					<TextField id="outlined-basic" label="Add Tags" variant="outlined" onKeyUp={ this.setValue } />
+					<TextField id="outlined-basic" label="Add sTags" variant="outlined" onKeyUp={ this.setValue } />
 					<p onClick={this.onSubmit}>Add</p>
 				</Fragment>
 		);

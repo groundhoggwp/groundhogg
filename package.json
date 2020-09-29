@@ -63,11 +63,13 @@
     "@wordpress/url": "2.13.0",
     "chart.js": "^2.9.3",
     "classnames": "2.2.6",
+    "cross-fetch": "^3.0.6",
     "memize": "^1.1.0",
     "qs": "6.9.4",
     "react-click-outside": "3.0.1",
     "react-router-dom": "5.1.2",
     "react-transition-group": "4.3.0",
+    "recharts": "^1.8.5",
     "uniqid": "5.2.0"
   }
 }

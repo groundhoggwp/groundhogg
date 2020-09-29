@@ -20,6 +20,7 @@ import Notices from './notices';
 import { getHistory } from '../../utils/navigation';
 import { withSettingsHydration } from '../../data';
 
+
 export class PrimaryLayout extends Component {
 	render() {
 		const { children } = this.props;
@@ -60,6 +61,7 @@ class Layout extends Component {
 						<Controller { ...restProps } query={ query } />
 					</div>
 				</PrimaryLayout>
+
 
 				<BottomBar />
 			</div>
