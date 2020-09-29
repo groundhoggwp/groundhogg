@@ -14,7 +14,7 @@ import Spinner from '../../../core-ui/spinner';
  */
 import { TAGS_STORE_NAME } from '../../../../data';
 
-class Dashboard extends Component {
+class Reports extends Component {
 
 	constructor() {
 		super( ...arguments );
@@ -60,7 +60,7 @@ class Dashboard extends Component {
 
 		return (
 				<Fragment>
-					<h2>Dashboard</h2>
+					<h2>Reports</h2>
 					<ol>
 					{
 						tags.map( ( tag ) => {
@@ -99,4 +99,4 @@ export default compose(
 			updateTags
 		};
 	} )
-)( Dashboard );
+)( Reports );

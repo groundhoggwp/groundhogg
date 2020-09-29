@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { Spinner } from '../../components';
 import { default as Dashboard } from './pages/dashboard';
-import { default as DashboardNathan } from './pages/dashboard-nathan';
+import { default as Reports } from './pages/reports';
 
 export const PAGES_FILTER = 'groundhogg_navigation';
 
@@ -19,12 +19,14 @@ export const getPages = () => {
 	const pages = [];
 
 	/** @TODO: parse/hydrate PHP-registered nav items for app navigation */
+
+	pages.push( {
+		container: Reports,
+		path: 'reports',
+	} );
+
 	pages.push( {
 		container: Dashboard,
-		path: '/dashboard',
-	} );
-	pages.push( {
-		container: DashboardNathan,
 		path: '/',
 	} );
 
