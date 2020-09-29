@@ -49,7 +49,7 @@ export function* updateTags( data ) {
 		} );
 
 		yield setIsUpdating( false );
-		return { success: true, ...results };
+		return { results };
 	} catch ( error ) {
 		yield setUpdatingError( error );
 		return { success: false, ...error };
