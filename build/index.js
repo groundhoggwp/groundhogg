@@ -1674,6 +1674,483 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/@material-ui/core/esm/Button/Button.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/@material-ui/core/esm/Button/Button.js ***!
+  \*************************************************************/
+/*! exports provided: styles, default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "styles", function() { return styles; });
+/* harmony import */ var _babel_runtime_helpers_esm_objectWithoutProperties__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/objectWithoutProperties */ "./node_modules/@babel/runtime/helpers/esm/objectWithoutProperties.js");
+/* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var clsx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! clsx */ "./node_modules/clsx/dist/clsx.m.js");
+/* harmony import */ var _styles_withStyles__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../styles/withStyles */ "./node_modules/@material-ui/core/esm/styles/withStyles.js");
+/* harmony import */ var _styles_colorManipulator__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../styles/colorManipulator */ "./node_modules/@material-ui/core/esm/styles/colorManipulator.js");
+/* harmony import */ var _ButtonBase__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../ButtonBase */ "./node_modules/@material-ui/core/esm/ButtonBase/index.js");
+/* harmony import */ var _utils_capitalize__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../utils/capitalize */ "./node_modules/@material-ui/core/esm/utils/capitalize.js");
+
+
+
+
+
+
+
+
+
+var styles = function styles(theme) {
+  return {
+    /* Styles applied to the root element. */
+    root: Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_1__["default"])({}, theme.typography.button, {
+      boxSizing: 'border-box',
+      minWidth: 64,
+      padding: '6px 16px',
+      borderRadius: theme.shape.borderRadius,
+      color: theme.palette.text.primary,
+      transition: theme.transitions.create(['background-color', 'box-shadow', 'border'], {
+        duration: theme.transitions.duration.short
+      }),
+      '&:hover': {
+        textDecoration: 'none',
+        backgroundColor: Object(_styles_colorManipulator__WEBPACK_IMPORTED_MODULE_6__["fade"])(theme.palette.text.primary, theme.palette.action.hoverOpacity),
+        // Reset on touch devices, it doesn't add specificity
+        '@media (hover: none)': {
+          backgroundColor: 'transparent'
+        },
+        '&$disabled': {
+          backgroundColor: 'transparent'
+        }
+      },
+      '&$disabled': {
+        color: theme.palette.action.disabled
+      }
+    }),
+
+    /* Styles applied to the span element that wraps the children. */
+    label: {
+      width: '100%',
+      // Ensure the correct width for iOS Safari
+      display: 'inherit',
+      alignItems: 'inherit',
+      justifyContent: 'inherit'
+    },
+
+    /* Styles applied to the root element if `variant="text"`. */
+    text: {
+      padding: '6px 8px'
+    },
+
+    /* Styles applied to the root element if `variant="text"` and `color="primary"`. */
+    textPrimary: {
+      color: theme.palette.primary.main,
+      '&:hover': {
+        backgroundColor: Object(_styles_colorManipulator__WEBPACK_IMPORTED_MODULE_6__["fade"])(theme.palette.primary.main, theme.palette.action.hoverOpacity),
+        // Reset on touch devices, it doesn't add specificity
+        '@media (hover: none)': {
+          backgroundColor: 'transparent'
+        }
+      }
+    },
+
+    /* Styles applied to the root element if `variant="text"` and `color="secondary"`. */
+    textSecondary: {
+      color: theme.palette.secondary.main,
+      '&:hover': {
+        backgroundColor: Object(_styles_colorManipulator__WEBPACK_IMPORTED_MODULE_6__["fade"])(theme.palette.secondary.main, theme.palette.action.hoverOpacity),
+        // Reset on touch devices, it doesn't add specificity
+        '@media (hover: none)': {
+          backgroundColor: 'transparent'
+        }
+      }
+    },
+
+    /* Styles applied to the root element if `variant="outlined"`. */
+    outlined: {
+      padding: '5px 15px',
+      border: "1px solid ".concat(theme.palette.type === 'light' ? 'rgba(0, 0, 0, 0.23)' : 'rgba(255, 255, 255, 0.23)'),
+      '&$disabled': {
+        border: "1px solid ".concat(theme.palette.action.disabledBackground)
+      }
+    },
+
+    /* Styles applied to the root element if `variant="outlined"` and `color="primary"`. */
+    outlinedPrimary: {
+      color: theme.palette.primary.main,
+      border: "1px solid ".concat(Object(_styles_colorManipulator__WEBPACK_IMPORTED_MODULE_6__["fade"])(theme.palette.primary.main, 0.5)),
+      '&:hover': {
+        border: "1px solid ".concat(theme.palette.primary.main),
+        backgroundColor: Object(_styles_colorManipulator__WEBPACK_IMPORTED_MODULE_6__["fade"])(theme.palette.primary.main, theme.palette.action.hoverOpacity),
+        // Reset on touch devices, it doesn't add specificity
+        '@media (hover: none)': {
+          backgroundColor: 'transparent'
+        }
+      }
+    },
+
+    /* Styles applied to the root element if `variant="outlined"` and `color="secondary"`. */
+    outlinedSecondary: {
+      color: theme.palette.secondary.main,
+      border: "1px solid ".concat(Object(_styles_colorManipulator__WEBPACK_IMPORTED_MODULE_6__["fade"])(theme.palette.secondary.main, 0.5)),
+      '&:hover': {
+        border: "1px solid ".concat(theme.palette.secondary.main),
+        backgroundColor: Object(_styles_colorManipulator__WEBPACK_IMPORTED_MODULE_6__["fade"])(theme.palette.secondary.main, theme.palette.action.hoverOpacity),
+        // Reset on touch devices, it doesn't add specificity
+        '@media (hover: none)': {
+          backgroundColor: 'transparent'
+        }
+      },
+      '&$disabled': {
+        border: "1px solid ".concat(theme.palette.action.disabled)
+      }
+    },
+
+    /* Styles applied to the root element if `variant="contained"`. */
+    contained: {
+      color: theme.palette.getContrastText(theme.palette.grey[300]),
+      backgroundColor: theme.palette.grey[300],
+      boxShadow: theme.shadows[2],
+      '&:hover': {
+        backgroundColor: theme.palette.grey.A100,
+        boxShadow: theme.shadows[4],
+        // Reset on touch devices, it doesn't add specificity
+        '@media (hover: none)': {
+          boxShadow: theme.shadows[2],
+          backgroundColor: theme.palette.grey[300]
+        },
+        '&$disabled': {
+          backgroundColor: theme.palette.action.disabledBackground
+        }
+      },
+      '&$focusVisible': {
+        boxShadow: theme.shadows[6]
+      },
+      '&:active': {
+        boxShadow: theme.shadows[8]
+      },
+      '&$disabled': {
+        color: theme.palette.action.disabled,
+        boxShadow: theme.shadows[0],
+        backgroundColor: theme.palette.action.disabledBackground
+      }
+    },
+
+    /* Styles applied to the root element if `variant="contained"` and `color="primary"`. */
+    containedPrimary: {
+      color: theme.palette.primary.contrastText,
+      backgroundColor: theme.palette.primary.main,
+      '&:hover': {
+        backgroundColor: theme.palette.primary.dark,
+        // Reset on touch devices, it doesn't add specificity
+        '@media (hover: none)': {
+          backgroundColor: theme.palette.primary.main
+        }
+      }
+    },
+
+    /* Styles applied to the root element if `variant="contained"` and `color="secondary"`. */
+    containedSecondary: {
+      color: theme.palette.secondary.contrastText,
+      backgroundColor: theme.palette.secondary.main,
+      '&:hover': {
+        backgroundColor: theme.palette.secondary.dark,
+        // Reset on touch devices, it doesn't add specificity
+        '@media (hover: none)': {
+          backgroundColor: theme.palette.secondary.main
+        }
+      }
+    },
+
+    /* Styles applied to the root element if `disableElevation={true}`. */
+    disableElevation: {
+      boxShadow: 'none',
+      '&:hover': {
+        boxShadow: 'none'
+      },
+      '&$focusVisible': {
+        boxShadow: 'none'
+      },
+      '&:active': {
+        boxShadow: 'none'
+      },
+      '&$disabled': {
+        boxShadow: 'none'
+      }
+    },
+
+    /* Pseudo-class applied to the ButtonBase root element if the button is keyboard focused. */
+    focusVisible: {},
+
+    /* Pseudo-class applied to the root element if `disabled={true}`. */
+    disabled: {},
+
+    /* Styles applied to the root element if `color="inherit"`. */
+    colorInherit: {
+      color: 'inherit',
+      borderColor: 'currentColor'
+    },
+
+    /* Styles applied to the root element if `size="small"` and `variant="text"`. */
+    textSizeSmall: {
+      padding: '4px 5px',
+      fontSize: theme.typography.pxToRem(13)
+    },
+
+    /* Styles applied to the root element if `size="large"` and `variant="text"`. */
+    textSizeLarge: {
+      padding: '8px 11px',
+      fontSize: theme.typography.pxToRem(15)
+    },
+
+    /* Styles applied to the root element if `size="small"` and `variant="outlined"`. */
+    outlinedSizeSmall: {
+      padding: '3px 9px',
+      fontSize: theme.typography.pxToRem(13)
+    },
+
+    /* Styles applied to the root element if `size="large"` and `variant="outlined"`. */
+    outlinedSizeLarge: {
+      padding: '7px 21px',
+      fontSize: theme.typography.pxToRem(15)
+    },
+
+    /* Styles applied to the root element if `size="small"` and `variant="contained"`. */
+    containedSizeSmall: {
+      padding: '4px 10px',
+      fontSize: theme.typography.pxToRem(13)
+    },
+
+    /* Styles applied to the root element if `size="large"` and `variant="contained"`. */
+    containedSizeLarge: {
+      padding: '8px 22px',
+      fontSize: theme.typography.pxToRem(15)
+    },
+
+    /* Styles applied to the root element if `size="small"`. */
+    sizeSmall: {},
+
+    /* Styles applied to the root element if `size="large"`. */
+    sizeLarge: {},
+
+    /* Styles applied to the root element if `fullWidth={true}`. */
+    fullWidth: {
+      width: '100%'
+    },
+
+    /* Styles applied to the startIcon element if supplied. */
+    startIcon: {
+      display: 'inherit',
+      marginRight: 8,
+      marginLeft: -4,
+      '&$iconSizeSmall': {
+        marginLeft: -2
+      }
+    },
+
+    /* Styles applied to the endIcon element if supplied. */
+    endIcon: {
+      display: 'inherit',
+      marginRight: -4,
+      marginLeft: 8,
+      '&$iconSizeSmall': {
+        marginRight: -2
+      }
+    },
+
+    /* Styles applied to the icon element if supplied and `size="small"`. */
+    iconSizeSmall: {
+      '& > *:first-child': {
+        fontSize: 18
+      }
+    },
+
+    /* Styles applied to the icon element if supplied and `size="medium"`. */
+    iconSizeMedium: {
+      '& > *:first-child': {
+        fontSize: 20
+      }
+    },
+
+    /* Styles applied to the icon element if supplied and `size="large"`. */
+    iconSizeLarge: {
+      '& > *:first-child': {
+        fontSize: 22
+      }
+    }
+  };
+};
+var Button = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2__["forwardRef"](function Button(props, ref) {
+  var children = props.children,
+      classes = props.classes,
+      className = props.className,
+      _props$color = props.color,
+      color = _props$color === void 0 ? 'default' : _props$color,
+      _props$component = props.component,
+      component = _props$component === void 0 ? 'button' : _props$component,
+      _props$disabled = props.disabled,
+      disabled = _props$disabled === void 0 ? false : _props$disabled,
+      _props$disableElevati = props.disableElevation,
+      disableElevation = _props$disableElevati === void 0 ? false : _props$disableElevati,
+      _props$disableFocusRi = props.disableFocusRipple,
+      disableFocusRipple = _props$disableFocusRi === void 0 ? false : _props$disableFocusRi,
+      endIconProp = props.endIcon,
+      focusVisibleClassName = props.focusVisibleClassName,
+      _props$fullWidth = props.fullWidth,
+      fullWidth = _props$fullWidth === void 0 ? false : _props$fullWidth,
+      _props$size = props.size,
+      size = _props$size === void 0 ? 'medium' : _props$size,
+      startIconProp = props.startIcon,
+      _props$type = props.type,
+      type = _props$type === void 0 ? 'button' : _props$type,
+      _props$variant = props.variant,
+      variant = _props$variant === void 0 ? 'text' : _props$variant,
+      other = Object(_babel_runtime_helpers_esm_objectWithoutProperties__WEBPACK_IMPORTED_MODULE_0__["default"])(props, ["children", "classes", "className", "color", "component", "disabled", "disableElevation", "disableFocusRipple", "endIcon", "focusVisibleClassName", "fullWidth", "size", "startIcon", "type", "variant"]);
+
+  var startIcon = startIconProp && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2__["createElement"]("span", {
+    className: Object(clsx__WEBPACK_IMPORTED_MODULE_4__["default"])(classes.startIcon, classes["iconSize".concat(Object(_utils_capitalize__WEBPACK_IMPORTED_MODULE_8__["default"])(size))])
+  }, startIconProp);
+  var endIcon = endIconProp && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2__["createElement"]("span", {
+    className: Object(clsx__WEBPACK_IMPORTED_MODULE_4__["default"])(classes.endIcon, classes["iconSize".concat(Object(_utils_capitalize__WEBPACK_IMPORTED_MODULE_8__["default"])(size))])
+  }, endIconProp);
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2__["createElement"](_ButtonBase__WEBPACK_IMPORTED_MODULE_7__["default"], Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_1__["default"])({
+    className: Object(clsx__WEBPACK_IMPORTED_MODULE_4__["default"])(classes.root, classes[variant], className, color === 'inherit' ? classes.colorInherit : color !== 'default' && classes["".concat(variant).concat(Object(_utils_capitalize__WEBPACK_IMPORTED_MODULE_8__["default"])(color))], size !== 'medium' && [classes["".concat(variant, "Size").concat(Object(_utils_capitalize__WEBPACK_IMPORTED_MODULE_8__["default"])(size))], classes["size".concat(Object(_utils_capitalize__WEBPACK_IMPORTED_MODULE_8__["default"])(size))]], disableElevation && classes.disableElevation, disabled && classes.disabled, fullWidth && classes.fullWidth),
+    component: component,
+    disabled: disabled,
+    focusRipple: !disableFocusRipple,
+    focusVisibleClassName: Object(clsx__WEBPACK_IMPORTED_MODULE_4__["default"])(classes.focusVisible, focusVisibleClassName),
+    ref: ref,
+    type: type
+  }, other), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2__["createElement"]("span", {
+    className: classes.label
+  }, startIcon, children, endIcon));
+});
+ true ? Button.propTypes = {
+  // ----------------------------- Warning --------------------------------
+  // | These PropTypes are generated from the TypeScript type definitions |
+  // |     To update them edit the d.ts file and run "yarn proptypes"     |
+  // ----------------------------------------------------------------------
+
+  /**
+   * The content of the button.
+   */
+  children: prop_types__WEBPACK_IMPORTED_MODULE_3___default.a.node,
+
+  /**
+   * Override or extend the styles applied to the component.
+   * See [CSS API](#css) below for more details.
+   */
+  classes: prop_types__WEBPACK_IMPORTED_MODULE_3___default.a.object,
+
+  /**
+   * @ignore
+   */
+  className: prop_types__WEBPACK_IMPORTED_MODULE_3___default.a.string,
+
+  /**
+   * The color of the component. It supports those theme colors that make sense for this component.
+   */
+  color: prop_types__WEBPACK_IMPORTED_MODULE_3___default.a.oneOf(['default', 'inherit', 'primary', 'secondary']),
+
+  /**
+   * The component used for the root node.
+   * Either a string to use a HTML element or a component.
+   */
+  component: prop_types__WEBPACK_IMPORTED_MODULE_3___default.a
+  /* @typescript-to-proptypes-ignore */
+  .elementType,
+
+  /**
+   * If `true`, the button will be disabled.
+   */
+  disabled: prop_types__WEBPACK_IMPORTED_MODULE_3___default.a.bool,
+
+  /**
+   * If `true`, no elevation is used.
+   */
+  disableElevation: prop_types__WEBPACK_IMPORTED_MODULE_3___default.a.bool,
+
+  /**
+   * If `true`, the  keyboard focus ripple will be disabled.
+   */
+  disableFocusRipple: prop_types__WEBPACK_IMPORTED_MODULE_3___default.a.bool,
+
+  /**
+   * If `true`, the ripple effect will be disabled.
+   *
+   * ⚠️ Without a ripple there is no styling for :focus-visible by default. Be sure
+   * to highlight the element by applying separate styles with the `focusVisibleClassName`.
+   */
+  disableRipple: prop_types__WEBPACK_IMPORTED_MODULE_3___default.a.bool,
+
+  /**
+   * Element placed after the children.
+   */
+  endIcon: prop_types__WEBPACK_IMPORTED_MODULE_3___default.a.node,
+
+  /**
+   * @ignore
+   */
+  focusVisibleClassName: prop_types__WEBPACK_IMPORTED_MODULE_3___default.a.string,
+
+  /**
+   * If `true`, the button will take up the full width of its container.
+   */
+  fullWidth: prop_types__WEBPACK_IMPORTED_MODULE_3___default.a.bool,
+
+  /**
+   * The URL to link to when the button is clicked.
+   * If defined, an `a` element will be used as the root node.
+   */
+  href: prop_types__WEBPACK_IMPORTED_MODULE_3___default.a.string,
+
+  /**
+   * The size of the button.
+   * `small` is equivalent to the dense button styling.
+   */
+  size: prop_types__WEBPACK_IMPORTED_MODULE_3___default.a.oneOf(['large', 'medium', 'small']),
+
+  /**
+   * Element placed before the children.
+   */
+  startIcon: prop_types__WEBPACK_IMPORTED_MODULE_3___default.a.node,
+
+  /**
+   * @ignore
+   */
+  type: prop_types__WEBPACK_IMPORTED_MODULE_3___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_3___default.a.oneOf(['button', 'reset', 'submit']), prop_types__WEBPACK_IMPORTED_MODULE_3___default.a.string]),
+
+  /**
+   * The variant to use.
+   */
+  variant: prop_types__WEBPACK_IMPORTED_MODULE_3___default.a.oneOf(['contained', 'outlined', 'text'])
+} : undefined;
+/* harmony default export */ __webpack_exports__["default"] = (Object(_styles_withStyles__WEBPACK_IMPORTED_MODULE_5__["default"])(styles, {
+  name: 'MuiButton'
+})(Button));
+
+/***/ }),
+
+/***/ "./node_modules/@material-ui/core/esm/Button/index.js":
+/*!************************************************************!*\
+  !*** ./node_modules/@material-ui/core/esm/Button/index.js ***!
+  \************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Button__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Button */ "./node_modules/@material-ui/core/esm/Button/Button.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "default", function() { return _Button__WEBPACK_IMPORTED_MODULE_0__["default"]; });
+
+
+
+/***/ }),
+
 /***/ "./node_modules/@material-ui/core/esm/ButtonBase/ButtonBase.js":
 /*!*********************************************************************!*\
   !*** ./node_modules/@material-ui/core/esm/ButtonBase/ButtonBase.js ***!
@@ -84760,6 +85237,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__);
 /* harmony import */ var _components__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../components */ "./src/components/index.js");
 /* harmony import */ var _pages_dashboard__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./pages/dashboard */ "./src/components/layout/pages/dashboard/index.js");
+/* harmony import */ var _pages_reports__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./pages/reports */ "./src/components/layout/pages/reports/index.js");
+/* harmony import */ var _pages_broadcast__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./pages/broadcast */ "./src/components/layout/pages/broadcast/index.js");
 
 
 
@@ -84784,14 +85263,24 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 
 
+
+
 var PAGES_FILTER = 'groundhogg_navigation';
 var getPages = function getPages() {
   var pages = [];
   /** @TODO: parse/hydrate PHP-registered nav items for app navigation */
 
   pages.push({
+    container: _pages_reports__WEBPACK_IMPORTED_MODULE_11__["default"],
+    path: 'reports'
+  });
+  pages.push({
     container: _pages_dashboard__WEBPACK_IMPORTED_MODULE_10__["default"],
     path: '/'
+  });
+  pages.push({
+    container: _pages_broadcast__WEBPACK_IMPORTED_MODULE_12__["default"],
+    path: 'broadcasts'
   });
   return Object(_wordpress_hooks__WEBPACK_IMPORTED_MODULE_7__["applyFilters"])(PAGES_FILTER, pages);
 };
@@ -85109,6 +85598,192 @@ var Notices = /*#__PURE__*/function (_Component) {
 
 /***/ }),
 
+/***/ "./src/components/layout/pages/broadcast/index.js":
+/*!********************************************************!*\
+  !*** ./src/components/layout/pages/broadcast/index.js ***!
+  \********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/assertThisInitialized */ "./node_modules/@babel/runtime/helpers/assertThisInitialized.js");
+/* harmony import */ var _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ "./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js");
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _wordpress_compose__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @wordpress/compose */ "@wordpress/compose");
+/* harmony import */ var _wordpress_compose__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(_wordpress_compose__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var _material_ui_core_Button__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @material-ui/core/Button */ "./node_modules/@material-ui/core/esm/Button/index.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! lodash */ "lodash");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_11__);
+/* harmony import */ var _core_ui_spinner__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../../core-ui/spinner */ "./src/components/core-ui/spinner/index.js");
+/* harmony import */ var _data__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../../../../data */ "./src/data/index.js");
+
+
+
+
+
+
+
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5___default()(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5___default()(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4___default()(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+/**
+ * External dependencies
+ */
+
+
+
+
+
+
+
+/**
+ * Internal dependencies
+ */
+
+
+
+var Broadcasts = /*#__PURE__*/function (_Component) {
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3___default()(Broadcasts, _Component);
+
+  var _super = _createSuper(Broadcasts);
+
+  function Broadcasts() {
+    var _this;
+
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, Broadcasts);
+
+    _this = _super.apply(this, arguments); // used to manage form data. updated based on form events.
+
+    _this.state = {
+      email_or_sms_id: 474,
+      tags: [168],
+      exclude_tags: [],
+      date: '',
+      time: '',
+      send_now: true,
+      send_in_timezone: '',
+      type: 'email'
+    };
+    _this.onScheduleBroadcast = _this.onScheduleBroadcast.bind(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_2___default()(_this));
+    _this.onCancelBroadcast = _this.onCancelBroadcast.bind(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_2___default()(_this));
+    return _this;
+  }
+  /**
+   * Makes the post request to schedule broadcast
+   */
+
+
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(Broadcasts, [{
+    key: "onScheduleBroadcast",
+    value: function onScheduleBroadcast() {
+      //todo validate the form to make sure all the required data is present.
+      var _this$props = this.props,
+          scheduleBroadcast = _this$props.scheduleBroadcast,
+          getBroadcasts = _this$props.getBroadcasts;
+      scheduleBroadcast(this.state); // creates a new broadcast still needs to run bulkjob!
+
+      getBroadcasts();
+    }
+  }, {
+    key: "onCancelBroadcast",
+    value: function onCancelBroadcast() {// its a bulk job process table
+    }
+  }, {
+    key: "onDeleteBroadcast",
+    value: function onDeleteBroadcast() {// its a bulk job process for table
+    } //
+    // setValue( event ) {
+    // 	this.setState( {
+    // 		tagValue : event.target.value
+    // 	} )
+    // }
+    //
+    // async onSubmit() {
+    // 	const {
+    // 		tagValue
+    // 	} = this.state;
+    //
+    // 	const {
+    // 		updateTags,
+    // 		tags
+    // 	} = this.props;
+    //
+    // 	if ( tags.tags.length ) {
+    // 		this.setState( { tags : tags } );
+    // 	}
+    //
+    // 	const updatingTags = updateTags( { tags : tagValue } )
+    //
+    // 	console.log(updatingTags);
+    //
+    // 	this.setState( { tags : updatingTags } );
+    // }
+
+  }, {
+    key: "render",
+    value: function render() {
+      var isUpdateRequesting = this.props.isUpdateRequesting;
+      var broadcasts = Object(lodash__WEBPACK_IMPORTED_MODULE_11__["castArray"])(this.props.broadcasts.broadcasts);
+      return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["Fragment"], null, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])("h2", null, "Broadcast"), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])(_material_ui_core_Button__WEBPACK_IMPORTED_MODULE_10__["default"], {
+        variant: "contained",
+        color: "primary",
+        onClick: this.onScheduleBroadcast
+      }, Object(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__["__"])('Schedule Broadcast', 'groundhogg')), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])(_material_ui_core_Button__WEBPACK_IMPORTED_MODULE_10__["default"], {
+        variant: "contained",
+        color: "secondary",
+        onClick: this.onCancelBroadcast
+      }, Object(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_9__["__"])('Cancel Broadcast', 'groundhogg')), isUpdateRequesting && Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])(_core_ui_spinner__WEBPACK_IMPORTED_MODULE_12__["default"], null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])("ol", null, broadcasts.map(function (tag) {
+        return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])("li", null, tag.title);
+      })));
+    }
+  }]);
+
+  return Broadcasts;
+}(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["Component"]); // default export
+
+
+/* harmony default export */ __webpack_exports__["default"] = (Object(_wordpress_compose__WEBPACK_IMPORTED_MODULE_7__["compose"])(Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_8__["withSelect"])(function (select) {
+  var _select = select(_data__WEBPACK_IMPORTED_MODULE_13__["BROADCASTS_STORE_NAME"]),
+      getBroadcasts = _select.getBroadcasts,
+      isBroadcastsUpdating = _select.isBroadcastsUpdating;
+
+  var broadcasts = getBroadcasts();
+  var isUpdateRequesting = isBroadcastsUpdating();
+  return {
+    broadcasts: broadcasts,
+    isUpdateRequesting: isUpdateRequesting
+  };
+}), Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_8__["withDispatch"])(function (dispatch) {
+  var _dispatch = dispatch(_data__WEBPACK_IMPORTED_MODULE_13__["BROADCASTS_STORE_NAME"]),
+      scheduleBroadcast = _dispatch.scheduleBroadcast,
+      cancelBroadcast = _dispatch.cancelBroadcast;
+
+  return {
+    scheduleBroadcast: scheduleBroadcast,
+    cancelBroadcast: cancelBroadcast
+  };
+}))(Broadcasts));
+
+/***/ }),
+
 /***/ "./src/components/layout/pages/dashboard/index.js":
 /*!********************************************************!*\
   !*** ./src/components/layout/pages/dashboard/index.js ***!
@@ -85145,7 +85820,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _material_ui_core_TextField__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @material-ui/core/TextField */ "./node_modules/@material-ui/core/esm/TextField/index.js");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! lodash */ "lodash");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_13__);
-/* harmony import */ var _data__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../../../data */ "./src/data/index.js");
+/* harmony import */ var _core_ui_spinner__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../../core-ui/spinner */ "./src/components/core-ui/spinner/index.js");
+/* harmony import */ var _data__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../../../../data */ "./src/data/index.js");
 
 
 
@@ -85169,10 +85845,10 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 
 
+
 /**
  * Internal dependencies
  */
-
 
 
 
@@ -85190,7 +85866,8 @@ var Dashboard = /*#__PURE__*/function (_Component) {
     _this.onSubmit = _this.onSubmit.bind(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_4___default()(_this));
     _this.setValue = _this.setValue.bind(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_4___default()(_this));
     _this.state = {
-      value: ''
+      tagValue: '',
+      tags: []
     };
     return _this;
   }
@@ -85199,25 +85876,37 @@ var Dashboard = /*#__PURE__*/function (_Component) {
     key: "setValue",
     value: function setValue(event) {
       this.setState({
-        value: event.target.value
+        tagValue: event.target.value
       });
     }
   }, {
     key: "onSubmit",
     value: function () {
       var _onSubmit = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-        var value, updateTags;
+        var tagValue, _this$props, updateTags, tags, updatingTags;
+
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                value = this.state.value;
-                updateTags = this.props.updateTags;
-                updateTags({
-                  tags: value
+                tagValue = this.state.tagValue;
+                _this$props = this.props, updateTags = _this$props.updateTags, tags = _this$props.tags;
+
+                if (tags.tags.length) {
+                  this.setState({
+                    tags: tags
+                  });
+                }
+
+                updatingTags = updateTags({
+                  tags: tagValue
+                });
+                console.log(updatingTags);
+                this.setState({
+                  tags: updatingTags
                 });
 
-              case 3:
+              case 6:
               case "end":
                 return _context.stop();
             }
@@ -85234,20 +85923,17 @@ var Dashboard = /*#__PURE__*/function (_Component) {
   }, {
     key: "render",
     value: function render() {
+      var isUpdateRequesting = this.props.isUpdateRequesting;
       var tags = Object(lodash__WEBPACK_IMPORTED_MODULE_13__["castArray"])(this.props.tags.tags);
-      var broadcasts = Object(lodash__WEBPACK_IMPORTED_MODULE_13__["castArray"])(this.props.broadcasts.broadcasts);
-      return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])("div", null, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["Fragment"], null, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])("h2", null, "Dashboard"), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])("ol", null, tags.map(function (tag) {
+      return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["Fragment"], null, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])("h2", null, "Dashboard"), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])("ol", null, tags.map(function (tag) {
         return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])("li", null, tag.tag_name);
       })), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])(_material_ui_core_TextField__WEBPACK_IMPORTED_MODULE_12__["default"], {
         id: "outlined-basic",
         label: "Add Tags",
-        variant: "outlined",
-        onKeyUp: this.setValue
+        variant: "outlined"
       }), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])("p", {
         onClick: this.onSubmit
-      }, "Add")), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["Fragment"], null, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])("h2", null, "BroadCast"), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])("ol", null, broadcasts.map(function (broadcast) {
-        return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])("li", null, broadcast.title);
-      }))));
+      }, "Add"), isUpdateRequesting && Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])(_core_ui_spinner__WEBPACK_IMPORTED_MODULE_14__["default"], null));
     }
   }]);
 
@@ -85256,34 +85942,203 @@ var Dashboard = /*#__PURE__*/function (_Component) {
 
 
 /* harmony default export */ __webpack_exports__["default"] = (Object(_wordpress_compose__WEBPACK_IMPORTED_MODULE_9__["compose"])(Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_10__["withSelect"])(function (select) {
-  var _select = select(_data__WEBPACK_IMPORTED_MODULE_14__["TAGS_STORE_NAME"]),
+  var _select = select(_data__WEBPACK_IMPORTED_MODULE_15__["TAGS_STORE_NAME"]),
       getTags = _select.getTags,
       isTagsUpdating = _select.isTagsUpdating;
 
-  var _select2 = select(_data__WEBPACK_IMPORTED_MODULE_14__["BROADCASTS_STORE_NAME"]),
-      getBroadcasts = _select2.getBroadcasts;
-
+  var isUpdateRequesting = isTagsUpdating();
   var tags = getTags();
-  var tagUpdate = isTagsUpdating();
-  var broadcasts = getBroadcasts();
   return {
     tags: tags,
-    broadcasts: broadcasts,
-    tagUpdate: tagUpdate // broadcastUpdate
-
+    isUpdateRequesting: isUpdateRequesting
   };
 }), Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_10__["withDispatch"])(function (dispatch) {
-  var _dispatch = dispatch(_data__WEBPACK_IMPORTED_MODULE_14__["TAGS_STORE_NAME"]),
+  var _dispatch = dispatch(_data__WEBPACK_IMPORTED_MODULE_15__["TAGS_STORE_NAME"]),
       updateTags = _dispatch.updateTags;
 
-  var _dispatch2 = dispatch(_data__WEBPACK_IMPORTED_MODULE_14__["BROADCASTS_STORE_NAME"]),
-      updateBroadcasts = _dispatch2.updateBroadcasts;
-
   return {
-    updateTags: updateTags,
-    updateBroadcasts: updateBroadcasts
+    updateTags: updateTags
   };
 }))(Dashboard));
+
+/***/ }),
+
+/***/ "./src/components/layout/pages/reports/index.js":
+/*!******************************************************!*\
+  !*** ./src/components/layout/pages/reports/index.js ***!
+  \******************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "@babel/runtime/regenerator");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/asyncToGenerator */ "./node_modules/@babel/runtime/helpers/asyncToGenerator.js");
+/* harmony import */ var _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/assertThisInitialized */ "./node_modules/@babel/runtime/helpers/assertThisInitialized.js");
+/* harmony import */ var _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ "./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js");
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var _wordpress_compose__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @wordpress/compose */ "@wordpress/compose");
+/* harmony import */ var _wordpress_compose__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(_wordpress_compose__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_10__);
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_11__);
+/* harmony import */ var _material_ui_core_TextField__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @material-ui/core/TextField */ "./node_modules/@material-ui/core/esm/TextField/index.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! lodash */ "lodash");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_13__);
+/* harmony import */ var _core_ui_spinner__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../../core-ui/spinner */ "./src/components/core-ui/spinner/index.js");
+/* harmony import */ var _data__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../../../../data */ "./src/data/index.js");
+
+
+
+
+
+
+
+
+
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_7___default()(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_7___default()(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_6___default()(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+/**
+ * External dependencies
+ */
+
+
+
+
+
+
+
+/**
+ * Internal dependencies
+ */
+
+
+
+var Reports = /*#__PURE__*/function (_Component) {
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(Reports, _Component);
+
+  var _super = _createSuper(Reports);
+
+  function Reports() {
+    var _this;
+
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default()(this, Reports);
+
+    _this = _super.apply(this, arguments);
+    _this.onSubmit = _this.onSubmit.bind(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_4___default()(_this));
+    _this.setValue = _this.setValue.bind(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_4___default()(_this));
+    _this.state = {
+      tagValue: '',
+      tags: []
+    };
+    return _this;
+  }
+
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3___default()(Reports, [{
+    key: "setValue",
+    value: function setValue(event) {
+      this.setState({
+        tagValue: event.target.value
+      });
+    }
+  }, {
+    key: "onSubmit",
+    value: function () {
+      var _onSubmit = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+        var tagValue, _this$props, updateTags, tags, updatingTags;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                tagValue = this.state.tagValue;
+                _this$props = this.props, updateTags = _this$props.updateTags, tags = _this$props.tags;
+
+                if (tags.tags.length) {
+                  this.setState({
+                    tags: tags
+                  });
+                }
+
+                updatingTags = updateTags({
+                  tags: tagValue
+                });
+                console.log(updatingTags);
+                this.setState({
+                  tags: updatingTags
+                });
+
+              case 6:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function onSubmit() {
+        return _onSubmit.apply(this, arguments);
+      }
+
+      return onSubmit;
+    }()
+  }, {
+    key: "render",
+    value: function render() {
+      var isUpdateRequesting = this.props.isUpdateRequesting;
+      var tags = Object(lodash__WEBPACK_IMPORTED_MODULE_13__["castArray"])(this.props.tags.tags);
+      return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["Fragment"], null, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])("h2", null, "Reports"), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])("ol", null, tags.map(function (tag) {
+        return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])("li", null, tag.tag_name);
+      })), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])(_material_ui_core_TextField__WEBPACK_IMPORTED_MODULE_12__["default"], {
+        id: "outlined-basic",
+        label: "Add Tags",
+        variant: "outlined"
+      }), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])("p", {
+        onClick: this.onSubmit
+      }, "Add"), isUpdateRequesting && Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])(_core_ui_spinner__WEBPACK_IMPORTED_MODULE_14__["default"], null));
+    }
+  }]);
+
+  return Reports;
+}(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["Component"]); // default export
+
+
+/* harmony default export */ __webpack_exports__["default"] = (Object(_wordpress_compose__WEBPACK_IMPORTED_MODULE_9__["compose"])(Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_10__["withSelect"])(function (select) {
+  var _select = select(_data__WEBPACK_IMPORTED_MODULE_15__["TAGS_STORE_NAME"]),
+      getTags = _select.getTags,
+      isTagsUpdating = _select.isTagsUpdating;
+
+  var isUpdateRequesting = isTagsUpdating();
+  var tags = getTags();
+  return {
+    tags: tags,
+    isUpdateRequesting: isUpdateRequesting
+  };
+}), Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_10__["withDispatch"])(function (dispatch) {
+  var _dispatch = dispatch(_data__WEBPACK_IMPORTED_MODULE_15__["TAGS_STORE_NAME"]),
+      updateTags = _dispatch.updateTags;
+
+  return {
+    updateTags: updateTags
+  };
+}))(Reports));
 
 /***/ }),
 
@@ -85464,6 +86319,8 @@ function TopBar() {
 __webpack_require__.r(__webpack_exports__);
 var TYPES = {
   RECEIVE_BROADCASTS: 'RECEIVE_BROADCASTS',
+  CANCEL_BROADCAST: 'CANCEL_BROADCAST',
+  SCHEDULE_BROADCAST: 'SCHEDULE_BROADCAST',
   SET_IS_REQUESTING: 'SET_IS_REQUESTING',
   SET_IS_UPDATING: 'SET_IS_UPDATING',
   SET_REQUESTING_ERROR: 'SET_REQUESTING_ERROR',
@@ -85477,7 +86334,7 @@ var TYPES = {
 /*!****************************************!*\
   !*** ./src/data/broadcasts/actions.js ***!
   \****************************************/
-/*! exports provided: receiveBroadcasts, setRequestingError, setUpdatingError, setIsUpdating, updateBroadcast */
+/*! exports provided: receiveBroadcasts, setRequestingError, setUpdatingError, setIsUpdating, scheduleBroadcast, cancelBroadcast */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -85486,7 +86343,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setRequestingError", function() { return setRequestingError; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setUpdatingError", function() { return setUpdatingError; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setIsUpdating", function() { return setIsUpdating; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "updateBroadcast", function() { return updateBroadcast; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "scheduleBroadcast", function() { return scheduleBroadcast; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cancelBroadcast", function() { return cancelBroadcast; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "@babel/runtime/regenerator");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/defineProperty */ "./node_modules/@babel/runtime/helpers/defineProperty.js");
@@ -85495,10 +86353,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_data_controls__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data_controls__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _action_types__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./action-types */ "./src/data/broadcasts/action-types.js");
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../constants */ "./src/data/constants.js");
+/* harmony import */ var _resolvers__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./resolvers */ "./src/data/broadcasts/resolvers.js");
 
 
 
-var _marked = /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(updateBroadcast);
+var _marked = /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(scheduleBroadcast),
+    _marked2 = /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(cancelBroadcast);
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
@@ -85511,6 +86371,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 /**
  * Internal dependencies
  */
+
 
 
 
@@ -85537,14 +86398,37 @@ function setIsUpdating(isUpdating) {
     type: _action_types__WEBPACK_IMPORTED_MODULE_3__["default"].SET_IS_UPDATING,
     isUpdating: isUpdating
   };
-}
+} //
+// /**
+//  * Update Broadcast Not required as there is nothing to update once set but you can cancel it and that will be handled in the row actions
+//  */
+// export function* updateBroadcast( data ) {
+// 	yield setIsUpdating( true );
+// 	yield receiveBroadcasts( data );
+//
+// 	try {
+// 		const results = yield apiFetch( {
+// 			path: NAMESPACE + '/tags',
+// 			method: 'POST',
+// 			data,
+// 		} );
+//
+// 		yield setIsUpdating( false );
+// 		return { success: true, ...results };
+// 	} catch ( error ) {
+// 		yield setUpdatingError( error );
+// 		return { success: false, ...error };
+// 	}
+// }
+
 /**
- * Update Broadcast Not required as there is nothing to update once set but you can cancel it and that will be handled in the row actions
+ * Schedules a new Broadcast.
+ * Creates row in the broadcast table still needs to run bulk-jobs to enqueue events
  */
 
-function updateBroadcast(data) {
+function scheduleBroadcast(data) {
   var results;
-  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function updateBroadcast$(_context) {
+  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function scheduleBroadcast$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
@@ -85559,7 +86443,7 @@ function updateBroadcast(data) {
           _context.prev = 4;
           _context.next = 7;
           return Object(_wordpress_data_controls__WEBPACK_IMPORTED_MODULE_2__["apiFetch"])({
-            path: _constants__WEBPACK_IMPORTED_MODULE_4__["NAMESPACE"] + '/tags',
+            path: _constants__WEBPACK_IMPORTED_MODULE_4__["NAMESPACE"] + '/broadcasts/schedule/',
             method: 'POST',
             data: data
           });
@@ -85567,30 +86451,88 @@ function updateBroadcast(data) {
         case 7:
           results = _context.sent;
           _context.next = 10;
-          return setIsUpdating(false);
+          return Object(_resolvers__WEBPACK_IMPORTED_MODULE_5__["getBroadcasts"])();
 
         case 10:
+          _context.next = 12;
+          return setIsUpdating(false);
+
+        case 12:
           return _context.abrupt("return", _objectSpread({
             success: true
           }, results));
 
-        case 13:
-          _context.prev = 13;
+        case 15:
+          _context.prev = 15;
           _context.t0 = _context["catch"](4);
-          _context.next = 17;
+          _context.next = 19;
           return setUpdatingError(_context.t0);
 
-        case 17:
+        case 19:
           return _context.abrupt("return", _objectSpread({
             success: false
           }, _context.t0));
 
-        case 18:
+        case 20:
         case "end":
           return _context.stop();
       }
     }
-  }, _marked, null, [[4, 13]]);
+  }, _marked, null, [[4, 15]]);
+}
+/**
+ * Cancels the scheduled Broadcast
+ */
+
+function cancelBroadcast(data) {
+  var results;
+  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function cancelBroadcast$(_context2) {
+    while (1) {
+      switch (_context2.prev = _context2.next) {
+        case 0:
+          _context2.next = 2;
+          return setIsUpdating(true);
+
+        case 2:
+          _context2.next = 4;
+          return receiveBroadcasts(data);
+
+        case 4:
+          _context2.prev = 4;
+          _context2.next = 7;
+          return Object(_wordpress_data_controls__WEBPACK_IMPORTED_MODULE_2__["apiFetch"])({
+            path: _constants__WEBPACK_IMPORTED_MODULE_4__["NAMESPACE"] + '/broadcasts/cancel',
+            method: 'POST',
+            data: data
+          });
+
+        case 7:
+          results = _context2.sent;
+          _context2.next = 10;
+          return setIsUpdating(false);
+
+        case 10:
+          return _context2.abrupt("return", _objectSpread({
+            success: true
+          }, results));
+
+        case 13:
+          _context2.prev = 13;
+          _context2.t0 = _context2["catch"](4);
+          _context2.next = 17;
+          return setUpdatingError(_context2.t0);
+
+        case 17:
+          return _context2.abrupt("return", _objectSpread({
+            success: false
+          }, _context2.t0));
+
+        case 18:
+        case "end":
+          return _context2.stop();
+      }
+    }
+  }, _marked2, null, [[4, 13]]);
 }
 
 /***/ }),
@@ -89951,9 +90893,9 @@ function updateTags(data) {
           return setIsUpdating(false);
 
         case 10:
-          return _context.abrupt("return", _objectSpread({
-            success: true
-          }, results));
+          return _context.abrupt("return", {
+            results: results
+          });
 
         case 13:
           _context.prev = 13;

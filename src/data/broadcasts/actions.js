@@ -8,6 +8,7 @@ import { apiFetch } from '@wordpress/data-controls';
  */
 import TYPES from './action-types';
 import { NAMESPACE } from '../constants';
+import {getBroadcasts} from "./resolvers";
 
 export function receiveBroadcasts( broadcasts ) {
 	return {
@@ -36,17 +37,62 @@ export function setIsUpdating( isUpdating ) {
 		isUpdating,
 	};
 }
+//
+// /**
+//  * Update Broadcast Not required as there is nothing to update once set but you can cancel it and that will be handled in the row actions
+//  */
+// export function* updateBroadcast( data ) {
+// 	yield setIsUpdating( true );
+// 	yield receiveBroadcasts( data );
+//
+// 	try {
+// 		const results = yield apiFetch( {
+// 			path: NAMESPACE + '/tags',
+// 			method: 'POST',
+// 			data,
+// 		} );
+//
+// 		yield setIsUpdating( false );
+// 		return { success: true, ...results };
+// 	} catch ( error ) {
+// 		yield setUpdatingError( error );
+// 		return { success: false, ...error };
+// 	}
+// }
 
 /**
- * Update Broadcast Not required as there is nothing to update once set but you can cancel it and that will be handled in the row actions
+ * Schedules a new Broadcast.
+ * Creates row in the broadcast table still needs to run bulk-jobs to enqueue events
  */
-export function* updateBroadcast( data ) {
+export function* scheduleBroadcast(data) {
 	yield setIsUpdating( true );
 	yield receiveBroadcasts( data );
 
 	try {
 		const results = yield apiFetch( {
-			path: NAMESPACE + '/tags',
+			path: NAMESPACE + '/broadcasts/schedule/',
+			method: 'POST',
+			data,
+		} );
+		yield getBroadcasts(); //refresh broadcast  // todo check is this correct
+		yield setIsUpdating( false );
+		return { success: true, ...results };
+	} catch ( error ) {
+		yield setUpdatingError( error );
+		return { success: false, ...error };
+	}
+}
+
+/**
+ * Cancels the scheduled Broadcast
+ */
+export function* cancelBroadcast(data) {
+	yield setIsUpdating( true );
+	yield receiveBroadcasts( data );
+
+	try {
+		const results = yield apiFetch( {
+			path: NAMESPACE + '/broadcasts/cancel',
 			method: 'POST',
 			data,
 		} );
