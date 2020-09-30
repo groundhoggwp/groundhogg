@@ -250,7 +250,7 @@ class Contact_Query {
 		$this->date_key    = $this->gh_db_contacts->get_date_key();
 		$this->cache_group = $this->gh_db_contacts->get_cache_group();
 
-		$this->query_var_defaults = array(
+		$defaults = array(
 			'number'                 => - 1,
 			'offset'                 => 0,
 			'orderby'                => 'ID',
@@ -259,6 +259,7 @@ class Contact_Query {
 			'exclude'                => '',
 			'users_include'          => '',
 			'users_exclude'          => '',
+			'has_user'               => false,
 			'tags_include'           => 0,
 			'tags_include_needs_all' => false,
 			'tags_exclude'           => 0,
@@ -289,8 +290,15 @@ class Contact_Query {
 
 		// Only show contacts associated with the current owner...
 		if ( current_user_can( 'view_contacts' ) && ! current_user_can( 'view_all_contacts' ) ) {
-			$this->query_var_defaults['owner'] = get_current_user_id();
+			$defaults['owner'] = get_current_user_id();
 		}
+
+		/**
+		 * Filter the query var defaults
+		 *
+		 * @param $query_var_defaults array
+		 */
+		$this->query_var_defaults = apply_filters( 'groundhogg/contact_query/query_var_defaults', $defaults );
 
 		if ( ! empty( $query ) ) {
 			$this->query( $query );
@@ -524,10 +532,10 @@ class Contact_Query {
 
 		$found_rows = ! $this->query_vars['no_found_rows'] ? 'SQL_CALC_FOUND_ROWS' : '';
 
-		$where = implode( ' AND ', $this->sql_clauses['where'] );
+		$this->sql_clauses['where'] = implode( ' AND ', $this->sql_clauses['where'] );
 
-		if ( $where ) {
-			$where = "WHERE $where";
+		if ( $this->sql_clauses['where'] ) {
+			$this->sql_clauses['where'] = "WHERE {$this->sql_clauses['where']}";
 		}
 
 		if ( $orderby ) {
@@ -550,7 +558,16 @@ class Contact_Query {
 
 		$this->sql_clauses['limits'] = $limits;
 
-		$this->request = "{$this->sql_clauses['select']} {$this->sql_clauses['from']} {$where} {$this->sql_clauses['groupby']} {$this->sql_clauses['orderby']} {$this->sql_clauses['limits']}";
+		/**
+		 * Filter the sql clauses before they are used in building the request.
+		 *
+		 * @param $sql_clauses array
+		 * @param $query_vars array
+		 * @param $query Contact_Query
+		 */
+		$this->sql_clauses = apply_filters( 'groundhogg/contact_query/query_items/sql_clauses', $this->sql_clauses, $this->query_vars, $this );
+
+		$this->request = "{$this->sql_clauses['select']} {$this->sql_clauses['from']} {$this->sql_clauses['where']} {$this->sql_clauses['groupby']} {$this->sql_clauses['orderby']} {$this->sql_clauses['limits']}";
 
 		$results = $wpdb->get_results( $this->request );
 
@@ -661,6 +678,10 @@ class Contact_Query {
 		if ( ! empty( $this->query_vars['users_exclude'] ) ) {
 			$users_exclude_ids      = implode( ',', wp_parse_id_list( $this->query_vars['users_exclude'] ) );
 			$where['users_exclude'] = "user_id NOT IN ( $users_exclude_ids )";
+		}
+
+		if ( ! empty( $this->query_vars['has_user'] ) ) {
+			$where['has_user'] = "user_id > 0";
 		}
 
 		if ( $this->query_vars['optin_status'] !== 'any' ) {
