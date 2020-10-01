@@ -6,10 +6,11 @@ import TYPES from './action-types';
 const tagsReducer = (
 	state = {
 		isUpdating: false,
+		isRequesting: false,
 		tags: [],
 		requestingErrors: {}
 	},
-	{ type, tags, error, isUpdating, name }
+	{ type, tags, error, isUpdating, isRequesting, name }
 ) => {
 	switch ( type ) {
 		case TYPES.RECEIVE_TAGS:
@@ -23,6 +24,13 @@ const tagsReducer = (
 				...state,
 				...tags,
 				isUpdating,
+			};
+		break;
+		case TYPES.SET_IS_REQUESTING:
+			state = {
+				...state,
+				...tags,
+				isRequesting,
 			};
 			break;
 		case TYPES.SET_REQUESTING_ERROR:

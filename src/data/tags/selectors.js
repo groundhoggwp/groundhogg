@@ -38,6 +38,15 @@ export const isTagsUpdating = ( state ) => {
 };
 
 /**
+ * Determine if tags are being updated.
+ *
+ * @param {Object} state - Reducer state
+ */
+export const isTagsRequesting = ( state ) => {
+	return state.isRequesting || false;
+};
+
+/**
  * Determine if an tags update resulted in an error.
  *
  * @param {Object} state - Reducer state

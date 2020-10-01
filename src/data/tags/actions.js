@@ -37,6 +37,13 @@ export function setIsUpdating( isUpdating ) {
 	};
 }
 
+export function setIsRequestingTags( isRequesting ) {
+	return {
+		type: TYPES.SET_IS_REQUESTING,
+		isRequesting,
+	};
+}
+
 export function* updateTags( data ) {
 	yield setIsUpdating( true );
 	yield receiveTags( data );

@@ -42,28 +42,25 @@ class Reports extends Component {
 			tags
 		} = this.props;
 
-		if ( tags.tags.length ) {
-			this.setState( { tags : tags } );
-		}
+		updateTags( { tags : tagValue } ).then( ( data ) => {
+			console.log( data );
+		} );
 
-		const updatingTags = updateTags( { tags : tagValue } )
-
-		console.log(updatingTags);
-
-		this.setState( { tags : updatingTags } );
 	}
 
 	render() {
 
-		const { isUpdateRequesting } = this.props;
-		const tags = castArray( this.props.tags.tags );
+		const {
+			isUpdateRequesting,
+			tags
+		} = this.props;
 
 		return (
 				<Fragment>
 					<h2>Reports</h2>
 					<ol>
 					{
-						tags.map( ( tag ) => {
+						tags().tags.map( ( tag ) => {
 							return( <li>{tag.tag_name}</li> )
 						} )
 					}
@@ -86,7 +83,7 @@ export default compose(
 		} = select( TAGS_STORE_NAME );
 
 		const isUpdateRequesting = isTagsUpdating();
-		const tags = getTags();
+		const tags = getTags;
 
 		return {
 			tags,
