@@ -37,6 +37,16 @@ export function setIsUpdating( isUpdating ) {
 		isUpdating,
 	};
 }
+
+
+export function setIsRequestingBroadcasts( isRequesting ) {
+	return {
+		type: TYPES.SET_IS_REQUESTING,
+		isRequesting,
+	};
+}
+
+
 //
 // /**
 //  * Update Broadcast Not required as there is nothing to update once set but you can cancel it and that will be handled in the row actions

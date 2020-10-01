@@ -1,152 +1,94 @@
 /**
  * External dependencies
  */
-import {Component, Fragment} from '@wordpress/element';
-import {compose} from '@wordpress/compose';
-import {withSelect, withDispatch} from '@wordpress/data';
+import {Fragment, useState, getState} from '@wordpress/element';
+import {useSelect, useDispatch} from '@wordpress/data';
 import {__} from '@wordpress/i18n';
 import Button from '@material-ui/core/Button';
 import {castArray} from 'lodash';
 import Spinner from '../../../core-ui/spinner';
+
 
 /**
  * Internal dependencies
  */
 import {BROADCASTS_STORE_NAME} from '../../../../data';
 
-class Broadcasts extends Component {
+export const Broadcasts = (props) => {
 
-    constructor() {
-        super(...arguments);
+    // getting all the state variables
+    const [emailOrSmsId, setEmailOrSmsId] = useState(0); //todo add ddl
+    const [tags, setTags] = useState([]);  // todo array form multiple tag picker
+    const [excludeTags, setExcludeTags] = useState([]);  // todo array form multiple tag picker
+    const [date, setDate] = useState('');  // todo Date picker
+    const [time, setTime] = useState('');  // todo Time picker
+    const [sendNow, setSendNow] = useState('');  // todo checkbox
+    const [sendInTimezone, setSendInTimezone] = useState('');  // todo checkbox
+    const [type, setType] = useState('');  // todo type picker. returns | email or SMS
 
+    const {scheduleBroadcast, cancelBroadcast} = useDispatch(BROADCASTS_STORE_NAME);
 
-        // used to manage form data. updated based on form events.
-        this.state = {
-            email_or_sms_id : 474,
-            tags : [168] ,
-            exclude_tags  : [] ,
-            date : '' ,
-            time : '' ,
-            send_now  : true ,
-            send_in_timezone  : '' ,
-            type  : 'email'
+    const {broadcasts, isRequesting, isUpdating} = useSelect((select) => {
+
+        const store = select(BROADCASTS_STORE_NAME);
+        return {
+            broadcasts: castArray(store.getBroadcasts().broadcasts),
+            isRequesting: store.isBroadcastsRequesting(),
+            isUpdating: store.isBroadcastsUpdating()
         }
+    });
 
-        this.onScheduleBroadcast = this.onScheduleBroadcast.bind(this);
-        this.onCancelBroadcast = this.onCancelBroadcast.bind(this);
-    }
-
-    /**
-     * Makes the post request to schedule broadcast
-     */
-    onScheduleBroadcast() {
-        //todo validate the form to make sure all the required data is present.
-        const {scheduleBroadcast,getBroadcasts} =  this.props;
-        scheduleBroadcast(this.state); // creates a new broadcast still needs to run bulkjob!
-        getBroadcasts();
-
-    }
-
-    onCancelBroadcast() {
-        // its a bulk job process table
-
-
-    }
-
-    onDeleteBroadcast(){
-        // its a bulk job process for table
-
+    if (isRequesting || isUpdating) {
+        return <Spinner/>;
     }
 
 
-    //
-    // setValue( event ) {
-    // 	this.setState( {
-    // 		tagValue : event.target.value
-    // 	} )
-    // }
-    //
-    // async onSubmit() {
-    // 	const {
-    // 		tagValue
-    // 	} = this.state;
-    //
-    // 	const {
-    // 		updateTags,
-    // 		tags
-    // 	} = this.props;
-    //
-    // 	if ( tags.tags.length ) {
-    // 		this.setState( { tags : tags } );
-    // 	}
-    //
-    // 	const updatingTags = updateTags( { tags : tagValue } )
-    //
-    // 	console.log(updatingTags);
-    //
-    // 	this.setState( { tags : updatingTags } );
-    // }
-
-    render() {
-
-        const {isUpdateRequesting} = this.props;
-        const broadcasts = castArray(this.props.broadcasts.broadcasts);
-
-        return (
-            <Fragment>
-                <h2>Broadcast</h2>
-                <Button variant="contained" color="primary" onClick={this.onScheduleBroadcast}>
-                    {__('Schedule Broadcast', 'groundhogg')}
-                </Button>
-
-                <Button variant="contained" color="secondary" onClick={this.onCancelBroadcast}>
-                    {__('Cancel Broadcast', 'groundhogg')}
-                </Button>
-
-                {(isUpdateRequesting) && (
-                    <Spinner/>
-                )}
+    // setting values for Broadcast test
 
 
-                <ol>
-                    {
-                        broadcasts.map((broadcast) => {
-                            return (<li>{broadcast.title}</li>)
-                        })
-                    }
-                </ol>
+    return (
+        <Fragment>
+            <h2>Broadcast</h2>
+            <Button variant="contained" color="primary" onClick={() => {
+                //print the value
 
+                //set the value statically
 
-            </Fragment>
-        );
-    }
+                // json request to schedule broadcast
+                scheduleBroadcast({
+                    email_or_sms_id: emailOrSmsId,
+                    tags: tags,
+                    exclude_tags: excludeTags ,
+                    date: date ,
+                    time: time,
+                    send_now: sendNow ,
+                    send_in_timezone: sendInTimezone ,
+                    type: type,
+                });
+            }}>
+                {__('Schedule Broadcast', 'groundhogg')}
+            </Button>
+            <br/>
+            <Button variant="contained" color="secondary" onClick={() => {
+
+                setEmailOrSmsId(474);
+                setTags( [168] );
+                setSendNow(true);
+                setType('email');
+
+            }}>
+                {__('Cancel Broadcast', 'groundhogg')}
+            </Button>
+
+            {(isUpdating) && (<Spinner/>)}
+
+            <ol>
+                {
+                    broadcasts.map((broadcast) => {
+                        return (<li>{broadcast.title}</li>)
+                    })
+                }
+            </ol>
+        </Fragment>
+    );
 }
-
-// default export
-export default compose(
-    withSelect((select) => {
-        const {
-            getBroadcasts,
-            isBroadcastsUpdating
-        } = select(BROADCASTS_STORE_NAME);
-
-        const broadcasts = getBroadcasts();
-        const isUpdateRequesting = isBroadcastsUpdating();
-
-        return {
-            broadcasts,
-            isUpdateRequesting
-        };
-    }),
-    withDispatch((dispatch) => {
-
-        const {
-            scheduleBroadcast,
-            cancelBroadcast
-        } = dispatch(BROADCASTS_STORE_NAME);
-        return {
-            scheduleBroadcast,
-            cancelBroadcast
-        };
-    })
-)(Broadcasts);

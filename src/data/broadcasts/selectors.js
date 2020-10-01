@@ -37,6 +37,16 @@ export const isBroadcastsUpdating = ( state ) => {
 	return state.isUpdating || false;
 };
 
+
+/**
+ * Determine if tags are being updated.
+ *
+ * @param {Object} state - Reducer state
+ */
+export const isBroadcastsRequesting = ( state ) => {
+	return state.isRequesting || false;
+};
+
 /**
  * Determine if an tags update resulted in an error.
  *

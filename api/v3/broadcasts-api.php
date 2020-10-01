@@ -77,10 +77,16 @@ class Broadcasts_Api extends Base {
 			return self::ERROR_INVALID_PERMISSIONS();
 		}
 
+		$offset  = $request->get_param( 'offset' ) ? : 0;
+		$limit   = $request->get_param( 'limit' ) ? : 100;
+		$order   = $request->get_param( 'order' ) ? : 'DESC';
+		$orderby = $request->get_param( 'orderby' ) ? : 'ID';
+
 		$broadcast_ids = wp_parse_id_list( wp_list_pluck( get_db( 'broadcasts' )->query( [
-			'orderby' => 'ID',
-			'order'   => 'desc',
-			'limit'   => 100
+			'orderby' => $orderby,
+			'order'   => $order,
+			'limit'   => $limit,
+			'offset'  => $offset
 		] ), 'ID' ) );
 
 		$response_broadcast = [];

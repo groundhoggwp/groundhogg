@@ -93,8 +93,6 @@ class Events extends Component {
                         })
                     }
                 </ol>
-
-
             </Fragment>
         );
     }

@@ -6,10 +6,11 @@ import TYPES from './action-types';
 const broadcastsReducer = (
 	state = {
 		isUpdating: false,
+		isRequesting: false,
 		broadcasts: [],
 		requestingErrors: {}
 	},
-	{ type, broadcasts, error, isUpdating, name }
+	{ type, broadcasts, error, isUpdating, name ,isRequesting }
 ) => {
 	switch ( type ) {
 		case TYPES.RECEIVE_BROADCASTS:
@@ -18,11 +19,11 @@ const broadcastsReducer = (
 				...broadcasts,
 			};
 			break;
-		case TYPES.SET_IS_UPDATING:
+		case TYPES.SET_IS_REQUESTING:
 			state = {
 				...state,
 				...broadcasts,
-				isUpdating,
+				isRequesting,
 			};
 			break;
 		case TYPES.SET_REQUESTING_ERROR:
@@ -31,6 +32,13 @@ const broadcastsReducer = (
 				requestingErrors: {
 					[ name ]: error,
 				},
+			};
+			break;
+		case TYPES.SET_IS_UPDATING:
+			state = {
+				...state,
+				...broadcasts,
+				isUpdating,
 			};
 			break;
 		case TYPES.SET_UPDATING_ERROR:
