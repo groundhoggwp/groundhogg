@@ -13,6 +13,7 @@ import { Spinner } from '../../components';
 import { default as Dashboard } from './pages/dashboard';
 import { default as Reports } from './pages/reports';
 import { default as Broadcasts } from './pages/broadcast';
+import { default as Events } from './pages/events';
 
 export const PAGES_FILTER = 'groundhogg_navigation';
 
@@ -35,6 +36,12 @@ export const getPages = () => {
 		container: Broadcasts,
 		path: 'broadcasts',
 	});
+
+	pages.push({
+		container: Events,
+		path: 'events',
+	});
+
 
 	return applyFilters( PAGES_FILTER, pages );
 };

@@ -54,6 +54,7 @@ class API_V3 {
 		$this->funnels_api     = new Funnels_Api();
 		$this->steps_api       = new Steps_Api();
 		$this->report_pages    = new Report_Pages_Api();
+		$this->events          = new Events_Api();
 	}
 
 	/**

@@ -110,8 +110,8 @@ class Broadcasts extends Component {
 
                 <ol>
                     {
-                        broadcasts.map((tag) => {
-                            return (<li>{tag.title}</li>)
+                        broadcasts.map((broadcast) => {
+                            return (<li>{broadcast.title}</li>)
                         })
                     }
                 </ol>

@@ -31,6 +31,9 @@ export { CORE_STORE_NAME } from './core';
 /**	Emails */
 export { EMAILS_STORE_NAME } from './emails';
 
+/**	Events */
+export { EVENTS_STORE_NAME } from './events';
+
 /**	Export */
 export { EXPORT_STORE_NAME } from './export';
 

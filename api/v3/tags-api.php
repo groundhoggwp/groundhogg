@@ -154,12 +154,19 @@ class Tags_Api extends Base {
 		$is_for_select2 = filter_var( $request->get_param( 'select2' ), FILTER_VALIDATE_BOOLEAN );
 		$is_for_axios   = filter_var( $request->get_param( 'axios' ), FILTER_VALIDATE_BOOLEAN );
 
+
+		$offset    = $request->get_param('offset') ?:0;
+		$limit    = $request->get_param('limit')?:100;
+		$order    = $request->get_param('order') ?: 'DESC' ;
+		$orderby    = $request->get_param('orderby')?: 'tag_id';
+
 		$tags = get_db( 'tags' )->query( [
 			'search'  => $search,
-			'orderby' => 'tag_name',
-			'order'   => 'asc',
-			'limit'   => 100
-		] );
+			'orderby' => $orderby,
+			'order'   => $order,
+			'limit'   => $limit,
+			'offset' => $offset
+			] );
 
 		if ( $is_for_select2 ) {
 			$json = array();
