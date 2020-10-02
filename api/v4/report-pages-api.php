@@ -1,6 +1,6 @@
 <?php
 
-namespace Groundhogg\Api\V3;
+namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {

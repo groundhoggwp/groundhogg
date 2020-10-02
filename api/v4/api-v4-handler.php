@@ -1,6 +1,6 @@
 <?php
 
-namespace Groundhogg\Api\V3;
+namespace Groundhogg\Api\V4;
 
 /**
  * Created by PhpStorm.
@@ -8,25 +8,30 @@ namespace Groundhogg\Api\V3;
  * Date: 12/12/2018
  * Time: 4:18 PM
  */
-class API_V3 {
+class API_V4_HANDLER {
 
 	/**
-	 * @var BASE[]
+	 * @var Base_Api[]
 	 */
 	public $apis = [];
 
 
 	public function __construct() {
+
+
 		define( 'DOING_GROUNDHOGG_REST_REQUEST', true );
 
 		/**
 		 * Use this action to declare extension endpoints...
 		 */
-		do_action( 'groundhogg/api/v3/pre_init', $this );
+		do_action( 'groundhogg/api/v4/pre_init', $this );
 
 		$this->declare_base_endpoints();
 
-		do_action( 'groundhogg/api/v3/init', $this );
+		do_action( 'groundhogg/api/v4/init', $this );
+
+		// Todo remove this after done testing
+		sleep( 1 );
 
 	}
 
@@ -34,8 +39,8 @@ class API_V3 {
 	 * Declare the initial endpoints.
 	 */
 	public function declare_base_endpoints() {
+
 		$this->contacts        = new Contacts_Api();
-		$this->authentication  = new Authentication_Api();
 		$this->tags            = new Tags_Api();
 		$this->emails          = new Email_Api();
 		$this->tracking        = new Tracking_Api();
@@ -44,6 +49,9 @@ class API_V3 {
 		$this->broadcasts      = new Broadcasts_Api();
 		$this->bulk_job        = new Bulk_Job_Api();
 		$this->unsubscribe_api = new Unsubscribe_Api();
+		$this->funnels_api     = new Funnels_Api();
+		$this->steps_api       = new Steps_Api();
+		$this->report_pages    = new Report_Pages_Api();
 	}
 
 	/**

@@ -3,6 +3,7 @@
 namespace Groundhogg\Api;
 
 use Groundhogg\Api\V3\API_V3;
+use Groundhogg\Api\V4\API_V4_HANDLER;
 
 /**
  * Created by PhpStorm.
@@ -27,6 +28,7 @@ class Api_Loader {
 
 	public function load_api() {
 		$this->v3 = new API_V3();
+		$this->v4 = new API_V4_HANDLER();
 	}
 
 }

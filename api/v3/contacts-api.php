@@ -246,14 +246,6 @@ class Contacts_Api extends Base {
 			]
 		] );
 
-		register_rest_route( self::NAME_SPACE, '/contacts/meta-keys', [
-			[
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'get_meta_keys' ],
-				'permission_callback' => $auth_callback,
-			],
-		] );
-
 
 	}
 
@@ -308,11 +300,11 @@ class Contacts_Api extends Base {
 
 		$contact_query = new Contact_Query();
 
-		$default_query_limit = absint( $request->get_param( 'number' ) ) ?: 100;
-		$default_offset      = absint( $request->get_param( 'offset' ) ) ?: 0;
+		$default_query_limit = $request->get_param( 'limit' ) ?: 100;
+		$default_offset      = $request->get_param( 'offset' ) ?: 0;
 
 		$query = wp_parse_args( $query, [
-			'number' => $default_query_limit,
+			'limit'  => $default_query_limit,
 			'offset' => $default_offset,
 		] );
 
@@ -322,10 +314,6 @@ class Contacts_Api extends Base {
 		}
 
 		$contacts = $contact_query->query( $query );
-
-		$orig_query = $contact_query->query_vars;
-
-		$count    = $contact_query->count( $query );
 
 		if ( $is_for_select2 ) {
 			$json = array();
@@ -353,15 +341,18 @@ class Contacts_Api extends Base {
 			$contacts = $response_contacts;
 
 		} else {
-			$contacts = array_map( function ( $contact ) {
-				return new Contact( $contact->ID );
-			}, $contacts );
+			$response_contacts = [];
+
+			foreach ( $contacts as $contact ) {
+				$id                       = absint( $contact->ID );
+				$response_contacts[ $id ] = $this->get_contact_for_rest_response( $id );
+			}
+
+			$contacts = $response_contacts;
 		}
 
 		$response = [
 			'contacts' => $contacts,
-			'count'    => $count,
-			'query'    => $orig_query
 		];
 
 		if ( $request->get_param( 'show_sql' ) ) {
@@ -616,10 +607,10 @@ class Contacts_Api extends Base {
 			return $contact;
 		}
 
-		$notes    = $contact->get_all_notes();
+		$notes = $contact->get_all_notes();
 		$response = [];
 
-		foreach ( $notes as $note ) {
+		foreach ( $notes as $note ){
 			$response[] = $note->get_as_array();
 		}
 
@@ -651,25 +642,6 @@ class Contacts_Api extends Base {
 		}
 
 		return self::SUCCESS_RESPONSE();
-	}
-
-	/**
-	 * Get meta keys
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return WP_Error|WP_REST_Response
-	 */
-	public function get_meta_keys( WP_REST_Request $request ) {
-		if ( ! current_user_can( 'view_contacts' ) ) {
-			return self::ERROR_INVALID_PERMISSIONS();
-		}
-
-		$search = $request->get_param( 'search' ) ?: $request->get_param( 's' );
-
-		$keys = get_db( 'contactmeta' )->get_keys( sanitize_text_field( $search ) );
-
-		return self::SUCCESS_RESPONSE( [ 'keys' => $keys ] );
 	}
 
 }
