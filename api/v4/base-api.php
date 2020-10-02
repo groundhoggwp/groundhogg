@@ -147,6 +147,32 @@ abstract class Base_Api {
 	}
 
 	/**
+	 * HTTP CODE 409 ERROR RESPONSE Wrapper
+	 *
+	 * @param string $code
+	 * @param string $msg
+	 * @param array  $data
+	 *
+	 * @return WP_Error
+	 */
+	protected static function ERROR_409( $code = '', $msg = '', $data = [] ) {
+		return self::ERROR_CODE( $code, $msg, $data, 409 );
+	}
+
+	/**
+	 * HTTP CODE 422 ERROR RESPONSE Wrapper
+	 *
+	 * @param string $code
+	 * @param string $msg
+	 * @param array  $data
+	 *
+	 * @return WP_Error
+	 */
+	protected static function ERROR_422( $code = '', $msg = '', $data = [] ) {
+		return self::ERROR_CODE( $code, $msg, $data, 422 );
+	}
+
+	/**
 	 * HTTP CODE 500 ERROR RESPONSE Wrapper
 	 *
 	 * @param string $code
