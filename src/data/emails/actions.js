@@ -9,18 +9,49 @@ import { apiFetch } from '@wordpress/data-controls';
 import TYPES from './action-types';
 import { NAMESPACE } from '../constants';
 
-export const fetchEmails = () => (dispatch, getState) => {
-const {
-	query,
-} = getState().contactList
+export function receiveTags( tags ) {
+	return {
+		type: TYPES.RECEIVE_TAGS,
+		tags,
+	};
+}
 
-dispatch(fetchContactsRequest())
+export function setRequestingError( error ) {
+	return {
+		type: TYPES.SET_REQUESTING_ERROR,
+		error
+	};
+}
 
-axios.get(groundhogg.rest_base + '/contacts', {
-	params: {
-	query: query,
-	},
-}).then(response => {
-	dispatch(fetchContactsSuccess(response.data))
-}).catch(error => fetchContactsFailed(error))
+export function setUpdatingError( error ) {
+	return {
+		type: TYPES.SET_UPDATING_ERROR,
+		error,
+	};
+}
+
+export function setIsUpdating( isUpdating ) {
+	return {
+		type: TYPES.SET_IS_UPDATING,
+		isUpdating,
+	};
+}
+
+export function* updateTags( data ) {
+	yield setIsUpdating( true );
+	yield receiveTags( data );
+
+	try {
+		const results = yield apiFetch( {
+			path: NAMESPACE + '/tags',
+			method: 'POST',
+			data,
+		} );
+
+		yield setIsUpdating( false );
+		return { results };
+	} catch ( error ) {
+		yield setUpdatingError( error );
+		return { success: false, ...error };
+	}
 }

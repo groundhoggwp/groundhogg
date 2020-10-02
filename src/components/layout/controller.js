@@ -10,11 +10,11 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { Spinner } from '../../components';
+
 import { default as Dashboard } from './pages/dashboard';
 import { default as Reports } from './pages/reports';
 import { default as Tags } from './pages/tags';
 import { default as Emails } from './pages/emails';
-import { default as NathanSandbox } from './pages/nathan-sandbox';
 
 export const PAGES_FILTER = 'groundhogg_navigation';
 
@@ -39,10 +39,6 @@ export const getPages = () => {
 	pages.push( {
 		container: Emails,
 		path: 'emails',
-	} );
-	pages.push( {
-		container: NathanSandbox,
-		path: 'nathan',
 	} );
 
 	return applyFilters( PAGES_FILTER, pages );
