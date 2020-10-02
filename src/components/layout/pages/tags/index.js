@@ -9,6 +9,7 @@ import TextField from '@material-ui/core/TextField';
 import { castArray } from 'lodash';
 import Spinner from '../../../core-ui/spinner';
 import SearchInput from '../../../core-ui/search-input';
+import ListTable from '../../../core-ui/list-table';
 
 /**
  * Internal dependencies
@@ -58,13 +59,13 @@ class Dashboard extends Component {
 
 		const { isUpdateRequesting } = this.props;
 		const tags = castArray( this.props.tags.tags );
-
+		 	
 		return (
 				<Fragment>
 					<h2>Tag Searching, Adding All Thats</h2>
 					<SearchInput label={'Select a Tag'} placeholder="Tags" multiple={false} options={tags} />
 					<SearchInput label={'Select Multiple Tags'} placeholder="Tags" multiple={true} options={tags} />
-
+					<ListTable data={tags}/>
 					<ol>
 					{
 						tags.map( ( tag ) => {

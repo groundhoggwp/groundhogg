@@ -34,7 +34,21 @@ const rows = [
   { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
 ];
 
-export default function DataTable() {
+export default function Listable(props) {
+  // let rows, columns;
+  // rows = props.data
+// console.log(props.data, rows.length, columns)
+//   if(rows.length > 0){
+//   rows.forEach((row, i)=>{
+//     row.id = i
+//     rows[i] = row
+//   })
+//   columns = Object.keys(props.data).map((column)=>{
+//     console.log(column)
+//     return  { field: 'id', headerName: 'ID', width: 70 };
+//   });
+// }
+
   return (
     <div style={{ height: 400, width: '100%' }}>
       <DataGrid rows={rows} columns={columns} pageSize={5} checkboxSelection />

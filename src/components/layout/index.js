@@ -64,8 +64,26 @@ export default function PrimaryLayout(props) {
 
 				<div className={classes.appBarSpacer} />
 				<Container maxWidth="lg" className={classes.container}>
-          <Notices />
-          { children }
+
+
+
+
+          <Grid container spacing={3}>
+            {/* Chart */}
+            <Grid item xs={12} md={8} lg={9}>
+            <Notices />
+            { children }    
+            </Grid>
+            {/* Recent Deposits */}
+            <Grid item xs={12} md={4} lg={3}>
+
+            </Grid>
+            {/* Recent Orders */}
+            <Grid item xs={12}>
+
+            </Grid>
+          </Grid>
+
 				</Container>
 
 			</main>

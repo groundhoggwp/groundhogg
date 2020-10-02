@@ -95360,7 +95360,7 @@ module.exports = function(module) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return DataTable; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Listable; });
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
@@ -95442,7 +95442,20 @@ var rows = [{
   firstName: 'Harvey',
   age: 65
 }];
-function DataTable() {
+function Listable(props) {
+  // let rows, columns;
+  // rows = props.data
+  // console.log(props.data, rows.length, columns)
+  //   if(rows.length > 0){
+  //   rows.forEach((row, i)=>{
+  //     row.id = i
+  //     rows[i] = row
+  //   })
+  //   columns = Object.keys(props.data).map((column)=>{
+  //     console.log(column)
+  //     return  { field: 'id', headerName: 'ID', width: 70 };
+  //   });
+  // }
   return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])("div", {
     style: {
       height: 400,
@@ -96105,7 +96118,23 @@ function PrimaryLayout(props) {
   }), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_7__["createElement"])(_material_ui_core_Container__WEBPACK_IMPORTED_MODULE_16__["default"], {
     maxWidth: "lg",
     className: classes.container
-  }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_7__["createElement"])(_notices__WEBPACK_IMPORTED_MODULE_23__["default"], null), children));
+  }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_7__["createElement"])(_material_ui_core_Grid__WEBPACK_IMPORTED_MODULE_18__["default"], {
+    container: true,
+    spacing: 3
+  }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_7__["createElement"])(_material_ui_core_Grid__WEBPACK_IMPORTED_MODULE_18__["default"], {
+    item: true,
+    xs: 12,
+    md: 8,
+    lg: 9
+  }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_7__["createElement"])(_notices__WEBPACK_IMPORTED_MODULE_23__["default"], null), children), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_7__["createElement"])(_material_ui_core_Grid__WEBPACK_IMPORTED_MODULE_18__["default"], {
+    item: true,
+    xs: 12,
+    md: 4,
+    lg: 3
+  }), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_7__["createElement"])(_material_ui_core_Grid__WEBPACK_IMPORTED_MODULE_18__["default"], {
+    item: true,
+    xs: 12
+  }))));
 }
 
 var Layout = /*#__PURE__*/function (_Component) {
@@ -96836,7 +96865,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_13__);
 /* harmony import */ var _core_ui_spinner__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../../core-ui/spinner */ "./src/components/core-ui/spinner/index.js");
 /* harmony import */ var _core_ui_search_input__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../../../core-ui/search-input */ "./src/components/core-ui/search-input/index.js");
-/* harmony import */ var _data__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../../../../data */ "./src/data/index.js");
+/* harmony import */ var _core_ui_list_table__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../../../core-ui/list-table */ "./src/components/core-ui/list-table/index.js");
+/* harmony import */ var _data__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../../../../data */ "./src/data/index.js");
 
 
 
@@ -96854,6 +96884,7 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 /**
  * External dependencies
  */
+
 
 
 
@@ -96951,6 +96982,8 @@ var Dashboard = /*#__PURE__*/function (_Component) {
         placeholder: "Tags",
         multiple: true,
         options: tags
+      }), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])(_core_ui_list_table__WEBPACK_IMPORTED_MODULE_16__["default"], {
+        data: tags
       }), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])("ol", null, tags.map(function (tag) {
         return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])("li", null, tag.tag_name);
       })), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_8__["createElement"])(_material_ui_core_TextField__WEBPACK_IMPORTED_MODULE_12__["default"], {
@@ -96968,7 +97001,7 @@ var Dashboard = /*#__PURE__*/function (_Component) {
 
 
 /* harmony default export */ __webpack_exports__["default"] = (Object(_wordpress_compose__WEBPACK_IMPORTED_MODULE_9__["compose"])(Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_10__["withSelect"])(function (select) {
-  var _select = select(_data__WEBPACK_IMPORTED_MODULE_16__["TAGS_STORE_NAME"]),
+  var _select = select(_data__WEBPACK_IMPORTED_MODULE_17__["TAGS_STORE_NAME"]),
       getTags = _select.getTags,
       isTagsUpdating = _select.isTagsUpdating;
 
@@ -96979,7 +97012,7 @@ var Dashboard = /*#__PURE__*/function (_Component) {
     isUpdateRequesting: isUpdateRequesting
   };
 }), Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_10__["withDispatch"])(function (dispatch) {
-  var _dispatch = dispatch(_data__WEBPACK_IMPORTED_MODULE_16__["TAGS_STORE_NAME"]),
+  var _dispatch = dispatch(_data__WEBPACK_IMPORTED_MODULE_17__["TAGS_STORE_NAME"]),
       updateTags = _dispatch.updateTags;
 
   return {
