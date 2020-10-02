@@ -24,7 +24,18 @@ const initialState = {
 
 const contactsReducer = (
 	state = initialState,
-	{ type, payload, data, error, isUpdating, isDeleting, isCreating, isUpdating, isRequesting, name }
+	{
+		type,
+		payload,
+		data,
+		error,
+		isUpdating,
+		isDeleting,
+		isCreating,
+		isUpdating,
+		isRequesting,
+		name
+	}
 ) => {
 	switch ( type ) {
 	  case TYPES.CHANGE_CONTEXT:
