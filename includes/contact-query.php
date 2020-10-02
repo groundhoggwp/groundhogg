@@ -201,9 +201,9 @@ class Contact_Query {
 	 * @param string|array $query          {
 	 *                                     Optional. Array or query string of contact query parameters. Default empty.
 	 *
-	 * @type int           $number         Maximum number of contacts to retrieve. Default 20.
-	 * @type int           $offset         Number of contacts to offset the query. Default 0.
-	 * @type string|array  $orderby        Customer status or array of statuses. To use 'meta_value'
+	 * @type int $number Maximum number of contacts to retrieve. Default 20.
+	 * @type int $offset Number of contacts to offset the query. Default 0.
+	 * @type string|array $orderby Customer status or array of statuses. To use 'meta_value'
 	 *                                        or 'meta_value_num', `$meta_key` must also be provided.
 	 *                                        To sort by a specific `$meta_query` clause, use that
 	 *                                        clause's array key. Accepts 'ID', 'user_id', 'first_name',
@@ -212,33 +212,33 @@ class Contact_Query {
 	 *                                        the value of `$meta_key`, and the array keys of `$meta_query`.
 	 *                                        Also accepts false, an empty array, or 'none' to disable the
 	 *                                        `ORDER BY` clause. Default 'ID'.
-	 * @type string        $order          How to order retrieved contacts. Accepts 'ASC', 'DESC'.
+	 * @type string $order How to order retrieved contacts. Accepts 'ASC', 'DESC'.
 	 *                                        Default 'DESC'.
-	 * @type string|array  $include        String or array of contact IDs to include. Default empty.
-	 * @type string|array  $exclude        String or array of contact IDs to exclude. Default empty.
-	 * @type string|array  $users_include  String or array of contact user IDs to include. Default
+	 * @type string|array $include String or array of contact IDs to include. Default empty.
+	 * @type string|array $exclude String or array of contact IDs to exclude. Default empty.
+	 * @type string|array $users_include String or array of contact user IDs to include. Default
 	 *                                        empty.
-	 * @type string|array  $users_exclude  String or array of contact user IDs to exclude. Default
+	 * @type string|array $users_exclude String or array of contact user IDs to exclude. Default
 	 *                                        empty.
-	 * @type string|array  $tags_include   String or array of tags the contact should have
-	 * @type string|array  $tags_exclude   String or array of tags the contact should not have
-	 * @type string|array  $email          Limit results to those contacts affiliated with one of
+	 * @type string|array $tags_include String or array of tags the contact should have
+	 * @type string|array $tags_exclude String or array of tags the contact should not have
+	 * @type string|array $email Limit results to those contacts affiliated with one of
 	 *                                        the given emails. Default empty.
-	 * @type string|array  $report         array of args for an activity report.
-	 * @type string        $search         Search term(s) to retrieve matching contacts for. Searches
+	 * @type string|array $report array of args for an activity report.
+	 * @type string $search Search term(s) to retrieve matching contacts for. Searches
 	 *                                        through contact names. Default empty.
-	 * @type string|array  $search_columns Columns to search using the value of `$search`. Default 'first_name'.
-	 * @type string        $meta_key       Include contacts with a matching contact meta key.
+	 * @type string|array $search_columns Columns to search using the value of `$search`. Default 'first_name'.
+	 * @type string $meta_key Include contacts with a matching contact meta key.
 	 *                                        Default empty.
-	 * @type string        $meta_value     Include contacts with a matching contact meta value.
+	 * @type string $meta_value Include contacts with a matching contact meta value.
 	 *                                        Requires `$meta_key` to be set. Default empty.
-	 * @type array         $meta_query     Meta query clauses to limit retrieved contacts by.
+	 * @type array $meta_query Meta query clauses to limit retrieved contacts by.
 	 *                                        See `WP_Meta_Query`. Default empty.
-	 * @type array         $date_query     Date query clauses to limit retrieved contacts by.
+	 * @type array $date_query Date query clauses to limit retrieved contacts by.
 	 *                                        See `WP_Date_Query`. Default empty.
-	 * @type bool          $count          Whether to return a count (true) instead of an array of
+	 * @type bool $count Whether to return a count (true) instead of an array of
 	 *                                        contact objects. Default false.
-	 * @type bool          $no_found_rows  Whether to disable the `SQL_CALC_FOUND_ROWS` query.
+	 * @type bool $no_found_rows Whether to disable the `SQL_CALC_FOUND_ROWS` query.
 	 *                                        Default true.
 	 *
 	 * @type array         $filters        extra filters for advanced querying...
@@ -257,7 +257,7 @@ class Contact_Query {
 		$this->date_key    = $this->gh_db_contacts->get_date_key();
 		$this->cache_group = $this->gh_db_contacts->get_cache_group();
 
-		$this->query_var_defaults = array(
+		$defaults = array(
 			'number'                 => - 1,
 			'offset'                 => 0,
 			'orderby'                => 'ID',
@@ -266,6 +266,7 @@ class Contact_Query {
 			'exclude'                => '',
 			'users_include'          => '',
 			'users_exclude'          => '',
+			'has_user'               => false,
 			'tags_include'           => 0,
 			'tags_include_needs_all' => false,
 			'tags_exclude'           => 0,
@@ -299,8 +300,15 @@ class Contact_Query {
 
 		// Only show contacts associated with the current owner...
 		if ( current_user_can( 'view_contacts' ) && ! current_user_can( 'view_all_contacts' ) ) {
-			$this->query_var_defaults['owner'] = get_current_user_id();
+			$defaults['owner'] = get_current_user_id();
 		}
+
+		/**
+		 * Filter the query var defaults
+		 *
+		 * @param $query_var_defaults array
+		 */
+		$this->query_var_defaults = apply_filters( 'groundhogg/contact_query/query_var_defaults', $defaults );
 
 		if ( ! empty( $query ) ) {
 			$this->query( $query );
@@ -556,10 +564,10 @@ class Contact_Query {
 
 		$found_rows = ! $this->query_vars['no_found_rows'] ? 'SQL_CALC_FOUND_ROWS' : '';
 
-		$where = implode( ' AND ', $this->sql_clauses['where'] );
+		$this->sql_clauses['where'] = implode( ' AND ', $this->sql_clauses['where'] );
 
-		if ( $where ) {
-			$where = "WHERE $where";
+		if ( $this->sql_clauses['where'] ) {
+			$this->sql_clauses['where'] = "WHERE {$this->sql_clauses['where']}";
 		}
 
 		if ( $orderby ) {
@@ -582,7 +590,16 @@ class Contact_Query {
 
 		$this->sql_clauses['limits'] = $limits;
 
-		$this->request = "{$this->sql_clauses['select']} {$this->sql_clauses['from']} {$where} {$this->sql_clauses['groupby']} {$this->sql_clauses['orderby']} {$this->sql_clauses['limits']}";
+		/**
+		 * Filter the sql clauses before they are used in building the request.
+		 *
+		 * @param $sql_clauses array
+		 * @param $query_vars array
+		 * @param $query Contact_Query
+		 */
+		$this->sql_clauses = apply_filters( 'groundhogg/contact_query/query_items/sql_clauses', $this->sql_clauses, $this->query_vars, $this );
+
+		$this->request = "{$this->sql_clauses['select']} {$this->sql_clauses['from']} {$this->sql_clauses['where']} {$this->sql_clauses['groupby']} {$this->sql_clauses['orderby']} {$this->sql_clauses['limits']}";
 
 		$results = $wpdb->get_results( $this->request );
 
@@ -685,6 +702,10 @@ class Contact_Query {
 		if ( ! empty( $this->query_vars['users_exclude'] ) ) {
 			$users_exclude_ids      = implode( ',', wp_parse_id_list( $this->query_vars['users_exclude'] ) );
 			$where['users_exclude'] = "user_id NOT IN ( $users_exclude_ids )";
+		}
+
+		if ( ! empty( $this->query_vars['has_user'] ) ) {
+			$where['has_user'] = "user_id > 0";
 		}
 
 		if ( $this->query_vars['optin_status'] && $this->query_vars['optin_status'] !== 'any' ) {

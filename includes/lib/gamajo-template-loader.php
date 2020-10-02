@@ -12,6 +12,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+// TODO prefix this class to avoid conflicts.
 if ( ! class_exists( 'Gamajo_Template_Loader' ) ) {
 
     /**

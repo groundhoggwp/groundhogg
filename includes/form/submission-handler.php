@@ -18,6 +18,7 @@ use function Groundhogg\split_name;
 use Groundhogg\Step;
 use Groundhogg\Submission;
 use Groundhogg\Supports_Errors;
+use function Groundhogg\track_live_activity;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -63,7 +64,6 @@ class Submission_Handler extends Supports_Errors {
 	 */
 	protected $step;
 
-
 	public function __construct() {
 		if ( ! get_request_var( 'gh_submit_form' ) ) {
 			return;
@@ -77,6 +77,13 @@ class Submission_Handler extends Supports_Errors {
 		} else {
 			add_action( 'init', [ $this, 'setup' ] );
 		}
+	}
+
+	/**
+	 * @return Step
+	 */
+	public function get_step(){
+		return $this->step;
 	}
 
 	public function ajax_handler() {

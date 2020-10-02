@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Classes\Activity;
 use Groundhogg\Lib\Mobile\Iso3166;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
@@ -767,8 +768,6 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	 *
 	 * @param array $args A compacted array of wp_mail() arguments, including the "to" email,
 	 *                    subject, message, headers, and attachments values.
-	 *
-	 * @since 2.2.0
 	 *
 	 */
 	$atts = apply_filters( 'wp_mail', compact( 'to', 'subject', 'message', 'headers', 'attachments' ) );
@@ -3660,6 +3659,123 @@ function fix_nested_p( $content ) {
 
 	return preg_replace( $patterns, $replacements, $content );
 }
+
+/**
+ * Track activity that happens on site caused by a human.
+ * Use the tracking cookie to populate the main arguments.
+ *
+ * @param $type
+ * @param $details
+ */
+function track_live_activity( $type, $details=[] ){
+
+	// Use tracked contact
+	$contact = get_contactdata();
+
+	// If there is not one available, skip
+	if ( ! is_a_contact( $contact ) ) {
+		return;
+	}
+
+	$args = [
+		'funnel_id'     => tracking()->get_current_funnel_id(),
+		'contact_id'    => tracking()->get_current_contact_id(),
+		'email_id'      => tracking()->get_current_email_id(),
+		'event_id'      => tracking()->get_current_event()->get_id(),
+		'referer'       => tracking()->get_leadsource(),
+    ];
+
+	track_activity( $type, $args, $details, $contact );
+}
+
+/**
+ * Log an activity conducted by the contact while they are performing actions on the site.
+ * Uses the cookie details for reporting.
+ *
+ * @param string  $type    string, an activity identifier
+ * @param array   $args    the details for the activity
+ * @param array   $details details about that activity
+ * @param Contact $contact the contact to track
+ */
+function track_activity( $contact, $type, $args, $details=[] ) {
+
+	// If there is not one available, skip
+	if ( ! is_a_contact( $contact ) ) {
+		return;
+	}
+
+	// use tracking cookies to generate information for the activity log
+	$defaults = [
+		'activity_type' => $type,
+		'timestamp'     => time(),
+	];
+
+	// Merge overrides with args
+	$args = wp_parse_args( $defaults, $args );
+	$args = apply_filters( 'groundhogg/track_live_activity/args', $args, $contact );
+
+	// Add the activity to the DB
+	$id = get_db( 'activity' )->add( $args );
+
+	if ( ! $id ) {
+		return;
+	}
+
+	$activity = new Activity( $id );
+
+	// Add any details to the activity meta
+	foreach ( $details as $detail_key => $value ) {
+		$activity->update_meta( $detail_key, $value );
+	}
+
+	/**
+	 * Fires after some activity is tracked
+	 *
+	 * @param $activity Activity
+	 * @param $contact  Contact
+	 */
+	do_action( 'groundhogg/track_activity', $activity, $contact );
+}
+
+/**
+ * Return json response for meta picker.
+ */
+function handle_ajax_meta_picker(){
+
+	if ( ! current_user_can( 'edit_contacts' ) || ! wp_verify_nonce( get_post_var( 'nonce' ), 'meta-picker' ) ) {
+		wp_send_json_error();
+	}
+
+	$search = sanitize_text_field( get_post_var( 'term' ) );
+
+	$table = get_db( 'contactmeta' );
+
+	global $wpdb;
+
+	$keys = $wpdb->get_col(
+		"SELECT DISTINCT meta_key FROM {$table->get_table_name()} WHERE `meta_key` RLIKE '{$search}' ORDER BY meta_key ASC"
+	);
+
+	$response = array_map( function ( $key ){
+	    return [
+		    'id'    => $key,
+		    'label' => $key,
+		    'value' => $key
+	    ];
+    }, $keys );
+
+	/**
+	 * Filter the json response for the meta key picker
+     *
+     * @param $response array[]
+     * @param $search string
+	 */
+	$response = apply_filters( 'groundhogg/handle_ajax_meta_picker', $response, $search );
+
+	wp_send_json( $response );
+}
+
+add_action( 'wp_ajax_gh_meta_picker', __NAMESPACE__ . '\handle_ajax_meta_picker' );
 
 /**
  * Parse shortcodes and return an array

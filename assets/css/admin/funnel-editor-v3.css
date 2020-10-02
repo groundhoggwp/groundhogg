@@ -422,6 +422,10 @@ button.button.save-button {
     border-radius: 5px;
 }
 
+.ui-front.ui-autocomplete{
+    z-index: 100100;
+}
+
 #actions table,
 #benchmarks table {
     box-sizing: border-box;
