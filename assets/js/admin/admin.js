@@ -1,3 +1,10 @@
+import {
+  addTableColumn,
+  registerNavItem,
+  registerSetting,
+  registerSettingsPanel
+} from './framework';
+
 ( function ($, nonces, endpoints, gh) {
 
   // Serialize better
@@ -129,5 +136,9 @@
   gh.pickers.metaPicker = metaPicker
   gh.nonces = nonces
   gh.endpoints = endpoints
+  gh.addTableColumn = addTableColumn
+  gh.registerNavItem = registerNavItem
+  gh.registerSetting = registerSetting
+  gh.registerSettingsPanel = registerSettingsPanel
 
 } )(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)
