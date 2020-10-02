@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { receiveTags, setRequestingError } from './actions';
+import { receiveEmails, setRequestingError } from './actions';
 import { NAMESPACE } from '../constants';
 
 /**
@@ -10,7 +10,7 @@ import { NAMESPACE } from '../constants';
 import { apiFetch } from '@wordpress/data-controls';
 
 /**
- * Request all tags.
+ * Request all Emails.
  */
 export function* getEmails() {
 	try {
@@ -19,8 +19,25 @@ export function* getEmails() {
 			path: url,
 			method: 'GET',
 		} );
-		yield receiveTags( result );
+
+		yield receiveEmails( result );
 	} catch ( error ) {
 		yield setRequestingError( error );
 	}
 }
+
+// /**
+//  * Request all tags.
+//  */
+// export function* getTags() {
+// 	try {
+// 		const url = NAMESPACE + '/tags/';
+// 		const result = yield apiFetch( {
+// 			path: url,
+// 			method: 'GET',
+// 		} );
+// 		yield receiveTags( result );
+// 	} catch ( error ) {
+// 		yield setRequestingError( error );
+// 	}
+// }

@@ -12,55 +12,29 @@ import Spinner from '../../../core-ui/spinner';
 /**
  * Internal dependencies
  */
-import { TAGS_STORE_NAME } from '../../../../data';
+import { EMAILS_STORE_NAME } from '../../../../data';
 
 class Emails extends Component {
 
 	constructor() {
 		super( ...arguments );
-		this.onSubmit = this.onSubmit.bind( this );
-		this.setValue = this.setValue.bind( this );
+
 		this.state = {
-			tagValue : '',
-			tags : []
 		};
 	}
 
-	setValue( event ) {
-		this.setState( {
-			tagValue : event.target.value
-		} )
-	}
-
-	async onSubmit() {
-		const {
-			tagValue
-		} = this.state;
-
-		const {
-			updateTags,
-			tags
-		} = this.props;
-
-		if ( tags.tags.length ) {
-			this.setState( { tags : tags } );
-		}
-
-		const updatingTags = updateTags( { tags : tagValue } )
-
-		console.log(updatingTags);
-
-		this.setState( { tags : updatingTags } );
-	}
-
 	render() {
-
-		const { isUpdateRequesting } = this.props;
-		const tags = castArray( this.props.tags.tags );
+		const emails = castArray( this.props.emails.emails );
 
 		return (
 				<Fragment>
-					<h2>Emails</h2>
+					<ol>
+					{
+						emails.map( ( email ) => {
+							return( <li>Email Title: {email.data.title}</li> )
+						} )
+					}
+					</ol>
 
 				</Fragment>
 		);
@@ -70,22 +44,22 @@ class Emails extends Component {
 export default compose(
 	withSelect( ( select ) => {
 		const {
-			getTags,
-			isTagsUpdating
-		} = select( TAGS_STORE_NAME );
+			getEmails,
+			// isTagsUpdating
+		} = select( EMAILS_STORE_NAME );
 
-		const isUpdateRequesting = isTagsUpdating();
-		const tags = getTags();
+		const emails = getEmails();
 
 		return {
-			tags,
-			isUpdateRequesting
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { updateTags } = dispatch( TAGS_STORE_NAME );
-		return {
-			updateTags
+			emails,
+			// isUpdateRequesting
 		};
 	} )
+	// } ),
+	// withDispatch( ( dispatch ) => {
+	// 	const { updateTags } = dispatch( EMAILS_STORE_NAME );
+	// 	return {
+	// 		updateTags
+	// 	};
+	// } )
 )( Emails );

@@ -5,14 +5,14 @@ import TYPES from './action-types';
 
 const emailsReducer = (
 	state = {
-		// isUpdating: false,
+		isUpdating: false,
 		emails: [],
-		// requestingErrors: {}
+		requestingErrors: {}
 	},
 	{ type, emails, error, isUpdating, name }
 ) => {
 	switch ( type ) {
-		case TYPES.GET_EMAILS:
+		case TYPES.RECEIVE_EMAILS:
 			state = {
 				...state,
 				...emails,

@@ -4,6 +4,6 @@
  * @param {Object} state - Reducer state
  * @param {Array} name - Option name
  */
-export const getTags = ( state ) => {
+export const getEmails = ( state ) => {
 	return state;
 };
