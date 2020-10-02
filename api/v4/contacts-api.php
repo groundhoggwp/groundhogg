@@ -10,7 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use function Groundhogg\get_contactdata;
-use function Groundhogg\get_db;
 use WP_REST_Server;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -242,7 +241,26 @@ class Contacts_Api extends Base_Api {
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
 	public function delete( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
+
+		$query  = (array) $request->get_param( 'query' ) ?: [];
+
+		// avoid deleting all contacts when query is empty
+		if ( empty( $query ) ){
+			return self::ERROR_401();
+		}
+
+		$contact_query = new Contact_Query();
+
+		$count    = $contact_query->count( $query );
+		$contacts = $contact_query->query( $query );
+
+		array_map( function ( $contact ) {
+			get_contactdata( $contact )->delete();
+		}, $contacts );
+
+		return self::SUCCESS_RESPONSE( [
+			'total_items' => $count
+		] );
 	}
 
 	/**
