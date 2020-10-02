@@ -248,6 +248,7 @@ class Scripts {
 
 		wp_localize_script( 'groundhogg-admin', 'groundhogg_nonces', [
 			'_wpnonce'            => wp_create_nonce(),
+			'_meta_nonce'         => wp_create_nonce( 'meta-picker' ),
 			'_wprest'             => wp_create_nonce( 'wp_rest' ),
 			'_adminajax'          => wp_create_nonce( 'admin_ajax' ),
 			'_ajax_linking_nonce' => wp_create_nonce( 'internal-linking' ),

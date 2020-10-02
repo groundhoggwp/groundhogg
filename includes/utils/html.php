@@ -37,6 +37,7 @@ class HTML {
 	const IMAGE_PICKER = 'image_picker';
 	const BENCHMARK_PICKER = 'benchmark_picker';
 	const META_KEY_PICKER = 'meta_key_picker';
+	const META_PICKER = 'meta_picker';
 	const DROPDOWN = 'dropdown';
 	const DROPDOWN_CONTACTS = 'dropdown_contacts';
 	const DROPDOWN_EMAILS = 'dropdown_emails';
@@ -1038,6 +1039,7 @@ class HTML {
 	 * @param array $args
 	 *
 	 * @return string
+     * @deprecated use meta_picker() instead
 	 */
 	public function meta_key_picker( $args = [] ) {
 		$a = wp_parse_args( $args, array(
@@ -1197,7 +1199,6 @@ class HTML {
 			'required'     => false
 		) );
 
-
 		$a['class'] .= ' gh-link-picker';
 
 		$html = $this->input( $a );
@@ -1208,6 +1209,37 @@ class HTML {
 		wp_enqueue_script( 'groundhogg-admin' );
 
 		return apply_filters( 'groundhogg/html/link_picker', $html, $args );
+	}
+
+	/**
+	 * Autocomplete meta picker
+	 *
+	 * @param $args
+	 *
+	 * @return string
+	 */
+	public function meta_picker( $args = [] ) {
+		$a = wp_parse_args( $args, array(
+			'type'         => 'text',
+			'name'         => '',
+			'id'           => '',
+			'class'        => 'regular-text',
+			'value'        => '',
+			'placeholder'  => __( 'Start typing...', 'groundhogg' ),
+			'autocomplete' => 'off',
+			'required'     => false
+		) );
+
+		$a['class'] .= ' gh-meta-picker';
+
+		$html = $this->input( $a );
+
+		wp_enqueue_script( 'jquery' );
+		wp_enqueue_script( 'jquery-ui-autocomplete' );
+		wp_enqueue_style( 'groundhogg-admin' );
+		wp_enqueue_script( 'groundhogg-admin' );
+
+		return apply_filters( 'groundhogg/html/meta_picker', $html, $args );
 	}
 
 	/**
