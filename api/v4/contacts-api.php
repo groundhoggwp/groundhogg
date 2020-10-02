@@ -288,6 +288,7 @@ class Contacts_Api extends Base_Api {
 	 * @todo sanitize data & meta
 	 * @todo prevent duplicate email addresses
 	 * @todo validate input
+	 * @todo support add/remove tags
 	 *
 	 * @param WP_REST_Request $request
 	 *
@@ -304,11 +305,12 @@ class Contacts_Api extends Base_Api {
 
 		$data = $request->get_param( 'data' );
 		$meta = $request->get_param( 'meta' );
+		$tags = $request->get_param( 'tags' );
 
 		$contact->update( $data );
 
 		foreach ( $meta as $key => $value ){
-			$contact->update_meta( $key, $value );
+			$contact->update_meta( sanitize_key( $key ), $value );
 		}
 
 		return self::SUCCESS_RESPONSE( [ 'item' => $contact ] );
