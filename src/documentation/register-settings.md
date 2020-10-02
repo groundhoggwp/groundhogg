@@ -24,8 +24,8 @@ addFilter( 'groundhogg_settings', 'gh-example/custom-setting', settings => {
 } );
 
 /* Alternatively, a higher-level API may be used. */
-if (window.groundhogg) {
-        groundhogg.registerSetting( {
+if (window.Groundhogg) {
+        Groundhogg.registerSetting( {
                 name: 'groundhogg_custom_setting',
                 panel: 'custom_panel',
                 priority: 10,

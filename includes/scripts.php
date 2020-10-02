@@ -253,10 +253,6 @@ class Scripts {
 			'_ajax_linking_nonce' => wp_create_nonce( 'internal-linking' ),
 		] );
 
-		wp_localize_script( 'groundhogg-admin', 'Groundhogg', [
-			'test' => 'Hello World!'
-		] );
-
 		do_action( 'groundhogg/scripts/after_register_admin_scripts', $this->is_script_debug_enabled(), $dot_min );
 	}
 

@@ -114,9 +114,9 @@ class _PageLayout extends Component {
 export const PageLayout = compose(
 	// Use the withFilters HoC so PageLayout is re-rendered when filters are used to add new pages
 	withFilters( PAGES_FILTER ),
-	window.groundhogg.preloadSettings
+	window.Groundhogg.preloadSettings
 		? withSettingsHydration( {
-				...window.groundhogg.preloadSettings,
+				...window.Groundhogg.preloadSettings,
 		  } )
 		: identity
 )( _PageLayout );
