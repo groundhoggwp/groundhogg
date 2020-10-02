@@ -1,6 +1,6 @@
 <?php
 
-namespace Groundhogg\Api\V3;
+namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -78,15 +78,27 @@ class Funnels_Api extends Base {
 	 */
 	public function read( WP_REST_Request $request ) {
 
-		$funnel_id = absint( $request->get_param( 'funnel_id' ) );
-
-		$funnel = new Funnel( $funnel_id );
-
-		if ( ! $funnel->exists() ) {
-			return self::ERROR_404( 'error', 'Funnel not found.' );
+		if ( ! current_user_can( 'edit_funnels' ) ) {
+			return self::ERROR_INVALID_PERMISSIONS();
 		}
 
-		return self::SUCCESS_RESPONSE( [ 'funnel' => $funnel->get_as_array() ] );
+		$args = array(
+			'where'   => $request->get_param( 'where' ) ?: [],
+			'limit'   => absint( $request->get_param( 'limit' ) ) ?: 25,
+			'offset'  => absint( $request->get_param( 'offset' ) ) ?: 0,
+			'order'   => sanitize_text_field( $request->get_param( 'offset' ) ) ?: 'DESC',
+			'orderby' => sanitize_text_field( $request->get_param( 'orderby' ) ) ?: 'ID',
+			'select'  => sanitize_text_field( $request->get_param( 'select' ) ) ?: '*',
+			'search'  => sanitize_text_field( $request->get_param( 'search' ) ),
+		);
+
+		$total = get_db( 'funnels' )->count( $args );
+		$items = get_db( 'funnels' )->query( $args );
+		$items = array_map( function ( $item ) {
+			return new Funnel( $item->ID );
+		}, $items );
+
+		return self::SUCCESS_RESPONSE( [ 'items' => $items, 'total_items' => $total ] );
 	}
 
 	/**

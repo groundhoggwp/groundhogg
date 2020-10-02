@@ -9,7 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Groundhogg\Email;
 use Groundhogg\Plugin;
-use WP_CLI\Shell\REPL;
 use function Groundhogg\send_email_notification;
 use function Groundhogg\sort_by_string_in_array;
 use WP_REST_Server;
@@ -28,26 +27,22 @@ class Email_Api extends Base {
 				'callback'            => [ $this, 'get_emails' ],
 				'permission_callback' => $auth_callback,
 				'args'                => [
-					'query'       => [
+					'query'   => [
 						'description' => _x( 'Any search parameters.', 'api', 'groundhogg' )
 					],
-					'select'      => [
+					'select'  => [
 						'required'    => false,
 						'description' => _x( 'Whether to retrieve as available for a select input.', 'api', 'groundhogg' ),
 					],
-					'selectReact' => [
+					'select2' => [
 						'required'    => false,
 						'description' => _x( 'Whether to retrieve as available for an ajax select2 input.', 'api', 'groundhogg' ),
 					],
-					'select2'     => [
-						'required'    => false,
-						'description' => _x( 'Whether to retrieve as available for an ajax select2 input.', 'api', 'groundhogg' ),
-					],
-					'search'      => [
+					'search'  => [
 						'required'    => false,
 						'description' => _x( 'Search string for tag name.', 'api', 'groundhogg' ),
 					],
-					'q'           => [
+					'q'       => [
 						'required'    => false,
 						'description' => _x( 'Shorthand for search.', 'api', 'groundhogg' ),
 					],
@@ -98,23 +93,10 @@ class Email_Api extends Base {
 			$query['search'] = $search;
 		}
 
-		$default_query_limit = $request->get_param( 'limit' ) ?: 20;
-		$default_offset      = $request->get_param( 'offset' ) ?: 0;
-		$default_orderby     = $request->get_param( 'orderby' ) ?: 'ID';
-		$default_order       = $request->get_param( 'order' ) ?: 'DESC';
+		$is_for_select  = filter_var( $request->get_param( 'select' ), FILTER_VALIDATE_BOOLEAN );
+		$is_for_select2 = filter_var( $request->get_param( 'select2' ), FILTER_VALIDATE_BOOLEAN );
 
-		$query = wp_parse_args( $query, [
-			'limit'   => $default_query_limit,
-			'offset'  => $default_offset,
-			'orderby' => $default_orderby,
-			'order'   => $default_order,
-		] );
-
-		$is_for_select       = filter_var( $request->get_param( 'select' ), FILTER_VALIDATE_BOOLEAN );
-		$is_for_select2      = filter_var( $request->get_param( 'select2' ), FILTER_VALIDATE_BOOLEAN );
-		$is_for_select_react = filter_var( $request->get_param( 'selectReact' ), FILTER_VALIDATE_BOOLEAN );
-
-		$emails = Plugin::$instance->dbs->get_db( 'emails' )->query( $query );
+		$emails = Plugin::$instance->dbs->get_db( 'emails' )->query( $query, 'ID' );
 
 		if ( $is_for_select2 ) {
 			$json = array();
@@ -135,7 +117,9 @@ class Email_Api extends Base {
 			$results = array( 'results' => $json, 'more' => false );
 
 			return rest_ensure_response( $results );
-		} else if ( $is_for_select ) {
+		}
+
+		if ( $is_for_select ) {
 
 			$response_emails = [];
 
@@ -144,29 +128,6 @@ class Email_Api extends Base {
 			}
 
 			$emails = $response_emails;
-
-		} else if ( $is_for_select_react ) {
-			$json = array();
-
-			foreach ( $emails as $i => $email ) {
-				$json[] = array(
-					'value' => absint( $email->ID ),
-					'label' => esc_html( $email->title ) ?: esc_html( $email->subject )
-				);
-			}
-
-			$results = array( 'emails' => $json );
-
-			return rest_ensure_response( $results );
-		} else {
-
-			$emails = array_map( function ( $email ) {
-
-				$email = new Email( $email->ID );
-
-				return $email->get_as_array();
-
-			}, $emails );
 
 		}
 

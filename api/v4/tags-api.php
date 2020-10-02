@@ -1,6 +1,6 @@
 <?php
 
-namespace Groundhogg\Api\V3;
+namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -8,10 +8,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Groundhogg\Contact;
-use Groundhogg\Contact_Query;
-use function Groundhogg\get_contactdata;
 use Groundhogg\Plugin;
-use function Groundhogg\sort_by_string_in_array;
+use Groundhogg\Tag;
+use function Groundhogg\get_db;
 use WP_REST_Server;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -29,22 +28,7 @@ class Tags_Api extends Base {
 				'callback'            => [ $this, 'get_tags' ],
 				'permission_callback' => $auth_callback,
 				'args'                => [
-					'select'  => [
-						'required'    => false,
-						'description' => _x( 'Whether to retrieve as available for a select input.', 'api', 'groundhogg' ),
-					],
-					'select2' => [
-						'required'    => false,
-						'description' => _x( 'Whether to retrieve as available for an ajax select2 input.', 'api', 'groundhogg' ),
-					],
-					'search'  => [
-						'required'    => false,
-						'description' => _x( 'Search string for tag name.', 'api', 'groundhogg' ),
-					],
-					'q'       => [
-						'required'    => false,
-						'description' => _x( 'Shorthand for search.', 'api', 'groundhogg' ),
-					],
+
 				]
 			],
 			[
@@ -142,48 +126,28 @@ class Tags_Api extends Base {
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function get_tags( WP_REST_Request $request ) {
+
 		if ( ! current_user_can( 'manage_tags' ) ) {
 			return self::ERROR_INVALID_PERMISSIONS();
 		}
 
-		$search = $request->get_param( 'q' ) ? $request->get_param( 'q' ) : $request->get_param( 'search' );
-		$search = sanitize_text_field( stripslashes( $search ) );
+		$args = array(
+			'where'   => $request->get_param( 'where' ) ?: [],
+			'limit'   => absint( $request->get_param( 'limit' ) ) ?: 25,
+			'offset'  => absint( $request->get_param( 'offset' ) ) ?: 0,
+			'order'   => sanitize_text_field( $request->get_param( 'offset' ) ) ?: 'DESC',
+			'orderby' => sanitize_text_field( $request->get_param( 'orderby' ) ) ?: 'tag_id',
+			'select'  => sanitize_text_field( $request->get_param( 'select' ) ) ?: '*',
+			'search'  => sanitize_text_field( $request->get_param( 'search' ) ),
+		);
 
-		$is_for_select  = filter_var( $request->get_param( 'select' ), FILTER_VALIDATE_BOOLEAN );
-		$is_for_select2 = filter_var( $request->get_param( 'select2' ), FILTER_VALIDATE_BOOLEAN );
+		$total = get_db( 'tags' )->count( $args );
+		$items = get_db( 'tags' )->query( $args );
+		$items = array_map( function ( $item ) {
+			return new Tag( $item->tag_id );
+		}, $items );
 
-		$tags = Plugin::$instance->dbs->get_db( 'tags' )->search( $search );
-
-		if ( $is_for_select2 ) {
-			$json = array();
-
-			usort( $tags, sort_by_string_in_array( 'tag_name' ) );
-
-			foreach ( $tags as $i => $tag ) {
-				$json[] = array(
-					'id'   => $tag->tag_id,
-					'text' => sprintf( "%s (%s)", $tag->tag_name, $tag->contact_count )
-				);
-			}
-
-			$results = array( 'results' => $json, 'more' => false );
-
-			return rest_ensure_response( $results );
-		}
-
-		if ( $is_for_select ) {
-
-			$response_tags = [];
-
-			foreach ( $tags as $i => $tag ) {
-				$response_tags[ $tag->tag_id ] = sprintf( "%s (%s)", $tag->tag_name, $tag->contact_count );
-			}
-
-			$tags = $response_tags;
-
-		}
-
-		return self::SUCCESS_RESPONSE( [ 'tags' => $tags ] );
+		return self::SUCCESS_RESPONSE( [ 'items' => $items, 'total_items' => $total ] );
 	}
 
 	/**
