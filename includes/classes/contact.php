@@ -325,6 +325,18 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * After contact created via this method.
+	 *
+	 * @param array $data
+	 *
+	 * @return bool|void
+	 */
+	public function create( $data = [] ) {
+		parent::create( $data );
+		$this->change_marketing_preference( $this->get_optin_status() );
+	}
+
+	/**
 	 * @return bool|mixed
 	 */
 	public function get_date_created() {

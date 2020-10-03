@@ -9,12 +9,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
+use function Groundhogg\convert_to_mysql_date;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use WP_REST_Server;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
 use function Groundhogg\is_a_contact;
+use function Groundhogg\isset_not_empty;
+use function Groundhogg\map_func_to_attr;
+use function Groundhogg\sanitize_contact_meta;
 
 class Contacts_Api extends Base_Api {
 
@@ -168,7 +173,7 @@ class Contacts_Api extends Base_Api {
 	 *
 	 * @return WP_Error
 	 */
-	protected static function ERROR_CONTACT_NOT_FOUND(){
+	protected static function ERROR_CONTACT_NOT_FOUND() {
 		return self::ERROR_404( 'error', 'Contact not found.' );
 	}
 
@@ -181,7 +186,44 @@ class Contacts_Api extends Base_Api {
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
 	public function create( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
+
+		$data = $request->get_param( 'data' );
+		$meta = $request->get_param( 'meta' );
+		$tags = $request->get_param( 'tags' );
+
+		map_func_to_attr( $data, 'first_name', 'sanitize_text_field' );
+		map_func_to_attr( $data, 'last_name', 'sanitize_text_field' );
+		map_func_to_attr( $data, 'email', 'sanitize_email' );
+		map_func_to_attr( $data, 'optin_status', 'absint' );
+		map_func_to_attr( $data, 'date_created', function ( $date ) {
+			return convert_to_mysql_date( $date );
+		} );
+
+		// get the email address
+		$email_address = get_array_var( $data, 'email' );
+
+		if ( ! $email_address ) {
+			return self::ERROR_422( 'error', 'An email address is required.' );
+		}
+
+		// will return false if the email address is not being used
+		if ( get_contactdata( $email_address ) ) {
+			return self::ERROR_409( 'error', 'Email address already in use.' );
+		}
+
+		// Create the contact record...
+		$contact = new Contact( $data );
+
+		foreach ( $meta as $key => $value ) {
+			$contact->update_meta( sanitize_key( $key ), sanitize_contact_meta( $value ) );
+		}
+
+		$contact->apply_tag( $tags );
+
+		return self::SUCCESS_RESPONSE( [
+			'item' => $contact
+		] );
+
 	}
 
 	/**
@@ -242,10 +284,10 @@ class Contacts_Api extends Base_Api {
 	 */
 	public function delete( WP_REST_Request $request ) {
 
-		$query  = (array) $request->get_param( 'query' ) ?: [];
+		$query = (array) $request->get_param( 'query' ) ?: [];
 
 		// avoid deleting all contacts when query is empty
-		if ( empty( $query ) ){
+		if ( empty( $query ) ) {
 			return self::ERROR_401();
 		}
 
@@ -285,14 +327,14 @@ class Contacts_Api extends Base_Api {
 	/**
 	 * Updates a contact given a contact array
 	 *
-	 * @todo sanitize data & meta
-	 * @todo prevent duplicate email addresses
-	 * @todo validate input
-	 * @todo support add/remove tags
-	 *
 	 * @param WP_REST_Request $request
 	 *
 	 * @return WP_Error|WP_REST_Response
+	 * @todo validate input
+	 * @todo support add/remove tags
+	 *
+	 * @todo sanitize data & meta
+	 * @todo prevent duplicate email addresses
 	 */
 	public function update_single( WP_REST_Request $request ) {
 		$ID = absint( $request->get_param( 'ID' ) );
@@ -309,7 +351,7 @@ class Contacts_Api extends Base_Api {
 
 		$contact->update( $data );
 
-		foreach ( $meta as $key => $value ){
+		foreach ( $meta as $key => $value ) {
 			$contact->update_meta( sanitize_key( $key ), $value );
 		}
 
