@@ -343,6 +343,13 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Update the notes table to new format.
+	 */
+	public function version_3_0_a_1(){
+		get_db( 'notes' )->update_3_0();
+	}
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -383,6 +390,7 @@ class Main_Updater extends Updater {
 			'2.2.19.2',
 			'2.2.19.3',
 			'2.2.19.4',
+			'3.0.a.1',
 		];
 	}
 
@@ -404,7 +412,7 @@ class Main_Updater extends Updater {
 			'2.2.19.2',
 			'2.2.19.3',
 			'2.2.19.4',
-
+			'3.0.a.1',
 		];
 	}
 

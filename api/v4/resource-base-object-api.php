@@ -11,6 +11,7 @@ use Groundhogg\Base_Object;
 use Groundhogg\Base_Object_With_Meta;
 use Groundhogg\Broadcast;
 use Groundhogg\Classes\Note;
+use Groundhogg\Contact;
 use Groundhogg\Email;
 use Groundhogg\Funnel;
 use Groundhogg\Step;
@@ -34,12 +35,13 @@ abstract class Resource_Base_Object_Api extends Base_Api {
 	protected function get_object_class() {
 
 		$object_type_class_map = apply_filters( 'groundhogg/api/v4/class_map', [
-			'note'      => Note::class,
+			'contact'   => Contact::class,
 			'tag'       => Tag::class,
+			'note'      => Note::class,
 			'email'     => Email::class,
 			'step'      => Step::class,
 			'funnel'    => Funnel::class,
-			'broadcast' => Broadcast::class
+			'broadcast' => Broadcast::class,
 		] );
 
 		$class = get_array_var( $object_type_class_map, $this->get_object_type() );
