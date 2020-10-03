@@ -290,6 +290,7 @@ class Main_Roles extends Roles {
 			'delete_emails',
 			'edit_emails',
 			'send_emails',
+			'view_emails',
 		);
 
 		return apply_filters( 'groundhogg/roles/caps/emails', $caps );
@@ -315,6 +316,7 @@ class Main_Roles extends Roles {
 			'edit_funnels',
 			'export_funnels',
 			'import_funnels',
+			'view_funnels',
 		);
 
 		return apply_filters( 'groundhogg/roles/caps/funnels', $caps );
