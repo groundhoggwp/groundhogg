@@ -350,6 +350,13 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Add new roles/caps
+	 */
+	public function version_3_0_a_2(){
+		Plugin::instance()->roles->add_caps();
+	}
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -391,6 +398,7 @@ class Main_Updater extends Updater {
 			'2.2.19.3',
 			'2.2.19.4',
 			'3.0.a.1',
+			'3.0.a.2',
 		];
 	}
 
@@ -413,6 +421,7 @@ class Main_Updater extends Updater {
 			'2.2.19.3',
 			'2.2.19.4',
 			'3.0.a.1',
+			'3.0.a.2',
 		];
 	}
 
