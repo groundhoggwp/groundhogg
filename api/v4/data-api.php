@@ -11,7 +11,7 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
 
-class Data_Api extends Base
+class Data_Api extends Base_Api
 {
 
     public function register_routes()

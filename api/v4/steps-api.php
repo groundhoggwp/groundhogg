@@ -22,7 +22,7 @@ use WP_Error;
 
 use Groundhogg\Admin\Dashboard\Widgets;
 
-class Steps_Api extends Base {
+class Steps_Api extends Base_Api {
 
 	public function register_routes() {
 

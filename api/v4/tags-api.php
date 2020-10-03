@@ -16,11 +16,11 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
 
-class Tags_Api extends Base {
+class Tags_Api extends Base_Api {
 
 	public function register_routes() {
 
-		$auth_callback = $this->get_auth_callback();
+		$auth_callback = '__return_true';
 
 		register_rest_route( self::NAME_SPACE, '/tags', [
 			[

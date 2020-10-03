@@ -35,6 +35,10 @@ abstract class Base_Api {
 		add_action( 'groundhogg/api/v4/init', array( $this, 'register_routes' ) );
 	}
 
+	public function get_auth_callback() {
+		return true;
+	}
+
 	/**
 	 * Register the relevant REST routes
 	 *

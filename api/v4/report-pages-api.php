@@ -12,7 +12,7 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
 
-class Report_Pages_Api extends Base {
+class Report_Pages_Api extends Base_Api {
 
 	public function register_routes() {
 		register_rest_route( self::NAME_SPACE, '/pages', [
