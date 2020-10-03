@@ -27,8 +27,6 @@ export const Dashboard = ( props ) => {
 		}
 	} );
 
-	console.log( tags );
-
 	if ( isRequesting || isUpdating ) {
 		return <Spinner />;
 	}
