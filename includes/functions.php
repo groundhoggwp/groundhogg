@@ -3942,11 +3942,13 @@ function map_func_to_attr( &$arr, $key, $func ) {
 /**
  * Handle sanitization of contact meta is most likely situations.
  *
- * @param $meta_value
+ * @param mixed $meta_value
+ * @param string $key
+ * @param string $object_type
  *
  * @return string
  */
-function sanitize_contact_meta( $meta_value ){
+function sanitize_object_meta( $meta_value, $key='', $object_type='' ){
 	if ( is_string( $meta_value ) && strpos( $meta_value, PHP_EOL ) !== false  ){
 		return sanitize_textarea_field( $meta_value );
 	} else if ( is_string( $meta_value ) ) {

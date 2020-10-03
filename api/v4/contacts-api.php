@@ -19,7 +19,7 @@ use function Groundhogg\get_db;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\is_email_address_in_use;
 use function Groundhogg\isset_not_empty;
-use function Groundhogg\sanitize_contact_meta;
+use function Groundhogg\sanitize_object_meta;
 
 class Contacts_Api extends Base_Api {
 
@@ -215,7 +215,7 @@ class Contacts_Api extends Base_Api {
 			$contact = new Contact( $data );
 
 			foreach ( $meta as $key => $value ) {
-				$contact->update_meta( sanitize_key( $key ), sanitize_contact_meta( $value ) );
+				$contact->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
 			}
 
 			$contact->apply_tag( $tags );
@@ -312,7 +312,7 @@ class Contacts_Api extends Base_Api {
 			$contact->update( $data );
 
 			foreach ( $meta as $key => $value ) {
-				$contact->update_meta( sanitize_key( $key ), sanitize_contact_meta( $value ) );
+				$contact->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
 			}
 
 			$contact->apply_tag( $add_tags );
@@ -386,7 +386,7 @@ class Contacts_Api extends Base_Api {
 		$contact = new Contact( $data );
 
 		foreach ( $meta as $key => $value ) {
-			$contact->update_meta( sanitize_key( $key ), sanitize_contact_meta( $value ) );
+			$contact->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
 		}
 
 		$contact->apply_tag( $tags );
@@ -448,7 +448,7 @@ class Contacts_Api extends Base_Api {
 		$contact->update( $data );
 
 		foreach ( $meta as $key => $value ) {
-			$contact->update_meta( sanitize_key( $key ), sanitize_contact_meta( $value ) );
+			$contact->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
 		}
 
 		$contact->apply_tag( $add_tags );
