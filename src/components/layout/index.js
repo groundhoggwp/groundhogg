@@ -91,8 +91,7 @@ class _PageLayout extends Component {
 	render() {
 		return (
 			<BrowserRouter basename="/wp-admin/groundhogg">
-				<Link to="/">Dashboard</Link> | |
-				<Link to="/reports">Reports</Link>
+				<Link to="/">Dashboard</Link> | <Link to="/reports">Reports</Link>
 				<Switch>
 					{ getPages().map( ( page ) => {
 						return (
