@@ -7,29 +7,29 @@ const tagsReducer = (
 	state = {
 		isUpdating: false,
 		isRequesting: false,
-		tags: [],
+		items: [],
 		requestingErrors: {}
 	},
-	{ type, tags, error, isUpdating, isRequesting, name }
+	{ type, items, error, isUpdating, isRequesting, name }
 ) => {
 	switch ( type ) {
 		case TYPES.RECEIVE_TAGS:
 			state = {
 				...state,
-				...tags,
+				items : items.map( ( item ) => { return item.data } )
 			};
 			break;
 		case TYPES.SET_IS_UPDATING:
 			state = {
 				...state,
-				...tags,
+				...items,
 				isUpdating,
 			};
 		break;
 		case TYPES.SET_IS_REQUESTING:
 			state = {
 				...state,
-				...tags,
+				...items,
 				isRequesting,
 			};
 			break;

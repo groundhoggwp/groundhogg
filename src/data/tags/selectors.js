@@ -9,13 +9,12 @@ export const getTag = ( state, name ) => {
 };
 
 /**
- * Get tag from state tree.
+ * Get tags from state tree.
  *
  * @param {Object} state - Reducer state
- * @param {Array} name - Option name
  */
 export const getTags = ( state ) => {
-	return state;
+	return state.items;
 };
 
 /**

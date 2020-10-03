@@ -18,14 +18,16 @@ export const Dashboard = ( props ) => {
 
 	const { updateTags } = useDispatch( TAGS_STORE_NAME );
 
-	const { tags, isRequesting, isUpdating 	} = useSelect( ( select ) => {
+	const { tags, isRequesting, isUpdating } = useSelect( ( select ) => {
 		const store = select( TAGS_STORE_NAME );
 		return {
-			tags : castArray( store.getTags().tags ),
+			tags : store.getTags(),
 			isRequesting : store.isTagsRequesting(),
 			isUpdating: store.isTagsUpdating()
 		}
 	} );
+
+	console.log( tags );
 
 	if ( isRequesting || isUpdating ) {
 		return <Spinner />;

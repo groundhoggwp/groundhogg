@@ -9,10 +9,10 @@ import { apiFetch } from '@wordpress/data-controls';
 import TYPES from './action-types';
 import { NAMESPACE } from '../constants';
 
-export function receiveTags( tags ) {
+export function receiveTags( items ) {
 	return {
 		type: TYPES.RECEIVE_TAGS,
-		tags,
+		items,
 	};
 }
 

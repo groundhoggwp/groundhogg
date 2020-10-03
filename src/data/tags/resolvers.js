@@ -20,8 +20,9 @@ export function* getTags() {
 			path: url,
 			method: 'GET',
 		} );
+
 		yield setIsRequestingTags( false );
-		yield receiveTags( result );
+		yield receiveTags( result.items );
 	} catch ( error ) {
 		yield setRequestingError( error );
 	}
