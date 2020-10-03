@@ -4,12 +4,14 @@ namespace Groundhogg\Admin;
 
 use Groundhogg\Plugin;
 use function Groundhogg\get_url_var;
+use function Groundhogg\wpgh_get_referer;
 use function Groundhogg\groundhogg_logo;
 
 class React_App {
 
 	public function __construct() {
-		add_action( 'admin_init', [ $this, 'maybe_render' ] );
+		add_action( 'admin_init', [ $this, 'maybe_redirect' ], 8 );
+		add_action( 'init'      , [ $this, 'maybe_render' ] );
 
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_nonces' ] );
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_ajax_url' ] );
@@ -20,9 +22,16 @@ class React_App {
 //		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_api_endpoints' ] );
 	}
 
+	public function maybe_redirect() {
+		if ( get_url_var( 'page' ) === 'groundhogg' ) {
+			wp_safe_redirect( admin_url( '/groundhogg' ) );
+			die;
+		}
+	}
+
 	public function maybe_render() {
 
-		if ( get_url_var( 'page' ) !== 'groundhogg' ) {
+		if ( false === strpos( $_SERVER['REQUEST_URI'], 'wp-admin/groundhogg' ) ) {
 			return;
 		}
 
