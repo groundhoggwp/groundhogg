@@ -4,7 +4,7 @@
 import { compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { withFilters } from '@wordpress/components';
-import { Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { identity } from 'lodash';
 import { parse } from 'qs';
 import PropTypes from 'prop-types';
@@ -17,7 +17,6 @@ import { Controller, getPages, PAGES_FILTER } from './controller';
 import TopBar from "./top-bar";
 import BottomBar from './bottom-bar';
 import Notices from './notices';
-import { getHistory } from '../../utils/navigation';
 import { withSettingsHydration } from '../../data';
 
 export class PrimaryLayout extends Component {
@@ -91,7 +90,7 @@ Layout.propTypes = {
 class _PageLayout extends Component {
 	render() {
 		return (
-			<Router history={ getHistory() }>
+			<BrowserRouter basename="/wp-admin/groundhogg">
 				<Switch>
 					{ getPages().map( ( page ) => {
 						return (
@@ -106,7 +105,7 @@ class _PageLayout extends Component {
 						);
 					} ) }
 				</Switch>
-			</Router>
+			</BrowserRouter>
 		);
 	}
 }

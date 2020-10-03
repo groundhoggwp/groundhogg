@@ -4,7 +4,6 @@
 import { Fragment, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { castArray } from 'lodash';
 import TextField from '@material-ui/core/TextField';
 import Spinner from '../../../core-ui/spinner';
 
