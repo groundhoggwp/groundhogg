@@ -29,23 +29,17 @@ class Contacts_Api extends Resource_Base_Object_Api {
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'read_tags' ],
-				'permission_callback' => function () {
-					return current_user_can( 'edit_contacts' );
-				},
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
 			],
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'create_tags' ],
-				'permission_callback' => function () {
-					return current_user_can( 'edit_contacts' );
-				},
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
 			],
 			[
 				'methods'             => WP_REST_Server::DELETABLE,
 				'callback'            => [ $this, 'delete_tags' ],
-				'permission_callback' => function () {
-					return current_user_can( 'edit_contacts' );
-				},
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
 			],
 		] );
 	}
