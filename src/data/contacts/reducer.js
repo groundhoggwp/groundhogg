@@ -29,11 +29,10 @@ const contactsReducer = (
 		payload,
 		data,
 		error,
+		isCreating,
+		isRequesting,
 		isUpdating,
 		isDeleting,
-		isCreating,
-		isUpdating,
-		isRequesting,
 		name
 	}
 ) => {
