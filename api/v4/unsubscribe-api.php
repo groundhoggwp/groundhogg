@@ -15,7 +15,7 @@ use WP_Error;
 use function Groundhogg\decrypt;
 use function Groundhogg\get_contactdata;
 
-class Unsubscribe_Api extends Base {
+class Unsubscribe_Api extends Base_Api {
 
 	public function register_routes() {
 		register_rest_route( self::NAME_SPACE, '/unsubscribe', [

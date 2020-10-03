@@ -52,7 +52,8 @@ class API_V4_HANDLER {
 //		$this->reports         = new Reports_Api();
 //		$this->report_pages    = new Report_Pages_Api();
 //		$this->bulk_job        = new Bulk_Job_Api();
-//		$this->unsubscribe_api = new Unsubscribe_Api();
+
+		$this->unsubscribe_api = new Unsubscribe_Api();
 	}
 
 	/**
