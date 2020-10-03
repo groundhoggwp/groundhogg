@@ -682,7 +682,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
         </table>
         <div id="gh-notes"><?php
 
-		$notes = $contact->get_all_notes();
+		$notes = $contact->get_notes();
 
 		foreach ( $notes as $note ) {
 			include __DIR__ . '/note.php';

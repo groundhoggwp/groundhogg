@@ -197,17 +197,16 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @return Note[]
 	 */
-	public function get_all_notes() {
-		$raw = get_db( 'contactnotes' )->query( [
-			'contact_id' => $this->get_id(),
-			'orderby'    => 'timestamp'
+	public function get_notes() {
+		$notes = get_db( 'notes' )->query( [
+			'object_id'   => $this->get_id(),
+			'object_type' => 'contact',
+			'orderby'     => 'timestamp'
 		] );
 
-		$notes = [];
-
-		foreach ( $raw as $note ) {
-			$notes[] = new Note( absint( $note->ID ) );
-		}
+		$notes = array_map( function ( $note ) {
+			return new Note( $note->ID );
+		}, $notes );
 
 		return $notes;
 	}
@@ -403,31 +402,18 @@ class Contact extends Base_Object_With_Meta {
 			return false;
 		}
 
-		$notes = [
+		$note_data = [
 			'contact_id' => $this->get_id(),
 			'context'    => $context,
-			'content'    => sanitize_textarea_field( $note ),
-			'user_id'    => $user_id,
+			'content'    => wp_kses_post( $note ),
+			'user_id'    => $user_id ?: get_current_user_id(),
 		];
 
-		if ( $context == 'user' && ! $user_id ) {
-			$notes['user_id'] = get_current_user_id();
-		}
-
-		get_db( 'contactnotes' )->add( $notes );
+		$note = new Note( $note_data );
 
 		do_action( 'groundhogg/contact/note/added', $this->ID, $note, $this );
 
 		return true;
-	}
-
-	/**
-	 * get the contact's notes
-	 *
-	 * @return string
-	 */
-	public function get_notes() {
-		return $this->get_meta( 'notes' );
 	}
 
 	/**
@@ -542,7 +528,7 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @param $user WP_User|int
 	 */
-	public function change_owner( $user ){
+	public function change_owner( $user ) {
 
 	}
 
@@ -855,7 +841,8 @@ class Contact extends Base_Object_With_Meta {
 				'meta'  => $this->get_meta(),
 				'tags'  => $this->get_tags(),
 				'files' => $this->get_files(),
-				'user'  => $this->user
+				'user'  => $this->user,
+				'notes' => $this->get_notes()
 			]
 		);
 	}
@@ -876,6 +863,24 @@ class Contact extends Base_Object_With_Meta {
 
 	public function get_job_title() {
 		return $this->get_meta( 'job_title' );
+	}
+
+	protected function sanitize_columns( $data = [] ) {
+
+		map_func_to_attr( $data, 'first_name', 'sanitize_text_field' );
+		map_func_to_attr( $data, 'last_name', 'sanitize_text_field' );
+		map_func_to_attr( $data, 'email', 'sanitize_email' );
+		map_func_to_attr( $data, 'optin_status', 'absint' );
+		map_func_to_attr( $data, 'owner_id', 'absint' );
+		map_func_to_attr( $data, 'user_id', 'absint' );
+		map_func_to_attr( $data, 'date_created', function ( $date ) {
+			return convert_to_mysql_date( $date );
+		} );
+		map_func_to_attr( $data, 'date_optin_status_changed', function ( $date ) {
+			return convert_to_mysql_date( $date );
+		} );
+
+		return $data;
 	}
 
 

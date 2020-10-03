@@ -9,16 +9,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
-use function Groundhogg\convert_to_mysql_date;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use WP_REST_Server;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
+use function Groundhogg\get_db;
 use function Groundhogg\is_a_contact;
+use function Groundhogg\is_email_address_in_use;
 use function Groundhogg\isset_not_empty;
-use function Groundhogg\map_func_to_attr;
 use function Groundhogg\sanitize_contact_meta;
 
 class Contacts_Api extends Base_Api {
@@ -56,7 +56,7 @@ class Contacts_Api extends Base_Api {
 			],
 		] );
 
-		register_rest_route( self::NAME_SPACE, '/contacts/(?P<ID>\d+)', [
+		register_rest_route( self::NAME_SPACE, '/contacts/(?P<id>\d+)', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'read_single' ],
@@ -80,7 +80,7 @@ class Contacts_Api extends Base_Api {
 			],
 		] );
 
-		register_rest_route( self::NAME_SPACE, '/contacts/(?P<ID>\d+)/notes', [
+		register_rest_route( self::NAME_SPACE, '/contacts/(?P<id>\d+)/notes', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'read_notes' ],
@@ -95,23 +95,9 @@ class Contacts_Api extends Base_Api {
 					return current_user_can( 'edit_contacts' );
 				},
 			],
-			[
-				'methods'             => WP_REST_Server::EDITABLE,
-				'callback'            => [ $this, 'update_notes' ],
-				'permission_callback' => function () {
-					return current_user_can( 'edit_contacts' );
-				},
-			],
-			[
-				'methods'             => WP_REST_Server::DELETABLE,
-				'callback'            => [ $this, 'delete_notes' ],
-				'permission_callback' => function () {
-					return current_user_can( 'edit_contacts' );
-				},
-			],
 		] );
 
-		register_rest_route( self::NAME_SPACE, '/contacts/(?P<ID>\d+)/tags', [
+		register_rest_route( self::NAME_SPACE, '/contacts/(?P<id>\d+)/tags', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'read_tags' ],
@@ -135,7 +121,7 @@ class Contacts_Api extends Base_Api {
 			],
 		] );
 
-		register_rest_route( self::NAME_SPACE, '/contacts/(?P<ID>\d+)/meta', [
+		register_rest_route( self::NAME_SPACE, '/contacts/(?P<id>\d+)/meta', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'read_meta' ],
@@ -178,6 +164,22 @@ class Contacts_Api extends Base_Api {
 	}
 
 	/**
+	 * Handle tags to be added/removed...
+	 *
+	 * @param $contact Contact
+	 * @param $tags array
+	 */
+	protected function handle_rest_tags( $contact, $tags ) {
+		if ( isset_not_empty( $tags, 'add' ) ) {
+			$contact->apply_tag( get_array_var( $tags, 'add' ) );
+		} else if ( isset_not_empty( $tags, 'remove' ) ) {
+			$contact->remove_tag( get_array_var( $tags, 'remove' ) );
+		} else {
+			$contact->apply_tag( $tags );
+		}
+	}
+
+	/**
 	 * Create a contact or multiple contacts
 	 * Should handle both cases
 	 *
@@ -186,44 +188,45 @@ class Contacts_Api extends Base_Api {
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
 	public function create( WP_REST_Request $request ) {
+		$items = $request->get_json_params();
 
-		$data = $request->get_param( 'data' );
-		$meta = $request->get_param( 'meta' );
-		$tags = $request->get_param( 'tags' );
-
-		map_func_to_attr( $data, 'first_name', 'sanitize_text_field' );
-		map_func_to_attr( $data, 'last_name', 'sanitize_text_field' );
-		map_func_to_attr( $data, 'email', 'sanitize_email' );
-		map_func_to_attr( $data, 'optin_status', 'absint' );
-		map_func_to_attr( $data, 'date_created', function ( $date ) {
-			return convert_to_mysql_date( $date );
-		} );
-
-		// get the email address
-		$email_address = get_array_var( $data, 'email' );
-
-		if ( ! $email_address ) {
-			return self::ERROR_422( 'error', 'An email address is required.' );
+		if ( empty( $items ) ) {
+			return self::ERROR_422( 'error', 'No contact data provided.' );
 		}
 
-		// will return false if the email address is not being used
-		if ( get_contactdata( $email_address ) ) {
-			return self::ERROR_409( 'error', 'Email address already in use.' );
+		$added = [];
+
+		foreach ( $items as $item ) {
+
+			$data = get_array_var( $item, 'data' );
+			$meta = get_array_var( $item, 'meta' );
+			$tags = get_array_var( $item, 'tags' );
+
+			// get the email address
+			$email_address = get_array_var( $data, 'email' );
+
+			// skip if an email address was not provided
+			// or if another contact is already using this address
+			if ( ! $email_address || get_contactdata( $email_address ) ) {
+				continue;
+			}
+
+			// Create the contact record...
+			$contact = new Contact( $data );
+
+			foreach ( $meta as $key => $value ) {
+				$contact->update_meta( sanitize_key( $key ), sanitize_contact_meta( $value ) );
+			}
+
+			$contact->apply_tag( $tags );
+
+			$added[] = $contact;
 		}
-
-		// Create the contact record...
-		$contact = new Contact( $data );
-
-		foreach ( $meta as $key => $value ) {
-			$contact->update_meta( sanitize_key( $key ), sanitize_contact_meta( $value ) );
-		}
-
-		$contact->apply_tag( $tags );
 
 		return self::SUCCESS_RESPONSE( [
-			'item' => $contact
+			'items'       => $added,
+			'total_items' => count( $added ),
 		] );
-
 	}
 
 	/**
@@ -272,7 +275,55 @@ class Contacts_Api extends Base_Api {
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function update( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
+		$query  = (array) $request->get_param( 'query' ) ?: [];
+		$search = sanitize_text_field( wp_unslash( $request->get_param( 'search' ) ) );
+
+		if ( ! key_exists( 'search', $query ) && ! empty( $search ) ) {
+			$query['search'] = $search;
+		}
+
+		$contact_query = new Contact_Query();
+
+		$count    = $contact_query->count( $query );
+		$contacts = $contact_query->query( $query );
+
+		$contacts = array_map( function ( $contact ) {
+			return new Contact( $contact->ID );
+		}, $contacts );
+
+		$data        = $request->get_param( 'data' );
+		$meta        = $request->get_param( 'meta' );
+		$add_tags    = $request->get_param( 'add_tags' ) ?: $request->get_param( 'apply_tags' );
+		$remove_tags = $request->get_param( 'remove_tags' );
+
+		/**
+		 * @var $contact Contact
+		 */
+		foreach ( $contacts as $contact ) {
+
+			// get the email address
+			$email_address = get_array_var( $data, 'email' );
+
+			// skip if the email address is not being used
+			if ( is_email_address_in_use( $email_address, $contact ) ) {
+				continue;
+			}
+
+			$contact->update( $data );
+
+			foreach ( $meta as $key => $value ) {
+				$contact->update_meta( sanitize_key( $key ), sanitize_contact_meta( $value ) );
+			}
+
+			$contact->apply_tag( $add_tags );
+			$contact->remove_tag( $remove_tags );
+
+		}
+
+		return self::SUCCESS_RESPONSE( [
+			'items'       => $contacts,
+			'total_items' => $count,
+		] );
 	}
 
 	/**
@@ -306,6 +357,47 @@ class Contacts_Api extends Base_Api {
 	}
 
 	/**
+	 * Create a contact or multiple contacts
+	 * Should handle both cases
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return mixed|WP_Error|WP_REST_Response
+	 */
+	public function create_single( WP_REST_Request $request ) {
+
+		$data = $request->get_param( 'data' );
+		$meta = $request->get_param( 'meta' );
+		$tags = $request->get_param( 'tags' );
+
+		// get the email address
+		$email_address = get_array_var( $data, 'email' );
+
+		if ( ! $email_address ) {
+			return self::ERROR_422( 'error', 'An email address is required.' );
+		}
+
+		// will return false if the email address is not being used
+		if ( is_email_address_in_use( $email_address ) ) {
+			return self::ERROR_409( 'error', 'Email address already in use.' );
+		}
+
+		// Create the contact record...
+		$contact = new Contact( $data );
+
+		foreach ( $meta as $key => $value ) {
+			$contact->update_meta( sanitize_key( $key ), sanitize_contact_meta( $value ) );
+		}
+
+		$contact->apply_tag( $tags );
+
+		return self::SUCCESS_RESPONSE( [
+			'item' => $contact
+		] );
+
+	}
+
+	/**
 	 * Fetches a single contact record
 	 *
 	 * @param WP_REST_Request $request
@@ -313,7 +405,7 @@ class Contacts_Api extends Base_Api {
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
 	public function read_single( WP_REST_Request $request ) {
-		$ID = absint( $request->get_param( 'ID' ) );
+		$ID = absint( $request->get_param( 'id' ) );
 
 		$contact = get_contactdata( $ID );
 
@@ -330,14 +422,9 @@ class Contacts_Api extends Base_Api {
 	 * @param WP_REST_Request $request
 	 *
 	 * @return WP_Error|WP_REST_Response
-	 * @todo validate input
-	 * @todo support add/remove tags
-	 *
-	 * @todo sanitize data & meta
-	 * @todo prevent duplicate email addresses
 	 */
 	public function update_single( WP_REST_Request $request ) {
-		$ID = absint( $request->get_param( 'ID' ) );
+		$ID = absint( $request->get_param( 'id' ) );
 
 		$contact = get_contactdata( $ID );
 
@@ -345,15 +432,27 @@ class Contacts_Api extends Base_Api {
 			return self::ERROR_CONTACT_NOT_FOUND();
 		}
 
-		$data = $request->get_param( 'data' );
-		$meta = $request->get_param( 'meta' );
-		$tags = $request->get_param( 'tags' );
+		$data        = $request->get_param( 'data' );
+		$meta        = $request->get_param( 'meta' );
+		$add_tags    = $request->get_param( 'add_tags' ) ?: $request->get_param( 'apply_tags' );
+		$remove_tags = $request->get_param( 'remove_tags' );
+
+		// get the email address
+		$email_address = get_array_var( $data, 'email' );
+
+		// will return false if the email address is not being used
+		if ( is_email_address_in_use( $email_address, $contact ) ) {
+			return self::ERROR_409( 'error', 'Email address already in use.' );
+		}
 
 		$contact->update( $data );
 
 		foreach ( $meta as $key => $value ) {
-			$contact->update_meta( sanitize_key( $key ), $value );
+			$contact->update_meta( sanitize_key( $key ), sanitize_contact_meta( $value ) );
 		}
+
+		$contact->apply_tag( $add_tags );
+		$contact->remove_tag( $remove_tags );
 
 		return self::SUCCESS_RESPONSE( [ 'item' => $contact ] );
 	}
@@ -366,7 +465,7 @@ class Contacts_Api extends Base_Api {
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function delete_single( WP_REST_Request $request ) {
-		$ID = absint( $request->get_param( 'ID' ) );
+		$ID = absint( $request->get_param( 'id' ) );
 
 		$contact = get_contactdata( $ID );
 
@@ -380,43 +479,59 @@ class Contacts_Api extends Base_Api {
 	}
 
 	/**
+	 * Create notes for a contact
 	 *
 	 * @param WP_REST_Request $request
 	 *
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
 	public function create_notes( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
+
+		$ID = absint( $request->get_param( 'id' ) );
+
+		$contact = get_contactdata( $ID );
+
+		if ( ! is_a_contact( $contact ) ) {
+			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		$notes = $request->get_json_params();
+
+		foreach ( $notes as $note ) {
+			// @todo change context if from admin
+			$contact->add_note( $note, 'api' );
+		}
+
+		$all_notes = $contact->get_notes();
+
+		return self::SUCCESS_RESPONSE( [
+			'items'       => $all_notes,
+			'total_items' => count( $all_notes )
+		] );
 	}
 
 	/**
+	 * Get a contacts notes
 	 *
 	 * @param WP_REST_Request $request
 	 *
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
 	public function read_notes( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
-	}
+		$ID = absint( $request->get_param( 'id' ) );
 
-	/**
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return WP_Error|WP_REST_Response
-	 */
-	public function update_notes( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
-	}
+		$contact = get_contactdata( $ID );
 
-	/**
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return mixed|WP_Error|WP_REST_Response
-	 */
-	public function delete_notes( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
+		if ( ! is_a_contact( $contact ) ) {
+			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		$all_notes = $contact->get_notes();
+
+		return self::SUCCESS_RESPONSE( [
+			'items'       => $all_notes,
+			'total_items' => count( $all_notes )
+		] );
 	}
 
 	/**

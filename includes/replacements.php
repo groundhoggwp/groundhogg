@@ -716,7 +716,7 @@ class Replacements {
 	 * @return mixed
 	 */
 	function replacement_notes( $contact_id ) {
-		$notes = $this->get_current_contact()->get_all_notes();
+		$notes = $this->get_current_contact()->get_notes();
 
 		$return = "";
 

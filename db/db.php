@@ -968,6 +968,14 @@ abstract class DB {
 
 		}
 
+		/**
+		 * Filter the where clause
+		 *
+		 * @param $clause string[]
+		 * @param $where array
+		 */
+		$where_clause = apply_filters( 'groundhogg/db/build_advanced_where_statement/clause', $clause, $where );
+
 		return implode( " {$relationship} ", $clause );
 	}
 

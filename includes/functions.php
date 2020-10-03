@@ -3955,3 +3955,28 @@ function sanitize_contact_meta( $meta_value ){
 
 	return $meta_value;
 }
+
+/**
+ * Check if the email address is in use
+ * You can pass a contact record to double check against the current contact as well.
+ *
+ * @param string $email_address
+ * @param bool|Contact $current_contact
+ *
+ * @return bool
+ */
+function is_email_address_in_use( $email_address, $current_contact=false ){
+
+    $contact = get_contactdata( $email_address );
+
+    // If there is no contact record
+    if ( ! is_a_contact( $contact ) ){
+        return false;
+    // If there is a contact but it's the same as the one we are passing...
+    } else if ( is_a_contact( $current_contact ) && $contact->get_id() === $current_contact->get_id() ){
+        return false;
+    // Otherwise
+    } else {
+	    return true;
+    }
+}
