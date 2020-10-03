@@ -4,7 +4,7 @@
 import { compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { withFilters } from '@wordpress/components';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, Link } from 'react-router-dom';
 import { identity } from 'lodash';
 import { parse } from 'qs';
 import PropTypes from 'prop-types';
@@ -91,6 +91,8 @@ class _PageLayout extends Component {
 	render() {
 		return (
 			<BrowserRouter basename="/wp-admin/groundhogg">
+				<Link to="/">Dashboard</Link> | |
+				<Link to="/reports">Reports</Link>
 				<Switch>
 					{ getPages().map( ( page ) => {
 						return (
