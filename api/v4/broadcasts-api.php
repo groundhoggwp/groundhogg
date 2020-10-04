@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Broadcasts_Api extends Resource_Base_Object_Api {
+class Broadcasts_Api extends Base_Object_Api {
 
 	public function register_routes() {
 

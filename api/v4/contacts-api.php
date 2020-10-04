@@ -19,7 +19,7 @@ use function Groundhogg\is_a_contact;
 use function Groundhogg\is_email_address_in_use;
 use function Groundhogg\sanitize_object_meta;
 
-class Contacts_Api extends Resource_Base_Object_Api {
+class Contacts_Api extends Base_Object_Api {
 
 	public function register_routes() {
 

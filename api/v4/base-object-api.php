@@ -23,7 +23,7 @@ use WP_REST_Response;
 use WP_Error;
 use function Groundhogg\get_db;
 
-abstract class Resource_Base_Object_Api extends Base_Api {
+abstract class Base_Object_Api extends Base_Api {
 
 	/**
 	 * Maps the resource to a class based on object type.

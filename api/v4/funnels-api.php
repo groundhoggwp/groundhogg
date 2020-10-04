@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Funnels_Api extends Resource_Base_Object_Api {
+class Funnels_Api extends Base_Object_Api {
 
 
 	/**

@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Notes_Api extends Resource_Base_Object_Api {
+class Notes_Api extends Base_Object_Api {
 
 	/**
 	 * @inheritDoc

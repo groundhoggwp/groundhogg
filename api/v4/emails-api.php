@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Emails_Api extends Resource_Base_Object_Api {
+class Emails_Api extends Base_Object_Api {
 
 	public function get_db_table_name() {
 		return 'emails';

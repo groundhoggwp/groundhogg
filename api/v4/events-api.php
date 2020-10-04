@@ -2,12 +2,7 @@
 
 namespace Groundhogg\Api\V4;
 
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-
-class Steps_Api extends Base_Object_Api {
+class Events_Api extends Base_Object_Api{
 
 	/**
 	 * The name of the table resource to use
@@ -15,7 +10,7 @@ class Steps_Api extends Base_Object_Api {
 	 * @return string
 	 */
 	public function get_db_table_name() {
-		return 'steps';
+		return 'events';
 	}
 
 	/**
@@ -24,7 +19,7 @@ class Steps_Api extends Base_Object_Api {
 	 * @return bool
 	 */
 	public function read_permissions_callback() {
-		return current_user_can('edit_funnels' );
+		return current_user_can( 'view_events' );
 	}
 
 	/**
@@ -33,7 +28,7 @@ class Steps_Api extends Base_Object_Api {
 	 * @return mixed
 	 */
 	public function update_permissions_callback() {
-		return current_user_can('edit_funnels' );
+		return current_user_can( 'edit_events' );
 	}
 
 	/**
@@ -42,7 +37,7 @@ class Steps_Api extends Base_Object_Api {
 	 * @return mixed
 	 */
 	public function create_permissions_callback() {
-		return current_user_can('edit_funnels' );
+		return current_user_can( 'add_events' );
 	}
 
 	/**
@@ -51,6 +46,6 @@ class Steps_Api extends Base_Object_Api {
 	 * @return mixed
 	 */
 	public function delete_permissions_callback() {
-		return current_user_can('edit_funnels' );
+		return current_user_can( 'delete_events' );
 	}
 }
