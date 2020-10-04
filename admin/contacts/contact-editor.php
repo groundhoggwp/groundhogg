@@ -634,7 +634,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						$args = array(
 							'id'       => 'tags',
 							'name'     => 'tags[]',
-							'selected' => $contact->get_tags(),
+							'selected' => $contact->get_tag_ids(),
 						);
 						echo Plugin::$instance->utils->html->tag_picker( $args ); ?>
                         <p class="description"><?php _ex( 'Add new tags by hitting [Enter] or by typing a [,].', 'contact_record', 'groundhogg' ); ?></p>

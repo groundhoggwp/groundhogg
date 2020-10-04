@@ -541,7 +541,7 @@ class Replacements {
 	 */
 	function tag_names( $contact_id ) {
 
-		$tag_ids = $this->get_current_contact()->get_tags();
+		$tag_ids = $this->get_current_contact()->get_tag_ids();
 		$tags    = array_map( [ $this, 'get_contact_tag_names' ], $tag_ids );
 
 		return implode( ',', $tags );

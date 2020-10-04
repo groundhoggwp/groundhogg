@@ -9,7 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Notes_Api extends Resource_Base_Object_Api {
 
-
 	/**
 	 * @inheritDoc
 	 */

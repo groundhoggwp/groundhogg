@@ -166,12 +166,23 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * Get the tags
+	 * Get the tag ids
 	 *
-	 * @return array
+	 * @return int[]
 	 */
-	public function get_tags() {
+	public function get_tag_ids() {
 		return wp_parse_id_list( $this->tags );
+	}
+
+	/**
+	 * Get the tag objects.
+	 *
+	 * @return Tag[]
+	 */
+	public function get_tags(){
+		return array_map( function ( $tag_id ) {
+			return new Tag( $tag_id );
+		}, $this->get_tag_ids() );
 	}
 
 	/**
@@ -180,7 +191,7 @@ class Contact extends Base_Object_With_Meta {
 	public function get_tags_for_select2() {
 		$return = [];
 
-		foreach ( $this->get_tags() as $tag_id ) {
+		foreach ( $this->get_tag_ids() as $tag_id ) {
 			$tag = new Tag( $tag_id );
 
 			$return[] = [
@@ -839,7 +850,7 @@ class Contact extends Base_Object_With_Meta {
 				'ID'    => $this->get_id(),
 				'data'  => $contact,
 				'meta'  => $this->get_meta(),
-				'tags'  => $this->get_tags(),
+				'tags'  => $this->get_tag_ids(),
 				'files' => $this->get_files(),
 				'user'  => $this->user,
 				'notes' => $this->get_notes()

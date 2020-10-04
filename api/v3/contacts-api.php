@@ -524,7 +524,7 @@ class Contacts_Api extends Base {
 			return $contact;
 		}
 
-		return self::SUCCESS_RESPONSE( [ 'tags' => $contact->get_tags() ] );
+		return self::SUCCESS_RESPONSE( [ 'tags' => $contact->get_tag_ids() ] );
 	}
 
 	/**

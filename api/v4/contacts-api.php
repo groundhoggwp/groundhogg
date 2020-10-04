@@ -42,6 +42,14 @@ class Contacts_Api extends Resource_Base_Object_Api {
 				'permission_callback' => [ $this, 'update_permissions_callback' ]
 			],
 		] );
+
+		register_rest_route( self::NAME_SPACE, '/contacts/(?P<id>\d+)/merge', [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'merge' ],
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
+			],
+		] );
 	}
 
 	/**
@@ -326,7 +334,19 @@ class Contacts_Api extends Resource_Base_Object_Api {
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
 	public function create_tags( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
+		$ID = absint( $request->get_param( 'id' ) );
+
+		$contact = get_contactdata( $ID );
+
+		if ( ! is_a_contact( $contact ) ) {
+			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		$tags = $request->get_json_params();
+
+		$contact->apply_tag( $tags );
+
+		return self::SUCCESS_RESPONSE( [ 'tags' => $contact->get_tags() ] );
 	}
 
 	/**
@@ -336,7 +356,15 @@ class Contacts_Api extends Resource_Base_Object_Api {
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
 	public function read_tags( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
+		$ID = absint( $request->get_param( 'id' ) );
+
+		$contact = get_contactdata( $ID );
+
+		if ( ! is_a_contact( $contact ) ) {
+			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		return self::SUCCESS_RESPONSE( [ 'tags' => $contact->get_tags() ] );
 	}
 
 	/**
@@ -346,7 +374,7 @@ class Contacts_Api extends Resource_Base_Object_Api {
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function update_tags( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
+		return $this->create_tags( $request );
 	}
 
 	/**
@@ -356,7 +384,44 @@ class Contacts_Api extends Resource_Base_Object_Api {
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
 	public function delete_tags( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
+		$ID = absint( $request->get_param( 'id' ) );
+
+		$contact = get_contactdata( $ID );
+
+		if ( ! is_a_contact( $contact ) ) {
+			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		$tags = $request->get_json_params();
+
+		$contact->remove_tag( $tags );
+
+		return self::SUCCESS_RESPONSE( [ 'tags' => $contact->get_tags() ] );
+	}
+
+	/**
+	 * Merge one or more contacts with the provided contact record.
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return mixed|WP_Error|WP_REST_Response
+	 */
+	public function merge( WP_REST_Request $request ){
+		$ID = absint( $request->get_param( 'id' ) );
+
+		$contact = get_contactdata( $ID );
+
+		if ( ! is_a_contact( $contact ) ) {
+			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		$others = $request->get_json_params();
+
+		foreach ( $others as $other ){
+			$contact->merge( $other );
+		}
+
+		return $contact;
 	}
 
 	/**
