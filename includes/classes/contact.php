@@ -814,6 +814,20 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Delete a file
+	 *
+	 * @param $file_name string
+	 */
+	public function delete_file( $file_name ){
+		$file_name = basename( $file_name );
+		foreach ( $this->get_files() as $file ){
+			if ( $file_name === $file[ 'file_name' ] ){
+				unlink( $file[ 'file_path' ] );
+			}
+		}
+	}
+
+	/**
 	 * Get the age of the contact
 	 *
 	 * @return int
@@ -919,6 +933,15 @@ class Contact extends Base_Object_With_Meta {
 
 		// May use this later...
 		$this->update_meta( 'previous_merge_data', $other->data );
+		$uploads_dir = $this->get_uploads_folder();
+
+		// Move any files to this contacts uploads folder.
+		foreach ( $other->get_files() as $file ){
+			$file_path = $file[ 'file_path' ];
+			$file_name = $file[ 'file_name' ];
+
+			rename( $file_path, $uploads_dir[ 'path' ] . '/' . $file_name );
+		}
 
 		/**
 		 * Fires before the $other is permanently deleted.

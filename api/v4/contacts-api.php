@@ -17,6 +17,7 @@ use WP_REST_Response;
 use WP_Error;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\is_email_address_in_use;
+use function Groundhogg\normalize_files;
 use function Groundhogg\sanitize_object_meta;
 
 class Contacts_Api extends Resource_Base_Object_Api {
@@ -40,6 +41,24 @@ class Contacts_Api extends Resource_Base_Object_Api {
 				'methods'             => WP_REST_Server::DELETABLE,
 				'callback'            => [ $this, 'delete_tags' ],
 				'permission_callback' => [ $this, 'update_permissions_callback' ]
+			],
+		] );
+
+		register_rest_route( self::NAME_SPACE, '/contacts/(?P<id>\d+)/files', [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'create_files' ],
+				'permission_callback' => [ $this, 'create_files_permissions_callback' ]
+			],
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'read_files' ],
+				'permission_callback' => [ $this, 'read_files_permissions_callback' ]
+			],
+			[
+				'methods'             => WP_REST_Server::DELETABLE,
+				'callback'            => [ $this, 'delete_files' ],
+				'permission_callback' => [ $this, 'delete_files_permissions_callback' ]
 			],
 		] );
 
@@ -72,7 +91,7 @@ class Contacts_Api extends Resource_Base_Object_Api {
 	public function create( WP_REST_Request $request ) {
 
 		// Create single maybe?
-		if ( $request->get_param( 'data' ) ){
+		if ( $request->get_param( 'data' ) ) {
 			return $this->create_single( $request );
 		}
 
@@ -350,6 +369,7 @@ class Contacts_Api extends Resource_Base_Object_Api {
 	}
 
 	/**
+	 * Fetch tags associated with the contact record
 	 *
 	 * @param WP_REST_Request $request
 	 *
@@ -368,6 +388,7 @@ class Contacts_Api extends Resource_Base_Object_Api {
 	}
 
 	/**
+	 * Add tags to a contact record
 	 *
 	 * @param WP_REST_Request $request
 	 *
@@ -378,6 +399,7 @@ class Contacts_Api extends Resource_Base_Object_Api {
 	}
 
 	/**
+	 * Remove tags from a contact record
 	 *
 	 * @param WP_REST_Request $request
 	 *
@@ -400,13 +422,102 @@ class Contacts_Api extends Resource_Base_Object_Api {
 	}
 
 	/**
+	 * Upload a file to a contact record.
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function create_files( WP_REST_Request $request ){
+		$ID = absint( $request->get_param( 'id' ) );
+
+		$contact = get_contactdata( $ID );
+
+		if ( ! is_a_contact( $contact ) ) {
+			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		if ( empty( $_FILES ) ){
+			return self::ERROR_422( 'error', 'No files provided.' );
+		}
+
+		foreach ( $_FILES as $file ){
+			$result = $contact->upload_file( $file );
+
+			if ( is_wp_error( $request ) ){
+				return $result;
+			}
+		}
+
+		return self::SUCCESS_RESPONSE( [
+			'items'       => $contact->get_files(),
+			'total_items' => count( $contact->get_files() )
+		] );
+	}
+
+	/**
+	 * Get contact files
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function read_files( WP_REST_Request $request ) {
+		$ID = absint( $request->get_param( 'id' ) );
+
+		$contact = get_contactdata( $ID );
+
+		if ( ! is_a_contact( $contact ) ) {
+			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		return self::SUCCESS_RESPONSE( [
+			'items'       => $contact->get_files(),
+			'total_items' => count( $contact->get_files() )
+		] );
+	}
+
+	/**
+	 * Delete a file from the contact record.
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function delete_files( WP_REST_Request $request ){
+
+		$ID = absint( $request->get_param( 'id' ) );
+
+		$contact = get_contactdata( $ID );
+
+		if ( ! is_a_contact( $contact ) ) {
+			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		$files_to_delete = $request->get_json_params();
+
+		if ( empty( $files_to_delete ) ){
+			return self::ERROR_422( 'error', 'Did not specify a file to delete.' );
+		}
+
+		foreach ( $files_to_delete as $file_name ){
+			$contact->delete_file( $file_name );
+		}
+
+		return self::SUCCESS_RESPONSE( [
+			'items'       => $contact->get_files(),
+			'total_items' => count( $contact->get_files() )
+		] );
+	}
+
+	/**
 	 * Merge one or more contacts with the provided contact record.
 	 *
 	 * @param WP_REST_Request $request
 	 *
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
-	public function merge( WP_REST_Request $request ){
+	public function merge( WP_REST_Request $request ) {
 		$ID = absint( $request->get_param( 'id' ) );
 
 		$contact = get_contactdata( $ID );
@@ -417,7 +528,7 @@ class Contacts_Api extends Resource_Base_Object_Api {
 
 		$others = $request->get_json_params();
 
-		foreach ( $others as $other ){
+		foreach ( $others as $other ) {
 			$contact->merge( $other );
 		}
 
@@ -467,5 +578,42 @@ class Contacts_Api extends Resource_Base_Object_Api {
 	 */
 	public function delete_permissions_callback() {
 		return current_user_can( 'delete_contacts' );
+	}
+
+	/**
+	 * Permissions callback for files
+	 *
+	 * @return bool
+	 */
+	public function create_files_permissions_callback() {
+		return current_user_can( 'download_contact_files' );
+	}
+
+
+	/**
+	 * Permissions callback for files
+	 *
+	 * @return bool
+	 */
+	public function read_files_permissions_callback() {
+		return current_user_can( 'download_contact_files' );
+	}
+
+	/**
+	 * Permissions callback for files
+	 *
+	 * @return bool
+	 */
+	public function update_files_permissions_callback() {
+		return current_user_can( 'download_contact_files' );
+	}
+
+	/**
+	 * Permissions callback for files
+	 *
+	 * @return bool
+	 */
+	public function delete_files_permissions_callback() {
+		return current_user_can( 'download_contact_files' );
 	}
 }
