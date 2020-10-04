@@ -856,7 +856,6 @@ class Contact extends Base_Object_With_Meta {
 		return sprintf( "%s (%s)", $this->get_full_name(), $this->get_email() );
 	}
 
-
 	public function get_company() {
 		return $this->get_meta( 'company_name' );
 	}
@@ -883,5 +882,43 @@ class Contact extends Base_Object_With_Meta {
 		return $data;
 	}
 
+	/**
+	 * Merge $other into $this
+	 * - Fills out missing info in $this from $other
+	 * - Updates all events for $other with $this' ID
+	 * - Updates all activity for $other with $this' ID
+	 * - Updates all notes for $other with $this' ID
+	 * - Move all files to $this' file folder
+	 * - Deletes $other
+	 *
+	 * @param int|string|Contact $other
+	 *
+	 * @return bool
+	 */
+	public function merge( $other ) {
 
+		$other = get_contactdata( $other );
+
+		if ( ! is_a_contact( $other ) ) {
+			return false;
+		}
+
+		$data = array_merge( $other->data, $this->data );
+		$this->update( $data );
+
+		// May use this later...
+		$this->update_meta( 'previous_merge_data', $other->data );
+
+		/**
+		 * Fires before the $other is permanently deleted.
+		 *
+		 * @param $primary Contact
+		 * @param $other Contact
+		 */
+		do_action( 'groundhogg/contact/merge', $this, $other );
+
+		$other->delete();
+
+		return true;
+	}
 }

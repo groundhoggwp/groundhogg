@@ -33,8 +33,10 @@ function get_current_contact() {
  * @return false|Contact
  */
 function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
-	if ( ! $contact_id_or_email ) {
 
+	if ( is_a_contact( $contact_id_or_email ) ) {
+		return $contact_id_or_email;
+	} else if ( ! $contact_id_or_email ) {
 		if ( Event_Queue::is_processing() ) {
 			return Plugin::instance()->event_queue->get_current_contact();
 		}
