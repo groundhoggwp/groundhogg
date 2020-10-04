@@ -17,7 +17,6 @@ use WP_REST_Response;
 use WP_Error;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\is_email_address_in_use;
-use function Groundhogg\normalize_files;
 use function Groundhogg\sanitize_object_meta;
 
 class Contacts_Api extends Resource_Base_Object_Api {

@@ -316,12 +316,18 @@ abstract class Resource_Base_Object_Api extends Base_Api {
 	 */
 	public function update( WP_REST_Request $request ) {
 
+		$where = $request->get_param( 'where' );
+
 		$args = array(
-			'where' => $request->get_param( 'where' ),
+			'where' => $where,
 		);
 
 		$data = $request->get_param( 'data' ) ?: [];
 		$meta = $request->get_param( 'meta' ) ?: [];
+
+		if ( empty( $data ) || empty( $where )){
+			return self::ERROR_422( 'error', 'No data to update.' );
+		}
 
 		$items = $this->get_db_table()->query( $args );
 		$items = array_map( [ $this, 'map_raw_object_to_class' ], $items );
@@ -353,9 +359,15 @@ abstract class Resource_Base_Object_Api extends Base_Api {
 	 */
 	public function delete( WP_REST_Request $request ) {
 
+		$where = $request->get_param( 'where' );
+
 		$args = array(
-			'where' => $request->get_param( 'where' ),
+			'where' => $where,
 		);
+
+		if ( empty( $where ) ){
+			return self::ERROR_422( 'error', 'Please specify items to delete.' );
+		}
 
 		$items = $this->get_db_table()->query( $args );
 		$items = array_map( [ $this, 'map_raw_object_to_class' ], $items );
