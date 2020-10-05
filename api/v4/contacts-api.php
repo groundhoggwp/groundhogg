@@ -27,13 +27,13 @@ class Contacts_Api extends Base_Object_Api {
 
 		register_rest_route( self::NAME_SPACE, '/contacts/(?P<id>\d+)/tags', [
 			[
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'read_tags' ],
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'create_tags' ],
 				'permission_callback' => [ $this, 'update_permissions_callback' ]
 			],
 			[
-				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'create_tags' ],
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'read_tags' ],
 				'permission_callback' => [ $this, 'update_permissions_callback' ]
 			],
 			[
