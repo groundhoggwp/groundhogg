@@ -96208,12 +96208,8 @@ var _PageLayout = /*#__PURE__*/function (_Component2) {
     key: "render",
     value: function render() {
       return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_7__["createElement"])(react_router_dom__WEBPACK_IMPORTED_MODULE_12__["BrowserRouter"], {
-        basename: "/wp-admin/groundhogg"
-      }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_7__["createElement"])(react_router_dom__WEBPACK_IMPORTED_MODULE_12__["Link"], {
-        to: "/"
-      }, "Dashboard"), " | ", Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_7__["createElement"])(react_router_dom__WEBPACK_IMPORTED_MODULE_12__["Link"], {
-        to: "/reports"
-      }, "Reports"), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_7__["createElement"])(react_router_dom__WEBPACK_IMPORTED_MODULE_12__["Switch"], null, Object(_controller__WEBPACK_IMPORTED_MODULE_20__["getPages"])().map(function (page) {
+        basename: window.Groundhogg.preloadSettings.basename
+      }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_7__["createElement"])(react_router_dom__WEBPACK_IMPORTED_MODULE_12__["Switch"], null, Object(_controller__WEBPACK_IMPORTED_MODULE_20__["getPages"])().map(function (page) {
         return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_7__["createElement"])(react_router_dom__WEBPACK_IMPORTED_MODULE_12__["Route"], {
           key: page.path,
           path: page.path,
@@ -98016,23 +98012,32 @@ var isNotesRequesting = function isNotesRequesting(state, selector) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-var TYPES = {
-  FETCH_CONTACTS_REQUEST: 'FETCH_CONTACTS_REQUEST',
-  FETCH_CONTACTS_SUCCESS: 'FETCH_CONTACTS_SUCCESS',
-  FETCH_MORE_CONTACTS_SUCCESS: 'FETCH_MORE_CONTACTS_SUCCESS',
-  FETCH_CONTACTS_FAILED: 'FETCH_CONTACTS_FAILED',
+/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/defineProperty */ "./node_modules/@babel/runtime/helpers/defineProperty.js");
+/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__);
+
+
+var _TYPES;
+
+var TYPES = (_TYPES = {
+  /** Interface Actions */
   SHOW_CONTACT_FILTERS: 'SHOW_CONTACT_FILTERS',
   CHANGE_CONTEXT: 'CHANGE_CONTEXT',
   CHANGE_QUERY: 'CHANGE_QUERY',
   CLEAR_ITEMS: 'CLEAR_ITEMS',
   CLEAR_STATE: 'CLEAR_STATE',
-  DELETE_CONTACTS: 'DELETE_CONTACTS',
   FILTER_CONTACTS: 'FILTER_CONTACTS',
-  FETCH_CONTACT: 'FETCH_CONTACT',
+
+  /** CRUD (Contact Entity) Actions */
   ADD_CONTACT: 'ADD_CONTACT',
+  REQUEST_CONTACT: 'REQUEST_CONTACT',
   EDIT_CONTACT: 'EDIT_CONTACT',
-  DELETE_CONTACT: 'DELETE_CONTACT'
-};
+  DELETE_CONTACT: 'DELETE_CONTACT',
+
+  /** CRUD (Contact Collections) Actions */
+  REQUEST_CONTACTS: 'REQUEST_CONTACTS',
+  BULK_EDIT_CONTACTS: 'BULK_EDIT_CONTACTS',
+  DELETE_CONTACTS: 'DELETE_CONTACTS'
+}, _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "DELETE_CONTACTS", 'DELETE_CONTACTS_FAILED'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_IS_REQUESTING", 'SET_IS_REQUESTING'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_IS_UPDATING", 'SET_IS_UPDATING'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_IS_DELETING", 'SET_IS_DELETING'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_IS_ADDING", 'SET_IS_ADDING'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_REQUESTING_ERROR", 'SET_REQUESTING_ERROR'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_UPDATING_ERROR", 'SET_UPDATING_ERROR'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_DELETING_ERROR", 'SET_DELETING_ERROR'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_ADDING_ERROR", 'SET_ADDING_ERROR'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "REQUEST_CONTACT_TAGS", 'REQUEST_CONTACT_TAGS'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "ADD_CONTACT_TAGS", 'ADD_CONTACT_TAGS'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "DELETE_CONTACT_TAGS", 'DELETE_CONTACT_TAGS'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "REQUEST_CONTACT_FILES", 'REQUEST_CONTACT_FILES'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "ADD_CONTACT_FILES", 'ADD_CONTACT_FILES'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "DELETE_CONTACT_FILES", 'DELETE_CONTACT_FILES'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "MERGE_CONTACTS", 'MERGE_CONTACTS'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_IS_REQUESTING_TAGS", 'SET_IS_REQUESTING_TAGS'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_IS_DELETING_TAGS", 'SET_IS_DELETING_TAGS'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_IS_ADDING_TAGS", 'SET_IS_ADDING_TAGS'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_REQUESTING_TAGS_ERROR", 'SET_REQUESTING_TAGS_ERROR'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_DELETING_TAGS_ERROR", 'SET_DELETING_TAGS_ERROR'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_ADDING_TAGS_ERROR", 'SET_ADDING_TAGS_ERROR'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_IS_REQUESTING_FILES", 'SET_IS_REQUESTING_FILES'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_IS_DELETING_FILES", 'SET_IS_DELETING_FILES'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_IS_ADDING_FILES", 'SET_IS_ADDING_FILES'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_REQUESTING_FILES_ERROR", 'SET_REQUESTING_FILES_ERROR'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_DELETING_FILES_ERROR", 'SET_DELETING_FILES_ERROR'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_ADDING_FILES_ERROR", 'SET_ADDING_FILES_ERROR'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_IS_MERGING", 'SET_IS_MERGING'), _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TYPES, "SET_IS_MERGING_ERROR", 'SET_IS_MERGING_ERROR'), _TYPES);
 /* harmony default export */ __webpack_exports__["default"] = (TYPES);
 
 /***/ }),
@@ -98057,23 +98062,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "showContactFilters", function() { return showContactFilters; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fetchContacts", function() { return fetchContacts; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fetchMoreContacts", function() { return fetchMoreContacts; });
-/* harmony import */ var _wordpress_data_controls__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/data-controls */ "@wordpress/data-controls");
-/* harmony import */ var _wordpress_data_controls__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data_controls__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _action_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./action-types */ "./src/data/contacts/action-types.js");
-/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../constants */ "./src/data/constants.js");
-/**
- * External dependencies
- */
-
+/* harmony import */ var _action_types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./action-types */ "./src/data/contacts/action-types.js");
 /**
  * Internal dependencies
  */
 
-
-
 function setItems(itemType, query, items, totalCount) {
   return {
-    type: _action_types__WEBPACK_IMPORTED_MODULE_1__["default"].SET_ITEMS,
+    type: _action_types__WEBPACK_IMPORTED_MODULE_0__["default"].SET_ITEMS,
     items: items,
     itemType: itemType,
     query: query,
@@ -98082,7 +98078,7 @@ function setItems(itemType, query, items, totalCount) {
 }
 function setError(itemType, query, error) {
   return {
-    type: _action_types__WEBPACK_IMPORTED_MODULE_1__["default"].SET_ERROR,
+    type: _action_types__WEBPACK_IMPORTED_MODULE_0__["default"].SET_ERROR,
     itemType: itemType,
     query: query,
     error: error
@@ -98091,13 +98087,13 @@ function setError(itemType, query, error) {
 
 var fetchContactsRequest = function fetchContactsRequest() {
   return {
-    type: _action_types__WEBPACK_IMPORTED_MODULE_1__["default"].FETCH_CONTACTS_REQUEST
+    type: _action_types__WEBPACK_IMPORTED_MODULE_0__["default"].FETCH_CONTACTS_REQUEST
   };
 };
 
 var fetchContactsSuccess = function fetchContactsSuccess(data) {
   return {
-    type: _action_types__WEBPACK_IMPORTED_MODULE_1__["default"].FETCH_CONTACTS_SUCCESS,
+    type: _action_types__WEBPACK_IMPORTED_MODULE_0__["default"].FETCH_CONTACTS_SUCCESS,
     payload: {
       contacts: data.contacts,
       total: data.count
@@ -98107,35 +98103,35 @@ var fetchContactsSuccess = function fetchContactsSuccess(data) {
 
 var fetchMoreContactsSuccess = function fetchMoreContactsSuccess(contacts) {
   return {
-    type: _action_types__WEBPACK_IMPORTED_MODULE_1__["default"].FETCH_MORE_CONTACTS_SUCCESS,
+    type: _action_types__WEBPACK_IMPORTED_MODULE_0__["default"].FETCH_MORE_CONTACTS_SUCCESS,
     payload: contacts
   };
 };
 
 var fetchContactsFailed = function fetchContactsFailed(error) {
   return {
-    type: _action_types__WEBPACK_IMPORTED_MODULE_1__["default"].FETCH_CONTACTS_FAILED,
+    type: _action_types__WEBPACK_IMPORTED_MODULE_0__["default"].FETCH_CONTACTS_FAILED,
     payload: error
   };
 };
 
 var changeQuery = function changeQuery(queryVars) {
   return {
-    type: _action_types__WEBPACK_IMPORTED_MODULE_1__["default"].CHANGE_QUERY,
+    type: _action_types__WEBPACK_IMPORTED_MODULE_0__["default"].CHANGE_QUERY,
     payload: queryVars
   };
 };
 var clearItems = function clearItems() {
   return function (dispatch) {
     dispatch({
-      type: _action_types__WEBPACK_IMPORTED_MODULE_1__["default"].CLEAR_ITEMS
+      type: _action_types__WEBPACK_IMPORTED_MODULE_0__["default"].CLEAR_ITEMS
     });
   };
 };
 var updateQuery = function updateQuery(queryVars) {
   return function (dispatch) {
     dispatch({
-      type: _action_types__WEBPACK_IMPORTED_MODULE_1__["default"].CHANGE_QUERY,
+      type: _action_types__WEBPACK_IMPORTED_MODULE_0__["default"].CHANGE_QUERY,
       payload: queryVars
     });
   };
@@ -98153,7 +98149,7 @@ var resetQuery = function resetQuery() {
 var changeContext = function changeContext(context) {
   return function (dispatch) {
     dispatch({
-      type: _action_types__WEBPACK_IMPORTED_MODULE_1__["default"].CLEAR_ITEMS,
+      type: _action_types__WEBPACK_IMPORTED_MODULE_0__["default"].CLEAR_ITEMS,
       payload: context
     });
   };
@@ -98161,14 +98157,14 @@ var changeContext = function changeContext(context) {
 var clearState = function clearState() {
   return function (dispatch) {
     dispatch({
-      type: _action_types__WEBPACK_IMPORTED_MODULE_1__["default"].CLEAR_STATE
+      type: _action_types__WEBPACK_IMPORTED_MODULE_0__["default"].CLEAR_STATE
     });
   };
 };
 var showContactFilters = function showContactFilters() {
   return function (dispatch) {
     dispatch({
-      type: _action_types__WEBPACK_IMPORTED_MODULE_1__["default"].SHOW_CONTACT_FILTERS
+      type: _action_types__WEBPACK_IMPORTED_MODULE_0__["default"].SHOW_CONTACT_FILTERS
     });
   };
 };
