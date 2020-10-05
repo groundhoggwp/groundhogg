@@ -1,7 +1,3 @@
-/* External dependencies */
-import { addFilter } from '@wordpress/hooks';
-import { uniqueId } from 'lodash';
-
 /**
  * Add custom column to table.
  *
@@ -12,7 +8,7 @@ import { uniqueId } from 'lodash';
  * @param {object} data Object containing header and column data. Column is object containing value and display properties.
  */
 export const addTableColumn = ( table, data ) => {
-	return addFilter( 'groundhogg_custom_columns', uniqueId( `${table}_${data.header.label}_` ), data );
+	return wp.hooks.addFilter( 'groundhogg_custom_columns', lodash.uniqueId( `${table}_${data.header.label}_` ), data );
 }
 
 /**
@@ -24,7 +20,7 @@ export const addTableColumn = ( table, data ) => {
  * @param {*} navItem
  */
 export const registerNavItem = ( navItem ) => {
-	return addFilter( 'groundhogg_custom_columns', uniqueId( `${navItem.name}_` ), navItem, navItem.priority );
+	return wp.hooks.addFilter( 'groundhogg_custom_columns', lodash.uniqueId( `${navItem.name}_` ), navItem, navItem.priority );
 }
 
 /**
@@ -36,7 +32,7 @@ export const registerNavItem = ( navItem ) => {
  * @param {*} settingObject
  */
 export const registerSetting = ( settingObject ) => {
-	return addFilter( 'groundhogg_settings', uniqueId( `${settingObject.name}_` ), settingObject, settingObject.priority );
+	return wp.hooks.addFilter( 'groundhogg_settings', lodash.uniqueId( `${settingObject.name}_` ), settingObject, settingObject.priority );
 }
 /**
  * Register a settings panel in a settings panel.
@@ -47,5 +43,5 @@ export const registerSetting = ( settingObject ) => {
  * @param {*} settingsPanel
  */
 export const registerSettingsPanel = ( settingsPanel ) => {
-	return addFilter( 'groundhogg_settings_panels', uniqueId( `${settingsPanel.name}_` ), settingsPanel, settingsPanel.priority );
+	return wp.hooks.addFilter( 'groundhogg_settings_panels', lodash.uniqueId( `${settingsPanel.name}_` ), settingsPanel, settingsPanel.priority );
 }

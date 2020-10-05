@@ -3,7 +3,7 @@ import {
   registerNavItem,
   registerSetting,
   registerSettingsPanel
-} from './framework';
+} from './framework/index.js';
 
 ( function ($, nonces, endpoints, gh) {
 

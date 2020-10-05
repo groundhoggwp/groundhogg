@@ -19,7 +19,6 @@ use WP_Error;
 
 class Tracking_Api extends Base {
 
-
 	public function register_routes() {
 		register_rest_route( self::NAME_SPACE, '/tracking/page-view', [
 			[
