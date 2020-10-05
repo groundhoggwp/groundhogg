@@ -4,7 +4,6 @@ namespace Groundhogg\Admin;
 
 use Groundhogg\Plugin;
 use function Groundhogg\get_url_var;
-use function Groundhogg\wpgh_get_referer;
 use function Groundhogg\groundhogg_logo;
 
 class React_App {
