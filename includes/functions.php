@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Classes\Activity;
 use Groundhogg\Lib\Mobile\Iso3166;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
@@ -32,8 +33,10 @@ function get_current_contact() {
  * @return false|Contact
  */
 function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
-	if ( ! $contact_id_or_email ) {
 
+	if ( is_a_contact( $contact_id_or_email ) ) {
+		return $contact_id_or_email;
+	} else if ( ! $contact_id_or_email ) {
 		if ( Event_Queue::is_processing() ) {
 			return Plugin::instance()->event_queue->get_current_contact();
 		}
@@ -72,7 +75,7 @@ function current_user_is( $role = 'subscriber' ) {
  * Internal URL builder.
  *
  * @param string $page
- * @param array  $args
+ * @param array $args
  *
  * @return string
  */
@@ -97,8 +100,8 @@ function admin_page_url( $page, $args = [] ) {
 /**
  * Similar to wp_list_pluck in that we take the ID and the title and match them up.
  *
- * @param array  $data      array[]
- * @param string $id_col    string
+ * @param array $data array[]
+ * @param string $id_col string
  * @param string $title_col string
  *
  * @return array
@@ -196,8 +199,8 @@ function isset_not_empty( $array, $key = '' ) {
  * Get a variable from the $_REQUEST global
  *
  * @param string $key
- * @param bool   $default
- * @param bool   $post_only
+ * @param bool $default
+ * @param bool $post_only
  *
  * @return mixed
  */
@@ -221,7 +224,7 @@ function set_request_var( $key, $value ) {
  * Get a variable from the $_POST global
  *
  * @param string $key
- * @param bool   $default
+ * @param bool $default
  *
  * @return mixed
  */
@@ -233,7 +236,7 @@ function get_post_var( $key = '', $default = false ) {
  * Get a variable from the $_GET global
  *
  * @param string $key
- * @param bool   $default
+ * @param bool $default
  *
  * @return mixed
  */
@@ -245,7 +248,7 @@ function get_url_var( $key = '', $default = false ) {
  * Get a variable from the $_GET global
  *
  * @param string $key
- * @param bool   $default
+ * @param bool $default
  *
  * @return mixed
  */
@@ -256,8 +259,8 @@ function get_url_param( $key = '', $default = false ) {
 /**
  * Get a db query from the URL.
  *
- * @param array $default       a default query if the given is empty
- * @param array $force         for the query to include the given
+ * @param array $default a default query if the given is empty
+ * @param array $force for the query to include the given
  * @param array $accepted_keys for the query to include the given
  *
  * @return array|string
@@ -335,7 +338,7 @@ function validate_tags( $maybe_tags ) {
 /**
  * Replacements Wrapper.
  *
- * @param string      $content
+ * @param string $content
  * @param int|Contact $contact_id
  *
  * @return string
@@ -380,7 +383,7 @@ function decrypt( $data ) {
  *
  * @param        $array
  * @param string $key
- * @param bool   $default
+ * @param bool $default
  *
  * @return mixed
  */
@@ -568,9 +571,9 @@ function dequeue_wc_css_compat() {
 /**
  * Enqueues the modal scripts
  *
- * @since 1.0.5
  * @return Modal
  *
+ * @since 1.0.5
  */
 function enqueue_groundhogg_modal() {
 	return Modal::instance();
@@ -660,7 +663,7 @@ function array_to_css( $atts ) {
  * Get a cookie value
  *
  * @param string $cookie
- * @param bool   $default
+ * @param bool $default
  *
  * @return mixed
  */
@@ -672,8 +675,8 @@ function get_cookie( $cookie = '', $default = false ) {
  * Set a cookie the WP way
  *
  * @param string $cookie
- * @param mixed  $value
- * @param int    $expiration
+ * @param mixed $value
+ * @param int $expiration
  *
  * @return bool
  */
@@ -741,29 +744,27 @@ function get_return_path_email() {
  * Overwrite the regular WP_Mail with an identical function but use our modified PHPMailer class instead
  * which sends the email to the Groundhogg Sending Service.
  *
+ * @param string|array $attachments Optional. Files to attach.
+ *
+ * @param string|array $to Array or comma-separated list of email addresses to send message.
+ *
+ * @param string $subject Email subject
+ * @param string $message Message contents
+ *
+ * @param string|array $headers Optional. Additional headers.
+ *
+ * @return bool Whether the email contents were sent successfully.
  * @throws \Exception
  *
  * @since      1.2.10
  * @deprecated 2.1.11
  *
- * @param string|array $attachments Optional. Files to attach.
- *
- * @param string|array $to          Array or comma-separated list of email addresses to send message.
- *
- * @param string       $subject     Email subject
- * @param string       $message     Message contents
- *
- * @param string|array $headers     Optional. Additional headers.
- *
- * @return bool Whether the email contents were sent successfully.
  */
 function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = array() ) {
 	// Compact the input, apply the filters, and extract them back out
 
 	/**
 	 * Filters the wp_mail() arguments.
-	 *
-	 * @since 2.2.0
 	 *
 	 * @param array $args A compacted array of wp_mail() arguments, including the "to" email,
 	 *                    subject, message, headers, and attachments values.
@@ -937,9 +938,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the email address to send from.
 	 *
-	 * @since 2.2.0
-	 *
 	 * @param string $from_email Email address to send from.
+	 *
+	 * @since 2.2.0
 	 *
 	 */
 	$from_email = apply_filters( 'wp_mail_from', $from_email );
@@ -947,9 +948,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the name to associate with the "from" email address.
 	 *
-	 * @since 2.3.0
-	 *
 	 * @param string $from_name Name associated with the "from" email address.
+	 *
+	 * @since 2.3.0
 	 *
 	 */
 	$from_name = apply_filters( 'wp_mail_from_name', $from_name );
@@ -1017,9 +1018,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the wp_mail() content type.
 	 *
-	 * @since 2.3.0
-	 *
 	 * @param string $content_type Default wp_mail() content type.
+	 *
+	 * @since 2.3.0
 	 *
 	 */
 	$content_type = apply_filters( 'wp_mail_content_type', $content_type );
@@ -1046,9 +1047,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the default wp_mail() charset.
 	 *
-	 * @since 2.3.0
-	 *
 	 * @param string $charset Default email charset.
+	 *
+	 * @since 2.3.0
 	 *
 	 */
 	$phpmailer->CharSet = apply_filters( 'wp_mail_charset', $charset );
@@ -1077,9 +1078,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Fires after PHPMailer is initialized.
 	 *
-	 * @since 2.2.0
-	 *
 	 * @param \PHPMailer $phpmailer The PHPMailer instance (passed by reference).
+	 *
+	 * @since 2.2.0
 	 *
 	 */
 	do_action_ref_array( 'phpmailer_init', array( &$phpmailer ) );
@@ -1113,10 +1114,10 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 		/**
 		 * Fires after a phpmailerException is caught.
 		 *
-		 * @since 4.4.0
-		 *
 		 * @param WP_Error $error A WP_Error object with the phpmailerException message, and an array
 		 *                        containing the mail recipient, subject, message, headers, and attachments.
+		 *
+		 * @since 4.4.0
 		 *
 		 */
 		do_action( 'wp_mail_failed', new WP_Error( 'wp_mail_failed', $e->getMessage(), $mail_error_data ) );
@@ -1281,7 +1282,7 @@ function create_contact_from_user( $user, $sync_meta = false ) {
  * Create a user from a contact
  *
  * @param        $contact       Contact
- * @param string $role          string
+ * @param string $role string
  * @param string $notifications string|bool
  *
  * @return int|false
@@ -1389,9 +1390,9 @@ function get_form_list() {
 /**
  * Schedule a 1 off email notification
  *
- * @param int        $email_id            the ID of the email to send
+ * @param int $email_id the ID of the email to send
  * @param int|string $contact_id_or_email the ID of the contact to send to
- * @param int        $time                time time to send at, defaults to time()
+ * @param int $time time time to send at, defaults to time()
  *
  * @return bool whether the scheduling was successful.
  */
@@ -1574,9 +1575,9 @@ function get_csv_delimiter( $file_path ) {
 
 	$handle = fopen( $file_path, 'r' );
 
-	if ( ! $handle ){
-	    return ',';
-    }
+	if ( ! $handle ) {
+		return ',';
+	}
 
 	$delimiters = [ "\t", ";", "|", "," ];
 	$data_1     = [];
@@ -1605,18 +1606,18 @@ function get_csv_delimiter( $file_path ) {
  *
  * @param string $file_path
  *
- * @param bool   $delimiter
+ * @param bool $delimiter
  *
  * @return array
  */
-function get_items_from_csv( $file_path = '', $delimiter=false ) {
+function get_items_from_csv( $file_path = '', $delimiter = false ) {
 
 	if ( ! file_exists( $file_path ) ) {
 		return [];
 	}
 
 	// If a delimiter is not provided, make a guess.
-	if ( ! $delimiter ){
+	if ( ! $delimiter ) {
 		$delimiter = get_csv_delimiter( $file_path ) ?: ',';
 	}
 
@@ -1706,13 +1707,13 @@ function get_mappable_fields( $extra = [] ) {
 /**
  * Generate a contact from given associative array and a field map.
  *
- * @throws \Exception
- *
  * @param $map    array map of field_ids to contact keys
  *
  * @param $fields array the raw data from the source
  *
  * @return Contact|false
+ * @throws \Exception
+ *
  */
 function generate_contact_with_map( $fields, $map = [] ) {
 
@@ -2044,10 +2045,10 @@ function scheduled_time( $time, $date_prefix = 'on' ) {
 /**
  * Render html for a time column with an associated contact
  *
- * @param int          $time            the time to display
- * @param bool         $show_local_time whether to also show local time
- * @param bool|Contact $contact         the contact to get the local time from.
- * @param string       $date_prefix
+ * @param int $time the time to display
+ * @param bool $show_local_time whether to also show local time
+ * @param bool|Contact $contact the contact to get the local time from.
+ * @param string $date_prefix
  *
  * @return string
  */
@@ -2122,7 +2123,7 @@ function floating_phil() {
  * Show the logo.
  *
  * @param string $color
- * @param int    $width
+ * @param int $width
  *
  * @return string|bool
  */
@@ -2319,11 +2320,11 @@ function add_managed_rewrite_rule( $regex = '', $query = '', $after = 'top' ) {
 }
 
 /**
- * @deprecated since 2.0.9.2
- *
  * @param string $string
  *
  * @return string
+ * @deprecated since 2.0.9.2
+ *
  */
 function managed_rewrite_rule( $string = '' ) {
 	return sprintf( 'index.php?pagename=%s&', get_managed_page_name() ) . $string;
@@ -2354,15 +2355,15 @@ function install_custom_rewrites() {
 /**
  * Retrieve URL with nonce added to URL query.
  *
- * @since 2.0.4
+ * @param string $actionurl URL to add nonce action.
  *
- * @param string     $actionurl URL to add nonce action.
+ * @param int|string $action Optional. Nonce action name. Default -1.
  *
- * @param int|string $action    Optional. Nonce action name. Default -1.
- *
- * @param string     $name      Optional. Nonce name. Default '_wpnonce'.
+ * @param string $name Optional. Nonce name. Default '_wpnonce'.
  *
  * @return string
+ * @since 2.0.4
+ *
  */
 function nonce_url_no_amp( $actionurl, $action = - 1, $name = '_wpnonce' ) {
 	return add_query_arg( $name, wp_create_nonce( $action ), $actionurl );
@@ -2373,7 +2374,7 @@ function nonce_url_no_amp( $actionurl, $action = - 1, $name = '_wpnonce' ) {
  *
  * @param        $icon
  * @param string $wrap
- * @param array  $atts
+ * @param array $atts
  *
  * @return string
  */
@@ -2398,7 +2399,7 @@ function dashicon( $icon, $wrap = 'span', $atts = [], $echo = false ) {
  *
  * @param        $icon
  * @param string $wrap
- * @param array  $atts
+ * @param array $atts
  */
 function dashicon_e( $icon, $wrap = 'span', $atts = [] ) {
 	dashicon( $icon, $wrap, $atts, true );
@@ -2472,10 +2473,10 @@ function is_main_blog() {
  * Glorified wp_remote_post wrapper
  *
  * @param string $url
- * @param array  $body
+ * @param array $body
  * @param string $method
- * @param array  $headers
- * @param bool   $as_array
+ * @param array $headers
+ * @param bool $as_array
  *
  * @return array|bool|WP_Error|object
  */
@@ -2590,9 +2591,9 @@ function file_access_url( $path, $download = false ) {
 /**
  * Triggers the API benchmark
  *
- * @param string $call_name   the name you wish to call
+ * @param string $call_name the name you wish to call
  * @param string $id_or_email id or email of the contact
- * @param bool   $by_user_id  whether the ID is the ID of a WP user
+ * @param bool $by_user_id whether the ID is the ID of a WP user
  */
 function do_api_trigger( $call_name = '', $id_or_email = '', $by_user_id = false ) {
 	do_action( 'groundhogg/steps/benchmarks/api', $call_name, $id_or_email, $by_user_id );
@@ -2603,7 +2604,7 @@ function do_api_trigger( $call_name = '', $id_or_email = '', $by_user_id = false
  *
  * @param string $call_name
  * @param string $id_or_email
- * @param bool   $by_user_id
+ * @param bool $by_user_id
  */
 function do_api_benchmark( $call_name = '', $id_or_email = '', $by_user_id = false ) {
 	do_api_trigger( $call_name, $id_or_email, $by_user_id );
@@ -2729,7 +2730,7 @@ function parse_inline_styles( $style ) {
  * echo an action input, similar to wp_nonce_field
  *
  * @param string $action
- * @param bool   $echo
+ * @param bool $echo
  *
  * @return bool|string
  */
@@ -2827,7 +2828,7 @@ function mobile_validator() {
  *
  * @param        $number       string
  * @param string $country_code the country code of the supposed contact
- * @param bool   $with_plus    whether to return with the + or not
+ * @param bool $with_plus whether to return with the + or not
  *
  * @return bool|string
  */
@@ -3208,7 +3209,7 @@ function get_user_test_email( $user_id = 0 ) {
  * Update a user's preferred test email address.
  *
  * @param string $email
- * @param int    $user_id
+ * @param int $user_id
  *
  * @return bool|int
  */
@@ -3354,7 +3355,7 @@ function is_groundhogg_network_active() {
  * Do an action after a contact has been created or updated
  *
  * @param int|Contact|Email $contact
- * @param string            $hook
+ * @param string $hook
  *
  * @return bool
  */
@@ -3404,7 +3405,7 @@ function is_a_user( $user ) {
 
 /**
  * @param      $usage
- * @param bool $contact      Contact
+ * @param bool $contact Contact
  * @param      $delete_after bool
  *
  * @return bool
@@ -3443,8 +3444,8 @@ function generate_permissions_key( $contact = false, $usage = 'preferences', $de
 
 /**
  * @param        $key     string
- * @param string $usage   string
- * @param bool   $contact Contact
+ * @param string $usage string
+ * @param bool $contact Contact
  *
  * @return bool
  */
@@ -3497,7 +3498,7 @@ function check_permissions_key( $key, $contact = false, $usage = 'preferences' )
  * @param        $contact
  *
  * @param string $usage
- * @param bool   $delete_after
+ * @param bool $delete_after
  *
  * @return string
  */
@@ -3530,7 +3531,7 @@ function get_permissions_key() {
  *
  * @param       $str
  * @param array $except
- * @param null  $delim
+ * @param null $delim
  *
  * @return mixed|string
  */
@@ -3662,6 +3663,123 @@ function fix_nested_p( $content ) {
 }
 
 /**
+ * Track activity that happens on site caused by a human.
+ * Use the tracking cookie to populate the main arguments.
+ *
+ * @param $type
+ * @param $details
+ */
+function track_live_activity( $type, $details = [] ) {
+
+	// Use tracked contact
+	$contact = get_contactdata();
+
+	// If there is not one available, skip
+	if ( ! is_a_contact( $contact ) ) {
+		return;
+	}
+
+	$args = [
+		'funnel_id'  => tracking()->get_current_funnel_id(),
+		'contact_id' => tracking()->get_current_contact_id(),
+		'email_id'   => tracking()->get_current_email_id(),
+		'event_id'   => tracking()->get_current_event()->get_id(),
+		'referer'    => tracking()->get_leadsource(),
+	];
+
+	track_activity( $type, $args, $details, $contact );
+}
+
+/**
+ * Log an activity conducted by the contact while they are performing actions on the site.
+ * Uses the cookie details for reporting.
+ *
+ * @param string $type string, an activity identifier
+ * @param array $args the details for the activity
+ * @param array $details details about that activity
+ * @param Contact $contact the contact to track
+ */
+function track_activity( $contact, $type, $args, $details = [] ) {
+
+	// If there is not one available, skip
+	if ( ! is_a_contact( $contact ) ) {
+		return;
+	}
+
+	// use tracking cookies to generate information for the activity log
+	$defaults = [
+		'activity_type' => $type,
+		'timestamp'     => time(),
+	];
+
+	// Merge overrides with args
+	$args = wp_parse_args( $defaults, $args );
+	$args = apply_filters( 'groundhogg/track_live_activity/args', $args, $contact );
+
+	// Add the activity to the DB
+	$id = get_db( 'activity' )->add( $args );
+
+	if ( ! $id ) {
+		return;
+	}
+
+	$activity = new Activity( $id );
+
+	// Add any details to the activity meta
+	foreach ( $details as $detail_key => $value ) {
+		$activity->update_meta( $detail_key, $value );
+	}
+
+	/**
+	 * Fires after some activity is tracked
+	 *
+	 * @param $activity Activity
+	 * @param $contact  Contact
+	 */
+	do_action( 'groundhogg/track_activity', $activity, $contact );
+}
+
+/**
+ * Return json response for meta picker.
+ */
+function handle_ajax_meta_picker() {
+
+	if ( ! current_user_can( 'edit_contacts' ) || ! wp_verify_nonce( get_post_var( 'nonce' ), 'meta-picker' ) ) {
+		wp_send_json_error();
+	}
+
+	$search = sanitize_text_field( get_post_var( 'term' ) );
+
+	$table = get_db( 'contactmeta' );
+
+	global $wpdb;
+
+	$keys = $wpdb->get_col(
+		"SELECT DISTINCT meta_key FROM {$table->get_table_name()} WHERE `meta_key` RLIKE '{$search}' ORDER BY meta_key ASC"
+	);
+
+	$response = array_map( function ( $key ) {
+		return [
+			'id'    => $key,
+			'label' => $key,
+			'value' => $key
+		];
+	}, $keys );
+
+	/**
+	 * Filter the json response for the meta key picker
+	 *
+	 * @param $response array[]
+	 * @param $search string
+	 */
+	$response = apply_filters( 'groundhogg/handle_ajax_meta_picker', $response, $search );
+
+	wp_send_json( $response );
+}
+
+add_action( 'wp_ajax_gh_meta_picker', __NAMESPACE__ . '\handle_ajax_meta_picker' );
+
+/**
  * Parse shortcodes and return an array
  *
  * @param $content string
@@ -3784,10 +3902,93 @@ function validate_form_json( $json ) {
 }
 
 /**
+ * Takes a string or int and returns a mysql friendly date
+ *
+ * @param $date string|int
+ *
+ * @return string|false
+ */
+function convert_to_mysql_date( $date ) {
+	if ( ! is_int( $date ) && ! is_string( $date ) ) {
+		return false;
+	}
+
+	return is_int( $date ) ? date( 'Y-m-d H:i:s', $date ) : date( 'Y-m-d H:i:s', strtotime( $date ) );
+}
+
+/**
  * @param $form
  *
  * @return array
  */
 function convert_form_shortcode_to_json( $form ) {
 	return validate_form_json( convert_shortcode_to_json( $form ) );
+}
+
+/**
+ * Map a function to the value of attr in an array or an object
+ *
+ * @param &$arr array|object
+ * @param $key string
+ * @param $func callable
+ */
+function map_func_to_attr( &$arr, $key, $func ) {
+	if ( isset_not_empty( $arr, $key ) ) {
+		if ( is_array( $arr ) ) {
+			$arr[ $key ] = call_user_func( $func, $arr[ $key ] );
+		} else if ( is_object( $arr ) ) {
+			$arr->$key = call_user_func( $func, $arr->$key );
+		}
+	}
+}
+
+/**
+ * Handle sanitization of contact meta is most likely situations.
+ *
+ * @param mixed $meta_value
+ * @param string $meta_key
+ * @param string $object_type
+ *
+ * @return string
+ */
+function sanitize_object_meta( $meta_value, $meta_key = '', $object_type = '' ) {
+	if ( is_string( $meta_value ) && strpos( $meta_value, PHP_EOL ) !== false ) {
+		$meta_value = sanitize_textarea_field( $meta_value );
+	} else if ( is_string( $meta_value ) ) {
+		$meta_value = sanitize_text_field( $meta_value );
+	}
+
+	/**
+	 * Filter the object meta
+	 *
+	 * @param mixed $meta_value
+	 * @param string $meta_key
+	 * @param string $object_type
+	 */
+	return apply_filters( 'groundhogg/sanitize_object_meta', $meta_value, $meta_key, $object_type );
+}
+
+/**
+ * Check if the email address is in use
+ * You can pass a contact record to double check against the current contact as well.
+ *
+ * @param string $email_address
+ * @param bool|Contact $current_contact
+ *
+ * @return bool
+ */
+function is_email_address_in_use( $email_address, $current_contact = false ) {
+
+	$contact = get_contactdata( $email_address );
+
+	// If there is no contact record
+	if ( ! is_a_contact( $contact ) ) {
+		return false;
+		// If there is a contact but it's the same as the one we are passing...
+	} else if ( is_a_contact( $current_contact ) && $contact->get_id() === $current_contact->get_id() ) {
+		return false;
+		// Otherwise
+	} else {
+		return true;
+	}
 }

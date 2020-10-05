@@ -3,10 +3,12 @@
 namespace Groundhogg\Classes;
 
 use Groundhogg\Base_Object;
+use Groundhogg\Base_Object_With_Meta;
 use Groundhogg\DB\DB;
+use Groundhogg\DB\Meta_DB;
 use function Groundhogg\get_db;
 
-class Activity extends Base_Object {
+class Activity extends Base_Object_With_Meta {
 	const EMAIL_OPENED    = 'email_opened';
 	const EMAIL_CLICKED   = 'email_link_click';
 	const FORM_IMPRESSION = 'form_impression';
@@ -42,5 +44,14 @@ class Activity extends Base_Object {
 	 */
 	protected function get_db() {
 		return get_db( 'activity' );
+	}
+
+	/**
+	 * Return a META DB instance associated with items of this type.
+	 *
+	 * @return Meta_DB
+	 */
+	protected function get_meta_db() {
+		return get_db( 'activitymeta' );
 	}
 }

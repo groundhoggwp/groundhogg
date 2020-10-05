@@ -8,8 +8,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Groundhogg\Admin\Dashboard\Dashboard_Widgets;
-use Groundhogg\Reports;
-use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use Groundhogg\Plugin;
 use function Groundhogg\show_groundhogg_branding;
@@ -23,53 +21,33 @@ use Groundhogg\Admin\Dashboard\Widgets;
 class Reports_Api extends Base {
 
 	public function register_routes() {
-//		$callback = $this->get_auth_callback();
-
-
-		register_rest_route( self::NAME_SPACE, '/reports', [
-			[
-				'methods'  => WP_REST_Server::READABLE,
-//				'permission_callback' => $callback,
-				'callback' => [ $this, 'get_report' ],
-//				'args'     => [
-//					'report'       => [
-//						'required' => true
-//					],
-//					'range'        => [
-//						'required' => true
-//					],
-//					'chart_format' => [
-//						'required' => false
-//					]
-//				]
-			],
-		] );
+		$callback = $this->get_auth_callback();
 
 		register_rest_route( self::NAME_SPACE, '/reports', [
 			[
-				'methods'  => WP_REST_Server::CREATABLE,
-//				'permission_callback' => $callback,
-				'callback' => [ $this, 'get_report_react' ],
-				'args'     => [
-//					'report'       => [
-//						'required' => true
-//					],
-//					'range'        => [
-//						'required' => true
-//					],
-//					'chart_format' => [
-//						'required' => false
-//					]
+				'methods'             => WP_REST_Server::READABLE,
+				'permission_callback' => $callback,
+				'callback'            => [ $this, 'get_report' ],
+				'args'                => [
+					'report'       => [
+						'required' => true
+					],
+					'range'        => [
+						'required' => true
+					],
+					'chart_format' => [
+						'required' => false
+					]
 				]
 			],
 		] );
 
 		register_rest_route( self::NAME_SPACE, '/reports/dashboard', [
 			[
-				'methods'  => WP_REST_Server::READABLE,
-//				'permission_callback' => $callback,
-				'callback' => [ $this, 'get_dashboard_reports' ],
-				'args'     => [
+				'methods'             => WP_REST_Server::READABLE,
+				'permission_callback' => $callback,
+				'callback'            => [ $this, 'get_dashboard_reports' ],
+				'args'                => [
 					'reports' => [
 						'required' => true,
 					],
@@ -161,90 +139,6 @@ class Reports_Api extends Base {
 
 		return self::SUCCESS_RESPONSE( $response );
 
-
 	}
-
-
-//	/**
-//	 *
-//	 *
-//	 * @param WP_REST_Request $request
-//	 *
-//	 * @return WP_Error|WP_REST_Response
-//	 */
-//	public function get_report_react( WP_REST_Request $request ) {
-//
-//
-//		$start_date = $request->get_param( 'start_date' );
-//
-//		if ( is_string( $start_date ) ) {
-//			$start_date = strtotime( $start_date );
-//		}
-//
-//		$end_date = $request->get_param( 'end_date' );
-//
-//		/**
-//		 * Get extra Data for fetching the contact
-//		 */
-//		$data = $request->get_param( 'data' );
-//
-//		$report_id = $request->get_param( 'id' );
-//
-//
-//		$reporting = new Reports( $start_date, $end_date, $data );
-//
-//		return self::SUCCESS_RESPONSE( $reporting->get_data( $report_id ) );
-//
-//	}
-
-
-
-
-
-	/**
-	 *
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return WP_Error|WP_REST_Response
-	 */
-	public function get_report_react( WP_REST_Request $request ) {
-
-
-
-
-
-
-		$start_date = $request->get_param( 'start_date' );
-
-		if ( is_string( $start_date ) ) {
-			$start_date = strtotime( $start_date );
-		}
-
-		$end_date = $request->get_param( 'end_date' );
-
-		/**
-		 * Get extra Data for fetching the contact
-		 */
-		$data = $request->get_param( 'data' );
-
-		$report_id = $request->get_param( 'id' );
-
-		$reports = $request->get_param( 'reports' );
-
-
-		$reporting = new Reports( $start_date, $end_date , $data );
-
-
-		$results = [] ;
-		foreach ( $reports as $report_id ) {
-			$results[ $report_id ] = $reporting->get_data( $report_id );
-		}
-
-		return self::SUCCESS_RESPONSE( $results);
-
-	}
-
-
 
 }

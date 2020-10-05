@@ -17,8 +17,6 @@ class API_V3 {
 
 
 	public function __construct() {
-
-
 		define( 'DOING_GROUNDHOGG_REST_REQUEST', true );
 
 		/**
@@ -30,17 +28,12 @@ class API_V3 {
 
 		do_action( 'groundhogg/api/v3/init', $this );
 
-		// Todo remove this after done testing
-		sleep( 1 );
-
 	}
 
 	/**
 	 * Declare the initial endpoints.
 	 */
 	public function declare_base_endpoints() {
-
-
 		$this->contacts        = new Contacts_Api();
 		$this->authentication  = new Authentication_Api();
 		$this->tags            = new Tags_Api();
@@ -51,10 +44,6 @@ class API_V3 {
 		$this->broadcasts      = new Broadcasts_Api();
 		$this->bulk_job        = new Bulk_Job_Api();
 		$this->unsubscribe_api = new Unsubscribe_Api();
-		$this->funnels_api     = new Funnels_Api();
-		$this->steps_api       = new Steps_Api();
-		$this->report_pages    = new Report_Pages_Api();
-		$this->events          = new Events_Api();
 	}
 
 	/**

@@ -343,6 +343,20 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Update the notes table to new format.
+	 */
+	public function version_3_0_a_1(){
+		get_db( 'notes' )->update_3_0();
+	}
+
+	/**
+	 * Add new roles/caps
+	 */
+	public function version_3_0_a_2(){
+		Plugin::instance()->roles->add_caps();
+	}
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -383,6 +397,8 @@ class Main_Updater extends Updater {
 			'2.2.19.2',
 			'2.2.19.3',
 			'2.2.19.4',
+			'3.0.a.1',
+			'3.0.a.2',
 		];
 	}
 
@@ -404,7 +420,8 @@ class Main_Updater extends Updater {
 			'2.2.19.2',
 			'2.2.19.3',
 			'2.2.19.4',
-
+			'3.0.a.1',
+			'3.0.a.2',
 		];
 	}
 

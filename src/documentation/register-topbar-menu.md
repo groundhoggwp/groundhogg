@@ -52,8 +52,8 @@ addFilter( 'groundhogg_navigation', 'gh-example/custom-navigation', navigation =
 } );
 
 /* Alternatively, a higher-level API may be used. */
-if (window.groundhogg) {
-        groundhogg.registerNavItem( {
+if (window.Groundhogg) {
+        Groundhogg.registerNavItem( {
             name: 'groundhogg_custom_nav_item',
 			priority: 10,
 			label: __( 'Advanced Integrations', 'groundhogg' ),

@@ -318,7 +318,7 @@ class Contacts_Table extends WP_List_Table {
 		if ( $contact->get_owner_id() ) {
 			$html .= '  <div class="owner">' . esc_html( $contact->get_owner_id() ) . '</div>';
 		}
-		$html .= '  <div class="tags">' . esc_html( json_encode( $contact->get_tags() ) ) . '</div>';
+		$html .= '  <div class="tags">' . esc_html( json_encode( $contact->get_tag_ids() ) ) . '</div>';
 		$html .= '  <div class="tags-data">' . esc_html( wp_json_encode( $contact->get_tags_for_select2() ) ) . '</div>';
 		$html .= '</div>';
 

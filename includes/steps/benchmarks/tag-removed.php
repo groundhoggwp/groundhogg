@@ -97,7 +97,7 @@ class Tag_Removed extends Tag_Applied {
 				$not_has_tags = in_array( $removed_tag, $tags );
 				break;
 			case 'all':
-				$diff         = array_diff( $tags, $this->get_current_contact()->get_tags() );
+				$diff         = array_diff( $tags, $this->get_current_contact()->get_tag_ids() );
 				$not_has_tags = in_array( $removed_tag, $tags ) && count( $diff ) === count( $tags );
 				break;
 		}

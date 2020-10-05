@@ -48,7 +48,7 @@ class Activity extends DB {
 	 * @return mixed
 	 */
 	public function get_db_version() {
-		return '2.0';
+		return '2.1';
 	}
 
 	/**
@@ -213,9 +213,9 @@ class Activity extends DB {
         contact_id bigint(20) unsigned NOT NULL,
         funnel_id bigint(20) unsigned NOT NULL,
         step_id bigint(20) unsigned NOT NULL,
-        activity_type VARCHAR(20) NOT NULL,
         email_id bigint(20) unsigned NOT NULL,
         event_id bigint(20) unsigned NOT NULL,
+        activity_type VARCHAR({$this->get_max_index_length()}) NOT NULL,
         referer text NOT NULL,
         referer_hash varchar(20) NOT NULL,
         PRIMARY KEY (ID),
@@ -223,7 +223,8 @@ class Activity extends DB {
         KEY funnel_id (funnel_id),
         KEY step_id (step_id),
         KEY event_id (event_id),
-        KEY referer_hash (referer_hash)
+        KEY referer_hash (referer_hash),
+        KEY activity_type (activity_type)
 		) $charset_collate;";
 
 		dbDelta( $sql );

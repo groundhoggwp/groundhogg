@@ -183,7 +183,7 @@ class Tag_Applied extends Benchmark {
 				$has_tags = in_array( $applied_tag, $tags );
 				break;
 			case 'all':
-				$intersect = array_intersect( $tags, $this->get_current_contact()->get_tags() );
+				$intersect = array_intersect( $tags, $this->get_current_contact()->get_tag_ids() );
 				$has_tags  = in_array( $applied_tag, $tags ) && count( $intersect ) === count( $tags );
 				break;
 		}
