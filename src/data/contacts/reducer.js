@@ -2,25 +2,8 @@
  * Internal dependencies
  */
 import TYPES from './action-types';
-
-const initialState = {
-	isRequesting: false,
-	isUpdating: false,
-	isCreating: false,
-	isDeleting: false,
-	showFilters: false,
-	total: 0,
-	context: {},
-	selected: [],
-	query: {
-	  number: 20,
-	  offset: 0,
-	  orderby: 'ID',
-	  order: 'DESC',
-	},
-	data: [],
-	error: {},
-};
+import { QUERY_DEFAULTS } from '../constants';
+import { initialState } from './initial-state';
 
 const contactsReducer = (
 	state = initialState,
