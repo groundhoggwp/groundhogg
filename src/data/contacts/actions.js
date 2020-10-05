@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import TYPES from './action-types';
+import { QUERY_DEFAULTS } from '../constants';
 
 //TODO: Ensure all CRUD actions are sync'd with parameters expected in API.
 //TODO: Inline docs.
@@ -264,25 +265,46 @@ export function setMergingError( error ) {
 }
 
 export function showContactFilters() {
-
+	return {
+		type: TYPES.SHOW_CONTACT_FILTERS,
+	};
 }
 
-export function changeContext() {
-
+export function changeContext( context ) {
+	return {
+		type: TYPES.CHANGE_CONTEXT,
+		context
+	};
 }
 
-export function changeQuery() {
-
+export function changeQuery( queryVars ) {
+	return {
+		type: TYPES.CHANGE_QUERY,
+		queryVars
+	};
 }
 
 export function clearItems() {
-
+	return {
+		type: TYPES.CLEAR_ITEMS,
+	};
 }
 
 export function clearState() {
-
+	return {
+		type: TYPES.CLEAR_STATE,
+	};
 }
 
 export function filterContacts() {
+	return {
+		type: TYPES.FILTER_CONTACTS,
+	};
+}
 
+export function resetQuery( queryVars = QUERY_DEFAULTS ) {
+	return {
+		type: TYPES.CHANGE_QUERY,
+		queryVars
+	};
 }
