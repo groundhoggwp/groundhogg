@@ -8,11 +8,18 @@ const tagsReducer = (
 		isUpdating: false,
 		isRequesting: false,
 		items: [],
+		item: null,
 		requestingErrors: {}
 	},
-	{ type, items, error, isUpdating, isRequesting, name }
+	{ type, items, error, isUpdating, isRequesting, name, item }
 ) => {
 	switch ( type ) {
+		case TYPES.RECEIVE_TAG:
+			state = {
+				...state,
+				item : item.data
+			};
+			break;
 		case TYPES.RECEIVE_TAGS:
 			state = {
 				...state,

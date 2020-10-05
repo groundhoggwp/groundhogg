@@ -12,15 +12,21 @@ import Spinner from '../../../core-ui/spinner';
  */
 import { TAGS_STORE_NAME } from '../../../../data';
 
+const singleEntityExample = ( ID, callback ) => {
+	let tag = callback( ID );
+	console.log( tag );
+}
+
 export const Dashboard = ( props ) => {
 	const [ stateTagValue, setTagValue ] = useState( '' );
 
 	const { updateTags } = useDispatch( TAGS_STORE_NAME );
 
-	const { tags, isRequesting, isUpdating } = useSelect( ( select ) => {
+	const { tags, getTag, isRequesting, isUpdating } = useSelect( ( select ) => {
 		const store = select( TAGS_STORE_NAME );
 		return {
 			tags : store.getTags(),
+			getTag : store.getTag,
 			isRequesting : store.isTagsRequesting(),
 			isUpdating: store.isTagsUpdating()
 		}
@@ -34,7 +40,7 @@ export const Dashboard = ( props ) => {
 			<Fragment>
 				<h2>Dashboard</h2>
 				<ol>
-					{ tags.map( tag => <li>{ tag.tag_name }</li> ) }
+					{ tags.map( tag => <li data-id={tag.ID} onClick={ () => { singleEntityExample( tag.ID, getTag ) } }>{ tag.tag_name }</li> ) }
 				</ol>
 				<TextField id="outlined-basic" label="Add Tags" variant="outlined" value={ stateTagValue } onChange={ ( event ) => setTagValue( event.target.value ) } />
 				<p onClick={ () => { updateTags( { tags : stateTagValue } ) } }>Add</p>

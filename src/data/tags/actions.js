@@ -16,6 +16,13 @@ export function receiveTags( items ) {
 	};
 }
 
+export function receiveTag( item ) {
+	return {
+		type: TYPES.RECEIVE_TAG,
+		item,
+	};
+}
+
 export function setRequestingError( error ) {
 	return {
 		type: TYPES.SET_REQUESTING_ERROR,
