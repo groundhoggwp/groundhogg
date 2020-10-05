@@ -13,7 +13,7 @@ import { Spinner } from '../../components';
 import { Dashboard } from './pages/dashboard';
 import { default as Reports } from './pages/reports';
 import { Broadcasts } from './pages/broadcast';
-import { default as Events } from './pages/events';
+import { Events } from './pages/events';
 
 export const PAGES_FILTER = 'groundhogg_navigation';
 

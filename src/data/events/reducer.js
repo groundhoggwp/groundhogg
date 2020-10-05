@@ -6,10 +6,11 @@ import TYPES from './action-types';
 const eventsReducer = (
 	state = {
 		isUpdating: false,
+		isRequesting: false,
 		events: [],
 		requestingErrors: {}
 	},
-	{ type, events, error, isUpdating, name }
+	{ type, events, error, isUpdating, name, isRequesting }
 ) => {
 	switch ( type ) {
 		case TYPES.RECEIVE_EVENTS:
@@ -23,6 +24,13 @@ const eventsReducer = (
 				...state,
 				...events,
 				isUpdating,
+			};
+			break;
+		case TYPES.SET_IS_REQUESTING:
+			state = {
+				...state,
+				...events,
+				isRequesting,
 			};
 			break;
 		case TYPES.SET_REQUESTING_ERROR:

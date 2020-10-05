@@ -71,6 +71,7 @@ export const Broadcasts = (props) => {
             <br/>
             <Button variant="contained" color="secondary" onClick={() => {
 
+                // set variables for the request
                 setEmailOrSmsId(474);
                 setTags( [168] );
                 setSendNow(true);

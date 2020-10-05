@@ -40,6 +40,14 @@ export function setIsUpdating( isUpdating ) {
 }
 
 
+export function setIsRequestingEvents( isRequesting ) {
+	return {
+		type: TYPES.SET_IS_REQUESTING,
+		isRequesting,
+	};
+}
+
+
 /**
  * Cancels the event is in processing
  */

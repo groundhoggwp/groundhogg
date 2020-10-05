@@ -139,18 +139,6 @@ class Events_Api extends Base {
 			];
 		}
 
-		// todo manage request query
-
-//		$request_query = get_request_query( [], [], array_keys( get_db( 'events' )->get_columns() ) );
-
-//		unset( $request_query['status'] );
-
-//		if ( ! empty( $request_query ) ) {
-//			foreach ( $request_query as $key => $value ) {
-//				$where[] = [ 'col' => $key, 'val' => $value, 'compare' => '=' ];
-//			}
-//		}
-
 		$args = array(
 			'where'   => $where,
 			'limit'   => $limit,
