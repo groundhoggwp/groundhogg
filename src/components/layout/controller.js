@@ -12,6 +12,8 @@ import { __ } from '@wordpress/i18n';
 import { Spinner } from '../../components';
 import { Dashboard } from './pages/dashboard';
 import { Reports } from './pages/reports';
+import { Emails } from './pages/emails';
+import { Tags } from './pages/tags';
 
 export const PAGES_FILTER = 'groundhogg_navigation';
 
@@ -28,6 +30,15 @@ export const getPages = () => {
 	pages.push( {
 		container: Reports,
 		path: '/reports',
+	} );
+
+	pages.push( {
+		container: Emails,
+		path: '/emails',
+	} );
+	pages.push( {
+		container: Tags,
+		path: '/tags',
 	} );
 
 	return applyFilters( PAGES_FILTER, pages );

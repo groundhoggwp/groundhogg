@@ -664,7 +664,7 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				),
 			),
-			'gh_hide_tooltips'                 => array(
+			'gh_hide_tooltips'                       => array(
 				'id'      => 'gh_hide_tooltips',
 				'section' => 'misc_info',
 				'label'   => _x( 'Hide Tooltips', 'settings', 'groundhogg' ),
@@ -1049,8 +1049,8 @@ class Settings_Page extends Admin_Page {
 				'desc'    => sprintf( _x( 'URLs containing these strings will not be tracked. For example, adding <code>/my-page/</code> would exclude <code>%s/my-page/download/</code>. You can also enter full URLs and URLs of other domains such as <code>https://wordpress.org</code>. To match an exact path use <code>$</code> at the end of the path.', 'settings', 'groundhogg' ), site_url() ),
 				'type'    => 'textarea',
 				'atts'    => array(
-					'name'  => 'gh_url_tracking_exclusions',
-					'id'    => 'gh_url_tracking_exclusions',
+					'name' => 'gh_url_tracking_exclusions',
+					'id'   => 'gh_url_tracking_exclusions',
 				),
 			]
 		);
@@ -1091,7 +1091,10 @@ class Settings_Page extends Admin_Page {
 				$this,
 				'settings_callback'
 			), 'gh_' . $this->sections[ $setting['section'] ]['tab'], 'gh_' . $setting['section'], $setting );
-			$args = isset_not_empty( $setting, 'args' ) ? $setting['args'] : [];
+
+			$args                 = isset_not_empty( $setting, 'args' ) ? $setting['args'] : [];
+			$args['show_in_rest'] = true;
+
 			register_setting( 'gh_' . $this->sections[ $setting['section'] ]['tab'], $setting['id'], $args );
 		}
 
