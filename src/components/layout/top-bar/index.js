@@ -126,8 +126,9 @@ export default function Dashboard(props) {
   };
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
-  let pageTitle = props.page.path;
+  let pageTitle = props.page.path.replace('/','');
   if(props.page.path === '/'){ pageTitle = 'Dashboard'}
+  console.log(pageTitle)
 
   return (
     <div className={classes.root}>

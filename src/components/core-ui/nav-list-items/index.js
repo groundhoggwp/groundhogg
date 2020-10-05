@@ -19,7 +19,7 @@ export default function NavListItems(props) {
   const changeView = (view) => {
   // // setOpen(false);
   console.log(props, view)
-  // props.props.history.push(`/${view}`)
+  props.props.history.push(`/${view}`)
   };
 
   return(
