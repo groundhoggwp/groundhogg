@@ -3,131 +3,286 @@
  */
 import TYPES from './action-types';
 
-export function setItems( itemType, query, items, totalCount ) {
+//TODO: Ensure all CRUD actions are sync'd with parameters expected in API.
+//TODO: Inline docs.
+
+export function addContact( itemData ) {
 	return {
-		type: TYPES.SET_ITEMS,
-		items,
-		itemType,
-		query,
-		totalCount,
+		type: TYPES.ADD_CONTACT,
+		itemData
 	};
 }
 
-export function setError( itemType, query, error ) {
+export function requestContact( itemId ) {
 	return {
-		type: TYPES.SET_ERROR,
-		itemType,
-		query,
-		error,
+		type: TYPES.REQUEST_CONTACT,
+		itemId
 	};
 }
 
-const fetchContactsRequest = () => {
-return {
-	type: TYPES.FETCH_CONTACTS_REQUEST,
+export function editContact( itemData ) {
+	return {
+		type: TYPES.EDIT_CONTACT,
+		itemData
+	};
 }
+
+export function deleteContact( itemId ) {
+	return {
+		type: TYPES.DELETE_CONTACT,
+		itemId
+	};
 }
 
-  const fetchContactsSuccess = (data) => {
+export function requestContacts( itemIds ) {
 	return {
-	  type: TYPES.FETCH_CONTACTS_SUCCESS,
-	  payload: {
-		contacts: data.contacts,
-		total: data.count,
-	  },
-	}
-  }
+		type: TYPES.REQUEST_CONTACTS,
+		itemIds
+	};
+}
 
-  const fetchMoreContactsSuccess = (contacts) => {
+export function bulkEditContacts( items ) {
 	return {
-	  type: TYPES.FETCH_MORE_CONTACTS_SUCCESS,
-	  payload: contacts,
-	}
-  }
+		type: TYPES.BULK_EDIT_CONTACTS,
+		items
+	};
+}
 
-  const fetchContactsFailed = (error) => {
+export function deleteContacts( itemIds ) {
 	return {
-	  type: TYPES.FETCH_CONTACTS_FAILED,
-	  payload: error,
-	}
-  }
+		type: TYPES.DELETE_CONTACTS,
+		itemIds
+	};
+}
 
-  export const changeQuery = (queryVars) => {
+export function setIsRequesting( isRequesting ) {
 	return {
-	  type: TYPES.CHANGE_QUERY,
-	  payload: queryVars,
-	}
-  }
+		type: TYPES.SET_IS_REQUESTING,
+		isRequesting
+	};
+}
 
-  export const clearItems = () => (dispatch) => {
-	dispatch({
-	  type: TYPES.CLEAR_ITEMS,
-	})
-  }
+export function setRequestingError( error ) {
+	return {
+		type: TYPES.SET_REQUESTING_ERROR,
+		error
+	};
+}
 
-  export const updateQuery = (queryVars) => (dispatch) => {
-	dispatch({
-	  type: TYPES.CHANGE_QUERY,
-	  payload: queryVars,
-	})
-  }
+export function setIsUpdating( isUpdating ) {
+	return {
+		type: TYPES.SET_IS_UPDATING,
+		isUpdating
+	};
+}
 
-  export const resetQuery = () => (dispatch) => {
-	dispatch(changeQuery({
-	  number: 20,
-	  offset: 0,
-	  orderby: 'ID',
-	  order: 'DESC',
-	}))
-  }
+export function setUpdatingError( error ) {
+	return {
+		type: TYPES.SET_UPDATING_ERROR,
+		error
+	};
+}
 
-  export const changeContext = (context) => (dispatch) => {
-	dispatch({
-	  type: TYPES.CLEAR_ITEMS,
-	  payload: context,
-	})
-  }
+export function setIsDeleting( isDeleting ) {
+	return {
+		type: TYPES.SET_IS_DELETING,
+		isDeleting
+	};
+}
 
-  export const clearState = () => (dispatch) => {
-	dispatch({
-	  type: TYPES.CLEAR_STATE,
-	})
-  }
+export function setDeletingError( error ) {
+	return {
+		type: TYPES.SET_DELETING_ERROR,
+		error
+	};
+}
 
-  export const showContactFilters = () => (dispatch) => {
-	dispatch({
-	  type: TYPES.SHOW_CONTACT_FILTERS,
-	})
-  }
+export function setIsAdding( isAdding ) {
+	return {
+		type: TYPES.SET_IS_ADDING,
+		isAdding
+	};
+}
 
-  export const fetchContacts = () => (dispatch, getState) => {
-	const {
-	  query,
-	} = getState().contactList
+export function setAddingError( error ) {
+	return {
+		type: TYPES.SET_ADDING_ERROR,
+		error
+	};
+}
 
-	dispatch(fetchContactsRequest())
+export function requestContactTags( itemId ) {
+	return {
+		type: TYPES.REQUEST_CONTACT_TAGS,
+		itemId
+	};
+}
 
-	axios.get(groundhogg.rest_base + '/contacts', {
-	  params: {
-		query: query,
-	  },
-	}).then(response => {
-	  dispatch(fetchContactsSuccess(response.data))
-	}).catch(error => fetchContactsFailed(error))
-  }
+export function addContactTags( itemId, tags ) {
+	return {
+		type: TYPES.ADD_CONTACT_TAGS,
+		itemId,
+		tags
+	};
+}
 
-  export const fetchMoreContacts = () => (dispatch, getState) => {
-	const {
-	  query,
-	} = getState().contactList
+export function deleteContactTags( itemId, tags ) {
+	return {
+		type: TYPES.DELETE_CONTACT_TAGS,
+		itemId,
+		tags
+	};
+}
 
-	dispatch(fetchContactsRequest())
+export function requestContactFiles( itemId ) {
+	return {
+		type: TYPES.REQUEST_CONTACT_FILES,
+		itemId
+	};
+}
 
-	axios.get(groundhogg.rest_base + '/contacts', {
-	  params: {
-		query: query,
-	  },
-	}).then(response => {
-	  dispatch(fetchMoreContactsSuccess(response.data.contacts))
-	}).catch(error => fetchContactsFailed(error))
-  }
+export function addContactFiles( itemId, files ) {
+	return {
+		type: TYPES.ADD_CONTACT_FILES,
+		itemId,
+		files
+	};
+}
+
+export function deleteContactFiles( itemId, files ) {
+	return {
+		type: TYPES.DELETE_CONTACT_FILES,
+		itemId,
+		files
+	};
+}
+
+export function mergeContacts( itemId, others ) {
+	return {
+		type: TYPES.MERGE_CONTACTS,
+		itemId,
+		others
+	};
+}
+
+export function setIsRequestingTags( isRequesting ) {
+	return {
+		type: TYPES.SET_IS_REQUESTING_TAGS,
+		isRequesting
+	};
+}
+
+export function setRequestingTagsError( error ) {
+	return {
+		type: TYPES.SET_REQUESTING_TAGS_ERROR,
+		error
+	};
+}
+
+export function setIsDeletingTags( isDeleting ) {
+	return {
+		type: TYPES.SET_IS_DELETING_FILES,
+		isDeleting
+	};
+}
+
+export function setDeletingTagsError( error ) {
+	return {
+		type: TYPES.SET_DELETING_TAGS_ERROR,
+		error
+	};
+}
+
+export function setIsAddingTags( isAdding ) {
+	return {
+		type: TYPES.SET_IS_ADDING_TAGS,
+		isAdding
+	};
+}
+
+export function setAddingTagsError( error ) {
+	return {
+		type: TYPES.SET_ADDING_TAGS_ERROR,
+		error
+	};
+}
+
+export function setIsRequestingFiles( isRequesting ) {
+	return {
+		type: TYPES.SET_IS_REQUESTING_FILES,
+		isRequesting
+	};
+}
+
+export function setRequestingFilesError( error ) {
+	return {
+		type: TYPES.SET_REQUESTING_FILES_ERROR,
+		error
+	};
+}
+
+export function setIsDeletingFiles( isDeleting ) {
+	return {
+		type: TYPES.SET_IS_DELETING_FILES,
+		isDeleting
+	};
+}
+
+export function setDeletingFilesError( error ) {
+	return {
+		type: TYPES.SET_DELETING_FILES_ERROR,
+		error
+	};
+}
+
+export function setIsAddingFiles( isAdding ) {
+	return {
+		type: TYPES.SET_IS_ADDING_FILES,
+		isAdding
+	};
+}
+
+export function setAddingFilesError( error ) {
+	return {
+		type: TYPES.SET_ADDING_FILES_ERROR,
+		error
+	};
+}
+
+export function setIsMerging( isMerging ) {
+	return {
+		type: TYPES.SET_IS_MERGING,
+		isMerging
+	};
+}
+
+export function setMergingError( error ) {
+	return {
+		type: TYPES.SET_MERGING_ERROR,
+		error
+	};
+}
+
+export function showContactFilters() {
+
+}
+
+export function changeContext() {
+
+}
+
+export function changeQuery() {
+
+}
+
+export function clearItems() {
+
+}
+
+export function clearState() {
+
+}
+
+export function filterContacts() {
+
+}
