@@ -4,7 +4,10 @@
 import TYPES from './action-types';
 
 const initialState = {
-	fetching: false,
+	isRequesting: false,
+	isUpdating: false,
+	isCreating: false,
+	isDeleting: false,
 	showFilters: false,
 	total: 0,
 	context: {},
@@ -17,16 +20,29 @@ const initialState = {
 	},
 	data: [],
 	error: {},
-}
+};
 
-  export default function (state = initialState, action ) {
-	switch (action.type) {
+const contactsReducer = (
+	state = initialState,
+	{
+		type,
+		payload,
+		data,
+		error,
+		isCreating,
+		isRequesting,
+		isUpdating,
+		isDeleting,
+		name
+	}
+) => {
+	switch ( type ) {
 	  case TYPES.CHANGE_CONTEXT:
 		return {
 		  ...state,
 		  context: {
 			...state.context,
-			...action.payload
+			...payload
 		  }
 		}
 	  case TYPES.CHANGE_QUERY:
@@ -34,7 +50,7 @@ const initialState = {
 		  ...state,
 		  query: {
 			...state.query,
-			...action.payload
+			...payload
 		  }
 		}
 	  case TYPES.CLEAR_STATE:
@@ -45,32 +61,32 @@ const initialState = {
 	  case TYPES.FETCH_CONTACTS_REQUEST:
 		return {
 		  ...state,
-		  fetching: true,
+		  isRequesting: true,
 		}
 	  case TYPES.FETCH_CONTACTS_SUCCESS:
 		return {
 		  ...state,
-		  fetching: false,
-		  data: action.payload.contacts,
-		  total: action.payload.total,
+		  isRequesting: false,
+		  data: payload.contacts,
+		  total: payload.total,
 		  error: {}
 		}
 	  case TYPES.FETCH_MORE_CONTACTS_SUCCESS:
 		return {
 		  ...state,
-		  fetching: false,
+		  isRequesting: false,
 		  data: [
 			...state.data,
-			...action.payload
+			...payload
 		  ],
 		  error: {}
 		}
 	  case TYPES.FETCH_CONTACTS_FAILED:
 		return {
 		  ...state,
-		  fetching: false,
+		  isRequesting: false,
 		  data: [],
-		  error: action.payload
+		  error: payload
 		}
 	  case TYPES.CLEAR_ITEMS:
 		return {
@@ -85,4 +101,6 @@ const initialState = {
 	  default:
 		return state;
 	}
-  }
+};
+
+export default contactsReducer;

@@ -124,6 +124,7 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	 * @return mixed
 	 */
 	public function get_meta( $key = false, $single = true ) {
+
 		if ( ! $key ) {
 			return $this->meta;
 		}
@@ -148,6 +149,10 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	 * @return mixed
 	 */
 	public function update_meta( $key, $value ) {
+
+		$key = sanitize_key( $key );
+		$value = sanitize_object_meta( $value, $key, $this->get_object_type() );
+
 		if ( $this->get_meta_db()->update_meta( $this->get_id(), $key, $value ) ) {
 			$this->meta[ $key ] = $value;
 
@@ -166,6 +171,10 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	 * @return mixed
 	 */
 	public function add_meta( $key, $value ) {
+
+		$key = sanitize_key( $key );
+		$value = sanitize_object_meta( $value, $key, $this->get_object_type() );
+
 		if ( $this->get_meta_db()->add_meta( $this->get_id(), $key, $value ) ) {
 			$this->meta[ $key ] = $value;
 

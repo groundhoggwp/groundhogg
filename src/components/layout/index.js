@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { withFilters } from '@wordpress/components';
-import { Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, Link } from 'react-router-dom';
 import { identity } from 'lodash';
 import { parse } from 'qs';
 import PropTypes from 'prop-types';
@@ -22,7 +22,6 @@ import { Controller, getPages, PAGES_FILTER } from './controller';
 import TopBar from "./top-bar";
 import BottomBar from './bottom-bar';
 import Notices from './notices';
-import { getHistory } from '../../utils/navigation';
 import { withSettingsHydration } from '../../data';
 
 const drawerWidth = 240;
@@ -145,7 +144,8 @@ Layout.propTypes = {
 class _PageLayout extends Component {
 	render() {
 		return (
-			<Router history={ getHistory() }>
+			<BrowserRouter basename="/wp-admin/groundhogg">
+				<Link to="/">Dashboard</Link> | <Link to="/reports">Reports</Link>
 				<Switch>
 					{ getPages().map( ( page ) => {
 						return (
@@ -160,7 +160,7 @@ class _PageLayout extends Component {
 						);
 					} ) }
 				</Switch>
-			</Router>
+			</BrowserRouter>
 		);
 	}
 }
@@ -168,9 +168,9 @@ class _PageLayout extends Component {
 export const PageLayout = compose(
 	// Use the withFilters HoC so PageLayout is re-rendered when filters are used to add new pages
 	withFilters( PAGES_FILTER ),
-	window.groundhogg.preloadSettings
+	window.Groundhogg.preloadSettings
 		? withSettingsHydration( {
-				...window.groundhogg.preloadSettings,
+				...window.Groundhogg.preloadSettings,
 		  } )
 		: identity
 )( _PageLayout );

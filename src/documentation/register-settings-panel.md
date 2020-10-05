@@ -25,8 +25,8 @@ addFilter( 'groundhogg_settings_panels', 'gh-example/custom-settings-panel', pan
 The benefit to this approach is how closely it mirrors PHP patterns. This lower-level API makes it extremely accessible to PHP developers who are used to WordPress hook patterns. At a higher-level API, we'll have a local registry method available for setting registration:
 
 ```js
-if (window.groundhogg) {
-      groundhogg.registerSettingsPanel( {
+if (window.Groundhogg) {
+      Groundhogg.registerSettingsPanel( {
             panel: 'groundhogg_custom_panel',
             parent: 'groundhogg_settings',
             priority: 100,

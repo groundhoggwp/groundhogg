@@ -86,4 +86,16 @@ addFilter(
 	}
 );
 
+/**	Alternative approach */
+Groundhogg.addTableColumn( 'contact', {
+	header : { label: 'NPS', key: 'nps' },
+	column :  {
+		display: (
+			<Rating name="read-only" value={ Number(
+					contact.meta.nps
+				) } readOnly />
+		),
+		value: contact.meta.nps,
+	}
+} );
 ```

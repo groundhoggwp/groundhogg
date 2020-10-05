@@ -9,10 +9,17 @@ import { apiFetch } from '@wordpress/data-controls';
 import TYPES from './action-types';
 import { NAMESPACE } from '../constants';
 
-export function receiveTags( tags ) {
+export function receiveTags( items ) {
 	return {
 		type: TYPES.RECEIVE_TAGS,
-		tags,
+		items,
+	};
+}
+
+export function receiveTag( item ) {
+	return {
+		type: TYPES.RECEIVE_TAG,
+		item,
 	};
 }
 
@@ -34,6 +41,13 @@ export function setIsUpdating( isUpdating ) {
 	return {
 		type: TYPES.SET_IS_UPDATING,
 		isUpdating,
+	};
+}
+
+export function setIsRequestingTags( isRequesting ) {
+	return {
+		type: TYPES.SET_IS_REQUESTING,
+		isRequesting,
 	};
 }
 

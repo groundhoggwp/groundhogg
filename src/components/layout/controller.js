@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Component, Suspense, lazy } from '@wordpress/element';
+import { Component, Suspense } from '@wordpress/element';
 import { parse } from 'qs';
 import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
@@ -10,11 +10,8 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { Spinner } from '../../components';
-
-import { default as Dashboard } from './pages/dashboard';
-import { default as Reports } from './pages/reports';
-import { default as Tags } from './pages/tags';
-import { default as Emails } from './pages/emails';
+import { Dashboard } from './pages/dashboard';
+import { Reports } from './pages/reports';
 
 export const PAGES_FILTER = 'groundhogg_navigation';
 
@@ -24,21 +21,13 @@ export const getPages = () => {
 	/** @TODO: parse/hydrate PHP-registered nav items for app navigation */
 
 	pages.push( {
-		container: Reports,
-		path: 'reports',
-	} );
-
-	pages.push( {
 		container: Dashboard,
 		path: '/',
 	} );
+
 	pages.push( {
-		container: Tags,
-		path: 'tags',
-	} );
-	pages.push( {
-		container: Emails,
-		path: 'emails',
+		container: Reports,
+		path: '/reports',
 	} );
 
 	return applyFilters( PAGES_FILTER, pages );

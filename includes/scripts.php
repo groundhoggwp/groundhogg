@@ -8,12 +8,33 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Scripts {
 
+	/**
+	 * Script handles that should be treated as modules
+	 */
+	protected $module_handles = [
+		'groundhogg-admin'
+	];
+
 	public function __construct() {
 		add_action( 'wp_enqueue_scripts', [ $this, 'register_frontend_scripts' ] );
 		add_action( 'wp_enqueue_scripts', [ $this, 'register_frontend_styles' ] );
 
 		add_action( 'admin_enqueue_scripts', [ $this, 'register_admin_styles' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'register_admin_scripts' ] );
+
+		add_filter( 'script_loader_tag', [ $this, 'register_module_support' ], 10, 3 );
+	}
+
+	/**
+	 * Allows scripts to be enqueued as modules, supporting imports without a build step
+	 */
+	public function register_module_support( $tag, $handle, $src ) {
+
+		if ( ! in_array( $handle, $this->module_handles, true ) ) {
+			return $tag;
+		}
+
+		return '<script type="module" src="' . esc_url( $src ) . '"></script>';
 	}
 
 	public function is_script_debug_enabled() {
@@ -209,7 +230,7 @@ class Scripts {
 			'wp-i18n'
 		], null, true );
 
-		$asset_file = include( GROUNDHOGG_PATH . 'build/index.asset.php' );
+		$asset_file = include_once( GROUNDHOGG_PATH . 'build/index.asset.php' );
 
 		wp_register_script(
 			'groundhogg-react',
@@ -248,13 +269,10 @@ class Scripts {
 
 		wp_localize_script( 'groundhogg-admin', 'groundhogg_nonces', [
 			'_wpnonce'            => wp_create_nonce(),
+			'_meta_nonce'         => wp_create_nonce( 'meta-picker' ),
 			'_wprest'             => wp_create_nonce( 'wp_rest' ),
 			'_adminajax'          => wp_create_nonce( 'admin_ajax' ),
 			'_ajax_linking_nonce' => wp_create_nonce( 'internal-linking' ),
-		] );
-
-		wp_localize_script( 'groundhogg-admin', 'Groundhogg', [
-			'test' => 'Hello World!'
 		] );
 
 		do_action( 'groundhogg/scripts/after_register_admin_scripts', $this->is_script_debug_enabled(), $dot_min );

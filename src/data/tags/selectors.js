@@ -4,18 +4,17 @@
  * @param {Object} state - Reducer state
  * @param {Array} name - Option name
  */
-export const getTag = ( state, name ) => {
-	return state[ name ];
+export const getTag = ( state, item ) => {
+	return state.item;
 };
 
 /**
- * Get tag from state tree.
+ * Get tags from state tree.
  *
  * @param {Object} state - Reducer state
- * @param {Array} name - Option name
  */
 export const getTags = ( state ) => {
-	return state;
+	return state.items;
 };
 
 /**
@@ -35,6 +34,15 @@ export const getTagsRequestingError = ( state, name ) => {
  */
 export const isTagsUpdating = ( state ) => {
 	return state.isUpdating || false;
+};
+
+/**
+ * Determine if tags are being updated.
+ *
+ * @param {Object} state - Reducer state
+ */
+export const isTagsRequesting = ( state ) => {
+	return state.isRequesting || false;
 };
 
 /**

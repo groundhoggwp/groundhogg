@@ -145,7 +145,11 @@ class Main_Roles extends Roles {
 			'send_emails',
 			'view_events',
 			'manage_tags',
-			'download_contact_files'
+			'download_contact_files',
+			'add_notes',
+			'delete_notes',
+			'edit_notes',
+			'view_notes',
 		];
 	}
 
@@ -163,7 +167,11 @@ class Main_Roles extends Roles {
 			'send_emails',
 			'view_events',
 			'manage_tags',
-			'download_contact_files'
+			'download_contact_files',
+			'add_notes',
+			'delete_notes',
+			'edit_notes',
+			'view_notes',
 		];
 	}
 
@@ -215,9 +223,32 @@ class Main_Roles extends Roles {
 			'delete_tags',
 			'edit_tags',
 			'manage_tags',
+			'view_tags',
 		);
 
 		return apply_filters( 'groundhogg/roles/caps/tags', $caps );
+	}
+
+	/**
+	 * Tags:
+	 * - Add Tags
+	 * - Delete Tags
+	 * - Edit Tags
+	 * - Manage Tags (for contacts)
+	 *
+	 * Get caps related to managing tags
+	 *
+	 * @return array
+	 */
+	public function get_note_caps() {
+		$caps = array(
+			'add_notes',
+			'delete_notes',
+			'edit_notes',
+			'view_notes',
+		);
+
+		return apply_filters( 'groundhogg/roles/caps/notes', $caps );
 	}
 
 
@@ -259,6 +290,7 @@ class Main_Roles extends Roles {
 			'delete_emails',
 			'edit_emails',
 			'send_emails',
+			'view_emails',
 		);
 
 		return apply_filters( 'groundhogg/roles/caps/emails', $caps );
@@ -284,6 +316,7 @@ class Main_Roles extends Roles {
 			'edit_funnels',
 			'export_funnels',
 			'import_funnels',
+			'view_funnels',
 		);
 
 		return apply_filters( 'groundhogg/roles/caps/funnels', $caps );
@@ -370,7 +403,8 @@ class Main_Roles extends Roles {
 			$this->get_tag_caps(),
 			$this->get_report_caps(),
 			$this->get_other_caps(),
-			$this->get_file_caps()
+			$this->get_file_caps(),
+			$this->get_note_caps()
 		);
 
 		return $caps;

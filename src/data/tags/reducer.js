@@ -6,23 +6,38 @@ import TYPES from './action-types';
 const tagsReducer = (
 	state = {
 		isUpdating: false,
-		tags: [],
+		isRequesting: false,
+		items: [],
+		item: null,
 		requestingErrors: {}
 	},
-	{ type, tags, error, isUpdating, name }
+	{ type, items, error, isUpdating, isRequesting, name, item }
 ) => {
 	switch ( type ) {
+		case TYPES.RECEIVE_TAG:
+			state = {
+				...state,
+				item : item.data
+			};
+			break;
 		case TYPES.RECEIVE_TAGS:
 			state = {
 				...state,
-				...tags,
+				items : items.map( ( item ) => { return item.data } )
 			};
 			break;
 		case TYPES.SET_IS_UPDATING:
 			state = {
 				...state,
-				...tags,
+				...items,
 				isUpdating,
+			};
+		break;
+		case TYPES.SET_IS_REQUESTING:
+			state = {
+				...state,
+				...items,
+				isRequesting,
 			};
 			break;
 		case TYPES.SET_REQUESTING_ERROR:

@@ -17,11 +17,11 @@ import {
 
 const appRoot = document.getElementById( 'root' );
 const settingsGroup = SETTINGS_STORE_NAME;
-const hydrateUser = window.groundhogg.user;
+const hydrateUser = window.Groundhogg.user;
 
 let HydratedPageLayout = withSettingsHydration(
 	settingsGroup,
-	window.groundhogg
+	window.Groundhogg
 )( PageLayout );
 
 if ( hydrateUser ) {
