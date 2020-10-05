@@ -72,6 +72,10 @@ abstract class Base_Api {
 	 * @return WP_Error
 	 */
 	protected static function ERROR_CODE( $code = '', $msg = '', $data = [], $http_response = 500 ) {
+
+		$code = $code ?: 'error';
+		$msg  = $msg ?: 'Something went wrong';
+
 		return new WP_Error( $code, $msg, [ 'status' => $http_response, 'data' => $data ] );
 	}
 
