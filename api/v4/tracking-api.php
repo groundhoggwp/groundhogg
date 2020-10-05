@@ -17,7 +17,7 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
 
-class Tracking_Api extends Base_Api {
+class Tracking_Api extends Base {
 
 
 	public function register_routes() {

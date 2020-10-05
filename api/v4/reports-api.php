@@ -20,7 +20,7 @@ use WP_Error;
 
 use Groundhogg\Admin\Dashboard\Widgets;
 
-class Reports_Api extends Base_Api {
+class Reports_Api extends Base {
 
 	public function register_routes() {
 //		$callback = $this->get_auth_callback();

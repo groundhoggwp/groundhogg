@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since  1.5
  */
-class Bulk_Job_Api extends Base_Api {
+class Bulk_Job_Api extends Base {
 
 	public function register_routes() {
 
