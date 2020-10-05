@@ -178,6 +178,14 @@ function tracking() {
 }
 
 /**
+ * @return Files
+ */
+function files() {
+	return Plugin::$instance->utils->files;
+}
+
+
+/**
  * Return if a value in an array isset and is not empty
  *
  * @param $array
@@ -3991,4 +3999,26 @@ function is_email_address_in_use( $email_address, $current_contact = false ) {
 	} else {
 		return true;
 	}
+}
+
+/**
+ * Get CSV file info
+ *
+ * @param $file_path string
+ *
+ * @return array|bool
+ */
+function get_csv_file_info( $file_path ){
+
+    if ( ! file_exists( $file_path ) ){
+        return false;
+    }
+
+	return [
+		'file_name' => basename( $file_path ),
+		'file_path' => $file_path,
+		'file_url'  => file_access_url( basename( dirname( $file_path ) ) . '/' .  basename( $file_path ), true ),
+		'timestamp' => filemtime( $file_path ),
+		'rows'      => count( file( $file_path, FILE_SKIP_EMPTY_LINES ) ) - 1,
+	];
 }
