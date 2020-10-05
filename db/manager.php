@@ -65,7 +65,7 @@ class Manager {
 		$this->submissions       = new Submissions();
 		$this->submissionmeta    = new Submission_Meta();
 		$this->form_impressions  = new Form_Impressions();
-		$this->contactnotes      = new Contact_Notes();
+		$this->notes             = new Notes();
 		$this->permissions_keys  = new Permissions_Keys();
 
 		//new queue table

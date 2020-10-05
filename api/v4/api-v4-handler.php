@@ -2,6 +2,8 @@
 
 namespace Groundhogg\Api\V4;
 
+use Groundhogg\DB\Activity;
+
 /**
  * Created by PhpStorm.
  * User: atty
@@ -41,17 +43,22 @@ class API_V4_HANDLER {
 	public function declare_base_endpoints() {
 
 		$this->contacts        = new Contacts_Api();
+		$this->notes_api       = new Notes_Api();
 		$this->tags            = new Tags_Api();
-		$this->emails          = new Email_Api();
-		$this->tracking        = new Tracking_Api();
-		$this->data            = new Data_Api();
-		$this->reports         = new Reports_Api();
+		$this->emails          = new Emails_Api();
 		$this->broadcasts      = new Broadcasts_Api();
-		$this->bulk_job        = new Bulk_Job_Api();
-		$this->unsubscribe_api = new Unsubscribe_Api();
 		$this->funnels_api     = new Funnels_Api();
 		$this->steps_api       = new Steps_Api();
-		$this->report_pages    = new Report_Pages_Api();
+		$this->activity_api    = new Activity_Api();
+		$this->events_api      = new Events_Api();
+		$this->event_queue_api = new Event_Queue_Api();
+
+//		$this->tracking        = new Tracking_Api();
+//		$this->reports         = new Reports_Api();
+//		$this->report_pages    = new Report_Pages_Api();
+//		$this->bulk_job        = new Bulk_Job_Api();
+
+		$this->unsubscribe_api = new Unsubscribe_Api();
 	}
 
 	/**
@@ -59,7 +66,7 @@ class API_V4_HANDLER {
 	 *
 	 * @param $name
 	 *
-	 * @return mixed | BASE
+	 * @return mixed | Base_Api
 	 */
 	public function __get( $name ) {
 		if ( property_exists( $this, $name ) ) {

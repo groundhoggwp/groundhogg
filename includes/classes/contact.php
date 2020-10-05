@@ -166,12 +166,23 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * Get the tags
+	 * Get the tag ids
 	 *
-	 * @return array
+	 * @return int[]
 	 */
-	public function get_tags() {
+	public function get_tag_ids() {
 		return wp_parse_id_list( $this->tags );
+	}
+
+	/**
+	 * Get the tag objects.
+	 *
+	 * @return Tag[]
+	 */
+	public function get_tags(){
+		return array_map( function ( $tag_id ) {
+			return new Tag( $tag_id );
+		}, $this->get_tag_ids() );
 	}
 
 	/**
@@ -180,7 +191,7 @@ class Contact extends Base_Object_With_Meta {
 	public function get_tags_for_select2() {
 		$return = [];
 
-		foreach ( $this->get_tags() as $tag_id ) {
+		foreach ( $this->get_tag_ids() as $tag_id ) {
 			$tag = new Tag( $tag_id );
 
 			$return[] = [
@@ -197,17 +208,16 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @return Note[]
 	 */
-	public function get_all_notes() {
-		$raw = get_db( 'contactnotes' )->query( [
-			'contact_id' => $this->get_id(),
-			'orderby'    => 'timestamp'
+	public function get_notes() {
+		$notes = get_db( 'notes' )->query( [
+			'object_id'   => $this->get_id(),
+			'object_type' => 'contact',
+			'orderby'     => 'timestamp'
 		] );
 
-		$notes = [];
-
-		foreach ( $raw as $note ) {
-			$notes[] = new Note( absint( $note->ID ) );
-		}
+		$notes = array_map( function ( $note ) {
+			return new Note( $note->ID );
+		}, $notes );
 
 		return $notes;
 	}
@@ -403,31 +413,18 @@ class Contact extends Base_Object_With_Meta {
 			return false;
 		}
 
-		$notes = [
+		$note_data = [
 			'contact_id' => $this->get_id(),
 			'context'    => $context,
-			'content'    => sanitize_textarea_field( $note ),
-			'user_id'    => $user_id,
+			'content'    => wp_kses_post( $note ),
+			'user_id'    => $user_id ?: get_current_user_id(),
 		];
 
-		if ( $context == 'user' && ! $user_id ) {
-			$notes['user_id'] = get_current_user_id();
-		}
-
-		get_db( 'contactnotes' )->add( $notes );
+		$note = new Note( $note_data );
 
 		do_action( 'groundhogg/contact/note/added', $this->ID, $note, $this );
 
 		return true;
-	}
-
-	/**
-	 * get the contact's notes
-	 *
-	 * @return string
-	 */
-	public function get_notes() {
-		return $this->get_meta( 'notes' );
 	}
 
 	/**
@@ -542,7 +539,7 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @param $user WP_User|int
 	 */
-	public function change_owner( $user ){
+	public function change_owner( $user ) {
 
 	}
 
@@ -817,6 +814,20 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Delete a file
+	 *
+	 * @param $file_name string
+	 */
+	public function delete_file( $file_name ){
+		$file_name = basename( $file_name );
+		foreach ( $this->get_files() as $file ){
+			if ( $file_name === $file[ 'file_name' ] ){
+				unlink( $file[ 'file_path' ] );
+			}
+		}
+	}
+
+	/**
 	 * Get the age of the contact
 	 *
 	 * @return int
@@ -853,9 +864,10 @@ class Contact extends Base_Object_With_Meta {
 				'ID'    => $this->get_id(),
 				'data'  => $contact,
 				'meta'  => $this->get_meta(),
-				'tags'  => $this->get_tags(),
+				'tags'  => $this->get_tag_ids(),
 				'files' => $this->get_files(),
-				'user'  => $this->user
+				'user'  => $this->user,
+				'notes' => $this->get_notes()
 			]
 		);
 	}
@@ -869,7 +881,6 @@ class Contact extends Base_Object_With_Meta {
 		return sprintf( "%s (%s)", $this->get_full_name(), $this->get_email() );
 	}
 
-
 	public function get_company() {
 		return $this->get_meta( 'company_name' );
 	}
@@ -878,5 +889,70 @@ class Contact extends Base_Object_With_Meta {
 		return $this->get_meta( 'job_title' );
 	}
 
+	protected function sanitize_columns( $data = [] ) {
 
+		map_func_to_attr( $data, 'first_name', 'sanitize_text_field' );
+		map_func_to_attr( $data, 'last_name', 'sanitize_text_field' );
+		map_func_to_attr( $data, 'email', 'sanitize_email' );
+		map_func_to_attr( $data, 'optin_status', 'absint' );
+		map_func_to_attr( $data, 'owner_id', 'absint' );
+		map_func_to_attr( $data, 'user_id', 'absint' );
+		map_func_to_attr( $data, 'date_created', function ( $date ) {
+			return convert_to_mysql_date( $date );
+		} );
+		map_func_to_attr( $data, 'date_optin_status_changed', function ( $date ) {
+			return convert_to_mysql_date( $date );
+		} );
+
+		return $data;
+	}
+
+	/**
+	 * Merge $other into $this
+	 * - Fills out missing info in $this from $other
+	 * - Updates all events for $other with $this' ID
+	 * - Updates all activity for $other with $this' ID
+	 * - Updates all notes for $other with $this' ID
+	 * - Move all files to $this' file folder
+	 * - Deletes $other
+	 *
+	 * @param int|string|Contact $other
+	 *
+	 * @return bool
+	 */
+	public function merge( $other ) {
+
+		$other = get_contactdata( $other );
+
+		if ( ! is_a_contact( $other ) ) {
+			return false;
+		}
+
+		$data = array_merge( $other->data, $this->data );
+		$this->update( $data );
+
+		// May use this later...
+		$this->update_meta( 'previous_merge_data', $other->data );
+		$uploads_dir = $this->get_uploads_folder();
+
+		// Move any files to this contacts uploads folder.
+		foreach ( $other->get_files() as $file ){
+			$file_path = $file[ 'file_path' ];
+			$file_name = $file[ 'file_name' ];
+
+			rename( $file_path, $uploads_dir[ 'path' ] . '/' . $file_name );
+		}
+
+		/**
+		 * Fires before the $other is permanently deleted.
+		 *
+		 * @param $primary Contact
+		 * @param $other Contact
+		 */
+		do_action( 'groundhogg/contact/merge', $this, $other );
+
+		$other->delete();
+
+		return true;
+	}
 }

@@ -33,8 +33,10 @@ function get_current_contact() {
  * @return false|Contact
  */
 function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
-	if ( ! $contact_id_or_email ) {
 
+	if ( is_a_contact( $contact_id_or_email ) ) {
+		return $contact_id_or_email;
+	} else if ( ! $contact_id_or_email ) {
 		if ( Event_Queue::is_processing() ) {
 			return Plugin::instance()->event_queue->get_current_contact();
 		}
@@ -3903,14 +3905,15 @@ function validate_form_json( $json ) {
  * Takes a string or int and returns a mysql friendly date
  *
  * @param $date string|int
+ *
  * @return string|false
  */
-function convert_to_mysql_date( $date ){
-    if ( ! is_int( $date) && ! is_string( $date ) ){
-        return false;
-    }
+function convert_to_mysql_date( $date ) {
+	if ( ! is_int( $date ) && ! is_string( $date ) ) {
+		return false;
+	}
 
-    return is_int( $date ) ? date( 'Y-m-d H:i:s', $date ) : date( 'Y-m-d H:i:s', strtotime( $date ) );
+	return is_int( $date ) ? date( 'Y-m-d H:i:s', $date ) : date( 'Y-m-d H:i:s', strtotime( $date ) );
 }
 
 /**
@@ -3942,16 +3945,50 @@ function map_func_to_attr( &$arr, $key, $func ) {
 /**
  * Handle sanitization of contact meta is most likely situations.
  *
- * @param $meta_value
+ * @param mixed $meta_value
+ * @param string $meta_key
+ * @param string $object_type
  *
  * @return string
  */
-function sanitize_contact_meta( $meta_value ){
-	if ( is_string( $meta_value ) && strpos( $meta_value, PHP_EOL ) !== false  ){
-		return sanitize_textarea_field( $meta_value );
+function sanitize_object_meta( $meta_value, $meta_key = '', $object_type = '' ) {
+	if ( is_string( $meta_value ) && strpos( $meta_value, PHP_EOL ) !== false ) {
+		$meta_value = sanitize_textarea_field( $meta_value );
 	} else if ( is_string( $meta_value ) ) {
-		return sanitize_text_field( $meta_value );
+		$meta_value = sanitize_text_field( $meta_value );
 	}
 
-	return $meta_value;
+	/**
+	 * Filter the object meta
+	 *
+	 * @param mixed $meta_value
+	 * @param string $meta_key
+	 * @param string $object_type
+	 */
+	return apply_filters( 'groundhogg/sanitize_object_meta', $meta_value, $meta_key, $object_type );
+}
+
+/**
+ * Check if the email address is in use
+ * You can pass a contact record to double check against the current contact as well.
+ *
+ * @param string $email_address
+ * @param bool|Contact $current_contact
+ *
+ * @return bool
+ */
+function is_email_address_in_use( $email_address, $current_contact = false ) {
+
+	$contact = get_contactdata( $email_address );
+
+	// If there is no contact record
+	if ( ! is_a_contact( $contact ) ) {
+		return false;
+		// If there is a contact but it's the same as the one we are passing...
+	} else if ( is_a_contact( $current_contact ) && $contact->get_id() === $current_contact->get_id() ) {
+		return false;
+		// Otherwise
+	} else {
+		return true;
+	}
 }

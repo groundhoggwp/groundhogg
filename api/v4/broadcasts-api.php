@@ -17,104 +17,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Broadcasts_Api extends Base_Api {
+class Broadcasts_Api extends Base_Object_Api {
 
 	public function register_routes() {
 
-		register_rest_route( self::NAME_SPACE, '/broadcasts', [
-			[
-				'methods'             => WP_REST_Server::CREATABLE,
-				'permission_callback' => [ $this, 'permission_callback' ],
-				'callback'            => [ $this, 'create' ],
-			],
-			[
-				'methods'             => WP_REST_Server::READABLE,
-				'permission_callback' => [ $this, 'permission_callback' ],
-				'callback'            => [ $this, 'read' ],
-			],
-			[
-				'methods'             => WP_REST_Server::EDITABLE,
-				'permission_callback' => [ $this, 'permission_callback' ],
-				'callback'            => [ $this, 'update' ],
-			],
-			[
-				'methods'             => WP_REST_Server::DELETABLE,
-				'permission_callback' => [ $this, 'permission_callback' ],
-				'callback'            => [ $this, 'delete' ],
-			],
-		] );
+		parent::register_routes();
 
-		register_rest_route( self::NAME_SPACE, '/broadcasts/schedule', array(
+		register_rest_route( self::NAME_SPACE, "/{$this->get_db_table_name()}/schedule", array(
 			'methods'             => WP_REST_Server::CREATABLE,
-			'permission_callback' => [ $this, 'permission_callback' ],
+			'permission_callback' => [ $this, 'create_permissions_callback' ],
 			'callback'            => [ $this, 'schedule_broadcast' ],
 		) );
 
-	}
-
-	/**
-	 * Get a list of emails which match a given query
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return WP_Error|WP_REST_Response
-	 */
-	public function read( WP_REST_Request $request ) {
-
-		if ( ! current_user_can( 'schedule_broadcasts' ) ) {
-			return self::ERROR_INVALID_PERMISSIONS();
-		}
-
-		$args = array(
-			'where'   => $request->get_param( 'where' ) ?: [],
-			'limit'   => absint( $request->get_param( 'limit' ) ) ?: 25,
-			'offset'  => absint( $request->get_param( 'offset' ) ) ?: 0,
-			'order'   => sanitize_text_field( $request->get_param( 'offset' ) ) ?: 'DESC',
-			'orderby' => sanitize_text_field( $request->get_param( 'orderby' ) ) ?: 'ID',
-			'select'  => sanitize_text_field( $request->get_param( 'select' ) ) ?: '*',
-			'search'  => sanitize_text_field( $request->get_param( 'search' ) ),
-		);
-
-		$total = get_db( 'broadcasts' )->count( $args );
-		$items = get_db( 'broadcasts' )->query( $args );
-		$items = array_map( function ( $item ) {
-			return new Broadcast( $item->ID );
-		}, $items );
-
-		return self::SUCCESS_RESPONSE( [ 'items' => $items, 'total_items' => $total ] );
-	}
-
-	/**
-	 * Create and email
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return WP_Error
-	 */
-	public function create( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
-	}
-
-	/**
-	 * Update 1 or many emails
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return WP_Error
-	 */
-	public function update( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
-	}
-
-	/**
-	 * Delete 1 or many emails
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return WP_Error
-	 */
-	public function delete( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
 	}
 
 	/**
@@ -225,5 +139,40 @@ class Broadcasts_Api extends Base_Api {
 		set_transient( 'gh_get_broadcast_config', $config, HOUR_IN_SECONDS );
 
 		return self::SUCCESS_RESPONSE( [], _x( 'Broadcast scheduled successfully.', 'api', 'groundhogg' ) );
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function get_db_table_name() {
+		return 'broadcasts';
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function read_permissions_callback() {
+		return current_user_can( 'view_broadcasts' );
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function update_permissions_callback() {
+		return current_user_can( 'edit_broadcasts' );
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function create_permissions_callback() {
+		return current_user_can( 'schedule_broadcasts' );
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function delete_permissions_callback() {
+		return current_user_can( 'delete_broadcasts' );
 	}
 }

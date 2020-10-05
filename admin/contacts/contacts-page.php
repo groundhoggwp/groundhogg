@@ -641,7 +641,7 @@ class Contacts_Page extends Admin_Page {
 
 			$tags = Plugin::$instance->dbs->get_db( 'tags' )->validate( get_request_var( 'tags' ) );
 
-			$cur_tags = $contact->get_tags();
+			$cur_tags = $contact->get_tag_ids();
 			$new_tags = $tags;
 
 			$delete_tags = array_diff( $cur_tags, $new_tags );
@@ -657,7 +657,7 @@ class Contacts_Page extends Admin_Page {
 				}
 			}
 		} else {
-			$contact->remove_tag( $contact->get_tags() );
+			$contact->remove_tag( $contact->get_tag_ids() );
 		}
 
 		// Check if needing to unsubscribe.
@@ -1011,7 +1011,7 @@ class Contacts_Page extends Admin_Page {
 
 			$tags = Plugin::$instance->dbs->get_db( 'tags' )->validate( get_request_var( 'tags' ) );
 
-			$cur_tags = $contact->get_tags();
+			$cur_tags = $contact->get_tag_ids();
 			$new_tags = $tags;
 
 			$delete_tags = array_diff( $cur_tags, $new_tags );
@@ -1027,7 +1027,7 @@ class Contacts_Page extends Admin_Page {
 				}
 			}
 		} else {
-			$contact->remove_tag( $contact->get_tags() );
+			$contact->remove_tag( $contact->get_tag_ids() );
 		}
 
 		if ( get_request_var( 'unsubscribe' ) ) {

@@ -524,7 +524,7 @@ class Contacts_Api extends Base {
 			return $contact;
 		}
 
-		return self::SUCCESS_RESPONSE( [ 'tags' => $contact->get_tags() ] );
+		return self::SUCCESS_RESPONSE( [ 'tags' => $contact->get_tag_ids() ] );
 	}
 
 	/**
@@ -607,7 +607,7 @@ class Contacts_Api extends Base {
 			return $contact;
 		}
 
-		$notes = $contact->get_all_notes();
+		$notes = $contact->get_notes();
 		$response = [];
 
 		foreach ( $notes as $note ){

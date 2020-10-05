@@ -9,7 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
-use function Groundhogg\convert_to_mysql_date;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use WP_REST_Server;
@@ -17,155 +16,58 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
 use function Groundhogg\is_a_contact;
-use function Groundhogg\isset_not_empty;
-use function Groundhogg\map_func_to_attr;
-use function Groundhogg\sanitize_contact_meta;
+use function Groundhogg\is_email_address_in_use;
+use function Groundhogg\sanitize_object_meta;
 
-class Contacts_Api extends Base_Api {
+class Contacts_Api extends Base_Object_Api {
 
 	public function register_routes() {
 
-		register_rest_route( self::NAME_SPACE, '/contacts', [
-			[
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'read' ],
-				'permission_callback' => function () {
-					return current_user_can( 'view_contacts' );
-				},
-			],
-			[
-				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'create' ],
-				'permission_callback' => function () {
-					return current_user_can( 'add_contacts' );
-				},
-			],
-			[
-				'methods'             => WP_REST_Server::EDITABLE,
-				'callback'            => [ $this, 'update' ],
-				'permission_callback' => function () {
-					return current_user_can( 'edit_contacts' );
-				},
-			],
-			[
-				'methods'             => WP_REST_Server::DELETABLE,
-				'callback'            => [ $this, 'delete' ],
-				'permission_callback' => function () {
-					return current_user_can( 'delete_contacts' );
-				},
-			],
-		] );
+		parent::register_routes();
 
-		register_rest_route( self::NAME_SPACE, '/contacts/(?P<ID>\d+)', [
-			[
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'read_single' ],
-				'permission_callback' => function () {
-					return current_user_can( 'view_contacts' );
-				},
-			],
-			[
-				'methods'             => WP_REST_Server::EDITABLE,
-				'callback'            => [ $this, 'update_single' ],
-				'permission_callback' => function () {
-					return current_user_can( 'edit_contacts' );
-				},
-			],
-			[
-				'methods'             => WP_REST_Server::DELETABLE,
-				'callback'            => [ $this, 'delete_single' ],
-				'permission_callback' => function () {
-					return current_user_can( 'delete_contacts' );
-				},
-			],
-		] );
-
-		register_rest_route( self::NAME_SPACE, '/contacts/(?P<ID>\d+)/notes', [
-			[
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'read_notes' ],
-				'permission_callback' => function () {
-					return current_user_can( 'edit_contacts' );
-				},
-			],
-			[
-				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'create_notes' ],
-				'permission_callback' => function () {
-					return current_user_can( 'edit_contacts' );
-				},
-			],
-			[
-				'methods'             => WP_REST_Server::EDITABLE,
-				'callback'            => [ $this, 'update_notes' ],
-				'permission_callback' => function () {
-					return current_user_can( 'edit_contacts' );
-				},
-			],
-			[
-				'methods'             => WP_REST_Server::DELETABLE,
-				'callback'            => [ $this, 'delete_notes' ],
-				'permission_callback' => function () {
-					return current_user_can( 'edit_contacts' );
-				},
-			],
-		] );
-
-		register_rest_route( self::NAME_SPACE, '/contacts/(?P<ID>\d+)/tags', [
+		register_rest_route( self::NAME_SPACE, '/contacts/(?P<id>\d+)/tags', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'read_tags' ],
-				'permission_callback' => function () {
-					return current_user_can( 'edit_contacts' );
-				},
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
 			],
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'create_tags' ],
-				'permission_callback' => function () {
-					return current_user_can( 'edit_contacts' );
-				},
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
 			],
 			[
 				'methods'             => WP_REST_Server::DELETABLE,
 				'callback'            => [ $this, 'delete_tags' ],
-				'permission_callback' => function () {
-					return current_user_can( 'edit_contacts' );
-				},
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
 			],
 		] );
 
-		register_rest_route( self::NAME_SPACE, '/contacts/(?P<ID>\d+)/meta', [
-			[
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'read_meta' ],
-				'permission_callback' => function () {
-					return current_user_can( 'edit_contacts' );
-				},
-			],
+		register_rest_route( self::NAME_SPACE, '/contacts/(?P<id>\d+)/files', [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'create_meta' ],
-				'permission_callback' => function () {
-					return current_user_can( 'edit_contacts' );
-				},
+				'callback'            => [ $this, 'create_files' ],
+				'permission_callback' => [ $this, 'create_files_permissions_callback' ]
 			],
 			[
-				'methods'             => WP_REST_Server::EDITABLE,
-				'callback'            => [ $this, 'update_meta' ],
-				'permission_callback' => function () {
-					return current_user_can( 'edit_contacts' );
-				},
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'read_files' ],
+				'permission_callback' => [ $this, 'read_files_permissions_callback' ]
 			],
 			[
 				'methods'             => WP_REST_Server::DELETABLE,
-				'callback'            => [ $this, 'delete_meta' ],
-				'permission_callback' => function () {
-					return current_user_can( 'edit_contacts' );
-				},
+				'callback'            => [ $this, 'delete_files' ],
+				'permission_callback' => [ $this, 'delete_files_permissions_callback' ]
 			],
 		] );
 
+		register_rest_route( self::NAME_SPACE, '/contacts/(?P<id>\d+)/merge', [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'merge' ],
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
+			],
+		] );
 	}
 
 	/**
@@ -187,43 +89,50 @@ class Contacts_Api extends Base_Api {
 	 */
 	public function create( WP_REST_Request $request ) {
 
-		$data = $request->get_param( 'data' );
-		$meta = $request->get_param( 'meta' );
-		$tags = $request->get_param( 'tags' );
-
-		map_func_to_attr( $data, 'first_name', 'sanitize_text_field' );
-		map_func_to_attr( $data, 'last_name', 'sanitize_text_field' );
-		map_func_to_attr( $data, 'email', 'sanitize_email' );
-		map_func_to_attr( $data, 'optin_status', 'absint' );
-		map_func_to_attr( $data, 'date_created', function ( $date ) {
-			return convert_to_mysql_date( $date );
-		} );
-
-		// get the email address
-		$email_address = get_array_var( $data, 'email' );
-
-		if ( ! $email_address ) {
-			return self::ERROR_422( 'error', 'An email address is required.' );
+		// Create single maybe?
+		if ( $request->get_param( 'data' ) ) {
+			return $this->create_single( $request );
 		}
 
-		// will return false if the email address is not being used
-		if ( get_contactdata( $email_address ) ) {
-			return self::ERROR_409( 'error', 'Email address already in use.' );
+		$items = $request->get_json_params();
+
+		if ( empty( $items ) ) {
+			return self::ERROR_422( 'error', 'No contact data provided.' );
 		}
 
-		// Create the contact record...
-		$contact = new Contact( $data );
+		$added = [];
 
-		foreach ( $meta as $key => $value ) {
-			$contact->update_meta( sanitize_key( $key ), sanitize_contact_meta( $value ) );
+		foreach ( $items as $item ) {
+
+			$data = get_array_var( $item, 'data' );
+			$meta = get_array_var( $item, 'meta' );
+			$tags = get_array_var( $item, 'tags' );
+
+			// get the email address
+			$email_address = get_array_var( $data, 'email' );
+
+			// skip if an email address was not provided
+			// or if another contact is already using this address
+			if ( ! $email_address || get_contactdata( $email_address ) ) {
+				continue;
+			}
+
+			// Create the contact record...
+			$contact = new Contact( $data );
+
+			foreach ( $meta as $key => $value ) {
+				$contact->update_meta( $key, $value );
+			}
+
+			$contact->apply_tag( $tags );
+
+			$added[] = $contact;
 		}
-
-		$contact->apply_tag( $tags );
 
 		return self::SUCCESS_RESPONSE( [
-			'item' => $contact
+			'items'       => $added,
+			'total_items' => count( $added ),
 		] );
-
 	}
 
 	/**
@@ -272,7 +181,56 @@ class Contacts_Api extends Base_Api {
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function update( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
+
+		$query  = (array) $request->get_param( 'query' ) ?: [];
+		$search = sanitize_text_field( wp_unslash( $request->get_param( 'search' ) ) );
+
+		if ( ! key_exists( 'search', $query ) && ! empty( $search ) ) {
+			$query['search'] = $search;
+		}
+
+		$contact_query = new Contact_Query();
+
+		$count    = $contact_query->count( $query );
+		$contacts = $contact_query->query( $query );
+
+		$contacts = array_map( function ( $contact ) {
+			return new Contact( $contact->ID );
+		}, $contacts );
+
+		$data        = $request->get_param( 'data' );
+		$meta        = $request->get_param( 'meta' );
+		$add_tags    = $request->get_param( 'add_tags' ) ?: $request->get_param( 'apply_tags' );
+		$remove_tags = $request->get_param( 'remove_tags' );
+
+		/**
+		 * @var $contact Contact
+		 */
+		foreach ( $contacts as $contact ) {
+
+			// get the email address
+			$email_address = get_array_var( $data, 'email' );
+
+			// skip if the email address is not being used
+			if ( is_email_address_in_use( $email_address, $contact ) ) {
+				continue;
+			}
+
+			$contact->update( $data );
+
+			foreach ( $meta as $key => $value ) {
+				$contact->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
+			}
+
+			$contact->apply_tag( $add_tags );
+			$contact->remove_tag( $remove_tags );
+
+		}
+
+		return self::SUCCESS_RESPONSE( [
+			'items'       => $contacts,
+			'total_items' => $count,
+		] );
 	}
 
 	/**
@@ -306,22 +264,44 @@ class Contacts_Api extends Base_Api {
 	}
 
 	/**
-	 * Fetches a single contact record
+	 * Create a contact or multiple contacts
+	 * Should handle both cases
 	 *
 	 * @param WP_REST_Request $request
 	 *
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
-	public function read_single( WP_REST_Request $request ) {
-		$ID = absint( $request->get_param( 'ID' ) );
+	public function create_single( WP_REST_Request $request ) {
 
-		$contact = get_contactdata( $ID );
+		$data = $request->get_param( 'data' );
+		$meta = $request->get_param( 'meta' );
+		$tags = $request->get_param( 'tags' );
 
-		if ( ! is_a_contact( $contact ) ) {
-			return self::ERROR_CONTACT_NOT_FOUND();
+		// get the email address
+		$email_address = get_array_var( $data, 'email' );
+
+		if ( ! $email_address ) {
+			return self::ERROR_422( 'error', 'An email address is required.' );
 		}
 
-		return self::SUCCESS_RESPONSE( [ 'item' => $contact ] );
+		// will return false if the email address is not being used
+		if ( is_email_address_in_use( $email_address ) ) {
+			return self::ERROR_409( 'error', 'Email address already in use.' );
+		}
+
+		// Create the contact record...
+		$contact = new Contact( $data );
+
+		foreach ( $meta as $key => $value ) {
+			$contact->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
+		}
+
+		$contact->apply_tag( $tags );
+
+		return self::SUCCESS_RESPONSE( [
+			'item' => $contact
+		] );
+
 	}
 
 	/**
@@ -330,14 +310,9 @@ class Contacts_Api extends Base_Api {
 	 * @param WP_REST_Request $request
 	 *
 	 * @return WP_Error|WP_REST_Response
-	 * @todo validate input
-	 * @todo support add/remove tags
-	 *
-	 * @todo sanitize data & meta
-	 * @todo prevent duplicate email addresses
 	 */
 	public function update_single( WP_REST_Request $request ) {
-		$ID = absint( $request->get_param( 'ID' ) );
+		$ID = absint( $request->get_param( 'id' ) );
 
 		$contact = get_contactdata( $ID );
 
@@ -345,78 +320,29 @@ class Contacts_Api extends Base_Api {
 			return self::ERROR_CONTACT_NOT_FOUND();
 		}
 
-		$data = $request->get_param( 'data' );
-		$meta = $request->get_param( 'meta' );
-		$tags = $request->get_param( 'tags' );
+		$data        = $request->get_param( 'data' );
+		$meta        = $request->get_param( 'meta' );
+		$add_tags    = $request->get_param( 'add_tags' ) ?: $request->get_param( 'apply_tags' );
+		$remove_tags = $request->get_param( 'remove_tags' );
+
+		// get the email address
+		$email_address = get_array_var( $data, 'email' );
+
+		// will return false if the email address is not being used
+		if ( is_email_address_in_use( $email_address, $contact ) ) {
+			return self::ERROR_409( 'error', 'Email address already in use.' );
+		}
 
 		$contact->update( $data );
 
 		foreach ( $meta as $key => $value ) {
-			$contact->update_meta( sanitize_key( $key ), $value );
+			$contact->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
 		}
+
+		$contact->apply_tag( $add_tags );
+		$contact->remove_tag( $remove_tags );
 
 		return self::SUCCESS_RESPONSE( [ 'item' => $contact ] );
-	}
-
-	/**
-	 * Delete a contact
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return WP_Error|WP_REST_Response
-	 */
-	public function delete_single( WP_REST_Request $request ) {
-		$ID = absint( $request->get_param( 'ID' ) );
-
-		$contact = get_contactdata( $ID );
-
-		if ( ! is_a_contact( $contact ) ) {
-			return self::ERROR_CONTACT_NOT_FOUND();
-		}
-
-		$contact->delete();
-
-		return self::SUCCESS_RESPONSE();
-	}
-
-	/**
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return mixed|WP_Error|WP_REST_Response
-	 */
-	public function create_notes( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
-	}
-
-	/**
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return mixed|WP_Error|WP_REST_Response
-	 */
-	public function read_notes( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
-	}
-
-	/**
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return WP_Error|WP_REST_Response
-	 */
-	public function update_notes( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
-	}
-
-	/**
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return mixed|WP_Error|WP_REST_Response
-	 */
-	public function delete_notes( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
 	}
 
 	/**
@@ -426,79 +352,267 @@ class Contacts_Api extends Base_Api {
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
 	public function create_tags( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
+		$ID = absint( $request->get_param( 'id' ) );
+
+		$contact = get_contactdata( $ID );
+
+		if ( ! is_a_contact( $contact ) ) {
+			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		$tags = $request->get_json_params();
+
+		$contact->apply_tag( $tags );
+
+		return self::SUCCESS_RESPONSE( [ 'tags' => $contact->get_tags() ] );
 	}
 
 	/**
+	 * Fetch tags associated with the contact record
 	 *
 	 * @param WP_REST_Request $request
 	 *
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
 	public function read_tags( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
+		$ID = absint( $request->get_param( 'id' ) );
+
+		$contact = get_contactdata( $ID );
+
+		if ( ! is_a_contact( $contact ) ) {
+			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		return self::SUCCESS_RESPONSE( [ 'tags' => $contact->get_tags() ] );
 	}
 
 	/**
+	 * Add tags to a contact record
 	 *
 	 * @param WP_REST_Request $request
 	 *
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function update_tags( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
+		return $this->create_tags( $request );
 	}
 
 	/**
+	 * Remove tags from a contact record
 	 *
 	 * @param WP_REST_Request $request
 	 *
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
 	public function delete_tags( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
-	}
+		$ID = absint( $request->get_param( 'id' ) );
 
+		$contact = get_contactdata( $ID );
 
-	/**
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return mixed|WP_Error|WP_REST_Response
-	 */
-	public function create_meta( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
-	}
+		if ( ! is_a_contact( $contact ) ) {
+			return self::ERROR_CONTACT_NOT_FOUND();
+		}
 
-	/**
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return mixed|WP_Error|WP_REST_Response
-	 */
-	public function read_meta( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
+		$tags = $request->get_json_params();
+
+		$contact->remove_tag( $tags );
+
+		return self::SUCCESS_RESPONSE( [ 'tags' => $contact->get_tags() ] );
 	}
 
 	/**
+	 * Upload a file to a contact record.
 	 *
 	 * @param WP_REST_Request $request
 	 *
 	 * @return WP_Error|WP_REST_Response
 	 */
-	public function update_meta( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
+	public function create_files( WP_REST_Request $request ){
+		$ID = absint( $request->get_param( 'id' ) );
+
+		$contact = get_contactdata( $ID );
+
+		if ( ! is_a_contact( $contact ) ) {
+			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		if ( empty( $_FILES ) ){
+			return self::ERROR_422( 'error', 'No files provided.' );
+		}
+
+		foreach ( $_FILES as $file ){
+			$result = $contact->upload_file( $file );
+
+			if ( is_wp_error( $request ) ){
+				return $result;
+			}
+		}
+
+		return self::SUCCESS_RESPONSE( [
+			'items'       => $contact->get_files(),
+			'total_items' => count( $contact->get_files() )
+		] );
 	}
 
 	/**
+	 * Get contact files
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function read_files( WP_REST_Request $request ) {
+		$ID = absint( $request->get_param( 'id' ) );
+
+		$contact = get_contactdata( $ID );
+
+		if ( ! is_a_contact( $contact ) ) {
+			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		return self::SUCCESS_RESPONSE( [
+			'items'       => $contact->get_files(),
+			'total_items' => count( $contact->get_files() )
+		] );
+	}
+
+	/**
+	 * Delete a file from the contact record.
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function delete_files( WP_REST_Request $request ){
+
+		$ID = absint( $request->get_param( 'id' ) );
+
+		$contact = get_contactdata( $ID );
+
+		if ( ! is_a_contact( $contact ) ) {
+			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		$files_to_delete = $request->get_json_params();
+
+		if ( empty( $files_to_delete ) ){
+			return self::ERROR_422( 'error', 'Did not specify a file to delete.' );
+		}
+
+		foreach ( $files_to_delete as $file_name ){
+			$contact->delete_file( $file_name );
+		}
+
+		return self::SUCCESS_RESPONSE( [
+			'items'       => $contact->get_files(),
+			'total_items' => count( $contact->get_files() )
+		] );
+	}
+
+	/**
+	 * Merge one or more contacts with the provided contact record.
 	 *
 	 * @param WP_REST_Request $request
 	 *
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
-	public function delete_meta( WP_REST_Request $request ) {
-		return self::ERROR_NOT_IN_SERVICE();
+	public function merge( WP_REST_Request $request ) {
+		$ID = absint( $request->get_param( 'id' ) );
+
+		$contact = get_contactdata( $ID );
+
+		if ( ! is_a_contact( $contact ) ) {
+			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		$others = $request->get_json_params();
+
+		foreach ( $others as $other ) {
+			$contact->merge( $other );
+		}
+
+		return $contact;
+	}
+
+	/**
+	 * The name of the table resource to use
+	 *
+	 * @return string
+	 */
+	public function get_db_table_name() {
+		return 'contacts';
+	}
+
+	/**
+	 * Permissions callback for read
+	 *
+	 * @return bool
+	 */
+	public function read_permissions_callback() {
+		return current_user_can( 'view_contacts' );
+	}
+
+	/**
+	 * Permissions callback for update
+	 *
+	 * @return mixed
+	 */
+	public function update_permissions_callback() {
+		return current_user_can( 'edit_contacts' );
+	}
+
+	/**
+	 * Permissions callback for create
+	 *
+	 * @return mixed
+	 */
+	public function create_permissions_callback() {
+		return current_user_can( 'add_contacts' );
+	}
+
+	/**
+	 * Permissions callback for delete
+	 *
+	 * @return mixed
+	 */
+	public function delete_permissions_callback() {
+		return current_user_can( 'delete_contacts' );
+	}
+
+	/**
+	 * Permissions callback for files
+	 *
+	 * @return bool
+	 */
+	public function create_files_permissions_callback() {
+		return current_user_can( 'download_contact_files' );
 	}
 
 
+	/**
+	 * Permissions callback for files
+	 *
+	 * @return bool
+	 */
+	public function read_files_permissions_callback() {
+		return current_user_can( 'download_contact_files' );
+	}
+
+	/**
+	 * Permissions callback for files
+	 *
+	 * @return bool
+	 */
+	public function update_files_permissions_callback() {
+		return current_user_can( 'download_contact_files' );
+	}
+
+	/**
+	 * Permissions callback for files
+	 *
+	 * @return bool
+	 */
+	public function delete_files_permissions_callback() {
+		return current_user_can( 'download_contact_files' );
+	}
 }
