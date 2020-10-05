@@ -71,7 +71,7 @@ export default function PrimaryLayout(props) {
             {/* Chart */}
             <Grid item xs={12} md={8} lg={9}>
             <Notices />
-            { children }    
+            { children }
             </Grid>
             {/* Recent Deposits */}
             <Grid item xs={12} md={4} lg={3}>
@@ -144,8 +144,7 @@ Layout.propTypes = {
 class _PageLayout extends Component {
 	render() {
 		return (
-			<BrowserRouter basename={window.Groundhogg.preloadSettings.basename}>
-				<Link to="/">Dashboard</Link> | <Link to="/reports">Reports</Link>
+			<BrowserRouter basename={window.Groundhogg.preloadSettings.basename}>				
 				<Switch>
 					{ getPages().map( ( page ) => {
 						return (
