@@ -5,17 +5,32 @@ import TYPES from './action-types';
 
 const emailsReducer = (
 	state = {
-		isUpdating: false,
-		emails: [],
+		isRequesting: false,
+		items: [],
 		requestingErrors: {}
 	},
-	{ type, emails, error, isUpdating, name }
+	{ type, items, error, isRequesting, name }
 ) => {
 	switch ( type ) {
 		case TYPES.RECEIVE_EMAILS:
 			state = {
 				...state,
-				...emails,
+				items : items.map( ( item ) => { return item.data } )
+			};
+			break;
+		case TYPES.SET_IS_REQUESTING:
+			state = {
+				...state,
+				...items,
+				isRequesting,
+			};
+			break;
+		case TYPES.SET_REQUESTING_ERROR:
+			state = {
+				...state,
+				requestingErrors: {
+					[ name ]: error,
+				},
 			};
 			break;
 	}
