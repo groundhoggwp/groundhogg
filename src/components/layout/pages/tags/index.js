@@ -13,7 +13,7 @@ import SearchInput from '../../../core-ui/search-input';
 import { TAGS_STORE_NAME } from '../../../../data';
 
 const singleEntityExample = ( ID, callback ) => {
-	let tag = callback( ID );	
+	let tag = callback( ID );
 }
 
 export const Tags = ( props ) => {
@@ -30,15 +30,10 @@ export const Tags = ( props ) => {
 			isUpdating: store.isTagsUpdating()
 		}
 	} );
-
-	console.log('hi', tags, isRequesting)
-
+	
 	if ( isRequesting || isUpdating ) {
-		console.log('inside')
 		return <Spinner />;
 	}
-
-	console.log('bye')
 
 	return (
 			<Fragment>

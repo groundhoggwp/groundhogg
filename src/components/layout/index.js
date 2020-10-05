@@ -62,7 +62,7 @@ export default function PrimaryLayout(props) {
 			<main className={`groundhogg-layout__primary ${classes.content}`}>
 
 				<div className={classes.appBarSpacer} />
-				<Container maxWidth="lg" className={classes.container}>
+				<Container maxWidth="xlg" className={classes.container}>
 
 
 
@@ -144,7 +144,7 @@ Layout.propTypes = {
 class _PageLayout extends Component {
 	render() {
 		return (
-			<BrowserRouter basename={window.Groundhogg.preloadSettings.basename}>				
+			<BrowserRouter basename={window.Groundhogg.preloadSettings.basename}>
 				<Switch>
 					{ getPages().map( ( page ) => {
 						return (

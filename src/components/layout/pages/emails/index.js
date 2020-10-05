@@ -1,65 +1,39 @@
 /**
  * External dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
-import { compose } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { Fragment, useState } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import TextField from '@material-ui/core/TextField';
-import { castArray } from 'lodash';
 import Spinner from '../../../core-ui/spinner';
+import Listable from '../../../core-ui/list-table';
 
 /**
  * Internal dependencies
  */
 import { EMAILS_STORE_NAME } from '../../../../data';
 
-class Emails extends Component {
-
-	constructor() {
-		super( ...arguments );
-
-		this.state = {
-		};
-	}
-
-	render() {
-		const emails = castArray( this.props.emails.emails );
-
-		return (
-				<Fragment>
-					<ol>
-					{
-						emails.map( ( email ) => {
-							return( <li>Email Title: {email.data.title}</li> )
-						} )
-					}
-					</ol>
-
-				</Fragment>
-		);
-	}
-}
-// default export
-export default compose(
-	withSelect( ( select ) => {
-		const {
-			getEmails,
-			// isTagsUpdating
-		} = select( EMAILS_STORE_NAME );
-
-		const emails = getEmails();
-
+export const Emails = ( props ) => {
+	const { emails, getEmail, isRequesting } = useSelect( ( select ) => {
+		const store = select( EMAILS_STORE_NAME );
 		return {
-			emails,
-			// isUpdateRequesting
-		};
-	} )
-	// } ),
-	// withDispatch( ( dispatch ) => {
-	// 	const { updateTags } = dispatch( EMAILS_STORE_NAME );
-	// 	return {
-	// 		updateTags
-	// 	};
-	// } )
-)( Emails );
+			emails : store.getEmails(),
+			getEmail : store.getEmail,
+			isRequesting : store.isEmailsRequesting()
+		}
+	} );
+
+	if (isRequesting) {
+		return <Spinner />;
+	}
+
+	return (
+			<Fragment>
+				<h2>Dashboard</h2>
+				<Listable data={emails}/>
+				<ol>
+					{ emails.map( email => <li data-id={email.ID}>{ email.content }</li> ) }
+				</ol>
+			</Fragment>
+	);
+}
