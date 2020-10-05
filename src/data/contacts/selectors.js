@@ -3,6 +3,12 @@
  */
 import { getResourceName } from '../utils';
 
+/**
+ * For potential use in our base object
+ * @param {*} state
+ * @param {*} itemType
+ * @param {*} query
+ */
 export const getItems = ( state, itemType, query ) => {
 	const resourceName = getResourceName( itemType, query );
 	const ids =
@@ -13,6 +19,14 @@ export const getItems = ( state, itemType, query ) => {
 		return map;
 	}, new Map() );
 };
+
+export const getContacts = ( state ) => {
+	return state.items || [];
+}
+
+export const getContact = ( state, id ) => {
+	return getItems(state).find(item => item.ID === id);
+}
 
 export const getItemsTotalCount = ( state, itemType, query ) => {
 	const resourceName = getResourceName( itemType, query );

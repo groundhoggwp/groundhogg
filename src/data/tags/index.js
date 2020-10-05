@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-
-import { select, registerStore } from '@wordpress/data';
+import { registerStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -14,18 +13,12 @@ import controls from '../controls';
 import reducer from './reducer';
 import * as resolvers from './resolvers';
 
-const storeSelectors = select( STORE_NAME );
-
-// @todo This is used to prevent double registration of the store due to webpack chunks.
-// The `storeSelectors` condition can be removed once this is fixed.
-if ( ! storeSelectors ) {
-	registerStore( STORE_NAME, {
-		reducer,
-		actions,
-		controls,
-		selectors,
-		resolvers
-	} );
-}
+registerStore( STORE_NAME, {
+	reducer,
+	actions,
+	controls,
+	selectors,
+	resolvers
+} );
 
 export const TAGS_STORE_NAME = STORE_NAME;

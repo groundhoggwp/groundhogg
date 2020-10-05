@@ -32,10 +32,10 @@ export function deleteContact( itemId ) {
 	};
 }
 
-export function requestContacts( itemIds ) {
+export function requestContacts( items ) {
 	return {
 		type: TYPES.REQUEST_CONTACTS,
-		itemIds
+		items
 	};
 }
 

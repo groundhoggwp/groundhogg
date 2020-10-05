@@ -3,7 +3,7 @@ import { QUERY_DEFAULTS } from '../constants';
 export const initialState = {
 	isRequesting: false,
 	isUpdating: false,
-	isCreating: false,
+	isAdding: false,
 	isDeleting: false,
 	showFilters: false,
 	total: 0,
@@ -13,4 +13,3 @@ export const initialState = {
 	data: [],
 	error: {},
 };
-

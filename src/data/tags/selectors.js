@@ -53,3 +53,7 @@ export const isTagsRequesting = ( state ) => {
 export const getTagsUpdatingError = ( state ) => {
 	return state.updatingError || false;
 };
+
+export const getEndpoint = ( state ) => {
+	return state.endpoint || '';
+}
