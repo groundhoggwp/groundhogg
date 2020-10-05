@@ -1,13 +1,7 @@
 /**
- * External dependencies
- */
-import { apiFetch } from '@wordpress/data-controls';
-
-/**
  * Internal dependencies
  */
 import TYPES from './action-types';
-import { NAMESPACE } from '../constants';
 
 export function setItems( itemType, query, items, totalCount ) {
 	return {
@@ -28,11 +22,11 @@ export function setError( itemType, query, error ) {
 	};
 }
 
-  const fetchContactsRequest = () => {
-	return {
-	  type: TYPES.FETCH_CONTACTS_REQUEST,
-	}
-  }
+const fetchContactsRequest = () => {
+return {
+	type: TYPES.FETCH_CONTACTS_REQUEST,
+}
+}
 
   const fetchContactsSuccess = (data) => {
 	return {

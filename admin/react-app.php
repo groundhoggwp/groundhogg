@@ -18,7 +18,7 @@ class React_App {
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_assets' ] );
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_userdata' ] );
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_settings' ] );
-//		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_api_endpoints' ] );
+		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_basename' ] );
 	}
 
 	public function maybe_redirect() {
@@ -124,7 +124,7 @@ class React_App {
 	 */
 	public function register_rest_base( $obj ) {
 
-		$obj['rest_base'] = rest_url( 'gh/v3' );
+		$obj['rest_base'] = rest_url( 'gh/v4' );
 
 		return $obj;
 	}
@@ -175,11 +175,12 @@ class React_App {
 	 *
 	 * @return mixed
 	 */
-	public function register_api_endpoints( $obj ) {
+	public function register_basename( $obj ) {
+		$settings = $obj['preloadSettings'];
 
-		$obj['api'] = [
-			''
-		];
+		$settings->basename = path_join( wp_parse_url( admin_url(), PHP_URL_PATH ), 'groundhogg' );
+
+		$obj['preloadSettings'] = $settings;
 
 		return $obj;
 	}

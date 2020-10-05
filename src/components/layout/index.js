@@ -90,7 +90,7 @@ Layout.propTypes = {
 class _PageLayout extends Component {
 	render() {
 		return (
-			<BrowserRouter basename="/wp-admin/groundhogg">
+			<BrowserRouter basename={window.Groundhogg.preloadSettings.basename}>
 				<Link to="/">Dashboard</Link> | <Link to="/reports">Reports</Link>
 				<Switch>
 					{ getPages().map( ( page ) => {
