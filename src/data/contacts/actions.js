@@ -4,9 +4,6 @@
 import TYPES from './action-types';
 import { QUERY_DEFAULTS } from '../constants';
 
-//TODO: Ensure all CRUD actions are sync'd with parameters expected in API.
-//TODO: Inline docs.
-
 export function addContact( itemData ) {
 	return {
 		type: TYPES.ADD_CONTACT,
