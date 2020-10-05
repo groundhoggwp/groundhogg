@@ -27,6 +27,7 @@ abstract class Base_Object_Api extends Base_Api {
 
 	/**
 	 * Maps the resource to a class based on object type.
+	 * This function can be overridden my child classes to simply return the correct class instead...
 	 *
 	 * @return mixed|string
 	 * @todo make this more intuitive, maybe add a get_object_class func to the data table?
@@ -372,6 +373,9 @@ abstract class Base_Object_Api extends Base_Api {
 		$items = $this->get_db_table()->query( $args );
 		$items = array_map( [ $this, 'map_raw_object_to_class' ], $items );
 
+		/**
+		 * @var $object Base_Object
+		 */
 		foreach ( $items as $object ) {
 			$object->delete();
 		}

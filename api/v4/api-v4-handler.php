@@ -52,6 +52,8 @@ class API_V4_HANDLER {
 		$this->activity_api    = new Activity_Api();
 		$this->events_api      = new Events_Api();
 		$this->event_queue_api = new Event_Queue_Api();
+		$this->submissions_api = new Submissions_Api();
+		$this->files_api       = new Files_Api();
 
 //		$this->tracking        = new Tracking_Api();
 //		$this->reports         = new Reports_Api();
