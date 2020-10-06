@@ -15,16 +15,19 @@ import * as resolvers from './resolvers';
 import { NAMESPACE } from '../constants'
 
 export function registerBaseObjectStore ( endpoint, options ) {
+
+	resolvers.getEndpoint = ( endpoint = storeName ) => endpoint;
+
 	const storeName = NAMESPACE + '/' + endpoint;
-	const initialState = { endpoint : storeName };
-	registerStore( storeName, {
+	const store     = registerStore( storeName, {
 		reducer,
 		actions,
-		controls,
 		selectors,
-		resolvers,
-		initialState
+		controls,
+		resolvers
 	} );
+
+	return store;
 }
 
 export function getStoreName( ghEndpoint ) {

@@ -3,7 +3,6 @@
  */
 import TYPES from './action-types';
 
-
 export function receiveItems( items ) {
 	return {
 		type: TYPES.RECEIVE_ITEMS,

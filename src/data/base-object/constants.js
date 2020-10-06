@@ -5,4 +5,4 @@ import { NAMESPACE } from '../constants';
  *
  * @todo: Note: this API endpoint does not currently exist.
  */
-export const STORE_NAME = `${NAMESPACE}/tags`;
+export const STORE_NAME = `${NAMESPACE}/`;

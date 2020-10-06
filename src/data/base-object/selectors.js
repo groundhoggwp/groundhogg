@@ -53,12 +53,3 @@ export const isItemsRequesting = ( state ) => {
 export const getItemsUpdatingError = ( state ) => {
 	return state.updatingError || false;
 };
-
-/**
- * Gets endpoint provided by initial state.
- *
- * @param {*} state
- */
-export const getEndpoint = ( state ) => {
-	return state.endpoint || '';
-}

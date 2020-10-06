@@ -6,14 +6,9 @@ import {
   setIsUpdating,
   setUpdatingError,
   setIsRequestingItems,
-  receiveItems, receiveItem,
+  receiveItems,
+  receiveItem,
 } from './actions'
-
-import {
-  getEndpoint
-} from './selectors'
-
-import { NAMESPACE } from '../constants'
 
 /**
  * External dependencies
@@ -21,15 +16,14 @@ import { NAMESPACE } from '../constants'
 import { apiFetch } from '@wordpress/data-controls'
 import { addQueryArgs } from '@wordpress/url'
 
-const endpoint = getEndpoint();
-
 /**
  * Request all tags.
  */
 export function * getItems (query) {
+  const endpoint = getEndpoint();
   yield setIsRequestingItems(true)
   try {
-    const url = addQueryArgs(`${ NAMESPACE }/${ endpoint }`, query)
+    const url = addQueryArgs(`${ endpoint }`, query)
     const result = yield apiFetch({
       path: url,
       method: 'GET',
@@ -49,8 +43,10 @@ export function * getItems (query) {
 export function * getItem (item) {
   yield setIsRequestingItems(true)
 
+  const endpoint = getEndpoint();
+
   try {
-    const url = `${ NAMESPACE }/${ endpoint }/${ item }`
+    const url = `${ endpoint }/${ item }`
     const result = yield apiFetch({
       path: url,
       method: 'GET',
@@ -63,3 +59,5 @@ export function * getItem (item) {
     yield setRequestingError(error)
   }
 }
+
+export function getEndpoint() {}
