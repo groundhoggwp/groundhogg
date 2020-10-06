@@ -48,7 +48,24 @@ export default function NavListItems(props) {
       </ListItemIcon>
       <ListItemText primary="Emails" />
     </ListItem>
-
+    <ListItem button onClick={()=>{changeView('broadcasts')}}>
+      <ListItemIcon>
+        <EmailIcon />
+      </ListItemIcon>
+      <ListItemText primary="Broadcasts" />
+    </ListItem>
+    <ListItem button onClick={()=>{changeView('events')}}>
+      <ListItemIcon>
+        <EmailIcon />
+      </ListItemIcon>
+      <ListItemText primary="Events" />
+    </ListItem>
+    <ListItem button onClick={()=>{changeView('funnels')}}>
+      <ListItemIcon>
+        <EmailIcon />
+      </ListItemIcon>
+      <ListItemText primary="Funnels" />
+    </ListItem>
     <ListSubheader inset>Saved reports</ListSubheader>
     <ListItem button>
       <ListItemIcon>

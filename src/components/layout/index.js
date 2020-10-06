@@ -145,7 +145,8 @@ class _PageLayout extends Component {
 	render() {
 		return (
 			<BrowserRouter basename={window.Groundhogg.preloadSettings.basename}>
-				<Link to="/">Dashboard</Link> | <Link to="/reports">Reports</Link>
+				<Link to="/">Dashboard</Link> | <Link to="/reports">Reports</Link> |<Link to="/broadcasts">Broadcasts</Link>
+
 				<Switch>
 					{ getPages().map( ( page ) => {
 						return (

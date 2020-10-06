@@ -46,30 +46,6 @@ export function setIsRequestingBroadcasts( isRequesting ) {
 	};
 }
 
-
-//
-// /**
-//  * Update Broadcast Not required as there is nothing to update once set but you can cancel it and that will be handled in the row actions
-//  */
-// export function* updateBroadcast( data ) {
-// 	yield setIsUpdating( true );
-// 	yield receiveBroadcasts( data );
-//
-// 	try {
-// 		const results = yield apiFetch( {
-// 			path: NAMESPACE + '/tags',
-// 			method: 'POST',
-// 			data,
-// 		} );
-//
-// 		yield setIsUpdating( false );
-// 		return { success: true, ...results };
-// 	} catch ( error ) {
-// 		yield setUpdatingError( error );
-// 		return { success: false, ...error };
-// 	}
-// }
-
 /**
  * Schedules a new Broadcast.
  * Creates row in the broadcast table still needs to run bulk-jobs to enqueue events

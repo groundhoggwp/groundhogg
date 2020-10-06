@@ -14,6 +14,9 @@ import { Dashboard } from './pages/dashboard';
 import { Reports } from './pages/reports';
 import { Emails } from './pages/emails';
 import { Tags } from './pages/tags';
+import {Broadcasts } from "./pages/broadcast";
+import {Events} from "./pages/events";
+import {Funnels} from  "./pages/funnels";
 
 export const PAGES_FILTER = 'groundhogg_navigation';
 
@@ -32,14 +35,30 @@ export const getPages = () => {
 		path: '/reports',
 	} );
 
+	// pages.push( {
+	// 	container: Emails,
+	// 	path: '/emails',
+	// } );
+	// pages.push( {
+	// 	container: Tags,
+	// 	path: '/tags',
+	// } );
+
 	pages.push( {
-		container: Emails,
-		path: '/emails',
+		container: Broadcasts,
+		path: '/broadcasts',
 	} );
+
 	pages.push( {
-		container: Tags,
-		path: '/tags',
+		container: Events,
+		path: '/events',
 	} );
+
+	pages.push( {
+		container: Funnels,
+		path: '/funnels',
+	} );
+
 
 	return applyFilters( PAGES_FILTER, pages );
 };
