@@ -42,15 +42,21 @@ class Reports_Api extends Base_Api {
 	 *
 	 * @param WP_REST_Request $request
 	 *
-	 * @return WP_REST_Response
+	 * @return WP_Error|WP_REST_Response
 	 */
 	public function read( WP_REST_Request $request ) {
-		$start   = strtotime( sanitize_text_field( $request->get_param( 'start' ) ) );
-		$end     = strtotime( sanitize_text_field( $request->get_param( 'end' ) ) ) + ( DAY_IN_SECONDS - 1 );
+		$start   = strtotime( sanitize_text_field( $request->get_param( 'start' ) ?: date( 'Y-m-d', time() - MONTH_IN_SECONDS ) ) );
+		$end     = strtotime( sanitize_text_field( $request->get_param( 'end' ) ?: date( 'Y-m-d' ) ) ) + ( DAY_IN_SECONDS - 1 );
 		$context = $request->get_param( 'context' );
+		$reports = $request->get_param( 'reports' );
 
-		$reports   = $request->get_param( 'reports' );
 		$reporting = new Reports( $start, $end, $context );
+
+		if ( empty( $reports ) ) {
+			return self::SUCCESS_RESPONSE( [
+				'items' => $reporting->get_all_report_ids()
+			] );
+		}
 
 		$results = [];
 

@@ -302,7 +302,7 @@ class Plugin {
 		$this->tag_mapping  = new Tag_Mapping();
 		$this->step_manager = new Step_Manager();
 		$this->bulk_jobs    = new Bulk_Job_Manager();
-		$this->reporting    = new Reporting();
+//		$this->reporting    = new Reporting();
 
 		$this->bounce_checker   = new Bounce_Checker();
 		$this->sending_service  = new Sending_Service();
