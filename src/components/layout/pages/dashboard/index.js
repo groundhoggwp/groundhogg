@@ -10,7 +10,9 @@ import Spinner from '../../../core-ui/spinner';
 /**
  * Internal dependencies
  */
-import { TAGS_STORE_NAME } from '../../../../data';
+import {
+	TAGS_STORE_NAME
+} from '../../../../data';
 
 const singleEntityExample = ( ID, callback ) => {
 	let tag = callback( ID );
@@ -40,7 +42,7 @@ export const Dashboard = ( props ) => {
 			<Fragment>
 				<h2>Dashboard</h2>
 				<ol>
-					{ tags.map( tag => <li data-id={tag.ID} onClick={ () => { singleEntityExample( tag.ID, getTag ) } }>{ tag.tag_name }</li> ) }
+					{ tags.map( tag => <li data-id={tag.ID} onClick={ () => { singleEntityExample( tag.ID, getTag ) } }>{ tag.data.tag_name }</li> ) }
 				</ol>
 				<TextField id="outlined-basic" label="Add Tags" variant="outlined" value={ stateTagValue } onChange={ ( event ) => setTagValue( event.target.value ) } />
 				<p onClick={ () => { updateTags( { tags : stateTagValue } ) } }>Add</p>
