@@ -54,3 +54,5 @@ export { STEPS_STORE_NAME } from './steps';
 
 /**	Tags */
 export { TAGS_STORE_NAME } from './tags';
+
+export { getStoreName, registerBaseObjectStore } from './base-object';

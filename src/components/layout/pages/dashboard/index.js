@@ -25,10 +25,10 @@ export const Dashboard = ( props ) => {
 	const { tags, getTag, isRequesting, isUpdating } = useSelect( ( select ) => {
 		const store = select( TAGS_STORE_NAME );
 		return {
-			tags : store.getTags(),
-			getTag : store.getTag,
-			isRequesting : store.isTagsRequesting(),
-			isUpdating: store.isTagsUpdating()
+			tags : store.getItems(),
+			getTag : store.getItem,
+			isRequesting : store.isItemsRequesting(),
+			isUpdating: store.isItemsUpdating()
 		}
 	} );
 
