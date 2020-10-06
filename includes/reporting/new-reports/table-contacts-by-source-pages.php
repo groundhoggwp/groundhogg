@@ -18,6 +18,7 @@ class Table_Contacts_By_Source_Pages extends Base_Table_Report {
 		return [
 			__( 'Source Page', 'groundhogg' ),
 			__( 'Contacts', 'groundhogg' ),
+			__( 'Percentage', 'groundhogg' ),
 		];
 	}
 
@@ -48,12 +49,8 @@ class Table_Contacts_By_Source_Pages extends Base_Table_Report {
 	 */
 	protected function normalize_datum( $item_key, $item_data ) {
 		return [
-			'label' => Plugin::$instance->utils->html->wrap( $item_key, 'a', [
-				'href'   => $item_key,
-				'target' => '_blank'
-			] ),
+			'label' => $item_key,
 			'data'  => $item_data,
-			'url'   => admin_url( 'admin.php?page=gh_contacts&meta_value=source_page&meta_value=' . urlencode( $item_key ) )
 		];
 	}
 }

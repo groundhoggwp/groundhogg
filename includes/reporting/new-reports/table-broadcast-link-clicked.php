@@ -26,9 +26,10 @@ class Table_Broadcast_Link_Clicked extends Base_Table_Report {
 
 	protected function get_broadcast_id() {
 //		return get_array_var( get_request_var( 'data', [] ), 'broadcast_id' );
-		if (get_array_var( $this->request_data , 'ddl_broadcasts' ) ) {
-			$id  = absint(get_array_var( $this->request_data , 'ddl_broadcasts' ) );
+		if ( get_array_var( $this->request_data, 'ddl_broadcasts' ) ) {
+			$id = absint( get_array_var( $this->request_data, 'ddl_broadcasts' ) );
 		}
+
 		return $id;
 	}
 
@@ -56,40 +57,20 @@ class Table_Broadcast_Link_Clicked extends Base_Table_Report {
 				];
 			}
 
-			$links[ $event->referer_hash ]['clicks'] ++;
-			$links[ $event->referer_hash ]['contacts'][] = $event->contact_id;
-			$links[ $event->referer_hash ]['uniques']    = count( array_unique( $links[ $event->referer_hash ]['contacts'] ) );
+			$links[ $event->referer_hash ][ 'clicks' ] ++;
+			$links[ $event->referer_hash ][ 'contacts' ][] = $event->contact_id;
+			$links[ $event->referer_hash ][ 'uniques' ]    = count( array_unique( $links[ $event->referer_hash ][ 'contacts' ] ) );
 		}
 
 		if ( empty( $links ) ) {
 			return [];
 		}
 
-
-		$data = [];
 		foreach ( $links as $hash => $link ) {
-			$data[] = [
-				'label'   => html()->wrap( $link['referer'], 'a', [
-					'href'  => $link['referer'],
-					'class' => 'number-total',
-					'title' => $link['referer'],
-					'target' => '_blank',
-				] ),
-				'uniques' => html()->wrap( $link['uniques'], 'a', [
-					'href'   => add_query_arg(
-						[
-							'activity' => [
-								'activity_type' => Activity::EMAIL_CLICKED,
-								'step_id'       => $broadcast->get_id(),
-								'funnel_id'     => $broadcast->get_funnel_id(),
-								'referer_hash'  => $hash,
-							]
-						],
-						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
-					),
-					'class'  => 'number-total'
-				] ),
-				'clicks'  => html()->wrap( $link['clicks'], 'span', [ 'class' => 'number-total' ] ),
+			$data [] = [
+				'label'   => $link[ 'referer' ],
+				'uniques' => $link[ 'uniques' ],
+				'clicks'  => $link[ 'clicks' ]
 			];
 		}
 

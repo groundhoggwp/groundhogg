@@ -5,9 +5,10 @@ export const MAX_PER_PAGE = 100;
  * Query defaults for reporting.
  */
 export const QUERY_DEFAULTS = {
-	pageSize: 25,
-	period: 'month',
-	compare: 'previous_year',
+	number: 20,
+	offset: 0,
+	orderby: 'ID',
+	order: 'DESC',
 };
 
 /**

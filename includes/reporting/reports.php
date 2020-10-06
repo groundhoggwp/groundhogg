@@ -95,6 +95,15 @@ class Reports {
 	}
 
 	/**
+	 * Fetch the report ids
+	 *
+	 * @return array
+	 */
+	public function get_all_report_ids(){
+		return array_values( wp_list_pluck( $this->reports, 'id' ) );
+	}
+
+	/**
 	 * Setup the default reports
 	 */
 	public function setup_default_reports() {

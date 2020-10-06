@@ -9,10 +9,10 @@ import { apiFetch } from '@wordpress/data-controls';
 import TYPES from './action-types';
 import { NAMESPACE } from '../constants';
 
-export function receiveEmails( emails ) {
+export function receiveEmails( items ) {
 	return {
 		type: TYPES.RECEIVE_EMAILS,
-		emails,
+		items
 	};
 }
 
@@ -23,35 +23,9 @@ export function setRequestingError( error ) {
 	};
 }
 
-export function setUpdatingError( error ) {
+export function setIsRequestingEmails( isRequesting ) {
 	return {
-		type: TYPES.SET_UPDATING_ERROR,
-		error,
+		type: TYPES.SET_IS_REQUESTING,
+		isRequesting,
 	};
 }
-
-export function setIsUpdating( isUpdating ) {
-	return {
-		type: TYPES.SET_IS_UPDATING,
-		isUpdating,
-	};
-}
-//
-// export function* updateTags( data ) {
-// 	yield setIsUpdating( true );
-// 	yield receiveTags( data );
-//
-// 	try {
-// 		const results = yield apiFetch( {
-// 			path: NAMESPACE + '/tags',
-// 			method: 'POST',
-// 			data,
-// 		} );
-//
-// 		yield setIsUpdating( false );
-// 		return { results };
-// 	} catch ( error ) {
-// 		yield setUpdatingError( error );
-// 		return { success: false, ...error };
-// 	}
-// }

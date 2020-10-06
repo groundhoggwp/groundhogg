@@ -208,8 +208,9 @@ abstract class Base_Report {
 		return absint( get_array_var( get_request_var( 'data', [] ), 'step_id' ) );
 	}
 
+
 	protected function get_title() {
-		return  'STATIC TITLE';
+		return  'TODO IF REQUIRED PLEASE LET ME KNOW';
 	}
 
 

@@ -62,7 +62,7 @@ export default function PrimaryLayout(props) {
 			<main className={`groundhogg-layout__primary ${classes.content}`}>
 
 				<div className={classes.appBarSpacer} />
-				<Container maxWidth="lg" className={classes.container}>
+				<Container maxWidth="xlg" className={classes.container}>
 
 
 
@@ -71,7 +71,7 @@ export default function PrimaryLayout(props) {
             {/* Chart */}
             <Grid item xs={12} md={8} lg={9}>
             <Notices />
-            { children }    
+            { children }
             </Grid>
             {/* Recent Deposits */}
             <Grid item xs={12} md={4} lg={3}>
@@ -145,8 +145,6 @@ class _PageLayout extends Component {
 	render() {
 		return (
 			<BrowserRouter basename={window.Groundhogg.preloadSettings.basename}>
-				<Link to="/">Dashboard</Link> | <Link to="/reports">Reports</Link> |<Link to="/broadcasts">Broadcasts</Link>
-
 				<Switch>
 					{ getPages().map( ( page ) => {
 						return (

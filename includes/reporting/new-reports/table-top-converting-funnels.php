@@ -40,30 +40,25 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 
 		$list = [];
 		foreach ( $funnels as $funnel ) {
+			$funnel_object = new Funnel($funnel->ID);
 			$list [] = [
 				'label' => $funnel->title,
-				'data'  => $this->get_conversion_rate( $funnel->ID ),
-				'url'   => admin_page_url( 'gh_reporting', [ 'tab' => 'funnels', 'funnel' => $funnel->ID ] ),
+				'data'  => $this->get_conversion_rate( $funnel->ID ) . '%' ,
+				'funnel' => $funnel_object->get_as_array()
 			];
 		}
 
 
-		$list = $this->normalize_data( $list );
+		return $list;
 
-		foreach ( $list as $i => $datum ) {
-
-
-			$datum['label'] = html()->wrap( $datum['label'], 'a', [
-				'href'  => $datum['url'],
-				'class' => 'number-total'
-			] );
-			$datum['data']  = $datum['data'] . '%';
-
-			unset( $datum['url'] );
-			$data[ $i ] = $datum;
-		}
-
-		return $data;
+//		$list = $this->normalize_data( $list );
+//
+//		foreach ( $list as $i => $datum ) {
+//			$datum['data']  = $datum['data'] . '%';
+//			$data[ $i ] = $datum;
+//		}
+//
+//		return $data;
 
 	}
 
@@ -81,7 +76,6 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 		return [
 			'label' => $item_data ['label'],
 			'data'  => $item_data ['data'],
-			'url'   => $item_data ['url'],
 		];
 	}
 

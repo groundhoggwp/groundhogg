@@ -2,104 +2,73 @@
  * Internal dependencies
  */
 import TYPES from './action-types';
-
-const initialState = {
-	isRequesting: false,
-	isUpdating: false,
-	isCreating: false,
-	isDeleting: false,
-	showFilters: false,
-	total: 0,
-	context: {},
-	selected: [],
-	query: {
-	  number: 20,
-	  offset: 0,
-	  orderby: 'ID',
-	  order: 'DESC',
-	},
-	data: [],
-	error: {},
-};
+import { initialState } from './initial-state';
 
 const contactsReducer = (
 	state = initialState,
 	{
 		type,
-		payload,
-		data,
 		error,
-		isCreating,
+		itemData, // Single entity item object
+		itemId, // Single entity ID
+		items, // Collection of item objects
+		itemIds, // Collection of item IDs
+		tags,
+		files,
+		others,
+		isAdding,
 		isRequesting,
 		isUpdating,
 		isDeleting,
-		name
+		isMerging,
+		context,
+		queryVars
 	}
 ) => {
 	switch ( type ) {
-	  case TYPES.CHANGE_CONTEXT:
-		return {
-		  ...state,
-		  context: {
-			...state.context,
-			...payload
-		  }
+		case TYPES.CHANGE_CONTEXT:
+			return {
+				...state,
+				context
 		}
-	  case TYPES.CHANGE_QUERY:
-		return {
-		  ...state,
-		  query: {
-			...state.query,
-			...payload
-		  }
+		case TYPES.CHANGE_QUERY:
+			return {
+				...state,
+				queryVars
 		}
-	  case TYPES.CLEAR_STATE:
-		return {
-		  ...state,
-		  ...initialState
+		case TYPES.CLEAR_STATE:
+			return {
+				...state,
+				...initialState
 		}
-	  case TYPES.FETCH_CONTACTS_REQUEST:
-		return {
-		  ...state,
-		  isRequesting: true,
+		case TYPES.REQUEST_CONTACTS:
+			return {
+				...state,
+				items: items,
 		}
-	  case TYPES.FETCH_CONTACTS_SUCCESS:
-		return {
-		  ...state,
-		  isRequesting: false,
-		  data: payload.contacts,
-		  total: payload.total,
-		  error: {}
+		case TYPES.EDIT_CONTACT:
+		case TYPES.ADD_CONTACT:
+			return {
+				...state,
+				items: [ ...state.items, itemData ],
 		}
-	  case TYPES.FETCH_MORE_CONTACTS_SUCCESS:
-		return {
-		  ...state,
-		  isRequesting: false,
-		  data: [
-			...state.data,
-			...payload
-		  ],
-		  error: {}
+		case TYPES.DELETE_CONTACT:
+			return {
+				...state,
+				items: state.items.filter(existing => existing.ID !== itemId)
 		}
-	  case TYPES.FETCH_CONTACTS_FAILED:
-		return {
-		  ...state,
-		  isRequesting: false,
-		  data: [],
-		  error: payload
+		case TYPES.CLEAR_ITEMS:
+			return {
+				...state,
+				items: [],
 		}
-	  case TYPES.CLEAR_ITEMS:
-		return {
-		  ...state,
-		  data: [],
+		case TYPES.SHOW_CONTACT_FILTERS:
+			return {
+				...state,
+				showFilters: true
 		}
-	  case TYPES.SHOW_CONTACT_FILTERS:
-		return {
-		  ...state,
-		  showFilters: true
-		}
-	  default:
-		return state;
+		default:
+			return state;
 	}
 };
 

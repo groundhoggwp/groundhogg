@@ -13,6 +13,7 @@ use Groundhogg\Broadcast;
 use Groundhogg\Classes\Note;
 use Groundhogg\Contact;
 use Groundhogg\Email;
+use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Step;
 use Groundhogg\Tag;
@@ -43,6 +44,7 @@ abstract class Base_Object_Api extends Base_Api {
 			'step'      => Step::class,
 			'funnel'    => Funnel::class,
 			'broadcast' => Broadcast::class,
+			'event'     => Event::class,
 		] );
 
 		$class = get_array_var( $object_type_class_map, $this->get_object_type() );
@@ -326,7 +328,7 @@ abstract class Base_Object_Api extends Base_Api {
 		$data = $request->get_param( 'data' ) ?: [];
 		$meta = $request->get_param( 'meta' ) ?: [];
 
-		if ( empty( $data ) || empty( $where )){
+		if ( empty( $data ) || empty( $where ) ) {
 			return self::ERROR_422( 'error', 'No data to update.' );
 		}
 
@@ -366,7 +368,7 @@ abstract class Base_Object_Api extends Base_Api {
 			'where' => $where,
 		);
 
-		if ( empty( $where ) ){
+		if ( empty( $where ) ) {
 			return self::ERROR_422( 'error', 'Please specify items to delete.' );
 		}
 
