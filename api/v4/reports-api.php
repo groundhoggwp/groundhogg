@@ -24,7 +24,7 @@ class Reports_Api extends Base_Api {
 			],
 		] );
 
-		register_rest_route( self::NAME_SPACE, '/reports/(?P<id>\d+)', [
+		register_rest_route( self::NAME_SPACE, '/reports/(?P<id>\w+)', [
 			[
 				'methods'              => WP_REST_Server::READABLE,
 				'callback'             => [ $this, 'read_single' ],
@@ -80,8 +80,8 @@ class Reports_Api extends Base_Api {
 	 */
 	public function read_single( WP_REST_Request $request ) {
 
-		$start   = strtotime( sanitize_text_field( $request->get_param( 'start' ) ) );
-		$end     = strtotime( sanitize_text_field( $request->get_param( 'end' ) ) ) + ( DAY_IN_SECONDS - 1 );
+		$start   = strtotime( sanitize_text_field( $request->get_param( 'start' ) ?: date( 'Y-m-d', time() - MONTH_IN_SECONDS ) ) );
+		$end     = strtotime( sanitize_text_field( $request->get_param( 'end' ) ?: date( 'Y-m-d' ) ) ) + ( DAY_IN_SECONDS - 1 );
 		$context = $request->get_param( 'context' );
 
 		$report    = $request->get_param( 'id' );
