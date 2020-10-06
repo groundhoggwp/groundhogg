@@ -24,7 +24,7 @@ abstract class Base_Table_Report extends Base_Report {
 		return [
 			'type'    => 'table',
 			'chart'   => [
-				'type' => 'table',
+				'type'  => 'table',
 				'label' => $this->get_label(),
 				'data'  => $this->get_table_data(),
 			],
@@ -36,9 +36,7 @@ abstract class Base_Table_Report extends Base_Report {
 	 * Text to display if no data is available...
 	 */
 	protected function no_data_notice() {
-		return html()->e( 'div', [ 'class' => 'notice notice-warning' ], [
-			html()->e( 'p', [], __( 'No information available.', 'groundhogg' ) )
-		] );
+		return __( "No information available." );
 	}
 
 	/**
@@ -136,15 +134,8 @@ abstract class Base_Table_Report extends Base_Report {
 		foreach ( $data as $i => $datum ) {
 
 			$sub_tal    = $datum[ 'data' ];
-			$percentage = ' (' . percentage( $total, $sub_tal ) . '%)';
-
-			$datum[ 'data' ] = html()->e( 'a', [
-				'href'  => $datum[ 'url' ],
-				'class' => 'number-total',
-				'title' => $datum[ 'url' ],
-			], $datum[ 'data' ] );
-
-			unset( $datum[ 'url' ] );
+			$percentage = percentage( $total, $sub_tal );
+			$datum['percentage'] = $percentage . '%' ;
 			$data[ $i ] = $datum;
 		}
 

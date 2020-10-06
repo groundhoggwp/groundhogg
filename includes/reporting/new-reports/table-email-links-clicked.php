@@ -60,28 +60,9 @@ class Table_Email_Links_Clicked extends Base_Table_Report {
 		$data = [];
 		foreach ( $links as $hash => $link ) {
 			$data[] = [
-				'label'   => html()->wrap( $link['referer'], 'a', [
-					'href'   => $link['referer'],
-					'class'  => 'number-total',
-					'title'  => $link['referer'],
-					'target' => '_blank',
-				] ),
-				'uniques' => html()->wrap( _nf( $link['uniques'] ), 'a', [
-					'href'  => add_query_arg(
-						[
-							'activity' => [
-								'activity_type' => Activity::EMAIL_CLICKED,
-								'email_id'      => $email->get_id(),
-								'referer_hash'  => $hash,
-								'before'        => $this->end,
-								'after'         => $this->start
-							]
-						],
-						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
-					),
-					'class' => 'number-total'
-				] ),
-				'clicks'  => html()->wrap( _nf( $link['clicks'] ), 'span', [ 'class' => 'number-total' ] ),
+				'label'   =>  $link['referer'],
+				'uniques' => _nf( $link['uniques'] ),
+				'clicks'  =>  _nf( $link['clicks'])
 			];
 		}
 

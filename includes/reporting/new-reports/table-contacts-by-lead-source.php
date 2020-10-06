@@ -22,7 +22,8 @@ class Table_Contacts_By_Lead_Source extends Base_Table_Report {
 	public function get_label() {
 		return [
 			__( 'Lead Source', 'groundhogg' ),
-			__( 'Contacts', 'groundhogg' ),
+			__( 'Number of Contacts', 'groundhogg' ),
+			__( 'Percentage', 'groundhogg' ),
 		];
 	}
 
@@ -57,17 +58,8 @@ class Table_Contacts_By_Lead_Source extends Base_Table_Report {
 	 */
 	protected function normalize_datum( $item_key, $item_data ) {
 		return [
-			'label' => html()->wrap( $item_key, 'a', [
-				'href'   => $item_key,
-				'target' => '_blank',
-				'title'  => $item_key
-			] ),
+			'label' => $item_key,
 			'data'  => $item_data,
-			'url'   => admin_page_url( 'gh_contacts', [
-				'meta_key'     => 'lead_source',
-				'meta_value'   => $item_key,
-				'meta_compare' => 'RLIKE',
-			] ),
 		];
 	}
 

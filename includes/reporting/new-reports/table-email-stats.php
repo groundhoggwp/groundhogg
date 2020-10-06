@@ -23,97 +23,44 @@ class Table_Email_Stats extends Base_Table_Report {
 
 		$email = new Email( $this->get_email_id() );
 
-		$title = $email->get_subject_line();
+		$title = $email->get_title();
 		$stats = $email->get_email_stats( $this->start, $this->end );
 
 		return [
 			[
 				'label' => __( 'Subject', 'groundhogg' ),
-				'data'  => html()->wrap( $title, 'a', [
-					'href'  => admin_page_url( 'gh_emails', [ 'action' => 'edit', 'email' => $email->get_id() ] ),
-					'title' => $title,
-					'class' => 'number-total'
-				] )
+				'data'  => $title
 			],
 			[
 				'label' => __( 'Total Delivered', 'groundhogg' ),
-				'data'  => html()->wrap( $stats['sent'], 'a', [
-					'href'  => add_query_arg(
-						[
-							'report' => [
-								'step'   => $stats[ 'steps' ],
-								'type'   => Event::FUNNEL,
-								'status' => Event::COMPLETE,
-								'before' => $this->end,
-								'after'  => $this->start
-							]
-						],
-						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
-					),
-					'class' => 'number-total'
-				] )
+				'data'  => $stats[ 'sent' ]
 			],
 			[
-				'label' => __( 'Opens', 'groundhogg' ),
-				'data'  => html()->wrap( $stats['opened'] . ' (' . percentage( $stats['sent'], $stats['opened'] ) . '%)', 'a', [
-					'href'  => add_query_arg(
-						[
-							'activity' => [
-								'activity_type' => Activity::EMAIL_OPENED,
-								'email_id'      => $email->get_id(),
-								'after'         => $this->start,
-								'before'        => $this->end
-							]
-						],
-						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
-					),
-					'class' => 'number-total'
-				] )
+				'label'      => __( 'Opens', 'groundhogg' ),
+				'data'       => $stats[ 'opened' ],
+				'percentage' => percentage( $stats[ 'sent' ], $stats[ 'opened' ] ) . '%'
 			],
 			[
 				'label' => __( 'Total Clicks', 'groundhogg' ),
-				'data'  => html()->wrap( $stats['all_clicks'], 'span', [
-					'class' => 'number-total'
-				] )
+				'data'  => $stats[ 'all_clicks' ]
 			],
 			[
-				'label' => __( 'Unique Clicks', 'groundhogg' ),
-				'data'  => html()->wrap( $stats['clicked'] . ' (' . percentage( $stats['sent'], $stats['clicked'] ) . '%)', 'a', [
-					'href'  => add_query_arg(
-						[
-							'activity' => [
-								'activity_type' => Activity::EMAIL_CLICKED,
-								'email_id'      => $email->get_id(),
-								'after'         => $this->start,
-								'before'        => $this->end
-							]
-						],
-						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
-					),
-					'class' => 'number-total'
-				] )
+				'label'      => __( 'Unique Clicks', 'groundhogg' ),
+				'data'       => $stats[ 'clicked' ],
+				'percentage' => percentage( $stats[ 'sent' ], $stats[ 'clicked' ] ) . '%',
 			],
 			[
 				'label' => __( 'Click Thru Rate', 'groundhogg' ),
-				'data'  => percentage( $stats['opened'], $stats['clicked'] ) . '%'
+				'data'  => percentage( $stats[ 'opened' ], $stats[ 'clicked' ] ) . '%'
 			],
 			[
-				'label' => __( 'Unsubscribed', 'groundhogg' ),
-				'data'  => html()->wrap( $stats['unsubscribed'] . ' (' . percentage( $stats['sent'], $stats['unsubscribed'] ) . '%)', 'a', [
-					'href'  => add_query_arg(
-						[
-							'activity' => [
-								'activity_type' => Activity::UNSUBSCRIBED,
-								'email_id'      => $email->get_id(),
-								'after'         => $this->start,
-								'before'        => $this->end
-							]
-						],
-						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
-					),
-					'class' => 'number-total'
-				] )
+				'label'      => __( 'Unsubscribed', 'groundhogg' ),
+				'data'       => $stats[ 'unsubscribed' ],
+				'percentage' => percentage( $stats[ 'sent' ], $stats[ 'unsubscribed' ] ) . '%'
 			],
+			[
+				'email' => $email->get_as_array()
+			]
 		];
 
 	}

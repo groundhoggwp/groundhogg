@@ -110,17 +110,19 @@ abstract class Base_Email_Performance_Table_Report extends Base_Table_Report {
 
 			if ( $this->should_include( $report['sent'], $report['opened'], $report ['clicked'] ) ) {
 				$list[] = [
-					'email'   => $email,
+					'label'   => $title,
 					'sent'    => _nf( $report['sent'] ),
-					'opened'  => percentage( $report['sent'], $report['opened'] ),
-					'clicked' => percentage( $report['opened'], $report['clicked'] ),
+					'opened'  => percentage( $report['sent'], $report['opened'] ) .'%',
+					'clicked' => percentage( $report['opened'], $report['clicked'] ) . '%',
+					'email' => $email->get_as_array()
 				];
 
 			}
 
 		}
 
-		return $this->normalize_data( $list );
+		return  $list;
+//		return $this->normalize_data( $list );
 	}
 
 	protected function normalize_data( $data ) {
@@ -136,7 +138,6 @@ abstract class Base_Email_Performance_Table_Report extends Base_Table_Report {
 			$datum['opened']  = $datum['opened'] . '%';
 			$datum['clicked'] = $datum['clicked'] . '%';
 
-			unset( $datum['url'] );
 		}
 
 		return $data;
@@ -153,7 +154,6 @@ abstract class Base_Email_Performance_Table_Report extends Base_Table_Report {
 	protected function normalize_datum( $item_key, $item_data ) {
 		return [
 			'label'   => $item_data['label'],
-			'url'     => $item_data['url'],
 			'sent'    => $item_data['sent'],
 			'opened'  => $item_data['opened'],
 			'clicked' => $item_data['clicked'],
