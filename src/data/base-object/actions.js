@@ -87,7 +87,7 @@ export function setRequestingError( error ) {
 	};
 }
 
-export function setIsUpdating( isUpdating ) {
+export function setIsUpdatingItems( isUpdating ) {
 	return {
 		type: TYPES.SET_IS_UPDATING,
 		isUpdating,
@@ -101,7 +101,7 @@ export function setUpdatingError( error ) {
 	};
 }
 
-export function setIsDeleting( isDeleting ) {
+export function setIsDeletingItems( isDeleting ) {
 	return {
 		type: TYPES.SET_IS_DELETING,
 		isDeleting,
