@@ -34,6 +34,10 @@ export const Dashboard = ( props ) => {
 		}
 	} );
 
+	if ( typeof tags === 'undefined' ) {
+		return null;
+	}
+
 	if ( isRequesting || isUpdating ) {
 		return <Spinner />;
 	}

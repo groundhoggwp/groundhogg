@@ -3,11 +3,6 @@
  */
 import TYPES from './action-types';
 
-/**
- * External dependencies
- */
-import { map } from 'lodash';
-
 const reducer = (
 	state = {
 		isCreating: false,
@@ -72,7 +67,7 @@ const reducer = (
 		case TYPES.RECEIVE_ITEMS:
 			state = {
 				...state,
-				items : items
+				items
 			};
 			break;
 		case TYPES.SET_IS_REQUESTING:
@@ -127,14 +122,14 @@ const reducer = (
 			state = {
 				...state,
 				items : state.items
-					.filter( existing => existing.ID !== item.ID )
+					.filter( existing => existing.ID !== itemId )
 			};
 			break;
 		case TYPES.DELETE_ITEMS:
 			state = {
 				...state,
 				items : state.items
-					.filter( existing => items.map( item => item.ID ).indexOf( existing.ID ) < 0 )
+					.filter( existing => itemIds.indexOf( existing.ID ) < 0 )
 			};
 			break;
 		case TYPES.SET_IS_DELETING:
