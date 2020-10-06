@@ -20,7 +20,7 @@ export { BULK_JOBS_STORE_NAME } from './bulk-jobs';
 export { CONTACT_META_STORE_NAME } from './contact-meta';
 
 /**	Contact Notes */
-export { CONTACT_NOTES_STORE_NAME } from './contact-notes';
+export { CONTACT_NOTES_STORE_NAME } from './notes';
 
 /**	Contacts */
 export { CONTACTS_STORE_NAME } from './contacts';

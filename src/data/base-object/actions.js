@@ -114,3 +114,8 @@ export function setDeletingError( error ) {
 		error,
 	};
 }
+
+/**
+ * This is overridden
+ */
+export function getEndpoint() {}

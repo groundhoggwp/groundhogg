@@ -21,6 +21,18 @@ class Reports_Api extends Base_Api {
 				'methods'              => WP_REST_Server::READABLE,
 				'callback'             => [ $this, 'read' ],
 				'permissions_callback' => [ $this, 'read_permissions_callback' ],
+				'args' => [
+					'start' => [
+						'validate_callback' => [ $this, 'is_valid_report_date' ],
+						'sanitize_callback' => [ $this, 'sanitize_report_data' ],
+						'default' => function (){
+							return ;
+						}
+					]
+				],
+				'schema' => [
+
+				]
 			],
 		] );
 
@@ -35,6 +47,19 @@ class Reports_Api extends Base_Api {
 
 	public function read_permissions_callback() {
 		return current_user_can( 'view_reports' );
+	}
+
+	/**
+	 * Verify the reporting dat is valid
+	 *
+	 * @param $param
+	 * @param $request
+	 * @param $key
+	 *
+	 * @return bool
+	 */
+	public function is_valid_report_date( $param, $request, $key ){
+		return strtotime( $param ) !== false;
 	}
 
 	/**

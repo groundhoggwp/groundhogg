@@ -15,9 +15,10 @@ import * as baseReducer from './reducer';
 import * as baseResolvers from './resolvers';
 import { NAMESPACE } from '../constants'
 
-export function registerBaseObjectStore ( endpoint, options ) {
+export function registerBaseObjectStore (endpoint) {
 
 	baseResolvers.getEndpoint = ( endpoint = storeName ) => endpoint;
+  baseActions.getEndpoint   = (endpoint = storeName) => endpoint
 
 	const storeArgs = {
 		reducer      : options.reducer   ? assign( baseReducer  , options.reducer )   : baseReducer,
@@ -31,6 +32,6 @@ export function registerBaseObjectStore ( endpoint, options ) {
 	return registerStore( NAMESPACE + '/' + endpoint, storeArgs );
 }
 
-export function getStoreName( ghEndpoint ) {
-	return NAMESPACE + '/' + ghEndpoint;
+export function getStoreName (ghEndpoint) {
+  return NAMESPACE + '/' + ghEndpoint
 }

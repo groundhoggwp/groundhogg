@@ -1,15 +1,15 @@
 /**
- * Get tag from state tree.
+ * Get item from state tree.
  *
  * @param {Object} state - Reducer state
  * @param {Array} item - Option name
  */
 export const getItem = ( state, item ) => {
-	return state.item;
+	return state.items.find( (_item ) => item.id === _item.id );
 };
 
 /**
- * Get tags from state tree.
+ * Get items from state tree.
  *
  * @param {Object} state - Reducer state
  */
@@ -18,17 +18,17 @@ export const getItems = ( state ) => {
 };
 
 /**
- * Determine if an tags request resulted in an error.
+ * Determine if an items read request resulted in an error.
  *
  * @param {Object} state - Reducer state
- * @param {string} name - Option name3
+ * @param {string} name - Option name
  */
 export const getItemsRequestingError = ( state, name ) => {
 	return state.requestingErrors[ name ] || false;
 };
 
 /**
- * Determine if tags are being updated.
+ * Determine if items are being updated.
  *
  * @param {Object} state - Reducer state
  */
@@ -37,7 +37,7 @@ export const isItemsUpdating = ( state ) => {
 };
 
 /**
- * Determine if tags are being updated.
+ * Determine if items are being updated.
  *
  * @param {Object} state - Reducer state
  */
@@ -46,7 +46,7 @@ export const isItemsRequesting = ( state ) => {
 };
 
 /**
- * Determine if an tags update resulted in an error.
+ * Determine if an items update resulted in an error.
  *
  * @param {Object} state - Reducer state
  */

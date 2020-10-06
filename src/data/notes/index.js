@@ -6,8 +6,8 @@ import {
   getStoreName
 } from '../base-object';
 
-const STORE_NAME = 'broadcasts';
+const STORE_NAME = 'notes';
 
 registerBaseObjectStore( STORE_NAME );
 
-export const BROADCASTS_STORE_NAME = getStoreName( STORE_NAME );
+export const NOTES_STORE_NAME = getStoreName( STORE_NAME );
