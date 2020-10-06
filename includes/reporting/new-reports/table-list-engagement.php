@@ -67,10 +67,8 @@ class Table_List_Engagement extends Base_Table_Report {
 		];
 
 		$rows[] = [
-			__( 'Engaged' ),
-			html()->e( 'a', [
-				'href' => admin_page_url( 'gh_contacts', $engaged_query )
-			], _nf( $engaged ), false )
+			"label" =>__( 'Engaged' ),
+			"data"  =>_nf( $engaged )
 		];
 
 		$unengaged_query = [
@@ -83,10 +81,8 @@ class Table_List_Engagement extends Base_Table_Report {
 		];
 
 		$rows[] = [
-			__( 'Unengaged' ),
-			html()->e( 'a', [
-				'href' => admin_page_url( 'gh_contacts', $unengaged_query )
-			], _nf( $total_contacts - $engaged ), false )
+			"label" =>__( 'Unengaged' ),
+			"data"  =>_nf( $total_contacts - $engaged )
 		];
 
 		$marketable_query = [
@@ -96,10 +92,8 @@ class Table_List_Engagement extends Base_Table_Report {
 		$marketable_contacts = get_db( 'contacts' )->count( $marketable_query );
 
 		$rows[] = [
-			__( 'Marketable' ),
-			html()->e( 'a', [
-				'href' => admin_page_url( 'gh_contacts', $marketable_query )
-			], _nf( $marketable_contacts ), false )
+			"label" =>__( 'Marketable' ),
+			"data"  =>_nf( $marketable_contacts )
 		];
 
 		$unmarketable_query = [
@@ -109,10 +103,8 @@ class Table_List_Engagement extends Base_Table_Report {
 		$unmarketable_contacts = get_db( 'contacts' )->count( $unmarketable_query );
 
 		$rows[] = [
-			__( 'Non Marketable' ),
-			html()->e( 'a', [
-				'href' => admin_page_url( 'gh_contacts', $unmarketable_query )
-			], _nf( $unmarketable_contacts ), false )
+			"label" => __( 'Non Marketable' ),
+			"data"  => _nf( $unmarketable_contacts )
 		];
 
 		return $rows;

@@ -40,8 +40,8 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 			}
 		}
 
-		if (get_array_var( $this->request_data , 'ddl_broadcasts' ) ) {
-			$id  = absint(get_array_var( $this->request_data , 'ddl_broadcasts' ) );
+		if ( get_array_var( $this->request_data, 'ddl_broadcasts' ) ) {
+			$id = absint( get_array_var( $this->request_data, 'ddl_broadcasts' ) );
 		}
 
 		return $id;
@@ -57,14 +57,7 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 		return [
 			[
 				'label' => __( 'Subject', 'groundhogg' ),
-				'data'  => html()->wrap( $title, 'a', [
-					'href'  => admin_page_url( 'gh_reporting', [
-						'tab'       => 'broadcasts',
-						'broadcast' => $broadcast->get_id()
-					] ),
-					'title' => $title,
-//					'class' => 'number-total'
-				] )
+				'data'  => $title
 			],
 			[
 				'label' => __( 'Sent', 'groundhogg' ),
@@ -72,81 +65,38 @@ class Table_Broadcast_Stats extends Base_Table_Report {
 			],
 			[
 				'label' => __( 'Total Delivered', 'groundhogg' ),
-				'data'  => html()->wrap( _nf( $stats['sent'] ), 'a', [
-					'href'  => add_query_arg(
-						[
-							'report' => [
-								'type'   => Event::BROADCAST,
-								'step'   => $broadcast->get_id(),
-								'status' => Event::COMPLETE
-							]
-						],
-						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
-					),
-					'class' => 'number-total'
-				] )
+				'data'  => _nf( $stats[ 'sent' ] )
 			],
 			[
-				'label' => __( 'Opens', 'groundhogg' ),
-				'data'  => html()->wrap( _nf( $stats['opened'] ) . ' (' . percentage( $stats['sent'], $stats['opened'] ) . '%)', 'a', [
-					'href'  => add_query_arg(
-						[
-							'activity' => [
-								'activity_type' => Activity::EMAIL_OPENED,
-								'step_id'       => $broadcast->get_id(),
-								'funnel_id'     => $broadcast->get_funnel_id()
-							]
-						],
-						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
-					),
-					'class' => 'number-total'
-				] )
+				'label'      => __( 'Opens', 'groundhogg' ),
+				'data'       => $stats[ 'opened' ],
+				'percentage' => percentage( $stats[ 'sent' ], $stats[ 'opened' ] ) . '%'
 			],
 			[
 				'label' => __( 'Total Clicks', 'groundhogg' ),
-				'data'  => html()->wrap( _nf( $stats['all_clicks'] ), 'span', [
-					'class' => 'number-total'
-				] )
+				'data'  => $stats[ 'all_clicks' ]
 			],
 			[
-				'label' => __( 'Unique Clicks', 'groundhogg' ),
-				'data'  => html()->wrap( _nf( $stats['clicked'] ) . ' (' . percentage( $stats['sent'], $stats['clicked'] ) . '%)', 'a', [
-					'href'  => add_query_arg(
-						[
-							'activity' => [
-								'activity_type' => Activity::EMAIL_CLICKED,
-								'step_id'       => $broadcast->get_id(),
-								'funnel_id'     => $broadcast->get_funnel_id()
-							]
-						],
-						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
-					),
-					'class' => 'number-total'
-				] )
+				'label'      => __( 'Unique Clicks', 'groundhogg' ),
+				'data'       => _nf( $stats[ 'clicked' ] ),
+				'percentage' => percentage( $stats[ 'sent' ], $stats[ 'clicked' ] ) . '%'
 			],
 			[
 				'label' => __( 'Click Thru Rate', 'groundhogg' ),
-				'data'  => percentage( $stats['opened'], $stats['clicked'] ) . '%'
+				'data'  => percentage( $stats[ 'opened' ], $stats[ 'clicked' ] ) . '%'
 			],
 			[
 				'label' => __( 'Unopened', 'groundhogg' ),
-				'data'  => _nf( $stats['unopened'] ) . ' (' . percentage( $stats['sent'], $stats['unopened'] ) . '%)'
+				'data'  => _nf( $stats[ 'unopened' ] ) ,
+				'percentage' =>  percentage( $stats[ 'sent' ], $stats[ 'unopened' ] ) . '%'
 			],
 			[
 				'label' => __( 'Unsubscribed', 'groundhogg' ),
-				'data'  => html()->wrap( _nf( $stats['unsubscribed'] ) . ' (' . percentage( $stats['sent'], $stats['unsubscribed'] ) . '%)', 'a', [
-					'href'  => add_query_arg(
-						[
-							'activity' => [
-								'activity_type' => Activity::UNSUBSCRIBED,
-								'step_id'       => $broadcast->get_id(),
-								'funnel_id'     => $broadcast->get_funnel_id()
-							]
-						],
-						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
-					),
-					'class' => 'number-total'
-				] )
+				'data'  => _nf( $stats[ 'unsubscribed' ] ) ,
+				'percentage' =>   percentage( $stats[ 'sent' ], $stats[ 'unsubscribed' ] ) . '%'
+			],
+			[
+				'object'  => $broadcast
 			],
 
 		];

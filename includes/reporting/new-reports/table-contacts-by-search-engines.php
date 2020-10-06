@@ -19,6 +19,7 @@ class Table_Contacts_By_Search_Engines extends Base_Table_Report {
 		return [
 			__( 'Search Engines', 'groundhogg' ),
 			__( 'Contacts', 'groundhogg' ),
+			__( 'Percentage' , 'groundhogg' )
 		];
 	}
 
@@ -51,21 +52,15 @@ class Table_Contacts_By_Search_Engines extends Base_Table_Report {
 			}
 		}
 
-//		$this->parse_table_data();
 
 		$data  = $this->normalize_data( $return );
+
 		$total = array_sum( wp_list_pluck( $data, 'data' ) );
 
 		foreach ( $data as $i => $datum ) {
-
 			$sub_tal    = $datum['data'];
-			$percentage = ' (' . percentage( $total, $sub_tal ) . '%)';
-
-			$datum['data'] = html()->wrap( $datum['data'] . $percentage, 'a', [
-				'href'  => $datum['url'],
-				'class' => 'number-total'
-			] );
-			unset( $datum['url'] );
+			$datum["percentage"] =  percentage( $total, $sub_tal ) . '%';
+			$datum["data"] =  $datum['data'];
 			$data[ $i ] = $datum;
 		}
 
@@ -84,11 +79,6 @@ class Table_Contacts_By_Search_Engines extends Base_Table_Report {
 		return [
 			'label' => $item_key,
 			'data'  => $item_data,
-			'url'   => admin_page_url( 'gh_contacts', [
-				'meta_key'     => 'lead_source',
-				'meta_value'   => strtolower( $item_key ),
-				'meta_compare' => 'RLIKE'
-			] ),
 		];
 	}
 

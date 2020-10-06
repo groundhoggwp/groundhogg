@@ -81,55 +81,16 @@ class Table_Email_Funnels_Used_In extends Base_Table_Report {
 
 			$data[] = [
 				// Funnel
-				html()->e( 'a', [
-					'href' => admin_page_url( 'gh_funnels', [
-						'action' => 'edit',
-						'funnel' => $step->get_funnel_id(),
-					] ),
-				], $step->get_funnel_title() ),
+				 'funnel' => $step->get_funnel_title() ,
 				// Step
-				html()->e( 'a', [
-					'href' => admin_page_url( 'gh_funnels', [
-						'action' => 'edit',
-						'funnel' => $step->get_funnel_id(),
-					] ),
-				], $step->get_step_title() ),
+				"step" => $step->get_step_title() ,
 				// Sent
-				html()->e( 'a', [
-					'href' => admin_page_url( 'gh_contacts', [
-						'report' => [
-							'step_id'   => $step->get_id(),
-							'funnel_id' => $step->get_funnel_id(),
-							'status'    => Event::COMPLETE,
-							'before'    => $this->end,
-							'after'     => $this->start
-						]
-					] ),
-				], _nf( $sent ) ),
+				'sent' => _nf( $sent ) ,
 				// Opens
-				html()->e( 'a', [
-					'href' => admin_page_url( 'gh_contacts', [
-						'activity' => [
-							'activity_type' => Activity::EMAIL_OPENED,
-							'step_id'       => $step->get_id(),
-							'funnel_id'     => $step->get_funnel_id(),
-							'before'        => $this->end,
-							'after'         => $this->start
-						]
-					] ),
-				], percentage( $sent, $opened ) . '%' ),
+				 'opens' => percentage( $sent, $opened ) . '%' ,
 				// Clicks
-				html()->e( 'a', [
-					'href' => admin_page_url( 'gh_contacts', [
-						'activity' => [
-							'activity_type' => Activity::EMAIL_CLICKED,
-							'step_id'       => $step->get_id(),
-							'funnel_id'     => $step->get_funnel_id(),
-							'before'        => $this->end,
-							'after'         => $this->start
-						]
-					] ),
-				], percentage( $opened, $clicked ) . '%' )
+				'clicks' => percentage( $opened, $clicked ) . '%',
+				'step_object' => $step->get_as_array()
 
 			];
 
