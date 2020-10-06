@@ -60,4 +60,7 @@ export function * getItem (item) {
   }
 }
 
+/**
+ * This is overridden
+ */
 export function getEndpoint() {}
