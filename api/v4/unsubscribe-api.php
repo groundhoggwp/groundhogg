@@ -20,9 +20,10 @@ class Unsubscribe_Api extends Base_Api {
 	public function register_routes() {
 		register_rest_route( self::NAME_SPACE, '/unsubscribe', [
 			[
-				'methods'  => WP_REST_Server::EDITABLE,
-				'callback' => [ $this, 'unsubscribe' ],
-				'args'     => [
+				'methods'              => WP_REST_Server::EDITABLE,
+				'callback'             => [ $this, 'unsubscribe' ],
+				'permissions_callback' => '__return_true',
+				'args'                 => [
 					'contact' => [
 						'description' => 'Encrypted contact ID or Email address',
 						'required'    => true
@@ -42,15 +43,15 @@ class Unsubscribe_Api extends Base_Api {
 	public function unsubscribe( WP_REST_Request $request ) {
 
 		$enc_contact_id_or_email = $request->get_param( 'contact' );
-		$contact_id_or_email = decrypt( $enc_contact_id_or_email );
+		$contact_id_or_email     = decrypt( $enc_contact_id_or_email );
 
-		if ( ! $contact_id_or_email ){
+		if ( ! $contact_id_or_email ) {
 			return self::ERROR_401( 'invalid_contact_id_or_email', 'The provided contact is invalid.' );
 		}
 
 		$contact = get_contactdata( $contact_id_or_email );
 
-		if ( ! $contact ){
+		if ( ! $contact ) {
 			return self::ERROR_401( 'invalid_contact_id_or_email', 'The provided contact is invalid.' );
 		}
 
