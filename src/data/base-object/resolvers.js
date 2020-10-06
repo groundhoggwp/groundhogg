@@ -8,6 +8,11 @@ import {
   setIsRequestingItems,
   receiveItems, receiveItem,
 } from './actions'
+
+import {
+  getEndpoint
+} from './selectors'
+
 import { NAMESPACE } from '../constants'
 
 /**
@@ -15,6 +20,8 @@ import { NAMESPACE } from '../constants'
  */
 import { apiFetch } from '@wordpress/data-controls'
 import { addQueryArgs } from '@wordpress/url'
+
+const endpoint = getEndpoint();
 
 /**
  * Request all tags.
@@ -41,6 +48,7 @@ export function * getItems (query) {
  */
 export function * getItem (item) {
   yield setIsRequestingItems(true)
+
   try {
     const url = `${ NAMESPACE }/${ endpoint }/${ item }`
     const result = yield apiFetch({

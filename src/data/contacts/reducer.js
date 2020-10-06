@@ -41,11 +41,6 @@ const contactsReducer = (
 				...state,
 				...initialState
 		}
-		case TYPES.REQUEST_CONTACT:
-			return {
-				...state,
-				items: items,
-		}
 		case TYPES.REQUEST_CONTACTS:
 			return {
 				...state,
