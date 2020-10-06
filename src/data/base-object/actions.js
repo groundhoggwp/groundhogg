@@ -44,3 +44,8 @@ export function setIsRequestingItems( isRequesting ) {
 		isRequesting,
 	};
 }
+
+/**
+ * This is overridden
+ */
+export function getEndpoint() {}

@@ -17,6 +17,7 @@ import { NAMESPACE } from '../constants'
 export function registerBaseObjectStore (endpoint) {
 
   resolvers.getEndpoint = (endpoint = storeName) => endpoint
+  actions.getEndpoint = (endpoint = storeName) => endpoint
 
   const storeName = NAMESPACE + '/' + endpoint
   return registerStore(storeName, {
