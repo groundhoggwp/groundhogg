@@ -30,11 +30,6 @@ export function registerBaseObjectStore (endpoint, options) {
 		initialState : options.initialState || {},
 	}
 
-	console.debug( baseResolver )
-
-	// storeArgs.resolvers.setEndpoint( storeName );
-	// storeArgs.actions.getEndpoint   = (endpoint = storeName) => endpoint
-
 	return registerStore( storeName, storeArgs );
 }
 
