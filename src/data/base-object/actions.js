@@ -2,24 +2,11 @@
  * Internal dependencies
  */
 import TYPES from './action-types';
+import { apiFetch } from '@wordpress/data-controls'
 
 export default (endpoint) => ( {
 
 	endpoint,
-
-	createItems( items ) {
-		return {
-			type: TYPES.CREATE_ITEMS,
-			items,
-		};
-	},
-
-	createItem( item ) {
-		return {
-			type: TYPES.CREATE_ITEM,
-			item,
-		};
-	},
 
 	receiveItems( items ) {
 		return {
@@ -35,32 +22,124 @@ export default (endpoint) => ( {
 		};
 	},
 
-	updateItems( items ) {
-		return {
-			type: TYPES.UPDATE_ITEMS,
-			items,
-		};
+	* createItems( items ) {
+		yield this.setIsCreatingItems( true )
+
+		try{
+			const result = yield apiFetch({
+				method: 'POST',
+				path: `${endpoint}`,
+				data: items
+			})
+
+			yield this.setIsCreatingItems( false )
+			yield {
+				type: TYPES.CREATE_ITEMS,
+				items: result.items,
+			}
+		} catch (e) {
+			yield this.setCreatingError( e )
+		}
 	},
 
-	updateItem( item ) {
-		return {
-			type: TYPES.UPDATE_ITEM,
-			item,
-		};
+	* createItem( item ) {
+		yield this.setIsCreatingItems( true )
+
+		try{
+			const result = yield apiFetch({
+				method: 'POST',
+				path: `${endpoint}`,
+				data: item
+			})
+
+			yield this.setIsCreatingItems( false )
+			yield {
+				type: TYPES.CREATE_ITEM,
+				item: result.item,
+			}
+		} catch (e) {
+			yield this.setCreatingError( e )
+		}
 	},
 
-	deleteItems( itemIds ) {
-		return {
-			type: TYPES.DELETE_ITEMS,
-			itemIds,
-		};
+	* updateItems( items ) {
+		yield this.setIsUpdatingItems( true )
+
+		try{
+			const response = yield apiFetch({
+				method: 'PATCH',
+				path: `${endpoint}`,
+				data: items
+			})
+
+			yield this.setIsUpdatingItems( false )
+			yield {
+				type: TYPES.UPDATE_ITEMS,
+				items: response.items,
+			}
+		} catch (e) {
+			yield this.setUpdatingError( e )
+		}
 	},
 
-	deleteItem( itemId ) {
-		return {
-			type: TYPES.DELETE_ITEM,
-			itemId,
-		};
+	* updateItem( itemId, data ) {
+
+		yield this.setIsUpdatingItems( true )
+
+		try{
+			const response = yield apiFetch({
+				method: 'PATCH',
+				path: `${endpoint}/${itemId}`,
+				data: data
+			})
+
+			yield this.setIsUpdatingItems( false )
+			yield {
+				type: TYPES.UPDATE_ITEM,
+				item: response.item
+			}
+		} catch (e) {
+			yield this.setUpdatingError( e )
+		}
+	},
+
+	* deleteItems( itemIds ) {
+		yield this.setIsDeletingItems( true )
+
+		try{
+			yield apiFetch({
+				method: 'DELETE',
+				path: `${endpoint}`,
+				data: itemIds
+			})
+
+			yield this.setIsDeletingItems( false )
+			yield {
+				type: TYPES.DELETE_ITEMS,
+				itemIds,
+			}
+		} catch (e) {
+			yield this.setDeletingError( e )
+		}
+	},
+
+	* deleteItem( itemId ) {
+		yield this.setIsDeletingItems( true )
+
+		try{
+			yield apiFetch({
+				path: `${endpoint}/${itemId}`,
+				method: 'DELETE'
+			})
+
+			yield this.setIsDeletingItems( false )
+			yield {
+				type: TYPES.DELETE_ITEM,
+				itemId,
+			}
+		} catch (e) {
+			yield this.setDeletingError( e )
+		}
 	},
 
 	setIsCreatingItems( isCreating ) {
