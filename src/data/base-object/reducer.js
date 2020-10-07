@@ -39,7 +39,7 @@ const reducer = (
 		case TYPES.CREATE_ITEMS:
 			state = {
 				...state,
-				items: [ ...state.items, items ]
+				items: [ ...state.items, ...items ]
 			};
 			break;
 		case TYPES.SET_IS_CREATING:
@@ -61,7 +61,8 @@ const reducer = (
 		case TYPES.RECEIVE_ITEM:
 			state = {
 				...state,
-				item : item
+				item: item,
+				items: [ ...state.items, item ]
 			};
 			break;
 		case TYPES.RECEIVE_ITEMS:

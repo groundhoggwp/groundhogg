@@ -25,11 +25,11 @@ export default (endpoint, actions) => ( {
     }
   },
 
-  * getItem (item) {
+  * getItem (itemId) {
     yield actions.setIsRequestingItems(true)
 
     try {
-      const url = `${ endpoint }/${ item }`
+      const url = `${ endpoint }/${ itemId }`
       const result = yield apiFetch({
         path: url,
         method: 'GET',

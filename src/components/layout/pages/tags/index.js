@@ -4,9 +4,8 @@
 import { Fragment, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import TextField from '@material-ui/core/TextField';
 import Spinner from '../../../core-ui/spinner';
-import SearchInput from '../../../core-ui/search-input';
+import Table from '@material-ui/core/Table'
 /**
  * Internal dependencies
  */
@@ -37,15 +36,10 @@ export const Tags = ( props ) => {
 
 	return (
 			<Fragment>
-				<h2>Dashboard</h2>
-				{/*<SearchInput label={'Select a Tag'} placeholder="Tags" multiple={false} options={tags} />*/}
-				<SearchInput label={'Select Multiple Tags'} placeholder="Tags" multiple={true} options={tags} />
-				<ol>
-					{ tags.map( tag => <li data-id={tag.ID} onClick={ () => { singleEntityExample( tag.ID, getTag ) } }>{ tag.tag_name }</li> ) }
-				</ol>
-				<TextField id="outlined-basic" label="Add Tags" variant="outlined" value={ stateTagValue } onChange={ ( event ) => setTagValue( event.target.value ) } />
-				<p onClick={ () => { updateTags( { tags : stateTagValue } ) } }>Add</p>
-				{ ( isUpdating ) && ( <Spinner /> ) }
+				<Table
+
+
+				/>
 			</Fragment>
 	);
 }
