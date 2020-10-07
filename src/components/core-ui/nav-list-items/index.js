@@ -30,6 +30,12 @@ export default function NavListItems(props) {
       </ListItemIcon>
       <ListItemText primary="Dashboard"  />
     </ListItem>
+    <ListItem button onClick={()=>{changeView('contacts')}}>
+      <ListItemIcon>
+        <PeopleIcon />
+      </ListItemIcon>
+      <ListItemText primary="Contacts" />
+    </ListItem>
     <ListItem button onClick={()=>{changeView('reports')}}>
       <ListItemIcon>
         <BarChartIcon />

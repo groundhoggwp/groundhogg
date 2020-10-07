@@ -14,6 +14,7 @@ import { Dashboard } from './pages/dashboard';
 import { Reports } from './pages/reports';
 import { Emails } from './pages/emails';
 import { Tags } from './pages/tags';
+import { Contacts } from './pages/contacts';
 
 export const PAGES_FILTER = 'groundhogg_navigation';
 
@@ -39,6 +40,10 @@ export const getPages = () => {
 	pages.push( {
 		container: Tags,
 		path: '/tags',
+	} );
+	pages.push( {
+		container: Contacts,
+		path: '/contacts',
 	} );
 
 	return applyFilters( PAGES_FILTER, pages );
