@@ -1,31 +1,44 @@
-import { Fragment } from '@wordpress/element';
+import { Fragment, useState, useEffect } from '@wordpress/element';
+import { makeStyles } from '@material-ui/core/styles';
+import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import { getPages } from '../../layout/controller';
 
-export default function NavListItems(props) {
-  console.log(props);
+const useStyles = makeStyles((theme) => ({
+  root: {
+    backgroundColor: theme.palette.background.paper,
+  },
+}));
 
-  // This isn't working corrrectling for the path parameter
-  const changeView = (view) => {
-    // // setOpen(false);
-    console.log(props, view)
-    props.props.history.push(`${view}`)
+export default function NavListItems(props) {
+  const { push } = props.props.history;
+  const classes = useStyles();
+
+  const handleListItemClick = (view) => {
+    push(`${view}`);
   };
 
   return(
-  <Fragment>
-     { getPages().map((page) => {
-          return(
-          <ListItem button onClick={ () => { changeView( page.path ) } }>
-            <ListItemIcon>
-              <page.icon />
-            </ListItemIcon>
-            <ListItemText primary={page.name}  />
-          </ListItem>
-        )
-      } ) }
-    </Fragment>
+    <div className={classes.root}>
+      <List component="nav" aria-label="main">
+        { getPages().map((page, index) =>
+              <ListItem
+                button
+                onClick={ (event) => {
+                  handleListItemClick(page.path)
+                } }
+                selected={ index === props.props.selectedIndex }
+              >
+                <ListItemIcon>
+                  <page.icon />
+                </ListItemIcon>
+                <ListItemText primary={page.name}  />
+              </ListItem>
+            )
+          }
+      </List>
+      </div>
   )
 }

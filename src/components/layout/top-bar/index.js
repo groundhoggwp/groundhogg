@@ -153,7 +153,7 @@ export default function Dashboard(props) {
           </IconButton>
         </div>
         <Divider />
-        <List><NavListItems props={props}/></List>
+        <NavListItems props={props} />
         <Divider />
       </Drawer>
 

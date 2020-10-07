@@ -122,14 +122,14 @@ class _PageLayout extends Component {
     return (
       <BrowserRouter basename={ window.Groundhogg.preloadSettings.basename }>
         <Switch>
-          { getPages().map((page) => {
+          { getPages().map((page, index) => {
             return (
               <Route
                 key={ page.path }
                 path={ page.path }
                 exact
                 render={ (props) => (
-                  <Layout page={ page } { ...props } />
+                  <Layout page={ page } selectedIndex={index} { ...props } />
                 ) }
               />
             )
