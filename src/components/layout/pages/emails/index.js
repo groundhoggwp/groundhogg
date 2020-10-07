@@ -17,9 +17,9 @@ export const Emails = ( props ) => {
 	const { emails, getEmail, isRequesting } = useSelect( ( select ) => {
 		const store = select( EMAILS_STORE_NAME );
 		return {
-			emails : store.getEmails(),
-			getEmail : store.getEmail,
-			isRequesting : store.isEmailsRequesting()
+			emails : store.getItems(),
+			getEmail : store.getItem,
+			isRequesting : store.isItemsRequesting()
 		}
 	} );
 
