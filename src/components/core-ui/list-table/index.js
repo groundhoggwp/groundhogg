@@ -12,7 +12,7 @@ export default function Listable(props) {
   let rows = []
   let columns = []
   if(props.data.length > 0){
-    rows = props.data.map(row=> ({ ...row, id: uniqueId() }))
+    rows = props.data.map(row=> ({ ...row, id: _.uniqueId() }))
     columns = Object.keys(props.data[0]).map((email)=>{
         return  { field: email, headerName: email, width: 70 };
     })
