@@ -3,7 +3,7 @@
  */
  import * as React from 'react';
  import { DataGrid } from '@material-ui/data-grid';
- import { find, forEach, isNull, get, includes, _, uniqueId } from 'lodash';
+ import { find, forEach, isNull, get, includes, uniqueId } from 'lodash';
 /**
  * Internal dependencies
  */

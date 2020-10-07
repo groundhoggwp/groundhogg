@@ -1,9 +1,4 @@
 /**
- * Internal dependencies
- */
-import BaseActions from './actions'
-
-/**
  * External dependencies
  */
 import { apiFetch } from '@wordpress/data-controls'
