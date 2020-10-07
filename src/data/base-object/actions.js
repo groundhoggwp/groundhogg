@@ -3,6 +3,7 @@
  */
 import TYPES from './action-types'
 import { apiFetch } from '@wordpress/data-controls'
+import { addQueryArgs } from '@wordpress/url'
 
 function receiveItems (items) {
   return {
@@ -82,6 +83,25 @@ export default (endpoint) => ( {
 	receiveItem,
 	setIsRequestingItems,
 	setRequestingError,
+
+  * fetchItems ( query ){
+    yield setIsRequestingItems(true)
+
+    try {
+      const result = yield apiFetch({
+        path: addQueryArgs( `${ endpoint }`, query ),
+      })
+
+      yield setIsRequestingItems(false)
+      yield {
+        type: TYPES.RECEIVE_ITEMS,
+        items: result.items,
+      }
+    }
+    catch (e) {
+      yield setCreatingError(e)
+    }
+  },
 
   * createItems (items) {
     yield setIsCreatingItems(true)
