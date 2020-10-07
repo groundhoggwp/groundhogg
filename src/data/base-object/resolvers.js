@@ -1,14 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-  setRequestingError,
-  setIsUpdating,
-  setUpdatingError,
-  setIsRequestingItems,
-  receiveItems,
-  receiveItem,
-} from './actions'
+import BaseActions from './actions'
 
 /**
  * External dependencies
@@ -16,42 +9,42 @@ import {
 import { apiFetch } from '@wordpress/data-controls'
 import { addQueryArgs } from '@wordpress/url'
 
-export default (endpoint) => ( {
+export default (endpoint, actions) => ( {
 
   __endpoint: endpoint,
 
   * getItems (query) {
-    yield setIsRequestingItems(true)
+    yield actions.setIsRequestingItems(true)
     try {
-      const url = addQueryArgs(`${endpoint}`, query)
+      const url = addQueryArgs(`${ endpoint }`, query)
       const result = yield apiFetch({
         path: url,
         method: 'GET',
       })
 
-      yield setIsRequestingItems(false)
-      yield receiveItems(result.items)
+      yield actions.setIsRequestingItems(false)
+      yield actions.receiveItems(result.items)
     }
     catch (error) {
-      yield setRequestingError(error)
+      yield actions.setRequestingError(error)
     }
   },
 
   * getItem (item) {
-    yield setIsRequestingItems(true)
+    yield actions.setIsRequestingItems(true)
 
     try {
-      const url = `${endpoint}/${ item }`
+      const url = `${ endpoint }/${ item }`
       const result = yield apiFetch({
         path: url,
         method: 'GET',
       })
 
-      yield setIsRequestingItems(false)
-      yield receiveItem(result.item)
+      yield actions.setIsRequestingItems(false)
+      yield actions.receiveItem(result.item)
     }
     catch (error) {
-      yield setRequestingError(error)
+      yield actions.setRequestingError(error)
     }
   },
 } )

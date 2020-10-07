@@ -19,8 +19,8 @@ export function registerBaseObjectStore (endpoint, options) {
 
   options = options || {}
 
-  let baseResolver = new BaseResolver( storeName );
   let baseActions = new BaseActions( storeName );
+	let baseResolver = new BaseResolver( storeName, baseActions );
 
 	const storeArgs = {
 		reducer      : options.reducer   ? assign( reducer, options.reducer )         : reducer,
