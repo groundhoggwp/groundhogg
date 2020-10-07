@@ -16,26 +16,14 @@ import {
 import { apiFetch } from '@wordpress/data-controls'
 import { addQueryArgs } from '@wordpress/url'
 
-/**
- * Create a Base Resovler
- *
- * @param endpoint
- * @constructor
- */
-export default function BaseResolver( endpoint ){
+export default (endpoint) => ( {
 
-  const _self = this;
+  __endpoint: endpoint,
 
-  this.__endpoint = endpoint;
-
-  /**
-   * Request all tags.
-   */
-  this.getItems = function * (query) {
-
+  * getItems (query) {
     yield setIsRequestingItems(true)
     try {
-      const url = addQueryArgs(`${ _self.__endpoint }`, query)
+      const url = addQueryArgs(`${endpoint}`, query)
       const result = yield apiFetch({
         path: url,
         method: 'GET',
@@ -47,16 +35,13 @@ export default function BaseResolver( endpoint ){
     catch (error) {
       yield setRequestingError(error)
     }
-  }
+  },
 
-  /**
-   * Request all tags.
-   */
-  this.getItem = function * (item) {
+  * getItem (item) {
     yield setIsRequestingItems(true)
 
     try {
-      const url = `${ _self.__endpoint }/${ item }`
+      const url = `${endpoint}/${ item }`
       const result = yield apiFetch({
         path: url,
         method: 'GET',
@@ -68,5 +53,5 @@ export default function BaseResolver( endpoint ){
     catch (error) {
       yield setRequestingError(error)
     }
-  }
-}
+  },
+} )

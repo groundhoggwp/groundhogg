@@ -10,7 +10,7 @@ const reducer = (
 		isUpdating: false,
 		isDeleting: false,
 		items: [],
-		item: null,
+		item: {},
 		creatingErrors: {},
 		requestingErrors: {},
 		updatingErrors: {},

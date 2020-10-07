@@ -24,21 +24,21 @@ export const Tags = ( props ) => {
 	const { tags, getTag, isRequesting, isUpdating } = useSelect( ( select ) => {
 		const store = select( TAGS_STORE_NAME );
 		return {
-			tags : store.getTags(),
-			getTag : store.getTag,
-			isRequesting : store.isTagsRequesting(),
-			isUpdating: store.isTagsUpdating()
+			tags : store.getItems() ? store.getItems().map( tag => tag.data ) : [],
+			getTag : store.getItem,
+			isRequesting : store.isItemsRequesting(),
+			isUpdating: store.isItemsUpdating()
 		}
 	} );
 	
-	if ( isRequesting || isUpdating ) {
+	if ( isRequesting || isUpdating || ! tags ) {
 		return <Spinner />;
 	}
 
 	return (
 			<Fragment>
 				<h2>Dashboard</h2>
-				<SearchInput label={'Select a Tag'} placeholder="Tags" multiple={false} options={tags} />
+				{/*<SearchInput label={'Select a Tag'} placeholder="Tags" multiple={false} options={tags} />*/}
 				<SearchInput label={'Select Multiple Tags'} placeholder="Tags" multiple={true} options={tags} />
 				<ol>
 					{ tags.map( tag => <li data-id={tag.ID} onClick={ () => { singleEntityExample( tag.ID, getTag ) } }>{ tag.tag_name }</li> ) }

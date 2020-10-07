@@ -5,7 +5,7 @@
  * @param {Array} item - Option name
  */
 export const getItem = ( state, item ) => {
-	return state.items.find( (_item ) => item.ID === _item.ID );
+	return state.items.find( ( _item ) => item.ID === _item.ID );
 };
 
 /**
@@ -13,7 +13,7 @@ export const getItem = ( state, item ) => {
  *
  * @param {Object} state - Reducer state
  */
-export const getItems = ( state, query ) => {
+export const getItems = ( state ) => {
 	return state.items;
 };
 

@@ -23,7 +23,7 @@ export const Emails = ( props ) => {
 		}
 	} );
 
-	if (isRequesting) {
+	if (isRequesting || ! emails ) {
 		return <Spinner />;
 	}
 
@@ -32,7 +32,7 @@ export const Emails = ( props ) => {
 				<h2>Dashboard</h2>
 				<Listable data={emails}/>
 				<ol>
-					{ emails.map( email => <li data-id={email.ID}>{ email.content }</li> ) }
+					{ emails.map( email => <li data-id={email.ID}>{ email.data.subject_line }</li> ) }
 				</ol>
 			</Fragment>
 	);
