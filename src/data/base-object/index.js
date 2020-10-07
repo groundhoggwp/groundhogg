@@ -9,9 +9,9 @@ import { assign } from 'lodash';
  */
 import * as baseSelectors from './selectors';
 import * as baseActions from './actions';
+import BaseResolver from './resolvers';
 import controls from '../controls';
 import reducer from './reducer';
-import * as baseResolvers from './resolvers';
 import { NAMESPACE } from '../constants'
 
 export function registerBaseObjectStore (endpoint, options) {
@@ -19,19 +19,23 @@ export function registerBaseObjectStore (endpoint, options) {
 
   options = options || {}
 
-	baseResolvers.getEndpoint = ( endpoint = storeName ) => endpoint
-  baseActions.getEndpoint   = (endpoint = storeName) => endpoint
+  let baseResolver = new BaseResolver( storeName );
 
 	const storeArgs = {
-		reducer      : options.reducer   ? assign( reducer  , options.reducer )   : reducer,
-		controls     : options.controls  ? assign( controls , options.controls )  : controls,
-		actions      : options.actions   ? assign( baseActions  , options.actions )   : baseActions,
+		reducer      : options.reducer   ? assign( reducer, options.reducer )         : reducer,
+		controls     : options.controls  ? assign( controls , options.controls )      : controls,
+		actions      : options.actions   ? assign( baseActions  , options.actions )   : baseActions ,
 		selectors    : options.selectors ? assign( baseSelectors, options.selectors ) : baseSelectors,
-		resolvers    : options.resolvers ? assign( baseResolvers, options.resolvers ) : baseResolvers,
+		resolvers    : options.resolvers ? assign( baseResolver, options.resolvers ) : baseResolver,
 		initialState : options.initialState || {},
 	}
 
-	return registerStore( NAMESPACE + '/' + endpoint, storeArgs );
+	console.debug( baseResolver )
+
+	// storeArgs.resolvers.setEndpoint( storeName );
+	// storeArgs.actions.getEndpoint   = (endpoint = storeName) => endpoint
+
+	return registerStore( storeName, storeArgs );
 }
 
 export function getStoreName (ghEndpoint) {

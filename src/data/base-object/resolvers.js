@@ -17,50 +17,56 @@ import { apiFetch } from '@wordpress/data-controls'
 import { addQueryArgs } from '@wordpress/url'
 
 /**
- * Request all tags.
+ * Create a Base Resovler
+ *
+ * @param endpoint
+ * @constructor
  */
-export function * getItems (query) {
-  const endpoint = getEndpoint();
-  yield setIsRequestingItems(true)
-  try {
-    const url = addQueryArgs(`${ endpoint }`, query)
-    const result = yield apiFetch({
-      path: url,
-      method: 'GET',
-    })
+export default function BaseResolver( endpoint ){
 
-    yield setIsRequestingItems(false)
-    yield receiveItems(result.items)
+  const _self = this;
+
+  this.__endpoint = endpoint;
+
+  /**
+   * Request all tags.
+   */
+  this.getItems = function * (query) {
+
+    yield setIsRequestingItems(true)
+    try {
+      const url = addQueryArgs(`${ _self.__endpoint }`, query)
+      const result = yield apiFetch({
+        path: url,
+        method: 'GET',
+      })
+
+      yield setIsRequestingItems(false)
+      yield receiveItems(result.items)
+    }
+    catch (error) {
+      yield setRequestingError(error)
+    }
   }
-  catch (error) {
-    yield setRequestingError(error)
+
+  /**
+   * Request all tags.
+   */
+  this.getItem = function * (item) {
+    yield setIsRequestingItems(true)
+
+    try {
+      const url = `${ _self.__endpoint }/${ item }`
+      const result = yield apiFetch({
+        path: url,
+        method: 'GET',
+      })
+
+      yield setIsRequestingItems(false)
+      yield receiveItem(result.item)
+    }
+    catch (error) {
+      yield setRequestingError(error)
+    }
   }
 }
-
-/**
- * Request all tags.
- */
-export function * getItem (item) {
-  yield setIsRequestingItems(true)
-
-  const endpoint = getEndpoint();
-
-  try {
-    const url = `${ endpoint }/${ item }`
-    const result = yield apiFetch({
-      path: url,
-      method: 'GET',
-    })
-
-    yield setIsRequestingItems(false)
-    yield receiveItem(result.item)
-  }
-  catch (error) {
-    yield setRequestingError(error)
-  }
-}
-
-/**
- * This is overridden
- */
-export function getEndpoint() {}
