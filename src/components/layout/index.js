@@ -87,8 +87,7 @@ class Layout extends Component {
 
     return (
       <div className="groundhogg-layout" style={ { display: 'flex' } }>
-        <TopBar { ...restProps } query={ query }/>
-
+        <TopBar { ...restProps } pages={ getPages() } query={ query } />
         <PrimaryLayout>
           <Controller { ...restProps } query={ query }/>
         </PrimaryLayout>

@@ -9,12 +9,20 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import {
+	Dashboard,
+	Reports,
+	Emails,
+	Tags,
+	Contacts
+} from './pages';
 import { Spinner } from '../../components';
-import { Dashboard } from './pages/dashboard';
-import { Reports } from './pages/reports';
-import { Emails } from './pages/emails';
-import { Tags } from './pages/tags';
-import { Contacts } from './pages/contacts';
+
+import DashboardIcon from '@material-ui/icons/Dashboard';
+import PeopleIcon from '@material-ui/icons/People';
+import BarChartIcon from '@material-ui/icons/BarChart';
+import LayersIcon from '@material-ui/icons/Layers';
+import EmailIcon from '@material-ui/icons/Email';
 
 export const PAGES_FILTER = 'groundhogg_navigation';
 
@@ -25,25 +33,37 @@ export const getPages = () => {
 
 	pages.push( {
 		container: Dashboard,
+		name: 'Dashboard',
 		path: '/',
+		icon : DashboardIcon
 	} );
 
 	pages.push( {
 		container: Reports,
+		name: 'Reports',
 		path: '/reports',
+		icon : BarChartIcon
 	} );
 
 	pages.push( {
 		container: Emails,
+		name: 'Emails',
 		path: '/emails',
+		icon : EmailIcon
 	} );
+
 	pages.push( {
 		container: Tags,
+		name: 'Tags',
 		path: '/tags',
+		icon : LayersIcon
 	} );
+
 	pages.push( {
 		container: Contacts,
+		name: 'Contacts',
 		path: '/contacts',
+		icon : PeopleIcon
 	} );
 
 	return applyFilters( PAGES_FILTER, pages );

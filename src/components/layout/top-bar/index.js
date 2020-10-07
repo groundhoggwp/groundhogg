@@ -20,19 +20,6 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import NavListItems from '../../core-ui/nav-list-items/';
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -127,7 +114,7 @@ export default function Dashboard(props) {
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
   let pageTitle = props.page.path.replace('/','');
-  if(props.page.path === '/'){ pageTitle = 'Dashboard'}  
+  if(props.page.path === '/'){ pageTitle = 'Dashboard'}
 
   return (
     <div className={classes.root}>
