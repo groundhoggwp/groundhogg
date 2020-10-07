@@ -1,35 +1,39 @@
 /**
  * External dependencies
  */
-
 import { registerStore } from '@wordpress/data';
+import { assign } from 'lodash';
 
 /**
  * Internal dependencies
  */
-import * as selectors from './selectors';
-import * as actions from './actions';
+import * as baseSelectors from './selectors';
+import * as baseActions from './actions';
 import controls from '../controls';
 import reducer from './reducer';
-import * as resolvers from './resolvers';
+import * as baseResolvers from './resolvers';
 import { NAMESPACE } from '../constants'
 
-export function registerBaseObjectStore ( endpoint, options ) {
+export function registerBaseObjectStore (endpoint, options) {
+  const storeName = NAMESPACE + '/' + endpoint
 
-	resolvers.getEndpoint = ( endpoint = storeName ) => endpoint;
+  options = options || {}
 
-	const storeName = NAMESPACE + '/' + endpoint;
-	const store     = registerStore( storeName, {
-		reducer,
-		actions,
-		selectors,
-		controls,
-		resolvers
-	} );
+	baseResolvers.getEndpoint = ( endpoint = storeName ) => endpoint
+  baseActions.getEndpoint   = (endpoint = storeName) => endpoint
 
-	return store;
+	const storeArgs = {
+		reducer      : options.reducer   ? assign( reducer  , options.reducer )   : reducer,
+		controls     : options.controls  ? assign( controls , options.controls )  : controls,
+		actions      : options.actions   ? assign( baseActions  , options.actions )   : baseActions,
+		selectors    : options.selectors ? assign( baseSelectors, options.selectors ) : baseSelectors,
+		resolvers    : options.resolvers ? assign( baseResolvers, options.resolvers ) : baseResolvers,
+		initialState : options.initialState || {},
+	}
+
+	return registerStore( NAMESPACE + '/' + endpoint, storeArgs );
 }
 
-export function getStoreName( ghEndpoint ) {
-	return NAMESPACE + '/' + ghEndpoint;
+export function getStoreName (ghEndpoint) {
+  return NAMESPACE + '/' + ghEndpoint
 }

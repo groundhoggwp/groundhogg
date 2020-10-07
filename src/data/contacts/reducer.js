@@ -41,22 +41,6 @@ const contactsReducer = (
 				...state,
 				...initialState
 		}
-		case TYPES.REQUEST_CONTACTS:
-			return {
-				...state,
-				items: items,
-		}
-		case TYPES.EDIT_CONTACT:
-		case TYPES.ADD_CONTACT:
-			return {
-				...state,
-				items: [ ...state.items, itemData ],
-		}
-		case TYPES.DELETE_CONTACT:
-			return {
-				...state,
-				items: state.items.filter(existing => existing.ID !== itemId)
-		}
 		case TYPES.CLEAR_ITEMS:
 			return {
 				...state,
