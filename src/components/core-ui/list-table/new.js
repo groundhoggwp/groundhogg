@@ -1,6 +1,6 @@
-import React from 'react'
-import { useEffect, useState } from '@wordpress/element'
-import { useSelect, useDispatch } from '@wordpress/data'
+import {
+  useEffect, useState
+} from '@wordpress/element'
 import Table from '@material-ui/core/Table'
 import TableContainer from '@material-ui/core/TableContainer'
 import TableHead from '@material-ui/core/TableHead'
@@ -21,17 +21,52 @@ import Toolbar from '@material-ui/core/Toolbar'
 import { lighten, makeStyles } from '@material-ui/core/styles'
 import clsx from 'clsx'
 
-export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, totalItems, fetchItems, isLoadingItems, bulkActions, onBulkAction }) {
+const useDebounce = (value, delay) => {
+  // State and setters for debounced value
+  const [debouncedValue, setDebouncedValue] = useState(value);
 
+  useEffect(
+    () => {
+      // Update debounced value after delay
+      const handler = setTimeout(() => {
+        setDebouncedValue(value);
+      }, delay);
+
+      // Cancel the timeout if value changes (also on delay change or unmount)
+      // This is how we prevent debounced value from updating if value is changed ...
+      // .. within the delay period. Timeout gets cleared and restarted.
+      return () => {
+        clearTimeout(handler);
+      };
+    },
+    [value, delay] // Only re-call effect if value or delay changes
+  );
+
+  return debouncedValue;
+}
+
+const useStyles = makeStyles({
+  root: {
+    width: '100%',
+  },
+  container: {
+    maxHeight: 'calc( 100vh - 200px )',
+    overflowY: 'auto',
+  },
+});
+
+export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, totalItems, fetchItems, isLoadingItems, bulkActions, onBulkAction }) {
+  const classes = useStyles();
   const [perPage, setPerPage] = useState(10)
   const [page, setPage] = useState(0)
   const [order, setOrder] = useState(defaultOrder)
   const [orderBy, setOrderBy] = useState(defaultOrderBy)
   const [selected, setSelected] = useState([])
   const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 250)
 
   const __fetchItems = () => {
-    fetchItems({
+    return fetchItems({
       limit: perPage,
       offset: perPage * page,
       orderBy: orderBy,
@@ -88,16 +123,21 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
     } )
   }
 
-  useEffect(() => {
+  useEffect( () => {
     __fetchItems()
   }, [
     perPage,
     page,
     order,
     orderBy,
-    search,
     totalItems
   ])
+
+  useEffect(  () => {
+      __fetchItems()
+    },
+    [debouncedSearch]
+  );
 
   /**
    * Handle the search results
@@ -105,7 +145,7 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
    * @param e
    */
   const handleSearch = (e) => {
-    setSearch(e.target.value)
+    setSearch( e.target.value )
   }
 
   /**
@@ -155,7 +195,7 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
 
   return (
     <>
-      <Paper>
+      <Paper className={classes.root}>
         <TableToolbar
           numSelected={ selected.length }
           search={ search }
@@ -163,8 +203,8 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
           onBulkAction={ handleBulkAction }
           bulkActions={ bulkActions }
         />
-        <TableContainer>
-          <Table size={ 'medium' }>
+        <TableContainer className={classes.container}>
+          <Table stickyHeader size={ 'medium' }>
             <TableHeader
               handleReOrder={ handleReOrder }
               onSelectAll={ handleSelectAll }
@@ -180,7 +220,7 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
               items.map(item => {
 
                 return (
-                  <TableRow key={ item.ID }>
+                  <TableRow hover key={ item.ID }>
                     <TableCell padding="checkbox">
                       <Checkbox
                         checked={ isSelected(item) }
@@ -290,6 +330,7 @@ function TableHeader (props) {
     perPage,
     totalItems,
     handleReOrder,
+    className
   } = props
 
   const __totalItems = Math.min(perPage, totalItems)
@@ -297,7 +338,7 @@ function TableHeader (props) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
+        <TableCell padding="checkbox" className={className}>
           <Checkbox
             indeterminate={ numSelected > 0 && numSelected < __totalItems }
             checked={ __totalItems > 0 && numSelected === __totalItems }
@@ -311,6 +352,7 @@ function TableHeader (props) {
             currentOrderBy={ orderBy }
             order={ order }
             handleReOrder={ handleReOrder }
+            className={className}
           />)
         }
       </TableRow>

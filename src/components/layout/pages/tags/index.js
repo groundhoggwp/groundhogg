@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Fragment, useState } from '@wordpress/element'
+import { Fragment } from '@wordpress/element'
 import { useSelect, useDispatch } from '@wordpress/data'
 import { ListTable } from '../../../core-ui/list-table/new'
 import { TAGS_STORE_NAME } from '../../../../data/tags'
