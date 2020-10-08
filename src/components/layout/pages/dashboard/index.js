@@ -19,7 +19,7 @@ const singleEntityExample = ( ID, callback ) => {
 	console.log( tag );
 }
 
-export const Dashboard = ( props ) => {
+export default ( props ) => {
 
 	const [ stateTagValue, setTagValue ] = useState( '' );
 

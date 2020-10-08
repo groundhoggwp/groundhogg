@@ -8,11 +8,12 @@ import Checkbox from '@material-ui/core/Checkbox/Checkbox'
 import TableSortLabel from '@material-ui/core/TableSortLabel'
 import React from 'react'
 import TableBody from '@material-ui/core/TableBody'
-import { useSelect } from '@wordpress/data'
+import { useDispatch, useSelect } from '@wordpress/data'
 import Paper from '@material-ui/core/Paper'
 import TablePagination from '@material-ui/core/TablePagination'
+import Spinner from '../spinner'
 
-export function ListTable ({ columns, storeName }) {
+export function ListTable ({ columns, items, isRequesting, fetchItems }) {
 
   const [perPage, setPerPage] = useState(25)
   const [page, setPage] = useState(1)
@@ -20,17 +21,18 @@ export function ListTable ({ columns, storeName }) {
   const [orderBy, setOrderBy] = useState('ID')
   const [selected, setSelected] = useState([])
 
-  const { items, getItems, isRequesting, isUpdating } = useSelect((select) => {
-    const store = select(storeName)
+  if ( ! items || isRequesting ){
+    return <Spinner/>
+  }
 
-    return {
-      items: store.getItems( {
-        limit: perPage
-      } ) ? store.getItems() : [],
-      getItems: store.getItems,
-      isRequesting: store.isItemsRequesting(),
-    }
-  }, [])
+  const __fetchItems = () => {
+    fetchItems({
+      limit: perPage,
+      offset: perPage * ( page - 1 ),
+      orderby: orderBy,
+      order: order,
+    })
+  }
 
   /**
    * Handle the update of the orderBy
@@ -41,10 +43,10 @@ export function ListTable ({ columns, storeName }) {
     // If the current column used for ordering is the same one as was chosen
     // already
     if (__orderBy === orderBy) {
-      setOrder(order === 'desc' ? 'asc' : 'desc')
+      setOrder(order === 'desc' ? 'asc' : 'desc', __fetchItems)
     }
     else {
-      setOrderBy(__orderBy)
+      setOrderBy(__orderBy, __fetchItems)
     }
   }
 
@@ -53,8 +55,8 @@ export function ListTable ({ columns, storeName }) {
    *
    * @param value
    */
-  const handlePerPageChange = ({value}) => {
-    setPerPage( value );
+  const handlePerPageChange = ({ value }) => {
+    setPerPage(value, __fetchItems )
   }
 
   /**
@@ -64,19 +66,19 @@ export function ListTable ({ columns, storeName }) {
    * @param __page
    */
   const handlePageChange = (e, __page) => {
-    setPage( __page );
+    setPage(__page, __fetchItems)
   }
 
   return (
     <>
-      <TableContainer component={Paper}>
+      <TableContainer component={ Paper }>
         <Table size={ 'medium' }>
           <AdvancedTableHeader
             handleReOrder={ handleReOrder }
             columns={ columns }
             order={ order }
             orderBy={ orderBy }
-            numSelected={selected.length}
+            numSelected={ selected.length }
           />
           <TableBody>
             { items &&
@@ -89,7 +91,7 @@ export function ListTable ({ columns, storeName }) {
 
                     />
                   </TableCell>
-                  { columns.map(col => <TableCell align={col.align}>
+                  { columns.map(col => <TableCell align={ col.align }>
                     <col.cell { ...item }/>
                   </TableCell>) }
                 </TableRow>
@@ -100,12 +102,12 @@ export function ListTable ({ columns, storeName }) {
         </Table>
         <TablePagination
           component="div"
-          rowsPerPage={perPage}
-          rowsPerPageOptions={[10, 25, 50, 100]}
-          onChangeRowsPerPage={handlePerPageChange}
-          count={items.length}
-          page={page}
-          onChangePage={handlePageChange}
+          rowsPerPage={ perPage }
+          rowsPerPageOptions={ [10, 25, 50, 100] }
+          onChangeRowsPerPage={ handlePerPageChange }
+          count={ items.length }
+          page={ page }
+          onChangePage={ handlePageChange }
 
         />
       </TableContainer>
@@ -128,7 +130,6 @@ function AdvancedTableHeader (props) {
   return (
     <TableHead>
       <TableRow>
-
         <TableCell padding="checkbox">
           <Checkbox
             indeterminate={ numSelected > 0 && numSelected < rowCount }
@@ -164,7 +165,7 @@ function AdvancedTableHeader (props) {
 function HeaderTableCell ({ column, currentOrderBy, handleReOrder, order }) {
   const Component = column.orderBy ? SortableHeaderCell : NonSortableHeaderCell
   return <Component { ...column } currentOrderBy={ currentOrderBy }
-                    onReOrder={ handleReOrder } order={order}/>
+                    onReOrder={ handleReOrder } order={ order }/>
 }
 
 /**
@@ -180,6 +181,7 @@ function HeaderTableCell ({ column, currentOrderBy, handleReOrder, order }) {
 function NonSortableHeaderCell ({ ID, name, align }) {
   return (
     <TableCell
+      variant={ 'head' }
       key={ ID }
       align={ align }
       padding={ 'default' }
@@ -206,6 +208,7 @@ function SortableHeaderCell ({ ID, orderBy, order, name, align, currentOrderBy, 
   return (
     <TableCell
       key={ ID }
+      variant={ 'head' }
       align={ align }
       padding={ 'default' }
       sortDirection={ currentOrderBy === orderBy ? order : false }

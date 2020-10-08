@@ -12,7 +12,7 @@ import Spinner from '../../../core-ui/spinner';
  */
 import { TAGS_STORE_NAME } from '../../../../data';
 
-export const Reports = ( props ) => {
+export default ( props ) => {
 	const [ stateTagValue, setTagValue ] = useState( '' );
 
 	const { updateTags } = useDispatch( TAGS_STORE_NAME );

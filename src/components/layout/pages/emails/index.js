@@ -13,7 +13,7 @@ import Listable from '../../../core-ui/list-table';
  */
 import { EMAILS_STORE_NAME } from '../../../../data';
 
-export const Emails = ( props ) => {
+export default ( props ) => {
 	const { emails, getEmail, isRequesting } = useSelect( ( select ) => {
 		const store = select( EMAILS_STORE_NAME );
 		return {
