@@ -9,6 +9,7 @@ const reducer = (
 		isRequesting: false,
 		isUpdating: false,
 		isDeleting: false,
+		totalItems: 0,
 		items: [],
 		item: {},
 		creatingErrors: {},
@@ -22,6 +23,7 @@ const reducer = (
 		item,
 		itemIds,
 		itemId,
+		totalItems,
 		error,
 		isCreating,
 		isRequesting,
@@ -68,7 +70,8 @@ const reducer = (
 		case TYPES.RECEIVE_ITEMS:
 			state = {
 				...state,
-				items
+				items,
+				totalItems
 			};
 			break;
 		case TYPES.SET_IS_REQUESTING:

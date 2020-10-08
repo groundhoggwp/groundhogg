@@ -1,4 +1,4 @@
-import { useState } from '@wordpress/element'
+import { useEffect, useState } from '@wordpress/element'
 import { useSelect, useDispatch } from '@wordpress/data'
 import Table from '@material-ui/core/Table'
 import TableContainer from '@material-ui/core/TableContainer'
@@ -13,28 +13,31 @@ import Paper from '@material-ui/core/Paper'
 import TablePagination from '@material-ui/core/TablePagination'
 import Spinner from '../spinner';
 
-export function ListTable ({ columns, storeName }) {
+export function ListTable ({ columns, items, totalItems, fetchItems, isLoadingItems }) {
 
   const [perPage, setPerPage] = useState(10)
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(0)
   const [order, setOrder] = useState('asc')
   const [orderBy, setOrderBy] = useState('ID')
   const [selected, setSelected] = useState([])
 
-  const { items, getItems, isRequesting, isUpdating } = useSelect((select) => {
-    const store = select(storeName)
+  const __fetchItems = () => {
+    fetchItems( {
+      limit : perPage,
+      offset: perPage * page,
+      orderBy: orderBy,
+      order: order
+    } )
+  }
 
-    return {
-      items: store.getItems( {
-        limit: perPage
-      } ),
-      getItems: store.getItems,
-      isRequesting: store.isItemsRequesting(),
-      isUpdating: store.isItemsUpdating(),
-    }
-  }, [])
-
-  const { fetchItems } = useDispatch( storeName );
+  useEffect(()=>{
+    __fetchItems()
+  }, [
+    perPage,
+    page,
+    order,
+    orderBy
+  ] )
 
   /**
    * Handle the update of the orderBy
@@ -55,10 +58,9 @@ export function ListTable ({ columns, storeName }) {
   /**
    * Handle the changing of the number of items per page
    *
-   * @param value
+   * @param event
    */
   const handlePerPageChange = ( event ) => {
-    fetchItems( { limit : event.target.value } )
     setPerPage( event.target.value );
   }
 
@@ -72,7 +74,7 @@ export function ListTable ({ columns, storeName }) {
     setPage( __page );
   }
 
-  if ( isRequesting || isUpdating || ! items ) {
+  if ( ! items || isLoadingItems ) {
     return <Spinner />
   }
 
@@ -113,8 +115,8 @@ export function ListTable ({ columns, storeName }) {
             rowsPerPage={perPage}
             rowsPerPageOptions={[10, 25, 50, 100]}
             onChangeRowsPerPage={handlePerPageChange}
-            count={items.length}
-            page={page}
+            count={totalItems}
+            page={totalItems < perPage ? page : 0}
             onChangePage={handlePageChange}
           />
         }
