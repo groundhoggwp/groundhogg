@@ -16,7 +16,6 @@ import { ContactRowPrimaryItem } from './contact-row-primary-item'
 export const Contacts = ( props ) => {
 	return (
 		<Fragment>
-			date created
 			<ListTable
 				storeName={ CONTACTS_STORE_NAME }
 				columns={[
@@ -53,7 +52,7 @@ export const Contacts = ( props ) => {
 						orderBy: 'username',
 						align: 'left',
 						cell: ({data}) => {
-							return data.meta.user_login || ''
+							return data.meta && data.meta.user_login || ''
 						}
 					},
 					{
