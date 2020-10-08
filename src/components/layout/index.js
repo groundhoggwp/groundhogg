@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import { compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
@@ -11,6 +10,7 @@ import { identity } from 'lodash';
 import { parse } from 'qs';
 import PropTypes from 'prop-types';
 import Container from '@material-ui/core/Container';
+import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 
@@ -24,69 +24,36 @@ import BottomBar from './bottom-bar';
 import Notices from './notices';
 import { withSettingsHydration } from '../../data';
 
+
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
-  // root: {
-  //   display: 'flex',
-  // },
-  toolbar: {
-    paddingRight: 24, // keep right padding when drawer closed
-  },
-  appBar: {
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  title: {
-    flexGrow: 1,
-  },
   appBarSpacer: theme.mixins.toolbar,
   content: {
-    flexGrow: 1,
     height: '100vh',
     overflow: 'auto',
   },
   container: {
+    width: '100%',
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),
-  },
+  }
 }));
 
 export default function PrimaryLayout(props) {
     const classes = useStyles();
 		const { children } = props;
 
-		return (
-			<main className={`groundhogg-layout__primary ${classes.content}`}>
-
-				<div className={classes.appBarSpacer} />
-				<Container maxWidth="xlg" className={classes.container}>
-
-
-
-
-          <Grid container spacing={3}>
-            {/* Chart */}
-            <Grid item xs={12} md={8} lg={9}>
-            <Notices />
-            { children }
-            </Grid>
-            {/* Recent Deposits */}
-            <Grid item xs={12} md={4} lg={3}>
-
-            </Grid>
-            {/* Recent Orders */}
-            <Grid item xs={12}>
-
-            </Grid>
-          </Grid>
-
-				</Container>
-
-			</main>
-		);
+    return (
+      <main className={classes.content}>
+        <div className={classes.appBarSpacer} />
+        <Container maxWidth="lg" className={classes.container}>
+          {children}
+        </Container>
+      </main>
+    );
 }
 
 class Layout extends Component {
@@ -112,7 +79,6 @@ class Layout extends Component {
 				<PrimaryLayout>
 						<Controller { ...restProps } query={ query } />
 				</PrimaryLayout>
-
 
 				<BottomBar />
 			</div>
