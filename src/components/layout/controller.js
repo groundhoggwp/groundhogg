@@ -6,12 +6,16 @@ import { parse } from 'qs';
 import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
-import Dashboard from './pages/dashboard';
-import Reports from './pages/reports';
-import Emails from './pages/emails';
-import Tags from './pages/tags';
-import Contacts from './pages/contacts';
-
+/**
+ * Internal dependencies
+ */
+import {
+	Dashboard,
+	Reports,
+	Emails,
+	Tags,
+	Contacts
+} from './pages';
 import { Spinner } from '../../components';
 
 import DashboardIcon from '@material-ui/icons/Dashboard';

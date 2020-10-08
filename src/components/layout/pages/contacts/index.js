@@ -12,7 +12,7 @@ import {
 } from '../../../../data';
 import { ListTable } from '../../../core-ui/list-table/new'
 
-export default ( props ) => {
+export const Contacts = ( props ) => {
 	return (
 		<Fragment>
 			<ListTable
