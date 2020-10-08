@@ -1,4 +1,5 @@
 import { useState } from '@wordpress/element'
+import { useSelect, useDispatch } from '@wordpress/data'
 import Table from '@material-ui/core/Table'
 import TableContainer from '@material-ui/core/TableContainer'
 import TableHead from '@material-ui/core/TableHead'
@@ -8,13 +9,13 @@ import Checkbox from '@material-ui/core/Checkbox/Checkbox'
 import TableSortLabel from '@material-ui/core/TableSortLabel'
 import React from 'react'
 import TableBody from '@material-ui/core/TableBody'
-import { useSelect } from '@wordpress/data'
 import Paper from '@material-ui/core/Paper'
 import TablePagination from '@material-ui/core/TablePagination'
+import Spinner from '../spinner';
 
 export function ListTable ({ columns, storeName }) {
 
-  const [perPage, setPerPage] = useState(25)
+  const [perPage, setPerPage] = useState(10)
   const [page, setPage] = useState(1)
   const [order, setOrder] = useState('asc')
   const [orderBy, setOrderBy] = useState('ID')
@@ -26,11 +27,14 @@ export function ListTable ({ columns, storeName }) {
     return {
       items: store.getItems( {
         limit: perPage
-      } ) ? store.getItems() : [],
+      } ),
       getItems: store.getItems,
       isRequesting: store.isItemsRequesting(),
+      isUpdating: store.isItemsUpdating(),
     }
   }, [])
+
+  const { fetchItems } = useDispatch( storeName );
 
   /**
    * Handle the update of the orderBy
@@ -53,8 +57,9 @@ export function ListTable ({ columns, storeName }) {
    *
    * @param value
    */
-  const handlePerPageChange = ({value}) => {
-    setPerPage( value );
+  const handlePerPageChange = ( event ) => {
+    fetchItems( { limit : event.target.value } )
+    setPerPage( event.target.value );
   }
 
   /**
@@ -65,6 +70,10 @@ export function ListTable ({ columns, storeName }) {
    */
   const handlePageChange = (e, __page) => {
     setPage( __page );
+  }
+
+  if ( isRequesting || isUpdating || ! items ) {
+    return <Spinner />
   }
 
   return (
@@ -98,16 +107,17 @@ export function ListTable ({ columns, storeName }) {
             }
           </TableBody>
         </Table>
-        <TablePagination
-          component="div"
-          rowsPerPage={perPage}
-          rowsPerPageOptions={[10, 25, 50, 100]}
-          onChangeRowsPerPage={handlePerPageChange}
-          count={items.length}
-          page={page}
-          onChangePage={handlePageChange}
-
-        />
+        { items &&
+          <TablePagination
+            component="div"
+            rowsPerPage={perPage}
+            rowsPerPageOptions={[10, 25, 50, 100]}
+            onChangeRowsPerPage={handlePerPageChange}
+            count={items.length}
+            page={page}
+            onChangePage={handlePageChange}
+          />
+        }
       </TableContainer>
     </>
   )
