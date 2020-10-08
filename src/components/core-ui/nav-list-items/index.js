@@ -37,7 +37,7 @@ export default function NavListItems(props) {
                 <ListItemIcon>
                   <page.icon />
                 </ListItemIcon>
-                <ListItemText primary={page.name}  />
+                <ListItemText primary={page.label}  />
               </ListItem>
             ) }
             <Divider />
@@ -46,11 +46,11 @@ export default function NavListItems(props) {
                 component="a"
                 href={ window.Groundhogg.preloadSettings.basename.replace( 'admin/groundhogg', 'admin/' ) }
               >
-              <ListItemIcon>
-                <ArrowBackIcon />
-              </ListItemIcon>
-              <ListItemText primary={ __( 'Back to WordPress' ) }  />
-              </ListItem>
+                <ListItemIcon>
+                  <ArrowBackIcon />
+                </ListItemIcon>
+                <ListItemText primary={ __( 'Back to WordPress' ) }  />
+            </ListItem>
       </List>
       </div>
   )

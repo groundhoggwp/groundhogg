@@ -24,7 +24,6 @@ import BottomBar from './bottom-bar'
 import Notices from './notices'
 import { withSettingsHydration } from '../../data'
 
-const drawerWidth = 240
 const useStyles = makeStyles((theme) => ( {
   // root: {
   //   display: 'flex',

@@ -1,10 +1,8 @@
 /**
  * External dependencies
  */
-import { Fragment, useState } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import Spinner from '../../../core-ui/spinner';
 
 /**
  * Internal dependencies
@@ -12,34 +10,34 @@ import Spinner from '../../../core-ui/spinner';
 import {
 	CONTACTS_STORE_NAME
 } from '../../../../data';
-import Listable from '../../../core-ui/list-table';
+import { ListTable } from '../../../core-ui/list-table/new'
 
 export const Contacts = ( props ) => {
-	const {
-		store,
-		contacts,
-		getContact,
-		isRequesting,
-		isUpdating
-	} = useSelect( ( select ) => {
-		const store = select( CONTACTS_STORE_NAME );
-		return {
-			store : store,
-			contacts : store.getItems(),
-			getContact : store.getItem,
-			isRequesting : store.isItemsRequesting(),
-			isUpdating: store.isItemsUpdating()
-		}
-	} );
-
-	if ( isRequesting || isUpdating || ! contacts ) {
-		return <Spinner />;
-	}
-
 	return (
-			<Fragment>
-				<h2>Contacts</h2>
-				<Listable data={contacts} />
-			</Fragment>
+		<Fragment>
+			<ListTable
+				storeName={ CONTACTS_STORE_NAME }
+				columns={[
+					{
+						ID: 'ID',
+						name: 'ID',
+						orderBy: 'ID',
+						align: 'left',
+						cell: ({data, ID}) => {
+							return data.ID
+						}
+					},
+					{
+						ID: 'name',
+						name: 'Name',
+						orderBy: 'first_name',
+						align: 'left',
+						cell: ({data}) => {
+							return data.first_name || ''
+						}
+					}
+				]}
+			/>
+		</Fragment>
 	);
 }

@@ -32,39 +32,51 @@ export const getPages = () => {
 	/** @TODO: parse/hydrate PHP-registered nav items for app navigation */
 
 	pages.push( {
-		container: Dashboard,
-		name: 'Dashboard',
+		component: Dashboard,
+		icon : DashboardIcon,
+		label: 'Dashboard',
+		name: 'dashboard',
 		path: '/',
-		icon : DashboardIcon
+		priority: 1
 	} );
 
 	pages.push( {
-		container: Reports,
-		name: 'Reports',
+		component: Reports,
+		icon : BarChartIcon,
+		label: 'Reports',
+		name: 'reports',
 		path: '/reports',
-		icon : BarChartIcon
+		priority: 10
 	} );
 
 	pages.push( {
-		container: Emails,
-		name: 'Emails',
+		component: Emails,
+		icon : EmailIcon,
+		label: 'Emails',
+		name: 'reports',
 		path: '/emails',
-		icon : EmailIcon
+		priority: 20
 	} );
 
 	pages.push( {
-		container: Tags,
-		name: 'Tags',
+		component: Tags,
+		icon : LayersIcon,
+		label: 'Tags',
+		name: 'tags',
 		path: '/tags',
-		icon : LayersIcon
+		priority: 30
 	} );
 
 	pages.push( {
-		container: Contacts,
-		name: 'Contacts',
+		component: Contacts,
+		icon : PeopleIcon,
+		label: 'Contacts',
 		path: '/contacts',
-		icon : PeopleIcon
+		name: 'contacts',
+		priority: 40
 	} );
+
+	pages.sort((a, b) => (a.priority > b.priority) ? 1 : -1)
 
 	return applyFilters( PAGES_FILTER, pages );
 };
@@ -87,7 +99,7 @@ export class Controller extends Component {
 
 		return (
 			<Suspense fallback={ <Spinner /> }>
-				<page.container
+				<page.component
 					params={ params }
 					path={ url }
 					pathMatch={ page.path }
