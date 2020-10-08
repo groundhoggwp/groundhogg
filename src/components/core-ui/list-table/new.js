@@ -18,6 +18,8 @@ import IconButton from '@material-ui/core/IconButton'
 import DeleteIcon from '@material-ui/icons/Delete'
 import TextField from '@material-ui/core/TextField'
 import Toolbar from '@material-ui/core/Toolbar'
+import { lighten, makeStyles } from '@material-ui/core/styles'
+import clsx from 'clsx'
 
 export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, totalItems, fetchItems, isLoadingItems, bulkActions, onBulkAction }) {
 
@@ -34,7 +36,7 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
       offset: perPage * page,
       orderBy: orderBy,
       order: order,
-      search: search
+      search: search,
     })
   }
 
@@ -42,7 +44,7 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
    * When select all occurs
    */
   const handleSelectAll = () => {
-    setSelected( selected.length === items.length ? [] : items );
+    setSelected(selected.length === items.length ? [] : items)
   }
 
   /**
@@ -52,7 +54,7 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
    * @returns {boolean}
    */
   const isSelected = (item) => {
-    return selected.filter( __item => __item.ID === item.ID ).length > 0;
+    return selected.filter(__item => __item.ID === item.ID).length > 0
   }
 
   /**
@@ -60,13 +62,14 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
    *
    * @param item
    */
-  const handleSelectItem = ( item ) => {
-    if ( isSelected( item ) ){
+  const handleSelectItem = (item) => {
+    if (isSelected(item)) {
       // Item is selected, so remove it
-      setSelected( selected.filter( __item => __item.ID !== item.ID ) )
-    } else {
+      setSelected(selected.filter(__item => __item.ID !== item.ID))
+    }
+    else {
       // Add it to the selected array
-      setSelected( [ ...selected, item ] )
+      setSelected([...selected, item])
     }
   }
 
@@ -76,8 +79,13 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
    * @param e
    * @param action
    */
-  const handleBulkAction = ( e, action ) => {
-    onBulkAction( action, selected  )
+  const handleBulkAction = (e, action) => {
+    onBulkAction( {
+      action,
+      selected,
+      setSelected,
+      fetchItems: __fetchItems
+    } )
   }
 
   useEffect(() => {
@@ -87,7 +95,8 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
     page,
     order,
     orderBy,
-    search
+    search,
+    totalItems
   ])
 
   /**
@@ -122,11 +131,11 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
    */
   const handlePerPageChange = (event) => {
     const __perPage = event.target.value
-    setPerPage(__perPage )
+    setPerPage(__perPage)
 
     // Handle per page being larger than available data
-    if ( totalItems / __perPage < page ){
-      setPage( Math.floor( totalItems / __perPage ) )
+    if (totalItems / __perPage < page) {
+      setPage(Math.floor(totalItems / __perPage))
     }
   }
 
@@ -149,20 +158,22 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
       <Paper>
         <TableToolbar
           numSelected={ selected.length }
-          search={search}
-          onSearch={handleSearch}
+          search={ search }
+          onSearch={ handleSearch }
+          onBulkAction={ handleBulkAction }
+          bulkActions={ bulkActions }
         />
         <TableContainer>
           <Table size={ 'medium' }>
             <TableHeader
               handleReOrder={ handleReOrder }
-              onSelectAll={handleSelectAll}
+              onSelectAll={ handleSelectAll }
               columns={ columns }
               order={ order }
               orderBy={ orderBy }
               numSelected={ selected.length }
-              perPage={perPage}
-              totalItems={totalItems}
+              perPage={ perPage }
+              totalItems={ totalItems }
             />
             <TableBody>
               { items &&
@@ -172,8 +183,8 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
                   <TableRow key={ item.ID }>
                     <TableCell padding="checkbox">
                       <Checkbox
-                        checked={ isSelected( item ) }
-                        onChange={ () => handleSelectItem( item ) }
+                        checked={ isSelected(item) }
+                        onChange={ () => handleSelectItem(item) }
                         inputProps={ { 'aria-label': 'select' } }
                       />
                     </TableCell>
@@ -203,33 +214,64 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
   )
 }
 
+const useToolbarStyles = makeStyles((theme) => ( {
+  root: {
+    paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(1),
+    // paddingTop: theme.spacing(1),
+  },
+  highlight:
+    theme.palette.type === 'light'
+      ? {
+        color: theme.palette.secondary.main,
+        backgroundColor: lighten(theme.palette.secondary.light, 0.85),
+      }
+      : {
+        color: theme.palette.text.primary,
+        backgroundColor: theme.palette.secondary.dark,
+      },
+  title: {
+    flex: '1 1 100%',
+  },
+} ))
+
 function TableToolbar (props) {
 
-  const { numSelected, tableTitle, search, onSearch } = props
+  const classes = useToolbarStyles()
+  const { numSelected, tableTitle, search, onSearch, bulkActions, onBulkAction } = props
 
   return (
-    <Toolbar>
+    <Toolbar
+      className={ clsx(classes.root, {
+        [classes.highlight]: numSelected > 0,
+      }) }
+    >
       { numSelected > 0 ? (
-        <Typography color="inherit" variant="subtitle1" component="div">
+        <Typography className={ classes.title } color="inherit"
+                    variant="subtitle1" component="div">
           { numSelected } selected
         </Typography>
       ) : (
-        <Typography variant="h6" id="tableTitle" component="div">
+        <Typography className={ classes.title } variant="h6" id="tableTitle"
+                    component="div">
           { tableTitle }
         </Typography>
       ) }
 
-      { numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton aria-label="delete">
-            <DeleteIcon/>
+      { numSelected > 0 ? bulkActions.map(action => (
+        <Tooltip title={ action.title }>
+          <IconButton
+            aria-label={ action.action }
+            onClick={(e) => onBulkAction(e, action.action )}
+          >
+            { action.icon }
           </IconButton>
-        </Tooltip>
-      ) : (
+        </Tooltip> )) : (
         <TextField id="search" label={ 'Search' } type="search"
                    variant="outlined"
                    value={ search }
                    onChange={ onSearch }
+                   size={ 'small' }
         />
       ) }
     </Toolbar>
@@ -250,7 +292,7 @@ function TableHeader (props) {
     handleReOrder,
   } = props
 
-  const __totalItems = Math.min( perPage, totalItems );
+  const __totalItems = Math.min(perPage, totalItems)
 
   return (
     <TableHead>
