@@ -13,12 +13,12 @@ import Paper from '@material-ui/core/Paper'
 import TablePagination from '@material-ui/core/TablePagination'
 import Spinner from '../spinner';
 
-export function ListTable ({ columns, items, totalItems, fetchItems, isLoadingItems }) {
+export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, totalItems, fetchItems, isLoadingItems }) {
 
   const [perPage, setPerPage] = useState(10)
   const [page, setPage] = useState(0)
-  const [order, setOrder] = useState('asc')
-  const [orderBy, setOrderBy] = useState('ID')
+  const [order, setOrder] = useState(defaultOrder)
+  const [orderBy, setOrderBy] = useState(defaultOrderBy)
   const [selected, setSelected] = useState([])
 
   const __fetchItems = () => {

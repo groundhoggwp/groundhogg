@@ -84,6 +84,8 @@ export const Tags = () => {
 		<Fragment>
 			<ListTable
 				items={items}
+				defaultOrderBy={'tag_id'}
+				defaultOrder={'desc'}
 				totalItems={totalItems}
 				fetchItems={fetchItems}
 				isRequesting={isRequesting}
