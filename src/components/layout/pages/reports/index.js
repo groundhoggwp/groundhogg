@@ -14,7 +14,7 @@ import TextField from '@material-ui/core/TextField';
  */
  import Chart from '../../../core-ui/chart';
  import Spinner from '../../../core-ui/spinner';
-// import { TAGS_STORE_NAME } from '../../../../data';
+import { REPORTS_STORE_NAME } from '../../../../data/reports'
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -33,30 +33,36 @@ const useStyles = makeStyles((theme) => ({
 	}
 }));
 
+export function Reports (props) {
+  const classes = useStyles();
+  const storeName = 'gh/v4/reports';
+  // const [perPage, setPerPage] = useState(10)
+  // const [page, setPage] = useState(1)
+  // const [order, setOrder] = useState('asc')
+  // const [orderBy, setOrderBy] = useState('ID')
+  // const [selected, setSelected] = useState([])
 
-export const Reports = ( props ) => {
-	const classes = useStyles();
-	// const [ stateTagValue, setTagValue ] = useState( '' );
-	//
-	// const { updateTags } = useDispatch( TAGS_STORE_NAME );
-	//
-	// const { tags, isRequesting, isUpdating } = useSelect( ( select ) => {
-	// 	const store = select( TAGS_STORE_NAME );
-	// 	return {
-	// 		tags : store.getTags(),
-	// 		isRequesting : store.isTagsRequesting(),
-	// 		isUpdating: store.isTagsUpdating()
-	// 	}
-	// } );
-	//
-	// if ( isRequesting || isUpdating ) {
-	// 	return <Spinner />;
-	// }
+  const { items, getItems, isRequesting, isUpdating } = useSelect((select) => {
+    const store = select(storeName)
 
+    return {
+      items: store.getItems( {
+        limit: 10
+      } ),
+      getItems: store.getItems,
+      isRequesting: store.isItemsRequesting(),
+      isUpdating: store.isItemsUpdating(),
+    }
+  }, [])
+
+  const { fetchItems } = useDispatch( storeName );
+
+  // fetchItems( { limit : 10 } )
+
+  console.log(props.query)
 	return (
 			<Fragment>
 				<Card className={classes.container}><Chart type='line'/></Card>
-				<Card className={classes.container}><Chart type='bar'/></Card>
 				<Card className={classes.container}>
 					<Typography className={classes.kpiTitle} component="h1" color="textSecondary">{`KPI`}</Typography>
 					<Typography className={classes.kpiMetric} component="div" color="textSecondary">{`${Math.round(Math.random()*1000)/10}%`}</Typography>
@@ -75,5 +81,6 @@ export const Reports = ( props ) => {
 				</Card>
 
 			</Fragment>
+
 	);
 }
