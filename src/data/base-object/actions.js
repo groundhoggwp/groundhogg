@@ -96,6 +96,7 @@ export default (endpoint) => ( {
       yield {
         type: TYPES.RECEIVE_ITEMS,
         items: result.items,
+        totalItems: result.total_items
       }
     }
     catch (e) {

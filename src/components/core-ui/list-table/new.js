@@ -1,4 +1,5 @@
-import { useState } from '@wordpress/element'
+import React from 'react'
+import { useEffect, useState } from '@wordpress/element'
 import { useSelect, useDispatch } from '@wordpress/data'
 import Table from '@material-ui/core/Table'
 import TableContainer from '@material-ui/core/TableContainer'
@@ -7,34 +8,105 @@ import TableRow from '@material-ui/core/TableRow'
 import TableCell from '@material-ui/core/TableCell/TableCell'
 import Checkbox from '@material-ui/core/Checkbox/Checkbox'
 import TableSortLabel from '@material-ui/core/TableSortLabel'
-import React from 'react'
 import TableBody from '@material-ui/core/TableBody'
 import Paper from '@material-ui/core/Paper'
 import TablePagination from '@material-ui/core/TablePagination'
-import Spinner from '../spinner';
+import Spinner from '../spinner'
+import Typography from '@material-ui/core/Typography'
+import Tooltip from '@material-ui/core/Tooltip/Tooltip'
+import IconButton from '@material-ui/core/IconButton'
+import DeleteIcon from '@material-ui/icons/Delete'
+import TextField from '@material-ui/core/TextField'
+import Toolbar from '@material-ui/core/Toolbar'
+import { lighten, makeStyles } from '@material-ui/core/styles'
+import clsx from 'clsx'
 
-export function ListTable ({ columns, storeName }) {
+export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, totalItems, fetchItems, isLoadingItems, bulkActions, onBulkAction }) {
 
   const [perPage, setPerPage] = useState(10)
-  const [page, setPage] = useState(1)
-  const [order, setOrder] = useState('asc')
-  const [orderBy, setOrderBy] = useState('ID')
+  const [page, setPage] = useState(0)
+  const [order, setOrder] = useState(defaultOrder)
+  const [orderBy, setOrderBy] = useState(defaultOrderBy)
   const [selected, setSelected] = useState([])
+  const [search, setSearch] = useState('')
 
-  const { items, getItems, isRequesting, isUpdating } = useSelect((select) => {
-    const store = select(storeName)
+  const __fetchItems = () => {
+    fetchItems({
+      limit: perPage,
+      offset: perPage * page,
+      orderBy: orderBy,
+      order: order,
+      search: search,
+    })
+  }
 
-    return {
-      items: store.getItems( {
-        limit: perPage
-      } ),
-      getItems: store.getItems,
-      isRequesting: store.isItemsRequesting(),
-      isUpdating: store.isItemsUpdating(),
+  /**
+   * When select all occurs
+   */
+  const handleSelectAll = () => {
+    setSelected(selected.length === items.length ? [] : items)
+  }
+
+  /**
+   * If an item is selected
+   *
+   * @param item
+   * @returns {boolean}
+   */
+  const isSelected = (item) => {
+    return selected.filter(__item => __item.ID === item.ID).length > 0
+  }
+
+  /**
+   * Select an item
+   *
+   * @param item
+   */
+  const handleSelectItem = (item) => {
+    if (isSelected(item)) {
+      // Item is selected, so remove it
+      setSelected(selected.filter(__item => __item.ID !== item.ID))
     }
-  }, [])
+    else {
+      // Add it to the selected array
+      setSelected([...selected, item])
+    }
+  }
 
-  const { fetchItems } = useDispatch( storeName );
+  /**
+   * Handle a bulk action
+   *
+   * @param e
+   * @param action
+   */
+  const handleBulkAction = (e, action) => {
+    onBulkAction( {
+      action,
+      selected,
+      setSelected,
+      fetchItems: __fetchItems
+    } )
+  }
+
+  useEffect(() => {
+    __fetchItems()
+  }, [
+    perPage,
+    page,
+    order,
+    orderBy,
+    search,
+    totalItems
+  ])
+
+  /**
+   * Handle the search results
+   *
+   * @param e
+   */
+  const handleSearch = (e) => {
+    setSearch(e.target.value)
+  }
 
   /**
    * Handle the update of the orderBy
@@ -55,11 +127,16 @@ export function ListTable ({ columns, storeName }) {
   /**
    * Handle the changing of the number of items per page
    *
-   * @param value
+   * @param event
    */
-  const handlePerPageChange = ( event ) => {
-    fetchItems( { limit : event.target.value } )
-    setPerPage( event.target.value );
+  const handlePerPageChange = (event) => {
+    const __perPage = event.target.value
+    setPerPage(__perPage)
+
+    // Handle per page being larger than available data
+    if (totalItems / __perPage < page) {
+      setPage(Math.floor(totalItems / __perPage))
+    }
   }
 
   /**
@@ -69,81 +146,162 @@ export function ListTable ({ columns, storeName }) {
    * @param __page
    */
   const handlePageChange = (e, __page) => {
-    setPage( __page );
+    setPage(__page)
   }
 
-  if ( isRequesting || isUpdating || ! items ) {
-    return <Spinner />
+  if (!items || isLoadingItems) {
+    return <Spinner/>
   }
 
   return (
     <>
-      <TableContainer component={Paper}>
-        <Table size={ 'medium' }>
-          <AdvancedTableHeader
-            handleReOrder={ handleReOrder }
-            columns={ columns }
-            order={ order }
-            orderBy={ orderBy }
-            numSelected={selected.length}
-          />
-          <TableBody>
-            { items &&
-            items.map(item => {
+      <Paper>
+        <TableToolbar
+          numSelected={ selected.length }
+          search={ search }
+          onSearch={ handleSearch }
+          onBulkAction={ handleBulkAction }
+          bulkActions={ bulkActions }
+        />
+        <TableContainer>
+          <Table size={ 'medium' }>
+            <TableHeader
+              handleReOrder={ handleReOrder }
+              onSelectAll={ handleSelectAll }
+              columns={ columns }
+              order={ order }
+              orderBy={ orderBy }
+              numSelected={ selected.length }
+              perPage={ perPage }
+              totalItems={ totalItems }
+            />
+            <TableBody>
+              { items &&
+              items.map(item => {
 
-              return (
-                <TableRow key={ item.ID }>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-
-                    />
-                  </TableCell>
-                  { columns.map(col => <TableCell align={col.align}>
-                    <col.cell { ...item }/>
-                  </TableCell>) }
-                </TableRow>
-              )
-            })
-            }
-          </TableBody>
-        </Table>
-        { items &&
+                return (
+                  <TableRow key={ item.ID }>
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        checked={ isSelected(item) }
+                        onChange={ () => handleSelectItem(item) }
+                        inputProps={ { 'aria-label': 'select' } }
+                      />
+                    </TableCell>
+                    { columns.map(col => <TableCell align={ col.align }>
+                      <col.cell { ...item }/>
+                    </TableCell>) }
+                  </TableRow>
+                )
+              })
+              }
+            </TableBody>
+          </Table>
+          { items &&
           <TablePagination
             component="div"
-            rowsPerPage={perPage}
-            rowsPerPageOptions={[10, 25, 50, 100]}
-            onChangeRowsPerPage={handlePerPageChange}
-            count={items.length}
-            page={page}
-            onChangePage={handlePageChange}
+            rowsPerPage={ perPage }
+            rowsPerPageOptions={ [10, 25, 50, 100] }
+            onChangeRowsPerPage={ handlePerPageChange }
+            count={ totalItems }
+            page={ page }
+            onChangePage={ handlePageChange }
           />
-        }
-      </TableContainer>
+          }
+        </TableContainer>
+      </Paper>
     </>
   )
 }
 
-function AdvancedTableHeader (props) {
+const useToolbarStyles = makeStyles((theme) => ( {
+  root: {
+    paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(1),
+    // paddingTop: theme.spacing(1),
+  },
+  highlight:
+    theme.palette.type === 'light'
+      ? {
+        color: theme.palette.secondary.main,
+        backgroundColor: lighten(theme.palette.secondary.light, 0.85),
+      }
+      : {
+        color: theme.palette.text.primary,
+        backgroundColor: theme.palette.secondary.dark,
+      },
+  title: {
+    flex: '1 1 100%',
+  },
+} ))
+
+function TableToolbar (props) {
+
+  const classes = useToolbarStyles()
+  const { numSelected, tableTitle, search, onSearch, bulkActions, onBulkAction } = props
+
+  return (
+    <Toolbar
+      className={ clsx(classes.root, {
+        [classes.highlight]: numSelected > 0,
+      }) }
+    >
+      { numSelected > 0 ? (
+        <Typography className={ classes.title } color="inherit"
+                    variant="subtitle1" component="div">
+          { numSelected } selected
+        </Typography>
+      ) : (
+        <Typography className={ classes.title } variant="h6" id="tableTitle"
+                    component="div">
+          { tableTitle }
+        </Typography>
+      ) }
+
+      { numSelected > 0 ? bulkActions.map(action => (
+        <Tooltip title={ action.title }>
+          <IconButton
+            aria-label={ action.action }
+            onClick={(e) => onBulkAction(e, action.action )}
+          >
+            { action.icon }
+          </IconButton>
+        </Tooltip> )) : (
+        <TextField id="search" label={ 'Search' } type="search"
+                   variant="outlined"
+                   value={ search }
+                   onChange={ onSearch }
+                   size={ 'small' }
+        />
+      ) }
+    </Toolbar>
+  )
+
+}
+
+function TableHeader (props) {
 
   const {
     columns,
-    onSelectAllClick,
+    onSelectAll,
     order,
     orderBy,
     numSelected,
-    rowCount,
+    perPage,
+    totalItems,
     handleReOrder,
   } = props
+
+  const __totalItems = Math.min(perPage, totalItems)
 
   return (
     <TableHead>
       <TableRow>
-
         <TableCell padding="checkbox">
           <Checkbox
-            indeterminate={ numSelected > 0 && numSelected < rowCount }
-            checked={ rowCount > 0 && numSelected === rowCount }
-            onChange={ onSelectAllClick }
+            indeterminate={ numSelected > 0 && numSelected < __totalItems }
+            checked={ __totalItems > 0 && numSelected === __totalItems }
+            onChange={ onSelectAll }
             inputProps={ { 'aria-label': 'select all' } }
           />
         </TableCell>
@@ -174,7 +332,7 @@ function AdvancedTableHeader (props) {
 function HeaderTableCell ({ column, currentOrderBy, handleReOrder, order }) {
   const Component = column.orderBy ? SortableHeaderCell : NonSortableHeaderCell
   return <Component { ...column } currentOrderBy={ currentOrderBy }
-                    onReOrder={ handleReOrder } order={order}/>
+                    onReOrder={ handleReOrder } order={ order }/>
 }
 
 /**

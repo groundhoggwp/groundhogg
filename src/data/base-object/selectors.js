@@ -18,6 +18,15 @@ export const getItems = ( state ) => {
 };
 
 /**
+ * Get items from state tree.
+ *
+ * @param {Object} state - Reducer state
+ */
+export const getTotalItems = ( state ) => {
+	return state.totalItems;
+};
+
+/**
  * Determine if an items read request resulted in an error.
  *
  * @param {Object} state - Reducer state
@@ -53,3 +62,4 @@ export const isItemsRequesting = ( state ) => {
 export const getItemsUpdatingError = ( state ) => {
 	return state.updatingError || false;
 };
+
