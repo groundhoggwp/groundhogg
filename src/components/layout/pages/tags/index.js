@@ -6,6 +6,7 @@ import { useSelect, useDispatch } from '@wordpress/data'
 import { ListTable } from '../../../core-ui/list-table/new'
 import { TAGS_STORE_NAME } from '../../../../data/tags'
 import LocalOfferIcon from '@material-ui/icons/LocalOffer'
+import DeleteIcon from '@material-ui/icons/Delete'
 import SettingsIcon from '@material-ui/icons/Settings';
 import GroupIcon from '@material-ui/icons/Group'
 import ButtonWithDropdown from '../../../core-ui/buttonWithDropdown'
@@ -66,6 +67,14 @@ const tagTableColumns =  [
 	},
 ];
 
+const tagTableBulkActions = [
+	{
+		title: 'Delete',
+		action: 'delete',
+		icon: <DeleteIcon/>
+	}
+]
+
 export const Tags = () => {
 
 	const { items, totalItems, isRequesting } = useSelect( (select) => {
@@ -78,7 +87,24 @@ export const Tags = () => {
 		}
 	}, [] );
 
-	const { fetchItems } = useDispatch( TAGS_STORE_NAME );
+	const { fetchItems, deleteItems } = useDispatch( TAGS_STORE_NAME );
+
+	/**
+	 * Handle any bulk actions
+	 *
+	 * @param action
+	 * @param selected
+	 * @param setSelected
+	 * @param fetchItems
+	 */
+	const handleBulkAction = ( { action, selected, setSelected, fetchItems } ) => {
+		switch (action) {
+			case 'delete':
+				deleteItems( selected.map( item => item.ID ) );
+				setSelected([])
+				break;
+		}
+	}
 
 	return (
 		<Fragment>
@@ -90,6 +116,8 @@ export const Tags = () => {
 				fetchItems={fetchItems}
 				isRequesting={isRequesting}
 				columns={tagTableColumns}
+				onBulkAction={handleBulkAction}
+				bulkActions={tagTableBulkActions}
 			/>
 		</Fragment>
 	)
