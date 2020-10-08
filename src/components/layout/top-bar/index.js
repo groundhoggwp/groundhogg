@@ -1,4 +1,4 @@
-import React from 'react';
+
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -19,19 +19,6 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import NavListItems from '../../core-ui/nav-list-items/';
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
 
 const drawerWidth = 240;
 
@@ -127,7 +114,7 @@ export default function Dashboard(props) {
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
   let pageTitle = props.page.path.replace('/','');
-  if(props.page.path === '/'){ pageTitle = 'Dashboard'}  
+  if(props.page.path === '/'){ pageTitle = 'Dashboard'}
 
   return (
     <div className={classes.root}>
@@ -166,8 +153,7 @@ export default function Dashboard(props) {
           </IconButton>
         </div>
         <Divider />
-        <List><NavListItems props={props}/></List>
-        <Divider />
+        <NavListItems props={props} />
       </Drawer>
 
     </div>

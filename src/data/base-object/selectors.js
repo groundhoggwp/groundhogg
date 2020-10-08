@@ -2,10 +2,10 @@
  * Get item from state tree.
  *
  * @param {Object} state - Reducer state
- * @param {Array} item - Option name
+ * @param {Array} itemId - Option name
  */
-export const getItem = ( state, item ) => {
-	return state.items.find( ( _item ) => item.ID === _item.ID );
+export const getItem = ( state, itemId ) => {
+	return state.item;
 };
 
 /**

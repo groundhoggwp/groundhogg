@@ -1,11 +1,8 @@
 /**
  * External dependencies
  */
-import { Fragment, useState } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import TextField from '@material-ui/core/TextField';
-import Spinner from '../../../core-ui/spinner';
 
 /**
  * Internal dependencies
@@ -13,32 +10,71 @@ import Spinner from '../../../core-ui/spinner';
 import {
 	CONTACTS_STORE_NAME
 } from '../../../../data';
-import Listable from '../../../core-ui/list-table';
+import { ListTable } from '../../../core-ui/list-table/new'
+import { ContactRowPrimaryItem } from './contact-row-primary-item'
 
 export const Contacts = ( props ) => {
-	const { contacts, getContact, isRequesting, isUpdating } = useSelect( ( select ) => {
-		const store = select( CONTACTS_STORE_NAME );
-		return {
-			contacts : store.getItems(),
-			getContact : store.getItem,
-			isRequesting : store.isItemsRequesting(),
-			isUpdating: store.isItemsUpdating()
-		}
-	} );
-
-	if ( isRequesting || isUpdating || ! contacts ) {
-		return <Spinner />;
-	}
-
-	console.log(contacts);
-
 	return (
-			<Fragment>
-				<h2>Contacts</h2>
-				<Listable data={contacts}/>
-				<ol>
-					{ contacts.map( contact => <li data-id={contact.ID}>{ contact.data.first_name }</li> ) }
-				</ol>
-			</Fragment>
+		<Fragment>
+			<ListTable
+				storeName={ CONTACTS_STORE_NAME }
+				columns={[
+					{
+						ID: 'email',
+						name: 'Email',
+						orderBy: 'email',
+						align: 'left',
+						cell: ({data, ID}) => {
+							return <ContactRowPrimaryItem data={data} />
+						}
+					},
+					{
+						ID: 'first_name',
+						name: 'First Name',
+						orderBy: 'first_name',
+						align: 'left',
+						cell: ({data}) => {
+							return data.first_name || ''
+						}
+					},
+					{
+						ID: 'last_name',
+						name: 'Last Name',
+						orderBy: 'last_name',
+						align: 'left',
+						cell: ({data}) => {
+							return data.last_name || ''
+						}
+					},
+					{
+						ID: 'username',
+						name: 'Username',
+						orderBy: 'username',
+						align: 'left',
+						cell: ({data}) => {
+							return data.meta && data.meta.user_login || ''
+						}
+					},
+					{
+						ID: 'owner',
+						name: 'Owner',
+						orderBy: 'owner_id',
+						align: 'left',
+						cell: ({data}) => {
+							return data.owner_id || '' // Need to resolve this to name/link
+						}
+					},
+					{
+						ID: 'date_created',
+						name: 'Date Created',
+						orderBy: 'date_created',
+						align: 'left',
+						cell: ({data}) => {
+							return data.date_created || '' // Need to resolve this to proper format
+						}
+					},
+				]}
+			/>
+		</Fragment>
 	);
 }
