@@ -35,13 +35,13 @@ const reducer = (
 		case TYPES.CREATE_ITEM:
 			state = {
 				...state,
-				items: [ ...state.items, item ]
+				items: [ item, ...state.items ]
 			};
 			break;
 		case TYPES.CREATE_ITEMS:
 			state = {
 				...state,
-				items: [ ...state.items, ...items ]
+				items: [ ...items, ...state.items ]
 			};
 			break;
 		case TYPES.SET_IS_CREATING:
