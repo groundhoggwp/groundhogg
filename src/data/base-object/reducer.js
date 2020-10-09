@@ -93,17 +93,13 @@ const reducer = (
 		case TYPES.UPDATE_ITEM:
 			state = {
 				...state,
-				items : state.items
-					.filter( existing => existing.ID !== item.ID )
-					.concat( [ item ] )
+				items : state.items.map( _item => _item.ID === item.ID ? item : _item )
 			};
 			break;
 		case TYPES.UPDATE_ITEMS:
 			state = {
 				...state,
-				items : state.items
-					.filter( existing => items.map( item => item.ID ).indexOf( existing.ID ) < 0 )
-					.concat( items )
+				items : state.items.map( _item => items.find( __item => _item.ID === __item.ID ) || _item )
 			};
 			break;
 		case TYPES.SET_IS_UPDATING:
