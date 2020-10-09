@@ -1,90 +1,57 @@
-import React from 'react';
-import { Fragment } from '@wordpress/element';
+import { makeStyles } from '@material-ui/core/styles';
+import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ListItemText from '@material-ui/core/ListItemText';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import DashboardIcon from '@material-ui/icons/Dashboard';
-import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
-import PeopleIcon from '@material-ui/icons/People';
-import BarChartIcon from '@material-ui/icons/BarChart';
-import LayersIcon from '@material-ui/icons/Layers';
-import AssignmentIcon from '@material-ui/icons/Assignment';
-import EmailIcon from '@material-ui/icons/Email';
+import Divider from '@material-ui/core/Divider';
+import { getPages } from '../../layout/controller';
 
+import { __ } from '@wordpress/i18n';
+const useStyles = makeStyles((theme) => ({
+  root: {
+    backgroundColor: theme.palette.background.paper,
+  },
+}));
 
 export default function NavListItems(props) {
+  const { push } = props.props.history;
+  const classes = useStyles();
 
-  // This isn't working corrrectling for the path parameter
-  const changeView = (view) => {
-  // // setOpen(false);
-  console.log(props, view)
-  props.props.history.push(`/${view}`)
+  const handleListItemClick = (view) => {
+    push(`${view}`);
   };
 
   return(
-  <Fragment>
-    <ListItem button onClick={()=>{changeView('')}}>
-      <ListItemIcon>
-        <DashboardIcon />
-      </ListItemIcon>
-      <ListItemText primary="Dashboard"  />
-    </ListItem>
-    <ListItem button onClick={()=>{changeView('reports')}}>
-      <ListItemIcon>
-        <BarChartIcon />
-      </ListItemIcon>
-      <ListItemText primary="Reports" />
-    </ListItem>
-    <ListItem button onClick={()=>{changeView('tags')}}>
-      <ListItemIcon>
-        <LayersIcon />
-      </ListItemIcon>
-      <ListItemText primary="Tags" />
-    </ListItem>
-    <ListItem button onClick={()=>{changeView('emails')}}>
-      <ListItemIcon>
-        <EmailIcon />
-      </ListItemIcon>
-      <ListItemText primary="Emails" />
-    </ListItem>
-    <ListItem button onClick={()=>{changeView('broadcasts')}}>
-      <ListItemIcon>
-        <EmailIcon />
-      </ListItemIcon>
-      <ListItemText primary="Broadcasts" />
-    </ListItem>
-    <ListItem button onClick={()=>{changeView('events')}}>
-      <ListItemIcon>
-        <EmailIcon />
-      </ListItemIcon>
-      <ListItemText primary="Events" />
-    </ListItem>
-    <ListItem button onClick={()=>{changeView('funnels')}}>
-      <ListItemIcon>
-        <EmailIcon />
-      </ListItemIcon>
-      <ListItemText primary="Funnels" />
-    </ListItem>
-    <ListSubheader inset>Saved reports</ListSubheader>
-    <ListItem button>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Current month" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Last quarter" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Year-end sale" />
-    </ListItem>
-  </Fragment>
-)
+    <div className={classes.root}>
+      <List component="nav" aria-label="main">
+        {
+        getPages().map((page, index) =>
+              <ListItem
+                button
+                onClick={ (event) => {
+                  handleListItemClick(page.path)
+                } }
+                selected={ index === props.props.selectedIndex }
+              >
+                <ListItemIcon>
+                  <page.icon />
+                </ListItemIcon>
+                <ListItemText primary={page.label}  />
+              </ListItem>
+            ) }
+            <Divider />
+            <ListItem
+                button
+                component="a"
+                href={ window.Groundhogg.preloadSettings.basename.replace( 'admin/groundhogg', 'admin/' ) }
+              >
+                <ListItemIcon>
+                  <ArrowBackIcon />
+                </ListItemIcon>
+                <ListItemText primary={ __( 'Back to WordPress' ) }  />
+            </ListItem>
+      </List>
+      </div>
+  )
 }

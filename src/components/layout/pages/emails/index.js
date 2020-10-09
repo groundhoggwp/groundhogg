@@ -17,13 +17,13 @@ export const Emails = ( props ) => {
 	const { emails, getEmail, isRequesting } = useSelect( ( select ) => {
 		const store = select( EMAILS_STORE_NAME );
 		return {
-			emails : store.getEmails(),
-			getEmail : store.getEmail,
-			isRequesting : store.isEmailsRequesting()
+			emails : store.getItems(),
+			getEmail : store.getItem,
+			isRequesting : store.isItemsRequesting()
 		}
 	} );
 
-	if (isRequesting) {
+	if (isRequesting || ! emails ) {
 		return <Spinner />;
 	}
 
@@ -32,7 +32,7 @@ export const Emails = ( props ) => {
 				<h2>Dashboard</h2>
 				<Listable data={emails}/>
 				<ol>
-					{ emails.map( email => <li data-id={email.ID}>{ email.content }</li> ) }
+					{ emails.map( email => <li data-id={email.ID}>{ email.data.subject_line }</li> ) }
 				</ol>
 			</Fragment>
 	);

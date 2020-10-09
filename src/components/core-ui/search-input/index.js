@@ -27,7 +27,6 @@ export default function Tags(props) {
         id="tags-standard"
         options={props.options}
         getOptionLabel={(option) => option.tag_name}
-        defaultValue={props.options[0]}
         renderInput={(params) => (
           <TextField
             {...params}

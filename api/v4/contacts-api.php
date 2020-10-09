@@ -189,6 +189,64 @@ class Contacts_Api extends Base_Object_Api {
 			$query['search'] = $search;
 		}
 
+		$data        = $request->get_param( 'data' );
+		$meta        = $request->get_param( 'meta' );
+		$add_tags    = $request->get_param( 'add_tags' ) ?: $request->get_param( 'apply_tags' );
+		$remove_tags = $request->get_param( 'remove_tags' );
+
+		if ( empty( $query ) && empty( $data) && empty( $meta ) && empty( $add_tags ) && empty( $remove_tags ) ){
+
+			$items = $request->get_json_params();
+
+			if ( empty( $items ) ){
+				return self::ERROR_422();
+			}
+
+			$contacts = [];
+
+			foreach ( $items as $item ) {
+
+				$id     = get_array_var( $item, 'ID' );
+				$contact = new Contact( $id );
+
+				if ( ! $contact->exists() ){
+					continue;
+				}
+
+				$data = get_array_var( $item, 'data', [] );
+				$meta = get_array_var( $item, 'meta', [] );
+				$add_tags = get_array_var( $item, 'add_tags', get_array_var( $item, 'apply_tags', [] ) );
+				$remove_tags = get_array_var( $item, 'remove_tags', [] );
+
+				// get the email address
+				$email_address = get_array_var( $data, 'email' );
+
+				// skip if the email address is not being used
+				if ( is_email_address_in_use( $email_address, $contact ) ) {
+					continue;
+				}
+
+				$contact->update( $data );
+
+				// If the current object supports meta data...
+				if ( ! empty( $meta ) && is_array( $meta ) ) {
+					foreach ( $meta as $key => $value ) {
+						$contact->update_meta( $key, $value );
+					}
+				}
+
+				$contact->apply_tag( $add_tags );
+				$contact->remove_tag( $remove_tags );
+
+				$contacts[] = $contact;
+			}
+
+			return self::SUCCESS_RESPONSE( [
+				'items'       => $contacts,
+				'total_items' => count( $contacts ),
+			] );
+		}
+
 		$contact_query = new Contact_Query();
 
 		$count    = $contact_query->count( $query );
@@ -197,11 +255,6 @@ class Contacts_Api extends Base_Object_Api {
 		$contacts = array_map( function ( $contact ) {
 			return new Contact( $contact->ID );
 		}, $contacts );
-
-		$data        = $request->get_param( 'data' );
-		$meta        = $request->get_param( 'meta' );
-		$add_tags    = $request->get_param( 'add_tags' ) ?: $request->get_param( 'apply_tags' );
-		$remove_tags = $request->get_param( 'remove_tags' );
 
 		/**
 		 * @var $contact Contact

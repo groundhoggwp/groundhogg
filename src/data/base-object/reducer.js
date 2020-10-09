@@ -9,8 +9,9 @@ const reducer = (
 		isRequesting: false,
 		isUpdating: false,
 		isDeleting: false,
+		totalItems: 0,
 		items: [],
-		item: null,
+		item: {},
 		creatingErrors: {},
 		requestingErrors: {},
 		updatingErrors: {},
@@ -22,6 +23,7 @@ const reducer = (
 		item,
 		itemIds,
 		itemId,
+		totalItems,
 		error,
 		isCreating,
 		isRequesting,
@@ -39,7 +41,7 @@ const reducer = (
 		case TYPES.CREATE_ITEMS:
 			state = {
 				...state,
-				items: [ ...state.items, items ]
+				items: [ ...state.items, ...items ]
 			};
 			break;
 		case TYPES.SET_IS_CREATING:
@@ -61,13 +63,15 @@ const reducer = (
 		case TYPES.RECEIVE_ITEM:
 			state = {
 				...state,
-				item : item
+				item: item,
+				items: [ ...state.items, item ]
 			};
 			break;
 		case TYPES.RECEIVE_ITEMS:
 			state = {
 				...state,
-				items
+				items,
+				totalItems
 			};
 			break;
 		case TYPES.SET_IS_REQUESTING:
@@ -122,14 +126,16 @@ const reducer = (
 			state = {
 				...state,
 				items : state.items
-					.filter( existing => existing.ID !== itemId )
+					.filter( existing => existing.ID !== itemId ),
+				totalItems: state.totalItems - 1
 			};
 			break;
 		case TYPES.DELETE_ITEMS:
 			state = {
 				...state,
 				items : state.items
-					.filter( existing => itemIds.indexOf( existing.ID ) < 0 )
+					.filter( existing => itemIds.indexOf( existing.ID ) < 0 ),
+				totalItems: state.totalItems - itemIds.length
 			};
 			break;
 		case TYPES.SET_IS_DELETING:

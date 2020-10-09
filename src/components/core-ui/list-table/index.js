@@ -3,7 +3,7 @@
  */
  import * as React from 'react';
  import { DataGrid } from '@material-ui/data-grid';
- import { find, forEach, isNull, get, includes } from 'lodash';
+ import { find, forEach, isNull, get, includes, uniqueId } from 'lodash';
 /**
  * Internal dependencies
  */
@@ -12,7 +12,7 @@ export default function Listable(props) {
   let rows = []
   let columns = []
   if(props.data.length > 0){
-    rows = props.data.map(row=> ({ ...row, id: _.uniqueId() }))
+    rows = props.data.map(row=> ({ ...row, id: uniqueId() }))
     columns = Object.keys(props.data[0]).map((email)=>{
         return  { field: email, headerName: email, width: 70 };
     })

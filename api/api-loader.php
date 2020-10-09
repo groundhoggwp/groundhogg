@@ -84,7 +84,7 @@ class Api_Loader {
 	/**
 	 * Check the keys provided.
 	 *
-	 * @param $secret
+	 * @param $secretsle
 	 * @param $public
 	 * @param $token
 	 *

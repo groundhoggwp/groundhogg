@@ -1,51 +1,124 @@
 /**
  * External dependencies
  */
-import { Fragment, useState } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import TextField from '@material-ui/core/TextField';
-import Spinner from '../../../core-ui/spinner';
-import SearchInput from '../../../core-ui/search-input';
-/**
- * Internal dependencies
- */
-import { TAGS_STORE_NAME } from '../../../../data';
+import { Fragment } from '@wordpress/element'
+import { useSelect, useDispatch } from '@wordpress/data'
+import { ListTable } from '../../../core-ui/list-table/new'
+import { TAGS_STORE_NAME } from '../../../../data/tags'
+import LocalOfferIcon from '@material-ui/icons/LocalOffer'
+import DeleteIcon from '@material-ui/icons/Delete'
+import SettingsIcon from '@material-ui/icons/Settings';
+import GroupIcon from '@material-ui/icons/Group'
+import ButtonWithDropdown from '../../../core-ui/buttonWithDropdown'
 
-const singleEntityExample = ( ID, callback ) => {
-	let tag = callback( ID );
+const iconProps = {
+	fontSize: 'small',
+	style: {
+		verticalAlign: 'middle'
+	}
 }
 
-export const Tags = ( props ) => {
-	const [ stateTagValue, setTagValue ] = useState( '' );
+const tagTableColumns =  [
+	{
+		ID: 'tag_id',
+		name: 'ID',
+		orderBy: 'tag_id',
+		align: 'right',
+		cell: ({ data, ID }) => {
+			return data.tag_id
+		},
+	},
+	{
+		ID: 'name',
+		name: <span><LocalOfferIcon {...iconProps}/> { 'Name' }</span>,
+		orderBy: 'tag_name',
+		align: 'left',
+		cell: ({ data }) => {
+			return <>{ data.tag_name }</>
+		},
+	},
+	{
+		ID: 'contacts',
+		name: <span><GroupIcon {...iconProps}/> { 'Contacts' }</span>,
+		orderBy: 'contact_count',
+		align: 'right',
+		cell: ({ data }) => {
+			return <>{ data.contact_count }</>
+		},
+	},
+	{
+		ID: 'contacts',
+		name: <span><SettingsIcon {...iconProps}/> { 'Actions' }</span>,
+		align: 'right',
+		cell: ({ data }) => {
 
-	const { updateTags } = useDispatch( TAGS_STORE_NAME );
+			return <>
+				<ButtonWithDropdown
+					button={'Edit'}
+					menuOptions={[
+						{
+							key: 'delete',
+							render: 'Delete'
+						},
+					]}
+				/>
+			</>
+		},
+	},
+];
 
-	const { tags, getTag, isRequesting, isUpdating } = useSelect( ( select ) => {
-		const store = select( TAGS_STORE_NAME );
+const tagTableBulkActions = [
+	{
+		title: 'Delete',
+		action: 'delete',
+		icon: <DeleteIcon/>
+	}
+]
+
+export const Tags = () => {
+
+	const { items, totalItems, isRequesting } = useSelect( (select) => {
+		const store = select(TAGS_STORE_NAME);
+
 		return {
-			tags : store.getTags(),
-			getTag : store.getTag,
-			isRequesting : store.isTagsRequesting(),
-			isUpdating: store.isTagsUpdating()
+			items: store.getItems(),
+			totalItems: store.getTotalItems(),
+			isRequesting: store.isItemsRequesting()
 		}
-	} );
-	
-	if ( isRequesting || isUpdating ) {
-		return <Spinner />;
+	}, [] );
+
+	const { fetchItems, deleteItems } = useDispatch( TAGS_STORE_NAME );
+
+	/**
+	 * Handle any bulk actions
+	 *
+	 * @param action
+	 * @param selected
+	 * @param setSelected
+	 * @param fetchItems
+	 */
+	const handleBulkAction = ( { action, selected, setSelected, fetchItems } ) => {
+		switch (action) {
+			case 'delete':
+				deleteItems( selected.map( item => item.ID ) );
+				setSelected([])
+				break;
+		}
 	}
 
 	return (
-			<Fragment>
-				<h2>Dashboard</h2>
-				<SearchInput label={'Select a Tag'} placeholder="Tags" multiple={false} options={tags} />
-				<SearchInput label={'Select Multiple Tags'} placeholder="Tags" multiple={true} options={tags} />
-				<ol>
-					{ tags.map( tag => <li data-id={tag.ID} onClick={ () => { singleEntityExample( tag.ID, getTag ) } }>{ tag.tag_name }</li> ) }
-				</ol>
-				<TextField id="outlined-basic" label="Add Tags" variant="outlined" value={ stateTagValue } onChange={ ( event ) => setTagValue( event.target.value ) } />
-				<p onClick={ () => { updateTags( { tags : stateTagValue } ) } }>Add</p>
-				{ ( isUpdating ) && ( <Spinner /> ) }
-			</Fragment>
-	);
+		<Fragment>
+			<ListTable
+				items={items}
+				defaultOrderBy={'tag_id'}
+				defaultOrder={'desc'}
+				totalItems={totalItems}
+				fetchItems={fetchItems}
+				isRequesting={isRequesting}
+				columns={tagTableColumns}
+				onBulkAction={handleBulkAction}
+				bulkActions={tagTableBulkActions}
+			/>
+		</Fragment>
+	)
 }

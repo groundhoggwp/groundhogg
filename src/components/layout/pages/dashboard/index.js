@@ -20,6 +20,7 @@ const singleEntityExample = ( ID, callback ) => {
 }
 
 export const Dashboard = ( props ) => {
+
 	const [ stateTagValue, setTagValue ] = useState( '' );
 
 	const { updateTags } = useDispatch( TAGS_STORE_NAME );

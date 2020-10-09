@@ -1,121 +1,233 @@
 /**
  * Internal dependencies
  */
-import TYPES from './action-types';
+import TYPES from './action-types'
+import { apiFetch } from '@wordpress/data-controls'
+import { addQueryArgs } from '@wordpress/url'
 
-export function createItems( items ) {
-	return {
-		type: TYPES.CREATE_ITEMS,
-		items,
-	};
+function receiveItems (items) {
+  return {
+    type: TYPES.RECEIVE_ITEMS,
+    items,
+  }
 }
 
-export function createItem( item ) {
-	return {
-		type: TYPES.CREATE_ITEM,
-		item,
-	};
+function receiveItem (item) {
+  return {
+    type: TYPES.RECEIVE_ITEM,
+    item,
+  }
 }
 
-export function receiveItems( items ) {
-	return {
-		type: TYPES.RECEIVE_ITEMS,
-		items,
-	};
+function setIsCreatingItems (isCreating) {
+  return {
+    type: TYPES.SET_IS_CREATING,
+    isCreating,
+  }
 }
 
-export function receiveItem( item ) {
-	return {
-		type: TYPES.RECEIVE_ITEM,
-		item,
-	};
+function setCreatingError (error) {
+  return {
+    type: TYPES.SET_CREATING_ERROR,
+    error,
+  }
 }
 
-export function updateItems( items ) {
-	return {
-		type: TYPES.UPDATE_ITEMS,
-		items,
-	};
+function setIsRequestingItems (isRequesting) {
+  return {
+    type: TYPES.SET_IS_REQUESTING,
+    isRequesting,
+  }
 }
 
-export function updateItem( item ) {
-	return {
-		type: TYPES.UPDATE_ITEM,
-		item,
-	};
+function setRequestingError (error) {
+  return {
+    type: TYPES.SET_REQUESTING_ERROR,
+    error,
+  }
 }
 
-export function deleteItems( itemIds ) {
-	return {
-		type: TYPES.DELETE_ITEMS,
-		itemIds,
-	};
+function setIsUpdatingItems (isUpdating) {
+  return {
+    type: TYPES.SET_IS_UPDATING,
+    isUpdating,
+  }
 }
 
-export function deleteItem( itemId ) {
-	return {
-		type: TYPES.DELETE_ITEM,
-		itemId,
-	};
+function setUpdatingError (error) {
+  return {
+    type: TYPES.SET_UPDATING_ERROR,
+    error,
+  }
 }
 
-export function setIsCreatingItems( isCreating ) {
-	return {
-		type: TYPES.SET_IS_CREATING,
-		isCreating,
-	};
+function setIsDeletingItems (isDeleting) {
+  return {
+    type: TYPES.SET_IS_DELETING,
+    isDeleting,
+  }
 }
 
-export function setCreatingError( error ) {
-	return {
-		type: TYPES.SET_CREATING_ERROR,
-		error
-	};
+function setDeletingError (error) {
+  return {
+    type: TYPES.SET_DELETING_ERROR,
+    error,
+  }
 }
 
-export function setIsRequestingItems( isRequesting ) {
-	return {
-		type: TYPES.SET_IS_REQUESTING,
-		isRequesting,
-	};
-}
+export default (endpoint) => ( {
 
-export function setRequestingError( error ) {
-	return {
-		type: TYPES.SET_REQUESTING_ERROR,
-		error
-	};
-}
+  endpoint,
 
-export function setIsUpdating( isUpdating ) {
-	return {
-		type: TYPES.SET_IS_UPDATING,
-		isUpdating,
-	};
-}
+	receiveItems,
+	receiveItem,
+	setIsRequestingItems,
+	setRequestingError,
 
-export function setUpdatingError( error ) {
-	return {
-		type: TYPES.SET_UPDATING_ERROR,
-		error,
-	};
-}
+  * fetchItems ( query ){
+    yield setIsRequestingItems(true)
 
-export function setIsDeleting( isDeleting ) {
-	return {
-		type: TYPES.SET_IS_DELETING,
-		isDeleting,
-	};
-}
+    try {
+      const result = yield apiFetch({
+        path: addQueryArgs( `${ endpoint }`, query ),
+      })
 
-export function setDeletingError( error ) {
-	return {
-		type: TYPES.SET_DELETING_ERROR,
-		error,
-	};
-}
+      yield setIsRequestingItems(false)
+      yield {
+        type: TYPES.RECEIVE_ITEMS,
+        items: result.items,
+        totalItems: result.total_items
+      }
+    }
+    catch (e) {
+      yield setCreatingError(e)
+    }
+  },
 
-/**
- * This is overridden
- */
-export function getEndpoint() {}
+  * createItems (items) {
+    yield setIsCreatingItems(true)
+
+    try {
+      const result = yield apiFetch({
+        method: 'POST',
+        path: `${ endpoint }`,
+        data: items,
+      })
+
+      yield setIsCreatingItems(false)
+      yield {
+        type: TYPES.CREATE_ITEMS,
+        items: result.items,
+      }
+    }
+    catch (e) {
+      yield setCreatingError(e)
+    }
+  },
+
+  * createItem (item) {
+    yield setIsCreatingItems(true)
+
+    try {
+      const result = yield apiFetch({
+        method: 'POST',
+        path: `${ endpoint }`,
+        data: item,
+      })
+
+      yield setIsCreatingItems(false)
+      yield {
+        type: TYPES.CREATE_ITEM,
+        item: result.item,
+      }
+    }
+    catch (e) {
+      yield setCreatingError(e)
+    }
+  },
+
+  * updateItems (items) {
+    yield setIsUpdatingItems(true)
+
+    try {
+      const response = yield apiFetch({
+        method: 'PATCH',
+        path: `${ endpoint }`,
+        data: items,
+      })
+
+      yield setIsUpdatingItems(false)
+      yield {
+        type: TYPES.UPDATE_ITEMS,
+        items: response.items,
+      }
+    }
+    catch (e) {
+      yield setUpdatingError(e)
+    }
+  },
+
+  * updateItem (itemId, data) {
+
+    yield setIsUpdatingItems(true)
+
+    try {
+      const response = yield apiFetch({
+        method: 'PATCH',
+        path: `${ endpoint }/${ itemId }`,
+        data: data,
+      })
+
+      yield setIsUpdatingItems(false)
+      yield {
+        type: TYPES.UPDATE_ITEM,
+        item: response.item,
+      }
+    }
+    catch (e) {
+      yield setUpdatingError(e)
+    }
+  },
+
+  * deleteItems (itemIds) {
+    yield setIsDeletingItems(true)
+
+    try {
+      yield apiFetch({
+        method: 'DELETE',
+        path: `${ endpoint }`,
+        data: itemIds,
+      })
+
+      yield setIsDeletingItems(false)
+      yield {
+        type: TYPES.DELETE_ITEMS,
+        itemIds,
+      }
+    }
+    catch (e) {
+      yield setDeletingError(e)
+    }
+  },
+
+  * deleteItem (itemId) {
+    yield setIsDeletingItems(true)
+
+    try {
+      yield apiFetch({
+        path: `${ endpoint }/${ itemId }`,
+        method: 'DELETE',
+      })
+
+      yield setIsDeletingItems(false)
+      yield {
+        type: TYPES.DELETE_ITEM,
+        itemId,
+      }
+    }
+    catch (e) {
+      yield setDeletingError(e)
+    }
+  },
+
+} )
