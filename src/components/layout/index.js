@@ -20,7 +20,6 @@ import Grid from '@material-ui/core/Grid'
 import './style.scss'
 import { Controller, getPages, PAGES_FILTER } from './controller'
 import TopBar from './top-bar'
-import BottomBar from './bottom-bar'
 import Notices from './notices'
 import { withSettingsHydration } from '../../data'
 
