@@ -27,16 +27,6 @@ export const getTotalItems = ( state ) => {
 };
 
 /**
- * Determine if an items read request resulted in an error.
- *
- * @param {Object} state - Reducer state
- * @param {string} name - Option name
- */
-export const getItemsRequestingError = ( state, name ) => {
-	return state.requestingErrors[ name ] || false;
-};
-
-/**
  * Determine if items are being updated.
  *
  * @param {Object} state - Reducer state
@@ -50,16 +40,45 @@ export const isItemsUpdating = ( state ) => {
  *
  * @param {Object} state - Reducer state
  */
+export const isItemsCreating = ( state ) => {
+	return state.isCreating || false;
+};
+
+/**
+ * Determine if items are being updated.
+ *
+ * @param {Object} state - Reducer state
+ */
 export const isItemsRequesting = ( state ) => {
 	return state.isRequesting || false;
+};
+
+/**
+ * Determine if an items create request resulted in an error.
+ *
+ * @param {Object} state - Reducer state
+ * @param {string} name - Option name
+ */
+export const getItemsCreatingError = ( state, name ) => {
+	return state.creatingErrors[ name ] || false;
+};
+
+/**
+ * Determine if an items read request resulted in an error.
+ *
+ * @param {Object} state - Reducer state
+ * @param {string} name - Option name
+ */
+export const getItemsRequestingError = ( state, name ) => {
+	return state.requestingErrors[ name ] || false;
 };
 
 /**
  * Determine if an items update resulted in an error.
  *
  * @param {Object} state - Reducer state
+ * @param name
  */
-export const getItemsUpdatingError = ( state ) => {
-	return state.updatingError || false;
+export const getItemsUpdatingError = ( state, name ) => {
+	return state.updatingErrors[name] || false;
 };
-

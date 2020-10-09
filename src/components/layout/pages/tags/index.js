@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Fragment, useState } from '@wordpress/element'
+import { Fragment, useEffect, useState } from '@wordpress/element'
 import { useSelect, useDispatch } from '@wordpress/data'
 import { ListTable } from '../../../core-ui/list-table/new'
 import { TAGS_STORE_NAME } from '../../../../data/tags'
@@ -15,6 +15,7 @@ import Button from '@material-ui/core/Button'
 import Box from '@material-ui/core/Box'
 import makeStyles from '@material-ui/core/styles/makeStyles'
 import { useKeyPress } from '../../../../utils'
+import Paper from '@material-ui/core/Paper'
 
 const iconProps = {
   fontSize: 'small',
@@ -93,6 +94,14 @@ const useStyles = makeStyles((theme) => ( {
     },
     '& .MuiButtonBase-root:not(:last-child)': {
       marginRight: theme.spacing(2),
+    },
+  },
+  add: {
+    minWidth: 468,
+    padding: theme.spacing(2),
+    marginRight: theme.spacing(2),
+    '& .MuiTextField-root': {
+      marginBottom: theme.spacing(2),
     },
   },
 } ))
@@ -202,6 +211,137 @@ const tagTableBulkActions = [
   },
 ]
 
+/**
+ * UI for adding tags
+ *
+ * @returns {*}
+ * @constructor
+ */
+const AddTags = () => {
+
+  const { createItem, createItems } = useDispatch(TAGS_STORE_NAME)
+  const [addingBulk, setAddingBulk] = useState(false)
+  const [tempData, setTempData] = useState({})
+  const classes = useStyles()
+
+  const { isCreating } = useSelect((select) => {
+    const store = select(TAGS_STORE_NAME)
+
+    return {
+      isCreating: store.isItemsCreating(),
+    }
+  }, [])
+
+  const handleOnChange = (atts) => {
+    setTempData({
+      ...tempData,
+      ...atts,
+    })
+  }
+
+  /**
+   * Handle pressing enter in the tag name
+   *
+   * @param keyCode
+   */
+  const handleOnKeydown = ({ keyCode }) => {
+    switch (keyCode) {
+      case 13:
+        commitSingle()
+        break
+    }
+  }
+
+  const commitSingle = () => {
+    createItem({
+      data: tempData,
+    })
+
+    setTempData({ tag_name: '', tag_description: '' })
+  }
+
+  const commitMultiple = () => {
+    const tagNames = tempData.multiple_tags.split('\n')
+    const tagData = tagNames.map(name => {
+      return {
+        data: {
+          tag_name: name,
+        },
+      }
+    })
+
+    createItems(tagData)
+
+    setTempData({ multiple_tags: '' })
+  }
+
+  if (addingBulk) {
+    return (
+      <Paper className={ classes.add }>
+        <TextField
+          id="multiple-tags"
+          label={ 'Multiple Tags' }
+          multiline
+          fullWidth
+          size="small"
+          rows={ 5 }
+          value={ tempData && tempData.multiple_tags }
+          onChange={ (e) => handleOnChange(
+            { multiple_tags: e.target.value }) }
+          variant="outlined"
+        />
+        <Box display={ 'flex' } justifyContent={ 'space-between' }>
+          <Button variant="contained" color="primary"
+                  onClick={ commitMultiple }>
+            { 'Create Tags' }
+          </Button>
+          <Button variant="contained" onClick={ () => setAddingBulk(false) }>
+            { 'Create Single Tag' }
+          </Button>
+        </Box>
+      </Paper>
+    )
+  }
+
+  return (
+    <>
+      <Paper className={ classes.add }>
+        <TextField
+          autoFocus
+          label={ 'Tag Name' }
+          id="tag-name"
+          fullWidth
+          value={ tempData.tag_name }
+          onChange={ (e) => handleOnChange({ tag_name: e.target.value }) }
+          onKeyDown={ handleOnKeydown }
+          variant="outlined"
+          size="small"
+        />
+        <TextField
+          id="tag-description"
+          label={ 'Tag Description' }
+          multiline
+          fullWidth
+          size="small"
+          rows={ 3 }
+          value={ tempData && tempData.tag_description }
+          onChange={ (e) => handleOnChange(
+            { tag_description: e.target.value }) }
+          variant="outlined"
+        />
+        <Box display={ 'flex' } justifyContent={ 'space-between' }>
+          <Button variant="contained" color="primary" onClick={ commitSingle }>
+            { 'Create Tag' }
+          </Button>
+          <Button variant="contained" onClick={ () => setAddingBulk(true) }>
+            { 'Create Multiple Tags' }
+          </Button>
+        </Box>
+      </Paper>
+    </>
+  )
+}
+
 export const Tags = () => {
 
   const { items, totalItems, isRequesting } = useSelect((select) => {
@@ -235,18 +375,25 @@ export const Tags = () => {
 
   return (
     <Fragment>
-      <ListTable
-        items={ items }
-        defaultOrderBy={ 'tag_id' }
-        defaultOrder={ 'desc' }
-        totalItems={ totalItems }
-        fetchItems={ fetchItems }
-        isRequesting={ isRequesting }
-        columns={ tagTableColumns }
-        onBulkAction={ handleBulkAction }
-        bulkActions={ tagTableBulkActions }
-        QuickEdit={ TagsQuickEdit }
-      />
+      <Box display={ 'flex' }>
+        <Box>
+          <AddTags/>
+        </Box>
+        <Box flexGrow={ 1 }>
+          <ListTable
+            items={ items }
+            defaultOrderBy={ 'tag_id' }
+            defaultOrder={ 'desc' }
+            totalItems={ totalItems }
+            fetchItems={ fetchItems }
+            isRequesting={ isRequesting }
+            columns={ tagTableColumns }
+            onBulkAction={ handleBulkAction }
+            bulkActions={ tagTableBulkActions }
+            QuickEdit={ TagsQuickEdit }
+          />
+        </Box>
+      </Box>
     </Fragment>
   )
 }
