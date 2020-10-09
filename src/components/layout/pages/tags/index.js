@@ -14,6 +14,7 @@ import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
 import Box from '@material-ui/core/Box'
 import makeStyles from '@material-ui/core/styles/makeStyles'
+import { useKeyPress } from '../../../../utils'
 
 const iconProps = {
   fontSize: 'small',
@@ -85,7 +86,7 @@ const tagTableColumns = [
 ]
 
 // Styling for inputs
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme) => ( {
   root: {
     '& .MuiTextField-root:not(:last-child)': {
       marginBottom: theme.spacing(2),
@@ -94,7 +95,7 @@ const useStyles = makeStyles((theme) => ({
       marginRight: theme.spacing(2),
     },
   },
-}));
+} ))
 
 /**
  * Handle the table quick edit
@@ -107,11 +108,28 @@ const useStyles = makeStyles((theme) => ({
  */
 const TagsQuickEdit = ({ ID, data, exitQuickEdit }) => {
 
-  const classes = useStyles();
+  const classes = useStyles()
   const { updateItem } = useDispatch(TAGS_STORE_NAME)
   const [tempState, setTempState] = useState({
     ...data,
   })
+
+  // Exit quick edit
+  useKeyPress(27, null, () => {
+    exitQuickEdit()
+  })
+
+  /**
+   * Handle pressing enter in the tag name
+   *
+   * @param keyCode
+   */
+  const handleOnKeydown = ({ keyCode }) => {
+    switch (keyCode) {
+      case 13:
+        commitChanges()
+    }
+  }
 
   /**
    * Store the changes in a temp state
@@ -136,34 +154,38 @@ const TagsQuickEdit = ({ ID, data, exitQuickEdit }) => {
   }
 
   return (
-    <Box display={ 'flex' } justifyContent={ 'space-between' } className={classes.root}>
+    <Box display={ 'flex' } justifyContent={ 'space-between' }
+         className={ classes.root }>
       <Box flexGrow={ 2 }>
         <TextField
+          autoFocus
           label={ 'Tag Name' }
           id="tag-name"
           fullWidth
           value={ tempState && tempState.tag_name }
           onChange={ (e) => handleOnChange({ tag_name: e.target.value }) }
+          onKeyDown={ handleOnKeydown }
           variant="outlined"
           size="small"
         />
         <TextField
           id="tag-description"
-          label={'Tag Description'}
+          label={ 'Tag Description' }
           multiline
           fullWidth
-          rows={2}
-          value={tempState && tempState.tag_description }
-          onChange={ (e) => handleOnChange({ tag_description: e.target.value }) }
+          rows={ 2 }
+          value={ tempState && tempState.tag_description }
+          onChange={ (e) => handleOnChange(
+            { tag_description: e.target.value }) }
           variant="outlined"
         />
       </Box>
       <Box flexGrow={ 1 }>
-        <Box display={'flex'} justifyContent={'flex-end'}>
+        <Box display={ 'flex' } justifyContent={ 'flex-end' }>
           <Button variant="contained" color="primary" onClick={ commitChanges }>
             { 'Save Changes' }
           </Button>
-          <Button variant="contained" onClick={exitQuickEdit}>
+          <Button variant="contained" onClick={ exitQuickEdit }>
             { 'Cancel' }
           </Button>
         </Box>
