@@ -7,13 +7,13 @@ import { makeStyles } from '@material-ui/core/styles';
 import { __ } from '@wordpress/i18n';
 import Card from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
+
 
 /**
  * Internal dependencies
  */
- import Chart from '../../../core-ui/chart';
  import Spinner from '../../../core-ui/spinner';
+ import TabPanel from '../../../core-ui/tab-panel';
 import { REPORTS_STORE_NAME } from '../../../../data/reports'
 
 const useStyles = makeStyles((theme) => ({
@@ -23,14 +23,6 @@ const useStyles = makeStyles((theme) => ({
     // paddingTop: theme.spacing(4),
     // paddingBottom: theme.spacing(4),
   },
-
-	kpiTitle: {
-		fontSize: '24px',
-		fontStyle: 'bold'
-	},
-	kpiMetric: {
-		fontSize: '16px'
-	}
 }));
 
 export function Reports (props) {
@@ -62,24 +54,7 @@ export function Reports (props) {
   console.log(props.query)
 	return (
 			<Fragment>
-				<Card className={classes.container}><Chart type='line'/></Card>
-				<Card className={classes.container}>
-					<Typography className={classes.kpiTitle} component="h1" color="textSecondary">{`KPI`}</Typography>
-					<Typography className={classes.kpiMetric} component="div" color="textSecondary">{`${Math.round(Math.random()*1000)/10}%`}</Typography>
-				</Card>
-				<Card className={classes.container}>
-					<Typography className={classes.kpiTitle} component="h1" color="textSecondary">{`KPI`}</Typography>
-					<Typography className={classes.kpiMetric} component="div" color="textSecondary">{`${Math.round(Math.random()*1000)/10}%`}</Typography>
-				</Card>
-				<Card className={classes.container}>
-					<Typography className={classes.kpiTitle} component="h1" color="textSecondary">{`KPI`}</Typography>
-					<Typography className={classes.kpiMetric} component="div" color="textSecondary">{`${Math.round(Math.random()*1000)/10}%`}</Typography>
-				</Card>
-				<Card className={classes.container}>
-					<Typography className={classes.kpiTitle} component="h1" color="textSecondary">{`KPI`}</Typography>
-					<Typography className={classes.kpiMetric} component="div" color="textSecondary">{`${Math.round(Math.random()*1000)/10}%`}</Typography>
-				</Card>
-
+				<TabPanel/>
 			</Fragment>
 
 	);
