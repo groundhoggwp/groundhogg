@@ -15,7 +15,6 @@
     "start": "wp-scripts start",
     "test:e2e": "wp-scripts test-e2e",
     "test:unit": "wp-scripts test-unit-js"
-
   },
   "browserslist": [
     ">0.2%",
@@ -66,6 +65,7 @@
     "@wordpress/i18n": "3.11.0",
     "@wordpress/scripts": "6.1.0",
     "@wordpress/url": "2.13.0",
+    "axios": "^0.20.0",
     "chart.js": "^2.9.3",
     "classnames": "2.2.6",
     "cross-fetch": "^3.0.6",
