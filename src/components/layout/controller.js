@@ -14,14 +14,16 @@ import {
 	Reports,
 	Emails,
 	Tags,
-	Contacts, Funnels,
+	Contacts,
+	Funnels,
+	Settings
 } from './pages'
-import { Spinner } from '../../components';
 
+import { Spinner } from '../../components';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import PeopleIcon from '@material-ui/icons/People';
 import BarChartIcon from '@material-ui/icons/BarChart';
-import LayersIcon from '@material-ui/icons/Layers';
+import SettingsIcon from '@material-ui/icons/Settings';
 import EmailIcon from '@material-ui/icons/Email';
 import LinearScaleIcon from '@material-ui/icons/LinearScale';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
@@ -36,7 +38,7 @@ export const getPages = () => {
 	pages.push( {
 		component: Dashboard,
 		icon : DashboardIcon,
-		label: 'Dashboard',
+		label: __( 'Dashboard' ),
 		name: 'dashboard',
 		path: '/',
 		priority: 1
@@ -45,7 +47,7 @@ export const getPages = () => {
 	pages.push( {
 		component: Reports,
 		icon : BarChartIcon,
-		label: 'Reports',
+		label: __( 'Reports' ),
 		name: 'reports',
 		path: '/reports',
 		priority: 10
@@ -54,7 +56,7 @@ export const getPages = () => {
 	pages.push( {
 		component: Contacts,
 		icon : PeopleIcon,
-		label: 'Contacts',
+		label: __( 'Contacts' ),
 		path: '/contacts',
 		name: 'contacts',
 		priority: 20
@@ -63,7 +65,7 @@ export const getPages = () => {
 	pages.push( {
 		component: Tags,
 		icon : LocalOfferIcon,
-		label: 'Tags',
+		label: __( 'Tags' ),
 		name: 'tags',
 		path: '/tags',
 		priority: 30
@@ -72,7 +74,7 @@ export const getPages = () => {
 	pages.push( {
 		component: Emails,
 		icon : EmailIcon,
-		label: 'Emails',
+		label: __( 'Emails' ),
 		name: 'reports',
 		path: '/emails',
 		priority: 40
@@ -81,10 +83,19 @@ export const getPages = () => {
 	pages.push( {
 		component: Funnels,
 		icon : LinearScaleIcon,
-		label: 'Funnels',
+		label: __( 'Funnels' ),
 		name: 'funnels',
 		path: '/funnels',
 		priority: 50
+	} );
+
+	pages.push( {
+		component: Settings,
+		icon : SettingsIcon,
+		label: __( 'Settings' ),
+		name: 'settings',
+		path: '/settings',
+		priority: 60
 	} );
 
 
@@ -105,7 +116,8 @@ export class Controller extends Component {
 	}
 
 	render() {
-		const { page, match, location } = this.props;
+		console.log(this.props);
+		const { page, match, location, id } = this.props;
 		const { url, params } = match;
 		const query = this.getQuery( location.search );
 

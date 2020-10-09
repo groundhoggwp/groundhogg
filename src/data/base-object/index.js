@@ -1,7 +1,11 @@
 /**
  * External dependencies
  */
-import { registerStore } from '@wordpress/data';
+import {
+	registerStore,
+	combineReducers
+} from '@wordpress/data';
+
 import { assign } from 'lodash';
 
 /**
@@ -15,19 +19,20 @@ import reducer from './reducer';
 import { NAMESPACE } from '../constants'
 
 export function registerBaseObjectStore (endpoint, options) {
-  const storeName = NAMESPACE + '/' + endpoint
+	const storeName = NAMESPACE + '/' + endpoint
 
-  options = options || {}
+	options = options || {}
 
-  let baseActions = new BaseActions( storeName );
+	let baseActions = new BaseActions( storeName );
 	let baseResolver = new BaseResolver( storeName, baseActions );
 
+	let extendedReducer = options.reducer;
 	const storeArgs = {
-		reducer      : options.reducer   ? assign( reducer, options.reducer )         : reducer,
-		controls     : options.controls  ? assign( controls , options.controls )      : controls,
-		selectors    : options.selectors ? assign( baseSelectors, options.selectors ) : baseSelectors,
+		reducer      : options.reducer   ? combineReducers( { reducer, extendedReducer } ): reducer,
 		actions      : options.actions   ? assign( baseActions  , options.actions )   : baseActions ,
+		selectors    : options.selectors ? assign( baseSelectors, options.selectors ) : baseSelectors,
 		resolvers    : options.resolvers ? assign( baseResolver, options.resolvers )  : baseResolver,
+		controls     : options.controls  ? assign( controls , options.controls )      : controls,
 		initialState : options.initialState || {},
 	}
 

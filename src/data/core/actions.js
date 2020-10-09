@@ -1,16 +1,24 @@
 /**
- * External dependencies
- */
-import { apiFetch } from '@wordpress/data-controls';
-
-/**
  * Internal dependencies
  */
-import { NAMESPACE } from '../constants';
 import TYPES from './action-types';
 
 /**
  * Core actions.
- *
- * @todo Define core actions below.
  */
+
+export function showSnackbar( message, severity ) {
+
+	return {
+		type: TYPES.OPEN_SNACKBAR,
+		snackbarMessage : message,
+		snackbarSeverity : severity,
+	}
+};
+
+export function clearSnackbar() {
+
+	return {
+		type: TYPES.CLEAR_SNACKBAR
+	}
+};

@@ -2,8 +2,14 @@
  * Internal dependencies
  */
 import TYPES from './action-types'
+import { addNotification } from '../../utils'
+
+/**
+ * External dependencies
+ */
 import { apiFetch } from '@wordpress/data-controls'
 import { addQueryArgs } from '@wordpress/url'
+import { __ } from '@wordpress/i18n'
 
 function receiveItems (items) {
   return {
@@ -20,6 +26,7 @@ function receiveItem (item) {
 }
 
 function setIsCreatingItems (isCreating) {
+
   return {
     type: TYPES.SET_IS_CREATING,
     isCreating,
@@ -48,6 +55,12 @@ function setRequestingError (error) {
 }
 
 function setIsUpdatingItems (isUpdating) {
+  if ( ! isUpdating ) {
+    addNotification( {
+      message : __( 'Item successfully updated.' )
+    } );
+  }
+
   return {
     type: TYPES.SET_IS_UPDATING,
     isUpdating,
@@ -62,6 +75,11 @@ function setUpdatingError (error) {
 }
 
 function setIsDeletingItems (isDeleting) {
+  if ( ! isDeleting ) {
+    addNotification( {
+      message : __( 'Item successfully deleted.', 'info' ),
+    } );
+  }
   return {
     type: TYPES.SET_IS_DELETING,
     isDeleting,
@@ -69,6 +87,7 @@ function setIsDeletingItems (isDeleting) {
 }
 
 function setDeletingError (error) {
+
   return {
     type: TYPES.SET_DELETING_ERROR,
     error,
@@ -78,7 +97,6 @@ function setDeletingError (error) {
 export default (endpoint) => ( {
 
   endpoint,
-
 	receiveItems,
 	receiveItem,
 	setIsRequestingItems,
