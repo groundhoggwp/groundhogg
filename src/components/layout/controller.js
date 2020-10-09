@@ -14,8 +14,8 @@ import {
 	Reports,
 	Emails,
 	Tags,
-	Contacts
-} from './pages';
+	Contacts, Funnels,
+} from './pages'
 import { Spinner } from '../../components';
 
 import DashboardIcon from '@material-ui/icons/Dashboard';
@@ -23,6 +23,8 @@ import PeopleIcon from '@material-ui/icons/People';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import LayersIcon from '@material-ui/icons/Layers';
 import EmailIcon from '@material-ui/icons/Email';
+import LinearScaleIcon from '@material-ui/icons/LinearScale';
+import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 
 export const PAGES_FILTER = 'groundhogg_navigation';
 
@@ -50,17 +52,17 @@ export const getPages = () => {
 	} );
 
 	pages.push( {
-		component: Emails,
-		icon : EmailIcon,
-		label: 'Emails',
-		name: 'reports',
-		path: '/emails',
+		component: Contacts,
+		icon : PeopleIcon,
+		label: 'Contacts',
+		path: '/contacts',
+		name: 'contacts',
 		priority: 20
 	} );
 
 	pages.push( {
 		component: Tags,
-		icon : LayersIcon,
+		icon : LocalOfferIcon,
 		label: 'Tags',
 		name: 'tags',
 		path: '/tags',
@@ -68,13 +70,23 @@ export const getPages = () => {
 	} );
 
 	pages.push( {
-		component: Contacts,
-		icon : PeopleIcon,
-		label: 'Contacts',
-		path: '/contacts',
-		name: 'contacts',
+		component: Emails,
+		icon : EmailIcon,
+		label: 'Emails',
+		name: 'reports',
+		path: '/emails',
 		priority: 40
 	} );
+
+	pages.push( {
+		component: Funnels,
+		icon : LinearScaleIcon,
+		label: 'Funnels',
+		name: 'funnels',
+		path: '/funnels',
+		priority: 50
+	} );
+
 
 	pages.sort((a, b) => (a.priority > b.priority) ? 1 : -1)
 

@@ -144,7 +144,8 @@ class Contacts_Api extends Base_Object_Api {
 	 */
 	public function read( WP_REST_Request $request ) {
 
-		$query  = (array) $request->get_param( 'query' ) ?: [];
+		// Might have passed root level query
+		$query  = (array) $request->get_param( 'query' ) ?: $request->get_params();
 		$search = sanitize_text_field( wp_unslash( $request->get_param( 'search' ) ) );
 
 		if ( ! key_exists( 'search', $query ) && ! empty( $search ) ) {

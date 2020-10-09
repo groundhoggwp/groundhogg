@@ -4,17 +4,22 @@
 import { Fragment, useState } from '@wordpress/element'
 import { useSelect, useDispatch } from '@wordpress/data'
 import { ListTable } from '../../../core-ui/list-table/new'
-import { TAGS_STORE_NAME } from '../../../../data/tags'
-import LocalOfferIcon from '@material-ui/icons/LocalOffer'
 import DeleteIcon from '@material-ui/icons/Delete'
 import SettingsIcon from '@material-ui/icons/Settings'
 import GroupIcon from '@material-ui/icons/Group'
+import TimelineIcon from '@material-ui/icons/Timeline'
+import AccountCircleIcon from '@material-ui/icons/AccountCircle'
 import RowActions from '../../../core-ui/row-actions'
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
 import Box from '@material-ui/core/Box'
 import makeStyles from '@material-ui/core/styles/makeStyles'
 import { useKeyPress } from '../../../../utils'
+import FlagIcon from '@material-ui/icons/Flag'
+import Chip from '@material-ui/core/Chip'
+import { Tooltip } from '@material-ui/core'
+import ButtonGroup from '@material-ui/core/ButtonGroup'
+import { FUNNELS_STORE_NAME } from '../../../../data/funnels'
 
 const iconProps = {
   fontSize: 'small',
@@ -23,49 +28,87 @@ const iconProps = {
   },
 }
 
-const tagTableColumns = [
+const funnelTableColumns = [
   {
-    ID: 'tag_id',
+    ID: 'ID',
     name: 'ID',
-    orderBy: 'tag_id',
+    orderBy: 'ID',
     align: 'right',
     cell: ({ data, ID }) => {
-      return data.tag_id
+      return ID
     },
   },
   {
     ID: 'name',
-    name: <span><LocalOfferIcon { ...iconProps }/> { 'Name' }</span>,
-    orderBy: 'tag_name',
+    name: <span>{ 'Title' }</span>,
+    orderBy: 'title',
     align: 'left',
     cell: ({ data }) => {
-      return <>{ data.tag_name }</>
+      return <>{ data.title }</>
     },
   },
   {
-    ID: 'description',
-    name: <span>{ 'Description' }</span>,
+    ID: 'stats',
+    name: <span><TimelineIcon { ...iconProps }/> { 'Stats' }</span>,
+    align: 'center',
+    cell: ({ stats }) => {
+      return <>
+        <Tooltip title={ 'Complete' }>
+          <Chip
+            icon={ <FlagIcon/> }
+            label={ stats.complete }
+          />
+        </Tooltip>
+        <Tooltip title={ 'Active' }>
+          <Chip
+            icon={ <AccountCircleIcon/> }
+            label={ stats.active_now }
+          />
+        </Tooltip>
+      </>
+    },
+  },
+  {
+    ID: 'status',
+    name: <span>{ 'Status' }</span>,
     align: 'left',
-    cell: ({ data }) => {
-      return <>{ data.tag_description }</>
+    orderBy: 'status',
+    cell: ({ ID, data }) => {
+
+      const { updateItem } = useDispatch(FUNNELS_STORE_NAME)
+
+      const handleClick = (status) => {
+        updateItem(ID, {
+          data: {
+            status: status,
+          },
+        })
+      }
+
+      return <>
+        <ButtonGroup size={ 'small' } color="primary"
+                     aria-label={ 'funnel status' }>
+          <Button
+            onClick={()=>handleClick('active')}
+            variant={ data.status === 'active'
+            ? 'contained'
+            : 'outlined' }>{ 'Active' }</Button>
+          <Button
+            onClick={()=>handleClick('inactive')}
+            variant={ data.status !== 'active'
+            ? 'contained'
+            : 'outlined' }>{ 'Inactive' }</Button>
+        </ButtonGroup>
+      </>
     },
   },
   {
-    ID: 'contacts',
-    name: <span><GroupIcon { ...iconProps }/> { 'Contacts' }</span>,
-    orderBy: 'contact_count',
-    align: 'right',
-    cell: ({ data }) => {
-      return <>{ data.contact_count }</>
-    },
-  },
-  {
-    ID: 'contacts',
+    ID: 'actions',
     name: <span><SettingsIcon { ...iconProps }/> { 'Actions' }</span>,
     align: 'right',
     cell: ({ ID, data, openQuickEdit }) => {
 
-      const { deleteItem } = useDispatch(TAGS_STORE_NAME)
+      const { deleteItem } = useDispatch(FUNNELS_STORE_NAME)
 
       const handleEdit = () => {
         openQuickEdit()
@@ -106,10 +149,10 @@ const useStyles = makeStyles((theme) => ( {
  * @returns {*}
  * @constructor
  */
-const TagsQuickEdit = ({ ID, data, exitQuickEdit }) => {
+const FunnelsQuickEdit = ({ ID, data, exitQuickEdit }) => {
 
   const classes = useStyles()
-  const { updateItem } = useDispatch(TAGS_STORE_NAME)
+  const { updateItem } = useDispatch(FUNNELS_STORE_NAME)
   const [tempState, setTempState] = useState({
     ...data,
   })
@@ -159,25 +202,14 @@ const TagsQuickEdit = ({ ID, data, exitQuickEdit }) => {
       <Box flexGrow={ 2 }>
         <TextField
           autoFocus
-          label={ 'Tag Name' }
-          id="tag-name"
+          label={ 'Funnel Title' }
+          id="funnel-title"
           fullWidth
-          value={ tempState && tempState.tag_name }
-          onChange={ (e) => handleOnChange({ tag_name: e.target.value }) }
+          value={ tempState && tempState.title }
+          onChange={ (e) => handleOnChange({ title: e.target.value }) }
           onKeyDown={ handleOnKeydown }
           variant="outlined"
           size="small"
-        />
-        <TextField
-          id="tag-description"
-          label={ 'Tag Description' }
-          multiline
-          fullWidth
-          rows={ 2 }
-          value={ tempState && tempState.tag_description }
-          onChange={ (e) => handleOnChange(
-            { tag_description: e.target.value }) }
-          variant="outlined"
         />
       </Box>
       <Box flexGrow={ 1 }>
@@ -194,7 +226,7 @@ const TagsQuickEdit = ({ ID, data, exitQuickEdit }) => {
   )
 }
 
-const tagTableBulkActions = [
+const FunnelTableBulkActions = [
   {
     title: 'Delete',
     action: 'delete',
@@ -202,10 +234,10 @@ const tagTableBulkActions = [
   },
 ]
 
-export const Tags = () => {
+export const Funnels = () => {
 
   const { items, totalItems, isRequesting } = useSelect((select) => {
-    const store = select(TAGS_STORE_NAME)
+    const store = select(FUNNELS_STORE_NAME)
 
     return {
       items: store.getItems(),
@@ -214,7 +246,7 @@ export const Tags = () => {
     }
   }, [])
 
-  const { fetchItems, deleteItems } = useDispatch(TAGS_STORE_NAME)
+  const { fetchItems, deleteItems } = useDispatch(FUNNELS_STORE_NAME)
 
   /**
    * Handle any bulk actions
@@ -237,15 +269,15 @@ export const Tags = () => {
     <Fragment>
       <ListTable
         items={ items }
-        defaultOrderBy={ 'tag_id' }
+        defaultOrderBy={ 'ID' }
         defaultOrder={ 'desc' }
         totalItems={ totalItems }
         fetchItems={ fetchItems }
         isRequesting={ isRequesting }
-        columns={ tagTableColumns }
+        columns={ funnelTableColumns }
         onBulkAction={ handleBulkAction }
-        bulkActions={ tagTableBulkActions }
-        QuickEdit={ TagsQuickEdit }
+        bulkActions={ FunnelTableBulkActions }
+        QuickEdit={ FunnelsQuickEdit }
       />
     </Fragment>
   )

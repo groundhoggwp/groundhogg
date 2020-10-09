@@ -164,6 +164,13 @@ class Funnel extends Base_Object_With_Meta {
 			$array['steps'][] = $step->get_as_array();
 		}
 
+		// Todo use real stats
+		$array['stats'] = [
+			'active_now'     => 10,
+			'active_last_30' => 30,
+			'complete'       => 15
+		];
+
 		$array = apply_filters( 'groundhogg/funnel/export', $array, $this );
 
 		return $array;
@@ -272,13 +279,13 @@ class Funnel extends Base_Object_With_Meta {
 
 		$steps = $this->get_steps();
 
-		foreach ( $steps as $step ){
+		foreach ( $steps as $step ) {
 
 			$step->validate();
 
-			if ( $step->has_errors() ){
+			if ( $step->has_errors() ) {
 
-				foreach ( $step->get_errors() as $error ){
+				foreach ( $step->get_errors() as $error ) {
 					$error->add_data( $step->get_id(), 'step_id' );
 					$this->add_error( $error );
 				}

@@ -663,6 +663,12 @@ abstract class DB {
 			return $this->advanced_query( $data, $from_cache );
 		}
 
+		// fix orderBy to orderby
+		if ( isset_not_empty( $data, 'orderBy' ) ){
+			$data[ 'orderby' ] = $data[ 'orderBy' ];
+			unset( $data[ 'orderBy' ] );
+		}
+
 		$query_vars = wp_parse_args( $data, [
 			'where'   => [],
 			'limit'   => false,
