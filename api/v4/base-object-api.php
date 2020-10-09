@@ -298,7 +298,7 @@ abstract class Base_Object_Api extends Base_Api {
 			'limit'   => absint( $request->get_param( 'limit' ) ) ?: 25,
 			'offset'  => absint( $request->get_param( 'offset' ) ) ?: 0,
 			'order'   => strtoupper( sanitize_text_field( $request->get_param( 'order' ) ) ) ?: 'DESC',
-			'orderby' => sanitize_text_field( $request->get_param( 'orderBy' ) ) ?: $this->get_primary_key(),
+			'orderBy' => sanitize_text_field( $request->get_param( 'orderBy' ) ) ?: $this->get_primary_key(),
 			'select'  => sanitize_text_field( $request->get_param( 'select' ) ) ?: '*',
 			'search'  => sanitize_text_field( $request->get_param( 'search' ) ),
 		);
