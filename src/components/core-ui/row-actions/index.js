@@ -44,7 +44,7 @@ export default ({
   if (typeof onTrash === 'function') {
     actions.push(
       <Tooltip title={ 'Trash' }>
-        <IconButton aria-label={ 'Trash item' } onClick={onTrash}>
+        <IconButton color={'secondary'} aria-label={ 'Trash item' } onClick={onTrash}>
           <DeleteIcon/>
         </IconButton>
       </Tooltip>,
@@ -54,7 +54,7 @@ export default ({
   if (typeof onDelete === 'function') {
     actions.push(
       <Tooltip title={ 'Delete' }>
-        <IconButton aria-label={ 'Delete item' } onClick={onDelete}>
+        <IconButton color={'secondary'} aria-label={ 'Delete item' } onClick={onDelete}>
           <DeleteForeverIcon/>
         </IconButton>
       </Tooltip>,
