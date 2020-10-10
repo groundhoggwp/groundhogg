@@ -73,6 +73,7 @@ const reducer = (
 				items,
 				totalItems
 			};
+			console.log(items);
 			break;
 		case TYPES.SET_IS_REQUESTING:
 			state = {

@@ -98,7 +98,6 @@ export const getPages = () => {
 		priority: 60
 	} );
 
-
 	pages.sort((a, b) => (a.priority > b.priority) ? 1 : -1)
 
 	return applyFilters( PAGES_FILTER, pages );

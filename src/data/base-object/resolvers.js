@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { apiFetch } from '@wordpress/data-controls'
-import { addQueryArgs } from '@wordpress/url'
 
 export default (endpoint, actions) => ( {
 

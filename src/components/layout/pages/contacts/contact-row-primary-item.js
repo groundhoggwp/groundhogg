@@ -5,6 +5,11 @@ import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { hasQueryArg } from '@wordpress/url'
 import { makeStyles } from '@material-ui/core/styles';
+import { generatePath } from "react-router";
+
+const getSingleContactLink = ( id ) => {
+	return generatePath( "/contacts/:id", { id } ) ;
+}
 
 const useStyles = makeStyles((theme) => ({
 	contactRowImage: {
@@ -13,10 +18,6 @@ const useStyles = makeStyles((theme) => ({
 		boxShadow: '1px 1px 4px #ccc',
 	},
   }));
-
-const getSingleContactLink = ( id ) => {
-	return `/${id}`;
-}
 
 const getContactRowActions = () => {
 	return 'SlotFill row actions here';

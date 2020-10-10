@@ -6,6 +6,10 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data'
 import DeleteIcon from '@material-ui/icons/Delete'
 
+import {
+	useParams
+} from "react-router-dom";
+
 /**
  * Internal dependencies
  */
@@ -79,18 +83,21 @@ const contactTableBulkActions = [
 		action: 'delete',
 		icon: <DeleteIcon/>
 	}
-]
+];
+
 export const Contacts = ( props ) => {
 	console.log( props );
-	const { items, totalItems, isRequesting } = useSelect( (select) => {
-		const store = select(CONTACTS_STORE_NAME);
+	console.log( useParams() );
+
+	const { items, totalItems, isRequesting } = useSelect((select) => {
+		const store = select(CONTACTS_STORE_NAME)
 
 		return {
-			items: store.getItems(),
-			totalItems: store.getTotalItems(),
-			isRequesting: store.isItemsRequesting()
+		  items: store.getItems(),
+		  totalItems: store.getTotalItems(),
+		  isRequesting: store.isItemsRequesting(),
 		}
-	}, [] );
+	  }, [])
 
 	const { fetchItems, deleteItems } = useDispatch( CONTACTS_STORE_NAME );
 
@@ -110,6 +117,10 @@ export const Contacts = ( props ) => {
 				break;
 		}
 	}
+
+	console.log( 'contacts' )
+	console.log( items )
+	console.log( isRequesting )
 
 	return (
 		<Fragment>
