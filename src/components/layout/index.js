@@ -69,9 +69,6 @@ export default function PrimaryLayout (props) {
 
 const Layout = (props) => {
 
-  console.log( useRouteMatch() )
-  console.log( useParams() )
-
   const { ...restProps } = props
 
     return (
@@ -96,7 +93,6 @@ Layout.propTypes = {
   }).isRequired,
 }
 const _PageLayout = ( props ) => {
-  console.log( props )
     return (
       <BrowserRouter basename={ window.Groundhogg.preloadSettings.basename }>
         <Switch>

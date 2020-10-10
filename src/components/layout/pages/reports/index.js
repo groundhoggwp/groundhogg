@@ -51,7 +51,6 @@ export function Reports (props) {
 
   // fetchItems( { limit : 10 } )
 
-  console.log(props.query)
 	return (
 			<Fragment>
 				<TabPanel/>

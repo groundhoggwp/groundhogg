@@ -207,10 +207,6 @@ export function ListTable ({
     setPage(__page)
   }
 
-  console.log( 'list table component.' )
-  console.log( items );
-  console.log( isLoadingItems );
-
   if (!items || isLoadingItems) {
     return <Spinner/>
   }

@@ -7,7 +7,8 @@ import { useSelect, useDispatch } from '@wordpress/data'
 import DeleteIcon from '@material-ui/icons/Delete'
 
 import {
-	useParams
+	useParams,
+	useRouteMatch
 } from "react-router-dom";
 
 /**
@@ -86,8 +87,10 @@ const contactTableBulkActions = [
 ];
 
 export const Contacts = ( props ) => {
-	console.log( props );
+	let { path, url } = useRouteMatch();
+
 	console.log( useParams() );
+	console.log( useRouteMatch() );
 
 	const { items, totalItems, isRequesting } = useSelect((select) => {
 		const store = select(CONTACTS_STORE_NAME)
@@ -117,10 +120,6 @@ export const Contacts = ( props ) => {
 				break;
 		}
 	}
-
-	console.log( 'contacts' )
-	console.log( items )
-	console.log( isRequesting )
 
 	return (
 		<Fragment>

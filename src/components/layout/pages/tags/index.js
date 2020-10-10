@@ -370,7 +370,6 @@ export const Tags = () => {
     switch (action) {
       case 'delete':
         deleteItems(selected.map(item => item.ID))
-        console.log( getSingleTagLink(selected.ID) );
         setSelected([])
         break
     }

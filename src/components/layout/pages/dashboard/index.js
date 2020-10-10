@@ -16,7 +16,6 @@ import {
 
 const singleEntityExample = ( ID, callback ) => {
 	let tag = callback( ID );
-	console.log( tag );
 }
 
 export const Dashboard = ( props ) => {
