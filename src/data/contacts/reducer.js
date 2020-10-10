@@ -17,8 +17,6 @@ const contactsReducer = (
 		queryVars
 	}
 ) => {
-	console.log(state);
-	console.log(type);
 	switch ( type ) {
 		case TYPES.CHANGE_CONTEXT:
 			return {
