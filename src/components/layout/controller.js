@@ -115,8 +115,7 @@ export class Controller extends Component {
 	}
 
 	render() {
-		console.log(this.props);
-		const { page, match, location, id } = this.props;
+		const { page, match, location } = this.props;
 		const { url, params } = match;
 		const query = this.getQuery( location.search );
 
