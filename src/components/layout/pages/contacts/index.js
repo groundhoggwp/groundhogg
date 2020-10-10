@@ -8,7 +8,9 @@ import DeleteIcon from '@material-ui/icons/Delete'
 
 import {
 	useParams,
-	useRouteMatch
+	useRouteMatch,
+	Switch,
+	Route
 } from "react-router-dom";
 
 /**
@@ -89,20 +91,28 @@ const contactTableBulkActions = [
 export const Contacts = ( props ) => {
 	let { path, url } = useRouteMatch();
 
-	console.log( useParams() );
-	console.log( useRouteMatch() );
-
-	const { items, totalItems, isRequesting } = useSelect((select) => {
+	const {
+		getItem,
+		items,
+		totalItems,
+		isRequesting
+	} = useSelect((select) => {
 		const store = select(CONTACTS_STORE_NAME)
 
 		return {
-		  items: store.getItems(),
-		  totalItems: store.getTotalItems(),
-		  isRequesting: store.isItemsRequesting(),
+			getItem: store.getItem,
+			items: store.getItems(),
+			totalItems: store.getTotalItems(),
+			isRequesting: store.isItemsRequesting(),
 		}
-	  }, [])
+	}, [] )
 
-	const { fetchItems, deleteItems } = useDispatch( CONTACTS_STORE_NAME );
+	const {
+		fetchItems,
+		updateItem,
+		deleteItem,
+		deleteItems
+	} = useDispatch( CONTACTS_STORE_NAME );
 
 	/**
 	 * Handle any bulk actions
@@ -121,19 +131,37 @@ export const Contacts = ( props ) => {
 		}
 	}
 
+	const renderListView = () => {
+		return (
+			<Fragment>
+				<ListTable
+					items={items}
+					defaultOrderBy={'date_created'}
+					defaultOrder={'desc'}
+					totalItems={totalItems}
+					fetchItems={fetchItems}
+					isRequesting={isRequesting}
+					columns={contactTableColumns}
+					onBulkAction={handleBulkAction}
+					bulkActions={contactTableBulkActions}
+				/>
+			</Fragment>
+		)
+	}
+
 	return (
-		<Fragment>
-			<ListTable
-				items={items}
-				defaultOrderBy={'date_created'}
-				defaultOrder={'desc'}
-				totalItems={totalItems}
-				fetchItems={fetchItems}
-				isRequesting={isRequesting}
-				columns={contactTableColumns}
-				onBulkAction={handleBulkAction}
-				bulkActions={contactTableBulkActions}
-			/>
-		</Fragment>
+		<Switch>
+			<Route exact path={path}>
+				{ renderListView }
+			</Route>
+			<Route path={`${path}/:id`}>
+				<SingleView
+					getItem={ getItem }
+					updateItem={ updateItem }
+					deleteItem={ deleteItem }
+					{...props}
+				/>
+			</Route>
+		</Switch>
 	)
 }

@@ -5,11 +5,7 @@ import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { hasQueryArg } from '@wordpress/url'
 import { makeStyles } from '@material-ui/core/styles';
-import { generatePath } from "react-router";
-
-const getSingleContactLink = ( id ) => {
-	return generatePath( "/contacts/:id", { id } ) ;
-}
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
 	contactRowImage: {
@@ -47,8 +43,12 @@ export const ContactRowPrimaryItem = ( props ) => {
 	const { data } = props;
 	return (
 		<Fragment>
-			<a href={ getSingleContactLink( data.ID ) }><img className={classes.contactRowImage} src={ data.gravatar } /></a>
-			<a href={ getSingleContactLink( data.ID ) }>{ data.email }</a>
+			 <Link to={ `/contacts/${data.ID}` }>
+				 <img className={classes.contactRowImage} src={ data.gravatar } />
+			 </Link>
+			 <Link to={ `/contacts/${data.ID}` }>
+				 { data.email }
+			 </Link>
 			{ getContactRowStatus( data ) }
 			<br />
 			{ getContactRowActions() }

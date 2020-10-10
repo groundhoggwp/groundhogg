@@ -99,9 +99,8 @@ const _PageLayout = ( props ) => {
           { getPages().map((page, index) => {
             return (
                 <Route
-                  key={ page.path }
                   path={ page.path }
-                  exact
+                  exact={ '/' === page.path }
                   render={ (props) => (
                     <Layout page={ page } selectedIndex={index} { ...props } />
                   ) }

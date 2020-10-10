@@ -2,7 +2,7 @@
  * Get item from state tree.
  *
  * @param {Object} state - Reducer state
- * @param {Array} itemId - Option name
+ * @param {Array} itemId - Item name
  */
 export const getItem = ( state, itemId ) => {
 	if ( state.extendedReducer ) {
