@@ -7,7 +7,6 @@ import { useSelect, useDispatch } from '@wordpress/data'
 import DeleteIcon from '@material-ui/icons/Delete'
 
 import {
-	useParams,
 	useRouteMatch,
 	Switch,
 	Route
@@ -89,7 +88,7 @@ const contactTableBulkActions = [
 ];
 
 export const Contacts = ( props ) => {
-	let { path, url } = useRouteMatch();
+	let { path } = useRouteMatch();
 
 	const {
 		getItem,
