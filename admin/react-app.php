@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin;
 
 use Groundhogg\Plugin;
+use Groundhogg\Admin\Settings\Settings_Page;
 use function Groundhogg\get_url_var;
 use function Groundhogg\groundhogg_logo;
 
@@ -178,7 +179,7 @@ class React_App {
 	public function register_basename( $obj ) {
 		$settings = $obj['preloadSettings'];
 
-		$settings->basename = path_join( wp_parse_url( admin_url(), PHP_URL_PATH ), 'groundhogg' );
+		$settings['basename'] = path_join( wp_parse_url( admin_url(), PHP_URL_PATH ), 'groundhogg' );
 
 		$obj['preloadSettings'] = $settings;
 
@@ -207,9 +208,13 @@ class React_App {
 	 * @return mixed
 	 */
 	public function register_settings( $obj ) {
+		$settings = new Settings_Page();
 
-		// @todo: Create or find proper getter for all settings key-value pairs
-		$obj['preloadSettings'] = Plugin::$instance->settings;
+		$settings->init_defaults();
+
+		$settings = wp_json_encode( $settings );
+
+		$obj['preloadSettings'] = json_decode( $settings, true );
 
 		return $obj;
 	}
