@@ -38,6 +38,7 @@ abstract class Bulk_Job {
 	protected $items_per_request;
 	protected $items_offset;
 	protected $context;
+	protected $job_id; // random bulkjob id to manage the transient
 
 	/**
 	 * WPGH_Bulk_Jon constructor.
@@ -47,7 +48,7 @@ abstract class Bulk_Job {
 		add_filter( "groundhogg/bulk_job/{$this->get_action()}/query", [ $this, 'query' ] );
 		add_action( "groundhogg/bulk_job/{$this->get_action()}/ajax", [ $this, 'process' ] );
 
-		add_action( "groundhogg/bulk_job/{$this->get_action()}/rest", [ $this, 'rest_handler' ], 10, 3 );
+		add_action( "groundhogg/bulk_job/{$this->get_action()}/rest", [ $this, 'rest_handler' ], 10, 4 );
 	}
 
 	protected static function is_rest() {
@@ -62,14 +63,16 @@ abstract class Bulk_Job {
 	 * @param $items_per_request int the number of items to be processed during this request
 	 * @param $items_offset      int the offset, the number of items processed so far
 	 * @param $context           array will contain relevant information about the request for the items
+	 * @param $job_id            int|string  id to manage custom transient to store the data
 	 */
-	public function rest_handler( $items_per_request, $items_offset, $context ) {
+	public function rest_handler( $items_per_request, $items_offset, $context, $job_id ) {
 
 		self::set_is_rest( true );
 
 		$this->items_per_request = absint( $items_per_request );
 		$this->items_offset      = absint( $items_offset );
 		$this->context           = $context;
+		$this->job_id            = $job_id;
 
 		$this->process();
 	}
@@ -169,13 +172,21 @@ abstract class Bulk_Job {
 		}
 
 		$items = $this->get_items();
-
+		if (self::$is_rest) {
+			$total = count( $items );
+			$items = array_slice( (array) $items, $this->items_offset, $this->items_per_request );
+		}
 		$completed = 0;
 
 		$this->pre_loop();
 
 		foreach ( $items as $item ) {
+		if (self::$is_rest){
+			$this->process_item( is_object( $item ) ? (array) $item : $item );
+		} else {
 			$this->process_item( $item );
+		}
+
 			$completed ++;
 		}
 
@@ -193,22 +204,30 @@ abstract class Bulk_Job {
 			$msg = sprintf( __( 'Processed %s items in %s seconds.', 'groundhogg' ), _nf( $completed ), _nf( $diff, 2 ) );
 		}
 
-		$response = [
-			'complete'    => $completed - $this->skipped,
-			'skipped'     => $this->skipped,
-			'complete_nf' => _nf( $completed - $this->skipped ),
-			'skipped_nf'  => _nf( $this->skipped ),
-			'message'     => esc_html( $msg ),
-			'output'      => $output,
+		$response   = [
+			'complete'      => $completed - $this->skipped,
+			'skipped'       => $this->skipped,
+			'complete_nf'   => _nf( $completed - $this->skipped ),
+			'skipped_nf'    => _nf( $this->skipped ),
+			'message'       => esc_html( $msg ),
+			'output'        => $output,
 			'finished'    => false
 		];
 
-		if ( $this->is_the_end() ) {
+		if (self::$is_rest) {
+			$next_index = $this->items_offset + $this->items_per_request;
+			$response['next_index'   ] = $next_index ;
+			$response['total_records'] = $total ;
+			$response['next_request' ] = ( $next_index > $total ) ? false : true ;
+		}
 
+
+
+		if ( $this->is_the_end()  || ( self::$is_rest && $next_index> $total ) ) {
 			$this->clean_up();
 
-			$response['return_url'] = $this->get_return_url();
-			$response['finished']   = true;
+			$response[ 'return_url' ] = $this->get_return_url();
+			$response[ 'finished' ]   = true;
 
 			Plugin::instance()->notices->add( 'finished', $this->get_finished_notice() );
 
@@ -234,9 +253,21 @@ abstract class Bulk_Job {
 	 * @return array
 	 */
 	public function get_items_restfully() {
-		_doing_it_wrong( __METHOD__, 'this method should be implemented', GROUNDHOGG_VERSION );
 
-		return [];
+		if ( get_transient( $this->get_action() . '-' . $this->job_id ) ) {
+			return get_transient( $this->get_action() . '-' . $this->job_id );
+		}
+
+		//get items
+		$items = $this->query( [] );
+
+		if ( count( $items ) > $this->items_per_request ) {
+			// set transient for second time to speed up the process
+			set_transient( $this->get_action() . '-' . $this->job_id, $items );
+		}
+
+		return $items;
+
 	}
 
 	/**
@@ -257,9 +288,10 @@ abstract class Bulk_Job {
 	 * Check whether the the end has been reached restfully/
 	 */
 	public function is_the_end_restfully() {
-		_doing_it_wrong( __METHOD__, 'this method should be implemented', GROUNDHOGG_VERSION );
 
-		return false;
+		delete_transient( $this->get_action() . '-' . $this->job_id );
+
+		return true;
 	}
 
 	/**
@@ -272,7 +304,7 @@ abstract class Bulk_Job {
 	/**
 	 * Process an item
 	 *
-	 * @param $item mixed
+	 * @param $item mixed|array
 	 * @param $args array
 	 *
 	 * @return void
