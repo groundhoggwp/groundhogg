@@ -18,7 +18,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NavListItems from '../../core-ui/nav-list-items/';
 import { useState } from '@wordpress/element';
-import { NotificationMenu } from './notification-menu';
+// import { NotificationMenu } from './notification-menu';
 
 const drawerWidth = 240;
 
@@ -140,7 +140,6 @@ export default function Dashboard(props) {
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
             {pageTitle}
           </Typography>
-          <NotificationMenu />
         </Toolbar>
       </AppBar>
       <Drawer

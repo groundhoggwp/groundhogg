@@ -10,7 +10,7 @@
     "lint:css": "wp-scripts lint-style",
     "lint:js": "wp-scripts lint-js",
     "lint:pkg-json": "wp-scripts lint-pkg-json",
-    "prettier": "prettier --check --write ./src/components/core-ui/chart/index.js",
+    "prettier": "prettier --check --write ./src/components/core-ui/block-editor/index.js",
     "prettier-full": "prettier --check --write ./src/components/**/**/index.js",
     "start": "wp-scripts start",
     "test:e2e": "wp-scripts test-e2e",
