@@ -1,9 +1,7 @@
 /**
  * Internal dependencies
  */
-import * as selectors from './selectors';
 import * as actions from './actions';
-import * as resolvers from './resolvers';
 import reducer from './reducer';
 
 import {
@@ -14,10 +12,8 @@ import {
 const STORE_NAME = 'contacts';
 
 registerBaseObjectStore( STORE_NAME, {
-	selectors,
-	actions,
-	resolvers,
-	reducer
+	reducer,
+	actions
 } );
 
 export const CONTACTS_STORE_NAME = getStoreName( STORE_NAME );

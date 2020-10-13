@@ -329,6 +329,13 @@ class Contact_Query {
 	 * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
 	 */
 	public function query( $query ) {
+
+		// fix orderBy to orderby
+		if ( isset_not_empty( $query, 'orderBy' ) ){
+			$query[ 'orderby' ] = $query[ 'orderBy' ];
+			unset( $query[ 'orderBy' ] );
+		}
+
 		$this->query_vars = wp_parse_args( $query );
 		$items            = $this->get_items();
 

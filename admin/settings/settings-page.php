@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @package     Admin
  */
-class Settings_Page extends Admin_Page {
+class Settings_Page extends Admin_Page implements \JsonSerializable {
 
 	// UNUSED FUNCTIONS
 	protected function add_ajax_actions() {
@@ -1326,5 +1326,14 @@ class Settings_Page extends Admin_Page {
 		}
 	}
 
+	/**
+	 * Expose tab, setting, and section properties to JSON object for React interface.
+	 *
+	 * @since 3.0.0
+	 * @return array Array of settings objects
+	 */
+	public function jsonSerialize() {
+        return get_object_vars( $this );
+    }
 
 }

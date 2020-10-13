@@ -1,5 +1,5 @@
 import {
-  useEffect, useState
+  useEffect, useState,
 } from '@wordpress/element'
 import Table from '@material-ui/core/Table'
 import TableContainer from '@material-ui/core/TableContainer'
@@ -23,26 +23,27 @@ import clsx from 'clsx'
 
 const useDebounce = (value, delay) => {
   // State and setters for debounced value
-  const [debouncedValue, setDebouncedValue] = useState(value);
+  const [debouncedValue, setDebouncedValue] = useState(value)
 
   useEffect(
     () => {
       // Update debounced value after delay
       const handler = setTimeout(() => {
-        setDebouncedValue(value);
-      }, delay);
+        setDebouncedValue(value)
+      }, delay)
 
       // Cancel the timeout if value changes (also on delay change or unmount)
-      // This is how we prevent debounced value from updating if value is changed ...
-      // .. within the delay period. Timeout gets cleared and restarted.
+      // This is how we prevent debounced value from updating if value is
+      // changed ... .. within the delay period. Timeout gets cleared and
+      // restarted.
       return () => {
-        clearTimeout(handler);
-      };
+        clearTimeout(handler)
+      }
     },
-    [value, delay] // Only re-call effect if value or delay changes
-  );
+    [value, delay], // Only re-call effect if value or delay changes
+  )
 
-  return debouncedValue;
+  return debouncedValue
 }
 
 const useStyles = makeStyles({
@@ -50,19 +51,36 @@ const useStyles = makeStyles({
     width: '100%',
   },
   container: {
-    maxHeight: 'calc( 100vh - 200px )',
-    overflowY: 'auto',
+    maxHeight: 'calc( 100vh - 250px )',
+    overflow: 'auto',
   },
-});
+  sticky: {
+    position: 'sticky',
+    top: '0',
+    zIndex: 10,
+    backgroundColor: 'white',
+  }})
 
-export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, totalItems, fetchItems, isLoadingItems, bulkActions, onBulkAction }) {
-  const classes = useStyles();
+export function ListTable ({
+  defaultOrderBy,
+  defaultOrder,
+  columns,
+  items,
+  totalItems,
+  fetchItems,
+  isLoadingItems,
+  bulkActions,
+  onBulkAction,
+  QuickEdit
+}) {
+  const classes = useStyles()
   const [perPage, setPerPage] = useState(10)
   const [page, setPage] = useState(0)
   const [order, setOrder] = useState(defaultOrder)
   const [orderBy, setOrderBy] = useState(defaultOrderBy)
   const [selected, setSelected] = useState([])
   const [search, setSearch] = useState('')
+  const [quickEditId, setQuickEditId] = useState(null)
   const debouncedSearch = useDebounce(search, 250)
 
   const __fetchItems = () => {
@@ -115,29 +133,29 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
    * @param action
    */
   const handleBulkAction = (e, action) => {
-    onBulkAction( {
+    onBulkAction({
       action,
       selected,
       setSelected,
-      fetchItems: __fetchItems
-    } )
+      fetchItems: __fetchItems,
+    })
   }
 
-  useEffect( () => {
+  useEffect(() => {
     __fetchItems()
   }, [
     perPage,
     page,
     order,
     orderBy,
-    totalItems
+    totalItems,
   ])
 
-  useEffect(  () => {
+  useEffect(() => {
       __fetchItems()
     },
-    [debouncedSearch]
-  );
+    [debouncedSearch],
+  )
 
   /**
    * Handle the search results
@@ -145,7 +163,7 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
    * @param e
    */
   const handleSearch = (e) => {
-    setSearch( e.target.value )
+    setSearch(e.target.value)
   }
 
   /**
@@ -195,7 +213,7 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
 
   return (
     <>
-      <Paper className={classes.root}>
+      <Paper className={ classes.root }>
         <TableToolbar
           numSelected={ selected.length }
           search={ search }
@@ -203,7 +221,7 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
           onBulkAction={ handleBulkAction }
           bulkActions={ bulkActions }
         />
-        <TableContainer className={classes.container}>
+        <TableContainer className={ classes.container }>
           <Table stickyHeader size={ 'medium' }>
             <TableHeader
               handleReOrder={ handleReOrder }
@@ -214,10 +232,22 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
               numSelected={ selected.length }
               perPage={ perPage }
               totalItems={ totalItems }
+              className={ classes.sticky }
             />
             <TableBody>
               { items &&
               items.map(item => {
+
+                if (quickEditId === item.ID) {
+                  return (
+                    <TableCell colSpan={columns.length + 1 }>
+                      <QuickEdit
+                        {...item}
+                        exitQuickEdit={()=>setQuickEditId(null)}
+                      />
+                    </TableCell>
+                  )
+                }
 
                 return (
                   <TableRow hover key={ item.ID }>
@@ -229,7 +259,10 @@ export function ListTable ({ defaultOrderBy, defaultOrder, columns, items, total
                       />
                     </TableCell>
                     { columns.map(col => <TableCell align={ col.align }>
-                      <col.cell { ...item }/>
+                      <col.cell
+                        { ...item }
+                        openQuickEdit={()=>setQuickEditId(item.ID)}
+                      />
                     </TableCell>) }
                   </TableRow>
                 )
@@ -302,7 +335,7 @@ function TableToolbar (props) {
         <Tooltip title={ action.title }>
           <IconButton
             aria-label={ action.action }
-            onClick={(e) => onBulkAction(e, action.action )}
+            onClick={ (e) => onBulkAction(e, action.action) }
           >
             { action.icon }
           </IconButton>
@@ -330,15 +363,15 @@ function TableHeader (props) {
     perPage,
     totalItems,
     handleReOrder,
-    className
+    className,
   } = props
 
   const __totalItems = Math.min(perPage, totalItems)
 
   return (
-    <TableHead>
-      <TableRow>
-        <TableCell padding="checkbox" className={className}>
+    <TableHead className={ className }>
+      <TableRow className={ className }>
+        <TableCell padding="checkbox" className={ className }>
           <Checkbox
             indeterminate={ numSelected > 0 && numSelected < __totalItems }
             checked={ __totalItems > 0 && numSelected === __totalItems }
@@ -352,7 +385,7 @@ function TableHeader (props) {
             currentOrderBy={ orderBy }
             order={ order }
             handleReOrder={ handleReOrder }
-            className={className}
+            className={ className }
           />)
         }
       </TableRow>
@@ -371,10 +404,10 @@ function TableHeader (props) {
  * @returns {*}
  * @constructor
  */
-function HeaderTableCell ({ column, currentOrderBy, handleReOrder, order }) {
+function HeaderTableCell ({ column, currentOrderBy, handleReOrder, order, className }) {
   const Component = column.orderBy ? SortableHeaderCell : NonSortableHeaderCell
   return <Component { ...column } currentOrderBy={ currentOrderBy }
-                    onReOrder={ handleReOrder } order={ order }/>
+                    onReOrder={ handleReOrder } className={ className } order={ order }/>
 }
 
 /**
@@ -387,12 +420,13 @@ function HeaderTableCell ({ column, currentOrderBy, handleReOrder, order }) {
  * @returns {*}
  * @constructor
  */
-function NonSortableHeaderCell ({ ID, name, align }) {
+function NonSortableHeaderCell ({ ID, name, align, className }) {
   return (
     <TableCell
       key={ ID }
       align={ align }
       padding={ 'default' }
+      className={ className }
     >
       { name }
     </TableCell>
@@ -412,13 +446,14 @@ function NonSortableHeaderCell ({ ID, name, align }) {
  * @returns {*}
  * @constructor
  */
-function SortableHeaderCell ({ ID, orderBy, order, name, align, currentOrderBy, onReOrder }) {
+function SortableHeaderCell ({ ID, orderBy, order, name, align, currentOrderBy, onReOrder, className }) {
   return (
     <TableCell
       key={ ID }
       align={ align }
       padding={ 'default' }
       sortDirection={ currentOrderBy === orderBy ? order : false }
+      className={ className }
     >
       <TableSortLabel
         active={ orderBy === currentOrderBy }

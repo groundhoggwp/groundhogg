@@ -1,4 +1,6 @@
 import { useEffect, useState } from '@wordpress/element'
+import { dispatch } from '@wordpress/data'
+import { CORE_STORE_NAME } from '../data';
 
 export const useShift = (onShift) => {
   useEffect(() => {
@@ -48,4 +50,14 @@ export const useKeyPress = (targetKey, onKeyDown, onKeyUp) => {
   }, []); // Empty array ensures that effect is only run on mount and unmount
 
   return keyPressed;
+}
+
+/**
+ * Adds Snackbar Notifications
+ *
+ * @param {string} message Message to show
+ * @param {string} type Type of notification: successs, info, warning, error (ordered by severity, defaults to success)
+ */
+export const addNotification = ( { message, type } ) => {
+  dispatch( CORE_STORE_NAME ).showSnackbar( message, type );
 }

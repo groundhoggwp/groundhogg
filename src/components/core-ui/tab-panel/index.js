@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import React from 'react';
+import { useState } from '@wordpress/element';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -10,11 +10,6 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import Card from '@material-ui/core/Card';
-
-/**
- * Internal dependencies
- */
-import Chart from '../chart';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -64,15 +59,13 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function ScrollableTabsButtonAuto() {
+export default function ScrollableTabsButtonAuto( { tabs } ) {
   const classes = useStyles();
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-
-  console.log(value)
 
   return (
     <div className={classes.root}>
@@ -86,39 +79,22 @@ export default function ScrollableTabsButtonAuto() {
           scrollButtons="auto"
           aria-label="scrollable auto tabs example"
         >
-          <Tab label="Overview" {...a11yProps(0)} />
-          <Tab label="Contacts" {...a11yProps(1)} />
-          <Tab label="Email" {...a11yProps(2)} />
-          <Tab label="Funnels" {...a11yProps(3)} />
-          <Tab label="Broadcasts" {...a11yProps(4)} />
-          <Tab label="Forms" {...a11yProps(5)} />
-          <Tab label="Pipeline" {...a11yProps(6)} />
+          {
+            tabs.map( ( tab, index ) => (
+               <Tab label={tab.label} {...a11yProps( { index } )} />
+              )
+            )
+          }
         </Tabs>
       </AppBar>
-      <TabPanel value={value} index={0}>
-        <Card className={classes.container}><Chart type='line'/></Card>
-        <Card className={classes.container}>
-          <Typography className={classes.kpiTitle} component="h1" color="textSecondary">{`KPI`}</Typography>
-          <Typography className={classes.kpiMetric} component="div" color="textSecondary">{`${Math.round(Math.random()*1000)/10}%`}</Typography>
-        </Card>
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        <Card className={classes.container}><Chart type='doughnut'/></Card>
-      </TabPanel>
-      <TabPanel value={value} index={2}>
-      </TabPanel>
-      <TabPanel value={value} index={3}>
-        Item Four
-      </TabPanel>
-      <TabPanel value={value} index={4}>
-        Item Five
-      </TabPanel>
-      <TabPanel value={value} index={5}>
-        Item Six
-      </TabPanel>
-      <TabPanel value={value} index={6}>
-        Item Seven
-      </TabPanel>
+        {
+          tabs.map( ( tab, index ) => (
+            <TabPanel value={value} index={index}>
+              <tab.component classes={classes} />
+            </TabPanel>
+           )
+          )
+        }
     </div>
   );
 }
