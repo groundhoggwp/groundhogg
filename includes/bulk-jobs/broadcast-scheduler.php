@@ -63,7 +63,9 @@ class Broadcast_Scheduler extends Bulk_Job {
 			return $items;
 		}
 
-		$broadcast = new Broadcast( absint( get_url_var( 'broadcast' ) ) );
+		// get broadcast id from url or context
+
+		$broadcast = new Broadcast( absint( get_url_var( 'broadcast' ) ? :$this->get_context( 'broadcast_id' ) ) );
 
 		$query = new Contact_Query();
 
@@ -171,7 +173,8 @@ class Broadcast_Scheduler extends Bulk_Job {
 	protected function pre_loop() {
 
 
-		$broadcast_id = absint( get_transient( 'gh_current_broadcast_id' ) );
+//		$broadcast_id = absint( get_transient( 'gh_current_broadcast_id' ) );
+		$broadcast_id = absint( get_transient( 'gh_current_broadcast_id' ) ) ? : absint( $this->get_context( 'broadcast_id' ));
 		$broadcast    = new Broadcast( $broadcast_id );
 
 		$config = wp_parse_args( $broadcast->get_all_meta(), [
