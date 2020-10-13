@@ -55,10 +55,10 @@ class Broadcasts_Api extends Base_Object_Api {
 		$type             = $request->get_param( 'type' );
 
 		/* Set the object  */
-		$config['object_id']   = $object_id;
-		$config['object_type'] = $type;
+		$config[ 'object_id' ]   = $object_id;
+		$config[ 'object_type' ] = $type;
 
-		if ( $config['object_type'] === 'email' ) {
+		if ( $config[ 'object_type' ] === 'email' ) {
 			$email = new Email( $object_id );
 			if ( $email->is_draft() ) {
 				return self::ERROR_400( 'email_in_draft_mode', sprintf( _x( 'You cannot schedule an email while it is in draft mode.', 'api', 'groundhogg' ) ) );
@@ -97,8 +97,8 @@ class Broadcasts_Api extends Base_Object_Api {
 		$send_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $time_string ) );
 
 		if ( $send_now ) {
-			$config['send_now'] = true;
-			$send_time          = time() + 10;
+			$config[ 'send_now' ] = true;
+			$send_time            = time() + 10;
 		}
 
 		if ( $send_time < time() ) {
@@ -106,15 +106,25 @@ class Broadcasts_Api extends Base_Object_Api {
 		}
 
 		/* Set the email */
-		$config['send_time'] = $send_time;
+		$config[ 'send_time' ] = $send_time;
+
+
+		$query = array(
+			'tags_include' => $tags,
+			'tags_exclude' => $exclude_tags
+		);
+
+		$config[ 'contact_query' ] = $query;
+
 
 		$args = array(
 			'object_id'    => $object_id,
-			'object_type'  => $config['object_type'],
+			'object_type'  => $config[ 'object_type' ],
 			'tags'         => $tags,
 			'send_time'    => $send_time,
 			'scheduled_by' => get_current_user_id(),
 			'status'       => 'scheduled',
+			'query'        => $query
 		);
 
 		$broadcast = new Broadcast( $args );
@@ -123,22 +133,19 @@ class Broadcasts_Api extends Base_Object_Api {
 			return self::ERROR_UNKNOWN();
 		}
 
-		$config['broadcast_id'] = $broadcast->get_id();
+		$config[ 'broadcast_id' ] = $broadcast->get_id();
 
-		$query = array(
-			'tags_include' => $tags,
-			'tags_exclude' => $exclude_tags
-		);
-
-		$config['contact_query'] = $query;
 
 		if ( $send_in_timezone ) {
-			$config['send_in_local_time'] = true;
+			$config[ 'send_in_local_time' ] = true;
 		}
 
 		set_transient( 'gh_get_broadcast_config', $config, HOUR_IN_SECONDS );
 
-		return self::SUCCESS_RESPONSE( [], _x( 'Broadcast scheduled successfully.', 'api', 'groundhogg' ) );
+		return self::SUCCESS_RESPONSE( [], [
+			'message' => _x( 'Broadcast scheduled successfully.', 'api', 'groundhogg' ),
+			'config'  => $config
+		] );
 	}
 
 	/**
