@@ -35,7 +35,10 @@ class React_App {
 			return;
 		}
 
-		if ( ! current_user_can( 'view_contacts' ) ) {
+		if ( ! is_user_logged_in() ){
+		    wp_redirect( wp_login_url( admin_url( 'groundhogg/' ) ) );
+		    die;
+        } if ( ! current_user_can( 'view_contacts' ) ) {
 			wp_die( __( 'You do not have access to this platform.', 'groundhogg' ) );
 		}
 

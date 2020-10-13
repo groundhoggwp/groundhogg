@@ -72,6 +72,7 @@
     "prettier": "^2.1.2",
     "qs": "6.9.4",
     "react-click-outside": "3.0.1",
+    "react-lineto": "^3.2.0",
     "react-router-dom": "5.1.2",
     "react-transition-group": "4.3.0",
     "recharts": "^1.8.5",

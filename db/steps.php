@@ -3,6 +3,8 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use function Groundhogg\map_func_to_attr;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -85,6 +87,7 @@ class Steps extends DB {
 			'step_status'    => '%s',
 			'step_type'      => '%s',
 			'step_group'     => '%s',
+			'next_steps'     => '%s',
 			'step_order'     => '%d',
 			'last_edited_by' => '%s',
 			'last_edited'    => '%s',
@@ -106,6 +109,7 @@ class Steps extends DB {
 			'step_status'    => 'ready',
 			'step_type'      => 'send_email',
 			'step_group'     => 'action',
+			'next_steps'     => [],
 			'step_order'     => 0,
 			'last_edited_by' => '',
 			'last_edited'    => current_time( 'mysql' ),
@@ -130,7 +134,28 @@ class Steps extends DB {
 			return false;
 		}
 
+		map_func_to_attr( $data, 'next_steps', 'maybe_serialize' );
+
 		return $this->insert( $args );
+	}
+
+	/**
+	 * Unserialize any args
+	 *
+	 * @param $row_id
+	 *
+	 * @return object
+	 */
+	public function get( $row_id ) {
+		$data = parent::get( $row_id );
+		map_func_to_attr( $data, 'next_steps', 'maybe_unserialize' );
+
+		return $data;
+	}
+
+	public function update( $row_id = 0, $data = [], $where = [] ) {
+		map_func_to_attr( $data, 'next_steps', 'maybe_serialize' );
+		return parent::update( $row_id, $data, $where );
 	}
 
 	/**
@@ -267,6 +292,7 @@ class Steps extends DB {
 		step_type varchar(50) NOT NULL,
 		step_group varchar(20) NOT NULL,
 		step_status varchar(20) NOT NULL,
+		next_steps text,
 		last_edited_by varchar(20) NOT NULL,
 		step_order int unsigned NOT NULL,
 		date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
