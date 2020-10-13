@@ -45,7 +45,6 @@ class Funnel extends Base_Object_With_Meta {
 		return 'funnel';
 	}
 
-
 	public function get_id() {
 		return absint( $this->ID );
 	}

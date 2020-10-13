@@ -140,6 +140,7 @@ export default function Dashboard(props) {
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
             {pageTitle}
           </Typography>
+          {/*<NotificationMenu />*/}
         </Toolbar>
       </AppBar>
       <Drawer

@@ -9,7 +9,12 @@ use function Groundhogg\groundhogg_logo;
 
 class React_App {
 
-	public function __construct() {
+	protected $settings = [];
+
+	public function __construct() {;
+
+		add_action( 'rest_api_init', [ $this, 'register_rest_settings' ] );
+
 		add_action( 'admin_init', [ $this, 'maybe_redirect' ], 8 );
 		add_action( 'init'      , [ $this, 'maybe_render' ] );
 
@@ -20,6 +25,12 @@ class React_App {
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_userdata' ] );
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_settings' ] );
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_basename' ] );
+	}
+
+	public function register_rest_settings() {
+		$this->settings = new Settings_Page();
+		$this->settings->init_defaults();
+		$this->settings->register_settings();
 	}
 
 	public function maybe_redirect() {
@@ -35,7 +46,10 @@ class React_App {
 			return;
 		}
 
-		if ( ! current_user_can( 'view_contacts' ) ) {
+		if ( ! is_user_logged_in() ){
+		    wp_redirect( wp_login_url( admin_url( 'groundhogg/' ) ) );
+		    die;
+        } if ( ! current_user_can( 'view_contacts' ) ) {
 			wp_die( __( 'You do not have access to this platform.', 'groundhogg' ) );
 		}
 
@@ -208,11 +222,12 @@ class React_App {
 	 * @return mixed
 	 */
 	public function register_settings( $obj ) {
-		$settings = new Settings_Page();
+		$this->settings = new Settings_Page();
 
-		$settings->init_defaults();
+		$this->settings->init_defaults();
+		$this->settings->register_settings();
 
-		$settings = wp_json_encode( $settings );
+		$settings = wp_json_encode( $this->settings );
 
 		$obj['preloadSettings'] = json_decode( $settings, true );
 
