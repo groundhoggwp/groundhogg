@@ -51,10 +51,15 @@ const useStyles = makeStyles({
     width: '100%',
   },
   container: {
-    maxHeight: 'calc( 100vh - 200px )',
-    overflowY: 'auto',
+    maxHeight: 'calc( 100vh - 250px )',
+    overflow: 'auto',
   },
-})
+  sticky: {
+    position: 'sticky',
+    top: '0',
+    zIndex: 10,
+    backgroundColor: 'white',
+  }})
 
 export function ListTable ({
   defaultOrderBy,
@@ -227,6 +232,7 @@ export function ListTable ({
               numSelected={ selected.length }
               perPage={ perPage }
               totalItems={ totalItems }
+              className={ classes.sticky }
             />
             <TableBody>
               { items &&
@@ -363,8 +369,8 @@ function TableHeader (props) {
   const __totalItems = Math.min(perPage, totalItems)
 
   return (
-    <TableHead>
-      <TableRow>
+    <TableHead className={ className }>
+      <TableRow className={ className }>
         <TableCell padding="checkbox" className={ className }>
           <Checkbox
             indeterminate={ numSelected > 0 && numSelected < __totalItems }
@@ -398,10 +404,10 @@ function TableHeader (props) {
  * @returns {*}
  * @constructor
  */
-function HeaderTableCell ({ column, currentOrderBy, handleReOrder, order }) {
+function HeaderTableCell ({ column, currentOrderBy, handleReOrder, order, className }) {
   const Component = column.orderBy ? SortableHeaderCell : NonSortableHeaderCell
   return <Component { ...column } currentOrderBy={ currentOrderBy }
-                    onReOrder={ handleReOrder } order={ order }/>
+                    onReOrder={ handleReOrder } className={ className } order={ order }/>
 }
 
 /**
@@ -414,12 +420,13 @@ function HeaderTableCell ({ column, currentOrderBy, handleReOrder, order }) {
  * @returns {*}
  * @constructor
  */
-function NonSortableHeaderCell ({ ID, name, align }) {
+function NonSortableHeaderCell ({ ID, name, align, className }) {
   return (
     <TableCell
       key={ ID }
       align={ align }
       padding={ 'default' }
+      className={ className }
     >
       { name }
     </TableCell>
@@ -439,13 +446,14 @@ function NonSortableHeaderCell ({ ID, name, align }) {
  * @returns {*}
  * @constructor
  */
-function SortableHeaderCell ({ ID, orderBy, order, name, align, currentOrderBy, onReOrder }) {
+function SortableHeaderCell ({ ID, orderBy, order, name, align, currentOrderBy, onReOrder, className }) {
   return (
     <TableCell
       key={ ID }
       align={ align }
       padding={ 'default' }
       sortDirection={ currentOrderBy === orderBy ? order : false }
+      className={ className }
     >
       <TableSortLabel
         active={ orderBy === currentOrderBy }

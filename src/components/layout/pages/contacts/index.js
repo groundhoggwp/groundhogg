@@ -4,6 +4,13 @@
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data'
+import DeleteIcon from '@material-ui/icons/Delete'
+
+import {
+	useRouteMatch,
+	Switch,
+	Route
+} from "react-router-dom";
 
 /**
  * Internal dependencies
@@ -13,6 +20,7 @@ import {
 } from '../../../../data';
 import { ListTable } from '../../../core-ui/list-table/new'
 import { ContactRowPrimaryItem } from './contact-row-primary-item'
+import { SingleView } from './single-view'
 
 const contactTableColumns = [
 	{
@@ -71,30 +79,88 @@ const contactTableColumns = [
 	},
 ];
 
+const contactTableBulkActions = [
+	{
+		title: 'Delete',
+		action: 'delete',
+		icon: <DeleteIcon/>
+	}
+];
+
 export const Contacts = ( props ) => {
-	const { items, totalItems, isRequesting } = useSelect( (select) => {
-		const store = select(CONTACTS_STORE_NAME);
+	let { path } = useRouteMatch();
+
+	const {
+		getItem,
+		items,
+		totalItems,
+		isRequesting
+	} = useSelect((select) => {
+		const store = select(CONTACTS_STORE_NAME)
 
 		return {
+			getItem: store.getItem,
 			items: store.getItems(),
 			totalItems: store.getTotalItems(),
-			isRequesting: store.isItemsRequesting()
+			isRequesting: store.isItemsRequesting(),
 		}
-	}, [] );
+	}, [] )
 
-	const { fetchItems } = useDispatch( CONTACTS_STORE_NAME );
+	const {
+		fetchItems,
+		updateItem,
+		deleteItem,
+		deleteItems
+	} = useDispatch( CONTACTS_STORE_NAME );
+
+	/**
+	 * Handle any bulk actions
+	 *
+	 * @param action
+	 * @param selected
+	 * @param setSelected
+	 * @param fetchItems
+	 */
+	const handleBulkAction = ( { action, selected, setSelected, fetchItems } ) => {
+		switch (action) {
+			case 'delete':
+				deleteItems( selected.map( item => item.ID ) );
+				setSelected([])
+				break;
+		}
+	}
+
+	const renderListView = () => {
+		return (
+			<Fragment>
+				<ListTable
+					items={items}
+					defaultOrderBy={'date_created'}
+					defaultOrder={'desc'}
+					totalItems={totalItems}
+					fetchItems={fetchItems}
+					isRequesting={isRequesting}
+					columns={contactTableColumns}
+					onBulkAction={handleBulkAction}
+					bulkActions={contactTableBulkActions}
+				/>
+			</Fragment>
+		)
+	}
 
 	return (
-		<Fragment>
-			<ListTable
-				items={items}
-				defaultOrderBy={'date_created'}
-				defaultOrder={'asc'}
-				totalItems={totalItems}
-				fetchItems={fetchItems}
-				isRequesting={isRequesting}
-				columns={contactTableColumns}
-			/>
-		</Fragment>
+		<Switch>
+			<Route exact path={path}>
+				{ renderListView }
+			</Route>
+			<Route path={`${path}/:id`}>
+				<SingleView
+					getItem={ getItem }
+					updateItem={ updateItem }
+					deleteItem={ deleteItem }
+					{...props}
+				/>
+			</Route>
+		</Switch>
 	)
 }

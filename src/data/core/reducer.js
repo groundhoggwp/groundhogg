@@ -5,22 +5,30 @@ import TYPES from './action-types';
 
 const coreReducer = (
 	state = {
-		errors: {},
-		requesting: {},
+		snackbarMessage : '',
+		snackbarOpen : false,
+		snackbarSeverity : 'success'
 	},
 	{
-		error,
-		isRequesting,
-		type,
+		snackbarMessage,
+		snackbarSeverity,
+		type
 	}
 ) => {
 	switch ( type ) {
-		case TYPES.CORE_ACTION:
+		case TYPES.OPEN_SNACKBAR:
 			state = {
 				...state,
-				param: {},
+				snackbarSeverity,
+				snackbarMessage,
+				snackbarOpen : true,
 			};
 			break;
+		case TYPES.CLEAR_SNACKBAR:
+			state = {
+				...state,
+				snackbarOpen : false,
+			};
 	}
 	return state;
 };

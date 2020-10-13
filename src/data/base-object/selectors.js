@@ -2,9 +2,12 @@
  * Get item from state tree.
  *
  * @param {Object} state - Reducer state
- * @param {Array} itemId - Option name
+ * @param {Array} itemId - Item name
  */
 export const getItem = ( state, itemId ) => {
+	if ( state.extendedReducer ) {
+		return state.reducer.item;
+	}
 	return state.item;
 };
 
@@ -14,6 +17,9 @@ export const getItem = ( state, itemId ) => {
  * @param {Object} state - Reducer state
  */
 export const getItems = ( state ) => {
+	if ( state.extendedReducer ) {
+		return state.reducer.items;
+	}
 	return state.items;
 };
 
@@ -23,6 +29,9 @@ export const getItems = ( state ) => {
  * @param {Object} state - Reducer state
  */
 export const getTotalItems = ( state ) => {
+	if ( state.extendedReducer ) {
+		return state.reducer.totalItems;
+	}
 	return state.totalItems;
 };
 
@@ -32,6 +41,9 @@ export const getTotalItems = ( state ) => {
  * @param {Object} state - Reducer state
  */
 export const isItemsUpdating = ( state ) => {
+	if ( state.extendedReducer ) {
+		return state.reducer.isUpdating || false;
+	}
 	return state.isUpdating || false;
 };
 
@@ -41,6 +53,9 @@ export const isItemsUpdating = ( state ) => {
  * @param {Object} state - Reducer state
  */
 export const isItemsCreating = ( state ) => {
+	if ( state.extendedReducer ) {
+		return state.reducer.isCreating || false;
+	}
 	return state.isCreating || false;
 };
 
@@ -50,6 +65,9 @@ export const isItemsCreating = ( state ) => {
  * @param {Object} state - Reducer state
  */
 export const isItemsRequesting = ( state ) => {
+	if ( state.extendedReducer ) {
+		return state.reducer.isRequesting || false;
+	}
 	return state.isRequesting || false;
 };
 
@@ -60,6 +78,10 @@ export const isItemsRequesting = ( state ) => {
  * @param {string} name - Option name
  */
 export const getItemsCreatingError = ( state, name ) => {
+	if ( state.extendedReducer ) {
+		return state.reducer.creatingErrors[ name ] || false;
+	}
+
 	return state.creatingErrors[ name ] || false;
 };
 
@@ -70,6 +92,10 @@ export const getItemsCreatingError = ( state, name ) => {
  * @param {string} name - Option name
  */
 export const getItemsRequestingError = ( state, name ) => {
+	if ( state.extendedReducer ) {
+		return state.reducer.requestingErrors[ name ] || false;
+	}
+
 	return state.requestingErrors[ name ] || false;
 };
 
@@ -80,5 +106,9 @@ export const getItemsRequestingError = ( state, name ) => {
  * @param name
  */
 export const getItemsUpdatingError = ( state, name ) => {
-	return state.updatingErrors[name] || false;
+	if ( state.extendedReducer ) {
+		return state.reducer.updatingErrors[ name ] || false;
+	}
+
+	return state.updatingErrors[ name ] || false;
 };

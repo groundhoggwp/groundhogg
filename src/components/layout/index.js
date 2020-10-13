@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { compose } from '@wordpress/compose'
 import { Component } from '@wordpress/element'
 import { withFilters } from '@wordpress/components'
-import { BrowserRouter, Route, Switch, Link } from 'react-router-dom'
+import { BrowserRouter, Route, Switch, Link, useRouteMatch, useParams } from 'react-router-dom'
 import { identity } from 'lodash'
 import { parse } from 'qs'
 import PropTypes from 'prop-types'
@@ -20,7 +20,7 @@ import Grid from '@material-ui/core/Grid'
 import './style.scss'
 import { Controller, getPages, PAGES_FILTER } from './controller'
 import TopBar from './top-bar'
-import Notices from './notices'
+import { SnackbarArea } from './snackbar'
 import { withSettingsHydration } from '../../data'
 
 const useStyles = makeStyles((theme) => ( {
@@ -67,31 +67,19 @@ export default function PrimaryLayout (props) {
   )
 }
 
-class Layout extends Component {
+const Layout = (props) => {
 
-  getQuery (searchString) {
-    if (!searchString) {
-      return {}
-    }
-
-    const search = searchString.substring(1)
-    return parse(search)
-  }
-
-  render () {
-    const { ...restProps } = this.props
-    const { location, page } = this.props
-    const query = this.getQuery(location && location.search)
+  const { ...restProps } = props
 
     return (
       <div className="groundhogg-layout" style={ { display: 'flex' } }>
-        <TopBar { ...restProps } pages={ getPages() } query={ query } />
+        <TopBar { ...restProps } pages={ getPages() } />
+        <SnackbarArea />
         <PrimaryLayout>
-          <Controller { ...restProps } query={ query }/>
+          <Controller { ...restProps } />
         </PrimaryLayout>
       </div>
     )
-  }
 }
 
 Layout.propTypes = {
@@ -102,40 +90,26 @@ Layout.propTypes = {
       PropTypes.object, // Support React.lazy
     ]),
     path: PropTypes.string,
-    breadcrumbs: PropTypes.oneOfType([
-      PropTypes.func,
-      PropTypes.arrayOf(
-        PropTypes.oneOfType([
-          PropTypes.arrayOf(PropTypes.string),
-          PropTypes.string,
-        ]),
-      ),
-    ]).isRequired,
-    wpOpenMenu: PropTypes.string,
   }).isRequired,
 }
-
-class _PageLayout extends Component {
-  render () {
+const _PageLayout = ( props ) => {
     return (
       <BrowserRouter basename={ window.Groundhogg.preloadSettings.basename }>
         <Switch>
           { getPages().map((page, index) => {
             return (
-              <Route
-                key={ page.path }
-                path={ page.path }
-                exact
-                render={ (props) => (
-                  <Layout page={ page } selectedIndex={index} { ...props } />
-                ) }
-              />
+                <Route
+                  path={ page.path }
+                  exact={ '/' === page.path }
+                  render={ (props) => (
+                    <Layout page={ page } selectedIndex={index} { ...props } />
+                  ) }
+                />
             )
           }) }
         </Switch>
       </BrowserRouter>
     )
-  }
 }
 
 export const PageLayout = compose(

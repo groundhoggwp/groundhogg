@@ -9,17 +9,9 @@ const contactsReducer = (
 	{
 		type,
 		error,
-		itemData, // Single entity item object
-		itemId, // Single entity ID
-		items, // Collection of item objects
-		itemIds, // Collection of item IDs
 		tags,
 		files,
 		others,
-		isAdding,
-		isRequesting,
-		isUpdating,
-		isDeleting,
 		isMerging,
 		context,
 		queryVars

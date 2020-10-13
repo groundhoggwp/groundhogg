@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { Fragment, useEffect, useState } from '@wordpress/element'
+import { __ } from '@wordpress/i18n'
+import { Fragment, useState } from '@wordpress/element'
 import { useSelect, useDispatch } from '@wordpress/data'
 import { ListTable } from '../../../core-ui/list-table/new'
 import { TAGS_STORE_NAME } from '../../../../data/tags'
@@ -280,7 +281,8 @@ const AddTags = () => {
       <Paper className={ classes.add }>
         <TextField
           id="multiple-tags"
-          label={ 'Multiple Tags' }
+          label={ __( 'Multiple Tags' ) }
+          placeholder={ __( 'Create one tag per line...' ) }
           multiline
           fullWidth
           size="small"

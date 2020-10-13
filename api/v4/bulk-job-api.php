@@ -16,17 +16,17 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since  1.5
  */
-class Bulk_Job_Api extends Base {
+class Bulk_Job_Api extends Base_Api {
 
 	public function register_routes() {
 
-		$auth_callback = $this->get_auth_callback();
+//		$auth_callback = $this->get_auth_callback();
 
 		register_rest_route( self::NAME_SPACE, '/bulkjob/(?P<action>[A-z_]+)', [
 			[
-				'methods'             => \WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'process' ],
-				'permission_callback' => $auth_callback,
+				'methods'  => \WP_REST_Server::CREATABLE,
+				'callback' => [ $this, 'process' ],
+//				'permission_callback' => $auth_callback,
 			],
 		] );
 	}
@@ -39,11 +39,12 @@ class Bulk_Job_Api extends Base {
 	 * @return \WP_Error|\WP_REST_Response
 	 */
 	public function process( \WP_REST_Request $request ) {
+
 		if ( ! current_user_can( 'perform_bulk_actions' ) ) {
 			return self::ERROR_INVALID_PERMISSIONS();
 		}
 
-		$action = $request['action'];
+		$action = $request[ 'action' ];
 		$action = sanitize_text_field( "groundhogg/bulk_job/{$action}/rest" );
 
 		if ( ! has_action( $action ) ) {
@@ -55,8 +56,9 @@ class Bulk_Job_Api extends Base {
 		$items_per_request = $request->get_param( 'items_per_request' );
 		$items_offset      = $request->get_param( 'items_offset' );
 		$context           = $request->get_param( 'context' );
+		$job_id            = $request->get_param( 'job_id' );
 
-		do_action( $action, $items_per_request, $items_offset, $context );
+		do_action( $action, $items_per_request, $items_offset, $context, $job_id );
 
 		return self::ERROR_403( 'invalid_action', 'Invalid bulk action provided.' );
 
