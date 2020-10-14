@@ -13,6 +13,8 @@ import {
 	FullscreenMode
 } from "@wordpress/interface";
 
+import Grid from '@material-ui/core/Grid';
+
 /**
  * Internal dependencies
  */
@@ -29,16 +31,14 @@ function Editor( { settings, email } ) {
 			<SlotFillProvider>
 				<DropZoneProvider>
 					<FocusReturnProvider>
-						<InterfaceSkeleton
-							header={<Header email={email} />}
-							sidebar={<Sidebar />}
-							content={
-								<>
-									<Notices />
-									<BlockEditor settings={settings} />
-								</>
-							}
-						/>
+						<Grid container spacing="2">
+							<Grid item xs="12"><Header email={email}/></Grid>
+							<Grid item xs="9">
+								<Notices />
+								<BlockEditor settings={settings} />
+							</Grid>
+							<Grid item xs="3"><Sidebar /></Grid>
+						</Grid>
 						<Popover.Slot />
 					</FocusReturnProvider>
 				</DropZoneProvider>
