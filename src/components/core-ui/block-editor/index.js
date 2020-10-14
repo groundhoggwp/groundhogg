@@ -1,51 +1,63 @@
 import {
-  BlockInspector,
-  BlockEditorProvider,
-  BlockList,
-  WritingFlow,
-  ObserveTyping,
-} from "@wordpress/block-editor";
-import { SlotFillProvider, Popover } from "@wordpress/components";
-import { useState } from "@wordpress/element";
+	BlockEditorKeyboardShortcuts,
+	BlockEditorProvider,
+	BlockList,
+	BlockInspector,
+	WritingFlow,
+	ObserveTyping,
+} from '@wordpress/block-editor';
 
-// import '@wordpress/block-library/build-style/style.css';
-// import '@wordpress/block-library/build-style/editor.css';
-// import '@wordpress/block-library/build-style/theme.css';
+import {
+	Popover,
+	SlotFillProvider,
+	DropZoneProvider,
+} from '@wordpress/components';
+
+import { useEffect, useState } from '@wordpress/element';
+
 import { registerCoreBlocks } from "@wordpress/block-library";
-import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
+import '@wordpress/format-library';
 
-registerCoreBlocks();
 export default function MyEditorComponent() {
-  const [blocks, updateBlocks] = useState([]);
+	const [ blocks, updateBlocks ] = useState( [] );
 
-  return (
-    <BlockEditorProvider
-      value={blocks}
-      onInput={(blocks) => updateBlocks(blocks)}
-      onChange={(blocks) => updateBlocks(blocks)}
-    >
-      <Grid container spacing={3}>
-        <Grid item xs={9}>
-          <Paper>
-            <SlotFillProvider>
-              <Popover.Slot name="block-toolbar" />
-              <WritingFlow>
-                <ObserveTyping>
-                  <BlockList />
-                </ObserveTyping>
-              </WritingFlow>
+	useEffect( () => {
+		registerCoreBlocks();
+	}, [] );
+
+	return (
+			<SlotFillProvider>
+				<DropZoneProvider>
+					<BlockEditorProvider
+						value={ blocks }
+						onInput={ updateBlocks }
+						onChange={ updateBlocks }
+					>
+          <Grid container spacing={3}>
+            <Grid item xs={9}>
+              <Paper>
+              <div className="editor-styles-wrapper">
+                <Popover.Slot name="block-toolbar" />
+                <BlockEditorKeyboardShortcuts />
+                <WritingFlow>
+                  <ObserveTyping>
+                    <BlockList />
+                  </ObserveTyping>
+                </WritingFlow>
+              </div>
+              </Paper>
+              </Grid>
+              <Grid item xs={3}>
+                <Paper>
+                  <BlockInspector />
+                </Paper>
               <Popover.Slot />
-            </SlotFillProvider>
-          </Paper>
-        </Grid>
-        <Grid item xs={3}>
-            <Paper>
-            <BlockInspector />
-            </Paper>
-        </Grid>
-      </Grid>
-    </BlockEditorProvider>
+              </Grid>
+            </Grid>
+					</BlockEditorProvider>
+				</DropZoneProvider>
+			</SlotFillProvider>
   );
 }

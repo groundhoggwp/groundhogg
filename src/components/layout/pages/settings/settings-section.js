@@ -4,29 +4,43 @@ import { applyFilters } from '@wordpress/hooks'
 import Checkbox from '@material-ui/core/Checkbox'
 import Select from '@material-ui/core/Select'
 import TextareaAutosize from '@material-ui/core/TextareaAutosize'
+import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
 import TagPicker from '../../../core-ui/tag-picker'
 import { SETTINGS_STORE_NAME } from '../../../../data'
 
 export const SettingsSection = ( { section } ) => {
 
-	const componentInputMap = applyFilters( 'groundhogg/settings_input_map', {
-		'input' : <TextField />,
-		'number' : <TextField />,
-		'checkbox' : <Checkbox />,
-		'tag_picker' : <TagPicker />,
-		'link_picker' :  <TagPicker />, // I imagine we'll have a LinkPicker component?
-		'dropdown' : <Select />,
-		'dropdown_owners' : <Select />, // Investigate any difference here.
-		'editor' : <TextareaAutosize />, // Need to build out TinyMCE Editor
-		'textarea' :  <TextareaAutosize />
+	const componentInputMap = applyFilters( 'groundhogg/settings/component_input_map', {
+		'input' : ( props ) => ( <TextField {...props} /> ),
+		'number' : ( props ) => ( <TextField {...props} /> ),
+		'checkbox' : ( props ) => ( <Checkbox {...props} /> ),
+		'tag_picker' : ( props ) => ( <TagPicker {...props} /> ),
+		'link_picker' : ( props ) => ( <TagPicker {...props} /> ), // I imagine we'll have a LinkPicker component?
+		'dropdown' : ( props ) => ( <Select {...props} /> ),
+		'dropdown_owners' : ( props ) => ( <Select {...props} /> ), // Investigate any difference here.
+		'editor' : ( props ) => ( <TextareaAutosize {...props} /> ), // Need to build out TinyMCE Editor
+		'textarea' :  ( props ) => ( <TextareaAutosize {...props} /> ),
 	 } )
 
-	console.log( section );
+	 console.log(section);
 
 	return (
 		<Fragment>
-			{ 'section' }
+			{
+				section.map( ( section ) => (
+						<Fragment>
+							<Typography variant="h3" component="h3">{ section.title }</Typography>
+								{
+									section.settings.map( ( setting ) => (
+											<Typography variant="h4" component="h4">{ setting.label }</Typography>
+										)
+									)
+								}
+						</Fragment>
+					)
+				)
+			}
 		</Fragment>
 	);
 }

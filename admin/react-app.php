@@ -40,6 +40,10 @@ class React_App {
 		}
 	}
 
+	public function enqueue_block_editor_styles() {
+		wp_enqueue_style( 'wp-edit-post' );
+	}
+
 	public function maybe_render() {
 
 		if ( false === strpos( $_SERVER['REQUEST_URI'], 'wp-admin/groundhogg' ) ) {
@@ -52,6 +56,8 @@ class React_App {
         } if ( ! current_user_can( 'view_contacts' ) ) {
 			wp_die( __( 'You do not have access to this platform.', 'groundhogg' ) );
 		}
+
+		$this->enqueue_block_editor_styles();
 
 		Plugin::instance()->scripts->register_admin_scripts();
 		Plugin::instance()->scripts->register_admin_styles();
