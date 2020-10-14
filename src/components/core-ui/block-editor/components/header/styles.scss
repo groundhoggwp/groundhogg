@@ -1,7 +1,7 @@
 .groundhogg-header {
 	align-items: center;
-	background: $white;
-	border-bottom: 1px solid $gray-200;
+	// background: $white;
+	// border-bottom: 1px solid $gray-200;
 	display: flex;
 	height: $header-height;
 	justify-content: space-between;
@@ -9,23 +9,29 @@
 	// Stick the toolbar to the top, because the admin bar is not fixed on mobile.
 	position: sticky;
 	right: 0;
-	top: 0;
+	top: 75px;
+	width: calc(100% - 318px);
 	// z-index: z-index(".groundhogg-header");
 
 	// On mobile, the main content area has to scroll,
 	// otherwise you can invoke the over-scroll bounce on the non-scrolling container.
-	@include break-small {
-		padding: $grid-unit-30;
-		position: fixed;
-		top: $admin-bar-height-big;
-	}
-
-	@include break-medium() {
-		top: $admin-bar-height;
-	}
+	// @include break-small {
+	// 	padding: $grid-unit-30;
+	// 	position: fixed;
+	// 	top: $admin-bar-height-big;
+	// }
+	//
+	// @include break-medium() {
+	// 	top: $admin-bar-height;
+	// }
 }
 
-@include editor-left(".groundhogg-header");
+// @include editor-left(".groundhogg-header");
+.interface-interface-skeleton__header{
+	border: none;
+	outline: none;
+	background: none;
+}
 
 .groundhogg-header__title {
 	font-size: 16px;
