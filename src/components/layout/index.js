@@ -17,7 +17,7 @@ import Grid from '@material-ui/core/Grid'
 /**
  * Internal dependencies
  */
-import './style.scss'
+import './index.scss'
 import { Controller, getPages, PAGES_FILTER } from './controller'
 import TopBar from './top-bar'
 import { SnackbarArea } from './snackbar'

@@ -26,6 +26,7 @@ import Grid from '@material-ui/core/Grid';
 import Sidebar from '../sidebar';
 
 //TODO Implement block persistence with email data store.
+//TODO Potentially use our own alerts data store (core).
 function BlockEditor( { settings: _settings } ) {
 	const [ blocks, updateBlocks ] = useState( [] );
 	const { createInfoNotice } = useDispatch( 'core/notices' );

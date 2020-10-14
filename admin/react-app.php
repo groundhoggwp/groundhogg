@@ -42,6 +42,7 @@ class React_App {
 
 	public function enqueue_block_editor_styles() {
 		wp_enqueue_style( 'wp-edit-post' );
+		wp_enqueue_style( 'groundhogg-react-styles', GROUNDHOGG_URL . 'build/index.css' );
 	}
 
 	public function maybe_render() {

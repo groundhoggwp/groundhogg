@@ -1,5 +1,6 @@
 import { registerCoreBlocks } from '@wordpress/block-library';
 import Editor from './editor';
+import './index.scss';
 
 /**
  * @link https://developer.wordpress.org/block-editor/packages/packages-block-editor/#SETTINGS_DEFAULTS
