@@ -31,21 +31,6 @@ const reducer = (
 		isDeleting,
 	}
 ) => {
-
-	console.log({
-		type,
-		items,
-		item,
-		itemIds,
-		itemId,
-		totalItems,
-		error,
-		isCreating,
-		isRequesting,
-		isUpdating,
-		isDeleting,
-	})
-
 	switch ( type ) {
 		case TYPES.CREATE_ITEM:
 			state = {

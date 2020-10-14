@@ -40,6 +40,11 @@ class React_App {
 		}
 	}
 
+	public function enqueue_block_editor_styles() {
+		wp_enqueue_style( 'wp-edit-post' );
+		wp_enqueue_style( 'groundhogg-react-styles', GROUNDHOGG_URL . 'build/index.css' );
+	}
+
 	public function maybe_render() {
 
 		if ( false === strpos( $_SERVER['REQUEST_URI'], 'wp-admin/groundhogg' ) ) {
@@ -52,6 +57,8 @@ class React_App {
         } if ( ! current_user_can( 'view_contacts' ) ) {
 			wp_die( __( 'You do not have access to this platform.', 'groundhogg' ) );
 		}
+
+		$this->enqueue_block_editor_styles();
 
 		Plugin::instance()->scripts->register_admin_scripts();
 		Plugin::instance()->scripts->register_admin_styles();
@@ -228,8 +235,18 @@ class React_App {
 		$this->settings->register_settings();
 
 		$settings = wp_json_encode( $this->settings );
+		$settings  = json_decode( $settings, true );
 
-		$obj['preloadSettings'] = json_decode( $settings, true );
+		$settings['allowedBlockTypes'] = apply_filters(
+			'groundhogg/email_editor/allowed_block_types',
+			[
+				'core/paragraph',
+				'core/image',
+				'core/heading'
+			] // Adding this for now, until we have our own block implementations.
+		);
+
+		$obj['preloadSettings'] = $settings;
 
 		return $obj;
 	}
