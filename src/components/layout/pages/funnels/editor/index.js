@@ -1,25 +1,40 @@
 import { Card } from '@material-ui/core'
 import Box from '@material-ui/core/Box'
 import LineTo from 'react-lineto'
+import { useDispatch, useSelect } from '@wordpress/data'
+import { STEPS_STORE_NAME } from '../../../../../data/steps'
+import BenchmarkPicker from './components/BenchmarkPicker'
+import AddStepButton from './components/AddStepButton'
+import Paper from '@material-ui/core/Paper'
 
-const Step = ({ data }) => {
+const Step = ({ ID, data }) => {
+
+  const classNames = [
+    data.step_group,
+    data.step_type,
+    data.step_order,
+    ID,
+  ]
+
   return (
-    <Box style={{padding:10}}>
-      <Card style={ { maxWidth: 250, padding:10 } }>
+    <Box style={ { padding: 10 } }>
+      <Card style={ { width: 250, padding: 10 } }
+            className={ classNames.join(' ') }>
         { data.step_title }
       </Card>
+      <ChartLine from={ data.step_order } to={ parseInt(data.step_order) + 1 }/>
     </Box>
   )
 }
 
-const ChartLine = ({from, to}) => {
+const ChartLine = ({ from, to }) => {
   return (
     <LineTo
-      from={from}
-      to={to}
-      borderWidth={3}
-      borderStyle={'solid'}
-      borderColor={'#e5e5e5'}
+      from={ from }
+      to={ to }
+      borderWidth={ 3 }
+      borderStyle={ 'solid' }
+      borderColor={ '#e5e5e5' }
     />
   )
 }
@@ -27,16 +42,38 @@ const ChartLine = ({from, to}) => {
 export default (props) => {
 
   const { funnel } = props
-  const { data, steps, meta, stats } = funnel
+  const { ID, data } = funnel
 
-  let maxOrder = Math.max( ...steps.map( step => parseInt( step.data.step_order ) ) )
-  let order = 1;
+  const stepQuery = {
+    where: {
+      funnel_id: ID,
+    },
+    limit: 999
+  };
 
-  const chart = [];
+  const { fetchItems } = useDispatch( STEPS_STORE_NAME )
+  const { steps } = useSelect((select) => {
 
-  while ( order <= maxOrder ){
-    chart.push( steps.filter( step => parseInt( step.data.step_order ) === order ) )
-    order++;
+    const store = select(STEPS_STORE_NAME)
+
+    return {
+      steps: store.getItems(stepQuery),
+    }
+
+  }, [])
+
+  if ( ! steps ){
+    return '...loading';
+  }
+
+  let maxOrder = Math.max(...steps.map(step => parseInt(step.data.step_order)))
+  let order = 1
+
+  const chart = []
+
+  while (order <= maxOrder) {
+    chart.push(steps.filter(step => parseInt(step.data.step_order) === order))
+    order++
   }
 
   // console.log( chart )
@@ -44,26 +81,24 @@ export default (props) => {
   return (
     <>
       {
-        chart.map( __steps => {
+        chart.length === 0 && (
+          <Box display={ 'flex' } justifyContent={ 'center' }>
+            <Paper style={{width:500}}>
+              <BenchmarkPicker/>
+            </Paper>
+          </Box>
+        )
+      }
+      {
+        chart.map(__steps => {
           return (
-            <Box display={'flex'} justifyContent={'center'}>
+            <Box display={ 'flex' } justifyContent={ 'center' }>
               {
-                __steps.map( _step => <Step {..._step}/>)
+                __steps.map(_step => <Step { ..._step }/>)
               }
             </Box>
           )
         })
-      }
-      {
-        steps.map( _step => {
-          return (
-            <>
-              {
-                _step.data.next_steps.map( __stepId => <ChartLine from={_step.ID} to={__stepId}/>)
-              }
-            </>
-          )
-        } )
       }
     </>
   )

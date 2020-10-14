@@ -427,10 +427,22 @@ abstract class Base_Object_Api extends Base_Api {
 		$data = $request->get_param( 'data' );
 		$meta = $request->get_param( 'meta' );
 
+//		wp_send_json( [
+//			$data,
+//			$meta
+//		] );
+
 		$object = $this->create_new_object( $data );
 
 		if ( ! $object->exists() ) {
-			return self::ERROR_400();
+
+			global $wpdb;
+
+			return self::ERROR_400( 'error', 'Bad request.', [
+				'data' => $data,
+				'meta' => $meta,
+				'wpdb' => $wpdb->last_error
+			] );
 		}
 
 		// If the current object supports meta data...

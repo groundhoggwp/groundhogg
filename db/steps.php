@@ -87,7 +87,8 @@ class Steps extends DB {
 			'step_status'    => '%s',
 			'step_type'      => '%s',
 			'step_group'     => '%s',
-			'next_steps'     => '%s',
+			'child_steps'    => '%s',
+			'parent_steps'   => '%s',
 			'step_order'     => '%d',
 			'last_edited_by' => '%s',
 			'last_edited'    => '%s',
@@ -109,7 +110,8 @@ class Steps extends DB {
 			'step_status'    => 'ready',
 			'step_type'      => 'send_email',
 			'step_group'     => 'action',
-			'next_steps'     => [],
+			'child_steps'    => maybe_serialize( [] ),
+			'parent_steps'   => maybe_serialize( [] ),
 			'step_order'     => 0,
 			'last_edited_by' => '',
 			'last_edited'    => current_time( 'mysql' ),
@@ -134,7 +136,8 @@ class Steps extends DB {
 			return false;
 		}
 
-		map_func_to_attr( $data, 'next_steps', 'maybe_serialize' );
+		map_func_to_attr( $data, 'child_steps', 'maybe_serialize' );
+		map_func_to_attr( $data, 'parent_steps', 'maybe_serialize' );
 
 		return $this->insert( $args );
 	}
@@ -148,13 +151,16 @@ class Steps extends DB {
 	 */
 	public function get( $row_id ) {
 		$data = parent::get( $row_id );
-		map_func_to_attr( $data, 'next_steps', 'maybe_unserialize' );
+		map_func_to_attr( $data, 'child_steps', 'maybe_unserialize' );
+		map_func_to_attr( $data, 'parent_steps', 'maybe_unserialize' );
 
 		return $data;
 	}
 
 	public function update( $row_id = 0, $data = [], $where = [] ) {
-		map_func_to_attr( $data, 'next_steps', 'maybe_serialize' );
+		map_func_to_attr( $data, 'child_steps', 'maybe_serialize' );
+		map_func_to_attr( $data, 'parent_steps', 'maybe_serialize' );
+
 		return parent::update( $row_id, $data, $where );
 	}
 
@@ -170,7 +176,7 @@ class Steps extends DB {
 			return false;
 		}
 
-		$steps = $this->get_steps( array( 'funnel_id' => $id ) );
+		$steps = $this->query( array( 'funnel_id' => $id ) );
 
 		$result = 0;
 
@@ -181,96 +187,6 @@ class Steps extends DB {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Retrieves the step by the ID.
-	 *
-	 * @param $id
-	 *
-	 * @return mixed
-	 */
-	public function get_step( $id ) {
-		return $this->get_step_by( 'ID', $id );
-	}
-
-	/**
-	 * Retrieves a single step from the database
-	 *
-	 * @access public
-	 *
-	 * @since  2.3
-	 *
-	 * @param mixed  $value The Customer ID or email to search
-	 *
-	 * @param string $field id or email
-	 *
-	 * @return mixed          Upon success, an object of the step. Upon failure, NULL
-	 */
-	public function get_step_by( $field = 'ID', $value = 0 ) {
-
-		if ( empty( $field ) || empty( $value ) ) {
-			return null;
-		}
-
-		return parent::get_by( $field, $value );
-	}
-
-
-	/**
-	 * Retrieve steps from the database
-	 *
-	 * @access  public
-	 * @since   2.1
-	 */
-	public function get_steps( $data = array(), $order = 'step_order' ) {
-
-		global $wpdb;
-
-		if ( ! is_array( $data ) ) {
-			return false;
-		}
-
-		$data = (array) $data;
-
-		$extra = '';
-
-		if ( isset( $data['search'] ) ) {
-
-			$extra .= sprintf( " AND (%s)", $this->generate_search( $data['search'] ) );
-
-		}
-
-		// Initialise column format array
-		$column_formats = $this->get_columns();
-
-		// Force fields to lower case
-		$data = array_change_key_case( $data );
-
-		// White list columns
-		$data = array_intersect_key( $data, $column_formats );
-
-		$where = $this->generate_where( $data );
-
-		if ( empty( $where ) ) {
-
-			$where = "1=1";
-
-		}
-
-		$results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where $extra ORDER BY `$order` ASC" );
-
-		return $results;
-	}
-
-	/**
-	 * Count the total number of steps in the database
-	 *
-	 * @access  public
-	 * @since   2.1
-	 */
-	public function count( $args = array() ) {
-		return count( $this->get_steps( $args ) );
 	}
 
 	/**
@@ -292,7 +208,8 @@ class Steps extends DB {
 		step_type varchar(50) NOT NULL,
 		step_group varchar(20) NOT NULL,
 		step_status varchar(20) NOT NULL,
-		next_steps text,
+		child_steps text,
+		parent_steps text,
 		last_edited_by varchar(20) NOT NULL,
 		step_order int unsigned NOT NULL,
 		date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,

@@ -122,7 +122,7 @@ class Funnel extends Base_Object_With_Meta {
 			'order'     => 'ASC',
 		] );
 
-		return wp_parse_id_list( wp_list_pluck( $this->get_steps_db()->get_steps( $query ), 'ID' ) );
+		return wp_parse_id_list( wp_list_pluck( $this->get_steps_db()->query( $query ), 'ID' ) );
 	}
 
 
@@ -153,6 +153,13 @@ class Funnel extends Base_Object_With_Meta {
 	public function get_as_array() {
 		$array          = parent::get_as_array();
 		$steps          = $this->get_steps();
+		// Todo use real stats
+		$array['stats'] = [
+			'active_now'     => 10,
+			'active_last_30' => 30,
+			'complete'       => 15
+		];
+
 		$array['steps'] = [];
 
 		if ( ! $steps ) {
@@ -162,13 +169,6 @@ class Funnel extends Base_Object_With_Meta {
 		foreach ( $steps as $step ) {
 			$array['steps'][] = $step->get_as_array();
 		}
-
-		// Todo use real stats
-		$array['stats'] = [
-			'active_now'     => 10,
-			'active_last_30' => 30,
-			'complete'       => 15
-		];
 
 		$array = apply_filters( 'groundhogg/funnel/export', $array, $this );
 

@@ -50,6 +50,7 @@ const reducer = (
 		case TYPES.CREATE_ITEM:
 			state = {
 				...state,
+				item: item,
 				items: [ item, ...state.items ]
 			};
 			break;
@@ -106,6 +107,7 @@ const reducer = (
 		case TYPES.UPDATE_ITEM:
 			state = {
 				...state,
+				item: item,
 				items : state.items.map( _item => _item.ID === item.ID ? item : _item )
 			};
 			break;

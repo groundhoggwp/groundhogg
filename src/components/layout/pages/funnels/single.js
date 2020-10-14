@@ -8,7 +8,7 @@ import Editor from './editor';
 export default () => {
 
   let { id } = useParams();
-  const { item, getItem } = useSelect( (select) => {
+  const { item } = useSelect( (select) => {
 
     const store = select( FUNNELS_STORE_NAME )
 

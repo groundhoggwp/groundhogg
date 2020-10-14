@@ -2,9 +2,8 @@
  * Get item from state tree.
  *
  * @param {Object} state - Reducer state
- * @param {Array} itemId - Item name
  */
-export const getItem = ( state, itemId ) => {
+export const getItem = ( state ) => {
 	if ( state.extendedReducer ) {
 		return state.reducer.item;
 	}
