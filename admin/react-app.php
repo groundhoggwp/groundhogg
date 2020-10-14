@@ -234,8 +234,18 @@ class React_App {
 		$this->settings->register_settings();
 
 		$settings = wp_json_encode( $this->settings );
+		$settings  = json_decode( $settings, true );
 
-		$obj['preloadSettings'] = json_decode( $settings, true );
+		$settings['allowedBlockTypes'] = apply_filters(
+			'groundhogg/email_editor/allowed_block_types',
+			[
+				'core/paragraph',
+				'core/image',
+				'core/heading'
+			] // Adding this for now, until we have our own block implementations.
+		);
+
+		$obj['preloadSettings'] = $settings;
 
 		return $obj;
 	}

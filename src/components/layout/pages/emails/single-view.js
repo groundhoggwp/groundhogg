@@ -21,11 +21,11 @@ export const SingleView = ( props ) => {
 		deleteItem,
 	} = props;
 
+	const email = getItem( id );
+
 	return (
 		<Fragment>
-			<p>Single view: Email ID: {id}</p>
-			<p>with gutenberg</p>
-			<BlockEditor/>
+			<BlockEditor email={email} />
 		</Fragment>
 	)
 }

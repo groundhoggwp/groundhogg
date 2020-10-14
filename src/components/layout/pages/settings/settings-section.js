@@ -23,8 +23,6 @@ export const SettingsSection = ( { section } ) => {
 		'textarea' :  ( props ) => ( <TextareaAutosize {...props} /> ),
 	 } )
 
-	 console.log(section);
-
 	return (
 		<Fragment>
 			{

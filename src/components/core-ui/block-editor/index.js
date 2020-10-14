@@ -1,63 +1,13 @@
-import {
-	BlockEditorKeyboardShortcuts,
-	BlockEditorProvider,
-	BlockList,
-	BlockInspector,
-	WritingFlow,
-	ObserveTyping,
-} from '@wordpress/block-editor';
+import { registerCoreBlocks } from '@wordpress/block-library';
+import Editor from './editor';
 
-import {
-	Popover,
-	SlotFillProvider,
-	DropZoneProvider,
-} from '@wordpress/components';
+/**
+ * @link https://developer.wordpress.org/block-editor/packages/packages-block-editor/#SETTINGS_DEFAULTS
+ * @todo Determine how tightly to couple Block Editor to "email"
+ */
+export default function EditorComponent( { email } ) {
 
-import { useEffect, useState } from '@wordpress/element';
-
-import { registerCoreBlocks } from "@wordpress/block-library";
-import Paper from "@material-ui/core/Paper";
-import Grid from "@material-ui/core/Grid";
-import '@wordpress/format-library';
-
-export default function MyEditorComponent() {
-	const [ blocks, updateBlocks ] = useState( [] );
-
-	useEffect( () => {
-		registerCoreBlocks();
-	}, [] );
-
-	return (
-			<SlotFillProvider>
-				<DropZoneProvider>
-					<BlockEditorProvider
-						value={ blocks }
-						onInput={ updateBlocks }
-						onChange={ updateBlocks }
-					>
-          <Grid container spacing={3}>
-            <Grid item xs={9}>
-              <Paper>
-              <div className="editor-styles-wrapper">
-                <Popover.Slot name="block-toolbar" />
-                <BlockEditorKeyboardShortcuts />
-                <WritingFlow>
-                  <ObserveTyping>
-                    <BlockList />
-                  </ObserveTyping>
-                </WritingFlow>
-              </div>
-              </Paper>
-              </Grid>
-              <Grid item xs={3}>
-                <Paper>
-                  <BlockInspector />
-                </Paper>
-              <Popover.Slot />
-              </Grid>
-            </Grid>
-					</BlockEditorProvider>
-				</DropZoneProvider>
-			</SlotFillProvider>
-  );
+  // @todo: we should be able to do away with this once we've registered our own blocks
+  registerCoreBlocks();
+  return ( <Editor email={email} settings={ window.Groundhogg.preloadSettings } /> );
 }

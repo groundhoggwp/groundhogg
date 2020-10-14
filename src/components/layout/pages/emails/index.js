@@ -22,8 +22,6 @@ import { ListTable } from '../../../core-ui/list-table/new'
 import { EmailRowPrimaryItem } from './email-row-primary-item'
 import { SingleView } from './single-view'
 
-
-
 const contactTableColumns = [
 	{
 		ID: 'title',
@@ -122,9 +120,6 @@ export const Emails = ( props ) => {
 				break;
 		}
 	}
-
-	console.log('asdfasd', items)
-	console.log('single', items, totalItems)
 
 	const renderListView = () => {
 		return (
