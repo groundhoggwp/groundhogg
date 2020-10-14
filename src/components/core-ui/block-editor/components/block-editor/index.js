@@ -76,23 +76,27 @@ function BlockEditor( { settings: _settings } ) {
 				onInput={ handleUpdateBlocks }
 				onChange={ handlePersistBlocks }
 			>
-
-			<Paper>
-				<div className="editor-styles-wrapper">
-					<BlockEditorKeyboardShortcuts />
-					<WritingFlow>
-						<ObserveTyping>
-							<BlockList className="groundhogg-block-editor__block-list" />
-						</ObserveTyping>
-					</WritingFlow>
-				</div>
-			</Paper>
-
-			<Paper>
-				<Sidebar.InspectorFill>
-					<BlockInspector />
-				</Sidebar.InspectorFill>
-			</Paper>
+				<Grid container spacing={3}>
+					<Grid item xs={9}>
+						<Paper>
+							<div className="editor-styles-wrapper">
+								<BlockEditorKeyboardShortcuts />
+								<WritingFlow>
+									<ObserveTyping>
+										<BlockList className="groundhogg-block-editor__block-list" />
+									</ObserveTyping>
+								</WritingFlow>
+							</div>
+						</Paper>
+					</Grid>
+					<Grid item xs={3}>
+						<Paper>
+							<Sidebar.InspectorFill>
+								<BlockInspector />
+							</Sidebar.InspectorFill>
+						</Paper>
+					</Grid>
+				</Grid>
 			</BlockEditorProvider>
 		</div>
 	);
