@@ -47,7 +47,6 @@ const reducer = (
 		case TYPES.SET_IS_CREATING:
 			state = {
 				...state,
-				...items,
 				isCreating,
 			};
 			break;
@@ -64,7 +63,7 @@ const reducer = (
 			state = {
 				...state,
 				item: item,
-				items: [ ...state.items, item ]
+				// items: [ ...state.items, item ]
 			};
 			break;
 		case TYPES.RECEIVE_ITEMS:
@@ -77,7 +76,6 @@ const reducer = (
 		case TYPES.SET_IS_REQUESTING:
 			state = {
 				...state,
-				...items,
 				isRequesting,
 			};
 			break;
@@ -105,7 +103,6 @@ const reducer = (
 		case TYPES.SET_IS_UPDATING:
 			state = {
 				...state,
-				...items,
 				isUpdating,
 			};
 		break;
@@ -137,7 +134,6 @@ const reducer = (
 		case TYPES.SET_IS_DELETING:
 			state = {
 				...state,
-				...items,
 				isDeleting,
 			};
 		break;

@@ -58,6 +58,7 @@ class Settings_Page extends Admin_Page implements \JsonSerializable {
 		add_action( 'admin_init', array( $this, 'init_defaults' ) );
 		add_action( 'admin_init', array( $this, 'register_sections' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+
 		add_action( "groundhogg/admin/settings/api_tab/after_form", [ $this, 'api_keys_table' ] );
 		add_action( "groundhogg/admin/settings/extensions/after_submit", [ $this, 'show_extensions' ] );
 	}
@@ -1087,10 +1088,7 @@ class Settings_Page extends Admin_Page implements \JsonSerializable {
 				continue;
 			}
 
-			add_settings_field( $setting['id'], $setting['label'], array(
-				$this,
-				'settings_callback'
-			), 'gh_' . $this->sections[ $setting['section'] ]['tab'], 'gh_' . $setting['section'], $setting );
+			$this->add_settings_field( $setting );
 
 			$args                 = isset_not_empty( $setting, 'args' ) ? $setting['args'] : [];
 			$args['show_in_rest'] = true;
@@ -1099,6 +1097,21 @@ class Settings_Page extends Admin_Page implements \JsonSerializable {
 		}
 
 		do_action( 'groundhogg/admin/register_settings/after', $this );
+	}
+
+	/**
+	 * Checks if add_settings_field() exists before adding setting field.
+	 *
+	 * @param $setting array Setting object
+	 * @since 3.0.0
+	 */
+	public function add_settings_field( $setting ) {
+		if ( function_exists( 'add_settings_field' ) ) {
+			add_settings_field( $setting['id'], $setting['label'], array(
+				$this,
+				'settings_callback'
+			), 'gh_' . $this->sections[ $setting['section'] ]['tab'], 'gh_' . $setting['section'], $setting );
+		}
 	}
 
 	/**
