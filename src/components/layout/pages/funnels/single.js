@@ -1,5 +1,5 @@
 import { useSelect } from '@wordpress/data';
-import { FUNNELS_STORE_NAME } from '../../../../data/funnels';
+import { FUNNELS_STORE_NAME } from 'data/funnels';
 import {
   useParams
 } from "react-router-dom";

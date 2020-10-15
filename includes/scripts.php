@@ -237,7 +237,7 @@ class Scripts {
 			GROUNDHOGG_URL . 'build/index.js',
 			array_merge( [
 				'wp-core-data',
-				'groundhogg-admin'
+				'groundhogg-admin',
 			], $asset_file['dependencies'] ),
 			$asset_file['version']
 		);
