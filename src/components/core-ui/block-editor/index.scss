@@ -37,11 +37,6 @@
 	@import "~@wordpress/editor/src/editor-styles.scss";
 }
 
-main.groundhogg-layout__primary.makeStyles-content-21,
-main.groundhogg-layout__primary.makeStyles-content-21 * {
-	overflow: auto;
-}
-
 .groundhogg-block-editor,
 // The modals are shown outside the .groundhogg-block-editor wrapper, they need these styles.
 .components-modal__frame {

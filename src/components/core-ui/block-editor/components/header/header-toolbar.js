@@ -22,9 +22,6 @@ import ToolbarItem from './toolbar-item'; // Stop-gap while WP catches up.
 function HeaderToolbar() {
 	const inserterButton = useRef();
 
-	console.log( Toolbar );
-	console.log( ToolbarItem );
-
 	/* const { setIsInserterOpened } = useDispatch( 'core/edit-post' ); */ // Consider adding to core actions
 	const isInserterOpened = false;
 	const isTextModeEnabled = false;
