@@ -52,4 +52,7 @@ export { STEPS_STORE_NAME } from './steps';
 /**	Tags */
 export { TAGS_STORE_NAME } from './tags';
 
+/** step registry */
+export { STEP_TYPES_STORE_NAME, registerStepType } from './step-type-registry';
+
 export { getStoreName, registerBaseObjectStore } from './base-object';

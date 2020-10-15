@@ -1,19 +1,19 @@
 import StepsPicker from '../StepPicker'
+import { useSelect } from '@wordpress/data'
+import { STEP_TYPES_STORE_NAME } from '../../../../../../../data/step-type-registry'
+import { BENCHMARK } from '../../steps-types/constants'
 
 export default (props) => {
 
-  let benchmarks = [
-    'form_filled',
-    'email_confirmed',
-    'tag_applied',
-    'tag_removed',
-    'logged_in',
-    'link_clicked'
-  ]
+  const { steps } = useSelect( (select) => {
+    return {
+      steps: select( STEP_TYPES_STORE_NAME ).getGroup( BENCHMARK )
+    }
+  }, [] )
 
   return <StepsPicker
-    steps={benchmarks}
-    stepGroup={'benchmark'}
+    steps={steps}
+    stepGroup={BENCHMARK}
     {...props}
   />
 }

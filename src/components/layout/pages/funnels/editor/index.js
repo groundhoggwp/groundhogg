@@ -6,6 +6,7 @@ import { STEPS_STORE_NAME } from '../../../../../data/steps'
 import BenchmarkPicker from './components/BenchmarkPicker'
 import AddStepButton from './components/AddStepButton'
 import Paper from '@material-ui/core/Paper'
+import './steps-types'
 
 const Step = ({ ID, data }) => {
 

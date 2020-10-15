@@ -7,12 +7,13 @@ import Paper from '@material-ui/core/Paper/Paper'
 import { select, useDispatch } from '@wordpress/data'
 import { STEPS_STORE_NAME } from '../../../../../../../data/steps'
 import { FUNNELS_STORE_NAME } from '../../../../../../../data/funnels'
+import Button from '@material-ui/core/Button'
 
 const useStyles = makeStyles((theme) => ( {
   box: {
     padding: theme.spacing(1),
   },
-  paper: {
+  stepPaper: {
     padding: theme.spacing(2),
     textAlign: 'center',
     color: theme.palette.text.secondary,
@@ -20,9 +21,17 @@ const useStyles = makeStyles((theme) => ( {
 } ))
 
 const SelectStepButton = ({ type, onSelect }) => {
-  const classes = useStyles()
+
+  const { name, icon } = type;
   return (
-    <Paper onClick={ () => onSelect(type) } className={ classes.paper }>{ type }</Paper>
+    <Button
+      size={'medium'}
+      variant={'outlined'}
+      onClick={ () => onSelect(type) }
+      startIcon={icon}
+    >
+      { name }
+    </Button>
   )
 }
 
@@ -84,7 +93,7 @@ export default (props) => {
       <Box className={ classes.box }>
         <Grid container spacing={ 2 }>
           {
-            steps.filter(item => item.includes(search)).
+            steps.filter(item => item.name.match(new RegExp(search, 'i') )).
               reduce(reducer, []).
               map(row => {
                 return (
