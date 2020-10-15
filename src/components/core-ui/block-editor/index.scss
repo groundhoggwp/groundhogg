@@ -51,4 +51,8 @@
 .interface-interface-skeleton {
 	top: 100px;
 	left: 115px;
+	max-width: 1600px;
+	.interface-interface-skeleton__sidebar {
+		top: 10px;
+	}
 }

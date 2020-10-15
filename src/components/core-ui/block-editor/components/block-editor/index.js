@@ -90,13 +90,9 @@ function BlockEditor( { settings: _settings } ) {
 							</div>
 						</Paper>
 					</Grid>
-					<Grid item xs={3}>
-						<Paper>
-							<Sidebar.InspectorFill>
-								<BlockInspector />
-							</Sidebar.InspectorFill>
-						</Paper>
-					</Grid>
+					<Sidebar.InspectorFill>
+						<BlockInspector />
+					</Sidebar.InspectorFill>
 				</Grid>
 			</BlockEditorProvider>
 		</div>
