@@ -7,8 +7,6 @@ import { hasQueryArg } from '@wordpress/url'
 import { makeStyles } from '@material-ui/core/styles';
 import { Link } from "react-router-dom";
 
-
-
 const useStyles = makeStyles((theme) => ({
 	contactRowImage: {
 		maxWidth: '55px',
@@ -43,7 +41,7 @@ const getContactRowStatus = ( data ) => {
 export const EmailRowPrimaryItem = ( props ) => {
 	const classes = useStyles();
 	const { data, ID } = props;
-	console.log('data', ID)
+
 	return (
 		<Fragment>
 			 <Link to={ `/emails/${ID}` }>

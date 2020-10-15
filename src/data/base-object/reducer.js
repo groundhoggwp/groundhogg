@@ -63,8 +63,7 @@ const reducer = (
 		case TYPES.RECEIVE_ITEM:
 			state = {
 				...state,
-				item: item,
-				// items: [ ...state.items, item ]
+				item: item
 			};
 			break;
 		case TYPES.RECEIVE_ITEMS:

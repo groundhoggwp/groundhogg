@@ -1,10 +1,10 @@
 import Box from '@material-ui/core/Box'
 import Card from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
-import CardActions from '@material-ui/core/CardActions'
+import CardActions from '@material-ui/core/CardActions';
 import { select, useDispatch, useSelect } from '@wordpress/data'
-import { STEP_TYPES_STORE_NAME } from '../../../../../../../data/step-type-registry'
-import { STEPS_STORE_NAME } from '../../../../../../../data/steps'
+import { STEP_TYPES_STORE_NAME } from 'data/step-type-registry'
+import { STEPS_STORE_NAME } from 'data/steps'
 import CardContent from '@material-ui/core/CardContent'
 import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'

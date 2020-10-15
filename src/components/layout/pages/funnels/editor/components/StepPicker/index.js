@@ -5,8 +5,8 @@ import Grid from '@material-ui/core/Grid'
 import makeStyles from '@material-ui/core/styles/makeStyles'
 import Paper from '@material-ui/core/Paper/Paper'
 import { select, useDispatch } from '@wordpress/data'
-import { STEPS_STORE_NAME } from '../../../../../../../data/steps'
-import { FUNNELS_STORE_NAME } from '../../../../../../../data/funnels'
+import { STEPS_STORE_NAME } from 'data/steps'
+import { FUNNELS_STORE_NAME } from 'data/funnels'
 import Button from '@material-ui/core/Button'
 
 const useStyles = makeStyles((theme) => ({

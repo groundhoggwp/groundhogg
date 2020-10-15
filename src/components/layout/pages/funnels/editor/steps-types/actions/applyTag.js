@@ -1,6 +1,6 @@
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import { ACTION } from '../constants'
-import { registerStepType } from '../../../../../../../data/step-type-registry'
+import { registerStepType } from 'data/step-type-registry'
 
 const STEP_TYPE = 'apply_tag'
 

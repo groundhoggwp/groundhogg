@@ -3,23 +3,23 @@
  */
 import { Fragment, useState } from '@wordpress/element'
 import { useSelect, useDispatch } from '@wordpress/data'
-import { ListTable } from '../../../core-ui/list-table/new'
+import { ListTable } from 'components/core-ui/list-table/new'
 import DeleteIcon from '@material-ui/icons/Delete'
 import SettingsIcon from '@material-ui/icons/Settings'
 import GroupIcon from '@material-ui/icons/Group'
 import TimelineIcon from '@material-ui/icons/Timeline'
 import AccountCircleIcon from '@material-ui/icons/AccountCircle'
-import RowActions from '../../../core-ui/row-actions'
+import RowActions from 'components/core-ui/row-actions'
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
 import Box from '@material-ui/core/Box'
 import makeStyles from '@material-ui/core/styles/makeStyles'
-import { useKeyPress } from '../../../../utils'
+import { useKeyPress } from 'utils'
 import FlagIcon from '@material-ui/icons/Flag'
 import Chip from '@material-ui/core/Chip'
 import { Tooltip } from '@material-ui/core'
 import ButtonGroup from '@material-ui/core/ButtonGroup'
-import { FUNNELS_STORE_NAME } from '../../../../data/funnels'
+import { FUNNELS_STORE_NAME } from 'data/funnels'
 
 const iconProps = {
   fontSize: 'small',
