@@ -10,16 +10,6 @@
 @import "components/sidebar/styles";
 @import "components/block-editor/styles";
 
-// In order to use mix-blend-mode, this element needs to have an explicitly set background-color
-// We scope it to .wp-toolbar to be wp-admin only, to prevent bleed into other implementations
-html.wp-toolbar {
-	background: $white;
-}
-
-body.block-editor-page {
-	@include wp-admin-reset( ".block-editor" );
-}
-
 .groundhogg-block-editor {
 	position: absolute;
 	top: 0;
@@ -47,6 +37,11 @@ body.block-editor-page {
 	@import "~@wordpress/editor/src/editor-styles.scss";
 }
 
+main.groundhogg-layout__primary.makeStyles-content-21,
+main.groundhogg-layout__primary.makeStyles-content-21 * {
+	overflow: auto;
+}
+
 .groundhogg-block-editor,
 // The modals are shown outside the .groundhogg-block-editor wrapper, they need these styles.
 .components-modal__frame {
@@ -58,7 +53,7 @@ body.block-editor-page {
 }
 
 // Custom CSS Begins
-.interface-interface-skeleton{
+.interface-interface-skeleton {
 	top: 100px;
 	left: 115px;
 }
