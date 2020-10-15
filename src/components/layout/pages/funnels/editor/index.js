@@ -5,28 +5,9 @@ import { useDispatch, useSelect } from '@wordpress/data'
 import { STEPS_STORE_NAME } from '../../../../../data/steps'
 import BenchmarkPicker from './components/BenchmarkPicker'
 import AddStepButton from './components/AddStepButton'
+import StepBlock from './components/StepBlock'
 import Paper from '@material-ui/core/Paper'
 import './steps-types'
-
-const Step = ({ ID, data }) => {
-
-  const classNames = [
-    data.step_group,
-    data.step_type,
-    data.step_order,
-    ID,
-  ]
-
-  return (
-    <Box style={ { padding: 10 } }>
-      <Card style={ { width: 250, padding: 10 } }
-            className={ classNames.join(' ') }>
-        { data.step_title }
-      </Card>
-      <ChartLine from={ data.step_order } to={ parseInt(data.step_order) + 1 }/>
-    </Box>
-  )
-}
 
 const ChartLine = ({ from, to }) => {
   return (
@@ -95,7 +76,7 @@ export default (props) => {
           return (
             <Box display={ 'flex' } justifyContent={ 'center' }>
               {
-                __steps.map(_step => <Step { ..._step }/>)
+                __steps.map(_step => <StepBlock { ..._step }/>)
               }
             </Box>
           )

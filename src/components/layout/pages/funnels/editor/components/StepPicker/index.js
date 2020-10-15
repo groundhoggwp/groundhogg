@@ -27,7 +27,7 @@ const SelectStepButton = ({ type, onSelect }) => {
     <Button
       size={'medium'}
       variant={'outlined'}
-      onClick={ () => onSelect(type) }
+      onClick={ () => onSelect(type.type) }
       startIcon={icon}
     >
       { name }
