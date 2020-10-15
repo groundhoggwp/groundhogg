@@ -24,13 +24,11 @@ import { SnackbarArea } from './snackbar'
 import { withSettingsHydration } from '../../data'
 
 const useStyles = makeStyles((theme) => ( {
-  // root: {
-  //   display: 'flex',
-  // },
   toolbar: {
     paddingRight: 24, // keep right padding when drawer closed
   },
   appBar: {
+    position: 'fixed',
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,

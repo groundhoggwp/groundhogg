@@ -17,16 +17,16 @@ const {
 //TODO: Match more closely to core edit-post
 function Sidebar() {
 	return (
-				<div
-					className="groundhogg-email-sidebar"
-					role="region"
-					aria-label={ __( 'Groundhogg Email Sidebar advanced settings.' ) }
-					tabIndex="-1"
-				>
-					<Panel header={ __( 'Inspector' ) }>
-						<InspectorSlot bubblesVirtually />
-					</Panel>
-				</div>
+		<div
+			className="groundhogg-email-sidebar"
+			role="region"
+			aria-label={ __( 'Groundhogg Email Sidebar advanced settings.' ) }
+			tabIndex="-1"
+		>
+			<Panel header={ __( 'Inspector' ) }>
+				<InspectorSlot bubblesVirtually />
+			</Panel>
+		</div>
 	);
 }
 

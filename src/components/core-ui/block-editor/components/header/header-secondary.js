@@ -1,111 +1,161 @@
-import { useViewportMatch } from '@wordpress/compose';
 import { __, _x } from '@wordpress/i18n';
 import {
-	BlockToolbar,
-	NavigableToolbar,
-	BlockNavigationDropdown,
-} from '@wordpress/block-editor';
-import {
-	TableOfContents,
-	EditorHistoryRedo,
-	EditorHistoryUndo,
-} from '@wordpress/editor';
-import {
-	Button,
+	Button
 } from '@wordpress/components';
-import { plus } from '@wordpress/icons';
-import { useRef } from '@wordpress/element';
+import {
+	plus,
+	people,
+	page,
+	megaphone,
+	mobile,
+	update,
+	desktop
+} from '@wordpress/icons';
+import { useRef, Fragment } from '@wordpress/element';
 import ToolbarItem from './toolbar-item'; // Stop-gap while WP catches up.
 
-function HeaderToolbar() {
+function HeaderSecondary() {
 	const inserterButton = useRef();
 
 	/* const { setIsInserterOpened } = useDispatch( 'core/edit-post' ); */ // Consider adding to core actions
 	const isInserterOpened = false;
 	const isTextModeEnabled = false;
 	const showIconLabels = false;
-	const displayBlockToolbar = true; // May connect to GH core state.
 	const isInserterEnabled = false; // May connect to GH core state.
 
-	const isWideViewport = useViewportMatch( 'wide' );
-
-
-	const toolbarAriaLabel = displayBlockToolbar
-		? /* translators: accessibility text for the editor toolbar when Top Toolbar is on */
-		  __( 'Document and block tools' )
-		: /* translators: accessibility text for the editor toolbar when Top Toolbar is off */
-		  __( 'Document tools' );
-
-	const overflowItems = (
-		<>
-			<ToolbarItem
-				as={ TableOfContents }
-				hasOutlineItemsDisabled={ isTextModeEnabled }
-				repositionDropdown={ showIconLabels && ! isWideViewport }
-				showTooltip={ ! showIconLabels }
-				isTertiary={ showIconLabels }
-			/>
-			<ToolbarItem
-				as={ BlockNavigationDropdown }
-				isDisabled={ isTextModeEnabled }
-				showTooltip={ ! showIconLabels }
-				isTertiary={ showIconLabels }
-			/>
-		</>
-	);
-
 	return (
-		<NavigableToolbar
-			className="groundhogg-header-toolbar edit-post-header-toolbar"
-			aria-label={ toolbarAriaLabel }
-		>
-			<div className="groundhogg-header-toolbar__left edit-post-header-toolbar__left">
-				<ToolbarItem
-					ref={ inserterButton }
-					as={ Button }
-					className="groundhogg-header-toolbar__inserter-toggle edit-post-header-toolbar__inserter-toggle"
-					isPrimary
-					isPressed={ isInserterOpened }
-					onMouseDown={ ( event ) => {
-						event.preventDefault();
-					} }
-					disabled={ ! isInserterEnabled }
-					icon={ plus }
-					/* translators: button label text should, if possible, be under 16
-			characters. */
-					label={ _x(
-						'Add block',
-						'Generic label for block inserter button'
-					) }
-					showTooltip={ ! showIconLabels }
-				>
-					{ showIconLabels && __( 'Add' ) }
-				</ToolbarItem>
-				{ ( isWideViewport ) && (
-					<>
-						<ToolbarItem
-							as={ EditorHistoryUndo }
-							showTooltip={ ! showIconLabels }
-							isTertiary={ showIconLabels }
-						/>
-						<ToolbarItem
-							as={ EditorHistoryRedo }
-							showTooltip={ ! showIconLabels }
-							isTertiary={ showIconLabels }
-						/>
-						{ overflowItems }
-					</>
+		<Fragment>
+			<ToolbarItem
+				ref={ inserterButton }
+				as={ Button }
+				className="groundhogg-header-toolbar__mode-toggle"
+				isPrimary
+				isPressed={ isInserterOpened }
+				onMouseDown={ ( event ) => {
+					event.preventDefault();
+				} }
+				icon={ plus }
+				/* translators: button label text should, if possible, be under 16
+		characters. */
+				label={ _x(
+					'Toggle between HTML and Visual Mode',
+					'Generic label for mode toggle button'
 				) }
-
-			</div>
-
-			{ displayBlockToolbar && (
-				<div className="groundhogg-header-toolbar__block-toolbar edit-post-header-toolbar__block-toolbar">
-					<BlockToolbar hideDragHandle />
-				</div>
-			) }
-		</NavigableToolbar>
+			>
+				{ __( 'Toggle Editor Mode' ) }
+			</ToolbarItem>
+			<ToolbarItem
+				ref={ inserterButton }
+				as={ Button }
+				className="groundhogg-header-toolbar__broadcast-link"
+				isPrimary
+				isPressed={ isInserterOpened }
+				onMouseDown={ ( event ) => {
+					event.preventDefault();
+				} }
+				icon={ megaphone }
+				/* translators: button label text should, if possible, be under 16
+		characters. */
+				label={ _x(
+					'Link to Broadcast',
+					'Generic label for link to broadcasts'
+				) }
+			>
+				{ __( 'Broadcast' ) }
+			</ToolbarItem>
+			<ToolbarItem
+				ref={ inserterButton }
+				as={ Button }
+				className="groundhogg-header-toolbar__replacements-modal"
+				isPrimary
+				isPressed={ isInserterOpened }
+				onMouseDown={ ( event ) => {
+					event.preventDefault();
+				} }
+				icon={ people }
+				/* translators: button label text should, if possible, be under 16
+		characters. */
+				label={ _x(
+					'Open replacements list',
+					'Generic label for replacements button'
+				) }
+			>
+				{ __( 'Replacements' ) }
+			</ToolbarItem>
+			<ToolbarItem
+				ref={ inserterButton }
+				as={ Button }
+				className="groundhogg-header-toolbar__alt-body-modal"
+				isPrimary
+				isPressed={ isInserterOpened }
+				onMouseDown={ ( event ) => {
+					event.preventDefault();
+				} }
+				icon={ page }
+				/* translators: button label text should, if possible, be under 16
+		characters. */
+				label={ _x(
+					'Open replacements list',
+					'Generic label for replacements button'
+				) }
+			>
+				{ __( 'Alt-Body' ) }
+			</ToolbarItem>
+			<ToolbarItem
+				ref={ inserterButton }
+				as={ Button }
+				className="groundhogg-header-toolbar__update-and-test"
+				isPrimary
+				isPressed={ isInserterOpened }
+				onMouseDown={ ( event ) => {
+					event.preventDefault();
+				} }
+				icon={ update }
+				/* translators: button label text should, if possible, be under 16
+		characters. */
+				label={ _x(
+					'Update and Test Link',
+					'Generic label for replacements button'
+				) }
+			>
+				{ __( 'Update and Test' ) }
+			</ToolbarItem>
+			<ToolbarItem
+				ref={ inserterButton }
+				as={ Button }
+				className="groundhogg-header-toolbar__mobile-device-toggle"
+				isPrimary
+				isPressed={ isInserterOpened }
+				onMouseDown={ ( event ) => {
+					event.preventDefault();
+				} }
+				icon={ mobile }
+				/* translators: button label text should, if possible, be under 16
+		characters. */
+				label={ _x(
+					'Mobile Device Toggle',
+					'Generic label for mobile device toggle button'
+				) }
+			></ToolbarItem>
+			<ToolbarItem
+				ref={ inserterButton }
+				as={ Button }
+				className="groundhogg-header-toolbar__large-device-toggle"
+				isPrimary
+				isPressed={ isInserterOpened }
+				onMouseDown={ ( event ) => {
+					event.preventDefault();
+				} }
+				icon={ desktop }
+				/* translators: button label text should, if possible, be under 16
+		characters. */
+				label={ _x(
+					'Desktop Preview Toggle',
+					'Generic label for desktop preview button'
+				) }
+			></ToolbarItem>
+		</Fragment>
 	);
 }
 
-export default HeaderToolbar;
+export default HeaderSecondary;
