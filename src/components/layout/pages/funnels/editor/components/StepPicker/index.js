@@ -9,28 +9,28 @@ import { STEPS_STORE_NAME } from '../../../../../../../data/steps'
 import { FUNNELS_STORE_NAME } from '../../../../../../../data/funnels'
 import Button from '@material-ui/core/Button'
 
-const useStyles = makeStyles((theme) => ( {
+const useStyles = makeStyles((theme) => ({
   box: {
-    padding: theme.spacing(1),
+    padding: theme.spacing(1)
   },
   stepPaper: {
     padding: theme.spacing(2),
     textAlign: 'center',
-    color: theme.palette.text.secondary,
-  },
-} ))
+    color: theme.palette.text.secondary
+  }
+}))
 
 const SelectStepButton = ({ type, onSelect }) => {
 
-  const { name, icon } = type;
+  const { name, icon } = type
   return (
     <Button
       size={'medium'}
       variant={'outlined'}
-      onClick={ () => onSelect(type.type) }
+      onClick={() => onSelect(type.type)}
       startIcon={icon}
     >
-      { name }
+      {name}
     </Button>
   )
 }
@@ -42,19 +42,18 @@ export default (props) => {
     stepGroup,
     parentSteps,
     childSteps,
-    stepOrder,
+    stepOrder
   } = props
 
   const classes = useStyles()
   const [search, setSearch] = useState('')
-  const { createItem } = useDispatch(STEPS_STORE_NAME)
+  const { createItems } = useDispatch(STEPS_STORE_NAME)
   const { ID } = select(FUNNELS_STORE_NAME).getItem()
 
   const reducer = (acc, curr) => {
     if (acc.length > 0 && acc[acc.length - 1].length < 3) {
       acc[acc.length - 1].push(curr)
-    }
-    else {
+    } else {
       acc.push([curr])
     }
     return acc
@@ -69,50 +68,48 @@ export default (props) => {
       step_group: stepGroup,
       child_steps: childSteps || [],
       parent_steps: parentSteps || [],
-      funnel_id: ID,
+      funnel_id: ID
     }
 
-    createItem({
-      data: newStepData,
-    })
+    createItems([{
+      data: newStepData
+    }])
   }
 
   return (
-    <Box className={ classes.box }>
-      <Box className={ classes.box }>
+    <Box className={classes.box}>
+      <Box className={classes.box}>
         <TextField
-          value={ search }
-          onChange={ (e) => setSearch(e.target.value) }
-          label={ 'Search' }
-          type={ 'search' }
-          variant={ 'outlined' }
-          size={ 'small' }
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          label={'Search'}
+          type={'search'}
+          variant={'outlined'}
+          size={'small'}
           fullWidth
         />
       </Box>
-      <Box className={ classes.box }>
-        <Grid container spacing={ 2 }>
+      <Box className={classes.box}>
+        <Grid container spacing={2}>
           {
-            steps.filter(item => item.name.match(new RegExp(search, 'i') )).
-              reduce(reducer, []).
-              map(row => {
-                return (
-                  <Grid container item xs={ 12 } spacing={ 2 }>
-                    {
-                      row.map(item => {
-                        return (
-                          <Grid item xs={ 4 }>
-                            <SelectStepButton
-                              type={ item }
-                              onSelect={ handleTypeChosen }
-                            />
-                          </Grid>
-                        )
-                      })
-                    }
-                  </Grid>
-                )
-              })
+            steps.filter(item => item.name.match(new RegExp(search, 'i'))).reduce(reducer, []).map(row => {
+              return (
+                <Grid container item xs={12} spacing={2}>
+                  {
+                    row.map(item => {
+                      return (
+                        <Grid item xs={4}>
+                          <SelectStepButton
+                            type={item}
+                            onSelect={handleTypeChosen}
+                          />
+                        </Grid>
+                      )
+                    })
+                  }
+                </Grid>
+              )
+            })
           }
         </Grid>
       </Box>

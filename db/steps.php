@@ -110,8 +110,8 @@ class Steps extends DB {
 			'step_status'    => 'ready',
 			'step_type'      => 'send_email',
 			'step_group'     => 'action',
-			'child_steps'    => maybe_serialize( [] ),
-			'parent_steps'   => maybe_serialize( [] ),
+			'child_steps'    => [],
+			'parent_steps'   => [],
 			'step_order'     => 0,
 			'last_edited_by' => '',
 			'last_edited'    => current_time( 'mysql' ),
@@ -138,6 +138,8 @@ class Steps extends DB {
 
 		map_func_to_attr( $data, 'child_steps', 'maybe_serialize' );
 		map_func_to_attr( $data, 'parent_steps', 'maybe_serialize' );
+
+//		wp_send_json( $data );
 
 		return $this->insert( $args );
 	}

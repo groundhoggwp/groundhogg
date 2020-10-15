@@ -79,6 +79,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return void
 	 */
 	protected function post_setup() {
+		$this->parent_steps = $this->parent_steps ? wp_parse_id_list( maybe_unserialize( $this->parent_steps ) ) : [];
+		$this->child_steps  = $this->child_steps ? wp_parse_id_list( maybe_unserialize( $this->child_steps ) ) : [];
 	}
 
 	/**
@@ -96,6 +98,14 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 	public function get_title() {
 		return $this->step_title;
+	}
+
+	public function get_child_steps() {
+		return $this->child_steps ? wp_parse_id_list( $this->child_steps ) : [];
+	}
+
+	public function get_parent_steps() {
+		return $this->parent_steps ? wp_parse_id_list( $this->parent_steps ) : [];
 	}
 
 	public function get_order() {
@@ -119,6 +129,72 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function get_funnel() {
 		return Plugin::$instance->utils->get_funnel( $this->get_funnel_id() );
+	}
+
+	/**
+	 * Id of the step
+	 *
+	 * @param $step Step
+	 */
+	public function add_parent_step( $step ){
+		if ( ! $step || ! $step->exists() || in_array( $step, $this->parent_steps ) ){
+			return;
+		}
+
+		$this->parent_steps[] = $step->get_id();
+
+		$this->update( [
+			'parent_steps' => $this->parent_steps
+		] );
+
+		$step->add_child_step( $this );
+	}
+
+	/**
+	 * @param $step Step
+	 */
+	public function add_child_step( $step ){
+		if ( ! $step || ! $step->exists() || in_array( $step, $this->child_steps ) ){
+			return;
+		}
+
+		$this->child_steps[] = $step->get_id();
+
+		$this->update( [
+			'child_steps' => $this->child_steps
+		] );
+
+		$step->add_parent_step( $this );
+	}
+
+	/**
+	 * @param $step Step
+	 */
+	public function remove_parent_step( $step ){
+		if ( ! $step || ! $step->exists() || ! in_array( $step, $this->parent_steps ) ){
+			return;
+		}
+
+		$this->update( [
+			'parent_steps' => array_diff( $this->parent_steps, [ $step->get_id() ] )
+		] );
+
+		$step->remove_child_step( $this );
+	}
+
+	/**
+	 * @param $step Step
+	 */
+	public function remove_child_step( $step ){
+		if ( ! $step || ! $step->exists() || ! in_array( $step, $this->child_steps ) ){
+			return;
+		}
+
+		$this->update( [
+			'child_steps' => array_diff( $this->child_steps, [ $step->get_id() ] )
+		] );
+
+		$step->remove_parent_step( $this );
 	}
 
 	/**

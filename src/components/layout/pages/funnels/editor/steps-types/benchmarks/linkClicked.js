@@ -14,8 +14,12 @@ const stepAtts = {
 
   icon: <LocalOfferIcon/>,
 
-  view: ({data, meta, stats}) => {},
-  edit: ({data, meta, stats}) => {},
+  view: ({data, meta, stats}) => {
+    return data.toString();
+  },
+  edit: ({data, meta, stats}) => {
+    return data.toString();
+  },
 }
 
 registerStepType( STEP_TYPE, stepAtts );

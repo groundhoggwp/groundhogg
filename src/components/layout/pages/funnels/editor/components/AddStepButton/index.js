@@ -17,7 +17,7 @@ export default (props) => {
 
   return (
     <>
-      <Fab color="primary" aria-label="add" onClick={handleClick}>
+      <Fab size={'small'} aria-label="add" onClick={handleClick}>
         <AddIcon />
       </Fab>
       <AddStepPopover
