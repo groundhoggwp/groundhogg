@@ -1,6 +1,6 @@
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import { BENCHMARK } from '../constants'
-import { registerStepType } from '../../../../../../../data/step-type-registry'
+import { registerStepType } from 'data/step-type-registry'
 
 const STEP_TYPE = 'link_clicked'
 

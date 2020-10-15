@@ -1,6 +1,6 @@
 import StepsPicker from '../StepPicker'
 import { useSelect } from '@wordpress/data'
-import { STEP_TYPES_STORE_NAME } from '../../../../../../../data/step-type-registry'
+import { STEP_TYPES_STORE_NAME } from 'data/step-type-registry'
 import { ACTION, BENCHMARK } from '../../steps-types/constants'
 
 export default (props) => {
