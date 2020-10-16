@@ -4,6 +4,9 @@
 import { createSlotFill, Panel } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
+
 const {
 	Slot: InspectorSlot,
 	Fill: InspectorFill

@@ -4,6 +4,8 @@
 @import "~@wordpress/base-styles/breakpoints";
 @import "~@wordpress/base-styles/animations";
 @import "~@wordpress/base-styles/z-index";
+@import "~@wordpress/interface/src/style.scss";
+
 
 // Internal
 @import "components/header/styles";
@@ -44,11 +46,15 @@
 }
 
 .groundhogg-block-editor {
-	top: 70px;
+	top: 140px;
 }
 
 // Custom CSS Begins
 .interface-interface-skeleton {
 	top: 100px;
 	left: 115px;
+	max-width: 1600px;
+	.interface-interface-skeleton__sidebar {
+		top: 10px;
+	}
 }
