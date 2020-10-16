@@ -100,12 +100,18 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return $this->step_title;
 	}
 
+	/**
+	 * @return Step[]
+	 */
 	public function get_child_steps() {
-		return $this->child_steps ? wp_parse_id_list( $this->child_steps ) : [];
+		return $this->child_steps ? id_list_to_class( $this->child_steps, Step::class ) : [];
 	}
 
+	/**
+	 * @return Step[]
+	 */
 	public function get_parent_steps() {
-		return $this->parent_steps ? wp_parse_id_list( $this->parent_steps ) : [];
+		return $this->parent_steps ? id_list_to_class( $this->parent_steps, Step::class ) : [];
 	}
 
 	public function get_order() {
@@ -147,14 +153,14 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'parent_steps' => $this->parent_steps
 		] );
 
-		$step->add_child_step( $this );
+//		$step->add_child_step( $this );
 	}
 
 	/**
 	 * @param $step Step
 	 */
 	public function add_child_step( $step ){
-		if ( ! $step || ! $step->exists() || in_array( $step, $this->child_steps ) ){
+		if ( ! $step || ! $step->exists() || in_array( $step->get_id(), $this->child_steps ) ){
 			return;
 		}
 
@@ -164,14 +170,14 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'child_steps' => $this->child_steps
 		] );
 
-		$step->add_parent_step( $this );
+//		$step->add_parent_step( $this );
 	}
 
 	/**
 	 * @param $step Step
 	 */
 	public function remove_parent_step( $step ){
-		if ( ! $step || ! $step->exists() || ! in_array( $step, $this->parent_steps ) ){
+		if ( ! $step || ! $step->exists() || ! in_array( $step->get_id(), $this->parent_steps ) ){
 			return;
 		}
 
@@ -179,14 +185,14 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'parent_steps' => array_diff( $this->parent_steps, [ $step->get_id() ] )
 		] );
 
-		$step->remove_child_step( $this );
+//		$step->remove_child_step( $this );
 	}
 
 	/**
 	 * @param $step Step
 	 */
 	public function remove_child_step( $step ){
-		if ( ! $step || ! $step->exists() || ! in_array( $step, $this->child_steps ) ){
+		if ( ! $step || ! $step->exists() || ! in_array( $step->get_id(), $this->child_steps ) ){
 			return;
 		}
 
@@ -194,7 +200,27 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'child_steps' => array_diff( $this->child_steps, [ $step->get_id() ] )
 		] );
 
-		$step->remove_parent_step( $this );
+//		$step->remove_parent_step( $this );
+	}
+
+	public function create( $data = [] ) {
+		parent::create( $data );
+
+//		foreach ( $this->get_parent_steps() as $parent ){
+//			$parent->add_child_step( $this );
+//		}
+//
+//		foreach ( $this->get_child_steps() as $step ){
+//			$step->add_parent_step( $this );
+//		}
+	}
+
+	protected function sanitize_columns( $data = [] ) {
+
+		map_func_to_attr( $data, 'parent_steps', 'wp_parse_id_list' );
+		map_func_to_attr( $data, 'child_steps', 'wp_parse_id_list' );
+
+		return $data;
 	}
 
 	/**

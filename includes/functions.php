@@ -4022,3 +4022,17 @@ function get_csv_file_info( $file_path ){
 		'rows'      => count( file( $file_path, FILE_SKIP_EMPTY_LINES ) ) - 1,
 	];
 }
+
+/**
+ * Parse list of Ids into classes
+ *
+ * @param $list
+ * @param $class
+ *
+ * @return array
+ */
+function id_list_to_class( $list, $class ){
+    return array_map( function ( $id ) use (&$class){
+        return new $class($id);
+    }, wp_parse_id_list( $list ) );
+}

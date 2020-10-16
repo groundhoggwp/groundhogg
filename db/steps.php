@@ -127,36 +127,19 @@ class Steps extends DB {
 	 */
 	public function add( $data = array() ) {
 
-		$args = wp_parse_args(
+		$data = wp_parse_args(
 			$data,
 			$this->get_column_defaults()
 		);
 
-		if ( empty( $args['step_type'] ) ) {
+		if ( empty( $data['step_type'] ) ) {
 			return false;
 		}
 
 		map_func_to_attr( $data, 'child_steps', 'maybe_serialize' );
 		map_func_to_attr( $data, 'parent_steps', 'maybe_serialize' );
 
-//		wp_send_json( $data );
-
-		return $this->insert( $args );
-	}
-
-	/**
-	 * Unserialize any args
-	 *
-	 * @param $row_id
-	 *
-	 * @return object
-	 */
-	public function get( $row_id ) {
-		$data = parent::get( $row_id );
-		map_func_to_attr( $data, 'child_steps', 'maybe_unserialize' );
-		map_func_to_attr( $data, 'parent_steps', 'maybe_unserialize' );
-
-		return $data;
+		return $this->insert( $data );
 	}
 
 	public function update( $row_id = 0, $data = [], $where = [] ) {
