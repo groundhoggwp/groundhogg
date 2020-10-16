@@ -10,7 +10,8 @@ import {
 
 import {
 	InterfaceSkeleton,
-	FullscreenMode
+	FullscreenMode,
+	ComplementaryArea
 } from "@wordpress/interface";
 
 /**

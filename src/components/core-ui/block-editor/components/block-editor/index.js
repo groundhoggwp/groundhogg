@@ -16,6 +16,8 @@ import {
 	ObserveTyping,
 } from '@wordpress/block-editor';
 
+import { Popover } from '@wordpress/components';
+
 /**
  * External dependencies
  */
@@ -85,7 +87,6 @@ function BlockEditor( { settings: _settings } ) {
 		<div className="groundhogg-block-editor">
 			<BlockEditorProvider
 				value={ blocks }
-				settings={ settings }
 				onInput={ handleUpdateBlocks }
 				onChange={ handlePersistBlocks }
 			>
@@ -95,10 +96,11 @@ function BlockEditor( { settings: _settings } ) {
 						<TextField className={ classes.subjectInputs } placeholder={ __( 'Pre Header Text: Used to summarize the content of the email.' ) } />
 						<Paper>
 							<div className="editor-styles-wrapper">
-								<BlockEditorKeyboardShortcuts />
+								<Popover.Slot name="block-toolbar" />
+								<BlockEditorKeyboardShortcuts.Register />
 								<WritingFlow>
 									<ObserveTyping>
-										<BlockList className="groundhogg-block-editor__block-list" />
+										<BlockList />
 									</ObserveTyping>
 								</WritingFlow>
 							</div>
