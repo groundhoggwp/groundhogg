@@ -74,7 +74,6 @@
     "@wordpress/hooks": "2.9.0",
     "@wordpress/html-entities": "2.7.0",
     "@wordpress/i18n": "3.11.0",
-    "@wordpress/icons": "^2.7.0",
     "@wordpress/interface": "^0.8.0",
     "@wordpress/media-utils": "^1.16.0",
     "@wordpress/url": "2.13.0",

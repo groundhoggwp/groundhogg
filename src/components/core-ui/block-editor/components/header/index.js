@@ -18,8 +18,8 @@ import {
 /**
  * Internal dependencies
  */
-import HeaderToolbar from './header-toolbar';
 import { CORE_STORE_NAME } from 'data/core';
+import HeaderToolbar from './header-toolbar';
 import HeaderPrimary from './header-primary';
 import HeaderSecondary from './header-secondary';
 

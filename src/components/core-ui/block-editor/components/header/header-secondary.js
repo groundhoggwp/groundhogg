@@ -1,16 +1,13 @@
 import { __, _x } from '@wordpress/i18n';
-import {
-	Button
-} from '@wordpress/components';
-import {
-	plus,
-	people,
-	page,
-	megaphone,
-	mobile,
-	update,
-	desktop
-} from '@wordpress/icons';
+import Button from '@material-ui/core/Button'
+import CodeIcon from '@material-ui/icons/Code';
+import LineStyleIcon from '@material-ui/icons/LineStyle';
+import SurroundSoundIcon from '@material-ui/icons/SurroundSound';
+import FindReplaceIcon from '@material-ui/icons/FindReplace';
+import ChromeReaderModeIcon from '@material-ui/icons/ChromeReaderMode';
+import DesktopMacIcon from '@material-ui/icons/DesktopMac';
+import SmartphoneIcon from '@material-ui/icons/Smartphone';
+import UpdateIcon from '@material-ui/icons/Update';
 import { useRef, Fragment } from '@wordpress/element';
 import ToolbarItem from './toolbar-item'; // Stop-gap while WP catches up.
 
@@ -29,12 +26,13 @@ function HeaderSecondary() {
 				ref={ inserterButton }
 				as={ Button }
 				className="groundhogg-header-toolbar__mode-toggle"
-				isPrimary
-				isPressed={ isInserterOpened }
+				variant="contained"
+				color="primary"
+				size="small"
 				onMouseDown={ ( event ) => {
 					event.preventDefault();
 				} }
-				icon={ plus }
+				startIcon={ ( isTextModeEnabled ) ? <LineStyleIcon /> : <CodeIcon /> }
 				/* translators: button label text should, if possible, be under 16
 		characters. */
 				label={ _x(
@@ -42,18 +40,19 @@ function HeaderSecondary() {
 					'Generic label for mode toggle button'
 				) }
 			>
-				{ __( 'Toggle Editor Mode' ) }
+				{ __( 'Editor Mode' ) }
 			</ToolbarItem>
 			<ToolbarItem
 				ref={ inserterButton }
 				as={ Button }
 				className="groundhogg-header-toolbar__broadcast-link"
-				isPrimary
-				isPressed={ isInserterOpened }
+				variant="contained"
+				color="primary"
+				size="small"
 				onMouseDown={ ( event ) => {
 					event.preventDefault();
 				} }
-				icon={ megaphone }
+				startIcon={ <SurroundSoundIcon /> }
 				/* translators: button label text should, if possible, be under 16
 		characters. */
 				label={ _x(
@@ -67,12 +66,13 @@ function HeaderSecondary() {
 				ref={ inserterButton }
 				as={ Button }
 				className="groundhogg-header-toolbar__replacements-modal"
-				isPrimary
-				isPressed={ isInserterOpened }
+				variant="contained"
+				color="primary"
+				size="small"
 				onMouseDown={ ( event ) => {
 					event.preventDefault();
 				} }
-				icon={ people }
+				startIcon={ <FindReplaceIcon /> }
 				/* translators: button label text should, if possible, be under 16
 		characters. */
 				label={ _x(
@@ -86,12 +86,13 @@ function HeaderSecondary() {
 				ref={ inserterButton }
 				as={ Button }
 				className="groundhogg-header-toolbar__alt-body-modal"
-				isPrimary
-				isPressed={ isInserterOpened }
+				variant="contained"
+				color="primary"
+				size="small"
 				onMouseDown={ ( event ) => {
 					event.preventDefault();
 				} }
-				icon={ page }
+				startIcon={ <ChromeReaderModeIcon /> }
 				/* translators: button label text should, if possible, be under 16
 		characters. */
 				label={ _x(
@@ -105,12 +106,13 @@ function HeaderSecondary() {
 				ref={ inserterButton }
 				as={ Button }
 				className="groundhogg-header-toolbar__update-and-test"
-				isPrimary
-				isPressed={ isInserterOpened }
+				variant="contained"
+				color="primary"
+				size="small"
 				onMouseDown={ ( event ) => {
 					event.preventDefault();
 				} }
-				icon={ update }
+				startIcon={ <UpdateIcon /> }
 				/* translators: button label text should, if possible, be under 16
 		characters. */
 				label={ _x(
@@ -123,13 +125,15 @@ function HeaderSecondary() {
 			<ToolbarItem
 				ref={ inserterButton }
 				as={ Button }
+				size="small"
 				className="groundhogg-header-toolbar__mobile-device-toggle"
-				isPrimary
+				variant="contained"
+				color="secondary"
 				isPressed={ isInserterOpened }
 				onMouseDown={ ( event ) => {
 					event.preventDefault();
 				} }
-				icon={ mobile }
+				startIcon={ <SmartphoneIcon /> }
 				/* translators: button label text should, if possible, be under 16
 		characters. */
 				label={ _x(
@@ -141,12 +145,13 @@ function HeaderSecondary() {
 				ref={ inserterButton }
 				as={ Button }
 				className="groundhogg-header-toolbar__large-device-toggle"
-				isPrimary
-				isPressed={ isInserterOpened }
+				variant="contained"
+				color="secondary"
 				onMouseDown={ ( event ) => {
 					event.preventDefault();
 				} }
-				icon={ desktop }
+				startIcon={ <DesktopMacIcon /> }
+				size="small"
 				/* translators: button label text should, if possible, be under 16
 		characters. */
 				label={ _x(
