@@ -51,7 +51,7 @@ function Editor( { settings, email } ) {
 							sidebar={
 								<>
 									<Sidebar />
-									<ComplementaryArea.Slot scope="core/edit-post" />
+									<ComplementaryArea.Slot scope="gh/v4/core" />
 								</>
 							}
 							content={

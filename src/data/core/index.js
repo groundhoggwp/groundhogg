@@ -23,4 +23,3 @@ const store = registerBaseObjectStore( STORE_NAME, {
 applyMiddlewares( store );
 
 export const CORE_STORE_NAME = getStoreName( STORE_NAME );
-

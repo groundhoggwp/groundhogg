@@ -18,7 +18,6 @@ import {
 	CopyHandler,
 	BlockSelectionClearer,
 	MultiSelectScrollIntoView,
-
 } from '@wordpress/block-editor';
 
 import {
