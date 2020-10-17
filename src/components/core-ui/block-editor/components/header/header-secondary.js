@@ -8,12 +8,11 @@ import ChromeReaderModeIcon from '@material-ui/icons/ChromeReaderMode';
 import DesktopMacIcon from '@material-ui/icons/DesktopMac';
 import SmartphoneIcon from '@material-ui/icons/Smartphone';
 import UpdateIcon from '@material-ui/icons/Update';
-import { useRef, Fragment } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import ToolbarItem from './toolbar-item'; // Stop-gap while WP catches up.
 import Dialog from '../dialog'; // Stop-gap while WP catches up.
 
 function HeaderSecondary() {
-	const inserterButton = useRef();
 
 	/* const { setIsInserterOpened } = useDispatch( 'core/edit-post' ); */ // Consider adding to core actions
 	const isInserterOpened = false;
@@ -24,7 +23,6 @@ function HeaderSecondary() {
 	return (
 		<Fragment>
 			<ToolbarItem
-				ref={ inserterButton }
 				as={ Button }
 				className="groundhogg-header-toolbar__mode-toggle"
 				variant="contained"
@@ -44,7 +42,6 @@ function HeaderSecondary() {
 				{ __( 'Editor Mode' ) }
 			</ToolbarItem>
 			<ToolbarItem
-				ref={ inserterButton }
 				as={ Button }
 				className="groundhogg-header-toolbar__broadcast-link"
 				variant="contained"
@@ -64,7 +61,6 @@ function HeaderSecondary() {
 				{ __( 'Broadcast' ) }
 			</ToolbarItem>
 			<ToolbarItem
-				ref={ inserterButton }
 				as={ Dialog }
 				className="groundhogg-header-toolbar__replacements-modal"
 				buttonIcon={ <FindReplaceIcon /> }
@@ -80,7 +76,6 @@ function HeaderSecondary() {
 				) }
 			/>
 			<ToolbarItem
-				ref={ inserterButton }
 				as={ Dialog }
 				buttonIcon={ <ChromeReaderModeIcon /> }
 				className="groundhogg-header-toolbar__alt-body-modal"
@@ -96,7 +91,6 @@ function HeaderSecondary() {
 				) }
 			/>
 			<ToolbarItem
-				ref={ inserterButton }
 				as={ Button }
 				className="groundhogg-header-toolbar__update-and-test"
 				variant="contained"
@@ -116,13 +110,11 @@ function HeaderSecondary() {
 				{ __( 'Update and Test' ) }
 			</ToolbarItem>
 			<ToolbarItem
-				ref={ inserterButton }
 				as={ Button }
 				size="small"
 				className="groundhogg-header-toolbar__mobile-device-toggle"
 				variant="contained"
 				color="secondary"
-				isPressed={ isInserterOpened }
 				onMouseDown={ ( event ) => {
 					event.preventDefault();
 				} }
@@ -135,7 +127,6 @@ function HeaderSecondary() {
 				) }
 			></ToolbarItem>
 			<ToolbarItem
-				ref={ inserterButton }
 				as={ Button }
 				className="groundhogg-header-toolbar__large-device-toggle"
 				variant="contained"

@@ -23,7 +23,6 @@ import Sidebar from './components/sidebar';
 import BlockEditor from './components/block-editor'
 
 function Editor( { settings, email } ) {
-
 	return (
 		<>
 			<FullscreenMode isActive={false} />

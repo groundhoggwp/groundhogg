@@ -37,7 +37,6 @@ export const SingleView = ( props ) => {
 		deleteItems
 	} = useDispatch( EMAILS_STORE_NAME );
 
-
 	if ( isRequesting || ! email ) {
 		return null;
 	}

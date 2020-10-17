@@ -87,6 +87,7 @@ function BlockEditor( { settings: _settings } ) {
 		<div className="groundhogg-block-editor">
 			<BlockEditorProvider
 				value={ blocks }
+				settings={ settings }
 				onInput={ handleUpdateBlocks }
 				onChange={ handlePersistBlocks }
 			>
