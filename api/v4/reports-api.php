@@ -92,7 +92,7 @@ class Reports_Api extends Base_Api {
 		return self::SUCCESS_RESPONSE( [
 			'start'   => $start,
 			'end'     => $end,
-			'results' => $results
+			'items' => $results
 		] );
 	}
 
@@ -117,7 +117,7 @@ class Reports_Api extends Base_Api {
 		return self::SUCCESS_RESPONSE( [
 			'start'   => $start,
 			'end'     => $end,
-			'results' => $results
+			'items' => $results
 		] );
 	}
 
