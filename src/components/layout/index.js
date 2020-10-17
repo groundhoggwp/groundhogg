@@ -57,7 +57,7 @@ export default function PrimaryLayout (props) {
     <main className={ `groundhogg-layout__primary ${ classes.content }` }>
 
       <div className={ classes.appBarSpacer }/>
-      <Container maxWidth="xlg" className={ classes.container }>
+      <Container className={ classes.container }>
         { children }
       </Container>
     </main>
@@ -97,6 +97,7 @@ const _PageLayout = ( props ) => {
             return (
                 <Route
                   path={ page.path }
+                  key={ index }
                   exact={ '/' === page.path }
                   render={ (props) => (
                     <Layout page={ page } selectedIndex={index} { ...props } />

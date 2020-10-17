@@ -2,11 +2,22 @@
  * Get item from state tree.
  *
  * @param {Object} state - Reducer state
+ * @param id
  */
-export const getItem = ( state ) => {
+export const getItem = ( state, id=false ) => {
 	if ( state.extendedReducer ) {
+
+		if ( id && state.reducer.items ){
+			return state.reducer.items.find( _item => _item.ID === id ) || state.reducer.item;
+		}
+
 		return state.reducer.item;
 	}
+
+	if ( id && state.items ){
+		return state.items.find( _item => _item.ID === id ) || state.item;
+	}
+
 	return state.item;
 };
 
@@ -21,6 +32,19 @@ export const getItems = ( state ) => {
 	}
 	return state.items;
 };
+
+/**
+ * Get the most recently created items
+ *
+ * @param state
+ * @returns {*}
+ */
+export const getCreatedItems = ( state ) => {
+	if ( state.extendedReducer ) {
+		return state.reducer.createdItems;
+	}
+	return state.createdItems;
+}
 
 /**
  * Get items from state tree.

@@ -10,7 +10,8 @@ import {
 
 import {
 	InterfaceSkeleton,
-	FullscreenMode
+	FullscreenMode,
+	ComplementaryArea
 } from "@wordpress/interface";
 
 /**
@@ -22,7 +23,6 @@ import Sidebar from './components/sidebar';
 import BlockEditor from './components/block-editor'
 
 function Editor( { settings, email } ) {
-
 	return (
 		<>
 			<FullscreenMode isActive={false} />

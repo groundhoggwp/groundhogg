@@ -31,11 +31,7 @@ export default (props) => {
 
   const { ID, data, meta } = props
   const { step_title, step_type, step_group, parent_steps, child_steps } = data
-  const { stepType } = useSelect((select) => {
-    return {
-      stepType: select(STEP_TYPES_STORE_NAME).getType(step_type)
-    }
-  }, [])
+  const stepType = select( STEP_TYPES_STORE_NAME ).getType( step_type );
 
   const { deleteItem, updateItem } = useDispatch(STEPS_STORE_NAME)
 

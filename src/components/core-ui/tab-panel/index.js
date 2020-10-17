@@ -81,7 +81,7 @@ export default function ScrollableTabsButtonAuto( { tabs } ) {
         >
           {
             tabs.map( ( tab, index ) => (
-               <Tab label={tab.label} {...a11yProps( { index } )} />
+               <Tab key={index} label={tab.label} {...a11yProps( { index } )} />
               )
             )
           }
@@ -89,7 +89,7 @@ export default function ScrollableTabsButtonAuto( { tabs } ) {
       </AppBar>
         {
           tabs.map( ( tab, index ) => (
-            <TabPanel value={value} index={index}>
+            <TabPanel value={value} index={index} key={index}>
               <tab.component classes={classes} />
             </TabPanel>
            )

@@ -25,21 +25,23 @@ export default function NavListItems(props) {
   return(
     <div className={classes.root}>
       <List component="nav" aria-label="main">
-        {
-        getPages().map((page, index) =>
-              <ListItem
-                button
-                onClick={ (event) => {
-                  handleListItemClick(page.path)
-                } }
-                selected={ index === props.props.selectedIndex }
-              >
-                <ListItemIcon>
-                  <page.icon />
-                </ListItemIcon>
-                <ListItemText primary={page.label}  />
-              </ListItem>
-            ) }
+          {
+          getPages().map((page, index) =>
+                <ListItem
+                  key={index}
+                  button
+                  onClick={ (event) => {
+                    handleListItemClick(page.path)
+                  } }
+                  selected={ index === props.props.selectedIndex }
+                >
+                  <ListItemIcon>
+                    <page.icon />
+                  </ListItemIcon>
+                  <ListItemText primary={page.label}  />
+                </ListItem>
+              )
+            }
             <Divider />
             <ListItem
                 button
