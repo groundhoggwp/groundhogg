@@ -150,16 +150,21 @@ const Chart = (props) => {
   const chartContainer = useRef(null);
   const [chartInstance, setChartInstance] = useState(null);
   console.log(props);
+  console.log(props.data.chart.type);
 
   let chartConfig = lineChartConfig;
-  if (props.type === "line") {
+  let chartType = props.data.chart.type;
+  let data = props.data.chart.data;
+
+  if (chartType === "line") {
     chartConfig = lineChartConfig;
-  } else if (props.type === "doughnut") {
-    console.log("donut");
+  } else if (chartType === "doughnut") {
     chartConfig = doughnutChart;
   }
+  chartConfig.type =  chartType
+  chartConfig.data =  data
 
-  chartConfig.type = props.type;
+
 
   useEffect(() => {
     if (chartContainer && chartContainer.current) {
