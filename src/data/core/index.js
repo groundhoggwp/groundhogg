@@ -4,6 +4,7 @@
 import * as selectors from './selectors';
 import * as actions from './actions';
 import reducer from './reducer';
+import applyMiddlewares from './middlewares';
 
 import {
 	registerBaseObjectStore,
@@ -12,11 +13,14 @@ import {
 
 const STORE_NAME = 'core';
 
-registerBaseObjectStore( STORE_NAME, {
+const store = registerBaseObjectStore( STORE_NAME, {
 	selectors,
 	actions,
-	reducer
+	reducer,
+	persist: [ 'preferences' ],
 } );
+
+applyMiddlewares( store );
 
 export const CORE_STORE_NAME = getStoreName( STORE_NAME );
 
