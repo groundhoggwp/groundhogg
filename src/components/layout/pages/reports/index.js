@@ -28,30 +28,27 @@ const useStyles = makeStyles((theme) => ({
 export function Reports (props) {
   const classes = useStyles();
   const storeName = 'gh/v4/reports';
-  // const [perPage, setPerPage] = useState(10)
-  // const [page, setPage] = useState(1)
-  // const [order, setOrder] = useState('asc')
-  // const [orderBy, setOrderBy] = useState('ID')
-  // const [selected, setSelected] = useState([])
 
-  const { items, getItems, isRequesting, isUpdating } = useSelect((select) => {
-    const store = select(storeName)
+  const {
+    reports,
+    getAllReports,
+    // isRequesting
+  } = useSelect((select) => {
+    const store = select(REPORTS_STORE_NAME)
 
     return {
-      items: store.getItems( {
-        limit: 10
-      } ),
-      getItems: store.getItems,
-      isRequesting: store.isItemsRequesting(),
-      isUpdating: store.isItemsUpdating(),
+      reports: store.getAllReports(),
+      // isRequesting: store.isItemsRequesting(),
     }
-  }, [])
+  }, [] )
 
-  const { fetchItems } = useDispatch( storeName );
+  const {
+    fetchItems,
+    // deleteItems
+  } = useDispatch( REPORTS_STORE_NAME );
 
-  // fetchItems( { limit : 10 } )
 
-  // @todo: Almsot certainly refactor this.
+  console.log('reports', reports)
   const tabs = [
     {
       label : __( 'Overview' ),

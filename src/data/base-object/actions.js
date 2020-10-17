@@ -107,6 +107,7 @@ export default (endpoint) => ( {
 
     try {
       const result = yield apiFetch({
+        // path: '/gh/v4/reports?start=2019-10-06&end=2020-10-06',
         path: addQueryArgs( `${ endpoint }`, query ),
       })
 

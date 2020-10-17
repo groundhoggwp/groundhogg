@@ -6,38 +6,17 @@ import TYPES from './action-types';
 const reports = (
 	state = {
 		itemErrors: {},
-		items: {},
+		reports: {},
 		statErrors: {},
-		stats: {},
+		// stats: {},
 	},
 	{ type, items, stats, error, resourceName }
 ) => {
 	switch ( type ) {
-		case TYPES.SET_REPORT_ITEMS:
+		case TYPES.FETCH_ALL_REPORTS:
 			return {
 				...state,
-				items: { ...state.items, [ resourceName ]: items },
-			};
-		case TYPES.SET_REPORT_STATS:
-			return {
-				...state,
-				stats: { ...state.stats, [ resourceName ]: stats },
-			};
-		case TYPES.SET_ITEM_ERROR:
-			return {
-				...state,
-				itemErrors: {
-					...state.itemErrors,
-					[ resourceName ]: error,
-				},
-			};
-		case TYPES.SET_STAT_ERROR:
-			return {
-				...state,
-				statErrors: {
-					...state.statErrors,
-					[ resourceName ]: error,
-				},
+				items: { ...state.reports, [ resourceName ]: reports },
 			};
 		default:
 			return state;

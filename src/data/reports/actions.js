@@ -4,42 +4,41 @@
 import { getResourceName } from '../utils';
 import TYPES from './action-types';
 
-export function setReportItemsError( endpoint, query, error ) {
-	const resourceName = getResourceName( endpoint, query );
-
-	return {
-		type: TYPES.SET_ITEM_ERROR,
-		resourceName,
-		error,
-	};
+function getAllReports (reports) {
+  return {
+    type: TYPES.FETCH_ALL_REPORTS,
+    reports,
+  }
 }
 
-export function setReportItems( endpoint, query, items ) {
-	const resourceName = getResourceName( endpoint, query );
+export default (endpoint) => ( {
 
-	return {
-		type: TYPES.SET_REPORT_ITEMS,
-		resourceName,
-		items,
-	};
-}
+  endpoint,
+	getAllReports,
+	// receiveItem,
+	// setIsRequestingItems,
+	// setRequestingError,
 
-export function setReportStats( endpoint, query, stats ) {
-	const resourceName = getResourceName( endpoint, query );
+  * getAllReports ( query ){
+    // yield setIsRequestingItems(true)
 
-	return {
-		type: TYPES.SET_REPORT_STATS,
-		resourceName,
-		stats,
-	};
-}
+    try {
+      const result = yield apiFetch({
+        path: '/gh/v4/reports?start=2019-10-06&end=2020-10-06',
+        // path: addQueryArgs( `${ endpoint }`, query ),
+      })
 
-export function setReportStatsError( endpoint, query, error ) {
-	const resourceName = getResourceName( endpoint, query );
+			console.log('inside result', result)
 
-	return {
-		type: TYPES.SET_STAT_ERROR,
-		resourceName,
-		error,
-	};
-}
+      // yield setIsRequestingItems(false)
+      yield {
+        type: TYPES.FETCH_ALL_REPORTS,
+        items: result.reports,
+        // totalItems: result.total_items
+      }
+    }
+    catch (e) {
+      // yield setCreatingError(e)
+    }
+  },
+} )
