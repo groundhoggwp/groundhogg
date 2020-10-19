@@ -143,7 +143,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @param $step Step
 	 */
 	public function add_parent_step( $step ){
-		if ( ! $step || ! $step->exists() || in_array( $step, $this->parent_steps ) ){
+		if ( ! $step || ! $step->exists() || in_array( $step->get_id(), $this->parent_steps ) ){
 			return;
 		}
 
@@ -152,8 +152,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$this->update( [
 			'parent_steps' => $this->parent_steps
 		] );
-
-//		$step->add_child_step( $this );
 	}
 
 	/**
@@ -169,8 +167,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$this->update( [
 			'child_steps' => $this->child_steps
 		] );
-
-//		$step->add_parent_step( $this );
 	}
 
 	/**
@@ -184,8 +180,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$this->update( [
 			'parent_steps' => array_diff( $this->parent_steps, [ $step->get_id() ] )
 		] );
-
-//		$step->remove_child_step( $this );
 	}
 
 	/**
@@ -199,20 +193,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$this->update( [
 			'child_steps' => array_diff( $this->child_steps, [ $step->get_id() ] )
 		] );
-
-//		$step->remove_parent_step( $this );
-	}
-
-	public function create( $data = [] ) {
-		parent::create( $data );
-
-//		foreach ( $this->get_parent_steps() as $parent ){
-//			$parent->add_child_step( $this );
-//		}
-//
-//		foreach ( $this->get_child_steps() as $step ){
-//			$step->add_parent_step( $this );
-//		}
 	}
 
 	protected function sanitize_columns( $data = [] ) {

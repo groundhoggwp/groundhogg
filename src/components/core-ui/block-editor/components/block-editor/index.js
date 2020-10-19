@@ -14,7 +14,15 @@ import {
 	BlockInspector,
 	WritingFlow,
 	ObserveTyping,
+	Typewriter,
+	CopyHandler,
+	BlockSelectionClearer,
+	MultiSelectScrollIntoView,
 } from '@wordpress/block-editor';
+
+import {
+	VisualEditorGlobalKeyboardShortcuts,
+} from '@wordpress/editor';
 
 import { Popover } from '@wordpress/components';
 
@@ -96,15 +104,23 @@ function BlockEditor( { settings: _settings } ) {
 						<TextField className={ classes.subjectInputs } value="Subject" />
 						<TextField className={ classes.subjectInputs } placeholder={ __( 'Pre Header Text: Used to summarize the content of the email.' ) } />
 						<Paper>
-							<div className="editor-styles-wrapper">
+							<BlockSelectionClearer
+					className="edit-post-visual-editor editor-styles-wrapper"
+							>
+								<VisualEditorGlobalKeyboardShortcuts />
+								<MultiSelectScrollIntoView />
 								<Popover.Slot name="block-toolbar" />
 								<BlockEditorKeyboardShortcuts.Register />
-								<WritingFlow>
-									<ObserveTyping>
-										<BlockList />
-									</ObserveTyping>
-								</WritingFlow>
-							</div>
+								<Typewriter>
+									<CopyHandler>
+										<WritingFlow>
+											<ObserveTyping>
+												<BlockList />
+											</ObserveTyping>
+										</WritingFlow>
+									</CopyHandler>
+								</Typewriter>
+							</BlockSelectionClearer>
 						</Paper>
 					</Grid>
 					<Sidebar.InspectorFill>
