@@ -86,6 +86,5 @@ export default function Header( { email } ) {
 			</HeaderToolbar>
 		</div>
 		</Fragment>
-
 	);
 }

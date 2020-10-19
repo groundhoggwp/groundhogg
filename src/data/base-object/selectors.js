@@ -8,14 +8,14 @@ export const getItem = ( state, id=false ) => {
 	if ( state.extendedReducer ) {
 
 		if ( id && state.reducer.items ){
-			return state.reducer.items.find( _item => _item.ID === id );
+			return state.reducer.items.find( _item => _item.ID === id ) || state.reducer.item;
 		}
 
 		return state.reducer.item;
 	}
 
 	if ( id && state.items ){
-		return state.items.find( _item => _item.ID === id );
+		return state.items.find( _item => _item.ID === id ) || state.item;
 	}
 
 	return state.item;

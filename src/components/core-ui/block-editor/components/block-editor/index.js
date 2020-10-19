@@ -14,7 +14,17 @@ import {
 	BlockInspector,
 	WritingFlow,
 	ObserveTyping,
+	Typewriter,
+	CopyHandler,
+	BlockSelectionClearer,
+	MultiSelectScrollIntoView,
 } from '@wordpress/block-editor';
+
+import {
+	VisualEditorGlobalKeyboardShortcuts,
+} from '@wordpress/editor';
+
+import { Popover } from '@wordpress/components';
 
 /**
  * External dependencies
@@ -94,14 +104,23 @@ function BlockEditor( { settings: _settings } ) {
 						<TextField className={ classes.subjectInputs } value="Subject" />
 						<TextField className={ classes.subjectInputs } placeholder={ __( 'Pre Header Text: Used to summarize the content of the email.' ) } />
 						<Paper>
-							<div className="editor-styles-wrapper">
-								<BlockEditorKeyboardShortcuts />
-								<WritingFlow>
-									<ObserveTyping>
-										<BlockList className="groundhogg-block-editor__block-list" />
-									</ObserveTyping>
-								</WritingFlow>
-							</div>
+							<BlockSelectionClearer
+					className="edit-post-visual-editor editor-styles-wrapper"
+							>
+								<VisualEditorGlobalKeyboardShortcuts />
+								<MultiSelectScrollIntoView />
+								<Popover.Slot name="block-toolbar" />
+								<BlockEditorKeyboardShortcuts.Register />
+								<Typewriter>
+									<CopyHandler>
+										<WritingFlow>
+											<ObserveTyping>
+												<BlockList />
+											</ObserveTyping>
+										</WritingFlow>
+									</CopyHandler>
+								</Typewriter>
+							</BlockSelectionClearer>
 						</Paper>
 					</Grid>
 					<Sidebar.InspectorFill>

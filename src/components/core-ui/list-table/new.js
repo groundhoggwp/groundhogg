@@ -240,7 +240,7 @@ export function ListTable ({
 
                 if (quickEditId === item.ID) {
                   return (
-                    <TableCell colSpan={columns.length + 1 }>
+                    <TableCell colSpan={columns.length + 1 } key={item.ID}>
                       <QuickEdit
                         {...item}
                         exitQuickEdit={()=>setQuickEditId(null)}
@@ -258,7 +258,7 @@ export function ListTable ({
                         inputProps={ { 'aria-label': 'select' } }
                       />
                     </TableCell>
-                    { columns.map(col => <TableCell align={ col.align }>
+                    { columns.map( ( col, index ) => <TableCell key={index} align={ col.align }>
                       <col.cell
                         { ...item }
                         openQuickEdit={()=>setQuickEditId(item.ID)}
@@ -331,8 +331,8 @@ function TableToolbar (props) {
         </Typography>
       ) }
 
-      { numSelected > 0 ? bulkActions.map(action => (
-        <Tooltip title={ action.title }>
+      { numSelected > 0 ? bulkActions.map( ( action, index )  => (
+        <Tooltip key={ index } title={ action.title }>
           <IconButton
             aria-label={ action.action }
             onClick={ (e) => onBulkAction(e, action.action) }
@@ -380,8 +380,9 @@ function TableHeader (props) {
           />
         </TableCell>
         {
-          columns.map(col => <HeaderTableCell
+          columns.map( ( col, index ) => <HeaderTableCell
             column={ col }
+            key={ index }
             currentOrderBy={ orderBy }
             order={ order }
             handleReOrder={ handleReOrder }

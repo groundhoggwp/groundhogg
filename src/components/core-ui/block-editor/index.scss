@@ -47,6 +47,9 @@
 
 .groundhogg-block-editor {
 	top: 140px;
+	padding-bottom: 280px;
+	overflow-y: auto;
+	overflow-x: hidden;
 }
 
 // Custom CSS Begins
@@ -56,5 +59,25 @@
 	max-width: 1600px;
 	.interface-interface-skeleton__sidebar {
 		top: 10px;
+	}
+}
+.edit-post-text-editor {
+	position: relative;
+	width: 100%;
+	background-color: #fff;
+	flex-grow: 1;
+}
+
+.edit-post-text-editor__body {
+	width: 100%;
+	max-width: 1080px;
+	padding: 0 24px 24px;
+	margin-left: auto;
+	margin-right: auto;
+
+	// This needs specificity to change the title block appearance on the code editor.
+	.editor-post-title__input.editor-post-title__input.editor-post-title__input {
+		font-family: "Menlo,Consolas,monaco,monospace";
+		font-size: 2em;
 	}
 }

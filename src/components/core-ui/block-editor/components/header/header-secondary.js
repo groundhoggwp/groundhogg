@@ -1,4 +1,7 @@
-import { __, _x } from '@wordpress/i18n';
+
+/**
+ * External dependencies
+ */
 import Button from '@material-ui/core/Button'
 import CodeIcon from '@material-ui/icons/Code';
 import LineStyleIcon from '@material-ui/icons/LineStyle';
@@ -8,30 +11,50 @@ import ChromeReaderModeIcon from '@material-ui/icons/ChromeReaderMode';
 import DesktopMacIcon from '@material-ui/icons/DesktopMac';
 import SmartphoneIcon from '@material-ui/icons/Smartphone';
 import UpdateIcon from '@material-ui/icons/Update';
-import { useRef, Fragment } from '@wordpress/element';
+
+/**
+ * WordPress dependencies
+ */
+import { __, _x } from '@wordpress/i18n';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { Fragment } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
 import ToolbarItem from './toolbar-item'; // Stop-gap while WP catches up.
+import Dialog from '../dialog';
+import { CORE_STORE_NAME } from 'data/core';
 
 function HeaderSecondary() {
-	const inserterButton = useRef();
 
-	/* const { setIsInserterOpened } = useDispatch( 'core/edit-post' ); */ // Consider adding to core actions
-	const isInserterOpened = false;
-	const isTextModeEnabled = false;
-	const showIconLabels = false;
-	const isInserterEnabled = false; // May connect to GH core state.
+	const {
+		editorMode,
+		isInserterEnabled,
+	} = useSelect(
+		( select ) => ( {
+				editorMode: select( CORE_STORE_NAME ).getEditorMode(),
+				isInserterOpened: select( CORE_STORE_NAME ).isInserterOpened(),
+			} ),
+		[]
+	);
+
+	const {
+		switchEditorMode,
+		setIsInserterOpened
+	} = useDispatch( CORE_STORE_NAME );
+
+	const isTextModeEnabled = editorMode !== 'visual';
 
 	return (
 		<Fragment>
 			<ToolbarItem
-				ref={ inserterButton }
 				as={ Button }
 				className="groundhogg-header-toolbar__mode-toggle"
 				variant="contained"
 				color="primary"
 				size="small"
-				onMouseDown={ ( event ) => {
-					event.preventDefault();
-				} }
+				onClick={ () => switchEditorMode( isTextModeEnabled ? 'visual' : 'text' ) }
 				startIcon={ ( isTextModeEnabled ) ? <LineStyleIcon /> : <CodeIcon /> }
 				/* translators: button label text should, if possible, be under 16
 		characters. */
@@ -43,7 +66,6 @@ function HeaderSecondary() {
 				{ __( 'Editor Mode' ) }
 			</ToolbarItem>
 			<ToolbarItem
-				ref={ inserterButton }
 				as={ Button }
 				className="groundhogg-header-toolbar__broadcast-link"
 				variant="contained"
@@ -63,47 +85,36 @@ function HeaderSecondary() {
 				{ __( 'Broadcast' ) }
 			</ToolbarItem>
 			<ToolbarItem
-				ref={ inserterButton }
-				as={ Button }
+				as={ Dialog }
 				className="groundhogg-header-toolbar__replacements-modal"
-				variant="contained"
-				color="primary"
-				size="small"
-				onMouseDown={ ( event ) => {
-					event.preventDefault();
-				} }
-				startIcon={ <FindReplaceIcon /> }
+				buttonIcon={ <FindReplaceIcon /> }
+				buttonTitle={ __( 'Replacements' ) }
+				title={ __( 'Replacements' ) }
+				content={ __( 'Replacements Table. TBD on how we want to parse this in here.' ) }
+				dialogButtons={ [ { color: 'primary', label: __( 'Insert' ) } ] }
 				/* translators: button label text should, if possible, be under 16
 		characters. */
 				label={ _x(
 					'Open replacements list',
 					'Generic label for replacements button'
 				) }
-			>
-				{ __( 'Replacements' ) }
-			</ToolbarItem>
+			/>
 			<ToolbarItem
-				ref={ inserterButton }
-				as={ Button }
+				as={ Dialog }
+				buttonIcon={ <ChromeReaderModeIcon /> }
 				className="groundhogg-header-toolbar__alt-body-modal"
-				variant="contained"
-				color="primary"
-				size="small"
-				onMouseDown={ ( event ) => {
-					event.preventDefault();
-				} }
-				startIcon={ <ChromeReaderModeIcon /> }
 				/* translators: button label text should, if possible, be under 16
 		characters. */
+				buttonTitle={ __( 'Email Alt-Body' ) }
+				title={ __( 'Email Alt-Body' ) }
+				content={ __( 'Alt Body Content. Will need to build out custom component here.' ) }
+				dialogButtons={ [ { color: 'primary', label: __( 'Done' ) } ] }
 				label={ _x(
 					'Open replacements list',
 					'Generic label for replacements button'
 				) }
-			>
-				{ __( 'Alt-Body' ) }
-			</ToolbarItem>
+			/>
 			<ToolbarItem
-				ref={ inserterButton }
 				as={ Button }
 				className="groundhogg-header-toolbar__update-and-test"
 				variant="contained"
@@ -123,13 +134,11 @@ function HeaderSecondary() {
 				{ __( 'Update and Test' ) }
 			</ToolbarItem>
 			<ToolbarItem
-				ref={ inserterButton }
 				as={ Button }
 				size="small"
 				className="groundhogg-header-toolbar__mobile-device-toggle"
 				variant="contained"
 				color="secondary"
-				isPressed={ isInserterOpened }
 				onMouseDown={ ( event ) => {
 					event.preventDefault();
 				} }
@@ -142,7 +151,6 @@ function HeaderSecondary() {
 				) }
 			></ToolbarItem>
 			<ToolbarItem
-				ref={ inserterButton }
 				as={ Button }
 				className="groundhogg-header-toolbar__large-device-toggle"
 				variant="contained"

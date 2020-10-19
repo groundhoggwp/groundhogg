@@ -37,7 +37,11 @@ const getGroundhoggMeta = ( user ) => {
 export const useUserPreferences = () => {
 	// Get our dispatch methods now - this can't happen inside the callback below.
 	const dispatch = useDispatch( STORE_NAME );
-	const { addEntities, receiveCurrentUser, saveEntityRecord } = dispatch;
+	const {
+		addEntities,
+		receiveCurrentUser,
+		saveEntityRecord
+	} = dispatch;
 	let { saveUser } = dispatch;
 
 	const { isRequesting, userPreferences, updateUserPreferences } = useSelect(
@@ -65,6 +69,7 @@ export const useUserPreferences = () => {
 					'wpgh_user_secret_key',
 					'dismissed_wp_pointers',
 					'gh_free_extension_checkout_link',
+					'block_editor_mode',
 				] );
 
 				// Prep valid fields for update.
