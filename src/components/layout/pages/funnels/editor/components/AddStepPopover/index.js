@@ -14,7 +14,6 @@ export default (props) => {
       open={open}
       anchorEl={target}
       onClose={onClose}
-      style={{width:500}}
       anchorOrigin={{
         vertical: 'center',
         horizontal: 'right',
