@@ -1,8 +1,9 @@
-import { registerCoreBlocks } from '@wordpress/block-library';
 import Editor from './editor';
 import './index.scss';
-import './components/blocks/index.js';
-
+import './components/blocks';
+import {
+	setDefaultBlockName,
+} from '@wordpress/blocks';
 /**
  * Block Editor component
  *
@@ -10,8 +11,6 @@ import './components/blocks/index.js';
  * @todo Determine how tightly to couple Block Editor to "email"
  */
 export default function EditorComponent( { email } ) {
-
-  // @todo: we should be able to do away with this once we've registered our own blocks
-  // registerCoreBlocks();
+  setDefaultBlockName( 'groundhogg/paragraph' );
   return ( <Editor email={email} settings={ window.Groundhogg.preloadSettings } /> );
 }
