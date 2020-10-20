@@ -3,12 +3,9 @@ import Box from '@material-ui/core/Box'
 import TextField from '@material-ui/core/TextField/TextField'
 import Grid from '@material-ui/core/Grid'
 import makeStyles from '@material-ui/core/styles/makeStyles'
-import Paper from '@material-ui/core/Paper/Paper'
-import { select, useDispatch, useSelect } from '@wordpress/data'
-import { STEPS_STORE_NAME } from 'data/steps'
-import { FUNNELS_STORE_NAME } from 'data/funnels'
 import Button from '@material-ui/core/Button'
-import { useEffect } from '@wordpress/element'
+import { useDispatch } from '@wordpress/data'
+import { FUNNELS_STORE_NAME } from 'data/funnels'
 
 const useStyles = makeStyles((theme) => ( {
   box: {
@@ -48,60 +45,7 @@ export default (props) => {
 
   const classes = useStyles()
   const [search, setSearch] = useState('')
-  const { createItems, updateItems } = useDispatch(STEPS_STORE_NAME)
-
-  // Get the current If of the funnel
-  const { ID } = select(FUNNELS_STORE_NAME).getItem()
-
-  // Get the current state of the steps
-  const { items, createdItems } = useSelect((select) => {
-    return {
-      items: select(STEPS_STORE_NAME).getItems(),
-      createdItems: select(STEPS_STORE_NAME).getCreatedItems(),
-    }
-  }, [])
-
-  // List for when items change
-  useEffect(() => {
-
-    if ( ! createdItems ){
-      return;
-    }
-
-    const itemsToUpdate = [];
-    const newStepId = createdItems.pop().ID
-
-    parentSteps.forEach( parent => {
-
-      const { child_steps } = select( STEPS_STORE_NAME ).getItem( parent ).data;
-
-      itemsToUpdate.push( {
-        ID: parent,
-        data: {
-          // remove edge from parent to child
-          // add new edge from parent to new child
-          child_steps: child_steps.filter( child => ! childSteps.includes( child ) ).push( newStepId ),
-        }
-      } )
-    } )
-
-    childSteps.forEach( child => {
-
-      const { parent_steps } = select( STEPS_STORE_NAME ).getItem( child ).data;
-
-      itemsToUpdate.push( {
-        ID: child,
-        data: {
-          // remove edge from child to parent
-          // add new edge from child to new parent
-          parent_steps: parent_steps.filter( parent => ! parentSteps.includes( parent ) ).push( newStepId ),
-        }
-      } )
-    } )
-
-    updateItems( itemsToUpdate );
-
-  }, [createdItems])
+  const { createStep } = useDispatch( FUNNELS_STORE_NAME );
 
   // reduce step types into rows of three
   const reducer = (acc, curr) => {
@@ -123,14 +67,9 @@ export default (props) => {
       step_group: stepGroup,
       child_steps: childSteps || [],
       parent_steps: parentSteps || [],
-      funnel_id: ID,
     }
 
-    createItems([
-      {
-        data: newStepData,
-      },
-    ])
+    createStep( newStepData );
   }
 
   return (

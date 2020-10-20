@@ -8,7 +8,7 @@ import AddStepButton from './components/AddStepButton'
 import StepBlock from './components/StepBlock'
 import Paper from '@material-ui/core/Paper'
 import './steps-types'
-import { ArcherContainer } from 'react-archer'
+import { ArcherContainer, ArcherElement } from 'react-archer'
 
 const ChartLine = ({ from, to }) => {
   return (
@@ -32,8 +32,6 @@ function buildChart (startNodes, allNodes) {
   startNodes.forEach(node => node.level = currentLevel)
   let chart = [[]]
   const queue = startNodes
-
-  console.log(queue)
 
   while (queue.length) {
     let currentNode = queue.shift()
@@ -74,11 +72,6 @@ function buildChart (startNodes, allNodes) {
     // Mark all the nodes of the level as visited
     level.forEach(node => visited.push(node))
 
-    console.log({
-      level,
-      visited,
-    })
-
     return level
   })
 
@@ -101,8 +94,6 @@ export default (props) => {
 
   const chart = buildChart(startingSteps, steps)
 
-  console.log(chart)
-
   return (
     <>
       <ArcherContainer strokeColor={ '#e5e5e5' }>
@@ -116,16 +107,29 @@ export default (props) => {
           )
         }
         {
-          chart.map( levels => {
+          chart.map((levels, l) => {
             return (
               <Box display={ 'flex' } justifyContent={ 'space-around' }>
                 {
-                  levels.map( step => step && <StepBlock { ...step }/> )
+                  levels.map((step, s) => {
+                      return (
+                        <>
+                          <StepBlock { ...step }/>
+                        </> )
+                    },
+                  )
                 }
               </Box>
             )
           })
         }
+        <Box display={ 'flex' } justifyContent={ 'space-around' }>
+          <ArcherElement id={ 'exit' }>
+            <Card>
+              { 'Exit Funnel!' }
+            </Card>
+          </ArcherElement>
+        </Box>
       </ArcherContainer>
     </>
   )
