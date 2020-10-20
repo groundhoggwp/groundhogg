@@ -16,3 +16,4 @@ import './button';
 import  './image';
 // import  './text-block/index-material.js';
 import  './heading';
+import  './paragraph';
