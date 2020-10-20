@@ -61,7 +61,7 @@ export default (props) => {
   return (
     <>
       <Box>
-        {parent_steps.length > 0 &&
+        {parent_steps.length > 1 &&
         <Box display={'flex'} justifyContent={'center'} className={classNames.addStepButton}>
           <AddStepButton
             parentSteps={parent_steps}
@@ -106,7 +106,7 @@ export default (props) => {
             </Card>
           </ArcherElement>
         </Box>
-        {child_steps.length <= 1 &&
+        { step_group !== 'condition' &&
         <Box display={'flex'} justifyContent={'center'} className={classNames.addStepButton}>
           <AddStepButton
             parentSteps={[ID]}

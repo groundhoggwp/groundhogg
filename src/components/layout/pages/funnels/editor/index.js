@@ -26,82 +26,68 @@ const ChartLine = ({ from, to }) => {
  * @param startNodes
  * @param allNodes
  */
-function buildChart( startNodes, allNodes ){
+function buildChart (startNodes, allNodes) {
 
-  let currentLevel = 0;
-  startNodes.forEach( node => node.level = currentLevel );
-  const chart = [[]];
-  const queue = startNodes;
+  let currentLevel = 0
+  startNodes.forEach(node => node.level = currentLevel)
+  const chart = [[]]
+  const queue = startNodes
 
-  console.log( queue );
+  console.log(queue)
 
-  while ( queue.length ){
-    let currentNode = queue.shift();
+  while (queue.length) {
+    let currentNode = queue.shift()
 
     // Increase the level and add an array to the chart
-    if ( currentNode.level > currentLevel ){
-      currentLevel++;
+    if (currentNode.level > currentLevel) {
+      currentLevel++
       chart.push([])
     }
 
-    // Only if the node is not already part of the chart and is not queued up for later
-    if ( ! chart[currentLevel].find( node => node.ID === currentNode.ID ) && ! queue.find( node => node.ID === currentNode.ID ) ){
-      chart[currentLevel].push( currentNode );
+    // Only if the node is not already part of the chart and is not queued up
+    // for later
+    if (!chart[currentLevel].find(node => node.ID === currentNode.ID) &&
+      !queue.find(node => node.ID === currentNode.ID)) {
+      chart[currentLevel].push(currentNode)
     }
 
     // Get the child nodes
-    let childNodes = allNodes.filter( node => currentNode.data.child_steps.includes( node.ID ) );
+    let childNodes = allNodes.filter(
+      node => currentNode.data.child_steps.includes(node.ID))
 
     // queue up the child nodes
-    childNodes.forEach( ( node ) => {
-      node.level = currentLevel + 1;
-      queue.push( node )
+    childNodes.forEach((node) => {
+      node.level = currentLevel + 1
+      queue.push(node)
     })
   }
 
-  return chart;
+  return chart
 }
 
 export default (props) => {
 
   const { funnel } = props
-  const { ID, data } = funnel
+  const { ID, data, steps } = funnel
 
-  const stepQuery = {
-    where: {
-      funnel_id: ID,
-    },
-    limit: 999
-  };
-
-  const { fetchItems } = useDispatch( STEPS_STORE_NAME )
-  const { steps } = useSelect((select) => {
-
-    const store = select(STEPS_STORE_NAME)
-
-    return {
-      steps: store.getItems(stepQuery),
-    }
-
-  }, [])
-
-  if ( ! steps ){
-    return '...loading';
+  if (!steps) {
+    return '...loading'
   }
 
-  const startingSteps = steps.filter( step => step.data.parent_steps.length === 0 );
+  const startingSteps = steps.filter(
+    step => step.data.parent_steps.length === 0)
 
-  const chart = buildChart( startingSteps, steps );
+  const chart = buildChart(startingSteps, steps)
 
-  console.log( chart );
+  console.log(chart)
 
   return (
     <>
-      <ArcherContainer strokeColor={'#e5e5e5'}>
+      <ArcherContainer strokeColor={ '#e5e5e5' }>
         {
           chart[0].length === 0 && (
             <Box display={ 'flex' } justifyContent={ 'center' }>
-              <Paper style={{width:500}}>
+              <Paper style={ { width: 500 } }>
                 <BenchmarkPicker/>
               </Paper>
             </Box>

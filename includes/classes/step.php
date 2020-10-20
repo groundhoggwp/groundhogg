@@ -148,10 +148,12 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			return;
 		}
 
-		$this->parent_steps[] = $step->get_id();
+		$parents = $this->parent_steps;
+
+		array_push( $parents, $step->get_id() );
 
 		$this->update( [
-			'parent_steps' => $this->parent_steps
+			'parent_steps' => $parents
 		] );
 	}
 
@@ -159,14 +161,17 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @param $step Step
 	 */
 	public function add_child_step( $step ) {
+
 		if ( ! $step || ! $step->exists() || in_array( $step->get_id(), $this->child_steps ) ) {
 			return;
 		}
 
-		$this->child_steps[] = $step->get_id();
+		$children = $this->child_steps;
+
+		array_push( $children, $step->get_id() );
 
 		$this->update( [
-			'child_steps' => $this->child_steps
+			'child_steps' => $children
 		] );
 	}
 
