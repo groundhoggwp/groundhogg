@@ -240,9 +240,13 @@ class React_App {
 		$settings['allowedBlockTypes'] = apply_filters(
 			'groundhogg/email_editor/allowed_block_types',
 			[
-				'core/paragraph',
-				'core/image',
-				'core/heading'
+				'groundhogg/paragraph',
+				'groundhogg/spacer',
+				'groundhogg/divider',
+				'groundhogg/html',
+				'groundhogg/button',
+				'groundhogg/image',
+				'groundhogg/heading',
 			] // Adding this for now, until we have our own block implementations.
 		);
 
