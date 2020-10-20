@@ -9,7 +9,7 @@ import TextField from '@material-ui/core/TextField'
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, Fragment } from '@wordpress/element';
 import {
 	PinnedItems,
@@ -18,12 +18,18 @@ import {
 /**
  * Internal dependencies
  */
-import { CORE_STORE_NAME } from 'data/core';
+import {
+	CORE_STORE_NAME,
+	EMAILS_STORE_NAME
+} from 'data';
 import HeaderToolbar from './header-toolbar';
 import HeaderPrimary from './header-primary';
 import HeaderSecondary from './header-secondary';
+import { Spinner } from  'components';
 
 export default function Header( { email } ) {
+	const dispatch = useDispatch( EMAILS_STORE_NAME );
+
 	const [ titleToggle, setTitleToggle ] = useState( false );
 
 	const onClick = () => true;
@@ -34,12 +40,19 @@ export default function Header( { email } ) {
 
 	const {
 		isSaving,
+		item
 	} = useSelect(
 		( select ) => ( {
 				isSaving: select( CORE_STORE_NAME ).isItemsUpdating(),
+				item: select( EMAILS_STORE_NAME ).getItem( email.ID ),
 			} ),
 		[]
 	);
+
+	const handleTitle = (e) => {
+		dispatch.updateItem( email.ID, { data: { title : e.target.value } } );
+		toggleTitleEdit();
+	}
 
 	return (
 		<Fragment>
@@ -56,14 +69,15 @@ export default function Header( { email } ) {
 							<h1 className="groundhogg-header__title">
 								{ ! titleToggle &&
 									<span onClick={ toggleTitleEdit }>
-										{ __( 'Now Editing  ', 'groundhogg' ) + email.data.title }
+										{ __( 'Now Editing  ', 'groundhogg' ) + item.data.title }
 									</span>
 								}
 								{ titleToggle &&
-									<TextField value={ email.data.title } onBlur={ toggleTitleEdit } />
+									<TextField defaultValue={ item.data.title } onBlur={ handleTitle } />
 								}
 							</h1>
 							<div className="groundhogg-header__settings edit-post-header__settings">
+								{ isSaving && <Spinner /> }
 								<Button onClick={onClick} variant="contained" color="secondary">{ __( 'Save Draft' ) }</Button>
 								<Button onClick={onClick} variant="contained" color="primary">{ __( 'Publish' ) }</Button>
 								<Button onClick={onClick} variant="contained" color="secondary">{ __( 'Close' ) }</Button>

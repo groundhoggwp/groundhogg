@@ -16,8 +16,9 @@ import Tooltip from '@material-ui/core/Tooltip'
 import makeStyles from '@material-ui/core/styles/makeStyles'
 import { ArcherElement } from 'react-archer'
 import {
-  BENCHMARK,
-  CONDITION,
+  ACTION, ACTIONS,
+  BENCHMARK, BENCHMARKS,
+  CONDITION, CONDITIONS,
 } from 'components/layout/pages/funnels/editor/steps-types/constants'
 import { FUNNELS_STORE_NAME } from 'data/funnels'
 
@@ -84,6 +85,10 @@ export default (props) => {
           <AddStepButton
             parentSteps={ parent_steps }
             childSteps={ [ID] }
+            showGroups={[
+              BENCHMARKS,
+              ACTIONS
+            ]}
           />
         </Box> }
         <Box display={ 'flex' } justifyContent={ 'center' }>
@@ -122,6 +127,9 @@ export default (props) => {
             <AddStepButton
               parentSteps={ parent_steps }
               childSteps={ child_steps }
+              showGroups={[
+                BENCHMARKS
+              ]}
             />
           </Box> }
         </Box>
@@ -131,6 +139,11 @@ export default (props) => {
           <AddStepButton
             parentSteps={ [ID] }
             childSteps={ child_steps }
+            showGroups={[
+              step_group === ACTION ? BENCHMARKS : false,
+              ACTIONS,
+              CONDITIONS,
+            ].filter( item => item !== false )}
           />
         </Box> }
       </Box>

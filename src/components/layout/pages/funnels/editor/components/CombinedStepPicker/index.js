@@ -2,49 +2,66 @@ import Tabs from '@material-ui/core/Tabs'
 import Tab from '@material-ui/core/Tab'
 import AppBar from '@material-ui/core/AppBar'
 import { useState } from '@wordpress/element'
-import BenchmarkPicker from '../BenchmarkPicker';
-import ActionPicker from '../ActionPicker';
+import BenchmarkPicker from '../BenchmarkPicker'
+import ActionPicker from '../ActionPicker'
+import {
+  ACTION,
+  ACTIONS,
+  BENCHMARKS, CONDITIONS,
+} from 'components/layout/pages/funnels/editor/steps-types/constants'
 
-export default (props) => {
+const CombinedStepPicker = (props) => {
 
-  const [value, setValue] = useState('benchmarks')
+  const { showGroups } = props
+  const [value, setValue] = useState( showGroups[0] )
 
   const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+    setValue(newValue)
+  }
 
-  let Picker;
+  let Picker
 
   switch (value) {
-    case 'benchmarks':
+    case BENCHMARKS:
       Picker = BenchmarkPicker
-      break;
-    case 'actions':
+      break
+    case ACTIONS:
       Picker = ActionPicker
-      break;
-    case 'conditions':
-      break;
+      break
+    case CONDITIONS:
+      Picker = ActionPicker
+      break
   }
 
   return (
     <>
-      <AppBar position={'static'}>
-        <Tabs value={value}  onChange={handleChange}>
-          <Tab
-            value={'benchmarks'}
-            label={'Benchmarks'}
-          />
-          <Tab
-            value={'actions'}
-            label={'actions'}
-          />
-          <Tab
-            value={'conditions'}
-            label={'Conditions'}
-          />
+      <AppBar position={ 'static' }>
+        <Tabs value={ value } onChange={ handleChange }>
+          { showGroups.includes( BENCHMARKS ) && <Tab
+            value={ BENCHMARKS }
+            label={ 'Benchmarks' }
+          /> }
+          { showGroups.includes( ACTIONS ) && <Tab
+            value={ ACTIONS }
+            label={ 'Actions' }
+          /> }
+          { showGroups.includes( CONDITIONS ) && <Tab
+            value={ CONDITIONS }
+            label={ 'Conditions' }
+          /> }
         </Tabs>
       </AppBar>
-      <Picker {...props}/>
+      <Picker { ...props }/>
     </>
   )
 }
+
+CombinedStepPicker.defaultProps = {
+  showGroups: [
+    BENCHMARKS,
+    ACTIONS,
+    CONDITIONS
+  ]
+}
+
+export default CombinedStepPicker

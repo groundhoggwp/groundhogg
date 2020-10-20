@@ -1,23 +1,11 @@
 import { Card } from '@material-ui/core'
 import Box from '@material-ui/core/Box'
 import LineTo from 'react-lineto'
-import { useDispatch, useSelect } from '@wordpress/data'
-import { STEPS_STORE_NAME } from 'data/steps'
 import BenchmarkPicker from './components/BenchmarkPicker'
-import AddStepButton from './components/AddStepButton'
 import StepBlock from './components/StepBlock'
 import Paper from '@material-ui/core/Paper'
 import './steps-types'
 import { ArcherContainer, ArcherElement } from 'react-archer'
-
-const ChartLine = ({ from, to }) => {
-  return (
-    <LineTo
-      from={ from + '-out' }
-      to={ to + '-in' }
-    />
-  )
-}
 
 /**
  * Breadth first search of the steps tree to build iout a row level based chart
@@ -123,13 +111,14 @@ export default (props) => {
             )
           })
         }
+        { chart[0].length > 0 &&
         <Box display={ 'flex' } justifyContent={ 'space-around' }>
           <ArcherElement id={ 'exit' }>
             <Card>
               { 'Exit Funnel!' }
             </Card>
           </ArcherElement>
-        </Box>
+        </Box> }
       </ArcherContainer>
     </>
   )
