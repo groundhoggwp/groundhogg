@@ -5,7 +5,13 @@ import Grid from '@material-ui/core/Grid'
 import makeStyles from '@material-ui/core/styles/makeStyles'
 import Button from '@material-ui/core/Button'
 import { useDispatch } from '@wordpress/data'
-import { FUNNELS_STORE_NAME } from 'data/funnels'
+
+/**
+ * Internal dependencies
+ */
+import {
+	FUNNELS_STORE_NAME
+} from 'data';
 
 const useStyles = makeStyles((theme) => ( {
   box: {
@@ -69,6 +75,7 @@ export default (props) => {
       parent_steps: parentSteps || [],
     }
 
+    console.log(newStepData)
     createStep( newStepData );
   }
 

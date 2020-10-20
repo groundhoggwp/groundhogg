@@ -1,42 +1,38 @@
 /**
  * Internal dependencies
  */
-import TYPES from './action-types';
-import { QUERY_DEFAULTS } from '../constants';
+import TYPES from './action-types'
+import BaseActions from '../base-object/actions';
 
+// import { addNotification } from '../../utils'
 
-export function addStep( itemId, step ) {
-	return {
-		type: TYPES.ADD_STEP,
-		itemId,
-		step
-	};
-}
+/**
+ * External dependencies
+ */
+import { apiFetch } from '@wordpress/data-controls'
 
-export function receieveStep( itemId ) {
-	return {
-		type: TYPES.FETCH_STEP,
-		itemId
-	};
-}
-export function receieveAllSteps( itemId, steps ) {
-	return {
-		type: TYPES.FETCH_ALL_STEPS,
-		itemId,
-		steps
-	};
-}
+export default (endpoint) => ( {
 
-export function updateSteps( itemId, step ) {
-	return {
-		type: TYPES.UPDATE_STEP,
-		itemId
-	};
-}
-export function deleteSteps( itemId, step ) {
-	return {
-		type: TYPES.DELETE_STEP,
-		itemId,
-		step
-	};
-}
+  endpoint,
+  * createStep (items) {
+    // yield setIsCreatingItems(true)
+
+    try {
+      const result = yield apiFetch({
+        method: 'POST',
+        path: `${ endpoint }`,
+        data: items,
+      })
+
+      // yield setIsCreatingItems(false)
+      yield {
+        type: TYPES.CREATE_ITEMS,
+        items: result.items,
+      }
+    }
+    catch (e) {
+      // yield setCreatingError(e)
+    }
+  },
+
+} )
