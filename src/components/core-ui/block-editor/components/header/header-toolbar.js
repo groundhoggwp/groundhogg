@@ -1,5 +1,7 @@
+/**
+ * WordPress dependencies
+ */
 import { __ } from '@wordpress/i18n';
-
 import {
 	NavigableToolbar,
 } from '@wordpress/block-editor';
