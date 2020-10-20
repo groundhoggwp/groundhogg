@@ -30,7 +30,7 @@ function buildChart (startNodes, allNodes) {
 
   let currentLevel = 0
   startNodes.forEach(node => node.level = currentLevel)
-  const chart = [[]]
+  let chart = [[]]
   const queue = startNodes
 
   console.log(queue)
@@ -57,10 +57,32 @@ function buildChart (startNodes, allNodes) {
 
     // queue up the child nodes
     childNodes.forEach((node) => {
-      node.level = currentLevel + 1
-      queue.push(node)
+      if (!queue.find(node => node.ID === currentNode.ID)) {
+        node.level = currentLevel + 1
+        queue.push(node)
+      }
     })
   }
+
+  let visited = []
+
+  // go back thru the chart and remove duplicate nodes from higher orders
+  chart = chart.reverse().map(level => {
+
+    // Check to see if the node was visited, filter the level if it was
+    level = level.filter(node => !visited.find(_node => node.ID === _node.ID))
+    // Mark all the nodes of the level as visited
+    level.forEach(node => visited.push(node))
+
+    console.log({
+      level,
+      visited,
+    })
+
+    return level
+  })
+
+  chart = chart.reverse()
 
   return chart
 }
@@ -94,11 +116,11 @@ export default (props) => {
           )
         }
         {
-          chart.map(__steps => {
+          chart.map( levels => {
             return (
               <Box display={ 'flex' } justifyContent={ 'space-around' }>
                 {
-                  __steps.map(_step => <StepBlock { ..._step }/>)
+                  levels.map( step => step && <StepBlock { ...step }/> )
                 }
               </Box>
             )

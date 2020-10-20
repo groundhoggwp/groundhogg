@@ -80,8 +80,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return void
 	 */
 	protected function post_setup() {
-		$this->parent_steps = $this->parent_steps ? wp_parse_id_list( maybe_unserialize( $this->parent_steps ) ) : [];
-		$this->child_steps  = $this->child_steps ? wp_parse_id_list( maybe_unserialize( $this->child_steps ) ) : [];
+		$this->parent_steps = $this->parent_steps ? array_values( wp_parse_id_list( maybe_unserialize( $this->parent_steps ) ) ): [];
+		$this->child_steps  = $this->child_steps ? array_values( wp_parse_id_list( maybe_unserialize( $this->child_steps ) ) ): [];
 	}
 
 	/**
