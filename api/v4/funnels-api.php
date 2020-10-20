@@ -32,11 +32,6 @@ class Funnels_Api extends Base_Object_Api {
 				'permission_callback' => [ $this, 'create_permissions_callback' ]
 			],
 			[
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'read_step' ],
-				'permission_callback' => [ $this, 'read_permissions_callback' ]
-			],
-			[
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => [ $this, 'update_step' ],
 				'permission_callback' => [ $this, 'update_permissions_callback' ]
@@ -89,19 +84,42 @@ class Funnels_Api extends Base_Object_Api {
 		] );
 	}
 
-	public function read_step( \WP_REST_Request $request ){
-
-		$funnel_id = absint( $request->get_param( 'ID' ) );
-		$funnel = new Funnel( $funnel_id );
-
-		return self::SUCCESS_RESPONSE( [
-			'item' => $funnel
-		] );
-	}
-
+	/**
+	 * Update a step in the funnel
+	 *
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return \WP_REST_Response
+	 */
 	public function update_step( \WP_REST_Request $request ){
 
 		$funnel_id = absint( $request->get_param( 'ID' ) );
+		$step_id   = absint( $request->get_param( 'step_id' ) );
+
+		$data = $request->get_param( 'data' );
+		$meta = $request->get_param( 'meta' );
+
+		$step = new Step( $step_id );
+
+		$step->update( $data );
+
+		foreach ( $meta as $key => $value ){
+			$step->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
+		}
+
+		// Add parent and child associations of new step
+		foreach ( $step->get_parent_steps() as $parent ){
+			$parent->add_child_step( $step );
+
+			foreach ( $step->get_child_steps() as $child ) {
+				$child->add_parent_step( $step );
+
+				// remove all the associations of parents and children
+				$parent->remove_child_step( $child );
+				$child->remove_parent_step( $parent );
+			}
+		}
+
 		$funnel = new Funnel( $funnel_id );
 
 		return self::SUCCESS_RESPONSE( [
@@ -109,9 +127,30 @@ class Funnels_Api extends Base_Object_Api {
 		] );
 	}
 
+	/**
+	 * Delete a step from the funnel
+	 *
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return \WP_REST_Response
+	 */
 	public function delete_step( \WP_REST_Request $request ){
 
 		$funnel_id = absint( $request->get_param( 'ID' ) );
+		$step_id   = absint( $request->get_param( 'step_id' ) );
+
+		$step = new Step( $step_id );
+
+		// Add likewise associations of parent to child
+		foreach ( $step->get_parent_steps() as $parent ){
+			foreach ( $step->get_child_steps() as $child ) {
+				$parent->add_child_step( $child );
+				$child->add_parent_step( $parent );
+			}
+		}
+
+		$step->delete();
+
 		$funnel = new Funnel( $funnel_id );
 
 		return self::SUCCESS_RESPONSE( [
