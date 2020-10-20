@@ -1,73 +1,42 @@
 /**
- * External dependencies
- */
-import { apiFetch } from '@wordpress/data-controls';
-
-/**
  * Internal dependencies
  */
 import TYPES from './action-types';
-import { NAMESPACE } from '../constants';
+import { QUERY_DEFAULTS } from '../constants';
 
-export function receiveFunnels( items ) {
 
+export function addStep( itemId, step ) {
 	return {
-		type: TYPES.RECEIVE_FUNNELS,
-		items,
+		type: TYPES.ADD_STEP,
+		itemId,
+		step
 	};
 }
 
-export function receiveFunnel( item ) {
+export function receieveStep( itemId ) {
 	return {
-		type: TYPES.RECEIVE_FUNNEL,
-		item,
+		type: TYPES.FETCH_STEP,
+		itemId
+	};
+}
+export function receieveAllSteps( itemId, steps ) {
+	return {
+		type: TYPES.FETCH_ALL_STEPS,
+		itemId,
+		steps
 	};
 }
 
-export function setIsRequestingFunnels( isRequesting ) {
+export function updateSteps( itemId, step ) {
 	return {
-		type: TYPES.SET_IS_REQUESTING,
-		isRequesting,
+		type: TYPES.UPDATE_STEP,
+		itemId
 	};
 }
-
-export function setRequestingError( error ) {
+export function deleteSteps( itemId, step ) {
 	return {
-		type: TYPES.SET_REQUESTING_ERROR,
-		error
+		type: TYPES.DELETE_STEP,
+		itemId,
+		step
 	};
 }
-
-export function setUpdatingError( error ) {
-	return {
-		type: TYPES.SET_UPDATING_ERROR,
-		error,
-	};
-}
-
-export function setIsUpdating( isUpdating ) {
-	return {
-		type: TYPES.SET_IS_UPDATING,
-		isUpdating,
-	};
-}
-
-// todo upadte funnels code.. might change
-// export function* updateFunnles( data ) {
-// 	yield setIsUpdating( true );
-// 	yield receiveTags( data );
-//
-// 	try {
-// 		const results = yield apiFetch( {
-// 			path: NAMESPACE + '/tags',
-// 			method: 'POST',
-// 			data,
-// 		} );
-//
-// 		yield setIsUpdating( false );
-// 		return { results };
-// 	} catch ( error ) {
-// 		yield setUpdatingError( error );
-// 		return { success: false, ...error };
-// 	}
-// }

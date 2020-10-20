@@ -1,0 +1,83 @@
+@import "~@wordpress/base-styles/colors";
+@import "~@wordpress/base-styles/variables";
+@import "~@wordpress/base-styles/mixins";
+@import "~@wordpress/base-styles/breakpoints";
+@import "~@wordpress/base-styles/animations";
+@import "~@wordpress/base-styles/z-index";
+@import "~@wordpress/interface/src/style.scss";
+
+
+// Internal
+@import "components/header/styles";
+@import "components/sidebar/styles";
+@import "components/block-editor/styles";
+
+.groundhogg-block-editor {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	min-height: calc(100vh - 32px);
+}
+
+.editor-styles-wrapper {
+	width: 100%;
+
+	@include break-small {
+		width: calc(100% - #{$sidebar-width});
+	}
+	// We need the styles scoped to "body" to be added to the
+	// div.editor-styles wrapper
+	font-family: $editor-font;
+	font-size: $editor-font-size;
+	line-height: $editor-line-height;
+	color: $gray-900;
+
+	// Important all other selectors scoped underneath
+	// `div.editor-styles-wrapper`
+	@import "~@wordpress/editor/src/editor-styles.scss";
+}
+
+.groundhogg-block-editor,
+// The modals are shown outside the .groundhogg-block-editor wrapper, they need these styles.
+.components-modal__frame {
+	@include reset;
+}
+
+.groundhogg-block-editor {
+	top: 140px;
+	padding-bottom: 280px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+// Custom CSS Begins
+.interface-interface-skeleton {
+	top: 100px;
+	left: 115px;
+	max-width: 1600px;
+	.interface-interface-skeleton__sidebar {
+		top: 10px;
+	}
+}
+.edit-post-text-editor {
+	position: relative;
+	width: 100%;
+	background-color: #fff;
+	flex-grow: 1;
+}
+
+.edit-post-text-editor__body {
+	width: 100%;
+	max-width: 1080px;
+	padding: 0 24px 24px;
+	margin-left: auto;
+	margin-right: auto;
+
+	// This needs specificity to change the title block appearance on the code editor.
+	.editor-post-title__input.editor-post-title__input.editor-post-title__input {
+		font-family: "Menlo,Consolas,monaco,monospace";
+		font-size: 2em;
+	}
+}

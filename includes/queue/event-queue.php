@@ -285,9 +285,9 @@ class Event_Queue extends Supports_Errors {
 
 				if ( $event->is_funnel_event() ) {
 
-					$next_step = $event->get_step()->get_next_action();
+					$next_step = $event->get_step()->get_next_step();
 
-					if ( $next_step instanceof Step && $next_step->is_active() ) {
+					if ( $next_step instanceof Step && $next_step->can_run() ) {
 						$next_step->enqueue( $event->get_contact() );
 					}
 				}

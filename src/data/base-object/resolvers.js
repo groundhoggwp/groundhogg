@@ -7,8 +7,8 @@ export default (endpoint, actions) => ( {
 
   __endpoint: endpoint,
 
-  * getItems () {
-    yield actions.fetchItems()
+  * getItems (query) {
+    yield actions.fetchItems(query)
   },
 
   * getItem (itemId) {

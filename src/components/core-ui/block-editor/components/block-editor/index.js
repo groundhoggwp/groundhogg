@@ -1,13 +1,12 @@
 /**
  * WordPress dependencies
  */
-import '@wordpress/editor'; // This shouldn't be necessary
 import '@wordpress/format-library';
+import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useState, useMemo } from '@wordpress/element';
 import { serialize, parse } from '@wordpress/blocks';
 import { uploadMedia } from '@wordpress/media-utils';
-
 import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
@@ -15,10 +14,25 @@ import {
 	BlockInspector,
 	WritingFlow,
 	ObserveTyping,
+	Typewriter,
+	CopyHandler,
+	BlockSelectionClearer,
+	MultiSelectScrollIntoView,
 } from '@wordpress/block-editor';
 
+import {
+	VisualEditorGlobalKeyboardShortcuts,
+} from '@wordpress/editor';
+
+import { Popover } from '@wordpress/components';
+
+/**
+ * External dependencies
+ */
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
+import TextField from '@material-ui/core/TextField'
+import { makeStyles } from "@material-ui/core/styles";
 
 /**
  * Internal dependencies
@@ -26,10 +40,19 @@ import Grid from '@material-ui/core/Grid';
 import Sidebar from '../sidebar';
 
 //TODO Implement block persistence with email data store.
+//TODO Potentially use our own alerts data store (core).
+
+const useStyles = makeStyles((theme) => ({
+    subjectInputs: {
+		width: "100%",
+		padding: '.5em 0'
+    },
+  }));
+
 function BlockEditor( { settings: _settings } ) {
 	const [ blocks, updateBlocks ] = useState( [] );
 	const { createInfoNotice } = useDispatch( 'core/notices' );
-
+	const classes = useStyles();
 	const canUserCreateMedia = useSelect( ( select ) => {
 		const _canUserCreateMedia = select( 'core' ).canUser( 'create', 'media' );
 		return _canUserCreateMedia || _canUserCreateMedia !== false;
@@ -78,24 +101,31 @@ function BlockEditor( { settings: _settings } ) {
 			>
 				<Grid container spacing={3}>
 					<Grid item xs={9}>
+						<TextField className={ classes.subjectInputs } value="Subject" />
+						<TextField className={ classes.subjectInputs } placeholder={ __( 'Pre Header Text: Used to summarize the content of the email.' ) } />
 						<Paper>
-							<div className="editor-styles-wrapper">
-								<BlockEditorKeyboardShortcuts />
-								<WritingFlow>
-									<ObserveTyping>
-										<BlockList className="groundhogg-block-editor__block-list" />
-									</ObserveTyping>
-								</WritingFlow>
-							</div>
+							<BlockSelectionClearer
+					className="edit-post-visual-editor editor-styles-wrapper"
+							>
+								<VisualEditorGlobalKeyboardShortcuts />
+								<MultiSelectScrollIntoView />
+								<Popover.Slot name="block-toolbar" />
+								<BlockEditorKeyboardShortcuts.Register />
+								<Typewriter>
+									<CopyHandler>
+										<WritingFlow>
+											<ObserveTyping>
+												<BlockList />
+											</ObserveTyping>
+										</WritingFlow>
+									</CopyHandler>
+								</Typewriter>
+							</BlockSelectionClearer>
 						</Paper>
 					</Grid>
-					<Grid item xs={3}>
-						<Paper>
-							<Sidebar.InspectorFill>
-								<BlockInspector />
-							</Sidebar.InspectorFill>
-						</Paper>
-					</Grid>
+					<Sidebar.InspectorFill>
+						<BlockInspector />
+					</Sidebar.InspectorFill>
 				</Grid>
 			</BlockEditorProvider>
 		</div>

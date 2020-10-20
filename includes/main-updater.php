@@ -345,24 +345,22 @@ class Main_Updater extends Updater {
 	/**
 	 * Update the notes table to new format.
 	 */
-	public function version_3_0_a_1(){
+	public function version_3_0_a_1() {
 		get_db( 'notes' )->update_3_0();
 	}
 
 	/**
 	 * Add new roles/caps
 	 */
-	public function version_3_0_a_2(){
+	public function version_3_0_a_2() {
 		Plugin::instance()->roles->add_caps();
 	}
 
 	/**
 	 * Update the steps table to support next_steps[]
 	 */
-	public function version_3_0_a_3(){
+	public function version_3_0_a_3() {
 		Plugin::$instance->dbs->install_dbs();
-
-
 	}
 
 	/**
@@ -408,6 +406,7 @@ class Main_Updater extends Updater {
 			'2.2.19.4',
 			'3.0.a.1',
 			'3.0.a.2',
+			'3.0.a.3',
 		];
 	}
 
@@ -431,6 +430,7 @@ class Main_Updater extends Updater {
 			'2.2.19.4',
 			'3.0.a.1',
 			'3.0.a.2',
+			'3.0.a.3',
 		];
 	}
 

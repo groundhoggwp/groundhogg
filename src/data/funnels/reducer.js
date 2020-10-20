@@ -2,63 +2,40 @@
  * Internal dependencies
  */
 import TYPES from './action-types';
+import { initialState } from './initial-state';
 
-const funnelsReducer = (
-	state = {
-		isUpdating: false,
-		isRequesting: false,
-		items: [],
-		item: null,
-		requestingErrors: {}
-	},
-	{ type, items, error, isUpdating, isRequesting, name, item }
+const funnelReducer = (
+	state = initialState,
+	{
+		type,
+		error,
+		tags,
+		files,
+		others,
+		isMerging,
+		context,
+		queryVars
+	}
 ) => {
 	switch ( type ) {
-		case TYPES.RECEIVE_FUNNEL:
-			state = {
+		case TYPES.UPDATE_STEP:
+			return {
 				...state,
-				item : item
-			};
-			break;
-		case TYPES.RECEIVE_FUNNELS:
-			state = {
+				context
+		}
+		case TYPES.ADD_STEP:
+			return {
 				...state,
-				items : items.map( ( item ) => { return item.data } )
-				// items : items.item
-			};
-			break;
-		case TYPES.SET_IS_UPDATING:
-			state = {
+				queryVars
+		}
+		case TYPES.DELETE_STEP:
+			return {
 				...state,
-				...items,
-				isUpdating,
-			};
-		break;
-		case TYPES.SET_IS_REQUESTING:
-			state = {
-				...state,
-				...items,
-				isRequesting,
-			};
-			break;
-		case TYPES.SET_REQUESTING_ERROR:
-			state = {
-				...state,
-				requestingErrors: {
-					[ name ]: error,
-				},
-			};
-			break;
-		case TYPES.SET_UPDATING_ERROR:
-			state = {
-				...state,
-				error,
-				updatingError: error,
-				isUpdating: false,
-			};
-			break;
+				...initialState
+		}
+		default:
+			return state;
 	}
-	return state;
 };
 
-export default funnelsReducer;
+export default funnelReducer;

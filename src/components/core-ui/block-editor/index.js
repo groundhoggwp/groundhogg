@@ -1,7 +1,10 @@
 import { registerCoreBlocks } from '@wordpress/block-library';
 import Editor from './editor';
+import './index.scss';
 
 /**
+ * Block Editor component
+ *
  * @link https://developer.wordpress.org/block-editor/packages/packages-block-editor/#SETTINGS_DEFAULTS
  * @todo Determine how tightly to couple Block Editor to "email"
  */

@@ -82,7 +82,6 @@ export const Emails = ( props ) => {
 	let { path } = useRouteMatch();
 
 	const {
-		getItem,
 		items,
 		totalItems,
 		isRequesting
@@ -90,7 +89,6 @@ export const Emails = ( props ) => {
 		const store = select(EMAILS_STORE_NAME)
 
 		return {
-			getItem: store.getItem,
 			items: store.getItems(),
 			totalItems: store.getTotalItems(),
 			isRequesting: store.isItemsRequesting(),
@@ -99,8 +97,6 @@ export const Emails = ( props ) => {
 
 	const {
 		fetchItems,
-		updateItem,
-		deleteItem,
 		deleteItems
 	} = useDispatch( EMAILS_STORE_NAME );
 
@@ -146,9 +142,6 @@ export const Emails = ( props ) => {
 			</Route>
 			<Route path={`${path}/:id`}>
 				<SingleView
-					getItem={ getItem }
-					updateItem={ updateItem }
-					deleteItem={ deleteItem }
 					{...props}
 				/>
 			</Route>

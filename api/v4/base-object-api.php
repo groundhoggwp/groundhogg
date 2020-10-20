@@ -333,6 +333,8 @@ abstract class Base_Object_Api extends Base_Api {
 				return self::ERROR_422();
 			}
 
+			$updated = [];
+
 			foreach ( $items as $item ) {
 
 				$id     = get_array_var( $item, $this->get_primary_key() );
@@ -345,13 +347,22 @@ abstract class Base_Object_Api extends Base_Api {
 				$data = get_array_var( $item, 'data', [] );
 				$meta = get_array_var( $item, 'meta', [] );
 
+				$object->update( $data );
+
 				// If the current object supports meta data...
 				if ( method_exists( $object, 'update_meta' ) && ! empty( $meta ) && is_array( $meta ) ) {
 					foreach ( $meta as $key => $value ) {
 						$object->update_meta( $key, $value );
 					}
 				}
+
+				$updated[] = $object;
 			}
+
+			return self::SUCCESS_RESPONSE( [
+				'items'       => $updated,
+				'total_items' => count( $updated ),
+			] );
 		}
 
 		$args = array(
@@ -361,6 +372,9 @@ abstract class Base_Object_Api extends Base_Api {
 		$items = $this->get_db_table()->query( $args );
 		$items = array_map( [ $this, 'map_raw_object_to_class' ], $items );
 
+		/**
+		 * @var $object Base_Object
+		 */
 		foreach ( $items as $object ) {
 
 			$object->update( $data );
@@ -427,10 +441,22 @@ abstract class Base_Object_Api extends Base_Api {
 		$data = $request->get_param( 'data' );
 		$meta = $request->get_param( 'meta' );
 
+//		wp_send_json( [
+//			$data,
+//			$meta
+//		] );
+
 		$object = $this->create_new_object( $data );
 
 		if ( ! $object->exists() ) {
-			return self::ERROR_400();
+
+			global $wpdb;
+
+			return self::ERROR_400( 'error', 'Bad request.', [
+				'data' => $data,
+				'meta' => $meta,
+				'wpdb' => $wpdb->last_error
+			] );
 		}
 
 		// If the current object supports meta data...

@@ -93,7 +93,7 @@ abstract class Base_Api {
 	 *
 	 * @return WP_Error
 	 */
-	protected static function ERROR_200( $code = '', $msg = '', $data = [] ) {
+	protected static function ERROR_200( $code = 'error', $msg = 'Something is up...', $data = [] ) {
 		return self::ERROR_CODE( $code, $msg, $data, 200 );
 	}
 
@@ -106,7 +106,7 @@ abstract class Base_Api {
 	 *
 	 * @return WP_Error
 	 */
-	protected static function ERROR_400( $code = '', $msg = '', $data = [] ) {
+	protected static function ERROR_400( $code = 'error', $msg = 'Bad request.', $data = [] ) {
 		return self::ERROR_CODE( $code, $msg, $data, 400 );
 	}
 
@@ -120,7 +120,7 @@ abstract class Base_Api {
 	 *
 	 * @return WP_Error
 	 */
-	protected static function ERROR_401( $code = '', $msg = '', $data = [] ) {
+	protected static function ERROR_401( $code = 'error', $msg = 'Unauthorized.', $data = [] ) {
 		return self::ERROR_CODE( $code, $msg, $data, 401 );
 	}
 
@@ -133,7 +133,7 @@ abstract class Base_Api {
 	 *
 	 * @return WP_Error
 	 */
-	protected static function ERROR_403( $code = '', $msg = '', $data = [] ) {
+	protected static function ERROR_403( $code = 'error', $msg = 'Forbidden.', $data = [] ) {
 		return self::ERROR_CODE( $code, $msg, $data, 403 );
 	}
 
@@ -146,7 +146,7 @@ abstract class Base_Api {
 	 *
 	 * @return WP_Error
 	 */
-	protected static function ERROR_404( $code = '', $msg = '', $data = [] ) {
+	protected static function ERROR_404( $code = 'error', $msg = 'Not found.', $data = [] ) {
 		return self::ERROR_CODE( $code, $msg, $data, 404 );
 	}
 
@@ -159,7 +159,7 @@ abstract class Base_Api {
 	 *
 	 * @return WP_Error
 	 */
-	protected static function ERROR_409( $code = '', $msg = '', $data = [] ) {
+	protected static function ERROR_409( $code = 'error', $msg = 'Resource conflict.', $data = [] ) {
 		return self::ERROR_CODE( $code, $msg, $data, 409 );
 	}
 
@@ -172,7 +172,7 @@ abstract class Base_Api {
 	 *
 	 * @return WP_Error
 	 */
-	protected static function ERROR_422( $code = '', $msg = '', $data = [] ) {
+	protected static function ERROR_422( $code = 'error', $msg = 'Missing params.', $data = [] ) {
 		return self::ERROR_CODE( $code, $msg, $data, 422 );
 	}
 
@@ -185,7 +185,7 @@ abstract class Base_Api {
 	 *
 	 * @return WP_Error
 	 */
-	protected static function ERROR_500( $code = '', $msg = '', $data = [] ) {
+	protected static function ERROR_500( $code = 'error', $msg = 'Something went wrong.', $data = [] ) {
 		return self::ERROR_CODE( $code, $msg, $data, 500 );
 	}
 
@@ -198,7 +198,7 @@ abstract class Base_Api {
 	 *
 	 * @return WP_Error
 	 */
-	protected static function ERROR_501( $code = '', $msg = '', $data = [] ) {
+	protected static function ERROR_501( $code = 'error', $msg = 'Not implemented.', $data = [] ) {
 		return self::ERROR_CODE( $code, $msg, $data, 403 );
 	}
 

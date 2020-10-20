@@ -27,7 +27,9 @@ export function registerBaseObjectStore (endpoint, options) {
 	let baseResolver = new BaseResolver( storeName, baseActions );
 
 	let extendedReducer = options.reducer;
+
 	const storeArgs = {
+		...options,
 		reducer      : options.reducer   ? combineReducers( { reducer, extendedReducer } ): reducer,
 		actions      : options.actions   ? assign( baseActions  , options.actions )   : baseActions ,
 		selectors    : options.selectors ? assign( baseSelectors, options.selectors ) : baseSelectors,

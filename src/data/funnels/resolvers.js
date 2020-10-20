@@ -1,28 +1,11 @@
 /**
- * Internal dependencies
- */
-import { receiveFunnels, setRequestingError, setIsRequestingFunnels } from './actions';
-import { NAMESPACE } from '../constants';
-
-/**
  * External dependencies
  */
-import { apiFetch } from '@wordpress/data-controls';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
- * Request all tags.
+ * Internal dependencies
  */
-export function* getFunnels() {
-	yield setIsRequestingFunnels( true );
-	try {
-		const url = NAMESPACE + '/funnels/';
-		const result = yield apiFetch( {
-			path: url,
-			method: 'GET',
-		} );
-		yield setIsRequestingFunnels( false );
-		yield receiveFunnels( result );
-	} catch ( error ) {
-		yield setRequestingError( error );
-	}
-}
+import { NAMESPACE } from '../constants';
+import { setError, setItems, setRequestingError } from './actions';
+import { fetchWithHeaders } from '../controls';

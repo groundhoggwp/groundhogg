@@ -17,16 +17,13 @@ import Grid from '@material-ui/core/Grid'
 /**
  * Internal dependencies
  */
-import './style.scss'
+import './index.scss'
 import { Controller, getPages, PAGES_FILTER } from './controller'
 import TopBar from './top-bar'
 import { SnackbarArea } from './snackbar'
 import { withSettingsHydration } from '../../data'
 
 const useStyles = makeStyles((theme) => ( {
-  // root: {
-  //   display: 'flex',
-  // },
   toolbar: {
     paddingRight: 24, // keep right padding when drawer closed
   },
@@ -60,7 +57,7 @@ export default function PrimaryLayout (props) {
     <main className={ `groundhogg-layout__primary ${ classes.content }` }>
 
       <div className={ classes.appBarSpacer }/>
-      <Container maxWidth="xlg" className={ classes.container }>
+      <Container className={ classes.container }>
         { children }
       </Container>
     </main>
@@ -100,6 +97,7 @@ const _PageLayout = ( props ) => {
             return (
                 <Route
                   path={ page.path }
+                  key={ index }
                   exact={ '/' === page.path }
                   render={ (props) => (
                     <Layout page={ page } selectedIndex={index} { ...props } />
