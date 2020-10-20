@@ -91,6 +91,10 @@ function BlockEditor( { settings: _settings } ) {
 		window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) );
 	}
 
+	if ( ! settings.hasOwnProperty( '__experimentalBlockPatterns' ) ) {
+		settings.__experimentalBlockPatterns = [];
+	}
+
 	return (
 		<div className="groundhogg-block-editor">
 			<BlockEditorProvider

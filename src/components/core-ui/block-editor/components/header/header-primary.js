@@ -1,3 +1,6 @@
+/**
+ * WordPress dependencies
+ */
 import { useViewportMatch } from '@wordpress/compose';
 import { __, _x } from '@wordpress/i18n';
 import {
@@ -8,6 +11,10 @@ import {
 } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
 import ToolbarItem from './toolbar-item'; // Stop-gap while WP catches up.
 
 function HeaderPrimary() {

@@ -1,6 +1,7 @@
 import { registerCoreBlocks } from '@wordpress/block-library';
 import Editor from './editor';
 import './index.scss';
+import './components/blocks/index.js';
 
 /**
  * Block Editor component
@@ -11,6 +12,6 @@ import './index.scss';
 export default function EditorComponent( { email } ) {
 
   // @todo: we should be able to do away with this once we've registered our own blocks
-  registerCoreBlocks();
+  // registerCoreBlocks();
   return ( <Editor email={email} settings={ window.Groundhogg.preloadSettings } /> );
 }
