@@ -65,6 +65,8 @@ class Funnels_Api extends Base_Object_Api {
 		}
 
 		// Add parent and child associations of new step
+		// Usually there will only be one parent => one child...
+		// Todo check for edge cases...
 		foreach ( $step->get_parent_steps() as $parent ){
 			$parent->add_child_step( $step );
 
@@ -108,6 +110,8 @@ class Funnels_Api extends Base_Object_Api {
 		}
 
 		// Add parent and child associations of new step
+		// Usually there will only be one parent => one child...
+		// Todo check for edge cases...
 		foreach ( $step->get_parent_steps() as $parent ){
 			$parent->add_child_step( $step );
 
@@ -142,6 +146,8 @@ class Funnels_Api extends Base_Object_Api {
 		$step = new Step( $step_id );
 
 		// Add likewise associations of parent to child
+		// Usually there will only be one parent => one child...
+		// Todo check for edge cases...
 		foreach ( $step->get_parent_steps() as $parent ){
 			foreach ( $step->get_child_steps() as $child ) {
 				$parent->add_child_step( $child );

@@ -26,6 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Step extends Base_Object_With_Meta implements Event_Process {
 	const BENCHMARK = 'benchmark';
+	const CONDITION = 'condition';
 	const ACTION = 'action';
 
 	/**
@@ -142,8 +143,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 *
 	 * @param $step Step
 	 */
-	public function add_parent_step( $step ){
-		if ( ! $step || ! $step->exists() || in_array( $step->get_id(), $this->parent_steps ) ){
+	public function add_parent_step( $step ) {
+		if ( ! $step || ! $step->exists() || in_array( $step->get_id(), $this->parent_steps ) ) {
 			return;
 		}
 
@@ -157,8 +158,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * @param $step Step
 	 */
-	public function add_child_step( $step ){
-		if ( ! $step || ! $step->exists() || in_array( $step->get_id(), $this->child_steps ) ){
+	public function add_child_step( $step ) {
+		if ( ! $step || ! $step->exists() || in_array( $step->get_id(), $this->child_steps ) ) {
 			return;
 		}
 
@@ -172,8 +173,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * @param $step Step
 	 */
-	public function remove_parent_step( $step ){
-		if ( ! $step || ! $step->exists() || ! in_array( $step->get_id(), $this->parent_steps ) ){
+	public function remove_parent_step( $step ) {
+		if ( ! $step || ! $step->exists() || ! in_array( $step->get_id(), $this->parent_steps ) ) {
 			return;
 		}
 
@@ -185,8 +186,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * @param $step Step
 	 */
-	public function remove_child_step( $step ){
-		if ( ! $step || ! $step->exists() || ! in_array( $step->get_id(), $this->child_steps ) ){
+	public function remove_child_step( $step ) {
+		if ( ! $step || ! $step->exists() || ! in_array( $step->get_id(), $this->child_steps ) ) {
 			return;
 		}
 
@@ -254,7 +255,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return $this->get_group() === self::BENCHMARK;
 	}
 
-
 	/**
 	 * @return bool whether the step is an action
 	 */
@@ -263,54 +263,41 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
-	 * Get the next step in the order
+	 * Whether the current step is a condition.
 	 *
-	 * @return Step|false
+	 * @return bool
 	 */
-	public function get_next_action() {
+	public function is_condition() {
+		return $this->get_group() === self::CONDITION;
+	}
 
-		/* this will give an array of objects ordered by appearance in the funnel builder */
-		$items = $this->get_funnel()->get_steps();
+	/**
+	 * Get the next step in the funnel.
+	 *
+	 * @return bool|Step
+	 */
+	public function get_next_step() {
 
-		if ( empty( $items ) ) {
-			/* something went wrong or there are no more steps*/
-			return false;
-		}
+		if ( $this->is_action() || $this->is_benchmark() ) {
 
-		$i = $this->get_order();
-
-		if ( $i >= count( $items ) ) {
-
-			/* This is the last step. */
-			return false;
-		}
-
-		if ( $items[ $i ]->get_group() === self::ACTION ) {
-
-			/* regardless of whether the current step is an action
-			or a benchmark we can run the next step if it's an action */
-			return $items[ $i ];
-
-		}
-
-		if ( $this->is_benchmark() ) {
-
-			while ( $i < count( $items ) ) {
-
-				if ( $items[ $i ]->get_group() === self::ACTION ) {
-
-					return $items[ $i ];
-
+			foreach ( $this->get_child_steps() as $child ) {
+				if ( $child->is_action() ) {
+					return $child;
 				}
-
-				$i ++;
-
 			}
+
+		} else if ( $this->is_condition() ) {
+
+			// Todo process the condition.
+
+			$passed = 1 || 2;
+			$index  = $passed ? 0 : 1;
+
+			return get_array_var( $this->get_child_steps(), $index );
 
 		}
 
 		return false;
-
 	}
 
 	/**
@@ -386,27 +373,44 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return bool
 	 */
 	public function can_complete( $contact = null ) {
+
 		// Actions cannot be completed.
-		if ( $this->is_action() || ! $this->is_active() ) {
-			return false;
+		if ( $this->is_action() || $this->is_condition() || ! $this->is_active() ) {
+			$can_complete = false;
 		}
-
 		// Check if starting
-		if ( $this->is_starting() ) {
-			return true;
-		} // If inner step, check if contact is at a step before this one.
-		else if ( $this->is_inner() ) {
+		else if ( $this->is_starting() ) {
+			$can_complete = true;
+		// check the path to see if this benchmark is in the same path as the contact.
+		} else {
+			// The step where the contact currently is in the funnel
+			$contact_step = $this->get_current_funnel_step( $contact );
 
-			// get the current funnel step
-			$current_order = $this->get_current_funnel_step_order( $contact );
+			// traverse the tree upwards to see if the current step is in the same path as this one.
+			$queue = [ $this ];
+			$can_complete = false;
 
-			// If the step order is < than this one, return true.
-			if ( $current_order && $current_order < $this->get_order() ) {
-				return true;
+			// BFS to find if the path is correct.
+			while ( ! empty( $queue ) && $can_complete === false ){
+
+				$current = array_shift( $queue );
+
+				// If the contact's current step was found among the parents/grandparents
+				// of the $this step.
+				if ( $current->get_id() === $contact_step->get_id() ){
+					$can_complete = true;
+					break;
+				}
+
+				// Add the $current steps parents to the queue.
+				foreach ( $current->get_parents() as $parent ){
+					array_push( $queue, $parent );
+				}
+
 			}
 		}
 
-		return apply_filters( 'groundhogg/step/can_complete', false, $this, $contact );
+		return apply_filters( 'groundhogg/step/can_complete', $can_complete, $this, $contact );
 	}
 
 	/**
@@ -415,9 +419,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 *
 	 * @param $contact Contact
 	 *
-	 * @return bool|int
+	 * @return bool|Step
 	 */
-	public function get_current_funnel_step_order( $contact ) {
+	public function get_current_funnel_step( $contact ) {
 
 		// Search waiting events, automatically the current event.
 		$events = $this->get_event_queue_db()->query( [
@@ -431,7 +435,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			$event = new Event( absint( $event->ID ), 'event_queue' );
 			// Double check step exists...
 			if ( $event->exists() && $event->get_step() && $event->get_step()->exists() ) {
-				return $event->get_step()->get_order();
+				return $event->get_step();
 			}
 		}
 
@@ -452,7 +456,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 			// Double check step exists...
 			if ( $event->exists() && $event->get_step() && $event->get_step()->exists() ) {
-				return $event->get_step()->get_order();
+				return $event->get_step();
 			}
 		}
 
@@ -496,33 +500,12 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 	/**
 	 * Whether the step starts a funnel
+	 * Will be starting if there are no parent steps and the step is in fact a benchmark.
 	 *
 	 * @return bool
 	 */
 	public function is_starting() {
-		if ( $this->is_action() ) {
-			return false;
-		}
-
-		if ( $this->get_order() === 1 ) {
-			return true;
-		}
-
-		$step_order = $this->get_order() - 1;
-		$steps      = $this->get_funnel()->get_steps();
-
-		while ( $step_order > 0 ) {
-
-			$step = $steps[ $step_order ];
-
-			if ( $step->is_action() ) {
-				return false;
-			}
-
-			$step_order -= 1;
-		}
-
-		return true;
+		return $this->is_benchmark() && empty( $this->parent_steps );
 	}
 
 	/**
@@ -561,34 +544,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return $result;
 	}
 
-	/**
-	 * Output icon html
-	 */
-	public function icon() {
-
-		$icon = false;
-
-		if ( has_filter( "groundhogg/steps/{$this->get_type()}/icon" ) ) {
-			$icon = apply_filters( "groundhogg/steps/{$this->get_type()}/icon", $this );
-		}
-
-		return $icon ?: GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/no-icon.png';
-	}
-
-	/**
-	 * Output icon html
-	 */
-	public function get_context() {
-
-		$context = [];
-
-		if ( has_filter( "groundhogg/steps/{$this->get_type()}/context" ) ) {
-			$context = apply_filters( "groundhogg/steps/{$this->get_type()}/context", [], $this );
-		}
-
-		return $context;
-	}
-
 	public function validate() {
 		if ( has_action( "groundhogg/steps/{$this->get_type()}/validate" ) ) {
 			do_action( "groundhogg/steps/{$this->get_type()}/validate", $this );
@@ -606,25 +561,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
-	 * Save the step
-	 *
-	 * @param $settings mixed[]
-	 */
-	public function save( $settings = [] ) {
-		if ( has_action( "groundhogg/steps/{$this->get_type()}/save" ) ) {
-			do_action( "groundhogg/steps/{$this->get_type()}/save", $this, $settings );
-
-			$this->update( [
-				'last_edited' => current_time( 'mysql' )
-			] );
-
-		} else {
-			do_action( "groundhogg/steps/error/save", $this, $settings );
-		}
-
-	}
-
-	/**
 	 * Oh Boy....
 	 *
 	 * @return array
@@ -638,12 +574,17 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * Get the step title...
+	 *
 	 * @return string
 	 */
 	public function get_step_title() {
 		return $this->get_title();
 	}
 
+	/**
+	 * @return mixed
+	 */
 	public function get_step_notes() {
 		return $this->get_meta( 'step_notes' );
 	}
@@ -660,56 +601,10 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
-	 * Get the HTML of the step and return it.
-	 *
-	 * @return false|string
-	 */
-	public function __toString() {
-		ob_start();
-
-		$this->html();
-
-		$html = ob_get_clean();
-
-		return $html;
-	}
-
-	/**
-	 * Return whether or not the current action can run.
-	 * This was implement so that WPMU could be effectively implemented with the GLOBAL DB option enabled.
-	 *
-	 * Always return true if not a multisite or multisite global is not enabled
-	 * otherwise compare the current blog ID to the blg ID associated with the step.
-	 *
-	 * @deprecated
+	 * Ensure the step can run.
 	 */
 	public function can_run() {
-
-		if ( Plugin::$instance->settings->is_global_multisite() ) {
-
-			$blog_id = $this->get_meta( 'blog_id' );
-
-			/* all blogs */
-			if ( ! $blog_id ) {
-
-				return true;
-
-				/* Current blog */
-			} else if ( intval( $blog_id ) === get_current_blog_id() ) {
-
-				return true;
-
-				/* Wrong Blog */
-			} else {
-
-				return false;
-
-			}
-
-		}
-
-		return true;
-
+		return ( $this->is_action() || $this->is_condition() ) && $this->is_active();
 	}
 
 	/**
@@ -720,9 +615,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	public function delete() {
 
 		// Maybe Move contacts forward...
-		$next_step = $this->get_next_action();
+		$next_step = $this->get_next_step();
 
-		if ( $next_step && $next_step->is_active() ) {
+		if ( $next_step && $next_step->can_run() ) {
 			$contacts = $this->get_waiting_contacts();
 
 			if ( ! empty( $contacts ) ) {
@@ -734,172 +629,5 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		}
 
 		return parent::delete();
-	}
-
-	public function get_delay() {
-
-	}
-
-	/**
-	 * Get the delay configuration
-	 *
-	 * @return mixed
-	 */
-	public function get_delay_config() {
-		$delay = $this->get_meta( '__delay__' );
-
-		if ( ! $delay ) {
-			$delay = [
-				'type' => 'instant',
-			];
-		}
-
-		return $delay;
-	}
-
-	/**
-	 * Update the delay configuration
-	 *
-	 * @param $delay []
-	 */
-	public function update_delay( $delay ) {
-
-		$delay = array_filter( $delay );
-		$delay = wp_parse_args( $delay, [
-			'type' => 'instant',
-		] );
-
-		switch ( $delay['type'] ) {
-
-			default:
-			case 'instant':
-				$defaults = [];
-				break;
-			case 'fixed':
-				$defaults = [
-					'period'              => 1,
-					'interval'            => 'hours',
-					'run_on'              => 'any',
-					'days_of_week'        => [],
-					'days_of_week_type'   => 'any',
-					'months_of_year'      => [],
-					'months_of_year_type' => 'any',
-					'days_of_month'       => [],
-					'run_at'              => 'any',
-					'time'                => '09:00:00',
-					'time_to'             => '17:00:00',
-				];
-				break;
-			case 'date':
-				$defaults = [
-					'run_on'              => 'specific',
-					'days_of_week_type'   => 'any',
-					'date'                => date( 'Y-m-d' ),
-					'date_to'             => date( 'Y-m-d', time() + WEEK_IN_SECONDS ),
-					'months_of_year'      => [],
-					'months_of_year_type' => 'any',
-					'run_at'              => 'any',
-					'time'                => '09:00:00',
-					'time_to'             => '17:00:00',
-				];
-				break;
-
-		}
-
-		$delay = wp_parse_args( $delay, $defaults );
-
-		$this->update_meta( '__delay__', $delay );
-	}
-
-	public function get_as_array() {
-		$array                   = parent::get_as_array();
-		$array['context']        = $this->get_context();
-		$array['delay']          = $this->get_delay_config();
-		$array['icon']           = $this->icon();
-		$array['settings']       = $this->get_all_meta();
-		$array['last_edited_by'] = esc_attr( ! is_numeric( $this->last_edited_by ) ? $this->last_edited_by : get_userdata( $this->last_edited_by )->display_name );
-
-		return $array;
-	}
-
-	#############################################
-
-	########## DEPRECATED FUNCTIONS #############
-	#############################################
-	/**
-	 * Restore the process to the current blog.
-	 *
-	 * @deprecated since 2.0
-	 */
-	public function restore_current_blog() {
-		if ( Plugin::$instance->settings->is_global_multisite() && ms_is_switched() ) {
-			restore_current_blog();
-		}
-	}
-
-	/**
-	 * Switches to the blog which the step can run on.
-	 *
-	 * @deprecated since 2.0
-	 */
-	public function switch_to_blog() {
-		if ( Plugin::$instance->settings->is_global_multisite() ) {
-			$blog_id = $this->get_meta( 'blog_id' );
-			if ( $blog_id && intval( $blog_id ) !== get_current_blog_id() ) {
-				switch_to_blog( $blog_id );
-			}
-		}
-	}
-
-	/**
-	 * Output the HTML of a step.
-	 *
-	 * @deprecated
-	 */
-	public function html_v2() {
-		if ( has_action( "groundhogg/steps/{$this->get_type()}/html_v2" ) ) {
-			do_action( "groundhogg/steps/{$this->get_type()}/html_v2", $this );
-		} else {
-			do_action( "groundhogg/steps/error/html_v2", $this );
-		}
-	}
-
-	/**
-	 * Output the HTML of a step.
-	 *
-	 * @deprecated
-	 */
-	public function sortable_item() {
-		if ( has_action( "groundhogg/steps/{$this->get_type()}/sortable" ) ) {
-			do_action( "groundhogg/steps/{$this->get_type()}/sortable", $this );
-		} else {
-			do_action( "groundhogg/steps/error/sortable", $this );
-		}
-	}
-
-	/**
-	 * Output the HTML of a step.
-	 *
-	 * @deprecated
-	 */
-	public function html() {
-		if ( has_action( "groundhogg/steps/{$this->get_type()}/html" ) ) {
-			do_action( "groundhogg/steps/{$this->get_type()}/html", $this );
-		} else {
-			do_action( "groundhogg/steps/error/html", $this );
-		}
-	}
-
-	/**
-	 * Return the name given with the ID prefixed for easy access in the $_POST variable
-	 *
-	 * @param $name
-	 *
-	 * @return string
-	 * @deprecated since 2.0
-	 *
-	 */
-	public function prefix( $name ) {
-		return $this->get_id() . '_' . esc_attr( $name );
 	}
 }
