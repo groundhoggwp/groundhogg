@@ -11,7 +11,7 @@ import { useDispatch } from '@wordpress/data'
  */
 import {
 	FUNNELS_STORE_NAME
-} from '../../../../../../../data/funnels';
+} from 'data';
 
 const useStyles = makeStyles((theme) => ( {
   box: {

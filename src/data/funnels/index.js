@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import * as actions from './actions';
+import BaseActions from './actions';
 import reducer from './reducer';
 
 import {
@@ -10,6 +10,8 @@ import {
 } from '../base-object';
 
 const STORE_NAME = 'funnels';
+
+const actions = new BaseActions( STORE_NAME );
 
 registerBaseObjectStore( STORE_NAME, {
 	reducer,

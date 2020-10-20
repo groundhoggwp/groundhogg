@@ -2,15 +2,14 @@
  * Internal dependencies
  */
 import TYPES from './action-types'
+import BaseActions from '../base-object/actions';
+
 // import { addNotification } from '../../utils'
 
 /**
  * External dependencies
  */
 import { apiFetch } from '@wordpress/data-controls'
-// import { addQueryArgs } from '@wordpress/url'
-// import { __ } from '@wordpress/i18n'
-
 
 export default (endpoint) => ( {
 
