@@ -14,24 +14,14 @@ const funnelReducer = (
 		others,
 		isMerging,
 		context,
-		queryVars
+		// queryVars
 	}
 ) => {
 	switch ( type ) {
-		case TYPES.UPDATE_STEP:
+		case TYPES.CREATE_STEP:
 			return {
 				...state,
-				context
-		}
-		case TYPES.ADD_STEP:
-			return {
-				...state,
-				queryVars
-		}
-		case TYPES.DELETE_STEP:
-			return {
-				...state,
-				...initialState
+				initialState
 		}
 		default:
 			return state;
