@@ -1,7 +1,7 @@
 import Box from '@material-ui/core/Box'
 import Card from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
-import CardActions from '@material-ui/core/CardActions';
+import CardActions from '@material-ui/core/CardActions'
 import { select, useDispatch, useSelect } from '@wordpress/data'
 import { STEP_TYPES_STORE_NAME } from 'data/step-type-registry'
 import { STEPS_STORE_NAME } from 'data/steps'
@@ -15,12 +15,17 @@ import AddStepButton from '../AddStepButton'
 import Tooltip from '@material-ui/core/Tooltip'
 import makeStyles from '@material-ui/core/styles/makeStyles'
 import { ArcherElement } from 'react-archer'
+import {
+  BENCHMARK,
+  CONDITION,
+} from 'components/layout/pages/funnels/editor/steps-types/constants'
+import { FUNNELS_STORE_NAME } from 'data/funnels'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme) => ( {
   addStepButton: {
-    padding: theme.spacing(3)
-  }
-}))
+    padding: theme.spacing(3),
+  },
+} ))
 
 export default (props) => {
 
@@ -31,9 +36,9 @@ export default (props) => {
 
   const { ID, data, meta } = props
   const { step_title, step_type, step_group, parent_steps, child_steps } = data
-  const stepType = select( STEP_TYPES_STORE_NAME ).getType( step_type );
+  const stepType = select(STEP_TYPES_STORE_NAME).getType(step_type)
 
-  const { deleteItem, updateItem } = useDispatch(STEPS_STORE_NAME)
+  const { deleteStep, updateStep } = useDispatch(FUNNELS_STORE_NAME)
 
   if (!stepType) {
     return 'loading...'
@@ -42,7 +47,7 @@ export default (props) => {
   const classes = [
     step_type,
     step_group,
-    ID
+    ID,
   ]
 
   const handleEdit = () => {
@@ -55,49 +60,56 @@ export default (props) => {
 
   const handleDelete = () => {
     setDeleting(true)
-    deleteItem(ID)
+    deleteStep( ID )
   }
+
+  let childRelations = child_steps.length > 0 ? child_steps.map(stepId => {
+    return {
+      targetId: 'archer-' + stepId,
+      targetAnchor: 'top',
+      sourceAnchor: 'bottom',
+    }
+  } ) : [{
+    targetId: 'exit',
+    targetAnchor: 'top',
+    sourceAnchor: 'bottom',
+  } ];
 
   return (
     <>
       <Box>
-        {parent_steps.length > 0 &&
-        <Box display={'flex'} justifyContent={'center'} className={classNames.addStepButton}>
+        { parent_steps.length > 1 &&
+        <Box display={ 'flex' } justifyContent={ 'center' }
+             className={ classNames.addStepButton }>
           <AddStepButton
-            parentSteps={parent_steps}
-            childSteps={[ID]}
+            parentSteps={ parent_steps }
+            childSteps={ [ID] }
           />
-        </Box>}
-        <Box>
+        </Box> }
+        <Box display={ 'flex' } justifyContent={ 'center' }>
           <ArcherElement
-            id={'archer-' + ID}
-            relations={data.child_steps.map( stepId => {
-              return {
-                targetId: 'archer-' + stepId,
-                targetAnchor: 'top',
-                sourceAnchor: 'bottom',
-              }
-            })}
+            id={ 'archer-' + ID }
+            relations={childRelations}
           >
-            <Card className={classes.join(' ')} style={{ width: 250 }}>
+            <Card className={ classes.join(' ') } style={ { width: 250 } }>
               <CardHeader
-                avatar={stepType.icon}
-                title={step_title}
-                subheader={stepType.name}
+                avatar={ stepType.icon }
+                title={ step_title }
+                subheader={ stepType.name }
               />
               <CardActions>
-                <Tooltip title={'Edit'}>
+                <Tooltip title={ 'Edit' }>
                   <IconButton
-                    color={'primary'}
-                    onClick={() => handleEdit()}
+                    color={ 'primary' }
+                    onClick={ () => handleEdit() }
                   >
                     <EditIcon/>
                   </IconButton>
                 </Tooltip>
-                <Tooltip title={'Delete'}>
+                <Tooltip title={ 'Delete' }>
                   <IconButton
-                    color={'secondary'}
-                    onClick={() => handleDelete()}
+                    color={ 'secondary' }
+                    onClick={ () => handleDelete() }
                   >
                     <DeleteIcon/>
                   </IconButton>
@@ -105,14 +117,22 @@ export default (props) => {
               </CardActions>
             </Card>
           </ArcherElement>
+          { step_group === BENCHMARK &&
+          <Box display={'flex'} alignItems={'center'} className={ classNames.addStepButton }>
+            <AddStepButton
+              parentSteps={ parent_steps }
+              childSteps={ child_steps }
+            />
+          </Box> }
         </Box>
-        {child_steps.length <= 1 &&
-        <Box display={'flex'} justifyContent={'center'} className={classNames.addStepButton}>
+        { step_group !== CONDITION &&
+        <Box display={ 'flex' } justifyContent={ 'center' }
+             className={ classNames.addStepButton }>
           <AddStepButton
-            parentSteps={[ID]}
-            childSteps={child_steps}
+            parentSteps={ [ID] }
+            childSteps={ child_steps }
           />
-        </Box>}
+        </Box> }
       </Box>
     </>
   )
