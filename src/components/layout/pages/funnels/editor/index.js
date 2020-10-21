@@ -18,9 +18,14 @@ function assignLevels (startNodes, allNodes) {
 
   startNodes.forEach(node => node.level = 0)
   const queue = startNodes
+  let index = 0;
 
   while (queue.length) {
     let currentNode = queue.shift()
+
+    if ( ! currentNode.index ){
+      currentNode.index = index;
+    }
 
     // Get the child nodes
     let childNodes = allNodes.filter(
@@ -31,6 +36,8 @@ function assignLevels (startNodes, allNodes) {
       node.level = currentNode.level + 1
       queue.push(node)
     })
+
+    index++;
   }
 }
 
@@ -65,12 +72,18 @@ export default (props) => {
           )
         }
         {
-          levels.map((level) => {
+          levels.map((level, l) => {
+
+            const lSteps = steps.filter( (step) => step.level === level ).sort( (a,b) => {
+              return a.index - b.index;
+            });
+
+            // Check to see if the steps
+
             return (
               <Box display={'flex'} justifyContent={'space-around'}>
                 {
-                  steps.filter( (step) => step.level === level ).map( step => {
-                    step.funnelID = ID
+                  lSteps.map( step => {
                     return (
                       <>
                         <StepBlock {...step}/>
