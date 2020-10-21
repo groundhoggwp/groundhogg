@@ -1,15 +1,15 @@
 import { useState } from '@wordpress/element'
 import { useDispatch, useSelect } from '@wordpress/data'
-import { STEP_TYPES_STORE_NAME } from '../../../../../../../data/step-type-registry'
-import { STEPS_STORE_NAME } from '../../../../../../../data/steps'
+import { STEP_TYPES_STORE_NAME } from 'data/step-type-registry'
+import { FUNNELS_STORE_NAME } from 'data/funnels'
 
-export default ({ID, data, meta, onCancel}) => {
+export default ({ID, data, meta, onCancel, onSave}) => {
 
   const [ tempData, setTempData ] = useState(data);
   const [ tempMeta, setTempMeta ] = useState(meta);
   const { step_title, step_type, step_group, parent_steps, child_steps } = data;
 
-  const { updateItem } = useDispatch( STEPS_STORE_NAME );
+  const { updateStep } = useDispatch( FUNNELS_STORE_NAME );
 
   const { stepType } = useSelect( (select) => {
     return {
@@ -18,7 +18,7 @@ export default ({ID, data, meta, onCancel}) => {
   }, [] )
 
   const handleSave = () => {
-    updateItem( ID, {
+    updateStep( ID, {
       data: tempData,
       meta: tempMeta,
     } )

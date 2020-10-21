@@ -14,28 +14,13 @@ import { ArcherContainer, ArcherElement } from 'react-archer'
  * @param startNodes
  * @param allNodes
  */
-function buildChart (startNodes, allNodes) {
+function assignLevels (startNodes, allNodes) {
 
-  let currentLevel = 0
-  startNodes.forEach(node => node.level = currentLevel)
-  let chart = [[]]
+  startNodes.forEach(node => node.level = 0)
   const queue = startNodes
 
   while (queue.length) {
     let currentNode = queue.shift()
-
-    // Increase the level and add an array to the chart
-    if (currentNode.level > currentLevel) {
-      currentLevel++
-      chart.push([])
-    }
-
-    // Only if the node is not already part of the chart and is not queued up
-    // for later
-    if (!chart[currentLevel].find(node => node.ID === currentNode.ID) &&
-      !queue.find(node => node.ID === currentNode.ID)) {
-      chart[currentLevel].push(currentNode)
-    }
 
     // Get the child nodes
     let childNodes = allNodes.filter(
@@ -43,29 +28,10 @@ function buildChart (startNodes, allNodes) {
 
     // queue up the child nodes
     childNodes.forEach((node) => {
-      if (!queue.find(node => node.ID === currentNode.ID)) {
-        node.level = currentLevel + 1
-        queue.push(node)
-      }
+      node.level = currentNode.level + 1
+      queue.push(node)
     })
   }
-
-  let visited = []
-
-  // go back thru the chart and remove duplicate nodes from higher orders
-  chart = chart.reverse().map(level => {
-
-    // Check to see if the node was visited, filter the level if it was
-    level = level.filter(node => !visited.find(_node => node.ID === _node.ID))
-    // Mark all the nodes of the level as visited
-    level.forEach(node => visited.push(node))
-
-    return level
-  })
-
-  chart = chart.reverse()
-
-  return chart
 }
 
 export default (props) => {
@@ -80,46 +46,49 @@ export default (props) => {
   const startingSteps = steps.filter(
     step => step.data.parent_steps.length === 0)
 
-  const chart = buildChart(startingSteps, steps)
+  assignLevels( startingSteps, steps );
+
+  const levels = [ ... new Set( steps.map( step => step.level ) ) ].sort( (a, b) => {
+    return a - b;
+  });
 
   return (
     <>
-      <ArcherContainer strokeColor={ '#e5e5e5' }>
+      <ArcherContainer strokeColor={'#e5e5e5'}>
         {
-          chart[0].length === 0 && (
-            <Box display={ 'flex' } justifyContent={ 'center' }>
-              <Paper style={ { width: 500 } }>
+          steps.length === 0 && (
+            <Box display={'flex'} justifyContent={'center'}>
+              <Paper style={{ width: 500 }}>
                 <BenchmarkPicker funnelID={ID}/>
               </Paper>
             </Box>
           )
         }
         {
-          chart.map((levels, l) => {
+          levels.map((level) => {
             return (
-              <Box display={ 'flex' } justifyContent={ 'space-around' }>
+              <Box display={'flex'} justifyContent={'space-around'}>
                 {
-                  levels.map((step, s) => {
-                      step.funnelID = ID
-                      return (
-                        <>
-                          <StepBlock { ...step }/>
-                        </> )
-                    },
-                  )
+                  steps.filter( (step) => step.level === level ).map( step => {
+                    step.funnelID = ID
+                    return (
+                      <>
+                        <StepBlock {...step}/>
+                      </>)
+                  } )
                 }
               </Box>
             )
           })
         }
-        { chart[0].length > 0 &&
-        <Box display={ 'flex' } justifyContent={ 'space-around' }>
-          <ArcherElement id={ 'exit' }>
+        {steps.length > 0 &&
+        <Box display={'flex'} justifyContent={'space-around'}>
+          <ArcherElement id={'exit'}>
             <Card>
-              { 'Exit Funnel!' }
+              {'Exit Funnel!'}
             </Card>
           </ArcherElement>
-        </Box> }
+        </Box>}
       </ArcherContainer>
     </>
   )
