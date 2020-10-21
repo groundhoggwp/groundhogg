@@ -19,7 +19,7 @@ import FlagIcon from '@material-ui/icons/Flag'
 import Chip from '@material-ui/core/Chip'
 import { Tooltip } from '@material-ui/core'
 import ButtonGroup from '@material-ui/core/ButtonGroup'
-import { FUNNELS_STORE_NAME } from 'data/funnels'
+import { FUNNELS_STORE_NAME } from 'data'
 import { Link } from "react-router-dom";
 
 const iconProps = {
@@ -44,7 +44,7 @@ const funnelTableColumns = [
     name: <span>{ 'Title' }</span>,
     orderBy: 'title',
     align: 'left',
-    cell: ({ data, ID }) => {      
+    cell: ({ data, ID }) => {
       return <Link to={ `/funnels/${ID}` }>
       				 { data.title }
       			 </Link>

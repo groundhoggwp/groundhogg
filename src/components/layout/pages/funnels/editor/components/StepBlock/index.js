@@ -20,7 +20,9 @@ import {
   BENCHMARK, BENCHMARKS,
   CONDITION, CONDITIONS
 } from 'components/layout/pages/funnels/editor/steps-types/constants'
-import { FUNNELS_STORE_NAME } from 'data/funnels'
+import {
+	FUNNELS_STORE_NAME
+} from 'data';
 
 const useStyles = makeStyles((theme) => ({
   stepBlockContainer: {
@@ -88,8 +90,9 @@ export default (props) => {
   }
 
   const handleDelete = () => {
+    console.log('set deasdf')
     setDeleting(true)
-    deleteStep(ID)
+    deleteStep(ID, funnel_id)
   }
 
   let childRelations = child_steps.length > 0 ? child_steps.map(stepId => {

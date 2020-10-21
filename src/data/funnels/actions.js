@@ -50,9 +50,44 @@ export default (endpoint) => ( {
     }
   },
 
-  * deleteStep (stepId, funnelId){},
-  * updateStep (stepId, funnelId){
+  * deleteStep (stepId, funnelId){
+    yield setIsCreatingStep(false)
 
+    try {
+      const result = yield apiFetch({
+        method: 'DELETE',
+        path: `${NAMESPACE}/${ endpoint }/${funnelId}/step/${stepId}`
+      })
+
+      yield setIsCreatingStep(false)
+      yield {
+        type: TYPES.CREATE_STEP,
+        item: result.item,
+      }
+    }
+    catch (e) {
+      yield setCreatingStepError(e)
+    }
+  },
+  * updateStep (stepData, funnelId){
+    yield setIsCreatingStep(false)
+
+    try {
+      const result = yield apiFetch({
+        method: 'PATCH',
+        path: `${NAMESPACE}/${ endpoint }/${funnelId}/step/${stepId}`,
+        // data: {data:stepData}
+      })
+
+      yield setIsCreatingStep(false)
+      yield {
+        type: TYPES.CREATE_STEP,
+        item: result.item,
+      }
+    }
+    catch (e) {
+      yield setCreatingStepError(e)
+    }
   },
 
 } )

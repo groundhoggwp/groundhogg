@@ -1,7 +1,7 @@
 import { useState } from '@wordpress/element'
 import { useDispatch, useSelect } from '@wordpress/data'
 import { STEP_TYPES_STORE_NAME } from 'data/step-type-registry'
-import { FUNNELS_STORE_NAME } from 'data/funnels'
+import { FUNNELS_STORE_NAME } from 'data'
 
 export default ({ID, data, meta, onCancel, onSave}) => {
 
