@@ -16,7 +16,7 @@ export default (endpoint) => ( {
   endpoint,
   * createStep (items) {
     // yield setIsCreatingItems(true)
-
+    console.log('asdfasdf', items)
     try {
       const result = yield apiFetch({
         method: 'POST',
