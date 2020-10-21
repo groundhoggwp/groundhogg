@@ -35,7 +35,7 @@ export default (props) => {
 
   const classNames = useStyles()
 
-  const { ID, data, meta } = props
+  const { ID, data, meta, funnelID } = props
   const { step_title, step_type, step_group, parent_steps, child_steps } = data
   const stepType = select(STEP_TYPES_STORE_NAME).getType(step_type)
 
@@ -83,6 +83,7 @@ export default (props) => {
         <Box display={ 'flex' } justifyContent={ 'center' }
              className={ classNames.addStepButton }>
           <AddStepButton
+           funnelID={funnelID}
             parentSteps={ parent_steps }
             childSteps={ [ID] }
             showGroups={[
@@ -125,6 +126,7 @@ export default (props) => {
           { step_group === BENCHMARK &&
           <Box display={'flex'} alignItems={'center'} className={ classNames.addStepButton }>
             <AddStepButton
+              funnelID={funnelID}
               parentSteps={ parent_steps }
               childSteps={ child_steps }
               showGroups={[
@@ -137,6 +139,7 @@ export default (props) => {
         <Box display={ 'flex' } justifyContent={ 'center' }
              className={ classNames.addStepButton }>
           <AddStepButton
+            funnelID={funnelID}
             parentSteps={ [ID] }
             childSteps={ child_steps }
             showGroups={[

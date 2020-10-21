@@ -47,6 +47,7 @@ export default (props) => {
     parentSteps,
     childSteps,
     stepOrder,
+		funnelID
   } = props
 
   const classes = useStyles()
@@ -75,8 +76,7 @@ export default (props) => {
       parent_steps: parentSteps || [],
     }
 
-    console.log(newStepData)
-    createStep( newStepData );
+    createStep( newStepData, funnelID );
   }
 
   return (

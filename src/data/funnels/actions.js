@@ -3,7 +3,7 @@
  */
 import TYPES from './action-types'
 import BaseActions from '../base-object/actions';
-
+import { NAMESPACE } from '../constants';
 // import { addNotification } from '../../utils'
 
 /**
@@ -11,27 +11,46 @@ import BaseActions from '../base-object/actions';
  */
 import { apiFetch } from '@wordpress/data-controls'
 
-export default (endpoint) => ( {
+function setIsCreatingStep (isCreating) {
+  return {
+    type: TYPES.SET_IS_CREATING,
+    isCreating,
+  }
+}
 
+function setCreatingStepError (error) {
+  return {
+    type: TYPES.SET_CREATING_ERROR,
+    error,
+  }
+}
+
+export default (endpoint) => ( {
   endpoint,
-  * createStep (items) {
-    // yield setIsCreatingItems(true)
-    console.log('asdfasdf', items)
+  setIsCreatingStep,
+  setCreatingStepError,
+  * createStep (data, funnelID) {
+    yield setIsCreatingStep(false)
+
     try {
       const result = yield apiFetch({
         method: 'POST',
-        path: `${ endpoint }`,
-        data: items,
+        path: `${NAMESPACE}/${ endpoint }/${funnelID}/step/`,
+        data
       })
 
-      // yield setIsCreatingItems(false)
+      console.log('data', data)
+      console.log('path', `${NAMESPACE}/${ endpoint }/${funnelID}/step/`)
+
+      yield setIsCreatingStep(false)
       yield {
-        type: TYPES.CREATE_ITEMS,
-        items: result.items,
+        type: TYPES.CREATE_STEP,
+        item: result.item,
       }
     }
     catch (e) {
-      // yield setCreatingError(e)
+      yield setCreatingStepError(e)
+
     }
   },
 

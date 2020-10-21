@@ -89,7 +89,7 @@ export default (props) => {
           chart[0].length === 0 && (
             <Box display={ 'flex' } justifyContent={ 'center' }>
               <Paper style={ { width: 500 } }>
-                <BenchmarkPicker/>
+                <BenchmarkPicker funnelID={ID}/>
               </Paper>
             </Box>
           )
@@ -100,6 +100,7 @@ export default (props) => {
               <Box display={ 'flex' } justifyContent={ 'space-around' }>
                 {
                   levels.map((step, s) => {
+                      step.funnelID = ID
                       return (
                         <>
                           <StepBlock { ...step }/>
