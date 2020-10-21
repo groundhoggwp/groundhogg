@@ -15,9 +15,11 @@ export default (props) => {
     setAnchorEl(null);
   };
 
+  const { className } = props;
+
   return (
     <>
-      <Fab size={'small'} aria-label="add" onClick={handleClick}>
+      <Fab className={ className } size={'small'} aria-label="add" onClick={handleClick}>
         <AddIcon />
       </Fab>
       <AddStepPopover

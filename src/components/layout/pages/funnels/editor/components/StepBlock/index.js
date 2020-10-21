@@ -18,15 +18,43 @@ import { ArcherElement } from 'react-archer'
 import {
   ACTION, ACTIONS,
   BENCHMARK, BENCHMARKS,
-  CONDITION, CONDITIONS,
+  CONDITION, CONDITIONS
 } from 'components/layout/pages/funnels/editor/steps-types/constants'
 import { FUNNELS_STORE_NAME } from 'data/funnels'
 
-const useStyles = makeStyles((theme) => ( {
-  addStepButton: {
-    padding: theme.spacing(3),
+const useStyles = makeStyles((theme) => ({
+  stepBlockContainer: {
+    padding: theme.spacing(12),
+    paddingTop: 0
   },
-} ))
+  stepBlock: {
+    position: 'relative',
+  },
+  addStepButtonTop: {
+    position: 'absolute',
+    margin: 'auto',
+    top: - theme.spacing(8),
+    left: 0,
+    bottom: 'auto',
+    right: 0,
+  },
+  addStepButtonRight: {
+    position: 'absolute',
+    margin: 'auto',
+    right: - theme.spacing(8),
+    top: 0,
+    left: 'auto',
+    bottom: 0
+  },
+  addStepButtonBottom: {
+    position: 'absolute',
+    margin: 'auto',
+    bottom: - theme.spacing(8),
+    top: 'auto',
+    left: 0,
+    right: 0,
+  }
+}))
 
 export default (props) => {
 
@@ -48,7 +76,7 @@ export default (props) => {
   const classes = [
     step_type,
     step_group,
-    ID,
+    ID
   ]
 
   const handleEdit = () => {
@@ -61,91 +89,90 @@ export default (props) => {
 
   const handleDelete = () => {
     setDeleting(true)
-    deleteStep( ID )
+    deleteStep(ID)
   }
 
   let childRelations = child_steps.length > 0 ? child_steps.map(stepId => {
     return {
       targetId: 'archer-' + stepId,
       targetAnchor: 'top',
-      sourceAnchor: 'bottom',
+      sourceAnchor: 'bottom'
     }
-  } ) : [{
+  }) : [{
     targetId: 'exit',
     targetAnchor: 'top',
-    sourceAnchor: 'bottom',
-  } ];
+    sourceAnchor: 'bottom'
+  }]
 
   return (
     <>
-      <Box>
-        { parent_steps.length > 1 &&
-        <Box display={ 'flex' } justifyContent={ 'center' }
-             className={ classNames.addStepButton }>
+      <Box className={classNames.stepBlockContainer}>
+        <Box className={classNames.stepBlock}>
+          {parent_steps.length > 1 &&
           <AddStepButton
-            parentSteps={ parent_steps }
-            childSteps={ [ID] }
+            className={classNames.addStepButtonTop}
+            parentSteps={parent_steps}
+            childSteps={[ID]}
             showGroups={[
               BENCHMARKS,
               ACTIONS
             ]}
           />
-        </Box> }
-        <Box display={ 'flex' } justifyContent={ 'center' }>
-          <ArcherElement
-            id={ 'archer-' + ID }
-            relations={childRelations}
-          >
-            <Card className={ classes.join(' ') } style={ { width: 250 } }>
-              <CardHeader
-                avatar={ stepType.icon }
-                title={ step_title }
-                subheader={ stepType.name }
-              />
-              <CardActions>
-                <Tooltip title={ 'Edit' }>
-                  <IconButton
-                    color={ 'primary' }
-                    onClick={ () => handleEdit() }
-                  >
-                    <EditIcon/>
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title={ 'Delete' }>
-                  <IconButton
-                    color={ 'secondary' }
-                    onClick={ () => handleDelete() }
-                  >
-                    <DeleteIcon/>
-                  </IconButton>
-                </Tooltip>
-              </CardActions>
-            </Card>
-          </ArcherElement>
-          { step_group === BENCHMARK &&
-          <Box display={'flex'} alignItems={'center'} className={ classNames.addStepButton }>
-            <AddStepButton
-              parentSteps={ parent_steps }
-              childSteps={ child_steps }
-              showGroups={[
-                BENCHMARKS
-              ]}
-            />
-          </Box> }
-        </Box>
-        { step_group !== CONDITION &&
-        <Box display={ 'flex' } justifyContent={ 'center' }
-             className={ classNames.addStepButton }>
+          }
+          {step_group === BENCHMARK &&
           <AddStepButton
-            parentSteps={ [ID] }
-            childSteps={ child_steps }
+            className={classNames.addStepButtonRight}
+            parentSteps={parent_steps}
+            childSteps={child_steps}
+            showGroups={[
+              BENCHMARKS
+            ]}
+          />}
+          {step_group !== CONDITION &&
+          <AddStepButton
+            className={classNames.addStepButtonBottom}
+            parentSteps={[ID]}
+            childSteps={child_steps}
             showGroups={[
               step_group === ACTION ? BENCHMARKS : false,
               ACTIONS,
-              CONDITIONS,
-            ].filter( item => item !== false )}
+              CONDITIONS
+            ].filter(item => item !== false)}
           />
-        </Box> }
+          }
+          <Box display={'flex'} justifyContent={'center'}>
+            <ArcherElement
+              id={'archer-' + ID}
+              relations={childRelations}
+            >
+              <Card className={classes.join(' ')} style={{ width: 250 }}>
+                <CardHeader
+                  avatar={stepType.icon}
+                  title={ID}
+                  subheader={stepType.name}
+                />
+                <CardActions>
+                  <Tooltip title={'Edit'}>
+                    <IconButton
+                      color={'primary'}
+                      onClick={() => handleEdit()}
+                    >
+                      <EditIcon/>
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title={'Delete'}>
+                    <IconButton
+                      color={'secondary'}
+                      onClick={() => handleDelete()}
+                    >
+                      <DeleteIcon/>
+                    </IconButton>
+                  </Tooltip>
+                </CardActions>
+              </Card>
+            </ArcherElement>
+          </Box>
+        </Box>
       </Box>
     </>
   )
