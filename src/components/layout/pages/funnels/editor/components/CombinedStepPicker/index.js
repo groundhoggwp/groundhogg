@@ -4,10 +4,11 @@ import AppBar from '@material-ui/core/AppBar'
 import { useState } from '@wordpress/element'
 import BenchmarkPicker from '../BenchmarkPicker'
 import ActionPicker from '../ActionPicker'
+import ConditionPicker from '../ConditionPicker'
 import {
-  ACTION,
   ACTIONS,
-  BENCHMARKS, CONDITIONS,
+  BENCHMARKS,
+  CONDITIONS,
 } from 'components/layout/pages/funnels/editor/steps-types/constants'
 
 const CombinedStepPicker = (props) => {
@@ -29,7 +30,7 @@ const CombinedStepPicker = (props) => {
       Picker = ActionPicker
       break
     case CONDITIONS:
-      Picker = ActionPicker
+      Picker = ConditionPicker
       break
   }
 

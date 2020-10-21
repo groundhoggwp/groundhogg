@@ -7,3 +7,5 @@ import './benchmarks/formFilled'
 import './benchmarks/tagApplied'
 import './benchmarks/tagRemoved'
 import './benchmarks/linkClicked'
+
+import './conditions/yes-no'
