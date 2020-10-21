@@ -14,6 +14,6 @@ import './divider';
 import './html';
 import './button';
 import  './image';
-import  './text-block/index-material.js';
-import  './paragraph';
+// import  './text-block/index-material.js';
 import  './heading';
+import  './paragraph';
