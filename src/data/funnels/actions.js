@@ -40,6 +40,8 @@ export default (endpoint) => ( {
       })
 
       console.log('data', data)
+      console.log('steps', result.item.steps)
+      console.log('result', result)
       console.log('path', `${NAMESPACE}/${ endpoint }/${funnelID}/step/`)
 
       yield setIsCreatingStep(false)
