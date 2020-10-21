@@ -8,7 +8,7 @@ const funnelReducer = (
 		item: {},
 		error: {},
 		isRequesting: false,
-		isUpdating: false,
+		isUpdating: true,
 		isCreating: false,
 		isDeleting: false,
 	},
@@ -50,10 +50,10 @@ const funnelReducer = (
 				...state,
 				item,
 			}
-		case TYPES.SET_IS_CREATING:
+		case TYPES.SET_IS_UPDATING:
 			state = {
 				...state,
-				isCreating,
+				isUpdating,
 			}
 			break
 		case TYPES.SET_CREATING_ERROR:
@@ -72,10 +72,10 @@ const funnelReducer = (
 				...state,
 				item,
 			}
-		case TYPES.SET_IS_CREATING:
+		case TYPES.SET_IS_DELETING:
 			state = {
 				...state,
-				isCreating,
+				isDeleting,
 			}
 			break
 		case TYPES.SET_CREATING_ERROR:

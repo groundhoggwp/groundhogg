@@ -60,12 +60,6 @@ function setIsDeletingStepError (error) {
 
 export default (endpoint) => ( {
   endpoint,
-  setIsCreatingStep,
-  setCreatingStepError,
-  setIsUpdatingStep,
-  setIsUpdatingStepError,
-  setIsDeletingStep,
-  setIsDeletingStepError,
   * createStep (stepData, funnelId) {
     yield setIsCreatingStep(true)
 

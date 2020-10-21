@@ -82,14 +82,14 @@ export default (props) => {
   ]
 
   const handleEdit = () => {
-    setEditing(true)
+    setUpdating(true)
   }
 
   const handleCancel = () => {
-    setEditing(false)
+    setUpdating(false)
   }
 
-  const handleDelete = () => {    
+  const handleDelete = () => {
     setDeleting(true)
     deleteStep(ID, funnel_id)
   }
