@@ -29,20 +29,15 @@ export default (endpoint) => ( {
   endpoint,
   setIsCreatingStep,
   setCreatingStepError,
-  * createStep (data, funnelId) {
+  * createStep (stepData, funnelId) {
     yield setIsCreatingStep(false)
 
     try {
       const result = yield apiFetch({
         method: 'POST',
         path: `${NAMESPACE}/${ endpoint }/${funnelId}/step/`,
-        data
+        data: {data:stepData}
       })
-
-      console.log('data', data)
-      console.log('steps', result.item.steps)
-      console.log('result', result)
-      console.log('path', `${NAMESPACE}/${ endpoint }/${funnelId}/step/`)
 
       yield setIsCreatingStep(false)
       yield {

@@ -9,15 +9,17 @@ const funnelReducer = (
 	{
 		type,
 		error,
+		tags,
+		files,
 		item,
-		// files,
-		// others,
-		// isMerging,
+		others,
+		isMerging,
 		context,
-		// queryVars
+		queryVars
 	}
 ) => {
 	switch ( type ) {
+
 		case TYPES.CREATE_STEP:
 			return {
 				...state,

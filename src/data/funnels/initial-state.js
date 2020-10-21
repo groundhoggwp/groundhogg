@@ -5,8 +5,12 @@ export const initialState = {
 	isUpdating: false,
 	isAdding: false,
 	isDeleting: false,
+	showFilters: false,
 	total: 0,
 	context: {},
+	selected: [],
+	query: QUERY_DEFAULTS,
 	data: [],
+	item: {},
 	error: {},
 };
