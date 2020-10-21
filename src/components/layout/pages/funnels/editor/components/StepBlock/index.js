@@ -89,8 +89,7 @@ export default (props) => {
     setEditing(false)
   }
 
-  const handleDelete = () => {
-    console.log('set deasdf')
+  const handleDelete = () => {    
     setDeleting(true)
     deleteStep(ID, funnel_id)
   }

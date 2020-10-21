@@ -9,32 +9,78 @@ const funnelReducer = (
 	{
 		type,
 		error,
-		tags,
-		files,
 		item,
-		others,
-		isMerging,
-		context,
-		queryVars
+		isCreating,
+		isUpdating,
+		isDeleting,
 	}
 ) => {
 	switch ( type ) {
-
+		// Create
 		case TYPES.CREATE_STEP:
 			return {
 				...state,
 				item,
 			}
-		case TYPES.DELETE_STEP:
-			return {
+		case TYPES.SET_IS_CREATING:
+			state = {
 				...state,
-				item,
+				isCreating,
 			}
+			break
+		case TYPES.SET_CREATING_ERROR:
+			state = {
+				...state,
+				creatingErrors: {
+					error,
+				},
+				isCreating: false,
+			}
+			break
+
+		// Update
 		case TYPES.UPDATE_STEP:
 			return {
 				...state,
 				item,
 			}
+		case TYPES.SET_IS_CREATING:
+			state = {
+				...state,
+				isCreating,
+			}
+			break
+		case TYPES.SET_CREATING_ERROR:
+			state = {
+				...state,
+				creatingErrors: {
+					error,
+				},
+				isCreating: false,
+			}
+			break
+			
+		// Delete
+		case TYPES.DELETE_STEP:
+			return {
+				...state,
+				item,
+			}
+		case TYPES.SET_IS_CREATING:
+			state = {
+				...state,
+				isCreating,
+			}
+			break
+		case TYPES.SET_CREATING_ERROR:
+			state = {
+				...state,
+				creatingErrors: {
+					error,
+				},
+				isCreating: false,
+			}
+			break
 		default:
 			return state;
 	}

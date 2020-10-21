@@ -11,6 +11,8 @@ import { NAMESPACE } from '../constants';
  */
 import { apiFetch } from '@wordpress/data-controls'
 
+
+// Creating
 function setIsCreatingStep (isCreating) {
   return {
     type: TYPES.SET_IS_CREATING,
@@ -25,12 +27,47 @@ function setCreatingStepError (error) {
   }
 }
 
+// Update
+function setIsUpdatingStep (isCreating) {
+  return {
+    type: TYPES.SET_IS_UPDATING,
+    isCreating,
+  }
+}
+
+function setIsUpdatingStepError (error) {
+  return {
+    type: TYPES.SET_UPDATING_ERROR,
+    error,
+  }
+}
+
+// Delete
+function setIsDeletingStep (isCreating) {
+  return {
+    type: TYPES.SET_IS_DELETING,
+    isCreating,
+  }
+}
+
+function setIsDeletingStepError (error) {
+  return {
+    type: TYPES.SET_DELETING_ERROR,
+    error,
+  }
+}
+
+
 export default (endpoint) => ( {
   endpoint,
   setIsCreatingStep,
   setCreatingStepError,
+  setIsUpdatingStep,
+  setIsUpdatingStepError,
+  setIsDeletingStep,
+  setIsDeletingStepError,
   * createStep (stepData, funnelId) {
-    yield setIsCreatingStep(false)
+    yield setIsCreatingStep(true)
 
     try {
       const result = yield apiFetch({
@@ -51,7 +88,7 @@ export default (endpoint) => ( {
   },
 
   * deleteStep (stepId, funnelId){
-    yield setIsCreatingStep(false)
+    yield setIsDeletingStep(true)
 
     try {
       const result = yield apiFetch({
@@ -59,34 +96,34 @@ export default (endpoint) => ( {
         path: `${NAMESPACE}/${ endpoint }/${funnelId}/step/${stepId}`
       })
 
-      yield setIsCreatingStep(false)
+      yield setIsDeletingStep(false)
       yield {
-        type: TYPES.CREATE_STEP,
+        type: TYPES.DELETE_STEP,
         item: result.item,
       }
     }
     catch (e) {
-      yield setCreatingStepError(e)
+      yield setIsDeletingStepError(e)
     }
   },
   * updateStep (stepData, funnelId){
-    yield setIsCreatingStep(false)
+    yield setIsUpdatingStep(true)
 
     try {
       const result = yield apiFetch({
         method: 'PATCH',
         path: `${NAMESPACE}/${ endpoint }/${funnelId}/step/${stepId}`,
-        // data: {data:stepData}
+        data: {data:stepData}
       })
 
-      yield setIsCreatingStep(false)
+      yield setIsUpdatingStep(false)
       yield {
-        type: TYPES.CREATE_STEP,
+        type: TYPES.UPDATE_STEP,
         item: result.item,
       }
     }
     catch (e) {
-      yield setCreatingStepError(e)
+      yield setIsUpdatingStepError(e)
     }
   },
 
