@@ -28,10 +28,10 @@ function setCreatingStepError (error) {
 }
 
 // Update
-function setIsUpdatingStep (isCreating) {
+function setIsUpdatingStep (isUpdating) {
   return {
     type: TYPES.SET_IS_UPDATING,
-    isCreating,
+    isUpdating,
   }
 }
 
@@ -43,10 +43,10 @@ function setIsUpdatingStepError (error) {
 }
 
 // Delete
-function setIsDeletingStep (isCreating) {
+function setIsDeletingStep (isDeleting) {
   return {
     type: TYPES.SET_IS_DELETING,
-    isCreating,
+    isDeleting,
   }
 }
 

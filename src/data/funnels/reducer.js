@@ -2,10 +2,16 @@
  * Internal dependencies
  */
 import TYPES from './action-types';
-import { initialState } from './initial-state';
 
 const funnelReducer = (
-	state = initialState,
+	state = {
+		item: {},
+		error: {},
+		isRequesting: false,
+		isUpdating: false,
+		isCreating: false,
+		isDeleting: false,
+	},
 	{
 		type,
 		error,
@@ -59,7 +65,7 @@ const funnelReducer = (
 				isCreating: false,
 			}
 			break
-			
+
 		// Delete
 		case TYPES.DELETE_STEP:
 			return {
