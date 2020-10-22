@@ -6,6 +6,7 @@ import { parse } from 'qs';
 import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
+
 /**
  * Internal dependencies
  */
@@ -16,7 +17,8 @@ import {
 	Tags,
 	Contacts,
 	Funnels,
-	Settings
+	Settings,
+	Broadcasts
 } from './pages'
 
 import { Spinner } from '../../components';
@@ -27,6 +29,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import EmailIcon from '@material-ui/icons/Email';
 import LinearScaleIcon from '@material-ui/icons/LinearScale';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
+import SettingsInputAntennaSharpIcon from '@material-ui/icons/SettingsInputAntennaSharp';
 
 export const PAGES_FILTER = 'groundhogg_navigation';
 
@@ -51,6 +54,16 @@ export const getPages = () => {
 		name: 'reports',
 		path: '/reports',
 		priority: 10
+	} );
+
+
+	pages.push( {
+		component: Broadcasts,
+		icon : SettingsInputAntennaSharpIcon,
+		label: __( 'Broadcasts' ),
+		name: 'broadcasts',
+		path: '/boradcasts',
+		priority: 20
 	} );
 
 	pages.push( {

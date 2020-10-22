@@ -6,7 +6,7 @@ import Select from '@material-ui/core/Select'
 import TextareaAutosize from '@material-ui/core/TextareaAutosize'
 import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
-import TagPicker from '../../../core-ui/tag-picker'
+// import TagPicker from '../../../core-ui/tag-picker'
 import { SETTINGS_STORE_NAME } from '../../../../data'
 
 export const SettingsSection = ( { section } ) => {
