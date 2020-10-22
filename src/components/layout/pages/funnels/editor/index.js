@@ -1,6 +1,10 @@
 import { Card } from '@material-ui/core'
 import Box from '@material-ui/core/Box'
-import LineTo from 'react-lineto'
+import { useSelect } from '@wordpress/data';
+import { FUNNELS_STORE_NAME } from 'data';
+import {
+  useParams
+} from "react-router-dom";
 import BenchmarkPicker from './components/BenchmarkPicker'
 import StepBlock from './components/StepBlock'
 import Paper from '@material-ui/core/Paper'
@@ -41,14 +45,32 @@ function assignLevels (startNodes, allNodes) {
   }
 }
 
-export default (props) => {
+export default () => {
 
-  const { funnel } = props
-  const { ID, data, steps } = funnel
+  let { id } = useParams();
 
-  if (!steps) {
-    return '...loading'
+  const { funnel, item, isCreating, isDeleting, isUpdating, isRequesting } = useSelect( (select) => {
+    const store = select( FUNNELS_STORE_NAME )
+
+    return {
+      item: store.getItem( id ),
+      funnel: store.getFunnel(),
+      isCreating: store.isCreatingStep(),
+      isDeleting: store.isDeletingStep(),
+      isUpdating: store.isUpdatingStep(),
+      isRequesting: store.isItemsRequesting()
+    }
+  }, [] )
+
+  if ( ! item ) {
+    return null;
   }
+
+  if ( ! item.steps ) {
+    return null;
+  }
+
+  const steps = funnel.steps || item.steps;
 
   const startingSteps = steps.filter(
     step => step.data.parent_steps.length === 0)

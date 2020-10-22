@@ -6,6 +6,7 @@ import TYPES from './action-types';
 const funnelReducer = (
 	state = {
 		item: {},
+		funnel: {},
 		error: {},
 		isRequesting: false,
 		isUpdating: true,
@@ -16,6 +17,7 @@ const funnelReducer = (
 		type,
 		error,
 		item,
+		funnel,
 		isCreating,
 		isUpdating,
 		isDeleting,
@@ -26,7 +28,8 @@ const funnelReducer = (
 		case TYPES.CREATE_STEP:
 			return {
 				...state,
-				item,
+				item : funnel,
+				funnel,
 			}
 		case TYPES.SET_IS_CREATING:
 			state = {
@@ -48,7 +51,8 @@ const funnelReducer = (
 		case TYPES.UPDATE_STEP:
 			return {
 				...state,
-				item,
+				item : funnel,
+				funnel,
 			}
 		case TYPES.SET_IS_UPDATING:
 			state = {
@@ -56,13 +60,13 @@ const funnelReducer = (
 				isUpdating,
 			}
 			break
-		case TYPES.SET_CREATING_ERROR:
+		case TYPES.SET_UPDATING_ERROR:
 			state = {
 				...state,
-				creatingErrors: {
+				updatingErrors: {
 					error,
 				},
-				isCreating: false,
+				isUpdating: false,
 			}
 			break
 
@@ -70,7 +74,8 @@ const funnelReducer = (
 		case TYPES.DELETE_STEP:
 			return {
 				...state,
-				item,
+				item : funnel,
+				funnel,
 			}
 		case TYPES.SET_IS_DELETING:
 			state = {
@@ -78,13 +83,13 @@ const funnelReducer = (
 				isDeleting,
 			}
 			break
-		case TYPES.SET_CREATING_ERROR:
+		case TYPES.SET_DELETING_ERROR:
 			state = {
 				...state,
-				creatingErrors: {
+				deletingErrors: {
 					error,
 				},
-				isCreating: false,
+				isDeleting: false,
 			}
 			break
 		default:

@@ -2,15 +2,12 @@
  * Internal dependencies
  */
 import TYPES from './action-types'
-import BaseActions from '../base-object/actions';
 import { NAMESPACE } from '../constants';
-// import { addNotification } from '../../utils'
 
 /**
  * External dependencies
  */
 import { apiFetch } from '@wordpress/data-controls'
-
 
 // Creating
 function setIsCreatingStep (isCreating) {
@@ -57,7 +54,6 @@ function setIsDeletingStepError (error) {
   }
 }
 
-
 export default (endpoint) => ( {
   endpoint,
   * createStep (stepData, funnelId) {
@@ -73,7 +69,7 @@ export default (endpoint) => ( {
       yield setIsCreatingStep(false)
       yield {
         type: TYPES.CREATE_STEP,
-        item: result.item,
+        funnel: result.item,
       }
     }
     catch (e) {
@@ -93,7 +89,7 @@ export default (endpoint) => ( {
       yield setIsDeletingStep(false)
       yield {
         type: TYPES.DELETE_STEP,
-        item: result.item,
+        funnel: result.item,
       }
     }
     catch (e) {
@@ -113,7 +109,7 @@ export default (endpoint) => ( {
       yield setIsUpdatingStep(false)
       yield {
         type: TYPES.UPDATE_STEP,
-        item: result.item,
+        funnel: result.item,
       }
     }
     catch (e) {

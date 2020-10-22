@@ -72,7 +72,7 @@ export default (props) => {
   const { deleteStep, updateStep } = useDispatch(FUNNELS_STORE_NAME)
 
   if (!stepType) {
-    return 'loading...'
+    return null;
   }
 
   const classes = [
