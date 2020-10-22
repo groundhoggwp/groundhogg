@@ -47,7 +47,8 @@ export default (props) => {
     parentSteps,
     childSteps,
     stepOrder,
-		funnelID
+		funnelID,
+		onClose
   } = props
 
   const classes = useStyles()
@@ -75,8 +76,8 @@ export default (props) => {
       child_steps: childSteps || [],
       parent_steps: parentSteps || [],
     }
-
     createStep( newStepData, funnelID );
+		onClose();
   }
 
   return (

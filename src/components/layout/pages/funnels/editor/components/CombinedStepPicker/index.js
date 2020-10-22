@@ -13,7 +13,7 @@ import {
 
 const CombinedStepPicker = (props) => {
 
-  const { showGroups } = props
+  const { showGroups, onClose } = props
   const [value, setValue] = useState( showGroups[0] )
 
   const handleChange = (event, newValue) => {
