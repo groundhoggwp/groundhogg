@@ -63,6 +63,17 @@ export default (props) => {
   const [editing, setEditing] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const openStepBlock = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const closeStepBlock = () => {
+    setAnchorEl(null);
+  };
+
+
   const classNames = useStyles()
 
   const { ID, data, meta, funnelID } = props
@@ -82,11 +93,11 @@ export default (props) => {
   ]
 
   const handleEdit = () => {
-    setUpdating(true)
+    openStepBlock();
   }
 
   const handleCancel = () => {
-    setUpdating(false)
+    closeStepBlock();
   }
 
   const handleDelete = () => {
@@ -120,6 +131,10 @@ export default (props) => {
               BENCHMARKS,
               ACTIONS
             ]}
+            anchorEl={anchorEl}
+            setAnchorEl={setAnchorEl}
+            openStepBlock={openStepBlock}
+            closeStepBlock={closeStepBlock}
           />
           }
           {step_group === BENCHMARK &&
@@ -131,6 +146,10 @@ export default (props) => {
             showGroups={[
               BENCHMARKS
             ]}
+            anchorEl={anchorEl}
+            setAnchorEl={setAnchorEl}
+            openStepBlock={openStepBlock}
+            closeStepBlock={closeStepBlock}
           />}
           {step_group !== CONDITION &&
           <AddStepButton
@@ -143,6 +162,10 @@ export default (props) => {
               ACTIONS,
               CONDITIONS
             ].filter(item => item !== false)}
+            anchorEl={anchorEl}
+            setAnchorEl={setAnchorEl}
+            openStepBlock={openStepBlock}
+            closeStepBlock={closeStepBlock}
           />
           }
           <Box display={'flex'} justifyContent={'center'}>
@@ -160,7 +183,7 @@ export default (props) => {
                   <Tooltip title={'Edit'}>
                     <IconButton
                       color={'primary'}
-                      onClick={() => handleEdit()}
+                      onClick={openStepBlock}
                     >
                       <EditIcon/>
                     </IconButton>
@@ -168,7 +191,7 @@ export default (props) => {
                   <Tooltip title={'Delete'}>
                     <IconButton
                       color={'secondary'}
-                      onClick={() => handleDelete()}
+                      onClick={handleDelete}
                     >
                       <DeleteIcon/>
                     </IconButton>

@@ -13,9 +13,9 @@ import {
 
 const CombinedStepPicker = (props) => {
 
-  const { showGroups, onClose } = props
+  const { showGroups, onClose, onOpen } = props
   const [value, setValue] = useState( showGroups[0] )
-
+  console.log(props, 'asdf')
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }

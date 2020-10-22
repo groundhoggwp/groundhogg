@@ -5,26 +5,17 @@ import { useState } from '@wordpress/element'
 
 export default (props) => {
 
-  const [anchorEl, setAnchorEl] = useState(null);
-
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const { className } = props;
+  const { className, openStepBlock, closeStepBlock, anchorEl, setAnchorEl } = props;
 
   return (
     <>
-      <Fab className={ className } size={'small'} aria-label="add" onClick={handleClick}>
+      <Fab className={ className } size={'small'} aria-label="add" onClick={openStepBlock}>
         <AddIcon />
       </Fab>
       <AddStepPopover
         target={anchorEl}
-        onClose={handleClose}
+        onClose={closeStepBlock}
+        onOpen={openStepBlock}
         {...props}
       />
     </>
