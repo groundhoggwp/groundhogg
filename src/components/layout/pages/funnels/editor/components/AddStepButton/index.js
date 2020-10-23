@@ -10,7 +10,6 @@ export default (props) => {
   const open = Boolean(anchorEl);
   const id = open ? 'step-picker-popover' : undefined;
 
-  console.log(props)
   return (
     <>
       <Fab className={ className } size={'small'} aria-label="add" onClick={openStepBlock}>

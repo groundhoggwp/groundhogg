@@ -62,7 +62,6 @@ export default () => {
     }
   }, [] )
 
-  console.log(item, funnel, steps)
 
   if ( ! item ) {
     return null;
