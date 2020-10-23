@@ -59,9 +59,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default (props) => {
 
-  const [editing, setEditing] = useState(false)
-  const [deleting, setDeleting] = useState(false)
-
+  const [editing, setEditing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
 
   const openStepBlock = (event) => {
