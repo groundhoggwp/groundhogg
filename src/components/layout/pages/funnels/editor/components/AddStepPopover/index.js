@@ -1,5 +1,5 @@
 import Popover from '@material-ui/core/Popover'
-import CombinedStepPicker from '../CombinedStepPicker'
+import CombinedStepPicker from '../Pickers/CombinedStepPicker'
 
 export default (props) => {
 

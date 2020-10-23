@@ -5,7 +5,7 @@ import { FUNNELS_STORE_NAME } from 'data';
 import {
   useParams
 } from "react-router-dom";
-import BenchmarkPicker from './components/BenchmarkPicker'
+import BenchmarkPicker from './components/Pickers/BenchmarkPicker'
 import StepBlock from './components/StepBlock'
 import Paper from '@material-ui/core/Paper'
 import './steps-types'
@@ -62,6 +62,8 @@ export default () => {
     }
   }, [] )
 
+  console.log(item, funnel, steps)
+
   if ( ! item ) {
     return null;
   }
@@ -88,7 +90,7 @@ export default () => {
           steps.length === 0 && (
             <Box display={'flex'} justifyContent={'center'}>
               <Paper style={{ width: 500 }}>
-                <BenchmarkPicker funnelID={ID}/>
+                <BenchmarkPicker funnelID={funnel.ID}/>
               </Paper>
             </Box>
           )
