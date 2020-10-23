@@ -3,7 +3,6 @@
  */
 import {
 	registerStore,
-	combineReducers
 } from '@wordpress/data';
 
 import { assign } from 'lodash';
@@ -17,6 +16,8 @@ import BaseResolver from './resolvers';
 import controls from '../controls';
 import reducer from './reducer';
 import { NAMESPACE } from '../constants'
+import { mergeReducers } from 'data/utils'
+import { INITIAL_STATE } from 'data/base-object/constants'
 
 export function registerBaseObjectStore (endpoint, options) {
 	const storeName = NAMESPACE + '/' + endpoint
@@ -30,12 +31,12 @@ export function registerBaseObjectStore (endpoint, options) {
 
 	const storeArgs = {
 		...options,
-		reducer      : options.reducer   ? combineReducers( { reducer, extendedReducer } ): reducer,
+		reducer      : options.reducer   ? mergeReducers( { reducer, extendedReducer } ): reducer,
 		actions      : options.actions   ? assign( baseActions  , options.actions )   : baseActions ,
 		selectors    : options.selectors ? assign( baseSelectors, options.selectors ) : baseSelectors,
 		resolvers    : options.resolvers ? assign( baseResolver, options.resolvers )  : baseResolver,
 		controls     : options.controls  ? assign( controls , options.controls )      : controls,
-		initialState : options.initialState || {},
+		initialState : options.initialState || INITIAL_STATE,
 	}
 
 	return registerStore( storeName, storeArgs );

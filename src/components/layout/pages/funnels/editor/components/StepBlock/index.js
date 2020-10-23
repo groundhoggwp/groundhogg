@@ -17,16 +17,16 @@ import { ArcherElement } from 'react-archer'
 import {
   ACTION, ACTIONS,
   BENCHMARK, BENCHMARKS,
-  CONDITION, CONDITIONS
+  CONDITION, CONDITIONS,
 } from 'components/layout/pages/funnels/editor/steps-types/constants'
 import {
-	FUNNELS_STORE_NAME
-} from 'data';
+  FUNNELS_STORE_NAME,
+} from 'data'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme) => ( {
   stepBlockContainer: {
     padding: theme.spacing(12),
-    paddingTop: 0
+    paddingTop: 0,
   },
   stepBlock: {
     position: 'relative',
@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
   addStepButtonTop: {
     position: 'absolute',
     margin: 'auto',
-    top: - theme.spacing(8),
+    top: -theme.spacing(8),
     left: 0,
     bottom: 'auto',
     right: 0,
@@ -42,35 +42,27 @@ const useStyles = makeStyles((theme) => ({
   addStepButtonRight: {
     position: 'absolute',
     margin: 'auto',
-    right: - theme.spacing(8),
+    right: -theme.spacing(8),
     top: 0,
     left: 'auto',
-    bottom: 0
+    bottom: 0,
   },
   addStepButtonBottom: {
     position: 'absolute',
     margin: 'auto',
-    bottom: - theme.spacing(8),
+    bottom: -theme.spacing(8),
     top: 'auto',
     left: 0,
     right: 0,
-  }
-}))
+  },
+} ))
 
 export default (props) => {
 
-  const [editing, setEditing] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
-
-  const openStepBlock = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const closeStepBlock = () => {
-    setAnchorEl(null);
-  };
-
+  const [editing, setEditing] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [anchorEl, setAnchorEl] = useState(null)
+  const [addingStep, setAddingStep] = useState(null)
 
   const classNames = useStyles()
 
@@ -81,21 +73,21 @@ export default (props) => {
   const { deleteStep, updateStep } = useDispatch(FUNNELS_STORE_NAME)
 
   if (!stepType) {
-    return null;
+    return null
   }
 
   const classes = [
     step_type,
     step_group,
-    ID
+    ID,
   ]
 
   const handleEdit = () => {
-    openStepBlock();
+    // openStepBlock();
   }
 
-  const handleCancel = () => {
-    closeStepBlock();
+  const handleCancelAdd = () => {
+    // closeStepBlock();
   }
 
   const handleDelete = () => {
@@ -103,93 +95,108 @@ export default (props) => {
     deleteStep(ID, funnel_id)
   }
 
+  const addStepBlock = (where, e) => {
+    setAddingStep(where)
+    setAnchorEl(e.currentTarget)
+  }
+
+  const addStepBlockCancel = () => {
+    setAnchorEl(null)
+    setAddingStep(null)
+  }
+
   let childRelations = child_steps.length > 0 ? child_steps.map(stepId => {
     return {
       targetId: 'archer-' + stepId,
       targetAnchor: 'top',
-      sourceAnchor: 'bottom'
+      sourceAnchor: 'bottom',
     }
-  }) : [{
-    targetId: 'exit',
-    targetAnchor: 'top',
-    sourceAnchor: 'bottom'
-  }]
+  }) : [
+    {
+      targetId: 'exit',
+      targetAnchor: 'top',
+      sourceAnchor: 'bottom',
+    },
+  ]
 
   return (
     <>
-      <Box className={classNames.stepBlockContainer}>
-        <Box className={classNames.stepBlock}>
-          {parent_steps.length > 1 &&
+      <Box className={ classNames.stepBlockContainer }>
+        <Box className={ classNames.stepBlock }>
+          { parent_steps.length > 1 &&
           <AddStepButton
-            funnelID={funnel_id}
-            className={classNames.addStepButtonTop}
-            parentSteps={parent_steps}
-            childSteps={[ID]}
-            showGroups={[
+            funnelID={ funnel_id }
+            className={ classNames.addStepButtonTop }
+            parentSteps={ parent_steps }
+            childSteps={ [ID] }
+            showGroups={ [
               BENCHMARKS,
-              ACTIONS
-            ]}
-            anchorEl={anchorEl}
-            setAnchorEl={setAnchorEl}
-            openStepBlock={openStepBlock}
-            closeStepBlock={closeStepBlock}
+              ACTIONS,
+            ] }
+            anchorEl={ anchorEl }
+            open={ addingStep === 'top' }
+            setAnchorEl={ setAnchorEl }
+            openStepBlock={ (e) => addStepBlock('top', e) }
+            closeStepBlock={ addStepBlockCancel }
           />
           }
-          {step_group === BENCHMARK &&
+          { step_group === BENCHMARK &&
           <AddStepButton
-            funnelID={funnel_id}
-            className={classNames.addStepButtonRight}
-            parentSteps={parent_steps}
-            childSteps={child_steps}
-            showGroups={[
-              BENCHMARKS
-            ]}
-            anchorEl={anchorEl}
-            setAnchorEl={setAnchorEl}
-            openStepBlock={openStepBlock}
-            closeStepBlock={closeStepBlock}
-          />}
-          {step_group !== CONDITION &&
+            funnelID={ funnel_id }
+            className={ classNames.addStepButtonRight }
+            parentSteps={ parent_steps }
+            childSteps={ child_steps }
+            showGroups={ [
+              BENCHMARKS,
+            ] }
+            anchorEl={ anchorEl }
+            open={ addingStep === 'right' }
+            setAnchorEl={ setAnchorEl }
+            openStepBlock={ (e) => addStepBlock( 'right', e ) }
+            closeStepBlock={ addStepBlockCancel }
+          /> }
+          { step_group !== CONDITION &&
           <AddStepButton
-            funnelID={funnel_id}
-            className={classNames.addStepButtonBottom}
-            parentSteps={[ID]}
-            childSteps={child_steps}
-            showGroups={[
+            funnelID={ funnel_id }
+            className={ classNames.addStepButtonBottom }
+            parentSteps={ [ID] }
+            childSteps={ child_steps }
+            showGroups={ [
               step_group === ACTION ? BENCHMARKS : false,
               ACTIONS,
-              CONDITIONS
-            ].filter(item => item !== false)}
-            anchorEl={anchorEl}
-            setAnchorEl={setAnchorEl}
-            openStepBlock={openStepBlock}
-            closeStepBlock={closeStepBlock}
+              CONDITIONS,
+            ].filter(item => item !== false) }
+            open={ addingStep === 'bottom' }
+            anchorEl={ anchorEl }
+            setAnchorEl={ setAnchorEl }
+            openStepBlock={ (e) => addStepBlock( 'bottom', e ) }
+            closeStepBlock={ addStepBlockCancel }
           />
           }
-          <Box display={'flex'} justifyContent={'center'}>
+          <Box display={ 'flex' } justifyContent={ 'center' }>
             <ArcherElement
-              id={'archer-' + ID}
-              relations={childRelations}
+              id={ 'archer-' + ID }
+              relations={ childRelations }
             >
-              <Card className={classes.join(' ')} style={{ width: 250 }}>
+              <Card className={ classes.join(' ') } style={ { width: 250 } }>
                 <CardHeader
-                  avatar={stepType.icon}
-                  title={ID}
-                  subheader={stepType.name}
+                  avatar={ stepType.icon }
+                  title={ ID }
+                  subheader={ stepType.name }
                 />
                 <CardActions>
-                  <Tooltip title={'Edit'}>
+                  <Tooltip title={ 'Edit' }>
                     <IconButton
-                      color={'primary'}
-                      onClick={openStepBlock}
+                      color={ 'primary' }
+                      // onClick={ openStepBlock }
                     >
                       <EditIcon/>
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title={'Delete'}>
+                  <Tooltip title={ 'Delete' }>
                     <IconButton
-                      color={'secondary'}
-                      onClick={handleDelete}
+                      color={ 'secondary' }
+                      onClick={ handleDelete }
                     >
                       <DeleteIcon/>
                     </IconButton>

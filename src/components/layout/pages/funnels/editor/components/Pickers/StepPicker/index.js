@@ -10,8 +10,8 @@ import { useDispatch } from '@wordpress/data'
  * Internal dependencies
  */
 import {
-	FUNNELS_STORE_NAME
-} from 'data';
+  FUNNELS_STORE_NAME,
+} from 'data'
 
 const useStyles = makeStyles((theme) => ( {
   box: {
@@ -47,13 +47,13 @@ export default (props) => {
     parentSteps,
     childSteps,
     stepOrder,
-		funnelID,
-		closeStepBlock
+    funnelID,
+    closeStepBlock,
   } = props
 
   const classes = useStyles()
   const [search, setSearch] = useState('')
-  const { createStep } = useDispatch( FUNNELS_STORE_NAME );
+  const { createStep } = useDispatch(FUNNELS_STORE_NAME)
 
   // reduce step types into rows of three
   const reducer = (acc, curr) => {
@@ -76,8 +76,10 @@ export default (props) => {
       child_steps: childSteps || [],
       parent_steps: parentSteps || [],
     }
-    createStep( newStepData, funnelID );
-		closeStepBlock();
+    createStep({
+      data: newStepData,
+    }, funnelID)
+    closeStepBlock()
   }
 
   return (

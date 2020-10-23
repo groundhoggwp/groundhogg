@@ -2,22 +2,18 @@
  * Internal dependencies
  */
 import TYPES from './action-types';
+import { INITIAL_STATE as BASE_OBJECT_INITIAL_STATE } from 'data/base-object/constants'
+
+const INITIAL_STATE = {
+	...BASE_OBJECT_INITIAL_STATE
+}
 
 const funnelReducer = (
-	state = {
-		item: {},
-		funnel: {},
-		error: {},
-		isRequesting: false,
-		isUpdating: true,
-		isCreating: false,
-		isDeleting: false,
-	},
+	state = INITIAL_STATE,
 	{
 		type,
 		error,
 		item,
-		funnel,
 		isCreating,
 		isUpdating,
 		isDeleting,
@@ -26,11 +22,12 @@ const funnelReducer = (
 	switch ( type ) {
 		// Create
 		case TYPES.CREATE_STEP:
-			return {
+			state = {
 				...state,
-				item : funnel,
-				funnel,
+				item: item,
+				items: state.items.map(_item => _item.ID === item.ID ? item : _item),
 			}
+			break
 		case TYPES.SET_IS_CREATING:
 			state = {
 				...state,
@@ -49,11 +46,12 @@ const funnelReducer = (
 
 		// Update
 		case TYPES.UPDATE_STEP:
-			return {
+			state = {
 				...state,
-				item : funnel,
-				funnel,
+				item: item,
+				items: state.items.map(_item => _item.ID === item.ID ? item : _item),
 			}
+			break
 		case TYPES.SET_IS_UPDATING:
 			state = {
 				...state,
@@ -72,11 +70,12 @@ const funnelReducer = (
 
 		// Delete
 		case TYPES.DELETE_STEP:
-			return {
+			state = {
 				...state,
-				item : funnel,
-				funnel,
+				item: item,
+				items: state.items.map(_item => _item.ID === item.ID ? item : _item),
 			}
+			break
 		case TYPES.SET_IS_DELETING:
 			state = {
 				...state,
@@ -92,9 +91,11 @@ const funnelReducer = (
 				isDeleting: false,
 			}
 			break
-		default:
-			return state;
 	}
+
+	console.log( state );
+
+	return state;
 };
 
 export default funnelReducer;

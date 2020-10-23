@@ -1,15 +1,12 @@
 import { Card } from '@material-ui/core'
 import Box from '@material-ui/core/Box'
-import { useSelect } from '@wordpress/data';
 import { FUNNELS_STORE_NAME } from 'data';
-import {
-  useParams
-} from "react-router-dom";
 import BenchmarkPicker from './components/Pickers/BenchmarkPicker'
 import StepBlock from './components/StepBlock'
 import Paper from '@material-ui/core/Paper'
 import './steps-types'
 import { ArcherContainer, ArcherElement } from 'react-archer'
+import { withSelect } from '@wordpress/data'
 
 /**
  * Breadth first search of the steps tree to build iout a row level based chart
@@ -45,33 +42,17 @@ function assignLevels (startNodes, allNodes) {
   }
 }
 
-export default () => {
+const Editor = ({ funnel }) => {
 
-  let { id } = useParams();
-
-  const { funnel, item, isCreating, isDeleting, isUpdating, isRequesting } = useSelect( (select) => {
-    const store = select( FUNNELS_STORE_NAME )
-
-    return {
-      item: store.getItem( id ),
-      funnel: store.getFunnel(),
-      isCreating: store.isCreatingStep(),
-      isDeleting: store.isDeletingStep(),
-      isUpdating: store.isUpdatingStep(),
-      isRequesting: store.isItemsRequesting()
-    }
-  }, [] )
-
-
-  if ( ! item ) {
+  if ( ! funnel ) {
     return null;
   }
 
-  if ( ! item.steps ) {
+  if ( ! funnel.steps ) {
     return null;
   }
 
-  const steps = funnel.steps || item.steps;
+  const steps = funnel.steps;
 
   const startingSteps = steps.filter(
     step => step.data.parent_steps.length === 0)
@@ -128,5 +109,18 @@ export default () => {
       </ArcherContainer>
     </>
   )
-
 }
+
+export default withSelect( ( select, ownProps ) => {
+
+  const store = select( FUNNELS_STORE_NAME )
+
+  return {
+    // ...ownProps,
+    funnel: store.getItem( ownProps.id ),
+    // isCreating: store.isCreatingStep(),
+    // isDeleting: store.isDeletingStep(),
+    // isUpdating: store.isUpdatingStep(),
+    // isRequesting: store.isItemsRequesting()
+  }
+} )( Editor );

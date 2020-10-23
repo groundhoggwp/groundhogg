@@ -10,18 +10,15 @@ import { includes } from 'lodash';
 import { createRegistrySelector } from '@wordpress/data';
 
 export const getSnackbarMessage = ( state ) => {
-	const { extendedReducer } = state;
-	return extendedReducer.snackbarMessage;
+	return state.snackbarMessage;
 };
 
 export const getSnackbarSeverity = ( state ) => {
-	const { extendedReducer } = state;
-	return extendedReducer.snackbarSeverity;
+	return state.snackbarSeverity;
 };
 
 export const getSnackbarMenuOpen = ( state ) => {
-	const { extendedReducer } = state;
-	return extendedReducer.snackbarOpen;
+	return state.snackbarOpen;
 };
 
 /**
@@ -32,8 +29,7 @@ export const getSnackbarMenuOpen = ( state ) => {
  * @return {string} Editing mode.
  */
 export function getEditorMode( state ) {
-	const { extendedReducer } = state;
-	return getPreference( extendedReducer, 'editorMode', 'visual' );
+	return getPreference( state, 'editorMode', 'visual' );
 }
 
 /**

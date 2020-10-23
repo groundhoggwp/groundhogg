@@ -63,13 +63,13 @@ export default (endpoint) => ( {
       const result = yield apiFetch({
         method: 'POST',
         path: `${NAMESPACE}/${ endpoint }/${funnelId}/step/`,
-        data: {data:stepData}
+        data: stepData
       })
 
       yield setIsCreatingStep(false)
       yield {
         type: TYPES.CREATE_STEP,
-        funnel: result.item,
+        item: result.item,
       }
     }
     catch (e) {
@@ -89,27 +89,27 @@ export default (endpoint) => ( {
       yield setIsDeletingStep(false)
       yield {
         type: TYPES.DELETE_STEP,
-        funnel: result.item,
+        item: result.item,
       }
     }
     catch (e) {
       yield setIsDeletingStepError(e)
     }
   },
-  * updateStep (stepData, funnelId){
+  * updateStep (stepId, stepData, funnelId){
     yield setIsUpdatingStep(true)
 
     try {
       const result = yield apiFetch({
         method: 'PATCH',
         path: `${NAMESPACE}/${ endpoint }/${funnelId}/step/${stepId}`,
-        data: {data:stepData}
+        data: stepData
       })
 
       yield setIsUpdatingStep(false)
       yield {
         type: TYPES.UPDATE_STEP,
-        funnel: result.item,
+        item: result.item,
       }
     }
     catch (e) {

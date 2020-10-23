@@ -6,8 +6,7 @@ import CombinedStepPicker from '../Pickers/CombinedStepPicker';
 
 export default (props) => {
 
-  const { className, openStepBlock, closeStepBlock, anchorEl, setAnchorEl } = props;
-  const open = Boolean(anchorEl);
+  const { className, openStepBlock, closeStepBlock, anchorEl, setAnchorEl, open } = props;
   const id = open ? 'step-picker-popover' : undefined;
 
   return (
