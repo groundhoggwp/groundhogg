@@ -3,6 +3,7 @@ import Box from '@material-ui/core/Box'
 import { FUNNELS_STORE_NAME } from 'data';
 import BenchmarkPicker from './components/Pickers/BenchmarkPicker'
 import StepBlock from './components/StepBlock'
+import ExitFunnel from './components/ExitFunnel'
 import Paper from '@material-ui/core/Paper'
 import './steps-types'
 import { ArcherContainer, ArcherElement } from 'react-archer'
@@ -56,6 +57,8 @@ const Editor = ({ funnel }) => {
 
   const startingSteps = steps.filter(
     step => step.data.parent_steps.length === 0)
+  const endingSteps = steps.filter(
+    step => step.data.child_steps.length === 0)
 
   assignLevels( startingSteps, steps );
 
@@ -99,13 +102,11 @@ const Editor = ({ funnel }) => {
           })
         }
         {steps.length > 0 &&
-        <Box display={'flex'} justifyContent={'space-around'}>
-          <ArcherElement id={'exit'}>
-            <Card>
-              {'Exit Funnel!'}
-            </Card>
-          </ArcherElement>
-        </Box>}
+          <ExitFunnel
+            funnelId={funnel.ID}
+            endingSteps={endingSteps.map( step => step.ID )}
+          />
+        }
       </ArcherContainer>
     </>
   )
