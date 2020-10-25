@@ -139,7 +139,7 @@ const reducer = (
       break
   }
 
-  console.log( state );
+  // console.log( state );
 
   return state
 }

@@ -24,6 +24,8 @@ export default ({ID, data, meta, onCancel, onSave}) => {
     } )
   }
 
+  console.log(stepType)
+
   return (
     <stepType.edit
       data={tempData}
