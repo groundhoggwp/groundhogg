@@ -93,8 +93,6 @@ const funnelReducer = (
 			break
 	}
 
-	console.log( state );
-
 	return state;
 };
 
