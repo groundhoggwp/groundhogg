@@ -53,7 +53,7 @@ export default (props) => {
 
   const classes = useStyles()
   const [search, setSearch] = useState('')
-  const { createStep } = useDispatch(FUNNELS_STORE_NAME)
+  const { createStep, updateStep } = useDispatch(FUNNELS_STORE_NAME)
 
   // reduce step types into rows of three
   const reducer = (acc, curr) => {
@@ -76,9 +76,15 @@ export default (props) => {
       child_steps: childSteps || [],
       parent_steps: parentSteps || [],
     }
+
     createStep({
       data: newStepData,
     }, funnelID)
+
+    // updateStep( ID, {
+    //   data: tempData,
+    //   meta: tempMeta,
+    // } )
     closeStepBlock()
   }
 

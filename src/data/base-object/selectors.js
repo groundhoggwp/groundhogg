@@ -5,7 +5,7 @@
  * @param id
  */
 export const getItem = ( state, id=false ) => {
-	console.log( state );
+	// console.log( state );
 
 	if ( id && state.items ){
 		return state.items.find( _item => _item.ID === id ) || state.item;

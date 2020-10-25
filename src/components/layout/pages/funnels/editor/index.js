@@ -3,6 +3,7 @@ import Box from '@material-ui/core/Box'
 import { FUNNELS_STORE_NAME } from 'data';
 import BenchmarkPicker from './components/Pickers/BenchmarkPicker'
 import StepBlock from './components/StepBlock'
+import StepEditor from './components/StepEditor'
 import ExitFunnel from './components/ExitFunnel'
 import Paper from '@material-ui/core/Paper'
 import './steps-types'
@@ -94,6 +95,7 @@ const Editor = ({ funnel }) => {
                     return (
                       <>
                         <StepBlock {...step}/>
+                        <StepEditor {...step}/>
                       </>)
                   } )
                 }
