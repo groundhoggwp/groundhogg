@@ -94,6 +94,10 @@ export function Reports (props) {
 		return null;
 	}
 
+  if ( reports.length === 0) {
+    return null;
+  }
+
 	if ( isRequesting || isUpdating ) {
 		return <Spinner />;
 	}
