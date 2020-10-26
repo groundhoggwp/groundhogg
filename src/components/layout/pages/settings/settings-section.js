@@ -9,9 +9,9 @@ import TextField from '@material-ui/core/TextField'
 import TagPicker from '../../../core-ui/tag-picker'
 import { SETTINGS_STORE_NAME } from '../../../../data'
 
-export const SettingsSection = ( { section } ) => {
 
-	const componentInputMap = applyFilters( 'groundhogg/settings/component_input_map', {
+export const SettingsSection = ( { section } ) => {
+	const componentInputMap = applyFilters( 'groundhogg.settings.componentInputMap', {
 		'input' : ( props ) => ( <TextField {...props} /> ),
 		'number' : ( props ) => ( <TextField {...props} /> ),
 		'checkbox' : ( props ) => ( <Checkbox {...props} /> ),
@@ -21,7 +21,7 @@ export const SettingsSection = ( { section } ) => {
 		'dropdown_owners' : ( props ) => ( <Select {...props} /> ), // Investigate any difference here.
 		'editor' : ( props ) => ( <TextareaAutosize {...props} /> ), // Need to build out TinyMCE Editor
 		'textarea' :  ( props ) => ( <TextareaAutosize {...props} /> ),
-	 } )
+	 } );
 
 	return (
 		<Fragment>

@@ -1,11 +1,9 @@
-Registering Custom Columns
+Customizing the Email Editor
 =======
 
-You can register a custom column to any table within Groundhogg with the following filters. Note: Because these columns interface with Groundhogg's REST API, you may need to register the custom data with our schema as well in order for it to be available on the front-end. used to modify the way data is retreived or displayed in Groundhogg.
+## Adding Custom Panels
 
-Internal @TODO: Confirm that we're actually implementing JSON schema via custom REST API endpoints. Cursory review in discovery leads me to assume we are not.
-
-## Extending Tables
+## Creating Custom Blocks
 
 ```php
 function table_column_register_script() {
