@@ -123,16 +123,16 @@ class Broadcasts_Page extends Admin_Page {
 
 		$meta = [];
 
-		$object_id = isset( $_POST['object_id'] ) ? intval( $_POST['object_id'] ) : null;
+		$object_id = isset( $_POST[ 'object_id' ] ) ? intval( $_POST[ 'object_id' ] ) : null;
 		if ( ! $object_id ) {
 			return new \WP_Error( 'unable_to_add_tags', __( 'Please select an email or SMS to send.', 'groundhogg' ) );
 		}
 
 		/* Set the object  */
-		$meta['object_id']   = $object_id;
-		$meta['object_type'] = isset( $_REQUEST['type'] ) && $_REQUEST['type'] === 'sms' ? 'sms' : 'email';
+		$meta[ 'object_id' ]   = $object_id;
+		$meta[ 'object_type' ] = isset( $_REQUEST[ 'type' ] ) && $_REQUEST[ 'type' ] === 'sms' ? 'sms' : 'email';
 
-		if ( $meta['object_type'] === 'email' ) {
+		if ( $meta[ 'object_type' ] === 'email' ) {
 
 			$email = Plugin::$instance->utils->get_email( $object_id );
 
@@ -141,17 +141,17 @@ class Broadcasts_Page extends Admin_Page {
 			}
 		}
 
-		$send_date = isset( $_POST['date'] ) ? sanitize_text_field( $_POST['date'] ) : date( 'Y-m-d', strtotime( 'tomorrow' ) );
-		$send_time = isset( $_POST['time'] ) ? sanitize_text_field( $_POST['time'] ) : '09:30';
+		$send_date = isset( $_POST[ 'date' ] ) ? sanitize_text_field( $_POST[ 'date' ] ) : date( 'Y-m-d', strtotime( 'tomorrow' ) );
+		$send_time = isset( $_POST[ 'time' ] ) ? sanitize_text_field( $_POST[ 'time' ] ) : '09:30';
 
 		$time_string = $send_date . ' ' . $send_time;
 
 		/* convert to UTC */
 		$send_time = Plugin::$instance->utils->date_time->convert_to_utc_0( strtotime( $time_string ) );
 
-		if ( isset( $_POST['send_now'] ) ) {
-			$meta['send_now'] = true;
-			$send_time        = time() + 10;
+		if ( isset( $_POST[ 'send_now' ] ) ) {
+			$meta[ 'send_now' ] = true;
+			$send_time          = time() + 10;
 		}
 
 		if ( $send_time < time() ) {
@@ -159,7 +159,7 @@ class Broadcasts_Page extends Admin_Page {
 		}
 
 		/* Set the email */
-		$meta['send_time'] = $send_time;
+		$meta[ 'send_time' ] = $send_time;
 
 		$include_tags = validate_tags( get_post_var( 'tags', [] ) );
 		$exclude_tags = validate_tags( get_post_var( 'exclude_tags', [] ) );
@@ -175,14 +175,14 @@ class Broadcasts_Page extends Admin_Page {
 		if ( $saved_search = sanitize_text_field( get_post_var( 'saved_search' ) ) ) {
 			$search = Saved_Searches::instance()->get( $saved_search );
 			if ( $search ) {
-				$query = $search['query'];
+				$query = $search[ 'query' ];
 			}
 		} else if ( $custom_query = get_post_var( 'custom_query' ) ) {
 			$query = map_deep( json_decode( $custom_query, true ), 'sanitize_text_field' );
 		}
 
 		// Unset the search param from the query...
-		unset( $query['is_searching'] );
+		unset( $query[ 'is_searching' ] );
 
 		$query = wp_parse_args( $query, [
 			'optin_status' => [
@@ -192,29 +192,29 @@ class Broadcasts_Page extends Admin_Page {
 		] );
 
 		// Assume marketing by default...
-		$meta['is_transactional'] = false;
+		$meta[ 'is_transactional' ] = false;
 
 		// if the email is a transactional email we will remove the optin statuses from the query
-		if ( $meta['object_type'] === 'email' && isset( $email ) && $email->is_transactional() ) {
+		if ( $meta[ 'object_type' ] === 'email' && isset( $email ) && $email->is_transactional() ) {
 
 			// Include additional statuses
-			unset( $query['optin_status'] );
+			unset( $query[ 'optin_status' ] );
 
-			$query['optin_status_exclude'] = [
+			$query[ 'optin_status_exclude' ] = [
 				Preferences::SPAM,
 				Preferences::HARD_BOUNCE,
 				Preferences::COMPLAINED
 			];
 
 			// make transactional
-			$meta['is_transactional'] = true;
+			$meta[ 'is_transactional' ] = true;
 		}
 
 		$query = array_filter( $query );
 
 		$args = array(
 			'object_id'    => $object_id,
-			'object_type'  => $meta['object_type'],
+			'object_type'  => $meta[ 'object_type' ],
 			'send_time'    => $send_time,
 			'scheduled_by' => get_current_user_id(),
 			'status'       => 'pending',
@@ -233,8 +233,8 @@ class Broadcasts_Page extends Admin_Page {
 			return new \WP_Error( 'unable_to_add_broadcast', __( 'Something went wrong while adding the broadcast.', 'groundhogg' ) );
 		}
 
-		if ( isset( $_POST['send_in_timezone'] ) ) {
-			$meta['send_in_local_time'] = true;
+		if ( isset( $_POST[ 'send_in_timezone' ] ) ) {
+			$meta[ 'send_in_local_time' ] = true;
 		}
 
 		$broadcast = new Broadcast( $broadcast_id );
@@ -246,18 +246,18 @@ class Broadcasts_Page extends Admin_Page {
 		/**
 		 * Fires after the broadcast is added to the DB but before the user is redirected to the scheduler
 		 *
-		 * @param int   $broadcast_id the ID of the broadcast
-		 * @param array $meta         the config object which is passed to the scheduler
+		 * @param int $broadcast_id the ID of the broadcast
+		 * @param array $meta the config object which is passed to the scheduler
 		 */
 		do_action( 'groundhogg/admin/broadcast/scheduled', $broadcast_id, $meta, $broadcast );
 
-        $this->add_notice( 'review', __( 'Review your broadcast before scheduling!', 'groundhogg' ), 'warning' );
+		$this->add_notice( 'review', __( 'Review your broadcast before scheduling!', 'groundhogg' ), 'warning' );
 
-        return admin_page_url( 'gh_broadcasts', [
-            'action'    => 'preview',
-            'broadcast' => $broadcast_id,
-        ] );
-    }
+		return admin_page_url( 'gh_broadcasts', [
+			'action'    => 'preview',
+			'broadcast' => $broadcast_id,
+		] );
+	}
 
 	/**
 	 * Confirm from the preview page

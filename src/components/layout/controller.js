@@ -62,7 +62,7 @@ export const getPages = () => {
 		icon : SettingsInputAntennaSharpIcon,
 		label: __( 'Broadcasts' ),
 		name: 'broadcasts',
-		path: '/boradcasts',
+		path: '/broadcasts',
 		priority: 20
 	} );
 
