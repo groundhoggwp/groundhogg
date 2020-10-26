@@ -76,15 +76,10 @@ export default (props) => {
       child_steps: childSteps || [],
       parent_steps: parentSteps || [],
     }
-
     createStep({
       data: newStepData,
     }, funnelID)
 
-    // updateStep( ID, {
-    //   data: tempData,
-    //   meta: tempMeta,
-    // } )
     closeStepBlock()
   }
 

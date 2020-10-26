@@ -7,7 +7,7 @@ export default ({ID, data, meta, onCancel, onSave}) => {
 
   const [ tempData, setTempData ] = useState(data);
   const [ tempMeta, setTempMeta ] = useState(meta);
-  const { step_title, step_type, step_group, parent_steps, child_steps } = data;
+  const { step_title, step_type, step_group, parent_steps, child_steps, funnel_id } = data;
 
   const { updateStep } = useDispatch( FUNNELS_STORE_NAME );
 
@@ -18,21 +18,40 @@ export default ({ID, data, meta, onCancel, onSave}) => {
   }, [] )
 
   const handleSave = () => {
-    updateStep( ID, {
+    // Funnel ID, Step ID, Data
+    updateStep( funnel_id, ID, {
       data: tempData,
-      meta: tempMeta,
-    } )
+      meta: metaData,
+    })
   }
 
-  console.log(stepType)
-
   return (
-    <stepType.edit
-      data={tempData}
-      meta={tempMeta}
-      onSave={handleSave}
-      onCanel={onCancel}
-    />
+    <div></div>
   )
+    
+  // console.log(stepType)
+  //
+  // // console.log(data, meta)
+  //
+  // if(!stepType){
+  //   return (
+  //     <div></div>
+  //   )
+  // }
+  // console.log(stepType.edit)
+  // if(!stepType.edit){
+  //   return (
+  //     <div></div>
+  //   )
+  // }
+  //
+  // return (
+  //   <stepType.edit
+  //     data={tempData}
+  //     meta={tempMeta}
+  //     onSave={handleSave}
+  //     onCanel={onCancel}
+  //   />
+  // )
 
  }
