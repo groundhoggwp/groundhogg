@@ -366,7 +366,7 @@ class Contacts_Api extends Base_Object_Api {
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function update_single( WP_REST_Request $request ) {
-		$ID = absint( $request->get_param( 'id' ) );
+		$ID = absint( $request->get_param( 'ID' ) );
 
 		$contact = get_contactdata( $ID );
 
@@ -406,7 +406,7 @@ class Contacts_Api extends Base_Object_Api {
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
 	public function create_tags( WP_REST_Request $request ) {
-		$ID = absint( $request->get_param( 'id' ) );
+		$ID = absint( $request->get_param( 'ID' ) );
 
 		$contact = get_contactdata( $ID );
 
@@ -429,7 +429,7 @@ class Contacts_Api extends Base_Object_Api {
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
 	public function read_tags( WP_REST_Request $request ) {
-		$ID = absint( $request->get_param( 'id' ) );
+		$ID = absint( $request->get_param( 'ID' ) );
 
 		$contact = get_contactdata( $ID );
 
@@ -459,7 +459,7 @@ class Contacts_Api extends Base_Object_Api {
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
 	public function delete_tags( WP_REST_Request $request ) {
-		$ID = absint( $request->get_param( 'id' ) );
+		$ID = absint( $request->get_param( 'ID' ) );
 
 		$contact = get_contactdata( $ID );
 
@@ -482,7 +482,7 @@ class Contacts_Api extends Base_Object_Api {
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function create_files( WP_REST_Request $request ){
-		$ID = absint( $request->get_param( 'id' ) );
+		$ID = absint( $request->get_param( 'ID' ) );
 
 		$contact = get_contactdata( $ID );
 
@@ -516,7 +516,7 @@ class Contacts_Api extends Base_Object_Api {
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function read_files( WP_REST_Request $request ) {
-		$ID = absint( $request->get_param( 'id' ) );
+		$ID = absint( $request->get_param( 'ID' ) );
 
 		$contact = get_contactdata( $ID );
 
@@ -539,7 +539,7 @@ class Contacts_Api extends Base_Object_Api {
 	 */
 	public function delete_files( WP_REST_Request $request ){
 
-		$ID = absint( $request->get_param( 'id' ) );
+		$ID = absint( $request->get_param( 'ID' ) );
 
 		$contact = get_contactdata( $ID );
 
@@ -571,7 +571,7 @@ class Contacts_Api extends Base_Object_Api {
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
 	public function merge( WP_REST_Request $request ) {
-		$ID = absint( $request->get_param( 'id' ) );
+		$ID = absint( $request->get_param( 'ID' ) );
 
 		$contact = get_contactdata( $ID );
 

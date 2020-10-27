@@ -2,7 +2,8 @@ import {
   addTableColumn,
   registerNavItem,
   registerSetting,
-  registerSettingsPanel
+  registerSettingsSection,
+  registerSettingsPanel,
 } from './framework/index.js';
 
 ( function ($, nonces, endpoints, gh) {
@@ -141,5 +142,6 @@ import {
   gh.registerNavItem = registerNavItem
   gh.registerSetting = registerSetting
   gh.registerSettingsPanel = registerSettingsPanel
+  gh.registerSettingsSection = registerSettingsSection
 
 } )(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)

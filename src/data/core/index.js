@@ -4,6 +4,7 @@
 import * as selectors from './selectors';
 import * as actions from './actions';
 import reducer from './reducer';
+import * as resolvers from './resolvers';
 import applyMiddlewares from './middlewares';
 
 import {
@@ -17,6 +18,7 @@ const store = registerBaseObjectStore( STORE_NAME, {
 	selectors,
 	actions,
 	reducer,
+	resolvers,
 	persist: [ 'preferences' ],
 } );
 
