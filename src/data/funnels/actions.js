@@ -96,7 +96,7 @@ export default (endpoint) => ( {
       yield setIsDeletingStepError(e)
     }
   },
-  * updateStep (stepId, stepData, funnelId){
+  * updateStep (funnelId, stepId, stepData){
     yield setIsUpdatingStep(true)
 
     try {

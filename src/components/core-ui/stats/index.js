@@ -1,46 +1,85 @@
 /**
  * External dependencies
  */
-import { Fragment, useState } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { makeStyles } from '@material-ui/core/styles';
-import { __ } from '@wordpress/i18n';
-import Card from '@material-ui/core/Card';
-import Typography from '@material-ui/core/Typography';
+import { Fragment, useState } from "@wordpress/element";
+import { useSelect, useDispatch } from "@wordpress/data";
+import { makeStyles } from "@material-ui/core/styles";
+import { __ } from "@wordpress/i18n";
+import Card from "@material-ui/core/Card";
+import Typography from "@material-ui/core/Typography";
 
 /**
  * Internal dependencies
  */
 
- const useStyles = makeStyles((theme) => ({
-   root: {
-     width: "100%",
-     // height: props.type === "doughnut" ? "700px" : "400px",
-   },
-   kpiTitle:{
-     fontSize: '24px'
-   },
-   kpiMetric:{
-     fontSize: '24px'
-   }
- }));
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: "300px",
+    height: "150px",
+    margin: "10px",
+    // height: type === "doughnut" ? "700px" : "400px",
+  },
+  title: {
+    fontSize: "24px",
+    fontStyle: "capitalize",
+  },
+  current: {
+    fontSize: "24px",
+  },
+}));
 
-const Stats = (props) => {
-
+const Stats = ({ title, data }) => {
   const classes = useStyles();
-  // const chartContainer = useRef(null);
-  // const [chartInstance, setChartInstance] = useState(null);
-  // console.log(props);
 
-  // <Card className={classes.container}><Chart type='line'/></Card>
-  // <Card className={classes.container}>
-  //   <Typography className={classes.kpiTitle} component="h1" color="textSecondary">{`KPI`}</Typography>
-  //   <Typography className={classes.kpiMetric} component="div" color="textSecondary">{`${Math.round(Math.random()*1000)/10}%`}</Typography>
-  // </Card>
+  // const {title} = props;
+  const { type, chart } = data;
+  const { current, compare } = data.chart.data;
+  const { number } = data.chart.number;
+  const { text } = data.chart.compare.text;
+  const { direction, color } = data.chart.compare.arrow;
+  // console.log('stats', data, title, type)
+  console.log(title, data, direction, color);
+  let arrow = direction === "up" ? "^" : "___";
+
   return (
-    <Fragment>
-asdasd
-    </Fragment>
+    <Card className={classes.root}>
+      <Typography
+        className={classes.title}
+        component="h1"
+        color="textSecondary"
+      >
+        {title}
+      </Typography>
+      <Typography
+        className={classes.current}
+        component="div"
+        color="textSecondary"
+      >
+        {current}
+      </Typography>
+      <Typography
+        className={classes.currentMetric}
+        component="div"
+        color="textSecondary"
+      >
+        {compare}
+      </Typography>
+      <Typography
+        className={classes.currentMetric}
+        component="div"
+        color="textSecondary"
+      >
+        {number}
+      </Typography>
+      <Typography
+        className={classes.currentMetric}
+        component="div"
+        color="textSecondary"
+      >
+        {text}
+      </Typography>
+      <div>{arrow}</div>
+    </Card>
   );
   // return (
   //   <Card className="groundhogg-state-card">

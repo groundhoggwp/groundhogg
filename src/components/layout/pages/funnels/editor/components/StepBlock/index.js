@@ -83,11 +83,11 @@ export default (props) => {
   ]
 
   const handleEdit = () => {
-    // openStepBlock();
+    openStepBlock();
   }
 
   const handleCancelAdd = () => {
-    // closeStepBlock();
+    closeStepBlock();
   }
 
   const handleDelete = () => {
@@ -188,7 +188,7 @@ export default (props) => {
                   <Tooltip title={ 'Edit' }>
                     <IconButton
                       color={ 'primary' }
-                      // onClick={ openStepBlock }
+                      onClick={ handleEdit }
                     >
                       <EditIcon/>
                     </IconButton>
