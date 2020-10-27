@@ -1,7 +1,7 @@
 import { useEffect, useState } from '@wordpress/element'
-import { dispatch } from '@wordpress/data'
+import { dispatch, useSelect } from '@wordpress/data'
 import { CORE_STORE_NAME } from '../data';
-
+import { useRouteMatch } from 'react-router-dom'
 export const useShift = (onShift) => {
   useEffect(() => {
     const handleShift = (event) => {
@@ -60,4 +60,18 @@ export const useKeyPress = (targetKey, onKeyDown, onKeyUp) => {
  */
 export const addNotification = ( { message, type } ) => {
   dispatch( CORE_STORE_NAME ).showSnackbar( message, type );
+}
+
+export const canUser = ( { action, id } ) => {
+
+  const { path } = useRouteMatch();
+
+  const { _canUser } = useSelect( (select) => {
+    return {
+      _canUser: select( CORE_STORE_NAME ).canUser
+    }
+  }, [] );
+
+
+  return _canUser( action, path.replace( '/', '' ), id );
 }

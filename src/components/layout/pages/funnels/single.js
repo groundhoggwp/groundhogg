@@ -7,8 +7,6 @@ export default () => {
 
   const { id } = useParams();
 
-  // console.debug( id );
-
   return (
     <>
       <Editor id={id}/>

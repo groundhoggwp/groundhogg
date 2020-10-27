@@ -1,6 +1,8 @@
 import {
-  useEffect, useState,
+  useEffect,
+  useState,
 } from '@wordpress/element'
+import { canUser } from 'utils'
 import Table from '@material-ui/core/Table'
 import TableContainer from '@material-ui/core/TableContainer'
 import TableHead from '@material-ui/core/TableHead'
@@ -11,15 +13,16 @@ import TableSortLabel from '@material-ui/core/TableSortLabel'
 import TableBody from '@material-ui/core/TableBody'
 import Paper from '@material-ui/core/Paper'
 import TablePagination from '@material-ui/core/TablePagination'
-import Spinner from '../spinner'
 import Typography from '@material-ui/core/Typography'
 import Tooltip from '@material-ui/core/Tooltip/Tooltip'
 import IconButton from '@material-ui/core/IconButton'
-import DeleteIcon from '@material-ui/icons/Delete'
 import TextField from '@material-ui/core/TextField'
 import Toolbar from '@material-ui/core/Toolbar'
 import { lighten, makeStyles } from '@material-ui/core/styles'
 import clsx from 'clsx'
+
+import Spinner from '../spinner'
+import { CORE_STORE_NAME } from 'data';
 
 const useDebounce = (value, delay) => {
   // State and setters for debounced value
@@ -211,6 +214,8 @@ export function ListTable ({
     return <Spinner/>
   }
 
+  const canUserUpdate = canUser( 'update' ); // More granularly, canUser( 'update', item.ID )
+
   return (
     <>
       <Paper className={ classes.root }>
@@ -238,7 +243,7 @@ export function ListTable ({
               { items &&
               items.map(item => {
 
-                if (quickEditId === item.ID) {
+                if (quickEditId === item.ID && canUserUpdate) {
                   return (
                     <TableCell colSpan={columns.length + 1 } key={item.ID}>
                       <QuickEdit
@@ -261,7 +266,9 @@ export function ListTable ({
                     { columns.map( ( col, index ) => <TableCell key={index} align={ col.align }>
                       <col.cell
                         { ...item }
-                        openQuickEdit={()=>setQuickEditId(item.ID)}
+                        openQuickEdit={
+                          () => canUserUpdate && setQuickEditId(item.ID)
+                        }
                       />
                     </TableCell>) }
                   </TableRow>
