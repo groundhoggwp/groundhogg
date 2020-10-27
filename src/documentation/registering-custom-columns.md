@@ -3,7 +3,6 @@ Registering Custom Columns
 
 You can register a custom column to any table within Groundhogg with the following filters. Note: Because these columns interface with Groundhogg's REST API, you may need to register the custom data with our schema as well in order for it to be available on the front-end. used to modify the way data is retreived or displayed in Groundhogg.
 
-Internal @TODO: Confirm that we're actually implementing JSON schema via custom REST API endpoints. Cursory review in discovery leads me to assume we are not.
 
 ## Extending Tables
 
