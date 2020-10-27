@@ -29,12 +29,17 @@ const useStyles = makeStyles((theme) => ({
 export function Reports(props) {
   const classes = useStyles();
 
+  const dateChange = (e)  => {
+    console.log('change the data', e)
+  }
+  
   const tabs = [
     {
       label: __("Overview"),
       component: (classes) => {
         return (
           <ReportPanel
+            dateChange={dateChange}
             reportList={[
               "total_new_contacts",
               "total_confirmed_contacts",

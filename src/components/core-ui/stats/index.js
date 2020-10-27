@@ -7,6 +7,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import { __ } from "@wordpress/i18n";
 import Card from "@material-ui/core/Card";
 import Typography from "@material-ui/core/Typography";
+import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 
 /**
  * Internal dependencies
@@ -14,71 +16,75 @@ import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles((theme) => ({
   root: {
+    position: 'relative',
     width: "300px",
     height: "150px",
     margin: "10px",
     // height: type === "doughnut" ? "700px" : "400px",
   },
   title: {
-    fontSize: "24px",
-    fontStyle: "capitalize",
+    display: 'block',
+    fontSize: "18px",
+    textTransform: "capitalize",
+    padding: "10px 5px 5px 10px",
+    color: '#ffffff',
+    background: '#DB741A',
+    marginBottom: '10px'
   },
   current: {
-    fontSize: "24px",
+    fontSize: "50px",
+    fontWeight: 900
+  },
+  compareArrow: {
+    position: 'absolute',
+    left: '-7px',
+    bottom: '-15px',
+    fontSize: '50px'
+  },
+  compare: {
+    position: 'absolute',
+    left: '35px',
+    bottom: '0',
+    fontSize: "12px",
+    // fontWeight: 900
   },
 }));
 
 const Stats = ({ title, data }) => {
   const classes = useStyles();
 
-  // const {title} = props;
-  const { type, chart } = data;
+  const { type} = data;
   const { current, compare } = data.chart.data;
   const { number } = data.chart.number;
-  const { text } = data.chart.compare.text;
+
+  const { text,  percent } = data.chart.compare;
   const { direction, color } = data.chart.compare.arrow;
-  // console.log('stats', data, title, type)
-  console.log(title, data, direction, color);
-  let arrow = direction === "up" ? "^" : "___";
+
+  let arrow = direction === "up" ? <ArrowDropUpIcon style={{color}} className={classes.compareArrow}/> : <ArrowDropDownIcon style={{color}} className={classes.compareArrow}/>;
 
   return (
     <Card className={classes.root}>
-      <Typography
+      <div
         className={classes.title}
-        component="h1"
-        color="textSecondary"
       >
         {title}
-      </Typography>
-      <Typography
+      </div>
+      <div
         className={classes.current}
-        component="div"
-        color="textSecondary"
       >
         {current}
-      </Typography>
-      <Typography
+      </div>
+
+      <div
         className={classes.currentMetric}
-        component="div"
-        color="textSecondary"
-      >
-        {compare}
-      </Typography>
-      <Typography
-        className={classes.currentMetric}
-        component="div"
-        color="textSecondary"
       >
         {number}
-      </Typography>
-      <Typography
-        className={classes.currentMetric}
-        component="div"
-        color="textSecondary"
-      >
-        {text}
-      </Typography>
-      <div>{arrow}</div>
+      </div>
+
+        {arrow}
+      <div className={classes.compare}>
+        {percent}{text}
+      </div>
     </Card>
   );
   // return (

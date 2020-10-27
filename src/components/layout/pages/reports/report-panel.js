@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default ({ reportList }) => {
+export default ({ reportList, dateChange }) => {
   // export default ({ID, data, meta, onCancel, onSave}) => {
   const classes = useStyles();
 
@@ -141,8 +141,8 @@ export default ({ reportList }) => {
   // return (
   return (
     <div className={classes.root}>
-      <DatePicker />
-      <DatePicker />
+      <DatePicker dateChange={dateChange}/>
+      <DatePicker dateChange={dateChange}/>
       <div className={classes.container}>
         {Object.keys(reports).map((reportKey, i) => {
           let title = reportKey.split("_");
