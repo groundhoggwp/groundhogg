@@ -62,7 +62,7 @@ const tagTableColumns = [
     },
   },
   {
-    ID: 'contacts',
+    ID: 'actions',
     name: <span><SettingsIcon { ...iconProps }/> { 'Actions' }</span>,
     align: 'right',
     cell: ({ ID, data, openQuickEdit }) => {
