@@ -38,8 +38,6 @@ export const Settings = () => {
 		})
 	} );
 
-	console.log(tabs);
-
 	return (
 		<Fragment>
 			<TabPanel tabs={tabs} />
