@@ -93,9 +93,31 @@ const coreReducer = (
 	return state;
 };
 
+/**
+ * State which tracks whether the user can perform an action on a REST
+ * resource.
+ *
+ * @param  {Object} state  Current state.
+ * @param  {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function userPermissions( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_USER_PERMISSION':
+			return {
+				...state,
+				[ action.key ]: action.isAllowed,
+			};
+	}
+
+	return state;
+}
+
 
 export default combineReducers( {
 	coreReducer,
 	preferences,
+	userPermissions,
 	isInserterOpened,
 } );
