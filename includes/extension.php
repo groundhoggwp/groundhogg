@@ -180,6 +180,7 @@ abstract class Extension {
 
 		$this->init_components();
 
+		add_action( 'groundhogg/scripts/after_enqueue_block_editor_assets', [ $this, 'register_react_assets' ], 10, 2 );
 		add_action( 'groundhogg/scripts/after_register_admin_scripts', [ $this, 'register_admin_scripts' ], 10, 2 );
 		add_action( 'groundhogg/scripts/after_register_admin_styles', [ $this, 'register_admin_styles' ] );
 		add_action( 'groundhogg/scripts/after_register_frontend_scripts', [
@@ -227,6 +228,10 @@ abstract class Extension {
 	 * @param $dot_min string
 	 */
 	public function register_admin_scripts( $is_minified, $dot_min ) {
+	}
+
+	public function register_react_assets() {
+
 	}
 
 	/**

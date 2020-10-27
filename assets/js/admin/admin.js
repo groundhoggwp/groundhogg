@@ -130,6 +130,7 @@ import {
   gh.pickers = {}
 
   // Map functions to Groundhogg object.
+  gh.hooks = wp.hooks.createHooks();
   gh.pickers.picker = picker
   gh.pickers.apiPicker = apiPicker
   gh.pickers.linkPicker = linkPicker

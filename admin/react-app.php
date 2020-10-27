@@ -40,9 +40,10 @@ class React_App {
 		}
 	}
 
-	public function enqueue_block_editor_styles() {
+	public function enqueue_block_editor_assets() {
 		wp_enqueue_style( 'wp-edit-post' );
 		wp_enqueue_style( 'groundhogg-react-styles', GROUNDHOGG_URL . 'build/index.css' );
+		do_action( 'groundhogg/scripts/after_enqueue_block_editor_assets' );
 	}
 
 	public function maybe_render() {
@@ -58,7 +59,7 @@ class React_App {
 			wp_die( __( 'You do not have access to this platform.', 'groundhogg' ) );
 		}
 
-		$this->enqueue_block_editor_styles();
+		$this->enqueue_block_editor_assets();
 
 		Plugin::instance()->scripts->register_admin_scripts();
 		Plugin::instance()->scripts->register_admin_styles();
@@ -110,10 +111,12 @@ class React_App {
 	 * The Groundhogg footer
 	 */
 	protected function edit_footer() {
-		?>
+		$handles = apply_filters( 'groundhogg/admin/scripts', [] );
+		$handles[] = 'groundhogg-react';
+	?>
         </body>
 		<?php do_action( 'groundhogg_footer' ); ?>
-		<?php wp_print_scripts( 'groundhogg-react' ) ?>
+		<?php wp_print_scripts( $handles ) ?>
         </html>
 		<?php
 	}

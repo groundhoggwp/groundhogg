@@ -147,7 +147,8 @@ class Scripts {
 		wp_register_script( 'groundhogg-admin', GROUNDHOGG_ASSETS_URL . 'js/admin/admin' . $dot_min . '.js', [
 			'jquery',
 			'select2',
-			'jquery-ui-autocomplete'
+			'jquery-ui-autocomplete',
+			'wp-plugins',
 		], GROUNDHOGG_VERSION, true );
 		wp_register_script( 'groundhogg-admin-functions', GROUNDHOGG_ASSETS_URL . 'js/admin/functions' . $dot_min . '.js', [
 			'jquery',
