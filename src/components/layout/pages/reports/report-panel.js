@@ -20,15 +20,25 @@ import DatePicker from "../../../core-ui/date-picker";
 
 const useStyles = makeStyles((theme) => ({
   root: {
+    position: 'relative',
     marginBottom: theme.spacing(1),
     textAlign: "center",
     // paddingTop: theme.spacing(4),
     // paddingBottom: theme.spacing(4),
   },
   container: {
-    display: "flex",
-    flexWrap: "wrap",
+    // display: "flex",
+    // flexWrap: "wrap",
   },
+  datePickers:{
+    position: 'absolute',
+    display: 'flex',
+    right: '0px',
+    width: '350px',
+    // display: 'flex',
+    // width: '100%',
+    justifyContent: 'flex-end'
+  }
 }));
 
 export default ({ reportList, dateChange }) => {
@@ -36,6 +46,7 @@ export default ({ reportList, dateChange }) => {
   const classes = useStyles();
 
   const [stateTagValue, setTagValue] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
 
   const { reports, getReports, isRequesting, isUpdating } = useSelect(
     (select) => {
@@ -138,24 +149,20 @@ export default ({ reportList, dateChange }) => {
     return <Spinner />;
   }
 
-  // return (
+
   return (
     <div className={classes.root}>
-      <DatePicker dateChange={dateChange}/>
-      <DatePicker dateChange={dateChange}/>
+
+      <div className={classes.datePickers}>
+        <DatePicker dateChange={dateChange} selectedDate={selectedDate} label={'start'} id={'start'}/>
+        <DatePicker dateChange={dateChange} selectedDate={selectedDate} label={'end'} id={'end'}/>
+      </div>
       <div className={classes.container}>
         {Object.keys(reports).map((reportKey, i) => {
           let title = reportKey.split("_");
           let type = reports[reportKey].chart.type;
           title.shift();
           title = title.join(" ");
-          console.log(
-            reportKey,
-            "asdfa",
-            title,
-            reports[reportKey].chart.type,
-            type
-          );
           if (type === "quick_stat") {
             return <Stats title={title} data={reports[reportKey]} />;
           } else {

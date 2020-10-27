@@ -139,22 +139,22 @@ const doughnutChart = {
   },
 };
 
-const Chart = (props) => {
+const Chart = ({type, data}) => {
   const useStyles = makeStyles((theme) => ({
     root: {
-      width: "100%",
-      height: props.type === "doughnut" ? "700px" : "400px",
+      // display: 'inline-block',
+      // width: "100%",
+      width: "calc(100% - 350px)",      
+      height: type === "doughnut" ? "700px" : "400px",
     },
   }));
   const classes = useStyles();
   const chartContainer = useRef(null);
   const [chartInstance, setChartInstance] = useState(null);
-  // console.log(props);
-  // console.log(props.data.chart.type);
+
 
   let chartConfig = lineChartConfig;
-  let chartType = props.data.chart.type;
-  let data = props.data.chart.data;
+  let chartType = data.chart.type;
 
   if (chartType === "line") {
     chartConfig = lineChartConfig;
@@ -162,9 +162,9 @@ const Chart = (props) => {
     chartConfig = doughnutChart;
   }
   chartConfig.type =  chartType
-  chartConfig.data =  data
+  chartConfig.data =  data.chart.data
 
-
+  console.log(type, data)
 
   useEffect(() => {
     if (chartContainer && chartContainer.current) {

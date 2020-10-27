@@ -32,7 +32,7 @@ export function Reports(props) {
   const dateChange = (e)  => {
     console.log('change the data', e)
   }
-  
+
   const tabs = [
     {
       label: __("Overview"),
@@ -41,6 +41,7 @@ export function Reports(props) {
           <ReportPanel
             dateChange={dateChange}
             reportList={[
+              "chart_new_contacts",
               "total_new_contacts",
               "total_confirmed_contacts",
               "total_engaged_contacts",
@@ -48,13 +49,12 @@ export function Reports(props) {
               "total_emails_sent",
               "email_open_rate",
               "email_click_rate",
-              "chart_new_contacts",
-              "chart_email_activity",
-              "chart_funnel_breakdown",
-              "chart_contacts_by_optin_status",
-              "chart_contacts_by_region",
-              "chart_contacts_by_country",
-              "chart_last_broadcast",
+              // "chart_email_activity",
+              // "chart_funnel_breakdown",
+              // "chart_contacts_by_optin_status",
+              // "chart_contacts_by_region",
+              // "chart_contacts_by_country",
+              // "chart_last_broadcast",
             ]}
           />
         );
