@@ -99,7 +99,7 @@ export const getPages = () => {
 	} );
 
 	pages = applyFilters(
-		'groundhogg.navigation',
+		PAGES_FILTER,
 		pages
 	);
 
