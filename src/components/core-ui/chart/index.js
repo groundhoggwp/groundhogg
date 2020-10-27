@@ -149,8 +149,8 @@ const Chart = (props) => {
   const classes = useStyles();
   const chartContainer = useRef(null);
   const [chartInstance, setChartInstance] = useState(null);
-  console.log(props);
-  console.log(props.data.chart.type);
+  // console.log(props);
+  // console.log(props.data.chart.type);
 
   let chartConfig = lineChartConfig;
   let chartType = props.data.chart.type;
