@@ -44,10 +44,17 @@ const useStyles = makeStyles((theme) => ({
   },
   compare: {
     position: 'absolute',
-    left: '35px',
+    left: '75px',
     bottom: '0',
     fontSize: "12px",
     // fontWeight: 900
+  },
+  percent: {
+    position: 'absolute',
+    left: '-35px',
+    bottom: '-2px',
+    fontSize: "18px",
+    fontWeight: 700
   },
 }));
 
@@ -84,7 +91,7 @@ const Stats = ({ title, data }) => {
 
         {arrow}
       <div className={classes.compare}>
-        {percent}{text}
+        <div className={classes.percent}>{percent}</div>{text}
       </div>
     </Card>
   );
