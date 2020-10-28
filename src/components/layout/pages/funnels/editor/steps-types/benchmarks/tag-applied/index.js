@@ -1,21 +1,25 @@
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
-import { ACTION } from '../constants'
+import { BENCHMARK } from '../../constants'
 import { registerStepType } from 'data/step-type-registry'
 
-const STEP_TYPE = 'remove_tag'
+const STEP_TYPE = 'tag_applied'
 
 const stepAtts = {
 
   type: STEP_TYPE,
 
-  group: ACTION,
+  group: BENCHMARK,
 
-  name: 'Remove Tag',
+  name: 'Tag Applied',
 
   icon: <LocalOfferIcon/>,
 
-  view: ({data, meta, stats}) => {},
-  edit: ({data, meta, stats}) => {},
+  view: ({data, meta, stats}) => {
+    return <></>
+  },
+  edit: ({data, meta, stats}) => {
+    return <></>
+  },
 }
 
 registerStepType( STEP_TYPE, stepAtts );
