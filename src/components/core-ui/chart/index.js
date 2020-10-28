@@ -170,57 +170,46 @@ const doughnutChart = {
   },
 };
 
-export default class Chart extends React.Component {
-  constructor(props) {
-    super(props);
+const Chart = ({id, title, data}) => {
+  // console.log(type)
+  const useStyles = makeStyles((theme) => ({
+    root: {
+      // display: 'inline-block',
+      // width: "100%",
+      // width: "calc(100% - 350px)",
+      paddingTop: '25px',
+      height: data.chart.type === "doughnut" ? "200px" : "400px",
+      // flexGrow: 3
+    },
+  }));
+  const classes = useStyles();
+  const chartContainer = useRef(null);
+  const [chartInstance, setChartInstance] = useState(null);
 
-    this.buildChart = this.buildChart.bind(this);
 
-    this.state = {
-      svgClassName: 'LineChart__' + Math.random(),
-    };
+  let chartConfig = lineChartConfig;
+  chartConfig.type = data.chart.type;
+
+  if (chartConfig.type === "line") {
+    chartConfig = lineChartConfig;
+  } else if (chartConfig.type === "doughnut") {
+    chartConfig = doughnutChart;
   }
+  chartConfig.data =  data.chart.data
+  // chartConfig.options.title.text =  title
 
-  componentDidMount() {
-    console.log(this.props)
-    // window.addEventListener('load', this.buildChart());
-  }
-
-  buildChart(){
-    let data = this.props
-    console.log(this.props)
-    // return;
-    let chartConfig = lineChartConfig;
-    // chartConfig.type = data.chart.type;
-
-    // if (chartConfig.type === "line") {
-    //   chartConfig = lineChartConfig;
-    // } else if (chartConfig.type === "doughnut") {
-    //   chartConfig = doughnutChart;
-    // }
-    // chartConfig.data =  data.chart.data
-    // let height = '50'
-    // let height = data.chart.type === "doughnut" ? "200px" : "400px";
-    // chartConfig.options.title.text =  title
-
-    const newChartInstance = new Chartjs(document.querySelector('.Chart__canvas'+this.props.id), chartConfig);
-    // setChartInstance(newChartInstance);
-    this.setState({
-      newChartInstance,
-      height: '500px'
-    })
-  }
-
-  render(){
-
-
-    // className={classes.root}
-    return (
-      <div>
-        <canvas className={"Chart__canvas"+this.props.id} style={{height: '500px'}} />
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (chartContainer && chartContainer.current) {
+      const newChartInstance = new Chartjs(chartContainer.current, chartConfig);
+      setChartInstance(newChartInstance);
+    }
+  }, [chartContainer]);
+  console.log(chartContainer.current)
+  return (
+    <div className={classes.root}>
+      <canvas className={"Chart__canvas"+id} ref={chartContainer} />
+    </div>
+  );
 };
 
-// export default Chart;
+export default Chart;
