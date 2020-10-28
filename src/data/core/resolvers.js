@@ -33,6 +33,7 @@ export function* canUser( action, resource, id ) {
 	};
 
 	const method = methods[ action ];
+
 	if ( ! method ) {
 		throw new Error( `'${ action }' is not a valid action.` );
 	}
@@ -47,6 +48,7 @@ export function* canUser( action, resource, id ) {
 			parse: false,
 		} );
 	} catch ( error ) {
+		console.log(error);
 		// Do nothing if our OPTIONS request comes back with an API error (4xx or
 		// 5xx). The previously determined isAllowed value will remain in the store.
 		return;
@@ -62,8 +64,8 @@ export function* canUser( action, resource, id ) {
 		// preloading middleware, the header will be a simple property.
 		allowHeader = get( response, [ 'headers', 'Allow' ], '' );
 	}
-
 	const key = compact( [ action, resource, id ] ).join( '/' );
 	const isAllowed = includes( allowHeader, method );
+
 	yield receiveUserPermission( key, isAllowed );
 }

@@ -49,7 +49,7 @@ const funnelTableColumns = [
     align: 'left',
     cell: ({ data, ID }) => {
       return <>
-      {canUser( 'update', ID )
+      { canUser( 'update', ID )
         ? <Link to={ `/funnels/${ID}` }>{ data.title }</Link>
         : <Fragment>{ data.title }</Fragment>
       }
