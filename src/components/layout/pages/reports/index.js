@@ -42,6 +42,12 @@ export function Reports(props) {
             dateChange={dateChange}
             reportList={[
               "chart_new_contacts",
+              "chart_email_activity",
+              "chart_funnel_breakdown",
+              "chart_contacts_by_optin_status",
+              "chart_contacts_by_region",
+              "chart_contacts_by_country",
+              "chart_new_contacts",
               "total_new_contacts",
               "total_confirmed_contacts",
               "total_engaged_contacts",
