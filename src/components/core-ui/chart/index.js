@@ -3,6 +3,10 @@
  */
 import React, { useEffect, useState, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
+import Card from "@material-ui/core/Card";
+/**
+ * Internal dependencies
+ */
 import Chartjs from "chart.js";
 
 const lineChartConfig = {
@@ -39,6 +43,7 @@ const lineChartConfig = {
       text: '',
       fontFamily:  'Roboto, Helvetica, Arial, sans-serif',
       // fontSize: '18px',
+      fontStyle: 'normal',
       fontWeight: '100'
     },
     legend: {
@@ -55,30 +60,29 @@ const lineChartConfig = {
       titleFontColor: "#000",
     },
     hover: {
-      mode: "nearest",
+      // mode: "nearest",
+      axis: 'x',
       intersect: true,
     },
-    'scales' : {
-      'xAxes' : {
-        0 : {
-          'type'       : 'time',
-          'time'       : {
-            'parser'        : "YYY-MM-DD HH:mm:ss",
-            'tooltipFormat' : "l HH:mm"
+    scales : {
+      xAxes: [{
+          type: "time",
+          time: {
+              parser: "YYY-MM-DD HH:mm:ss",
+              tooltipFormat: "l HH:mm"
           },
-          'scaleLabel' : {
-            'display'     : false,
-            'labelString' : 'Date',
+          scaleLabel: {
+              display: true,
+              labelString: "Date"
+          },
+          gridLines: {display: false},
+      }],
+      yAxes: [{
+          scaleLabel: {
+              display: true,
+              labelString: "Numbers"
           }
-        }
-      },
-      yAxes:{
-
-          'scaleLabel' : {
-            'display'     : false,
-            'labelString' : 'Numbers',
-          }
-        }
+      }]
     },
     // scales: {
     //   x: {
@@ -132,6 +136,17 @@ const doughnutChart = {
     ],
   },
   options: {
+    title: {
+      display: true,
+      text: '',
+      fontFamily:  'Roboto, Helvetica, Arial, sans-serif',
+      // fontSize: '18px',
+      fontWeight: '100'
+
+    },
+    legend: {
+      position: 'right'
+    },
     grid: {
       clickable: true,
       hoverable: true,
@@ -174,12 +189,9 @@ const Chart = ({id, title, data}) => {
   // console.log(type)
   const useStyles = makeStyles((theme) => ({
     root: {
-      // display: 'inline-block',
-      // width: "100%",
-      // width: "calc(100% - 350px)",
       paddingTop: '25px',
-      height: data.chart.type === "doughnut" ? "200px" : "400px",
-      // flexGrow: 3
+      width: data.chart.type === "doughnut" ? "400px" : "100%",
+      height: data.chart.type === "doughnut" ? "250px" : "400px",
     },
   }));
   const classes = useStyles();
@@ -195,20 +207,46 @@ const Chart = ({id, title, data}) => {
   } else if (chartConfig.type === "doughnut") {
     chartConfig = doughnutChart;
   }
-  chartConfig.data =  data.chart.data
-  // chartConfig.options.title.text =  title
 
+  //Capitalizes the text
+  chartConfig.options.title.text =  title.replace(/(^\w{1})|(\s{1}\w{1})/g, match => match.toUpperCase());
+  chartConfig.data =  data.chart.data
+
+
+  console.log('chart', chartConfig.type, data.chart.type)
   useEffect(() => {
     if (chartContainer && chartContainer.current) {
+      console.log(chartConfig)
       const newChartInstance = new Chartjs(chartContainer.current, chartConfig);
       setChartInstance(newChartInstance);
+
+      // Vertical line blurb
+      // //Vertical line
+      // $(document).ready(function(){
+      //     $("#myChart").on("mousemove", function(evt) {
+      //         var element = $("#cursor"),
+      // 				offsetLeft = element.offset().left,
+      // 				domElement = element.get(0),
+      // 				clientX = parseInt(evt.clientX - offsetLeft),
+      // 				ctx = element.get(0).getContext('2d');
+      //
+      //         ctx.clearRect(0, 0, domElement.width, domElement.height),
+      //             ctx.beginPath(),
+      //             ctx.moveTo(clientX, 0),
+      //             ctx.lineTo(clientX, domElement.height),
+      //             ctx.setLineDash([10, 10]),
+      //             ctx.strokeStyle = "#333",
+      //             ctx.stroke()
+      //     });
+      // });
     }
   }, [chartContainer]);
   console.log(chartContainer.current)
   return (
-    <div className={classes.root}>
+
+    <Card  className={classes.root}>
       <canvas className={"Chart__canvas"+id} ref={chartContainer} />
-    </div>
+    </Card>
   );
 };
 

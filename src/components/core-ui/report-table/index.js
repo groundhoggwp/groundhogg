@@ -58,43 +58,25 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Stats = ({ title, data }) => {
+const ReporTable = ({ title, data }) => {
+
+  // console.log('table', title, data)
   const classes = useStyles();
-
-  const { type} = data;
-  const { current, compare } = data.chart.data;
-  const { number } = data.chart.number;
-
-  const { text,  percent } = data.chart.compare;
-  const { direction, color } = data.chart.compare.arrow;
-
-  let arrow = direction === "up" ? <ArrowDropUpIcon style={{color}} className={classes.compareArrow}/> : <ArrowDropDownIcon style={{color}} className={classes.compareArrow}/>;
+  //
+  // const { type} = data;
+  // const { current, compare } = data.chart.data;
+  // const { number } = data.chart.number;
+  //
+  // const { text,  percent } = data.chart.compare;
+  // const { direction, color } = data.chart.compare.arrow;
+  //
+  // let arrow = direction === "up" ? <ArrowDropUpIcon style={{color}} className={classes.compareArrow}/> : <ArrowDropDownIcon style={{color}} className={classes.compareArrow}/>;
 
   return (
     <Card className={classes.root}>
-      <div
-        className={classes.title}
-      >
-        {title}
-      </div>
-      <div
-        className={classes.current}
-      >
-        {current}
-      </div>
 
-      <div
-        className={classes.currentMetric}
-      >
-        {number}
-      </div>
-
-        {arrow}
-      <div className={classes.compare}>
-        <div className={classes.percent}>{percent}</div>{text}
-      </div>
     </Card>
   );
 };
 
-export default Stats;
+export default ReporTable;

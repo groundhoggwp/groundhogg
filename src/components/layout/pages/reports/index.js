@@ -49,12 +49,12 @@ export function Reports(props) {
               "total_emails_sent",
               "email_open_rate",
               "email_click_rate",
-              "chart_contacts_by_optin_status",
-              "table_contacts_by_lead_source",
-              "table_top_converting_funnels",
-              "table_top_performing_emails",
-              "table_contacts_by_countries",
-              "table_contacts_by_lead_source",
+              // "chart_contacts_by_optin_status",
+              // "table_contacts_by_lead_source",
+              // "table_top_converting_funnels",
+              // "table_top_performing_emails",
+              // "table_contacts_by_countries",
+              // "table_contacts_by_lead_source",
             ]}
           />
         );

@@ -16,6 +16,7 @@ import Spinner from "../../../core-ui/spinner";
 import { REPORTS_STORE_NAME } from "../../../../data/reports";
 import Chart from "../../../core-ui/chart";
 import Stats from "../../../core-ui/stats";
+import ReportTable from "../../../core-ui/report-table";
 import DatePicker from "../../../core-ui/date-picker";
 
 const useStyles = makeStyles((theme) => ({
@@ -91,6 +92,8 @@ export default ({ reportList, dateChange }) => {
           title = title.join(" ");
           if (type === "quick_stat") {
             return <Stats title={title} id={reportKey} data={reports[reportKey]} />;
+          } else if (type === "table") {
+            return <ReportTable title={title} id={reportKey} data={reports[reportKey]} />;
           } else {
             return <Chart title={title} id={reportKey} data={reports[reportKey]} />;
           }
