@@ -105,7 +105,7 @@ export default (props) => {
     setAddingStep(null)
   }
 
-  let childRelations = child_steps.length > 0 ? child_steps.map(stepId => {
+  let childRelations = Array.isArray( child_steps ) && child_steps.length > 0 ? child_steps.map(stepId => {
     return {
       targetId: 'archer-' + stepId,
       targetAnchor: 'top',
