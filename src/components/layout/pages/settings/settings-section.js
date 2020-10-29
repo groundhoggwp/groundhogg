@@ -50,7 +50,7 @@ export const SettingsSection = ( { section } ) => {
 
 		 if ( mapping.hasOwnProperty( type ) ) {
 			 const mappedComponent = mapping[ type ];
-			 return ( <mappedComponent.component {...props} /> );
+			 return ( <mappedComponent.component {...restProps} /> );
 		 }
 
 		 return null;
@@ -76,7 +76,7 @@ export const SettingsSection = ( { section } ) => {
 					)
 				)
 			}
-			<Button variant="contained" color="primary">{ __( 'Save Settings' ) }</Button>
+			<Button variant="contained" color="primary" onClick={ onClick() }>{ __( 'Save Settings' ) }</Button>
 		</Fragment>
 	);
 }

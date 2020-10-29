@@ -240,6 +240,10 @@ class React_App {
 		$settings = wp_json_encode( $this->settings );
 		$settings = json_decode( $settings, true );
 
+		foreach ( $settings['settings'] as $name => $setting ) {
+			$settings['settings'][ $name ]['defaultValue'] = (string) Plugin::instance()->settings->get_option( $setting['id'] );
+		}
+
 		$settings['allowedBlockTypes'] = apply_filters(
 			'groundhogg/email_editor/allowed_block_types',
 			[
