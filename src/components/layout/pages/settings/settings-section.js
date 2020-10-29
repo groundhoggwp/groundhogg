@@ -33,19 +33,29 @@ const useStyles = makeStyles((theme) => ({
 export const SettingsSection = ( { section } ) => {
 	const classes = useStyles();
 
-	const componentInputMap = applyFilters( 'groundhogg.settings.componentInputMap', {
-		'input' : ( props ) => ( <TextField {...props} /> ),
-		'number' : ( props ) => ( <TextField {...props} /> ),
-		'checkbox' : ( props ) => ( <Checkbox {...props} /> ),
-		'tag_picker' : ( props ) => ( <TagPicker {...props} /> ),
-		'link_picker' : ( props ) => ( <TagPicker {...props} /> ), // I imagine we'll have a LinkPicker component?
-		'dropdown' : ( props ) => ( <Select {...props} /> ),
-		'dropdown_owners' : ( props ) => ( <Select {...props} /> ), // Investigate any difference here.
-		'editor' : ( props ) => ( <TextareaAutosize {...props} /> ), // Need to build out TinyMCE Editor
-		'textarea' :  ( props ) => ( <TextareaAutosize {...props} /> ),
-	 } );
+	const componentInputMap = ( props ) => {
+		const { type } = props;
 
-	console.log(section);
+		const mapping = applyFilters( 'groundhogg.settings.componentInputMap', {
+			'input' : { component : TextField },
+			'number' : { component : TextField },
+			'checkbox' : { component : Checkbox },
+			'tag_picker' : { component : TagPicker },
+			'link_picker' : { component : TagPicker }, // I imagine we'll have a LinkPicker component?
+			'dropdown' : { component : Select },
+			'dropdown_owners' : { component : Select }, // Investigate any difference here.
+			'editor' : { component : TextareaAutosize }, // Need to build out TinyMCE Editor
+			'textarea' : { component : TextareaAutosize },
+		 } );
+
+		 if ( mapping.hasOwnProperty( type ) ) {
+			 const mappedComponent = mapping[ type ];
+			 return ( <mappedComponent.component {...props} /> );
+		 }
+
+		 return null;
+	};
+
 	return (
 		<Fragment>
 			{
@@ -56,7 +66,8 @@ export const SettingsSection = ( { section } ) => {
 									section.settings.map( ( setting ) => (
 										<>
 											<Typography variant="p" component="p">{ setting.label }</Typography>
-											<Typography className={classes.description} variant="p" component="p">{ setting.desc }</Typography>
+											{ componentInputMap( setting ) }
+											<Typography className={classes.description} variant="p" component="p" dangerouslySetInnerHTML={{ __html: setting.desc }} />
 										</>
 										)
 									)

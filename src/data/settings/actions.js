@@ -9,7 +9,6 @@ import { concat } from 'lodash';
 /**
  * Internal dependencies
  */
-import { NAMESPACE } from '../constants';
 import { STORE_NAME } from './constants';
 import TYPES from './action-types';
 
@@ -72,7 +71,7 @@ export function* persistSettingsForGroup( group ) {
 		group,
 		dirtyKeys
 	);
-	const url = `${ NAMESPACE }/settings/${ group }/batch`;
+	const url = `${ STORE_NAME }/${ group }`;
 
 	const update = dirtyKeys.reduce( ( updates, key ) => {
 		const u = Object.keys( dirtyData[ key ] ).map( ( k ) => {

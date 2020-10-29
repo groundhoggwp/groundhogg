@@ -109,4 +109,7 @@ registerStore( 'sample-shop', {
 } );
 ```
 
+### Implementing a simple data store
+
+
 In your own custom implementations, it will likely make more sense to separate your concerns into their own files, like [we do in core](ref). Additionally, you'll very likely be enqueueing this JavaScript file and registering your own REST API endpoints in your plugin.
