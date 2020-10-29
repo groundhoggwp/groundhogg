@@ -16,26 +16,37 @@ import Spinner from "../../../core-ui/spinner";
 import { REPORTS_STORE_NAME } from "../../../../data/reports";
 import Chart from "../../../core-ui/chart";
 import Stats from "../../../core-ui/stats";
+import ReportTable from "../../../core-ui/report-table";
 import DatePicker from "../../../core-ui/date-picker";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    marginBottom: theme.spacing(1),
-    textAlign: "center",
-    // paddingTop: theme.spacing(4),
-    // paddingBottom: theme.spacing(4),
-  },
-  container: {
     display: "flex",
     flexWrap: "wrap",
+    position: 'relative',
+    marginBottom: theme.spacing(1),
+    textAlign: "center",
   },
+  container: {
+
+  },
+  datePickers:{
+    position: 'absolute',
+    display: 'flex',
+    right: '0px',
+    width: '350px',
+    // display: 'flex',
+    // width: '100%',
+    justifyContent: 'flex-end'
+  }
 }));
 
-export default ({ reportList }) => {
+export default ({ reportList, dateChange }) => {
   // export default ({ID, data, meta, onCancel, onSave}) => {
   const classes = useStyles();
 
   const [stateTagValue, setTagValue] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
 
   const { reports, getReports, isRequesting, isUpdating } = useSelect(
     (select) => {
@@ -46,79 +57,6 @@ export default ({ reportList }) => {
           start: "2015-10-06",
           end: "2020-10-06",
         }),
-        // contactsData : store.getItems({
-        //   "reports" : [
-        //     "table_contacts_by_lead_source",
-        //     "table_contacts_by_search_engines",
-        //     "table_contacts_by_social_media",
-        //     "table_contacts_by_source_page",
-        //     "table_contacts_by_countries",
-        //   ],
-        //   "start": "2015-10-06",
-        //   "end" : "2020-10-06"
-        // }),
-        // emailsData : store.getItems({
-        //   "reports" : [
-        //     "table_top_performing_emails",
-        //     "table_worst_performing_emails",
-        //     "table_top_performing_broadcasts",
-        //   ],
-        //   "start": "2015-10-06",
-        //   "end" : "2020-10-06"
-        // }),
-        // funnelsData : store.getItems({
-        //   "reports" : [
-        //     "total_funnel_conversion_rate",
-        //   ],
-        //   "start": "2015-10-06",
-        //   "end" : "2020-10-06"
-        // }),
-        // broadcastsData : store.getItems({
-        //   "reports" : [
-        //     "table_broadcast_stats",
-        //     "table_broadcast_link_clicked",
-        //   ],
-        //   "start": "2015-10-06",
-        //   "end" : "2020-10-06"
-        // }),
-        // formsData : store.getItems({
-        //   "reports" : [
-        //
-        //
-        //   ],
-        //   "start": "2015-10-06",
-        //   "end" : "2020-10-06"
-        // }),
-        // pipelineData : store.getItems({
-        //   "reports" : [
-        //
-        //
-        //   ],
-        //   "start": "2015-10-06",
-        //   "end" : "2020-10-06"
-        // }),
-
-        // "total_spam_contacts",
-        // "total_bounces_contacts",
-        // "total_complaints_contacts",
-        // "total_contacts_in_funnel",
-
-        // "total_benchmark_conversion_rate",
-        // "total_abandonment_rate",
-
-        // "table_benchmark_conversion_rate",
-        // "table_top_converting_funnels",
-        // "table_form_activity",
-        // "table_email_stats",
-        // "table_email_links_clicked",
-        // "chart_donut_email_stats",
-        // "table_funnel_stats",
-        // "table_email_funnels_used_in",
-        // "table_list_engagement",
-        // "ddl_funnels",
-        // "ddl_region",
-        // "ddl_broadcasts"
-
         getReports: store.getItem,
         isRequesting: store.isItemsRequesting(),
         isUpdating: store.isItemsUpdating(),
@@ -137,29 +75,27 @@ export default ({ reportList }) => {
   if (isRequesting || isUpdating) {
     return <Spinner />;
   }
+  console.log('data', reports)
 
-  // return (
   return (
     <div className={classes.root}>
-      <DatePicker />
-      <DatePicker />
+
+      <div className={classes.datePickers}>
+        <DatePicker dateChange={dateChange} selectedDate={selectedDate} label={'start'} id={'start'}/>
+        <DatePicker dateChange={dateChange} selectedDate={selectedDate} label={'end'} id={'end'}/>
+      </div>
       <div className={classes.container}>
         {Object.keys(reports).map((reportKey, i) => {
           let title = reportKey.split("_");
           let type = reports[reportKey].chart.type;
           title.shift();
           title = title.join(" ");
-          console.log(
-            reportKey,
-            "asdfa",
-            title,
-            reports[reportKey].chart.type,
-            type
-          );
           if (type === "quick_stat") {
-            return <Stats title={title} data={reports[reportKey]} />;
+            return <Stats title={title} id={reportKey} data={reports[reportKey]} />;
+          } else if (type === "table") {
+            return <ReportTable title={title} id={reportKey} data={reports[reportKey]} />;
           } else {
-            return <Chart title={title} data={reports[reportKey]} />;
+            return <Chart title={title} id={reportKey} data={reports[reportKey]} />;
           }
         })}
       </div>

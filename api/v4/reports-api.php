@@ -21,16 +21,16 @@ class Reports_Api extends Base_Api {
 				'methods'              => WP_REST_Server::READABLE,
 				'callback'             => [ $this, 'read' ],
 				'permissions_callback' => [ $this, 'read_permissions_callback' ],
-				'args' => [
-					'start' => [
-						'validate_callback' => [ $this, 'is_valid_report_date' ],
-						'sanitize_callback' => [ $this, 'sanitize_report_data' ],
-						'default' => function (){
-							return ;
-						}
-					]
-				],
-				'schema' => [
+//				'args' => [
+//					'start' => [
+//						'validate_callback' => [ $this, 'is_valid_report_date' ],
+//						'sanitize_callback' => [ $this, 'sanitize_report_data' ],
+//						'default' => function (){
+//							return ;
+//						}
+//					]
+//				],
+				'schema'               => [
 
 				]
 			],
@@ -58,7 +58,7 @@ class Reports_Api extends Base_Api {
 	 *
 	 * @return bool
 	 */
-	public function is_valid_report_date( $param, $request, $key ){
+	public function is_valid_report_date( $param, $request, $key ) {
 		return strtotime( $param ) !== false;
 	}
 
@@ -70,10 +70,11 @@ class Reports_Api extends Base_Api {
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function read( WP_REST_Request $request ) {
-		$start   = strtotime( sanitize_text_field( $request->get_param( 'start' ) ?: date( 'Y-m-d', time() - MONTH_IN_SECONDS ) ) );
-		$end     = strtotime( sanitize_text_field( $request->get_param( 'end' ) ?: date( 'Y-m-d' ) ) ) + ( DAY_IN_SECONDS - 1 );
+		$start = strtotime( sanitize_text_field( $request->get_param( 'start' ) ? : date( 'Y-m-d', time() - MONTH_IN_SECONDS ) ) );
+		$end   = strtotime( sanitize_text_field( $request->get_param( 'end' ) ? : date( 'Y-m-d' ) ) ) + ( DAY_IN_SECONDS - 1 );
+
 		$context = $request->get_param( 'context' );
-		$reports = $request->get_param( 'reports' );
+		$reports = map_deep( $request->get_param( 'reports' ), 'sanitize_key' );
 
 		$reporting = new Reports( $start, $end, $context );
 
@@ -90,8 +91,8 @@ class Reports_Api extends Base_Api {
 		}
 
 		return self::SUCCESS_RESPONSE( [
-			'start'   => $start,
-			'end'     => $end,
+			'start' => $start,
+			'end'   => $end,
 			'items' => $results
 		] );
 	}
@@ -105,8 +106,8 @@ class Reports_Api extends Base_Api {
 	 */
 	public function read_single( WP_REST_Request $request ) {
 
-		$start   = strtotime( sanitize_text_field( $request->get_param( 'start' ) ?: date( 'Y-m-d', time() - MONTH_IN_SECONDS ) ) );
-		$end     = strtotime( sanitize_text_field( $request->get_param( 'end' ) ?: date( 'Y-m-d' ) ) ) + ( DAY_IN_SECONDS - 1 );
+		$start   = strtotime( sanitize_text_field( $request->get_param( 'start' ) ? : date( 'Y-m-d', time() - MONTH_IN_SECONDS ) ) );
+		$end     = strtotime( sanitize_text_field( $request->get_param( 'end' ) ? : date( 'Y-m-d' ) ) ) + ( DAY_IN_SECONDS - 1 );
 		$context = $request->get_param( 'context' );
 
 		$report    = $request->get_param( 'id' );
@@ -115,8 +116,8 @@ class Reports_Api extends Base_Api {
 		$results = $reporting->get_data( $report );
 
 		return self::SUCCESS_RESPONSE( [
-			'start'   => $start,
-			'end'     => $end,
+			'start' => $start,
+			'end'   => $end,
 			'items' => $results
 		] );
 	}

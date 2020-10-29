@@ -13,6 +13,7 @@ import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 /**
  * Internal dependencies
  */
+
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'inline-block',
@@ -28,8 +29,7 @@ const useStyles = makeStyles((theme) => ({
     textTransform: "capitalize",
     padding: "10px 5px 5px 10px",
     color: '#ffffff',
-    background: theme.palette.primary.main,
-    // background: '#DB741A',
+    background: '#DB741A',
     marginBottom: '10px'
   },
   current: {
@@ -51,50 +51,32 @@ const useStyles = makeStyles((theme) => ({
   },
   percent: {
     position: 'absolute',
-    left: '-45px',
+    left: '-35px',
     bottom: '-2px',
     fontSize: "18px",
     fontWeight: 700
   },
 }));
 
-const Stats = ({ title, data }) => {
+const ReporTable = ({ title, data }) => {
+
+  // console.log('table', title, data)
   const classes = useStyles();
-
-  const { type} = data;
-  const { current, compare } = data.chart.data;
-  const { number } = data.chart.number;
-
-  const { text,  percent } = data.chart.compare;
-  const { direction, color } = data.chart.compare.arrow;
-
-  let arrow = direction === "up" ? <ArrowDropUpIcon style={{color}} className={classes.compareArrow}/> : <ArrowDropDownIcon style={{color}} className={classes.compareArrow}/>;
+  //
+  // const { type} = data;
+  // const { current, compare } = data.chart.data;
+  // const { number } = data.chart.number;
+  //
+  // const { text,  percent } = data.chart.compare;
+  // const { direction, color } = data.chart.compare.arrow;
+  //
+  // let arrow = direction === "up" ? <ArrowDropUpIcon style={{color}} className={classes.compareArrow}/> : <ArrowDropDownIcon style={{color}} className={classes.compareArrow}/>;
 
   return (
     <Card className={classes.root}>
-      <div
-        className={classes.title}
-      >
-        {title}
-      </div>
-      <div
-        className={classes.current}
-      >
-        {current}
-      </div>
 
-      <div
-        className={classes.currentMetric}
-      >
-        {number}
-      </div>
-
-        {arrow}
-      <div className={classes.compare}>
-        <div className={classes.percent}>{percent}</div>{text}
-      </div>
     </Card>
   );
 };
 
-export default Stats;
+export default ReporTable;
