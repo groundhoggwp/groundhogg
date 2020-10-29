@@ -25,9 +25,7 @@ function table_column_register_script() {
 
 add_action( 'groundhogg_head', 'table_column_register_script' );
 ```
-
 Settings can be added, removed, or modified by hooking into `groundhogg_custom_columns`.  For example:
-
 ```js
 /**
  * External dependencies

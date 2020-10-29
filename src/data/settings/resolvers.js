@@ -20,7 +20,7 @@ export function* getSettings( group ) {
 	yield dispatch( STORE_NAME, 'setIsRequesting', group, true );
 
 	try {
-		const url = 'wp/v2/settings/' + group;
+		const url = `${STORE_NAME}/${group}`;
 		const results = yield apiFetch( {
 			path: url,
 			method: 'GET',
