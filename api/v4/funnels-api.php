@@ -65,7 +65,8 @@ class Funnels_Api extends Base_Object_Api {
 
 		$data[ 'funnel_id' ] = $funnel_id;
 
-		$step = new Step( $data );
+		$step = new Step();
+		$step->create( $data );
 
 		foreach ( $meta as $key => $value ){
 			$step->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );

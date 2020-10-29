@@ -1,14 +1,13 @@
-import { Card } from '@material-ui/core'
 import Box from '@material-ui/core/Box'
-import { FUNNELS_STORE_NAME } from 'data';
+import { FUNNELS_STORE_NAME } from 'data'
 import BenchmarkPicker from './components/Pickers/BenchmarkPicker'
 import StepBlock from './components/StepBlock'
-import StepEditor from './components/StepEditor'
 import ExitFunnel from './components/ExitFunnel'
 import Paper from '@material-ui/core/Paper'
 import './steps-types'
-import { ArcherContainer, ArcherElement } from 'react-archer'
 import { withSelect } from '@wordpress/data'
+import dagre from 'dagre'
+import Xarrow from 'react-xarrows'
 
 /**
  * Breadth first search of the steps tree to build iout a row level based chart
@@ -19,111 +18,176 @@ import { withSelect } from '@wordpress/data'
  */
 function assignLevels (startNodes, allNodes) {
 
-  startNodes.forEach(node => node.level = 0)
+  startNodes.forEach((node, i) => {
+    node.level = 0
+    node.xPos = i
+  })
+
   const queue = startNodes
-  let index = 0;
 
   while (queue.length) {
     let currentNode = queue.shift()
-
-    if ( ! currentNode.index ){
-      currentNode.index = index;
-    }
 
     // Get the child nodes
     let childNodes = allNodes.filter(
       node => currentNode.data.child_steps.includes(node.ID))
 
     // queue up the child nodes
-    childNodes.forEach((node) => {
+    childNodes.forEach((node, i) => {
+
       node.level = currentNode.level + 1
+      node.xPos = i + currentNode.xPos
+
       queue.push(node)
     })
+  }// let parentNodes = allNodes.filter(
+  //   node => currentNode.data.parent_steps.includes(node.ID))
 
-    index++;
-  }
+  console.log(allNodes)
 }
 
 const Editor = ({ funnel }) => {
 
-  if ( ! funnel ) {
-    return null;
+  if (!funnel) {
+    return null
   }
 
-  if ( ! funnel.steps ) {
-    return null;
+  if (!funnel.steps) {
+    return null
   }
 
-  const steps = funnel.steps;
+  const steps = funnel.steps
 
-  const startingSteps = steps.filter(
-    step => step.data.parent_steps.length === 0)
   const endingSteps = steps.filter(
     step => step.data.child_steps.length === 0)
 
-  assignLevels( startingSteps, steps );
+  const graph = new dagre.graphlib.Graph()
 
-  const levels = [ ... new Set( steps.map( step => step.level ) ) ].sort( (a, b) => {
-    return a - b;
-  });
+  graph.setGraph({
+    // ranker: 'tight-tree',
+    // align: 'UL'
+    nodesep: 100
+  })
+
+  graph.setDefaultEdgeLabel(() => { return {} })
+
+  graph.setNode('exit', { label: 'exit', width: 300, height: 250 })
+
+  steps.forEach((step) => {
+    const { child_steps } = step.data
+
+    graph.setNode(step.ID, { label: step.ID, width: 300, height: 250 })
+
+    child_steps.forEach((child) => {
+      graph.setEdge(step.ID, child)
+    })
+
+    if (!child_steps.length) {
+      graph.setEdge(step.ID, 'exit')
+    }
+  })
+
+  dagre.layout(graph)
+
+  let exitYPos, exitXPos = 0
+  let graphHeight = 0
+
+  graph.nodes().forEach((ID) => {
+
+    if (!ID) {
+      return
+    }
+
+    const { x, y } = graph.node(ID) || {}
+
+    graphHeight = Math.max(graphHeight, y)
+
+    if (ID === 'exit') {
+      exitXPos = x
+      exitYPos = y
+      return
+    }
+
+    steps.forEach((step) => {
+      if (step.ID == ID) {
+        // step.yPos = step.data.parent_steps.length ? y : 125
+        step.yPos = y
+        step.xPos = x
+      }
+    })
+  })
 
   return (
     <>
-      <ArcherContainer strokeColor={'#e5e5e5'}>
+      <div style={ { position: 'relative', height: exitYPos + 100 } }>
         {
           steps.length === 0 && (
-            <Box display={'flex'} justifyContent={'center'}>
-              <Paper style={{ width: 500 }}>
-                <BenchmarkPicker funnelID={funnel.ID}/>
+            <Box display={ 'flex' } justifyContent={ 'center' }>
+              <Paper style={ { width: 500 } }>
+                <BenchmarkPicker funnelID={ funnel.ID }/>
               </Paper>
             </Box>
           )
         }
         {
-          levels.map((level, l) => {
-
-            const lSteps = steps.filter( (step) => step.level === level ).sort( (a,b) => {
-              return a.index - b.index;
-            });
-
-            // Check to see if the steps
-
+          steps.map(step => {
             return (
-              <Box display={'flex'} justifyContent={'space-around'}>
-                {
-                  lSteps.map( step => {
-                    return (
-                      <>
-                        <StepBlock {...step}/>
-                        <StepEditor {...step}/>
-                      </>)
-                  } )
-                }
-              </Box>
+              <>
+                <StepBlock { ...step }/>
+              </>
             )
           })
         }
-        {steps.length > 0 &&
-          <ExitFunnel
-            funnelId={funnel.ID}
-            endingSteps={endingSteps.map( step => step.ID )}
-          />
+        { steps.length > 0 && <ExitFunnel
+          xPos={ exitXPos }
+          yPos={ exitYPos }
+          funnelId={ funnel.ID }
+          endingSteps={ endingSteps.map(step => step.ID) }/>
         }
-      </ArcherContainer>
+        {
+          steps.map((step, i) => {
+
+            const { child_steps } = step.data;
+
+            if ( ! child_steps.length ){
+              child_steps.push( 'exit' )
+            }
+
+            return (
+              <>
+                {
+                  child_steps.map(child => <Xarrow
+                    key={ i }
+                    start={ 'step-' + step.ID }
+                    end={ 'step-' + child }
+                    startAnchor={ ['bottom', 'middle'] }
+                    endAnchor={ ['top', 'middle'] }
+                    curveness={1}
+                    headSize={5}
+                    strokeWidth={2}
+                    path={'smooth'}
+                    color={'#cbcbcb'}
+                  />)
+                }
+              </>
+            )
+          })
+        }
+      </div>
     </>
   )
 }
 
-export default withSelect( ( select, ownProps ) => {
+export default withSelect((select, ownProps) => {
 
-  const store = select( FUNNELS_STORE_NAME )
+  const store = select(FUNNELS_STORE_NAME)
 
   return {
     // ...ownProps,
-    funnel: store.getItem( ownProps.id ),
+    funnel: store.getItem(ownProps.id),
     // isCreating: store.isCreatingStep(),
     // isDeleting: store.isDeletingStep(),
     // isUpdating: store.isUpdatingStep(),
     // isRequesting: store.isItemsRequesting()
   }
-} )( Editor );
+})(Editor)
