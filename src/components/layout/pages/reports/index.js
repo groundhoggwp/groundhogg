@@ -29,8 +29,15 @@ const useStyles = makeStyles((theme) => ({
 export function Reports(props) {
   const classes = useStyles();
 
-  const dateChange = (e)  => {
-    console.log('change the data', e)
+  const [startDate, setStartDate] = useState("2017-01-01");
+  const [endDate, setEndDate] = useState("2020-01-01");
+
+  const dateChange = (id, e)  => {
+    if (id === 'start'){
+      setStartDate(e.target.value);
+    } else {
+      setEndDate(e.target.value);
+    }
   }
 
   const tabs = [
@@ -39,6 +46,8 @@ export function Reports(props) {
       component: (classes) => {
         return (
           <ReportPanel
+            startDate={startDate}
+            endDate={endDate}
             dateChange={dateChange}
             reportList={[
               "chart_new_contacts",
@@ -65,6 +74,8 @@ export function Reports(props) {
       component: (classes) => {
         return (
           <ReportPanel
+            startDate={startDate}
+            endDate={endDate}
             dateChange={dateChange}
             reportList={[
               "chart_new_contacts",
@@ -90,6 +101,8 @@ export function Reports(props) {
       component: (classes) => {
         return (
           <ReportPanel
+            startDate={startDate}
+            endDate={endDate}
             dateChange={dateChange}
             reportList={[
               "chart_email_activity",
@@ -105,6 +118,8 @@ export function Reports(props) {
       label: __("Funnels"),
       component: () => {
         return <ReportPanel
+          startDate={startDate}
+          endDate={endDate}
           dateChange={dateChange}
           reportList={[
             "chart_funnel_breakdown"
@@ -116,6 +131,8 @@ export function Reports(props) {
       label: __("Broadcasts"),
       component: () => {
         return <ReportPanel
+          startDate={startDate}
+          endDate={endDate}
           dateChange={dateChange}
           reportList={[
             "table_broadcast_stats",
@@ -128,6 +145,8 @@ export function Reports(props) {
       label: __("Forms"),
       component: () => {
         return <ReportPanel
+          startDate={startDate}
+          endDate={endDate}
           dateChange={dateChange}
           reportList={[
             "table_form_activity"
@@ -139,6 +158,8 @@ export function Reports(props) {
       label: __("Pipeline"),
       component: () => {
         return <ReportPanel
+          startDate={startDate}
+          endDate={endDate}
           dateChange={dateChange}
           reportList={[
             "table_form_activity"

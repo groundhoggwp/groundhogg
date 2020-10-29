@@ -40,12 +40,8 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default ({ reportList, dateChange }) => {
-  // export default ({ID, data, meta, onCancel, onSave}) => {
+export default ({ reportList, dateChange, startDate, endDate }) => {
   const classes = useStyles();
-
-  const [stateTagValue, setTagValue] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
 
   const { reports, getReports, isRequesting, isUpdating } = useSelect(
     (select) => {
@@ -53,8 +49,8 @@ export default ({ reportList, dateChange }) => {
       return {
         reports: store.getItems({
           reports: reportList,
-          start: "2015-10-06",
-          end: "2020-10-06",
+          start: startDate,
+          end: endDate,
         }),
         getReports: store.getItem,
         isRequesting: store.isItemsRequesting(),
@@ -80,8 +76,8 @@ export default ({ reportList, dateChange }) => {
     <div className={classes.root}>
 
       <div className={classes.datePickers}>
-        <DatePicker dateChange={dateChange} selectedDate={selectedDate} label={'start'} id={'start'}/>
-        <DatePicker dateChange={dateChange} selectedDate={selectedDate} label={'end'} id={'end'}/>
+        <DatePicker dateChange={dateChange} selectedDate={startDate} label={'start'} id={'start'}/>
+        <DatePicker dateChange={dateChange} selectedDate={endDate} label={'end'} id={'end'}/>
       </div>
       <div className={classes.container}>
         {Object.keys(reports).map((reportKey, i) => {

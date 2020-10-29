@@ -21,9 +21,10 @@ const classes = makeStyles((theme) => ({
   },
 }));
 
-export default function DatePickers({dateChange, label, id}) {
+export default function DatePickers({selectedDate, dateChange, label, id}) {
   // const classes = useStyles();
   // console.log(props);
+  console.log('change', selectedDate)
   return (
     <form  noValidate>
       <TextField
@@ -31,8 +32,9 @@ export default function DatePickers({dateChange, label, id}) {
         id={id}
         label={label}
         type='date'
-        defaultValue="2017-05-24"
-        onChange={dateChange}
+
+        value={selectedDate}
+        onChange={dateChange.bind(this, id)}
         width={150}
         // onChange={(event, x) => {console.log(x, event);}}
         // className={classes.textField}
