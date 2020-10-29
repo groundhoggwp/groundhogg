@@ -6,7 +6,6 @@ import { useSelect, useDispatch } from '@wordpress/data'
 import { ListTable } from 'components/core-ui/list-table/new'
 import DeleteIcon from '@material-ui/icons/Delete'
 import SettingsIcon from '@material-ui/icons/Settings'
-import GroupIcon from '@material-ui/icons/Group'
 import TimelineIcon from '@material-ui/icons/Timeline'
 import AccountCircleIcon from '@material-ui/icons/AccountCircle'
 import RowActions from 'components/core-ui/row-actions'
@@ -19,8 +18,12 @@ import FlagIcon from '@material-ui/icons/Flag'
 import Chip from '@material-ui/core/Chip'
 import { Tooltip } from '@material-ui/core'
 import ButtonGroup from '@material-ui/core/ButtonGroup'
-import { FUNNELS_STORE_NAME } from 'data/funnels'
+import { canUser } from 'utils'
 import { Link } from "react-router-dom";
+
+import {
+  FUNNELS_STORE_NAME
+} from 'data'
 
 const iconProps = {
   fontSize: 'small',
@@ -44,11 +47,14 @@ const funnelTableColumns = [
     name: <span>{ 'Title' }</span>,
     orderBy: 'title',
     align: 'left',
-    cell: ({ data, ID }) => {      
-      return <Link to={ `/funnels/${ID}` }>
-      				 { data.title }
-      			 </Link>
-    },
+    cell: ({ data, ID }) => {
+      return <>
+      { canUser( 'update', ID )
+        ? <Link to={ `/funnels/${ID}` }>{ data.title }</Link>
+        : <Fragment>{ data.title }</Fragment>
+      }
+    </>
+    }
   },
   {
     ID: 'stats',
@@ -124,7 +130,7 @@ const funnelTableColumns = [
       return <>
         <RowActions
           onEdit={ openQuickEdit }
-          onDelete={ () => handleDelete(ID) }
+          onDelete={ () => canUser( 'delete', ID ) && handleDelete(ID) }
         />
       </>
     },

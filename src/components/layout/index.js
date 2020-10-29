@@ -13,6 +13,8 @@ import PropTypes from 'prop-types'
 import Container from '@material-ui/core/Container'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
+import { ThemeProvider } from '@material-ui/styles';
+import { createMuiTheme } from '@material-ui/core/styles';
 
 /**
  * Internal dependencies
@@ -22,8 +24,10 @@ import { Controller, getPages, PAGES_FILTER } from './controller'
 import TopBar from './top-bar'
 import { SnackbarArea } from './snackbar'
 import { withSettingsHydration } from '../../data'
+import theme from './theme.js'
 
-const useStyles = makeStyles((theme) => ( {
+
+const useStyles = makeStyles((theme) => ({
   toolbar: {
     paddingRight: 24, // keep right padding when drawer closed
   },
@@ -57,7 +61,7 @@ export default function PrimaryLayout (props) {
     <main className={ `groundhogg-layout__primary ${ classes.content }` }>
 
       <div className={ classes.appBarSpacer }/>
-      <Container className={ classes.container }>
+      <Container className={ classes.container } maxWidth="xlg">
         { children }
       </Container>
     </main>
@@ -65,7 +69,6 @@ export default function PrimaryLayout (props) {
 }
 
 const Layout = (props) => {
-
   const { ...restProps } = props
 
     return (
@@ -91,22 +94,24 @@ Layout.propTypes = {
 }
 const _PageLayout = ( props ) => {
     return (
-      <BrowserRouter basename={ window.Groundhogg.preloadSettings.basename }>
-        <Switch>
-          { getPages().map((page, index) => {
-            return (
-                <Route
-                  path={ page.path }
-                  key={ index }
-                  exact={ '/' === page.path }
-                  render={ (props) => (
-                    <Layout page={ page } selectedIndex={index} { ...props } />
-                  ) }
-                />
-            )
-          }) }
-        </Switch>
-      </BrowserRouter>
+      <ThemeProvider theme={theme}>
+        <BrowserRouter basename={ window.Groundhogg.preloadSettings.basename }>
+          <Switch>
+            { getPages().map((page, index) => {
+              return (
+                  <Route
+                    path={ page.path }
+                    key={ index }
+                    exact={ '/' === page.path }
+                    render={ (props) => (
+                      <Layout page={ page } selectedIndex={index} { ...props } />
+                    ) }
+                  />
+              )
+            }) }
+          </Switch>
+        </BrowserRouter>
+      </ThemeProvider>
     )
 }
 

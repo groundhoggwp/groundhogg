@@ -1,32 +1,22 @@
-import { useSelect } from '@wordpress/data';
-import { FUNNELS_STORE_NAME } from 'data/funnels';
+import Editor from './editor';
+import { canUser } from 'utils'
 import {
   useParams
 } from "react-router-dom";
-import Editor from './editor';
 
 export default () => {
 
-  let { id } = useParams();
-  const { item } = useSelect( (select) => {
+  const { id } = useParams();
 
-    const store = select( FUNNELS_STORE_NAME )
+  const canUserEdit = canUser( 'update', id );
 
-    return {
-      item: store.getItem( id ),
-      getItem: store.getItem,
-    }
-  }, [] )
-
-  if ( ! item ){
-    return <>Loading...</>
+  if ( ! canUserEdit ) {
+    return <p>{ 'Cheating!' }</p>
   }
 
   return (
     <>
-      <Editor
-        funnel={item}
-      />
+      <Editor id={id}/>
     </>
   )
 }

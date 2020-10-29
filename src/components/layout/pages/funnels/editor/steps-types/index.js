@@ -1,9 +1,11 @@
-import './actions/applyTag'
-import './actions/removeTag'
-import './actions/sendEmail'
-import './actions/adminNotification'
+import './actions/admin-notification';
+import './actions/apply-tag';
+import './actions/remove-tag';
+import './actions/send-email';
 
-import './benchmarks/formFilled'
-import './benchmarks/tagApplied'
-import './benchmarks/tagRemoved'
-import './benchmarks/linkClicked'
+import './benchmarks/form-filled'
+import './benchmarks/link-clicked'
+import './benchmarks/tag-applied'
+import './benchmarks/tag-removed'
+
+import './conditions/yes-or-no'

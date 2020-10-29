@@ -17,6 +17,7 @@ import Link from '@material-ui/core/Link';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NavListItems from '../../core-ui/nav-list-items/';
+import BeaverIcon from '../../core-ui/beaver-icon/';
 import { useState } from '@wordpress/element';
 // import { NotificationMenu } from './notification-menu';
 
@@ -141,6 +142,8 @@ export default function Dashboard(props) {
             {pageTitle}
           </Typography>
           {/*<NotificationMenu />*/}
+
+          <BeaverIcon/>
         </Toolbar>
       </AppBar>
       <Drawer

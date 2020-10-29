@@ -31,10 +31,10 @@ import LinearScaleIcon from '@material-ui/icons/LinearScale';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import SettingsInputAntennaSharpIcon from '@material-ui/icons/SettingsInputAntennaSharp';
 
-export const PAGES_FILTER = 'groundhogg_navigation';
+export const PAGES_FILTER = 'groundhogg.navigation';
 
 export const getPages = () => {
-	const pages = [];
+	let pages = [];
 
 	/** @TODO: parse/hydrate PHP-registered nav items for app navigation */
 
@@ -111,9 +111,14 @@ export const getPages = () => {
 		priority: 60
 	} );
 
+	pages = applyFilters(
+		PAGES_FILTER,
+		pages
+	);
+
 	pages.sort((a, b) => (a.priority > b.priority) ? 1 : -1)
 
-	return applyFilters( PAGES_FILTER, pages );
+	return pages;
 };
 
 export class Controller extends Component {

@@ -2,25 +2,10 @@
  * Internal dependencies
  */
 import TYPES from './action-types'
+import { INITIAL_STATE } from 'data/base-object/constants'
 
 const reducer = (
-  state = {
-    isCreating: false,
-    isRequesting: false,
-    isUpdating: false,
-    isDeleting: false,
-    totalItems: 0,
-    items: [],
-    createdItems: [],
-    updatedItems: [],
-    item: {},
-    createdItem: {},
-    updatedItem: {},
-    creatingErrors: {},
-    requestingErrors: {},
-    updatingErrors: {},
-    deletingErrors: {},
-  },
+  state = INITIAL_STATE,
   {
     type,
     items,
@@ -153,6 +138,9 @@ const reducer = (
       }
       break
   }
+
+  // console.log( state );
+
   return state
 }
 

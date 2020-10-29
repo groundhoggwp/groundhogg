@@ -1,11 +1,14 @@
 import { Card } from '@material-ui/core'
 import Box from '@material-ui/core/Box'
-import LineTo from 'react-lineto'
-import BenchmarkPicker from './components/BenchmarkPicker'
+import { FUNNELS_STORE_NAME } from 'data';
+import BenchmarkPicker from './components/Pickers/BenchmarkPicker'
 import StepBlock from './components/StepBlock'
+import StepEditor from './components/StepEditor'
+import ExitFunnel from './components/ExitFunnel'
 import Paper from '@material-ui/core/Paper'
 import './steps-types'
 import { ArcherContainer, ArcherElement } from 'react-archer'
+import { withSelect } from '@wordpress/data'
 
 /**
  * Breadth first search of the steps tree to build iout a row level based chart
@@ -14,27 +17,17 @@ import { ArcherContainer, ArcherElement } from 'react-archer'
  * @param startNodes
  * @param allNodes
  */
-function buildChart (startNodes, allNodes) {
+function assignLevels (startNodes, allNodes) {
 
-  let currentLevel = 0
-  startNodes.forEach(node => node.level = currentLevel)
-  let chart = [[]]
+  startNodes.forEach(node => node.level = 0)
   const queue = startNodes
+  let index = 0;
 
   while (queue.length) {
     let currentNode = queue.shift()
 
-    // Increase the level and add an array to the chart
-    if (currentNode.level > currentLevel) {
-      currentLevel++
-      chart.push([])
-    }
-
-    // Only if the node is not already part of the chart and is not queued up
-    // for later
-    if (!chart[currentLevel].find(node => node.ID === currentNode.ID) &&
-      !queue.find(node => node.ID === currentNode.ID)) {
-      chart[currentLevel].push(currentNode)
+    if ( ! currentNode.index ){
+      currentNode.index = index;
     }
 
     // Get the child nodes
@@ -43,84 +36,94 @@ function buildChart (startNodes, allNodes) {
 
     // queue up the child nodes
     childNodes.forEach((node) => {
-      if (!queue.find(node => node.ID === currentNode.ID)) {
-        node.level = currentLevel + 1
-        queue.push(node)
-      }
+      node.level = currentNode.level + 1
+      queue.push(node)
     })
+
+    index++;
   }
-
-  let visited = []
-
-  // go back thru the chart and remove duplicate nodes from higher orders
-  chart = chart.reverse().map(level => {
-
-    // Check to see if the node was visited, filter the level if it was
-    level = level.filter(node => !visited.find(_node => node.ID === _node.ID))
-    // Mark all the nodes of the level as visited
-    level.forEach(node => visited.push(node))
-
-    return level
-  })
-
-  chart = chart.reverse()
-
-  return chart
 }
 
-export default (props) => {
+const Editor = ({ funnel }) => {
 
-  const { funnel } = props
-  const { ID, data, steps } = funnel
-
-  if (!steps) {
-    return '...loading'
+  if ( ! funnel ) {
+    return null;
   }
+
+  if ( ! funnel.steps ) {
+    return null;
+  }
+
+  const steps = funnel.steps;
 
   const startingSteps = steps.filter(
     step => step.data.parent_steps.length === 0)
+  const endingSteps = steps.filter(
+    step => step.data.child_steps.length === 0)
 
-  const chart = buildChart(startingSteps, steps)
+  assignLevels( startingSteps, steps );
+
+  const levels = [ ... new Set( steps.map( step => step.level ) ) ].sort( (a, b) => {
+    return a - b;
+  });
 
   return (
     <>
-      <ArcherContainer strokeColor={ '#e5e5e5' }>
+      <ArcherContainer strokeColor={'#e5e5e5'}>
         {
-          chart[0].length === 0 && (
-            <Box display={ 'flex' } justifyContent={ 'center' }>
-              <Paper style={ { width: 500 } }>
-                <BenchmarkPicker/>
+          steps.length === 0 && (
+            <Box display={'flex'} justifyContent={'center'}>
+              <Paper style={{ width: 500 }}>
+                <BenchmarkPicker funnelID={funnel.ID}/>
               </Paper>
             </Box>
           )
         }
         {
-          chart.map((levels, l) => {
+          levels.map((level, l) => {
+
+            const lSteps = steps.filter( (step) => step.level === level ).sort( (a,b) => {
+              return a.index - b.index;
+            });
+
+            // Check to see if the steps
+
             return (
-              <Box display={ 'flex' } justifyContent={ 'space-around' }>
+              <Box display={'flex'} justifyContent={'space-around'}>
                 {
-                  levels.map((step, s) => {
-                      return (
-                        <>
-                          <StepBlock { ...step }/>
-                        </> )
-                    },
-                  )
+                  lSteps.map( step => {
+                    return (
+                      <>
+                        <StepBlock {...step}/>
+                        <StepEditor {...step}/>
+                      </>)
+                  } )
                 }
               </Box>
             )
           })
         }
-        { chart[0].length > 0 &&
-        <Box display={ 'flex' } justifyContent={ 'space-around' }>
-          <ArcherElement id={ 'exit' }>
-            <Card>
-              { 'Exit Funnel!' }
-            </Card>
-          </ArcherElement>
-        </Box> }
+        {steps.length > 0 &&
+          <ExitFunnel
+            funnelId={funnel.ID}
+            endingSteps={endingSteps.map( step => step.ID )}
+          />
+        }
       </ArcherContainer>
     </>
   )
-
 }
+
+export default withSelect( ( select, ownProps ) => {
+
+  const store = select( FUNNELS_STORE_NAME )
+
+  return {
+    // ...ownProps,
+    funnel: store.getItem( ownProps.id ),
+    // isCreating: store.isCreatingStep(),
+    // isDeleting: store.isDeletingStep(),
+    // isUpdating: store.isUpdatingStep(),
+    // isRequesting: store.isItemsRequesting()
+  }
+} )( Editor );

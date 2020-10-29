@@ -5,14 +5,7 @@
  * @param id
  */
 export const getItem = ( state, id=false ) => {
-	if ( state.extendedReducer ) {
-
-		if ( id && state.reducer.items ){
-			return state.reducer.items.find( _item => _item.ID === id ) || state.reducer.item;
-		}
-
-		return state.reducer.item;
-	}
+	// console.log( state );
 
 	if ( id && state.items ){
 		return state.items.find( _item => _item.ID === id ) || state.item;
@@ -27,9 +20,7 @@ export const getItem = ( state, id=false ) => {
  * @param {Object} state - Reducer state
  */
 export const getItems = ( state ) => {
-	if ( state.extendedReducer ) {
-		return state.reducer.items;
-	}
+
 	return state.items;
 };
 
@@ -40,9 +31,9 @@ export const getItems = ( state ) => {
  * @returns {*}
  */
 export const getCreatedItems = ( state ) => {
-	if ( state.extendedReducer ) {
-		return state.reducer.createdItems;
-	}
+	// if ( state.extendedReducer ) {
+	// 	return state.reducer.createdItems;
+	// }
 	return state.createdItems;
 }
 
@@ -52,9 +43,9 @@ export const getCreatedItems = ( state ) => {
  * @param {Object} state - Reducer state
  */
 export const getTotalItems = ( state ) => {
-	if ( state.extendedReducer ) {
-		return state.reducer.totalItems;
-	}
+	// if ( state.extendedReducer ) {
+	// 	return state.reducer.totalItems;
+	// }
 	return state.totalItems;
 };
 
@@ -64,9 +55,9 @@ export const getTotalItems = ( state ) => {
  * @param {Object} state - Reducer state
  */
 export const isItemsUpdating = ( state ) => {
-	if ( state.extendedReducer ) {
-		return state.reducer.isUpdating || false;
-	}
+	// if ( state.extendedReducer ) {
+	// 	return state.reducer.isUpdating || false;
+	// }
 	return state.isUpdating || false;
 };
 
@@ -76,9 +67,9 @@ export const isItemsUpdating = ( state ) => {
  * @param {Object} state - Reducer state
  */
 export const isItemsCreating = ( state ) => {
-	if ( state.extendedReducer ) {
-		return state.reducer.isCreating || false;
-	}
+	// if ( state.extendedReducer ) {
+	// 	return state.reducer.isCreating || false;
+	// }
 	return state.isCreating || false;
 };
 
@@ -88,9 +79,9 @@ export const isItemsCreating = ( state ) => {
  * @param {Object} state - Reducer state
  */
 export const isItemsRequesting = ( state ) => {
-	if ( state.extendedReducer ) {
-		return state.reducer.isRequesting || false;
-	}
+	// if ( state.extendedReducer ) {
+	// 	return state.reducer.isRequesting || false;
+	// }
 	return state.isRequesting || false;
 };
 
@@ -101,9 +92,9 @@ export const isItemsRequesting = ( state ) => {
  * @param {string} name - Option name
  */
 export const getItemsCreatingError = ( state, name ) => {
-	if ( state.extendedReducer ) {
-		return state.reducer.creatingErrors[ name ] || false;
-	}
+	// if ( state.extendedReducer ) {
+	// 	return state.reducer.creatingErrors[ name ] || false;
+	// }
 
 	return state.creatingErrors[ name ] || false;
 };
@@ -115,9 +106,9 @@ export const getItemsCreatingError = ( state, name ) => {
  * @param {string} name - Option name
  */
 export const getItemsRequestingError = ( state, name ) => {
-	if ( state.extendedReducer ) {
-		return state.reducer.requestingErrors[ name ] || false;
-	}
+	// if ( state.extendedReducer ) {
+	// 	return state.reducer.requestingErrors[ name ] || false;
+	// }
 
 	return state.requestingErrors[ name ] || false;
 };
@@ -129,9 +120,9 @@ export const getItemsRequestingError = ( state, name ) => {
  * @param name
  */
 export const getItemsUpdatingError = ( state, name ) => {
-	if ( state.extendedReducer ) {
-		return state.reducer.updatingErrors[ name ] || false;
-	}
+	// if ( state.extendedReducer ) {
+	// 	return state.reducer.updatingErrors[ name ] || false;
+	// }
 
 	return state.updatingErrors[ name ] || false;
 };

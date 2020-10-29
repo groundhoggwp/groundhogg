@@ -10,7 +10,6 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
 import IconButton from '@material-ui/core/IconButton'
 import { useState } from '@wordpress/element'
-import StepEditor from '../StepEditor'
 import AddStepButton from '../AddStepButton'
 import Tooltip from '@material-ui/core/Tooltip'
 import makeStyles from '@material-ui/core/styles/makeStyles'
@@ -20,11 +19,41 @@ import {
   BENCHMARK, BENCHMARKS,
   CONDITION, CONDITIONS,
 } from 'components/layout/pages/funnels/editor/steps-types/constants'
-import { FUNNELS_STORE_NAME } from 'data/funnels'
+import {
+  FUNNELS_STORE_NAME,
+} from 'data'
 
 const useStyles = makeStyles((theme) => ( {
-  addStepButton: {
-    padding: theme.spacing(3),
+  stepBlockContainer: {
+    padding: theme.spacing(12),
+    paddingTop: 0,
+  },
+  stepBlock: {
+    position: 'relative',
+  },
+  addStepButtonTop: {
+    position: 'absolute',
+    margin: 'auto',
+    top: -theme.spacing(8),
+    left: 0,
+    bottom: 'auto',
+    right: 0,
+  },
+  addStepButtonRight: {
+    position: 'absolute',
+    margin: 'auto',
+    right: -theme.spacing(8),
+    top: 0,
+    left: 'auto',
+    bottom: 0,
+  },
+  addStepButtonBottom: {
+    position: 'absolute',
+    margin: 'auto',
+    bottom: -theme.spacing(8),
+    top: 'auto',
+    left: 0,
+    right: 0,
   },
 } ))
 
@@ -32,17 +61,19 @@ export default (props) => {
 
   const [editing, setEditing] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [anchorEl, setAnchorEl] = useState(null)
+  const [addingStep, setAddingStep] = useState(null)
 
   const classNames = useStyles()
 
-  const { ID, data, meta } = props
-  const { step_title, step_type, step_group, parent_steps, child_steps } = data
+  const { ID, data, meta, funnelID } = props
+  const { step_title, step_type, step_group, parent_steps, child_steps, funnel_id } = data
   const stepType = select(STEP_TYPES_STORE_NAME).getType(step_type)
 
   const { deleteStep, updateStep } = useDispatch(FUNNELS_STORE_NAME)
 
   if (!stepType) {
-    return 'loading...'
+    return null
   }
 
   const classes = [
@@ -52,100 +83,129 @@ export default (props) => {
   ]
 
   const handleEdit = () => {
-    setEditing(true)
+    openStepBlock();
   }
 
-  const handleCancel = () => {
-    setEditing(false)
+  const handleCancelAdd = () => {
+    closeStepBlock();
   }
 
   const handleDelete = () => {
     setDeleting(true)
-    deleteStep( ID )
+    deleteStep(ID, funnel_id)
   }
 
-  let childRelations = child_steps.length > 0 ? child_steps.map(stepId => {
+  const addStepBlock = (where, e) => {
+    setAddingStep(where)
+    setAnchorEl(e.currentTarget)
+  }
+
+  const addStepBlockCancel = () => {
+    setAnchorEl(null)
+    setAddingStep(null)
+  }
+
+  let childRelations = Array.isArray( child_steps ) && child_steps.length > 0 ? child_steps.map(stepId => {
     return {
       targetId: 'archer-' + stepId,
       targetAnchor: 'top',
       sourceAnchor: 'bottom',
     }
-  } ) : [{
-    targetId: 'exit',
-    targetAnchor: 'top',
-    sourceAnchor: 'bottom',
-  } ];
+  }) : [
+    {
+      targetId: 'exit',
+      targetAnchor: 'top',
+      sourceAnchor: 'bottom',
+    },
+  ]
 
   return (
     <>
-      <Box>
-        { parent_steps.length > 1 &&
-        <Box display={ 'flex' } justifyContent={ 'center' }
-             className={ classNames.addStepButton }>
+      <Box className={ classNames.stepBlockContainer }>
+        <Box className={ classNames.stepBlock }>
+          { parent_steps.length > 1 &&
           <AddStepButton
+            funnelID={ funnel_id }
+            className={ classNames.addStepButtonTop }
             parentSteps={ parent_steps }
             childSteps={ [ID] }
-            showGroups={[
+            showGroups={ [
               BENCHMARKS,
-              ACTIONS
-            ]}
+              ACTIONS,
+            ] }
+            anchorEl={ anchorEl }
+            open={ addingStep === 'top' }
+            setAnchorEl={ setAnchorEl }
+            openStepBlock={ (e) => addStepBlock('top', e) }
+            closeStepBlock={ addStepBlockCancel }
           />
-        </Box> }
-        <Box display={ 'flex' } justifyContent={ 'center' }>
-          <ArcherElement
-            id={ 'archer-' + ID }
-            relations={childRelations}
-          >
-            <Card className={ classes.join(' ') } style={ { width: 250 } }>
-              <CardHeader
-                avatar={ stepType.icon }
-                title={ step_title }
-                subheader={ stepType.name }
-              />
-              <CardActions>
-                <Tooltip title={ 'Edit' }>
-                  <IconButton
-                    color={ 'primary' }
-                    onClick={ () => handleEdit() }
-                  >
-                    <EditIcon/>
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title={ 'Delete' }>
-                  <IconButton
-                    color={ 'secondary' }
-                    onClick={ () => handleDelete() }
-                  >
-                    <DeleteIcon/>
-                  </IconButton>
-                </Tooltip>
-              </CardActions>
-            </Card>
-          </ArcherElement>
+          }
           { step_group === BENCHMARK &&
-          <Box display={'flex'} alignItems={'center'} className={ classNames.addStepButton }>
-            <AddStepButton
-              parentSteps={ parent_steps }
-              childSteps={ child_steps }
-              showGroups={[
-                BENCHMARKS
-              ]}
-            />
-          </Box> }
-        </Box>
-        { step_group !== CONDITION &&
-        <Box display={ 'flex' } justifyContent={ 'center' }
-             className={ classNames.addStepButton }>
           <AddStepButton
+            funnelID={ funnel_id }
+            className={ classNames.addStepButtonRight }
+            parentSteps={ parent_steps }
+            childSteps={ child_steps }
+            showGroups={ [
+              BENCHMARKS,
+            ] }
+            anchorEl={ anchorEl }
+            open={ addingStep === 'right' }
+            setAnchorEl={ setAnchorEl }
+            openStepBlock={ (e) => addStepBlock( 'right', e ) }
+            closeStepBlock={ addStepBlockCancel }
+          /> }
+          { step_group !== CONDITION &&
+          <AddStepButton
+            funnelID={ funnel_id }
+            className={ classNames.addStepButtonBottom }
             parentSteps={ [ID] }
             childSteps={ child_steps }
-            showGroups={[
+            showGroups={ [
               step_group === ACTION ? BENCHMARKS : false,
               ACTIONS,
               CONDITIONS,
-            ].filter( item => item !== false )}
+            ].filter(item => item !== false) }
+            open={ addingStep === 'bottom' }
+            anchorEl={ anchorEl }
+            setAnchorEl={ setAnchorEl }
+            openStepBlock={ (e) => addStepBlock( 'bottom', e ) }
+            closeStepBlock={ addStepBlockCancel }
           />
-        </Box> }
+          }
+          <Box display={ 'flex' } justifyContent={ 'center' }>
+            <ArcherElement
+              id={ 'archer-' + ID }
+              relations={ childRelations }
+            >
+              <Card className={ classes.join(' ') } style={ { width: 250 } }>
+                <CardHeader
+                  avatar={ stepType.icon }
+                  title={ ID }
+                  subheader={ stepType.name }
+                />
+                <CardActions>
+                  <Tooltip title={ 'Edit' }>
+                    <IconButton
+                      color={ 'primary' }
+                      onClick={ handleEdit }
+                    >
+                      <EditIcon/>
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title={ 'Delete' }>
+                    <IconButton
+                      color={ 'secondary' }
+                      onClick={ handleDelete }
+                    >
+                      <DeleteIcon/>
+                    </IconButton>
+                  </Tooltip>
+                </CardActions>
+              </Card>
+            </ArcherElement>
+          </Box>
+        </Box>
       </Box>
     </>
   )
