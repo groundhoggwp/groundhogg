@@ -328,7 +328,7 @@ abstract class Base_Object_Api extends Base_Api {
 		if ( empty( $data ) || empty( $where ) ) {
 
 			$items = $request->get_json_params();
-			
+
 			if ( empty( $items ) ){
 				return self::ERROR_422();
 			}
@@ -339,11 +339,11 @@ abstract class Base_Object_Api extends Base_Api {
 
 				$id     = get_array_var( $item, $this->get_primary_key() );
 				$object = $this->create_new_object( $id );
-				
+
 				if ( ! $object->exists() ){
 					continue;
 				}
-				
+
 				$data = get_array_var( $item, 'data', [] );
 				$meta = get_array_var( $item, 'meta', [] );
 
@@ -415,7 +415,7 @@ abstract class Base_Object_Api extends Base_Api {
 			$items = $request->get_json_params();
 			$items = array_map( [ $this, 'create_new_object' ], $items );
 		}
-		
+
 		/**
 		 * @var $object Base_Object
 		 */
