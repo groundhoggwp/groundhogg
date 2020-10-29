@@ -33,7 +33,6 @@ const BulkJob = (props) => {
         onFinish(true);
     }
 
-    onFinish(true);
 
     // make HTTP request to perform the task
     function scheduleJob() {
@@ -65,7 +64,7 @@ const BulkJob = (props) => {
         }
     }
 
-    // scheduleJob();
+    scheduleJob();
 
     return (
         <div>

@@ -21,14 +21,12 @@ export const ScheduleEvents = (props) => {
 
     const onFinish = (newValue) => {
         // handle the response and do any tasks which are required.
-        addNotification({message: __("Broadcast scheduled "), type: 'success'}); // NOT working
-        alert("Broadcast scheduled ");
+        // addNotification({message: __("Broadcast scheduled "), type: 'success'}); // NOT working
         setFinish(true);
-
     };
 
-    //Redirect to main page once broadcast is scheduled sucessfully
-    if (finish) {
+    // Redirect to main page once broadcast is scheduled sucessfully
+    if (finish === true) {
         return <Redirect to={ '/broadcasts' } />
     }
 

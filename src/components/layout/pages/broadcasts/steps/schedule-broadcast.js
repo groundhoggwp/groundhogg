@@ -6,34 +6,13 @@ import Button from "@material-ui/core/Button";
 import {Link} from "react-router-dom";
 import {Fragment} from "@wordpress/element";
 import {mergeDeep} from "utils/core";
+import {TagPicker} from "components/core-ui/tag-picker";
+import TextField from '@material-ui/core/TextField';
 
 
 // sets data into the broadcast data option
 export const ScheduleBroadcast = (props) => {
 
-    //code to schedule the broadcast
-    // const [emailOrSmsId, setEmailOrSmsId] = useState(0); //todo add ddl
-    // const [tags, setTags] = useState([]);  // todo array form multiple tag picker
-    // const [excludeTags, setExcludeTags] = useState([]);  // todo array form multiple tag picker
-    // const [date, setDate] = useState('');  // todo Date picker
-    // const [time, setTime] = useState('');  // todo Time picker
-    // const [sendNow, setSendNow] = useState('');  // todo checkbox
-    // const [sendInTimezone, setSendInTimezone] = useState('');  // todo checkbox
-    // const [type, setType] = useState('');  // todo type picker. returns | email or
-    //
-    //
-    // json request to schedule broadcast
-    // scheduleBroadcast({
-    //     email_or_sms_id: emailOrSmsId,
-    //     tags: tags,
-    //     exclude_tags: excludeTags ,
-    //     date: date ,
-    //     time: time,
-    //     send_now: sendNow ,
-    //     send_in_timezone: sendInTimezone ,
-    //     type: type,
-    // });
-    //
     // createItem({
     //     data: {
     //         email_or_sms_id: 474,
@@ -48,6 +27,8 @@ export const ScheduleBroadcast = (props) => {
     // });
 
     const {handleNext, setData, data} = props;
+    const {date, time, tags, exclude_tags, email_or_sms_id} = data;
+
 
     const handleConfirm = () => {
         // merge the response.....
@@ -66,18 +47,81 @@ export const ScheduleBroadcast = (props) => {
 
 
     const handleChange = (event) => {
-        setData({...data, ...{extra: event.target.value}});
+        setData({...data, ...{email_or_sms_id: event.target.value}});
     }
-    return (
-        <div style={{
-            padding: 24,
-            background: '#fff',
 
-        }}>
-            <input type='text' onChange={handleChange}/>
-            <br />
-            <Button variant="contained" color="primary" onClick={handleConfirm}>{__('Confirm', 'groundhogg')}</Button>
-        </div>
+    const handleDateChange = (event) => {
+        setData({...data, ...{date: event.target.value}})
+    }
+
+    const handleTimeChange = (event) => {
+        setData({...data, ...{time: event.target.value}})
+    }
+
+
+    return (
+
+        <Fragment>
+            <div style={{
+                padding: 24,
+                background: '#fff',
+
+            }}>
+
+                <h1>TODO WHEN component library is completed </h1>
+
+
+                <h3>Email ID</h3>
+                <input type='text' value={email_or_sms_id} onChange={handleChange}/>
+                <br/>
+
+                <h3> Apply Tags </h3>
+
+                <h3> Exclude Tags </h3>
+
+
+                <h3> Send on </h3>
+                <br/>
+
+                <TextField
+                    id="date"
+                    label={__('Date')}
+                    type="date"
+                    value={date}
+                    onChange={handleDateChange}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    InputProps={{inputProps: {min: "2020-10-29"}}}
+                />
+
+                <TextField
+                    id="time"
+                    label={__('Time', 'groundhogg')}
+                    type="time"
+                    defaultValue="09:00"
+                    value={time}
+                    onChange={handleTimeChange}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    inputProps={{
+                        step: 300, // 5 min
+                    }}
+                />
+
+            </div>
+
+            <div style={{
+                padding: 24,
+                background: '#fff',
+                marginTop: 20
+
+            }}>
+                <Button variant="contained" color="primary"
+                        onClick={handleConfirm}>{__('Confirm', 'groundhogg')}</Button>
+            </div>
+        </Fragment>
 
     );
 }

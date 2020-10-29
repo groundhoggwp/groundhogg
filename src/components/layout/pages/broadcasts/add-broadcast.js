@@ -9,7 +9,6 @@ import Typography from '@material-ui/core/Typography';
 import {ScheduleBroadcast} from './steps/schedule-broadcast';
 import {ConfirmBroadcast} from './steps/confirm-broadcast';
 import {ScheduleEvents} from "./steps/schedule-events";
-import {use} from "@wordpress/data";
 
 
 const useStyles = makeStyles((theme) => ({

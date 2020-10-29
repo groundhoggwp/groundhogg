@@ -1,6 +1,6 @@
 import AsyncCreatableSelect from 'react-select/async-creatable'
 import AsyncSelect from 'react-select/async'
-import {parseArgs} from '../../layout/pages/reports/App'
+// import {parseArgs} from '../../layout/pages/reports/App'
 import apiFetch from "@wordpress/api-fetch";
 import {NAMESPACE} from "data/constants";
 import {useEffect} from "@wordpress/element";
