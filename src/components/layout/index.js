@@ -26,7 +26,7 @@ import { SnackbarArea } from './snackbar'
 import { withSettingsHydration } from '../../data'
 import theme from './theme.js'
 
-console.log('theme', theme)
+
 const useStyles = makeStyles((theme) => ({
   toolbar: {
     paddingRight: 24, // keep right padding when drawer closed

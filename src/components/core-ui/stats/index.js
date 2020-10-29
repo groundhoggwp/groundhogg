@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
   },
   percent: {
     position: 'absolute',
-    left: '-35px',
+    left: '-45px',
     bottom: '-2px',
     fontSize: "18px",
     fontWeight: 700
