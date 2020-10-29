@@ -24,21 +24,9 @@ import { Controller, getPages, PAGES_FILTER } from './controller'
 import TopBar from './top-bar'
 import { SnackbarArea } from './snackbar'
 import { withSettingsHydration } from '../../data'
-// import theme from './theme.js'
+import theme from './theme.js'
 
-// console.log(theme)
-
-// theme = createMuiTheme({
-let theme = createMuiTheme({
-  palette: {
-    primary: {
-      main: '#DB741A',
-    },
-    secondary: {
-      main: '#000',
-    },
-  },
-});
+console.log('theme', theme)
 const useStyles = makeStyles((theme) => ({
   toolbar: {
     paddingRight: 24, // keep right padding when drawer closed
@@ -73,7 +61,7 @@ export default function PrimaryLayout (props) {
     <main className={ `groundhogg-layout__primary ${ classes.content }` }>
 
       <div className={ classes.appBarSpacer }/>
-      <Container className={ classes.container }>
+      <Container className={ classes.container } maxWidth="xlg">
         { children }
       </Container>
     </main>
@@ -81,7 +69,6 @@ export default function PrimaryLayout (props) {
 }
 
 const Layout = (props) => {
-
   const { ...restProps } = props
 
     return (

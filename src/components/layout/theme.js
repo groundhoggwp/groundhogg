@@ -1,7 +1,7 @@
 import { createMuiTheme } from '@material-ui/core/styles';
 import blue from '@material-ui/core/colors/blue';
 
-export const theme = createMuiTheme({
+const theme = createMuiTheme({
   palette: {
     primary: {
       main: '#DB741A',
@@ -11,3 +11,5 @@ export const theme = createMuiTheme({
     },
   },
 });
+
+export default theme;
