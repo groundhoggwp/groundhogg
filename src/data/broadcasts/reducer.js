@@ -1,15 +1,12 @@
 /**
  * Internal dependencies
  */
+
 import TYPES from './action-types';
+import { initialState } from './initial-state';
 
 const broadcastsReducer = (
-	state = {
-		isUpdating: false,
-		isRequesting: false,
-		broadcasts: [],
-		requestingErrors: {}
-	},
+	state = initialState,
 	{ type, broadcasts, error, isUpdating, name ,isRequesting }
 ) => {
 	switch ( type ) {

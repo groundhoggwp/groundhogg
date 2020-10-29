@@ -10,6 +10,7 @@ import Spinner from '../../../core-ui/spinner';
 
 
 
+
 /**
  * Internal dependencies
  */
@@ -184,6 +185,8 @@ export default (props) => {
 
             <Button variant="contained" color="primary" onClick={() => {
 
+
+                props.history.push("/broadcasts/schedule");
                 //open a new page
 
 
@@ -193,9 +196,7 @@ export default (props) => {
                 //set the value statically
 
                 // setBulkJob(true);
-                <Link to={ `/broadcasts/schedule` }>
-                    <img className={classes.contactRowImage} src={ data.gravatar } />
-                </Link>
+
 
                 // addNotification({message: __("Broadcast scheduled "), type: 'success'});
             }}>

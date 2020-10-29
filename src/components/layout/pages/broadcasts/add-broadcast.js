@@ -1,7 +1,6 @@
-
 import {__} from '@wordpress/i18n';
 import {Fragment, useState} from '@wordpress/element';
-import { makeStyles } from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
@@ -9,7 +8,8 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import {ScheduleBroadcast} from './steps/schedule-broadcast';
 import {ConfirmBroadcast} from './steps/confirm-broadcast';
-import  {ScheduleEvents} from "./steps/schedule-events";
+import {ScheduleEvents} from "./steps/schedule-events";
+import {use} from "@wordpress/data";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -27,31 +27,61 @@ const useStyles = makeStyles((theme) => ({
 
 function getSteps() {
     return [
-        __('Schedule Broadcast', 'goundhogg' ),
-        __('Confirm Broadcast', 'goundhogg' ),
-        __('Send Broadcast', 'goundhogg' ),
+        __('Schedule Broadcast', 'goundhogg'),
+        __('Confirm Broadcast', 'goundhogg'),
+        __('Send Broadcast', 'goundhogg'),
     ];
 }
 
-function getStepContent(stepIndex) {
+function getStepContent(stepIndex, handleNext, handleBack, data, setData, broadcast, setBroadcast) {
     switch (stepIndex) {
         case 0:
-            return <ScheduleBroadcast />;
+            return <ScheduleBroadcast
+                handleNext={handleNext}
+                handleBack={handleBack}
+                data={data}
+                setData={setData}
+            />;
         case 1:
-            return <ConfirmBroadcast />;
+            return <ConfirmBroadcast
+                handleNext={handleNext}
+                handleBack={handleBack}
+                setData={setData}
+                data={data}
+                broadcast = {broadcast}
+                setBroadcast ={setBroadcast}
+            />;
         case 2:
-            return <ScheduleEvents />;
+            return <ScheduleEvents
+                handleNext={handleNext}
+                handleBack={handleBack}
+                setData={setData}
+                data={data}
+                broadcast = {broadcast}
+                setBroadcast ={setBroadcast}
+            />;
         default:
             return 'Unknown stepIndex';
     }
 }
 
-export const AddBroadcast =  (props) =>{
+export const AddBroadcast = (props) => {
 
 
     const classes = useStyles();
     const [activeStep, setActiveStep] = useState(0);
-    const [broadcast , setBroadcast ] = useState(0);
+    const [data, setData] = useState({
+        email_or_sms_id: 0,
+        tags: [],
+        exclude_tags: [],
+        date: '',
+        time: '',
+        send_now: false,
+        send_in_timezone: false,
+        type: '',
+    });
+    const [broadcast, setBroadcast] = useState(0);
+
     const steps = getSteps();
 
     const handleNext = () => {
@@ -64,7 +94,7 @@ export const AddBroadcast =  (props) =>{
 
     const handleReset = () => {
         // setActiveStep(0);
-        props.history.push( '/broadcasts' );
+        props.history.push('/broadcasts');
     };
 
     return (
@@ -84,19 +114,23 @@ export const AddBroadcast =  (props) =>{
                     </div>
                 ) : (
                     <div>
-                        <Typography className={classes.instructions}>{getStepContent(activeStep)}</Typography>
-                        <div>
-                            <Button
-                                disabled={activeStep === 0}
-                                onClick={handleBack}
-                                className={classes.backButton}
-                            >
-                                Back
-                            </Button>
-                            <Button variant="contained" color="primary" onClick={handleNext}>
-                                {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-                            </Button>
-                        </div>
+                        <Typography
+                            className={classes.instructions}>{
+                            getStepContent(activeStep, handleNext, handleBack, data, setData ,broadcast, setBroadcast)
+                        }
+                        </Typography>
+                        {/*<div>*/}
+                        {/*    <Button*/}
+                        {/*        disabled={activeStep === 0}*/}
+                        {/*        onClick={handleBack}*/}
+                        {/*        className={classes.backButton}*/}
+                        {/*    >*/}
+                        {/*        Back*/}
+                        {/*    </Button>*/}
+                        {/*    <Button variant="contained" color="primary" onClick={handleNext}>*/}
+                        {/*        {activeStep === steps.length - 1 ? 'Finish' : 'Next'}*/}
+                        {/*    </Button>*/}
+                        {/*</div>*/}
                     </div>
                 )}
             </div>
