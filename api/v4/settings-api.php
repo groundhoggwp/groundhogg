@@ -81,7 +81,21 @@ class Settings_Api extends Base_Api {
 	}
 
 	protected function prepare_settings( $data, $group_id ) {
+		$settings = array_keys( $this->get_settings( $group_id ) );
 
+		foreach ( $data as $name => $value ) {
+			if ( ! in_array( $name, $settings, true ) ) {
+				unset( $data[ $name ] );
+			}
+
+			$value = trim( $value );
+
+			if ( empty( $value ) ) {
+				$data[ $name ] = false;
+			}
+		}
+
+		return $data;
 	}
 
 	/**
@@ -110,7 +124,7 @@ class Settings_Api extends Base_Api {
 	public function update( WP_REST_Request $request ) {
 
 		$data     = $request->get_param( 'data' ) ?: [];
-		$group_id = $request->get_params( 'group_id' );
+		$group_id = $request->get_param( 'group_id' );
 
 		$items = $this->prepare_settings( $data, $group_id );
 
