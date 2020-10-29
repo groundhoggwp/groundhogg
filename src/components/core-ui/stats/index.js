@@ -13,7 +13,6 @@ import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 /**
  * Internal dependencies
  */
-
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'inline-block',
@@ -29,7 +28,8 @@ const useStyles = makeStyles((theme) => ({
     textTransform: "capitalize",
     padding: "10px 5px 5px 10px",
     color: '#ffffff',
-    background: '#DB741A',
+    background: theme.palette.primary.main,
+    // background: '#DB741A',
     marginBottom: '10px'
   },
   current: {
