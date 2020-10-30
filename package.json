@@ -82,6 +82,7 @@
     "chart.js": "^2.9.3",
     "classnames": "2.2.6",
     "cross-fetch": "^3.0.6",
+    "dagre": "^0.8.5",
     "memize": "^1.1.0",
     "prettier": "^2.1.2",
     "qs": "6.9.4",
@@ -91,6 +92,7 @@
     "react-router-dom": "5.1.2",
     "react-select": "^3.1.0",
     "react-transition-group": "4.3.0",
+    "react-xarrows": "^1.5.0",
     "recharts": "^1.8.5",
     "uniqid": "5.2.0"
   }

@@ -16,10 +16,20 @@ const Chart = ({id, title, data}) => {
   // console.log(type)
   const useStyles = makeStyles((theme) => ({
     root: {
-      paddingTop: '25px',
+      position: 'relative',
+      paddingTop: '50px',
       width: data.chart.type === "doughnut" ? "400px" : "100%",
       height: data.chart.type === "doughnut" ? "250px" : "400px",
     },
+    title: {
+      fontSize: '18px',
+      position: 'absolute',
+      textTransform:'capitalize',
+      top: '10px',
+      left: '42px',
+      fontWeight: '700'
+      // left:
+    }
   }));
   const classes = useStyles();
   const chartContainer = useRef(null);
@@ -36,14 +46,14 @@ const Chart = ({id, title, data}) => {
   }
 
   //Capitalizes the text
-  chartConfig.options.title.text =  title.replace(/(^\w{1})|(\s{1}\w{1})/g, match => match.toUpperCase());
+  // chartConfig.options.title.text =  title.replace(/(^\w{1})|(\s{1}\w{1})/g, match => match.toUpperCase());
   chartConfig.data =  data.chart.data
 
 
-  console.log('chart', chartConfig.type, data.chart.type)
+  // console.log('chart', chartConfig.type, data.chart.type)
   useEffect(() => {
     if (chartContainer && chartContainer.current) {
-      console.log(chartConfig)
+      // console.log(chartConfig)
       const newChartInstance = new Chartjs(chartContainer.current, chartConfig);
       setChartInstance(newChartInstance);
 
@@ -68,10 +78,11 @@ const Chart = ({id, title, data}) => {
       // });
     }
   }, [chartContainer]);
-  console.log(chartContainer.current)
+  // console.log(chartContainer.current)
   return (
 
-    <Card  className={classes.root}>
+    <Card className={classes.root}>
+      <div className={classes.title}>{title}</div>
       <canvas className={"Chart__canvas"+id} ref={chartContainer} />
     </Card>
   );

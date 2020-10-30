@@ -73,8 +73,8 @@ export default (props) => {
       step_type: type,
       step_order: stepOrder || 1,
       step_group: stepGroup,
-      child_steps: childSteps || [],
-      parent_steps: parentSteps || [],
+      child_steps: childSteps ? childSteps.filter( s => s !== 'exit' ) : [],
+      parent_steps: parentSteps ? parentSteps.filter( s => s !== 'exit' ) : [],
     }
     createStep({
       data: newStepData,

@@ -35,9 +35,8 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     right: '0px',
     width: '350px',
-    // display: 'flex',
-    // width: '100%',
-    justifyContent: 'flex-end'
+    justifyContent: 'flex-end',
+    zIndex: '5'
   }
 }));
 
@@ -90,11 +89,16 @@ export default ({ reportList, dateChange }) => {
           let type = reports[reportKey].chart.type;
           title.shift();
           title = title.join(" ");
+          // let firstChart = true
           if (type === "quick_stat") {
             return <Stats title={title} id={reportKey} data={reports[reportKey]} />;
           } else if (type === "table") {
             return <ReportTable title={title} id={reportKey} data={reports[reportKey]} />;
           } else {
+            // if(firstChart){
+            //   firstChart = false
+            //   return <Chart title={title} id={reportKey} data={reports[reportKey]} /></>;
+            // }
             return <Chart title={title} id={reportKey} data={reports[reportKey]} />;
           }
         })}

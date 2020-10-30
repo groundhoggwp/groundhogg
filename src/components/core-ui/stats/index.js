@@ -16,7 +16,7 @@ import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'inline-block',
-    position: 'relative',
+    position: 'relative',    
     width: "250px",
     height: "150px",
     margin: "10px",

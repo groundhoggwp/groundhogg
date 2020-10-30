@@ -1,21 +1,17 @@
 import Box from '@material-ui/core/Box'
 import Card from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
-import CardActions from '@material-ui/core/CardActions'
-import IconButton from '@material-ui/core/IconButton'
+
 import { useState } from '@wordpress/element'
 import AddStepButton from '../AddStepButton'
-import Tooltip from '@material-ui/core/Tooltip'
+
 import makeStyles from '@material-ui/core/styles/makeStyles'
-import { ArcherElement } from 'react-archer'
+
 import {
   ACTION, ACTIONS,
   BENCHMARK, BENCHMARKS,
-  CONDITION, CONDITIONS,
+
 } from 'components/layout/pages/funnels/editor/steps-types/constants'
-import {
-  FUNNELS_STORE_NAME,
-} from 'data'
 
 const useStyles = makeStyles((theme) => ( {
   stepBlockContainer: {
@@ -53,7 +49,7 @@ const useStyles = makeStyles((theme) => ( {
 
 export default (props) => {
 
-  const { endingSteps, funnelId } = props;
+  const { endingSteps, funnelId, xPos, yPos } = props
   const [anchorEl, setAnchorEl] = useState(null)
   const [addingStep, setAddingStep] = useState(null)
 
@@ -69,9 +65,15 @@ export default (props) => {
     setAddingStep(null)
   }
 
+  const position = {
+    position: 'absolute',
+    top: yPos,
+    left: xPos,
+  }
+
   return (
     <>
-      <Box className={ classNames.stepBlockContainer }>
+      <Box className={ classNames.stepBlockContainer } style={ position }>
         <Box className={ classNames.stepBlock }>
           { endingSteps.length > 1 &&
           <AddStepButton
@@ -90,15 +92,11 @@ export default (props) => {
           />
           }
           <Box display={ 'flex' } justifyContent={ 'center' }>
-            <ArcherElement
-              id={ 'exit' }
-            >
-              <Card style={ { width: 250 } }>
-                <CardHeader
-                  title={ 'Exit Funnel' }
-                />
-              </Card>
-            </ArcherElement>
+            <Card style={ { width: 250 } } id={ 'step-exit' }>
+              <CardHeader
+                title={ 'Exit Funnel' }
+              />
+            </Card>
           </Box>
         </Box>
       </Box>
