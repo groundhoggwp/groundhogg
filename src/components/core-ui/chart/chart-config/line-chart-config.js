@@ -28,7 +28,7 @@ const lineChartConfig = {
     responsive: true,
     maintainAspectRatio: false,
     title: {
-      display: true,
+      display: false,
       text: '',
       fontFamily:  'Roboto, Helvetica, Arial, sans-serif',
       // fontSize: '18px',
@@ -62,6 +62,9 @@ const lineChartConfig = {
                 month: "MMM D"
               },
               tooltipFormat: "day"
+          },
+          ticks:{
+            maxTicksLimit: 20
           },
           scaleLabel: {
               display: false,
