@@ -5,87 +5,128 @@ import {Fragment, useState, getState} from '@wordpress/element';
 import {useSelect, useDispatch} from '@wordpress/data';
 import {__} from '@wordpress/i18n';
 import Button from '@material-ui/core/Button';
-import {castArray} from 'lodash';
-import Spinner from '../../../core-ui/spinner';
-
-
 
 
 /**
  * Internal dependencies
  */
-import {BROADCASTS_STORE_NAME} from '../../../../data';
-import {addNotification} from "utils/index";
+import {BROADCASTS_STORE_NAME} from 'data/broadcasts';
 import Box from "@material-ui/core/Box";
 import {ListTable} from "components/core-ui/list-table/new";
-import {TagPicker} from "components/core-ui/tag-picker";
-import {Card} from "@material-ui/core";
-import Single from "components/layout/pages/funnels/single";
-import {Link, Route, useRouteMatch} from "react-router-dom";
-
+import {Link} from "react-router-dom";
+import {Tooltip} from "@material-ui/core";
+import Chip from "@material-ui/core/Chip";
+import SendIcon from '@material-ui/icons/Send';
+import DraftsIcon from '@material-ui/icons/Drafts';
+import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
+import {AssignmentTurnedIn} from "@material-ui/icons";
 
 const BroadcastsTableColumns = [
     {
         ID: 'object_id',
         name: 'ID',
-        orderBy: 'objcet_id',
-        align: 'right',
+        orderBy: 'object_id',
+        align: 'left',
         cell: ({data}) => {
             return data.object_id
         },
     },
+    {
+        ID: 'title',
+        name: 'Email/SMS',
+        orderBy: '',
+        align: 'left',
+        cell: ({title}) => {
+            return title;
+        }
 
+    },
+    {
+        ID: 'Schedule',
+        name: 'Schedule By',
+        orderBy: '',
+        align: 'left',
+        cell: ({user}) => {
+            return  user.data.display_name
+        }
 
+    },
+    {
+        ID: 'run_date',
+        name: 'Scheduled Run Date',
+        orderBy: '',
+        align: 'left',
+        cell: ({data}) => {
+            return data.send_time // todo format using the decided library
+        }
+
+    },
+
+    {
+        ID: 'status',
+        name: 'Status',
+        orderBy: 'status',
+        align: 'left',
+        cell: ({data}) => {
+            return <Chip variant="outlined" color="primary" size="small" label={data.status}/>
+        }
+
+    },
     // {
-    //     ID: 'title',
-    //     name: <span><LocalOfferIcon { ...iconProps }/> { 'Name' }</span>,
+    //     ID: 'send_to',
+    //     name: 'Sending TO',
     //     orderBy: '',
     //     align: 'left',
-    //     cell: ({ title }) => {
-    //         return title
-    //     },
-    // },
-    // {
-    //     ID: 'description',
-    //     name: <span>{ 'Description' }</span>,
-    //     align: 'left',
-    //     cell: ({ data }) => {
-    //         return <>{ data.tag_description }</>
-    //     },
-    // },
-    // {
-    //     ID: 'contacts',
-    //     name: <span><GroupIcon { ...iconProps }/> { 'Contacts' }</span>,
-    //     orderBy: 'contact_count',
-    //     align: 'right',
-    //     cell: ({ data }) => {
-    //         return <>{ data.contact_count }</>
-    //     },
-    // },
-    // {
-    //     ID: 'contacts',
-    //     name: <span><SettingsIcon { ...iconProps }/> { 'Actions' }</span>,
-    //     align: 'right',
-    //     cell: ({ ID, data, openQuickEdit }) => {
+    //     cell: ({data}) => {
+    //         return 'Hello'
+    //     }
     //
-    //         const { deleteItem } = useDispatch(TAGS_STORE_NAME)
-    //
-    //         const handleEdit = () => {
-    //             openQuickEdit()
-    //         }
-    //
-    //         const handleDelete = (ID) => {
-    //             deleteItem(ID)
-    //         }
-    //
-    //         return <>
-    //             <RowActions
-    //                 onEdit={ openQuickEdit }
-    //                 onDelete={ () => handleDelete(ID) }
-    //             />
-    //         </>
-    //     },
     // },
+
+    {
+        ID: 'stats',
+        name: 'Stats',
+        orderBy: '',
+        align: 'left',
+        cell: ({report, data}) => {
+
+            if (data.status === 'scheduled') {
+                return '-';
+            }
+            return <>
+                <Tooltip title={'Sent'}>
+                    <Chip
+                        icon={<SendIcon/>}
+                        label={report.sent}
+                    />
+                </Tooltip>
+                <br/>
+                <Tooltip title={'Opened'}>
+                    <Chip
+                        icon={<DraftsIcon/>}
+                        label={report.opened}
+                    />
+                </Tooltip>
+                <br/>
+                <Tooltip title={'Clicked'}>
+                    <Chip
+                        icon={<AssignmentTurnedInIcon/>}
+                        label={report.clicked}
+                    />
+                </Tooltip>
+            </>
+        }
+    },
+    {
+        ID: 'date_scheduled',
+        name: 'Date Scheduled',
+        orderBy: 'date_scheduled',
+        align: 'left',
+        cell: ({data}) => {
+            return data.date_scheduled; // Need to resolve this to proper format
+        }
+
+    },
 ];
 
 //
@@ -130,7 +171,6 @@ const BroadcastsTableColumns = [
 export default (props) => {
 
 
-
     // getting all the state variables
 
 
@@ -164,45 +204,11 @@ export default (props) => {
     // }
 
 
-
     return (
         <Fragment>
-
-            {/*    // set variables for the request*/}
-            {/*    setEmailOrSmsId(474);*/}
-            {/*    setTags( [168] );*/}
-            {/*    setSendNow(true);*/}
-            {/*    setType('email');*/}
-
-            {/*}}>*/}
-            {/*    {__('Cancel Broadcast', 'groundhogg')}*/}
-            {/*</Button>*/}
-
-            {/*{(isUpdating) && (<Spinner/>)}*/}
-            <Link to={ `/broadcasts/schedule` }>
+            <Link to={`/broadcasts/schedule`}>
                 Schedule Broadcast
             </Link>
-
-            <Button variant="contained" color="primary" onClick={() => {
-
-
-                props.history.push("/broadcasts/schedule");
-                //open a new page
-
-
-
-                //print the value
-
-                //set the value statically
-
-                // setBulkJob(true);
-
-
-                // addNotification({message: __("Broadcast scheduled "), type: 'success'});
-            }}>
-                {__('Schedule Broadcast', 'groundhogg')}
-            </Button>
-
             <Box display={'flex'}>
                 <Box>
                     {/*<ScheduleBroadcast/>*/}
