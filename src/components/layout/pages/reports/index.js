@@ -30,7 +30,7 @@ export function Reports(props) {
   const classes = useStyles();
 
   const [startDate, setStartDate] = useState("2017-01-01");
-  const [endDate, setEndDate] = useState("2020-01-01");
+  const [endDate, setEndDate] = useState("2020-10-30");
 
   const dateChange = (id, e)  => {
     if (id === 'start'){
@@ -58,8 +58,7 @@ export function Reports(props) {
               "total_emails_sent",
               "email_open_rate",
               "email_click_rate",
-              "chart_contacts_by_optin_status",
-              "table_contacts_by_lead_source",
+              // "chart_contacts_by_optin_status",
               "table_top_converting_funnels",
               "table_top_performing_emails",
               "table_contacts_by_countries",
@@ -78,19 +77,19 @@ export function Reports(props) {
             endDate={endDate}
             dateChange={dateChange}
             reportList={[
-              "chart_new_contacts",
-              "total_new_contacts",
-              "total_confirmed_contacts",
-              "total_engaged_contacts",
-              "total_unsubscribed_contacts",
-              "chart_contacts_by_optin_status",
-              "table_contacts_by_lead_source",
-              "table_contacts_by_countries",
-              "chart_contacts_by_region",
-              "table_contacts_by_search_engines",
-              "table_contacts_by_social_media",
-              "table_contacts_by_source_page",
-              "table_list_engagement",
+              // "chart_new_contacts",
+              // "total_new_contacts",
+              // "total_confirmed_contacts",
+              // "total_engaged_contacts",
+              // "total_unsubscribed_contacts",
+              // "chart_contacts_by_optin_status",
+              // "table_contacts_by_lead_source",
+              // "table_contacts_by_countries",
+              // "chart_contacts_by_region",
+              // "table_contacts_by_search_engines",
+              // "table_contacts_by_social_media",
+              // "table_contacts_by_source_page",
+              // "table_list_engagement",
             ]}
           />
         );
@@ -105,9 +104,18 @@ export function Reports(props) {
             endDate={endDate}
             dateChange={dateChange}
             reportList={[
-              "chart_email_activity",
-              "email_open_rate",
-              "email_click_rate",
+              // "chart_email_activity",
+              // "total_emails_sent",
+              // "email_open_rate",
+              // "email_click_rate",
+              // "total_unsubscribed_contacts",
+              // "total_spam_contacts",
+              // "total_bounces_contacts",
+              // "total_complaints_contacts",
+              // "table_top_performing_broadcasts",
+              // "chart_last_broadcast",
+              // "table_top_performing_emails",
+              // "table_worst_performing_emails",
             ]}
           />
 
@@ -122,7 +130,14 @@ export function Reports(props) {
           endDate={endDate}
           dateChange={dateChange}
           reportList={[
-            "chart_funnel_breakdown"
+            // "chart_funnel_breakdown",
+            // "total_contacts_in_funnel",
+            // "total_funnel_conversion_rate",
+            // "total_abandonment_rate",
+            // "table_top_performing_emails",
+            // "table_worst_performing_emails",
+            // "total_benchmark_conversion_rate",
+            // "table_form_activity"
           ]}
         />
       },
@@ -135,8 +150,8 @@ export function Reports(props) {
           endDate={endDate}
           dateChange={dateChange}
           reportList={[
-            "table_broadcast_stats",
-            "table_broadcast_link_clicked",
+            // "table_broadcast_stats",
+            // "table_broadcast_link_clicked",
           ]}
         />
       },
@@ -154,19 +169,19 @@ export function Reports(props) {
         />
       },
     },
-    {
-      label: __("Pipeline"),
-      component: () => {
-        return <ReportPanel
-          startDate={startDate}
-          endDate={endDate}
-          dateChange={dateChange}
-          reportList={[
-            "table_form_activity"
-          ]}
-        />
-      },
-    }
+    // {
+    //   label: __("Pipeline"),
+    //   component: () => {
+    //     return <ReportPanel
+    //       startDate={startDate}
+    //       endDate={endDate}
+    //       dateChange={dateChange}
+    //       reportList={[
+    //         "table_form_activity"
+    //       ]}
+    //     />
+    //   },
+    // }
   ];
 
   return <TabPanel tabs={tabs} />;

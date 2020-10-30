@@ -49,6 +49,8 @@ export default ({ reportList, dateChange, startDate, endDate }) => {
       return {
         reports: store.getItems({
           reports: reportList,
+          // start: "2017-01-01",
+          // end: "2020-10-30",
           start: startDate,
           end: endDate,
         }),
@@ -86,16 +88,15 @@ export default ({ reportList, dateChange, startDate, endDate }) => {
           title.shift();
           title = title.join(" ");
           // let firstChart = true
+          console.log(type)
           if (type === "quick_stat") {
             return <Stats title={title} id={reportKey} data={reports[reportKey]} />;
           } else if (type === "table") {
             return <ReportTable title={title} id={reportKey} data={reports[reportKey]} />;
-          } else {
-            // if(firstChart){
-            //   firstChart = false
-            //   return <Chart title={title} id={reportKey} data={reports[reportKey]} /></>;
-            // }
+          } else if(type === "doughnut" || type === "line") {
             return <Chart title={title} id={reportKey} data={reports[reportKey]} />;
+          } else {
+            return <Card>{title} No data?</Card>
           }
         })}
       </div>

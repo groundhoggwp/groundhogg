@@ -47,7 +47,7 @@ const Chart = ({id, title, data}) => {
 
   //Capitalizes the text
   // chartConfig.options.title.text =  title.replace(/(^\w{1})|(\s{1}\w{1})/g, match => match.toUpperCase());
-  // chartConfig.data =  data.chart.data
+  chartConfig.data =  data.chart.data
 
 
   // console.log('chart', chartConfig.type, data.chart.type)

@@ -19,7 +19,8 @@ const useStyles = makeStyles({
   },
   table: {
     // minWidth: 650,
-    width: '100%'
+    width: '100%',
+    height: '300px'
   },
   title: {
     fontSize: '18px',
