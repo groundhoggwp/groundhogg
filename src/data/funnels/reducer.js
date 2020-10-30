@@ -5,7 +5,8 @@ import TYPES from './action-types';
 import { INITIAL_STATE as BASE_OBJECT_INITIAL_STATE } from 'data/base-object/constants'
 
 const INITIAL_STATE = {
-	...BASE_OBJECT_INITIAL_STATE
+	...BASE_OBJECT_INITIAL_STATE,
+	edges: []
 }
 
 const funnelReducer = (
