@@ -2,8 +2,6 @@ import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import { makeStyles } from '@material-ui/core/styles';
-import { select } from '@wordpress/data'
-import { __ } from '@wordpress/i18n'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -28,16 +26,11 @@ export default function ghSelect(props) {
   const {
 	  defaultValue,
 	  value,
-	  onChange
+	  onChange,
+	  atts
   } = props;
 
-  const adminUsers = select( 'core' ).getUsers( { roles : [ 'administrator' ] } );
-
-  if ( ! adminUsers ) {
-	  return null;
-  }
-
-  if ( ! adminUsers.length ) {
+  if ( ! atts.options.length ) {
 	  return null;
   }
 
@@ -51,8 +44,7 @@ export default function ghSelect(props) {
 				className={classes.selectEmpty}
 				inputProps={{ 'aria-label': 'Without label' }}
 			>
-				<MenuItem value={''}>{ __( 'Please select an owner.' ) }</MenuItem>
-				{adminUsers.map( ( user ) => ( <MenuItem value={user.id}>{ `${user.username}(${user.email})` }</MenuItem> ) ) }
+				{atts.options.map( ( key, value ) => ( <MenuItem value={key}>{value}</MenuItem> ) ) }
 			</Select>
 		</FormControl>
     </div>

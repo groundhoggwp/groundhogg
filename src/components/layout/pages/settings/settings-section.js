@@ -20,6 +20,7 @@ import { makeStyles } from "@material-ui/core/styles";
  * Internal dependencies
  */
 import TagPicker from 'components/core-ui/tag-picker'
+import SelectOwners from 'components/core-ui/select-owners'
 import Select from 'components/core-ui/select'
 import { useSettings } from 'data'
 import { addNotification } from 'utils'
@@ -113,7 +114,7 @@ export const SettingsSection = ( { section } ) => {
 			'tag_picker' : { component : TagPicker },
 			'link_picker' : { component : TagPicker }, // I imagine we'll have a LinkPicker component?
 			'dropdown' : { component : Select },
-			'dropdown_owners' : { component : Select }, // Investigate any difference here.
+			'dropdown_owners' : { component : SelectOwners }, // Investigate any difference here.
 			'editor' : { component : TextareaAutosize }, // Need to build out TinyMCE Editor
 			'textarea' : { component : TextareaAutosize },
 		 } );

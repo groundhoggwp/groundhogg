@@ -5,7 +5,8 @@ import TYPES from './action-types';
 import { INITIAL_STATE as BASE_OBJECT_INITIAL_STATE } from 'data/base-object/constants'
 
 const INITIAL_STATE = {
-	...BASE_OBJECT_INITIAL_STATE
+	...BASE_OBJECT_INITIAL_STATE,
+	editorMode : 'visual'
 }
 
 const coreReducer = (
@@ -14,7 +15,7 @@ const coreReducer = (
 		type,
 		value,
 		key,
-		mode,
+		editorMode,
 		isAllowed,
 		snackbarSeverity,
 		snackbarMessage,
@@ -50,7 +51,7 @@ const coreReducer = (
 		case TYPES.SWITCH_MODE:
 			state = {
 				...state,
-				mode,
+				editorMode,
 			};
 			break;
 	}
