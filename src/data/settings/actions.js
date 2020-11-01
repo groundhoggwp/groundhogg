@@ -4,7 +4,7 @@
 
 import { __ } from '@wordpress/i18n';
 import { apiFetch, select } from '@wordpress/data-controls';
-import { concat } from 'lodash';
+import { concat, filter } from 'lodash';
 
 /**
  * Internal dependencies
@@ -13,6 +13,7 @@ import { STORE_NAME } from './constants';
 import TYPES from './action-types';
 
 export function updateSettingsForGroup( group, data, time = new Date() ) {
+
 	return {
 		type: TYPES.UPDATE_SETTINGS_FOR_GROUP,
 		group,
@@ -71,14 +72,16 @@ export function* persistSettingsForGroup( group ) {
 		group,
 		dirtyKeys
 	);
-	const url = `${ STORE_NAME }/${ group }`;
+	const url = `${ STORE_NAME }/`;
 
 	const update = dirtyKeys.reduce( ( updates, key ) => {
 		const u = Object.keys( dirtyData[ key ] ).map( ( k ) => {
 			return { id: k, value: dirtyData[ key ][ k ] };
 		} );
-		return concat( updates, u );
+
+		return filter( concat( updates, u ), ( setting ) => ! setting.value.hasOwnProperty( 'defaultValue' ) );
 	}, [] );
+
 	try {
 		const results = yield apiFetch( {
 			path: url,
@@ -104,10 +107,4 @@ export function* persistSettingsForGroup( group ) {
 		yield setIsRequesting( group, false );
 		throw e;
 	}
-}
-
-export function clearSettings() {
-	return {
-		type: TYPES.CLEAR_SETTINGS,
-	};
 }

@@ -4,7 +4,6 @@ import { applyFilters } from '@wordpress/hooks'
 import { filter, forEach } from 'lodash'
 import TabPanel from 'components/core-ui/tab-panel'
 import { SettingsSection } from './settings-section'
-import { useSettings } from 'data'
 
 export const Settings = () => {
 

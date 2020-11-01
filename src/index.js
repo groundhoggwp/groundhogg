@@ -11,17 +11,16 @@ import { PageLayout } from './components/layout';
 
 import {
 	withCurrentUserHydration,
-	withSettingsHydration,
-	SETTINGS_STORE_NAME
+	withSettingsHydration
 } from './data';
 
 const appRoot = document.getElementById( 'root' );
-const settingsGroup = SETTINGS_STORE_NAME;
+const settingsGroup = 'gh_admin';
 const hydrateUser = window.Groundhogg.user;
 
 let HydratedPageLayout = withSettingsHydration(
 	settingsGroup,
-	window.Groundhogg
+	window.Groundhogg.preloadSettings
 )( PageLayout );
 
 if ( hydrateUser ) {

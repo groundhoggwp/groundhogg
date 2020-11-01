@@ -3,14 +3,13 @@
  */
 import { Fragment } from '@wordpress/element'
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useRef, useEffect } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks'
 
 /**
  * External dependencies
  */
 import Checkbox from '@material-ui/core/Checkbox'
-import Select from '@material-ui/core/Select'
 import TextareaAutosize from '@material-ui/core/TextareaAutosize'
 import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
@@ -21,7 +20,9 @@ import { makeStyles } from "@material-ui/core/styles";
  * Internal dependencies
  */
 import TagPicker from 'components/core-ui/tag-picker'
-import { SETTINGS_STORE_NAME } from 'data'
+import Select from 'components/core-ui/select'
+import { useSettings } from 'data'
+import { addNotification } from 'utils'
 
 const useStyles = makeStyles((theme) => ({
     description: {
@@ -32,9 +33,78 @@ const useStyles = makeStyles((theme) => ({
 
 export const SettingsSection = ( { section } ) => {
 	const classes = useStyles();
+	const {
+		settingsError,
+		isRequesting,
+		isDirty,
+		updateSettings,
+		persistSettings,
+		settings
+	} = useSettings( 'gh_admin', [ 'settings' ] );
+
+	const hasSaved = useRef( false );
+
+	const saveChanges = () => {
+		persistSettings();
+	};
+
+	const handleInputChange = ( e ) => {
+		const { checked, type, value, id } = e.target;
+		const nextSettings = { ...settings };
+
+		if ( type === 'checkbox' ) {
+			if ( checked ) {
+				nextSettings[ id ] = [ ...nextSettings[ id ], value ];
+			} else {
+				nextSettings[ id ] = nextSettings[ id ].filter(
+					( v ) => v !== value
+				);
+			}
+		} else {
+			nextSettings[ id ] = value;
+		}
+
+		updateSettings( 'settings', nextSettings );
+	};
+
+	useEffect( () => {
+		function warnIfUnsavedChanges( event ) {
+			if ( isDirty ) {
+				event.returnValue = __(
+					'You have unsaved changes. If you proceed, they will be lost.',
+					'groundhogg'
+				);
+				return event.returnValue;
+			}
+		}
+		window.addEventListener( 'beforeunload', warnIfUnsavedChanges );
+		return () =>
+			window.removeEventListener( 'beforeunload', warnIfUnsavedChanges );
+	}, [ isDirty ] );
+
+	useEffect( () => {
+		if ( isRequesting ) {
+			hasSaved.current = true;
+			return;
+		}
+		if ( ! isRequesting && hasSaved.current ) {
+			if ( ! settingsError ) {
+				addNotification( {
+					message : __( 'Your settings have been successfully saved.', 'groundhogg' )
+				} );
+			} else {
+				addNotification( {
+					message : __( 'There was an error saving your settings. Please try again.', 'groundhogg' ),
+					type: 'error'
+				} );
+			}
+			hasSaved.current = false;
+		}
+	}, [ isRequesting, settingsError ] );
 
 	const componentInputMap = ( props ) => {
-		const { type } = props;
+		const { type, id, defaultValue } = props;
+		const { ...restProps } = props;
 
 		const mapping = applyFilters( 'groundhogg.settings.componentInputMap', {
 			'input' : { component : TextField },
@@ -48,14 +118,15 @@ export const SettingsSection = ( { section } ) => {
 			'textarea' : { component : TextareaAutosize },
 		 } );
 
+		 const value = settings[ id ].hasOwnProperty( 'defaultValue' ) ? defaultValue : settings[ id ];
+
 		 if ( mapping.hasOwnProperty( type ) ) {
 			 const mappedComponent = mapping[ type ];
-			 return ( <mappedComponent.component {...restProps} /> );
+			 return ( <mappedComponent.component onChange={handleInputChange} value={value} {...restProps} /> );
 		 }
 
 		 return null;
 	};
-
 	return (
 		<Fragment>
 			{
@@ -76,7 +147,7 @@ export const SettingsSection = ( { section } ) => {
 					)
 				)
 			}
-			<Button variant="contained" color="primary" onClick={ onClick() }>{ __( 'Save Settings' ) }</Button>
+			<Button variant="contained" color="primary" onClick={ saveChanges }>{ __( 'Save Settings' ) }</Button>
 		</Fragment>
 	);
 }

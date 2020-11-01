@@ -28,16 +28,18 @@ export const SnackbarArea = () => {
 	}
 
   return (
-    <Snackbar
-      anchorOrigin={{
-        vertical: "bottom",
-        horizontal: "left"
-      }}
-      open={isOpen}
-      autoHideDuration={6000}
-      onClose={handleClose}
-    >
-		<Alert onClose={handleClose} severity={severity}>{ message }</Alert>
-	</Snackbar>
+	<div id="groundhogg-snackbar-area">
+		<Snackbar
+		anchorOrigin={{
+			vertical: "bottom",
+			horizontal: "left"
+		}}
+		open={isOpen}
+		autoHideDuration={6000}
+		onClose={handleClose}
+		>
+			<Alert onClose={handleClose} severity={severity}>{ message }</Alert>
+		</Snackbar>
+	</div>
   );
 }
