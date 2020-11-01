@@ -7,43 +7,59 @@ import Paper from '@material-ui/core/Paper'
 import './steps-types'
 import { withSelect } from '@wordpress/data'
 import dagre from 'dagre'
-import Xarrow from 'react-xarrows'
+import StepEdges from './components/StepEdges'
+import { CONDITION } from 'components/layout/pages/funnels/editor/steps-types/constants'
 
 /**
  * Breadth first search of the steps tree to build iout a row level based chart
  * for putting the steps on the page.
  *
- * @param startNodes
- * @param allNodes
+ * @param steps
+ * @param graph
  */
-function assignLevels (startNodes, allNodes) {
+function buildGraph (steps, graph) {
 
-  startNodes.forEach((node, i) => {
-    node.level = 0
-    node.xPos = i
-  })
-
-  const queue = startNodes
+  const queue = steps.filter(
+    step => Object.values(step.data.parent_steps).length === 0)
 
   while (queue.length) {
     let currentNode = queue.shift()
+    const { ID, data } = currentNode
+    const { child_steps, step_group } = data
+    let children = Object.values(child_steps)
+
+    if (graph.node(ID)) {
+      continue
+    }
+
+    graph.setNode(ID, { label: ID, width: 300, height: 250 })
 
     // Get the child nodes
-    let childNodes = allNodes.filter(
-      node => currentNode.data.child_steps.includes(node.ID))
+    let childNodes = steps.filter(
+      node => children.includes(node.ID))
 
-    // queue up the child nodes
-    childNodes.forEach((node, i) => {
+    if (step_group === CONDITION) {
+      graph.setEdge(ID, child_steps.no || 'exit')
+      graph.setEdge(ID, child_steps.yes || 'exit')
 
-      node.level = currentNode.level + 1
-      node.xPos = i + currentNode.xPos
+      child_steps.yes && queue.push( childNodes.find( node => node.ID === child_steps.yes  ) )
+      child_steps.no && queue.push( childNodes.find( node => node.ID === child_steps.no  ) )
 
-      queue.push(node)
-    })
-  }// let parentNodes = allNodes.filter(
-  //   node => currentNode.data.parent_steps.includes(node.ID))
+    } else {
 
-  console.log(allNodes)
+      if (!childNodes.length) {
+        // set to exit
+        graph.setEdge(ID, 'exit')
+        continue
+      }
+
+      // queue up the child nodes
+      childNodes.forEach((node, i) => {
+        graph.setEdge(ID, node.ID)
+        queue.push(node)
+      })
+    }
+  }
 }
 
 const Editor = ({ funnel }) => {
@@ -59,33 +75,22 @@ const Editor = ({ funnel }) => {
   const steps = funnel.steps
 
   const endingSteps = steps.filter(
-    step => step.data.child_steps.length === 0)
+    step => Object.values(step.data.child_steps).length === 0)
 
   const graph = new dagre.graphlib.Graph()
 
   graph.setGraph({
     // ranker: 'tight-tree',
-    // align: 'UL'
-    nodesep: 100
+    // align: 'DL',
+    // rankdir: 'LR',
+    nodesep: 100,
   })
 
   graph.setDefaultEdgeLabel(() => { return {} })
 
   graph.setNode('exit', { label: 'exit', width: 300, height: 250 })
 
-  steps.forEach((step) => {
-    const { child_steps } = step.data
-
-    graph.setNode(step.ID, { label: step.ID, width: 300, height: 250 })
-
-    child_steps.forEach((child) => {
-      graph.setEdge(step.ID, child)
-    })
-
-    if (!child_steps.length) {
-      graph.setEdge(step.ID, 'exit')
-    }
-  })
+  buildGraph(steps, graph)
 
   dagre.layout(graph)
 
@@ -145,33 +150,7 @@ const Editor = ({ funnel }) => {
           endingSteps={ endingSteps.map(step => step.ID) }/>
         }
         {
-          steps.map((step, i) => {
-
-            const { child_steps } = step.data;
-
-            if ( ! child_steps.length ){
-              child_steps.push( 'exit' )
-            }
-
-            return (
-              <>
-                {
-                  child_steps.map(child => <Xarrow
-                    key={ i }
-                    start={ 'step-' + step.ID }
-                    end={ 'step-' + child }
-                    startAnchor={ ['bottom', 'middle'] }
-                    endAnchor={ ['top', 'middle'] }
-                    curveness={1}
-                    headSize={5}
-                    strokeWidth={2}
-                    path={'smooth'}
-                    color={'#cbcbcb'}
-                  />)
-                }
-              </>
-            )
-          })
+          steps.map((step, i) => <StepEdges { ...step } />)
         }
       </div>
     </>
