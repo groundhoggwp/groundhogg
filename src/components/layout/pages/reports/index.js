@@ -7,6 +7,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { __ } from "@wordpress/i18n";
 import Card from "@material-ui/core/Card";
 import Typography from "@material-ui/core/Typography";
+import { DateTime } from 'luxon';
 
 /**
  * Internal dependencies
@@ -26,11 +27,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+
 export function Reports(props) {
   const classes = useStyles();
 
-  const [startDate, setStartDate] = useState("2017-01-01");
-  const [endDate, setEndDate] = useState("2020-10-30");
+  const [startDate, setStartDate] = useState(DateTime.local().minus({ years: 1 }).startOf('day').toISODate());
+  const [endDate, setEndDate] = useState(DateTime.local().startOf('day').toISODate());
 
   const dateChange = (id, e)  => {
     if (id === 'start'){
