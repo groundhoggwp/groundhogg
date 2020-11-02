@@ -73,7 +73,7 @@ const lineChartConfig = {
           },
           gridLines: {
             display: true,
-            offsetGridLines: true
+            // offsetGridLines: true
           },
 
       }],
