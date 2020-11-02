@@ -57,7 +57,7 @@ function Editor( { settings, email } ) {
 							content={
 								<>
 									<Notices />
-									{ editorMode === 'visual' && <BlockEditor settings={settings} /> }
+									{ editorMode !== 'text' && <BlockEditor settings={settings} /> }
 									{ editorMode === 'text' && <PostTextEditor /> }
 								</>
 							}

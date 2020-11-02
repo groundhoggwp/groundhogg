@@ -82,20 +82,16 @@ class Settings_Api extends Base_Api {
 
 	protected function prepare_settings( $data, $group_id ) {
 		$settings = array_keys( $this->get_settings( $group_id ) );
-
-		foreach ( $data as $name => $value ) {
-			if ( ! in_array( $name, $settings, true ) ) {
-				unset( $data[ $name ] );
+		$_data = [];
+		foreach ( $data as $index => $setting ) {
+			if ( ! in_array( $setting['id'], $settings, true ) ) {
+				unset( $data[ $index ] );
 			}
 
-			$value = trim( $value );
-
-			if ( empty( $value ) ) {
-				$data[ $name ] = false;
-			}
+			$_data[ $setting['id'] ] = trim( $setting['value'] );
 		}
 
-		return $data;
+		return $_data;
 	}
 
 	/**
@@ -122,8 +118,7 @@ class Settings_Api extends Base_Api {
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function update( WP_REST_Request $request ) {
-
-		$data     = $request->get_param( 'data' ) ?: [];
+		$data     = $request->get_param( 'update' ) ?: [];
 		$group_id = $request->get_param( 'group_id' );
 
 		$items = $this->prepare_settings( $data, $group_id );
@@ -132,11 +127,7 @@ class Settings_Api extends Base_Api {
 		 * @var $object Base_Object
 		 */
 		foreach ( $items as $name => $value ) {
-			if ( $value ) {
-				Plugin::$instance->settings->update_option( $name, $value );
-			} else {
-				Plugin::$instance->settings->delete_option( $name );
-			}
+			Plugin::$instance->settings->update_option( $name, $value );
 		}
 
 		return self::SUCCESS_RESPONSE( [

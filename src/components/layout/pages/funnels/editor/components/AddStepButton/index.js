@@ -3,19 +3,21 @@ import AddIcon from '@material-ui/icons/Add';
 import { useState } from '@wordpress/element';
 import Popover from '@material-ui/core/Popover';
 import CombinedStepPicker from '../Pickers/CombinedStepPicker';
+import Tooltip from '@material-ui/core/Tooltip'
 
 export default (props) => {
 
-  const { className, openStepBlock, closeStepBlock, anchorEl, setAnchorEl, open } = props;
-  const id = open ? 'step-picker-popover' : undefined;
+  const { className, openStepBlock, closeStepBlock, anchorEl, setAnchorEl, open, id, toolTipTitle } = props;
 
   return (
     <>
-      <Fab className={ className } size={'small'} aria-label="add" onClick={openStepBlock}>
-        <AddIcon />
-      </Fab>
+      <Tooltip title={toolTipTitle}>
+        <Fab id={id} className={ className } size={'small'} aria-label="add" onClick={openStepBlock}>
+          <AddIcon />
+        </Fab>
+      </Tooltip>
       <Popover
-        id={id}
+        id={id + '-popover' }
         open={open}
         anchorEl={anchorEl}
         onClose={closeStepBlock}

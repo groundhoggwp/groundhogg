@@ -23,10 +23,10 @@ export function clearSnackbar() {
 	}
 };
 
-export function switchEditorMode( mode ) {
+export function switchEditorMode( editorMode ) {
 	return {
 		type: TYPES.SWITCH_MODE,
-		mode,
+		editorMode,
 	};
 }
 /**

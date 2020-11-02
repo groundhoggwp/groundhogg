@@ -80,8 +80,21 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return void
 	 */
 	protected function post_setup() {
-		$this->parent_steps = $this->parent_steps ? array_values( wp_parse_id_list( maybe_unserialize( $this->parent_steps ) ) ): [];
-		$this->child_steps  = $this->child_steps ? array_values( wp_parse_id_list( maybe_unserialize( $this->child_steps ) ) ): [];
+		$this->parent_steps = $this->parent_steps ? $this->ensure_ids( maybe_unserialize( $this->parent_steps ) ) : [];
+		$this->child_steps  = $this->child_steps ? $this->ensure_ids( maybe_unserialize( $this->child_steps ) ) : [];
+	}
+
+	/**
+	 * @param $list
+	 *
+	 * @return mixed
+	 */
+	public function ensure_ids( $list ) {
+		foreach ( $list as $i => &$id ) {
+			$id = absint( $id );
+		}
+
+		return array_filter( $list );
 	}
 
 	/**
@@ -106,6 +119,20 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function get_child_steps() {
 		return $this->child_steps ? id_list_to_class( $this->child_steps, Step::class ) : [];
+	}
+
+	/**
+	 * @return bool|Step
+	 */
+	public function get_yes_step() {
+		return $this->is_condition() ? new Step( $this->child_steps['yes'] ) : false;
+	}
+
+	/**
+	 * @return bool|Step
+	 */
+	public function get_no_step() {
+		return $this->is_condition() ? new Step( $this->child_steps['no'] ) : false;
 	}
 
 	/**
@@ -160,19 +187,37 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * @param $step Step
 	 */
-	public function add_child_step( $step ) {
+	public function add_child_step( $step, $key = false ) {
 
-		if ( ! $step || ! $step->exists() || in_array( $step->get_id(), $this->child_steps ) ) {
+		if ( ! $step || ! $step->exists() || ( $key ? $this->child_steps[ $key ] === $step->get_id() : in_array( $step->get_id(), $this->child_steps ) ) ) {
 			return;
 		}
 
 		$children = $this->child_steps;
 
-		array_push( $children, $step->get_id() );
+		if ( ! $key ) {
+			array_push( $children, $step->get_id() );
+		} else {
+			$children[ $key ] = $step->get_id();
+		}
 
 		$this->update( [
 			'child_steps' => $children
 		] );
+	}
+
+	/**
+	 * @param $step
+	 */
+	public function set_yes_step( $step ) {
+		$this->add_child_step( $step, 'yes' );
+	}
+
+	/**
+	 * @param $step
+	 */
+	public function set_no_step( $step ) {
+		$this->add_child_step( $step, 'no' );
 	}
 
 	/**
@@ -201,10 +246,105 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		] );
 	}
 
+	public function create( $data = [], $path = false ) {
+
+		parent::create( $data );
+
+		$this->create_edges( $path );
+	}
+
+	public function create_edges( $path ) {
+
+		// Add edge from parent to this
+
+		$child_steps  = $this->get_child_steps();
+		$parent_steps = $this->get_parent_steps();
+
+		foreach ( $parent_steps as $parent_step ) {
+			$parent_step->add_child_step( $this, $path );
+		}
+
+		// add edge from child to this
+		foreach ( $child_steps as $child_step ) {
+
+			if ( $this->is_condition() ){
+				$this->set_no_step( $child_step );
+				$this->set_yes_step( $child_step );
+			}
+
+			$child_step->add_parent_step( $this );
+		}
+
+		// Generic case
+		// remove old edges from parent to child
+		foreach ( $parent_steps as $parent_step ) {
+			foreach ( $child_steps as $child_step ) {
+
+				if ( ! $path ){
+					$parent_step->remove_child_step( $child_step );
+				}
+
+				$child_step->remove_parent_step( $parent_step );
+			}
+		}
+
+	}
+
+
+
+	public function delete_edges(){
+
+
+		// Add likewise associations of parent to child
+		// Usually there will only be one parent => one child...
+		// Todo check for edge cases...
+		foreach ( $this->get_parent_steps() as $parent ) {
+			foreach ( $this->get_child_steps() as $child ) {
+				$parent->add_child_step( $child );
+				$child->add_parent_step( $parent );
+			}
+		}
+
+		foreach ( $this->get_parent_steps() as $parent ) {
+			$parent->remove_child_step( $this );
+		}
+
+		foreach ( $this->get_child_steps() as $parent ) {
+			$parent->remove_parent_step( $this );
+		}
+
+	}
+
+	/**
+	 * Needs to handle the moving of contacts to another step...
+	 *
+	 * @return bool
+	 */
+	public function delete() {
+
+		$this->delete_edges();
+
+		// Maybe Move contacts forward...
+		$next_step = $this->get_next_step();
+
+//		if ( $next_step && $next_step->can_run() ) {
+//			$contacts = $this->get_waiting_contacts();
+//
+//			if ( ! empty( $contacts ) ) {
+//				foreach ( $contacts as $contact ) {
+//					$next_step->enqueue( $contact );
+//				}
+//			}
+//
+//		}
+
+		return parent::delete();
+	}
+
 	protected function sanitize_columns( $data = [] ) {
 
-		map_func_to_attr( $data, 'parent_steps', 'wp_parse_id_list' );
-		map_func_to_attr( $data, 'child_steps', 'wp_parse_id_list' );
+		map_func_to_attr( $data, 'parent_steps', [ $this, 'ensure_ids' ] );
+		map_func_to_attr( $data, 'child_steps', [ $this, 'ensure_ids' ] );
 
 		return $data;
 	}
@@ -382,33 +522,32 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		// Actions cannot be completed.
 		if ( $this->is_action() || $this->is_condition() || ! $this->is_active() ) {
 			$can_complete = false;
-		}
-		// Check if starting
+		} // Check if starting
 		else if ( $this->is_starting() ) {
 			$can_complete = true;
-		// check the path to see if this benchmark is in the same path as the contact.
+			// check the path to see if this benchmark is in the same path as the contact.
 		} else {
 			// The step where the contact currently is in the funnel
 			$contact_step = $this->get_current_funnel_step( $contact );
 
 			// traverse the tree upwards to see if the current step is in the same path as this one.
-			$queue = [ $this ];
+			$queue        = [ $this ];
 			$can_complete = false;
 
 			// BFS to find if the path is correct.
-			while ( ! empty( $queue ) && $can_complete === false ){
+			while ( ! empty( $queue ) && $can_complete === false ) {
 
 				$current = array_shift( $queue );
 
 				// If the contact's current step was found among the parents/grandparents
 				// of the $this step.
-				if ( $current->get_id() === $contact_step->get_id() ){
+				if ( $current->get_id() === $contact_step->get_id() ) {
 					$can_complete = true;
 					break;
 				}
 
 				// Add the $current steps parents to the queue.
-				foreach ( $current->get_parents() as $parent ){
+				foreach ( $current->get_parents() as $parent ) {
 					array_push( $queue, $parent );
 				}
 
@@ -610,29 +749,5 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function can_run() {
 		return ( $this->is_action() || $this->is_condition() ) && $this->is_active();
-	}
-
-	/**
-	 * Needs to handle the moving of contacts to another step...
-	 *
-	 * @return bool
-	 */
-	public function delete() {
-
-		// Maybe Move contacts forward...
-		$next_step = $this->get_next_step();
-
-		if ( $next_step && $next_step->can_run() ) {
-			$contacts = $this->get_waiting_contacts();
-
-			if ( ! empty( $contacts ) ) {
-				foreach ( $contacts as $contact ) {
-					$next_step->enqueue( $contact );
-				}
-			}
-
-		}
-
-		return parent::delete();
 	}
 }
