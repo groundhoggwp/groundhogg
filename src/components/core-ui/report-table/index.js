@@ -44,7 +44,6 @@ export default function ReportTable({title, data}) {
   }
 
   const headers = data.chart.label.map((label)=>{
-    console.log(label)
     if(typeof(value)=== 'object'){
       'Conversation Rate'
     }
@@ -53,7 +52,6 @@ export default function ReportTable({title, data}) {
 
   const rows = data.chart.data.slice(0,5)
 
-  // console.log(headers)
 
   return (
     <Card className={classes.root}>
@@ -72,8 +70,7 @@ export default function ReportTable({title, data}) {
             rows.map(row => {
               return (<TableRow>
                   {Object.values(row).map((value)=> {
-                    if(typeof(value)=== 'object'){
-                      // console.log(value)
+                    if(typeof(value)=== 'object'){                      
                       return <TableCell>{value.data.title}</TableCell>
                     } else {
                       return <TableCell>{value}</TableCell>

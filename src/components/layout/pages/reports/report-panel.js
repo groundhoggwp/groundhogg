@@ -72,7 +72,6 @@ export default ({ reportList, dateChange, startDate, endDate }) => {
   if (isRequesting || isUpdating) {
     return <Spinner />;
   }
-  console.log('data', reports)
 
   return (
     <div className={classes.root}>
@@ -87,8 +86,7 @@ export default ({ reportList, dateChange, startDate, endDate }) => {
           let type = reports[reportKey].chart.type;
           title.shift();
           title = title.join(" ");
-          // let firstChart = true
-          console.log(type)
+
           if (type === "quick_stat") {
             return <Stats title={title} id={reportKey} data={reports[reportKey]} />;
           } else if (type === "table") {
@@ -102,6 +100,4 @@ export default ({ reportList, dateChange, startDate, endDate }) => {
       </div>
     </div>
   );
-
-  // );
 };

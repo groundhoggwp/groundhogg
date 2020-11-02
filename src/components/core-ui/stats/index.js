@@ -45,14 +45,14 @@ const useStyles = makeStyles((theme) => ({
   },
   compare: {
     position: 'absolute',
-    left: '75px',
+    left: '85px',
     bottom: '0',
     fontSize: "12px",
     // fontWeight: 900
   },
   percent: {
     position: 'absolute',
-    left: '-45px',
+    // left: '-45px',
     bottom: '-2px',
     fontSize: "18px",
     fontWeight: 700
@@ -69,7 +69,8 @@ const Stats = ({ title, data }) => {
   const { text,  percent } = data.chart.compare;
   const { direction, color } = data.chart.compare.arrow;
 
-  let arrow = direction === "up" ? <ArrowDropUpIcon style={{color}} className={classes.compareArrow}/> : <ArrowDropDownIcon style={{color}} className={classes.compareArrow}/>;
+  const percentPosition = (-15*(percent.length-1)-5)+'px';
+  const arrow = direction === "up" ? <ArrowDropUpIcon style={{color}} className={classes.compareArrow}/> : <ArrowDropDownIcon style={{color}} className={classes.compareArrow}/>;
 
   return (
     <Card className={classes.root}>
@@ -92,7 +93,7 @@ const Stats = ({ title, data }) => {
 
         {arrow}
       <div className={classes.compare}>
-        <div className={classes.percent}>{percent}</div>{text}
+        <div style={{left:percentPosition}} className={classes.percent}>{percent}</div>{text}
       </div>
     </Card>
   );

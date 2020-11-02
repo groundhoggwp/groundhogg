@@ -24,7 +24,6 @@ const classes = makeStyles((theme) => ({
 export default function DatePickers({selectedDate, dateChange, label, id}) {
   // const classes = useStyles();
   // console.log(props);
-  console.log('change', selectedDate)
   return (
     <form  noValidate>
       <TextField
