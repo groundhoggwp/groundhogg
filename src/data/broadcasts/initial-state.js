@@ -5,6 +5,8 @@ export const initialState = {
 	isUpdating: false,
 	isAdding: false,
 	isDeleting: false,
+	isScheduling : false,
+	schedulingErrors : {},
 	total: 0,
 	context: {},
 	data: [],

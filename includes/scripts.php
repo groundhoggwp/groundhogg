@@ -239,7 +239,7 @@ class Scripts {
 			array_merge( [
 				'wp-core-data',
 				'groundhogg-admin',
-			], $asset_file['dependencies'] ),
+			], (array)$asset_file['dependencies'] ),
 			$asset_file['version']
 		);
 

@@ -21,7 +21,7 @@ export const ScheduleEvents = (props) => {
 
     const onFinish = (newValue) => {
         // handle the response and do any tasks which are required.
-        // addNotification({message: __("Broadcast scheduled "), type: 'success'}); // NOT working
+        addNotification({message: __("Broadcast scheduled successfully"), type: 'success'});
         setFinish(true);
     };
 

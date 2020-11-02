@@ -5,11 +5,11 @@ import {__} from "@wordpress/i18n";
 import {useState, Fragment} from "@wordpress/element";
 import {EMAILS_STORE_NAME} from "data/emails";
 import {CONTACTS_STORE_NAME} from "data/contacts";
+import {addNotification} from "utils/index";
 
 
 export const ConfirmBroadcast = (props) => {
 
-    const [scheduling, setScheduling] = useState(false);
 
     const {handleBack, handleNext, data, setBroadcast} = props;
     const {email_or_sms_id, type, tags, exclude_tags} = data;
@@ -17,8 +17,15 @@ export const ConfirmBroadcast = (props) => {
     // make request to schedule the broadcast
     const {scheduleBroadcast} = useDispatch(BROADCASTS_STORE_NAME);
 
-    //finding Email Or SMS details
+    const {isScheduling} = useSelect((select) => {
+        const store = select(BROADCASTS_STORE_NAME);
+        return {
+            isScheduling: store.getIsScheduling(),
+        }
 
+    }, []);
+
+    //finding Email Or SMS details
     const {object} = useSelect((select) => {
         if (email_or_sms_id > 0 && type === 'email') {
             const store = select(EMAILS_STORE_NAME);
@@ -48,15 +55,21 @@ export const ConfirmBroadcast = (props) => {
     }, []);
 
     const handleSchedule = () => {
-        setScheduling(true);
+
         scheduleBroadcast(data).then((result) => {
             //set the broadcast ID
-            setScheduling(false);
-            setBroadcast(result.broadcast_id);
-            handleNext();
-        }).catch((e) => {
-            console.log();
-        });
+            if (result.success === true) {
+                setBroadcast(result.broadcast_id);
+                handleNext();
+            } else {
+                addNotification({
+                    message: __(result.e.message, 'groundhogg'),
+                    type: 'error'
+                });
+            }
+        })
+
+
     }
 
     var title = '';
@@ -84,11 +97,11 @@ export const ConfirmBroadcast = (props) => {
                 padding: 24,
                 background: '#fff',
             }}>
-                <Button variant="contained" color="secondary" onClick={handleBack} disabled={scheduling}>
+                <Button variant="contained" color="secondary" onClick={handleBack} disabled={isScheduling}>
                     {__('Back', 'groundhogg')}
                 </Button>
-                <Button variant="contained" color="primary" onClick={handleSchedule} disabled={scheduling}>
-                    {scheduling ? __('Loading..') : __('Schedule', 'groundhogg')}
+                <Button variant="contained" color="primary" onClick={handleSchedule} disabled={isScheduling}>
+                    {isScheduling ? __('Loading..') : __('Schedule', 'groundhogg')}
                 </Button>
             </div>
         </Fragment>

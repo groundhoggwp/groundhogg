@@ -19,7 +19,6 @@ import Chip from "@material-ui/core/Chip";
 import SendIcon from '@material-ui/icons/Send';
 import DraftsIcon from '@material-ui/icons/Drafts';
 import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
-import {AssignmentTurnedIn} from "@material-ui/icons";
 
 const BroadcastsTableColumns = [
     {
@@ -47,7 +46,7 @@ const BroadcastsTableColumns = [
         orderBy: '',
         align: 'left',
         cell: ({user}) => {
-            return  user.data.display_name
+            return user.data.display_name
         }
 
     },
@@ -170,10 +169,7 @@ const BroadcastsTableColumns = [
 
 export default (props) => {
 
-
     // getting all the state variables
-
-
     const {items, totalItems, isRequesting} = useSelect((select) => {
         const store = select(BROADCASTS_STORE_NAME)
 
@@ -207,7 +203,7 @@ export default (props) => {
     return (
         <Fragment>
             <Link to={`/broadcasts/schedule`}>
-                Schedule Broadcast
+                {__('Schedule Broadcast','groundhogg')}
             </Link>
             <Box display={'flex'}>
                 <Box>

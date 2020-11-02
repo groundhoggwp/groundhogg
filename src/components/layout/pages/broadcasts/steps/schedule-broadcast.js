@@ -35,11 +35,20 @@ export const ScheduleBroadcast = (props) => {
         setData({
             ...data
             , ...{
+                //Success Test
                 email_or_sms_id: 474,
                 tags: [156],
                 exclude_tags: [],
                 send_now: true,
                 type: 'email',
+
+            // Error test
+            // email_or_sms_id: 479,
+            //     tags: [156],
+            // exclude_tags: [],
+            // send_now: true,
+            // type: 'email',
+
             }
         });
         handleNext();

@@ -7,44 +7,24 @@ import { initialState } from './initial-state';
 
 const broadcastsReducer = (
 	state = initialState,
-	{ type, broadcasts, error, isUpdating, name ,isRequesting }
+	{ type, isScheduling ,error}
 ) => {
 	switch ( type ) {
-		case TYPES.RECEIVE_BROADCASTS:
+
+		case TYPES.SET_IS_SCHEDULING :
 			state = {
 				...state,
-				...broadcasts,
-			};
+				isScheduling,
+			}
 			break;
-		case TYPES.SET_IS_REQUESTING:
+		case TYPES.SET_SCHEDULING_ERROR :
 			state = {
 				...state,
-				...broadcasts,
-				isRequesting,
-			};
-			break;
-		case TYPES.SET_REQUESTING_ERROR:
-			state = {
-				...state,
-				requestingErrors: {
-					[ name ]: error,
+				schedulingErrors: {
+					error
 				},
-			};
-			break;
-		case TYPES.SET_IS_UPDATING:
-			state = {
-				...state,
-				...broadcasts,
-				isUpdating,
-			};
-			break;
-		case TYPES.SET_UPDATING_ERROR:
-			state = {
-				...state,
-				error,
-				updatingError: error,
-				isUpdating: false,
-			};
+				isScheduling: false,
+			}
 			break;
 	}
 	return state;
