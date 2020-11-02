@@ -44,7 +44,7 @@ function HeaderSecondary() {
 		setIsInserterOpened
 	} = useDispatch( CORE_STORE_NAME );
 
-	const isTextModeEnabled = editorMode !== 'visual';
+	const isTextModeEnabled = editorMode === 'text';
 
 	return (
 		<Fragment>

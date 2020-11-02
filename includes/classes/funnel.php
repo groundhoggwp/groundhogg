@@ -118,7 +118,7 @@ class Funnel extends Base_Object_With_Meta {
 	public function get_step_ids( $query = [] ) {
 		$query = array_merge( $query, [
 			'funnel_id' => $this->get_id(),
-			'orderby'   => 'step_order',
+			'orderby'   => 'ID',
 			'order'     => 'ASC',
 		] );
 

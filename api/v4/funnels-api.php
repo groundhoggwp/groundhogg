@@ -51,43 +51,27 @@ class Funnels_Api extends Base_Object_Api {
 	 *
 	 * @return \WP_Error|\WP_REST_Response
 	 */
-	public function create_step( \WP_REST_Request $request ){
+	public function create_step( \WP_REST_Request $request ) {
 
 		$funnel_id = absint( $request->get_param( 'ID' ) );
-		$funnel = new Funnel( $funnel_id );
+		$funnel    = new Funnel( $funnel_id );
 
-		if ( ! $funnel->exists() ){
+		if ( ! $funnel->exists() ) {
 			return self::ERROR_404();
 		}
 
 		$data = $request->get_param( 'data' );
 		$meta = $request->get_param( 'meta' );
 
-		$data[ 'funnel_id' ] = $funnel_id;
+		$data['funnel_id'] = $funnel_id;
 
 		$step = new Step();
-		$step->create( $data );
+		$step->create( $data, $request->get_param( 'condition_path' ) );
 
-		foreach ( $meta as $key => $value ){
+		foreach ( $meta as $key => $value ) {
 			$step->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
 		}
-
-		// Add parent and child associations of new step
-		// Usually there will only be one parent => one child...
-		// Todo check for edge cases...
-
-		foreach ( $step->get_parent_steps() as $parent ){
-			$parent->add_child_step( $step );
-
-			foreach ( $step->get_child_steps() as $child ) {
-				$child->add_parent_step( $step );
-
-				// remove all the associations of parents and children
-				$parent->remove_child_step( $child );
-				$child->remove_parent_step( $parent );
-			}
-		}
-
+		
 		return self::SUCCESS_RESPONSE( [
 			'item' => $funnel
 		] );
@@ -100,7 +84,7 @@ class Funnels_Api extends Base_Object_Api {
 	 *
 	 * @return \WP_REST_Response
 	 */
-	public function update_step( \WP_REST_Request $request ){
+	public function update_step( \WP_REST_Request $request ) {
 
 		$funnel_id = absint( $request->get_param( 'ID' ) );
 		$step_id   = absint( $request->get_param( 'step_id' ) );
@@ -112,14 +96,14 @@ class Funnels_Api extends Base_Object_Api {
 
 		$step->update( $data );
 
-		foreach ( $meta as $key => $value ){
+		foreach ( $meta as $key => $value ) {
 			$step->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
 		}
 
 		// Add parent and child associations of new step
 		// Usually there will only be one parent => one child...
 		// Todo check for edge cases...
-		foreach ( $step->get_parent_steps() as $parent ){
+		foreach ( $step->get_parent_steps() as $parent ) {
 			$parent->add_child_step( $step );
 
 			foreach ( $step->get_child_steps() as $child ) {
@@ -145,26 +129,12 @@ class Funnels_Api extends Base_Object_Api {
 	 *
 	 * @return \WP_REST_Response
 	 */
-	public function delete_step( \WP_REST_Request $request ){
+	public function delete_step( \WP_REST_Request $request ) {
 
 		$funnel_id = absint( $request->get_param( 'ID' ) );
 		$step_id   = absint( $request->get_param( 'step_id' ) );
 
 		$step = new Step( $step_id );
-
-		// Add likewise associations of parent to child
-		// Usually there will only be one parent => one child...
-		// Todo check for edge cases...
-		foreach ( $step->get_parent_steps() as $parent ){
-			$parent->remove_child_step( $step );
-
-			foreach ( $step->get_child_steps() as $child ) {
-				$child->remove_parent_step( $step );
-
-				$parent->add_child_step( $child );
-				$child->add_parent_step( $parent );
-			}
-		}
 
 		$step->delete();
 
@@ -182,12 +152,12 @@ class Funnels_Api extends Base_Object_Api {
 	 *
 	 * @return \WP_Error|\WP_REST_Response
 	 */
-	public function duplicate( \WP_REST_Request $request ){
+	public function duplicate( \WP_REST_Request $request ) {
 
-		$ID = absint( $request->get_param( 'ID' ) );
+		$ID     = absint( $request->get_param( 'ID' ) );
 		$funnel = new Funnel( $ID );
 
-		if ( ! $funnel->exists() ){
+		if ( ! $funnel->exists() ) {
 			return self::ERROR_404();
 		}
 

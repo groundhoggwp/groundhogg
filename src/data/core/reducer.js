@@ -2,80 +2,32 @@
  * Internal dependencies
  */
 import TYPES from './action-types';
-import { PREFERENCES_DEFAULTS } from './defaults';
+import { INITIAL_STATE as BASE_OBJECT_INITIAL_STATE } from 'data/base-object/constants'
 
-/**
- * External dependencies
- */
-import { flow, get, omit, union, without } from 'lodash';
-
-/**
- * WordPress dependencies
- */
-import { combineReducers } from '@wordpress/data';
-
-/**
- * Higher-order reducer creator which provides the given initial state for the
- * original reducer.
- *
- * @param {*} initialState Initial state to provide to reducer.
- *
- * @return {Function} Higher-order reducer.
- */
-const createWithInitialState = ( initialState ) => ( reducer ) => {
-	return ( state = initialState, action ) => reducer( state, action );
-};
-
-/**
- * Reducer returning the user preferences.
- *
- * @param {Object}  state                           Current state.
- * @param {string}  state.mode                      Current editor mode, either
- *                                                  "visual" or "text".
- * @param {Object}  action                          Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export const preferences = flow( [
-	combineReducers,
-	createWithInitialState( PREFERENCES_DEFAULTS ),
-] )( {
-	editorMode( state, action ) {
-		if ( action.type === 'SWITCH_MODE' ) {
-			return action.mode;
-		}
-
-		return state;
-	},
-} );
-
-/**
- * Reducer tracking whether the inserter is open.
- *
- * @param {boolean} state
- * @param {Object}  action
- */
-function isInserterOpened( state = false, action ) {
-	switch ( action.type ) {
-		case 'SET_IS_INSERTER_OPENED':
-			return action.value;
-	}
-	return state;
+const INITIAL_STATE = {
+	...BASE_OBJECT_INITIAL_STATE,
+	editorMode : 'visual'
 }
 
 const coreReducer = (
-	state = {
-		snackbarMessage : '',
-		snackbarOpen : false,
-		snackbarSeverity : 'success'
-	},
+	state = INITIAL_STATE,
 	{
-		snackbarMessage,
+		type,
+		value,
+		key,
+		editorMode,
+		isAllowed,
 		snackbarSeverity,
-		type
+		snackbarMessage,
 	}
 ) => {
 	switch ( type ) {
+		case TYPES.RECEIVE_USER_PERMISSION:
+			state = {
+				...state,
+				[ key ]: isAllowed,
+			}
+			break
 		case TYPES.OPEN_SNACKBAR:
 			state = {
 				...state,
@@ -89,35 +41,22 @@ const coreReducer = (
 				...state,
 				snackbarOpen : false,
 			};
+			break;
+		case TYPES.SET_IS_INSERTER_OPENED:
+			state = {
+				...state,
+				isInserterOpened : value,
+			};
+			break;
+		case TYPES.SWITCH_MODE:
+			state = {
+				...state,
+				editorMode,
+			};
+			break;
 	}
+
 	return state;
 };
 
-/**
- * State which tracks whether the user can perform an action on a REST
- * resource.
- *
- * @param  {Object} state  Current state.
- * @param  {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function userPermissions( state = {}, action ) {
-	switch ( action.type ) {
-		case 'RECEIVE_USER_PERMISSION':
-			return {
-				...state,
-				[ action.key ]: action.isAllowed,
-			};
-	}
-
-	return state;
-}
-
-
-export default combineReducers( {
-	coreReducer,
-	preferences,
-	userPermissions,
-	isInserterOpened,
-} );
+export default coreReducer;

@@ -121,7 +121,7 @@ export const PageLayout = compose(
   withFilters(PAGES_FILTER),
   window.Groundhogg.preloadSettings
     ? withSettingsHydration({
-      ...window.Groundhogg.preloadSettings,
+      ...window.Groundhogg.preloadSettings.settings,
     })
     : identity,
 )(_PageLayout)
