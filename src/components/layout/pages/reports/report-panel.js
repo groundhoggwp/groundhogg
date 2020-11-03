@@ -21,17 +21,21 @@ import DatePicker from "../../../core-ui/date-picker";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    display: "flex",
-    flexWrap: "wrap",
     position: 'relative',
     marginBottom: theme.spacing(1),
     textAlign: "center",
   },
   container: {
-
+    display: "grid",
+    width: '100%',
+    paddingTop: '10px',
+    gridGap: '10px',
+    gridTemplateColumns: "repeat(3, calc(33% - 80px)) 240px",
+    gridTemplateRows: "repeat(10, 160px)",
+    rowGap: '10px',
   },
   datePickers:{
-    position: 'absolute',
+    float: 'right',
     display: 'flex',
     right: '0px',
     width: '350px',
@@ -40,21 +44,22 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default ({ reportList, dateChange }) => {
-  // export default ({ID, data, meta, onCancel, onSave}) => {
+export default ({ reportList, dateChange, startDate, endDate }) => {
   const classes = useStyles();
-
-  const [stateTagValue, setTagValue] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
 
   const { reports, getReports, isRequesting, isUpdating } = useSelect(
     (select) => {
+      const reportNames = Object.values(reportList).map((report)=>{ return report.name
+        // console.log(report)
+        return report.name
+      });
+
       const store = select(REPORTS_STORE_NAME);
       return {
         reports: store.getItems({
-          reports: reportList,
-          start: "2015-10-06",
-          end: "2020-10-06",
+          reports: reportNames,
+          start: startDate,
+          end: endDate,
         }),
         getReports: store.getItem,
         isRequesting: store.isItemsRequesting(),
@@ -62,6 +67,8 @@ export default ({ reportList, dateChange }) => {
       };
     }
   );
+
+
 
   if (typeof reports === "undefined") {
     return null;
@@ -74,14 +81,13 @@ export default ({ reportList, dateChange }) => {
   if (isRequesting || isUpdating) {
     return <Spinner />;
   }
-  console.log('data', reports)
 
   return (
     <div className={classes.root}>
 
       <div className={classes.datePickers}>
-        <DatePicker dateChange={dateChange} selectedDate={selectedDate} label={'start'} id={'start'}/>
-        <DatePicker dateChange={dateChange} selectedDate={selectedDate} label={'end'} id={'end'}/>
+        <DatePicker dateChange={dateChange} selectedDate={startDate} label={'start'} id={'start'}/>
+        <DatePicker dateChange={dateChange} selectedDate={endDate} label={'end'} id={'end'}/>
       </div>
       <div className={classes.container}>
         {Object.keys(reports).map((reportKey, i) => {
@@ -89,22 +95,20 @@ export default ({ reportList, dateChange }) => {
           let type = reports[reportKey].chart.type;
           title.shift();
           title = title.join(" ");
-          // let firstChart = true
+
+          const { gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd } = reportList[i];
+
           if (type === "quick_stat") {
-            return <Stats title={title} id={reportKey} data={reports[reportKey]} />;
+            return <Stats title={title} id={reportKey} data={reports[reportKey]}  gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} />;
           } else if (type === "table") {
-            return <ReportTable title={title} id={reportKey} data={reports[reportKey]} />;
+            return <ReportTable title={title} id={reportKey} data={reports[reportKey]}  gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} />;
+          } else if(type === "doughnut" || type === "line") {
+            return <Chart title={title} id={reportKey} data={reports[reportKey]} gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} />;
           } else {
-            // if(firstChart){
-            //   firstChart = false
-            //   return <Chart title={title} id={reportKey} data={reports[reportKey]} /></>;
-            // }
-            return <Chart title={title} id={reportKey} data={reports[reportKey]} />;
+            return <Card>{title} No data?</Card>
           }
         })}
       </div>
     </div>
   );
-
-  // );
 };

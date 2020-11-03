@@ -3,42 +3,46 @@ import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
-// import purple from '@material-ui/core/colors/purple';
-// import green from '@material-ui/core/colors/green';
-// import white from '@material-ui/core/colors/white';
 
-const classes = makeStyles((theme) => ({
-  root: {
-    // display: 'inline-block'
-    // display: 'flex',
-    // color: 'white',
-    // flexWrap: 'wrap',
-  },
+const useStyles = makeStyles((theme) => ({
   textField: {
-    // marginLeft: theme.spacing(1),
-    // marginRight: theme.spacing(1),
-    width: '145px',
+    minWidth: '150px'
   },
 }));
 
-export default function DatePickers({dateChange, label, id}) {
-  // const classes = useStyles();
-  // console.log(props);
+export default function DatePickers({selectedDate, dateChange, label, id}) {
+  const classes = useStyles();
+
+  const handleChange = (ele, here) => {
+    console.log('handle change')
+  };
+  const handleAccept = (ele, here) => {
+    console.log(ele.target, here)
+    console.log(ele.target.value, here)
+    // dateChange.bind(this, id)
+    // setAttributes({
+    //   text: value,
+    // });
+  };
+
+  const handleMonthChange = () =>{
+    console.log('month change')
+  }
+        // onChange={dateChange.bind(this, id)}
   return (
     <form  noValidate>
       <TextField
+        type='date'
         className={classes.textField}
         id={id}
-        label={label}
-        type='date'
-        defaultValue="2017-05-24"
-        onChange={dateChange}
-        width={150}
-        // onChange={(event, x) => {console.log(x, event);}}
-        // className={classes.textField}
-        // InputLabelProps={{
-        //   shrink: true,
-        // }}
+        label={label}        
+        value={selectedDate}
+        onChange={handleChange}
+        onAccept={handleAccept}
+        onMonthChange={handleMonthChange}
+        KeyboardButtonProps={{
+          'aria-label': 'change date',
+        }}
       />
     </form>
   );

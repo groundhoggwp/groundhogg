@@ -12,23 +12,25 @@ import lineChartConfig from './chart-config/line-chart-config.js'
 import doughnutChartConfig from './chart-config/doughnut-chart-config.js'
 
 
-const Chart = ({id, title, data}) => {
+const Chart = ({id, title, data, gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd}) => {
   // console.log(type)
   const useStyles = makeStyles((theme) => ({
     root: {
       position: 'relative',
-      paddingTop: '50px',
-      width: data.chart.type === "doughnut" ? "400px" : "100%",
-      height: data.chart.type === "doughnut" ? "250px" : "400px",
+      overflow: 'visible',
+      gridColumnStart,
+      gridColumnEnd,
+      gridRowStart,
+      gridRowEnd,
     },
     title: {
-      fontSize: '18px',
+      fontSize: '28px',
       position: 'absolute',
       textTransform:'capitalize',
-      top: '10px',
-      left: '42px',
+      top: '-50px',
+      left: '37px',
       fontWeight: '700'
-      // left:
+
     }
   }));
   const classes = useStyles();
