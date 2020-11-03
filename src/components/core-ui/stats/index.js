@@ -21,7 +21,7 @@ const Stats = ({ title, data, gridColumnStart, gridColumnEnd, gridRowStart, grid
     root: {
       display: 'inline-block',
       position: 'relative',
-      margin: "5px",
+      // margin: "5px",
       gridColumnStart,
       gridColumnEnd,
       gridRowStart,

@@ -28,8 +28,11 @@ const useStyles = makeStyles((theme) => ({
   container: {
     display: "grid",
     width: '100%',
-    gridTemplateColumns: "repeat(10, 25%)",
-    gridTemplateRows: "repeat(10, 150px)"
+    paddingTop: '10px',
+    gridGap: '10px',
+    gridTemplateColumns: "repeat(3, calc(33% - 80px)) 240px",
+    gridTemplateRows: "repeat(10, 160px)",
+    rowGap: '10px',
   },
   datePickers:{
     float: 'right',

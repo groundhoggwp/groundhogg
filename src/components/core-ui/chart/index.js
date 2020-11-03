@@ -17,20 +17,20 @@ const Chart = ({id, title, data, gridColumnStart, gridColumnEnd, gridRowStart, g
   const useStyles = makeStyles((theme) => ({
     root: {
       position: 'relative',
-      paddingTop: '50px',
+      overflow: 'visible',
       gridColumnStart,
       gridColumnEnd,
       gridRowStart,
       gridRowEnd,
     },
     title: {
-      fontSize: '18px',
+      fontSize: '28px',
       position: 'absolute',
       textTransform:'capitalize',
-      top: '10px',
-      left: '42px',
+      top: '-50px',
+      left: '37px',
       fontWeight: '700'
-      // left:
+
     }
   }));
   const classes = useStyles();
