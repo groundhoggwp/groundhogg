@@ -18,7 +18,8 @@ import {
 	Contacts,
 	Funnels,
 	Settings,
-	Broadcasts
+	Broadcasts,
+	Tools
 } from './pages'
 
 import { Spinner } from '../../components';
@@ -30,6 +31,7 @@ import EmailIcon from '@material-ui/icons/Email';
 import LinearScaleIcon from '@material-ui/icons/LinearScale';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import SettingsInputAntennaSharpIcon from '@material-ui/icons/SettingsInputAntennaSharp';
+import BuildIcon from '@material-ui/icons/Build';
 
 export const PAGES_FILTER = 'groundhogg.navigation';
 
@@ -100,6 +102,15 @@ export const getPages = () => {
 		name: 'funnels',
 		path: '/funnels',
 		priority: 50
+	} );
+
+	pages.push( {
+		component: Tools,
+		icon : BuildIcon,
+		label: __( 'Tools' ),
+		name: 'tools',
+		path: '/tools',
+		priority: 55
 	} );
 
 	pages.push( {
