@@ -9,30 +9,34 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Card from "@material-ui/core/Card";
 
-const useStyles = makeStyles({
-  root:{
-    position:'relative',
-    paddingTop: '53px',
-    width: 'calc(50% - 20px)',
-    display: 'inline-block',
-    margin: '10px'
-  },
-  table: {
-    // minWidth: 650,
-    width: '100%',
-    height: '300px'
-  },
-  title: {
-    fontSize: '18px',
-    position: 'absolute',
-    textTransform:'capitalize',
-    top: '18px',
-    left: '15px',
-    fontWeight: '700'
-  }
-});
 
-export default function ReportTable({title, data}) {
+
+const ReportTable = ({title, data, gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd}) => {
+  const useStyles = makeStyles({
+    root:{
+      position:'relative',
+      paddingTop: '53px',
+      margin: '10px',
+      gridColumnStart,
+      gridColumnEnd,
+      gridRowStart,
+      gridRowEnd,
+    },
+    table: {
+      // minWidth: 650,
+      width: '100%',
+      height: '300px'
+    },
+    title: {
+      fontSize: '18px',
+      position: 'absolute',
+      textTransform:'capitalize',
+      top: '18px',
+      left: '15px',
+      fontWeight: '700'
+    }
+  });
+
   const classes = useStyles();
 
 
@@ -70,7 +74,7 @@ export default function ReportTable({title, data}) {
             rows.map(row => {
               return (<TableRow>
                   {Object.values(row).map((value)=> {
-                    if(typeof(value)=== 'object'){                      
+                    if(typeof(value)=== 'object'){
                       return <TableCell>{value.data.title}</TableCell>
                     } else {
                       return <TableCell>{value}</TableCell>
@@ -85,3 +89,5 @@ export default function ReportTable({title, data}) {
     </Card>
   );
 }
+
+export default ReportTable;

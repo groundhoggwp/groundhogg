@@ -111,23 +111,23 @@ export function Reports(props) {
               {
                name:"table_top_converting_funnels",
                gridColumnStart: 1,
-               gridColumnEnd: 2,
+               gridColumnEnd: 3,
                gridRowStart: 5,
-               gridRowEnd: 6,
+               gridRowEnd: 8,
               },
               {
                name:"table_contacts_by_countries",
                gridColumnStart: 3,
-               gridColumnEnd: 4,
+               gridColumnEnd: 5,
                gridRowStart: 5,
-               gridRowEnd: 6,
+               gridRowEnd: 8,
               },
               {
                name:"table_contacts_by_lead_source",
                gridColumnStart: 1,
-               gridColumnEnd: 4,
-               gridRowStart: 7,
-               gridRowEnd: 8,
+               gridColumnEnd: 5,
+               gridRowStart: 8,
+               gridRowEnd: 12,
               },
             ]}
           />
