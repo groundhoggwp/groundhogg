@@ -21,17 +21,18 @@ import DatePicker from "../../../core-ui/date-picker";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    display: "flex",
-    flexWrap: "wrap",
     position: 'relative',
     marginBottom: theme.spacing(1),
     textAlign: "center",
   },
   container: {
-
+    display: "grid",
+    width: '100%',
+    gridTemplateColumns: "repeat(10, 25%)",
+    gridTemplateRows: "repeat(10, 150px)"
   },
   datePickers:{
-    position: 'absolute',
+    float: 'right',
     display: 'flex',
     right: '0px',
     width: '350px',
@@ -45,12 +46,15 @@ export default ({ reportList, dateChange, startDate, endDate }) => {
 
   const { reports, getReports, isRequesting, isUpdating } = useSelect(
     (select) => {
+      const reportNames = Object.values(reportList).map((report)=>{ return report.name
+        // console.log(report)
+        return report.name
+      });
+
       const store = select(REPORTS_STORE_NAME);
       return {
         reports: store.getItems({
-          reports: reportList,
-          // start: "2017-01-01",
-          // end: "2020-10-30",
+          reports: reportNames,
           start: startDate,
           end: endDate,
         }),
@@ -60,6 +64,8 @@ export default ({ reportList, dateChange, startDate, endDate }) => {
       };
     }
   );
+
+
 
   if (typeof reports === "undefined") {
     return null;
@@ -87,12 +93,14 @@ export default ({ reportList, dateChange, startDate, endDate }) => {
           title.shift();
           title = title.join(" ");
 
+          const { gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd } = reportList[i];
+
           if (type === "quick_stat") {
-            return <Stats title={title} id={reportKey} data={reports[reportKey]} />;
+            return <Stats title={title} id={reportKey} data={reports[reportKey]}  gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} />;
           } else if (type === "table") {
-            return <ReportTable title={title} id={reportKey} data={reports[reportKey]} />;
+            return <ReportTable title={title} id={reportKey} data={reports[reportKey]}  gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} />;
           } else if(type === "doughnut" || type === "line") {
-            return <Chart title={title} id={reportKey} data={reports[reportKey]} />;
+            return <Chart title={title} id={reportKey} data={reports[reportKey]} gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} />;
           } else {
             return <Card>{title} No data?</Card>
           }
