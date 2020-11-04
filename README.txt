@@ -1,4 +1,4 @@
-=== CRM, Email & Marketing Automation for WordPress - Groundhogg ===
+=== WordPress CRM, Email & Marketing Automation for WordPress | Award Winner — Groundhogg ===
 Contributors: trainingbusinesspros, Groundhogg, Dhrumit, Adrian Tobey
 Tags: wordpress crm, marketing automation wordpress, crm, email marketing, email automation
 Donate link: https://www.groundhogg.io/try/
@@ -13,7 +13,7 @@ Create funnels, email campaigns, newsletters, marketing automation, and have a C
 
 == Description ==
 
-WordPress CRM & Marketing Automation
+WordPress CRM, Email & Marketing Automation
 
 👉 [Official Site](https://groundhogg.io/) | 📃 [Documentation](https://help.groundhogg.io/) | 🎓 [Groundhogg Academy](https://academy.groundhogg.io/)
 
@@ -98,7 +98,7 @@ After some time, it became apparent that there was a desperate need in the WordP
 
 One that could match SaaS platforms on features and reliability did not yet exist, so we built it!
 
-Groundhogg, starting in 2018 from founder Adrian Tobey was a culmination of a combined 20 years experience in the CRM industry and WordPress plugin community.
+Starting in 2018, Adrian Tobey (founder) and his team took their combined 20+ years of experince in the CRM and Marketing Automation industry to create a better option for WordPress based businesses.
 
 We know funnels, CRM, and automation like the back of our hands!
 
