@@ -257,29 +257,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		$this->enqueued_contact = $contact;
 
-		// check if there are events with steps of higher order than the one about to be enqueued
-		// this covers the edge case of tags being applied in a funnel triggering tag applied benchmarks in the same funnel.
-
-		global $wpdb;
-
-		$num_events_of_higher_step_order = $wpdb->get_var( $wpdb->prepare(
-			"SELECT 
-						count(*) FROM {$this->get_event_queue_db()->get_table_name()} 
-					WHERE 
-						`funnel_id` = {$this->get_funnel_id()}
-						AND `contact_id` = {$contact->get_id()}
-						AND `event_type` = %s
-						AND `status` = %s
-						AND `step_id` in (
-							SELECT 
-								ID from {$this->get_db()->get_table_name()}
-							WHERE
-								`funnel_id` = {$this->get_funnel_id()}
-								AND `step_order` > {$this->get_order()}
-						)
-						"
-			, Event::FUNNEL, Event::WAITING ) );
-
 		/**
 		 * @param bool $enqueue whether the step can be enqueued or not...
 		 * @param Contact Contact
@@ -287,7 +264,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		 *
 		 * @return bool whether the step can be enqueued or not...
 		 */
-		$can_enqueue = apply_filters( 'groundhogg/steps/enqueue', $num_events_of_higher_step_order === 0, $contact, $this );
+		$can_enqueue = apply_filters( 'groundhogg/steps/enqueue', true, $contact, $this );
 
 		if ( ! $can_enqueue ) {
 			return false;
