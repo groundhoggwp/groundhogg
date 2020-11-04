@@ -241,7 +241,11 @@ class React_App {
 		$settings = json_decode( $settings, true );
 
 		foreach ( $settings['settings'] as $name => $setting ) {
-			$settings['settings'][ $name ]['defaultValue'] = (string) Plugin::instance()->settings->get_option( $setting['id'] );
+		    if (is_array(  Plugin::instance()->settings->get_option( $setting['id'] ) ) ){
+			    $settings['settings'][ $name ]['defaultValue'] = (string) Plugin::instance()->settings->get_option( $setting['id'][0] );
+            }else {
+			    $settings['settings'][ $name ]['defaultValue'] = (string) Plugin::instance()->settings->get_option( $setting['id'] );
+		    }
 		}
 
 		$settings['allowedBlockTypes'] = apply_filters(
