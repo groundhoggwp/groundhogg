@@ -7,7 +7,9 @@ import ReportPanel from "components/layout/pages/reports/report-panel";
 
 
 export const Import = (props) =>{
+    //displaying table based on the file
     return (<h1> Import</h1>);
+
 }
 
 
