@@ -1,4 +1,3 @@
-
 import {addFilter, applyFilters} from "@wordpress/hooks";
 import {Fragment, render} from "@wordpress/element";
 import {__} from "@wordpress/i18n";
@@ -12,6 +11,7 @@ import IconButton from "@material-ui/core/IconButton";
 import React from "react";
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import DeleteIcon from "@material-ui/icons/Delete";
+import {DateTime} from 'luxon';
 
 const ExportTableColumns = [
     {
@@ -20,7 +20,7 @@ const ExportTableColumns = [
         orderBy: 'file_name',
         align: 'left',
         cell: ({file_name}) => {
-            return file_name ;
+            return file_name;
         },
     },
     {
@@ -39,7 +39,7 @@ const ExportTableColumns = [
         orderBy: 'timestamp',
         align: 'left',
         cell: ({timestamp}) => {
-            return timestamp;
+            return DateTime.fromSeconds(  timestamp ).toLocaleString(DateTime.DATETIME_FULL);
         }
 
     },
@@ -48,22 +48,22 @@ const ExportTableColumns = [
         name: 'Actions',
         orderBy: '',
         align: '',
-        cell: ({file_url ,file_name}) => {
+        cell: ({file_url, file_name}) => {
 
-            const onDownload =( event )=>{
-                window.open(file_url ,'_blank');
+            const onDownload = (event) => {
+                window.open(file_url, '_blank');
             }
 
-            const { deleteItems } = useDispatch(EXPORT_STORE_NAME);
+            const {deleteItems} = useDispatch(EXPORT_STORE_NAME);
 
             return (<>
-                <Tooltip title={ 'Download' }>
-                    <IconButton aria-label={ 'Download' } onClick={onDownload}>
-                        <ArrowDownwardIcon />
+                <Tooltip title={'Download'}>
+                    <IconButton aria-label={'Download'} onClick={onDownload}>
+                        <ArrowDownwardIcon/>
                     </IconButton>
                 </Tooltip>
                 <RowActions
-                    onDelete={ () => deleteItems([file_name]) }
+                    onDelete={() => deleteItems([file_name])}
                 />
             </>)
         }
@@ -79,12 +79,11 @@ const exportBulkActions = [
     },
 ];
 
-export const Export = (props) =>{
+export const Export = (props) => {
     // use
 
     const {items, totalItems, isRequesting} = useSelect((select) => {
         const store = select(EXPORT_STORE_NAME);
-
         return {
             items: store.getItems(),
             totalItems: store.getTotalItems(),
@@ -92,7 +91,7 @@ export const Export = (props) =>{
         }
     }, []);
 
-    const {fetchItems ,deleteItems} = useDispatch(EXPORT_STORE_NAME);
+    const {fetchItems, deleteItems} = useDispatch(EXPORT_STORE_NAME);
 
     /**
      * Handle any bulk actions
@@ -102,18 +101,49 @@ export const Export = (props) =>{
      * @param setSelected
      * @param fetchItems
      */
-    const handleBulkAction = ({ action, selected, setSelected, fetchItems }) => {
+    const handleBulkAction = ({action, selected, setSelected, fetchItems}) => {
         switch (action) {
             case 'delete':
-                deleteItems(selected.map(item => item.file_name  === selected) )
+                deleteItems(selected.map(item => item.file_name ) )
                 setSelected([])
                 break
         }
     }
 
+    /**
+     * Overrides isSelected method for the
+     *
+     * @param item
+     * @param selected
+     * @returns {boolean}
+     */
+    const isSelected = ( { item ,selected } ) => {
+        if (selected) {
+            return selected.filter(__item => __item.file_name === item.file_name).length > 0
+        }
+        return true;
+    }
+
+    /**
+     *  Overrides core list table method which looks for ID instead of file_name
+     *
+     * @param item
+     * @param setSelected
+     * @param selected
+     */
+    const handleSelectItem = ( {item, setSelected ,selected}) => {
+        if (isSelected({ item ,selected })) {
+            // Item is selected, so remove it
+            setSelected(selected.filter(__item => __item.file_name !== item.file_name))
+        } else {
+            // Add it to the selected array
+            setSelected([...selected, item])
+        }
+    }
+
     return (
         <Fragment>
-            <h1> EXPORT  </h1>
+            <h1> EXPORT </h1>
             <Box display={'flex'}>
 
                 <Box flexGrow={1}>
@@ -125,9 +155,11 @@ export const Export = (props) =>{
                         fetchItems={fetchItems}
                         isRequesting={isRequesting}
                         columns={ExportTableColumns}
-                        onBulkAction={ handleBulkAction }
-                        bulkActions={ exportBulkActions }
-                        isSelected =
+                        onBulkAction={handleBulkAction}
+                        bulkActions={exportBulkActions}
+                        onSelectItem={handleSelectItem}
+                        isCheckboxSelected = {isSelected}
+
                     />
                 </Box>
             </Box>
@@ -136,16 +168,15 @@ export const Export = (props) =>{
 }
 
 
-
 //Hook to push content into the page
 addFilter('groundhogg.tools.tabs', 'groundhogg', (tabs) => {
     tabs.push({
-        title: __("Export" , 'groundhogg' ),
+        title: __("Export", 'groundhogg'),
         path: '/export',
-        description: __('First Description'  ,'groundhogg'),
+        description: __('First Description', 'groundhogg'),
         component: (classes) => {
             return (
-               <Export />
+                <Export/>
             )
         }
     });
