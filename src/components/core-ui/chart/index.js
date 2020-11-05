@@ -38,12 +38,10 @@ const Chart = ({id, title, data, gridColumnStart, gridColumnEnd, gridRowStart, g
   const [chartInstance, setChartInstance] = useState(null);
 
 
-  let chartConfig = lineChartConfig;
-  chartConfig.type = data.chart.type;
-
-  if (chartConfig.type === "line") {
+  let chartConfig;
+  if (data.chart.type === "line") {
     chartConfig = lineChartConfig;
-  } else if (chartConfig.type === "doughnut") {
+  } else if (data.chart.type === "doughnut") {
     chartConfig = doughnutChartConfig;
   }
 
@@ -55,7 +53,7 @@ const Chart = ({id, title, data, gridColumnStart, gridColumnEnd, gridRowStart, g
   // console.log('chart', chartConfig.type, data.chart.type)
   useEffect(() => {
     if (chartContainer && chartContainer.current) {
-      // console.log(chartConfig)
+      console.log('config fire', data.chart.type, chartConfig.type, newChartInstance, chartInstance)
       const newChartInstance = new Chartjs(chartContainer.current, chartConfig);
       setChartInstance(newChartInstance);
 

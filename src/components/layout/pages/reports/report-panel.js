@@ -95,7 +95,7 @@ export default ({ reportList, dateChange, startDate, endDate }) => {
           let type = reports[reportKey].chart.type;
           title.shift();
           title = title.join(" ");
-
+          // console.log(title, reportList, reports)
           const { gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd } = reportList[i];
 
           if (type === "quick_stat") {
