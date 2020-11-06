@@ -16,14 +16,12 @@ const ReportTable = ({title, data, gridColumnStart, gridColumnEnd, gridRowStart,
     root:{
       position:'relative',
       paddingTop: '53px',
-      margin: '10px',
       gridColumnStart,
       gridColumnEnd,
       gridRowStart,
       gridRowEnd,
     },
     table: {
-      // minWidth: 650,
       width: '100%',
       height: '300px'
     },
@@ -60,7 +58,7 @@ const ReportTable = ({title, data, gridColumnStart, gridColumnEnd, gridRowStart,
   return (
     <Card className={classes.root}>
       <div className={classes.title}>{title}</div>
-      <TableContainer component={Paper}>
+      <TableContainer>
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
             <TableRow>

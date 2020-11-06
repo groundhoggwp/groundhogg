@@ -120,21 +120,21 @@ export function Reports(props) {
                gridColumnStart: 1,
                gridColumnEnd: 3,
                gridRowStart: 8,
-               gridRowEnd: 12,
+               gridRowEnd: 11,
               },
               {
                name:"table_contacts_by_countries",
                gridColumnStart: 3,
                gridColumnEnd: 5,
                gridRowStart: 8,
-               gridRowEnd: 12,
+               gridRowEnd: 11,
               },
               {
                name:"table_contacts_by_lead_source",
                gridColumnStart: 1,
                gridColumnEnd: 5,
-               gridRowStart: 12,
-               gridRowEnd: 15,
+               gridRowStart: 11,
+               gridRowEnd: 14,
               },
             ]}
           />
