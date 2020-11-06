@@ -6,9 +6,9 @@ import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import {Map} from  './steps/map'
-import {Import} from  './steps/import'
-import {Upload} from  './steps/upload'
+import {Map} from './steps/map'
+import {Import} from './steps/import'
+import {Upload} from './steps/upload'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -32,24 +32,30 @@ function getSteps() {
     ];
 }
 
-function getStepContent(stepIndex, handleNext, handleBack) {
+function getStepContent(stepIndex, handleNext, handleBack, data, setData) {
     switch (stepIndex) {
         case 0:
             return <Upload
                 handleNext={handleNext}
                 handleBack={handleBack}
+                data={data}
+                setData={setData}
+
             />;
         case 1:
             return <Map
                 handleNext={handleNext}
                 handleBack={handleBack}
-
+                data={data}
+                setData={setData}
             />;
         case 2:
             return <Import
                 handleNext={handleNext}
                 handleBack={handleBack}
-                />;
+                data={data}
+                setData={setData}
+            />;
         default:
             return 'Unknown stepIndex';
     }
@@ -59,10 +65,14 @@ export const ImportSteps = (props) => {
 
 
     const classes = useStyles();
-
     const steps = getSteps();
 
     const [activeStep, setActiveStep] = useState(0);
+    const [data, setData] = useState({
+        file: null,
+        delimiter : ';',
+        map : {}
+    });
 
     const handleNext = () => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -71,7 +81,6 @@ export const ImportSteps = (props) => {
     const handleBack = () => {
         setActiveStep((prevActiveStep) => prevActiveStep - 1);
     };
-
 
 
     return (
@@ -92,7 +101,7 @@ export const ImportSteps = (props) => {
                     <div>
                         <Typography
                             className={classes.instructions}>{
-                            getStepContent(activeStep, handleNext, handleBack)
+                            getStepContent(activeStep, handleNext, handleBack, data, setData)
                         }
                         </Typography>
                     </div>

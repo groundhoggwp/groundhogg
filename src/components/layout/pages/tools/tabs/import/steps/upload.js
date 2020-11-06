@@ -11,16 +11,21 @@ import {FormFileUpload} from '@wordpress/components';
 
 export const Upload = (props) => {
 
+    const {handleBack, handleNext, data, setData} = props;
 
-    const {handleBack, handleNext} = props;
+    const {delimiter, file  } = data;
 
     const handleUpload = () => {
-
-        handleNext();
-
+        // console.log(file);
+        // if (file) {
+            handleNext();
+        // } else {
+        //     addNotification({
+        //         message: __("Please upload a File"),
+        //         type: 'error'
+        //     });
+        // }
     }
-
-    let selected = ';';
 
     return (
         <Fragment>
@@ -29,20 +34,31 @@ export const Upload = (props) => {
                 background: '#fff',
             }}>
 
-                Select Your CSV Delimiter
                 <Select
                     labelId="demo-customized-select-label"
                     id="demo-customized-select"
-                    value={selected}
-                    // onChange={}
-                    // input={<BootstrapInput />}
+                    value={delimiter}
+                    onChange={(event) => {
+                        setData({
+                            ...data,
+                            ...{
+                                delimiter: event.target.value
+                            }
+                        });
+                    }}
+
                 >
                     <MenuItem value={';'}>Semicolon Separated (;)</MenuItem>
                     <MenuItem value={','}>Comma Separated (,)</MenuItem>
                 </Select>
                 <FormFileUpload
                     accept="CSV/*"
-                    onChange={() => console.log('new image')}
+                    onChange={(event) => setData({
+                        ...data,
+                        ...{
+                            file: event.target.files[0]
+                        }
+                    })}
                 >
                     Upload
                 </FormFileUpload>

@@ -4,6 +4,7 @@ namespace Groundhogg\Admin;
 
 use Groundhogg\Plugin;
 use Groundhogg\Admin\Settings\Settings_Page;
+use function Groundhogg\get_mappable_fields;
 use function Groundhogg\get_url_var;
 use function Groundhogg\groundhogg_logo;
 
@@ -11,12 +12,12 @@ class React_App {
 
 	protected $settings = [];
 
-	public function __construct() {;
+	public function __construct() {
 
 		add_action( 'rest_api_init', [ $this, 'register_rest_settings' ] );
 
 		add_action( 'admin_init', [ $this, 'maybe_redirect' ], 8 );
-		add_action( 'init'      , [ $this, 'maybe_render' ] );
+		add_action( 'init', [ $this, 'maybe_render' ] );
 
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_nonces' ] );
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_ajax_url' ] );
@@ -25,7 +26,27 @@ class React_App {
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_userdata' ] );
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_settings' ] );
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_basename' ] );
+		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_fields' ] );
 	}
+
+
+	/**
+	 * Adds field_map argument in the Groundhogg Object
+	 *
+	 * @param $obj
+	 *
+	 * @return mixed
+	 */
+	public function register_fields( $obj ) {
+
+		$arr = get_mappable_fields();
+		// removed the custom field as it returns array and brakes the map field
+		$arr [ 'Custom Fields' ] = '';
+		$obj[ 'field_map' ]      = $arr;
+
+		return $obj;
+	}
+
 
 	public function register_rest_settings() {
 		$this->settings = new Settings_Page();
@@ -48,14 +69,15 @@ class React_App {
 
 	public function maybe_render() {
 
-		if ( false === strpos( $_SERVER['REQUEST_URI'], 'wp-admin/groundhogg' ) ) {
+		if ( false === strpos( $_SERVER[ 'REQUEST_URI' ], 'wp-admin/groundhogg' ) ) {
 			return;
 		}
 
-		if ( ! is_user_logged_in() ){
-		    wp_redirect( wp_login_url( admin_url( 'groundhogg/' ) ) );
-		    die;
-        } if ( ! current_user_can( 'view_contacts' ) ) {
+		if ( ! is_user_logged_in() ) {
+			wp_redirect( wp_login_url( admin_url( 'groundhogg/' ) ) );
+			die;
+		}
+		if ( ! current_user_can( 'view_contacts' ) ) {
 			wp_die( __( 'You do not have access to this platform.', 'groundhogg' ) );
 		}
 
@@ -111,9 +133,9 @@ class React_App {
 	 * The Groundhogg footer
 	 */
 	protected function edit_footer() {
-		$handles = apply_filters( 'groundhogg/admin/scripts', [] );
+		$handles   = apply_filters( 'groundhogg/admin/scripts', [] );
 		$handles[] = 'groundhogg-react';
-	?>
+		?>
         </body>
 		<?php do_action( 'groundhogg_footer' ); ?>
 		<?php wp_print_scripts( $handles ) ?>
@@ -130,7 +152,7 @@ class React_App {
 	 */
 	public function register_nonces( $obj ) {
 
-		$obj['nonces'] = [
+		$obj[ 'nonces' ] = [
 			'_wpnonce'            => wp_create_nonce(),
 			'_wprest'             => wp_create_nonce( 'wp_rest' ),
 			'_adminajax'          => wp_create_nonce( 'admin_ajax' ),
@@ -149,7 +171,7 @@ class React_App {
 	 */
 	public function register_rest_base( $obj ) {
 
-		$obj['rest_base'] = rest_url( 'gh/v4' );
+		$obj[ 'rest_base' ] = rest_url( 'gh/v4' );
 
 		return $obj;
 	}
@@ -163,7 +185,7 @@ class React_App {
 	 */
 	public function register_ajax_url( $obj ) {
 
-		$obj['ajax_url'] = admin_url( 'admin-ajax.php' );
+		$obj[ 'ajax_url' ] = admin_url( 'admin-ajax.php' );
 
 		return $obj;
 	}
@@ -177,7 +199,7 @@ class React_App {
 	 */
 	public function register_assets( $obj ) {
 
-		$obj['assets'] = [
+		$obj[ 'assets' ] = [
 			'bigG'      => GROUNDHOGG_ASSETS_URL . 'images/big-g.png',
 			'logoBlack' => GROUNDHOGG_ASSETS_URL . 'images/logo-black-1000x182.png',
 			'logoWhite' => GROUNDHOGG_ASSETS_URL . 'images/logo-white-1000x182.png',
@@ -186,7 +208,7 @@ class React_App {
 				'funnel'    => GROUNDHOGG_ASSETS_URL . 'images/welcome/create-your-first-funnel-with-groundhogg.png',
 				'broadcast' => GROUNDHOGG_ASSETS_URL . 'images/welcome/send-your-first-broadcast-with-groundhogg.png',
 				'cron'      => GROUNDHOGG_ASSETS_URL . 'images/welcome/correctly-configure-wp-cron-for-groundhogg.png',
-				'course'      => GROUNDHOGG_ASSETS_URL . 'images/welcome/official-quickstart-course-for-groundhogg.png',
+				'course'    => GROUNDHOGG_ASSETS_URL . 'images/welcome/official-quickstart-course-for-groundhogg.png',
 			],
 		];
 
@@ -201,11 +223,11 @@ class React_App {
 	 * @return mixed
 	 */
 	public function register_basename( $obj ) {
-		$settings = $obj['preloadSettings'];
+		$settings = $obj[ 'preloadSettings' ];
 
-		$settings['basename'] = path_join( wp_parse_url( admin_url(), PHP_URL_PATH ), 'groundhogg' );
+		$settings[ 'basename' ] = path_join( wp_parse_url( admin_url(), PHP_URL_PATH ), 'groundhogg' );
 
-		$obj['preloadSettings'] = $settings;
+		$obj[ 'preloadSettings' ] = $settings;
 
 		return $obj;
 	}
@@ -219,7 +241,7 @@ class React_App {
 	 */
 	public function register_userdata( $obj ) {
 
-		$obj['user'] = wp_get_current_user();
+		$obj[ 'user' ] = wp_get_current_user();
 
 		return $obj;
 	}
@@ -240,15 +262,15 @@ class React_App {
 		$settings = wp_json_encode( $this->settings );
 		$settings = json_decode( $settings, true );
 
-		foreach ( $settings['settings'] as $name => $setting ) {
-		    if (is_array(  Plugin::instance()->settings->get_option( $setting['id'] ) ) ){
-			    $settings['settings'][ $name ]['defaultValue'] = (string) Plugin::instance()->settings->get_option( $setting['id'][0] );
-            }else {
-			    $settings['settings'][ $name ]['defaultValue'] = (string) Plugin::instance()->settings->get_option( $setting['id'] );
-		    }
+		foreach ( $settings[ 'settings' ] as $name => $setting ) {
+			if ( is_array( Plugin::instance()->settings->get_option( $setting[ 'id' ] ) ) ) {
+				$settings[ 'settings' ][ $name ][ 'defaultValue' ] = (string) Plugin::instance()->settings->get_option( $setting[ 'id' ][ 0 ] );
+			} else {
+				$settings[ 'settings' ][ $name ][ 'defaultValue' ] = (string) Plugin::instance()->settings->get_option( $setting[ 'id' ] );
+			}
 		}
 
-		$settings['allowedBlockTypes'] = apply_filters(
+		$settings[ 'allowedBlockTypes' ] = apply_filters(
 			'groundhogg/email_editor/allowed_block_types',
 			[
 				'groundhogg/paragraph',
@@ -261,7 +283,7 @@ class React_App {
 			]
 		);
 
-		$obj['preloadSettings'] = $settings;
+		$obj[ 'preloadSettings' ] = $settings;
 
 		return $obj;
 	}
