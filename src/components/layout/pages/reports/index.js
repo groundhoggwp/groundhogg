@@ -7,6 +7,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { __ } from "@wordpress/i18n";
 import Card from "@material-ui/core/Card";
 import Typography from "@material-ui/core/Typography";
+import { DateTime } from 'luxon';
 
 /**
  * Internal dependencies
@@ -26,11 +27,19 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+
 export function Reports(props) {
   const classes = useStyles();
 
-  const dateChange = (e)  => {
-    console.log('change the data', e)
+  const [startDate, setStartDate] = useState(DateTime.local().minus({ years: 1 }).startOf('day').toISODate());
+  const [endDate, setEndDate] = useState(DateTime.local().startOf('day').toISODate());
+
+  const dateChange = (id, e)  => {
+    if (id === 'start'){
+      setStartDate(e.target.value);
+    } else {
+      setEndDate(e.target.value);
+    }
   }
 
   const tabs = [
@@ -39,22 +48,94 @@ export function Reports(props) {
       component: (classes) => {
         return (
           <ReportPanel
+            startDate={startDate}
+            endDate={endDate}
             dateChange={dateChange}
             reportList={[
-              "chart_new_contacts",
-              "total_new_contacts",
-              "total_confirmed_contacts",
-              "total_engaged_contacts",
-              "total_unsubscribed_contacts",
-              "total_emails_sent",
-              "email_open_rate",
-              "email_click_rate",
-              "chart_contacts_by_optin_status",
-              "table_contacts_by_lead_source",
-              "table_top_converting_funnels",
-              "table_top_performing_emails",
-              "table_contacts_by_countries",
-              "table_contacts_by_lead_source",
+              {
+               name:"chart_new_contacts",
+               gridColumnStart: 1,
+               gridColumnEnd: 4,
+               gridRowStart: 1,
+               gridRowEnd: 4,
+              },
+              {
+               name:"total_new_contacts",
+               gridColumnStart: 4,
+               gridColumnEnd: 4,
+               gridRowStart: 1,
+               gridRowEnd: 1
+              },
+              {
+               name:"total_confirmed_contacts",
+               gridColumnStart: 4,
+               gridColumnEnd: 4,
+               gridRowStart: 2,
+               gridRowEnd: 2
+              },
+              {
+               name:"total_engaged_contacts",
+               gridColumnStart: 4,
+               gridColumnEnd: 4,
+               gridRowStart: 3,
+               gridRowEnd: 3,
+              },
+              {
+               name:"total_unsubscribed_contacts",
+               gridColumnStart: 1,
+               gridColumnEnd: 1,
+               gridRowStart: 4,
+               gridRowEnd: 4,
+              },
+              {
+               name:"total_emails_sent",
+               gridColumnStart: 2,
+               gridColumnEnd: 2,
+               gridRowStart: 4,
+               gridRowEnd: 4,
+              },
+              {
+               name:"email_open_rate",
+               gridColumnStart: 3,
+               gridColumnEnd: 3,
+               gridRowStart: 4,
+               gridRowEnd: 4,
+              },
+              {
+               name:"email_click_rate",
+               gridColumnStart: 4,
+               gridColumnEnd: 4,
+               gridRowStart: 4,
+               gridRowEnd: 4,
+              },
+              {
+               name:"chart_contacts_by_optin_status",
+               gridColumnStart: 1,
+               gridColumnEnd: 3,
+               gridRowStart: 5,
+               gridRowEnd: 8,
+              },
+              {
+               name:"table_top_converting_funnels",
+               gridColumnStart: 1,
+               gridColumnEnd: 3,
+               gridRowStart: 8,
+               gridRowEnd: 12,
+              },
+              {
+               name:"table_contacts_by_countries",
+               gridColumnStart: 3,
+               gridColumnEnd: 5,
+               gridRowStart: 8,
+               gridRowEnd: 12,
+              },
+              {
+               name:"table_contacts_by_lead_source",
+               gridColumnStart: 1,
+               gridColumnEnd: 5,
+               gridRowStart: 12,
+               gridRowEnd: 15,
+              },
             ]}
           />
         );
@@ -65,21 +146,73 @@ export function Reports(props) {
       component: (classes) => {
         return (
           <ReportPanel
+            startDate={startDate}
+            endDate={endDate}
             dateChange={dateChange}
             reportList={[
-              "chart_new_contacts",
-              "total_new_contacts",
-              "total_confirmed_contacts",
-              "total_engaged_contacts",
-              "total_unsubscribed_contacts",
-              "chart_contacts_by_optin_status",
-              "table_contacts_by_lead_source",
-              "table_contacts_by_countries",
-              "chart_contacts_by_region",
-              "table_contacts_by_search_engines",
-              "table_contacts_by_social_media",
-              "table_contacts_by_source_page",
-              "table_list_engagement",
+              {
+               name:"chart_new_contacts",
+               gridColumnStart: 1,
+               gridColumnEnd: 4,
+               gridRowStart: 1,
+               gridRowEnd: 4,
+              },
+              {
+               name:"total_new_contacts",
+               gridColumnStart: 4,
+               gridColumnEnd: 4,
+               gridRowStart: 1,
+               gridRowEnd: 1
+              },
+              {
+               name:"total_confirmed_contacts",
+               gridColumnStart: 4,
+               gridColumnEnd: 4,
+               gridRowStart: 2,
+               gridRowEnd: 2
+              },
+              {
+               name:"total_engaged_contacts",
+               gridColumnStart: 4,
+               gridColumnEnd: 4,
+               gridRowStart: 3,
+               gridRowEnd: 3,
+              },
+              {
+               name:"total_unsubscribed_contacts",
+               gridColumnStart: 1,
+               gridColumnEnd: 1,
+               gridRowStart: 4,
+               gridRowEnd: 4,
+              },
+              {
+               name:"table_contacts_by_search_engines",
+               gridColumnStart: 1,
+               gridColumnEnd: 3,
+               gridRowStart: 5,
+               gridRowEnd: 8,
+              },
+              {
+               name:"table_contacts_by_social_media",
+               gridColumnStart: 3,
+               gridColumnEnd: 5,
+               gridRowStart: 5,
+               gridRowEnd: 8,
+              },
+              {
+               name:"table_contacts_by_source_page",
+               gridColumnStart: 1,
+               gridColumnEnd: 3,
+               gridRowStart: 8,
+               gridRowEnd: 12,
+              },
+              {
+               name:"table_list_engagement",
+               gridColumnStart: 3,
+               gridColumnEnd: 5,
+               gridRowStart: 8,
+               gridRowEnd: 12,
+              },
             ]}
           />
         );
@@ -90,11 +223,28 @@ export function Reports(props) {
       component: (classes) => {
         return (
           <ReportPanel
+            startDate={startDate}
+            endDate={endDate}
             dateChange={dateChange}
             reportList={[
-              "chart_email_activity",
-              "email_open_rate",
-              "email_click_rate",
+              {
+               name:"chart_email_activity",
+               gridColumnStart: 1,
+               gridColumnEnd: 4,
+               gridRowStart: 1,
+               gridRowEnd: 4,
+              },
+              // "total_emails_sent",
+              // "email_open_rate",
+              // "email_click_rate",
+              // "total_unsubscribed_contacts",
+              // "total_spam_contacts",
+              // "total_bounces_contacts",
+              // "total_complaints_contacts",
+              // "table_top_performing_broadcasts",
+              // "chart_last_broadcast",
+              // "table_top_performing_emails",
+              // "table_worst_performing_emails",
             ]}
           />
 
@@ -105,9 +255,24 @@ export function Reports(props) {
       label: __("Funnels"),
       component: () => {
         return <ReportPanel
+          startDate={startDate}
+          endDate={endDate}
           dateChange={dateChange}
           reportList={[
-            "chart_funnel_breakdown"
+            {
+             name:"chart_funnel_breakdown",
+             gridColumnStart: 1,
+             gridColumnEnd: 4,
+             gridRowStart: 1,
+             gridRowEnd: 4,
+            },
+            // "total_contacts_in_funnel",
+            // "total_funnel_conversion_rate",
+            // "total_abandonment_rate",
+            // "table_top_performing_emails",
+            // "table_worst_performing_emails",
+            // "total_benchmark_conversion_rate",
+            // "table_form_activity"
           ]}
         />
       },
@@ -116,10 +281,24 @@ export function Reports(props) {
       label: __("Broadcasts"),
       component: () => {
         return <ReportPanel
+          startDate={startDate}
+          endDate={endDate}
           dateChange={dateChange}
           reportList={[
-            "table_broadcast_stats",
-            "table_broadcast_link_clicked",
+            {
+             name:"table_broadcast_stats",
+             gridColumnStart: 1,
+             gridColumnEnd: 4,
+             gridRowStart: 1,
+             gridRowEnd: 4,
+            },
+            {
+             name:"table_broadcast_link_clicked",
+             gridColumnStart: 1,
+             gridColumnEnd: 4,
+             gridRowStart: 1,
+             gridRowEnd: 4,
+            },
           ]}
         />
       },
@@ -128,9 +307,17 @@ export function Reports(props) {
       label: __("Forms"),
       component: () => {
         return <ReportPanel
+          startDate={startDate}
+          endDate={endDate}
           dateChange={dateChange}
           reportList={[
-            "table_form_activity"
+            {
+             name:"table_form_activity",
+             gridColumnStart: 1,
+             gridColumnEnd: 4,
+             gridRowStart: 1,
+             gridRowEnd: 4,
+            },
           ]}
         />
       },
@@ -139,9 +326,17 @@ export function Reports(props) {
       label: __("Pipeline"),
       component: () => {
         return <ReportPanel
+          startDate={startDate}
+          endDate={endDate}
           dateChange={dateChange}
           reportList={[
-            "table_form_activity"
+            {
+             name:"table_form_activity",
+             gridColumnStart: 1,
+             gridColumnEnd: 4,
+             gridRowStart: 1,
+             gridRowEnd: 4,
+            },
           ]}
         />
       },

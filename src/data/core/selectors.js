@@ -29,7 +29,7 @@ export const getSnackbarMenuOpen = ( state ) => {
  * @return {string} Editing mode.
  */
 export function getEditorMode( state ) {
-	return getPreference( state, 'editorMode', 'visual' );
+	return state.editorMode;
 }
 
 /**

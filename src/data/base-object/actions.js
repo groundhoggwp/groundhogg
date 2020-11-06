@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import TYPES from './action-types'
-import { addNotification } from '../../utils'
+import { addNotification } from 'utils'
 
 /**
  * External dependencies

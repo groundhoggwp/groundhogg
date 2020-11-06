@@ -54,6 +54,10 @@ export default function Header( { email } ) {
 		toggleTitleEdit();
 	}
 
+	if ( ! item.hasOwnProperty( 'ID' ) ) {
+		return null;
+	}
+
 	return (
 		<Fragment>
 			<div
