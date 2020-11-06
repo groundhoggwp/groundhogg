@@ -1,6 +1,6 @@
 === WordPress CRM, Email & Marketing Automation for WordPress | Award Winner — Groundhogg ===
 Contributors: trainingbusinesspros, Groundhogg, Dhrumit, Adrian Tobey
-Tags: wordpress crm, marketing automation wordpress, crm, email marketing, email automation
+Tags: wordpress crm, marketing automation, crm, email marketing, email automation
 Donate link: https://www.groundhogg.io/try/
 Requires at least: 4.9
 Tested up to: 5.5
@@ -9,7 +9,7 @@ Stable tag: trunk
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
-Create funnels, email campaigns, newsletters, marketing automation, and have a CRM all within your WordPress website.
+The best WordPress CRM & Marketing Automation plugin. Create funnels, email campaigns, newsletters, marketing automation, and have a CRM all within your WordPress website.
 
 == Description ==
 
@@ -230,15 +230,16 @@ If you'd like a trial of our premium plans, please check out our [$1 sandbox dem
 [](http://coderisk.com/wp/plugin/groundhogg/RIPS-RLU9faYUDI)
 
 == Screenshots ==
-1. Drag and drop steps in any order to create your sales funnel.
-2. View funnel reports to help optimize your sales process.
-3. Choose from a variety of actions to to communicate with your customers.
-4. Choose from a variety of benchmarks to start and move customers through your funnels.
-5. Write personalized emails and send them right from WordPress.
-6. Send out mass emails to your list whenever you want.
-7. keep customer info up to date, pull reports and more with your CRM.
-8. Know your KPIs with your executive dashboard reports.
-9. Meet the team!
+1. Meet the team!
+2. Drag and drop steps in any order to create your sales funnel.
+3. View funnel reports to help optimize your sales process.
+4. Choose from a variety of actions to to communicate with your customers.
+5. Choose from a variety of benchmarks to start and move customers through your funnels.
+6. Write personalized emails and send them right from WordPress.
+7. Send out mass emails to your list whenever you want.
+8. keep customer info up to date, pull reports and more with your CRM.
+9. Know your KPIs with your executive dashboard reports.
+10. Choose from easy to use funnel templates to get started faster.
 
 == Installation ==
 = Plugin Repo =
