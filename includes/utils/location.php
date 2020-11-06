@@ -523,6 +523,9 @@ class Location {
 				if ( filter_var( @$_SERVER['HTTP_CLIENT_IP'], FILTER_VALIDATE_IP ) ) {
 					$ip = $_SERVER['HTTP_CLIENT_IP'];
 				}
+				if ( filter_var( @$_SERVER['HTTP_CF_CONNECTING_IP'], FILTER_VALIDATE_IP ) ) {
+					$ip = $_SERVER['HTTP_CF_CONNECTING_IP'];
+				}
 			}
 		}
 		$purpose    = str_replace( array( "name", "\n", "\t", " ", "-", "_" ), null, strtolower( trim( $purpose ) ) );

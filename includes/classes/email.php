@@ -651,7 +651,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_reply_to_address() {
-		return ( is_email( $this->get_meta( 'reply_to_override' ) ) ? $this->get_meta( 'reply_to_override' ) : $this->get_from_email() );
+		return ( is_email( $this->get_meta( 'reply_to_override' ) ) ? do_replacements( $this->get_meta( 'reply_to_override' ), $this->get_contact()->get_id() ) : $this->get_from_email() );
 	}
 
 	/**

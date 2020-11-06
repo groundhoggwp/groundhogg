@@ -405,7 +405,6 @@ abstract class Updater {
 
 		// Check if an update lock is present.
 		if ( $this->are_updates_locked() ) {
-		    wp_send_json_error( 'updates are locked' );
 			return false;
 		}
 
