@@ -42,9 +42,9 @@ const Chart = ({id, title, data, gridColumnStart, gridColumnEnd, gridRowStart, g
   }
 
   chartConfig.data =  data.chart.data
-  console.log(data.chart.data)
+  // console.log(data.chart.data)
   useEffect(() => {
-    console.log('anything here?', chartContainer, chartContainer.current,chartInstance)
+    // console.log('anything here?', chartContainer, chartContainer.current,chartInstance)
     if (chartContainer && chartContainer.current) {
       const newChartInstance = new Chartjs(chartContainer.current, chartConfig);
       setChartInstance(newChartInstance);

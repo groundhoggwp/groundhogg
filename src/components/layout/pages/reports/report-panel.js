@@ -12,7 +12,6 @@ import Typography from "@material-ui/core/Typography";
  * Internal dependencies
  */
 import Spinner from "../../../core-ui/spinner";
-// import TabPanel from '../../../core-ui/tab-panel';
 import { REPORTS_STORE_NAME } from "../../../../data/reports";
 import Chart from "../../../core-ui/chart";
 import Stats from "../../../core-ui/stats";
@@ -50,7 +49,6 @@ export default ({ key, reportList, dateChange, startDate, endDate }) => {
   const { reports, getReports, isRequesting, isUpdating } = useSelect(
     (select) => {
       const reportNames = Object.values(reportList).map((report)=>{ return report.name
-        // console.log(report)
         return report.name
       });
 
