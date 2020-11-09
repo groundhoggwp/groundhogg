@@ -79,6 +79,8 @@ class Webhook extends Base_Object {
 	/**
 	 * Enqueue the webhook into the scheduler
 	 *
+	 * todo decide how dispatching is going to happen...
+	 *
 	 * @param $object      Base_Object_With_Meta|Base_Object
 	 * @param $event       string
 	 */
@@ -117,6 +119,8 @@ class Webhook extends Base_Object {
 
 	/**
 	 * subscribe all the webhooks to their events
+	 *
+	 * todo decide where to load the webhooks, every page load? Conditionally?
 	 */
 	public static function init() {
 
@@ -155,6 +159,7 @@ class Webhook extends Base_Object {
 	 */
 	public static function register_default_event_types() {
 
+		// todo figure out which callbacks are needed.
 		$event_types = [
 			[
 				'type'                   => 'contact/created',
@@ -187,7 +192,7 @@ class Webhook extends Base_Object {
 
 		$event = get_array_var( $event_data, 'event' );
 
-
+		// Todo come up with the data portion...
 		return $webhook->post( '' , $event );
 	}
 }
