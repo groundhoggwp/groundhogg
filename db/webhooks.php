@@ -78,6 +78,7 @@ class Webhooks extends DB {
 		return array(
 			'ID'              => '%d',
 			'endpoint'        => '%s',
+			'initiation'      => '%s',
 			'events'          => '%s',
 			'status'          => '%s',
 			'last_event'      => '%s',
@@ -94,8 +95,9 @@ class Webhooks extends DB {
 	 */
 	public function get_column_defaults() {
 		return array(
-			'ID' => 0,
+			'ID'              => 0,
 			'endpoint'        => '',
+			'initiation'      => '',
 			'events'          => '',
 			'status'          => 'draft',
 			'last_event'      => '',
@@ -117,6 +119,7 @@ class Webhooks extends DB {
 		$sql = "CREATE TABLE " . $this->table_name . " (
 		ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 		endpoint longtext NOT NULL,
+		initiation longtext NOT NULL,
 		events longtext NOT NULL,
 		status varchar(20) NOT NULL,
 		last_event longtext NOT NULL,

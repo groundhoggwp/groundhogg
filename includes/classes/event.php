@@ -545,10 +545,6 @@ class Event extends Base_Object {
 			[
 				'type'     => 'broadcast',
 				'callback' => [ Broadcast::class, 'event_callback' ],
-			],
-			[
-				'type'     => 'webhook',
-				'callback' => [ Webhook::class, 'event_callback' ],
 			]
 		];
 
