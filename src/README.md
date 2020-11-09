@@ -3,7 +3,7 @@ Follow this quick guide to get your local Groundhogg up and running. Talk to Nat
 
 # Setup Wordpress
 
-Drumit please take care of this
+Follow https://www.wpbeginner.com/wp-tutorials/how-to-install-wordpress-on-your-windows-computer-using-wamp/ or https://themeisle.com/blog/install-xampp-and-wordpress-locally/ to set up local wordpress environment.
 
 # React Install and Development
 React lives entirely within /src folder but all commands are run at the root level
