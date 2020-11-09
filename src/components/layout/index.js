@@ -69,11 +69,11 @@ export default function PrimaryLayout (props) {
 }
 
 const Layout = (props) => {
-  const { ...restProps } = props
+  const { ...restProps } = props;
 
     return (
       <div className="groundhogg-layout" style={ { display: 'flex' } }>
-        <TopBar { ...restProps } pages={ getPages() } />
+        <TopBar { ...restProps } />
         <SnackbarArea />
         <PrimaryLayout>
           <Controller { ...restProps } />

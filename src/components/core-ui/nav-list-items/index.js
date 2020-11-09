@@ -31,7 +31,7 @@ export default function NavListItems(props) {
                   key={index}
                   button
                   onClick={ (event) => {
-                    handleListItemClick(page.path)
+                    handleListItemClick(page.link)
                   } }
                   selected={ index === props.props.selectedIndex }
                 >

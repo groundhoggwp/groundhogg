@@ -3,6 +3,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
+import { DateTime } from 'luxon';
+import { useState, useRef, useEffect, Fragment } from '@wordpress/element';
 
 const useStyles = makeStyles((theme) => ({
   textField: {
@@ -13,33 +15,31 @@ const useStyles = makeStyles((theme) => ({
 export default function DatePickers({selectedDate, dateChange, label, id}) {
   const classes = useStyles();
 
-  const handleChange = (ele, here) => {
-    console.log('handle change')
-  };
-  const handleAccept = (ele, here) => {
-    console.log(ele.target, here)
-    console.log(ele.target.value, here)
-    // dateChange.bind(this, id)
-    // setAttributes({
-    //   text: value,
-    // });
-  };
+  const [date, setDate] = useState( selectedDate );
 
-  const handleMonthChange = () =>{
-    console.log('month change')
-  }
-        // onChange={dateChange.bind(this, id)}
+  const handleChange = (ele) => {
+    const newValue = ele.target.value;
+
+    if(newValue === DateTime.fromISO(date).plus({ months: 1 }).toISODate()) {
+      console.log('month forward')
+    } else if(newValue === DateTime.fromISO(date).minus({ months: 1 }).toISODate()) {
+      console.log('month back')
+    } else {
+      console.log('new date')
+      dateChange(id, newValue);
+    }
+
+    setDate(newValue);
+  };
   return (
     <form  noValidate>
       <TextField
         type='date'
         className={classes.textField}
         id={id}
-        label={label}        
+        label={label}
         value={selectedDate}
         onChange={handleChange}
-        onAccept={handleAccept}
-        onMonthChange={handleMonthChange}
         KeyboardButtonProps={{
           'aria-label': 'change date',
         }}

@@ -12,7 +12,6 @@ import Typography from "@material-ui/core/Typography";
  * Internal dependencies
  */
 import Spinner from "../../../core-ui/spinner";
-// import TabPanel from '../../../core-ui/tab-panel';
 import { REPORTS_STORE_NAME } from "../../../../data/reports";
 import Chart from "../../../core-ui/chart";
 import Stats from "../../../core-ui/stats";
@@ -44,13 +43,12 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default ({ reportList, dateChange, startDate, endDate }) => {
+export default ({ key, reportList, dateChange, startDate, endDate }) => {
   const classes = useStyles();
 
   const { reports, getReports, isRequesting, isUpdating } = useSelect(
     (select) => {
       const reportNames = Object.values(reportList).map((report)=>{ return report.name
-        // console.log(report)
         return report.name
       });
 
@@ -95,18 +93,23 @@ export default ({ reportList, dateChange, startDate, endDate }) => {
           let type = reports[reportKey].chart.type;
           title.shift();
           title = title.join(" ");
-          // console.log(title, reportList, reports)
-          const { gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd } = reportList[i];
+          // console.log(reports, reportKey, reportList, i)
 
-          if (type === "quick_stat") {
-            return <Stats title={title} id={reportKey} data={reports[reportKey]}  gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} />;
-          } else if (type === "table") {
-            return <ReportTable title={title} id={reportKey} data={reports[reportKey]}  gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} />;
-          } else if(type === "doughnut" || type === "line") {
-            return <Chart title={title} id={reportKey} data={reports[reportKey]} gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} />;
-          } else {
-            return <Card>{title} No data?</Card>
+          if(reportList[i]){
+            const { gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd } = reportList[i];
+
+            if (type === "quick_stat") {
+              return <Stats title={title} id={reportKey} data={reports[reportKey]}  gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} />;
+            } else if (type === "table") {
+              return <ReportTable title={title} id={reportKey} data={reports[reportKey]}  gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} />;
+            } else if(type === "doughnut" || type === "line") {
+              return <Chart title={title} id={reportKey} data={reports[reportKey]} gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} />;
+            } else {
+
+            }
           }
+
+          return <Card>{title} No data?</Card>
         })}
       </div>
     </div>

@@ -59,20 +59,16 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function ScrollableTabsButtonAuto( { tabs } ) {
+export default function ScrollableTabsButtonAuto( { tabs, history, selectedPanel, handlePanelChange} ) {
   const classes = useStyles();
-  const [value, setValue] = useState(0);
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+  const value = selectedPanel;
 
   return (
     <div className={classes.root}>
       <AppBar position="static" color="default">
         <Tabs
           value={value}
-          onChange={handleChange}
+          onChange={handlePanelChange}
           indicatorColor="primary"
           textColor="primary"
           variant="scrollable"

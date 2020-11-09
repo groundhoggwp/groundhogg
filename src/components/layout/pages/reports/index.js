@@ -28,23 +28,26 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export function Reports(props) {
+export function Reports({history, match}) {
   const classes = useStyles();
+  const reportRoute = match.params.report;
 
   const [startDate, setStartDate] = useState(DateTime.local().minus({ years: 1 }).startOf('day').toISODate());
   const [endDate, setEndDate] = useState(DateTime.local().startOf('day').toISODate());
-
-  const dateChange = (id, e)  => {
+  console.log(startDate, endDate)
+  const dateChange = (id, newValue)  => {
+    console.log('asdfad', newValue)
     if (id === 'start'){
-      setStartDate(e.target.value);
+      setStartDate(newValue);
     } else {
-      setEndDate(e.target.value);
+      setEndDate(newValue);
     }
   }
 
   const tabs = [
     {
       label: __("Overview"),
+      route: __("overview"),
       component: (classes) => {
         return (
           <ReportPanel
@@ -120,21 +123,21 @@ export function Reports(props) {
                gridColumnStart: 1,
                gridColumnEnd: 3,
                gridRowStart: 8,
-               gridRowEnd: 12,
+               gridRowEnd: 11,
               },
               {
                name:"table_contacts_by_countries",
                gridColumnStart: 3,
                gridColumnEnd: 5,
                gridRowStart: 8,
-               gridRowEnd: 12,
+               gridRowEnd: 11,
               },
               {
                name:"table_contacts_by_lead_source",
                gridColumnStart: 1,
                gridColumnEnd: 5,
-               gridRowStart: 12,
-               gridRowEnd: 15,
+               gridRowStart: 11,
+               gridRowEnd: 14,
               },
             ]}
           />
@@ -143,6 +146,7 @@ export function Reports(props) {
     },
     {
       label: __("Contacts"),
+      route: __("contacts"),
       component: (classes) => {
         return (
           <ReportPanel
@@ -200,7 +204,7 @@ export function Reports(props) {
                gridRowEnd: 8,
               },
               {
-               name:"table_contacts_by_source_page",
+               name:"table_contacts_by_source_route",
                gridColumnStart: 1,
                gridColumnEnd: 3,
                gridRowStart: 8,
@@ -220,6 +224,7 @@ export function Reports(props) {
     },
     {
       label: __("Email"),
+      route: __("email"),
       component: (classes) => {
         return (
           <ReportPanel
@@ -253,6 +258,7 @@ export function Reports(props) {
     },
     {
       label: __("Funnels"),
+      route: __("funnels"),
       component: () => {
         return <ReportPanel
           startDate={startDate}
@@ -279,6 +285,7 @@ export function Reports(props) {
     },
     {
       label: __("Broadcasts"),
+      route: __("broadcasts"),
       component: () => {
         return <ReportPanel
           startDate={startDate}
@@ -305,6 +312,7 @@ export function Reports(props) {
     },
     {
       label: __("Forms"),
+      route: __("forms"),
       component: () => {
         return <ReportPanel
           startDate={startDate}
@@ -324,6 +332,7 @@ export function Reports(props) {
     },
     {
       label: __("Pipeline"),
+      route: __("pipeline"),
       component: () => {
         return <ReportPanel
           startDate={startDate}
@@ -343,5 +352,19 @@ export function Reports(props) {
     }
   ];
 
-  return <TabPanel tabs={tabs} />;
+  let defaultTab = 0;
+  tabs.forEach((tab,i)=>{
+    if(tab.route === reportRoute){
+      defaultTab = i
+    }
+  });
+
+  const [selectedPanel, setSelectedPanel] = useState(defaultTab);
+
+  const handlePanelChange = (event, newValue) => {
+    history.push('/reports/'+tabs[newValue].route)
+    setSelectedPanel(newValue);
+  };
+
+  return <TabPanel tabs={tabs} selectedPanel={selectedPanel} handlePanelChange={handlePanelChange} history={history} />;
 }
