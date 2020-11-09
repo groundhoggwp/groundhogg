@@ -750,4 +750,29 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	public function can_run() {
 		return ( $this->is_action() || $this->is_condition() ) && $this->is_active();
 	}
+
+	/**
+	 * Restore the process to the current blog.
+	 *
+	 * @deprecated since 2.0
+	 */
+	public function restore_current_blog() {
+		if ( Plugin::$instance->settings->is_global_multisite() && ms_is_switched() ) {
+			restore_current_blog();
+		}
+	}
+
+	/**
+	 * Switches to the blog which the step can run on.
+	 *
+	 * @deprecated since 2.0
+	 */
+	public function switch_to_blog() {
+		if ( Plugin::$instance->settings->is_global_multisite() ) {
+			$blog_id = $this->get_meta( 'blog_id' );
+			if ( $blog_id && intval( $blog_id ) !== get_current_blog_id() ) {
+				switch_to_blog( $blog_id );
+			}
+		}
+	}
 }
