@@ -446,11 +446,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Return the name given with the ID prefixed for easy access in the $_POST variable
 	 *
+	 * @deprecated since 2.0
+	 *
 	 * @param $name
 	 *
 	 * @return string
-	 * @deprecated since 2.0
-	 *
 	 */
 	public function prefix( $name ) {
 		return $this->get_id() . '_' . esc_attr( $name );
@@ -571,9 +571,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return $this->get_title();
 	}
 
-	public function get_step_notes()
-	{
-		return $this->get_meta('step_notes');
+	public function get_step_notes() {
+		return $this->get_meta( 'step_notes' );
 	}
 
 	/**
@@ -678,7 +677,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		if ( $next_step && $next_step->is_active() ) {
 			$contacts = $this->get_waiting_contacts();
 
-			if ( ! empty( $contacts ) ){
+			if ( ! empty( $contacts ) ) {
 				foreach ( $contacts as $contact ) {
 					$next_step->enqueue( $contact );
 				}
