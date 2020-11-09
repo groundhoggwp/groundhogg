@@ -17,6 +17,7 @@ use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Step;
 use Groundhogg\Tag;
+use Groundhogg\Webhook;
 use function Groundhogg\get_array_var;
 use WP_REST_Server;
 use WP_REST_Request;
@@ -45,6 +46,7 @@ abstract class Base_Object_Api extends Base_Api {
 			'funnel'    => Funnel::class,
 			'broadcast' => Broadcast::class,
 			'event'     => Event::class,
+			'webhook'   => Webhook::class,
 		] );
 
 		$class = get_array_var( $object_type_class_map, $this->get_object_type() );
@@ -329,7 +331,7 @@ abstract class Base_Object_Api extends Base_Api {
 
 			$items = $request->get_json_params();
 
-			if ( empty( $items ) ){
+			if ( empty( $items ) ) {
 				return self::ERROR_422();
 			}
 
@@ -340,7 +342,7 @@ abstract class Base_Object_Api extends Base_Api {
 				$id     = get_array_var( $item, $this->get_primary_key() );
 				$object = $this->create_new_object( $id );
 
-				if ( ! $object->exists() ){
+				if ( ! $object->exists() ) {
 					continue;
 				}
 
