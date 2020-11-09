@@ -10,10 +10,16 @@ namespace Groundhogg;
  */
 class Webhook extends Base_Object {
 
+	/**
+	 * @return DB\DB|DB\Meta_DB|DB\Tags
+	 */
 	protected function get_db() {
 		return get_db( 'webhooks' );
 	}
 
+	/**
+	 * @return string
+	 */
 	protected function get_object_type() {
 		return 'webhook';
 	}
@@ -24,18 +30,6 @@ class Webhook extends Base_Object {
 	 * @return void
 	 */
 	protected function post_setup() {
-		$this->events = maybe_unserialize( $this->events );
-	}
-
-	/**
-	 * @param array $data
-	 *
-	 * @return array
-	 */
-	protected function sanitize_columns( $data = [] ) {
-		map_func_to_attr( $data, 'events', 'maybe_serialize' );
-
-		return $data;
 	}
 
 	/**
@@ -48,151 +42,52 @@ class Webhook extends Base_Object {
 	}
 
 	/**
-	 * The list of events this webhook is subscribed to.
+	 * Dispatch the webhook
 	 *
-	 * @return bool|mixed
+	 * @param $event string
+	 * @param $initiated_by string
+	 * @param $data  mixed
+	 *
+	 * @return array|bool|object|\WP_Error
 	 */
-	public function get_events() {
-		return $this->events;
-	}
-
-	/**
-	 * Subscribe to all of the events.
-	 *
-	 * Events have the following structure
-	 */
-	public function subscribe() {
-
-		$events = $this->get_events();
-
-		foreach ( $events as $event ) {
-
-			// Ignore non registered event types...
-			if ( ! isset_not_empty( self::$event_types, $event ) ) {
-				continue;
-			}
-
-			add_action( "groundhogg/{$event}", [ $this, 'dispatch' ], 10, 3 );
-		}
-	}
-
-	/**
-	 * Enqueue the webhook into the scheduler
-	 *
-	 * todo decide how dispatching is going to happen...
-	 *
-	 * @param $object      Base_Object_With_Meta|Base_Object
-	 * @param $event       string
-	 */
-	public function dispatch( $event, $data ) {
-
-		enqueue_event( [
-			'event_type' => Event::WEBHOOK,
-			'step_id'    => $this->get_id(), // use step_id for the webhook ID
-			'data'       => [
-				'event' => $event,
-
-			],
-		] );
-
-	}
-
-	/**
-	 * Post the base object to the URL endpoint in question.
-	 *
-	 * @param mixed  $data
-	 * @param string $event
-	 *
-	 * @return true|\WP_Error
-	 */
-	public function post( $data, $event = '' ) {
+	public function post( $event, $initiated_by, $data ) {
 
 		$data = [
-			'event' => $event,
-			'data'  => $data
+			'event'        => $event,
+			'initiated_by' => $initiated_by,
+			'data'         => $data
 		];
 
-		$result = remote_post_json( $this->get_endpoint(), $data );
-
-		return is_wp_error( $result ) ? $result : true;
+		return remote_post_json( $this->get_endpoint(), $data );
 	}
 
 	/**
-	 * subscribe all the webhooks to their events
+	 * Dispatch the webhooks for a particular endpoint
 	 *
-	 * todo decide where to load the webhooks, every page load? Conditionally?
+	 * todo introduce batching HTTP requests...
+	 *
+	 * @param $event
+	 * @param $initiated_by
+	 * @param $data
 	 */
-	public static function init() {
+	public static function dispatch( $event, $initiated_by, $data ) {
 
-		$webhooks = get_db( 'webhooks' )->query( [ 'status' => 'active' ] );
+		$query = [
+			'where' => [
+				[ 'events', 'RLIKE', $event ],
+				[ 'initiation', 'RLIKE', $initiated_by ],
+			]
+		];
 
+		$webhooks = wp_list_pluck( get_db( 'webhooks' )->query( $query ), 'ID' );
+		$webhooks = id_list_to_class( $webhooks, Webhook::class );
+
+		/**
+		 * @var $webhooks Webhook[]
+		 */
 		foreach ( $webhooks as $webhook ) {
-			$webhook = new Webhook( $webhook->ID );
-
-			$webhook->subscribe();
+			$webhook->post( $event, $initiated_by, $data );
 		}
-	}
 
-	/**
-	 * Holds the registered event types...
-	 *
-	 * @var array
-	 */
-	public static $event_types = [];
-
-	/**
-	 * Register and event type
-	 *
-	 * @param $type
-	 * @param $callback
-	 */
-	public static function register_event_type( $type, $callback ) {
-		self::$event_types[ $type ] = [
-			'callback' => $callback
-		];
-	}
-
-	/**
-	 * Register all the default event types
-	 *
-	 * @type callable callback
-	 */
-	public static function register_default_event_types() {
-
-		// todo figure out which callbacks are needed.
-		$event_types = [
-			[
-				'type'                   => 'contact/created',
-				'post_data_callback'     => function () {
-
-				},
-				'dispatch_data_callback' => function () {
-
-				}
-			],
-		];
-
-		foreach ( $event_types as $event_type ) {
-			self::register_event_type( $event_type['type'], $event_type['callback'] );
-		}
-	}
-
-	/**
-	 * Event callback for the email notification
-	 *
-	 * @param $event Event
-	 *
-	 * @return bool
-	 */
-	public static function event_callback( $event ) {
-
-		$webhook = new Webhook( $event->get_step_id() );
-
-		$event_data = $event->get_event_data();
-
-		$event = get_array_var( $event_data, 'event' );
-
-		// Todo come up with the data portion...
-		return $webhook->post( '' , $event );
 	}
 }

@@ -280,6 +280,8 @@ abstract class Base_Object_Api extends Base_Api {
 			$added[] = $object;
 		}
 
+
+
 		return self::SUCCESS_RESPONSE( [
 			'items'       => $added,
 			'total_items' => count( $added ),
