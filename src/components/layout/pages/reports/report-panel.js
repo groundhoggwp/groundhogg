@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: '10px',
     gridGap: '10px',
     gridTemplateColumns: "repeat(3, calc(33% - 80px)) 240px",
-    gridTemplateRows: "repeat(10, 160px)",
+    gridTemplateRows: "repeat(100, 160px)",
     rowGap: '10px',
   },
   datePickers:{
@@ -102,7 +102,7 @@ export default ({ key, reportList, dateChange, startDate, endDate }) => {
               return <Stats title={title} id={reportKey} data={reports[reportKey]}  gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} />;
             } else if (type === "table") {
               return <ReportTable title={title} id={reportKey} data={reports[reportKey]}  gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} />;
-            } else if(type === "doughnut" || type === "line") {
+            } else if(type === "doughnut" || type === "line" || type === "bar" ) {
               return <Chart title={title} id={reportKey} data={reports[reportKey]} gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} />;
             } else {
 
