@@ -8,8 +8,10 @@ import Card from "@material-ui/core/Card";
  * Internal dependencies
  */
 import Chartjs from "chart.js";
+import barChartConfig from './chart-config/bar-chart-config.js'
 import lineChartConfig from './chart-config/line-chart-config.js'
 import doughnutChartConfig from './chart-config/doughnut-chart-config.js'
+
 
 const Chart = ({id, title, data, gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd}) => {
   const useStyles = makeStyles((theme) => ({
@@ -37,14 +39,15 @@ const Chart = ({id, title, data, gridColumnStart, gridColumnEnd, gridRowStart, g
   let chartConfig;
   if (data.chart.type === "line") {
     chartConfig = lineChartConfig;
+  } else if (data.chart.type === "bar") {
+    chartConfig = barChartConfig;
   } else if (data.chart.type === "doughnut") {
     chartConfig = doughnutChartConfig;
   }
 
-  chartConfig.data =  data.chart.data
-  // console.log(data.chart.data)
+  chartConfig.data =  data.chart.data;
+
   useEffect(() => {
-    // console.log('anything here?', chartContainer, chartContainer.current,chartInstance)
     if (chartContainer && chartContainer.current) {
       const newChartInstance = new Chartjs(chartContainer.current, chartConfig);
       setChartInstance(newChartInstance);
