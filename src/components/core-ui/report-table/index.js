@@ -32,16 +32,23 @@ const ReportTable = ({title, data, gridColumnStart, gridColumnEnd, gridRowStart,
   if(!data.chart.data){
     return(<div/>)
   }
+
   if(data.chart.data.length === 0){
-    return(<div/>)
+    return (
+      <Card className={classes.root}>
+        <div className={classes.title}>{title}</div>
+        <p>{data.no_data}</p>
+      </Card>
+    );
   }
 
+  // Manual width calc is required because each container is dynamic and data grid can't use % then
+  const columnWidth = ((window.innerWidth-600)/(data.chart.label.length*2));
   const columns = data.chart.label.map((label)=>{
     if(typeof(value)=== 'object'){
-
-      return { field: 'Conversation Rate', headerName: 'Conversation Rate', width: 200, sortable: true }
+      label = 'Conversation Rate';
     }
-    return { field: label, headerName: label, width: 200 }
+    return { field: label, headerName: label, width: columnWidth, align: 'left', sortable: true }
   });
 
   const rows = data.chart.data.map((data, i)=>{
