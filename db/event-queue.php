@@ -114,6 +114,7 @@ class Event_Queue extends DB {
 			'time'           => '%d',
 			'micro_time'     => '%s',
 			'time_scheduled' => '%d',
+			'event_data'     => '%s',
 			'funnel_id'      => '%d',
 			'step_id'        => '%d',
 			'email_id'       => '%d',
@@ -140,6 +141,7 @@ class Event_Queue extends DB {
 			'micro_time'     => 0,
 			'time_scheduled' => time(),
 			'funnel_id'      => 0,
+			'event_data'     => '',
 			'step_id'        => 0,
 			'email_id'       => 0,
 			'contact_id'     => 0,
@@ -237,11 +239,12 @@ class Event_Queue extends DB {
         time bigint(20) unsigned NOT NULL,
         micro_time float(8) unsigned NOT NULL,
         time_scheduled bigint(20) unsigned NOT NULL,
+        event_data longtext NOT NULL,
         contact_id bigint(20) unsigned NOT NULL,
         funnel_id bigint(20) unsigned NOT NULL,
         step_id bigint(20) unsigned NOT NULL,
         email_id bigint(20) unsigned NOT NULL,
-        event_type int unsigned NOT NULL,
+        event_type varchar({$this->get_max_index_length()}) NOT NULL,
         error_code tinytext NOT NULL,
         error_message tinytext NOT NULL, 
         priority int unsigned NOT NULL,
@@ -259,6 +262,34 @@ class Event_Queue extends DB {
 		dbDelta( $sql );
 
 		update_option( $this->table_name . '_db_version', $this->version );
+	}
+
+	/**
+	 * Use strings for better management of event types, use instead of int, more unique
+	 *
+	 * @since 3.0
+	 */
+	public function change_event_type_to_varchar() {
+
+		global $wpdb;
+
+		$wpdb->query( "ALTER TABLE {$this->get_table_name()} MODIFY event_type varchar({$this->get_max_index_length()});" );
+
+		$mappings = [
+			1  => 'funnel',
+			2  => 'broadcast',
+			3  => 'email_notification',
+			98 => 'test_success',
+			99 => 'test_failure'
+		];
+
+		foreach ( $mappings as $old_int => $new_string ) {
+			$this->mass_update( [
+				'event_type' => $new_string
+			], [
+				'event_type' => $old_int
+			] );
+		}
 	}
 
 	/**

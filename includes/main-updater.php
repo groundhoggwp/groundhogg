@@ -364,6 +364,15 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Update the steps table to support next_steps[]
+	 */
+	public function version_3_0_a_4() {
+		get_db( 'events' )->change_event_type_to_varchar();
+		get_db( 'event_queue' )->change_event_type_to_varchar();
+	}
+
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -407,6 +416,7 @@ class Main_Updater extends Updater {
 			'3.0.a.1',
 			'3.0.a.2',
 			'3.0.a.3',
+			'3.0.a.4',
 		];
 	}
 
@@ -431,6 +441,7 @@ class Main_Updater extends Updater {
 			'3.0.a.1',
 			'3.0.a.2',
 			'3.0.a.3',
+			'3.0.a.4',
 		];
 	}
 
