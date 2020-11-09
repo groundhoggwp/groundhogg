@@ -60,7 +60,7 @@ class Email_Open_Rate extends Base_Quick_Stat_Percent {
 			$data = $wpdb->get_var( $wpdb->prepare(
 				"SELECT COUNT(*) FROM $events_table e 
                         LEFT JOIN $steps_table s ON e.step_id = s.ID 
-                        WHERE e.status = %s AND ( s.step_type = %s OR e.event_type = %d OR e.event_type = %d)
+                        WHERE e.status = %s AND ( s.step_type = %s OR e.event_type = %s OR e.event_type = %s)
                         AND e.time >= %d AND e.time <= %d
                         ORDER BY time DESC"
 				, 'complete', 'send_email', Event::BROADCAST, Event::EMAIL_NOTIFICATION,

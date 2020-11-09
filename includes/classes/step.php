@@ -267,7 +267,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		// add edge from child to this
 		foreach ( $child_steps as $child_step ) {
 
-			if ( $this->is_condition() ){
+			if ( $this->is_condition() ) {
 				$this->set_no_step( $child_step );
 				$this->set_yes_step( $child_step );
 			}
@@ -280,7 +280,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		foreach ( $parent_steps as $parent_step ) {
 			foreach ( $child_steps as $child_step ) {
 
-				if ( ! $path ){
+				if ( ! $path ) {
 					$parent_step->remove_child_step( $child_step );
 				}
 
@@ -291,8 +291,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 
-
-	public function delete_edges(){
+	public function delete_edges() {
 
 
 		// Add likewise associations of parent to child
@@ -484,18 +483,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			return false;
 		}
 
-		// Update any events to skipped...
-		$this->get_event_queue_db()->mass_update(
-			[
-				'status' => Event::SKIPPED
-			],
-			[
-				'funnel_id'  => $this->get_funnel_id(),
-				'contact_id' => $contact->get_id(),
-				'event_type' => Event::FUNNEL,
-				'status'     => Event::WAITING
-			]
-		);
+		// Todo handle the contact being in the funnel in two places...
 
 		// Setup the new event args
 		$event = [
@@ -685,6 +673,15 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		// Modify the result
 		$result = apply_filters( 'groundhogg/steps/run/result', $result, $this, $contact, $event );
 
+		if ( $result ) {
+
+			$next = $this->get_next_step();
+
+			if ( $next ) {
+				$next->enqueue( $contact );
+			}
+		}
+
 		return $result;
 	}
 
@@ -751,28 +748,16 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return ( $this->is_action() || $this->is_condition() ) && $this->is_active();
 	}
 
-	/**
-	 * Restore the process to the current blog.
-	 *
-	 * @deprecated since 2.0
-	 */
-	public function restore_current_blog() {
-		if ( Plugin::$instance->settings->is_global_multisite() && ms_is_switched() ) {
-			restore_current_blog();
-		}
-	}
 
 	/**
-	 * Switches to the blog which the step can run on.
+	 * Callback to trigger the run method of the associated step
 	 *
-	 * @deprecated since 2.0
+	 * @param $event Event
+	 *
+	 * @return bool|\WP_Error
 	 */
-	public function switch_to_blog() {
-		if ( Plugin::$instance->settings->is_global_multisite() ) {
-			$blog_id = $this->get_meta( 'blog_id' );
-			if ( $blog_id && intval( $blog_id ) !== get_current_blog_id() ) {
-				switch_to_blog( $blog_id );
-			}
-		}
+	public static function event_callback( $event ) {
+		$step = new Step( $event->get_step_id() );
+		return $step->run( $event->get_contact(), $event );
 	}
 }
