@@ -25,7 +25,10 @@ const coreReducer = (
 		case TYPES.RECEIVE_USER_PERMISSION:
 			state = {
 				...state,
-				[ key ]: isAllowed,
+				userPermissions: {
+					...state.userPermissions,
+					[key]: isAllowed
+				},
 			}
 			break
 		case TYPES.OPEN_SNACKBAR:

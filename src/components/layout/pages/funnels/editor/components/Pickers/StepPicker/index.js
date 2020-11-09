@@ -74,8 +74,8 @@ export default (props) => {
       step_type: type,
       step_order: stepOrder || 1,
       step_group: stepGroup,
-      child_steps: Object.values( childSteps ) || [],
-      parent_steps: Object.values( parentSteps ) || [],
+      child_steps: childSteps ? Object.values( childSteps ) : [],
+      parent_steps: parentSteps? Object.values( parentSteps ) : [],
     }
     createStep({
       data: newStepData,
