@@ -34,9 +34,8 @@ export function Reports({history, match}) {
 
   const [startDate, setStartDate] = useState(DateTime.local().minus({ years: 1 }).startOf('day').toISODate());
   const [endDate, setEndDate] = useState(DateTime.local().startOf('day').toISODate());
-  console.log(startDate, endDate)
+  
   const dateChange = (id, newValue)  => {
-    console.log('asdfad', newValue)
     if (id === 'start'){
       setStartDate(newValue);
     } else {

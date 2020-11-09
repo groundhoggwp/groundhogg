@@ -17,19 +17,29 @@ export default function DatePickers({selectedDate, dateChange, label, id}) {
 
   const [date, setDate] = useState( selectedDate );
 
-  const handleChange = (ele) => {
-    const newValue = ele.target.value;
+  const validDateChange = (newDate) => {
+    // May need to enhance this logic for multi month/year changes
+    // console.log(Math.abs(diffInMonths.as('days')) % 30);
 
-    if(newValue === DateTime.fromISO(date).plus({ months: 1 }).toISODate()) {
-      console.log('month forward')
-    } else if(newValue === DateTime.fromISO(date).minus({ months: 1 }).toISODate()) {
-      console.log('month back')
-    } else {
-      console.log('new date')
-      dateChange(id, newValue);
+    // Block Month Changes
+    if(DateTime.fromISO(date).plus({ months: 1 }).toISODate() === newDate){
+      return false;
+    }
+    if(DateTime.fromISO(date).minus({ months: 1 }).toISODate() === newDate){
+      return false;
     }
 
-    setDate(newValue);
+    return true;
+  }
+
+  const handleChange = (ele) => {
+    const newDate = ele.target.value;
+
+    if(validDateChange(newDate)){
+      dateChange(id, newDate);
+    }
+
+    setDate(newDate);
   };
   return (
     <form  noValidate>

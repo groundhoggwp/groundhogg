@@ -93,7 +93,6 @@ export default ({ key, reportList, dateChange, startDate, endDate }) => {
           let type = reports[reportKey].chart.type;
           title.shift();
           title = title.join(" ");
-          // console.log(reports, reportKey, reportList, i)
 
           if(reportList[i]){
             const { gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd } = reportList[i];
