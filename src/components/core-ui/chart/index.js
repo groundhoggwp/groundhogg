@@ -50,7 +50,6 @@ const Chart = ({id, title, data, gridColumnStart, gridColumnEnd, gridRowStart, g
   useEffect(() => {
     if (chartContainer && chartContainer.current) {
       const newChartInstance = new Chartjs(chartContainer.current, chartConfig);
-      setChartInstance(newChartInstance);
     }
   }, [chartContainer]);
 

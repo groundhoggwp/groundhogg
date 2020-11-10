@@ -45,12 +45,11 @@ const useStyles = makeStyles((theme) => ({
 
 export default ({ key, reportList, dateChange, startDate, endDate }) => {
   const classes = useStyles();
-
+  const reportNames = Object.values(reportList).map((report)=>{ return report.name
+    return report.name
+  });
   const { reports, getReports, isRequesting, isUpdating } = useSelect(
     (select) => {
-      const reportNames = Object.values(reportList).map((report)=>{ return report.name
-        return report.name
-      });
 
       const store = select(REPORTS_STORE_NAME);
       return {
@@ -66,7 +65,15 @@ export default ({ key, reportList, dateChange, startDate, endDate }) => {
     }
   );
 
+  Object.keys(reports).forEach((reportName)=>{
+    console.log(reportName, reportList)
+    console.log(reportName, reportNames.includes(reportName))
+    if(!reportNames.includes(reportName)){
+      delete reports[reportName]
+    }
+  })
 
+  console.log('result', reports.length)
 
   if (typeof reports === "undefined") {
     return null;
