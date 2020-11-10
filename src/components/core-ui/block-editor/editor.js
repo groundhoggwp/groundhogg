@@ -29,7 +29,7 @@ import Sidebar from './components/sidebar';
 import BlockEditor from './components/block-editor'
 import { CORE_STORE_NAME } from 'data/core';
 
-function Editor( { settings, email } ) {
+function Editor( { settings, email, history } ) {
 
 	const {
 		editorMode,
@@ -47,7 +47,7 @@ function Editor( { settings, email } ) {
 				<DropZoneProvider>
 					<FocusReturnProvider>
 						<InterfaceSkeleton
-							header={<Header email={email} />}
+							header={<Header email={email} history={history} />}
 							sidebar={
 								<>
 									<Sidebar />
