@@ -59,16 +59,33 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function ScrollableTabsButtonAuto( { tabs, history, selectedPanel, handlePanelChange} ) {
+export default function ScrollableTabsButtonAuto( { tabs, enableRouting, history, match } ) {
+  let defaultTab = 0;
+  if(enableRouting){
+    const reportRoute = match.params.routeId;
+    tabs.forEach((tab,i)=>{
+      if(tab.route === reportRoute){
+        defaultTab = i
+      }
+    });
+  }
+
   const classes = useStyles();
-  const value = selectedPanel;
+  const [value, setValue] = useState(defaultTab);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+    if(enableRouting){
+      history.push(match.path.replace(':routeId', '')+tabs[newValue].route)
+    }
+  };
 
   return (
     <div className={classes.root}>
       <AppBar position="static" color="default">
         <Tabs
           value={value}
-          onChange={handlePanelChange}
+          onChange={handleChange}
           indicatorColor="primary"
           textColor="primary"
           variant="scrollable"

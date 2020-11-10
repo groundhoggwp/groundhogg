@@ -5,8 +5,7 @@ import { filter, forEach } from 'lodash'
 import TabPanel from 'components/core-ui/tab-panel'
 import { SettingsSection } from './settings-section'
 
-export const Settings = () => {
-
+export const Settings = ({history, match}) => {
 	const getTabs = () => {
 		return applyFilters(
 			'groundhogg.settings.tabs',
@@ -30,6 +29,7 @@ export const Settings = () => {
 		let section = prepareSections( tab.id, applyFilters( 'groundhogg.settings.sections', window.Groundhogg.preloadSettings.sections ) );
 		tabs.push({
 			label: tab.title,
+			route: tab.title.toLowerCase(),
 			component : () => {
 				return (
 				  <SettingsSection section={ section } />
@@ -40,8 +40,7 @@ export const Settings = () => {
 
 	return (
 		<Fragment>
-			<TabPanel tabs={tabs} />
+			return <TabPanel tabs={tabs} enableRouting={true} history={history} match={match} />;
 		</Fragment>
 	);
 };
-

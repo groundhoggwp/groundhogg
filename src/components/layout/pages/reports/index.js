@@ -30,11 +30,11 @@ const useStyles = makeStyles((theme) => ({
 
 export function Reports({history, match}) {
   const classes = useStyles();
-  const reportRoute = match.params.report;
+
 
   const [startDate, setStartDate] = useState(DateTime.local().minus({ years: 1 }).startOf('day').toISODate());
   const [endDate, setEndDate] = useState(DateTime.local().startOf('day').toISODate());
-  
+
   const dateChange = (id, newValue)  => {
     if (id === 'start'){
       setStartDate(newValue);
@@ -110,13 +110,13 @@ export function Reports({history, match}) {
                gridRowStart: 4,
                gridRowEnd: 4,
               },
-              {
-               name:"chart_contacts_by_optin_status",
-               gridColumnStart: 1,
-               gridColumnEnd: 3,
-               gridRowStart: 5,
-               gridRowEnd: 8,
-              },
+              // {
+              //  name:"chart_contacts_by_optin_status",
+              //  gridColumnStart: 1,
+              //  gridColumnEnd: 3,
+              //  gridRowStart: 5,
+              //  gridRowEnd: 8,
+              // },
               {
                name:"table_top_converting_funnels",
                gridColumnStart: 1,
@@ -330,13 +330,13 @@ export function Reports({history, match}) {
                gridRowStart: 5,
                gridRowEnd: 8,
               },
-              {
-               name:"chart_last_broadcast",
-               gridColumnStart: 3,
-               gridColumnEnd: 5,
-               gridRowStart: 5,
-               gridRowEnd: 8,
-              },
+              // {
+              //  name:"chart_last_broadcast",
+              //  gridColumnStart: 3,
+              //  gridColumnEnd: 5,
+              //  gridRowStart: 5,
+              //  gridRowEnd: 8,
+              // },
               {
                name:"table_top_performing_emails",
                gridColumnStart: 1,
@@ -509,19 +509,6 @@ export function Reports({history, match}) {
     }
   ];
 
-  let defaultTab = 0;
-  tabs.forEach((tab,i)=>{
-    if(tab.route === reportRoute){
-      defaultTab = i
-    }
-  });
 
-  const [selectedPanel, setSelectedPanel] = useState(defaultTab);
-
-  const handlePanelChange = (event, newValue) => {
-    history.push('/reports/'+tabs[newValue].route)
-    setSelectedPanel(newValue);
-  };
-
-  return <TabPanel tabs={tabs} selectedPanel={selectedPanel} handlePanelChange={handlePanelChange} history={history} />;
+  return <TabPanel tabs={tabs} enableRouting={true} history={history} match={match} />;
 }
