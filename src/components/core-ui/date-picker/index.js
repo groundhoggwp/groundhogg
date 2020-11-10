@@ -3,6 +3,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
+import { DateTime } from 'luxon';
+import { useState, useRef, useEffect, Fragment } from '@wordpress/element';
 
 const useStyles = makeStyles((theme) => ({
   textField: {
@@ -13,33 +15,41 @@ const useStyles = makeStyles((theme) => ({
 export default function DatePickers({selectedDate, dateChange, label, id}) {
   const classes = useStyles();
 
-  const handleChange = (ele, here) => {
-    console.log('handle change')
-  };
-  const handleAccept = (ele, here) => {
-    console.log(ele.target, here)
-    console.log(ele.target.value, here)
-    // dateChange.bind(this, id)
-    // setAttributes({
-    //   text: value,
-    // });
-  };
+  const [date, setDate] = useState( selectedDate );
 
-  const handleMonthChange = () =>{
-    console.log('month change')
+  const validDateChange = (newDate) => {
+    // May need to enhance this logic for multi month/year changes
+    // console.log(Math.abs(diffInMonths.as('days')) % 30);
+
+    // Block Month Changes
+    if(DateTime.fromISO(date).plus({ months: 1 }).toISODate() === newDate){
+      return false;
+    }
+    if(DateTime.fromISO(date).minus({ months: 1 }).toISODate() === newDate){
+      return false;
+    }
+
+    return true;
   }
-        // onChange={dateChange.bind(this, id)}
+
+  const handleChange = (ele) => {
+    const newDate = ele.target.value;
+
+    if(validDateChange(newDate)){
+      dateChange(id, newDate);
+    }
+
+    setDate(newDate);
+  };
   return (
     <form  noValidate>
       <TextField
         type='date'
         className={classes.textField}
         id={id}
-        label={label}        
+        label={label}
         value={selectedDate}
         onChange={handleChange}
-        onAccept={handleAccept}
-        onMonthChange={handleMonthChange}
         KeyboardButtonProps={{
           'aria-label': 'change date',
         }}

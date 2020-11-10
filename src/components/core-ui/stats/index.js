@@ -16,7 +16,7 @@ import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 
 
 const Stats = ({ title, data, gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd }) => {
-  console.log('stats', gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd)
+  // console.log('stats', gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd)
   const useStyles = makeStyles((theme) => ({
     root: {
       display: 'inline-block',

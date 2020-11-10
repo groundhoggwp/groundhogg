@@ -1,6 +1,6 @@
-=== CRM, Email & Marketing Automation for WordPress - Groundhogg ===
+=== WordPress CRM, Email & Marketing Automation for WordPress | Award Winner — Groundhogg ===
 Contributors: trainingbusinesspros, Groundhogg, Dhrumit, Adrian Tobey
-Tags: crm, email, marketing, automation, newsletters
+Tags: wordpress crm, marketing automation, crm, email marketing, email automation
 Donate link: https://www.groundhogg.io/try/
 Requires at least: 4.9
 Tested up to: 5.5
@@ -9,128 +9,237 @@ Stable tag: trunk
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
-Create funnels, email campaigns, newsletters, marketing automation and have a CRM all within your WordPress website.
+The best WordPress CRM & Marketing Automation plugin. Create funnels, email campaigns, newsletters, marketing automation, and have a CRM all within your WordPress website.
 
 == Description ==
 
-## ATTENTION MARKETERS, AGENCIES, FREELANCERS, STORE OWNERS, PODCASTERS & WORDPRESS AFICIONADOS!
+WordPress CRM, Email & Marketing Automation
 
-Want to launch your marketing strategy right now? **We can help!**
+👉 [Official Site](https://groundhogg.io/) | 📃 [Documentation](https://help.groundhogg.io/) | 🎓 [Groundhogg Academy](https://academy.groundhogg.io/)
 
-Simplify, consolidate and automate your sales and marketing so you can save valuable time and get better results faster than ever before.
+🌎 [Facebook Group](https://www.facebook.com/groups/groundhoggwp/) | 📺 [YouTube Channel](https://www.youtube.com/groundhogg)
 
-**Marketing Automation** is one of the most effective tools that can help you build your list and generate more revenue for your business.
+🚀 [Free Quickstart Course — Launch your first funnel!](https://academy.groundhogg.io/course/groundhogg-quickstart/)
 
-With Groundhogg you can turn your static blog, e-commerce store or membership site into a personalized customer journey that will help you create more raving fans and maximize profits.
+🏆 [2020 Gold Stevie Award Winner](https://www.groundhogg.io/press/gold-2020-stevie-award-winner-our-first-award/)
 
-Groundhogg is the only open source Marketing Automation tool of its kind, built for power WordPress users. Imagine having your CRM, Email Marketing, SMS Marketing and more, all contained in your Wordpress environment! This allows for power users to execute real ninja moves as you design the ideal customer journey for your visitors and users. And you do it all without ever leaving your WordPress site!
+## Join 2,000+ Small Businesses in 35+ Countries!
+### Never let another lead get away!
 
-### GROUNDHOGG IS PERFECT FOR:
+[youtube https://youtu.be/8S-9jhBiHrI]
 
-* Capturing leads and learning more about your customers
-* Creating marketing automation strategies
-* Sending personalized email and text messages
-* Collecting unlimited customer data
-* Profiling subscribers
-* Automating the customer journey
-* Improving e-commerce sales
-* Increasing membership retention
-* Sending newsletters to your list
-* And so much more...
+Groundhogg can help you dramatically improve how you acquire leads and make more sales!
 
-Groundhogg is the perfect alternative to [Infusionsoft, HubSpot, Actionetics, ActiveCampaign, ConvertKit, MailChimp and many other expensive third-party apps](https://www.groundhogg.io/comparison/).
+Our award winning WordPress CRM is the very best alternative to [Infusionsoft](https://groundhogg.io/comparison/groundhogg-vs-infusionsoft/), [ActiveCampaign](https://groundhogg.io/comparison/groundhogg-vs-activecampaign/), [Convertkit](https://www.groundhogg.io/comparison/convertkit/), [HubSpot](https://groundhogg.io/comparison/groundhogg-vs-hubspot/), [MailChimp](https://www.groundhogg.io/comparison/mailchimp/) and [other SaaS platforms](https://www.groundhogg.io/comparison/).
 
-### CUT COSTS, NOT FEATURES
+You don’t have to sacrifice features when you switch to our self-hosted solution. In fact you can **[save $1,000s per year](https://www.groundhogg.io/comparison/)** and have the added benefit of owning all your information.
 
-Go ahead, compare Groundhogg to any SaaS product side by side! The savings alone will make you go “wow!” In addition, here are Groundhogg’s super powers:
+If you are an agency, WaaS, WordPress developer, LMS/Course Creator, WordPress freelancer, or CRM implementation service provider then this is for you.
 
-* **Send Unlimited Emails** — Groundhogg does not impose a limit on the number of emails you send.
-* **Collect Unlimited Contacts** — Groundhogg does not impose a limit on the number of contacts you can have.
-* **Deep WordPress Integration** — Being a WordPress plugin, we are deeply integrated with WP so that setup is minimal.
-* **Unlimited Custom Fields** — Collect an unlimited amount of data about your customers to help you make crucial decisions about your business.
-* **Drag & Drop Email Builder** — Our email builder allows you to create beautiful looking emails that can be viewed without issue in every email client including the oldest versions of outlook.
-* **Automated FunnelStepsContainer Builder** — *La piece de resistance,* Our funnel builder is the ultimate tool that will allow you to design high converting customer journeys that integrate with your favorite WordPress tools.
-* **Import & Export EVERYTHING** — Everything in Groundhogg can be exported and imported into any other website in seconds! Emails, Funnels, Contacts, Settings, EVERYTHING! This makes sharing strategies with customers or clients a breeze.
-* **Share Marketing Strategies** — Push your funnels from one site to another. Groundhogg makes sharing strategies with customers or clients a breeze.
+## 💸 Eliminating the "Success Tax"
 
-And there is so much more that Groundhogg can do for you.
+Other SaaS (Software as a Service) CRM platforms will charge you more as your list grows.
 
-### WHY IS GROUNDHOGG A GAME CHANGER?
+But not us!
 
-* **YOU OWN YOUR DATA** — You’ve heard the horror stories of the businesses that didn’t pay their CRM bill and they lost all their data. With Groundhogg all your data is contained in your WordPress site! This means whether you upgrade, downgrade or pay nothing, you never lose your data!
-* **SHORT LEARNING CURVE** — A lot SaaS products inundate you with a huge feature set and really steep learning curve. It’s almost like you have to learn a new language! Not with Groundhogg. We make it easy by providing you with concrete instructions, templates, and videos in [Groundhogg Academy](https://academy.groundhogg.io). If you know something about WordPress, you’ll get this marketing automation tool fast!
-* **IT'S OPEN SOURCE** — It’s a no brainer. Why rent when you can own? Because Groundhogg is open source you can make any modifications you need to tailor Groundhogg perfectly to your business.
-* **LOCKED IN PRICING** — The business model of our competitors is to lock you in with their features so that it becomes too painful to leave, and charge you more every time your list grows. We think that sucks, and that’s why we’ve worked hard to build tools that put you back in control. When your list grows, your price stays the same.
-* **25+ NATIVE INTEGRATIONS** — Groundhogg integrates seamlessly with many popular WordPress plugins like WooCommerce, LifterLMS, Zapier, LearnDash, ThriveCart etc. [Go here to see all Extensions!](https://www.groundhogg.io/downloads/)
-* **ACTIVE COMMUNITY** — We have an active [Facebook Community](https://www.groundhogg.io/fb/) where users share their high value knowledge and answer questions when you need answers. Office hours and weekly discussions also provide an opportunity for you to speak directly with the Groundhogg team.
+When using Groundhogg free or with any of our paid plans, _we'll never charge you more_!
 
-### WHAT IS INCLUDED IN THE FREE PLUG IN?
+### 🚫 There are *no limits* on:
 
-Groundhogg guarantees that you can...
+* Number of contacts
+* Number of funnels or automations
+* Number of emails sent
 
-* Send Emails
-* Create Funnels
-* Complete CRM
-* Send Broadcasts
-* Top Tier Reporting
-* Lead Source Tracking
-* CASL/GDPR Compliant
-* REST API
+Groundhogg will **never** limit you on the amount of **anything**! Unlike [other SaaS platforms](https://www.groundhogg.io/comparison/).
 
-You can buy addons and extensions separately. Or upgrade to a plan at any time without losing any of your data.
+## 🔎 At A Glance
 
-[Upgrade to a paid plan to get…](https://www.groundhogg.io/pricing/)
+* Organize and segment your contacts to sned more relevant communications.
+* Automate your communications to save you time and increase your productivity.
+* Collect data and mine your list so you can stop bleeding money. "The money is in the list!"
+* Own your data so you’ll never be at the mercy of a SaaS company again.
+* Control your expenses! There are NO LIMITS on how many contacts and users you can have! Groundhogg grows with you! Your costs do NOT increase when your lists grows. We don’t tax you for scaling up!
+* Translate & configure into any language.
 
-* Integrations with 25+ WordPress plugins and services.
-* 15+ extensions to improve Groundhogg and add additional features
-* Premium technical support
+## 🌎 We care! Join our Community!
 
-### WHO CAN USE GROUNDHOGG TO GROW?
+Groundhoggers are very generous with their business intelligence. Just as the Groundhogg team is deeply committed to helping!  So we create lots of tools to help you succeed.
 
-Groundhogg is designed for...
+* 🚀 [**Free** 1-Hour Quickstart Course!](https://academy.groundhogg.io/course/groundhogg-quickstart/)
+* 🌎 Community care & support in the [open Facebook group!](https://www.facebook.com/groups/groundhoggwp/)
+* 📺 Over **60 hours** of easy Groundhogg [Youtube tutorials!](https://www.youtube.com/groundhogg)
+* 📃 Use our [Knowledge Centre](https://help.groundhogg.io/) to get the answers you need.
+* 🎙️ Ask your burning questions in **Office Hours** on our _live Facebook stream every Tuesday!_
 
-* Podcasters
-* Mom & Pop Shops
-* Course Creators
-* Bloggers
-* Membership sites
-* Physical product stores
-* Digital product stores
-* Agencies
-* Freelancers
-* Non-Profits
-* Charities
-* Startups
-* Artists
-* Real Estate Agents & Brokers
+## 🤷‍♂️ Who can benefit from Groundhogg?
 
-**Anyone who can benefit from collecting an email address can benefit from using Groundhogg!**
+Groundhogg is being used by a wide variety of 2,000+ businesses in over 35+ countries. The diversity of use cases is huge!
 
-### JOIN OUR COMMUNITY
+If you're business is using WordPress, you can use Groundhogg.
 
-Join our [Facebook group](https://www.groundhogg.io/fb/) to talk to others who are using Groundhogg to grow their business.
+Here are some of the more common use cases:
 
-### ABOUT US
+* Digital Marketing Agencies
+* WordPress Freelancers
+* LifterLMS, LearnDash, or TutorLMS sites
+* WooCommerce Sites
+* WaaS Multisite Platforms
+* Blogs and News Sites
+* Coaches and Trainers
+* Educators and Public Speakers
+* Business Directories
+* And many more!
 
-We used to be a digital marketing agency that would implement many different SaaS CRM products for our clients.
+## 💡 Made by people who know CRM & Marketing Automation!
 
-Over time we grew frustrated with the common issues we faced with implementing SaaS products for our clients. They were too expensive, too complicated, and lacked a decent integration with WordPress.
+Our team is based in Toronto, Canada! We've been helping small businesses implement CRM and Marketing Automation since 2014 working with tools like Infusionsoft, ActiveCampaign and HubSpot.
 
-We decided to build our own tool that would help us move faster and get better results for our customers.
+After some time, it became apparent that there was a desperate need in the WordPress ecosystem for a capable CRM and Marketing Automation tool for WordPress site owners.
 
-Today, we are helping more than 800+ businesses in 30+ countries reach their audiences and grow their lists.
+One that could match SaaS platforms on features and reliability did not yet exist, so we built it!
+
+Starting in 2018, Adrian Tobey (founder) and his team took their combined 20+ years of experince in the CRM and Marketing Automation industry to create a better option for WordPress based businesses.
+
+We know funnels, CRM, and automation like the back of our hands!
+
+You can trust us to not only provide you with stellar software and support, but also provide you guidance on the kinds of funnels and automation you should be building to get maximum value from our products.
+
+[youtube https://youtu.be/e-_QCUtdghw]
+
+## ❤️ Businesses Love Groundhogg!
+
+2,000+ businesses in 35+ countries are using Groundhogg to launch their funnel, grow their list and scale their business.
+
+Here's what a few of them had to say about our products and support!
+
+From 👨  **[Chris Badget](https://wordpress.org/support/topic/best-crm-and-marketing-automation-for-wordpress/)**, _CEO of [LifterLMS](https://www.groundhogg.io/best-lifterlms-crm/)_
+
+> Great team, great product, and works with all the key WordPress tools I’m using.
+> So nice to be able to do broadcast emails, tagging, and marketing automation all from inside my WordPress website.
+
+From 👨‍🦱 **[Francisco Opazo](https://www.groundhogg.io/best-buddyboss-crm/)**, _Marketing Manager at [BuddyBoss](https://www.groundhogg.io/best-buddyboss-crm/)_
+
+> Groundhogg is essential for many community builders, course creators, and membership site owners to achieve higher rates of engagement and retention. It simplifies many complex processes including onboarding, email marketing, funnels, and enables you to scale your marketing efforts more efficiently.
+
+From 👨 **[Jonathan Denwood](https://wordpress.org/support/topic/great-crm-product/)**, _Podcaster & Owner of WP-Tonic Agency_
+
+> Adrian and his team have really built a great WordPress based CRM that’s really competitive with the big guys like ActiveCampagin. I would highly recommend it to anybody who is running WordPress.
+
+There are over [66 ⭐⭐⭐⭐⭐ reviews](https://wordpress.org/support/plugin/groundhogg/reviews/?filter=5) for Groundhogg on WordPress.org and even [more reviews on our Facebook Page](https://www.facebook.com/groundhoggwp/reviews/)!
+
+## Features
+
+Here are the tools you can use to launch your funnel, grow your list, and scale your business faster!
+
+### 🕺 Straightforward Contact Management
+
+* Segmentation with tags
+* Unlimited custom fields
+* Activity and email history
+* Profile picture
+* Automatic location discovery
+* Notes
+* CSV importing & exporting
+* Sync with WordPress users
+
+### ⚙️ Funnels & Automation Features
+
+* Create highly effective customer journeys with our easy to learn funnel builder.
+* Over 30+ integrations available to connect with your favorite WordPress plugins.
+* Create simple funnels or complex ones!
+* Measure the effectiveness of your funnels with easy to read metrics.
+* Start funnels from forms, payments, or new users, and more!
+* Open API to add your own benchmarks & actions.
+
+### 📧 Simple Email Marketing
+
+* 2 Editors to choose from.
+* Plain Text Editor or Drag & Drop Editor
+* Use images, headers, paragrapgh and more.
+* Simple preview & testing.
+* Perfect for sales emails, newsletters, transactional notifications and more.
+* Send broadcast emails to your lists.
+* Distinguish between **transactional** and **marketing** emails.
+
+### 📈 Unmatched Analytics Reporting
+
+* We track EVERYTHING!
+* Granular details of how your site is performing.
+* See open rates, click through rates and conversions at a glance.
+* Detailed results from your funnels and broadcast emails.
+* Integrate with Ecommerce to see revenue from your marketing.
+* Learn more about your audience with demographic reporting.
+* See which funnels/emails are underperforming.
+
+### 🇪🇺 GDPR Ready
+
+* Simple GDPR features to keep you compliant
+* Automatic preferences center, data download, and opt out.
+* Track GDPR consent
+* Prevent marketing to those who withdraw consent.
+
+## 🙌 Get more with premium features!
+
+Groundhogg has 45+ extensions to help you expand and integrate Groundhogg to help you build your all in one solution.
+
+👉 Bundle all of our incredible premium features into a [flat rate plan](https://www.groundhogg.io/pricing/). [Yearly](https://www.groundhogg.io/pricing/) & [monthly](https://www.groundhogg.io/pricing/monthly/) options available.
+
+You can also use our **[⏱️ 14 day $1 demo](https://www.groundhogg.io/try/)** to see a preview of these stellar features.
+
+Over **[24+ extensions](https://www.groundhogg.io/downloads/category/add-ons/)** to help you handle more...
+
+* [Custom SMTP](https://www.groundhogg.io/downloads/smtp/)
+* [Advanced Email Preferences](https://www.groundhogg.io/downloads/advanced-preferences/)
+* [Superlinks](https://www.groundhogg.io/downloads/advanced-features/)
+* [Lead Scoring](https://www.groundhogg.io/downloads/lead-scoring/)
+* [Booking Calendars](https://www.groundhogg.io/downloads/booking-calendar/)
+* [Social Proof Popups](https://www.groundhogg.io/downloads/proof/)
+* [Signed Contracts](https://www.groundhogg.io/downloads/contracts/)
+* [Company Management](https://www.groundhogg.io/downloads/companies/)
+* [Sales Pipeline](https://www.groundhogg.io/downloads/pipeline/)
+* [Birthday Automation](https://www.groundhogg.io/downloads/birthdays/)
+* And [many more...]()
+
+Over **[30+ integrations](https://www.groundhogg.io/downloads/category/integrations/)** to connect to your favorite WordPress plugins. Integrate with...
+
+* **[LifterLMS](https://www.groundhogg.io/best-lifterlms-crm/)** | _[FREE COURSE](https://academy.groundhogg.io/course/course-creator-essentials/)_
+* **[LearnDash](https://www.groundhogg.io/best-learndash-crm/)** | _[FREE COURSE](https://academy.groundhogg.io/course/course-creator-essentials/)_
+* **[BuddyBoss](https://www.groundhogg.io/best-buddyboss-crm/)** | _[FREE COURSE](https://academy.groundhogg.io/course/essentials-funnels-for-buddyboss/)_
+* [WooCommerce](https://www.groundhogg.io/downloads/woocommerce/)
+* [Elementor](https://www.groundhogg.io/downloads/elementor/)
+* [Amazon Web Services](https://www.groundhogg.io/downloads/aws/)
+* [SendGrid](https://www.groundhogg.io/downloads/sendgrid-integration/)
+* [AffiliateWP](https://www.groundhogg.io/downloads/affiliatewp-integration/)
+* [ThriveCart](https://www.groundhogg.io/downloads/thrivecart/)
+* [WPForms](https://www.groundhogg.io/downloads/wpforms/)
+* And [many more...](https://www.groundhogg.io/downloads/category/integrations/)
+
+## ⏱️ Want to test out premium?
+
+If you'd like a trial of our premium plans, please check out our [$1 sandbox demo](https://www.groundhogg.io/try/).
+
+## Milestones
+
+* Groundhogg **3.0!** _Coming Q1 2021._
+* Serving 2,000+ businesses in 35+ countries.
+* ⭐⭐⭐⭐⭐ rated software and support!
+* 40+ Certified partners.
+* 🏆 [Gold Stevie Award 2020](https://www.groundhogg.io/press/gold-2020-stevie-award-winner-our-first-award/) for Tech Start up of the Year _(American Business Awards)_.
+* 🏅 Best Software Innovation 2020 finalist _(Canadian Search Awards)_.
 
 [](http://coderisk.com/wp/plugin/groundhogg/RIPS-RLU9faYUDI)
 
 == Screenshots ==
-1. Drag and drop steps in any order to create your sales funnel.
-2. View funnel reports to help optimize your sales process.
-3. Choose from a variety of actions to to communicate with your customers.
-4. Choose from a variety of benchmarks to start and move customers through your funnels.
-5. Write personalized emails and send them right from WordPress.
-6. Send out mass emails to your list whenever you want.
-7. keep customer info up to date, pull reports and more with your CRM.
-8. Know your KPIs with your executive dashboard reports.
+1. Meet the team!
+2. Drag and drop steps in any order to create your sales funnel.
+3. View funnel reports to help optimize your sales process.
+4. Choose from a variety of actions to to communicate with your customers.
+5. Choose from a variety of benchmarks to start and move customers through your funnels.
+6. Write personalized emails and send them right from WordPress.
+7. Send out mass emails to your list whenever you want.
+8. keep customer info up to date, pull reports and more with your CRM.
+9. Know your KPIs with your executive dashboard reports.
+10. Choose from easy to use funnel templates to get started faster.
 
 == Installation ==
 = Plugin Repo =
@@ -153,11 +262,26 @@ Today, we are helping more than 800+ businesses in 30+ countries reach their aud
 = Does Groundhogg need any additional marketing software like MailChimp? =
 No, Groundhogg is a completely standalone, lightweight marketing system designed to keep you in the black, even when it comes to your monthly software bill.
 
-= Does Groundhogg have any monthly fee or required upgrades? =
+= Does Groundhogg require and external transactional email service like SendGrid? =
+No, but it is **highly** recommended. Without a proper transactional email service your emails are likely to end up in spam.
+
+Groundhogg provides a number of recommended solutions:
+
+* [MailHawk](https://mailhawk.io/)
+* [SendGrid](https://www.groundhogg.io/downloads/sendgrid-integration/)
+* [AWS SES](https://www.groundhogg.io/downloads/aws/)
+* [Elastic Email](https://www.groundhogg.io/downloads/elastic-email-integration/)
+* [Basic SMTP](https://www.groundhogg.io/downloads/smtp/) for other services.
+
+Groundhogg will automatically use the mail solution you have configured on your WordPress website.
+
+= Does Groundhogg have any required monthly fee or upgrades? =
 No, you can use Groundhogg for free forever. Groundhogg is a Open Source project designed to democratize email marketing and provide simple easy to use tools to new and none tech savvy business owners.
 
+That being said, our [premium upgrades](https://www.groundhogg.io/pricing/) can seriously help your business! Use our proven tools and strategies to supercharge your marketing and WordPress site!
+
 = Does Groundhogg connect to Woocommerce or other plugins? =
-Yes, you can find our Official [Woocommerce](https://groundhogg.io/downloads/woocommerce) extension on our site among other extensions for other popular plugins.
+Yes, Groundhogg can [integrate with over 30+](https://www.groundhogg.io/downloads/category/integrations/) of the most popular WordPress plugins around.
 
 = Does Groundhogg work with my theme? =
 Groundhogg is theme agnostic, meaning it will work with every and any theme. Groundhogg is mostly administrative and very little is seen by visitors.
@@ -166,7 +290,7 @@ Groundhogg is theme agnostic, meaning it will work with every and any theme. Gro
 Yes, Groundhogg has a very smart tracking system that will allow you to monitor your clients interactions with your emails and your site.
 
 = Does Groundhogg Integrate with my membership plugin? =
-YEs, Groundhogg has a builtin connection with the WordPress user API, meaning it will automatically use user roles in your site, like from a membership plugin.
+Yes, Groundhogg has a builtin connection with the WordPress user API, meaning it will automatically use user roles in your site, like from a membership plugin.
 
 = Is Groundhogg secure? =
 We follow all best WordPress security practices. Plus it's open source, so we have a large community looking out for potential weaknesses when it comes to your data.
@@ -177,7 +301,20 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 = Is Groundhogg better than my current CRM/Marketing Automation tool? =
 Well, that's up to you! We'll never say Groundhogg is better than anyone, but it is **different.** And sometimes different is better than better.
 
+= Where can I upgrade to premium? =
+You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
+
+= Are monthly billing options available for premium? =
+Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/monthly/).
+
 == Changelog ==
+
+= 2.2.20 (2020-11-04) =
+* Updated `readme.text`
+* Various fixes and tweaks
+* Add support for detecting `HTTP_CF_CONNECTING_IP` header.
+* Add `do_replacements` to the reply-to override.
+* Fix permissions callbacks in open API endpoints.
 
 = 2.2.19.5 (2020-09-28) =
 * TWEAKED Merged autocomplete meta picker from ACMF extension into core.
@@ -315,7 +452,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 = 2.2.10 (2020-05-26) =
 * ADDED Reporting links in email & funnels table for easy access to reports.
-* FIXED "View FunnelStepsContainer" link on the funnel report page causing fatal error because of incorrect field name.
+* FIXED "View Funnel" link on the funnel report page causing fatal error because of incorrect field name.
 
 = 2.2.9 (2020-05-25) =
 * ADDED [MailHawk](https://mailhawk.io) as a recommended email service.
@@ -426,7 +563,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 = 2.1.13.6 (2020-03-02) =
 * TWEAKED Make usage tracking GDPR compliant.
-* TWEAKED FunnelStepsContainer events are given higher priority than broadcast events in the event queue.
+* TWEAKED Funnel events are given higher priority than broadcast events in the event queue.
 * TWEAKED The marketable status of a contact will be checked before scheduling any broadcast emails.
 * FIXED Ajax Form Submission not working.
 * FIXED checkbox required attribute not added in HTML.
@@ -581,7 +718,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 = 2.1.7 (2019-12-03) =
 * TWEAKED Whole new welcome page UI. Goodbye to the BG image and docs/extensions. New welcome page is just focused on education.
-* TWEAKED FunnelStepsContainer builder UI now takes over the whole screen for the best editing experience.
+* TWEAKED Funnel builder UI now takes over the whole screen for the best editing experience.
 * TWEAKED Overall improvement of the layout of the funnel builder and js event management.
 * TWEAKED {files} will not longer take any parameters, just simply list the files in the filebox.
 * TWEAKED Re-designed the guided setup onboarding experience.
@@ -667,7 +804,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * ADDED Template library to replace builtin templates.
 * TWEAKED Better guided setup onboarding experience.
 * FIXED Some special characters not being accepted in first & last name fields.
-* REMOVED SMS, Superlinks, Advanced Email Editor, Advanced FunnelStepsContainer Steps.
+* REMOVED SMS, Superlinks, Advanced Email Editor, Advanced Funnel Steps.
 
 = 2.0.12.2 (2019-10-22) =
 * FIXED Bounce checker running even if settings are not setup
@@ -805,7 +942,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * FIXED Bug where nested replacements caused fatal error.
 
 = 2.0.9.7 (2019-09-06) =
-* ADDED Step to reset tags in the event of a failed install.
+* ADDED Action to reset tags in the event of a failed install.
 * FIXED Various recommendations from the WP Plugin team
 * FIXED Import function for contacts not working.
 
@@ -1039,7 +1176,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * ADDED Pie chart of optin status report
 * ADDED Tools menu item.
 * ADDED Admin menu base class for use in extensions.
-* TWEAKED FunnelStepsContainer Breakdown will now also feature a line chart of contact progress
+* TWEAKED Funnel Breakdown will now also feature a line chart of contact progress
 * TWEAKED Emails sent using the Groundhogg Sending Service will not longer use wp_mail as backup for error reporting purposes
 * TWEAKED The Groundhogg Sending Service url is now aws.groundhogg.io to improve the speed of requests.
 * FIXED Confirmation emails not skipping if email is already confirmed.
@@ -1075,7 +1212,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 = 1.1.4 =
 * ADDED Search form to welcome page for docs help
-* ADDED Distinct helper methods to FunnelStepsContainer Parent Class
+* ADDED Distinct helper methods to Funnel Parent Class
 * TWEAKED Welcome page now queries docs direct from documentation site
 * TWEAKED Welcome page now queries extensions direct from store
 * TWEAKED Stats collection will retrieve display_name
@@ -1346,7 +1483,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * TWEAKED added new code for the default form.
 
 = 1.0.11 =
-* ADDED New FunnelStepsContainer Reporting Graph at top of funnel when in reporting mode.
+* ADDED New Funnel Reporting Graph at top of funnel when in reporting mode.
 * ADDED compatibility for modal outside of funnel editor.
 * TWEAKED New form build improvements. Popup UI for adding fields in the form builder.
 
@@ -1423,7 +1560,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * TWEAKED if global multisite setting is enabled you can choose to only run an event if the associated step can be run by the current blog.
 
 = 1.0.6 =
-* Added FunnelStepsContainer updates automatically when the modal closes.
+* Added Funnel updates automatically when the modal closes.
 * Added Contacts which have unconfirmed emails will show as (Unconfirmed) int he table view
 * Added new wpgh_get_contact( $id_or_email ) function instead of new WPGH_Contact
 * Fixed removed console.log() calls.
@@ -1458,14 +1595,14 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 
 = 1.0.2 =
 * Added WPGH_Form instance to wpgh_form_code filter
-* Added Columns and Rows to the FunnelStepsContainer Form Editor
+* Added Columns and Rows to the Funnel Form Editor
 * Added base class CSS for frontend forms
 * Fixed text editor bar is now sticky when scrolling.
 
 = 1.0.1 =
 * Changed to a vastly superior layout in the funnel editor.
 * Fixed load funnel editor scripts in head rather than in footer.
-* Changed editing view for emails to make similar to new FunnelStepsContainer Editor layout.
+* Changed editing view for emails to make similar to new Funnel Editor layout.
 * Fixed load email editor scripts in head instead of footer.
 
 = 1.0 =
@@ -1524,7 +1661,7 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 * Added last_optin to submission
 
 = 0.9.9 =
-* Finished implementing the Create User Step.
+* Finished implementing the Create User Action.
 * Fixed bug where add from previous emails gives a warning.
 * Tracking now uses the Logged in user as a contact if it exists so that if you're logged in replacement codes
 among other functionality will work on the front end.

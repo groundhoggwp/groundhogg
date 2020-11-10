@@ -396,6 +396,7 @@ function decrypt( $data ) {
  * @return mixed
  */
 function get_array_var( $array, $key = '', $default = false ) {
+
 	if ( isset_not_empty( $array, $key ) ) {
 		if ( is_object( $array ) ) {
 			return $array->$key;
@@ -4035,4 +4036,15 @@ function id_list_to_class( $list, $class ){
     return array_map( function ( $id ) use (&$class){
         return new $class($id);
     }, wp_parse_id_list( $list ) );
+}
+
+/**
+ *
+ *
+ * @param $time
+ *
+ * @return false|string
+ */
+function ymd_his( $time=false ){
+    return date( 'Y-m-d H:i:s', $time || time() );
 }

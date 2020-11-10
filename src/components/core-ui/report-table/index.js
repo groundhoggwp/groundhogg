@@ -1,29 +1,19 @@
-import React from 'react';
+import * as React from 'react';
+import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
 import Card from "@material-ui/core/Card";
-
-
 
 const ReportTable = ({title, data, gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd}) => {
   const useStyles = makeStyles({
     root:{
       position:'relative',
       paddingTop: '53px',
-      margin: '10px',
       gridColumnStart,
       gridColumnEnd,
       gridRowStart,
       gridRowEnd,
     },
     table: {
-      // minWidth: 650,
       width: '100%',
       height: '300px'
     },
@@ -39,53 +29,36 @@ const ReportTable = ({title, data, gridColumnStart, gridColumnEnd, gridRowStart,
 
   const classes = useStyles();
 
-
   if(!data.chart.data){
     return(<div/>)
   }
+
   if(data.chart.data.length === 0){
-    return(<div/>)
+    return (
+      <Card className={classes.root}>
+        <div className={classes.title}>{title}</div>
+        <p>{data.no_data}</p>
+      </Card>
+    );
   }
 
-  const headers = data.chart.label.map((label)=>{
+  // Manual width calc is required because each container is dynamic and data grid can't use % then
+  const columnWidth = ((window.innerWidth-600)/(data.chart.label.length*2));
+  const columns = data.chart.label.map((label)=>{
     if(typeof(value)=== 'object'){
-      'Conversation Rate'
+      label = 'Conversation Rate';
     }
-    return label
+    return { field: label, headerName: label, width: columnWidth, align: 'left', sortable: true }
   });
 
-  const rows = data.chart.data.slice(0,5)
-
+  const rows = data.chart.data.map((data, i)=>{
+    return { id: i, [columns[0]['field']]: data.label, [columns[1]['field']]: data.data};
+  })
 
   return (
     <Card className={classes.root}>
       <div className={classes.title}>{title}</div>
-      <TableContainer component={Paper}>
-        <Table className={classes.table} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              {headers.map((header) => (
-                <TableCell>{header}</TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-          {
-            rows.map(row => {
-              return (<TableRow>
-                  {Object.values(row).map((value)=> {
-                    if(typeof(value)=== 'object'){
-                      return <TableCell>{value.data.title}</TableCell>
-                    } else {
-                      return <TableCell>{value}</TableCell>
-                    }
-                  })}
-                </TableRow>)
-            })
-          }
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <DataGrid rows={rows} columns={columns} pageSize={5} checkboxSelection={false} />
     </Card>
   );
 }

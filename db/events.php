@@ -80,11 +80,12 @@ class Events extends DB {
 			'time'           => '%d',
 			'micro_time'     => '%s',
 			'time_scheduled' => '%d',
+			'event_data'     => '',
 			'funnel_id'      => '%d',
 			'step_id'        => '%d',
 			'email_id'       => '%d',
 			'contact_id'     => '%d',
-			'event_type'     => '%d',
+			'event_type'     => '%s',
 			'error_code'     => '%s',
 			'error_message'  => '%s',
 			'status'         => '%s',
@@ -106,6 +107,7 @@ class Events extends DB {
 			'time'           => time(),
 			'micro_time'     => 0,
 			'time_scheduled' => time(),
+			'event_data'     => '',
 			'funnel_id'      => 0,
 			'step_id'        => 0,
 			'email_id'       => 0,
@@ -144,7 +146,7 @@ class Events extends DB {
 	 * Move events from this table to the event queue
 	 *
 	 * @param array $where
-	 * @param bool $delete_from_history whether to delete the records from the history table
+	 * @param bool  $delete_from_history whether to delete the records from the history table
 	 */
 	public function move_events_to_queue( $where = [], $delete_from_history = false ) {
 
@@ -197,16 +199,19 @@ class Events extends DB {
 	 *
 	 * @access  public
 	 *
-	 * @param $column
+	 * @since   2.1
+	 *
 	 * @param $row_id
 	 *
+	 * @param $column
+	 *
 	 * @return  object
-	 * @since   2.1
 	 */
 	public function get_by( $column, $row_id ) {
 		global $wpdb;
-		$column = esc_sql( $column );
+		$column  = esc_sql( $column );
 		$results = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $this->table_name WHERE `$column` = %s ORDER BY `ID` DESC LIMIT 1;", $row_id ) );
+
 		return apply_filters( 'groundhogg/db/get/' . $this->get_object_type(), $results );
 	}
 
@@ -270,12 +275,13 @@ class Events extends DB {
         time bigint(20) unsigned NOT NULL,
         micro_time float(8) unsigned NOT NULL,
         time_scheduled bigint(20) unsigned NOT NULL,
+        event_data longtext NOT NULL,
         queued_id bigint(20) unsigned NOT NULL,
         contact_id bigint(20) unsigned NOT NULL,
         funnel_id bigint(20) unsigned NOT NULL,
         step_id bigint(20) unsigned NOT NULL,
         email_id bigint(20) unsigned NOT NULL,
-        event_type int unsigned NOT NULL,
+        event_type varchar({$this->get_max_index_length()}) NOT NULL,
         error_code tinytext NOT NULL,
         error_message tinytext NOT NULL, 
         priority int unsigned NOT NULL,
@@ -296,6 +302,34 @@ class Events extends DB {
 		dbDelta( $sql );
 
 		update_option( $this->table_name . '_db_version', $this->version );
+	}
+
+	/**
+	 * Use strings for better management of event types, use instead of int, more unique
+	 *
+	 * @since 3.0
+	 */
+	public function change_event_type_to_varchar() {
+
+		global $wpdb;
+
+		$wpdb->query( "ALTER TABLE {$this->get_table_name()} MODIFY event_type varchar({$this->get_max_index_length()});" );
+
+		$mappings = [
+			1  => 'funnel',
+			2  => 'broadcast',
+			3  => 'email_notification',
+			98 => 'test_success',
+			99 => 'test_failure'
+		];
+
+		foreach ( $mappings as $old_int => $new_string ) {
+			$this->mass_update( [
+				'event_type' => $new_string
+			], [
+				'event_type' => $old_int
+			] );
+		}
 	}
 
 	/**

@@ -39,11 +39,12 @@ class Event extends Base_Object {
 	/**
 	 * Supported Event Types
 	 */
-	const FUNNEL = 1;
-	const BROADCAST = 2;
-	const EMAIL_NOTIFICATION = 3;
-	const TEST_SUCCESS = 98;
-	const TEST_FAILURE = 99;
+	const FUNNEL = 'funnel';
+	const BROADCAST = 'broadcast';
+	const WEBHOOK = 'webhook';
+	const EMAIL_NOTIFICATION = 'email_notification';
+	const TEST_SUCCESS = 'test_success';
+	const TEST_FAILURE = 'test_failure';
 
 	/**
 	 * @var Contact
@@ -68,8 +69,8 @@ class Event extends Base_Object {
 	/**
 	 * Event constructor.
 	 *
-	 * @param int $identifier_or_args
-	 * @param string $db allow for the passing of the db name, this allows the reference of the event_queue table OR the regular events table.
+	 * @param int    $identifier_or_args
+	 * @param string $db    allow for the passing of the db name, this allows the reference of the event_queue table OR the regular events table.
 	 * @param string $field the field to identify when querying the DB
 	 */
 	public function __construct( $identifier_or_args = 0, $db = 'events', $field = 'ID' ) {
@@ -145,7 +146,7 @@ class Event extends Base_Object {
 	 * @return int
 	 */
 	public function get_event_type() {
-		return absint( $this->event_type );
+		return $this->event_type;
 	}
 
 	/**
@@ -240,19 +241,7 @@ class Event extends Base_Object {
 	 * @return bool|Email
 	 */
 	public function get_email() {
-		switch ( $this->get_event_type() ) {
-			case Event::FUNNEL;
-				return new Email( absint( $this->get_step()->get_meta( 'email_id' ) ) );
-				break;
-			case Event::EMAIL_NOTIFICATION;
-				return new Email( $this->get_step()->get_id() );
-				break;
-			case Event::BROADCAST;
-				return new Email( $this->get_step()->get_object_id() );
-				break;
-		}
-
-		return false;
+		return new Email( $this->get_email_id() );
 	}
 
 	/**
@@ -275,43 +264,24 @@ class Event extends Base_Object {
 	 * @return void
 	 */
 	protected function post_setup() {
-
 		$this->contact = get_contactdata( $this->get_contact_id() );
+		$this->event_data = maybe_unserialize( $this->event_data );
+	}
 
-		switch ( $this->get_event_type() ) {
-			case self::FUNNEL:
-				$this->step = Plugin::$instance->utils->get_step( $this->get_step_id() );
-				break;
-			case self::EMAIL_NOTIFICATION:
-				$this->step = new Email_Notification( $this->get_step_id() );
-				break;
-			case self::BROADCAST:
-				$this->step = new Broadcast( $this->get_step_id() );
-				break;
-			case self::TEST_SUCCESS:
-				$this->step = new Test_Event_Success();
-				break;
-			case self::TEST_FAILURE:
-				$this->step = new Test_Event_Failure();
-				break;
-			default:
-				$class = apply_filters( 'groundhogg/event/post_setup/step_class', false, $this );
-
-				if ( class_exists( $class ) ) {
-					$this->step = new $class( $this->get_step_id() );
-				}
-
-				break;
-		}
-
-		do_action( 'groundhogg/event/post_setup', $this );
+	/**
+	 *
+	 *
+	 * @return bool|mixed
+	 */
+	public function get_event_data(){
+		return $this->event_data;
 	}
 
 	/**
 	 * Return whether the event is a funnel (automated) event.
 	 *
-	 * @return bool
 	 * @since 1.2
+	 * @return bool
 	 */
 	public function is_funnel_event() {
 		return $this->get_event_type() === self::FUNNEL;
@@ -364,17 +334,20 @@ class Event extends Base_Object {
 
 		$this->in_progress();
 
-		// No step or not contact?
-		if ( ! $this->get_step() || ! $this->get_contact() || ! $this->get_contact()->exists() ) {
+		// Get the registered callback for the given event type...
+		$run_callback = get_array_var( get_array_var( self::$event_types, $this->get_event_type() ), 'callback' );
 
-			$this->add_error( new \WP_Error( 'missing', 'Could not locate contact or step record.' ) );
+		if ( ! $run_callback ){
+			// no way to handle this...
 
 			$this->fail();
 
 			return apply_filters( 'groundhogg/event/run/failed_result', false, $this );
 		}
 
-		$result = $this->get_step()->run( $this->get_contact(), $this );
+
+		// Run the callback
+		$result = call_user_func( $run_callback, $this );
 
 		// Soft fail when return false
 		if ( ! $result ) {
@@ -534,4 +507,62 @@ class Event extends Base_Object {
 	}
 
 
+	/**
+	 * Holds the register event types...
+	 *
+	 * @var array
+	 */
+	public static $event_types = [];
+
+	/**
+	 * Register and event type
+	 *
+	 * @param $type
+	 * @param $callback
+	 */
+	public static function register_event_type( $type, $callback ) {
+		self::$event_types[ $type ] = [
+			'callback' => $callback
+		];
+	}
+
+	/**
+	 * Register all the default event types
+	 *
+	 * @type callable callback
+	 */
+	public static function register_default_event_types() {
+
+		$event_types = [
+			[
+				'type'     => 'funnel',
+				'callback' => [ Step::class, 'event_callback' ]
+			],
+			[
+				'type'     => 'email_notification',
+				'callback' => [ Email_Notification::class, 'event_callback' ],
+			],
+			[
+				'type'     => 'broadcast',
+				'callback' => [ Broadcast::class, 'event_callback' ],
+			]
+		];
+
+		foreach ( $event_types as $event_type ) {
+			self::register_event_type( $event_type['type'], $event_type['callback'] );
+		}
+
+	}
+
+	/**
+	 * Serialize the event data
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	protected function sanitize_columns( $data = [] ) {
+		map_func_to_attr( $data, 'event_data', 'maybe_serialize' );
+		return $data;
+	}
 }

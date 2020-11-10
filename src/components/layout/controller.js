@@ -54,7 +54,8 @@ export const getPages = () => {
 		icon : BarChartIcon,
 		label: __( 'Reports' ),
 		name: 'reports',
-		path: '/reports',
+		path: '/reports/:report',
+		link: '/reports/overview',
 		priority: 10
 	} );
 
@@ -73,6 +74,7 @@ export const getPages = () => {
 		icon : PeopleIcon,
 		label: __( 'Contacts' ),
 		path: '/contacts',
+		link: '/contacts',
 		name: 'contacts',
 		priority: 20
 	} );
@@ -83,6 +85,7 @@ export const getPages = () => {
 		label: __( 'Tags' ),
 		name: 'tags',
 		path: '/tags',
+		link: '/tags',
 		priority: 30
 	} );
 
@@ -90,8 +93,9 @@ export const getPages = () => {
 		component: Emails,
 		icon : EmailIcon,
 		label: __( 'Emails' ),
-		name: 'reports',
+		name: 'emails',
 		path: '/emails',
+		link: '/emails',
 		priority: 40
 	} );
 
@@ -101,6 +105,7 @@ export const getPages = () => {
 		label: __( 'Funnels' ),
 		name: 'funnels',
 		path: '/funnels',
+		link: '/funnels',
 		priority: 50
 	} );
 
@@ -119,6 +124,7 @@ export const getPages = () => {
 		label: __( 'Settings' ),
 		name: 'settings',
 		path: '/settings',
+		link: '/settings',
 		priority: 60
 	} );
 
@@ -144,7 +150,7 @@ export class Controller extends Component {
 	}
 
 	render() {
-		const { page, match, location } = this.props;
+		const { page, match, location, history } = this.props;
 		const { url, params } = match;
 		const query = this.getQuery( location.search );
 
@@ -155,6 +161,9 @@ export class Controller extends Component {
 					path={ url }
 					pathMatch={ page.path }
 					query={ query }
+					match={match}
+					location={location}
+					history={history}
 				/>
 			</Suspense>
 		);
