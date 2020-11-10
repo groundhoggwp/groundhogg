@@ -399,7 +399,7 @@ class Contact extends Base_Object_With_Meta {
 		];
 
 		if ( $context == 'user' && ! $user_id ) {
-			$notes['user_id'] = get_current_user_id();
+			$notes[ 'user_id' ] = get_current_user_id();
 		}
 
 		get_db( 'contactnotes' )->add( $notes );
@@ -530,7 +530,7 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @param $user WP_User|int
 	 */
-	public function change_owner( $user ){
+	public function change_owner( $user ) {
 
 	}
 
@@ -713,9 +713,9 @@ class Contact extends Base_Object_With_Meta {
 	 * @return mixed
 	 */
 	public function map_upload( $dirs ) {
-		$dirs['path']   = $this->upload_paths['path'];
-		$dirs['url']    = $this->upload_paths['url'];
-		$dirs['subdir'] = $this->upload_paths['subdir'];
+		$dirs[ 'path' ]   = $this->upload_paths[ 'path' ];
+		$dirs[ 'url' ]    = $this->upload_paths[ 'url' ];
+		$dirs[ 'subdir' ] = $this->upload_paths[ 'subdir' ];
 
 		return $dirs;
 	}
@@ -731,7 +731,7 @@ class Contact extends Base_Object_With_Meta {
 	 */
 	public function upload_file( &$file ) {
 
-		$file['name'] = sanitize_file_name( $file['name'] );
+		$file[ 'name' ] = sanitize_file_name( $file[ 'name' ] );
 
 		$upload_overrides = array( 'test_form' => false );
 
@@ -750,6 +750,28 @@ class Contact extends Base_Object_With_Meta {
 
 		return $mfile;
 	}
+
+	public function copy_file( $url ) {
+
+		if ( ! function_exists( 'download_url' ) ) {
+			require_once( ABSPATH . '/wp-admin/includes/file.php' );
+		}
+
+		$tmp_file = download_url( $url );
+
+		if ( ! is_dir( $this->get_uploads_folder() [ 'path' ] ) ) {
+			mkdir( $this->get_uploads_folder() [ 'path' ] );
+		}
+		try {
+			$result = copy( $tmp_file, $this->get_uploads_folder()[ 'path' ] . '/' . basename( $url ) );
+			@unlink( $tmp_file );
+		} catch ( \Exception $e ) {
+			var_dump( $e );
+		}
+
+		return $result;
+	}
+
 
 	/**
 	 * Get the basename of the path
@@ -783,12 +805,12 @@ class Contact extends Base_Object_With_Meta {
 
 		$uploads_dir = $this->get_uploads_folder();
 
-		if ( file_exists( $uploads_dir['path'] ) ) {
+		if ( file_exists( $uploads_dir[ 'path' ] ) ) {
 
-			$scanned_directory = array_diff( scandir( $uploads_dir['path'] ), [ '..', '.' ] );
+			$scanned_directory = array_diff( scandir( $uploads_dir[ 'path' ] ), [ '..', '.' ] );
 
 			foreach ( $scanned_directory as $filename ) {
-				$filepath = $uploads_dir['path'] . '/' . $filename;
+				$filepath = $uploads_dir[ 'path' ] . '/' . $filename;
 				$file     = [
 					'file_name'     => $filename,
 					'file_path'     => $filepath,
@@ -830,10 +852,10 @@ class Contact extends Base_Object_With_Meta {
 	 * @return array
 	 */
 	public function get_as_array() {
-		$contact             = $this->get_data();
-		$contact['ID']       = $this->get_id();
-		$contact['gravatar'] = $this->get_profile_picture();
-		$contact['age']      = $this->get_age();
+		$contact               = $this->get_data();
+		$contact[ 'ID' ]       = $this->get_id();
+		$contact[ 'gravatar' ] = $this->get_profile_picture();
+		$contact[ 'age' ]      = $this->get_age();
 
 		return apply_filters(
 			"groundhogg/{$this->get_object_type()}/get_as_array",
