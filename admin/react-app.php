@@ -10,7 +10,10 @@ use function Groundhogg\white_labeled_name;
 
 class React_App {
 
-	protected $settings = [];
+	/**
+	 * @var Settings
+	 */
+	protected $settings;
 
 	public function __construct() {;
 
@@ -30,9 +33,6 @@ class React_App {
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_basename' ] );
 	}
 
-	/**
-	 * Register the menu item
-	 */
 	public function register_menu_item () {
 		add_menu_page(
 			white_labeled_name(),

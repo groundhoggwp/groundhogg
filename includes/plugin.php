@@ -70,13 +70,6 @@ class Plugin {
 	public $pointers;
 
 	/**
-	 * Inits the admin screens.
-	 *
-	 * @var Admin_Menu
-	 */
-	public $admin;
-
-	/**
 	 * @var Utils
 	 */
 	public $utils;
@@ -311,9 +304,9 @@ class Plugin {
 
 		$this->event_queue = new Event_Queue();
 
-		if ( is_admin() ) {
-			$this->admin = new Admin_Menu();
-		}
+//		if ( is_admin() ) {
+//			$this->admin = new Admin_Menu();
+//		}
 
 		// Goes last to ensure everything is installed before running...
 		$this->installer = new Main_Installer();

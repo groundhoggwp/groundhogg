@@ -6,7 +6,7 @@
 
 namespace Groundhogg;
 
-class Settings {
+class Settings implements \JsonSerializable {
 
 	/**
 	 * A list of the settings tabs
@@ -1025,4 +1025,13 @@ class Settings {
 		return set_transient( $this->prefix( $key ), $value, $exp );
 	}
 
+	/**
+	 * Expose tab, setting, and section properties to JSON object for React interface.
+	 *
+	 * @since 3.0.0
+	 * @return array Array of settings objects
+	 */
+	public function jsonSerialize() {
+		return get_object_vars( $this );
+	}
 }
