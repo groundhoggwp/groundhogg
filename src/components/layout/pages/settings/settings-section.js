@@ -25,15 +25,10 @@ import Select from 'components/core-ui/select'
 import { useSettings } from 'data'
 import { addNotification } from 'utils'
 
-const useStyles = makeStyles((theme) => ({
-    description: {
-		fontSize: ".9em",
-		color: '#666'
-    },
-}));
+
+
 
 export const SettingsSection = ( { section } ) => {
-	const classes = useStyles();
 	const {
 		settingsError,
 		isRequesting,
@@ -103,7 +98,7 @@ export const SettingsSection = ( { section } ) => {
 		}
 	}, [ isRequesting, settingsError ] );
 
-	const componentInputMap = ( props ) => {
+	const componentInputMap = ( props, style ) => {
 		const { type, id, defaultValue } = props;
 		const { ...restProps } = props;
 
@@ -123,24 +118,49 @@ export const SettingsSection = ( { section } ) => {
 
 		 if ( mapping.hasOwnProperty( type ) ) {
 			 const mappedComponent = mapping[ type ];
-			 return ( <mappedComponent.component onChange={handleInputChange} value={value} {...restProps} /> );
+			 return ( <mappedComponent.component onChange={handleInputChange} value={value} {...restProps} className={style} /> );
 		 }
 
 		 return null;
 	};
+
+  const useStyles = makeStyles((theme) => ({
+      title: {
+        fontSize: '28px',
+        fontWeight: 700,
+        '&:last-of-type':{
+          marginTop: '40px'
+        }
+      },
+      inputSection:{
+        width: '100%',
+        marginBottom: '10px'
+        // border: '1px solid #000'
+      },
+      inputStyle:{
+        width: '100%'
+      },
+      description: {
+    		fontSize: "12px",
+    		color: '#666',
+        marginTop: '5px'
+      },
+  }));
+	const classes = useStyles();
+
 	return (
 		<Fragment>
 			{
 				section.map( ( section ) => (
 						<Fragment>
-							<Typography variant="h4" component="h4">{ section.title }</Typography>
+							<Typography variant="h4" component="h4" className={classes.title}>{ section.title }</Typography>
 								{
 									section.settings.map( ( setting ) => (
-										<>
-											<Typography variant="p" component="p">{ setting.label }</Typography>
-											{ componentInputMap( setting ) }
+										<div className={classes.inputSection}>
+											{/*<Typography variant="p" component="p">{ setting.label }</Typography>*/}
+											{ componentInputMap( setting, classes.inputStyle ) }
 											<Typography className={classes.description} variant="p" component="p" dangerouslySetInnerHTML={{ __html: setting.desc }} />
-										</>
+										</div>
 										)
 									)
 								}

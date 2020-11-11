@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: 500,
+    width: '100%',
     '& > * + *': {
       marginTop: theme.spacing(3),
     },
@@ -15,6 +15,7 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 120,
   },
   selectEmpty: {
+    width: '100%',
     marginTop: theme.spacing(2),
   },
 

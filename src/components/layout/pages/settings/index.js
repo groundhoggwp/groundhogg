@@ -40,7 +40,7 @@ export const Settings = ({history, match}) => {
 
 	return (
 		<Fragment>
-			return <TabPanel tabs={tabs} enableRouting={true} history={history} match={match} />;
+			<TabPanel tabs={tabs} enableRouting={true} history={history} match={match} />;
 		</Fragment>
 	);
 };
