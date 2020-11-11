@@ -149,58 +149,6 @@ class Main_Updater extends Updater {
 	}
 
 	/**
-	 * Refactor contact optin statuses
-	 */
-	public function version_2_1_13() {
-
-		$contacts = get_db( 'contacts' );
-
-		$changes = [
-			7 => Preferences::COMPLAINED,
-			6 => Preferences::SPAM,
-			5 => Preferences::HARD_BOUNCE,
-			4 => Preferences::MONTHLY,
-			3 => Preferences::WEEKLY,
-			2 => Preferences::UNSUBSCRIBED,
-			1 => Preferences::CONFIRMED,
-			0 => Preferences::UNCONFIRMED
-		];
-
-		foreach ( $changes as $old_status => $new_status ) {
-			$contacts->mass_update( [
-				'optin_status' => $new_status
-			], [
-				'optin_status' => $old_status
-			] );
-		}
-	}
-
-	/**
-	 * Revert version 2.1.13
-	 */
-	public function version_2_1_13_revert() {
-		$contacts = get_db( 'contacts' );
-
-		$changes = [
-			2 => 1,
-			3 => 2,
-			4 => 3,
-			5 => 4,
-			6 => 5,
-			7 => 6,
-			8 => 7,
-		];
-
-		foreach ( $changes as $old_status => $new_status ) {
-			$contacts->mass_update( [
-				'optin_status' => $new_status
-			], [
-				'optin_status' => $old_status
-			] );
-		}
-	}
-
-	/**
 	 * Add priority column to events db
 	 */
 	public function version_2_1_13_6() {
@@ -401,7 +349,6 @@ class Main_Updater extends Updater {
 			'2.1.6.2',
 			'2.1.7.1',
 			'2.1.11.1',
-			'2.1.13',
 			'2.1.13.6',
 			'2.1.14.1',
 			'2.2',
@@ -464,8 +411,6 @@ class Main_Updater extends Updater {
 	protected function get_update_descriptions() {
 		return [
 			'2.1.14'        => __( 'Added notes table.', 'groundhogg' ),
-			'2.1.13'        => __( 'Refactor contact optin statuses to meet new format.', 'groundhogg' ),
-			'2.1.13.revert' => __( 'Revert update 2.1.13 if rogue updated refactored optin status more than once.', 'groundhogg' ),
 			'2.1.13.6'      => __( 'Give funnel events higher priority than broadcast events.', 'groundhogg' ),
 			'2.1.13.11'     => __( 'Add micro_time column to events table for better display of events order.', 'groundhogg' ),
 			'2.1.14.1'      => __( 'Add missing index on `claim` column.', 'groundhogg' ),

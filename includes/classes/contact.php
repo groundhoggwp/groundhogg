@@ -153,7 +153,6 @@ class Contact extends Base_Object_With_Meta {
 		$this->ID           = absint( $this->ID );
 		$this->user_id      = absint( $this->user_id );
 		$this->owner_id     = absint( $this->owner_id );
-		$this->optin_status = absint( $this->optin_status );
 	}
 
 	/**
@@ -238,7 +237,7 @@ class Contact extends Base_Object_With_Meta {
 	 * @return int
 	 */
 	public function get_optin_status() {
-		return absint( $this->optin_status );
+		return $this->optin_status;
 	}
 
 	/**
@@ -894,7 +893,7 @@ class Contact extends Base_Object_With_Meta {
 		map_func_to_attr( $data, 'first_name', 'sanitize_text_field' );
 		map_func_to_attr( $data, 'last_name', 'sanitize_text_field' );
 		map_func_to_attr( $data, 'email', 'sanitize_email' );
-		map_func_to_attr( $data, 'optin_status', 'absint' );
+		map_func_to_attr( $data, 'optin_status', 'sanitize_text_field' );
 		map_func_to_attr( $data, 'owner_id', 'absint' );
 		map_func_to_attr( $data, 'user_id', 'absint' );
 		map_func_to_attr( $data, 'date_created', function ( $date ) {
