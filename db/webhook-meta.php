@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 2.0
  */
-class Submission_Meta extends Meta_DB {
+class Webhook_Meta extends Meta_DB {
 
 	/**
 	 * Get the DB suffix

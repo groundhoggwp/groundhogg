@@ -67,6 +67,8 @@ class Manager {
 		$this->form_impressions  = new Form_Impressions();
 		$this->notes             = new Notes();
 		$this->permissions_keys  = new Permissions_Keys();
+		$this->webhooks          = new Webhooks();
+		$this->webhook_meta      = new Webhook_Meta();
 
 		//new queue table
 		$this->event_queue = new Event_Queue();
