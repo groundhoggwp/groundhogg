@@ -3,7 +3,7 @@
 namespace Groundhogg\Admin;
 
 use Groundhogg\Plugin;
-use Groundhogg\Admin\Settings\Settings_Page;
+use Groundhogg\Settings;
 use function Groundhogg\get_url_var;
 use function Groundhogg\groundhogg_logo;
 
@@ -28,7 +28,7 @@ class React_App {
 	}
 
 	public function register_rest_settings() {
-		$this->settings = new Settings_Page();
+		$this->settings = new Settings();
 		$this->settings->init_defaults();
 		$this->settings->register_settings();
 	}
@@ -232,7 +232,7 @@ class React_App {
 	 * @return mixed
 	 */
 	public function register_settings( $obj ) {
-		$this->settings = new Settings_Page();
+		$this->settings = new Settings();
 
 		$this->settings->init_defaults();
 		$this->settings->register_settings();
