@@ -9,6 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import {Map} from './steps/map'
 import {Import} from './steps/import'
 import {Upload} from './steps/upload'
+import { useLocation } from "react-router-dom";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -63,13 +64,15 @@ function getStepContent(stepIndex, handleNext, handleBack, data, setData) {
 
 export const ImportSteps = (props) => {
 
+    // used to get file details send from the table
+    const location = useLocation();
 
     const classes = useStyles();
     const steps = getSteps();
 
     const [activeStep, setActiveStep] = useState(0);
     const [data, setData] = useState({
-        file: null,
+        file: location.file ? location.file : null,
         delimiter : ';',
         map : {}
     });

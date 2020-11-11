@@ -66,6 +66,7 @@ export const getPages = () => {
 		label: __( 'Broadcasts' ),
 		name: 'broadcasts',
 		path: '/broadcasts',
+		link: '/broadcasts',
 		priority: 20
 	} );
 
@@ -115,6 +116,7 @@ export const getPages = () => {
 		label: __( 'Tools' ),
 		name: 'tools',
 		path: '/tools',
+		link: '/tools',
 		priority: 55
 	} );
 
