@@ -94,37 +94,9 @@ const Editor = ({ funnel }) => {
 
   dagre.layout(graph)
 
-  let exitYPos, exitXPos = 0
-  let graphHeight = 0
-
-  graph.nodes().forEach((ID) => {
-
-    if (!ID) {
-      return
-    }
-
-    const { x, y } = graph.node(ID) || {}
-
-    graphHeight = Math.max(graphHeight, y)
-
-    if (ID === 'exit') {
-      exitXPos = x
-      exitYPos = y
-      return
-    }
-
-    steps.forEach((step) => {
-      if (step.ID == ID) {
-        // step.yPos = step.data.parent_steps.length ? y : 125
-        step.yPos = y
-        step.xPos = x
-      }
-    })
-  })
-
   return (
     <>
-      <div style={ { position: 'relative', height: exitYPos + 100 } }>
+      <div style={ { position: 'relative', height: graph.node( 'exit' ).y + 100 } }>
         {
           steps.length === 0 && (
             <Box display={ 'flex' } justifyContent={ 'center' }>
@@ -138,14 +110,14 @@ const Editor = ({ funnel }) => {
           steps.map(step => {
             return (
               <>
-                <StepBlock { ...step }/>
+                <StepBlock { ...step } graph={graph}/>
               </>
             )
           })
         }
         { steps.length > 0 && <ExitFunnel
-          xPos={ exitXPos }
-          yPos={ exitYPos }
+          xPos={ graph.node( 'exit' ).x }
+          yPos={ graph.node( 'exit' ).y }
           funnelId={ funnel.ID }
           endingSteps={ endingSteps.map(step => step.ID) }/>
         }
