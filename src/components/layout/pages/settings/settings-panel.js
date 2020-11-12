@@ -175,7 +175,7 @@ export const SettingsPanel = ( { section } ) => {
     		fontSize: "12px",
     		color: '#666',
         marginTop: '5px',
-				marginLeft: '65px'
+				marginLeft: '42px'
       },
   }));
 	const classes = useStyles();
