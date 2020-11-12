@@ -2,7 +2,6 @@ import { useState } from '@wordpress/element'
 import { addNotification } from 'utils/index'
 import { __ } from '@wordpress/i18n'
 import BulkJob from 'components/core-ui/bulk-job'
-import {} from '@material-ui/core'
 import { Redirect } from 'react-router'
 
 export const Import = (props) => {

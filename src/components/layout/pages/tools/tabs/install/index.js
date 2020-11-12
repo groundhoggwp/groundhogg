@@ -1,9 +1,7 @@
-import TabPanel from "components/core-ui/tab-panel";
-import {SettingsSection} from "components/layout/pages/settings/settings-section";
+
 import {addFilter, applyFilters} from "@wordpress/hooks";
-import {Fragment, render} from "@wordpress/element";
 import {__} from "@wordpress/i18n";
-import ReportPanel from "components/layout/pages/reports/report-panel";
+
 
 
 export const Install = (props) => {

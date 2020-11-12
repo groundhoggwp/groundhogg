@@ -1,5 +1,4 @@
 import { Fragment, useEffect, useState } from '@wordpress/element'
-import { addNotification } from 'utils/index'
 import { __ } from '@wordpress/i18n'
 import Button from '@material-ui/core/Button'
 import { FieldMap } from 'components/core-ui/field-map'
