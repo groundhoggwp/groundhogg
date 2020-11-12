@@ -2,16 +2,18 @@ import Box from '@material-ui/core/Box'
 import { FUNNELS_STORE_NAME } from 'data'
 import BenchmarkPicker from './components/Pickers/BenchmarkPicker'
 import StepBlock from './components/StepBlock'
-import ExitFunnel from './components/ExitFunnel'
 import Paper from '@material-ui/core/Paper'
 import './steps-types'
 import { withSelect } from '@wordpress/data'
 import dagre from 'dagre'
 import StepEdges from './components/StepEdges'
+import StepTargets from './components/StepTargets'
+// import ExitEdges from './components/ExitEdges'
 import { CONDITION } from 'components/layout/pages/funnels/editor/steps-types/constants'
+import { useLayoutEffect, useRef, useState } from '@wordpress/element'
 
-export const NODE_HEIGHT = 136 * 2;
-export const NODE_WIDTH = 150 * 2;
+export const NODE_HEIGHT = 250
+export const NODE_WIDTH = 300
 
 /**
  * Breadth first search of the steps tree to build iout a row level based chart
@@ -35,7 +37,7 @@ function buildGraph (steps, graph) {
       continue
     }
 
-    graph.setNode(ID, { label: ID, width: NODE_WIDTH, height: NODE_HEIGHT })
+    graph.setNode(ID, { label: ID, width: NODE_WIDTH, height: NODE_HEIGHT, ...currentNode } )
 
     // Get the child nodes
     let childNodes = steps.filter(
@@ -45,10 +47,13 @@ function buildGraph (steps, graph) {
       graph.setEdge(ID, child_steps.no || 'exit')
       graph.setEdge(ID, child_steps.yes || 'exit')
 
-      child_steps.yes && queue.push( childNodes.find( node => node.ID === child_steps.yes  ) )
-      child_steps.no && queue.push( childNodes.find( node => node.ID === child_steps.no  ) )
+      child_steps.yes &&
+      queue.push(childNodes.find(node => node.ID === child_steps.yes))
+      child_steps.no &&
+      queue.push(childNodes.find(node => node.ID === child_steps.no))
 
-    } else {
+    }
+    else {
 
       if (!childNodes.length) {
         // set to exit
@@ -75,10 +80,29 @@ const Editor = ({ funnel }) => {
     return null
   }
 
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
+  const targetRef = useRef()
+  useLayoutEffect(() => {
+    if (targetRef.current) {
+      const updateDimensions = () => {
+        setDimensions({
+          width: targetRef.current.offsetWidth,
+          height: targetRef.current.offsetHeight,
+        })
+      }
+
+      window.addEventListener('resize', updateDimensions)
+      updateDimensions()
+      return () => window.removeEventListener('resize', updateDimensions)
+    }
+  }, [])
+
+  let windowMidPoint = dimensions.width / 2
+
   const steps = funnel.steps
 
   const endingSteps = steps.filter(
-    step => Object.values(step.data.child_steps).length === 0)
+    step => Object.values(step.data.child_steps).length === 0 || ( step.data.step_group === CONDITION && ( ! step.data.child_steps.yes || ! step.data.child_steps.no ) ) )
 
   const graph = new dagre.graphlib.Graph()
 
@@ -91,15 +115,21 @@ const Editor = ({ funnel }) => {
 
   graph.setDefaultEdgeLabel(() => { return {} })
 
-  graph.setNode('exit', { label: 'exit', width: 300, height: 250 })
+  graph.setNode('exit',
+    { label: 'exit', width: NODE_WIDTH, height: NODE_HEIGHT })
 
   buildGraph(steps, graph)
 
   dagre.layout(graph)
 
+  let XOffset = windowMidPoint - graph.node('exit').x - ( NODE_WIDTH / 2 )
+
   return (
     <>
-      <div style={ { position: 'relative', height: graph.node( 'exit' ).y + 100 } }>
+      <div ref={ targetRef } style={ {
+        position: 'relative',
+        height: graph.node('exit').y + 100,
+      } }>
         {
           steps.length === 0 && (
             <Box display={ 'flex' } justifyContent={ 'center' }>
@@ -113,18 +143,40 @@ const Editor = ({ funnel }) => {
           steps.map(step => {
             return (
               <>
-                <StepBlock { ...step } graph={graph}/>
+                <StepBlock
+                  { ...step }
+                  graph={ graph }
+                  xOffset={ XOffset }
+                />
               </>
             )
           })
         }
-        { steps.length > 0 && <ExitFunnel
-          graph={graph}
-          funnelId={ funnel.ID }
-          endingSteps={ endingSteps.map(step => step.ID) }/>
+        {
+          steps.map(step => {
+            return (
+              <>
+                <StepTargets
+                  { ...step }
+                  graph={ graph }
+                  xOffset={ XOffset }
+                />
+              </>
+            )
+          })
         }
         {
-          steps.map((step, i) => <StepEdges { ...step } />)
+          steps.map(step => {
+            return (
+              <>
+                <StepEdges
+                  { ...step }
+                  graph={ graph }
+                  xOffset={ XOffset }
+                />
+              </>
+            )
+          })
         }
       </div>
     </>

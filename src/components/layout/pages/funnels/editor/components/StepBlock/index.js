@@ -8,23 +8,17 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
 import IconButton from '@material-ui/core/IconButton'
 import { useState } from '@wordpress/element'
-import AddStepButton from '../AddStepButton'
 import Tooltip from '@material-ui/core/Tooltip'
 import makeStyles from '@material-ui/core/styles/makeStyles'
 import {
-  ACTION, ACTIONS,
-  BENCHMARK, BENCHMARKS,
-  CONDITION, CONDITIONS
-} from 'components/layout/pages/funnels/editor/steps-types/constants'
-import {
   FUNNELS_STORE_NAME
 } from 'data'
-import theme from 'components/layout/theme'
-import { NODE_HEIGHT, NODE_WIDTH } from 'components/layout/pages/funnels/editor'
+import { CARD_WIDTH } from 'components/layout/pages/funnels/editor/steps-types/constants'
 
 const useStyles = makeStyles((theme) => ({
   stepBlockContainer: {
     paddingTop: 0,
+    zIndex: 1,
     position: 'absolute',
     '& .MuiFab-root': {
       zIndex: 99
@@ -52,8 +46,6 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-const CONDITION_ADD_STEP_OFFSET = 45
-
 export default (props) => {
 
   const [editing, setEditing] = useState(false)
@@ -63,9 +55,8 @@ export default (props) => {
 
   const classNames = useStyles()
 
-  const { ID, data, meta, funnelID, level, index, graph } = props
+  const { ID, data, meta, funnelID, level, index, graph, xOffset } = props
   const { step_title, step_type, step_group, parent_steps, child_steps, funnel_id } = data
-  const { yes_steps, no_steps } = meta
 
   let numParents = Object.values(parent_steps).length
   let numChildren = Object.values(child_steps).length
@@ -108,70 +99,19 @@ export default (props) => {
     setAddingStep(null)
   }
 
+  let gNode =  graph.node(ID);
+
   const positioning = {
-    top: graph.node(ID).y,
-    left: graph.node(ID).x
+    top: gNode && gNode.y,
+    left: gNode && gNode.x + xOffset
   }
 
   return (
     <>
       <Box className={classNames.stepBlockContainer} style={positioning}>
         <Box className={classNames.stepBlock}>
-          {numParents > 1 &&
-          <AddStepButton
-            id={'add-step-top-' + ID}
-            funnelID={funnel_id}
-            position={'topMiddle'}
-            parentSteps={parent_steps}
-            childSteps={[ID]}
-            showGroups={[
-              BENCHMARKS,
-              ACTIONS
-            ]}
-            anchorEl={anchorEl}
-            open={addingStep === 'top'}
-            setAnchorEl={setAnchorEl}
-            openStepBlock={(e) => addStepBlock('top', e)}
-            closeStepBlock={addStepBlockCancel}
-          />
-          }
-          {step_group === BENCHMARK && numParents < 2 &&
-          <AddStepButton
-            id={'add-step-right-' + ID}
-            funnelID={funnel_id}
-            position={'rightMiddle'}
-            childSteps={child_steps}
-            parentSteps={parent_steps}
-            showGroups={[
-              BENCHMARKS
-            ]}
-            anchorEl={anchorEl}
-            open={addingStep === 'right'}
-            setAnchorEl={setAnchorEl}
-            openStepBlock={(e) => addStepBlock('right', e)}
-            closeStepBlock={addStepBlockCancel}
-          />}
-          {step_group !== CONDITION &&
-          <AddStepButton
-            id={'add-step-bottom-' + ID}
-            funnelID={funnel_id}
-            position={'bottomMiddle'}
-            parentSteps={[ID]}
-            childSteps={child_steps}
-            showGroups={[
-              step_group === ACTION ? BENCHMARKS : false,
-              ACTIONS,
-              CONDITIONS
-            ].filter(item => item !== false)}
-            open={addingStep === 'bottom'}
-            anchorEl={anchorEl}
-            setAnchorEl={setAnchorEl}
-            openStepBlock={(e) => addStepBlock('bottom', e)}
-            closeStepBlock={addStepBlockCancel}
-          />
-          }
           <Card className={classes.join(' ') + ' ' + classNames.stepCard}
-                style={{ width: 250 }}
+                style={{ width: CARD_WIDTH }}
                 id={'step-card-' + ID}>
             <CardHeader
               avatar={stepType.icon}
@@ -199,54 +139,6 @@ export default (props) => {
           </Card>
         </Box>
       </Box>
-      {step_group === CONDITION && (
-        <>
-          <AddStepButton
-            toolTipTitle={'No'}
-            id={'add-step-no-' + ID}
-            funnelID={funnel_id}
-            position={{
-              position: 'absolute',
-              top: graph.node(ID).y + (NODE_HEIGHT / 2) + CONDITION_ADD_STEP_OFFSET,
-              left: child_steps.no === child_steps.yes ? graph.node(child_steps.no || 'exit').x + (NODE_WIDTH / 2) - (4 * CONDITION_ADD_STEP_OFFSET) : graph.node(child_steps.no || 'exit').x + (NODE_WIDTH / 2) - CONDITION_ADD_STEP_OFFSET
-            }}
-            parentSteps={[ID]}
-            childSteps={[child_steps.no]}
-            showGroups={[
-              ACTIONS,
-              CONDITIONS
-            ].filter(item => item !== false)}
-            open={addingStep === 'no'}
-            anchorEl={anchorEl}
-            setAnchorEl={setAnchorEl}
-            openStepBlock={(e) => addStepBlock('no', e)}
-            closeStepBlock={addStepBlockCancel}
-            conditionPath={'no'}
-          />
-          <AddStepButton
-            toolTipTitle={'Yes'}
-            id={'add-step-yes-' + ID}
-            funnelID={funnel_id}
-            position={{
-              position: 'absolute',
-              top: graph.node(ID).y + (NODE_HEIGHT / 2) + CONDITION_ADD_STEP_OFFSET,
-              left: child_steps.no === child_steps.yes ? graph.node(child_steps.yes || 'exit').x + (NODE_WIDTH / 2) + (3 * CONDITION_ADD_STEP_OFFSET) : graph.node(child_steps.yes || 'exit').x + (NODE_WIDTH / 2) - CONDITION_ADD_STEP_OFFSET
-            }}
-            parentSteps={[ID]}
-            childSteps={[child_steps.yes]}
-            showGroups={[
-              ACTIONS,
-              CONDITIONS
-            ].filter(item => item !== false)}
-            open={addingStep === 'yes'}
-            anchorEl={anchorEl}
-            setAnchorEl={setAnchorEl}
-            openStepBlock={(e) => addStepBlock('yes', e)}
-            closeStepBlock={addStepBlockCancel}
-            conditionPath={'yes'}
-          />
-        </>)
-      }
     </>
   )
 }
