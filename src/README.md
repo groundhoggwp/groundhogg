@@ -9,7 +9,7 @@ Follow https://www.wpbeginner.com/wp-tutorials/how-to-install-wordpress-on-your-
 React lives entirely within /src folder but all commands are run at the root level
 
 #### Turn on Script Debugging
-Add this line to wp-config.php. This file is located within your instance of XAMP or WAMP. Restart your environment after. This puts you in the development mode to see full React errors.
+Add this line to wp-config.php. This file is located outside of the repo but within htdocs of your XAMP or WAMP install. Restart your environment after. This puts you in the development mode to see full React errors.
 ```
 define('SCRIPT_DEBUG', true);
 ```
