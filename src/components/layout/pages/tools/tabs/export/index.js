@@ -12,6 +12,9 @@ import React from "react";
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import DeleteIcon from "@material-ui/icons/Delete";
 import {DateTime} from 'luxon';
+import { Route, Switch, useHistory, useRouteMatch } from 'react-router-dom'
+import { ExportSteps } from 'components/layout/pages/tools/tabs/export/export-steps'
+import Button from '@material-ui/core/Button'
 
 const ExportTableColumns = [
     {
@@ -80,7 +83,25 @@ const exportBulkActions = [
 ];
 
 export const Export = (props) => {
-    // use
+
+
+    let { path } = useRouteMatch();
+    return (
+      <Switch>
+          <Route exact path={path}>
+              <Table />
+          </Route>
+          <Route path={`${path}/steps`}>
+              <ExportSteps />
+          </Route>
+      </Switch>
+    )
+
+}
+
+
+const Table  = (props) => {
+
 
     const {items, totalItems, isRequesting} = useSelect((select) => {
         const store = select(EXPORT_STORE_NAME);
@@ -141,31 +162,42 @@ export const Export = (props) => {
         }
     }
 
+    let history = useHistory()
+
+    let { path } = useRouteMatch()
+
     return (
-        <Fragment>
-            <h1> EXPORT </h1>
-            <Box display={'flex'}>
+      <Fragment>
+          <h1> EXPORT </h1>
 
-                <Box flexGrow={1}>
-                    <ListTable
-                        items={items}
-                        defaultOrderBy={'timestamp'}
-                        defaultOrder={'desc'}
-                        totalItems={totalItems}
-                        fetchItems={fetchItems}
-                        isRequesting={isRequesting}
-                        columns={ExportTableColumns}
-                        onBulkAction={handleBulkAction}
-                        bulkActions={exportBulkActions}
-                        onSelectItem={handleSelectItem}
-                        isCheckboxSelected = {isSelected}
+          <Button variant="contained" color="secondary" onClick={() => {
+              history.push(path + '/steps')
+          }}>
+              {__('Export All', 'groundhogg')}
+          </Button>
+          <Box display={'flex'}>
 
-                    />
-                </Box>
-            </Box>
-        </Fragment>
+              <Box flexGrow={1}>
+                  <ListTable
+                    items={items}
+                    defaultOrderBy={'timestamp'}
+                    defaultOrder={'desc'}
+                    totalItems={totalItems}
+                    fetchItems={fetchItems}
+                    isRequesting={isRequesting}
+                    columns={ExportTableColumns}
+                    onBulkAction={handleBulkAction}
+                    bulkActions={exportBulkActions}
+                    onSelectItem={handleSelectItem}
+                    isCheckboxSelected = {isSelected}
+
+                  />
+              </Box>
+          </Box>
+      </Fragment>
     );
 }
+
 
 
 //Hook to push content into the page

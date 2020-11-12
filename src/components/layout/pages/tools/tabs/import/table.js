@@ -164,7 +164,10 @@ export const Table = (props) => {
     <Fragment>
       <h1> Import </h1>
       <Button variant="contained" color="secondary" onClick={() => {
-        history.push(path + '/steps')
+        history.push({
+          pathname: path + '/steps',
+          file: null
+        })
       }}>
         {__('Import', 'groundhogg')}
       </Button>
