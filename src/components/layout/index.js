@@ -61,7 +61,7 @@ export default function PrimaryLayout (props) {
     <main className={ `groundhogg-layout__primary ${ classes.content }` }>
 
       <div className={ classes.appBarSpacer }/>
-      <Container className={ classes.container } maxWidth="xlg">
+      <Container className={ classes.container } maxWidth="xl">
         { children }
       </Container>
     </main>
