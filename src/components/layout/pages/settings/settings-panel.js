@@ -25,15 +25,8 @@ import Select from 'components/core-ui/select'
 import { useSettings } from 'data'
 import { addNotification } from 'utils'
 
-const useStyles = makeStyles((theme) => ({
-    description: {
-		fontSize: ".9em",
-		color: '#666'
-    },
-}));
 
-export const SettingsSection = ( { section } ) => {
-	const classes = useStyles();
+export const SettingsPanel = ( { section } ) => {
 	const {
 		settingsError,
 		isRequesting,
@@ -103,9 +96,10 @@ export const SettingsSection = ( { section } ) => {
 		}
 	}, [ isRequesting, settingsError ] );
 
-	const componentInputMap = ( props ) => {
-		const { type, id, defaultValue } = props;
+	const componentInputMap = ( props, classes ) => {
+		const { type, id, defaultValue, label, desc } = props;
 		const { ...restProps } = props;
+
 
 		const mapping = applyFilters( 'groundhogg.settings.componentInputMap', {
 			'input' : { component : TextField },
@@ -115,32 +109,88 @@ export const SettingsSection = ( { section } ) => {
 			'link_picker' : { component : TagPicker }, // I imagine we'll have a LinkPicker component?
 			'dropdown' : { component : Select },
 			'dropdown_owners' : { component : SelectOwners }, // Investigate any difference here.
-			'editor' : { component : TextareaAutosize }, // Need to build out TinyMCE Editor
-			'textarea' : { component : TextareaAutosize },
+			// 'editor' : { component : TextareaAutosize }, // Need to build out TinyMCE Editor
+			// 'textarea' : { component : TextareaAutosize },
+			'editor' : { component : TextField }, // Need to build out TinyMCE Editor
+			'textarea' : { component : TextField },
 		 } );
+
 
 		 const value = settings[ id ].hasOwnProperty( 'defaultValue' ) ? defaultValue : settings[ id ];
 
 		 if ( mapping.hasOwnProperty( type ) ) {
 			 const mappedComponent = mapping[ type ];
-			 return ( <mappedComponent.component onChange={handleInputChange} value={value} {...restProps} /> );
+			 // console.log(type, label,)
+
+			 // Some refactoring is needed on the final pass of settings, but specific styling is needed.
+			 if(type === 'checkbox') {
+				 return ( <>
+					 <mappedComponent.component onChange={handleInputChange} value={value} {...restProps} className={classes.styleCheckbox} />
+ 					 <Typography variant="span" component="span">{ label }</Typography>
+					 <Typography className={classes.descriptionCheckbox} variant="p" component="p" dangerouslySetInnerHTML={{ __html: desc }} />
+
+					 </>
+				 );
+			 } else {
+				 //multiline rows={4} used for textarea
+				 return ( <>
+					 <mappedComponent.component onChange={handleInputChange} value={value} {...restProps} className={classes.inputStyle}   />
+					 <Typography className={classes.description} variant="p" component="p" dangerouslySetInnerHTML={{ __html: desc }} />
+					 </>
+				 );
+			 }
+
 		 }
 
 		 return null;
 	};
+
+  const useStyles = makeStyles((theme) => ({
+      title: {
+        fontSize: '28px',
+        fontWeight: 700,
+        '&:last-of-type':{
+          marginTop: '40px'
+        },
+				marginBottom: '20px'
+      },
+      inputSection:{
+        width: '100%',
+        marginBottom: '10px'
+        // border: '1px solid #000'
+      },
+      inputStyle:{
+        width: '100%'
+      },
+			inputStyleCheckbox:{
+				width: '43px',
+				marginRight: '20px'
+			},
+      description: {
+    		fontSize: "12px",
+    		color: '#666',
+        marginTop: '5px',
+      },
+      descriptionCheckbox: {
+    		fontSize: "12px",
+    		color: '#666',
+        marginTop: '5px',
+				marginLeft: '65px'
+      },
+  }));
+	const classes = useStyles();
+
 	return (
 		<Fragment>
 			{
 				section.map( ( section ) => (
 						<Fragment>
-							<Typography variant="h4" component="h4">{ section.title }</Typography>
+							<Typography variant="h4" component="h4" className={classes.title}>{ section.title }</Typography>
 								{
 									section.settings.map( ( setting ) => (
-										<>
-											<Typography variant="p" component="p">{ setting.label }</Typography>
-											{ componentInputMap( setting ) }
-											<Typography className={classes.description} variant="p" component="p" dangerouslySetInnerHTML={{ __html: setting.desc }} />
-										</>
+										<div className={classes.inputSection}>
+											{ componentInputMap( setting, classes ) }
+										</div>
 										)
 									)
 								}

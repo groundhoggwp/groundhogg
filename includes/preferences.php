@@ -4,14 +4,12 @@ namespace Groundhogg;
 
 class Preferences {
 	// Optin Statuses
-	const UNCONFIRMED = 1;
-	const CONFIRMED = 2;
-	const UNSUBSCRIBED = 3;
-	const WEEKLY = 4;
-	const MONTHLY = 5;
-	const HARD_BOUNCE = 6;
-	const SPAM = 7;
-	const COMPLAINED = 8;
+	const UNCONFIRMED = 'unconfirmed';
+	const CONFIRMED = 'confirmed';
+	const UNSUBSCRIBED = 'unsubscribed';
+	const HARD_BOUNCE = 'bounced';
+	const SPAM = 'spam';
+	const COMPLAINED = 'complaint';
 
 	public function __construct() {
 		add_action( 'init', [ $this, 'add_rewrite_rules' ] );
@@ -27,11 +25,11 @@ class Preferences {
 	 *
 	 * @return bool
 	 */
-	public function current_contact_can_modify_preferences(){
+	public function current_contact_can_modify_preferences() {
 
 		$permissions_hash = get_cookie( 'gh-preferences-permission' );
 
-		if ( ! $permissions_hash ){
+		if ( ! $permissions_hash ) {
 			return false;
 		}
 
@@ -47,7 +45,7 @@ class Preferences {
 
 		$value = wp_hash( encrypt( implode( '|', $parts ) ) );
 
-		if ( $value !== $permissions_hash ){
+		if ( $value !== $permissions_hash ) {
 			return false;
 		}
 
@@ -163,12 +161,6 @@ class Preferences {
 			case self::UNSUBSCRIBED:
 				return _x( 'Unsubscribed. They will not receive marketing.', 'optin_status', 'groundhogg' );
 				break;
-			case self::WEEKLY:
-				return _x( 'This contact will only receive marketing weekly.', 'optin_status', 'groundhogg' );
-				break;
-			case self::MONTHLY:
-				return _x( 'This contact will only receive marketing monthly.', 'optin_status', 'groundhogg' );
-				break;
 			case self::HARD_BOUNCE:
 				return _x( 'This email address bounced, they will not receive marketing.', 'optin_status', 'groundhogg' );
 				break;
@@ -191,8 +183,6 @@ class Preferences {
 			self::UNCONFIRMED  => _x( 'Unconfirmed', 'optin_status', 'groundhogg' ),
 			self::CONFIRMED    => _x( 'Confirmed', 'optin_status', 'groundhogg' ),
 			self::UNSUBSCRIBED => _x( 'Unsubscribed', 'optin_status', 'groundhogg' ),
-			self::WEEKLY       => _x( 'Subscribed Weekly', 'optin_status', 'groundhogg' ),
-			self::MONTHLY      => _x( 'Subscribed Monthly', 'optin_status', 'groundhogg' ),
 			self::HARD_BOUNCE  => _x( 'Bounced', 'optin_status', 'groundhogg' ),
 			self::SPAM         => _x( 'Spam', 'optin_status', 'groundhogg' ),
 			self::COMPLAINED   => _x( 'Complained', 'optin_status', 'groundhogg' ),
@@ -208,7 +198,7 @@ class Preferences {
 	 */
 	public static function string_to_preference( $string ) {
 
-		if ( ! is_string( $string ) ){
+		if ( ! is_string( $string ) ) {
 			return self::UNCONFIRMED;
 		}
 
@@ -219,8 +209,6 @@ class Preferences {
 			'confirmed'    => self::CONFIRMED,
 			'unsubscribe'  => self::UNSUBSCRIBED,
 			'unsubscribed' => self::UNSUBSCRIBED,
-			'weekly'       => self::WEEKLY,
-			'monthly'      => self::MONTHLY,
 			'hard_bounce'  => self::HARD_BOUNCE,
 			'bounce'       => self::HARD_BOUNCE,
 			'bounced'      => self::HARD_BOUNCE,
@@ -283,16 +271,6 @@ class Preferences {
 			case self::HARD_BOUNCE;
 			case self::UNSUBSCRIBED:
 				return false;
-				break;
-			case self::WEEKLY:
-				$last_sent = $contact->get_meta( 'last_sent' );
-
-				return ( time() - absint( $last_sent ) ) > 7 * 24 * HOUR_IN_SECONDS;
-				break;
-			case self::MONTHLY:
-				$last_sent = $contact->get_meta( 'last_sent' );
-
-				return ( time() - absint( $last_sent ) ) > 30 * 24 * HOUR_IN_SECONDS;
 				break;
 		}
 	}

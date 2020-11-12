@@ -3,10 +3,31 @@ import {
   ACTION, BENCHMARK,
   CONDITION,
 } from 'components/layout/pages/funnels/editor/steps-types/constants'
+import { makeStyles } from '@material-ui/core/styles'
+
+const useStyles = makeStyles((theme) => ({
+  edgeLabel: {
+    background: '#ffffff',
+    padding: theme.spacing(1),
+    border: '1px solid',
+    borderRadius: 3,
+  },
+  edgeNo: {
+    background: '#F8D7DA',
+    borderColor: '#f5c6cb',
+    color: '#721c24'
+  },
+  edgeYes: {
+    background: '#d4edda',
+    borderColor: '#c3e6cb',
+    color: '#155724'
+  }
+}))
 
 export default ({ data, meta, ID }) => {
 
   const { parent_steps, child_steps, step_group } = data
+  const { edgeLabel, edgeYes, edgeNo } = useStyles();
 
   const arrows = []
 
@@ -22,41 +43,42 @@ export default ({ data, meta, ID }) => {
 
   let parents, children;
 
+  parents = Object.values( parent_steps );
+  children = Object.values( child_steps );
+
+  if ( parents.length > 1) {
+
+    arrows.push({
+      ...arrowStyle,
+      start: `add-step-top-${ ID }`,
+      end: `step-card-${ ID }`,
+      // headSize: 0,
+    })
+
+    parents.forEach( parent => {
+
+      arrows.push( {
+        ...arrowStyle,
+        start: `add-step-bottom-${ parent }`,
+        end: `add-step-top-${ ID }`,
+        headSize: 0,
+      } )
+
+    } )
+
+  } else {
+    parents.forEach( parent => {
+      arrows.push( {
+        ...arrowStyle,
+        start: `add-step-bottom-${ parent }`,
+        end: `step-card-${ ID }`,
+      } )
+    } )
+  }
+
   switch (step_group) {
     case ACTION:
 
-      parents = Object.values( parent_steps );
-      children = Object.values( child_steps );
-
-      if ( parents.length > 1) {
-
-        arrows.push({
-          ...arrowStyle,
-          start: `add-step-top-${ ID }`,
-          end: `step-card-${ ID }`,
-          // headSize: 0,
-        })
-
-        parents.forEach( parent => {
-
-          arrows.push( {
-            ...arrowStyle,
-            start: `add-step-bottom-${ parent }`,
-            end: `add-step-top-${ ID }`,
-            headSize: 0,
-          } )
-
-        } )
-
-      } else {
-        parents.forEach( parent => {
-          arrows.push( {
-            ...arrowStyle,
-            start: `add-step-bottom-${ parent }`,
-            end: `step-card-${ ID }`,
-          } )
-        } )
-      }
 
       arrows.push({
         ...arrowStyle,
@@ -76,78 +98,53 @@ export default ({ data, meta, ID }) => {
       break
     case CONDITION:
 
-      parents = Object.values( parent_steps );
-
-      if (parents.length > 1) {
-        arrows.push({
-          ...arrowStyle,
-          start: `add-step-top-${ ID }`,
-          end: `step-card-${ ID }`,
-          // headSize: 0,
-        })
-      } else {
-        parents.forEach( parent => {
-          arrows.push( {
-            ...arrowStyle,
-            start: `add-step-bottom-${ parent }`,
-            end: `step-card-${ ID }`,
-          } )
-        } )
-      }
-
       arrows.push({
         ...arrowStyle,
         start: `step-card-${ ID }`,
-        end: `add-step-bottom-left-${ ID }`,
-        endAnchor: ['right', 'middle'],
+        end: `add-step-no-${ ID }`,
+        endAnchor: ['top', 'middle'],
         headSize: 0,
+        label: {
+          middle: (
+            <div className={[edgeLabel, edgeNo].join( ' ' )}>
+              No
+            </div>
+          )
+        }
       })
 
       arrows.push({
         ...arrowStyle,
         start: `step-card-${ ID }`,
-        end: `add-step-bottom-right-${ ID }`,
-        endAnchor: ['left', 'middle'],
-        headSize: 0,
+        end: `add-step-yes-${ ID }`,
+        endAnchor: ['top', 'middle'],
+        headSize: 0,label: {
+          middle: (
+            <div className={[edgeLabel, edgeYes].join( ' ' )}>
+              Yes
+            </div>
+          )
+        }
+
       })
 
       arrows.push({
         ...arrowStyle,
         startAnchor: ['bottom', 'middle'],
-        start: `add-step-bottom-right-${ ID }`,
+        start: `add-step-no-${ ID }`,
         end: child_steps.no ? `step-card-${ child_steps.no }` : 'step-exit',
       })
 
       arrows.push({
         ...arrowStyle,
         startAnchor: ['bottom', 'middle'],
-        start: `add-step-bottom-left-${ ID }`,
+        start: `add-step-yes-${ ID }`,
         end: child_steps.yes ? `step-card-${ child_steps.yes }` : 'step-exit',
       })
 
 
       break
     case BENCHMARK:
-
-      parents = Object.values( parent_steps );
-      children = Object.values( child_steps );
-
-      if (parents.length > 1) {
-        arrows.push({
-          ...arrowStyle,
-          start: `add-step-top-${ ID }`,
-          end: `step-card-${ ID }`,
-          // headSize: 0,
-        })
-      } else {
-        parents.forEach( parent => {
-          arrows.push( {
-            ...arrowStyle,
-            start: `add-step-bottom-${ parent }`,
-            end: `step-card-${ ID }`,
-          } )
-        } )
-      }
 
       arrows.push({
         ...arrowStyle,

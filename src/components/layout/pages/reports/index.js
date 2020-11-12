@@ -30,11 +30,11 @@ const useStyles = makeStyles((theme) => ({
 
 export function Reports({history, match}) {
   const classes = useStyles();
-  const reportRoute = match.params.report;
+
 
   const [startDate, setStartDate] = useState(DateTime.local().minus({ years: 1 }).startOf('day').toISODate());
   const [endDate, setEndDate] = useState(DateTime.local().startOf('day').toISODate());
-  
+
   const dateChange = (id, newValue)  => {
     if (id === 'start'){
       setStartDate(newValue);
@@ -115,28 +115,31 @@ export function Reports({history, match}) {
                gridColumnStart: 1,
                gridColumnEnd: 3,
                gridRowStart: 5,
-               gridRowEnd: 8,
+               gridRowEnd: 7,
               },
               {
                name:"table_top_converting_funnels",
                gridColumnStart: 1,
                gridColumnEnd: 3,
-               gridRowStart: 8,
-               gridRowEnd: 11,
+               gridRowStart: 7,
+               gridRowEnd: 10,
+               fullWidth: false
               },
               {
                name:"table_contacts_by_countries",
                gridColumnStart: 3,
                gridColumnEnd: 5,
-               gridRowStart: 8,
-               gridRowEnd: 11,
+               gridRowStart: 7,
+               gridRowEnd: 10,
+               fullWidth: false
               },
               {
                name:"table_contacts_by_lead_source",
                gridColumnStart: 1,
                gridColumnEnd: 5,
-               gridRowStart: 11,
-               gridRowEnd: 14,
+               gridRowStart: 10,
+               gridRowEnd: 13,
+               fullWidth: true
               },
             ]}
           />
@@ -193,64 +196,64 @@ export function Reports({history, match}) {
                gridColumnStart: 1,
                gridColumnEnd: 3,
                gridRowStart: 5,
-               gridRowEnd: 8,
+               gridRowEnd: 7,
               },
               {
                name:"table_contacts_by_lead_source",
                gridColumnStart: 3,
                gridColumnEnd: 5,
                gridRowStart: 5,
-               gridRowEnd: 8,
+               gridRowEnd: 7,
               },
               {
                name:"chart_contacts_by_country",
                gridColumnStart: 1,
                gridColumnEnd: 3,
-               gridRowStart: 8,
-               gridRowEnd: 11,
+               gridRowStart: 7,
+               gridRowEnd: 9,
               },
               {
                name:"chart_contacts_by_region",
                gridColumnStart: 3,
                gridColumnEnd: 5,
-               gridRowStart: 8,
-               gridRowEnd: 11,
+               gridRowStart: 7,
+               gridRowEnd: 9,
               },
               {
                name:"table_contacts_by_search_engines",
                gridColumnStart: 1,
                gridColumnEnd: 3,
-               gridRowStart: 11,
-               gridRowEnd: 14,
+               gridRowStart: 9,
+               gridRowEnd: 12,
               },
               {
                name:"table_contacts_by_social_media",
                gridColumnStart: 3,
                gridColumnEnd: 5,
-               gridRowStart: 11,
-               gridRowEnd: 14,
+               gridRowStart: 9,
+               gridRowEnd: 12,
               },
               {
                name:"table_contacts_by_source_page",
                gridColumnStart: 1,
                gridColumnEnd: 3,
-               gridRowStart: 14,
-               gridRowEnd: 17,
+               gridRowStart: 12,
+               gridRowEnd: 15,
               },
               // Undefined server side
               {
                name:"table_contacts_by_lead_source",
                gridColumnStart: 3,
                gridColumnEnd: 5,
-               gridRowStart: 14,
-               gridRowEnd: 17,
+               gridRowStart: 12,
+               gridRowEnd: 15,
               },
               {
                name:"table_list_engagement",
                gridColumnStart: 1,
                gridColumnEnd: 5,
-               gridRowStart: 17,
-               gridRowEnd: 20,
+               gridRowStart: 15,
+               gridRowEnd: 18,
               },
             ]}
           />
@@ -327,7 +330,7 @@ export function Reports({history, match}) {
                name:"table_top_performing_broadcasts",
                gridColumnStart: 1,
                gridColumnEnd: 3,
-               gridRowStart: 5,
+               gridRowStart: 4,
                gridRowEnd: 8,
               },
               {
@@ -398,36 +401,32 @@ export function Reports({history, match}) {
              name:"table_top_performing_emails",
              gridColumnStart: 1,
              gridColumnEnd: 3,
-             gridRowStart: 8,
-             gridRowEnd: 11,
+             gridRowStart: 4,
+             gridRowEnd: 7,
             },
             {
              name:"table_worst_performing_emails",
              gridColumnStart: 3,
              gridColumnEnd: 5,
-             gridRowStart: 8,
-             gridRowEnd: 11,
+             gridRowStart: 4,
+             gridRowEnd: 7,
+             fullWidth: false
             },
             {
              name:"table_benchmark_conversion_rate",
              gridColumnStart: 1,
              gridColumnEnd: 5,
-             gridRowStart: 11,
-             gridRowEnd: 14,
+             gridRowStart: 7,
+             gridRowEnd: 10,
+             fullWidth: false
             },
             {
              name:"table_form_activity",
              gridColumnStart: 1,
              gridColumnEnd: 5,
-             gridRowStart: 14,
-             gridRowEnd: 17,
-            },
-            {
-             name:"table_form_activity",
-             gridColumnStart: 1,
-             gridColumnEnd: 5,
-             gridRowStart: 17,
-             gridRowEnd: 20,
+             gridRowStart: 10,
+             gridRowEnd: 13,
+             fullWidth: true
             },
           ]}
         />
@@ -509,19 +508,6 @@ export function Reports({history, match}) {
     }
   ];
 
-  let defaultTab = 0;
-  tabs.forEach((tab,i)=>{
-    if(tab.route === reportRoute){
-      defaultTab = i
-    }
-  });
 
-  const [selectedPanel, setSelectedPanel] = useState(defaultTab);
-
-  const handlePanelChange = (event, newValue) => {
-    history.push('/reports/'+tabs[newValue].route)
-    setSelectedPanel(newValue);
-  };
-
-  return <TabPanel tabs={tabs} selectedPanel={selectedPanel} handlePanelChange={handlePanelChange} history={history} />;
+  return <TabPanel tabs={tabs} enableRouting={true} history={history} match={match} />;
 }

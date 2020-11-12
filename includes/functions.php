@@ -1790,13 +1790,8 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				$args[ $field ] = date( 'Y-m-d H:i:s', strtotime( $value ) );
 				break;
 			case 'optin_status':
-
 				// Will default to unconfirmed
-				if ( ! is_numeric( $value ) ) {
-					$value = Preferences::string_to_preference( $value );
-				}
-
-				$args[ $field ] = absint( $value );
+				$args[ $field ] = Preferences::string_to_preference( $value );
 				break;
 			case 'user_id':
 			case 'owner_id':

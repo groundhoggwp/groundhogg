@@ -9,17 +9,16 @@ import makeStyles from '@material-ui/core/styles/makeStyles'
 
 import {
   ACTION, ACTIONS,
-  BENCHMARK, BENCHMARKS,
+  BENCHMARK, BENCHMARKS
 
 } from 'components/layout/pages/funnels/editor/steps-types/constants'
+import { CARD_WIDTH } from 'components/layout/pages/funnels/editor/components/StepBlock'
 
-const useStyles = makeStyles((theme) => ( {
+const useStyles = makeStyles((theme) => ({
   stepBlockContainer: {
-    padding: theme.spacing(12),
-    paddingTop: 0,
   },
   stepBlock: {
-    position: 'relative',
+    position: 'relative'
   },
   addStepButtonTop: {
     position: 'absolute',
@@ -27,7 +26,7 @@ const useStyles = makeStyles((theme) => ( {
     top: -theme.spacing(8),
     left: 0,
     bottom: 'auto',
-    right: 0,
+    right: 0
   },
   addStepButtonRight: {
     position: 'absolute',
@@ -35,7 +34,7 @@ const useStyles = makeStyles((theme) => ( {
     right: -theme.spacing(8),
     top: 0,
     left: 'auto',
-    bottom: 0,
+    bottom: 0
   },
   addStepButtonBottom: {
     position: 'absolute',
@@ -43,13 +42,13 @@ const useStyles = makeStyles((theme) => ( {
     bottom: -theme.spacing(8),
     top: 'auto',
     left: 0,
-    right: 0,
-  },
-} ))
+    right: 0
+  }
+}))
 
 export default (props) => {
 
-  const { endingSteps, funnelId, xPos, yPos } = props
+  const { endingSteps, funnelId, graph } = props
   const [anchorEl, setAnchorEl] = useState(null)
   const [addingStep, setAddingStep] = useState(null)
 
@@ -67,34 +66,34 @@ export default (props) => {
 
   const position = {
     position: 'absolute',
-    top: yPos,
-    left: xPos,
+    top: graph.node('exit').y,
+    left: graph.node('exit').x
   }
 
   return (
     <>
-      <Box className={ classNames.stepBlockContainer } style={ position }>
-        <Box className={ classNames.stepBlock }>
-          { endingSteps.length > 1 &&
+      <Box className={classNames.stepBlockContainer} style={position}>
+        <Box className={classNames.stepBlock}>
+          {endingSteps.length > 1 &&
           <AddStepButton
-            funnelID={ funnelId }
-            className={ classNames.addStepButtonTop }
-            parentSteps={ endingSteps }
-            showGroups={ [
+            funnelID={funnelId}
+            position={'topMiddle'}
+            parentSteps={endingSteps}
+            showGroups={[
               BENCHMARKS,
-              ACTIONS,
-            ] }
-            anchorEl={ anchorEl }
-            open={ addingStep === 'top' }
-            setAnchorEl={ setAnchorEl }
-            openStepBlock={ (e) => addStepBlock('top', e) }
-            closeStepBlock={ addStepBlockCancel }
+              ACTIONS
+            ]}
+            anchorEl={anchorEl}
+            open={addingStep === 'top'}
+            setAnchorEl={setAnchorEl}
+            openStepBlock={(e) => addStepBlock('top', e)}
+            closeStepBlock={addStepBlockCancel}
           />
           }
-          <Box display={ 'flex' } justifyContent={ 'center' }>
-            <Card style={ { width: 250 } } id={ 'step-exit' }>
+          <Box display={'flex'} justifyContent={'center'}>
+            <Card style={{ width: CARD_WIDTH }} id={'step-exit'}>
               <CardHeader
-                title={ 'Exit Funnel' }
+                title={'Exit Funnel'}
               />
             </Card>
           </Box>

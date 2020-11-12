@@ -234,14 +234,6 @@ class Tag_Mapping extends Bulk_Job {
 				'tag_name'        => 'Complained',
 				'tag_description' => 'This tag is applied to anyone whose optin status is complained.',
 			],
-			'gh_monthly_tag'        => [
-				'tag_name'        => 'Subscribed (Monthly)',
-				'tag_description' => 'This tag is applied to anyone whose receives emails monthly.',
-			],
-			'gh_weekly_tag'         => [
-				'tag_name'        => 'Subscribed (Weekly)',
-				'tag_description' => 'This tag is applied to anyone who receives emails weekly.',
-			],
 			'gh_marketable_tag'     => [
 				'tag_name'        => 'Marketable',
 				'tag_description' => 'This tag is applied to anyone whose optin status is marketable.',
@@ -285,8 +277,6 @@ class Tag_Mapping extends Bulk_Job {
 				Preferences::SPAM         => Plugin::$instance->settings->get_option( 'gh_spammed_tag', false ),
 				Preferences::HARD_BOUNCE  => Plugin::$instance->settings->get_option( 'gh_bounced_tag', false ),
 				Preferences::COMPLAINED   => Plugin::$instance->settings->get_option( 'gh_complained_tag', false ),
-				Preferences::WEEKLY       => Plugin::$instance->settings->get_option( 'gh_weekly_tag', false ),
-				Preferences::MONTHLY      => Plugin::$instance->settings->get_option( 'gh_monthly_tag', false ),
 				self::MARKETABLE          => Plugin::$instance->settings->get_option( 'gh_marketable_tag', false ),
 				self::NON_MARKETABLE      => Plugin::$instance->settings->get_option( 'gh_non_marketable_tag', false ),
 			];
@@ -337,7 +327,7 @@ class Tag_Mapping extends Bulk_Job {
 	 * Perform the tag mapping.
 	 *
 	 * @param     $contact_id int the ID of the contact
-	 * @param int $status     the status.
+	 * @param int $status the status.
 	 * @param int $old_status the previous status.
 	 *
 	 * @return void
@@ -401,11 +391,7 @@ class Tag_Mapping extends Bulk_Job {
 			$event->get_last_error()->get_error_code() === 'non_marketable'
 			// Check if contact currently has marketable tag
 			&& $event->get_contact()->has_tag( $marketable_tag )
-			// Ignore monthly or weekly preferences
-			&& ! in_array( $event->get_contact()->get_optin_status(), [
-				Preferences::WEEKLY,
-				Preferences::MONTHLY
-			] ) ) {
+		) {
 			$event->get_contact()->remove_tag( $marketable_tag );
 			$event->get_contact()->apply_tag( $non_marketable_tag );
 		}
@@ -489,10 +475,10 @@ class Tag_Mapping extends Bulk_Job {
 			$apply_tags[] = $contact->is_marketable() ? $this->get_status_tag( self::MARKETABLE ) : $this->get_status_tag( self::NON_MARKETABLE );
 
 			// Role tag
-            if ( $contact->get_user_id() ){
-	            $role_tags  = $this->get_roles_pretty_names( $contact->get_userdata()->roles );
-	            $apply_tags = array_merge( $apply_tags, $role_tags );
-            }
+			if ( $contact->get_user_id() ) {
+				$role_tags  = $this->get_roles_pretty_names( $contact->get_userdata()->roles );
+				$apply_tags = array_merge( $apply_tags, $role_tags );
+			}
 
 			// Add the tags
 			$contact->apply_tag( $apply_tags );

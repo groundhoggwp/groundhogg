@@ -10,6 +10,9 @@ import dagre from 'dagre'
 import StepEdges from './components/StepEdges'
 import { CONDITION } from 'components/layout/pages/funnels/editor/steps-types/constants'
 
+export const NODE_HEIGHT = 136 * 2;
+export const NODE_WIDTH = 150 * 2;
+
 /**
  * Breadth first search of the steps tree to build iout a row level based chart
  * for putting the steps on the page.
@@ -32,7 +35,7 @@ function buildGraph (steps, graph) {
       continue
     }
 
-    graph.setNode(ID, { label: ID, width: 300, height: 250 })
+    graph.setNode(ID, { label: ID, width: NODE_WIDTH, height: NODE_HEIGHT })
 
     // Get the child nodes
     let childNodes = steps.filter(
@@ -88,43 +91,17 @@ const Editor = ({ funnel }) => {
 
   graph.setDefaultEdgeLabel(() => { return {} })
 
-  graph.setNode('exit', { label: 'exit', width: 300, height: 250 })
+  graph.setNode('exit', { label: 'exit', width: NODE_WIDTH, height: NODE_HEIGHT })
 
   buildGraph(steps, graph)
 
+  console.debug( graph.nodes().map( i => graph.node( i ) ) )
+
   dagre.layout(graph)
-
-  let exitYPos, exitXPos = 0
-  let graphHeight = 0
-
-  graph.nodes().forEach((ID) => {
-
-    if (!ID) {
-      return
-    }
-
-    const { x, y } = graph.node(ID) || {}
-
-    graphHeight = Math.max(graphHeight, y)
-
-    if (ID === 'exit') {
-      exitXPos = x
-      exitYPos = y
-      return
-    }
-
-    steps.forEach((step) => {
-      if (step.ID == ID) {
-        // step.yPos = step.data.parent_steps.length ? y : 125
-        step.yPos = y
-        step.xPos = x
-      }
-    })
-  })
 
   return (
     <>
-      <div style={ { position: 'relative', height: exitYPos + 100 } }>
+      <div style={ { position: 'relative', height: graph.node( 'exit' ).y + 100 } }>
         {
           steps.length === 0 && (
             <Box display={ 'flex' } justifyContent={ 'center' }>
@@ -138,14 +115,13 @@ const Editor = ({ funnel }) => {
           steps.map(step => {
             return (
               <>
-                <StepBlock { ...step }/>
+                <StepBlock { ...step } graph={graph}/>
               </>
             )
           })
         }
         { steps.length > 0 && <ExitFunnel
-          xPos={ exitXPos }
-          yPos={ exitYPos }
+          graph={graph}
           funnelId={ funnel.ID }
           endingSteps={ endingSteps.map(step => step.ID) }/>
         }

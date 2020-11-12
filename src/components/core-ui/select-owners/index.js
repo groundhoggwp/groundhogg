@@ -7,14 +7,14 @@ import { __ } from '@wordpress/i18n'
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: 500,
+    width: '100%',
     '& > * + *': {
       marginTop: theme.spacing(3),
     },
   },
   formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120,
+    // margin: theme.spacing(1),
+    width: '100%',
   },
   selectEmpty: {
     marginTop: theme.spacing(2),

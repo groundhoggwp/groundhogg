@@ -16,7 +16,7 @@ import { useSelect, useDispatch } from '@wordpress/data'
 	 EMAILS_STORE_NAME
  } from '../../../../data';
 
-export const SingleView = ( props ) => {
+export const SingleView = ( {history} ) => {
 
 	let { id } = useParams();
 
@@ -43,7 +43,7 @@ export const SingleView = ( props ) => {
 
 	return (
 		<Fragment>
-			<BlockEditor email={email} />
+			<BlockEditor email={email} history={history} />
 		</Fragment>
 	)
 }

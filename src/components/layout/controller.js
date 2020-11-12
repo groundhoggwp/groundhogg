@@ -54,7 +54,7 @@ export const getPages = () => {
 		icon : BarChartIcon,
 		label: __( 'Reports' ),
 		name: 'reports',
-		path: '/reports/:report',
+		path: '/reports/:routeId',
 		link: '/reports/overview',
 		priority: 10
 	} );
@@ -125,10 +125,11 @@ export const getPages = () => {
 		icon : SettingsIcon,
 		label: __( 'Settings' ),
 		name: 'settings',
-		path: '/settings',
-		link: '/settings',
+		path: '/settings/:routeId',
+		link: '/settings/general',
 		priority: 60
 	} );
+
 
 	pages = applyFilters(
 		PAGES_FILTER,
