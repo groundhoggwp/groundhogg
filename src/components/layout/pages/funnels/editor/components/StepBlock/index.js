@@ -25,6 +25,7 @@ import { NODE_HEIGHT, NODE_WIDTH } from 'components/layout/pages/funnels/editor'
 const useStyles = makeStyles((theme) => ({
   stepBlockContainer: {
     paddingTop: 0,
+    zIndex: 1,
     position: 'absolute',
     '& .MuiFab-root': {
       zIndex: 99
@@ -109,9 +110,44 @@ export default (props) => {
     setAddingStep(null)
   }
 
+  let gNode =  graph.node(ID);
+
   const positioning = {
-    top: graph.node(ID).y,
-    left: graph.node(ID).x
+    top: gNode && gNode.y,
+    left: gNode && gNode.x
+  }
+
+  let yesPosY, yesPosX, noPosY, noPosX
+
+  if ( step_group === CONDITION ){
+
+    let yesNode = graph.node( child_steps.yes || 'exit' );
+    let noNode = graph.node( child_steps.no || 'exit' );
+
+    yesPosY = noPosY = graph.node(ID).y + (NODE_HEIGHT / 2) + CONDITION_ADD_STEP_OFFSET;
+
+    if ( yesNode.x === noNode.x ){
+      // case 1: yes/no are the same node
+      yesPosX = gNode.x - CONDITION_ADD_STEP_OFFSET;
+      noPosX = gNode.x + NODE_WIDTH - CONDITION_ADD_STEP_OFFSET;
+
+    } else if ( yesNode.x === gNode.x && noNode.x !== gNode.x ){
+      // case 2: yes is 2 levels down, no is 1 level down
+      noPosX = noNode.x + (NODE_WIDTH / 2) - CONDITION_ADD_STEP_OFFSET;
+      yesPosX = gNode.x - CONDITION_ADD_STEP_OFFSET;
+
+    } else if ( noNode.x === gNode.x && yesNode.x !== gNode.x ){
+      // case 3: no is 2 levels down, yes is 1 level down
+      yesPosX = yesNode.x + (NODE_WIDTH / 2) - CONDITION_ADD_STEP_OFFSET;
+      noPosX = gNode.x - CONDITION_ADD_STEP_OFFSET;
+
+    } else {
+      // cas3 4: yes, no are different and are both down 1 level
+      noPosX = noNode.x + (NODE_WIDTH / 2) - CONDITION_ADD_STEP_OFFSET;
+      yesPosX = yesNode.x + (NODE_WIDTH / 2) - CONDITION_ADD_STEP_OFFSET;
+
+    }
+
   }
 
   return (
@@ -208,8 +244,8 @@ export default (props) => {
             funnelID={funnel_id}
             position={{
               position: 'absolute',
-              top: graph.node(ID).y + (NODE_HEIGHT / 2) + CONDITION_ADD_STEP_OFFSET,
-              left: child_steps.no === child_steps.yes ? graph.node(child_steps.no || 'exit').x + (NODE_WIDTH / 2) - (4 * CONDITION_ADD_STEP_OFFSET) : graph.node(child_steps.no || 'exit').x + (NODE_WIDTH / 2) - CONDITION_ADD_STEP_OFFSET
+              top: noPosY,
+              left: noPosX
             }}
             parentSteps={[ID]}
             childSteps={[child_steps.no]}
@@ -230,8 +266,8 @@ export default (props) => {
             funnelID={funnel_id}
             position={{
               position: 'absolute',
-              top: graph.node(ID).y + (NODE_HEIGHT / 2) + CONDITION_ADD_STEP_OFFSET,
-              left: child_steps.no === child_steps.yes ? graph.node(child_steps.yes || 'exit').x + (NODE_WIDTH / 2) + (3 * CONDITION_ADD_STEP_OFFSET) : graph.node(child_steps.yes || 'exit').x + (NODE_WIDTH / 2) - CONDITION_ADD_STEP_OFFSET
+              top: yesPosY,
+              left: yesPosX
             }}
             parentSteps={[ID]}
             childSteps={[child_steps.yes]}

@@ -11,6 +11,8 @@ import {
   CONDITIONS,
 } from 'components/layout/pages/funnels/editor/steps-types/constants'
 
+const COMBINED_PICKER_WIDTH = 500;
+
 const CombinedStepPicker = (props) => {
 
   const { showGroups } = props
@@ -36,7 +38,7 @@ const CombinedStepPicker = (props) => {
 
   return (
     <>
-      <AppBar position={ 'static' }>
+      <AppBar style={{width:COMBINED_PICKER_WIDTH}} position={ 'static' }>
         <Tabs value={ value } onChange={ handleChange }>
           { showGroups.includes( BENCHMARKS ) && <Tab
             value={ BENCHMARKS }
@@ -52,7 +54,9 @@ const CombinedStepPicker = (props) => {
           /> }
         </Tabs>
       </AppBar>
-      <Picker { ...props }/>
+      <div style={{width:COMBINED_PICKER_WIDTH}}>
+        <Picker { ...props }/>
+      </div>
     </>
   )
 }
