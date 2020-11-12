@@ -59,8 +59,8 @@ abstract class Benchmark extends Funnel_Step {
 		// Accepts no arguments, but requires that child implementations setup the data ahead of time.
 		foreach ( $this->get_complete_hooks() as $hook => $args ) {
 			if ( is_array( $args ) ) {
-				add_action( $args[0], [ $this, 'setup' ], 98, $args[1] );
-				add_action( $args[0], [ $this, 'complete' ], 99, 0 );
+				add_action( $args[ 0 ], [ $this, 'setup' ], 98, $args[ 1 ] );
+				add_action( $args[ 0 ], [ $this, 'complete' ], 99, 0 );
 			} else {
 				add_action( $hook, [ $this, 'setup' ], 98, $args );
 				add_action( $hook, [ $this, 'complete' ], 99, 0 );
@@ -107,7 +107,7 @@ abstract class Benchmark extends Funnel_Step {
 				continue;
 			}
 
-			$this->set_current_contact( $this->get_the_contact() );
+			$this->set_current_contact( $contact );
 
 			if ( $this->can_complete_step() && $step->can_complete( $this->get_current_contact() ) ) {
 
