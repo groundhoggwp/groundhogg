@@ -11,8 +11,8 @@ import StepEdges from './components/StepEdges'
 import { CONDITION } from 'components/layout/pages/funnels/editor/steps-types/constants'
 import { useLayoutEffect, useRef, useState } from '@wordpress/element'
 
-export const NODE_HEIGHT = 136 * 2;
-export const NODE_WIDTH = 150 * 2;
+export const NODE_HEIGHT = 136 * 2
+export const NODE_WIDTH = 150 * 2
 
 /**
  * Breadth first search of the steps tree to build iout a row level based chart
@@ -46,10 +46,13 @@ function buildGraph (steps, graph) {
       graph.setEdge(ID, child_steps.no || 'exit')
       graph.setEdge(ID, child_steps.yes || 'exit')
 
-      child_steps.yes && queue.push( childNodes.find( node => node.ID === child_steps.yes  ) )
-      child_steps.no && queue.push( childNodes.find( node => node.ID === child_steps.no  ) )
+      child_steps.yes &&
+      queue.push(childNodes.find(node => node.ID === child_steps.yes))
+      child_steps.no &&
+      queue.push(childNodes.find(node => node.ID === child_steps.no))
 
-    } else {
+    }
+    else {
 
       if (!childNodes.length) {
         // set to exit
@@ -76,18 +79,24 @@ const Editor = ({ funnel }) => {
     return null
   }
 
-  const [dimensions, setDimensions] = useState({ width:0, height: 0 });
-  const targetRef = useRef();
-  useLayoutEffect(()=>{
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
+  const targetRef = useRef()
+  useLayoutEffect(() => {
     if (targetRef.current) {
-      setDimensions({
-        width: targetRef.current.offsetWidth,
-        height: targetRef.current.offsetHeight
-      });
+      const updateDimensions = () => {
+        setDimensions({
+          width: targetRef.current.offsetWidth,
+          height: targetRef.current.offsetHeight,
+        })
+      }
+
+      window.addEventListener('resize', updateDimensions);
+      updateDimensions();
+      return () => window.removeEventListener('resize', updateDimensions);
     }
   }, [])
 
-  let windowMidPoint = dimensions.width / 2;
+  let windowMidPoint = dimensions.width / 2
 
   const steps = funnel.steps
 
@@ -105,19 +114,21 @@ const Editor = ({ funnel }) => {
 
   graph.setDefaultEdgeLabel(() => { return {} })
 
-  graph.setNode('exit', { label: 'exit', width: NODE_WIDTH, height: NODE_HEIGHT })
+  graph.setNode('exit',
+    { label: 'exit', width: NODE_WIDTH, height: NODE_HEIGHT })
 
   buildGraph(steps, graph)
 
-  console.debug( graph.nodes().map( i => graph.node( i ) ) )
-
   dagre.layout(graph)
 
-  let XOffset = windowMidPoint - graph.node('exit').x - (NODE_WIDTH/2);
+  let XOffset = windowMidPoint - graph.node('exit').x - ( NODE_WIDTH / 2 )
 
   return (
     <>
-      <div ref={targetRef} style={ { position: 'relative', height: graph.node( 'exit' ).y + 100 } }>
+      <div ref={ targetRef } style={ {
+        position: 'relative',
+        height: graph.node('exit').y + 100,
+      } }>
         {
           steps.length === 0 && (
             <Box display={ 'flex' } justifyContent={ 'center' }>
@@ -131,16 +142,16 @@ const Editor = ({ funnel }) => {
           steps.map(step => {
             return (
               <>
-                <StepBlock { ...step } graph={graph} xOffset={XOffset}/>
+                <StepBlock { ...step } graph={ graph } xOffset={ XOffset }/>
               </>
             )
           })
         }
         { steps.length > 0 && <ExitFunnel
-          graph={graph}
+          graph={ graph }
           funnelId={ funnel.ID }
           endingSteps={ endingSteps.map(step => step.ID) }
-          xOffset={XOffset}
+          xOffset={ XOffset }
         />
         }
         {
