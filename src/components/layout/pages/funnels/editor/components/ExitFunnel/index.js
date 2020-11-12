@@ -12,11 +12,10 @@ import {
   BENCHMARK, BENCHMARKS
 
 } from 'components/layout/pages/funnels/editor/steps-types/constants'
+import { CARD_WIDTH } from 'components/layout/pages/funnels/editor/components/StepBlock'
 
 const useStyles = makeStyles((theme) => ({
   stepBlockContainer: {
-    padding: theme.spacing(12),
-    paddingTop: 0
   },
   stepBlock: {
     position: 'relative'
@@ -92,7 +91,7 @@ export default (props) => {
           />
           }
           <Box display={'flex'} justifyContent={'center'}>
-            <Card style={{ width: 250 }} id={'step-exit'}>
+            <Card style={{ width: CARD_WIDTH }} id={'step-exit'}>
               <CardHeader
                 title={'Exit Funnel'}
               />

@@ -91,9 +91,11 @@ const Editor = ({ funnel }) => {
 
   graph.setDefaultEdgeLabel(() => { return {} })
 
-  graph.setNode('exit', { label: 'exit', width: 300, height: 250 })
+  graph.setNode('exit', { label: 'exit', width: NODE_WIDTH, height: NODE_HEIGHT })
 
   buildGraph(steps, graph)
+
+  console.debug( graph.nodes().map( i => graph.node( i ) ) )
 
   dagre.layout(graph)
 

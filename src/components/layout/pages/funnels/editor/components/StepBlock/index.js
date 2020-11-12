@@ -53,6 +53,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const CONDITION_ADD_STEP_OFFSET = 45
+export const CARD_WIDTH = 250;
 
 export default (props) => {
 
@@ -171,7 +172,7 @@ export default (props) => {
           />
           }
           <Card className={classes.join(' ') + ' ' + classNames.stepCard}
-                style={{ width: 250 }}
+                style={{ width: CARD_WIDTH }}
                 id={'step-card-' + ID}>
             <CardHeader
               avatar={stepType.icon}
