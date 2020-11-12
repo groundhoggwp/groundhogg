@@ -3,7 +3,7 @@ import { DataGrid } from '@material-ui/data-grid';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from "@material-ui/core/Card";
 
-const ReportTable = ({title, data, gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd}) => {
+const ReportTable = ({title, data, gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd, fullWidth}) => {
   const useStyles = makeStyles({
     root:{
       position:'relative',
@@ -15,7 +15,7 @@ const ReportTable = ({title, data, gridColumnStart, gridColumnEnd, gridRowStart,
     },
     table: {
       width: '100%',
-      height: '300px'
+      height: '100%'
     },
     title: {
       fontSize: '18px',
@@ -43,22 +43,35 @@ const ReportTable = ({title, data, gridColumnStart, gridColumnEnd, gridRowStart,
   }
 
   // Manual width calc is required because each container is dynamic and data grid can't use % then
-  const columnWidth = ((window.innerWidth-600)/(data.chart.label.length*2));
-  const columns = data.chart.label.map((label)=>{
+  let columnWidth = ((window.innerWidth/2)/(data.chart.label.length*2));
+  if(fullWidth){
+    columnWidth = ((window.innerWidth)/(data.chart.label.length*2));
+  }
+  let columns = data.chart.label.map((label)=>{
     if(typeof(value)=== 'object'){
       label = 'Conversation Rate';
     }
+
     return { field: label, headerName: label, width: columnWidth, align: 'left', sortable: true }
   });
 
+  if(data.chart.data[0].percentage && !data.chart.label.includes('Percentage')){
+    columns.push({ field: 'Percentage', headerName: 'Percentage', width: columnWidth, align: 'left', sortable: true })
+  }
+
+
   const rows = data.chart.data.map((data, i)=>{
-    return { id: i, [columns[0]['field']]: data.label, [columns[1]['field']]: data.data};
+    let row = { id: i, [columns[0]['field']]: data.label, [columns[1]['field']]: data.data};
+    if(data.percentage){
+      row['Percentage'] = data.percentage;
+    }
+    return row
   })
 
   return (
     <Card className={classes.root}>
       <div className={classes.title}>{title}</div>
-      <DataGrid rows={rows} columns={columns} pageSize={5} checkboxSelection={false} />
+      <DataGrid rows={rows} columns={columns} pageSize={6} checkboxSelection={false} />
     </Card>
   );
 }

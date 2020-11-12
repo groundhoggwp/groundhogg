@@ -110,33 +110,36 @@ export function Reports({history, match}) {
                gridRowStart: 4,
                gridRowEnd: 4,
               },
-              // {
-              //  name:"chart_contacts_by_optin_status",
-              //  gridColumnStart: 1,
-              //  gridColumnEnd: 3,
-              //  gridRowStart: 5,
-              //  gridRowEnd: 8,
-              // },
+              {
+               name:"chart_contacts_by_optin_status",
+               gridColumnStart: 1,
+               gridColumnEnd: 3,
+               gridRowStart: 5,
+               gridRowEnd: 7,
+              },
               {
                name:"table_top_converting_funnels",
                gridColumnStart: 1,
                gridColumnEnd: 3,
-               gridRowStart: 8,
-               gridRowEnd: 11,
+               gridRowStart: 7,
+               gridRowEnd: 10,
+               fullWidth: false
               },
               {
                name:"table_contacts_by_countries",
                gridColumnStart: 3,
                gridColumnEnd: 5,
-               gridRowStart: 8,
-               gridRowEnd: 11,
+               gridRowStart: 7,
+               gridRowEnd: 10,
+               fullWidth: false
               },
               {
                name:"table_contacts_by_lead_source",
                gridColumnStart: 1,
                gridColumnEnd: 5,
-               gridRowStart: 11,
-               gridRowEnd: 14,
+               gridRowStart: 10,
+               gridRowEnd: 13,
+               fullWidth: true
               },
             ]}
           />

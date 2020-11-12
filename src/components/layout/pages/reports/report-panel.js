@@ -29,6 +29,7 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     paddingTop: '10px',
     gridGap: '10px',
+    // gridTemplateColumns: "repeat(5, 20%)",
     gridTemplateColumns: "repeat(3, calc(33% - 80px)) 240px",
     gridTemplateRows: "repeat(100, 160px)",
     rowGap: '10px',
@@ -65,15 +66,17 @@ export default ({ key, reportList, dateChange, startDate, endDate }) => {
     }
   );
 
+  // This needs to be re-factored, its an issue in the data store
+  // console.log('before manual fix', reports.length)
   Object.keys(reports).forEach((reportName)=>{
-    console.log(reportName, reportList)
-    console.log(reportName, reportNames.includes(reportName))
+    // console.log(reportName, reportList)
+    // console.log(reportName, reportNames.includes(reportName))
     if(!reportNames.includes(reportName)){
       delete reports[reportName]
     }
   })
 
-  console.log('result', reports.length)
+  // console.log('result', reports.length)
 
   if (typeof reports === "undefined") {
     return null;
@@ -102,12 +105,12 @@ export default ({ key, reportList, dateChange, startDate, endDate }) => {
           title = title.join(" ");
 
           if(reportList[i]){
-            const { gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd } = reportList[i];
+            const { gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd, fullWidth } = reportList[i];
 
             if (type === "quick_stat") {
               return <Stats title={title} id={reportKey} data={reports[reportKey]}  gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} />;
             } else if (type === "table") {
-              return <ReportTable title={title} id={reportKey} data={reports[reportKey]}  gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} />;
+              return <ReportTable title={title} id={reportKey} data={reports[reportKey]}  gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} fullWidth={fullWidth}/>;
             } else if(type === "doughnut" || type === "line" || type === "bar" ) {
               return <Chart title={title} id={reportKey} data={reports[reportKey]} gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} />;
             } else {
