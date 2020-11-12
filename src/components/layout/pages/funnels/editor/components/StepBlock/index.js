@@ -19,10 +19,11 @@ import {
 import {
   FUNNELS_STORE_NAME
 } from 'data'
+import theme from 'components/layout/theme'
+import { NODE_HEIGHT, NODE_WIDTH } from 'components/layout/pages/funnels/editor'
 
 const useStyles = makeStyles((theme) => ({
   stepBlockContainer: {
-    padding: theme.spacing(12),
     paddingTop: 0,
     position: 'absolute',
     '& .MuiFab-root': {
@@ -50,6 +51,8 @@ const useStyles = makeStyles((theme) => ({
     }
   }
 }))
+
+const CONDITION_ADD_STEP_OFFSET = 45
 
 export default (props) => {
 
@@ -167,46 +170,6 @@ export default (props) => {
             closeStepBlock={addStepBlockCancel}
           />
           }
-          {step_group === CONDITION && (
-            <>
-              <AddStepButton
-                toolTipTitle={'No'}
-                id={'add-step-no-' + ID}
-                funnelID={funnel_id}
-                position={graph.node(child_steps.no || 'exit').x >= graph.node(child_steps.yes || 'exit').x ? 'bottomRight' : 'bottomLeft'}
-                parentSteps={[ID]}
-                childSteps={[child_steps.no]}
-                showGroups={[
-                  ACTIONS,
-                  CONDITIONS
-                ].filter(item => item !== false)}
-                open={addingStep === 'no'}
-                anchorEl={anchorEl}
-                setAnchorEl={setAnchorEl}
-                openStepBlock={(e) => addStepBlock('no', e)}
-                closeStepBlock={addStepBlockCancel}
-                conditionPath={'no'}
-              />
-              <AddStepButton
-                toolTipTitle={'Yes'}
-                id={'add-step-yes-' + ID}
-                funnelID={funnel_id}
-                position={graph.node(child_steps.yes || 'exit').x <= graph.node(child_steps.no || 'exit').x ? 'bottomLeft' : 'bottomRight'}
-                parentSteps={[ID]}
-                childSteps={[child_steps.yes]}
-                showGroups={[
-                  ACTIONS,
-                  CONDITIONS
-                ].filter(item => item !== false)}
-                open={addingStep === 'yes'}
-                anchorEl={anchorEl}
-                setAnchorEl={setAnchorEl}
-                openStepBlock={(e) => addStepBlock('yes', e)}
-                closeStepBlock={addStepBlockCancel}
-                conditionPath={'yes'}
-              />
-            </>)
-          }
           <Card className={classes.join(' ') + ' ' + classNames.stepCard}
                 style={{ width: 250 }}
                 id={'step-card-' + ID}>
@@ -236,6 +199,54 @@ export default (props) => {
           </Card>
         </Box>
       </Box>
+      {step_group === CONDITION && (
+        <>
+          <AddStepButton
+            toolTipTitle={'No'}
+            id={'add-step-no-' + ID}
+            funnelID={funnel_id}
+            position={{
+              position: 'absolute',
+              top: graph.node(ID).y + (NODE_HEIGHT / 2) + CONDITION_ADD_STEP_OFFSET,
+              left: child_steps.no === child_steps.yes ? graph.node(child_steps.no || 'exit').x + (NODE_WIDTH / 2) - (4 * CONDITION_ADD_STEP_OFFSET) : graph.node(child_steps.no || 'exit').x + (NODE_WIDTH / 2) - CONDITION_ADD_STEP_OFFSET
+            }}
+            parentSteps={[ID]}
+            childSteps={[child_steps.no]}
+            showGroups={[
+              ACTIONS,
+              CONDITIONS
+            ].filter(item => item !== false)}
+            open={addingStep === 'no'}
+            anchorEl={anchorEl}
+            setAnchorEl={setAnchorEl}
+            openStepBlock={(e) => addStepBlock('no', e)}
+            closeStepBlock={addStepBlockCancel}
+            conditionPath={'no'}
+          />
+          <AddStepButton
+            toolTipTitle={'Yes'}
+            id={'add-step-yes-' + ID}
+            funnelID={funnel_id}
+            position={{
+              position: 'absolute',
+              top: graph.node(ID).y + (NODE_HEIGHT / 2) + CONDITION_ADD_STEP_OFFSET,
+              left: child_steps.no === child_steps.yes ? graph.node(child_steps.yes || 'exit').x + (NODE_WIDTH / 2) + (3 * CONDITION_ADD_STEP_OFFSET) : graph.node(child_steps.yes || 'exit').x + (NODE_WIDTH / 2) - CONDITION_ADD_STEP_OFFSET
+            }}
+            parentSteps={[ID]}
+            childSteps={[child_steps.yes]}
+            showGroups={[
+              ACTIONS,
+              CONDITIONS
+            ].filter(item => item !== false)}
+            open={addingStep === 'yes'}
+            anchorEl={anchorEl}
+            setAnchorEl={setAnchorEl}
+            openStepBlock={(e) => addStepBlock('yes', e)}
+            closeStepBlock={addStepBlockCancel}
+            conditionPath={'yes'}
+          />
+        </>)
+      }
     </>
   )
 }

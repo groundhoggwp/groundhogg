@@ -10,6 +10,9 @@ import dagre from 'dagre'
 import StepEdges from './components/StepEdges'
 import { CONDITION } from 'components/layout/pages/funnels/editor/steps-types/constants'
 
+export const NODE_HEIGHT = 136 * 2;
+export const NODE_WIDTH = 150 * 2;
+
 /**
  * Breadth first search of the steps tree to build iout a row level based chart
  * for putting the steps on the page.
@@ -32,7 +35,7 @@ function buildGraph (steps, graph) {
       continue
     }
 
-    graph.setNode(ID, { label: ID, width: 300, height: 250 })
+    graph.setNode(ID, { label: ID, width: NODE_WIDTH, height: NODE_HEIGHT })
 
     // Get the child nodes
     let childNodes = steps.filter(
@@ -116,8 +119,7 @@ const Editor = ({ funnel }) => {
           })
         }
         { steps.length > 0 && <ExitFunnel
-          xPos={ graph.node( 'exit' ).x }
-          yPos={ graph.node( 'exit' ).y }
+          graph={graph}
           funnelId={ funnel.ID }
           endingSteps={ endingSteps.map(step => step.ID) }/>
         }
