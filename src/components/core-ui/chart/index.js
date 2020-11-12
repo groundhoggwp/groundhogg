@@ -45,7 +45,19 @@ const Chart = ({id, title, data, gridColumnStart, gridColumnEnd, gridRowStart, g
     chartConfig = doughnutChartConfig;
   }
 
-  chartConfig.data =  data.chart.data;
+  // Remove and just set the data in the future, my local shows about 213 labels for this
+  console.log(data.chart.data)
+  if (data.chart.type === "doughnut") {
+    let labels = data.chart.data.labels.splice(0,10);
+    let backgroundColor = data.chart.data.datasets[0].backgroundColor.splice(0,10);
+    let dataNameSpace = data.chart.data.datasets[0].data.splice(0,10);
+    chartConfig.data = {
+      labels,
+      datasets: [{"backgroundColor":backgroundColor, "data":dataNameSpace}]
+    }
+  } else {
+    chartConfig.data =  data.chart.data;
+  }
 
   useEffect(() => {
     if (chartContainer && chartContainer.current) {
