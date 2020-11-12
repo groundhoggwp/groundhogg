@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default (props) => {
 
-  const { endingSteps, funnelId, graph } = props
+  const { endingSteps, funnelId, graph, xOffset } = props
   const [anchorEl, setAnchorEl] = useState(null)
   const [addingStep, setAddingStep] = useState(null)
 
@@ -67,7 +67,7 @@ export default (props) => {
   const position = {
     position: 'absolute',
     top: graph.node('exit').y,
-    left: graph.node('exit').x
+    left: graph.node('exit').x + xOffset
   }
 
   return (

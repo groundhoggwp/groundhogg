@@ -65,7 +65,7 @@ export default (props) => {
 
   const classNames = useStyles()
 
-  const { ID, data, meta, funnelID, level, index, graph } = props
+  const { ID, data, meta, funnelID, level, index, graph, xOffset } = props
   const { step_title, step_type, step_group, parent_steps, child_steps, funnel_id } = data
   const { yes_steps, no_steps } = meta
 
@@ -114,7 +114,7 @@ export default (props) => {
 
   const positioning = {
     top: gNode && gNode.y,
-    left: gNode && gNode.x
+    left: gNode && gNode.x + xOffset
   }
 
   let yesPosY, yesPosX, noPosY, noPosX
@@ -245,7 +245,7 @@ export default (props) => {
             position={{
               position: 'absolute',
               top: noPosY,
-              left: noPosX
+              left: noPosX + xOffset
             }}
             parentSteps={[ID]}
             childSteps={[child_steps.no]}
@@ -267,7 +267,7 @@ export default (props) => {
             position={{
               position: 'absolute',
               top: yesPosY,
-              left: yesPosX
+              left: yesPosX + xOffset
             }}
             parentSteps={[ID]}
             childSteps={[child_steps.yes]}

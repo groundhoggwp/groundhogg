@@ -9,6 +9,7 @@ import { withSelect } from '@wordpress/data'
 import dagre from 'dagre'
 import StepEdges from './components/StepEdges'
 import { CONDITION } from 'components/layout/pages/funnels/editor/steps-types/constants'
+import { useLayoutEffect, useRef, useState } from '@wordpress/element'
 
 export const NODE_HEIGHT = 136 * 2;
 export const NODE_WIDTH = 150 * 2;
@@ -75,6 +76,19 @@ const Editor = ({ funnel }) => {
     return null
   }
 
+  const [dimensions, setDimensions] = useState({ width:0, height: 0 });
+  const targetRef = useRef();
+  useLayoutEffect(()=>{
+    if (targetRef.current) {
+      setDimensions({
+        width: targetRef.current.offsetWidth,
+        height: targetRef.current.offsetHeight
+      });
+    }
+  }, [])
+
+  let windowMidPoint = dimensions.width / 2;
+
   const steps = funnel.steps
 
   const endingSteps = steps.filter(
@@ -99,9 +113,11 @@ const Editor = ({ funnel }) => {
 
   dagre.layout(graph)
 
+  let XOffset = windowMidPoint - graph.node('exit').x - (NODE_WIDTH/2);
+
   return (
     <>
-      <div style={ { position: 'relative', height: graph.node( 'exit' ).y + 100 } }>
+      <div ref={targetRef} style={ { position: 'relative', height: graph.node( 'exit' ).y + 100 } }>
         {
           steps.length === 0 && (
             <Box display={ 'flex' } justifyContent={ 'center' }>
@@ -115,7 +131,7 @@ const Editor = ({ funnel }) => {
           steps.map(step => {
             return (
               <>
-                <StepBlock { ...step } graph={graph}/>
+                <StepBlock { ...step } graph={graph} xOffset={XOffset}/>
               </>
             )
           })
@@ -123,7 +139,9 @@ const Editor = ({ funnel }) => {
         { steps.length > 0 && <ExitFunnel
           graph={graph}
           funnelId={ funnel.ID }
-          endingSteps={ endingSteps.map(step => step.ID) }/>
+          endingSteps={ endingSteps.map(step => step.ID) }
+          xOffset={XOffset}
+        />
         }
         {
           steps.map((step, i) => <StepEdges { ...step } />)
