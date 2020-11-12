@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n'
 import { applyFilters } from '@wordpress/hooks'
 import { filter, forEach } from 'lodash'
 import TabPanel from 'components/core-ui/tab-panel'
-import { SettingsSection } from './settings-section'
+import { SettingsPanel } from './settings-panel'
 
 export const Settings = ({history, match}) => {
 	const getTabs = () => {
@@ -32,7 +32,7 @@ export const Settings = ({history, match}) => {
 			route: tab.title.toLowerCase(),
 			component : () => {
 				return (
-				  <SettingsSection section={ section } />
+				  <SettingsPanel section={ section } />
 				);
 			}
 		})

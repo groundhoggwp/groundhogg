@@ -26,9 +26,7 @@ import { useSettings } from 'data'
 import { addNotification } from 'utils'
 
 
-
-
-export const SettingsSection = ( { section } ) => {
+export const SettingsPanel = ( { section } ) => {
 	const {
 		settingsError,
 		isRequesting,
