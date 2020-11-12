@@ -20,7 +20,7 @@ class Authentication_Api extends Base {
 			[
 				'methods'              => WP_REST_Server::CREATABLE,
 				'callback'             => [ $this, 'get_credentials' ],
-				'permissions_callback' => '__return_true',
+				'permission_callback' => '__return_true',
 				'args'                 => [
 					'login'    => [
 						'description' => 'User login.',
