@@ -3,15 +3,21 @@
 namespace Groundhogg\Admin;
 
 use Groundhogg\Plugin;
-use Groundhogg\Admin\Settings\Settings_Page;
+use Groundhogg\Settings;
 use function Groundhogg\get_url_var;
 use function Groundhogg\groundhogg_logo;
+use function Groundhogg\white_labeled_name;
 
 class React_App {
 
-	protected $settings = [];
+	/**
+	 * @var Settings
+	 */
+	protected $settings;
 
 	public function __construct() {;
+
+	    add_action( 'admin_menu', [ $this, 'register_menu_item' ] );
 
 		add_action( 'rest_api_init', [ $this, 'register_rest_settings' ] );
 
@@ -27,8 +33,22 @@ class React_App {
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_basename' ] );
 	}
 
+	public function register_menu_item () {
+		add_menu_page(
+			white_labeled_name(),
+			white_labeled_name(),
+			'view_contacts',
+			'groundhogg',
+			function () {
+				echo 'Whoops!';
+			},
+			'dashicons-email-alt',
+			2
+		);
+	}
+
 	public function register_rest_settings() {
-		$this->settings = new Settings_Page();
+		$this->settings = new Settings();
 		$this->settings->init_defaults();
 		$this->settings->register_settings();
 	}
@@ -232,7 +252,7 @@ class React_App {
 	 * @return mixed
 	 */
 	public function register_settings( $obj ) {
-		$this->settings = new Settings_Page();
+		$this->settings = new Settings();
 
 		$this->settings->init_defaults();
 		$this->settings->register_settings();

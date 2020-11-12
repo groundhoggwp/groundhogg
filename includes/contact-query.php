@@ -718,9 +718,7 @@ class Contact_Query {
 		if ( $this->query_vars['optin_status'] && $this->query_vars['optin_status'] !== 'any' ) {
 
 			if ( is_array( $this->query_vars['optin_status'] ) ) {
-				$this->query_vars['optin_status'] = implode( ',', wp_parse_id_list( $this->query_vars['optin_status'] ) );
-			} else {
-				$this->query_vars['optin_status'] = absint( $this->query_vars['optin_status'] );
+				$this->query_vars['optin_status'] = implode( ',', $this->query_vars['optin_status'] );
 			}
 
 			$where['optin_status'] = "optin_status IN ( {$this->query_vars['optin_status']} )";

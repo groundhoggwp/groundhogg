@@ -98,30 +98,30 @@ export default ({ data, meta, ID }) => {
       arrows.push({
         ...arrowStyle,
         start: `step-card-${ ID }`,
-        end: `add-step-bottom-left-${ ID }`,
-        endAnchor: ['right', 'middle'],
+        end: `add-step-no-${ ID }`,
+        endAnchor: ['top', 'middle'],
         headSize: 0,
       })
 
       arrows.push({
         ...arrowStyle,
         start: `step-card-${ ID }`,
-        end: `add-step-bottom-right-${ ID }`,
-        endAnchor: ['left', 'middle'],
+        end: `add-step-yes-${ ID }`,
+        endAnchor: ['top', 'middle'],
         headSize: 0,
       })
 
       arrows.push({
         ...arrowStyle,
         startAnchor: ['bottom', 'middle'],
-        start: `add-step-bottom-right-${ ID }`,
+        start: `add-step-no-${ ID }`,
         end: child_steps.no ? `step-card-${ child_steps.no }` : 'step-exit',
       })
 
       arrows.push({
         ...arrowStyle,
         startAnchor: ['bottom', 'middle'],
-        start: `add-step-bottom-left-${ ID }`,
+        start: `add-step-yes-${ ID }`,
         end: child_steps.yes ? `step-card-${ child_steps.yes }` : 'step-exit',
       })
 

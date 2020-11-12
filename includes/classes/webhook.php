@@ -2,13 +2,17 @@
 
 namespace Groundhogg;
 
+use Groundhogg\DB\Meta_DB;
+
 /**
  * Created by PhpStorm.
  * User: atty
  * Date: 01-May-19
  * Time: 4:34 PM
  */
-class Webhook extends Base_Object {
+class Webhook extends Base_Object_With_Meta {
+
+	protected static $requests = [];
 
 	/**
 	 * @return DB\DB|DB\Meta_DB|DB\Tags
@@ -47,10 +51,8 @@ class Webhook extends Base_Object {
 	 * @param $event string
 	 * @param $initiated_by string
 	 * @param $data  mixed
-	 *
-	 * @return array|bool|object|\WP_Error
 	 */
-	public function post( $event, $initiated_by, $data ) {
+	public function build_request( $event, $initiated_by, $data ) {
 
 		$data = [
 			'event'        => $event,
@@ -58,13 +60,34 @@ class Webhook extends Base_Object {
 			'data'         => $data
 		];
 
-		return remote_post_json( $this->get_endpoint(), $data );
+		$headers = $this->get_meta( 'custom_headers' );
+
+		$content_type = $this->get_meta( 'content_type' );
+
+		switch ( $content_type ) {
+			default:
+			case 'json':
+				$headers['Content-Type'] = sprintf( 'application/json; charset=%s', get_bloginfo( 'charset' ) );
+				$data                    = wp_json_encode( $data );
+				break;
+			case 'form':
+				$headers['Content-Type'] = sprintf( 'application/x-www-form-urlencoded; charset=%s', get_bloginfo( 'charset' ) );
+				break;
+		}
+
+		$request = [
+			'type'    => 'POST',
+			'headers' => $headers,
+			'url'     => $this->get_endpoint(),
+			'data'    => $data,
+			'options' => [],
+		];
+
+		self::$requests[] = $request;
 	}
 
 	/**
 	 * Dispatch the webhooks for a particular endpoint
-	 *
-	 * todo introduce batching HTTP requests...
 	 *
 	 * @param $event
 	 * @param $initiated_by
@@ -83,11 +106,25 @@ class Webhook extends Base_Object {
 		$webhooks = id_list_to_class( $webhooks, Webhook::class );
 
 		/**
+		 * Add the batch requests to the requests array
+		 *
 		 * @var $webhooks Webhook[]
 		 */
 		foreach ( $webhooks as $webhook ) {
-			$webhook->post( $event, $initiated_by, $data );
+			$webhook->build_request( $event, $initiated_by, $data );
 		}
 
+		// Initiate the requests
+		\Requests::request_multiple( self::$requests );
+
+		// Clear the requests
+		self::$requests = [];
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	protected function get_meta_db() {
+		return get_db( 'webhook_meta' );
 	}
 }
