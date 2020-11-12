@@ -74,7 +74,9 @@ export const ImportSteps = (props) => {
     const [data, setData] = useState({
         file: location.file ? location.file : null,
         delimiter : ';',
-        map : {}
+        map : {},
+        tags : [],
+        confirm : false
     });
 
     const handleNext = () => {
