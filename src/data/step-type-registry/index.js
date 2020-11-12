@@ -1,4 +1,4 @@
-import { dispatch, registerStore } from '@wordpress/data'
+import { dispatch, registerStore, select } from '@wordpress/data'
 
 export const STEP_TYPES_STORE_NAME = 'gh/stepTypes'
 
@@ -54,4 +54,14 @@ registerStore(STEP_TYPES_STORE_NAME, {
 export function registerStepType ( type, atts ) {
   atts.type = type;
   dispatch( STEP_TYPES_STORE_NAME ).addType( type, atts )
+}
+
+/**
+ * Get the step type
+ *
+ * @param type
+ * @returns {*|string}
+ */
+export function getStepType ( type ) {
+  return select(STEP_TYPES_STORE_NAME).getType(type)
 }

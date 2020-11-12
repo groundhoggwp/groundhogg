@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-export default (props) => {
+export default ({id, groups, parents, children, position}) => {
 
   const classes = useStyles()
 
@@ -55,7 +55,7 @@ export default (props) => {
 
   return (
     <>
-      <Tooltip title={toolTipTitle}>
+      <Tooltip title={toolTipTitle || 'Add'}>
         <Fab id={id} style={typeof position === 'object' ? position : {}}
              className={typeof position === 'string' ? classes[position] : ''} size={'small'} aria-label="add"
              onClick={openStepBlock}>

@@ -1,10 +1,12 @@
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
-import { ACTION } from '../../constants'
+import { ACTION, ACTION_TYPE_DEFAULTS } from '../../constants'
 import { registerStepType } from 'data/step-type-registry'
 
 const STEP_TYPE = 'remove_tag'
 
 const stepAtts = {
+
+  ...ACTION_TYPE_DEFAULTS,
 
   type: STEP_TYPE,
 
