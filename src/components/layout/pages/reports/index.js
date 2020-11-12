@@ -330,7 +330,7 @@ export function Reports({history, match}) {
                name:"table_top_performing_broadcasts",
                gridColumnStart: 1,
                gridColumnEnd: 3,
-               gridRowStart: 4,
+               gridRowStart: 5,
                gridRowEnd: 8,
               },
               {

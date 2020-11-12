@@ -37,16 +37,17 @@ const Chart = ({id, title, data, gridColumnStart, gridColumnEnd, gridRowStart, g
   const [chartInstance, setChartInstance] = useState(null);
 
   let chartConfig;
+  let canvasHeight;
   if (data.chart.type === "line") {
     chartConfig = lineChartConfig;
   } else if (data.chart.type === "bar") {
     chartConfig = barChartConfig;
   } else if (data.chart.type === "doughnut") {
     chartConfig = doughnutChartConfig;
+    canvasHeight = 145
   }
 
   // Remove and just set the data in the future, my local shows about 213 labels for this
-  console.log(data.chart.data)
   if (data.chart.type === "doughnut") {
     let labels = data.chart.data.labels.splice(0,10);
     let backgroundColor = data.chart.data.datasets[0].backgroundColor.splice(0,10);
@@ -68,7 +69,7 @@ const Chart = ({id, title, data, gridColumnStart, gridColumnEnd, gridRowStart, g
   return (
     <Card className={classes.root}>
       <div className={classes.title}>{title}</div>
-      <canvas className={"Chart__canvas"+id} ref={chartContainer} />
+      <canvas height={canvasHeight} className={`Chart__canvas ${id}`} ref={chartContainer} />
     </Card>
   );
 };

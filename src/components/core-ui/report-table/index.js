@@ -43,10 +43,12 @@ const ReportTable = ({title, data, gridColumnStart, gridColumnEnd, gridRowStart,
 
   const classes = useStyles();
 
+  // Stop Renders while data is loading
   if(!data.chart.data){
     return(<div/>)
   }
 
+  // Report has no Data
   if(data.chart.data.length === 0){
     return (
       <Card className={classes.root}>
@@ -55,47 +57,50 @@ const ReportTable = ({title, data, gridColumnStart, gridColumnEnd, gridRowStart,
       </Card>
     );
   }
-
-  // const tableLabels = data.chart.label.filter(label => !label.includes('Funnel'))
   const tableLabels = data.chart.label;
-  // const dataset
-  // console.log(data.chart.label, data.chart.data, tableLabels)
+  const tableData = data.chart.data.map((row)=>{
+    Object.keys(row).map((key)=>{
+      if(typeof row[key] === 'object') {
+        delete row[key];
+      }
+    });
+    return row;
+  })
+  const tableFields = Object.keys(tableData[0]);
+
 
   // Manual width calc is required because each container is dynamic and data grid can't use % then
-  let columnWidth = ((window.innerWidth/2)/(tableLabels.length*2));
+  let columnWidth = (((window.innerWidth-300)/2)/(tableFields.length));
   if(fullWidth){
-    columnWidth = ((window.innerWidth)/(tableLabels.length*2));
+    columnWidth = ((window.innerWidth)/(tableFields.length*2));
   }
-  // console.log(title, columnWidth)
+
+  // console.log(tableFields.length, window.innerWidth, columnWidth)
 
   const columns = Object.keys(data.chart.data[0]).map((label, i)=>{
     // The server data model isn't ideal for this component, sometimes labels are valid and exist
-    // Sometimes they need to be inferred from row data
+    // Sometimes they need to be inferred from row data.
     if(tableLabels[i]){
       label = tableLabels[i]
     }
-    if(typeof(value)=== 'object'){
-      label = 'Conversation Rate';
-    }
 
-    return { field: label, headerName: _.capitalize(label), width: columnWidth, align: 'left', sortable: true }
+    return { field: tableFields[i], headerName: _.capitalize(label), width: columnWidth, headerAlign:'center', sortable: true }
   });
 
 
   // Remove funnels and other garbage from here
   const rows = data.chart.data.map((data, i)=>{
-    let row = { id: i, [columns[0]['field']]: data.label, [columns[1]['field']]: data.data};
-
-    if(data.percentage){
-      row[columns[2]['field']] = data.percentage;
-    }
+    let row = { id: i};
+    Object.keys(data).forEach((field, ii)=>{
+      row[columns[ii]['field']] = data[field]
+    })
     return row
   })
 
   return (
     <Card className={classes.root}>
       <div className={classes.title}>{title}</div>
-      <DataGrid rows={rows} columns={columns} pageSize={5} checkboxSelection={false} />
+      <DataGrid rows={rows} columns={columns} pageSize={5} alignLeft checkboxSelection={false} />
     </Card>
   );
 }
