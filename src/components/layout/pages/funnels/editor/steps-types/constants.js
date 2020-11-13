@@ -3,7 +3,7 @@ import Fab from '@material-ui/core/Fab'
 import AddIcon from '@material-ui/icons/Add'
 import AddStepButton from '../components/AddStepButton'
 import {
-  getChildren,
+  getChildren, getEdgeChangesAbove, getEdgeChangesBelow, getEdgeChangesBeside,
   getParents,
   isBenchmark,
   numChildren,
@@ -121,8 +121,7 @@ export const ACTION_TYPE_DEFAULTS = {
       targets.push({
         id: `add-step-above-${ ID }`,
         groups: allowedGroups,
-        parents: parents,
-        children: [ID],
+        edges: getEdgeChangesAbove( ID, graph ),
         position: {
           // Todo calculate correct value here
           x: thisNode.x + ( CARD_WIDTH / 2 ) - ADD_STEP_BUTTON_X_OFFSET,
@@ -148,8 +147,7 @@ export const ACTION_TYPE_DEFAULTS = {
     targets.push({
       id: `add-step-below-${ ID }`,
       groups: allowedGroups,
-      parents: [ID],
-      children: children,
+      edges: getEdgeChangesBelow( ID, graph ),
       position: {
         x: thisNode.x + ( CARD_WIDTH / 2 ) - ADD_STEP_BUTTON_X_OFFSET,
         y: thisNode.y + CARD_HEIGHT + ADD_STEP_BUTTON_Y_OFFSET,
@@ -264,8 +262,7 @@ export const BENCHMARK_TYPE_DEFAULTS = {
           ACTIONS,
           CONDITIONS,
         ],
-        parents: parents,
-        children: [ID],
+        edges: getEdgeChangesAbove( ID, graph ),
         position: {
           x: thisNode.x + ( CARD_WIDTH / 2 ) - ADD_STEP_BUTTON_X_OFFSET,
           y: thisNode.y - ( ADD_STEP_BUTTON_Y_OFFSET * 2 ),
@@ -278,8 +275,7 @@ export const BENCHMARK_TYPE_DEFAULTS = {
         groups: [
           BENCHMARKS,
         ],
-        parents: parents,
-        children: children,
+        edges: getEdgeChangesBeside( ID, graph ),
         position: {
           // Todo calculate correct value here
           x: thisNode.x + CARD_WIDTH + ADD_STEP_BUTTON_Y_OFFSET,
@@ -294,8 +290,7 @@ export const BENCHMARK_TYPE_DEFAULTS = {
         ACTIONS,
         CONDITIONS,
       ],
-      parents: [ID],
-      children: children,
+      edges: getEdgeChangesBelow( ID, graph ),
       position: {
         x: thisNode.x + ( CARD_WIDTH / 2 ) - ADD_STEP_BUTTON_X_OFFSET,
         y: thisNode.y + CARD_HEIGHT + ADD_STEP_BUTTON_Y_OFFSET,
