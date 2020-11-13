@@ -115,9 +115,8 @@ const stepAtts = {
       startAnchor: ['bottom', 'middle'],
       start: `add-step-no-${ ID }`,
       end: child_steps.no
-        ? `step-entry-${ child_steps.no }`
+        ? `step-card-${ child_steps.no }`
         : 'add-step-above-exit',
-      headSize: 0,
     })
 
     arrows.push({
@@ -125,9 +124,8 @@ const stepAtts = {
       startAnchor: ['bottom', 'middle'],
       start: `add-step-yes-${ ID }`,
       end: child_steps.yes
-        ? `step-entry-${ child_steps.yes }`
+        ? `step-card-${ child_steps.yes }`
         : 'add-step-above-exit',
-      headSize: 0,
     })
 
     return (
@@ -162,7 +160,7 @@ const stepAtts = {
     let yesPosY, yesPosX, noPosY, noPosX
 
     yesPosY = noPosY = thisNode.y + CARD_HEIGHT +
-      ADD_STEP_BUTTON_Y_OFFSET
+      (ADD_STEP_BUTTON_Y_OFFSET*1.5)
 
     if (yesNode.x === noNode.x) {
       // case 1: yes/no are the same node

@@ -2,6 +2,10 @@ import Xarrow from 'react-xarrows'
 import Fab from '@material-ui/core/Fab'
 import { NODE_HEIGHT, NODE_WIDTH } from 'components/layout/pages/funnels/editor'
 import AddIcon from '@material-ui/icons/Add'
+import {
+  numChildren,
+  numParents,
+} from 'components/layout/pages/funnels/editor/functions'
 
 export const ACTION = 'action'
 export const ACTIONS = 'actions'
@@ -10,6 +14,8 @@ export const BENCHMARKS = 'benchmarks'
 export const CONDITION = 'condition'
 export const CONDITIONS = 'conditions'
 
+const ARROW_HEAD_SIZE = 5;
+
 export const ARROW_STYLE = {
   startAnchor: ['bottom', 'middle'],
   endAnchor: ['top', 'middle'],
@@ -17,7 +23,7 @@ export const ARROW_STYLE = {
   path: 'smooth',
   color: '#cbcbcb',
   curveness: 1,
-  headSize: 5,
+  headSize: ARROW_HEAD_SIZE,
 }
 
 export const ADD_STEP_BUTTON_X_OFFSET = 20
@@ -50,9 +56,11 @@ export const ACTION_TYPE_DEFAULTS = {
     children.forEach(child => {
       arrows.push({
         ...ARROW_STYLE,
-        start: `step-${ ID }-exit`,
-        end: `step-${ child }-entry`,
-        headSize: 0,
+        start: `add-step-below-${ ID }`,
+        end: numParents( child, graph ) > 1
+          ? `add-step-above-${ child }`
+          : `step-card-${ child }`,
+        headSize: numParents( child, graph ) > 1 ? 0 : ARROW_HEAD_SIZE,
       })
     })
 
@@ -65,7 +73,6 @@ export const ACTION_TYPE_DEFAULTS = {
         ...ARROW_STYLE,
         start: `add-step-above-${ ID }`,
         end: `step-card-${ ID }`,
-        headSize: 0,
       })
     }
 
@@ -191,9 +198,11 @@ export const BENCHMARK_TYPE_DEFAULTS = {
     children.forEach(child => {
       arrows.push({
         ...ARROW_STYLE,
-        start: `step-${ ID }-exit`,
-        end: `step-${ child }-entry`,
-        headSize: 0,
+        start: `add-step-below-${ ID }`,
+        end: numParents( child, graph ) > 1
+          ? `add-step-above-${ child }`
+          : `step-card-${ child }`,
+        headSize: numParents( child, graph ) > 1 ? 0 : ARROW_HEAD_SIZE,
       })
     })
 
@@ -206,7 +215,6 @@ export const BENCHMARK_TYPE_DEFAULTS = {
         ...ARROW_STYLE,
         start: `add-step-below-${ ID }`,
         end: `step-card-${ ID }`,
-        headSize: 0,
       })
     }
     else {
