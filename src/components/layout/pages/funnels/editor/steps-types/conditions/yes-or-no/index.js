@@ -85,9 +85,8 @@ const stepAtts = {
 
       arrows.push({
         ...ARROW_STYLE,
-        start: `add-step-below-${ ID }`,
+        start: `add-step-above-${ ID }`,
         end: `step-card-${ ID }`,
-        headSize: 0,
       })
     }
 
@@ -255,7 +254,7 @@ const stepAtts = {
         children: [ID],
         position: {
           x: thisNode.x + ( CARD_WIDTH / 2 ) - ADD_STEP_BUTTON_X_OFFSET,
-          y: thisNode.y - ADD_STEP_BUTTON_Y_OFFSET,
+          y: thisNode.y - ( ADD_STEP_BUTTON_Y_OFFSET * 2 ),
         },
       })
     }
