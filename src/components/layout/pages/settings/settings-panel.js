@@ -111,30 +111,33 @@ export const SettingsPanel = ( { section } ) => {
 			'dropdown_owners' : { component : SelectOwners }, // Investigate any difference here.
 			// 'editor' : { component : TextareaAutosize }, // Need to build out TinyMCE Editor
 			// 'textarea' : { component : TextareaAutosize },
-			'editor' : { component : TextField }, // Need to build out TinyMCE Editor
+			'editor' : { component : TextField, properties: ['multiline'] }, // Need to build out TinyMCE Editor
 			'textarea' : { component : TextField },
 		 } );
 
 
 		 const value = settings[ id ].hasOwnProperty( 'defaultValue' ) ? defaultValue : settings[ id ];
 
+		 // This component is a little hacky and manual, I think the entire panel needs some refactoring
 		 if ( mapping.hasOwnProperty( type ) ) {
 			 const mappedComponent = mapping[ type ];
-			 // console.log(type, label,)
+
+			 if(['editor', 'textarea'].includes(type)){
+				 restProps.rows = 4;
+				 restProps.multiline = true;
+			 }
 
 			 // Some refactoring is needed on the final pass of settings, but specific styling is needed.
 			 if(type === 'checkbox') {
 				 return ( <>
-					 <mappedComponent.component onChange={handleInputChange} value={value} {...restProps} className={classes.styleCheckbox} />
+					 <mappedComponent.component onChange={handleInputChange} value={value} {...restProps} multiline className={classes.styleCheckbox} />
  					 <Typography variant="span" component="span">{ label }</Typography>
 					 <Typography className={classes.descriptionCheckbox} variant="p" component="p" dangerouslySetInnerHTML={{ __html: desc }} />
-
 					 </>
 				 );
 			 } else {
-				 //multiline rows={4} used for textarea
 				 return ( <>
-					 <mappedComponent.component onChange={handleInputChange} value={value} {...restProps} className={classes.inputStyle}   />
+					 <mappedComponent.component onChange={handleInputChange} value={value} {...restProps}  className={classes.inputStyle}   />
 					 <Typography className={classes.description} variant="p" component="p" dangerouslySetInnerHTML={{ __html: desc }} />
 					 </>
 				 );
@@ -175,7 +178,7 @@ export const SettingsPanel = ( { section } ) => {
     		fontSize: "12px",
     		color: '#666',
         marginTop: '5px',
-				marginLeft: '65px'
+				marginLeft: '42px'
       },
   }));
 	const classes = useStyles();

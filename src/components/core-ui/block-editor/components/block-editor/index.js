@@ -49,7 +49,8 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-function BlockEditor( { settings: _settings } ) {
+function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHeader, handlePreHeaderChange } ) {
+
 	const [ blocks, updateBlocks ] = useState( [] );
 	const { createInfoNotice } = useDispatch( 'core/notices' );
 	const classes = useStyles();
@@ -82,13 +83,18 @@ function BlockEditor( { settings: _settings } ) {
 		}
 	}, [] );
 
-	function handleUpdateBlocks(blocks) {
+	const handleUpdateBlocks = (blocks) => {
 		updateBlocks( blocks );
 	}
 
-	function handlePersistBlocks( newBlocks ) {
+	const handlePersistBlocks = ( newBlocks ) => {
 		updateBlocks( newBlocks );
 		window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) );
+	}
+
+	const handleFieldChange = (e)=>{
+		console.log(e.target.value)
+
 	}
 
 	if ( ! settings.hasOwnProperty( '__experimentalBlockPatterns' ) ) {
@@ -105,8 +111,8 @@ function BlockEditor( { settings: _settings } ) {
 			>
 				<Grid container spacing={3}>
 					<Grid item xs={9}>
-						<TextField className={ classes.subjectInputs } value="Subject" />
-						<TextField className={ classes.subjectInputs } placeholder={ __( 'Pre Header Text: Used to summarize the content of the email.' ) } />
+						<TextField className={ classes.subjectInputs } onChange={handleSubjectChange} value={subject} />
+						<TextField className={ classes.subjectInputs } onChange={handlePreHeaderChange} value={preHeader} placeholder={ __( 'Pre Header Text: Used to summarize the content of the email.' ) } />
 						<Paper>
 							<BlockSelectionClearer
 					className="edit-post-visual-editor editor-styles-wrapper"
