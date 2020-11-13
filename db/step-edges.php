@@ -174,7 +174,7 @@ class Step_Edges extends DB {
 		to_id bigint(20) unsigned NOT NULL,
 		funnel_id bigint(20) unsigned NOT NULL,
 		path varchar(20) NOT NULL,
-		PRIMARY KEY (from_id,to_id),
+		PRIMARY KEY (from_id,to_id,path),
 		KEY from_id (from_id),
 		KEY to_id (to_id),
 		KEY funnel_id (funnel_id)

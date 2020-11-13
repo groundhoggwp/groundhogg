@@ -96,8 +96,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	protected function setup_edges() {
-//		$this->child_edges   = $this->get_edges_db()->query( [ 'from_id' => $this->get_id() ] );
-//		$this->parents_edges = $this->get_edges_db()->query( [ 'to_id' => $this->get_id() ] );
+		$this->child_edges   = $this->get_edges_db()->query( [ 'from_id' => $this->get_id() ] );
+		$this->parents_edges = $this->get_edges_db()->query( [ 'to_id' => $this->get_id() ] );
 	}
 
 	/**
@@ -190,8 +190,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'ID'           => $this->get_id(),
 			'data'         => $this->data,
 			'meta'         => $this->meta,
-//			'child_edges'  => $this->child_edges,
-//			'parent_edges' => $this->parents_edges,
+			'child_edges'  => $this->child_edges,
+			'parent_edges' => $this->parents_edges,
 		] );
 	}
 

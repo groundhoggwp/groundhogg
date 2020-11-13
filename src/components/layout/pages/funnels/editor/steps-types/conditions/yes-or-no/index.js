@@ -18,7 +18,11 @@ import Fab from '@material-ui/core/Fab'
 import AddIcon from '@material-ui/icons/Add'
 import AddStepButton
   from 'components/layout/pages/funnels/editor/components/AddStepButton'
-import { isBenchmark } from 'components/layout/pages/funnels/editor/functions'
+import {
+  getChildren,
+  getParents,
+  isBenchmark,
+} from 'components/layout/pages/funnels/editor/functions'
 
 const STEP_TYPE = 'yes_no_condition'
 
@@ -61,17 +65,20 @@ const stepAtts = {
     return <></>
   },
 
-  Edges: ({ data, meta, ID, graph }) => {
+  Edges: ({ data, meta, ID, graph, child_edges }) => {
     // Benchmarks should only ever have 1 child...
     // can have multiple parents though!
 
     const { edgeLabel, edgeYes, edgeNo } = useStyles()
 
-    const { parent_steps, child_steps, step_group } = data
+    let parents = getParents(ID, graph)
+
+    let yesNode = graph.node(child_edges.find(e => e.path === 'yes').to_id)
+    let noNode = graph.node(child_edges.find(e => e.path === 'no').to_id)
 
     const arrows = []
 
-    if (parent_steps.length > 1) {
+    if (parents.length > 1) {
 
       // If there are multiple parents we need an edge from the add step button
       // to the top of the card
@@ -117,8 +124,8 @@ const stepAtts = {
       ...ARROW_STYLE,
       startAnchor: ['bottom', 'middle'],
       start: `add-step-no-${ ID }`,
-      end: child_steps.no
-        ? `step-card-${ child_steps.no }`
+      end: noNode.ID
+        ? `step-card-${ noNode.ID }`
         : 'add-step-above-exit',
     })
 
@@ -126,8 +133,8 @@ const stepAtts = {
       ...ARROW_STYLE,
       startAnchor: ['bottom', 'middle'],
       start: `add-step-yes-${ ID }`,
-      end: child_steps.yes
-        ? `step-card-${ child_steps.yes }`
+      end: yesNode.ID
+        ? `step-card-${ yesNode.ID }`
         : 'add-step-above-exit',
     })
 
@@ -151,20 +158,22 @@ const stepAtts = {
    * @param ID
    * @param graph
    * @param xOffset
+   * @param child_edges
    * @returns {*}
    */
-  Targets: ({ data, meta, ID, graph, xOffset }) => {
+  Targets: ({ data, meta, ID, graph, xOffset, child_edges }) => {
 
-    const { parent_steps, child_steps, step_group } = data
+    let parents = getParents(ID, graph)
+    let children = getChildren(ID, graph)
 
     let thisNode = graph.node(ID)
-    let yesNode = graph.node(child_steps.yes || 'exit')
-    let noNode = graph.node(child_steps.no || 'exit')
+    let yesNode = graph.node(child_edges.find(e => e.path === 'yes').to_id)
+    let noNode = graph.node(child_edges.find(e => e.path === 'no').to_id)
 
     let yesPosY, yesPosX, noPosY, noPosX
 
     yesPosY = noPosY = thisNode.y + CARD_HEIGHT +
-      (ADD_STEP_BUTTON_Y_OFFSET*1.5)
+      ( ADD_STEP_BUTTON_Y_OFFSET * 1.5 )
 
     if (yesNode.x === noNode.x) {
       // case 1: yes/no are the same node
@@ -200,7 +209,7 @@ const stepAtts = {
         CONDITIONS,
       ],
       parents: [ID],
-      children: [child_steps.yes],
+      children: [yesNode.ID],
       position: {
         x: yesPosX,
         y: yesPosY,
@@ -215,7 +224,7 @@ const stepAtts = {
         CONDITIONS,
       ],
       parents: [ID],
-      children: [child_steps.no],
+      children: [noNode.ID],
       position: {
         x: noPosX,
         y: noPosY,
@@ -223,7 +232,7 @@ const stepAtts = {
     })
 
     // If there are multiple parents a target must be placed above
-    if (parent_steps.length > 1) {
+    if (parents.length > 1) {
 
       let allowedGroups = [
         ACTIONS,
@@ -233,7 +242,7 @@ const stepAtts = {
 
       // cannot include benchmarks if the parents have benchmarks in them...
       // other steps are legal
-      if (parent_steps.filter(id => {
+      if (parents.filter(id => {
         return isBenchmark(id, graph)
       }).length) {
         allowedGroups = allowedGroups.filter(group => group !== BENCHMARKS)
@@ -242,11 +251,10 @@ const stepAtts = {
       targets.push({
         id: `add-step-above-${ ID }`,
         groups: allowedGroups,
-        parents: parent_steps,
+        parents: parents,
         children: [ID],
         position: {
-          // Todo calculate correct value here
-          x: thisNode.x + ( CARD_WIDTH/2 ) - ADD_STEP_BUTTON_X_OFFSET,
+          x: thisNode.x + ( CARD_WIDTH / 2 ) - ADD_STEP_BUTTON_X_OFFSET,
           y: thisNode.y - ADD_STEP_BUTTON_Y_OFFSET,
         },
       })

@@ -3,6 +3,8 @@ import Fab from '@material-ui/core/Fab'
 import AddIcon from '@material-ui/icons/Add'
 import AddStepButton from '../components/AddStepButton'
 import {
+  getChildren,
+  getParents,
   isBenchmark,
   numChildren,
   numParents,
@@ -38,9 +40,10 @@ export const ACTION_TYPE_DEFAULTS = {
     // Benchmarks should only ever have 1 child...
     // can have multiple parents though!
 
-    const { parent_steps, child_steps, step_group } = data
-    let children = Object.values(child_steps)
-    let parents = Object.values(parent_steps)
+    let children = getChildren( ID, graph )
+    let parents = getParents( ID, graph )
+
+    console.log( children, parents )
 
     const arrows = []
 
@@ -93,11 +96,10 @@ export const ACTION_TYPE_DEFAULTS = {
 
     const targets = []
 
-    const { parent_steps, child_steps, step_group } = data
-    let children = Object.values(child_steps)
-    let parents = Object.values(parent_steps)
-
     let thisNode = graph.node(ID)
+
+    let parents = getParents( ID, graph );
+    let children = getChildren( ID, graph );
 
     // If there are multiple parents a target must be placed above
     if (parents.length > 1) {
@@ -119,7 +121,7 @@ export const ACTION_TYPE_DEFAULTS = {
       targets.push({
         id: `add-step-above-${ ID }`,
         groups: allowedGroups,
-        parents: parent_steps,
+        parents: parents,
         children: [ID],
         position: {
           // Todo calculate correct value here
@@ -147,7 +149,7 @@ export const ACTION_TYPE_DEFAULTS = {
       id: `add-step-below-${ ID }`,
       groups: allowedGroups,
       parents: [ID],
-      children: child_steps,
+      children: children,
       position: {
         x: thisNode.x + ( CARD_WIDTH / 2 ) - ADD_STEP_BUTTON_X_OFFSET,
         y: thisNode.y + CARD_HEIGHT + ADD_STEP_BUTTON_Y_OFFSET,
@@ -181,9 +183,8 @@ export const BENCHMARK_TYPE_DEFAULTS = {
     // Benchmarks should only ever have 1 child...
     // can have multiple parents though!
 
-    const { parent_steps, child_steps, step_group } = data
-    let children = Object.values(child_steps)
-    let parents = Object.values(parent_steps)
+    let parents = getParents( ID, graph );
+    let children = getChildren( ID, graph );
 
     const arrows = []
 
@@ -249,9 +250,8 @@ export const BENCHMARK_TYPE_DEFAULTS = {
 
     const targets = []
 
-    const { parent_steps, child_steps, step_group } = data
-    let children = Object.values(child_steps)
-    let parents = Object.values(parent_steps)
+    let parents = getParents( ID, graph );
+    let children = getChildren( ID, graph );
 
     let thisNode = graph.node(ID)
 
@@ -264,7 +264,7 @@ export const BENCHMARK_TYPE_DEFAULTS = {
           ACTIONS,
           CONDITIONS,
         ],
-        parents: parent_steps,
+        parents: parents,
         children: [ID],
         position: {
           x: thisNode.x + ( CARD_WIDTH / 2 ) - ADD_STEP_BUTTON_X_OFFSET,
@@ -278,8 +278,8 @@ export const BENCHMARK_TYPE_DEFAULTS = {
         groups: [
           BENCHMARKS,
         ],
-        parents: parent_steps,
-        children: child_steps,
+        parents: parents,
+        children: children,
         position: {
           // Todo calculate correct value here
           x: thisNode.x + CARD_WIDTH + ADD_STEP_BUTTON_Y_OFFSET,
@@ -295,7 +295,7 @@ export const BENCHMARK_TYPE_DEFAULTS = {
         CONDITIONS,
       ],
       parents: [ID],
-      children: child_steps,
+      children: children,
       position: {
         x: thisNode.x + ( CARD_WIDTH / 2 ) - ADD_STEP_BUTTON_X_OFFSET,
         y: thisNode.y + CARD_HEIGHT + ADD_STEP_BUTTON_Y_OFFSET,

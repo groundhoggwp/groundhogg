@@ -18,6 +18,8 @@ import { useLayoutEffect, useRef, useState } from '@wordpress/element'
 export const NODE_HEIGHT = 250
 export const NODE_WIDTH = 300
 
+
+
 /**
  * Breadth first search of the steps tree to build iout a row level based chart
  * for putting the steps on the page.
@@ -109,32 +111,32 @@ const Editor = ({ funnel }) => {
             )
           })
         }
-        {/*{*/}
-        {/*  steps.map(step => {*/}
-        {/*    return (*/}
-        {/*      <>*/}
-        {/*        <StepTargets*/}
-        {/*          { ...step }*/}
-        {/*          graph={ graph }*/}
-        {/*          xOffset={ XOffset }*/}
-        {/*        />*/}
-        {/*      </>*/}
-        {/*    )*/}
-        {/*  })*/}
-        {/*}*/}
-        {/*{*/}
-        {/*  steps.map(step => {*/}
-        {/*    return (*/}
-        {/*      <>*/}
-        {/*        <StepEdges*/}
-        {/*          { ...step }*/}
-        {/*          graph={ graph }*/}
-        {/*          xOffset={ XOffset }*/}
-        {/*        />*/}
-        {/*      </>*/}
-        {/*    )*/}
-        {/*  })*/}
-        {/*}*/}
+        {
+          steps.map(step => {
+            return (
+              <>
+                <StepTargets
+                  { ...step }
+                  graph={ graph }
+                  xOffset={ xOffset }
+                />
+              </>
+            )
+          })
+        }
+        {
+          steps.map(step => {
+            return (
+              <>
+                <StepEdges
+                  { ...step }
+                  graph={ graph }
+                  xOffset={ xOffset }
+                />
+              </>
+            )
+          })
+        }
       </div>
     </>
   )
