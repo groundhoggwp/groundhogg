@@ -6,67 +6,36 @@ import CombinedStepPicker from '../Pickers/CombinedStepPicker'
 import Tooltip from '@material-ui/core/Tooltip'
 import makeStyles from '@material-ui/core/styles/makeStyles'
 
-const useStyles = makeStyles((theme) => ({
-  topMiddle: {
-    position: 'absolute',
-    margin: 'auto',
-    top: -theme.spacing(8),
-    left: 0,
-    bottom: 'auto',
-    right: 0
-  },
-  rightMiddle: {
-    position: 'absolute',
-    margin: 'auto',
-    right: -theme.spacing(8),
-    top: 0,
-    left: 'auto',
-    bottom: 0
-  },
-  bottomMiddle: {
-    position: 'absolute',
-    margin: 'auto',
-    bottom: -theme.spacing(8),
-    top: 'auto',
-    left: 0,
-    right: 0
-  },
-  bottomRight: {
-    position: 'absolute',
-    margin: 'auto',
-    bottom: -theme.spacing(16),
-    top: 'auto',
-    right: 0
-  },
-  bottomLeft: {
-    position: 'absolute',
-    margin: 'auto',
-    bottom: -theme.spacing(16),
-    top: 'auto',
-    left: 0
-  }
-}))
-
 export default ({id, groups, parents, children, position}) => {
 
-  const classes = useStyles()
+  const [anchorEl, setAnchorEl] = useState(null)
 
-  const { position, openStepBlock, closeStepBlock, anchorEl, setAnchorEl, open, id, toolTipTitle } = props
+  const openPicker = (e) => {
+    setAnchorEl(e.currentTarget)
+  }
+
+  const closePicker = () => {
+    setAnchorEl(null);
+  }
 
   return (
     <>
-      <Tooltip title={toolTipTitle || 'Add'}>
-        <Fab id={id} style={typeof position === 'object' ? position : {}}
-             className={typeof position === 'string' ? classes[position] : ''} size={'small'} aria-label="add"
-             onClick={openStepBlock}>
+      <Tooltip title={'Add'}>
+        <Fab id={id} style={{
+          position: 'absolute',
+          top: position.y,
+          left: position.x,
+        }}
+             size={'small'} aria-label="add"
+             onClick={openPicker}>
           <AddIcon/>
         </Fab>
       </Tooltip>
       <Popover
         id={id + '-popover'}
-        open={open}
+        open={Boolean(anchorEl)}
         anchorEl={anchorEl}
-        onClose={closeStepBlock}
+        onClose={closePicker}
         anchorOrigin={{
           vertical: 'center',
           horizontal: 'right'
@@ -76,7 +45,12 @@ export default ({id, groups, parents, children, position}) => {
           horizontal: 'left'
         }}
       >
-        <CombinedStepPicker {...props}/>
+        <CombinedStepPicker
+          showGroups={groups}
+          parentSteps={parents}
+          childSteps={children}
+          closePicker={closePicker}
+        />
       </Popover>
     </>
   )

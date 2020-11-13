@@ -32,5 +32,16 @@ export const isDeletingStep = ( state ) => {
  * @param {Object} state - Reducer state
  */
 export const getFunnel = ( state ) => {
-	return state.extendedReducer.funnel || {};
+	return state.item || {};
 };
+
+/**
+ *
+ * The ID of the current item
+ *
+ * @param state
+ * @returns {boolean}
+ */
+export const getCurrentId = ( state ) => {
+	return state.item ? state.item.ID : false;
+}

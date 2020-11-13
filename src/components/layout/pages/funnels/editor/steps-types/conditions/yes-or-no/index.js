@@ -16,6 +16,9 @@ import {
 } from 'components/layout/pages/funnels/editor/steps-types/constants'
 import Fab from '@material-ui/core/Fab'
 import AddIcon from '@material-ui/icons/Add'
+import AddStepButton
+  from 'components/layout/pages/funnels/editor/components/AddStepButton'
+import { isBenchmark } from 'components/layout/pages/funnels/editor/functions'
 
 const STEP_TYPE = 'yes_no_condition'
 
@@ -147,6 +150,7 @@ const stepAtts = {
    * @param meta
    * @param ID
    * @param graph
+   * @param xOffset
    * @returns {*}
    */
   Targets: ({ data, meta, ID, graph, xOffset }) => {
@@ -230,7 +234,7 @@ const stepAtts = {
       // cannot include benchmarks if the parents have benchmarks in them...
       // other steps are legal
       if (parent_steps.filter(id => {
-        return graph.node(id).data.step_group === BENCHMARK
+        return isBenchmark(id, graph)
       }).length) {
         allowedGroups = allowedGroups.filter(group => group !== BENCHMARKS)
       }
@@ -251,12 +255,17 @@ const stepAtts = {
     return (
       <>
         {
-          targets.map(({ id, position }) => (
-            <Fab id={ id } style={ { position: 'absolute', top: position.y, left: position.x + xOffset } }
-                 size={ 'small' } aria-label="add">
-              <AddIcon/>
-            </Fab>
-          ))
+          targets.map(({ id, position, groups, parents, children }) =>
+            <AddStepButton
+              id={ id }
+              groups={ groups }
+              parents={ parents }
+              children={ children }
+              position={ {
+                x: position.x + xOffset,
+                y: position.y,
+              } }
+            />)
         }
       </>
     )

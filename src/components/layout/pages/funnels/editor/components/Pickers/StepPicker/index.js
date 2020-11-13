@@ -4,7 +4,7 @@ import TextField from '@material-ui/core/TextField/TextField'
 import Grid from '@material-ui/core/Grid'
 import makeStyles from '@material-ui/core/styles/makeStyles'
 import Button from '@material-ui/core/Button'
-import { useDispatch } from '@wordpress/data'
+import { useDispatch, useSelect } from '@wordpress/data'
 
 /**
  * Internal dependencies
@@ -47,14 +47,18 @@ export default (props) => {
     parentSteps,
     childSteps,
     stepOrder,
-    funnelID,
     conditionPath,
-    closeStepBlock,
+    closePicker,
   } = props
 
   const classes = useStyles()
   const [search, setSearch] = useState('')
   const { createStep, updateStep } = useDispatch(FUNNELS_STORE_NAME)
+  const { funnelId } = useSelect((select) => {
+    return {
+      funnelId : select( FUNNELS_STORE_NAME ).getCurrentId()
+    }
+  }, [])
 
   // reduce step types into rows of three
   const reducer = (acc, curr) => {
@@ -80,9 +84,9 @@ export default (props) => {
     createStep({
       data: newStepData,
       condition_path: conditionPath
-    }, funnelID)
+    }, funnelId)
 
-    closeStepBlock()
+    closePicker && closePicker()
   }
 
   return (

@@ -3,7 +3,7 @@ import Card from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
 import CardActions from '@material-ui/core/CardActions'
 import { select, useDispatch, useSelect } from '@wordpress/data'
-import { STEP_TYPES_STORE_NAME } from 'data/step-type-registry'
+import { getStepType, STEP_TYPES_STORE_NAME } from 'data/step-type-registry'
 import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
 import IconButton from '@material-ui/core/IconButton'
@@ -50,25 +50,15 @@ export default (props) => {
 
   const [editing, setEditing] = useState(false)
   const [deleting, setDeleting] = useState(false)
-  const [anchorEl, setAnchorEl] = useState(null)
-  const [addingStep, setAddingStep] = useState(null)
 
   const classNames = useStyles()
 
   const { ID, data, meta, funnelID, level, index, graph, xOffset } = props
-  const { step_title, step_type, step_group, parent_steps, child_steps, funnel_id } = data
+  const { step_title, step_type, step_group, funnel_id } = data
 
-  let numParents = Object.values(parent_steps).length
-  let numChildren = Object.values(child_steps).length
-
-  const stepType = select(STEP_TYPES_STORE_NAME).getType(step_type)
+  const StepType = getStepType( step_type );
 
   const { deleteStep, updateStep } = useDispatch(FUNNELS_STORE_NAME)
-
-  // output ghost node...
-  if (!stepType) {
-    return <div>boo!</div>
-  }
 
   const classes = [
     step_type,
@@ -80,30 +70,16 @@ export default (props) => {
     // openStepBlock();
   }
 
-  const handleCancelAdd = () => {
-    // closeStepBlock();
-  }
-
   const handleDelete = () => {
     setDeleting(true)
     deleteStep(ID, funnel_id)
   }
 
-  const addStepBlock = (where, e) => {
-    setAddingStep(where)
-    setAnchorEl(e.currentTarget)
-  }
-
-  const addStepBlockCancel = () => {
-    setAnchorEl(null)
-    setAddingStep(null)
-  }
-
-  let gNode =  graph.node(ID);
+  let thisNode =  graph.node(ID);
 
   const positioning = {
-    top: gNode && gNode.y,
-    left: gNode && gNode.x + xOffset
+    top: thisNode && thisNode.y,
+    left: thisNode && thisNode.x + xOffset
   }
 
   return (
@@ -114,9 +90,9 @@ export default (props) => {
                 style={{ width: CARD_WIDTH }}
                 id={'step-card-' + ID}>
             <CardHeader
-              avatar={stepType.icon}
+              avatar={StepType.icon}
               title={ID}
-              subheader={stepType.name}
+              subheader={StepType.name}
             />
             <CardActions>
               <Tooltip title={'Edit'}>
