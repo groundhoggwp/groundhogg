@@ -3,6 +3,8 @@ import {
   BENCHMARK,
 } from 'components/layout/pages/funnels/editor/steps-types/constants'
 
+const NEW_STEP = 'new';
+
 export function isBenchmark (n, graph) {
   n = graph.node(n)
   return n ? n.data.step_group === BENCHMARK : false
@@ -39,8 +41,8 @@ export function getEdgeChangesAbove (n, graph) {
 
   return {
     new: [
-      { from: 'new', to: n },
-      ...parents.map(parent => { return { from: parent, to: 'new' } }),
+      { from: NEW_STEP, to: n },
+      ...parents.map(parent => { return { from: parent, to: NEW_STEP } }),
     ],
     delete: parents.map(parent => { return { from: parent, to: n } }),
   }
@@ -56,8 +58,8 @@ export function getEdgeChangesBelow (n, graph) {
 
   return {
     new: [
-      { from: n, to: 'new' },
-      ...children.map(child => { return { from: 'new', to: child } }),
+      { from: n, to: NEW_STEP },
+      ...children.map(child => { return { from: NEW_STEP, to: child } }),
     ],
     delete: children.map(child => { return { from: n, to: child } }),
   }
@@ -72,15 +74,10 @@ export function getEdgeChangesBeside (n, graph) {
   let children = getChildren(n, graph)
   let parents = getParents(n, graph)
 
-  let newEdges=[]
-
-  parents.forEach( parent => {
-    children.forEach( child => {
-      newEdges.push( { from: parent, to: child } )
-    })
-  })
-
   return {
-    new: newEdges
+    new: [
+      ...parents.map( parent => { return { from: parent, to: NEW_STEP } } ),
+      ...children.map( child => { return { from: NEW_STEP, to: child } } )
+    ]
   }
 }
