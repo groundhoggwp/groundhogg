@@ -18,7 +18,7 @@ import {
 	PostTextEditor
 } from '@wordpress/editor';
 import { useEffect, useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -27,18 +27,19 @@ import Notices from './components/notices';
 import Header from './components/header';
 import Sidebar from './components/sidebar';
 import BlockEditor from './components/block-editor'
-import { CORE_STORE_NAME } from 'data/core';
+import {
+	CORE_STORE_NAME,
+	EMAILS_STORE_NAME
+} from 'data';
 
 const Editor = ( { settings, email, history } ) => {
+	const dispatch = useDispatch( EMAILS_STORE_NAME );
 
-	const {
-		editorMode,
-	} = useSelect(
-		( select ) => ( {
-				editorMode: select( CORE_STORE_NAME ).getEditorMode(),
-			} ),
-		[]
-	);
+	const [ titleToggle, setTitleToggle ] = useState( false );
+
+	const toggleTitleEdit = () => {
+		setTitleToggle( ! titleToggle )
+	}
 
 	const {subject: defaultSubjectValue, pre_header: defaultPreHeaderValue, content: defaultContentValue } = email.data
 	// console.log(email.data)
@@ -60,8 +61,33 @@ const Editor = ( { settings, email, history } ) => {
 	const [ preHeader, setPreHeader ] = useState( defaultPreHeaderValue );
 	const [ content, setContent ] = useState( defaultContentValue );
 
+	const {
+		editorMode,
+		isSaving,
+		item
+	} = useSelect(
+		( select ) => ( {
+				editorMode: select( CORE_STORE_NAME ).getEditorMode(),
+				isSaving: select( CORE_STORE_NAME ).isItemsUpdating(),
+				item: select( EMAILS_STORE_NAME ).getItem( email.ID ),
+			} ),
+		[]
+	);
+
+
+	const handleTitle = (e) => {
+		dispatch.updateItem( email.ID, { data: { title : e.target.value } } );
+		toggleTitleEdit();
+	}
+
+	if ( ! item.hasOwnProperty( 'ID' ) ) {
+		return null;
+	}
+
 	const handleSubjectChange = (e)=>{
 		setSubject(e.target.value);
+		dispatch.updateItem( email.ID, { data: { subject : e.target.value } } );
+		toggleTitleEdit();
 	}
 	const handlePreHeaderChange = (e)=>{
 		setPreHeader(e.target.value);
@@ -85,7 +111,7 @@ const Editor = ( { settings, email, history } ) => {
 				<DropZoneProvider>
 					<FocusReturnProvider>
 						<InterfaceSkeleton
-							header={<Header email={email} history={history} saveDraft={saveDraft} publishEmail={publishEmail} closeEditor={closeEditor} />}
+							header={<Header email={email} history={history} saveDraft={saveDraft} publishEmail={publishEmail} closeEditor={closeEditor} isSaving={isSaving} titleToggle={titleToggle} toggleTitleEdit={toggleTitleEdit} handleTitle={handleTitle} item={item} />}
 							sidebar={
 								<>
 									<Sidebar />

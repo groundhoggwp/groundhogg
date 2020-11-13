@@ -9,8 +9,7 @@ import TextField from '@material-ui/core/TextField'
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, Fragment } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import {
 	PinnedItems,
 } from '@wordpress/interface';
@@ -18,43 +17,14 @@ import {
 /**
  * Internal dependencies
  */
-import {
-	CORE_STORE_NAME,
-	EMAILS_STORE_NAME
-} from 'data';
+
 import HeaderToolbar from './header-toolbar';
 import HeaderPrimary from './header-primary';
 import HeaderSecondary from './header-secondary';
 import { Spinner } from  'components';
 
-export default function Header( { email, history, saveDraft, publishEmail, closeEditor } ) {
-	const dispatch = useDispatch( EMAILS_STORE_NAME );
+export default function Header( { email, history, saveDraft, publishEmail, closeEditor, isSaving, titleToggle, toggleTitleEdit, handleTitle, item } ) {
 
-	const [ titleToggle, setTitleToggle ] = useState( false );
-
-	const toggleTitleEdit = () => {
-		setTitleToggle( ! titleToggle )
-	}
-
-	const {
-		isSaving,
-		item
-	} = useSelect(
-		( select ) => ( {
-				isSaving: select( CORE_STORE_NAME ).isItemsUpdating(),
-				item: select( EMAILS_STORE_NAME ).getItem( email.ID ),
-			} ),
-		[]
-	);
-
-	const handleTitle = (e) => {
-		dispatch.updateItem( email.ID, { data: { title : e.target.value } } );
-		toggleTitleEdit();
-	}
-
-	if ( ! item.hasOwnProperty( 'ID' ) ) {
-		return null;
-	}
 
 	return (
 		<Fragment>
