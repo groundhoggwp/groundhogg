@@ -142,9 +142,10 @@ class Broadcasts_Api extends Base_Object_Api {
 
 		set_transient( 'gh_get_broadcast_config', $config, HOUR_IN_SECONDS );
 
-		return self::SUCCESS_RESPONSE( [], [
+		return self::SUCCESS_RESPONSE( ['broadcast_id' =>$broadcast->get_id()], [
 			'message' => _x( 'Broadcast scheduled successfully.', 'api', 'groundhogg' ),
-			'config'  => $config
+			'config'  => $config,
+
 		] );
 	}
 

@@ -55,10 +55,10 @@ function setRequestingError (error) {
 }
 
 function setIsUpdatingItems (isUpdating) {
-  if ( ! isUpdating ) {
-    addNotification( {
-      message : __( 'Item successfully updated.' )
-    } );
+  if (!isUpdating) {
+    addNotification({
+      message: __('Item successfully updated.')
+    })
   }
 
   return {
@@ -75,10 +75,10 @@ function setUpdatingError (error) {
 }
 
 function setIsDeletingItems (isDeleting) {
-  if ( ! isDeleting ) {
-    addNotification( {
-      message : __( 'Item successfully deleted.', 'info' ),
-    } );
+  if (!isDeleting) {
+    addNotification({
+      message: __('Item successfully deleted.', 'info'),
+    })
   }
   return {
     type: TYPES.SET_IS_DELETING,
@@ -94,20 +94,20 @@ function setDeletingError (error) {
   }
 }
 
-export default (endpoint) => ( {
+export default (endpoint) => ({
 
   endpoint,
-	receiveItems,
-	receiveItem,
-	setIsRequestingItems,
-	setRequestingError,
+  receiveItems,
+  receiveItem,
+  setIsRequestingItems,
+  setRequestingError,
 
-  * fetchItems ( query ){
+  * fetchItems (query) {
     yield setIsRequestingItems(true)
 
     try {
       const result = yield apiFetch({
-        path: addQueryArgs( `${ endpoint }`, query ),
+        path: addQueryArgs(`${endpoint}`, query),
       })
 
       yield setIsRequestingItems(false)
@@ -116,29 +116,42 @@ export default (endpoint) => ( {
         items: result.items,
         totalItems: result.total_items
       }
-    }
-    catch (e) {
+    } catch (e) {
       yield setCreatingError(e)
     }
   },
+  /**
+   * Create Items
+   * @param items data item
+   * @param other any other arguments
+   * @returns {Generator<{type: string, items: *}|{request: Object, type: string}|{isCreating: *, type: string}|{type: string, error: *}, void, *>}
+   */ * createItems (items,sendBody= false) {
 
-  * createItems (items) {
     yield setIsCreatingItems(true)
 
+    let data = {};
+    if (sendBody) {
+      data = {
+        body : items
+      }
+    } else {
+      data = {
+        data:items
+      }
+    }
+
     try {
-      const result = yield apiFetch({
+      const result = yield apiFetch( {... {
         method: 'POST',
-        path: `${ endpoint }`,
-        data: items,
-      })
+        path: `${endpoint}`,
+      } , ...data })
 
       yield setIsCreatingItems(false)
       yield {
         type: TYPES.CREATE_ITEMS,
         items: result.items,
       }
-    }
-    catch (e) {
+    } catch (e) {
       yield setCreatingError(e)
     }
   },
@@ -149,7 +162,7 @@ export default (endpoint) => ( {
     try {
       const result = yield apiFetch({
         method: 'POST',
-        path: `${ endpoint }`,
+        path: `${endpoint}`,
         data: item,
       })
 
@@ -158,8 +171,7 @@ export default (endpoint) => ( {
         type: TYPES.CREATE_ITEM,
         item: result.item,
       }
-    }
-    catch (e) {
+    } catch (e) {
       yield setCreatingError(e)
     }
   },
@@ -170,7 +182,7 @@ export default (endpoint) => ( {
     try {
       const response = yield apiFetch({
         method: 'PATCH',
-        path: `${ endpoint }`,
+        path: `${endpoint}`,
         data: items,
       })
 
@@ -179,8 +191,7 @@ export default (endpoint) => ( {
         type: TYPES.UPDATE_ITEMS,
         items: response.items,
       }
-    }
-    catch (e) {
+    } catch (e) {
       yield setUpdatingError(e)
     }
   },
@@ -192,7 +203,7 @@ export default (endpoint) => ( {
     try {
       const response = yield apiFetch({
         method: 'PATCH',
-        path: `${ endpoint }/${ itemId }`,
+        path: `${endpoint}/${itemId}`,
         data: data,
       })
 
@@ -201,8 +212,7 @@ export default (endpoint) => ( {
         type: TYPES.UPDATE_ITEM,
         item: response.item,
       }
-    }
-    catch (e) {
+    } catch (e) {
       yield setUpdatingError(e)
     }
   },
@@ -213,7 +223,7 @@ export default (endpoint) => ( {
     try {
       yield apiFetch({
         method: 'DELETE',
-        path: `${ endpoint }`,
+        path: `${endpoint}`,
         data: itemIds,
       })
 
@@ -222,8 +232,7 @@ export default (endpoint) => ( {
         type: TYPES.DELETE_ITEMS,
         itemIds,
       }
-    }
-    catch (e) {
+    } catch (e) {
       yield setDeletingError(e)
     }
   },
@@ -233,7 +242,7 @@ export default (endpoint) => ( {
 
     try {
       yield apiFetch({
-        path: `${ endpoint }/${ itemId }`,
+        path: `${endpoint}/${itemId}`,
         method: 'DELETE',
       })
 
@@ -242,10 +251,9 @@ export default (endpoint) => ( {
         type: TYPES.DELETE_ITEM,
         itemId,
       }
-    }
-    catch (e) {
+    } catch (e) {
       yield setDeletingError(e)
     }
   },
 
-} )
+})

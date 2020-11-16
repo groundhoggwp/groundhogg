@@ -3,6 +3,7 @@
 namespace Groundhogg\Api\V4;
 
 use Groundhogg\Plugin;
+use WP_REST_Request;
 use WP_REST_Server;
 use function Groundhogg\file_access_url;
 use function Groundhogg\files;
@@ -89,6 +90,7 @@ class Files_Api extends Base_Api {
 			$uploaded[] = get_csv_file_info( $result[ 'file' ] );
 		}
 
+
 		return self::SUCCESS_RESPONSE( [
 			'items'       => $uploaded,
 			'total_items' => count( $uploaded )
@@ -114,8 +116,11 @@ class Files_Api extends Base_Api {
 			}
 		}
 
+		$limit   = absint( $request->get_param( 'limit' ) ) ?: 25 ;
+		$offset  = absint( $request->get_param( 'offset' ) ) ?: 0 ;
+
 		return self::SUCCESS_RESPONSE( [
-			'items'       => $data,
+			'items'       => array_slice( $data ,$offset , $limit ),
 			'total_items' => count( $data )
 		] );
 	}
@@ -140,11 +145,13 @@ class Files_Api extends Base_Api {
 	}
 
 	/**
-	 * Return a list of exports with their data
+	 * List of export
+	 *
+	 * @param WP_REST_Request $request
 	 *
 	 * @return \WP_REST_Response
 	 */
-	public function read_exports() {
+	public function read_exports(WP_REST_Request $request ) {
 		$data = [];
 
 		if ( file_exists( files()->get_csv_exports_dir() ) ) {
@@ -157,8 +164,11 @@ class Files_Api extends Base_Api {
 			}
 		}
 
+		$limit   = absint( $request->get_param( 'limit' ) ) ?: 25 ;
+		$offset  = absint( $request->get_param( 'offset' ) ) ?: 0 ;
+
 		return self::SUCCESS_RESPONSE( [
-			'items'       => $data,
+			'items'       => array_slice($data,$offset , $limit ),
 			'total_items' => count( $data )
 		] );
 	}

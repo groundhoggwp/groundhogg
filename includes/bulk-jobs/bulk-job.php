@@ -154,6 +154,10 @@ abstract class Bulk_Job {
 		$this->skipped ++;
 	}
 
+	protected function get_response_data () {
+		return [] ;
+	}
+
 	/**
 	 * Process the bulk job.
 	 */
@@ -190,6 +194,8 @@ abstract class Bulk_Job {
 			$completed ++;
 		}
 
+		$response = [];
+
 		$this->post_loop();
 
 		// Clean up any output like DB errors.
@@ -204,26 +210,25 @@ abstract class Bulk_Job {
 			$msg = sprintf( __( 'Processed %s items in %s seconds.', 'groundhogg' ), _nf( $completed ), _nf( $diff, 2 ) );
 		}
 
-		$response   = [
-			'complete'      => $completed - $this->skipped,
-			'skipped'       => $this->skipped,
-			'complete_nf'   => _nf( $completed - $this->skipped ),
-			'skipped_nf'    => _nf( $this->skipped ),
-			'message'       => esc_html( $msg ),
-			'output'        => $output,
-			'finished'    => false
-		];
+			$response ['complete'    ]   = $completed - $this->skipped ;
+			$response ['skipped'     ]   = $this->skipped ;
+			$response ['complete_nf' ]   = _nf( $completed - $this->skipped ) ;
+			$response ['skipped_nf'  ]   = _nf( $this->skipped ) ;
+			$response ['message'     ]   = esc_html( $msg ) ;
+			$response ['output'      ]   = $output ;
+			$response ['finished'    ]   = false ;
 
 		if (self::$is_rest) {
 			$next_index = $this->items_offset + $this->items_per_request;
 			$response['next_index'   ] = $next_index ;
 			$response['total_records'] = $total ;
 			$response['next_request' ] = ( $next_index > $total ) ? false : true ;
+			$response['data'] = $this->get_response_data();
 		}
 
 
 
-		if ( $this->is_the_end()  || ( self::$is_rest && $next_index> $total ) ) {
+		if ( $this->is_the_end()  || ( self::$is_rest && $next_index > $total ) ) {
 			$this->clean_up();
 
 			$response[ 'return_url' ] = $this->get_return_url();
