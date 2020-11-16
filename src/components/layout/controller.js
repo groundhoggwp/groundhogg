@@ -46,6 +46,7 @@ export const getPages = () => {
 		label: __( 'Dashboard' ),
 		name: 'dashboard',
 		path: '/',
+		link: '/',
 		priority: 1
 	} );
 

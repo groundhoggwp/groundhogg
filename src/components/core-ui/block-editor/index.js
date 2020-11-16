@@ -12,5 +12,9 @@ import {
  */
 export default function EditorComponent( { email, history } ) {
   setDefaultBlockName( 'groundhogg/paragraph' );
+	if(!email.data){
+		return <div/>
+	}
+
   return ( <Editor email={email} history={history} settings={ window.Groundhogg.preloadSettings } /> );
 }

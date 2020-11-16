@@ -60,18 +60,17 @@ class Funnels_Api extends Base_Object_Api {
 			return self::ERROR_404();
 		}
 
-		$data = $request->get_param( 'data' );
-		$meta = $request->get_param( 'meta' );
+		$data     = $request->get_param( 'data' );
+		$meta     = $request->get_param( 'meta' );
+
+		$parents  = $request->get_param( 'parents' );
+		$children = $request->get_param( 'children' );
 
 		$data['funnel_id'] = $funnel_id;
 
 		$step = new Step();
-		$step->create( $data, $request->get_param( 'condition_path' ) );
+		$step->create( $data, $meta );
 
-		foreach ( $meta as $key => $value ) {
-			$step->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
-		}
-		
 		return self::SUCCESS_RESPONSE( [
 			'item' => $funnel
 		] );
@@ -89,31 +88,14 @@ class Funnels_Api extends Base_Object_Api {
 		$funnel_id = absint( $request->get_param( 'ID' ) );
 		$step_id   = absint( $request->get_param( 'step_id' ) );
 
-		$data = $request->get_param( 'data' );
-		$meta = $request->get_param( 'meta' );
+		$data  = $request->get_param( 'data' );
+		$meta  = $request->get_param( 'meta' );
+
+		$edges = $request->get_param( 'edges' );
 
 		$step = new Step( $step_id );
 
-		$step->update( $data );
-
-		foreach ( $meta as $key => $value ) {
-			$step->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
-		}
-
-		// Add parent and child associations of new step
-		// Usually there will only be one parent => one child...
-		// Todo check for edge cases...
-		foreach ( $step->get_parent_steps() as $parent ) {
-			$parent->add_child_step( $step );
-
-			foreach ( $step->get_child_steps() as $child ) {
-				$child->add_parent_step( $step );
-
-				// remove all the associations of parents and children
-				$parent->remove_child_step( $child );
-				$child->remove_parent_step( $parent );
-			}
-		}
+		$step->update( $data, $meta );
 
 		$funnel = new Funnel( $funnel_id );
 

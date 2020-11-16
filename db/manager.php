@@ -58,8 +58,9 @@ class Manager {
 		$this->events            = new Events();
 		$this->funnels           = new Funnels();
 		$this->funnelmeta        = new Funnel_Meta();
-		$this->stepmeta          = new Step_Meta();
 		$this->steps             = new Steps();
+		$this->stepmeta          = new Step_Meta();
+		$this->step_edges        = new Step_Edges();
 		$this->tags              = new Tags();
 		$this->tag_relationships = new Tag_Relationships();
 		$this->submissions       = new Submissions();

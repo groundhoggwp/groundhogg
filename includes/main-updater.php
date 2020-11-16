@@ -307,7 +307,7 @@ class Main_Updater extends Updater {
 	/**
 	 * Update the steps table to support next_steps[]
 	 */
-	public function version_3_0_a_3() {
+	public function version_3_0_a_7() {
 		Plugin::$instance->dbs->install_dbs();
 	}
 
@@ -364,6 +364,7 @@ class Main_Updater extends Updater {
 			'3.0.a.2',
 			'3.0.a.3',
 			'3.0.a.4',
+			'3.0.a.7',
 		];
 	}
 

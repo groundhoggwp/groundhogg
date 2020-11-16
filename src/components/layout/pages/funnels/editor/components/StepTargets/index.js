@@ -6,5 +6,5 @@ export default (props) => {
 
   const StepType = getStepType( step_type );
 
-  return <StepType.Edges {...props}/>
+  return <StepType.Targets {...props}/>
 }

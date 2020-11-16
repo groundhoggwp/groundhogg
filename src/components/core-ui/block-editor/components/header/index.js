@@ -27,20 +27,10 @@ import HeaderPrimary from './header-primary';
 import HeaderSecondary from './header-secondary';
 import { Spinner } from  'components';
 
-export default function Header( { email, history } ) {
+export default function Header( { email, history, saveDraft, publishEmail, closeEditor } ) {
 	const dispatch = useDispatch( EMAILS_STORE_NAME );
 
 	const [ titleToggle, setTitleToggle ] = useState( false );
-
-	const saveDraft = () => {
-		console.log('save')
-	};
-	const publish = () => {
-		console.log('publish')
-	};
-	const closeEditor = () => {
-		history.goBack();
-	};
 
 	const toggleTitleEdit = () => {
 		setTitleToggle( ! titleToggle )
@@ -91,7 +81,7 @@ export default function Header( { email, history } ) {
 							<div className="groundhogg-header__settings edit-post-header__settings">
 								{ isSaving && <Spinner /> }
 								<Button onClick={saveDraft} variant="contained" color="secondary">{ __( 'Save Draft' ) }</Button>
-								<Button onClick={publish} variant="contained" color="primary">{ __( 'Publish' ) }</Button>
+								<Button onClick={publishEmail} variant="contained" color="primary">{ __( 'Publish' ) }</Button>
 								<Button onClick={closeEditor} variant="contained" color="secondary">{ __( 'Close' ) }</Button>
 								<PinnedItems.Slot scope="gh/v4/core" />
 							</div>

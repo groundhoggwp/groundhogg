@@ -340,8 +340,8 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @return bool|void
 	 */
-	public function create( $data = [] ) {
-		parent::create( $data );
+	public function create( $data = [], $meta=[] ) {
+		parent::create( $data, $meta );
 		$this->change_marketing_preference( $this->get_optin_status() );
 	}
 

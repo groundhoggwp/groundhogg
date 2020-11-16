@@ -89,6 +89,39 @@ abstract class Base_Object_With_Meta extends Base_Object {
 		return $data;
 	}
 
+	public function create( $data = [], $meta=[] ) {
+		$id = parent::create( $data );
+
+		if ( $id ){
+
+			foreach ( $meta as $key => $value ) {
+				$this->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
+			}
+		}
+
+		return $id;
+	}
+
+	/**
+	 * Wrapper for updated
+	 *
+	 * @param array $data
+	 * @param array $meta
+	 *
+	 * @return bool
+	 */
+	public function update( $data = [], $meta=[] ) {
+		$updated = parent::update( $data );
+
+		if ( $updated && $meta && is_array( $meta ) ){
+			foreach ( $meta as $key => $value ) {
+				$this->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
+			}
+		}
+
+		return $updated;
+	}
+
 	/**
 	 * Get all the meta data.
 	 *

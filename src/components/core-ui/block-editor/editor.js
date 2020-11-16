@@ -17,7 +17,7 @@ import {
 import {
 	PostTextEditor
 } from '@wordpress/editor';
-
+import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -29,7 +29,7 @@ import Sidebar from './components/sidebar';
 import BlockEditor from './components/block-editor'
 import { CORE_STORE_NAME } from 'data/core';
 
-function Editor( { settings, email, history } ) {
+const Editor = ( { settings, email, history } ) => {
 
 	const {
 		editorMode,
@@ -40,6 +40,44 @@ function Editor( { settings, email, history } ) {
 		[]
 	);
 
+	const {subject: defaultSubjectValue, pre_header: defaultPreHeaderValue, content: defaultContentValue } = email.data
+	// console.log(email.data)
+	//email data shape
+	// {
+	// 	ID,
+	// 	content,
+	// 	subject,
+	// 	pre_header,
+	// 	from_user,
+	// 	author,
+	// 	last_updated,
+	// 	date_created,
+	// 	status,
+	// 	is_template,
+	// 	title
+	// }
+	const [ subject, setSubject ] = useState( defaultSubjectValue );
+	const [ preHeader, setPreHeader ] = useState( defaultPreHeaderValue );
+	const [ content, setContent ] = useState( defaultContentValue );
+
+	const handleSubjectChange = (e)=>{
+		setSubject(e.target.value);
+	}
+	const handlePreHeaderChange = (e)=>{
+		setPreHeader(e.target.value);
+	}
+
+	const saveDraft = (e)=>{
+	}
+
+	const publishEmail = (e)=>{
+
+	}
+
+	const closeEditor = (e)=>{
+		history.goBack();
+	}
+
 	return (
 		<>
 			<FullscreenMode isActive={false} />
@@ -47,7 +85,7 @@ function Editor( { settings, email, history } ) {
 				<DropZoneProvider>
 					<FocusReturnProvider>
 						<InterfaceSkeleton
-							header={<Header email={email} history={history} />}
+							header={<Header email={email} history={history} saveDraft={saveDraft} publishEmail={publishEmail} closeEditor={closeEditor} />}
 							sidebar={
 								<>
 									<Sidebar />
@@ -57,7 +95,7 @@ function Editor( { settings, email, history } ) {
 							content={
 								<>
 									<Notices />
-									{ editorMode !== 'text' && <BlockEditor settings={settings} /> }
+									{ editorMode !== 'text' && <BlockEditor settings={settings} subject={subject} handleSubjectChange={handleSubjectChange} preHeader={preHeader} handlePreHeaderChange={handlePreHeaderChange}/> }
 									{ editorMode === 'text' && <PostTextEditor /> }
 								</>
 							}

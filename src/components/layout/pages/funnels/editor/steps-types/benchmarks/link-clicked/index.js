@@ -1,10 +1,12 @@
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
-import { BENCHMARK } from '../../constants'
+import { BENCHMARK, BENCHMARK_TYPE_DEFAULTS } from '../../constants'
 import { registerStepType } from 'data/step-type-registry'
 
 const STEP_TYPE = 'link_clicked'
 
 const stepAtts = {
+
+  ...BENCHMARK_TYPE_DEFAULTS,
 
   type: STEP_TYPE,
 
