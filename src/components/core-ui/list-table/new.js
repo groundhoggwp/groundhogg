@@ -23,6 +23,7 @@ import clsx from 'clsx'
 
 import Spinner from '../spinner'
 import { CORE_STORE_NAME } from 'data';
+import {isFunction} from "@material-ui/data-grid";
 
 const useDebounce = (value, delay) => {
   // State and setters for debounced value
@@ -74,7 +75,9 @@ export function ListTable ({
   isLoadingItems,
   bulkActions,
   onBulkAction,
-  QuickEdit
+  QuickEdit,
+  onSelectItem, // used to manage Handle Select Item
+  isCheckboxSelected // used to override default check of ID
 }) {
   const classes = useStyles()
   const [perPage, setPerPage] = useState(10)
@@ -110,7 +113,11 @@ export function ListTable ({
    * @returns {boolean}
    */
   const isSelected = (item) => {
-    return selected.filter(__item => __item.ID === item.ID).length > 0
+    if (isFunction(isCheckboxSelected)) {
+        return isCheckboxSelected( { item,selected }) ;
+    } else {
+      return selected.filter(__item => __item.ID === item.ID).length > 0
+    }
   }
 
   /**
@@ -119,14 +126,20 @@ export function ListTable ({
    * @param item
    */
   const handleSelectItem = (item) => {
-    if (isSelected(item)) {
-      // Item is selected, so remove it
-      setSelected(selected.filter(__item => __item.ID !== item.ID))
-    }
-    else {
-      // Add it to the selected array
-      setSelected([...selected, item])
-    }
+
+      if (isFunction(onSelectItem)) {
+          onSelectItem( { item , setSelected ,selected });
+      } else {
+          // default fucntion to handle is selected if there is no cusotm function
+          if (isSelected(item)) {
+              // Item is selected, so remove it
+              setSelected(selected.filter(__item => __item.ID !== item.ID))
+          } else {
+              // Add it to the selected array
+              setSelected([...selected, item])
+          }
+      }
+
   }
 
   /**

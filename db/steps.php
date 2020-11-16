@@ -87,9 +87,6 @@ class Steps extends DB {
 			'step_status'    => '%s',
 			'step_type'      => '%s',
 			'step_group'     => '%s',
-			'child_steps'    => '%s',
-			'parent_steps'   => '%s',
-			'step_order'     => '%d',
 			'last_edited_by' => '%s',
 			'last_edited'    => '%s',
 			'date_created'   => '%s',
@@ -110,43 +107,10 @@ class Steps extends DB {
 			'step_status'    => 'ready',
 			'step_type'      => 'send_email',
 			'step_group'     => 'action',
-			'child_steps'    => [],
-			'parent_steps'   => [],
-			'step_order'     => 0,
 			'last_edited_by' => '',
 			'last_edited'    => current_time( 'mysql' ),
 			'date_created'   => current_time( 'mysql' ),
 		);
-	}
-
-	/**
-	 * Add a step
-	 *
-	 * @access  public
-	 * @since   2.1
-	 */
-	public function add( $data = array() ) {
-
-		$data = wp_parse_args(
-			$data,
-			$this->get_column_defaults()
-		);
-
-		if ( empty( $data['step_type'] ) ) {
-			return false;
-		}
-
-		map_func_to_attr( $data, 'child_steps', 'maybe_serialize' );
-		map_func_to_attr( $data, 'parent_steps', 'maybe_serialize' );
-
-		return $this->insert( $data );
-	}
-
-	public function update( $row_id = 0, $data = [], $where = [] ) {
-		map_func_to_attr( $data, 'child_steps', 'maybe_serialize' );
-		map_func_to_attr( $data, 'parent_steps', 'maybe_serialize' );
-
-		return parent::update( $row_id, $data, $where );
 	}
 
 	/**
@@ -193,10 +157,7 @@ class Steps extends DB {
 		step_type varchar(50) NOT NULL,
 		step_group varchar(20) NOT NULL,
 		step_status varchar(20) NOT NULL,
-		child_steps text,
-		parent_steps text,
 		last_edited_by varchar(20) NOT NULL,
-		step_order int unsigned NOT NULL,
 		date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		last_edited datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		PRIMARY KEY  (ID)

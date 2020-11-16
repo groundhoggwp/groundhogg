@@ -6,6 +6,7 @@ use Groundhogg\DB\DB;
 use Groundhogg\DB\Event_Queue;
 use Groundhogg\DB\Events;
 use Groundhogg\DB\Meta_DB;
+use Groundhogg\DB\Step_Edges;
 use Groundhogg\DB\Step_Meta;
 use Groundhogg\DB\Steps;
 
@@ -38,6 +39,10 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public $enqueued_contact;
 
+	protected $child_edges = [];
+
+	protected $parents_edges = [];
+
 	/**
 	 * Return the DB instance that is associated with items of this type.
 	 *
@@ -54,6 +59,13 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	protected function get_meta_db() {
 		return get_db( 'stepmeta' );
+	}
+
+	/**
+	 * @return Step_Edges
+	 */
+	protected function get_edges_db() {
+		return get_db( 'step_edges' );
 	}
 
 	/**
@@ -80,21 +92,12 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return void
 	 */
 	protected function post_setup() {
-		$this->parent_steps = $this->parent_steps ? $this->ensure_ids( maybe_unserialize( $this->parent_steps ) ) : [];
-		$this->child_steps  = $this->child_steps ? $this->ensure_ids( maybe_unserialize( $this->child_steps ) ) : [];
+		$this->setup_edges();
 	}
 
-	/**
-	 * @param $list
-	 *
-	 * @return mixed
-	 */
-	public function ensure_ids( $list ) {
-		foreach ( $list as $i => &$id ) {
-			$id = absint( $id );
-		}
-
-		return array_filter( $list );
+	protected function setup_edges() {
+		$this->child_edges   = $this->get_edges_db()->query( [ 'from_id' => $this->get_id() ] );
+		$this->parents_edges = $this->get_edges_db()->query( [ 'to_id' => $this->get_id() ] );
 	}
 
 	/**
@@ -118,28 +121,18 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return Step[]
 	 */
 	public function get_child_steps() {
-		return $this->child_steps ? id_list_to_class( $this->child_steps, Step::class ) : [];
-	}
-
-	/**
-	 * @return bool|Step
-	 */
-	public function get_yes_step() {
-		return $this->is_condition() ? new Step( $this->child_steps['yes'] ) : false;
-	}
-
-	/**
-	 * @return bool|Step
-	 */
-	public function get_no_step() {
-		return $this->is_condition() ? new Step( $this->child_steps['no'] ) : false;
+		return array_map( function ( $edge ) {
+			return new Step( $edge->to_id );
+		}, $this->child_edges );
 	}
 
 	/**
 	 * @return Step[]
 	 */
 	public function get_parent_steps() {
-		return $this->parent_steps ? id_list_to_class( $this->parent_steps, Step::class ) : [];
+		return array_map( function ( $edge ) {
+			return new Step( $edge->from_id );
+		}, $this->parents_edges );
 	}
 
 	public function get_order() {
@@ -166,186 +159,40 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
-	 * Id of the step
-	 *
-	 * @param $step Step
+	 * @param        $step Step
+	 * @param string $path
 	 */
-	public function add_parent_step( $step ) {
-		if ( ! $step || ! $step->exists() || in_array( $step->get_id(), $this->parent_steps ) ) {
-			return;
-		}
+	public function add_child_step( $step, $path = '' ) {
+		$this->get_edges_db()->add( [
 
-		$parents = $this->parent_steps;
-
-		array_push( $parents, $step->get_id() );
-
-		$this->update( [
-			'parent_steps' => $parents
 		] );
-	}
 
-	/**
-	 * @param $step Step
-	 */
-	public function add_child_step( $step, $key = false ) {
-
-		if ( ! $step || ! $step->exists() || ( $key ? $this->child_steps[ $key ] === $step->get_id() : in_array( $step->get_id(), $this->child_steps ) ) ) {
-			return;
-		}
-
-		$children = $this->child_steps;
-
-		if ( ! $key ) {
-			array_push( $children, $step->get_id() );
-		} else {
-			$children[ $key ] = $step->get_id();
-		}
-
-		$this->update( [
-			'child_steps' => $children
-		] );
-	}
-
-	/**
-	 * @param $step
-	 */
-	public function set_yes_step( $step ) {
-		$this->add_child_step( $step, 'yes' );
-	}
-
-	/**
-	 * @param $step
-	 */
-	public function set_no_step( $step ) {
-		$this->add_child_step( $step, 'no' );
-	}
-
-	/**
-	 * @param $step Step
-	 */
-	public function remove_parent_step( $step ) {
-		if ( ! $step || ! $step->exists() || ! in_array( $step->get_id(), $this->parent_steps ) ) {
-			return;
-		}
-
-		$this->update( [
-			'parent_steps' => array_diff( $this->parent_steps, [ $step->get_id() ] )
-		] );
+		$this->setup_edges();
 	}
 
 	/**
 	 * @param $step Step
 	 */
 	public function remove_child_step( $step ) {
-		if ( ! $step || ! $step->exists() || ! in_array( $step->get_id(), $this->child_steps ) ) {
-			return;
-		}
-
-		$this->update( [
-			'child_steps' => array_diff( $this->child_steps, [ $step->get_id() ] )
+		$this->get_edges_db()->delete( [
+			'from_id' => $this->get_id(),
+			'to_id'   => $step->get_id(),
 		] );
-	}
 
-	public function create( $data = [], $path = false ) {
-
-		parent::create( $data );
-
-		$this->create_edges( $path );
-	}
-
-	public function create_edges( $path ) {
-
-		// Add edge from parent to this
-
-		$child_steps  = $this->get_child_steps();
-		$parent_steps = $this->get_parent_steps();
-
-		foreach ( $parent_steps as $parent_step ) {
-			$parent_step->add_child_step( $this, $path );
-		}
-
-		// add edge from child to this
-		foreach ( $child_steps as $child_step ) {
-
-			if ( $this->is_condition() ) {
-				$this->set_no_step( $child_step );
-				$this->set_yes_step( $child_step );
-			}
-
-			$child_step->add_parent_step( $this );
-		}
-
-		// Generic case
-		// remove old edges from parent to child
-		foreach ( $parent_steps as $parent_step ) {
-			foreach ( $child_steps as $child_step ) {
-
-				if ( ! $path ) {
-					$parent_step->remove_child_step( $child_step );
-				}
-
-				$child_step->remove_parent_step( $parent_step );
-			}
-		}
-
-	}
-
-
-	public function delete_edges() {
-
-
-		// Add likewise associations of parent to child
-		// Usually there will only be one parent => one child...
-		// Todo check for edge cases...
-		foreach ( $this->get_parent_steps() as $parent ) {
-			foreach ( $this->get_child_steps() as $child ) {
-				$parent->add_child_step( $child );
-				$child->add_parent_step( $parent );
-			}
-		}
-
-		foreach ( $this->get_parent_steps() as $parent ) {
-			$parent->remove_child_step( $this );
-		}
-
-		foreach ( $this->get_child_steps() as $parent ) {
-			$parent->remove_parent_step( $this );
-		}
-
+		$this->setup_edges();
 	}
 
 	/**
-	 * Needs to handle the moving of contacts to another step...
-	 *
-	 * @return bool
+	 * @return array|mixed|void
 	 */
-	public function delete() {
-
-		$this->delete_edges();
-
-		// Maybe Move contacts forward...
-		$next_step = $this->get_next_step();
-
-//		if ( $next_step && $next_step->can_run() ) {
-//			$contacts = $this->get_waiting_contacts();
-//
-//			if ( ! empty( $contacts ) ) {
-//				foreach ( $contacts as $contact ) {
-//					$next_step->enqueue( $contact );
-//				}
-//			}
-//
-//		}
-
-		return parent::delete();
-	}
-
-	protected function sanitize_columns( $data = [] ) {
-
-		map_func_to_attr( $data, 'parent_steps', [ $this, 'ensure_ids' ] );
-		map_func_to_attr( $data, 'child_steps', [ $this, 'ensure_ids' ] );
-
-		return $data;
+	public function get_as_array() {
+		return apply_filters( "groundhogg/{$this->get_object_type()}/get_as_array", [
+			'ID'           => $this->get_id(),
+			'data'         => $this->data,
+			'meta'         => $this->meta,
+			'child_edges'  => $this->child_edges,
+			'parent_edges' => $this->parents_edges,
+		] );
 	}
 
 	/**
@@ -691,14 +538,22 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		}
 	}
 
-	public function update( $data = [] ) {
+	/**
+	 * Update wrapper
+	 *
+	 * @param array $data
+	 * @param array $meta
+	 *
+	 * @return bool
+	 */
+	public function update( $data = [], $meta=[] ) {
 
 		if ( ! empty( $data ) ) {
 			$data['last_edited']    = current_time( 'mysql' );
 			$data['last_edited_by'] = is_user_logged_in() ? get_current_user_id() : 'system';
 		}
 
-		return parent::update( $data ); // TODO: Change the autogenerated stub
+		return parent::update( $data, $meta );
 	}
 
 	/**
@@ -758,6 +613,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public static function event_callback( $event ) {
 		$step = new Step( $event->get_step_id() );
+
 		return $step->run( $event->get_contact(), $event );
 	}
 }

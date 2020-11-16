@@ -8,76 +8,63 @@ import { withSelect } from '@wordpress/data'
 import dagre from 'dagre'
 import StepEdges from './components/StepEdges'
 import StepTargets from './components/StepTargets'
-// import ExitEdges from './components/ExitEdges'
-import { CONDITION } from 'components/layout/pages/funnels/editor/steps-types/constants'
+import {
+  ACTION,
+  BENCHMARK,
+  CONDITION, EXIT,
+} from 'components/layout/pages/funnels/editor/steps-types/constants'
 import { useLayoutEffect, useRef, useState } from '@wordpress/element'
+import { numChildren } from 'components/layout/pages/funnels/editor/functions'
 
-export const NODE_HEIGHT = 250
-export const NODE_WIDTH = 300
+export const NODE_HEIGHT = 136
+export const NODE_WIDTH = 250
+
+const NODE_SEP = 100
+const RANK_SEP = 150
 
 /**
  * Breadth first search of the steps tree to build iout a row level based chart
  * for putting the steps on the page.
  *
  * @param steps
- * @param graph
+ * @param edges
  */
-function buildGraph (steps, graph) {
+function buildGraph (steps, edges) {
 
-  const queue = steps.filter(
-    step => Object.values(step.data.parent_steps).length === 0)
+  const graph = new dagre.graphlib.Graph()
 
-  while (queue.length) {
-    let currentNode = queue.shift()
-    const { ID, data } = currentNode
-    const { child_steps, step_group } = data
-    let children = Object.values(child_steps)
+  graph.setGraph({
+    nodesep: NODE_SEP,
+    ranksep: RANK_SEP,
+  })
 
-    if (graph.node(ID)) {
-      continue
+  graph.setDefaultEdgeLabel(() => { return {} })
+
+  steps.forEach(step => {
+    graph.setNode(step.ID,
+      { label: step.ID, width: NODE_WIDTH, height: NODE_HEIGHT, ...step })
+  })
+
+  graph.setNode(EXIT,
+    { label: EXIT, width: NODE_WIDTH, height: NODE_HEIGHT, data:{}, ID: EXIT })
+
+  edges.forEach(edge => {
+    graph.setEdge(parseInt(edge.from_id), parseInt(edge.to_id))
+  })
+
+  graph.nodes().forEach(node => {
+    if (numChildren(node, graph) === 0) {
+      graph.setEdge(node, EXIT)
     }
+  })
 
-    graph.setNode(ID, { label: ID, width: NODE_WIDTH, height: NODE_HEIGHT, ...currentNode } )
-
-    // Get the child nodes
-    let childNodes = steps.filter(
-      node => children.includes(node.ID))
-
-    if (step_group === CONDITION) {
-      graph.setEdge(ID, child_steps.no || 'exit')
-      graph.setEdge(ID, child_steps.yes || 'exit')
-
-      child_steps.yes &&
-      queue.push(childNodes.find(node => node.ID === child_steps.yes))
-      child_steps.no &&
-      queue.push(childNodes.find(node => node.ID === child_steps.no))
-
-    }
-    else {
-
-      if (!childNodes.length) {
-        // set to exit
-        graph.setEdge(ID, 'exit')
-        continue
-      }
-
-      // queue up the child nodes
-      childNodes.forEach((node, i) => {
-        graph.setEdge(ID, node.ID)
-        queue.push(node)
-      })
-    }
-  }
+  return graph
 }
 
 const Editor = ({ funnel }) => {
 
-  if (!funnel) {
-    return null
-  }
-
-  if (!funnel.steps) {
-    return null
+  if (!funnel || !funnel.steps || !funnel.edges) {
+    return <>Loading...</>
   }
 
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
@@ -99,36 +86,20 @@ const Editor = ({ funnel }) => {
 
   let windowMidPoint = dimensions.width / 2
 
-  const steps = funnel.steps
+  const { steps, edges } = funnel
 
-  const endingSteps = steps.filter(
-    step => Object.values(step.data.child_steps).length === 0 || ( step.data.step_group === CONDITION && ( ! step.data.child_steps.yes || ! step.data.child_steps.no ) ) )
-
-  const graph = new dagre.graphlib.Graph()
-
-  graph.setGraph({
-    // ranker: 'tight-tree',
-    // align: 'DL',
-    // rankdir: 'LR',
-    nodesep: 100,
-  })
-
-  graph.setDefaultEdgeLabel(() => { return {} })
-
-  graph.setNode('exit',
-    { label: 'exit', width: NODE_WIDTH, height: NODE_HEIGHT })
-
-  buildGraph(steps, graph)
+  const graph = buildGraph(steps, edges)
 
   dagre.layout(graph)
 
-  let XOffset = windowMidPoint - graph.node('exit').x - ( NODE_WIDTH / 2 )
+  let xOffset = windowMidPoint - graph.node('exit').x - ( NODE_WIDTH / 2 )
+  // let xOffset = 0
 
   return (
     <>
       <div ref={ targetRef } style={ {
         position: 'relative',
-        height: graph.node('exit').y + 100,
+        height: dimensions.height,
       } }>
         {
           steps.length === 0 && (
@@ -146,7 +117,7 @@ const Editor = ({ funnel }) => {
                 <StepBlock
                   { ...step }
                   graph={ graph }
-                  xOffset={ XOffset }
+                  xOffset={ xOffset }
                 />
               </>
             )
@@ -159,7 +130,7 @@ const Editor = ({ funnel }) => {
                 <StepTargets
                   { ...step }
                   graph={ graph }
-                  xOffset={ XOffset }
+                  xOffset={ xOffset }
                 />
               </>
             )
@@ -172,7 +143,7 @@ const Editor = ({ funnel }) => {
                 <StepEdges
                   { ...step }
                   graph={ graph }
-                  xOffset={ XOffset }
+                  xOffset={ xOffset }
                 />
               </>
             )

@@ -1,7 +1,16 @@
 import Xarrow from 'react-xarrows'
 import Fab from '@material-ui/core/Fab'
-import { NODE_HEIGHT, NODE_WIDTH } from 'components/layout/pages/funnels/editor'
 import AddIcon from '@material-ui/icons/Add'
+import AddStepButton from '../components/AddStepButton'
+import {
+  getChildren, getEdgeChangesAbove, getEdgeChangesBelow, getEdgeChangesBeside,
+  getParents,
+  isBenchmark,
+  numChildren,
+  numParents,
+} from 'components/layout/pages/funnels/editor/functions'
+
+export const EXIT = 'exit'
 
 export const ACTION = 'action'
 export const ACTIONS = 'actions'
@@ -10,6 +19,8 @@ export const BENCHMARKS = 'benchmarks'
 export const CONDITION = 'condition'
 export const CONDITIONS = 'conditions'
 
+export const ARROW_HEAD_SIZE = 5
+
 export const ARROW_STYLE = {
   startAnchor: ['bottom', 'middle'],
   endAnchor: ['top', 'middle'],
@@ -17,11 +28,11 @@ export const ARROW_STYLE = {
   path: 'smooth',
   color: '#cbcbcb',
   curveness: 1,
-  headSize: 5,
+  headSize: ARROW_HEAD_SIZE,
 }
 
 export const ADD_STEP_BUTTON_X_OFFSET = 20
-export const ADD_STEP_BUTTON_Y_OFFSET = 40
+export const ADD_STEP_BUTTON_Y_OFFSET = 30
 export const CARD_WIDTH = 250
 export const CARD_HEIGHT = 136
 
@@ -31,9 +42,10 @@ export const ACTION_TYPE_DEFAULTS = {
     // Benchmarks should only ever have 1 child...
     // can have multiple parents though!
 
-    const { parent_steps, child_steps, step_group } = data
-    let children = Object.values(child_steps)
-    let parents = Object.values(parent_steps)
+    let children = getChildren( ID, graph )
+    let parents = getParents( ID, graph )
+
+    console.log( children, parents )
 
     const arrows = []
 
@@ -50,9 +62,11 @@ export const ACTION_TYPE_DEFAULTS = {
     children.forEach(child => {
       arrows.push({
         ...ARROW_STYLE,
-        start: `step-${ ID }-exit`,
-        end: `step-${ child }-entry`,
-        headSize: 0,
+        start: `add-step-below-${ ID }`,
+        end: numParents(child, graph) > 1
+          ? `add-step-above-${ child }`
+          : `step-card-${ child }`,
+        headSize: numParents(child, graph) > 1 ? 0 : ARROW_HEAD_SIZE,
       })
     })
 
@@ -65,7 +79,6 @@ export const ACTION_TYPE_DEFAULTS = {
         ...ARROW_STYLE,
         start: `add-step-above-${ ID }`,
         end: `step-card-${ ID }`,
-        headSize: 0,
       })
     }
 
@@ -85,11 +98,10 @@ export const ACTION_TYPE_DEFAULTS = {
 
     const targets = []
 
-    const { parent_steps, child_steps, step_group } = data
-    let children = Object.values(child_steps)
-    let parents = Object.values(parent_steps)
-
     let thisNode = graph.node(ID)
+
+    let parents = getParents( ID, graph );
+    let children = getChildren( ID, graph );
 
     // If there are multiple parents a target must be placed above
     if (parents.length > 1) {
@@ -103,7 +115,7 @@ export const ACTION_TYPE_DEFAULTS = {
       // cannot include benchmarks if the parents have benchmarks in them...
       // other steps are legal
       if (parents.filter(id => {
-        return graph.node(id).data.step_group === BENCHMARK
+        return isBenchmark( id, graph );
       }).length) {
         allowedGroups = allowedGroups.filter(group => group !== BENCHMARKS)
       }
@@ -111,8 +123,7 @@ export const ACTION_TYPE_DEFAULTS = {
       targets.push({
         id: `add-step-above-${ ID }`,
         groups: allowedGroups,
-        parents: parent_steps,
-        children: [ID],
+        edges: getEdgeChangesAbove( ID, graph ),
         position: {
           // Todo calculate correct value here
           x: thisNode.x + ( CARD_WIDTH / 2 ) - ADD_STEP_BUTTON_X_OFFSET,
@@ -130,7 +141,7 @@ export const ACTION_TYPE_DEFAULTS = {
     // cannot include benchmarks if the parents have benchmarks in them...
     // other steps are legal
     if (children.filter(id => {
-      return graph.node(id).data.step_group === BENCHMARK
+      return isBenchmark( id, graph )
     }).length) {
       allowedGroups = allowedGroups.filter(group => group !== BENCHMARKS)
     }
@@ -138,8 +149,7 @@ export const ACTION_TYPE_DEFAULTS = {
     targets.push({
       id: `add-step-below-${ ID }`,
       groups: allowedGroups,
-      parents: [ID],
-      children: parent_steps,
+      edges: getEdgeChangesBelow( ID, graph ),
       position: {
         x: thisNode.x + ( CARD_WIDTH / 2 ) - ADD_STEP_BUTTON_X_OFFSET,
         y: thisNode.y + CARD_HEIGHT + ADD_STEP_BUTTON_Y_OFFSET,
@@ -148,16 +158,16 @@ export const ACTION_TYPE_DEFAULTS = {
     return (
       <>
         {
-          targets.map(({ id, position }) => (
-            <Fab id={ id } style={ {
-              position: 'absolute',
-              top: position.y,
-              left: position.x + xOffset,
-            } }
-                 size={ 'small' } aria-label="add">
-              <AddIcon/>
-            </Fab>
-          ))
+          targets.map(({ id, position, groups, edges }) =>
+            <AddStepButton
+              id={ id }
+              groups={ groups }
+              edges={edges}
+              position={ {
+                x: position.x + xOffset,
+                y: position.y,
+              } }
+            />)
         }
       </>
     )
@@ -172,9 +182,8 @@ export const BENCHMARK_TYPE_DEFAULTS = {
     // Benchmarks should only ever have 1 child...
     // can have multiple parents though!
 
-    const { parent_steps, child_steps, step_group } = data
-    let children = Object.values(child_steps)
-    let parents = Object.values(parent_steps)
+    let parents = getParents( ID, graph );
+    let children = getChildren( ID, graph );
 
     const arrows = []
 
@@ -191,9 +200,11 @@ export const BENCHMARK_TYPE_DEFAULTS = {
     children.forEach(child => {
       arrows.push({
         ...ARROW_STYLE,
-        start: `step-${ ID }-exit`,
-        end: `step-${ child }-entry`,
-        headSize: 0,
+        start: `add-step-below-${ ID }`,
+        end: numParents(child, graph) > 1
+          ? `add-step-above-${ child }`
+          : `step-card-${ child }`,
+        headSize: numParents(child, graph) > 1 ? 0 : ARROW_HEAD_SIZE,
       })
     })
 
@@ -206,7 +217,6 @@ export const BENCHMARK_TYPE_DEFAULTS = {
         ...ARROW_STYLE,
         start: `add-step-below-${ ID }`,
         end: `step-card-${ ID }`,
-        headSize: 0,
       })
     }
     else {
@@ -239,9 +249,8 @@ export const BENCHMARK_TYPE_DEFAULTS = {
 
     const targets = []
 
-    const { parent_steps, child_steps, step_group } = data
-    let children = Object.values(child_steps)
-    let parents = Object.values(parent_steps)
+    let parents = getParents( ID, graph );
+    let children = getChildren( ID, graph );
 
     let thisNode = graph.node(ID)
 
@@ -254,8 +263,7 @@ export const BENCHMARK_TYPE_DEFAULTS = {
           ACTIONS,
           CONDITIONS,
         ],
-        parents: parent_steps,
-        children: [ID],
+        edges: getEdgeChangesAbove( ID, graph ),
         position: {
           x: thisNode.x + ( CARD_WIDTH / 2 ) - ADD_STEP_BUTTON_X_OFFSET,
           y: thisNode.y - ( ADD_STEP_BUTTON_Y_OFFSET * 2 ),
@@ -268,10 +276,8 @@ export const BENCHMARK_TYPE_DEFAULTS = {
         groups: [
           BENCHMARKS,
         ],
-        parents: parent_steps,
-        children: child_steps,
+        edges: getEdgeChangesBeside( ID, graph ),
         position: {
-          // Todo calculate correct value here
           x: thisNode.x + CARD_WIDTH + ADD_STEP_BUTTON_Y_OFFSET,
           y: thisNode.y + ( CARD_HEIGHT / 2 ) - ADD_STEP_BUTTON_X_OFFSET,
         },
@@ -284,8 +290,7 @@ export const BENCHMARK_TYPE_DEFAULTS = {
         ACTIONS,
         CONDITIONS,
       ],
-      parents: [ID],
-      children: parent_steps,
+      edges: getEdgeChangesBelow( ID, graph ),
       position: {
         x: thisNode.x + ( CARD_WIDTH / 2 ) - ADD_STEP_BUTTON_X_OFFSET,
         y: thisNode.y + CARD_HEIGHT + ADD_STEP_BUTTON_Y_OFFSET,
@@ -295,16 +300,16 @@ export const BENCHMARK_TYPE_DEFAULTS = {
     return (
       <>
         {
-          targets.map(({ id, position }) => (
-            <Fab id={ id } style={ {
-              position: 'absolute',
-              top: position.y,
-              left: position.x + xOffset,
-            } }
-                 size={ 'small' } aria-label="add">
-              <AddIcon/>
-            </Fab>
-          ))
+          targets.map(({ id, position, groups, edges }) =>
+            <AddStepButton
+              id={ id }
+              groups={ groups }
+              edges={edges}
+              position={ {
+                x: position.x + xOffset,
+                y: position.y,
+              } }
+            />)
         }
       </>
     )

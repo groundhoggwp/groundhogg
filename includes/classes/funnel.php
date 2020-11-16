@@ -89,25 +89,6 @@ class Funnel extends Base_Object_With_Meta {
 		return $conversion_step_id;
 	}
 
-	public function get_first_action_id() {
-		$actions = $this->get_step_ids( [
-			'step_group' => Step::ACTION,
-		] );
-
-		return array_shift( $actions );
-	}
-
-	/**
-	 * @return int
-	 */
-	public function get_first_step_id() {
-		$actions = $this->get_step_ids( [
-			'step_group' => Step::BENCHMARK,
-		] );
-
-		return array_shift( $actions );
-	}
-
 	/**
 	 * Get the step IDs associate with this funnel
 	 *
@@ -124,7 +105,6 @@ class Funnel extends Base_Object_With_Meta {
 
 		return wp_parse_id_list( wp_list_pluck( $this->get_steps_db()->query( $query ), 'ID' ) );
 	}
-
 
 	/**
 	 * Get a bunch of steps
@@ -151,8 +131,10 @@ class Funnel extends Base_Object_With_Meta {
 	 * @return array|bool
 	 */
 	public function get_as_array() {
-		$array          = parent::get_as_array();
-		$steps          = $this->get_steps();
+
+		$array = parent::get_as_array();
+		$steps = $this->get_steps();
+
 		// Todo use real stats
 		$array['stats'] = [
 			'active_now'     => 10,
@@ -169,6 +151,8 @@ class Funnel extends Base_Object_With_Meta {
 		foreach ( $steps as $step ) {
 			$array['steps'][] = $step->get_as_array();
 		}
+
+		$array['edges'] = get_db( 'step_edges' )->query( [ 'funnel_id' => $this->get_id() ] );
 
 		$array = apply_filters( 'groundhogg/funnel/export', $array, $this );
 
@@ -272,63 +256,5 @@ class Funnel extends Base_Object_With_Meta {
 		}
 
 		return $funnel_id;
-	}
-
-	public function isValidFunnel() {
-
-		$steps = $this->get_steps();
-
-		foreach ( $steps as $step ) {
-
-			$step->validate();
-
-			if ( $step->has_errors() ) {
-
-				foreach ( $step->get_errors() as $error ) {
-					$error->add_data( $step->get_id(), 'step_id' );
-					$this->add_error( $error );
-				}
-
-			}
-
-		}
-
-		return ! $this->has_errors();
-	}
-
-	/**
-	 * @return false|string
-	 */
-	public function get_as_json() {
-		return wp_json_encode( $this->get_as_array() );
-	}
-
-	/**
-	 * Add a step to the funnel
-	 *
-	 * @param $args array a list of args for the step
-	 *
-	 * @return Step|false
-	 */
-	public function add_step( $args ) {
-
-		$args = wp_parse_args( $args, [
-			'funnel_id'   => $this->get_id(),
-			'step_status' => 'ready',
-			'step_order'  => count( $this->get_step_ids() ) + 1,
-			'meta'        => [],
-		] );
-
-		$step = new Step( $args );
-
-		if ( ! $step->exists() ) {
-			return false;
-		}
-
-		foreach ( $args['meta'] as $key => $value ) {
-			$step->update_meta( $key, $value );
-		}
-
-		return $step;
 	}
 }

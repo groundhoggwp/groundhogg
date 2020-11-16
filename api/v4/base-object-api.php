@@ -136,8 +136,12 @@ abstract class Base_Object_Api extends Base_Api {
 	 *
 	 * @return Base_Object | Base_Object_With_Meta
 	 */
-	public function create_new_object( $data ) {
+	public function create_new_object( $data, $meta=[] ) {
 		$class_name = $this->get_object_class();
+
+		if ( method_exists( $class_name, 'update_meta' ) && ! empty( $meta ) ){
+			return new $class_name( $data, $meta );
+		}
 
 		return new $class_name( $data );
 	}
@@ -264,23 +268,14 @@ abstract class Base_Object_Api extends Base_Api {
 			$data = get_array_var( $item, 'data' ) ?: $item;
 			$meta = get_array_var( $item, 'meta' );
 
-			$object = $this->create_new_object( $data );
+			$object = $this->create_new_object( $data, $meta );
 
 			if ( ! $object->exists() ) {
 				continue;
 			}
 
-			// If the current object supports meta data...
-			if ( method_exists( $object, 'update_meta' ) && ! empty( $meta ) && is_array( $meta ) ) {
-				foreach ( $meta as $key => $value ) {
-					$object->update_meta( $key, $value );
-				}
-			}
-
 			$added[] = $object;
 		}
-
-
 
 		return self::SUCCESS_RESPONSE( [
 			'items'       => $added,
@@ -351,13 +346,11 @@ abstract class Base_Object_Api extends Base_Api {
 				$data = get_array_var( $item, 'data', [] );
 				$meta = get_array_var( $item, 'meta', [] );
 
-				$object->update( $data );
-
 				// If the current object supports meta data...
-				if ( method_exists( $object, 'update_meta' ) && ! empty( $meta ) && is_array( $meta ) ) {
-					foreach ( $meta as $key => $value ) {
-						$object->update_meta( $key, $value );
-					}
+				if ( method_exists( $object, 'update_meta' ) ) {
+					$object->update( $data, $meta );
+				} else {
+					$object->update( $data );
 				}
 
 				$updated[] = $object;
@@ -377,17 +370,15 @@ abstract class Base_Object_Api extends Base_Api {
 		$items = array_map( [ $this, 'map_raw_object_to_class' ], $items );
 
 		/**
-		 * @var $object Base_Object
+		 * @var $object Base_Object|Base_Object_With_Meta
 		 */
 		foreach ( $items as $object ) {
 
-			$object->update( $data );
-
 			// If the current object supports meta data...
-			if ( method_exists( $object, 'update_meta' ) && ! empty( $meta ) && is_array( $meta ) ) {
-				foreach ( $meta as $key => $value ) {
-					$object->update_meta( $key, $value );
-				}
+			if ( method_exists( $object, 'update_meta' ) ) {
+				$object->update( $data, $meta );
+			} else {
+				$object->update( $data );
 			}
 		}
 
@@ -445,12 +436,7 @@ abstract class Base_Object_Api extends Base_Api {
 		$data = $request->get_param( 'data' );
 		$meta = $request->get_param( 'meta' );
 
-//		wp_send_json( [
-//			$data,
-//			$meta
-//		] );
-
-		$object = $this->create_new_object( $data );
+		$object = $this->create_new_object( $data, $meta );
 
 		if ( ! $object->exists() ) {
 
@@ -461,13 +447,6 @@ abstract class Base_Object_Api extends Base_Api {
 				'meta' => $meta,
 				'wpdb' => $wpdb->last_error
 			] );
-		}
-
-		// If the current object supports meta data...
-		if ( method_exists( $object, 'update_meta' ) && ! empty( $meta ) && is_array( $meta ) ) {
-			foreach ( $meta as $key => $value ) {
-				$object->update_meta( $key, $value );
-			}
 		}
 
 		return self::SUCCESS_RESPONSE( [
@@ -517,10 +496,10 @@ abstract class Base_Object_Api extends Base_Api {
 		$object->update( $data );
 
 		// If the current object supports meta data...
-		if ( method_exists( $object, 'update_meta' ) && ! empty( $meta ) && is_array( $meta ) ) {
-			foreach ( $meta as $key => $value ) {
-				$object->update_meta( $key, $value );
-			}
+		if ( method_exists( $object, 'update_meta' ) ) {
+			$object->update( $data, $meta );
+		} else {
+			$object->update( $data );
 		}
 
 		return self::SUCCESS_RESPONSE( [ 'item' => $object ] );
