@@ -1,18 +1,22 @@
 import {
   ACTION,
-  BENCHMARK,
+  BENCHMARK, EXIT,
 } from 'components/layout/pages/funnels/editor/steps-types/constants'
 
-const NEW_STEP = 'new';
+export const NEW_STEP = 'new';
+
+export function isExit ( n ) {
+  return n === EXIT;
+}
 
 export function isBenchmark (n, graph) {
   n = graph.node(n)
-  return n ? n.data.step_group === BENCHMARK : false
+  return n && ! isExit(n) ? n.data.step_group === BENCHMARK : false
 }
 
 export function isAction (n, graph) {
   n = graph.node(n)
-  return n ? n.data.step_group === ACTION : false
+  return n && ! isExit(n) ? n.data.step_group === ACTION : false
 }
 
 export function numParents (n, graph) {

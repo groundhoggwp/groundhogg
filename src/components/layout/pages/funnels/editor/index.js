@@ -11,14 +11,16 @@ import StepTargets from './components/StepTargets'
 import {
   ACTION,
   BENCHMARK,
-  CONDITION,
+  CONDITION, EXIT,
 } from 'components/layout/pages/funnels/editor/steps-types/constants'
 import { useLayoutEffect, useRef, useState } from '@wordpress/element'
+import { numChildren } from 'components/layout/pages/funnels/editor/functions'
 
-export const NODE_HEIGHT = 250
-export const NODE_WIDTH = 300
+export const NODE_HEIGHT = 136
+export const NODE_WIDTH = 250
 
-
+const NODE_SEP = 100
+const RANK_SEP = 150
 
 /**
  * Breadth first search of the steps tree to build iout a row level based chart
@@ -32,26 +34,36 @@ function buildGraph (steps, edges) {
   const graph = new dagre.graphlib.Graph()
 
   graph.setGraph({
-    nodesep: 100,
+    nodesep: NODE_SEP,
+    ranksep: RANK_SEP,
   })
 
   graph.setDefaultEdgeLabel(() => { return {} })
 
-  steps.forEach( step => {
-    graph.setNode( step.ID,
+  steps.forEach(step => {
+    graph.setNode(step.ID,
       { label: step.ID, width: NODE_WIDTH, height: NODE_HEIGHT, ...step })
   })
 
-  edges.forEach( edge => {
-    graph.setEdge( parseInt( edge.from_id ), parseInt( edge.to_id ) )
-  } )
+  graph.setNode(EXIT,
+    { label: EXIT, width: NODE_WIDTH, height: NODE_HEIGHT, data:{}, ID: EXIT })
 
-  return graph;
+  edges.forEach(edge => {
+    graph.setEdge(parseInt(edge.from_id), parseInt(edge.to_id))
+  })
+
+  graph.nodes().forEach(node => {
+    if (numChildren(node, graph) === 0) {
+      graph.setEdge(node, EXIT)
+    }
+  })
+
+  return graph
 }
 
 const Editor = ({ funnel }) => {
 
-  if ( ! funnel || ! funnel.steps || ! funnel.edges ){
+  if (!funnel || !funnel.steps || !funnel.edges) {
     return <>Loading...</>
   }
 
@@ -74,14 +86,14 @@ const Editor = ({ funnel }) => {
 
   let windowMidPoint = dimensions.width / 2
 
-  const { steps, edges } = funnel;
+  const { steps, edges } = funnel
 
   const graph = buildGraph(steps, edges)
 
   dagre.layout(graph)
 
-  // let xOffset = windowMidPoint - graph.node('exit').x - ( NODE_WIDTH / 2 )
-  let xOffset = 0
+  let xOffset = windowMidPoint - graph.node('exit').x - ( NODE_WIDTH / 2 )
+  // let xOffset = 0
 
   return (
     <>

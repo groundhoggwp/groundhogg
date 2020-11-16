@@ -10,6 +10,8 @@ import {
   numParents,
 } from 'components/layout/pages/funnels/editor/functions'
 
+export const EXIT = 'exit'
+
 export const ACTION = 'action'
 export const ACTIONS = 'actions'
 export const BENCHMARK = 'benchmark'
@@ -17,7 +19,7 @@ export const BENCHMARKS = 'benchmarks'
 export const CONDITION = 'condition'
 export const CONDITIONS = 'conditions'
 
-const ARROW_HEAD_SIZE = 5
+export const ARROW_HEAD_SIZE = 5
 
 export const ARROW_STYLE = {
   startAnchor: ['bottom', 'middle'],
@@ -156,12 +158,11 @@ export const ACTION_TYPE_DEFAULTS = {
     return (
       <>
         {
-          targets.map(({ id, position, groups, parents, children }) =>
+          targets.map(({ id, position, groups, edges }) =>
             <AddStepButton
               id={ id }
               groups={ groups }
-              parents={ parents }
-              children={ children }
+              edges={edges}
               position={ {
                 x: position.x + xOffset,
                 y: position.y,
@@ -277,7 +278,6 @@ export const BENCHMARK_TYPE_DEFAULTS = {
         ],
         edges: getEdgeChangesBeside( ID, graph ),
         position: {
-          // Todo calculate correct value here
           x: thisNode.x + CARD_WIDTH + ADD_STEP_BUTTON_Y_OFFSET,
           y: thisNode.y + ( CARD_HEIGHT / 2 ) - ADD_STEP_BUTTON_X_OFFSET,
         },
@@ -300,12 +300,11 @@ export const BENCHMARK_TYPE_DEFAULTS = {
     return (
       <>
         {
-          targets.map(({ id, position, groups, parents, children }) =>
+          targets.map(({ id, position, groups, edges }) =>
             <AddStepButton
               id={ id }
               groups={ groups }
-              parents={ parents }
-              children={ children }
+              edges={edges}
               position={ {
                 x: position.x + xOffset,
                 y: position.y,

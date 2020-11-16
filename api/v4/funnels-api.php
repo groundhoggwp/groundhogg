@@ -3,9 +3,13 @@
 namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
+use Groundhogg\DB\Step_Edges;
 use Groundhogg\Funnel;
 use Groundhogg\Step;
 use WP_REST_Server;
+use function Groundhogg\get_array_var;
+use function Groundhogg\get_db;
+use function Groundhogg\map_func_to_attr;
 use function Groundhogg\sanitize_object_meta;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -44,6 +48,65 @@ class Funnels_Api extends Base_Object_Api {
 		] );
 	}
 
+	const NEW_STEP = 'new';
+
+	/**
+	 * @return Step_Edges
+	 */
+	function get_edges_db() {
+		return get_db( 'step_edges' );
+	}
+
+	/**
+	 * @param $edges
+	 * @param $step Step
+	 */
+	function handle_edges( $edges, $step ) {
+
+		$new_edges    = get_array_var( $edges, 'new', [] );
+		$delete_edges = get_array_var( $edges, 'delete', [] );
+
+		foreach ( $new_edges as $new_edge ) {
+
+			$new_edge = wp_parse_args( $new_edge, [
+				'from' => '',
+				'to'   => '',
+				'path' => '',
+			] );
+
+			$from_id = $new_edge['from'] === self::NEW_STEP ? $step->get_id() : absint( $new_edge['from'] );
+			$to_id   = $new_edge['to'] === self::NEW_STEP ? $step->get_id() : absint( $new_edge['to'] );
+			$path    = sanitize_text_field( $new_edge['path'] );
+
+			$this->get_edges_db()->add( [
+				'funnel_id' => $step->get_funnel_id(),
+				'from_id'   => $from_id,
+				'to_id'     => $to_id,
+				'path'      => $path,
+			] );
+		}
+
+		foreach ( $delete_edges as $edge ) {
+
+			$edge = wp_parse_args( $edge, [
+				'from' => '',
+				'to'   => '',
+				'path' => '',
+			] );
+
+			map_func_to_attr( $edge, 'from', 'absint' );
+			map_func_to_attr( $edge, 'to', 'absint' );
+			map_func_to_attr( $edge, 'path', 'sanitize_text_field' );
+
+			$this->get_edges_db()->delete( [
+				'funnel_id' => $step->get_funnel_id(),
+				'from_id'   => $edge['from'],
+				'to_id'     => $edge['to'],
+				'path'      => $edge['path'],
+			] );
+		}
+	}
+
 	/**
 	 * Create a step for a funnel
 	 *
@@ -60,16 +123,17 @@ class Funnels_Api extends Base_Object_Api {
 			return self::ERROR_404();
 		}
 
-		$data     = $request->get_param( 'data' );
-		$meta     = $request->get_param( 'meta' );
+		$data = $request->get_param( 'data' );
+		$meta = $request->get_param( 'meta' );
 
-		$parents  = $request->get_param( 'parents' );
-		$children = $request->get_param( 'children' );
+		$edges = $request->get_param( 'edges' );
 
 		$data['funnel_id'] = $funnel_id;
 
 		$step = new Step();
 		$step->create( $data, $meta );
+
+		$this->handle_edges( $edges, $step );
 
 		return self::SUCCESS_RESPONSE( [
 			'item' => $funnel
@@ -88,8 +152,8 @@ class Funnels_Api extends Base_Object_Api {
 		$funnel_id = absint( $request->get_param( 'ID' ) );
 		$step_id   = absint( $request->get_param( 'step_id' ) );
 
-		$data  = $request->get_param( 'data' );
-		$meta  = $request->get_param( 'meta' );
+		$data = $request->get_param( 'data' );
+		$meta = $request->get_param( 'meta' );
 
 		$edges = $request->get_param( 'edges' );
 

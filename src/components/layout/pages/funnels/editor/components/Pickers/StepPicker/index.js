@@ -4,14 +4,15 @@ import TextField from '@material-ui/core/TextField/TextField'
 import Grid from '@material-ui/core/Grid'
 import makeStyles from '@material-ui/core/styles/makeStyles'
 import Button from '@material-ui/core/Button'
-import { useDispatch, useSelect } from '@wordpress/data'
+import { select, useDispatch, useSelect } from '@wordpress/data'
 
 /**
  * Internal dependencies
  */
 import {
-  FUNNELS_STORE_NAME,
+  FUNNELS_STORE_NAME, STEP_TYPES_STORE_NAME,
 } from 'data'
+import { getStepType } from 'data/step-type-registry'
 
 const useStyles = makeStyles((theme) => ( {
   box: {
@@ -44,10 +45,7 @@ export default (props) => {
   const {
     steps,
     stepGroup,
-    parentSteps,
-    childSteps,
-    stepOrder,
-    conditionPath,
+    edges,
     closePicker,
   } = props
 
@@ -73,17 +71,16 @@ export default (props) => {
 
   const handleTypeChosen = (type) => {
 
+    const StepType = getStepType( type );
+
     // Create the step
     const newStepData = {
       step_type: type,
-      step_order: stepOrder || 1,
       step_group: stepGroup,
-      child_steps: childSteps ? Object.values( childSteps ) : [],
-      parent_steps: parentSteps? Object.values( parentSteps ) : [],
     }
     createStep({
       data: newStepData,
-      condition_path: conditionPath
+      edges: StepType.edgesFilter ? StepType.edgesFilter( edges ) : edges
     }, funnelId)
 
     closePicker && closePicker()

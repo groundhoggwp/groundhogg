@@ -6,7 +6,7 @@ import CombinedStepPicker from '../Pickers/CombinedStepPicker'
 import Tooltip from '@material-ui/core/Tooltip'
 import makeStyles from '@material-ui/core/styles/makeStyles'
 
-export default ({id, groups, parents, children, position}) => {
+export default ({id, groups, edges, position}) => {
 
   const [anchorEl, setAnchorEl] = useState(null)
 
@@ -47,8 +47,7 @@ export default ({id, groups, parents, children, position}) => {
       >
         <CombinedStepPicker
           showGroups={groups}
-          parentSteps={parents}
-          childSteps={children}
+          edges={edges}
           closePicker={closePicker}
         />
       </Popover>
