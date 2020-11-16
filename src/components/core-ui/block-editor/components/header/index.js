@@ -41,7 +41,7 @@ export default function Header( { email, history, saveDraft, publishEmail, close
 							<h1 className="groundhogg-header__title">
 								{ ! titleToggle &&
 									<span onClick={ toggleTitleEdit }>
-										{ __( 'Now Editing  ', 'groundhogg' ) + item.data.title }
+										{ /*__( 'Now Editing  ', 'groundhogg' ) + */ item.data.title }
 									</span>
 								}
 								{ titleToggle &&

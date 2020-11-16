@@ -26,7 +26,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import Notices from './components/notices';
 import Header from './components/header';
 import Sidebar from './components/sidebar';
-import BlockEditor from './components/block-editor'
+import BlockEditor from './components/block-editor';
+import { DateTime } from 'luxon';
 import {
 	CORE_STORE_NAME,
 	EMAILS_STORE_NAME
@@ -42,21 +43,8 @@ const Editor = ( { settings, email, history } ) => {
 	}
 
 	const {subject: defaultSubjectValue, pre_header: defaultPreHeaderValue, content: defaultContentValue } = email.data
-	// console.log(email.data)
-	//email data shape
-	// {
-	// 	ID,
-	// 	content,
-	// 	subject,
-	// 	pre_header,
-	// 	from_user,
-	// 	author,
-	// 	last_updated,
-	// 	date_created,
-	// 	status,
-	// 	is_template,
-	// 	title
-	// }
+
+	const [ title, setTitle ] = useState( defaultSubjectValue );
 	const [ subject, setSubject ] = useState( defaultSubjectValue );
 	const [ preHeader, setPreHeader ] = useState( defaultPreHeaderValue );
 	const [ content, setContent ] = useState( defaultContentValue );
@@ -74,29 +62,44 @@ const Editor = ( { settings, email, history } ) => {
 		[]
 	);
 
+	// console.log(email.data)
+	//email data shape
+	// {
+	// 	ID,
+	// 	content,
+	// 	subject,
+	// 	pre_header,
+	// 	from_user,
+	// 	author,
+	// 	last_updated,
+	// 	date_created,
+	// 	status,
+	// 	is_template,
+	// 	title
+	// }
+
 
 	const handleTitle = (e) => {
-		dispatch.updateItem( email.ID, { data: { title : e.target.value } } );
-		toggleTitleEdit();
+		setTitle(e.target.value);
 	}
-
 	if ( ! item.hasOwnProperty( 'ID' ) ) {
 		return null;
 	}
 
 	const handleSubjectChange = (e)=>{
 		setSubject(e.target.value);
-		dispatch.updateItem( email.ID, { data: { subject : e.target.value } } );
-		toggleTitleEdit();
+
 	}
 	const handlePreHeaderChange = (e)=>{
 		setPreHeader(e.target.value);
 	}
 
 	const saveDraft = (e)=>{
+		dispatch.updateItem( email.ID, { data: { subject, title, pre_header: preHeader, status: 'draft', last_updated: `${DateTime.local()} ${DateTime.local().toISOTime()}` } } );
 	}
 
 	const publishEmail = (e)=>{
+		dispatch.updateItem( email.ID, { data: { subject, title,  pre_header: preHeader, status: 'ready', last_updated: `${DateTime.local()} ${DateTime.local().toISOTime()}` } } );
 
 	}
 
