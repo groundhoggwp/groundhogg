@@ -5,7 +5,7 @@ import '@wordpress/format-library';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useState, useMemo } from '@wordpress/element';
-import { serialize, parse } from '@wordpress/blocks';
+
 import { uploadMedia } from '@wordpress/media-utils';
 import {
 	BlockEditorKeyboardShortcuts,
@@ -49,9 +49,9 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHeader, handlePreHeaderChange } ) {
+function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHeader, handlePreHeaderChange, handleUpdateBlocks, handlePersistBlocks, blocks } ) {
 
-	const [ blocks, updateBlocks ] = useState( [] );
+
 	const { createInfoNotice } = useDispatch( 'core/notices' );
 	const classes = useStyles();
 	const canUserCreateMedia = useSelect( ( select ) => {
@@ -75,27 +75,6 @@ function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHe
 		};
 	}, [ canUserCreateMedia, _settings ] );
 
-	useEffect( () => {
-		const storedBlocks = window.localStorage.getItem( 'groundhoggBlocks' );
-
-		if ( storedBlocks?.length ) {
-			handleUpdateBlocks(() => parse(storedBlocks));
-		}
-	}, [] );
-
-	const handleUpdateBlocks = (blocks) => {
-		updateBlocks( blocks );
-	}
-
-	const handlePersistBlocks = ( newBlocks ) => {
-		updateBlocks( newBlocks );
-		window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) );
-	}
-
-	const handleFieldChange = (e)=>{
-		console.log(e.target.value)
-
-	}
 
 	if ( ! settings.hasOwnProperty( '__experimentalBlockPatterns' ) ) {
 		settings.__experimentalBlockPatterns = [];
