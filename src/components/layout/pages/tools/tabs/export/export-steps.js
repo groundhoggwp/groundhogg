@@ -10,7 +10,10 @@ import { Download } from './steps/download'
 export const ExportSteps = (props) => {
 
   // top level props to manage the data
-  const [data, setData] = useState({})
+  const [data, setData] = useState({
+    fields :[],
+    file : {}
+  })
 
   let steps = [
     __('Select Fields', 'goundhogg'),

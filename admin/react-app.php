@@ -7,6 +7,7 @@ use Groundhogg\Settings;
 use function Groundhogg\get_mappable_fields;
 use function Groundhogg\get_url_var;
 use function Groundhogg\groundhogg_logo;
+use function Groundhogg\key_to_words;
 use function Groundhogg\white_labeled_name;
 
 class React_App {
@@ -49,6 +50,18 @@ class React_App {
 		// removed the custom field as it returns array and brakes the map field
 		$arr [ 'Custom Fields' ] = '';
 		$obj[ 'field_map' ]      = $arr;
+		$obj ['export_default_keys'] =   [
+			'ID',
+			'email',
+			'first_name',
+			'last_name',
+			'user_id',
+			'owner_id',
+			'optin_status',
+			'date_created',
+			'tags'
+		];
+		$obj[ 'export_meta_keys'] =  array_values( Plugin::$instance->dbs->get_db( 'contactmeta' )->get_keys() );
 
 		return $obj;
 	}

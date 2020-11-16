@@ -27,6 +27,7 @@ class Manager {
 		$this->broadcast_scheduler = new Broadcast_Scheduler();
 		$this->delete_contacts     = new Delete_Contacts();
 		$this->export_contacts     = new Export_Contacts();
+		$this->export_contacts_rest    = new Export_Contacts_Rest();
 
 //        if ( use_experimental_features() ){
 //            $this->import_contacts      = new Import_Contacts_Exp();

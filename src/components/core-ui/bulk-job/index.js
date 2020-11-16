@@ -24,13 +24,18 @@ const BulkJob = (props) => {
         offset: 0,
         total: 0,
         nextRequest: true,
-        message: ''
+        message: '',
+        data : {}
     });
+
 
     const {offset,progress ,total, nextRequest, message} = properties;
 
     if (nextRequest === false) {
-        onFinish(true);
+        onFinish({
+            finished :true,
+            data : properties.data
+        });
     }
 
 
@@ -48,13 +53,14 @@ const BulkJob = (props) => {
                 method: 'POST',
                 path: url,
                 data: data
-            }).then(({next_index, total_records, next_request, message}) => {
+            }).then(({next_index, total_records, next_request, message , data}) => {
                 setProperties({
                     offset: next_index,
                     total: total_records,
                     nextRequest: next_request,
                     message:message,
-                    progress: Math.round((next_index * 100) /total_records )
+                    progress: Math.round((next_index * 100) /total_records ),
+                    data : data
                 });
             });
 
