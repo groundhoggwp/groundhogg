@@ -41,6 +41,7 @@ class Manager {
 		$this->migrate_waiting_events   = new Migrate_Waiting_Events();
 		$this->add_contacts_to_funnel   = new Add_Contacts_To_Funnel();
 		$this->create_users             = new Create_Users();
+		$this->create_users_res         = new Create_Users_Rest();
 		$this->process_events           = new Process_Events();
 		$this->migrate_notes            = new Migrate_Notes();
 		$this->update_subsites          = new Update_subsites();

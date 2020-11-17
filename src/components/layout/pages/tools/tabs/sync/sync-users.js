@@ -44,8 +44,4 @@ export const SyncUsers = (props) => {
       </div>
   )
 
-
-  return <h1> Sync users </h1>;
-
-
 }
