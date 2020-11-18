@@ -4,8 +4,10 @@ namespace Groundhogg\Admin\Emails;
 
 use Groundhogg;
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Contact;
 use Groundhogg\Email;
 use Groundhogg\Plugin;
+use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\has_replacements;
 use function Groundhogg\managed_page_url;
@@ -144,8 +146,8 @@ class Emails_Page extends Admin_Page {
 		$reporting_args = [ 'tab' => 'email' ];
 
 		if ( $email = Groundhogg\get_request_var( 'email' ) ) {
-			$broadcast_args['email'] = absint( $email );
-			$reporting_args          = [
+			$broadcast_args[ 'email' ] = absint( $email );
+			$reporting_args            = [
 				'tab'   => 'email_step',
 				'email' => $email,
 			];
@@ -300,13 +302,13 @@ class Emails_Page extends Admin_Page {
 					return new \WP_Error( 'error', 'Invalid email ID!' );
 				}
 
-				$args['content']    = $from_email->get_content();
-				$args['subject']    = $from_email->get_subject_line();
-				$args['title']      = sprintf( "%s - (copy)", $from_email->get_title() );
-				$args['pre_header'] = $from_email->get_pre_header();
+				$args[ 'content' ]    = $from_email->get_content();
+				$args[ 'subject' ]    = $from_email->get_subject_line();
+				$args[ 'title' ]      = sprintf( "%s - (copy)", $from_email->get_title() );
+				$args[ 'pre_header' ] = $from_email->get_pre_header();
 
-				$args['author']    = get_current_user_id();
-				$args['from_user'] = get_current_user_id();
+				$args[ 'author' ]    = get_current_user_id();
+				$args[ 'from_user' ] = get_current_user_id();
 
 				$email = new Email( $args );
 
@@ -353,14 +355,14 @@ class Emails_Page extends Admin_Page {
 		$pre_header = sanitize_text_field( Groundhogg\get_request_var( 'pre_header' ) );
 		$content    = apply_filters( 'groundhogg/admin/emails/sanitize_email_content', Groundhogg\get_request_var( 'email_content' ) );
 
-		$args['status']       = $status;
-		$args['from_user']    = $from_user;
-		$args['subject']      = $subject;
-		$args['title']        = sanitize_text_field( Groundhogg\get_request_var( 'title', $subject ) );
-		$args['pre_header']   = $pre_header;
-		$args['content']      = $content;
-		$args['last_updated'] = current_time( 'mysql' );
-		$args['is_template']  = key_exists( 'save_as_template', $_POST ) ? 1 : 0;
+		$args[ 'status' ]       = $status;
+		$args[ 'from_user' ]    = $from_user;
+		$args[ 'subject' ]      = $subject;
+		$args[ 'title' ]        = sanitize_text_field( Groundhogg\get_request_var( 'title', $subject ) );
+		$args[ 'pre_header' ]   = $pre_header;
+		$args[ 'content' ]      = $content;
+		$args[ 'last_updated' ] = current_time( 'mysql' );
+		$args[ 'is_template' ]  = key_exists( 'save_as_template', $_POST ) ? 1 : 0;
 
 
 		if ( $email->update( $args ) ) {
@@ -399,8 +401,8 @@ class Emails_Page extends Admin_Page {
 							if ( is_email( $header_value ) ) {
 								$headers[ $header_key ] = has_replacements( $header_value ) ? sanitize_text_field( $header_value ) : sanitize_email( $header_value );
 							} else if ( preg_match( '/([^<]+) <([^>]+)>/', $header_value, $matches ) ) {
-								$email_address          = has_replacements( $matches[2] ) ? sanitize_text_field($matches[2]) : sanitize_email( $matches[2] );
-								$name                   = sanitize_text_field( $matches[1] );
+								$email_address          = has_replacements( $matches[ 2 ] ) ? sanitize_text_field( $matches[ 2 ] ) : sanitize_email( $matches[ 2 ] );
+								$name                   = sanitize_text_field( $matches[ 1 ] );
 								$headers[ $header_key ] = sprintf( '%s <%s>', $name, $email_address );
 							} else {
 								$headers[ $header_key ] = '';
@@ -438,12 +440,12 @@ class Emails_Page extends Admin_Page {
 				$this->wp_die_no_access();
 			}
 
-			$test_email = sanitize_email( Groundhogg\get_request_var( 'test_email', wp_get_current_user()->user_email ) );
+			$test_email = strtolower( sanitize_email( get_request_var( 'test_email', wp_get_current_user()->user_email ) ) );
 			$test_email = apply_filters( 'groundhogg/admin/emails/test_email', $test_email );
 
 			if ( $test_email && is_email( $test_email ) ) {
 
-				$contact = new Groundhogg\Contact( [ 'email' => $test_email ] );
+				$contact = new Contact( $test_email );
 
 				if ( $contact->exists() && $contact->get_email() === $test_email ) {
 
