@@ -14,14 +14,35 @@ import { SyncUsers } from './sync-users'
 import Checkbox from '@material-ui/core/Checkbox'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import { useState } from '@wordpress/element'
+import { select } from '@wordpress/data'
 
 export const SyncPage = (props) => {
 
+  //state for the sync user
   const [syncMeta, setSyncMeta] = useState(false)
 
+  //state for creating user
+  const [tagsInclude, setTagsInclude] = useState([])
+  const [tagsExclude, setTagsExclude] = useState([])
+  const [sendEmail, setSendEmail] = useState(false)
+  const [role, setRole] = useState()
+
+
+  console.log(select( 'core' ).getUsers( { roles : [ 'administrator' ] } ) )
+  console.log({
+    tags_include: tagsInclude,
+    tags_exclude: tagsExclude,
+    send_email: sendEmail,
+    role: role
+  })
+
+  //get location details
   let history = useHistory()
   let { path } = useRouteMatch()
 
+  /**
+   * Handle sync user Redirect
+   */
   const handleSyncUsers = () => {
     //code to display sync user bulk job and sends the data about sync meta
     history.push({
@@ -29,11 +50,22 @@ export const SyncPage = (props) => {
       bulk_job: true,
       sync_meta: syncMeta
     })
-
   }
 
+  /**
+   * Handle Create user redirect
+   */
   const handleCreateUsers = () => {
+    //Code to display bluk job
+    history.push({
+      pathname: path + '/sync-users',
+      bulk_job: true,
+      tags_include: tagsInclude,
+      tags_exclude: tagsExclude,
+      send_email: sendEmail,
+      role: role
 
+    })
   }
 
   return (
@@ -78,7 +110,23 @@ export const SyncPage = (props) => {
                 {__('Create Users', 'groundhogg')}
               </Typography>
               <Typography variant="body2" color="textSecondary" component="p">
-                {__('', 'groundhogg')}
+
+
+                <FormControlLabel
+                  control={<Checkbox
+                    color="primary"
+                    checked={sendEmail}
+                    onChange={(event) => {
+                      if (sendEmail) {
+                        setSendEmail(false)
+                      } else {
+                        setSendEmail(true)
+                      }
+                    }}/>}
+                  label={'Send email notification to user.(Much slower)'}
+                  labelPlacement="end"
+                />
+
               </Typography>
             </CardContent>
             <CardActions>
@@ -91,7 +139,6 @@ export const SyncPage = (props) => {
       </Grid>
     </Box>
   )
-
 }
 
 export const Sync = (props) => {
@@ -126,5 +173,4 @@ addFilter('groundhogg.tools.tabs', 'groundhogg', (tabs) => {
     }
   })
   return tabs
-
 }, 10)
