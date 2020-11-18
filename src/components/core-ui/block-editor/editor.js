@@ -128,14 +128,14 @@ const Editor = ( { settings, email, history } ) => {
 	}, [] );
 
 	const handleUpdateBlocks = (blocks) => {
-		// console.log('update', blocks)
+		console.log('update', blocks)
 		updateBlocks( blocks );
 	}
 
 	const handlePersistBlocks = ( newBlocks ) => {
-		// console.log('new', newBlocks)
+		console.log('new', newBlocks)
 		// updateBlocks( newBlocks );
-		// window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) );
+		window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) );
 	}
 
 	return (
