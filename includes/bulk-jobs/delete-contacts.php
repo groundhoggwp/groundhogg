@@ -36,6 +36,18 @@ class Delete_Contacts extends Bulk_Job {
 		}
 
 		$args = get_request_query();
+		if ( $this::$is_rest ) {
+			if (empty($this->get_context( 'tags_include'  , []))){
+				return  [];
+			}
+
+			$args = [
+				'tags_include' => $this->get_context( 'tags_include' )
+			];
+
+
+		}
+
 
 		$query    = new Contact_Query();
 		$contacts = $query->query( $args );
@@ -60,22 +72,23 @@ class Delete_Contacts extends Bulk_Job {
 		return min( 300, intval( ini_get( 'max_input_vars' ) ) );
 	}
 
-	/**
-	 * Get the items from a restful request
-	 *
-	 * @return array
-	 */
-	public function get_items_restfully() {
-
-		$query = $this->get_context( 'query', [] );
-
-		$query[ 'number' ] = $this->items_per_request;
-		$query[ 'offset' ] = $this->items_offset;
-
-		$query = new Contact_Query( $query );
-
-		return wp_parse_id_list( wp_list_pluck( $query->items, 'ID' ) );
-	}
+//	/**
+//	 * Get the items from a restful request
+//	 *
+//	 * @return array
+//	 */
+//	public function get_items_restfully() {
+//
+//		$query = $this->get_context( 'query', [] );
+//
+//		$query[ 'number' ] = $this->items_per_request;
+//		$query[ 'offset' ] = $this->items_offset;
+//
+//		$query = new Contact_Query( $query );
+//
+//		wp_send_json(wp_parse_id_list( wp_list_pluck( $query->items, 'ID' ) ));
+//		return wp_parse_id_list( wp_list_pluck( $query->items, 'ID' ) );
+//	}
 
 	/**
 	 * Then end has been reached once no more contacts match the query
@@ -86,11 +99,11 @@ class Delete_Contacts extends Bulk_Job {
 
 		$query = $this->get_context( 'query', [] );
 
-		$query[ 'number' ] = -1;
+		$query[ 'number' ] = - 1;
 		$query[ 'offset' ] = 0;
 
 		$c_query = new Contact_Query();
-		$count = $c_query->count( $query );
+		$count   = $c_query->count( $query );
 
 		return $count === 0;
 	}
@@ -105,7 +118,7 @@ class Delete_Contacts extends Bulk_Job {
 	protected function process_item( $item ) {
 		$contact = new Contact( $item );
 
-		if ( $contact->exists() ){
+		if ( $contact->exists() ) {
 			$contact->delete();
 		}
 	}
