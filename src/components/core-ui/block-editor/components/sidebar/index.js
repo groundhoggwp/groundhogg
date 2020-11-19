@@ -3,6 +3,22 @@
  */
 import { createSlotFill, Panel } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import {
+	BlockEditorKeyboardShortcuts,
+	BlockEditorProvider,
+	BlockList,
+	BlockInspector,
+	WritingFlow,
+	ObserveTyping,
+	Typewriter,
+	CopyHandler,
+	BlockSelectionClearer,
+	MultiSelectScrollIntoView,
+} from '@wordpress/block-editor';
+/**
+ * Internal dependencies
+ */
+import ghDialog from '../dialog.js';
 
 const {
 	Slot: InspectorSlot,
@@ -20,6 +36,9 @@ function Sidebar() {
 			aria-label={ __( 'Groundhogg Email Sidebar advanced settings.' ) }
 			tabIndex="-1"
 		>
+			<Panel header={ __( 'Blocks' ) }>
+
+			</Panel>
 			<Panel header={ __( 'Inspector' ) }>
 				<InspectorSlot bubblesVirtually />
 			</Panel>
