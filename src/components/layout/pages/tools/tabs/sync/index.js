@@ -9,12 +9,17 @@ import Button from '@material-ui/core/Button'
 import Box from '@material-ui/core/Box'
 import { Route, Switch, useHistory, useRouteMatch } from 'react-router-dom'
 import React from 'react'
-import { CreateUser } from './create-users'
+import { CreateUsers } from './create-users'
 import { SyncUsers } from './sync-users'
 import Checkbox from '@material-ui/core/Checkbox'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import { useState } from '@wordpress/element'
 import { select } from '@wordpress/data'
+import Select from '@material-ui/core/Select'
+import MenuItem from '@material-ui/core/MenuItem'
+import FormControl from '@material-ui/core/FormControl'
+import InputLabel from '@material-ui/core/InputLabel'
+import { TagPicker } from 'components/index'
 
 export const SyncPage = (props) => {
 
@@ -22,13 +27,11 @@ export const SyncPage = (props) => {
   const [syncMeta, setSyncMeta] = useState(false)
 
   //state for creating user
-  const [tagsInclude, setTagsInclude] = useState([])
+  const [tagsInclude, setTagsInclude] = useState([156])
   const [tagsExclude, setTagsExclude] = useState([])
   const [sendEmail, setSendEmail] = useState(false)
-  const [role, setRole] = useState()
+  const [role, setRole] = useState('subscriber')
 
-
-  console.log(select( 'core' ).getUsers( { roles : [ 'administrator' ] } ) )
   console.log({
     tags_include: tagsInclude,
     tags_exclude: tagsExclude,
@@ -58,7 +61,7 @@ export const SyncPage = (props) => {
   const handleCreateUsers = () => {
     //Code to display bluk job
     history.push({
-      pathname: path + '/sync-users',
+      pathname: path + '/create-users',
       bulk_job: true,
       tags_include: tagsInclude,
       tags_exclude: tagsExclude,
@@ -67,6 +70,8 @@ export const SyncPage = (props) => {
 
     })
   }
+
+  // TODO tag pickers
 
   return (
     <Box style={{ marginTop: 20 }}>
@@ -112,6 +117,27 @@ export const SyncPage = (props) => {
               <Typography variant="body2" color="textSecondary" component="p">
 
 
+                <FormControl variant="outlined">
+                  <InputLabel htmlFor="outlined-age-native-simple">{__('Choose role', 'groundhogg')}</InputLabel>
+                  <Select
+                    labelId="choose-role"
+                    id="choose-role"
+                    value={role}
+                    onChange={((event) => {
+                      setRole(event.target.value)
+                    })}
+                    label="Choose Role"
+                    variant="outlined"
+                    displayEmpty
+                  >
+                    {window.Groundhogg.user_roles.map((item) => {
+                      return <MenuItem value={item.value}>{item.label}</MenuItem>
+                    })}
+                  </Select>
+
+                </FormControl>
+
+
                 <FormControlLabel
                   control={<Checkbox
                     color="primary"
@@ -130,7 +156,7 @@ export const SyncPage = (props) => {
               </Typography>
             </CardContent>
             <CardActions>
-              <Button variant="contained" size="large" color="primary" onClick={handleSyncUsers}>
+              <Button variant="contained" size="large" color="primary" onClick={handleCreateUsers}>
                 {__('Create Users')}
               </Button>
             </CardActions>
@@ -153,7 +179,7 @@ export const Sync = (props) => {
         <SyncUsers/>
       </Route>
       <Route path={`${path}/create-users`}>
-        <CreateUser/>
+        <CreateUsers/>
       </Route>
     </Switch>
   )
