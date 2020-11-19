@@ -94,8 +94,8 @@ const Editor = ( { settings, email, history } ) => {
 	const handlePreHeaderChange = (e)=>{
 		setPreHeader(e.target.value);
 	}
-	const handleContentChange = (e)=>{
-		setContent('asdf');
+	const handleContentChange = (blocks)=>{		
+		setContent(serialize(blocks));
 	}
 
 	const saveDraft = (e)=>{
@@ -130,7 +130,7 @@ const Editor = ( { settings, email, history } ) => {
 							content={
 								<>
 									<Notices />
-									{ editorMode !== 'text' && <BlockEditor settings={settings} subject={subject} handleSubjectChange={handleSubjectChange} preHeader={preHeader} handlePreHeaderChange={handlePreHeaderChange} content={content}/> }
+									{ editorMode !== 'text' && <BlockEditor settings={settings} subject={subject} handleSubjectChange={handleSubjectChange} preHeader={preHeader} handlePreHeaderChange={handlePreHeaderChange} content={content} handleContentChange={handleContentChange}/> }
 									{ editorMode === 'text' && <PostTextEditor /> }
 								</>
 							}

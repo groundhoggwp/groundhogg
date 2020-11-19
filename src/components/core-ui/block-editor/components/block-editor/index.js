@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHeader, handlePreHeaderChange, content } ) {
+function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHeader, handlePreHeaderChange, content, handleContentChange } ) {
 	const [ blocks, updateBlocks ] = useState( [] );
 	const { createInfoNotice } = useDispatch( 'core/notices' );
 	const classes = useStyles();
@@ -75,10 +75,8 @@ function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHe
 	}, [ canUserCreateMedia, _settings ] );
 
 	useEffect( () => {
-		const storedBlocks = window.localStorage.getItem( 'groundhoggBlocks' );
-
-		if ( storedBlocks?.length ) {
-			handleUpdateBlocks(() => parse(storedBlocks));
+		if ( content?.length ) {
+			handleUpdateBlocks(() => parse(content));
 		}
 	}, [] );
 
@@ -89,7 +87,8 @@ function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHe
 	const handlePersistBlocks = ( newBlocks ) => {
 		updateBlocks( newBlocks );
 		console.log('handlePersistBlocks' , newBlocks)
-		window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) );
+		// window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) );
+		handleContentChange(blocks)
 	}
 
 	return (
@@ -102,8 +101,8 @@ function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHe
 			>
 				<Grid container spacing={3}>
 					<Grid item xs={9}>
-						<TextField className={ classes.subjectInputs } value="Subject" />
-						<TextField className={ classes.subjectInputs } placeholder={ __( 'Pre Header Text: Used to summarize the content of the email.' ) } />
+						<TextField className={ classes.subjectInputs } onChange={handleSubjectChange} value={subject} />
+						<TextField className={ classes.subjectInputs } onChange={handlePreHeaderChange} value={preHeader} placeholder={ __( 'Pre Header Text: Used to summarize the content of the email.' ) } />
 						<Paper>
 							<BlockSelectionClearer
 					className="edit-post-visual-editor editor-styles-wrapper"
