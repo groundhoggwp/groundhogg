@@ -49,7 +49,6 @@ const Editor = ( { settings, email, history } ) => {
 	const [ subject, setSubject ] = useState( defaultSubjectValue );
 	const [ preHeader, setPreHeader ] = useState( defaultPreHeaderValue );
 	const [ content, setContent ] = useState( defaultContentValue );
-	const [ blocks, updateBlocks ] = useState( [] );
 
 	const {
 		editorMode,
@@ -95,14 +94,16 @@ const Editor = ( { settings, email, history } ) => {
 	const handlePreHeaderChange = (e)=>{
 		setPreHeader(e.target.value);
 	}
+	const handleContentChange = (e)=>{
+		setContent('asdf');
+	}
 
 	const saveDraft = (e)=>{
-		console.log(blocks)
-		dispatch.updateItem( email.ID, { data: { subject, title, pre_header: preHeader, status: 'draft', content: JSON.stringify(blocks), last_updated: `${DateTime.local()} ${DateTime.local().toISOTime()}` } } );
+		dispatch.updateItem( email.ID, { data: { subject, title, pre_header: preHeader, status: 'draft', content, last_updated: `${DateTime.local()} ${DateTime.local().toISOTime()}` } } );
 	}
 
 	const publishEmail = (e)=>{
-		dispatch.updateItem( email.ID, { data: { subject, title,  pre_header: preHeader, status: 'ready', content: JSON.stringify(blocks), last_updated: `${DateTime.local()} ${DateTime.local().toISOTime()}` } } );
+		dispatch.updateItem( email.ID, { data: { subject, title,  pre_header: preHeader, status: 'ready', content, last_updated: `${DateTime.local()} ${DateTime.local().toISOTime()}` } } );
 
 	}
 
@@ -111,32 +112,6 @@ const Editor = ( { settings, email, history } ) => {
 	}
 
 
-	useEffect( () => {
-		const storedBlocks = window.localStorage.getItem( 'groundhoggBlocks' );
-
-		if ( storedBlocks.length ) {
-
-			console.log('parse', storedBlocks)
-			console.log('parse', parse(storedBlocks))
-			console.log('parse', rawHandler(parse(storedBlocks)))
-			// console.log('paste', pasteHandler(storedBlocks[0]))
-			// Should be html to block
-			// console.log('raw', rawHandler(storedBlocks[0]))
-			handleUpdateBlocks(() => parse(storedBlocks));
-			console.log(serialize(blocks))
-		}
-	}, [] );
-
-	const handleUpdateBlocks = (blocks) => {
-		console.log('update', blocks)
-		updateBlocks( blocks );
-	}
-
-	const handlePersistBlocks = ( newBlocks ) => {
-		console.log('new', newBlocks)
-		// updateBlocks( newBlocks );
-		window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) );
-	}
 
 	return (
 		<>
@@ -145,7 +120,7 @@ const Editor = ( { settings, email, history } ) => {
 				<DropZoneProvider>
 					<FocusReturnProvider>
 						<InterfaceSkeleton
-							header={<Header email={email} history={history} saveDraft={saveDraft} publishEmail={publishEmail} closeEditor={closeEditor} isSaving={isSaving} titleToggle={titleToggle} toggleTitleEdit={toggleTitleEdit} handleTitle={handleTitle} item={item} />}
+							header={<Header email={email} history={history} saveDraft={saveDraft} publishEmail={publishEmail} closeEditor={closeEditor} isSaving={isSaving} titleToggle={titleToggle} toggleTitleEdit={toggleTitleEdit} handleTitle={handleTitle} content={content} item={item} />}
 							sidebar={
 								<>
 									<Sidebar />
@@ -155,7 +130,7 @@ const Editor = ( { settings, email, history } ) => {
 							content={
 								<>
 									<Notices />
-									{ editorMode !== 'text' && <BlockEditor settings={settings} subject={subject} handleSubjectChange={handleSubjectChange} preHeader={preHeader} handlePreHeaderChange={handlePreHeaderChange} blocks={blocks}/> }
+									{ editorMode !== 'text' && <BlockEditor settings={settings} subject={subject} handleSubjectChange={handleSubjectChange} preHeader={preHeader} handlePreHeaderChange={handlePreHeaderChange} content={content}/> }
 									{ editorMode === 'text' && <PostTextEditor /> }
 								</>
 							}

@@ -5,7 +5,7 @@ import '@wordpress/format-library';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useState, useMemo } from '@wordpress/element';
-
+import { serialize, parse } from '@wordpress/blocks';
 import { uploadMedia } from '@wordpress/media-utils';
 import {
 	BlockEditorKeyboardShortcuts,
@@ -49,9 +49,8 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHeader, handlePreHeaderChange, handleUpdateBlocks, handlePersistBlocks, blocks } ) {
-
-
+function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHeader, handlePreHeaderChange, content } ) {
+	const [ blocks, updateBlocks ] = useState( [] );
 	const { createInfoNotice } = useDispatch( 'core/notices' );
 	const classes = useStyles();
 	const canUserCreateMedia = useSelect( ( select ) => {
@@ -75,6 +74,23 @@ function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHe
 		};
 	}, [ canUserCreateMedia, _settings ] );
 
+	useEffect( () => {
+		const storedBlocks = window.localStorage.getItem( 'groundhoggBlocks' );
+
+		if ( storedBlocks?.length ) {
+			handleUpdateBlocks(() => parse(storedBlocks));
+		}
+	}, [] );
+
+	function handleUpdateBlocks(blocks) {
+		updateBlocks( blocks );
+	}
+
+	function handlePersistBlocks( newBlocks ) {
+		updateBlocks( newBlocks );
+		console.log('handlePersistBlocks' , newBlocks)
+		window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) );
+	}
 
 	if ( ! settings.hasOwnProperty( '__experimentalBlockPatterns' ) ) {
 		settings.__experimentalBlockPatterns = [];
@@ -90,8 +106,8 @@ function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHe
 			>
 				<Grid container spacing={3}>
 					<Grid item xs={9}>
-						<TextField className={ classes.subjectInputs } onChange={handleSubjectChange} value={subject} />
-						<TextField className={ classes.subjectInputs } onChange={handlePreHeaderChange} value={preHeader} placeholder={ __( 'Pre Header Text: Used to summarize the content of the email.' ) } />
+						<TextField className={ classes.subjectInputs } value="Subject" />
+						<TextField className={ classes.subjectInputs } placeholder={ __( 'Pre Header Text: Used to summarize the content of the email.' ) } />
 						<Paper>
 							<BlockSelectionClearer
 					className="edit-post-visual-editor editor-styles-wrapper"
