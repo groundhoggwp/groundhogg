@@ -75,23 +75,28 @@ function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHe
 	}, [ canUserCreateMedia, _settings ] );
 
 	useEffect( () => {
-		const storedBlocks = window.localStorage.getItem( 'groundhoggBlocks' );
+		// const storedBlocks = window.localStorage.getItem( 'groundhoggBlocks' );
 
-		if ( storedBlocks?.length ) {
-			handleUpdateBlocks(() => parse(storedBlocks));
+		if (content?.length ) {
+			handleUpdateBlocks(() => parse(content));
 		}
 	}, [] );
-	
+
 	const handleUpdateBlocks = (blocks) => {
 		updateBlocks( blocks );
 	}
 
 	const handlePersistBlocks = ( newBlocks ) => {
-		updateBlocks( newBlocks );
-		console.log('handlePersistBlocks' , newBlocks)
-		window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) )
-		// handleContentChange(blocks)
+		// updateBlocks( newBlocks );
+		// console.log('handlePersistBlocks' , newBlocks)
+		// window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) )
+		handleContentChange(blocks)
 	}
+
+	if ( ! settings.hasOwnProperty( '__experimentalBlockPatterns' ) ) {
+		settings.__experimentalBlockPatterns = [];
+	}
+
 
 	return (
 		<div className="groundhogg-block-editor">
