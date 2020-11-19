@@ -116,7 +116,7 @@ registerBlockType('groundhogg/button', {
 					</PanelBody>
 					<PanelBody title={__('Button Link')}>
 						<TextControl
-							onChange={updateLink()}
+							onChange={updateLink}
 							value={link}
 							placeholder="http://www.google.com"
 							label="Button Link"

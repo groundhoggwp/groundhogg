@@ -6,11 +6,11 @@ import {NAMESPACE} from "data/constants";
 import {useEffect} from "@wordpress/element";
 
 
-export const FaIcon = ({classes}) => {
+const FaIcon = ({classes}) => {
     return <i className={'fa ' + classes.map(c => 'fa-' + c).join(' ')}></i>
 }
 
-export const  TagPicker = ({selectProps, onChange, value, isCreatable}) => {
+const TagPicker = ({selectProps, onChange, value, isCreatable}) => {
 
     selectProps = parseArgs(selectProps || {}, {
         cacheOptions: true,
@@ -68,3 +68,5 @@ export const  TagPicker = ({selectProps, onChange, value, isCreatable}) => {
         />
     )
 }
+
+export default TagPicker;

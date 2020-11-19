@@ -49,8 +49,7 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHeader, handlePreHeaderChange } ) {
-
+function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHeader, handlePreHeaderChange, content, handleContentChange } ) {
 	const [ blocks, updateBlocks ] = useState( [] );
 	const { createInfoNotice } = useDispatch( 'core/notices' );
 	const classes = useStyles();
@@ -76,10 +75,10 @@ function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHe
 	}, [ canUserCreateMedia, _settings ] );
 
 	useEffect( () => {
-		const storedBlocks = window.localStorage.getItem( 'groundhoggBlocks' );
+		// const storedBlocks = window.localStorage.getItem( 'groundhoggBlocks' );
 
-		if ( storedBlocks?.length ) {
-			handleUpdateBlocks(() => parse(storedBlocks));
+		if (content?.length ) {
+			handleUpdateBlocks(() => parse(content));
 		}
 	}, [] );
 
@@ -88,18 +87,16 @@ function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHe
 	}
 
 	const handlePersistBlocks = ( newBlocks ) => {
-		updateBlocks( newBlocks );
-		window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) );
-	}
-
-	const handleFieldChange = (e)=>{
-		console.log(e.target.value)
-
+		// updateBlocks( newBlocks );
+		// console.log('handlePersistBlocks' , newBlocks)
+		// window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) )
+		handleContentChange(blocks)
 	}
 
 	if ( ! settings.hasOwnProperty( '__experimentalBlockPatterns' ) ) {
 		settings.__experimentalBlockPatterns = [];
 	}
+
 
 	return (
 		<div className="groundhogg-block-editor">
