@@ -94,7 +94,7 @@ const Editor = ( { settings, email, history } ) => {
 	const handlePreHeaderChange = (e)=>{
 		setPreHeader(e.target.value);
 	}
-	const handleContentChange = (blocks)=>{		
+	const handleContentChange = (blocks)=>{
 		setContent(serialize(blocks));
 	}
 
@@ -104,7 +104,6 @@ const Editor = ( { settings, email, history } ) => {
 
 	const publishEmail = (e)=>{
 		dispatch.updateItem( email.ID, { data: { subject, title,  pre_header: preHeader, status: 'ready', content, last_updated: `${DateTime.local()} ${DateTime.local().toISOTime()}` } } );
-
 	}
 
 	const closeEditor = (e)=>{
