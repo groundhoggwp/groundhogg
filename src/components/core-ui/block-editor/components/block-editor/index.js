@@ -82,18 +82,14 @@ function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHe
 		}
 	}, [] );
 
-	function handleUpdateBlocks(blocks) {
+	const handleUpdateBlocks = (blocks) => {
 		updateBlocks( blocks );
 	}
 
-	function handlePersistBlocks( newBlocks ) {
+	const handlePersistBlocks = ( newBlocks ) => {
 		updateBlocks( newBlocks );
 		console.log('handlePersistBlocks' , newBlocks)
 		window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) );
-	}
-
-	if ( ! settings.hasOwnProperty( '__experimentalBlockPatterns' ) ) {
-		settings.__experimentalBlockPatterns = [];
 	}
 
 	return (
