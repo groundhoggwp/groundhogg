@@ -46,7 +46,7 @@ function buildGraph (steps, edges) {
   })
 
   graph.setNode(EXIT,
-    { label: EXIT, width: NODE_WIDTH, height: NODE_HEIGHT, data:{}, ID: EXIT })
+    { label: EXIT, width: NODE_WIDTH, height: NODE_HEIGHT, data: {}, ID: EXIT })
 
   edges.forEach(edge => {
     graph.setEdge(parseInt(edge.from_id), parseInt(edge.to_id))
@@ -61,10 +61,21 @@ function buildGraph (steps, edges) {
   return graph
 }
 
+const FirstStepPicker = ({ funnel }) => {
+  return (
+    <Box display={ 'flex' } justifyContent={ 'center' }>
+      <Paper style={ { width: 500 } }>
+        <BenchmarkPicker funnelID={ funnel.ID }/>
+      </Paper>
+    </Box>
+  )
+}
+
 const Editor = ({ funnel }) => {
 
   if (!funnel || !funnel.steps || !funnel.edges) {
-    return <>Loading...</>
+    return <FirstStepPicker funnel={ funnel }/>
+
   }
 
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
@@ -103,11 +114,7 @@ const Editor = ({ funnel }) => {
       } }>
         {
           steps.length === 0 && (
-            <Box display={ 'flex' } justifyContent={ 'center' }>
-              <Paper style={ { width: 500 } }>
-                <BenchmarkPicker funnelID={ funnel.ID }/>
-              </Paper>
-            </Box>
+            <FirstStepPicker funnel={ funnel }/>
           )
         }
         {

@@ -71,7 +71,7 @@ export const addNotification = ( { message, type } ) => {
  * `canUser()` resolver.
  *
  * @param {string}   action           Action to check. One of: 'create', 'read', 'update', 'delete'.
- * @param {string}   resource         REST resource to check, e.g. 'funnels' or 'emails'.
+ * @param {string=}  resource         REST resource to check, e.g. 'funnels' or 'emails'.
  * @param {string=}  id               Optional ID of the rest resource to check.
  *
  * @return {boolean|undefined} Whether or not the user can perform the action,
