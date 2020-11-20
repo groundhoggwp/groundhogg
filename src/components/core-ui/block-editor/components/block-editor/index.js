@@ -44,7 +44,7 @@ import Sidebar from '../sidebar';
 
 const useStyles = makeStyles((theme) => ({
     subjectInputs: {
-		width: "100%",
+		width: "calc(100% - 50px)",
 		padding: '.5em 0'
     },
   }));
@@ -108,8 +108,10 @@ function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHe
 			>
 				<Grid container spacing={3}>
 					<Grid item xs={9}>
-						<TextField className={ classes.subjectInputs } onChange={handleSubjectChange} value={subject} />
-						<TextField className={ classes.subjectInputs } onChange={handlePreHeaderChange} value={preHeader} placeholder={ __( 'Pre Header Text: Used to summarize the content of the email.' ) } />
+						<form noValidate autoComplete="off">
+							<TextField className={ classes.subjectInputs } onChange={handleSubjectChange} label={'Subject'} value={subject} />
+							<TextField className={ classes.subjectInputs } onChange={handlePreHeaderChange} label={'Pre Header'} value={preHeader} placeholder={ __( 'Pre Header Text: Used to summarize the content of the email.' ) } />
+						</form>
 						<Paper>
 							<BlockSelectionClearer
 					className="edit-post-visual-editor editor-styles-wrapper"

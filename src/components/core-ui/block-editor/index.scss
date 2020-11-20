@@ -39,6 +39,10 @@
 	@import "~@wordpress/editor/src/editor-styles.scss";
 }
 
+.Groundhogg-BlockEditor .interface-interface-skeleton__content{
+	outline: none;
+}
+
 .groundhogg-block-editor,
 // The modals are shown outside the .groundhogg-block-editor wrapper, they need these styles.
 .components-modal__frame {

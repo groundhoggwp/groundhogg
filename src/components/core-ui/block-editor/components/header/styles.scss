@@ -18,25 +18,31 @@
 	background: none;
 }
 
-.groundhogg-header-toolbar {
+.groundhogg-email-sidebar{
+ outline: none;	
+}
+
+.groundhogg-header__toolbar{
 	width: 100%;
 }
 
-.groundhogg-header-toolbar__left {
+.groundhogg-header__title, .groundhogg-header-toolbar{
 	width: 100%;
-	.groundhogg-header__title {
-		font-size: 16px;
-		padding: 0 20px;
-		min-width: calc(100% - 400px);
-		.MuiTextField-root {
-			width: 100%;
-		}
-	}
-	button,
-	h1 {
-		float: left;
+}
+
+.groundhogg-header__title {
+	font-size: 16px;
+	// padding: 0 20px;
+	width: calc(100% - 335px);
+	.MuiTextField-root {
+		width: 100%;
 	}
 }
+button,
+h1 {
+	float: left;
+}
+
 
 .groundhogg-header__settings {
 	float: right

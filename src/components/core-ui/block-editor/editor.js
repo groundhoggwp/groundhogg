@@ -37,11 +37,6 @@ import {
 const Editor = ( { settings, email, history } ) => {
 	const dispatch = useDispatch( EMAILS_STORE_NAME );
 
-	const [ titleToggle, setTitleToggle ] = useState( false );
-
-	const toggleTitleEdit = () => {
-		setTitleToggle( ! titleToggle )
-	}
 
 	const {subject: defaultSubjectValue, pre_header: defaultPreHeaderValue, content: defaultContentValue } = email.data
 
@@ -80,7 +75,7 @@ const Editor = ( { settings, email, history } ) => {
 	// }
 
 
-	const handleTitle = (e) => {
+	const handleTitleChange = (e) => {
 		setTitle(e.target.value);
 	}
 	if ( ! item.hasOwnProperty( 'ID' ) ) {
@@ -110,16 +105,14 @@ const Editor = ( { settings, email, history } ) => {
 		history.goBack();
 	}
 
-
-
 	return (
-		<>
+		<div className="Groundhogg-BlockEditor">
 			<FullscreenMode isActive={false} />
 			<SlotFillProvider>
 				<DropZoneProvider>
 					<FocusReturnProvider>
 						<InterfaceSkeleton
-							header={<Header email={email} history={history} saveDraft={saveDraft} publishEmail={publishEmail} closeEditor={closeEditor} isSaving={isSaving} titleToggle={titleToggle} toggleTitleEdit={toggleTitleEdit} handleTitle={handleTitle} content={content} item={item} />}
+							header={<Header email={email} history={history} saveDraft={saveDraft} publishEmail={publishEmail} closeEditor={closeEditor} isSaving={isSaving} handleTitleChange={handleTitleChange} title={title} />}
 							sidebar={
 								<>
 									<Sidebar />
@@ -138,7 +131,7 @@ const Editor = ( { settings, email, history } ) => {
 					</FocusReturnProvider>
 				</DropZoneProvider>
 			</SlotFillProvider>
-		</>
+		</div>
 	);
 }
 
