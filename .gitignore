@@ -3,4 +3,4 @@
 /wp-cli.phar
 /composer.phar
 /.idea/
-build
+/build/
