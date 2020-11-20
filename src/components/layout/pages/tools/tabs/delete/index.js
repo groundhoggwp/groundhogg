@@ -12,6 +12,7 @@ import Button from '@material-ui/core/Button'
 import { useState } from '@wordpress/element'
 import { addNotification } from 'utils/index'
 import BulkJob from 'components/core-ui/bulk-job'
+import { TagPicker } from 'components/index'
 
 export const DeleteContacts = (props) => {
 
@@ -58,17 +59,24 @@ export const DeleteContacts = (props) => {
 export const DeletePage = (props) => {
 
   //state to get the data
-  const [tags, setTags] = useState([156])
+  const [tags, setTags] = useState([])
 
   //get location details
   let history = useHistory()
   let { path } = useRouteMatch()
 
   const handleDeleteContacts = () => {
+
+    let tags_include = []
+
+    if (tags !== null) {
+      tags_include = tags.map((tag) => tag.value)
+    }
+
     history.push({
       pathname: path + '/delete-contacts',
       bulk_job: true,
-      tags_include: tags
+      tags_include: tags_include
     })
   }
 
@@ -79,10 +87,13 @@ export const DeletePage = (props) => {
           <Card>
             <CardContent>
               <Typography gutterBottom variant="h5" component="h2">
-                {__('Create Users', 'groundhogg')}
+                {__('Delete Users', 'groundhogg')}
               </Typography>
-              <Typography variant="body2" color="textSecondary" component="p">
-                <h1> ADd tag picker HERE </h1>
+              {/*<Typography variant="body2" color="textSecondary" component="p">*/}
+              <TagPicker onChange={setTags} value={tags}/>
+              {/*</Typography>*/}
+              <Typography variant="body2" color="textSecondary" component="b">
+                { __('⚠ Once you click the delete button there is no going back! ' ,'groundhogg') }
               </Typography>
             </CardContent>
             <CardActions>
@@ -111,7 +122,6 @@ export const Delete = (props) => {
 
     </Switch>
   )
-
 }
 
 //Hook to push content into the page

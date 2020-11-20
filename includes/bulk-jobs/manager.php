@@ -33,6 +33,7 @@ class Manager {
 //            $this->import_contacts      = new Import_Contacts_Exp();
 //        } else {
 		$this->import_contacts = new Import_Contacts();
+		$this->import_contacts_rest = new Import_Contacts_Rest();
 //        }
 
 		$this->sync_contacts            = new Sync_Contacts();

@@ -27,17 +27,10 @@ export const SyncPage = (props) => {
   const [syncMeta, setSyncMeta] = useState(false)
 
   //state for creating user
-  const [tagsInclude, setTagsInclude] = useState([156])
+  const [tagsInclude, setTagsInclude] = useState([])
   const [tagsExclude, setTagsExclude] = useState([])
   const [sendEmail, setSendEmail] = useState(false)
   const [role, setRole] = useState('subscriber')
-
-  console.log({
-    tags_include: tagsInclude,
-    tags_exclude: tagsExclude,
-    send_email: sendEmail,
-    role: role
-  })
 
   //get location details
   let history = useHistory()
@@ -60,11 +53,25 @@ export const SyncPage = (props) => {
    */
   const handleCreateUsers = () => {
     //Code to display bluk job
+
+    //convert tags to array
+    let tags_include = []
+
+    if (tagsInclude !== null) {
+      tags_include = tagsInclude.map((tag) => tag.value)
+    }
+
+    let tags_exclude = []
+
+    if (tagsExclude !== null) {
+      tags_exclude = tagsExclude.map((tag) => tag.value)
+    }
+
     history.push({
       pathname: path + '/create-users',
       bulk_job: true,
-      tags_include: tagsInclude,
-      tags_exclude: tagsExclude,
+      tags_include: tags_include,
+      tags_exclude: tags_exclude,
       send_email: sendEmail,
       role: role
 
@@ -115,7 +122,10 @@ export const SyncPage = (props) => {
                 {__('Create Users', 'groundhogg')}
               </Typography>
               <Typography variant="body2" color="textSecondary" component="p">
-
+                Select contacts to create accounts for.
+                <TagPicker onChange={setTagsInclude} value={tagsInclude}/>
+                Exclude these contacts.
+                <TagPicker onChange={setTagsExclude} value={tagsExclude}/>
 
                 <FormControl variant="outlined">
                   <InputLabel htmlFor="outlined-age-native-simple">{__('Choose role', 'groundhogg')}</InputLabel>
