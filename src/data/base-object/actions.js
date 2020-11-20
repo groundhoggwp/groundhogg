@@ -171,6 +171,10 @@ export default (endpoint) => ({
         type: TYPES.CREATE_ITEM,
         item: result.item,
       }
+
+      return {
+        item : result.item,
+      }
     } catch (e) {
       yield setCreatingError(e)
     }
@@ -191,6 +195,10 @@ export default (endpoint) => ({
         type: TYPES.UPDATE_ITEMS,
         items: response.items,
       }
+
+      // return {
+      //   items: result.items,
+      // }
     } catch (e) {
       yield setUpdatingError(e)
     }

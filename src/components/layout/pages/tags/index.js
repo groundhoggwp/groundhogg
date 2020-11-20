@@ -253,11 +253,11 @@ const AddTags = () => {
     }
   }
 
-  const commitSingle = () => {
-    createItem({
+  const commitSingle = async () => {
+      const result = await createItem({
       data: tempData,
     })
-
+    console.log(result)
     setTempData({ tag_name: '', tag_description: '' })
   }
 

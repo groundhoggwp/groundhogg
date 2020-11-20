@@ -44,7 +44,7 @@ import Sidebar from '../sidebar';
 
 const useStyles = makeStyles((theme) => ({
     subjectInputs: {
-		width: "calc(100% - 50px)",
+		width: "calc(100% - 10px)",
 		padding: '.5em 0'
     },
   }));
