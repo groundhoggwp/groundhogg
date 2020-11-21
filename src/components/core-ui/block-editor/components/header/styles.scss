@@ -58,21 +58,6 @@ h1 {
 		margin: 0
 	}
 }
-.groundhogg-header.secondary-header {
-	background: #ddd;
-	.groundhogg-header-toolbar__left {
-
-		justify-content: flex-end;
-		display: flex;
-		padding-right: 16px;
-		button {
-			margin: 0 8px;
-			&:last-child {
-				margin: 0
-			}
-		}
-	}
-}
 
 .groundhogg-header-toolbar__large-device-toggle,
 .groundhogg-header-toolbar__mobile-device-toggle {

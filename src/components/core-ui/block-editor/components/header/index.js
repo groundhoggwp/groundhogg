@@ -24,8 +24,6 @@ import HeaderSecondary from './header-secondary';
 import { Spinner } from  'components';
 
 export default function Header( { email, history, saveDraft, publishEmail, closeEditor, isSaving, handleTitleChange, title } ) {
-	console.log('hii', title)
-
 	return (
 		<Fragment>
 			<div
@@ -56,9 +54,7 @@ export default function Header( { email, history, saveDraft, publishEmail, close
 			tabIndex="-1"
 		>
 			<HeaderToolbar>
-				<div className="groundhogg-header-toolbar__left edit-post-header-toolbar__left">
-					<HeaderSecondary />
-				</div>
+				<HeaderSecondary />
 			</HeaderToolbar>
 		</div>
 		</Fragment>
