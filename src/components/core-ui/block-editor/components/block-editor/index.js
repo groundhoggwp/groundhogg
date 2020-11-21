@@ -50,7 +50,8 @@ const useStyles = makeStyles((theme) => ({
 		},
     subjectInputs: {
 		width: "100%",
-		padding: ''
+		padding: '',
+		marginBottom: '10px'
     },
   }));
 

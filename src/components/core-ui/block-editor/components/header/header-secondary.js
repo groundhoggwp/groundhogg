@@ -32,10 +32,11 @@ const useStyles = makeStyles({
     width: '100%',
 		display: 'flex',
 		justifyContent: 'flex-start',
-
+    padding: '20px'
   },
 	button:{
-		marginLeft: '8px'
+		marginRight: '8px',
+
 	}
 });
 function HeaderSecondary() {
@@ -60,7 +61,7 @@ function HeaderSecondary() {
 	const isTextModeEnabled = editorMode === 'text';
 
 	return (
-		<Card className={classes.root}>
+		<div className={classes.root}>
 			<ToolbarItem
 				as={ Button }
 				className={classes.button+" groundhogg-header-toolbar__mode-toggle"}
@@ -180,7 +181,7 @@ function HeaderSecondary() {
 					'Generic label for desktop preview button'
 				) }
 			></ToolbarItem>
-		</Card>
+		</div>
 	);
 }
 

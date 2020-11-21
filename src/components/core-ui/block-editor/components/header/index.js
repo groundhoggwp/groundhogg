@@ -2,8 +2,8 @@
 /**
  * External dependencies
  */
-import Button from '@material-ui/core/Button'
-import TextField from '@material-ui/core/TextField'
+import {Button, Card, TextField } from '@material-ui/core'
+
 
 /**
  * WordPress dependencies
@@ -47,6 +47,7 @@ export default function Header( { email, history, saveDraft, publishEmail, close
 						</div>
 				</HeaderToolbar>
 			</div>
+
 		<div
 			className="groundhogg-header secondary-header edit-post-header"
 			role="region"
@@ -56,7 +57,9 @@ export default function Header( { email, history, saveDraft, publishEmail, close
 			<HeaderToolbar>
 				<HeaderSecondary />
 			</HeaderToolbar>
+
 		</div>
+
 		</Fragment>
 	);
 }

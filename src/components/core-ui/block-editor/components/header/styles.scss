@@ -1,7 +1,6 @@
 .groundhogg-header {
 	align-items: center;
 	background: $white;
-	border-bottom: 1px solid $gray-200;
 	display: flex;
 	height: $header-height;
 	justify-content: space-between;
@@ -22,11 +21,7 @@
  outline: none;
 }
 
-.groundhogg-header__toolbar{
-	width: 100%;
-}
-
-.groundhogg-header__title, .groundhogg-header-toolbar{
+.groundhogg-header-toolbar{
 	width: 100%;
 }
 
@@ -37,7 +32,8 @@
 .groundhogg-header__title {
 	font-size: 16px;
 	outline: none;
-	width: calc(100% - 335px);
+	width: calc(100% - 345px);
+	padding: 20px;
 	.MuiTextField-root {
 		width: 100%;
 	}
