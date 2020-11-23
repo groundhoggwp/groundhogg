@@ -215,7 +215,7 @@ export const BENCHMARK_TYPE_DEFAULTS = {
 
       arrows.push({
         ...ARROW_STYLE,
-        start: `add-step-below-${ ID }`,
+        start: `add-step-above-${ ID }`,
         end: `step-card-${ ID }`,
       })
     }

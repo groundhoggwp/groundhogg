@@ -1,7 +1,6 @@
 .groundhogg-header {
 	align-items: center;
 	background: $white;
-	border-bottom: 1px solid $gray-200;
 	display: flex;
 	height: $header-height;
 	justify-content: space-between;
@@ -18,25 +17,32 @@
 	background: none;
 }
 
-.groundhogg-header-toolbar {
+.groundhogg-email-sidebar{
+ outline: none;
+}
+
+.groundhogg-header-toolbar{
 	width: 100%;
 }
 
-.groundhogg-header-toolbar__left {
-	width: 100%;
-	.groundhogg-header__title {
-		font-size: 16px;
-		padding: 0 20px;
-		min-width: calc(100% - 400px);
-		.MuiTextField-root {
-			width: 100%;
-		}
-	}
-	button,
-	h1 {
-		float: left;
+.groundhogg-header{
+	outline: none;
+}
+
+.groundhogg-header__title {
+	font-size: 16px;
+	outline: none;
+	width: calc(100% - 345px);
+	padding: 20px;
+	.MuiTextField-root {
+		width: 100%;
 	}
 }
+button,
+h1 {
+	float: left;
+}
+
 
 .groundhogg-header__settings {
 	float: right
@@ -46,21 +52,6 @@
 	margin: 0 8px;
 	&:last-child {
 		margin: 0
-	}
-}
-.groundhogg-header.secondary-header {
-	background: #ddd;
-	.groundhogg-header-toolbar__left {
-
-		justify-content: flex-end;
-		display: flex;
-		padding-right: 16px;
-		button {
-			margin: 0 8px;
-			&:last-child {
-				margin: 0
-			}
-		}
 	}
 }
 

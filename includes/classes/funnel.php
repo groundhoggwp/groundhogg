@@ -3,7 +3,6 @@
 namespace Groundhogg;
 
 use Groundhogg\DB\Funnels;
-use Groundhogg\DB\Meta_DB;
 use Groundhogg\DB\Steps;
 
 class Funnel extends Base_Object_With_Meta {

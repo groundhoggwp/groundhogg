@@ -29,6 +29,7 @@ import { Popover } from '@wordpress/components';
 /**
  * External dependencies
  */
+import Card from '@material-ui/core/Card';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField'
@@ -43,9 +44,14 @@ import Sidebar from '../sidebar';
 //TODO Potentially use our own alerts data store (core).
 
 const useStyles = makeStyles((theme) => ({
+		subjectHeader:{
+			padding: '20px',
+			marginBottom: '10px'
+		},
     subjectInputs: {
 		width: "100%",
-		padding: '.5em 0'
+		padding: '',
+		marginBottom: '10px'
     },
   }));
 
@@ -108,8 +114,12 @@ function BlockEditor( { settings: _settings, subject, handleSubjectChange, preHe
 			>
 				<Grid container spacing={3}>
 					<Grid item xs={9}>
-						<TextField className={ classes.subjectInputs } onChange={handleSubjectChange} value={subject} />
-						<TextField className={ classes.subjectInputs } onChange={handlePreHeaderChange} value={preHeader} placeholder={ __( 'Pre Header Text: Used to summarize the content of the email.' ) } />
+						<Card  className={classes.subjectHeader}>
+							<form noValidate autoComplete="off">
+								<TextField className={ classes.subjectInputs } onChange={handleSubjectChange} label={'Subject'} value={subject} />
+								<TextField className={ classes.subjectInputs } onChange={handlePreHeaderChange} label={'Pre Header'} value={preHeader} placeholder={ __( 'Pre Header Text: Used to summarize the content of the email.' ) } />
+							</form>
+						</Card>
 						<Paper>
 							<BlockSelectionClearer
 					className="edit-post-visual-editor editor-styles-wrapper"

@@ -11,13 +11,14 @@ import ChromeReaderModeIcon from '@material-ui/icons/ChromeReaderMode';
 import DesktopMacIcon from '@material-ui/icons/DesktopMac';
 import SmartphoneIcon from '@material-ui/icons/Smartphone';
 import UpdateIcon from '@material-ui/icons/Update';
-
+import { makeStyles } from '@material-ui/core/styles';
 /**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Fragment } from '@wordpress/element';
+import {Card} from '@material-ui/core';
 
 /**
  * Internal dependencies
@@ -26,7 +27,20 @@ import ToolbarItem from './toolbar-item'; // Stop-gap while WP catches up.
 import Dialog from '../dialog';
 import { CORE_STORE_NAME } from 'data/core';
 
+const useStyles = makeStyles({
+  root: {
+    width: '100%',
+		display: 'flex',
+		justifyContent: 'flex-start',
+    padding: '20px'
+  },
+	button:{
+		marginRight: '8px',
+
+	}
+});
 function HeaderSecondary() {
+	const classes = useStyles();
 
 	const {
 		editorMode,
@@ -47,10 +61,10 @@ function HeaderSecondary() {
 	const isTextModeEnabled = editorMode === 'text';
 
 	return (
-		<Fragment>
+		<div className={classes.root}>
 			<ToolbarItem
 				as={ Button }
-				className="groundhogg-header-toolbar__mode-toggle"
+				className={classes.button+" groundhogg-header-toolbar__mode-toggle"}
 				variant="contained"
 				color="primary"
 				size="small"
@@ -67,7 +81,7 @@ function HeaderSecondary() {
 			</ToolbarItem>
 			<ToolbarItem
 				as={ Button }
-				className="groundhogg-header-toolbar__broadcast-link"
+				className={classes.button+" groundhogg-header-toolbar__broadcast-link"}
 				variant="contained"
 				color="primary"
 				size="small"
@@ -86,7 +100,7 @@ function HeaderSecondary() {
 			</ToolbarItem>
 			<ToolbarItem
 				as={ Dialog }
-				className="groundhogg-header-toolbar__replacements-modal"
+				className={classes.button+" groundhogg-header-toolbar__replacements-modal"}
 				buttonIcon={ <FindReplaceIcon /> }
 				buttonTitle={ __( 'Replacements' ) }
 				title={ __( 'Replacements' ) }
@@ -102,7 +116,7 @@ function HeaderSecondary() {
 			<ToolbarItem
 				as={ Dialog }
 				buttonIcon={ <ChromeReaderModeIcon /> }
-				className="groundhogg-header-toolbar__alt-body-modal"
+				className={classes.button+" groundhogg-header-toolbar__alt-body-modal"}
 				/* translators: button label text should, if possible, be under 16
 		characters. */
 				buttonTitle={ __( 'Email Alt-Body' ) }
@@ -116,7 +130,7 @@ function HeaderSecondary() {
 			/>
 			<ToolbarItem
 				as={ Button }
-				className="groundhogg-header-toolbar__update-and-test"
+				className={classes.button+" groundhogg-header-toolbar__update-and-test"}
 				variant="contained"
 				color="primary"
 				size="small"
@@ -136,7 +150,7 @@ function HeaderSecondary() {
 			<ToolbarItem
 				as={ Button }
 				size="small"
-				className="groundhogg-header-toolbar__mobile-device-toggle"
+				className={classes.button+" groundhogg-header-toolbar__mobile-device-toggle"}
 				variant="contained"
 				color="secondary"
 				onMouseDown={ ( event ) => {
@@ -152,7 +166,7 @@ function HeaderSecondary() {
 			></ToolbarItem>
 			<ToolbarItem
 				as={ Button }
-				className="groundhogg-header-toolbar__large-device-toggle"
+				className={classes.button+" groundhogg-header-toolbar__large-device-toggle"}
 				variant="contained"
 				color="secondary"
 				onMouseDown={ ( event ) => {
@@ -167,7 +181,7 @@ function HeaderSecondary() {
 					'Generic label for desktop preview button'
 				) }
 			></ToolbarItem>
-		</Fragment>
+		</div>
 	);
 }
 
