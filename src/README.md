@@ -51,10 +51,9 @@ $ npm i
 $ npm start
 ```
 
-#### Pushing changes
-Files can be manually pushed, or an ftp can be used. But symbolic links take care of all this. Use this command once with updated paths. This create a fake link pointing xamp outside of its file directory.
+#### Symbolic Link
+A symbolic links is used to link your repo to XAMP's directory. Below is an example of windows command to set it up. But a full guide can be found here: https://www.maketecheasier.com/create-symbolic-links-windows10/
 
-**** This command is un-tested. I believe it requires more options then the one I originally used.
 
 ```
 mklink /J "C:\Link To Folder inside Xamp" "C:\repo\Groundhogg"
