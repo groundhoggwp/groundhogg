@@ -182,7 +182,7 @@ window.dragMoveListener = dragMoveListener
 
 
 
-		interact('.wp-block')
+		interact('.wp-block, .drag-drop')
 		// interact('.drag-drop')
 			.resizable({
 		// resize from all edges and corners
