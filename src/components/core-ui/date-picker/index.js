@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
-import { DateTime } from 'luxon';
+import {getLuxonDate} from "utils/index";
 import { useState, useRef, useEffect, Fragment } from '@wordpress/element';
 
 const useStyles = makeStyles((theme) => ({
@@ -22,10 +22,10 @@ export default function DatePickers({selectedDate, dateChange, label, id}) {
     // console.log(Math.abs(diffInMonths.as('days')) % 30);
 
     // Block Month Changes
-    if(DateTime.fromISO(date).plus({ months: 1 }).toISODate() === newDate){
+    if(getLuxonDate('one_month_back') === newDate){
       return false;
     }
-    if(DateTime.fromISO(date).minus({ months: 1 }).toISODate() === newDate){
+    if(getLuxonDate('one_month_forward') === newDate){
       return false;
     }
 

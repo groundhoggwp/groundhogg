@@ -19,6 +19,7 @@ import Chart from "../../../core-ui/chart";
 import Stats from "../../../core-ui/stats";
 import DatePicker from "../../../core-ui/date-picker";
 import ReportPanel from "./report-panel.js";
+import {getLuxonDate} from "utils/index";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -32,8 +33,8 @@ export function Reports({history, match}) {
   const classes = useStyles();
 
 
-  const [startDate, setStartDate] = useState(DateTime.local().minus({ years: 1 }).startOf('day').toISODate());
-  const [endDate, setEndDate] = useState(DateTime.local().startOf('day').toISODate());
+  const [startDate, setStartDate] = useState(getLuxonDate('one_year_back'));
+  const [endDate, setEndDate] = useState(getLuxonDate('today'));
 
   const dateChange = (id, newValue)  => {
     if (id === 'start'){

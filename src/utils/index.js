@@ -107,10 +107,22 @@ export const canUser = ( action, id, resource ) => {
 export const getLuxonDate = (type) => {
   switch (type) {
     case 'last_updated':
-      return `${DateTime.local()} ${DateTime.local().toISOTime()}`
+      return `${DateTime.local()} ${DateTime.local().toISOTime()}`;
       break;
     case 'date_created':
-      return `${DateTime.local()} ${DateTime.local().toISOTime()}`
+      return `${DateTime.local()} ${DateTime.local().toISOTime()}`;
+      break;
+    case 'today':
+      return DateTime.local().startOf('day').toISODate();
+      break;
+    case 'one_year_back':
+      return  DateTime.local().minus({ years: 1 }).startOf('day').toISODate();
+      break;
+    case 'one_month_back':
+      return  DateTime.fromISO(date).minus({ months: 1 }).toISODate();
+      break;
+    case 'one_month_forward':
+      return  DateTime.fromISO(date).plus({ months: 1 }).toISODate();
       break;
     default:
       console.log(`Nothing matched in luxon.`);
