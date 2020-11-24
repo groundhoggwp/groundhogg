@@ -37,7 +37,7 @@ function Sidebar() {
 			tabIndex="-1"
 		>
 			<Panel header={ __( 'Blocks' ) }>
-
+					<div id="yes-drop" className="drag-drop"> #yes-drop </div>
 			</Panel>
 			<Panel header={ __( 'Inspector' ) }>
 				<InspectorSlot bubblesVirtually />
