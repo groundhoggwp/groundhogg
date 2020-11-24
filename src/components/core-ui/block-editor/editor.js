@@ -25,6 +25,7 @@ import { serialize, parse, pasteHandler, rawHandler } from '@wordpress/blocks';
  * External dependencies
  */
 import interact from 'interactjs';
+import { DateTime } from 'luxon';
 
 /**
  * Internal dependencies
@@ -33,11 +34,13 @@ import Notices from './components/notices';
 import Header from './components/header';
 import Sidebar from './components/sidebar';
 import BlockEditor from './components/block-editor';
-import { DateTime } from 'luxon';
+import {getLuxonDate} from "utils/index";
 import {
 	CORE_STORE_NAME,
 	EMAILS_STORE_NAME
 } from 'data';
+
+
 
 
 
@@ -100,12 +103,14 @@ const Editor = ( { settings, email, history } ) => {
 		setContent(serialize(blocks));
 	}
 
+
+
 	const saveDraft = (e)=>{
-		dispatch.updateItem( email.ID, { data: { subject, title, pre_header: preHeader, status: 'draft', content, last_updated: `${DateTime.local()} ${DateTime.local().toISOTime()}` } } );
+		dispatch.updateItem( email.ID, { data: { subject, title, pre_header: preHeader, status: 'draft', content, last_updated: getLuxonDate('last_updated') } } );
 	}
 
 	const publishEmail = (e)=>{
-		dispatch.updateItem( email.ID, { data: { subject, title,  pre_header: preHeader, status: 'ready', content, last_updated: `${DateTime.local()} ${DateTime.local().toISOTime()}` } } );
+		dispatch.updateItem( email.ID, { data: { subject, title,  pre_header: preHeader, status: 'ready', content, last_updated: getLuxonDate('last_updated') } } );
 	}
 
 	const closeEditor = (e)=>{

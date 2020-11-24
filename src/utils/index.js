@@ -1,7 +1,8 @@
 import { useEffect, useState } from '@wordpress/element'
 import { dispatch, useSelect } from '@wordpress/data'
 import { CORE_STORE_NAME } from '../data';
-import { useRouteMatch } from 'react-router-dom'
+import { useRouteMatch } from 'react-router-dom';
+import { DateTime } from 'luxon';
 
 export const useShift = (onShift) => {
   useEffect(() => {
@@ -93,4 +94,27 @@ export const canUser = ( action, id, resource ) => {
   }, [] );
 
   return canUser;
+}
+
+/**
+
+ * Returns Luxon returns in a predictable manner
+ *
+ * @param {string=}  type What type, usually associated to DB or widget requirements
+  *
+ * @return {DateIOSString|Luxon Object} Returns various Luxon outputs, strings, objects etc.
+ */
+export const getLuxonDate = (type) => {
+  switch (type) {
+    case 'last_updated':
+      return `${DateTime.local()} ${DateTime.local().toISOTime()}`
+      break;
+    case 'date_created':
+      return `${DateTime.local()} ${DateTime.local().toISOTime()}`
+      break;
+    default:
+      console.log(`Nothing matched in luxon.`);
+  }
+
+
 }
