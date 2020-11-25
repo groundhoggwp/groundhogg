@@ -24,8 +24,7 @@ const lineChartConfig = {
           borderWidth: 1
       }]
   },
-  options: {
-    responsive: true,
+  options: {    
     maintainAspectRatio: false,
     title: {
       display: false,

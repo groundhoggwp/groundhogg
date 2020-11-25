@@ -85,6 +85,7 @@ function HeaderSecondary() {
 				variant="contained"
 				color="primary"
 				size="small"
+        onClick={ () => switchEditorMode( 'broadcast' ) }
 				onMouseDown={ ( event ) => {
 					event.preventDefault();
 				} }
@@ -134,6 +135,7 @@ function HeaderSecondary() {
 				variant="contained"
 				color="primary"
 				size="small"
+        onClick={ () => switchEditorMode( 'update-and-test' ) }
 				onMouseDown={ ( event ) => {
 					event.preventDefault();
 				} }
@@ -181,6 +183,23 @@ function HeaderSecondary() {
 					'Generic label for desktop preview button'
 				) }
 			></ToolbarItem>
+			<ToolbarItem
+				as={ Button }
+				className={classes.button+" groundhogg-header-toolbar__large-device-toggle"}
+				variant="contained"
+				color="secondary"
+				onMouseDown={ ( event ) => {
+					event.preventDefault();
+				} }
+				size="small"
+        onClick={ () => switchEditorMode( 'drag-and-drop-test' ) }
+				/* translators: button label text should, if possible, be under 16
+		characters. */
+				label={ _x(
+					'Desktop Preview Toggle',
+					'Generic label for desktop preview button'
+				) }
+			>drag-and-drop-test</ToolbarItem>
 		</div>
 	);
 }

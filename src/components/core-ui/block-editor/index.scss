@@ -85,3 +85,69 @@
 		font-size: 2em;
 	}
 }
+
+.wp-block {
+// .wp-block.is-selected.is-highlighted {
+// .block-editor-block-list__block.wp-block.is-selected.is-highlighted {
+	border: 1px solid #000;
+}
+// block-editor-block-list__block wp-block is-selected wp-block
+
+#inner-dropzone {
+	position: absolute;
+  height: 700px;
+	width: calc(100% - 300px);
+}
+
+.dropzone {
+  background-color: #bfe4ff;
+  border: dashed 4px transparent;
+  border-radius: 4px;
+  margin: 10px auto 30px;
+  padding: 10px;
+  width: 80%;
+  transition: background-color 0.3s;
+}
+
+.drop-active {
+  border-color: #aaa;
+}
+
+.drop-target {
+  background-color: #29e;
+  border-color: #fff;
+  border-style: solid;
+}
+
+.drag-drop {
+  display: inline-block;
+  width: 40px;
+  padding: 2em 0.5em;
+  margin: 1rem 0 0 1rem;
+	z-index: 1000;
+  color: #fff;
+  background-color: #29e;
+  border: solid 2px #fff;
+
+  touch-action: none;
+  -webkit-transform: translate(0px, 0px);
+          transform: translate(0px, 0px);
+
+  transition: background-color 0.3s;
+}
+
+.drag-drop.can-drop {
+  color: #000;
+  background-color: #4e4;
+}
+
+#grid-snap {
+  width: 40%;
+  border-radius: 4px;
+  padding: 2%;
+  margin: 1rem 0 0 1rem;
+  background-color: #29e;
+  color: #fff;
+  font-size: 1.2em;
+  touch-action: none;
+}
