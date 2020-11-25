@@ -437,7 +437,7 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function tracking_link_callback( $matches ) {
 
-		$clean_url = str_replace( '&amp;', '&', $matches[2] );
+		$clean_url = no_and_amp( $matches[2] );
 
 		// If the url is not to be tracked leave it alone.
 		if ( is_url_excluded_from_tracking( $clean_url ) ){
