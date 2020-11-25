@@ -23,7 +23,7 @@ WordPress CRM, Email & Marketing Automation
 
 🏆 [2020 Gold Stevie Award Winner](https://www.groundhogg.io/press/gold-2020-stevie-award-winner-our-first-award/)
 
-## Join 2,000+ Small Businesses in 35+ Countries!
+## Join 3,000+ Small Businesses in 35+ Countries!
 ### Never let another lead get away!
 
 [youtube https://youtu.be/8S-9jhBiHrI]
@@ -73,7 +73,7 @@ Groundhoggers are very generous with their business intelligence. Just as the Gr
 
 ## 🤷‍♂️ Who can benefit from Groundhogg?
 
-Groundhogg is being used by a wide variety of 2,000+ businesses in over 35+ countries. The diversity of use cases is huge!
+Groundhogg is being used by a wide variety of 3,000+ businesses in over 35+ countries. The diversity of use cases is huge!
 
 If you're business is using WordPress, you can use Groundhogg.
 
@@ -108,7 +108,7 @@ You can trust us to not only provide you with stellar software and support, but 
 
 ## ❤️ Businesses Love Groundhogg!
 
-2,000+ businesses in 35+ countries are using Groundhogg to launch their funnel, grow their list and scale their business.
+3,000+ businesses in 35+ countries are using Groundhogg to launch their funnel, grow their list and scale their business.
 
 Here's what a few of them had to say about our products and support!
 
@@ -221,7 +221,7 @@ If you'd like a trial of our premium plans, please check out our [$1 sandbox dem
 ## Milestones
 
 * Groundhogg **3.0!** _Coming Q1 2021._
-* Serving 2,000+ businesses in 35+ countries.
+* Serving 3,000+ businesses in 35+ countries.
 * ⭐⭐⭐⭐⭐ rated software and support!
 * 40+ Certified partners.
 * 🏆 [Gold Stevie Award 2020](https://www.groundhogg.io/press/gold-2020-stevie-award-winner-our-first-award/) for Tech Start up of the Year _(American Business Awards)_.
@@ -309,12 +309,17 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.2.21 (2020-11-25) =
+* FIXED `pk` being invalid if multiple usages withing the same email.
+* FIXED Error in contact screen caused by invalid step ID provided for starting a funnel.
+* FIXED URL encoding for `{confirmation_link}` and `{auto_login_link}` redirects
+* FIXES permissions callbacks in open API endpoints.
+
 = 2.2.20 (2020-11-04) =
-* Updated `readme.text`
 * Various fixes and tweaks
-* Add support for detecting `HTTP_CF_CONNECTING_IP` header.
-* Add `do_replacements` to the reply-to override.
-* Fix permissions callbacks in open API endpoints.
+* UPDATED `readme.text`
+* ADDED support for detecting `HTTP_CF_CONNECTING_IP` header.
+* ADDED `do_replacements` to the reply-to override.
 
 = 2.2.19.5 (2020-09-28) =
 * TWEAKED Merged autocomplete meta picker from ACMF extension into core.
