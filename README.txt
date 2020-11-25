@@ -309,10 +309,12 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.2.21.1 (2020-11-25) =
+* FIXED URL encoding for `{confirmation_link}` and `{auto_login_link}` redirects
+
 = 2.2.21 (2020-11-25) =
 * FIXED `pk` being invalid if multiple usages withing the same email.
 * FIXED Error in contact screen caused by invalid step ID provided for starting a funnel.
-* FIXED URL encoding for `{confirmation_link}` and `{auto_login_link}` redirects
 * FIXES permissions callbacks in open API endpoints.
 
 = 2.2.20 (2020-11-04) =

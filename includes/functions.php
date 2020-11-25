@@ -2394,6 +2394,18 @@ function nonce_url_no_amp( $actionurl, $action = - 1, $name = '_wpnonce' ) {
 }
 
 /**
+ * Remove &amp; from the url
+ * Relevant for when links are provided in replacement codes.
+ *
+ * @param $url
+ *
+ * @return string|string[]
+ */
+function no_and_amp( $url ){
+    return preg_replace( "/(&amp;)([^=]*=[^&]*)/", "&$2", $url );
+}
+
+/**
  * Return a dashicon
  *
  * @param        $icon
