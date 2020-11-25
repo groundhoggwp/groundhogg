@@ -246,7 +246,7 @@ function get_post_var( $key = '', $default = false ) {
  * @return mixed
  */
 function get_url_var( $key = '', $default = false ) {
-	return map_deep( get_array_var( $_GET, $key, $default ), 'urldecode' );
+	return urldecode_deep( get_array_var( $_GET, $key, $default ) );
 }
 
 /**
@@ -3442,8 +3442,11 @@ function generate_permissions_key( $contact = false, $usage = 'preferences', $de
 		return false;
 	}
 
+	// Cache key is a combo of the contact ID and the usage case
+	$cache_key = $contact->get_id() . '-' . $usage;
+
 	// If a key was already created for the given contact within the current runtime
-	$found = wp_cache_get( $contact->get_id(), 'permissions_keys' );
+	$found = wp_cache_get( $cache_key, 'permissions_keys' );
 
 	// use it instead of creating a new one
 	if ( $found ) {
@@ -3461,7 +3464,7 @@ function generate_permissions_key( $contact = false, $usage = 'preferences', $de
 	] );
 
 	// set the key for the given contact in the cache
-	wp_cache_set( $contact->get_id(), $key, 'permissions_keys' );
+	wp_cache_set( $cache_key, $key, 'permissions_keys' );
 
 	return $key;
 }

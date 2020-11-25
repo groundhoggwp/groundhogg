@@ -876,7 +876,7 @@ class Replacements {
 
 		if ( $redirect_to && is_string( $redirect_to ) ) {
 			$link_url = add_query_arg( [
-				'redirect_to' => $redirect_to
+				'redirect_to' => urlencode( $redirect_to )
 			], $link_url );
 		}
 
@@ -903,7 +903,7 @@ class Replacements {
 
 		if ( $redirect_to && is_string( $redirect_to ) ) {
 			$link_url = add_query_arg( [
-				'redirect_to' => $redirect_to
+				'redirect_to' => urlencode( $redirect_to )
 			], $link_url );
 		}
 
