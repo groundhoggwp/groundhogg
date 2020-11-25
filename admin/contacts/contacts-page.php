@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Contacts;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Classes\Note;
 use Groundhogg\Saved_Searches;
+use Groundhogg\Step;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
@@ -698,8 +699,8 @@ class Contacts_Page extends Admin_Page {
 		}
 
 		if ( isset( $_POST['start_funnel'] ) && isset( $_POST['add_contacts_to_funnel_step_picker'] ) && current_user_can( 'edit_contacts' ) ) {
-			$step = Plugin::$instance->utils->get_step( intval( $_POST['add_contacts_to_funnel_step_picker'] ) );
-			if ( $step->enqueue( $contact ) ) {
+			$step = new Step( intval( $_POST['add_contacts_to_funnel_step_picker'] ) );
+			if ( $step->exists() && $step->enqueue( $contact ) ) {
 				$this->add_notice( 'started', _x( "Contact added to funnel.", 'notice', 'groundhogg' ), 'info' );
 			}
 		}
