@@ -1,7 +1,15 @@
 .interface-interface-skeleton .interface-interface-skeleton__sidebar {
+  overflow: visible;
   outline: none;
 }
+
+.interface-interface-skeleton__sidebar > div {
+  overflow: visible;
+}
+
 .groundhogg-email-sidebar {
+  overflow: visible;
+  outline: none;
   background: $white;
   border-left: $border-width solid $gray-200;
   bottom: 0;

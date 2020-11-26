@@ -188,8 +188,8 @@ export default ({ settings, email, history }) => {
     var x = 0;
     var y = 0;
 
-    interact(".wp-block, .drag-drop")
-      // interact('.drag-drop')
+    // interact(".wp-block, .drag-drop")
+      interact('.drag-drop')
       .resizable({
         // resize from all edges and corners
         edges: { left: true, right: true, bottom: true, top: true },
@@ -247,7 +247,8 @@ export default ({ settings, email, history }) => {
             relativePoints: [{ x: 0, y: 0 }],
           }),
           interact.modifiers.restrictRect({
-            restriction: "parent",
+            restriction: ".dropzone",
+            // restriction: "parent",
             endOnly: true,
           }),
         ],

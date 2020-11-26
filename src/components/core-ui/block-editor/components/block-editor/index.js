@@ -139,23 +139,25 @@ function BlockEditor({
               </form>
             </Card>
             <Paper>
-              <BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper">
+
+              <BlockList />
+              {/*<BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper">
                 <VisualEditorGlobalKeyboardShortcuts />
                 <MultiSelectScrollIntoView />
-                {/* Add Block Button */}
+
                 <BlockEditorKeyboardShortcuts.Register />
                 <Popover.Slot name="block-toolbar" />
                 <Typewriter>
                   <CopyHandler>
                     <WritingFlow>
                       <ObserveTyping>
-                        {/* Rendered blocks */ }
-                        <BlockList />
+
+
                       </ObserveTyping>
                     </WritingFlow>
                   </CopyHandler>
                 </Typewriter>
-              </BlockSelectionClearer>
+              </BlockSelectionClearer>*/}
             </Paper>
           </Grid>
           <Sidebar.InspectorFill>
