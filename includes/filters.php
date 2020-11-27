@@ -269,19 +269,6 @@ function kses_wrapper( $content ){
 }
 
 /**
- * This is pretty hacky, do better in the future.
- *
- * @param $protocols array
- */
-function replacement_code_protocols_compat_hack( $protocols ){
-
-	$protocols[] = '{confirmation_link_raw.{auto_login_link.https';
-//	$protocols[] = '{confirmation_link_raw.{auto_login_link.{superlink}}';
-	$protocols[] = '{confirmation_link_raw.{auto_login_link.http';
-
-	return $protocols;
-}
-/**
  * Add some filters....
  *
  * @param $content

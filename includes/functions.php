@@ -73,7 +73,7 @@ function current_user_is( $role = 'subscriber' ) {
  * Internal URL builder.
  *
  * @param string $page
- * @param array $args
+ * @param array  $args
  *
  * @return string
  */
@@ -98,8 +98,8 @@ function admin_page_url( $page, $args = [] ) {
 /**
  * Similar to wp_list_pluck in that we take the ID and the title and match them up.
  *
- * @param array $data array[]
- * @param string $id_col string
+ * @param array  $data      array[]
+ * @param string $id_col    string
  * @param string $title_col string
  *
  * @return array
@@ -204,8 +204,8 @@ function isset_not_empty( $array, $key = '' ) {
  * Get a variable from the $_REQUEST global
  *
  * @param string $key
- * @param bool $default
- * @param bool $post_only
+ * @param bool   $default
+ * @param bool   $post_only
  *
  * @return mixed
  */
@@ -229,7 +229,7 @@ function set_request_var( $key, $value ) {
  * Get a variable from the $_POST global
  *
  * @param string $key
- * @param bool $default
+ * @param bool   $default
  *
  * @return mixed
  */
@@ -241,7 +241,7 @@ function get_post_var( $key = '', $default = false ) {
  * Get a variable from the $_GET global
  *
  * @param string $key
- * @param bool $default
+ * @param bool   $default
  *
  * @return mixed
  */
@@ -253,7 +253,7 @@ function get_url_var( $key = '', $default = false ) {
  * Get a variable from the $_GET global
  *
  * @param string $key
- * @param bool $default
+ * @param bool   $default
  *
  * @return mixed
  */
@@ -264,8 +264,8 @@ function get_url_param( $key = '', $default = false ) {
 /**
  * Get a db query from the URL.
  *
- * @param array $default a default query if the given is empty
- * @param array $force for the query to include the given
+ * @param array $default       a default query if the given is empty
+ * @param array $force         for the query to include the given
  * @param array $accepted_keys for the query to include the given
  *
  * @return array|string
@@ -291,7 +291,7 @@ function get_request_query( $default = [], $force = [], $accepted_keys = [] ) {
 	$query = urldecode_deep( $query );
 
 	if ( $search = get_request_var( 's' ) ) {
-		$query[ 'search' ] = $search;
+		$query['search'] = $search;
 	}
 
 	$query = array_merge( $query, $force );
@@ -343,7 +343,7 @@ function validate_tags( $maybe_tags ) {
 /**
  * Replacements Wrapper.
  *
- * @param string $content
+ * @param string      $content
  * @param int|Contact $contact_id
  *
  * @return string
@@ -388,7 +388,7 @@ function decrypt( $data ) {
  *
  * @param        $array
  * @param string $key
- * @param bool $default
+ * @param bool   $default
  *
  * @return mixed
  */
@@ -527,7 +527,7 @@ function get_json_error( $json ) {
  */
 function normalize_files( &$files ) {
 	$_files       = [];
-	$_files_count = count( $files[ 'name' ] );
+	$_files_count = count( $files['name'] );
 	$_files_keys  = array_keys( $files );
 
 	for ( $i = 0; $i < $_files_count; $i ++ ) {
@@ -576,9 +576,9 @@ function dequeue_wc_css_compat() {
 /**
  * Enqueues the modal scripts
  *
+ * @since 1.0.5
  * @return Modal
  *
- * @since 1.0.5
  */
 function enqueue_groundhogg_modal() {
 	return Modal::instance();
@@ -668,7 +668,7 @@ function array_to_css( $atts ) {
  * Get a cookie value
  *
  * @param string $cookie
- * @param bool $default
+ * @param bool   $default
  *
  * @return mixed
  */
@@ -680,8 +680,8 @@ function get_cookie( $cookie = '', $default = false ) {
  * Set a cookie the WP way
  *
  * @param string $cookie
- * @param mixed $value
- * @param int $expiration
+ * @param mixed  $value
+ * @param int    $expiration
  *
  * @return bool
  */
@@ -749,21 +749,22 @@ function get_return_path_email() {
  * Overwrite the regular WP_Mail with an identical function but use our modified PHPMailer class instead
  * which sends the email to the Groundhogg Sending Service.
  *
- * @param string|array $attachments Optional. Files to attach.
- *
- * @param string|array $to Array or comma-separated list of email addresses to send message.
- *
- * @param string $subject Email subject
- * @param string $message Message contents
- *
- * @param string|array $headers Optional. Additional headers.
- *
- * @return bool Whether the email contents were sent successfully.
  * @throws \Exception
  *
  * @since      1.2.10
  * @deprecated 2.1.11
  *
+ * @param string       $message     Message contents
+ *
+ * @param string|array $headers     Optional. Additional headers.
+ *
+ * @param string|array $attachments Optional. Files to attach.
+ *
+ * @param string|array $to          Array or comma-separated list of email addresses to send message.
+ *
+ * @param string       $subject     Email subject
+ *
+ * @return bool Whether the email contents were sent successfully.
  */
 function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = array() ) {
 	// Compact the input, apply the filters, and extract them back out
@@ -771,36 +772,36 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the wp_mail() arguments.
 	 *
+	 * @since 2.2.0
+	 *
 	 * @param array $args A compacted array of wp_mail() arguments, including the "to" email,
 	 *                    subject, message, headers, and attachments values.
-	 *
-	 * @since 2.2.0
 	 *
 	 */
 	$atts = apply_filters( 'wp_mail', compact( 'to', 'subject', 'message', 'headers', 'attachments' ) );
 
-	if ( isset( $atts[ 'to' ] ) ) {
-		$to = $atts[ 'to' ];
+	if ( isset( $atts['to'] ) ) {
+		$to = $atts['to'];
 	}
 
 	if ( ! is_array( $to ) ) {
 		$to = explode( ',', $to );
 	}
 
-	if ( isset( $atts[ 'subject' ] ) ) {
-		$subject = $atts[ 'subject' ];
+	if ( isset( $atts['subject'] ) ) {
+		$subject = $atts['subject'];
 	}
 
-	if ( isset( $atts[ 'message' ] ) ) {
-		$message = $atts[ 'message' ];
+	if ( isset( $atts['message'] ) ) {
+		$message = $atts['message'];
 	}
 
-	if ( isset( $atts[ 'headers' ] ) ) {
-		$headers = $atts[ 'headers' ];
+	if ( isset( $atts['headers'] ) ) {
+		$headers = $atts['headers'];
 	}
 
-	if ( isset( $atts[ 'attachments' ] ) ) {
-		$attachments = $atts[ 'attachments' ];
+	if ( isset( $atts['attachments'] ) ) {
+		$attachments = $atts['attachments'];
 	}
 
 	if ( ! is_array( $attachments ) ) {
@@ -837,7 +838,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 				if ( strpos( $header, ':' ) === false ) {
 					if ( false !== stripos( $header, 'boundary=' ) ) {
 						$parts    = preg_split( '/boundary=/i', trim( $header ) );
-						$boundary = trim( str_replace( array( "'", '"' ), '', $parts[ 1 ] ) );
+						$boundary = trim( str_replace( array( "'", '"' ), '', $parts[1] ) );
 					}
 					continue;
 				}
@@ -932,7 +933,7 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 
 	if ( ! isset( $from_email ) ) {
 		// Get the site domain and get rid of www.
-		$sitename = strtolower( $_SERVER[ 'SERVER_NAME' ] );
+		$sitename = strtolower( $_SERVER['SERVER_NAME'] );
 		if ( substr( $sitename, 0, 4 ) == 'www.' ) {
 			$sitename = substr( $sitename, 4 );
 		}
@@ -943,9 +944,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the email address to send from.
 	 *
-	 * @param string $from_email Email address to send from.
-	 *
 	 * @since 2.2.0
+	 *
+	 * @param string $from_email Email address to send from.
 	 *
 	 */
 	$from_email = apply_filters( 'wp_mail_from', $from_email );
@@ -953,9 +954,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the name to associate with the "from" email address.
 	 *
-	 * @param string $from_name Name associated with the "from" email address.
-	 *
 	 * @since 2.3.0
+	 *
+	 * @param string $from_name Name associated with the "from" email address.
 	 *
 	 */
 	$from_name = apply_filters( 'wp_mail_from_name', $from_name );
@@ -963,10 +964,10 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	try {
 		$phpmailer->setFrom( $from_email, $from_name, false );
 	} catch ( \phpmailerException $e ) {
-		$mail_error_data                               = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
-		$mail_error_data[ 'set_from_name' ]            = $from_name;
-		$mail_error_data[ 'set_from_email' ]           = $from_email;
-		$mail_error_data[ 'phpmailer_exception_code' ] = $e->getCode();
+		$mail_error_data                             = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
+		$mail_error_data['set_from_name']            = $from_name;
+		$mail_error_data['set_from_email']           = $from_email;
+		$mail_error_data['phpmailer_exception_code'] = $e->getCode();
 
 		/** This filter is documented in wp-includes/pluggable.php */
 		do_action( 'wp_mail_failed', new WP_Error( 'wp_mail_failed', $e->getMessage(), $mail_error_data ) );
@@ -989,8 +990,8 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 
 				if ( preg_match( '/(.*)<(.+)>/', $address, $matches ) ) {
 					if ( count( $matches ) == 3 ) {
-						$recipient_name = $matches[ 1 ];
-						$address        = $matches[ 2 ];
+						$recipient_name = $matches[1];
+						$address        = $matches[2];
 					}
 				}
 
@@ -1023,9 +1024,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the wp_mail() content type.
 	 *
-	 * @param string $content_type Default wp_mail() content type.
-	 *
 	 * @since 2.3.0
+	 *
+	 * @param string $content_type Default wp_mail() content type.
 	 *
 	 */
 	$content_type = apply_filters( 'wp_mail_content_type', $content_type );
@@ -1052,9 +1053,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the default wp_mail() charset.
 	 *
-	 * @param string $charset Default email charset.
-	 *
 	 * @since 2.3.0
+	 *
+	 * @param string $charset Default email charset.
 	 *
 	 */
 	$phpmailer->CharSet = apply_filters( 'wp_mail_charset', $charset );
@@ -1083,9 +1084,9 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Fires after PHPMailer is initialized.
 	 *
-	 * @param \PHPMailer $phpmailer The PHPMailer instance (passed by reference).
-	 *
 	 * @since 2.2.0
+	 *
+	 * @param \PHPMailer $phpmailer The PHPMailer instance (passed by reference).
 	 *
 	 */
 	do_action_ref_array( 'phpmailer_init', array( &$phpmailer ) );
@@ -1104,25 +1105,25 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 
 	} catch ( \phpmailerException $e ) {
 
-		$mail_error_data                               = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
-		$mail_error_data[ 'phpmailer_exception_code' ] = $e->getCode();
-		$mail_error_data[ 'mime_message' ]             = $phpmailer->getSentMIMEMessage();
-		$mail_error_data[ 'set_from_name' ]            = $from_name;
-		$mail_error_data[ 'set_from_email' ]           = $from_email;
+		$mail_error_data                             = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
+		$mail_error_data['phpmailer_exception_code'] = $e->getCode();
+		$mail_error_data['mime_message']             = $phpmailer->getSentMIMEMessage();
+		$mail_error_data['set_from_name']            = $from_name;
+		$mail_error_data['set_from_email']           = $from_email;
 
 		if ( Plugin::$instance->sending_service->has_errors() ) {
-			$mail_error_data[ 'orig_error_data' ]    = Plugin::$instance->sending_service->get_last_error()->get_error_data();
-			$mail_error_data[ 'orig_error_message' ] = Plugin::$instance->sending_service->get_last_error()->get_error_message();
-			$mail_error_data[ 'orig_error_code' ]    = Plugin::$instance->sending_service->get_last_error()->get_error_code();
+			$mail_error_data['orig_error_data']    = Plugin::$instance->sending_service->get_last_error()->get_error_data();
+			$mail_error_data['orig_error_message'] = Plugin::$instance->sending_service->get_last_error()->get_error_message();
+			$mail_error_data['orig_error_code']    = Plugin::$instance->sending_service->get_last_error()->get_error_code();
 		}
 
 		/**
 		 * Fires after a phpmailerException is caught.
 		 *
+		 * @since 4.4.0
+		 *
 		 * @param WP_Error $error A WP_Error object with the phpmailerException message, and an array
 		 *                        containing the mail recipient, subject, message, headers, and attachments.
-		 *
-		 * @since 4.4.0
 		 *
 		 */
 		do_action( 'wp_mail_failed', new WP_Error( 'wp_mail_failed', $e->getMessage(), $mail_error_data ) );
@@ -1143,13 +1144,13 @@ function listen_for_complaint_and_bounce_emails( $error ) {
 		return;
 	}
 
-	$code = $data[ 'orig_error_code' ];
-	$data = $data[ 'orig_error_data' ];
+	$code = $data['orig_error_code'];
+	$data = $data['orig_error_data'];
 
 	if ( $code === 'invalid_recipients' ) {
 
 		/* handle bounces */
-		$bounces = isset_not_empty( $data, 'bounces' ) ? $data[ 'bounces' ] : [];
+		$bounces = isset_not_empty( $data, 'bounces' ) ? $data['bounces'] : [];
 
 		if ( ! empty( $bounces ) ) {
 			foreach ( $bounces as $email ) {
@@ -1160,7 +1161,7 @@ function listen_for_complaint_and_bounce_emails( $error ) {
 
 		}
 
-		$complaints = isset_not_empty( $data, 'complaints' ) ? $data[ 'complaints' ] : [];
+		$complaints = isset_not_empty( $data, 'complaints' ) ? $data['complaints'] : [];
 
 		if ( ! empty( $complaints ) ) {
 			foreach ( $complaints as $email ) {
@@ -1180,11 +1181,11 @@ add_action( 'wp_mail_failed', __NAMESPACE__ . '\listen_for_complaint_and_bounce_
  * @return string
  */
 function wpgh_get_referer() {
-	if ( ! isset( $_POST[ '_wp_http_referer' ] ) ) {
+	if ( ! isset( $_POST['_wp_http_referer'] ) ) {
 		return wp_get_referer();
 	}
 
-	return ( is_ssl() ? "https" : "http" ) . "://{$_SERVER['HTTP_HOST']}" . $_REQUEST[ '_wp_http_referer' ];
+	return ( is_ssl() ? "https" : "http" ) . "://{$_SERVER['HTTP_HOST']}" . $_REQUEST['_wp_http_referer'];
 }
 
 /**
@@ -1246,8 +1247,8 @@ function create_contact_from_user( $user, $sync_meta = false ) {
 		'optin_status' => Preferences::UNCONFIRMED
 	);
 
-	if ( empty( $args[ 'first_name' ] ) ) {
-		$args[ 'first_name' ] = $user->display_name;
+	if ( empty( $args['first_name'] ) ) {
+		$args['first_name'] = $user->display_name;
 	}
 
 	$contact = new Contact();
@@ -1287,7 +1288,7 @@ function create_contact_from_user( $user, $sync_meta = false ) {
  * Create a user from a contact
  *
  * @param        $contact       Contact
- * @param string $role string
+ * @param string $role          string
  * @param string $notifications string|bool
  *
  * @return int|false
@@ -1395,9 +1396,9 @@ function get_form_list() {
 /**
  * Schedule a 1 off email notification
  *
- * @param int $email_id the ID of the email to send
+ * @param int        $email_id            the ID of the email to send
  * @param int|string $contact_id_or_email the ID of the contact to send to
- * @param int $time time time to send at, defaults to time()
+ * @param int        $time                time time to send at, defaults to time()
  *
  * @return bool whether the scheduling was successful.
  */
@@ -1454,11 +1455,11 @@ function parse_email_headers( $headers ) {
 	$map = [];
 
 	if ( $parsed->sender && ! is_array( $parsed->sender ) ) {
-		$map[ 'sender' ] = sprintf( '%s@%s', $parsed->sender->mailbox, $parsed->sender->host );
-		$map[ 'from' ]   = $parsed->sender->personal;
+		$map['sender'] = sprintf( '%s@%s', $parsed->sender->mailbox, $parsed->sender->host );
+		$map['from']   = $parsed->sender->personal;
 	} else if ( is_array( $parsed->sender ) ) {
-		$map[ 'sender' ] = sprintf( '%s@%s', $parsed->sender[ 0 ]->mailbox, $parsed->sender[ 0 ]->host );
-		$map[ 'from' ]   = $parsed->sender[ 0 ]->personal;
+		$map['sender'] = sprintf( '%s@%s', $parsed->sender[0]->mailbox, $parsed->sender[0]->host );
+		$map['from']   = $parsed->sender[0]->personal;
 	}
 
 	return $map;
@@ -1587,7 +1588,7 @@ function get_csv_delimiter( $file_path ) {
 	$delimiters = [ "\t", ";", "|", "," ];
 	$data_1     = [];
 	$data_2     = [];
-	$delimiter  = $delimiters[ 0 ];
+	$delimiter  = $delimiters[0];
 
 	foreach ( $delimiters as $d ) {
 		$data_1 = fgetcsv( $handle, 4096, $d );
@@ -1611,7 +1612,7 @@ function get_csv_delimiter( $file_path ) {
  *
  * @param string $file_path
  *
- * @param bool $delimiter
+ * @param bool   $delimiter
  *
  * @return array
  */
@@ -1623,7 +1624,7 @@ function get_items_from_csv( $file_path = '', $delimiter = false ) {
 
 	// If a delimiter is not provided, make a guess.
 	if ( ! $delimiter ) {
-		$delimiter = get_csv_delimiter( $file_path ) ? : ',';
+		$delimiter = get_csv_delimiter( $file_path ) ?: ',';
 	}
 
 	$header       = null;
@@ -1712,13 +1713,13 @@ function get_mappable_fields( $extra = [] ) {
 /**
  * Generate a contact from given associative array and a field map.
  *
- * @param $map    array map of field_ids to contact keys
+ * @throws \Exception
  *
  * @param $fields array the raw data from the source
  *
- * @return Contact|false
- * @throws \Exception
+ * @param $map    array map of field_ids to contact keys
  *
+ * @return Contact|false
  */
 function generate_contact_with_map( $fields, $map = [] ) {
 
@@ -1771,9 +1772,9 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 				break;
 			case 'full_name':
-				$parts                = split_name( $value );
-				$args[ 'first_name' ] = sanitize_text_field( $parts[ 0 ] );
-				$args[ 'last_name' ]  = sanitize_text_field( $parts[ 1 ] );
+				$parts              = split_name( $value );
+				$args['first_name'] = sanitize_text_field( $parts[0] );
+				$args['last_name']  = sanitize_text_field( $parts[1] );
 				break;
 			case 'first_name':
 			case 'last_name':
@@ -1843,15 +1844,15 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			// Only checks whether value is not empty.
 			case 'terms_agreement':
 				if ( ! empty( $value ) ) {
-					$meta[ 'terms_agreement' ]      = 'yes';
-					$meta[ 'terms_agreement_date' ] = date_i18n( get_date_time_format() );
+					$meta['terms_agreement']      = 'yes';
+					$meta['terms_agreement_date'] = date_i18n( get_date_time_format() );
 				}
 				break;
 			// Only checks whether value is not empty.
 			case 'gdpr_consent':
 				if ( ! empty( $value ) ) {
-					$meta[ 'gdpr_consent' ]      = 'yes';
-					$meta[ 'gdpr_consent_date' ] = date_i18n( get_date_time_format() );
+					$meta['gdpr_consent']      = 'yes';
+					$meta['gdpr_consent_date'] = date_i18n( get_date_time_format() );
 				}
 				break;
 			case 'country':
@@ -1882,7 +1883,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				if ( ! function_exists( 'download_url' ) ) {
 					require_once( ABSPATH . '/wp-admin/includes/file.php' );
 				}
-				if (download_url( $value ) ) {
+				if ( download_url( $value ) ) {
 					$copy [] = $value;
 				}
 
@@ -1908,10 +1909,10 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				$date  = date( 'Y-m-d', strtotime( $value ) );
 				$parts = map_deep( explode( '-', $date ), 'absint' );
 
-				$meta[ 'birthday_year' ]  = $parts[ 0 ];
-				$meta[ 'birthday_month' ] = $parts[ 1 ];
-				$meta[ 'birthday_day' ]   = $parts[ 2 ];
-				$meta[ 'birthday' ]       = $date;
+				$meta['birthday_year']  = $parts[0];
+				$meta['birthday_month'] = $parts[1];
+				$meta['birthday_day']   = $parts[2];
+				$meta['birthday']       = $date;
 				break;
 		}
 
@@ -1920,13 +1921,13 @@ function generate_contact_with_map( $fields, $map = [] ) {
 	$contact = false;
 
 	// No point in trying if there is no email field
-	if ( isset( $args[ 'email' ] ) ) {
+	if ( isset( $args['email'] ) ) {
 
-		if ( ! is_email( $args[ 'email' ] ) ) {
+		if ( ! is_email( $args['email'] ) ) {
 			return false;
 		}
 
-		$contact = get_contactdata( $args[ 'email' ] );
+		$contact = get_contactdata( $args['email'] );
 
 		// update existing
 		if ( $contact !== false && $contact->exists() ) {
@@ -2069,10 +2070,10 @@ function scheduled_time( $time, $date_prefix = 'on' ) {
 /**
  * Render html for a time column with an associated contact
  *
- * @param int $time the time to display
- * @param bool $show_local_time whether to also show local time
- * @param bool|Contact $contact the contact to get the local time from.
- * @param string $date_prefix
+ * @param int          $time            the time to display
+ * @param bool         $show_local_time whether to also show local time
+ * @param bool|Contact $contact         the contact to get the local time from.
+ * @param string       $date_prefix
  *
  * @return string
  */
@@ -2147,7 +2148,7 @@ function floating_phil() {
  * Show the logo.
  *
  * @param string $color
- * @param int $width
+ * @param int    $width
  *
  * @return string|bool
  */
@@ -2344,11 +2345,11 @@ function add_managed_rewrite_rule( $regex = '', $query = '', $after = 'top' ) {
 }
 
 /**
+ * @deprecated since 2.0.9.2
+ *
  * @param string $string
  *
  * @return string
- * @deprecated since 2.0.9.2
- *
  */
 function managed_rewrite_rule( $string = '' ) {
 	return sprintf( 'index.php?pagename=%s&', get_managed_page_name() ) . $string;
@@ -2379,15 +2380,15 @@ function install_custom_rewrites() {
 /**
  * Retrieve URL with nonce added to URL query.
  *
- * @param string $actionurl URL to add nonce action.
- *
- * @param int|string $action Optional. Nonce action name. Default -1.
- *
- * @param string $name Optional. Nonce name. Default '_wpnonce'.
- *
- * @return string
  * @since 2.0.4
  *
+ * @param int|string $action    Optional. Nonce action name. Default -1.
+ *
+ * @param string     $name      Optional. Nonce name. Default '_wpnonce'.
+ *
+ * @param string     $actionurl URL to add nonce action.
+ *
+ * @return string
  */
 function nonce_url_no_amp( $actionurl, $action = - 1, $name = '_wpnonce' ) {
 	return add_query_arg( $name, wp_create_nonce( $action ), $actionurl );
@@ -2401,8 +2402,8 @@ function nonce_url_no_amp( $actionurl, $action = - 1, $name = '_wpnonce' ) {
  *
  * @return string|string[]
  */
-function no_and_amp( $url ){
-    return preg_replace( "/(&amp;)([^=]*=[^&]*)/", "&$2", $url );
+function no_and_amp( $url ) {
+	return preg_replace( "/(&amp;)([^=]*=[^&]*)/", "&$2", $url );
 }
 
 /**
@@ -2410,7 +2411,7 @@ function no_and_amp( $url ){
  *
  * @param        $icon
  * @param string $wrap
- * @param array $atts
+ * @param array  $atts
  *
  * @return string
  */
@@ -2419,7 +2420,7 @@ function dashicon( $icon, $wrap = 'span', $atts = [], $echo = false ) {
 		'class' => 'dashicons dashicons-'
 	] );
 
-	$atts[ 'class' ] .= $icon;
+	$atts['class'] .= $icon;
 
 	$html = html()->e( $wrap, $atts, '', false );
 
@@ -2435,7 +2436,7 @@ function dashicon( $icon, $wrap = 'span', $atts = [], $echo = false ) {
  *
  * @param        $icon
  * @param string $wrap
- * @param array $atts
+ * @param array  $atts
  */
 function dashicon_e( $icon, $wrap = 'span', $atts = [] ) {
 	dashicon( $icon, $wrap, $atts, true );
@@ -2509,10 +2510,10 @@ function is_main_blog() {
  * Glorified wp_remote_post wrapper
  *
  * @param string $url
- * @param array $body
+ * @param array  $body
  * @param string $method
- * @param array $headers
- * @param bool $as_array
+ * @param array  $headers
+ * @param bool   $as_array
  *
  * @return array|bool|WP_Error|object
  */
@@ -2520,7 +2521,7 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
 	$method = strtoupper( $method );
 
 	if ( ! isset_not_empty( $headers, 'Content-type' ) ) {
-		$headers[ 'Content-type' ] = sprintf( 'application/json; charset=%s', get_bloginfo( 'charset' ) );
+		$headers['Content-type'] = sprintf( 'application/json; charset=%s', get_bloginfo( 'charset' ) );
 	}
 
 	switch ( $method ) {
@@ -2567,10 +2568,10 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
 
 		$data = (array) $error->get_error_data();
 
-		$data[ 'url' ]     = $url;
-		$data[ 'method' ]  = $method;
-		$data[ 'headers' ] = $headers;
-		$data[ 'body' ]    = json_decode( $body );
+		$data['url']     = $url;
+		$data['method']  = $method;
+		$data['headers'] = $headers;
+		$data['body']    = json_decode( $body );
 
 		$error->add_data( $data );
 
@@ -2627,9 +2628,9 @@ function file_access_url( $path, $download = false ) {
 /**
  * Triggers the API benchmark
  *
- * @param string $call_name the name you wish to call
+ * @param string $call_name   the name you wish to call
  * @param string $id_or_email id or email of the contact
- * @param bool $by_user_id whether the ID is the ID of a WP user
+ * @param bool   $by_user_id  whether the ID is the ID of a WP user
  */
 function do_api_trigger( $call_name = '', $id_or_email = '', $by_user_id = false ) {
 	do_action( 'groundhogg/steps/benchmarks/api', $call_name, $id_or_email, $by_user_id );
@@ -2640,7 +2641,7 @@ function do_api_trigger( $call_name = '', $id_or_email = '', $by_user_id = false
  *
  * @param string $call_name
  * @param string $id_or_email
- * @param bool $by_user_id
+ * @param bool   $by_user_id
  */
 function do_api_benchmark( $call_name = '', $id_or_email = '', $by_user_id = false ) {
 	do_api_trigger( $call_name, $id_or_email, $by_user_id );
@@ -2680,7 +2681,7 @@ if ( ! function_exists( __NAMESPACE__ . '\get_email_top_image_url' ) ):
 			return 'https://via.placeholder.com/350x150';
 		}
 
-		return $image[ 0 ];
+		return $image[0];
 	}
 
 endif;
@@ -2708,16 +2709,16 @@ function get_tag_attributes( $tag ) {
 		return false;
 	}
 
-	$tag = $matches[ 0 ];
+	$tag = $matches[0];
 
 	preg_match_all( "/([a-z\-]+)(=\"([^\"]+)\")/", $tag, $all_atts );
 
-	$attributes = map_deep( $all_atts[ 1 ], 'sanitize_key' );
-	$values     = $all_atts[ 3 ];
+	$attributes = map_deep( $all_atts[1], 'sanitize_key' );
+	$values     = $all_atts[3];
 	$attributes = array_combine( $attributes, $values );
 
 	if ( isset_not_empty( $attributes, 'style' ) ) {
-		$attributes[ 'style' ] = parse_inline_styles( $attributes[ 'style' ] );
+		$attributes['style'] = parse_inline_styles( $attributes['style'] );
 	}
 
 	return $attributes;
@@ -2736,7 +2737,7 @@ function get_tag_name( $tag ) {
 	}
 	preg_match( '/<([^\W]+)/', $tag, $matches );
 
-	return $matches[ 1 ];
+	return $matches[1];
 }
 
 /**
@@ -2754,8 +2755,8 @@ function parse_inline_styles( $style ) {
 	foreach ( $bits as $bit ) {
 
 		$rule              = explode( ':', $bit );
-		$attribute         = sanitize_key( $rule[ 0 ] );
-		$value             = trim( $rule[ 1 ] );
+		$attribute         = sanitize_key( $rule[0] );
+		$value             = trim( $rule[1] );
 		$css[ $attribute ] = $value;
 	}
 
@@ -2766,7 +2767,7 @@ function parse_inline_styles( $style ) {
  * echo an action input, similar to wp_nonce_field
  *
  * @param string $action
- * @param bool $echo
+ * @param bool   $echo
  *
  * @return bool|string
  */
@@ -2864,7 +2865,7 @@ function mobile_validator() {
  *
  * @param        $number       string
  * @param string $country_code the country code of the supposed contact
- * @param bool $with_plus whether to return with the + or not
+ * @param bool   $with_plus    whether to return with the + or not
  *
  * @return bool|string
  */
@@ -2885,7 +2886,7 @@ function validate_mobile_number( $number, $country_code = '', $with_plus = false
 
 	// Number may come from validator meaning it will be in array
 	if ( is_array( $number ) ) {
-		$number = $number[ 0 ];
+		$number = $number[0];
 	}
 
 	// Add plus to string if not there
@@ -2932,15 +2933,15 @@ function get_upload_wp_error( $file ) {
 	}
 
 	// no Error
-	if ( absint( $file[ 'error' ] ) === UPLOAD_ERR_OK ) {
+	if ( absint( $file['error'] ) === UPLOAD_ERR_OK ) {
 		return false;
 	}
 
-	if ( ! is_uploaded_file( $file[ 'tmp_name' ] ) ) {
+	if ( ! is_uploaded_file( $file['tmp_name'] ) ) {
 		return new WP_Error( 'upload_error', 'File is not uploaded.' );
 	}
 
-	switch ( $file[ 'error' ] ) {
+	switch ( $file['error'] ) {
 		case UPLOAD_ERR_INI_SIZE:
 			$message = "The uploaded file exceeds the upload_max_filesize directive in php.ini";
 			break;
@@ -3054,10 +3055,10 @@ add_action( 'admin_menu', function () {
 	}
 
 	foreach ( $groundhogg as &$li ) {
-		$li[ 4 ] = $li[ 2 ];
+		$li[4] = $li[2];
 	}
 
-	$submenu[ 'groundhogg' ] = $groundhogg;
+	$submenu['groundhogg'] = $groundhogg;
 
 }, 99999999 );
 
@@ -3125,7 +3126,7 @@ function allow_funnel_uploads() {
  * @return mixed
  */
 function _allow_funnel_uploads( $mimes ) {
-	$mimes[ 'funnel' ] = 'text/plain';
+	$mimes['funnel'] = 'text/plain';
 
 	return $mimes;
 }
@@ -3207,7 +3208,7 @@ function use_experimental_features() {
  */
 function micro_seconds() {
 	$secs = explode( ' ', microtime() );
-	$secs = floatval( $secs[ 0 ] );
+	$secs = floatval( $secs[0] );
 
 	return $secs;
 }
@@ -3245,7 +3246,7 @@ function get_user_test_email( $user_id = 0 ) {
  * Update a user's preferred test email address.
  *
  * @param string $email
- * @param int $user_id
+ * @param int    $user_id
  *
  * @return bool|int
  */
@@ -3380,7 +3381,7 @@ function is_groundhogg_network_active() {
 
 	$plugins = get_site_option( 'active_sitewide_plugins' );
 
-	if ( isset( $plugins[ 'groundhogg/groundhogg.php' ] ) ) {
+	if ( isset( $plugins['groundhogg/groundhogg.php'] ) ) {
 		return true;
 	}
 
@@ -3391,7 +3392,7 @@ function is_groundhogg_network_active() {
  * Do an action after a contact has been created or updated
  *
  * @param int|Contact|Email $contact
- * @param string $hook
+ * @param string            $hook
  *
  * @return bool
  */
@@ -3440,15 +3441,19 @@ function is_a_user( $user ) {
 }
 
 /**
- * @param      $usage
- * @param bool $contact Contact
- * @param      $delete_after bool
+ * Generate a key which can be used to perform high level operations that requires a level of authentication
+ * For example change email preferences or auto-login.
+ *
+ * @param bool      $contact          Contact
+ * @param string    $usage            what they key should be used for
+ * @param float|int $expiration       the time at which the key expires
+ * @param bool      $delete_after_use whether to delete the key once it's been used
  *
  * @return bool
  */
-function generate_permissions_key( $contact = false, $usage = 'preferences', $delete_after = false ) {
+function generate_permissions_key( $contact = false, $usage = 'preferences', $expiration = WEEK_IN_SECONDS, $delete_after_use = false ) {
 
-	$contact = $contact ? : get_contactdata();
+	$contact = $contact ?: get_contactdata();
 
 	if ( ! is_a_contact( $contact ) ) {
 		return false;
@@ -3472,7 +3477,8 @@ function generate_permissions_key( $contact = false, $usage = 'preferences', $de
 		'contact_id'       => $contact->get_id(),
 		'usage_type'       => sanitize_key( $usage ),
 		'permissions_key'  => wp_hash_password( $key ),
-		'delete_after_use' => $delete_after,
+		'delete_after_use' => $delete_after_use,
+		'expiration_date'  => Ymd_His( time() + $expiration )
 	] );
 
 	// set the key for the given contact in the cache
@@ -3482,15 +3488,17 @@ function generate_permissions_key( $contact = false, $usage = 'preferences', $de
 }
 
 /**
+ * Check the validity of a permissions key
+ *
  * @param        $key     string
- * @param string $usage string
- * @param bool $contact Contact
+ * @param string $usage   string
+ * @param bool   $contact Contact
  *
  * @return bool
  */
 function check_permissions_key( $key, $contact = false, $usage = 'preferences' ) {
 
-	$contact = $contact ? : get_contactdata();
+	$contact = $contact ?: get_contactdata();
 
 	if ( ! is_a_contact( $contact ) || empty( $key ) || ! is_string( $key ) ) {
 		return false;
@@ -3507,8 +3515,6 @@ function check_permissions_key( $key, $contact = false, $usage = 'preferences' )
 	if ( empty( $keys ) ) {
 		return false;
 	}
-
-//	$keys = wp_list_pluck( $keys, 'permissions_key' );
 
 	if ( empty( $wp_hasher ) ) {
 		require_once ABSPATH . WPINC . '/class-phpass.php';
@@ -3533,17 +3539,17 @@ function check_permissions_key( $key, $contact = false, $usage = 'preferences' )
 /**
  * Generate a url with the permissions key on it.
  *
- * @param        $url
- * @param        $contact
- *
- * @param string $usage
- * @param bool $delete_after
+ * @param string    $url              the url to append the key to
+ * @param Contact   $contact          the contact the key is to be created for
+ * @param string    $usage            the usage type for the key
+ * @param float|int $expiration       the expiration time of the key in seconds, defaults to a week since the common use is for the preferences center.
+ * @param bool      $delete_after_use whether the key should be delete after it is used.
  *
  * @return string
  */
-function permissions_key_url( $url, $contact, $usage = 'preferences', $delete_after = false ) {
+function permissions_key_url( $url, $contact, $usage = 'preferences', $expiration = WEEK_IN_SECONDS, $delete_after_use = false ) {
 	return add_query_arg( [
-		'pk' => generate_permissions_key( $contact, $usage, $delete_after ),
+		'pk' => generate_permissions_key( $contact, $usage, $expiration, $delete_after_use ),
 	], $url );
 }
 
@@ -3570,7 +3576,7 @@ function get_permissions_key() {
  *
  * @param       $str
  * @param array $except
- * @param null $delim
+ * @param null  $delim
  *
  * @return mixed|string
  */
@@ -3726,16 +3732,16 @@ function track_live_activity( $type, $details = [] ) {
 		'referer'    => tracking()->get_leadsource(),
 	];
 
-	track_activity( $type, $args, $details, $contact );
+	track_activity( $contact, $type, $args, $details );
 }
 
 /**
  * Log an activity conducted by the contact while they are performing actions on the site.
  * Uses the cookie details for reporting.
  *
- * @param string $type string, an activity identifier
- * @param array $args the details for the activity
- * @param array $details details about that activity
+ * @param string  $type    string, an activity identifier
+ * @param array   $args    the details for the activity
+ * @param array   $details details about that activity
  * @param Contact $contact the contact to track
  */
 function track_activity( $contact, $type, $args, $details = [] ) {
@@ -3809,7 +3815,7 @@ function handle_ajax_meta_picker() {
 	 * Filter the json response for the meta key picker
 	 *
 	 * @param $response array[]
-	 * @param $search string
+	 * @param $search   string
 	 */
 	$response = apply_filters( 'groundhogg/handle_ajax_meta_picker', $response, $search );
 
@@ -3817,3 +3823,14 @@ function handle_ajax_meta_picker() {
 }
 
 add_action( 'wp_ajax_gh_meta_picker', __NAMESPACE__ . '\handle_ajax_meta_picker' );
+
+/**
+ * Quick formatting function for Y-m-d H:i:s date time.
+ *
+ * @param false $time
+ *
+ * @return false|string
+ */
+function Ymd_His( $time = false ) {
+	return date( 'Y-m-d H:i:s', $time ?: time() );
+}

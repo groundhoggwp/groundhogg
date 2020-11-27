@@ -901,7 +901,7 @@ class Replacements {
 			return $redirect_to;
 		}
 
-		$link_url = permissions_key_url( $link_url, $this->get_current_contact(), 'auto_login', true );
+		$link_url = permissions_key_url( $link_url, $this->get_current_contact(), 'auto_login', DAY_IN_SECONDS, true );
 
 		if ( $redirect_to && is_string( $redirect_to ) ) {
 			$link_url = add_query_arg( [
