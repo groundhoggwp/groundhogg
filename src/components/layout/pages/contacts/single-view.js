@@ -16,11 +16,11 @@ import { Divider } from '@material-ui/core'
 import { useSelect } from '@wordpress/data'
 import { CONTACTS_STORE_NAME } from 'data/contacts'
 
-
 import MailOutlineIcon from '@material-ui/icons/MailOutline'
 import { ContactPanel } from 'components/layout/pages/contacts/contact-panel'
 import TextField from '@material-ui/core/TextField'
-import {GeneralInfo}  from './general-info'
+import { GeneralInfo } from './general-info'
+import { CustomInfo } from './custom-info'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -39,18 +39,6 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-const ContactMeta = (props) => {
-
-}
-
-const CustomInfo = (props) => {
-
-  return (
-    <h1> custom </h1>
-  )
-
-}
-
 //
 // const useStyles = makeStyles((theme) => ({
 //   root: {
@@ -59,7 +47,6 @@ const CustomInfo = (props) => {
 //     backgroundColor: theme.palette.background.paper,
 //   },
 // }));
-
 
 const Segmentation = (props) => {
   return (
@@ -128,7 +115,6 @@ export const SingleView = (props) => {
     }
   ]
 
-
   return (
     <Fragment>
       {/*<p>Single view: Contact ID: {id}</p>*/}
@@ -144,11 +130,9 @@ export const SingleView = (props) => {
           </Grid>
         </Grid>
         <Grid item xs={12} md={7} lg={7}>
-
-            <Fragment>
-              <TabPanel tabs={tabs} enableRouting={false} history={history} match={match}/>
-            </Fragment>
-          
+          <Fragment>
+            <TabPanel tabs={tabs} enableRouting={false} history={history} match={match}/>
+          </Fragment>
         </Grid>
         <Grid item xs={12} md={2} lg={2}>
           <Paper>
