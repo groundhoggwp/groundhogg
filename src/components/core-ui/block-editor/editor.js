@@ -59,22 +59,6 @@ export default ({ settings, email, history }) => {
     []
   );
 
-  // console.log(email.data)
-  //email data shape
-  // {
-  // 	ID,
-  // 	content,
-  // 	subject,
-  // 	pre_header,
-  // 	from_user,
-  // 	author,
-  // 	last_updated,
-  // 	date_created,
-  // 	status,
-  // 	is_template,
-  // 	title
-  // }
-
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
   };

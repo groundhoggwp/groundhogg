@@ -14,11 +14,12 @@ import {
   CopyHandler,
   BlockSelectionClearer,
   MultiSelectScrollIntoView,
+  Inserter
 } from "@wordpress/block-editor";
 /**
  * Internal dependencies
  */
-import ghDialog from "../dialog.js";
+
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
   "GroundhoggEmailBuilderSidebarInspector"
@@ -34,9 +35,11 @@ function Sidebar() {
       tabIndex="-1"
     >
       <Panel header={__("Blocks")}>
+        <Inserter/>
         <div id="yes-drop" className="drag-drop">
           {" "}
           #yes-drop{" "}
+
         </div>
       </Panel>
       <Panel header={__("Inspector")}>

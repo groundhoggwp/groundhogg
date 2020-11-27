@@ -9,6 +9,8 @@ import { Button, Card, TextField } from "@material-ui/core";
 import { __ } from "@wordpress/i18n";
 import { Fragment } from "@wordpress/element";
 import { PinnedItems } from "@wordpress/interface";
+import { Inserter
+} from "@wordpress/block-editor";
 
 /**
  * Internal dependencies
@@ -38,6 +40,7 @@ export default function Header({
         tabIndex="-1"
       >
         <HeaderToolbar>
+          <Inserter/>
           <h1 className="groundhogg-header__title">
             <form noValidate autoComplete="off">
               <TextField
