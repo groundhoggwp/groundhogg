@@ -309,6 +309,12 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.2.22 (2020-11-27) =
+* TWEAKED If the url is just `/gh/` then display the preferences screen.
+* TWEAKED Added `noindex` to the managed page. Should have done this sooner.
+* TWEAKED Unsubscribe links are now valid for 1 week instead of just 1 day.
+* FIXED `{confirmation_link_raw}` & `{auto_login_link}` with redirects not being saved when placed inside buttons.
+
 = 2.2.21.1 (2020-11-25) =
 * FIXED URL encoding for `{confirmation_link}` and `{auto_login_link}` redirects
 

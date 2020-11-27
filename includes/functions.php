@@ -2363,6 +2363,28 @@ function is_managed_page() {
 }
 
 /**
+ * HTML for the no-index meta tag
+ */
+function no_index_tag() {
+	?>
+    <meta name="robots" content="noindex">
+	<?php
+}
+
+/**
+ * No-index the managed page if someone ends up here for whatever reason.
+ */
+function no_index_managed_page() {
+	if ( ! is_managed_page() ) {
+		return;
+	}
+
+	no_index_tag();
+}
+
+add_action( 'wp_head', __NAMESPACE__ . '\no_index_managed_page' );
+
+/**
  * Add the new rewrite rules.
  */
 function install_custom_rewrites() {
