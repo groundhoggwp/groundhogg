@@ -51,7 +51,7 @@ export default function selectOwners(props) {
 				className={classes.selectEmpty}
 				inputProps={{ 'aria-label': 'Without label' }}
 			>
-				<MenuItem value={''}>{ __( 'Please select an owner.' ) }</MenuItem>
+				<MenuItem value={0}>{ __( 'Please select an owner.' ) }</MenuItem>
 				{adminUsers.map( ( user ) => ( <MenuItem value={user.id}>{ `${user.username}(${user.email})` }</MenuItem> ) ) }
 			</Select>
 		</FormControl>

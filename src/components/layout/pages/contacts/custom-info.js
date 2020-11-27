@@ -3,18 +3,11 @@ import { ContactPanel } from 'components/layout/pages/contacts/contact-panel'
 import React from 'react'
 
 import { __ } from '@wordpress/i18n'
-
-
-
-
-
-
+import { Button } from '@material-ui/core'
 
 export const CustomInfo = (props) => {
 
   let meta = props.contact.meta
-
-  console.log(meta)
 
   // get list of pre renderd meta
 
@@ -85,6 +78,9 @@ export const CustomInfo = (props) => {
 
   return (
     <Fragment>
+      <p><Button  variant={'contained'}>Add meta (TODO)</Button></p>
+      <br />
+      <br />
       <ContactPanel section={info} contact={props.contact}/>
     </Fragment>
   )

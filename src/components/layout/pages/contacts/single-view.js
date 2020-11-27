@@ -21,6 +21,7 @@ import { ContactPanel } from 'components/layout/pages/contacts/contact-panel'
 import TextField from '@material-ui/core/TextField'
 import { GeneralInfo } from './general-info'
 import { CustomInfo } from './custom-info'
+import { Segmentation } from './segmentation'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -48,12 +49,6 @@ const useStyles = makeStyles((theme) => ({
 //   },
 // }));
 
-const Segmentation = (props) => {
-  return (
-    <h1> Segementation </h1>
-  )
-
-}
 
 export const ContactSection = ({ section }) => {
   return (

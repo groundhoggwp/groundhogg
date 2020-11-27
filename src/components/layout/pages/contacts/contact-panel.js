@@ -41,6 +41,7 @@ export const ContactPanel = ({ section, contact }) => {
 
   const [data, setData] = useState(contact.data)
   const [meta, setMeta] = useState(contact.meta)
+  const [tags ,setTags ] =useState (contact.tags)
 
   const handleInputChange = (e) => {
 
@@ -64,6 +65,13 @@ export const ContactPanel = ({ section, contact }) => {
             }
           }
         )
+        break;
+      case 'tags' :
+        //todo handle tags
+
+
+        //clean tags
+
 
     }
 
@@ -145,6 +153,10 @@ export const ContactPanel = ({ section, contact }) => {
     var value = defaultValue
     if (dataFromDataType) {
       value = dataFromDataType.hasOwnProperty(id) ? dataFromDataType[id] : defaultValue
+    }
+
+    if (dataType === 'tags'){
+      value = dataFromDataType
     }
 
     // const value = eval(dataType)[id].hasOwnProperty('defaultValue') ? defaultValue : eval(dataType)[id]
@@ -241,7 +253,7 @@ export const ContactPanel = ({ section, contact }) => {
         section.map((section) => (
             <Fragment>
 
-              <Typography variant="h4" component="h4" className={section.id}>{section.title}</Typography>
+              <Typography variant="h4" component="h4" style={{marginTop:10}} className={section.id}>{section.title}</Typography>
 
               <Grid container spacing={2}>
                 {
