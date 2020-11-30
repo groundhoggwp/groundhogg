@@ -1,1 +1,0 @@
-{"version":3,"sources":["@wordpress/block-library/src/pullquote/shared.js"],"names":["SOLID_COLOR_STYLE_NAME","SOLID_COLOR_CLASS"],"mappings":";;;;;;AAAO,IAAMA,sBAAsB,GAAG,aAA/B;;AACA,IAAMC,iBAAiB,sBAAgBD,sBAAhB,CAAvB","sourcesContent":["export const SOLID_COLOR_STYLE_NAME = 'solid-color';\nexport const SOLID_COLOR_CLASS = `is-style-${ SOLID_COLOR_STYLE_NAME }`;\n"]}

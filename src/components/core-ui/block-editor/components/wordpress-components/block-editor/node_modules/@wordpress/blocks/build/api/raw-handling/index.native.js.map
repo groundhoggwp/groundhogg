@@ -1,1 +1,0 @@
-{"version":3,"sources":["@wordpress/blocks/src/api/raw-handling/index.native.js"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;AAAA;;AACA;;AACA","sourcesContent":["export { getPhrasingContentSchema } from '@wordpress/dom';\nexport { pasteHandler } from './paste-handler';\nexport { rawHandler } from './index.js';\n"]}

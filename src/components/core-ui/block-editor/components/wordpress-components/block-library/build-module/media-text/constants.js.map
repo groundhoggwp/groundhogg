@@ -1,1 +1,0 @@
-{"version":3,"sources":["@wordpress/block-library/src/media-text/constants.js"],"names":["DEFAULT_MEDIA_SIZE_SLUG"],"mappings":"AAAA,OAAO,IAAMA,uBAAuB,GAAG,MAAhC","sourcesContent":["export const DEFAULT_MEDIA_SIZE_SLUG = 'full';\n"]}

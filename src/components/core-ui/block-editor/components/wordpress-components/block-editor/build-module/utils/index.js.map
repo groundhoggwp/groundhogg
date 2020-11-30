@@ -1,1 +1,0 @@
-{"version":3,"sources":["@wordpress/block-editor/src/utils/index.js"],"names":["default","transformStyles"],"mappings":"AAAA,SAASA,OAAO,IAAIC,eAApB,QAA2C,oBAA3C;AACA,cAAc,SAAd","sourcesContent":["export { default as transformStyles } from './transform-styles';\nexport * from './theme';\n"]}

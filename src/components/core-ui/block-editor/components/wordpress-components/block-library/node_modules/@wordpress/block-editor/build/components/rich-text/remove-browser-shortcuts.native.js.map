@@ -1,1 +1,0 @@
-{"version":3,"sources":["@wordpress/block-editor/src/components/rich-text/remove-browser-shortcuts.native.js"],"names":["RemoveBrowserShortcuts"],"mappings":";;;;;;;AAAO,IAAMA,sBAAsB,GAAG,SAAzBA,sBAAyB;AAAA,SAAM,IAAN;AAAA,CAA/B","sourcesContent":["export const RemoveBrowserShortcuts = () => null;\n"]}

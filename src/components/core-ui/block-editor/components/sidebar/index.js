@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill, Panel } from "@wordpress/components";
+import { createSlotFill, Panel, Box } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
 import {
   BlockEditorKeyboardShortcuts,
@@ -14,8 +14,17 @@ import {
   CopyHandler,
   BlockSelectionClearer,
   MultiSelectScrollIntoView,
-  Inserter
+  Inserter,
+  // InserterListItem
 } from "@wordpress/block-editor";
+import {
+  getBlockTypes,
+  // InserterListItem
+} from "@wordpress/blocks";
+/**
+ * External dependencies
+ */
+import TextField from '@material-ui/core/TextField/TextField'
 /**
  * Internal dependencies
  */
@@ -25,8 +34,19 @@ const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
   "GroundhoggEmailBuilderSidebarInspector"
 );
 
+console.log(Inserter)
+// <Box className="">
+//   <Grid container spacing={ 2 }>
+//
+//   </Grid>
+// </Box>
 //TODO: Match more closely to core edit-post
+
+
 function Sidebar() {
+  let blockTypes = getBlockTypes()
+  console.log(asdfsadf, blockTypes)
+  let search = ""
   return (
     <div
       className="groundhogg-email-sidebar"
@@ -35,7 +55,14 @@ function Sidebar() {
       tabIndex="-1"
     >
       <Panel header={__("Blocks")}>
-        <Inserter/>
+          <TextField
+            value={ search }
+            label={ 'Search' }
+            type={ 'search' }
+            variant={ 'outlined' }
+            size={ 'small' }
+            fullWidth
+          />
         <div id="yes-drop" className="drag-drop">
           {" "}
           #yes-drop{" "}

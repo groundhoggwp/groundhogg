@@ -11,7 +11,11 @@ import { Fragment } from "@wordpress/element";
 import { PinnedItems } from "@wordpress/interface";
 import { Inserter
 } from "@wordpress/block-editor";
-
+// import { Inserter
+// } from "../../wordpress-components/block-editor/";
+// import { InserterMenu
+// } from "../../wordpress-components/block-editor/";
+// wordpress-components\block-editor\src\components\inserter\index.js
 /**
  * Internal dependencies
  */

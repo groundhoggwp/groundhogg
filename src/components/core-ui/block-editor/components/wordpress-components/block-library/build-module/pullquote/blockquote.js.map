@@ -1,1 +1,0 @@
-{"version":3,"sources":["@wordpress/block-library/src/pullquote/blockquote.js"],"names":["BlockQuote"],"mappings":"AAAA,OAAO,IAAMA,UAAU,GAAG,YAAnB","sourcesContent":["export const BlockQuote = 'blockquote';\n"]}

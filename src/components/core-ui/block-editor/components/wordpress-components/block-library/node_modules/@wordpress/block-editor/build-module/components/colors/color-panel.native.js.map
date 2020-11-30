@@ -1,1 +1,0 @@
-{"version":3,"sources":["@wordpress/block-editor/src/components/colors/color-panel.native.js"],"names":["ColorPanel"],"mappings":"AAAA,eAAe,SAASA,UAAT,GAAsB;AACpC,SAAO,IAAP;AACA","sourcesContent":["export default function ColorPanel() {\n\treturn null;\n}\n"]}

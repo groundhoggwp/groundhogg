@@ -1,9 +1,0 @@
-export var MIN_SIZE = 20;
-export var LINK_DESTINATION_NONE = 'none';
-export var LINK_DESTINATION_MEDIA = 'media';
-export var LINK_DESTINATION_ATTACHMENT = 'attachment';
-export var LINK_DESTINATION_CUSTOM = 'custom';
-export var NEW_TAB_REL = ['noreferrer', 'noopener'];
-export var ALLOWED_MEDIA_TYPES = ['image'];
-export var DEFAULT_SIZE_SLUG = 'large';
-//# sourceMappingURL=constants.js.map
