@@ -1,0 +1,1 @@
+{"version":3,"sources":["@wordpress/block-library/src/query/constants.js"],"names":["MAX_FETCHED_TERMS"],"mappings":"AAAA,OAAO,IAAMA,iBAAiB,GAAG,GAA1B;AAEP,eAAe;AACdA,EAAAA,iBAAiB,EAAjBA;AADc,CAAf","sourcesContent":["export const MAX_FETCHED_TERMS = 100;\n\nexport default {\n\tMAX_FETCHED_TERMS,\n};\n"]}

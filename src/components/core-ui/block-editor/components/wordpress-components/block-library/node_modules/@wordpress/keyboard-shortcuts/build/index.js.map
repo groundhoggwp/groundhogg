@@ -1,0 +1,1 @@
+{"version":3,"sources":["@wordpress/keyboard-shortcuts/src/index.js"],"names":[],"mappings":";;;;;;;;;;;;;;AAGA;;AAEA","sourcesContent":["/**\n * Internal dependencies\n */\nimport './store';\n\nexport { default as useShortcut } from './hooks/use-shortcut';\n"]}

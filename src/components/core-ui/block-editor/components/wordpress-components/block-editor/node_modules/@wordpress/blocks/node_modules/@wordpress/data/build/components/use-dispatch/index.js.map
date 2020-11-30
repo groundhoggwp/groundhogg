@@ -1,0 +1,1 @@
+{"version":3,"sources":["@wordpress/data/src/components/use-dispatch/index.js"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;AAAA;;AACA","sourcesContent":["export { default as useDispatch } from './use-dispatch';\nexport { default as useDispatchWithMap } from './use-dispatch-with-map';\n"]}

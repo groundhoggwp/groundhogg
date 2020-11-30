@@ -1,0 +1,2 @@
+export var fontFamily = "font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto,\nOxygen-Sans, Ubuntu, Cantarell, \"Helvetica Neue\", sans-serif;";
+//# sourceMappingURL=font-family.js.map

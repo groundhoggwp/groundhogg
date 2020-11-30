@@ -1,0 +1,1 @@
+{"version":3,"sources":["@wordpress/block-editor/src/components/gradients/index.js"],"names":[],"mappings":"AAAA,cAAc,gBAAd","sourcesContent":["export * from './use-gradient';\n"]}

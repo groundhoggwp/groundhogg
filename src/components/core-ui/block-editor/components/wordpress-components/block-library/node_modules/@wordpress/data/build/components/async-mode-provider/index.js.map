@@ -1,0 +1,1 @@
+{"version":3,"sources":["@wordpress/data/src/components/async-mode-provider/index.js"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;AAAA;;AACA","sourcesContent":["export { default as useAsyncMode } from './use-async-mode';\nexport { default as AsyncModeProvider, AsyncModeConsumer } from './context';\n"]}

@@ -1,0 +1,1 @@
+{"version":3,"sources":["@wordpress/components/src/text/styles/font-family.native.js"],"names":["fontFamily"],"mappings":";;;;;;AAAO,IAAMA,UAAU,GAAG,EAAnB","sourcesContent":["export const fontFamily = '';\n"]}

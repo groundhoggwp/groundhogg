@@ -1,0 +1,1 @@
+{"version":3,"sources":["@wordpress/components/src/spinner/index.js"],"names":["Spinner"],"mappings":";;;;;;;;;AAAe,SAASA,OAAT,GAAmB;AACjC,SAAO;AAAM,IAAA,SAAS,EAAC;AAAhB,IAAP;AACA","sourcesContent":["export default function Spinner() {\n\treturn <span className=\"components-spinner\" />;\n}\n"]}

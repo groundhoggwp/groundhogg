@@ -1,0 +1,1 @@
+{"version":3,"sources":["@wordpress/block-editor/src/components/autocomplete/index.native.js"],"names":[],"mappings":"AAAA,gBAAe;AAAA,SAAM,IAAN;AAAA,CAAf","sourcesContent":["export default () => null;\n"]}

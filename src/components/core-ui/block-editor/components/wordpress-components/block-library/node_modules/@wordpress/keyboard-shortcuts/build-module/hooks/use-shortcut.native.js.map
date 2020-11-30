@@ -1,0 +1,1 @@
+{"version":3,"sources":["@wordpress/keyboard-shortcuts/src/hooks/use-shortcut.native.js"],"names":["useShortcut"],"mappings":"AAAA,IAAMA,WAAW,GAAG,SAAdA,WAAc;AAAA,SAAM,IAAN;AAAA,CAApB;;AACA,eAAeA,WAAf","sourcesContent":["const useShortcut = () => null;\nexport default useShortcut;\n"]}

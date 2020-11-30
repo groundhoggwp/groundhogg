@@ -1,0 +1,602 @@
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _element = require("@wordpress/element");
+
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
+
+var _classnames = _interopRequireDefault(require("classnames"));
+
+var _lodash = require("lodash");
+
+var _blockEditor = require("@wordpress/block-editor");
+
+var _shared = require("./shared");
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { (0, _defineProperty2.default)(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+var deprecated = [{
+  attributes: {
+    images: {
+      type: 'array',
+      default: [],
+      source: 'query',
+      selector: '.blocks-gallery-item',
+      query: {
+        url: {
+          type: 'string',
+          source: 'attribute',
+          selector: 'img',
+          attribute: 'src'
+        },
+        fullUrl: {
+          type: 'string',
+          source: 'attribute',
+          selector: 'img',
+          attribute: 'data-full-url'
+        },
+        link: {
+          type: 'string',
+          source: 'attribute',
+          selector: 'img',
+          attribute: 'data-link'
+        },
+        alt: {
+          type: 'string',
+          source: 'attribute',
+          selector: 'img',
+          attribute: 'alt',
+          default: ''
+        },
+        id: {
+          type: 'string',
+          source: 'attribute',
+          selector: 'img',
+          attribute: 'data-id'
+        },
+        caption: {
+          type: 'string',
+          source: 'html',
+          selector: '.blocks-gallery-item__caption'
+        }
+      }
+    },
+    ids: {
+      type: 'array',
+      items: {
+        type: 'number'
+      },
+      default: []
+    },
+    columns: {
+      type: 'number',
+      minimum: 1,
+      maximum: 8
+    },
+    caption: {
+      type: 'string',
+      source: 'html',
+      selector: '.blocks-gallery-caption'
+    },
+    imageCrop: {
+      type: 'boolean',
+      default: true
+    },
+    linkTo: {
+      type: 'string',
+      default: 'none'
+    },
+    sizeSlug: {
+      type: 'string',
+      default: 'large'
+    }
+  },
+  supports: {
+    align: true
+  },
+  isEligible: function isEligible(_ref) {
+    var linkTo = _ref.linkTo;
+    return !linkTo || linkTo === 'attachment' || linkTo === 'media';
+  },
+  migrate: function migrate(attributes) {
+    var linkTo = attributes.linkTo;
+
+    if (!attributes.linkTo) {
+      linkTo = 'none';
+    } else if (attributes.linkTo === 'attachment') {
+      linkTo = 'post';
+    } else if (attributes.linkTo === 'media') {
+      linkTo = 'file';
+    }
+
+    return _objectSpread(_objectSpread({}, attributes), {}, {
+      linkTo: linkTo
+    });
+  },
+  save: function save(_ref2) {
+    var attributes = _ref2.attributes;
+    var images = attributes.images,
+        _attributes$columns = attributes.columns,
+        columns = _attributes$columns === void 0 ? (0, _shared.defaultColumnsNumber)(attributes) : _attributes$columns,
+        imageCrop = attributes.imageCrop,
+        caption = attributes.caption,
+        linkTo = attributes.linkTo;
+    return (0, _element.createElement)("figure", {
+      className: "columns-".concat(columns, " ").concat(imageCrop ? 'is-cropped' : '')
+    }, (0, _element.createElement)("ul", {
+      className: "blocks-gallery-grid"
+    }, images.map(function (image) {
+      var href;
+
+      switch (linkTo) {
+        case 'media':
+          href = image.fullUrl || image.url;
+          break;
+
+        case 'attachment':
+          href = image.link;
+          break;
+      }
+
+      var img = (0, _element.createElement)("img", {
+        src: image.url,
+        alt: image.alt,
+        "data-id": image.id,
+        "data-full-url": image.fullUrl,
+        "data-link": image.link,
+        className: image.id ? "wp-image-".concat(image.id) : null
+      });
+      return (0, _element.createElement)("li", {
+        key: image.id || image.url,
+        className: "blocks-gallery-item"
+      }, (0, _element.createElement)("figure", null, href ? (0, _element.createElement)("a", {
+        href: href
+      }, img) : img, !_blockEditor.RichText.isEmpty(image.caption) && (0, _element.createElement)(_blockEditor.RichText.Content, {
+        tagName: "figcaption",
+        className: "blocks-gallery-item__caption",
+        value: image.caption
+      })));
+    })), !_blockEditor.RichText.isEmpty(caption) && (0, _element.createElement)(_blockEditor.RichText.Content, {
+      tagName: "figcaption",
+      className: "blocks-gallery-caption",
+      value: caption
+    }));
+  }
+}, {
+  attributes: {
+    images: {
+      type: 'array',
+      default: [],
+      source: 'query',
+      selector: '.blocks-gallery-item',
+      query: {
+        url: {
+          source: 'attribute',
+          selector: 'img',
+          attribute: 'src'
+        },
+        fullUrl: {
+          source: 'attribute',
+          selector: 'img',
+          attribute: 'data-full-url'
+        },
+        link: {
+          source: 'attribute',
+          selector: 'img',
+          attribute: 'data-link'
+        },
+        alt: {
+          source: 'attribute',
+          selector: 'img',
+          attribute: 'alt',
+          default: ''
+        },
+        id: {
+          source: 'attribute',
+          selector: 'img',
+          attribute: 'data-id'
+        },
+        caption: {
+          type: 'string',
+          source: 'html',
+          selector: '.blocks-gallery-item__caption'
+        }
+      }
+    },
+    ids: {
+      type: 'array',
+      default: []
+    },
+    columns: {
+      type: 'number'
+    },
+    caption: {
+      type: 'string',
+      source: 'html',
+      selector: '.blocks-gallery-caption'
+    },
+    imageCrop: {
+      type: 'boolean',
+      default: true
+    },
+    linkTo: {
+      type: 'string',
+      default: 'none'
+    }
+  },
+  supports: {
+    align: true
+  },
+  isEligible: function isEligible(_ref3) {
+    var ids = _ref3.ids;
+    return ids && ids.some(function (id) {
+      return typeof id === 'string';
+    });
+  },
+  migrate: function migrate(attributes) {
+    return _objectSpread(_objectSpread({}, attributes), {}, {
+      ids: (0, _lodash.map)(attributes.ids, function (id) {
+        var parsedId = parseInt(id, 10);
+        return Number.isInteger(parsedId) ? parsedId : null;
+      })
+    });
+  },
+  save: function save(_ref4) {
+    var attributes = _ref4.attributes;
+    var images = attributes.images,
+        _attributes$columns2 = attributes.columns,
+        columns = _attributes$columns2 === void 0 ? (0, _shared.defaultColumnsNumber)(attributes) : _attributes$columns2,
+        imageCrop = attributes.imageCrop,
+        caption = attributes.caption,
+        linkTo = attributes.linkTo;
+    return (0, _element.createElement)("figure", {
+      className: "columns-".concat(columns, " ").concat(imageCrop ? 'is-cropped' : '')
+    }, (0, _element.createElement)("ul", {
+      className: "blocks-gallery-grid"
+    }, images.map(function (image) {
+      var href;
+
+      switch (linkTo) {
+        case 'media':
+          href = image.fullUrl || image.url;
+          break;
+
+        case 'attachment':
+          href = image.link;
+          break;
+      }
+
+      var img = (0, _element.createElement)("img", {
+        src: image.url,
+        alt: image.alt,
+        "data-id": image.id,
+        "data-full-url": image.fullUrl,
+        "data-link": image.link,
+        className: image.id ? "wp-image-".concat(image.id) : null
+      });
+      return (0, _element.createElement)("li", {
+        key: image.id || image.url,
+        className: "blocks-gallery-item"
+      }, (0, _element.createElement)("figure", null, href ? (0, _element.createElement)("a", {
+        href: href
+      }, img) : img, !_blockEditor.RichText.isEmpty(image.caption) && (0, _element.createElement)(_blockEditor.RichText.Content, {
+        tagName: "figcaption",
+        className: "blocks-gallery-item__caption",
+        value: image.caption
+      })));
+    })), !_blockEditor.RichText.isEmpty(caption) && (0, _element.createElement)(_blockEditor.RichText.Content, {
+      tagName: "figcaption",
+      className: "blocks-gallery-caption",
+      value: caption
+    }));
+  }
+}, {
+  attributes: {
+    images: {
+      type: 'array',
+      default: [],
+      source: 'query',
+      selector: 'ul.wp-block-gallery .blocks-gallery-item',
+      query: {
+        url: {
+          source: 'attribute',
+          selector: 'img',
+          attribute: 'src'
+        },
+        fullUrl: {
+          source: 'attribute',
+          selector: 'img',
+          attribute: 'data-full-url'
+        },
+        alt: {
+          source: 'attribute',
+          selector: 'img',
+          attribute: 'alt',
+          default: ''
+        },
+        id: {
+          source: 'attribute',
+          selector: 'img',
+          attribute: 'data-id'
+        },
+        link: {
+          source: 'attribute',
+          selector: 'img',
+          attribute: 'data-link'
+        },
+        caption: {
+          type: 'array',
+          source: 'children',
+          selector: 'figcaption'
+        }
+      }
+    },
+    ids: {
+      type: 'array',
+      default: []
+    },
+    columns: {
+      type: 'number'
+    },
+    imageCrop: {
+      type: 'boolean',
+      default: true
+    },
+    linkTo: {
+      type: 'string',
+      default: 'none'
+    }
+  },
+  supports: {
+    align: true
+  },
+  save: function save(_ref5) {
+    var attributes = _ref5.attributes;
+    var images = attributes.images,
+        _attributes$columns3 = attributes.columns,
+        columns = _attributes$columns3 === void 0 ? (0, _shared.defaultColumnsNumber)(attributes) : _attributes$columns3,
+        imageCrop = attributes.imageCrop,
+        linkTo = attributes.linkTo;
+    return (0, _element.createElement)("ul", {
+      className: "columns-".concat(columns, " ").concat(imageCrop ? 'is-cropped' : '')
+    }, images.map(function (image) {
+      var href;
+
+      switch (linkTo) {
+        case 'media':
+          href = image.fullUrl || image.url;
+          break;
+
+        case 'attachment':
+          href = image.link;
+          break;
+      }
+
+      var img = (0, _element.createElement)("img", {
+        src: image.url,
+        alt: image.alt,
+        "data-id": image.id,
+        "data-full-url": image.fullUrl,
+        "data-link": image.link,
+        className: image.id ? "wp-image-".concat(image.id) : null
+      });
+      return (0, _element.createElement)("li", {
+        key: image.id || image.url,
+        className: "blocks-gallery-item"
+      }, (0, _element.createElement)("figure", null, href ? (0, _element.createElement)("a", {
+        href: href
+      }, img) : img, image.caption && image.caption.length > 0 && (0, _element.createElement)(_blockEditor.RichText.Content, {
+        tagName: "figcaption",
+        value: image.caption
+      })));
+    }));
+  }
+}, {
+  attributes: {
+    images: {
+      type: 'array',
+      default: [],
+      source: 'query',
+      selector: 'ul.wp-block-gallery .blocks-gallery-item',
+      query: {
+        url: {
+          source: 'attribute',
+          selector: 'img',
+          attribute: 'src'
+        },
+        alt: {
+          source: 'attribute',
+          selector: 'img',
+          attribute: 'alt',
+          default: ''
+        },
+        id: {
+          source: 'attribute',
+          selector: 'img',
+          attribute: 'data-id'
+        },
+        link: {
+          source: 'attribute',
+          selector: 'img',
+          attribute: 'data-link'
+        },
+        caption: {
+          type: 'array',
+          source: 'children',
+          selector: 'figcaption'
+        }
+      }
+    },
+    columns: {
+      type: 'number'
+    },
+    imageCrop: {
+      type: 'boolean',
+      default: true
+    },
+    linkTo: {
+      type: 'string',
+      default: 'none'
+    }
+  },
+  isEligible: function isEligible(_ref6) {
+    var images = _ref6.images,
+        ids = _ref6.ids;
+    return images && images.length > 0 && (!ids && images || ids && images && ids.length !== images.length || (0, _lodash.some)(images, function (id, index) {
+      if (!id && ids[index] !== null) {
+        return true;
+      }
+
+      return parseInt(id, 10) !== ids[index];
+    }));
+  },
+  migrate: function migrate(attributes) {
+    return _objectSpread(_objectSpread({}, attributes), {}, {
+      ids: (0, _lodash.map)(attributes.images, function (_ref7) {
+        var id = _ref7.id;
+
+        if (!id) {
+          return null;
+        }
+
+        return parseInt(id, 10);
+      })
+    });
+  },
+  supports: {
+    align: true
+  },
+  save: function save(_ref8) {
+    var attributes = _ref8.attributes;
+    var images = attributes.images,
+        _attributes$columns4 = attributes.columns,
+        columns = _attributes$columns4 === void 0 ? (0, _shared.defaultColumnsNumber)(attributes) : _attributes$columns4,
+        imageCrop = attributes.imageCrop,
+        linkTo = attributes.linkTo;
+    return (0, _element.createElement)("ul", {
+      className: "columns-".concat(columns, " ").concat(imageCrop ? 'is-cropped' : '')
+    }, images.map(function (image) {
+      var href;
+
+      switch (linkTo) {
+        case 'media':
+          href = image.url;
+          break;
+
+        case 'attachment':
+          href = image.link;
+          break;
+      }
+
+      var img = (0, _element.createElement)("img", {
+        src: image.url,
+        alt: image.alt,
+        "data-id": image.id,
+        "data-link": image.link,
+        className: image.id ? "wp-image-".concat(image.id) : null
+      });
+      return (0, _element.createElement)("li", {
+        key: image.id || image.url,
+        className: "blocks-gallery-item"
+      }, (0, _element.createElement)("figure", null, href ? (0, _element.createElement)("a", {
+        href: href
+      }, img) : img, image.caption && image.caption.length > 0 && (0, _element.createElement)(_blockEditor.RichText.Content, {
+        tagName: "figcaption",
+        value: image.caption
+      })));
+    }));
+  }
+}, {
+  attributes: {
+    images: {
+      type: 'array',
+      default: [],
+      source: 'query',
+      selector: 'div.wp-block-gallery figure.blocks-gallery-image img',
+      query: {
+        url: {
+          source: 'attribute',
+          attribute: 'src'
+        },
+        alt: {
+          source: 'attribute',
+          attribute: 'alt',
+          default: ''
+        },
+        id: {
+          source: 'attribute',
+          attribute: 'data-id'
+        }
+      }
+    },
+    columns: {
+      type: 'number'
+    },
+    imageCrop: {
+      type: 'boolean',
+      default: true
+    },
+    linkTo: {
+      type: 'string',
+      default: 'none'
+    },
+    align: {
+      type: 'string',
+      default: 'none'
+    }
+  },
+  supports: {
+    align: true
+  },
+  save: function save(_ref9) {
+    var attributes = _ref9.attributes;
+    var images = attributes.images,
+        _attributes$columns5 = attributes.columns,
+        columns = _attributes$columns5 === void 0 ? (0, _shared.defaultColumnsNumber)(attributes) : _attributes$columns5,
+        align = attributes.align,
+        imageCrop = attributes.imageCrop,
+        linkTo = attributes.linkTo;
+    var className = (0, _classnames.default)("columns-".concat(columns), {
+      alignnone: align === 'none',
+      'is-cropped': imageCrop
+    });
+    return (0, _element.createElement)("div", {
+      className: className
+    }, images.map(function (image) {
+      var href;
+
+      switch (linkTo) {
+        case 'media':
+          href = image.url;
+          break;
+
+        case 'attachment':
+          href = image.link;
+          break;
+      }
+
+      var img = (0, _element.createElement)("img", {
+        src: image.url,
+        alt: image.alt,
+        "data-id": image.id
+      });
+      return (0, _element.createElement)("figure", {
+        key: image.id || image.url,
+        className: "blocks-gallery-image"
+      }, href ? (0, _element.createElement)("a", {
+        href: href
+      }, img) : img);
+    }));
+  }
+}];
+var _default = deprecated;
+exports.default = _default;
+//# sourceMappingURL=deprecated.js.map

@@ -1,0 +1,1 @@
+{"version":3,"sources":["@wordpress/primitives/src/block-quotation/index.js"],"names":["BlockQuotation"],"mappings":"AAAA,OAAO,IAAMA,cAAc,GAAG,YAAvB","sourcesContent":["export const BlockQuotation = 'blockquote';\n"]}

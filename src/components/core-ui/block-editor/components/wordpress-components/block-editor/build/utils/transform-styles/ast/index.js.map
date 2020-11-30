@@ -1,0 +1,1 @@
+{"version":3,"sources":["@wordpress/block-editor/src/utils/transform-styles/ast/index.js"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;AAGA;;AACA","sourcesContent":["// Adapted from https://github.com/reworkcss/css\n// because we needed to remove source map support.\n\nexport { default as parse } from './parse';\nexport { default as stringify } from './stringify';\n"]}

@@ -1,0 +1,23 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.DEFAULT_SIZE_SLUG = exports.ALLOWED_MEDIA_TYPES = exports.NEW_TAB_REL = exports.LINK_DESTINATION_CUSTOM = exports.LINK_DESTINATION_ATTACHMENT = exports.LINK_DESTINATION_MEDIA = exports.LINK_DESTINATION_NONE = exports.MIN_SIZE = void 0;
+var MIN_SIZE = 20;
+exports.MIN_SIZE = MIN_SIZE;
+var LINK_DESTINATION_NONE = 'none';
+exports.LINK_DESTINATION_NONE = LINK_DESTINATION_NONE;
+var LINK_DESTINATION_MEDIA = 'media';
+exports.LINK_DESTINATION_MEDIA = LINK_DESTINATION_MEDIA;
+var LINK_DESTINATION_ATTACHMENT = 'attachment';
+exports.LINK_DESTINATION_ATTACHMENT = LINK_DESTINATION_ATTACHMENT;
+var LINK_DESTINATION_CUSTOM = 'custom';
+exports.LINK_DESTINATION_CUSTOM = LINK_DESTINATION_CUSTOM;
+var NEW_TAB_REL = ['noreferrer', 'noopener'];
+exports.NEW_TAB_REL = NEW_TAB_REL;
+var ALLOWED_MEDIA_TYPES = ['image'];
+exports.ALLOWED_MEDIA_TYPES = ALLOWED_MEDIA_TYPES;
+var DEFAULT_SIZE_SLUG = 'large';
+exports.DEFAULT_SIZE_SLUG = DEFAULT_SIZE_SLUG;
+//# sourceMappingURL=constants.js.map

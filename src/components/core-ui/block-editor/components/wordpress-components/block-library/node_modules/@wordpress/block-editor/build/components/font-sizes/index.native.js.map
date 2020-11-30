@@ -1,0 +1,1 @@
+{"version":3,"sources":["@wordpress/block-editor/src/components/font-sizes/index.native.js"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;AAAA","sourcesContent":["export { getFontSize, getFontSizeClass } from './utils';\n"]}

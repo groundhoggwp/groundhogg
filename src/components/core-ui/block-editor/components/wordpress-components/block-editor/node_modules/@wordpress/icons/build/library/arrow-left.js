@@ -1,0 +1,23 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _element = require("@wordpress/element");
+
+var _primitives = require("@wordpress/primitives");
+
+/**
+ * WordPress dependencies
+ */
+var arrowLeft = (0, _element.createElement)(_primitives.SVG, {
+  xmlns: "http://www.w3.org/2000/svg",
+  viewBox: "0 0 24 24"
+}, (0, _element.createElement)(_primitives.Path, {
+  d: "M9.737 18.011L3.98 12.255l5.734-6.28 1.107 1.012-4.103 4.494h13.3v1.5H6.828l3.97 3.97-1.06 1.06z"
+}));
+var _default = arrowLeft;
+exports.default = _default;
+//# sourceMappingURL=arrow-left.js.map

@@ -1,0 +1,1 @@
+{"version":3,"sources":["@wordpress/block-editor/src/components/font-sizes/index.native.js"],"names":["getFontSize","getFontSizeClass"],"mappings":"AAAA,SAASA,WAAT,EAAsBC,gBAAtB,QAA8C,SAA9C","sourcesContent":["export { getFontSize, getFontSizeClass } from './utils';\n"]}
