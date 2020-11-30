@@ -2,7 +2,10 @@
  * Internal dependencies
  */
 import TYPES from './action-types';
-import { QUERY_DEFAULTS } from '../constants';
+import { NAMESPACE, QUERY_DEFAULTS } from '../constants'
+import { apiFetch } from '@wordpress/data-controls'
+import { addQueryArgs } from '@wordpress/url'
+
 
 export function requestContactTags( itemId ) {
 	return {
@@ -200,3 +203,44 @@ export function resetQuery( queryVars = QUERY_DEFAULTS ) {
 		queryVars
 	};
 }
+
+// TODO build methods and do stuff
+
+export default (endpoint) => ( {
+		endpoint,
+		* addFile ( item  , data) {
+			// yield setIsCreatingItems(true);
+			try {
+				const result = yield apiFetch({
+					method: 'POST',
+					path: `${NAMESPACE}/${ endpoint }/${item}/files`,
+					body : data
+				})
+				return {success: true, ...result};
+			}
+			catch (e) {
+				// yield setSchedulingError(e);
+				return {success: false, e };
+			}
+		},
+
+		* fetchFiles (item , query) {
+			yield setIsRequestingFiles(true)
+			try {
+				const result = yield apiFetch({
+					path: addQueryArgs(`${NAMESPACE}/${ endpoint }/${item}/files`, query),
+				})
+
+				yield setIsRequestingFiles(false)
+				yield {
+					type: TYPES.RECEIVE_CONTACT_FILES,
+					files: result.items,
+					totalFiles: result.total_items
+				}
+			} catch (e) {
+				yield setRequestingFilesError(e)
+			}
+		},
+
+
+	} )

@@ -22,6 +22,9 @@ import TextField from '@material-ui/core/TextField'
 import { GeneralInfo } from './general-info'
 import { CustomInfo } from './custom-info'
 import { Segmentation } from './segmentation'
+import { ContactNotes } from 'components/layout/pages/contacts/contact-notes'
+import { Files } from 'components/layout/pages/contacts/files'
+import { Actions } from 'components/layout/pages/contacts/actions'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -50,16 +53,6 @@ const useStyles = makeStyles((theme) => ({
 // }));
 
 
-export const ContactSection = ({ section }) => {
-  return (
-    <div>
-      <h3>{section.title}</h3>
-      <Divider/>
-      <section.component/>
-    </div>
-  )
-
-}
 
 export const SingleView = (props) => {
   const classes = useStyles()
@@ -107,7 +100,43 @@ export const SingleView = (props) => {
           <Segmentation contact={contact}/>
         )
       }
-    }
+    },
+    {
+      label: 'Notes',
+      route: 'notes',
+      component: () => {
+        return (
+          <ContactNotes contact={contact}/>
+        )
+      }
+    },
+    {
+      label: 'Files',
+      route: 'files',
+      component: () => {
+        return (
+          <Files contact={contact}/>
+        )
+      }
+    },
+    {
+      label: 'Actions',
+      route: 'actions',
+      component: () => {
+        return (
+          <Actions contact={contact}/>
+        )
+      }
+    },{
+      label: 'Activity',
+      route: 'activity',
+      component: () => {
+        return (
+          <Actions contact={contact}/>
+        )
+      }
+    },
+
   ]
 
   return (
