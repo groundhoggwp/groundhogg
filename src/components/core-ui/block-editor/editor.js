@@ -76,11 +76,11 @@ export default ({ settings, email, history }) => {
     setContent(serialize(blocks));
   };
   const handleBlockResize = (width, height) => {
-    let modifiedBlocks = parse(content)
-    console.log(modifiedBlocks[2])
+    let modifiedBlocks = parse(content);
+    console.log(modifiedBlocks[2]);
     modifiedBlocks[2].attributes.width = width;
-    modifiedBlocks[2].attributes.height= height;
-    console.log(modifiedBlocks[2])
+    modifiedBlocks[2].attributes.height = height;
+    console.log(modifiedBlocks[2]);
     setContent(serialize(modifiedBlocks));
   };
 
@@ -116,7 +116,6 @@ export default ({ settings, email, history }) => {
 
   useEffect(() => {
     const dragMoveListener = (event) => {
-
       let target = event.target;
 
       // keep the dragged position in the data-x/data-y attributes
@@ -173,66 +172,66 @@ export default ({ settings, email, history }) => {
     var y = 0;
 
     // interact(".wp-block, .drag-drop")
-      interact('.drag-drop')
-      .resizable({
-        // resize from all edges and corners
-        edges: { left: true, right: true, bottom: true, top: true },
-
-        listeners: {
-          move(event) {
-            var target = event.target;
-            var x = parseFloat(target.getAttribute("data-x")) || 0;
-            var y = parseFloat(target.getAttribute("data-y")) || 0;
-
-
-            // update the element's style
-            target.style.width = event.rect.width + "px";
-            target.style.height = event.rect.height + "px";
-
-            // translate when resizing from top or left edges
-            x += event.deltaRect.left;
-            y += event.deltaRect.top;
-
-            target.style.webkitTransform = target.style.transform =
-              "translate(" + x + "px," + y + "px)";
-
-            target.setAttribute("data-x", x);
-            target.setAttribute("data-y", y);
-            // target.textContent =
-            //   Math.round(event.rect.width) +
-            //   "\u00D7" +
-            //   Math.round(event.rect.height);
-            console.log(target)
-            console.log(target.children[0])
-            handleBlockResize(target.style.width , target.style.height)
-
-          },
-        },
-        modifiers: [
-          // keep the edges inside the parent
-          interact.modifiers.restrictEdges({
-            outer: "parent",
-          }),
-
-          // minimum size
-          interact.modifiers.restrictSize({
-            min: { width: 100, height: 50 },
-          }),
-        ],
-
-        inertia: true,
-      })
+    interact(".drag-drop")
+      // .resizable({
+      //   // resize from all edges and corners
+      //   edges: { left: true, right: true, bottom: true, top: true },
+      //
+      //   listeners: {
+      //     move(event) {
+      //       var target = event.target;
+      //       var x = parseFloat(target.getAttribute("data-x")) || 0;
+      //       var y = parseFloat(target.getAttribute("data-y")) || 0;
+      //
+      //
+      //       // update the element's style
+      //       target.style.width = event.rect.width + "px";
+      //       target.style.height = event.rect.height + "px";
+      //
+      //       // translate when resizing from top or left edges
+      //       x += event.deltaRect.left;
+      //       y += event.deltaRect.top;
+      //
+      //       target.style.webkitTransform = target.style.transform =
+      //         "translate(" + x + "px," + y + "px)";
+      //
+      //       target.setAttribute("data-x", x);
+      //       target.setAttribute("data-y", y);
+      //       // target.textContent =
+      //       //   Math.round(event.rect.width) +
+      //       //   "\u00D7" +
+      //       //   Math.round(event.rect.height);
+      //       console.log(target)
+      //       console.log(target.children[0])
+      //       handleBlockResize(target.style.width , target.style.height)
+      //
+      //     },
+      //   },
+      //   modifiers: [
+      //     // keep the edges inside the parent
+      //     interact.modifiers.restrictEdges({
+      //       outer: "parent",
+      //     }),
+      //
+      //     // minimum size
+      //     interact.modifiers.restrictSize({
+      //       min: { width: 100, height: 50 },
+      //     }),
+      //   ],
+      //
+      //   inertia: true,
+      // })
       .draggable({
         inertia: true,
         modifiers: [
-          interact.modifiers.snap({
-            targets: [interact.createSnapGrid({ x: 30, y: 30 })],
-            range: Infinity,
-            relativePoints: [{ x: 0, y: 0 }],
-          }),
+          // interact.modifiers.snap({
+          //   targets: [interact.createSnapGrid({ x: 30, y: 30 })],
+          //   range: Infinity,
+          //   relativePoints: [{ x: 0, y: 0 }],
+          // }),
           interact.modifiers.restrictRect({
-            restriction: ".dropzone",
-            // restriction: "parent",
+            // restriction: ".dropzone",
+            restriction: "parent",
             endOnly: true,
           }),
         ],

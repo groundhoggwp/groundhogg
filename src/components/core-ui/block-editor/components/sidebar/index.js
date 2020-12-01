@@ -14,39 +14,57 @@ import {
   CopyHandler,
   BlockSelectionClearer,
   MultiSelectScrollIntoView,
-  Inserter,
-  // InserterListItem
 } from "@wordpress/block-editor";
-import {
-  getBlockTypes,
-  // InserterListItem
-} from "@wordpress/blocks";
+import { getBlockTypes } from "@wordpress/blocks";
+
 /**
  * External dependencies
  */
-import TextField from '@material-ui/core/TextField/TextField'
+import { makeStyles } from "@material-ui/core/styles";
+import { useEffect, useState } from "@wordpress/element";
+import TextField from "@material-ui/core/TextField/TextField";
+import Grid from "@material-ui/core/Grid/Grid";
+
 /**
  * Internal dependencies
  */
 
+const useStyles = makeStyles((theme) => ({
+  root: {},
+  searchField: {
+    width: "calc(100% - 20px)",
+    margin: "10px",
+  },
+}));
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
   "GroundhoggEmailBuilderSidebarInspector"
 );
 
-console.log(Inserter)
-// <Box className="">
-//   <Grid container spacing={ 2 }>
-//
-//   </Grid>
-// </Box>
-//TODO: Match more closely to core edit-post
+const Sidebar = () => {
+  const classes = useStyles();
 
+  const [blocks, setBlocks] = useState(getBlockTypes());
+  const [search, setSearch] = useState("");
+  let blockTypes = getBlockTypes();
 
-function Sidebar() {
-  let blockTypes = getBlockTypes()
-  console.log(asdfsadf, blockTypes)
-  let search = ""
+  const handleOnChange = (e) => {
+    setSearch(e.target.value);
+
+    updateBlocks();
+  };
+
+  const updateBlocks = () => {
+    if (e.target.value.trim() === "") {
+      setBlocks(getBlockTypes());
+    } else {
+      const newBlocks = getBlockTypes().filter(
+        (block) => block.title.toLowerCase().indexOf(search) !== -1
+      );
+      setBlocks(newBlocks);
+    }
+  };
+
   return (
     <div
       className="groundhogg-email-sidebar"
@@ -55,26 +73,42 @@ function Sidebar() {
       tabIndex="-1"
     >
       <Panel header={__("Blocks")}>
-          <TextField
-            value={ search }
-            label={ 'Search' }
-            type={ 'search' }
-            variant={ 'outlined' }
-            size={ 'small' }
-            fullWidth
-          />
-        <div id="yes-drop" className="drag-drop">
-          {" "}
-          #yes-drop{" "}
-
-        </div>
+        <TextField
+          className={classes.searchField}
+          value={search}
+          label={"Search"}
+          type={"search"}
+          variant={"outlined"}
+          size={"small"}
+          onChange={handleOnChange}
+          fullWidth
+        />
+        {blocks.map((block) => {
+          return (
+            <div className="block-editor-block drag-drop">
+              <svg
+                aria-hidden="true"
+                role="img"
+                focusable="false"
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                class="dashicon dashicons-shield"
+              >
+                <path d="M10 2s3 2 7 2c0 11-7 14-7 14S3 15 3 4c4 0 7-2 7-2zm0 8h5s1-1 1-5c0 0-5-1-6-2v7H5c1 4 5 7 5 7v-7z"></path>
+              </svg>
+              {block.title}
+            </div>
+          );
+        })}
       </Panel>
       <Panel header={__("Inspector")}>
         <InspectorSlot bubblesVirtually />
       </Panel>
     </div>
   );
-}
+};
 
 Sidebar.InspectorFill = InspectorFill;
 

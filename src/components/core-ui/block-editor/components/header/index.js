@@ -9,8 +9,7 @@ import { Button, Card, TextField } from "@material-ui/core";
 import { __ } from "@wordpress/i18n";
 import { Fragment } from "@wordpress/element";
 import { PinnedItems } from "@wordpress/interface";
-import { Inserter
-} from "@wordpress/block-editor";
+import { Inserter } from "@wordpress/block-editor";
 // import { Inserter
 // } from "../../wordpress-components/block-editor/";
 // import { InserterMenu
@@ -44,7 +43,7 @@ export default function Header({
         tabIndex="-1"
       >
         <HeaderToolbar>
-          <Inserter/>
+          <Inserter />
           <h1 className="groundhogg-header__title">
             <form noValidate autoComplete="off">
               <TextField

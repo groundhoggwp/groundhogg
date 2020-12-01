@@ -149,9 +149,8 @@ function BlockEditor({
                   <CopyHandler>
                     <WritingFlow>
                       <ObserveTyping>
-                        {/* Rendered blocks */ }
+                        {/* Rendered blocks */}
                         <BlockList />
-
                       </ObserveTyping>
                     </WritingFlow>
                   </CopyHandler>

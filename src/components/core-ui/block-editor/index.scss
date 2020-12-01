@@ -89,7 +89,6 @@
   border: 1px solid #ccc;
 }
 
-
 #inner-dropzone {
   position: absolute;
   height: 700px;
@@ -122,8 +121,8 @@
   padding: 2em 0.5em;
   margin: 1rem 0 0 1rem;
   z-index: 1000;
-  color: #fff;
-  background-color: #29e;
+  color: #000;
+  // background-color: #29e;
   border: solid 2px #fff;
 
   touch-action: none;
@@ -133,9 +132,15 @@
   transition: background-color 0.3s;
 }
 
-.drag-drop.can-drop {
-  color: #000;
-  background-color: #4e4;
+.drag-drop:hover {
+  color: "#007cbal";
+  background-color: "#007cbal";
+}
+
+.drop-active {
+  border: 1px solid #000;
+  // color: #000;
+  // background-color: #4e4;
 }
 
 #grid-snap {

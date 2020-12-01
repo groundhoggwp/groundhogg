@@ -48,4 +48,18 @@
   .block-editor-block-inspector__card {
     margin: 0;
   }
+
+  .block-editor-block {
+    width: 110px;
+    height: 110px;
+    text-align: center;
+    font-size: 12px;
+
+    svg {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: 15px;
+    }
+  }
 }
