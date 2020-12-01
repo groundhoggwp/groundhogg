@@ -9,11 +9,11 @@
  * Webpack is compiling as the input file.
  */
 
-import './spacer';
-import './divider';
-import './html';
-import './button';
-import  './image';
+import "./spacer";
+import "./divider";
+import "./html";
+import "./button";
+import "./image";
 // import  './text-block/index-material.js';
-import  './heading';
-import  './paragraph';
+import "./heading";
+import "./paragraph";
