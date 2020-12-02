@@ -44,7 +44,6 @@ export const Upload = (props) => {
       // make a rest api call here to upload a file
       const formData = new FormData()
       formData.append('upload', upload)
-      formData.append('key', 'value')
       createItems(formData, true)
 
     } else if (file) {

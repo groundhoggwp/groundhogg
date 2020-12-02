@@ -434,6 +434,10 @@ class Main_Roles extends Roles {
 	 * @return array[]
 	 */
 	public function get_roles_for_react_select() {
+		if (!function_exists('get_editable_roles')) {
+			require_once(ABSPATH . '/wp-admin/includes/user.php');
+		}
+
 		$editable_roles = array_reverse( get_editable_roles() );
 
 		$roles = [];

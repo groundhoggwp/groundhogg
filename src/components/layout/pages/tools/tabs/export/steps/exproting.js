@@ -1,9 +1,6 @@
-import { useState } from '@wordpress/element'
 import { addNotification } from 'utils/index'
 import { __ } from '@wordpress/i18n'
 import BulkJob from 'components/core-ui/bulk-job'
-import { Redirect } from 'react-router'
-import { DATETIME_FULL } from 'luxon/src/impl/formats'
 
 export const Exporting = (props) => {
 

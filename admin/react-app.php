@@ -38,7 +38,7 @@ class React_App {
 
 
 	/**
-	 * Adds field_map argument in the Groundhogg Object
+	 * Adds field_map argument in the Groundhogg Object also dumped some extra settings
 	 *
 	 * @param $obj
 	 *
@@ -62,6 +62,8 @@ class React_App {
 			'tags'
 		];
 		$obj[ 'export_meta_keys'] =  array_values( Plugin::$instance->dbs->get_db( 'contactmeta' )->get_keys() );
+
+		$obj[ 'user_roles' ] = Plugin::$instance->roles->get_roles_for_react_select();
 
 		return $obj;
 	}

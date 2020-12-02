@@ -102,6 +102,11 @@ export default (endpoint) => ({
   setIsRequestingItems,
   setRequestingError,
 
+  /**
+   *
+   * @param query
+   * @returns {Generator<{totalItems: *, type: string, items: *}|{type: string, isRequesting: *}|{request: Object, type: string}|{type: string, error: *}, void, *>}
+   */
   * fetchItems (query) {
     yield setIsRequestingItems(true)
 

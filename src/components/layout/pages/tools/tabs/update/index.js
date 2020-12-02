@@ -1,11 +1,20 @@
 
 import {addFilter, applyFilters} from "@wordpress/hooks";
 import {__} from "@wordpress/i18n";
+import EmailPicker from 'components/core-ui/email-picker'
+import { useState } from '@wordpress/element'
 
 
 
 export const Updates  = (props) =>{
-    return (<h1>Updates </h1>);
+    const  [email , setEmail ] =useState ();
+
+    console.log(email)
+
+    console.log(email)
+    return (
+      <EmailPicker onChange = {setEmail} value={email} />
+    );
 }
 
 
@@ -13,7 +22,7 @@ export const Updates  = (props) =>{
 //Hook to push content into the page
 addFilter('groundhogg.tools.tabs', 'groundhogg', (tabs) => {
     tabs.push({
-        title: __("updates" , 'groundhogg' ),
+        title: __("Updates" , 'groundhogg' ),
         path: '/updates',
         description: __('First Description'  ,'groundhogg'),
         component: (classes) => {

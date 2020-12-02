@@ -12,4 +12,6 @@ export const initialState = {
 	query: QUERY_DEFAULTS,
 	data: [],
 	error: {},
+	files : [],
+	totalFiles : 0
 };
