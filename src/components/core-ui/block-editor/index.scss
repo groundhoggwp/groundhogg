@@ -112,7 +112,9 @@
 }
 
 .drop-active {
-  border-color: #aaa;
+  color: #005a87;
+  border: 1px solid #005a87;
+  z-index: 999;
 }
 
 .drop-target {
@@ -137,17 +139,9 @@
   background: #fff;
 }
 
-.side-bar-drag-drop-block:hover{
+.side-bar-drag-drop-block:hover {
   color: #2196f3;
-  border:1px solid #2196f3;
-}
-
-.side-bar-drag-drop-block.drop-active {
-  color: #005a87;
-  border: 1px solid #005a87;
-  z-index: 999;
-  // color: #000;
-  // background-color: #4e4;
+  border: 1px solid #2196f3;
 }
 
 #grid-snap {
