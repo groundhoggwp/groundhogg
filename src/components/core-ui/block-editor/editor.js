@@ -72,7 +72,8 @@ export default ({ settings, email, history }) => {
   const handlePreHeaderChange = (e) => {
     setPreHeader(e.target.value);
   };
-  const handleContentChange = (blocks) => {
+  const handleContentChange = (blocks) => {    
+    if(!Array.isArray(blocks)){return;}
     setContent(serialize(blocks));
   };
   const handleBlockResize = (width, height) => {

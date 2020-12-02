@@ -95,12 +95,14 @@ function BlockEditor({
   }, []);
 
   const handleUpdateBlocks = (blocks) => {
+    console.log('update', blocks)
     updateBlocks(blocks);
+    handleContentChange(blocks);
   };
 
   const handlePersistBlocks = (newBlocks) => {
     // updateBlocks( newBlocks );
-    // console.log('handlePersistBlocks' , newBlocks)
+    console.log('handlePersistBlocks' , newBlocks)
     // window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) )
     handleContentChange(blocks);
   };
