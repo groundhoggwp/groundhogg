@@ -18,6 +18,7 @@ const TYPES = {
 
 	/** Sub-Type Resolver Actions. Possible worth simplifying into isRequesting( type ) */
 	/** Opting for verbosity in the data store in favor of clarity in components for now. */
+	/** build in a such a way it will manipulate isRequesting and other state variable form the base actions**/
 	SET_IS_REQUESTING_TAGS: 'SET_IS_REQUESTING_TAGS',
 	SET_IS_DELETING_TAGS: 'SET_IS_DELETING_TAGS',
 	SET_IS_ADDING_TAGS: 'SET_IS_ADDING_TAGS',

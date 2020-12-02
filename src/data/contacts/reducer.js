@@ -15,7 +15,10 @@ const contactsReducer = (
     others,
     isMerging,
     context,
-    queryVars
+    queryVars,
+    isRequesting,
+    isDeleting,
+    isAdding
   }
 ) => {
   switch (type) {
@@ -45,10 +48,25 @@ const contactsReducer = (
         showFilters: true
       }
     case TYPES.RECEIVE_CONTACT_FILES :
-      return  {
+      return {
         ...state,
         files,
         totalFiles,
+      }
+    case TYPES.SET_IS_REQUESTING_FILES :
+      return {
+        ...state,
+        isRequesting,
+      }
+    case TYPES.SET_IS_ADDING_FILES :
+      return {
+        ...state,
+        isAdding,
+      }
+    case TYPES.SET_IS_DELETING_FILES :
+      return {
+        ...state,
+        isDeleting,
       }
     default:
       return state
