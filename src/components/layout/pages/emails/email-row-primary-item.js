@@ -42,10 +42,12 @@ export const EmailRowPrimaryItem = ( props ) => {
 	const classes = useStyles();
 	const { data, ID } = props;
 
+	const title =  data.title === "" ? "No title" :  data.title
+
 	return (
 		<Fragment>
 			 <Link to={ `/emails/${ID}` }>
-				 { data.title }
+				 { title }
 			 </Link>
 			{ getContactRowStatus( data ) }
 			<br />

@@ -1,63 +1,62 @@
 .groundhogg-header {
-	align-items: center;
-	background: $white;
-	display: flex;
-	height: $header-height;
-	justify-content: space-between;
-	left: 0;
-	position: sticky;
-	right: 0;
-	top: 75px;
-	width: 100%;
+  align-items: center;
+  background: $white;
+  display: flex;
+  height: $header-height;
+  justify-content: space-between;
+  left: 0;
+  position: sticky;
+  right: 0;
+  top: 75px;
+  width: 100%;
 }
 
 .interface-interface-skeleton__header {
-	border: none;
-	outline: none;
-	background: none;
+  border: none;
+  outline: none;
+  background: none;
 }
 
-.groundhogg-email-sidebar{
- outline: none;
+.groundhogg-email-sidebar {
+  outline: none;
 }
 
-.groundhogg-header-toolbar{
-	width: 100%;
+.groundhogg-header-toolbar {
+  width: 100%;
 }
 
-.groundhogg-header{
-	outline: none;
+.groundhogg-header {
+  outline: none;
 }
 
 .groundhogg-header__title {
-	font-size: 16px;
-	outline: none;
-	width: calc(100% - 345px);
-	padding: 20px;
-	.MuiTextField-root {
-		width: 100%;
-	}
+  font-size: 16px;
+  outline: none;
+  width: calc(100% - 345px);
+  padding: 20px;
+  .MuiTextField-root {
+    width: 100%;
+  }
 }
 button,
 h1 {
-	float: left;
+  float: left;
 }
 
-
 .groundhogg-header__settings {
-	float: right
+  float: right;
 }
 
 .groundhogg-header__settings button {
-	margin: 0 8px;
-	&:last-child {
-		margin: 0
-	}
+  margin: 0 8px;
+  &:last-child {
+    margin: 0;
+  }
 }
 
 .groundhogg-header-toolbar__large-device-toggle,
 .groundhogg-header-toolbar__mobile-device-toggle {
-	.MuiButton-startIcon {
-		margin-right: 0;
-	}
+  .MuiButton-startIcon {
+    margin-right: 0;
+  }
 }

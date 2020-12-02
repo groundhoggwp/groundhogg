@@ -14,7 +14,7 @@
     "packages-update": "wp-scripts packages-update",
     "prettierComp": "prettier --check --write ./src/components/core-ui/stats/index.js",
     "prettierPage": "prettier --check --write ./src/components/layout/pages/reports/**.js",
-    "prettier-full": "prettier --check --write ./src/components/**/**/index.js",
+    "prettier-full": "prettier --check --write ./src/components/core-ui/block-editor/**/**/** && prettier --check --write ./src/components/core-ui/block-editor/**/** && prettier --check --write ./src/components/core-ui/block-editor/**",
     "start": "wp-scripts start",
     "test:e2e": "wp-scripts test-e2e",
     "test:unit": "wp-scripts test-unit-js",
