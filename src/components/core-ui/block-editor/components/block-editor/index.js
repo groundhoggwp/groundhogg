@@ -117,52 +117,50 @@ function BlockEditor({
         onInput={handleUpdateBlocks}
         onChange={handlePersistBlocks}
       >
-        <Grid container spacing={3}>
-          <Grid item xs={9}>
-            <Card className={classes.subjectHeader}>
-              <form noValidate autoComplete="off">
-                <TextField
-                  className={classes.subjectInputs}
-                  onChange={handleSubjectChange}
-                  label={"Subject"}
-                  value={subject}
-                />
-                <TextField
-                  className={classes.subjectInputs}
-                  onChange={handlePreHeaderChange}
-                  label={"Pre Header"}
-                  value={preHeader}
-                  placeholder={__(
-                    "Pre Header Text: Used to summarize the content of the email."
-                  )}
-                />
-              </form>
-            </Card>
-            <Paper>
-              <BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper">
-                <VisualEditorGlobalKeyboardShortcuts />
-                <MultiSelectScrollIntoView />
-                {/* Add Block Button */}
-                <BlockEditorKeyboardShortcuts.Register />
-                <Popover.Slot name="block-toolbar" />
-                <Typewriter>
-                  <CopyHandler>
-                    <WritingFlow>
-                      <ObserveTyping>
-                        {/* Rendered blocks */}
-                        <BlockList />
-                      </ObserveTyping>
-                    </WritingFlow>
-                  </CopyHandler>
-                </Typewriter>
-              </BlockSelectionClearer>
-            </Paper>
-          </Grid>
-          <Sidebar.InspectorFill>
-            <Popover name="block-toolbar" />
-            <BlockInspector />
-          </Sidebar.InspectorFill>
-        </Grid>
+        <div className="groundhogg-block-editor__email-content">
+          <Card className={classes.subjectHeader}>
+            <form noValidate autoComplete="off">
+              <TextField
+                className={classes.subjectInputs}
+                onChange={handleSubjectChange}
+                label={"Subject"}
+                value={subject}
+              />
+              <TextField
+                className={classes.subjectInputs}
+                onChange={handlePreHeaderChange}
+                label={"Pre Header"}
+                value={preHeader}
+                placeholder={__(
+                  "Pre Header Text: Used to summarize the content of the email."
+                )}
+              />
+            </form>
+          </Card>
+          <Paper>
+            <BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper">
+              <VisualEditorGlobalKeyboardShortcuts />
+              <MultiSelectScrollIntoView />
+              {/* Add Block Button */}
+              <BlockEditorKeyboardShortcuts.Register />
+              <Popover.Slot name="block-toolbar" />
+              <Typewriter>
+                <CopyHandler>
+                  <WritingFlow>
+                    <ObserveTyping>
+                      {/* Rendered blocks */}
+                      <BlockList />
+                    </ObserveTyping>
+                  </WritingFlow>
+                </CopyHandler>
+              </Typewriter>
+            </BlockSelectionClearer>
+          </Paper>
+        </div>
+        <Sidebar.InspectorFill>
+          <Popover name="block-toolbar" />
+          <BlockInspector />
+        </Sidebar.InspectorFill>
       </BlockEditorProvider>
     </div>
   );

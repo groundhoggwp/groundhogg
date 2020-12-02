@@ -49,7 +49,7 @@
 }
 
 .groundhogg-block-editor {
-  top: 140px;
+  top: 129px;
   padding-bottom: 280px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -95,6 +95,11 @@
   width: calc(100% - 300px);
 }
 
+.side-bar-blocks-container {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
 .dropzone {
   background-color: #bfe4ff;
   border: dashed 4px transparent;
@@ -115,24 +120,22 @@
   border-style: solid;
 }
 
-.drag-drop {
+.side-bar-drag-drop-block {
   display: inline-block;
   width: 40px;
   padding: 2em 0.5em;
-  margin: 1rem 0 0 1rem;
+  border: 1px solid #ccc;
+  margin: 5px;
   z-index: 1000;
   color: #000;
-  // background-color: #29e;
-  border: solid 2px #fff;
-
   touch-action: none;
   -webkit-transform: translate(0px, 0px);
   transform: translate(0px, 0px);
-
+  border-radius: 4px;
   transition: background-color 0.3s;
 }
 
-.drag-drop:hover {
+.side-bar-drag-drop-block:hover {
   color: "#007cbal";
   background-color: "#007cbal";
 }

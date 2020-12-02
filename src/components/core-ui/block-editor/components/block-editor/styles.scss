@@ -13,3 +13,7 @@
     max-width: $content-width;
   }
 }
+
+.groundhogg-block-editor__email-content {
+  width: calc(100% - 400px);
+}

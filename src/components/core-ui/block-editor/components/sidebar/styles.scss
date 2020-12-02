@@ -17,7 +17,8 @@
   height: 100vh;
   right: 0;
   top: 0;
-  width: $sidebar-width;
+  width: 371px;
+  margin-right: 20px;
 
   @include break-small() {
     -webkit-overflow-scrolling: touch;
@@ -42,6 +43,7 @@
 
     > .components-panel__header {
       background: $gray-200;
+      border-radius: 4px 4px 0 0;
     }
   }
 

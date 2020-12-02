@@ -11,14 +11,14 @@
   width: 100%;
 }
 
+.interface-interface-skeleton__body {
+  overflow: visible;
+}
+
 .interface-interface-skeleton__header {
   border: none;
   outline: none;
   background: none;
-}
-
-.groundhogg-email-sidebar {
-  outline: none;
 }
 
 .groundhogg-header-toolbar {
@@ -32,7 +32,7 @@
 .groundhogg-header__title {
   font-size: 16px;
   outline: none;
-  width: calc(100% - 345px);
+  width: calc(100% - 402px);
   padding: 20px;
   .MuiTextField-root {
     width: 100%;
@@ -59,4 +59,8 @@ h1 {
   .MuiButton-startIcon {
     margin-right: 0;
   }
+}
+
+.groundhogg-header .components-button svg {
+  fill: #fff;
 }
