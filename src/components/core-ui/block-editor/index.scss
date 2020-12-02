@@ -22,7 +22,8 @@
 
 .editor-styles-wrapper {
   width: 100%;
-
+  margin-left: auto;
+  margin-right: auto;
   @include break-small {
     width: calc(100% - #{$sidebar-width});
   }
@@ -132,16 +133,19 @@
   -webkit-transform: translate(0px, 0px);
   transform: translate(0px, 0px);
   border-radius: 4px;
-  transition: background-color 0.3s;
+  // transition: background-color 0.3s;
+  background: #fff;
 }
 
-.side-bar-drag-drop-block:hover {
-  color: "#007cbal";
-  background-color: "#007cbal";
+.side-bar-drag-drop-block:hover{
+  color: #2196f3;
+  border:1px solid #2196f3;
 }
 
-.drop-active {
-  border: 1px solid #000;
+.side-bar-drag-drop-block.drop-active {
+  color: #005a87;
+  border: 1px solid #005a87;
+  z-index: 999;
   // color: #000;
   // background-color: #4e4;
 }

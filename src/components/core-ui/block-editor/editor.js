@@ -118,6 +118,8 @@ export default ({ settings, email, history }) => {
     const dragMoveListener = (event) => {
       let target = event.target;
 
+      event.target.classList.toggle('drop-active')
+
       // keep the dragged position in the data-x/data-y attributes
       let x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
       let y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
@@ -132,7 +134,9 @@ export default ({ settings, email, history }) => {
     };
     const dragEndListener = (event) => {
       let target = event.target;
-      console.log("release");
+      document.querySelectorAll('.block-editor-block.drop-active').forEach((ele)=>{
+        ele.classList.toggle('drop-active');
+      })
 
       // keep the dragged position in the data-x/data-y attributes
       let x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
