@@ -46,15 +46,17 @@ const Sidebar = () => {
 
   const [blocks, setBlocks] = useState(getBlockTypes());
   const [search, setSearch] = useState("");
-  let blockTypes = getBlockTypes();
+
+  useEffect(() => {
+    updateBlocks();
+  }, [search]);
 
   const handleOnChange = (e) => {
-    setSearch(e.target.value);
-    updateBlocks(e.target.value.trim());
+    setSearch(e.target.value.trim());
   };
 
-  const updateBlocks = (searchTerm) => {
-    if (searchTerm === "") {
+  const updateBlocks = () => {
+    if (search === "") {
       setBlocks(getBlockTypes());
     } else {
       const newBlocks = getBlockTypes().filter(

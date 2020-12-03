@@ -95,14 +95,14 @@ function BlockEditor({
   }, []);
 
   const handleUpdateBlocks = (blocks) => {
-    console.log('update', blocks)
+    console.log("update", blocks);
     updateBlocks(blocks);
     handleContentChange(blocks);
   };
 
   const handlePersistBlocks = (newBlocks) => {
     // updateBlocks( newBlocks );
-    console.log('handlePersistBlocks' , newBlocks)
+    console.log("handlePersistBlocks", newBlocks);
     // window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) )
     handleContentChange(blocks);
   };
@@ -140,6 +140,16 @@ function BlockEditor({
             </form>
           </Card>
           <Paper>
+            <div
+              id="block-editor-droppable-area"
+              className="side-bar-drag-drop-block"
+            >
+              {" "}
+              #yes-drop{" "}
+            </div>
+            <div id="inner-dropzone" className="dropzone">
+              #inner-dropzone
+            </div>
             <BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper">
               <VisualEditorGlobalKeyboardShortcuts />
               <MultiSelectScrollIntoView />

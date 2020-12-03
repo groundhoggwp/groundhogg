@@ -72,8 +72,10 @@ export default ({ settings, email, history }) => {
   const handlePreHeaderChange = (e) => {
     setPreHeader(e.target.value);
   };
-  const handleContentChange = (blocks) => {    
-    if(!Array.isArray(blocks)){return;}
+  const handleContentChange = (blocks) => {
+    if (!Array.isArray(blocks)) {
+      return;
+    }
     setContent(serialize(blocks));
   };
   const handleBlockResize = (width, height) => {
@@ -156,7 +158,8 @@ export default ({ settings, email, history }) => {
 
     interact(".dropzone").dropzone({
       // only accept elements matching this CSS selector
-      accept: "#block-editor-droppable-area",
+      // accept: ".edit-post-visual-editor",
+      // accept: "#block-editor-droppable-area",
       // Require a 75% element overlap for a drop to be possible
       overlap: 0.75,
 
@@ -182,6 +185,7 @@ export default ({ settings, email, history }) => {
         event.relatedTarget.textContent = "Dragged out";
       },
       ondrop: function (event) {
+        // Add block here
         event.relatedTarget.textContent = "Dropped";
       },
       ondropdeactivate: function (event) {
@@ -195,7 +199,7 @@ export default ({ settings, email, history }) => {
     var y = 0;
 
     // interact(".wp-block, .side-bar-drag-drop-block")
-    interact(".side-bar-drag-drop-block").draggable({
+    interact(".side-bar-drag-drop-block, .wp-block").draggable({
       cursorChecker(action, interactable, element, interacting) {
         return "grab";
       },
@@ -217,8 +221,7 @@ export default ({ settings, email, history }) => {
       onend: dragEndListener,
       listeners: { move: dragMoveListener },
     });
-    // .styleCursor('grab')
-    // .resizable({
+    // interact(".wp-block").resizable({
     //   // resize from all edges and corners
     //   edges: { left: true, right: true, bottom: true, top: true },
     //
@@ -227,7 +230,6 @@ export default ({ settings, email, history }) => {
     //       var target = event.target;
     //       var x = parseFloat(target.getAttribute("data-x")) || 0;
     //       var y = parseFloat(target.getAttribute("data-y")) || 0;
-    //
     //
     //       // update the element's style
     //       target.style.width = event.rect.width + "px";
@@ -246,10 +248,9 @@ export default ({ settings, email, history }) => {
     //       //   Math.round(event.rect.width) +
     //       //   "\u00D7" +
     //       //   Math.round(event.rect.height);
-    //       console.log(target)
-    //       console.log(target.children[0])
-    //       handleBlockResize(target.style.width , target.style.height)
-    //
+    //       console.log(target);
+    //       console.log(target.children[0]);
+    //       handleBlockResize(target.style.width, target.style.height);
     //     },
     //   },
     //   modifiers: [
@@ -265,7 +266,7 @@ export default ({ settings, email, history }) => {
     //   ],
     //
     //   inertia: true,
-    // })
+    // });
   });
 
   let editorPanel;
@@ -285,22 +286,6 @@ export default ({ settings, email, history }) => {
       break;
     case "text":
       editorPanel = <PostTextEditor />;
-      break;
-    case "drag-and-drop-test":
-      editorPanel = (
-        <Fragment>
-          <div
-            id="block-editor-droppable-area"
-            className="side-bar-drag-drop-block"
-          >
-            {" "}
-            #yes-drop{" "}
-          </div>
-          <div id="inner-dropzone" className="dropzone">
-            #inner-dropzone
-          </div>
-        </Fragment>
-      );
       break;
     default:
       editorPanel = (

@@ -190,27 +190,6 @@ function HeaderSecondary() {
           "Generic label for desktop preview button"
         )}
       ></ToolbarItem>
-      <ToolbarItem
-        as={Button}
-        className={
-          classes.button + " groundhogg-header-toolbar__large-device-toggle"
-        }
-        variant="contained"
-        color="secondary"
-        onMouseDown={(event) => {
-          event.preventDefault();
-        }}
-        size="small"
-        onClick={() => switchEditorMode("drag-and-drop-test")}
-        /* translators: button label text should, if possible, be under 16
-		characters. */
-        label={_x(
-          "Desktop Preview Toggle",
-          "Generic label for desktop preview button"
-        )}
-      >
-        drag-and-drop-test
-      </ToolbarItem>
     </div>
   );
 }
