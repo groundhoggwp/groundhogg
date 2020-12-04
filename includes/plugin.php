@@ -329,6 +329,7 @@ class Plugin {
 
         new Extension_Upgrader();
         new Plugin_Compatibility();
+        new License_Nag();
 
         // Partner
         SendWp::instance();
