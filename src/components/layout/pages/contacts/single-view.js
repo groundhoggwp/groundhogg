@@ -24,7 +24,6 @@ import { CustomInfo } from './custom-info'
 import { Segmentation } from './segmentation'
 import { ContactNotes } from 'components/layout/pages/contacts/contact-notes'
 import { Files } from 'components/layout/pages/contacts/files'
-import { Actions } from 'components/layout/pages/contacts/actions'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -116,23 +115,6 @@ export const SingleView = (props) => {
       component: () => {
         return (
           <Files contact={contact}/>
-        )
-      }
-    },
-    {
-      label: 'Actions',
-      route: 'actions',
-      component: () => {
-        return (
-          <Actions contact={contact}/>
-        )
-      }
-    },{
-      label: 'Activity',
-      route: 'activity',
-      component: () => {
-        return (
-          <Actions contact={contact}/>
         )
       }
     },
