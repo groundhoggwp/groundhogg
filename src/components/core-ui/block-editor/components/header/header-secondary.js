@@ -37,7 +37,7 @@ const useStyles = makeStyles({
     marginRight: "8px",
   },
 });
-function HeaderSecondary() {
+export default ({ handleViewTypeChange }) => {
   const classes = useStyles();
 
   const { editorMode, isInserterEnabled } = useSelect(
@@ -162,6 +162,7 @@ function HeaderSecondary() {
         color="secondary"
         onMouseDown={(event) => {
           event.preventDefault();
+          handleViewTypeChange("mobile");
         }}
         startIcon={<SmartphoneIcon />}
         /* translators: button label text should, if possible, be under 16
@@ -180,6 +181,7 @@ function HeaderSecondary() {
         color="secondary"
         onMouseDown={(event) => {
           event.preventDefault();
+          handleViewTypeChange("desktop");
         }}
         startIcon={<DesktopMacIcon />}
         size="small"
@@ -192,6 +194,4 @@ function HeaderSecondary() {
       ></ToolbarItem>
     </div>
   );
-}
-
-export default HeaderSecondary;
+};

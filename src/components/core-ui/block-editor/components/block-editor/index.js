@@ -41,18 +41,6 @@ import Sidebar from "../sidebar";
 //TODO Implement block persistence with email data store.
 //TODO Potentially use our own alerts data store (core).
 
-const useStyles = makeStyles((theme) => ({
-  subjectHeader: {
-    padding: "20px",
-    marginBottom: "10px",
-  },
-  subjectInputs: {
-    width: "100%",
-    padding: "",
-    marginBottom: "10px",
-  },
-}));
-
 function BlockEditor({
   settings: _settings,
   subject,
@@ -61,7 +49,26 @@ function BlockEditor({
   handlePreHeaderChange,
   content,
   handleContentChange,
+  viewType,
 }) {
+  const useStyles = makeStyles((theme) => ({
+    subjectHeader: {
+      padding: "20px",
+      marginBottom: "10px",
+    },
+    subjectInputs: {
+      width: "100%",
+      padding: "",
+      marginBottom: "10px",
+    },
+    emailContent: {
+      display: "block",
+      width: viewType === "desktop" ? "600px" : "320px",
+      marginLeft: "auto",
+      marginRight: "auto",
+    },
+  }));
+
   const [blocks, updateBlocks] = useState([]);
   const { createInfoNotice } = useDispatch("core/notices");
   const classes = useStyles();
@@ -111,6 +118,8 @@ function BlockEditor({
     settings.__experimentalBlockPatterns = [];
   }
 
+  console.log(viewType, viewType === "desktop", classes.emailContent);
+
   return (
     <div className="groundhogg-block-editor">
       <BlockEditorProvider
@@ -119,7 +128,7 @@ function BlockEditor({
         onInput={handleUpdateBlocks}
         onChange={handlePersistBlocks}
       >
-        <div className="groundhogg-block-editor__email-content">
+        <div className="groundhogg-block-editor__email-container">
           <Card className={classes.subjectHeader}>
             <form noValidate autoComplete="off">
               <TextField
@@ -142,31 +151,31 @@ function BlockEditor({
           <Paper>
             <div
               id="block-editor-droppable-area"
-              className="side-bar-drag-drop-block"
+              className={classes.emailContent + " side-bar-drag-drop-block"}
             >
               {" "}
               #yes-drop{" "}
+              <div id="inner-dropzone" className="dropzone">
+                #inner-dropzone
+              </div>
+              <BlockSelectionClearer className={classes}>
+                <VisualEditorGlobalKeyboardShortcuts />
+                <MultiSelectScrollIntoView />
+                {/* Add Block Button */}
+                <BlockEditorKeyboardShortcuts.Register />
+                <Popover.Slot name="block-toolbar" />
+                <Typewriter>
+                  <CopyHandler>
+                    <WritingFlow>
+                      <ObserveTyping>
+                        {/* Rendered blocks */}
+                        <BlockList />
+                      </ObserveTyping>
+                    </WritingFlow>
+                  </CopyHandler>
+                </Typewriter>
+              </BlockSelectionClearer>
             </div>
-            <div id="inner-dropzone" className="dropzone">
-              #inner-dropzone
-            </div>
-            <BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper">
-              <VisualEditorGlobalKeyboardShortcuts />
-              <MultiSelectScrollIntoView />
-              {/* Add Block Button */}
-              <BlockEditorKeyboardShortcuts.Register />
-              <Popover.Slot name="block-toolbar" />
-              <Typewriter>
-                <CopyHandler>
-                  <WritingFlow>
-                    <ObserveTyping>
-                      {/* Rendered blocks */}
-                      <BlockList />
-                    </ObserveTyping>
-                  </WritingFlow>
-                </CopyHandler>
-              </Typewriter>
-            </BlockSelectionClearer>
           </Paper>
         </div>
         <Sidebar.InspectorFill>

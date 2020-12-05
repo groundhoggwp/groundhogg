@@ -49,6 +49,7 @@ export default ({ settings, email, history }) => {
   const [subject, setSubject] = useState(defaultSubjectValue);
   const [preHeader, setPreHeader] = useState(defaultPreHeaderValue);
   const [content, setContent] = useState(defaultContentValue);
+  const [viewType, setViewType] = useState("desktop");
 
   const { editorMode, isSaving, item } = useSelect(
     (select) => ({
@@ -269,6 +270,10 @@ export default ({ settings, email, history }) => {
     // });
   });
 
+  const handleViewTypeChange = (type) => {
+    setViewType(type);
+  };
+
   let editorPanel;
   switch (editorMode) {
     case "visual":
@@ -281,6 +286,7 @@ export default ({ settings, email, history }) => {
           handlePreHeaderChange={handlePreHeaderChange}
           content={content}
           handleContentChange={handleContentChange}
+          viewType={viewType}
         />
       );
       break;
@@ -297,6 +303,7 @@ export default ({ settings, email, history }) => {
           handlePreHeaderChange={handlePreHeaderChange}
           content={content}
           handleContentChange={handleContentChange}
+          viewType={viewType}
         />
       );
   }
@@ -317,6 +324,7 @@ export default ({ settings, email, history }) => {
                   closeEditor={closeEditor}
                   isSaving={isSaving}
                   handleTitleChange={handleTitleChange}
+                  handleViewTypeChange={handleViewTypeChange}
                   title={title}
                 />
               }

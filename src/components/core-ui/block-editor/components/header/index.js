@@ -48,6 +48,7 @@ export default function Header({
   isSaving,
   handleTitleChange,
   title,
+  handleViewTypeChange,
 }) {
   const classes = useStyles();
   return (
@@ -95,7 +96,7 @@ export default function Header({
         tabIndex="-1"
       >
         <HeaderToolbar>
-          <HeaderSecondary />
+          <HeaderSecondary handleViewTypeChange={handleViewTypeChange} />
         </HeaderToolbar>
       </div>
     </Card>
