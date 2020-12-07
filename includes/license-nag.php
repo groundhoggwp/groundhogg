@@ -19,6 +19,7 @@ class License_Nag {
 	 */
 	public function get_expired_licenses() {
 		$extensions = License_Manager::get_expired_licenses();
+
 		return array_pop( $extensions );
 	}
 
@@ -37,6 +38,11 @@ class License_Nag {
 			'edd_license_key' => $license_key
 		], self::CHECKOUT_URL );
 
+		$deactivate_url = admin_url( wp_nonce_url( add_query_arg( [
+			'action'    => 'deactivate_license',
+			'license'   => $license_key,
+		], 'admin.php?page=gh_settings&tab=extensions' ) ) );
+
 		$check_license_url = Plugin::instance()->bulk_jobs->check_licenses->get_start_url();
 
 		?>
@@ -49,6 +55,8 @@ class License_Nag {
                    href="<?php echo esc_url( $renewal_url ); ?>"><?php _e( "👉 Yes, I'd like to renew my license!", 'groundhogg' ); ?></a>
                 <a class="button button-secondary"
                    href="<?php echo esc_url( $check_license_url ); ?>"><?php _e( "Verify my renewal", 'groundhogg' ); ?></a>
+                <a class="button button-secondary"
+                   href="<?php echo esc_url( $deactivate_url ); ?>"><?php _e( "Deactivate this license.", 'groundhogg' ); ?></a>
             </p>
             <p>
                 <i><?php _e( "⚠️ By not updating your extensions, you leave your site at risk to bugs and plugin conflicts. These can cause user experience issues, or worse, crash your site and disable it altogether.", 'groundhogg' ) ?></i>
@@ -62,8 +70,9 @@ class License_Nag {
 	 */
 	public function show_non_licensed_extensions_nag() {
 
-		$licensed  = array_filter( array_keys( License_Manager::get_extension_licenses() ) );
-		$installed = Extension::$extension_ids;
+		// Only check against official extensions
+		$licensed  = array_intersect( Extension::$extension_ids, array_keys( License_Manager::get_extension_licenses() ) );
+		$installed = array_intersect( Extension::$extension_ids, Extension_Upgrader::get_extension_ids() );
 
 		if ( count( $installed ) === count( $licensed ) ) {
 			return;

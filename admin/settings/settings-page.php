@@ -229,11 +229,9 @@ class Settings_Page extends Admin_Page {
 	public function process_deactivate_license() {
 
 		$item_id = absint( get_request_var( 'extension' ) );
+		$license = sanitize_text_field( get_request_var( 'license' ) );
 
-		if ( $item_id ) {
-			License_Manager::deactivate_license( $item_id );
-		}
-
+        License_Manager::deactivate_license( $item_id ?: $license );
 	}
 
 	/**

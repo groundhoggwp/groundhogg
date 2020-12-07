@@ -161,6 +161,21 @@ class License_Manager {
 	}
 
 	/**
+	 * Get the extension Ids which are being used with a specific license.
+	 *
+	 * @param $license
+	 *
+	 * @return array
+	 */
+	public static function get_extensions_by_license( $license ) {
+		self::init_licenses();
+
+		return array_keys( array_filter( self::$extensions, function ( $extension ) use ( $license ) {
+			return $extension['license'] === $license;
+		} ) );
+	}
+
+	/**
 	 * Get the status of a specific license
 	 *
 	 * @param $item_id
@@ -233,12 +248,12 @@ class License_Manager {
 	}
 
 	/**
-     * Get the error message for a given error.
-     *
+	 * Get the error message for a given error.
+	 *
 	 * @param       $error
 	 * @param false $expiry
-     *
-     * @return string
+	 *
+	 * @return string
 	 */
 	protected static function get_license_error_message( $error, $expiry = false ) {
 
@@ -246,7 +261,7 @@ class License_Manager {
 			case 'expired' :
 				$message = sprintf(
 					_x( 'Your license key expired on %s.', 'notice', 'groundhogg' ),
-					date_i18n( get_option( 'date_format' ), strtotime($expiry, current_time( 'timestamp' ) ) )
+					date_i18n( get_option( 'date_format' ), strtotime( $expiry, current_time( 'timestamp' ) ) )
 				);
 				break;
 			case 'invalid' :
@@ -316,7 +331,7 @@ class License_Manager {
 			$license_data = json_decode( wp_remote_retrieve_body( $response ) );
 			if ( false === $license_data->success ) {
 
-			    $message = self::get_license_error_message( $license_data->error, $license_data->expires );
+				$message = self::get_license_error_message( $license_data->error, $license_data->expires );
 
 			}
 		}
@@ -336,8 +351,8 @@ class License_Manager {
 	}
 
 	/**
-     * Activate a license key
-     *
+	 * Activate a license key
+	 *
 	 * @param $license
 	 * @param $item_id
 	 *
@@ -345,29 +360,36 @@ class License_Manager {
 	 */
 	public static function activate_license( $license, $item_id ) {
 
-	    $result = self::activate_license_quietly( $license, $item_id );
+		$result = self::activate_license_quietly( $license, $item_id );
 
-	    if ( is_wp_error( $result ) ){
-	        notices()->add( $result );
+		if ( is_wp_error( $result ) ) {
+			notices()->add( $result );
 
-	        return false;
-        }
+			return false;
+		}
 
-	    notices()->add( 'license_activated', __( 'License activated!', 'groundhogg' ) );
+		notices()->add( 'license_activated', __( 'License activated!', 'groundhogg' ) );
 
-	    return true;
+		return true;
 	}
 
 	/**
 	 * Deactivate a license
 	 *
-	 * @param $license string
+	 * @param int|string $item_id_or_license
 	 *
 	 * @return bool
 	 */
-	public static function deactivate_license( $item_id = 0 ) {
+	public static function deactivate_license( $item_id_or_license = 0 ) {
 
-		$license = self::get_license( $item_id );
+		if ( is_int( $item_id_or_license ) ) {
+			$item_id = $item_id_or_license;
+			$license = self::get_license( $item_id );
+		} else {
+			$license = $item_id_or_license;
+			$items   = self::get_extensions_by_license( $license );
+			$item_id = array_pop( $items );
+		}
 
 		$api_params = array(
 			'edd_action' => 'deactivate_license',
@@ -446,7 +468,7 @@ class License_Manager {
 			self::update_license_status( $item_id, 'valid', $license_data->expires );
 		} else {
 
-			$code = $license_data->license;
+			$code    = $license_data->license;
 			$message = self::get_license_error_message( $code, $license_data->expires );
 
 			notices()->add( new \WP_Error( $code, $message ) );
