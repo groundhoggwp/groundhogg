@@ -152,8 +152,10 @@ class Settings_Page extends Admin_Page {
 
 				if ( ! is_white_labeled() ):
 
+                    $verify_license_url = Plugin::instance()->bulk_jobs->check_licenses->get_start_url();
+
 					?>
-                    <p><?php _e( 'Enter your extension license keys here to receive updates for purchased extensions. If your license key has expired, <a href="https://groundhogg.io/account/">please renew your license.</a>', 'groundhogg' ); ?></p>
+                    <p><?php printf ( __( 'Enter your extension license keys here to receive updates for purchased extensions. If your license key has expired, <a href="https://groundhogg.io/account/">please renew your license</a>. If you have recently renewed your license <a href="%s">click here to re-verify it</a>.', 'groundhogg' ), $verify_license_url ); ?></p>
 				<?php
 
 				endif;
@@ -221,6 +223,9 @@ class Settings_Page extends Admin_Page {
 
 	}
 
+	/**
+	 * Deactivate a license key
+	 */
 	public function process_deactivate_license() {
 
 		$item_id = absint( get_request_var( 'extension' ) );
@@ -229,6 +234,18 @@ class Settings_Page extends Admin_Page {
 			License_Manager::deactivate_license( $item_id );
 		}
 
+	}
+
+	/**
+	 * Check a license key
+	 */
+	public function process_check_license() {
+
+		$item_id = absint( get_request_var( 'extension' ) );
+
+		if ( $item_id ) {
+			License_Manager::verify_license( $item_id );
+		}
 	}
 
 	/**

@@ -16,11 +16,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Helper class for extensions with Groundhogg.
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
 abstract class Extension {
 
@@ -84,11 +84,11 @@ abstract class Extension {
 	 *
 	 * Ensures only one instance of the plugin class is loaded or can be loaded.
 	 *
-	 * @return Extension
-	 * @since 1.0.0
+	 * @since  1.0.0
 	 * @access public
 	 * @static
 	 *
+	 * @return Extension
 	 */
 	public static function instance() {
 
@@ -107,7 +107,7 @@ abstract class Extension {
 	 *
 	 * Groundhogg autoloader loads all the classes needed to run the plugin.
 	 *
-	 * @since 1.6.0
+	 * @since  1.6.0
 	 * @access private
 	 */
 	abstract protected function register_autoloader();
@@ -224,28 +224,28 @@ abstract class Extension {
 
 	/**
 	 * @param $is_minified bool
-	 * @param $dot_min string
+	 * @param $dot_min     string
 	 */
 	public function register_admin_scripts( $is_minified, $dot_min ) {
 	}
 
 	/**
 	 * @param $is_minified bool
-	 * @param $dot_min string
+	 * @param $dot_min     string
 	 */
 	public function register_admin_styles() {
 	}
 
 	/**
 	 * @param $is_minified bool
-	 * @param $dot_min string
+	 * @param $dot_min     string
 	 */
 	public function register_frontend_scripts( $is_minified, $dot_min ) {
 	}
 
 	/**
 	 * @param $is_minified bool
-	 * @param $dot_min string
+	 * @param $dot_min     string
 	 */
 	public function register_frontend_styles() {
 	}
@@ -505,13 +505,23 @@ abstract class Extension {
 			$content .= sprintf( __( "Your license expires on %s", 'groundhogg' ), $this->get_expiry() );
 			$content .= "</p>";
 
-			$content .= html()->wrap( html()->wrap( __( 'Deactivate', 'groundhogg' ), 'a', [
-				'class' => 'button button-secondary',
-				'href'  => admin_url( wp_nonce_url( add_query_arg( [
-					'action'    => 'deactivate_license',
-					'extension' => $this->get_download_id()
-				], 'admin.php?page=gh_settings&tab=extensions' ) ) )
-			] ), 'p' );
+			$content .= html()->wrap( [
+				html()->wrap( __( 'Deactivate', 'groundhogg' ), 'a', [
+					'class' => 'button button-secondary',
+					'href'  => admin_url( wp_nonce_url( add_query_arg( [
+						'action'    => 'deactivate_license',
+						'extension' => $this->get_download_id()
+					], 'admin.php?page=gh_settings&tab=extensions' ) ) )
+				] ),
+				'&nbsp;',
+				html()->wrap( __( 'Check', 'groundhogg' ), 'a', [
+					'class' => 'button button-secondary',
+					'href'  => admin_url( wp_nonce_url( add_query_arg( [
+						'action'    => 'check_license',
+						'extension' => $this->get_download_id()
+					], 'admin.php?page=gh_settings&tab=extensions' ) ) )
+				] )
+			], 'p' );
 		} else {
 			$content .= html()->wrap( html()->input( [
 				'type'  => 'submit',

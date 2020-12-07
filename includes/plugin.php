@@ -324,12 +324,12 @@ class Plugin {
 
         if( ! is_white_labeled() ) {
             new Reviews();
+	        new License_Nag();
 //            new Upgrade_Notice();
         }
 
-        new Extension_Upgrader();
-        new Plugin_Compatibility();
-        new License_Nag();
+	    new Extension_Upgrader();
+	    new Plugin_Compatibility();
 
         // Partner
         SendWp::instance();

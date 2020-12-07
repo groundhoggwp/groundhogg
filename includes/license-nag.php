@@ -18,8 +18,7 @@ class License_Nag {
 	 * @return mixed
 	 */
 	public function get_expired_licenses() {
-		$extensions = License_Manager::get_licenses();
-
+		$extensions = License_Manager::get_expired_licenses();
 		return array_pop( $extensions );
 	}
 
@@ -66,10 +65,8 @@ class License_Nag {
 		$licensed  = array_filter( array_keys( License_Manager::get_extension_licenses() ) );
 		$installed = Extension::$extension_ids;
 
-//		var_dump( $licensed, $installed );
-
-		if ( count( $installed ) === count( $licensed ) ){
-		    return;
+		if ( count( $installed ) === count( $licensed ) ) {
+			return;
 		}
 
 		$license_page_url = in_array( self::HELPER_PLUGIN_ID, $installed ) ? admin_page_url( 'gh_extensions' ) : admin_page_url( 'gh_settings', [ 'tab' => 'extensions' ] );

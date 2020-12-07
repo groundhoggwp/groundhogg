@@ -341,6 +341,15 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Verify all the license statuses
+	 */
+	public function version_2_2_23() {
+		$this->remember_version_update( '2.2.23' );
+
+		Plugin::instance()->bulk_jobs->check_licenses->start();
+	}
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -381,6 +390,7 @@ class Main_Updater extends Updater {
 			'2.2.19.3',
 			'2.2.19.4',
 			'2.2.22',
+			'2.2.23'
 		];
 	}
 

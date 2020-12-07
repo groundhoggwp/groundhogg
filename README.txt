@@ -309,6 +309,10 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.2.23 (2020-12-07) =
+* TWEAKED Improved license management in the background.
+* FIXED Deprecated jQuery function calls in the `fullframe.js` script.
+
 = 2.2.22 (2020-11-27) =
 * TWEAKED If the url is just `/gh/` then display the preferences screen.
 * TWEAKED Added `noindex` to the managed page. Should have done this sooner.
