@@ -766,7 +766,7 @@ class Contact extends Base_Object_With_Meta {
 			$result = copy( $tmp_file, $this->get_uploads_folder()[ 'path' ] . '/' . basename( $url ) );
 			@unlink( $tmp_file );
 		} catch ( \Exception $e ) {
-			var_dump( $e );
+//			var_dump( $e );
 		}
 
 		return $result;
