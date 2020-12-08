@@ -245,4 +245,34 @@ abstract class Base_Api {
 
 		return rest_ensure_response( $args );
 	}
+
+	/**
+	 * Given a request get a contact if one exists.
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return false|WP_Error|Contact
+	 */
+	protected static function get_contact_from_request( WP_REST_Request $request ) {
+
+		$id_or_email = $request->get_param( 'id_or_email' );
+
+		/* Return false if we are not requesting it. */
+		if ( ! $id_or_email ) {
+			return false;
+		}
+
+		$by_user_id = filter_var( $request->get_param( 'by_user_id' ), FILTER_VALIDATE_BOOLEAN );
+		$contact    = get_contactdata( $id_or_email, $by_user_id );
+
+		if ( ! $contact ) {
+			if ( is_numeric( $id_or_email ) ) {
+				return self::ERROR_400( 'invalid_id', sprintf( _x( 'Contact with ID %s does not exist.', 'api', 'groundhogg' ), $id_or_email ) );
+			} else {
+				return self::ERROR_400( 'invalid_email', sprintf( _x( 'Contact with email %s does not exist.', 'api', 'groundhogg' ), $id_or_email ) );
+			}
+		}
+
+		return $contact;
+	}
 }
