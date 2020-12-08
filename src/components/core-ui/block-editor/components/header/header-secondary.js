@@ -179,7 +179,7 @@ export default ({ handleViewTypeChange, sendTestEmail }) => {
           classes.button + " groundhogg-header-toolbar__mobile-device-toggle"
         }
         variant="contained"
-        color="primary"
+        color="secondary"
         size="small"
         onMouseDown={(event) => {
           event.preventDefault();

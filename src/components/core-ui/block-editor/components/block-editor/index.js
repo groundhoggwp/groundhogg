@@ -50,6 +50,9 @@ function BlockEditor({
   content,
   handleContentChange,
   viewType,
+  handleUpdateBlocks,
+  handlePersistBlocks,
+  blocks
 }) {
   const useStyles = makeStyles((theme) => ({
     subjectHeader: {
@@ -69,7 +72,6 @@ function BlockEditor({
     },
   }));
 
-  const [blocks, updateBlocks] = useState([]);
   const { createInfoNotice } = useDispatch("core/notices");
   const classes = useStyles();
   const canUserCreateMedia = useSelect((select) => {
@@ -93,26 +95,6 @@ function BlockEditor({
     };
   }, [canUserCreateMedia, _settings]);
 
-  useEffect(() => {
-    // const storedBlocks = window.localStorage.getItem( 'groundhoggBlocks' );
-
-    if (content?.length) {
-      handleUpdateBlocks(() => parse(content));
-    }
-  }, []);
-
-  const handleUpdateBlocks = (blocks) => {
-    console.log("update", blocks);
-    updateBlocks(blocks);
-    handleContentChange(blocks);
-  };
-
-  const handlePersistBlocks = (newBlocks) => {
-    // updateBlocks( newBlocks );
-    console.log("handlePersistBlocks", newBlocks);
-    // window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) )
-    handleContentChange(blocks);
-  };
 
   if (!settings.hasOwnProperty("__experimentalBlockPatterns")) {
     settings.__experimentalBlockPatterns = [];

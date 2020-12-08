@@ -65,9 +65,7 @@ export default ({ settings, email, history }) => {
     return null;
   }
 
-  useEffect(() => {
-    setupInteractJS();
-  }, [draggedBlock]);
+
 
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
@@ -86,12 +84,27 @@ export default ({ settings, email, history }) => {
     setContent(serialize(blocks));
   };
 
+  const [blocks, updateBlocks] = useState([]);
+
   const handleContentChangeDraggedBlock = () => {
     console.log("handle content", draggedBlock);
     // console.log(parse(block))
     // console.log(serialize(block))
     // setContent(serialize(blocks));
     // setDraggedBlock(null);
+  };
+
+  const handleUpdateBlocks = (blocks) => {
+    console.log("update", blocks);
+    updateBlocks(blocks);
+    handleContentChange(blocks);
+  };
+
+  const handlePersistBlocks = (newBlocks) => {
+    // updateBlocks( newBlocks );
+    console.log("handlePersistBlocks", newBlocks);
+    // window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) )
+    handleContentChange(blocks);
   };
 
   const saveDraft = (e) => {
@@ -208,6 +221,13 @@ export default ({ settings, email, history }) => {
     // setViewType(type);
   };
 
+  useEffect(() => {
+    if (content?.length) {
+      handleUpdateBlocks(() => parse(content));
+    }
+    setupInteractJS();
+  }, [draggedBlock]);
+
   let editorPanel;
   switch (editorMode) {
     case "visual":
@@ -221,6 +241,9 @@ export default ({ settings, email, history }) => {
           content={content}
           handleContentChange={handleContentChange}
           viewType={viewType}
+          handleUpdateBlocks={handleUpdateBlocks}
+          handlePersistBlocks={handlePersistBlocks}
+          blocks={blocks}
         />
       );
       break;
@@ -238,6 +261,9 @@ export default ({ settings, email, history }) => {
           content={content}
           handleContentChange={handleContentChange}
           viewType={viewType}
+          handleUpdateBlocks={handleUpdateBlocks}
+          handlePersistBlocks={handlePersistBlocks}
+          blocks={blocks}
         />
       );
   }
