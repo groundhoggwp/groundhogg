@@ -2,7 +2,7 @@
  * External dependencies
  */
 import {apiFetch} from '@wordpress/data-controls';
-import TYPES from "./action-types";
+
 import { NAMESPACE } from '../constants';
 //
 // // Creating
