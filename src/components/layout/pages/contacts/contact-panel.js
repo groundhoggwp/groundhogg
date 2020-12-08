@@ -30,7 +30,7 @@ import { useDispatch } from '@wordpress/data'
 import { TAGS_STORE_NAME } from 'data/tags'
 import { CONTACTS_STORE_NAME } from 'data/contacts'
 
-export const ContactPanel = ({ section, contact }) => {
+export const ContactPanel = ({ section, contact, afterUpdateButtonClick = () => {}, customObject = {} }) => {
 
   const hasSaved = useRef(false)
 
@@ -41,7 +41,7 @@ export const ContactPanel = ({ section, contact }) => {
 
   const [data, setData] = useState(contact.data)
   const [meta, setMeta] = useState(contact.meta)
-  const [tags ,setTags ] =useState (contact.tags)
+  const [tags, setTags] = useState(contact.tags)
 
   const handleInputChange = (e) => {
 
@@ -55,23 +55,24 @@ export const ContactPanel = ({ section, contact }) => {
           ...data,
           ...{
             [id]: value
-          }
+          },
+
         })
         break
       case 'meta' :
         setMeta({
-            ...meta, ...{
+            ...meta,
+            ...{
               [id]: value
-            }
+            },
+
           }
         )
-        break;
+        break
       case 'tags' :
-        //todo handle tags
+      //todo handle tags
 
-
-        //clean tags
-
+      //clean tags
 
     }
 
@@ -155,7 +156,7 @@ export const ContactPanel = ({ section, contact }) => {
       value = dataFromDataType.hasOwnProperty(id) ? dataFromDataType[id] : defaultValue
     }
 
-    if (dataType === 'tags'){
+    if (dataType === 'tags') {
       value = dataFromDataType
     }
 
@@ -237,14 +238,16 @@ export const ContactPanel = ({ section, contact }) => {
   const classes = useStyles()
 
   const handleUpdateContact = (event) => {
-
     const results = async () => {
       await updateItem(contact.ID, {
-        data: data,
-        meta: meta
+        data: { ...data, ...customObject.data },
+        meta: { ...meta, ...customObject.meta }
       })
     }
-    console.log(results())
+
+    results()
+    afterUpdateButtonClick()
+
   }
 
   return (
@@ -252,9 +255,9 @@ export const ContactPanel = ({ section, contact }) => {
       {
         section.map((section) => (
             <Fragment>
-
-              <Typography variant="h4" component="h4" style={{marginTop:10}} className={section.id}>{section.title}</Typography>
-
+              {/*<Typography variant="h4" component="h4" style={{ marginTop: 10 }}*/}
+              {/*            className={section.id}>{section.title}</Typography>*/}
+              <h3>{section.title} </h3>
               <Grid container spacing={2}>
                 {
                   section.fields.map((fields) => (
@@ -274,7 +277,7 @@ export const ContactPanel = ({ section, contact }) => {
           )
         )
       }
-      <Button variant="contained" color="primary" onClick={handleUpdateContact}>{__('Update Contact')}</Button>
+      <Button variant="contained" color="primary" style={{marginTop: 10 , marginBottom: 16}} onClick={handleUpdateContact}>{__('Update Contact')}</Button>
     </Fragment>
   )
 }
