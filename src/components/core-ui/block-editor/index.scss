@@ -87,16 +87,15 @@
   border: 1px solid #ccc;
 }
 
-#inner-dropzone {
-  height: 700px;
-}
-
 .side-bar-blocks-container {
   margin-left: 5px;
   margin-right: 5px;
 }
 
-.dropzone {
+.groundhogg-email-editor__email-content {
+}
+
+.groundhogg-email-editor__email-content.drop-active {
   background-color: #bfe4ff;
 }
 

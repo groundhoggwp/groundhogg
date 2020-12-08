@@ -107,6 +107,9 @@ export default ({ handleViewTypeChange, sendTestEmail }) => {
         className={
           classes.button + " groundhogg-header-toolbar__replacements-modal"
         }
+        variant="contained"
+        color="primary"
+        size="small"
         buttonIcon={<FindReplaceIcon />}
         buttonTitle={__("Replacements")}
         title={__("Replacements")}
@@ -127,8 +130,9 @@ export default ({ handleViewTypeChange, sendTestEmail }) => {
         className={
           classes.button + " groundhogg-header-toolbar__alt-body-modal"
         }
-        /* translators: button label text should, if possible, be under 16
-		characters. */
+        variant="contained"
+        color="primary"
+        size="small"
         buttonTitle={__("Email Alt-Body")}
         title={__("Email Alt-Body")}
         content={__(
@@ -171,12 +175,12 @@ export default ({ handleViewTypeChange, sendTestEmail }) => {
 
       <ToolbarItem
         as={Button}
-        size="small"
         className={
           classes.button + " groundhogg-header-toolbar__mobile-device-toggle"
         }
         variant="contained"
-        color="secondary"
+        color="primary"
+        size="small"
         onMouseDown={(event) => {
           event.preventDefault();
           handleViewTypeChange("mobile");
@@ -196,6 +200,7 @@ export default ({ handleViewTypeChange, sendTestEmail }) => {
         }
         variant="contained"
         color="secondary"
+        size="small"
         onMouseDown={(event) => {
           event.preventDefault();
           handleViewTypeChange("desktop");

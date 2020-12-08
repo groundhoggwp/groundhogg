@@ -148,31 +148,27 @@ function BlockEditor({
           </Card>
           <Paper>
             <div
-              id="block-editor-droppable-area"
-              className={classes.emailContent + " side-bar-drag-drop-block"}
+              className={
+                classes.emailContent + " groundhogg-email-editor__email-content"
+              }
             >
-              {" "}
-              #yes-drop{" "}
-              <div id="inner-dropzone" className="dropzone">
-                #inner-dropzone
-                <BlockSelectionClearer className={classes}>
-                  <VisualEditorGlobalKeyboardShortcuts />
-                  <MultiSelectScrollIntoView />
-                  {/* Add Block Button */}
-                  <BlockEditorKeyboardShortcuts.Register />
-                  <Popover.Slot name="block-toolbar" />
-                  <Typewriter>
-                    <CopyHandler>
-                      <WritingFlow>
-                        <ObserveTyping>
-                          {/* Rendered blocks */}
-                          <BlockList />
-                        </ObserveTyping>
-                      </WritingFlow>
-                    </CopyHandler>
-                  </Typewriter>
-                </BlockSelectionClearer>
-              </div>
+              <BlockSelectionClearer className={classes}>
+                <VisualEditorGlobalKeyboardShortcuts />
+                <MultiSelectScrollIntoView />
+                {/* Add Block Button */}
+                <BlockEditorKeyboardShortcuts.Register />
+                <Popover.Slot name="block-toolbar" />
+                <Typewriter>
+                  <CopyHandler>
+                    <WritingFlow>
+                      <ObserveTyping>
+                        {/* Rendered blocks */}
+                        <BlockList />
+                      </ObserveTyping>
+                    </WritingFlow>
+                  </CopyHandler>
+                </Typewriter>
+              </BlockSelectionClearer>
             </div>
           </Paper>
         </div>

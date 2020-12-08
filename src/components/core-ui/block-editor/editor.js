@@ -132,7 +132,7 @@ export default ({ settings, email, history }) => {
 
       setDraggedBlock(target.getAttribute("data-block"));
       console.log("set block", draggedBlock);
-      event.target.classList.toggle("drop-active");
+      event.target.classList.add("drop-active");
 
       // keep the dragged position in the data-x/data-y attributes
       let x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
@@ -148,11 +148,11 @@ export default ({ settings, email, history }) => {
     };
     const dragEndListener = (event) => {
       let target = event.target;
-      document
-        .querySelectorAll(".block-editor-block.drop-active")
-        .forEach((ele) => {
-          // ele.classList.toggle('drop-active');
-        });
+      // document
+      //   .querySelectorAll(".block-editor-block.drop-active")
+      //   .forEach((ele) => {
+      //     // ele.classList.toggle('drop-active');
+      //   });
 
       // keep the dragged position in the data-x/data-y attributes
       let x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
@@ -167,7 +167,7 @@ export default ({ settings, email, history }) => {
       target.setAttribute("data-y", 0);
     };
 
-    interact(".dropzone").dropzone({
+    interact(".groundhogg-email-editor__email-content").dropzone({
       // only accept elements matching this CSS selector
       // accept: ".edit-post-visual-editor",
       // accept: "#block-editor-droppable-area",
@@ -178,8 +178,11 @@ export default ({ settings, email, history }) => {
 
       ondropactivate: (event) => {
         // add active dropzone feedback
-        console.log("started drag");
-        event.target.classList.add("drop-active");
+
+        // event.target.classList.add("drop-active");
+        event.target.style.border = "1px solid #005a87";
+        event.target.style.background = "#bfe4ff";
+        console.log("started drag", event.target, event.target.classList);
       },
       ondragenter: (event) => {
         var draggableElement = event.relatedTarget;
@@ -205,8 +208,10 @@ export default ({ settings, email, history }) => {
       },
       ondropdeactivate: (event) => {
         // remove active dropzone feedback
+        console.log("ended drag", event.target);
+        event.target.style.border = "";
+        event.target.style.background = "";
         event.target.classList.remove("drop-active");
-        event.target.classList.remove("drop-target");
       },
     });
 
@@ -226,7 +231,7 @@ export default ({ settings, email, history }) => {
       //   //   relativePoints: [{ x: 0, y: 0 }],
       //   // }),
       //   interact.modifiers.restrictRect({
-      //     // restriction: ".dropzone",
+      //     // restriction: ".groundhogg-email-editor__email-content",
       //     restriction: "parent",
       //     endOnly: true,
       //   }),
