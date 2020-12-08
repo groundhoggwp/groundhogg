@@ -1,7 +1,6 @@
 <?php
 
 namespace Groundhogg\Bulk_Jobs;
-
 use function Groundhogg\get_array_var;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\use_experimental_features;
@@ -46,6 +45,7 @@ class Manager {
 		$this->process_events           = new Process_Events();
 		$this->migrate_notes            = new Migrate_Notes();
 		$this->update_subsites          = new Update_subsites();
+		$this->check_licenses           = new Check_Licenses();
 
 		do_action( 'groundhogg/bulk_jobs/init', $this );
 	}

@@ -242,7 +242,31 @@ add_filter( 'admin_footer_text', __NAMESPACE__ . '\add_bug_report_prompt' );
 
 add_filter( 'groundhogg/admin/emails/sanitize_email_content', __NAMESPACE__ . '\safe_css_filter_rgb_to_hex', 10 );
 add_filter( 'groundhogg/admin/emails/sanitize_email_content', __NAMESPACE__ . '\add_safe_style_attributes_to_email', 10 );
-add_filter( 'groundhogg/admin/emails/sanitize_email_content', 'wp_kses_post', 11 );
+add_filter( 'groundhogg/admin/emails/sanitize_email_content', __NAMESPACE__ . '\email_kses', 11 );
+
+function email_kses( $content ){
+
+	// Basic protocols
+	$basic_protocols = [ 'http', 'https', 'mailto','mms', 'sms', 'svn', 'tel', 'fax' ];
+
+	// Weird protocols for replacements compatibility
+	$wacky_protocols = [
+		'{confirmation_link_raw.{auto_login_link.https',
+		'{confirmation_link_raw.{auto_login_link.https',
+		'{confirmation_link.{auto_login_link.http',
+		'{confirmation_link.{auto_login_link.http',
+		'{confirmation_link_raw.https',
+		'{confirmation_link_raw.http',
+		'{confirmation_link.https',
+		'{confirmation_link.http',
+		'{auto_login_link.{confirmation_link_raw.https',
+		'{auto_login_link.{confirmation_link_raw.http',
+		'{auto_login_link.https',
+		'{auto_login_link.http',
+	];
+
+	return wp_kses( $content, 'post', array_merge( $basic_protocols, $wacky_protocols ) );
+}
 
 /**
  * Add some filters....

@@ -321,6 +321,23 @@ class Main_Updater extends Updater {
 
 
 	/**
+	 * Add delete_after_use field to permissions keys
+	 * Add the autologin rewrite
+	 */
+	public function version_2_2_22() {
+		install_custom_rewrites();
+	}
+
+	/**
+	 * Verify all the license statuses
+	 */
+	public function version_2_2_23() {
+		$this->remember_version_update( '2.2.23' );
+
+		Plugin::instance()->bulk_jobs->check_licenses->start();
+	}
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -365,6 +382,8 @@ class Main_Updater extends Updater {
 			'3.0.a.3',
 			'3.0.a.4',
 			'3.0.a.7',
+			'2.2.22',
+			'2.2.23'
 		];
 	}
 
@@ -390,6 +409,7 @@ class Main_Updater extends Updater {
 			'3.0.a.2',
 			'3.0.a.3',
 			'3.0.a.4',
+			'2.2.22',
 		];
 	}
 
@@ -422,6 +442,7 @@ class Main_Updater extends Updater {
 			'2.2.18'        => __( 'Add email_id column to events tables.', 'groundhogg' ),
 			'2.2.19.3'      => __( 'Increased tag name size. Tag name can be 191 to 255 characters based on your hosted server.', 'groundhogg' ),
 			'2.2.19.4'      => __( 'Update the permission keys table to support new usage.', 'groundhogg' ),
+			'2.2.22'        => __( 'Show preferences page if url is just /gh/.', 'groundhogg' ),
 		];
 	}
 }
