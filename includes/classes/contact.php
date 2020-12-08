@@ -759,6 +759,28 @@ class Contact extends Base_Object_With_Meta {
 		return $mfile;
 	}
 
+	public function copy_file( $url ) {
+
+		if ( ! function_exists( 'download_url' ) ) {
+			require_once( ABSPATH . '/wp-admin/includes/file.php' );
+		}
+
+		$tmp_file = download_url( $url );
+
+		if ( ! is_dir( $this->get_uploads_folder() [ 'path' ] ) ) {
+			mkdir( $this->get_uploads_folder() [ 'path' ] );
+		}
+		try {
+			$result = copy( $tmp_file, $this->get_uploads_folder()[ 'path' ] . '/' . basename( $url ) );
+			@unlink( $tmp_file );
+		} catch ( \Exception $e ) {
+//			var_dump( $e );
+		}
+
+		return $result;
+	}
+
+
 	/**
 	 * Get the basename of the path
 	 *
@@ -791,12 +813,12 @@ class Contact extends Base_Object_With_Meta {
 
 		$uploads_dir = $this->get_uploads_folder();
 
-		if ( file_exists( $uploads_dir['path'] ) ) {
+		if ( file_exists( $uploads_dir[ 'path' ] ) ) {
 
-			$scanned_directory = array_diff( scandir( $uploads_dir['path'] ), [ '..', '.' ] );
+			$scanned_directory = array_diff( scandir( $uploads_dir[ 'path' ] ), [ '..', '.' ] );
 
 			foreach ( $scanned_directory as $filename ) {
-				$filepath = $uploads_dir['path'] . '/' . $filename;
+				$filepath = $uploads_dir[ 'path' ] . '/' . $filename;
 				$file     = [
 					'file_name'     => $filename,
 					'file_path'     => $filepath,
@@ -852,10 +874,10 @@ class Contact extends Base_Object_With_Meta {
 	 * @return array
 	 */
 	public function get_as_array() {
-		$contact             = $this->get_data();
-		$contact['ID']       = $this->get_id();
-		$contact['gravatar'] = $this->get_profile_picture();
-		$contact['age']      = $this->get_age();
+		$contact               = $this->get_data();
+		$contact[ 'ID' ]       = $this->get_id();
+		$contact[ 'gravatar' ] = $this->get_profile_picture();
+		$contact[ 'age' ]      = $this->get_age();
 
 		return apply_filters(
 			"groundhogg/{$this->get_object_type()}/get_as_array",

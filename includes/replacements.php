@@ -46,7 +46,7 @@ class Replacements {
 
 		add_action( 'init', [ $this, 'setup_defaults' ] );
 
-		if ( isset_not_empty( $_GET, 'page' ) && strpos( $_GET[ 'page' ], 'gh_' ) !== false ) {
+		if ( isset_not_empty( $_GET, 'page' ) && strpos( $_GET['page'], 'gh_' ) !== false ) {
 			add_action( 'admin_footer', [ $this, 'replacements_in_footer' ] );
 		}
 
@@ -238,7 +238,7 @@ class Replacements {
 		$replacements = apply_filters( 'groundhogg/replacements/defaults', $replacements );
 
 		foreach ( $replacements as $replacement ) {
-			$this->add( $replacement[ 'code' ], $replacement[ 'callback' ], $replacement[ 'description' ] );
+			$this->add( $replacement['code'], $replacement['callback'], $replacement['description'] );
 		}
 
 		do_action( 'groundhogg/replacements/init', $this );
@@ -275,9 +275,9 @@ class Replacements {
 	/**
 	 * Remove a replacement code
 	 *
-	 * @param string $code to remove
-	 *
 	 * @since 1.9
+	 *
+	 * @param string $code to remove
 	 *
 	 */
 	public function remove( $code ) {
@@ -298,9 +298,9 @@ class Replacements {
 	/**
 	 * Returns a list of all replacement codes
 	 *
-	 * @return array
 	 * @since 1.9
 	 *
+	 * @return array
 	 */
 	public function get_replacements() {
 		return $this->replacement_codes;
@@ -398,15 +398,15 @@ class Replacements {
 		//Support Default Arguments.
 		if ( strpos( $code, '::' ) > 0 ) {
 			$parts   = explode( '::', $code, 2 );
-			$code    = $parts[ 0 ];
-			$default = $parts[ 1 ];
+			$code    = $parts[0];
+			$default = $parts[1];
 		}
 
 		/* make sure that if it's a dynamic code to remove anything after the period */
 		if ( strpos( $code, '.' ) > 0 ) {
 			$parts = explode( '.', $code, 2 );
-			$code  = $parts[ 0 ];
-			$arg   = $parts[ 1 ];
+			$code  = $parts[0];
+			$arg   = $parts[1];
 		}
 
 		return [
@@ -426,13 +426,13 @@ class Replacements {
 	 */
 	private function do_replacement( $m ) {
 		// Get tag
-		$code = $m[ 1 ];
+		$code = $m[1];
 
 		$parts = $this->parse_code( $code );
 
-		$arg     = $parts[ 'arg' ];
-		$code    = $parts[ 'code' ];
-		$default = $parts[ 'default' ];
+		$arg     = $parts['arg'];
+		$code    = $parts['code'];
+		$default = $parts['default'];
 
 		// Return tag if tag not set
 		if ( ! $this->has_replacement( $code ) && substr( $code, 0, 1 ) !== '_' ) {
@@ -451,9 +451,9 @@ class Replacements {
 			$field = substr( $code, 1 );
 			$text  = $this->get_current_contact()->$field;
 		} else if ( $arg ) {
-			$text = call_user_func( $this->replacement_codes[ $code ][ 'callback' ], $arg, $this->contact_id, $code );
+			$text = call_user_func( $this->replacement_codes[ $code ]['callback'], $arg, $this->contact_id, $code );
 		} else {
-			$text = call_user_func( $this->replacement_codes[ $code ][ 'callback' ], $this->contact_id, $code );
+			$text = call_user_func( $this->replacement_codes[ $code ]['callback'], $this->contact_id, $code );
 		}
 
 		if ( empty( $text ) ) {
@@ -483,10 +483,10 @@ class Replacements {
                     <td>
                         <input class="replacement-selector"
                                style="border: none;outline: none;background: transparent;width: 100%;"
-                               onfocus="this.select();" value="{<?php echo $replacement[ 'code' ]; ?>}" readonly>
+                               onfocus="this.select();" value="{<?php echo $replacement['code']; ?>}" readonly>
                     </td>
                     <td>
-                        <span><?php esc_html_e( $replacement[ 'description' ] ); ?></span>
+                        <span><?php esc_html_e( $replacement['description'] ); ?></span>
                     </td>
                 </tr>
 			<?php endforeach; ?>
@@ -508,7 +508,9 @@ class Replacements {
 
 		echo Plugin::$instance->utils->html->modal_link( array(
 			'title'              => __( 'Replacements', 'groundhogg' ),
-			'text'               => $short ? '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>' : '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>&nbsp;' . _x( 'Insert Replacement', 'replacement', 'groundhogg' ),
+			'text'               => $short
+                ? '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>'
+                : '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>&nbsp;' . _x( 'Insert Replacement', 'replacement', 'groundhogg' ),
 			'footer_button_text' => __( 'Insert' ),
 			'id'                 => 'replacements',
 			'class'              => 'button button-secondary no-padding replacements replacements-button',
@@ -553,8 +555,8 @@ class Replacements {
 	}
 
 	/**
-     * Returns tag name of the contact
-     *
+	 * Returns tag name of the contact
+	 *
 	 * @param $tag_id
 	 *
 	 * @return string
@@ -850,7 +852,7 @@ class Replacements {
 	 * Return the owner's signature
 	 *
 	 * @param mixed $attr the attribute to fetch...
-	 * @param int $contact_id
+	 * @param int   $contact_id
 	 *
 	 * @return mixed|string
 	 */
@@ -896,11 +898,11 @@ class Replacements {
 
 		$link_url = permissions_key_url( $link_url, $this->get_current_contact(), 'preferences' );
 
-		$redirect_to = is_string( $redirect_to ) ? esc_url_raw( $redirect_to ) : false;
+		$redirect_to = is_string( $redirect_to ) ? esc_url_raw( no_and_amp( $redirect_to ) ) : false;
 
 		if ( $redirect_to && is_string( $redirect_to ) ) {
 			$link_url = add_query_arg( [
-				'redirect_to' => $redirect_to
+				'redirect_to' => urlencode( $redirect_to )
 			], $link_url );
 		}
 
@@ -917,17 +919,17 @@ class Replacements {
 	function replacement_auto_login_link( $redirect_to ) {
 
 		$link_url    = managed_page_url( 'auto-login' );
-		$redirect_to = is_string( $redirect_to ) ? esc_url_raw( $redirect_to ) : false;
+		$redirect_to = is_string( $redirect_to ) ? esc_url_raw( no_and_amp( $redirect_to ) ) : false;
 
 		if ( ! $this->get_current_contact()->get_userdata() ) {
 			return $redirect_to;
 		}
 
-		$link_url = permissions_key_url( $link_url, $this->get_current_contact(), 'auto_login', true );
+		$link_url = permissions_key_url( $link_url, $this->get_current_contact(), 'auto_login', DAY_IN_SECONDS, true );
 
 		if ( $redirect_to && is_string( $redirect_to ) ) {
 			$link_url = add_query_arg( [
-				'redirect_to' => $redirect_to
+				'redirect_to' => urlencode( $redirect_to )
 			], $link_url );
 		}
 
@@ -966,10 +968,10 @@ class Replacements {
 
 		if ( count( $parts ) === 1 ) {
 			$format = get_date_time_format();
-			$when   = $parts[ 0 ];
+			$when   = $parts[0];
 		} else {
-			$format = $parts[ 0 ];
-			$when   = $parts[ 1 ];
+			$format = $parts[0];
+			$when   = $parts[1];
 		}
 
 		/* convert to local time */
@@ -1050,7 +1052,7 @@ class Replacements {
 		$html = '';
 
 		foreach ( $files as $i => $file ) {
-			$html .= sprintf( '<li><a href="%s">%s</a></li>', esc_url( $file[ 'file_url' ] ), esc_html( $file[ 'file_name' ] ) );
+			$html .= sprintf( '<li><a href="%s">%s</a></li>', esc_url( $file['file_url'] ), esc_html( $file['file_name'] ) );
 		}
 
 		return sprintf( '<ul>%s</ul>', $html );
