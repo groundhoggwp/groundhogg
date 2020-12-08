@@ -255,10 +255,9 @@ export const ContactPanel = ({ section, contact, afterUpdateButtonClick = () => 
       {
         section.map((section) => (
             <Fragment>
-
-              <Typography variant="h4" component="h4" style={{ marginTop: 10 }}
-                          className={section.id}>{section.title}</Typography>
-
+              {/*<Typography variant="h4" component="h4" style={{ marginTop: 10 }}*/}
+              {/*            className={section.id}>{section.title}</Typography>*/}
+              <h3>{section.title} </h3>
               <Grid container spacing={2}>
                 {
                   section.fields.map((fields) => (
@@ -278,7 +277,7 @@ export const ContactPanel = ({ section, contact, afterUpdateButtonClick = () => 
           )
         )
       }
-      <Button variant="contained" color="primary" onClick={handleUpdateContact}>{__('Update Contact')}</Button>
+      <Button variant="contained" color="primary" style={{marginTop: 10 , marginBottom: 16}} onClick={handleUpdateContact}>{__('Update Contact')}</Button>
     </Fragment>
   )
 }

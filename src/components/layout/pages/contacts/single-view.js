@@ -25,6 +25,13 @@ import { Segmentation } from './segmentation'
 import { ContactNotes } from 'components/layout/pages/contacts/contact-notes'
 import { Files } from 'components/layout/pages/contacts/files'
 
+import Accordion from '@material-ui/core/Accordion'
+import AccordionSummary from '@material-ui/core/AccordionSummary'
+import AccordionDetails from '@material-ui/core/AccordionDetails'
+import Typography from '@material-ui/core/Typography'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import { Actions } from 'components/layout/pages/contacts/actions'
+
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -39,7 +46,12 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: '50%',
     // boxShadow: '1px 1px 4px #ccc',
 
-  }
+  },
+  heading: {
+    fontSize: theme.typography.pxToRem(15),
+    fontWeight: theme.typography.fontWeightRegular,
+  },
+
 }))
 
 //
@@ -50,8 +62,6 @@ const useStyles = makeStyles((theme) => ({
 //     backgroundColor: theme.palette.background.paper,
 //   },
 // }));
-
-
 
 export const SingleView = (props) => {
   const classes = useStyles()
@@ -72,7 +82,7 @@ export const SingleView = (props) => {
 
   const { data, meta } = contact
 
-  const tabs = [
+  var detailsTab = [
     {
       label: 'General Info ',
       route: 'general',
@@ -100,6 +110,10 @@ export const SingleView = (props) => {
         )
       }
     },
+
+  ]
+
+  var AdditionalInfo = [
     {
       label: 'Notes',
       route: 'notes',
@@ -121,31 +135,78 @@ export const SingleView = (props) => {
 
   ]
 
+  var contactSections = [
+    {
+      label: 'Details ',
+      component: () => {
+        return (
+          <TabPanel tabs={detailsTab} enableRouting={false} history={history} match={match}/>
+        )
+      }
+    }, {
+      label: 'Additional Info ',
+      component: () => {
+        return (
+          <TabPanel tabs={AdditionalInfo} enableRouting={false} history={history} match={match}/>
+        )
+      }
+    },
+  ]
+
+  contactSections = applyFilters('groundhogg.contacts.sections', contactSections)
+
   return (
     <Fragment>
       {/*<p>Single view: Contact ID: {id}</p>*/}
-      <Grid container spacing={3}>
+      <Grid container spacing={0}>
         <Grid item xs={12} md={3} lg={3}>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={12} lg={12}>
-              <img className={classes.contactImage}
-                   src={meta.profile_picture}/>
-              <h3> {data.first_name + ' ' + data.last_name} </h3>
-              <p> {data.email}</p>
-            </Grid>
-          </Grid>
+          <SideBar contact={contact}/>
         </Grid>
         <Grid item xs={12} md={7} lg={7}>
           <Fragment>
-            <TabPanel tabs={tabs} enableRouting={false} history={history} match={match}/>
+            {contactSections.map((section) => {
+
+              return (
+                <Accordion defaultExpanded>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon/>}
+                    aria-controls="panel1a-content"
+                  >
+                    <Typography variant="h5" component="h5" style={{ marginTop: 10 }}
+                    >{section.label}</Typography>
+                    {/*<h2> {section.label} </h2>*/}
+                    {/*<Typography className={classes.heading}>{section.label}</Typography>*/}
+                  </AccordionSummary>
+                  <AccordionDetails style={{ padding: 0 }}>
+                    <section.component/>
+                  </AccordionDetails>
+                </Accordion>
+              )
+            })}
           </Fragment>
         </Grid>
+
         <Grid item xs={12} md={2} lg={2}>
-          <Paper>
-            <ContactTimeline/>
-          </Paper>
+          <ContactTimeline/>
         </Grid>
       </Grid>
+    </Fragment>
+  )
+}
+
+export const SideBar = (props) => {
+
+  const classes = useStyles()
+  const { meta, data } = props.contact
+
+  return (
+
+    <Fragment>
+      <img className={classes.contactImage}
+           src={meta.profile_picture}/>
+      <h3> {data.first_name + ' ' + data.last_name} </h3>
+      <p> {data.email}</p>
+      <Actions/>
     </Fragment>
   )
 }
