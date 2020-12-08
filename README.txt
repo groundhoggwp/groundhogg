@@ -309,6 +309,9 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.2.23.2 (2020-12-07) =
+* FIXED License missing message showing even though all active extensions are licensed in some cases.
+
 = 2.2.23.1 (2020-12-07) =
 * FIXED License missing message showing for non official extensions. Only show for extensions with official ids.
 

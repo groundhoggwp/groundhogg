@@ -323,7 +323,7 @@ class Plugin {
 
         if( ! is_white_labeled() ) {
             new Reviews();
-	        new License_Nag();
+	        new License_Notice();
 //            new Upgrade_Notice();
 		}
 
