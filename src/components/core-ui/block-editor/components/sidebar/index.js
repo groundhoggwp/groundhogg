@@ -88,7 +88,10 @@ const Sidebar = () => {
         <div className="side-bar-blocks-container">
           {blocks.map((block) => {
             return (
-              <div className="block-editor-block side-bar-drag-drop-block">
+              <div
+                className="block-editor-block side-bar-drag-drop-block"
+                data-block={JSON.stringify(block)}
+              >
                 <svg
                   aria-hidden="true"
                   role="img"

@@ -1,12 +1,12 @@
 .interface-interface-skeleton .interface-interface-skeleton__sidebar {
   outline: none;
-  overflow: auto;
+  overflow: visible;
   top: 10px;
 }
 
 .groundhogg-email-sidebar {
   outline: none;
-  overflow-y: visible;
+  overflow: visible;
   background: $white;
   border-left: $border-width solid $gray-200;
   bottom: 0;
@@ -15,7 +15,6 @@
   // margin-top: 10px;
   width: 388px;
   margin-right: 20px;
-
 
   > .components-panel {
     border-left: 0;

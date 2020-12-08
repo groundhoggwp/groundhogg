@@ -46,6 +46,7 @@ export default ({ settings, email, history }) => {
   } = email.data;
 
   const [title, setTitle] = useState(defaultTitleValue);
+  const [draggedBlock, setDraggedBlock] = useState(null);
   const [subject, setSubject] = useState(defaultSubjectValue);
   const [preHeader, setPreHeader] = useState(defaultPreHeaderValue);
   const [content, setContent] = useState(defaultContentValue);
@@ -78,6 +79,13 @@ export default ({ settings, email, history }) => {
       return;
     }
     setContent(serialize(blocks));
+  };
+  const handleContentChangeDraggedBlock = () => {
+    console.log("handle content", draggedBlock);
+    // console.log(parse(block))
+    // console.log(serialize(block))
+    // setContent(serialize(blocks));
+    // setDraggedBlock(null);
   };
   const handleBlockResize = (width, height) => {
     let modifiedBlocks = parse(content);
@@ -122,6 +130,8 @@ export default ({ settings, email, history }) => {
     const dragMoveListener = (event) => {
       let target = event.target;
 
+      setDraggedBlock(target.getAttribute("data-block"));
+      console.log("set block", draggedBlock);
       event.target.classList.toggle("drop-active");
 
       // keep the dragged position in the data-x/data-y attributes
@@ -168,28 +178,32 @@ export default ({ settings, email, history }) => {
 
       ondropactivate: (event) => {
         // add active dropzone feedback
+        console.log("started drag");
         event.target.classList.add("drop-active");
       },
-      ondragenter: function (event) {
+      ondragenter: (event) => {
         var draggableElement = event.relatedTarget;
         var dropzoneElement = event.target;
-
+        console.log("entered the drag zone, still holding");
         // feedback the possibility of a drop
-        dropzoneElement.classList.add("drop-target");
-        draggableElement.classList.add("can-drop");
-        draggableElement.textContent = "Dragged in";
+        // dropzoneElement.classList.add("drop-target");
+        // draggableElement.classList.add("can-drop");
+        // draggableElement.textContent = "Dragged in";
       },
       ondragleave: (event) => {
+        // Probably dont need this one
         // remove the drop feedback style
-        event.target.classList.remove("drop-target");
-        event.relatedTarget.classList.remove("can-drop");
-        event.relatedTarget.textContent = "Dragged out";
+        // event.target.classList.remove("drop-target");
+        // event.relatedTarget.classList.remove("can-drop");
+        // event.relatedTarget.textContent = "Dragged out";
       },
-      ondrop: function (event) {
+      ondrop: (event) => {
         // Add block here
-        event.relatedTarget.textContent = "Dropped";
+        console.log("dropped");
+        handleContentChangeDraggedBlock();
+        // event.relatedTarget.textContent = "Dropped";
       },
-      ondropdeactivate: function (event) {
+      ondropdeactivate: (event) => {
         // remove active dropzone feedback
         event.target.classList.remove("drop-active");
         event.target.classList.remove("drop-target");
@@ -268,10 +282,14 @@ export default ({ settings, email, history }) => {
     //
     //   inertia: true,
     // });
-  });
+  }, [draggedBlock]);
 
   const handleViewTypeChange = (type) => {
     setViewType(type);
+  };
+  const sendTestEmail = (type) => {
+    console.log("email");
+    // setViewType(type);
   };
 
   let editorPanel;
@@ -325,6 +343,7 @@ export default ({ settings, email, history }) => {
                   isSaving={isSaving}
                   handleTitleChange={handleTitleChange}
                   handleViewTypeChange={handleViewTypeChange}
+                  sendTestEmail={sendTestEmail}
                   title={title}
                 />
               }

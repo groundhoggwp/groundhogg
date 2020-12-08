@@ -118,8 +118,6 @@ function BlockEditor({
     settings.__experimentalBlockPatterns = [];
   }
 
-  console.log(viewType, viewType === "desktop", classes.emailContent);
-
   return (
     <div className="groundhogg-block-editor">
       <BlockEditorProvider
@@ -157,24 +155,24 @@ function BlockEditor({
               #yes-drop{" "}
               <div id="inner-dropzone" className="dropzone">
                 #inner-dropzone
+                <BlockSelectionClearer className={classes}>
+                  <VisualEditorGlobalKeyboardShortcuts />
+                  <MultiSelectScrollIntoView />
+                  {/* Add Block Button */}
+                  <BlockEditorKeyboardShortcuts.Register />
+                  <Popover.Slot name="block-toolbar" />
+                  <Typewriter>
+                    <CopyHandler>
+                      <WritingFlow>
+                        <ObserveTyping>
+                          {/* Rendered blocks */}
+                          <BlockList />
+                        </ObserveTyping>
+                      </WritingFlow>
+                    </CopyHandler>
+                  </Typewriter>
+                </BlockSelectionClearer>
               </div>
-              <BlockSelectionClearer className={classes}>
-                <VisualEditorGlobalKeyboardShortcuts />
-                <MultiSelectScrollIntoView />
-                {/* Add Block Button */}
-                <BlockEditorKeyboardShortcuts.Register />
-                <Popover.Slot name="block-toolbar" />
-                <Typewriter>
-                  <CopyHandler>
-                    <WritingFlow>
-                      <ObserveTyping>
-                        {/* Rendered blocks */}
-                        <BlockList />
-                      </ObserveTyping>
-                    </WritingFlow>
-                  </CopyHandler>
-                </Typewriter>
-              </BlockSelectionClearer>
             </div>
           </Paper>
         </div>

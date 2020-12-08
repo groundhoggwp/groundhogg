@@ -11,6 +11,8 @@ import DesktopMacIcon from "@material-ui/icons/DesktopMac";
 import SmartphoneIcon from "@material-ui/icons/Smartphone";
 import UpdateIcon from "@material-ui/icons/Update";
 import { makeStyles } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+
 /**
  * WordPress dependencies
  */
@@ -18,6 +20,7 @@ import { __, _x } from "@wordpress/i18n";
 import { useSelect, useDispatch } from "@wordpress/data";
 import { Fragment } from "@wordpress/element";
 import { Card } from "@material-ui/core";
+import { useEffect, useState, useMemo } from "@wordpress/element";
 
 /**
  * Internal dependencies
@@ -37,8 +40,10 @@ const useStyles = makeStyles({
     marginRight: "8px",
   },
 });
-export default ({ handleViewTypeChange }) => {
+export default ({ handleViewTypeChange, sendTestEmail }) => {
   const classes = useStyles();
+
+  const [testEmail, setTestEmail] = useState([]);
 
   const { editorMode, isInserterEnabled } = useSelect(
     (select) => ({
@@ -51,6 +56,11 @@ export default ({ handleViewTypeChange }) => {
   const { switchEditorMode, setIsInserterOpened } = useDispatch(
     CORE_STORE_NAME
   );
+
+  const handleTestEmailChange = (e) => {
+    console.log(e.target.value);
+    setTestEmail(e.target.value);
+  };
 
   const isTextModeEnabled = editorMode === "text";
 
@@ -130,28 +140,35 @@ export default ({ handleViewTypeChange }) => {
           "Generic label for replacements button"
         )}
       />
+
       <ToolbarItem
-        as={Button}
+        as={Dialog}
+        buttonIcon={<UpdateIcon />}
         className={
           classes.button + " groundhogg-header-toolbar__update-and-test"
         }
         variant="contained"
         color="primary"
         size="small"
-        onClick={() => switchEditorMode("update-and-test")}
-        onMouseDown={(event) => {
-          event.preventDefault();
-        }}
-        startIcon={<UpdateIcon />}
-        /* translators: button label text should, if possible, be under 16
-		characters. */
+        buttonTitle={__("Update and Test")}
+        title={__("Update and Test")}
+        content={__(
+          <TextField
+            onChange={handleTestEmailChange}
+            label={__("Send Test Email to ...")}
+            value={testEmail}
+            placeholder={__(
+              "Pre Header Text: Used to summarize the content of the email."
+            )}
+          />
+        )}
+        dialogButtons={[{ color: "primary", label: __("Done") }]}
         label={_x(
           "Update and Test Link",
           "Generic label for replacements button"
         )}
-      >
-        {__("Update and Test")}
-      </ToolbarItem>
+      />
+
       <ToolbarItem
         as={Button}
         size="small"

@@ -49,6 +49,7 @@ export default function Header({
   handleTitleChange,
   title,
   handleViewTypeChange,
+  sendTestEmail,
 }) {
   const classes = useStyles();
   return (
@@ -96,7 +97,10 @@ export default function Header({
         tabIndex="-1"
       >
         <HeaderToolbar>
-          <HeaderSecondary handleViewTypeChange={handleViewTypeChange} />
+          <HeaderSecondary
+            handleViewTypeChange={handleViewTypeChange}
+            sendTestEmail={sendTestEmail}
+          />
         </HeaderToolbar>
       </div>
     </Card>
