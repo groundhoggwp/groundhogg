@@ -306,6 +306,11 @@ class Replacements {
 		return $this->replacement_codes;
 	}
 
+	/**
+     * Get just the codes...
+     *
+	 * @return array
+	 */
 	public function get_codes(){
 	    return wp_list_pluck( array_values( $this->replacement_codes ), 'code' );
     }
