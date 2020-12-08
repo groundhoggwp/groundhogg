@@ -122,9 +122,10 @@ function managed_page_head( $title = '', $action = '' ) {
     <head>
         <meta charset="<?php bloginfo( 'charset' ); ?>">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+	    <?php no_index_tag(); ?>
         <link rel="profile" href="http://gmpg.org/xfn/11">
         <title><?php echo $mp_title; ?></title>
-		<?php wp_head(); ?>
+        <?php wp_head(); ?>
     </head>
     <body class="managed-page <?php echo esc_attr( implode( ' ', $classes ) ); ?>">
     <div id="main">

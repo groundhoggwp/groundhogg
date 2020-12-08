@@ -321,8 +321,9 @@ class Plugin {
 
 		new Blocks\Blocks();
 
-		if ( ! is_white_labeled() ) {
-			new Reviews();
+        if( ! is_white_labeled() ) {
+            new Reviews();
+	        new License_Nag();
 //            new Upgrade_Notice();
 		}
 

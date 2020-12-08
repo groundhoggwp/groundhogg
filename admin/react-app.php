@@ -34,6 +34,7 @@ class React_App {
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_settings' ] );
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_basename' ] );
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_fields' ] );
+		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_replacement_codes' ] );
 	}
 
 
@@ -279,6 +280,20 @@ class React_App {
 
 		return $obj;
 	}
+
+	/**
+     * Add the replacement codes to the global object
+     *
+	 * @param $obj
+	 *
+	 * @return mixed
+	 */
+	public function register_replacement_codes( $obj ){
+
+	    $obj[ 'replacements' ] = Plugin::instance()->replacements->get_replacements();
+
+	    return $obj;
+    }
 
 	/**
 	 * Make the settings accessible
