@@ -46,20 +46,22 @@ const Sidebar = () => {
 
   const [blocks, setBlocks] = useState(getBlockTypes());
   const [search, setSearch] = useState("");
-  let blockTypes = getBlockTypes();
+
+  useEffect(() => {
+    updateBlocks();
+  }, [search]);
 
   const handleOnChange = (e) => {
-    setSearch(e.target.value);
-
-    updateBlocks();
+    setSearch(e.target.value.trim());
   };
 
   const updateBlocks = () => {
-    if (e.target.value.trim() === "") {
+    if (search === "") {
       setBlocks(getBlockTypes());
     } else {
       const newBlocks = getBlockTypes().filter(
-        (block) => block.title.toLowerCase().indexOf(search) !== -1
+        (block) =>
+          block.title.split(" - ")[1].toLowerCase().indexOf(search) !== -1
       );
       setBlocks(newBlocks);
     }
@@ -83,25 +85,30 @@ const Sidebar = () => {
           onChange={handleOnChange}
           fullWidth
         />
-        {blocks.map((block) => {
-          return (
-            <div className="block-editor-block drag-drop">
-              <svg
-                aria-hidden="true"
-                role="img"
-                focusable="false"
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                class="dashicon dashicons-shield"
+        <div className="side-bar-blocks-container">
+          {blocks.map((block) => {
+            return (
+              <div
+                className="block-editor-block side-bar-drag-drop-block"
+                data-block={JSON.stringify(block)}
               >
-                <path d="M10 2s3 2 7 2c0 11-7 14-7 14S3 15 3 4c4 0 7-2 7-2zm0 8h5s1-1 1-5c0 0-5-1-6-2v7H5c1 4 5 7 5 7v-7z"></path>
-              </svg>
-              {block.title}
-            </div>
-          );
-        })}
+                <svg
+                  aria-hidden="true"
+                  role="img"
+                  focusable="false"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  class="dashicon dashicons-shield"
+                >
+                  <path d="M10 2s3 2 7 2c0 11-7 14-7 14S3 15 3 4c4 0 7-2 7-2zm0 8h5s1-1 1-5c0 0-5-1-6-2v7H5c1 4 5 7 5 7v-7z"></path>
+                </svg>
+                {block.title}
+              </div>
+            );
+          })}
+        </div>
       </Panel>
       <Panel header={__("Inspector")}>
         <InspectorSlot bubblesVirtually />

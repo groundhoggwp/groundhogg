@@ -3,13 +3,8 @@
   padding-top: $grid-unit-60 + 5;
   margin-left: auto;
   margin-right: auto;
+}
 
-  .block-editor-block-list__block {
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .wp-block {
-    max-width: $content-width;
-  }
+.groundhogg-block-editor__email-container {
+  width: calc(100% - 400px);
 }

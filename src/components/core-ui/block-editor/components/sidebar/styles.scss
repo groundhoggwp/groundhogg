@@ -1,38 +1,20 @@
 .interface-interface-skeleton .interface-interface-skeleton__sidebar {
-  overflow: visible;
   outline: none;
-}
-
-.interface-interface-skeleton__sidebar > div {
   overflow: visible;
+  top: 10px;
 }
 
 .groundhogg-email-sidebar {
-  overflow: visible;
   outline: none;
+  overflow: visible;
   background: $white;
   border-left: $border-width solid $gray-200;
   bottom: 0;
   color: $gray-900;
-  height: 100vh;
   right: 0;
-  top: 0;
-  width: $sidebar-width;
-
-  @include break-small() {
-    -webkit-overflow-scrolling: touch;
-    height: auto;
-    overflow: auto;
-    top: $admin-bar-height-big + $header-height;
-  }
-
-  @include break-medium() {
-    top: $admin-bar-height + $header-height;
-  }
-
-  @include break-small() {
-    display: block;
-  }
+  // margin-top: 10px;
+  width: 388px;
+  margin-right: 20px;
 
   > .components-panel {
     border-left: 0;
@@ -42,6 +24,7 @@
 
     > .components-panel__header {
       background: $gray-200;
+      border-radius: 4px 4px 0 0;
     }
   }
 

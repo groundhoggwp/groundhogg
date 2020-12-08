@@ -22,7 +22,8 @@
 
 .editor-styles-wrapper {
   width: 100%;
-
+  margin-left: auto;
+  margin-right: auto;
   @include break-small {
     width: calc(100% - #{$sidebar-width});
   }
@@ -49,7 +50,7 @@
 }
 
 .groundhogg-block-editor {
-  top: 140px;
+  top: 129px;
   padding-bottom: 280px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -60,9 +61,6 @@
   top: 100px;
   left: 115px;
   max-width: 1600px;
-  .interface-interface-skeleton__sidebar {
-    top: 10px;
-  }
 }
 .edit-post-text-editor {
   position: relative;
@@ -73,8 +71,8 @@
 
 .edit-post-text-editor__body {
   width: 100%;
-  max-width: 1080px;
-  padding: 0 24px 24px;
+  // max-width: 1080px;
+  // padding: 0 24px 24px;
   margin-left: auto;
   margin-right: auto;
 
@@ -89,24 +87,22 @@
   border: 1px solid #ccc;
 }
 
-#inner-dropzone {
-  position: absolute;
-  height: 700px;
-  width: calc(100% - 300px);
+.side-bar-blocks-container {
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
-.dropzone {
+.groundhogg-email-editor__email-content {
+}
+
+.groundhogg-email-editor__email-content.drop-active {
   background-color: #bfe4ff;
-  border: dashed 4px transparent;
-  border-radius: 4px;
-  margin: 10px auto 30px;
-  padding: 10px;
-  width: 80%;
-  transition: background-color 0.3s;
 }
 
 .drop-active {
-  border-color: #aaa;
+  color: #005a87;
+  border: 1px solid #005a87;
+  z-index: 999;
 }
 
 .drop-target {
@@ -115,32 +111,25 @@
   border-style: solid;
 }
 
-.drag-drop {
+.side-bar-drag-drop-block {
   display: inline-block;
   width: 40px;
   padding: 2em 0.5em;
-  margin: 1rem 0 0 1rem;
+  border: 1px solid #ccc;
+  margin: 5px;
   z-index: 1000;
   color: #000;
-  // background-color: #29e;
-  border: solid 2px #fff;
-
   touch-action: none;
   -webkit-transform: translate(0px, 0px);
   transform: translate(0px, 0px);
-
-  transition: background-color 0.3s;
+  border-radius: 4px;
+  // transition: background-color 0.3s;
+  background: #fff;
 }
 
-.drag-drop:hover {
-  color: "#007cbal";
-  background-color: "#007cbal";
-}
-
-.drop-active {
-  border: 1px solid #000;
-  // color: #000;
-  // background-color: #4e4;
+.side-bar-drag-drop-block:hover {
+  color: #2196f3;
+  border: 1px solid #2196f3;
 }
 
 #grid-snap {

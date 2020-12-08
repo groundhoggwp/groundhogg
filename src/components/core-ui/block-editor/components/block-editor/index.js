@@ -41,18 +41,6 @@ import Sidebar from "../sidebar";
 //TODO Implement block persistence with email data store.
 //TODO Potentially use our own alerts data store (core).
 
-const useStyles = makeStyles((theme) => ({
-  subjectHeader: {
-    padding: "20px",
-    marginBottom: "10px",
-  },
-  subjectInputs: {
-    width: "100%",
-    padding: "",
-    marginBottom: "10px",
-  },
-}));
-
 function BlockEditor({
   settings: _settings,
   subject,
@@ -61,7 +49,26 @@ function BlockEditor({
   handlePreHeaderChange,
   content,
   handleContentChange,
+  viewType,
 }) {
+  const useStyles = makeStyles((theme) => ({
+    subjectHeader: {
+      padding: "20px",
+      marginBottom: "10px",
+    },
+    subjectInputs: {
+      width: "100%",
+      padding: "",
+      marginBottom: "10px",
+    },
+    emailContent: {
+      display: "block",
+      width: viewType === "desktop" ? "600px" : "320px",
+      marginLeft: "auto",
+      marginRight: "auto",
+    },
+  }));
+
   const [blocks, updateBlocks] = useState([]);
   const { createInfoNotice } = useDispatch("core/notices");
   const classes = useStyles();
@@ -95,12 +102,14 @@ function BlockEditor({
   }, []);
 
   const handleUpdateBlocks = (blocks) => {
+    console.log("update", blocks);
     updateBlocks(blocks);
+    handleContentChange(blocks);
   };
 
   const handlePersistBlocks = (newBlocks) => {
     // updateBlocks( newBlocks );
-    // console.log('handlePersistBlocks' , newBlocks)
+    console.log("handlePersistBlocks", newBlocks);
     // window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) )
     handleContentChange(blocks);
   };
@@ -117,29 +126,33 @@ function BlockEditor({
         onInput={handleUpdateBlocks}
         onChange={handlePersistBlocks}
       >
-        <Grid container spacing={3}>
-          <Grid item xs={9}>
-            <Card className={classes.subjectHeader}>
-              <form noValidate autoComplete="off">
-                <TextField
-                  className={classes.subjectInputs}
-                  onChange={handleSubjectChange}
-                  label={"Subject"}
-                  value={subject}
-                />
-                <TextField
-                  className={classes.subjectInputs}
-                  onChange={handlePreHeaderChange}
-                  label={"Pre Header"}
-                  value={preHeader}
-                  placeholder={__(
-                    "Pre Header Text: Used to summarize the content of the email."
-                  )}
-                />
-              </form>
-            </Card>
-            <Paper>
-              <BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper">
+        <div className="groundhogg-block-editor__email-container">
+          <Card className={classes.subjectHeader}>
+            <form noValidate autoComplete="off">
+              <TextField
+                className={classes.subjectInputs}
+                onChange={handleSubjectChange}
+                label={"Subject"}
+                value={subject}
+              />
+              <TextField
+                className={classes.subjectInputs}
+                onChange={handlePreHeaderChange}
+                label={"Pre Header"}
+                value={preHeader}
+                placeholder={__(
+                  "Pre Header Text: Used to summarize the content of the email."
+                )}
+              />
+            </form>
+          </Card>
+          <Paper>
+            <div
+              className={
+                classes.emailContent + " groundhogg-email-editor__email-content"
+              }
+            >
+              <BlockSelectionClearer className={classes}>
                 <VisualEditorGlobalKeyboardShortcuts />
                 <MultiSelectScrollIntoView />
                 {/* Add Block Button */}
@@ -156,13 +169,13 @@ function BlockEditor({
                   </CopyHandler>
                 </Typewriter>
               </BlockSelectionClearer>
-            </Paper>
-          </Grid>
-          <Sidebar.InspectorFill>
-            <Popover name="block-toolbar" />
-            <BlockInspector />
-          </Sidebar.InspectorFill>
-        </Grid>
+            </div>
+          </Paper>
+        </div>
+        <Sidebar.InspectorFill>
+          <Popover name="block-toolbar" />
+          <BlockInspector />
+        </Sidebar.InspectorFill>
       </BlockEditorProvider>
     </div>
   );
