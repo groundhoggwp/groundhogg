@@ -24,7 +24,7 @@ import { NAMESPACE } from '../constants';
 
 export default (endpoint) => ( {
     endpoint,
-    * SendEmailRaw (data) {
+    * sendEmailRaw (data) {
         // yield setIsScheduling(true);
         try {
             const result = yield apiFetch({
@@ -42,7 +42,7 @@ export default (endpoint) => ( {
     },
 
 
-    * SendEmailById ( emailId , data) {
+    * sendEmailById ( emailId , data) {
         // yield setIsScheduling(true);
         try {
             const result = yield apiFetch({

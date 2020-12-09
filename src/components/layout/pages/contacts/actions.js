@@ -13,6 +13,10 @@ import { __ } from '@wordpress/i18n'
 import IconButton from '@material-ui/core/IconButton'
 import EmailIcon from '@material-ui/icons/Email'
 import Tooltip from '@material-ui/core/Tooltip/Tooltip'
+import {useParams} from "react-router-dom";
+import {useDispatch} from "@wordpress/data";
+import {EMAILS_STORE_NAME} from "../../../../data";
+import {addNotification} from "../../../../utils";
 
 export const Actions = (props) => {
 
@@ -47,6 +51,8 @@ export const Actions = (props) => {
 export const SendEmails = (props) => {
   const [open, setOpen] = useState(false)
   const [email, setEmail] = useState({})
+  let { id } = useParams()
+  const {sendEmailById } = useDispatch(EMAILS_STORE_NAME)
 
   const handleClickOpen = () => {
     setOpen(true)
@@ -57,11 +63,14 @@ export const SendEmails = (props) => {
   }
 
   const handleSendEmail = () => {
-    alert(email.value);
+    if (Object.keys(email).length !== 0) {
+      // schedules the event
+      sendEmailById (email.value , {
+        id_or_email : id
+      })
+      addNotification( 'Email Scheduled.' , 'groundhogg' )
+    }
 
-    // code to send email using the ID
-
-    // TODO SEND EMAILS 
     setOpen(false)
 
   }
