@@ -18,6 +18,7 @@ use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use Groundhogg\Plugin;
 use \WP_Error;
+use function Groundhogg\install_gh_cron_file;
 use function Groundhogg\is_groundhogg_network_active;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\isset_not_empty;
@@ -926,10 +927,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	public function process_advanced_cron_install_gh_cron() {
 
-		$gh_cron_php = file_get_contents( GROUNDHOGG_PATH . 'gh-cron.txt' );
-		$bytes       = file_put_contents( ABSPATH . 'gh-cron.php', $gh_cron_php );
-
-		if ( ! $bytes ) {
+		if ( ! install_gh_cron_file() ) {
 			return new \WP_Error( 'error', __( 'Unable to install gh-cron.php file. Please install is manually.', 'groundhogg' ) );
 		} else {
 			$this->add_notice( 'success', __( 'Installed gh-cron.php successfully!', 'groundhogg' ) );

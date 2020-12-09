@@ -3294,6 +3294,28 @@ function gh_cron_installed() {
 }
 
 /**
+ * Install the GH cron file
+ *
+ * @return bool
+ */
+function install_gh_cron_file(){
+
+	$gh_cron_php = file_get_contents( GROUNDHOGG_PATH . 'gh-cron.txt' );
+	$bytes       = file_put_contents( ABSPATH . 'gh-cron.php', $gh_cron_php );
+
+	return (bool) $bytes;
+}
+
+/**
+ * Delete the GH cron file.
+ *
+ * @return bool
+ */
+function delete_gh_cron_file(){
+   return unlink( GROUNDHOGG_PATH . 'gh-cron.txt' );
+}
+
+/**
  * Get an event from the event history table by referencing it's ID from the event queue
  *
  * @param $queued_id int
@@ -3856,3 +3878,53 @@ add_action( 'wp_ajax_gh_meta_picker', __NAMESPACE__ . '\handle_ajax_meta_picker'
 function Ymd_His( $time = false ) {
 	return date( 'Y-m-d H:i:s', $time ?: time() );
 }
+
+/**
+ * Find which plugin has wp_mail defined.
+ *
+ * @throws \ReflectionException
+ * @return string
+ */
+function extrapolate_wp_mail_plugin() {
+
+	$reflFunc = new \ReflectionFunction( 'wp_mail' );
+	$defined  = wp_normalize_path( $reflFunc->getFileName() );
+
+	$active_plugins = get_option( 'active_plugins', [] );
+
+	foreach ( $active_plugins as $active_plugin ) {
+
+		$plugin_dir = 'wp-content/plugins/' . dirname( $active_plugin ) . '/';
+
+		if ( strpos( $defined, $plugin_dir ) !== false ) {
+			return $active_plugin;
+		}
+	}
+
+	// No active plugins are the cause, that means a plugin is probably including pluggable.php explicitly somewhere...
+	// BAD JU-JU guys...
+
+	// todo, find out which plugin includes pluggable before it's supposed to.
+
+	return $defined;
+}
+
+/**
+ * Tracks pings to the wp-cron.php file
+ */
+function track_wp_cron_ping(){
+    if ( defined('DOING_CRON') && DOING_CRON && ( ! defined( 'DOING_GH_CRON' ) || ! DOING_GH_CRON ) ){
+	    update_option( 'wp_cron_last_ping', time() );
+    }
+}
+
+add_action( 'wp_loaded', __NAMESPACE__ . '\track_wp_cron_ping' );
+
+/**
+ * Tracks the pings of the gh-cron.php.
+ */
+function track_gh_cron_ping(){
+    update_option( 'gh_cron_last_ping', time() );
+}
+
+add_action( 'groundhogg_process_queue', __NAMESPACE__ . '\track_gh_cron_ping', 9 );

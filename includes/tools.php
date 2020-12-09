@@ -18,7 +18,7 @@ function groundhogg_tools_sysinfo_get() {
 
 	global $wpdb;
 
-	$plugin = \Groundhogg\Plugin::$instance;
+	$plugin = \Groundhogg\Plugin::instance();
 
 	if( !class_exists( 'Browser' ) )
 		require_once GROUNDHOGG_PATH . 'includes/lib/browser.php';
@@ -95,7 +95,7 @@ function groundhogg_tools_sysinfo_get() {
 		'body'          => $request
 	);
 
-	$response = wp_remote_post( 'https://www.groundhogg.io', $params );
+	$response = wp_remote_post( 'https://www.groundhogg.io/wp-rest/gh/v3', $params );
 
 	if( !is_wp_error( $response ) && $response['response']['code'] >= 200 && $response['response']['code'] < 300 ) {
 		$WP_REMOTE_POST = 'wp_remote_post() works';
@@ -108,7 +108,6 @@ function groundhogg_tools_sysinfo_get() {
 	// Commented out per https://github.com/easydigitaldownloads/Easy-Digital-Downloads/issues/3475
 	//$return .= 'Admin AJAX:               ' . ( groundhogg_test_ajax_works() ? 'Accessible' : 'Inaccessible' ) . "\n";
 	$return .= 'WP_DEBUG:                 ' . ( defined( 'WP_DEBUG' ) ? WP_DEBUG ? 'Enabled' : 'Disabled' : 'Not set' ) . "\n";
-	$return .= 'DISABLE_WP_CRON:          ' . ( defined( 'DISABLE_WP_CRON' ) ? DISABLE_WP_CRON ? 'Enabled' : 'Disabled' : 'Not set' ) . "\n";
 	$return .= 'Memory Limit:             ' . WP_MEMORY_LIMIT . "\n";
 	$return .= 'Registered Post Stati:    ' . implode( ', ', get_post_stati() ) . "\n";
 
@@ -117,45 +116,108 @@ function groundhogg_tools_sysinfo_get() {
 	// Groundhogg configuration
 	$return .= "\n" . '-- Plugin Configuration' . "\n\n";
 	$return .= 'Version:                  ' . GROUNDHOGG_VERSION . "\n";
-	$return .= 'Global Multisite:         ' . ( $plugin->settings->is_global_multisite() ? "Enabled\n" : "Disabled\n" );
 	$return .= 'Safe Mode:                ' . ( is_option_enabled( 'gh_safe_mode_enabled' ) ? "Enabled\n" : "Disabled\n" );
-
-	$return .= "\n" . '-- Compliance Configuration' . "\n\n";
-	$return .= 'Confirmed Emails Only:     ' . ( $plugin->preferences->is_confirmation_strict() ? "Enabled\n" : "Disabled\n" );
-	$return .= 'Confirmation Grace Period: ' . $plugin->preferences->get_grace_period() . "\n";
-	$return .= 'GDPR Enabled:              ' . ( ( $plugin->preferences->is_gdpr_enabled() ) ? "Enabled\n" : "Disabled\n" );
-	$return .= 'GDPR Strict:               ' . ( $plugin->preferences->is_gdpr_strict()  ? "Enabled\n" : "Disabled\n" );
-
-	$return .= "\n" . '-- Bounce Configuration' . "\n\n";
-
-	$return .= 'IMAP Enabled:              ' . ( function_exists( 'imap_open' ) ? "Enabled\n" : "Disabled\n" );
-	$return .= 'Tracking Bounces:          ' . ( $plugin->bounce_checker->get_bounce_inbox() && $plugin->bounce_checker->get_bounce_inbox_pw() ? "Enabled\n" : "Disabled\n" );
-	$return .= 'Mail Server:               ' . $plugin->bounce_checker->get_mail_server() . "\n";
-	$return .= 'Port:                      ' . $plugin->bounce_checker->get_port() . "\n";
-
-	$return .= "\n" . '-- Email Configuration' . "\n\n";
-	$return .= 'Sending Service:           ' . ( $plugin->sending_service->is_active_for_email() && $plugin->sending_service->has_api_token() ? "Enabled\n" : "Disabled\n" );
-	$return .= 'Sending Service ALL MAIL:  ' . ( $plugin->sending_service->is_active_for_transactional_email() && $plugin->sending_service->has_api_token() ? "Enabled\n" : "Disabled\n" );
-
-	$return .= "\n" . '-- Event Queue Configuration' . "\n\n";
-	$return .= 'Max Execution Time:           ' . esc_html( Limits::get_time_limit() ) . " seconds\n";
-	$return .= 'Average Execution Time:       ' . esc_html( $plugin->event_queue->get_queue_execution_time() ) . " seconds\n";
-	$return .= 'Last Execution Time:          ' . esc_html( $plugin->event_queue->get_last_execution_time() ) . " seconds\n";
-	$return .= 'Total Executions:             ' . esc_html( $plugin->event_queue->get_total_executions() ) . "\n";
 
 	$return  = apply_filters( 'groundhogg_sysinfo_after_plugin_config', $return );
 
+	$return .= "\n" . '-- Compliance Configuration' . "\n\n";
+	$return .= 'Confirmation Required:    ' . ( $plugin->preferences->is_confirmation_strict() ? "Enabled\n" : "Disabled\n" );
+	$return .= 'Grace Period:             ' . $plugin->preferences->get_grace_period() . "\n";
+	$return .= 'GDPR Enabled:             ' . ( ( $plugin->preferences->is_gdpr_enabled() ) ? "Enabled\n" : "Disabled\n" );
+	$return .= 'GDPR Strict:              ' . ( $plugin->preferences->is_gdpr_strict()  ? "Enabled\n" : "Disabled\n" );
+	$return  = apply_filters( 'groundhogg_sysinfo_after_compliance_config', $return );
+
+	$return .= "\n" . '-- Bounce Configuration' . "\n\n";
+
+	$return .= 'IMAP Enabled:             ' . ( function_exists( 'imap_open' ) ? "Enabled\n" : "Disabled\n" );
+	$return .= 'Tracking Bounces:         ' . ( $plugin->bounce_checker->get_bounce_inbox() && $plugin->bounce_checker->get_bounce_inbox_pw() ? "Enabled\n" : "Disabled\n" );
+	$return .= 'Mail Server:              ' . $plugin->bounce_checker->get_mail_server() . "\n";
+	$return .= 'Port:                     ' . $plugin->bounce_checker->get_port() . "\n";
+	$return  = apply_filters( 'groundhogg_sysinfo_after_bounce_config', $return );
+
+	$return .= "\n" . '-- Email Configuration' . "\n\n";
+	$return .= 'wp_mail() defined in:     ' . \Groundhogg\extrapolate_wp_mail_plugin() . "\n";
+	$return .= 'Default FROM:             ' . sprintf( "%s <%s>", \Groundhogg\get_default_from_name(), \Groundhogg\get_default_from_email() ) . "\n";
+	$return  = apply_filters( 'groundhogg_sysinfo_after_email_config', $return );
+
+	$return .= "\n" . '-- CRON Configuration' . "\n\n";
+	$return .= 'DISABLE_WP_CRON:          ' . ( defined( 'DISABLE_WP_CRON' ) ? DISABLE_WP_CRON ? 'Enabled' : 'Disabled' : 'Not set' ) . "\n";
+	$return .= 'wp-cron.php last ping:    ' . ( get_option( 'wp_cron_last_ping' ) ? human_time_diff( get_option( 'wp_cron_last_ping' ), time() ) . ' ago' : 'Not pinged yet...' ) . "\n\n";
+	$return .= 'gh-cron.php installed:    ' . ( \Groundhogg\gh_cron_installed() ? 'Yes' : 'No' ) . "\n";
+	$return .= 'Event Queue Unhooked:     ' . ( ! wp_next_scheduled( 'groundhogg_process_queue' ) ? 'Yes' : 'No' ) . "\n";
+	$return .= 'gh-cron.php last ping:    ' . ( get_option( 'gh_cron_last_ping' ) ? human_time_diff( get_option( 'gh_cron_last_ping' ), time() ) . ' ago' : 'Not pinged yet...' ) . "\n";
+
+	$return  = apply_filters( 'groundhogg_sysinfo_after_cron_config', $return );
+
 	// Groundhogg Templates
-	$dir = get_stylesheet_directory() . '/groundhogg_templates/*';
+	$dir = get_stylesheet_directory() . '/groundhogg-templates/*';
 	if( is_dir( $dir ) && ( count( glob( "$dir/*" ) ) !== 0 ) ) {
 		$return .= "\n" . '-- Groundhogg Template Overrides' . "\n\n";
 
 		foreach( glob( $dir ) as $file ) {
-			$return .= 'Filename:                 ' . basename( $file ) . "\n";
+			$return .= 'Filename:          ' . basename( $file ) . "\n";
 		}
 
 		$return  = apply_filters( 'groundhogg_sysinfo_after_groundhogg_templates', $return );
 	}
+
+	// Server configuration (really just versioning)
+	$return .= "\n" . '-- Webserver Configuration' . "\n\n";
+	$return .= 'PHP Version:              ' . PHP_VERSION . "\n";
+	$return .= 'MySQL Version:            ' . $wpdb->db_version() . "\n";
+	$return .= 'Webserver Info:           ' . $_SERVER['SERVER_SOFTWARE'] . "\n";
+
+	$return  = apply_filters( 'groundhogg_sysinfo_after_webserver_config', $return );
+
+	// PHP configs... now we're getting to the important stuff
+	$return .= "\n" . '-- PHP Configuration' . "\n\n";
+	$return .= 'Memory Limit:             ' . ini_get( 'memory_limit' ) . "\n";
+	$return .= 'Upload Max Size:          ' . ini_get( 'upload_max_filesize' ) . "\n";
+	$return .= 'Post Max Size:            ' . ini_get( 'post_max_size' ) . "\n";
+	$return .= 'Upload Max Filesize:      ' . ini_get( 'upload_max_filesize' ) . "\n";
+	$return .= 'Time Limit:               ' . ini_get( 'max_execution_time' ) . "\n";
+	$return .= 'Max Input Vars:           ' . ini_get( 'max_input_vars' ) . "\n";
+	$return .= 'Display Errors:           ' . ( ini_get( 'display_errors' ) ? 'On (' . ini_get( 'display_errors' ) . ')' : 'N/A' ) . "\n";
+	$return .= 'PHP Arg Separator:        ' . ini_get( 'arg_separator.output' ) . "\n";
+
+	$return  = apply_filters( 'groundhogg_sysinfo_after_php_config', $return );
+
+	// PHP extensions and such
+	$return .= "\n" . '-- PHP Extensions' . "\n\n";
+	$return .= 'cURL:                     ' . ( function_exists( 'curl_init' ) ? 'Supported' : 'Not Supported' ) . "\n";
+	$return .= 'fsockopen:                ' . ( function_exists( 'fsockopen' ) ? 'Supported' : 'Not Supported' ) . "\n";
+	$return .= 'SOAP Client:              ' . ( class_exists( 'SoapClient' ) ? 'Installed' : 'Not Installed' ) . "\n";
+	$return .= 'Suhosin:                  ' . ( extension_loaded( 'suhosin' ) ? 'Installed' : 'Not Installed' ) . "\n";
+
+	$return  = apply_filters( 'groundhogg_sysinfo_after_php_ext', $return );
+
+	// Session stuff
+	$return .= "\n" . '-- Session Configuration' . "\n\n";
+	$return .= 'Session:                  ' . ( isset( $_SESSION ) ? 'Enabled' : 'Disabled' ) . "\n";
+
+	// The rest of this is only relevant is session is enabled
+	if( isset( $_SESSION ) ) {
+		$return .= 'Session Name:             ' . esc_html( ini_get( 'session.name' ) ) . "\n";
+		$return .= 'Cookie Path:              ' . esc_html( ini_get( 'session.cookie_path' ) ) . "\n";
+		$return .= 'Save Path:                ' . esc_html( ini_get( 'session.save_path' ) ) . "\n";
+		$return .= 'Use Cookies:              ' . ( ini_get( 'session.use_cookies' ) ? 'On' : 'Off' ) . "\n";
+		$return .= 'Use Only Cookies:         ' . ( ini_get( 'session.use_only_cookies' ) ? 'On' : 'Off' ) . "\n";
+	}
+
+	$return  = apply_filters( 'groundhogg_sysinfo_after_session_config', $return );
+
+	$plugin = \Groundhogg\Plugin::instance();
+
+	$return .= "\n" . '-- Tables' . "\n\n";
+
+	$dbs = $plugin->dbs->get_dbs();
+
+	foreach ( $dbs as $db ){
+		$return .= str_pad( sprintf( '%s:', $db->get_table_name() ), 25,' ', STR_PAD_RIGHT ) . ( $db->installed() ? 'Installed' : 'Not Installed' ) . "\n";
+	}
+
+	$return  = apply_filters( 'groundhogg_sysinfo_after_tables', $return );
+
 
 	// Get plugins that have an update
 	$updates = get_plugin_updates();
@@ -223,76 +285,6 @@ function groundhogg_tools_sysinfo_get() {
 		$return  = apply_filters( 'groundhogg_sysinfo_after_wordpress_ms_plugins', $return );
 	}
 
-	$plugin = \Groundhogg\Plugin::$instance;
-
-	// Server configuration (really just versioning)
-	$return .= "\n" . '-- Webserver Configuration' . "\n\n";
-	$return .= 'PHP Version:              ' . PHP_VERSION . "\n";
-	$return .= 'MySQL Version:            ' . $wpdb->db_version() . "\n";
-	$return .= 'Webserver Info:           ' . $_SERVER['SERVER_SOFTWARE'] . "\n";
-
-	$return  = apply_filters( 'groundhogg_sysinfo_after_webserver_config', $return );
-
-	// PHP configs... now we're getting to the important stuff
-	$return .= "\n" . '-- PHP Configuration' . "\n\n";
-	$return .= 'Memory Limit:             ' . ini_get( 'memory_limit' ) . "\n";
-	$return .= 'Upload Max Size:          ' . ini_get( 'upload_max_filesize' ) . "\n";
-	$return .= 'Post Max Size:            ' . ini_get( 'post_max_size' ) . "\n";
-	$return .= 'Upload Max Filesize:      ' . ini_get( 'upload_max_filesize' ) . "\n";
-	$return .= 'Time Limit:               ' . ini_get( 'max_execution_time' ) . "\n";
-	$return .= 'Max Input Vars:           ' . ini_get( 'max_input_vars' ) . "\n";
-	$return .= 'Display Errors:           ' . ( ini_get( 'display_errors' ) ? 'On (' . ini_get( 'display_errors' ) . ')' : 'N/A' ) . "\n";
-	$return .= 'PHP Arg Separator:        ' . ini_get( 'arg_separator.output' ) . "\n";
-
-	$return  = apply_filters( 'groundhogg_sysinfo_after_php_config', $return );
-
-	// PHP extensions and such
-	$return .= "\n" . '-- PHP Extensions' . "\n\n";
-	$return .= 'cURL:                     ' . ( function_exists( 'curl_init' ) ? 'Supported' : 'Not Supported' ) . "\n";
-	$return .= 'fsockopen:                ' . ( function_exists( 'fsockopen' ) ? 'Supported' : 'Not Supported' ) . "\n";
-	$return .= 'SOAP Client:              ' . ( class_exists( 'SoapClient' ) ? 'Installed' : 'Not Installed' ) . "\n";
-	$return .= 'Suhosin:                  ' . ( extension_loaded( 'suhosin' ) ? 'Installed' : 'Not Installed' ) . "\n";
-
-	$return  = apply_filters( 'groundhogg_sysinfo_after_php_ext', $return );
-
-	// Session stuff
-	$return .= "\n" . '-- Session Configuration' . "\n\n";
-	$return .= 'Session:                  ' . ( isset( $_SESSION ) ? 'Enabled' : 'Disabled' ) . "\n";
-
-	// The rest of this is only relevant is session is enabled
-	if( isset( $_SESSION ) ) {
-		$return .= 'Session Name:             ' . esc_html( ini_get( 'session.name' ) ) . "\n";
-		$return .= 'Cookie Path:              ' . esc_html( ini_get( 'session.cookie_path' ) ) . "\n";
-		$return .= 'Save Path:                ' . esc_html( ini_get( 'session.save_path' ) ) . "\n";
-		$return .= 'Use Cookies:              ' . ( ini_get( 'session.use_cookies' ) ? 'On' : 'Off' ) . "\n";
-		$return .= 'Use Only Cookies:         ' . ( ini_get( 'session.use_only_cookies' ) ? 'On' : 'Off' ) . "\n";
-	}
-
-	$return .= "\n" . '-- Tables' . "\n\n";
-
-	$dbs = $plugin->dbs->get_dbs();
-
-	foreach ( $dbs as $db ){
-		$return .= str_pad( sprintf( '%s:', $db->get_table_name() ), 25,' ', STR_PAD_RIGHT ) . ( $db->installed() ? 'Installed' : 'Not Installed' ) . "\n";
-	}
-
-	$return .= "\n" . '-- WPDB' . "\n\n";
-	$return .= implode( PHP_EOL, $wpdb->tables() ) . "\n";
-
-	$return .= "\n" . '-- Rewrites' . "\n\n";
-
-	global $wp_rewrite;
-
-	$return .= "Structure: $wp_rewrite->permalink_structure\n";
-	$return .= "Rules:\n";
-
-	if ( ! empty( $wp_rewrite->rewrite_rules() ) ){
-		foreach ( $wp_rewrite->rules as $rule => $match ){
-			$return .= " - $rule : $match\n";
-		}
-	}
-
-	$return  = apply_filters( 'groundhogg_sysinfo_after_session_config', $return );
 	$return .= "\n" . '### End System Info ###';
 
 	return $return;

@@ -309,6 +309,11 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.2.23.3 (2020-12-09) =
+* TWEAKED Improved system status file with more useful information for the support team.
+* TWEAKED Auto Link link will support CID specified in the url.
+* TWEAKED Added `DOING_GH_CRON` constant to the `gh-cron.php` file.
+
 = 2.2.23.2 (2020-12-07) =
 * FIXED License missing message showing even though all active extensions are licensed in some cases.
 
