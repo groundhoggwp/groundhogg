@@ -65,8 +65,6 @@ export default ({ settings, email, history }) => {
     return null;
   }
 
-
-
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
   };
@@ -97,13 +95,6 @@ export default ({ settings, email, history }) => {
   const handleUpdateBlocks = (blocks) => {
     console.log("update", blocks);
     updateBlocks(blocks);
-    handleContentChange(blocks);
-  };
-
-  const handlePersistBlocks = (newBlocks) => {
-    // updateBlocks( newBlocks );
-    console.log("handlePersistBlocks", newBlocks);
-    // window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) )
     handleContentChange(blocks);
   };
 
@@ -242,7 +233,6 @@ export default ({ settings, email, history }) => {
           handleContentChange={handleContentChange}
           viewType={viewType}
           handleUpdateBlocks={handleUpdateBlocks}
-          handlePersistBlocks={handlePersistBlocks}
           blocks={blocks}
         />
       );
@@ -262,7 +252,6 @@ export default ({ settings, email, history }) => {
           handleContentChange={handleContentChange}
           viewType={viewType}
           handleUpdateBlocks={handleUpdateBlocks}
-          handlePersistBlocks={handlePersistBlocks}
           blocks={blocks}
         />
       );

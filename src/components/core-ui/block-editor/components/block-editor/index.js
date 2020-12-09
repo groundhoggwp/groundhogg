@@ -51,8 +51,7 @@ function BlockEditor({
   handleContentChange,
   viewType,
   handleUpdateBlocks,
-  handlePersistBlocks,
-  blocks
+  blocks,
 }) {
   const useStyles = makeStyles((theme) => ({
     subjectHeader: {
@@ -95,7 +94,6 @@ function BlockEditor({
     };
   }, [canUserCreateMedia, _settings]);
 
-
   if (!settings.hasOwnProperty("__experimentalBlockPatterns")) {
     settings.__experimentalBlockPatterns = [];
   }
@@ -106,7 +104,7 @@ function BlockEditor({
         value={blocks}
         settings={settings}
         onInput={handleUpdateBlocks}
-        onChange={handlePersistBlocks}
+        onChange={handleUpdateBlocks}
       >
         <div className="groundhogg-block-editor__email-container">
           <Card className={classes.subjectHeader}>
