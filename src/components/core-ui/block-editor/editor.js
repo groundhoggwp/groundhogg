@@ -88,6 +88,10 @@ export default ({ settings, email, history }) => {
 
   const handleContentChangeDraggedBlock = () => {
 
+    let newBlocks = blocks;
+    // console.log(blocks, draggedBlock, newBlocks)
+    newBlocks.push(createBlock(draggedBlock.name));
+    handleUpdateBlocks(newBlocks)
     // const newBlock = JSON.parse(target.getAttribute("data-block"))
     // // const newBlock = createBlock(JSON.parse(target.getAttribute("data-block")).name);
     // // console.log(newBlock)
@@ -104,12 +108,6 @@ export default ({ settings, email, history }) => {
     // // insertBlock(newBlock);
     // // // insertBlock(newBlock, 1, newBlock.clientId);
     // insertBlocks([newBlock]);
-
-
-    let newBlocks = blocks;
-    console.log(blocks, draggedBlock, newBlocks)
-    newBlocks.push(createBlock(draggedBlock.name));
-    handleUpdateBlocks(newBlocks)
     // const blockData = {"name":"groundhogg/divider","icon":{"src":"shield"},"keywords":["Groundhogg - Divider"],"attributes":{"height":{"type":"number","default":2},"width":{"type":"number","default":80},"color":{"type":"string"},"className":{"type":"string"}},"providesContext":{},"usesContext":[],"supports":{},"styles":[],"title":"Groundhogg - Divider","category":"text","description":"Add Space in your email","variations":[]}
     // let newBlock = createBlock(draggedBlock.name)
     // // let newBlock = createBlock(blockData.name, blockData.attributes)
@@ -201,37 +199,32 @@ export default ({ settings, email, history }) => {
       target.setAttribute("data-y", 0);
     };
 
+    // if(interact.isSet(".groundhogg-email-editor__email-content")){
+    //   console.log('unsett')
+    //   interact(".groundhogg-email-editor__email-content").unset();
+    // }
     interact(".groundhogg-email-editor__email-content").dropzone({
       overlap: 0.75,
       ondropactivate: (event) => {
-        // event.target.style.border = "1px solid #005a87";
-        // event.target.style.background = "#bfe4ff";
-        // console.log("started drag", event.target, event.target.classList);
       },
       ondragenter: (event) => {
-        var draggableElement = event.relatedTarget;
-        var dropzoneElement = event.target;
-        // console.log("entered the drag zone, still holding");
+        // var draggableElement = event.relatedTarget;
+        // var dropzoneElement = event.target;
       },
       ondragleave: (event) => {
-        // Probably dont need this one
       },
       ondrop: (event) => {
-        // Add block here
         console.log("dropped");
         handleContentChangeDraggedBlock();
-        // event.relatedTarget.textContent = "Dropped";
       },
       ondropdeactivate: (event) => {
-        // remove active dropzone feedback
-        // console.log("ended drag", event.target);
-        event.target.style.border = "";
-        event.target.style.background = "";
-        event.target.classList.remove("drop-active");
       },
     });
 
-    // interact(".wp-block, .side-bar-drag-drop-block")
+    // if(interact.isSet(".side-bar-drag-drop-block, .wp-block")){
+    //   interact(".side-bar-drag-drop-block, .wp-block").unset();
+    // }
+
     interact(".side-bar-drag-drop-block, .wp-block").draggable({
       cursorChecker(action, interactable, element, interacting) {
         return "grab";
