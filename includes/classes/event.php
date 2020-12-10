@@ -83,6 +83,7 @@ class Event extends Base_Object {
 		}
 
 		parent::__construct( $identifier_or_args, $field );
+		self::register_default_event_types();
 	}
 
 	/**
@@ -143,7 +144,7 @@ class Event extends Base_Object {
 	}
 
 	/**
-	 * @return int
+	 * @return string
 	 */
 	public function get_event_type() {
 		return $this->event_type;

@@ -119,7 +119,7 @@ class Event_Queue extends DB {
 			'step_id'        => '%d',
 			'email_id'       => '%d',
 			'contact_id'     => '%d',
-			'event_type'     => '%d',
+			'event_type'     => '%s',
 			'error_code'     => '%s',
 			'error_message'  => '%s',
 			'status'         => '%s',
