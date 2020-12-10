@@ -136,14 +136,18 @@ export default ({ settings, email, history }) => {
       const target = event.target;
       event.target.classList.add("drop-active");
       setDraggedBlock(JSON.parse(target.getAttribute("data-block")));
-      let newBlock = JSON.parse(target.getAttribute("data-block"))
-
+      const newBlock = createBlock(JSON.parse(target.getAttribute("data-block")).name);
+      console.log(newBlock)
+      insertBlock(newBlock);
       // Otal API resource for core block calls
       // https://developer.wordpress.org/block-editor/data/data-core-block-editor/
       // https://developer.wordpress.org/block-editor/data/data-core-block-editor/#insertBlock
-      const newBlock1 = createBlock(newBlock.name, {}, [{attributes: newBlock.attributes}])
-      console.log(newBlock1)
-      insertBlock(newBlock, 1, newBlock.clientId);
+      // const newBlock1 = createBlock(newBlock.name)
+      // const newBlock2 = createBlock(newBlock.name, {}, [{attributes: newBlock.attributes}])
+      console.log(newBlock)
+      // insertBlock(createBlock(newBlock.name, {}, [{attributes: newBlock.attributes}]));
+      insertBlock(newBlock);
+      // insertBlock(newBlock, 1, newBlock.clientId);
       insertBlocks([newBlock]);
 
       // keep the dragged position in the data-x/data-y attributes
