@@ -47,6 +47,7 @@ import { getLuxonDate } from "utils/index";
 import { CORE_STORE_NAME, EMAILS_STORE_NAME } from "data";
 
 let draggedBlock = {};
+let startInteractJS = false
 export default ({ settings, email, history }) => {
   const dispatch = useDispatch(EMAILS_STORE_NAME);
   const { sendEmailById } = useDispatch(EMAILS_STORE_NAME);
@@ -63,6 +64,7 @@ export default ({ settings, email, history }) => {
   const [preHeader, setPreHeader] = useState(defaultPreHeaderValue);
   const [content, setContent] = useState(defaultContentValue);
   const [viewType, setViewType] = useState("desktop");
+  const [blocks, updateBlocks] = useState(parse(defaultContentValue));
 
   const { editorMode, isSaving, item } = useSelect(
     (select) => ({
@@ -87,60 +89,20 @@ export default ({ settings, email, history }) => {
   const handlePreHeaderChange = (e) => {
     setPreHeader(e.target.value);
   };
-  const handleContentChange = (blocks) => {
-    if (!Array.isArray(blocks)) {
-      return;
-    }
-    setContent(serialize(blocks));
-  };
 
-  const [blocks, updateBlocks] = useState([]);
 
   const handleContentChangeDraggedBlock = () => {
     let newBlocks = blocks;
-    // console.log(blocks, draggedBlock, newBlocks)
     newBlocks.push(createBlock(draggedBlock.name));
     handleUpdateBlocks(newBlocks);
-    // const newBlock = JSON.parse(target.getAttribute("data-block"))
-    // // const newBlock = createBlock(JSON.parse(target.getAttribute("data-block")).name);
-    // // console.log(newBlock)
-    // // insertBlock(newBlock);
-    // // Otal API resource for core block calls
-    // // https://developer.wordpress.org/block-editor/data/data-core-block-editor/
-    // // https://developer.wordpress.org/block-editor/data/data-core-block-editor/#insertBlock
-    // // const newBlock1 = createBlock(newBlock.name)
-    // // const newBlock2 = createBlock(newBlock.name, {}, [{attributes: newBlock.attributes}])
-    // console.log(newBlock)
-    // let insertionPoint = select( 'core/block-editor' ).getBlockInsertionPoint();
-    // console.log(insertionPoint)
-    // insertBlock(createBlock(newBlock))
-    // // insertBlock(newBlock);
-    // // // insertBlock(newBlock, 1, newBlock.clientId);
-    // insertBlocks([newBlock]);
-    // const blockData = {"name":"groundhogg/divider","icon":{"src":"shield"},"keywords":["Groundhogg - Divider"],"attributes":{"height":{"type":"number","default":2},"width":{"type":"number","default":80},"color":{"type":"string"},"className":{"type":"string"}},"providesContext":{},"usesContext":[],"supports":{},"styles":[],"title":"Groundhogg - Divider","category":"text","description":"Add Space in your email","variations":[]}
-    // let newBlock = createBlock(draggedBlock.name)
-    // // let newBlock = createBlock(blockData.name, blockData.attributes)
-    //
-    //
-    //
-    // const newBlocks = blocks
-    //
-    // console.log(newBlock, newBlocks)
-    //
-    // newBlocks.push(newBlock)
-    //
-    //
-    // handleUpdateBlocks(newBlocks)
-    // console.log(parse(block))
-    // console.log(serialize(block))
-    // setContent(serialize(blocks));
-    // setDraggedBlock(null);
   };
 
   const handleUpdateBlocks = (blocks) => {
     // console.log("update", blocks);
     updateBlocks(blocks);
-    handleContentChange(blocks);
+    if (Array.isArray(blocks)) {
+      setContent(serialize(blocks));
+    }
   };
 
   const saveDraft = (e) => {
@@ -178,6 +140,7 @@ export default ({ settings, email, history }) => {
       const target = event.target;
       event.target.classList.add("drop-active");
       draggedBlock = JSON.parse(target.getAttribute("data-block"));
+      // setDraggedBlock(JSON.parse(target.getAttribute("data-block"));
 
       // keep the dragged position in the data-x/data-y attributes
       const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
