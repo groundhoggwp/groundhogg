@@ -17,7 +17,7 @@ import {
 import { PostTextEditor } from "@wordpress/editor";
 import { useEffect, useState } from "@wordpress/element";
 import { useSelect, useDispatch } from "@wordpress/data";
-import { serialize, parse, pasteHandler, rawHandler } from "@wordpress/blocks";
+import { serialize, parse, pasteHandler, rawHandler, createBlock, insertBlock, insertBlocks, insertDefaultBlock, getBlockTypes } from "@wordpress/blocks";
 
 /**
  * External dependencies
@@ -85,7 +85,9 @@ export default ({ settings, email, history }) => {
   const [blocks, updateBlocks] = useState([]);
 
   const handleContentChangeDraggedBlock = () => {
-    console.log("handle content", draggedBlock);
+
+
+
     // console.log(parse(block))
     // console.log(serialize(block))
     // setContent(serialize(blocks));
@@ -93,7 +95,7 @@ export default ({ settings, email, history }) => {
   };
 
   const handleUpdateBlocks = (blocks) => {
-    console.log("update", blocks);
+    // console.log("update", blocks);
     updateBlocks(blocks);
     handleContentChange(blocks);
   };
@@ -128,12 +130,21 @@ export default ({ settings, email, history }) => {
     history.goBack();
   };
 
-  const setupInteractJS = () => {
+  const setupInteractJS = async () => {
     const dragMoveListener = (event) => {
-      console.log("set block", draggedBlock);
+
       const target = event.target;
       event.target.classList.add("drop-active");
-      setDraggedBlock(target.getAttribute("data-block"));
+      setDraggedBlock(JSON.parse(target.getAttribute("data-block")));
+      let newBlock = JSON.parse(target.getAttribute("data-block"))
+
+      // Otal API resource for core block calls
+      // https://developer.wordpress.org/block-editor/data/data-core-block-editor/
+      // https://developer.wordpress.org/block-editor/data/data-core-block-editor/#insertBlock
+      const newBlock1 = createBlock(newBlock.name, {}, [{attributes: newBlock.attributes}])
+      console.log(newBlock1)
+      insertBlock(newBlock, 1, newBlock.clientId);
+      insertBlocks([newBlock]);
 
       // keep the dragged position in the data-x/data-y attributes
       const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
@@ -168,12 +179,12 @@ export default ({ settings, email, history }) => {
       ondropactivate: (event) => {
         // event.target.style.border = "1px solid #005a87";
         // event.target.style.background = "#bfe4ff";
-        console.log("started drag", event.target, event.target.classList);
+        // console.log("started drag", event.target, event.target.classList);
       },
       ondragenter: (event) => {
         var draggableElement = event.relatedTarget;
         var dropzoneElement = event.target;
-        console.log("entered the drag zone, still holding");
+        // console.log("entered the drag zone, still holding");
       },
       ondragleave: (event) => {
         // Probably dont need this one
@@ -186,7 +197,7 @@ export default ({ settings, email, history }) => {
       },
       ondropdeactivate: (event) => {
         // remove active dropzone feedback
-        console.log("ended drag", event.target);
+        // console.log("ended drag", event.target);
         event.target.style.border = "";
         event.target.style.background = "";
         event.target.classList.remove("drop-active");
@@ -208,7 +219,7 @@ export default ({ settings, email, history }) => {
     setViewType(type);
   };
   const sendTestEmail = (type) => {
-    console.log("email");
+    // console.log("email");
     // setViewType(type);
   };
 
