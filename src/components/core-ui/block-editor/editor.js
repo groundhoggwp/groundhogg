@@ -35,6 +35,8 @@ import BlockEditor from "./components/block-editor";
 import { getLuxonDate } from "utils/index";
 import { CORE_STORE_NAME, EMAILS_STORE_NAME } from "data";
 
+
+let draggedBlock = {}
 export default ({ settings, email, history }) => {
   const dispatch = useDispatch(EMAILS_STORE_NAME);
 
@@ -46,7 +48,7 @@ export default ({ settings, email, history }) => {
   } = email.data;
 
   const [title, setTitle] = useState(defaultTitleValue);
-  const [draggedBlock, setDraggedBlock] = useState(null);
+  // const [draggedBlock, setDraggedBlock] = useState(null);
   const [subject, setSubject] = useState(defaultSubjectValue);
   const [preHeader, setPreHeader] = useState(defaultPreHeaderValue);
   const [content, setContent] = useState(defaultContentValue);
@@ -86,8 +88,42 @@ export default ({ settings, email, history }) => {
 
   const handleContentChangeDraggedBlock = () => {
 
+    // const newBlock = JSON.parse(target.getAttribute("data-block"))
+    // // const newBlock = createBlock(JSON.parse(target.getAttribute("data-block")).name);
+    // // console.log(newBlock)
+    // // insertBlock(newBlock);
+    // // Otal API resource for core block calls
+    // // https://developer.wordpress.org/block-editor/data/data-core-block-editor/
+    // // https://developer.wordpress.org/block-editor/data/data-core-block-editor/#insertBlock
+    // // const newBlock1 = createBlock(newBlock.name)
+    // // const newBlock2 = createBlock(newBlock.name, {}, [{attributes: newBlock.attributes}])
+    // console.log(newBlock)
+    // let insertionPoint = select( 'core/block-editor' ).getBlockInsertionPoint();
+    // console.log(insertionPoint)
+    // insertBlock(createBlock(newBlock))
+    // // insertBlock(newBlock);
+    // // // insertBlock(newBlock, 1, newBlock.clientId);
+    // insertBlocks([newBlock]);
 
 
+    let newBlocks = blocks;
+    console.log(blocks, draggedBlock, newBlocks)
+    newBlocks.push(createBlock(draggedBlock.name));
+    handleUpdateBlocks(newBlocks)
+    // const blockData = {"name":"groundhogg/divider","icon":{"src":"shield"},"keywords":["Groundhogg - Divider"],"attributes":{"height":{"type":"number","default":2},"width":{"type":"number","default":80},"color":{"type":"string"},"className":{"type":"string"}},"providesContext":{},"usesContext":[],"supports":{},"styles":[],"title":"Groundhogg - Divider","category":"text","description":"Add Space in your email","variations":[]}
+    // let newBlock = createBlock(draggedBlock.name)
+    // // let newBlock = createBlock(blockData.name, blockData.attributes)
+    //
+    //
+    //
+    // const newBlocks = blocks
+    //
+    // console.log(newBlock, newBlocks)
+    //
+    // newBlocks.push(newBlock)
+    //
+    //
+    // handleUpdateBlocks(newBlocks)
     // console.log(parse(block))
     // console.log(serialize(block))
     // setContent(serialize(blocks));
@@ -135,23 +171,7 @@ export default ({ settings, email, history }) => {
 
       const target = event.target;
       event.target.classList.add("drop-active");
-      setDraggedBlock(JSON.parse(target.getAttribute("data-block")));
-      const newBlock = JSON.parse(target.getAttribute("data-block"))
-      // const newBlock = createBlock(JSON.parse(target.getAttribute("data-block")).name);
-      // console.log(newBlock)
-      // insertBlock(newBlock);
-      // Otal API resource for core block calls
-      // https://developer.wordpress.org/block-editor/data/data-core-block-editor/
-      // https://developer.wordpress.org/block-editor/data/data-core-block-editor/#insertBlock
-      // const newBlock1 = createBlock(newBlock.name)
-      // const newBlock2 = createBlock(newBlock.name, {}, [{attributes: newBlock.attributes}])
-      console.log(newBlock)
-      let insertionPoint = select( 'core/block-editor' ).getBlockInsertionPoint();
-      console.log(insertionPoint)
-      insertBlock(createBlock(newBlock))
-      // insertBlock(newBlock);
-      // // insertBlock(newBlock, 1, newBlock.clientId);
-      // insertBlocks([newBlock]);
+     draggedBlock = JSON.parse(target.getAttribute("data-block"));
 
       // keep the dragged position in the data-x/data-y attributes
       const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
@@ -234,6 +254,8 @@ export default ({ settings, email, history }) => {
     if (content?.length) {
       handleUpdateBlocks(() => parse(content));
     }
+
+    console.log(blocks)
     setupInteractJS();
   }, [draggedBlock]);
 
