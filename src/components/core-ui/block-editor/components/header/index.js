@@ -51,7 +51,7 @@ export default function Header({
   handleViewTypeChange,
   sendTestEmail,
   handleTestEmailChange,
-  testEmail
+  testEmail,
 }) {
   const classes = useStyles();
   return (

@@ -17,7 +17,18 @@ import {
 import { PostTextEditor } from "@wordpress/editor";
 import { useEffect, useState } from "@wordpress/element";
 import { useSelect, useDispatch } from "@wordpress/data";
-import { serialize, parse, pasteHandler, rawHandler, createBlock, insertBlock, insertBlocks, insertDefaultBlock, getBlockTypes, getBlockInsertionPoint } from "@wordpress/blocks";
+import {
+  serialize,
+  parse,
+  pasteHandler,
+  rawHandler,
+  createBlock,
+  insertBlock,
+  insertBlocks,
+  insertDefaultBlock,
+  getBlockTypes,
+  getBlockInsertionPoint,
+} from "@wordpress/blocks";
 
 /**
  * External dependencies
@@ -35,11 +46,10 @@ import BlockEditor from "./components/block-editor";
 import { getLuxonDate } from "utils/index";
 import { CORE_STORE_NAME, EMAILS_STORE_NAME } from "data";
 
-
-let draggedBlock = {}
+let draggedBlock = {};
 export default ({ settings, email, history }) => {
   const dispatch = useDispatch(EMAILS_STORE_NAME);
-  const { sendEmailById } = useDispatch(EMAILS_STORE_NAME)
+  const { sendEmailById } = useDispatch(EMAILS_STORE_NAME);
   const {
     title: defaultTitleValue,
     subject: defaultSubjectValue,
@@ -87,11 +97,10 @@ export default ({ settings, email, history }) => {
   const [blocks, updateBlocks] = useState([]);
 
   const handleContentChangeDraggedBlock = () => {
-
     let newBlocks = blocks;
     // console.log(blocks, draggedBlock, newBlocks)
     newBlocks.push(createBlock(draggedBlock.name));
-    handleUpdateBlocks(newBlocks)
+    handleUpdateBlocks(newBlocks);
     // const newBlock = JSON.parse(target.getAttribute("data-block"))
     // // const newBlock = createBlock(JSON.parse(target.getAttribute("data-block")).name);
     // // console.log(newBlock)
@@ -166,10 +175,9 @@ export default ({ settings, email, history }) => {
 
   const setupInteractJS = async () => {
     const dragMoveListener = (event) => {
-
       const target = event.target;
       event.target.classList.add("drop-active");
-     draggedBlock = JSON.parse(target.getAttribute("data-block"));
+      draggedBlock = JSON.parse(target.getAttribute("data-block"));
 
       // keep the dragged position in the data-x/data-y attributes
       const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
@@ -205,20 +213,17 @@ export default ({ settings, email, history }) => {
     // }
     interact(".groundhogg-email-editor__email-content").dropzone({
       overlap: 0.75,
-      ondropactivate: (event) => {
-      },
+      ondropactivate: (event) => {},
       ondragenter: (event) => {
         // var draggableElement = event.relatedTarget;
         // var dropzoneElement = event.target;
       },
-      ondragleave: (event) => {
-      },
+      ondragleave: (event) => {},
       ondrop: (event) => {
         console.log("dropped");
         handleContentChangeDraggedBlock();
       },
-      ondropdeactivate: (event) => {
-      },
+      ondropdeactivate: (event) => {},
     });
 
     // if(interact.isSet(".side-bar-drag-drop-block, .wp-block")){
@@ -245,19 +250,14 @@ export default ({ settings, email, history }) => {
     // setTestEmail(e.target.value);
 
     sendEmailById(e.target.value, {
-      id_or_email: 'n.sachs.7@gmail.com'
-    })
+      id_or_email: "n.sachs.7@gmail.com",
+    });
     // addNotification({ message: __('Email Scheduled.' ,'groundhogg' ), type: 'success' })
-
   };
 
   const sendTestEmail = (type) => {
     console.log("email", testEmail);
     // console.log(event)
-
-
-
-
   };
 
   useEffect(() => {
@@ -265,7 +265,7 @@ export default ({ settings, email, history }) => {
       handleUpdateBlocks(() => parse(content));
     }
 
-    console.log(blocks)
+    console.log(blocks);
     setupInteractJS();
   }, [draggedBlock]);
 
