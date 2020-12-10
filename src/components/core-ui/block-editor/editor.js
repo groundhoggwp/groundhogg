@@ -39,7 +39,7 @@ import { CORE_STORE_NAME, EMAILS_STORE_NAME } from "data";
 let draggedBlock = {}
 export default ({ settings, email, history }) => {
   const dispatch = useDispatch(EMAILS_STORE_NAME);
-
+  const { sendEmailById } = useDispatch(EMAILS_STORE_NAME)
   const {
     title: defaultTitleValue,
     subject: defaultSubjectValue,
@@ -238,9 +238,26 @@ export default ({ settings, email, history }) => {
   const handleViewTypeChange = (type) => {
     setViewType(type);
   };
+
+  const [testEmail, setTestEmail] = useState([]);
+  const handleTestEmailChange = (e) => {
+    console.log(e.target.value);
+    // setTestEmail(e.target.value);
+
+    sendEmailById(e.target.value, {
+      id_or_email: 'n.sachs.7@gmail.com'
+    })
+    // addNotification({ message: __('Email Scheduled.' ,'groundhogg' ), type: 'success' })
+
+  };
+
   const sendTestEmail = (type) => {
-    // console.log("email");
-    // setViewType(type);
+    console.log("email", testEmail);
+    // console.log(event)
+
+
+
+
   };
 
   useEffect(() => {
@@ -308,6 +325,7 @@ export default ({ settings, email, history }) => {
                   handleTitleChange={handleTitleChange}
                   handleViewTypeChange={handleViewTypeChange}
                   sendTestEmail={sendTestEmail}
+                  handleTestEmailChange={handleTestEmailChange}
                   title={title}
                 />
               }

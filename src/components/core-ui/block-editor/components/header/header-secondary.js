@@ -40,10 +40,9 @@ const useStyles = makeStyles({
     marginRight: "8px",
   },
 });
-export default ({ handleViewTypeChange, sendTestEmail }) => {
+export default ({ handleViewTypeChange, sendTestEmail, testEmail, handleTestEmailChange }) => {
   const classes = useStyles();
 
-  const [testEmail, setTestEmail] = useState([]);
 
   const { editorMode, isInserterEnabled } = useSelect(
     (select) => ({
@@ -57,10 +56,7 @@ export default ({ handleViewTypeChange, sendTestEmail }) => {
     CORE_STORE_NAME
   );
 
-  const handleTestEmailChange = (e) => {
-    console.log(e.target.value);
-    setTestEmail(e.target.value);
-  };
+
 
   const isTextModeEnabled = editorMode === "text";
 
@@ -166,6 +162,11 @@ export default ({ handleViewTypeChange, sendTestEmail }) => {
             )}
           />
         )}
+        onClick={(event) => {
+          // event.preventDefault();
+          console.log('clikcck')
+        }}
+
         dialogButtons={[{ color: "primary", label: __("Done") }]}
         label={_x(
           "Update and Test Link",
