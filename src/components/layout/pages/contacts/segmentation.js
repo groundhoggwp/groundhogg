@@ -59,9 +59,6 @@ export const Segmentation = (props) => {
           md: '12',
           lg: '12'
         },
-
-
-
       ],
     }
   ]

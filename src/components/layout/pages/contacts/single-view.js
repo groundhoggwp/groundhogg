@@ -31,6 +31,8 @@ import AccordionDetails from '@material-ui/core/AccordionDetails'
 import Typography from '@material-ui/core/Typography'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import { Actions } from 'components/layout/pages/contacts/actions'
+import Button from '@material-ui/core/Button'
+import Box from '@material-ui/core/Box'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,6 +53,67 @@ const useStyles = makeStyles((theme) => ({
     fontSize: theme.typography.pxToRem(15),
     fontWeight: theme.typography.fontWeightRegular,
   },
+  imgFluid: {
+    maxWidth: '100%',
+    height: 'auto'
+  },
+  imgRaised: {
+    borderRadius: '50% !important',
+    boxShadow:
+      '0 5px 15px -8px rgba(0, 0, 0, 0.24), 0 8px 10px -5px rgba(0, 0, 0, 0.2)'
+  },
+
+  profile: {
+    textAlign: 'center',
+    '& img': {
+      maxWidth: '150px',
+      width: '100%',
+      margin: '0 auto',
+      transform: 'translate3d(0, -50%, 0)'
+    }
+  },
+  description: {
+    margin: '1.071rem auto 0',
+    maxWidth: '600px',
+    color: '#999',
+    textAlign: 'center !important'
+  },
+  name: {
+    marginTop: '-80px'
+  },
+  mainRaised: {
+    background: '#FFFFFF',
+    position: 'relative',
+    zIndex: '3',
+    // margin: '-60px 30px 0px',
+    borderRadius: '10px',
+    // boxShadow:
+    //   '0 16px 0px 1px rgba(0, 0, 0,0), '+
+    //   '0 6px 0px 1px rgba(0, 0, 0, 0.12), '+
+    //   '0 8px 0px -5px rgba(0, 0, 0, 0.2)'
+  },
+  title: {
+    display: 'inline-block',
+    position: 'relative',
+    marginTop: '30px',
+    minHeight: '32px',
+    textDecoration: 'none'
+  },
+  socials: {
+    marginTop: '0',
+    width: '100%',
+    transform: 'none',
+    left: '0',
+    top: '0',
+    height: '100%',
+    lineHeight: '41px',
+    fontSize: '20px',
+    color: '#999'
+  },
+  navWrapper: {
+    margin: '20px auto 50px auto',
+    textAlign: 'center'
+  }
 
 }))
 
@@ -158,7 +221,7 @@ export const SingleView = (props) => {
   return (
     <Fragment>
       {/*<p>Single view: Contact ID: {id}</p>*/}
-      <Grid container spacing={0}>
+      <Grid container spacing={1}>
         <Grid item xs={12} md={3} lg={3}>
           <SideBar contact={contact}/>
         </Grid>
@@ -194,19 +257,51 @@ export const SingleView = (props) => {
   )
 }
 
-export const SideBar = (props) => {
+export const SideBar = ({ contact }) => {
 
   const classes = useStyles()
-  const { meta, data } = props.contact
+  const { meta, data } = contact
 
   return (
 
     <Fragment>
-      <img className={classes.contactImage}
-           src={meta.profile_picture}/>
-      <h3> {data.first_name + ' ' + data.last_name} </h3>
-      <p> {data.email}</p>
-      <Actions/>
+      <Grid container>
+        <Grid item style={{ width: '100%', marginTop: 75 }}>
+          <Box className={classes.mainRaised} boxShadow={2}>
+            <div>
+              <div className={classes.profile}>
+                <Grid container justify="center">
+                  <Grid Item xs={12} sm={12} md={6}>
+                    <div className={classes.profile}>
+                      <div>
+                        <img src={meta.profile_picture} alt="..." className={classes.imgRaised}/>
+                      </div>
+                      <div className={classes.name}>
+                        <h3 className={classes.title}> {data.first_name + ' ' + data.last_name} </h3>
+                        <h6>{data.email}</h6>
+                      </div>
+                    </div>
+                  </Grid>
+                </Grid>
+              </div>
+            </div>
+          </Box>
+        </Grid>
+        <Grid item style={{ width: '100%', marginTop:5 }}>
+          <Box className={classes.mainRaised} boxShadow={2}>
+            <Actions/>
+          </Box>
+        </Grid>
+
+        <Grid item style={{ width: '100%' }}>
+          <Box className={classes.mainRaised} boxShadow={2}>
+            <Segmentation contact={contact}/>
+          </Box>
+        </Grid>
+
+      </Grid>
+
+
     </Fragment>
   )
 }

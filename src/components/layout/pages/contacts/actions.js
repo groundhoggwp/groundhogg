@@ -77,31 +77,31 @@ export const SendEmails = (props) => {
 
   return (
     <div>
-      {/*<Tooltip title={__('Send Email', 'groundhogg')}>*/}
-      {/*  <IconButton aria-label={__('Send Email', 'groundhogg')} onClick={handleClickOpen} style={{*/}
-      {/*    bgcolor: 'background.paper',*/}
-      {/*    borderColor: 'text.primary',*/}
-      {/*    m: 1,*/}
-      {/*    border: 1,*/}
-      {/*    style: { width: '5rem', height: '5rem' },*/}
-      {/*  }}>*/}
+      <Tooltip title={__('Send Email', 'groundhogg')}>
+        <IconButton aria-label={__('Send Email', 'groundhogg')} onClick={handleClickOpen} style={{
+          bgcolor: 'background.paper',
+          borderColor: 'text.primary',
+          m: 1,
+          border: 1,
+          style: { width: '5rem', height: '5rem' },
+        }}>
 
 
-      {/*    <EmailIcon color={'primary'}/>*/}
-      {/*  </IconButton>*/}
-      {/*</Tooltip>*/}
+          <EmailIcon color={'primary'}/>
+        </IconButton>
+      </Tooltip>
 
 
-      <Button
-        variant="outlined"
-        color="primary"
-        size="large"
-        onClick={handleClickOpen}
-        // className={classes.button}
-        startIcon={<EmailIcon />}
-      >
-        {__('Send Email', 'groundhogg')}
-      </Button>
+      {/*<Button*/}
+      {/*  variant="outlined"*/}
+      {/*  color="primary"*/}
+      {/*  size="large"*/}
+      {/*  onClick={handleClickOpen}*/}
+      {/*  // className={classes.button}*/}
+      {/*  startIcon={<EmailIcon />}*/}
+      {/*>*/}
+      {/*  {__('Send Email', 'groundhogg')}*/}
+      {/*</Button>*/}
 
       <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title" fullWidth={true} maxWidth={'md'}>
         <DialogTitle id="form-dialog-title">{__('Send Email', 'groundhogg')}</DialogTitle>
