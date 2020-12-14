@@ -47,10 +47,10 @@ import { getLuxonDate } from "utils/index";
 import { CORE_STORE_NAME, EMAILS_STORE_NAME } from "data";
 
 let draggedBlock = {};
-let startInteractJS = false
+let startInteractJS = false;
 export default ({ settings, email, history }) => {
   const dispatch = useDispatch(EMAILS_STORE_NAME);
-  const { sendEmailById } = useDispatch(EMAILS_STORE_NAME);
+  const { sendEmailById, sendEmailRaw } = useDispatch(EMAILS_STORE_NAME);
   const {
     title: defaultTitleValue,
     subject: defaultSubjectValue,
@@ -89,7 +89,6 @@ export default ({ settings, email, history }) => {
   const handlePreHeaderChange = (e) => {
     setPreHeader(e.target.value);
   };
-
 
   const handleContentChangeDraggedBlock = () => {
     let newBlocks = blocks;
@@ -146,6 +145,8 @@ export default ({ settings, email, history }) => {
       const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
       const y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
 
+      console.log(x, y);
+
       // translate the element
       target.style.webkitTransform = target.style.transform =
         "translate(" + x + "px, " + y + "px)";
@@ -179,11 +180,23 @@ export default ({ settings, email, history }) => {
       ondropactivate: (event) => {},
       ondragenter: (event) => {
         // var draggableElement = event.relatedTarget;
-        // var dropzoneElement = event.target;
+        var dropzoneElement = event.target.classList.add("active");
       },
-      ondragleave: (event) => {},
+      ondragleave: (event) => {
+        var dropzoneElement = event.target.classList.remove("active");
+      },
       ondrop: (event) => {
-        console.log("dropped");
+        console.log(
+          "dropped",
+          event.relatedTarget.offsetTop,
+          event.target.offsetTop
+        );
+        console.log(
+          "dropped",
+          event.relatedTarget.offsetLeft,
+          event.target.offsetLeft
+        );
+        var dropzoneElement = event.target.classList.remove("active");
         handleContentChangeDraggedBlock();
       },
       ondropdeactivate: (event) => {},
@@ -200,6 +213,21 @@ export default ({ settings, email, history }) => {
       autoScroll: true,
       onend: dragEndListener,
       listeners: { move: dragMoveListener },
+      modifiers: [
+        // interact.modifiers.snap({
+        //   // targets: [
+        //   //   interact.snappers.grid({ x: 30, y: 30 })
+        //   // ],
+        //   range: Infinity,
+        //   relativePoints: [ { x: 0, y: 0 } ]
+        // }),
+        interact.modifiers.restrict({
+          restriction: interact(".groundhogg-email-editor__email-content"),
+          elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
+          endOnly: true,
+        }),
+      ],
+      // inertia: true
     });
   };
 
@@ -211,11 +239,16 @@ export default ({ settings, email, history }) => {
   const handleTestEmailChange = (e) => {
     console.log(e.target.value);
     // setTestEmail(e.target.value);
-
-    sendEmailById(e.target.value, {
-      id_or_email: "n.sachs.7@gmail.com",
+    console.log(item.ID);
+    //
+    // sendEmailById(item.ID, {
+    sendEmailRaw({
+      to: "n.sachs.7@fastmail.com",
+      from_email: "dhrumit.groundhogg@gmail.com",
+      from_name: "TEST D",
+      content: content,
+      subject: subject,
     });
-    // addNotification({ message: __('Email Scheduled.' ,'groundhogg' ), type: 'success' })
   };
 
   const sendTestEmail = (type) => {

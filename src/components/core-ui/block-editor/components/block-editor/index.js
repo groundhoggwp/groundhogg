@@ -46,7 +46,7 @@ function BlockEditor({
   subject,
   handleSubjectChange,
   preHeader,
-  handlePreHeaderChange,  
+  handlePreHeaderChange,
   viewType,
   handleUpdateBlocks,
   blocks,
