@@ -9,16 +9,11 @@ import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import ContactTimeline from './contact-timeline'
 import TabPanel from 'components/core-ui/tab-panel'
-import { filter, forEach } from 'lodash'
 import { applyFilters } from '@wordpress/hooks'
-import { SettingsPanel } from 'components/layout/pages/settings/settings-panel'
-import { Divider } from '@material-ui/core'
+
 import { useSelect } from '@wordpress/data'
 import { CONTACTS_STORE_NAME } from 'data/contacts'
 
-import MailOutlineIcon from '@material-ui/icons/MailOutline'
-import { ContactPanel } from 'components/layout/pages/contacts/contact-panel'
-import TextField from '@material-ui/core/TextField'
 import { GeneralInfo } from './general-info'
 import { CustomInfo } from './custom-info'
 import { Segmentation } from './segmentation'
@@ -31,38 +26,14 @@ import AccordionDetails from '@material-ui/core/AccordionDetails'
 import Typography from '@material-ui/core/Typography'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import { Actions } from 'components/layout/pages/contacts/actions'
-import Button from '@material-ui/core/Button'
 import Box from '@material-ui/core/Box'
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  paper: {
-    padding: theme.spacing(2),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-  },
-  contactImage: {
-    maxWidth: '150px',
-    borderRadius: '50%',
-    // boxShadow: '1px 1px 4px #ccc',
-
-  },
-  heading: {
-    fontSize: theme.typography.pxToRem(15),
-    fontWeight: theme.typography.fontWeightRegular,
-  },
-  imgFluid: {
-    maxWidth: '100%',
-    height: 'auto'
-  },
-  imgRaised: {
+   imgRaised: {
     borderRadius: '50% !important',
     boxShadow:
       '0 5px 15px -8px rgba(0, 0, 0, 0.24), 0 8px 10px -5px rgba(0, 0, 0, 0.2)'
   },
-
   profile: {
     textAlign: 'center',
     '& img': {
@@ -72,44 +43,36 @@ const useStyles = makeStyles((theme) => ({
       transform: 'translate3d(0, -50%, 0)'
     }
   },
-  description: {
-    margin: '1.071rem auto 0',
-    maxWidth: '600px',
-    color: '#999',
-    textAlign: 'center !important'
-  },
-  name: {
+
+  actions: {
     marginTop: '-80px'
   },
   mainRaised: {
     background: '#FFFFFF',
     position: 'relative',
     zIndex: '3',
-    // margin: '-60px 30px 0px',
     borderRadius: '10px',
-    // boxShadow:
-    //   '0 16px 0px 1px rgba(0, 0, 0,0), '+
-    //   '0 6px 0px 1px rgba(0, 0, 0, 0.12), '+
-    //   '0 8px 0px -5px rgba(0, 0, 0, 0.2)'
+
   },
   title: {
-    display: 'inline-block',
+    // display: 'inline-block',
     position: 'relative',
-    marginTop: '30px',
-    minHeight: '32px',
-    textDecoration: 'none'
+    fontSize: 20,
+    fontWeight: 'bold',
+    textDecoration: 'none',
+    marginTop:10
+
+
   },
-  socials: {
-    marginTop: '0',
-    width: '100%',
-    transform: 'none',
-    left: '0',
-    top: '0',
-    height: '100%',
-    lineHeight: '41px',
-    fontSize: '20px',
-    color: '#999'
+  emailStyle :{
+    position: 'relative',
+    fontSize: 18,
+    // fontWeight: 'bold',
+    textDecoration: 'none',
+    marginTop:8
+
   },
+
   navWrapper: {
     margin: '20px auto 50px auto',
     textAlign: 'center'
@@ -117,14 +80,6 @@ const useStyles = makeStyles((theme) => ({
 
 }))
 
-//
-// const useStyles = makeStyles((theme) => ({
-//   root: {
-//     width: '100%',
-//     maxWidth: 360,
-//     backgroundColor: theme.palette.background.paper,
-//   },
-// }));
 
 export const SingleView = (props) => {
   const classes = useStyles()
@@ -164,19 +119,12 @@ export const SingleView = (props) => {
         )
       }
     },
-    {
-      label: 'Segmentation',
-      route: 'segmentation',
-      component: () => {
-        return (
-          <Segmentation contact={contact}/>
-        )
-      }
-    },
 
   ]
 
-  var AdditionalInfo = [
+  detailsTab = applyFilters('groundhogg.contacts.details', detailsTab)
+
+  var additionalInfo = [
     {
       label: 'Notes',
       route: 'notes',
@@ -198,6 +146,8 @@ export const SingleView = (props) => {
 
   ]
 
+  additionalInfo = applyFilters('groundhogg.contacts.additionalInfo', additionalInfo)
+
   var contactSections = [
     {
       label: 'Details ',
@@ -210,7 +160,7 @@ export const SingleView = (props) => {
       label: 'Additional Info ',
       component: () => {
         return (
-          <TabPanel tabs={AdditionalInfo} enableRouting={false} history={history} match={match}/>
+          <TabPanel tabs={additionalInfo} enableRouting={false} history={history} match={match}/>
         )
       }
     },
@@ -263,45 +213,57 @@ export const SideBar = ({ contact }) => {
   const { meta, data } = contact
 
   return (
-
     <Fragment>
-      <Grid container>
+      <Grid container spacing={2}>
         <Grid item style={{ width: '100%', marginTop: 75 }}>
           <Box className={classes.mainRaised} boxShadow={2}>
-            <div>
-              <div className={classes.profile}>
-                <Grid container justify="center">
-                  <Grid Item xs={12} sm={12} md={6}>
-                    <div className={classes.profile}>
-                      <div>
-                        <img src={meta.profile_picture} alt="..." className={classes.imgRaised}/>
-                      </div>
-                      <div className={classes.name}>
-                        <h3 className={classes.title}> {data.first_name + ' ' + data.last_name} </h3>
-                        <h6>{data.email}</h6>
-                      </div>
+            <div className={classes.profile}>
+              <Grid container justify="center" spacing={2}>
+                <Grid Item xs={12} sm={12} md={12}>
+                  <div className={classes.profile}>
+                    <img src={meta.profile_picture} alt="..." className={classes.imgRaised}/>
+                    <div className={classes.actions}>
+                      <Actions style={{ width: 100 }}/>
                     </div>
-                  </Grid>
+                  </div>
                 </Grid>
-              </div>
+                <Grid item>
+                  {/*<Typography variant="h3" component="h3" style={{ marginTop: 10 }}*/}
+                  {/*>{data.first_name + ' ' + data.last_name} </Typography>*/}
+                  {/**/}
+                  {/*<Typography variant="h6" component="h6" style={{ marginTop: 10 }}*/}
+                  {/*>{data.email}</Typography>*/}
+                  <div className={classes.title}> {data.first_name + ' ' + data.last_name} </div>
+                  <div className={classes.emailStyle}>{data.email}</div>
+                </Grid>
+              </Grid>
             </div>
           </Box>
         </Grid>
-        <Grid item style={{ width: '100%', marginTop:5 }}>
-          <Box className={classes.mainRaised} boxShadow={2}>
-            <Actions/>
-          </Box>
-        </Grid>
+
+        {/*<Grid item style={{ width: '100%' }}>*/}
+        {/*  <Box boxShadow={2} className={classes.mainRaised}>*/}
+        {/*    <Actions/>*/}
+        {/*  </Box>*/}
+
+        {/*</Grid>*/}
 
         <Grid item style={{ width: '100%' }}>
-          <Box className={classes.mainRaised} boxShadow={2}>
-            <Segmentation contact={contact}/>
+          <Box className={classes.mainRaised} style={{ padding: 5 }} boxShadow={2}>
+            <div>
+              {/*<div className={classes.profile}>*/}
+              <Grid container justify="center">
+                <Grid Item xs={12} sm={12} md={12}>
+                  <div className={classes.profile}>
+                    <Segmentation contact={contact}/>
+                  </div>
+                </Grid>
+              </Grid>
+              {/*</div>*/}
+            </div>
           </Box>
         </Grid>
-
       </Grid>
-
-
     </Fragment>
   )
 }

@@ -17,33 +17,69 @@ import { useParams } from 'react-router-dom'
 import { useDispatch } from '@wordpress/data'
 import { EMAILS_STORE_NAME } from '../../../../data'
 import { addNotification } from '../../../../utils'
+import { Grid } from '@material-ui/core'
+import { makeStyles } from '@material-ui/core/styles'
+import Box from '@material-ui/core/Box'
+
+const useStyles = makeStyles((theme) => ({
+  action: {
+    // backgroundColor: 'primary',
+
+  },
+  button: {
+    height: 95, // setting height/width is optional
+    width: 100,
+
+    // width: '100%'
+  },
+  label: {
+    // Aligns the content of the button vertically.
+    flexDirection: 'column'
+  },
+  icon: {
+    display: 'block',
+    width: 50,
+    height: 50,
+    border: '2px solid #909090',
+    borderColor :theme.palette.primary,
+    borderRadius: 50,
+    textAlign: 'center',
+
+  }
+
+}))
 
 export const Actions = (props) => {
 
-  let actions = [
+  let classes = useStyles()
 
+  let actions = [
     {
-      label: 'General Info ',
-      route: 'general',
+      label: 'SendEmail',
       component: () => {
         return <SendEmails/>
       }
     },
-
   ]
 
-  let contactActions = applyFilters('groundhogg.contacts.actions', actions)
+  let contactActions = applyFilters('groundhogg.contacts.actions', actions, classes)
   // let contactActions = actions
 
   return (
     <Fragment>
 
-      {contactActions.map((action) => {
-        return <action.component/>
-      })}
+      <Grid container spacing={2} justify="center">
+        {contactActions.map((action) => {
+          return (
+            // <Grid item lg={3} md={3} sm={3} xs={3} className={classes.action}>
+            <Grid item className={classes.action}>
+              <action.component/>
+            </Grid>
 
+          )
+        })}
+      </Grid>
     </Fragment>
-
   )
 
 }
@@ -53,6 +89,8 @@ export const SendEmails = (props) => {
   const [email, setEmail] = useState({})
   let { id } = useParams()
   const { sendEmailById } = useDispatch(EMAILS_STORE_NAME)
+
+  let classes = useStyles()
 
   const handleClickOpen = () => {
     setOpen(true)
@@ -68,7 +106,7 @@ export const SendEmails = (props) => {
       sendEmailById(email.value, {
         id_or_email: id
       })
-      addNotification({ message: __('Email Scheduled.' ,'groundhogg' ), type: 'success' })
+      addNotification({ message: __('Email Scheduled.', 'groundhogg'), type: 'success' })
     }
 
     setOpen(false)
@@ -76,32 +114,28 @@ export const SendEmails = (props) => {
   }
 
   return (
+
     <div>
       <Tooltip title={__('Send Email', 'groundhogg')}>
-        <IconButton aria-label={__('Send Email', 'groundhogg')} onClick={handleClickOpen} style={{
-          bgcolor: 'background.paper',
-          borderColor: 'text.primary',
-          m: 1,
-          border: 1,
-          style: { width: '5rem', height: '5rem' },
-        }}>
-
-
+        <IconButton aria-label={__('Send Email', 'groundhogg')} onClick={handleClickOpen} className={classes.icon} >
           <EmailIcon color={'primary'}/>
         </IconButton>
       </Tooltip>
 
 
       {/*<Button*/}
-      {/*  variant="outlined"*/}
+      {/*  // classes={{ root: classes.button, label: classes.label }}*/}
+      {/*  variant="raised"*/}
       {/*  color="primary"*/}
-      {/*  size="large"*/}
+      {/*  disableRipple={true}*/}
       {/*  onClick={handleClickOpen}*/}
-      {/*  // className={classes.button}*/}
-      {/*  startIcon={<EmailIcon />}*/}
+
+      {/*  className={classes.icon}*/}
       {/*>*/}
+      {/*  <EmailIcon />*/}
       {/*  {__('Send Email', 'groundhogg')}*/}
       {/*</Button>*/}
+
 
       <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title" fullWidth={true} maxWidth={'md'}>
         <DialogTitle id="form-dialog-title">{__('Send Email', 'groundhogg')}</DialogTitle>
