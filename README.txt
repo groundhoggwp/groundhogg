@@ -310,6 +310,7 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 == Changelog ==
 
 = 2.2.23.4 (2020-12-09) =
+* TWEAKED Replacement codes will default to blank "" if no info is available instead of the code name.
 * FIXED ChartJS not loading after WordPress 5.6
 
 = 2.2.23.3 (2020-12-09) =

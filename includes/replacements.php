@@ -367,7 +367,7 @@ class Replacements {
 	 */
 	protected function parse_code( $code = '' ) {
 
-		$default = $code;
+		$default = "";
 		$arg     = false;
 
 		//Support Default Arguments.
@@ -410,9 +410,13 @@ class Replacements {
 		$default = $parts['default'];
 
 		// Return tag if tag not set
-		if ( ( ! $this->has_replacement( $code ) && substr( $code, 0, 1 ) !== '_' ) || ! $this->contact_id || ! $this->current_contact ) {
+		if ( ! $this->has_replacement( $code ) && substr( $code, 0, 1 ) !== '_' ) {
 			return $default;
 		}
+
+//		else if ( ! $this->contact_id || ! $this->current_contact ){
+//			return $default;
+//        }
 
 		$cache_key   = 'key:' . $this->contact_id . ':' . md5( serialize( $parts ) );
 		$cache_value = wp_cache_get( $cache_key, 'replacements' );
