@@ -127,6 +127,19 @@ export const getLuxonDate = (type) => {
     default:
       console.log(`Nothing matched in luxon.`);
   }
+}
+/**
 
+ * Returns Luxon returns in a predictable manner
+ *
+ * @param {string=}  type What type, usually associated to DB or widget requirements
+  *
+ * @return {DateIOSString|Luxon Object} Returns various Luxon outputs, strings, objects etc.
+ */
+export const matchEmailRegex = (testEmail) => {
+  if(testEmail.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)){
+    return true;
+  }
 
+  return false;  
 }

@@ -83,8 +83,19 @@
   }
 }
 
-.wp-block {
-  border: 1px solid #ccc;
+// .groundhogg-email-editor__email-content .wp-block {
+.groundhogg-email-editor__email-content.active .wp-block {
+  // border-color: ;
+  border: dashed 4px #aaa;
+}
+
+.groundhogg-email-editor__email-content.active {
+  background-color: #bfe4ff;
+  border-radius: 4px;
+  margin: 10px auto 30px;
+  padding: 10px;
+  width: 80%;
+  transition: background-color 0.3s;
 }
 
 .side-bar-blocks-container {

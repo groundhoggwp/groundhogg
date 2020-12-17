@@ -17,7 +17,18 @@ import {
 import { PostTextEditor } from "@wordpress/editor";
 import { useEffect, useState } from "@wordpress/element";
 import { useSelect, useDispatch } from "@wordpress/data";
-import { serialize, parse, pasteHandler, rawHandler } from "@wordpress/blocks";
+import {
+  serialize,
+  parse,
+  pasteHandler,
+  rawHandler,
+  createBlock,
+  insertBlock,
+  insertBlocks,
+  insertDefaultBlock,
+  getBlockTypes,
+  getBlockInsertionPoint,
+} from "@wordpress/blocks";
 
 /**
  * External dependencies
@@ -32,12 +43,15 @@ import Notices from "./components/notices";
 import Header from "./components/header";
 import Sidebar from "./components/sidebar";
 import BlockEditor from "./components/block-editor";
-import { getLuxonDate } from "utils/index";
+import { getLuxonDate, matchEmailRegex } from "utils/index";
+
 import { CORE_STORE_NAME, EMAILS_STORE_NAME } from "data";
 
+let draggedBlock = {};
+let startInteractJS = false;
 export default ({ settings, email, history }) => {
   const dispatch = useDispatch(EMAILS_STORE_NAME);
-
+  const { sendEmailById, sendEmailRaw } = useDispatch(EMAILS_STORE_NAME);
   const {
     title: defaultTitleValue,
     subject: defaultSubjectValue,
@@ -46,11 +60,12 @@ export default ({ settings, email, history }) => {
   } = email.data;
 
   const [title, setTitle] = useState(defaultTitleValue);
-  const [draggedBlock, setDraggedBlock] = useState(null);
+  // const [draggedBlock, setDraggedBlock] = useState(null);
   const [subject, setSubject] = useState(defaultSubjectValue);
   const [preHeader, setPreHeader] = useState(defaultPreHeaderValue);
   const [content, setContent] = useState(defaultContentValue);
   const [viewType, setViewType] = useState("desktop");
+  const [blocks, updateBlocks] = useState(parse(defaultContentValue));
 
   const { editorMode, isSaving, item } = useSelect(
     (select) => ({
@@ -61,12 +76,13 @@ export default ({ settings, email, history }) => {
     []
   );
 
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value);
-  };
   if (!item.hasOwnProperty("ID")) {
     return null;
   }
+
+  const handleTitleChange = (e) => {
+    setTitle(e.target.value);
+  };
 
   const handleSubjectChange = (e) => {
     setSubject(e.target.value);
@@ -74,26 +90,19 @@ export default ({ settings, email, history }) => {
   const handlePreHeaderChange = (e) => {
     setPreHeader(e.target.value);
   };
-  const handleContentChange = (blocks) => {
-    if (!Array.isArray(blocks)) {
-      return;
-    }
-    setContent(serialize(blocks));
-  };
+
   const handleContentChangeDraggedBlock = () => {
-    console.log("handle content", draggedBlock);
-    // console.log(parse(block))
-    // console.log(serialize(block))
-    // setContent(serialize(blocks));
-    // setDraggedBlock(null);
+    let newBlocks = blocks;
+    newBlocks.push(createBlock(draggedBlock.name));
+    handleUpdateBlocks(newBlocks);
   };
-  const handleBlockResize = (width, height) => {
-    let modifiedBlocks = parse(content);
-    console.log(modifiedBlocks[2]);
-    modifiedBlocks[2].attributes.width = width;
-    modifiedBlocks[2].attributes.height = height;
-    console.log(modifiedBlocks[2]);
-    setContent(serialize(modifiedBlocks));
+
+  const handleUpdateBlocks = (blocks) => {
+    // console.log("update", blocks);
+    updateBlocks(blocks);
+    if (Array.isArray(blocks)) {
+      setContent(serialize(blocks));
+    }
   };
 
   const saveDraft = (e) => {
@@ -126,17 +135,18 @@ export default ({ settings, email, history }) => {
     history.goBack();
   };
 
-  useEffect(() => {
+  const setupInteractJS = async () => {
     const dragMoveListener = (event) => {
-      let target = event.target;
-
-      setDraggedBlock(target.getAttribute("data-block"));
-      console.log("set block", draggedBlock);
+      const target = event.target;
       event.target.classList.add("drop-active");
+      draggedBlock = JSON.parse(target.getAttribute("data-block"));
+      // setDraggedBlock(JSON.parse(target.getAttribute("data-block"));
 
       // keep the dragged position in the data-x/data-y attributes
-      let x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
-      let y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
+      const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
+      const y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
+
+      console.log(x, y);
 
       // translate the element
       target.style.webkitTransform = target.style.transform =
@@ -147,16 +157,11 @@ export default ({ settings, email, history }) => {
       target.setAttribute("data-y", y);
     };
     const dragEndListener = (event) => {
-      let target = event.target;
-      // document
-      //   .querySelectorAll(".block-editor-block.drop-active")
-      //   .forEach((ele) => {
-      //     // ele.classList.toggle('drop-active');
-      //   });
+      const target = event.target;
 
       // keep the dragged position in the data-x/data-y attributes
-      let x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
-      let y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
+      const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
+      const y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
 
       // translate the element
       target.style.webkitTransform = target.style.transform =
@@ -167,135 +172,96 @@ export default ({ settings, email, history }) => {
       target.setAttribute("data-y", 0);
     };
 
+    // if(interact.isSet(".groundhogg-email-editor__email-content")){
+    //   console.log('unsett')
+    //   interact(".groundhogg-email-editor__email-content").unset();
+    // }
     interact(".groundhogg-email-editor__email-content").dropzone({
-      // only accept elements matching this CSS selector
-      // accept: ".edit-post-visual-editor",
-      // accept: "#block-editor-droppable-area",
-      // Require a 75% element overlap for a drop to be possible
       overlap: 0.75,
-
-      // listen for drop related events:
-
-      ondropactivate: (event) => {
-        // add active dropzone feedback
-
-        // event.target.classList.add("drop-active");
-        event.target.style.border = "1px solid #005a87";
-        event.target.style.background = "#bfe4ff";
-        console.log("started drag", event.target, event.target.classList);
-      },
+      ondropactivate: (event) => {},
       ondragenter: (event) => {
-        var draggableElement = event.relatedTarget;
-        var dropzoneElement = event.target;
-        console.log("entered the drag zone, still holding");
-        // feedback the possibility of a drop
-        // dropzoneElement.classList.add("drop-target");
-        // draggableElement.classList.add("can-drop");
-        // draggableElement.textContent = "Dragged in";
+        // var draggableElement = event.relatedTarget;
+        var dropzoneElement = event.target.classList.add("active");
       },
       ondragleave: (event) => {
-        // Probably dont need this one
-        // remove the drop feedback style
-        // event.target.classList.remove("drop-target");
-        // event.relatedTarget.classList.remove("can-drop");
-        // event.relatedTarget.textContent = "Dragged out";
+        var dropzoneElement = event.target.classList.remove("active");
       },
       ondrop: (event) => {
-        // Add block here
-        console.log("dropped");
+        console.log(
+          "dropped",
+          event.relatedTarget.offsetTop,
+          event.target.offsetTop
+        );
+        console.log(
+          "dropped",
+          event.relatedTarget.offsetLeft,
+          event.target.offsetLeft
+        );
+        var dropzoneElement = event.target.classList.remove("active");
         handleContentChangeDraggedBlock();
-        // event.relatedTarget.textContent = "Dropped";
       },
-      ondropdeactivate: (event) => {
-        // remove active dropzone feedback
-        console.log("ended drag", event.target);
-        event.target.style.border = "";
-        event.target.style.background = "";
-        event.target.classList.remove("drop-active");
-      },
+      ondropdeactivate: (event) => {},
     });
 
-    var x = 0;
-    var y = 0;
+    // if(interact.isSet(".side-bar-drag-drop-block, .wp-block")){
+    //   interact(".side-bar-drag-drop-block, .wp-block").unset();
+    // }
 
-    // interact(".wp-block, .side-bar-drag-drop-block")
     interact(".side-bar-drag-drop-block, .wp-block").draggable({
       cursorChecker(action, interactable, element, interacting) {
         return "grab";
       },
-      // inertia: true,
-      // modifiers: [
-      //   // interact.modifiers.snap({
-      //   //   targets: [interact.createSnapGrid({ x: 30, y: 30 })],
-      //   //   range: Infinity,
-      //   //   relativePoints: [{ x: 0, y: 0 }],
-      //   // }),
-      //   interact.modifiers.restrictRect({
-      //     // restriction: ".groundhogg-email-editor__email-content",
-      //     restriction: "parent",
-      //     endOnly: true,
-      //   }),
-      // ],
       autoScroll: true,
-      // dragMoveListener from the dragging demo above
       onend: dragEndListener,
       listeners: { move: dragMoveListener },
+      modifiers: [
+        // interact.modifiers.snap({
+        //   // targets: [
+        //   //   interact.snappers.grid({ x: 30, y: 30 })
+        //   // ],
+        //   range: Infinity,
+        //   relativePoints: [ { x: 0, y: 0 } ]
+        // }),
+        interact.modifiers.restrict({
+          restriction: interact(".groundhogg-email-editor__email-content"),
+          elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
+          endOnly: true,
+        }),
+      ],
+      // inertia: true
     });
-    // interact(".wp-block").resizable({
-    //   // resize from all edges and corners
-    //   edges: { left: true, right: true, bottom: true, top: true },
-    //
-    //   listeners: {
-    //     move(event) {
-    //       var target = event.target;
-    //       var x = parseFloat(target.getAttribute("data-x")) || 0;
-    //       var y = parseFloat(target.getAttribute("data-y")) || 0;
-    //
-    //       // update the element's style
-    //       target.style.width = event.rect.width + "px";
-    //       target.style.height = event.rect.height + "px";
-    //
-    //       // translate when resizing from top or left edges
-    //       x += event.deltaRect.left;
-    //       y += event.deltaRect.top;
-    //
-    //       target.style.webkitTransform = target.style.transform =
-    //         "translate(" + x + "px," + y + "px)";
-    //
-    //       target.setAttribute("data-x", x);
-    //       target.setAttribute("data-y", y);
-    //       // target.textContent =
-    //       //   Math.round(event.rect.width) +
-    //       //   "\u00D7" +
-    //       //   Math.round(event.rect.height);
-    //       console.log(target);
-    //       console.log(target.children[0]);
-    //       handleBlockResize(target.style.width, target.style.height);
-    //     },
-    //   },
-    //   modifiers: [
-    //     // keep the edges inside the parent
-    //     interact.modifiers.restrictEdges({
-    //       outer: "parent",
-    //     }),
-    //
-    //     // minimum size
-    //     interact.modifiers.restrictSize({
-    //       min: { width: 100, height: 50 },
-    //     }),
-    //   ],
-    //
-    //   inertia: true,
-    // });
-  }, [draggedBlock]);
+  };
 
   const handleViewTypeChange = (type) => {
     setViewType(type);
   };
-  const sendTestEmail = (type) => {
-    console.log("email");
-    // setViewType(type);
+
+  const [testEmail, setTestEmail] = useState([]);
+  const sendTestEmail = (e) => {
+    if (!matchEmailRegex(testEmail)) {
+      return;
+    }
+    console.log("valid let send", testEmail);
+    sendEmailRaw({
+      to: testEmail,
+      from_email: "dhrumit.groundhogg@gmail.com",
+      from_name: "TEST D",
+      content: content,
+      subject: subject,
+    });
   };
+  const handleTestEmailChange = (e) => {
+    setTestEmail(e.target.value);
+  };
+
+  useEffect(() => {
+    if (content?.length) {
+      handleUpdateBlocks(() => parse(content));
+    }
+
+    console.log(blocks);
+    setupInteractJS();
+  }, [draggedBlock]);
 
   let editorPanel;
   switch (editorMode) {
@@ -307,9 +273,9 @@ export default ({ settings, email, history }) => {
           handleSubjectChange={handleSubjectChange}
           preHeader={preHeader}
           handlePreHeaderChange={handlePreHeaderChange}
-          content={content}
-          handleContentChange={handleContentChange}
           viewType={viewType}
+          handleUpdateBlocks={handleUpdateBlocks}
+          blocks={blocks}
         />
       );
       break;
@@ -324,9 +290,9 @@ export default ({ settings, email, history }) => {
           handleSubjectChange={handleSubjectChange}
           preHeader={preHeader}
           handlePreHeaderChange={handlePreHeaderChange}
-          content={content}
-          handleContentChange={handleContentChange}
           viewType={viewType}
+          handleUpdateBlocks={handleUpdateBlocks}
+          blocks={blocks}
         />
       );
   }
@@ -349,6 +315,7 @@ export default ({ settings, email, history }) => {
                   handleTitleChange={handleTitleChange}
                   handleViewTypeChange={handleViewTypeChange}
                   sendTestEmail={sendTestEmail}
+                  handleTestEmailChange={handleTestEmailChange}
                   title={title}
                 />
               }

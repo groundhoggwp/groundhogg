@@ -50,6 +50,8 @@ export default function Header({
   title,
   handleViewTypeChange,
   sendTestEmail,
+  handleTestEmailChange,
+  testEmail,
 }) {
   const classes = useStyles();
   return (
@@ -100,6 +102,8 @@ export default function Header({
           <HeaderSecondary
             handleViewTypeChange={handleViewTypeChange}
             sendTestEmail={sendTestEmail}
+            handleTestEmailChange={handleTestEmailChange}
+            testEmail={testEmail}
           />
         </HeaderToolbar>
       </div>

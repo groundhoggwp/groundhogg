@@ -26,7 +26,7 @@ import { useEffect, useState, useMemo } from "@wordpress/element";
  * Internal dependencies
  */
 import ToolbarItem from "./toolbar-item"; // Stop-gap while WP catches up.
-import Dialog from "../dialog";
+import Dialog from "../dialog/";
 import { CORE_STORE_NAME } from "data/core";
 
 const useStyles = makeStyles({
@@ -40,10 +40,13 @@ const useStyles = makeStyles({
     marginRight: "8px",
   },
 });
-export default ({ handleViewTypeChange, sendTestEmail }) => {
+export default ({
+  handleViewTypeChange,
+  sendTestEmail,
+  testEmail,
+  handleTestEmailChange,
+}) => {
   const classes = useStyles();
-
-  const [testEmail, setTestEmail] = useState([]);
 
   const { editorMode, isInserterEnabled } = useSelect(
     (select) => ({
@@ -56,11 +59,6 @@ export default ({ handleViewTypeChange, sendTestEmail }) => {
   const { switchEditorMode, setIsInserterOpened } = useDispatch(
     CORE_STORE_NAME
   );
-
-  const handleTestEmailChange = (e) => {
-    console.log(e.target.value);
-    setTestEmail(e.target.value);
-  };
 
   const isTextModeEnabled = editorMode === "text";
 
@@ -123,6 +121,7 @@ export default ({ handleViewTypeChange, sendTestEmail }) => {
           "Open replacements list",
           "Generic label for replacements button"
         )}
+        dialogAction={() => {}}
       />
       <ToolbarItem
         as={Dialog}
@@ -143,6 +142,7 @@ export default ({ handleViewTypeChange, sendTestEmail }) => {
           "Open replacements list",
           "Generic label for replacements button"
         )}
+        dialogAction={() => {}}
       />
 
       <ToolbarItem
@@ -154,8 +154,8 @@ export default ({ handleViewTypeChange, sendTestEmail }) => {
         variant="contained"
         color="primary"
         size="small"
-        buttonTitle={__("Update and Test")}
-        title={__("Update and Test")}
+        buttonTitle={__("Test")}
+        title={__("Test")}
         content={__(
           <TextField
             onChange={handleTestEmailChange}
@@ -166,11 +166,12 @@ export default ({ handleViewTypeChange, sendTestEmail }) => {
             )}
           />
         )}
-        dialogButtons={[{ color: "primary", label: __("Done") }]}
-        label={_x(
-          "Update and Test Link",
-          "Generic label for replacements button"
-        )}
+        dialogButtons={[
+          { color: "secondary", label: __("Cancel") },
+          { color: "primary", label: __("Done") },
+        ]}
+        label={_x("Test Link", "Generic label for replacements button")}
+        dialogAction={sendTestEmail}
       />
 
       <ToolbarItem
@@ -179,7 +180,7 @@ export default ({ handleViewTypeChange, sendTestEmail }) => {
           classes.button + " groundhogg-header-toolbar__mobile-device-toggle"
         }
         variant="contained"
-        color="primary"
+        color="secondary"
         size="small"
         onMouseDown={(event) => {
           event.preventDefault();
