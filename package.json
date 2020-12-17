@@ -15,6 +15,7 @@
     "prettierComp": "prettier --check --write ./src/components/core-ui/stats/index.js",
     "prettierPage": "prettier --check --write ./src/components/layout/pages/reports/**.js",
     "prettier-full": "prettier --check --write ./src/components/core-ui/block-editor/**/**/** && prettier --check --write ./src/components/core-ui/block-editor/**/** && prettier --check --write ./src/components/core-ui/block-editor/**",
+    "prettier-all": "don't use yet, prettier --check --write {*.js,!(node*)**/*.{js,css,scss}}",
     "start": "wp-scripts start",
     "test:e2e": "wp-scripts test-e2e",
     "test:unit": "wp-scripts test-unit-js",
