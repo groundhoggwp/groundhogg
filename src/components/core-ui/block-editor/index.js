@@ -14,6 +14,8 @@ export default function EditorComponent({ email, history }) {
     return <div />;
   }
 
+  console.log('double fire here I bet', email, history)
+
   return (
     <Editor
       email={email}
