@@ -41,6 +41,10 @@ export const SingleView = ( {history} ) => {
 		return null;
 	}
 
+	if (Object.keys(email).length === 0) {
+		return null;
+	}
+
 	return (
 		<Fragment>
 			<BlockEditor email={email} history={history} />

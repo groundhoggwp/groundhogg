@@ -138,8 +138,6 @@ export const Emails = ( props ) => {
 			}
 		});
 
-		// this
-		console.log(result.item.ID, props)
 		props.history.push(`/emails/${result.item.ID}`)
 	};
 

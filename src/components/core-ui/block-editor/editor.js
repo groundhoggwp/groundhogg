@@ -176,6 +176,7 @@ export default ({ settings, email, history }) => {
     //   console.log('unsett')
     //   interact(".groundhogg-email-editor__email-content").unset();
     // }
+    console.log('setup')
     interact(".groundhogg-email-editor__email-content").dropzone({
       overlap: 0.75,
       ondropactivate: (event) => {},
@@ -187,16 +188,17 @@ export default ({ settings, email, history }) => {
         var dropzoneElement = event.target.classList.remove("active");
       },
       ondrop: (event) => {
-        console.log(
-          "dropped",
-          event.relatedTarget.offsetTop,
-          event.target.offsetTop
-        );
-        console.log(
-          "dropped",
-          event.relatedTarget.offsetLeft,
-          event.target.offsetLeft
-        );
+        console.log('dropped')
+        // console.log(
+        //   "dropped",
+        //   event.relatedTarget.offsetTop,
+        //   event.target.offsetTop
+        // );
+        // console.log(
+        //   "dropped",
+        //   event.relatedTarget.offsetLeft,
+        //   event.target.offsetLeft
+        // );
         var dropzoneElement = event.target.classList.remove("active");
         handleContentChangeDraggedBlock();
       },
@@ -255,13 +257,15 @@ export default ({ settings, email, history }) => {
   };
 
   useEffect(() => {
-    if (content?.length) {
-      handleUpdateBlocks(() => parse(content));
-    }
-
-    console.log(blocks);
-    setupInteractJS();
-  }, [draggedBlock]);
+    console.log('hello')
+    // if (content?.length) {
+    //   handleUpdateBlocks(() => parse(content));
+    // }
+    //
+    // console.log(blocks);
+    // setupInteractJS();
+  }, []);
+  // }, [draggedBlock]);
 
   let editorPanel;
   switch (editorMode) {
