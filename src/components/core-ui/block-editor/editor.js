@@ -43,7 +43,8 @@ import Notices from "./components/notices";
 import Header from "./components/header";
 import Sidebar from "./components/sidebar";
 import BlockEditor from "./components/block-editor";
-import { getLuxonDate } from "utils/index";
+import { getLuxonDate, matchEmailRegex } from "utils/index";
+
 import { CORE_STORE_NAME, EMAILS_STORE_NAME } from "data";
 
 let draggedBlock = {};
@@ -236,24 +237,21 @@ export default ({ settings, email, history }) => {
   };
 
   const [testEmail, setTestEmail] = useState([]);
-  const handleTestEmailChange = (e) => {
-    console.log(e.target.value);
-    // setTestEmail(e.target.value);
-    console.log(item.ID);
-    //
-    // sendEmailById(item.ID, {
+  const sendTestEmail = (e) => {
+    if (!matchEmailRegex(testEmail)) {
+      return;
+    }
+    console.log("valid let send", testEmail);
     sendEmailRaw({
-      to: "n.sachs.7@fastmail.com",
+      to: testEmail,
       from_email: "dhrumit.groundhogg@gmail.com",
       from_name: "TEST D",
       content: content,
       subject: subject,
     });
   };
-
-  const sendTestEmail = (type) => {
-    console.log("email", testEmail);
-    // console.log(event)
+  const handleTestEmailChange = (e) => {
+    setTestEmail(e.target.value);
   };
 
   useEffect(() => {

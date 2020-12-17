@@ -12,11 +12,18 @@ const ghDialog = ({
   title,
   content,
   dialogButtons,
+  dialogAction,
+  className,
 }) => {
   const [open, setOpen] = useState(false);
 
-  const handleClose = () => {
+  const handleClose = (e) => {
     setOpen(false);
+  };
+
+  const handleAction = (e) => {
+    setOpen(false);
+    dialogAction();
   };
 
   const descriptionElementRef = useRef(null);
@@ -33,6 +40,7 @@ const ghDialog = ({
   return (
     <Fragment>
       <Button
+        className={className}
         onClick={() => setOpen(true)}
         variant="contained"
         color="primary"
@@ -59,11 +67,21 @@ const ghDialog = ({
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          {dialogButtons.map((button, index) => (
-            <Button onClick={handleClose} color={button.color} key={index}>
-              {button.label}
-            </Button>
-          ))}
+          {dialogButtons.map((button, index) => {
+            if (button.label === "Cancel") {
+              return (
+                <Button onClick={handleClose} color={button.color} key={index}>
+                  {button.label}
+                </Button>
+              );
+            }
+
+            return (
+              <Button onClick={handleAction} color={button.color} key={index}>
+                {button.label}
+              </Button>
+            );
+          })}
         </DialogActions>
       </Dialog>
     </Fragment>

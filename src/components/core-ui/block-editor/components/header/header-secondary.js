@@ -26,7 +26,7 @@ import { useEffect, useState, useMemo } from "@wordpress/element";
  * Internal dependencies
  */
 import ToolbarItem from "./toolbar-item"; // Stop-gap while WP catches up.
-import Dialog from "../dialog";
+import Dialog from "../dialog/";
 import { CORE_STORE_NAME } from "data/core";
 
 const useStyles = makeStyles({
@@ -121,6 +121,7 @@ export default ({
           "Open replacements list",
           "Generic label for replacements button"
         )}
+        dialogAction={() => {}}
       />
       <ToolbarItem
         as={Dialog}
@@ -141,6 +142,7 @@ export default ({
           "Open replacements list",
           "Generic label for replacements button"
         )}
+        dialogAction={() => {}}
       />
 
       <ToolbarItem
@@ -152,8 +154,8 @@ export default ({
         variant="contained"
         color="primary"
         size="small"
-        buttonTitle={__("Update and Test")}
-        title={__("Update and Test")}
+        buttonTitle={__("Test")}
+        title={__("Test")}
         content={__(
           <TextField
             onChange={handleTestEmailChange}
@@ -164,15 +166,12 @@ export default ({
             )}
           />
         )}
-        onClick={(event) => {
-          // event.preventDefault();
-          console.log("clikcck");
-        }}
-        dialogButtons={[{ color: "primary", label: __("Done") }]}
-        label={_x(
-          "Update and Test Link",
-          "Generic label for replacements button"
-        )}
+        dialogButtons={[
+          { color: "secondary", label: __("Cancel") },
+          { color: "primary", label: __("Done") },
+        ]}
+        label={_x("Test Link", "Generic label for replacements button")}
+        dialogAction={sendTestEmail}
       />
 
       <ToolbarItem
