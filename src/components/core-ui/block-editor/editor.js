@@ -257,13 +257,13 @@ export default ({ settings, email, history }) => {
   };
 
   useEffect(() => {
-    console.log('hello')
-    // if (content?.length) {
-    //   handleUpdateBlocks(() => parse(content));
-    // }
-    //
-    // console.log(blocks);
-    // setupInteractJS();
+    console.log('2222')
+    if (content?.length) {
+      handleUpdateBlocks(() => parse(content));
+    }
+
+    console.log(blocks);
+    setupInteractJS();
   }, []);
   // }, [draggedBlock]);
 
@@ -335,8 +335,7 @@ export default ({ settings, email, history }) => {
                   {editorPanel}
                 </>
               }
-            />
-            <Popover.Slot />
+            />            
           </FocusReturnProvider>
         </DropZoneProvider>
       </SlotFillProvider>

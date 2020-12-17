@@ -135,7 +135,9 @@ function BlockEditor({
                 <MultiSelectScrollIntoView />
                 {/* Add Block Button */}
                 <BlockEditorKeyboardShortcuts.Register />
-                <Popover.Slot name="block-toolbar" />
+                <Popover.Slot refresh={(e)=>{console.log('refresh', e)}} left={300} top={500} />
+                <Popover.Slot name="block-toolbar" left={300} top={500} refresh={(e)=>{console.log('refresh', e)}}/>
+
                 <Typewriter>
                   <CopyHandler>
                     <WritingFlow>
