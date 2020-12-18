@@ -309,6 +309,9 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.2.24 (2020-12-18) =
+* ADDED Ability to have multiple email services installed and differentiate between marketing and transactional emails.
+
 = 2.2.23.4 (2020-12-09) =
 * TWEAKED Replacement codes will default to blank "" if no info is available instead of the code name.
 * FIXED ChartJS not loading after WordPress 5.6
