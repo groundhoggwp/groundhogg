@@ -257,6 +257,49 @@ export const GeneralInfo = (props) => {
           lg: '12'
         },
       ],
+    },
+    {
+      id: 'segmentation',
+      tab: 'segmentation',
+      title: __('Segmentation', 'groundhogg'),
+      fields: [
+        {
+          defaultValue: '',
+          desc: '',
+          id: 'owner_id',
+          label: __('Owner', 'groundhogg'),
+          section: 'segmentation',
+          type: 'dropdown_owners',
+          dataType: 'data',
+          sm: '12',
+          md: '12',
+          lg: '12'
+        },
+        {
+          defaultValue: '',
+          desc: '',
+          id: 'source_page',
+          label: __('Source Page', 'groundhogg'),
+          section: 'segmentation',
+          type: 'input',
+          dataType: 'meta',
+          sm: '12',
+          md: '12',
+          lg: '12'
+        },
+        {
+          defaultValue: '',
+          desc: '',
+          id: 'lead_source',
+          label: __('Lead Source', 'groundhogg'),
+          section: 'segmentation',
+          type: 'input',
+          dataType: 'meta',
+          sm: '12',
+          md: '12',
+          lg: '12'
+        },
+      ],
     }
   ]
 
