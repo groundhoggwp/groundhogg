@@ -4,6 +4,9 @@ use function Groundhogg\get_array_var;
 
 class Groundhogg_Email_Services {
 
+	const TRANSACTIONAL = 'transactional';
+	const MARKETING = 'marketing';
+
 	private static $email_services = [];
 
 	public static function get() {
@@ -58,7 +61,7 @@ class Groundhogg_Email_Services {
 	 */
 	public static function dropdown() {
 		return array_map( function ( $service ) {
-			return $service[ 'name' ];
+			return $service['name'];
 		}, self::$email_services );
 	}
 
@@ -67,18 +70,19 @@ class Groundhogg_Email_Services {
 	 *
 	 * @return false|mixed|string|void
 	 */
-	public static function get_saved_service( $type ){
+	public static function get_saved_service( $type ) {
 		$saved_service = get_option( 'gh_' . $type . '_email_service', 'wp_mail' );
+
 		return $saved_service ?: 'wp_mail';
 	}
 
 	/**
 	 * Set the service
 	 *
-	 * @param $type string
+	 * @param $type    string
 	 * @param $service string
 	 */
-	public static function set_service( $type, $service ){
+	public static function set_service( $type, $service ) {
 		update_option( 'gh_' . $type . '_email_service', $service );
 	}
 
@@ -93,8 +97,9 @@ class Groundhogg_Email_Services {
 	 *
 	 * @return bool Whether the email contents were sent successfully.
 	 */
-	public static function send( $service, $to, $subject, $message, $headers = '', $attachments = array() ){
+	public static function send( $service, $to, $subject, $message, $headers = '', $attachments = array() ) {
 		$callback = is_callable( self::get_callback( $service ) ) ? self::get_callback( $service ) : 'wp_mail';
+
 		return call_user_func( $callback, $to, $subject, $message, $headers, $attachments );
 	}
 
@@ -109,8 +114,9 @@ class Groundhogg_Email_Services {
 	 *
 	 * @return bool Whether the email contents were sent successfully.
 	 */
-	public static function send_transactional( $to, $subject, $message, $headers = '', $attachments = array() ){
-		$service = self::get_saved_service( 'transactional' );
+	public static function send_transactional( $to, $subject, $message, $headers = '', $attachments = array() ) {
+		$service = self::get_saved_service( self::TRANSACTIONAL );
+
 		return self::send( $service, $to, $subject, $message, $headers, $attachments );
 	}
 
@@ -125,8 +131,9 @@ class Groundhogg_Email_Services {
 	 *
 	 * @return bool Whether the email contents were sent successfully.
 	 */
-	public static function send_marketing( $to, $subject, $message, $headers = '', $attachments = array() ){
-		$service = self::get_saved_service( 'marketing' );
+	public static function send_marketing( $to, $subject, $message, $headers = '', $attachments = array() ) {
+		$service = self::get_saved_service( self::MARKETING );
+
 		return self::send( $service, $to, $subject, $message, $headers, $attachments );
 	}
 }
