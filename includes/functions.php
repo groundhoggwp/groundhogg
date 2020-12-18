@@ -3298,7 +3298,7 @@ function gh_cron_installed() {
  *
  * @return bool
  */
-function install_gh_cron_file(){
+function install_gh_cron_file() {
 
 	$gh_cron_php = file_get_contents( GROUNDHOGG_PATH . 'gh-cron.txt' );
 	$bytes       = file_put_contents( ABSPATH . 'gh-cron.php', $gh_cron_php );
@@ -3311,8 +3311,8 @@ function install_gh_cron_file(){
  *
  * @return bool
  */
-function delete_gh_cron_file(){
-   return unlink( GROUNDHOGG_PATH . 'gh-cron.txt' );
+function delete_gh_cron_file() {
+	return unlink( GROUNDHOGG_PATH . 'gh-cron.txt' );
 }
 
 /**
@@ -3902,7 +3902,37 @@ function extrapolate_wp_mail_plugin() {
 	}
 
 	// No active plugins are the cause, that means a plugin is probably including pluggable.php explicitly somewhere...
-	// BAD JU-JU guys...
+	// BAD JuJu guys...
+
+	// todo, find out which plugin includes pluggable before it's supposed to.
+
+	return $defined;
+}
+
+/**
+ * Find which plugin has gh_mail defined.
+ *
+ * @throws \ReflectionException
+ * @return string
+ */
+function extrapolate_gh_mail_plugin() {
+
+	$reflFunc = new \ReflectionFunction( 'gh_mail' );
+	$defined  = wp_normalize_path( $reflFunc->getFileName() );
+
+	$active_plugins = get_option( 'active_plugins', [] );
+
+	foreach ( $active_plugins as $active_plugin ) {
+
+		$plugin_dir = 'wp-content/plugins/' . dirname( $active_plugin ) . '/';
+
+		if ( strpos( $defined, $plugin_dir ) !== false ) {
+			return $active_plugin;
+		}
+	}
+
+	// No active plugins are the cause, that means a plugin is probably including pluggable.php explicitly somewhere...
+	// BAD JuJu guys...
 
 	// todo, find out which plugin includes pluggable before it's supposed to.
 
@@ -3912,10 +3942,10 @@ function extrapolate_wp_mail_plugin() {
 /**
  * Tracks pings to the wp-cron.php file
  */
-function track_wp_cron_ping(){
-    if ( defined('DOING_CRON') && DOING_CRON && ( ! defined( 'DOING_GH_CRON' ) || ! DOING_GH_CRON ) ){
-	    update_option( 'wp_cron_last_ping', time() );
-    }
+function track_wp_cron_ping() {
+	if ( defined( 'DOING_CRON' ) && DOING_CRON && ( ! defined( 'DOING_GH_CRON' ) || ! DOING_GH_CRON ) ) {
+		update_option( 'wp_cron_last_ping', time() );
+	}
 }
 
 add_action( 'wp_loaded', __NAMESPACE__ . '\track_wp_cron_ping' );
@@ -3923,8 +3953,8 @@ add_action( 'wp_loaded', __NAMESPACE__ . '\track_wp_cron_ping' );
 /**
  * Tracks the pings of the gh-cron.php.
  */
-function track_gh_cron_ping(){
-    update_option( 'gh_cron_last_ping', time() );
+function track_gh_cron_ping() {
+	update_option( 'gh_cron_last_ping', time() );
 }
 
 add_action( 'groundhogg_process_queue', __NAMESPACE__ . '\track_gh_cron_ping', 9 );

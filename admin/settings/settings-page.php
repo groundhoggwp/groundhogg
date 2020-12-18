@@ -6,6 +6,7 @@ use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Extension;
 use Groundhogg\Mailhawk;
 use Groundhogg\SendWp;
+use Groundhogg_Email_Services;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
@@ -152,10 +153,10 @@ class Settings_Page extends Admin_Page {
 
 				if ( ! is_white_labeled() ):
 
-                    $verify_license_url = Plugin::instance()->bulk_jobs->check_licenses->get_start_url();
+					$verify_license_url = Plugin::instance()->bulk_jobs->check_licenses->get_start_url();
 
 					?>
-                    <p><?php printf ( __( 'Enter your extension license keys here to receive updates for purchased extensions. If your license key has expired, <a href="https://groundhogg.io/account/">please renew your license</a>. If you have recently renewed your license <a href="%s">click here to re-verify it</a>.', 'groundhogg' ), $verify_license_url ); ?></p>
+                    <p><?php printf( __( 'Enter your extension license keys here to receive updates for purchased extensions. If your license key has expired, <a href="https://groundhogg.io/account/">please renew your license</a>. If you have recently renewed your license <a href="%s">click here to re-verify it</a>.', 'groundhogg' ), $verify_license_url ); ?></p>
 				<?php
 
 				endif;
@@ -231,7 +232,7 @@ class Settings_Page extends Admin_Page {
 		$item_id = absint( get_request_var( 'extension' ) );
 		$license = sanitize_text_field( get_request_var( 'license' ) );
 
-        License_Manager::deactivate_license( $item_id ?: $license );
+		License_Manager::deactivate_license( $item_id ?: $license );
 	}
 
 	/**
@@ -318,42 +319,42 @@ class Settings_Page extends Admin_Page {
 	private function get_default_sections() {
 
 		$sections = array(
-			'business_info'     => array(
+			'business_info'         => array(
 				'id'    => 'business_info',
 				'title' => _x( 'Business Settings', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'general'
 			),
-			'general_other'     => array(
+			'general_other'         => array(
 				'id'    => 'general_other',
 				'title' => _x( 'Other', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'general'
 			),
-			'misc_info'         => array(
+			'misc_info'             => array(
 				'id'    => 'misc_info',
 				'title' => _x( 'Misc Settings', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
 			),
-			'wp_cron'           => [
+			'wp_cron'               => [
 				'id'    => 'wp_cron',
 				'title' => _x( 'WP Cron', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc',
 			],
-			'affiliate'         => array(
+			'affiliate'             => array(
 				'id'    => 'affiliate',
 				'title' => _x( 'Affiliate Section', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
 			),
-			'captcha'           => array(
+			'captcha'               => array(
 				'id'    => 'captcha',
 				'title' => _x( 'Google reCAPTCHA', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
 			),
-			'event_notices'     => [
+			'event_notices'         => [
 				'id'    => 'event_notices',
 				'title' => _x( 'Event Notices', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
 			],
-			'compliance'        => array(
+			'compliance'            => array(
 				'id'    => 'compliance',
 				'title' => _x( 'Compliance', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'marketing'
@@ -364,23 +365,28 @@ class Settings_Page extends Admin_Page {
 //				'tab'      => 'email',
 //				'callback' => [ SendWp::instance(), 'settings_connect_ui' ],
 //			],
-			'mailhawk'          => [
+			'mailhawk'              => [
 				'id'       => 'mailhawk',
 				'title'    => _x( 'MailHawk', 'settings_sections', 'groundhogg' ),
 				'tab'      => 'email',
 				'callback' => [ Mailhawk::instance(), 'settings_connect_ui' ],
 			],
-			'overrides'         => [
+			'outgoing_email_config' => [
+				'id'    => 'outgoing_email_config',
+				'title' => _x( 'Outgoing Email', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'email'
+			],
+			'overrides'             => [
 				'id'    => 'overrides',
 				'title' => _x( 'Overrides', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'email'
 			],
-			'tracking'          => array(
+			'tracking'              => array(
 				'id'    => 'tracking',
 				'title' => _x( 'Tracking', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'email',
 			),
-			'bounces'           => array(
+			'bounces'               => array(
 				'id'       => 'bounces',
 				'title'    => _x( 'Email Bounces', 'settings_sections', 'groundhogg' ),
 				'tab'      => 'email',
@@ -391,7 +397,7 @@ class Settings_Page extends Admin_Page {
 //				'title' => _x( 'API Settings', 'settings_sections', 'groundhogg' ),
 //				'tab'   => 'api_tab'
 //			),
-			'optin_status_tags' => [
+			'optin_status_tags'     => [
 				'id'       => 'optin_status_tags',
 				'title'    => _x( 'Optin Status Tags', 'settings_sections', 'groundhogg' ),
 				'tab'      => 'tags',
@@ -679,7 +685,7 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				),
 			),
-			'gh_hide_tooltips'                 => array(
+			'gh_hide_tooltips'                       => array(
 				'id'      => 'gh_hide_tooltips',
 				'section' => 'misc_info',
 				'label'   => _x( 'Hide Tooltips', 'settings', 'groundhogg' ),
@@ -1064,8 +1070,34 @@ class Settings_Page extends Admin_Page {
 				'desc'    => sprintf( _x( 'URLs containing these strings will not be tracked. For example, adding <code>/my-page/</code> would exclude <code>%s/my-page/download/</code>. You can also enter full URLs and URLs of other domains such as <code>https://wordpress.org</code>. To match an exact path use <code>$</code> at the end of the path.', 'settings', 'groundhogg' ), site_url() ),
 				'type'    => 'textarea',
 				'atts'    => array(
-					'name'  => 'gh_url_tracking_exclusions',
-					'id'    => 'gh_url_tracking_exclusions',
+					'name' => 'gh_url_tracking_exclusions',
+					'id'   => 'gh_url_tracking_exclusions',
+				),
+			],
+			'gh_transactional_email_service'             => [
+				'id'      => 'gh_transactional_email_service',
+				'section' => 'outgoing_email_config',
+				'label'   => _x( 'Transactional Email Service', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'Choose which installed service should handle transactional email from WordPress & Groundhogg. This service will apply to <b>all WordPress email</b> and Groundhogg emails with their <code>message type</code> set to <b>Transactional</b>.', 'settings', 'groundhogg' ),
+				'type'    => 'dropdown',
+				'atts'    => array(
+					'name'        => 'gh_transactional_email_service',
+					'id'          => 'gh_transactional_email_service',
+					'option_none' => false,
+					'options'     => Groundhogg_Email_Services::dropdown()
+				),
+			],
+			'gh_marketing_email_service'         => [
+				'id'      => 'gh_marketing_email_service',
+				'section' => 'outgoing_email_config',
+				'label'   => _x( 'Marketing Email Service', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'Choose which installed service should handle marketing email from Groundhogg. This service will only apply to Groundhogg emails which have their <code>message type</code> set to as <b>Marketing</b>.', 'settings', 'groundhogg' ),
+				'type'    => 'dropdown',
+				'atts'    => array(
+					'name'        => 'gh_marketing_email_service',
+					'id'          => 'gh_marketing_email_service',
+					'option_none' => false,
+					'options'     => Groundhogg_Email_Services::dropdown()
 				),
 			]
 		);

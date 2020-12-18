@@ -24,11 +24,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * You may add your own email templates by defining, email-template.php in your theme.
  * The default template is email-default.php
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
 class Email extends Base_Object_With_Meta {
 	/**
@@ -440,7 +440,7 @@ class Email extends Base_Object_With_Meta {
 		$clean_url = no_and_amp( $matches[2] );
 
 		// If the url is not to be tracked leave it alone.
-		if ( is_url_excluded_from_tracking( $clean_url ) ){
+		if ( is_url_excluded_from_tracking( $clean_url ) ) {
 			return $matches[1] . $clean_url . $matches[3];
 		}
 
@@ -500,7 +500,7 @@ class Email extends Base_Object_With_Meta {
 		$url = managed_page_url( 'preferences/manage' );
 
 		// only add permissions key if this is a real email being sent.
-		if ( ! $this->is_testing() && ! is_user_logged_in() ){
+		if ( ! $this->is_testing() && ! is_user_logged_in() ) {
 			$url = permissions_key_url( $url, $this->get_contact(), 'preferences' );
 		}
 
@@ -808,13 +808,13 @@ class Email extends Base_Object_With_Meta {
 
 		$headers = $this->get_headers();
 
-		/* Send with default WP */
-		$sent = $this->send_with_wp(
-			$to,
-			$subject,
-			$content,
-			$headers
-		);
+		if ( $this->is_transactional() ) {
+			// If the email is transactional, use the installed transactional system
+			$sent = \Groundhogg_Email_Services::send_transactional( $to, $subject, $content, $headers );
+		} else {
+			// If the email is marketing, send using the installed marketing system, in most cases also wp_mail.
+			$sent = \Groundhogg_Email_Services::send_marketing( $to, $subject, $content, $headers );
+		}
 
 		remove_action( 'phpmailer_init', [ $this, 'set_bounce_return_path' ] );
 		remove_action( 'phpmailer_init', [ $this, 'set_plaintext_body' ] );
@@ -981,10 +981,10 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @return array
 	 */
-	public function get_email_stats( $start, $end , $steps_ids = [] ) {
+	public function get_email_stats( $start, $end, $steps_ids = [] ) {
 
 
-		if (empty( $steps_ids ) ) {
+		if ( empty( $steps_ids ) ) {
 
 			$steps = get_db( 'stepmeta' )->query( [
 				'meta_key'   => 'email_id',
