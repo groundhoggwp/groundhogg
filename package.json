@@ -13,7 +13,7 @@
     "lint:pkg-json": "wp-scripts lint-pkg-json",
     "packages-update": "wp-scripts packages-update",
     "prettier": "prettier --write {,src/components/core-ui/block-editor/*/**/}*.{js,scss}",
-    "prettier-all": "break this will change all of src, eprettier --check {,src/*/**/}*.{js,scss}",
+    "prettier-all": "prettier --check {,src/*/**/}*.{js,scss}",
     "start": "wp-scripts start",
     "test:e2e": "wp-scripts test-e2e",
     "test:unit": "wp-scripts test-unit-js",
