@@ -59,6 +59,7 @@ export default ({ settings, email, history }) => {
     content: defaultContentValue,
   } = email.data;
 
+  const [testEmail, setTestEmail] = useState([]);
   const [title, setTitle] = useState(defaultTitleValue);
   // const [draggedBlock, setDraggedBlock] = useState(null);
   const [subject, setSubject] = useState(defaultSubjectValue);
@@ -92,13 +93,15 @@ export default ({ settings, email, history }) => {
   };
 
   const handleContentChangeDraggedBlock = () => {
+    // if(!startInteractJS){return;}
     let newBlocks = blocks;
     newBlocks.push(createBlock(draggedBlock.name));
     handleUpdateBlocks(newBlocks);
+    startInteractJS = false;
   };
 
   const handleUpdateBlocks = (blocks) => {
-    // console.log("update", blocks);
+    console.log("update", blocks);
     updateBlocks(blocks);
     if (Array.isArray(blocks)) {
       setContent(serialize(blocks));
@@ -135,53 +138,51 @@ export default ({ settings, email, history }) => {
     history.goBack();
   };
 
+  const dragMoveListener = (event) => {
+    const target = event.target;
+    event.target.classList.add("drop-active");
+    draggedBlock = JSON.parse(target.getAttribute("data-block"));
+    // setDraggedBlock(JSON.parse(target.getAttribute("data-block"));
+
+    // keep the dragged position in the data-x/data-y attributes
+    const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
+    const y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
+
+    // console.log(x, y);
+
+    // translate the element
+    target.style.webkitTransform = target.style.transform =
+      "translate(" + x + "px, " + y + "px)";
+
+    // update the posiion attributes
+    target.setAttribute("data-x", x);
+    target.setAttribute("data-y", y);
+  };
+
+  const dragEndListener = (event) => {
+    const target = event.target;
+
+    // keep the dragged position in the data-x/data-y attributes
+    const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
+    const y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
+
+    // translate the element
+    target.style.webkitTransform = target.style.transform =
+      "translate(" + 0 + "px, " + 0 + "px)";
+
+    // update the posiion attributes
+    target.setAttribute("data-x", 0);
+    target.setAttribute("data-y", 0);
+  };
+
   const setupInteractJS = async () => {
-    const dragMoveListener = (event) => {
-      const target = event.target;
-      event.target.classList.add("drop-active");
-      draggedBlock = JSON.parse(target.getAttribute("data-block"));
-      // setDraggedBlock(JSON.parse(target.getAttribute("data-block"));
-
-      // keep the dragged position in the data-x/data-y attributes
-      const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
-      const y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
-
-      console.log(x, y);
-
-      // translate the element
-      target.style.webkitTransform = target.style.transform =
-        "translate(" + x + "px, " + y + "px)";
-
-      // update the posiion attributes
-      target.setAttribute("data-x", x);
-      target.setAttribute("data-y", y);
-    };
-    const dragEndListener = (event) => {
-      const target = event.target;
-
-      // keep the dragged position in the data-x/data-y attributes
-      const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
-      const y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
-
-      // translate the element
-      target.style.webkitTransform = target.style.transform =
-        "translate(" + 0 + "px, " + 0 + "px)";
-
-      // update the posiion attributes
-      target.setAttribute("data-x", 0);
-      target.setAttribute("data-y", 0);
-    };
-
-    // if(interact.isSet(".groundhogg-email-editor__email-content")){
-    //   console.log('unsett')
-    //   interact(".groundhogg-email-editor__email-content").unset();
-    // }
-    console.log('setup')
     interact(".groundhogg-email-editor__email-content").dropzone({
       overlap: 0.75,
       ondropactivate: (event) => {},
       ondragenter: (event) => {
         // var draggableElement = event.relatedTarget;
+        // console.log('drag enter')
+        startInteractJS = true
         var dropzoneElement = event.target.classList.add("active");
       },
       ondragleave: (event) => {
@@ -189,48 +190,26 @@ export default ({ settings, email, history }) => {
       },
       ondrop: (event) => {
         console.log('dropped')
-        // console.log(
-        //   "dropped",
-        //   event.relatedTarget.offsetTop,
-        //   event.target.offsetTop
-        // );
-        // console.log(
-        //   "dropped",
-        //   event.relatedTarget.offsetLeft,
-        //   event.target.offsetLeft
-        // );
         var dropzoneElement = event.target.classList.remove("active");
         handleContentChangeDraggedBlock();
       },
       ondropdeactivate: (event) => {},
     });
 
-    // if(interact.isSet(".side-bar-drag-drop-block, .wp-block")){
-    //   interact(".side-bar-drag-drop-block, .wp-block").unset();
-    // }
-
     interact(".side-bar-drag-drop-block, .wp-block").draggable({
       cursorChecker(action, interactable, element, interacting) {
         return "grab";
       },
-      autoScroll: true,
+      // autoScroll: true,
       onend: dragEndListener,
       listeners: { move: dragMoveListener },
       modifiers: [
-        // interact.modifiers.snap({
-        //   // targets: [
-        //   //   interact.snappers.grid({ x: 30, y: 30 })
-        //   // ],
-        //   range: Infinity,
-        //   relativePoints: [ { x: 0, y: 0 } ]
-        // }),
         interact.modifiers.restrict({
           restriction: interact(".groundhogg-email-editor__email-content"),
           elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
           endOnly: true,
         }),
       ],
-      // inertia: true
     });
   };
 
@@ -238,7 +217,7 @@ export default ({ settings, email, history }) => {
     setViewType(type);
   };
 
-  const [testEmail, setTestEmail] = useState([]);
+
   const sendTestEmail = (e) => {
     if (!matchEmailRegex(testEmail)) {
       return;
@@ -257,15 +236,8 @@ export default ({ settings, email, history }) => {
   };
 
   useEffect(() => {
-    console.log('2222')
-    if (content?.length) {
-      handleUpdateBlocks(() => parse(content));
-    }
-
-    console.log(blocks);
     setupInteractJS();
   }, []);
-  // }, [draggedBlock]);
 
   let editorPanel;
   switch (editorMode) {
@@ -335,7 +307,7 @@ export default ({ settings, email, history }) => {
                   {editorPanel}
                 </>
               }
-            />            
+            />
           </FocusReturnProvider>
         </DropZoneProvider>
       </SlotFillProvider>

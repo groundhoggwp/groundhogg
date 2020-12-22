@@ -14,8 +14,6 @@ export default function EditorComponent({ email, history }) {
     return <div />;
   }
 
-  console.log('11111')
-
   return (
     <Editor
       email={email}
