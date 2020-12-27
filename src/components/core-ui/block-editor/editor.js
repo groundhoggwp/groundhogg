@@ -30,7 +30,7 @@ import {
   getBlockInsertionPoint,
 } from "@wordpress/blocks";
 
-/**
+/*
  * External dependencies
  */
 import interact from "interactjs";
