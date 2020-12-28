@@ -9,41 +9,113 @@ import {NOTES_STORE_NAME} from "data/notes";
 import {useParams} from "react-router-dom";
 import Box from "@material-ui/core/Box";
 import LocalOfferIcon from "@material-ui/icons/LocalOffer";
-import {Button} from "@material-ui/core";
+import {Button, withStyles,} from "@material-ui/core";
 import {addNotification, useKeyPress} from "utils";
 import {__} from '@wordpress/i18n'
 import {ListView} from "components/core-ui/list-view";
 import SettingsIcon from "@material-ui/icons/Settings";
 import RowActions from "components/core-ui/row-actions";
+import {makeStyles} from "@material-ui/core/styles";
+import Divider from "@material-ui/core/Divider";
+import Tooltip from "@material-ui/core/Tooltip/Tooltip";
+import IconButton from "@material-ui/core/IconButton";
+import EditIcon from "@material-ui/icons/Edit";
+import FileCopyIcon from "@material-ui/icons/FileCopy";
+
+
+import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
+
+import MuiTableCell from "@material-ui/core/TableCell";
+import * as PropTypes from "prop-types";
+import DeleteIcon from "@material-ui/icons/Delete";
+import Grid from "@material-ui/core/Grid";
+
+const theme = createMuiTheme({
+    overrides: {
+        MuiTableCell: {
+            root: {
+                border: '1px solid #ccd0d4',
+                backgroundColor: '#FFFFFF',
+                borderRadius: 1,
+// margin: 10px 0;
+//                 borderRadius: 3,
+//                 border: 1,
+                height: 48,
+                padding: '0 30px',
+                borderBottom: "none",
+
+            },
+        },
+        MuiButtonBase: {},
+        MuiIconButton: {
+            sizeSmall: {
+
+                flot: 'right !important'
+            }
+        }
+    },
+    '& button, & h1': {
+        float: 'right'
+    }
+
+
+});
+
+const useStyles = makeStyles((theme) => ({
+    content: {
+        background: '#FFFFFF',
+        position: 'relative',
+        zIndex: '3',
+        borderRadius: '10px',
+
+    },
+    actions: {
+        float: 'right',
+        color: '#aaa',
+        margin: '1px 1px 10px 10px',
+        width: '100%',
+        // fontSize : 10
+    },
+
+    '& button,h1': {
+        float: 'right'
+    }
+
+}))
+
 
 const notesTableColumn = [
 
-    {
-        ID: 'content',
-        name: 'Content',
-        orderBy: '',
-        align: 'left',
-        cell: ({data}) => {
-            return <>{data.content}</>
-        },
-    },
-
-    {
-        ID: 'date',
-        name: 'Date',
-        orderBy: '',
-        align: 'left',
-        cell: ({data}) => {
-            return <>{data.date_created}</>
-        },
-    },
+    // {
+    //     ID: 'content',
+    //     name: 'Content',
+    //     orderBy: '',
+    //     align: 'left',
+    //     cell: ({data}) => {
+    //         return <>{data.content}</>
+    //
+    //     },
+    // },
+    //
+    // {
+    //     ID: 'date',
+    //     name: 'Date',
+    //     orderBy: '',
+    //     align: 'left',
+    //     cell: ({data}) => {
+    //         return <>{data.date_created}</>
+    //     },
+    // },
     {
         ID: 'actions',
-        name: <span><SettingsIcon/> { 'Actions' }</span>,
-        align: 'right',
-        cell: ({ ID, data, openQuickEdit }) => {
+        name: <span><SettingsIcon/> {'Actions'}</span>,
+        align: 'left',
+        cell: ({ID, data, openQuickEdit}) => {
 
-            const { deleteItem } = useDispatch(NOTES_STORE_NAME)
+
+            const classes = useStyles()
+
+            const {deleteItem} = useDispatch(NOTES_STORE_NAME)
 
             const handleEdit = () => {
                 openQuickEdit()
@@ -53,12 +125,38 @@ const notesTableColumn = [
                 deleteItem(ID)
             }
 
-            return <>
-                <RowActions
-                    onEdit={ openQuickEdit }
-                    onDelete={ () => handleDelete(ID) }
-                />
-            </>
+            return (
+                <Fragment>
+                    {/*<div className={classes.content}>*/}
+
+
+                    <Grid container>
+                        <Grid item className={classes.actions}>
+                            <div align={'right'}>
+                                {data.date_created}
+                                <Tooltip title={'Edit'}>
+                                    <IconButton size={'small'} style={{flot: 'right !important'}}
+                                                aria-label={'Edit item'} onClick={openQuickEdit}>
+                                        <EditIcon fontSize={'small'} fontVariant={'small'}/>
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title={'Delete'}>
+                                    <IconButton style={{flot: 'right'}} size={'small'} aria-label={'Delete item'}
+                                                onClick={() => handleDelete(ID)}>
+                                        <DeleteIcon fontSize={'small'} fontVariant={'small'}/>
+                                    </IconButton>
+                                </Tooltip>
+                            </div>
+                        </Grid>
+
+
+                        <Grid item> {data.content}</Grid>
+
+                    </Grid>
+
+
+                </Fragment>
+            )
         },
     },
 
@@ -74,9 +172,9 @@ const notesTableColumn = [
  * @returns {*}
  * @constructor
  */
-const NotesQuickEdit = ({ ID, data, exitQuickEdit }) => {
+const NotesQuickEdit = ({ID, data, exitQuickEdit}) => {
 
-    const { updateItem } = useDispatch(NOTES_STORE_NAME)
+    const {updateItem} = useDispatch(NOTES_STORE_NAME)
     const [tempState, setTempState] = useState({
         ...data,
     })
@@ -91,7 +189,7 @@ const NotesQuickEdit = ({ ID, data, exitQuickEdit }) => {
      *
      * @param keyCode
      */
-    const handleOnKeydown = ({ keyCode }) => {
+    const handleOnKeydown = ({keyCode}) => {
         switch (keyCode) {
             case 13:
                 commitChanges()
@@ -121,35 +219,33 @@ const NotesQuickEdit = ({ ID, data, exitQuickEdit }) => {
     }
 
     return (
-        <Box display={ 'flex' } justifyContent={ 'space-between' }>
-            <Box flexGrow={ 2 }>
+        <Box display={'flex'} justifyContent={'space-between'}>
+            <Box flexGrow={2}>
                 <TextField
                     id="content"
-                    label={ 'Content' }
+                    label={'Content'}
                     multiline
                     fullWidth
-                    rows={ 2 }
-                    value={ tempState && tempState.content }
-                    onChange={ (e) => handleOnChange(
-                        { content: e.target.value }) }
+                    rows={2}
+                    value={tempState && tempState.content}
+                    onChange={(e) => handleOnChange(
+                        {content: e.target.value})}
                     variant="outlined"
                 />
             </Box>
-            <Box flexGrow={ 1 }>
-                <Box display={ 'flex' } justifyContent={ 'flex-end' }>
-                    <Button variant="contained" color="primary" onClick={ commitChanges }>
-                        { 'Save Changes' }
+            <Box flexGrow={1}>
+                <Box display={'flex'} justifyContent={'flex-end'}>
+                    <Button variant="contained" color="primary" onClick={commitChanges}>
+                        {'Save Changes'}
                     </Button>
-                    <Button variant="contained" onClick={ exitQuickEdit }>
-                        { 'Cancel' }
+                    <Button variant="contained" onClick={exitQuickEdit}>
+                        {'Cancel'}
                     </Button>
                 </Box>
             </Box>
         </Box>
     )
 }
-
-
 
 export const ContactNotes = ({contact}) => {
 
@@ -241,6 +337,7 @@ export const ContactNotes = ({contact}) => {
             <Button onClick={addContactNotes}> Add Note </Button>
 
             {/*<Box flexGrow={1}>*/}
+            <ThemeProvider theme={theme}>
                 <ListTable
                     items={items}
                     // defaultOrderBy={'ID'}
@@ -249,9 +346,14 @@ export const ContactNotes = ({contact}) => {
                     fetchItems={fetchNotes}
                     isRequesting={isRequesting}
                     columns={notesTableColumn}
-                    QuickEdit={ NotesQuickEdit }
+                    QuickEdit={NotesQuickEdit}
+                    isCheckboxHidden={true}
+                    isHeaderHidden={true}
+                    isToolbarHidden={true}
 
                 />
+
+            </ThemeProvider>
             {/*</Box>*/}
 
             {/*<ListView items={items}*/}
