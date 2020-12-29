@@ -282,93 +282,85 @@ class Tools_Page extends Tabbed_Admin_Page {
 	public function sync_create_users_view() {
 		?>
         <div class="tools-left">
-            <div class="show-upload-view">
-                <div class="upload-plugin-wrap">
-                    <div class="upload-plugin">
-                        <p class="install-help"><?php _e( 'Sync Users & Contacts', 'groundhogg' ); ?></p>
-                        <form method="post" class="gh-tools-box">
-							<?php wp_nonce_field(); ?>
-							<?php echo Plugin::$instance->utils->html->input( [
-								'type'  => 'hidden',
-								'name'  => 'action',
-								'value' => 'bulk_sync',
-							] ); ?>
-                            <p><?php _e( 'The sync process will create new contact records for all users in the database. If a contact records already exists then the association will be updated.' ); ?></p>
-                            <p>
-								<?php echo html()->checkbox( [
-									'label' => __( 'Sync all user meta.', 'groundhogg' ),
-									'value' => 1,
-									'name'  => 'sync_user_meta'
-								] ); ?>
-                            </p>
-                            <p class="submit" style="text-align: center;padding-bottom: 0;margin: 0;">
-                                <button style="width: 100%" class="button-primary" name="sync_users"
-                                        value="sync"><?php _ex( 'Start Sync Process', 'action', 'groundhogg' ); ?></button>
-                            </p>
-                        </form>
-                    </div>
-                </div>
+            <div class="gh-tools-wrap">
+                <p class="tools-help"><?php _e( 'Sync Users & Contacts', 'groundhogg' ); ?></p>
+                <form method="post" class="gh-tools-box">
+					<?php wp_nonce_field(); ?>
+					<?php echo Plugin::$instance->utils->html->input( [
+						'type'  => 'hidden',
+						'name'  => 'action',
+						'value' => 'bulk_sync',
+					] ); ?>
+                    <p><?php _e( 'The sync process will create new contact records for all users in the database. If a contact records already exists then the association will be updated.' ); ?></p>
+                    <p>
+						<?php echo html()->checkbox( [
+							'label' => __( 'Sync all user meta.', 'groundhogg' ),
+							'value' => 1,
+							'name'  => 'sync_user_meta'
+						] ); ?>
+                    </p>
+                    <p class="submit" style="text-align: center;padding-bottom: 0;margin: 0;">
+                        <button style="width: 100%" class="button-primary" name="sync_users"
+                                value="sync"><?php _ex( 'Start Sync Process', 'action', 'groundhogg' ); ?></button>
+                    </p>
+                </form>
             </div>
         </div>
         <div class="tools-right">
-            <div class="show-upload-view">
-                <div class="upload-plugin-wrap">
-                    <div class="upload-plugin">
-                        <p class="install-help"><?php _e( 'Create Users', 'groundhogg' ); ?></p>
-                        <form method="post" class="gh-tools-box">
-							<?php wp_nonce_field(); ?>
-							<?php echo Plugin::$instance->utils->html->input( [
-								'type'  => 'hidden',
-								'name'  => 'action',
-								'value' => 'start',
-							] );
+            <div class="gh-tools-wrap">
+                <p class="tools-help"><?php _e( 'Create Users', 'groundhogg' ); ?></p>
+                <form method="post" class="gh-tools-box">
+					<?php wp_nonce_field(); ?>
+					<?php echo Plugin::$instance->utils->html->input( [
+						'type'  => 'hidden',
+						'name'  => 'action',
+						'value' => 'start',
+					] );
 
-							echo html()->e( 'p', [], [
-								__( 'Select contacts to create accounts for.', 'groundhogg' ),
-								html()->tag_picker( [
-									'name' => 'tags_include[]',
-									'id'   => 'tags_include',
-								] ),
-							] );
+					echo html()->e( 'p', [], [
+						__( 'Select contacts to create accounts for.', 'groundhogg' ),
+						html()->tag_picker( [
+							'name' => 'tags_include[]',
+							'id'   => 'tags_include',
+						] ),
+					] );
 
-							echo html()->e( 'p', [], [
-								__( 'Exclude these contacts.', 'groundhogg' ),
-								html()->tag_picker( [
-									'name' => 'tags_exclude[]',
-									'id'   => 'tags_exclude',
-								] ),
-							] );
+					echo html()->e( 'p', [], [
+						__( 'Exclude these contacts.', 'groundhogg' ),
+						html()->tag_picker( [
+							'name' => 'tags_exclude[]',
+							'id'   => 'tags_exclude',
+						] ),
+					] );
 
-							echo html()->e( 'p', [], [
-								__( 'Choose role.', 'groundhogg' ),
-								html()->dropdown( [
-									'name'     => 'role',
-									'id'       => 'role',
-									'options'  => Plugin::$instance->roles->get_roles_for_select(),
-									'selected' => 'subscriber',
-									'style'    => [ 'width' => '100%' ]
-								] ),
-							] );
+					echo html()->e( 'p', [], [
+						__( 'Choose role.', 'groundhogg' ),
+						html()->dropdown( [
+							'name'     => 'role',
+							'id'       => 'role',
+							'options'  => Plugin::$instance->roles->get_roles_for_select(),
+							'selected' => 'subscriber',
+							'style'    => [ 'width' => '100%' ]
+						] ),
+					] );
 
-							echo html()->e( 'p', [], [
-								html()->checkbox( [
-									'label'   => __( 'Send email notification to user.', 'groundhogg' ),
-									'name'    => 'send_email_notification',
-									'value'   => '1',
-									'checked' => false,
-								] ),
-								'<br/>',
-								html()->e( 'i', [], sprintf( ' (%s)', __( 'Much slower' ) ) )
-							] );
+					echo html()->e( 'p', [], [
+						html()->checkbox( [
+							'label'   => __( 'Send email notification to user.', 'groundhogg' ),
+							'name'    => 'send_email_notification',
+							'value'   => '1',
+							'checked' => false,
+						] ),
+						'<br/>',
+						html()->e( 'i', [], sprintf( ' (%s)', __( 'Much slower' ) ) )
+					] );
 
-							?>
-                            <p class="submit" style="text-align: center;padding-bottom: 0;margin: 0;">
-                                <button style="width: 100%" class="button-primary" name="start"
-                                        value="start"><?php _ex( 'Create Users', 'action', 'groundhogg' ); ?></button>
-                            </p>
-                        </form>
-                    </div>
-                </div>
+					?>
+                    <p class="submit" style="text-align: center;padding-bottom: 0;margin: 0;">
+                        <button style="width: 100%" class="button-primary" name="start"
+                                value="start"><?php _ex( 'Create Users', 'action', 'groundhogg' ); ?></button>
+                    </p>
+                </form>
             </div>
         </div>
         <div class="wp-clearfix"></div>
@@ -690,7 +682,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 					?></p>
                 <script>
-                  ( function ($) {
+                  (function ($) {
 
                     $('.select-all-meta').click(function (e) {
                       $('.meta.header').attr('checked', 'checked')
@@ -700,7 +692,7 @@ class Tools_Page extends Tabbed_Admin_Page {
                       $('.meta.header').attr('checked', false)
                     })
 
-                  } )(jQuery)
+                  })(jQuery)
                 </script>
                 <table>
 					<?php
@@ -832,7 +824,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 						do_action( 'groundhogg/admin/tools/network_updates' );
 
-                        ?>
+						?>
                     </div>
                 </div>
 			<?php endif; ?>
@@ -870,28 +862,24 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 	public function delete_view() {
 		?>
-        <div class="show-upload-view">
-            <div class="upload-plugin-wrap">
-                <div class="upload-plugin">
-                    <p class="install-help"><?php _e( 'Delete Contacts in Bulk by Tag', 'groundhogg' ); ?></p>
-                    <form method="post" class="gh-tools-box">
-						<?php wp_nonce_field(); ?>
-						<?php echo Plugin::$instance->utils->html->input( [
-							'type'  => 'hidden',
-							'name'  => 'action',
-							'value' => 'bulk_delete',
-						] ); ?>
-						<?php echo Plugin::$instance->utils->html->tag_picker( [] ); ?>
-                        <p>
-                            &#9888;&nbsp;<b><?php _e( 'Once you click the delete button there is no going back!' ); ?></b>
-                        </p>
-                        <p class="submit" style="text-align: center;padding-bottom: 0;margin: 0;">
-                            <button style="width: 100%" class="button-primary" name="delete_contacts"
-                                    value="delete"><?php _ex( 'Delete Contacts', 'action', 'groundhogg' ); ?></button>
-                        </p>
-                    </form>
-                </div>
-            </div>
+        <div class="gh-tools-wrap">
+            <p class="tools-help"><?php _e( 'Delete Contacts in Bulk by Tag', 'groundhogg' ); ?></p>
+            <form method="post" class="gh-tools-box">
+				<?php wp_nonce_field(); ?>
+				<?php echo Plugin::$instance->utils->html->input( [
+					'type'  => 'hidden',
+					'name'  => 'action',
+					'value' => 'bulk_delete',
+				] ); ?>
+				<?php echo Plugin::$instance->utils->html->tag_picker( [] ); ?>
+                <p>
+                    &#9888;&nbsp;<b><?php _e( 'Once you click the delete button there is no going back!' ); ?></b>
+                </p>
+                <p class="submit" style="text-align: center;padding-bottom: 0;margin: 0;">
+                    <button style="width: 100%" class="button-primary" name="delete_contacts"
+                            value="delete"><?php _ex( 'Delete Contacts', 'action', 'groundhogg' ); ?></button>
+                </p>
+            </form>
         </div>
 		<?php
 	}

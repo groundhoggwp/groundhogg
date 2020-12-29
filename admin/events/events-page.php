@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Events;
 
 use cli\Table;
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Event;
 use function Groundhogg\get_db;
 use Groundhogg\Plugin;
@@ -28,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.1
  */
-class Events_Page extends Admin_Page {
+class Events_Page extends Tabbed_Admin_Page {
 
 	//UNUSED FUNCTIONS
 	protected function add_ajax_actions() {
@@ -49,7 +50,7 @@ class Events_Page extends Admin_Page {
 	}
 
 	public function get_name() {
-		return _x( 'Events', 'page_title', 'groundhogg' );
+		return _x( 'Logs', 'page_title', 'groundhogg' );
 	}
 
 	public function get_cap() {
@@ -61,7 +62,7 @@ class Events_Page extends Admin_Page {
 	}
 
 	public function get_priority() {
-		return 40;
+		return 99;
 	}
 
 	protected function get_title_actions() {
@@ -73,12 +74,7 @@ class Events_Page extends Admin_Page {
 	 * @return string
 	 */
 	public function get_title() {
-		switch ( $this->get_current_action() ) {
-			case 'view':
-			default:
-				return _x( 'Events', 'page_title', 'groundhogg' );
-				break;
-		}
+		return _x( 'Logs', 'page_title', 'groundhogg' );
 	}
 
 	/**
@@ -306,4 +302,25 @@ class Events_Page extends Admin_Page {
 		<?php
 	}
 
+	/**
+	 * @inheritDoc
+	 */
+	protected function get_tabs() {
+		return [
+			[
+				'name' => __( 'Events', 'groundhogg' ),
+				'slug' => 'events'
+			],
+			[
+				'name' => __( 'Emails', 'groundhogg' ),
+				'slug' => 'emails'
+			],
+		];
+	}
+
+	public function view_emails(){
+
+
+
+	}
 }

@@ -325,6 +325,26 @@ input[type=range].slider:focus::-ms-fill-upper {
     }
 }
 
+.gh-tools-wrap {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 50px 0;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    top: 10px;
+}
+
+.gh-tools-wrap p.tools-help{
+    color: #555d66;
+    font-size: 18px;
+    font-style: normal;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    line-height: 1.5;
+}
+
 .gh-tools-box {
     background: #fafafa;
     border: 1px solid #ccd0d4;
@@ -352,10 +372,10 @@ table.wp-list-table.funnels td.column-active_contacts {
     text-align: center;
 }
 
-#wpbody .dash-button{
+#wpbody .dash-button {
     padding: 0 5px 1px;
 }
 
-#wpbody .dash-button .dashicons{
+#wpbody .dash-button .dashicons {
     vertical-align: middle;
 }
