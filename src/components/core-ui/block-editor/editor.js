@@ -141,6 +141,7 @@ export default ({ settings, email, history }) => {
   const dragMoveListener = (event) => {
     const target = event.target;
     event.target.classList.add("drop-active");
+
     draggedBlock = JSON.parse(target.getAttribute("data-block"));
     // setDraggedBlock(JSON.parse(target.getAttribute("data-block"));
 
@@ -204,7 +205,8 @@ export default ({ settings, email, history }) => {
       ondropdeactivate: (event) => {},
     });
 
-    interact(".side-bar-drag-drop-block, .wp-block").draggable({
+    interact(".side-bar-drag-drop-block").draggable({
+    // interact(".side-bar-drag-drop-block, .wp-block").draggable({
       cursorChecker(action, interactable, element, interacting) {
         return "grab";
       },
