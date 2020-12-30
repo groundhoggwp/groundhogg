@@ -8,8 +8,7 @@ namespace Groundhogg\Admin;
  *
  * @package Groundhogg\Admin
  */
-abstract class Tabbed_Admin_Page_Extension
-{
+abstract class Tabbed_Admin_Page_Extension {
 
 	/**
 	 * Page_Extension constructor.
@@ -23,18 +22,18 @@ abstract class Tabbed_Admin_Page_Extension
 
 	/**
 	 * Register the new Tab
-	 * 
+	 *
 	 * @param $tabs
 	 *
 	 * @return mixed
 	 */
 	public function register_tab( $tabs ) {
-		
+
 		$tabs[ $this->get_tab_slug() ] = [
 			'slug' => $this->get_tab_slug(),
 			'name' => $this->get_tab_name(),
 		];
-		
+
 		return $tabs;
 	}
 
@@ -47,14 +46,14 @@ abstract class Tabbed_Admin_Page_Extension
 
 	/**
 	 * Get the tab slug
-	 * 
+	 *
 	 * @return mixed
 	 */
 	abstract protected function get_tab_slug();
 
 	/**
 	 * Get the tab name
-	 * 
+	 *
 	 * @return mixed
 	 */
 	abstract protected function get_tab_name();

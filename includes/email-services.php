@@ -77,6 +77,20 @@ class Groundhogg_Email_Services {
 	}
 
 	/**
+	 * @return false|mixed|string|void
+	 */
+	public static function get_transactional_service(){
+		return self::get_saved_service( self::TRANSACTIONAL );
+	}
+
+	/**
+	 * @return false|mixed|string|void
+	 */
+	public static function get_marketing_service(){
+		return self::get_saved_service( self::MARKETING );
+	}
+
+	/**
 	 * Set the service
 	 *
 	 * @param $type    string
