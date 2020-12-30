@@ -159,7 +159,13 @@ export default ({ settings, email, history }) => {
     target.setAttribute("data-y", y);
   };
 
+  const dragStartListener = (event) => {
+    console.log('drag start')
+    document.querySelector('.interface-interface-skeleton__sidebar').scrollTop = 0;
+    document.querySelector('.interface-interface-skeleton__sidebar').classList.add("show-overflow");
+  };
   const dragEndListener = (event) => {
+    document.querySelector('.interface-interface-skeleton__sidebar').classList.remove("show-overflow");
     const target = event.target;
 
     // keep the dragged position in the data-x/data-y attributes
@@ -179,11 +185,13 @@ export default ({ settings, email, history }) => {
     interact(".groundhogg-email-editor__email-content").dropzone({
       overlap: 0.75,
       ondropactivate: (event) => {},
+
       ondragenter: (event) => {
         // var draggableElement = event.relatedTarget;
-        // console.log('drag enter')
+        console.log('drag enter')
         startInteractJS = true
         var dropzoneElement = event.target.classList.add("active");
+
       },
       ondragleave: (event) => {
         var dropzoneElement = event.target.classList.remove("active");
@@ -200,7 +208,7 @@ export default ({ settings, email, history }) => {
       cursorChecker(action, interactable, element, interacting) {
         return "grab";
       },
-      // autoScroll: true,
+      onstart: dragStartListener,
       onend: dragEndListener,
       listeners: { move: dragMoveListener },
       modifiers: [
