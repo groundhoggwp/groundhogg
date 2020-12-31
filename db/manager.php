@@ -67,6 +67,7 @@ class Manager {
 		$this->form_impressions  = new Form_Impressions();
 		$this->contactnotes      = new Contact_Notes();
 		$this->permissions_keys  = new Permissions_Keys();
+		$this->email_log         = new Email_Log();
 
 		//new queue table
 		$this->event_queue = new Event_Queue();
