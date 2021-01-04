@@ -320,7 +320,21 @@ class Events_Page extends Tabbed_Admin_Page {
 
 	public function view_emails(){
 
+		if ( ! current_user_can( 'view_events' ) ) {
+			$this->wp_die_no_access();
+		}
 
+		$log_table = new Email_Log_Table();
+
+		$log_table->views();
+		?>
+        <form method="post" class="search-form wp-clearfix">
+            <!-- search form -->
+			<?php $log_table->prepare_items(); ?>
+			<?php $log_table->display(); ?>
+        </form>
+
+		<?php
 
 	}
 }

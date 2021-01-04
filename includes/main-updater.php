@@ -359,6 +359,13 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Install new DBs
+	 */
+	public function version_2_2_24() {
+		Plugin::$instance->dbs->install_dbs();
+	}
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -400,7 +407,8 @@ class Main_Updater extends Updater {
 			'2.2.19.4',
 			'2.2.22',
 			'2.2.23',
-			'2.2.23.3'
+			'2.2.23.3',
+			'2.2.24'
 		];
 	}
 
@@ -423,6 +431,7 @@ class Main_Updater extends Updater {
 			'2.2.19.4',
 			'2.2.22',
 			'2.2.22.3',
+			'2.2.24',
 		];
 	}
 

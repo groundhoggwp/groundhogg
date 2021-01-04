@@ -146,29 +146,29 @@ class Email_Log_Table extends Table {
 
 		switch ( $email->status ) {
 
-			case 'sent':
-			case 'delivered':
-				$actions['resend']   = "<a href='" . wp_nonce_url( get_admin_groundhogg_uri( [
-						'view' => 'log',
-						'id'   => $email->get_id()
-					] ), 'retry_email', '_groundhogg_nonce' ) . "'>" . __( 'Resend', 'groundhogg' ) . "</a>";
-				$actions['mpreview'] = "<a data-log-id=\"" . $email->get_id() . "\" href='" . esc_url( get_admin_groundhogg_uri( [
-						'view'    => 'log',
-						'preview' => $email->get_id()
-					] ) ) . "'>" . __( 'Preview' ) . "</a>";
-				break;
-			case 'failed':
-			case 'bounced':
-			case 'softfail':
-				$actions['retry']    = "<a href='" . wp_nonce_url( get_admin_groundhogg_uri( [
-						'view' => 'log',
-						'id'   => $email->get_id()
-					] ), 'retry_email', '_groundhogg_nonce' ) . "'>" . __( 'Retry', 'groundhogg' ) . "</a>";
-				$actions['mpreview'] = "<a data-log-id=\"" . $email->get_id() . "\" href='" . esc_url( get_admin_groundhogg_uri( [
-						'view'    => 'log',
-						'preview' => $email->get_id()
-					] ) ) . "'>" . __( 'Details', 'groundhogg' ) . "</a>";
-				break;
+//			case 'sent':
+//			case 'delivered':
+//				$actions['resend']   = "<a href='" . wp_nonce_url( get_admin_groundhogg_uri( [
+//						'view' => 'log',
+//						'id'   => $email->get_id()
+//					] ), 'retry_email', '_groundhogg_nonce' ) . "'>" . __( 'Resend', 'groundhogg' ) . "</a>";
+//				$actions['mpreview'] = "<a data-log-id=\"" . $email->get_id() . "\" href='" . esc_url( get_admin_groundhogg_uri( [
+//						'view'    => 'log',
+//						'preview' => $email->get_id()
+//					] ) ) . "'>" . __( 'Preview' ) . "</a>";
+//				break;
+//			case 'failed':
+//			case 'bounced':
+//			case 'softfail':
+//				$actions['retry']    = "<a href='" . wp_nonce_url( get_admin_groundhogg_uri( [
+//						'view' => 'log',
+//						'id'   => $email->get_id()
+//					] ), 'retry_email', '_groundhogg_nonce' ) . "'>" . __( 'Retry', 'groundhogg' ) . "</a>";
+//				$actions['mpreview'] = "<a data-log-id=\"" . $email->get_id() . "\" href='" . esc_url( get_admin_groundhogg_uri( [
+//						'view'    => 'log',
+//						'preview' => $email->get_id()
+//					] ) ) . "'>" . __( 'Details', 'groundhogg' ) . "</a>";
+//				break;
 
 		}
 
@@ -239,7 +239,7 @@ class Email_Log_Table extends Table {
 			case 'delivered':
 
 				?>
-                <span class="email-sent"><?php echo get_email_status_pretty_name( $email->status ); ?></span>
+                <span class="email-sent"><?php echo $email->status; ?></span>
 				<?php
 
 				break;
@@ -248,7 +248,7 @@ class Email_Log_Table extends Table {
 			case 'softfail':
 
 				?>
-                <span class="email-failed"><?php echo get_email_status_pretty_name( $email->status ); ?></span>
+                <span class="email-failed"><?php echo $email->status; ?></span>
 				<?php
 
 				break;
