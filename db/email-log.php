@@ -2,6 +2,8 @@
 
 namespace Groundhogg\DB;
 
+use function Groundhogg\Ymd_His;
+
 class Email_Log extends DB {
 
 
@@ -137,16 +139,16 @@ class Email_Log extends DB {
 	public function get_columns() {
 		return array(
 			'ID'            => '%d',
-			'msg_id'        => '%s',
 			'recipients'    => '%s',
 			'from_address'  => '%s',
 			'subject'       => '%s',
 			'content'       => '%s',
 			'headers'       => '%s',
-			'raw'           => '%s',
-			'status'        => '%s',
+			'message_type'  => '%s',
+			'email_service' => '%s',
 			'error_code'    => '%s',
 			'error_message' => '%s',
+			'status'        => '%s',
 			'retries'       => '%d',
 			'date_sent'     => '%s',
 		);
@@ -161,18 +163,18 @@ class Email_Log extends DB {
 	public function get_column_defaults() {
 		return array(
 			'ID'            => 0,
-			'msg_id'        => '',
 			'recipients'    => '',
 			'from_address'  => '',
 			'subject'       => '',
 			'content'       => '',
 			'headers'       => '',
-			'raw'           => '',
-			'status'        => 'sent',
+			'message_type'  => '',
+			'email_service' => '',
 			'error_code'    => '',
 			'error_message' => '',
+			'status'        => 'sent',
 			'retries'       => 0,
-			'date_sent'     => current_time( 'mysql' ),
+			'date_sent'     => Ymd_His(),
 		);
 	}
 
@@ -184,13 +186,13 @@ class Email_Log extends DB {
 
 		$sql = "CREATE TABLE " . $this->table_name . " (
 		ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-		msg_id text NOT NULL,
 		recipients text NOT NULL,
 		from_address text NOT NULL,
 		subject mediumtext NOT NULL,
 		headers mediumtext NOT NULL,
 		content longtext NOT NULL,
-		raw longtext NOT NULL,
+		message_type varchar(20) NOT NULL,
+		email_service varchar(20) NOT NULL,
 		status varchar(20) NOT NULL,
 		error_code varchar(30) NOT NULL,
 		error_message text NOT NULL,

@@ -14,7 +14,9 @@ class Email_Logger {
 	 */
 	private static $log_item;
 
-
+	/**
+	 * Email_Logger constructor.
+	 */
 	public function __construct() {
 		add_action( 'init', [ $this, 'init' ] );
 	}
@@ -22,8 +24,8 @@ class Email_Logger {
 	/**
 	 * Lazy load the initial actions so we can check that email logging is enabled.
 	 */
-	public function init(){
-		if ( is_option_enabled( 'gh_log_emails' ) ){
+	public function init() {
+		if ( is_option_enabled( 'gh_log_emails' ) ) {
 			// Do last
 			add_action( 'phpmailer_init', [ $this, 'phpmailer_init_callback' ], 99 );
 			// Do first
@@ -56,7 +58,7 @@ class Email_Logger {
 			[ 'From', sprintf( "%s <%s>", $phpmailer->FromName, $phpmailer->From ) ],
 		];
 
-		if ( $phpmailer->Sender ){
+		if ( $phpmailer->Sender ) {
 			$headers[] = [ 'Sender', $phpmailer->Sender ];
 		}
 
@@ -68,6 +70,8 @@ class Email_Logger {
 			'subject'       => $phpmailer->Subject,
 			'content'       => $phpmailer->Body,
 			'headers'       => $headers,
+			'message_type'  => \Groundhogg_Email_Services::get_current_message_type(),
+			'email_service' => \Groundhogg_Email_Services::get_current_email_service(),
 			'error_code'    => '',
 			'error_message' => '',
 			'status'        => 'sent'

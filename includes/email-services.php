@@ -7,6 +7,9 @@ class Groundhogg_Email_Services {
 	const TRANSACTIONAL = 'transactional';
 	const MARKETING = 'marketing';
 
+	private static $current_message_type = null;
+	private static $current_email_service = null;
+
 	private static $email_services = [];
 
 	public static function get() {
@@ -15,6 +18,30 @@ class Groundhogg_Email_Services {
 
 	public static function init() {
 		self::register( 'wp_mail', __( 'WordPress Default', 'groundhogg' ), 'wp_mail' );
+	}
+
+	private static function clear() {
+		self::$current_message_type  = null;
+		self::$current_email_service = null;
+	}
+
+	/**
+	 * Get the current message type
+	 * If not set assume transactional
+	 *
+	 * @return null|string
+	 */
+	public static function get_current_message_type() {
+		return self::$current_message_type ?: self::TRANSACTIONAL;
+	}
+
+	/**
+	 * Get the email service in use
+	 *
+	 * @return null|string
+	 */
+	public static function get_current_email_service() {
+		return self::$current_email_service ?: 'wp_mail';
 	}
 
 	/**
@@ -79,14 +106,14 @@ class Groundhogg_Email_Services {
 	/**
 	 * @return false|mixed|string|void
 	 */
-	public static function get_transactional_service(){
+	public static function get_transactional_service() {
 		return self::get_saved_service( self::TRANSACTIONAL );
 	}
 
 	/**
 	 * @return false|mixed|string|void
 	 */
-	public static function get_marketing_service(){
+	public static function get_marketing_service() {
 		return self::get_saved_service( self::MARKETING );
 	}
 
@@ -103,33 +130,39 @@ class Groundhogg_Email_Services {
 	/**
 	 * Handler for transactional emails.
 	 *
-	 * @param string|array $to          Array or comma-separated list of email addresses to send message.
-	 * @param string       $subject     Email subject
-	 * @param string       $message     Message contents
-	 * @param string|array $headers     Optional. Additional headers.
+	 * @param string|array $to Array or comma-separated list of email addresses to send message.
+	 * @param string $subject Email subject
+	 * @param string $message Message contents
+	 * @param string|array $headers Optional. Additional headers.
 	 * @param string|array $attachments Optional. Files to attach.
 	 *
 	 * @return bool Whether the email contents were sent successfully.
 	 */
 	public static function send( $service, $to, $subject, $message, $headers = '', $attachments = array() ) {
-		$callback = is_callable( self::get_callback( $service ) ) ? self::get_callback( $service ) : 'wp_mail';
+		$callback                    = is_callable( self::get_callback( $service ) ) ? self::get_callback( $service ) : 'wp_mail';
+		self::$current_email_service = $service;
 
-		return call_user_func( $callback, $to, $subject, $message, $headers, $attachments );
+		$sent = call_user_func( $callback, $to, $subject, $message, $headers, $attachments );
+
+		self::clear();
+
+		return $sent;
 	}
 
 	/**
 	 * Handler for transactional emails.
 	 *
-	 * @param string|array $to          Array or comma-separated list of email addresses to send message.
-	 * @param string       $subject     Email subject
-	 * @param string       $message     Message contents
-	 * @param string|array $headers     Optional. Additional headers.
+	 * @param string|array $to Array or comma-separated list of email addresses to send message.
+	 * @param string $subject Email subject
+	 * @param string $message Message contents
+	 * @param string|array $headers Optional. Additional headers.
 	 * @param string|array $attachments Optional. Files to attach.
 	 *
 	 * @return bool Whether the email contents were sent successfully.
 	 */
 	public static function send_transactional( $to, $subject, $message, $headers = '', $attachments = array() ) {
-		$service = self::get_saved_service( self::TRANSACTIONAL );
+		$service                    = self::get_saved_service( self::TRANSACTIONAL );
+		self::$current_message_type = self::TRANSACTIONAL;
 
 		return self::send( $service, $to, $subject, $message, $headers, $attachments );
 	}
@@ -137,16 +170,17 @@ class Groundhogg_Email_Services {
 	/**
 	 * Handler for marketing emails.
 	 *
-	 * @param string|array $to          Array or comma-separated list of email addresses to send message.
-	 * @param string       $subject     Email subject
-	 * @param string       $message     Message contents
-	 * @param string|array $headers     Optional. Additional headers.
+	 * @param string|array $to Array or comma-separated list of email addresses to send message.
+	 * @param string $subject Email subject
+	 * @param string $message Message contents
+	 * @param string|array $headers Optional. Additional headers.
 	 * @param string|array $attachments Optional. Files to attach.
 	 *
 	 * @return bool Whether the email contents were sent successfully.
 	 */
 	public static function send_marketing( $to, $subject, $message, $headers = '', $attachments = array() ) {
-		$service = self::get_saved_service( self::MARKETING );
+		$service                    = self::get_saved_service( self::MARKETING );
+		self::$current_message_type = self::MARKETING;
 
 		return self::send( $service, $to, $subject, $message, $headers, $attachments );
 	}
