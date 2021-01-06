@@ -10,10 +10,13 @@ use Groundhogg\Email_Log_Item;
 use WP_List_Table;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\dashicon;
+use function Groundhogg\enqueue_groundhogg_modal;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
 use function Groundhogg\get_url_var;
+use function Groundhogg\html;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -158,10 +161,16 @@ class Email_Log_Table extends Table {
 		$actions['resend']       = "<a href='" . action_url( 'resend_email', [
 				'id' => $email->get_id()
 			] ) . "'>" . __( 'Resend', 'groundhogg' ) . "</a>";
-		$actions['view-details'] = "<a data-log-id=\"" . $email->get_id() . "\" href='" . esc_url( admin_page_url( 'gh_events', [
-				'tab' => 'log',
-				'log' => $email->get_id()
-			] ) ) . "'>" . __( 'View details' ) . "</a>";
+		$actions['view-details'] = html()->modal_link( [
+			'title'              => __( 'Log Details', 'groundhogg' ),
+			'text'               => __( 'View Details', 'groundhogg' ),
+			'class'              => 'view-email-log',
+			'footer'             => 'false',
+			'height'             => 500,
+			'width'              => 500,
+			'source'             => 'modal-log-details',
+            'data-log-id'        => $email->get_id()
+		] );
 
 		return $this->row_actions( apply_filters( 'groundhogg/log/row_actions', $actions, $email, $column_name ) );
 	}

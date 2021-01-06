@@ -108,4 +108,6 @@
 
     $(initAllFrames);
 
+    window.fullFrame = initAllFrames;
+
 })(jQuery);

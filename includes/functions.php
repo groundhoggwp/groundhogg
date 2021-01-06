@@ -574,6 +574,14 @@ function dequeue_wc_css_compat() {
 }
 
 /**
+ * Enqueue any iframe compat scripts
+ */
+function iframe_compat(){
+	wp_enqueue_script( 'groundhogg-admin-iframe' );
+	wp_enqueue_style( 'groundhogg-admin-iframe' );
+}
+
+/**
  * Enqueues the modal scripts
  *
  * @since 1.0.5
