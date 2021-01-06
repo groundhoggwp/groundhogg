@@ -841,20 +841,6 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * Send with generic WP mail
-	 *
-	 * @param $to
-	 * @param $subject
-	 * @param $content
-	 * @param $headers
-	 *
-	 * @return bool
-	 */
-	private function send_with_wp( $to, $subject, $content, $headers ) {
-		return wp_mail( $to, $subject, $content, $headers );
-	}
-
-	/**
 	 * Log failures
 	 *
 	 * @param $error WP_Error

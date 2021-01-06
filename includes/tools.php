@@ -2,6 +2,9 @@
 
 use Groundhogg\Utils\Limits;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\extrapolate_wp_mail_plugin;
+use function Groundhogg\get_default_from_name;
+use function Groundhogg\gh_cron_installed;
 use function Groundhogg\html;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\nonce_url_no_amp;
@@ -136,14 +139,17 @@ function groundhogg_tools_sysinfo_get() {
 	$return  = apply_filters( 'groundhogg_sysinfo_after_bounce_config', $return );
 
 	$return .= "\n" . '-- Email Configuration' . "\n\n";
-	$return .= 'wp_mail() defined in:     ' . \Groundhogg\extrapolate_wp_mail_plugin() . "\n";
-	$return .= 'Default FROM:             ' . sprintf( "%s <%s>", \Groundhogg\get_default_from_name(), \Groundhogg\get_default_from_email() ) . "\n";
+	$return .= 'wp_mail() defined in:     ' . extrapolate_wp_mail_plugin() . "\n";
+	$return .= 'Default FROM:             ' . sprintf( "%s <%s>", get_default_from_name(), \Groundhogg\get_default_from_email() ) . "\n";
+	$return .= 'WordPress Service:        ' . Groundhogg_Email_Services::get_service_display_name( Groundhogg_Email_Services::get_wordpress_service() ) . "\n";
+	$return .= 'Transactional Service:    ' . Groundhogg_Email_Services::get_service_display_name( Groundhogg_Email_Services::get_transactional_service() ) . "\n";
+	$return .= 'Marketing Service:        ' . Groundhogg_Email_Services::get_service_display_name( Groundhogg_Email_Services::get_marketing_service() ) . "\n";
 	$return  = apply_filters( 'groundhogg_sysinfo_after_email_config', $return );
 
 	$return .= "\n" . '-- CRON Configuration' . "\n\n";
 	$return .= 'DISABLE_WP_CRON:          ' . ( defined( 'DISABLE_WP_CRON' ) ? DISABLE_WP_CRON ? 'Enabled' : 'Disabled' : 'Not set' ) . "\n";
 	$return .= 'wp-cron.php last ping:    ' . ( get_option( 'wp_cron_last_ping' ) ? human_time_diff( get_option( 'wp_cron_last_ping' ), time() ) . ' ago' : 'Not pinged yet...' ) . "\n\n";
-	$return .= 'gh-cron.php installed:    ' . ( \Groundhogg\gh_cron_installed() ? 'Yes' : 'No' ) . "\n";
+	$return .= 'gh-cron.php installed:    ' . ( gh_cron_installed() ? 'Yes' : 'No' ) . "\n";
 	$return .= 'Event Queue Unhooked:     ' . ( ! wp_next_scheduled( 'groundhogg_process_queue' ) ? 'Yes' : 'No' ) . "\n";
 	$return .= 'gh-cron.php last ping:    ' . ( get_option( 'gh_cron_last_ping' ) ? human_time_diff( get_option( 'gh_cron_last_ping' ), time() ) . ' ago' : 'Not pinged yet...' ) . "\n";
 

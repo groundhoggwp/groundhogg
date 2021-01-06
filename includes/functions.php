@@ -1545,7 +1545,7 @@ function send_event_failure_notification( $event ) {
 
 	do_action( 'groundhogg/send_event_failure_notification/before' );
 
-	if ( wp_mail( $to, $subject, $message ) ) {
+	if ( \Groundhogg_Email_Services::send_wordpress( $to, $subject, $message ) ) {
 		set_transient( 'gh_hold_failed_event_notification', true, MINUTE_IN_SECONDS );
 	}
 
@@ -3882,43 +3882,16 @@ function Ymd_His( $time = false ) {
 /**
  * Find which plugin has wp_mail defined.
  *
- * @throws \ReflectionException
- * @return string
+ * @return string|false
  */
 function extrapolate_wp_mail_plugin() {
 
-	$reflFunc = new \ReflectionFunction( 'wp_mail' );
-	$defined  = wp_normalize_path( $reflFunc->getFileName() );
-
-	$active_plugins = get_option( 'active_plugins', [] );
-
-	foreach ( $active_plugins as $active_plugin ) {
-
-		$plugin_dir = 'wp-content/plugins/' . dirname( $active_plugin ) . '/';
-
-		if ( strpos( $defined, $plugin_dir ) !== false ) {
-			return $active_plugin;
-		}
-	}
-
-	// No active plugins are the cause, that means a plugin is probably including pluggable.php explicitly somewhere...
-	// BAD JuJu guys...
-
-	// todo, find out which plugin includes pluggable before it's supposed to.
-
-	return $defined;
-}
-
-/**
- * Find which plugin has gh_mail defined.
- *
- * @throws \ReflectionException
- * @return string
- */
-function extrapolate_gh_mail_plugin() {
-
-	$reflFunc = new \ReflectionFunction( 'gh_mail' );
-	$defined  = wp_normalize_path( $reflFunc->getFileName() );
+    try{
+	    $reflFunc = new \ReflectionFunction( 'wp_mail' );
+	    $defined  = wp_normalize_path( $reflFunc->getFileName() );
+    } catch ( \ReflectionException $e ){
+        return false;
+    }
 
 	$active_plugins = get_option( 'active_plugins', [] );
 

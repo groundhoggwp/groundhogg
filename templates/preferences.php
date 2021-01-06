@@ -103,7 +103,7 @@ if ( ! function_exists( __NAMESPACE__ . '\mail_gdpr_data' ) ) {
 		 */
 		$message = apply_filters( 'groundhogg/preferences/gdpr_audit_message', $message );
 
-		return wp_mail( $contact->get_email(), wp_specialchars_decode( $subject_line ), $message, [
+		return \Groundhogg_Email_Services::send_transactional( $contact->get_email(), wp_specialchars_decode( $subject_line ), $message, [
 			'Content-Type: text/plain'
 		] );
 	}
@@ -154,7 +154,7 @@ if ( ! function_exists( __NAMESPACE__ . '\send_email_preferences_link' ) ) {
 		 */
 		$message = apply_filters( 'groundhogg/preferences/send_preferences_link_message', $message, $contact );
 
-		return wp_mail( $contact->get_email(), wp_specialchars_decode( $subject ), $message, [
+		return \Groundhogg_Email_Services::send_transactional( $contact->get_email(), wp_specialchars_decode( $subject ), $message, [
 			'Content-Type: text/plain'
 		] );
 	}
