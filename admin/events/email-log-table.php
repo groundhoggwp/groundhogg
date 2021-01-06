@@ -3,10 +3,14 @@
 namespace Groundhogg\Admin\Events;
 
 // Exit if accessed directly
+use Groundhogg\Admin\Guided_Setup\Steps\Email;
 use Groundhogg\Admin\Table;
 use Groundhogg\DB\DB;
 use Groundhogg\Email_Log_Item;
 use WP_List_Table;
+use function Groundhogg\action_url;
+use function Groundhogg\admin_page_url;
+use function Groundhogg\get_contactdata;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
 use function Groundhogg\get_url_var;
@@ -36,7 +40,7 @@ class Email_Log_Table extends Table {
 	 * @inheritDoc
 	 */
 	function get_table_id() {
-	    return 'email_log_table';
+		return 'email_log_table';
 	}
 
 	/**
@@ -46,41 +50,45 @@ class Email_Log_Table extends Table {
 		return get_db( 'email_log' );
 	}
 
+	protected function view_param() {
+		return 'status';
+	}
+
 	/**
 	 * @inheritDoc
 	 */
 	protected function get_row_actions( $item, $column_name, $primary ) {
-	    return [];
+		return [];
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	protected function get_views_setup() {
-	    return [
-		    [
-			    'id'    => 'all',
-			    'name'  => __( 'All' ),
-			    'query' => [],
-		    ],
-		    [
-			    'id'    => 'sent',
-			    'name'  => __( 'Sent', 'groundhogg' ),
-			    'query' => [ 'status' => 'sent' ],
-		    ],
-		    [
-			    'id'    => 'failed',
-			    'name'  => __( 'Failed', 'groundhogg' ),
-			    'query' => [ 'status' => 'failed' ],
-		    ]
-        ];
+		return [
+			[
+				'view'    => '',
+				'display' => __( 'All' ),
+				'count'   => [],
+			],
+			[
+				'view'    => 'sent',
+				'display' => __( 'Sent', 'groundhogg' ),
+				'count'   => [ 'status' => 'sent' ],
+			],
+			[
+				'view'    => 'failed',
+				'display' => __( 'Failed', 'groundhogg' ),
+				'count'   => [ 'status' => 'failed' ],
+			]
+		];
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	function get_default_query() {
-	    return [];
+		return [];
 	}
 
 	/**
@@ -89,8 +97,8 @@ class Email_Log_Table extends Table {
 	 *
 	 * bulk steps or checkboxes, simply leave the 'cb' entry out of your array.
 	 *
-	 * @return array An associative array containing column information.
 	 * @see WP_List_Table::::single_row_columns()
+	 * @return array An associative array containing column information.
 	 */
 	public function get_columns() {
 		$columns = array(
@@ -104,7 +112,16 @@ class Email_Log_Table extends Table {
 			//'date_created' => _x( 'Date Created', 'Column label', 'groundhogg' ),
 		);
 
+		if ( $this->get_view() === 'failed' ){
+		    $columns[ 'error_code' ] = _x( 'Error', 'Column label', 'groundhogg' );
+		    $columns[ 'error_message' ] = _x( 'Message', 'Column label', 'groundhogg' );
+        }
+
 		return apply_filters( 'groundhogg/log/columns', $columns );
+	}
+
+	protected function parse_item( $item ) {
+		return new Email_Log_Item( $item->ID );
 	}
 
 	/**
@@ -126,7 +143,7 @@ class Email_Log_Table extends Table {
 	}
 
 	/**
-	 * @param  $email Email_Log_Item
+	 * @param        $email Email_Log_Item
 	 * @param string $column_name
 	 * @param string $primary
 	 *
@@ -138,39 +155,13 @@ class Email_Log_Table extends Table {
 			return '';
 		}
 
-		// Resend
-		// Retry
-		// Blacklist?
-		// Whitelist?
-		$actions = [];
-
-		switch ( $email->status ) {
-
-//			case 'sent':
-//			case 'delivered':
-//				$actions['resend']   = "<a href='" . wp_nonce_url( get_admin_groundhogg_uri( [
-//						'view' => 'log',
-//						'id'   => $email->get_id()
-//					] ), 'retry_email', '_groundhogg_nonce' ) . "'>" . __( 'Resend', 'groundhogg' ) . "</a>";
-//				$actions['mpreview'] = "<a data-log-id=\"" . $email->get_id() . "\" href='" . esc_url( get_admin_groundhogg_uri( [
-//						'view'    => 'log',
-//						'preview' => $email->get_id()
-//					] ) ) . "'>" . __( 'Preview' ) . "</a>";
-//				break;
-//			case 'failed':
-//			case 'bounced':
-//			case 'softfail':
-//				$actions['retry']    = "<a href='" . wp_nonce_url( get_admin_groundhogg_uri( [
-//						'view' => 'log',
-//						'id'   => $email->get_id()
-//					] ), 'retry_email', '_groundhogg_nonce' ) . "'>" . __( 'Retry', 'groundhogg' ) . "</a>";
-//				$actions['mpreview'] = "<a data-log-id=\"" . $email->get_id() . "\" href='" . esc_url( get_admin_groundhogg_uri( [
-//						'view'    => 'log',
-//						'preview' => $email->get_id()
-//					] ) ) . "'>" . __( 'Details', 'groundhogg' ) . "</a>";
-//				break;
-
-		}
+		$actions['resend']       = "<a href='" . action_url( 'resend_email', [
+				'id' => $email->get_id()
+			] ) . "'>" . __( 'Resend', 'groundhogg' ) . "</a>";
+		$actions['view-details'] = "<a data-log-id=\"" . $email->get_id() . "\" href='" . esc_url( admin_page_url( 'gh_events', [
+				'tab' => 'log',
+				'log' => $email->get_id()
+			] ) ) . "'>" . __( 'View details' ) . "</a>";
 
 		return $this->row_actions( apply_filters( 'groundhogg/log/row_actions', $actions, $email, $column_name ) );
 	}
@@ -182,8 +173,6 @@ class Email_Log_Table extends Table {
 	 */
 	protected function column_to( $email ) {
 
-//		print_r( $email->recipients );
-
 		$links = [];
 
 		foreach ( $email->recipients as $recipient ) {
@@ -192,8 +181,16 @@ class Email_Log_Table extends Table {
 				continue;
 			}
 
-			$links[] = sprintf( '<a href="mailto:%1$s">%1$s</a>', $recipient );
+			$contact = get_contactdata( $recipient );
 
+			if ( $contact ) {
+				$links[] = sprintf( '<a href="%2$s">%1$s</a>', $recipient, admin_page_url( 'gh_contacts', [
+					'action'  => 'edit',
+					'contact' => $contact->get_id()
+				] ) );
+			} else {
+				$links[] = sprintf( '<a href="mailto:%1$s">%1$s</a>', $recipient );
+			}
 		}
 
 		return implode( ', ', $links );
@@ -215,15 +212,6 @@ class Email_Log_Table extends Table {
 	 */
 	protected function column_from( $email ) {
 		esc_html_e( $email->from_address );
-	}
-
-	/**
-	 * @param $email Email_Log_Item
-	 *
-	 * @return string|void
-	 */
-	protected function column_content( $email ) {
-
 	}
 
 	/**
@@ -281,7 +269,7 @@ class Email_Log_Table extends Table {
 	 * For more detailed insight into how columns are handled, take a look at
 	 * WP_List_Table::single_row_columns()
 	 *
-	 * @param object $email A singular item (one full row's worth of data).
+	 * @param object $email       A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string|void Text or HTML to be placed inside the column <td>.

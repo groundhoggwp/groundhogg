@@ -326,6 +326,8 @@ class Events_Page extends Tabbed_Admin_Page {
 
 		$log_table = new Email_Log_Table();
 
+		$this->search_form( __( 'Search Logs', 'groundhogg' ) );
+
 		$log_table->views();
 		?>
         <form method="post" class="search-form wp-clearfix">

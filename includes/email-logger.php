@@ -25,12 +25,12 @@ class Email_Logger {
 	 * Lazy load the initial actions so we can check that email logging is enabled.
 	 */
 	public function init() {
-		if ( is_option_enabled( 'gh_log_emails' ) ) {
+//		if ( is_option_enabled( 'gh_log_emails' ) ) {
 			// Do last
 			add_action( 'phpmailer_init', [ $this, 'phpmailer_init_callback' ], 99 );
 			// Do first
 			add_action( 'wp_mail_failed', [ $this, 'wp_mail_failed_callback' ], 1 );
-		}
+//		}
 	}
 
 	/**
@@ -76,6 +76,8 @@ class Email_Logger {
 			'error_message' => '',
 			'status'        => 'sent'
 		];
+
+//		wp_send_json( $log_data );
 
 		self::$log_item_id = get_db( 'email_log' )->add( $log_data );
 		self::$log_item    = new Email_Log_Item( self::$log_item_id );

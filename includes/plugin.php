@@ -333,9 +333,12 @@ class Plugin {
 
 		new Extension_Upgrader();
 		new Plugin_Compatibility();
+		new Email_Logger();
 
 		// Partner
 		SendWp::instance();
+
+		\Groundhogg_Email_Services::init();
 	}
 
 	/**
@@ -377,7 +380,6 @@ class Plugin {
 
 		// Load the email handler
 		include __DIR__ . '/email-services.php';
-		\Groundhogg_Email_Services::init();
 
 		// Override wp_mail maybe
 		include __DIR__ . '/pluggable.php';
