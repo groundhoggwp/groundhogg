@@ -63,9 +63,10 @@ export default function Header({
         tabIndex="-1"
       >
         <HeaderToolbar>
+          {/* This is totally undocumented, it pops up and import blocks fine but the add doesn't work at all without documentation I can't figure out how to use the functions without a ton of digging
           <div className={classes.inserterBtn}>
             <Inserter />
-          </div>
+          </div>*/}
           <h1 className="groundhogg-header__title">
             <form noValidate autoComplete="off">
               <TextField
