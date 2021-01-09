@@ -103,9 +103,10 @@ export default ({ settings, email, history }) => {
   const handleUpdateBlocks = (blocks) => {
     console.log("update", blocks);
     updateBlocks(blocks);
-    if (Array.isArray(blocks)) {
-      setContent(serialize(blocks));
-    }
+    setContent(serialize(blocks));
+    // if (Array.isArray(blocks)) {
+    //
+    // }
   };
 
   const saveDraft = (e) => {
@@ -246,25 +247,12 @@ export default ({ settings, email, history }) => {
   };
 
   useEffect(() => {
+    console.log('use effect')
     setupInteractJS();
   }, []);
 
   let editorPanel;
   switch (editorMode) {
-    case "visual":
-      editorPanel = (
-        <BlockEditor
-          settings={settings}
-          subject={subject}
-          handleSubjectChange={handleSubjectChange}
-          preHeader={preHeader}
-          handlePreHeaderChange={handlePreHeaderChange}
-          viewType={viewType}
-          handleUpdateBlocks={handleUpdateBlocks}
-          blocks={blocks}
-        />
-      );
-      break;
     case "text":
       editorPanel = <PostTextEditor />;
       break;
@@ -282,6 +270,8 @@ export default ({ settings, email, history }) => {
         />
       );
   }
+
+  console.log('rebuild', blocks)
 
   return (
     <div className="Groundhogg-BlockEditor">

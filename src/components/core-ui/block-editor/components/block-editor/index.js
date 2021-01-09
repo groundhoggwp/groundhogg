@@ -51,6 +51,7 @@ function BlockEditor({
   handleUpdateBlocks,
   blocks,
 }) {
+
   const useStyles = makeStyles((theme) => ({
     subjectHeader: {
       padding: "20px",
@@ -96,6 +97,7 @@ function BlockEditor({
     settings.__experimentalBlockPatterns = [];
   }
 
+  console.log('edoitor update', blocks)
   return (
     <div className="groundhogg-block-editor">
       <BlockEditorProvider
