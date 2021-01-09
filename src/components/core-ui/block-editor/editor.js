@@ -102,11 +102,12 @@ export default ({ settings, email, history }) => {
 
   const handleUpdateBlocks = (blocks) => {
     console.log("update", blocks);
+    // console.log("update", serialize(blocks));
     updateBlocks(blocks);
+
+    if (Array.isArray(blocks)) {
     setContent(serialize(blocks));
-    // if (Array.isArray(blocks)) {
-    //
-    // }
+    }
   };
 
   const saveDraft = (e) => {
@@ -247,6 +248,10 @@ export default ({ settings, email, history }) => {
   };
 
   useEffect(() => {
+    if (content) {
+      handleUpdateBlocks(() => parse(content));
+    }
+
     console.log('use effect')
     setupInteractJS();
   }, []);
