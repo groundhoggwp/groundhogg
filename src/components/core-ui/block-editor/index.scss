@@ -83,14 +83,11 @@
   }
 }
 
-.groundhogg-email-editor__email-content {
-// .groundhogg-email-editor__email-content.active .wp-block {
-  // border-color: ;
+.groundhogg-email-editor__email-content.active .wp-block {
   border: dashed 4px #aaa;
 }
 
-.groundhogg-email-editor__email-content {
-// .groundhogg-email-editor__email-content.active {
+.groundhogg-email-editor__email-content.active {
   background-color: #bfe4ff;
   border-radius: 4px;
   margin: 10px auto 30px;
