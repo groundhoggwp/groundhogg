@@ -23,7 +23,7 @@ WordPress CRM, Email & Marketing Automation
 
 🏆 [2020 Gold Stevie Award Winner](https://www.groundhogg.io/press/gold-2020-stevie-award-winner-our-first-award/)
 
-## Join 2,000+ Small Businesses in 35+ Countries!
+## Join 3,000+ Small Businesses in 35+ Countries!
 ### Never let another lead get away!
 
 [youtube https://youtu.be/8S-9jhBiHrI]
@@ -73,7 +73,7 @@ Groundhoggers are very generous with their business intelligence. Just as the Gr
 
 ## 🤷‍♂️ Who can benefit from Groundhogg?
 
-Groundhogg is being used by a wide variety of 2,000+ businesses in over 35+ countries. The diversity of use cases is huge!
+Groundhogg is being used by a wide variety of 3,000+ businesses in over 35+ countries. The diversity of use cases is huge!
 
 If you're business is using WordPress, you can use Groundhogg.
 
@@ -108,7 +108,7 @@ You can trust us to not only provide you with stellar software and support, but 
 
 ## ❤️ Businesses Love Groundhogg!
 
-2,000+ businesses in 35+ countries are using Groundhogg to launch their funnel, grow their list and scale their business.
+3,000+ businesses in 35+ countries are using Groundhogg to launch their funnel, grow their list and scale their business.
 
 Here's what a few of them had to say about our products and support!
 
@@ -121,11 +121,11 @@ From 👨‍🦱 **[Francisco Opazo](https://www.groundhogg.io/best-buddyboss-cr
 
 > Groundhogg is essential for many community builders, course creators, and membership site owners to achieve higher rates of engagement and retention. It simplifies many complex processes including onboarding, email marketing, funnels, and enables you to scale your marketing efforts more efficiently.
 
-From 👨 **[Jonathan Denwood](https://wordpress.org/support/topic/great-crm-product/)**, _Podcaster & Owner of WP-Tonic Agency_
+From 👨 **[Jonathan Denwood](https://wordpress.org/support/topic/great-crm-product/)**, _Podcaster & Owner of [WP-Tonic Agency](https://www.groundhogg.io/best-crm-for-agencies/)_
 
 > Adrian and his team have really built a great WordPress based CRM that’s really competitive with the big guys like ActiveCampagin. I would highly recommend it to anybody who is running WordPress.
 
-There are over [66 ⭐⭐⭐⭐⭐ reviews](https://wordpress.org/support/plugin/groundhogg/reviews/?filter=5) for Groundhogg on WordPress.org and even [more reviews on our Facebook Page](https://www.facebook.com/groundhoggwp/reviews/)!
+There are over [71 ⭐⭐⭐⭐⭐ reviews](https://wordpress.org/support/plugin/groundhogg/reviews/?filter=5) for Groundhogg on WordPress.org and even [more reviews on our Facebook Page](https://www.facebook.com/groundhoggwp/reviews/)!
 
 ## Features
 
@@ -221,7 +221,7 @@ If you'd like a trial of our premium plans, please check out our [$1 sandbox dem
 ## Milestones
 
 * Groundhogg **3.0!** _Coming Q1 2021._
-* Serving 2,000+ businesses in 35+ countries.
+* Serving 3,000+ businesses in 35+ countries.
 * ⭐⭐⭐⭐⭐ rated software and support!
 * 40+ Certified partners.
 * 🏆 [Gold Stevie Award 2020](https://www.groundhogg.io/press/gold-2020-stevie-award-winner-our-first-award/) for Tech Start up of the Year _(American Business Awards)_.
@@ -309,12 +309,32 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.2.23.1 (2020-12-07) =
+* FIXED License missing message showing for non official extensions. Only show for extensions with official ids.
+
+= 2.2.23 (2020-12-07) =
+* TWEAKED Improved license management in the background.
+* FIXED Deprecated jQuery function calls in the `fullframe.js` script.
+
+= 2.2.22 (2020-11-27) =
+* TWEAKED If the url is just `/gh/` then display the preferences screen.
+* TWEAKED Added `noindex` to the managed page. Should have done this sooner.
+* TWEAKED Unsubscribe links are now valid for 1 week instead of just 1 day.
+* FIXED `{confirmation_link_raw}` & `{auto_login_link}` with redirects not being saved when placed inside buttons.
+
+= 2.2.21.1 (2020-11-25) =
+* FIXED URL encoding for `{confirmation_link}` and `{auto_login_link}` redirects
+
+= 2.2.21 (2020-11-25) =
+* FIXED `pk` being invalid if multiple usages withing the same email.
+* FIXED Error in contact screen caused by invalid step ID provided for starting a funnel.
+* FIXES permissions callbacks in open API endpoints.
+
 = 2.2.20 (2020-11-04) =
-* Updated `readme.text`
 * Various fixes and tweaks
-* Add support for detecting `HTTP_CF_CONNECTING_IP` header.
-* Add `do_replacements` to the reply-to override.
-* Fix permissions callbacks in open API endpoints.
+* UPDATED `readme.text`
+* ADDED support for detecting `HTTP_CF_CONNECTING_IP` header.
+* ADDED `do_replacements` to the reply-to override.
 
 = 2.2.19.5 (2020-09-28) =
 * TWEAKED Merged autocomplete meta picker from ACMF extension into core.

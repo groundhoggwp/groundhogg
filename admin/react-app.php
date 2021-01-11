@@ -34,11 +34,12 @@ class React_App {
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_settings' ] );
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_basename' ] );
 		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_fields' ] );
+		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_replacement_codes' ] );
 	}
 
 
 	/**
-	 * Adds field_map argument in the Groundhogg Object
+	 * Adds field_map argument in the Groundhogg Object also dumped some extra settings
 	 *
 	 * @param $obj
 	 *
@@ -62,6 +63,8 @@ class React_App {
 			'tags'
 		];
 		$obj[ 'export_meta_keys'] =  array_values( Plugin::$instance->dbs->get_db( 'contactmeta' )->get_keys() );
+
+		$obj[ 'user_roles' ] = Plugin::$instance->roles->get_roles_for_react_select();
 
 		return $obj;
 	}
@@ -277,6 +280,20 @@ class React_App {
 
 		return $obj;
 	}
+
+	/**
+     * Add the replacement codes to the global object
+     *
+	 * @param $obj
+	 *
+	 * @return mixed
+	 */
+	public function register_replacement_codes( $obj ){
+
+	    $obj[ 'replacements' ] = Plugin::instance()->replacements->get_replacements();
+
+	    return $obj;
+    }
 
 	/**
 	 * Make the settings accessible

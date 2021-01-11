@@ -102,6 +102,11 @@ export default (endpoint) => ({
   setIsRequestingItems,
   setRequestingError,
 
+  /**
+   *
+   * @param query
+   * @returns {Generator<{totalItems: *, type: string, items: *}|{type: string, isRequesting: *}|{request: Object, type: string}|{type: string, error: *}, void, *>}
+   */
   * fetchItems (query) {
     yield setIsRequestingItems(true)
 
@@ -151,6 +156,10 @@ export default (endpoint) => ({
         type: TYPES.CREATE_ITEMS,
         items: result.items,
       }
+
+      return {
+        items : result.items,
+      }
     } catch (e) {
       yield setCreatingError(e)
     }
@@ -170,6 +179,10 @@ export default (endpoint) => ({
       yield {
         type: TYPES.CREATE_ITEM,
         item: result.item,
+      }
+
+      return {
+        item : result.item,
       }
     } catch (e) {
       yield setCreatingError(e)
@@ -191,6 +204,11 @@ export default (endpoint) => ({
         type: TYPES.UPDATE_ITEMS,
         items: response.items,
       }
+
+      return {
+        items : result.items,
+      }
+
     } catch (e) {
       yield setUpdatingError(e)
     }
@@ -212,6 +230,10 @@ export default (endpoint) => ({
         type: TYPES.UPDATE_ITEM,
         item: response.item,
       }
+
+      return {
+        item : result.item,
+      }
     } catch (e) {
       yield setUpdatingError(e)
     }
@@ -232,6 +254,10 @@ export default (endpoint) => ({
         type: TYPES.DELETE_ITEMS,
         itemIds,
       }
+
+      return {
+        itemIds
+      }
     } catch (e) {
       yield setDeletingError(e)
     }
@@ -250,6 +276,10 @@ export default (endpoint) => ({
       yield {
         type: TYPES.DELETE_ITEM,
         itemId,
+      }
+
+      return {
+        itemId
       }
     } catch (e) {
       yield setDeletingError(e)

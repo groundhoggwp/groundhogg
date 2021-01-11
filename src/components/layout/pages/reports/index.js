@@ -19,6 +19,7 @@ import Chart from "../../../core-ui/chart";
 import Stats from "../../../core-ui/stats";
 import DatePicker from "../../../core-ui/date-picker";
 import ReportPanel from "./report-panel.js";
+import {getLuxonDate} from "utils/index";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -32,8 +33,8 @@ export function Reports({history, match}) {
   const classes = useStyles();
 
 
-  const [startDate, setStartDate] = useState(DateTime.local().minus({ years: 1 }).startOf('day').toISODate());
-  const [endDate, setEndDate] = useState(DateTime.local().startOf('day').toISODate());
+  const [startDate, setStartDate] = useState(getLuxonDate('one_year_back'));
+  const [endDate, setEndDate] = useState(getLuxonDate('today'));
 
   const dateChange = (id, newValue)  => {
     if (id === 'start'){
@@ -117,28 +118,29 @@ export function Reports({history, match}) {
                gridRowStart: 5,
                gridRowEnd: 7,
               },
-              {
-               name:"table_top_converting_funnels",
-               gridColumnStart: 1,
-               gridColumnEnd: 3,
-               gridRowStart: 7,
-               gridRowEnd: 10,
-               fullWidth: false
-              },
+              // Busted
+              // {
+              //  name:"table_top_converting_funnels",
+              //  gridColumnStart: 1,
+              //  gridColumnEnd: 3,
+              //  gridRowStart: 7,
+              //  gridRowEnd: 10,
+              //  fullWidth: false
+              // },
               {
                name:"table_contacts_by_countries",
                gridColumnStart: 3,
                gridColumnEnd: 5,
-               gridRowStart: 7,
-               gridRowEnd: 10,
+               gridRowStart: 5,
+               gridRowEnd: 7,
                fullWidth: false
               },
               {
                name:"table_contacts_by_lead_source",
                gridColumnStart: 1,
                gridColumnEnd: 5,
-               gridRowStart: 10,
-               gridRowEnd: 13,
+               gridRowStart: 7,
+               gridRowEnd: 10,
                fullWidth: true
               },
             ]}

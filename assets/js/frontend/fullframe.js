@@ -33,8 +33,6 @@
         browser.safari = true;
     }
 
-    $.browser = browser;
-
     function initAllFrames() {
         var iFrames = $('iframe');
 
@@ -51,9 +49,9 @@
             }
         }
 
-        if ($.browser.safari || $.browser.opera) {
+        if (browser.safari || browser.opera) {
 
-            iFrames.load(function () {
+            iFrames.on( 'load', function () {
                 setTimeout(iResize, 0);
             });
 
@@ -64,7 +62,7 @@
             }
 
         } else {
-            iFrames.load(function () {
+            iFrames.on( 'load', function () {
                 $(this).height($(this.contentWindow.document).height());
             });
         }

@@ -253,15 +253,15 @@ const AddTags = () => {
     }
   }
 
-  const commitSingle = () => {
-    createItem({
+  const commitSingle = async () => {
+      const result = await createItem({
       data: tempData,
     })
 
     setTempData({ tag_name: '', tag_description: '' })
   }
 
-  const commitMultiple = () => {
+  const commitMultiple = async () => {
     const tagNames = tempData.multiple_tags.split('\n')
     const tagData = tagNames.map(name => {
       return {
@@ -271,7 +271,9 @@ const AddTags = () => {
       }
     })
 
-    createItems(tagData)
+    const result = await createItems(tagData)
+
+    console.log(result)
 
     setTempData({ multiple_tags: '' })
   }

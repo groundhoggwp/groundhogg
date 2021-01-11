@@ -60,11 +60,21 @@ class Extension_Upgrader {
 		38642 => 'groundhogg-backup/groundhogg-backup.php',
 		39872 => 'groundhogg-add-to-calendar/groundhogg-add-to-calendar.php',
 		45632 => 'groundhogg-sms77/groundhogg-sms77.php',
+		48143 => 'groundhogg-helper/groundhogg-helper.php',
 		48864 => 'groundhogg-sendgrid/groundhogg-sendgrid.php',
 		49869 => 'groundhogg-better-meta/groundhogg-better-meta.php',
 		50123 => 'groundhogg-elastic-email/groundhogg-elastic-email.php',
 		52477 => 'groundhogg-buddyboss/groundhogg-buddyboss.php',
 	];
+
+	/**
+	 * The ids of official Groundhogg extensions
+	 *
+	 * @return int[]
+	 */
+	public static function get_extension_ids(){
+		return array_keys( static::$file_map );
+	}
 
 	/**
 	 * @param $id

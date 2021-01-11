@@ -6,78 +6,160 @@
 @import "~@wordpress/base-styles/z-index";
 @import "~@wordpress/interface/src/style.scss";
 
-
 // Internal
 @import "components/header/styles";
 @import "components/sidebar/styles";
 @import "components/block-editor/styles";
 
 .groundhogg-block-editor {
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	min-height: calc(100vh - 32px);
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  min-height: calc(100vh - 32px);
 }
 
 .editor-styles-wrapper {
-	width: 100%;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  @include break-small {
+    width: calc(100% - #{$sidebar-width});
+  }
+  // We need the styles scoped to "body" to be added to the
+  // div.editor-styles wrapper
+  font-family: $editor-font;
+  font-size: $editor-font-size;
+  line-height: $editor-line-height;
+  color: $gray-900;
 
-	@include break-small {
-		width: calc(100% - #{$sidebar-width});
-	}
-	// We need the styles scoped to "body" to be added to the
-	// div.editor-styles wrapper
-	font-family: $editor-font;
-	font-size: $editor-font-size;
-	line-height: $editor-line-height;
-	color: $gray-900;
+  // Important all other selectors scoped underneath
+  // `div.editor-styles-wrapper`
+  @import "~@wordpress/editor/src/editor-styles.scss";
+}
 
-	// Important all other selectors scoped underneath
-	// `div.editor-styles-wrapper`
-	@import "~@wordpress/editor/src/editor-styles.scss";
+.Groundhogg-BlockEditor .interface-interface-skeleton__content {
+  outline: none;
 }
 
 .groundhogg-block-editor,
 // The modals are shown outside the .groundhogg-block-editor wrapper, they need these styles.
 .components-modal__frame {
-	@include reset;
+  @include reset;
 }
 
 .groundhogg-block-editor {
-	top: 140px;
-	padding-bottom: 280px;
-	overflow-y: auto;
-	overflow-x: hidden;
+  top: 129px;
+  padding-bottom: 280px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 // Custom CSS Begins
 .interface-interface-skeleton {
-	top: 100px;
-	left: 115px;
-	max-width: 1600px;
-	.interface-interface-skeleton__sidebar {
-		top: 10px;
-	}
+  top: 100px;
+  left: 115px;
+  max-width: 1600px;
 }
 .edit-post-text-editor {
-	position: relative;
-	width: 100%;
-	background-color: #fff;
-	flex-grow: 1;
+  position: relative;
+  width: 100%;
+  background-color: #fff;
+  flex-grow: 1;
 }
 
 .edit-post-text-editor__body {
-	width: 100%;
-	max-width: 1080px;
-	padding: 0 24px 24px;
-	margin-left: auto;
-	margin-right: auto;
+  width: 100%;
+  // max-width: 1080px;
+  // padding: 0 24px 24px;
+  margin-left: auto;
+  margin-right: auto;
 
-	// This needs specificity to change the title block appearance on the code editor.
-	.editor-post-title__input.editor-post-title__input.editor-post-title__input {
-		font-family: "Menlo,Consolas,monaco,monospace";
-		font-size: 2em;
-	}
+  // This needs specificity to change the title block appearance on the code editor.
+  .editor-post-title__input.editor-post-title__input.editor-post-title__input {
+    font-family: "Menlo,Consolas,monaco,monospace";
+    font-size: 2em;
+  }
+}
+
+.groundhogg-email-editor__email-content {
+// .groundhogg-email-editor__email-content.active .wp-block {
+  // border-color: ;
+  border: dashed 4px #aaa;
+}
+
+.groundhogg-email-editor__email-content {
+// .groundhogg-email-editor__email-content.active {
+  background-color: #bfe4ff;
+  border-radius: 4px;
+  margin: 10px auto 30px;
+  padding: 10px;
+  width: 80%;
+  transition: background-color 0.3s;
+}
+
+.side-bar-blocks-container {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.groundhogg-email-editor__email-content {
+}
+
+.groundhogg-email-editor__email-content.drop-active {
+  background-color: #bfe4ff;
+}
+
+.drop-active {
+  color: #005a87;
+  border: 1px solid #005a87;
+  z-index: 999;
+}
+
+.drop-target {
+  background-color: #29e;
+  border-color: #fff;
+  border-style: solid;
+}
+
+.side-bar-drag-drop-block {
+  display: inline-block;
+  width: 40px;
+  padding: 2em 0.5em;
+  border: 1px solid #ccc;
+  margin: 5px;
+  z-index: 1000;
+  color: #000;
+  touch-action: none;
+  -webkit-transform: translate(0px, 0px);
+  transform: translate(0px, 0px);
+  border-radius: 4px;
+  // transition: background-color 0.3s;
+  background: #fff;
+}
+
+.side-bar-drag-drop-block:hover {
+  color: #2196f3;
+  border: 1px solid #2196f3;
+}
+
+#grid-snap {
+  width: 40%;
+  border-radius: 4px;
+  padding: 2%;
+  margin: 1rem 0 0 1rem;
+  background-color: #29e;
+  color: #fff;
+  font-size: 1.2em;
+  touch-action: none;
+}
+
+.edit-post-visual-editor
+  > .block-editor__typewriter
+  > div
+  > .block-editor-writing-flow
+  > .block-editor-writing-flow__click-redirect,
+.groundhogg-block-editor * {
+  outline: none;
 }

@@ -25,7 +25,7 @@ class Contacts_Api extends Base_Object_Api {
 
 		parent::register_routes();
 
-		register_rest_route( self::NAME_SPACE, '/contacts/(?P<id>\d+)/tags', [
+		register_rest_route( self::NAME_SPACE, '/contacts/(?P<ID>\d+)/tags', [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'create_tags' ],
@@ -43,7 +43,7 @@ class Contacts_Api extends Base_Object_Api {
 			],
 		] );
 
-		register_rest_route( self::NAME_SPACE, '/contacts/(?P<id>\d+)/files', [
+		register_rest_route( self::NAME_SPACE, '/contacts/(?P<ID>\d+)/files', [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'create_files' ],
@@ -61,7 +61,7 @@ class Contacts_Api extends Base_Object_Api {
 			],
 		] );
 
-		register_rest_route( self::NAME_SPACE, '/contacts/(?P<id>\d+)/merge', [
+		register_rest_route( self::NAME_SPACE, '/contacts/(?P<ID>\d+)/merge', [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'merge' ],
@@ -482,6 +482,8 @@ class Contacts_Api extends Base_Object_Api {
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function create_files( WP_REST_Request $request ){
+
+
 		$ID = absint( $request->get_param( 'ID' ) );
 
 		$contact = get_contactdata( $ID );
@@ -524,10 +526,16 @@ class Contacts_Api extends Base_Object_Api {
 			return self::ERROR_CONTACT_NOT_FOUND();
 		}
 
+		$data = $contact->get_files();
+
+		$limit   = absint( $request->get_param( 'limit' ) ) ?: 25 ;
+		$offset  = absint( $request->get_param( 'offset' ) ) ?: 0 ;
+
 		return self::SUCCESS_RESPONSE( [
-			'items'       => $contact->get_files(),
-			'total_items' => count( $contact->get_files() )
+			'items'       => array_slice( $data ,$offset , $limit ),
+			'total_items' => count( $data )
 		] );
+
 	}
 
 	/**

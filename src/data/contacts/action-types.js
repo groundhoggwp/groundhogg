@@ -11,13 +11,14 @@ const TYPES = {
 	REQUEST_CONTACT_TAGS: 'REQUEST_CONTACT_TAGS',
 	ADD_CONTACT_TAGS: 'ADD_CONTACT_TAGS',
 	DELETE_CONTACT_TAGS: 'DELETE_CONTACT_TAGS',
-	REQUEST_CONTACT_FILES: 'REQUEST_CONTACT_FILES',
+	RECEIVE_CONTACT_FILES: 'RECEIVE_CONTACT_FILES',
 	ADD_CONTACT_FILES: 'ADD_CONTACT_FILES',
 	DELETE_CONTACT_FILES: 'DELETE_CONTACT_FILES',
 	MERGE_CONTACTS: 'MERGE_CONTACTS',
 
 	/** Sub-Type Resolver Actions. Possible worth simplifying into isRequesting( type ) */
 	/** Opting for verbosity in the data store in favor of clarity in components for now. */
+	/** build in a such a way it will manipulate isRequesting and other state variable form the base actions**/
 	SET_IS_REQUESTING_TAGS: 'SET_IS_REQUESTING_TAGS',
 	SET_IS_DELETING_TAGS: 'SET_IS_DELETING_TAGS',
 	SET_IS_ADDING_TAGS: 'SET_IS_ADDING_TAGS',

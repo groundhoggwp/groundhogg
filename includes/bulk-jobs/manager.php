@@ -1,7 +1,6 @@
 <?php
 
 namespace Groundhogg\Bulk_Jobs;
-
 use function Groundhogg\get_array_var;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\use_experimental_features;
@@ -24,25 +23,29 @@ class Manager {
 	}
 
 	public function init_jobs() {
-		$this->broadcast_scheduler = new Broadcast_Scheduler();
-		$this->delete_contacts     = new Delete_Contacts();
-		$this->export_contacts     = new Export_Contacts();
-		$this->export_contacts_rest    = new Export_Contacts_Rest();
+		$this->broadcast_scheduler  = new Broadcast_Scheduler();
+		$this->delete_contacts      = new Delete_Contacts();
+		$this->export_contacts      = new Export_Contacts();
+		$this->export_contacts_rest = new Export_Contacts_Rest();
 
 //        if ( use_experimental_features() ){
 //            $this->import_contacts      = new Import_Contacts_Exp();
 //        } else {
 		$this->import_contacts = new Import_Contacts();
+		$this->import_contacts_rest = new Import_Contacts_Rest();
 //        }
 
 		$this->sync_contacts            = new Sync_Contacts();
+		$this->sync_contacts_rest       = new Sync_Contacts_Rest();
 		$this->migrate_form_impressions = new Migrate_Form_Impressions();
 		$this->migrate_waiting_events   = new Migrate_Waiting_Events();
 		$this->add_contacts_to_funnel   = new Add_Contacts_To_Funnel();
 		$this->create_users             = new Create_Users();
+		$this->create_users_res         = new Create_Users_Rest();
 		$this->process_events           = new Process_Events();
 		$this->migrate_notes            = new Migrate_Notes();
 		$this->update_subsites          = new Update_subsites();
+		$this->check_licenses           = new Check_Licenses();
 
 		do_action( 'groundhogg/bulk_jobs/init', $this );
 	}

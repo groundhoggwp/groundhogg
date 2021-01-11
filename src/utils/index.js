@@ -1,7 +1,8 @@
 import { useEffect, useState } from '@wordpress/element'
 import { dispatch, useSelect } from '@wordpress/data'
 import { CORE_STORE_NAME } from '../data';
-import { useRouteMatch } from 'react-router-dom'
+import { useRouteMatch } from 'react-router-dom';
+import { DateTime } from 'luxon';
 
 export const useShift = (onShift) => {
   useEffect(() => {
@@ -93,4 +94,52 @@ export const canUser = ( action, id, resource ) => {
   }, [] );
 
   return canUser;
+}
+
+/**
+
+ * Returns Luxon returns in a predictable manner
+ *
+ * @param {string=}  type What type, usually associated to DB or widget requirements
+  *
+ * @return {DateIOSString|Luxon Object} Returns various Luxon outputs, strings, objects etc.
+ */
+export const getLuxonDate = (type) => {
+  switch (type) {
+    case 'last_updated':
+      return `${DateTime.local()} ${DateTime.local().toISOTime()}`;
+      break;
+    case 'date_created':
+      return `${DateTime.local()} ${DateTime.local().toISOTime()}`;
+      break;
+    case 'today':
+      return DateTime.local().startOf('day').toISODate();
+      break;
+    case 'one_year_back':
+      return  DateTime.local().minus({ years: 1 }).startOf('day').toISODate();
+      break;
+    case 'one_month_back':
+      return  DateTime.fromISO(date).minus({ months: 1 }).toISODate();
+      break;
+    case 'one_month_forward':
+      return  DateTime.fromISO(date).plus({ months: 1 }).toISODate();
+      break;
+    default:
+      console.log(`Nothing matched in luxon.`);
+  }
+}
+/**
+
+ * Returns Luxon returns in a predictable manner
+ *
+ * @param {string=}  type What type, usually associated to DB or widget requirements
+  *
+ * @return {DateIOSString|Luxon Object} Returns various Luxon outputs, strings, objects etc.
+ */
+export const matchEmailRegex = (testEmail) => {
+  if(testEmail.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)){
+    return true;
+  }
+
+  return false;  
 }

@@ -25,6 +25,7 @@ const doughnutChartConfig = {
     ],
   },
   options: {
+    responsive: false,
     title: {
       display: true,
       text: '',

@@ -4,7 +4,8 @@
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data'
-import DeleteIcon from '@material-ui/icons/Delete'
+import DeleteIcon from '@material-ui/icons/delete'
+import Button from '@material-ui/core/Button'
 
 import {
 	useRouteMatch,
@@ -21,6 +22,7 @@ import {
 import { ListTable } from '../../../core-ui/list-table/new'
 import { EmailRowPrimaryItem } from './email-row-primary-item'
 import { SingleView } from './single-view'
+import {getLuxonDate} from "utils/index";
 
 const contactTableColumns = [
 	{
@@ -84,7 +86,8 @@ export const Emails = ( props ) => {
 	const {
 		items,
 		totalItems,
-		isRequesting
+		isRequesting,
+		isCreating
 	} = useSelect((select) => {
 		const store = select(EMAILS_STORE_NAME)
 
@@ -92,10 +95,12 @@ export const Emails = ( props ) => {
 			items: store.getItems(),
 			totalItems: store.getTotalItems(),
 			isRequesting: store.isItemsRequesting(),
+			isCreating: store.isItemsCreating()
 		}
 	}, [] )
 
 	const {
+		createItem,
 		fetchItems,
 		deleteItems
 	} = useDispatch( EMAILS_STORE_NAME );
@@ -117,9 +122,31 @@ export const Emails = ( props ) => {
 		}
 	}
 
+	const createEmail = async () => {
+		const result = await createItem({
+			data: {
+					content:'',
+					subject:'',
+					pre_header:'',
+					from_user:'',
+					author:'',
+					last_updated:getLuxonDate('last_updated'),
+					date_created:getLuxonDate('date_created'),
+					status:'draft',
+					is_template:0,
+					title:'New Email'
+			}
+		});
+
+		props.history.push(`/emails/${result.item.ID}`)
+	};
+
 	const renderListView = () => {
 		return (
 			<Fragment>
+				<Button style={{margin: '10px'}} variant="contained" color="primary" onClick={createEmail}>
+				  Create Email
+				</Button>
 				<ListTable
 					items={items}
 					defaultOrderBy={'date_created'}

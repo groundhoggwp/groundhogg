@@ -30,6 +30,10 @@ const Chart = ({id, title, data, gridColumnStart, gridColumnEnd, gridRowStart, g
       top: gridRowStart === 1 ? '-50px' : '10px',
       left: gridRowStart === 1 ? '37px' : '25px',
       fontWeight: '700'
+    },
+    canvas:{
+      marginTop: '-10px',
+      marginLeft: '20px'
     }
   }));
   const classes = useStyles();
@@ -37,6 +41,7 @@ const Chart = ({id, title, data, gridColumnStart, gridColumnEnd, gridRowStart, g
   const [chartInstance, setChartInstance] = useState(null);
 
   let chartConfig;
+  let canvasWidth;
   let canvasHeight;
   if (data.chart.type === "line") {
     chartConfig = lineChartConfig;
@@ -44,7 +49,8 @@ const Chart = ({id, title, data, gridColumnStart, gridColumnEnd, gridRowStart, g
     chartConfig = barChartConfig;
   } else if (data.chart.type === "doughnut") {
     chartConfig = doughnutChartConfig;
-    canvasHeight = 145
+    canvasWidth = 400;
+    canvasHeight = 350;
   }
 
   // Remove and just set the data in the future, my local shows about 213 labels for this
@@ -69,7 +75,7 @@ const Chart = ({id, title, data, gridColumnStart, gridColumnEnd, gridRowStart, g
   return (
     <Card className={classes.root}>
       <div className={classes.title}>{title}</div>
-      <canvas height={canvasHeight} className={`Chart__canvas ${id}`} ref={chartContainer} />
+      <canvas width={canvasWidth} height={canvasHeight} className={`Chart__canvas ${id} ${classes.canvas}`} ref={chartContainer} />
     </Card>
   );
 };
