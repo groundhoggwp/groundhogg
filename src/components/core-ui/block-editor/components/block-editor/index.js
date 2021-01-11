@@ -4,7 +4,7 @@
 import "@wordpress/format-library";
 import { __ } from "@wordpress/i18n";
 import { useSelect, useDispatch } from "@wordpress/data";
-import { useEffect, useState, useMemo } from "@wordpress/element";
+import { useEffect, useState, useMemo, useRef } from "@wordpress/element";
 import { serialize, parse } from "@wordpress/blocks";
 import { uploadMedia } from "@wordpress/media-utils";
 import {
@@ -98,9 +98,26 @@ function BlockEditor({
     settings.__experimentalBlockPatterns = [];
   }
 
-  console.log('edoitor update', blocks)
+  const blockEditorEl = useRef(null);
+
+  useEffect(() => {
+    blockEditorEl.current.removeEventListener('scroll', () => {})
+    blockEditorEl.current.addEventListener('scroll', (event) => {
+
+      // const popOverEl = document.querySelector('.components-popover.block-editor-block-list__block-popover');
+      // // const popOverEl = document.querySelector('.components-popover.block-editor-block-list__block-popover');
+      // if(popOverEl){
+      //   console.log('scroll', popOverEl)
+      //   // document.querySelector('.components-popover.block-editor-block-list__block-popover').style.top = `${blockEditorEl.current.scrollTop}px`;
+      //   // document.querySelector('.components-popover.block-editor-block-list__block-popover').style.transform = `translateY(${blockEditorEl.current.scrollTop}px)`;
+      // }
+
+    });
+  });
+
+
   return (
-    <div className="groundhogg-block-editor">
+    <div className="groundhogg-block-editor" ref={blockEditorEl} >
       <BlockEditorProvider
         value={blocks}
         settings={settings}
