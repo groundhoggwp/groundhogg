@@ -63,6 +63,7 @@ function BlockEditor({
       marginBottom: "10px",
     },
     emailContent: {
+      position: 'relative',
       display: "block",
       width: viewType === "desktop" ? "600px" : "320px",
       marginLeft: "auto",
