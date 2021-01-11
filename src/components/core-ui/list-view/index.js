@@ -2,6 +2,18 @@ import {useCallback, useEffect, useState} from "@wordpress/element";
 import {Virtuoso} from "react-virtuoso";
 import React from "react";
 
+/**
+ * UNFINISHED TEST
+ *
+ *
+ * @param items
+ * @param fetchItems
+ * @param DisplayRecord
+ * @param defaultOrder
+ * @param defaultOrderBy
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export const ListView = ({items, fetchItems, DisplayRecord, defaultOrder, defaultOrderBy}) => {
 
     const [data, setData] = useState(() => [])
