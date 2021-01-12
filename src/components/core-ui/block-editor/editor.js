@@ -202,6 +202,11 @@ export default ({ settings, email, history }) => {
       ondrop: (event) => {
         console.log('dropped')
         var dropzoneElement = event.target.classList.remove("active");
+
+        document.querySelectorAll('.wp-block').forEach((block)=>{
+          // Find the index here and drop in the block accordingly
+          console.log(event.relatedTarget.getBoundingClientRect().top - event.target.getBoundingClientRect().top, block.getBoundingClientRect().top)
+        })
         handleContentChangeDraggedBlock();
       },
       ondropdeactivate: (event) => {},
