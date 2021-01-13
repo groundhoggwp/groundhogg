@@ -88,6 +88,7 @@ class Activity extends DB {
 			'activity_type' => '%s',
 			'referer'       => '%s',
 			'referer_hash'  => '%s',
+			'description' =>  '%s'
 		];
 	}
 
@@ -109,6 +110,7 @@ class Activity extends DB {
 			'activity_type' => '',
 			'referer'       => '',
 			'referer_hash'  => '',
+			'description' =>  ''
 		);
 	}
 
@@ -218,6 +220,7 @@ class Activity extends DB {
         activity_type VARCHAR({$this->get_max_index_length()}) NOT NULL,
         referer text NOT NULL,
         referer_hash varchar(20) NOT NULL,
+        description VARCHAR({$this->get_max_index_length()}) NOT NULL,
         PRIMARY KEY (ID),
         KEY timestamp (timestamp),
         KEY funnel_id (funnel_id),

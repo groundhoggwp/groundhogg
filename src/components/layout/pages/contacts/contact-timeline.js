@@ -14,9 +14,14 @@ import DraftsIcon from '@material-ui/icons/Drafts';
 import {useParams} from "react-router-dom";
 import {useDispatch, useSelect} from "@wordpress/data";
 import {ACTIVITY_STORE_NAME} from "../../../../data";
+// import {ACTIVITY_STORE_NAME} from "data/activity";
 import {useCallback, useEffect, useState} from "@wordpress/element";
 import Button from "@material-ui/core/Button";
 import {__} from "@wordpress/i18n";
+import {phpKeyTOWords} from "../../../../data/utils"
+import {DateTime} from 'luxon'
+import TouchAppIcon from '@material-ui/icons/TouchApp';
+
 
 const useStyles = makeStyles((theme) => ({
 
@@ -73,7 +78,7 @@ export const ContactTimeline = () => {
         let perPage = 10 // todo change as per requirement
         setLoading(true)
 
-        let {items ,totalItems} = await fetchItems({
+        let {items, totalItems} = await fetchItems({
             limit: perPage,
             offset: perPage * page,
             orderBy: 'ID',
@@ -96,8 +101,8 @@ export const ContactTimeline = () => {
         fetchActivity()
     }, [])
 
-    const loadMore  =() =>{
-        setPage (page + 1 );
+    const loadMore = () => {
+        setPage(page + 1);
         fetchActivity()
     }
 
@@ -116,21 +121,22 @@ export const ContactTimeline = () => {
                             </TimelineSeparator>
                             <TimelineContent>
                                 <Typography variant="h6" component="h1">
-                                    {data.activity_type}
+                                    {phpKeyTOWords(data.activity_type)}
                                 </Typography>
                                 <Typography variant="caption" display="block" gutterBottom>
-                                    date
+                                    {DateTime.fromSeconds(parseInt(data.timestamp)).toISODate()}</Typography>
+                                <Typography variant={"body2"}>
+                                    {data.description}
                                 </Typography>
-                                <Typography variant={"body2"}>Because you need strength</Typography>
-
                             </TimelineContent>
                         </TimelineItem>
 
                     )
                 })}
             </Timeline>
-            <Button variant="contained" color="primary" onClick={loadMore} disabled={loading || (activity.length >= total)} >
-                {loading ? __('Loading..' , 'groundhogg' ) :(activity.length >= total) ? __('End of Activity' , 'groundhogg'): __('Load More', 'groundhogg')}
+            <Button variant="contained" color="primary" onClick={loadMore}
+                    disabled={loading || (activity.length >= total)}>
+                {loading ? __('Loading..', 'groundhogg') : (activity.length >= total) ? __('End of Activity', 'groundhogg') : __('Load More', 'groundhogg')}
             </Button>
 
         </div>
@@ -141,6 +147,8 @@ export const TimelineIcon = ({type}) => {
 
     const mapping = applyFilters('groundhogg.contacts.timeline.icons', {
         'email_opened': {component: DraftsIcon},
+        'email_link_click' : {component :TouchAppIcon},
+
 
     })
     if (mapping.hasOwnProperty(type)) {
