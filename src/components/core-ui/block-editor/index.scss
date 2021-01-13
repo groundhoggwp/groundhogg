@@ -83,29 +83,22 @@
   }
 }
 
-.groundhogg-email-editor__email-content.active .wp-block {
-  border: dashed 4px #aaa;
-}
-
-.groundhogg-email-editor__email-content.active {
-  background-color: #bfe4ff;
-  border-radius: 4px;
+.groundhogg-email-editor__email-content {
   margin: 10px auto 30px;
   padding: 10px;
   width: 80%;
-  transition: background-color 0.3s;
+
+  .dragged-over-top.wp-block{
+    border-top: 4px solid #007cba;
+  }
+  .dragged-over-bottom.wp-block{
+    border-bottom: 4px solid #007cba;
+  }
 }
 
 .side-bar-blocks-container {
   margin-left: 5px;
   margin-right: 5px;
-}
-
-.groundhogg-email-editor__email-content {
-}
-
-.groundhogg-email-editor__email-content.drop-active {
-  background-color: #bfe4ff;
 }
 
 .drop-active {
