@@ -47,6 +47,7 @@ import { getLuxonDate, matchEmailRegex } from "utils/index";
 
 import { CORE_STORE_NAME, EMAILS_STORE_NAME } from "data";
 
+let draggedBlockIndex = {};
 let draggedBlock = {};
 let startInteractJS = false;
 export default ({ settings, email, history }) => {
@@ -95,7 +96,7 @@ export default ({ settings, email, history }) => {
   const handleContentChangeDraggedBlock = () => {
     // if(!startInteractJS){return;}
     let newBlocks = blocks;
-    newBlocks.push(createBlock(draggedBlock.name));
+    newBlocks.splice(draggedBlockIndex, 0, createBlock(draggedBlock.name));
     handleUpdateBlocks(newBlocks);
     startInteractJS = false;
   };
@@ -151,8 +152,6 @@ export default ({ settings, email, history }) => {
     const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
     const y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
 
-    // console.log(x, y);
-
     // translate the element
     target.style.webkitTransform = target.style.transform =
       "translate(" + x + "px, " + y + "px)";
@@ -160,10 +159,38 @@ export default ({ settings, email, history }) => {
     // update the posiion attributes
     target.setAttribute("data-x", x);
     target.setAttribute("data-y", y);
+
+
+    if(!y){return;}
+    draggedBlockIndex = 0;
+    let adjustedY = y + 433+55; //Offset by header and block size
+    let classToApply = '';
+    let saveBlock = false
+
+    document.querySelectorAll('.wp-block').forEach((block, i)=>{
+      block.classList.remove('dragged-over-top')
+
+      if(adjustedY >= block.getBoundingClientRect().top && adjustedY <= block.getBoundingClientRect().bottom ){
+        draggedBlockIndex = i
+        saveBlock = block
+        // if(block.getBoundingClientRect().bottom - block.getBoundingClientRect().top &&)
+      }
+
+      // if(draggedBlock === 0){
+      //   console.log(block, y, block.getBoundingClientRect().bottom)
+      // }
+    })
+
+
+    if(draggedBlockIndex === 0){
+      console.log(event.target)
+      return;
+    }
+    document.querySelectorAll('.wp-block')[draggedBlockIndex].classList.add('dragged-over-top');
   };
 
   const dragStartListener = (event) => {
-    console.log('drag start')
+    console.log('drag start', event)
     document.querySelector('.interface-interface-skeleton__sidebar').scrollTop = 0;
     document.querySelector('.interface-interface-skeleton__sidebar').classList.add("show-overflow");
   };
@@ -203,10 +230,6 @@ export default ({ settings, email, history }) => {
         console.log('dropped')
         var dropzoneElement = event.target.classList.remove("active");
 
-        document.querySelectorAll('.wp-block').forEach((block)=>{
-          // Find the index here and drop in the block accordingly
-          console.log(event.relatedTarget.getBoundingClientRect().top - event.target.getBoundingClientRect().top, block.getBoundingClientRect().top)
-        })
         handleContentChangeDraggedBlock();
       },
       ondropdeactivate: (event) => {},
