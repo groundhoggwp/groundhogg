@@ -242,7 +242,7 @@ export default ({ settings, email, history }) => {
     console.log("valid let send", testEmail);
     sendEmailRaw({
       to: testEmail,
-      from_email: "dhrumit.groundhogg@gmail.com",
+      from_email: "nathan.groundhogg@gmail.com",
       from_name: "TEST D",
       content: content,
       subject: subject,

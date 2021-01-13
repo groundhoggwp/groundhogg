@@ -25,18 +25,22 @@ import { NAMESPACE } from '../constants';
 export default (endpoint) => ( {
     endpoint,
     * sendEmailRaw (data) {
+      console.log('raw eamils?')
         // yield setIsScheduling(true);
         try {
+          console.log('try and fetch')
             const result = yield apiFetch({
                 method: 'POST',
                 path: `${NAMESPACE}/${ endpoint }/send`,
                 data,
             })
+            console.log('send raw email result', result)
             // yield setIsScheduling(false);
             return {success: true, ...result};
         }
         catch (e) {
             // yield setSchedulingError(e);
+            console.log('raw email error', e)
             return {success: false, e };
         }
     },
@@ -60,5 +64,3 @@ export default (endpoint) => ( {
     },
 
 } )
-
-
