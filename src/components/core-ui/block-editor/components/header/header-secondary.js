@@ -94,7 +94,7 @@ export default ({
         variant="contained"
         color="primary"
         size="small"
-        onClick={() => switchEditorMode("broadcast")}
+        onClick={() => {}}
         onMouseDown={(event) => {
           event.preventDefault();
         }}

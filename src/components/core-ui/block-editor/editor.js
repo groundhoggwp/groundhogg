@@ -14,7 +14,7 @@ import {
   ComplementaryArea,
 } from "@wordpress/interface";
 
-import { PostTextEditor } from "@wordpress/editor";
+
 import { useEffect, useState } from "@wordpress/element";
 import { useSelect, useDispatch } from "@wordpress/data";
 import {
@@ -43,6 +43,7 @@ import Notices from "./components/notices";
 import Header from "./components/header";
 import Sidebar from "./components/sidebar";
 import BlockEditor from "./components/block-editor";
+import TextEditor from "./components/text-editor";
 import { getLuxonDate, matchEmailRegex } from "utils/index";
 
 import { CORE_STORE_NAME, EMAILS_STORE_NAME } from "data";
@@ -297,7 +298,19 @@ export default ({ settings, email, history }) => {
   let editorPanel;
   switch (editorMode) {
     case "text":
-      editorPanel = <PostTextEditor />;
+    editorPanel = (
+      <TextEditor
+        settings={settings}
+        subject={subject}
+        handleSubjectChange={handleSubjectChange}
+        preHeader={preHeader}
+        handlePreHeaderChange={handlePreHeaderChange}
+        viewType={viewType}
+        handleUpdateBlocks={handleUpdateBlocks}
+        blocks={blocks}
+      />
+    );
+
       break;
     default:
       editorPanel = (
