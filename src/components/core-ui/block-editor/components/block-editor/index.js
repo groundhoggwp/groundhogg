@@ -51,7 +51,6 @@ function BlockEditor({
   handleUpdateBlocks,
   blocks,
 }) {
-
   const useStyles = makeStyles((theme) => ({
     subjectHeader: {
       padding: "20px",
@@ -63,7 +62,7 @@ function BlockEditor({
       marginBottom: "10px",
     },
     emailContent: {
-      position: 'relative',
+      position: "relative",
       display: "block",
       width: viewType === "desktop" ? "600px" : "320px",
       marginLeft: "auto",
@@ -101,9 +100,8 @@ function BlockEditor({
   const blockEditorEl = useRef(null);
 
   useEffect(() => {
-    blockEditorEl.current.removeEventListener('scroll', () => {})
-    blockEditorEl.current.addEventListener('scroll', (event) => {
-
+    blockEditorEl.current.removeEventListener("scroll", () => {});
+    blockEditorEl.current.addEventListener("scroll", (event) => {
       // const popOverEl = document.querySelector('.components-popover.block-editor-block-list__block-popover');
       // // const popOverEl = document.querySelector('.components-popover.block-editor-block-list__block-popover');
       // if(popOverEl){
@@ -111,13 +109,11 @@ function BlockEditor({
       //   // document.querySelector('.components-popover.block-editor-block-list__block-popover').style.top = `${blockEditorEl.current.scrollTop}px`;
       //   // document.querySelector('.components-popover.block-editor-block-list__block-popover').style.transform = `translateY(${blockEditorEl.current.scrollTop}px)`;
       // }
-
     });
   });
 
-
   return (
-    <div className="groundhogg-block-editor" ref={blockEditorEl} >
+    <div className="groundhogg-block-editor" ref={blockEditorEl}>
       <BlockEditorProvider
         value={blocks}
         settings={settings}
@@ -156,8 +152,8 @@ function BlockEditor({
                 {/* Add Block Button */}
                 <BlockEditorKeyboardShortcuts.Register />
                 <Popover.Slot left={300} top={500} />
-                <Popover.Slot name="block-toolbar" left={300} top={500}/> {/*refresh={(e)=>{console.log('refresh', e)}}/>*/}
-
+                <Popover.Slot name="block-toolbar" left={300} top={500} />{" "}
+                {/*refresh={(e)=>{console.log('refresh', e)}}/>*/}
                 <Typewriter>
                   <CopyHandler>
                     <WritingFlow>

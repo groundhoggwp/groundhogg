@@ -55,7 +55,7 @@ export default function Header({
   altBodyContent,
   handleAltBodyContent,
   altBodyEnable,
-  handleAltBodyEnable
+  handleAltBodyEnable,
 }) {
   const classes = useStyles();
   return (

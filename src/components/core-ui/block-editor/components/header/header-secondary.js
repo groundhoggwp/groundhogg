@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import Checkbox from '@material-ui/core/Checkbox'
+import Checkbox from "@material-ui/core/Checkbox";
 import Button from "@material-ui/core/Button";
 import CodeIcon from "@material-ui/icons/Code";
 import LineStyleIcon from "@material-ui/icons/LineStyle";
@@ -13,7 +13,7 @@ import SmartphoneIcon from "@material-ui/icons/Smartphone";
 import UpdateIcon from "@material-ui/icons/Update";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
-import Typography from '@material-ui/core/Typography'
+import Typography from "@material-ui/core/Typography";
 
 /**
  * WordPress dependencies
@@ -49,7 +49,7 @@ export default ({
   altBodyContent,
   handleAltBodyContent,
   altBodyEnable,
-  handleAltBodyEnable
+  handleAltBodyEnable,
 }) => {
   const classes = useStyles();
 
@@ -141,24 +141,31 @@ export default ({
         title={__("Email Alt-Body")}
         content={__(
           <Fragment>
-            <Typography variant="p" component="p">Use this custom Alt Body text</Typography>
-            <Typography variant="span" component="span">Enable</Typography>
+            <Typography variant="p" component="p">
+              Use this custom Alt Body text
+            </Typography>
+            <Typography variant="span" component="span">
+              Enable
+            </Typography>
             <Checkbox
               checked={altBodyEnable}
               onChange={handleAltBodyEnable}
               name=""
               color="primary"
-
             />
-            <Typography variant="p" component="p">If left un-enabled an alt-body will be auot-generated.</Typography>
-            <br/>
+            <Typography variant="p" component="p">
+              If left un-enabled an alt-body will be auot-generated.
+            </Typography>
+            <br />
             <TextField
               onChange={handleAltBodyContent}
               label={__("Alt Body Content")}
               value={altBodyContent}
               multiline
               fullWidth={true}
-              placeholder={__("Alt Body Content. Will need to build out custom component here.")}
+              placeholder={__(
+                "Alt Body Content. Will need to build out custom component here."
+              )}
             />
           </Fragment>
         )}
