@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import Checkbox from '@material-ui/core/Checkbox'
 import Button from "@material-ui/core/Button";
 import CodeIcon from "@material-ui/icons/Code";
 import LineStyleIcon from "@material-ui/icons/LineStyle";
@@ -12,15 +13,15 @@ import SmartphoneIcon from "@material-ui/icons/Smartphone";
 import UpdateIcon from "@material-ui/icons/Update";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
+import Typography from '@material-ui/core/Typography'
 
 /**
  * WordPress dependencies
  */
 import { __, _x } from "@wordpress/i18n";
 import { useSelect, useDispatch } from "@wordpress/data";
-import { Fragment } from "@wordpress/element";
 import { Card } from "@material-ui/core";
-import { useEffect, useState, useMemo } from "@wordpress/element";
+import { Fragment, useEffect, useState, useMemo } from "@wordpress/element";
 
 /**
  * Internal dependencies
@@ -45,6 +46,10 @@ export default ({
   sendTestEmail,
   testEmail,
   handleTestEmailChange,
+  altBodyContent,
+  handleAltBodyContent,
+  altBodyEnable,
+  handleAltBodyEnable
 }) => {
   const classes = useStyles();
 
@@ -107,7 +112,7 @@ export default ({
         }
         variant="contained"
         color="primary"
-        size="small"
+        size="md"
         buttonIcon={<FindReplaceIcon />}
         buttonTitle={__("Replacements")}
         title={__("Replacements")}
@@ -135,7 +140,27 @@ export default ({
         buttonTitle={__("Email Alt-Body")}
         title={__("Email Alt-Body")}
         content={__(
-          "Alt Body Content. Will need to build out custom component here."
+          <Fragment>
+            <Typography variant="p" component="p">Use this custom Alt Body text</Typography>
+            <Typography variant="span" component="span">Enable</Typography>
+            <Checkbox
+              checked={altBodyEnable}
+              onChange={handleAltBodyEnable}
+              name=""
+              color="primary"
+
+            />
+            <Typography variant="p" component="p">If left un-enabled an alt-body will be auot-generated.</Typography>
+            <br/>
+            <TextField
+              onChange={handleAltBodyContent}
+              label={__("Alt Body Content")}
+              value={altBodyContent}
+              multiline
+              fullWidth={true}
+              placeholder={__("Alt Body Content. Will need to build out custom component here.")}
+            />
+          </Fragment>
         )}
         dialogButtons={[{ color: "primary", label: __("Done") }]}
         label={_x(

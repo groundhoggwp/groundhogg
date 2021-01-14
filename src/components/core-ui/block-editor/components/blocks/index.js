@@ -9,6 +9,8 @@
  * Webpack is compiling as the input file.
  */
 
+import "./column";
+import "./columns";
 import "./spacer";
 import "./divider";
 import "./html";

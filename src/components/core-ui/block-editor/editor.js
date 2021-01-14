@@ -61,6 +61,8 @@ export default ({ settings, email, history }) => {
   } = email.data;
 
   const [testEmail, setTestEmail] = useState([]);
+  const [altBodyContent, setAltBodyContent] = useState('');
+  const [altBodyEnable, setAltBodyEnable] = useState('');
   const [title, setTitle] = useState(defaultTitleValue);
   // const [draggedBlock, setDraggedBlock] = useState(null);
   const [subject, setSubject] = useState(defaultSubjectValue);
@@ -274,6 +276,14 @@ export default ({ settings, email, history }) => {
   const handleTestEmailChange = (e) => {
     setTestEmail(e.target.value);
   };
+  const handleAltBodyContent = (e) => {
+    console.log('alt body content', altBodyContent)
+    setAltBodyContent(e.target.value);
+  };
+  const handleAltBodyEnable = (e) => {
+    console.log('alt body enable',   altBodyEnable)
+    setAltBodyContent(e.target.value);
+  };
 
   useEffect(() => {
     if (content) {
@@ -321,11 +331,15 @@ export default ({ settings, email, history }) => {
                   publishEmail={publishEmail}
                   closeEditor={closeEditor}
                   isSaving={isSaving}
+                  title={title}
                   handleTitleChange={handleTitleChange}
                   handleViewTypeChange={handleViewTypeChange}
                   sendTestEmail={sendTestEmail}
                   handleTestEmailChange={handleTestEmailChange}
-                  title={title}
+                  altBodyContent={altBodyContent}
+                  handleAltBodyContent={handleAltBodyContent}
+                  altBodyEnable={altBodyEnable}
+                  handleAltBodyEnable={handleAltBodyEnable}
                 />
               }
               sidebar={

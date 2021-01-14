@@ -52,6 +52,10 @@ export default function Header({
   sendTestEmail,
   handleTestEmailChange,
   testEmail,
+  altBodyContent,
+  handleAltBodyContent,
+  altBodyEnable,
+  handleAltBodyEnable
 }) {
   const classes = useStyles();
   return (
@@ -105,6 +109,10 @@ export default function Header({
             sendTestEmail={sendTestEmail}
             handleTestEmailChange={handleTestEmailChange}
             testEmail={testEmail}
+            altBodyContent={altBodyContent}
+            handleAltBodyContent={handleAltBodyContent}
+            altBodyEnable={altBodyEnable}
+            handleAltBodyEnable={handleAltBodyEnable}
           />
         </HeaderToolbar>
       </div>
