@@ -44,20 +44,12 @@ class Email_Log_Item extends Base_Object {
 			$headers[] = sprintf( "%s: %s\n", $header[0], $header[1] );
 		}
 
-		Hawk_Mailer::set_log_item_id( $this->get_id() );
+		$message_type = $this->message_type;
+		$service      = \Groundhogg_Email_Services::get_saved_service( $message_type );
 
-		add_action( 'wp_mail_failed', [ $this, 'catch_mail_error' ] );
+		Email_Logger::
 
-		// Mail this thing!
-		$result = mailhawk_mail( $this->recipients, $this->subject, $this->content, $headers );
-
-		if ( ! $result ){
-			// update retries
-
-			$this->update( [
-				'retries' => $this->retries + 1,
-			] );
-		}
+		$result = \Groundhogg_Email_Services::send( $service, $this->recipients, $this->subject, $this->content, $headers );
 
 		return $result;
 	}

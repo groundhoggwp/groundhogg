@@ -351,6 +351,11 @@ abstract class Admin_Page extends Supports_Errors {
 	 * @param string $name
 	 */
 	protected function search_form( $title, $name = 's' ) {
+
+		if ( method_exists( $this, 'get_current_tab' ) ){
+			?><div style="margin-top: 10px"></div><?php
+		}
+
 		?>
         <form method="get" class="search-form">
 			<?php html()->hidden_GET_inputs( true ); ?>

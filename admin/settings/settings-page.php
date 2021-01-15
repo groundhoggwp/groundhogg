@@ -384,6 +384,11 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Tracking', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'email',
 			),
+			'email_logging'         => array(
+				'id'    => 'email_logging',
+				'title' => _x( 'Logging', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'email',
+			),
 			'bounces'               => array(
 				'id'       => 'bounces',
 				'title'    => _x( 'Email Bounces', 'settings_sections', 'groundhogg' ),
@@ -1072,7 +1077,7 @@ class Settings_Page extends Admin_Page {
 					'id'   => 'gh_url_tracking_exclusions',
 				),
 			],
-			'gh_wordpress_email_service'         => [
+			'gh_wordpress_email_service'             => [
 				'id'      => 'gh_wordpress_email_service',
 				'section' => 'outgoing_email_config',
 				'label'   => _x( 'WordPress Default Email Service', 'settings', 'groundhogg' ),
@@ -1110,7 +1115,36 @@ class Settings_Page extends Admin_Page {
 					'option_none' => false,
 					'options'     => Groundhogg_Email_Services::dropdown()
 				),
-			]
+			],
+			'gh_log_emails'                          => array(
+				'id'      => 'gh_log_emails',
+				'section' => 'email_logging',
+				'label'   => _x( 'Enable Email Logging', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'This will have Groundhogg save all emails sent to the database for a period of time. Useful for debugging or verifying someone received an email.', 'settings', 'groundhogg' ),
+				'type'    => 'checkbox',
+				'atts'    => array(
+					'label' => __( 'Enable' ),
+					//keep brackets for backwards compat
+					'name'  => 'gh_log_emails',
+					'id'    => 'gh_log_emails',
+					'value' => 'on',
+				),
+			),
+			'gh_email_log_retention'                 => [
+				'id'      => 'gh_email_log_retention',
+				'section' => 'email_logging',
+				'label'   => _x( 'Email Log Retention', 'settings', 'groundhogg' ),
+				'desc'    => sprintf( _x( 'The number of days to retain logged emails. Logs older then <code>%d</code> days will be deleted.', 'settings', 'groundhogg' ), get_option( 'gh_email_log_retention' ) ?: 14 ),
+				'type'    => 'input',
+				'atts'    => array(
+					'type'        => 'number',
+					'min'         => 0,
+					'class'       => 'input',
+					'name'        => 'gh_email_log_retention',
+					'id'          => 'gh_email_log_retention',
+					'placeholder' => 14,
+				),
+			],
 		);
 
 		if ( ! defined( 'DISABLE_WP_CRON' ) || defined( 'GH_SHOW_DISABLE_WP_CRON_OPTION' ) ) {
@@ -1159,7 +1193,7 @@ class Settings_Page extends Admin_Page {
 	/**
 	 * Add a tab to the settings page
 	 *
-	 * @param string $id    if of the tab
+	 * @param string $id if of the tab
 	 * @param string $title title of the tab
 	 *
 	 * @return bool
@@ -1181,9 +1215,9 @@ class Settings_Page extends Admin_Page {
 	/**
 	 * Add a section to a tab
 	 *
-	 * @param string $id    id of the section
+	 * @param string $id id of the section
 	 * @param string $title title of the section
-	 * @param string $tab   the tab
+	 * @param string $tab the tab
 	 *
 	 * @return bool
 	 */

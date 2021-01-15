@@ -363,6 +363,7 @@ class Main_Updater extends Updater {
 	 */
 	public function version_2_2_24() {
 		Plugin::$instance->dbs->install_dbs();
+		get_db( 'email_log' )->create_table();
 	}
 
 	/**
