@@ -209,6 +209,13 @@ export default (endpoint) => ({
         body: data
       })
       yield  setIsAddingFiles(false)
+
+      yield {
+        type: TYPES.RECEIVE_CONTACT_FILES,
+        files: result.items,
+        totalFiles: result.total_items
+      }
+
       return { success: true, ...result }
     } catch (e) {
       // yield setSchedulingError(e);
@@ -216,13 +223,13 @@ export default (endpoint) => ({
     }
   },
   * fetchFiles (contactId, query) {
-    yield setIsRequestingFiles(true)
+    // yield setIsRequestingFiles(true)
     try {
       const result = yield apiFetch({
         path: addQueryArgs(`${NAMESPACE}/${endpoint}/${contactId}/files`, query),
       })
 
-      yield setIsRequestingFiles(false)
+      // yield setIsRequestingFiles(false)
       yield {
         type: TYPES.RECEIVE_CONTACT_FILES,
         files: result.items,
@@ -235,13 +242,18 @@ export default (endpoint) => ({
   * deleteFiles (contactId, itemIds) {
     yield setIsDeletingFiles(true)
     try {
-      yield apiFetch({
+      const result = yield apiFetch({
         method: 'DELETE',
         path: `${NAMESPACE}/${endpoint}/${contactId}/files`,
         data: itemIds,
       })
       yield setIsDeletingFiles(false)
-      yield this.fetchFiles(contactId)
+
+      yield {
+        type: TYPES.RECEIVE_CONTACT_FILES,
+        files: result.items,
+        totalFiles: result.total_items
+      }
     } catch (e) {
       yield setDeletingError(e)
     }

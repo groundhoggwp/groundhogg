@@ -41,28 +41,35 @@ import Sidebar from "../sidebar";
 //TODO Implement block persistence with email data store.
 //TODO Potentially use our own alerts data store (core).
 
-const useStyles = makeStyles((theme) => ({
-  subjectHeader: {
-    padding: "20px",
-    marginBottom: "10px",
-  },
-  subjectInputs: {
-    width: "100%",
-    padding: "",
-    marginBottom: "10px",
-  },
-}));
-
 function BlockEditor({
   settings: _settings,
   subject,
   handleSubjectChange,
   preHeader,
   handlePreHeaderChange,
-  content,
-  handleContentChange,
+  viewType,
+  handleUpdateBlocks,
+  blocks,
 }) {
-  const [blocks, updateBlocks] = useState([]);
+
+  const useStyles = makeStyles((theme) => ({
+    subjectHeader: {
+      padding: "20px",
+      marginBottom: "10px",
+    },
+    subjectInputs: {
+      width: "100%",
+      padding: "",
+      marginBottom: "10px",
+    },
+    emailContent: {
+      display: "block",
+      width: viewType === "desktop" ? "600px" : "320px",
+      marginLeft: "auto",
+      marginRight: "auto",
+    },
+  }));
+
   const { createInfoNotice } = useDispatch("core/notices");
   const classes = useStyles();
   const canUserCreateMedia = useSelect((select) => {
@@ -86,65 +93,53 @@ function BlockEditor({
     };
   }, [canUserCreateMedia, _settings]);
 
-  useEffect(() => {
-    // const storedBlocks = window.localStorage.getItem( 'groundhoggBlocks' );
-
-    if (content?.length) {
-      handleUpdateBlocks(() => parse(content));
-    }
-  }, []);
-
-  const handleUpdateBlocks = (blocks) => {
-    updateBlocks(blocks);
-  };
-
-  const handlePersistBlocks = (newBlocks) => {
-    // updateBlocks( newBlocks );
-    // console.log('handlePersistBlocks' , newBlocks)
-    // window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) )
-    handleContentChange(blocks);
-  };
-
   if (!settings.hasOwnProperty("__experimentalBlockPatterns")) {
     settings.__experimentalBlockPatterns = [];
   }
 
+  console.log('edoitor update', blocks)
   return (
     <div className="groundhogg-block-editor">
       <BlockEditorProvider
         value={blocks}
         settings={settings}
         onInput={handleUpdateBlocks}
-        onChange={handlePersistBlocks}
+        onChange={handleUpdateBlocks}
       >
-        <Grid container spacing={3}>
-          <Grid item xs={9}>
-            <Card className={classes.subjectHeader}>
-              <form noValidate autoComplete="off">
-                <TextField
-                  className={classes.subjectInputs}
-                  onChange={handleSubjectChange}
-                  label={"Subject"}
-                  value={subject}
-                />
-                <TextField
-                  className={classes.subjectInputs}
-                  onChange={handlePreHeaderChange}
-                  label={"Pre Header"}
-                  value={preHeader}
-                  placeholder={__(
-                    "Pre Header Text: Used to summarize the content of the email."
-                  )}
-                />
-              </form>
-            </Card>
-            <Paper>
-              <BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper">
+        <div className="groundhogg-block-editor__email-container">
+          <Card className={classes.subjectHeader}>
+            <form noValidate autoComplete="off">
+              <TextField
+                className={classes.subjectInputs}
+                onChange={handleSubjectChange}
+                label={"Subject"}
+                value={subject}
+              />
+              <TextField
+                className={classes.subjectInputs}
+                onChange={handlePreHeaderChange}
+                label={"Pre Header"}
+                value={preHeader}
+                placeholder={__(
+                  "Pre Header Text: Used to summarize the content of the email."
+                )}
+              />
+            </form>
+          </Card>
+          <Paper>
+            <div
+              className={
+                classes.emailContent + " groundhogg-email-editor__email-content"
+              }
+            >
+              <BlockSelectionClearer className={classes}>
                 <VisualEditorGlobalKeyboardShortcuts />
                 <MultiSelectScrollIntoView />
                 {/* Add Block Button */}
                 <BlockEditorKeyboardShortcuts.Register />
-                <Popover.Slot name="block-toolbar" />
+                <Popover.Slot left={300} top={500} />
+                <Popover.Slot name="block-toolbar" left={300} top={500}/> {/*refresh={(e)=>{console.log('refresh', e)}}/>*/}
+
                 <Typewriter>
                   <CopyHandler>
                     <WritingFlow>
@@ -156,13 +151,13 @@ function BlockEditor({
                   </CopyHandler>
                 </Typewriter>
               </BlockSelectionClearer>
-            </Paper>
-          </Grid>
-          <Sidebar.InspectorFill>
-            <Popover name="block-toolbar" />
-            <BlockInspector />
-          </Sidebar.InspectorFill>
-        </Grid>
+            </div>
+          </Paper>
+        </div>
+        <Sidebar.InspectorFill>
+          <Popover name="block-toolbar" />
+          <BlockInspector />
+        </Sidebar.InspectorFill>
       </BlockEditorProvider>
     </div>
   );

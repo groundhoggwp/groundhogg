@@ -7,46 +7,10 @@ export const Segmentation = (props) => {
 
   let segments = [
     {
-      id: 'segmentation',
-      tab: 'segmentation',
-      title: __('Segmentation', 'groundhogg'),
+      id: 'tags',
+      tab: 'tags',
+      title: __('Tags', 'groundhogg'),
       fields: [
-        {
-          defaultValue: '',
-          desc: '',
-          id: 'owner_id',
-          label: __('Owner', 'groundhogg'),
-          section: 'segmentation',
-          type: 'dropdown_owners',
-          dataType: 'data',
-          sm: '12',
-          md: '12',
-          lg: '12'
-        },
-        {
-          defaultValue: '',
-          desc: '',
-          id: 'source_page',
-          label: __('Source Page', 'groundhogg'),
-          section: 'segmentation',
-          type: 'input',
-          dataType: 'meta',
-          sm: '12',
-          md: '12',
-          lg: '12'
-        },
-        {
-          defaultValue: '',
-          desc: '',
-          id: 'lead_source',
-          label: __('Lead Source', 'groundhogg'),
-          section: 'segmentation',
-          type: 'input',
-          dataType: 'meta',
-          sm: '12',
-          md: '12',
-          lg: '12'
-        },
         {
           defaultValue: '',
           desc: '',
@@ -59,9 +23,6 @@ export const Segmentation = (props) => {
           md: '12',
           lg: '12'
         },
-
-
-
       ],
     }
   ]

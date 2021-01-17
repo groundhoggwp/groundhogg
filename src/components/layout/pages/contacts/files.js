@@ -79,6 +79,9 @@ const filesBulkActions = [
 
 export const Files = (props) => {
 
+
+  let { id } = useParams()
+
   const { files, totalFiles, isRequesting } = useSelect((select) => {
     const store = select(CONTACTS_STORE_NAME)
     return {
@@ -100,9 +103,10 @@ export const Files = (props) => {
    * @param fetchItems
    */
   const handleBulkAction = ({ action, selected, setSelected, fetchItems }) => {
+
     switch (action) {
       case 'delete':
-        deleteFiles(selected.map(item => item.file_name))
+        deleteFiles( id, selected.map(item => item.file_name))
         setSelected([])
         break
     }

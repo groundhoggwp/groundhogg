@@ -27,7 +27,7 @@ class Tag_Mapping extends Bulk_Job {
 
 		// Contact's marketability can expire with time, but it's too costly to setup a cronjob
 		// So instead we'll listen for an event failed. #goodenough
-		add_action( 'groundhogg/event/failed', [ $this, 'listen_for_non_marketable' ] );
+//		add_action( 'groundhogg/event/failed', [ $this, 'listen_for_non_marketable' ] );  // todo uncomment
 
 		if ( get_option( 'gh_optin_status_job', false ) ) {
 			add_action( 'admin_init', [ $this, 'add_upgrade_notice' ] );

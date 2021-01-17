@@ -17,9 +17,20 @@ import {
 import { PostTextEditor } from "@wordpress/editor";
 import { useEffect, useState } from "@wordpress/element";
 import { useSelect, useDispatch } from "@wordpress/data";
-import { serialize, parse, pasteHandler, rawHandler } from "@wordpress/blocks";
+import {
+  serialize,
+  parse,
+  pasteHandler,
+  rawHandler,
+  createBlock,
+  insertBlock,
+  insertBlocks,
+  insertDefaultBlock,
+  getBlockTypes,
+  getBlockInsertionPoint,
+} from "@wordpress/blocks";
 
-/**
+/*
  * External dependencies
  */
 import interact from "interactjs";
@@ -32,12 +43,15 @@ import Notices from "./components/notices";
 import Header from "./components/header";
 import Sidebar from "./components/sidebar";
 import BlockEditor from "./components/block-editor";
-import { getLuxonDate } from "utils/index";
+import { getLuxonDate, matchEmailRegex } from "utils/index";
+
 import { CORE_STORE_NAME, EMAILS_STORE_NAME } from "data";
 
+let draggedBlock = {};
+let startInteractJS = false;
 export default ({ settings, email, history }) => {
   const dispatch = useDispatch(EMAILS_STORE_NAME);
-
+  const { sendEmailById, sendEmailRaw } = useDispatch(EMAILS_STORE_NAME);
   const {
     title: defaultTitleValue,
     subject: defaultSubjectValue,
@@ -45,10 +59,14 @@ export default ({ settings, email, history }) => {
     content: defaultContentValue,
   } = email.data;
 
+  const [testEmail, setTestEmail] = useState([]);
   const [title, setTitle] = useState(defaultTitleValue);
+  // const [draggedBlock, setDraggedBlock] = useState(null);
   const [subject, setSubject] = useState(defaultSubjectValue);
   const [preHeader, setPreHeader] = useState(defaultPreHeaderValue);
   const [content, setContent] = useState(defaultContentValue);
+  const [viewType, setViewType] = useState("desktop");
+  const [blocks, updateBlocks] = useState(parse(defaultContentValue));
 
   const { editorMode, isSaving, item } = useSelect(
     (select) => ({
@@ -59,12 +77,13 @@ export default ({ settings, email, history }) => {
     []
   );
 
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value);
-  };
   if (!item.hasOwnProperty("ID")) {
     return null;
   }
+
+  const handleTitleChange = (e) => {
+    setTitle(e.target.value);
+  };
 
   const handleSubjectChange = (e) => {
     setSubject(e.target.value);
@@ -72,16 +91,23 @@ export default ({ settings, email, history }) => {
   const handlePreHeaderChange = (e) => {
     setPreHeader(e.target.value);
   };
-  const handleContentChange = (blocks) => {
-    setContent(serialize(blocks));
+
+  const handleContentChangeDraggedBlock = () => {
+    // if(!startInteractJS){return;}
+    let newBlocks = blocks;
+    newBlocks.push(createBlock(draggedBlock.name));
+    handleUpdateBlocks(newBlocks);
+    startInteractJS = false;
   };
-  const handleBlockResize = (width, height) => {
-    let modifiedBlocks = parse(content);
-    console.log(modifiedBlocks[2]);
-    modifiedBlocks[2].attributes.width = width;
-    modifiedBlocks[2].attributes.height = height;
-    console.log(modifiedBlocks[2]);
-    setContent(serialize(modifiedBlocks));
+
+  const handleUpdateBlocks = (blocks) => {
+    console.log("update", blocks);
+    // console.log("update", serialize(blocks));
+    updateBlocks(blocks);
+
+    if (Array.isArray(blocks)) {
+    setContent(serialize(blocks));
+    }
   };
 
   const saveDraft = (e) => {
@@ -114,163 +140,126 @@ export default ({ settings, email, history }) => {
     history.goBack();
   };
 
-  useEffect(() => {
-    const dragMoveListener = (event) => {
-      let target = event.target;
+  const dragMoveListener = (event) => {
+    const target = event.target;
+    event.target.classList.add("drop-active");
 
-      // keep the dragged position in the data-x/data-y attributes
-      let x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
-      let y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
+    draggedBlock = JSON.parse(target.getAttribute("data-block"));
+    // setDraggedBlock(JSON.parse(target.getAttribute("data-block"));
 
-      // translate the element
-      target.style.webkitTransform = target.style.transform =
-        "translate(" + x + "px, " + y + "px)";
+    // keep the dragged position in the data-x/data-y attributes
+    const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
+    const y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
 
-      // update the posiion attributes
-      target.setAttribute("data-x", x);
-      target.setAttribute("data-y", y);
-    };
+    // console.log(x, y);
 
-    interact(".dropzone").dropzone({
-      // only accept elements matching this CSS selector
-      accept: "#block-editor-droppable-area",
-      // Require a 75% element overlap for a drop to be possible
+    // translate the element
+    target.style.webkitTransform = target.style.transform =
+      "translate(" + x + "px, " + y + "px)";
+
+    // update the posiion attributes
+    target.setAttribute("data-x", x);
+    target.setAttribute("data-y", y);
+  };
+
+  const dragStartListener = (event) => {
+    console.log('drag start')
+    document.querySelector('.interface-interface-skeleton__sidebar').scrollTop = 0;
+    document.querySelector('.interface-interface-skeleton__sidebar').classList.add("show-overflow");
+  };
+  const dragEndListener = (event) => {
+    document.querySelector('.interface-interface-skeleton__sidebar').classList.remove("show-overflow");
+    const target = event.target;
+
+    // keep the dragged position in the data-x/data-y attributes
+    const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
+    const y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
+
+    // translate the element
+    target.style.webkitTransform = target.style.transform =
+      "translate(" + 0 + "px, " + 0 + "px)";
+
+    // update the posiion attributes
+    target.setAttribute("data-x", 0);
+    target.setAttribute("data-y", 0);
+  };
+
+  const setupInteractJS = async () => {
+    interact(".groundhogg-email-editor__email-content").dropzone({
       overlap: 0.75,
+      ondropactivate: (event) => {},
 
-      // listen for drop related events:
+      ondragenter: (event) => {
+        // var draggableElement = event.relatedTarget;
+        console.log('drag enter')
+        startInteractJS = true
+        var dropzoneElement = event.target.classList.add("active");
 
-      ondropactivate: (event) => {
-        // add active dropzone feedback
-        event.target.classList.add("drop-active");
-      },
-      ondragenter: function (event) {
-        var draggableElement = event.relatedTarget;
-        var dropzoneElement = event.target;
-
-        // feedback the possibility of a drop
-        dropzoneElement.classList.add("drop-target");
-        draggableElement.classList.add("can-drop");
-        draggableElement.textContent = "Dragged in";
       },
       ondragleave: (event) => {
-        // remove the drop feedback style
-        event.target.classList.remove("drop-target");
-        event.relatedTarget.classList.remove("can-drop");
-        event.relatedTarget.textContent = "Dragged out";
+        var dropzoneElement = event.target.classList.remove("active");
       },
-      ondrop: function (event) {
-        event.relatedTarget.textContent = "Dropped";
+      ondrop: (event) => {
+        console.log('dropped')
+        var dropzoneElement = event.target.classList.remove("active");
+        handleContentChangeDraggedBlock();
       },
-      ondropdeactivate: function (event) {
-        // remove active dropzone feedback
-        event.target.classList.remove("drop-active");
-        event.target.classList.remove("drop-target");
-      },
+      ondropdeactivate: (event) => {},
     });
 
-    var x = 0;
-    var y = 0;
+    interact(".side-bar-drag-drop-block").draggable({
+    // interact(".side-bar-drag-drop-block, .wp-block").draggable({
+      cursorChecker(action, interactable, element, interacting) {
+        return "grab";
+      },
+      onstart: dragStartListener,
+      onend: dragEndListener,
+      listeners: { move: dragMoveListener },
+      modifiers: [
+        interact.modifiers.restrict({
+          restriction: interact(".groundhogg-email-editor__email-content"),
+          elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
+          endOnly: true,
+        }),
+      ],
+    });
+  };
 
-    // interact(".wp-block, .drag-drop")
-    interact(".drag-drop")
-      // .resizable({
-      //   // resize from all edges and corners
-      //   edges: { left: true, right: true, bottom: true, top: true },
-      //
-      //   listeners: {
-      //     move(event) {
-      //       var target = event.target;
-      //       var x = parseFloat(target.getAttribute("data-x")) || 0;
-      //       var y = parseFloat(target.getAttribute("data-y")) || 0;
-      //
-      //
-      //       // update the element's style
-      //       target.style.width = event.rect.width + "px";
-      //       target.style.height = event.rect.height + "px";
-      //
-      //       // translate when resizing from top or left edges
-      //       x += event.deltaRect.left;
-      //       y += event.deltaRect.top;
-      //
-      //       target.style.webkitTransform = target.style.transform =
-      //         "translate(" + x + "px," + y + "px)";
-      //
-      //       target.setAttribute("data-x", x);
-      //       target.setAttribute("data-y", y);
-      //       // target.textContent =
-      //       //   Math.round(event.rect.width) +
-      //       //   "\u00D7" +
-      //       //   Math.round(event.rect.height);
-      //       console.log(target)
-      //       console.log(target.children[0])
-      //       handleBlockResize(target.style.width , target.style.height)
-      //
-      //     },
-      //   },
-      //   modifiers: [
-      //     // keep the edges inside the parent
-      //     interact.modifiers.restrictEdges({
-      //       outer: "parent",
-      //     }),
-      //
-      //     // minimum size
-      //     interact.modifiers.restrictSize({
-      //       min: { width: 100, height: 50 },
-      //     }),
-      //   ],
-      //
-      //   inertia: true,
-      // })
-      .draggable({
-        inertia: true,
-        modifiers: [
-          // interact.modifiers.snap({
-          //   targets: [interact.createSnapGrid({ x: 30, y: 30 })],
-          //   range: Infinity,
-          //   relativePoints: [{ x: 0, y: 0 }],
-          // }),
-          interact.modifiers.restrictRect({
-            // restriction: ".dropzone",
-            restriction: "parent",
-            endOnly: true,
-          }),
-        ],
-        autoScroll: true,
-        // dragMoveListener from the dragging demo above
-        listeners: { move: dragMoveListener },
-      });
-  });
+  const handleViewTypeChange = (type) => {
+    setViewType(type);
+  };
+
+
+  const sendTestEmail = (e) => {
+    if (!matchEmailRegex(testEmail)) {
+      return;
+    }
+    console.log("valid let send", testEmail);
+    sendEmailRaw({
+      to: testEmail,
+      from_email: "dhrumit.groundhogg@gmail.com",
+      from_name: "TEST D",
+      content: content,
+      subject: subject,
+    });
+  };
+  const handleTestEmailChange = (e) => {
+    setTestEmail(e.target.value);
+  };
+
+  useEffect(() => {
+    if (content) {
+      handleUpdateBlocks(() => parse(content));
+    }
+
+    console.log('use effect')
+    setupInteractJS();
+  }, []);
 
   let editorPanel;
   switch (editorMode) {
-    case "visual":
-      editorPanel = (
-        <BlockEditor
-          settings={settings}
-          subject={subject}
-          handleSubjectChange={handleSubjectChange}
-          preHeader={preHeader}
-          handlePreHeaderChange={handlePreHeaderChange}
-          content={content}
-          handleContentChange={handleContentChange}
-        />
-      );
-      break;
     case "text":
       editorPanel = <PostTextEditor />;
-      break;
-    case "drag-and-drop-test":
-      editorPanel = (
-        <Fragment>
-          <div id="block-editor-droppable-area" className="drag-drop">
-            {" "}
-            #yes-drop{" "}
-          </div>
-          <div id="inner-dropzone" className="dropzone">
-            #inner-dropzone
-          </div>
-        </Fragment>
-      );
       break;
     default:
       editorPanel = (
@@ -280,11 +269,14 @@ export default ({ settings, email, history }) => {
           handleSubjectChange={handleSubjectChange}
           preHeader={preHeader}
           handlePreHeaderChange={handlePreHeaderChange}
-          content={content}
-          handleContentChange={handleContentChange}
+          viewType={viewType}
+          handleUpdateBlocks={handleUpdateBlocks}
+          blocks={blocks}
         />
       );
   }
+
+  console.log('rebuild', blocks)
 
   return (
     <div className="Groundhogg-BlockEditor">
@@ -302,6 +294,9 @@ export default ({ settings, email, history }) => {
                   closeEditor={closeEditor}
                   isSaving={isSaving}
                   handleTitleChange={handleTitleChange}
+                  handleViewTypeChange={handleViewTypeChange}
+                  sendTestEmail={sendTestEmail}
+                  handleTestEmailChange={handleTestEmailChange}
                   title={title}
                 />
               }
@@ -314,12 +309,10 @@ export default ({ settings, email, history }) => {
               content={
                 <>
                   <Notices />
-                  <br />
                   {editorPanel}
                 </>
               }
             />
-            <Popover.Slot />
           </FocusReturnProvider>
         </DropZoneProvider>
       </SlotFillProvider>

@@ -3511,7 +3511,7 @@ function generate_permissions_key( $contact = false, $usage = 'preferences', $ex
 		'usage_type'       => sanitize_key( $usage ),
 		'permissions_key'  => wp_hash_password( $key ),
 		'delete_after_use' => $delete_after_use,
-		'expiration_date'  => Ymd_His( time() + $expiration )
+		'expiration_date'  => ymd_his( time() + $expiration )
 	] );
 
 	// set the key for the given contact in the cache
@@ -3857,16 +3857,6 @@ function handle_ajax_meta_picker() {
 
 add_action( 'wp_ajax_gh_meta_picker', __NAMESPACE__ . '\handle_ajax_meta_picker' );
 
-/**
- * Quick formatting function for Y-m-d H:i:s date time.
- *
- * @param false $time
- *
- * @return false|string
- */
-function Ymd_His( $time = false ) {
-	return date( 'Y-m-d H:i:s', $time ?: time() );
-}
 
 /**
  * Find which plugin has wp_mail defined.
@@ -4173,7 +4163,7 @@ function id_list_to_class( $list, $class ){
 }
 
 /**
- *
+ * NEW most used
  *
  * @param $time
  *
@@ -4182,3 +4172,15 @@ function id_list_to_class( $list, $class ){
 function ymd_his( $time=false ){
     return date( 'Y-m-d H:i:s', $time || time() );
 }
+
+//
+///**
+// * Quick formatting function for Y-m-d H:i:s date time. - OLD
+// *
+// * @param false $time
+// *
+// * @return false|string
+// */
+//function Ymd_His( $time = false ) {
+//	return date( 'Y-m-d H:i:s', $time ?: time() );
+//}

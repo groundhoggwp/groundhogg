@@ -1,47 +1,32 @@
 .interface-interface-skeleton .interface-interface-skeleton__sidebar {
-  overflow: visible;
+  height: calc(100% - 350px);
   outline: none;
+  top: 10px;
 }
 
-.interface-interface-skeleton__sidebar > div {
+.interface-interface-skeleton__sidebar.show-overflow {
   overflow: visible;
 }
 
 .groundhogg-email-sidebar {
-  overflow: visible;
   outline: none;
   background: $white;
   border-left: $border-width solid $gray-200;
   bottom: 0;
   color: $gray-900;
-  height: 100vh;
   right: 0;
-  top: 0;
-  width: $sidebar-width;
-
-  @include break-small() {
-    -webkit-overflow-scrolling: touch;
-    height: auto;
-    overflow: auto;
-    top: $admin-bar-height-big + $header-height;
-  }
-
-  @include break-medium() {
-    top: $admin-bar-height + $header-height;
-  }
-
-  @include break-small() {
-    display: block;
-  }
+  // margin-top: 10px;
+  width: 388px;
+  margin-right: 20px;
 
   > .components-panel {
     border-left: 0;
     border-right: 0;
-    margin-bottom: -1px;
-    margin-top: -1px;
+    height: 475px;
 
     > .components-panel__header {
       background: $gray-200;
+      border-radius: 4px 4px 0 0;
     }
   }
 
@@ -62,4 +47,13 @@
       margin-bottom: 15px;
     }
   }
+}
+
+.block-editor-block-inspector{
+  padding-bottom: 100px;
+}
+
+.components-popover.components-animate__appear.is-from-bottom.is-from-right.is-without-arrow {
+  display: none;
+  visibility: none;
 }

@@ -11,6 +11,8 @@ import DesktopMacIcon from "@material-ui/icons/DesktopMac";
 import SmartphoneIcon from "@material-ui/icons/Smartphone";
 import UpdateIcon from "@material-ui/icons/Update";
 import { makeStyles } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+
 /**
  * WordPress dependencies
  */
@@ -18,12 +20,13 @@ import { __, _x } from "@wordpress/i18n";
 import { useSelect, useDispatch } from "@wordpress/data";
 import { Fragment } from "@wordpress/element";
 import { Card } from "@material-ui/core";
+import { useEffect, useState, useMemo } from "@wordpress/element";
 
 /**
  * Internal dependencies
  */
 import ToolbarItem from "./toolbar-item"; // Stop-gap while WP catches up.
-import Dialog from "../dialog";
+import Dialog from "../dialog/";
 import { CORE_STORE_NAME } from "data/core";
 
 const useStyles = makeStyles({
@@ -37,7 +40,12 @@ const useStyles = makeStyles({
     marginRight: "8px",
   },
 });
-function HeaderSecondary() {
+export default ({
+  handleViewTypeChange,
+  sendTestEmail,
+  testEmail,
+  handleTestEmailChange,
+}) => {
   const classes = useStyles();
 
   const { editorMode, isInserterEnabled } = useSelect(
@@ -97,6 +105,9 @@ function HeaderSecondary() {
         className={
           classes.button + " groundhogg-header-toolbar__replacements-modal"
         }
+        variant="contained"
+        color="primary"
+        size="small"
         buttonIcon={<FindReplaceIcon />}
         buttonTitle={__("Replacements")}
         title={__("Replacements")}
@@ -110,6 +121,7 @@ function HeaderSecondary() {
           "Open replacements list",
           "Generic label for replacements button"
         )}
+        dialogAction={() => {}}
       />
       <ToolbarItem
         as={Dialog}
@@ -117,8 +129,9 @@ function HeaderSecondary() {
         className={
           classes.button + " groundhogg-header-toolbar__alt-body-modal"
         }
-        /* translators: button label text should, if possible, be under 16
-		characters. */
+        variant="contained"
+        color="primary"
+        size="small"
         buttonTitle={__("Email Alt-Body")}
         title={__("Email Alt-Body")}
         content={__(
@@ -129,39 +142,49 @@ function HeaderSecondary() {
           "Open replacements list",
           "Generic label for replacements button"
         )}
+        dialogAction={() => {}}
       />
+
       <ToolbarItem
-        as={Button}
+        as={Dialog}
+        buttonIcon={<UpdateIcon />}
         className={
           classes.button + " groundhogg-header-toolbar__update-and-test"
         }
         variant="contained"
         color="primary"
         size="small"
-        onClick={() => switchEditorMode("update-and-test")}
-        onMouseDown={(event) => {
-          event.preventDefault();
-        }}
-        startIcon={<UpdateIcon />}
-        /* translators: button label text should, if possible, be under 16
-		characters. */
-        label={_x(
-          "Update and Test Link",
-          "Generic label for replacements button"
+        buttonTitle={__("Test")}
+        title={__("Test")}
+        content={__(
+          <TextField
+            onChange={handleTestEmailChange}
+            label={__("Send Test Email to ...")}
+            value={testEmail}
+            placeholder={__(
+              "Pre Header Text: Used to summarize the content of the email."
+            )}
+          />
         )}
-      >
-        {__("Update and Test")}
-      </ToolbarItem>
+        dialogButtons={[
+          { color: "secondary", label: __("Cancel") },
+          { color: "primary", label: __("Done") },
+        ]}
+        label={_x("Test Link", "Generic label for replacements button")}
+        dialogAction={sendTestEmail}
+      />
+
       <ToolbarItem
         as={Button}
-        size="small"
         className={
           classes.button + " groundhogg-header-toolbar__mobile-device-toggle"
         }
         variant="contained"
         color="secondary"
+        size="small"
         onMouseDown={(event) => {
           event.preventDefault();
+          handleViewTypeChange("mobile");
         }}
         startIcon={<SmartphoneIcon />}
         /* translators: button label text should, if possible, be under 16
@@ -178,8 +201,10 @@ function HeaderSecondary() {
         }
         variant="contained"
         color="secondary"
+        size="small"
         onMouseDown={(event) => {
           event.preventDefault();
+          handleViewTypeChange("desktop");
         }}
         startIcon={<DesktopMacIcon />}
         size="small"
@@ -190,29 +215,6 @@ function HeaderSecondary() {
           "Generic label for desktop preview button"
         )}
       ></ToolbarItem>
-      <ToolbarItem
-        as={Button}
-        className={
-          classes.button + " groundhogg-header-toolbar__large-device-toggle"
-        }
-        variant="contained"
-        color="secondary"
-        onMouseDown={(event) => {
-          event.preventDefault();
-        }}
-        size="small"
-        onClick={() => switchEditorMode("drag-and-drop-test")}
-        /* translators: button label text should, if possible, be under 16
-		characters. */
-        label={_x(
-          "Desktop Preview Toggle",
-          "Generic label for desktop preview button"
-        )}
-      >
-        drag-and-drop-test
-      </ToolbarItem>
     </div>
   );
-}
-
-export default HeaderSecondary;
+};

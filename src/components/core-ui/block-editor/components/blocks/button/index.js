@@ -156,7 +156,6 @@ registerBlockType("groundhogg/button", {
     );
   },
   save: (props) => {
-    console.log("saved ");
     const {
       attributes: { text, link, color, fontColor, fontSize, font, alignment },
     } = props;
