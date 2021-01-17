@@ -338,6 +338,23 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Re-install the gh-cron.php file with the new constant
+	 */
+	public function version_2_2_23_3() {
+		if ( gh_cron_installed() ) {
+			install_gh_cron_file();
+		}
+	}
+
+	/**
+	 * Install new DBs
+	 */
+	public function version_2_2_24() {
+		Plugin::$instance->dbs->install_dbs();
+		get_db( 'email_log' )->create_table();
+	}
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -383,7 +400,9 @@ class Main_Updater extends Updater {
 			'3.0.a.4',
 			'3.0.a.7',
 			'2.2.22',
-			'2.2.23'
+			'2.2.23',
+			'2.2.23.3',
+			'2.2.24'
 		];
 	}
 
@@ -410,6 +429,8 @@ class Main_Updater extends Updater {
 			'3.0.a.3',
 			'3.0.a.4',
 			'2.2.22',
+			'2.2.22.3',
+			'2.2.24',
 		];
 	}
 
@@ -443,6 +464,7 @@ class Main_Updater extends Updater {
 			'2.2.19.3'      => __( 'Increased tag name size. Tag name can be 191 to 255 characters based on your hosted server.', 'groundhogg' ),
 			'2.2.19.4'      => __( 'Update the permission keys table to support new usage.', 'groundhogg' ),
 			'2.2.22'        => __( 'Show preferences page if url is just /gh/.', 'groundhogg' ),
+			'2.2.22.3'      => __( 'Re-install the gh-cron.php file to include a constant <code>DOING_GH_CRON</code>.', 'groundhogg' ),
 		];
 	}
 }

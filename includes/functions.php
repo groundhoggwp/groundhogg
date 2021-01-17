@@ -33,6 +33,7 @@ function get_current_contact() {
  * @return false|Contact
  */
 function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
+	if ( ! $contact_id_or_email ) {
 
 	if ( is_a_contact( $contact_id_or_email ) ) {
 		return $contact_id_or_email;
@@ -100,8 +101,8 @@ function admin_page_url( $page, $args = [] ) {
 /**
  * Similar to wp_list_pluck in that we take the ID and the title and match them up.
  *
- * @param array $data array[]
- * @param string $id_col string
+ * @param array  $data      array[]
+ * @param string $id_col    string
  * @param string $title_col string
  *
  * @return array
@@ -403,7 +404,6 @@ function decrypt( $data ) {
  * @return mixed
  */
 function get_array_var( $array, $key = '', $default = false ) {
-
 	if ( isset_not_empty( $array, $key ) ) {
 		if ( is_object( $array ) ) {
 			return $array->$key;
@@ -587,9 +587,9 @@ function dequeue_wc_css_compat() {
 /**
  * Enqueues the modal scripts
  *
+ * @since 1.0.5
  * @return Modal
  *
- * @since 1.0.5
  */
 function enqueue_groundhogg_modal() {
 	return Modal::instance();
@@ -691,8 +691,8 @@ function get_cookie( $cookie = '', $default = false ) {
  * Set a cookie the WP way
  *
  * @param string $cookie
- * @param mixed $value
- * @param int $expiration
+ * @param mixed  $value
+ * @param int    $expiration
  *
  * @return bool
  */
@@ -760,19 +760,22 @@ function get_return_path_email() {
  * Overwrite the regular WP_Mail with an identical function but use our modified PHPMailer class instead
  * which sends the email to the Groundhogg Sending Service.
  *
- * @param string|array $attachments Optional. Files to attach.
- *
- * @param string|array $to Array or comma-separated list of email addresses to send message.
- * @param string $subject Email subject
- * @param string $message Message contents
- * @param string|array $headers Optional. Additional headers.
- *
- * @return bool Whether the email contents were sent successfully.
  * @throws \Exception
  *
  * @since      1.2.10
  * @deprecated 2.1.11
  *
+ * @param string       $message     Message contents
+ *
+ * @param string|array $headers     Optional. Additional headers.
+ *
+ * @param string|array $attachments Optional. Files to attach.
+ *
+ * @param string|array $to          Array or comma-separated list of email addresses to send message.
+ *
+ * @param string       $subject     Email subject
+ *
+ * @return bool Whether the email contents were sent successfully.
  */
 function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = array() ) {
 	// Compact the input, apply the filters, and extract them back out
@@ -780,10 +783,10 @@ function gh_ss_mail( $to, $subject, $message, $headers = '', $attachments = arra
 	/**
 	 * Filters the wp_mail() arguments.
 	 *
+	 * @since 2.2.0
+	 *
 	 * @param array $args A compacted array of wp_mail() arguments, including the "to" email,
 	 *                    subject, message, headers, and attachments values.
-	 *
-	 * @since 2.2.0
 	 *
 	 */
 	$atts = apply_filters( 'wp_mail', compact( 'to', 'subject', 'message', 'headers', 'attachments' ) );
@@ -1704,7 +1707,7 @@ function get_mappable_fields( $extra = [] ) {
 		'notes'                     => __( 'Add To Notes' ),
 		'tags'                      => __( 'Apply Value as Tag' ),
 		'meta'                      => __( 'Add as Custom Meta' ),
-		'file'                      => __( 'Upload File' ),
+		'copy_file'                 => __( 'Add as File' ),
 		'utm_campaign'              => __( 'UTM Campaign' ),
 		'utm_content'               => __( 'UTM Content' ),
 		'utm_medium'                => __( 'UTM Medium' ),
@@ -1723,9 +1726,9 @@ function get_mappable_fields( $extra = [] ) {
  *
  * @throws \Exception
  *
- * @param $map    array map of field_ids to contact keys
- *
  * @param $fields array the raw data from the source
+ *
+ * @param $map    array map of field_ids to contact keys
  *
  * @return Contact|false
  */
@@ -1741,6 +1744,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 	$notes = [];
 	$args  = [];
 	$files = [];
+	$copy  = [];
 
 	foreach ( $fields as $column => $value ) {
 
@@ -1797,7 +1801,11 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			case 'optin_status':
 
 				// Will default to unconfirmed
-				$args[ $field ] = Preferences::string_to_preference( $value );
+				if ( ! is_numeric( $value ) ) {
+					$value = Preferences::string_to_preference( $value );
+				}
+
+				$args[ $field ] = absint( $value );
 				break;
 			case 'user_id':
 			case 'owner_id':
@@ -2405,17 +2413,15 @@ function install_custom_rewrites() {
 /**
  * Retrieve URL with nonce added to URL query.
  *
- * @param string $actionurl URL to add nonce action.
+ * @since 2.0.4
  *
- * @param int|string $action Optional. Nonce action name. Default -1.
+ * @param int|string $action    Optional. Nonce action name. Default -1.
  *
- * @param string $name Optional. Nonce name. Default '_wpnonce'.
+ * @param string     $name      Optional. Nonce name. Default '_wpnonce'.
  *
  * @param string     $actionurl URL to add nonce action.
  *
  * @return string
- * @since 2.0.4
- *
  */
 function nonce_url_no_amp( $actionurl, $action = - 1, $name = '_wpnonce' ) {
 	return add_query_arg( $name, wp_create_nonce( $action ), $actionurl );
@@ -3576,7 +3582,7 @@ function check_permissions_key( $key, $contact = false, $usage = 'preferences' )
  */
 function permissions_key_url( $url, $contact, $usage = 'preferences', $expiration = WEEK_IN_SECONDS, $delete_after_use = false ) {
 	return add_query_arg( [
-		'pk' => generate_permissions_key( $contact, $usage, $delete_after ),
+		'pk' => generate_permissions_key( $contact, $usage, $expiration, $delete_after_use ),
 	], $url );
 }
 
@@ -3766,9 +3772,9 @@ function track_live_activity( $type, $details = [] ) {
  * Log an activity conducted by the contact while they are performing actions on the site.
  * Uses the cookie details for reporting.
  *
- * @param string $type string, an activity identifier
- * @param array $args the details for the activity
- * @param array $details details about that activity
+ * @param string  $type    string, an activity identifier
+ * @param array   $args    the details for the activity
+ * @param array   $details details about that activity
  * @param Contact $contact the contact to track
  */
 function track_activity( $contact, $type, $args, $details = [] ) {
@@ -3861,6 +3867,60 @@ add_action( 'wp_ajax_gh_meta_picker', __NAMESPACE__ . '\handle_ajax_meta_picker'
 function Ymd_His( $time = false ) {
 	return date( 'Y-m-d H:i:s', $time ?: time() );
 }
+
+/**
+ * Find which plugin has wp_mail defined.
+ *
+ * @return string|false
+ */
+function extrapolate_wp_mail_plugin() {
+
+    try{
+	    $reflFunc = new \ReflectionFunction( 'wp_mail' );
+	    $defined  = wp_normalize_path( $reflFunc->getFileName() );
+    } catch ( \ReflectionException $e ){
+        return false;
+    }
+
+	$active_plugins = get_option( 'active_plugins', [] );
+
+	foreach ( $active_plugins as $active_plugin ) {
+
+		$plugin_dir = 'wp-content/plugins/' . dirname( $active_plugin ) . '/';
+
+		if ( strpos( $defined, $plugin_dir ) !== false ) {
+			return $active_plugin;
+		}
+	}
+
+	// No active plugins are the cause, that means a plugin is probably including pluggable.php explicitly somewhere...
+	// BAD JuJu guys...
+
+	// todo, find out which plugin includes pluggable before it's supposed to.
+
+	return $defined;
+}
+
+/**
+ * Tracks pings to the wp-cron.php file
+ */
+function track_wp_cron_ping() {
+	if ( defined( 'DOING_CRON' ) && DOING_CRON && ( ! defined( 'DOING_GH_CRON' ) || ! DOING_GH_CRON ) ) {
+		update_option( 'wp_cron_last_ping', time() );
+	}
+}
+
+add_action( 'wp_loaded', __NAMESPACE__ . '\track_wp_cron_ping' );
+
+/**
+ * Tracks the pings of the gh-cron.php.
+ */
+function track_gh_cron_ping() {
+	update_option( 'gh_cron_last_ping', time() );
+}
+
+add_action( 'groundhogg_process_queue', __NAMESPACE__ . '\track_gh_cron_ping', 9 );
+
 
 /**
  * Parse shortcodes and return an array

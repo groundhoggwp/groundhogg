@@ -384,7 +384,7 @@ class Admin_Notification extends Action {
 				$headers[] = sprintf( 'Reply-To: %s', $reply_to );
 			}
 
-			$sent = wp_mail( $send_to, wp_specialchars_decode($subject ), $finished_note, $headers );
+			$sent = \Groundhogg_Email_Services::send_transactional( $send_to, wp_specialchars_decode($subject ), $finished_note, $headers );
 
 			remove_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
 		} else {

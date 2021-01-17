@@ -4,10 +4,10 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['jquery', 'assets/lib/calendar/js/moment'], factory);
+    define(['jquery', 'moment'], factory);
   } else if (typeof exports === 'object') {
     // Node/CommonJS
-    module.exports = factory(require('jquery'), require('assets/lib/calendar/js/moment'));
+    module.exports = factory(require('jquery'), require('moment'));
   } else {
     // Browser globals
     root.Calendar = factory(jQuery, moment);
