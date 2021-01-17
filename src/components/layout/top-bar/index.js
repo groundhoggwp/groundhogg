@@ -1,162 +1,92 @@
-
+import React from 'react';
+import { Link as RouterLink } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import clsx from 'clsx';
-import { makeStyles } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Drawer from '@material-ui/core/Drawer';
-import Box from '@material-ui/core/Box';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
-import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
-import Link from '@material-ui/core/Link';
-import MenuIcon from '@material-ui/icons/Menu';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import NavListItems from '../../core-ui/nav-list-items/';
-import BeaverIcon from '../../core-ui/beaver-icon/';
-import { useState } from '@wordpress/element';
-// import { NotificationMenu } from './notification-menu';
-
-const drawerWidth = 240;
+import {
+  AppBar,
+  Box,
+  Hidden,
+  IconButton,
+  Toolbar,
+  makeStyles,
+  SvgIcon
+} from '@material-ui/core';
+import { Menu as MenuIcon } from 'react-feather';
+import Logo from '../../Logo';
+import { THEMES } from '../../../constants';
+import Account from './Account';
+import Contacts from './Contacts';
+import Notifications from './Notifications';
+import Search from './Search';
+import Settings from './Settings';
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    display: 'flex',
+    zIndex: theme.zIndex.drawer + 100,
+    ...theme.name === THEMES.LIGHT ? {
+      boxShadow: 'none',
+      backgroundColor: theme.palette.primary.main
+    } : {},
+    ...theme.name === THEMES.ONE_DARK ? {
+      backgroundColor: theme.palette.background.default
+    } : {}
   },
   toolbar: {
-    paddingRight: 24, // keep right padding when drawer closed
-  },
-  toolbarIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: '0 8px',
-    ...theme.mixins.toolbar,
-  },
-  appBar: {
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  appBarShift: {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  menuButton: {
-    marginRight: 36,
-  },
-  menuButtonHidden: {
-    display: 'none',
-  },
-  title: {
-    flexGrow: 1,
-    textTransform: 'capitalize'
-  },
-  drawerPaper: {
-    position: 'relative',
-    whiteSpace: 'nowrap',
-    width: drawerWidth,
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  drawerPaperClose: {
-    overflowX: 'hidden',
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    width: theme.spacing(7),
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(9),
-    },
-  },
-  appBarSpacer: theme.mixins.toolbar,
-  content: {
-    flexGrow: 1,
-    height: '100vh',
-    overflow: 'auto',
-  },
-  container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4),
-  },
-  paper: {
-    padding: theme.spacing(2),
-    display: 'flex',
-    overflow: 'auto',
-    flexDirection: 'column',
-  },
-  fixedHeight: {
-    height: 240,
-  },
+    minHeight: 64
+  }
 }));
 
-export default function Dashboard(props) {
+const TopBar = ({
+  className,
+  onMobileNavOpen,
+  ...rest
+}) => {
   const classes = useStyles();
 
-  const [open, setOpen] = useState(false);
-
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
-  const pageTitle = props.match.path.split('/')[1];
-
   return (
-    <div className={classes.root}>
-      <CssBaseline />
-      <AppBar position="fixed" className={clsx(classes.appBar, open && classes.appBarShift)}>
-        <Toolbar className={classes.toolbar}>
+    <AppBar
+      className={clsx(classes.root, className)}
+      {...rest}
+    >
+      <Toolbar className={classes.toolbar}>
+        <Hidden lgUp>
           <IconButton
-            edge="start"
             color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            className={clsx(classes.menuButton, open && classes.menuButtonHidden)}
+            onClick={onMobileNavOpen}
           >
-            <MenuIcon />
+            <SvgIcon fontSize="small">
+              <MenuIcon />
+            </SvgIcon>
           </IconButton>
-          <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-            {pageTitle}
-          </Typography>
-          {/*<NotificationMenu />*/}
-
-          <BeaverIcon/>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        variant="permanent"
-        classes={{
-          paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
-        }}
-        open={open}
-      >
-        <div className={classes.toolbarIcon}>
-          <IconButton onClick={handleDrawerClose}>
-            <ChevronLeftIcon />
-          </IconButton>
-        </div>
-        <Divider />
-        <NavListItems props={props} />
-      </Drawer>
-
-    </div>
+        </Hidden>
+        <Hidden mdDown>
+          <RouterLink to="/">
+            <Logo />
+          </RouterLink>
+        </Hidden>
+        <Box
+          ml={2}
+          flexGrow={1}
+        />
+        <Search />
+        <Contacts />
+        <Notifications />
+        <Settings />
+        <Box ml={2}>
+          <Account />
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
-}
+};
+
+TopBar.propTypes = {
+  className: PropTypes.string,
+  onMobileNavOpen: PropTypes.func
+};
+
+TopBar.defaultProps = {
+  onMobileNavOpen: () => {}
+};
+
+export default TopBar;
