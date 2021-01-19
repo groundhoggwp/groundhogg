@@ -24,7 +24,17 @@ import { Controller, getPages, PAGES_FILTER } from './controller'
 import TopBar from './top-bar'
 import { SnackbarArea } from './snackbar'
 import { withSettingsHydration } from '../../data'
-import theme from './theme.js'
+// import theme from './theme/'
+
+import { createTheme } from '../../theme';
+
+
+const theme = createTheme({
+  // direction: settings.direction,
+  // responsiveFontSizes: settings.responsiveFontSizes,
+  // theme: settings.theme
+});
+
 
 
 const useStyles = makeStyles((theme) => ({
