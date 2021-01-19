@@ -43,7 +43,7 @@ const useStyles = makeStyles(() => ({
   root: {}
 }));
 
-const PageHeader = ({ className, match, ...rest }) => {
+const PageHeader = ({ className, match, page, ...rest }) => {
   const classes = useStyles();
   const actionRef = useRef(null);
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -77,12 +77,12 @@ const PageHeader = ({ className, match, ...rest }) => {
 
         </Breadcrumbs>
 
-        {/*<Typography
+        <Typography
           variant="h3"
           color="textPrimary"
         >
-          Here&apos;s what&apos;s happening
-        </Typography>*/}
+          {page.title}
+        </Typography>
       </Grid>
       <Grid item>
         <Button

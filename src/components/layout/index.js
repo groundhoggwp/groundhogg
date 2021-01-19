@@ -15,12 +15,14 @@ import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
 import './index.scss'
-import { Controller, getPages, PAGES_FILTER } from './controller'
+import { Controller } from './controller'
+import navSections from './nav-sections'
 import NavBar from './nav-bar'
 import TopBar from './top-bar'
 import PageHeader from './page-header'
@@ -107,17 +109,26 @@ Layout.propTypes = {
     path: PropTypes.string,
   }).isRequired,
 }
+
+
+export const PAGES_FILTER = 'groundhogg.navigation';
+	const pages = applyFilters(
+		PAGES_FILTER,
+		navSections[0].items
+	);
+
 const _PageLayout = ( props ) => {
     return (
       <ThemeProvider theme={theme}>
         <BrowserRouter basename={ window.Groundhogg.preloadSettings.basename }>
           <Switch>
-            { getPages().map((page, index) => {
+            {
+             pages.map((page, index) => {
               return (
                   <Route
-                    path={ page.path }
+                    path={ page.href }
                     key={ index }
-                    exact={ '/' === page.path }
+                    exact={ '/' === page.href }
                     render={ (props) => (
                       <Layout page={ page } selectedIndex={index} { ...props } />
                     ) }
