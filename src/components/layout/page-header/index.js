@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React, {
   useRef,
   useState
@@ -42,13 +43,11 @@ const useStyles = makeStyles(() => ({
   root: {}
 }));
 
-const PageHeader = ({ className, page, ...rest }) => {
+const PageHeader = ({ className, match, ...rest }) => {
   const classes = useStyles();
   const actionRef = useRef(null);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [timeRange, setTimeRange] = useState(timeRanges[2].text);
-
-  console.log(rest, page.label)
 
   return (
     <Grid
@@ -63,20 +62,19 @@ const PageHeader = ({ className, page, ...rest }) => {
           separator={<NavigateNextIcon fontSize="small" />}
           aria-label="breadcrumb"
         >
-          <Link
-            variant="body1"
-            color="inherit"
-            to="/app"
-            component={RouterLink}
-          >
-            {page.label}
-          </Link>
-          {/*<Typography
-            variant="body1"
-            color="textPrimary"
-          >
-            Reports
-          </Typography>*/}
+          {match.url.split('/').slice(1).map((urlPart) => {
+              return (
+                <Link
+                  variant="body1"
+                  color="inherit"
+                  to="/app"
+                  component={RouterLink}
+                >
+                  {_.startCase(_.toLower(urlPart))}
+                </Link>
+              );
+          })}
+
         </Breadcrumbs>
 
         {/*<Typography
