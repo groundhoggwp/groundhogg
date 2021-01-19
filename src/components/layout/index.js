@@ -21,7 +21,9 @@ import { createMuiTheme } from '@material-ui/core/styles';
  */
 import './index.scss'
 import { Controller, getPages, PAGES_FILTER } from './controller'
+import NavBar from './nav-bar'
 import TopBar from './top-bar'
+import PageHeader from './page-header'
 import { SnackbarArea } from './snackbar'
 import { withSettingsHydration } from '../../data'
 // import theme from './theme/'
@@ -56,6 +58,7 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     height: '100vh',
     overflow: 'auto',
+    paddingLeft: '265px'
   },
   container: {
     paddingTop: theme.spacing(4),
@@ -83,9 +86,11 @@ const Layout = (props) => {
 
     return (
       <div className="groundhogg-layout" style={ { display: 'flex' } }>
+        <NavBar { ...restProps } />
         <TopBar { ...restProps } />
         <SnackbarArea />
         <PrimaryLayout>
+          <PageHeader { ...restProps }/>
           <Controller { ...restProps } />
         </PrimaryLayout>
       </div>
