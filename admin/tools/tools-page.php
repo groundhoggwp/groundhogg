@@ -151,6 +151,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 			];
 		}
 
+		$actions = apply_filters( 'groundhogg/admin/tools/title_action', $actions , $this );
 		return $actions;
 
 	}

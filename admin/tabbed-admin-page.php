@@ -38,7 +38,7 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 	 *
 	 * @return mixed
 	 */
-	protected function get_current_tab() {
+	public function get_current_tab() {
 		$tabs = $this->get_tabs();
 
 		return get_request_var( 'tab', $tabs[0]['slug'] );
