@@ -17,6 +17,8 @@ import {
   Typography,
   makeStyles
 } from '@material-ui/core';
+import 'react-perfect-scrollbar/dist/css/styles.css';
+
 
 import Logo from '../../Logo';
 // import useAuth from 'src/hooks/useAuth';
