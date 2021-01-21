@@ -92,6 +92,7 @@
     "react-archer": "^3.0.0",
     "react-click-outside": "3.0.1",
     "react-feather": "^2.0.9",
+    "react-helmet": "^6.1.0",
     "react-lineto": "^3.2.0",
     "react-papaparse": "^3.11.0",
     "react-perfect-scrollbar": "^1.5.8",
