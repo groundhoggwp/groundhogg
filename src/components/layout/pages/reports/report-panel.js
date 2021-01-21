@@ -5,8 +5,9 @@ import { Fragment, useState } from "@wordpress/element";
 import { useSelect, useDispatch } from "@wordpress/data";
 import { makeStyles } from "@material-ui/core/styles";
 import { __ } from "@wordpress/i18n";
-import Card from "@material-ui/core/Card";
+import {Card, Container, Grid} from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
+import AttachMoneyIcon from '@material-ui/icons/AttachMoney'
 
 /**
  * Internal dependencies
@@ -14,25 +15,17 @@ import Typography from "@material-ui/core/Typography";
 import Spinner from "../../../core-ui/spinner";
 import { REPORTS_STORE_NAME } from "../../../../data/reports";
 import Chart from "../../../core-ui/chart";
-import Stats from "../../../core-ui/stats";
+import StatsCard from "../../../core-ui/stats-card";
 import ReportTable from "../../../core-ui/report-table";
 import DatePicker from "../../../core-ui/date-picker";
+import Page from "../../../core-ui/page";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    position: 'relative',
-    marginBottom: theme.spacing(1),
-    textAlign: "center",
-  },
-  container: {
-    display: "grid",
-    width: '100%',
-    paddingTop: '10px',
-    gridGap: '10px',
-    // gridTemplateColumns: "repeat(5, 20%)",
-    gridTemplateColumns: "repeat(3, calc(33% - 80px)) 240px",
-    gridTemplateRows: "repeat(100, 160px)",
-    rowGap: '10px',
+    backgroundColor: theme.palette.background.dark,
+    minHeight: '100%',
+    paddingTop: theme.spacing(3),
+    paddingBottom: theme.spacing(3)
   },
   datePickers:{
     float: 'right',
@@ -43,6 +36,8 @@ const useStyles = makeStyles((theme) => ({
     zIndex: '5'
   }
 }));
+
+
 
 export default ({ key, reportList, dateChange, startDate, endDate }) => {
   const classes = useStyles();
@@ -91,13 +86,27 @@ export default ({ key, reportList, dateChange, startDate, endDate }) => {
   }
 
   return (
-    <div className={classes.root}>
+    <Page
+      className={classes.root}
+      title="Dashboard"
+    >
+      <Container maxWidth={false}>
+        {/*<Header />*/}
+        <div className={classes.datePickers}>
+          <DatePicker dateChange={dateChange} selectedDate={startDate} label={'start'} id={'start'}/>
+          <DatePicker dateChange={dateChange} selectedDate={endDate} label={'end'} id={'end'}/>
+        </div>
+        <Grid
+          container
+          spacing={3}
+        >
+          <Grid
+            item
+            lg={3}
+            sm={6}
+            xs={12}
+          >
 
-      <div className={classes.datePickers}>
-        <DatePicker dateChange={dateChange} selectedDate={startDate} label={'start'} id={'start'}/>
-        <DatePicker dateChange={dateChange} selectedDate={endDate} label={'end'} id={'end'}/>
-      </div>
-      <div className={classes.container}>
         {Object.keys(reports).map((reportKey, i) => {
           let title = reportKey.split("_");
           let type = reports[reportKey].chart.type;
@@ -108,11 +117,11 @@ export default ({ key, reportList, dateChange, startDate, endDate }) => {
             const { gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd, fullWidth } = reportList[i];
 
             if (type === "quick_stat") {
-              return <Stats title={title} id={reportKey} data={reports[reportKey]}  gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} />;
+              return <StatsCard title={title} id={reportKey} data={reports[reportKey]} icon={<AttachMoneyIcon />} />;
             } else if (type === "table") {
-              return <ReportTable title={title} id={reportKey} data={reports[reportKey]}  gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} fullWidth={fullWidth}/>;
+              return <ReportTable title={title} id={reportKey} data={reports[reportKey]} fullWidth={fullWidth}/>;
             } else if(type === "doughnut" || type === "line" || type === "bar" ) {
-              return <Chart title={title} id={reportKey} data={reports[reportKey]} gridColumnStart={gridColumnStart} gridColumnEnd={gridColumnEnd} gridRowStart={gridRowStart} gridRowEnd={gridRowEnd} />;
+              return <Chart title={title} id={reportKey} data={reports[reportKey]} />;
             } else {
 
             }
@@ -120,7 +129,11 @@ export default ({ key, reportList, dateChange, startDate, endDate }) => {
 
           return <Card>{title} No data?</Card>
         })}
-      </div>
-    </div>
+        </Grid>
+      </Grid>
+      </Container>
+    </Page>
+
+
   );
 };

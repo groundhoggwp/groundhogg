@@ -13,22 +13,18 @@ import lineChartConfig from './chart-config/line-chart-config.js'
 import doughnutChartConfig from './chart-config/doughnut-chart-config.js'
 
 
-const Chart = ({id, title, data, gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd}) => {
+const Chart = ({id, title, data}) => {
   const useStyles = makeStyles((theme) => ({
     root: {
       position: 'relative',
       overflow: 'visible',
-      gridColumnStart,
-      gridColumnEnd,
-      gridRowStart,
-      gridRowEnd,
     },
     title: {
-      fontSize: gridRowStart === 1 ? '28px' : '18px',
-      position: 'absolute',
+      // fontSize: gridRowStart === 1 ? '28px' : '18px',
+      // position: 'absolute',
       textTransform:'capitalize',
-      top: gridRowStart === 1 ? '-50px' : '10px',
-      left: gridRowStart === 1 ? '37px' : '25px',
+      // top: gridRowStart === 1 ? '-50px' : '10px',
+      // left: gridRowStart === 1 ? '37px' : '25px',
       fontWeight: '700'
     },
     canvas:{

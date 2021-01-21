@@ -16,7 +16,6 @@ import Spinner from "../../../core-ui/spinner";
 import TabPanel from "../../../core-ui/tab-panel";
 import { REPORTS_STORE_NAME } from "../../../../data/reports";
 import Chart from "../../../core-ui/chart";
-import Stats from "../../../core-ui/stats";
 import DatePicker from "../../../core-ui/date-picker";
 import ReportPanel from "./report-panel.js";
 import {getLuxonDate} from "utils/index";
@@ -55,13 +54,13 @@ export function Reports({history, match}) {
             endDate={endDate}
             dateChange={dateChange}
             reportList={[
-              {
-               name:"chart_new_contacts",
-               gridColumnStart: 1,
-               gridColumnEnd: 4,
-               gridRowStart: 1,
-               gridRowEnd: 4,
-              },
+              // {
+              //  name:"chart_new_contacts",
+              //  gridColumnStart: 1,
+              //  gridColumnEnd: 4,
+              //  gridRowStart: 1,
+              //  gridRowEnd: 4,
+              // },
               {
                name:"total_new_contacts",
                gridColumnStart: 4,
@@ -90,34 +89,34 @@ export function Reports({history, match}) {
                gridRowStart: 4,
                gridRowEnd: 4,
               },
-              {
-               name:"total_emails_sent",
-               gridColumnStart: 2,
-               gridColumnEnd: 2,
-               gridRowStart: 4,
-               gridRowEnd: 4,
-              },
-              {
-               name:"email_open_rate",
-               gridColumnStart: 3,
-               gridColumnEnd: 3,
-               gridRowStart: 4,
-               gridRowEnd: 4,
-              },
-              {
-               name:"email_click_rate",
-               gridColumnStart: 4,
-               gridColumnEnd: 4,
-               gridRowStart: 4,
-               gridRowEnd: 4,
-              },
-              {
-               name:"chart_contacts_by_optin_status",
-               gridColumnStart: 1,
-               gridColumnEnd: 3,
-               gridRowStart: 5,
-               gridRowEnd: 7,
-              },
+              // {
+              //  name:"total_emails_sent",
+              //  gridColumnStart: 2,
+              //  gridColumnEnd: 2,
+              //  gridRowStart: 4,
+              //  gridRowEnd: 4,
+              // },
+              // {
+              //  name:"email_open_rate",
+              //  gridColumnStart: 3,
+              //  gridColumnEnd: 3,
+              //  gridRowStart: 4,
+              //  gridRowEnd: 4,
+              // },
+              // {
+              //  name:"email_click_rate",
+              //  gridColumnStart: 4,
+              //  gridColumnEnd: 4,
+              //  gridRowStart: 4,
+              //  gridRowEnd: 4,
+              // },
+              // {
+              //  name:"chart_contacts_by_optin_status",
+              //  gridColumnStart: 1,
+              //  gridColumnEnd: 3,
+              //  gridRowStart: 5,
+              //  gridRowEnd: 7,
+              // },
               // Busted
               // {
               //  name:"table_top_converting_funnels",
