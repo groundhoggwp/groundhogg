@@ -27,8 +27,8 @@ import NavBar from './nav-bar'
 import TopBar from './top-bar'
 import PageHeader from './page-header'
 import { SnackbarArea } from './snackbar'
-import { withSettingsHydration } from '../../data'
-// import theme from './theme/'
+import { withSettingsHydration } from '../../data';
+import Page from "../core-ui/page";
 
 import { createTheme } from '../../theme';
 
@@ -42,6 +42,12 @@ const theme = createTheme({
 
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    backgroundColor: theme.palette.background.dark,
+    minHeight: '100%',
+    paddingTop: theme.spacing(3),
+    paddingBottom: theme.spacing(3)
+  },
   toolbar: {
     paddingRight: 24, // keep right padding when drawer closed
   },
@@ -71,15 +77,14 @@ const useStyles = makeStyles((theme) => ({
 export default function PrimaryLayout (props) {
   const classes = useStyles()
   const { children } = props
-
+  console.log(props)
   return (
-    <main className={ `groundhogg-layout__primary ${ classes.content }` }>
-
+    <Page className={ `groundhogg-layout__primary ${ classes.root }` } title="Dashboard">
       <div className={ classes.appBarSpacer }/>
-      <Container className={ classes.container } maxWidth="xl">
+      <Container className={ classes.content } maxWidth="xl">
         { children }
       </Container>
-    </main>
+    </Page>
   )
 }
 

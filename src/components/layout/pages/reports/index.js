@@ -54,13 +54,6 @@ export function Reports({history, match}) {
             endDate={endDate}
             dateChange={dateChange}
             reportList={[
-              // {
-              //  name:"chart_new_contacts",
-              //  gridColumnStart: 1,
-              //  gridColumnEnd: 4,
-              //  gridRowStart: 1,
-              //  gridRowEnd: 4,
-              // },
               {
                name:"total_new_contacts",
                gridColumnStart: 4,
@@ -87,6 +80,13 @@ export function Reports({history, match}) {
                gridColumnStart: 1,
                gridColumnEnd: 1,
                gridRowStart: 4,
+               gridRowEnd: 4,
+              },
+              {
+               name:"chart_new_contacts",
+               gridColumnStart: 1,
+               gridColumnEnd: 4,
+               gridRowStart: 1,
                gridRowEnd: 4,
               },
               // {

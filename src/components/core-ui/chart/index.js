@@ -1,79 +1,92 @@
-/**
- * External dependencies
- */
-import React, { useEffect, useState, useRef } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Card from "@material-ui/core/Card";
-/**
- * Internal dependencies
- */
-import Chartjs from "chart.js";
-import barChartConfig from './chart-config/bar-chart-config.js'
-import lineChartConfig from './chart-config/line-chart-config.js'
-import doughnutChartConfig from './chart-config/doughnut-chart-config.js'
+import React from 'react';
+import clsx from 'clsx';
+import PropTypes from 'prop-types';
+import PerfectScrollbar from 'react-perfect-scrollbar';
+import {
+  Box,
+  Card,
+  CardHeader,
+  CardContent,
+  Divider,
+  makeStyles
+} from '@material-ui/core';
+// import GenericMoreButton from 'src/components/GenericMoreButton';
+import Chart from './Chart';
+
+const useStyles = makeStyles(() => ({
+  root: {},
+  chart: {
+    height: '100%'
+  }
+}));
+
+const PerformanceOverTime = ({ className, data, ...rest }) => {
 
 
-const Chart = ({id, title, data}) => {
-  const useStyles = makeStyles((theme) => ({
-    root: {
-      position: 'relative',
-      overflow: 'visible',
-    },
-    title: {
-      // fontSize: gridRowStart === 1 ? '28px' : '18px',
-      // position: 'absolute',
-      textTransform:'capitalize',
-      // top: gridRowStart === 1 ? '-50px' : '10px',
-      // left: gridRowStart === 1 ? '37px' : '25px',
-      fontWeight: '700'
-    },
-    canvas:{
-      marginTop: '-10px',
-      marginLeft: '20px'
-    }
-  }));
+  // const {chart} = data;
+  console.log(data.chart.data.labels)
+  console.log(data.chart)
+  console.log(data.chart.data)
+  console.log(data.chart.data.datasets)
   const classes = useStyles();
-  const chartContainer = useRef(null);
-  const [chartInstance, setChartInstance] = useState(null);
-
-  let chartConfig;
-  let canvasWidth;
-  let canvasHeight;
-  if (data.chart.type === "line") {
-    chartConfig = lineChartConfig;
-  } else if (data.chart.type === "bar") {
-    chartConfig = barChartConfig;
-  } else if (data.chart.type === "doughnut") {
-    chartConfig = doughnutChartConfig;
-    canvasWidth = 400;
-    canvasHeight = 350;
-  }
-
-  // Remove and just set the data in the future, my local shows about 213 labels for this
-  if (data.chart.type === "doughnut") {
-    let labels = data.chart.data.labels.splice(0,10);
-    let backgroundColor = data.chart.data.datasets[0].backgroundColor.splice(0,10);
-    let dataNameSpace = data.chart.data.datasets[0].data.splice(0,10);
-    chartConfig.data = {
-      labels,
-      datasets: [{"backgroundColor":backgroundColor, "data":dataNameSpace}]
+  const performance = {
+    thisWeek: {
+      data: [],
+      labels: []
+    },
+    thisMonth: {
+      data: [],
+      labels: []
+    },
+    thisYear: {
+      data: [10, 5, 11, 20, 13, 28, 18, 4, 13, 12, 13, 5],
+      labels: [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec'
+      ]
     }
-  } else {
-    chartConfig.data =  data.chart.data;
-  }
-
-  useEffect(() => {
-    if (chartContainer && chartContainer.current) {
-      const newChartInstance = new Chartjs(chartContainer.current, chartConfig);
-    }
-  }, [chartContainer]);
+  };
 
   return (
-    <Card className={classes.root}>
-      <div className={classes.title}>{title}</div>
-      <canvas width={canvasWidth} height={canvasHeight} className={`Chart__canvas ${id} ${classes.canvas}`} ref={chartContainer} />
+    <Card
+      className={clsx(classes.root, className)}
+      {...rest}
+    >
+      <CardHeader
+        action={<div />}
+        title="Performance Over Time"
+      />
+      <Divider />
+      <CardContent>
+        <PerfectScrollbar>
+          <Box
+            height={375}
+            minWidth={500}
+          >
+            <Chart
+              className={classes.chart}
+              datasets={data.chart.data.datasets}
+              labels={performance.thisYear.labels}
+            />
+          </Box>
+        </PerfectScrollbar>
+      </CardContent>
     </Card>
   );
 };
 
-export default Chart;
+PerformanceOverTime.propTypes = {
+  className: PropTypes.string
+};
+
+export default PerformanceOverTime;

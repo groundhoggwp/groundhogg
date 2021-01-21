@@ -18,15 +18,9 @@ import Chart from "../../../core-ui/chart";
 import StatsCard from "../../../core-ui/stats-card";
 import ReportTable from "../../../core-ui/report-table";
 import DatePicker from "../../../core-ui/date-picker";
-import Page from "../../../core-ui/page";
+
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    backgroundColor: theme.palette.background.dark,
-    minHeight: '100%',
-    paddingTop: theme.spacing(3),
-    paddingBottom: theme.spacing(3)
-  },
   datePickers:{
     float: 'right',
     display: 'flex',
@@ -86,11 +80,7 @@ export default ({ key, reportList, dateChange, startDate, endDate }) => {
   }
 
   return (
-    <Page
-      className={classes.root}
-      title="Dashboard"
-    >
-      <Container maxWidth={false}>
+    <>
         {/*<Header />*/}
         <div className={classes.datePickers}>
           <DatePicker dateChange={dateChange} selectedDate={startDate} label={'start'} id={'start'}/>
@@ -100,12 +90,7 @@ export default ({ key, reportList, dateChange, startDate, endDate }) => {
           container
           spacing={3}
         >
-          <Grid
-            item
-            lg={3}
-            sm={6}
-            xs={12}
-          >
+
 
         {Object.keys(reports).map((reportKey, i) => {
           let title = reportKey.split("_");
@@ -127,12 +112,18 @@ export default ({ key, reportList, dateChange, startDate, endDate }) => {
             }
           }
 
-          return <Card>{title} No data?</Card>
+          return   <Grid
+              item
+              lg={3}
+              sm={6}
+              xs={12}
+            >
+              <Card>{title} No data?</Card>
+            </Grid>
         })}
-        </Grid>
+
       </Grid>
-      </Container>
-    </Page>
+      </>
 
 
   );

@@ -3,13 +3,7 @@
  */
 import { useState } from '@wordpress/element';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
-import Card from '@material-ui/core/Card';
+import {Box, Card, makeStyles, Paper, Tab, Tabs, Typography } from '@material-ui/core';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -48,7 +42,9 @@ const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
     width: '100%',
+    minHeight: '2000px',
     backgroundColor: theme.palette.background.paper,
+    marginTop: '20px',    
   },
   kpiTitle: {
     fontSize: '24px',
@@ -56,6 +52,9 @@ const useStyles = makeStyles((theme) => ({
   },
   kpiMetric: {
     fontSize: '16px'
+  },
+  tabBar: {
+    borderBottom: '1px solid #e0e0e0'
   }
 }));
 
@@ -81,16 +80,16 @@ export default function ScrollableTabsButtonAuto( { tabs, enableRouting, history
   };
 
   return (
-    <div className={classes.root}>
-      <AppBar position="static" color="default">
+    <Paper className={classes.root}>
         <Tabs
+          className={classes.tabBar}
           value={value}
           onChange={handleChange}
           indicatorColor="primary"
           textColor="primary"
           variant="scrollable"
           scrollButtons="auto"
-          aria-label="scrollable auto tabs example"
+          aria-label="scrollable auto tabs"
         >
           {
             tabs.map( ( tab, index ) => (
@@ -99,7 +98,6 @@ export default function ScrollableTabsButtonAuto( { tabs, enableRouting, history
             )
           }
         </Tabs>
-      </AppBar>
         {
           tabs.map( ( tab, index ) => (
             <TabPanel value={value} index={index} key={index}>
@@ -108,6 +106,6 @@ export default function ScrollableTabsButtonAuto( { tabs, enableRouting, history
            )
           )
         }
-    </div>
+    </Paper>
   );
 }

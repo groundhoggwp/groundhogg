@@ -8,7 +8,9 @@ import { useState, useRef, useEffect, Fragment } from '@wordpress/element';
 
 const useStyles = makeStyles((theme) => ({
   textField: {
-    minWidth: '150px'
+    minWidth: '150px',
+    border: 'none',
+    outline: 'none'
   },
 }));
 

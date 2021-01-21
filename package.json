@@ -90,6 +90,7 @@
     "prettier": "^2.1.2",
     "qs": "6.9.4",
     "react-archer": "^3.0.0",
+    "react-chartjs-2": "^2.11.1",
     "react-click-outside": "3.0.1",
     "react-feather": "^2.0.9",
     "react-helmet": "^6.1.0",
