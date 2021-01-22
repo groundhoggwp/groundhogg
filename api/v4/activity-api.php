@@ -22,6 +22,7 @@ class Activity_Api extends Base_Object_Api{
 		return current_user_can( 'view_activity' );
 	}
 
+
 	/**
 	 * Permissions callback for update
 	 *

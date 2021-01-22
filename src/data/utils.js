@@ -44,3 +44,10 @@ export function mergeReducers (reducers) {
     return state
   }
 }
+
+
+export function phpKeyTOWords ( key) {
+  let s = ( key.replace(/-|_/g,' '));
+  return s[0].toUpperCase() + s.slice(1);
+
+}

@@ -63,7 +63,10 @@ const useStyles = makeStyles({
     top: '0',
     zIndex: 10,
     backgroundColor: 'white',
-  }})
+
+  },
+
+})
 
 export function ListTable ({
   defaultOrderBy,
@@ -77,7 +80,11 @@ export function ListTable ({
   onBulkAction,
   QuickEdit,
   onSelectItem, // used to manage Handle Select Item
-  isCheckboxSelected // used to override default check of ID
+  isCheckboxSelected,  // used to override default check of ID
+  isCheckboxHidden,
+  isHeaderHidden,
+  isToolbarHidden
+
 }) {
   const classes = useStyles()
   const [perPage, setPerPage] = useState(10)
@@ -232,26 +239,30 @@ export function ListTable ({
   return (
     <>
       <Paper className={ classes.root }>
+
+        {isToolbarHidden ? '' :
         <TableToolbar
           numSelected={ selected.length }
           search={ search }
           onSearch={ handleSearch }
           onBulkAction={ handleBulkAction }
           bulkActions={ bulkActions }
-        />
+        />}
         <TableContainer className={ classes.container }>
           <Table stickyHeader size={ 'medium' }>
-            <TableHeader
-              handleReOrder={ handleReOrder }
-              onSelectAll={ handleSelectAll }
-              columns={ columns }
-              order={ order }
-              orderBy={ orderBy }
-              numSelected={ selected.length }
-              perPage={ perPage }
-              totalItems={ totalItems }
-              className={ classes.sticky }
-            />
+              {isHeaderHidden ? '':
+                  <TableHeader
+                      handleReOrder={handleReOrder}
+                      onSelectAll={handleSelectAll}
+                      columns={columns}
+                      order={order}
+                      orderBy={orderBy}
+                      numSelected={selected.length}
+                      perPage={perPage}
+                      totalItems={totalItems}
+                      className={classes.sticky}
+                  />
+              }
             <TableBody>
               { items &&
               items.map(item => {
@@ -269,13 +280,15 @@ export function ListTable ({
 
                 return (
                   <TableRow hover key={ item.ID }>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={ isSelected(item) }
-                        onChange={ () => handleSelectItem(item) }
-                        inputProps={ { 'aria-label': 'select' } }
-                      />
-                    </TableCell>
+                      {isCheckboxHidden ? '' :
+                          <TableCell padding="checkbox">
+                              <Checkbox
+                                  checked={isSelected(item)}
+                                  onChange={() => handleSelectItem(item)}
+                                  inputProps={{'aria-label': 'select'}}
+                              />
+                          </TableCell>
+                      }
                     { columns.map( ( col, index ) => <TableCell key={index} align={ col.align }>
                       <col.cell
                         { ...item }
