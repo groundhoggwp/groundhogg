@@ -45,8 +45,6 @@ export const ACTION_TYPE_DEFAULTS = {
     let children = getChildren( ID, graph )
     let parents = getParents( ID, graph )
 
-    console.log( children, parents )
-
     const arrows = []
 
     // This will always be present

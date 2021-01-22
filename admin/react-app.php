@@ -5,36 +5,22 @@ namespace Groundhogg\Admin;
 use Groundhogg\Plugin;
 use Groundhogg\Settings;
 use function Groundhogg\get_mappable_fields;
-use function Groundhogg\get_url_var;
-use function Groundhogg\groundhogg_logo;
-use function Groundhogg\key_to_words;
-use function Groundhogg\white_labeled_name;
 
 class React_App {
 
-	/**
-	 * @var Settings
-	 */
-	protected $settings;
+	public static function context_filters() {
 
-	public function __construct() {
-
-	    add_action( 'admin_menu', [ $this, 'register_menu_item' ] );
-
-		add_action( 'rest_api_init', [ $this, 'register_rest_settings' ] );
-
-		add_action( 'admin_init', [ $this, 'maybe_redirect' ], 8 );
-		add_action( 'init', [ $this, 'maybe_render' ] );
-
-		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_nonces' ] );
-		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_ajax_url' ] );
-		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_rest_base' ] );
-		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_assets' ] );
-		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_userdata' ] );
-		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_settings' ] );
-		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_basename' ] );
-		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_fields' ] );
-		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_replacement_codes' ] );
+		add_filter( 'groundhogg/admin/react_init_obj', [ __CLASS__, 'register_nonces' ] );
+		add_filter( 'groundhogg/admin/react_init_obj', [ __CLASS__, 'register_ajax_url' ] );
+		add_filter( 'groundhogg/admin/react_init_obj', [ __CLASS__, 'register_rest_base' ] );
+		add_filter( 'groundhogg/admin/react_init_obj', [ __CLASS__, 'register_assets' ] );
+		add_filter( 'groundhogg/admin/react_init_obj', [ __CLASS__, 'register_userdata' ] );
+		add_filter( 'groundhogg/admin/react_init_obj', [ __CLASS__, 'register_settings' ] );
+		add_filter( 'groundhogg/admin/react_init_obj', [ __CLASS__, 'register_basename' ] );
+		add_filter( 'groundhogg/admin/react_init_obj', [ __CLASS__, 'register_fields' ] );
+		add_filter( 'groundhogg/admin/react_init_obj', [ __CLASS__, 'register_url_params' ] );
+//		add_filter( 'groundhogg/admin/react_init_obj', [ __CLASS__, 'register_page_compat' ] );
+//		add_filter( 'groundhogg/admin/react_init_obj', [ $this, 'register_replacement_codes' ] );
 	}
 
 
@@ -45,13 +31,13 @@ class React_App {
 	 *
 	 * @return mixed
 	 */
-	public function register_fields( $obj ) {
+	public static function register_fields( $obj ) {
 
 		$arr = get_mappable_fields();
 		// removed the custom field as it returns array and brakes the map field
-		$arr [ 'Custom Fields' ] = '';
-		$obj[ 'field_map' ]      = $arr;
-		$obj ['export_default_keys'] =   [
+		$arr['Custom Fields']       = '';
+		$obj['field_map']           = $arr;
+		$obj['export_default_keys'] = [
 			'ID',
 			'email',
 			'first_name',
@@ -62,121 +48,24 @@ class React_App {
 			'date_created',
 			'tags'
 		];
-		$obj[ 'export_meta_keys'] =  array_values( Plugin::$instance->dbs->get_db( 'contactmeta' )->get_keys() );
-
-		$obj[ 'user_roles' ] = Plugin::$instance->roles->get_roles_for_react_select();
+		$obj['export_meta_keys']    = array_values( Plugin::$instance->dbs->get_db( 'contactmeta' )->get_keys() );
+		$obj['user_roles']          = Plugin::$instance->roles->get_roles_for_react_select();
 
 		return $obj;
 	}
 
-
-	public function register_menu_item () {
-		add_menu_page(
-			white_labeled_name(),
-			white_labeled_name(),
-			'view_contacts',
-			'groundhogg',
-			function () {
-				echo 'Whoops!';
-			},
-			'dashicons-email-alt',
-			2
-		);
-	}
-
-	public function register_rest_settings() {
-		$this->settings = new Settings();
-		$this->settings->init_defaults();
-		$this->settings->register_settings();
-	}
-
-	public function maybe_redirect() {
-		if ( get_url_var( 'page' ) === 'groundhogg' ) {
-			wp_safe_redirect( admin_url( '/groundhogg' ) );
-			die;
-		}
-	}
-
-	public function enqueue_block_editor_assets() {
-		wp_enqueue_style( 'wp-edit-post' );
-		wp_enqueue_style( 'groundhogg-react-styles', GROUNDHOGG_URL . 'build/index.css' );
-		do_action( 'groundhogg/scripts/after_enqueue_block_editor_assets' );
-	}
-
-	public function maybe_render() {
-
-		if ( false === strpos( $_SERVER['REQUEST_URI'], 'wp-admin/groundhogg' ) ) {
-			return;
-		}
-
-		if ( ! is_user_logged_in() ){
-		    wp_redirect( wp_login_url( admin_url( 'groundhogg/' ) ) );
-		    die;
-        } if ( ! current_user_can( 'view_contacts' ) ) {
-			wp_die( __( 'You do not have access to this platform.', 'groundhogg' ) );
-		}
-
-		$this->enqueue_block_editor_assets();
-
-		Plugin::instance()->scripts->register_admin_scripts();
-		Plugin::instance()->scripts->register_admin_styles();
-
-		wp_localize_script( 'groundhogg-react', 'Groundhogg', apply_filters( 'groundhogg/admin/react_init_obj', [] ) );
-
-		wp_enqueue_style( 'fa-icons', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css' );
-		wp_enqueue_style( 'groundhogg-admin-react' );
-
-		do_action( 'enqueue_groundhogg_assets_header' );
-
-		ob_start();
-
-		$this->edit_header();
-		$this->edit_content();
-		$this->edit_footer();
-		exit;
-
-	}
-
 	/**
-	 * Groundhogg header!
+	 * This will determine which component should be used.
+	 *
+	 * @return mixed
 	 */
-	protected function edit_header() {
-		?>
-        <!DOCTYPE html>
-        <html <?php language_attributes(); ?>>
-        <head>
-            <meta name="viewport" content="width=device-width"/>
-            <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-            <title><?php esc_html_e( 'Groundhogg', 'groundhogg' ); ?></title>
-			<?php do_action( 'admin_print_styles' ); ?>
-			<?php do_action( 'groundhogg_head' ); ?>
-        </head>
-        <body class="groundhogg groundhogg-funnel">
-		<?php
+	public static function register_url_params( $obj ) {
+
+		$obj['params'] = urldecode_deep( $_GET );
+
+		return $obj;
 	}
 
-	/**
-	 * Where react starts
-	 */
-	protected function edit_content() {
-		?>
-        <div id="root"></div>
-		<?php
-	}
-
-	/**
-	 * The Groundhogg footer
-	 */
-	protected function edit_footer() {
-		$handles = apply_filters( 'groundhogg/admin/scripts', [] );
-		$handles[] = 'groundhogg-react';
-	?>
-        </body>
-		<?php do_action( 'groundhogg_footer' ); ?>
-		<?php wp_print_scripts( $handles ) ?>
-        </html>
-		<?php
-	}
 
 	/**
 	 * Register the nonces that will be required for accessing this
@@ -185,7 +74,7 @@ class React_App {
 	 *
 	 * @return mixed
 	 */
-	public function register_nonces( $obj ) {
+	public static function register_nonces( $obj ) {
 
 		$obj['nonces'] = [
 			'_wpnonce'            => wp_create_nonce(),
@@ -204,7 +93,7 @@ class React_App {
 	 *
 	 * @return mixed
 	 */
-	public function register_rest_base( $obj ) {
+	public static function register_rest_base( $obj ) {
 
 		$obj['rest_base'] = rest_url( 'gh/v4' );
 
@@ -218,7 +107,7 @@ class React_App {
 	 *
 	 * @return mixed
 	 */
-	public function register_ajax_url( $obj ) {
+	public static function register_ajax_url( $obj ) {
 
 		$obj['ajax_url'] = admin_url( 'admin-ajax.php' );
 
@@ -232,7 +121,7 @@ class React_App {
 	 *
 	 * @return mixed
 	 */
-	public function register_assets( $obj ) {
+	public static function register_assets( $obj ) {
 
 		$obj['assets'] = [
 			'bigG'      => GROUNDHOGG_ASSETS_URL . 'images/big-g.png',
@@ -243,7 +132,7 @@ class React_App {
 				'funnel'    => GROUNDHOGG_ASSETS_URL . 'images/welcome/create-your-first-funnel-with-groundhogg.png',
 				'broadcast' => GROUNDHOGG_ASSETS_URL . 'images/welcome/send-your-first-broadcast-with-groundhogg.png',
 				'cron'      => GROUNDHOGG_ASSETS_URL . 'images/welcome/correctly-configure-wp-cron-for-groundhogg.png',
-				'course'      => GROUNDHOGG_ASSETS_URL . 'images/welcome/official-quickstart-course-for-groundhogg.png',
+				'course'    => GROUNDHOGG_ASSETS_URL . 'images/welcome/official-quickstart-course-for-groundhogg.png',
 			],
 		];
 
@@ -257,7 +146,7 @@ class React_App {
 	 *
 	 * @return mixed
 	 */
-	public function register_basename( $obj ) {
+	public static function register_basename( $obj ) {
 		$settings = $obj['preloadSettings'];
 
 		$settings['basename'] = path_join( wp_parse_url( admin_url(), PHP_URL_PATH ), 'groundhogg' );
@@ -274,7 +163,7 @@ class React_App {
 	 *
 	 * @return mixed
 	 */
-	public function register_userdata( $obj ) {
+	public static function register_userdata( $obj ) {
 
 		$obj['user'] = wp_get_current_user();
 
@@ -282,18 +171,18 @@ class React_App {
 	}
 
 	/**
-     * Add the replacement codes to the global object
-     *
+	 * Add the replacement codes to the global object
+	 *
 	 * @param $obj
 	 *
 	 * @return mixed
 	 */
-	public function register_replacement_codes( $obj ){
+	public static function register_replacement_codes( $obj ) {
 
-	    $obj[ 'replacements' ] = Plugin::instance()->replacements->get_replacements();
+		$obj['replacements'] = Plugin::instance()->replacements->get_replacements();
 
-	    return $obj;
-    }
+		return $obj;
+	}
 
 	/**
 	 * Make the settings accessible
@@ -302,13 +191,13 @@ class React_App {
 	 *
 	 * @return mixed
 	 */
-	public function register_settings( $obj ) {
-		$this->settings = new Settings();
+	public static function register_settings( $obj ) {
+		$settings = new Settings();
 
-		$this->settings->init_defaults();
-		$this->settings->register_settings();
+		$settings->init_defaults();
+		$settings->register_settings();
 
-		$settings = wp_json_encode( $this->settings );
+		$settings = wp_json_encode( $settings );
 		$settings = json_decode( $settings, true );
 
 		foreach ( $settings['settings'] as $name => $setting ) {
@@ -333,4 +222,88 @@ class React_App {
 		return $obj;
 	}
 
+	/**
+     * Add custom context to the React APP init object
+     *
+	 * @param $context
+	 */
+	public static function add_context( $context ) {
+
+	    if ( did_action( 'enqueue_groundhogg_react_assets_scripts' ) ){
+	        _doing_it_wrong( __CLASS__ . '::' . __METHOD__, 'This needs to be called before enqueuing the React APpp scripts.', GROUNDHOGG_VERSION );
+        }
+
+		add_filter( 'groundhogg/admin/react_init_obj', function ( $obj ) use ( $context ) {
+			return array_merge( $obj, $context );
+		} );
+	}
+
+	/**
+	 * Adds additional actions.
+	 */
+	public static function required_actions() {
+		add_action( 'screen_options_show_screen', '__return_false' );
+		add_action( 'admin_enqueue_scripts', function () {
+			wp_styles()->remove( [ 'forms', 'wp-admin' ] );
+			wp_styles()->add( 'wp-admin', false, array(
+				'dashicons',
+				'common',
+				'admin-menu',
+				'dashboard',
+				'list-tables',
+				'edit',
+				'revisions',
+				'media',
+				'themes',
+				'about',
+				'nav-menus',
+				'widgets',
+				'site-icon',
+				'l10n'
+			) );
+
+		}, 999 );
+		add_action( 'admin_head', function () {
+			?>
+            <style>
+                .wrap {
+                    margin: 0;
+                    min-height: 300vh;
+                }
+                #wpcontent {
+                    padding-left: 0 !important;
+                }
+            </style>
+			<?php
+		} );
+	}
+
+	/**
+	 * Enqueue any scripts
+	 */
+	public static function scripts() {
+
+	    self::context_filters();
+//
+		wp_enqueue_style( 'wp-edit-post' );
+		wp_enqueue_style( 'groundhogg-react-styles', GROUNDHOGG_URL . 'build/index.css' );
+//
+		wp_enqueue_script( 'groundhogg-react' );
+		wp_localize_script( 'groundhogg-react', 'Groundhogg', apply_filters( 'groundhogg/admin/react_init_obj', [] ) );
+
+//		wp_enqueue_style( 'fa-icons', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css' );
+		wp_dequeue_script( 'groundhogg-admin' );
+
+		do_action( 'enqueue_groundhogg_react_assets_scripts' );
+	}
+
+	public static function app() {
+
+		?>
+        <div class="wrap">
+            <div class="" id="gh-react-app-root"></div>
+            <div class="wp-clearfix"></div>
+        </div>
+		<?php
+	}
 }

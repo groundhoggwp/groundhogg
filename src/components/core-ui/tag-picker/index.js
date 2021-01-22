@@ -1,61 +1,89 @@
-import AsyncCreatableSelect from 'react-select/async-creatable'
-import AsyncSelect from 'react-select/async'
-import apiFetch from '@wordpress/api-fetch'
-import { NAMESPACE } from 'data/constants'
 import { parseArgs } from 'utils/core'
+import Chip from '@material-ui/core/Chip'
+import Autocomplete from '@material-ui/lab/Autocomplete'
+import { makeStyles } from '@material-ui/core/styles'
+import TextField from '@material-ui/core/TextField'
+import { useDispatch, useSelect } from '@wordpress/data'
+import { TAGS_STORE_NAME } from 'data/tags'
+import { useEffect, useState } from '@wordpress/element'
+import { useDebounce } from 'utils/index'
+import CircularProgress from '@material-ui/core/CircularProgress'
 
-const FaIcon = ({ classes }) => {
-  return <i className={'fa ' + classes.map(c => 'fa-' + c).join(' ')}></i>
-}
-
-const TagPicker = ({ selectProps, onChange, value, isCreatable }) => {
+const TagPicker = ({ selectProps, textFieldProps, onChange, selected, isCreatable }) => {
 
   selectProps = parseArgs(selectProps || {}, {
-    cacheOptions: true,
-    isMulti: true,
-    ignoreCase: true,
-    isClearable: true,
-    // defaultOptions: [],
+    multiple: true,
+    fullWidth: true
   })
 
-  // const promiseOptions = inputValue => new Promise(resolve => {
-  //     axios.get(groundhogg.rest_base + '/tags?axios=1&q=' + inputValue).
-  //     then(result => {
-  //         resolve(result.data.tags)
-  //     })
-  // })
+  const { options, isLoading } = useSelect((select) => {
+    const store = select(TAGS_STORE_NAME)
+    return {
+      options: store.getItems(),
+      isLoading: store.isItemsRequesting()
+    }
+  }, [])
+  const { fetchItems } = useDispatch(TAGS_STORE_NAME)
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 250)
 
-  const promiseOptions = inputValue => new Promise(resolve => {
-    apiFetch({
-      method: 'GET',
-      path: NAMESPACE + '/tags?search=' + inputValue,
-    }).then(({ items }) => {
-      resolve(items.map((item) => {
-        return ({ value: item.ID, label: item.data.tag_name + `(${item.data.contact_count})` })
-      }))
+  const __fetchItems = () => {
+    fetchItems({
+      search: search
     })
-  })
+  }
 
-  // const TagSelect = isCreatable ? AsyncCreatableSelect : AsyncSelect
-  const TagSelect = AsyncSelect
-  // value = value.map(item  => {return ({value: item}) });
+  useEffect(() => {
+      if (open) {
+        __fetchItems()
+      }
+    },
+    [debouncedSearch]
+  )
 
   return (
-    // <TagSelect
-    //     {...selectProps}
-    //     defaultOptions={promiseOptions}
-    //     loadOptions={promiseOptions}
-    //     // onChange={ onChange }
-    //     value={ ['a'] }
-    // />
 
-    <AsyncSelect
+    <Autocomplete
       {...selectProps}
-      cacheOptions
-      defaultOptions
-      loadOptions={promiseOptions}
+      fullWidth
+      open={open}
+      onOpen={() => {
+        setOpen(true)
+      }}
+      onClose={() => {
+        setOpen(false)
+      }}
+      loading={isLoading}
+      options={options}
       onChange={onChange}
-      value={value}
+      getOptionLabel={(option) => option.data.tag_name}
+      // getOptionSelected={(option, value) => {
+      //   console.debug( option, value )
+      //   return value.find( v => option.ID === v.ID )
+      // }}
+      onInputChange={(e, value) => setSearch(value)}
+      inputValue={search}
+      value={selected||[]}
+      filterSelectedOptions
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          {...textFieldProps}
+          variant="outlined"
+          label="Select Tags"
+          placeholder="Tag Name"
+          InputProps={{
+            ...params.InputProps,
+            endAdornment: (
+              <>
+                {isLoading ? <CircularProgress color="inherit" size={20}/> : null}
+                {params.InputProps.endAdornment}
+              </>
+            )
+          }}
+        />
+      )}
     />
   )
 }

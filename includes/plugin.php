@@ -7,7 +7,6 @@ use Groundhogg\DB\Manager as DB_Manager;
 use Groundhogg\Admin\Admin_Menu;
 use Groundhogg\Form\Submission_Handler;
 use Groundhogg\Queue\Event_Queue;
-use Groundhogg\Reporting\Reporting;
 use Groundhogg\Steps\Manager as Step_Manager;
 use Groundhogg\Bulk_Jobs\Manager as Bulk_Job_Manager;
 
@@ -182,11 +181,6 @@ class Plugin {
      */
     public $bulk_jobs;
 
-    /**
-     * @var Reporting
-     */
-    public $reporting;
-
 	/**
 	 * @var Library
 	 */
@@ -297,10 +291,8 @@ class Plugin {
         $this->tag_mapping  = new Tag_Mapping();
         $this->step_manager = new Step_Manager();
         $this->bulk_jobs    = new Bulk_Job_Manager();
-        $this->reporting    = new Reporting();
 
         $this->bounce_checker   = new Bounce_Checker();
-        $this->sending_service  = new Sending_Service();
         $this->proxy_service    = new Proxy_Service();
         $this->stats_collection = new Stats_Collection();
 
@@ -332,10 +324,9 @@ class Plugin {
 		new Extension_Upgrader();
 		new Plugin_Compatibility();
 		new Email_Logger();
+//		new React_App();
 
 		// Partner
-		SendWp::instance();
-
 		\Groundhogg_Email_Services::init();
 	}
 
@@ -364,14 +355,15 @@ class Plugin {
      */
     private function __construct() {
 
-        $this->register_autoloader();
-        $this->load_immediate();
+	    $this->register_autoloader();
+	    $this->load_immediate();
 
-        if ( did_action( 'plugins_loaded' ) ){
-            $this->init();
-        } else {
-            add_action( 'plugins_loaded', [ $this, 'init' ], 0 );
-        }
+	    if ( did_action( 'plugins_loaded' ) ) {
+		    $this->init();
+	    } else {
+		    add_action( 'plugins_loaded', [ $this, 'init' ], 0 );
+	    }
+    }
 
 	private function load_immediate() {
 

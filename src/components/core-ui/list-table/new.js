@@ -24,31 +24,7 @@ import clsx from 'clsx'
 import Spinner from '../spinner'
 import { CORE_STORE_NAME } from 'data';
 import {isFunction} from "@material-ui/data-grid";
-
-const useDebounce = (value, delay) => {
-  // State and setters for debounced value
-  const [debouncedValue, setDebouncedValue] = useState(value)
-
-  useEffect(
-    () => {
-      // Update debounced value after delay
-      const handler = setTimeout(() => {
-        setDebouncedValue(value)
-      }, delay)
-
-      // Cancel the timeout if value changes (also on delay change or unmount)
-      // This is how we prevent debounced value from updating if value is
-      // changed ... .. within the delay period. Timeout gets cleared and
-      // restarted.
-      return () => {
-        clearTimeout(handler)
-      }
-    },
-    [value, delay], // Only re-call effect if value or delay changes
-  )
-
-  return debouncedValue
-}
+import { useDebounce } from 'utils/index'
 
 const useStyles = makeStyles({
   root: {
@@ -85,8 +61,8 @@ export function ListTable ({
   const [order, setOrder] = useState(defaultOrder)
   const [orderBy, setOrderBy] = useState(defaultOrderBy)
   const [selected, setSelected] = useState([])
-  const [search, setSearch] = useState('')
   const [quickEditId, setQuickEditId] = useState(null)
+  const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 250)
 
   const __fetchItems = () => {
