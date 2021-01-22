@@ -121,6 +121,10 @@ export default (endpoint) => ({
         items: result.items,
         totalItems: result.total_items
       }
+      return {
+        items : result.items,
+        totalItems: result.total_items
+      }
     } catch (e) {
       yield setCreatingError(e)
     }

@@ -4124,3 +4124,15 @@ function ymd_his( $time=false ){
 //function Ymd_His( $time = false ) {
 //	return date( 'Y-m-d H:i:s', $time ?: time() );
 //}
+
+
+/**
+ *  test function to run something init while development
+ */
+    function  test() {
+
+//	    get_db( 'notes' )->update_3_0();
+//    wp_die("here");
+
+    }
+    add_action( "init" , __NAMESPACE__ .  '\test' );

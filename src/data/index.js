@@ -10,6 +10,8 @@ export { USER_STORE_NAME } from './user-preferences';
 export { withCurrentUserHydration } from './user-preferences/with-current-user-hydration';
 export { useUserPreferences } from './user-preferences/use-user-preferences';
 
+export {ACTIVITY_STORE_NAME} from './activity';
+
 /**	Broadcasts */
 export { BROADCASTS_STORE_NAME } from './broadcasts';
 

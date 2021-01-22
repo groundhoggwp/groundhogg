@@ -7,7 +7,7 @@ import {
 import { makeStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
-import ContactTimeline from './contact-timeline'
+import {ContactTimeline} from './contact-timeline'
 import TabPanel from 'components/core-ui/tab-panel'
 import { applyFilters } from '@wordpress/hooks'
 

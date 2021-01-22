@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Groundhogg\Base_Object;
 use Groundhogg\Base_Object_With_Meta;
 use Groundhogg\Broadcast;
+use Groundhogg\Classes\Activity;
 use Groundhogg\Classes\Note;
 use Groundhogg\Contact;
 use Groundhogg\Email;
@@ -47,6 +48,7 @@ abstract class Base_Object_Api extends Base_Api {
 			'broadcast' => Broadcast::class,
 			'event'     => Event::class,
 			'webhook'   => Webhook::class,
+			'activity'  => Activity::class
 		] );
 
 		$class = get_array_var( $object_type_class_map, $this->get_object_type() );
@@ -136,10 +138,10 @@ abstract class Base_Object_Api extends Base_Api {
 	 *
 	 * @return Base_Object | Base_Object_With_Meta
 	 */
-	public function create_new_object( $data, $meta=[] ) {
+	public function create_new_object( $data, $meta = [] ) {
 		$class_name = $this->get_object_class();
 
-		if ( method_exists( $class_name, 'update_meta' ) && ! empty( $meta ) ){
+		if ( method_exists( $class_name, 'update_meta' ) && ! empty( $meta ) ) {
 			return new $class_name( $data, $meta );
 		}
 
