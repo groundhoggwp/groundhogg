@@ -15,6 +15,7 @@ import {
 } from 'components/layout/pages/funnels/editor/steps-types/constants'
 import { useLayoutEffect, useRef, useState } from '@wordpress/element'
 import { numChildren } from 'components/layout/pages/funnels/editor/functions'
+import FunnelAppBar from 'components/layout/pages/funnels/FunnelAppBar'
 
 export const NODE_HEIGHT = 136
 export const NODE_WIDTH = 250
@@ -108,9 +109,11 @@ const Editor = ({ funnel }) => {
 
   return (
     <>
+      <FunnelAppBar id={ funnel.ID } width={dimensions.width}/>
       <div ref={ targetRef } style={ {
+        marginTop: 60,
         position: 'relative',
-        height: dimensions.height,
+        height: dimensions.height || graph.node( 'exit' ).y + NODE_HEIGHT ,
       } }>
         {
           steps.length === 0 && (
@@ -122,6 +125,7 @@ const Editor = ({ funnel }) => {
             return (
               <>
                 <StepBlock
+                  step={step}
                   { ...step }
                   graph={ graph }
                   xOffset={ xOffset }

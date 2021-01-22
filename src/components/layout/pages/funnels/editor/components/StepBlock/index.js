@@ -14,6 +14,7 @@ import {
   FUNNELS_STORE_NAME
 } from 'data'
 import { CARD_WIDTH } from 'components/layout/pages/funnels/editor/steps-types/constants'
+import StepEditor from '../StepEditor'
 
 const useStyles = makeStyles((theme) => ({
   stepBlockContainer: {
@@ -28,19 +29,27 @@ const useStyles = makeStyles((theme) => ({
     position: 'relative'
   },
   stepCard: {
+    '& .MuiCardHeader-title': {
+      textTransform: 'uppercase',
+      fontWeight: 'bold'
+    },
+    '& .MuiCardHeader-subheader': {
+      fontWeight: '300'
+      // fontSize: 11
+    },
     '&.benchmark': {
-      '& .MuiCardHeader-root': {
-        backgroundColor: '#DB741A'
+      '& .MuiCardHeader-title': {
+        color: '#DB741A'
       }
     },
     '&.action': {
-      '& .MuiCardHeader-root': {
-        backgroundColor: '#58AB7E'
+      '& .MuiCardHeader-title': {
+        color: '#58AB7E'
       }
     },
     '&.condition': {
-      '& .MuiCardHeader-root': {
-        backgroundColor: '#48639C'
+      '& .MuiCardHeader-title': {
+        color: '#48639C'
       }
     }
   }
@@ -53,10 +62,10 @@ export default (props) => {
 
   const classNames = useStyles()
 
-  const { ID, data, meta, funnelID, level, index, graph, xOffset } = props
+  const { ID, data, meta, funnelID, level, index, graph, xOffset, step } = props
   const { step_title, step_type, step_group, funnel_id } = data
 
-  const StepType = getStepType( step_type );
+  const StepType = getStepType(step_type)
 
   const { deleteStep, updateStep } = useDispatch(FUNNELS_STORE_NAME)
 
@@ -67,7 +76,7 @@ export default (props) => {
   ]
 
   const handleEdit = () => {
-    // openStepBlock();
+    setEditing(true)
   }
 
   const handleDelete = () => {
@@ -75,7 +84,7 @@ export default (props) => {
     deleteStep(ID, funnel_id)
   }
 
-  let thisNode =  graph.node(ID);
+  let thisNode = graph.node(ID)
 
   const positioning = {
     top: thisNode && thisNode.y,
@@ -91,7 +100,7 @@ export default (props) => {
                 id={'step-card-' + ID}>
             <CardHeader
               avatar={StepType.icon}
-              title={ID}
+              title={<StepType.view data={data} meta={meta}/>}
               subheader={StepType.name}
             />
             <CardActions>
@@ -112,6 +121,11 @@ export default (props) => {
                 </IconButton>
               </Tooltip>
             </CardActions>
+            {
+              editing && <StepEditor
+                step={step}
+              />
+            }
           </Card>
         </Box>
       </Box>

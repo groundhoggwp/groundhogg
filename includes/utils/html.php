@@ -490,7 +490,7 @@ class HTML {
 	 * @return string
 	 */
 	public function modal_link( $args = [] ) {
-		$a = wp_parse_args( $args, array(
+		$atts = wp_parse_args( $args, array(
 			'title'              => 'Modal',
 			'text'               => __( 'Open Modal', 'groundhogg' ),
 			'footer_button_text' => __( 'Save Changes' ),
@@ -505,21 +505,29 @@ class HTML {
 
 		enqueue_groundhogg_modal();
 
-		$html = sprintf(
-			"<a title='%s' id='%s' class='%s trigger-popup' href='#source=%s&footer=%s&width=%d&height=%d&footertext=%s&preventSave=%s' >%s</a>",
-			esc_attr( $a['title'] ),
-			esc_attr( $a['id'] ),
-			esc_attr( $a['class'] ),
-			urlencode( $a['source'] ),
-			esc_attr( $a['footer'] ),
-			intval( $a['width'] ),
-			intval( $a['height'] ),
-			urlencode( $a['footer_button_text'] ),
-			esc_attr( $a['preventSave'] ),
-			$a['text']
-		);
+		$href = sprintf( "#source=%s&footer=%s&width=%d&height=%d&footertext=%s&preventSave=%s",
+			urlencode( $atts['source'] ),
+			esc_attr( $atts['footer'] ),
+			intval( $atts['width'] ),
+			intval( $atts['height'] ),
+			urlencode( $atts['footer_button_text'] ),
+			esc_attr( $atts['preventSave'] ) );
 
-		return apply_filters( 'groundhogg/html/modal_link', $html, $a );
+		unset( $atts[ 'source' ] );
+		unset( $atts[ 'footer' ] );
+		unset( $atts[ 'width' ] );
+		unset( $atts[ 'height' ] );
+		unset( $atts[ 'footer_button_text' ] );
+		unset( $atts[ 'preventSave' ] );
+
+		$text = $atts['text'];
+
+		unset( $atts[ 'text' ] );
+
+		$atts[ 'class' ] .= ' trigger-popup';
+		$atts[ 'href' ] = $href;
+
+		return $this->e( 'a', $atts, $text );
 	}
 
 	/**
@@ -1036,10 +1044,11 @@ class HTML {
 	/**
 	 * Get a meta key picker. useful for searching.
 	 *
+	 * @deprecated use meta_picker() instead
+	 *
 	 * @param array $args
 	 *
 	 * @return string
-     * @deprecated use meta_picker() instead
 	 */
 	public function meta_key_picker( $args = [] ) {
 		$a = wp_parse_args( $args, array(

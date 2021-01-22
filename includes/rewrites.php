@@ -285,7 +285,7 @@ class Rewrites {
 				break;
 			case 'auto_login':
 
-				$contact = get_contactdata();
+				$contact = get_contactdata( get_url_var( 'cid' ) );
 				$permissions_key = get_permissions_key();
 
 				if ( ! is_user_logged_in() ){

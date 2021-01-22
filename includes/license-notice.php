@@ -2,7 +2,7 @@
 
 namespace Groundhogg;
 
-class License_Nag {
+class License_Notice {
 
 	const CHECKOUT_URL = 'https://www.groundhogg.io/secure/checkout/';
 	const HELPER_PLUGIN_ID = 48143;
@@ -27,6 +27,10 @@ class License_Nag {
 	 * Show an admin notice to nag users into renewing or updating their license.
 	 */
 	public function show_expired_license_nag() {
+
+		if ( ! apply_filters( 'groundhogg/license_notice/show', true ) ){
+			return;
+		}
 
 		$license_key = $this->get_expired_licenses();
 
@@ -70,15 +74,21 @@ class License_Nag {
 	 */
 	public function show_non_licensed_extensions_nag() {
 
+		if ( ! apply_filters( 'groundhogg/license_notice/show', true ) ){
+			return;
+		}
+
 		// Only check against official extensions
 		$licensed  = array_intersect( Extension::$extension_ids, array_keys( License_Manager::get_extension_licenses() ) );
 		$installed = array_intersect( Extension::$extension_ids, Extension_Upgrader::get_extension_ids() );
 
-		if ( count( $installed ) === count( $licensed ) ) {
+		// Licensed may be greater than installed if an extension was licensed then deactivated.
+		if ( count( $installed ) <= count( $licensed ) ) {
 			return;
 		}
 
-		$license_page_url = in_array( self::HELPER_PLUGIN_ID, $installed ) ? admin_page_url( 'gh_extensions' ) : admin_page_url( 'gh_settings', [ 'tab' => 'extensions' ] );
+//		$license_page_url = in_array( self::HELPER_PLUGIN_ID, $installed ) ? admin_page_url( 'gh_extensions' ) : admin_page_url( 'gh_settings', [ 'tab' => 'extensions' ] );
+		$license_page_url = admin_page_url( 'gh_settings', [ 'tab' => 'extensions' ] );
 
 		?>
         <div class="notice notice-warning is-dismissible">

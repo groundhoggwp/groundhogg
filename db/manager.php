@@ -70,6 +70,7 @@ class Manager {
 		$this->permissions_keys  = new Permissions_Keys();
 		$this->webhooks          = new Webhooks();
 		$this->webhook_meta      = new Webhook_Meta();
+		$this->email_log         = new Email_Log();
 
 		//new queue table
 		$this->event_queue = new Event_Queue();

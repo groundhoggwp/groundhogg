@@ -1,8 +1,9 @@
 import { useEffect, useState } from '@wordpress/element'
-import { dispatch, useSelect } from '@wordpress/data'
+import { dispatch, useDispatch, useSelect } from '@wordpress/data'
 import { CORE_STORE_NAME } from '../data';
 import { useRouteMatch } from 'react-router-dom';
 import { DateTime } from 'luxon';
+import { objEquals } from 'utils/core'
 
 export const useShift = (onShift) => {
   useEffect(() => {
@@ -17,6 +18,57 @@ export const useShift = (onShift) => {
       window.removeEventListener('keydown', handleShift)
     }
   }, [])
+}
+
+export const useDebounce = (value, delay) => {
+  // State and setters for debounced value
+  const [debouncedValue, setDebouncedValue] = useState(value)
+
+  useEffect(
+    () => {
+      // Update debounced value after delay
+      const handler = setTimeout(() => {
+        setDebouncedValue(value)
+      }, delay)
+
+      // Cancel the timeout if value changes (also on delay change or unmount)
+      // This is how we prevent debounced value from updating if value is
+      // changed ... .. within the delay period. Timeout gets cleared and
+      // restarted.
+      return () => {
+        clearTimeout(handler)
+      }
+    },
+    [value, delay], // Only re-call effect if value or delay changes
+  )
+
+  return debouncedValue
+}
+
+/**
+ * Allows easy manipulation of state without having to update right away.
+ *
+ * @param origState
+ * @returns {{tempState: object, setTempState: setTempState }}
+ */
+export const useTempState = ( origState ) => {
+
+  const [tempState, setTempState] = useState({
+    ...origState
+  })
+
+  /**
+   * Reset the state to the original state
+   */
+  const resetTempState = () => {
+    setTempState( { ...origState } );
+  }
+
+  return {
+    tempState,
+    setTempState,
+    resetTempState,
+  }
 }
 
 // Hook

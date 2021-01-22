@@ -18,7 +18,7 @@ if ( function_exists( 'fastcgi_finish_request' ) && version_compare( phpversion(
     fastcgi_finish_request();
 }
 
-if ( ! empty( $_POST ) || defined( 'DOING_AJAX' ) || defined( 'DOING_CRON' ) ) {
+if ( ! empty( $_POST ) || defined( 'DOING_AJAX' ) || defined( 'DOING_CRON' ) || defined( 'DOING_GH_CRON' ) ) {
     die();
 }
 
@@ -39,6 +39,13 @@ if ( ! empty( $_POST ) || defined( 'DOING_AJAX' ) || defined( 'DOING_CRON' ) ) {
  * @var bool
  */
 define( 'DOING_CRON', true );
+
+/**
+ * Special const for Groundhogg compat
+ *
+ * @var bool
+ */
+define( 'DOING_GH_CRON', true );
 
 if ( ! defined( 'ABSPATH' ) ) {
     /** Set up WordPress environment */

@@ -4,7 +4,7 @@
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data'
-import DeleteIcon from '@material-ui/icons/delete'
+import DeleteIcon from '@material-ui/icons/Delete'
 import Button from '@material-ui/core/Button'
 
 import {

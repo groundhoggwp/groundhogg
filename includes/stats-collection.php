@@ -82,7 +82,7 @@ We appreciate your help, enjoy!
 
 @ the Groundhogg Team", 'groundhogg' ), wp_get_current_user()->display_name, $checkout_link );
 
-		wp_mail( wp_get_current_user()->user_email, __( '[Groundhogg] Download your free extension.', 'groundhogg' ), $message );
+		\Groundhogg_Email_Services::send_transactional( wp_get_current_user()->user_email, __( '[Groundhogg] Download your free extension.', 'groundhogg' ), $message );
 	}
 
 	/**

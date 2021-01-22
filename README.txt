@@ -54,7 +54,7 @@ Groundhogg will **never** limit you on the amount of **anything**! Unlike [other
 
 ## 🔎 At A Glance
 
-* Organize and segment your contacts to sned more relevant communications.
+* Organize and segment your contacts to send more relevant communications.
 * Automate your communications to save you time and increase your productivity.
 * Collect data and mine your list so you can stop bleeding money. "The money is in the list!"
 * Own your data so you’ll never be at the mercy of a SaaS company again.
@@ -98,7 +98,7 @@ After some time, it became apparent that there was a desperate need in the WordP
 
 One that could match SaaS platforms on features and reliability did not yet exist, so we built it!
 
-Starting in 2018, Adrian Tobey (founder) and his team took their combined 20+ years of experince in the CRM and Marketing Automation industry to create a better option for WordPress based businesses.
+Starting in 2018, Adrian Tobey (founder) and his team took their combined 20+ years of experience in the CRM and Marketing Automation industry to create a better option for WordPress based businesses.
 
 We know funnels, CRM, and automation like the back of our hands!
 
@@ -155,7 +155,7 @@ Here are the tools you can use to launch your funnel, grow your list, and scale 
 
 * 2 Editors to choose from.
 * Plain Text Editor or Drag & Drop Editor
-* Use images, headers, paragrapgh and more.
+* Use images, headers, paragraph and more.
 * Simple preview & testing.
 * Perfect for sales emails, newsletters, transactional notifications and more.
 * Send broadcast emails to your lists.
@@ -308,6 +308,21 @@ You can purchase a premium plan for access to support and our premium extensions
 Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/monthly/).
 
 == Changelog ==
+
+= 2.2.24 (2020-12-18) =
+* ADDED Ability to have multiple email services installed and differentiate between marketing and transactional emails.
+
+= 2.2.23.4 (2020-12-09) =
+* TWEAKED Replacement codes will default to blank "" if no info is available instead of the code name.
+* FIXED ChartJS not loading after WordPress 5.6
+
+= 2.2.23.3 (2020-12-09) =
+* TWEAKED Improved system status file with more useful information for the support team.
+* TWEAKED Auto Link link will support CID specified in the url.
+* TWEAKED Added `DOING_GH_CRON` constant to the `gh-cron.php` file.
+
+= 2.2.23.2 (2020-12-07) =
+* FIXED License missing message showing even though all active extensions are licensed in some cases.
 
 = 2.2.23.1 (2020-12-07) =
 * FIXED License missing message showing for non official extensions. Only show for extensions with official ids.
