@@ -1,5 +1,5 @@
 import { registerChartType } from 'data/reports-registry'
-import lineChartConfig from 'components/core-ui/chart/chart-config/line-chart-config'
+// import lineChartConfig from 'components/core-ui/chart/chart-config/line-chart-config'
 import Chartjs from 'chart.js'
 import Card from '@material-ui/core/Card'
 import { useRef, useState, useEffect } from '@wordpress/element'
@@ -29,18 +29,18 @@ export const LineChart = ({ id, title, report, loading }) => {
   const chartContainer = useRef(null)
   const { chart } = report
 
-  console.log(report)
-
-  const chartConfig = {
-    ...lineChartConfig,
-    data: isObject(chart) ? chart.data : {}
-  }
+  // const chartConfig = {
+  //   ...lineChartConfig,
+  //   data: isObject(chart) ? chart.data : {}
+  // }
 
   useEffect(() => {
     if (chartContainer && chartContainer.current) {
-      const newChartInstance = new Chartjs(chartContainer.current, chartConfig)
+      // const newChartInstance = new Chartjs(chartContainer.current, chartConfig)
     }
   }, [report, chartContainer])
+
+  console.log('asdfasdfasdfasdf')
 
   return (
     <Card className={classes.root}>
