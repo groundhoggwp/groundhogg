@@ -1,0 +1,124 @@
+.Groundhogg {
+
+  .navbar{
+    min-height: 60px;
+    border-bottom: 1px solid #e5e5e5;
+
+    .navbar-brand.main-brand{
+      margin-left: 60px;
+    }
+
+    .big-g.logo {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 60px;
+      background-color: #212529;
+      padding: 10px;
+
+      img{
+        height: 40px;
+      }
+    }
+
+    .title-input-reading{
+      cursor: pointer;
+    }
+
+    .title-input-editing{
+      margin-top: -.3125rem;
+      margin-bottom: -.3125rem;
+      width: 400px;
+      max-width: 100%;
+    }
+
+    .groundhogg-nav {
+      padding-right: 50px;
+
+      .funnel-actions{
+        margin-left: 10px;
+      }
+    }
+
+    .last-updated,
+    .saving{
+      opacity: 0.5;
+      margin-right: 20px;
+    }
+  }
+
+  //.sticky-top{
+  //  top: 32px;
+  //}
+
+  .groundhogg-exit-button{
+    .spinner-border{
+      margin: 13px;
+    }
+  }
+}
+
+@keyframes blink {
+  /**
+   * At the start of the animation the dot
+   * has an opacity of .2
+   */
+  0% {
+    opacity: .2;
+  }
+  /**
+   * At 20% the dot is fully visible and
+   * then fades out slowly
+   */
+  20% {
+    opacity: 1;
+  }
+  /**
+   * Until it reaches an opacity of .2 and
+   * the animation can start again
+   */
+  100% {
+    opacity: .2;
+  }
+}
+
+.saving span {
+  /**
+   * Use the blink animation, which is defined above
+   */
+  animation-name: blink;
+  /**
+   * The animation should take 1.4 seconds
+   */
+  animation-duration: 1.4s;
+  /**
+   * It will repeat itself forever
+   */
+  animation-iteration-count: infinite;
+  /**
+   * This makes sure that the starting style (opacity: .2)
+   * of the animation is applied before the animation starts.
+   * Otherwise we would see a short flash or would have
+   * to set the default styling of the dots to the same
+   * as the animation. Same applies for the ending styles.
+   */
+  animation-fill-mode: both;
+}
+
+.saving span:nth-child(2) {
+  /**
+   * Starts the animation of the third dot
+   * with a delay of .2s, otherwise all dots
+   * would animate at the same time
+   */
+  animation-delay: .2s;
+}
+
+.saving span:nth-child(3) {
+  /**
+   * Starts the animation of the third dot
+   * with a delay of .4s, otherwise all dots
+   * would animate at the same time
+   */
+  animation-delay: .4s;
+}

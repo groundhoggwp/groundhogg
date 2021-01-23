@@ -19,7 +19,9 @@ const TagPicker = ({ selectProps, textFieldProps, onChange, selected, isCreatabl
   const { options, isLoading } = useSelect((select) => {
     const store = select(TAGS_STORE_NAME)
     return {
-      options: store.getItems(),
+      options: store.getItems({
+        where: select.length > 0 ? [[ 'tag_id', 'IN', selected ]] : {}
+      }),
       isLoading: store.isItemsRequesting()
     }
   }, [])
@@ -58,13 +60,9 @@ const TagPicker = ({ selectProps, textFieldProps, onChange, selected, isCreatabl
       options={options}
       onChange={onChange}
       getOptionLabel={(option) => option.data.tag_name}
-      // getOptionSelected={(option, value) => {
-      //   console.debug( option, value )
-      //   return value.find( v => option.ID === v.ID )
-      // }}
       onInputChange={(e, value) => setSearch(value)}
       inputValue={search}
-      value={selected||[]}
+      value={options.filter( option => selected.includes( option.ID ) )}
       filterSelectedOptions
       renderInput={(params) => (
         <TextField

@@ -1,0 +1,125 @@
+@import "../../master";
+
+body.disable-scrolling {
+  height: 100vh;
+  overflow-y: hidden;
+  padding-right: 15px;
+}
+
+.groundhogg-funnel-editor{
+  max-width: 1000px;
+  margin: auto;
+  margin-top: 20px;
+  width: 100%;
+  padding-bottom: 40px;
+}
+
+#screen-meta-links{
+  display: none;
+}
+
+#wpcontent{
+  padding: 0 !important;
+}
+
+#wpwrap{
+  background-color: $background-color;
+}
+
+.gh-box {
+  position: relative;
+  border: 1px solid $border-color;
+  //box-shadow: 0 1px 1px rgba(0,0,0,.04);
+  background-color: $background-color-light;
+
+  //-moz-background-clip: padding;
+  //-webkit-background-clip: padding-box;
+  //background-clip: padding-box;
+}
+
+.round-borders{
+  border-radius: 3px;
+}
+
+.items-grid .grid-item {
+  display: inline-block;
+  vertical-align: top;
+  box-sizing: border-box;
+  float: left;
+  overflow: hidden;
+  margin: 0 16px 16px 0;
+}
+
+@media only screen and (max-width: 800px) {
+  .items-grid .grid-item {
+    display: block;
+    width: 100%;
+    margin-right: 0;
+  }
+}
+
+
+@media only screen and (max-width: 1300px) and (min-width: 800px) {
+  .items-grid .grid-item {
+    width: calc(50% - 8px);
+  }
+
+  .items-grid .grid-item:nth-child(2n+1)::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+
+  .items-grid .grid-item:nth-child(2n+2) {
+    margin-right: 0;
+  }
+}
+
+@media only screen and (min-width: 1300px) and (max-width: 1800px) {
+  .items-grid .grid-item {
+    width: calc(33% - 10px);
+  }
+
+  .items-grid .grid-item:nth-child(3n+1)::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+
+  .items-grid .grid-item:nth-child(3n) {
+    width: 33%;
+    margin-right: 0;
+  }
+}
+
+@media only screen and (min-width: 1800px) {
+  .items-grid .grid-item {
+    width: calc(25% - 16px);
+  }
+
+  .items-grid .grid-item:nth-child(4n+1)::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+
+  .items-grid .grid-item:nth-child(4n) {
+    width: 25%;
+    margin-right: 0;
+  }
+}
+
+.alert-warning.edit-while-active{
+
+  border-radius: 0;
+
+  p{
+    margin: 0;
+  }
+}
+
+.Groundhogg{
+  .progress{
+    border-radius: 0;
+  }
+}

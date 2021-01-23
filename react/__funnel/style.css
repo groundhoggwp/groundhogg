@@ -1,0 +1,22 @@
+#screen-meta-links{
+    display: none;
+}
+
+#wpcontent{
+    padding: 0 !important;
+}
+
+.gh-box {
+    position: relative;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    background: #fff;
+
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+}
+
+.round-borders{
+    border-radius: 3px;
+}

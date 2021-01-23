@@ -9,7 +9,7 @@ import { render } from '@wordpress/element';
  * Internal dependencies
  */
 import { PageLayout } from './components/layout';
-import FunnelEditor from 'components/layout/pages/funnels/FunnelEditor'
+import { FunnelEditorNew } from 'components/layout/pages/funnelEditor'
 
 import {
 	withCurrentUserHydration,
@@ -20,8 +20,8 @@ import { EmailEditor } from 'components/layout/pages/emails/email-editor'
 import { ReportsPage } from 'components/layout/pages/reporting'
 
 const componentMap = {
-	full : PageLayout,
-	gh_funnels : FunnelEditor,
+	// full : PageLayout,
+	gh_funnels : FunnelEditorNew,
 	gh_reporting: ReportsPage,
 	gh_emails: EmailEditor,
 }

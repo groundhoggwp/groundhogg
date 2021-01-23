@@ -86,7 +86,6 @@ class Step_Edges extends DB {
 			'from_id'   => '%d',
 			'to_id'     => '%d',
 			'funnel_id' => '%d',
-			'path'      => '%s'
 		);
 	}
 
@@ -101,7 +100,6 @@ class Step_Edges extends DB {
 			'from_id'   => 0,
 			'to_id'     => 0,
 			'funnel_id' => 0,
-			'path'      => ''
 		);
 	}
 
@@ -173,7 +171,6 @@ class Step_Edges extends DB {
 		from_id bigint(20) unsigned NOT NULL,
 		to_id bigint(20) unsigned NOT NULL,
 		funnel_id bigint(20) unsigned NOT NULL,
-		path varchar(20) NOT NULL,
 		PRIMARY KEY (from_id,to_id,path),
 		KEY from_id (from_id),
 		KEY to_id (to_id),

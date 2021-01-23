@@ -1,0 +1,63 @@
+@import "../../colors";
+
+.getting-started {
+  display: flex;
+  flex-direction: column;
+
+  .welcome-message {
+    padding: 40px 0 20px 0;
+    margin: auto;
+  }
+
+  .welcome-section{
+    max-width: 1000px;
+    width: 100%;
+    margin: auto;
+
+    //&:not(:last-child){
+      margin-bottom: 30px;
+    //}
+  }
+
+  .welcome-nav{
+    width: 100%;
+
+    ul{
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+
+      li {
+
+        //margin: 3px;
+        //padding: 8px 12px;
+        //border-radius: 5px;
+        //transition: 0.2s;
+        //background-color: $background-color-groundhogg;
+
+      //  &:hover{
+      //    background-color: $background-color-hover;
+      //    transition: 0.2s;
+      //  }
+      //
+      //  a {
+      //    //color: $font-color;
+      //    color: $font-color-groundhogg;
+      //    text-decoration: none;
+      //  }
+      }
+    }
+  }
+
+  .welcome-videos {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    .video-card {
+      &:not(:last-child) {
+        margin-right: 20px;
+      }
+    }
+  }
+}
