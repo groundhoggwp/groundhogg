@@ -15,6 +15,21 @@ export const getItem = ( state, id=false ) => {
 };
 
 /**
+ * Get an item from the items cache if it exists
+ *
+ * @param state
+ * @param id
+ * @returns {boolean|*}
+ */
+export const getItemFromCache = ( state, id=false  ) => {
+	if ( id && state.cache ){
+		return state.cache.find( _item => _item.ID === id ) || state.item;
+	}
+
+	return false;
+}
+
+/**
  * Get items from state tree.
  *
  * @param {Object} state - Reducer state
@@ -23,6 +38,16 @@ export const getItems = ( state ) => {
 
 	return state.items;
 };
+
+/**
+ * Get from the items cache
+ *
+ * @param state
+ * @returns {*}
+ */
+export const getItemsCache = (state) => {
+	return state.cache;
+}
 
 /**
  * Get the most recently created items

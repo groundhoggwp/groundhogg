@@ -1,15 +1,16 @@
 import { parseArgs } from 'utils/core'
-import Chip from '@material-ui/core/Chip'
-import Autocomplete from '@material-ui/lab/Autocomplete'
-import { makeStyles } from '@material-ui/core/styles'
+import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete'
 import TextField from '@material-ui/core/TextField'
 import { useDispatch, useSelect } from '@wordpress/data'
 import { TAGS_STORE_NAME } from 'data/tags'
 import { useEffect, useState } from '@wordpress/element'
 import { useDebounce } from 'utils/index'
 import CircularProgress from '@material-ui/core/CircularProgress'
+import { isString } from '@material-ui/data-grid'
 
-const TagPicker = ({ selectProps, textFieldProps, onChange, selected, isCreatable }) => {
+const filter = createFilterOptions()
+
+const TagPicker = ({ selectProps, onChange, selected, isCreatable }) => {
 
   selectProps = parseArgs(selectProps || {}, {
     multiple: true,
@@ -19,13 +20,12 @@ const TagPicker = ({ selectProps, textFieldProps, onChange, selected, isCreatabl
   const { options, isLoading } = useSelect((select) => {
     const store = select(TAGS_STORE_NAME)
     return {
-      options: store.getItems({
-        where: select.length > 0 ? [[ 'tag_id', 'IN', selected ]] : {}
-      }),
+      options: store.getItemsCache(),
       isLoading: store.isItemsRequesting()
     }
   }, [])
-  const { fetchItems } = useDispatch(TAGS_STORE_NAME)
+
+  const { fetchItems, createItem, createItems } = useDispatch(TAGS_STORE_NAME)
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 250)
@@ -36,6 +36,7 @@ const TagPicker = ({ selectProps, textFieldProps, onChange, selected, isCreatabl
     })
   }
 
+  // Load new search results
   useEffect(() => {
       if (open) {
         __fetchItems()
@@ -44,9 +45,70 @@ const TagPicker = ({ selectProps, textFieldProps, onChange, selected, isCreatabl
     [debouncedSearch]
   )
 
+  // Load selected
+  useEffect(() => {
+      __fetchItems({
+        where: selected.length > 0 ? [['tag_id', 'IN', selected]] : {}
+      })
+    },
+    []
+  )
+
+  /**
+   * Add any new text options that are not INT based
+   *
+   * @param e
+   * @param value
+   * @param reason
+   * @returns {Promise<void>}
+   */
+  const handleOnChange = async (e, value, reason) => {
+
+    const tagIds = value.map(tag => {
+      return tag.ID
+    })
+
+    // new text option
+    const newTags = tagIds.filter(tagId => isString(tagId))
+
+    if ( newTags.length > 0 ){
+      const result = await createItems(newTags.map(tagName => {
+        return {
+          data: {
+            tag_name: tagName
+          }
+        }
+      }))
+
+      const newTagIds = result.items.map( tag => tag.ID )
+
+      tagIds.push(...newTagIds)
+    }
+
+    onChange(tagIds.filter( id => ! isString( id ) ) )
+
+    setSearch('')
+  }
+
+  const filterOptions = (options, params) => {
+    const filtered = filter(options, params)
+
+    if (params.inputValue !== '' && filtered.length === 0) {
+      filtered.push({
+        ID: params.inputValue,
+        data: {
+          tag_name: `Add "${params.inputValue}"`
+        }
+      })
+    }
+
+    return filtered
+  }
+
   return (
 
     <Autocomplete
+      key={'tag-picker'}
       {...selectProps}
       fullWidth
       open={open}
@@ -56,18 +118,22 @@ const TagPicker = ({ selectProps, textFieldProps, onChange, selected, isCreatabl
       onClose={() => {
         setOpen(false)
       }}
+      selectOnFocus
+      clearOnBlur
+      freeSolo
+      handleHomeEndKeys
+      filterSelectedOptions
       loading={isLoading}
       options={options}
-      onChange={onChange}
-      getOptionLabel={(option) => option.data.tag_name}
-      onInputChange={(e, value) => setSearch(value)}
       inputValue={search}
-      value={options.filter( option => selected.includes( option.ID ) )}
-      filterSelectedOptions
+      onChange={handleOnChange}
+      filterOptions={filterOptions}
+      onInputChange={(e, value, reason) => { reason !== 'reset' && setSearch(value) }}
+      getOptionLabel={(option) => option.data.tag_name}
+      value={options.filter(option => selected.includes(option.ID))}
       renderInput={(params) => (
         <TextField
           {...params}
-          {...textFieldProps}
           variant="outlined"
           label="Select Tags"
           placeholder="Tag Name"

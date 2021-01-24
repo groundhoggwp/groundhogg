@@ -5,8 +5,28 @@ import TagPicker from 'components/core-ui/tag-picker'
 import { useDispatch } from '@wordpress/data'
 import { TAGS_STORE_NAME } from 'data/tags'
 import { useEffect, useState } from '@wordpress/element'
+import { makeStyles } from '@material-ui/core/styles'
+import Box from '@material-ui/core/Box'
 
 const STEP_TYPE = 'tag_applied'
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(1),
+  }
+}))
+
+const SettingsRow = ({children}) => {
+
+  const classes = useStyles()
+
+  return (<>
+    <Box className={classes.root}>
+      {children}
+    </Box>
+  </>)
+}
 
 const stepAtts = {
 
@@ -28,16 +48,20 @@ const stepAtts = {
 
     const { tag_ids } = settings
 
-    const handleTagsChosen = (e, tags) => {
+    const handleTagsChosen = (tagIds) => {
 
       updateSettings({
         ...settings,
-        tag_ids: tags.map(tag => tag.ID)
+        tag_ids: tagIds
       })
     }
 
     return <>
-      <TagPicker selected={tag_ids || []} onChange={handleTagsChosen}/>
+      <SettingsRow>
+        <TagPicker selected={tag_ids || []} onChange={handleTagsChosen}/>
+      </SettingsRow>
+      <SettingsRow>
+      </SettingsRow>
     </>
   }
 }
