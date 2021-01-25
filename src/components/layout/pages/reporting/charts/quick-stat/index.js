@@ -1,104 +1,105 @@
-import { registerChartType } from 'data/reports-registry'
-import Card from '@material-ui/core/Card'
-import { makeStyles } from '@material-ui/core/styles'
-import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp'
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown'
-import { isObject } from 'utils/core'
+import React from 'react';
+import clsx from 'clsx';
+import PropTypes from 'prop-types';
+import {
+  Avatar,
+  Box,
+  Card,
+  Typography,
+  makeStyles
+} from '@material-ui/core';
+import Label from '../../../../../core-ui/label/';
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    // display: 'inline-block',
-    position: 'relative'
+    padding: theme.spacing(3),
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between'
   },
-  title: {
-    display: 'block',
-    fontSize: '18px',
-    textTransform: 'capitalize',
-    padding: '10px 5px 5px 10px',
-    // color: '#ffffff',
-    // background: theme.palette.primary.main,
-    marginBottom: '10px'
+  label: {
+    marginLeft: theme.spacing(1)
   },
-  current: {
-    fontSize: '50px',
-    fontWeight: 900
-  },
-  compareArrow: {
-    position: 'absolute',
-    left: '-7px',
-    bottom: '-15px',
-    fontSize: '50px'
-  },
-  compare: {
-    position: 'absolute',
-    left: '85px',
-    bottom: '0',
-    fontSize: '12px'
-    // fontWeight: 900
-  },
-  percent: {
-    position: 'absolute',
-    // left: '-45px',
-    bottom: '-2px',
-    fontSize: '18px',
-    fontWeight: 700
+  avatar: {
+    backgroundColor: theme.palette.secondary.main,
+    color: theme.palette.secondary.contrastText,
+    height: 48,
+    width: 48
   }
-}))
+}));
 
 const dummyData = {
-  chart: {
-    data: {
-      current: 0,
-      compare: 0
-    },
-    number: 0,
+  chart : {
+    data : [
+
+    ],
+    number : 1,
     compare: {
-      text: '',
-      percent: true,
-      arrow: {
-        direction: 'up',
-        color: 'green',
-      }
+      percent: '99%'
     }
   }
 }
 
-export const QuickStat = ({ id, title, data, loading }) => {
-
-  const classes = useStyles()
-
+export const QuickStat = ({ className,  title, data, icon, loading, ...rest }) => {
   const chartData = loading ? dummyData : data
+  console.log(icon)
+  const classes = useStyles();
 
-  // console.debug( chartData )
+  const { current, compare } = chartData.chart.data;
+  const { number } = chartData.chart.number;
 
-  const { current, compare } = chartData.chart.data
-  const { number } = chartData.chart.number
-
-  const { text, percent } = chartData.chart.compare
-  const { direction, color } = chartData.chart.compare.arrow
-
-  const percentPosition = (-15 * (percent.length - 1) - 5) + 'px'
-  const arrow = direction === 'up' ? <ArrowDropUpIcon style={{ color }} className={classes.compareArrow}/> :
-    <ArrowDropDownIcon style={{ color }} className={classes.compareArrow}/>
+  let { percent } = chartData.chart.compare;
+  percent = parseInt(percent.replace('%', ''));
 
   return (
-    <Card className={classes.root}>
-      <div className={classes.title}>
-        {title}
-      </div>
-      <div className={classes.current}>
-        {current}
-      </div>
-      <div className={classes.currentMetric}>
-        {number}
-      </div>
-      {arrow}
-      <div className={classes.compare}>
-        <div style={{ left: percentPosition }} className={classes.percent}>{percent}</div>
-        {text}
-      </div>
+    <Card
+      className={clsx(classes.root, className)}
+      {...rest}
+    >
+      <Box flexGrow={1}>
+        <Typography
+          component="h3"
+          gutterBottom
+          variant="overline"
+          color="textSecondary"
+        >
+          {title}
+        </Typography>
+        <Box
+          display="flex"
+          alignItems="center"
+          flexWrap="wrap"
+        >
+          <Typography
+            variant="h3"
+            color="textPrimary"
+          >
+            {data.currency}
+            {current}
+          </Typography>
+          <Label
+            className={classes.label}
+            color={percent > 0 ? 'success' : 'error'}
+          >
+            {percent > 0 ? '+' : '-'}
+            {percent}
+            %
+          </Label>
+        </Box>
+      </Box>
+      <Avatar className={classes.avatar}>
+        {icon}
+      </Avatar>
     </Card>
-  )
-}
+  );
+};
 
-registerChartType('quick_stat', QuickStat)
+QuickStat.propTypes = {
+  className: PropTypes.string,
+  title: PropTypes.string,
+  data: PropTypes.object,
+  loading: PropTypes.Boolean,
+  icon: PropTypes.object
+};
+
+export default QuickStat;

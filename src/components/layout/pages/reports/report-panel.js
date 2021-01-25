@@ -15,7 +15,7 @@ import AttachMoneyIcon from '@material-ui/icons/AttachMoney'
 import Spinner from "../../../core-ui/spinner";
 import { REPORTS_STORE_NAME } from "../../../../data/reports";
 import Chart from "../../../core-ui/chart";
-import StatsCard from "../../../core-ui/stats-card";
+// import StatsCard from "../../../core-ui/stats-card";
 import ReportTable from "../../../core-ui/report-table";
 import DatePicker from "../../../core-ui/date-picker";
 
@@ -102,7 +102,7 @@ export default ({ key, reportList, dateChange, startDate, endDate }) => {
             const { gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd, fullWidth } = reportList[i];
 
             if (type === "quick_stat") {
-              return <StatsCard title={title} id={reportKey} data={reports[reportKey]} icon={<AttachMoneyIcon />} />;
+              // return <StatsCard title={title} id={reportKey} data={reports[reportKey]} icon={<AttachMoneyIcon />} />;
             } else if (type === "table") {
               return <ReportTable title={title} id={reportKey} data={reports[reportKey]} fullWidth={fullWidth}/>;
             } else if(type === "doughnut" || type === "line" || type === "bar" ) {

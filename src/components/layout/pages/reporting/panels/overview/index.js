@@ -3,6 +3,7 @@ import Grid from '@material-ui/core/Grid'
 import { Box } from '@material-ui/core'
 import { LineChart } from 'components/layout/pages/reporting/charts/line-chart'
 import { QuickStat } from 'components/layout/pages/reporting/charts/quick-stat'
+import ContactMailIcon from '@material-ui/icons/ContactMail';
 
 registerReportsPanel('overview', {
 
@@ -38,6 +39,7 @@ registerReportsPanel('overview', {
               id={'total_new_contacts'}
               data={!isLoading ? total_new_contacts : {}}
               loading={isLoading}
+              icon={<ContactMailIcon/>}
             />
           </Grid>
           <Grid item xs={4}>
@@ -46,6 +48,7 @@ registerReportsPanel('overview', {
               id={'total_new_contacts'}
               data={!isLoading ? total_new_contacts : {}}
               loading={isLoading}
+              icon={<ContactMailIcon/>}
             />
           </Grid>
           <Grid item xs={4}>
@@ -54,6 +57,7 @@ registerReportsPanel('overview', {
               id={'total_new_contacts'}
               data={!isLoading ? total_new_contacts : {}}
               loading={isLoading}
+              icon={<ContactMailIcon/>}
             />
           </Grid>
         </Grid>
@@ -61,4 +65,3 @@ registerReportsPanel('overview', {
     )
   }
 })
-
