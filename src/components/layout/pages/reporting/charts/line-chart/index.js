@@ -1,59 +1,93 @@
-import { registerChartType } from 'data/reports-registry'
-// import lineChartConfig from 'components/core-ui/chart/chart-config/line-chart-config'
-import Chartjs from 'chart.js'
-import Card from '@material-ui/core/Card'
-import { useRef, useState, useEffect } from '@wordpress/element'
-import { makeStyles } from '@material-ui/core/styles'
-import { isObject } from 'utils/core'
-import CardContent from '@material-ui/core/CardContent'
-import Typography from '@material-ui/core/Typography'
+import React from 'react';
+import clsx from 'clsx';
+import PropTypes from 'prop-types';
+import PerfectScrollbar from 'react-perfect-scrollbar';
+import {
+  Box,
+  Card,
+  CardHeader,
+  CardContent,
+  Divider,
+  makeStyles
+} from '@material-ui/core';
+// import GenericMoreButton from 'src/components/GenericMoreButton';
+import Chart from './Chart';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    // padding: theme.spacing(2)
-  },
-  loading: {
-    filter: 'blur(5px)'
-  },
-  chartContainer: {
-    position: 'relative',
-    height: 300,
-    width: '100%'
+const useStyles = makeStyles(() => ({
+  root: {},
+  chart: {
+    height: '100%'
   }
-}))
+}));
 
-export const LineChart = ({ id, title, report, loading }) => {
-  // const [chartInstance, setChartInstance] = useState(null);
-  const classes = useStyles()
+export const LineChart = ({ className, title, data, loading, ...rest }) => {
 
-  const chartContainer = useRef(null)
-  const { chart } = report
-
-  // const chartConfig = {
-  //   ...lineChartConfig,
-  //   data: isObject(chart) ? chart.data : {}
-  // }
-
-  useEffect(() => {
-    if (chartContainer && chartContainer.current) {
-      // const newChartInstance = new Chartjs(chartContainer.current, chartConfig)
+  console.log('here', data, rest, loading)
+  if(loading){
+    return <div/>
+  }
+  // const {chart} = data;
+  console.log(data.chart.data.labels)
+  console.log(data.chart)
+  console.log(data.chart.data)
+  console.log(data.chart.data.datasets)
+  const classes = useStyles();
+  const performance = {
+    thisWeek: {
+      data: [],
+      labels: []
+    },
+    thisMonth: {
+      data: [],
+      labels: []
+    },
+    thisYear: {
+      data: [10, 5, 11, 20, 13, 28, 18, 4, 13, 12, 13, 5],
+      labels: [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec'
+      ]
     }
-  }, [report, chartContainer])
-
-  console.log('asdfasdfasdfasdf')
+  };
 
   return (
-    <Card className={classes.root}>
+    <Card
+      className={clsx(classes.root, className)}
+      {...rest}
+    >
+      <CardHeader
+        action={<div />}
+        title={title}
+      />
+      <Divider />
       <CardContent>
-        <Typography variant="h5" component="h2">
-          {title}
-        </Typography>
-        <div className={classes.chartContainer}>
-          <canvas width={'100%'} height={300} className={`Chart__canvas ${id}`} ref={chartContainer}/>
-        </div>
+        <PerfectScrollbar>
+          <Box
+            height={375}
+            minWidth={500}
+          >
+            <Chart
+              className={classes.chart}
+              datasets={data.chart.data.datasets}
+              labels={performance.thisYear.labels}
+            />
+          </Box>
+        </PerfectScrollbar>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-registerChartType('line_chart', LineChart)
+LineChart.propTypes = {
+  className: PropTypes.string
+};
