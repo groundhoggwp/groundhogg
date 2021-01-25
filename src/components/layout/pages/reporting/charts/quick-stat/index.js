@@ -40,13 +40,9 @@ const dummyData = {
   }
 }
 
-export const QuickStat = ({ className,  title, data, loading, ...rest }) => {
-  // export const QuickStat = ({ className, title, data, icon, ...rest }) => { 
-
-  const icon = <div/>;
-
+export const QuickStat = ({ className,  title, data, icon, loading, ...rest }) => {
   const chartData = loading ? dummyData : data
-
+  console.log(icon)
   const classes = useStyles();
 
   const { current, compare } = chartData.chart.data;
