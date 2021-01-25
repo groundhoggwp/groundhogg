@@ -90,6 +90,9 @@ class Steps extends DB {
 			'last_edited_by' => '%s',
 			'last_edited'    => '%s',
 			'date_created'   => '%s',
+
+			'branch'         => '%s', // This is essentially another step ID or main
+			'path'           => '%s', // Which path the step is in
 		);
 	}
 
@@ -110,6 +113,9 @@ class Steps extends DB {
 			'last_edited_by' => '',
 			'last_edited'    => current_time( 'mysql' ),
 			'date_created'   => current_time( 'mysql' ),
+
+			'branch'         => '', // This is essentially another step ID or main
+			'path'           => '', // Which path the step is in
 		);
 	}
 
@@ -146,8 +152,6 @@ class Steps extends DB {
 	 */
 	public function create_table() {
 
-		global $wpdb;
-
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
 		$sql = "CREATE TABLE " . $this->table_name . " (
@@ -160,6 +164,8 @@ class Steps extends DB {
 		last_edited_by varchar(20) NOT NULL,
 		date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		last_edited datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+		branch varchar({$this->get_max_index_length()}) NOT NULL,
+		path varchar({$this->get_max_index_length()}) NOT NULL,
 		PRIMARY KEY  (ID)
 		) {$this->get_charset_collate()};";
 

@@ -1,0 +1,71 @@
+@import "master";
+
+$grid-color: #eeeff3;
+
+body {
+  background-color: $background-color;
+  //background-attachment: fixed;
+  //background-image: linear-gradient($grid-color 1px, transparent 1px), linear-gradient(90deg, $grid-color 1px, transparent 1px);
+  //background-size: 3em 3em;
+}
+
+input[type="text"],
+input[type="url"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="date"],
+input[type="time"],
+input[type="search"],
+input[type="datetime-local"],
+select,
+textarea
+{
+  //display: block;
+  //width: 100%;
+  height: auto;
+  padding: 6px 2px 6px 8px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid $border-color;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+
+  &:focus{
+    color: #495057;
+    background-color: #fff;
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+  }
+
+  &:disabled, &[readonly] {
+    background-color: #e9ecef;
+    opacity: 1;
+  }
+}
+
+.alignright{
+  float: right;
+}
+
+.description{
+  font-style: italic;
+  font-size: 14px;
+  color: #666;
+}
+
+.wp-clearfix{
+  content: "";
+  clear: both;
+  display: table;
+}
+
+iframe{
+  border: none;
+}

@@ -9,6 +9,7 @@ const reducer = (
   {
     type,
     items,
+    cache,
     item,
     itemIds,
     itemId,
@@ -26,12 +27,14 @@ const reducer = (
         ...state,
         item: item,
         items: [item, ...state.items],
+        cache: [item, ...state.cache],
       }
       break
     case TYPES.CREATE_ITEMS:
       state = {
         ...state,
         items: [...items, ...state.items],
+        cache: [...items, ...state.cache],
         createdItems: items,
       }
       break
@@ -54,6 +57,7 @@ const reducer = (
       state = {
         ...state,
         item: item,
+        cache: [ ...[item].filter( _item => ! state.cache.find( __item => __item.ID === _item.ID ) ), ...state.cache ]
       }
       break
     case TYPES.RECEIVE_ITEMS:
@@ -61,6 +65,7 @@ const reducer = (
         ...state,
         items,
         totalItems,
+        cache: [ ...items.filter( _item => ! state.cache.find( __item => __item.ID === _item.ID ) ), ...state.cache ]
       }
       break
     case TYPES.SET_IS_REQUESTING:
@@ -83,12 +88,15 @@ const reducer = (
         ...state,
         item: item,
         items: state.items.map(_item => _item.ID === item.ID ? item : _item),
+        cache: state.cache.map(_item => _item.ID === item.ID ? item : _item),
       }
       break
     case TYPES.UPDATE_ITEMS:
       state = {
         ...state,
         items: state.items.map(
+          _item => items.find(__item => _item.ID === __item.ID) || _item),
+        cache: state.cache.map(
           _item => items.find(__item => _item.ID === __item.ID) || _item),
         updatedItems: items,
       }
@@ -112,6 +120,7 @@ const reducer = (
       state = {
         ...state,
         items: state.items.filter(existing => existing.ID !== itemId),
+        cache: state.cache.filter(existing => existing.ID !== itemId),
         totalItems: state.totalItems - 1,
       }
       break
@@ -119,6 +128,7 @@ const reducer = (
       state = {
         ...state,
         items: state.items.filter(existing => itemIds.indexOf(existing.ID) < 0),
+        cache: state.cache.filter(existing => itemIds.indexOf(existing.ID) < 0),
         totalItems: state.totalItems - itemIds.length,
       }
       break

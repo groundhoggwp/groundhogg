@@ -1,9 +1,7 @@
 import { registerChartType } from 'data/reports-registry'
 
-registerChartType( 'donut_chart', {
+export const DonutChart = ({}) => {
 
-  layout : ( { title, data } ) => {
+}
 
-  }
-
-} )
+registerChartType( 'donut_chart', DonutChart );

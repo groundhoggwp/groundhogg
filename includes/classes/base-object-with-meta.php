@@ -113,10 +113,13 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	public function update( $data = [], $meta=[] ) {
 		$updated = parent::update( $data );
 
-		if ( $updated && $meta && is_array( $meta ) ){
+		if ( ! empty( $meta ) && is_array( $meta ) ){
+
 			foreach ( $meta as $key => $value ) {
 				$this->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
 			}
+
+			$updated = true;
 		}
 
 		return $updated;
@@ -133,8 +136,6 @@ abstract class Base_Object_With_Meta extends Base_Object {
 		}
 
 		$meta = $this->get_meta_db()->get_meta( $this->get_id() );
-
-//        var_dump( $meta );
 
 		if ( ! $meta ) {
 			return [];

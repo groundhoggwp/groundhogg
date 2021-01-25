@@ -33,7 +33,7 @@ class API_V4_HANDLER {
 		do_action( 'groundhogg/api/v4/init', $this );
 
 		// Todo remove this after done testing
-		sleep( 1 );
+//		sleep( 1 );
 
 	}
 

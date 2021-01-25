@@ -71,18 +71,15 @@ class Funnels_Api extends Base_Object_Api {
 			$new_edge = wp_parse_args( $new_edge, [
 				'from' => '',
 				'to'   => '',
-				'path' => '',
 			] );
 
 			$from_id = $new_edge['from'] === self::NEW_STEP ? $step->get_id() : absint( $new_edge['from'] );
 			$to_id   = $new_edge['to'] === self::NEW_STEP ? $step->get_id() : absint( $new_edge['to'] );
-			$path    = sanitize_text_field( $new_edge['path'] );
 
 			$this->get_edges_db()->add( [
 				'funnel_id' => $step->get_funnel_id(),
 				'from_id'   => $from_id,
 				'to_id'     => $to_id,
-				'path'      => $path,
 			] );
 		}
 
@@ -91,18 +88,15 @@ class Funnels_Api extends Base_Object_Api {
 			$edge = wp_parse_args( $edge, [
 				'from' => '',
 				'to'   => '',
-				'path' => '',
 			] );
 
 			map_func_to_attr( $edge, 'from', 'absint' );
 			map_func_to_attr( $edge, 'to', 'absint' );
-			map_func_to_attr( $edge, 'path', 'sanitize_text_field' );
 
 			$this->get_edges_db()->delete( [
 				'funnel_id' => $step->get_funnel_id(),
 				'from_id'   => $edge['from'],
 				'to_id'     => $edge['to'],
-				'path'      => $edge['path'],
 			] );
 		}
 	}
@@ -154,8 +148,6 @@ class Funnels_Api extends Base_Object_Api {
 
 		$data = $request->get_param( 'data' );
 		$meta = $request->get_param( 'meta' );
-
-		$edges = $request->get_param( 'edges' );
 
 		$step = new Step( $step_id );
 

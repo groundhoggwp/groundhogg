@@ -102,6 +102,16 @@ export function number_format (number) {
 }
 
 /**
+ * Remove the slash from a path
+ *
+ * @param path
+ * @returns {*}
+ */
+export function unSlash ( path ){
+  return path.slice(-1) === '/' ? path.slice(0, -1) : path;
+}
+
+/**
  * Deep mapping for the objects
  */
 
@@ -113,6 +123,16 @@ export function number_format (number) {
 export function isObject (item) {
   return (item && typeof item === 'object' && !Array.isArray(item))
 }
+
+// export function isEmpty(foo){
+//   const type = typeof foo
+//   switch (type) {
+//     case 'object':
+//       return
+//   }
+//
+//   return false
+// }
 
 /**
  * Deep merge two objects.

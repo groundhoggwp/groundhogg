@@ -293,6 +293,7 @@ class React_App {
 
 //		wp_enqueue_style( 'fa-icons', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css' );
 		wp_dequeue_script( 'groundhogg-admin' );
+		wp_deregister_script( 'groundhogg-admin' );
 
 		do_action( 'enqueue_groundhogg_react_assets_scripts' );
 	}

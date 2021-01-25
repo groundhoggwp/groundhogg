@@ -12,7 +12,7 @@ class Scripts {
 	 * Script handles that should be treated as modules
 	 */
 	protected $module_handles = [
-		'groundhogg-admin'
+//		'groundhogg-admin'
 	];
 
 	public function __construct() {
@@ -239,7 +239,6 @@ class Scripts {
 			GROUNDHOGG_URL . 'build/index.js',
 			array_merge( [
 				'wp-core-data',
-//				'groundhogg-admin',
 			], (array)$asset_file['dependencies'] ),
 			$asset_file['version'],
 			true

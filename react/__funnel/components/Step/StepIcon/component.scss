@@ -1,0 +1,23 @@
+@import "../../../master";
+
+.step-icon-wrap{
+
+  position: absolute;
+  left: -1px;
+  top: -1px;
+
+  &.action-icon-wrap{
+    background: $action-color;
+  }
+
+  &.benchmark-icon-wrap{
+    background: $benchmark-color;
+  }
+
+  img.step-icon{
+    height: 54px;
+    width: 54px;
+    //border-radius: 3px 0 0 3px;
+  }
+
+}

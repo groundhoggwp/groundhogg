@@ -12,6 +12,7 @@ export const INITIAL_STATE = {
   isDeleting: false,
   totalItems: 0,
   items: [],
+  cache: [],
   createdItems: [],
   updatedItems: [],
   item: {},
