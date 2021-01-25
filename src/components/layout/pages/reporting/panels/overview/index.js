@@ -61,4 +61,3 @@ registerReportsPanel('overview', {
     )
   }
 })
-
