@@ -9,8 +9,11 @@ registerReportsPanel('overview', {
 
   name: 'Overview',
   reports: [
-    'chart_new_contacts',
-    'total_new_contacts'
+    'total_new_contacts',
+    'total_confirmed_contacts',
+    'total_engaged_contacts',
+    'total_unsubscribed_contacts',
+    'chart_new_contacts'
   ],
   layout: ({
     reports,
@@ -18,46 +21,58 @@ registerReportsPanel('overview', {
   }) => {
 
     const {
-      chart_new_contacts,
-      total_new_contacts
+      total_new_contacts,
+      total_confirmed_contacts,
+      total_engaged_contacts,
+      total_unsubscribed_contacts,
+      chart_new_contacts
     } = reports
 
     return (
       <Box flexGrow={1}>
         <Grid container spacing={3}>
+          <Grid item xs={3}>
+            <QuickStat
+              title={'Total New Contacts'} i
+              id={'total_new_contacts'}
+              data={!isLoading ? total_new_contacts : {}}
+              loading={isLoading}
+              icon={<ContactMailIcon/>}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <QuickStat
+              title={'Total New Contacts'} i
+              id={'total_confirmed_contacts'}
+              data={!isLoading ? total_confirmed_contacts : {}}
+              loading={isLoading}
+              icon={<ContactMailIcon/>}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <QuickStat
+              title={'Total New Contacts'}
+              id={'total_engaged_contacts'}
+              data={!isLoading ? total_engaged_contacts : {}}
+              loading={isLoading}
+              icon={<ContactMailIcon/>}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <QuickStat
+              title={'Total New Contacts'}
+              id={'total_unsubscribed_contacts'}
+              data={!isLoading ? total_unsubscribed_contacts : {}}
+              loading={isLoading}
+              icon={<ContactMailIcon/>}
+            />
+          </Grid>
           <Grid item xs={12}>
             <LineChart
               title={'New Contacts'}
               id={'chart_new_contacts'}
-              report={!isLoading ? chart_new_contacts : {}}
+              data={!isLoading ? chart_new_contacts : {}}
               loading={isLoading}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <QuickStat
-              title={'Total New Contacts'} i
-              id={'total_new_contacts'}
-              data={!isLoading ? total_new_contacts : {}}
-              loading={isLoading}
-              icon={<ContactMailIcon/>}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <QuickStat
-              title={'Total New Contacts'} i
-              id={'total_new_contacts'}
-              data={!isLoading ? total_new_contacts : {}}
-              loading={isLoading}
-              icon={<ContactMailIcon/>}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <QuickStat
-              title={'Total New Contacts'}
-              id={'total_new_contacts'}
-              data={!isLoading ? total_new_contacts : {}}
-              loading={isLoading}
-              icon={<ContactMailIcon/>}
             />
           </Grid>
         </Grid>
