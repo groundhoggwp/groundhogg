@@ -43,7 +43,7 @@ const useStyles = makeStyles(() => ({
   root: {}
 }));
 
-const PageHeader = ({ className, match, page, ...rest }) => {
+const BreadCrumb = ({ className, match, page, ...rest }) => {
   const classes = useStyles();
   const actionRef = useRef(null);
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -124,8 +124,8 @@ const PageHeader = ({ className, match, page, ...rest }) => {
   );
 };
 
-PageHeader.propTypes = {
+BreadCrumb.propTypes = {
   className: PropTypes.string
 };
 
-export default PageHeader;
+export default BreadCrumb;
