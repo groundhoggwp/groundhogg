@@ -8,6 +8,11 @@ import {
   useTheme
 } from '@material-ui/core';
 
+
+import { createTheme } from '../../../../../../theme';
+const theme = createTheme({});
+
+
 const useStyles = makeStyles(() => ({
   root: {
     position: 'relative'
@@ -21,13 +26,14 @@ const Chart = ({
   ...rest
 }) => {
   const classes = useStyles();
-  const theme = useTheme();
 
   const data = (canvas) => {
     const ctx = canvas.getContext('2d');
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
 
-    gradient.addColorStop(0, fade(theme.palette.secondary.main, 0.2));
+
+    const lineColor = theme.palette.primary.main;
+    gradient.addColorStop(0, fade(lineColor, 0.2));
     gradient.addColorStop(0.9, 'rgba(255,255,255,0)');
     gradient.addColorStop(1, 'rgba(255,255,255,0)');
 
@@ -36,11 +42,11 @@ const Chart = ({
       return   {
           data,
           backgroundColor: gradient,
-          borderColor: theme.palette.secondary.main,
-          pointBorderColor: theme.palette.background.default,
+          borderColor: lineColor,
+          pointBorderColor: lineColor,
           pointBorderWidth: 3,
           pointRadius: 6,
-          pointBackgroundColor: theme.palette.secondary.main
+          pointBackgroundColor: lineColor
         }
     })
     return {
@@ -110,11 +116,11 @@ const Chart = ({
       callbacks: {
         title: () => {},
         label: (tooltipItem) => {
-          let label = `Income: ${tooltipItem.yLabel}`;
+          let label = `Contacts: ${tooltipItem.yLabel}`;
 
-          if (tooltipItem.yLabel > 0) {
-            label += 'K';
-          }
+          // if (tooltipItem.yLabel > 0) {
+          //   label += 'K';
+          // }
 
           return label;
         }
