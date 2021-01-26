@@ -22,15 +22,11 @@ const useStyles = makeStyles(() => ({
 
 export const LineChart = ({ className, title, data, loading, ...rest }) => {
 
-  console.log('here', data, rest, loading)
+
   if(loading){
     return <div/>
   }
-  // const {chart} = data;
-  console.log(data.chart.data.labels)
-  console.log(data.chart)
-  console.log(data.chart.data)
-  console.log(data.chart.data.datasets)
+  
   const classes = useStyles();
   const performance = {
     thisWeek: {
