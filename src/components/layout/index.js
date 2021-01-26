@@ -97,7 +97,7 @@ const Layout = (props) => {
         <TopBar { ...restProps } />
         <SnackbarArea />
         <PrimaryLayout>
-          <BreadCrumb { ...restProps }/>
+          {/*<BreadCrumb { ...restProps }/>*/}
           <Controller { ...restProps } />
         </PrimaryLayout>
       </div>
@@ -126,7 +126,7 @@ const _PageLayout = ( props ) => {
     return (
       <ThemeProvider theme={theme}>
         <BrowserRouter basename={ window.Groundhogg.preloadSettings.basename }>
-          <Switch>            
+          <Switch>
             {
              pages.map((page, index) => {
               return (

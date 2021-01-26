@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     minHeight: '2000px',
     backgroundColor: theme.palette.background.paper,
-    marginTop: '20px',    
+    marginTop: '20px',
   },
   kpiTitle: {
     fontSize: '24px',
@@ -58,25 +58,27 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function ScrollableTabsButtonAuto( { tabs, enableRouting, history, match } ) {
+export default function ScrollableTabsButtonAuto( { tabs, enableRouting } ) {
+// export default function ScrollableTabsButtonAuto( { tabs, enableRouting, history, match } ) {
   let defaultTab = 0;
-  if(enableRouting){
-    const reportRoute = match.params.routeId;
-    tabs.forEach((tab,i)=>{
-      if(tab.route === reportRoute){
-        defaultTab = i
-      }
-    });
-  }
-
+  // if(enableRouting){
+  //   const reportRoute = match.params.routeId;
+  //   tabs.forEach((tab,i)=>{
+  //     if(tab.route === reportRoute){
+  //       defaultTab = i
+  //     }
+  //   });
+  // }
+  //
   const classes = useStyles();
   const [value, setValue] = useState(defaultTab);
 
   const handleChange = (event, newValue) => {
-    setValue(newValue);
-    if(enableRouting){
-      history.push(match.path.replace(':routeId', '')+tabs[newValue].route)
-    }
+    console.log(event, newValue)
+    // setValue(newValue);
+    // if(enableRouting){
+    //   history.push(match.path.replace(':routeId', '')+tabs[newValue].route)
+    // }
   };
 
   return (

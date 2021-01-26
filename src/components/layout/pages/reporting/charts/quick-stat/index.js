@@ -32,7 +32,7 @@ export const QuickStat = ({ className,  title, data, icon, loading, ...rest }) =
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      minHeight: '120px'
+      minHeight: '90px'
     },
     label: {
       marginLeft: theme.spacing(1)
