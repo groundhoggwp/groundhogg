@@ -28,16 +28,18 @@ const Chart = ({
   const classes = useStyles();
 
   const data = (canvas) => {
-    const ctx = canvas.getContext('2d');
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
 
 
-    const lineColor = theme.palette.primary.main;
-    gradient.addColorStop(0, fade(lineColor, 0.2));
-    gradient.addColorStop(0.9, 'rgba(255,255,255,0)');
-    gradient.addColorStop(1, 'rgba(255,255,255,0)');
+    datasets = datasets.map((dataset, i)=>{
+      const ctx = canvas.getContext('2d');
+      const gradient = ctx.createLinearGradient(0, 0, 0, 400);
 
-    datasets = datasets.map((dataset)=>{
+
+      let lineColor = i === 0 ? theme.palette.primary.main : theme.palette.secondary.main;
+      gradient.addColorStop(0, fade(lineColor, 0.2));
+      gradient.addColorStop(0.9, 'rgba(255,255,255,0)');
+      gradient.addColorStop(1, 'rgba(255,255,255,0)');
+
       const data = dataset.data
       return   {
           data,
@@ -67,6 +69,14 @@ const Chart = ({
     },
     scales: {
       xAxes: [
+        // {
+        //     type: 'time',
+        //     time: {
+        //       displayFormats: {
+        //           day: 'MMM D'
+        //       }
+        //     }
+        // },
         {
           gridLines: {
             display: false,
@@ -74,7 +84,10 @@ const Chart = ({
           },
           ticks: {
             padding: 20,
-            fontColor: theme.palette.text.secondary
+            fontColor: theme.palette.text.secondary,
+            callback: (value) => {
+                return new Date(value).toLocaleDateString('de-DE', {month:'short', year:'numeric'});
+            },
           }
         }
       ],
@@ -95,7 +108,7 @@ const Chart = ({
             beginAtZero: true,
             min: 0,
             maxTicksLimit: 7,
-            callback: (value) => (value > 0 ? `${value}K` : value)
+            // callback: (value) => (value > 0 ? `${value}K` : value)
           }
         }
       ]
@@ -116,13 +129,7 @@ const Chart = ({
       callbacks: {
         title: () => {},
         label: (tooltipItem) => {
-          let label = `Contacts: ${tooltipItem.yLabel}`;
-
-          // if (tooltipItem.yLabel > 0) {
-          //   label += 'K';
-          // }
-
-          return label;
+          return `Contacts: ${tooltipItem.yLabel} ${new Date(tooltipItem.xLabel).toLocaleDateString('de-DE', {month:'short', year:'numeric'})}`;
         }
       }
     }

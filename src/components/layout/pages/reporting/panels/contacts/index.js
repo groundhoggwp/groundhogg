@@ -9,7 +9,8 @@ registerReportsPanel('contacts', {
 
   name: 'Contacts',
   reports: [
-    'total_new_contacts'
+    'total_new_contacts',
+    'chart_new_contacts'
   ],
   layout: ({
     reports,
@@ -17,7 +18,8 @@ registerReportsPanel('contacts', {
   }) => {
 
     const {
-      total_new_contacts
+      total_new_contacts,
+      chart_new_contacts
     } = reports
 
     return (
@@ -30,6 +32,14 @@ registerReportsPanel('contacts', {
               data={!isLoading ? total_new_contacts : {}}
               loading={isLoading}
               icon={<ContactMailIcon/>}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <LineChart
+              title={'New Contacts'}
+              id={'chart_new_contacts'}
+              data={!isLoading ? chart_new_contacts : {}}
+              loading={isLoading}
             />
           </Grid>
         </Grid>
