@@ -8,7 +8,7 @@ import { isEmpty, isUndefined } from 'lodash'
 import { FUNNELS_STORE_NAME } from 'data/funnels'
 import FunnelAppBar from './components/FunnelAppBar'
 import ControlsCenter from './components/ControlsCenter'
-import StepsPath from './components/StepsPath'
+import StepsPath from './components/StepFlow'
 import './steps-types'
 
 export const FunnelEditorNew = () => {

@@ -1,33 +1,45 @@
 import LocalOfferIcon from '@material-ui/icons/LocalOffer'
 import {
-  CONDITION,
+  CONDITION, STEP_DEFAULTS
 } from '../../constants'
 import { registerStepType } from 'data/step-type-registry'
 import { makeStyles } from '@material-ui/core/styles'
+import Typography from '@material-ui/core/Typography'
 
 
 const STEP_TYPE = 'yes_no_condition'
 
 const useStyles = makeStyles((theme) => ( {
-  edgeLabel: {
-    background: '#ffffff',
-    padding: theme.spacing(1),
-    border: '1px solid',
-    borderRadius: 3,
+  root : {
+    marginBottom: 30,
   },
-  edgeNo: {
-    background: '#F8D7DA',
-    borderColor: '#f5c6cb',
-    color: '#721c24',
+  icon: {
+    height: 30,
+    width: 30,
+    float: 'left',
   },
-  edgeYes: {
-    background: '#d4edda',
-    borderColor: '#c3e6cb',
-    color: '#155724',
+  read: {
+    marginLeft: 70,
   },
+  actionIcon : {
+    backgroundColor: 'green',
+    borderRadius: 50,
+  },
+  benchmarkIcon : {
+    backgroundColor: 'orange',
+    borderRadius: 5,
+  },
+
+  conditionIcon : {
+    backgroundColor: 'purple',
+    borderRadius: 5,
+    transform: 'rotate(45deg)'
+  }
 } ))
 
 const stepAtts = {
+
+  ...STEP_DEFAULTS,
 
   type: STEP_TYPE,
 
@@ -44,6 +56,24 @@ const stepAtts = {
   edit: ({ data, meta, stats }) => {
     return <></>
   },
+
+  flow: ({ icon, read }) => {
+
+    const classes = useStyles()
+
+    return <>
+      <div className={classes.root}>
+        <div className={classes.icon + ' ' + classes.conditionIcon}>
+          {icon}
+        </div>
+        <div className={classes.read}>
+          <Typography variant={'p'} component={'div'}>
+            {read}
+          </Typography>
+        </div>
+      </div>
+    </>
+  }
 }
 
 registerStepType(STEP_TYPE, stepAtts)
