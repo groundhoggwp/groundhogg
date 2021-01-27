@@ -57,6 +57,22 @@ export function registerStepType ( type, atts ) {
 }
 
 /**
+ *
+ * @param type
+ * @returns {{StepFlow: (boolean|(function({data: *, meta: *, read: *}): *)|STEP_DEFAULTS.flow|(function({data: *, meta: *, icon: *, read: *}): *)|BENCHMARK_TYPE_DEFAULTS.flow|(function({data: *, meta: *, read: *}): *)|*), StepRead: *, StepEdit: *}}
+ */
+export function useStepType ( type ) {
+  const StepType = select(STEP_TYPES_STORE_NAME).getType(type);
+
+  return {
+    StepEdit: StepType.edit,
+    StepRead: StepType.read,
+    StepFlow: StepType.flow,
+    StepIcon: StepType.icon
+  }
+}
+
+/**
  * Get the step type
  *
  * @param type
@@ -64,4 +80,22 @@ export function registerStepType ( type, atts ) {
  */
 export function getStepType ( type ) {
   return select(STEP_TYPES_STORE_NAME).getType(type)
+}
+
+/**
+ *
+ * @param group
+ * @returns {*}
+ */
+export function getStepGroup ( group ) {
+  return select(STEP_TYPES_STORE_NAME).getGroup(group)
+}
+
+/**
+ *
+ * @param group
+ * @returns {*}
+ */
+export function getAllSteps ( group ) {
+  return select(STEP_TYPES_STORE_NAME).getGroup(group)
 }

@@ -1,41 +1,49 @@
-import { useParams } from 'react-router-dom'
-import { FUNNELS_STORE_NAME } from 'data/funnels'
-import { useDispatch, useSelect } from '@wordpress/data'
-import { getStepType } from 'data/step-type-registry'
 import { useTempState } from 'utils/index'
 import Typography from '@material-ui/core/Typography'
 import { Button } from '@material-ui/core'
 import { useEffect } from '@wordpress/element'
 import { objEquals } from 'utils/core'
+import { makeStyles } from '@material-ui/core/styles'
+import { useCurrentStep } from 'components/layout/pages/funnelEditor/utils/hooks'
+import SettingsRow from '../SettingsRow'
+
+const useStyles = makeStyles((theme) => ({
+  actions : {
+    float: 'right'
+  },
+  saveButtons : {
+    '& .MuiButton-root:first-child' :{
+      marginRight: theme.spacing(2)
+    }
+  }
+}))
 
 export default () => {
 
-  const { stepId } = useParams()
+  const classes = useStyles()
 
-  const { step, isUpdating } = useSelect((select) => {
-    const store = select(FUNNELS_STORE_NAME)
-    return {
-      step: store.getStep(parseInt(stepId)),
-      isUpdating: store.isUpdatingStep
-    }
-  }, [stepId])
-
-  const { updateStep, deleteStep } = useDispatch(FUNNELS_STORE_NAME)
-  const { step_type, funnel_id } = step.data
-  const StepType = getStepType(step_type)
+  const { step, funnelId, stepId, isUpdating, StepType, updateStep, deleteStep } = useCurrentStep()
   const { tempState, setTempState, resetTempState } = useTempState(step.meta)
 
   const commitChanges = () => {
-    updateStep(funnel_id, stepId, {
+    updateStep(funnelId, stepId, {
       meta: {
         ...tempState
       }
     })
   }
 
+  // Reset the meta once the step is updated.
   useEffect(() => {
     setTempState(step.meta)
   }, [isUpdating])
+
+  // Cleanup after unmount
+  useEffect(() => {
+    return () => {
+      resetTempState()
+    }
+  }, [])
 
   return (
     <>
@@ -43,10 +51,12 @@ export default () => {
       <div className={'edit-panel'}>
         <StepType.edit data={step.data} settings={tempState} updateSettings={setTempState}/>
         {!objEquals(tempState, step.meta) &&
-        <>
-          <Button onClick={commitChanges} variant={'contained'} color={'primary'}>{'Save Changes'}</Button>
-          <Button onClick={resetTempState} variant={'contained'}>{'Cancel'}</Button>
-        </>
+        <SettingsRow>
+          <div className={classes.saveButtons}>
+            <Button onClick={commitChanges} variant={'contained'} color={'primary'}>{'Save Changes'}</Button>
+            <Button onClick={resetTempState} variant={'contained'}>{'Cancel'}</Button>
+          </div>
+        </SettingsRow>
         }
       </div>
     </>
