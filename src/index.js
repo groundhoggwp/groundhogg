@@ -4,6 +4,7 @@
  */
 import '@wordpress/notices';
 import { render } from '@wordpress/element';
+import { ThemeProvider } from '@material-ui/styles';
 
 /**
  * Internal dependencies
@@ -18,6 +19,16 @@ import {
 // import { Reports } from 'components/layout/pages'
 import { EmailEditor } from 'components/layout/pages/emails/email-editor'
 import { ReportsPage } from 'components/layout/pages/reporting'
+
+import { createTheme } from './theme';
+
+
+const theme = createTheme({
+  // direction: settings.direction,
+  // responsiveFontSizes: settings.responsiveFontSizes,
+  // theme: settings.theme
+});
+
 
 const componentMap = {
 	// full : PageLayout,
@@ -42,4 +53,4 @@ if ( hydrateUser ) {
 	);
 }
 
-render( <HydratedPageLayout />, appRoot );
+render( <ThemeProvider theme={theme}><HydratedPageLayout /></ThemeProvider>, appRoot );

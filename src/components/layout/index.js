@@ -25,7 +25,7 @@ import { Controller } from './controller'
 import navSections from './nav-sections'
 import NavBar from './nav-bar'
 import TopBar from './top-bar'
-import PageHeader from './page-header'
+import BreadCrumb from '../core-ui/bread-crumb'
 import { SnackbarArea } from './snackbar'
 import { withSettingsHydration } from '../../data';
 import Page from "../core-ui/page";
@@ -97,7 +97,7 @@ const Layout = (props) => {
         <TopBar { ...restProps } />
         <SnackbarArea />
         <PrimaryLayout>
-          <PageHeader { ...restProps }/>
+          {/*<BreadCrumb { ...restProps }/>*/}
           <Controller { ...restProps } />
         </PrimaryLayout>
       </div>

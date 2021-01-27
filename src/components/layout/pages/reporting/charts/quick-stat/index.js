@@ -6,27 +6,10 @@ import {
   Box,
   Card,
   Typography,
-  makeStyles
+  makeStyles,
+  useTheme
 } from '@material-ui/core';
 import Label from '../../../../../core-ui/label/';
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    padding: theme.spacing(3),
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between'
-  },
-  label: {
-    marginLeft: theme.spacing(1)
-  },
-  avatar: {
-    backgroundColor: theme.palette.secondary.main,
-    color: theme.palette.secondary.contrastText,
-    height: 48,
-    width: 48
-  }
-}));
 
 const dummyData = {
   chart : {
@@ -42,8 +25,27 @@ const dummyData = {
 
 export const QuickStat = ({ className,  title, data, icon, loading, ...rest }) => {
   const chartData = loading ? dummyData : data
-  console.log(icon)
+
+  const useStyles = makeStyles((theme) => ({
+    root: {
+      padding: theme.spacing(3),
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      minHeight: '90px'
+    },
+    label: {
+      marginLeft: theme.spacing(1)
+    },
+    avatar: {
+      backgroundColor: theme.palette.primary.main,
+      color: theme.palette.secondary.contrastText,
+      height: 48,
+      width: 48
+    }
+  }));
   const classes = useStyles();
+
 
   const { current, compare } = chartData.chart.data;
   const { number } = chartData.chart.number;

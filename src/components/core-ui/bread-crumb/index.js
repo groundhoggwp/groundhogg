@@ -43,7 +43,7 @@ const useStyles = makeStyles(() => ({
   root: {}
 }));
 
-const PageHeader = ({ className, match, page, ...rest }) => {
+const BreadCrumb = ({ className, path, page, ...rest }) => {
   const classes = useStyles();
   const actionRef = useRef(null);
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -58,11 +58,11 @@ const PageHeader = ({ className, match, page, ...rest }) => {
       {...rest}
     >
       <Grid item>
-        <Breadcrumbs
+        {/*<Breadcrumbs
           separator={<NavigateNextIcon fontSize="small" />}
           aria-label="breadcrumb"
         >
-          {match.url.split('/').slice(1).map((urlPart) => {
+          {path.map((urlPart) => {
               return (
                 <Link
                   variant="body1"
@@ -75,13 +75,14 @@ const PageHeader = ({ className, match, page, ...rest }) => {
               );
           })}
 
-        </Breadcrumbs>
+        </Breadcrumbs>*/}
 
         <Typography
           variant="h3"
           color="textPrimary"
         >
-          {page.title}
+          {path[1]}
+          {/*page.title*/}
         </Typography>
       </Grid>
       <Grid item>
@@ -124,8 +125,8 @@ const PageHeader = ({ className, match, page, ...rest }) => {
   );
 };
 
-PageHeader.propTypes = {
+BreadCrumb.propTypes = {
   className: PropTypes.string
 };
 
-export default PageHeader;
+export default BreadCrumb;
