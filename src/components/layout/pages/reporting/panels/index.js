@@ -1,3 +1,7 @@
-// import './donut-chart'
 import './overview'
 import './contacts'
+import './emails'
+import './funnels'
+import './broadcasts'
+import './forms'
+import './pipeline'

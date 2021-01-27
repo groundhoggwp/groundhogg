@@ -108,6 +108,41 @@ const ReportPanel = (props) => {
         component: (classes) => {
           return <div>{panel}</div>
         }
+      },
+      {
+        label: __("Emails"),
+        route: __("emails"),
+        component: (classes) => {
+          return <div>{panel}</div>
+        }
+      },
+      {
+        label: __("Funnels"),
+        route: __("funnels"),
+        component: (classes) => {
+          return <div>{panel}</div>
+        }
+      },
+      {
+        label: __("Broadcasts"),
+        route: __("broadcasts"),
+        component: (classes) => {
+          return <div>{panel}</div>
+        }
+      },
+      {
+        label: __("Forms"),
+        route: __("forms"),
+        component: (classes) => {
+          return <div>{panel}</div>
+        }
+      },
+      {
+        label: __("Pipeline"),
+        route: __("pipeline"),
+        component: (classes) => {
+          return <div>{panel}</div>
+        }
       }
     ]
 
