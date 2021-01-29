@@ -37,18 +37,16 @@ export const DonutChart = ({
   loading,
   ...rest
 }) => {
-  const classes = useStyles();
+  //
+  // if (loading) {
+  //   return <div />;
+  // }
 
-  if (!data) {
-    return null;
-  }
+  const classes = useStyles();
 
   return (
     <Card className={clsx(classes.root, className)} {...rest}>
-      <CardHeader
-        // action={<GenericMoreButton />}
-        title={title}
-      />
+      <CardHeader action={<div />} title={title} />
       <Divider />
       <Box p={3} position="relative" minHeight={320}>
         <Chart data={data.chart.data} />
