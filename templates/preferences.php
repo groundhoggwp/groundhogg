@@ -352,7 +352,7 @@ switch ( $action ):
 					$redirect = nonce_url_no_amp( managed_page_url( 'preferences/unsubscribe/' ), 'unsubscribe' );
 					break;
 				case 'confirm':
-					$redirect = nonce_url_no_amp( managed_page_url( 'preferences/confirm/' ), - 1, 'key' );
+					$redirect = managed_page_url( 'preferences/confirm/' );
 					break;
 				case 'gdpr_delete':
 					$redirect = nonce_url_no_amp( managed_page_url( 'preferences/erase/' ), 'erase_profile' );
@@ -442,11 +442,6 @@ switch ( $action ):
 
 		break;
 	case 'confirm':
-
-		if ( ! wp_verify_nonce( get_request_var( 'key' ) ) ) {
-			wp_redirect( managed_page_url( 'preferences/manage/' ) );
-			die();
-		}
 
 		$contact->change_marketing_preference( Preferences::CONFIRMED );
 		$redirect_to = esc_url_raw( sanitize_text_field( get_url_var( 'redirect_to' ) ) );
