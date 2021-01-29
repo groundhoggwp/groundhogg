@@ -22,42 +22,17 @@ const useStyles = makeStyles(() => ({
 
 export const LineChart = ({ className, title, data, loading, ...rest }) => {
 
-  console.log('here', data, rest, loading)
+
   if(loading){
     return <div/>
   }
-  // const {chart} = data;
-  console.log(data.chart.data.labels)
-  console.log(data.chart)
-  console.log(data.chart.data)
-  console.log(data.chart.data.datasets)
+
   const classes = useStyles();
-  const performance = {
-    thisWeek: {
-      data: [],
-      labels: []
-    },
-    thisMonth: {
-      data: [],
-      labels: []
-    },
-    thisYear: {
-      data: [10, 5, 11, 20, 13, 28, 18, 4, 13, 12, 13, 5],
-      labels: [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec'
-      ]
-    }
+  const chartJSData = {
+    data: data.chart.data.datasets,
+    labels: data.chart.data.datasets[0].data.map((datum)=>{      
+      return datum.t
+    })
   };
 
   return (
@@ -78,8 +53,8 @@ export const LineChart = ({ className, title, data, loading, ...rest }) => {
           >
             <Chart
               className={classes.chart}
-              datasets={data.chart.data.datasets}
-              labels={performance.thisYear.labels}
+              datasets={chartJSData.data}
+              labels={chartJSData.labels}
             />
           </Box>
         </PerfectScrollbar>

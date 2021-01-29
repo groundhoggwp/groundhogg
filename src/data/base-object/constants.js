@@ -13,6 +13,7 @@ export const INITIAL_STATE = {
   totalItems: 0,
   items: [],
   cache: [],
+  useCache: true,
   createdItems: [],
   updatedItems: [],
   item: {},

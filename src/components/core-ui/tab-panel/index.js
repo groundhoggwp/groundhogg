@@ -1,9 +1,10 @@
 /**
  * External dependencies
  */
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import PropTypes from 'prop-types';
 import {Box, Card, makeStyles, Paper, Tab, Tabs, Typography } from '@material-ui/core';
+import {useHistory, useLocation, Link } from 'react-router-dom';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -44,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     minHeight: '2000px',
     backgroundColor: theme.palette.background.paper,
-    marginTop: '20px',    
+    marginTop: '20px',
   },
   kpiTitle: {
     fontSize: '24px',
@@ -58,26 +59,28 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function ScrollableTabsButtonAuto( { tabs, enableRouting, history, match } ) {
+export default function ScrollableTabsButtonAuto( { tabs, enableRouting } ) {
   let defaultTab = 0;
-  if(enableRouting){
-    const reportRoute = match.params.routeId;
-    tabs.forEach((tab,i)=>{
-      if(tab.route === reportRoute){
-        defaultTab = i
-      }
-    });
-  }
+  const location = useLocation();
+
+  tabs.forEach((tab,i)=>{
+    if(tab.route === location.pathname.replace('/','')){
+      defaultTab = i
+    }
+  });
 
   const classes = useStyles();
   const [value, setValue] = useState(defaultTab);
+  const history = useHistory();
 
   const handleChange = (event, newValue) => {
+    console.log(event, tabs[newValue].route)
     setValue(newValue);
-    if(enableRouting){
-      history.push(match.path.replace(':routeId', '')+tabs[newValue].route)
-    }
+    history.push(tabs[newValue].route)
   };
+
+
+
 
   return (
     <Paper className={classes.root}>

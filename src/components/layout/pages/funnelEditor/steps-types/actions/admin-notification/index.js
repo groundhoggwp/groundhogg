@@ -1,8 +1,6 @@
 import EmailIcon from '@material-ui/icons/Email';
-
-import { ACTION } from '../../constants'
 import { registerStepType } from 'data/step-type-registry'
-import { ACTION_TYPE_DEFAULTS } from 'components/layout/pages/funnels/editor/steps-types/constants'
+import { ACTION, ACTION_TYPE_DEFAULTS } from '../../constants'
 
 const STEP_TYPE = 'admin_notification'
 

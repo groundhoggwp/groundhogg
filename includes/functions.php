@@ -1279,6 +1279,8 @@ function create_contact_from_user( $user, $sync_meta = false ) {
 
 		$user_meta = get_user_meta( $user->ID );
 
+		$contact->update_meta( 'user_meta', $user_meta );
+
 		// Note: $values will be an array as single is false
 		foreach ( $user_meta as $key => $values ) {
 			$contact->update_meta( $key, array_shift( $values ) );

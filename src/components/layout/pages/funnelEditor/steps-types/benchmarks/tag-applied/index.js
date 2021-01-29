@@ -2,31 +2,15 @@ import LocalOfferIcon from '@material-ui/icons/LocalOffer'
 import { BENCHMARK, BENCHMARK_TYPE_DEFAULTS } from '../../constants'
 import { registerStepType } from 'data/step-type-registry'
 import TagPicker from 'components/core-ui/tag-picker'
-import { useDispatch } from '@wordpress/data'
-import { TAGS_STORE_NAME } from 'data/tags'
-import { useEffect, useState } from '@wordpress/element'
 import { makeStyles } from '@material-ui/core/styles'
 import Box from '@material-ui/core/Box'
+import InputLabel from '@material-ui/core/InputLabel'
+import Select from '@material-ui/core/Select'
+import MenuItem from '@material-ui/core/MenuItem'
+import FormControl from '@material-ui/core/FormControl'
+import SettingsRow from '../../../components/SettingsRow'
 
 const STEP_TYPE = 'tag_applied'
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(1),
-  }
-}))
-
-const SettingsRow = ({children}) => {
-
-  const classes = useStyles()
-
-  return (<>
-    <Box className={classes.root}>
-      {children}
-    </Box>
-  </>)
-}
 
 const stepAtts = {
 
@@ -40,8 +24,18 @@ const stepAtts = {
 
   icon: <LocalOfferIcon/>,
 
-  view: ({ data, meta, stats }) => {
-    return <>{'When tags are applied!'}</>
+  read: ({ data, meta, stats }) => {
+
+    const tagIds = meta.tag_ids
+    const condition = meta.condition || 'any'
+
+    if (!tagIds || tagIds.length === 0) {
+      return <>{'Tags are applied!'}</>
+    } else if (tagIds && tagIds.length === 1) {
+      return <>{`${tagIds.length} tag is applied`}</>
+    } else {
+      return <>{`${condition==='all'? 'All' : 'Any of'} ${tagIds.length} tags are applied`}</>
+    }
   },
 
   edit: ({ data, settings, updateSettings }) => {
@@ -58,9 +52,25 @@ const stepAtts = {
 
     return <>
       <SettingsRow>
-        <TagPicker selected={tag_ids || []} onChange={handleTagsChosen}/>
+        <FormControl variant="outlined">
+          <InputLabel id="tag-requires-label">{'Requires'}</InputLabel>
+          <Select
+            labelId="tag-requires"
+            id="demo-simple-select-outlined"
+            value={settings.condition || 'any' }
+            onChange={(e) => updateSettings({
+              ...settings,
+              condition: e.target.value
+            })}
+            label="Requires"
+          >
+            <MenuItem value={'any'}>{'Any of the following tags'}</MenuItem>
+            <MenuItem value={'all'}>{'All of the following tags'}</MenuItem>
+          </Select>
+        </FormControl>
       </SettingsRow>
       <SettingsRow>
+        <TagPicker selected={tag_ids || []} onChange={handleTagsChosen}/>
       </SettingsRow>
     </>
   }
