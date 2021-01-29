@@ -149,58 +149,6 @@ class Main_Updater extends Updater {
 	}
 
 	/**
-	 * Refactor contact optin statuses
-	 */
-	public function version_2_1_13() {
-
-		$contacts = get_db( 'contacts' );
-
-		$changes = [
-			7 => Preferences::COMPLAINED,
-			6 => Preferences::SPAM,
-			5 => Preferences::HARD_BOUNCE,
-			4 => Preferences::MONTHLY,
-			3 => Preferences::WEEKLY,
-			2 => Preferences::UNSUBSCRIBED,
-			1 => Preferences::CONFIRMED,
-			0 => Preferences::UNCONFIRMED
-		];
-
-		foreach ( $changes as $old_status => $new_status ) {
-			$contacts->mass_update( [
-				'optin_status' => $new_status
-			], [
-				'optin_status' => $old_status
-			] );
-		}
-	}
-
-	/**
-	 * Revert version 2.1.13
-	 */
-	public function version_2_1_13_revert() {
-		$contacts = get_db( 'contacts' );
-
-		$changes = [
-			2 => 1,
-			3 => 2,
-			4 => 3,
-			5 => 4,
-			6 => 5,
-			7 => 6,
-			8 => 7,
-		];
-
-		foreach ( $changes as $old_status => $new_status ) {
-			$contacts->mass_update( [
-				'optin_status' => $new_status
-			], [
-				'optin_status' => $old_status
-			] );
-		}
-	}
-
-	/**
 	 * Add priority column to events db
 	 */
 	public function version_2_1_13_6() {
@@ -297,7 +245,17 @@ class Main_Updater extends Updater {
 		Plugin::$instance->dbs->install_dbs();
 	}
 
+
 	public function version_2_2_18() {
+		Plugin::$instance->dbs->install_dbs();
+	}
+
+
+	/**
+	 * Notes db added.
+	 * Migrate notes
+	 */
+	public function version_2_2_18_1() {
 		Plugin::$instance->dbs->install_dbs();
 	}
 
@@ -331,6 +289,36 @@ class Main_Updater extends Updater {
 		Plugin::$instance->dbs->install_dbs();
 		install_custom_rewrites();
 	}
+
+	/**
+	 * Update the notes table to new format.
+	 */
+	public function version_3_0_a_1() {
+		get_db( 'notes' )->update_3_0();
+	}
+
+	/**
+	 * Add new roles/caps
+	 */
+	public function version_3_0_a_2() {
+		Plugin::instance()->roles->add_caps();
+	}
+
+	/**
+	 * Update the steps table to support next_steps[]
+	 */
+	public function version_3_0_a_7() {
+		Plugin::$instance->dbs->install_dbs();
+	}
+
+	/**
+	 * Update the steps table to support next_steps[]
+	 */
+	public function version_3_0_a_4() {
+		get_db( 'events' )->change_event_type_to_varchar();
+		get_db( 'event_queue' )->change_event_type_to_varchar();
+	}
+
 
 	/**
 	 * Add delete_after_use field to permissions keys
@@ -395,17 +383,22 @@ class Main_Updater extends Updater {
 			'2.1.6.2',
 			'2.1.7.1',
 			'2.1.11.1',
-			'2.1.13',
 			'2.1.13.6',
 			'2.1.14.1',
 			'2.2',
 			'2.2.14',
 			'2.2.17',
 			'2.2.18',
+			'2.2.18.1',
 			'2.2.19',
 			'2.2.19.2',
 			'2.2.19.3',
 			'2.2.19.4',
+			'3.0.a.1',
+			'3.0.a.2',
+			'3.0.a.3',
+			'3.0.a.4',
+			'3.0.a.7',
 			'2.2.22',
 			'2.2.23',
 			'2.2.23.3',
@@ -426,10 +419,15 @@ class Main_Updater extends Updater {
 			'2.2.13',
 			'2.2.14',
 			'2.2.18',
+			'2.2.18.1',
 			'2.2.19',
 			'2.2.19.2',
 			'2.2.19.3',
 			'2.2.19.4',
+			'3.0.a.1',
+			'3.0.a.2',
+			'3.0.a.3',
+			'3.0.a.4',
 			'2.2.22',
 			'2.2.22.3',
 			'2.2.24',
@@ -455,8 +453,6 @@ class Main_Updater extends Updater {
 	protected function get_update_descriptions() {
 		return [
 			'2.1.14'        => __( 'Added notes table.', 'groundhogg' ),
-			'2.1.13'        => __( 'Refactor contact optin statuses to meet new format.', 'groundhogg' ),
-			'2.1.13.revert' => __( 'Revert update 2.1.13 if rogue updated refactored optin status more than once.', 'groundhogg' ),
 			'2.1.13.6'      => __( 'Give funnel events higher priority than broadcast events.', 'groundhogg' ),
 			'2.1.13.11'     => __( 'Add micro_time column to events table for better display of events order.', 'groundhogg' ),
 			'2.1.14.1'      => __( 'Add missing index on `claim` column.', 'groundhogg' ),

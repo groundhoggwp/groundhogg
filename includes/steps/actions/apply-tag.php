@@ -7,7 +7,9 @@ use Groundhogg\Event;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use Groundhogg\Tag;
 use function Groundhogg\get_db;
+use function Groundhogg\get_tag_name;
 use function Groundhogg\validate_tags;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -19,12 +21,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Adds a tag to the contact.
  *
- * @package     Elements
+ * @since       File available since Release 0.9
  * @subpackage  Elements/Actions
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.9
+ * @package     Elements
  */
 class Apply_Tag extends Action {
 
@@ -72,38 +74,40 @@ class Apply_Tag extends Action {
 	}
 
 	/**
-	 * @param $step Step
-	 */
-	public function settings( $step ) {
-
-		$this->start_controls_section();
-
-		$this->add_control( 'tags', [
-			'label'       => __( 'Apply These Tags:', 'groundhogg' ),
-			'type'        => HTML::TAG_PICKER,
-			'description' => __( 'Add new tags by hitting [enter] or by typing a [comma].', 'groundhogg' ),
-			'field'       => [
-				'multiple' => true,
-			]
-		] );
-
-		$this->end_controls_section();
-	}
-
-	/**
 	 * Save the step settings
 	 *
 	 * @param $step Step
 	 */
 	public function save( $step ) {
-		$this->save_setting( 'tags', validate_tags( $this->get_posted_data( 'tags', [] ) ) );
+		$tag_ids = validate_tags( $this->get_posted_data( 'tags', [] ) );
+		$this->save_setting( 'tags', $tag_ids );
+	}
+
+	/**
+	 * Provide the additional edit context
+	 *
+	 * @param mixed[] $context
+	 * @param Step $step
+	 *
+	 * @return array|mixed[]
+	 */
+	public function context( $context, $step ) {
+		$tag_ids = wp_parse_id_list( $this->get_setting( 'tags' ) );
+
+		$reactSelectCompat = array_map( function( $tag_id ){
+			return [ 'value' => $tag_id, 'label' => get_db( 'tags' )->get( $tag_id )->tag_name ];
+		}, $tag_ids );
+
+		$context[ 'tags_display' ] = $reactSelectCompat;
+
+		return $context;
 	}
 
 	/**
 	 * Process the apply tag step...
 	 *
 	 * @param $contact Contact
-	 * @param $event Event
+	 * @param $event   Event
 	 *
 	 * @return true
 	 */
@@ -115,7 +119,7 @@ class Apply_Tag extends Action {
 
 	/**
 	 * @param array $args
-	 * @param Step $step
+	 * @param Step  $step
 	 */
 	public function import( $args, $step ) {
 		if ( empty( $args['tags'] ) ) {
@@ -129,7 +133,7 @@ class Apply_Tag extends Action {
 
 	/**
 	 * @param array $args
-	 * @param Step $step
+	 * @param Step  $step
 	 *
 	 * @return array
 	 */
@@ -154,4 +158,5 @@ class Apply_Tag extends Action {
 
 		return $args;
 	}
+
 }

@@ -804,8 +804,8 @@ msgstr "Senden"
 
 #: admin/contacts/contact-editor.php:692
 msgctxt "contact_record"
-msgid "Add To Funnel"
-msgstr "Zum Funnel hinzufügen"
+msgid "Add To FunnelStepsContainer"
+msgstr "Zum FunnelStepsContainer hinzufügen"
 
 #: admin/contacts/contact-editor.php:717
 msgid "Start"
@@ -865,14 +865,14 @@ msgid ""
 "Any upcoming funnel steps will show up here. you can choose to cancel them "
 "or to run them immediately."
 msgstr ""
-"Alle anstehenden Funnel Schritte werden hier angezeigt. Sie können sie "
+"Alle anstehenden FunnelStepsContainer Schritte werden hier angezeigt. Sie können sie "
 "abbrechen oder sofort ausführen.\n"
 "\n"
 
 #: admin/contacts/contact-editor.php:908
 msgctxt "contact_record"
-msgid "Recent Funnel History"
-msgstr "Jüngster Funnel verlauf"
+msgid "Recent FunnelStepsContainer History"
+msgstr "Jüngster FunnelStepsContainer verlauf"
 
 #: admin/contacts/contact-editor.php:909
 msgctxt "contact_record"
@@ -881,7 +881,7 @@ msgid ""
 "<br/>This report only shows the 10 most recent events, to see more you can "
 "see all this contact's history in the event queue."
 msgstr ""
-"Alle vorherigen Funnel Schritte werden hier angezeigt. Sie können sie erneut "
+"Alle vorherigen FunnelStepsContainer Schritte werden hier angezeigt. Sie können sie erneut "
 "ausführen. <br/> In diesem Bericht werden nur die 10 letzten Ereignisse "
 "angezeigt. Um mehr zu sehen, wird der gesamte Verlauf dieses Kontakts in der "
 "Ereigniswarteschlange angezeigt."
@@ -1133,7 +1133,7 @@ msgstr ""
 #: admin/contacts/contacts-page.php:660
 msgctxt "notice"
 msgid "Contact added to funnel."
-msgstr "Kontakt zum Funnel hinzugefügt."
+msgstr "Kontakt zum FunnelStepsContainer hinzugefügt."
 
 #: admin/contacts/contacts-page.php:687
 msgctxt "notice"
@@ -1334,8 +1334,8 @@ msgstr "Ortszeit"
 #: admin/contacts/tables/contact-events-table.php:70 
 #: admin/events/events-table.php:63
 msgctxt "Column label"
-msgid "Funnel"
-msgstr "Funnel"
+msgid "FunnelStepsContainer"
+msgstr "FunnelStepsContainer"
 
 #: admin/contacts/tables/contact-events-table.php:71 
 #: admin/events/events-table.php:64
@@ -1368,8 +1368,8 @@ msgstr "Ereignisse verarbeiten"
 #: admin/contacts/tables/contact-events-table.php:127 
 #: admin/events/events-table.php:411 admin/events/events-table.php:412
 msgctxt "action"
-msgid "Edit Funnel"
-msgstr "Funnel editieren"
+msgid "Edit FunnelStepsContainer"
+msgstr "FunnelStepsContainer editieren"
 
 #: admin/contacts/tables/contact-events-table.php:135 
 #: admin/contacts/tables/contact-events-table.php:136 
@@ -1641,8 +1641,8 @@ msgid "Conversion Rate (%)"
 msgstr "Konversions Rate (%)"
 
 #: admin/dashboard/widgets/funnel-breakdown.php:41
-msgid "Funnel Breakdown"
-msgstr "Funnel Ausfall"
+msgid "FunnelStepsContainer Breakdown"
+msgstr "FunnelStepsContainer Ausfall"
 
 #: admin/dashboard/widgets/funnel-breakdown.php:153 
 #: admin/funnels/funnel-editor-v2.php:218
@@ -2121,7 +2121,7 @@ msgstr "Kontakt gelöscht"
 #: admin/events/events-table.php:125
 msgctxt "status"
 msgid "funnel deleted"
-msgstr "Funnel gelöscht"
+msgstr "FunnelStepsContainer gelöscht"
 
 #: admin/events/events-table.php:140
 msgctxt "status"
@@ -2206,13 +2206,13 @@ msgstr "Kontakt anschauen"
 
 #: admin/funnels/add-funnel.php:35
 msgctxt "add_funnel_tab"
-msgid "Funnel Templates"
-msgstr "Funnel Vorlagen"
+msgid "FunnelStepsContainer Templates"
+msgstr "FunnelStepsContainer Vorlagen"
 
 #: admin/funnels/add-funnel.php:37
 msgctxt "add_funnel_tab"
-msgid "Import Funnel"
-msgstr "Importiere einen Funnel"
+msgid "Import FunnelStepsContainer"
+msgstr "Importiere einen FunnelStepsContainer"
 
 #: admin/funnels/add-funnel.php:59
 msgctxt "action"
@@ -2229,7 +2229,7 @@ msgid ""
 "//www.groundhogg.io/updates/sell-your-templates-on-groundhogg-io/\">Get "
 "Started Now!</a>"
 msgstr ""
-"Möchten Sie Ihren Funnel mit der Welt teilen? <a target=\"_blank\" "
+"Möchten Sie Ihren FunnelStepsContainer mit der Welt teilen? <a target=\"_blank\" "
 "href=\"https://www.groundhogg.io/updates/sell-your-templates-on-groundhogg-"
 "io/\">Jetzt loslegen!</a>\n"
 "\n"
@@ -2242,34 +2242,34 @@ msgstr "Geben Sie einen Suchbegriff wie Webinar ein ..."
 msgid ""
 "If you have a funnel import file (ends in .funnel) you can upload it here!"
 msgstr ""
-"Wenn Sie eine Funnel-Importdatei haben (endet in .funnel), können Sie diese "
+"Wenn Sie eine FunnelStepsContainer-Importdatei haben (endet in .funnel), können Sie diese "
 "hier hochladen!"
 
 #: admin/funnels/add-funnel.php:146
 msgid "Upload a .funnel export file."
-msgstr "Eine Funnel Export Datei hochladen"
+msgstr "Eine FunnelStepsContainer Export Datei hochladen"
 
 #: admin/funnels/add-funnel.php:150 admin/funnels/add-funnel.php:160
 msgctxt "action"
-msgid "Import Funnel"
-msgstr "Funnel importieren"
+msgid "Import FunnelStepsContainer"
+msgstr "FunnelStepsContainer importieren"
 
 #: admin/funnels/add-funnel.php:155
 msgid ""
 "Copy and paste JSON from a .funnel export file if you are having issue "
 "uploading."
 msgstr ""
-"Kopieren Sie JSON aus einer .Funnel-Exportdatei und fügen Sie es ein, wenn "
+"Kopieren Sie JSON aus einer .FunnelStepsContainer-Exportdatei und fügen Sie es ein, wenn "
 "beim Hochladen Probleme auftreten.\n"
 "\n"
 
 #: admin/funnels/add-funnel.php:158
 msgid "Paste JSON from .funnel file."
-msgstr "Fügen Sie JSON aus der .Funnel-Datei ein."
+msgstr "Fügen Sie JSON aus der .FunnelStepsContainer-Datei ein."
 
 #: admin/funnels/funnel-editor-v2.php:44 admin/funnels/funnel-editor.php:59
-msgid "Enter Funnel Name Here"
-msgstr "Funnel Name angeben"
+msgid "Enter FunnelStepsContainer Name Here"
+msgstr "FunnelStepsContainer Name angeben"
 
 #: admin/funnels/funnel-editor-v2.php:96 admin/funnels/funnel-editor.php:104
 msgctxt "action"
@@ -2311,19 +2311,19 @@ msgid "Add Step"
 msgstr "Schritt hinzufügen"
 
 #: admin/funnels/funnel-editor-v2.php:230
-msgid "Funnel Builder V2 (BETA)"
-msgstr "Funnel Builder V2 (Beta)"
+msgid "FunnelStepsContainer Builder V2 (BETA)"
+msgstr "FunnelStepsContainer Builder V2 (Beta)"
 
 #: admin/funnels/funnel-editor-v2.php:231
-msgid "Welcome to version 2 of the Funnel Builder!"
-msgstr "Willkommen zur 2. Version des Funnel Builder"
+msgid "Welcome to version 2 of the FunnelStepsContainer Builder!"
+msgstr "Willkommen zur 2. Version des FunnelStepsContainer Builder"
 
 #: admin/funnels/funnel-editor-v2.php:232
 msgid ""
 "Our newest iteration of the funnel builder has been designed to provide a "
 "superior editing experience on both large and small screens."
 msgstr ""
-"Unsere neueste Iteration des Funnel Baus wurde entwickelt, um sowohl auf "
+"Unsere neueste Iteration des FunnelStepsContainer Baus wurde entwickelt, um sowohl auf "
 "großen als auch auf kleinen Bildschirmen ein überragendes "
 "Bearbeitungserlebnis zu bieten."
 
@@ -2345,7 +2345,7 @@ msgstr ""
 #: admin/funnels/funnel-editor-v2.php:380 admin/funnels/funnel-editor.php:258
 msgid "Select contacts to add into funnel:"
 msgstr ""
-"Wählen Sie die Kontakte aus, die in den Funnel eingefügt werden sollen:"
+"Wählen Sie die Kontakte aus, die in den FunnelStepsContainer eingefügt werden sollen:"
 
 #: admin/funnels/funnel-editor-v2.php:397 admin/funnels/funnel-editor.php:275
 msgid "Exclude these contacts:"
@@ -2356,12 +2356,12 @@ msgid "Select where to start:"
 msgstr "Wählen Sie aus, wo Sie beginnen möchten:"
 
 #: admin/funnels/funnel-editor-v2.php:440 admin/funnels/funnel-editor.php:318
-msgid "Add Contacts to Funnel"
-msgstr "Kontakte zum Funnel hinzufügen"
+msgid "Add Contacts to FunnelStepsContainer"
+msgstr "Kontakte zum FunnelStepsContainer hinzufügen"
 
 #: admin/funnels/funnel-editor.php:39
-msgid "The new and improved Funnel Builder has Arrived!"
-msgstr "Der neue und verbesserte Funnel Builder ist da!"
+msgid "The new and improved FunnelStepsContainer Builder has Arrived!"
+msgstr "Der neue und verbesserte FunnelStepsContainer Builder ist da!"
 
 #: admin/funnels/funnel-editor.php:39
 msgid "Launch V2 Now!"
@@ -2369,11 +2369,11 @@ msgstr "Gerade V2 gestartet!"
 
 #: admin/funnels/funnels-page.php:104
 msgid "You have no active funnels."
-msgstr "Du hast keinen aktiven Funnel."
+msgstr "Du hast keinen aktiven FunnelStepsContainer."
 
 #: admin/funnels/funnels-page.php:106
 msgid "Activate a funnel!"
-msgstr "Den Funnel aktivieren!"
+msgstr "Den FunnelStepsContainer aktivieren!"
 
 #: admin/funnels/funnels-page.php:118 admin/funnels/funnels-page.php:374
 msgctxt "page_title"
@@ -2387,10 +2387,10 @@ msgid ""
 "number of active contacts in each funnel, as well as when it was created and "
 "last updated."
 msgstr ""
-"Hier können Sie Ihre Funnel bearbeiten. Ein Funnel besteht aus einer Reihe "
+"Hier können Sie Ihre FunnelStepsContainer bearbeiten. Ein FunnelStepsContainer besteht aus einer Reihe "
 "von Schritten, mit denen die Automatisierung auf der Grundlage von "
 "Kontaktinteraktionen mit Ihrer Site ausgeführt werden kann. Sie können die "
-"Anzahl der aktiven Kontakte in jedem Funnel sowie den Zeitpunkt ihrer "
+"Anzahl der aktiven Kontakte in jedem FunnelStepsContainer sowie den Zeitpunkt ihrer "
 "Erstellung und letzten Aktualisierung anzeigen."
 
 #: admin/funnels/funnels-page.php:189
@@ -2400,15 +2400,15 @@ msgid ""
 "stop moving forward. The same goes for Archived funnels which simply do not "
 "show in the main list."
 msgstr ""
-"Funnel können entweder aktiv / inaktiv / archiviert sein. Wenn ein Funnel "
+"FunnelStepsContainer können entweder aktiv / inaktiv / archiviert sein. Wenn ein FunnelStepsContainer "
 "inaktiv ist, können keine Kontakte eingegeben werden, und alle Kontakte, die "
 "sich möglicherweise im Trichter befunden haben, hören auf, sich vorwärts zu "
 "bewegen. Gleiches gilt für archivierte Trichter, die einfach nicht in der "
 "Hauptliste angezeigt werden."
 
 #: admin/funnels/funnels-page.php:196
-msgid "Add A Funnel"
-msgstr "Einen Funnel hinzufügen"
+msgid "Add A FunnelStepsContainer"
+msgstr "Einen FunnelStepsContainer hinzufügen"
 
 #: admin/funnels/funnels-page.php:197
 msgid ""
@@ -2417,25 +2417,25 @@ msgid ""
 "click the import tab and upload the funnel file which will auto generate a "
 "funnel for you."
 msgstr ""
-"Um einen neuen Funnel zu erstellen, klicken Sie einfach oben links auf die "
-"Schaltfläche \"Neu hinzufügen\" und wählen Sie eine vorgefertigte Funnel "
-"Vorlage aus. Wenn Sie eine Funnel-Importdatei haben, können Sie auf die "
-"Registerkarte \"Importieren\" klicken und die Funnel-Datei hochladen, die "
-"automatisch einen Funnel für Sie generiert.\n"
+"Um einen neuen FunnelStepsContainer zu erstellen, klicken Sie einfach oben links auf die "
+"Schaltfläche \"Neu hinzufügen\" und wählen Sie eine vorgefertigte FunnelStepsContainer "
+"Vorlage aus. Wenn Sie eine FunnelStepsContainer-Importdatei haben, können Sie auf die "
+"Registerkarte \"Importieren\" klicken und die FunnelStepsContainer-Datei hochladen, die "
+"automatisch einen FunnelStepsContainer für Sie generiert.\n"
 "\n"
 
 #: admin/funnels/funnels-page.php:205
 msgid ""
-"When editing a funnel you can add Funnel Steps. Funnel Steps are either "
+"When editing a funnel you can add FunnelStepsContainer Steps. FunnelStepsContainer Steps are either "
 "Benchmarks or Actions. Benchmarks are whenever a Contact \"does\" something, "
 "while Actions are doing thing to a contact such as sending an email. Simply "
 "drag in the desired funnel steps in any order."
 msgstr ""
-"Beim Bearbeiten eines Funnels können Sie die Funnel Schritte hinzufügen. "
-"Funnel Schritte sind entweder Benchmarks oder Aktionen. Benchmarks sind "
+"Beim Bearbeiten eines Funnels können Sie die FunnelStepsContainer Schritte hinzufügen. "
+"FunnelStepsContainer Schritte sind entweder Benchmarks oder Aktionen. Benchmarks sind "
 "immer dann, wenn ein Kontakt etwas \"tut\", während Aktionen einen Kontakt "
 "betreffen, z. B. das Senden einer E-Mail. Ziehen Sie einfach die gewünschten "
-"Funnel Schritte in beliebiger Reihenfolge hinein."
+"FunnelStepsContainer Schritte in beliebiger Reihenfolge hinein."
 
 #: admin/funnels/funnels-page.php:206
 msgid ""
@@ -2478,7 +2478,7 @@ msgid ""
 "select the time range which you would like to view by using the dropdown on "
 "the left and click the filter button."
 msgstr ""
-"Um die Funnel Berichte anzuzeigen, rufen Sie einfach den "
+"Um die FunnelStepsContainer Berichte anzuzeigen, rufen Sie einfach den "
 "Bearbeitungsbildschirm eines beliebigen Funnels auf und schalten Sie den "
 "Schalter Berichterstellung / Bearbeitung im Berichterstellungsfeld um. Sie "
 "können den Zeitraum auswählen, den Sie anzeigen möchten, indem Sie die "
@@ -2486,20 +2486,20 @@ msgstr ""
 
 #: admin/funnels/funnels-page.php:367
 msgctxt "page_title"
-msgid "Add Funnel"
-msgstr "Funnel hinzufügen"
+msgid "Add FunnelStepsContainer"
+msgstr "FunnelStepsContainer hinzufügen"
 
 #: admin/funnels/funnels-page.php:370
 msgctxt "page_title"
-msgid "Edit Funnel"
-msgstr "Funnel ändern"
+msgid "Edit FunnelStepsContainer"
+msgstr "FunnelStepsContainer ändern"
 
 #: admin/funnels/funnels-page.php:390
 #, php-format
 msgctxt "notice"
 msgid "Deleted %d funnel"
 msgid_plural "Deleted %d funnels"
-msgstr[0] "Funnel %d gelöscht"
+msgstr[0] "FunnelStepsContainer %d gelöscht"
 msgstr[1] "Funnels %d gelöscht"
 
 #: admin/funnels/funnels-page.php:410
@@ -2507,30 +2507,30 @@ msgstr[1] "Funnels %d gelöscht"
 msgctxt "notice"
 msgid "Restored %d funnel"
 msgid_plural "Deleted %d funnels"
-msgstr[0] "%d Funnel wiederhergestellt"
-msgstr[1] "%d Funnel wiederhergestellt"
+msgstr[0] "%d FunnelStepsContainer wiederhergestellt"
+msgstr[1] "%d FunnelStepsContainer wiederhergestellt"
 
 #: admin/funnels/funnels-page.php:438
 msgctxt "notice"
-msgid "Funnel duplicated"
-msgstr "Funnel dupliziert"
+msgid "FunnelStepsContainer duplicated"
+msgstr "FunnelStepsContainer dupliziert"
 
 #: admin/funnels/funnels-page.php:473
 #, php-format
 msgctxt "notice"
 msgid "Archived %d funnel"
 msgid_plural "Archived %d funnels"
-msgstr[0] "Archivierter %d Funnel"
+msgstr[0] "Archivierter %d FunnelStepsContainer"
 msgstr[1] "Archivierte %d Funnels"
 
 #: admin/funnels/funnels-page.php:582
 msgid "Could not create funnel."
-msgstr "Kann keinen Funnel erstellen."
+msgstr "Kann keinen FunnelStepsContainer erstellen."
 
 #: admin/funnels/funnels-page.php:585
 msgctxt "notice"
-msgid "Funnel created"
-msgstr "Funnel erzeugt"
+msgid "FunnelStepsContainer created"
+msgstr "FunnelStepsContainer erzeugt"
 
 #: admin/funnels/funnels-page.php:751
 msgctxt "stats"
@@ -2543,7 +2543,7 @@ msgstr "Wartende Kontakte"
 
 #: admin/funnels/funnels-page.php:785
 msgid "You cannot do this while the funnel is not active."
-msgstr "Sie können dies nicht tun, solange der Funnel nicht aktiv ist."
+msgstr "Sie können dies nicht tun, solange der FunnelStepsContainer nicht aktiv ist."
 
 #: admin/funnels/funnels-page.php:791
 msgctxt "notice"
@@ -2554,8 +2554,8 @@ msgid ""
 "q=increase+max_input_vars+php\">increase your [max_input_vars] to at least "
 "double the current size.</a>."
 msgstr ""
-"Ihr [max_input_vars] ist zu klein für Ihren Funnel! Möglicherweise tritt ein "
-"ungewöhnliches Verhalten auf, und Ihr Funnel wird möglicherweise nicht "
+"Ihr [max_input_vars] ist zu klein für Ihren FunnelStepsContainer! Möglicherweise tritt ein "
+"ungewöhnliches Verhalten auf, und Ihr FunnelStepsContainer wird möglicherweise nicht "
 "richtig gespeichert. Bitte <a target=\"_blank\" href=\"http://www.google."
 "com/search?q=increase+max_input_vars+php\"> erhöhen Sie Ihre [max_input_vars]"
 ", um die aktuelle Größe mindestens zu verdoppeln </a>."
@@ -2563,12 +2563,12 @@ msgstr ""
 #: admin/funnels/funnels-page.php:831
 msgctxt "warning"
 msgid "Funnels must start with 1 or more benchmarks"
-msgstr "Der Funnel muß mit einem oder mehreren Benchmarks beginnen"
+msgstr "Der FunnelStepsContainer muß mit einem oder mehreren Benchmarks beginnen"
 
 #: admin/funnels/funnels-page.php:834
 msgctxt "notice"
-msgid "Funnel updated"
-msgstr "Funnel aktuialisiert"
+msgid "FunnelStepsContainer updated"
+msgstr "FunnelStepsContainer aktuialisiert"
 
 #: admin/funnels/funnels-page.php:930
 #, php-format
@@ -2580,12 +2580,12 @@ msgstr "%s - (kopieren)"
 msgctxt "notice"
 msgid "%d contact added to funnel"
 msgid_plural "%d contacts added to funnel"
-msgstr[0] "%d Kontakt wurde zum Funnel hinzugefügt"
-msgstr[1] "%d Kontakte wurden zum Funnel hinzugefügt"
+msgstr[0] "%d Kontakt wurde zum FunnelStepsContainer hinzugefügt"
+msgstr[1] "%d Kontakte wurden zum FunnelStepsContainer hinzugefügt"
 
 #: admin/funnels/funnels-page.php:1075
 msgid "Search Funnels"
-msgstr "Funnel suchen"
+msgstr "FunnelStepsContainer suchen"
 
 #: admin/funnels/funnels-page.php:1160 includes/license-manager.php:537
 #, php-format
@@ -3392,7 +3392,7 @@ msgctxt "settings"
 msgid ""
 "This will let you know if something goes wrong in a funnel so you can fix it."
 msgstr ""
-"Auf diese Weise erfahren Sie, ob in einem Funnel ein Fehler aufgetreten ist, "
+"Auf diese Weise erfahren Sie, ob in einem FunnelStepsContainer ein Fehler aufgetreten ist, "
 "damit Sie ihn beheben können."
 
 #: admin/settings/settings-page.php:568
@@ -3422,7 +3422,7 @@ msgstr ""
 #: admin/settings/settings-page.php:594
 msgctxt "settings"
 msgid "Use the classic funnel builder."
-msgstr "Verwenden Sie den klassischen Funnel-Builder."
+msgstr "Verwenden Sie den klassischen FunnelStepsContainer-Builder."
 
 #: admin/settings/settings-page.php:595
 msgctxt "settings"
@@ -3430,7 +3430,7 @@ msgid ""
 "Don't like the new funnel builder? You can use the original one by enabling "
 "this option."
 msgstr ""
-"Mögen Sie den neuen Funnel nicht? Sie können das Original verwenden, indem "
+"Mögen Sie den neuen FunnelStepsContainer nicht? Sie können das Original verwenden, indem "
 "Sie diese Option aktivieren."
 
 #: admin/settings/settings-page.php:607
@@ -4227,7 +4227,7 @@ msgstr "Erweiteter E-Mail Editor."
 
 #: admin/tools/tools-page.php:755
 msgid "Advanced funnel steps"
-msgstr "Erweiterte Funnel Schritte"
+msgstr "Erweiterte FunnelStepsContainer Schritte"
 
 #: admin/tools/tools-page.php:756
 msgid "Superlinks"
@@ -5576,8 +5576,8 @@ msgid "Custom Range"
 msgstr "Benutzerdefinierten Bereich"
 
 #: includes/reporting/reports/complete-funnel-activity.php:41
-msgid "Complete Funnel Activity"
-msgstr "Komplette Funnel Aktivität"
+msgid "Complete FunnelStepsContainer Activity"
+msgstr "Komplette FunnelStepsContainer Aktivität"
 
 #: includes/reporting/reports/contacts-by-country.php:27
 msgid "Contacts By Country"
@@ -5638,8 +5638,8 @@ msgid "Last Broadcast"
 msgstr "Letzte Mitteilung"
 
 #: includes/reporting/reports/waiting-funnel-activity.php:41
-msgid "Waiting Funnel Activity"
-msgstr "Warte auf Funnel Aktivität"
+msgid "Waiting FunnelStepsContainer Activity"
+msgstr "Warte auf FunnelStepsContainer Aktivität"
 
 #: includes/reviews.php:28
 #, php-format
@@ -6093,7 +6093,7 @@ msgstr "Wird ausgeführt, wenn ein Kontakt seine E-Mail bestätigt."
 
 #: includes/steps/benchmarks/email-confirmed.php:81
 msgid "Runs whenever an email is confirmed while in this funnel"
-msgstr "Wird ausgeführt, wenn eine E-Mail in diesem Funnel bestätigt wird"
+msgstr "Wird ausgeführt, wenn eine E-Mail in diesem FunnelStepsContainer bestätigt wird"
 
 #: includes/steps/benchmarks/form-filled.php:55
 msgctxt "step_name"

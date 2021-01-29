@@ -352,13 +352,7 @@ switch ( $action ):
 					$redirect = nonce_url_no_amp( managed_page_url( 'preferences/unsubscribe/' ), 'unsubscribe' );
 					break;
 				case 'confirm':
-					$redirect = nonce_url_no_amp( managed_page_url( 'preferences/confirm/' ), - 1, 'key' );
-					break;
-				case 'weekly':
-					$contact->change_marketing_preference( Preferences::WEEKLY );
-					break;
-				case 'monthly':
-					$contact->change_marketing_preference( Preferences::MONTHLY );
+					$redirect = managed_page_url( 'preferences/confirm/' );
 					break;
 				case 'gdpr_delete':
 					$redirect = nonce_url_no_amp( managed_page_url( 'preferences/erase/' ), 'erase_profile' );
@@ -381,8 +375,6 @@ switch ( $action ):
 
 		$preferences = [
 			'confirm'     => _x( 'I love this company, you can communicate with me whenever you feel like.', 'preferences', 'groundhogg' ),
-			'weekly'      => _x( "It's getting a bit much. Communicate with me weekly.", 'preferences', 'groundhogg' ),
-			'monthly'     => _x( 'Distance makes the heart grow fonder. Communicate with me monthly.', 'preferences', 'groundhogg' ),
 			'unsubscribe' => _x( 'I no longer wish to receive any form of communication. Unsubscribe me!', 'preferences', 'groundhogg' )
 		];
 
@@ -450,11 +442,6 @@ switch ( $action ):
 
 		break;
 	case 'confirm':
-
-		if ( ! wp_verify_nonce( get_request_var( 'key' ) ) ) {
-			wp_redirect( managed_page_url( 'preferences/manage/' ) );
-			die();
-		}
 
 		$contact->change_marketing_preference( Preferences::CONFIRMED );
 		$redirect_to = esc_url_raw( sanitize_text_field( get_url_var( 'redirect_to' ) ) );

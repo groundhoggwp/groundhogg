@@ -93,7 +93,7 @@ class Export_Contacts extends Bulk_Job {
 
 				if ( $header === 'tags' ) {
 
-					$raw_tags = get_db( 'tags' )->query( [ 'tag_id' => $contact->get_tags() ] );
+					$raw_tags = get_db( 'tags' )->query( [ 'tag_id' => $contact->get_tag_ids() ] );
 
 					if ( $raw_tags ) {
 						$names  = wp_list_pluck( $raw_tags, 'tag_name' );

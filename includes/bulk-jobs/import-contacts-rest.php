@@ -1,0 +1,143 @@
+<?php
+
+namespace Groundhogg\Bulk_Jobs;
+
+use function Groundhogg\admin_page_url;
+use function Groundhogg\generate_contact_with_map;
+use function Groundhogg\get_items_from_csv;
+use Groundhogg\Plugin;
+use Groundhogg\Preferences;
+use function Groundhogg\get_url_var;
+use function Groundhogg\guided_setup_finished;
+use function Groundhogg\recount_tag_contacts_count;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+class Import_Contacts_Rest extends Bulk_Job {
+
+	protected $field_map = [];
+	protected $import_tags = [];
+	protected $confirm_contacts = false;
+
+	/**
+	 * Get the action reference.
+	 *
+	 * @return string
+	 */
+	function get_action() {
+		return 'gh_import_contacts_rest';
+	}
+
+	/**
+	 * Get an array of items someway somehow
+	 *
+	 * @param $items array
+	 *
+	 * @return array
+	 */
+	public function query( $items ) {
+
+
+
+		if ( ! current_user_can( 'import_contacts' ) ) {
+			return $items;
+		}
+
+//		$file_name = sanitize_file_name( get_url_var( 'import' ) );
+
+		$file_name = $this->get_context( 'import' );
+		$file_path = wp_normalize_path( Plugin::$instance->utils->files->get_csv_imports_dir( $file_name ) );
+		return get_items_from_csv( $file_path );
+	}
+
+	/**
+	 * Get the maximum number of items which can be processed at a time.
+	 *
+	 * @param $max int
+	 * @param $items array
+	 *
+	 * @return int
+	 */
+	public function max_items( $max, $items ) {
+//		$item   = array_shift( $items );
+//		$fields = count( array_keys( $item ) );
+//
+//		$max       = intval( ini_get( 'max_input_vars' ) );
+//		$max_items = floor( $max / $fields );
+//
+//		$max_override = absint( get_url_var( 'max_items' ) );
+//
+//		if ( $max_override > 0 ) {
+//			return $max_override;
+//		}
+//
+//		return min( $max_items, 100 );
+		return  100; // todo
+
+	}
+
+	/**
+	 * Process an item
+	 *
+	 * @param $item mixed
+	 *
+	 * @return void
+	 * @throws \Exception
+	 */
+	protected function process_item( $item ) {
+		$contact = generate_contact_with_map( $item, $this->field_map );
+
+		if ( $contact ) {
+			$contact->apply_tag( $this->import_tags );
+
+			if ( $this->confirm_contacts ) {
+				$contact->change_marketing_preference( Preferences::CONFIRMED );
+			}
+		}
+	}
+
+	/**
+	 * Do stuff before the loop
+	 *
+	 * @return void
+	 */
+	protected function pre_loop() {
+
+		$this->field_map        =(array) $this->get_context( 'map' );
+		$this->import_tags      = wp_parse_id_list( $this->get_context( 'tags' ) );
+		$this->confirm_contacts = $this->get_context( 'confirm' );
+
+	}
+
+	/**
+	 * do stuff after the loop
+	 *
+	 * @return void
+	 */
+	protected function post_loop() {
+	}
+
+	/**
+	 * Cleanup any options/transients/notices after the bulk job has been processed.
+	 *
+	 * @return void
+	 */
+	protected function clean_up() {
+		Plugin::$instance->settings->delete_transient( 'gh_import_map' );
+		Plugin::$instance->settings->delete_transient( 'gh_import_tags' );
+		Plugin::$instance->settings->delete_transient( 'gh_import_confirm_contacts' );
+
+		recount_tag_contacts_count();
+	}
+
+	/**
+	 * Get the return URL
+	 *
+	 * @return string
+	 */
+	protected function get_return_url() {
+		return admin_page_url( 'gh_contacts' );
+	}
+}

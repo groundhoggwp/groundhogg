@@ -1,0 +1,98 @@
+@import "../../../../master";
+
+.groundhogg.modal{
+
+  .edit-delay-controls{
+
+    .edit-delay-controls-inner{
+      border-top: 1px solid $border-color;
+      background: #f9f9f9;
+    }
+
+    .delay-text,
+    .delay-type{
+      padding: 20px;
+    }
+
+    .delay-text{
+      border-bottom: 1px solid $border-color;
+      background: #f9f9f9;
+    }
+
+    .delay-attr-error{
+      margin: 4px 0;
+      //background: $white;
+      color: $error-red;
+      padding: 4px 8px 4px 25px;
+      font-size: 14px;
+      position: relative;
+
+      .dashicons{
+        position: absolute;
+        left: 0;
+      }
+    }
+
+    input,select{
+      vertical-align: top;
+      font-size: 14px;
+      height: auto;
+    }
+
+    .col-controls{
+      margin-top: 10px;
+
+      .control {
+        margin-bottom: 5px;
+      }
+    }
+
+    .interval-period{
+      input.period{
+        width: 60px;
+      }
+
+      .period{
+        border-right: none;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+
+      .interval{
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+
+      &.wait-type{
+        .interval{
+          border-radius: 0;
+        }
+
+        .wait_type{
+          border-left: none;
+          border-top-left-radius: 0;
+          border-bottom-left-radius: 0;
+        }
+      }
+    }
+
+    .replacement-controls{
+      margin-top: 10px;
+    }
+
+    .row{
+      .col,
+      .col-5,
+      .col-4,
+      .col-3
+      {
+        padding: 20px;
+        border-right: 1px solid $border-color;
+
+        &:last-child{
+          border-right: none;
+        }
+      }
+    }
+  }
+}

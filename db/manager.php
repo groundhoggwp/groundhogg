@@ -58,15 +58,18 @@ class Manager {
 		$this->events            = new Events();
 		$this->funnels           = new Funnels();
 		$this->funnelmeta        = new Funnel_Meta();
-		$this->stepmeta          = new Step_Meta();
 		$this->steps             = new Steps();
+		$this->stepmeta          = new Step_Meta();
+		$this->step_edges        = new Step_Edges();
 		$this->tags              = new Tags();
 		$this->tag_relationships = new Tag_Relationships();
 		$this->submissions       = new Submissions();
 		$this->submissionmeta    = new Submission_Meta();
 		$this->form_impressions  = new Form_Impressions();
-		$this->contactnotes      = new Contact_Notes();
+		$this->notes             = new Notes();
 		$this->permissions_keys  = new Permissions_Keys();
+		$this->webhooks          = new Webhooks();
+		$this->webhook_meta      = new Webhook_Meta();
 		$this->email_log         = new Email_Log();
 
 		//new queue table

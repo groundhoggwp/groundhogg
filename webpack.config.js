@@ -1,41 +1,23 @@
-const path = require('path');
-const webpack = require('webpack');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const path = require("path");
+
+const defaultConfig = require("@wordpress/scripts/config/webpack.config");
+
+const rootDir = path.resolve(__dirname);
+
+const paths = {
+  srcDir: path.resolve(rootDir, "src"),
+  buildDIr: path.resolve(rootDir, "build"),
+};
 
 module.exports = {
-    mode: 'development',
-    entry: {
-        // './blocks/gutenberg/js/blocks' : './blocks/gutenberg/index.js',
-        './react/build': './react/index.js',
+  ...defaultConfig,
+  resolve: {
+    ...defaultConfig.resolve,
+    // alias directories to paths you can use in import() statements
+    alias: {
+      components: path.join(paths.srcDir, "components"),
+      data: path.join(paths.srcDir, "data"),
+      utils: path.join(paths.srcDir, "utils"),
     },
-    output: {
-        path: path.resolve(__dirname),
-        filename: './react/build/[hash].js',
-    },
-    watch: true,
-    devtool: 'cheap-eval-source-map',
-    module: {
-        rules: [
-            {
-                test: /\.js$/,
-                exclude: /(node_modules|bower_components)/,
-                use: {
-                    loader: 'babel-loader',
-                },
-            },
-            {
-                test: /\.s?css$/,
-                use: [
-                    MiniCssExtractPlugin.loader,
-                    'css-loader',
-                    'sass-loader',
-                ]
-            },
-        ],
-    },
-    plugins: [
-        new MiniCssExtractPlugin({
-            filename: './react/build/build.css'
-        })
-    ]
+  },
 };

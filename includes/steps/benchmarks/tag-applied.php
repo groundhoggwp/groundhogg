@@ -3,10 +3,8 @@
 namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
-use function Groundhogg\get_array_var;
 use Groundhogg\HTML;
 use function Groundhogg\get_db;
-use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 use Groundhogg\Tag;
@@ -73,38 +71,6 @@ class Tag_Applied extends Benchmark {
 	}
 
 	/**
-	 * @param $step Step
-	 */
-	public function settings( $step ) {
-		$this->start_controls_section();
-
-		$html = Plugin::$instance->utils->html;
-
-		$condition_picker = $html->dropdown( [
-			'name'        => $this->setting_name_prefix( 'condition' ),
-			'selected'    => $this->get_setting( 'condition', 'any' ),
-			'option_none' => false,
-			'style'       => [ 'vertical-align' => 'middle' ],
-			'options'     =>
-				[
-					'any' => __( 'any' ),
-					'all' => __( 'all' ),
-				]
-		] );
-
-		$this->add_control( 'tags', [
-			'label'       => sprintf( __( 'Run when %s of these tags are applied:', 'groundhogg' ), $condition_picker ),
-			'type'        => HTML::TAG_PICKER,
-			'description' => __( 'Add new tags by hitting [enter] or by typing a [comma].', 'groundhogg' ),
-			'field'       => [
-				'multiple' => true,
-			]
-		] );
-
-		$this->end_controls_section();
-	}
-
-	/**
 	 * Save the step settings
 	 *
 	 * @param $step Step
@@ -112,6 +78,18 @@ class Tag_Applied extends Benchmark {
 	public function save( $step ) {
 		$this->save_setting( 'tags', Plugin::$instance->dbs->get_db( 'tags' )->validate( $this->get_posted_data( 'tags', [] ) ) );
 		$this->save_setting( 'condition', sanitize_text_field( $this->get_posted_data( 'condition', 'any' ) ) );
+	}
+
+	public function context( $context, $step ) {
+		$tag_ids = wp_parse_id_list( $this->get_setting( 'tags' ) );
+
+		$reactSelectCompat = array_map( function( $tag_id ){
+			return [ 'value' => $tag_id, 'label' => get_db( 'tags' )->get( $tag_id )->tag_name ];
+		}, $tag_ids );
+
+		$context[ 'tags_display' ] = $reactSelectCompat;
+
+		return $context;
 	}
 
 	/**
@@ -205,7 +183,7 @@ class Tag_Applied extends Benchmark {
 				$has_tags = in_array( $applied_tag, $tags );
 				break;
 			case 'all':
-				$intersect = array_intersect( $tags, $this->get_current_contact()->get_tags() );
+				$intersect = array_intersect( $tags, $this->get_current_contact()->get_tag_ids() );
 				$has_tags  = in_array( $applied_tag, $tags ) && count( $intersect ) === count( $tags );
 				break;
 		}

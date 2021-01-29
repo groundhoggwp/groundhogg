@@ -771,7 +771,7 @@ msgstr "Enviar SMS"
 
 #: admin/contacts/contact-editor.php:613
 msgctxt "contact_record"
-msgid "Add To Funnel"
+msgid "Add To FunnelStepsContainer"
 msgstr "Adicionar ao funil"
 
 #: admin/contacts/contact-editor.php:638
@@ -841,7 +841,7 @@ msgstr ""
 
 #: admin/contacts/contact-editor.php:845
 msgctxt "contact_record"
-msgid "Recent Funnel History"
+msgid "Recent FunnelStepsContainer History"
 msgstr "História recente do funil"
 
 #: admin/contacts/contact-editor.php:846
@@ -1299,7 +1299,7 @@ msgstr "hora local"
 #: admin/contacts/tables/contact-events-table.php:68
 #: admin/events/events-table.php:60
 msgctxt "Column label"
-msgid "Funnel"
+msgid "FunnelStepsContainer"
 msgstr "Funil"
 
 #: admin/contacts/tables/contact-events-table.php:69
@@ -1333,7 +1333,7 @@ msgstr "Processar Eventos"
 #: admin/contacts/tables/contact-events-table.php:123
 #: admin/events/events-table.php:405 admin/events/events-table.php:406
 msgctxt "action"
-msgid "Edit Funnel"
+msgid "Edit FunnelStepsContainer"
 msgstr "Editar Funil"
 
 #: admin/contacts/tables/contact-events-table.php:131
@@ -1608,7 +1608,7 @@ msgid "Conversion Rate (%)"
 msgstr "Taxa de Conversão (%)"
 
 #: admin/dashboard/widgets/funnel-breakdown.php:40
-msgid "Funnel Breakdown"
+msgid "FunnelStepsContainer Breakdown"
 msgstr "Análise do Funil"
 
 #: admin/dashboard/widgets/funnel-breakdown.php:158
@@ -2386,7 +2386,7 @@ msgstr "Ver Contato"
 
 #: admin/funnels/add-funnel.php:31
 msgctxt "add_funnel_tab"
-msgid "Funnel Templates"
+msgid "FunnelStepsContainer Templates"
 msgstr "Modelos de funil"
 
 #: admin/funnels/add-funnel.php:33
@@ -2396,7 +2396,7 @@ msgstr "Mercado"
 
 #: admin/funnels/add-funnel.php:35
 msgctxt "add_funnel_tab"
-msgid "Import Funnel"
+msgid "Import FunnelStepsContainer"
 msgstr "Importar Funil"
 
 #: admin/funnels/add-funnel.php:58
@@ -2431,11 +2431,11 @@ msgstr ""
 
 #: admin/funnels/add-funnel.php:142
 msgctxt "action"
-msgid "Import Funnel"
+msgid "Import FunnelStepsContainer"
 msgstr "Importar Funil"
 
 #: admin/funnels/funnel-editor-v2.php:43 admin/funnels/funnel-editor.php:55
-msgid "Enter Funnel Name Here"
+msgid "Enter FunnelStepsContainer Name Here"
 msgstr "Digite o nome do funil aqui"
 
 #: admin/funnels/funnel-editor-v2.php:95 admin/funnels/funnel-editor.php:100
@@ -2481,12 +2481,12 @@ msgid "Select where to start:"
 msgstr "Selecione onde começar:"
 
 #: admin/funnels/funnel-editor-v2.php:351 admin/funnels/funnel-editor.php:314
-msgid "Add Contacts to Funnel"
+msgid "Add Contacts to FunnelStepsContainer"
 msgstr "Adicionar contatos ao funil"
 
 #: admin/funnels/funnel-editor.php:39
-msgid "The new and improved Funnel Builder has Arrived!"
-msgstr "O novo e melhorado Funnel Builder chegou!"
+msgid "The new and improved FunnelStepsContainer Builder has Arrived!"
+msgstr "O novo e melhorado FunnelStepsContainer Builder chegou!"
 
 #: admin/funnels/funnel-editor.php:39
 msgid "Launch V2 Now!"
@@ -2530,7 +2530,7 @@ msgstr ""
 "aparecem na lista principal."
 
 #: admin/funnels/funnels-page.php:187
-msgid "Add A Funnel"
+msgid "Add A FunnelStepsContainer"
 msgstr "Adicionar um funil"
 
 #: admin/funnels/funnels-page.php:188
@@ -2547,7 +2547,7 @@ msgstr ""
 
 #: admin/funnels/funnels-page.php:196
 msgid ""
-"When editing a funnel you can add Funnel Steps. Funnel Steps are either "
+"When editing a funnel you can add FunnelStepsContainer Steps. FunnelStepsContainer Steps are either "
 "Benchmarks or Actions. Benchmarks are whenever a Contact \"does\" something, "
 "while Actions are doing thing to a contact such as sending an email. Simply "
 "drag in the desired funnel steps in any order."
@@ -2605,12 +2605,12 @@ msgstr ""
 
 #: admin/funnels/funnels-page.php:357
 msgctxt "page_title"
-msgid "Add Funnel"
+msgid "Add FunnelStepsContainer"
 msgstr "Adicionar Funil"
 
 #: admin/funnels/funnels-page.php:360
 msgctxt "page_title"
-msgid "Edit Funnel"
+msgid "Edit FunnelStepsContainer"
 msgstr "Editar Funil"
 
 #: admin/funnels/funnels-page.php:380
@@ -2631,7 +2631,7 @@ msgstr[1] "Excluídos %d funis"
 
 #: admin/funnels/funnels-page.php:429
 msgctxt "notice"
-msgid "Funnel duplicated"
+msgid "FunnelStepsContainer duplicated"
 msgstr "Funil duplicado"
 
 #: admin/funnels/funnels-page.php:464
@@ -2648,7 +2648,7 @@ msgstr "Por favor, selecione um modelo..."
 
 #: admin/funnels/funnels-page.php:518
 msgctxt "notice"
-msgid "Funnel created"
+msgid "FunnelStepsContainer created"
 msgstr "Funil criado"
 
 #: admin/funnels/funnels-page.php:664
@@ -2685,7 +2685,7 @@ msgstr "Funis devem começar com 1 ou mais benchmarks"
 
 #: admin/funnels/funnels-page.php:744
 msgctxt "notice"
-msgid "Funnel updated"
+msgid "FunnelStepsContainer updated"
 msgstr "Funil atualizado"
 
 #: admin/funnels/funnels-page.php:840
@@ -3487,13 +3487,13 @@ msgstr ""
 
 #: admin/settings/settings-page.php:532
 msgctxt "settings"
-msgid "Enable Funnel Builder V2 (Beta)"
+msgid "Enable FunnelStepsContainer Builder V2 (Beta)"
 msgstr "Ativar o Funil Builder V2 (Beta)"
 
 #: admin/settings/settings-page.php:533
 msgctxt "settings"
-msgid "Use the new version of the Funnel Builder."
-msgstr "Use a nova versão do Funnel Builder."
+msgid "Use the new version of the FunnelStepsContainer Builder."
+msgstr "Use a nova versão do FunnelStepsContainer Builder."
 
 #: admin/settings/settings-page.php:545 includes/classes/email.php:473
 #: templates/managed-page.php:148
@@ -5845,7 +5845,7 @@ msgid "Custom Range"
 msgstr "Personalizado"
 
 #: includes/reporting/reports/complete-funnel-activity.php:41
-msgid "Complete Funnel Activity"
+msgid "Complete FunnelStepsContainer Activity"
 msgstr "Atividade de Funil Completa"
 
 #: includes/reporting/reports/contacts-by-country.php:27
@@ -5907,7 +5907,7 @@ msgid "Last Broadcast"
 msgstr "Última transmissão"
 
 #: includes/reporting/reports/waiting-funnel-activity.php:41
-msgid "Waiting Funnel Activity"
+msgid "Waiting FunnelStepsContainer Activity"
 msgstr "Atividade de Funil de Espera"
 
 #: includes/reviews.php:28
@@ -7172,7 +7172,7 @@ msgstr "Mapear %s"
 
 #: templates/assets/email-templates.php:39
 msgctxt "email_template_name"
-msgid "Call To Action"
+msgid "Call To Step"
 msgstr "Chamada Para Ação"
 
 #: templates/assets/email-templates.php:40

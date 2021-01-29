@@ -242,9 +242,9 @@ add_filter( 'admin_footer_text', __NAMESPACE__ . '\add_bug_report_prompt' );
 
 add_filter( 'groundhogg/admin/emails/sanitize_email_content', __NAMESPACE__ . '\safe_css_filter_rgb_to_hex', 10 );
 add_filter( 'groundhogg/admin/emails/sanitize_email_content', __NAMESPACE__ . '\add_safe_style_attributes_to_email', 10 );
-add_filter( 'groundhogg/admin/emails/sanitize_email_content', __NAMESPACE__ . '\kses_wrapper', 11 );
+add_filter( 'groundhogg/admin/emails/sanitize_email_content', __NAMESPACE__ . '\email_kses', 11 );
 
-function kses_wrapper( $content ){
+function email_kses( $content ){
 
 	// Basic protocols
 	$basic_protocols = [ 'http', 'https', 'mailto','mms', 'sms', 'svn', 'tel', 'fax' ];

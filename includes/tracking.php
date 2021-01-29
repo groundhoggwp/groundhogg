@@ -647,7 +647,6 @@ class Tracking {
 		$this->email_opened();
 
 		$event    = $this->get_current_event();
-		$redirect = add_query_arg( [ 'key' => wp_create_nonce() ], $target );
 
 		/**
 		 * @since 2.1
@@ -659,7 +658,7 @@ class Tracking {
 		 * always.
 		 */
 		if ( ! $event || ! $event->exists() ) {
-			wp_redirect( $redirect );
+			wp_redirect( $target );
 
 			return;
 		}
@@ -679,7 +678,7 @@ class Tracking {
 		if ( get_db( 'activity' )->add( $args ) ) {
 			do_action( 'groundhogg/tracking/email/click', $this );
 
-			wp_redirect( $redirect );
+			wp_redirect( $target );
 
 			return;
 		}

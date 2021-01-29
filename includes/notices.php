@@ -19,6 +19,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+//wp_send_json( get_option( 'permalink_structure' ) );
+
 class Notices {
 	const TRANSIENT = 'groundhogg_notices';
 	const DISMISSED_NOTICES_OPTION = 'gh_dismissed_notices';

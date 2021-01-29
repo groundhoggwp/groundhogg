@@ -81,4 +81,16 @@ class Email_Notification implements Event_Process {
 	public function get_step_title() {
 		return $this->email->get_title();
 	}
+
+	/**
+	 * Event callback for the email notification
+	 *
+	 * @param $event Event
+	 *
+	 * @return bool
+	 */
+	public static function event_callback( $event ){
+		$notification = new Email_Notification( $event->get_step_id() );
+		return $notification->run( $event->get_contact(), $event );
+	}
 }

@@ -381,6 +381,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 			'data'   => $this->data,
 			'title'  => $this->get_title(),
 			'report' => $this->get_report_data(),
+			'user' => get_userdata($this->get_scheduled_by_id() )
 		];
 	}
 

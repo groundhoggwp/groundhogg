@@ -21,6 +21,10 @@ abstract class Base_Chart_Report extends Base_Report {
 	 */
 	abstract protected function get_options();
 
+	/**
+	 * @return string
+	 */
+
 
 	/**
 	 * Get the report data
@@ -31,6 +35,7 @@ abstract class Base_Chart_Report extends Base_Report {
 
 		return [
 			'type'  => 'chart',
+			'title' => $this->get_title(),
 			'chart' => [
 				'type'    => $this->get_type(),
 				'data'    => $this->get_datasets(),
@@ -44,18 +49,18 @@ abstract class Base_Chart_Report extends Base_Report {
 	 * Text to display if no data is available...
 	 */
 	protected function no_data_notice() {
-		return html()->e( 'div', [ 'class' => 'notice notice-warning' ], [
-			html()->e( 'p', [], __( 'No information available.', 'groundhogg' ) )
-		] );
+		return __( "No information available.", 'groundhogg' );
 	}
 
 	public function get_pie_chart_options() {
 		return [
-			'legend' => [
+			'maintainAspectRatio' => false,
+			'legend'              => [
 				'display' => false
+//				'position' => 'right'
 			],
-//			'responsive' => true,
-			'tooltips'   => [
+			'responsive'          => false,
+			'tooltips'            => [
 				'backgroundColor' => '#FFF',
 				'bodyFontColor'   => '#000',
 				'borderColor'     => '#727272',

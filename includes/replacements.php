@@ -307,6 +307,30 @@ class Replacements {
 	}
 
 	/**
+     * Get just the codes...
+     *
+	 * @return array
+	 */
+	public function get_codes(){
+	    return wp_list_pluck( array_values( $this->replacement_codes ), 'code' );
+    }
+
+	/**
+	 * @return array
+	 */
+    public function get_codes_with_pretty_name(){
+	    $codes =  $this->get_codes();
+
+	    $return = [];
+
+	    foreach ( $codes as $code ){
+	        $return[] = [ 'code' => $code, 'name' => key_to_words( $code ) ];
+        }
+
+	    return $return;
+    }
+
+	/**
 	 * Process the codes based on the given contact ID
 	 *
 	 * @param $contact_id_or_email int|bool|Contact ID of the contact
@@ -527,7 +551,7 @@ class Replacements {
 	 */
 	function tag_names( $contact_id ) {
 
-		$tag_ids = $this->get_current_contact()->get_tags();
+		$tag_ids = $this->get_current_contact()->get_tag_ids();
 		$tags    = array_map( [ $this, 'get_contact_tag_names' ], $tag_ids );
 
 		return implode( ',', $tags );
@@ -702,7 +726,7 @@ class Replacements {
 	 * @return mixed
 	 */
 	function replacement_notes( $contact_id ) {
-		$notes = $this->get_current_contact()->get_all_notes();
+		$notes = $this->get_current_contact()->get_notes();
 
 		$return = "";
 

@@ -69,34 +69,14 @@ class Apply_Note extends Action {
 	}
 
 	/**
-	 * @param $step Step
-	 */
-	public function settings( $step ) {
-		$this->start_controls_section();
-
-		$this->add_control( 'note_text', [
-			'label'       => __( 'Content:', 'groundhogg' ),
-			'type'        => HTML::TEXTAREA,
-			'default'     => "This contact is super awesome!",
-			'description' => __( 'Use any valid replacement codes.', 'groundhogg' ),
-			'field'       => [
-				'cols' => 64,
-				'rows' => 4
-			],
-		] );
-
-		$this->end_controls_section();
-	}
-
-	/**
 	 * Save the step settings
 	 *
 	 * @param $step Step
 	 */
 	public function save( $step ) {
+		$this->save_setting( 'note_title', sanitize_text_field( $this->get_posted_data( 'note_title', "" ) ) );
 		$this->save_setting( 'note_text', sanitize_textarea_field( $this->get_posted_data( 'note_text', "" ) ) );
 	}
-
 
 	/**
 	 * Process the apply note step...

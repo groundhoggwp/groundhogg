@@ -1,0 +1,34 @@
+@import "react/colors";
+
+
+$color :$groundhogg;
+.groundhogg-report-nav {
+  width: 100%;
+  background: #fff;
+  border-top: 1px solid $color;
+  border-bottom: 1px solid $color;
+  padding: 10px 10px;
+  margin-top: 10px;
+
+  .nav-link  {
+    color: $font-color !important;
+  }
+  .nav-link.active {
+    font-weight: 700;
+    border-bottom: 2px solid #fff;
+    border-bottom-color: $color;
+  }
+
+  .navbar-brand {
+    color: $color !important;
+  }
+
+  @media (max-width: 990px) {
+    .nav-link.active {
+      border: none;
+      color: $groundhogg;
+
+    }
+  }
+
+}

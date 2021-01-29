@@ -1,0 +1,386 @@
+@import "../master";
+
+input[type='text'].note-title {
+  width: 100%;
+}
+
+.aligncenter {
+  text-align: center;
+}
+
+textarea.note-content {
+  width: 100%;
+  height: 100px;
+}
+
+.main-preview-wrap {
+  padding: 20px;
+  vertical-align: bottom;
+
+  .email-item {
+    border: 1px solid $border-color-light;
+    background: $background-color-med;
+    border-radius: 5px;
+    vertical-align: top;
+    overflow: hidden;
+
+    .email-item-details {
+      padding: 10px;
+
+      .subject-line {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        font-size: 18px;
+      }
+    }
+  }
+}
+
+iframe.email-preview {
+  width: 100%;
+  height: 450px;
+  vertical-align: bottom;
+  overflow: hidden;
+
+  &.main-preview {
+    overflow-y: auto;
+  }
+}
+
+.modal-body {
+
+  .no-margins {
+    margin: 0 !important;
+  }
+
+  .no-padding {
+    padding: 0 !important;
+  }
+
+  label {
+    font-weight: 500;
+    //font-size: 18px;
+  }
+
+  input[type='text'],
+  input[type='email'],
+  input[type='tel'],
+  input[type='password'],
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  p {
+    font-size: 16px;
+
+    &.description {
+      font-size: 14px;
+    }
+
+  }
+
+  .nav-tabs {
+    margin-bottom: 10px;
+  }
+
+  .row {
+    padding: 10px 0 0 0;
+
+    &:last-child {
+      padding-bottom: 10px;
+    }
+  }
+}
+
+.groundhogg {
+  &.simple-edit-modal.modal {
+    //z-index: 999999;
+  }
+
+  &.simple-edit-modal.modal-backdrop {
+    //z-index: 99999;
+  }
+}
+
+.email-selector {
+  .email-search {
+    background: $background-color-med;
+    //padding: 20px;
+    border-bottom: 1px solid $border-color;
+  }
+
+  .grid-item {
+    padding: 20px;
+  }
+
+  .emails-grid {
+    padding: 20px;
+    display: inline-block;
+    max-height: 68vh;
+    overflow-y: auto;
+    background: $background-color-light;
+    width: 100%;
+    vertical-align: bottom;
+  }
+
+  .email-item {
+    border: 1px solid $border-color-light;
+    background: $background-color-med;
+    //height: 500px;
+    border-radius: 5px;
+    overflow: hidden;
+    vertical-align: top;
+    //cursor: pointer;
+    position: relative;
+
+    .selectable {
+      display: none;
+    }
+
+    .email-item-details {
+      padding: 10px;
+
+      .subject-line {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        font-size: 18px;
+      }
+    }
+
+    &:hover {
+      border-color: transparent;
+      transition: 150ms;
+
+      .selectable {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background: rgba(92, 92, 92, 0.8);
+        color: $white;
+        z-index: 99999;
+
+        .selectable-actions {
+          width: 250px;
+          text-align: center;
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%) translateX(-50%);
+          left: 50%;
+
+          .btn-outline-light:not(:hover) {
+            background: rgba(92, 92, 92, 0.8);
+          }
+        }
+      }
+    }
+  }
+}
+
+.modal-90w {
+  width: 90%;
+  max-width: none !important;
+}
+
+.modal-80w {
+  width: 80%;
+  max-width: none !important;
+}
+
+.modal-70w {
+  width: 70%;
+  max-width: none !important;
+}
+
+.form-preview {
+
+  padding: 20px;
+  border-left: 1px solid $border-color-light;
+
+  .is-required {
+    color: $error-red;
+  }
+
+  label {
+    display: block;
+
+    input[type='text'],
+    input[type='email'],
+    input[type='tel'],
+    input[type='password'],
+      //input[type='password'],
+    textarea,
+    select {
+      font-weight: normal;
+    }
+
+  }
+
+  .gh-form-column {
+    padding: 15px;
+
+    border: dashed $border-color-light;
+    border-width: 0 0 0 1px;
+
+    &:hover {
+      border-color: $border-hover-color;
+      margin: -1px 0 -1px 0;
+      border-width: 1px 1px 1px 1px;
+    }
+
+    &:nth-last-child(2) {
+      border-right-width: 1px;
+    }
+
+    p.description {
+      margin: 0;
+    }
+  }
+
+  .address-fields{
+    .gh-form-row,
+    .gh-form-column {
+      padding: 0;
+      margin: 0;
+      border: none;
+    }
+  }
+
+  .gh-form-row {
+
+    border: dashed $border-color-light;
+    border-width: 1px 0 0 0;
+    display: flex;
+
+    &:last-child {
+      border-bottom-width: 1px;
+    }
+  }
+}
+
+.form-name-wrap {
+
+  width: 500px;
+  margin: auto;
+
+  input.form-name {
+    width: 300px;
+  }
+}
+
+.form-builder-wrap {
+  padding: 20px;
+
+  .add-field-wrap {
+    margin-top: 20px;
+    text-align: center;
+  }
+}
+
+.form-fields {
+
+  margin-top: 20px;
+
+  .field-attributes {
+    margin: 0 10px 0 10px;
+    border: solid $border-color;
+    border-width: 0 1px 1px 1px;
+    padding: 15px;
+  }
+
+  .field-sortable-item {
+    margin: 10px 10px 0 10px;
+    padding: 15px;
+    border: 1px solid $border-color;
+    background-color: $background-color-light;
+    font-size: 16px;
+    position: relative;
+    cursor: pointer;
+
+    &:hover {
+      border-color: $border-hover-color;
+    }
+
+    .edit-field-button,
+    .delete-field-button {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background: transparent;
+      border: none;
+      border-left: 1px solid $border-color;
+      width: 55px;
+
+      .dashicons {
+        font-size: 22px;
+        vertical-align: text-top;
+        height: 22px;
+        width: 22px;
+      }
+    }
+  }
+}
+
+.modal-dialog.form {
+  .nav-tabs .nav-item {
+    border-top: none !important;
+    border-radius: 0;
+  }
+
+  .nav-tabs {
+    margin-bottom: 0;
+    background-color: $background-color-light;
+  }
+}
+
+label.block {
+  display: block;
+}
+
+.field-attribute-control.attribute-options {
+
+  //background: $background-color-light;
+  //border-width: 1px 0;
+  //border-style: solid;
+  //border-color: $border-color;
+  padding: 16px 0 6px 0;
+  margin-top: 10px;
+
+  .attribute-option {
+
+    .col,
+    .col-sm-2,
+    .col-sm-3,
+    .col-sm-4,
+    .col-sm-1 {
+      padding: 0 8px 0 0;
+    }
+
+    input {
+      width: 100%;
+    }
+  }
+}
+
+.clear-button {
+  background: transparent;
+  border: none;
+}
+
+.delete-button {
+  color: $error-red;
+}
+
+.tab-content-inner {
+
+  &.submit,
+  &.embed {
+    padding: 15px;
+  }
+}

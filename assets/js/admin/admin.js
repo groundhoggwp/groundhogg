@@ -1,3 +1,11 @@
+import {
+  addTableColumn,
+  registerNavItem,
+  registerSetting,
+  registerSettingsSection,
+  registerSettingsPanel,
+} from './framework/index.js';
+
 ( function ($, nonces, endpoints, gh) {
 
   // Serialize better
@@ -123,11 +131,17 @@
   gh.pickers = {}
 
   // Map functions to Groundhogg object.
+  gh.hooks = wp.hooks.createHooks();
   gh.pickers.picker = picker
   gh.pickers.apiPicker = apiPicker
   gh.pickers.linkPicker = linkPicker
   gh.pickers.metaPicker = metaPicker
   gh.nonces = nonces
   gh.endpoints = endpoints
+  gh.addTableColumn = addTableColumn
+  gh.registerNavItem = registerNavItem
+  gh.registerSetting = registerSetting
+  gh.registerSettingsPanel = registerSettingsPanel
+  gh.registerSettingsSection = registerSettingsSection
 
 } )(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)

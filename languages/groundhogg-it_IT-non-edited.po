@@ -841,8 +841,8 @@ msgstr "Invia SMS"
 
 #: admin/contacts/contact-editor.php:613
 msgctxt "contact_record"
-msgid "Add To Funnel"
-msgstr "Aggiungi al Funnel"
+msgid "Add To FunnelStepsContainer"
+msgstr "Aggiungi al FunnelStepsContainer"
 
 #: admin/contacts/contact-editor.php:638
 msgid "Start"
@@ -913,7 +913,7 @@ msgstr ""
 #: admin/contacts/contact-editor.php:845
 #, fuzzy
 msgctxt "contact_record"
-msgid "Recent Funnel History"
+msgid "Recent FunnelStepsContainer History"
 msgstr "Storia recente dell'imbuto"
 
 #: admin/contacts/contact-editor.php:846
@@ -1412,8 +1412,8 @@ msgstr "ora locale"
 #: admin/contacts/tables/contact-events-table.php:68
 #: admin/events/events-table.php:60
 msgctxt "Column label"
-msgid "Funnel"
-msgstr "Funnel"
+msgid "FunnelStepsContainer"
+msgstr "FunnelStepsContainer"
 
 #: admin/contacts/tables/contact-events-table.php:69
 #: admin/events/events-table.php:61
@@ -1447,8 +1447,8 @@ msgstr "Eventi di processo"
 #: admin/contacts/tables/contact-events-table.php:123
 #: admin/events/events-table.php:405 admin/events/events-table.php:406
 msgctxt "action"
-msgid "Edit Funnel"
-msgstr "Modifica Funnel"
+msgid "Edit FunnelStepsContainer"
+msgstr "Modifica FunnelStepsContainer"
 
 #: admin/contacts/tables/contact-events-table.php:131
 #: admin/contacts/tables/contact-events-table.php:132
@@ -1734,8 +1734,8 @@ msgid "Conversion Rate (%)"
 msgstr "Tasso di conversione (%)"
 
 #: admin/dashboard/widgets/funnel-breakdown.php:40
-msgid "Funnel Breakdown"
-msgstr "Ripartizione del Funnel"
+msgid "FunnelStepsContainer Breakdown"
+msgstr "Ripartizione del FunnelStepsContainer"
 
 #: admin/dashboard/widgets/funnel-breakdown.php:158
 msgid "Step"
@@ -2567,8 +2567,8 @@ msgstr "Visualizza contatto"
 
 #: admin/funnels/add-funnel.php:31
 msgctxt "add_funnel_tab"
-msgid "Funnel Templates"
-msgstr "Modelli Funnel"
+msgid "FunnelStepsContainer Templates"
+msgstr "Modelli FunnelStepsContainer"
 
 #: admin/funnels/add-funnel.php:33
 msgctxt "add_funnel_tab"
@@ -2578,7 +2578,7 @@ msgstr "Marketplace"
 #: admin/funnels/add-funnel.php:35
 #, fuzzy
 msgctxt "add_funnel_tab"
-msgid "Import Funnel"
+msgid "Import FunnelStepsContainer"
 msgstr "Imbuto di importazione"
 
 #: admin/funnels/add-funnel.php:58
@@ -2619,11 +2619,11 @@ msgstr ""
 #: admin/funnels/add-funnel.php:142
 #, fuzzy
 msgctxt "action"
-msgid "Import Funnel"
+msgid "Import FunnelStepsContainer"
 msgstr "Imbuto di importazione"
 
 #: admin/funnels/funnel-editor-v2.php:43 admin/funnels/funnel-editor.php:55
-msgid "Enter Funnel Name Here"
+msgid "Enter FunnelStepsContainer Name Here"
 msgstr "Inserisci il nome del funnel qui"
 
 #: admin/funnels/funnel-editor-v2.php:95 admin/funnels/funnel-editor.php:100
@@ -2681,13 +2681,13 @@ msgstr "Selezionare da dove iniziare:"
 
 #: admin/funnels/funnel-editor-v2.php:351 admin/funnels/funnel-editor.php:314
 #, fuzzy
-msgid "Add Contacts to Funnel"
+msgid "Add Contacts to FunnelStepsContainer"
 msgstr "Aggiungere contatti all'imbuto"
 
 #: admin/funnels/funnel-editor.php:39
 #, fuzzy
-msgid "The new and improved Funnel Builder has Arrived!"
-msgstr "Il nuovo e migliorato Funnel Builder è arrivato!"
+msgid "The new and improved FunnelStepsContainer Builder has Arrived!"
+msgstr "Il nuovo e migliorato FunnelStepsContainer Builder è arrivato!"
 
 #: admin/funnels/funnel-editor.php:39
 #, fuzzy
@@ -2706,7 +2706,7 @@ msgstr "Attivare un imbuto!"
 #: admin/funnels/funnels-page.php:112 admin/funnels/funnels-page.php:364
 msgctxt "page_title"
 msgid "Funnels"
-msgstr "Funnel"
+msgstr "FunnelStepsContainer"
 
 #: admin/funnels/funnels-page.php:179
 #, fuzzy
@@ -2735,8 +2735,8 @@ msgstr ""
 "archiviati che semplicemente non compaiono nella lista principale."
 
 #: admin/funnels/funnels-page.php:187
-msgid "Add A Funnel"
-msgstr "Aggiungi Funnel"
+msgid "Add A FunnelStepsContainer"
+msgstr "Aggiungi FunnelStepsContainer"
 
 #: admin/funnels/funnels-page.php:188
 #, fuzzy
@@ -2755,7 +2755,7 @@ msgstr ""
 #: admin/funnels/funnels-page.php:196
 #, fuzzy
 msgid ""
-"When editing a funnel you can add Funnel Steps. Funnel Steps are either "
+"When editing a funnel you can add FunnelStepsContainer Steps. FunnelStepsContainer Steps are either "
 "Benchmarks or Actions. Benchmarks are whenever a Contact \"does\" something, "
 "while Actions are doing thing to a contact such as sending an email. Simply "
 "drag in the desired funnel steps in any order."
@@ -2820,13 +2820,13 @@ msgstr ""
 #: admin/funnels/funnels-page.php:357
 #, fuzzy
 msgctxt "page_title"
-msgid "Add Funnel"
+msgid "Add FunnelStepsContainer"
 msgstr "Aggiungi Imbuto"
 
 #: admin/funnels/funnels-page.php:360
 msgctxt "page_title"
-msgid "Edit Funnel"
-msgstr "Modifica Funnel"
+msgid "Edit FunnelStepsContainer"
+msgstr "Modifica FunnelStepsContainer"
 
 #: admin/funnels/funnels-page.php:380
 #, php-format
@@ -2847,7 +2847,7 @@ msgstr[1] "Ripristina %d funnel"
 #: admin/funnels/funnels-page.php:429
 #, fuzzy
 msgctxt "notice"
-msgid "Funnel duplicated"
+msgid "FunnelStepsContainer duplicated"
 msgstr "Imbuto duplicato"
 
 #: admin/funnels/funnels-page.php:464
@@ -2865,8 +2865,8 @@ msgstr "Selezionare un modello....."
 
 #: admin/funnels/funnels-page.php:518
 msgctxt "notice"
-msgid "Funnel created"
-msgstr "Funnel creato"
+msgid "FunnelStepsContainer created"
+msgstr "FunnelStepsContainer creato"
 
 #: admin/funnels/funnels-page.php:664
 #, fuzzy
@@ -2908,7 +2908,7 @@ msgstr "Le gallerie devono iniziare con uno o più parametri di riferimento"
 #: admin/funnels/funnels-page.php:744
 #, fuzzy
 msgctxt "notice"
-msgid "Funnel updated"
+msgid "FunnelStepsContainer updated"
 msgstr "Aggiornato l'imbuto"
 
 #: admin/funnels/funnels-page.php:840
@@ -2926,7 +2926,7 @@ msgstr[1] "%d contatti aggiunti al funnel"
 
 #: admin/funnels/funnels-page.php:983
 msgid "Search Funnels"
-msgstr "Cerca Funnel"
+msgstr "Cerca FunnelStepsContainer"
 
 #: admin/funnels/funnels-page.php:1068 includes/license-manager.php:406
 #, fuzzy, php-format
@@ -3789,14 +3789,14 @@ msgstr ""
 #: admin/settings/settings-page.php:532
 #, fuzzy
 msgctxt "settings"
-msgid "Enable Funnel Builder V2 (Beta)"
+msgid "Enable FunnelStepsContainer Builder V2 (Beta)"
 msgstr "Abilita Costruttore di imbuto V2 (Beta)"
 
 #: admin/settings/settings-page.php:533
 #, fuzzy
 msgctxt "settings"
-msgid "Use the new version of the Funnel Builder."
-msgstr "Utilizzare la nuova versione di Funnel Builder."
+msgid "Use the new version of the FunnelStepsContainer Builder."
+msgstr "Utilizzare la nuova versione di FunnelStepsContainer Builder."
 
 #: admin/settings/settings-page.php:545 includes/classes/email.php:473
 #: templates/managed-page.php:148
@@ -6461,7 +6461,7 @@ msgstr "Gamma personalizzata"
 
 #: includes/reporting/reports/complete-funnel-activity.php:41
 #, fuzzy
-msgid "Complete Funnel Activity"
+msgid "Complete FunnelStepsContainer Activity"
 msgstr "Completare l'attività dell'imbuto"
 
 #: includes/reporting/reports/contacts-by-country.php:27
@@ -6535,7 +6535,7 @@ msgstr "Ultima trasmissione"
 
 #: includes/reporting/reports/waiting-funnel-activity.php:41
 #, fuzzy
-msgid "Waiting Funnel Activity"
+msgid "Waiting FunnelStepsContainer Activity"
 msgstr "Attività dell'imbuto di attesa"
 
 #: includes/reviews.php:28
@@ -7968,8 +7968,8 @@ msgstr "Mappa %s"
 
 #: templates/assets/email-templates.php:39
 msgctxt "email_template_name"
-msgid "Call To Action"
-msgstr "Call To Action"
+msgid "Call To Step"
+msgstr "Call To Step"
 
 #: templates/assets/email-templates.php:40
 #, fuzzy

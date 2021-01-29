@@ -3,7 +3,7 @@
 namespace Groundhogg;
 
 use Composer\Repository\PackageRepository;
-use Groundhogg\Api\V3\Unsubscribe_Api;
+use Groundhogg\Api\V4\Unsubscribe_Api;
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Email_Meta;
 use Groundhogg\DB\Emails;
@@ -1046,6 +1046,12 @@ class Email extends Base_Object_With_Meta {
 			'all_clicks'   => $all_clicked,
 			'unsubscribed' => $unsubscribed,
 		];
+	}
+
+	public function get_as_array() {
+		$array = parent::get_as_array();
+		$array['url'] = managed_page_url('emails/' . $this->get_id() );
+		return $array;
 	}
 
 

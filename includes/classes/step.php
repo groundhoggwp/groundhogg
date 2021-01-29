@@ -6,6 +6,7 @@ use Groundhogg\DB\DB;
 use Groundhogg\DB\Event_Queue;
 use Groundhogg\DB\Events;
 use Groundhogg\DB\Meta_DB;
+use Groundhogg\DB\Step_Edges;
 use Groundhogg\DB\Step_Meta;
 use Groundhogg\DB\Steps;
 
@@ -26,6 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Step extends Base_Object_With_Meta implements Event_Process {
 	const BENCHMARK = 'benchmark';
+	const CONDITION = 'condition';
 	const ACTION = 'action';
 
 	/**
@@ -36,6 +38,10 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @var Contact
 	 */
 	public $enqueued_contact;
+
+	protected $child_edges = [];
+
+	protected $parents_edges = [];
 
 	/**
 	 * Return the DB instance that is associated with items of this type.
@@ -53,6 +59,13 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	protected function get_meta_db() {
 		return get_db( 'stepmeta' );
+	}
+
+	/**
+	 * @return Step_Edges
+	 */
+	protected function get_edges_db() {
+		return get_db( 'step_edges' );
 	}
 
 	/**
@@ -79,6 +92,12 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return void
 	 */
 	protected function post_setup() {
+		$this->setup_edges();
+	}
+
+	protected function setup_edges() {
+		$this->child_edges   = $this->get_edges_db()->query( [ 'from_id' => $this->get_id() ] );
+		$this->parents_edges = $this->get_edges_db()->query( [ 'to_id' => $this->get_id() ] );
 	}
 
 	/**
@@ -96,6 +115,24 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 	public function get_title() {
 		return $this->step_title;
+	}
+
+	/**
+	 * @return Step[]
+	 */
+	public function get_child_steps() {
+		return array_map( function ( $edge ) {
+			return new Step( $edge->to_id );
+		}, $this->child_edges );
+	}
+
+	/**
+	 * @return Step[]
+	 */
+	public function get_parent_steps() {
+		return array_map( function ( $edge ) {
+			return new Step( $edge->from_id );
+		}, $this->parents_edges );
 	}
 
 	public function get_order() {
@@ -122,6 +159,43 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * @param        $step Step
+	 * @param string $path
+	 */
+	public function add_child_step( $step, $path = '' ) {
+		$this->get_edges_db()->add( [
+
+		] );
+
+		$this->setup_edges();
+	}
+
+	/**
+	 * @param $step Step
+	 */
+	public function remove_child_step( $step ) {
+		$this->get_edges_db()->delete( [
+			'from_id' => $this->get_id(),
+			'to_id'   => $step->get_id(),
+		] );
+
+		$this->setup_edges();
+	}
+
+	/**
+	 * @return array|mixed|void
+	 */
+	public function get_as_array() {
+		return apply_filters( "groundhogg/{$this->get_object_type()}/get_as_array", [
+			'ID'           => $this->get_id(),
+			'data'         => $this->data,
+			'meta'         => $this->meta,
+			'child_edges'  => $this->child_edges,
+			'parent_edges' => $this->parents_edges,
+		] );
+	}
+
+	/**
 	 * Get an array of contacts which are "waiting'
 	 * @return Contact[] | false
 	 */
@@ -139,7 +213,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		return $contacts;
 	}
-
 
 	/**
 	 * Get an array of waiting events
@@ -181,54 +254,41 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
-	 * Get the next step in the order
+	 * Whether the current step is a condition.
 	 *
-	 * @return Step|false
+	 * @return bool
 	 */
-	public function get_next_action() {
+	public function is_condition() {
+		return $this->get_group() === self::CONDITION;
+	}
 
-		/* this will give an array of objects ordered by appearance in the funnel builder */
-		$items = $this->get_funnel()->get_steps();
+	/**
+	 * Get the next step in the funnel.
+	 *
+	 * @return bool|Step
+	 */
+	public function get_next_step() {
 
-		if ( empty( $items ) ) {
-			/* something went wrong or there are no more steps*/
-			return false;
-		}
+		if ( $this->is_action() || $this->is_benchmark() ) {
 
-		$i = $this->get_order();
-
-		if ( $i >= count( $items ) ) {
-
-			/* This is the last step. */
-			return false;
-		}
-
-		if ( $items[ $i ]->get_group() === self::ACTION ) {
-
-			/* regardless of whether the current step is an action
-			or a benchmark we can run the next step if it's an action */
-			return $items[ $i ];
-
-		}
-
-		if ( $this->is_benchmark() ) {
-
-			while ( $i < count( $items ) ) {
-
-				if ( $items[ $i ]->get_group() === self::ACTION ) {
-
-					return $items[ $i ];
-
+			foreach ( $this->get_child_steps() as $child ) {
+				if ( $child->is_action() ) {
+					return $child;
 				}
-
-				$i ++;
-
 			}
+
+		} else if ( $this->is_condition() ) {
+
+			// Todo process the condition.
+
+			$passed = 1 || 2;
+			$index  = $passed ? 0 : 1;
+
+			return get_array_var( $this->get_child_steps(), $index );
 
 		}
 
 		return false;
-
 	}
 
 	/**
@@ -270,18 +330,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			return false;
 		}
 
-		// Update any events to skipped...
-		$this->get_event_queue_db()->mass_update(
-			[
-				'status' => Event::SKIPPED
-			],
-			[
-				'funnel_id'  => $this->get_funnel_id(),
-				'contact_id' => $contact->get_id(),
-				'event_type' => Event::FUNNEL,
-				'status'     => Event::WAITING
-			]
-		);
+		// Todo handle the contact being in the funnel in two places...
 
 		// Setup the new event args
 		$event = [
@@ -304,27 +353,43 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return bool
 	 */
 	public function can_complete( $contact = null ) {
+
 		// Actions cannot be completed.
-		if ( $this->is_action() || ! $this->is_active() ) {
-			return false;
-		}
+		if ( $this->is_action() || $this->is_condition() || ! $this->is_active() ) {
+			$can_complete = false;
+		} // Check if starting
+		else if ( $this->is_starting() ) {
+			$can_complete = true;
+			// check the path to see if this benchmark is in the same path as the contact.
+		} else {
+			// The step where the contact currently is in the funnel
+			$contact_step = $this->get_current_funnel_step( $contact );
 
-		// Check if starting
-		if ( $this->is_starting() ) {
-			return true;
-		} // If inner step, check if contact is at a step before this one.
-		else if ( $this->is_inner() ) {
+			// traverse the tree upwards to see if the current step is in the same path as this one.
+			$queue        = [ $this ];
+			$can_complete = false;
 
-			// get the current funnel step
-			$current_order = $this->get_current_funnel_step_order( $contact );
+			// BFS to find if the path is correct.
+			while ( ! empty( $queue ) && $can_complete === false ) {
 
-			// If the step order is < than this one, return true.
-			if ( $current_order && $current_order < $this->get_order() ) {
-				return true;
+				$current = array_shift( $queue );
+
+				// If the contact's current step was found among the parents/grandparents
+				// of the $this step.
+				if ( $current->get_id() === $contact_step->get_id() ) {
+					$can_complete = true;
+					break;
+				}
+
+				// Add the $current steps parents to the queue.
+				foreach ( $current->get_parents() as $parent ) {
+					array_push( $queue, $parent );
+				}
+
 			}
 		}
 
-		return apply_filters( 'groundhogg/step/can_complete', false, $this, $contact );
+		return apply_filters( 'groundhogg/step/can_complete', $can_complete, $this, $contact );
 	}
 
 	/**
@@ -333,9 +398,9 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 *
 	 * @param $contact Contact
 	 *
-	 * @return bool|int
+	 * @return bool|Step
 	 */
-	public function get_current_funnel_step_order( $contact ) {
+	public function get_current_funnel_step( $contact ) {
 
 		// Search waiting events, automatically the current event.
 		$events = $this->get_event_queue_db()->query( [
@@ -349,7 +414,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			$event = new Event( absint( $event->ID ), 'event_queue' );
 			// Double check step exists...
 			if ( $event->exists() && $event->get_step() && $event->get_step()->exists() ) {
-				return $event->get_step()->get_order();
+				return $event->get_step();
 			}
 		}
 
@@ -370,7 +435,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 			// Double check step exists...
 			if ( $event->exists() && $event->get_step() && $event->get_step()->exists() ) {
-				return $event->get_step()->get_order();
+				return $event->get_step();
 			}
 		}
 
@@ -414,46 +479,12 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 	/**
 	 * Whether the step starts a funnel
+	 * Will be starting if there are no parent steps and the step is in fact a benchmark.
 	 *
 	 * @return bool
 	 */
 	public function is_starting() {
-		if ( $this->is_action() ) {
-			return false;
-		}
-
-		if ( $this->get_order() === 1 ) {
-			return true;
-		}
-
-		$step_order = $this->get_order() - 1;
-		$steps      = $this->get_funnel()->get_steps();
-
-		while ( $step_order > 0 ) {
-
-			$step = $steps[ $step_order ];
-
-			if ( $step->is_action() ) {
-				return false;
-			}
-
-			$step_order -= 1;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Return the name given with the ID prefixed for easy access in the $_POST variable
-	 *
-	 * @deprecated since 2.0
-	 *
-	 * @param $name
-	 *
-	 * @return string
-	 */
-	public function prefix( $name ) {
-		return $this->get_id() . '_' . esc_attr( $name );
+		return $this->is_benchmark() && empty( $this->parent_steps );
 	}
 
 	/**
@@ -489,66 +520,40 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		// Modify the result
 		$result = apply_filters( 'groundhogg/steps/run/result', $result, $this, $contact, $event );
 
+		if ( $result ) {
+
+			$next = $this->get_next_step();
+
+			if ( $next ) {
+				$next->enqueue( $contact );
+			}
+		}
+
 		return $result;
 	}
 
-
-	/**
-	 * Output the HTML of a step.
-	 */
-	public function sortable_item() {
-		if ( has_action( "groundhogg/steps/{$this->get_type()}/sortable" ) ) {
-			do_action( "groundhogg/steps/{$this->get_type()}/sortable", $this );
-		} else {
-			do_action( "groundhogg/steps/error/sortable", $this );
+	public function validate() {
+		if ( has_action( "groundhogg/steps/{$this->get_type()}/validate" ) ) {
+			do_action( "groundhogg/steps/{$this->get_type()}/validate", $this );
 		}
 	}
 
 	/**
-	 * Output the HTML of a step.
+	 * Update wrapper
+	 *
+	 * @param array $data
+	 * @param array $meta
+	 *
+	 * @return bool
 	 */
-	public function html() {
-		if ( has_action( "groundhogg/steps/{$this->get_type()}/html" ) ) {
-			do_action( "groundhogg/steps/{$this->get_type()}/html", $this );
-		} else {
-			do_action( "groundhogg/steps/error/html", $this );
-		}
-	}
+	public function update( $data = [], $meta=[] ) {
 
-	/**
-	 * Output icon html
-	 */
-	public function icon() {
-
-		$icon = false;
-
-		if ( has_filter( "groundhogg/steps/{$this->get_type()}/icon" ) ) {
-			$icon = apply_filters( "groundhogg/steps/{$this->get_type()}/icon", $this );
+		if ( ! empty( $data ) ) {
+			$data['last_edited']    = current_time( 'mysql' );
+			$data['last_edited_by'] = is_user_logged_in() ? get_current_user_id() : 'system';
 		}
 
-		return $icon ?: GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/no-icon.png';
-	}
-
-	/**
-	 * Output the HTML of a step.
-	 */
-	public function html_v2() {
-		if ( has_action( "groundhogg/steps/{$this->get_type()}/html_v2" ) ) {
-			do_action( "groundhogg/steps/{$this->get_type()}/html_v2", $this );
-		} else {
-			do_action( "groundhogg/steps/error/html_v2", $this );
-		}
-	}
-
-	/**
-	 * Save the step
-	 */
-	public function save() {
-		if ( has_action( "groundhogg/steps/{$this->get_type()}/save" ) ) {
-			do_action( "groundhogg/steps/{$this->get_type()}/save", $this );
-		} else {
-			do_action( "groundhogg/steps/error/save", $this );
-		}
+		return parent::update( $data, $meta );
 	}
 
 	/**
@@ -565,12 +570,17 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * Get the step title...
+	 *
 	 * @return string
 	 */
 	public function get_step_title() {
 		return $this->get_title();
 	}
 
+	/**
+	 * @return mixed
+	 */
 	public function get_step_notes() {
 		return $this->get_meta( 'step_notes' );
 	}
@@ -587,104 +597,23 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
-	 * Get the HTML of the step and return it.
-	 *
-	 * @return false|string
-	 */
-	public function __toString() {
-		ob_start();
-
-		$this->html();
-
-		$html = ob_get_clean();
-
-		return $html;
-	}
-
-	/**
-	 * Return whether or not the current action can run.
-	 * This was implement so that WPMU could be effectively implemented with the GLOBAL DB option enabled.
-	 *
-	 * Always return true if not a multisite or multisite global is not enabled
-	 * otherwise compare the current blog ID to the blg ID associated with the step.
-	 *
-	 * @deprecated
+	 * Ensure the step can run.
 	 */
 	public function can_run() {
-
-		if ( Plugin::$instance->settings->is_global_multisite() ) {
-
-			$blog_id = $this->get_meta( 'blog_id' );
-
-			/* all blogs */
-			if ( ! $blog_id ) {
-
-				return true;
-
-				/* Current blog */
-			} else if ( intval( $blog_id ) === get_current_blog_id() ) {
-
-				return true;
-
-				/* Wrong Blog */
-			} else {
-
-				return false;
-
-			}
-
-		}
-
-		return true;
-
+		return ( $this->is_action() || $this->is_condition() ) && $this->is_active();
 	}
 
-	/**
-	 * Restore the process to the current blog.
-	 *
-	 * @deprecated since 2.0
-	 */
-	public function restore_current_blog() {
-		if ( Plugin::$instance->settings->is_global_multisite() && ms_is_switched() ) {
-			restore_current_blog();
-		}
-	}
 
 	/**
-	 * Switches to the blog which the step can run on.
+	 * Callback to trigger the run method of the associated step
 	 *
-	 * @deprecated since 2.0
-	 */
-	public function switch_to_blog() {
-		if ( Plugin::$instance->settings->is_global_multisite() ) {
-			$blog_id = $this->get_meta( 'blog_id' );
-			if ( $blog_id && intval( $blog_id ) !== get_current_blog_id() ) {
-				switch_to_blog( $blog_id );
-			}
-		}
-	}
-
-	/**
-	 * Needs to handle the moving of contacts to another step...
+	 * @param $event Event
 	 *
-	 * @return bool
+	 * @return bool|\WP_Error
 	 */
-	public function delete() {
+	public static function event_callback( $event ) {
+		$step = new Step( $event->get_step_id() );
 
-		// Maybe Move contacts forward...
-		$next_step = $this->get_next_action();
-
-		if ( $next_step && $next_step->is_active() ) {
-			$contacts = $this->get_waiting_contacts();
-
-			if ( ! empty( $contacts ) ) {
-				foreach ( $contacts as $contact ) {
-					$next_step->enqueue( $contact );
-				}
-			}
-
-		}
-
-		return parent::delete();
+		return $step->run( $event->get_contact(), $event );
 	}
 }

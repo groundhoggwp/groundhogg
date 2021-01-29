@@ -1,0 +1,150 @@
+@import '../../master';
+
+.step-wrap {
+
+  &.deleting {
+    opacity: 0;
+    transition: 0.5s;
+    transition-timing-function: ease-in-out;
+
+    .step{
+      border-color: $error-red;
+      color: $error-red;
+      background-color: $error-red-background;
+    }
+  }
+
+  &.deleted{
+    display: none;
+  }
+
+  .step-title {
+    padding-left: 60px;
+    cursor: pointer;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: calc(100% - 140px);
+
+    b {
+      font-weight: 500;
+    }
+  }
+
+  .edit-step-controls {
+    display: inline-block;
+  }
+
+  .line-left {
+    border-left: 2px solid $border-color;
+    margin: 5px 0 5px 10px;
+    padding: 10px 10px 10px 22px;
+  }
+
+  .delay {
+    //margin: 10px 30px;
+    font-size: 16px;
+
+    .delay-text {
+      cursor: pointer;
+      background: $background-color;
+      padding: 0 4px;
+
+      b {
+        font-weight: 500;
+      }
+    }
+
+    .dashicons {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+      margin-right: 10px;
+    }
+  }
+
+  .step {
+    height: 54px;
+    display: flex;
+    align-items: center;
+
+    &.action {
+      //margin: 10px 22px;
+      padding: 10px;
+      background-color: #FFFFFF;
+
+      .step-icon {
+        background: $action-color;
+      }
+    }
+
+    &.benchmark {
+      margin: 10px 10px 0 10px;
+      padding: 10px;
+      background-color: #FFFFFF;
+
+      .step-icon {
+        background: $benchmark-color;
+      }
+
+      &:last-child {
+        margin-bottom: 10px;
+      }
+    }
+
+    .step-controls {
+      visibility: hidden;
+      opacity: 0;
+      transition: visibility 0s, opacity 0.5s linear;
+    }
+
+    &:hover {
+
+      border-color: $border-hover-color;
+
+      .step-controls {
+        visibility: visible;
+        opacity: 1;
+        transition: visibility 0s, opacity 0.5s linear;
+      }
+    }
+  }
+
+  &:last-child {
+    .line-left {
+      //border-left-color: transparent;
+    }
+  }
+}
+
+.delay-text {
+  .gh-highlight {
+    color: #1c271c;
+    font-weight: 500;
+    font-size: 15px;
+    background: rgba(92, 192, 165, 0.11);
+    display: inline-block;
+    padding: 0 7px;
+    border-radius: 6px;
+  }
+}
+
+.delay-types.btn-group {
+  .btn {
+
+    position: relative;
+    padding-left: 30px;
+
+    .dashicons {
+      position: absolute;
+      left: 6px;
+      top: 8px;
+    }
+  }
+}
+
+.edit-delay-controls{
+  input,select{
+    font-size: 16px;
+  }
+}

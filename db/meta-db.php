@@ -229,13 +229,21 @@ abstract class Meta_DB extends DB {
 	/**
 	 * Returns an array of all the meta keys in a table.
 	 *
+	 * @param string $search
+	 *
 	 * @return array
 	 */
-	public function get_keys() {
+	public function get_keys( $search = '' ) {
 		global $wpdb;
 
+		$where = '1=1';
+
+		if ( $search ){
+			$where = $wpdb->prepare( "meta_key RLIKE %s", $search );
+		}
+
 		$keys = $wpdb->get_col(
-			"SELECT DISTINCT meta_key FROM $this->table_name ORDER BY meta_key ASC"
+			"SELECT DISTINCT meta_key FROM $this->table_name WHERE $where ORDER BY meta_key ASC"
 		);
 
 		$key_array = array_combine( $keys, $keys );

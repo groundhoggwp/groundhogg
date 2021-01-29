@@ -67,6 +67,8 @@ class Admin_Menu {
 		$this->bulk_jobs = new Bulk_Job_Page();
 
 		$this->reporting = new Reports_Page();
+
+//		new React_App();
 //        $this->dashboard = new Dashboard_Widgets();
 
 		if ( ! is_white_labeled() ) {

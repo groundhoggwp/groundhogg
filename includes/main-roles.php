@@ -87,7 +87,11 @@ class Main_Roles extends Roles {
 					'publish_pages'          => true,
 					'publish_posts'          => true,
 					'read_private_pages'     => true,
-					'read_private_posts'     => true
+					'read_private_posts'     => true,
+					'add_activity'           => true,
+					'edit_activity'          => true,
+					'view_activity'          => true,
+
 				]
 			],
 			[
@@ -97,7 +101,8 @@ class Main_Roles extends Roles {
 					'read'         => true,
 					'edit_posts'   => false,
 					'upload_files' => true,
-					'delete_posts' => false
+					'delete_posts' => false,
+
 				]
 			],
 			[
@@ -145,7 +150,13 @@ class Main_Roles extends Roles {
 			'send_emails',
 			'view_events',
 			'manage_tags',
-			'download_contact_files'
+			'download_contact_files',
+			'add_notes',
+			'delete_notes',
+			'edit_notes',
+			'view_notes',
+			'add_activity',
+			'view_activity',
 		];
 	}
 
@@ -163,7 +174,13 @@ class Main_Roles extends Roles {
 			'send_emails',
 			'view_events',
 			'manage_tags',
-			'download_contact_files'
+			'download_contact_files',
+			'add_notes',
+			'delete_notes',
+			'edit_notes',
+			'view_notes',
+			'add_activity',
+			'view_activity',
 		];
 	}
 
@@ -215,9 +232,32 @@ class Main_Roles extends Roles {
 			'delete_tags',
 			'edit_tags',
 			'manage_tags',
+			'view_tags',
 		);
 
 		return apply_filters( 'groundhogg/roles/caps/tags', $caps );
+	}
+
+	/**
+	 * Tags:
+	 * - Add Tags
+	 * - Delete Tags
+	 * - Edit Tags
+	 * - Manage Tags (for contacts)
+	 *
+	 * Get caps related to managing tags
+	 *
+	 * @return array
+	 */
+	public function get_note_caps() {
+		$caps = array(
+			'add_notes',
+			'delete_notes',
+			'edit_notes',
+			'view_notes',
+		);
+
+		return apply_filters( 'groundhogg/roles/caps/notes', $caps );
 	}
 
 
@@ -259,9 +299,32 @@ class Main_Roles extends Roles {
 			'delete_emails',
 			'edit_emails',
 			'send_emails',
+			'view_emails',
 		);
 
 		return apply_filters( 'groundhogg/roles/caps/emails', $caps );
+	}
+
+	/**
+	 * Activity:
+	 * - Add Activity
+	 * - Delete Activity
+	 * - Edit Activity
+	 * - Send Activity
+	 *
+	 * Get caps related to managing activities
+	 *
+	 * @return array
+	 */
+	public function get_activity_caps() {
+		$caps = array(
+			'add_activity',
+			'delete_activity',
+			'edit_activity',
+			'view_activity',
+		);
+
+		return apply_filters( 'groundhogg/roles/caps/activity', $caps );
 	}
 
 	/**
@@ -284,6 +347,7 @@ class Main_Roles extends Roles {
 			'edit_funnels',
 			'export_funnels',
 			'import_funnels',
+			'view_funnels',
 		);
 
 		return apply_filters( 'groundhogg/roles/caps/funnels', $caps );
@@ -370,7 +434,9 @@ class Main_Roles extends Roles {
 			$this->get_tag_caps(),
 			$this->get_report_caps(),
 			$this->get_other_caps(),
-			$this->get_file_caps()
+			$this->get_file_caps(),
+			$this->get_note_caps(),
+			$this->get_activity_caps()
 		);
 
 		return $caps;
@@ -389,6 +455,28 @@ class Main_Roles extends Roles {
 		foreach ( $editable_roles as $role => $details ) {
 			$name           = translate_user_role( $details['name'] );
 			$roles[ $role ] = $name;
+		}
+
+		return $roles;
+	}
+
+	/**
+	 * Returns an array of roles used for select elements.
+	 *
+	 * @return array[]
+	 */
+	public function get_roles_for_react_select() {
+		if ( ! function_exists( 'get_editable_roles' ) ) {
+			require_once( ABSPATH . '/wp-admin/includes/user.php' );
+		}
+
+		$editable_roles = array_reverse( get_editable_roles() );
+
+		$roles = [];
+
+		foreach ( $editable_roles as $role => $details ) {
+			$name    = translate_user_role( $details['name'] );
+			$roles[] = [ 'value' => $role, 'label' => $name ];
 		}
 
 		return $roles;

@@ -3,6 +3,8 @@
 namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Admin\React_App;
+use Groundhogg\Admin\React_App_Page;
 use Groundhogg\Funnel;
 use Groundhogg\Library;
 use function Groundhogg\dashicon;
@@ -13,6 +15,7 @@ use function Groundhogg\get_store_products;
 use function Groundhogg\enqueue_groundhogg_modal;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_upload_wp_error;
+use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use function Groundhogg\is_option_enabled;
 use Groundhogg\Plugin;
@@ -112,7 +115,6 @@ class Funnels_Page extends Admin_Page {
 	}
 
 	protected function add_additional_actions() {
-//		$this->setup_reporting();
 
 		if ( $this->is_current_page() && $this->get_current_action() === 'view' ) {
 			add_action( 'admin_init', [ $this, 'redirect_to_add' ] );
@@ -120,8 +122,8 @@ class Funnels_Page extends Admin_Page {
 
 		if ( $this->is_current_page() && $this->get_current_action() === 'edit' ) {
 			add_action( 'in_admin_header', array( $this, 'prevent_notices' ) );
-			/* just need to enqueue it... */
-			enqueue_groundhogg_modal();
+
+			React_App::required_actions();
 		}
 
 		add_action( "groundhogg/admin/gh_funnels/before", function () {
@@ -157,45 +159,16 @@ class Funnels_Page extends Admin_Page {
 	 * enqueue editor scripts
 	 */
 	public function scripts() {
+
 		if ( $this->get_current_action() === 'edit' ) {
 
-			wp_enqueue_script( 'chart-js' );
+		    React_App::add_context( [
+		      'funnel' => new Funnel( get_url_var( 'funnel' ) )
+            ] );
 
-			wp_enqueue_style( 'editor-buttons' );
-			wp_enqueue_style( 'jquery-ui' );
+		    React_App::scripts();
 
-			wp_enqueue_editor();
-			wp_enqueue_script( 'wplink' );
-
-			wp_enqueue_script( 'jquery-ui-sortable' );
-			wp_enqueue_script( 'jquery-ui-draggable' );
-			wp_enqueue_script( 'jquery-ui-datepicker' );
-
-//           wp_enqueue_script( 'groundhogg-admin-link-picker' );
-			wp_enqueue_script( 'sticky-sidebar' );
-
-
-			wp_enqueue_style( 'groundhogg-admin-funnel-editor-v2' );
-			wp_enqueue_script( 'groundhogg-admin-funnel-editor-v2' );
-			wp_localize_script( 'groundhogg-admin-funnel-editor-v2', 'Funnel', [
-				'id'                    => absint( get_request_var( 'funnel' ) ),
-				'save_text'             => dashicon( 'yes' ) . __( 'Save', 'groundhogg' ),
-				'saving_text'           => dashicon( 'admin-generic' ) . __( 'Saving...', 'groundhogg' ),
-				'disable_deselect_step' => is_white_labeled(),
-				'add_step_button'       => html()->modal_link( [
-					'title'              => __( 'Add Step' ),
-					'text'               => dashicon( 'plus' ),
-					'footer_button_text' => __( 'Cancel' ),
-					'class'              => 'add-step button button-secondary no-padding',
-					'source'             => 'steps',
-					'height'             => 700,
-					'width'              => 500,
-					'footer'             => 'true',
-					'preventSave'        => 'true',
-				] )
-			] );
-
-			wp_enqueue_script( 'groundhogg-admin-replacements' );
+		    return;
 
 		} else if ( $this->get_current_action() === 'funnel_settings' ) {
 			wp_enqueue_script( 'groundhogg-admin-iframe' );
@@ -206,41 +179,33 @@ class Funnels_Page extends Admin_Page {
 	}
 
 	public function help() {
-		$screen = get_current_screen();
-
-		$screen->add_help_tab(
-			array(
-				'id'      => 'gh_overview',
-				'title'   => __( 'Overview' ),
-				'content' => '<p>' . __( 'Here you can edit your funnels. A funnel is a set of steps which can run automation based on contact interactions with your site. You can view the number of active contacts in each funnel, as well as when it was created and last updated.', 'groundhogg' ) . '</p>'
-				             . '<p>' . __( 'Funnels can be either Active/Inactive/Archived. If a funnel is Inactive, no contacts can enter and any contacts that may have been in the funnel will stop moving forward. The same goes for Archived funnels which simply do not show in the main list.', 'groundhogg' ) . '</p>'
-			)
-		);
-
-		$screen->add_help_tab(
-			array(
-				'id'      => 'gh_add',
-				'title'   => __( 'Add A Funnel' ),
-				'content' => '<p>' . __( 'To create a new funnel, simply click the Add New Button in the top left and select a pre-built funnel template. If you have a funnel import file you can click the import tab and upload the funnel file which will auto generate a funnel for you.', 'groundhogg' ) . '</p>'
-			)
-		);
-
-		$screen->add_help_tab(
-			array(
-				'id'      => 'gh_edit',
-				'title'   => __( 'Editing' ),
-				'content' => '<p>' . __( 'When editing a funnel you can add Funnel Steps. Funnel Steps are either Benchmarks or Actions. Benchmarks are whenever a Contact "does" something, while Actions are doing thing to a contact such as sending an email. Simply drag in the desired funnel steps in any order.', 'groundhogg' ) . '</p>'
-				             . '<p>' . __( 'Actions are run sequentially, so when an action takes place, it simply loads the next action. That means if you need to change it you can!', 'groundhogg' ) . '</p>'
-				             . '<p>' . __( 'Benchmarks are a bit different. If you have several benchmarks in a row, what happens is once one of them is completed by a contact the first action found proceeding that benchmark is launched, skipping all other benchmarks. That way you can have multiple automation triggers. ', 'groundhogg' ) . '</p>'
-				             . '<p>' . __( 'Once a benchmark is complete all steps that are scheduled before that benchmark will stop immediately.', 'groundhogg' ) . '</p>'
-			)
-		);
-
+//		$screen = get_current_screen();
+//
 //		$screen->add_help_tab(
 //			array(
-//				'id'      => 'gh_reporting',
-//				'title'   => __( 'Reporting' ),
-//				'content' => '<p>' . __( 'To view funnel reporting, simply go to the editing screen of any funnel, and then toggle the Reporting/Editing switch in the reporting box. You can select the time range which you would like to view by using the dropdown on the left and click the filter button.', 'groundhogg' ) . '</p>'
+//				'id'      => 'gh_overview',
+//				'title'   => __( 'Overview' ),
+//				'content' => '<p>' . __( 'Here you can edit your funnels. A funnel is a set of steps which can run automation based on contact interactions with your site. You can view the number of active contacts in each funnel, as well as when it was created and last updated.', 'groundhogg' ) . '</p>'
+//				             . '<p>' . __( 'Funnels can be either Active/Inactive/Archived. If a funnel is Inactive, no contacts can enter and any contacts that may have been in the funnel will stop moving forward. The same goes for Archived funnels which simply do not show in the main list.', 'groundhogg' ) . '</p>'
+//			)
+//		);
+//
+//		$screen->add_help_tab(
+//			array(
+//				'id'      => 'gh_add',
+//				'title'   => __( 'Add A Funnel' ),
+//				'content' => '<p>' . __( 'To create a new funnel, simply click the Add New Button in the top left and select a pre-built funnel template. If you have a funnel import file you can click the import tab and upload the funnel file which will auto generate a funnel for you.', 'groundhogg' ) . '</p>'
+//			)
+//		);
+//
+//		$screen->add_help_tab(
+//			array(
+//				'id'      => 'gh_edit',
+//				'title'   => __( 'Editing' ),
+//				'content' => '<p>' . __( 'When editing a funnel you can add Funnel Steps. Funnel Steps are either Benchmarks or Actions. Benchmarks are whenever a Contact "does" something, while Actions are doing thing to a contact such as sending an email. Simply drag in the desired funnel steps in any order.', 'groundhogg' ) . '</p>'
+//				             . '<p>' . __( 'Actions are run sequentially, so when an action takes place, it simply loads the next action. That means if you need to change it you can!', 'groundhogg' ) . '</p>'
+//				             . '<p>' . __( 'Benchmarks are a bit different. If you have several benchmarks in a row, what happens is once one of them is completed by a contact the first action found proceeding that benchmark is launched, skipping all other benchmarks. That way you can have multiple automation triggers. ', 'groundhogg' ) . '</p>'
+//				             . '<p>' . __( 'Once a benchmark is complete all steps that are scheduled before that benchmark will stop immediately.', 'groundhogg' ) . '</p>'
 //			)
 //		);
 
@@ -363,21 +328,6 @@ class Funnels_Page extends Admin_Page {
 			],
 		];
 	}
-//	public function get_reporting_start_time() {
-//		return Plugin::$instance->reporting->get_start_time();
-//	}
-//
-//	public function get_reporting_end_time() {
-//		return Plugin::$instance->reporting->get_end_time();
-//	}
-//
-//	private function setup_reporting() {
-//
-//		if ( get_request_var( 'reporting_on' ) ) {
-//			$this->reporting_enabled = true;
-//		}
-
-//	}
 
 	public function process_delete() {
 		if ( ! current_user_can( 'delete_funnels' ) ) {
@@ -657,80 +607,6 @@ class Funnels_Page extends Admin_Page {
 		return $html;
 	}
 
-//	/**
-//	 * Chart Data
-//	 *
-//	 * @var array
-//	 */
-//	protected $chart_data = [];
-
-//	/**
-//	 * The chart data
-//	 *
-//	 * @return array
-//	 */
-//	public function get_chart_data() {
-//		if ( ! empty( $this->chart_data ) ) {
-//			return $this->chart_data;
-//		}
-//
-//		$funnel = new Funnel( absint( get_request_var( 'funnel' ) ) );
-//		$steps  = $funnel->get_steps();
-//
-//		$dataset1 = array();
-//		$dataset2 = array();
-//
-//		foreach ( $steps as $i => $step ) {
-//
-//			$query = new Contact_Query();
-//
-//			$args = array(
-//				'report' => array(
-//					'funnel' => $funnel->get_id(),
-//					'step'   => $step->get_id(),
-//					'status' => 'complete',
-//					'start'  => $this->get_reporting_start_time(),
-//					'end'    => $this->get_reporting_end_time(),
-//				)
-//			);
-//
-//			$count = count( $query->query( $args ) );
-//
-//			$url = add_query_arg( $args, admin_url( 'admin.php?page=gh_contacts' ) );
-//
-//			$dataset1[] = array( ( $i + 1 ) . '. ' . $step->get_title(), $count, $url );
-//
-//			$args = array(
-//				'report' => array(
-//					'funnel' => intval( $_REQUEST['funnel'] ),
-//					'step'   => $step->ID,
-//					'status' => 'waiting'
-//				)
-//			);
-//
-//			$count = count( $query->query( $args ) );
-//
-//			$url = add_query_arg( $args, admin_url( 'admin.php?page=gh_contacts' ) );
-//
-//			$dataset2[] = array( ( $i + 1 ) . '. ' . $step->get_title(), $count, $url );
-//
-//		}
-//
-//		$ds[] = array(
-//			'label' => _x( 'Completed Events', 'stats', 'groundhogg' ),
-//			'data'  => $dataset1
-//		);
-//
-//		$ds[] = array(
-//			'label' => __( 'Waiting Contacts', 'stats', 'groundhogg' ),
-//			'data'  => $dataset2
-//		);
-//
-//		$this->chart_data = $ds;
-//
-//		return $ds;
-//	}
-
 	/**
 	 * Save the funnel
 	 */
@@ -876,6 +752,142 @@ class Funnels_Page extends Admin_Page {
 		wp_send_json_error();
 	}
 
+	/**
+	 * Quickly add contacts to a funnel VIA the funnel editor UI
+	 */
+	public function add_contacts_to_funnel() {
+
+		if ( ! current_user_can( 'edit_contacts' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$tags = array_map( 'intval', $_POST['tags'] );
+
+		$query    = new Contact_Query();
+		$contacts = $query->query( array( 'tags_include' => $tags ) );
+
+		$step = Plugin::$instance->utils->get_step( intval( $_POST['step'] ) );
+
+		foreach ( $contacts as $contact ) {
+
+			$contact = Plugin::$instance->utils->get_contact( $contact->ID );
+			$step->enqueue( $contact );
+
+		}
+
+		$this->add_notice( 'contacts-added', sprintf( _nx( '%d contact added to funnel', '%d contacts added to funnel', count( $contacts ), 'notice', 'groundhogg' ), count( $contacts ) ), 'success' );
+
+		ob_start();
+
+		$this->add_notice();
+
+		$content = ob_get_clean();
+
+		wp_die( $content );
+
+	}
+
+	public function edit() {
+		if ( ! current_user_can( 'edit_funnels' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		React_App::app();
+	}
+
+	public function add() {
+		if ( ! current_user_can( 'add_funnels' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		include __DIR__ . '/add-funnel.php';
+	}
+
+	public function view() {
+		if ( ! class_exists( 'Funnels_Table' ) ) {
+			include __DIR__ . '/funnels-table.php';
+		}
+
+		$funnels_table = new Funnels_Table();
+
+		$funnels_table->views();
+		$this->search_form( __( 'Search Funnels', 'groundhogg' ) );
+		?>
+        <form method="post" class="wp-clearfix">
+			<?php $funnels_table->prepare_items(); ?>
+			<?php $funnels_table->display(); ?>
+        </form>
+		<?php
+	}
+
+	public function page() {
+		if ( $this->get_current_action() === 'edit' ) {
+			$this->edit();
+
+			return;
+		}
+
+		parent::page();
+	}
+
+
+	public function funnel_settings() {
+
+		if ( ! current_user_can( 'edit_funnels' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		include __DIR__ . '/funnel-settings.php';
+	}
+
+	public function process_funnel_settings() {
+
+		if ( ! current_user_can( 'edit_funnels' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$funnel_id          = absint( get_request_var( 'funnel' ) );
+		$conversion_step_id = absint( get_post_var( 'conversion_step_id' ) );
+
+		$funnel = new Funnel( $funnel_id );
+
+		$funnel->update( [
+			'conversion_step' => $conversion_step_id
+		] );
+
+
+		$this->add_notice( 'success', __( 'Settings saved!', 'groundhogg' ) );
+
+		// Stay on page
+		return true;
+	}
+
+	/**
+	 * Prevent notices from other plugins appearing on the edit funnel screen as the break the format.
+	 */
+	public function prevent_notices() {
+		remove_all_actions( 'network_admin_notices' );
+		remove_all_actions( 'user_admin_notices' );
+		remove_all_actions( 'admin_notices' );
+	}
+
+	/**
+	 * Get template HTML via ajax
+	 */
+	public function get_funnel_templates_ajax() {
+		ob_start();
+
+		$this->display_funnel_templates();
+		$html = ob_get_clean();
+
+		$response = array(
+			'html' => $html
+		);
+
+		wp_send_json( $response );
+
+	}
+
 	public function duplicate_step() {
 
 		if ( ! current_user_can( 'edit_funnels' ) ) {
@@ -970,149 +982,6 @@ class Funnels_Page extends Admin_Page {
 		wp_send_json_error();
 	}
 
-	/**
-	 * Quickly add contacts to a funnel VIA the funnel editor UI
-	 */
-	public function add_contacts_to_funnel() {
-
-		if ( ! current_user_can( 'edit_contacts' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		$tags = array_map( 'intval', $_POST['tags'] );
-
-		$query    = new Contact_Query();
-		$contacts = $query->query( array( 'tags_include' => $tags ) );
-
-		$step = Plugin::$instance->utils->get_step( intval( $_POST['step'] ) );
-
-		foreach ( $contacts as $contact ) {
-
-			$contact = Plugin::$instance->utils->get_contact( $contact->ID );
-			$step->enqueue( $contact );
-
-		}
-
-		$this->add_notice( 'contacts-added', sprintf( _nx( '%d contact added to funnel', '%d contacts added to funnel', count( $contacts ), 'notice', 'groundhogg' ), count( $contacts ) ), 'success' );
-
-		ob_start();
-
-		$this->add_notice();
-
-		$content = ob_get_clean();
-
-		wp_die( $content );
-
-	}
-
-	public function edit() {
-		if ( ! current_user_can( 'edit_funnels' ) ) {
-			$this->wp_die_no_access();
-		}
-
-//		if ( $this->is_v2() ) {
-		include __DIR__ . '/funnel-editor-v3.php';
-
-//			return;
-//		}
-//
-//		include __DIR__ . '/funnel-editor.php';
-
-	}
-
-	public function add() {
-		if ( ! current_user_can( 'add_funnels' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		include __DIR__ . '/add-funnel.php';
-	}
-
-	public function view() {
-		if ( ! class_exists( 'Funnels_Table' ) ) {
-			include __DIR__ . '/funnels-table.php';
-		}
-
-		$funnels_table = new Funnels_Table();
-
-		$funnels_table->views();
-		$this->search_form( __( 'Search Funnels', 'groundhogg' ) );
-		?>
-        <form method="post" class="wp-clearfix">
-			<?php $funnels_table->prepare_items(); ?>
-			<?php $funnels_table->display(); ?>
-        </form>
-		<?php
-	}
-
-
-	public function funnel_settings() {
-
-		if ( ! current_user_can( 'edit_funnels' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		include __DIR__ . '/funnel-settings.php';
-	}
-
-	public function process_funnel_settings() {
-
-		if ( ! current_user_can( 'edit_funnels' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		$funnel_id          = absint( get_request_var( 'funnel' ) );
-		$conversion_step_id = absint( get_post_var( 'conversion_step_id' ) );
-
-		$funnel = new Funnel( $funnel_id );
-
-		$funnel->update( [
-			'conversion_step' => $conversion_step_id
-		] );
-
-
-		$this->add_notice( 'success', __( 'Settings saved!', 'groundhogg' ) );
-
-		// Stay on page
-		return true;
-	}
-
-	public function page() {
-		if ( $this->get_current_action() === 'edit' ) {
-			$this->edit();
-
-			return;
-		}
-
-		parent::page();
-	}
-
-	/**
-	 * Prevent notices from other plugins appearing on the edit funnel screen as the break the format.
-	 */
-	public function prevent_notices() {
-		remove_all_actions( 'network_admin_notices' );
-		remove_all_actions( 'user_admin_notices' );
-		remove_all_actions( 'admin_notices' );
-	}
-
-	/**
-	 * Get template HTML via ajax
-	 */
-	public function get_funnel_templates_ajax() {
-		ob_start();
-
-		$this->display_funnel_templates();
-		$html = ob_get_clean();
-
-		$response = array(
-			'html' => $html
-		);
-
-		wp_send_json( $response );
-
-	}
-
 	public function display_funnel_templates( $args = array() ) {
 		$page         = isset( $_REQUEST['p'] ) ? intval( $_REQUEST['p'] ) : '1';
 		$args['page'] = $page;
@@ -1179,10 +1048,7 @@ class Funnels_Page extends Admin_Page {
 		}
 	}
 
-	/**
-	 * @return bool
-	 */
-	public function is_reporting_enabled() {
-		return (bool) get_request_var( 'reporting_on' );
+	public function register_page_compat( $obj ) {
+		// TODO: Implement register_page_compat() method.
 	}
 }

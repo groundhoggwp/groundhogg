@@ -102,7 +102,7 @@ class Contacts extends DB {
 			'last_name'                 => '%s',
 			'user_id'                   => '%d',
 			'owner_id'                  => '%d',
-			'optin_status'              => '%d',
+			'optin_status'              => '%s',
 			'date_created'              => '%s',
 			'date_optin_status_changed' => '%s',
 		);
@@ -407,7 +407,7 @@ class Contacts extends DB {
 		last_name mediumtext NOT NULL,
 		user_id bigint(20) unsigned NOT NULL,
 		owner_id bigint(20) unsigned NOT NULL,
-		optin_status int unsigned NOT NULL,
+		optin_status varchar({$this->get_max_index_length()}) NOT NULL,
 		date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		date_optin_status_changed datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		PRIMARY KEY (ID),
@@ -422,6 +422,37 @@ class Contacts extends DB {
 		dbDelta( $sql );
 
 		update_option( $this->table_name . '_db_version', $this->version );
+	}
+
+	/**
+	 * Use strings for better management of event types, use instead of int, more unique
+	 *
+	 * @since 3.0
+	 */
+	public function change_optin_status_to_varchar() {
+
+		global $wpdb;
+
+		$wpdb->query( "ALTER TABLE {$this->get_table_name()} MODIFY optin_status varchar({$this->get_max_index_length()});" );
+
+		$mappings = [
+			1  => Preferences::UNCONFIRMED,
+			2  => Preferences::CONFIRMED,
+			3  => Preferences::UNSUBSCRIBED,
+			4  => Preferences::CONFIRMED,
+			5  => Preferences::CONFIRMED,
+			6  => Preferences::HARD_BOUNCE,
+			7  => Preferences::SPAM,
+			8  => Preferences::COMPLAINED,
+		];
+
+		foreach ( $mappings as $old_int => $new_string ) {
+			$this->mass_update( [
+				'optin_status' => $new_string
+			], [
+				'optin_status' => $old_int
+			] );
+		}
 	}
 
 	/**
@@ -445,6 +476,8 @@ class Contacts extends DB {
 					$cols[ $key ] = strtolower( sanitize_email( $val ) );
 					break;
 				case 'optin_status':
+					$cols[ $key ] = $val;
+					break;
 				case 'owner_id':
 				case 'user_id':
 					$cols[ $key ] = absint( $val );

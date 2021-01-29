@@ -782,7 +782,7 @@ msgstr "Envoyer des SMS"
 
 #: admin/contacts/contact-editor.php:613
 msgctxt "contact_record"
-msgid "Add To Funnel"
+msgid "Add To FunnelStepsContainer"
 msgstr "Ajouter à l'entonnoir"
 
 #: admin/contacts/contact-editor.php:638
@@ -852,7 +852,7 @@ msgstr ""
 
 #: admin/contacts/contact-editor.php:845
 msgctxt "contact_record"
-msgid "Recent Funnel History"
+msgid "Recent FunnelStepsContainer History"
 msgstr "Historique de l'entonnoir récent"
 
 #: admin/contacts/contact-editor.php:846
@@ -1307,7 +1307,7 @@ msgstr ""
 #: admin/contacts/tables/contact-events-table.php:68
 #: admin/events/events-table.php:60
 msgctxt "Column label"
-msgid "Funnel"
+msgid "FunnelStepsContainer"
 msgstr "Entonnoir"
 
 #: admin/contacts/tables/contact-events-table.php:69
@@ -1341,7 +1341,7 @@ msgstr ""
 #: admin/contacts/tables/contact-events-table.php:123
 #: admin/events/events-table.php:405 admin/events/events-table.php:406
 msgctxt "action"
-msgid "Edit Funnel"
+msgid "Edit FunnelStepsContainer"
 msgstr "Modifier l'entonnoir"
 
 #: admin/contacts/tables/contact-events-table.php:131
@@ -1623,7 +1623,7 @@ msgid "Conversion Rate (%)"
 msgstr "Taux de conversion"
 
 #: admin/dashboard/widgets/funnel-breakdown.php:40
-msgid "Funnel Breakdown"
+msgid "FunnelStepsContainer Breakdown"
 msgstr "Ventilation de l'entonnoir"
 
 #: admin/dashboard/widgets/funnel-breakdown.php:158
@@ -2397,7 +2397,7 @@ msgstr "Voir contact"
 
 #: admin/funnels/add-funnel.php:31
 msgctxt "add_funnel_tab"
-msgid "Funnel Templates"
+msgid "FunnelStepsContainer Templates"
 msgstr "Modèles d'entonnoir"
 
 #: admin/funnels/add-funnel.php:33
@@ -2407,7 +2407,7 @@ msgstr "Marché"
 
 #: admin/funnels/add-funnel.php:35
 msgctxt "add_funnel_tab"
-msgid "Import Funnel"
+msgid "Import FunnelStepsContainer"
 msgstr "Entonnoir d'importation"
 
 #: admin/funnels/add-funnel.php:58
@@ -2443,11 +2443,11 @@ msgstr ""
 
 #: admin/funnels/add-funnel.php:142
 msgctxt "action"
-msgid "Import Funnel"
+msgid "Import FunnelStepsContainer"
 msgstr "Entonnoir d'importation"
 
 #: admin/funnels/funnel-editor-v2.php:43 admin/funnels/funnel-editor.php:55
-msgid "Enter Funnel Name Here"
+msgid "Enter FunnelStepsContainer Name Here"
 msgstr "Entrez le nom de l'entonnoir ici"
 
 #: admin/funnels/funnel-editor-v2.php:95 admin/funnels/funnel-editor.php:100
@@ -2496,11 +2496,11 @@ msgid "Select where to start:"
 msgstr "Sélectionnez l'endroit où commencer:"
 
 #: admin/funnels/funnel-editor-v2.php:351 admin/funnels/funnel-editor.php:314
-msgid "Add Contacts to Funnel"
+msgid "Add Contacts to FunnelStepsContainer"
 msgstr ""
 
 #: admin/funnels/funnel-editor.php:39
-msgid "The new and improved Funnel Builder has Arrived!"
+msgid "The new and improved FunnelStepsContainer Builder has Arrived!"
 msgstr ""
 
 #: admin/funnels/funnel-editor.php:39
@@ -2547,7 +2547,7 @@ msgstr ""
 "principale."
 
 #: admin/funnels/funnels-page.php:187
-msgid "Add A Funnel"
+msgid "Add A FunnelStepsContainer"
 msgstr "Ajouter un entonnoir"
 
 #: admin/funnels/funnels-page.php:188
@@ -2565,7 +2565,7 @@ msgstr ""
 
 #: admin/funnels/funnels-page.php:196
 msgid ""
-"When editing a funnel you can add Funnel Steps. Funnel Steps are either "
+"When editing a funnel you can add FunnelStepsContainer Steps. FunnelStepsContainer Steps are either "
 "Benchmarks or Actions. Benchmarks are whenever a Contact \"does\" something, "
 "while Actions are doing thing to a contact such as sending an email. Simply "
 "drag in the desired funnel steps in any order."
@@ -2624,12 +2624,12 @@ msgstr ""
 
 #: admin/funnels/funnels-page.php:357
 msgctxt "page_title"
-msgid "Add Funnel"
+msgid "Add FunnelStepsContainer"
 msgstr "Ajouter entonnoir"
 
 #: admin/funnels/funnels-page.php:360
 msgctxt "page_title"
-msgid "Edit Funnel"
+msgid "Edit FunnelStepsContainer"
 msgstr "Modifier l'entonnoir"
 
 #: admin/funnels/funnels-page.php:380
@@ -2650,7 +2650,7 @@ msgstr[1] "Supprimé %d contacts."
 
 #: admin/funnels/funnels-page.php:429
 msgctxt "notice"
-msgid "Funnel duplicated"
+msgid "FunnelStepsContainer duplicated"
 msgstr "Entonnoir dupliqué"
 
 #: admin/funnels/funnels-page.php:464
@@ -2667,7 +2667,7 @@ msgstr "Veuillez sélectionner un modèle..."
 
 #: admin/funnels/funnels-page.php:518
 msgctxt "notice"
-msgid "Funnel created"
+msgid "FunnelStepsContainer created"
 msgstr "Entonnoir créé"
 
 #: admin/funnels/funnels-page.php:664
@@ -2704,7 +2704,7 @@ msgstr "Les entonnoirs doivent commencer par 1 ou plusieurs repères"
 
 #: admin/funnels/funnels-page.php:744
 msgctxt "notice"
-msgid "Funnel updated"
+msgid "FunnelStepsContainer updated"
 msgstr "Entonnoir mis à jour"
 
 #: admin/funnels/funnels-page.php:840
@@ -3484,12 +3484,12 @@ msgstr ""
 
 #: admin/settings/settings-page.php:532
 msgctxt "settings"
-msgid "Enable Funnel Builder V2 (Beta)"
+msgid "Enable FunnelStepsContainer Builder V2 (Beta)"
 msgstr ""
 
 #: admin/settings/settings-page.php:533
 msgctxt "settings"
-msgid "Use the new version of the Funnel Builder."
+msgid "Use the new version of the FunnelStepsContainer Builder."
 msgstr ""
 
 #: admin/settings/settings-page.php:545 includes/classes/email.php:473
@@ -5816,7 +5816,7 @@ msgid "Custom Range"
 msgstr "Gamme personnalisée"
 
 #: includes/reporting/reports/complete-funnel-activity.php:41
-msgid "Complete Funnel Activity"
+msgid "Complete FunnelStepsContainer Activity"
 msgstr ""
 
 #: includes/reporting/reports/contacts-by-country.php:27
@@ -5878,7 +5878,7 @@ msgid "Last Broadcast"
 msgstr ""
 
 #: includes/reporting/reports/waiting-funnel-activity.php:41
-msgid "Waiting Funnel Activity"
+msgid "Waiting FunnelStepsContainer Activity"
 msgstr ""
 
 #: includes/reviews.php:28
@@ -7118,7 +7118,7 @@ msgstr ""
 
 #: templates/assets/email-templates.php:39
 msgctxt "email_template_name"
-msgid "Call To Action"
+msgid "Call To Step"
 msgstr "Appel à l'action"
 
 #: templates/assets/email-templates.php:40

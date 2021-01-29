@@ -15,7 +15,7 @@ class Table_Top_Performing_Broadcasts extends Base_Email_Performance_Table_Repor
 	 *
 	 * @return array
 	 */
-	protected function get_email_ids_of_sent_emails() {
+	protected function get_email_ids_of_sent_broadcasts() {
 
 		$broadcasts = get_db( 'broadcasts' )->query( [
 			'where' => [
@@ -36,36 +36,34 @@ class Table_Top_Performing_Broadcasts extends Base_Email_Performance_Table_Repor
 	}
 
 	protected function get_table_data() {
-		$emails = $this->get_email_ids_of_sent_emails();
+		$broadcasts = $this->get_email_ids_of_sent_broadcasts();
 
 		$list = [];
 
-		foreach ( $emails as $email ) {
+		foreach ( $broadcasts as $broadcast ) {
 
-			$email_id = is_object( $email ) ? $email->ID : $email;
+			$broadcast_id = is_object( $broadcast ) ? $broadcast->ID : $broadcast;
 
-			$email  = new Broadcast( $email_id );
-			$report = $email->get_report_data();
+			$broadcast  = new Broadcast( $broadcast_id );
 
-			$title = $email->get_title();
+			$report = $broadcast->get_report_data();
+
+			$title = $broadcast->get_title();
 
 			if ( $this->should_include( $report['sent'], $report['opened'], $report ['clicked'] ) ) {
 				$list[] = [
 					'label'   => $title,
-					'url'     => admin_page_url( 'gh_reporting', [
-						'tab' => 'broadcasts',
-						'broadcast'  => $email->get_id()
-					] ),
 					'sent'    => $report['sent'],
-					'opened'  => percentage( $report['sent'], $report['opened'] ),
-					'clicked' => percentage( $report['opened'], $report['clicked'] ),
+					'opened'  => percentage( $report['sent'], $report['opened'] ) . '%' ,
+					'clicked' => percentage( $report['opened'], $report['clicked'] ) . '%',
+					'broadcast' => $broadcast->get_as_array()
 				];
 
 			}
 
 		}
 
-		return $this->normalize_data( $list );
+		return $list ;
 	}
 
 	/**

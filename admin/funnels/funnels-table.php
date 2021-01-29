@@ -81,8 +81,8 @@ class Funnels_Table extends WP_List_Table {
 			'date_created'    => _x( 'Date Created', 'Column label', 'groundhogg' ),
 		);
 
-		if ( $this->get_view() !== 'active' ){
-			unset( $columns[ 'active_contacts' ] );
+		if ( $this->get_view() !== 'active' ) {
+			unset( $columns['active_contacts'] );
 		}
 
 		return apply_filters( 'groundhogg_funnels_get_columns', $columns );
@@ -123,7 +123,7 @@ class Funnels_Table extends WP_List_Table {
 		);
 
 		// If there are no scheduled broadcasts, go to the sent view
-		if ( $count[ 'active' ] === 0 && $this->get_view() === 'active' ){
+		if ( $count['active'] === 0 && $this->get_view() === 'active' ) {
 			$this->default_view = 'inactive';
 		}
 
@@ -158,7 +158,10 @@ class Funnels_Table extends WP_List_Table {
 		$actions = array();
 		$id      = $funnel->get_id();
 
-		$editUrl = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel->ID );
+		$editUrl = admin_page_url( 'gh_funnels', [
+			'funnel'    => $funnel->ID,
+			'action'    => 'edit'
+		] );
 
 		$editUrlClassic = add_query_arg( [
 			'version' => 1
@@ -189,13 +192,10 @@ class Funnels_Table extends WP_List_Table {
 	protected function column_title( $funnel ) {
 		$subject = ( ! $funnel->title ) ? '(' . __( 'no title' ) . ')' : $funnel->title;
 
-		$editUrl = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel->ID );
-
-//		if ( is_option_enabled( 'gh_use_classic_builder' ) ) {
-//			$editUrl = add_query_arg( [
-//				'version' => 1
-//			], $editUrl );
-//		}
+		$editUrl = admin_page_url( 'gh_funnels', [
+			'funnel'    => $funnel->ID,
+			'action'    => 'edit'
+		] );
 
 		if ( $this->get_view() === 'archived' ) {
 			$html = "<strong>{$subject}</strong>";

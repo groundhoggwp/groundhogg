@@ -88,6 +88,104 @@ class Admin_Notification extends Action {
 	}
 
 	/**
+	 * Register the controls for this step
+	 *
+	 */
+	public function register_controls() {
+		// TODO: Implement register_controls() method.
+
+		if ( is_sms_plugin_active() ){
+
+			$this->start_controls_section( 'type', [
+				'label' => __( 'Notification Type', 'groundhogg' )
+			] );
+
+			$this->add_control( 'is_sms', [
+				'label'       => __( 'Convert to SMS notification?', 'groundhogg' ),
+				'type'        => 'yes_no_toggle',
+				'description' => __( 'Send an SMS notification instead of an email notification.', 'groundhogg' )
+			] );
+
+			$this->end_controls_section();
+
+			$this->start_controls_section( 'sms', [
+				'label' => __( 'SMS Notification', 'groundhogg' ),
+				'conditions' => [
+					'is_sms' => true
+				]
+			] );
+
+			$this->end_controls_section();
+
+		}
+
+		// Email Notification
+		$this->start_controls_section( 'email', [
+			'label' => __( 'Email Notification', 'groundhogg' ),
+			'conditions' => [
+				'is_sms' => false
+			]
+		] );
+
+		$this->add_control( 'send_to', [
+			'label' => __( 'Recipients' ),
+			'type' => 'email_address_picker',
+			'options' => [
+				'multiple' => true
+			],
+			'description' => __( 'Who should this notification be sent to?', 'groundhogg' ),
+		] );
+
+		$this->add_control( 'from', [
+			'label'       => __( 'From', 'groundhogg' ),
+			'type'        => 'email_address',
+			'options'     => [
+				'default' => get_bloginfo( 'admin_email' )
+			],
+			'description' => __( 'The email address which you want to send email from.', 'groundhogg' )
+		] );
+
+		$this->add_control( 'reply_to', [
+			'label'       => __( 'Reply to', 'groundhogg' ),
+			'type'        => 'email_address',
+			'options'     => [
+				'default' => '{email}'
+			],
+			'description' => __( 'The email address replies are sent to.', 'groundhogg' )
+		] );
+
+		$this->add_control( 'hide_admin_links', [
+			'label'       => __( 'Hide admin links?', 'groundhogg' ),
+			'type'        => 'yes_no_toggle',
+			'description' => __( 'This will prevent links to the contact record in the footer of the notification.', 'groundhogg' )
+		] );
+
+		$this->end_controls_section();
+
+		$this->start_controls_section( 'content', [
+			'label' => __( 'Notification Content', 'groundhogg' ),
+		] );
+
+		$this->add_control( 'subject', [
+			'label'       => __( 'Subject line', 'groundhogg' ),
+			'type'        => HTML::INPUT,
+			'default'     => "Admin notification for {full_name} ({email})",
+			'description' => __( 'The subject line for the email notification.', 'groundhogg' )
+		] );
+
+		$this->add_control( 'note_text', [
+			'label' => __( 'Content', 'groundhogg' ),
+			'type'  => 'textarea',
+			'options' => [
+				'has_replacements' => true
+			],
+			'description' => __( 'The content will be merged with the contacts existing details.', 'groundhogg' ),
+		] );
+
+		$this->end_controls_section();
+	}
+
+	/**
 	 * @param $step Step
 	 */
 	public function settings( $step ) {

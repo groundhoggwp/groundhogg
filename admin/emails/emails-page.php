@@ -83,28 +83,16 @@ class Emails_Page extends Admin_Page {
 	}
 
 	public function scripts() {
-		if ( in_array( $this->get_current_action(), [ 'add', 'edit' ] ) ) {
 
-			wp_enqueue_style( 'groundhogg-admin-email-editor-plain' );
-			wp_enqueue_script( 'groundhogg-admin-email-editor-plain' );
+		if ( $this->get_current_action() === 'edit' ) {
 
-			wp_localize_script( 'groundhogg-admin-email-editor-plain', 'Email', [
-				'send_test_prompt' => __( 'Send test email to...', 'groundhogg' ),
-				'email_id'         => absint( Groundhogg\get_request_var( 'email' ) ),
+			Groundhogg\Admin\React_App::add_context( [
+				'email' => new Email( get_url_var( 'email' ) )
 			] );
 
-			remove_editor_styles();
+			Groundhogg\Admin\React_App::scripts();
 
-			add_filter( 'mce_css', function ( $mce_css ) {
-				return $mce_css . ', ' . GROUNDHOGG_ASSETS_URL . 'css/admin/email-wysiwyg-style.css';
-			} );
-
-			wp_enqueue_script( 'groundhogg-admin-iframe' );
-			wp_enqueue_style( 'groundhogg-admin-iframe' );
-
-			wp_enqueue_style( 'groundhogg-admin-email-preview' );
-			wp_enqueue_script( 'groundhogg-admin-email-preview' );
-
+			return;
 		}
 
 		remove_editor_styles();
@@ -146,8 +134,8 @@ class Emails_Page extends Admin_Page {
 		$reporting_args = [ 'tab' => 'email' ];
 
 		if ( $email = Groundhogg\get_request_var( 'email' ) ) {
-			$broadcast_args[ 'email' ] = absint( $email );
-			$reporting_args            = [
+			$broadcast_args['email'] = absint( $email );
+			$reporting_args          = [
 				'tab'   => 'email_step',
 				'email' => $email,
 			];
@@ -302,13 +290,13 @@ class Emails_Page extends Admin_Page {
 					return new \WP_Error( 'error', 'Invalid email ID!' );
 				}
 
-				$args[ 'content' ]    = $from_email->get_content();
-				$args[ 'subject' ]    = $from_email->get_subject_line();
-				$args[ 'title' ]      = sprintf( "%s - (copy)", $from_email->get_title() );
-				$args[ 'pre_header' ] = $from_email->get_pre_header();
+				$args['content']    = $from_email->get_content();
+				$args['subject']    = $from_email->get_subject_line();
+				$args['title']      = sprintf( "%s - (copy)", $from_email->get_title() );
+				$args['pre_header'] = $from_email->get_pre_header();
 
-				$args[ 'author' ]    = get_current_user_id();
-				$args[ 'from_user' ] = get_current_user_id();
+				$args['author']    = get_current_user_id();
+				$args['from_user'] = get_current_user_id();
 
 				$email = new Email( $args );
 
@@ -355,14 +343,14 @@ class Emails_Page extends Admin_Page {
 		$pre_header = sanitize_text_field( Groundhogg\get_request_var( 'pre_header' ) );
 		$content    = apply_filters( 'groundhogg/admin/emails/sanitize_email_content', Groundhogg\get_request_var( 'email_content' ) );
 
-		$args[ 'status' ]       = $status;
-		$args[ 'from_user' ]    = $from_user;
-		$args[ 'subject' ]      = $subject;
-		$args[ 'title' ]        = sanitize_text_field( Groundhogg\get_request_var( 'title', $subject ) );
-		$args[ 'pre_header' ]   = $pre_header;
-		$args[ 'content' ]      = $content;
-		$args[ 'last_updated' ] = current_time( 'mysql' );
-		$args[ 'is_template' ]  = key_exists( 'save_as_template', $_POST ) ? 1 : 0;
+		$args['status']       = $status;
+		$args['from_user']    = $from_user;
+		$args['subject']      = $subject;
+		$args['title']        = sanitize_text_field( Groundhogg\get_request_var( 'title', $subject ) );
+		$args['pre_header']   = $pre_header;
+		$args['content']      = $content;
+		$args['last_updated'] = current_time( 'mysql' );
+		$args['is_template']  = key_exists( 'save_as_template', $_POST ) ? 1 : 0;
 
 
 		if ( $email->update( $args ) ) {
@@ -401,8 +389,8 @@ class Emails_Page extends Admin_Page {
 							if ( is_email( $header_value ) ) {
 								$headers[ $header_key ] = has_replacements( $header_value ) ? sanitize_text_field( $header_value ) : sanitize_email( $header_value );
 							} else if ( preg_match( '/([^<]+) <([^>]+)>/', $header_value, $matches ) ) {
-								$email_address          = has_replacements( $matches[ 2 ] ) ? sanitize_text_field( $matches[ 2 ] ) : sanitize_email( $matches[ 2 ] );
-								$name                   = sanitize_text_field( $matches[ 1 ] );
+								$email_address          = has_replacements( $matches[2] ) ? sanitize_text_field( $matches[2] ) : sanitize_email( $matches[2] );
+								$name                   = sanitize_text_field( $matches[1] );
 								$headers[ $header_key ] = sprintf( '%s <%s>', $name, $email_address );
 							} else {
 								$headers[ $header_key ] = '';
@@ -506,7 +494,17 @@ class Emails_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		include __DIR__ . '/email-editor.php';
+		Groundhogg\Admin\React_App::app();
+	}
+
+	public function page() {
+
+	    if ( $this->get_current_action() === 'edit' ){
+	        $this->edit();
+	        return;
+        }
+
+		parent::page();
 	}
 
 

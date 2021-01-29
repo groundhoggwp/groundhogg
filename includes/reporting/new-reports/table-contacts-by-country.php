@@ -30,19 +30,16 @@ class Table_Contacts_By_Country extends Base_Table_Report {
 
 		$values = wp_list_pluck( $rows, 'meta_value' );
 		$counts = array_count_values( $values );
+
 		$data   = $this->normalize_data( $counts );
 		$total  = array_sum( wp_list_pluck( $data, 'data' ) );
 
 		foreach ( $data as $i => $datum ) {
 			$sub_tal    = $datum['data'];
-			$percentage = ' (' . percentage( $total, $sub_tal ) . '%)';
-
-			$datum['data'] = html()->wrap( $datum['data'], 'a', [
-				'href'  => $datum['url'],
-				'class' => 'number-total'
-			] );
-			unset( $datum['url'] );
+			$datum["percentage"] =  percentage( $total, $sub_tal ) . '%';
+			$datum["data"] =  $datum['data'];
 			$data[ $i ] = $datum;
+
 		}
 
 		return $data;
@@ -61,12 +58,9 @@ class Table_Contacts_By_Country extends Base_Table_Report {
 
 		$label = ! empty( $item_key ) ? Plugin::$instance->utils->location->get_countries_list( $item_key ) : __( 'Unknown' );
 		$data  = $item_data;
-		$url   = ! empty( $item_key ) ? admin_url( sprintf( 'admin.php?page=gh_contacts&meta_key=country&meta_value=%s', $item_key ) ) : '#';
-
 		return [
 			'label' => $label,
 			'data'  => $data,
-			'url'   => $url
 		];
 	}
 

@@ -3,6 +3,8 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use function Groundhogg\map_func_to_attr;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -12,12 +14,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * store steps that belong to funnels
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @subpackage  includes/DB
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
 class Steps extends DB {
 
@@ -79,13 +81,18 @@ class Steps extends DB {
 	 */
 	public function get_columns() {
 		return array(
-			'ID'          => '%d',
-			'funnel_id'   => '%d',
-			'step_title'  => '%s',
-			'step_status' => '%s',
-			'step_type'   => '%s',
-			'step_group'  => '%s',
-			'step_order'  => '%d',
+			'ID'             => '%d',
+			'funnel_id'      => '%d',
+			'step_title'     => '%s',
+			'step_status'    => '%s',
+			'step_type'      => '%s',
+			'step_group'     => '%s',
+			'last_edited_by' => '%s',
+			'last_edited'    => '%s',
+			'date_created'   => '%s',
+
+			'branch'         => '%s', // This is essentially another step ID or main
+			'path'           => '%s', // Which path the step is in
 		);
 	}
 
@@ -97,34 +104,19 @@ class Steps extends DB {
 	 */
 	public function get_column_defaults() {
 		return array(
-			'ID'          => 0,
-			'funnel_id'   => 0,
-			'step_title'  => __( 'New Step' ),
-			'step_status' => 'ready',
-			'step_type'   => 'send_email',
-			'step_group'  => 'action',
-			'step_order'  => 0,
+			'ID'             => 0,
+			'funnel_id'      => 0,
+			'step_title'     => __( 'New Step' ),
+			'step_status'    => 'ready',
+			'step_type'      => 'send_email',
+			'step_group'     => 'action',
+			'last_edited_by' => '',
+			'last_edited'    => current_time( 'mysql' ),
+			'date_created'   => current_time( 'mysql' ),
+
+			'branch'         => '', // This is essentially another step ID or main
+			'path'           => '', // Which path the step is in
 		);
-	}
-
-	/**
-	 * Add a step
-	 *
-	 * @access  public
-	 * @since   2.1
-	 */
-	public function add( $data = array() ) {
-
-		$args = wp_parse_args(
-			$data,
-			$this->get_column_defaults()
-		);
-
-		if ( empty( $args['step_type'] ) ) {
-			return false;
-		}
-
-		return $this->insert( $args );
 	}
 
 	/**
@@ -139,7 +131,7 @@ class Steps extends DB {
 			return false;
 		}
 
-		$steps = $this->get_steps( array( 'funnel_id' => $id ) );
+		$steps = $this->query( array( 'funnel_id' => $id ) );
 
 		$result = 0;
 
@@ -153,104 +145,12 @@ class Steps extends DB {
 	}
 
 	/**
-	 * Retrieves the step by the ID.
-	 *
-	 * @param $id
-	 *
-	 * @return mixed
-	 */
-	public function get_step( $id ) {
-		return $this->get_step_by( 'ID', $id );
-	}
-
-	/**
-	 * Retrieves a single step from the database
-	 *
-	 * @access public
-	 *
-	 * @param string $field id or email
-	 * @param mixed $value The Customer ID or email to search
-	 *
-	 * @return mixed          Upon success, an object of the step. Upon failure, NULL
-	 * @since  2.3
-	 */
-	public function get_step_by( $field = 'ID', $value = 0 ) {
-
-		if ( empty( $field ) || empty( $value ) ) {
-			return null;
-		}
-
-		return parent::get_by( $field, $value );
-	}
-
-
-	/**
-	 * Retrieve steps from the database
-	 *
-	 * @access  public
-	 * @since   2.1
-	 */
-	public function get_steps( $data = array(), $order = 'step_order' ) {
-
-		global $wpdb;
-
-		if ( ! is_array( $data ) ) {
-			return false;
-		}
-
-		$data = (array) $data;
-
-		$extra = '';
-
-		if ( isset( $data['search'] ) ) {
-
-			$extra .= sprintf( " AND (%s)", $this->generate_search( $data['search'] ) );
-
-		}
-
-		// Initialise column format array
-		$column_formats = $this->get_columns();
-
-		// Force fields to lower case
-		$data = array_change_key_case( $data );
-
-		// White list columns
-		$data = array_intersect_key( $data, $column_formats );
-
-		$where = $this->generate_where( $data );
-
-		if ( empty( $where ) ) {
-
-			$where = "1=1";
-
-		}
-
-		$results = $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where $extra ORDER BY `$order` ASC" );
-
-		return $results;
-	}
-
-	/**
-	 * Count the total number of steps in the database
-	 *
-	 * @access  public
-	 * @since   2.1
-	 */
-	public function count( $args = array() ) {
-
-		return count( $this->get_steps( $args ) );
-
-	}
-
-	/**
 	 * Create the table
 	 *
 	 * @access  public
 	 * @since   2.1
 	 */
 	public function create_table() {
-
-		global $wpdb;
 
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
@@ -261,7 +161,11 @@ class Steps extends DB {
 		step_type varchar(50) NOT NULL,
 		step_group varchar(20) NOT NULL,
 		step_status varchar(20) NOT NULL,
-		step_order int unsigned NOT NULL,
+		last_edited_by varchar(20) NOT NULL,
+		date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+		last_edited datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+		branch varchar({$this->get_max_index_length()}) NOT NULL,
+		path varchar({$this->get_max_index_length()}) NOT NULL,
 		PRIMARY KEY  (ID)
 		) {$this->get_charset_collate()};";
 

@@ -45,12 +45,7 @@ class Table_Form_Activity extends Base_Table_Report {
 			}
 
 			$form_stats = [
-				'name' => html()->e( 'a', [
-					'href' => admin_page_url( 'gh_funnels', [
-						'action' => 'edit',
-						'funnel' => $form_step->get_funnel_id()
-					] )
-				], $form_name ),
+				'name' => $form_name ,
 			];
 
 			$unique_impressions = get_db( 'form_impressions' )->count([
@@ -79,16 +74,7 @@ class Table_Form_Activity extends Base_Table_Report {
 			] ) );
 
 			if ( $submissions > 0 ){
-				$form_stats[ 'submissions' ] = html()->e( 'a', [
-					'href' => admin_page_url( 'gh_contacts', [
-						'report' => [
-							'step_id' => $form_id,
-							'status'  => Event::COMPLETE,
-							'before'  => $this->end,
-							'after'   => $this->start,
-						]
-					] ),
-				], _nf( $submissions ) ?: '0', false );
+				$form_stats[ 'submissions' ] =_nf( $submissions ) ?: '0';
 			} else {
 				$form_stats[ 'submissions' ] = 0;
 			}
@@ -123,8 +109,6 @@ class Table_Form_Activity extends Base_Table_Report {
 	}
 
 	protected function no_data_notice() {
-		return html()->e( 'div', [ 'class' => 'notice notice-warning' ], [
-			html()->e( 'p', [], __( 'You have no active forms.', 'groundhogg' ) )
-		] );
+		return __( 'You have no active forms.', 'groundhogg' );
 	}
 }

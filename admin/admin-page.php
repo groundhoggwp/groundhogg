@@ -44,7 +44,7 @@ abstract class Admin_Page extends Supports_Errors {
 
 		if ( $this->is_current_page() ) {
 
-			add_action( 'admin_enqueue_scripts', [ $this, 'scripts' ] );
+			add_action( 'admin_enqueue_scripts', [ $this, 'scripts' ], 11 );
 			add_action( 'admin_enqueue_scripts', [ $this, 'register_pointers' ] );
 			add_filter( 'admin_title', [ $this, 'admin_title' ], 10, 2 );
 

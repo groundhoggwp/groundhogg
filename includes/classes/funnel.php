@@ -3,7 +3,6 @@
 namespace Groundhogg;
 
 use Groundhogg\DB\Funnels;
-use Groundhogg\DB\Meta_DB;
 use Groundhogg\DB\Steps;
 
 class Funnel extends Base_Object_With_Meta {
@@ -35,7 +34,6 @@ class Funnel extends Base_Object_With_Meta {
 	protected function get_meta_db() {
 		return Plugin::instance()->dbs->get_db( 'funnelmeta' );
 	}
-
 
 	/**
 	 * A string to represent the object type
@@ -78,36 +76,17 @@ class Funnel extends Base_Object_With_Meta {
 
 			$last = array_pop( $steps );
 
-			if ($last){
+			if ( $last ) {
 
 				return $last->get_id();
 			}
+
 			return 0;
 
 		}
 
 		return $conversion_step_id;
 	}
-
-	public function get_first_action_id() {
-		$actions = $this->get_step_ids( [
-			'step_group' => Step::ACTION,
-		] );
-
-		return array_shift( $actions );
-	}
-
-	/**
-	 * @return int
-	 */
-	public function get_first_step_id() {
-		$actions = $this->get_step_ids( [
-			'step_group' => Step::BENCHMARK,
-		] );
-
-		return array_shift( $actions );
-	}
-
 
 	/**
 	 * Get the step IDs associate with this funnel
@@ -119,11 +98,11 @@ class Funnel extends Base_Object_With_Meta {
 	public function get_step_ids( $query = [] ) {
 		$query = array_merge( $query, [
 			'funnel_id' => $this->get_id(),
-			'orderby'   => 'step_order',
+			'orderby'   => 'ID',
 			'order'     => 'ASC',
 		] );
 
-		return wp_parse_id_list( wp_list_pluck( $this->get_steps_db()->get_steps( $query ), 'ID' ) );
+		return wp_parse_id_list( wp_list_pluck( $this->get_steps_db()->query( $query ), 'ID' ) );
 	}
 
 	/**
@@ -151,31 +130,32 @@ class Funnel extends Base_Object_With_Meta {
 	 * @return array|bool
 	 */
 	public function get_as_array() {
-		$export          = [];
-		$export['title'] = sprintf( "%s - Copy", $this->get_title() );
-		$export['steps'] = [];
 
+		$array = parent::get_as_array();
 		$steps = $this->get_steps();
 
+		// Todo use real stats
+		$array['stats'] = [
+			'active_now'     => 10,
+			'active_last_30' => 30,
+			'complete'       => 15
+		];
+
+		$array['steps'] = [];
+
 		if ( ! $steps ) {
-			return false;
+			return $array;
 		}
 
-		foreach ( $steps as $i => $step ) {
-
-			$export['steps'][ $i ]          = [];
-			$export['steps'][ $i ]['title'] = $step->get_title();
-			$export['steps'][ $i ]['group'] = $step->get_group();
-			$export['steps'][ $i ]['order'] = $step->get_order();
-			$export['steps'][ $i ]['type']  = $step->get_type();
-			$export['steps'][ $i ]['meta']  = $step->get_meta();
-			$export['steps'][ $i ]['args']  = $step->export();
+		foreach ( $steps as $step ) {
+			$array['steps'][] = $step->get_as_array();
 		}
 
+		$array['edges'] = get_db( 'step_edges' )->query( [ 'funnel_id' => $this->get_id() ] );
 
-		$export = apply_filters( 'groundhogg/funnel/export', $export, $this );
+		$array = apply_filters( 'groundhogg/funnel/export', $array, $this );
 
-		return $export;
+		return $array;
 	}
 
 	/**
@@ -268,48 +248,12 @@ class Funnel extends Base_Object_With_Meta {
 			$step->import( $import_args );
 
 			// The screen will be blank, so set the first step to active
-			if ( $i === 0 && is_white_labeled() ){
+			if ( $i === 0 && is_white_labeled() ) {
 				$step->update_meta( 'is_active', true );
 			}
 
 		}
 
 		return $funnel_id;
-	}
-
-	/**
-	 * @return false|string
-	 */
-	public function get_as_json() {
-		return wp_json_encode( $this->get_as_array() );
-	}
-
-	/**
-	 * Add a step to the funnel
-	 *
-	 * @param $args array a list of args for the step
-	 *
-	 * @return Step|false
-	 */
-	public function add_step( $args ) {
-
-		$args = wp_parse_args( $args, [
-			'funnel_id'   => $this->get_id(),
-			'step_status' => 'ready',
-			'step_order'  => count( $this->get_step_ids() ) + 1,
-			'meta'        => [],
-		] );
-
-		$step = new Step( $args );
-
-		if ( ! $step->exists() ) {
-			return false;
-		}
-
-		foreach ( $args['meta'] as $key => $value ) {
-			$step->update_meta( $key, $value );
-		}
-
-		return $step;
 	}
 }

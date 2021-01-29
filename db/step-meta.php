@@ -1,8 +1,11 @@
 <?php
+
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Step Meta DB
@@ -18,33 +21,30 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class Step_Meta extends Meta_DB {
 
-    /**
-     * Get the DB suffix
-     *
-     * @return string
-     */
-    public function get_db_suffix()
-    {
-        return 'gh_stepmeta';
-    }
+	/**
+	 * Get the DB suffix
+	 *
+	 * @return string
+	 */
+	public function get_db_suffix() {
+		return 'gh_stepmeta';
+	}
 
-    /**
-     * Get the DB version
-     *
-     * @return mixed
-     */
-    public function get_db_version()
-    {
-        return '2.0';
-    }
+	/**
+	 * Get the DB version
+	 *
+	 * @return mixed
+	 */
+	public function get_db_version() {
+		return '2.0';
+	}
 
-    /**
-     * Get the object type we're inserting/updateing/deleting.
-     *
-     * @return string
-     */
-    public function get_object_type()
-    {
-        return 'step';
-    }
+	/**
+	 * Get the object type we're inserting/updateing/deleting.
+	 *
+	 * @return string
+	 */
+	public function get_object_type() {
+		return 'step';
+	}
 }

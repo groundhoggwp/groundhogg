@@ -5,6 +5,8 @@ namespace Groundhogg\Steps\Benchmarks;
 use Groundhogg\Contact;
 use Groundhogg\Reporting\Reporting;
 use Groundhogg\Utils\Graph;
+use function Groundhogg\convert_form_shortcode_to_json;
+use function Groundhogg\convert_shortcode_to_json;
 use function Groundhogg\encrypt;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
@@ -129,7 +131,7 @@ class Form_Filled extends Benchmark {
 	}
 
 	public function get_default_form() {
-		return "[row][col width=\"1/2\"][first required=\"true\" label=\"First Name *\" placeholder=\"John\"][/col][col width=\"1/2\"][last required=\"true\" label=\"Last Name *\" placeholder=\"Doe\"][/col][/row][row][col width=\"1/1\"][email required=\"true\" label=\"Email *\" placeholder=\"email@example.com\"][/col][/row][row][col width=\"1/1\"][submit text=\"Submit\"][/col][/row]";
+		return "[row][col width=\"1/2\"][first required=\"true\" label=\"First Name\" placeholder=\"John\"][/col][col width=\"1/2\"][last required=\"true\" label=\"Last Name\" placeholder=\"Doe\"][/col][/row][row][col width=\"1/1\"][email required=\"true\" label=\"Email\" placeholder=\"email@example.com\"][/col][/row][row][col width=\"1/1\"][submit text=\"Submit\"][/col][/row]";
 	}
 
 	/**
@@ -191,7 +193,7 @@ class Form_Filled extends Benchmark {
                                         type="text"
                                         onfocus="this.select()"
                                         class="regular-text code"
-                                        value="<?php echo esc_attr( $form->get_submission_url() ); ?>"
+                                        value="<?php echo esc_attr( $form->get_hosted_url() ); ?>"
                                         readonly></td>
                         </tr>
                         </tbody>
@@ -814,163 +816,34 @@ class Form_Filled extends Benchmark {
 	 * @param $step Step
 	 */
 	public function save( $step ) {
+		$this->save_setting( 'form_name', sanitize_text_field( $this->get_posted_data( 'form_name' ) ) );
 		$this->save_setting( 'form', wp_kses_post( $this->get_posted_data( 'form' ) ) );
+		$this->save_setting( 'form_json', $this->get_posted_data( 'form_json', [] ) );
 		$this->save_setting( 'success_page', sanitize_text_field( $this->get_posted_data( 'success_page' ) ) );
 		$this->save_setting( 'success_message', sanitize_textarea_field( $this->get_posted_data( 'success_message' ) ) );
 		$this->save_setting( 'enable_ajax', absint( $this->get_posted_data( 'enable_ajax' ) ) );
 
 		// Render the config quietly
-		$form = do_shortcode( sprintf( "[gh_form id=%d]", $step->get_id() ) );
+//		$form = do_shortcode( sprintf( "[gh_form id=%d]", $step->get_id() ) );
 
 	}
 
-	/**
-	 * Extend the Form reporting VIEW with impressions vs. submissions...
-	 *
-	 * @param $step Step
-	 */
-	public function reporting( $step ) {
-		$start_time = Plugin::$instance->admin->get_page( 'funnels' )->get_reporting_start_time();
-		$end_time   = Plugin::$instance->admin->get_page( 'funnels' )->get_reporting_end_time();
+	public function context( $context, $step ) {
 
-		$cquery = new Contact_Query();
+		$form = new Form\Form( [ 'id' => $step->get_id() ] );
 
-		$num_events_completed = $cquery->query( array(
-			'count'  => true,
-			'report' => array(
-				'start'  => $start_time,
-				'end'    => $end_time,
-				'step'   => $step->get_id(),
-				'funnel' => $step->get_funnel_id(),
-				'status' => 'complete'
-			)
-		) );
-
-		$records = get_db( 'form_impressions' )->query( [
-			'after'   => $start_time,
-			'before'  => $end_time,
-			'form_id' => $step->get_id(),
-		] );
-
-		$num_impressions = array_sum( map_deep( wp_list_pluck( $records, 'count' ), 'absint' ) );
-
-		?>
-        <p class="report">
-            <span class="impressions"><?php _e( 'Views: ' ); ?>
-                <strong>
-                    <?php echo $num_impressions; ?>
-                </strong>
-            </span> |
-            <!-- TODO -->
-            <span class="submissions"><?php _e( 'Fills: ' ); ?><strong>
-                    <a target="_blank" href="<?php echo add_query_arg( [
-	                    'report' => [
-		                    'step'   => $step->get_id(),
-		                    'funnel' => $step->get_funnel_id(),
-		                    'status' => 'complete',
-		                    'start'  => $start_time,
-		                    'end'    => $end_time,
-	                    ]
-                    ], admin_url( 'admin.php?page=gh_contacts' ) ); ?>">
-                <b><?php echo $num_events_completed; ?></b>
-            </a>
-                </strong></span> |
-            <span class="cvr"
-                  title="<?php _e( 'Conversion Rate' ); ?>"><?php _e( 'CVR: ' ); ?><strong><?php echo round( ( $num_events_completed / ( ( $num_impressions > 0 ) ? $num_impressions : 1 ) * 100 ), 2 ); ?></strong>%</span>
-        </p>
-		<?php
-	}
-
-	public function reporting_v2( $step ) {
-		parent::reporting_v2( $step );
-
-		?>
-        <div class="reporting-results"><?php
-
-		$times = $this->get_reporting_interval();
-
-		$start_time = $times['start_time'];
-		$end_time   = $times['end_time'];
-
-		$db = get_db( 'form_impressions' );
-
-		$data = $db->query( [
-			'before' => $end_time,
-			'after'  => $start_time
-		] );
-
-		$impressions = [];
-
-		// Normalize data so reports don't have to change...
-		foreach ( $data as $datum ) {
-			$count = absint( $datum->count );
-			for ( $i = 0; $i < $count; $i ++ ) {
-				$impressions[] = [ 'timestamp' => absint( $datum->timestamp ) ];
-			}
-		}
-
-		$submissions = get_db( 'events' )->query( [
-			'step_id' => $step->get_id(),
-			'status'  => Event::COMPLETE,
-			'before'  => $end_time,
-			'after'   => $start_time
-		] );
-
-		$total_impressions = count( $impressions );
-		$total_submissions = count( $submissions );
-
-		$impressions = Reporting::group_by_time( $impressions, 'timestamp', 'absint' );
-		$submissions = Reporting::group_by_time( $submissions, 'time', 'absint' );
-
-		$data = [
-			[
-				'label' => __( 'Impressions', 'groundhogg' ),
-				'data'  => $impressions
-			],
-			[
-				'label' => __( 'Submissions', 'groundhogg' ),
-				'data'  => $submissions
-			],
+		$embed = [
+			'shortcode' => sprintf( "[gh_form id=%d]", $step->get_id() ),
+			'html'      => $form->get_html_embed_code(),
+			'iframe'    => $form->get_iframe_embed_code(),
+			'hosted'    => esc_url( $form->get_hosted_url() ),
 		];
 
-		$graph = new Graph( $step->get_id(), [
-			'mode' => 'time'
-		], $data );
+		$context[ 'embed' ] = $embed;
+		$context[ 'url' ] = esc_url( $form->get_submission_url() );
+		$context[ 'default_form_json' ] = convert_form_shortcode_to_json( $this->get_setting( 'form', $this->get_default_form() ) );
+		$context[ 'recaptcha_is_v3' ] = get_option( 'gh_recaptcha_version', 'v2' ) ?: 'v2' === 'v3';
 
-		if ( $graph->has_data() ):
-
-			?>
-            <div class="chart">
-                <div class="inside">
-					<?php $graph->render(); ?>
-                </div>
-            </div>
-		<?php
-
-		endif;
-
-		?>
-        <h3><?php _e( 'Activity', 'groundhogg' ); ?></h3>
-		<?php
-
-		html()->list_table(
-			[ 'class' => 'form_activity' ],
-			[
-				__( 'Impressions', 'groundhogg' ),
-				__( 'Submissions', 'groundhogg' ),
-				__( 'Conversion Rate (%)', 'groundhogg' ),
-			],
-			[
-				[
-					html()->wrap( $total_impressions, 'span', [ 'class' => 'number-total' ] ),
-					html()->wrap( $total_submissions, 'span', [ 'class' => 'number-total' ] ),
-					html()->wrap( percentage( $total_impressions, $total_submissions ) . '%', 'span', [ 'class' => 'number-total' ] ),
-				]
-			],
-			false
-		);
-
-		?></div><?php
-
+		return $context;
 	}
 }

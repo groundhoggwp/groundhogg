@@ -62,14 +62,13 @@ class Manager {
 //			return;
 //		}
 
-
 		/* actions */
 		$this->add_step( new Send_Email() );
 		$this->add_step( new Admin_Notification() );
 		$this->add_step( new Apply_Tag() );
 		$this->add_step( new Remove_Tag() );
 		$this->add_step( new Apply_Note() );
-		$this->add_step( new Delay_Timer() );
+//		$this->add_step( new Delay_Timer() );
 
 		/* Benchmarks */
 
@@ -83,7 +82,7 @@ class Manager {
 		/* Other */
 		$this->add_step( new Error() );
 
-		do_action( 'groundhogg/steps/init', $this );
+//		do_action( 'groundhogg/steps/init', $this );
 	}
 
 	/**
@@ -109,6 +108,43 @@ class Manager {
 	 */
 	public function get_actions() {
 		return apply_filters( 'groundhogg/steps/actions', array() );
+	}
+
+	public function get_actions_as_array() {
+		$actions = $this->get_actions();
+
+		$array = [];
+
+		foreach ( $actions as $action ) {
+			$array[] = [
+				'icon'        => $action->get_icon(),
+				'type'        => $action->get_type(),
+				'group'       => $action->get_group(),
+				'name'        => $action->get_name(),
+				'description' => $action->get_description(),
+			];
+		}
+
+		return $array;
+	}
+
+
+	public function get_benchmarks_as_array() {
+		$benchmarks = $this->get_benchmarks();
+
+		$array = [];
+
+		foreach ( $benchmarks as $benchmark ) {
+			$array[] = [
+				'icon'        => $benchmark->get_icon(),
+				'type'        => $benchmark->get_type(),
+				'group'       => $benchmark->get_group(),
+				'name'        => $benchmark->get_name(),
+				'description' => $benchmark->get_description(),
+			];
+		}
+
+		return $array;
 	}
 
 	/**
