@@ -21,6 +21,7 @@ use \WP_Error;
 use function Groundhogg\install_gh_cron_file;
 use function Groundhogg\is_groundhogg_network_active;
 use function Groundhogg\is_option_enabled;
+use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\key_to_words;
 use function Groundhogg\nonce_url_no_amp;
@@ -151,7 +152,8 @@ class Tools_Page extends Tabbed_Admin_Page {
 			];
 		}
 
-		$actions = apply_filters( 'groundhogg/admin/tools/title_action', $actions , $this );
+		$actions = apply_filters( 'groundhogg/admin/tools/title_action', $actions, $this );
+
 		return $actions;
 
 	}
@@ -216,19 +218,21 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 			<?php do_action( 'groundhogg/admin/tools/system_status/before' ); ?>
 
-            <div class="postbox">
-                <h2 class="hndle"><?php _e( 'Download System Info', 'groundhogg' ); ?></h2>
-                <div class="inside">
-                    <p class="description"><?php _e( 'Download System Info when requesting support.', 'groundhogg' ); ?></p>
-                    <textarea class="code" style="width: 100%;height:600px;" readonly="readonly"
-                              onclick="this.focus(); this.select()" id="system-info-textarea"
-                              name="sysinfo"><?php echo groundhogg_tools_sysinfo_get(); ?></textarea>
-                    <p class="submit">
-                        <a class="button button-secondary"
-                           href="<?php echo admin_url( '?gh_download_sys_info=1' ) ?>"><?php _e( 'Download System Info', 'groundhogg' ); ?></a>
-                    </p>
+			<?php if ( ! is_white_labeled() ) : ?>
+                <div class="postbox">
+                    <h2 class="hndle"><?php _e( 'Download System Info', 'groundhogg' ); ?></h2>
+                    <div class="inside">
+                        <p class="description"><?php _e( 'Download System Info when requesting support.', 'groundhogg' ); ?></p>
+                        <textarea class="code" style="width: 100%;height:600px;" readonly="readonly"
+                                  onclick="this.focus(); this.select()" id="system-info-textarea"
+                                  name="sysinfo"><?php echo groundhogg_tools_sysinfo_get(); ?></textarea>
+                        <p class="submit">
+                            <a class="button button-secondary"
+                               href="<?php echo admin_url( '?gh_download_sys_info=1' ) ?>"><?php _e( 'Download System Info', 'groundhogg' ); ?></a>
+                        </p>
+                    </div>
                 </div>
-            </div>
+			<?php endif; ?>
             <div class="postbox">
                 <h2 class="hndle"><?php _e( 'Safe Mode', 'groundhogg' ); ?></h2>
                 <div class="inside">
@@ -683,17 +687,17 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 					?></p>
                 <script>
-                  (function ($) {
+                    (function ($) {
 
-                    $('.select-all-meta').click(function (e) {
-                      $('.meta.header').attr('checked', 'checked')
-                    })
+                        $('.select-all-meta').click(function (e) {
+                            $('.meta.header').attr('checked', 'checked')
+                        })
 
-                    $('.deselect-all-meta').click(function (e) {
-                      $('.meta.header').attr('checked', false)
-                    })
+                        $('.deselect-all-meta').click(function (e) {
+                            $('.meta.header').attr('checked', false)
+                        })
 
-                  })(jQuery)
+                    })(jQuery)
                 </script>
                 <table>
 					<?php
