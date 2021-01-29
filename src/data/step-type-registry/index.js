@@ -62,7 +62,7 @@ export function registerStepType ( type, atts ) {
  * @returns {{StepFlow: (boolean|(function({data: *, meta: *, read: *}): *)|STEP_DEFAULTS.flow|(function({data: *, meta: *, icon: *, read: *}): *)|BENCHMARK_TYPE_DEFAULTS.flow|(function({data: *, meta: *, read: *}): *)|*), StepRead: *, StepEdit: *}}
  */
 export function useStepType ( type ) {
-  const StepType = select(STEP_TYPES_STORE_NAME).getType(type);
+  let StepType = getStepType( type )
 
   return {
     StepEdit: StepType.edit,
@@ -79,7 +79,14 @@ export function useStepType ( type ) {
  * @returns {*|string}
  */
 export function getStepType ( type ) {
-  return select(STEP_TYPES_STORE_NAME).getType(type)
+
+  let StepType = select(STEP_TYPES_STORE_NAME).getType(type);
+
+  if ( ! StepType ){
+    StepType = select(STEP_TYPES_STORE_NAME).getType('error');
+  }
+
+  return StepType
 }
 
 /**

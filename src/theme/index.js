@@ -55,10 +55,10 @@ const themesOptions = [
         paper: colors.common.white
       },
       primary: {
-        main: colors.indigo[600]
+        main: '#f18f01'
       },
       secondary: {
-        main: '#5850EC'
+        main: '#006e90'
       },
       text: {
         primary: colors.blueGrey[900],
@@ -66,71 +66,12 @@ const themesOptions = [
       }
     },
     shadows: softShadows
-  },
-  {
-    name: THEMES.ONE_DARK,
-    palette: {
-      type: 'dark',
-      action: {
-        active: 'rgba(255, 255, 255, 0.54)',
-        hover: 'rgba(255, 255, 255, 0.04)',
-        selected: 'rgba(255, 255, 255, 0.08)',
-        disabled: 'rgba(255, 255, 255, 0.26)',
-        disabledBackground: 'rgba(255, 255, 255, 0.12)',
-        focus: 'rgba(255, 255, 255, 0.12)'
-      },
-      background: {
-        default: '#282C34',
-        dark: '#1c2025',
-        paper: '#282C34'
-      },
-      primary: {
-        main: '#8a85ff'
-      },
-      secondary: {
-        main: '#8a85ff'
-      },
-      text: {
-        primary: '#e6e5e8',
-        secondary: '#adb0bb'
-      }
-    },
-    shadows: strongShadows
-  },
-  {
-    name: THEMES.UNICORN,
-    palette: {
-      type: 'dark',
-      action: {
-        active: 'rgba(255, 255, 255, 0.54)',
-        hover: 'rgba(255, 255, 255, 0.04)',
-        selected: 'rgba(255, 255, 255, 0.08)',
-        disabled: 'rgba(255, 255, 255, 0.26)',
-        disabledBackground: 'rgba(255, 255, 255, 0.12)',
-        focus: 'rgba(255, 255, 255, 0.12)'
-      },
-      background: {
-        default: '#2a2d3d',
-        dark: '#222431',
-        paper: '#2a2d3d'
-      },
-      primary: {
-        main: '#a67dff'
-      },
-      secondary: {
-        main: '#a67dff'
-      },
-      text: {
-        primary: '#f6f5f8',
-        secondary: '#9699a4'
-      }
-    },
-    shadows: strongShadows
   }
 ];
 
 export const createTheme = (config = {}) => {
-  let themeOptions = themesOptions.find((theme) => theme.name === config.theme);
+  let themeOptions = themesOptions.find((theme) => theme.name === 'LIGHT');
+  // let themeOptions = themesOptions.find((theme) => theme.name === config.theme);
 
   if (!themeOptions) {
     console.warn(new Error(`The theme ${config.theme} is not valid`));

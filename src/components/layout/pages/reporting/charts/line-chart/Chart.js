@@ -8,6 +8,11 @@ import {
   useTheme
 } from '@material-ui/core';
 
+
+import { createTheme } from '../../../../../../theme';
+const theme = createTheme({});
+
+
 const useStyles = makeStyles(() => ({
   root: {
     position: 'relative'
@@ -21,26 +26,29 @@ const Chart = ({
   ...rest
 }) => {
   const classes = useStyles();
-  const theme = useTheme();
 
   const data = (canvas) => {
-    const ctx = canvas.getContext('2d');
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
 
-    gradient.addColorStop(0, fade(theme.palette.secondary.main, 0.2));
-    gradient.addColorStop(0.9, 'rgba(255,255,255,0)');
-    gradient.addColorStop(1, 'rgba(255,255,255,0)');
 
-    datasets = datasets.map((dataset)=>{
+    datasets = datasets.map((dataset, i)=>{
+      const ctx = canvas.getContext('2d');
+      const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+
+
+      let lineColor = i === 0 ? theme.palette.primary.main : theme.palette.secondary.main;
+      gradient.addColorStop(0, fade(lineColor, 0.2));
+      gradient.addColorStop(0.9, 'rgba(255,255,255,0)');
+      gradient.addColorStop(1, 'rgba(255,255,255,0)');
+
       const data = dataset.data
       return   {
           data,
           backgroundColor: gradient,
-          borderColor: theme.palette.secondary.main,
-          pointBorderColor: theme.palette.background.default,
+          borderColor: lineColor,
+          pointBorderColor: lineColor,
           pointBorderWidth: 3,
           pointRadius: 6,
-          pointBackgroundColor: theme.palette.secondary.main
+          pointBackgroundColor: lineColor
         }
     })
     return {
@@ -61,6 +69,14 @@ const Chart = ({
     },
     scales: {
       xAxes: [
+        // {
+        //     type: 'time',
+        //     time: {
+        //       displayFormats: {
+        //           day: 'MMM D'
+        //       }
+        //     }
+        // },
         {
           gridLines: {
             display: false,
@@ -68,7 +84,10 @@ const Chart = ({
           },
           ticks: {
             padding: 20,
-            fontColor: theme.palette.text.secondary
+            fontColor: theme.palette.text.secondary,
+            callback: (value) => {
+                return new Date(value).toLocaleDateString('de-DE', {month:'short', year:'numeric'});
+            },
           }
         }
       ],
@@ -89,7 +108,7 @@ const Chart = ({
             beginAtZero: true,
             min: 0,
             maxTicksLimit: 7,
-            callback: (value) => (value > 0 ? `${value}K` : value)
+            // callback: (value) => (value > 0 ? `${value}K` : value)
           }
         }
       ]
@@ -110,13 +129,7 @@ const Chart = ({
       callbacks: {
         title: () => {},
         label: (tooltipItem) => {
-          let label = `Income: ${tooltipItem.yLabel}`;
-
-          if (tooltipItem.yLabel > 0) {
-            label += 'K';
-          }
-
-          return label;
+          return `Contacts: ${tooltipItem.yLabel} ${new Date(tooltipItem.xLabel).toLocaleDateString('de-DE', {month:'short', year:'numeric'})}`;
         }
       }
     }
