@@ -319,6 +319,7 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 * TWEAKED Email step actions are now visible persistently.
 * FIXED `key` param conflict with EDD.
 * FIXED the sync users tool will re-sync already synced users and contacts.
+* FIXED Reporting not loading when script debug is enabled.
 
 = 2.2.24 (2020-12-18) =
 * ADDED Ability to have multiple email services installed and differentiate between marketing and transactional emails.
