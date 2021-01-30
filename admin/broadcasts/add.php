@@ -53,10 +53,6 @@ $type = isset( $_REQUEST['type'] ) && $_REQUEST['type'] === 'sms' ? 'sms' : 'ema
 
 					echo Plugin::$instance->utils->html->dropdown_emails( $args );
 					?>
-                    <div class="row-actions">
-                        <a target="_blank" class="button button-secondary"
-                           href="<?php echo admin_url( 'admin.php?page=gh_emails&action=add' ); ?>"><?php _e( 'Create New Email', 'groundhogg' ); ?></a>
-                    </div>
                     <p class="description"><?php _e( 'The Broadcast tool uses your global emails.', 'groundhogg' ) ?></p>
                 </td>
             </tr>

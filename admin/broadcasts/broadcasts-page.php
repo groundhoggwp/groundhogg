@@ -349,17 +349,10 @@ class Broadcasts_Page extends Admin_Page {
 	public function view() {
 		$broadcasts_table = new Broadcasts_Table();
 
+		$this->search_form( __( 'Search Broadcasts', 'groundhogg' ) );
 		$broadcasts_table->views(); ?>
-        <form method="post" class="search-form wp-clearfix">
+        <form method="post" class="wp-clearfix">
             <!-- search form -->
-            <p class="search-box">
-                <label class="screen-reader-text"
-                       for="post-search-input"><?php _ex( 'Search Broadcasts', 'search', 'groundhogg' ); ?>
-                    :&nbsp;</label>
-                <input type="search" id="post-search-input" name="s" value="">
-                <input type="submit" id="search-submit" class="button"
-                       value="<?php _ex( 'Search Broadcasts', 'search', 'groundhogg' ); ?>">
-            </p>
 			<?php $broadcasts_table->prepare_items(); ?>
 			<?php $broadcasts_table->display(); ?>
         </form>

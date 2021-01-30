@@ -75,8 +75,8 @@ class Broadcasts_Table extends WP_List_Table {
 	 *
 	 * bulk steps or checkboxes, simply leave the 'cb' entry out of your array.
 	 *
-	 * @see WP_List_Table::::single_row_columns()
 	 * @return array An associative array containing column information.
+	 * @see WP_List_Table::::single_row_columns()
 	 */
 	public function get_columns() {
 
@@ -101,7 +101,7 @@ class Broadcasts_Table extends WP_List_Table {
 		} else if ( $this->get_view() === 'pending' ) {
 			unset( $columns['stats'] );
 			unset( $columns['sending_to'] );
-			$columns[ 'process_schedule' ] = _x( 'Finish Scheduling', 'Column label', 'groundhogg' );
+			$columns['process_schedule'] = _x( 'Finish Scheduling', 'Column label', 'groundhogg' );
 		}
 
 		/**
@@ -309,7 +309,7 @@ class Broadcasts_Table extends WP_List_Table {
 	 */
 	protected function column_query( $broadcast ) {
 
-		$query           = $broadcast->get_query();
+		$query                 = $broadcast->get_query();
 		$query['is_searching'] = 'on';
 
 		return html()->e( 'a', [
@@ -446,14 +446,14 @@ class Broadcasts_Table extends WP_List_Table {
 	 *
 	 * @return string
 	 */
-	protected function column_process_schedule( $broadcast ){
+	protected function column_process_schedule( $broadcast ) {
 		$confirm_link = admin_page_url( 'gh_broadcasts', [
 			'action'    => 'preview',
 			'broadcast' => $broadcast->get_id(),
 		] );
 
 		return html()->e( 'a', [
-			'href' => $confirm_link,
+			'href'  => $confirm_link,
 			'class' => 'button'
 		], __( 'Finish Scheduling' ) );
 	}
@@ -462,7 +462,7 @@ class Broadcasts_Table extends WP_List_Table {
 	 * For more detailed insight into how columns are handled, take a look at
 	 * WP_List_Table::single_row_columns()
 	 *
-	 * @param object $broadcast   A singular item (one full row's worth of data).
+	 * @param object $broadcast A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string Text or HTML to be placed inside the column <td>.
@@ -535,7 +535,7 @@ class Broadcasts_Table extends WP_List_Table {
 		$per_page = absint( get_url_var( 'limit', get_screen_option( 'per_page' ) ) );
 		$paged    = $this->get_pagenum();
 		$offset   = $per_page * ( $paged - 1 );
-		$search   = get_url_var( 's' );
+		$search   = sanitize_text_field( get_url_var( 's' ) );
 		$order    = get_url_var( 'order', 'DESC' );
 		$orderby  = get_url_var( 'orderby', 'ID' );
 
@@ -551,15 +551,31 @@ class Broadcasts_Table extends WP_List_Table {
 
 		$args = array(
 			'where'   => $where,
-			'search'  => $search,
+//			'search'  => $search,
 			'limit'   => $per_page,
 			'offset'  => $offset,
 			'order'   => $order,
 			'orderby' => $orderby,
 		);
 
+		$anonymous = function ( $clauses ) use ( $search ) {
+
+			if ( ! empty( $search ) ) {
+
+				$emails_table       = get_db( 'emails' )->table_name;
+				$email_table_search = "SELECT ID FROM $emails_table WHERE `title` RLIKE '{$search}' OR `subject` RLIKE '{$search}'";
+				$clauses['where']   .= " AND object_id IN ({$email_table_search})";
+			}
+
+			return $clauses;
+		};
+
+		add_filter( 'groundhogg/db/sql_query_clauses', $anonymous, 13 );
+
 		$events = get_db( 'broadcasts' )->query( $args );
 		$total  = get_db( 'broadcasts' )->count( $args );
+
+		remove_filter( 'groundhogg/db/sql_query_clauses', $anonymous, 13 );
 
 		$this->items = $events;
 

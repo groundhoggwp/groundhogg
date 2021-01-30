@@ -82,7 +82,7 @@ abstract class Form_Integration extends Benchmark {
 				html()->e( 'span', [ 'class' => 'spinner' ], '', false )
 			],
 				'div',
-				[ 'class' => 'row-actions' ]
+				[ 'class' => '' ]
 			),
 			html()->wrap( $this->field_map_table( $this->get_setting( 'form_id' ) ), 'div', [
 				'class' => 'hidden field-map-wrapper',

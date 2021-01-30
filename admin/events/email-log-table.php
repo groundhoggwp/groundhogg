@@ -100,8 +100,8 @@ class Email_Log_Table extends Table {
 	 *
 	 * bulk steps or checkboxes, simply leave the 'cb' entry out of your array.
 	 *
-	 * @see WP_List_Table::::single_row_columns()
 	 * @return array An associative array containing column information.
+	 * @see WP_List_Table::::single_row_columns()
 	 */
 	public function get_columns() {
 		$columns = array(
@@ -115,10 +115,10 @@ class Email_Log_Table extends Table {
 			//'date_created' => _x( 'Date Created', 'Column label', 'groundhogg' ),
 		);
 
-		if ( $this->get_view() === 'failed' ){
-		    $columns[ 'error_code' ] = _x( 'Error', 'Column label', 'groundhogg' );
-		    $columns[ 'error_message' ] = _x( 'Message', 'Column label', 'groundhogg' );
-        }
+		if ( $this->get_view() === 'failed' ) {
+			$columns['error_code']    = _x( 'Error', 'Column label', 'groundhogg' );
+			$columns['error_message'] = _x( 'Message', 'Column label', 'groundhogg' );
+		}
 
 		return apply_filters( 'groundhogg/log/columns', $columns );
 	}
@@ -157,19 +157,19 @@ class Email_Log_Table extends Table {
 		if ( $primary !== $column_name ) {
 			return '';
 		}
-
-		$actions['resend']       = "<a href='" . action_url( 'resend_email', [
-				'id' => $email->get_id()
-			] ) . "'>" . __( 'Resend', 'groundhogg' ) . "</a>";
+//
+//		$actions['resend']       = "<a href='" . action_url( 'resend_email', [
+//				'id' => $email->get_id()
+//			] ) . "'>" . __( 'Resend', 'groundhogg' ) . "</a>";
 		$actions['view-details'] = html()->modal_link( [
-			'title'              => __( 'Log Details', 'groundhogg' ),
-			'text'               => __( 'View Details', 'groundhogg' ),
-			'class'              => 'view-email-log',
-			'footer'             => 'false',
-			'height'             => 500,
-			'width'              => 500,
-			'source'             => 'modal-log-details',
-            'data-log-id'        => $email->get_id()
+			'title'       => __( 'Log Details', 'groundhogg' ),
+			'text'        => __( 'View Details', 'groundhogg' ),
+			'class'       => 'view-email-log',
+			'footer'      => 'false',
+			'height'      => 500,
+			'width'       => 500,
+			'source'      => 'modal-log-details',
+			'data-log-id' => $email->get_id()
 		] );
 
 		return $this->row_actions( apply_filters( 'groundhogg/log/row_actions', $actions, $email, $column_name ) );
@@ -278,7 +278,7 @@ class Email_Log_Table extends Table {
 	 * For more detailed insight into how columns are handled, take a look at
 	 * WP_List_Table::single_row_columns()
 	 *
-	 * @param object $email       A singular item (one full row's worth of data).
+	 * @param object $email A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string|void Text or HTML to be placed inside the column <td>.
@@ -311,10 +311,11 @@ class Email_Log_Table extends Table {
 	protected function get_bulk_actions() {
 
 		$actions = [
-			'retry'     => __( 'Retry', 'groundhogg' ),
-			'resend'    => __( 'Resend', 'groundhogg' ),
-			'blacklist' => __( 'Blacklist', 'groundhogg' ),
-			'whitelist' => __( 'Whitelist', 'groundhogg' ),
+//			'retry'     => __( 'Retry', 'groundhogg' ),
+//			'blacklist' => __( 'Blacklist', 'groundhogg' ),
+//			'whitelist' => __( 'Whitelist', 'groundhogg' ),
+			'resend' => __( 'Resend', 'groundhogg' ),
+			'delete' => __( 'Delete', 'groundhogg' ),
 		];
 
 		return apply_filters( 'groundhogg/log/bulk_actions', $actions );

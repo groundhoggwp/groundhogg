@@ -113,7 +113,7 @@ class Groundhogg_Email_Services {
 	 * @return null|string
 	 */
 	public static function get_current_message_type() {
-		return self::$current_message_type ?: self::TRANSACTIONAL;
+		return self::$current_message_type ?: self::WORDPRESS;
 	}
 
 	/**
@@ -122,7 +122,7 @@ class Groundhogg_Email_Services {
 	 * @return null|string
 	 */
 	public static function get_current_email_service() {
-		return self::$current_email_service ?: self::get_transactional_service();
+		return self::$current_email_service ?: self::get_wordpress_service();
 	}
 
 	/**

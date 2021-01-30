@@ -275,9 +275,9 @@ class Replacements {
 	/**
 	 * Remove a replacement code
 	 *
-	 * @since 1.9
-	 *
 	 * @param string $code to remove
+	 *
+	 * @since 1.9
 	 *
 	 */
 	public function remove( $code ) {
@@ -298,9 +298,9 @@ class Replacements {
 	/**
 	 * Returns a list of all replacement codes
 	 *
+	 * @return array
 	 * @since 1.9
 	 *
-	 * @return array
 	 */
 	public function get_replacements() {
 		return $this->replacement_codes;
@@ -325,6 +325,9 @@ class Replacements {
 		if ( $contact && $contact->exists() ) {
 			$this->contact_id      = $contact->get_id();
 			$this->current_contact = $contact;
+		} else {
+			$this->contact_id      = 0;
+			$this->current_contact = new Contact;
 		}
 
 
@@ -418,7 +421,7 @@ class Replacements {
 //			return $default;
 //        }
 
-		$cache_key   = 'key:' . $this->contact_id . ':' . md5( serialize( $parts ) );
+		$cache_key   = 'key:' . ( $this->contact_id ?: 'anon' ) . ':' . md5( serialize( $parts ) );
 		$cache_value = wp_cache_get( $cache_key, 'replacements' );
 
 		if ( $cache_value ) {
@@ -488,8 +491,8 @@ class Replacements {
 		echo Plugin::$instance->utils->html->modal_link( array(
 			'title'              => __( 'Replacements', 'groundhogg' ),
 			'text'               => $short
-                ? '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>'
-                : '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>&nbsp;' . _x( 'Insert Replacement', 'replacement', 'groundhogg' ),
+				? '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>'
+				: '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>&nbsp;' . _x( 'Insert Replacement', 'replacement', 'groundhogg' ),
 			'footer_button_text' => __( 'Insert' ),
 			'id'                 => 'replacements',
 			'class'              => 'button button-secondary no-padding replacements replacements-button',
@@ -831,7 +834,7 @@ class Replacements {
 	 * Return the owner's signature
 	 *
 	 * @param mixed $attr the attribute to fetch...
-	 * @param int   $contact_id
+	 * @param int $contact_id
 	 *
 	 * @return mixed|string
 	 */

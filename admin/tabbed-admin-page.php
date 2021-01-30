@@ -26,6 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 abstract class Tabbed_Admin_Page extends Admin_Page {
+
 	/**
 	 * array of [ 'name', 'slug' ]
 	 *
@@ -34,26 +35,63 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 	abstract protected function get_tabs();
 
 	/**
+	 * @return array
+	 */
+	protected function parsed_tabs(){
+
+		$tabs = $this->get_tabs();
+
+		$tabs = array_map( function ( $tab ){
+			return wp_parse_args( $tab, [
+				'name' => '',
+				'slug' => 'gh_tab',
+				'cap'  => 'view_contacts'
+			] );
+		}, $tabs );
+
+		return array_filter( $tabs, function ( $tab ){
+			return current_user_can( $tab['cap'] );
+		} );
+
+	}
+
+	/**
 	 * Get the current tab.
 	 *
 	 * @return mixed
 	 */
 	public function get_current_tab() {
-		$tabs = $this->get_tabs();
+		$tabs = $this->parsed_tabs();
 
-		return get_request_var( 'tab', $tabs[0]['slug'] );
+		return get_request_var( 'tab', array_shift( $tabs )['slug'] );
 	}
+
+	/**
+     * Retrieves the cap for the current tab
+     *
+	 * @return bool
+	 */
+	public function get_current_tab_cap(){
+
+		foreach ( $this->parsed_tabs() as $tab ){
+		    if ( $tab[ 'slug' ] === $this->get_current_tab() ){
+		        return $tab[ 'cap' ];
+            }
+        }
+
+	    return false;
+    }
 
 	/**
 	 * Output HTML for the page tabs
 	 */
 	protected function do_page_tabs() {
-		$tabs = apply_filters( "groundhogg/admin/{$this->get_slug()}/tabs", $this->get_tabs() );
 
 		?>
         <!-- BEGIN TABS -->
         <h2 class="nav-tab-wrapper">
-			<?php foreach ( $tabs as $id => $tab ): ?>
+			<?php foreach ( $this->parsed_tabs() as $id => $tab ): ?>
+                <?php if ( ! current_user_can( $tab['cap'] ) ) continue; ?>
                 <a href="?page=<?php echo $this->get_slug(); ?>&tab=<?php echo $tab['slug']; ?>"
                    class="nav-tab <?php echo $this->get_current_tab() == $tab['slug'] ? 'nav-tab-active' : ''; ?>"><?php _e( $tab['name'], 'groundhogg' ); ?></a>
 			<?php endforeach; ?>
@@ -138,22 +176,26 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 			<?php $this->do_page_tabs(); ?>
 			<?php
 
-			$methods = [
-				"{$this->get_current_tab()}_{$this->get_current_action()}",
-				"{$this->get_current_action()}_{$this->get_current_tab()}",
-				"{$this->get_current_tab()}_view",
-				"view_{$this->get_current_tab()}",
-				"view"
-			];
+			if ( current_user_can( $this->get_current_tab_cap() ) ){
 
-			foreach ( $methods as $method ) {
-				if ( method_exists( $this, $method ) ) {
-					call_user_func( [ $this, $method ] );
-					break;
-				} else if ( has_action( "groundhogg/admin/{$this->get_slug()}/display/{$method}" ) ) {
-					do_action( "groundhogg/admin/{$this->get_slug()}/display/{$method}", $this );
-					break;
+				$methods = [
+					"{$this->get_current_tab()}_{$this->get_current_action()}",
+					"{$this->get_current_action()}_{$this->get_current_tab()}",
+					"{$this->get_current_tab()}_view",
+					"view_{$this->get_current_tab()}",
+					"view"
+				];
+
+				foreach ( $methods as $method ) {
+					if ( method_exists( $this, $method ) ) {
+						call_user_func( [ $this, $method ] );
+						break;
+					} else if ( has_action( "groundhogg/admin/{$this->get_slug()}/display/{$method}" ) ) {
+						do_action( "groundhogg/admin/{$this->get_slug()}/display/{$method}", $this );
+						break;
+					}
 				}
+
 			}
 
 			?>

@@ -112,7 +112,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	}
 
 	public function get_cap() {
-		return 'manage_options';
+		return 'view_contacts';
 	}
 
 	public function get_item_type() {
@@ -163,34 +163,42 @@ class Tools_Page extends Tabbed_Admin_Page {
 			[
 				'name' => __( 'System Info & Debug' ),
 				'slug' => 'system',
+                'cap'  => 'manage_options'
 			],
 			[
 				'name' => __( 'Import' ),
 				'slug' => 'import',
+				'cap'  => 'import_contacts'
 			],
 			[
 				'name' => __( 'Export' ),
 				'slug' => 'export',
+				'cap'  => 'export_contacts'
 			],
 			[
 				'name' => __( 'Sync/Create Users' ),
 				'slug' => 'sync_create_users',
+				'cap'  => 'import_contacts'
 			],
 			[
 				'name' => __( 'Bulk Delete', 'groundhogg' ),
 				'slug' => 'delete',
+				'cap'  => 'delete_contacts'
 			],
 			[
 				'name' => __( 'Updates', 'groundhogg' ),
-				'slug' => 'updates'
+				'slug' => 'updates',
+				'cap'  => 'manage_options'
 			],
 			[
 				'name' => __( 'Install', 'groundhogg' ),
-				'slug' => 'install'
+				'slug' => 'install',
+				'cap'  => 'manage_options'
 			],
 			[
 				'name' => __( 'Advanced Cron Setup', 'groundhogg' ),
-				'slug' => 'advanced_cron'
+				'slug' => 'advanced_cron',
+				'cap'  => 'manage_options'
 			],
 		];
 

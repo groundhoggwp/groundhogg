@@ -309,6 +309,17 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.3 (2021-01-29) =
+* ADDED Email logging, emails can be logged optionally. Find it in the new **Logs** screen.
+* TWEAKED Events have been moved to the **Logs** screen to differentiate it from other kinds of events in WordPress.
+* TWEAKED There are now 3 email service options. Core WordPress email, Groundhogg transactional email, and marketing email.
+* TWEAKED Any role with the user cap of view_contacts will be applicable for contact owner status.
+* TWEAKED Removed the `key` param appended to the URL after a tracking link is clicked. Replaced with the `pk` param now.
+* TWEAKED Better capability checks for tabbed pages like the tools for more granular access.
+* TWEAKED Email step actions are now visible persistently.
+* FIXED `key` param conflict with EDD.
+* FIXED the sync users tool will re-sync already synced users and contacts.
+
 = 2.2.24 (2020-12-18) =
 * ADDED Ability to have multiple email services installed and differentiate between marketing and transactional emails.
 

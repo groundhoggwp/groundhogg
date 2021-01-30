@@ -47,11 +47,16 @@ class Email_Log_Item extends Base_Object {
 		$message_type = $this->message_type;
 		$service      = \Groundhogg_Email_Services::get_saved_service( $message_type );
 
-		Email_Logger::
+		add_action( 'groundhogg/email_logger/before_create_log', [ $this, 'setup_email_logger_with_this' ] );
 
-		$result = \Groundhogg_Email_Services::send( $service, $this->recipients, $this->subject, $this->content, $headers );
+		\Groundhogg_Email_Services::send( $service, $this->recipients, $this->subject, $this->content, $headers );
+	}
 
-		return $result;
+	/**
+	 * @param $logger Email_Logger
+	 */
+	public function setup_email_logger_with_this( $logger ){
+		$logger->set_log( $this );
 	}
 
 	/**

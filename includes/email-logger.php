@@ -93,6 +93,8 @@ class Email_Logger {
 
 		self::clear();
 
+		do_action( 'groundhogg/email_logger/before_create_log', $this );
+
 		$recipients = array_keys( $phpmailer->getAllRecipientAddresses() );
 
 		$headers = [
@@ -120,8 +122,13 @@ class Email_Logger {
 			'status'          => 'sent'
 		];
 
-		self::$log_item_id = get_db( 'email_log' )->add( $log_data );
-		self::$log_item    = new Email_Log_Item( self::$log_item_id );
+		if ( self::$log_item_id && self::$log_item->exists() ){
+			self::$log_item->update( $log_data );
+		} else {
+			self::$log_item_id = get_db( 'email_log' )->add( $log_data );
+			self::$log_item    = new Email_Log_Item( self::$log_item_id );
+		}
+
 	}
 
 	/**

@@ -386,8 +386,11 @@ class Settings_Page extends Admin_Page {
 			),
 			'email_logging'         => array(
 				'id'    => 'email_logging',
-				'title' => _x( 'Logging', 'settings_sections', 'groundhogg' ),
+				'title' => _x( 'Email Logging', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'email',
+                'callback' => function () {
+					?><div id="email-logging"></div><?php
+                }
 			),
 			'bounces'               => array(
 				'id'       => 'bounces',

@@ -852,11 +852,13 @@ abstract class DB {
 			'offset'  => $offset,
 		];
 
+		$clauses = apply_filters( 'groundhogg/db/sql_query_clauses', $clauses, $query_vars );
+
 		$clauses = implode( ' ', array_filter( $clauses ) );
 
 		$sql = "SELECT {$select} FROM {$this->get_table_name()} WHERE $clauses";
 
-		return $sql;
+		return apply_filters( 'groundhogg/db/sql_query', $sql, $query_vars );
 	}
 
 	/**

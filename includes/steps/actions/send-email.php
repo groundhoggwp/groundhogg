@@ -119,7 +119,7 @@ class Send_Email extends Action {
 				'selected' => $this->get_setting( 'email_id' ),
 			] ),
 			// ROW ACTIONS
-			"<div class=\"row-actions\">",
+			"<div style='margin-top: 10px'>",
 			// EDIT EMAIL
 			$html->button( [
 				'title' => 'Edit Email',
