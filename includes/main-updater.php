@@ -361,9 +361,19 @@ class Main_Updater extends Updater {
 	/**
 	 * Install new DBs
 	 */
-	public function version_2_2_24() {
+	public function version_2_2_25() {
+
+		// Update the DBs
 		Plugin::$instance->dbs->install_dbs();
+
+		// Create the email logging table
 		get_db( 'email_log' )->create_table();
+
+		// add new logs caps
+		Plugin::instance()->roles->add_caps();
+
+		// Set the WordPress SMTP service to the current Transactional one
+		\Groundhogg_Email_Services::set_service( \Groundhogg_Email_Services::WORDPRESS, \Groundhogg_Email_Services::get_transactional_service() );
 	}
 
 	/**
@@ -409,7 +419,7 @@ class Main_Updater extends Updater {
 			'2.2.22',
 			'2.2.23',
 			'2.2.23.3',
-			'2.2.24'
+			'2.2.25'
 		];
 	}
 
@@ -432,7 +442,7 @@ class Main_Updater extends Updater {
 			'2.2.19.4',
 			'2.2.22',
 			'2.2.22.3',
-			'2.2.24',
+			'2.2.25',
 		];
 	}
 
@@ -469,6 +479,7 @@ class Main_Updater extends Updater {
 			'2.2.19.4'      => __( 'Update the permission keys table to support new usage.', 'groundhogg' ),
 			'2.2.22'        => __( 'Show preferences page if url is just /gh/.', 'groundhogg' ),
 			'2.2.22.3'      => __( 'Re-install the gh-cron.php file to include a constant <code>DOING_GH_CRON</code>.', 'groundhogg' ),
+			'2.2.25'        => __( 'Add the new database tables for the new Email Logging feature.', 'groundhogg' ),
 		];
 	}
 }

@@ -60,10 +60,13 @@ abstract class Table extends \WP_List_Table {
 	 * @return string
 	 */
 	protected function create_view( $view, $param, $display, $count = 0 ) {
+
+		$is_active = is_string( $param ) ? get_request_var( $param ) === $view : get_request_query() === $param;
+
 		return html()->e( 'a',
 			[
-				'class' => get_request_var( $param ) === $view ? 'current' : '',
-				'href'  => add_query_arg( [
+				'class' => $is_active ? 'current' : '',
+				'href'  => add_query_arg( is_array( $param ) ? $param: [
 					$param => $view,
 				], $this->get_page_url() ),
 			],

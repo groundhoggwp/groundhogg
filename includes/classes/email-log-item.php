@@ -32,8 +32,6 @@ class Email_Log_Item extends Base_Object {
 
 	/**
 	 * Retry to send the email.
-	 *
-	 * @return bool
 	 */
 	public function retry() {
 

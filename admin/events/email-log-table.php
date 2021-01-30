@@ -83,6 +83,24 @@ class Email_Log_Table extends Table {
 				'view'    => 'failed',
 				'display' => __( 'Failed', 'groundhogg' ),
 				'count'   => [ 'status' => 'failed' ],
+			],
+			[
+				'view'    => 'wordpress',
+				'display' => __( 'WordPress', 'groundhogg' ),
+				'count'   => [ 'message_type' => \Groundhogg_Email_Services::WORDPRESS ],
+				'param'   => [ 'message_type' => \Groundhogg_Email_Services::WORDPRESS ],
+			],
+			[
+				'view'    => 'transactional',
+				'display' => __( 'Transactional', 'groundhogg' ),
+				'count'   => [ 'message_type' => \Groundhogg_Email_Services::TRANSACTIONAL ],
+				'param'   => [ 'message_type' => \Groundhogg_Email_Services::TRANSACTIONAL ],
+			],
+			[
+				'view'    => 'marketing',
+				'display' => __( 'Marketing', 'groundhogg' ),
+				'count'   => [ 'message_type' => \Groundhogg_Email_Services::MARKETING ],
+				'param'   => [ 'message_type' => \Groundhogg_Email_Services::MARKETING ],
 			]
 		];
 	}
@@ -158,9 +176,10 @@ class Email_Log_Table extends Table {
 			return '';
 		}
 //
-//		$actions['resend']       = "<a href='" . action_url( 'resend_email', [
-//				'id' => $email->get_id()
-//			] ) . "'>" . __( 'Resend', 'groundhogg' ) . "</a>";
+		$actions['resend']       = "<a href='" . action_url( 'resend', [
+				'email' => $email->get_id()
+			] ) . "'>" . __( 'Resend', 'groundhogg' ) . "</a>";
+
 		$actions['view-details'] = html()->modal_link( [
 			'title'       => __( 'Log Details', 'groundhogg' ),
 			'text'        => __( 'View Details', 'groundhogg' ),
@@ -236,7 +255,7 @@ class Email_Log_Table extends Table {
 			case 'delivered':
 
 				?>
-                <span class="email-sent"><?php echo $email->status; ?></span>
+                <span class="email-sent"><?php _e( 'Sent', 'groundhogg' ) ?></span>
 				<?php
 
 				break;
@@ -245,7 +264,7 @@ class Email_Log_Table extends Table {
 			case 'softfail':
 
 				?>
-                <span class="email-failed"><?php echo $email->status; ?></span>
+                <span class="email-failed"><?php _e( 'Failed', 'groundhogg' ) ?></span>
 				<?php
 
 				break;

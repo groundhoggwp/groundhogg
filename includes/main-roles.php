@@ -346,6 +346,22 @@ class Main_Roles extends Roles {
 	 *
 	 * @return string[]
 	 */
+	public function get_log_caps() {
+
+		$caps = array(
+			'view_logs',
+			'delete_logs',
+		);
+
+		return apply_filters( 'groundhogg/roles/caps/logs', $caps );
+	}
+
+
+	/**
+	 * Get unrelated extra caps...
+	 *
+	 * @return string[]
+	 */
 	public function get_other_caps() {
 
 		$caps = array(
@@ -370,7 +386,8 @@ class Main_Roles extends Roles {
 			$this->get_tag_caps(),
 			$this->get_report_caps(),
 			$this->get_other_caps(),
-			$this->get_file_caps()
+			$this->get_file_caps(),
+			$this->get_log_caps()
 		);
 
 		return $caps;

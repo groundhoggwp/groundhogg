@@ -284,6 +284,7 @@ function get_request_query( $default = [], $force = [], $accepted_keys = [] ) {
 		'paged',
 		'ids',
 		'tab',
+		'view',
 		'action',
 		'bulk_action',
 		'_wpnonce',
