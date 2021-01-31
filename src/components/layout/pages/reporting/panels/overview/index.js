@@ -13,7 +13,10 @@ registerReportsPanel('overview', {
     'total_confirmed_contacts',
     'total_engaged_contacts',
     'total_unsubscribed_contacts',
-    'chart_new_contacts'
+    'chart_new_contacts',
+    'total_emails_sent',
+    'email_open_rate',
+    'email_click_rate'
   ],
   layout: ({
     reports,
@@ -25,7 +28,10 @@ registerReportsPanel('overview', {
       total_confirmed_contacts,
       total_engaged_contacts,
       total_unsubscribed_contacts,
-      chart_new_contacts
+      chart_new_contacts,
+      total_emails_sent,
+      email_open_rate,
+      email_click_rate
     } = reports
 
     return (
@@ -42,7 +48,7 @@ registerReportsPanel('overview', {
           </Grid>
           <Grid item xs={3}>
             <QuickStat
-              title={'Total New Contacts'} i
+              title={'Total Confirmed Contacts'} i
               id={'total_confirmed_contacts'}
               data={!isLoading ? total_confirmed_contacts : {}}
               loading={isLoading}
@@ -51,7 +57,7 @@ registerReportsPanel('overview', {
           </Grid>
           <Grid item xs={3}>
             <QuickStat
-              title={'Total New Contacts'}
+              title={'Total Engaged Contacts'}
               id={'total_engaged_contacts'}
               data={!isLoading ? total_engaged_contacts : {}}
               loading={isLoading}
@@ -73,6 +79,33 @@ registerReportsPanel('overview', {
               id={'chart_new_contacts'}
               data={!isLoading ? chart_new_contacts : {}}
               loading={isLoading}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <QuickStat
+              title={'Total Unsubscribed Contacts'}
+              id={'total_emails_sent'}
+              data={!isLoading ? total_emails_sent : {}}
+              loading={isLoading}
+              icon={<ContactMailIcon/>}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <QuickStat
+              title={'Email Open Rate'}
+              id={'email_open_rate'}
+              data={!isLoading ? email_open_rate : {}}
+              loading={isLoading}
+              icon={<ContactMailIcon/>}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <QuickStat
+              title={'Email Click Rate'}
+              id={'email_click_rate'}
+              data={!isLoading ? email_click_rate : {}}
+              loading={isLoading}
+              icon={<ContactMailIcon/>}
             />
           </Grid>
         </Grid>
