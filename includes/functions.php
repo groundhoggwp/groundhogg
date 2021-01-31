@@ -102,6 +102,36 @@ function admin_page_url( $page, $args = [], $fragment = '' ) {
 }
 
 /**
+ * Provides a modal link URL
+ *
+ * @param $args
+ *
+ * @return string
+ */
+function modal_link_url( $args ){
+
+    $atts = wp_parse_args( $args, array(
+		'title'              => 'Modal',
+		'footer_button_text' => __( 'Save Changes' ),
+		'source'             => '',
+		'height'             => 500,
+		'width'              => 500,
+		'footer'             => 'true',
+		'preventSave'        => 'true',
+	) );
+
+	enqueue_groundhogg_modal();
+
+	return sprintf( "#source=%s&footer=%s&width=%d&height=%d&footertext=%s&preventSave=%s",
+		urlencode( $atts['source'] ),
+		esc_attr( $atts['footer'] ),
+		intval( $atts['width'] ),
+		intval( $atts['height'] ),
+		urlencode( $atts['footer_button_text'] ),
+		esc_attr( $atts['preventSave'] ) );
+}
+
+/**
  * Similar to wp_list_pluck in that we take the ID and the title and match them up.
  *
  * @param array $data array[]

@@ -49,7 +49,10 @@ abstract class Admin_Page extends Supports_Errors {
 			add_filter( 'admin_title', [ $this, 'admin_title' ], 10, 2 );
 
 			add_filter( "set-screen-option", [ $this, 'set_screen_options' ], 10, 3 );
-			add_filter( "set_screen_option_{$this->get_slug()}_per_page", [ $this, 'set_screen_option_per_page' ], 10, 3 );
+			add_filter( "set_screen_option_{$this->get_slug()}_per_page", [
+				$this,
+				'set_screen_option_per_page'
+			], 10, 3 );
 
 			add_action( 'admin_init', [ $this, 'process_action' ] );
 
@@ -200,14 +203,14 @@ abstract class Admin_Page extends Supports_Errors {
 	 *
 	 * @return mixed
 	 */
-	public function set_screen_options( $keep, $option, $value ){
+	public function set_screen_options( $keep, $option, $value ) {
 
-	    if ( $this->get_slug() . '_per_page' === $option ){
-	        return $value;
-        }
+		if ( $this->get_slug() . '_per_page' === $option ) {
+			return $value;
+		}
 
-	    return $keep;
-    }
+		return $keep;
+	}
 
 	/**
 	 * Save screen option per page
@@ -352,8 +355,9 @@ abstract class Admin_Page extends Supports_Errors {
 	 */
 	protected function search_form( $title, $name = 's' ) {
 
-		if ( method_exists( $this, 'get_current_tab' ) ){
-			?><div style="margin-top: 10px"></div><?php
+		if ( method_exists( $this, 'get_current_tab' ) ) {
+			?>
+            <div style="margin-top: 10px"></div><?php
 		}
 
 		?>
@@ -446,14 +450,15 @@ abstract class Admin_Page extends Supports_Errors {
 		foreach ( $actions as $action ):
 
 			$action = wp_parse_args( $action, [
-				'link'   => admin_url(),
-				'action' => __( 'Add New', 'groundhogg' ),
-				'target' => '_self',
-				'id'     => '',
+				'link'    => admin_url(),
+				'action'  => __( 'Add New', 'groundhogg' ),
+				'target'  => '_self',
+				'id'      => '',
+				'classes' => '',
 			] );
 
 			echo html()->e( 'a', [
-				'class'  => 'page-title-action aria-button-if-js',
+				'class'  => 'page-title-action aria-button-if-js ' . $action['classes'],
 				'target' => $action['target'],
 				'href'   => $action['link'],
 				'id'     => $action['id'],
@@ -536,7 +541,7 @@ abstract class Admin_Page extends Supports_Errors {
 	 * @param string $code
 	 * @param string $message
 	 * @param string $type
-	 * @param bool   $cap
+	 * @param bool $cap
 	 */
 	protected function add_notice( $code = '', $message = '', $type = 'success', $cap = false ) {
 		if ( ! $cap ) {

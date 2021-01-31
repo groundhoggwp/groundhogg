@@ -59,35 +59,30 @@ class Table_Benchmark_Conversion_Rate extends Base_Table_Report {
 			}
 
 			return $data;
-		} else {
+
+		} else if ( count( $steps ) === 1 ) {
 
 			$current_step = $steps[0];
 
-			if( $current_step ) {
+			$total = $this->get_num_of_completed_contacts( $current_step->get_id(), $this->start, $this->end );
 
+			return [
+				[
+					'from'   => $current_step->get_step_title(),
+					'total1' => _nf( $total ),
+					'to'     => '',
+					'total2' => '',
+					'scr'    => percentage( $total, $total ) . '%'
+				]
+			];
 
-				$total = $this->get_num_of_completed_contacts( $current_step->get_id(), $this->start, $this->end );
+		} else {
 
-				return [
-					[
-						'from'   => $current_step->get_step_title(),
-						'total1' => _nf( $total ),
-						'to'     => '',
-						'total2' => '',
-						'scr'    => percentage( $total, $total ) . '%'
-					]
-				];
-			} else {
-
-				return [];
-
-			}
-
+			return [];
 
 		}
 
 	}
-
 
 	/**
 	 * Normalize a datum

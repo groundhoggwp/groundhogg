@@ -7,6 +7,7 @@ use Groundhogg\Contact_Query;
 use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Step;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\isset_not_empty;
@@ -18,11 +19,11 @@ class Chart_Funnel_Breakdown extends Base_Chart_Report {
 		$data = $this->get_complete_activity();
 
 		return [
-			'labels'   => $data['label'],
+			'labels'   => get_array_var( $data, 'label', [] ),
 			'datasets' => [
 				[
 					'label'           => __( 'Completed', 'groundhogg' ),
-					'data'            => $data['data'],
+					'data'            => get_array_var( $data, 'data', [] ),
 					'backgroundColor' => $this->get_random_color()
 				]
 //				$this->get_waiting_activity()

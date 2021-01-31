@@ -14,6 +14,8 @@ use function Groundhogg\get_request_query;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
+use function Groundhogg\html;
+use function Groundhogg\modal_link_url;
 use function Groundhogg\normalize_files;
 use Groundhogg\Plugin;
 use Groundhogg\Contact;
@@ -113,7 +115,7 @@ class Contacts_Page extends Admin_Page {
 			wp_localize_script( 'groundhogg-admin-contact-editor', 'ContactEditor', [
 				'contact_id'       => absint( get_url_var( 'contact' ) ),
 				'delete_note_text' => __( 'Are you sure you want to delete this note?', 'groundhogg' ),
-            ] );
+			] );
 		} else {
 			wp_enqueue_style( 'select2' );
 			wp_enqueue_script( 'select2' );
@@ -385,6 +387,17 @@ class Contacts_Page extends Admin_Page {
 	}
 
 	protected function get_title_actions() {
+//
+//		$search_modal_link = modal_link_url( [
+//			'title'              => __( 'Search Contacts', 'groundhogg' ),
+//			'footer_button_text' => __( 'Search' ),
+//			'source'             => 'search-filters',
+//			'height'             => 500,
+//			'width'              => 900,
+//			'footer'             => 'false',
+//			'preventSave'        => 'true',
+//		] );
+
 		return [
 			[
 				'link'   => $this->admin_url( [ 'action' => 'add' ] ),
@@ -393,16 +406,17 @@ class Contacts_Page extends Admin_Page {
 				'id'     => '',
 			],
 			[
-				'link'   => Plugin::$instance->admin->tools->admin_url( [ 'tab' => 'import', 'action' => 'add' ] ),
+				'link'   => admin_page_url( 'gh_tools', [ 'tab' => 'import', 'action' => 'add' ] ),
 				'action' => __( 'Import', 'groundhogg' ),
 				'target' => '_self',
 				'id'     => 'import_contacts'
 			],
 			[
-				'link'   => '#',
-				'action' => __( 'Search', 'groundhogg' ),
-				'target' => '_self',
-				'id'     => 'search_contacts'
+				'link'    => $this->get_current_action() === 'view' ? '#' : admin_page_url( 'gh_contacts', [ 'is_searching' => true ] ),
+				'action'  => __( 'Advanced Search', 'groundhogg' ),
+				'target'  => '_self',
+				'id'      => 'search_contacts',
+				'classes' => 'trigger-popup'
 			],
 		];
 	}
@@ -447,7 +461,7 @@ class Contacts_Page extends Admin_Page {
 
 		$contact->update_meta( 'primary_phone', sanitize_text_field( get_request_var( 'primary_phone' ) ) );
 		$contact->update_meta( 'primary_phone_extension', sanitize_text_field( get_request_var( 'primary_phone_extension' ) ) );
-		$contact->add_note(  get_request_var( 'notes' ) );
+		$contact->add_note( get_request_var( 'notes' ) );
 
 
 		if ( get_request_var( 'tags' ) ) {
@@ -892,7 +906,7 @@ class Contacts_Page extends Admin_Page {
 
 		$note_id = absint( get_request_var( 'note_id' ) );
 		$content = sanitize_textarea_field( get_request_var( 'note' ) );
-		$note = new Note( $note_id );
+		$note    = new Note( $note_id );
 		$note->update( [
 			'timestamp' => time(),
 			'content'   => $content,
@@ -920,7 +934,7 @@ class Contacts_Page extends Admin_Page {
 			wp_send_json_error();
 		}
 
-		$note = sanitize_textarea_field( get_post_var( 'note' ) );
+		$note       = sanitize_textarea_field( get_post_var( 'note' ) );
 		$contact_id = absint( get_post_var( 'contact' ) );
 
 		$id = get_db( 'contactnotes' )->add( [

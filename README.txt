@@ -330,6 +330,8 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 * FIXED Reporting not loading when script debug is enabled.
 * FIXED Wonky CSS in the tools page.
 * FIXED Sales Representative and Sales Manager roles capabilities for adding contacts manually.
+* FIXED Clicking **search** when in the contact screen will take you to the list with the search open.
+* FIXED PHP notices caused by empty reports in the reports area.
 
 = 2.2.24 (2020-12-18) =
 * ADDED Ability to have multiple email services installed and differentiate between marketing and transactional emails.
