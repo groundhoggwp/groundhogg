@@ -183,8 +183,13 @@ function emergency_init_dbs() {
  * @return bool
  */
 function is_option_enabled( $option = '' ) {
-	return Plugin::$instance->settings->is_option_enabled( $option );
-}
+	$option = get_option( $option );
+
+	if ( ! is_array( $option ) && $option ) {
+		return true;
+	}
+
+	return is_array( $option ) && in_array( 'on', $option );}
 
 /**
  * Shorthand;

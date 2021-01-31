@@ -309,6 +309,9 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.3.1 (2021-01-29) =
+* FIXED Unable to activate plugin caused by fatal error
+
 = 2.3 (2021-01-29) =
 * ADDED New feature. **Email logging**! Emails can be logged optionally. Find it in the new **Logs** screen.
 * ADDED New feature. **Real-time User Meta Syncing**! The user meta will be synced in real-time to the contact record when enabled in the **General Settings**.
