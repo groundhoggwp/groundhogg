@@ -308,7 +308,7 @@ class Emails_Page extends Admin_Page {
 				$args[ 'pre_header' ] = $from_email->get_pre_header();
 
 				$args[ 'author' ]    = get_current_user_id();
-				$args[ 'from_user' ] = get_current_user_id();
+				$args[ 'from_user' ] = $from_email->get_from_user_id();
 
 				$email = new Email( $args );
 

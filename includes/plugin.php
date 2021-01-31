@@ -334,6 +334,7 @@ class Plugin {
 		new Extension_Upgrader();
 		new Plugin_Compatibility();
 		new Email_Logger();
+		new User_Syncing();
 
 		// Partner
 		SendWp::instance();
@@ -351,7 +352,7 @@ class Plugin {
 	 */
 	private function register_autoloader() {
 		require __DIR__ . '/autoloader.php';
-		require __DIR__ . '/overrides.php'; // todo disable this
+//		require __DIR__ . '/overrides.php';
 
 		Autoloader::run();
 	}

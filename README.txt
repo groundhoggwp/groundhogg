@@ -310,7 +310,8 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 == Changelog ==
 
 = 2.3 (2021-01-29) =
-* ADDED New feature. **Email logging**! emails can be logged optionally. Find it in the new **Logs** screen.
+* ADDED New feature. **Email logging**! Emails can be logged optionally. Find it in the new **Logs** screen.
+* ADDED New feature. **Real-time User Meta Syncing**! The user meta will be synced in real-time to the contact record when enabled in the **General Settings**.
 * TWEAKED Events have been moved to the **Logs** screen to differentiate it from other kinds of events in WordPress.
 * TWEAKED There are now 3 email service options. Core WordPress email, Groundhogg transactional email, and marketing email.
 * TWEAKED Any role with the user cap of view_contacts will be applicable for contact owner status.
@@ -322,6 +323,8 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 * TWEAKED Changed verbiage of **Primary User** to **Primary Contact Owner** for better clarity.
 * TWEAKED If the **Primary Contact Owner** is defined all new contacts will have the owner ID of that contact set by default unless it is otherwise changed.
 * TWEAKED When contacts are being added manually or imported the contact owner will be automatically set to the current user unless otherwise specified.
+* TWEAKED Improved sync of first, last, and email between user records and contact records.
+* TWEAKED When using an existing email as a template the `from user` will be copied instead of set to the current user.
 * FIXED `key` param conflict with EDD.
 * FIXED the sync users tool will re-sync already synced users and contacts.
 * FIXED Reporting not loading when script debug is enabled.

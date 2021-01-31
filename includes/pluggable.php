@@ -64,15 +64,17 @@ function gh_wp_mail_already_defined_notice() {
 		\Groundhogg\admin_page_url( 'gh_settings', [ 'tab' => 'email' ] ),
 		/* translators: %s: Plugin name. */
 		esc_attr( __( "Set WordPress email service to WordPress Default", 'groundhogg' ) ),
-		__( "Set WordPress email service to <b>WordPress Default</b>", 'groundhogg' )
+		__( "Change your <b>WordPress Default</b> email service", 'groundhogg' )
 	);
 
 	$current_service_name = Groundhogg_Email_Services::get_name( Groundhogg_Email_Services::get_wordpress_service() );
 
 	?>
     <div class="notice notice-warning is-dismissible">
+        <?php if ( ! \Groundhogg\is_white_labeled() ): ?>
         <img class="alignleft" height="90" style="margin: 10px 10px 3px 3px"
              src="<?php echo esc_url( GROUNDHOGG_ASSETS_URL . 'images/phil-oops.png' ); ?>" alt="Phil">
+        <?php endif; ?>
         <p>
 			<?php printf( __( '<b>Attention:</b> It looks like another plugin is overwriting the <code>wp_mail</code> function. This means <b>%s</b> will not be able to send your WordPress emails.', 'groundhogg' ), $current_service_name ); ?>
         </p>

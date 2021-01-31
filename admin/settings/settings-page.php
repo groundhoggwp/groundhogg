@@ -385,12 +385,13 @@ class Settings_Page extends Admin_Page {
 				'tab'   => 'email',
 			),
 			'email_logging'         => array(
-				'id'    => 'email_logging',
-				'title' => _x( 'Email Logging', 'settings_sections', 'groundhogg' ),
-				'tab'   => 'email',
-                'callback' => function () {
-					?><div id="email-logging"></div><?php
-                }
+				'id'       => 'email_logging',
+				'title'    => _x( 'Email Logging', 'settings_sections', 'groundhogg' ),
+				'tab'      => 'email',
+				'callback' => function () {
+					?>
+                    <div id="email-logging"></div><?php
+				}
 			),
 			'bounces'               => array(
 				'id'       => 'bounces',
@@ -529,6 +530,20 @@ class Settings_Page extends Admin_Page {
 				'atts'    => array(
 					'id'   => 'gh_primary_user',
 					'name' => 'gh_primary_user',
+				),
+			),
+			'gh_sync_user_meta'                      => array(
+				'id'      => 'gh_sync_user_meta',
+				'section' => 'general_other',
+				'label'   => __( 'Sync All User Meta', 'groundhogg' ),
+				'desc'    => _x( 'When enabled all user meta will be synced in real time with contact meta.', 'settings', 'groundhogg' ),
+				'type'    => 'checkbox',
+				'atts'    => array(
+					'label' => __( 'Enable' ),
+					//keep brackets for backwards compat
+					'name'  => 'gh_sync_user_meta',
+					'id'    => 'gh_sync_user_meta',
+					'value' => 'on',
 				),
 			),
 			'gh_uninstall_on_delete'                 => array(

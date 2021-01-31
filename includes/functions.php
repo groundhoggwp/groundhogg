@@ -1239,12 +1239,14 @@ function create_contact_from_user( $user, $sync_meta = false ) {
 		return false;
 	}
 
-	$contact = get_contactdata( $user->user_email );
+	$contact = get_contactdata( $user->ID, true );
 
-	/**
-	 * Do not continue if the contact already exists. Just return it...
-	 */
-	if ( $contact && $contact->exists() ) {
+	// If not available by user ID try by email
+	if ( ! is_a_contact( $contact ) ) {
+		$contact = get_contactdata( $user->user_email );
+	}
+
+	if ( is_a_contact( $contact ) ) {
 
 		/**
 		 * Setup the initial args..
@@ -1297,6 +1299,12 @@ function create_contact_from_user( $user, $sync_meta = false ) {
 
 		// Note: $values will be an array as single is false
 		foreach ( $user_meta as $key => $values ) {
+
+			// Don't sync some keys
+			if ( User_Syncing::is_meta_ignored( $key ) ) {
+				continue;
+			}
+
 			$contact->update_meta( $key, array_shift( $values ) );
 		}
 
@@ -1373,7 +1381,7 @@ function convert_user_to_contact_when_user_registered( $userId ) {
 		return;
 	}
 
-	$contact = create_contact_from_user( $user );
+	$contact = create_contact_from_user( $user, is_option_enabled( 'gh_sync_user_meta' ) );
 
 	if ( ! $contact || is_wp_error( $contact ) ) {
 		return;
@@ -1394,9 +1402,6 @@ function convert_user_to_contact_when_user_registered( $userId ) {
 	 */
 	do_action( 'groundhogg/contact_created_from_user', $user, $contact );
 }
-
-// Ensure runs before tag mapping stuff...
-add_action( 'user_register', __NAMESPACE__ . '\convert_user_to_contact_when_user_registered' );
 
 /**
  * Used for blocks...
@@ -1950,8 +1955,8 @@ function generate_contact_with_map( $fields, $map = [] ) {
 	$contact = false;
 
 	// If the current user can add a contact and a contact owner has not been explicitly defined.
-	if ( current_user_can( 'add_contacts' ) && ! isset_not_empty( $args, 'owner_id' ) ){
-		$args[ 'owner_id' ] = get_current_user_id();
+	if ( current_user_can( 'add_contacts' ) && ! isset_not_empty( $args, 'owner_id' ) ) {
+		$args['owner_id'] = get_current_user_id();
 	}
 
 	// No point in trying if there is no email field
@@ -3249,11 +3254,11 @@ function get_primary_user() {
  */
 function get_primary_owner() {
 
-    static $user, $primary_user_id;
+	static $user, $primary_user_id;
 
-    if ( is_a( $user, '\WP_User' ) ){
-        return $user;
-    }
+	if ( is_a( $user, '\WP_User' ) ) {
+		return $user;
+	}
 
 	$primary_user_id = absint( get_option( 'gh_primary_user', 1 ) );
 
