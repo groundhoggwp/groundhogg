@@ -25,6 +25,7 @@ use function Groundhogg\isset_not_empty;
 use function Groundhogg\key_to_words;
 use function Groundhogg\nonce_url_no_amp;
 use function Groundhogg\notices;
+use function Groundhogg\uninstall_gh_cron_file;
 use function Groundhogg\white_labeled_name;
 use function set_transient;
 
@@ -924,14 +925,39 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	public function process_advanced_cron_install_gh_cron() {
 
-		if ( ! install_gh_cron_file() ) {
+		if ( ! current_user_can( 'manage_options' ) ){
+			$this->wp_die_no_access();
+		}
+
+		if ( ! install_gh_cron_file() || wp_unschedule_hook( Event_Queue::WP_CRON_HOOK ) === false ) {
 			return new \WP_Error( 'error', __( 'Unable to install gh-cron.php file. Please install is manually.', 'groundhogg' ) );
 		} else {
-			$this->add_notice( 'success', __( 'Installed gh-cron.php successfully!', 'groundhogg' ) );
+			$this->add_notice( 'success', __( 'Installed gh-cron.php successfully! Please configure the new CRON JOB as shown in <u>Step 2</u>.', 'groundhogg' ) );
 		}
 
 		return false;
 	}
+
+	/**
+	 * Uninstall the gh-cron.php file
+	 *
+	 * @return bool|\WP_Error
+	 */
+	public function process_advanced_cron_uninstall_gh_cron() {
+
+	    if ( ! current_user_can( 'manage_options' ) ){
+	        $this->wp_die_no_access();
+        }
+
+		if ( ! uninstall_gh_cron_file() ) {
+			return new \WP_Error( 'error', __( 'Unable to uninstall gh-cron.php file. Please delete it manually via FTP.', 'groundhogg' ) );
+		} else {
+			$this->add_notice( 'success', __( 'Uninstalled gh-cron.php successfully!', 'groundhogg' ) );
+		}
+
+		return false;
+	}
+
 
 	/**
 	 * Download the gh-cron.txt file.

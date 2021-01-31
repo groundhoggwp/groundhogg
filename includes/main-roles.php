@@ -139,9 +139,11 @@ class Main_Roles extends Roles {
 	public function get_sales_manager_caps() {
 		return [
 			'edit_contacts',
+			'add_contacts',
 			'view_contacts',
 			'view_all_contacts',
 			'import_contacts',
+			'export_contacts',
 			'send_emails',
 			'view_events',
 			'manage_tags',
@@ -157,9 +159,11 @@ class Main_Roles extends Roles {
 	public function get_sales_rep_caps() {
 		return [
 			'edit_contacts',
+			'add_contacts',
 			'view_contacts',
 			'view_own_contacts',
 			'import_contacts',
+			'export_contacts',
 			'send_emails',
 			'view_events',
 			'manage_tags',

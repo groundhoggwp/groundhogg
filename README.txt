@@ -310,16 +310,23 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 == Changelog ==
 
 = 2.3 (2021-01-29) =
-* ADDED Email logging, emails can be logged optionally. Find it in the new **Logs** screen.
+* ADDED New feature. **Email logging**! emails can be logged optionally. Find it in the new **Logs** screen.
 * TWEAKED Events have been moved to the **Logs** screen to differentiate it from other kinds of events in WordPress.
 * TWEAKED There are now 3 email service options. Core WordPress email, Groundhogg transactional email, and marketing email.
 * TWEAKED Any role with the user cap of view_contacts will be applicable for contact owner status.
 * TWEAKED Removed the `key` param appended to the URL after a tracking link is clicked. Replaced with the `pk` param now.
 * TWEAKED Better capability checks for tabbed pages like the tools for more granular access.
 * TWEAKED Email step actions are now visible persistently.
+* TWEAKED Option to uninstall the `gh-cron.php` file added for debugging purposes.
+* TWEAKED When installing the `gh-cron.php` file Groundhogg will automatically be unhooked from WP-Cron instead of requiring manual input.
+* TWEAKED Changed verbiage of **Primary User** to **Primary Contact Owner** for better clarity.
+* TWEAKED If the **Primary Contact Owner** is defined all new contacts will have the owner ID of that contact set by default unless it is otherwise changed.
+* TWEAKED When contacts are being added manually or imported the contact owner will be automatically set to the current user unless otherwise specified.
 * FIXED `key` param conflict with EDD.
 * FIXED the sync users tool will re-sync already synced users and contacts.
 * FIXED Reporting not loading when script debug is enabled.
+* FIXED Wonky CSS in the tools page.
+* FIXED Sales Representative and Sales Manager roles capabilities for adding contacts manually.
 
 = 2.2.24 (2020-12-18) =
 * ADDED Ability to have multiple email services installed and differentiate between marketing and transactional emails.

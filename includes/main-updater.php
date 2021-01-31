@@ -361,7 +361,7 @@ class Main_Updater extends Updater {
 	/**
 	 * Install new DBs
 	 */
-	public function version_2_2_25() {
+	public function version_2_3() {
 
 		// Update the DBs
 		Plugin::$instance->dbs->install_dbs();
@@ -419,7 +419,7 @@ class Main_Updater extends Updater {
 			'2.2.22',
 			'2.2.23',
 			'2.2.23.3',
-			'2.2.25'
+			'2.3'
 		];
 	}
 
@@ -442,7 +442,7 @@ class Main_Updater extends Updater {
 			'2.2.19.4',
 			'2.2.22',
 			'2.2.22.3',
-			'2.2.25',
+			'2.3',
 		];
 	}
 
@@ -479,7 +479,7 @@ class Main_Updater extends Updater {
 			'2.2.19.4'      => __( 'Update the permission keys table to support new usage.', 'groundhogg' ),
 			'2.2.22'        => __( 'Show preferences page if url is just /gh/.', 'groundhogg' ),
 			'2.2.22.3'      => __( 'Re-install the gh-cron.php file to include a constant <code>DOING_GH_CRON</code>.', 'groundhogg' ),
-			'2.2.25'        => __( 'Add the new database tables for the new Email Logging feature.', 'groundhogg' ),
+			'2.3'        => __( 'Add the new database tables for the new Email Logging feature.', 'groundhogg' ),
 		];
 	}
 }

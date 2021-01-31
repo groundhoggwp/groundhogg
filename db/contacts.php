@@ -4,6 +4,7 @@ namespace Groundhogg\DB;
 
 // Exit if accessed directly
 use Groundhogg\Preferences;
+use function Groundhogg\get_primary_owner;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Contact_Query;
 
@@ -121,7 +122,7 @@ class Contacts extends DB {
 			'first_name'                => '',
 			'last_name'                 => '',
 			'user_id'                   => 0,
-			'owner_id'                  => 0,
+			'owner_id'                  => get_primary_owner() ? get_primary_owner()->ID : false,
 			'optin_status'              => Preferences::UNCONFIRMED,
 			'date_created'              => current_time( 'mysql' ),
 			'date_optin_status_changed' => current_time( 'mysql' ),

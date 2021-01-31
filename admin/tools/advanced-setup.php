@@ -11,11 +11,15 @@ use function Groundhogg\gh_cron_installed;
 <h4><?php _e( '1. Install <code>gh-cron.php</code>', 'groundhogg' ); ?></h4>
 <p><?php _e( 'This file can be installed automatically.', 'groundhogg' ); ?></p>
 <p>
-    <a class="button button-secondary" href="<?php echo esc_url( action_url( 'install_gh_cron' ) ); ?>">
-		<?php _e( 'Install Automatically!', 'groundhogg' ); ?>
-    </a>
-	<?php if ( gh_cron_installed() ): ?>
+	<?php if ( ! gh_cron_installed() ): ?>
+        <a class="button button-secondary" href="<?php echo esc_url( action_url( 'install_gh_cron' ) ); ?>">
+			<?php _e( 'Install Automatically!', 'groundhogg' ); ?>
+        </a>
+	<?php else: ?>
         <span style="color: green"><?php _e( "<code>gh-cron.php</code> is installed!", 'groundhogg' ); ?></span>
+        <a class="button button-secondary" href="<?php echo esc_url( action_url( 'uninstall_gh_cron' ) ); ?>">
+			<?php _e( 'Uninstall', 'groundhogg' ); ?>
+        </a>
 	<?php endif; ?>
 </p>
 <p><?php _e( 'If automatic installation does not work, install it manually.', 'groundhogg' ); ?></p>

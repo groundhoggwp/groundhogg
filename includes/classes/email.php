@@ -620,8 +620,12 @@ class Email extends Base_Object_With_Meta {
 			return $this->get_from_user()->display_name;
 		}
 
-		if ( $this->get_contact()->get_ownerdata() ) {
+		else if ( $this->get_contact()->get_ownerdata() ) {
 			return $this->get_contact()->get_ownerdata()->display_name;
+		}
+
+		else if ( get_primary_owner() ) {
+			return get_primary_owner()->display_name;
 		}
 
 		return get_default_from_name();
@@ -638,9 +642,14 @@ class Email extends Base_Object_With_Meta {
 			return $this->get_from_user()->user_email;
 		}
 
-		if ( $this->get_contact()->get_ownerdata() ) {
+		else if ( $this->get_contact()->get_ownerdata() ) {
 			return $this->get_contact()->get_ownerdata()->user_email;
 		}
+
+		else if ( get_primary_owner() ) {
+			return get_primary_owner()->user_email;
+		}
+
 
 		return get_default_from_email();
 	}

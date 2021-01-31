@@ -425,7 +425,7 @@ class Contacts_Page extends Admin_Page {
 
 		$args['first_name'] = sanitize_text_field( get_request_var( 'first_name' ) );
 		$args['last_name']  = sanitize_text_field( get_request_var( 'last_name' ) );
-		$args['owner_id']   = absint( get_request_var( 'owner_id' ) );
+		$args['owner_id']   = absint( get_request_var( 'owner_id', get_current_user_id() ) );
 
 		$email = sanitize_email( get_request_var( 'email' ) );
 

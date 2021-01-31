@@ -193,7 +193,6 @@ class Email_Log extends DB {
 		msg_id varchar({$this->get_max_index_length()}) NOT NULL,
 		recipients text NOT NULL,
 		from_address text NOT NULL,
-		from_address text NOT NULL,
 		subject mediumtext NOT NULL,
 		headers mediumtext NOT NULL,
 		content longtext NOT NULL,

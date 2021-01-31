@@ -23,7 +23,7 @@ class Email_Logger {
 		add_action( 'init', [ $this, 'init' ] );
 	}
 
-	public static function enabled() {
+	public static function is_enabled() {
 		return is_option_enabled( 'gh_log_emails' );
 	}
 
@@ -31,7 +31,7 @@ class Email_Logger {
 	 * Lazy load the initial actions so we can check that email logging is enabled.
 	 */
 	public function init() {
-		if ( self::enabled() ) {
+		if ( self::is_enabled() ) {
 			// Do last
 			add_action( 'phpmailer_init', [ $this, 'phpmailer_init_callback' ], 99 );
 			// Do first

@@ -523,8 +523,8 @@ class Settings_Page extends Admin_Page {
 			'gh_primary_user'                        => array(
 				'id'      => 'gh_primary_user',
 				'section' => 'general_other',
-				'label'   => __( 'Primary User', 'groundhogg' ),
-				'desc'    => _x( 'The primary user to reference for contact information.', 'settings', 'groundhogg' ),
+				'label'   => __( 'Default Contact Owner', 'groundhogg' ),
+				'desc'    => _x( 'The primary contact owner which will be automatically assigned to contacts if another is not specified.', 'settings', 'groundhogg' ),
 				'type'    => 'dropdown_owners',
 				'atts'    => array(
 					'id'   => 'gh_primary_user',

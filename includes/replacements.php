@@ -758,7 +758,7 @@ class Replacements {
 
 		if ( ! $user ) {
 			// return admin details
-			$user = get_primary_user();
+			$user = get_primary_owner();
 
 			if ( ! $user ) {
 				return '';
@@ -780,7 +780,7 @@ class Replacements {
 
 		if ( ! $user ) {
 			//return admin details
-			$user = get_primary_user();
+			$user = get_primary_owner();
 
 			if ( ! $user ) {
 				return '';

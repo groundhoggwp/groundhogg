@@ -13,6 +13,7 @@ use function Groundhogg\get_db;
 use Groundhogg\Plugin;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
+use function Groundhogg\is_option_enabled;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -95,6 +96,7 @@ class Events_Page extends Tabbed_Admin_Page {
             </style>
             <?php
         } );
+
 	}
 
 
@@ -479,8 +481,8 @@ class Events_Page extends Tabbed_Admin_Page {
 			return;
 		}
 
-		if ( $this->get_current_tab() === 'emails' && ! Email_Logger::enabled() ) {
-			$this->add_notice( 'inactive', sprintf( __( "Email logging is currently disabled. You can enable email logging in the <a href='%s'>email settings</a>.", 'groundhogg' ), admin_page_url( 'gh_settings', [ 'tab' => 'email' ] ) ), 'warning' );
+		if ( $this->get_current_tab() === 'emails' && ! Email_Logger::is_enabled() ) {
+			$this->add_notice( 'inactive', sprintf( __( "Email logging is currently disabled. You can enable email logging in the <a href='%s'>email settings</a>.", 'groundhogg' ), admin_page_url( 'gh_settings', [ 'tab' => 'email' ], 'email-logging' ) ), 'warning' );
 		}
 
 		parent::page();

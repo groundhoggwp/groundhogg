@@ -1949,6 +1949,11 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 	$contact = false;
 
+	// If the current user can add a contact and a contact owner has not been explicitly defined.
+	if ( current_user_can( 'add_contacts' ) && ! isset_not_empty( $args, 'owner_id' ) ){
+		$args[ 'owner_id' ] = get_current_user_id();
+	}
+
 	// No point in trying if there is no email field
 	if ( isset( $args['email'] ) ) {
 
@@ -3227,11 +3232,29 @@ function is_wpengine() {
 }
 
 /**
- * Get the primary user.
+ * Renamed the function for better clarity
  *
  * @return bool|\WP_User
  */
 function get_primary_user() {
+	_doing_it_wrong( 'get_primary_user', "Use <code>get_primary_owner</code> instead.", GROUNDHOGG_VERSION );
+
+	return get_primary_owner();
+}
+
+/**
+ * Get the primary user.
+ *
+ * @return bool|\WP_User
+ */
+function get_primary_owner() {
+
+    static $user, $primary_user_id;
+
+    if ( is_a( $user, '\WP_User' ) ){
+        return $user;
+    }
+
 	$primary_user_id = absint( get_option( 'gh_primary_user', 1 ) );
 
 	if ( ! $primary_user_id ) {
@@ -3336,12 +3359,12 @@ function install_gh_cron_file() {
 }
 
 /**
- * Delete the GH cron file.
+ * Remove the gh-cron.php file.
  *
  * @return bool
  */
-function delete_gh_cron_file() {
-	return unlink( GROUNDHOGG_PATH . 'gh-cron.txt' );
+function uninstall_gh_cron_file() {
+	return unlink( ABSPATH . 'gh-cron.php' );
 }
 
 /**

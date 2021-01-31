@@ -353,6 +353,12 @@ class Submission_Handler extends Supports_Errors {
 
 		// No need for this if is in the admin
 		if ( ! $this->is_admin_submission() ) {
+
+			// Set the owner to the current user who added the contact
+			$contact->update( [
+				'owner_id' => get_current_user_id()
+			] );
+
 			after_form_submit_handler( $contact );
 		}
 
