@@ -156,7 +156,7 @@ export const canUser = ( action, id, resource ) => {
   *
  * @return {DateIOSString|Luxon Object} Returns various Luxon outputs, strings, objects etc.
  */
-export const getLuxonDate = (type) => {
+export const getLuxonDate = (type, date) => {
   switch (type) {
     case 'last_updated':
       return `${DateTime.local()} ${DateTime.local().toISOTime()}`;
@@ -193,5 +193,5 @@ export const matchEmailRegex = (testEmail) => {
     return true;
   }
 
-  return false;  
+  return false;
 }
