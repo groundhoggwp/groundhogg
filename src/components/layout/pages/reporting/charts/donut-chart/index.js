@@ -37,16 +37,17 @@ export const DonutChart = ({
   loading,
   ...rest
 }) => {
-  //
-  // if (loading) {
-  //   return <div />;
-  // }
+
+
+  if(loading){
+    return <div/>
+  }
 
   const classes = useStyles();
 
   return (
     <Card className={clsx(classes.root, className)} {...rest}>
-      <CardHeader action={<div />} title={title} />
+      <CardHeader  title={title} />
       <Divider />
       <Box p={3} position="relative" minHeight={320}>
         <Chart data={data.chart.data} />

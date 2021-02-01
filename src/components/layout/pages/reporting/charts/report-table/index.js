@@ -1,4 +1,3 @@
-
 import clsx from "clsx";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import PropTypes from "prop-types";
@@ -18,8 +17,10 @@ import {
   makeStyles,
 } from "@material-ui/core";
 import _ from "lodash";
+import React from "react";
 // import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 // import Label from "src/components/Label";
+
 
 const labelColors = {
   complete: "success",
@@ -51,6 +52,9 @@ export const ReportTable = ({ className, title, data, loading, ...rest }) => {
   //
   // console.log(columns);
 
+  if (loading) {
+    return <div />;
+  }
   return (
     <Card className={clsx(classes.root, className)} {...rest}>
       <CardHeader title="Latest Orders" />
@@ -61,7 +65,7 @@ export const ReportTable = ({ className, title, data, loading, ...rest }) => {
             <TableHead>
               <TableRow>
                 {data.chart.label.map((label) => {
-                  return <TableCell>{label}</TableCell>;
+                  return <TableCell> <b>{label}</b></TableCell>;
                 })}
               </TableRow>
             </TableHead>

@@ -3,6 +3,9 @@ import PropTypes from "prop-types";
 import { Doughnut } from "react-chartjs-2";
 import { useTheme } from "@material-ui/core";
 
+import { createTheme } from '../../../../../../theme';
+const theme = createTheme({});
+
 const Chart = ({ data: dataProp, ...rest }) => {
   const theme = useTheme();
 
@@ -29,17 +32,17 @@ const Chart = ({ data: dataProp, ...rest }) => {
     },
     tooltips: {
       enabled: true,
-      // mode: 'index',
-      // intersect: false,
+      mode: 'index',
+      intersect: false,
       caretSize: 10,
       yPadding: 20,
       xPadding: 20,
       borderWidth: 1,
       borderColor: theme.palette.divider,
-      backgroundColor: theme.palette.background.light,
-      // titleFontColor: theme.palette.text.primary,
-      // bodyFontColor: theme.palette.text.secondary,
-      // footerFontColor: theme.palette.text.secondary,
+      backgroundColor: theme.palette.background.default,
+      titleFontColor: theme.palette.text.primary,
+      bodyFontColor: theme.palette.text.secondary,
+      footerFontColor: theme.palette.text.secondary,
       // callbacks: {
       //   label(tooltipItem, _data) {
       //     const label = _data.labels[tooltipItem.index];
