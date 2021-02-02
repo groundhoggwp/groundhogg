@@ -3,7 +3,7 @@ import './panels/'
 
 import { __ } from "@wordpress/i18n";
 import { getReportPanel, getReportPanels } from 'data/reports-registry'
-import { useSelect, useDispatch } from '@wordpress/data'
+import { useSelect } from '@wordpress/data'
 import { useState } from "@wordpress/element";
 import { makeStyles } from "@material-ui/core/styles";
 import { REPORTS_STORE_NAME } from 'data/reports'
@@ -29,6 +29,7 @@ const useStyles = makeStyles((theme) => ({
 export const ReportsPage = () => {
   const panels = getReportPanels()
 
+  console.log(panels)
   return (
     <>
       <HashRouter>
@@ -81,18 +82,7 @@ const ReportPanel = (props) => {
     }
     , [])
 
-    const { setIsRequestingItems } = useDispatch(REPORTS_STORE_NAME)
-
-    const tabChange = () =>{
-      // setIsRequestingItems(true)
-      console.log('tab change')
-
-    }
-
-    console.log('isrequest', isRequesting, Object.keys(reports))
-
-
-   const panel = <>
+     const panel = <>
        <Breadcrumb path={['Reporting', Panel.name]}/>
        <div className={classes.datePickers}>
          <DatePicker dateChange={dateChange} selectedDate={startDate} label={'start'} id={'start'}/>
@@ -158,7 +148,7 @@ const ReportPanel = (props) => {
 
   return (
     <>
-      <TabPanel tabs={tabs} handleChangeHook={tabChange} />
+      <TabPanel tabs={tabs} enableRouting={true} />
     </>
   )
 }
