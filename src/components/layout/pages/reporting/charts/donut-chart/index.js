@@ -38,8 +38,11 @@ export const DonutChart = ({
   ...rest
 }) => {
 
-
-  if(loading){
+  console.log('donut chart', loading, data)
+  if(loading || !data){
+    return <div/>
+  }
+  if(loading || !data.chart){
     return <div/>
   }
 

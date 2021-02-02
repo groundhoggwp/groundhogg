@@ -51,7 +51,10 @@ export const ReportTable = ({ className, title, data, loading, ...rest }) => {
   // });
   //
   // console.log(columns);
-
+  console.log('report -table', loading, data)
+  if (loading || !data) {
+    return <div />;
+  }
   if (loading || !data.chart) {
     return <div />;
   }

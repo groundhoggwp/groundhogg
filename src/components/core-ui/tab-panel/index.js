@@ -59,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function ScrollableTabsButtonAuto( { tabs, enableRouting } ) {
+export default function ScrollableTabsButtonAuto( { tabs, handleChangeHook } ) {
   let defaultTab = 0;
   const location = useLocation();
 
@@ -73,10 +73,10 @@ export default function ScrollableTabsButtonAuto( { tabs, enableRouting } ) {
   const [value, setValue] = useState(defaultTab);
   const history = useHistory();
 
-  const handleChange = (event, newValue) => {
-    console.log(event, tabs[newValue].route)
+  const handleChange = (event, newValue) => {    
     setValue(newValue);
     history.push(tabs[newValue].route)
+    handleChangeHook();
   };
 
 
