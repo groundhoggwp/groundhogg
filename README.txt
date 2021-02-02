@@ -309,6 +309,10 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.3.2 (2021-02-01) =
+* FIXED Owner dropdown not limited to suers with owner capabilities
+* FIXED Rescheduling and canceling events in the admin screen not working.
+
 = 2.3.1 (2021-01-29) =
 * FIXED Unable to activate plugin caused by fatal error
 

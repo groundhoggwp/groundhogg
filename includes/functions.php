@@ -3491,15 +3491,21 @@ function convert_to_local_time( $time ) {
  */
 function get_owners() {
 
+	static $users;
+
+	if ( ! empty( $users ) ){
+		return $users;
+	}
+
 	$roles__in = [];
 
 	foreach ( wp_roles()->roles as $role_slug => $role ) {
-		if ( ! empty( $role['capabilities']['view_contacts'] ) ) {
+		if ( isset_not_empty( $role['capabilities'], 'view_contacts' ) ) {
 			$roles__in[] = $role_slug;
 		}
 	}
 
-	$users = get_users( [ 'roles__in' => $roles__in ] );
+	$users = get_users( [ 'role__in' => ! empty( $roles__in ) ? $roles__in : Main_Roles::$owner_roles ] );
 
 	return apply_filters( 'groundhogg/owners', $users );
 }

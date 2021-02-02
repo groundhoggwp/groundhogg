@@ -125,7 +125,7 @@ class Events_Page extends Tabbed_Admin_Page {
 		switch ( $this->get_current_tab() ) {
 			default:
 			case 'events' :
-				return 'events';
+				return 'event';
 			case 'emails' :
 				return 'email';
 		}
