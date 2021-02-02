@@ -51,12 +51,11 @@ export const ReportsPage = () => {
 const ReportPanel = (props) => {
   const classes = useStyles();
 
-  const report = useLocation().pathname.replace('/','');
-
-  const Panel = getReportPanel(report || 'overview' )
-
+  const [report, setReport] = useState(useLocation().pathname.replace('/',''));
   const [startDate, setStartDate] = useState(getLuxonDate('one_year_back'));
   const [endDate, setEndDate] = useState(getLuxonDate('today'));
+
+  const Panel = getReportPanel(report || 'overview' )
 
   const dateChange = (id, newValue)  => {
     if (id === 'start'){
@@ -65,6 +64,15 @@ const ReportPanel = (props) => {
       setEndDate(newValue);
     }
   }
+  const tabsHandleChange = (value)  => {
+    console.log('change', value)
+
+    const {setIsRequestingItems} = useDispatch(REPORTS_STORE_NAME)
+    setIsRequestingItems(true);
+    setReport(value)
+  }
+
+
 
   const { reports, isRequesting } = useSelect(
     (select) => {
@@ -81,6 +89,8 @@ const ReportPanel = (props) => {
       }
     }
     , [])
+
+    console.log(report, isRequesting, startDate, endDate)
 
      const panel = <>
        <Breadcrumb path={['Reporting', Panel.name]}/>
@@ -148,7 +158,7 @@ const ReportPanel = (props) => {
 
   return (
     <>
-      <TabPanel tabs={tabs} enableRouting={true} />
+      <TabPanel tabs={tabs} handleChangeHook={tabsHandleChange} />
     </>
   )
 }
