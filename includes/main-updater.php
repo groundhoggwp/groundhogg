@@ -312,6 +312,14 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Updates the contact table with string opt-in status
+	 */
+	public function version_3_0_a_8() {
+		Plugin::$instance->dbs->install_dbs();
+		get_db('contacts')->change_optin_status_to_varchar();
+	}
+
+	/**
 	 * Update the steps table to support next_steps[]
 	 */
 	public function version_3_0_a_4() {
@@ -353,6 +361,7 @@ class Main_Updater extends Updater {
 		Plugin::$instance->dbs->install_dbs();
 		get_db( 'email_log' )->create_table();
 	}
+
 
 	/**
 	 * A unique name for the updater to avoid conflicts
@@ -399,6 +408,7 @@ class Main_Updater extends Updater {
 			'3.0.a.3',
 			'3.0.a.4',
 			'3.0.a.7',
+			'3.0.a.8',
 			'2.2.22',
 			'2.2.23',
 			'2.2.23.3',
@@ -428,6 +438,7 @@ class Main_Updater extends Updater {
 			'3.0.a.2',
 			'3.0.a.3',
 			'3.0.a.4',
+			'3.0.a.5',
 			'2.2.22',
 			'2.2.22.3',
 			'2.2.24',
