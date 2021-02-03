@@ -56,7 +56,7 @@ export const ReportTable = ({ className, title, data, loading, ...rest }) => {
   //
   // console.log(columns);
 
-  if (loading) {
+  if (loading || !data.chart) {
     return <div />;
   }
   const [page, setPage] = React.useState(0);

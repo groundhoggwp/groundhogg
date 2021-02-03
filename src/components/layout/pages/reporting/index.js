@@ -8,7 +8,7 @@ import { useState } from "@wordpress/element";
 import { makeStyles } from "@material-ui/core/styles";
 import { REPORTS_STORE_NAME } from 'data/reports'
 import { isObject } from 'utils/core'
-import { HashRouter, Switch, useLocation, Route, Link } from 'react-router-dom'
+import { HashRouter, Switch, useLocation, useHistory, Route, Link } from 'react-router-dom'
 import DatePicker from "../../../core-ui/date-picker";
 import { DateTime } from 'luxon';
 import {getLuxonDate} from "utils/index";
@@ -51,12 +51,13 @@ export const ReportsPage = () => {
 const ReportPanel = (props) => {
   const classes = useStyles();
 
-  const report = useLocation().pathname.replace('/','');
+  console.log('report panel', props, useLocation(), useHistory())
 
-  const Panel = getReportPanel(report || 'overview' )
-
+  const [report, setReport] = useState(useLocation().pathname.replace('/',''));
   const [startDate, setStartDate] = useState(getLuxonDate('one_year_back'));
   const [endDate, setEndDate] = useState(getLuxonDate('today'));
+
+  const Panel = getReportPanel(report || 'overview' )
 
   const dateChange = (id, newValue)  => {
     if (id === 'start'){
@@ -65,6 +66,15 @@ const ReportPanel = (props) => {
       setEndDate(newValue);
     }
   }
+  const tabsHandleChange = (value)  => {
+    console.log('change', value)
+
+    const {setIsRequestingItems} = useDispatch(REPORTS_STORE_NAME)
+    setIsRequestingItems(true);
+    setReport(value)
+  }
+
+
 
   const { reports, isRequesting } = useSelect(
     (select) => {
@@ -81,6 +91,8 @@ const ReportPanel = (props) => {
       }
     }
     , [])
+
+    console.log(report, isRequesting, startDate, endDate)
 
      const panel = <>
        <Breadcrumb path={['Reporting', Panel.name]}/>
@@ -148,7 +160,7 @@ const ReportPanel = (props) => {
 
   return (
     <>
-      <TabPanel tabs={tabs} enableRouting={true} />
+      <TabPanel tabs={tabs} handleChangeHook={tabsHandleChange} />
     </>
   )
 }
