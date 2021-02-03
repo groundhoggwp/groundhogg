@@ -10,9 +10,8 @@ import {
   Typography,
   makeStyles,
 } from "@material-ui/core";
-// import GenericMoreButton from 'src/components/GenericMoreButton';
-// import axios from 'src/utils/axios';
 import Chart from "./Chart";
+import PerfectScrollbar from "react-perfect-scrollbar";
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -37,34 +36,34 @@ export const DonutChart = ({
   loading,
   ...rest
 }) => {
-
-
-  if(loading){
-    return <div/>
+  if (loading) {
+    return <div />;
   }
 
   const classes = useStyles();
 
   return (
     <Card className={clsx(classes.root, className)} {...rest}>
-      <CardHeader  title={title} />
+      <CardHeader title={title} />
       <Divider />
       <Box p={3} position="relative" minHeight={320}>
         <Chart data={data.chart.data} />
       </Box>
       <Divider />
-      <Box display="flex">
-        {data.chart.data.labels.map((label, i) => (
-          <div key={label} className={classes.item}>
-            <Typography variant="h4" color="textPrimary">
-              {data.chart.data.datasets[0].data[i]}
-            </Typography>
-            <Typography variant="overline" color="textSecondary">
-              {label}
-            </Typography>
-          </div>
-        ))}
-      </Box>
+      <PerfectScrollbar>
+        <Box display="flex">
+          {data.chart.data.labels.map((label, i) => (
+            <div key={label} className={classes.item}>
+              <Typography variant="h4" color="textPrimary">
+                {data.chart.data.datasets[0].data[i]}
+              </Typography>
+              <Typography variant="overline" color="textSecondary">
+                {label}
+              </Typography>
+            </div>
+          ))}
+        </Box>
+      </PerfectScrollbar>
     </Card>
   );
 };
