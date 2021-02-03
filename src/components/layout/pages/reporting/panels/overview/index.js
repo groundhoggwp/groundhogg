@@ -72,8 +72,8 @@ registerReportsPanel("overview", {
           </Grid>
           <Grid item xs={12}>
             <LineChart
-              title={'New Contacts'}
-              id={'chart_new_contacts'}
+              title={"New Contacts"}
+              id={"chart_new_contacts"}
               data={!isLoading ? chart_new_contacts : {}}
               loading={isLoading}
             />
@@ -90,7 +90,7 @@ registerReportsPanel("overview", {
             <ReportTable
               title={"Top Performing Emails"}
               id={"table_top_performing_emails"}
-              data={isLoading ? table_top_performing_emails : {}}
+              data={!isLoading ? table_top_performing_emails : {}}
               loading={isLoading}
             />
           </Grid>
