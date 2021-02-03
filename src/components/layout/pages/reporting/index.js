@@ -8,7 +8,7 @@ import { useState } from "@wordpress/element";
 import { makeStyles } from "@material-ui/core/styles";
 import { REPORTS_STORE_NAME } from 'data/reports'
 import { isObject } from 'utils/core'
-import { HashRouter, Switch, useLocation, Route, Link } from 'react-router-dom'
+import { HashRouter, Switch, useLocation, useHistory, Route, Link } from 'react-router-dom'
 import DatePicker from "../../../core-ui/date-picker";
 import { DateTime } from 'luxon';
 import {getLuxonDate} from "utils/index";
@@ -50,6 +50,8 @@ export const ReportsPage = () => {
 
 const ReportPanel = (props) => {
   const classes = useStyles();
+
+  console.log('report panel', props, useLocation(), useHistory())
 
   const [report, setReport] = useState(useLocation().pathname.replace('/',''));
   const [startDate, setStartDate] = useState(getLuxonDate('one_year_back'));
