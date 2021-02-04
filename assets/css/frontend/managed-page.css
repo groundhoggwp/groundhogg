@@ -173,3 +173,8 @@ label {
 #main .contact-name{
     border-bottom: 1px dotted;
 }
+
+.erase #main ul{
+    padding-left: 20px;
+    list-style-type: disc;
+}

@@ -313,6 +313,13 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 * ADDED Setting to enabled one click unsubscribe in the **Compliance** settings.
 * ADDED Setting to disable the `list-unsubscribe` header.
 * TWEAKED `list-unsubscribe` header will not be added if the email is transactional.
+* TWEAKED Added a call to action for contacts to re-subscribe if they unsubscribe.
+* TWEAKED Changed the manage email preferences from from radio buttons to links for better UX.
+* TWEAKED Change the color of the erase profile button to red for better UX.
+* TWEAKED Change the color of the unsubscribe preference options to red for better UX.
+* TWEAKED Split **GDPR consent** into **Data Processing Consent** and **Marketing Consent** for improved compliance.
+* TWEAKED Contacts can now manage their marketing and data processing consent on the profile page.
+* TWEAKED Added a confirmation step to the GDPR profile erasure feature. Explain what will/will not be erased.
 
 = 2.3.2 (2021-02-01) =
 * FIXED Owner dropdown not limited to users with owner capabilities

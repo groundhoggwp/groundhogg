@@ -370,7 +370,7 @@ switch ( $action ):
                 <a id="downloadprofile" class="button"
                    href="<?php echo esc_url( wp_nonce_url( managed_page_url( 'preferences/download/' ), 'download_profile' ) ); ?>"><?php _e( 'Download Profile', 'groundhogg' ) ?></a>
                 <a id="eraseprofile" class="button danger right"
-                   href="<?php echo esc_url( wp_nonce_url( managed_page_url( 'preferences/erase/' ), 'erase_profile' ) ); ?>"><?php _e( 'Erase Profile', 'groundhogg' ) ?></a>
+                   href="<?php echo esc_url( managed_page_url( 'preferences/erase/' ) ); ?>"><?php _e( 'Erase Profile', 'groundhogg' ) ?></a>
             </p>
         </div>
 	<?php endif; ?>
@@ -403,7 +403,10 @@ switch ( $action ):
 					$contact->change_marketing_preference( Preferences::MONTHLY );
 					break;
 				case 'gdpr_delete':
-					$redirect = nonce_url_no_amp( managed_page_url( 'preferences/erase/' ), 'erase_profile' );
+
+				    $contact->unsubscribe();
+
+					$redirect = managed_page_url( 'preferences/erase/' );
 					break;
 			}
 
@@ -522,7 +525,38 @@ switch ( $action ):
 	case 'erase':
 
 		if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), 'erase_profile' ) ) {
-			wp_redirect( managed_page_url( 'preferences/profile/' ) );
+
+			managed_page_head( __( 'Erase your profile', 'groundhogg' ), 'erase' );
+
+			?>
+            <div class="box">
+                <p><b><?php _e( 'Are you sure you want to erase your profile?', 'groundhogg' ); ?></b></p>
+                <p><?php _e( "Erasing your profile will mean that you will no longer receive critical updates and communications from us.", 'groundhogg' ); ?></p>
+	            <p><b><?php _e( "What will be erased?", 'groundhogg' ); ?></b></p>
+	            <ul>
+		            <li><?php _e( "Your profile details.", 'groundhogg' ); ?></li>
+		            <li><?php _e( "Your profile marketing history.", 'groundhogg' ); ?></li>
+		            <li><?php _e( "Tracking data associated with your profile.", 'groundhogg' ); ?></li>
+	            </ul>
+	            <p><b><?php _e( "What will be <u>NOT</u> erased?", 'groundhogg' ); ?></b></p>
+	            <ul>
+		            <?php if ( $contact->get_user_id() ): ?>
+		                <li><?php _e( "Your user account. <i>To erase your user account contact us.</i>", 'groundhogg' ); ?></li>
+		                <li><?php _e( "Tracking data and historic details associated with your user account.", 'groundhogg' ); ?></li>
+					<?php endif; ?>
+		            <li><?php _e( "Associated purchase history and orders.", 'groundhogg' ); ?></li>
+		            <li><?php _e( "Legal documents associated with your profile.", 'groundhogg' ); ?></li>
+	            </ul>
+                <p>
+	                <a id="gotoprofile" class="button"
+	                   href="<?php echo esc_url( managed_page_url( 'preferences/profile/' ) ); ?>"><?php _e( "Nevermind! Don't erase my profile.", 'groundhogg' ) ?></a>
+	                <a id="eraseprofile" class="button danger right"
+	                   href="<?php echo esc_url( wp_nonce_url( managed_page_url( 'preferences/erase/' ), 'erase_profile' ) ); ?>"><?php _e( 'Erase Profile', 'groundhogg' ) ?></a>
+                </p>
+            </div>
+			<?php
+			managed_page_footer();
+
 			die();
 		}
 
@@ -539,7 +573,7 @@ switch ( $action ):
 
 		?>
         <div class="box">
-            <p><b><?php _e( 'Your data has been erased!', 'groundhogg' ); ?></b></p>
+            <p><b><?php _e( 'Your profile has been erased!', 'groundhogg' ); ?></b></p>
             <p><?php _e( 'Further interactions with our site may be interpreted as re-subscribing to our list and will result in further communication.', 'groundhogg' ); ?></p>
             <p>
                 <a id="gotosite" class="button"
