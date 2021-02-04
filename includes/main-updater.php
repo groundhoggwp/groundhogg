@@ -377,6 +377,15 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Verify all the license statuses
+	 */
+	public function version_2_3_3() {
+		$this->remember_version_update( '2.3.3' );
+
+		Plugin::instance()->bulk_jobs->update_marketing_consent->start();
+	}
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -419,7 +428,8 @@ class Main_Updater extends Updater {
 			'2.2.22',
 			'2.2.23',
 			'2.2.23.3',
-			'2.3'
+			'2.3',
+			'2.3.3'
 		];
 	}
 
@@ -479,7 +489,8 @@ class Main_Updater extends Updater {
 			'2.2.19.4'      => __( 'Update the permission keys table to support new usage.', 'groundhogg' ),
 			'2.2.22'        => __( 'Show preferences page if url is just /gh/.', 'groundhogg' ),
 			'2.2.22.3'      => __( 'Re-install the gh-cron.php file to include a constant <code>DOING_GH_CRON</code>.', 'groundhogg' ),
-			'2.3'        => __( 'Add the new database tables for the new Email Logging feature.', 'groundhogg' ),
+			'2.3'           => __( 'Add the new database tables for the new Email Logging feature.', 'groundhogg' ),
+			'2.3.3'         => __( 'Separate GDPR consent into Data Processing consent and Marketing consent', 'groundhogg' ),
 		];
 	}
 }
