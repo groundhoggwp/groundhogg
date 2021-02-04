@@ -10,6 +10,10 @@ const useStyles = makeStyles((theme) => ({
     minWidth: '150px',
     border: 'none',
     outline: 'none'
+    // Parking this for later, a great example of how we can avoid using classes
+    // "& .MuiInputBase-input": {
+    //         display: "none"
+    //  }
   },
 }));
 
