@@ -88,7 +88,7 @@ class Contacts_Table extends WP_List_Table {
 		$per_page = absint( get_url_var( 'limit', get_screen_option( 'per_page' ) ) );
 		$paged    = $this->get_pagenum();
 		$offset   = $per_page * ( $paged - 1 );
-		$search   = get_url_var( 's' );
+		$search   = trim( sanitize_text_field( get_url_var( 's' ) ) );
 		$order    = get_url_var( 'order', 'DESC' );
 		$orderby  = get_url_var( 'orderby', 'ID' );
 
