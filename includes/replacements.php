@@ -316,7 +316,7 @@ class Replacements {
 	 */
 	public function process( $content, $contact_id_or_email = false ) {
 
-		if ( $contact_id_or_email instanceof Contact ) {
+		if ( is_a_contact( $contact_id_or_email ) ) {
 			$contact = $contact_id_or_email;
 		} else {
 			$contact = get_contactdata( $contact_id_or_email );
@@ -329,7 +329,6 @@ class Replacements {
 			$this->contact_id      = 0;
 			$this->current_contact = new Contact;
 		}
-
 
 		return $this->tackle_replacements( $content );
 	}

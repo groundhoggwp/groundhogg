@@ -320,6 +320,7 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 * TWEAKED Split **GDPR consent** into **Data Processing Consent** and **Marketing Consent** for improved compliance.
 * TWEAKED Contacts can now manage their marketing and data processing consent on the profile page.
 * TWEAKED Added a confirmation step to the GDPR profile erasure feature. Explain what will/will not be erased.
+* FIXED Google Recaptcha v3 not working with ajax form submission.
 
 = 2.3.2 (2021-02-01) =
 * FIXED Owner dropdown not limited to users with owner capabilities
