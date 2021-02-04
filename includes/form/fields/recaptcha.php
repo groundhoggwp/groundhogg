@@ -106,17 +106,17 @@ class Recaptcha extends Input {
 		}
 
 		// Check the score...
-		if ( self::get_version() === 'v3' ){
+		if ( self::get_version() === 'v3' ) {
 			$score = get_array_var( $responseData, 'score' );
 
-			if ( ! $score ){
+			if ( ! $score ) {
 				return $bot_error;
 			}
 
 			$score_threshold = floatval( apply_filters( 'groundhogg/recaptcha/v3/score_threshold', get_option( 'gh_recaptcha_v3_score_threshold', 0.5 ) ) );
-			$score_threshold = $score_threshold?:0.5;
+			$score_threshold = $score_threshold ?: 0.5;
 
-			if ( $score < $score_threshold ){
+			if ( $score < $score_threshold ) {
 				return $bot_error;
 			}
 		}

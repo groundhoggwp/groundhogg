@@ -45,39 +45,58 @@
             data.append( '_ghnonce', gh._ghnonce );
             // data.form_data = $form.serializeArray();
             // data.action = 'groundhogg_ajax_form_submit';
+
             data.append( 'action', 'groundhogg_ajax_form_submit' );
 
-            // console.log(data);
+            //check if google is active
 
-            $.ajax( {
-                method: 'POST',
-                // dataType: 'json',
-                url: gh.ajaxurl,
-                data: data,
-                processData: false,
-                contentType: false,
-                cache: false,
-                timeout: 600000,
-                enctype: 'multipart/form-data',
-                success: function( response ){
-                    if ( response.success == undefined ){
-                        return;
+            let captcha_validate=true ;
+            /**
+             * Code to validate google captcha-v3
+             */
+            if($('.gh-recaptcha-v3').length ){
+                captcha_validate = false;
+            }
+
+            if(data.has('g-recaptcha-response'))
+            {
+                captcha_validate=true;
+            }
+            if (captcha_validate) {
+
+                $.ajax({
+                    method: 'POST',
+                    // dataType: 'json',
+                    url: gh.ajaxurl,
+                    data: data,
+                    processData: false,
+                    contentType: false,
+                    cache: false,
+                    timeout: 600000,
+                    enctype: 'multipart/form-data',
+                    success: function (response) {
+                        if (response.success == undefined) {
+                            return;
+                        }
+
+                        if (response.success) {
+
+                            $form.after('<div class="gh-message-wrapper gh-form-success-wrapper">' + response.data.message + '</div>');
+                            $form.trigger("reset");
+
+                        } else {
+                            $form.before(response.data.html);
+                        }
+
+                        $form.showButton();
+
+                    },
+                    error: function () {
                     }
+                })
+            }
 
-                    if ( response.success ){
 
-                        $form.after( '<div class="gh-message-wrapper gh-form-success-wrapper">' + response.data.message + '</div>' );
-                        $form.trigger("reset");
-
-                    } else {
-                        $form.before( response.data.html );
-                    }
-
-                    $form.showButton();
-
-                },
-                error: function(){}
-            } )
         } );
     });
 
