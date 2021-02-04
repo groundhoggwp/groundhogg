@@ -19,17 +19,21 @@ export default function DatePickers({selectedDate, dateChange, label, id}) {
   const [date, setDate] = useState( selectedDate );
 
   const validDateChange = (newDate) => {
-    // May need to enhance this logic for multi month/year changes
-    // console.log(Math.abs(diffInMonths.as('days')) % 30);
 
-    // Block Month Changes
-    if(getLuxonDate('one_month_back') === newDate){
+    // The date picker can move forward months and years back and forth these conditions block updates and improves the UX
+    // More conditions may be needed
+    if(getLuxonDate('one_month_back', date) === newDate){
       return false;
     }
-    if(getLuxonDate('one_month_forward') === newDate){
+    if(getLuxonDate('one_month_forward', date) === newDate){
       return false;
     }
-
+    if(getLuxonDate('one_year_back', date) === newDate){
+      return false;
+    }
+    if(getLuxonDate('one_year_forward', date) === newDate){
+      return false;
+    }
     return true;
   }
 
