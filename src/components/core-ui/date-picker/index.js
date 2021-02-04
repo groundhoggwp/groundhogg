@@ -8,13 +8,17 @@ import { useState, useRef, useEffect, Fragment } from '@wordpress/element';
 const useStyles = makeStyles((theme) => ({
   textField: {
     minWidth: '150px',
-    border: 'none',
-    outline: 'none'
+    marginLeft: '30px',    
     // Parking this for later, a great example of how we can avoid using classes
     // "& .MuiInputBase-input": {
     //         display: "none"
     //  }
   },
+  input: {
+    "&:before": {
+      border: 'none'
+    }
+}
 }));
 
 export default function DatePickers({selectedDate, dateChange, label, id}) {
@@ -61,6 +65,9 @@ export default function DatePickers({selectedDate, dateChange, label, id}) {
         onChange={handleChange}
         KeyboardButtonProps={{
           'aria-label': 'change date',
+        }}
+        InputProps={{
+            className: classes.input,
         }}
       />
     </form>

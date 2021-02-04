@@ -85,7 +85,7 @@ const BreadCrumb = ({ className, path, page, ...rest }) => {
           {/*page.title*/}
         </Typography>
       </Grid>
-      <Grid item>
+      {/*<Grid item>
         <Button
           ref={actionRef}
           onClick={() => setMenuOpen(true)}
@@ -120,7 +120,7 @@ const BreadCrumb = ({ className, path, page, ...rest }) => {
             </MenuItem>
           ))}
         </Menu>
-      </Grid>
+      </Grid>*/}
     </Grid>
   );
 };
