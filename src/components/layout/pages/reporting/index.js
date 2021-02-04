@@ -22,6 +22,7 @@ const useStyles = makeStyles((theme) => ({
     right: '0px',
     width: '350px',
     justifyContent: 'flex-end',
+    marginTop: '-38px',
     zIndex: '5'
   }
 }));

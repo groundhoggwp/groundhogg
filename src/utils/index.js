@@ -168,7 +168,10 @@ export const getLuxonDate = (type, date) => {
       return DateTime.local().startOf('day').toISODate();
       break;
     case 'one_year_back':
-      return  DateTime.local().minus({ years: 1 }).startOf('day').toISODate();
+      return  DateTime.local().minus({ years: 1 }).toISODate();
+      break;
+    case 'one_year_forward':
+      return  DateTime.local().plus({ years: 1 }).toISODate();
       break;
     case 'one_month_back':
       return  DateTime.fromISO(date).minus({ months: 1 }).toISODate();
