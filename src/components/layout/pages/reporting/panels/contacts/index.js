@@ -12,13 +12,20 @@ registerReportsPanel("contacts", {
   reports: [
     "total_new_contacts",
     "chart_new_contacts",
+    "total_engaged_contacts",
+    "total_confirmed_contacts",
+    "total_engaged_contacts",
+    "total_unsubscribed_contacts",
     "chart_contacts_by_optin_status",
-      "table_list_engagement"
+    "table_list_engagement"
   ],
   layout: ({ reports, isLoading }) => {
     const {
       total_new_contacts,
       chart_new_contacts,
+      total_confirmed_contacts,
+      total_engaged_contacts,
+      total_unsubscribed_contacts,
       chart_contacts_by_optin_status,
       table_list_engagement
     } = reports;
@@ -28,10 +35,40 @@ registerReportsPanel("contacts", {
         <Grid container spacing={3}>
           <Grid item xs={3}>
             <QuickStat
-              title={"Total New Contacts"}
+              title={"New Contacts"}
               i
               id={"total_new_contacts"}
               data={!isLoading ? total_new_contacts : {}}
+              loading={isLoading}
+              icon={<ContactMailIcon />}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <QuickStat
+              title={"Confirmed Contacts"}
+              i
+              id={"total_new_contacts"}
+              data={!isLoading ? total_confirmed_contacts : {}}
+              loading={isLoading}
+              icon={<ContactMailIcon />}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <QuickStat
+              title={"Engaged Contacts"}
+              i
+              id={"total_engaged_contacts"}
+              data={!isLoading ? total_engaged_contacts : {}}
+              loading={isLoading}
+              icon={<ContactMailIcon />}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <QuickStat
+              title={"Unsubscribes"}
+              i
+              id={"total_unsubscribed_contacts"}
+              data={!isLoading ? total_unsubscribed_contacts : {}}
               loading={isLoading}
               icon={<ContactMailIcon />}
             />
