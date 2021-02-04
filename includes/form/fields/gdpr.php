@@ -1,5 +1,8 @@
 <?php
+
 namespace Groundhogg\Form\Fields;
+
+use function Groundhogg\html;
 
 /**
  * Created by PhpStorm.
@@ -7,30 +10,59 @@ namespace Groundhogg\Form\Fields;
  * Date: 2019-05-09
  * Time: 4:25 PM
  */
+class GDPR extends Checkbox {
+	public function get_default_args() {
+		return [
+			'label'    => sprintf( _x( "I agree to %s's storage and processing of my personal data.", 'form_default', 'groundhogg' ), get_bloginfo() ),
+			'label-2'  => sprintf( _x( "I agree to receive marketing offers and updates from %s.", 'form_default', 'groundhogg' ), get_bloginfo() ),
+			'name'     => 'gdpr_consent',
+			'id'       => 'gdpr_consent',
+			'name-2'   => 'marketing_consent',
+			'id-2'     => 'marketing_consent',
+			'class'    => 'gh-gdpr',
+			'value'    => 'yes',
+			'tag'      => 0,
+			'title'    => _x( 'I Consent', 'form_default', 'groundhogg' ),
+			'required' => true,
+		];
+	}
 
-class GDPR extends Checkbox
-{
-    public function get_default_args()
-    {
-        return [
-            'label'         => _x( 'I consent to having my personal information collected, and to receive marketing and transactional information related to my request.', 'form_default', 'groundhogg' ),
-            'name'          => 'gdpr_consent',
-            'id'            => 'gdpr_consent',
-            'class'         => 'gh-gdpr',
-            'value'         => 'yes',
-            'tag'           => 0,
-            'title'         => _x( 'I Consent', 'form_default', 'groundhogg' ),
-            'required'      => true,
-        ];
-    }
+	/**
+	 * Get the name of the shortcode
+	 *
+	 * @return string
+	 */
+	public function get_shortcode_name() {
+		return 'gdpr';
+	}
 
-    /**
-     * Get the name of the shortcode
-     *
-     * @return string
-     */
-    public function get_shortcode_name()
-    {
-        return 'gdpr';
-    }
+	public function render() {
+		$atts = [
+			'label'    => $this->get_label(),
+			'name'     => $this->get_name(),
+			'id'       => $this->get_id(),
+			'class'    => $this->get_classes() . ' gh-checkbox',
+			'value'    => $this->get_value(),
+			'title'    => $this->get_title(),
+			'required' => $this->is_required(),
+			'checked'  => $this->is_checked()
+		];
+
+		$atts2 = [
+			'label'    => $this->get_att( "label-2" ),
+			'name'     => $this->get_att( "name-2" ),
+			'id'       => $this->get_att( "id-2" ),
+			'class'    => $this->get_classes() . ' gh-checkbox',
+			'value'    => $this->get_value(),
+			'title'    => $this->get_title(),
+			'required' => $this->is_required(),
+			'checked'  => $this->is_checked()
+		];
+
+
+		return html()->wrap( [
+			html()->checkbox( $atts ),
+			html()->checkbox( $atts2 ),
+		], 'div', [ 'id' => 'gdpr-checkboxes-wrap' ] );
+	}
 }

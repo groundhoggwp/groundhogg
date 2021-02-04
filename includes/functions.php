@@ -108,9 +108,9 @@ function admin_page_url( $page, $args = [], $fragment = '' ) {
  *
  * @return string
  */
-function modal_link_url( $args ){
+function modal_link_url( $args ) {
 
-    $atts = wp_parse_args( $args, array(
+	$atts = wp_parse_args( $args, array(
 		'title'              => 'Modal',
 		'footer_button_text' => __( 'Save Changes' ),
 		'source'             => '',
@@ -190,10 +190,10 @@ function is_option_enabled( $option = '' ) {
 	}
 
 	/**
-     * Whether the option is enabled or not.
-     *
+	 * Whether the option is enabled or not.
+	 *
 	 * @param $enabled bool
-     * @param $option string
+	 * @param $option string
 	 */
 	return apply_filters( 'groundhogg/io_option_enabled', is_array( $option ) && in_array( 'on', $option ), $option );
 }
@@ -1768,7 +1768,8 @@ function get_mappable_fields( $extra = [] ) {
 		'lead_source'               => __( 'Lead Source' ),
 		'source_page'               => __( 'Source Page' ),
 		'terms_agreement'           => __( 'Terms Agreement' ),
-		'gdpr_consent'              => __( 'GDPR Consent' ),
+		'gdpr_consent'              => __( 'Data Processing Consent' ),
+		'marketing_consent'         => __( 'Marketing Consent' ),
 		'notes'                     => __( 'Add To Notes' ),
 		'tags'                      => __( 'Apply Value as Tag' ),
 		'meta'                      => __( 'Add as Custom Meta' ),
@@ -1929,6 +1930,12 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				if ( ! empty( $value ) ) {
 					$meta['gdpr_consent']      = 'yes';
 					$meta['gdpr_consent_date'] = date_i18n( get_date_time_format() );
+				}
+				break;
+            case 'marketing_consent':
+				if ( ! empty( $value ) ) {
+					$meta['marketing_consent']      = 'yes';
+					$meta['marketing_consent_date'] = date_i18n( get_date_time_format() );
 				}
 				break;
 			case 'country':
@@ -3500,7 +3507,7 @@ function get_owners() {
 
 	static $users;
 
-	if ( ! empty( $users ) ){
+	if ( ! empty( $users ) ) {
 		return $users;
 	}
 

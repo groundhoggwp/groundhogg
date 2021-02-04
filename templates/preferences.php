@@ -160,14 +160,6 @@ if ( ! function_exists( __NAMESPACE__ . '\send_email_preferences_link' ) ) {
 	}
 }
 
-add_action( 'enqueue_managed_page_styles', function () {
-	wp_enqueue_style( 'manage-preferences' );
-} );
-
-add_action( 'enqueue_managed_page_scripts', function () {
-	wp_enqueue_script( 'manage-preferences' );
-} );
-
 $permissions_key = get_permissions_key();
 
 if ( $permissions_key && ( $enc_identity = get_url_var( 'identity' ) ) ) {
@@ -284,6 +276,29 @@ switch ( $action ):
 			}
 		}
 
+		if ( wp_verify_nonce( get_request_var( '_wpnonce' ), 'update_gdpr_consent' ) ) {
+
+			$processing_consent = get_post_var( 'gdpr_consent' );
+			$marketing_consent  = get_post_var( 'marketing_consent' );
+
+			if ( $processing_consent !== 'yes' ){
+				$contact->delete_meta( 'gdpr_consent' );
+				$contact->delete_meta( 'gdpr_consent_date' );
+			} else {
+				$contact->update_meta( 'gdpr_consent', 'yes' );
+				$contact->update_meta( 'gdpr_consent_date', $contact->get_meta( 'gdpr_consent_date' ) ?: date_i18n( get_date_time_format() ) );
+			}
+
+			if ( $marketing_consent !== 'yes' ){
+				$contact->delete_meta( 'marketing_consent' );
+				$contact->delete_meta( 'marketing_consent_date' );
+			} else {
+				$contact->update_meta( 'marketing_consent', 'yes' );
+				$contact->update_meta( 'marketing_consent_date', $contact->get_meta( 'marketing_consent_date' ) ?: date_i18n( get_date_time_format() ) );
+			}
+
+		}
+
 		managed_page_head( __( 'Update Profile', 'groundhogg' ), 'profile' );
 
 		?>
@@ -323,11 +338,38 @@ switch ( $action ):
         </div>
 		<?php if ( Plugin::$instance->preferences->is_gdpr_enabled() ): ?>
         <div class="box">
+            <p><?php _e( 'If you wish to update your consent please do so below. Changes to your consent will be honored instantly.', 'groundhogg' ) ?></p>
+            <form class="gdpr-consent" method="post">
+				<?php wp_nonce_field( 'update_gdpr_consent' ); ?>
+                <p>
+					<?php echo html()->checkbox( [
+						'label'   => sprintf( _x( "I agree to %s's storage and processing of my personal data.", 'form_default', 'groundhogg' ), get_bloginfo() ),
+						'name'    => 'gdpr_consent',
+						'id'      => 'gdpr_consent',
+						'class'   => 'gh-gdpr',
+						'value'   => 'yes',
+						'title'   => _x( 'I Consent', 'form_default', 'groundhogg' ),
+						'checked' => $contact->get_meta( 'gdpr_consent' ) === 'yes',
+					] ) ?>
+                </p>
+                <p>
+					<?php echo html()->checkbox( [
+						'label'   => sprintf( _x( "I agree to receive marketing offers and updates from %s.", 'form_default', 'groundhogg' ), get_bloginfo() ),
+						'name'    => 'marketing_consent',
+						'id'      => 'marketing_consent',
+						'class'   => 'gh-gdpr',
+						'value'   => 'yes',
+						'title'   => _x( 'I Consent', 'form_default', 'groundhogg' ),
+						'checked' => $contact->get_meta( 'marketing_consent' ) === 'yes',
+					] ) ?>
+                </p>
+                <button class="button" type="submit"><?php _e( 'Update Consent', 'groundhogg' ); ?></button>
+            </form>
             <p><?php _e( 'Click below to email yourself an audit of all personal information currently on file. Or if you wish for us to no longer have access to this information you can request a data erasure in accordance with your privacy rights.', 'groundhogg' ) ?></p>
             <p>
                 <a id="downloadprofile" class="button"
                    href="<?php echo esc_url( wp_nonce_url( managed_page_url( 'preferences/download/' ), 'download_profile' ) ); ?>"><?php _e( 'Download Profile', 'groundhogg' ) ?></a>
-                <a id="eraseprofile" class="button right"
+                <a id="eraseprofile" class="button danger right"
                    href="<?php echo esc_url( wp_nonce_url( managed_page_url( 'preferences/erase/' ), 'erase_profile' ) ); ?>"><?php _e( 'Erase Profile', 'groundhogg' ) ?></a>
             </p>
         </div>
@@ -395,26 +437,24 @@ switch ( $action ):
 		do_action( 'groundhogg/preferences/manage/form/before' );
 
 		?>
-        <form action="" id="preferences" method="post">
+        <div class="box">
             <p>
                 <b><?php printf( __( 'Managing preferences for <span class="contact-name">%s (%s)</span>.', 'groundhogg' ), $contact->get_full_name(), obfuscate_email( $contact->get_email() ) ) ?></b>
             </p>
 			<?php wp_nonce_field( 'manage_email_preferences' ); ?>
 			<?php do_action( 'groundhogg/preferences/manage/form/inside' ); ?>
-            <ul class="preferences">
-				<?php foreach ( $preferences as $preference => $text ): ?>
-                    <li><label><input type="radio" name="preference" value="<?php esc_attr_e( $preference ); ?>"
-                                      class="preference-<?php esc_attr_e( $preference ); ?>"
-                            ><?php echo $text; ?></label></li>
-				<?php endforeach; ?>
-            </ul>
-            <p>
-                <input class="button" id="submit" type="submit"
-                       value="<?php esc_attr_e( 'Save Changes', 'groundhogg' ); ?>">
-                <a id="gotoprofile" class="button right"
+			<?php foreach ( $preferences as $preference => $text ): ?>
+                <div class="preference-option">
+                    <a href="<?php echo wp_nonce_url( managed_page_url( 'preferences/manage/' ) . '?preference=' . $preference, 'manage_email_preferences' ); ?>"
+                       class="preference-<?php esc_attr_e( $preference ); ?>"
+                    ><?php echo $text; ?></a>
+                </div>
+			<?php endforeach; ?>
+            <p class="align-center">
+                <a id="gotoprofile" class="button"
                    href="<?php echo esc_url( managed_page_url( 'preferences/profile/' ) ); ?>"><?php _e( 'Cancel' ) ?></a>
             </p>
-        </form>
+        </div>
 		<?php
 
 		do_action( 'groundhogg/preferences/manage/form/after' );
@@ -424,7 +464,7 @@ switch ( $action ):
 		break;
 	case 'unsubscribe':
 
-	    // Don't require the nonce check if one click unsub is require because it will go directly to this page.
+		// Don't require the nonce check if one click unsub is require because it will go directly to this page.
 		if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), 'unsubscribe' ) && ! is_option_enabled( 'gh_enable_one_click_unsubscribe' ) ) {
 			wp_redirect( managed_page_url( 'preferences/manage/' ) );
 			die();
@@ -440,10 +480,10 @@ switch ( $action ):
                 <b><?php printf( __( 'Your email address %s has just been unsubscribed.', 'groundhogg' ), obfuscate_email( $contact->get_email() ) ) ?></b>
             </p>
             <p><?php _e( 'Further interactions with our site may be interpreted as re-subscribing to our list and will result in further electronic communication.', 'groundhogg' ); ?></p>
-            <p>
-                <a id="gotosite" class="button"
-                   href="<?php echo esc_url( home_url() ); ?>"><?php printf( __( 'Return to %s', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ); ?></a>
-            </p>
+            <div class="preference-option">
+                <a href="<?php echo wp_nonce_url( managed_page_url( 'preferences/manage/' ) . '?preference=confirm', 'manage_email_preferences' ); ?>"
+                   class="preference-confirm"><?php _e( "Oops, I didn't mean to unsubscribe! Re-subscribe me!", 'groundhogg' ); ?></a>
+            </div>
         </div>
 		<?php
 

@@ -15,11 +15,11 @@ html, body, #main {
 
 #main {
     max-width: 500px;
-    padding: 3% 0 0;
+    padding: 3% 0 20px 0;
     margin: auto;
 }
 
-#main form, #main .box {
+#main form:not(.gdpr-consent), #main .box {
     margin-top: 20px;
     margin-left: 0;
     padding: 26px 24px;
@@ -62,6 +62,10 @@ html, body, #main {
     float: right;
 }
 
+.align-center {
+    text-align: center;
+}
+
 @media screen and (max-width: 360px ) {
     .right {
         float: none;
@@ -96,6 +100,29 @@ label {
 #extralinks {
     color: #555d66;
     text-align: center;
+}
+
+#main .preference-option a {
+    margin: 10px 0 0 0;
+    padding: 10px 20px;
+    background: #F9F9F9;
+    border: 1px solid #e5e5e5;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    border-radius: 3px;
+}
+
+#main .preference-option a.preference-unsubscribe,
+#main .preference-option a.preference-gdpr_delete
+{
+    color: #d2120c;
+}
+
+#main .preference-option a.preference-unsubscribe:hover,
+#main .preference-option a.preference-gdpr_delete:hover
+{
+    color: #900c08;
 }
 
 #main p label {
@@ -133,6 +160,14 @@ label {
 
 #main .button:hover {
     background-color: #016087;
+}
+
+#main .button.danger{
+    background-color: #d2120c;
+}
+
+#main .button.danger:hover{
+    background-color: #900c08;
 }
 
 #main .contact-name{

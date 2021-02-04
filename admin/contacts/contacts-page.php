@@ -491,6 +491,8 @@ class Contacts_Page extends Admin_Page {
 			'terms_agreement_date',
 			'gdpr_consent',
 			'gdpr_consent_date',
+			'marketing_consent',
+			'marketing_consent_date',
 			'primary_phone',
 			'primary_phone_extension',
 			'street_address_1',

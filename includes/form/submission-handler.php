@@ -255,6 +255,12 @@ class Submission_Handler extends Supports_Errors {
 						$meta['gdpr_consent_date'] = date_i18n( get_option( 'date_format' ) );
 					}
 					break;
+				case 'marketing_consent':
+					if ( ! empty( $value ) ) {
+						$meta['marketing_consent']      = 'yes';
+						$meta['marketing_consent_date'] = date_i18n( get_option( 'date_format' ) );
+					}
+					break;
 				case 'country':
 					if ( strlen( $value ) !== 2 ) {
 						$countries = Plugin::$instance->utils->location->get_countries_list();

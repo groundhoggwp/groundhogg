@@ -31,7 +31,7 @@ class Scripts {
 			'jquery',
 			'groundhogg-frontend'
 		], GROUNDHOGG_VERSION, true );
-		wp_register_script( 'manage-preferences', GROUNDHOGG_ASSETS_URL . 'js/frontend/preferences' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION );
+
 		wp_register_script( 'fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
 
 		$google_recaptcha_api_url = 'https://www.google.com/recaptcha/api.js';
@@ -77,7 +77,6 @@ class Scripts {
 	public function register_frontend_styles() {
 		wp_register_style( 'jquery-ui', GROUNDHOGG_ASSETS_URL . 'lib/jquery-ui/jquery-ui.min.css', [], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-form', GROUNDHOGG_ASSETS_URL . 'css/frontend/form.css', [], GROUNDHOGG_VERSION );
-		wp_register_style( 'manage-preferences', GROUNDHOGG_ASSETS_URL . 'css/frontend/preferences.css', [], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-managed-page', GROUNDHOGG_ASSETS_URL . 'css/frontend/managed-page.css', [], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-loader', GROUNDHOGG_ASSETS_URL . 'css/frontend/loader.css', [], GROUNDHOGG_VERSION );
 

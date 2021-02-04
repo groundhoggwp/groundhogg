@@ -141,8 +141,10 @@ class Preferences {
 		}
 
 		if ( $this->is_gdpr_enabled() && $this->is_gdpr_strict() ) {
-			$consent = $contact->get_meta( 'gdpr_consent' );
-			if ( $consent !== 'yes' ) {
+			$gdpr_consent = $contact->get_meta( 'gdpr_consent' );
+			$marketing_consent = $contact->get_meta( 'marketing_consent' );
+
+			if ( $gdpr_consent !== 'yes' || $marketing_consent !== 'yes' ) {
 				return _x( 'This contact has not agreed to receive email marketing from you.', 'optin_status', 'groundhogg' );
 			}
 		}
@@ -258,8 +260,10 @@ class Preferences {
 
 		/* check for strict GDPR settings */
 		if ( $this->is_gdpr_enabled() && $this->is_gdpr_strict() ) {
-			$consent = $contact->get_meta( 'gdpr_consent' );
-			if ( $consent !== 'yes' ) {
+			$gdpr_consent = $contact->get_meta( 'gdpr_consent' );
+			$marketing_consent = $contact->get_meta( 'marketing_consent' );
+
+			if ( $gdpr_consent !== 'yes' || $marketing_consent !== 'yes' ) {
 				return false;
 			}
 		}

@@ -562,8 +562,12 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
             </tr>
 			<?php if ( Plugin::$instance->preferences->is_gdpr_enabled() ): ?>
                 <tr>
-                    <th><?php _e( 'GDPR Consent' ); ?></th>
+                    <th><?php _e( 'Data Processing Consent' ); ?></th>
                     <td><?php echo ( $contact->get_meta( 'gdpr_consent' ) === 'yes' ) ? sprintf( "%s: %s", __( 'Agreed' ), $contact->get_meta( 'gdpr_consent_date' ) ) : '&#x2014;'; ?></td>
+                </tr>
+                <tr>
+                    <th><?php _e( 'Marketing Consent' ); ?></th>
+                    <td><?php echo ( $contact->get_meta( 'marketing_consent' ) === 'yes' ) ? sprintf( "%s: %s", __( 'Agreed' ), $contact->get_meta( 'marketing_consent_date' ) ) : '&#x2014;'; ?></td>
                 </tr>
 			<?php endif; ?>
             </tbody>
