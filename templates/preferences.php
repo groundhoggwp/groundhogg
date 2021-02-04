@@ -349,10 +349,10 @@ switch ( $action ):
 
 			switch ( $preference ) {
 				case 'unsubscribe':
-					$redirect = nonce_url_no_amp( managed_page_url( 'preferences/unsubscribe/' ), 'unsubscribe' );
+					$redirect = managed_page_url( 'preferences/unsubscribe/' );
 					break;
 				case 'confirm':
-					$redirect = nonce_url_no_amp( managed_page_url( 'preferences/confirm/' ), 'confirm' );
+					$redirect = managed_page_url( 'preferences/confirm/' );
 					break;
 				case 'weekly':
 					$contact->change_marketing_preference( Preferences::WEEKLY );
@@ -424,7 +424,8 @@ switch ( $action ):
 		break;
 	case 'unsubscribe':
 
-		if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), 'unsubscribe' ) ) {
+	    // Don't require the nonce check if one click unsub is require because it will go directly to this page.
+		if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), 'unsubscribe' ) && ! is_option_enabled( 'gh_enable_one_click_unsubscribe' ) ) {
 			wp_redirect( managed_page_url( 'preferences/manage/' ) );
 			die();
 		}

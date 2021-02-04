@@ -357,6 +357,11 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Compliance', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'marketing'
 			),
+			'unsubscribe'           => array(
+				'id'    => 'unsubscribe',
+				'title' => _x( 'Unsubscribe Settings', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'marketing'
+			),
 //			'sendwp'            => [
 //				'id'       => 'sendwp',
 //				'title'    => _x( 'SendWP', 'settings_sections', 'groundhogg' ),
@@ -1163,6 +1168,32 @@ class Settings_Page extends Admin_Page {
 					'placeholder' => 14,
 				),
 			],
+			'gh_enable_one_click_unsubscribe'         => array(
+				'id'      => 'gh_enable_one_click_unsubscribe',
+				'section' => 'unsubscribe',
+				'label'   => _x( 'Enable One-Click Unsubscribe', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'When contacts click the unsubscribe link in emails they will be instantly unsubscribed rather than required to unsubscribe in the email preferences area.', 'settings', 'groundhogg' ),
+				'type'    => 'checkbox',
+				'atts'    => array(
+					'label' => __( 'Enable' ),
+					'name'  => 'gh_enable_one_click_unsubscribe',
+					'id'    => 'gh_enable_one_click_unsubscribe',
+					'value' => 'on',
+				),
+			),
+			'gh_disable_unsubscribe_header'         => array(
+				'id'      => 'gh_disable_unsubscribe_header',
+				'section' => 'unsubscribe',
+				'label'   => _x( 'Disable the Unsubscribe header.', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'The unsubscribe header is recommended for promotional emails and will improve deliverability among large email senders. Disabling it may result in your email going to spam.', 'settings', 'groundhogg' ),
+				'type'    => 'checkbox',
+				'atts'    => array(
+					'label' => __( 'Disable' ),
+					'name'  => 'gh_disable_unsubscribe_header',
+					'id'    => 'gh_disable_unsubscribe_header',
+					'value' => 'on',
+				),
+			),
 		);
 
 		if ( ! defined( 'DISABLE_WP_CRON' ) || defined( 'GH_SHOW_DISABLE_WP_CRON_OPTION' ) ) {

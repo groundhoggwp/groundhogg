@@ -189,7 +189,14 @@ function is_option_enabled( $option = '' ) {
 		return true;
 	}
 
-	return is_array( $option ) && in_array( 'on', $option );}
+	/**
+     * Whether the option is enabled or not.
+     *
+	 * @param $enabled bool
+     * @param $option string
+	 */
+	return apply_filters( 'groundhogg/io_option_enabled', is_array( $option ) && in_array( 'on', $option ), $option );
+}
 
 /**
  * Shorthand;

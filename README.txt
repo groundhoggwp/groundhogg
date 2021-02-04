@@ -309,8 +309,13 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.3.3 (2021-02-04) =
+* ADDED Setting to enabled one click unsubscribe in the **Compliance** settings.
+* ADDED Setting to disable the `list-unsubscribe` header.
+* TWEAKED `list-unsubscribe` header will not be added if the email is transactional.
+
 = 2.3.2 (2021-02-01) =
-* FIXED Owner dropdown not limited to suers with owner capabilities
+* FIXED Owner dropdown not limited to users with owner capabilities
 * FIXED Rescheduling and canceling events in the admin screen not working.
 
 = 2.3.1 (2021-01-29) =
