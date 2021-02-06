@@ -1,0 +1,44 @@
+.contact-info-cards .stuffbox>h3, .contact-info-cards h2, .contact-info-cards h3.hndle {
+  font-size: 14px;
+  padding: 8px 12px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.info-card.closed .inside{
+  display: none;
+}
+
+.info-card button.toggle{
+  float: right;
+  background: transparent;
+  border: none;
+}
+
+.contact-info-cards .postbox {
+  margin-bottom: 10px;
+}
+
+.info-card ul.info-list{
+  margin-bottom: 0;
+}
+
+.info-card ul.info-list li:not(:last-child){
+  margin-bottom: 10px;
+}
+
+.info-card ul.info-list li span.label,
+.info-card ul.info-list li span.data{
+  display: block;
+}
+.info-card ul.info-list li span.label{
+  font-weight: 500;
+  color: #808080;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.info-card ul.info-list li span.data{
+  font-size: 16px;
+  color: #1b1b1b;
+}

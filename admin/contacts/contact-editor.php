@@ -2,8 +2,6 @@
 namespace Groundhogg\Admin\Contacts;
 
 use function Groundhogg\admin_page_url;
-use function Groundhogg\convert_to_local_time;
-use function Groundhogg\current_user_is;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_cookie;
 use function Groundhogg\get_date_time_format;
@@ -16,64 +14,15 @@ use Groundhogg\Contact;
 use Groundhogg\Preferences;
 use Groundhogg\Step;
 use Groundhogg\Submission;
-use function Groundhogg\key_to_words;
-
-/**
- * Edit a contact record via the Admin
- *
- * This page is AWESOME. It has 3 main functions....
- * 1. Provide a simple UI for editing the import contact details.
- * 2. Provide a simple UI for editing contact meta data (custom fields)
- * 3. Provide a simple UI for managing funnel events related to the contact.
- *
- * To add your own settings section there are a multitude of hooks to choose from.
- * The api to add settings sections is not complicated, but as a result you will be responsible for your own CSS & HTML
- * Your best option would be to do something like this...
- *
- * add_action( 'contact_edit_before_history', 'my_settings_section' ); ( $id )
- *
- *
- * This will add your section right above the funnel events history section.
- *
- * To save your custom information you will need to hook into the save method which you do by...
- *
- * add_action( 'admin_update_contact_after', 'my_save_function' ); ($id)
- *
- * And accessing the $_POST directly.
- *
- * @package     Admin
- * @subpackage  Admin/Contacts
- * @author      Adrian Tobey <info@groundhogg.io>
- * @copyright   Copyright (c) 2018, Groundhogg Inc.
- * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @see         WPGH_Contacts_Page::edit()
- * @since       File available since Release 0.1
- */
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$id = absint( get_request_var( 'contact' ) );
-
-$contact = Plugin::$instance->utils->get_contact( $id );
-
-if ( ! $contact || ! $contact->exists() ) {
-	wp_die( _x( 'This contact has been deleted.', 'contact_record', 'groundhogg' ) );
-}
-
-//include_once "class-wpgh-contact-activity-table.php";
-//include_once "class-wpgh-contact-events-table.php";
-
-/* Quit if */
-if ( current_user_is( 'sales_manager' ) ) {
-	if ( $contact->get_owner_id() !== get_current_user_id() ) {
-
-		wp_die( _x( 'You are not the owner of this contact.', 'contact_record', 'groundhogg' ) );
-
-	}
-}
+/**
+ * @var $contact Contact
+ */
 
 //var_dump( $contact );
 
@@ -94,12 +43,6 @@ $tabs       = apply_filters( 'groundhogg/admin/contact/record/tabs', $tabs );
 $cookie_tab = str_replace( 'tab_', '', get_cookie( 'gh_contact_tab', 'general' ) );
 $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 ?>
-<div class="local-time" style="float: right; padding: 10px;font-size: 18px;">
-	<?php _ex( 'Local Time:', 'groundhogg' ); ?>
-    <span style="font-family: Georgia, Times New Roman, Bitstream Charter, Times, serif;font-weight: 400;"><?php echo date_i18n( get_date_time_format(), $contact->get_local_time() ); ?>
-        </span>
-</div>
-
 <form method="post" class="" enctype="multipart/form-data">
 	<?php wp_nonce_field( 'edit' ); ?>
 

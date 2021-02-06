@@ -2,11 +2,28 @@
 
 namespace Groundhogg\Admin\Contacts;
 
-use Composer\Package\Package;
+
 use Groundhogg\Contact;
+use function Groundhogg\dashicon;
 use function Groundhogg\is_a_contact;
 
-class Info_Boxes {
+class Info_Cards {
+
+    public function __construct() {
+        add_action( 'admin_init', [ $this, 'register_core_cards' ] );
+    }
+
+    public function register_core_cards(){
+
+        self::register( 'user', __( 'WordPress User', 'groundhogg' ), '', function ( $contact ){
+            include __DIR__ . '/cards/user.php';
+        } );
+
+        self::register( 'files', __( 'Files', 'groundhogg' ), '', '__return_empty_string' );
+        self::register( 'activity', __( 'Activity', 'groundhogg' ), '', '__return_empty_string' );
+
+        do_action( 'groundhogg/admin/contacts/register_info_cards', $this );
+    }
 
 	/**
 	 * Static memory of the meta boxes
@@ -46,7 +63,7 @@ class Info_Boxes {
 	 *
 	 * @param $contact Contact
 	 */
-	public function do_info_boxes( $contact ) {
+	public static function do_info_cards( $contact ) {
 
 		if ( ! is_a_contact( $contact ) ) {
 			return;
@@ -71,10 +88,12 @@ class Info_Boxes {
 			extract( $info_box, EXTR_OVERWRITE );
 
 			if ( current_user_can( $capability ) ): ?>
-                <div class="postbox <?php esc_attr_e( $id ); ?>">
+                <div class="postbox info-card <?php esc_attr_e( $id ); ?>">
+	                <button class="toggle"><?php echo dashicon( 'arrow-up-alt2' ); ?></button>
                     <h3 class="hndle"><?php echo $title; ?></h3>
                     <div class="inside">
 						<?php call_user_func( $callback, $contact ); ?>
+                        <?php do_action( "groundhogg/admin/contact/info_card/{$id}", $contact ) ;?>
                     </div>
                 </div>
 			<?php endif;

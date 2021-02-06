@@ -5,6 +5,7 @@ namespace Groundhogg\Admin;
 use Groundhogg\Admin\Broadcasts\Broadcasts_Page;
 use Groundhogg\Admin\Bulk_Jobs\Bulk_Job_Page;
 use Groundhogg\Admin\Contacts\Contacts_Page;
+use Groundhogg\Admin\Contacts\Info_Cards;
 use Groundhogg\Admin\Dashboard\Dashboard_Widgets;
 use Groundhogg\Admin\Emails\Emails_Page;
 use Groundhogg\Admin\Events\Events_Page;
@@ -80,6 +81,7 @@ class Admin_Menu {
 
 		// user profile edits...
 		new Admin_User();
+		new Info_Cards();
 
 		do_action( 'groundhogg/admin/init', $this );
 	}

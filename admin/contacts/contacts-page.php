@@ -111,6 +111,7 @@ class Contacts_Page extends Admin_Page {
 
 		if ( $this->get_current_action() === 'edit' || $this->get_current_action() === 'add' || $this->get_current_action() === 'form' ) {
 			wp_enqueue_style( 'groundhogg-admin-contact-editor' );
+			wp_enqueue_style( 'groundhogg-admin-contact-info-cards' );
 			wp_enqueue_script( 'groundhogg-admin-contact-editor' );
 			wp_localize_script( 'groundhogg-admin-contact-editor', 'ContactEditor', [
 				'contact_id'       => absint( get_url_var( 'contact' ) ),
@@ -1201,7 +1202,7 @@ class Contacts_Page extends Admin_Page {
 		if ( ! current_user_can( 'view_contacts' ) ) {
 			$this->wp_die_no_access();
 		}
-		include __DIR__ . '/contact-editor.php';
+		include __DIR__ . '/edit.php';
 	}
 
 	/**
