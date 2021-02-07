@@ -14,7 +14,11 @@ registerReportsPanel('funnels', {
     'chart_funnel_breakdown',
     'total_new_contacts',
     'total_funnel_conversion_rate',
-    'total_abandonment_rate'
+    'total_abandonment_rate',
+    'table_top_performing_emails',
+    'table_worst_performing_emails',
+    'table_benchmark_conversion_rate',
+    'table_form_activity'
   ],
   layout: ({
     reports,
@@ -23,9 +27,13 @@ registerReportsPanel('funnels', {
 
     const {
       chart_funnel_breakdown,
-      total_new_contacts,
-      total_funnel_conversion_rate,
-      total_abandonment_rate
+      // total_new_contacts,
+      // total_funnel_conversion_rate,
+      // total_abandonment_rate,
+      table_top_performing_emails,
+      table_worst_performing_emails,
+      table_benchmark_conversion_rate,
+      table_form_activity,
     } = reports
 
     return (
@@ -67,6 +75,38 @@ registerReportsPanel('funnels', {
               data={!isLoading ? total_abandonment_rate : {}}
               loading={isLoading}
               icon={<ContactMailIcon />}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <ReportTable
+              title={"Top Performing Emails"}
+              id={"table_top_performing_emails"}
+              data={!isLoading ? table_top_performing_emails : {}}
+              loading={isLoading}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <ReportTable
+              title={"Worst Performing Emails"}
+              id={"table_worst_performing_emails"}
+              data={!isLoading ? table_worst_performing_emails : {}}
+              loading={isLoading}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <ReportTable
+              title={"Benchmark Converstion Rate"}
+              id={"table_benchmark_conversion_rate"}
+              data={!isLoading ? table_benchmark_conversion_rate : {}}
+              loading={isLoading}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <ReportTable
+              title={"Top Performing Emails"}
+              id={"table_top_performing_emails"}
+              data={!isLoading ? table_top_performing_emails : {}}
+              loading={isLoading}
             />
           </Grid>
         </Grid>

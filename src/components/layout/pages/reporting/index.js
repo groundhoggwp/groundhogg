@@ -30,7 +30,6 @@ const useStyles = makeStyles((theme) => ({
 export const ReportsPage = () => {
   const panels = getReportPanels()
 
-  console.log(panels)
   return (
     <>
       <HashRouter>
@@ -68,6 +67,7 @@ const ReportPanel = (props) => {
 
       return {
         reports: store.getItems({
+          // reports: [],
           reports: Panel.reports,
           start: startDate,
           end: endDate,
@@ -165,6 +165,7 @@ const ReportPanel = (props) => {
       // setIsRequestingItems(false);
     }
 
+    console.log('report', reports)
 
   return (
     <>
