@@ -24,6 +24,7 @@ const dummyData = {
 }
 
 export const QuickStat = ({ className,  title, data, icon, loading, ...rest }) => {
+  return <div/>;
   const chartData = loading ? dummyData : data
 
   const useStyles = makeStyles((theme) => ({
