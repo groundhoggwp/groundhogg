@@ -45,6 +45,7 @@ import Sidebar from "./components/sidebar";
 import BlockEditor from "./components/block-editor";
 import TextEditor from "./components/text-editor";
 import { getLuxonDate, matchEmailRegex } from "utils/index";
+import Breadcrumb from "../bread-crumb";
 
 import { CORE_STORE_NAME, EMAILS_STORE_NAME } from "data";
 
@@ -330,47 +331,50 @@ export default ({ settings, email, history }) => {
   console.log('rebuild', blocks)
 
   return (
-    <div className="Groundhogg-BlockEditor">
-      <FullscreenMode isActive={false} />
-      <SlotFillProvider>
-        <DropZoneProvider>
-          <FocusReturnProvider>
-            <InterfaceSkeleton
-              header={
-                <Header
-                  email={email}
-                  history={history}
-                  saveDraft={saveDraft}
-                  publishEmail={publishEmail}
-                  closeEditor={closeEditor}
-                  isSaving={isSaving}
-                  title={title}
-                  handleTitleChange={handleTitleChange}
-                  handleViewTypeChange={handleViewTypeChange}
-                  sendTestEmail={sendTestEmail}
-                  handleTestEmailChange={handleTestEmailChange}
-                  altBodyContent={altBodyContent}
-                  handleAltBodyContent={handleAltBodyContent}
-                  altBodyEnable={altBodyEnable}
-                  handleAltBodyEnable={handleAltBodyEnable}
-                />
-              }
-              sidebar={
-                <>
-                  <Sidebar />
-                  <ComplementaryArea.Slot scope="gh/v4/core" />
-                </>
-              }
-              content={
-                <>
-                  <Notices />
-                  {editorPanel}
-                </>
-              }
-            />
-          </FocusReturnProvider>
-        </DropZoneProvider>
-      </SlotFillProvider>
-    </div>
+    <>
+      <Breadcrumb path={['Email Editor', title]}/>
+      <div className="Groundhogg-BlockEditor">
+        <FullscreenMode isActive={false} />
+        <SlotFillProvider>
+          <DropZoneProvider>
+            <FocusReturnProvider>
+              <InterfaceSkeleton
+                header={
+                  <Header
+                    email={email}
+                    history={history}
+                    saveDraft={saveDraft}
+                    publishEmail={publishEmail}
+                    closeEditor={closeEditor}
+                    isSaving={isSaving}
+                    title={title}
+                    handleTitleChange={handleTitleChange}
+                    handleViewTypeChange={handleViewTypeChange}
+                    sendTestEmail={sendTestEmail}
+                    handleTestEmailChange={handleTestEmailChange}
+                    altBodyContent={altBodyContent}
+                    handleAltBodyContent={handleAltBodyContent}
+                    altBodyEnable={altBodyEnable}
+                    handleAltBodyEnable={handleAltBodyEnable}
+                  />
+                }
+                sidebar={
+                  <>
+                    <Sidebar />
+                    <ComplementaryArea.Slot scope="gh/v4/core" />
+                  </>
+                }
+                content={
+                  <>
+                    <Notices />
+                    {editorPanel}
+                  </>
+                }
+              />
+            </FocusReturnProvider>
+          </DropZoneProvider>
+        </SlotFillProvider>
+      </div>
+    </>
   );
 };

@@ -27,8 +27,13 @@ import { Spinner } from "components";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: "calc(100% - 19px)",
+    // width: "calc(100% - 19px)",
     overflow: "visible",
+    borderRadius: "5px",
+    padding: "20px",
+  },
+  button:{
+    color: '#fff'
   },
   inserterBtn: {
     backgroundColor: theme.palette.secondary.main,
@@ -83,13 +88,13 @@ export default function Header({
           </h1>
           <div className="groundhogg-header__settings edit-post-header__settings">
             {isSaving && <Spinner />}
-            <Button onClick={saveDraft} variant="contained" color="secondary">
+            <Button className={classes.button} onClick={saveDraft} variant="contained" color="secondary">
               {__("Save Draft")}
             </Button>
-            <Button onClick={publishEmail} variant="contained" color="primary">
+            <Button className={classes.button} onClick={publishEmail} variant="contained" color="primary">
               {__("Publish")}
             </Button>
-            <Button onClick={closeEditor} variant="contained" color="secondary">
+            <Button className={classes.button} onClick={closeEditor} variant="contained" color="secondary">
               {__("Close")}
             </Button>
             <PinnedItems.Slot scope="gh/v4/core" />

@@ -50,7 +50,7 @@
 }
 
 .groundhogg-block-editor {
-  top: 129px;
+  top: 173px;
   padding-bottom: 280px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -58,9 +58,9 @@
 
 // Custom CSS Begins
 .interface-interface-skeleton {
-  top: 100px;
-  left: 115px;
-  max-width: 1600px;
+  top: 90px;
+  left: 180px !important;
+  width: calc(100% - 200px);
 }
 .edit-post-text-editor {
   position: relative;
