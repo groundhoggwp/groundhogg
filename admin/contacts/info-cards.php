@@ -9,21 +9,21 @@ use function Groundhogg\is_a_contact;
 
 class Info_Cards {
 
-    public function __construct() {
-        add_action( 'admin_init', [ $this, 'register_core_cards' ] );
-    }
+	public function __construct() {
+		add_action( 'admin_init', [ $this, 'register_core_cards' ] );
+	}
 
-    public function register_core_cards(){
+	public function register_core_cards() {
 
-        self::register( 'user', __( 'WordPress User', 'groundhogg' ), '', function ( $contact ){
-            include __DIR__ . '/cards/user.php';
-        } );
+		self::register( 'user', __( 'WordPress User', 'groundhogg' ), '', function ( $contact ) {
+			include __DIR__ . '/cards/user.php';
+		} );
 
-        self::register( 'files', __( 'Files', 'groundhogg' ), '', '__return_empty_string' );
-        self::register( 'activity', __( 'Activity', 'groundhogg' ), '', '__return_empty_string' );
+		self::register( 'files', __( 'Files', 'groundhogg' ), '', '__return_empty_string' );
+		self::register( 'activity', __( 'Activity', 'groundhogg' ), '', '__return_empty_string' );
 
-        do_action( 'groundhogg/admin/contacts/register_info_cards', $this );
-    }
+		do_action( 'groundhogg/admin/contacts/register_info_cards', $this );
+	}
 
 	/**
 	 * Static memory of the meta boxes
@@ -88,12 +88,32 @@ class Info_Cards {
 			extract( $info_box, EXTR_OVERWRITE );
 
 			if ( current_user_can( $capability ) ): ?>
-                <div class="postbox info-card <?php esc_attr_e( $id ); ?>">
-	                <button class="toggle"><?php echo dashicon( 'arrow-up-alt2' ); ?></button>
-                    <h3 class="hndle"><?php echo $title; ?></h3>
+                <div id=<?php esc_attr_e( $id ); ?>"" class="postbox info-card <?php esc_attr_e( $id ); ?>">
+                    <div class="postbox-header">
+                        <h2 class="hndle ui-sortable-handle"><?php echo $title; ?></h2>
+                        <div class="handle-actions hide-if-no-js">
+                            <button type="button" class="handle-order-higher" aria-disabled="false"
+                                    aria-describedby="pageparentdiv-handle-order-higher-description"><span
+                                        class="screen-reader-text"><?php _e( 'Move up' ); ?></span><span
+                                        class="order-higher-indicator"
+                                        aria-hidden="true"></span></button>
+                            <span class="hidden"
+                                  id="pageparentdiv-handle-order-higher-description"><?php _e( 'Move info box up', 'groundhogg' ); ?></span>
+                            <button type="button" class="handle-order-lower" aria-disabled="false"
+                                    aria-describedby="pageparentdiv-handle-order-lower-description"><span
+                                        class="screen-reader-text"><?php _e( 'Move down' ); ?></span><span
+                                        class="order-lower-indicator"
+                                        aria-hidden="true"></span></button>
+                            <span class="hidden"
+                                  id="pageparentdiv-handle-order-lower-description"><?php _e( 'Move info box down', 'grounhogg' ); ?></span>
+                            <button type="button" class="handlediv" aria-expanded="true"><span
+                                        class="screen-reader-text"><?php _e( 'Toggle info box panel', 'grounhogg' ); ?></span><span
+                                        class="toggle-indicator" aria-hidden="true"></span></button>
+                        </div>
+                    </div>
                     <div class="inside">
 						<?php call_user_func( $callback, $contact ); ?>
-                        <?php do_action( "groundhogg/admin/contact/info_card/{$id}", $contact ) ;?>
+						<?php do_action( "groundhogg/admin/contact/info_card/{$id}", $contact ); ?>
                     </div>
                 </div>
 			<?php endif;

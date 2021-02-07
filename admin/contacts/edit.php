@@ -30,7 +30,7 @@ if ( current_user_is( 'sales_manager' ) ) {
 	<div class="contact-editor-wrap">
 		<?php include __DIR__ . '/contact-editor.php'; ?>
 	</div>
-	<div class="contact-info-cards">
+	<div class="contact-info-cards meta-box-sortables">
 		<?php Info_Cards::do_info_cards( $contact ); ?>
 	</div>
 </div>
