@@ -62,10 +62,10 @@ const useStyles = makeStyles((theme) => ({
 export default function ScrollableTabsButtonAuto( { tabs, tabRoute, handleChangeHook  } ) {
   const classes = useStyles();
 
-  // const handleChange = (event, newValue) => {
-  //   handleChangeHook(tabs[newValue].route);
-  // };
-
+  const handleChange = (event, newValue) => {
+    handleChangeHook(tabs[newValue].route);
+  };
+  
   let currentTab = 0;
   tabs.forEach((tab,i)=>{
     if(tab.route === tabRoute){
@@ -80,7 +80,7 @@ export default function ScrollableTabsButtonAuto( { tabs, tabRoute, handleChange
         <Tabs
           className={classes.tabBar}
           value={currentTab}
-          onChange={handleChangeHook}
+          onChange={handleChange}
           indicatorColor="primary"
           textColor="primary"
           variant="scrollable"

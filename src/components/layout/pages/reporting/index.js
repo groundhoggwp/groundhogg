@@ -15,7 +15,6 @@ import {getLuxonDate} from "utils/index";
 import TabPanel from "../../../core-ui/tab-panel";
 import Breadcrumb from "../../../core-ui/bread-crumb";
 
-let report = 'overview'
 const useStyles = makeStyles((theme) => ({
   datePickers:{
     float: 'right',
@@ -56,22 +55,17 @@ const ReportPanel = (props) => {
   const history = useHistory();
   const location = useLocation();
 
-  // const [report, setReport] = useState(location.pathname.replace('/',''));
+  const [report, setReport] = useState(location.pathname.replace('/',''));
   const [startDate, setStartDate] = useState(getLuxonDate('one_year_back'));
   const [endDate, setEndDate] = useState(getLuxonDate('today'));
 
   const Panel = getReportPanel(report || 'overview' )
 
-  let { reports, isRequesting } = useSelect(
+  const { reports, isRequesting } = useSelect(
     (select) => {
 
       const store = select(REPORTS_STORE_NAME);
-      const reporTesteing = store.getItems({
-        reports: Panel.reports,
-        start: startDate,
-        end: endDate,
-      });
-      console.log('the reports', report, location.pathname.replace('/',''), reporTesteing.length)
+
       return {
         reports: store.getItems({
           reports: Panel.reports,
@@ -83,15 +77,6 @@ const ReportPanel = (props) => {
     }
     , [])
 
-    const dateChange = (id, newValue)  => {
-      if (id === 'start'){
-        setStartDate(newValue);
-      } else {
-        setEndDate(newValue);
-      }
-    }
-
-    // console.log('select runnnn', report, reports)
      const panel = <>
        <Breadcrumb path={['Reporting', Panel.name]}/>
        <div className={classes.datePickers}>
@@ -155,23 +140,29 @@ const ReportPanel = (props) => {
       }
     ]
 
+    const dateChange = (id, newValue)  => {
+      if (id === 'start'){
+        setStartDate(newValue);
+      } else {
+        setEndDate(newValue);
+      }
+    }
 
     const {setIsRequestingItems} = useDispatch(REPORTS_STORE_NAME)
 
-    const tabsHandleChange = (event, value)  => {
+    const tabsHandleChange = (value)  => {
 
-      let newReport = 'overview'
+      let newCurrentTab = 0;
       tabs.forEach((tab,i)=>{
-        if(i === value){
-          newReport = tab.route;
+        if(tab.route === value){
+          newCurrentTab = i
           history.push(tab.route)
         }
       });
 
-      report = newReport
       setIsRequestingItems(true);
-      // setReport(newReport);
-
+      setReport(value);
+      // setIsRequestingItems(false);
     }
 
 

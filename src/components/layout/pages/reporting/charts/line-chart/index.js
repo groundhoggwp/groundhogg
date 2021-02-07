@@ -22,8 +22,7 @@ const useStyles = makeStyles(() => ({
 
 export const LineChart = ({ className, title, data, loading, ...rest }) => {
 
-  console.log('line chart', loading, data)
-  return <div/>;
+
   if(loading){
     return <div/>
   }
@@ -31,7 +30,7 @@ export const LineChart = ({ className, title, data, loading, ...rest }) => {
   const classes = useStyles();
   const chartJSData = {
     data: data.chart.data.datasets,
-    labels: data.chart.data.datasets[0].data.map((datum)=>{
+    labels: data.chart.data.datasets[0].data.map((datum)=>{      
       return datum.t
     })
   };

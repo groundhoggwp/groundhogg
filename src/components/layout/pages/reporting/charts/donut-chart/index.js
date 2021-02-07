@@ -36,7 +36,6 @@ export const DonutChart = ({
   loading,
   ...rest
 }) => {
-  return <div/>;
   if (loading) {
     return <div />;
   }
@@ -45,7 +44,26 @@ export const DonutChart = ({
 
   return (
     <Card className={clsx(classes.root, className)} {...rest}>
-
+      <CardHeader title={title} />
+      <Divider />
+      <Box p={3} position="relative" minHeight={320}>
+        <Chart data={data.chart.data} />
+      </Box>
+      <Divider />
+      <PerfectScrollbar>
+        <Box display="flex">
+          {data.chart.data.labels.map((label, i) => (
+            <div key={label} className={classes.item}>
+              <Typography variant="h4" color="textPrimary">
+                {data.chart.data.datasets[0].data[i]}
+              </Typography>
+              <Typography variant="overline" color="textSecondary">
+                {label}
+              </Typography>
+            </div>
+          ))}
+        </Box>
+      </PerfectScrollbar>
     </Card>
   );
 };

@@ -18,8 +18,6 @@ function titleCase(str) {
 }
 
 const ReportTable = ({title, data, gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd, fullWidth}) => {
-
-  return <div/>;
   const useStyles = makeStyles({
     root:{
       position:'relative',

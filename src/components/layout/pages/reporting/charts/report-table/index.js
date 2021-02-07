@@ -39,7 +39,6 @@ const useStyles = makeStyles(() => ({
 export const ReportTable = ({ className, title, data, loading, ...rest }) => {
   const classes = useStyles();
 
-  return <div/>
   // const columns = Object.keys(data.chart.data[0]).map((label, i) => {
   //   // The server data model isn't ideal for this component, sometimes labels are valid and exist
   //   // Sometimes they need to be inferred from row data.
