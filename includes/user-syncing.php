@@ -76,6 +76,7 @@ class User_Syncing {
 			'show_welcome_panel',
 			'session_tokens',
 			'wp_dashboard_quick_press_last_post_id',
+			'groundhogg_info_card_order',
 		];
 
 		return in_array( $meta_key, $keys );

@@ -5,16 +5,6 @@
   line-height: 1.4;
 }
 
-.info-card.closed .inside{
-  display: none;
-}
-
-.info-card button.toggle{
-  float: right;
-  background: transparent;
-  border: none;
-}
-
 .contact-info-cards .postbox {
   margin-bottom: 10px;
 }

@@ -5,14 +5,38 @@ namespace Groundhogg\Admin\Contacts;
 
 use Groundhogg\Contact;
 use function Groundhogg\dashicon;
+use function Groundhogg\get_post_var;
 use function Groundhogg\is_a_contact;
+use function Groundhogg\isset_not_empty;
 
 class Info_Cards {
 
 	public function __construct() {
 		add_action( 'admin_init', [ $this, 'register_core_cards' ] );
+		add_action( 'wp_ajax_groundhogg_save_card_order', [ $this, 'save_card_atts' ] );
 	}
 
+	/**
+	 * Save the user card info to the user meta when they change the order of the cards in the UI
+	 */
+	public function save_card_atts() {
+		if ( ! current_user_can( 'view_contacts' ) ) {
+			return;
+		}
+
+		$card_order = array_map( function ( $card_atts ) {
+			return [
+				'id'   => sanitize_key( $card_atts['id'] ),
+				'open' => $card_atts['open'] !== 'false',
+			];
+		}, get_post_var( 'cardOrder', [] ) );
+
+		update_user_meta( get_current_user_id(), 'groundhogg_info_card_order', $card_order );
+	}
+
+	/**
+	 * Register the core cards
+	 */
 	public function register_core_cards() {
 
 		self::register( 'user', __( 'WordPress User', 'groundhogg' ), '', function ( $contact ) {
@@ -30,7 +54,7 @@ class Info_Cards {
 	 *
 	 * @var array[]
 	 */
-	public static $info_boxes = [];
+	public static $info_cards = [];
 
 	/**
 	 * Register a new info box.
@@ -48,7 +72,7 @@ class Info_Cards {
 			return;
 		}
 
-		self::$info_boxes[ sanitize_key( $id ) ] = [
+		self::$info_cards[ sanitize_key( $id ) ] = [
 			'id'         => sanitize_key( $id ),
 			'title'      => $title,
 			'icon'       => $icon,
@@ -69,12 +93,36 @@ class Info_Cards {
 			return;
 		}
 
+		$user_info_card_atts = get_user_meta( get_current_user_id(), 'groundhogg_info_card_order', true );
+		$priority            = 0;
+
+		if ( ! empty( $user_info_card_atts ) && is_array( $user_info_card_atts ) ){
+			foreach ( $user_info_card_atts as $card_atts ) {
+
+				$card_atts = wp_parse_args( $card_atts, [
+					'id'   => '',
+					'open' => true,
+				] );
+
+				if ( ! isset_not_empty( self::$info_cards, $card_atts['id'] ) ) {
+					continue;
+				}
+
+				self::$info_cards[ $card_atts['id'] ]['priority'] = $priority;
+				self::$info_cards[ $card_atts['id'] ]['open']     = $card_atts['open'];
+
+				$priority += 100;
+			}
+		}
+
+		// Override any existing priority with the users.
+
 		// Sort the meta boxes by priority
-		usort( self::$info_boxes, function ( $a, $b ) {
+		usort( self::$info_cards, function ( $a, $b ) {
 			return $a['priority'] - $b['priority'];
 		} );
 
-		foreach ( self::$info_boxes as $info_box ):
+		foreach ( self::$info_cards as $info_card ):
 
 			/**
 			 * @var int $id
@@ -83,32 +131,38 @@ class Info_Cards {
 			 * @var callable $callback
 			 * @var int $priority
 			 * @var string $capability
+			 * @var bool $open
 			 */
 
-			extract( $info_box, EXTR_OVERWRITE );
+			extract( $info_card, EXTR_OVERWRITE );
 
 			if ( current_user_can( $capability ) ): ?>
-                <div id=<?php esc_attr_e( $id ); ?>"" class="postbox info-card <?php esc_attr_e( $id ); ?>">
+                <div id="<?php esc_attr_e( $id ); ?>" class="postbox info-card <?php esc_attr_e( $id ); ?> <?php esc_attr_e( ! $open ? 'closed' : '' ); ?>">
                     <div class="postbox-header">
-                        <h2 class="hndle ui-sortable-handle"><?php echo $title; ?></h2>
+                        <h2 class="hndle"><?php echo $title; ?></h2>
                         <div class="handle-actions hide-if-no-js">
                             <button type="button" class="handle-order-higher" aria-disabled="false"
-                                    aria-describedby="pageparentdiv-handle-order-higher-description"><span
-                                        class="screen-reader-text"><?php _e( 'Move up' ); ?></span><span
-                                        class="order-higher-indicator"
-                                        aria-hidden="true"></span></button>
-                            <span class="hidden"
-                                  id="pageparentdiv-handle-order-higher-description"><?php _e( 'Move info box up', 'groundhogg' ); ?></span>
+                                    aria-describedby="<?php esc_attr_e( $id ); ?>-handle-order-higher-description">
+                                <span class="screen-reader-text"><?php _e( 'Move up' ); ?></span>
+                                <span class="order-higher-indicator" aria-hidden="true"></span>
+                            </button>
+                            <span class="hidden" id="pageparentdiv-handle-order-higher-description">
+                                <?php _e( 'Move info box up', 'groundhogg' ); ?>
+                            </span>
                             <button type="button" class="handle-order-lower" aria-disabled="false"
-                                    aria-describedby="pageparentdiv-handle-order-lower-description"><span
-                                        class="screen-reader-text"><?php _e( 'Move down' ); ?></span><span
-                                        class="order-lower-indicator"
-                                        aria-hidden="true"></span></button>
-                            <span class="hidden"
-                                  id="pageparentdiv-handle-order-lower-description"><?php _e( 'Move info box down', 'grounhogg' ); ?></span>
-                            <button type="button" class="handlediv" aria-expanded="true"><span
-                                        class="screen-reader-text"><?php _e( 'Toggle info box panel', 'grounhogg' ); ?></span><span
-                                        class="toggle-indicator" aria-hidden="true"></span></button>
+                                    aria-describedby="<?php esc_attr_e( $id ); ?>-handle-order-lower-description">
+                                <span class="screen-reader-text"><?php _e( 'Move down' ); ?></span>
+                                <span class="order-lower-indicator" aria-hidden="true"></span>
+                            </button>
+                            <span class="hidden" id="<?php esc_attr_e( $id ); ?>-handle-order-lower-description">
+                                <?php _e( 'Move info box down', 'grounhogg' ); ?>
+                            </span>
+                            <button type="button" class="handlediv" aria-expanded="true">
+                                <span class="screen-reader-text">
+                                    <?php _e( 'Toggle info box panel', 'grounhogg' ); ?>
+                                </span>
+                                <span class="toggle-indicator" aria-hidden="true"></span>
+                            </button>
                         </div>
                     </div>
                     <div class="inside">
