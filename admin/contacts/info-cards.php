@@ -4,7 +4,6 @@ namespace Groundhogg\Admin\Contacts;
 
 
 use Groundhogg\Contact;
-use function Groundhogg\dashicon;
 use function Groundhogg\get_post_var;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\isset_not_empty;
@@ -96,7 +95,7 @@ class Info_Cards {
 		$user_info_card_atts = get_user_meta( get_current_user_id(), 'groundhogg_info_card_order', true );
 		$priority            = 0;
 
-		if ( ! empty( $user_info_card_atts ) && is_array( $user_info_card_atts ) ){
+		if ( ! empty( $user_info_card_atts ) && is_array( $user_info_card_atts ) ) {
 			foreach ( $user_info_card_atts as $card_atts ) {
 
 				$card_atts = wp_parse_args( $card_atts, [
@@ -124,6 +123,11 @@ class Info_Cards {
 
 		foreach ( self::$info_cards as $info_card ):
 
+			$info_card = wp_parse_args( $info_card, [
+				'priority' => 100,
+				'open'     => true,
+			] );
+
 			/**
 			 * @var int $id
 			 * @var string $title
@@ -137,7 +141,8 @@ class Info_Cards {
 			extract( $info_card, EXTR_OVERWRITE );
 
 			if ( current_user_can( $capability ) ): ?>
-                <div id="<?php esc_attr_e( $id ); ?>" class="postbox info-card <?php esc_attr_e( $id ); ?> <?php esc_attr_e( ! $open ? 'closed' : '' ); ?>">
+                <div id="<?php esc_attr_e( $id ); ?>"
+                     class="postbox info-card <?php esc_attr_e( $id ); ?> <?php esc_attr_e( ! $open ? 'closed' : '' ); ?>">
                     <div class="postbox-header">
                         <h2 class="hndle"><?php echo $title; ?></h2>
                         <div class="handle-actions hide-if-no-js">
