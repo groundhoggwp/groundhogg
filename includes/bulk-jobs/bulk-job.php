@@ -172,12 +172,11 @@ abstract class Bulk_Job {
 
 		if ( filter_var( $the_end, FILTER_VALIDATE_BOOLEAN ) ) {
 
-			$this->clean_up();
-
 			$response['return_url'] = $this->get_return_url();
 
 			Plugin::instance()->notices->add( 'finished', $this->get_finished_notice() );
 
+			$this->clean_up();
 		}
 
 		$this->send_response( $response );

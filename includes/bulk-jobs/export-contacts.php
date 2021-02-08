@@ -5,10 +5,13 @@ namespace Groundhogg\Bulk_Jobs;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use function Groundhogg\encrypt;
+use function Groundhogg\export_field;
 use function Groundhogg\file_access_url;
+use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
+use function Groundhogg\is_a_contact;
 use function Groundhogg\multi_implode;
 use Groundhogg\Plugin;
 
@@ -48,7 +51,7 @@ class Export_Contacts extends Bulk_Job {
 		$args  = get_request_var( 'query' );
 
 		// Backwards compat
-		if ( empty( $args ) ){
+		if ( empty( $args ) ) {
 			$args = get_request_query();
 		}
 
@@ -85,30 +88,17 @@ class Export_Contacts extends Bulk_Job {
 
 		$line = [];
 
-		$contact = Plugin::$instance->utils->get_contact( absint( $item ) );
+		$contact = get_contactdata( absint( $item ) );
 
-		if ( $contact ) {
-
-			foreach ( $this->headers as $header ) {
-
-				if ( $header === 'tags' ) {
-
-					$raw_tags = get_db( 'tags' )->query( [ 'tag_id' => $contact->get_tags() ] );
-
-					if ( $raw_tags ) {
-						$names  = wp_list_pluck( $raw_tags, 'tag_name' );
-						$line[] = implode( ',', $names );
-					}
-
-				} else {
-					$line[] = is_array( $contact->$header ) ? multi_implode( ',', $contact->$header ) : $contact->$header;
-				}
-			}
-
-			fputcsv( $this->fp, $line );
-
+		if ( ! is_a_contact( $contact ) ) {
+			return;
 		}
 
+		foreach ( $this->headers as $header ) {
+			$line[] = export_field( $contact, $header );
+		}
+
+		fputcsv( $this->fp, $line );
 	}
 
 	/**

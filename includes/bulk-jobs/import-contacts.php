@@ -4,11 +4,14 @@ namespace Groundhogg\Bulk_Jobs;
 
 use function Groundhogg\admin_page_url;
 use function Groundhogg\generate_contact_with_map;
+use function Groundhogg\get_db;
 use function Groundhogg\get_items_from_csv;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 use function Groundhogg\get_url_var;
 use function Groundhogg\guided_setup_finished;
+use function Groundhogg\is_a_contact;
+use function Groundhogg\isset_not_empty;
 use function Groundhogg\recount_tag_contacts_count;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -19,7 +22,7 @@ class Import_Contacts extends Bulk_Job {
 
 	protected $field_map = [];
 	protected $import_tags = [];
-	protected $confirm_contacts = false;
+	protected $compliance = [];
 
 	/**
 	 * Get the action reference.
@@ -81,14 +84,23 @@ class Import_Contacts extends Bulk_Job {
 	 * @throws \Exception
 	 */
 	protected function process_item( $item ) {
+
+		if ( isset_not_empty( $this->compliance, 'is_confirmed' ) ){
+			$item[ 'optin_status' ] = Preferences::CONFIRMED;
+		}
+
+		if ( isset_not_empty( $this->compliance, 'gdpr_consent' ) ){
+			$item[ 'gdpr_consent' ] = 'yes';
+		}
+
+		if ( isset_not_empty( $this->compliance, 'marketing_consent' ) ){
+			$item[ 'marketing_consent' ] = 'yes';
+		}
+
 		$contact = generate_contact_with_map( $item, $this->field_map );
 
-		if ( $contact ) {
+		if ( is_a_contact( $contact ) ) {
 			$contact->apply_tag( $this->import_tags );
-
-			if ( $this->confirm_contacts ) {
-				$contact->change_marketing_preference( Preferences::CONFIRMED );
-			}
 		}
 	}
 
@@ -98,9 +110,22 @@ class Import_Contacts extends Bulk_Job {
 	 * @return void
 	 */
 	protected function pre_loop() {
-		$this->field_map        = Plugin::$instance->settings->get_transient( 'gh_import_map' );
-		$this->import_tags      = wp_parse_id_list( Plugin::$instance->settings->get_transient( 'gh_import_tags' ) );
-		$this->confirm_contacts = Plugin::$instance->settings->get_transient( 'gh_import_confirm_contacts' );
+		$this->field_map   = get_transient( 'gh_import_map' );
+		$this->import_tags = get_transient( 'gh_import_tags' );
+		$this->compliance  = get_transient( 'gh_import_compliance' );
+
+		if ( isset_not_empty( $this->compliance, 'is_confirmed' ) ){
+			$this->field_map[ 'optin_status' ] = 'optin_status';
+		}
+
+		if ( isset_not_empty( $this->compliance, 'gdpr_consent' ) ){
+			$this->field_map[ 'gdpr_consent' ] = 'gdpr_consent';
+		}
+
+		if ( isset_not_empty( $this->compliance, 'marketing_consent' ) ){
+			$this->field_map[ 'marketing_consent' ] = 'marketing_consent';
+		}
+
 	}
 
 	/**
@@ -119,9 +144,24 @@ class Import_Contacts extends Bulk_Job {
 	protected function clean_up() {
 		Plugin::$instance->settings->delete_transient( 'gh_import_map' );
 		Plugin::$instance->settings->delete_transient( 'gh_import_tags' );
-		Plugin::$instance->settings->delete_transient( 'gh_import_confirm_contacts' );
+		Plugin::$instance->settings->delete_transient( 'gh_import_compliance' );
 
 		recount_tag_contacts_count();
+	}
+
+	/**
+	 * Display the total import count.
+	 *
+	 * @return string
+	 */
+	protected function get_finished_notice() {
+
+		$total_contacts_imported = get_db( 'contacts' )->count( [
+			'tags_include'           => $this->import_tags,
+			'tags_include_needs_all' => 1,
+		] );
+
+		return sprintf( _n( '%s contact imported!', '%s contacts imported!', $total_contacts_imported, 'groundhogg' ), number_format_i18n( $total_contacts_imported ) );
 	}
 
 	/**
@@ -130,6 +170,9 @@ class Import_Contacts extends Bulk_Job {
 	 * @return string
 	 */
 	protected function get_return_url() {
-		return admin_page_url( 'gh_contacts' );
+		return admin_page_url( 'gh_contacts', [
+			'tags_include'           => $this->import_tags,
+			'tags_include_needs_all' => 1,
+		] );
 	}
 }

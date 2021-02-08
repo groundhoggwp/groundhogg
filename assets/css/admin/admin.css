@@ -335,7 +335,7 @@ input[type=range].slider:focus::-ms-fill-upper {
     top: 10px;
 }
 
-.gh-tools-wrap p.tools-help{
+.gh-tools-wrap p.tools-help {
     color: #555d66;
     font-size: 18px;
     font-style: normal;
@@ -378,4 +378,28 @@ table.wp-list-table.funnels td.column-active_contacts {
 
 #wpbody .dash-button .dashicons {
     vertical-align: middle;
+}
+
+.import-table.tablenav,
+.import-table.wp-list-table{
+    max-width: 800px;
+}
+
+.import-table.wp-list-table th:first-child {
+    width: 200px;
+}
+.import-table.wp-list-table th:last-child {
+    width: 210px;
+}
+
+.import-table td .regular-text{
+    width: 100%;
+}
+
+.export-table.wp-list-table{
+    max-width: 600px;
+}
+
+.export-table.wp-list-table th:first-child {
+    /*width: 50px;*/
 }

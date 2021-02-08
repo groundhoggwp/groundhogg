@@ -19,7 +19,7 @@ class Preferences {
 
 		// Do last so precedence is given to Groundhogg
 		add_filter( 'template_include', [ $this, 'template_include' ], 99 );
-		add_action( 'groundhogg/tracking/email/click', [ $this, 'set_temp_preferences_permissions_cookie' ] );
+//		add_action( 'groundhogg/tracking/email/click', [ $this, 'set_temp_preferences_permissions_cookie' ] );
 	}
 
 	/**

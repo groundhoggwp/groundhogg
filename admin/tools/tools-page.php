@@ -13,6 +13,8 @@ use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
+use function Groundhogg\get_exportable_fields;
+use function Groundhogg\get_mappable_fields;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
@@ -26,6 +28,7 @@ use function Groundhogg\key_to_words;
 use function Groundhogg\nonce_url_no_amp;
 use function Groundhogg\notices;
 use function Groundhogg\uninstall_gh_cron_file;
+use function Groundhogg\validate_tags;
 use function Groundhogg\white_labeled_name;
 use function set_transient;
 
@@ -152,7 +155,8 @@ class Tools_Page extends Tabbed_Admin_Page {
 			];
 		}
 
-		$actions = apply_filters( 'groundhogg/admin/tools/title_action', $actions , $this );
+		$actions = apply_filters( 'groundhogg/admin/tools/title_action', $actions, $this );
+
 		return $actions;
 
 	}
@@ -162,7 +166,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 			[
 				'name' => __( 'System Info & Debug' ),
 				'slug' => 'system',
-                'cap'  => 'manage_options'
+				'cap'  => 'manage_options'
 			],
 			[
 				'name' => __( 'Import' ),
@@ -567,14 +571,15 @@ class Tools_Page extends Tabbed_Admin_Page {
 			$tags = array_merge( $tags, get_post_var( 'tags' ) );
 		}
 
-		$tags = Plugin::$instance->dbs->get_db( 'tags' )->validate( $tags );
+		$tags = validate_tags( $tags );
 
 		set_transient( 'gh_import_tags', $tags, DAY_IN_SECONDS );
 		set_transient( 'gh_import_map', $map, DAY_IN_SECONDS );
-
-		if ( get_request_var( 'is_confirmed' ) ) {
-			set_transient( 'gh_import_confirm_contacts', true, DAY_IN_SECONDS );
-		}
+		set_transient( 'gh_import_compliance', [
+			'is_confirmed'      => (bool) get_post_var( 'email_is_confirmed' ),
+			'gdpr_consent'      => (bool) get_post_var( 'data_processing_consent_given' ),
+			'marketing_consent' => (bool) get_post_var( 'marketing_consent_given' ),
+		], DAY_IN_SECONDS );
 
 		$this->importer->start( [ 'import' => $file_name ] );
 	}
@@ -628,117 +633,122 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 		$count = get_db( 'contacts' )->count( $query_args );
 
-		$default_keys = [
-			'ID',
-			'email',
-			'first_name',
-			'last_name',
-			'user_id',
-			'owner_id',
-			'optin_status',
-			'date_created',
-			'tags'
-		];
-
-		$meta_keys = array_values( Plugin::$instance->dbs->get_db( 'contactmeta' )->get_keys() );
+		$default_exportable_fields = get_exportable_fields();
+		$meta_keys                 = array_diff( array_values( Plugin::$instance->dbs->get_db( 'contactmeta' )->get_keys() ), array_keys( $default_exportable_fields ) );
 
 		?>
-        <h3><?php _e( 'Select Columns to Export', 'groundhogg' ) ?></h3>
         <form method="post">
 			<?php wp_nonce_field( 'choose_columns' ); ?>
-            <h4><?php _e( 'Basic Contact Information', 'groundhogg' ) ?></h4>
-            <table>
-				<?php
+            <h3><?php _e( 'Basic Contact Information', 'groundhogg' ) ?></h3>
+			<?php
 
-				foreach ( $default_keys as $header ) {
+			html()->list_table( [
+				'class' => 'export-table'
+			], [
+				[
+					'class' => 'check-column',
+					'name'  => "<input type='checkbox' value='1' checked class='select-all-basic'>",
+					'tag'   => 'td'
+				],
+				__( 'Nice Name', 'groundhogg' ),
+				__( 'Field ID', 'groundhogg' ),
+			], map_deep( array_keys( $default_exportable_fields ), function ( $header ) use ( $default_exportable_fields ) {
+				return [
+					html()->checkbox( [
+						'label'   => '',
+						'type'    => 'checkbox',
+						'name'    => 'headers[' . $header . ']',
+						'id'      => 'header_' . $header,
+						'class'   => 'basic header',
+						'value'   => '1',
+						'checked' => true,
+					] ),
+					$default_exportable_fields[ $header ],
+					'<code>' . esc_html( $header ) . '</code>'
+				];
+			} ) );
 
-					html()->start_row();
-
-					html()->td( [
-						html()->checkbox( [
-							'label'   => key_to_words( $header ) . ' (' . $header . ')',
-							'type'    => 'checkbox',
-							'name'    => 'headers[' . $header . ']',
-							'id'      => 'header_' . $header,
-							'class'   => 'default header',
-							'value'   => '1',
-							'checked' => true,
-						] )
-					] );
-
-					html()->end_row();
-				}
-
-				?>
-            </table>
+			?>
 
 			<?php if ( ! empty( $meta_keys ) ): ?>
 
-                <h4><?php _e( 'Custom Meta Information', 'groundhogg' ) ?></h4>
-                <p><?php
+                <h3><?php _e( 'Custom Meta Information', 'groundhogg' ) ?></h3>
+				<?php
 
-					echo html()->e( 'a', [
-						'href'  => '#',
-						'class' => 'select-all-meta button button-secondary',
-						'style' => [
-							'margin-right' => '10px'
-						]
-					], __( 'Select All', 'groundhogg' ) );
+				html()->list_table( [
+					'class' => 'export-table'
+				], [
+					[
+						'class' => 'check-column',
+						'name'  => "<input type='checkbox' value='1' class='select-all-meta'>",
+						'tag'   => 'td'
+					],
+					__( 'Nice Name', 'groundhogg' ),
+					__( 'Meta Key', 'groundhogg' ),
+				], map_deep( $meta_keys, function ( $header ) {
+					return [
+						html()->checkbox( [
+							'label'   => '',
+							'type'    => 'checkbox',
+							'name'    => 'headers[' . $header . ']',
+							'id'      => 'header_' . $header,
+							'class'   => 'meta header',
+							'value'   => '1',
+							'checked' => false,
+						] ),
+						key_to_words( $header ),
+						'<code>' . esc_html( $header ) . '</code>'
+					];
+				} ) );
 
-					echo html()->e( 'a', [
-						'href'  => '#',
-						'class' => 'deselect-all-meta button button-secondary'
-					], __( 'De-Select All', 'groundhogg' ) );
+			endif;
+			?>
+            <table class="form-table">
+                <tbody>
+                <tr>
+                    <th><?php _e( 'Select the kind of column headers you want.', 'groundhogg' ) ?></th>
+                    <td>
+						<?php
 
-					?></p>
-                <script>
-                  (function ($) {
-
-                    $('.select-all-meta').click(function (e) {
-                      $('.meta.header').attr('checked', 'checked')
-                    })
-
-                    $('.deselect-all-meta').click(function (e) {
-                      $('.meta.header').attr('checked', false)
-                    })
-
-                  })(jQuery)
-                </script>
-                <table>
-					<?php
-
-					foreach ( $meta_keys as $header ) {
-
-						if ( in_array( $header, $default_keys ) ) {
-							continue;
-						}
-
-						html()->start_row();
-
-						html()->td( [
-							html()->checkbox( [
-								'label'   => key_to_words( $header ) . ' (' . $header . ')',
-								'type'    => 'checkbox',
-								'name'    => 'headers[' . $header . ']',
-								'id'      => 'header_' . $header,
-								'class'   => 'meta header',
-								'value'   => '1',
-								'checked' => false,
-							] )
+						echo html()->dropdown( [
+							'options'     => [
+								'keys' => __( 'Field IDs' ),
+								'name' => __( 'Pretty Names' ),
+							],
+							'option_none' => false
 						] );
 
-						html()->end_row();
-					}
+						echo html()->description( __( "Choose <b>Fields IDs</b> for <code>first_name</code> and <b>Pretty Names</b> for <code>First Name</code>.", 'groundhogg' ) )
 
-					?>
-                </table>
-
-			<?php endif; ?>
-
+						?>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
 			<?php submit_button( sprintf( _nx( 'Export %s contact', 'Export %s contacts', $count, 'action', 'groundhogg' ), number_format_i18n( $count ) ) ); ?>
         </form>
-		<?php
+        <script>
+          (function ($) {
 
+            $('.select-all-meta').on('change', function (e) {
+              if ($(this).is(':checked')) {
+                $('input.meta.header').prop('checked', true)
+              } else {
+                $('input.meta.header').prop('checked', false)
+              }
+            })
+
+            $('.select-all-basic').on('change', function (e) {
+              if ($(this).is(':checked')) {
+                $('input.basic.header').prop('checked', true)
+              } else {
+                $('input.basic.header').prop('checked', false)
+              }
+            })
+
+          })(jQuery)
+        </script>
+		<?php
 	}
 
 	/**
@@ -755,7 +765,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 			return new WP_Error( 'error', 'Please choose columns to export.' );
 		}
 
-		$headers = map_deep( $headers, 'sanitize_key' );
+//		$headers = map_deep( $headers );
 
 		set_transient( 'gh_export_headers', $headers, DAY_IN_SECONDS );
 
@@ -925,7 +935,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	public function process_advanced_cron_install_gh_cron() {
 
-		if ( ! current_user_can( 'manage_options' ) ){
+		if ( ! current_user_can( 'manage_options' ) ) {
 			$this->wp_die_no_access();
 		}
 
@@ -945,9 +955,9 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	public function process_advanced_cron_uninstall_gh_cron() {
 
-	    if ( ! current_user_can( 'manage_options' ) ){
-	        $this->wp_die_no_access();
-        }
+		if ( ! current_user_can( 'manage_options' ) ) {
+			$this->wp_die_no_access();
+		}
 
 		if ( ! uninstall_gh_cron_file() ) {
 			return new \WP_Error( 'error', __( 'Unable to uninstall gh-cron.php file. Please delete it manually via FTP.', 'groundhogg' ) );
