@@ -2,7 +2,7 @@ import './charts/'
 import './panels/'
 
 import { __ } from "@wordpress/i18n";
-import { getReportPanel, getReportPanels } from 'data/reports-registry'
+import { getReportPanel, getReportPanels, getReportPanelList } from 'data/reports-registry'
 import { useSelect, useDispatch } from '@wordpress/data'
 import { useState } from "@wordpress/element";
 import { makeStyles } from "@material-ui/core/styles";
@@ -53,12 +53,22 @@ const ReportPanel = (props) => {
 
   const history = useHistory();
   const location = useLocation();
+  const defaultReport = location.pathname.split('/')[1]
+  const subRoute = location.pathname.split('/')[2]
 
-  const [report, setReport] = useState(location.pathname.replace('/',''));
+
+
+  const [report, setReport] = useState(defaultReport);
   const [startDate, setStartDate] = useState(getLuxonDate('one_year_back'));
   const [endDate, setEndDate] = useState(getLuxonDate('today'));
 
-  const Panel = getReportPanel(report || 'overview' )
+  let Panel = getReportPanel(report || 'overview' )
+  if(subRoute){
+    Panel = getReportPanel(report+'-list' )
+  }
+
+  console.log(defaultReport, Panel)
+
 
   const { reports, isRequesting } = useSelect(
     (select) => {
@@ -77,11 +87,18 @@ const ReportPanel = (props) => {
     }
     , [])
 
+    let datePickers = <div/>;
+    if(subRoute){
+      datePickers = <>
+        <DatePicker dateChange={dateChange} selectedDate={startDate} label={'start'} id={'start'}/>
+        <DatePicker dateChange={dateChange} selectedDate={endDate} label={'end'} id={'end'}/>
+      </>
+    }
+
      const panel = <>
        <Breadcrumb path={['Reporting', Panel.name]}/>
        <div className={classes.datePickers}>
-         <DatePicker dateChange={dateChange} selectedDate={startDate} label={'start'} id={'start'}/>
-         <DatePicker dateChange={dateChange} selectedDate={endDate} label={'end'} id={'end'}/>
+        {datePickers}
        </div>
        <Panel.layout
          isLoading={isRequesting || !isObject(reports)}
