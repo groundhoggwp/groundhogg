@@ -711,9 +711,10 @@ class Tools_Page extends Tabbed_Admin_Page {
 						<?php
 
 						echo html()->dropdown( [
+							'name'        => 'header_type',
 							'options'     => [
-								'keys' => __( 'Field IDs' ),
-								'name' => __( 'Pretty Names' ),
+								'basic'  => __( 'Field IDs' ),
+								'pretty' => __( 'Pretty Names' ),
 							],
 							'option_none' => false
 						] );
@@ -768,6 +769,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 //		$headers = map_deep( $headers );
 
 		set_transient( 'gh_export_headers', $headers, DAY_IN_SECONDS );
+		set_transient( 'gh_export_header_type', sanitize_text_field( get_post_var( 'header_type' ) ), DAY_IN_SECONDS );
 
 		Plugin::$instance->bulk_jobs->export_contacts->start( [
 			'query' => $query,

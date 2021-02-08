@@ -6,12 +6,14 @@ use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use function Groundhogg\encrypt;
 use function Groundhogg\export_field;
+use function Groundhogg\export_header_pretty_name;
 use function Groundhogg\file_access_url;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
 use function Groundhogg\is_a_contact;
+use function Groundhogg\key_to_words;
 use function Groundhogg\multi_implode;
 use Groundhogg\Plugin;
 
@@ -108,7 +110,8 @@ class Export_Contacts extends Bulk_Job {
 	 */
 	protected function pre_loop() {
 
-		$headers = get_transient( 'gh_export_headers' );
+		$headers     = get_transient( 'gh_export_headers' );
+		$header_type = get_transient( 'gh_export_header_type' );
 
 		$file_name = Plugin::$instance->settings->get_transient( 'gh_export_file' );
 
@@ -125,7 +128,16 @@ class Export_Contacts extends Bulk_Job {
 
 			//write the headers to the export.
 			$fp = fopen( $file_path, "w" );
-			fputcsv( $fp, $headers );
+
+			if ( $header_type === 'pretty' ){
+				$file_headers = array_map( function ( $header ){
+					return export_header_pretty_name( $header );
+				}, $headers );
+			} else {
+				$file_headers = $headers;
+			}
+
+			fputcsv( $fp, $file_headers );
 		}
 
 		// If we have the file name then open the file before we move on.

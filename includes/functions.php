@@ -1733,6 +1733,27 @@ function get_items_from_csv( $file_path = '', $delimiter = false ) {
 }
 
 /**
+ * Get the pretty name for the header in the export file
+ *
+ * @param string $key
+ *
+ * @return mixed|string
+ */
+function export_header_pretty_name( $key = '' ){
+    static $keys;
+
+    if ( empty( $keys ) ){
+        $keys = get_exportable_fields();
+    }
+
+    if ( isset_not_empty( $keys, $key ) ){
+        return $keys[$key];
+    }
+
+    return key_to_words( $key );
+}
+
+/**
  * Get a list of mappable fields as well as extra fields
  *
  * @param array $extra
