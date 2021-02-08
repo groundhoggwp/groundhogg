@@ -111,7 +111,7 @@ function BlockEditor({
       // }
     });
   });
-
+  console.log('pre', preHeader === '')
   return (
     <div className="groundhogg-block-editor" ref={blockEditorEl}>
       <BlockEditorProvider
@@ -133,10 +133,7 @@ function BlockEditor({
                 className={classes.subjectInputs}
                 onChange={handlePreHeaderChange}
                 label={"Pre Header"}
-                value={preHeader}
-                placeholder={__(
-                  "Pre Header Text: Used to summarize the content of the email."
-                )}
+                value={preHeader === '' ? 'Pre Header' : preHeader}
               />
             </form>
           </Card>

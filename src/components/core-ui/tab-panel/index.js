@@ -59,27 +59,19 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function ScrollableTabsButtonAuto( { tabs, handleChangeHook } ) {
-  let defaultTab = 0;
-  const location = useLocation();
-
-  tabs.forEach((tab,i)=>{
-    if(tab.route === location.pathname.replace('/','')){
-      defaultTab = i
-    }
-  });
-
+export default function ScrollableTabsButtonAuto( { tabs, tabRoute, handleChangeHook  } ) {
   const classes = useStyles();
-  const [value, setValue] = useState(defaultTab);
-  const history = useHistory();
 
   const handleChange = (event, newValue) => {
-    console.log(event, tabs[newValue].route)
-    setValue(newValue);
-    history.push(tabs[newValue].route)
     handleChangeHook(tabs[newValue].route);
   };
-
+  
+  let currentTab = 0;
+  tabs.forEach((tab,i)=>{
+    if(tab.route === tabRoute){
+      currentTab = i
+    }
+  });
 
 
 
@@ -87,7 +79,7 @@ export default function ScrollableTabsButtonAuto( { tabs, handleChangeHook } ) {
     <Paper className={classes.root}>
         <Tabs
           className={classes.tabBar}
-          value={value}
+          value={currentTab}
           onChange={handleChange}
           indicatorColor="primary"
           textColor="primary"
@@ -104,7 +96,7 @@ export default function ScrollableTabsButtonAuto( { tabs, handleChangeHook } ) {
         </Tabs>
         {
           tabs.map( ( tab, index ) => (
-            <TabPanel value={value} index={index} key={index}>
+            <TabPanel value={currentTab} index={index} key={index}>
               <tab.component classes={classes} />
             </TabPanel>
            )

@@ -16,6 +16,7 @@ import {
   MultiSelectScrollIntoView,
 } from "@wordpress/block-editor";
 import { getBlockTypes } from "@wordpress/blocks";
+import PerfectScrollbar from "react-perfect-scrollbar";
 
 /**
  * External dependencies
@@ -68,12 +69,15 @@ const Sidebar = () => {
   };
 
   return (
+    <PerfectScrollbar>
     <div
       className="groundhogg-email-sidebar"
       role="region"
       aria-label={__("Groundhogg Email Sidebar advanced settings.")}
       tabIndex="-1"
     >
+
+
       <Panel header={__("Blocks")}>
         <TextField
           className={classes.searchField}
@@ -114,6 +118,7 @@ const Sidebar = () => {
         <InspectorSlot bubblesVirtually />
       </Panel>
     </div>
+    </PerfectScrollbar>
   );
 };
 

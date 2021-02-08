@@ -35,9 +35,10 @@ const useStyles = makeStyles({
     width: "100%",
     display: "flex",
     justifyContent: "flex-start",
-    padding: "20px",
+    paddingTop: "10px",
   },
   button: {
+    color: '#fff',
     marginRight: "8px",
   },
 });
