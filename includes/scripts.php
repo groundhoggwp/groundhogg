@@ -26,7 +26,7 @@ class Scripts {
 	public function register_frontend_scripts() {
 		$dot_min = $this->is_script_debug_enabled() ? '' : '.min';
 
-		wp_register_script( 'groundhogg-frontend', GROUNDHOGG_ASSETS_URL . 'js/frontend/frontend' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
+		wp_register_script( 'groundhogg-frontend', GROUNDHOGG_ASSETS_URL . 'js/frontend/frontend' . $dot_min . '.js', [], GROUNDHOGG_VERSION, true );
 		wp_register_script( 'groundhogg-ajax-form', GROUNDHOGG_ASSETS_URL . 'js/frontend/ajax-form' . $dot_min . '.js', [
 			'jquery',
 			'groundhogg-frontend'
@@ -51,7 +51,11 @@ class Scripts {
 		] );
 
 		wp_localize_script( 'groundhogg-frontend', 'Groundhogg', array(
-			'tracking_enabled'         => ! is_option_enabled( 'gh_disable_page_view_tracking' ),
+			// Don't run unless pro features is active
+			'tracking_enabled'         => ! is_option_enabled( 'gh_disable_page_view_tracking' ) && is_pro_features_active(),
+			// This will come from the advanced features plugin
+			'tracked_pages_regex'      => str_replace( '/', '\/', get_option( 'gh_tracked_pages_regex', '' ) ),
+			'base_url'                 => untrailingslashit( home_url() ),
 			'form_impression_endpoint' => rest_url( 'gh/v3/tracking/form-impression/' ),
 			'page_view_endpoint'       => rest_url( 'gh/v3/tracking/page-view/' ),
 			'form_submission_endpoint' => rest_url( 'gh/v3/forms/submit/' ),
@@ -62,11 +66,12 @@ class Scripts {
 				'tracking'         => Tracking::TRACKING_COOKIE,
 				'lead_source'      => Tracking::LEAD_SOURCE_COOKIE,
 				'form_impressions' => Tracking::FORM_IMPRESSIONS_COOKIE
-			]
+			],
+			// Cookies can be disabled form via the settings
+			'cookies_enabled'          => ! is_option_enabled( 'gh_disable_unnecessary_cookies' )
 		) );
 
 		wp_enqueue_script( 'groundhogg-frontend' );
-
 
 		do_action( 'groundhogg/scripts/after_register_frontend_scripts', $this->is_script_debug_enabled(), $dot_min );
 	}
@@ -137,7 +142,10 @@ class Scripts {
 			'wp-color-picker'
 		], GROUNDHOGG_VERSION, true );
 //		wp_register_script( 'groundhogg-admin-contact-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/contact-editor' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
-		wp_register_script( 'groundhogg-admin-contact-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/contact-editor.js', [ 'jquery', 'jquery-ui-sortable' ], GROUNDHOGG_VERSION, true );
+		wp_register_script( 'groundhogg-admin-contact-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/contact-editor.js', [
+			'jquery',
+			'jquery-ui-sortable'
+		], GROUNDHOGG_VERSION, true );
 		wp_register_script( 'groundhogg-admin-contact-inline', GROUNDHOGG_ASSETS_URL . 'js/admin/inline-edit-contacts' . $dot_min . '.js', [
 			'jquery',
 			'groundhogg-admin'

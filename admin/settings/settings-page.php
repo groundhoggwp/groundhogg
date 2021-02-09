@@ -764,7 +764,7 @@ class Settings_Page extends Admin_Page {
 			'gh_confirmation_grace_period'           => array(
 				'id'      => 'gh_confirmation_grace_period',
 				'section' => 'compliance',
-				'label'   => _x( 'Email confirmation grace Period', 'settings', 'groundhogg' ),
+				'label'   => _x( 'Email confirmation grace period', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'The number of days for which you can send an email to a contact after they are created but their email has not been confirmed. The default is 14 days.', 'settings', 'groundhogg' ),
 				'type'    => 'number',
 				'atts'    => array(
@@ -777,7 +777,7 @@ class Settings_Page extends Admin_Page {
 			'gh_enable_gdpr'                         => array(
 				'id'      => 'gh_enable_gdpr',
 				'section' => 'compliance',
-				'label'   => _x( 'Enable GDPR features.', 'settings', 'groundhogg' ),
+				'label'   => _x( 'Enable GDPR features', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'This will add a consent box to your forms as well as a "Delete Everything" Button to your email preferences page.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => array(
@@ -791,7 +791,7 @@ class Settings_Page extends Admin_Page {
 			'gh_strict_gdpr'                         => array(
 				'id'      => 'gh_strict_gdpr',
 				'section' => 'compliance',
-				'label'   => _x( 'Do not send email without consent.', 'settings', 'groundhogg' ),
+				'label'   => _x( 'Do not send email without consent', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'This will prevent your system from sending emails to contacts for which you do not have explicit consent. Only works if GDPR features are enabled.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => array(
@@ -799,6 +799,20 @@ class Settings_Page extends Admin_Page {
 					//keep brackets for backwards compat
 					'name'  => 'gh_strict_gdpr[]',
 					'id'    => 'gh_strict_gdpr',
+					'value' => 'on',
+				),
+			),
+			'gh_disable_unnecessary_cookies'            => array(
+				'id'      => 'gh_disable_unnecessary_cookies',
+				'section' => 'compliance',
+				'label'   => _x( 'Disable unnecessary cookies', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'This will prevent the <code>groundhogg-lead-source</code> and <code>gh-form-impressions</code> cookies from being set.', 'settings', 'groundhogg' ),
+				'type'    => 'checkbox',
+				'atts'    => array(
+					'label' => __( 'Disable' ),
+					//keep brackets for backwards compat
+					'name'  => 'gh_disable_unnecessary_cookies',
+					'id'    => 'gh_disable_unnecessary_cookies',
 					'value' => 'on',
 				),
 			),
@@ -1168,7 +1182,7 @@ class Settings_Page extends Admin_Page {
 					'placeholder' => 14,
 				),
 			],
-			'gh_enable_one_click_unsubscribe'         => array(
+			'gh_enable_one_click_unsubscribe'        => array(
 				'id'      => 'gh_enable_one_click_unsubscribe',
 				'section' => 'unsubscribe',
 				'label'   => _x( 'Enable One-Click Unsubscribe', 'settings', 'groundhogg' ),
@@ -1181,7 +1195,7 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				),
 			),
-			'gh_disable_unsubscribe_header'         => array(
+			'gh_disable_unsubscribe_header'          => array(
 				'id'      => 'gh_disable_unsubscribe_header',
 				'section' => 'unsubscribe',
 				'label'   => _x( 'Disable the Unsubscribe header.', 'settings', 'groundhogg' ),

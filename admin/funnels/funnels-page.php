@@ -809,6 +809,11 @@ class Funnels_Page extends Admin_Page {
 			return new \WP_Error( 'invalid_config', _x( 'Funnels must start with 1 or more benchmarks', 'warning', 'groundhogg' ) );
 		}
 
+		/**
+		 * Runs after the funnel as been updated.
+		 */
+		do_action( 'groundhogg/admin/funnel/updated', $funnel );
+
 		$this->add_notice( esc_attr( 'updated' ), _x( 'Funnel updated', 'notice', 'groundhogg' ), 'success' );
 
 		return true;
