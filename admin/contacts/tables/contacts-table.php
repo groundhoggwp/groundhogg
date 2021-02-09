@@ -258,13 +258,11 @@ class Contacts_Table extends WP_List_Table {
                                 <span class="title"><?php _e( 'Owner', 'groundhogg' ); ?></span>
                                 <span class="input-text-wrap">
                                     <?php $args = array(
-	                                    'show_option_none' => __( 'Select an owner' ),
 	                                    'id'               => 'owner',
 	                                    'name'             => 'owner',
-	                                    'role'             => 'administrator',
 	                                    'class'            => 'cowner'
                                     ); ?>
-                                    <?php wp_dropdown_users( $args ) ?>
+                                    <?php html()->dropdown_owners( $args ); ?>
                                 </span>
                             </label>
                             <label>
