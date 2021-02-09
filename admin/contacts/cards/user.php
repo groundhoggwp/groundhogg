@@ -24,12 +24,6 @@ if ( $contact->get_user_id() ):?>
 			        <a href="<?php echo esc_url( admin_url( 'user-edit.php?user_id=' . $contact->get_user_id() ) ) ?>"><?php echo $contact->get_userdata()->user_login; ?></a>
 		        </span>
         </li>
-        <li>
-            <span class="label"><?php _e( 'Last Login Date', 'groundhogg' ) ?></span>
-            <span class="data">
-			        #<?php echo $contact->get_user_id() ?>
-		        </span>
-        </li>
     </ul>
 <?php else: ?>
 

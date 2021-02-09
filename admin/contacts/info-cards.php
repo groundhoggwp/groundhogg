@@ -38,12 +38,15 @@ class Info_Cards {
 	 */
 	public function register_core_cards() {
 
-		self::register( 'user', __( 'WordPress User', 'groundhogg' ), '', function ( $contact ) {
+		self::register( 'user', __( 'WordPress User', 'groundhogg' ), function ( $contact ) {
 			include __DIR__ . '/cards/user.php';
 		} );
 
-		self::register( 'files', __( 'Files', 'groundhogg' ), '', '__return_empty_string' );
-		self::register( 'activity', __( 'Activity', 'groundhogg' ), '', '__return_empty_string' );
+//		self::register( 'email_activity', __( 'Email Activity', 'groundhogg' ), function ( $contact ) {
+//			include __DIR__ . '/cards/email-activity.php';
+//		} );
+
+//		self::register( 'files', __( 'Files', 'groundhogg' ), '', '__return_empty_string' );
 
 		do_action( 'groundhogg/admin/contacts/register_info_cards', $this );
 	}
@@ -60,12 +63,11 @@ class Info_Cards {
 	 *
 	 * @param int $id
 	 * @param string $title
-	 * @param string $icon
 	 * @param callable $callback
 	 * @param int $priority
 	 * @param string $capability
 	 */
-	public static function register( $id, $title, $icon, $callback, $priority = 100, $capability = 'view_contacts' ) {
+	public static function register( $id, $title, $callback, $priority = 100, $capability = 'view_contacts' ) {
 
 		if ( empty( $id ) || ! is_callable( $callback ) ) {
 			return;
@@ -74,7 +76,6 @@ class Info_Cards {
 		self::$info_cards[ sanitize_key( $id ) ] = [
 			'id'         => sanitize_key( $id ),
 			'title'      => $title,
-			'icon'       => $icon,
 			'callback'   => $callback,
 			'priority'   => $priority,
 			'capability' => $capability
@@ -131,7 +132,6 @@ class Info_Cards {
 			/**
 			 * @var int $id
 			 * @var string $title
-			 * @var string $icon
 			 * @var callable $callback
 			 * @var int $priority
 			 * @var string $capability

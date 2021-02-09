@@ -63,8 +63,10 @@
       // create a regex based on the URLs provided.
       var regex = new RegExp(this.tracked_pages_regex)
 
-      // Compare against the base URL of the site
+      // Compare against the base URL of the site and remove fragment and query string
       var location = window.location.href.replace(self.base_url, '')
+        .replace(/\?.*/, '')
+        .replace(/\#.*/, '')
 
       // If the page matches one of the global regex options
       if (location.match(regex)) {
@@ -88,11 +90,7 @@
     formImpression: function (id) {
       var self = this
 
-      if (!id) {
-        return
-      }
-
-      if (this.previousFormImpressions.indexOf(id) !== -1) {
+      if (!id || this.previousFormImpressions.indexOf(id) !== -1) {
         return
       }
 
@@ -101,8 +99,8 @@
         url: self.form_impression_endpoint,
         data: { ref: window.location.href, form_id: id, _ghnonce: self._ghnonce },
         success: function (response) {
-          self.previousFormImpressions.push([id])
-          self.setCookie(self.cookies.form_impression, self.previousFormImpressions.join(), 3)
+          self.previousFormImpressions.push(id)
+          self.setCookie(self.cookies.form_impressions, self.previousFormImpressions.join(), 3)
         },
         error: function (response) {}
       })
@@ -123,8 +121,8 @@
           previousFormImpressions = ''
         }
 
-        this.logFormImpressions()
         this.previousFormImpressions = previousFormImpressions.split(',')
+        this.logFormImpressions()
       }
 
       this.pageView()

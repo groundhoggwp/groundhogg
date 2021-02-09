@@ -1739,18 +1739,18 @@ function get_items_from_csv( $file_path = '', $delimiter = false ) {
  *
  * @return mixed|string
  */
-function export_header_pretty_name( $key = '' ){
-    static $keys;
+function export_header_pretty_name( $key = '' ) {
+	static $keys;
 
-    if ( empty( $keys ) ){
-        $keys = get_exportable_fields();
-    }
+	if ( empty( $keys ) ) {
+		$keys = get_exportable_fields();
+	}
 
-    if ( isset_not_empty( $keys, $key ) ){
-        return $keys[$key];
-    }
+	if ( isset_not_empty( $keys, $key ) ) {
+		return $keys[ $key ];
+	}
 
-    return key_to_words( $key );
+	return key_to_words( $key );
 }
 
 /**
@@ -2645,10 +2645,10 @@ function no_and_amp( $url ) {
  */
 function dashicon( $icon, $wrap = 'span', $atts = [], $echo = false ) {
 	$atts = wp_parse_args( $atts, [
-		'class' => 'dashicons dashicons-'
+		'class' => ''
 	] );
 
-	$atts['class'] .= $icon;
+	$atts['class'] .= ' dashicons dashicons-' . $icon;
 
 	$html = html()->e( $wrap, $atts, '', false );
 

@@ -29,6 +29,10 @@ class Activity extends Base_Object_With_Meta {
 		return absint( $this->timestamp );
 	}
 
+	public function get_time(){
+		return $this->get_timestamp();
+	}
+
 	public function get_step_id() {
 		return absint( $this->step_id );
 	}

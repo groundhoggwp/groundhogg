@@ -309,6 +309,15 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.3.4 (2021-02-08) =
+* ADDED Ability to declare data processing consent and marketing consent when importing contacts.
+* ADDED Ability to change the column header type when exporting contacts.
+* ADDED Option disable unnecessary cookies like `groundhogg-lead-source` in the **Compliance** settings.
+* TWEAKED Improved the default columns when exporting contacts.
+* TWEAKED Improved UI for exporting and importing contacts.
+* TWEAKED Better handling of the page tracking script, will now only track on pages which tracking is explicitly requested via the funnel.
+* FIXED Updated POT file.
+
 = 2.3.3 (2021-02-04) =
 * ADDED Setting to enabled one click unsubscribe in the **Compliance** settings.
 * ADDED Setting to disable the `list-unsubscribe` header.

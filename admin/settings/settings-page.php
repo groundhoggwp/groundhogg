@@ -806,7 +806,7 @@ class Settings_Page extends Admin_Page {
 				'id'      => 'gh_disable_unnecessary_cookies',
 				'section' => 'compliance',
 				'label'   => _x( 'Disable unnecessary cookies', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'This will prevent the <code>groundhogg-lead-source</code> and <code>gh-form-impressions</code> cookies from being set.', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'This will prevent the <code>groundhogg-lead-source</code> and <code>groundhogg-form-impressions</code> cookies from being set.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => array(
 					'label' => __( 'Disable' ),
