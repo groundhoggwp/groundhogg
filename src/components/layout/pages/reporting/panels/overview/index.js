@@ -14,9 +14,15 @@ registerReportsPanel("overview", {
     "total_confirmed_contacts",
     "total_engaged_contacts",
     "total_unsubscribed_contacts",
+    "total_emails_sent",
+    "email_open_rate",
+    "email_click_rate",
     "chart_new_contacts",
     "chart_contacts_by_optin_status",
     "table_top_performing_emails",
+    // "table_top_converting_funnels",
+    "table_contacts_by_countries",
+    "table_contacts_by_lead_source",
   ],
   layout: ({ reports, isLoading }) => {
     const {
@@ -24,9 +30,15 @@ registerReportsPanel("overview", {
       total_confirmed_contacts,
       total_engaged_contacts,
       total_unsubscribed_contacts,
+      total_emails_sent,
+      email_open_rate,
+      email_click_rate,
       chart_new_contacts,
       chart_contacts_by_optin_status,
       table_top_performing_emails,
+      // table_top_converting_funnels, //todo does not work with new funnel
+      table_contacts_by_countries,
+      table_contacts_by_lead_source,
     } = reports;
 
     return (
@@ -70,6 +82,35 @@ registerReportsPanel("overview", {
               icon={<ContactMailIcon />}
             />
           </Grid>
+
+          <Grid item xs={4}>
+            <QuickStat
+              title={"Email Sent"}
+              id={"total_emails_sent"}
+              data={!isLoading ? total_emails_sent : {}}
+              loading={isLoading}
+              icon={<ContactMailIcon />}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <QuickStat
+              title={"Open Rate"}
+              id={"email_open_rate"}
+              data={!isLoading ? email_open_rate : {}}
+              loading={isLoading}
+              icon={<ContactMailIcon />}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <QuickStat
+              title={"Click Thru Rate"}
+              id={"email_click_rate"}
+              data={!isLoading ? email_click_rate : {}}
+              loading={isLoading}
+              icon={<ContactMailIcon />}
+            />
+          </Grid>
+
           <Grid item xs={12}>
             <LineChart
               title={"New Contacts"}
@@ -91,6 +132,23 @@ registerReportsPanel("overview", {
               title={"Top Performing Emails"}
               id={"table_top_performing_emails"}
               data={!isLoading ? table_top_performing_emails : {}}
+              loading={isLoading}
+            />
+          </Grid>
+
+          <Grid item xs={6}>
+            <ReportTable
+              title={"Top Countries"}
+              id={"table_contacts_by_countries"}
+              data={!isLoading ? table_contacts_by_countries : {}}
+              loading={isLoading}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <ReportTable
+              title={"Top lead Sources"}
+              id={"table_contacts_by_lead_source"}
+              data={!isLoading ? table_contacts_by_lead_source : {}}
               loading={isLoading}
             />
           </Grid>
