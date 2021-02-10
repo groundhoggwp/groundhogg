@@ -19,21 +19,21 @@ registerReportsPanel('broadcasts', {
   }) => {
 
     const {
-      table_broadcast_stats,
+      // table_broadcast_stats,
       table_broadcast_link_clicked
     } = reports
 
     return (
       <Box flexGrow={1}>
         <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <ReportTable
-              title={"Broadcast Stats"}
-              id={"table_broadcast_stats"}
-              data={!isLoading ? table_broadcast_stats : {}}
-              loading={isLoading}
-            />
-          </Grid>
+          {/*<Grid item xs={12}>*/}
+          {/*  <ReportTable*/}
+          {/*    title={"Broadcast Stats"}*/}
+          {/*    id={"table_broadcast_stats"}*/}
+          {/*    data={!isLoading ? table_broadcast_stats : {}}*/}
+          {/*    loading={isLoading}*/}
+          {/*  />*/}
+          {/*</Grid>*/}
           <Grid item xs={12}>
             <ReportTable
               title={"Broadcast Link Clicked"}

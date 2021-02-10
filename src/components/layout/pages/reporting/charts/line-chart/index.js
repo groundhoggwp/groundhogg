@@ -12,6 +12,7 @@ import {
 } from '@material-ui/core';
 // import GenericMoreButton from 'src/components/GenericMoreButton';
 import Chart from './Chart';
+import {LoadingReport} from "../loading-report";
 
 const useStyles = makeStyles(() => ({
   root: {},
@@ -22,10 +23,10 @@ const useStyles = makeStyles(() => ({
 
 export const LineChart = ({ className, title, data, loading, ...rest }) => {
 
-
-  if(loading){
-    return <div/>
+  if (loading || !data || !data.hasOwnProperty( 'chart' ) ) {
+    return <LoadingReport className={className} title={title} />;
   }
+
 
   const classes = useStyles();
   const chartJSData = {
