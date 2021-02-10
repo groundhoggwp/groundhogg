@@ -12,6 +12,7 @@ import {
 } from "@material-ui/core";
 import Chart from "./Chart";
 import PerfectScrollbar from "react-perfect-scrollbar";
+import {LoadingReport} from "../loading-report";
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -36,9 +37,10 @@ export const DonutChart = ({
   loading,
   ...rest
 }) => {
-  if (loading) {
-    return <div />;
+  if (loading || !data || !data.hasOwnProperty( 'chart' ) ) {
+    return <LoadingReport className={className} title={title} />;
   }
+
 
   const classes = useStyles();
 

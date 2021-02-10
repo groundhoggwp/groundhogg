@@ -23,6 +23,7 @@ import _ from "lodash";
 import React from "react";
 import Typography from "@material-ui/core/Typography";
 import TablePaginationActions from "@material-ui/core/TablePagination/TablePaginationActions";
+import {LoadingReport} from "../loading-report";
 // import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 // import Label from "src/components/Label";
 
@@ -53,11 +54,10 @@ export const ReportTable = ({ className, title, data, loading, ...rest }) => {
   //     sortable: true,
   //   };
   // });
-  //
-  // console.log(columns);
 
-  if (loading || !data.chart) {
-    return <div />;
+
+  if (loading || !data || !data.hasOwnProperty( 'chart' ) ) {
+    return <LoadingReport className={className} title={title} />;
   }
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);

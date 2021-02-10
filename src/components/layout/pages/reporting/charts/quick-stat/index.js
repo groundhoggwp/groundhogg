@@ -7,9 +7,10 @@ import {
   Card,
   Typography,
   makeStyles,
-  useTheme
+  useTheme, LinearProgress
 } from '@material-ui/core';
 import Label from '../../../../../core-ui/label/';
+import {LoadingReport} from "../loading-report";
 
 const dummyData = {
   chart : {
@@ -24,6 +25,11 @@ const dummyData = {
 }
 
 export const QuickStat = ({ className,  title, data, icon, loading, ...rest }) => {
+
+  if ( !data || !data.hasOwnProperty( 'chart' ) ) {
+    return <LoadingReport className={className} title={title}/>;
+  }
+
   const chartData = loading ? dummyData : data
 
   const useStyles = makeStyles((theme) => ({
