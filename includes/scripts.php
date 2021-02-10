@@ -141,10 +141,12 @@ class Scripts {
 			'jquery',
 			'wp-color-picker'
 		], GROUNDHOGG_VERSION, true );
-//		wp_register_script( 'groundhogg-admin-contact-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/contact-editor' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
-		wp_register_script( 'groundhogg-admin-contact-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/contact-editor.js', [
+		wp_register_script( 'groundhogg-admin-contact-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/contact-editor' . $dot_min . '.js', [
 			'jquery',
 			'jquery-ui-sortable'
+		], GROUNDHOGG_VERSION, true );
+		wp_register_script( 'groundhogg-admin-contact-info-cards', GROUNDHOGG_ASSETS_URL . 'js/admin/info-cards.js', [
+			'jquery',
 		], GROUNDHOGG_VERSION, true );
 		wp_register_script( 'groundhogg-admin-contact-inline', GROUNDHOGG_ASSETS_URL . 'js/admin/inline-edit-contacts' . $dot_min . '.js', [
 			'jquery',

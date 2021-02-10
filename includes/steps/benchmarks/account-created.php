@@ -46,7 +46,7 @@ class Account_Created extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'New User', 'step_name', 'groundhogg' );
+		return _x( 'User Created', 'step_name', 'groundhogg' );
 
 	}
 
