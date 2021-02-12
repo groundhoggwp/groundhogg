@@ -3,7 +3,6 @@
 namespace Groundhogg\Admin\Tools;
 
 use Groundhogg\Preferences;
-use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use Groundhogg\Plugin;
@@ -139,7 +138,7 @@ $sample_item = $items[ $selected ];
 					'title'   => 'I have confirmed.',
 				] );
 
-	            echo html()->description( __( "If you are importing <b>the optin status</b> per contact in your CSV leave this unchecked.", 'groundhogg' ) )
+	            echo html()->description( __( "If you are importing the <b>optin status</b> per contact in your CSV leave this unchecked.", 'groundhogg' ) )
 
 	            ?></td>
         </tr>
