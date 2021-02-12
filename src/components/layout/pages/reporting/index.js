@@ -42,9 +42,6 @@ export const ReportsPage = () => {
     <>
       <HashRouter>
         <div style={{ padding: 20 }}>
-          {/*panels.map(panel =>
-            <Link to={'/' + panel.id }>{panel.name}</Link>
-          )*/}
           <Switch>
             <Route path="/" children={<ReportPanel />} />
             <Route path="/:report" children={<ReportPanel />} />
@@ -62,18 +59,38 @@ const ReportPanel = (props) => {
   const history = useHistory();
   const location = useLocation();
 
-  const [report, setReport] = useState(location.pathname.replace("/", ""));
+
+
+  const [report, setReport] = useState(location.pathname.split('/')[1]);
   const [startDate, setStartDate] = useState(getLuxonDate("one_year_back"));
   const [endDate, setEndDate] = useState(getLuxonDate("today"));
   const [reports, setReports] = useState({});
 
-  const Panel = getReportPanel(report || "overview");
+  let Panel = getReportPanel(report || "overview");
+  let datePickers = <div/>
+  // Once we've restored top level routing we can clean this up
+  if(location.pathname.split('/')[2]){
+    Panel = getReportPanel(`${report}-single` || "overview");
+    datePickers = <div className={classes.datePickers}>
+        <DatePicker
+          dateChange={dateChange}
+          selectedDate={startDate}
+          label={"start"}
+          id={"start"}
+        />
+        <DatePicker
+          dateChange={dateChange}
+          selectedDate={endDate}
+          label={"end"}
+          id={"end"}
+        />
+    </div>
+  }
 
   const { fetchItems } = useDispatch(REPORTS_STORE_NAME);
 
   const getReports = async () => {
     fetchItems({
-      // reports: [],
       reports: Panel.reports,
       start: startDate,
       end: endDate,
@@ -94,23 +111,12 @@ const ReportPanel = (props) => {
     };
   }, []);
 
+
+
   const panel = (
     <>
       <Breadcrumb path={["Reporting", Panel.name]} />
-      <div className={classes.datePickers}>
-        <DatePicker
-          dateChange={dateChange}
-          selectedDate={startDate}
-          label={"start"}
-          id={"start"}
-        />
-        <DatePicker
-          dateChange={dateChange}
-          selectedDate={endDate}
-          label={"end"}
-          id={"end"}
-        />
-      </div>
+      {datePickers}
       <Panel.layout
         isLoading={isRequesting || !isObject(reports)}
         reports={isObject(reports) ? reports : {}}
