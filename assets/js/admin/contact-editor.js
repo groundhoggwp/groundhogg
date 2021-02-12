@@ -85,21 +85,21 @@
           ui.placeholder.width(ui.item.width())
         },
         stop: saveInfoCardOrder
-      }).disableSelection()
+      })
 
       $(document).on('click', '.contact-info-cards button.handlediv', function (e) {
         $(this).closest('.postbox').toggleClass('closed')
-          saveInfoCardOrder();
+        saveInfoCardOrder()
       })
 
       $(document).on('click', '.contact-info-cards button.handle-order-higher', function (e) {
         $(this).closest('.postbox').insertBefore($(this).closest('.postbox').prev())
-          saveInfoCardOrder();
+        saveInfoCardOrder()
       })
 
       $(document).on('click', '.contact-info-cards button.handle-order-lower', function (e) {
         $(this).closest('.postbox').insertAfter($(this).closest('.postbox').next())
-          saveInfoCardOrder();
+        saveInfoCardOrder()
       })
 
     }
@@ -137,13 +137,13 @@
   function saveInfoCardOrder () {
 
     var $cards = $('.contact-info-cards .info-card')
-    var cardOrder = [];
+    var cardOrder = []
     $cards.each(function (i, card) {
-        cardOrder.push({
-            id: card.id,
-            open: ! $(card).hasClass( 'closed' )
-        })
-    });
+      cardOrder.push({
+        id: card.id,
+        open: !$(card).hasClass('closed')
+      })
+    })
 
     // console.log(cardOrder)
 

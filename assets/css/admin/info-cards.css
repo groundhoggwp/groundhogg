@@ -13,6 +13,14 @@
   margin-bottom: 0;
 }
 
+.info-card .postbox-header .hndle{
+  justify-content: left;
+}
+
+.info-card .postbox-header img.emoji {
+  margin-right: 10px !important;
+}
+
 .info-card ul.info-list li:not(:last-child){
   margin-bottom: 10px;
 }
@@ -31,6 +39,19 @@
 .info-card ul.info-list li span.data{
   font-size: 16px;
   color: #1b1b1b;
+}
+
+ul.regular-list{
+  list-style: disc;
+  padding-left: 20px;
+}
+
+ul.regular-list li{
+  margin: 0;
+}
+
+.smalldate{
+
 }
 
 /* Nilesh, you can write your JS code here */

@@ -2274,6 +2274,34 @@ function scheduled_time( $time, $date_prefix = 'on' ) {
 }
 
 /**
+ * Get a time string representing when something should be completed.
+ *
+ * @param        $time
+ *
+ * @return string
+ */
+function time_ago( $time ) {
+
+	if ( is_string( $time ) ) {
+		$time = strtotime( $time );
+	}
+
+	// Get the current time.
+	$cur_time = (int) current_time( 'timestamp' );
+
+	$time_diff = $time - $cur_time;
+
+	if ( absint( $time_diff ) > DAY_IN_SECONDS ) {
+		$time = date_i18n( get_date_time_format(), intval( $time ) );
+	} else {
+		$format = $time_diff <= 0 ? _x( "%s ago", 'status', 'groundhogg' ) : _x( "in %s", 'status', 'groundhogg' );
+		$time   = sprintf( $format, human_time_diff( $time, $cur_time ) );
+	}
+
+	return $time;
+}
+
+/**
  * Render html for a time column with an associated contact
  *
  * @param int $time the time to display
