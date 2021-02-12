@@ -317,6 +317,7 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 * TWEAKED Improved the default columns when exporting contacts.
 * TWEAKED Improved UI for exporting and importing contacts.
 * TWEAKED Better handling of the page tracking script, will now only track on pages which tracking is explicitly requested via the funnel.
+* TWEAKED Removed jQuery dependency for the `groundhogg-frontend` script.
 * FIXED Updated POT file.
 
 = 2.3.3 (2021-02-04) =
