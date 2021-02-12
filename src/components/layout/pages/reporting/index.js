@@ -78,7 +78,7 @@ const ReportPanel = (props) => {
       start: startDate,
       end: endDate,
     }).then((results) => {
-      if(results.hasOwnProperty( 'items')){
+      if (results.hasOwnProperty("items")) {
         setReports(results.items);
       }
     });
@@ -114,6 +114,8 @@ const ReportPanel = (props) => {
       <Panel.layout
         isLoading={isRequesting || !isObject(reports)}
         reports={isObject(reports) ? reports : {}}
+        startDate={startDate}
+        endDate={endDate}
       />
     </>
   );
