@@ -1127,8 +1127,6 @@ class Tools_Page extends Tabbed_Admin_Page {
 			22397  // Pro features
 		];
 
-		$installed = false;
-
 		foreach ( $downloads as $download ) {
 			$installed = Extension_Upgrader::remote_install( $download, sanitize_text_field( get_request_var( 'license_key' ) ) );
 
@@ -1141,9 +1139,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 			}
 		}
 
-		if ( $installed ) {
-			$this->add_notice( 'installed', 'Installed extension successfully!' );
-		}
+        $this->add_notice( 'installed', 'Installed extension successfully!' );
 
 		notices()->dismiss_notice( 'features-removed-notice' );
 
