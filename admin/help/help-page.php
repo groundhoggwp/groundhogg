@@ -273,7 +273,7 @@ class Help_Page extends Tabbed_Admin_Page {
                 </p>
                 <p style="text-align: center">
                     <a href="https://www.groundhogg.io/fb/"
-                       target="_blank"><?php _e( 'Post to Facebook.', 'groundhogg' ); ?></a>
+                       target="_blank"><?php _e( 'Ask my question on Facebook.', 'groundhogg' ); ?></a>
                 </p>
             </div>
 		<?php
