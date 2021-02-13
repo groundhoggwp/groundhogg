@@ -634,6 +634,8 @@ class Tools_Page extends Tabbed_Admin_Page {
 		$meta_keys                 = array_diff( array_values( Plugin::$instance->dbs->get_db( 'contactmeta' )->get_keys() ), array_keys( $default_exportable_fields ) );
 
 		?>
+        <p><?php _e( "Select which information you want to appear in your CSV file.", 'groundhogg' ); ?></p>
+
         <form method="post">
 			<?php wp_nonce_field( 'choose_columns' ); ?>
             <h3><?php _e( 'Basic Contact Information', 'groundhogg' ) ?></h3>
@@ -647,7 +649,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 					'name'  => "<input type='checkbox' value='1' checked class='select-all-basic'>",
 					'tag'   => 'td'
 				],
-				__( 'Nice Name', 'groundhogg' ),
+				__( 'Pretty Name', 'groundhogg' ),
 				__( 'Field ID', 'groundhogg' ),
 			], map_deep( array_keys( $default_exportable_fields ), function ( $header ) use ( $default_exportable_fields ) {
 				return [
@@ -680,8 +682,8 @@ class Tools_Page extends Tabbed_Admin_Page {
 						'name'  => "<input type='checkbox' value='1' class='select-all-meta'>",
 						'tag'   => 'td'
 					],
-					__( 'Nice Name', 'groundhogg' ),
-					__( 'Meta Key', 'groundhogg' ),
+					__( 'Pretty Name', 'groundhogg' ),
+					__( 'Field ID', 'groundhogg' ),
 				], map_deep( $meta_keys, function ( $header ) {
 					return [
 						html()->checkbox( [

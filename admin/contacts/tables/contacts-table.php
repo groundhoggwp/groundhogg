@@ -20,6 +20,7 @@ use Groundhogg\Plugin;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use function Groundhogg\scheduled_time_column;
+use function Groundhogg\split_name;
 
 
 /**
@@ -92,7 +93,19 @@ class Contacts_Table extends WP_List_Table {
 		$order    = get_url_var( 'order', 'DESC' );
 		$orderby  = get_url_var( 'orderby', 'ID' );
 
+
 		$query = get_request_query();
+
+		$full_name = split_name( $search );
+
+		if ( $full_name[0] && $full_name[1] ){
+		    $query['first_name'] = $full_name[0];
+		    $query['first_name_compare'] = 'starts_with';
+			$query['last_name'] = $full_name[1];
+			$query['last_name_compare'] = 'starts_with';
+			// If search by first and last clear regular search
+		    $search=null;
+        }
 
 		// Since unconfirmed is 0 (aside maybe we should change that) we need to specify we actually want it still.
 		$optin_status = get_request_var( 'optin_status' );

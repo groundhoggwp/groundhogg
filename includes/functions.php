@@ -4057,7 +4057,7 @@ function track_live_activity( $type, $details = [] ) {
  * @param array $details details about that activity
  * @param Contact $contact the contact to track
  */
-function track_activity( $contact, $type, $args, $details = [] ) {
+function track_activity( $contact, $type='', $args=[], $details = [] ) {
 
 	// If there is not one available, skip
 	if ( ! is_a_contact( $contact ) ) {

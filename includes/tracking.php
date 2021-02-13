@@ -89,6 +89,7 @@ class Tracking {
 
 		// Actions which build the tracking cookie.
 		add_action( 'wp_login', [ $this, 'wp_login' ], 10, 2 );
+		add_action( 'wp_logout', [ $this, 'wp_logout' ], 10, 2 );
 
 		add_action( 'after_setup_theme', [ $this, 'deconstruct_tracking_cookie' ], 1 );
 		add_action( 'init', [ $this, 'add_rewrite_rules' ] );
@@ -232,7 +233,7 @@ class Tracking {
 		// Clean the URL, wonky encoding sometimes...
 		$target_url = str_replace( '&#038;', '&', $target_url );
 
-		if ( empty( $target_url ) ){
+		if ( empty( $target_url ) ) {
 			$target_url = home_url();
 		}
 
@@ -342,9 +343,9 @@ class Tracking {
 	 *
 	 * @return bool
 	 */
-	public function set_current_contact( $contact ){
+	public function set_current_contact( $contact ) {
 
-		if ( ! is_a_contact( $contact ) ){
+		if ( ! is_a_contact( $contact ) ) {
 			return false;
 		}
 
@@ -398,7 +399,7 @@ class Tracking {
 
 		$id = absint( $this->get_tracking_cookie_param( 'event_id' ) );
 
-		if ( $this->event && $this->event->get_id() === $id ){
+		if ( $this->event && $this->event->get_id() === $id ) {
 			return $this->event;
 		}
 
@@ -406,7 +407,7 @@ class Tracking {
 		// so reference the `queued_id` rather than the actual event `ID`
 		$event = get_event_by_queued_id( $id );
 
-		if ( ! $event || ! $event->exists() ){
+		if ( ! $event || ! $event->exists() ) {
 			return false;
 		}
 
@@ -530,13 +531,22 @@ class Tracking {
 		$this->add_tracking_cookie_param( 'user_id', $user->ID );
 		$this->add_tracking_cookie_param( 'source', 'login' );
 
-		$contact = Plugin::$instance->utils->get_contact( $user->user_email );
+		$contact = get_contactdata( $user->user_email );
 
 		if ( $contact ) {
 			$this->add_tracking_cookie_param( 'contact_id', $contact->get_id() );
 		}
 
 		$this->build_tracking_cookie();
+
+		track_live_activity( 'login' );
+	}
+
+	/**
+	 * Track when a user logs out
+	 */
+	public function wp_logout() {
+		track_live_activity( 'logout' );
 	}
 
 	/**
@@ -646,7 +656,7 @@ class Tracking {
 		/* track every click as an open */
 		$this->email_opened();
 
-		$event    = $this->get_current_event();
+		$event = $this->get_current_event();
 
 		/**
 		 * @since 2.1
