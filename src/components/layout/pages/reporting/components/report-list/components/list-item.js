@@ -126,9 +126,10 @@ const ListItem = ({
   onSelect,
   selected,
   title,
-  id,
-  status,
-  date,
+  link,
+  // id,
+  // status,
+  // date,
   ...rest
 
 }) => {
@@ -165,7 +166,7 @@ const ListItem = ({
         display="flex"
         flexGrow={1}
         component={RouterLink}
-        to={`funnels/${id}`}
+        to={link}
         className={classes.content}
       >
         {/*<Avatar src={'asdfasdf'}>
@@ -205,7 +206,7 @@ const ListItem = ({
               </Box>
               {'mail.message'}
             </Typography>*/}
-              <Box
+              {/*<Box
                 display="flex"
                 mx={2}
               >
@@ -222,14 +223,15 @@ const ListItem = ({
 
 
               </Box>
+              */}
           {/*</Hidden>*/}
-          <Typography
+          {/*<Typography
             className={classes.date}
             color="textSecondary"
             variant="caption"
           >
             {moment(date).format('DD MMM YYYY')}
-          </Typography>
+          </Typography>*/}
         </Box>
       </Box>
     </div>
