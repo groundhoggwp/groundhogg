@@ -179,12 +179,20 @@ class Funnel extends Base_Object_With_Meta {
 	/**
 	 * Import a funnel
 	 *
+	 * 1. Create the funnel with details from the JSON config file
+	 * 2. Create a map of all the step IDs to a unique ID
+	 * 4. Replace all the IDs in the edges and steps with the Unique ID
+	 * 5. Import all the steps
+	 *      update the map with the new step ID from the DB
+	 * 6. Import all the edges, referencing the ID map
+	 *
 	 * @param $import
 	 *
 	 * @return bool|int|\WP_Error
 	 */
 	public function import( $import ) {
 
+		// Validate the import
 		if ( is_string( $import ) ) {
 			$import = json_decode( $import, true );
 		}
@@ -193,6 +201,7 @@ class Funnel extends Base_Object_With_Meta {
 			return new \WP_Error( 'invalid_funnel', 'Invalid funnel markup.' );
 		}
 
+		// Create the funnel
 		$title = $import['title'];
 
 		$args = [
@@ -207,13 +216,21 @@ class Funnel extends Base_Object_With_Meta {
 			return new \WP_Error( 'db_error', 'Could not add to the DB.' );
 		}
 
+		// Import the steps
 		$steps = $import['steps'];
+		$edges = $import['edges'];
 
-		foreach ( $steps as $i => $step_args ) {
+		$id_map = [];
 
-			$step_title = $step_args['title'];
-			$step_group = $step_args['group'];
-			$step_type  = $step_args['type'];
+		foreach ( $steps as $i => $step ) {
+
+			$old_step_id = $step['ID'];
+
+			$data = $step['data'];
+
+			$step_title = $data['title'];
+			$step_group = $data['group'];
+			$step_type  = $data['type'];
 
 			$args = array(
 				'funnel_id'   => $funnel_id,
@@ -221,7 +238,6 @@ class Funnel extends Base_Object_With_Meta {
 				'step_status' => 'ready',
 				'step_group'  => $step_group,
 				'step_type'   => $step_type,
-				'step_order'  => $i + 1,
 			);
 
 			$step = new Step( $args );
@@ -230,30 +246,97 @@ class Funnel extends Base_Object_With_Meta {
 				continue;
 			}
 
-			$step_meta = $step_args['meta'];
+			$new_step_id = $step->get_id();
+
+			$step_meta = $step['meta'];
 
 			foreach ( $step_meta as $key => $value ) {
-
-				// Replace URL
-				if ( is_string( $value ) ) {
-					$value = search_and_replace_domain( $value );
-				}
-
 				$step->update_meta( $key, $value );
-
 			}
 
-			$import_args = $step_args['args'];
-
-			$step->import( $import_args );
-
-			// The screen will be blank, so set the first step to active
-			if ( $i === 0 && is_white_labeled() ) {
-				$step->update_meta( 'is_active', true );
-			}
+			// Create the ID map
+			$id_map[ $old_step_id ] = $new_step_id;
 
 		}
 
+		// Add edges using the ID map to fetch the real step ID
+		foreach ( $edges as $edge ) {
+			get_db( 'step_edges' )->add( [
+				'funnel_id' => $this->get_id(),
+				'from_id'   => $id_map[ $edge['from_id'] ],
+				'to_id'     => $id_map[ $edge['to_id'] ],
+			] );
+		}
+
 		return $funnel_id;
+	}
+
+	/**
+	 * Publish changes made in the config to the steps and their respective settings
+	 * This allows for automatic updates of the funnel without making changes live until the user
+	 * commits the changes.
+	 *
+	 * 1. Pause any active events in the funnel.
+	 * 2. For each of the steps in the config, update the steps in the DB with those settings.
+	 * 3. Delete ALL of the edges in the step edges table
+	 * 4. Recreate the edges based on the edges in the config.
+	 * 5. If there are any orphaned steps (without edges) delete them.
+	 * 6. Release any pending events.
+	 *
+	 * @var $config array the serialized json config.
+	 */
+	public function publish_changes() {
+
+		// pause any active events
+		get_db( 'events' )->update( [
+			'funnel_id' => $this->get_id(),
+			'status'    => Event::WAITING
+		], [
+			'status' => Event::PAUSED
+		] );
+
+		// Update the steps with the most recent information.
+		$config        = $this->draft_config;
+		$altered_steps = $config['steps'];
+
+		foreach ( $altered_steps as $altered_step ) {
+			$live_step = new Step( $altered_step['ID'] );
+			$live_step->update( $altered_step['data'], $altered_step['meta'] );
+		}
+
+		// Delete all current edges
+		get_db( 'step_edges' )->bulk_delete( [
+			'funnel_id' => $this->get_id()
+		] );
+
+		// Recreate any edges
+		$new_edges = $config['edges'];
+
+		foreach ( $new_edges as $new_edge ) {
+			get_db( 'step_edges' )->add( [
+				'funnel_id' => $this->get_id(),
+				'from_id'   => $new_edge['from_id'],
+				'to_id'     => $new_edge['to_id'],
+			] );
+		}
+
+		// Delete orphaned steps
+		$all_step_ids = $this->get_step_ids();
+
+		foreach ( $all_step_ids as $step_id ) {
+			if ( get_db( 'step_edges' )->is_step_orphaned( $this->get_id(), $step_id ) ) {
+				$step = new Step( $step_id );
+				$step->delete();
+			}
+		}
+
+		// Release any paused events
+		get_db( 'events' )->update( [
+			'funnel_id' => $this->get_id(),
+			'status'    => Event::PAUSED
+		], [
+			'status' => Event::WAITING
+		] );
+
 	}
 }

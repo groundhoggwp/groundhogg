@@ -123,6 +123,22 @@ class Step_Edges extends DB {
 	}
 
 	/**
+	 * Whether the current step is orphaned or not
+	 *
+	 * @param $funnel_id
+	 * @param $step_id
+	 *
+	 * @return bool
+	 */
+	public function is_step_orphaned( int $funnel_id, int $step_id ): bool {
+		global $wpdb;
+		$sql     = "SELECT * FROM {$this->table_name} WHERE funnel_id = $funnel_id AND ( from_id = $step_id OR to_id = $step_id )";
+		$results = $wpdb->get_results( $sql );
+
+		return empty( $results );
+	}
+
+	/**
 	 * Delete a tag relationship
 	 *
 	 * @access  public
@@ -149,7 +165,7 @@ class Step_Edges extends DB {
 			return false;
 		}
 
-		do_action( 'groundhogg/db/post_delete/tag_relationship', $args );
+		do_action( 'groundhogg/db/post_delete/step_edge', $args );
 
 		return true;
 
