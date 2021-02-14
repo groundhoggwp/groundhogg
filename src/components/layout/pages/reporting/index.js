@@ -60,41 +60,52 @@ const ReportPanel = (props) => {
   const location = useLocation();
 
 
+  const singleView = location.pathname.split('/')[2];
 
+  console.log('single view', singleView)
   const [report, setReport] = useState(location.pathname.split('/')[1]);
   const [startDate, setStartDate] = useState(getLuxonDate("one_year_back"));
   const [endDate, setEndDate] = useState(getLuxonDate("today"));
   const [reports, setReports] = useState({});
 
   let Panel = getReportPanel(report || "overview");
-  let datePickers = <div/>
+  let datePickers = <div className={classes.datePickers}>
+      <DatePicker
+        dateChange={dateChange}
+        selectedDate={startDate}
+        label={"start"}
+        id={"start"}
+      />
+      <DatePicker
+        dateChange={dateChange}
+        selectedDate={endDate}
+        label={"end"}
+        id={"end"}
+      />
+  </div>
   // Once we've restored top level routing we can clean this up
-  if(location.pathname.split('/')[2]){
+
+  if(singleView){
+    datePickers = <div/>
     Panel = getReportPanel(`${report}-single` || "overview");
-    datePickers = <div className={classes.datePickers}>
-        <DatePicker
-          dateChange={dateChange}
-          selectedDate={startDate}
-          label={"start"}
-          id={"start"}
-        />
-        <DatePicker
-          dateChange={dateChange}
-          selectedDate={endDate}
-          label={"end"}
-          id={"end"}
-        />
-    </div>
   }
 
   const { fetchItems } = useDispatch(REPORTS_STORE_NAME);
 
   const getReports = async () => {
-    fetchItems({
+    console.log(Panel.reports[0])
+    const fetchRequest = singleView ? {
+      context: {
+        [Panel.reports[0]]: "IN"
+      },
+      start: startDate,
+      end: endDate,
+    } : {
       reports: Panel.reports,
       start: startDate,
       end: endDate,
-    }).then((results) => {
+    }
+    fetchItems(fetchRequest).then((results) => {
       if(results.hasOwnProperty( 'items')){
         setReports(results.items);
       }
@@ -184,11 +195,13 @@ const ReportPanel = (props) => {
   };
 
   const tabsHandleChange = (value) => {
-    let newCurrentTab = 0;
     tabs.forEach((tab, i) => {
       if (tab.route === value) {
-        newCurrentTab = i;
-        history.push(tab.route);
+        if(singleView){
+          history.push(`../${tab.route}`);
+        } else {
+          history.push(tab.route);
+        }
       }
     });
 
