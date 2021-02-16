@@ -1,10 +1,18 @@
+
 .interface-interface-skeleton .interface-interface-skeleton__sidebar {
   height: 100%;
   outline: none;
   top: 13px;
-  overflow: hidden;
+  // overflow: hidden;
   border-radius: 5px;
 }
+
+.interface-interface-skeleton {
+  .interface-interface-skeleton__sidebar, .scrollbar-container {
+    overflow: visible !important;
+  }
+}
+
 
 
 .groundhogg-email-sidebar {
