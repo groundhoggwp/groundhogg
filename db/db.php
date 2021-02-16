@@ -493,9 +493,8 @@ abstract class DB {
 
 		global $wpdb;
 
-		$row_id = absint( $row_id );
-
-		if ( ! empty( $row_id ) ) {
+		if ( ! is_array( $row_id ) ){
+			$row_id = absint( $row_id );
 			$where = [ $this->get_primary_key() => $row_id ];
 		}
 
