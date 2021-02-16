@@ -11,16 +11,11 @@ registerReportsPanel('funnels-single', {
 
   name: 'Funnel',
   reports: [
-    'ddl_funnels'
   ],
   layout: ({
     reports,
-    isLoading
+    isLoading,
   }) => {
-
-    const {
-      ddl_funnels
-    } = reports
 
     return (
       <Box flexGrow={1}>
@@ -30,7 +25,7 @@ registerReportsPanel('funnels-single', {
                 title={"Total New Contacts"}
                 i
                 id={"ddl_funnels"}
-                data={!isLoading ? ddl_funnels : {}}
+                data={!isLoading ? reports[0] : {}}
                 loading={isLoading}
                 icon={<ContactMailIcon />}
             />

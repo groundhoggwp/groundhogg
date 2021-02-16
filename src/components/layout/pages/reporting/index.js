@@ -60,9 +60,8 @@ const ReportPanel = (props) => {
   const location = useLocation();
 
 
-  const singleView = location.pathname.split('/')[2];
+  const subRoute = location.pathname.split('/')[2];
 
-  console.log('single view', singleView)
   const [report, setReport] = useState(location.pathname.split('/')[1]);
   const [startDate, setStartDate] = useState(getLuxonDate("one_year_back"));
   const [endDate, setEndDate] = useState(getLuxonDate("today"));
@@ -85,7 +84,7 @@ const ReportPanel = (props) => {
   </div>
   // Once we've restored top level routing we can clean this up
 
-  if(singleView){
+  if(subRoute){
     datePickers = <div/>
     Panel = getReportPanel(`${report}-single` || "overview");
   }
@@ -93,10 +92,9 @@ const ReportPanel = (props) => {
   const { fetchItems } = useDispatch(REPORTS_STORE_NAME);
 
   const getReports = async () => {
-    console.log(Panel.reports[0])
-    const fetchRequest = singleView ? {
+    const fetchRequest = subRoute ? {
       context: {
-        [Panel.reports[0]]: "IN"
+        [subRoute]: "IN"
       },
       start: startDate,
       end: endDate,
@@ -105,6 +103,7 @@ const ReportPanel = (props) => {
       start: startDate,
       end: endDate,
     }
+
     fetchItems(fetchRequest).then((results) => {
       if(results.hasOwnProperty( 'items')){
         setReports(results.items);
@@ -131,6 +130,7 @@ const ReportPanel = (props) => {
       <Panel.layout
         isLoading={isRequesting || !isObject(reports)}
         reports={isObject(reports) ? reports : {}}
+        testing={'testing'}
       />
     </>
   );
@@ -197,7 +197,7 @@ const ReportPanel = (props) => {
   const tabsHandleChange = (value) => {
     tabs.forEach((tab, i) => {
       if (tab.route === value) {
-        if(singleView){
+        if(subRoute){
           history.push(`../${tab.route}`);
         } else {
           history.push(tab.route);
