@@ -42,9 +42,6 @@ export const ReportsPage = () => {
     <>
       <HashRouter>
         <div style={{ padding: 20 }}>
-          {/*panels.map(panel =>
-            <Link to={'/' + panel.id }>{panel.name}</Link>
-          )*/}
           <Switch>
             <Route path="/" children={<ReportPanel />} />
             <Route path="/:report" children={<ReportPanel />} />
@@ -62,23 +59,53 @@ const ReportPanel = (props) => {
   const history = useHistory();
   const location = useLocation();
 
-  const [report, setReport] = useState(location.pathname.replace("/", ""));
+
+  const subRoute = location.pathname.split('/')[2];
+
+  const [report, setReport] = useState(location.pathname.split('/')[1]);
   const [startDate, setStartDate] = useState(getLuxonDate("one_year_back"));
   const [endDate, setEndDate] = useState(getLuxonDate("today"));
   const [reports, setReports] = useState({});
 
-  const Panel = getReportPanel(report || "overview");
+  let Panel = getReportPanel(report || "overview");
+  let datePickers = <div className={classes.datePickers}>
+      <DatePicker
+        dateChange={dateChange}
+        selectedDate={startDate}
+        label={"start"}
+        id={"start"}
+      />
+      <DatePicker
+        dateChange={dateChange}
+        selectedDate={endDate}
+        label={"end"}
+        id={"end"}
+      />
+  </div>
+  // Once we've restored top level routing we can clean this up
+
+  if(subRoute){
+    datePickers = <div/>
+    Panel = getReportPanel(`${report}-single` || "overview");
+  }
 
   const { fetchItems } = useDispatch(REPORTS_STORE_NAME);
 
   const getReports = async () => {
-    fetchItems({
-      // reports: [],
+    const fetchRequest = subRoute ? {
+      context: {
+        [subRoute]: "IN"
+      },
+      start: startDate,
+      end: endDate,
+    } : {
       reports: Panel.reports,
       start: startDate,
       end: endDate,
-    }).then((results) => {
-      if (results.hasOwnProperty("items")) {
+    }
+
+    fetchItems(fetchRequest).then((results) => {
+      if(results.hasOwnProperty( 'items')){
         setReports(results.items);
       }
     });
@@ -94,28 +121,16 @@ const ReportPanel = (props) => {
     };
   }, []);
 
+
+
   const panel = (
     <>
       <Breadcrumb path={["Reporting", Panel.name]} />
-      <div className={classes.datePickers}>
-        <DatePicker
-          dateChange={dateChange}
-          selectedDate={startDate}
-          label={"start"}
-          id={"start"}
-        />
-        <DatePicker
-          dateChange={dateChange}
-          selectedDate={endDate}
-          label={"end"}
-          id={"end"}
-        />
-      </div>
+      {datePickers}
       <Panel.layout
         isLoading={isRequesting || !isObject(reports)}
         reports={isObject(reports) ? reports : {}}
-        startDate={startDate}
-        endDate={endDate}
+        testing={'testing'}
       />
     </>
   );
@@ -180,11 +195,13 @@ const ReportPanel = (props) => {
   };
 
   const tabsHandleChange = (value) => {
-    let newCurrentTab = 0;
     tabs.forEach((tab, i) => {
       if (tab.route === value) {
-        newCurrentTab = i;
-        history.push(tab.route);
+        if(subRoute){
+          history.push(`../${tab.route}`);
+        } else {
+          history.push(tab.route);
+        }
       }
     });
 
