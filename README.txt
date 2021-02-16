@@ -309,7 +309,10 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
-= 2.3.4 (2021-02-13) =
+= 2.3.4.1 (2021-02-16) =
+* FIXED Login fails caused by event tracking not being available.
+
+= 2.3.4 (2021-02-16) =
 * ADDED Ability to declare data processing consent and marketing consent when importing contacts.
 * ADDED Ability to change the column header type when exporting contacts.
 * ADDED Option disable unnecessary cookies like `groundhogg-lead-source` in the **Compliance** settings.

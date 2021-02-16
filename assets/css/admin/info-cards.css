@@ -1,57 +1,233 @@
-.contact-info-cards .stuffbox>h3, .contact-info-cards h2, .contact-info-cards h3.hndle {
-  font-size: 14px;
-  padding: 8px 12px;
-  margin: 0;
-  line-height: 1.4;
+.contact-info-cards .stuffbox > h3, .contact-info-cards h2, .contact-info-cards h3.hndle {
+    font-size: 14px;
+    padding: 8px 12px;
+    margin: 0;
+    line-height: 1.4;
 }
 
 .contact-info-cards .postbox {
-  margin-bottom: 10px;
+    margin-bottom: 10px;
 }
 
-.info-card ul.info-list{
-  margin-bottom: 0;
-}
-
-.info-card .postbox-header .hndle{
-  justify-content: left;
-}
-
-.info-card .postbox-header img.emoji {
-  margin-right: 10px !important;
-}
-
-.info-card ul.info-list li:not(:last-child){
-  margin-bottom: 10px;
-}
-
-.info-card ul.info-list li span.label,
-.info-card ul.info-list li span.data{
-  display: block;
-}
-.info-card ul.info-list li span.label{
-  font-weight: 500;
-  color: #808080;
-  font-size: 12px;
-  text-transform: uppercase;
-}
-
-.info-card ul.info-list li span.data{
-  font-size: 16px;
-  color: #1b1b1b;
+.info-card ul.info-list {
+    margin-bottom: 0;
 }
 
 ul.regular-list{
-  list-style: disc;
-  padding-left: 20px;
+    list-style: disc;
+    padding-left: 20px;
 }
 
 ul.regular-list li{
-  margin: 0;
+    margin: 0;
 }
 
-.smalldate{
-
+.info-card .postbox-header .hndle {
+    justify-content: left;
 }
 
-/* Nilesh, you can write your JS code here */
+.info-card .postbox-header img.emoji {
+    margin-right: 10px !important;
+}
+
+.info-card ul.info-list li:not(:last-child) {
+    margin-bottom: 10px;
+}
+
+.info-card ul.info-list li span.label,
+.info-card ul.info-list li span.data {
+    display: block;
+}
+
+.info-card ul.info-list li span.label {
+    font-weight: 500;
+    color: #808080;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.info-card ul.info-list li span.data {
+    font-size: 16px;
+    color: #1b1b1b;
+}
+
+.container-info {
+    background-color: #f1f1f1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin: 0 0 10px;
+    padding: 10px 0 0;
+}
+
+.container-info .content-info {
+    display: none;
+    padding: 10px 10px 1px;
+    background-color: #fff;
+}
+
+.header-info {
+    cursor: pointer;
+}
+
+.header-info .header-content {
+    display: inline-block;
+    font-weight: 500;
+    padding: 0 6px 10px;
+}
+
+.header-info span {
+    margin: 0 5px 0 0;
+}
+
+.header-info > .dashicons {
+    float: right;
+    font-size: 18px;
+    margin: 0 5px 0 0;
+}
+
+.content-info li {
+    display: flex;
+    margin: 0 0 10px;
+}
+
+.content-info li .label {
+    font-weight: 500;
+}
+
+.content-info .dashicons {
+    float: none;
+    font-size: 17px;
+    margin: 0 2px 0 0;
+}
+
+.content-info .content {
+    padding: 0 4px;
+    max-width: 150px;
+}
+
+.content-info .content input {
+    width: 100%;
+}
+
+.content-info .content .status {
+    padding: 2px 8px;
+    color: #fff;
+    font-weight: 500;
+    margin: 0 5px;
+}
+
+.content-info .content .red {
+    background: #eb2222;
+}
+
+.content-info .content .green {
+    background: #218838;
+}
+
+.content-info .timeline li {
+    position: relative;
+    padding: 0 0 0 20px;
+}
+
+.content-info .timeline li:before {
+    position: absolute;
+    content: "";
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px #d0d0d0, 0 0 0 2px #d0d0d0;
+    width: 8px;
+    content: "";
+    height: 8px;
+    top: 6px;
+    left: 2px;
+}
+
+.content-info .timeline li:after {
+    background: #dadcde;
+    content: "";
+    height: 130%;
+    left: 5px;
+    position: absolute;
+    top: 14px;
+    width: 2px;
+}
+
+.content-info .timeline li:last-child:after {
+    height: 0;
+}
+
+.content-info .timeline-second {
+    position: relative;
+    margin: 0 auto;
+}
+
+.content-info .timeline-second:before {
+    content: '';
+    position: absolute;
+    width: 6px;
+    background-color: #d0d0d0;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    margin-left: -3px;
+}
+
+.content-info .timeline-second li {
+    display: block;
+    width: 40%;
+    padding: 10px 8px;
+    position: relative;
+    background-color: inherit;
+}
+
+.content-info .timeline-second li:after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    right: -18px;
+    background-color: white;
+    border: 4px solid #FF9F55;
+    top: 15px;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.content-info .timeline-second .left {
+    left: 0;
+}
+
+.content-info .timeline-second .left::before {
+    content: " ";
+    height: 0;
+    position: absolute;
+    top: 20px;
+    width: 0;
+    z-index: 1;
+    right: 8px;
+    border: medium solid black;
+    border-width: 5px 0 5px 5px;
+    border-color: transparent transparent transparent black;
+}
+
+.content-info .timeline-second .right {
+    padding: 10px 8px 10px 30px;
+    left: 50%;
+}
+
+.content-info .timeline-second .right:before {
+    content: " ";
+    height: 0;
+    position: absolute;
+    top: 20px;
+    width: 0;
+    z-index: 1;
+    left: 14px;
+    border: medium solid #000;
+    border-width: 5px 5px 5px 0;
+    border-color: transparent #000 transparent transparent;
+}
+
+.content-info .timeline-second .right::after {
+    left: -9px;
+}

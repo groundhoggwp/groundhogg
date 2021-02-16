@@ -4041,7 +4041,7 @@ function track_live_activity( $type, $details = [] ) {
 		'funnel_id'  => tracking()->get_current_funnel_id(),
 		'contact_id' => tracking()->get_current_contact_id(),
 		'email_id'   => tracking()->get_current_email_id(),
-		'event_id'   => tracking()->get_current_event()->get_id(),
+		'event_id'   => tracking()->get_current_event() ? tracking()->get_current_event()->get_id() : false,
 		'referer'    => tracking()->get_leadsource(),
 	];
 
