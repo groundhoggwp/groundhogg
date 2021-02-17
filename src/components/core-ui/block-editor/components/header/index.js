@@ -15,14 +15,13 @@ import { Inserter } from "@wordpress/block-editor";
  * External dependencies
  */
 import { makeStyles } from "@material-ui/core/styles";
-
+import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import ReplayIcon from '@material-ui/icons/Replay';
 /**
  * Internal dependencies
  */
 
 import HeaderToolbar from "./header-toolbar";
-// import HeaderPrimary from './header-primary';<HeaderPrimary />
-import HeaderSecondary from "./header-secondary";
 import { Spinner } from "components";
 
 const useStyles = makeStyles((theme) => ({
@@ -47,20 +46,10 @@ const useStyles = makeStyles((theme) => ({
 export default function Header({
   email,
   history,
-  saveDraft,
   publishEmail,
-  closeEditor,
   isSaving,
   handleTitleChange,
   title,
-  handleViewTypeChange,
-  sendTestEmail,
-  handleTestEmailChange,
-  testEmail,
-  altBodyContent,
-  handleAltBodyContent,
-  altBodyEnable,
-  handleAltBodyEnable,
 }) {
   const classes = useStyles();
   return (
@@ -72,10 +61,9 @@ export default function Header({
         tabIndex="-1"
       >
         <HeaderToolbar>
-          {/* This is totally undocumented, it pops up and import blocks fine but the add doesn't work at all without documentation I can't figure out how to use the functions without a ton of digging
-          <div className={classes.inserterBtn}>
-            <Inserter />
-          </div>*/}
+          <Button className={classes.button} variant="contained" color="secondary" href="./admin.php?page=gh_emails">
+            <ArrowBackIosIcon/>
+          </Button>
           <h1 className="groundhogg-header__title">
             <form noValidate autoComplete="off">
               <TextField
@@ -86,39 +74,17 @@ export default function Header({
               />
             </form>
           </h1>
+          <div className="groundhogg-header__reverseChangesBtns edit-post-header__settings">
+            <Button><ReplayIcon/></Button>
+            <Button><ReplayIcon/></Button>
+          </div>
           <div className="groundhogg-header__settings edit-post-header__settings">
             {isSaving && <Spinner />}
-            <Button className={classes.button} onClick={saveDraft} variant="contained" color="secondary">
-              {__("Save Draft")}
-            </Button>
             <Button className={classes.button} onClick={publishEmail} variant="contained" color="primary">
-              {__("Publish")}
-            </Button>
-            <Button className={classes.button} onClick={closeEditor} variant="contained" color="secondary">
-              {__("Close")}
+              {__("Update")}
             </Button>
             <PinnedItems.Slot scope="gh/v4/core" />
           </div>
-        </HeaderToolbar>
-      </div>
-
-      <div
-        className="groundhogg-header secondary-header edit-post-header"
-        role="region"
-        aria-label={__("Email Editor secondary top bar.", "groundhogg")}
-        tabIndex="-1"
-      >
-        <HeaderToolbar>
-          <HeaderSecondary
-            handleViewTypeChange={handleViewTypeChange}
-            sendTestEmail={sendTestEmail}
-            handleTestEmailChange={handleTestEmailChange}
-            testEmail={testEmail}
-            altBodyContent={altBodyContent}
-            handleAltBodyContent={handleAltBodyContent}
-            altBodyEnable={altBodyEnable}
-            handleAltBodyEnable={handleAltBodyEnable}
-          />
         </HeaderToolbar>
       </div>
     </Card>

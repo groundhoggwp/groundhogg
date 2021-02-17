@@ -50,7 +50,7 @@
 }
 
 .groundhogg-block-editor {
-  top: 173px;
+  top: 116px;
   padding-bottom: 280px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -152,4 +152,10 @@
   > .block-editor-writing-flow__click-redirect,
 .groundhogg-block-editor * {
   outline: none;
+}
+
+
+
+.bottomPanelTesting .components-panel {
+  margin-top: 700px
 }

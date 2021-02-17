@@ -23,8 +23,16 @@ import PerfectScrollbar from "react-perfect-scrollbar";
  */
 import { makeStyles } from "@material-ui/core/styles";
 import { useEffect, useState } from "@wordpress/element";
-import TextField from "@material-ui/core/TextField/TextField";
-import Grid from "@material-ui/core/Grid/Grid";
+import {Button, TextField, InputLabel} from "@material-ui/core";
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
+import DesktopMacIcon from '@material-ui/icons/DesktopMac';
+import SmartphoneIcon from '@material-ui/icons/Smartphone';
+import FormatAlignJustifyIcon from '@material-ui/icons/FormatAlignJustify';
+import FormatAlignLeftIcon from '@material-ui/icons/FormatAlignLeft';
+import FormatAlignRightIcon from '@material-ui/icons/FormatAlignRight';
 
 /**
  * Internal dependencies
@@ -34,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
   root: {},
   searchField: {
     width: "calc(100% - 20px)",
-    margin: "10px",
+    margin: "10px"
   },
 }));
 
@@ -42,7 +50,7 @@ const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
   "GroundhoggEmailBuilderSidebarInspector"
 );
 
-const Sidebar = () => {
+const Sidebar = ({isInspecting}) => {
   const classes = useStyles();
 
   const [blocks, setBlocks] = useState(getBlockTypes());
@@ -68,6 +76,52 @@ const Sidebar = () => {
     }
   };
 
+  const blockPanel = isInspecting ?
+
+      <Panel header={__("Inspector")}>
+        <InspectorSlot bubblesVirtually />
+      </Panel>
+      :
+      <Panel header={__("Blocks")}>
+          <TextField
+            className={classes.searchField}
+            value={search}
+            label={"Search"}
+            type={"search"}
+            variant={"outlined"}
+            size={"small"}
+            onChange={handleOnChange}
+            fullWidth
+          />
+          <div className="side-bar-blocks-container">
+            {blocks.map((block) => {
+              return (
+                <div
+                  data-block={JSON.stringify(block)}
+                  className="block-editor-block side-bar-drag-drop-block"
+                >
+                  <svg
+                    aria-hidden="true"
+                    role="img"
+                    focusable="false"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    class="dashicon dashicons-shield"
+                  >
+                    <path d="M10 2s3 2 7 2c0 11-7 14-7 14S3 15 3 4c4 0 7-2 7-2zm0 8h5s1-1 1-5c0 0-5-1-6-2v7H5c1 4 5 7 5 7v-7z"></path>
+                  </svg>
+                  {block.title}
+                </div>
+              );
+            })}
+          </div>
+
+          <Button>Additional options:</Button>
+        </Panel>
+
+
   return (
     <PerfectScrollbar>
     <div
@@ -76,47 +130,63 @@ const Sidebar = () => {
       aria-label={__("Groundhogg Email Sidebar advanced settings.")}
       tabIndex="-1"
     >
+      <Panel>
+        <Button>{__("Send test email")}</Button>
+        <Button>
+          <SmartphoneIcon />
+        </Button>
+        <Button>
+          <DesktopMacIcon />
+        </Button>
 
-
-      <Panel header={__("Blocks")}>
         <TextField
           className={classes.searchField}
-          value={search}
-          label={"Search"}
+          value={'from'}
+          label={"From"}
           type={"search"}
-          variant={"outlined"}
-          size={"small"}
           onChange={handleOnChange}
           fullWidth
         />
-        <div className="side-bar-blocks-container">
-          {blocks.map((block) => {
-            return (
-              <div
-                className="block-editor-block side-bar-drag-drop-block"
-                data-block={JSON.stringify(block)}
-              >
-                <svg
-                  aria-hidden="true"
-                  role="img"
-                  focusable="false"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  class="dashicon dashicons-shield"
-                >
-                  <path d="M10 2s3 2 7 2c0 11-7 14-7 14S3 15 3 4c4 0 7-2 7-2zm0 8h5s1-1 1-5c0 0-5-1-6-2v7H5c1 4 5 7 5 7v-7z"></path>
-                </svg>
-                {block.title}
-              </div>
-            );
-          })}
-        </div>
+        <TextField
+          className={classes.searchField}
+          value={'from'}
+          label={"Reply to"}
+          type={"search"}
+          onChange={handleOnChange}
+          fullWidth
+        />
+
+        <label>{__("Alignment")}</label>
+        <Button><FormatAlignJustifyIcon/></Button>
+        <Button><FormatAlignLeftIcon/></Button>
+        <Button><FormatAlignRightIcon/></Button>
+
+        <FormControl className={classes.formControl}>
+          <InputLabel shrink id="demo-simple-select-placeholder-label-label">
+            Message type:
+          </InputLabel>
+          <Select
+            labelId="demo-simple-select-placeholder-label-label"
+            id="demo-simple-select-placeholder-label"
+            value={5}
+            onChange={()=>{}}
+            displayEmpty
+            className={classes.selectEmpty}
+          >
+            <MenuItem value="">
+              <em>None</em>
+            </MenuItem>
+            <MenuItem value={10}>Marketing</MenuItem>
+          </Select>
+          <FormHelperText>Label + placeholder</FormHelperText>
+      </FormControl>
+
+
+
       </Panel>
-      <Panel header={__("Inspector")}>
-        <InspectorSlot bubblesVirtually />
-      </Panel>
+
+      {blockPanel}
+
     </div>
     </PerfectScrollbar>
   );

@@ -1,11 +1,15 @@
 /**
  * WordPress dependencies
  */
+import { __ } from "@wordpress/i18n";
 import {
   Popover,
   SlotFillProvider,
   DropZoneProvider,
   FocusReturnProvider,
+  Panel,
+  PanelBody,
+  PanelRow
 } from "@wordpress/components";
 
 import {
@@ -45,7 +49,6 @@ import Sidebar from "./components/sidebar";
 import BlockEditor from "./components/block-editor";
 import TextEditor from "./components/text-editor";
 import { getLuxonDate, matchEmailRegex } from "utils/index";
-import Breadcrumb from "../bread-crumb";
 
 import { CORE_STORE_NAME, EMAILS_STORE_NAME } from "data";
 
@@ -332,7 +335,6 @@ export default ({ settings, email, history }) => {
 
   return (
     <>
-      <Breadcrumb path={['Email Editor', title]}/>
       <div className="Groundhogg-BlockEditor">
         <FullscreenMode isActive={false} />
         <SlotFillProvider>
@@ -368,6 +370,14 @@ export default ({ settings, email, history }) => {
                   <>
                     <Notices />
                     {editorPanel}
+                    <div className="bottomPanelTesting">
+                    <Panel header={__("Blocks")} style={{marginTop:'500px'}}>
+                      {/*icon={ more }*/}]
+                      <PanelBody title="My Block Settings"  initialOpen={ true } style={{backgroundColor:'#ccc'}}>
+                          <PanelRow>My Panel Inputs and Labels</PanelRow>
+                      </PanelBody>
+                    </Panel>
+                    </div>
                   </>
                 }
               />
