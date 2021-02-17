@@ -15,6 +15,7 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import { LoadingReport } from "../loading-report";
 import {useDispatch} from "@wordpress/data";
 import {REPORTS_STORE_NAME} from "../../../../../../data";
+import {propsReadySystem} from "react-virtuoso/dist/propsReadySystem";
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -69,7 +70,12 @@ export const DonutChart =(props) => {
     ...rest
   } = props;
 
-  if (loading || !props.hasOwnProperty('data') || !props.data ||!props.data.hasOwnProperty("chart")) {
+  if (
+    loading ||
+    !props.hasOwnProperty("data") ||
+    !props.data ||
+    !props.data.hasOwnProperty("chart")
+  ) {
     return <LoadingReport className={className} title={title} />;
   }
 
@@ -78,9 +84,9 @@ export const DonutChart =(props) => {
   const [data ,setData ] = useState(props.data);
   const { fetchItems } = useDispatch(REPORTS_STORE_NAME);
 
+
+
   const handleSelectionChange = (e) =>{
-    // make get request
-    console.log(e.target.value)
 
     // make get request and set data
     fetchItems({
@@ -88,17 +94,21 @@ export const DonutChart =(props) => {
       reports:[id],
       start: startDate,
       end: endDate,
+      context : {
+        ddl_region :  e.target.value
+      }
     }).then((results) => {
-
+      console.log(results.items[id])
         setData(results.items[id]);
+        console.log("HERER AFTER DATA ");
+        console.log(data)
 
     });
-
-
   }
 
 
 
+  console.log(data);
   return (
     <Card className={clsx(classes.root, className)} {...rest}>
       <CardHeader title={title} />
