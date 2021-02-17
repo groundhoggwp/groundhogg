@@ -91,11 +91,11 @@ code.meta-replacement-code{
 }
 
 #gh-notes{
-    max-width: 700px;
-    border: 1px solid #ccd0d4;
-    background-color: #FFFFFF;
-    border-radius: 1px;
-    margin: 10px 0;
+    /*max-width: 700px;*/
+    /*border-bottom: 1px solid #f1f1f1;*/
+    /*background-color: #FFFFFF;*/
+    /*border-radius: 1px;*/
+    margin-top: 10px;
 }
 
 #gh-notes:empty{
@@ -103,11 +103,12 @@ code.meta-replacement-code{
 }
 
 .gh-note{
-    padding: 10px 10px;
+    padding: 0 0 10px 0;
 }
 
 .gh-note:not(:last-child){
-    border-bottom: 1px solid #ccd0d4;
+    border-bottom: 1px solid #f1f1f1;
+    margin-bottom: 10px;
 }
 
 .gh-notes-container::after {
@@ -117,9 +118,14 @@ code.meta-replacement-code{
 }
 
 .note-actions {
-    float: right;
+    /*float: right;*/
     color: #aaa;
-    margin: 0 0 10px 10px;
+    /*margin: 0 0 10px 10px;*/
+    font-size: 12px;
+}
+
+.note-actions .dashicons {
+    font-size: 12px;
 }
 
 .gh-note p{
@@ -142,4 +148,16 @@ code.meta-replacement-code{
     white-space: nowrap;
     display: inline-block;
     vertical-align: top;
+}
+
+.edit-actions {
+    display: none;
+}
+
+.gh-note:hover .edit-actions{
+    display: block;
+}
+
+.delete-note.delete a{
+    color: #a00;
 }

@@ -5,6 +5,7 @@ use Groundhogg\Funnel;
 use function Groundhogg\convert_to_local_time;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\key_to_words;
+use function Groundhogg\time_ago;
 
 /**
  * @var $note \Groundhogg\Classes\Note
@@ -34,28 +35,30 @@ if ( $note->date_created !== date( 'Y-m-d H:i:s', convert_to_local_time( absint(
 	$label = __( 'Last edited', 'groundhogg' );
 }
 
-$display_date = date_i18n( get_date_time_format(), convert_to_local_time( absint( $note->timestamp ) ) );
+$display_date = time_ago( absint( $note->timestamp ) );
 
 ?>
 <div class="gh-note" id="<?php esc_attr_e( $note->ID ); ?>">
     <div class="gh-note-view">
+        <div class="display-notes gh-notes-container">
+		    <?php echo wpautop( esc_html( $note->content ) ); ?>
+        </div>
         <div class='note-actions'>
             <span class="note-date">
-            <?php printf( __( '%s by <span class="note-context" title="%s">%s</span> on %s', 'groundhogg' ), $label, esc_attr( $display_context ), $display_context, $display_date ); ?>
+            <?php printf( __( '%s by <span class="note-context" title="%s">%s</span> - %s', 'groundhogg' ), $label, esc_attr( $display_context ), $display_context, $display_date ); ?>
             </span>
-            | <span class="edit-notes" title="<?php esc_attr_e( 'Edit' );?>">
+            <div class="edit-actions">
+                <span class="edit-notes" title="<?php esc_attr_e( 'Edit' );?>">
                 <a style="text-decoration: none" href="javascript:void(0)">
-                    <span class="dashicons dashicons-edit"></span>
+                    <?php _e( 'Edit' ); ?>
+                </a>
+            </span> |
+                <span class="delete-note delete danger" title="<?php esc_attr_e( 'Delete' );?>">
+                <a style="text-decoration: none" href="javascript:void(0)">
+                    <?php _e( 'Delete' ); ?>
                 </a>
             </span>
-            | <span class="delete-note" title="<?php esc_attr_e( 'Delete' );?>">
-                <a style="text-decoration: none" href="javascript:void(0)">
-                    <span class="dashicons dashicons-trash delete"></span>
-                </a>
-            </span>
-        </div>
-        <div class="display-notes gh-notes-container">
-			<?php echo wpautop( esc_html( $note->content ) ); ?>
+            </div>
         </div>
     </div>
     <div class="gh-note-edit" style="display: none;">

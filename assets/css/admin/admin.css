@@ -20,6 +20,10 @@
     box-sizing: border-box;
 }
 
+.full-width{
+    width: 100%;
+}
+
 .progress-percentage {
     color: #FFFFFF;
     font-weight: 500;
