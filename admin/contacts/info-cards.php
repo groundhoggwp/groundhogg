@@ -67,11 +67,11 @@ class Info_Cards {
 	/**
 	 * Register a new info box.
 	 *
-	 * @param int $id
-	 * @param string $title
-	 * @param callable $callback
-	 * @param int $priority
-	 * @param string $capability
+	 * @param string $id the ID of the info card
+	 * @param string $title the title of the info card
+	 * @param callable $callback callback to display the data
+	 * @param int $priority how high in the cards it should be displayed
+	 * @param string $capability the minimum capability for the viewing user to see the data in this card.
 	 */
 	public static function register( $id, $title, $callback, $priority = 100, $capability = 'view_contacts' ) {
 
