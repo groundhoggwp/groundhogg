@@ -52,16 +52,17 @@ ul.regular-list li{
 }
 
 .container-info {
-    background-color: #f1f1f1;
-    padding: 10px;
-    border: 1px solid #ccc;
+    /*background-color: #f1f1f1;*/
+    /*padding: 10px;*/
+    /*border: 1px solid #ccc;*/
     margin: 0 0 10px;
-    padding: 10px 0 0;
+    /*padding: 10px 0 0;*/
+    border-bottom: 1px solid #f1f1f1;
 }
 
 .container-info .content-info {
     display: none;
-    padding: 10px 10px 1px;
+    padding: 10px 0;
     background-color: #fff;
 }
 
@@ -72,7 +73,7 @@ ul.regular-list li{
 .header-info .header-content {
     display: inline-block;
     font-weight: 500;
-    padding: 0 6px 10px;
+    padding: 0 6px 10px 0;
 }
 
 .header-info span {
