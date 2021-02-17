@@ -4,7 +4,10 @@ namespace Groundhogg\Admin\Contacts;
 // Exit if accessed directly
 use Groundhogg\Plugin;
 use function Groundhogg\current_user_is;
+use function Groundhogg\dashicon_e;
 use function Groundhogg\get_request_var;
+use function Groundhogg\html;
+use function Groundhogg\isset_not_empty;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -27,10 +30,39 @@ if ( current_user_is( 'sales_manager' ) ) {
 
 ?>
 <div class="contact-record">
-	<div class="contact-editor-wrap">
+    <div class="contact-editor-wrap">
 		<?php include __DIR__ . '/contact-editor.php'; ?>
-	</div>
-	<div class="contact-info-cards meta-box-sortables">
+    </div>
+    <div class="contact-info-cards meta-box-sortables">
+        <div class="info-card-actions">
+            <a class="expand-all"
+               href="javascript:void(0)"><?php _e( 'Expand All', 'groundhogg' ); ?><?php dashicon_e( 'arrow-up' ); ?></a>
+            <a class="collapse-all"
+               href="javascript:void(0)"><?php _e( 'Collapse All', 'groundhogg' ); ?><?php dashicon_e( 'arrow-down' ); ?></a>
+            <a href="javascript:void(0)"><?php _e( 'View', 'groundhogg' ); ?><?php dashicon_e( 'visibility' ); ?></a>
+        </div>
+        <div class="info-card-views postbox">
+            <div class="inside">
+                <p><?php _e( 'Select which cards you want visible.', 'groundhogg' ); ?></p>
+				<?php
+
+				foreach ( Info_Cards::$info_cards as $id => $card ):
+
+					?>
+                    <div><?php
+					echo html()->checkbox( [
+						'label' => $card['title'],
+						'name'  => sprintf( 'cards_display[%s]', $id ),
+						'value' => 1,
+                        'checked' => ! isset_not_empty( $card, 'hidden' )
+					] );
+					?></div><?php
+
+				endforeach;
+
+				?>
+            </div>
+        </div>
 		<?php Info_Cards::do_info_cards( $contact ); ?>
-	</div>
+    </div>
 </div>

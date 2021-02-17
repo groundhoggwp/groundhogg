@@ -1,3 +1,13 @@
+.info-card-actions{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.info-card-actions a[href]{
+    text-decoration: none;
+}
+
 .contact-info-cards .stuffbox > h3, .contact-info-cards h2, .contact-info-cards h3.hndle {
     font-size: 14px;
     padding: 8px 12px;
