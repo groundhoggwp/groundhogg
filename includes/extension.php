@@ -3,6 +3,7 @@
 namespace Groundhogg;
 
 use Groundhogg\Admin\Admin_Menu;
+use Groundhogg\Admin\Contacts\Info_Cards;
 use Groundhogg\Admin\Dashboard\Dashboard_Widgets;
 use Groundhogg\DB\Manager;
 use Groundhogg\Reporting\Reports\Report;
@@ -195,6 +196,7 @@ abstract class Extension {
 		add_action( 'groundhogg/steps/init', [ $this, 'register_funnel_steps' ] );
 		add_action( 'groundhogg/dashboard/widgets/init', [ $this, 'register_dashboard_widgets' ] );
 		add_action( 'groundhogg/replacements/init', [ $this, 'add_replacements' ] );
+		add_action( 'groundhogg/admin/contacts/register_info_cards', [ $this, 'register_contact_info_cards' ] );
 		add_filter( 'groundhogg/admin/emails/blocks/init', [ $this, 'register_email_blocks' ] );
 
 		add_filter( 'groundhogg/reporting/reports', [ $this, 'register_reports' ] );
@@ -293,6 +295,12 @@ abstract class Extension {
 	 * @param $dashboard Dashboard_Widgets
 	 */
 	public function register_dashboard_widgets( $dashboard ) {
+	}
+
+	/**
+	 * @param $cards Info_Cards
+	 */
+	public function register_contact_info_cards( $cards ) {
 	}
 
 	/**

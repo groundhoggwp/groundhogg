@@ -50,9 +50,9 @@ class Info_Cards {
 //			include __DIR__ . '/cards/email-activity.php';
 //		} );
 
-//		self::register( 'formatting-example', __( 'Formatting Example', 'groundhogg' ), function ( $contact ){
-//		    include __DIR__ . '/cards/example.php';
-//        } );
+		self::register( 'formatting-example', __( 'Formatting Example', 'groundhogg' ), function ( $contact ){
+		    include __DIR__ . '/cards/example.php';
+        } );
 
 		do_action( 'groundhogg/admin/contacts/register_info_cards', $this );
 	}
