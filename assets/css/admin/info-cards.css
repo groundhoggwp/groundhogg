@@ -47,8 +47,12 @@ ul.regular-list li{
 }
 
 .info-card ul.info-list li span.data {
-    font-size: 16px;
+    font-size: 14px;
     color: #1b1b1b;
+}
+.info-card ul.info-list li span.subdata {
+    font-size: 12px;
+    /*color: #1b1b1b;*/
 }
 
 .container-info {
@@ -118,6 +122,10 @@ ul.regular-list li{
     font-size: 11px;
     border-radius: 2px;
     text-transform: uppercase;
+}
+
+.light-text{
+    color: #aaaaaa;
 }
 
 .content-info .red {

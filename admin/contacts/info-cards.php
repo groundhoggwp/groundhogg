@@ -50,6 +50,10 @@ class Info_Cards {
 			include __DIR__ . '/cards/notes.php';
 		} );
 
+		self::register( 'files', __( 'Files', 'groundhogg' ), function ( $contact ) {
+			include __DIR__ . '/cards/files.php';
+		} );
+
 //		self::register( 'email_activity', __( 'Email Activity', 'groundhogg' ), function ( $contact ) {
 //			include __DIR__ . '/cards/email-activity.php';
 //		} );

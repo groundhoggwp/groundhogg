@@ -34,7 +34,7 @@ $tabs = array(
 	'meta_data'    => _x( 'Custom Info', 'contact_record_tab', 'groundhogg' ),
 	'segmentation' => _x( 'Segmentation', 'contact_record_tab', 'groundhogg' ),
 //	'notes'        => _x( 'Notes', 'contact_record_tab', 'groundhogg' ),
-	'files'        => _x( 'Files', 'contact_record_tab', 'groundhogg' ),
+//	'files'        => _x( 'Files', 'contact_record_tab', 'groundhogg' ),
 	'actions'      => _x( 'Actions', 'contact_record_tab', 'groundhogg' ),
 	'activity'     => _x( 'Activity', 'contact_record_tab', 'groundhogg' ),
 );

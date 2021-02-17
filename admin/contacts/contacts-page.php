@@ -521,6 +521,40 @@ class Contacts_Page extends Admin_Page {
 	}
 
 	/**
+     * Process a file upload
+     *
+	 * @return array|bool|\WP_Error
+	 */
+	public function process_upload_file(){
+
+		$id = absint( get_request_var( 'contact' ) );
+
+		if ( ! $id ) {
+			return new \WP_Error( 'no_contact_id', __( 'Contact id not found.', 'groundhogg' ) );
+		}
+
+		$contact = get_contactdata( $id );
+		$count = 0;
+
+		if ( ! empty( $_FILES['files'] ) ) {
+			$files = normalize_files( $_FILES['files'] );
+			foreach ( $files as $file_key => $file ) {
+				if ( ! get_array_var( $file, 'error' ) ) {
+					$e = $contact->upload_file( $file );
+					if ( is_wp_error( $e ) ) {
+						return $e;
+					}
+					$count++;
+				}
+			}
+		}
+
+		$this->add_notice( 'uploaded', sprintf( _n( "Uploaded file", "Uploaded %s files", $count, 'groundhogg' ), $count ) );
+
+		return admin_page_url( 'gh_contacts', [ 'action' => 'edit', 'contact' => $contact->get_id() ] );
+    }
+
+	/**
 	 * Update the contact via the admin screen
 	 */
 	public function process_edit() {

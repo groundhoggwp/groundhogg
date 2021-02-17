@@ -102,13 +102,10 @@ code.meta-replacement-code{
     display: none;
 }
 
-.gh-note{
-    padding: 0 0 10px 0;
-}
-
 .gh-note:not(:last-child){
     border-bottom: 1px solid #f1f1f1;
     margin-bottom: 10px;
+    padding: 0 0 10px 0;
 }
 
 .gh-notes-container::after {
@@ -150,14 +147,21 @@ code.meta-replacement-code{
     vertical-align: top;
 }
 
+.file-actions,
 .edit-actions {
-    display: none;
+    visibility: hidden;
 }
 
+.file:hover .file-actions,
 .gh-note:hover .edit-actions{
-    display: block;
+    visibility: visible;
 }
 
-.delete-note.delete a{
+.delete a{
     color: #a00;
+    text-decoration: none;
+}
+
+.file a.file-download{
+    text-decoration: none;
 }

@@ -407,3 +407,15 @@ table.wp-list-table.funnels td.column-active_contacts {
 .export-table.wp-list-table th:first-child {
     /*width: 50px;*/
 }
+
+.wp-admin .gh-file-uploader {
+    width: 100%;
+    margin: auto;
+    padding: 10px !important;
+    box-sizing: border-box;
+    background: #F9F9F9;
+    border: 2px dashed #e5e5e5;
+    text-align: center;
+    /*margin-top: 10px;*/
+    margin-bottom: 3px;
+}

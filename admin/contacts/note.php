@@ -36,6 +36,7 @@ if ( $note->date_created !== date( 'Y-m-d H:i:s', convert_to_local_time( absint(
 }
 
 $display_date = time_ago( absint( $note->timestamp ) );
+$real_date = date_i18n( get_date_time_format(), absint( $note->timestamp ) );
 
 ?>
 <div class="gh-note" id="<?php esc_attr_e( $note->ID ); ?>">
@@ -45,7 +46,7 @@ $display_date = time_ago( absint( $note->timestamp ) );
         </div>
         <div class='note-actions'>
             <span class="note-date">
-            <?php printf( __( '%s by <span class="note-context" title="%s">%s</span> - %s', 'groundhogg' ), $label, esc_attr( $display_context ), $display_context, $display_date ); ?>
+            <?php printf( __( '%s by <span class="note-context" title="%s">%s</span> - <abbr title="%s">%s</abbr>', 'groundhogg' ), $label, esc_attr( $display_context ), $display_context, $real_date, $display_date ); ?>
             </span>
             <div class="edit-actions">
                 <span class="edit-notes" title="<?php esc_attr_e( 'Edit' );?>">
