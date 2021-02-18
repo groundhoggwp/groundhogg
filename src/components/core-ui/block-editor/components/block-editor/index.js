@@ -111,7 +111,7 @@ function BlockEditor({
       // }
     });
   });
-  console.log('pre', preHeader === '')
+
   return (
     <div className="groundhogg-block-editor" ref={blockEditorEl}>
       <BlockEditorProvider
@@ -150,7 +150,7 @@ function BlockEditor({
                 <BlockEditorKeyboardShortcuts.Register />
                 <Popover.Slot left={300} top={500} />
                 <Popover.Slot name="block-toolbar" left={300} top={500} />{" "}
-                {/*refresh={(e)=>{console.log('refresh', e)}}/>*/}
+
                 <Typewriter>
                   <CopyHandler>
                     <WritingFlow>

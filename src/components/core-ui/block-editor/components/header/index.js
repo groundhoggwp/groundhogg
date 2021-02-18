@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Header({
   email,
   history,
-  publishEmail,
+  updateEmail,
   isSaving,
   handleTitleChange,
   title,
@@ -80,7 +80,7 @@ export default function Header({
           </div>
           <div className="groundhogg-header__settings edit-post-header__settings">
             {isSaving && <Spinner />}
-            <Button className={classes.button} onClick={publishEmail} variant="contained" color="primary">
+            <Button className={classes.button} onClick={updateEmail} variant="contained" color="primary">
               {__("Update")}
             </Button>
             <PinnedItems.Slot scope="gh/v4/core" />

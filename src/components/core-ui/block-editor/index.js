@@ -71,6 +71,7 @@ export default ({ email, history }) => {
     content: defaultContentValue,
   } = email.data;
 
+  const [isInspecting, setIsInspecting] = useState(false);
   const [testEmail, setTestEmail] = useState([]);
   const [altBodyContent, setAltBodyContent] = useState('');
   const [altBodyEnable, setAltBodyEnable] = useState('');
@@ -124,20 +125,21 @@ export default ({ email, history }) => {
     }
   };
 
-  const saveDraft = (e) => {
-    dispatch.updateItem(email.ID, {
-      data: {
-        subject,
-        title,
-        pre_header: preHeader,
-        status: "draft",
-        content,
-        last_updated: getLuxonDate("last_updated"),
-      },
-    });
-  };
+  // Delete this
+  // const saveDraft = (e) => {
+  //   dispatch.updateItem(email.ID, {
+  //     data: {
+  //       subject,
+  //       title,
+  //       pre_header: preHeader,
+  //       status: "draft",
+  //       content,
+  //       last_updated: getLuxonDate("last_updated"),
+  //     },
+  //   });
+  // };
 
-  const publishEmail = (e) => {
+  const updateEmail = (e) => {
     dispatch.updateItem(email.ID, {
       data: {
         subject,
@@ -151,7 +153,8 @@ export default ({ email, history }) => {
   };
 
   const closeEditor = (e) => {
-    history.goBack();
+    // Doesn't work without local routing
+    // history.goBack();
   };
 
   const dragMoveListener = (event) => {
@@ -267,6 +270,7 @@ export default ({ email, history }) => {
   };
 
   const handleViewTypeChange = (type) => {
+    console.log(type)
     setViewType(type);
   };
 
@@ -350,25 +354,17 @@ export default ({ email, history }) => {
                 header={
                   <Header
                     email={email}
-                    history={history}
-                    saveDraft={saveDraft}
-                    publishEmail={publishEmail}
+                    history={history}                    
+                    updateEmail={updateEmail}
                     closeEditor={closeEditor}
                     isSaving={isSaving}
                     title={title}
                     handleTitleChange={handleTitleChange}
-                    handleViewTypeChange={handleViewTypeChange}
-                    sendTestEmail={sendTestEmail}
-                    handleTestEmailChange={handleTestEmailChange}
-                    altBodyContent={altBodyContent}
-                    handleAltBodyContent={handleAltBodyContent}
-                    altBodyEnable={altBodyEnable}
-                    handleAltBodyEnable={handleAltBodyEnable}
                   />
                 }
                 sidebar={
                   <>
-                    <Sidebar />
+                    <Sidebar isInspecting={isInspecting} handleViewTypeChange={handleViewTypeChange} />
                     <ComplementaryArea.Slot scope="gh/v4/core" />
                   </>
                 }

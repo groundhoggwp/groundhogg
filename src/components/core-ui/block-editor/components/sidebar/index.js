@@ -50,7 +50,7 @@ const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
   "GroundhoggEmailBuilderSidebarInspector"
 );
 
-const Sidebar = ({isInspecting}) => {
+const Sidebar = ({isInspecting, handleViewTypeChange}) => {
   const classes = useStyles();
 
   const [blocks, setBlocks] = useState(getBlockTypes());
@@ -132,10 +132,10 @@ const Sidebar = ({isInspecting}) => {
     >
       <Panel>
         <Button>{__("Send test email")}</Button>
-        <Button>
-          <SmartphoneIcon />
+        <Button onClick={() => { handleViewTypeChange('mobile') }}>
+          <SmartphoneIcon/>
         </Button>
-        <Button>
+        <Button onClick={() => { handleViewTypeChange('desktop') }}>
           <DesktopMacIcon />
         </Button>
 
