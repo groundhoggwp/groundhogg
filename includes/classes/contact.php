@@ -302,6 +302,13 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * @return string
 	 */
+	public function get_mobile_number() {
+		return $this->get_meta( 'mobile_phone' );
+	}
+
+	/**
+	 * @return string
+	 */
 	public function get_phone_extension() {
 		return $this->get_meta( 'primary_phone_extension' );
 	}

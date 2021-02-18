@@ -1774,8 +1774,11 @@ function get_exportable_fields( $extra = [] ) {
 		'date_created'              => __( 'Date Created', 'groundhogg' ),
 		'date_optin_status_changed' => __( 'Date Optin Status Changed', 'groundhogg' ),
 		'birthday'                  => __( 'Birthday', 'groundhogg' ),
-		'primary_phone'             => __( 'Phone Number', 'groundhogg' ),
-		'primary_phone_extension'   => __( 'Phone Number Extension', 'groundhogg' ),
+		'mobile_phone'              => __( 'Mobile Phone Number', 'groundhogg' ),
+		'primary_phone'             => __( 'Primary Phone Number', 'groundhogg' ),
+		'primary_phone_extension'   => __( 'Primary Phone Number Extension', 'groundhogg' ),
+		'company_phone'             => __( 'Company Phone Number', 'groundhogg' ),
+		'company_phone_extension'   => __( 'Company Phone Number Extension', 'groundhogg' ),
 		'street_address_1'          => __( 'Street Address 1', 'groundhogg' ),
 		'street_address_2'          => __( 'Street Address 2', 'groundhogg' ),
 		'city'                      => __( 'City', 'groundhogg' ),
@@ -1870,8 +1873,11 @@ function get_mappable_fields( $extra = [] ) {
 		'date_created'              => __( 'Date Created', 'groundhogg' ),
 		'date_optin_status_changed' => __( 'Date Optin Status Changed', 'groundhogg' ),
 		'birthday'                  => __( 'Birthday', 'groundhogg' ),
-		'primary_phone'             => __( 'Phone Number', 'groundhogg' ),
-		'primary_phone_extension'   => __( 'Phone Number Extension', 'groundhogg' ),
+		'mobile_phone'              => __( 'Mobile Phone Number', 'groundhogg' ),
+		'primary_phone'             => __( 'Primary Phone Number', 'groundhogg' ),
+		'primary_phone_extension'   => __( 'Primary Phone Number Extension', 'groundhogg' ),
+		'company_phone'             => __( 'Company Phone Number', 'groundhogg' ),
+		'company_phone_extension'   => __( 'Company Phone Number Extension', 'groundhogg' ),
 		'street_address_1'          => __( 'Street Address 1', 'groundhogg' ),
 		'street_address_2'          => __( 'Street Address 2', 'groundhogg' ),
 		'city'                      => __( 'City', 'groundhogg' ),
@@ -2017,8 +2023,11 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				}
 
 				break;
+			case 'mobile_phone':
 			case 'primary_phone':
 			case 'primary_phone_extension':
+			case 'company_phone':
+			case 'company_phone_extension':
 			case 'street_address_1' :
 			case 'street_address_2':
 			case 'city':
@@ -4057,7 +4066,7 @@ function track_live_activity( $type, $details = [] ) {
  * @param array $details details about that activity
  * @param Contact $contact the contact to track
  */
-function track_activity( $contact, $type='', $args=[], $details = [] ) {
+function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 
 	// If there is not one available, skip
 	if ( ! is_a_contact( $contact ) ) {

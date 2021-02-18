@@ -498,8 +498,11 @@ class Contacts_Page extends Admin_Page {
 			'gdpr_consent_date',
 			'marketing_consent',
 			'marketing_consent_date',
+			'mobile_phone',
 			'primary_phone',
 			'primary_phone_extension',
+            'company_phone',
+			'company_phone_extension',
 			'street_address_1',
 			'street_address_2',
 			'time_zone',
@@ -632,8 +635,11 @@ class Contacts_Page extends Admin_Page {
 		$contact->update( $args );
 
 		$basic_text_fields = [
+			'mobile_phone',
 			'primary_phone',
 			'primary_phone_extension',
+            'company_phone',
+			'company_phone_extension',
 			'company_name',
 			'job_title',
 			'company_address',

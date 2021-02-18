@@ -445,7 +445,7 @@ abstract class Admin_Page extends Supports_Errors {
 	 * Output the title actions
 	 */
 	protected function do_title_actions() {
-		$actions = apply_filters( "gronudhogg/admin/{$this->get_slug()}/{$this->get_current_action()}/title_actions", $this->get_title_actions() );
+		$actions = apply_filters( "groundhogg/admin/{$this->get_slug()}/{$this->get_current_action()}/title_actions", $this->get_title_actions() );
 
 		foreach ( $actions as $action ):
 

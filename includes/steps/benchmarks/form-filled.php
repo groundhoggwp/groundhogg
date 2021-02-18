@@ -724,6 +724,39 @@ class Form_Filled extends Benchmark {
                     </tr>
                     <!-- END DATE OPTIONS -->
 
+                    <!-- BEGIN PHONE OPTIONS-->
+                    <tr id="gh-field-phone_type">
+                        <th><?php _e( 'Phone Type', 'groundhogg' ) ?></th>
+                        <td><?php
+							echo html()->dropdown( [
+								'id'      => 'field-phone_type',
+								'name'    => 'phone_type',
+								'options' => [
+									'primary' => __( 'Primary Phone', 'groundhogg' ),
+									'mobile'  => __( 'Mobile Phone', 'groundhogg' ),
+									'company' => __( 'Company Phone', 'groundhogg' ),
+								],
+                                'option_none' => false,
+							] )
+							?>
+                            <p class="description"><?php _e( 'Which phone field you want the contact to provide.', 'groundhogg' ) ?></p>
+                        </td>
+                    </tr>
+                    <tr id="gh-field-show_ext">
+                        <th><?php _e( 'Collect Number Extension', 'groundhogg' ) ?></th>
+                        <td><?php
+		                    echo html()->checkbox( [
+			                    'id'    => 'field-show_ext',
+			                    'name'  => 'show_ext',
+			                    'label' => __( 'Yes' ),
+			                    'value' => 'true'
+                            ] );
+		                    ?>
+                            <p class="description"><?php _e( 'Ask to collect the phone number extension.', 'groundhogg' ) ?></p>
+                        </td>
+                    </tr>
+                    <!-- END PHONE OPTIONS-->
+
                     <!-- BEGIN TIME OPTIONS -->
                     <tr id="gh-field-min_time">
                         <th><?php _e( 'Min Time', 'groundhogg' ) ?></th>

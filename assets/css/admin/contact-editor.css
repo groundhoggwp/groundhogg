@@ -20,7 +20,7 @@
     border: 1px solid #ccd0d4;
     box-shadow: 0 1px 1px rgba(0,0,0,.04);
     background: #fff;
-    width: 500px;
+    width: 540px;
     max-width: 100%;
     padding: 20px 20px 20px 20px;
     box-sizing: border-box;
@@ -49,6 +49,18 @@
     text-decoration: none;
 }
 
+.contact-details .tags{
+    white-space: normal;
+}
+
+.contact-details .tags .tag{
+    background: #f2f2f2;
+    padding: 3px 9px;
+    border-radius: 3px;
+    margin: 0 6px 6px 0;
+    display: inline-block;
+}
+
 div.email-status{
    margin: 20px;
 }
@@ -70,6 +82,10 @@ div.email-status{
 
 .basic-details .details {
     margin: 0 0 10px 2px;
+}
+
+.phone-ext{
+    width: 100px;
 }
 
 .deal-details .details {
@@ -188,4 +204,8 @@ code.meta-replacement-code{
 
 .file a.file-download{
     text-decoration: none;
+}
+
+.button-actions{
+    margin-top: 3px;
 }
