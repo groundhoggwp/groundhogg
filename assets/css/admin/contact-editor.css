@@ -1,5 +1,6 @@
 .contact-record{
     display: flex;
+    margin-top: 10px;
 }
 
 .contact-editor-wrap{
@@ -23,8 +24,25 @@
     max-width: 100%;
     padding: 20px 20px 20px 20px;
     box-sizing: border-box;
-    margin: 10px 0;
+    margin: 0 0 10px 0;
     /*margin-left: 300px;*/
+}
+
+.contact-details .full-name{
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.contact-details div:not(:last-child){
+    margin-bottom: 8px;
+}
+
+.contact-details div .dashicons{
+    margin-right: 10px;
+}
+
+.contact-details div a {
+    text-decoration: none;
 }
 
 div.email-status{
@@ -38,10 +56,12 @@ div.email-status{
     position: relative;
     /*box-shadow: 0 1px 1px rgba(0,0,0,.04);*/
     background: #fff;
+    border-radius: 3px;
 }
 
 .contact-picture img {
     vertical-align: middle;
+    border-radius: 3px;
 }
 
 .basic-details .details {

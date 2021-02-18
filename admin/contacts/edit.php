@@ -34,12 +34,14 @@ if ( current_user_is( 'sales_manager' ) ) {
 		<?php include __DIR__ . '/contact-editor.php'; ?>
     </div>
     <div class="contact-info-cards meta-box-sortables">
-        <div class="info-card-actions">
-            <a class="expand-all"
-               href="javascript:void(0)"><?php _e( 'Expand All', 'groundhogg' ); ?><?php dashicon_e( 'arrow-up' ); ?></a>
-            <a class="collapse-all"
-               href="javascript:void(0)"><?php _e( 'Collapse All', 'groundhogg' ); ?><?php dashicon_e( 'arrow-down' ); ?></a>
-            <a class="view-cards" href="javascript:void(0)"><?php _e( 'Cards', 'groundhogg' ); ?><?php dashicon_e( 'visibility' ); ?></a>
+        <div class="info-card-actions postbox">
+            <div class="inside">
+                <a class="expand-all"
+                   href="javascript:void(0)"><?php _e( 'Expand All', 'groundhogg' ); ?><?php dashicon_e( 'arrow-up' ); ?></a>
+                <a class="collapse-all"
+                   href="javascript:void(0)"><?php _e( 'Collapse All', 'groundhogg' ); ?><?php dashicon_e( 'arrow-down' ); ?></a>
+                <a class="view-cards" href="javascript:void(0)"><?php _e( 'Cards', 'groundhogg' ); ?><?php dashicon_e( 'visibility' ); ?></a>
+            </div>
         </div>
         <div class="info-card-views postbox hidden">
             <div class="inside">

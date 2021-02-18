@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin\Contacts;
 
 use function Groundhogg\admin_page_url;
+use function Groundhogg\dashicon_e;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_cookie;
 use function Groundhogg\get_date_time_format;
@@ -60,71 +61,24 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
         </div>
         <div class="basic-details">
             <!-- FIRST -->
-			<?php
-
-			echo html()->e( 'div', [ 'class' => 'details' ], html()->input( [
-				'name'        => 'first_name',
-				'title'       => __( 'First Name' ),
-				'value'       => $contact->get_first_name(),
-//            'readonly' => true,
-				'class'       => 'auto-copy regular-text',
-				'placeholder' => __( 'First Name' )
-			] ) );
-
-			echo html()->e( 'div', [ 'class' => 'details' ], html()->input( [
-				'name'        => 'last_name',
-				'title'       => __( 'Last Name' ),
-				'value'       => $contact->get_last_name(),
-//            'readonly' => true,
-				'class'       => 'auto-copy regular-text',
-				'placeholder' => __( 'Last Name' )
-			] ) );
-
-			echo html()->e( 'div', [ 'class' => 'details' ], [
-				html()->input( [
-					'title'       => __( 'Email' ),
-					'name'        => 'email_readonly',
-					'value'       => $contact->get_email(),
-					'readonly'    => true,
-					'placeholder' => __( 'Email' ),
-					'class'       => 'auto-copy regular-text',
-					'style'       => [
-						'max-width' => '18em'
-					]
-				] ),
-				html()->e( 'a', [
-					'class' => 'button',
-					'title' => __( 'Send Email', 'groundhogg' ),
-					'href'  => sprintf( 'mailto:%s', $contact->get_email() )
-				], '<span class="dashicons dashicons-email"></span>' )
-			] );
-
-			if ( $contact->get_phone_number() ) {
-				echo html()->e( 'div', [ 'class' => 'details' ], [
-					html()->input( [
-						'name'        => 'primary_phone_readonly',
-						'title'       => __( 'Phone' ),
-						'value'       => $contact->get_phone_number(),
-						'placeholder' => __( 'Phone Number' ),
-						'readonly'    => true,
-						'class'       => 'auto-copy regular-text',
-						'style'       => [
-							'max-width' => '18em'
-						]
-					] ),
-					html()->e( 'a', [
-						'class' => 'button',
-						'title' => __( 'Call Now', 'groundhogg' ),
-						'href'  => sprintf( 'tel:%s', $contact->get_phone_number() )
-					], '<span class="dashicons dashicons-phone"></span>' )
-				] );
-			}
-
-
-			?>
-            <!-- LAST -->
-            <!-- EMAIL -->
-            <!-- PHONE -->
+            <div class="full-name"><?php dashicon_e( 'admin-users' ); ?><?php echo $contact->get_full_name(); ?></div>
+            <div class="email"><?php dashicon_e( 'email' ); ?><?php echo html()->e( 'a', [ 'href' => 'mailto:' . $contact->get_email() ], $contact->get_email() ) ?></div>
+			<?php if ( $contact->get_phone_number() ): ?>
+                <div class="phone"><?php dashicon_e( 'phone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_phone_number() ], $contact->get_phone_number() ) ?>
+                    <?php if ( $contact->get_phone_extension() ): ?>
+                        <span class="extension"><?php printf( __( 'ext. %s', 'groundhogg' ), $contact->get_phone_extension() ) ?></span>
+                    <?php endif; ?>
+                </div>
+			<?php endif; ?>
+			<?php if ( count( $contact->get_address() ) > 0 ): ?>
+                <div class="location" title="<?php esc_attr_e( 'Location', 'groundhogg' ); ?>">
+					<?php dashicon_e( 'admin-site' ); ?>
+					<?php echo html()->e( 'a', [ 'href' => 'https://www.google.com/maps/place/' . implode( ',+', $contact->get_address() ) ], implode( ', ', $contact->get_address() ) ) ?>
+                </div>
+			<?php endif; ?>
+            <div class="localtime" title="<?php esc_attr_e( 'Local time', 'groundhogg' ); ?>">
+				<?php dashicon_e( 'clock' ); ?><?php echo date_i18n( get_date_time_format(), $contact->get_local_time() ) ?>
+            </div>
         </div>
         <div class="wp-clearfix"></div>
     </div>
@@ -161,6 +115,31 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
         <!-- GENERAL NAME INFO -->
         <table class="form-table">
             <tbody>
+            <tr>
+                <th><label for="first_name"><?php echo _x( 'First Name', 'contact_record', 'groundhogg' ) ?></label>
+                </th>
+                <td><?php
+					echo html()->input( [
+						'name'        => 'first_name',
+						'title'       => __( 'First Name' ),
+						'value'       => $contact->get_first_name(),
+						'class'       => 'auto-copy regular-text',
+						'placeholder' => __( 'First Name' )
+					] );
+					?></td>
+            </tr>
+            <tr>
+                <th><label for="last_name"><?php echo _x( 'Last Name', 'contact_record', 'groundhogg' ) ?></label></th>
+                <td><?php
+					echo html()->input( [
+						'name'        => 'last_name',
+						'title'       => __( 'Last Name' ),
+						'value'       => $contact->get_last_name(),
+						'class'       => 'auto-copy regular-text',
+						'placeholder' => __( 'Last Name' )
+					] );
+					?></td>
+            </tr>
             <tr>
                 <th><label for="email"><?php echo _x( 'Email', 'contact_record', 'groundhogg' ) ?></label></th>
 
@@ -205,10 +184,10 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                             </div>
                         </div>
                         <script>jQuery(function ($) {
-                                $("#manual-confirm").on("change", function () {
-                                    $("#confirmation-reason").toggleClass("hidden");
-                                });
-                            });</script>
+                            $('#manual-confirm').on('change', function () {
+                              $('#confirmation-reason').toggleClass('hidden')
+                            })
+                          })</script>
 					<?php endif;
 
 					do_action( 'groundhogg/contact/record/email/after', $contact );

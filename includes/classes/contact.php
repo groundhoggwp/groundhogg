@@ -84,7 +84,7 @@ class Contact extends Base_Object_With_Meta {
 			$profile_pic = $this->profile_picture;
 		} else {
 			$profile_pic = get_avatar_url( $this->get_email(), [ 'size' => 300 ] );
-			$this->update_meta( 'profile_picture', $profile_pic );
+			$this->profile_picture = $profile_pic;
 		}
 
 		/**
@@ -334,10 +334,13 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * Get the address
 	 *
+	 * @param string[] $exclude
+	 *
 	 * @return array
 	 */
-	public function get_address() {
-		$address_keys = [
+	public function get_address( $exclude=['region','country_name'] ) {
+
+		$address_keys = array_diff( [
 			'street_address_1',
 			'street_address_2',
 			'postal_zip',
@@ -346,7 +349,7 @@ class Contact extends Base_Object_With_Meta {
 			'region_code',
 			'country',
 			'country_name',
-		];
+		], $exclude );
 
 		$address = [];
 
