@@ -660,7 +660,7 @@ class Contacts_Page extends Admin_Page {
 		}
 
 		if ( get_request_var( 'extrapolate_location' ) ) {
-			if ( $contact->extrapolate_location() ) {
+			if ( $contact->extrapolate_location( true ) ) {
 				$this->add_notice( 'location_updated', _x( 'Location updated.', 'notice', 'groundhogg' ), 'info' );
 			}
 		}

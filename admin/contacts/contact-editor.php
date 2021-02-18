@@ -65,15 +65,19 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
             <div class="email"><?php dashicon_e( 'email' ); ?><?php echo html()->e( 'a', [ 'href' => 'mailto:' . $contact->get_email() ], $contact->get_email() ) ?></div>
 			<?php if ( $contact->get_phone_number() ): ?>
                 <div class="phone"><?php dashicon_e( 'phone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_phone_number() ], $contact->get_phone_number() ) ?>
-                    <?php if ( $contact->get_phone_extension() ): ?>
+					<?php if ( $contact->get_phone_extension() ): ?>
                         <span class="extension"><?php printf( __( 'ext. %s', 'groundhogg' ), $contact->get_phone_extension() ) ?></span>
-                    <?php endif; ?>
+					<?php endif; ?>
                 </div>
 			<?php endif; ?>
 			<?php if ( count( $contact->get_address() ) > 0 ): ?>
                 <div class="location" title="<?php esc_attr_e( 'Location', 'groundhogg' ); ?>">
 					<?php dashicon_e( 'admin-site' ); ?>
-					<?php echo html()->e( 'a', [ 'href' => 'https://www.google.com/maps/place/' . implode( ',+', $contact->get_address() ), 'target' => '_blank' ], implode( ', ', $contact->get_address() ) ) ?>
+                    <div class="address">
+						<?php echo html()->e( 'a', [ 'href'   => 'https://www.google.com/maps/place/' . implode( ',+', $contact->get_address() ),
+						                             'target' => '_blank'
+						], implode( ', ', $contact->get_address() ) ) ?>
+                    </div>
                 </div>
 			<?php endif; ?>
             <div class="localtime" title="<?php esc_attr_e( 'Local time', 'groundhogg' ); ?>">

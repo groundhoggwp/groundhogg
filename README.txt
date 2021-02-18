@@ -309,6 +309,13 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.3.5 (2021-02-16) =
+* ADDED Expand/Collapse all contact info cards.
+* ADDED View/Display management for info cards so you can hide ones you don't use.
+* TWEAKED Improve the contact details card, moved editable fields to the general tab.
+* TWEAKED Refactored contact notes as an info card widget.
+* TWEAKED Refactored contact files as an info card widget.
+
 = 2.3.4.1 (2021-02-16) =
 * FIXED Login fails caused by event tracking not being available.
 

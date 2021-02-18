@@ -28,6 +28,10 @@
     /*margin-left: 300px;*/
 }
 
+.contact-details .location .dashicons{
+    float: left;
+}
+
 .contact-details .full-name{
     font-size: 18px;
     font-weight: 500;
