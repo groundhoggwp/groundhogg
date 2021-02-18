@@ -73,7 +73,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 			<?php if ( count( $contact->get_address() ) > 0 ): ?>
                 <div class="location" title="<?php esc_attr_e( 'Location', 'groundhogg' ); ?>">
 					<?php dashicon_e( 'admin-site' ); ?>
-					<?php echo html()->e( 'a', [ 'href' => 'https://www.google.com/maps/place/' . implode( ',+', $contact->get_address() ) ], implode( ', ', $contact->get_address() ) ) ?>
+					<?php echo html()->e( 'a', [ 'href' => 'https://www.google.com/maps/place/' . implode( ',+', $contact->get_address() ), 'target' => '_blank' ], implode( ', ', $contact->get_address() ) ) ?>
                 </div>
 			<?php endif; ?>
             <div class="localtime" title="<?php esc_attr_e( 'Local time', 'groundhogg' ); ?>">
