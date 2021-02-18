@@ -7,18 +7,9 @@
 @import "~@wordpress/interface/src/style.scss";
 
 // Internal
-@import "components/header/styles";
+// @import "components/header/styles";
 @import "components/sidebar/styles";
-@import "components/block-editor/styles";
-
-.groundhogg-block-editor {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  min-height: calc(100vh - 32px);
-}
+// @import "components/block-editor/styles";
 
 .editor-styles-wrapper {
   width: 100%;
@@ -43,18 +34,12 @@
   outline: none;
 }
 
-.groundhogg-block-editor,
+
 // The modals are shown outside the .groundhogg-block-editor wrapper, they need these styles.
 .components-modal__frame {
   @include reset;
 }
 
-.groundhogg-block-editor {
-  top: 116px;
-  padding-bottom: 280px;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
 
 // Custom CSS Begins
 .interface-interface-skeleton {
@@ -83,17 +68,12 @@
   }
 }
 
-.groundhogg-email-editor__email-content {
-  margin: 10px auto 30px;
-  padding: 10px;
-  width: 80%;
 
-  .dragged-over-top.wp-block{
-    border-top: 4px solid #007cba;
-  }
-  .dragged-over-bottom.wp-block{
-    border-bottom: 4px solid #007cba;
-  }
+.dragged-over-top.wp-block{
+  border-top: 4px solid #007cba;
+}
+.dragged-over-bottom.wp-block{
+  border-bottom: 4px solid #007cba;
 }
 
 .side-bar-blocks-container {
@@ -134,23 +114,11 @@
   border: 1px solid #2196f3;
 }
 
-#grid-snap {
-  width: 40%;
-  border-radius: 4px;
-  padding: 2%;
-  margin: 1rem 0 0 1rem;
-  background-color: #29e;
-  color: #fff;
-  font-size: 1.2em;
-  touch-action: none;
-}
-
 .edit-post-visual-editor
   > .block-editor__typewriter
   > div
   > .block-editor-writing-flow
-  > .block-editor-writing-flow__click-redirect,
-.groundhogg-block-editor * {
+  > .block-editor-writing-flow__click-redirect {
   outline: none;
 }
 

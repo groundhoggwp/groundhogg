@@ -34,13 +34,13 @@ const useStyles = makeStyles((theme) => ({
   button:{
     color: '#fff'
   },
-  inserterBtn: {
-    backgroundColor: theme.palette.secondary.main,
-    height: "36px",
-    marginLeft: "20px",
-    marginTop: "6px",
-    borderRadius: "4px",
-  },
+  titleContainer:{
+    display: 'inline-block',
+    width: 'calc(100% - 342px)',
+    // '& .MuiTextField-root':{
+    //   width: '100%'
+    // }
+  }
 }));
 
 export default function Header({
@@ -55,7 +55,6 @@ export default function Header({
   return (
     <Card className={classes.root}>
       <div
-        className="groundhogg-header primary-header edit-post-header"
         role="region"
         aria-label={__("Email Editor primary top bar.", "groundhogg")}
         tabIndex="-1"
@@ -64,27 +63,24 @@ export default function Header({
           <Button className={classes.button} variant="contained" color="secondary" href="./admin.php?page=gh_emails">
             <ArrowBackIosIcon/>
           </Button>
-          <h1 className="groundhogg-header__title">
-            <form noValidate autoComplete="off">
+          <h1 className={classes.titleContainer}>
               <TextField
-                className="groundhogg-header__title"
+                fullWidth={true}
                 label="Email Title"
                 value={title}
                 onChange={handleTitleChange}
               />
-            </form>
           </h1>
-          <div className="groundhogg-header__reverseChangesBtns edit-post-header__settings">
+          <span>
             <Button><ReplayIcon/></Button>
             <Button><ReplayIcon/></Button>
-          </div>
-          <div className="groundhogg-header__settings edit-post-header__settings">
+
             {isSaving && <Spinner />}
             <Button className={classes.button} onClick={updateEmail} variant="contained" color="primary">
               {__("Update")}
             </Button>
             <PinnedItems.Slot scope="gh/v4/core" />
-          </div>
+          </span>
         </HeaderToolbar>
       </div>
     </Card>

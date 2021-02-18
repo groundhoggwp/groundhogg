@@ -4,7 +4,32 @@
 import { __ } from "@wordpress/i18n";
 import { NavigableToolbar } from "@wordpress/block-editor";
 
-function HeaderToolbar({ children }) {
+/**
+ * External dependencies
+ */
+import { makeStyles } from "@material-ui/core/styles";
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: "calc(100%)",
+    overflow: "visible",
+    borderRadius: "5px",
+    padding: "20px",
+  },
+  button:{
+    color: '#fff'
+  },
+  inserterBtn: {
+    backgroundColor: theme.palette.secondary.main,
+    height: "36px",
+    marginLeft: "20px",
+    marginTop: "6px",
+    borderRadius: "4px",
+  },
+}));
+
+export default function HeaderToolbar({ children }) {
+  const classes = useStyles();
   const displayBlockToolbar = true; // May connect to GH core state.
 
   const toolbarAriaLabel = displayBlockToolbar
@@ -15,12 +40,10 @@ function HeaderToolbar({ children }) {
 
   return (
     <NavigableToolbar
-      className="groundhogg-header-toolbar edit-post-header-toolbar"
+      className={classes.root}
       aria-label={toolbarAriaLabel}
     >
       {children}
     </NavigableToolbar>
   );
 }
-
-export default HeaderToolbar;
