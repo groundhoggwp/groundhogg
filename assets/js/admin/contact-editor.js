@@ -112,6 +112,20 @@
         saveInfoCardOrder()
       })
 
+      $(document).on('click', '.view-cards', function (e) {
+        $('.info-card-views').toggleClass('hidden')
+      })
+
+      $(document).on('change', '.hide-card', function (e) {
+        var $checkbox = $(this)
+        if ($checkbox.is(':checked')) {
+          $('#' + $checkbox.val()).removeClass('hidden')
+        } else {
+          $('#' + $checkbox.val()).addClass('hidden')
+        }
+
+        saveInfoCardOrder()
+      })
     }
   })
 

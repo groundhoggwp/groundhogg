@@ -25,8 +25,9 @@ class Info_Cards {
 
 		$card_order = array_map( function ( $card_atts ) {
 			return [
-				'id'   => sanitize_key( $card_atts['id'] ),
-				'open' => $card_atts['open'] !== 'false',
+				'id'     => sanitize_key( $card_atts['id'] ),
+				'open'   => $card_atts['open'] !== 'false',
+				'hidden' => $card_atts['hidden'] !== 'false',
 			];
 		}, get_post_var( 'cardOrder', [] ) );
 
@@ -99,6 +100,53 @@ class Info_Cards {
 	}
 
 	/**
+	 * Get the cards according to the current preferences of the user.
+	 *
+	 * @return array[]
+	 */
+	public static function get_user_info_cards() {
+
+		$cards = self::$info_cards;
+
+		$user_info_card_atts = get_user_meta( get_current_user_id(), 'groundhogg_info_card_order', true );
+		$priority            = 0;
+
+		if ( ! empty( $user_info_card_atts ) && is_array( $user_info_card_atts ) ) {
+			foreach ( $user_info_card_atts as $card_atts ) {
+
+				$card_atts = wp_parse_args( $card_atts, [
+					'id'     => '',
+					'open'   => true,
+					'hidden' => false,
+				] );
+
+				if ( ! isset_not_empty( $cards, $card_atts['id'] ) ) {
+					continue;
+				}
+
+				$cards[ $card_atts['id'] ]['priority'] = $priority;
+				$cards[ $card_atts['id'] ]['open']     = $card_atts['open'];
+				$cards[ $card_atts['id'] ]['hidden']   = $card_atts['hidden'];
+
+				$priority += 100;
+			}
+		}
+
+		// Override any existing priority with the users.
+
+		// Sort the meta boxes by priority
+		uasort( $cards, function ( $a, $b ) {
+			return $a['priority'] - $b['priority'];
+		} );
+
+		$cards = array_filter( $cards, function ( $card ) {
+			return current_user_can( $card['capability'] );
+		} );
+
+		return $cards;
+	}
+
+	/**
 	 * Output the contact info boxes
 	 *
 	 * @param $contact Contact
@@ -109,40 +157,14 @@ class Info_Cards {
 			return;
 		}
 
-		$user_info_card_atts = get_user_meta( get_current_user_id(), 'groundhogg_info_card_order', true );
-		$priority            = 0;
+		$cards = self::get_user_info_cards();
 
-		if ( ! empty( $user_info_card_atts ) && is_array( $user_info_card_atts ) ) {
-			foreach ( $user_info_card_atts as $card_atts ) {
-
-				$card_atts = wp_parse_args( $card_atts, [
-					'id'   => '',
-					'open' => true,
-				] );
-
-				if ( ! isset_not_empty( self::$info_cards, $card_atts['id'] ) ) {
-					continue;
-				}
-
-				self::$info_cards[ $card_atts['id'] ]['priority'] = $priority;
-				self::$info_cards[ $card_atts['id'] ]['open']     = $card_atts['open'];
-
-				$priority += 100;
-			}
-		}
-
-		// Override any existing priority with the users.
-
-		// Sort the meta boxes by priority
-		usort( self::$info_cards, function ( $a, $b ) {
-			return $a['priority'] - $b['priority'];
-		} );
-
-		foreach ( self::$info_cards as $info_card ):
+		foreach ( $cards as $info_card ):
 
 			$info_card = wp_parse_args( $info_card, [
 				'priority' => 100,
 				'open'     => true,
+				'hidden'   => false,
 			] );
 
 			/**
@@ -152,6 +174,7 @@ class Info_Cards {
 			 * @var int $priority
 			 * @var string $capability
 			 * @var bool $open
+			 * @var bool $hidden
 			 * @var callable $should_display_callback
 			 */
 
@@ -163,7 +186,7 @@ class Info_Cards {
 
 			?>
             <div id="<?php esc_attr_e( $id ); ?>"
-                 class="postbox info-card <?php esc_attr_e( $id ); ?> <?php esc_attr_e( ! $open ? 'closed' : '' ); ?>">
+                 class="postbox info-card <?php esc_attr_e( $id ); ?> <?php esc_attr_e( ! $open ? 'closed' : '' ); ?> <?php esc_attr_e( $hidden ? 'hidden' : '' ); ?>">
                 <div class="postbox-header">
                     <h2 class="hndle"><?php echo $title; ?></h2>
                     <div class="handle-actions hide-if-no-js">

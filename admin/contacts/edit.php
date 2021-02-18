@@ -39,28 +39,34 @@ if ( current_user_is( 'sales_manager' ) ) {
                href="javascript:void(0)"><?php _e( 'Expand All', 'groundhogg' ); ?><?php dashicon_e( 'arrow-up' ); ?></a>
             <a class="collapse-all"
                href="javascript:void(0)"><?php _e( 'Collapse All', 'groundhogg' ); ?><?php dashicon_e( 'arrow-down' ); ?></a>
-            <a href="javascript:void(0)"><?php _e( 'View', 'groundhogg' ); ?><?php dashicon_e( 'visibility' ); ?></a>
+            <a class="view-cards" href="javascript:void(0)"><?php _e( 'Cards', 'groundhogg' ); ?><?php dashicon_e( 'visibility' ); ?></a>
         </div>
-        <div class="info-card-views postbox">
+        <div class="info-card-views postbox hidden">
             <div class="inside">
                 <p><?php _e( 'Select which cards you want visible.', 'groundhogg' ); ?></p>
+                <ul>
 				<?php
 
-				foreach ( Info_Cards::$info_cards as $id => $card ):
+				foreach ( Info_Cards::get_user_info_cards() as $id => $card ):
 
 					?>
-                    <div><?php
+                    <li><?php
 					echo html()->checkbox( [
-						'label' => $card['title'],
-						'name'  => sprintf( 'cards_display[%s]', $id ),
-						'value' => 1,
-                        'checked' => ! isset_not_empty( $card, 'hidden' )
+						'label'   => $card['title'],
+						'name'    => sprintf( 'cards_display[%s]', $id ),
+						'class'   => 'hide-card',
+						'value'   => $id,
+						'checked' => ! isset_not_empty( $card, 'hidden' )
 					] );
-					?></div><?php
+					?></li><?php
 
 				endforeach;
 
 				?>
+                </ul>
+                <p>
+                    <a class="view-cards" href="javascript:void(0)"><?php _e( 'Close', 'groundhogg' ); ?></a>
+                </p>
             </div>
         </div>
 		<?php Info_Cards::do_info_cards( $contact ); ?>
