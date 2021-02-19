@@ -1,47 +1,43 @@
-.contact-record{
+.contact-record {
     display: flex;
     margin-top: 10px;
 }
 
-.contact-editor-wrap{
+.contact-editor-wrap {
     flex: 1;
     padding-right: 20px;
 }
 
-.contact-info-cards{
+.contact-info-cards {
     flex: 0 0 300px;
 }
 
-.contact-details{
+.contact-details {
     display: block;
-    float: left;
-    /*margin-right: 20px;*/
     position: relative;
     border: 1px solid #ccd0d4;
-    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
     background: #fff;
-    width: 540px;
-    max-width: 100%;
+    width: 600px;
     padding: 20px 20px 20px 20px;
     box-sizing: border-box;
     margin: 0 0 10px 0;
-    /*margin-left: 300px;*/
 }
 
-.contact-details .location .dashicons{
+.contact-details .location .dashicons {
     float: left;
 }
 
-.contact-details .full-name{
+.contact-details .full-name {
     font-size: 18px;
     font-weight: 500;
 }
 
-.contact-details div:not(:last-child){
+.contact-details div:not(:last-child) {
     margin-bottom: 8px;
 }
 
-.contact-details div .dashicons{
+.contact-details div .dashicons {
     margin-right: 10px;
 }
 
@@ -49,11 +45,11 @@
     text-decoration: none;
 }
 
-.contact-details .tags{
+.contact-details .tags {
     white-space: normal;
 }
 
-.contact-details .tags .tag{
+.contact-details .tags .tag {
     background: #f2f2f2;
     padding: 3px 9px;
     border-radius: 3px;
@@ -61,8 +57,26 @@
     display: inline-block;
 }
 
-div.email-status{
-   margin: 20px;
+div.email-status {
+    margin: 20px;
+}
+
+a.change-status {
+    text-decoration: none;
+}
+
+a.change-status.unsubscribed,
+a.change-status.spam,
+a.change-status.bounced,
+a.change-status.complained {
+    color: #a00;
+}
+
+a.change-status.unsubscribed:hover,
+a.change-status.spam:hover,
+a.change-status.bounced:hover,
+a.change-status.complained:hover {
+    color: #dc3232;
 }
 
 .contact-picture {
@@ -84,7 +98,7 @@ div.email-status{
     margin: 0 0 10px 2px;
 }
 
-.phone-ext{
+.phone-ext {
     width: 100px;
 }
 
@@ -92,9 +106,10 @@ div.email-status{
     margin: 0 0 10px 2px;
 }
 
-.contact-details textarea{
+.contact-details textarea {
     width: 100%;
 }
+
 .basic-details .details .regular-text {
     width: 20em;
 }
@@ -104,7 +119,7 @@ div.email-status{
     padding: 0 4px 1px;
 }
 
-.basic-details .details .dashicons{
+.basic-details .details .dashicons {
     vertical-align: text-bottom;
 }
 
@@ -117,20 +132,19 @@ div.email-status{
 
 #files th:last-child,
 #files th:nth-child(3),
-#files th:nth-child(2)
-{
+#files th:nth-child(2) {
     width: 60px;
 }
 
-th p{
+th p {
     margin-bottom: 0;
 }
 
-code.meta-replacement-code{
+code.meta-replacement-code {
     font-weight: 400;
 }
 
-#gh-notes{
+#gh-notes {
     /*max-width: 700px;*/
     /*border-bottom: 1px solid #f1f1f1;*/
     /*background-color: #FFFFFF;*/
@@ -138,11 +152,11 @@ code.meta-replacement-code{
     margin-top: 10px;
 }
 
-#gh-notes:empty{
+#gh-notes:empty {
     display: none;
 }
 
-.gh-note:not(:last-child){
+.gh-note:not(:last-child) {
     border-bottom: 1px solid #f1f1f1;
     margin-bottom: 10px;
     padding: 0 0 10px 0;
@@ -165,20 +179,20 @@ code.meta-replacement-code{
     font-size: 12px;
 }
 
-.gh-note p{
+.gh-note p {
     margin: 0;
 }
 
-.gh-note p:not(:last-child){
+.gh-note p:not(:last-child) {
     margin-bottom: 5px;
 }
 
-.gh-note .edited-note-text{
+.gh-note .edited-note-text {
     width: 100%;
     box-sizing: border-box;
 }
 
-.gh-note .note-context{
+.gh-note .note-context {
     max-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -193,19 +207,23 @@ code.meta-replacement-code{
 }
 
 .file:hover .file-actions,
-.gh-note:hover .edit-actions{
+.gh-note:hover .edit-actions {
     visibility: visible;
 }
 
-.delete a{
+.delete a {
     color: #a00;
     text-decoration: none;
 }
 
-.file a.file-download{
+.file a.file-download {
     text-decoration: none;
 }
 
-.button-actions{
+.button-actions {
     margin-top: 3px;
+}
+
+.status-actions{
+    color: #aaa;
 }

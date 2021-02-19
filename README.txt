@@ -312,9 +312,13 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 = 2.3.5 (2021-02-16) =
 * ADDED Expand/Collapse all contact info cards.
 * ADDED View/Display management for info cards so you can hide ones you don't use.
-* TWEAKED Improve the contact details card, moved editable fields to the general tab.
+* ADDED Company phone & mobile phone contact fields.
+* ADDED Tags, Mobile Phone, Location, & Local time to the contact detail card.
+* ADDED Better support for multiple phone types and phone extensions to the phone field in the form builder.
+* TWEAKED Merged segmentation and general info tab, moved all editable fields to the general tab from the details card.
 * TWEAKED Refactored contact notes as an info card widget.
 * TWEAKED Refactored contact files as an info card widget.
+* FIXED Typo in filter of title actions.
 
 = 2.3.4.1 (2021-02-16) =
 * FIXED Login fails caused by event tracking not being available.

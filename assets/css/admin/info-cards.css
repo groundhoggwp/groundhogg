@@ -127,6 +127,7 @@ ul.regular-list li{
     width: 100%;
 }
 
+.basic-details .status,
 .content-info .content .status {
     padding: 3px 8px;
     color: #fff;
@@ -141,28 +142,32 @@ ul.regular-list li{
     color: #aaaaaa;
 }
 
+.basic-details .red,
 .content-info .red {
-    color: #eb2222;
+    color: #a00;
 }
 
+.basic-details .green,
 .content-info .green {
     color: #218838;
 }
 
+.basic-details .orange,
 .content-info .orange {
     color: #ff8900;
 }
 
+.basic-details .status.red,
 .content-info .status.red {
-    background: #eb2222;
+    background: #a00;
     color: #FFFFFF;
 }
-
+.basic-details .status.green,
 .content-info .status.green {
     background: #218838;
     color: #FFFFFF;
 }
-
+.basic-details .status.orange,
 .content-info .status.orange {
     background: #ff8900;
     color: #FFFFFF;

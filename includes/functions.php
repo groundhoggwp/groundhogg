@@ -4209,3 +4209,19 @@ function track_gh_cron_ping() {
 }
 
 add_action( 'groundhogg_process_queue', __NAMESPACE__ . '\track_gh_cron_ping', 9 );
+
+/**
+ * Same as array_map, but passes both the key AND the value
+ *
+ * @param $array array
+ * @param $callback callable
+ *
+ * @return array
+ */
+function array_map_keys( array $array, callable $callback ): array {
+    foreach ( $array as $i => &$v ){
+        $v = call_user_func( $callback, $v, $i );
+    }
+
+    return $array;
+}

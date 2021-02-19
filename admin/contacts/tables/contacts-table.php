@@ -3,7 +3,9 @@
 namespace Groundhogg\Admin\Contacts\Tables;
 
 use function Groundhogg\_nf;
+use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\array_map_keys;
 use function Groundhogg\current_user_is;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
@@ -98,14 +100,14 @@ class Contacts_Table extends WP_List_Table {
 
 		$full_name = split_name( $search );
 
-		if ( $full_name[0] && $full_name[1] ){
-		    $query['first_name'] = $full_name[0];
-		    $query['first_name_compare'] = 'starts_with';
-			$query['last_name'] = $full_name[1];
-			$query['last_name_compare'] = 'starts_with';
+		if ( $full_name[0] && $full_name[1] ) {
+			$query['first_name']         = $full_name[0];
+			$query['first_name_compare'] = 'starts_with';
+			$query['last_name']          = $full_name[1];
+			$query['last_name_compare']  = 'starts_with';
 			// If search by first and last clear regular search
-		    $search=null;
-        }
+			$search = null;
+		}
 
 		// Since unconfirmed is 0 (aside maybe we should change that) we need to specify we actually want it still.
 		$optin_status = get_request_var( 'optin_status' );
@@ -271,11 +273,11 @@ class Contacts_Table extends WP_List_Table {
                                 <span class="title"><?php _e( 'Owner', 'groundhogg' ); ?></span>
                                 <span class="input-text-wrap">
                                     <?php $args = array(
-	                                    'id'               => 'owner',
-	                                    'name'             => 'owner',
-	                                    'class'            => 'cowner'
+	                                    'id'    => 'owner',
+	                                    'name'  => 'owner',
+	                                    'class' => 'cowner'
                                     ); ?>
-                                    <?php html()->dropdown_owners( $args ); ?>
+                                    <?php echo html()->dropdown_owners( $args ); ?>
                                 </span>
                             </label>
                             <label>
@@ -441,17 +443,17 @@ class Contacts_Table extends WP_List_Table {
 	protected function get_bulk_actions() {
 
 		$actions = array(
-			'apply_tag'  => _x( 'Apply Tag', 'List table bulk action', 'groundhogg' ),
-			'remove_tag' => _x( 'Remove Tag', 'List table bulk action', 'groundhogg' ),
-			'delete'     => _x( 'Delete', 'List table bulk action', 'groundhogg' ),
-			'spam'       => _x( 'Spam', 'List table bulk action', 'groundhogg' ),
-			'unspam'     => _x( 'Unspam', 'List table bulk action', 'groundhogg' ),
+			'apply_tag'   => _x( 'Apply Tag', 'List table bulk action', 'groundhogg' ),
+			'remove_tag'  => _x( 'Remove Tag', 'List table bulk action', 'groundhogg' ),
+			'delete'      => _x( 'Delete', 'List table bulk action', 'groundhogg' ),
+			'spam'        => _x( 'Spam', 'List table bulk action', 'groundhogg' ),
+			'resubscribe' => _x( 'Re-subscribe', 'List table bulk action', 'groundhogg' ),
 		);
 
 		// Sales reps/managers can't delete contacts...
-		if ( ! current_user_can( 'delete_contacts' ) ){
-			unset( $actions[ 'delete' ] );
-        }
+		if ( ! current_user_can( 'delete_contacts' ) ) {
+			unset( $actions['delete'] );
+		}
 
 		return apply_filters( 'groundhogg_contact_bulk_actions', $actions );
 	}
@@ -570,39 +572,35 @@ class Contacts_Table extends WP_List_Table {
 			__( 'Edit' )
 		);
 
-		if ( $contact->get_optin_status() === Preferences::SPAM ) {
-			$actions['unspam'] = sprintf(
-				'<a href="%s" class="unspam" aria-label="%s">%s</a>',
-				wp_nonce_url( admin_url( 'admin.php?page=gh_contacts&contact=' . $contact->get_id() . '&action=unspam' ) ),
-				/* translators: %s: title */
-				esc_attr( sprintf( _x( 'Mark %s as approved.', 'action', 'groundhogg' ), $title ) ),
-				__( 'Approve' )
-			);
-		} else if ( $contact->get_optin_status() === Preferences::HARD_BOUNCE ) {
-			$actions['unbounce'] = sprintf(
-				'<a href="%s" class="unbounce" aria-label="%s">%s</a>',
-				wp_nonce_url( admin_url( 'admin.php?page=gh_contacts&contact=' . $contact->get_id() . '&action=unbounce' ) ),
-				/* translators: %s: title */
-				esc_attr( sprintf( _x( 'Mark %s as a valid email.', 'action', 'groundhogg' ), $title ) ),
-				_x( 'Valid Email', 'action', 'groundhogg' )
-			);
-		} else {
-			$actions['spam'] = sprintf(
-				'<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-				wp_nonce_url( admin_url( 'admin.php?page=gh_contacts&contact=' . $contact->get_id() . '&action=spam' ) ),
-				/* translators: %s: title */
-				esc_attr( sprintf( _x( 'Mark %s as spam', 'action', 'groundhogg' ), $title ) ),
-				__( 'Spam' )
-			);
+		$status_actions = [];
+
+		switch ( $contact->get_optin_status() ) {
+			default:
+			case Preferences::CONFIRMED:
+			case Preferences::UNCONFIRMED:
+				$status_actions[ Preferences::SPAM ] = __( 'Spam', 'groundhogg' );
+				break;
+			case Preferences::UNSUBSCRIBED:
+			case Preferences::COMPLAINED:
+			case Preferences::SPAM:
+			case Preferences::HARD_BOUNCE:
+				$status_actions[ Preferences::UNCONFIRMED ] = __( 'Re-subscribe', 'groundhogg' );
+				break;
 		}
 
-		$actions['delete'] = sprintf(
-			'<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-			wp_nonce_url( admin_url( 'admin.php?page=gh_contacts&contact=' . $contact->get_id() . '&action=delete' ) ),
-			/* translators: %s: title */
-			esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently' ), $title ) ),
-			__( 'Delete' )
-		);
+		$status_actions = array_map_keys( $status_actions, function ( $text, $status ) use ( $contact ) {
+			return html()->e( 'a', [
+				'href'  => action_url( 'status_change', [
+					'contact' => $contact->get_id(),
+					'status'  => $status
+				] ),
+				'class' => 'change-status ' . strtolower( Preferences::get_preference_pretty_name( $status ) )
+			], $text );
+		} );
+
+		$actions = array_merge( $actions, $status_actions );
+
+		$actions['delete'] = html()->e( 'a', [ 'href' => action_url( 'delete', [ 'contact' => $contact->get_id() ] ) ], __( 'Delete' ) );
 
 		return $this->row_actions( apply_filters( 'groundhogg_contact_row_actions', $actions, $contact, $column_name ) );
 	}
@@ -613,16 +611,16 @@ class Contacts_Table extends WP_List_Table {
 	protected function extra_tablenav( $which ) {
 		if ( $which === 'top' ) : ?>
             <script>
-                jQuery(function ($) {
-                    $("#bulk-action-selector-top,#bulk-action-selector-bottom").on("change", function () {
-                        var $bulk = $(this);
-                        if ($bulk.val() === "apply_tag" || $bulk.val() === "remove_tag") {
-                            $(".bulk-tag-action").removeClass("hidden");
-                        } else {
-                            $(".bulk-tag-action").addClass("hidden");
-                        }
-                    });
-                });
+              jQuery(function ($) {
+                $('#bulk-action-selector-top,#bulk-action-selector-bottom').on('change', function () {
+                  var $bulk = $(this)
+                  if ($bulk.val() === 'apply_tag' || $bulk.val() === 'remove_tag') {
+                    $('.bulk-tag-action').removeClass('hidden')
+                  } else {
+                    $('.bulk-tag-action').addClass('hidden')
+                  }
+                })
+              })
             </script>
             <div class="alignleft gh-actions bulk-tag-action hidden">
                 <div style="width: 300px;display: inline-block;margin: 0 20px 5px 0"><?php echo Plugin::$instance->utils->html->tag_picker( [
@@ -660,7 +658,7 @@ class Contacts_Table extends WP_List_Table {
 				<?php
 			}
 
-			if ( current_user_can( 'schedule_broadcasts' ) && $this->get_pagination_arg( 'total_items' ) > 0  ){
+			if ( current_user_can( 'schedule_broadcasts' ) && $this->get_pagination_arg( 'total_items' ) > 0 ) {
 
 				$broadcast_query = $this->query;
 
@@ -677,10 +675,10 @@ class Contacts_Table extends WP_List_Table {
 				?>
                 <a class="button action broadcast-contacts"
                    href="<?php echo esc_url( $broadcast_url ); ?>">
-                    <?php printf( _nx( 'Send a broadcast to %s contact', 'Send a broadcast to %s contacts', $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?>
+					<?php printf( _nx( 'Send a broadcast to %s contact', 'Send a broadcast to %s contacts', $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?>
                 </a>
 				<?php
-            }
+			}
 
 			do_action( 'groundhogg/admin/contacts/table/extra_tablenav', $this );
 

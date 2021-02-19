@@ -2,7 +2,9 @@
 namespace Groundhogg\Admin\Contacts;
 
 use Groundhogg\Tag;
+use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\array_map_keys;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_cookie;
@@ -33,16 +35,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 $contact->auto_link_account();
 
 $tabs = array(
-	'general'   => _x( 'General Info', 'contact_record_tab', 'groundhogg' ),
-	'meta_data' => _x( 'Custom Info', 'contact_record_tab', 'groundhogg' ),
+	'general'   => _x( 'General', 'contact_record_tab', 'groundhogg' ),
+	'meta_data' => _x( 'Meta', 'contact_record_tab', 'groundhogg' ),
 //	'segmentation' => _x( 'Segmentation', 'contact_record_tab', 'groundhogg' ),
 //	'notes'        => _x( 'Notes', 'contact_record_tab', 'groundhogg' ),
 //	'files'        => _x( 'Files', 'contact_record_tab', 'groundhogg' ),
-	'actions'   => _x( 'Actions', 'contact_record_tab', 'groundhogg' ),
-	'activity'  => _x( 'Activity', 'contact_record_tab', 'groundhogg' ),
 );
 
-$tabs       = apply_filters( 'groundhogg/admin/contact/record/tabs', $tabs );
+$tabs = apply_filters( 'groundhogg/admin/contact/record/tabs', $tabs );
+
+$tabs['actions']  = _x( 'Actions', 'contact_record_tab', 'groundhogg' );
+$tabs['activity'] = _x( 'Activity', 'contact_record_tab', 'groundhogg' );
+
 $cookie_tab = str_replace( 'tab_', '', get_cookie( 'gh_contact_tab', 'general' ) );
 $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 ?>
@@ -64,7 +68,10 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
         <div class="basic-details">
             <!-- FIRST -->
             <div class="full-name"><?php dashicon_e( 'admin-users' ); ?><?php echo $contact->get_full_name(); ?></div>
-            <div class="email"><?php dashicon_e( 'email' ); ?><?php echo html()->e( 'a', [ 'href' => 'mailto:' . $contact->get_email() ], $contact->get_email() ) ?></div>
+            <div class="email">
+				<?php dashicon_e( 'email' ); ?><?php echo html()->e( 'a', [ 'href' => 'mailto:' . $contact->get_email() ], $contact->get_email() ) ?>
+                <span class="status <?php echo $contact->is_marketable() ? 'green' : 'red'; ?>"><?php echo Preferences::get_preference_pretty_name( $contact->get_optin_status() ); ?></span>
+            </div>
 			<?php if ( $contact->get_phone_number() ): ?>
                 <div class="phone"><?php dashicon_e( 'phone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_phone_number() ], $contact->get_phone_number() ) ?>
 					<?php if ( $contact->get_phone_extension() ): ?>
@@ -72,11 +79,11 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 					<?php endif; ?>
                 </div>
 			<?php endif; ?>
-	        <?php if ( $contact->get_mobile_number() ): ?>
+			<?php if ( $contact->get_mobile_number() ): ?>
                 <div class="mobile"><?php dashicon_e( 'smartphone' ); ?>
-                    <?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_mobile_number() ], $contact->get_mobile_number() ) ?>
+					<?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_mobile_number() ], $contact->get_mobile_number() ) ?>
                 </div>
-	        <?php endif; ?>
+			<?php endif; ?>
 			<?php if ( count( $contact->get_address() ) > 0 ): ?>
                 <div class="location" title="<?php esc_attr_e( 'Location', 'groundhogg' ); ?>">
 					<?php dashicon_e( 'admin-site' ); ?>
@@ -93,9 +100,10 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
             </div>
         </div>
         <div class="wp-clearfix"></div>
-        <div class="tags" title="<?php esc_attr_e( 'Tags' );?>"><?php dashicon_e( 'tag' ); ?>
+        <div class="tags" title="<?php esc_attr_e( 'Tags' ); ?>"><?php dashicon_e( 'tag' ); ?>
 			<?php foreach ( $contact->get_tags() as $tag ):
-                $tag = new Tag( $tag )?><span class="tag"><?php esc_html_e( $tag->get_name() ); ?></span><?php endforeach; ?>
+				$tag = new Tag( $tag ) ?><span
+                    class="tag"><?php esc_html_e( $tag->get_name() ); ?></span><?php endforeach; ?>
         </div>
     </div>
     <div class="wp-clearfix"></div>
@@ -178,33 +186,48 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                         <p><?php echo '<b>' . _x( 'Email Status', 'contact_record', 'groundhogg' ) . ': </b>' . Plugin::$instance->preferences->get_optin_status_text( $contact->get_id() ); ?></p>
 						<?php do_action( 'groundhogg/contact/record/email_status/after', $contact ); ?>
                     </div>
-					<?php if ( $contact->get_optin_status() !== Preferences::UNSUBSCRIBED ): ?>
-                        <div id="manual-unsubscribe" style="margin-bottom: 10px;">
-                            <label><input type="checkbox" name="unsubscribe"
-                                          value="1"><?php _ex( 'Mark as unsubscribed.', 'contact_record', 'groundhogg' ); ?>
-                            </label>
-                        </div>
-					<?php endif; ?>
-					<?php if ( $contact->get_optin_status() !== Preferences::CONFIRMED ): ?>
-                        <div id="manual-confirmation">
-                            <label><input type="checkbox" name="manual_confirm" id="manual-confirm"
-                                          value="1"><?php _ex( 'Manually confirm this email address.', 'contact_record', 'groundhogg' ); ?>
-                            </label>
-                            <div id="confirmation-reason" class="hidden">
-								<?php echo Plugin::$instance->utils->html->textarea( [
-									'name'        => 'confirmation_reason',
-									'cols'        => 50,
-									'rows'        => 2,
-									'placeholder' => __( 'Confirmation reason...', 'groundhogg' )
-								] ); ?>
-                            </div>
-                        </div>
-                        <script>jQuery(function ($) {
-                            $('#manual-confirm').on('change', function () {
-                              $('#confirmation-reason').toggleClass('hidden')
-                            })
-                          })</script>
-					<?php endif;
+
+					<?php
+
+					$status_actions = [];
+
+					switch ( $contact->get_optin_status() ) {
+						default:
+						case Preferences::UNCONFIRMED:
+							$status_actions[ Preferences::CONFIRMED ]  = __( 'Confirmed', 'groundhogg' );
+							$status_actions[ Preferences::UNSUBSCRIBED ] = __( 'Unsubscribe', 'groundhogg' );
+							$status_actions[ Preferences::SPAM ]         = __( 'Spam', 'groundhogg' );
+							$status_actions[ Preferences::HARD_BOUNCE ]  = __( 'Bounced', 'groundhogg' );
+							$status_actions[ Preferences::COMPLAINED ]   = __( 'Complained', 'groundhogg' );
+							break;
+						case Preferences::CONFIRMED:
+							$status_actions[ Preferences::UNSUBSCRIBED ] = __( 'Unsubscribe', 'groundhogg' );
+							$status_actions[ Preferences::SPAM ]         = __( 'Spam', 'groundhogg' );
+							$status_actions[ Preferences::HARD_BOUNCE ]  = __( 'Bounced', 'groundhogg' );
+							$status_actions[ Preferences::COMPLAINED ]   = __( 'Complained', 'groundhogg' );
+							break;
+						case Preferences::UNSUBSCRIBED:
+						case Preferences::COMPLAINED:
+						case Preferences::SPAM:
+						case Preferences::HARD_BOUNCE:
+							$status_actions[ Preferences::UNCONFIRMED ] = __( 'Re-subscribe', 'groundhogg' );
+							break;
+					}
+
+					?>
+                    <span class="status-actions">
+                        <?php _e( 'Change status:', 'groundhogg' ); ?>
+                        <?php echo implode( ' | ', array_map_keys( $status_actions, function ( $text, $status ) use ( $contact ) {
+	                        return html()->e( 'a', [
+		                        'href'  => action_url( 'status_change', [
+			                        'contact' => $contact->get_id(),
+			                        'status'  => $status
+		                        ] ),
+		                        'class' => 'change-status ' . strtolower( Preferences::get_preference_pretty_name( $status ) )
+	                        ], $text );
+                        } ) ); ?>
+                    </span>
+					<?php
 
 					do_action( 'groundhogg/contact/record/email/after', $contact );
 
@@ -223,14 +246,14 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'value' => $contact->get_meta( 'primary_phone' ),
 					);
 					echo Plugin::$instance->utils->html->input( $args ); ?>
-                    <?php _e( 'ext.', 'groundhogg' ) ?>
-	                <?php $args = array(
-		                'id'    => 'primary_phone_extension',
-		                'name'  => 'primary_phone_extension',
-		                'class' => 'phone-ext',
-		                'value' => $contact->get_meta( 'primary_phone_extension' ),
-	                );
-	                echo Plugin::$instance->utils->html->input( $args ); ?>
+					<?php _e( 'ext.', 'groundhogg' ) ?>
+					<?php $args = array(
+						'id'    => 'primary_phone_extension',
+						'name'  => 'primary_phone_extension',
+						'class' => 'phone-ext',
+						'value' => $contact->get_meta( 'primary_phone_extension' ),
+					);
+					echo Plugin::$instance->utils->html->input( $args ); ?>
                 </td>
             </tr>
             <tr>
@@ -238,13 +261,13 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                     <label for="mobile_phone"><?php echo _x( 'Mobile Phone', 'contact_record', 'groundhogg' ) ?></label>
                 </th>
                 <td><?php $args = array(
-			            'type'  => 'tel',
-			            'class' => 'input',
-			            'id'    => 'mobile_phone',
-			            'name'  => 'mobile_phone',
-			            'value' => $contact->get_meta( 'mobile_phone' ),
-		            );
-		            echo Plugin::$instance->utils->html->input( $args ); ?>
+						'type'  => 'tel',
+						'class' => 'input',
+						'id'    => 'mobile_phone',
+						'name'  => 'mobile_phone',
+						'value' => $contact->get_meta( 'mobile_phone' ),
+					);
+					echo Plugin::$instance->utils->html->input( $args ); ?>
                 </td>
             </tr>
             <tr>
@@ -416,21 +439,21 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                     <label for="company_phone"><?php echo _x( 'Company Phone', 'contact_record', 'groundhogg' ) ?></label>
                 </th>
                 <td><?php $args = array(
-				        'type'  => 'tel',
-				        'class' => 'input',
-				        'id'    => 'company_phone',
-				        'name'  => 'company_phone',
-				        'value' => $contact->get_meta( 'company_phone' ),
-			        );
-			        echo Plugin::$instance->utils->html->input( $args ); ?>
-			        <?php _e( 'ext.', 'groundhogg' ) ?>
-			        <?php $args = array(
-				        'id'    => 'company_phone_extension',
-				        'name'  => 'company_phone_extension',
-				        'class' => 'phone-ext',
-				        'value' => $contact->get_meta( 'company_phone_extension' ),
-			        );
-			        echo Plugin::$instance->utils->html->input( $args ); ?>
+						'type'  => 'tel',
+						'class' => 'input',
+						'id'    => 'company_phone',
+						'name'  => 'company_phone',
+						'value' => $contact->get_meta( 'company_phone' ),
+					);
+					echo Plugin::$instance->utils->html->input( $args ); ?>
+					<?php _e( 'ext.', 'groundhogg' ) ?>
+					<?php $args = array(
+						'id'    => 'company_phone_extension',
+						'name'  => 'company_phone_extension',
+						'class' => 'phone-ext',
+						'value' => $contact->get_meta( 'company_phone_extension' ),
+					);
+					echo Plugin::$instance->utils->html->input( $args ); ?>
                 </td>
             </tr>
         </table>

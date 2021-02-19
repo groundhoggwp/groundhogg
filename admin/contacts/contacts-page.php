@@ -21,6 +21,7 @@ use Groundhogg\Plugin;
 use Groundhogg\Contact;
 use Groundhogg\Preferences;
 use function Groundhogg\send_email_notification;
+use function Groundhogg\set_request_var;
 use function Groundhogg\validate_tags;
 
 // Exit if accessed directly
@@ -501,7 +502,7 @@ class Contacts_Page extends Admin_Page {
 			'mobile_phone',
 			'primary_phone',
 			'primary_phone_extension',
-            'company_phone',
+			'company_phone',
 			'company_phone_extension',
 			'street_address_1',
 			'street_address_2',
@@ -524,11 +525,11 @@ class Contacts_Page extends Admin_Page {
 	}
 
 	/**
-     * Process a file upload
-     *
+	 * Process a file upload
+	 *
 	 * @return array|bool|\WP_Error
 	 */
-	public function process_upload_file(){
+	public function process_upload_file() {
 
 		$id = absint( get_request_var( 'contact' ) );
 
@@ -537,7 +538,7 @@ class Contacts_Page extends Admin_Page {
 		}
 
 		$contact = get_contactdata( $id );
-		$count = 0;
+		$count   = 0;
 
 		if ( ! empty( $_FILES['files'] ) ) {
 			$files = normalize_files( $_FILES['files'] );
@@ -547,7 +548,7 @@ class Contacts_Page extends Admin_Page {
 					if ( is_wp_error( $e ) ) {
 						return $e;
 					}
-					$count++;
+					$count ++;
 				}
 			}
 		}
@@ -555,7 +556,7 @@ class Contacts_Page extends Admin_Page {
 		$this->add_notice( 'uploaded', sprintf( _n( "Uploaded file", "Uploaded %s files", $count, 'groundhogg' ), $count ) );
 
 		return admin_page_url( 'gh_contacts', [ 'action' => 'edit', 'contact' => $contact->get_id() ] );
-    }
+	}
 
 	/**
 	 * Update the contact via the admin screen
@@ -638,7 +639,7 @@ class Contacts_Page extends Admin_Page {
 			'mobile_phone',
 			'primary_phone',
 			'primary_phone_extension',
-            'company_phone',
+			'company_phone',
 			'company_phone_extension',
 			'company_name',
 			'job_title',
@@ -698,10 +699,10 @@ class Contacts_Page extends Admin_Page {
 			}
 		}
 
-		// Process any tag removals.
-		if ( get_request_var( 'tags' ) ) {
+		// Process any tag adds/removals.
+		if ( get_post_var( 'tags', [] ) ) {
 
-			$tags = Plugin::$instance->dbs->get_db( 'tags' )->validate( get_request_var( 'tags' ) );
+			$tags = validate_tags( get_request_var( 'tags', [] ) );
 
 			$cur_tags = $contact->get_tags();
 			$new_tags = $tags;
@@ -719,6 +720,7 @@ class Contacts_Page extends Admin_Page {
 				}
 			}
 		} else {
+			// If the tags array is empty all tags were deleted.
 			$contact->remove_tag( $contact->get_tags() );
 		}
 
@@ -746,10 +748,6 @@ class Contacts_Page extends Admin_Page {
 				return new \WP_Error( 'manual_confirmation_error', __( 'A reason is required to change the email confirmation status.', 'groundhogg' ) );
 
 			}
-		}
-
-		if ( get_request_var( 'add_new_note' ) ) {
-//			$contact->add_note( get_request_var( 'add_note' ), 'user' );
 		}
 
 		if ( isset( $_POST['send_email'] ) && isset( $_POST['email_id'] ) && current_user_can( 'send_emails' ) ) {
@@ -794,6 +792,11 @@ class Contacts_Page extends Admin_Page {
 		return true;
 	}
 
+	/**
+	 * Delete a bunch of contacts
+	 *
+	 * @return false|\WP_Error
+	 */
 	public function process_delete() {
 		if ( ! current_user_can( 'delete_contacts' ) ) {
 			$this->wp_die_no_access();
@@ -807,83 +810,81 @@ class Contacts_Page extends Admin_Page {
 
 		$this->add_notice(
 			esc_attr( 'deleted' ),
-			sprintf( _nx( 'Deleted %d contact', 'Deleted %d contacts', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
+			sprintf( _nx( 'Deleted %d contact.', 'Deleted %d contacts.', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
 			'success'
 		);
 
 		return false;
 	}
 
-	public function process_spam() {
+	/**
+	 * Update the status of a contact
+	 *
+	 * @return false|string
+	 */
+	public function process_status_change() {
 		if ( ! current_user_can( 'edit_contacts' ) ) {
 			$this->wp_die_no_access();
 		}
 
+		$status = absint( get_request_var( 'status' ) );
+
 		foreach ( $this->get_items() as $id ) {
-			$contact = Plugin::$instance->utils->get_contact( $id );
-			$contact->change_marketing_preference( Preferences::SPAM );
+			$contact = get_contactdata( $id );
 
-			$ip_address = $contact->get_meta( 'ip_address' );
+			// Don't re-subscribe contacts already confirmed
+			if ( $contact->get_optin_status() === Preferences::CONFIRMED && $status === Preferences::UNCONFIRMED ){
+			    continue;
+            }
 
-			if ( $ip_address ) {
-				$blacklist = get_option( 'blacklist_keys' );
-				$blacklist .= "\n" . $ip_address;
-				$blacklist = sanitize_textarea_field( $blacklist );
-				update_option( 'blacklist_keys', $blacklist );
+			$contact->change_marketing_preference( $status );
+
+			if ( $status === Preferences::SPAM ) {
+				$ip_address = $contact->get_meta( 'ip_address' );
+
+				if ( $ip_address ) {
+					$blacklist = get_option( 'blacklist_keys' );
+					$blacklist .= "\n" . $ip_address;
+					$blacklist = sanitize_textarea_field( $blacklist );
+					update_option( 'blacklist_keys', $blacklist );
+				}
 			}
 
-			do_action( 'groundhogg/admin/contacts/spam', $contact );
+
+			do_action( "groundhogg/admin/contacts/{$status}", $contact );
 		}
 
 		$this->add_notice(
-			esc_attr( 'spammed' ),
-			sprintf( _nx( 'Marked %d contact as spam.', 'Marked %d contacts as spam.', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
+			esc_attr( 'status-updated' ),
+			sprintf( _nx( 'Marked contact as %2$s.', 'Marked %1$d contacts as %2$s.', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ), Preferences::get_preference_pretty_name( $status ) ),
 			'success'
 		);
+
+		if ( count( $this->get_items() ) === 1 ) {
+			return $this->admin_url( [ 'action' => 'edit', 'contact' => $id ] );
+		}
 
 		return false;
 	}
 
-	public function process_unspam() {
-		if ( ! current_user_can( 'edit_contacts' ) ) {
-			$this->wp_die_no_access();
-		}
+	/**
+     * Process spam bulk action
+     *
+	 * @return false|string
+	 */
+	public function process_spam(){
+	    set_request_var( 'status', Preferences::SPAM );
+	    return $this->process_status_change();
+    }
 
-		foreach ( $this->get_items() as $id ) {
-			$contact = Plugin::$instance->utils->get_contact( $id );
-			$contact->change_marketing_preference( Preferences::UNCONFIRMED );
-
-			do_action( 'groundhogg/admin/contacts/unspam', $contact );
-		}
-
-		$this->add_notice(
-			esc_attr( 'unspam' ),
-			sprintf( _nx( 'Approved %d contact.', 'Approved %d contacts.', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
-			'success'
-		);
-
-		return false;
-	}
-
-	public function process_unbounce() {
-		if ( ! current_user_can( 'edit_contacts' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		foreach ( $this->get_items() as $id ) {
-			$contact = Plugin::$instance->utils->get_contact( $id );
-			$contact->change_marketing_preference( Preferences::UNCONFIRMED );
-
-			do_action( 'groundhogg/admin/contacts/unbounce', $contact );
-		}
-
-		$this->add_notice(
-			esc_attr( 'unbounce' ),
-			sprintf( _nx( 'Approved %d contact.', 'Approved %d contacts.', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
-			'success'
-		);
-
-		return false;
+	/**
+	 * Process re-subscribe bulk action
+	 *
+	 * @return false|string
+	 */
+	public function process_resubscribe(){
+		set_request_var( 'status', Preferences::UNCONFIRMED );
+		return $this->process_status_change();
 	}
 
 	public function process_apply_tag() {

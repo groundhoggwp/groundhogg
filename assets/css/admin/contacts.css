@@ -50,3 +50,17 @@
 .wp-list-table #date_created{
     width: 200px;
 }
+
+a.change-status.unsubscribed,
+a.change-status.spam,
+a.change-status.bounced,
+a.change-status.complained {
+    color: #a00;
+}
+
+a.change-status.unsubscribed:hover,
+a.change-status.spam:hover,
+a.change-status.bounced:hover,
+a.change-status.complained:hover {
+    color: #dc3232;
+}

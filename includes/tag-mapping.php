@@ -24,10 +24,12 @@ class Tag_Mapping extends Bulk_Job {
 		// Listen for an explicit status change.
 		add_action( 'groundhogg/contact/preferences/updated', [ $this, 'optin_status_changed' ], 10, 3 );
 		add_action( 'groundhogg/db/post_insert/contact', [ $this, 'optin_status_set' ], 10, 1 );
+//		add_action( 'groundhogg/contact/tag_applied', [ $this, 'listen_for_tag_change' ], 10, 2 );
 
 		// Contact's marketability can expire with time, but it's too costly to setup a cronjob
 		// So instead we'll listen for an event failed. #goodenough
 		add_action( 'groundhogg/event/failed', [ $this, 'listen_for_non_marketable' ] );
+
 
 		if ( get_option( 'gh_optin_status_job', false ) ) {
 			add_action( 'admin_init', [ $this, 'add_upgrade_notice' ] );
@@ -55,7 +57,7 @@ class Tag_Mapping extends Bulk_Job {
 
 	public function reset_tags() {
 		if ( current_user_can( 'manage_options' ) && wp_verify_nonce( get_request_var( 'reset_tags' ), 'reset_tags' ) ) {
-			$this->install_default_tags();
+			$this->install_default_tags( true );
 			Plugin::$instance->notices->add( 'tags_reset', __( 'Tags have been reset!', 'groundhogg' ) );
 		}
 	}
@@ -258,10 +260,10 @@ class Tag_Mapping extends Bulk_Job {
 	/**
 	 * Install the defaults.
 	 */
-	public function install_default_tags() {
+	public function install_default_tags( $force = false ) {
 		$tags = $this->get_default_tags();
 		foreach ( $tags as $option_name => $tag_args ) {
-			if ( ! Plugin::$instance->settings->get_option( $option_name, false ) ) {
+			if ( $force || ! Plugin::$instance->settings->get_option( $option_name, false ) ) {
 				$tags_id = Plugin::$instance->dbs->get_db( 'tags' )->add( $tag_args );
 				if ( $tags_id ) {
 					Plugin::$instance->settings->update_option( $option_name, $tags_id );
@@ -279,16 +281,16 @@ class Tag_Mapping extends Bulk_Job {
 
 		if ( empty( $this->tag_map ) ) {
 			$this->tag_map = [
-				Preferences::CONFIRMED    => Plugin::$instance->settings->get_option( 'gh_confirmed_tag', false ),
-				Preferences::UNCONFIRMED  => Plugin::$instance->settings->get_option( 'gh_unconfirmed_tag', false ),
-				Preferences::UNSUBSCRIBED => Plugin::$instance->settings->get_option( 'gh_unsubscribed_tag', false ),
-				Preferences::SPAM         => Plugin::$instance->settings->get_option( 'gh_spammed_tag', false ),
-				Preferences::HARD_BOUNCE  => Plugin::$instance->settings->get_option( 'gh_bounced_tag', false ),
-				Preferences::COMPLAINED   => Plugin::$instance->settings->get_option( 'gh_complained_tag', false ),
-				Preferences::WEEKLY       => Plugin::$instance->settings->get_option( 'gh_weekly_tag', false ),
-				Preferences::MONTHLY      => Plugin::$instance->settings->get_option( 'gh_monthly_tag', false ),
-				self::MARKETABLE          => Plugin::$instance->settings->get_option( 'gh_marketable_tag', false ),
-				self::NON_MARKETABLE      => Plugin::$instance->settings->get_option( 'gh_non_marketable_tag', false ),
+				Preferences::CONFIRMED    => get_option( 'gh_confirmed_tag', false ),
+				Preferences::UNCONFIRMED  => get_option( 'gh_unconfirmed_tag', false ),
+				Preferences::UNSUBSCRIBED => get_option( 'gh_unsubscribed_tag', false ),
+				Preferences::SPAM         => get_option( 'gh_spammed_tag', false ),
+				Preferences::HARD_BOUNCE  => get_option( 'gh_bounced_tag', false ),
+				Preferences::COMPLAINED   => get_option( 'gh_complained_tag', false ),
+				Preferences::WEEKLY       => get_option( 'gh_weekly_tag', false ),
+				Preferences::MONTHLY      => get_option( 'gh_monthly_tag', false ),
+				self::MARKETABLE          => get_option( 'gh_marketable_tag', false ),
+				self::NON_MARKETABLE      => get_option( 'gh_non_marketable_tag', false ),
 			];
 		}
 
@@ -337,18 +339,21 @@ class Tag_Mapping extends Bulk_Job {
 	 * Perform the tag mapping.
 	 *
 	 * @param     $contact_id int the ID of the contact
-	 * @param int $status     the status.
+	 * @param int $status the status.
 	 * @param int $old_status the previous status.
 	 *
 	 * @return void
 	 */
 	public function optin_status_changed( $contact_id = 0, $status = 0, $old_status = 0 ) {
 
-		$contact = Plugin::$instance->utils->get_contact( $contact_id );
+
+		$contact = get_contactdata( $contact_id );
 
 		if ( ! $contact ) {
 			return;
 		}
+
+//		remove_action( 'groundhogg/contact/tag_applied', [ $this, 'listen_for_tag_change' ] );
 
 		$non_marketable_tag = $this->get_status_tag( self::NON_MARKETABLE );
 		$marketable_tag     = $this->get_status_tag( self::MARKETABLE );
@@ -382,6 +387,29 @@ class Tag_Mapping extends Bulk_Job {
 		/* Add the tags */
 		$contact->apply_tag( $add_tags );
 
+//		add_action( 'groundhogg/contact/tag_applied', [ $this, 'listen_for_tag_change' ], 10, 2 );
+
+	}
+
+	/**
+	 * Update the optin status if a mapped optin status tag is applied.
+	 *
+	 * @param $contact Contact
+	 * @param $tag_id int
+	 *
+	 * @return void
+	 */
+	public function listen_for_tag_change( $contact, $tag_id ) {
+
+		if ( ! in_array( $tag_id, $this->get_tag_map() ) ) {
+			return;
+		}
+
+		$preference = array_search( $tag_id, $this->get_tag_map() );
+
+		if ( is_int( $preference ) ){
+			$contact->change_marketing_preference( $preference );
+		}
 	}
 
 	/**
@@ -489,10 +517,10 @@ class Tag_Mapping extends Bulk_Job {
 			$apply_tags[] = $contact->is_marketable() ? $this->get_status_tag( self::MARKETABLE ) : $this->get_status_tag( self::NON_MARKETABLE );
 
 			// Role tag
-            if ( $contact->get_user_id() ){
-	            $role_tags  = $this->get_roles_pretty_names( $contact->get_userdata()->roles );
-	            $apply_tags = array_merge( $apply_tags, $role_tags );
-            }
+			if ( $contact->get_user_id() ) {
+				$role_tags  = $this->get_roles_pretty_names( $contact->get_userdata()->roles );
+				$apply_tags = array_merge( $apply_tags, $role_tags );
+			}
 
 			// Add the tags
 			$contact->apply_tag( $apply_tags );
