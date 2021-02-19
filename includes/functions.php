@@ -4219,9 +4219,55 @@ add_action( 'groundhogg_process_queue', __NAMESPACE__ . '\track_gh_cron_ping', 9
  * @return array
  */
 function array_map_keys( array $array, callable $callback ): array {
-    foreach ( $array as $i => &$v ){
-        $v = call_user_func( $callback, $v, $i );
-    }
+	foreach ( $array as $i => &$v ) {
+		$v = call_user_func( $callback, $v, $i );
+	}
 
-    return $array;
+	return $array;
+}
+
+/**
+ * Sanitize any type email header
+ *
+ * @param $header_value
+ * @param $header_type
+ *
+ * @return string
+ */
+function sanitize_email_header( $header_value, $header_type ): string {
+	switch ( $header_type ) {
+		case 'from':
+			// If only the email is provided
+			if ( is_email( $header_value ) ) {
+				$header_value = has_replacements( $header_value ) ? sanitize_text_field( $header_value ) : sanitize_email( $header_value );
+			} else if ( preg_match( '/([^<]+) <([^>]+)>/', $header_value, $matches ) ) {
+				$email_address = has_replacements( $matches[2] ) ? sanitize_text_field( $matches[2] ) : sanitize_email( $matches[2] );
+				$name          = sanitize_text_field( $matches[1] );
+				$header_value  = sprintf( '%s <%s>', $name, $email_address );
+			} else {
+				$header_value = '';
+			}
+			break;
+		case 'bcc':
+		case 'cc':
+		case 'return-path':
+		case 'reply-to':
+			$emails       = explode( ',', $header_value );
+			$emails       = map_deep( $emails, 'trim' );
+			$emails       = map_deep( $emails, function ( $email ) {
+				if ( has_replacements( $email ) ) {
+					return sanitize_text_field( $email );
+				} else {
+					return sanitize_email( $email );
+				}
+			} );
+			$emails       = implode( ',', array_filter( $emails ) );
+			$header_value = $emails;
+			break;
+		default:
+			$header_value = sanitize_text_field( $header_value );
+			break;
+	}
+
+	return $header_value;
 }

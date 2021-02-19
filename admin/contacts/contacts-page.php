@@ -7,6 +7,7 @@ use Groundhogg\Classes\Note;
 use Groundhogg\Saved_Searches;
 use Groundhogg\Step;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\do_replacements;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_post_var;
@@ -15,11 +16,14 @@ use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
+use function Groundhogg\is_a_contact;
+use function Groundhogg\kses_wrapper;
 use function Groundhogg\modal_link_url;
 use function Groundhogg\normalize_files;
 use Groundhogg\Plugin;
 use Groundhogg\Contact;
 use Groundhogg\Preferences;
+use function Groundhogg\sanitize_email_header;
 use function Groundhogg\send_email_notification;
 use function Groundhogg\set_request_var;
 use function Groundhogg\validate_tags;
@@ -833,9 +837,9 @@ class Contacts_Page extends Admin_Page {
 			$contact = get_contactdata( $id );
 
 			// Don't re-subscribe contacts already confirmed
-			if ( $contact->get_optin_status() === Preferences::CONFIRMED && $status === Preferences::UNCONFIRMED ){
-			    continue;
-            }
+			if ( $contact->get_optin_status() === Preferences::CONFIRMED && $status === Preferences::UNCONFIRMED ) {
+				continue;
+			}
 
 			$contact->change_marketing_preference( $status );
 
@@ -868,22 +872,24 @@ class Contacts_Page extends Admin_Page {
 	}
 
 	/**
-     * Process spam bulk action
-     *
+	 * Process spam bulk action
+	 *
 	 * @return false|string
 	 */
-	public function process_spam(){
-	    set_request_var( 'status', Preferences::SPAM );
-	    return $this->process_status_change();
-    }
+	public function process_spam() {
+		set_request_var( 'status', Preferences::SPAM );
+
+		return $this->process_status_change();
+	}
 
 	/**
 	 * Process re-subscribe bulk action
 	 *
 	 * @return false|string
 	 */
-	public function process_resubscribe(){
+	public function process_resubscribe() {
 		set_request_var( 'status', Preferences::UNCONFIRMED );
+
 		return $this->process_status_change();
 	}
 
@@ -1209,6 +1215,57 @@ class Contacts_Page extends Admin_Page {
 		$this->add_notice( 'deleted', __( 'Search deleted!', 'groundhogg' ) );
 
 		return true;
+	}
+
+	/**
+     * Send a 1 off personal email
+     *
+	 * @return string
+	 */
+	public function process_send_personal_email() {
+
+		$contact = get_contactdata( get_url_var( 'contact' ) );
+
+		if ( ! is_a_contact( $contact ) || ! current_user_can( 'send_emails' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$subject   = do_replacements( sanitize_text_field( get_post_var( 'subject' ) ) );
+		$from_user = get_userdata( absint( get_post_var( 'from_user', $contact->get_owner_id() ) ) );
+		$from      = sprintf( '%s <%s>', $from_user->display_name, $from_user->user_email );
+		$cc        = do_replacements( sanitize_email_header( get_post_var( 'cc' ), 'cc' ), $contact );
+		$bcc       = do_replacements( sanitize_email_header( get_post_var( 'bcc' ), 'bcc' ), $contact );
+		$content   = do_replacements( wpautop( kses_wrapper( get_post_var( 'email_content' ) ) ), $contact );
+
+		$headers = [
+			'From: ' . $from
+		];
+
+		if ( ! empty( $cc ) ) {
+			$headers[] = 'Cc: ' . $cc;
+		}
+
+		if ( ! empty( $bcc ) ) {
+			$headers[] = 'Bcc: ' . $bcc;
+		}
+
+//		wp_send_json([
+//            $content,
+//            $headers
+//        ]);
+
+		add_action( 'wp_mail_failed', [ $this, 'catch_personal_email_error' ] );
+
+		\Groundhogg_Email_Services::send_wordpress( $contact->get_email(), $subject, $content, $headers );
+
+		return $this->admin_url( [
+			'action'  => 'edit',
+			'contact' => $contact->get_id()
+		] );
+	}
+
+	public function catch_personal_email_error( $error ) {
+		$this->add_notice( $error );
 	}
 
 	/**

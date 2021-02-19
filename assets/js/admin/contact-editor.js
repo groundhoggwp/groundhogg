@@ -119,9 +119,9 @@
       $(document).on('change', '.hide-card', function (e) {
         var $checkbox = $(this)
         if ($checkbox.is(':checked')) {
-          $('#' + $checkbox.val()).removeClass('hidden')
+          $('.info-card#' + $checkbox.val()).removeClass('hidden')
         } else {
-          $('#' + $checkbox.val()).addClass('hidden')
+          $('.info-card#' + $checkbox.val()).addClass('hidden')
         }
 
         saveInfoCardOrder()

@@ -280,3 +280,39 @@ ul.regular-list li{
 .content-info .timeline-second .right::after {
     left: -9px;
 }
+
+.popup-content #personal-email-form{
+    padding: 20px 0;
+}
+
+#personal-email-form label {
+    position: absolute;
+    top: 6px;
+    left: 10px;
+    color: #aaaaaa;
+}
+
+#personal-email-form .section input,
+#personal-email-form .section select{
+    padding-left: 60px;
+    width: 100%;
+}
+
+#personal-email-form .section{
+    position: relative;
+    margin-bottom: 10px;
+}
+
+#personal-email-form #send-email{
+    margin-top: 10px;
+}
+
+#personal-email-form .header-info.additional-options{
+    margin: 10px 0;
+    color: #777;
+}
+
+#personal-email-form .mce-wrap {
+    clear: both;
+    border: 1px solid #e5e5e5;
+}

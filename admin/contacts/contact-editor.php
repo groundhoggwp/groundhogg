@@ -19,6 +19,7 @@ use Groundhogg\Contact;
 use Groundhogg\Preferences;
 use Groundhogg\Step;
 use Groundhogg\Submission;
+use function Groundhogg\modal_link_url;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -69,7 +70,18 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
             <!-- FIRST -->
             <div class="full-name"><?php dashicon_e( 'admin-users' ); ?><?php echo $contact->get_full_name(); ?></div>
             <div class="email">
-				<?php dashicon_e( 'email' ); ?><?php echo html()->e( 'a', [ 'href' => 'mailto:' . $contact->get_email() ], $contact->get_email() ) ?>
+				<?php dashicon_e( 'email' ); ?><?php echo html()->e( 'a', [
+					'class' => 'trigger-popup',
+					'href'  => modal_link_url( [
+						'title'              => __( 'Send Email', 'groundhogg' ),
+						'footer_button_text' => __( 'Save Changes' ),
+						'source'             => 'email-form-wrap',
+						'height'             => 600,
+						'width'              => 500,
+						'footer'             => 'false',
+						'preventSave'        => 'true',
+					] )
+				], $contact->get_email() ) ?>
                 <span class="status <?php echo $contact->is_marketable() ? 'green' : 'red'; ?>"><?php echo Preferences::get_preference_pretty_name( $contact->get_optin_status() ); ?></span>
             </div>
 			<?php if ( $contact->get_phone_number() ): ?>
@@ -179,9 +191,18 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                                 style="text-decoration: none" target="_blank"
                                 href="<?php echo esc_url( substr( $contact->get_email(), strpos( $contact->get_email(), '@' ) + 1 ) ); ?>"><span
                                     class="dashicons dashicons-external"></span></a>
-                <a title="<?php esc_attr_e( 'Send email.', 'groundhogg' ); ?>" style="text-decoration: none"
-                   target="_blank" href="mailto:<?php echo $contact->get_email(); ?>"><span
-                            class="dashicons dashicons-email"></span></a></span>
+                <a class="trigger-popup" title="<?php esc_attr_e( 'Send email.', 'groundhogg' ); ?>"
+                   style="text-decoration: none"
+                   target="_blank" href="<?php echo modal_link_url( [
+	                'title'              => __( 'Send Email', 'groundhogg' ),
+	                'footer_button_text' => __( 'Save Changes' ),
+	                'source'             => 'email-form-wrap',
+	                'height'             => 600,
+	                'width'              => 500,
+	                'footer'             => 'false',
+	                'preventSave'        => 'true',
+                ] ) ?>">
+                    <span class="dashicons dashicons-email"></span></a></span>
                     <div class="email-status">
                         <p><?php echo '<b>' . _x( 'Email Status', 'contact_record', 'groundhogg' ) . ': </b>' . Plugin::$instance->preferences->get_optin_status_text( $contact->get_id() ); ?></p>
 						<?php do_action( 'groundhogg/contact/record/email_status/after', $contact ); ?>
@@ -194,7 +215,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 					switch ( $contact->get_optin_status() ) {
 						default:
 						case Preferences::UNCONFIRMED:
-							$status_actions[ Preferences::CONFIRMED ]  = __( 'Confirmed', 'groundhogg' );
+							$status_actions[ Preferences::CONFIRMED ]    = __( 'Confirmed', 'groundhogg' );
 							$status_actions[ Preferences::UNSUBSCRIBED ] = __( 'Unsubscribe', 'groundhogg' );
 							$status_actions[ Preferences::SPAM ]         = __( 'Spam', 'groundhogg' );
 							$status_actions[ Preferences::HARD_BOUNCE ]  = __( 'Bounced', 'groundhogg' );

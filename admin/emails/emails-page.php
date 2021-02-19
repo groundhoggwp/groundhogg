@@ -394,40 +394,7 @@ class Emails_Page extends Admin_Page {
 				if ( $headers_key[ $i ] ) {
 					$header_key   = strtolower( sanitize_key( $headers_key[ $i ] ) );
 					$header_value = $headers_value[ $i ];
-
-					switch ( $header_key ) {
-						case 'from':
-							// If only the email is provided
-							if ( is_email( $header_value ) ) {
-								$headers[ $header_key ] = has_replacements( $header_value ) ? sanitize_text_field( $header_value ) : sanitize_email( $header_value );
-							} else if ( preg_match( '/([^<]+) <([^>]+)>/', $header_value, $matches ) ) {
-								$email_address          = has_replacements( $matches[ 2 ] ) ? sanitize_text_field( $matches[ 2 ] ) : sanitize_email( $matches[ 2 ] );
-								$name                   = sanitize_text_field( $matches[ 1 ] );
-								$headers[ $header_key ] = sprintf( '%s <%s>', $name, $email_address );
-							} else {
-								$headers[ $header_key ] = '';
-							}
-							break;
-						case 'bcc':
-						case 'cc':
-						case 'return-path':
-						case 'reply-to':
-							$emails                 = explode( ',', $header_value );
-							$emails                 = map_deep( $emails, 'trim' );
-							$emails                 = map_deep( $emails, function ( $email ) {
-								if ( has_replacements( $email ) ) {
-									return sanitize_text_field( $email );
-								} else {
-									return sanitize_email( $email );
-								}
-							} );
-							$emails                 = implode( ',', array_filter( $emails ) );
-							$headers[ $header_key ] = $emails;
-							break;
-						default:
-							$headers[ $header_key ] = sanitize_text_field( $header_value );
-							break;
-					}
+					$headers[$header_key] = Groundhogg\sanitize_email_header( $header_value, $header_key );
 				}
 			}
 		}

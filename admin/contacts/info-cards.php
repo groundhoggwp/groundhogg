@@ -55,6 +55,10 @@ class Info_Cards {
 			include __DIR__ . '/cards/files.php';
 		} );
 
+		self::register( 'email', __( 'Send Email', 'groundhogg' ), function ( $contact ) {
+			include __DIR__ . '/cards/email.php';
+		}, 100, 'send_emails' );
+
 //		self::register( 'email_activity', __( 'Email Activity', 'groundhogg' ), function ( $contact ) {
 //			include __DIR__ . '/cards/email-activity.php';
 //		} );
