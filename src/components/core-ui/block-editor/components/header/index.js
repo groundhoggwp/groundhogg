@@ -23,6 +23,10 @@ import ReplayIcon from '@material-ui/icons/Replay';
 
 import HeaderToolbar from "./header-toolbar";
 import { Spinner } from "components";
+import ArrowLeftIcon from "components/svg/ArrowLeftIcon/";
+import ArrowCurveLeft from "components/svg/ArrowCurveLeft/";
+import ArrowCurveRight from "components/svg/ArrowCurveRight/";
+import SendMail from "components/svg/SendMail/";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,23 +39,34 @@ const useStyles = makeStyles((theme) => ({
     color: '#fff'
   },
   titleContainer:{
-    display: 'inline-block',
-    width: 'calc(100% - 342px)',
-    // '& .MuiTextField-root':{
-    //   width: '100%'
-    // }
+    '& label':{
+      fontSize: '12px'
+    },
+    '& input[type="text"], & input[type="text"]:focus':{
+      fontSize: '24px',
+      outline: 'none',
+      border: 'none',
+      boxShadow: 'none',
+      padding: '0',
+      marginLeft: '-1px'
+    }
   }
 }));
 
 export default function Header({
   email,
   history,
-  updateEmail,
+  updateDoc,
   isSaving,
   handleTitleChange,
   title,
+  editorType
 }) {
+  console.log(editorType)
+
   const classes = useStyles();
+  const buttonText = editorType === 'email' ? __("Update Email") : __("Update Funnel")
+
   return (
     <Card className={classes.root}>
       <div
@@ -60,24 +75,24 @@ export default function Header({
         tabIndex="-1"
       >
         <HeaderToolbar>
-          <Button className={classes.button} variant="contained" color="secondary" href="./admin.php?page=gh_emails">
-            <ArrowBackIosIcon/>
+          <Button className={classes.button} href="./admin.php?page=gh_emails">
+            <ArrowLeftIcon/>
           </Button>
-          <h1 className={classes.titleContainer}>
-              <TextField
-                fullWidth={true}
-                label="Email Title"
+
+              <TextField className={classes.titleContainer}
+                label="Email Info"
                 value={title}
                 onChange={handleTitleChange}
+                InputProps={{ disableUnderline: true }}
               />
-          </h1>
           <span>
-            <Button><ReplayIcon/></Button>
-            <Button><ReplayIcon/></Button>
+            <Button><ArrowCurveRight/></Button>
+            <Button><ArrowCurveLeft/></Button>
 
-            {isSaving && <Spinner />}
-            <Button className={classes.button} onClick={updateEmail} variant="contained" color="primary">
-              {__("Update")}
+
+            <Button className={classes.button} onClick={updateDoc} variant="contained" color="primary">
+              {buttonText}
+              <SendMail/>
             </Button>
             <PinnedItems.Slot scope="gh/v4/core" />
           </span>

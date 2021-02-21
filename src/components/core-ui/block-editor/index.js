@@ -59,7 +59,7 @@ import { CORE_STORE_NAME, EMAILS_STORE_NAME } from "data";
 let draggedBlockIndex = {};
 let draggedBlock = {};
 let startInteractJS = false;
-export default ({ email, history }) => {
+export default ({ document, history }) => {
   setDefaultBlockName("groundhogg/paragraph");
 
   const dispatch = useDispatch(EMAILS_STORE_NAME);
@@ -69,7 +69,10 @@ export default ({ email, history }) => {
     subject: defaultSubjectValue,
     pre_header: defaultPreHeaderValue,
     content: defaultContentValue,
-  } = email.data;
+    editorType,
+  } = document.data;
+
+  console.log(document, editorType)
 
   const [isInspecting, setIsInspecting] = useState(false);
   const [testEmail, setTestEmail] = useState([]);
@@ -87,7 +90,7 @@ export default ({ email, history }) => {
     (select) => ({
       editorMode: select(CORE_STORE_NAME).getEditorMode(),
       isSaving: select(CORE_STORE_NAME).isItemsUpdating(),
-      item: select(EMAILS_STORE_NAME).getItem(email.ID),
+      item: select(EMAILS_STORE_NAME).getItem(document.ID),
     }),
     []
   );
@@ -127,7 +130,7 @@ export default ({ email, history }) => {
 
   // Delete this
   // const saveDraft = (e) => {
-  //   dispatch.updateItem(email.ID, {
+  //   dispatch.updateItem(document.ID, {
   //     data: {
   //       subject,
   //       title,
@@ -139,8 +142,8 @@ export default ({ email, history }) => {
   //   });
   // };
 
-  const updateEmail = (e) => {
-    dispatch.updateItem(email.ID, {
+  const updateDoc = (e) => {
+    dispatch.updateItem(document.ID, {
       data: {
         subject,
         title,
@@ -353,13 +356,14 @@ export default ({ email, history }) => {
               <InterfaceSkeleton
                 header={
                   <Header
-                    email={email}
-                    history={history}                    
-                    updateEmail={updateEmail}
+                    document={document}
+                    history={history}
+                    updateDoc={updateDoc}
                     closeEditor={closeEditor}
                     isSaving={isSaving}
                     title={title}
                     handleTitleChange={handleTitleChange}
+                    editorType={editorType}
                   />
                 }
                 sidebar={
