@@ -1,4 +1,5 @@
 export default {
+  // fontFamily: 'Montserrat, Arial, sans-serif',
   h1: {
     fontWeight: 500,
     fontSize: 35,
