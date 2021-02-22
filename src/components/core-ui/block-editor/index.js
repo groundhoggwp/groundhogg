@@ -353,40 +353,36 @@ export default ({ document, history }) => {
         <SlotFillProvider>
           <DropZoneProvider>
             <FocusReturnProvider>
-              <InterfaceSkeleton
-                header={
-                  <Header
-                    document={document}
-                    history={history}
-                    updateDoc={updateDoc}
-                    closeEditor={closeEditor}
-                    isSaving={isSaving}
-                    title={title}
-                    handleTitleChange={handleTitleChange}
-                    editorType={editorType}
-                  />
-                }
-                sidebar={
-                  <>
-                    <Sidebar isInspecting={isInspecting} handleViewTypeChange={handleViewTypeChange} />
-                    <ComplementaryArea.Slot scope="gh/v4/core" />
-                  </>
-                }
-                content={
-                  <>
-                    <Notices />
-                    {editorPanel}
-                    <div className="bottomPanelTesting">
-                    <Panel header={__("Blocks")} style={{marginTop:'500px'}}>
-                      {/*icon={ more }*/}]
-                      <PanelBody title="My Block Settings"  initialOpen={ true } style={{backgroundColor:'#ccc'}}>
-                          <PanelRow>My Panel Inputs and Labels</PanelRow>
-                      </PanelBody>
-                    </Panel>
-                    </div>
-                  </>
-                }
+              <Header
+                document={document}
+                history={history}
+                updateDoc={updateDoc}
+                closeEditor={closeEditor}
+                isSaving={isSaving}
+                title={title}
+                handleTitleChange={handleTitleChange}
+                editorType={editorType}
               />
+
+
+              <div className="content">
+
+                <Notices />
+                {editorPanel}
+                <div className="bottomPanelTesting">
+                <Panel header={__("Blocks")} style={{marginTop:'500px'}}>
+                  {/*icon={ more }*/}]
+                  <PanelBody title="My Block Settings"  initialOpen={ true } style={{backgroundColor:'#ccc'}}>
+                      <PanelRow>My Panel Inputs and Labels</PanelRow>
+                  </PanelBody>
+                </Panel>
+                </div>
+              </div>
+
+              <Sidebar isInspecting={isInspecting} handleViewTypeChange={handleViewTypeChange} />
+
+              <ComplementaryArea.Slot scope="gh/v4/core" />
+
             </FocusReturnProvider>
           </DropZoneProvider>
         </SlotFillProvider>

@@ -28,8 +28,6 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
-import DesktopMacIcon from '@material-ui/icons/DesktopMac';
-import SmartphoneIcon from '@material-ui/icons/Smartphone';
 import FormatAlignJustifyIcon from '@material-ui/icons/FormatAlignJustify';
 import FormatAlignLeftIcon from '@material-ui/icons/FormatAlignLeft';
 import FormatAlignRightIcon from '@material-ui/icons/FormatAlignRight';
@@ -37,9 +35,30 @@ import FormatAlignRightIcon from '@material-ui/icons/FormatAlignRight';
 /**
  * Internal dependencies
  */
+import Desktop from "components/svg/Desktop/";
+import Phone from "components/svg/Phone/";
 
 const useStyles = makeStyles((theme) => ({
-  root: {},
+  root: {
+    position: 'absolute',
+    top: '110px',
+    right: '0px',
+    width: '320px',
+    padding: '20px 20px 20px 0',
+    borderRadius: '7px',
+    margin: '20px',
+    '& .scrollbar-container': {
+      height: '500px'
+    }
+  },
+ sendTestButton:{
+   fontSize: '12px',
+   textTransform: 'none',
+   // marginLeft: '20px'
+ },
+ viewTypeButton:{
+   margin: '20px 5px 20px 0px'
+ },
   searchField: {
     width: "calc(100% - 20px)",
     margin: "10px"
@@ -76,7 +95,7 @@ const Sidebar = ({isInspecting, handleViewTypeChange}) => {
     }
   };
 
-  const blockPanel = isInspecting ?
+  const blockPanel = !isInspecting ?
 
       <Panel header={__("Inspector")}>
         <InspectorSlot bubblesVirtually />
@@ -121,22 +140,23 @@ const Sidebar = ({isInspecting, handleViewTypeChange}) => {
           <Button>Additional options:</Button>
         </Panel>
 
-
+        // <PerfectScrollbar>
+        // </PerfectScrollbar>
   return (
-    <PerfectScrollbar>
+
     <div
-      className="groundhogg-email-sidebar"
+      className={classes.root}
       role="region"
       aria-label={__("Groundhogg Email Sidebar advanced settings.")}
       tabIndex="-1"
     >
       <Panel>
-        <Button>{__("Send test email")}</Button>
-        <Button onClick={() => { handleViewTypeChange('mobile') }}>
-          <SmartphoneIcon/>
+        <Button className={classes.sendTestButton} variant="outlined" color="secondary">{__("Send test email")}</Button>
+        <Button className={classes.viewTypeButton} variant="outlined" color="secondary" onClick={() => { handleViewTypeChange('mobile') }}>
+          <Phone/>
         </Button>
-        <Button onClick={() => { handleViewTypeChange('desktop') }}>
-          <DesktopMacIcon />
+        <Button className={classes.viewTypeButton} variant="outlined" color="secondary" onClick={() => { handleViewTypeChange('desktop') }}>
+          <Desktop />
         </Button>
 
         <TextField
@@ -188,7 +208,7 @@ const Sidebar = ({isInspecting, handleViewTypeChange}) => {
       {blockPanel}
 
     </div>
-    </PerfectScrollbar>
+
   );
 };
 

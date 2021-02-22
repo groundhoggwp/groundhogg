@@ -21,22 +21,31 @@ import ReplayIcon from '@material-ui/icons/Replay';
  * Internal dependencies
  */
 
-import HeaderToolbar from "./header-toolbar";
+
 import { Spinner } from "components";
-import ArrowLeftIcon from "components/svg/ArrowLeftIcon/";
+import ArrowLeft from "components/svg/ArrowLeft/";
 import ArrowCurveLeft from "components/svg/ArrowCurveLeft/";
 import ArrowCurveRight from "components/svg/ArrowCurveRight/";
+import EditPen from "components/svg/EditPen/";
 import SendMail from "components/svg/SendMail/";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    // width: "calc(100% - 19px)",
+    position: 'absolute',
+    top: '0',
+    left: '-20px',
     overflow: "visible",
     borderRadius: "5px",
-    padding: "20px",
+    margin: "20px",
+    width: "calc(100%)",
+    overflow: "visible",
+    padding: "28px 0px 28px 10px",
   },
-  button:{
-    color: '#fff'
+  backButton:{
+    display: 'inline-block',
+    color: '#fff',
+    width: '10px',
+    margin: '15px 25px 0px 10px'
   },
   titleContainer:{
     '& label':{
@@ -49,6 +58,27 @@ const useStyles = makeStyles((theme) => ({
       boxShadow: 'none',
       padding: '0',
       marginLeft: '-1px'
+    }
+  },
+  updateContainer : {
+    float: 'right',
+    display: 'inline-block',
+    marginRight: '20px'
+  },
+  stepUpdateButton: {
+    width: '15px',
+    margin: '0px 10px 0px 10px'
+  },
+  updateButton: {
+    width: '320px',
+    color: '#fff',
+    background: '#9ECE38',
+    fontSize: '18px',
+    textTransform: 'none',
+    marginLeft: '70px',
+    borderRadius: '7px',
+    '& svg':{
+      marginLeft: '145px'
     }
   }
 }));
@@ -74,29 +104,31 @@ export default function Header({
         aria-label={__("Email Editor primary top bar.", "groundhogg")}
         tabIndex="-1"
       >
-        <HeaderToolbar>
-          <Button className={classes.button} href="./admin.php?page=gh_emails">
-            <ArrowLeftIcon/>
-          </Button>
+              <span className={classes.backButton}><ArrowLeft href="./admin.php?page=gh_emails"/></span>
 
-              <TextField className={classes.titleContainer}
-                label="Email Info"
-                value={title}
-                onChange={handleTitleChange}
-                InputProps={{ disableUnderline: true }}
-              />
-          <span>
-            <Button><ArrowCurveRight/></Button>
-            <Button><ArrowCurveLeft/></Button>
+              <span className={classes.titleContainer}>
+                <TextField
+                  label="Email Info"
+                  value={title}
+                  onChange={handleTitleChange}
+                  InputProps={{ disableUnderline: true }}
+                />
+                <EditPen/>
+              </span>
 
 
-            <Button className={classes.button} onClick={updateDoc} variant="contained" color="primary">
-              {buttonText}
-              <SendMail/>
-            </Button>
+            <span className={classes.updateContainer}>
+              <span className={classes.stepUpdateButton}><ArrowCurveRight/></span>
+              <span className={classes.stepUpdateButton}><ArrowCurveLeft/></span>
+
+
+              <Button className={classes.updateButton} onClick={updateDoc}>
+                {buttonText}
+                <SendMail/>
+              </Button>
+            </span>
             <PinnedItems.Slot scope="gh/v4/core" />
-          </span>
-        </HeaderToolbar>
+
       </div>
     </Card>
   );

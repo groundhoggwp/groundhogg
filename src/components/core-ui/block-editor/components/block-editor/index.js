@@ -54,7 +54,7 @@ function BlockEditor({
   const useStyles = makeStyles((theme) => ({
     root: {
       position: 'absolute',
-      top: '116px',
+      top: '150px',
       right: '0',
       bottom: '0',
       left: '0',
