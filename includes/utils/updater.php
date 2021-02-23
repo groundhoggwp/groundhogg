@@ -33,6 +33,7 @@ abstract class Updater {
 
 		// Show updates path in tools area
 		add_action( 'groundhogg/admin/tools/updates', [ $this, 'show_manual_updates' ] );
+		add_filter( 'groundhogg/admin/tools/updaters', [ $this, 'show_updates_in_dropdown' ] );
 		add_action( 'groundhogg/admin/tools/network_updates', [ $this, 'show_network_updates' ] );
 
 		// Do the manual update
@@ -40,6 +41,7 @@ abstract class Updater {
 
 		// Save previous updates when plugin installed.
 		add_action( 'activated_plugin', [ $this, 'save_previous_updates_when_installed' ], 99 );
+		add_action( 'groundhogg/reset', [ $this, 'save_previous_updates_when_installed' ], 99 );
 	}
 
 	/**
@@ -68,41 +70,56 @@ abstract class Updater {
 	abstract protected function get_updater_name();
 
 	/**
+	 * @param $plugins
+	 *
+	 * @return mixed
+	 */
+	public function show_updates_in_dropdown( $plugins ){
+	    $plugins[ $this->get_updater_name() ] = $this->get_display_name();
+	    return $plugins;
+    }
+
+	/**
 	 * Show the manual updates in the tools area
 	 */
-	public function show_manual_updates() {
-		?><h3><?php echo apply_filters( 'groundhogg/updater/display_name', $this->get_display_name() ); ?></h3><?php
+	public function show_manual_updates( $updater ) {
+
+	    if ( $updater !== $this->get_updater_name() ){
+	        return;
+        }
+
+		?>
+        <h3><?php echo apply_filters( 'groundhogg/updater/display_name', $this->get_display_name() ); ?></h3>
+        <p><?php _e( 'Click on a version to run the update process for that version.', 'groundhogg' ); ?></p>
+        <?php
 
 		$updates = array_merge( $this->get_available_updates(), $this->get_optional_updates() );
 
 		usort( $updates, 'version_compare' );
 
-		foreach ( $updates as $update ):
+		$_this = $this;
 
-			?><p><?php
-
-			$text = sprintf( __( 'Version %s', 'groundhogg' ), $update );
-
-			if ( $this->did_update( $update ) ) {
-				echo '<span style="color: green">&#x2705;</span>&nbsp;';
-			}
-
-			echo html()->e( 'a', [
-				'href' => add_query_arg( [
-					'updater'       => $this->get_updater_name(),
-					'manual_update' => $update,
-					'confirm'       => 'yes',
-				], $_SERVER['REQUEST_URI'] )
-			], $text );
-
-
-			if ( $this->get_update_description( $update ) ) {
-				echo ' - ' . esc_html( $this->get_update_description( $update ) );
-			}
-
-			?></p><?php
-
-		endforeach;
+		html()->list_table( [
+            'id' => 'updates-list'
+        ], [
+            __( 'Completed' ),
+            __( 'version' ),
+            __( 'Description' ),
+        ],
+            array_map_with_keys( array_reverse( $updates ), function ( $update ) use ( $_this ){
+                return [
+                    $this->did_update( $update ) ? "<span style=\"color: green\">&#x2705;</span>" : '-',
+	                html()->e( 'a', [
+		                'href' => add_query_arg( [
+			                'updater'       => $this->get_updater_name(),
+			                'manual_update' => $update,
+			                'confirm'       => 'yes',
+		                ], $_SERVER['REQUEST_URI'] )
+	                ], $update ),
+                    esc_html( $_this->get_update_description( $update ) )
+                ];
+            } )
+        );
 	}
 
 	/**

@@ -21,6 +21,7 @@ abstract class Installer {
 
 		register_activation_hook( $this->get_plugin_file(), [ $this, 'activation_hook' ] );
 		register_deactivation_hook( $this->get_plugin_file(), [ $this, 'deactivation_hook' ] );
+		add_action( 'groundhogg/reset', [ $this, 'activation_hook' ] );
 
 		add_action( 'wp_insert_site', [ $this, 'new_blog_created' ], 10, 6 );
 		add_filter( 'wpmu_drop_tables', [ $this, 'wpmu_drop_tables' ], 10, 2 );
@@ -34,22 +35,18 @@ abstract class Installer {
 		return key_to_words( $this->get_installer_name() );
 	}
 
-	public function show_manual_install() {
+	/**
+     * Register the installer
+     *
+	 * @param $plugins
+	 *
+	 * @return mixed
+	 */
+	public function show_manual_install( $plugins ) {
 
-		?>
-        <h3><?php echo $this->get_display_name(); ?></h3>
-        <p><?php
+	    $plugins[ $this->get_installer_name() ] = $this->get_display_name();
 
-		echo html()->e( 'a', [
-			'class' => 'button',
-			'href'  => add_query_arg( [
-				'manual_install'       => $this->get_installer_name(),
-				'manual_install_nonce' => wp_create_nonce( 'gh_manual_install' ),
-			], $_SERVER['REQUEST_URI'] )
-		], __( 'Run Install', 'groundhogg' ) )
-
-		?></p><?php
-
+	    return $plugins;
 	}
 
 	/**

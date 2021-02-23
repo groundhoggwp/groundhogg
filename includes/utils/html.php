@@ -107,9 +107,9 @@ class HTML {
 
 				echo sprintf( '<%1$s %2$s>%3$s</%1$s>', $tag, array_to_atts( $atts ), $name );
 
-            else: ?>
+			else: ?>
                 <th><?php echo $name; ?></th>
-            <?php endif;
+			<?php endif;
 		endforeach;
 	}
 
@@ -117,7 +117,7 @@ class HTML {
 	 * @param array $args
 	 * @param array $cols
 	 * @param array $rows
-	 * @param bool $footer
+	 * @param bool  $footer
 	 */
 	public function list_table( $args = [], $cols = [], $rows = [], $footer = true ) {
 		$args = wp_parse_args( $args, [
@@ -267,7 +267,7 @@ class HTML {
 	 * Add a form table row
 	 *
 	 * @param array $args
-	 * @param bool $tr_wrap whether the control should be wrapped in a TR tag
+	 * @param bool  $tr_wrap whether the control should be wrapped in a TR tag
 	 */
 	public function add_form_control( $args = [], $tr_wrap = true ) {
 		$args = wp_parse_args( $args, [
@@ -312,7 +312,7 @@ class HTML {
 	 *
 	 * @param string $content
 	 * @param string $e
-	 * @param array $atts
+	 * @param array  $atts
 	 *
 	 * @return string
 	 */
@@ -328,8 +328,8 @@ class HTML {
 	 * Generate an html element.
 	 *
 	 * @param string $e
-	 * @param array $atts
-	 * @param bool $self_closing
+	 * @param array  $atts
+	 * @param bool   $self_closing
 	 *
 	 * @return string
 	 */
@@ -469,6 +469,22 @@ class HTML {
 	}
 
 	/**
+     * Submit button wrapper
+     *
+	 * @param array $args
+	 *
+	 * @return string
+	 */
+	public function submit( $args = [] ) {
+		$args = wp_parse_args( $args, [
+			'type'  => 'submit',
+			'class' => 'button button-primary'
+		] );
+
+		return $this->button( $args );
+	}
+
+	/**
 	 * Output a checkbox
 	 *
 	 * @param $args
@@ -487,7 +503,7 @@ class HTML {
 			'title'   => '',
 		) );
 
-		$html = $this->wrap( $this->input( $a ) . ( ! empty( $a[ 'label' ] )  ? '&nbsp;' . $a['label'] : '' ), 'label', [ 'class' => 'gh-checkbox-label' ] );
+		$html = $this->wrap( $this->input( $a ) . ( ! empty( $a['label'] ) ? '&nbsp;' . $a['label'] : '' ), 'label', [ 'class' => 'gh-checkbox-label' ] );
 
 		return apply_filters( 'groundhogg/html/checkbox', $html, $a );
 	}
@@ -1069,11 +1085,11 @@ class HTML {
 	/**
 	 * Get a meta key picker. useful for searching.
 	 *
+	 * @deprecated use meta_picker() instead
+	 *
 	 * @param array $args
 	 *
 	 * @return string
-	 * @deprecated use meta_picker() instead
-	 *
 	 */
 	public function meta_key_picker( $args = [] ) {
 		$a = wp_parse_args( $args, array(

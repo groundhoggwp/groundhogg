@@ -9,6 +9,7 @@ use Groundhogg\Extension_Upgrader;
 use Groundhogg\License_Manager;
 use Groundhogg\Queue\Event_Queue;
 use function Groundhogg\action_input;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\get_exportable_fields;
@@ -25,6 +26,7 @@ use function Groundhogg\key_to_words;
 use function Groundhogg\nonce_url_no_amp;
 use function Groundhogg\notices;
 use function Groundhogg\uninstall_gh_cron_file;
+use function Groundhogg\uninstall_groundhogg;
 use function Groundhogg\validate_tags;
 use function Groundhogg\white_labeled_name;
 use function set_transient;
@@ -176,7 +178,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 				'cap'  => 'export_contacts'
 			],
 			[
-				'name' => __( 'Sync/Create Users' ),
+				'name' => __( 'Sync or Create Users' ),
 				'slug' => 'sync_create_users',
 				'cap'  => 'import_contacts'
 			],
@@ -186,13 +188,8 @@ class Tools_Page extends Tabbed_Admin_Page {
 				'cap'  => 'delete_contacts'
 			],
 			[
-				'name' => __( 'Updates', 'groundhogg' ),
-				'slug' => 'updates',
-				'cap'  => 'manage_options'
-			],
-			[
-				'name' => __( 'Install', 'groundhogg' ),
-				'slug' => 'install',
+				'name' => __( 'Install & Updates', 'groundhogg' ),
+				'slug' => 'install_updates',
 				'cap'  => 'manage_options'
 			],
 			[
@@ -728,12 +725,13 @@ class Tools_Page extends Tabbed_Admin_Page {
 			<?php submit_button( sprintf( _nx( 'Export %s contact', 'Export %s contacts', $count, 'action', 'groundhogg' ), number_format_i18n( $count ) ) ); ?>
         </form>
         <script>
-          (function ($) {
+          ( function ($) {
 
             $('.select-all-meta').on('change', function (e) {
               if ($(this).is(':checked')) {
                 $('input.meta.header').prop('checked', true)
-              } else {
+              }
+              else {
                 $('input.meta.header').prop('checked', false)
               }
             })
@@ -741,12 +739,13 @@ class Tools_Page extends Tabbed_Admin_Page {
             $('.select-all-basic').on('change', function (e) {
               if ($(this).is(':checked')) {
                 $('input.basic.header').prop('checked', true)
-              } else {
+              }
+              else {
                 $('input.basic.header').prop('checked', false)
               }
             })
 
-          })(jQuery)
+          } )(jQuery)
         </script>
 		<?php
 	}
@@ -797,19 +796,45 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 	####### UPDATES TAB FUNCTIONS #########
 
-	public function updates_view() {
+	public function install_updates_view() {
 
 		?>
         <div id="poststuff">
             <div class="postbox">
-                <h2 class="hndle"><?php _e( 'Previous Updates', 'groundhogg' ); ?></h2>
+                <div class="postbox-header">
+                    <h2 class="hndle"><?php _e( 'Install Help', 'groundhogg' ); ?></h2>
+                </div>
+                <div class="inside">
+                    <p><?php _e( 'In the event there were installation issues you can run the install process from here.', 'groundhogg' ); ?></p>
+                    <form method="get">
+						<?php html()->hidden_GET_inputs() ?>
+						<?php wp_nonce_field( 'gh_manual_install', 'manual_install_nonce' ) ?>
+						<?php echo html()->dropdown( [
+							'name'        => 'manual_install',
+							'options'     => apply_filters( 'groundhogg/admin/tools/install', [] ),
+							'required'    => true,
+							'option_none' => __( 'Select plugin to run install', 'groundhogg' )
+						] );
+
+
+						echo html()->submit( [
+							'text' => __( 'Run installation', 'groundhogg' )
+						] )
+						?>
+                    </form>
+                </div>
+            </div>
+            <div class="postbox">
+                <div class="postbox-header">
+                    <h2 class="hndle"><?php _e( 'Previous Updates', 'groundhogg' ); ?></h2>
+                </div>
                 <div class="inside">
 					<?php
 
 					if ( get_request_var( 'confirm' ) === 'yes' ):
 
 						?>
-                        <p class="description"><?php _e( 'WARNING: Re-performing previous updates can cause unexpected issues and should be done with caution. We recommend you backup your site, or export your contact list before proceeding.', 'groundhogg' ); ?></p>
+                        <p><?php _e( '<b>WARNING:</b> Re-performing previous updates can cause unexpected issues and should be done with caution. We recommend you backup your site, or export your contact list before proceeding.', 'groundhogg' ); ?></p>
 						<?php
 
 
@@ -822,13 +847,31 @@ class Tools_Page extends Tabbed_Admin_Page {
 							], $_SERVER['REQUEST_URI'] )
 						], sprintf( __( 'Yes, perform update %s', 'groundhogg' ), sanitize_text_field( get_request_var( 'manual_update' ) ) ) );
 
+                    elseif ( get_request_var( 'action' ) === 'view_updates' ):
+
+						do_action( 'groundhogg/admin/tools/updates', get_request_var( 'updater' ) );
+
 					else:
 
 						?>
-                        <p class="description"><?php _e( 'Run previous update paths in case of a failed update.', 'groundhogg' ); ?></p>
-						<?php
+                        <p><?php _e( 'Run previous update paths in case of a failed update.', 'groundhogg' ); ?></p>
+                        <form method="get">
+							<?php html()->hidden_GET_inputs() ?>
+							<?php action_input( 'view_updates' ) ?>
+							<?php echo html()->dropdown( [
+								'name'        => 'updater',
+								'required'    => true,
+								'options'     => apply_filters( 'groundhogg/admin/tools/updaters', [] ),
+								'option_none' => __( 'Select plugin to view updates', 'groundhogg' )
+							] );
 
-						do_action( 'groundhogg/admin/tools/updates' );
+							echo html()->submit( [
+								'text' => __( 'View Updates' )
+							] )
+
+							?>
+                        </form>
+					<?php
 
 					endif;
 
@@ -840,7 +883,7 @@ class Tools_Page extends Tabbed_Admin_Page {
                 <div class="postbox">
                     <h2 class="hndle"><?php _e( 'Network Upgrades', 'groundhogg' ); ?></h2>
                     <div class="inside">
-                        <p class="description"><?php _e( 'Process database upgrades network wide so they do not have to be done by each subsite owner.' ); ?></p>
+                        <p><?php _e( 'Process database upgrades network wide so they do not have to be done by each subsite owner.' ); ?></p>
 						<?php
 
 						do_action( 'groundhogg/admin/tools/network_updates' );
@@ -849,28 +892,56 @@ class Tools_Page extends Tabbed_Admin_Page {
                     </div>
                 </div>
 			<?php endif; ?>
+            <div class="postbox">
+                <div class="postbox-header">
+                    <h2 class="hndle"><span>⚠️ <?php _e( 'Reset', 'groundhogg' ); ?></span></h2>
+                </div>
+                <div class="inside">
+                    <p><?php printf( __( 'Want to start from scratch? You can reset your %s installation to when you first installed it.', 'groundhogg' ), white_labeled_name() ); ?></p>
+                    <p><?php _e( 'To confirm you want to reset, type <code>reset</code> into the text box below.', 'groundhogg' ); ?></p>
+                    <form method="post">
+						<?php wp_nonce_field( 'reset' ) ?>
+						<?php action_input( 'reset' ) ?>
+						<?php echo html()->input( [
+							'class'       => 'input',
+							'name'        => 'reset_confirmation',
+							'placeholder' => 'reset',
+							'required'    => true,
+						] );
+
+
+						echo html()->submit( [
+							'text' => __( '⚠️ Reset', 'groundhogg' )
+						] )
+						?>
+                    </form>
+                    <p><?php _e( 'This cannot be undone.', 'groundhogg' ); ?></p>
+                </div>
+            </div>
+
         </div>
 		<?php
 	}
 
-	####### UPDATES TAB FUNCTIONS #########
+	/**
+	 * Reset Groundhogg to when first installed.
+	 */
+	public function process_install_updates_reset() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			$this->wp_die_no_access();
+		} elseif ( get_post_var( 'reset_confirmation' ) !== 'reset' ){
+		    return new WP_Error( 'error', __( 'You must confirm the reset by typing <code>reset</code> into the text field.', 'groundhogg' ) );
+		}
 
-	public function install_view() {
-		?>
-        <div id="poststuff">
-            <div class="postbox">
-                <h2 class="hndle"><?php _e( 'Install Help', 'groundhogg' ); ?></h2>
-                <div class="inside">
-                    <p class="description"><?php _e( 'In the event there were installation issues you can run the install process from here.', 'groundhogg' ); ?></p>
-					<?php
+		if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ){
+		    define( 'WP_UNINSTALL_PLUGIN', true );
+		}
 
-					do_action( 'groundhogg/admin/tools/install' );
+		uninstall_groundhogg();
 
-					?>
-                </div>
-            </div>
-        </div>
-		<?php
+		do_action( 'groundhogg/reset' );
+
+		return admin_page_url( 'gh_guided_setup' );
 	}
 
 	####### DELETE TAB FUNCTIONS #########
@@ -1141,7 +1212,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 			}
 		}
 
-        $this->add_notice( 'installed', 'Installed extension successfully!' );
+		$this->add_notice( 'installed', 'Installed extension successfully!' );
 
 		notices()->dismiss_notice( 'features-removed-notice' );
 
