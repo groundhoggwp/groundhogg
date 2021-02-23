@@ -131,6 +131,8 @@ const ReportPanel = (props) => {
         isLoading={isRequesting || !isObject(reports)}
         reports={isObject(reports) ? reports : {}}
         testing={'testing'}
+        startDate={startDate}
+        endDate={endDate}
       />
     </>
   );
