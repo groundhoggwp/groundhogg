@@ -317,11 +317,14 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 * ADDED Send email info card widget to send one-off emails quickly.
 * ADDED Links to easily change optin status within a contact record.
 * ADDED Better support for multiple phone types and phone extensions to the phone field in the form builder.
+* ADDED Reset tool in the Updates/install screen. Useful for testing purposes.
 * TWEAKED Replacements now support Group, Name, and Default Arg attributes when registering.
 * TWEAKED Merged segmentation and general info tab, moved all editable fields to the general tab from the details card.
 * TWEAKED Refactored contact notes as an info card widget.
 * TWEAKED Refactored contact files as an info card widget.
+* TWEAKEd Merged Install & Updates tabs in the tools screen.
 * FIXED Typo in filter of title actions.
+* FIXED PHP Warnings & Notices during uninstall.
 * FIXED Dequeue Avada theme styles on the managed page.
 
 = 2.3.4.1 (2021-02-16) =
