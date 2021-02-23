@@ -57,6 +57,8 @@ wp_enqueue_editor();
 				] );
 				?></div><?php
 
+            Plugin::$instance->replacements->show_replacements_dropdown();
+
 			echo html()->wrap( html()->textarea( [
 				'name'  => 'email_content',
 				'id'    => 'email_content',
@@ -64,20 +66,6 @@ wp_enqueue_editor();
 				'cols'  => '',
 				'rows'  => ''
 			] ), 'div', [ 'class' => 'mce-wrap' ] )
-
-			//			wp_editor( "", 'email_content', [
-			//				'_content_editor_dfw' => $_content_editor_dfw,
-			//				'drag_drop_upload'    => true,
-			//				'tabfocus_elements'   => 'content-html,save-post',
-			//				'editor_height'       => 200,
-			//				'quicktags'           => false,
-			//				'tinymce'             => array(
-			//					'resize'                  => false,
-			//					'wp_autoresize_on'        => $_wp_editor_expand,
-			//					'add_unload_trigger'      => false,
-			//					'wp_keep_scroll_position' => ! $is_IE,
-			//				),
-			//			] );
 
 			?>
             <div class="container-info">

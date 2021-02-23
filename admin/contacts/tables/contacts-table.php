@@ -5,7 +5,7 @@ namespace Groundhogg\Admin\Contacts\Tables;
 use function Groundhogg\_nf;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
-use function Groundhogg\array_map_keys;
+use function Groundhogg\array_map_with_keys;
 use function Groundhogg\current_user_is;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
@@ -588,7 +588,7 @@ class Contacts_Table extends WP_List_Table {
 				break;
 		}
 
-		$status_actions = array_map_keys( $status_actions, function ( $text, $status ) use ( $contact ) {
+		$status_actions = array_map_with_keys( $status_actions, function ( $text, $status ) use ( $contact ) {
 			return html()->e( 'a', [
 				'href'  => action_url( 'status_change', [
 					'contact' => $contact->get_id(),

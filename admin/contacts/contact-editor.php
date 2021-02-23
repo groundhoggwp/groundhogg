@@ -4,7 +4,7 @@ namespace Groundhogg\Admin\Contacts;
 use Groundhogg\Tag;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
-use function Groundhogg\array_map_keys;
+use function Groundhogg\array_map_with_keys;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_cookie;
@@ -238,7 +238,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 					?>
                     <span class="status-actions">
                         <?php _e( 'Change status:', 'groundhogg' ); ?>
-                        <?php echo implode( ' | ', array_map_keys( $status_actions, function ( $text, $status ) use ( $contact ) {
+                        <?php echo implode( ' | ', array_map_with_keys( $status_actions, function ( $text, $status ) use ( $contact ) {
 	                        return html()->e( 'a', [
 		                        'href'  => action_url( 'status_change', [
 			                        'contact' => $contact->get_id(),

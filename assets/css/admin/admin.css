@@ -419,3 +419,17 @@ table.wp-list-table.funnels td.column-active_contacts {
     /*margin-top: 10px;*/
     margin-bottom: 3px;
 }
+
+.replacements-dropdown-wrap {
+    position: relative;
+}
+
+.replacements-dropdown-wrap .dashicons{
+    position: absolute;
+    top: 5px;
+    left: 6px;
+}
+
+.replacements-dropdown-wrap select{
+    padding-left: 30px;
+}

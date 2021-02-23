@@ -316,3 +316,8 @@ ul.regular-list li{
     clear: both;
     border: 1px solid #e5e5e5;
 }
+
+#personal-email-form .replacements-dropdown-wrap{
+    margin-bottom: 10px;
+    /*text-align: right;*/
+}

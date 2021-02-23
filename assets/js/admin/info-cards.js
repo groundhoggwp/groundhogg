@@ -8,9 +8,12 @@
   })
 
   $(document).on('tinymce-editor-setup', function (event, editor) {
-    editor.settings.toolbar1 = 'bold,italic,underline,blockquote,strikethrough,bullist,numlist,alignleft,aligncenter,alignright,undo,redo,link'; //Teeny -fullscreen
-    editor.settings.height = 200;
-  });
+    editor.settings.toolbar1 = 'bold,italic,underline,blockquote,strikethrough,bullist,numlist,alignleft,aligncenter,alignright,undo,redo,link' //Teeny -fullscreen
+    editor.settings.height = 200
+    editor.on('click', function (ed, e) {
+      $(document).trigger('to_mce')
+    });
+  })
 
   function renderEmailEditor () {
 

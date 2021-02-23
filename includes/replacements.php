@@ -25,7 +25,14 @@ class Replacements {
 	 *
 	 * @var array
 	 */
-	var $replacement_codes = array();
+	var $replacement_codes = [];
+
+	/**
+	 * Groups to which codes can be assigned
+	 *
+	 * @var array
+	 */
+	var $replacement_code_groups = [];
 
 	/**
 	 * The contact ID
@@ -57,188 +64,278 @@ class Replacements {
 	 */
 	public function setup_defaults() {
 
-		$replacements = array(
-			array(
+		$groups = [
+			'contact'    => __( 'Contact', 'groundhogg' ),
+			'user'       => __( 'Contact WP User', 'groundhogg' ),
+			'owner'      => __( 'Contact Owner', 'groundhogg' ),
+			'company'    => __( 'Contact Company', 'groundhogg' ),
+			'site'       => __( 'Site', 'groundhogg' ),
+			'compliance' => __( 'Compliance', 'groundhogg' ),
+			'other'      => __( 'Other', 'groundhogg' ),
+		];
+
+		$replacement_groups = apply_filters( 'groundhogg/replacements/default_groups', $groups );
+
+		foreach ( $replacement_groups as $group => $name ) {
+			$this->add_group( $group, $name );
+		}
+
+		$replacements = [
+			[
 				'code'        => 'id',
+				'group'       => 'contact',
 				'callback'    => [ $this, 'replacement_id' ],
+				'name'        => __( 'Contact ID', 'groundhogg' ),
 				'description' => _x( 'The contact\'s ID number.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'first',
+				'group'       => 'contact',
 				'callback'    => [ $this, 'replacement_first_name' ],
+				'name'        => __( 'First Name', 'groundhogg' ),
 				'description' => _x( 'The contact\'s first name.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'first_name',
 				'callback'    => [ $this, 'replacement_first_name' ],
 				'description' => _x( 'The contact\'s first name.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'last',
+				'group'       => 'contact',
 				'callback'    => [ $this, 'replacement_last_name' ],
+				'name'        => __( 'Last Name', 'groundhogg' ),
 				'description' => _x( 'The contact\'s last name.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'last_name',
 				'callback'    => [ $this, 'replacement_last_name' ],
 				'description' => _x( 'The contact\'s last name.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'full_name',
+				'group'       => 'contact',
 				'callback'    => [ $this, 'replacement_full_name' ],
+				'name'        => __( 'Full Name', 'groundhogg' ),
 				'description' => _x( 'The contact\'s full name.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'username',
+				'group'       => 'user',
 				'callback'    => [ $this, 'replacement_username' ],
-				'description' => _x( 'The contact\'s last name.', 'replacement', 'groundhogg' ),
-			),
-			array(
+				'name'        => __( 'User Name', 'groundhogg' ),
+				'description' => _x( 'The contact\'s user record user name.', 'replacement', 'groundhogg' ),
+			],
+			[
 				'code'        => 'email',
+				'group'       => 'contact',
 				'callback'    => [ $this, 'replacement_email' ],
+				'name'        => __( 'Email Address', 'groundhogg' ),
 				'description' => _x( 'The contact\'s email address.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'phone',
+				'group'       => 'contact',
 				'callback'    => [ $this, 'replacement_phone' ],
+				'name'        => __( 'Primary Phone', 'groundhogg' ),
 				'description' => _x( 'The contact\'s phone number.', 'replacement', 'groundhogg' ),
-			),
-			array(
-				'code'        => 'phone_ext',
-				'callback'    => [ $this, 'replacement_phone_ext' ],
-				'description' => _x( 'The contact\'s phone number extension.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
+				'code'        => 'mobile_phone',
+				'group'       => 'contact',
+				'callback'    => [ $this, 'replacement_mobile_phone' ],
+				'name'        => __( 'Mobile Phone', 'groundhogg' ),
+				'description' => _x( 'The contact\'s mobile phone number.', 'replacement', 'groundhogg' ),
+			],
+			[
 				'code'        => 'address',
+				'group'       => 'contact',
 				'callback'    => [ $this, 'replacement_address' ],
+				'name'        => __( 'Full Address', 'groundhogg' ),
 				'description' => _x( 'The contact\'s full address.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'company_name',
+				'group'       => 'company',
 				'callback'    => [ $this, 'replacement_company_name' ],
+				'name'        => __( 'Company Name', 'groundhogg' ),
 				'description' => _x( 'The contact\'s company name.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'job_title',
+				'group'       => 'company',
 				'callback'    => [ $this, 'replacement_job_title' ],
+				'name'        => __( 'Job Title', 'groundhogg' ),
 				'description' => _x( 'The contact\'s job title.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'company_address',
+				'group'       => 'company',
 				'callback'    => [ $this, 'replacement_company_address' ],
+				'name'        => __( 'Address', 'groundhogg' ),
 				'description' => _x( 'The contact\'s company address.', 'replacement', 'groundhogg' ),
-			),
-			array(
-				'code'        => 'notes',
-				'callback'    => [ $this, 'replacement_notes' ],
-				'description' => _x( 'The contact\'s notes.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+//			[
+//				'code'        => 'notes',
+//				'callback'    => [ $this, 'replacement_notes' ],
+//				'name'        => __( '', 'groundhogg' ),
+//				'description' => _x( 'The contact\'s notes.', 'replacement', 'groundhogg' ),
+//			],
+			[
 				'code'        => 'tag_names',
+				'group'       => 'contact',
 				'callback'    => [ $this, 'tag_names' ],
+				'name'        => __( 'Tag Names', 'groundhogg' ),
 				'description' => _x( 'List of tags applied to the contact.', 'replacement', 'groundhogg' ),
-			),
-			array(
-				'code'        => 'meta',
-				'callback'    => [ $this, 'replacement_meta' ],
-				'description' => _x( 'Any meta data related to the contact. Usage: {meta.attribute}', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
+				'code'         => 'meta',
+				'group'        => 'contact',
+				'default_args' => 'meta_key',
+				'callback'     => [ $this, 'replacement_meta' ],
+				'name'         => __( 'Meta Data', 'groundhogg' ),
+				'description'  => _x( 'Any meta data related to the contact. Usage: {meta.attribute}', 'replacement', 'groundhogg' ),
+			],
+			[
 				'code'        => 'user',
+				'group'       => 'user',
 				'callback'    => [ $this, 'replacement_user' ],
+				'name'        => __( 'User Data', 'groundhogg' ),
 				'description' => _x( 'Any data related to the contact\'s linked user record. Usage: {user.attribute}', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'business_name',
+				'group'       => 'site',
 				'callback'    => [ $this, 'replacement_business_name' ],
+				'name'        => __( 'Name', 'groundhogg' ),
 				'description' => _x( 'The business name as defined in the settings.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'business_phone',
+				'group'       => 'site',
 				'callback'    => [ $this, 'replacement_business_phone' ],
+				'name'        => __( 'Phone', 'groundhogg' ),
 				'description' => _x( 'The business phone number as defined in the settings.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'business_address',
+				'group'       => 'site',
 				'callback'    => [ $this, 'replacement_business_address' ],
+				'name'        => __( 'Address', 'groundhogg' ),
 				'description' => _x( 'The business address as defined in the settings.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'site_url',
+				'group'       => 'site',
 				'callback'    => [ $this, 'site_url' ],
+				'name'        => __( 'URL', 'groundhogg' ),
 				'description' => _x( 'The site url.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'owner_first_name',
+				'group'       => 'owner',
 				'callback'    => [ $this, 'replacement_owner_first_name' ],
+				'name'        => __( 'First Name', 'groundhogg' ),
 				'description' => _x( 'The contact owner\'s name.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'owner_last_name',
+				'group'       => 'owner',
 				'callback'    => [ $this, 'replacement_owner_last_name' ],
+				'name'        => __( 'Last Name', 'groundhogg' ),
 				'description' => _x( 'The contact owner\'s name.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'owner_email',
+				'group'       => 'owner',
 				'callback'    => [ $this, 'replacement_owner_email' ],
+				'name'        => __( 'Email', 'groundhogg' ),
 				'description' => _x( 'The contact owner\'s email address.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'owner_phone',
+				'group'       => 'owner',
 				'callback'    => [ $this, 'replacement_owner_phone' ],
+				'name'        => __( 'Phone', 'groundhogg' ),
 				'description' => _x( 'The contact owner\'s phone number.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'owner_signature',
+				'group'       => 'owner',
 				'callback'    => [ $this, 'replacement_owner_signature' ],
+				'name'        => __( 'Email Signature', 'groundhogg' ),
 				'description' => _x( 'The contact owner\'s signature.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'owner',
+				'group'       => 'owner',
 				'callback'    => [ $this, 'replacement_owner' ],
+				'name'        => __( 'Owner Data', 'groundhogg' ),
 				'description' => _x( 'Any data related to the contact\'s linked owner. Usage: {owner.attribute}', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'confirmation_link',
+				'group'       => 'compliance',
 				'callback'    => [ $this, 'replacement_confirmation_link' ],
+				'name'        => __( 'Confirmation Link', 'groundhogg' ),
 				'description' => _x( 'A link to confirm the email address of a contact.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'confirmation_link_raw',
+				'group'       => 'compliance',
 				'callback'    => [ $this, 'replacement_confirmation_link_raw' ],
+				'name'        => __( 'Raw Confirmation Link', 'groundhogg' ),
 				'description' => _x( 'A link to confirm the email address of a contact which can be placed in a button or link.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'unsubscribe_link',
+				'group'       => 'compliance',
 				'callback'    => [ $this, 'replacement_unsubscribe_link' ],
+				'name'        => __( 'Unsubscribe Link', 'groundhogg' ),
 				'description' => _x( 'A link that will unsubscribe the contact.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'auto_login_link',
+				'group'       => 'site',
 				'callback'    => [ $this, 'replacement_auto_login_link' ],
+				'name'        => __( 'Auto-Login link', 'groundhogg' ),
 				'description' => _x( 'Automatically login the contact if they have a user account.', 'replacement', 'groundhogg' ),
-			),
-			array(
-				'code'        => 'date',
-				'callback'    => [ $this, 'replacement_date' ],
-				'description' => _x( 'Insert a dynamic date. Usage {date.format|time}. Example: {date.Y-m-d|+2 days}', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
+				'code'         => 'date',
+				'group'        => 'site',
+				'default_args' => 'Y-m-d|now',
+				'callback'     => [ $this, 'replacement_date' ],
+				'name'         => __( 'Date', 'groundhogg' ),
+				'description'  => _x( 'Insert a dynamic date. Usage {date.format|time}. Example: {date.Y-m-d|+2 days}', 'replacement', 'groundhogg' ),
+			],
+			[
 				'code'        => 'files',
+				'group'       => 'contact',
 				'callback'    => [ $this, 'replacement_files' ],
+				'name'        => __( 'Files List', 'groundhogg' ),
 				'description' => _x( 'Insert all the files in a contact\'s file box.', 'replacement', 'groundhogg' ),
-			),
-			array(
+			],
+			[
 				'code'        => 'groundhogg_day_quote',
+				'group'       => 'other',
+				'name'        => __( 'Groundhog Day Quote', 'groundhogg' ),
 				'callback'    => [ $this, 'get_random_groundhogday_quote' ],
 				'description' => _x( 'Inserts a random quote from the movie Groundhog Day featuring Bill Murray', 'replacement', 'groundhogg' ),
-			)
-		);
+			]
+		];
 
 		$replacements = apply_filters( 'groundhogg/replacements/defaults', $replacements );
 
 		foreach ( $replacements as $replacement ) {
-			$this->add( $replacement['code'], $replacement['callback'], $replacement['description'] );
+			$this->add(
+				$replacement['code'],
+				$replacement['callback'],
+				$replacement['description'],
+				get_array_var( $replacement, 'name' ),
+				get_array_var( $replacement, 'group' ),
+				get_array_var( $replacement, 'default_args' )
+			);
 		}
 
 		do_action( 'groundhogg/replacements/init', $this );
@@ -250,10 +347,13 @@ class Replacements {
 	 * @param        $code        string the code
 	 * @param        $callback    string|array the callback function
 	 * @param string $description string description of the code
+	 * @param string $name the display name of the replacement for the dropdown
+	 * @param string $group the group where it should be displayed
+	 * @param string $default_args the default args that should be inserted when selected
 	 *
 	 * @return bool
 	 */
-	function add( $code, $callback, $description = '' ) {
+	function add( $code, $callback, $description = '', $name = '', $group = 'other', $default_args = '' ) {
 		if ( ! $code || ! $callback ) {
 			return false;
 		}
@@ -262,7 +362,10 @@ class Replacements {
 			$this->replacement_codes[ $code ] = array(
 				'code'        => $code,
 				'callback'    => $callback,
-				'description' => $description
+				'name'        => $name ?: $code,
+				'group'       => $group,
+				'description' => $description,
+				'insert'      => ! empty( $default_args ) ? sprintf( '{%s.%s}', $code, $default_args ) : sprintf( '{%s}', $code )
 			);
 
 			return true;
@@ -270,6 +373,16 @@ class Replacements {
 
 		return false;
 
+	}
+
+	/**
+	 * Register a new group
+	 *
+	 * @param $group
+	 * @param $name
+	 */
+	public function add_group( $group, $name ) {
+		$this->replacement_code_groups[ $group ] = $name;
 	}
 
 	/**
@@ -282,6 +395,15 @@ class Replacements {
 	 */
 	public function remove( $code ) {
 		unset( $this->replacement_codes[ $code ] );
+	}
+
+	/**
+	 * Remove a replacement code group
+	 *
+	 * @param $group
+	 */
+	public function remove_group( $group ) {
+		unset( $this->replacement_code_groups[ $group ] );
 	}
 
 	/**
@@ -459,12 +581,14 @@ class Replacements {
             </thead>
             <tbody>
 
-			<?php foreach ( $this->get_replacements() as $replacement ): ?>
+			<?php foreach ( $this->get_replacements() as $code => $replacement ): ?>
                 <tr>
                     <td>
                         <input class="replacement-selector"
                                style="border: none;outline: none;background: transparent;width: 100%;"
-                               onfocus="this.select();" value="{<?php echo $replacement['code']; ?>}" readonly>
+                               onfocus="this.select();"
+                               value="<?php echo get_array_var( $replacement, 'insert', '{' . $code . '}' ) ?>"
+                               readonly>
                     </td>
                     <td>
                         <span><?php esc_html_e( $replacement['description'] ); ?></span>
@@ -500,6 +624,38 @@ class Replacements {
 			'width'              => 700,
 		) );
 
+	}
+
+	public function show_replacements_dropdown( $short = false ) {
+		wp_enqueue_script( 'groundhogg-admin-replacements' );
+
+		$options = [];
+
+		/**
+		 * Build the categorized replacements list.
+		 */
+		foreach ( $this->replacement_code_groups as $group => $name ) {
+			$options[ $name ] = array_map_with_keys( array_map_keys( array_filter( $this->replacement_codes, function ( $atts ) use ( $group ) {
+				return $atts['group'] === $group;
+			} ), function ( $code, $atts ) {
+				return get_array_var( $atts, 'insert', '{' . $code . '}' );
+			} ), function ( $atts, $code ) {
+				return $atts['name'];
+			} );
+		}
+
+		echo html()->e( 'div', [
+			'class' => 'replacements-dropdown-wrap'
+		], [
+			'<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>',
+			html()->dropdown( [
+				'option_none' => _x( 'Insert Replacement', 'replacement', 'groundhogg' ),
+				'name'        => 'replacement_code',
+				'id'          => 'replacement-code',
+				'class'       => 'replacement-code-dropdown',
+				'options'     => $options
+			] )
+		] );
 	}
 
 

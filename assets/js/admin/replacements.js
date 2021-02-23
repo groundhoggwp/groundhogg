@@ -1,94 +1,99 @@
 var ReplacementsInsertListener = {};
+(function ($, replacements, modal) {
 
-(function ($,replacements,modal) {
-
-    function insertAtCursor(myField, myValue) {
-        //IE support
-        if (document.selection) {
-            myField.focus();
-            sel = document.selection.createRange();
-            sel.text = myValue;
-        }
-        //MOZILLA and others
-        else if (myField.selectionStart || myField.selectionStart == '0') {
-            var startPos = myField.selectionStart;
-            var endPos = myField.selectionEnd;
-            myField.value = myField.value.substring(0, startPos)
-                + myValue
-                + myField.value.substring(endPos, myField.value.length);
-        } else {
-            myField.value += myValue;
-        }
-
-        $(myField).trigger( 'change' );
+  function insertAtCursor (myField, myValue) {
+    //IE support
+    if (document.selection) {
+      myField.focus()
+      var sel = document.selection.createRange()
+      sel.text = myValue
+    }
+    //MOZILLA and others
+    else if (myField.selectionStart || myField.selectionStart == '0') {
+      var startPos = myField.selectionStart
+      var endPos = myField.selectionEnd
+      myField.value = myField.value.substring(0, startPos)
+        + myValue
+        + myField.value.substring(endPos, myField.value.length)
+    } else {
+      myField.value += myValue
     }
 
-    $.extend( replacements, {
+    $(myField).trigger('change')
+  }
 
-        inserting: false,
-        active: null,
-        text: '',
-        to_mce: false,
+  $.extend(replacements, {
 
-        init: function () {
+    inserting: false,
+    active: null,
+    text: '',
+    to_mce: false,
 
-            var self = this;
+    init: function () {
 
-            $( document ).on( 'click', '.replacements-button', function () {
-                self.inserting = true;
-            } );
+      var self = this
 
-            // GO TO MCE
-            $(document).on( 'to_mce', function () {
-                self.to_mce = true;
-            } );
+      $(document).on('click', '.replacements-button', function () {
+        self.inserting = true
+      })
 
-            // NOPE, GO TO TEXT
-            $(document).on( 'click', '#wpbody input, #wpbody textarea', function () {
-                self.active = this;
-                self.to_mce = false;
-            } );
+      // GO TO MCE
+      $(document).on('to_mce', function () {
+        self.to_mce = true
+      })
 
-            $( document ).on( 'click', '.replacement-selector', function () {
-                self.text = $(this).val();
-            } );
+      // NOPE, GO TO TEXT
+      $(document).on('click', '#wpbody input, #wpbody textarea', function () {
+        self.active = this
+        self.to_mce = false
+      })
 
-            $( document ).on( 'dblclick', '.replacement-selector', function () {
-                self.text = $(this).val();
-                self.insert();
-                modal.close();
-            } );
+      $(document).on('click', '.replacement-selector', function () {
+        self.text = $(this).val()
+      })
 
-            $( '#popup-close-footer' ).on( 'click', function () {
+      $(document).on('dblclick', '.replacement-selector', function () {
+        self.text = $(this).val()
+        self.insert()
+        modal.close()
+      })
 
-                if ( ! self.inserting ){
-                    return;
-                }
-                self.insert();
-                self.inserting = false;
-            });
+      $(document).on('change', '.replacement-code-dropdown', function () {
+        self.text = $(this).val()
+        self.insert()
+        $('.replacement-code-dropdown option').prop('selected', false)
+      })
 
-        },
+      $('#popup-close-footer').on('click', function () {
 
-        insert: function () {
-
-            // CHECK TINY MCE
-            if ( typeof tinymce != 'undefined' && tinymce.activeEditor != null && this.to_mce ){
-                tinymce.activeEditor.execCommand('mceInsertContent', false, this.text );
-            // INSERT REGULAR TEXT INPUT.
-            }
-
-            if ( this.active != null && ! this.to_mce ) {
-                insertAtCursor( this.active, this.text );
-            }
-
-            console.log( { text: this.text } );
+        if (!self.inserting) {
+          return
         }
+        self.insert()
+        self.inserting = false
+      })
 
-    } );
+    },
 
-    $(function () {
-        replacements.init();
-    });
+    insert: function () {
 
-})(jQuery,ReplacementsInsertListener,GroundhoggModal);
+      // CHECK TINY MCE
+      if (typeof tinymce != 'undefined' && tinymce.activeEditor != null && this.to_mce) {
+        tinymce.activeEditor.execCommand('mceInsertContent', false, this.text)
+        // INSERT REGULAR TEXT INPUT.
+      }
+
+      if (this.active != null && !this.to_mce) {
+        insertAtCursor(this.active, this.text)
+      }
+
+      console.log({ text: this.text })
+    }
+
+  })
+
+  $(function () {
+    replacements.init()
+  })
+
+})(jQuery, ReplacementsInsertListener, GroundhoggModal)
