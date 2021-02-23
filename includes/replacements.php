@@ -344,8 +344,8 @@ class Replacements {
 	/**
 	 * Add a replacement code
 	 *
-	 * @param        $code        string the code
-	 * @param        $callback    string|array the callback function
+	 * @param string $code the code
+	 * @param callable $callback the callback function
 	 * @param string $description string description of the code
 	 * @param string $name the display name of the replacement for the dropdown
 	 * @param string $group the group where it should be displayed
