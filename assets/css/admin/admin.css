@@ -244,6 +244,22 @@ input[type=range].slider:focus::-ms-fill-upper {
     max-width: 400px !important;
 }
 
+.select2-container .select2-search--inline .select2-search__field{
+    min-height: 0;
+    line-height: 1;
+    padding-left: 10px;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__rendered li{
+    margin-bottom: 0;
+    line-height: 1.4em;
+    /*padding: 1px 3px 4px 3px;*/
+}
+
+.postbox .select2-container--default .select2-selection--multiple .select2-selection__rendered{
+    margin: 0 0 5px 0 !important;
+}
+
 #wpbody .big-button {
     position: relative;
     font-size: 16px;
@@ -432,4 +448,8 @@ table.wp-list-table.funnels td.column-active_contacts {
 
 .replacements-dropdown-wrap select{
     padding-left: 30px;
+}
+
+.wp-core-ui table td select{
+    max-width: 100%;
 }

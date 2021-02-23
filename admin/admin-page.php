@@ -356,8 +356,7 @@ abstract class Admin_Page extends Supports_Errors {
 	protected function search_form( $title, $name = 's' ) {
 
 		if ( method_exists( $this, 'get_current_tab' ) ) {
-			?>
-            <div style="margin-top: 10px"></div><?php
+			?><div style="margin-top: 10px"></div><?php
 		}
 
 		?>

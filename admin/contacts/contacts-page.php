@@ -1278,11 +1278,12 @@ class Contacts_Page extends Admin_Page {
 
 		$contacts_table = new Tables\Contacts_Table();
 
-		include __DIR__ . '/search.php';
-
-		$this->search_form( __( 'Search Contacts', 'groundhogg' ) );
+		include __DIR__ . '/advanced-search.php';
 
 		$contacts_table->views();
+
+		include __DIR__ . '/quick-search.php';
+
 		?>
         <form method="post">
 			<?php

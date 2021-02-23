@@ -96,7 +96,7 @@ class Contacts extends DB {
 	 * @since   2.1
 	 */
 	public function get_columns() {
-		return array(
+		return [
 			'ID'                        => '%d',
 			'email'                     => '%s',
 			'first_name'                => '%s',
@@ -106,7 +106,7 @@ class Contacts extends DB {
 			'optin_status'              => '%d',
 			'date_created'              => '%s',
 			'date_optin_status_changed' => '%s',
-		);
+		];
 	}
 
 	/**

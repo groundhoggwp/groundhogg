@@ -64,3 +64,22 @@ a.change-status.bounced:hover,
 a.change-status.complained:hover {
     color: #dc3232;
 }
+
+#quick-search{
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background: #f9f9f9;
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
+#quick-search .small-select-wrap{
+    width: 250px;
+    display: inline-block;
+}
+
+#quick-search .tag-quick-search-wrap{
+    display: inline-block;
+    margin-right: 20px;
+}
