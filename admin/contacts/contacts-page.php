@@ -426,7 +426,6 @@ class Contacts_Page extends Admin_Page {
 				'action'  => __( 'Advanced Search', 'groundhogg' ),
 				'target'  => '_self',
 				'id'      => 'search_contacts',
-				'classes' => 'trigger-popup'
 			],
 		];
 	}

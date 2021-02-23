@@ -50,7 +50,6 @@ use function Groundhogg\html;
 				] );
 				?></p>
         </div>
-
         <div class="last-name-search inline-block search-param">
 
 			<?php
@@ -84,13 +83,10 @@ use function Groundhogg\html;
 				] );
 				?></p>
         </div>
-
         <div class="email-search inline-block search-param">
-
-			<?php
-
-			echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Filter By Email', 'groundhogg' ) );
-			?>
+	        <?php
+	        echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Filter By Email', 'groundhogg' ) );
+	        ?>
             <p><?php
 				echo html()->dropdown( [
 					'name'        => 'email_compare',
@@ -117,64 +113,7 @@ use function Groundhogg\html;
 				?></p>
             <p>
         </div>
-
-        <div class="tags-include inline-block search-param">
-			<?php
-
-			echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Includes contacts with', 'groundhogg' ) );
-			echo "&nbsp;";
-			echo html()->dropdown( [
-				'name'        => 'tags_include_needs_all',
-				'id'          => 'tags_include_needs_all',
-				'class'       => '',
-				'options'     => array(
-					0 => __( 'Any', 'groundhogg' ),
-					1 => __( 'All', 'groundhogg' )
-				),
-				'selected'    => absint( get_url_var( 'tags_include_needs_all' ) ),
-				'option_none' => false
-			] );
-
-			echo html()->e( 'p', [], [
-				html()->tag_picker( [
-					'name'     => 'tags_include[]',
-					'id'       => 'tags_include',
-					'selected' => wp_parse_id_list( get_url_var( 'tags_include' ) )
-				] )
-
-			] );
-
-			?>
-        </div>
-        <div class="tags-exclude inline-block search-param">
-			<?php
-
-			echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Excludes contacts with', 'groundhogg' ) );
-			echo "&nbsp;";
-
-			echo html()->dropdown( [
-				'name'        => 'tags_exclude_needs_all',
-				'id'          => 'tags_exclude_needs_all',
-				'class'       => '',
-				'options'     => array(
-					0 => __( 'Any', 'groundhogg' ),
-					1 => __( 'All', 'groundhogg' )
-				),
-				'selected'    => absint( get_url_var( 'tags_exclude_needs_all' ) ),
-				'option_none' => false
-			] );
-
-			echo html()->e( 'p', [], [
-				html()->tag_picker( [
-					'name'     => 'tags_exclude[]',
-					'id'       => 'tags_exclude',
-					'selected' => wp_parse_id_list( get_url_var( 'tags_exclude' ) )
-				] )
-			] );
-
-			?>
-        </div>
-        <div class="tags-exclude inline-block search-param">
+        <div class="optin-status inline-block search-param">
 
 			<?php
 
@@ -301,7 +240,67 @@ use function Groundhogg\html;
 
 				?></p>
         </div>
+        <div class="tags-filter search-param">
+		    <?php echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Filter By Tags', 'groundhogg' ) ); ?>
+            <div class="filters">
+                <div class="tags-include inline-block search-param">
+				    <?php
 
+				    echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Includes contacts with', 'groundhogg' ) );
+				    echo "&nbsp;";
+				    echo html()->dropdown( [
+					    'name'        => 'tags_include_needs_all',
+					    'id'          => 'tags_include_needs_all',
+					    'class'       => '',
+					    'options'     => array(
+						    0 => __( 'Any', 'groundhogg' ),
+						    1 => __( 'All', 'groundhogg' )
+					    ),
+					    'selected'    => absint( get_url_var( 'tags_include_needs_all' ) ),
+					    'option_none' => false
+				    ] );
+
+				    echo html()->e( 'p', [], [
+					    html()->tag_picker( [
+						    'name'     => 'tags_include[]',
+						    'id'       => 'tags_include',
+						    'selected' => wp_parse_id_list( get_url_var( 'tags_include' ) )
+					    ] )
+
+				    ] );
+
+				    ?>
+                </div>
+                <div class="tags-exclude inline-block search-param">
+				    <?php
+
+				    echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Excludes contacts with', 'groundhogg' ) );
+				    echo "&nbsp;";
+
+				    echo html()->dropdown( [
+					    'name'        => 'tags_exclude_needs_all',
+					    'id'          => 'tags_exclude_needs_all',
+					    'class'       => '',
+					    'options'     => array(
+						    0 => __( 'Any', 'groundhogg' ),
+						    1 => __( 'All', 'groundhogg' )
+					    ),
+					    'selected'    => absint( get_url_var( 'tags_exclude_needs_all' ) ),
+					    'option_none' => false
+				    ] );
+
+				    echo html()->e( 'p', [], [
+					    html()->tag_picker( [
+						    'name'     => 'tags_exclude[]',
+						    'id'       => 'tags_exclude',
+						    'selected' => wp_parse_id_list( get_url_var( 'tags_exclude' ) )
+					    ] )
+				    ] );
+
+				    ?>
+                </div>
+            </div>
+        </div>
 		<?php do_action( 'groundhogg/admin/contacts/search' ); ?>
 
         <div class="start-search">

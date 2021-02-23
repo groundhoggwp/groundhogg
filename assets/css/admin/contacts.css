@@ -36,6 +36,22 @@
     max-width: 100%;
 }
 
+#search-filters .tags-filter.search-param{
+    display: inline-block;
+    max-width: 700px;
+}
+
+#search-filters .tags-filter .filters{
+    display: flex;
+    justify-content: left;
+    /*float: left;*/
+}
+
+#search-filters .tags-filter .filters .search-param{
+    padding: 0;
+    margin: 10px 10px 0 0;
+}
+
 .start-search{
     padding-left: 15px;
 }
