@@ -23,7 +23,16 @@ import PerfectScrollbar from "react-perfect-scrollbar";
  */
 import { makeStyles } from "@material-ui/core/styles";
 import { useEffect, useState } from "@wordpress/element";
-import {Card, Button, FormControl, FormHelperText, InputLabel, MenuItem, Select,  TextField} from "@material-ui/core";
+import {
+  Card,
+  Button,
+  FormControl,
+  FormHelperText,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@material-ui/core";
 
 /**
  * Internal dependencies
@@ -35,75 +44,81 @@ import AlignLeft from "components/svg/AlignLeft/";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    position: 'absolute',
-    top: '127px',
-    right: '0px',
-    width: '320px',
-    borderRadius: '7px',
-    margin: '20px',
-    '& .scrollbar-container': {
-      height: '100%'
-    }
+    position: "absolute",
+    top: "127px",
+    right: "0px",
+    width: "320px",
+    borderRadius: "7px",
+    margin: "20px",
+    "& .scrollbar-container": {
+      height: "100%",
+    },
   },
 
-   inputText: {
-     width: "calc(100% - 10px)",
-     marginTop: "10px"
-   },
-   blockPanel:{
-     marginTop: '20px'
-   },
-  emailControls:{
-    height: '350px',
-    padding: '10px 22px 0 22px',
+  inputText: {
+    width: "calc(100% - 10px)",
+    marginTop: "10px",
   },
- sendTestButton:{
-   fontSize: '12px',
-   textTransform: 'none',
-   marginTop: '-9px',
-   width: '187px',
-   height: '32px',
-   color: '#0075FF',
-   border : '1.2px solid #0075FF',
- },
- viewTypeButton:{
-   display: 'inline-block',
-   border : '1.2px solid rgba(16, 38, 64, 0.15)',
-   padding: '5px 5px 4px 5px',
-   margin: '0px 0px 10px 15px',
-   borderRadius : '5px',
-   '&:hover' : {
-     border : '1.2px solid #0075FF',
-     cursor: 'pointer'
-   }
- },
- alignmentContainer:{
-    display: 'inline-block',
-   marginTop: '20px',
-   width: '115px'
-
- },
- messageTypeContainer:{
-   display: 'inline-block',
-   marginTop: '20px'
- },
- additionalInfoContainer:{
-   width: '100%',
-   borderRadius: '7px',
-   background: '#E7EEFB'
- }
+  blockPanel: {
+    marginTop: "20px",
+  },
+  emailControls: {
+    height: "350px",
+    padding: "10px 22px 0 22px",
+  },
+  sendTestButton: {
+    fontSize: "12px",
+    textTransform: "none",
+    marginTop: "-9px",
+    width: "187px",
+    height: "32px",
+    color: "#0075FF",
+    border: "1.2px solid #0075FF",
+  },
+  viewTypeButton: {
+    display: "inline-block",
+    border: "1.2px solid rgba(16, 38, 64, 0.15)",
+    padding: "5px 5px 4px 5px",
+    margin: "0px 0px 10px 15px",
+    borderRadius: "5px",
+    "&:hover": {
+      border: "1.2px solid #0075FF",
+      cursor: "pointer",
+    },
+  },
+  alignmentContainer: {
+    display: "inline-block",
+    marginTop: "20px",
+    width: "115px",
+  },
+  messageTypeContainer: {
+    display: "inline-block",
+    marginTop: "20px",
+  },
+  additionalInfoContainer: {
+    width: "100%",
+    borderRadius: "7px",
+    background: "#E7EEFB",
+  },
 }));
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
   "GroundhoggEmailBuilderSidebarInspector"
 );
 
-const Sidebar = ({isInspecting, sendTestEmail, handleViewTypeChange, replyTo, handleSetReplyTo, from, handleSetFrom}) => {
+const Sidebar = ({
+  isInspecting,
+  sendTestEmail,
+  handleViewTypeChange,
+  replyTo,
+  handleSetReplyTo,
+  from,
+  handleSetFrom,
+}) => {
   const classes = useStyles();
 
   const [blocks, setBlocks] = useState(getBlockTypes());
   const [search, setSearch] = useState("");
-
 
   useEffect(() => {
     updateBlocks();
@@ -125,39 +140,37 @@ const Sidebar = ({isInspecting, sendTestEmail, handleViewTypeChange, replyTo, ha
     }
   };
 
-  const blockPanel = isInspecting ?
+  const blockPanel = isInspecting ? (
+    <InspectorSlot bubblesVirtually />
+  ) : (
+    <>
+      {blocks.map((block) => {
+        return (
+          <div
+            data-block={JSON.stringify(block)}
+            className="block-editor-block side-bar-drag-drop-block"
+          >
+            <svg
+              aria-hidden="true"
+              role="img"
+              focusable="false"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              class="dashicon dashicons-shield"
+            >
+              <path d="M10 2s3 2 7 2c0 11-7 14-7 14S3 15 3 4c4 0 7-2 7-2zm0 8h5s1-1 1-5c0 0-5-1-6-2v7H5c1 4 5 7 5 7v-7z"></path>
+            </svg>
+            {block.title}
+          </div>
+        );
+      })}
+    </>
+  );
 
-
-      <InspectorSlot bubblesVirtually />
-      :
-          <>
-            {blocks.map((block) => {
-              return (
-                <div
-                  data-block={JSON.stringify(block)}
-                  className="block-editor-block side-bar-drag-drop-block"
-                >
-                  <svg
-                    aria-hidden="true"
-                    role="img"
-                    focusable="false"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 20 20"
-                    class="dashicon dashicons-shield"
-                  >
-                    <path d="M10 2s3 2 7 2c0 11-7 14-7 14S3 15 3 4c4 0 7-2 7-2zm0 8h5s1-1 1-5c0 0-5-1-6-2v7H5c1 4 5 7 5 7v-7z"></path>
-                  </svg>
-                  {block.title}
-                </div>
-              );
-            })}
-          </>        
-
-
-        // <PerfectScrollbar>
-        // </PerfectScrollbar>
+  // <PerfectScrollbar>
+  // </PerfectScrollbar>
   return (
     <div
       className={classes.root}
@@ -165,13 +178,29 @@ const Sidebar = ({isInspecting, sendTestEmail, handleViewTypeChange, replyTo, ha
       aria-label={__("Groundhogg Email Sidebar advanced settings.")}
       tabIndex="-1"
     >
-
       <Card className={classes.emailControls}>
-        <Button className={classes.sendTestButton} onClick={()=> {sendTestEmail()}}>{__("Send test email")}</Button>
-        <div className={classes.viewTypeButton} onClick={() => { handleViewTypeChange('mobile') }}>
-          <Phone/>
+        <Button
+          className={classes.sendTestButton}
+          onClick={() => {
+            sendTestEmail();
+          }}
+        >
+          {__("Send test email")}
+        </Button>
+        <div
+          className={classes.viewTypeButton}
+          onClick={() => {
+            handleViewTypeChange("mobile");
+          }}
+        >
+          <Phone />
         </div>
-        <div className={classes.viewTypeButton} onClick={() => { handleViewTypeChange('desktop') }}>
+        <div
+          className={classes.viewTypeButton}
+          onClick={() => {
+            handleViewTypeChange("desktop");
+          }}
+        >
           <Desktop />
         </div>
 
@@ -193,9 +222,10 @@ const Sidebar = ({isInspecting, sendTestEmail, handleViewTypeChange, replyTo, ha
         />
 
         <div className={classes.alignmentContainer}>
-          <label>{__("Alignment")}</label><br/>
-          <AlignLeft/>
-          <AlignCenter/>
+          <label>{__("Alignment")}</label>
+          <br />
+          <AlignLeft />
+          <AlignCenter />
         </div>
 
         <FormControl className={classes.messageTypeContainer}>
@@ -206,7 +236,7 @@ const Sidebar = ({isInspecting, sendTestEmail, handleViewTypeChange, replyTo, ha
             labelId="demo-simple-select-placeholder-label-label"
             id="demo-simple-select-placeholder-label"
             value={5}
-            onChange={()=>{}}
+            onChange={() => {}}
             displayEmpty
             className={classes.selectEmpty}
           >
@@ -216,19 +246,16 @@ const Sidebar = ({isInspecting, sendTestEmail, handleViewTypeChange, replyTo, ha
             <MenuItem value={10}>Marketing</MenuItem>
           </Select>
           <FormHelperText>Label + placeholder</FormHelperText>
-      </FormControl>
+        </FormControl>
 
-      <div className={classes.additionalInfoContainer}>
-        <label>{__("Additional info")}</label><br/>
-      </div>
+        <div className={classes.additionalInfoContainer}>
+          <label>{__("Additional info")}</label>
+          <br />
+        </div>
+      </Card>
 
-    </Card>
-
-    <Card className={classes.blockPanel}>
-      {blockPanel}
-    </Card>
+      <Card className={classes.blockPanel}>{blockPanel}</Card>
     </div>
-
   );
 };
 
