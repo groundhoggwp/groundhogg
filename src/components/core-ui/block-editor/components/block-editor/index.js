@@ -52,6 +52,18 @@ function BlockEditor({
   blocks,
 }) {
   const useStyles = makeStyles((theme) => ({
+    root: {
+      position: "absolute",
+      top: "150px",
+      right: "0",
+      bottom: "0",
+      left: "0",
+      width: "calc(100%)",
+      minHeight: "calc(100vh - 32px)",
+      paddingBottom: "280px",
+      overflowY: "auto",
+      overflowX: "hidden",
+    },
     subjectHeader: {
       padding: "20px",
       marginBottom: "10px",
@@ -61,12 +73,15 @@ function BlockEditor({
       padding: "",
       marginBottom: "10px",
     },
+    emailContainer: {
+      width: "calc(100% - 405px)",
+    },
     emailContent: {
       position: "relative",
       display: "block",
       width: viewType === "desktop" ? "600px" : "320px",
-      marginLeft: "auto",
-      marginRight: "auto",
+      margin: "10px auto 30px auto",
+      padding: "10px",
     },
   }));
 
@@ -111,16 +126,16 @@ function BlockEditor({
       // }
     });
   });
-  console.log('pre', preHeader === '')
+
   return (
-    <div className="groundhogg-block-editor" ref={blockEditorEl}>
+    <div className={classes.root} ref={blockEditorEl}>
       <BlockEditorProvider
         value={blocks}
         settings={settings}
         onInput={handleUpdateBlocks}
         onChange={handleUpdateBlocks}
       >
-        <div className="groundhogg-block-editor__email-container">
+        <div className={classes.emailContainer}>
           <Card className={classes.subjectHeader}>
             <form noValidate autoComplete="off">
               <TextField
@@ -133,16 +148,12 @@ function BlockEditor({
                 className={classes.subjectInputs}
                 onChange={handlePreHeaderChange}
                 label={"Pre Header"}
-                value={preHeader === '' ? 'Pre Header' : preHeader}
+                value={preHeader === "" ? "Pre Header" : preHeader}
               />
             </form>
           </Card>
           <Paper>
-            <div
-              className={
-                classes.emailContent + " groundhogg-email-editor__email-content"
-              }
-            >
+            <div className={classes.emailContent}>
               <BlockSelectionClearer className={classes}>
                 <VisualEditorGlobalKeyboardShortcuts />
                 <MultiSelectScrollIntoView />
@@ -150,7 +161,6 @@ function BlockEditor({
                 <BlockEditorKeyboardShortcuts.Register />
                 <Popover.Slot left={300} top={500} />
                 <Popover.Slot name="block-toolbar" left={300} top={500} />{" "}
-                {/*refresh={(e)=>{console.log('refresh', e)}}/>*/}
                 <Typewriter>
                   <CopyHandler>
                     <WritingFlow>

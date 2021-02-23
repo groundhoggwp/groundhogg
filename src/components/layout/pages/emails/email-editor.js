@@ -42,9 +42,11 @@ export const EmailEditor = () => {
 		return null;
 	}
 
+  email.data.editorType = 'email';
+
 	return (
 		<Fragment>
-			<BlockEditor email={email} />
+			<BlockEditor document={email} />
 		</Fragment>
 	)
 }

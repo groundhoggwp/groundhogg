@@ -15,111 +15,123 @@ import { Inserter } from "@wordpress/block-editor";
  * External dependencies
  */
 import { makeStyles } from "@material-ui/core/styles";
-
+import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
+import ReplayIcon from "@material-ui/icons/Replay";
 /**
  * Internal dependencies
  */
 
-import HeaderToolbar from "./header-toolbar";
-// import HeaderPrimary from './header-primary';<HeaderPrimary />
-import HeaderSecondary from "./header-secondary";
 import { Spinner } from "components";
+import ArrowLeft from "components/svg/ArrowLeft/";
+import ArrowCurveLeft from "components/svg/ArrowCurveLeft/";
+import ArrowCurveRight from "components/svg/ArrowCurveRight/";
+import EditPen from "components/svg/EditPen/";
+import SendMail from "components/svg/SendMail/";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    // width: "calc(100% - 19px)",
+    position: "absolute",
+    top: "0",
+    left: "-20px",
     overflow: "visible",
     borderRadius: "5px",
-    padding: "20px",
+    margin: "20px",
+    width: "calc(100%)",
+    overflow: "visible",
+    padding: "28px 0px 28px 10px",
   },
-  button:{
-    color: '#fff'
+  backButton: {
+    display: "inline-block",
+    color: "#fff",
+    width: "10px",
+    margin: "15px 25px 0px 10px",
   },
-  inserterBtn: {
-    backgroundColor: theme.palette.secondary.main,
-    height: "36px",
-    marginLeft: "20px",
-    marginTop: "6px",
-    borderRadius: "4px",
+  titleContainer: {
+    "& label": {
+      fontSize: "12px",
+    },
+    '& input[type="text"], & input[type="text"]:focus': {
+      fontSize: "24px",
+      outline: "none",
+      border: "none",
+      boxShadow: "none",
+      padding: "0",
+      marginLeft: "-1px",
+    },
+  },
+  updateContainer: {
+    float: "right",
+    display: "inline-block",
+    marginRight: "20px",
+  },
+  stepUpdateButton: {
+    width: "15px",
+    margin: "0px 10px 0px 10px",
+  },
+  updateButton: {
+    width: "320px",
+    color: "#fff",
+    background: "#9ECE38",
+    fontSize: "18px",
+    textTransform: "none",
+    marginLeft: "70px",
+    borderRadius: "7px",
+    "& svg": {
+      marginLeft: "145px",
+    },
   },
 }));
 
 export default function Header({
   email,
   history,
-  saveDraft,
-  publishEmail,
-  closeEditor,
+  updateDoc,
   isSaving,
   handleTitleChange,
   title,
-  handleViewTypeChange,
-  sendTestEmail,
-  handleTestEmailChange,
-  testEmail,
-  altBodyContent,
-  handleAltBodyContent,
-  altBodyEnable,
-  handleAltBodyEnable,
+  editorType,
 }) {
+  console.log(editorType);
+
   const classes = useStyles();
+  const buttonText =
+    editorType === "email" ? __("Update Email") : __("Update Funnel");
+
   return (
     <Card className={classes.root}>
       <div
-        className="groundhogg-header primary-header edit-post-header"
         role="region"
         aria-label={__("Email Editor primary top bar.", "groundhogg")}
         tabIndex="-1"
       >
-        <HeaderToolbar>
-          {/* This is totally undocumented, it pops up and import blocks fine but the add doesn't work at all without documentation I can't figure out how to use the functions without a ton of digging
-          <div className={classes.inserterBtn}>
-            <Inserter />
-          </div>*/}
-          <h1 className="groundhogg-header__title">
-            <form noValidate autoComplete="off">
-              <TextField
-                className="groundhogg-header__title"
-                label="Email Title"
-                value={title}
-                onChange={handleTitleChange}
-              />
-            </form>
-          </h1>
-          <div className="groundhogg-header__settings edit-post-header__settings">
-            {isSaving && <Spinner />}
-            <Button className={classes.button} onClick={saveDraft} variant="contained" color="secondary">
-              {__("Save Draft")}
-            </Button>
-            <Button className={classes.button} onClick={publishEmail} variant="contained" color="primary">
-              {__("Publish")}
-            </Button>
-            <Button className={classes.button} onClick={closeEditor} variant="contained" color="secondary">
-              {__("Close")}
-            </Button>
-            <PinnedItems.Slot scope="gh/v4/core" />
-          </div>
-        </HeaderToolbar>
-      </div>
+        <span className={classes.backButton}>
+          <ArrowLeft href="./admin.php?page=gh_emails" />
+        </span>
 
-      <div
-        className="groundhogg-header secondary-header edit-post-header"
-        role="region"
-        aria-label={__("Email Editor secondary top bar.", "groundhogg")}
-        tabIndex="-1"
-      >
-        <HeaderToolbar>
-          <HeaderSecondary
-            handleViewTypeChange={handleViewTypeChange}
-            sendTestEmail={sendTestEmail}
-            handleTestEmailChange={handleTestEmailChange}
-            testEmail={testEmail}
-            altBodyContent={altBodyContent}
-            handleAltBodyContent={handleAltBodyContent}
-            altBodyEnable={altBodyEnable}
-            handleAltBodyEnable={handleAltBodyEnable}
+        <span className={classes.titleContainer}>
+          <TextField
+            label="Email Info"
+            value={title}
+            onChange={handleTitleChange}
+            InputProps={{ disableUnderline: true }}
           />
-        </HeaderToolbar>
+          <EditPen />
+        </span>
+
+        <span className={classes.updateContainer}>
+          <span className={classes.stepUpdateButton}>
+            <ArrowCurveRight />
+          </span>
+          <span className={classes.stepUpdateButton}>
+            <ArrowCurveLeft />
+          </span>
+
+          <Button className={classes.updateButton} onClick={updateDoc}>
+            {buttonText}
+            <SendMail />
+          </Button>
+        </span>
+        <PinnedItems.Slot scope="gh/v4/core" />
       </div>
     </Card>
   );
