@@ -599,6 +599,9 @@ function dequeue_theme_css_compat() {
 	wp_dequeue_style( $theme_name );
 	wp_dequeue_style( 'style' );
 
+	// Additional compat
+	wp_dequeue_style( 'fusion-dynamic-css' );
+
 	// Extra compat.
 	global $wp_styles;
 	$maybe_dequeue = $wp_styles->queue;
