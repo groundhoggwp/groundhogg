@@ -72,19 +72,25 @@ export default ({ document, history }) => {
     editorType,
   } = document.data;
 
-  console.log(document, editorType)
+  // Editor Contents
+  const [title, setTitle] = useState(defaultTitleValue);
+  const [content, setContent] = useState(defaultContentValue);
+  const [blocks, updateBlocks] = useState(parse(defaultContentValue));
 
+  // Side Bar States
+  const [replyTo, setReplyTo] = useState("");
+  const [from, setFrom] = useState("");
+  const [viewType, setViewType] = useState("desktop");
+
+  // Unused
   const [isInspecting, setIsInspecting] = useState(false);
-  const [testEmail, setTestEmail] = useState([]);
   const [altBodyContent, setAltBodyContent] = useState('');
   const [altBodyEnable, setAltBodyEnable] = useState('');
-  const [title, setTitle] = useState(defaultTitleValue);
-  // const [draggedBlock, setDraggedBlock] = useState(null);
   const [subject, setSubject] = useState(defaultSubjectValue);
   const [preHeader, setPreHeader] = useState(defaultPreHeaderValue);
-  const [content, setContent] = useState(defaultContentValue);
-  const [viewType, setViewType] = useState("desktop");
-  const [blocks, updateBlocks] = useState(parse(defaultContentValue));
+
+  // Unused Old
+  // const [testEmail, setTestEmail] = useState([]);
 
   const { editorMode, isSaving, item } = useSelect(
     (select) => ({
@@ -284,16 +290,16 @@ export default ({ document, history }) => {
     }
     console.log("valid let send", testEmail);
     sendEmailRaw({
-      to: testEmail,
-      from_email: "nathan.groundhogg@gmail.com",
+      to: replyTo,
+      from,
       from_name: "TEST D",
       content: content,
       subject: subject,
     });
   };
-  const handleTestEmailChange = (e) => {
-    setTestEmail(e.target.value);
-  };
+  // const handleTestEmailChange = (e) => {
+  //   setTestEmail(e.target.value);
+  // };
   const handleAltBodyContent = (e) => {
     console.log('alt body content', altBodyContent)
     setAltBodyContent(e.target.value);
@@ -365,8 +371,7 @@ export default ({ document, history }) => {
               />
 
 
-              <div className="content">
-
+              <div className="Groundhogg-BlockEditor__Contents">
                 <Notices />
                 {editorPanel}
                 <div className="bottomPanelTesting">
@@ -379,7 +384,7 @@ export default ({ document, history }) => {
                 </div>
               </div>
 
-              <Sidebar isInspecting={isInspecting} handleViewTypeChange={handleViewTypeChange} />
+              <Sidebar isInspecting={isInspecting} sendTestEmail={sendTestEmail} handleViewTypeChange={handleViewTypeChange} />
 
               <ComplementaryArea.Slot scope="gh/v4/core" />
 

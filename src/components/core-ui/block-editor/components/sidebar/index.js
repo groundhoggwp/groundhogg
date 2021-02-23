@@ -23,57 +23,87 @@ import PerfectScrollbar from "react-perfect-scrollbar";
  */
 import { makeStyles } from "@material-ui/core/styles";
 import { useEffect, useState } from "@wordpress/element";
-import {Button, TextField, InputLabel} from "@material-ui/core";
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-import FormatAlignJustifyIcon from '@material-ui/icons/FormatAlignJustify';
-import FormatAlignLeftIcon from '@material-ui/icons/FormatAlignLeft';
-import FormatAlignRightIcon from '@material-ui/icons/FormatAlignRight';
+import {Card, Button, FormControl, FormHelperText, InputLabel, MenuItem, Select,  TextField} from "@material-ui/core";
 
 /**
  * Internal dependencies
  */
 import Desktop from "components/svg/Desktop/";
 import Phone from "components/svg/Phone/";
+import AlignCenter from "components/svg/AlignCenter/";
+import AlignLeft from "components/svg/AlignLeft/";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     position: 'absolute',
-    top: '110px',
+    top: '127px',
     right: '0px',
     width: '320px',
-    padding: '20px 20px 20px 0',
     borderRadius: '7px',
     margin: '20px',
     '& .scrollbar-container': {
-      height: '500px'
+      height: '100%'
     }
+  },
+
+   inputText: {
+     width: "calc(100% - 10px)",
+     marginTop: "10px"
+   },
+   blockPanel:{
+     marginTop: '20px'
+   },
+  emailControls:{
+    height: '350px',
+    padding: '10px 22px 0 22px',
   },
  sendTestButton:{
    fontSize: '12px',
    textTransform: 'none',
-   // marginLeft: '20px'
+   marginTop: '-9px',
+   width: '187px',
+   height: '32px',
+   color: '#0075FF',
+   border : '1.2px solid #0075FF',
  },
  viewTypeButton:{
-   margin: '20px 5px 20px 0px'
+   display: 'inline-block',
+   border : '1.2px solid rgba(16, 38, 64, 0.15)',
+   padding: '5px 5px 4px 5px',
+   margin: '0px 0px 10px 15px',
+   borderRadius : '5px',
+   '&:hover' : {
+     border : '1.2px solid #0075FF',
+     cursor: 'pointer'
+   }
  },
-  searchField: {
-    width: "calc(100% - 20px)",
-    margin: "10px"
-  },
+ alignmentContainer:{
+    display: 'inline-block',
+   marginTop: '20px',
+   width: '115px'
+
+ },
+ messageTypeContainer:{
+   display: 'inline-block',
+   marginTop: '20px'
+ },
+ additionalInfoContainer:{
+   width: '100%',
+   borderRadius: '7px',
+   background: '#E7EEFB'
+ }
 }));
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
   "GroundhoggEmailBuilderSidebarInspector"
 );
 
-const Sidebar = ({isInspecting, handleViewTypeChange}) => {
+const Sidebar = ({isInspecting, sendTestEmail, handleViewTypeChange, replyTo, handleSetReplyTo, from, handleSetFrom}) => {
   const classes = useStyles();
 
   const [blocks, setBlocks] = useState(getBlockTypes());
   const [search, setSearch] = useState("");
+
 
   useEffect(() => {
     updateBlocks();
@@ -95,24 +125,12 @@ const Sidebar = ({isInspecting, handleViewTypeChange}) => {
     }
   };
 
-  const blockPanel = !isInspecting ?
+  const blockPanel = isInspecting ?
 
-      <Panel header={__("Inspector")}>
-        <InspectorSlot bubblesVirtually />
-      </Panel>
+
+      <InspectorSlot bubblesVirtually />
       :
-      <Panel header={__("Blocks")}>
-          <TextField
-            className={classes.searchField}
-            value={search}
-            label={"Search"}
-            type={"search"}
-            variant={"outlined"}
-            size={"small"}
-            onChange={handleOnChange}
-            fullWidth
-          />
-          <div className="side-bar-blocks-container">
+          <>
             {blocks.map((block) => {
               return (
                 <div
@@ -135,53 +153,52 @@ const Sidebar = ({isInspecting, handleViewTypeChange}) => {
                 </div>
               );
             })}
-          </div>
+          </>        
 
-          <Button>Additional options:</Button>
-        </Panel>
 
         // <PerfectScrollbar>
         // </PerfectScrollbar>
   return (
-
     <div
       className={classes.root}
       role="region"
       aria-label={__("Groundhogg Email Sidebar advanced settings.")}
       tabIndex="-1"
     >
-      <Panel>
-        <Button className={classes.sendTestButton} variant="outlined" color="secondary">{__("Send test email")}</Button>
-        <Button className={classes.viewTypeButton} variant="outlined" color="secondary" onClick={() => { handleViewTypeChange('mobile') }}>
+
+      <Card className={classes.emailControls}>
+        <Button className={classes.sendTestButton} onClick={()=> {sendTestEmail()}}>{__("Send test email")}</Button>
+        <div className={classes.viewTypeButton} onClick={() => { handleViewTypeChange('mobile') }}>
           <Phone/>
-        </Button>
-        <Button className={classes.viewTypeButton} variant="outlined" color="secondary" onClick={() => { handleViewTypeChange('desktop') }}>
+        </div>
+        <div className={classes.viewTypeButton} onClick={() => { handleViewTypeChange('desktop') }}>
           <Desktop />
-        </Button>
+        </div>
 
         <TextField
-          className={classes.searchField}
-          value={'from'}
-          label={"From"}
-          type={"search"}
+          className={classes.inputText}
+          value={from}
+          placeholder={"From"}
+          variant={"outlined"}
           onChange={handleOnChange}
           fullWidth
         />
         <TextField
-          className={classes.searchField}
-          value={'from'}
-          label={"Reply to"}
-          type={"search"}
+          className={classes.inputText}
+          value={replyTo}
+          placeholder={"Reply to"}
+          variant={"outlined"}
           onChange={handleOnChange}
           fullWidth
         />
 
-        <label>{__("Alignment")}</label>
-        <Button><FormatAlignJustifyIcon/></Button>
-        <Button><FormatAlignLeftIcon/></Button>
-        <Button><FormatAlignRightIcon/></Button>
+        <div className={classes.alignmentContainer}>
+          <label>{__("Alignment")}</label><br/>
+          <AlignLeft/>
+          <AlignCenter/>
+        </div>
 
-        <FormControl className={classes.formControl}>
+        <FormControl className={classes.messageTypeContainer}>
           <InputLabel shrink id="demo-simple-select-placeholder-label-label">
             Message type:
           </InputLabel>
@@ -201,12 +218,15 @@ const Sidebar = ({isInspecting, handleViewTypeChange}) => {
           <FormHelperText>Label + placeholder</FormHelperText>
       </FormControl>
 
+      <div className={classes.additionalInfoContainer}>
+        <label>{__("Additional info")}</label><br/>
+      </div>
 
+    </Card>
 
-      </Panel>
-
+    <Card className={classes.blockPanel}>
       {blockPanel}
-
+    </Card>
     </div>
 
   );
