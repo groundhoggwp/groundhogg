@@ -53,7 +53,7 @@ class Info_Cards {
 
 		self::register( 'files', __( 'Files', 'groundhogg' ), function ( $contact ) {
 			include __DIR__ . '/cards/files.php';
-		} );
+		}, 100, 'download_contact_files' );
 
 		self::register( 'email', __( 'Send Email', 'groundhogg' ), function ( $contact ) {
 			include __DIR__ . '/cards/email.php';
@@ -63,9 +63,9 @@ class Info_Cards {
 //			include __DIR__ . '/cards/email-activity.php';
 //		} );
 
-		self::register( 'formatting-example', __( 'Formatting Example', 'groundhogg' ), function ( $contact ) {
-			include __DIR__ . '/cards/example.php';
-		} );
+//		self::register( 'formatting-example', __( 'Formatting Example', 'groundhogg' ), function ( $contact ) {
+//			include __DIR__ . '/cards/example.php';
+//		} );
 
 		do_action( 'groundhogg/admin/contacts/register_info_cards', $this );
 	}

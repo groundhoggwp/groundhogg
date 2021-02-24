@@ -286,6 +286,7 @@ class Contact_Query {
 			'date_query'             => null,
 			'count'                  => false,
 			'no_found_rows'          => true,
+			'filters'                => []
 		);
 
 		// Only show contacts associated with the current owner...
@@ -854,6 +855,10 @@ class Contact_Query {
 			$where['tax_query'] = preg_replace( '/^\s*AND\s*/', '', $this->tag_query_clauses['where'] );
 		}
 
+		if ( ! empty( $this->query_vars['filters'] ) ) {
+			$where['filters'] = $this->parse_filters( $this->query_vars['filters'] );
+		}
+
 		return $where;
 	}
 
@@ -1087,5 +1092,248 @@ class Contact_Query {
 	 */
 	protected function get_allowed_orderby_keys() {
 		return array_keys( $this->gh_db_contacts->get_columns() );
+	}
+
+	/**
+	 * Parse the provided filters to form a where clause
+	 *
+	 * @param $filters
+	 *
+	 * @return string
+	 */
+	protected function parse_filters( $filters ): string {
+
+		$or_clauses = [];
+
+		// Or Group
+		foreach ( $filters as $filter_and_group ) {
+
+			$and_clauses = [];
+
+			// And Group
+			foreach ( $filter_and_group as $filter ) {
+				$clause = $this->parse_filter( $filter );
+				if ( $clause !== false ) {
+					$and_clauses[] = $clause;
+				}
+			}
+
+			$or_clauses[] = '(' . implode( ' AND ', $and_clauses ) . ')';
+		}
+
+		return implode( " OR ", $or_clauses );
+	}
+
+	/**
+	 * Parse a single filter
+	 *
+	 * @param $filter
+	 *
+	 * @return false|string
+	 */
+	protected function parse_filter( $filter ) {
+
+		$filter = wp_parse_args( $filter, [
+			'type' => ''
+		] );
+
+		$type = $filter['type'];
+
+		$handler = get_array_var( static::$filters, $type );
+
+		// No filter handler available
+		if ( ! $handler || ! is_callable( $handler['filter_callback'] ) ) {
+			return false;
+		}
+
+		return call_user_func( $handler['filter_callback'], $filter );
+	}
+
+	/**
+	 * Registered filters
+	 *
+	 * @var array[]
+	 */
+	protected static $filters = [];
+
+	/**
+	 * Filter Groups
+	 *
+	 * @var string[]
+	 */
+	protected static $filter_groups = [];
+
+	/**
+	 * Register a filter callback which will return an SQL statement
+	 *
+	 * @param string $type
+	 * @param string $group
+	 * @param string $name
+	 * @param callable $filter_callback
+	 * @param callable $display_callback
+	 *
+	 * @return bool
+	 */
+	public static function register_filter( string $type, string $group, string $name, callable $filter_callback, callable $display_callback ): bool {
+		if ( ! $type || ! is_callable( $filter_callback ) || ! is_callable( $display_callback ) ) {
+			return false;
+		}
+
+		self::$filters[ $type ] = [
+			'type'             => $type,
+			'name'             => $name,
+			'group'            => $group,
+			'filter_callback'  => $filter_callback,
+			'display_callback' => $display_callback
+		];
+
+		return true;
+	}
+
+	/**
+	 * Register a filter group
+	 *
+	 * @param $group
+	 * @param $name
+	 */
+	public static function register_filter_group( $group, $name ) {
+		self::$filter_groups[ $group ] = $name;
+	}
+
+	/**
+	 * Setup some initial filters
+	 */
+	public static function setup_default_filters() {
+
+		self::register_filter_group( 'contact_fields', __( "Contact Fields", 'groundhogg' ) );
+		self::register_filter_group( 'custom_fields', __( "Custom Fields", 'groundhogg' ) );
+
+		self::register_filter(
+			'first_name',
+			'contact_fields',
+			__( "First Name", 'groundhogg' ),
+			[ self::class, 'contact_generic_text_filter_compare' ],
+			[ self::class, 'filter_contact_display_callback' ]
+		);
+
+		self::register_filter(
+			'last_name',
+			'contact_fields',
+			__( "Last Name", 'groundhogg' ),
+			[ self::class, 'contact_generic_text_filter_compare' ],
+			[ self::class, 'filter_contact_display_callback' ]
+		);
+
+		self::register_filter(
+			'email',
+			'contact_fields',
+			__( "Email", 'groundhogg' ),
+			[ self::class, 'contact_generic_text_filter_compare' ],
+			[ self::class, 'filter_contact_display_callback' ]
+		);
+	}
+
+	/**
+	 * Generic filter for text comparison
+	 *
+	 * @param $filter_vars array
+	 * @param $column_key string
+	 *
+	 * @return string
+	 */
+	public static function generic_text_filter_compare( array $filter_vars, string $column_key ): string {
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'value'   => '',
+			'compare' => '',
+		] );
+
+		global $wpdb;
+
+		$value = sanitize_text_field( $filter_vars['value'] );
+
+		switch ( $filter_vars['compare'] ) {
+			default:
+			case 'equals':
+				return sprintf( "`%s` = '%s'", $column_key, $value );
+			case 'not_equals':
+				return sprintf( "`%s` != '%s'", $column_key, $value );
+			case 'contains':
+				return sprintf( "`%s` RLIKE '%s'", $column_key, $value );
+			case 'not_contains':
+				return sprintf( "`%s` NOT RLIKE '%s'", $column_key, $value );
+			case 'begins_with':
+				return sprintf( "`%s` LIKE '%s'", $column_key, $wpdb->esc_like( $value ) . '%s' );
+			case 'ends_with':
+				return sprintf( "`%s` LIKE '%s'", $column_key, '%' . $wpdb->esc_like( $value ) );
+			case 'is_empty':
+				return sprintf( "`%s` = ''", $column_key );
+			case 'not_empty':
+				return sprintf( "`%s` != ''", $column_key );
+		}
+	}
+
+	/**
+	 * Generic filter for text comparison
+	 *
+	 * @param $filter_vars array
+	 * @param $column_key string
+	 *
+	 * @return string
+	 */
+	public static function generic_number_filter_compare( array $filter_vars, string $column_key ): string {
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'value'   => '',
+			'compare' => '',
+		] );
+
+		global $wpdb;
+
+		$value = sanitize_text_field( $filter_vars['value'] );
+
+		switch ( $filter_vars['compare'] ) {
+			default:
+			case 'equals':
+				return sprintf( "`%s` = %d", $column_key, $value );
+			case 'not_equals':
+				return sprintf( "`%s` != %d", $column_key, $value );
+			case 'greater_than':
+				return sprintf( "`%s` > %d", $column_key, $value );
+			case 'less_than':
+				return sprintf( "`%s` < %d", $column_key, $value );
+			case 'greater_than_or_equal_to':
+				return sprintf( "`%s` >= %d", $column_key, $value );
+			case 'less_than_or_equal_to':
+				return sprintf( "`%s` <= %d", $column_key, $value );
+			case 'between_inclusive':
+				return sprintf( "`%s` <= %d", $column_key, $value );
+			case 'between_exclusive':
+				return sprintf( "`%s` <= %d", $column_key, $value );
+		}
+	}
+
+	/**
+	 * Handle the first name filter args
+	 *
+	 * @param $filter_vars array
+	 *
+	 * @return string
+	 */
+	public static function contact_generic_text_filter_compare( array $filter_vars ): string {
+		return self::generic_text_filter_compare( $filter_vars, $filter_vars['type'] );
+	}
+
+	/**
+	 * Handle the first name filter args
+	 *
+	 * @param $filter_vars array
+	 *
+	 * @return string
+	 */
+	public static function contact_generic_number_filter_compare( array $filter_vars ): string {
+		return self::generic_number_filter_compare( $filter_vars, $filter_vars['type'] );
+	}
+
+	public static function render_filters( $filters ){
+
 	}
 }
