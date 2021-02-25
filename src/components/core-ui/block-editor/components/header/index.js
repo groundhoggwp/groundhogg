@@ -27,6 +27,7 @@ import ArrowCurveLeft from "components/svg/ArrowCurveLeft/";
 import ArrowCurveRight from "components/svg/ArrowCurveRight/";
 import EditPen from "components/svg/EditPen/";
 import SendMail from "components/svg/SendMail/";
+import MoreDots from "components/svg/MoreDots/";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -60,6 +61,16 @@ const useStyles = makeStyles((theme) => ({
       marginLeft: "-1px",
     },
   },
+  moreBtn:{
+    display: 'inline-flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '44px',
+    height: '22px',
+    border: '0.5px solid rgba(16, 38, 64, 0.25)',
+    borderRadius: '5px',
+    marginLeft: '25px'
+  },
   updateContainer: {
     float: "right",
     display: "inline-block",
@@ -92,7 +103,8 @@ export default function Header({
   title,
   editorType,
 }) {
-  const [disableTitle, setDisableTitle] = useState(true);
+
+  const [disableTitle, setDisableTitle] = useState(false);
 
   const classes = useStyles();
   const buttonText =
@@ -122,6 +134,8 @@ export default function Header({
             InputProps={{ disableUnderline: true, disabled: disableTitle }}
           />
           <Button onClick={toggleTitle}><EditPen /></Button>
+
+          <span className={classes.moreBtn}><MoreDots/></span>
         </span>
 
         <span className={classes.updateContainer}>

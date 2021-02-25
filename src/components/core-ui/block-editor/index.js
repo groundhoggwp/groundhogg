@@ -68,10 +68,9 @@ export default ({ document, history }) => {
     subject: defaultSubjectValue,
     pre_header: defaultPreHeaderValue,
     content: defaultContentValue,
-    // editorType,
+    editorType,
   } = document.data;
 
-  let editorType = 'funnel'
 
   // Editor Contents
   const [title, setTitle] = useState(defaultTitleValue);
@@ -367,14 +366,19 @@ export default ({ document, history }) => {
       );
   }
 
+  let steps = <div/>
+  if(editorType === 'funnel'){
+    steps = <div className={classes.contentSideBar}>
+      <EditorSteps/>
+    </div>
+  }
+
   console.log('rebuild', blocks)
 
   return (
     <>
       <div className="Groundhogg-BlockEditor">
-        <div className={classes.contentSideBar}>
-          <EditorSteps/>
-        </div>
+        {steps}
         <FullscreenMode isActive={false} />
         <SlotFillProvider>
           <DropZoneProvider>

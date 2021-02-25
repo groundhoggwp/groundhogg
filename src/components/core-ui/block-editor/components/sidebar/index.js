@@ -41,6 +41,11 @@ import Desktop from "components/svg/Desktop/";
 import Phone from "components/svg/Phone/";
 import AlignCenter from "components/svg/AlignCenter/";
 import AlignLeft from "components/svg/AlignLeft/";
+import BlocksDivider from "components/svg/block-editor/BlocksDivider/";
+import BlocksHeading from "components/svg/block-editor/BlocksHeading/";
+import BlocksImage from "components/svg/block-editor/BlocksImage/";
+import BlocksSpacer from "components/svg/block-editor/BlocksSpacer/";
+import BlocksText from "components/svg/block-editor/BlocksText/";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -54,7 +59,6 @@ const useStyles = makeStyles((theme) => ({
       height: "100%",
     },
   },
-
   inputText: {
     width: "calc(100% - 10px)",
     marginTop: "10px",
@@ -100,6 +104,42 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: "7px",
     background: "#E7EEFB",
   },
+  blocksTitle:{
+    display: 'block',
+    fontSize: '18px',
+    width: '50px',
+    fontWeight: '500',
+    margin: '18px auto 5px auto'
+
+  },
+  block:{
+    position: 'relative',
+    display: 'inline-block',
+    margin: '10px',
+    width: '84px',
+    height: '80px',
+    border: '1.2px solid rgba(0, 117, 255, 0.2)',
+    borderRadius: '5px',
+    textAlign: 'center',
+    fontWeight: '500',
+    '&:hover':{
+      color: '#fff',
+      background: '#0075FF'
+    },
+    '& svg, & path':{
+      fill: '#0075FF'
+    }
+  },
+  blockIcon: {
+    margin: '15px 0 0 0',
+
+  },
+  blockName:{
+    position: 'absolute',
+    bottom: '5px',
+    width: '100%',
+    textAlign: 'center'
+  }
 }));
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
@@ -140,29 +180,29 @@ const Sidebar = ({
     }
   };
 
+  // import BlocksDivider from "components/svg/block-editor/BlocksDivider/";
+  // import BlocksHeading from "components/svg/block-editor/BlocksHeading/";
+  // import BlocksImage from "components/svg/block-editor/BlocksImage/";
+  // import BlocksSpacer from "components/svg/block-editor/BlocksSpacer/";
+  // import BlocksText from "components/svg/block-editor/BlocksText/";
   const blockPanel = isInspecting ? (
     <InspectorSlot bubblesVirtually />
   ) : (
     <>
+      <div className={classes.blocksTitle}>Blocks</div>
       {blocks.map((block) => {
         return (
           <div
             data-block={JSON.stringify(block)}
-            className="block-editor-block side-bar-drag-drop-block"
+            className={classes.block+" block-editor-block side-bar-drag-drop-block"}
           >
-            <svg
-              aria-hidden="true"
-              role="img"
-              focusable="false"
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              class="dashicon dashicons-shield"
-            >
-              <path d="M10 2s3 2 7 2c0 11-7 14-7 14S3 15 3 4c4 0 7-2 7-2zm0 8h5s1-1 1-5c0 0-5-1-6-2v7H5c1 4 5 7 5 7v-7z"></path>
-            </svg>
-            {block.title}
+            <div className={classes.blockIcon}>
+              <BlocksImage/>
+            </div>
+
+            <div className={classes.blockName}>
+              {block.title.replace('Groundhogg - ', '')}
+            </div>
           </div>
         );
       })}

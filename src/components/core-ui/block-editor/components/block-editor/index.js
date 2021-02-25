@@ -65,18 +65,40 @@ function BlockEditor({
       overflowY: "auto",
       overflowX: "hidden",
     },
-    subjectHeader: {
+    emailHeader: {
+      // '& input:nth-of-type(1)':{
+      //   width: 'calc(100% - 50px)'
+      // },
+      // '& input:nth-of-type(2)':{
+      //   width: 'calc(100% - 150px)'
+      // }
+    },
+    subjectHeaderRow: {
+      display: 'block',
+      width: 'calc(100% - 75px)',
+      margin: '0 auto 0 auto',
+      fontSize: '16px',
       padding: "20px",
-      marginBottom: "10px",
+
+      borderBottom: '1px solid rgba(16, 38, 64, 0.15)',
+      '& label':{
+        fontWeight: '500'
+      }
     },
     subjectInputs: {
-      width: "100%",
-      padding: "",
-      marginBottom: "10px",
+      display: 'inline-block',
+      width: 'calc(100% - 140px)',
+      fontSize: '16px',
+      outline: "none",
+      border: "none",
+      boxShadow: "none",
+      marginLeft: "10px",
+
     },
     emailContainer: {
-      width: editorType === 'email' ? 'calc(100% - 405px)' : 'calc(100% - 630px)',
+      width: editorType === 'email' ? 'calc(100% - 360px)' : 'calc(100% - 630px)',
       marginLeft: editorType === 'email' ? '0px' : '305px'
+
     },
     emailContent: {
       position: "relative",
@@ -137,24 +159,31 @@ function BlockEditor({
         onInput={handleUpdateBlocks}
         onChange={handleUpdateBlocks}
       >
-        <div className={classes.emailContainer}>
-          <Card className={classes.subjectHeader}>
-            <form noValidate autoComplete="off">
-              <TextField
+
+          <Card className={classes.emailContainer}>
+            <form noValidate autoComplete="off" className={classes.emailHeader}>
+              <div className={classes.subjectHeaderRow}>
+              <label>Subject:</label>
+              <input
                 className={classes.subjectInputs}
                 onChange={handleSubjectChange}
                 label={"Subject"}
                 value={subject}
               />
-              <TextField
+              <br/>
+              </div>
+              <div className={classes.subjectHeaderRow}>
+              <label>Pre Header Text:</label>
+              <input
                 className={classes.subjectInputs}
                 onChange={handlePreHeaderChange}
                 label={"Pre Header"}
                 value={preHeader === "" ? "Pre Header" : preHeader}
               />
+              </div>
             </form>
-          </Card>
-          <Paper>
+
+
             <div className={classes.emailContent}>
               <BlockSelectionClearer className={classes}>
                 <VisualEditorGlobalKeyboardShortcuts />
@@ -175,8 +204,8 @@ function BlockEditor({
                 </Typewriter>
               </BlockSelectionClearer>
             </div>
-          </Paper>
-        </div>
+          </Card>
+
         <Sidebar.InspectorFill>
           <Popover name="block-toolbar" />
           <BlockInspector />
