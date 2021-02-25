@@ -15,14 +15,6 @@ import {
   PanelBody,
   PanelRow
 } from "@wordpress/components";
-
-import {
-  InterfaceSkeleton,
-  FullscreenMode,
-  ComplementaryArea,
-} from "@wordpress/interface";
-
-
 import { useEffect, useState } from "@wordpress/element";
 import { useSelect, useDispatch } from "@wordpress/data";
 import {
@@ -38,9 +30,15 @@ import {
   getBlockInsertionPoint,
 } from "@wordpress/blocks";
 
-/*
+/**
  * External dependencies
  */
+ import { makeStyles } from "@material-ui/core/styles";
+import {
+  InterfaceSkeleton,
+  FullscreenMode,
+  ComplementaryArea,
+} from "@wordpress/interface";
 import interact from "interactjs";
 import { DateTime } from "luxon";
 
@@ -52,6 +50,7 @@ import Header from "./components/header";
 import Sidebar from "./components/sidebar";
 import BlockEditor from "./components/block-editor";
 import TextEditor from "./components/text-editor";
+import EditorSteps from "./components/editor-steps";
 import { getLuxonDate, matchEmailRegex } from "utils/index";
 
 import { CORE_STORE_NAME, EMAILS_STORE_NAME } from "data";
@@ -69,8 +68,10 @@ export default ({ document, history }) => {
     subject: defaultSubjectValue,
     pre_header: defaultPreHeaderValue,
     content: defaultContentValue,
-    editorType,
+    // editorType,
   } = document.data;
+
+  let editorType = 'funnel'
 
   // Editor Contents
   const [title, setTitle] = useState(defaultTitleValue);
@@ -318,6 +319,21 @@ export default ({ document, history }) => {
     setupInteractJS();
   }, []);
 
+
+  const useStyles = makeStyles((theme) => ({
+    root: {
+
+    },
+    contentMain:{
+
+    },
+    contentSideBar:{
+
+    }
+  }));
+
+  const classes = useStyles();
+
   let editorPanel;
   switch (editorMode) {
     case "text":
@@ -346,6 +362,7 @@ export default ({ document, history }) => {
           viewType={viewType}
           handleUpdateBlocks={handleUpdateBlocks}
           blocks={blocks}
+          editorType={editorType}
         />
       );
   }
@@ -355,6 +372,9 @@ export default ({ document, history }) => {
   return (
     <>
       <div className="Groundhogg-BlockEditor">
+        <div className={classes.contentSideBar}>
+          <EditorSteps/>
+        </div>
         <FullscreenMode isActive={false} />
         <SlotFillProvider>
           <DropZoneProvider>
@@ -371,17 +391,10 @@ export default ({ document, history }) => {
               />
 
 
-              <div className="Groundhogg-BlockEditor__Contents">
-                <Notices />
-                {editorPanel}
-                <div className="bottomPanelTesting">
-                <Panel header={__("Blocks")} style={{marginTop:'500px'}}>
-                  {/*icon={ more }*/}]
-                  <PanelBody title="My Block Settings"  initialOpen={ true } style={{backgroundColor:'#ccc'}}>
-                      <PanelRow>My Panel Inputs and Labels</PanelRow>
-                  </PanelBody>
-                </Panel>
-                </div>
+              <div className={classes.content}>
+                  {/*Notices probably needs to be re-wrote*/}
+                  <Notices />
+                  {editorPanel}
               </div>
 
               <Sidebar isInspecting={isInspecting} sendTestEmail={sendTestEmail} handleViewTypeChange={handleViewTypeChange} />
@@ -391,6 +404,15 @@ export default ({ document, history }) => {
             </FocusReturnProvider>
           </DropZoneProvider>
         </SlotFillProvider>
+
+        <div className={classes.contentFooter}>
+          <Panel header={__("Blocks")} style={{marginTop:'500px'}}>
+            {/*icon={ more }*/}]
+            <PanelBody title="My Block Settings"  initialOpen={ true } style={{backgroundColor:'#ccc'}}>
+                <PanelRow>My Panel Inputs and Labels</PanelRow>
+            </PanelBody>
+          </Panel>
+        </div>
       </div>
     </>
   );

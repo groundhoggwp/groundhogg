@@ -50,6 +50,7 @@ function BlockEditor({
   viewType,
   handleUpdateBlocks,
   blocks,
+  editorType
 }) {
   const useStyles = makeStyles((theme) => ({
     root: {
@@ -74,7 +75,8 @@ function BlockEditor({
       marginBottom: "10px",
     },
     emailContainer: {
-      width: "calc(100% - 405px)",
+      width: editorType === 'email' ? 'calc(100% - 405px)' : 'calc(100% - 630px)',
+      marginLeft: editorType === 'email' ? '0px' : '305px'
     },
     emailContent: {
       position: "relative",

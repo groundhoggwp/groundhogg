@@ -7,7 +7,7 @@ import { Button, Card, TextField } from "@material-ui/core";
  * WordPress dependencies
  */
 import { __ } from "@wordpress/i18n";
-import { Fragment } from "@wordpress/element";
+import { Fragment, useState } from "@wordpress/element";
 import { PinnedItems } from "@wordpress/interface";
 import { Inserter } from "@wordpress/block-editor";
 
@@ -51,6 +51,7 @@ const useStyles = makeStyles((theme) => ({
       fontSize: "12px",
     },
     '& input[type="text"], & input[type="text"]:focus': {
+      color: '#000',
       fontSize: "24px",
       outline: "none",
       border: "none",
@@ -91,11 +92,16 @@ export default function Header({
   title,
   editorType,
 }) {
-  console.log(editorType);
+  const [disableTitle, setDisableTitle] = useState(true);
 
   const classes = useStyles();
   const buttonText =
     editorType === "email" ? __("Update Email") : __("Update Funnel");
+
+  const toggleTitle = () =>{
+    console.log(disableTitle)
+    setDisableTitle(disableTitle ? false : true )
+  }
 
   return (
     <Card className={classes.root}>
@@ -113,9 +119,9 @@ export default function Header({
             label="Email Info"
             value={title}
             onChange={handleTitleChange}
-            InputProps={{ disableUnderline: true }}
+            InputProps={{ disableUnderline: true, disabled: disableTitle }}
           />
-          <EditPen />
+          <Button onClick={toggleTitle}><EditPen /></Button>
         </span>
 
         <span className={classes.updateContainer}>
