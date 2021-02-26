@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Contacts;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Classes\Note;
 use Groundhogg\Saved_Searches;
+use Groundhogg\Scripts;
 use Groundhogg\Step;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\do_replacements;
@@ -131,6 +132,9 @@ class Contacts_Page extends Admin_Page {
 			wp_enqueue_script( 'select2' );
 			wp_enqueue_style( 'groundhogg-admin-contact-inline' );
 			wp_enqueue_script( 'groundhogg-admin-contact-inline' );
+
+			// Advanced Search
+            Scripts::enqueue_advanced_search_filters_scripts();
 		}
 	}
 
@@ -1277,7 +1281,7 @@ class Contacts_Page extends Admin_Page {
 
 		$contacts_table = new Tables\Contacts_Table();
 
-		include __DIR__ . '/advanced-search.php';
+		include __DIR__ . '/advanced-search-new.php';
 
 		$contacts_table->views();
 

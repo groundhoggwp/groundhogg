@@ -2,14 +2,8 @@
 
 namespace Groundhogg\Admin\Contacts;
 
-use Groundhogg\Contact_Query;
-use Groundhogg\Saved_Searches;
-use function Groundhogg\action_input;
-use function Groundhogg\get_db;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
-
-$filters = get_url_var( 'filters' );
 
 ?>
 <div id="search-filters" class="postbox <?php echo ( get_url_var( 'is_searching' ) ) ? '' : 'hidden'; ?>">
@@ -22,7 +16,14 @@ $filters = get_url_var( 'filters' );
 		<?php html()->hidden_GET_inputs(); ?>
 
         <div id="filters">
-            <?php Contact_Query::render_filters( $filters ); ?>
+            <div class="filter-or-group" v-for="(filterGroup, index) in filterGroups" :key="index">
+                <filter-group :id="index" :filters="filterGroup.filters" @add-filter="addFilter"></filter-group>
+                <or-separator></or-separator>
+            </div>
+            <div class="filter-group-wrap">
+                <button class="button" type="button"
+                        v-on:click="addFilterGroup"><?php _e( 'Add Filter', 'groundhogg' ) ?></button>
+            </div>
         </div>
     </form>
 </div>

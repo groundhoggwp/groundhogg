@@ -29,6 +29,7 @@
   "dependencies": {
     "npm-check-updates": "^7.0.2",
     "uglify-es": "^3.3.10",
-    "uglify-js": "^3.10.0"
+    "uglify-js": "^3.10.0",
+    "vue": "^3.0.6"
   }
 }

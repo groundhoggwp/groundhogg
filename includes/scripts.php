@@ -105,6 +105,9 @@ class Scripts {
 		wp_register_script( 'beautify-css', GROUNDHOGG_ASSETS_URL . 'lib/js-beautify/beautify-css.min.js' );
 		wp_register_script( 'beautify-html', GROUNDHOGG_ASSETS_URL . 'lib/js-beautify/beautify-html.min.js' );
 
+		// Vue JS
+		wp_register_script( 'vuejs', 'https://unpkg.com/vue@next' );
+
 		// PapaParse
 		wp_register_script( 'papaparse', GROUNDHOGG_ASSETS_URL . 'lib/papa-parse/papaparse' . $dot_min . '.js' );
 
@@ -145,9 +148,30 @@ class Scripts {
 			'jquery',
 			'jquery-ui-sortable'
 		], GROUNDHOGG_VERSION, true );
+
 		wp_register_script( 'groundhogg-admin-contact-info-cards', GROUNDHOGG_ASSETS_URL . 'js/admin/info-cards' . $dot_min . '.js', [
 			'jquery',
 		], GROUNDHOGG_VERSION, true );
+
+		wp_register_script( 'groundhogg-admin-contact-advanced-search', GROUNDHOGG_ASSETS_URL . 'js/admin/filtersApp/app.js', [
+			'vuejs',
+		], GROUNDHOGG_VERSION, true );
+
+		wp_register_script( 'groundhogg-admin-contact-advanced-search-mounting', GROUNDHOGG_ASSETS_URL . 'js/admin/filtersApp/mount.js', [
+			'groundhogg-admin-contact-advanced-search',
+		], GROUNDHOGG_VERSION, true );
+
+		$components = [
+			'filterGroup',
+			'orSeparator'
+		];
+
+		foreach ( $components as $component ) {
+			wp_register_script( 'groundhogg-admin-contact-advanced-search-' . $component, GROUNDHOGG_ASSETS_URL . 'js/admin/filtersApp/components/' . $component . '.js', [
+				'groundhogg-admin-contact-advanced-search',
+			], GROUNDHOGG_VERSION, true );
+		}
+
 		wp_register_script( 'groundhogg-admin-contact-inline', GROUNDHOGG_ASSETS_URL . 'js/admin/inline-edit-contacts' . $dot_min . '.js', [
 			'jquery',
 			'groundhogg-admin'
@@ -202,6 +226,7 @@ class Scripts {
 			'jquery',
 			'groundhogg-admin-modal'
 		], GROUNDHOGG_VERSION, true );
+
 		wp_register_script( 'groundhogg-funnel-delay-timer', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-steps/delay-timer' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
 		wp_register_script( 'groundhogg-funnel-webhook', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-steps/webhook' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
 		wp_register_script( 'groundhogg-funnel-form-integration', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-steps/form-integration' . $dot_min . '.js', [
@@ -280,6 +305,21 @@ class Scripts {
 		wp_register_style( 'groundhogg-form', GROUNDHOGG_ASSETS_URL . 'css/frontend/form.css', [], GROUNDHOGG_VERSION );
 
 		do_action( 'groundhogg/scripts/after_register_admin_styles' );
+	}
+
+	public static function enqueue_advanced_search_filters_scripts() {
+		wp_enqueue_script( 'groundhogg-admin-contact-advanced-search' );
+
+		$components = [
+			'filterGroup',
+			'orSeparator'
+		];
+
+		foreach ( $components as $component ) {
+			wp_enqueue_script( 'groundhogg-admin-contact-advanced-search-' . $component );
+		}
+
+		wp_enqueue_script( 'groundhogg-admin-contact-advanced-search-mounting' );
 	}
 
 }

@@ -1157,47 +1157,24 @@ class Contact_Query {
 	protected static $filters = [];
 
 	/**
-	 * Filter Groups
-	 *
-	 * @var string[]
-	 */
-	protected static $filter_groups = [];
-
-	/**
 	 * Register a filter callback which will return an SQL statement
 	 *
 	 * @param string $type
-	 * @param string $group
-	 * @param string $name
 	 * @param callable $filter_callback
-	 * @param callable $display_callback
 	 *
 	 * @return bool
 	 */
-	public static function register_filter( string $type, string $group, string $name, callable $filter_callback, callable $display_callback ): bool {
-		if ( ! $type || ! is_callable( $filter_callback ) || ! is_callable( $display_callback ) ) {
+	public static function register_filter( string $type, callable $filter_callback ): bool {
+		if ( ! $type || ! is_callable( $filter_callback ) ) {
 			return false;
 		}
 
 		self::$filters[ $type ] = [
 			'type'             => $type,
-			'name'             => $name,
-			'group'            => $group,
 			'filter_callback'  => $filter_callback,
-			'display_callback' => $display_callback
 		];
 
 		return true;
-	}
-
-	/**
-	 * Register a filter group
-	 *
-	 * @param $group
-	 * @param $name
-	 */
-	public static function register_filter_group( $group, $name ) {
-		self::$filter_groups[ $group ] = $name;
 	}
 
 	/**
@@ -1205,31 +1182,19 @@ class Contact_Query {
 	 */
 	public static function setup_default_filters() {
 
-		self::register_filter_group( 'contact_fields', __( "Contact Fields", 'groundhogg' ) );
-		self::register_filter_group( 'custom_fields', __( "Custom Fields", 'groundhogg' ) );
-
 		self::register_filter(
 			'first_name',
-			'contact_fields',
-			__( "First Name", 'groundhogg' ),
 			[ self::class, 'contact_generic_text_filter_compare' ],
-			[ self::class, 'filter_contact_display_callback' ]
 		);
 
 		self::register_filter(
 			'last_name',
-			'contact_fields',
-			__( "Last Name", 'groundhogg' ),
 			[ self::class, 'contact_generic_text_filter_compare' ],
-			[ self::class, 'filter_contact_display_callback' ]
 		);
 
 		self::register_filter(
 			'email',
-			'contact_fields',
-			__( "Email", 'groundhogg' ),
 			[ self::class, 'contact_generic_text_filter_compare' ],
-			[ self::class, 'filter_contact_display_callback' ]
 		);
 	}
 
@@ -1305,7 +1270,7 @@ class Contact_Query {
 			case 'less_than_or_equal_to':
 				return sprintf( "`%s` <= %d", $column_key, $value );
 			case 'between_inclusive':
-				return sprintf( "`%s` <= %d", $column_key, $value );
+				return sprintf( "`%s` <> %d", $column_key, $value );
 			case 'between_exclusive':
 				return sprintf( "`%s` <= %d", $column_key, $value );
 		}
@@ -1331,9 +1296,5 @@ class Contact_Query {
 	 */
 	public static function contact_generic_number_filter_compare( array $filter_vars ): string {
 		return self::generic_number_filter_compare( $filter_vars, $filter_vars['type'] );
-	}
-
-	public static function render_filters( $filters ){
-
 	}
 }
