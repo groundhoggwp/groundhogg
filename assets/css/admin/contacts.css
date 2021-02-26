@@ -56,6 +56,7 @@
     padding-left: 15px;
 }
 
+.wp-list-table th[id^='field_'],
 .wp-list-table #first_name,
 .wp-list-table #user_id,
 .wp-list-table #owner_id,
@@ -123,4 +124,34 @@ a.change-status.complained:hover {
 
 .filter-group-wrap{
     padding: 20px
+}
+
+td.column-tags .tags {
+    white-space: normal;
+}
+
+td.column-tags .tags .tag {
+    background: #f2f2f2;
+    padding: 3px 9px;
+    border-radius: 3px;
+    margin: 0 6px 6px 0;
+    font-size: 12px;
+    display: inline-block;
+}
+
+td.address .time-zone:before,
+td.address .ip-address:before{
+    content: "\f11f";
+    display: inline-block;
+    font: normal 13px/1 dashicons;
+    speak: never;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-decoration: none;
+    margin-right: 3px;
+    vertical-align: middle;
+}
+
+td.address .time-zone:before{
+    content: "\f469";
 }

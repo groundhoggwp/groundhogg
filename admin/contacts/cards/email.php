@@ -10,25 +10,6 @@ use Groundhogg\Plugin;
 use function Groundhogg\action_input;
 use function Groundhogg\html;
 
-//$_content_editor_dfw = true;
-//$_wp_editor_expand   = true;
-//
-//$_wp_editor_expand_class = '';
-//if ( $_wp_editor_expand ) {
-//	$_wp_editor_expand_class = ' wp-editor-expand';
-//}
-
-//add_action( 'media_buttons', [
-//	Plugin::$instance->replacements,
-//	'show_replacements_button'
-//] );
-
-//remove_editor_styles();
-//
-//add_filter( 'mce_css', function ( $mce_css ) {
-//	return $mce_css . ', ' . GROUNDHOGG_ASSETS_URL . 'css/admin/email-wysiwyg-style.css';
-//} );
-
 wp_enqueue_editor();
 
 ?>
@@ -57,7 +38,7 @@ wp_enqueue_editor();
 				] );
 				?></div><?php
 
-            Plugin::$instance->replacements->show_replacements_dropdown();
+			Plugin::$instance->replacements->show_replacements_dropdown();
 
 			echo html()->wrap( html()->textarea( [
 				'name'  => 'email_content',
@@ -68,12 +49,11 @@ wp_enqueue_editor();
 			] ), 'div', [ 'class' => 'mce-wrap' ] )
 
 			?>
-            <div class="container-info">
-                <div class="header-info additional-options">
+            <div class="ic-section">
+                <div class="ic-section-header additional-options">
 					<?php _e( 'Additional options', 'groundhogg' ); ?>
-                    <i class="dashicons dashicons-arrow-down-alt2"></i>
                 </div>
-                <div class="content-info">
+                <div class="ic-section-content">
                     <div class="section"><?php
 						echo html()->e( 'label', [ 'for' => 'cc' ], __( 'Cc:', 'groundhogg' ) );
 						echo html()->input( [

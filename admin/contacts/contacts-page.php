@@ -1281,7 +1281,7 @@ class Contacts_Page extends Admin_Page {
 
 		$contacts_table = new Tables\Contacts_Table();
 
-		include __DIR__ . '/advanced-search-new.php';
+		include __DIR__ . '/advanced-search.php';
 
 		$contacts_table->views();
 
@@ -1319,13 +1319,6 @@ class Contacts_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 		include __DIR__ . '/add-contact.php';
-	}
-
-	function search() {
-		if ( ! current_user_can( 'view_contacts' ) ) {
-			$this->wp_die_no_access();
-		}
-		include __DIR__ . '/search.php';
 	}
 
 	public function form() {

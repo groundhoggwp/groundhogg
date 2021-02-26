@@ -60,6 +60,7 @@ class Contacts_Table extends WP_List_Table {
 	 * use the parent reference to set some default configs.
 	 */
 	public function __construct() {
+
 		// Set parent defaults.
 		parent::__construct( array(
 			'singular' => 'contact',     // Singular name of the listed records.
@@ -83,7 +84,7 @@ class Contacts_Table extends WP_List_Table {
 
 
 		$columns  = $this->get_columns();
-		$hidden   = array(); // No hidden columns
+		$hidden   = get_hidden_columns( get_current_screen() );
 		$sortable = $this->get_sortable_columns();
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
@@ -178,18 +179,13 @@ class Contacts_Table extends WP_List_Table {
 	}
 
 	/**
-	 * @return array An associative array containing column information.
 	 * @see WP_List_Table::::single_row_columns()
+	 * @return array An associative array containing column information.
 	 */
 	public function get_columns() {
 		$columns = array(
 			'cb'           => '<input type="checkbox" />', // Render a checkbox instead of text.
 			'email'        => _x( 'Email', 'Column label', 'groundhogg' ),
-			'first_name'   => _x( 'First Name', 'Column label', 'groundhogg' ),
-			'last_name'    => _x( 'Last Name', 'Column label', 'groundhogg' ),
-			'user_id'      => _x( 'Username', 'Column label', 'groundhogg' ),
-			'owner_id'     => _x( 'Owner', 'Column label', 'groundhogg' ),
-			'date_created' => _x( 'Date Created', 'Column label', 'groundhogg' ),
 		);
 
 		return apply_filters( 'groundhogg_contact_columns', $columns );
@@ -206,12 +202,7 @@ class Contacts_Table extends WP_List_Table {
 	 */
 	protected function get_sortable_columns() {
 		$sortable_columns = array(
-			'email'        => array( 'email', false ),
-			'first_name'   => array( 'first_name', false ),
-			'last_name'    => array( 'last_name', false ),
-			'user_id'      => array( 'user_id', false ),
-			'owner_id'     => array( 'owner_id', false ),
-			'date_created' => array( 'date_created', false )
+			'email'        => [ 'email', false ],
 		);
 
 		return apply_filters( 'groundhogg_contact_sortable_columns', $sortable_columns );
@@ -219,7 +210,7 @@ class Contacts_Table extends WP_List_Table {
 
 	/**
 	 * @param object|Contact $contact
-	 * @param int $level
+	 * @param int            $level
 	 */
 	public function single_row( $contact, $level = 0 ) {
 
@@ -358,57 +349,9 @@ class Contacts_Table extends WP_List_Table {
 	}
 
 	/**
-	 * @param $contact Contact
-	 *
-	 * @return string
-	 */
-	protected function column_first_name( $contact ) {
-		return $contact->get_first_name() ? $contact->get_first_name() : '&#x2014;';
-	}
-
-	/**
-	 * @param $contact Contact
-	 *
-	 * @return string
-	 */
-	protected function column_last_name( $contact ) {
-		return $contact->get_last_name() ? $contact->get_last_name() : '&#x2014;';
-	}
-
-	/**
-	 * @param $contact Contact
-	 *
-	 * @return string
-	 */
-	protected function column_user_id( $contact ) {
-		return $contact->get_userdata() ? '<a href="' . admin_url( 'user-edit.php?user_id=' . $contact->get_userdata()->ID ) . '">' . $contact->get_userdata()->display_name . '</a>' : '&#x2014;';
-	}
-
-	/**
-	 * @param $contact Contact
-	 *
-	 * @return string
-	 */
-	protected function column_owner_id( $contact ) {
-		return ! empty( $contact->get_owner_id() ) ? '<a href="' . admin_url( 'admin.php?page=gh_contacts&owner=' . $contact->get_owner_id() ) . '">' . $contact->get_ownerdata()->user_login . '</a>' : '&#x2014;';
-	}
-
-	/**
-	 * @param $contact Contact
-	 *
-	 * @return string
-	 */
-	protected function column_date_created( $contact ) {
-		$dc_time = mysql2date( 'U', $contact->get_date_created() );
-		$dc_time = Plugin::instance()->utils->date_time->convert_to_utc_0( $dc_time );
-
-		return scheduled_time_column( $dc_time, false, false, false );
-	}
-
-	/**
 	 * Get default column value.
 	 *
-	 * @param object $contact A singular item (one full row's worth of data).
+	 * @param object $contact     A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string Text or HTML to be placed inside the column <td>.
@@ -543,7 +486,7 @@ class Contacts_Table extends WP_List_Table {
 	 *
 	 * @param        $contact     Contact Contact being acted upon.
 	 * @param string $column_name Current column name.
-	 * @param string $primary Primary column name.
+	 * @param string $primary     Primary column name.
 	 *
 	 * @return string Row steps output for posts.
 	 */
@@ -616,7 +559,8 @@ class Contacts_Table extends WP_List_Table {
                   var $bulk = $(this)
                   if ($bulk.val() === 'apply_tag' || $bulk.val() === 'remove_tag') {
                     $('.bulk-tag-action').removeClass('hidden')
-                  } else {
+                  }
+                  else {
                     $('.bulk-tag-action').addClass('hidden')
                   }
                 })

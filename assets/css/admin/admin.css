@@ -438,6 +438,7 @@ table.wp-list-table.funnels td.column-active_contacts {
 
 .replacements-dropdown-wrap {
     position: relative;
+    display: inline-block;
 }
 
 .replacements-dropdown-wrap .dashicons{

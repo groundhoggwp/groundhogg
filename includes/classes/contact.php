@@ -850,7 +850,7 @@ class Contact extends Base_Object_With_Meta {
 		}
 
 		$age_in_seconds = time() - strtotime( $date );
-		$age_in_years   = round( $age_in_seconds / YEAR_IN_SECONDS, 0 );
+		$age_in_years   = floor( $age_in_seconds / YEAR_IN_SECONDS );
 
 		return absint( $age_in_years );
 	}

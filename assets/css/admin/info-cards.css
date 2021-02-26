@@ -1,11 +1,11 @@
-.info-card-actions .inside{
+.info-card-actions .inside {
     display: flex;
     justify-content: space-between;
     padding: 0;
     margin: 0;
 }
 
-.info-card-actions a[href]{
+.info-card-actions a[href] {
     text-decoration: none;
     flex-grow: 1;
     padding: 10px;
@@ -26,12 +26,12 @@
     margin-bottom: 0;
 }
 
-ul.regular-list{
+ul.regular-list {
     list-style: disc;
     padding-left: 20px;
 }
 
-ul.regular-list li{
+ul.regular-list li {
     margin: 0;
 }
 
@@ -63,12 +63,13 @@ ul.regular-list li{
     font-size: 14px;
     color: #1b1b1b;
 }
+
 .info-card ul.info-list li span.subdata {
     font-size: 12px;
     /*color: #1b1b1b;*/
 }
 
-.container-info {
+.ic-section {
     /*background-color: #f1f1f1;*/
     /*padding: 10px;*/
     /*border: 1px solid #ccc;*/
@@ -77,58 +78,77 @@ ul.regular-list li{
     border-bottom: 1px solid #f1f1f1;
 }
 
-.container-info .content-info {
+.ic-section .ic-section-content {
     display: none;
     padding: 10px 0;
     background-color: #fff;
 }
 
-.header-info {
+.ic-section.open .ic-section-content {
+    display: block;
+}
+
+.ic-section-header {
     cursor: pointer;
 }
 
-.header-info .header-content {
+.ic-section-header .ic-section-header-content {
     display: inline-block;
     font-weight: 500;
     padding: 0 6px 10px 0;
 }
 
-.header-info span {
+.ic-section .ic-section-header:after{
+    float: right;
+    content: "\f140";
+    display: inline-block;
+    font: normal 20px/1 dashicons;
+    speak: never;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-decoration: none;
+}
+
+.ic-section.open .ic-section-header:after{
+    content: "\f142";
+}
+
+.ic-section-header span {
     margin: 0 5px 0 0;
 }
 
-.header-info > .dashicons {
+.ic-section-header > .dashicons {
     float: right;
     font-size: 18px;
     margin: 0 5px 0 0;
 }
 
-.content-info li {
+.ic-section-content li {
     display: flex;
     margin: 0 0 10px;
 }
 
-.content-info li .label {
+.ic-section-content li .label {
     font-weight: 500;
 }
 
-.content-info .dashicons {
+.ic-section-content .dashicons {
     float: none;
     font-size: 17px;
     margin: 0 2px 0 0;
 }
 
-.content-info .content {
+.ic-section-content .content {
     padding: 0 4px;
     max-width: 150px;
 }
 
-.content-info .content input {
+.ic-section-content .content input {
     width: 100%;
 }
 
 .basic-details .status,
-.content-info .content .status {
+.ic-section-content .content .status {
     padding: 3px 8px;
     color: #fff;
     font-weight: 600;
@@ -138,47 +158,49 @@ ul.regular-list li{
     text-transform: uppercase;
 }
 
-.light-text{
+.light-text {
     color: #aaaaaa;
 }
 
 .basic-details .red,
-.content-info .red {
+.ic-section-content .red {
     color: #a00;
 }
 
 .basic-details .green,
-.content-info .green {
+.ic-section-content .green {
     color: #218838;
 }
 
 .basic-details .orange,
-.content-info .orange {
+.ic-section-content .orange {
     color: #ff8900;
 }
 
 .basic-details .status.red,
-.content-info .status.red {
+.ic-section-content .status.red {
     background: #a00;
     color: #FFFFFF;
 }
+
 .basic-details .status.green,
-.content-info .status.green {
+.ic-section-content .status.green {
     background: #218838;
     color: #FFFFFF;
 }
+
 .basic-details .status.orange,
-.content-info .status.orange {
+.ic-section-content .status.orange {
     background: #ff8900;
     color: #FFFFFF;
 }
 
-.content-info .timeline li {
+.ic-section-content .timeline li {
     position: relative;
     padding: 0 0 0 20px;
 }
 
-.content-info .timeline li:before {
+.ic-section-content .timeline li:before {
     position: absolute;
     content: "";
     background: #fff;
@@ -191,7 +213,7 @@ ul.regular-list li{
     left: 2px;
 }
 
-.content-info .timeline li:after {
+.ic-section-content .timeline li:after {
     background: #dadcde;
     content: "";
     height: 130%;
@@ -201,16 +223,16 @@ ul.regular-list li{
     width: 2px;
 }
 
-.content-info .timeline li:last-child:after {
+.ic-section-content .timeline li:last-child:after {
     height: 0;
 }
 
-.content-info .timeline-second {
+.ic-section-content .timeline-second {
     position: relative;
     margin: 0 auto;
 }
 
-.content-info .timeline-second:before {
+.ic-section-content .timeline-second:before {
     content: '';
     position: absolute;
     width: 6px;
@@ -221,7 +243,7 @@ ul.regular-list li{
     margin-left: -3px;
 }
 
-.content-info .timeline-second li {
+.ic-section-content .timeline-second li {
     display: block;
     width: 40%;
     padding: 10px 8px;
@@ -229,7 +251,7 @@ ul.regular-list li{
     background-color: inherit;
 }
 
-.content-info .timeline-second li:after {
+.ic-section-content .timeline-second li:after {
     content: '';
     position: absolute;
     width: 10px;
@@ -242,11 +264,11 @@ ul.regular-list li{
     z-index: 1;
 }
 
-.content-info .timeline-second .left {
+.ic-section-content .timeline-second .left {
     left: 0;
 }
 
-.content-info .timeline-second .left::before {
+.ic-section-content .timeline-second .left::before {
     content: " ";
     height: 0;
     position: absolute;
@@ -259,12 +281,12 @@ ul.regular-list li{
     border-color: transparent transparent transparent black;
 }
 
-.content-info .timeline-second .right {
+.ic-section-content .timeline-second .right {
     padding: 10px 8px 10px 30px;
     left: 50%;
 }
 
-.content-info .timeline-second .right:before {
+.ic-section-content .timeline-second .right:before {
     content: " ";
     height: 0;
     position: absolute;
@@ -277,11 +299,11 @@ ul.regular-list li{
     border-color: transparent #000 transparent transparent;
 }
 
-.content-info .timeline-second .right::after {
+.ic-section-content .timeline-second .right::after {
     left: -9px;
 }
 
-.popup-content #personal-email-form{
+.popup-content #personal-email-form {
     padding: 20px 0;
 }
 
@@ -293,21 +315,21 @@ ul.regular-list li{
 }
 
 #personal-email-form .section input,
-#personal-email-form .section select{
+#personal-email-form .section select {
     padding-left: 60px;
     width: 100%;
 }
 
-#personal-email-form .section{
+#personal-email-form .section {
     position: relative;
     margin-bottom: 10px;
 }
 
-#personal-email-form #send-email{
+#personal-email-form #send-email {
     margin-top: 10px;
 }
 
-#personal-email-form .header-info.additional-options{
+#personal-email-form .ic-section-header.additional-options {
     margin: 10px 0;
     color: #777;
 }
@@ -317,7 +339,7 @@ ul.regular-list li{
     border: 1px solid #e5e5e5;
 }
 
-#personal-email-form .replacements-dropdown-wrap{
+#personal-email-form .replacements-dropdown-wrap {
     margin-bottom: 10px;
     /*text-align: right;*/
 }

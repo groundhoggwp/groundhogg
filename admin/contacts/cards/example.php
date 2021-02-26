@@ -19,11 +19,11 @@ if ( $contact->get_user_id() ):
 
         <li class="ui-state-default" id="1">
 
-            <div class="container-info">
+            <div class="ic-section">
 
-                <div class="header-info">
+                <div class="ic-section-header">
 
-                    <div class="header-content">
+                    <div class="ic-section-header-content">
 
                         <span class="dashicons dashicons-businessman"></span>User Basic Info
                     </div>
@@ -32,7 +32,7 @@ if ( $contact->get_user_id() ):
 
                 </div>
 
-                <div class="content-info">
+                <div class="ic-section-content">
 
                     <ul>
 
@@ -88,11 +88,11 @@ if ( $contact->get_user_id() ):
 
         <li class="ui-state-default" id="2">
 
-            <div class="container-info">
+            <div class="ic-section">
 
-                <div class="header-info">
+                <div class="ic-section-header">
 
-                    <div class="header-content">
+                    <div class="ic-section-header-content">
 
                         <span class="dashicons dashicons-location"></span>Location
                     </div>
@@ -101,7 +101,7 @@ if ( $contact->get_user_id() ):
 
                 </div>
 
-                <div class="content-info">
+                <div class="ic-section-content">
 
                     <ul>
 
@@ -155,11 +155,11 @@ if ( $contact->get_user_id() ):
 
         <li class="ui-state-default" id="3">
 
-            <div class="container-info">
+            <div class="ic-section">
 
-                <div class="header-info">
+                <div class="ic-section-header">
 
-                    <div class="header-content">
+                    <div class="ic-section-header-content">
 
                         <span class="dashicons dashicons-screenoptions"></span>User Activity
                     </div>
@@ -168,7 +168,7 @@ if ( $contact->get_user_id() ):
 
                 </div>
 
-                <div class="content-info">
+                <div class="ic-section-content">
 
                     <ul class="timeline">
 
@@ -222,11 +222,11 @@ if ( $contact->get_user_id() ):
 
         <li class="ui-state-default" id="4">
 
-            <div class="container-info">
+            <div class="ic-section">
 
-                <div class="header-info">
+                <div class="ic-section-header">
 
-                    <div class="header-content">
+                    <div class="ic-section-header-content">
 
                         <span class="dashicons dashicons-networking"></span>User Actions
                     </div>
@@ -235,7 +235,7 @@ if ( $contact->get_user_id() ):
 
                 </div>
 
-                <div class="content-info">
+                <div class="ic-section-content">
 
                     <ul class="timeline-second">
 

@@ -188,7 +188,7 @@ function get_dummy_text() {
 
 						add_action( 'media_buttons', [
 							\Groundhogg\Plugin::$instance->replacements,
-							'show_replacements_button'
+							'show_replacements_dropdown'
 						] );
 
 						wp_editor( wpautop( get_dummy_text() ), 'email_content', [

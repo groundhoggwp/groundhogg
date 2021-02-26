@@ -48,6 +48,7 @@ use function Groundhogg\html;
 					'name'     => 'owner',
 					'class'    => 'owner',
 					'selected' => absint( get_url_var( 'owner' ) ),
+                    'option_none' => __( 'Any owner', 'groundhogg' )
 				] ) );
 
                 ?>
@@ -57,7 +58,7 @@ use function Groundhogg\html;
 			<?php
 			echo html()->input( [
 				'name'        => 's',
-				'placeholder' => 'Search contacts',
+				'placeholder' => __( 'Name or Email', 'groundhogg' ),
 				'class'       => 'input',
 				'value'       => sanitize_text_field( get_url_var( 's' ) )
 			] ) ?>

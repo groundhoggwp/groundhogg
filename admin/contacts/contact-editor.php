@@ -36,17 +36,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 $contact->auto_link_account();
 
 $tabs = array(
-	'general'   => _x( 'General', 'contact_record_tab', 'groundhogg' ),
-	'meta_data' => _x( 'Meta', 'contact_record_tab', 'groundhogg' ),
-//	'segmentation' => _x( 'Segmentation', 'contact_record_tab', 'groundhogg' ),
-//	'notes'        => _x( 'Notes', 'contact_record_tab', 'groundhogg' ),
-//	'files'        => _x( 'Files', 'contact_record_tab', 'groundhogg' ),
+	'general' => _x( 'General', 'contact_record_tab', 'groundhogg' ),
 );
 
 $tabs = apply_filters( 'groundhogg/admin/contact/record/tabs', $tabs );
 
-$tabs['actions']  = _x( 'Actions', 'contact_record_tab', 'groundhogg' );
-$tabs['activity'] = _x( 'Activity', 'contact_record_tab', 'groundhogg' );
+$tabs['meta_data'] = _x( 'Meta', 'contact_record_tab', 'groundhogg' );
+$tabs['actions']   = _x( 'Actions', 'contact_record_tab', 'groundhogg' );
+$tabs['activity']  = _x( 'Activity', 'contact_record_tab', 'groundhogg' );
+
+$tabs = apply_filters( 'groundhogg/admin/contact/record/tabs_after', $tabs );
 
 $cookie_tab = str_replace( 'tab_', '', get_cookie( 'gh_contact_tab', 'general' ) );
 $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
@@ -141,9 +140,10 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 	/**
 	 * Contact Info
 	 *
+	 * @throws \Exception
+	 *
 	 * @param $contact Contact
 	 *
-	 * @throws \Exception
 	 */
 	function contact_record_general_info( $contact ) {
 		?>
@@ -312,7 +312,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 
 			);
 			echo Plugin::$instance->utils->html->tag_picker( $args ); ?>
-            <p class="description"><?php _ex( 'Add new tags by hitting [Enter] or by typing a [,].', 'contact_record', 'groundhogg' ); ?></p>
+            <p class="description"><?php _ex( 'Add new tags by hitting <code>Enter</code> or by typing a <code>,</code>.', 'contact_record', 'groundhogg' ); ?></p>
         </div>
         <h2><?php _e( 'User Account' ); ?></h2>
         <table class="form-table">
@@ -947,7 +947,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 									'readonly' => true
 								);
 								echo Plugin::$instance->utils->html->input( $args );
-							} elseif ( strpos( $value, PHP_EOL ) !== false ) {
+							} else if ( strpos( $value, PHP_EOL ) !== false ) {
 								$args = array(
 									'name'  => 'meta[' . $meta_key . ']',
 									'id'    => $meta_key,

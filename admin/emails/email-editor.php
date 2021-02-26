@@ -214,7 +214,7 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 
 						add_action( 'media_buttons', [
 							\Groundhogg\Plugin::$instance->replacements,
-							'show_replacements_button'
+							'show_replacements_dropdown'
 						] );
 
 						wp_editor( $email->get_content(), 'email_content', [

@@ -6,6 +6,7 @@ use Groundhogg\Admin\Broadcasts\Broadcasts_Page;
 use Groundhogg\Admin\Bulk_Jobs\Bulk_Job_Page;
 use Groundhogg\Admin\Contacts\Contacts_Page;
 use Groundhogg\Admin\Contacts\Info_Cards;
+use Groundhogg\Admin\Contacts\Tables\Contact_Table_Columns;
 use Groundhogg\Admin\Dashboard\Dashboard_Widgets;
 use Groundhogg\Admin\Emails\Emails_Page;
 use Groundhogg\Admin\Events\Events_Page;
@@ -82,6 +83,7 @@ class Admin_Menu {
 		// user profile edits...
 		new Admin_User();
 		new Info_Cards();
+		new Contact_Table_Columns();
 
 		do_action( 'groundhogg/admin/init', $this );
 	}

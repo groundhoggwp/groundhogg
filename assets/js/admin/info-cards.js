@@ -1,11 +1,8 @@
 (function ($) {
 
-  $(function () {
-    $('.header-info').on('click', function () {
-      $(this).next('.content-info').slideToggle(500)
-      $(this).children('i').toggleClass('dashicons-arrow-up-alt2')
-    })
-  })
+  $(document).on('click', '.ic-section-header', function () {
+    $(this).closest('.ic-section').toggleClass('open');
+  });
 
   $(document).on('tinymce-editor-setup', function (event, editor) {
     editor.settings.toolbar1 = 'bold,italic,underline,blockquote,strikethrough,bullist,numlist,alignleft,aligncenter,alignright,undo,redo,link' //Teeny -fullscreen
