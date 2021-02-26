@@ -82,8 +82,6 @@ class Admin_Menu {
 
 		// user profile edits...
 		new Admin_User();
-		new Info_Cards();
-		new Contact_Table_Columns();
 
 		do_action( 'groundhogg/admin/init', $this );
 	}

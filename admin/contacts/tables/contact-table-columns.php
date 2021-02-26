@@ -172,7 +172,7 @@ class Contact_Table_Columns {
 	 *
 	 * @return void
 	 */
-	protected function column_first_name( $contact ) {
+	protected static function column_first_name( $contact ) {
 		echo $contact->get_first_name() ? $contact->get_first_name() : '&#x2014;';
 	}
 
@@ -181,7 +181,7 @@ class Contact_Table_Columns {
 	 *
 	 * @return void
 	 */
-	protected function column_last_name( $contact ) {
+	protected static  function column_last_name( $contact ) {
 		echo $contact->get_last_name() ? $contact->get_last_name() : '&#x2014;';
 	}
 
@@ -190,7 +190,7 @@ class Contact_Table_Columns {
 	 *
 	 * @return void
 	 */
-	protected function column_user_id( $contact ) {
+	protected static  function column_user_id( $contact ) {
 		echo $contact->get_userdata() ? '<a href="' . admin_url( 'user-edit.php?user_id=' . $contact->get_userdata()->ID ) . '">' . $contact->get_userdata()->display_name . '</a>' : '&#x2014;';
 	}
 
@@ -199,7 +199,7 @@ class Contact_Table_Columns {
 	 *
 	 * @return void
 	 */
-	protected function column_owner_id( $contact ) {
+	protected static  function column_owner_id( $contact ) {
 		echo ! empty( $contact->get_owner_id() ) ? '<a href="' . admin_url( 'admin.php?page=gh_contacts&owner=' . $contact->get_owner_id() ) . '">' . $contact->get_ownerdata()->user_login . '</a>' : '&#x2014;';
 	}
 
@@ -208,7 +208,7 @@ class Contact_Table_Columns {
 	 *
 	 * @return void
 	 */
-	protected function column_date_created( $contact ) {
+	protected static  function column_date_created( $contact ) {
 		$dc_time = mysql2date( 'U', $contact->get_date_created() );
 		$dc_time = Plugin::instance()->utils->date_time->convert_to_utc_0( $dc_time );
 
@@ -220,7 +220,7 @@ class Contact_Table_Columns {
 	 *
 	 * @param $contact Contact
 	 */
-	public static function column_tags( Contact $contact ) {
+	protected static function column_tags( Contact $contact ) {
 		?>
         <div class="tags" title="<?php esc_attr_e( 'Tags' ); ?>">
 			<?php foreach ( $contact->get_tags() as $tag ):
@@ -235,7 +235,7 @@ class Contact_Table_Columns {
 	 *
 	 * @param $contact Contact
 	 */
-	public static function column_birthday( Contact $contact ) {
+	protected static function column_birthday( Contact $contact ) {
 
 		if ( ! $contact->birthday ) {
 			return;
@@ -253,7 +253,7 @@ class Contact_Table_Columns {
 	 *
 	 * @param $contact Contact
 	 */
-	public static function column_location( Contact $contact ) {
+	protected static function column_location( Contact $contact ) {
 
 		if ( count( $contact->get_address() ) > 0 ):
 			?>

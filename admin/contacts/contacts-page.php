@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Contacts;
 
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Admin\Contacts\Tables\Contact_Table_Columns;
 use Groundhogg\Classes\Note;
 use Groundhogg\Saved_Searches;
 use Groundhogg\Scripts;
@@ -47,16 +48,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * When saving custom information or doing something else. Runs after the admin saves a contact via the admin screen.
  *
- * @package     Admin
+ * @since       File available since Release 0.1
  * @subpackage  Admin/Contacts
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Admin
  */
 class Contacts_Page extends Admin_Page {
 
 	protected function add_additional_actions() {
+		if ( $this->get_current_action() === 'view' ) {
+			new Contact_Table_Columns();
+		}
+
+		if ( $this->get_current_action() === 'edit' ){
+			new Info_Cards();
+		}
 	}
 
 	protected function add_ajax_actions() {
@@ -121,6 +129,7 @@ class Contacts_Page extends Admin_Page {
 			wp_enqueue_style( 'buttons' );
 			wp_enqueue_style( 'media-views' );
 //			wp_enqueue_style( 'edit' );
+			wp_enqueue_script( 'postbox' );
 			wp_enqueue_script( 'groundhogg-admin-contact-editor' );
 			wp_enqueue_script( 'groundhogg-admin-contact-info-cards' );
 			wp_localize_script( 'groundhogg-admin-contact-editor', 'ContactEditor', [
@@ -134,7 +143,7 @@ class Contacts_Page extends Admin_Page {
 			wp_enqueue_script( 'groundhogg-admin-contact-inline' );
 
 			// Advanced Search
-            Scripts::enqueue_advanced_search_filters_scripts();
+			Scripts::enqueue_advanced_search_filters_scripts();
 		}
 	}
 
@@ -426,10 +435,10 @@ class Contacts_Page extends Admin_Page {
 				'id'     => 'import_contacts'
 			],
 			[
-				'link'    => $this->get_current_action() === 'view' ? '#' : admin_page_url( 'gh_contacts', [ 'is_searching' => true ] ),
-				'action'  => __( 'Advanced Search', 'groundhogg' ),
-				'target'  => '_self',
-				'id'      => 'search_contacts',
+				'link'   => $this->get_current_action() === 'view' ? '#' : admin_page_url( 'gh_contacts', [ 'is_searching' => true ] ),
+				'action' => __( 'Advanced Search', 'groundhogg' ),
+				'target' => '_self',
+				'id'     => 'search_contacts',
 			],
 		];
 	}
@@ -957,7 +966,7 @@ class Contacts_Page extends Admin_Page {
 
 		if ( ! wp_doing_ajax() ) {
 			return;
-		} elseif ( ! current_user_can( 'edit_contacts' ) ) {
+		} else if ( ! current_user_can( 'edit_contacts' ) ) {
 			wp_send_json_error();
 		}
 
@@ -987,7 +996,7 @@ class Contacts_Page extends Admin_Page {
 
 		if ( ! wp_doing_ajax() ) {
 			return;
-		} elseif ( ! current_user_can( 'edit_contacts' ) ) {
+		} else if ( ! current_user_can( 'edit_contacts' ) ) {
 			wp_send_json_error();
 		}
 
@@ -1221,8 +1230,8 @@ class Contacts_Page extends Admin_Page {
 	}
 
 	/**
-     * Send a 1 off personal email
-     *
+	 * Send a 1 off personal email
+	 *
 	 * @return string
 	 */
 	public function process_send_personal_email() {

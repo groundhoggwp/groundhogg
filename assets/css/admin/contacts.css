@@ -64,8 +64,13 @@
     width: 125px;
 }
 
+.wp-list-table #birthday,
 .wp-list-table #date_created{
     width: 200px;
+}
+
+.wp-list-table #address{
+    width: 300px;
 }
 
 a.change-status.unsubscribed,

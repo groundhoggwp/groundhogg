@@ -15,6 +15,12 @@ class Info_Cards {
 		add_action( 'wp_ajax_groundhogg_save_card_order', [ $this, 'save_card_atts' ] );
 	}
 
+	public static function register_as_metaboxes_for_screen_options() {
+		global $wp_meta_boxes;
+
+		$wp_meta_boxes['groundhogg_page_gh_contacts']['side']['core'] = self::$info_cards;
+	}
+
 	/**
 	 * Save the user card info to the user meta when they change the order of the cards in the UI
 	 */
@@ -68,6 +74,8 @@ class Info_Cards {
 //		} );
 
 		do_action( 'groundhogg/admin/contacts/register_info_cards', $this );
+
+		self::register_as_metaboxes_for_screen_options();
 	}
 
 	/**
@@ -80,11 +88,11 @@ class Info_Cards {
 	/**
 	 * Register a new info box.
 	 *
-	 * @param string $id the ID of the info card
-	 * @param string $title the title of the info card
-	 * @param callable $callback callback to display the data
-	 * @param int $priority how high in the cards it should be displayed
-	 * @param string $capability the minimum capability for the viewing user to see the data in this card.
+	 * @param string   $id                      the ID of the info card
+	 * @param string   $title                   the title of the info card
+	 * @param callable $callback                callback to display the data
+	 * @param int      $priority                how high in the cards it should be displayed
+	 * @param string   $capability              the minimum capability for the viewing user to see the data in this card.
 	 * @param callable $should_display_callback an optional function you can define that will conditionally show the info card based on external parameters. Returns true or false. Returning false will hide the card.
 	 */
 	public static function register( $id, $title, $callback, $priority = 100, $capability = 'view_contacts', $should_display_callback = null ) {
@@ -99,7 +107,8 @@ class Info_Cards {
 			'callback'                => $callback,
 			'priority'                => $priority,
 			'capability'              => $capability,
-			'should_display_callback' => $should_display_callback
+			'should_display_callback' => $should_display_callback,
+			'args'                    => [] // metabox compat only
 		];
 	}
 
@@ -172,13 +181,13 @@ class Info_Cards {
 			] );
 
 			/**
-			 * @var int $id
-			 * @var string $title
+			 * @var int      $id
+			 * @var string   $title
 			 * @var callable $callback
-			 * @var int $priority
-			 * @var string $capability
-			 * @var bool $open
-			 * @var bool $hidden
+			 * @var int      $priority
+			 * @var string   $capability
+			 * @var bool     $open
+			 * @var bool     $hidden
 			 * @var callable $should_display_callback
 			 */
 
