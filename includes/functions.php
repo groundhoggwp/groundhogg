@@ -3580,7 +3580,7 @@ function uninstall_gh_cron_file() {
 }
 
 /**
- * Get an event from the event history table by referencing it's ID from the event queue
+ * Get an event from the event history table by referencing its ID from the event queue
  *
  * @param $queued_id int
  *
@@ -3602,7 +3602,7 @@ function get_event_by_queued_id( $queued_id ) {
 }
 
 /**
- * Get an event from the event history table by referencing it's ID from the event queue
+ * Get an event from the event history table by referencing its ID from the event queue
  *
  * @param $event_id int
  *
