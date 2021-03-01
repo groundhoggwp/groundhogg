@@ -67,7 +67,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: "20px",
   },
   emailControls: {
-    height: "350px",
+    height: "261px",
     padding: "10px 22px 0 22px",
   },
   sendTestButton: {
@@ -95,14 +95,24 @@ const useStyles = makeStyles((theme) => ({
     marginTop: "20px",
     width: "115px",
   },
+  alignmentBtn:{
+    width: '27px',
+    height: '27px',
+    borderRadius: '7px'
+  },
   messageTypeContainer: {
     display: "inline-block",
     marginTop: "20px",
   },
   additionalInfoContainer: {
-    width: "100%",
+    fontSize: "12px",
+    width: "calc(100% + 44px)",
+    marginLeft: "-22px",
     borderRadius: "7px",
+    padding:"10px 0 13px 25px",
+    fontWeight: "600",
     background: "#E7EEFB",
+
   },
   blocksTitle:{
     display: 'block',
@@ -122,13 +132,18 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: '5px',
     textAlign: 'center',
     fontWeight: '500',
-    '&:hover':{
-      color: '#fff',
-      background: '#0075FF'
-    },
-    '& svg, & path':{
-      fill: '#0075FF'
-    }
+    // '& svg, & path':{
+    //   fill: '#0075FF',
+    //   stroke: '#0075FF'
+    // },
+    // '&:hover':{
+    //   color: '#fff',
+    //   background: '#0075FF'
+    // },
+    // '&:hover svg, &:hover path':{
+    //   fill: '#fff',
+    //   stroke: '#fff'
+    // }
   },
   blockIcon: {
     margin: '15px 0 0 0',
@@ -191,17 +206,47 @@ const Sidebar = ({
     <>
       <div className={classes.blocksTitle}>Blocks</div>
       {blocks.map((block) => {
+
+        const title = block.title.replace('Groundhogg - ', '')
+
+        console.log(title)
+
+        let icon = <BlocksDivider/>
+        switch (title) {
+          case 'Spacer':
+            icon = <BlocksSpacer stroke={''} fill={'none'}/>
+            break;
+          case 'Divider':
+            icon = <BlocksDivider  stroke={''} fill={'#000'} fillSecondary={'#ccc'}/>
+            break;
+          case 'HTML':
+            icon = <BlocksDivider/>
+            break;
+          case 'Button':
+            icon = <BlocksDivider/>
+            break;
+          case 'Image':
+            icon = <BlocksImage/>
+            break;
+          case 'Heading':
+            icon = <BlocksHeading/>
+            break;
+          case 'paragraph':
+            icon = <BlocksText/>
+            break;
+        }
+
         return (
           <div
             data-block={JSON.stringify(block)}
             className={classes.block+" block-editor-block side-bar-drag-drop-block"}
           >
             <div className={classes.blockIcon}>
-              <BlocksImage/>
+              {icon}
             </div>
 
             <div className={classes.blockName}>
-              {block.title.replace('Groundhogg - ', '')}
+              {title}
             </div>
           </div>
         );
@@ -244,28 +289,25 @@ const Sidebar = ({
           <Desktop />
         </div>
 
-        <TextField
+        <input
           className={classes.inputText}
           value={from}
           placeholder={"From"}
-          variant={"outlined"}
           onChange={handleOnChange}
           fullWidth
         />
-        <TextField
+        <input
           className={classes.inputText}
           value={replyTo}
-          placeholder={"Reply to"}
-          variant={"outlined"}
+          placeholder={"Reply to"}          
           onChange={handleOnChange}
           fullWidth
         />
 
         <div className={classes.alignmentContainer}>
-          <label>{__("Alignment")}</label>
-          <br />
-          <AlignLeft />
-          <AlignCenter />
+          <div>{__("Alignment")}</div>
+          <span className={classes.alignmentBtn}><AlignLeft /></span>
+          <span className={classes.alignmentBtn}><AlignCenter /></span>
         </div>
 
         <FormControl className={classes.messageTypeContainer}>
@@ -289,7 +331,7 @@ const Sidebar = ({
         </FormControl>
 
         <div className={classes.additionalInfoContainer}>
-          <label>{__("Additional info")}</label>
+          <label>{__("Additional info:")}</label>
           <br />
         </div>
       </Card>

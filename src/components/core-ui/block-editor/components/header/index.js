@@ -32,6 +32,7 @@ import MoreDots from "components/svg/MoreDots/";
 const useStyles = makeStyles((theme) => ({
   root: {
     position: "absolute",
+    display: 'flex',
     top: "0",
     left: "-20px",
     overflow: "visible",
@@ -39,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
     margin: "20px",
     width: "calc(100%)",
     overflow: "visible",
-    padding: "28px 0px 28px 10px",
+    padding: "23px 0px 28px 5px",
   },
   backButton: {
     display: "inline-block",
@@ -61,6 +62,10 @@ const useStyles = makeStyles((theme) => ({
       marginLeft: "-1px",
     },
   },
+  editTitleBtn:{
+    cursor: 'pointer',
+    margin: '20px 0 0 5px'
+  },
   moreBtn:{
     display: 'inline-flex',
     justifyContent: 'center',
@@ -69,16 +74,22 @@ const useStyles = makeStyles((theme) => ({
     height: '22px',
     border: '0.5px solid rgba(16, 38, 64, 0.25)',
     borderRadius: '5px',
-    marginLeft: '25px'
+    margin: '15px 0 0 25px',
+    cursor: 'pointer'
   },
   updateContainer: {
-    float: "right",
-    display: "inline-block",
+    display: 'inline-flex',
+    alignItems: 'center',
     marginRight: "20px",
   },
   stepUpdateButton: {
     width: "15px",
-    margin: "0px 10px 0px 10px",
+    margin: "16px 10px 0px 10px",
+    justifySelf: 'end',
+    cursor: 'pointer'
+  },
+  stepUpdateButtonFirst:{
+    marginLeft: '285px'
   },
   updateButton: {
     width: "320px",
@@ -86,8 +97,9 @@ const useStyles = makeStyles((theme) => ({
     background: "#9ECE38",
     fontSize: "18px",
     textTransform: "none",
-    marginLeft: "70px",
+    margin: "9px 0 0 70px",
     borderRadius: "7px",
+    justifySelf: 'end',
     "& svg": {
       marginLeft: "145px",
     },
@@ -102,26 +114,23 @@ export default function Header({
   handleTitleChange,
   title,
   editorType,
+  handleOpen,
+  emailStepBackward,
+  emailStepForward
 }) {
 
-  const [disableTitle, setDisableTitle] = useState(false);
+  const [disableTitle, setDisableTitle] = useState(true);
 
   const classes = useStyles();
   const buttonText =
     editorType === "email" ? __("Update Email") : __("Update Funnel");
 
   const toggleTitle = () =>{
-    console.log(disableTitle)
     setDisableTitle(disableTitle ? false : true )
   }
 
   return (
     <Card className={classes.root}>
-      <div
-        role="region"
-        aria-label={__("Email Editor primary top bar.", "groundhogg")}
-        tabIndex="-1"
-      >
         <span className={classes.backButton}>
           <ArrowLeft href="./admin.php?page=gh_emails" />
         </span>
@@ -133,16 +142,16 @@ export default function Header({
             onChange={handleTitleChange}
             InputProps={{ disableUnderline: true, disabled: disableTitle }}
           />
-          <Button onClick={toggleTitle}><EditPen /></Button>
-
-          <span className={classes.moreBtn}><MoreDots/></span>
         </span>
 
         <span className={classes.updateContainer}>
-          <span className={classes.stepUpdateButton}>
+          <span className={classes.editTitleBtn} onClick={toggleTitle}><EditPen /></span>
+
+          <span className={classes.moreBtn} onClick={()=>{handleOpen()}}><MoreDots/></span>
+          <span className={`${classes.stepUpdateButton} ${classes.stepUpdateButtonFirst}`} onClick={() => {emailStepBackward()}}>
             <ArrowCurveRight />
           </span>
-          <span className={classes.stepUpdateButton}>
+          <span className={classes.stepUpdateButton} onClick={() => {emailStepForward()}}>
             <ArrowCurveLeft />
           </span>
 
@@ -152,7 +161,6 @@ export default function Header({
           </Button>
         </span>
         <PinnedItems.Slot scope="gh/v4/core" />
-      </div>
     </Card>
   );
 }

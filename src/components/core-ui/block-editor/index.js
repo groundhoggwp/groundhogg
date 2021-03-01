@@ -51,6 +51,7 @@ import Sidebar from "./components/sidebar";
 import BlockEditor from "./components/block-editor";
 import TextEditor from "./components/text-editor";
 import EditorSteps from "./components/editor-steps";
+import SimpleModal from "./components/Modal";
 import { getLuxonDate, matchEmailRegex } from "utils/index";
 
 import { CORE_STORE_NAME, EMAILS_STORE_NAME } from "data";
@@ -72,10 +73,18 @@ export default ({ document, history }) => {
   } = document.data;
 
 
+
+  // Global States
+  const [changeTracker, setChangeTracker] = useState(0);
+  const [blockChangeData, setBlockChangeData] = useState([defaultContentValue]);
+
   // Editor Contents
   const [title, setTitle] = useState(defaultTitleValue);
   const [content, setContent] = useState(defaultContentValue);
   const [blocks, updateBlocks] = useState(parse(defaultContentValue));
+
+  // Modal
+  const [open, setOpen] = useState(false);
 
   // Side Bar States
   const [replyTo, setReplyTo] = useState("");
@@ -147,6 +156,14 @@ export default ({ document, history }) => {
   //     },
   //   });
   // };
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const updateDoc = (e) => {
     dispatch.updateItem(document.ID, {
@@ -328,7 +345,12 @@ export default ({ document, history }) => {
     },
     contentSideBar:{
 
+    },
+    contentFooter:{
+      posiion: 'absolute',
+      bottom: '0'
     }
+
   }));
 
   const classes = useStyles();
@@ -373,12 +395,36 @@ export default ({ document, history }) => {
     </div>
   }
 
-  console.log('rebuild', blocks)
+  const emailStepBackward = () => {
+    console.log(changeTracker)
+
+    if(changeTracker === 0){
+      return;
+    }
+
+    const newChangeTracker = changeTracker -1
+    setChangeTracker(newChangeTracker)
+    setBlockChangeData(blockChangeData[newChangeTracker])
+  }
+  const emailStepForward = () => {
+    console.log(changeTracker)
+
+    if(!blockChangeData[newChangeTracker]){
+      return;
+    }
+
+    const newChangeTracker = changeTracker + 1
+    setChangeTracker(newChangeTracker)
+    setBlockChangeData(blockChangeData[newChangeTracker])
+  }
+
+  // console.log('rebuild', blocks)
 
   return (
     <>
       <div className="Groundhogg-BlockEditor">
         {steps}
+        <SimpleModal open={open}/>
         <FullscreenMode isActive={false} />
         <SlotFillProvider>
           <DropZoneProvider>
@@ -392,6 +438,9 @@ export default ({ document, history }) => {
                 title={title}
                 handleTitleChange={handleTitleChange}
                 editorType={editorType}
+                handleOpen={handleOpen}
+                emailStepBackward={emailStepBackward}
+                emailStepForward={emailStepForward}
               />
 
 
@@ -409,14 +458,14 @@ export default ({ document, history }) => {
           </DropZoneProvider>
         </SlotFillProvider>
 
-        <div className={classes.contentFooter}>
-          <Panel header={__("Blocks")} style={{marginTop:'500px'}}>
-            {/*icon={ more }*/}]
+        {/* formatting is off not working lets hide until its good
+          <div className={classes.contentFooter}>
+          <Panel header={__("Blocks")} style={{marginTop:'500px'}}>            
             <PanelBody title="My Block Settings"  initialOpen={ true } style={{backgroundColor:'#ccc'}}>
                 <PanelRow>My Panel Inputs and Labels</PanelRow>
             </PanelBody>
           </Panel>
-        </div>
+        </div>*/}
       </div>
     </>
   );
