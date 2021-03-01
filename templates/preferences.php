@@ -196,6 +196,10 @@ if ( ! $can_edit_preferences || ! is_a_contact( $contact ) ) {
 	$action = 'unidentified';
 }
 
+if ( current_user_can( 'view_contacts' ) && ! tracking()->tracking_cookie_matches_logged_in_user() ){
+	add_notice( 'notice_admin_logged_in_testing_warning' );
+}
+
 switch ( $action ):
 	case 'unidentified':
 

@@ -10,6 +10,7 @@ use Groundhogg_Email_Services;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
+use function Groundhogg\is_option_enabled;
 use function Groundhogg\is_white_labeled;
 use Groundhogg\License_Manager;
 use Groundhogg\Plugin;
@@ -418,11 +419,6 @@ class Settings_Page extends Admin_Page {
 			],
 		);
 
-		if ( defined( 'DISABLE_WP_CRON' ) && ! defined( 'GH_SHOW_DISABLE_WP_CRON_OPTION' ) ) {
-			unset( $sections['wp_cron'] );
-		}
-
-
 		return apply_filters( 'groundhogg/admin/settings/sections', $sections );
 	}
 
@@ -802,7 +798,7 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				),
 			),
-			'gh_disable_unnecessary_cookies'            => array(
+			'gh_disable_unnecessary_cookies'         => array(
 				'id'      => 'gh_disable_unnecessary_cookies',
 				'section' => 'compliance',
 				'label'   => _x( 'Disable unnecessary cookies', 'settings', 'groundhogg' ),
@@ -1208,23 +1204,24 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				),
 			),
-		);
-
-		if ( ! defined( 'DISABLE_WP_CRON' ) || defined( 'GH_SHOW_DISABLE_WP_CRON_OPTION' ) ) {
-			$settings['gh_disable_wp_cron'] = array(
+			'gh_disable_wp_cron'                     => [
 				'id'      => 'gh_disable_wp_cron',
 				'section' => 'wp_cron',
 				'label'   => _x( 'Disable WP Cron.', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'Disable the built-in WP Cron system. This is recommended if you are using an external cron job.', 'settings', 'groundhogg' ),
+				'desc'    => defined( 'DISABLE_WP_CRON' ) && ! defined( 'GH_SHOW_DISABLE_WP_CRON_OPTION' )
+                    ? _x( 'WP Cron has been disabled by your host or in your <code>wp-config.php</code> file already.', 'settings', 'groundhogg' )
+                    : _x( 'Disable the built-in WP Cron system. This is recommended if you are using an external cron job.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
-				'atts'    => array(
-					'label' => __( 'Disable' ),
-					'name'  => 'gh_disable_wp_cron',
-					'id'    => 'gh_disable_wp_cron',
-					'value' => 'on',
-				),
-			);
-		}
+				'atts'    => [
+					'label'    => __( 'Disable' ),
+					'name'     => 'gh_disable_wp_cron',
+					'id'       => 'gh_disable_wp_cron',
+					'value'    => 'on',
+					'disabled' => defined( 'DISABLE_WP_CRON' ) && ! defined( 'GH_SHOW_DISABLE_WP_CRON_OPTION' ),
+					'checked'  => defined( 'DISABLE_WP_CRON' ),
+				],
+			]
+		);
 
 		return apply_filters( 'groundhogg/admin/settings/settings', $settings );
 	}

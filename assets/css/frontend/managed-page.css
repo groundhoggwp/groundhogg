@@ -55,7 +55,11 @@ html, body, #main {
 }
 
 #main .notice {
-    margin: 0;
+    margin: 0 0 10px 0;
+}
+
+#main .notice:last-child{
+    margin-bottom: 0;
 }
 
 .right {

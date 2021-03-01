@@ -288,6 +288,24 @@ class Tracking {
 	}
 
 	/**
+	 * Whether the contact ID associated with the tracking cookie is the same as the logged in user.
+	 *
+	 * @return bool
+	 */
+	public function tracking_cookie_matches_logged_in_user() {
+		$tracking_id_value  = absint( $this->get_tracking_cookie_param( 'contact_id' ) );
+		$logged_in_id_value = false;
+
+		// Get from the user if logged in and the ID is not available.
+		if ( function_exists( 'is_user_logged_in' ) && is_user_logged_in() ) {
+			$contact            = $this->get_current_contact();
+			$logged_in_id_value = $contact->get_id();
+		}
+
+		return $logged_in_id_value === $tracking_id_value;
+	}
+
+	/**
 	 * Get a param from the tracking cookie.
 	 *
 	 * @param $key

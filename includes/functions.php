@@ -599,17 +599,17 @@ function dequeue_theme_css_compat() {
 	wp_dequeue_style( $theme_name );
 	wp_dequeue_style( 'style' );
 
-	// Additional compat
-	wp_dequeue_style( 'fusion-dynamic-css' );
+	$wp_styles  = wp_styles();
+	$themes_uri = get_theme_root_uri();
 
-	// Extra compat.
-	global $wp_styles;
-	$maybe_dequeue = $wp_styles->queue;
-	foreach ( $maybe_dequeue as $style ) {
-		if ( strpos( $style, $theme_name ) !== false ) {
-			wp_dequeue_style( $style );
+	foreach ( $wp_styles->registered as $wp_style ) {
+		if ( strpos( $wp_style->src, $themes_uri ) !== false ) {
+			wp_dequeue_style( $wp_style->handle );
 		}
 	}
+
+	// Additional compat
+	wp_dequeue_style( 'fusion-dynamic-css' );
 }
 
 /**
