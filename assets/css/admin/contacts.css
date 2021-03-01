@@ -160,3 +160,13 @@ td.address .ip-address:before{
 td.address .time-zone:before{
     content: "\f469";
 }
+
+td.tel_numbers .dashicons{
+    font-size: 13px !important;
+    margin-right: 5px !important;
+    vertical-align: middle;
+}
+
+.phone-ext {
+    width: 100px;
+}

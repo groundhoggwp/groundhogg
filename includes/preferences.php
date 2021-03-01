@@ -247,6 +247,29 @@ class Preferences {
 	}
 
 	/**
+	 * ensure that the provided preference is valid
+	 *
+	 * @param $preference
+	 * @param false $old_preference
+	 *
+	 * @return false|int|mixed
+	 */
+	public static function sanitize( $preference, $old_preference = false ){
+		return self::is_valid( absint( $preference ) ) ? absint( $preference ) : $old_preference ?: self::UNCONFIRMED;
+	}
+
+	/**
+	 * simple check to see if the provided preference is valid
+	 *
+	 * @param $preference
+	 *
+	 * @return bool
+	 */
+	public static function is_valid( $preference ){
+		return in_array( $preference, array_keys( self::get_preference_names() ) );
+	}
+
+	/**
 	 * Return whether the contact is marketable or not.
 	 *
 	 * @return bool

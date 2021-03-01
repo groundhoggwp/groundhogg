@@ -7,6 +7,7 @@ use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\array_map_with_keys;
 use function Groundhogg\current_user_is;
+use function Groundhogg\get_contactdata;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
@@ -15,6 +16,7 @@ use function Groundhogg\get_request_var;
 use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
+use function Groundhogg\is_a_contact;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Preferences;
 use \WP_List_Table;
@@ -68,6 +70,12 @@ class Contacts_Table extends WP_List_Table {
 			'ajax'     => true,       // Does this table support ajax?
 			'screen'   => wp_doing_ajax() ? 'admin_ajax' : null
 		) );
+
+		$columns  = $this->get_columns();
+		$hidden   = get_hidden_columns( 'groundhogg_page_gh_contacts' );
+		$sortable = $this->get_sortable_columns();
+
+		$this->_column_headers = array( $columns, $hidden, $sortable );
 	}
 
 	/**
@@ -81,13 +89,6 @@ class Contacts_Table extends WP_List_Table {
 	 * @uses $this->set_pagination_args()
 	 */
 	function prepare_items() {
-
-
-		$columns  = $this->get_columns();
-		$hidden   = get_hidden_columns( get_current_screen() );
-		$sortable = $this->get_sortable_columns();
-
-		$this->_column_headers = array( $columns, $hidden, $sortable );
 
 		$per_page = absint( get_url_var( 'limit', get_screen_option( 'per_page' ) ) );
 		$paged    = $this->get_pagenum();
@@ -165,7 +166,9 @@ class Contacts_Table extends WP_List_Table {
 
 		$total = get_db( 'contacts' )->count( $query );
 
-		$this->items = $data;
+		$this->items = array_map( function ( $item ){
+		    return get_contactdata( $item->ID );
+        }, $data );
 
 		// Add condition to be sure we don't divide by zero.
 		// If $this->per_page is 0, then set total pages to 1.
@@ -179,13 +182,13 @@ class Contacts_Table extends WP_List_Table {
 	}
 
 	/**
-	 * @see WP_List_Table::::single_row_columns()
 	 * @return array An associative array containing column information.
+	 * @see WP_List_Table::::single_row_columns()
 	 */
 	public function get_columns() {
 		$columns = array(
-			'cb'           => '<input type="checkbox" />', // Render a checkbox instead of text.
-			'email'        => _x( 'Email', 'Column label', 'groundhogg' ),
+			'cb'    => '<input type="checkbox" />', // Render a checkbox instead of text.
+			'email' => _x( 'Email', 'Column label', 'groundhogg' ),
 		);
 
 		return apply_filters( 'groundhogg_contact_columns', $columns );
@@ -202,7 +205,7 @@ class Contacts_Table extends WP_List_Table {
 	 */
 	protected function get_sortable_columns() {
 		$sortable_columns = array(
-			'email'        => [ 'email', false ],
+			'email' => [ 'email', false ],
 		);
 
 		return apply_filters( 'groundhogg_contact_sortable_columns', $sortable_columns );
@@ -210,15 +213,11 @@ class Contacts_Table extends WP_List_Table {
 
 	/**
 	 * @param object|Contact $contact
-	 * @param int            $level
+	 * @param int $level
 	 */
 	public function single_row( $contact, $level = 0 ) {
 
-		if ( ! $contact instanceof Contact ) {
-			$contact = Plugin::$instance->utils->get_contact( absint( $contact->ID ) );
-		}
-
-		if ( ! $contact ) {
+		if ( ! is_a_contact( $contact ) ) {
 			return;
 		}
 
@@ -272,20 +271,57 @@ class Contacts_Table extends WP_List_Table {
                                 </span>
                             </label>
                             <label>
-                                <input type="checkbox"
-                                       name="unsubscribe"><?php _ex( 'Unsubscribe this contact.', 'action', 'groundhogg' ); ?>
+                                <span class="title"><?php _e( 'Status', 'groundhogg' ); ?></span>
+                                <span class="input-text-wrap">
+                                    <?php echo html()->dropdown( [
+	                                    'id'      => 'optin_status',
+	                                    'name'    => 'optin_status',
+	                                    'options' => Preferences::get_preference_names()
+                                    ] ); ?>
+                                </span>
                             </label>
                         </div>
                     </fieldset>
                     <fieldset class="inline-edit-col-right">
+                        <legend class="inline-edit-legend">&nbsp;</legend>
                         <div class="inline-edit-col">
-                            <label class="inline-edit-tags">
-                                <span class="title"><?php _e( 'Tags' ); ?></span>
+                            <label>
+                                <span class="title"><?php _e( 'Primary', 'groundhogg' ); ?></span>
+                                <span class="input-text-wrap">
+	                            <?php echo html()->input( [
+		                            'type'  => 'tel',
+		                            'class' => 'input',
+		                            'id'    => 'primary_phone',
+		                            'name'  => 'primary_phone',
+	                            ] ); ?>
+	                            <?php _e( 'ext.', 'groundhogg' ) ?>
+	                            <?php echo html()->number( [
+		                            'id'    => 'primary_phone_extension',
+		                            'name'  => 'primary_phone_extension',
+		                            'class' => 'phone-ext',
+	                            ] ); ?>
+                                </span>
                             </label>
-							<?php echo Plugin::$instance->utils->html->dropdown( array(
-								'id'   => 'tags',
-								'name' => 'tags[]'
-							) ); ?>
+                            <label>
+                                <span class="title"><?php _e( 'Mobile', 'groundhogg' ); ?></span>
+                                <span class="input-text-wrap">
+								<?php echo html()->input( [
+									'type'  => 'tel',
+									'class' => 'input',
+									'id'    => 'mobile_phone',
+									'name'  => 'mobile_phone',
+								] ); ?>
+                                </span>
+                            </label>
+                            <label>
+                                <span class="title"><?php _e( 'Tags' ); ?></span>
+                                <span class="input-text-wrap">
+								<?php echo html()->dropdown( [
+									'id'   => 'tags',
+									'name' => 'tags[]'
+								] ); ?>
+                                </span>
+                            </label>
                         </div>
                     </fieldset>
                     <div class="submit inline-edit-save">
@@ -319,6 +355,9 @@ class Contacts_Table extends WP_List_Table {
 		$html    .= '  <div class="first_name">' . esc_html( $contact->get_first_name() ) . '</div>';
 		$html    .= '  <div class="last_name">' . esc_html( $contact->get_last_name() ) . '</div>';
 		$html    .= '  <div class="optin_status">' . esc_html( $contact->get_optin_status() ) . '</div>';
+		$html    .= '  <div class="mobile_phone">' . esc_html( $contact->get_mobile_number() ) . '</div>';
+		$html    .= '  <div class="primary_phone">' . esc_html( $contact->get_phone_number() ) . '</div>';
+		$html    .= '  <div class="primary_phone_extension">' . esc_html( $contact->get_phone_extension() ) . '</div>';
 		if ( $contact->get_owner_id() ) {
 			$html .= '  <div class="owner">' . esc_html( $contact->get_owner_id() ) . '</div>';
 		}
@@ -351,7 +390,7 @@ class Contacts_Table extends WP_List_Table {
 	/**
 	 * Get default column value.
 	 *
-	 * @param object $contact     A singular item (one full row's worth of data).
+	 * @param object $contact A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string Text or HTML to be placed inside the column <td>.
@@ -486,7 +525,7 @@ class Contacts_Table extends WP_List_Table {
 	 *
 	 * @param        $contact     Contact Contact being acted upon.
 	 * @param string $column_name Current column name.
-	 * @param string $primary     Primary column name.
+	 * @param string $primary Primary column name.
 	 *
 	 * @return string Row steps output for posts.
 	 */
@@ -559,15 +598,14 @@ class Contacts_Table extends WP_List_Table {
                   var $bulk = $(this)
                   if ($bulk.val() === 'apply_tag' || $bulk.val() === 'remove_tag') {
                     $('.bulk-tag-action').removeClass('hidden')
-                  }
-                  else {
+                  } else {
                     $('.bulk-tag-action').addClass('hidden')
                   }
                 })
               })
             </script>
             <div class="alignleft gh-actions bulk-tag-action hidden">
-                <div style="width: 300px;display: inline-block;margin: 0 20px 5px 0"><?php echo Plugin::$instance->utils->html->tag_picker( [
+                <div style="width: 300px;display: inline-block;margin: 0 20px 5px 0"><?php echo html()->tag_picker( [
 						'name'        => 'bulk_tags[]',
 						'id'          => 'bulk_tags',
 						'class'       => 'gh-tag-picker',

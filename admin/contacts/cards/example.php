@@ -28,8 +28,6 @@ if ( $contact->get_user_id() ):
                         <span class="dashicons dashicons-businessman"></span>User Basic Info
                     </div>
 
-                    <i class="dashicons dashicons-arrow-down-alt2"></i>
-
                 </div>
 
                 <div class="ic-section-content">
@@ -97,7 +95,6 @@ if ( $contact->get_user_id() ):
                         <span class="dashicons dashicons-location"></span>Location
                     </div>
 
-                    <i class="dashicons dashicons-arrow-down-alt2"></i>
 
                 </div>
 
@@ -164,7 +161,6 @@ if ( $contact->get_user_id() ):
                         <span class="dashicons dashicons-screenoptions"></span>User Activity
                     </div>
 
-                    <i class="dashicons dashicons-arrow-down-alt2"></i>
 
                 </div>
 
@@ -231,7 +227,6 @@ if ( $contact->get_user_id() ):
                         <span class="dashicons dashicons-networking"></span>User Actions
                     </div>
 
-                    <i class="dashicons dashicons-arrow-down-alt2"></i>
 
                 </div>
 

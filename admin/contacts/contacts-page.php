@@ -62,17 +62,19 @@ class Contacts_Page extends Admin_Page {
 			new Contact_Table_Columns();
 		}
 
-		if ( $this->get_current_action() === 'edit' ){
+		if ( $this->get_current_action() === 'edit' ) {
 			new Info_Cards();
 		}
 	}
 
 	protected function add_ajax_actions() {
+
+		new Contact_Table_Columns();
+
 		add_action( 'wp_ajax_wpgh_inline_save_contacts', array( $this, 'save_inline' ) );
 		add_action( 'wp_ajax_groundhogg_edit_notes', [ $this, 'edit_note_ajax' ] );
 		add_action( 'wp_ajax_groundhogg_delete_notes', [ $this, 'delete_note_ajax' ] );
 		add_action( 'wp_ajax_groundhogg_add_notes', [ $this, 'add_note_ajax' ] );
-
 	}
 
 	/**
@@ -1062,9 +1064,19 @@ class Contacts_Page extends Admin_Page {
 
 		$email = sanitize_email( get_request_var( 'email' ) );
 
-		$args['first_name'] = sanitize_text_field( get_request_var( 'first_name' ) );
-		$args['last_name']  = sanitize_text_field( get_request_var( 'last_name' ) );
-		$args['owner_id']   = absint( get_request_var( 'owner' ) );
+		$args['first_name']   = sanitize_text_field( get_request_var( 'first_name' ) );
+		$args['last_name']    = sanitize_text_field( get_request_var( 'last_name' ) );
+		$args['owner_id']     = absint( get_request_var( 'owner' ) );
+
+		$meta_keys = [
+			'mobile_phone',
+			'primary_phone',
+			'primary_phone_extension',
+		];
+
+		foreach ( $meta_keys as $meta_key ) {
+			$contact->update_meta( $meta_key, sanitize_text_field( get_request_var( $meta_key ) ) );
+		}
 
 		$err = array();
 
@@ -1086,6 +1098,8 @@ class Contacts_Page extends Admin_Page {
 		}
 
 		$contact->update( $args );
+
+		$contact->change_marketing_preference( get_request_var( 'optin_status' ) );
 
 		// Process any tag removals.
 		if ( get_request_var( 'tags' ) ) {
@@ -1111,13 +1125,10 @@ class Contacts_Page extends Admin_Page {
 			$contact->remove_tag( $contact->get_tags() );
 		}
 
-		if ( get_request_var( 'unsubscribe' ) ) {
-			$contact->unsubscribe();
-		}
-
 		do_action( 'groundhogg/admin/contact/save_inline/after', $id, $contact );
 
 		$contactTable = new Tables\Contacts_Table;
+
 		$contactTable->single_row( $contact );
 		wp_die();
 	}

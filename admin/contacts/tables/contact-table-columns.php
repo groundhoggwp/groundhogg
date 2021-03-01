@@ -96,12 +96,12 @@ class Contact_Table_Columns {
 	/**
 	 * Register a new contact table column
 	 *
-	 * @param string   $id         the ID of the info card
-	 * @param string   $title      the title of the info card
-	 * @param callable $callback   callback to display the data
-	 * @param string   $orderby    if the column will be sortable
-	 * @param int      $priority   how high in the cards it should be displayed
-	 * @param string   $capability the minimum capability for the viewing user to see the data in this card.
+	 * @param string $id the ID of the info card
+	 * @param string $title the title of the info card
+	 * @param callable $callback callback to display the data
+	 * @param string $orderby if the column will be sortable
+	 * @param int $priority how high in the cards it should be displayed
+	 * @param string $capability the minimum capability for the viewing user to see the data in this card.
 	 */
 	public static function register( string $id, string $title, callable $callback, $orderby = false, $priority = 100, $capability = 'view_contacts' ) {
 
@@ -141,7 +141,7 @@ class Contact_Table_Columns {
 	 */
 	public function register_core_columns() {
 
-	    // Core columns
+		// Core columns
 		self::register( 'first_name', __( 'First Name', 'groundhogg' ), [
 			self::class,
 			'column_first_name'
@@ -152,13 +152,14 @@ class Contact_Table_Columns {
 		], 'last_name', 10 );
 		self::register( 'user_id', __( 'Username', 'groundhogg' ), [ self::class, 'column_user_id' ], 'user_id', 10 );
 		self::register( 'owner_id', __( 'Owner', 'groundhogg' ), [ self::class, 'column_owner_id' ], 'owner_id', 10 );
+		self::register( 'tel_numbers', __( 'Phone', 'groundhogg' ), [ self::class, 'column_tel_numbers' ], false, 10 );
 		self::register( 'date_created', __( 'Date Created', 'groundhogg' ), [
 			self::class,
 			'column_date_created'
 		], 'date_created', 10 );
 
 		// Other Columns
-		self::register( 'tags', __( 'Tags' ), [ self::class, 'column_tags' ] );
+		self::register( 'tags_col', __( 'Tags' ), [ self::class, 'column_tags' ] );
 		self::register( 'address', __( 'Location' ), [ self::class, 'column_location' ] );
 		self::register( 'birthday', __( 'Birthday' ), [ self::class, 'column_birthday' ] );
 
@@ -181,7 +182,7 @@ class Contact_Table_Columns {
 	 *
 	 * @return void
 	 */
-	protected static  function column_last_name( $contact ) {
+	protected static function column_last_name( $contact ) {
 		echo $contact->get_last_name() ? $contact->get_last_name() : '&#x2014;';
 	}
 
@@ -190,7 +191,7 @@ class Contact_Table_Columns {
 	 *
 	 * @return void
 	 */
-	protected static  function column_user_id( $contact ) {
+	protected static function column_user_id( $contact ) {
 		echo $contact->get_userdata() ? '<a href="' . admin_url( 'user-edit.php?user_id=' . $contact->get_userdata()->ID ) . '">' . $contact->get_userdata()->display_name . '</a>' : '&#x2014;';
 	}
 
@@ -199,7 +200,7 @@ class Contact_Table_Columns {
 	 *
 	 * @return void
 	 */
-	protected static  function column_owner_id( $contact ) {
+	protected static function column_owner_id( $contact ) {
 		echo ! empty( $contact->get_owner_id() ) ? '<a href="' . admin_url( 'admin.php?page=gh_contacts&owner=' . $contact->get_owner_id() ) . '">' . $contact->get_ownerdata()->user_login . '</a>' : '&#x2014;';
 	}
 
@@ -208,7 +209,7 @@ class Contact_Table_Columns {
 	 *
 	 * @return void
 	 */
-	protected static  function column_date_created( $contact ) {
+	protected static function column_date_created( $contact ) {
 		$dc_time = mysql2date( 'U', $contact->get_date_created() );
 		$dc_time = Plugin::instance()->utils->date_time->convert_to_utc_0( $dc_time );
 
@@ -247,6 +248,24 @@ class Contact_Table_Columns {
 		printf( __( 'Born <abbr title="Age">%s</abbr> | %s years old', 'groundhogg' ), $date, $age );
 	}
 
+	/**
+	 * Display tags
+	 *
+	 * @param $contact Contact
+	 */
+	protected static function column_tel_numbers( Contact $contact ) {
+		if ( $contact->get_phone_number() ): ?>
+            <div class="phone" title="<?php esc_attr_e( 'Primary phone number', 'groundhogg' );?>"><?php dashicon_e( 'phone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_phone_number() ], $contact->get_phone_number() ) ?>
+				<?php if ( $contact->get_phone_extension() ): ?>
+                    <span class="extension"><?php printf( __( 'ext. %s', 'groundhogg' ), $contact->get_phone_extension() ) ?></span>
+				<?php endif; ?>
+            </div>
+		<?php endif;
+		if ( $contact->get_mobile_number() ): ?>
+            <div class="phone" title="<?php esc_attr_e( 'Mobile phone number', 'groundhogg' );?>"><?php dashicon_e( 'smartphone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_mobile_number() ], $contact->get_mobile_number() ) ?>
+            </div>
+		<?php endif;
+	}
 
 	/**
 	 * Display tags
