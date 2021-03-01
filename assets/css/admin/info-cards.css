@@ -124,7 +124,7 @@ ul.regular-list li {
 }
 
 .ic-section-content li {
-    display: flex;
+    /*display: flex;*/
     margin: 0 0 10px;
 }
 

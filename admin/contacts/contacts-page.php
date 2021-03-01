@@ -70,6 +70,7 @@ class Contacts_Page extends Admin_Page {
 	protected function add_ajax_actions() {
 
 		new Contact_Table_Columns();
+		new Info_Cards();
 
 		add_action( 'wp_ajax_wpgh_inline_save_contacts', array( $this, 'save_inline' ) );
 		add_action( 'wp_ajax_groundhogg_edit_notes', [ $this, 'edit_note_ajax' ] );
