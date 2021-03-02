@@ -412,7 +412,7 @@ class Emails_Page extends Admin_Page {
 
 			if ( $test_email && is_email( $test_email ) ) {
 
-				$contact = new Contact( $test_email );
+				$contact = new Contact( [ 'email' => $test_email ] );
 
 				if ( $contact->exists() && $contact->get_email() === $test_email ) {
 

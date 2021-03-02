@@ -163,7 +163,6 @@ class Imports_Table extends WP_List_Table {
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-
         $data = [];
 
         if ( file_exists( Plugin::$instance->utils->files->get_csv_imports_dir() ) )  {

@@ -131,11 +131,11 @@ a.change-status.complained:hover {
     padding: 20px
 }
 
-td.column-tags .tags {
+td.column-tags_col .tags {
     white-space: normal;
 }
 
-td.column-tags .tags .tag {
+td.column-tags_col .tags .tag {
     background: #f2f2f2;
     padding: 3px 9px;
     border-radius: 3px;

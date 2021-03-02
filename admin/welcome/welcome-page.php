@@ -5,6 +5,8 @@ namespace Groundhogg\Admin\Welcome;
 use Groundhogg\Admin\Admin_Page;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon;
+use function Groundhogg\files;
+use function Groundhogg\get_db;
 use function Groundhogg\groundhogg_logo;
 use function Groundhogg\html;
 use function Groundhogg\is_white_labeled;
@@ -35,7 +37,7 @@ class Welcome_Page extends Admin_Page {
 	}
 
 	public function process_action() {
-	    return;
+		return;
 	}
 
 	/**
@@ -247,7 +249,7 @@ class Welcome_Page extends Admin_Page {
                         </div>
                     </div>
                 </div>
-
+                <?php include __DIR__ . '/checklist.php' ?>
                 <div class="col">
                     <div class="postbox">
 						<?php
@@ -305,9 +307,10 @@ class Welcome_Page extends Admin_Page {
 							'href'  => admin_page_url( 'gh_tools', [ 'tab' => 'import', 'action' => 'add' ] )
 						], __( 'Import your Contact List!', 'groundhogg' ) );
 
-						echo html()->e( 'a', [ 'class'  => 'guide-link',
-						                       'href'   => 'https://help.groundhogg.io/article/14-how-do-i-import-my-list',
-						                       'target' => '_blank'
+						echo html()->e( 'a', [
+							'class'  => 'guide-link',
+							'href'   => 'https://help.groundhogg.io/article/14-how-do-i-import-my-list',
+							'target' => '_blank'
 						], __( 'Read the full guide', 'groundhogg' ) );
 
 						?>
@@ -342,9 +345,10 @@ class Welcome_Page extends Admin_Page {
 							'href'  => admin_page_url( 'gh_funnels', [ 'action' => 'add' ] )
 						], __( 'Create your first Funnel!', 'groundhogg' ) );
 
-						echo html()->e( 'a', [ 'class'  => 'guide-link',
-						                       'href'   => 'https://help.groundhogg.io/article/112-how-to-setup-a-lead-magnet-download-funnel',
-						                       'target' => '_blank'
+						echo html()->e( 'a', [
+							'class'  => 'guide-link',
+							'href'   => 'https://help.groundhogg.io/article/112-how-to-setup-a-lead-magnet-download-funnel',
+							'target' => '_blank'
 						], __( 'Read the full guide', 'groundhogg' ) );
 
 						?>
@@ -417,9 +421,10 @@ class Welcome_Page extends Admin_Page {
 							'href'  => admin_page_url( 'gh_tools', [ 'tab' => 'cron_setup' ] )
 						], __( 'Configure WP-Cron!' ) );
 
-						echo html()->e( 'a', [ 'class'  => 'guide-link',
-						                       'href'   => 'https://help.groundhogg.io/article/45-how-to-disable-builtin-wp-cron',
-						                       'target' => '_blank'
+						echo html()->e( 'a', [
+							'class'  => 'guide-link',
+							'href'   => 'https://help.groundhogg.io/article/45-how-to-disable-builtin-wp-cron',
+							'target' => '_blank'
 						], __( 'Read the full guide', 'groundhogg' ) ); ?>
                         <div class="hidden" id="configure-wp-cron">
                             <iframe width="800" height="450" src="https://www.youtube.com/embed/1-csY3W-WP0"

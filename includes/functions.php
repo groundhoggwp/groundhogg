@@ -224,6 +224,20 @@ function tracking() {
 }
 
 /**
+ * @return Utils
+ */
+function utils(){
+    return Plugin::$instance->utils;
+}
+
+/**
+ * @return Files
+ */
+function files(){
+	return utils()->files;
+}
+
+/**
  * @return Event_Queue
  */
 function event_queue() {

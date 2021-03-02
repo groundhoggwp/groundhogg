@@ -1,39 +1,23 @@
-/*.phil{*/
-/*    position: fixed;*/
-/*    bottom: -80px;*/
-/*    right: -80px;*/
-/*    transform: rotate(-20deg);*/
-/*}*/
-
-/*#wpcontent{*/
-/*    padding: 0;*/
-/*    background-color: rgba(169, 169, 169, 0.25);*/
-/*}*/
-
-/*#wpfooter{*/
-/*    background-color: #F1F1F1;*/
-/*}*/
-
-#welcome-page{
+#welcome-page {
     max-width: 1000px;
     margin: auto;
 }
 
-.welcome-header{
+.welcome-header {
     text-align: center;
 }
 
-.postbox img{
+.postbox img {
     max-width: 100%;
 }
 
-.guide-link{
+.guide-link {
     margin: 10px auto 20px;
     text-decoration: none;
 }
 
 .guide-link,
-#wpbody .big-button{
+#wpbody .big-button {
     text-align: center;
     width: 300px;
     display: block;
@@ -43,21 +27,21 @@
 /*    color:white;*/
 /*}*/
 
-.powered-by img{
+.powered-by img {
     vertical-align: middle;
 }
 
-.welcome-header h1{
+.welcome-header h1 {
     font-size: 24px;
     margin-bottom: 20px;
 }
 
-.welcome-header h1 img{
+.welcome-header h1 img {
     vertical-align: middle;
     margin-left: 10px;
 }
 
-.progress h2{
+.progress h2 {
     font-size: 30px !important;
     color: black;
     font-family: "Arial Black";
@@ -72,7 +56,7 @@
 }
 
 .right-col,
-.left-col{
+.left-col {
     display: inline-block;
     float: left;
     width: 50%;
@@ -118,4 +102,30 @@
 
 #ghmenu li a:hover:not(.active) {
     background-color: #f1f1f1;
+}
+
+.onboarding-checklist .checklist-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px 12px 20px;
+}
+
+.onboarding-checklist .checklist-row:not(:last-child) {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.onboarding-checklist h3.item-title {
+    margin: 8px 0 4px 0;
+    font-size: 16px;
+    font-weight: 400;
+}
+.onboarding-checklist .checklist-row .fix-link,
+.onboarding-checklist .checklist-row .item-status {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+}
+
+.onboarding-checklist .checklist-row .details{
+    flex-grow: 1;
 }

@@ -96,7 +96,7 @@ class Files {
 	 *
 	 * @param string $subdir
 	 * @param string $file_path
-	 * @param bool   $create_folders
+	 * @param bool $create_folders
 	 *
 	 * @return string
 	 */
@@ -164,6 +164,38 @@ class Files {
 	 */
 	public function get_csv_exports_url( $file_path = '' ) {
 		return $this->get_uploads_url( 'exports', $file_path );
+	}
+
+	/**
+	 * Get all the imported files available.
+	 *
+	 * @return array[]
+	 */
+	public function get_imports() {
+		$data = [];
+
+		if ( file_exists( $this->get_csv_imports_dir() ) ) {
+
+			$scanned_directory = array_diff( scandir( $this->get_csv_imports_dir() ), [ '..', '.' ] );
+
+			foreach ( $scanned_directory as $filename ) {
+
+				$filepath = $this->get_csv_imports_dir( $filename );
+
+				$file = [
+					'file'      => $filename,
+					'file_path' => $filepath,
+					'file_url'  => file_access_url( '/imports/' . $filename, true ),
+					'date'      => filemtime( $filepath ),
+					'rows'      => count( file( $filepath, FILE_SKIP_EMPTY_LINES ) ) - 1,
+				];
+
+				$data[] = $file;
+
+			}
+		}
+
+		return $data;
 	}
 
 }
