@@ -85,17 +85,18 @@ class Events_Page extends Tabbed_Admin_Page {
 	protected function add_additional_actions() {
 		add_action( 'admin_init', [ $this, 'raw_email_content' ] );
 		add_action( 'admin_head', function () {
-		    ?>
-            <style>
-                .email-sent{
+			?>
+			<style>
+                .email-sent {
                     color: green;
                 }
-                .email-failed{
+
+                .email-failed {
                     color: red;
                 }
-            </style>
-            <?php
-        } );
+			</style>
+			<?php
+		} );
 
 	}
 
@@ -223,10 +224,10 @@ class Events_Page extends Tabbed_Admin_Page {
 
 		$events = get_db( 'events' );
 
-		$result = $wpdb->query( "DELETE FROM {$events->get_table_name()} WHERE `status` in ( 'waiting', 'failed' )" );
+		$result = $wpdb->query( $wpdb->prepare( "DELETE FROM {$events->get_table_name()} WHERE `status` = %s", get_url_var( 'status' ) ) );
 
 		if ( $result !== false ) {
-			$this->add_notice( 'events_purged', __( 'Purged failed events!' ) );
+			$this->add_notice( 'events_purged', __( 'Purged events!' ) );
 		}
 	}
 
@@ -374,11 +375,11 @@ class Events_Page extends Tabbed_Admin_Page {
 
 		$events_table->views();
 		?>
-        <form method="post" class="search-form wp-clearfix">
-            <!-- search form -->
+		<form method="post" class="search-form wp-clearfix">
+			<!-- search form -->
 			<?php $events_table->prepare_items(); ?>
 			<?php $events_table->display(); ?>
-        </form>
+		</form>
 
 		<?php
 	}
@@ -391,7 +392,7 @@ class Events_Page extends Tabbed_Admin_Page {
 			[
 				'name' => __( 'Events', 'groundhogg' ),
 				'slug' => 'events',
-                'cap'  => 'view_events'
+				'cap'  => 'view_events'
 			],
 			[
 				'name' => __( 'Emails', 'groundhogg' ),
@@ -414,14 +415,14 @@ class Events_Page extends Tabbed_Admin_Page {
 
 		$log_table->views();
 		?>
-        <form method="post" class="search-form wp-clearfix">
-            <!-- search form -->
+		<form method="post" class="search-form wp-clearfix">
+			<!-- search form -->
 			<?php $log_table->prepare_items(); ?>
 			<?php $log_table->display(); ?>
-        </form>
-        <div id="modal-log-details">
-            <div id="modal-log-details-view"></div>
-        </div>
+		</form>
+		<div id="modal-log-details">
+			<div id="modal-log-details-view"></div>
+		</div>
 		<?php
 	}
 
@@ -450,7 +451,7 @@ class Events_Page extends Tabbed_Admin_Page {
 	/**
 	 * Resent emails
 	 */
-	public function process_emails_resend(){
+	public function process_emails_resend() {
 
 		if ( ! current_user_can( 'send_emails' ) ) {
 			$this->wp_die_no_access();
@@ -467,7 +468,7 @@ class Events_Page extends Tabbed_Admin_Page {
 			sprintf( _nx( 'Resent %d email', 'Resent %d emails', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
 			'success'
 		);
-    }
+	}
 
 	public function view_log() {
 		include __DIR__ . '/log-preview.php';
