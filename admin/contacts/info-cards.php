@@ -75,7 +75,7 @@ class Info_Cards {
 
 		do_action( 'groundhogg/admin/contacts/register_info_cards', $this );
 
-		self::register_as_metaboxes_for_screen_options();
+//		self::register_as_metaboxes_for_screen_options();
 	}
 
 	/**

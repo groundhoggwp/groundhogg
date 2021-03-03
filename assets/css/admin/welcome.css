@@ -83,12 +83,16 @@
     margin: 0;
     padding: 0;
     overflow: hidden;
+    display: flex;
+    justify-content: space-between;
     /*background-color: #333;*/
 }
 
 #ghmenu li {
-    float: left;
+    /*float: left;*/
     margin: 0;
+    flex-grow: 1;
+
 }
 
 #ghmenu li a {

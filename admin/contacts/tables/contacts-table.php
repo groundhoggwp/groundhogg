@@ -166,9 +166,9 @@ class Contacts_Table extends WP_List_Table {
 
 		$total = get_db( 'contacts' )->count( $query );
 
-		$this->items = array_map( function ( $item ){
-		    return get_contactdata( $item->ID );
-        }, $data );
+		$this->items = array_map( function ( $item ) {
+			return get_contactdata( $item->ID );
+		}, $data );
 
 		// Add condition to be sure we don't divide by zero.
 		// If $this->per_page is 0, then set total pages to 1.
@@ -182,8 +182,8 @@ class Contacts_Table extends WP_List_Table {
 	}
 
 	/**
-	 * @return array An associative array containing column information.
 	 * @see WP_List_Table::::single_row_columns()
+	 * @return array An associative array containing column information.
 	 */
 	public function get_columns() {
 		$columns = array(
@@ -213,7 +213,7 @@ class Contacts_Table extends WP_List_Table {
 
 	/**
 	 * @param object|Contact $contact
-	 * @param int $level
+	 * @param int            $level
 	 */
 	public function single_row( $contact, $level = 0 ) {
 
@@ -390,7 +390,7 @@ class Contacts_Table extends WP_List_Table {
 	/**
 	 * Get default column value.
 	 *
-	 * @param object $contact A singular item (one full row's worth of data).
+	 * @param object $contact     A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string Text or HTML to be placed inside the column <td>.
@@ -525,7 +525,7 @@ class Contacts_Table extends WP_List_Table {
 	 *
 	 * @param        $contact     Contact Contact being acted upon.
 	 * @param string $column_name Current column name.
-	 * @param string $primary Primary column name.
+	 * @param string $primary     Primary column name.
 	 *
 	 * @return string Row steps output for posts.
 	 */
@@ -598,7 +598,8 @@ class Contacts_Table extends WP_List_Table {
                   var $bulk = $(this)
                   if ($bulk.val() === 'apply_tag' || $bulk.val() === 'remove_tag') {
                     $('.bulk-tag-action').removeClass('hidden')
-                  } else {
+                  }
+                  else {
                     $('.bulk-tag-action').addClass('hidden')
                   }
                 })
@@ -666,5 +667,47 @@ class Contacts_Table extends WP_List_Table {
 
 			?></div><?php
 
+	}
+
+	/**
+	 * Add horizontal scrolling div
+	 */
+	public function display() {
+		$singular = $this->_args['singular'];
+
+		$this->display_tablenav( 'top' );
+
+		$this->screen->render_screen_reader_content( 'heading_list' );
+		?>
+        <div class="table-wrap">
+            <div class="table-scroll">
+                <table class="wp-list-table <?php echo implode( ' ', $this->get_table_classes() ); ?>">
+                    <thead>
+                    <tr>
+				        <?php $this->print_column_headers(); ?>
+                    </tr>
+                    </thead>
+
+                    <tbody id="the-list"
+				        <?php
+				        if ( $singular ) {
+					        echo " data-wp-lists='list:$singular'";
+				        }
+				        ?>
+                    >
+			        <?php $this->display_rows_or_placeholder(); ?>
+                    </tbody>
+
+                    <tfoot>
+                    <tr>
+				        <?php $this->print_column_headers( false ); ?>
+                    </tr>
+                    </tfoot>
+
+                </table>
+            </div>
+        </div>
+		<?php
+		$this->display_tablenav( 'bottom' );
 	}
 }

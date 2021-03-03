@@ -21,11 +21,11 @@ $wp_cron_setup = time() - get_option( 'wp_cron_last_ping' ) <= 15 * MINUTE_IN_SE
 
 // MailHawk is installed but not connected -> redirect to the mailhawk connect page
 if ( function_exists( 'mailhawk_is_connected' ) && ! mailhawk_is_connected() ):
-    $smtp_fix_link = admin_page_url( 'mailhawk' );
+	$smtp_fix_link = admin_page_url( 'mailhawk' );
 
 // The number of registered services is > 1, means that an integration is installed.
 elseif ( count( Groundhogg_Email_Services::get() ) > 1 ):
-    $smtp_fix_link = admin_page_url( 'gh_settings', [ 'tab' => 'email' ] );
+	$smtp_fix_link = admin_page_url( 'gh_settings', [ 'tab' => 'email' ] );
 
 // No other service is currently in use.
 else:
@@ -41,7 +41,7 @@ $checklist_items = [
 		'fix'         => admin_page_url( 'gh_tools', [ 'tab' => 'cron' ] ),
 		'cap'         => 'manage_options'
 	],
-    [
+	[
 		'title'       => __( 'Integrate An SMTP Service', 'groundhogg' ),
 		'description' => __( "You need a proper SMTP service to ensure your email reaches the inbox. We recommend <a href='https://mailhawk.io'>MailHawk!</a>", 'groundhogg' ),
 		'completed'   => Groundhogg_Email_Services::get_marketing_service() !== 'wp_mail' || function_exists( 'mailhawk_mail' ),
@@ -75,7 +75,7 @@ $checklist_items = [
 			'width'              => 800,
 			'footer'             => 'true',
 			'preventSave'        => 'true',
-        ] ),
+		] ),
 		'cap'         => 'edit_emails'
 	],
 	[
@@ -96,35 +96,50 @@ $checklist_items = [
 	],
 ];
 
-?>
+$all_completed = array_reduce( $checklist_items, function ( $carry, $item ) {
+	return $carry && $item['completed'];
+}, true );
 
+$all_completed = true;
+
+?>
 <div class="col">
     <div class="postbox onboarding-checklist">
         <div class="postbox-header">
             <h3 class="hndle"><span>🚀 <?php _e( 'Quickstart Checklist', 'groundhogg' ) ?></span></h3>
         </div>
-		<?php foreach ( $checklist_items as $item ):
+		<?php
 
-            // todo remove this
-//            $item['completed'] = false;
+		if ( $all_completed ):
+            ?>
+            <div class="inside checklist-complete">
+                <p>🎉 <?php _e( "Yay! You finished the quickstart checklist! Groundhogg is now completely configured and you're ready to launch!", 'groundhogg' ); ?></p>
+            </div>
+            <?php
+		else :
 
-            if ( ! current_user_can( $item[ 'cap' ] ) ) continue; ?>
-            <div class="checklist-row">
-                <div class="item-status <?php echo $item['completed'] ? 'done' : 'todo' ?>">
-					<?php if ( $item['completed'] ): ?>
-                        ✅
-					<?php else: ?>
-                        ❌
+			foreach ( $checklist_items as $item ):
+
+				if ( ! current_user_can( $item['cap'] ) ) {
+					continue;
+				} ?>
+                <div class="checklist-row">
+                    <div class="item-status <?php echo $item['completed'] ? 'done' : 'todo' ?>">
+						<?php if ( $item['completed'] ): ?>
+                            ✅
+						<?php else: ?>
+                            ❌
+						<?php endif; ?>
+                    </div>
+                    <div class="details">
+                        <h3 class="item-title"><?php echo $item['title']; ?></h3>
+                        <p class="description"><?php echo $item['description']; ?></p>
+                    </div>
+					<?php if ( ! $item['completed'] ): ?>
+                        <span class="fix-link"><?php echo html()->e( 'a', [ 'href' => $item['fix'] ], __( 'Fix', 'groundhogg' ) ); ?></span>
 					<?php endif; ?>
                 </div>
-                <div class="details">
-                    <h3 class="item-title"><?php echo $item['title']; ?></h3>
-                    <p class="description"><?php echo $item['description']; ?></p>
-                </div>
-				<?php if ( ! $item['completed'] ): ?>
-                    <span class="fix-link"><?php echo html()->e( 'a', [ 'href' => $item['fix'] ], __( 'Fix', 'groundhogg' ) ); ?></span>
-				<?php endif; ?>
-            </div>
-		<?php endforeach; ?>
+			<?php endforeach;
+		endif; ?>
     </div>
 </div>

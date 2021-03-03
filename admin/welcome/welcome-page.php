@@ -220,7 +220,7 @@ class Welcome_Page extends Admin_Page {
 									[
 										'icon'    => 'location-alt',
 										'display' => __( 'Find a Partner' ),
-										'url'     => 'https://www.groundhogg.io/partner/certified-partner-directory/'
+										'url'     => 'https://www.groundhogg.io/find-a-partner/'
 									],
 								];
 
