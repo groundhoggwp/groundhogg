@@ -3935,20 +3935,18 @@ function preg_quote_except( $str, $except = [], $delim = null ) {
 }
 
 /**
- * Check whether a specific URL is to be excluded from click tracking.
- *
- * @param       $url
+ * Get the regex for URLs to ignore tracking
  *
  * @param array $exclusions
  *
- * @return false|int
+ * @return false|string
  */
-function is_url_excluded_from_tracking( $url, $exclusions = [] ) {
+function get_url_exclusions_regex( $exclusions = [] ){
 	static $exclusions_regex;
 
 	if ( ! $exclusions_regex ) {
 
-		$exclusions = get_option( 'gh_url_tracking_exclusions', $exclusions );
+		$exclusions = get_option( 'gh_url_tracking_exclusions' );
 
 		if ( ! is_array( $exclusions ) ) {
 			$exclusions = explode( PHP_EOL, $exclusions );
@@ -3959,17 +3957,31 @@ function is_url_excluded_from_tracking( $url, $exclusions = [] ) {
 		}
 
 		$exclusions       = array_map( function ( $exclusion ) {
-			return preg_quote_except( $exclusion, [ '$', '^' ] );
-		}, $exclusions );
+			return preg_quote_except( trim( $exclusion ), [ '$', '^' ] );
+		}, array_filter( $exclusions ) );
+
 		$exclusions_regex = implode( '|', $exclusions );
 	}
 
-	// No exclusions? Exit.
-	if ( empty( $exclusions_regex ) ) {
-		return false;
-	}
+	return ! empty( $exclusions_regex ) ? "@$exclusions_regex@" : false;
+}
 
-	return apply_filters( 'groundhogg/is_url_excluded_from_tracking', preg_match( "@$exclusions_regex@", $url ), $url, $exclusions_regex );
+/**
+ * Check whether a specific URL is to be excluded from click tracking.
+ *
+ * @param       $url
+ *
+ * @param array $exclusions
+ *
+ * @return false|int
+ */
+function is_url_excluded_from_tracking( $url, $exclusions = [] ) {
+
+	$exclusions_regex = get_url_exclusions_regex( $exclusions );
+
+	$matched = $exclusions_regex !== false ? preg_match( $exclusions_regex, $url ) : false;
+
+	return apply_filters( 'groundhogg/is_url_excluded_from_tracking', $matched, $url, $exclusions_regex );
 }
 
 /**

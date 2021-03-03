@@ -309,7 +309,7 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
-= 2.3.5 (2021-02-16) =
+= 2.4 (2021-02-16) =
 * ADDED Expand/Collapse all contact info cards.
 * ADDED View/Display management for info cards so you can hide ones you don't use.
 * ADDED Company phone & mobile phone contact fields.
@@ -318,11 +318,18 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 * ADDED Links to easily change optin status within a contact record.
 * ADDED Better support for multiple phone types and phone extensions to the phone field in the form builder.
 * ADDED Reset tool in the Updates/install screen. Useful for testing purposes.
+* ADDED Purge function for skipped/cancelled events as well as failed events.
+* ADDED Quickstart checklist on the welcome screen.
+* ADDED Quick search bar on the contacts list screen.
+* ADDED API for additional columns in the contact table. If using the *Advanced Custom Meta Fields* extension new fields can be automatically added to the contacts table.
+* ADDED Initial framework for the search filters API, a way to create advanced contact searches in 3.0.
+* ADDED Warning when admin users are logged in on the preferences screen when trying to manage someone else's preferences.
+* ADDED Optin Status, Contact Owner, Primary and Mobile Phone to the contact quick edit.
 * TWEAKED Replacements now support Group, Name, and Default Arg attributes when registering.
 * TWEAKED Merged segmentation and general info tab, moved all editable fields to the general tab from the details card.
 * TWEAKED Refactored contact notes as an info card widget.
 * TWEAKED Refactored contact files as an info card widget.
-* TWEAKEd Merged Install & Updates tabs in the tools screen.
+* TWEAKED Merged Install & Updates tabs in the tools screen.
 * FIXED Typo in filter of title actions.
 * FIXED PHP Warnings & Notices during uninstall.
 * FIXED Dequeue Avada theme styles on the managed page.

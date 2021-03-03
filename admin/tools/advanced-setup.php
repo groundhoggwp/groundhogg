@@ -1,7 +1,19 @@
 <?php
 
 use function Groundhogg\action_url;
+use function Groundhogg\get_url_var;
 use function Groundhogg\gh_cron_installed;
+
+switch ( get_url_var( 'step' ) ):
+	default:
+
+		break;
+
+
+endswitch;
+
+
+
 
 ?>
 
