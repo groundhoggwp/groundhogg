@@ -929,12 +929,12 @@ class Tools_Page extends Tabbed_Admin_Page {
 	public function process_install_updates_reset() {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			$this->wp_die_no_access();
-		} elseif ( get_post_var( 'reset_confirmation' ) !== 'reset' ){
-		    return new WP_Error( 'error', __( 'You must confirm the reset by typing <code>reset</code> into the text field.', 'groundhogg' ) );
+		} else if ( get_post_var( 'reset_confirmation' ) !== 'reset' ) {
+			return new WP_Error( 'error', __( 'You must confirm the reset by typing <code>reset</code> into the text field.', 'groundhogg' ) );
 		}
 
-		if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ){
-		    define( 'WP_UNINSTALL_PLUGIN', true );
+		if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+			define( 'WP_UNINSTALL_PLUGIN', true );
 		}
 
 		uninstall_groundhogg();
@@ -1014,7 +1014,12 @@ class Tools_Page extends Tabbed_Admin_Page {
 		if ( ! install_gh_cron_file() || wp_unschedule_hook( Event_Queue::WP_CRON_HOOK ) === false ) {
 			return new \WP_Error( 'error', __( 'Unable to install gh-cron.php file. Please install is manually.', 'groundhogg' ) );
 		} else {
-			$this->add_notice( 'success', __( 'Installed gh-cron.php successfully! Please configure the new CRON JOB as shown in <u>Step 2</u>.', 'groundhogg' ) );
+			$this->add_notice( 'success', __( 'Installed gh-cron.php successfully!', 'groundhogg' ) );
+		}
+
+		// Disable WP Cron if not already disabled.
+		if ( ! defined( 'DISABLE_WP_CRON' ) ) {
+			update_option( 'gh_disable_wp_cron', 'on' );
 		}
 
 		return false;

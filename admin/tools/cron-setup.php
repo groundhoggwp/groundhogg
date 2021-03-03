@@ -7,7 +7,16 @@ use function Groundhogg\gh_cron_installed;
 use function Groundhogg\html;
 use function Groundhogg\white_labeled_name;
 
-switch ( get_url_var( 'step' ) ):
+$gh_cron_setup = time() - get_option( 'gh_cron_last_ping' ) <= MINUTE_IN_SECONDS;
+$wp_cron_setup = time() - get_option( 'wp_cron_last_ping' ) <= 15 * MINUTE_IN_SECONDS;
+
+$step = get_url_var( 'step' );
+
+if ( $gh_cron_setup && $wp_cron_setup && gh_cron_installed() && defined( 'DISABLE_WP_CRON' ) ){
+    $step = 'verify';
+}
+
+switch ( $step ):
 
 	default:
 	case 'start':
@@ -112,11 +121,7 @@ switch ( get_url_var( 'step' ) ):
 		<?php
 		break;
 	case 'verify':
-
-		$gh_cron_setup = time() - get_option( 'gh_cron_last_ping' ) <= MINUTE_IN_SECONDS;
-		$wp_cron_setup = time() - get_option( 'wp_cron_last_ping' ) <= 15 * MINUTE_IN_SECONDS;
-
-		?>
+	    ?>
         <div class="gh-tools-wrap">
             <p class="tools-help"><?php _e( 'Verify Setup', 'groundhogg' ); ?></p>
             <div class="gh-tools-box">

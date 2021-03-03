@@ -9,30 +9,43 @@
 
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\extrapolate_wp_mail_plugin;
 use function Groundhogg\files;
 use function Groundhogg\get_db;
+use function Groundhogg\gh_cron_installed;
 use function Groundhogg\html;
+use function Groundhogg\modal_link_url;
+
+$gh_cron_setup = time() - get_option( 'gh_cron_last_ping' ) <= MINUTE_IN_SECONDS;
+$wp_cron_setup = time() - get_option( 'wp_cron_last_ping' ) <= 15 * MINUTE_IN_SECONDS;
+
+// MailHawk is installed but not connected -> redirect to the mailhawk connect page
+if ( function_exists( 'mailhawk_is_connected' ) && ! mailhawk_is_connected() ):
+    $smtp_fix_link = admin_page_url( 'mailhawk' );
+
+// The number of registered services is > 1, means that an integration is installed.
+elseif ( count( Groundhogg_Email_Services::get() ) > 1 ):
+    $smtp_fix_link = admin_page_url( 'gh_settings', [ 'tab' => 'email' ] );
+
+// No other service is currently in use.
+else:
+	$smtp_fix_link = admin_page_url( 'gh_guided_setup', [ 'step' => '3' ] );
+
+endif;
 
 $checklist_items = [
 	[
-		'title'       => __( 'Disable Internal WP Cron', 'groundhogg' ),
-		'description' => __( 'This is a WordPress best practice and will improve the performance of your site.', 'groundhogg' ),
-		'completed'   => defined( 'DISABLE_WP_CRON' ),
-		'fix'         => action_url( 'disable_wp_cron' ),
-		'cap'         => 'manage_options'
-	],
-	[
-		'title'       => __( 'Configure An External Cron Job', 'groundhogg' ),
-		'description' => __( 'This is what will ensure Groundhogg sends emails on time!', 'groundhogg' ),
-		'completed'   => time() - get_option( 'gh_cron_last_ping' ) <= MINUTE_IN_SECONDS,
-		'fix'         => admin_page_url( 'gh_tools', [ 'tab' => 'advanced_cron' ] ),
+		'title'       => __( 'Configure Cron Jobs', 'groundhogg' ),
+		'description' => __( 'This is a best practice and will improve the performance of your site.', 'groundhogg' ),
+		'completed'   => $gh_cron_setup && $wp_cron_setup && gh_cron_installed() && defined( 'DISABLE_WP_CRON' ),
+		'fix'         => admin_page_url( 'gh_tools', [ 'tab' => 'cron' ] ),
 		'cap'         => 'manage_options'
 	],
     [
 		'title'       => __( 'Integrate An SMTP Service', 'groundhogg' ),
-		'description' => __( "You need a proper SMTP service to ensure your email reaches the inbox.", 'groundhogg' ),
+		'description' => __( "You need a proper SMTP service to ensure your email reaches the inbox. We recommend <a href='https://mailhawk.io'>MailHawk!</a>", 'groundhogg' ),
 		'completed'   => Groundhogg_Email_Services::get_marketing_service() !== 'wp_mail' || function_exists( 'mailhawk_mail' ),
-		'fix'         => admin_page_url( 'gh_tools', [ 'tab' => 'advanced_cron' ] ),
+		'fix'         => $smtp_fix_link,
 		'cap'         => 'manage_options'
 	],
 	[
@@ -53,14 +66,32 @@ $checklist_items = [
 		'title'       => __( 'Send A Broadcast Email To Your List', 'groundhogg' ),
 		'description' => __( "Let's make sure your subscribers can hear you. Send them a broadcast email and say hello!", 'groundhogg' ),
 		'completed'   => get_db( 'broadcasts' )->count( [ 'status' => 'sent' ] ) > 0,
-		'fix'         => action_url( 'send_welcome_broadcast_email' ),
+		'fix'         => modal_link_url( [
+			'title'              => __( 'Send your first broadcast!', 'groundhogg' ),
+			'footer_button_text' => __( 'Close' ),
+			'source'             => 'send-your-first-broadcast-video',
+			'class'              => 'img-link no-padding',
+			'height'             => 555,
+			'width'              => 800,
+			'footer'             => 'true',
+			'preventSave'        => 'true',
+        ] ),
 		'cap'         => 'edit_emails'
 	],
 	[
 		'title'       => __( 'Launch A Funnel', 'groundhogg' ),
 		'description' => __( "We're going to launch a funnel that will welcome new subscribers to the list. It will only take a few minutes.", 'groundhogg' ),
 		'completed'   => get_db( 'funnels' )->count( [ 'status' => 'active' ] ) > 0,
-		'fix'         => action_url( '' ),
+		'fix'         => modal_link_url( [
+			'title'              => __( 'Create your first funnel!', 'groundhogg' ),
+			'footer_button_text' => __( 'Close' ),
+			'source'             => 'create-your-first-funnel-video',
+			'class'              => 'img-link no-padding',
+			'height'             => 555,
+			'width'              => 800,
+			'footer'             => 'true',
+			'preventSave'        => 'true',
+		] ),
 		'cap'         => 'edit_funnels'
 	],
 ];
@@ -75,7 +106,7 @@ $checklist_items = [
 		<?php foreach ( $checklist_items as $item ):
 
             // todo remove this
-            $item['completed'] = false;
+//            $item['completed'] = false;
 
             if ( ! current_user_can( $item[ 'cap' ] ) ) continue; ?>
             <div class="checklist-row">

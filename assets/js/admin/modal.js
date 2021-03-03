@@ -1,4 +1,4 @@
-/* 
+/*
 Grab a container via the ID of the container and load that content into the box.
 Display the box in the correct position of the screen.
 close the thickbox and put the content back where it came from.
@@ -193,7 +193,7 @@ var GroundhoggModal = {};
     reload: function () {
       var self = this
 
-      $(document).on('click', '.trigger-popup',
+      $(document).on('click', 'a[href^="#source="]',
         function (e) {
           e.preventDefault()
           //console.log(this.href);
