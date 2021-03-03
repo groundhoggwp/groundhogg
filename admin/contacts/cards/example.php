@@ -14,74 +14,70 @@ if ( $contact->get_user_id() ):
 
 	?>
 
+    <div class="ic-section">
+        <div class="ic-section-header">
+            <div class="ic-section-header-content">
+                Section
+            </div>
+        </div>
+        <div class="ic-section-content">
+            <div class="ic-section">
+                <div class="ic-section-header">
+                    <div class="ic-section-header-content">
+                        Section in a section
+                    </div>
+                </div>
+                <div class="ic-section-content">
+                    <div class="ic-section">
+                        <div class="ic-section-header">
+                            <div class="ic-section-header-content">
+                                Section in a section in a section
+                            </div>
+                        </div>
+                        <div class="ic-section-content">
+                            Some content
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <ul id="sortable">
-
         <li class="ui-state-default" id="1">
-
             <div class="ic-section">
-
                 <div class="ic-section-header">
-
                     <div class="ic-section-header-content">
-
                         <span class="dashicons dashicons-businessman"></span>User Basic Info
                     </div>
-
                 </div>
-
                 <div class="ic-section-content">
-
                     <ul>
-
                         <li>
-
                             <div class="label"><i class="dashicons dashicons-admin-users"></i>Username:</div>
-
                             <div class="content"><?php echo $contact->get_userdata()->user_login; ?></div>
-
                         </li>
-
                         <li>
-
                             <div class="label"><i class="dashicons dashicons-phone"></i>Contact:</div>
-
                             <div class="content"><?php echo ( $contact_metadata['primary_phone'] ) ? $contact_metadata['primary_phone'] : ''; ?></div>
-
                         </li>
-
                         <li>
-
                             <div class="label"><i class="dashicons dashicons-email-alt"></i>Email:</div>
-
                             <div class="content"><a
                                         href="mailto:<?php echo $contact->get_userdata()->user_email; ?>"><?php echo ( $contact->get_userdata()->user_email ) ? $contact->get_userdata()->user_email : ''; ?></a>
                             </div>
-
                         </li>
-
                         <li>
-
                             <div class="label"><i class="dashicons dashicons-calendar"></i>Registered At:</div>
-
                             <div class="content orange"><?php echo ( $contact->get_userdata()->user_registered ) ? date( 'F j, Y', strtotime( $contact->get_userdata()->user_registered ) ) : ''; ?></div>
-
                         </li>
-
                         <li>
-
                             <div class="label"><i class="dashicons dashicons-format-status"></i>Status:</div>
-
                             <div class="content"><?php echo( $contact->get_optin_status() == '2' ? '<span class="status green">Confirmed</span>' : '<span class="status red">Unconfirmed</span>' ); ?></div>
-
                         </li>
-
                     </ul>
-
                 </div>
-
             </div>
-
         </li>
 
         <li class="ui-state-default" id="2">

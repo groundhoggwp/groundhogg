@@ -193,8 +193,8 @@ class Tools_Page extends Tabbed_Admin_Page {
 				'cap'  => 'manage_options'
 			],
 			[
-				'name' => __( 'Advanced Cron Setup', 'groundhogg' ),
-				'slug' => 'advanced_cron',
+				'name' => __( 'Cron Setup', 'groundhogg' ),
+				'slug' => 'cron',
 				'cap'  => 'manage_options'
 			],
 		];
@@ -996,8 +996,8 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 	########### ADVANCED SETUP ###########
 
-	public function advanced_cron_view() {
-		include __DIR__ . '/advanced-setup.php';
+	public function cron_view() {
+		include __DIR__ . '/cron-setup.php';
 	}
 
 	/**
@@ -1005,7 +1005,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 *
 	 * @return bool|\WP_Error
 	 */
-	public function process_advanced_cron_install_gh_cron() {
+	public function process_cron_install_gh_cron() {
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			$this->wp_die_no_access();
@@ -1025,7 +1025,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 *
 	 * @return bool|\WP_Error
 	 */
-	public function process_advanced_cron_uninstall_gh_cron() {
+	public function process_cron_uninstall_gh_cron() {
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			$this->wp_die_no_access();
@@ -1046,7 +1046,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 *
 	 * @return void
 	 */
-	public function process_advanced_cron_install_gh_cron_manually() {
+	public function process_cron_install_gh_cron_manually() {
 
 		$gh_cron_php = file_get_contents( GROUNDHOGG_PATH . 'gh-cron.txt' );
 
@@ -1064,7 +1064,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 *
 	 * @return bool|WP_Error
 	 */
-	public function process_advanced_cron_unschedule_gh_cron() {
+	public function process_cron_unschedule_gh_cron() {
 		if ( wp_unschedule_hook( Event_Queue::WP_CRON_HOOK ) === false ) {
 			return new \WP_Error( 'error', __( 'Something went wrong.', 'groundhogg' ) );
 		} else {

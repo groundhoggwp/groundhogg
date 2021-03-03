@@ -73,6 +73,10 @@ $checklist_items = [
             <h3 class="hndle"><span>🚀 <?php _e( 'Quickstart Checklist', 'groundhogg' ) ?></span></h3>
         </div>
 		<?php foreach ( $checklist_items as $item ):
+
+            // todo remove this
+            $item['completed'] = false;
+
             if ( ! current_user_can( $item[ 'cap' ] ) ) continue; ?>
             <div class="checklist-row">
                 <div class="item-status <?php echo $item['completed'] ? 'done' : 'todo' ?>">

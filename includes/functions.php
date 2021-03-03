@@ -84,19 +84,28 @@ function groundhogg_url( $page = '', $args = [] ) {
 /**
  * Easier url builder.
  *
- * @param $page
- * @param $args
- * @param $fragment
+ * @param array|string $page
+ * @param array|string $args
+ * @param string $fragment
  *
  * @return string
  */
 function admin_page_url( $page, $args = [], $fragment = '' ) {
-	$args = wp_parse_args( $args, [ 'page' => $page ] );
-	$url  = add_query_arg( $args, admin_url( 'admin.php' ) );
 
-	if ( $fragment ) {
-		$url .= '#' . $fragment;
-	}
+    if ( is_array( $page ) ){
+        $url = admin_page_url( get_url_var( 'page' ), $page );
+
+        if ( is_string( $args ) ){
+	        $url .= '#' . $args;
+        }
+    } else {
+	    $args = wp_parse_args( $args, [ 'page' => $page ] );
+	    $url  = add_query_arg( $args, admin_url( 'admin.php' ) );
+
+	    if ( $fragment ) {
+		    $url .= '#' . $fragment;
+	    }
+    }
 
 	return $url;
 }

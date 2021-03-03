@@ -78,13 +78,13 @@ ul.regular-list li {
     border-bottom: 1px solid #f1f1f1;
 }
 
-.ic-section .ic-section-content {
+.ic-section > .ic-section-content {
     display: none;
     padding: 10px 0;
     background-color: #fff;
 }
 
-.ic-section.open .ic-section-content {
+.ic-section.open > .ic-section-content {
     display: block;
 }
 
@@ -92,13 +92,13 @@ ul.regular-list li {
     cursor: pointer;
 }
 
-.ic-section-header .ic-section-header-content {
+.ic-section-header > .ic-section-header-content {
     display: inline-block;
     font-weight: 500;
     padding: 0 6px 10px 0;
 }
 
-.ic-section .ic-section-header:after{
+.ic-section > .ic-section-header:after{
     float: right;
     content: "\f140";
     display: inline-block;
@@ -109,7 +109,7 @@ ul.regular-list li {
     text-decoration: none;
 }
 
-.ic-section.open .ic-section-header:after{
+.ic-section.open > .ic-section-header:after{
     content: "\f142";
 }
 

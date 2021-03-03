@@ -329,16 +329,24 @@ class HTML {
 	 *
 	 * @param string $e
 	 * @param array  $atts
+	 * @param string $content
 	 * @param bool   $self_closing
+	 * @param bool   $echo
 	 *
 	 * @return string
 	 */
-	public function e( $e = 'div', $atts = [], $content = '', $self_closing = true ) {
+	public function e( $e = 'div', $atts = [], $content = '', $self_closing = true, $echo = false ) {
 		if ( ! empty( $content ) || ! $self_closing ) {
-			return $this->wrap( $content, $e, $atts );
+			$html = $this->wrap( $content, $e, $atts );
+		} else {
+			$html = sprintf( '<%1$s %2$s/>', esc_html( $e ), array_to_atts( $atts ) );
 		}
 
-		return sprintf( '<%1$s %2$s/>', esc_html( $e ), array_to_atts( $atts ) );
+		if ( $echo === true ) {
+			echo $html;
+		}
+
+		return $html;
 	}
 
 
@@ -448,11 +456,12 @@ class HTML {
 	/**
 	 * Output a button
 	 *
-	 * @param $args
+	 * @param array $args
+	 * @param bool  $echo
 	 *
 	 * @return string
 	 */
-	public function button( $args = [] ) {
+	public function button( $args = [], $echo = false ) {
 		$a = wp_parse_args( $args, array(
 			'type'  => 'button',
 			'text'  => '',
@@ -465,23 +474,24 @@ class HTML {
 		$text = $a['text'];
 		unset( $a['text'] );
 
-		return apply_filters( 'groundhogg/html/button', $this->wrap( $text, 'button', $a ), $a );
+		return apply_filters( 'groundhogg/html/button', $this->e( 'button', $a, $text, false, $echo ), $a );
 	}
 
 	/**
-     * Submit button wrapper
-     *
+	 * Submit button wrapper
+	 *
 	 * @param array $args
+	 * @param bool  $echo
 	 *
 	 * @return string
 	 */
-	public function submit( $args = [] ) {
+	public function submit( $args = [], $echo = false ) {
 		$args = wp_parse_args( $args, [
 			'type'  => 'submit',
 			'class' => 'button button-primary'
 		] );
 
-		return $this->button( $args );
+		return $this->button( $args, $echo );
 	}
 
 	/**
