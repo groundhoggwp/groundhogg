@@ -36,10 +36,6 @@ class Welcome_Page extends Admin_Page {
 	protected function add_ajax_actions() {
 	}
 
-	public function process_action() {
-		return;
-	}
-
 	/**
 	 * Get the menu order between 1 - 99
 	 *
@@ -437,6 +433,20 @@ class Welcome_Page extends Admin_Page {
             </div>
         </div>
 		<?php
+	}
+
+	/**
+	 * Hides the quickstart check list
+	 */
+	public function process_hide_checklist(){
+		update_user_option( get_current_user_id(), 'gh_hide_groundhogg_quickstart', true );
+	}
+
+	/**
+	 * Shows the quickstart check list
+	 */
+	public function process_show_checklist(){
+		delete_user_option( get_current_user_id(), 'gh_hide_groundhogg_quickstart' );
 	}
 
 }

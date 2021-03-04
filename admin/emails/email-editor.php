@@ -185,21 +185,26 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
                            size="30" value="<?php echo esc_attr( $email->get_title() ); ?>" id="title" spellcheck="true"
                            autocomplete="off" required>
                 </div>
+	            <div id="subject-wrap">
+		            <h3><?php _e( 'Subject & Pre-Header', 'groundhogg' ); ?></h3>
+		            <!-- Subject Line -->
+		            <span>
+	                <label for="subject"><?php _e( 'Subject:', 'groundhogg' ); ?></label>
+	                <input placeholder="<?php echo __( 'Used to capture the attention of the reader.', 'groundhogg' ); ?>"
+	                       type="text" name="subject" size="30"
+	                       value="<?php echo esc_attr( $email->get_subject_line() ); ?>" id="subject" spellcheck="true"
+	                       autocomplete="off" required>
+	                </span>
 
-                <div id="subject-wrap">
-                    <h3><?php _e( 'Subject & Pre-Header', 'groundhogg' ); ?></h3>
-                    <!-- Subject Line -->
-                    <input placeholder="<?php echo __( 'Subject Line: Used to capture the attention of the reader.', 'groundhogg' ); ?>"
-                           type="text" name="subject" size="30"
-                           value="<?php echo esc_attr( $email->get_subject_line() ); ?>" id="subject" spellcheck="true"
-                           autocomplete="off" required>
-
-                    <!-- Pre Header-->
-                    <input placeholder="<?php echo __( 'Pre Header Text: Used to summarize the content of the email.', 'groundhogg' ); ?>"
+		            <!-- Pre Header-->
+		            <span>
+	                <label for="preview-text"><?php _e( 'Preview:', 'groundhogg' ); ?></label>
+                    <input placeholder="<?php echo __( 'Shows in the email preview in the inbox before the content.', 'groundhogg' ); ?>"
                            type="text" name="pre_header" size="30"
-                           value="<?php echo esc_attr( $email->get_pre_header() ); ?>" id="pre_header" spellcheck="true"
+                           value="<?php echo esc_attr( $email->get_pre_header() ); ?>" id="preview-text" spellcheck="true"
                            autocomplete="off">
-                </div>
+	                </span>
+	            </div>
                 <div id="content-wrap">
                     <div id="postdivrich" class="postarea<?php echo $_wp_editor_expand_class; ?>">
 

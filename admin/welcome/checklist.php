@@ -102,17 +102,27 @@ $all_completed = array_reduce( $checklist_items, function ( $carry, $item ) {
 
 $all_completed = true;
 
+$hidden = get_user_option( 'gh_hide_groundhogg_quickstart' ) !== false;
+
 ?>
 <div class="col">
-    <div class="postbox onboarding-checklist">
+    <div id="checklist" class="postbox onboarding-checklist <?php esc_attr_e( $hidden ? 'closed' : 'open' );?>">
         <div class="postbox-header">
             <h3 class="hndle"><span>🚀 <?php _e( 'Quickstart Checklist', 'groundhogg' ) ?></span></h3>
+	        <div class="handle-actions">
+		        <?php html()->e( 'a', [ 'href' => action_url( $hidden ? 'show_checklist' : 'hide_checklist' ) ], $hidden ? __( 'Show', 'groundhogg' ) : __( 'Hide', 'groundhogg' ), false, true ); ?>
+	        </div>
         </div>
 		<?php
 
 		if ( $all_completed ):
             ?>
             <div class="inside checklist-complete">
+	            <?php
+	            html()->e( 'img', [
+	            	'src' => GROUNDHOGG_ASSETS_URL . 'images/phil-confetti.png'
+	            ], false, true, true )
+	            ?>
                 <p>🎉 <?php _e( "Yay! You finished the quickstart checklist! Groundhogg is now completely configured and you're ready to launch!", 'groundhogg' ); ?></p>
             </div>
             <?php

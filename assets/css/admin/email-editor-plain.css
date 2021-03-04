@@ -1,17 +1,21 @@
+
+
 #subject,
 #title,
 /*#alt-wrap,*/
-#pre_header{
+#preview-text{
     width: 100%;
     font-size:18px;
 }
 
 #subject{
+    padding-left: 80px;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
 }
 
-#pre_header{
+#preview-text{
+    padding-left: 80px;
     border-top-width: 0;
     border-top-right-radius: 0;
     border-top-left-radius: 0;
@@ -23,9 +27,16 @@
     margin-top: 20px;
 }
 
-/*#save{*/
-/*    padding: 10px;*/
-/*}*/
+#subject-wrap span{
+    position: relative;
+}
+
+#subject-wrap span label[for]{
+    position: absolute;
+    left: 10px;
+    top: -2px;
+    font-size: 16px;
+}
 
 .button .dashicons {
     vertical-align: middle;

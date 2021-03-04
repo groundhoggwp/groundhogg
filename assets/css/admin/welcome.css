@@ -133,3 +133,18 @@
 .onboarding-checklist .checklist-row .details{
     flex-grow: 1;
 }
+
+#checklist .inside.checklist-complete{
+    margin: auto;
+    max-width: 400px;
+    text-align: center;
+    padding-bottom: 30px;
+}
+
+#checklist .inside.checklist-complete p{
+    font-size: 16px;
+}
+
+.postbox-header .handle-actions{
+    margin-right: 10px;
+}

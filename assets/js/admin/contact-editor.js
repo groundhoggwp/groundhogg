@@ -73,7 +73,7 @@
         add_note()
       })
 
-      $('.contact-info-cards').sortable({
+      $('.contact-info-cards .meta-box-sortables').sortable({
         placeholder: 'sortable-placeholder',
         // connectWith: '.ui-sortable',
         handle: '.hndle',

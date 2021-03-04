@@ -69,7 +69,7 @@ ul.regular-list li {
     /*color: #1b1b1b;*/
 }
 
-.ic-section {
+.ic-section:not(:last-child) {
     /*background-color: #f1f1f1;*/
     /*padding: 10px;*/
     /*border: 1px solid #ccc;*/
