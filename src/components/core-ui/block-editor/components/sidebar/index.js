@@ -27,6 +27,7 @@ import {
   Card,
   Button,
   FormControl,
+  NativeSelect,
   FormHelperText,
   InputLabel,
   MenuItem,
@@ -37,6 +38,7 @@ import {
 /**
  * Internal dependencies
  */
+import ArrowDown from "components/svg/ArrowDown/";
 import Desktop from "components/svg/Desktop/";
 import Phone from "components/svg/Phone/";
 import AlignCenter from "components/svg/AlignCenter/";
@@ -61,13 +63,18 @@ const useStyles = makeStyles((theme) => ({
   },
   inputText: {
     width: "calc(100% - 10px)",
+    padding: '5px 0px 5px 17px',
     marginTop: "10px",
   },
   blockPanel: {
     marginTop: "20px",
+    overflow: "visible",
+    '&:last-of-type':{
+      paddingBottom: '20px'
+    }
   },
   emailControls: {
-    height: "261px",
+    height: "287px",
     padding: "10px 22px 0 22px",
   },
   sendTestButton: {
@@ -96,54 +103,72 @@ const useStyles = makeStyles((theme) => ({
     width: "115px",
   },
   alignmentBtn:{
+    display: 'inline-block',
     width: '27px',
     height: '27px',
-    borderRadius: '7px'
+    borderRadius: '7px',
+    margin: '15px 15px 34px 0px',
+    cursor: 'pointer'
   },
   messageTypeContainer: {
     display: "inline-block",
-    marginTop: "20px",
+    // marginTop: "20px",
+    '& select' : {
+      marginTop: '5px',
+      padding: '7px 74px 7px 17px',
+      border: '1.5px solid rgba(16, 38, 64, 0.1)'
+    }
+  },
+  selectMessageType : {
+    width: '100px',
+    padding: '7px 0px 7px 17px'
   },
   additionalInfoContainer: {
     fontSize: "12px",
-    width: "calc(100% + 44px)",
+    width: "calc(100% + 19px)",
     marginLeft: "-22px",
     borderRadius: "7px",
     padding:"10px 0 13px 25px",
     fontWeight: "600",
     background: "#E7EEFB",
-
+    cursor: 'pointer',
+    "& svg": {
+      float: 'right',
+      margin: '8px 25px'
+    },
   },
   blocksTitle:{
     display: 'block',
     fontSize: '18px',
     width: '50px',
     fontWeight: '500',
-    margin: '18px auto 5px auto'
+    margin: '18px auto 5px auto',
+    paddingTop: '20px'
 
   },
   block:{
     position: 'relative',
     display: 'inline-block',
     margin: '10px',
-    width: '84px',
-    height: '80px',
+    width: '82px',
+    height: '78px',
     border: '1.2px solid rgba(0, 117, 255, 0.2)',
     borderRadius: '5px',
     textAlign: 'center',
     fontWeight: '500',
-    // '& svg, & path':{
-    //   fill: '#0075FF',
-    //   stroke: '#0075FF'
-    // },
-    // '&:hover':{
-    //   color: '#fff',
-    //   background: '#0075FF'
-    // },
-    // '&:hover svg, &:hover path':{
-    //   fill: '#fff',
-    //   stroke: '#fff'
-    // }
+    color: '#102640',
+    '& svg, & path':{
+      stroke: '#102640'
+    },
+    '&:hover':{
+      color: '#fff',
+      background: '#0075FF'
+    },
+    '&:hover svg, &:hover path':{
+      stroke: '#fff',
+      fill: '#fff',
+      color: '#fff'
+    }
   },
   blockIcon: {
     margin: '15px 0 0 0',
@@ -153,7 +178,8 @@ const useStyles = makeStyles((theme) => ({
     position: 'absolute',
     bottom: '5px',
     width: '100%',
-    textAlign: 'center'
+    textAlign: 'center',
+    fontWeight: '500'
   }
 }));
 
@@ -195,11 +221,6 @@ const Sidebar = ({
     }
   };
 
-  // import BlocksDivider from "components/svg/block-editor/BlocksDivider/";
-  // import BlocksHeading from "components/svg/block-editor/BlocksHeading/";
-  // import BlocksImage from "components/svg/block-editor/BlocksImage/";
-  // import BlocksSpacer from "components/svg/block-editor/BlocksSpacer/";
-  // import BlocksText from "components/svg/block-editor/BlocksText/";
   const blockPanel = isInspecting ? (
     <InspectorSlot bubblesVirtually />
   ) : (
@@ -209,9 +230,7 @@ const Sidebar = ({
 
         const title = block.title.replace('Groundhogg - ', '')
 
-        console.log(title)
-
-        let icon = <BlocksDivider/>
+        let icon = <BlocksImage/>
         switch (title) {
           case 'Spacer':
             icon = <BlocksSpacer stroke={''} fill={'none'}/>
@@ -220,10 +239,10 @@ const Sidebar = ({
             icon = <BlocksDivider  stroke={''} fill={'#000'} fillSecondary={'#ccc'}/>
             break;
           case 'HTML':
-            icon = <BlocksDivider/>
+            icon = <BlocksImage/>
             break;
           case 'Button':
-            icon = <BlocksDivider/>
+            icon = <BlocksImage/>
             break;
           case 'Image':
             icon = <BlocksImage/>
@@ -253,6 +272,10 @@ const Sidebar = ({
       })}
     </>
   );
+
+  const toggleAdditionalInfoContainer = () => {
+
+  }
 
   // <PerfectScrollbar>
   // </PerfectScrollbar>
@@ -299,39 +322,31 @@ const Sidebar = ({
         <input
           className={classes.inputText}
           value={replyTo}
-          placeholder={"Reply to"}          
+          placeholder={"Reply to"}
           onChange={handleOnChange}
           fullWidth
         />
 
         <div className={classes.alignmentContainer}>
-          <div>{__("Alignment")}</div>
+          <div>{__("Alignment:")}</div>
           <span className={classes.alignmentBtn}><AlignLeft /></span>
           <span className={classes.alignmentBtn}><AlignCenter /></span>
         </div>
 
-        <FormControl className={classes.messageTypeContainer}>
-          <InputLabel shrink id="demo-simple-select-placeholder-label-label">
-            Message type:
-          </InputLabel>
-          <Select
-            labelId="demo-simple-select-placeholder-label-label"
-            id="demo-simple-select-placeholder-label"
-            value={5}
-            onChange={() => {}}
-            displayEmpty
-            className={classes.selectEmpty}
+        <div className={classes.messageTypeContainer}>
+          <div>{__("Message Type:")}</div>
+          <select
+            value={''}
+            onChange={()=>{}}
+            label=""
           >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value={10}>Marketing</MenuItem>
-          </Select>
-          <FormHelperText>Label + placeholder</FormHelperText>
-        </FormControl>
+            <option value={10}>none</option>
+            <option value={20}>Marketing</option>
+          </select>
+        </div>
 
         <div className={classes.additionalInfoContainer}>
-          <label>{__("Additional info:")}</label>
+          <label onClick={toggleAdditionalInfoContainer}>{__("Additional options:")} <ArrowDown/></label>
           <br />
         </div>
       </Card>

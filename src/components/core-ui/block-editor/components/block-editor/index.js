@@ -55,7 +55,7 @@ function BlockEditor({
   const useStyles = makeStyles((theme) => ({
     root: {
       position: "absolute",
-      top: "150px",
+      top: "332px",
       right: "0",
       bottom: "0",
       left: "0",
@@ -150,6 +150,8 @@ function BlockEditor({
       // }
     });
   });
+
+
 
   return (
     <div className={classes.root} ref={blockEditorEl}>

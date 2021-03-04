@@ -33,6 +33,7 @@ import {
 /**
  * External dependencies
  */
+ import { Card, TextField, FormControl, FormHelperText, FormControlLabel, Select, Switch, MenuItem } from "@material-ui/core";
  import { makeStyles } from "@material-ui/core/styles";
 import {
   InterfaceSkeleton,
@@ -41,6 +42,7 @@ import {
 } from "@wordpress/interface";
 import interact from "interactjs";
 import { DateTime } from "luxon";
+import { withStyles } from '@material-ui/core/styles';
 
 /**
  * Internal dependencies
@@ -53,12 +55,68 @@ import TextEditor from "./components/text-editor";
 import EditorSteps from "./components/editor-steps";
 import SimpleModal from "./components/Modal";
 import { getLuxonDate, matchEmailRegex } from "utils/index";
+import EditPen from "components/svg/EditPen/";
 
 import { CORE_STORE_NAME, EMAILS_STORE_NAME } from "data";
 
 let draggedBlockIndex = {};
 let draggedBlock = {};
 let startInteractJS = false;
+
+
+const IOSSwitch = withStyles((theme) => ({
+  root: {
+    width: 42,
+    height: 26,
+    padding: 0,
+    margin: theme.spacing(1),
+  },
+  switchBase: {
+    padding: 1,
+    '&$checked': {
+      transform: 'translateX(16px)',
+      color: theme.palette.common.white,
+      '& + $track': {
+        backgroundColor: '#52d869',
+        opacity: 1,
+        border: 'none',
+      },
+    },
+    '&$focusVisible $thumb': {
+      color: '#52d869',
+      border: '6px solid #fff',
+    },
+  },
+  thumb: {
+    width: 24,
+    height: 24,
+  },
+  track: {
+    borderRadius: 26 / 2,
+    border: `1px solid ${theme.palette.grey[400]}`,
+    backgroundColor: theme.palette.grey[50],
+    opacity: 1,
+    transition: theme.transitions.create(['background-color', 'border']),
+  },
+  checked: {},
+  focusVisible: {},
+}))(({ classes, ...props }) => {
+  return (
+    <Switch
+      focusVisibleClassName={classes.focusVisible}
+      disableRipple
+      classes={{
+        root: classes.root,
+        switchBase: classes.switchBase,
+        thumb: classes.thumb,
+        track: classes.track,
+        checked: classes.checked,
+      }}
+      {...props}
+    />
+  );
+});
+
 export default ({ document, history }) => {
   setDefaultBlockName("groundhogg/paragraph");
 
@@ -82,6 +140,8 @@ export default ({ document, history }) => {
   const [title, setTitle] = useState(defaultTitleValue);
   const [content, setContent] = useState(defaultContentValue);
   const [blocks, updateBlocks] = useState(parse(defaultContentValue));
+  const [subTitle, setSubTitle] = useState(defaultTitleValue);
+  const [disableSubTitle, setDisableSubTitle] = useState(false);
 
   // Modal
   const [open, setOpen] = useState(false);
@@ -209,35 +269,35 @@ export default ({ document, history }) => {
     let classToApply = '';
     let saveBlock = false
 
-    document.querySelectorAll('.wp-block').forEach((block, i)=>{
-      block.classList.remove('dragged-over-top')
+    // document.querySelectorAll('.wp-block').forEach((block, i)=>{
+      // block.classList.remove('dragged-over-top')
 
-      if(adjustedY >= block.getBoundingClientRect().top && adjustedY <= block.getBoundingClientRect().bottom ){
-        draggedBlockIndex = i
-        saveBlock = block
-        // if(block.getBoundingClientRect().bottom - block.getBoundingClientRect().top &&)
-      }
+      // if(adjustedY >= block.getBoundingClientRect().top && adjustedY <= block.getBoundingClientRect().bottom ){
+      //   draggedBlockIndex = i
+      //   saveBlock = block
+      //   // if(block.getBoundingClientRect().bottom - block.getBoundingClientRect().top &&)
+      // }
 
       // if(draggedBlock === 0){
       //   console.log(block, y, block.getBoundingClientRect().bottom)
       // }
-    })
+    // })
 
 
-    if(draggedBlockIndex === 0){
-      console.log(event.target)
-      return;
-    }
-    document.querySelectorAll('.wp-block')[draggedBlockIndex].classList.add('dragged-over-top');
+    // if(draggedBlockIndex === 0){
+    //   console.log(event.target)
+    //   return;
+    // }
+    // document.querySelectorAll('.wp-block')[draggedBlockIndex].classList.add('dragged-over-top');
   };
 
   const dragStartListener = (event) => {
     console.log('drag start', event)
-    document.querySelector('.interface-interface-skeleton__sidebar').scrollTop = 0;
-    document.querySelector('.interface-interface-skeleton__sidebar').classList.add("show-overflow");
+    // document.querySelector('.interface-interface-skeleton__sidebar').scrollTop = 0;
+    // document.querySelector('.interface-interface-skeleton__sidebar').classList.add("show-overflow");
   };
   const dragEndListener = (event) => {
-    document.querySelector('.interface-interface-skeleton__sidebar').classList.remove("show-overflow");
+    // document.querySelector('.interface-interface-skeleton__sidebar').classList.remove("show-overflow");
     const target = event.target;
 
     // keep the dragged position in the data-x/data-y attributes
@@ -343,6 +403,46 @@ export default ({ document, history }) => {
     contentMain:{
 
     },
+    sendEmailComponent:{
+      position: 'absolute',
+      top: '147px',
+      width: 'calc(100% - 412px)',
+      padding: '33px 25px 33px 25px'
+    },
+    sendEmailComponentLabel:{
+      color: '#0075FF',
+      fontSize: '16px',
+      fontWeight: '500'
+    },
+    newEmailButton:{
+      float: 'right'
+    },
+    sendEmailSelect:{
+      display: 'block',
+      width: 'calc(100% -40px)'
+    },
+    subTitleContainer: {
+      position: 'absolute',
+      top: '295px',
+      marginLeft: '20px',
+      "& label": {
+        fontSize: "12px",
+      },
+      "& svg": {
+        cursor: 'pointer',
+        marginTop: '10px'
+      },
+      '& input[type="text"], & input[type="text"]:focus': {
+        color: '#000',
+        background: 'none',
+        fontSize: "16px",
+        outline: "none",
+        border: "none",
+        boxShadow: "none",
+        padding: "0",
+        marginLeft: "-1px",
+      },
+    },
     contentSideBar:{
 
     },
@@ -352,6 +452,12 @@ export default ({ document, history }) => {
     }
 
   }));
+
+  const toggleSubTitle = () =>{
+    setDisableTitle(disableSubTitle ? false : true )
+  }
+
+
 
   const classes = useStyles();
 
@@ -418,6 +524,14 @@ export default ({ document, history }) => {
     setBlockChangeData(blockChangeData[newChangeTracker])
   }
 
+  const handleSubTitleChange = (e) => {
+    setSubTitle(e.target.value)
+  }
+
+  const toggleSubTitleDisable = () => {
+    setDisableSubTitle(disableSubTitle ? false : true)
+  }
+
   // console.log('rebuild', blocks)
 
   return (
@@ -447,6 +561,39 @@ export default ({ document, history }) => {
               <div className={classes.content}>
                   {/*Notices probably needs to be re-wrote*/}
                   <Notices />
+                  <Card className={classes.sendEmailComponent}>
+                  <div className={classes.sendEmailComponentLabel}>Select an email to send:</div>
+
+                  <div className={classes.newEmailButton}>
+                    <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1.56641" y="0.75" width="14.0265" height="14.5" rx="3.25" fill="white" stroke="#0075FF" stroke-width="1.5"/>
+                    </svg>
+                    new email
+                  </div>
+
+                  <select
+                    className={classes.sendEmailSelect}
+                    value={''}
+                    onChange={()=>{}}
+                    label=""
+                  >
+                    <option value={10}>none</option>
+                    <option value={20}>Marketing</option>
+                  </select>
+
+                  <div>Skip email step if confirmed:</div>
+                  <IOSSwitch checked={false} onChange={()=>{}} name="checkedB" />
+                  </Card>
+                  <div className={classes.subTitleContainer}>
+                    <TextField
+                      label=""
+                      value={subTitle}
+                      onChange={handleSubTitleChange}
+                      InputProps={{ disableUnderline: true, disabled: disableSubTitle }}
+                    />
+                    <EditPen onClick={toggleSubTitleDisable}/>
+                  </div>
+
                   {editorPanel}
               </div>
 
@@ -460,7 +607,7 @@ export default ({ document, history }) => {
 
         {/* formatting is off not working lets hide until its good
           <div className={classes.contentFooter}>
-          <Panel header={__("Blocks")} style={{marginTop:'500px'}}>            
+          <Panel header={__("Blocks")} style={{marginTop:'500px'}}>
             <PanelBody title="My Block Settings"  initialOpen={ true } style={{backgroundColor:'#ccc'}}>
                 <PanelRow>My Panel Inputs and Labels</PanelRow>
             </PanelBody>

@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
     overflow: "visible",
     borderRadius: "5px",
     margin: "20px",
-    width: "calc(100%)",
+    width: "calc(100% - 26px)",
     overflow: "visible",
     padding: "23px 0px 28px 5px",
   },
