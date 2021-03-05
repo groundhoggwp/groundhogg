@@ -414,7 +414,7 @@ class Welcome_Page extends Admin_Page {
 
 						echo html()->e( 'a', [
 							'class' => 'button big-button',
-							'href'  => admin_page_url( 'gh_tools', [ 'tab' => 'cron_setup' ] )
+							'href'  => admin_page_url( 'gh_tools', [ 'tab' => 'cron' ] )
 						], __( 'Configure WP-Cron!' ) );
 
 						echo html()->e( 'a', [

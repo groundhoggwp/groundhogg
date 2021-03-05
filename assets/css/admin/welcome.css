@@ -148,3 +148,7 @@
 .postbox-header .handle-actions{
     margin-right: 10px;
 }
+
+.postbox.closed .checklist-row{
+    display: none;
+}

@@ -95,6 +95,7 @@ switch ( $step ):
                 <p><input type="text" class="code regular-text" onfocus="this.select()"
                           value="<?php esc_attr_e( home_url( 'wp-cron.php' ) ); ?>" readonly>
                 </p>
+	            <?php do_action( 'groundhogg/admin/tools/cron/create_external_jobs' ); ?>
                 <hr/>
                 <p><?php _e( 'Not sure how to create an external cron job?', 'groundhogg' ); ?></p>
                 <ul style="list-style-type: disc; padding-left: 20px">
@@ -139,13 +140,15 @@ switch ( $step ):
 				<?php endif; ?>
 				<?php if ( ! $wp_cron_setup ): ?>
                     <p>❌ <?php _e( "It looks like your WordPress cron job isn't working.", 'groundhogg' ); ?></p>
-                    <p><input type="text" class="code regular-text" onfocus="this.select()"
+					<p><?php _e( 'This cron job is for <b>WordPress core</b> and other plugins, and should execute <code>every 15 minutes</code>', 'groundhogg' ); ?></p>
+					<p><input type="text" class="code regular-text" onfocus="this.select()"
                               value="<?php esc_attr_e( home_url( 'wp-cron.php' ) ); ?>" readonly>
                     </p>
 				<?php else: ?>
                     <p>✅️ <?php _e( "Success! Your WordPress cron job is working.", 'groundhogg' ); ?></p>
 				<?php endif; ?>
-                <hr/>
+	            <?php do_action( 'groundhogg/admin/tools/cron/verify' ); ?>
+	            <hr/>
 				<?php if ( $gh_cron_setup && $wp_cron_setup ): ?>
                     <p>
                         🎉 <?php _e( "Yay! You have successfully configured your cron jobs! That wasn't so hard was it?", 'groundhogg' ); ?></p>
