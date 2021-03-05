@@ -1104,7 +1104,7 @@ class Settings_Page extends Admin_Page {
 				'id'      => 'gh_url_tracking_exclusions',
 				'section' => 'tracking',
 				'label'   => _x( 'Tracking URL Exclusions', 'settings', 'groundhogg' ),
-				'desc'    => sprintf( _x( '<pre>%s</pre> URLs containing these strings will not be tracked. For example, adding <code>/my-page/</code> would exclude <code>%s/my-page/download/</code>. You can also enter full URLs and URLs of other domains such as <code>https://wordpress.org</code>. To match an exact path use <code>$</code> at the end of the path.', 'settings', 'groundhogg' ), get_url_exclusions_regex(), site_url() ),
+				'desc'    => sprintf( _x( 'URLs containing these strings will not be tracked. For example, adding <code>/my-page/</code> would exclude <code>%s/my-page/download/</code>. You can also enter full URLs and URLs of other domains such as <code>https://wordpress.org</code>. To match an exact path use <code>$</code> at the end of the path.', 'settings', 'groundhogg' ), site_url() ),
 				'type'    => 'textarea',
 				'atts'    => array(
 					'name' => 'gh_url_tracking_exclusions',

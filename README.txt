@@ -125,7 +125,7 @@ From 👨 **[Jonathan Denwood](https://wordpress.org/support/topic/great-crm-pro
 
 > Adrian and his team have really built a great WordPress based CRM that’s really competitive with the big guys like ActiveCampagin. I would highly recommend it to anybody who is running WordPress.
 
-There are over [71 ⭐⭐⭐⭐⭐ reviews](https://wordpress.org/support/plugin/groundhogg/reviews/?filter=5) for Groundhogg on WordPress.org and even [more reviews on our Facebook Page](https://www.facebook.com/groundhoggwp/reviews/)!
+There are over [88 ⭐⭐⭐⭐⭐ reviews](https://wordpress.org/support/plugin/groundhogg/reviews/?filter=5) for Groundhogg on WordPress.org and even [more reviews on our Facebook Page](https://www.facebook.com/groundhoggwp/reviews/)!
 
 ## Features
 
@@ -325,11 +325,13 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 * ADDED Initial framework for the search filters API, a way to create advanced contact searches in 3.0.
 * ADDED Warning when admin users are logged in on the preferences screen when trying to manage someone else's preferences.
 * ADDED Optin Status, Contact Owner, Primary and Mobile Phone to the contact quick edit.
+* TWEAKED Improved the cron setup screen, made it a default suggestion, method to verify setup was done correctly.
 * TWEAKED Replacements now support Group, Name, and Default Arg attributes when registering.
 * TWEAKED Merged segmentation and general info tab, moved all editable fields to the general tab from the details card.
 * TWEAKED Refactored contact notes as an info card widget.
 * TWEAKED Refactored contact files as an info card widget.
 * TWEAKED Merged Install & Updates tabs in the tools screen.
+* TWEAKED Improved method of dequeueing styles on the managed pages.
 * FIXED Typo in filter of title actions.
 * FIXED PHP Warnings & Notices during uninstall.
 * FIXED Dequeue Avada theme styles on the managed page.

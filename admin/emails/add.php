@@ -169,7 +169,7 @@ function get_dummy_text() {
                 </div>
 
                 <div id="subject-wrap">
-                    <h3><?php _e( 'Subject & Pre-Header', 'groundhogg' ); ?></h3>
+                    <h3><?php _e( 'Subject & Preview', 'groundhogg' ); ?></h3>
                     <!-- Subject Line -->
 	                <span>
 	                <label for="subject"><?php _e( 'Subject:', 'groundhogg' ); ?></label>

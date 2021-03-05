@@ -9,7 +9,6 @@
 
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
-use function Groundhogg\extrapolate_wp_mail_plugin;
 use function Groundhogg\files;
 use function Groundhogg\get_db;
 use function Groundhogg\gh_cron_installed;
@@ -99,8 +98,6 @@ $checklist_items = [
 $all_completed = array_reduce( $checklist_items, function ( $carry, $item ) {
 	return $carry && $item['completed'];
 }, true );
-
-$all_completed = true;
 
 $hidden = get_user_option( 'gh_hide_groundhogg_quickstart' ) !== false;
 

@@ -454,3 +454,8 @@ table.wp-list-table.funnels td.column-active_contacts {
 .wp-core-ui table td select{
     max-width: 100%;
 }
+
+.wp-list-table#updates-list th:first-child,
+.wp-list-table#updates-list th:nth-child(2){
+    width: 100px;
+}

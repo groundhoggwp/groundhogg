@@ -102,9 +102,9 @@ abstract class Updater {
 		html()->list_table( [
             'id' => 'updates-list'
         ], [
-            __( 'Completed' ),
-            __( 'version' ),
-            __( 'Description' ),
+            __( 'Completed', 'groundhogg' ),
+            __( 'Version', 'groundhogg' ),
+            __( 'Description', 'groundhogg' ),
         ],
             array_map_with_keys( array_reverse( $updates ), function ( $update ) use ( $_this ){
                 return [
