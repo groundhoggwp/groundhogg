@@ -126,7 +126,7 @@ class Activity extends DB {
 		);
 
 		if ( isset_not_empty( $data, 'referer' ) ) {
-			$data['referer_hash'] = generate_referer_hash( $data[ 'referer' ] );
+			$data['referer_hash'] = generate_referer_hash( $data['referer'] );
 		}
 
 		return $this->insert( $data );
@@ -142,7 +142,7 @@ class Activity extends DB {
 	public function update( $row_id = 0, $data = [], $where = [] ) {
 
 		if ( isset_not_empty( $data, 'referer' ) ) {
-			$data['referer_hash'] =  generate_referer_hash( $data[ 'referer' ] );
+			$data['referer_hash'] = generate_referer_hash( $data['referer'] );
 		}
 
 		return parent::update( $row_id, $data, $where );
@@ -188,7 +188,7 @@ class Activity extends DB {
 	/**
 	 * Set the referer hash as aan easier method to search thru the activity
 	 */
-	public function update_2_2(){
+	public function update_2_2() {
 		global $wpdb;
 		$result = $wpdb->query( "UPDATE `{$this->get_table_name()}` SET `referer_hash` = SUBSTR( MD5(`referer`), 1, 20) WHERE `referer` != '';" );
 	}

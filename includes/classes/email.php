@@ -497,7 +497,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return false|string
 	 */
 	public function get_unsubscribe_link( $url = '' ) {
-		$url = is_option_enabled( 'gh_enable_one_click_unsubscribe' ) ?  managed_page_url( 'preferences/unsubscribe' ) : managed_page_url( 'preferences/manage' );
+		$url = is_option_enabled( 'gh_enable_one_click_unsubscribe' ) ? managed_page_url( 'preferences/unsubscribe' ) : managed_page_url( 'preferences/manage' );
 
 		// only add permissions key if this is a real email being sent.
 		if ( ! $this->is_testing() && ! is_user_logged_in() ) {
@@ -618,13 +618,9 @@ class Email extends Base_Object_With_Meta {
 	public function get_from_name() {
 		if ( $this->get_from_user() ) {
 			return $this->get_from_user()->display_name;
-		}
-
-		else if ( $this->get_contact()->get_ownerdata() ) {
+		} else if ( $this->get_contact()->get_ownerdata() ) {
 			return $this->get_contact()->get_ownerdata()->display_name;
-		}
-
-		else if ( get_primary_owner() ) {
+		} else if ( get_primary_owner() ) {
 			return get_primary_owner()->display_name;
 		}
 
@@ -640,13 +636,9 @@ class Email extends Base_Object_With_Meta {
 	public function get_from_email() {
 		if ( $this->get_from_user() ) {
 			return $this->get_from_user()->user_email;
-		}
-
-		else if ( $this->get_contact()->get_ownerdata() ) {
+		} else if ( $this->get_contact()->get_ownerdata() ) {
 			return $this->get_contact()->get_ownerdata()->user_email;
-		}
-
-		else if ( get_primary_owner() ) {
+		} else if ( get_primary_owner() ) {
 			return get_primary_owner()->user_email;
 		}
 
@@ -685,14 +677,14 @@ class Email extends Base_Object_With_Meta {
 		}
 
 		$defaults = [
-			'from'                  => sprintf( '%s <%s>', wp_specialchars_decode( $this->get_from_name() ), $this->get_from_email() ),
-			'reply-to'              => $this->get_reply_to_address(),
-			'return-path'           => is_email( get_return_path_email() ) ? get_return_path_email() : $this->get_from_email(),
-			'content-type'          => 'text/html; charset=UTF-8',
+			'from'         => sprintf( '%s <%s>', wp_specialchars_decode( $this->get_from_name() ), $this->get_from_email() ),
+			'reply-to'     => $this->get_reply_to_address(),
+			'return-path'  => is_email( get_return_path_email() ) ? get_return_path_email() : $this->get_from_email(),
+			'content-type' => 'text/html; charset=UTF-8',
 		];
 
 		// Do not add this header to transactional emails or if the header is disabled in the settings.
-		if ( ! $this->is_transactional() && ! is_option_enabled( 'gh_disable_unsubscribe_header' ) ){
+		if ( ! $this->is_transactional() && ! is_option_enabled( 'gh_disable_unsubscribe_header' ) ) {
 
 			$list_unsub_header = sprintf(
 				'<%s>,<mailto:%s?subject=Unsubscribe %s from %s>',
@@ -704,8 +696,8 @@ class Email extends Base_Object_With_Meta {
 				get_bloginfo()
 			);
 
-			$defaults[ 'list-unsubscribe' ] = $list_unsub_header;
-			$defaults[ 'list-unsubscribe-post' ] = 'List-Unsubscribe=One-Click';
+			$defaults['list-unsubscribe']      = $list_unsub_header;
+			$defaults['list-unsubscribe-post'] = 'List-Unsubscribe=One-Click';
 		}
 
 		// Merge the custom headers with the defaults...

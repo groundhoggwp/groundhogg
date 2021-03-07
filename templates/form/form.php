@@ -10,7 +10,7 @@
  */
 $form_id = get_query_var( 'form_id' );
 
-$step = \Groundhogg\Plugin::$instance->utils->get_step( $form_id );
+$step = \Groundhogg\new Step( $form_id );
 
 if ( ! $step ){
     wp_die( 'No form found...' );

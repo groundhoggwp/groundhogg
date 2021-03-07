@@ -103,7 +103,8 @@ class Broadcasts extends DB {
 	 * @return int
 	 */
 	public function add( $data = array() ) {
-		$data[ 'query' ] = maybe_serialize( $data[ 'query' ] );
+		$data['query'] = maybe_serialize( $data['query'] );
+
 		return parent::add( $data );
 	}
 
@@ -113,8 +114,9 @@ class Broadcasts extends DB {
 	 * @return object
 	 */
 	public function get( $row_id ) {
-		$data = parent::get( $row_id );
+		$data        = parent::get( $row_id );
 		$data->query = maybe_unserialize( $data->query );
+
 		return $data;
 	}
 

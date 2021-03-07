@@ -170,14 +170,14 @@ class Contacts extends DB {
 	 * Insert a new contact
 	 *
 	 * @access  public
-	 * @since   2.1
 	 * @return  int
+	 * @since   2.1
 	 */
 	public function insert( $data ) {
 		$result = parent::insert( $data );
 
 		if ( $result ) {
-			$this->set_last_changed();
+			$this->cache_set_last_changed();
 		}
 
 		return $result;
@@ -187,8 +187,8 @@ class Contacts extends DB {
 	 * Update a contact
 	 *
 	 * @access  public
-	 * @since   2.1
 	 * @return  bool
+	 * @since   2.1
 	 */
 	public function update( $row_id = 0, $data = [], $where = [] ) {
 
@@ -206,7 +206,7 @@ class Contacts extends DB {
 		$result = parent::update( $row_id, $data, $where );
 
 		if ( $result ) {
-			$this->set_last_changed();
+			$this->cache_set_last_changed();
 		}
 
 		return $result;
@@ -268,12 +268,13 @@ class Contacts extends DB {
 	 * Retrieves a single contact from the database
 	 *
 	 * @access public
-	 * @since  2.3
 	 *
 	 * @param string $field id or email
-	 * @param mixed  $value The Customer ID or email to search
+	 * @param mixed $value The Customer ID or email to search
 	 *
 	 * @return mixed          Upon success, an object of the contact. Upon failure, NULL
+	 * @since  2.3
+	 *
 	 */
 	public function get_contact_by( $field = 'ID', $value = 0 ) {
 		if ( empty( $field ) || empty( $value ) ) {
@@ -286,7 +287,7 @@ class Contacts extends DB {
 	/**
 	 * Use contact query calss
 	 *
-	 * @param array  $data
+	 * @param array $data
 	 * @param string $order
 	 *
 	 * @return array|bool|object|null
@@ -336,11 +337,12 @@ class Contacts extends DB {
 	 * This method ensures that old arguments transition seamlessly to the new system.
 	 *
 	 * @access protected
-	 * @since  2.8
 	 *
 	 * @param array $args Arguments for `WPGH_Contact_Query`.
 	 *
 	 * @return array Prepared arguments.
+	 * @since  2.8
+	 *
 	 */
 	protected function prepare_contact_query_args( $args ) {
 		if ( ! empty( $args['ID'] ) ) {

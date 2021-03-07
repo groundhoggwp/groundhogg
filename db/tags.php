@@ -229,12 +229,13 @@ class Tags extends DB {
 	 * Retrieves a single tag from the database
 	 *
 	 * @access public
-	 * @since  2.3
 	 *
 	 * @param string $field id or email
-	 * @param mixed  $value The Customer ID or email to search
+	 * @param mixed $value The Customer ID or email to search
 	 *
 	 * @return mixed          Upon success, an object of the tag. Upon failure, NULL
+	 * @since  2.3
+	 *
 	 */
 	public function get_tag_by( $field = 'tag_id', $value = 0 ) {
 		if ( empty( $field ) || empty( $value ) ) {

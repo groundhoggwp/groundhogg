@@ -474,7 +474,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 *
 	 * @return array
 	 */
-	public function toArray(){
+	public function toArray() {
 		return $this->get_as_array();
 	}
 

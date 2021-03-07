@@ -100,7 +100,7 @@ abstract class DB {
 		 * Filter the table name...
 		 *
 		 * @param string $table_name
-		 * @param DB     $db
+		 * @param DB $db
 		 */
 		$this->table_name = apply_filters( 'groundhogg/db/render_table_name', $table_name, $this );
 	}
@@ -124,9 +124,9 @@ abstract class DB {
 	/**
 	 * Check if the site is global multisite enabled
 	 *
-	 * @deprecated
 	 * @return bool
 	 *
+	 * @deprecated
 	 */
 	private function is_global_multisite() {
 		return false;
@@ -207,7 +207,7 @@ abstract class DB {
 	/**
 	 * Gets the max index length
 	 */
-	public function get_max_index_length(){
+	public function get_max_index_length() {
 		return $this->get_charset() === 'utf8mb4' ? 191 : 255;
 	}
 
@@ -269,8 +269,8 @@ abstract class DB {
 	 * Whitelist of columns
 	 *
 	 * @access  public
-	 * @since   2.1
 	 * @return  array
+	 * @since   2.1
 	 */
 	public function get_columns() {
 		return [];
@@ -279,7 +279,7 @@ abstract class DB {
 	/**
 	 * Create a where clause given an array
 	 *
-	 * @param array  $args
+	 * @param array $args
 	 * @param string $operator
 	 *
 	 * @return string
@@ -332,41 +332,65 @@ abstract class DB {
 	 * Retrieve a row by the primary key
 	 *
 	 * @access  public
-	 * @since   2.1
 	 * @return  object
+	 * @since   2.1
 	 */
 	public function get( $row_id ) {
-		global $wpdb;
-
-		return apply_filters( 'groundhogg/db/get/' . $this->get_object_type(), $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $this->table_name WHERE $this->primary_key = %s LIMIT 1;", $row_id ) ) );
+		return $this->get_by( $this->primary_key, $row_id );
 	}
 
 	/**
 	 * Retrieve a row by a specific column / value
 	 *
 	 * @access  public
-	 * @since   2.1
 	 * @return  object
+	 * @since   2.1
 	 */
 	public function get_by( $column, $row_id ) {
 		global $wpdb;
 		$column = esc_sql( $column );
 
-		return apply_filters( 'groundhogg/db/get/' . $this->get_object_type(), $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $this->table_name WHERE $column = %s LIMIT 1;", $row_id ) ) );
+		$cache_key   = "$column:$row_id";
+		$cache_value = $this->cache_get( $cache_key );
+
+		if ( $cache_value ) {
+			return $cache_value;
+		}
+
+		$results = apply_filters( 'groundhogg/db/get/' . $this->get_object_type(), $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $this->table_name WHERE $column = %s LIMIT 1;", $row_id ) ) );
+
+		$this->cache_set( $cache_key, $results );
+
+		return $results;
 	}
 
 	/**
 	 * Retrieve a specific column's value by the primary key
 	 *
 	 * @access  public
-	 * @since   2.1
 	 * @return  string
+	 * @since   2.1
 	 */
 	public function get_column( $column, $row_id ) {
 		global $wpdb;
 		$column = esc_sql( $column );
 
 		return apply_filters( 'groundhogg/db/get_column/' . $this->get_object_type(), $wpdb->get_var( $wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $this->primary_key = %s LIMIT 1;", $row_id ) ) );
+	}
+
+	/**
+	 * Retrieve a specific column's value by the the specified column / value
+	 *
+	 * @access  public
+	 * @return  string
+	 * @since   2.1
+	 */
+	public function get_column_by( $column, $column_where, $column_value ) {
+		global $wpdb;
+		$column_where = esc_sql( $column_where );
+		$column       = esc_sql( $column );
+
+		return apply_filters( 'groundhogg/db/get_column/' . $this->get_object_type(), $wpdb->get_var( $wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $column_where = %s LIMIT 1;", $column_value ) ) );
 	}
 
 	/**
@@ -389,8 +413,8 @@ abstract class DB {
 	 * Default column values
 	 *
 	 * @access  public
-	 * @since   2.1
 	 * @return  array
+	 * @since   2.1
 	 */
 	public function get_column_defaults() {
 		return [];
@@ -400,8 +424,8 @@ abstract class DB {
 	 * Insert a new row
 	 *
 	 * @access  public
-	 * @since   2.1
 	 * @return  int
+	 * @since   2.1
 	 */
 	public function insert( $data ) {
 		global $wpdb;
@@ -430,7 +454,7 @@ abstract class DB {
 		$wpdb_insert_id = $wpdb->insert_id;
 
 		if ( $wpdb_insert_id ) {
-			$this->set_last_changed();
+			$this->cache_set_last_changed();
 		}
 
 		do_action( 'groundhogg/db/post_insert/' . $this->get_object_type(), $wpdb_insert_id, $data );
@@ -444,8 +468,35 @@ abstract class DB {
 	 * @access public
 	 * @since  2.8
 	 */
-	public function set_last_changed() {
+	public function cache_set_last_changed() {
 		wp_cache_set( 'last_changed', microtime(), $this->get_cache_group() );
+	}
+
+	/**
+	 * Get the results from the cache
+	 *
+	 * @param $cache_key
+	 *
+	 * @return false|mixed
+	 */
+	public function cache_get( $cache_key ) {
+		$last_changed = $this->get_last_changed();
+		$cache_key    = "$cache_key:$last_changed";
+		return wp_cache_get( $cache_key, $this->get_cache_group() );
+	}
+
+	/**
+	 * Set the value in the cache
+	 *
+	 * @param $cache_key
+	 * @param $results
+	 *
+	 * @return bool
+	 */
+	public function cache_set( $cache_key, $results ){
+		$last_changed = $this->get_last_changed();
+		$cache_key    = "$cache_key:$last_changed";
+		return wp_cache_set( $cache_key, $results, $this->get_cache_group() );
 	}
 
 	/**
@@ -461,8 +512,8 @@ abstract class DB {
 	 * Update a row
 	 *
 	 * @access  public
-	 * @since   2.1
 	 * @return  bool
+	 * @since   2.1
 	 */
 	public function update( $row_id = 0, $data = [], $where = [] ) {
 
@@ -499,7 +550,7 @@ abstract class DB {
 			return false;
 		}
 
-		$this->set_last_changed();
+		$this->cache_set_last_changed();
 
 		do_action( 'groundhogg/db/post_update/' . $this->get_object_type(), $where );
 
@@ -535,6 +586,8 @@ abstract class DB {
 			return false;
 		}
 
+		$this->cache_set_last_changed();
+
 		do_action( 'groundhogg/db/post_mass_update/' . $this->get_object_type(), $data );
 
 		return true;
@@ -563,6 +616,8 @@ abstract class DB {
 
 		do_action( 'groundhogg/db/post_bulk_delete/' . $this->get_object_type(), $where );
 
+		$this->cache_set_last_changed();
+
 		return $result;
 	}
 
@@ -570,8 +625,8 @@ abstract class DB {
 	 * Delete a row identified by the primary key
 	 *
 	 * @access  public
-	 * @since   2.1
 	 * @return  bool
+	 * @since   2.1
 	 */
 	public function delete( $row_id = 0 ) {
 
@@ -590,7 +645,7 @@ abstract class DB {
 			return false;
 		}
 
-		$this->set_last_changed();
+		$this->cache_set_last_changed();
 
 		do_action( 'groundhogg/db/post_delete/' . $this->get_object_type(), $row_id );
 
@@ -627,9 +682,9 @@ abstract class DB {
 	}
 
 	/**
-	 * @param array        $data
+	 * @param array $data
 	 * @param string|false $ORDER_BY
-	 * @param bool         $from_cache
+	 * @param bool $from_cache
 	 *
 	 * @return array|bool|null|object
 	 */
@@ -718,18 +773,15 @@ abstract class DB {
 	 * New and improved query function to access DB in more complex and interesting ways.
 	 *
 	 * @param array $query_vars
-	 * @param bool  $from_cache
+	 * @param bool $from_cache
 	 *
 	 * @return object[]|array[]|int
 	 */
 	public function advanced_query( $query_vars = [], $from_cache = true ) {
 
-		$key = md5( serialize( $query_vars ) );
+		$cache_key = md5( serialize( $query_vars ) );
 
-		$last_changed = $this->get_last_changed();
-
-		$cache_key   = "query:$key:$last_changed";
-		$cache_value = wp_cache_get( $cache_key, $this->get_cache_group() );
+		$cache_value = $this->cache_get( $cache_key );
 
 		if ( $cache_value && $from_cache !== false ) {
 			return $cache_value;
@@ -756,7 +808,7 @@ abstract class DB {
 
 		$results = apply_filters( 'groundhogg/db/query/' . $this->get_object_type(), $results, $query_vars );
 
-		wp_cache_add( $cache_key, $cache_value, $this->get_cache_group() );
+		$this->cache_set( $cache_key, $results );
 
 		return $results;
 	}
@@ -1012,21 +1064,6 @@ abstract class DB {
 	}
 
 	/**
-	 * Retrieve a specific column's value by the the specified column / value
-	 *
-	 * @access  public
-	 * @since   2.1
-	 * @return  string
-	 */
-	public function get_column_by( $column, $column_where, $column_value ) {
-		global $wpdb;
-		$column_where = esc_sql( $column_where );
-		$column       = esc_sql( $column );
-
-		return apply_filters( 'groundhogg/db/get_column/' . $this->get_object_type(), $wpdb->get_var( $wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $column_where = %s LIMIT 1;", $column_value ) ) );
-	}
-
-	/**
 	 * @param array $args
 	 *
 	 * @return int
@@ -1083,8 +1120,8 @@ abstract class DB {
 	/**
 	 * Check if the table was ever installed
 	 *
-	 * @since  2.4
 	 * @return bool Returns if the contacts table was installed and upgrade routine run
+	 * @since  2.4
 	 */
 	public function installed() {
 		return $this->table_exists( $this->table_name );
@@ -1093,11 +1130,11 @@ abstract class DB {
 	/**
 	 * Check if the given table exists
 	 *
-	 * @since  2.4
-	 *
 	 * @param string $table The table name
 	 *
 	 * @return bool          If the table name exists
+	 * @since  2.4
+	 *
 	 */
 	public function table_exists( $table ) {
 		global $wpdb;

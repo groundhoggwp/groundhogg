@@ -6,7 +6,7 @@ use Groundhogg\Base_Object;
 use Groundhogg\DB\DB;
 use function Groundhogg\get_db;
 
-class Note extends Base_Object{
+class Note extends Base_Object {
 
 	protected function post_setup() {
 		// TODO: Implement post_setup() method.

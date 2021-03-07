@@ -302,8 +302,8 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 //			'email_id'   => $email_id
 		] );
 
-		$data['id'] = $this->get_id();
-		$data[ 'email_id' ] = $email_id ;
+		$data['id']       = $this->get_id();
+		$data['email_id'] = $email_id;
 
 		if ( $this->is_sent() ) {
 

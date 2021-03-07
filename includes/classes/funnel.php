@@ -78,10 +78,11 @@ class Funnel extends Base_Object_With_Meta {
 
 			$last = array_pop( $steps );
 
-			if ($last){
+			if ( $last ) {
 
 				return $last->get_id();
 			}
+
 			return 0;
 
 		}
@@ -268,7 +269,7 @@ class Funnel extends Base_Object_With_Meta {
 			$step->import( $import_args );
 
 			// The screen will be blank, so set the first step to active
-			if ( $i === 0 && is_white_labeled() ){
+			if ( $i === 0 && is_white_labeled() ) {
 				$step->update_meta( 'is_active', true );
 			}
 

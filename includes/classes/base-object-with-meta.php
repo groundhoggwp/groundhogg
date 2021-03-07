@@ -194,7 +194,7 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	 */
 	public function get_as_array() {
 		return apply_filters( "groundhogg/{$this->get_object_type()}/get_as_array", [
-			'ID'    => $this->get_id(),
+			'ID'   => $this->get_id(),
 			'data' => $this->data,
 			'meta' => $this->meta
 		] );

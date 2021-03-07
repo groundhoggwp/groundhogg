@@ -15,7 +15,7 @@ class Email_Log_Item extends Base_Object {
 			'retries'
 		];
 
-		foreach ( $int_props as $prop ){
+		foreach ( $int_props as $prop ) {
 			$this->$prop = intval( $this->$prop );
 		}
 
@@ -38,7 +38,7 @@ class Email_Log_Item extends Base_Object {
 		// Compile headers!
 		$headers = [];
 
-		foreach ( $this->headers as $header ){
+		foreach ( $this->headers as $header ) {
 			$headers[] = sprintf( "%s: %s\n", $header[0], $header[1] );
 		}
 
@@ -53,7 +53,7 @@ class Email_Log_Item extends Base_Object {
 	/**
 	 * @param $logger Email_Logger
 	 */
-	public function setup_email_logger_with_this( $logger ){
+	public function setup_email_logger_with_this( $logger ) {
 		$logger->set_log( $this );
 	}
 

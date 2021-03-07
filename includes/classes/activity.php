@@ -9,12 +9,12 @@ use Groundhogg\DB\Meta_DB;
 use function Groundhogg\get_db;
 
 class Activity extends Base_Object_With_Meta {
-	const EMAIL_OPENED    = 'email_opened';
-	const EMAIL_CLICKED   = 'email_link_click';
+	const EMAIL_OPENED = 'email_opened';
+	const EMAIL_CLICKED = 'email_link_click';
 	const FORM_IMPRESSION = 'form_impression';
 	const FORM_SUBMISSION = 'form_submission';
-	const UNSUBSCRIBED    = 'unsubscribed';
-	const PAGE_VIEW       = 'page_view';
+	const UNSUBSCRIBED = 'unsubscribed';
+	const PAGE_VIEW = 'page_view';
 
 	/**
 	 * Do any post setup actions.
@@ -29,7 +29,7 @@ class Activity extends Base_Object_With_Meta {
 		return absint( $this->timestamp );
 	}
 
-	public function get_time(){
+	public function get_time() {
 		return $this->get_timestamp();
 	}
 
