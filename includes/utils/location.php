@@ -517,14 +517,18 @@ class Location {
 		if ( filter_var( $ip, FILTER_VALIDATE_IP ) === false ) {
 			$ip = $_SERVER["REMOTE_ADDR"];
 			if ( $deep_detect ) {
-				if ( filter_var( @$_SERVER['HTTP_X_FORWARDED_FOR'], FILTER_VALIDATE_IP ) ) {
-					$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-				}
-				if ( filter_var( @$_SERVER['HTTP_CLIENT_IP'], FILTER_VALIDATE_IP ) ) {
-					$ip = $_SERVER['HTTP_CLIENT_IP'];
-				}
-				if ( filter_var( @$_SERVER['HTTP_CF_CONNECTING_IP'], FILTER_VALIDATE_IP ) ) {
-					$ip = $_SERVER['HTTP_CF_CONNECTING_IP'];
+
+				$IP_Alias = [
+					'HTTP_X_FORWARDED_FOR',
+					'HTTP_CLIENT_IP',
+					'HTTP_CF_CONNECTING_IP'
+				];
+
+				foreach ( $IP_Alias as $alias ) {
+					$alias_ip = get_array_var( $_SERVER, $alias );
+					if ( $alias_ip && filter_var( $alias_ip, FILTER_VALIDATE_IP ) ) {
+						$ip = $alias_ip;
+					}
 				}
 			}
 		}

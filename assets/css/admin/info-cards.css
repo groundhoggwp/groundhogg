@@ -98,7 +98,7 @@ ul.regular-list li {
     padding: 0 6px 10px 0;
 }
 
-.ic-section > .ic-section-header:after{
+.ic-section > .ic-section-header:after {
     float: right;
     content: "\f140";
     display: inline-block;
@@ -109,7 +109,7 @@ ul.regular-list li {
     text-decoration: none;
 }
 
-.ic-section.open > .ic-section-header:after{
+.ic-section.open > .ic-section-header:after {
     content: "\f142";
 }
 
@@ -342,4 +342,21 @@ ul.regular-list li {
 #personal-email-form .replacements-dropdown-wrap {
     margin-bottom: 10px;
     /*text-align: right;*/
+}
+
+.section.inline-label {
+    position: relative;
+}
+
+.section.inline-label label[for] {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    color: #aaaaaa;
+}
+
+.section.inline-label input,
+.section.inline-label select {
+    padding-left: 30px;
+    width: 100%;
 }

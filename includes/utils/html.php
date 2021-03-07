@@ -617,9 +617,9 @@ class HTML {
 		$a = wp_parse_args( $args, array(
 			'name'        => '',
 			'id'          => '',
-			'class'       => '',
+			'class'       => 'full-width',
 			'value'       => '',
-			'cols'        => '100',
+			'cols'        => '',
 			'rows'        => '7',
 			'placeholder' => '',
 		) );

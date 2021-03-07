@@ -15,3 +15,11 @@ if ( ! class_exists( '\PHPMailer\PHPMailer\PHPMailer' ) ) {
 class GH_Mailer extends PHPMailer {
 	// Util class for SMTP integrations
 }
+
+class GH_SMTP extends SMTP{
+
+}
+
+class GH_Mailer_Exception extends Exception{
+
+}

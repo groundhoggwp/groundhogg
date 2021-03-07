@@ -49,6 +49,7 @@ class Autoloader {
 		'Sending_Service'                   => 'includes/sending-service.php',
 		'Template_Loader'                   => 'includes/template-loader.php',
 		'GH_SS_Mailer'                      => 'includes/gh-ss-mailer.php',
+		'GH_Mailer'                         => 'includes/mailer/gh-mailer.php',
 		'HTML'                              => 'includes/utils/html.php',
 		'Utils'                             => 'includes/utils/utils.php',
 		'Email_Parser'                      => 'includes/utils/email-parser.php',
@@ -104,11 +105,12 @@ class Autoloader {
 	 *
 	 * For a given class name, require the class file.
 	 *
+	 * @param string $relative_class_name Class name.
+	 *
 	 * @since  1.6.0
 	 * @access private
 	 * @static
 	 *
-	 * @param string $relative_class_name Class name.
 	 */
 	private static function load_class( $relative_class_name ) {
 
@@ -142,11 +144,12 @@ class Autoloader {
 	 *
 	 * For a given class, check if it exist and load it.
 	 *
+	 * @param string $class Class name.
+	 *
 	 * @since  1.6.0
 	 * @access private
 	 * @static
 	 *
-	 * @param string $class Class name.
 	 */
 	private static function autoload( $class ) {
 		if ( 0 !== strpos( $class, __NAMESPACE__ . '\\' ) ) {

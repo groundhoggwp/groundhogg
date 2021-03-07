@@ -3062,8 +3062,12 @@ function parse_inline_styles( $style ) {
  *
  * @return bool|string
  */
-function action_input( $action = '', $echo = true ) {
+function action_input( $action = '', $echo = true, $nonce=false ) {
 	$input = html()->input( [ 'value' => $action, 'type' => 'hidden', 'name' => 'action' ] );
+
+	if ( $nonce ){
+		$input .= wp_nonce_field( $action, '_wpnonce', true, false );
+	}
 
 	if ( $echo ) {
 		echo $input;
