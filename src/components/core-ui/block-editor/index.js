@@ -127,8 +127,10 @@ export default ({ document, history }) => {
     subject: defaultSubjectValue,
     pre_header: defaultPreHeaderValue,
     content: defaultContentValue,
-    editorType,
+    // editorType,
   } = document.data;
+
+  let editorType = 'funnel'
 
 
 
@@ -406,24 +408,38 @@ export default ({ document, history }) => {
     sendEmailComponent:{
       position: 'absolute',
       top: '147px',
-      width: 'calc(100% - 412px)',
-      padding: '33px 25px 33px 25px'
+      left: editorType === 'email' ? '40px' : '305px',
+      width: editorType === 'email' ? 'calc(100% - 412px)' : 'calc(100% - 729px)',
+      padding: '33px 25px 18px 25px'
     },
     sendEmailComponentLabel:{
-      color: '#0075FF',
+      color: '#102640',
+      width: '250px',
+      display: 'inline-block',
+      marginBottom: '20px',
       fontSize: '16px',
       fontWeight: '500'
     },
+    skipEmail:{
+      fontSize: '14px',
+      fontWeight: '300',
+      margin: '10px 0px 0px 20px'
+    },
     newEmailButton:{
+      color: '#0075FF',
       float: 'right'
     },
     sendEmailSelect:{
+      // Importants are needed while we are still inside wordpress, remove this later
       display: 'block',
-      width: 'calc(100% -40px)'
+      width: 'calc(100%) !important',
+      maxWidth: 'calc(100%) !important',
+      border: '1.2px solid rgba(16, 38, 64, 0.15) !important'
     },
     subTitleContainer: {
       position: 'absolute',
-      top: '295px',
+      top: '347px',
+      left: '320px',
       marginLeft: '20px',
       "& label": {
         fontSize: "12px",
@@ -562,27 +578,29 @@ export default ({ document, history }) => {
                   {/*Notices probably needs to be re-wrote*/}
                   <Notices />
                   <Card className={classes.sendEmailComponent}>
-                  <div className={classes.sendEmailComponentLabel}>Select an email to send:</div>
+                    <div className={classes.sendEmailComponentLabel}>Select an email to send:</div>
 
-                  <div className={classes.newEmailButton}>
-                    <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="1.56641" y="0.75" width="14.0265" height="14.5" rx="3.25" fill="white" stroke="#0075FF" stroke-width="1.5"/>
-                    </svg>
-                    new email
-                  </div>
+                    <div className={classes.newEmailButton}>
+                      <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="1.56641" y="0.75" width="14.0265" height="14.5" rx="3.25" fill="white" stroke="#0075FF" stroke-width="1.5"/>
+                      </svg>
+                      new email
+                    </div>
 
-                  <select
-                    className={classes.sendEmailSelect}
-                    value={''}
-                    onChange={()=>{}}
-                    label=""
-                  >
-                    <option value={10}>none</option>
-                    <option value={20}>Marketing</option>
-                  </select>
+                    <select
+                      className={classes.sendEmailSelect}
+                      value={''}
+                      onChange={()=>{}}
+                      label=""
+                    >
+                      <option value={10}>none</option>
+                      <option value={20}>Marketing</option>
+                    </select>
 
-                  <div>Skip email step if confirmed:</div>
-                  <IOSSwitch checked={false} onChange={()=>{}} name="checkedB" />
+                    <div className={classes.skipEmail}>
+                      <label>Skip email step if confirmed:</label>
+                      <IOSSwitch checked={false} onChange={()=>{}} name="checkedB" />
+                    </div>
                   </Card>
                   <div className={classes.subTitleContainer}>
                     <TextField

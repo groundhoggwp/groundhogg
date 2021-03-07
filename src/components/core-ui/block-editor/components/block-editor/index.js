@@ -37,6 +37,8 @@ import { makeStyles } from "@material-ui/core/styles";
  * Internal dependencies
  */
 import Sidebar from "../sidebar";
+import ExpandablePanel from "../expandable-panel/";
+
 
 //TODO Implement block persistence with email data store.
 //TODO Potentially use our own alerts data store (core).
@@ -55,7 +57,7 @@ function BlockEditor({
   const useStyles = makeStyles((theme) => ({
     root: {
       position: "absolute",
-      top: "332px",
+      top: "385px",
       right: "0",
       bottom: "0",
       left: "0",
@@ -96,7 +98,7 @@ function BlockEditor({
 
     },
     emailContainer: {
-      width: editorType === 'email' ? 'calc(100% - 360px)' : 'calc(100% - 630px)',
+      width: editorType === 'email' ? 'calc(100% - 360px)' : 'calc(100% - 680px)',
       marginLeft: editorType === 'email' ? '0px' : '305px'
 
     },
@@ -162,51 +164,57 @@ function BlockEditor({
         onChange={handleUpdateBlocks}
       >
 
-          <Card className={classes.emailContainer}>
-            <form noValidate autoComplete="off" className={classes.emailHeader}>
-              <div className={classes.subjectHeaderRow}>
-              <label>Subject:</label>
-              <input
-                className={classes.subjectInputs}
-                onChange={handleSubjectChange}
-                label={"Subject"}
-                value={subject}
-              />
-              <br/>
-              </div>
-              <div className={classes.subjectHeaderRow}>
-              <label>Pre Header Text:</label>
-              <input
-                className={classes.subjectInputs}
-                onChange={handlePreHeaderChange}
-                label={"Pre Header"}
-                value={preHeader === "" ? "Pre Header" : preHeader}
-              />
-              </div>
-            </form>
+          <div className={classes.emailContainer}>
+            <Card>
+              <form noValidate autoComplete="off" className={classes.emailHeader}>
+                <div className={classes.subjectHeaderRow}>
+                <label>Subject:</label>
+                <input
+                  className={classes.subjectInputs}
+                  onChange={handleSubjectChange}
+                  label={"Subject"}
+                  value={subject}
+                />
+                <br/>
+                </div>
+                <div className={classes.subjectHeaderRow}>
+                <label>Pre Header Text:</label>
+                <input
+                  className={classes.subjectInputs}
+                  onChange={handlePreHeaderChange}
+                  label={"Pre Header"}
+                  value={preHeader === "" ? "Pre Header" : preHeader}
+                />
+                </div>
+              </form>
 
 
-            <div className={classes.emailContent}>
-              <BlockSelectionClearer className={classes}>
-                <VisualEditorGlobalKeyboardShortcuts />
-                <MultiSelectScrollIntoView />
-                {/* Add Block Button */}
-                <BlockEditorKeyboardShortcuts.Register />
-                <Popover.Slot left={300} top={500} />
-                <Popover.Slot name="block-toolbar" left={300} top={500} />{" "}
-                <Typewriter>
-                  <CopyHandler>
-                    <WritingFlow>
-                      <ObserveTyping>
-                        {/* Rendered blocks */}
-                        <BlockList />
-                      </ObserveTyping>
-                    </WritingFlow>
-                  </CopyHandler>
-                </Typewriter>
-              </BlockSelectionClearer>
-            </div>
-          </Card>
+              <div className={classes.emailContent}>
+                <BlockSelectionClearer className={classes}>
+                  <VisualEditorGlobalKeyboardShortcuts />
+                  <MultiSelectScrollIntoView />
+                  {/* Add Block Button */}
+                  <BlockEditorKeyboardShortcuts.Register />
+                  <Popover.Slot left={300} top={500} />
+                  <Popover.Slot name="block-toolbar" left={300} top={500} />{" "}
+                  <Typewriter>
+                    <CopyHandler>
+                      <WritingFlow>
+                        <ObserveTyping>
+                          {/* Rendered blocks */}
+                          <BlockList />
+                        </ObserveTyping>
+                      </WritingFlow>
+                    </CopyHandler>
+                  </Typewriter>
+                </BlockSelectionClearer>
+              </div>
+            </Card>
+
+            <ExpandablePanel title={'Advanced'} fontSize={'16px'} width={'calc(100%)'} margin={'20px 0px 0px 0px'} contents={<div>contents</div>}/>
+          </div>
+
+
 
         <Sidebar.InspectorFill>
           <Popover name="block-toolbar" />

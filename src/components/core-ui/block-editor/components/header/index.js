@@ -81,6 +81,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'inline-flex',
     alignItems: 'center',
     marginRight: "20px",
+    width: '100%'
   },
   stepUpdateButton: {
     width: "15px",
@@ -89,7 +90,7 @@ const useStyles = makeStyles((theme) => ({
     cursor: 'pointer'
   },
   stepUpdateButtonFirst:{
-    marginLeft: '285px'
+    marginLeft: 'calc(100% - 535px)'
   },
   updateButton: {
     width: "320px",

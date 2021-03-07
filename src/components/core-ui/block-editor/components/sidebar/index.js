@@ -38,6 +38,7 @@ import {
 /**
  * Internal dependencies
  */
+ import ExpandablePanel from "../expandable-panel/";
 import ArrowDown from "components/svg/ArrowDown/";
 import Desktop from "components/svg/Desktop/";
 import Phone from "components/svg/Phone/";
@@ -48,6 +49,7 @@ import BlocksHeading from "components/svg/block-editor/BlocksHeading/";
 import BlocksImage from "components/svg/block-editor/BlocksImage/";
 import BlocksSpacer from "components/svg/block-editor/BlocksSpacer/";
 import BlocksText from "components/svg/block-editor/BlocksText/";
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -74,7 +76,7 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   emailControls: {
-    height: "287px",
+    height: "auto",
     padding: "10px 22px 0 22px",
   },
   sendTestButton: {
@@ -99,8 +101,9 @@ const useStyles = makeStyles((theme) => ({
   },
   alignmentContainer: {
     display: "inline-block",
-    marginTop: "20px",
+    margin: "20px 0px 3px 0px",
     width: "115px",
+
   },
   alignmentBtn:{
     display: 'inline-block',
@@ -123,20 +126,7 @@ const useStyles = makeStyles((theme) => ({
     width: '100px',
     padding: '7px 0px 7px 17px'
   },
-  additionalInfoContainer: {
-    fontSize: "12px",
-    width: "calc(100% + 19px)",
-    marginLeft: "-22px",
-    borderRadius: "7px",
-    padding:"10px 0 13px 25px",
-    fontWeight: "600",
-    background: "#E7EEFB",
-    cursor: 'pointer',
-    "& svg": {
-      float: 'right',
-      margin: '8px 25px'
-    },
-  },
+
   blocksTitle:{
     display: 'block',
     fontSize: '18px',
@@ -345,10 +335,7 @@ const Sidebar = ({
           </select>
         </div>
 
-        <div className={classes.additionalInfoContainer}>
-          <label onClick={toggleAdditionalInfoContainer}>{__("Additional options:")} <ArrowDown/></label>
-          <br />
-        </div>
+        <ExpandablePanel title={'Additional options:'} fontSize={'12px'} width={'calc(100% + 44px)'} margin={'0px 0px 0px -22px'}/>
       </Card>
 
       <Card className={classes.blockPanel}>{blockPanel}</Card>

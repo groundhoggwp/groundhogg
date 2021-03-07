@@ -35,6 +35,7 @@ const useStyles = makeStyles((theme) => ({
     zIndex: '999'
   },
   addStepHoverPlus:{
+    color: '#0075FF',
     position: 'absolute',
     top: 'calc(50% - 8px)',
     left: 'calc(50% - 8px)',
