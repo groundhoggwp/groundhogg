@@ -32,13 +32,6 @@ class Modal {
 	public function scripts() {
 		wp_enqueue_style( 'groundhogg-admin-modal' );
 		wp_enqueue_script( 'groundhogg-admin-modal' );
-		wp_localize_script( 'groundhogg-admin-modal', 'GroundhoggModalDefaults', [
-			'title'      => 'Modal',
-			'footertext' => __( 'Close' ),
-			'height'     => 500,
-			'width'      => 500,
-			'footer'     => 'true',
-		] );
 	}
 
 	public function popup() {

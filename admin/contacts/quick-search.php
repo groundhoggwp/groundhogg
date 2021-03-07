@@ -10,7 +10,6 @@ use function Groundhogg\html;
 
 ?>
 <div class="wp-clearfix"></div>
-<?php html()->hidden_GET_inputs( true ); ?>
 <div id="quick-search" class="postbox">
 	<div class="left">
 		<form method="post">
@@ -33,6 +32,7 @@ use function Groundhogg\html;
 	</div>
 	<div class="right">
 		<form method="get">
+			<?php html()->hidden_GET_inputs( true ); ?>
 			<div class="tag-quick-search-wrap">
 				<?php
 
