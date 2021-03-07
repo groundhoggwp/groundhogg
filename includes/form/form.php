@@ -57,7 +57,7 @@ class Form {
 			'id'    => 0
 		], $atts );
 
-		$this->step = new Step( $atts[ 'id' ] );
+		$this->step   = new Step( $atts['id'] );
 		$this->uniqid = uniqid( 'form_' );
 		$this->init_fields();
 	}

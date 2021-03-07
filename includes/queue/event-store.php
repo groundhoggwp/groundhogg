@@ -27,7 +27,7 @@ class Event_Store {
 				[ 'col' => 'claim', 'val' => $claim, 'compare' => '=' ],
 			],
 			'orderby' => 'time',
-			'select' => 'ID'
+			'select'  => 'ID'
 		], false );
 
 		$ids = wp_parse_id_list( wp_list_pluck( $queued_events, 'ID' ) );
@@ -67,6 +67,7 @@ class Event_Store {
 	 */
 	public function generate_claim_id() {
 		$claim_id = md5( uniqid( microtime( true ) ) );
+
 		return substr( $claim_id, 0, 20 ); // to fit in db field with 20 char limit
 	}
 
@@ -78,7 +79,6 @@ class Event_Store {
 	 * @return array
 	 */
 	public function get_queued_event_ids( $count = 100 ) {
-
 
 
 		global $wpdb;

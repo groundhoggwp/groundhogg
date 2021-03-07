@@ -4,7 +4,9 @@ namespace Groundhogg\Steps\Actions;
 
 use Groundhogg\Steps\Funnel_Step;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Created by PhpStorm.
@@ -12,27 +14,23 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * Date: 2019-04-29
  * Time: 9:45 AM
  */
-
-abstract class Action extends Funnel_Step
-{
+abstract class Action extends Funnel_Step {
 
 	const GROUP = 'action';
 
 	/**
 	 * @return string
 	 */
-	public function get_help_article()
-	{
+	public function get_help_article() {
 		return 'https://docs.groundhogg.io/docs/builder/actions/';
 	}
 
-    /**
-     *
-     * @return string
-     */
-    final public function get_group()
-    {
-        return self::ACTION;
-    }
+	/**
+	 *
+	 * @return string
+	 */
+	final public function get_group() {
+		return self::ACTION;
+	}
 
 }

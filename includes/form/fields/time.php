@@ -1,4 +1,5 @@
 <?php
+
 namespace Groundhogg\Form\Fields;
 
 /**
@@ -14,49 +15,43 @@ namespace Groundhogg\Form\Fields;
  * Class File
  * @package Groundhogg\Form\Fields
  */
-class Time extends Input
-{
+class Time extends Input {
 
-    public function get_default_args()
-    {
-        return [
-            'type'          => 'time',
-            'label'         => _x( 'Time *', 'form_default', 'groundhogg' ),
-            'name'          => '',
-            'id'            => '',
-            'class'         => '',
-            'max_time'      => '',
-            'min_time'      => '',
-            'required'      => false,
-            'attributes'    => '',
-        ];
-    }
+	public function get_default_args() {
+		return [
+			'type'       => 'time',
+			'label'      => _x( 'Time *', 'form_default', 'groundhogg' ),
+			'name'       => '',
+			'id'         => '',
+			'class'      => '',
+			'max_time'   => '',
+			'min_time'   => '',
+			'required'   => false,
+			'attributes' => '',
+		];
+	}
 
-    /**
-     * Get the name of the shortcode
-     *
-     * @return string
-     */
-    public function get_shortcode_name()
-    {
-        return 'time';
-    }
+	/**
+	 * Get the name of the shortcode
+	 *
+	 * @return string
+	 */
+	public function get_shortcode_name() {
+		return 'time';
+	}
 
-    public function get_min_time()
-    {
-        return esc_attr( $this->get_att( 'min_time' ) );
-    }
+	public function get_min_time() {
+		return esc_attr( $this->get_att( 'min_time' ) );
+	}
 
-    public function get_max_time()
-    {
-        return esc_attr( $this->get_att( 'max_time' ) );
-    }
+	public function get_max_time() {
+		return esc_attr( $this->get_att( 'max_time' ) );
+	}
 
-    public function get_attributes()
-    {
-        return sprintf( ' max="%1$s" min="%2$s" %3$s',
-            $this->get_min_time(),
-            $this->get_max_time(),
-            $this->get_att( 'attributes' ) );
-    }
+	public function get_attributes() {
+		return sprintf( ' max="%1$s" min="%2$s" %3$s',
+			$this->get_min_time(),
+			$this->get_max_time(),
+			$this->get_att( 'attributes' ) );
+	}
 }

@@ -70,6 +70,7 @@ class Recaptcha extends Input {
 			);
 		} else {
 			wp_enqueue_script( 'groundhogg-google-recaptcha' );
+
 			return "<div class='gh-recaptcha-v3' style='display: none;'>";
 		}
 	}

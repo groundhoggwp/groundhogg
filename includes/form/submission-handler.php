@@ -82,7 +82,7 @@ class Submission_Handler extends Supports_Errors {
 	/**
 	 * @return Step
 	 */
-	public function get_step(){
+	public function get_step() {
 		return $this->step;
 	}
 

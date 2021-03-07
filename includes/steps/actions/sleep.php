@@ -1,4 +1,5 @@
 <?php
+
 namespace Groundhogg\Steps\Actions;
 
 
@@ -8,7 +9,9 @@ use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Create User
@@ -22,87 +25,78 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.9
  */
-class Sleep extends Action
-{
+class Sleep extends Action {
 
-    /**
-     * @return string
-     */
-    public function get_help_article()
-    {
-        return 'https://docs.groundhogg.io/docs/builder/actions/create-user/';
-    }
+	/**
+	 * @return string
+	 */
+	public function get_help_article() {
+		return 'https://docs.groundhogg.io/docs/builder/actions/create-user/';
+	}
 
-    /**
-     * Get the element name
-     *
-     * @return string
-     */
-    public function get_name()
-    {
-        return _x( 'Sleep', 'step_name', 'groundhogg' );
-    }
+	/**
+	 * Get the element name
+	 *
+	 * @return string
+	 */
+	public function get_name() {
+		return _x( 'Sleep', 'step_name', 'groundhogg' );
+	}
 
-    /**
-     * Get the element type
-     *
-     * @return string
-     */
-    public function get_type()
-    {
-        return 'sleep';
-    }
+	/**
+	 * Get the element type
+	 *
+	 * @return string
+	 */
+	public function get_type() {
+		return 'sleep';
+	}
 
-    /**
-     * Get the description
-     *
-     * @return string
-     */
-    public function get_description()
-    {
-        return _x( 'Sleep for 1 second', 'step_description', 'groundhogg' );
-    }
+	/**
+	 * Get the description
+	 *
+	 * @return string
+	 */
+	public function get_description() {
+		return _x( 'Sleep for 1 second', 'step_description', 'groundhogg' );
+	}
 
-    /**
-     * Get the icon URL
-     *
-     * @return string
-     */
-    public function get_icon()
-    {
-        return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/create-user.png';
-    }
+	/**
+	 * Get the icon URL
+	 *
+	 * @return string
+	 */
+	public function get_icon() {
+		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/create-user.png';
+	}
 
-    /**
-     * @param $step Step
-     */
-    public function settings( $step )
-    {
-        echo Plugin::$instance->utils->html->description( 'Sleep for a second.' );
-    }
+	/**
+	 * @param $step Step
+	 */
+	public function settings( $step ) {
+		echo Plugin::$instance->utils->html->description( 'Sleep for a second.' );
+	}
 
-    /**
-     * Save the step settings
-     *
-     * @param $step Step
-     */
-    public function save( $step )
-    {
-        return true;
-    }
+	/**
+	 * Save the step settings
+	 *
+	 * @param $step Step
+	 */
+	public function save( $step ) {
+		return true;
+	}
 
-    /**
-     * Process the apply tag step...
-     *
-     * @param $contact Contact
-     * @param $event Event
-     *
-     * @return true
-     */
-    public function run( $contact, $event )
-    {
-        sleep( 1 );
+	/**
+	 * Process the apply tag step...
+	 *
+	 * @param $contact Contact
+	 * @param $event Event
+	 *
+	 * @return true
+	 */
+	public function run( $contact, $event ) {
+		sleep( 1 );
 
-	    return true;
-    }
+		return true;
+	}
 }

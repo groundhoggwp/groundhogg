@@ -1,7 +1,9 @@
 <?php
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Modified to remove var
@@ -149,7 +151,6 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *   Removed Netscape checks (matches heavily with firefox & mozilla)
  *
  */
-
 class Browser {
 	public $_agent = '';
 	public $_browser_name = '';
@@ -222,7 +223,7 @@ class Browser {
 
 	public $OPERATING_SYSTEM_UNKNOWN = 'unknown';
 
-	function __construct( $useragent="" ) {
+	function __construct( $useragent = "" ) {
 		$this->reset();
 		if ( $useragent != "" ) {
 			$this->setUserAgent( $useragent );
@@ -235,115 +236,163 @@ class Browser {
 	 * Reset all properties
 	 */
 	function reset() {
-		$this->_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : "";
+		$this->_agent        = isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : "";
 		$this->_browser_name = $this->BROWSER_UNKNOWN;
-		$this->_version = $this->VERSION_UNKNOWN;
-		$this->_platform = $this->PLATFORM_UNKNOWN;
-		$this->_os = $this->OPERATING_SYSTEM_UNKNOWN;
-		$this->_is_aol = false;
-		$this->_is_mobile = false;
-		$this->_is_robot = false;
-		$this->_aol_version = $this->VERSION_UNKNOWN;
+		$this->_version      = $this->VERSION_UNKNOWN;
+		$this->_platform     = $this->PLATFORM_UNKNOWN;
+		$this->_os           = $this->OPERATING_SYSTEM_UNKNOWN;
+		$this->_is_aol       = false;
+		$this->_is_mobile    = false;
+		$this->_is_robot     = false;
+		$this->_aol_version  = $this->VERSION_UNKNOWN;
 	}
 
 	/**
 	 * Check to see if the specific browser is valid
 	 *
-	 * @param string  $browserName
+	 * @param string $browserName
+	 *
 	 * @return True if the browser is the specified browser
 	 */
-	function isBrowser( $browserName ) { return 0 == strcasecmp( $this->_browser_name, trim( $browserName ) ); }
+	function isBrowser( $browserName ) {
+		return 0 == strcasecmp( $this->_browser_name, trim( $browserName ) );
+	}
 
 	/**
 	 * The name of the browser.  All return types are from the class contants
 	 *
 	 * @return string Name of the browser
 	 */
-	function getBrowser() { return $this->_browser_name; }
+	function getBrowser() {
+		return $this->_browser_name;
+	}
+
 	/**
 	 * Set the name of the browser
 	 *
 	 * @param unknown $browser The name of the Browser
 	 */
-	function setBrowser( $browser ) { return $this->_browser_name = $browser; }
+	function setBrowser( $browser ) {
+		return $this->_browser_name = $browser;
+	}
+
 	/**
 	 * The name of the platform.  All return types are from the class contants
 	 *
 	 * @return string Name of the browser
 	 */
-	function getPlatform() { return $this->_platform; }
+	function getPlatform() {
+		return $this->_platform;
+	}
+
 	/**
 	 * Set the name of the platform
 	 *
 	 * @param unknown $platform The name of the Platform
 	 */
-	function setPlatform( $platform ) { return $this->_platform = $platform; }
+	function setPlatform( $platform ) {
+		return $this->_platform = $platform;
+	}
+
 	/**
 	 * The version of the browser.
 	 *
 	 * @return string Version of the browser (will only contain alpha-numeric characters and a period)
 	 */
-	function getVersion() { return $this->_version; }
+	function getVersion() {
+		return $this->_version;
+	}
+
 	/**
 	 * Set the version of the browser
 	 *
 	 * @param unknown $version The version of the Browser
 	 */
-	function setVersion( $version ) { $this->_version = preg_replace( '/[^0-9,.,a-z,A-Z-]/', '', $version ); }
+	function setVersion( $version ) {
+		$this->_version = preg_replace( '/[^0-9,.,a-z,A-Z-]/', '', $version );
+	}
+
 	/**
 	 * The version of AOL.
 	 *
 	 * @return string Version of AOL (will only contain alpha-numeric characters and a period)
 	 */
-	function getAolVersion() { return $this->_aol_version; }
+	function getAolVersion() {
+		return $this->_aol_version;
+	}
+
 	/**
 	 * Set the version of AOL
 	 *
 	 * @param unknown $version The version of AOL
 	 */
-	function setAolVersion( $version ) { $this->_aol_version = preg_replace( '/[^0-9,.,a-z,A-Z]/', '', $version ); }
+	function setAolVersion( $version ) {
+		$this->_aol_version = preg_replace( '/[^0-9,.,a-z,A-Z]/', '', $version );
+	}
+
 	/**
 	 * Is the browser from AOL?
 	 *
 	 * @return boolean True if the browser is from AOL otherwise false
 	 */
-	function isAol() { return $this->_is_aol; }
+	function isAol() {
+		return $this->_is_aol;
+	}
+
 	/**
 	 * Is the browser from a mobile device?
 	 *
 	 * @return boolean True if the browser is from a mobile device otherwise false
 	 */
-	function isMobile() { return $this->_is_mobile; }
+	function isMobile() {
+		return $this->_is_mobile;
+	}
+
 	/**
 	 * Is the browser from a robot (ex Slurp,GoogleBot)?
 	 *
 	 * @return boolean True if the browser is from a robot otherwise false
 	 */
-	function isRobot() { return $this->_is_robot; }
+	function isRobot() {
+		return $this->_is_robot;
+	}
+
 	/**
 	 * Set the browser to be from AOL
 	 *
 	 * @param unknown $isAol
 	 */
-	function setAol( $isAol ) { $this->_is_aol = $isAol; }
+	function setAol( $isAol ) {
+		$this->_is_aol = $isAol;
+	}
+
 	/**
 	 * Set the Browser to be mobile
 	 *
 	 * @param boolean $value is the browser a mobile brower or not
 	 */
-	function setMobile( $value=true ) { $this->_is_mobile = $value; }
+	function setMobile( $value = true ) {
+		$this->_is_mobile = $value;
+	}
+
 	/**
 	 * Set the Browser to be a robot
 	 *
 	 * @param boolean $value is the browser a robot or not
 	 */
-	function setRobot( $value=true ) { $this->_is_robot = $value; }
+	function setRobot( $value = true ) {
+		$this->_is_robot = $value;
+	}
+
 	/**
 	 * Get the user agent value in use to determine the browser
 	 *
 	 * @return string The user agent from the HTTP header
 	 */
-	function getUserAgent() { return $this->_agent; }
+	function getUserAgent() {
+		return $this->_agent;
+	}
+
 	/**
 	 * Set the user agent value (the construction will use the HTTP header value - this will overwrite it)
 	 *
@@ -354,42 +403,46 @@ class Browser {
 		$this->_agent = $agent_string;
 		$this->determine();
 	}
+
 	/**
 	 * Used to determine if the browser is actually "chromeframe"
 	 *
-	 * @since 1.7
 	 * @return boolean True if the browser is using chromeframe
+	 * @since 1.7
 	 */
 	function isChromeFrame() {
 		return strpos( $this->_agent, "chromeframe" ) !== false;
 	}
+
 	/**
 	 * Returns a formatted string with a summary of the details of the browser.
 	 *
 	 * @return string formatted string with a summary of the browser
 	 */
 	function __toString() {
-		$text1   = $this->getUserAgent(); //grabs the UA (user agent) string
-		$UAline1 = substr( $text1, 0, 32 ); //the first line we print should only be the first 32 characters of the UA string
-		$text2       = $this->getUserAgent();//now we grab it again and save it to a string
-		$towrapUA    = str_replace( $UAline1, '', $text2 );//the rest of the printoff (other than first line) is equivolent
+		$text1    = $this->getUserAgent(); //grabs the UA (user agent) string
+		$UAline1  = substr( $text1, 0, 32 ); //the first line we print should only be the first 32 characters of the UA string
+		$text2    = $this->getUserAgent();//now we grab it again and save it to a string
+		$towrapUA = str_replace( $UAline1, '', $text2 );//the rest of the printoff (other than first line) is equivolent
 		// To the whole string minus the part we printed off. IE
 		// User Agent:      thefirst32charactersfromUAline1
 		//                  the rest of it is now stored in
 		//                  $text2 to be printed off
 		// But we need to add spaces before each line that is split other than line 1
 		$space = '';
-		for ( $i = 0; $i < 25; $i++ ) {
+		for ( $i = 0; $i < 25; $i ++ ) {
 			$space .= ' ';
 		}
 		// Now we split the remaining string of UA ($text2) into lines that are prefixed by spaces for formatting
 		$wordwrapped = chunk_split( $towrapUA, 32, "\n $space" );
-		return "Platform:                 {$this->getPlatform()} \n".
-			"Browser Name:             {$this->getBrowser()}  \n" .
-			"Browser Version:          {$this->getVersion()} \n" .
-			"User Agent String:        $UAline1 \n\t\t\t  " .
-			"$wordwrapped";
+
+		return "Platform:                 {$this->getPlatform()} \n" .
+		       "Browser Name:             {$this->getBrowser()}  \n" .
+		       "Browser Version:          {$this->getVersion()} \n" .
+		       "User Agent String:        $UAline1 \n\t\t\t  " .
+		       "$wordwrapped";
 	}
+
 	/**
 	 * Protected routine to calculate and determine what the browser is in use (including platform)
 	 */
@@ -398,6 +451,7 @@ class Browser {
 		$this->checkBrowsers();
 		$this->checkForAol();
 	}
+
 	/**
 	 * Protected routine to determine the browser type
 	 *
@@ -465,13 +519,15 @@ class Browser {
 	 */
 	function checkBrowserBlackBerry() {
 		if ( stripos( $this->_agent, 'blackberry' ) !== false ) {
-			$aresult = explode( "/", stristr( $this->_agent, "BlackBerry" ) );
+			$aresult  = explode( "/", stristr( $this->_agent, "BlackBerry" ) );
 			$aversion = explode( ' ', $aresult[1] );
 			$this->setVersion( $aversion[0] );
 			$this->_browser_name = $this->BROWSER_BLACKBERRY;
 			$this->setMobile( true );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -488,8 +544,10 @@ class Browser {
 			$aversion = explode( ' ', stristr( $this->_agent, 'AOL' ) );
 			$this->setAol( true );
 			$this->setAolVersion( preg_replace( '/[^0-9\.a-z]/i', '', $aversion[1] ) );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -500,13 +558,15 @@ class Browser {
 	 */
 	function checkBrowserGoogleBot() {
 		if ( stripos( $this->_agent, 'googlebot' ) !== false ) {
-			$aresult = explode( '/', stristr( $this->_agent, 'googlebot' ) );
+			$aresult  = explode( '/', stristr( $this->_agent, 'googlebot' ) );
 			$aversion = explode( ' ', $aresult[1] );
 			$this->setVersion( str_replace( ';', '', $aversion[0] ) );
 			$this->_browser_name = $this->BROWSER_GOOGLEBOT;
 			$this->setRobot( true );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -517,13 +577,15 @@ class Browser {
 	 */
 	function checkBrowserMSNBot() {
 		if ( stripos( $this->_agent, "msnbot" ) !== false ) {
-			$aresult = explode( "/", stristr( $this->_agent, "msnbot" ) );
+			$aresult  = explode( "/", stristr( $this->_agent, "msnbot" ) );
 			$aversion = explode( " ", $aresult[1] );
 			$this->setVersion( str_replace( ";", "", $aversion[0] ) );
 			$this->_browser_name = $this->BROWSER_MSNBOT;
 			$this->setRobot( true );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -534,20 +596,23 @@ class Browser {
 	 */
 	function checkBrowserW3CValidator() {
 		if ( stripos( $this->_agent, 'W3C-checklink' ) !== false ) {
-			$aresult = explode( '/', stristr( $this->_agent, 'W3C-checklink' ) );
+			$aresult  = explode( '/', stristr( $this->_agent, 'W3C-checklink' ) );
 			$aversion = explode( ' ', $aresult[1] );
 			$this->setVersion( $aversion[0] );
 			$this->_browser_name = $this->BROWSER_W3CVALIDATOR;
+
 			return true;
 		} else if ( stripos( $this->_agent, 'W3C_Validator' ) !== false ) {
 			// Some of the Validator versions do not delineate w/ a slash - add it back in
-			$ua = str_replace( "W3C_Validator ", "W3C_Validator/", $this->_agent );
-			$aresult = explode( '/', stristr( $ua, 'W3C_Validator' ) );
+			$ua       = str_replace( "W3C_Validator ", "W3C_Validator/", $this->_agent );
+			$aresult  = explode( '/', stristr( $ua, 'W3C_Validator' ) );
 			$aversion = explode( ' ', $aresult[1] );
 			$this->setVersion( $aversion[0] );
 			$this->_browser_name = $this->BROWSER_W3CVALIDATOR;
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -558,14 +623,16 @@ class Browser {
 	 */
 	function checkBrowserSlurp() {
 		if ( stripos( $this->_agent, 'slurp' ) !== false ) {
-			$aresult = explode( '/', stristr( $this->_agent, 'Slurp' ) );
+			$aresult  = explode( '/', stristr( $this->_agent, 'Slurp' ) );
 			$aversion = explode( ' ', $aresult[1] );
 			$this->setVersion( $aversion[0] );
 			$this->_browser_name = $this->BROWSER_SLURP;
 			$this->setRobot( true );
 			$this->setMobile( false );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -584,26 +651,27 @@ class Browser {
 			if ( preg_match( '/308|425|426|474|0b1/i', $aresult ) ) {
 				$this->setVersion( '1.5' );
 			}
+
 			return true;
-		}
-		// Test for versions > 1.5
+		} // Test for versions > 1.5
 		else if ( stripos( $this->_agent, 'msie' ) !== false && stripos( $this->_agent, 'opera' ) === false ) {
 			// See if the browser is the odd MSN Explorer
 			if ( stripos( $this->_agent, 'msnb' ) !== false ) {
 				$aresult = explode( ' ', stristr( str_replace( ';', '; ', $this->_agent ), 'MSN' ) );
 				$this->setBrowser( $this->BROWSER_MSN );
 				$this->setVersion( str_replace( array( '(', ')', ';' ), '', $aresult[1] ) );
+
 				return true;
 			}
 			$aresult = explode( ' ', stristr( str_replace( ';', '; ', $this->_agent ), 'msie' ) );
 			$this->setBrowser( $this->BROWSER_IE );
 			$this->setVersion( str_replace( array( '(', ')', ';' ), '', $aresult[1] ) );
+
 			return true;
-		}
-		// Test for Pocket IE
+		} // Test for Pocket IE
 		else if ( stripos( $this->_agent, 'mspie' ) !== false || stripos( $this->_agent, 'pocket' ) !== false ) {
 			$aresult = explode( ' ', stristr( $this->_agent, 'mspie' ) );
-				$this->setPlatform( $this->PLATFORM_WINDOWS_CE );
+			$this->setPlatform( $this->PLATFORM_WINDOWS_CE );
 			$this->setBrowser( $this->BROWSER_POCKET_IE );
 			$this->setMobile( true );
 
@@ -613,8 +681,10 @@ class Browser {
 				$aversion = explode( '/', $this->_agent );
 				$this->setVersion( $aversion[1] );
 			}
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -627,7 +697,7 @@ class Browser {
 		if ( stripos( $this->_agent, 'opera mini' ) !== false ) {
 			$resultant = stristr( $this->_agent, 'opera mini' );
 			if ( preg_match( '/\//', $resultant ) ) {
-				$aresult = explode( '/', $resultant );
+				$aresult  = explode( '/', $resultant );
 				$aversion = explode( ' ', $aresult[1] );
 				$this->setVersion( $aversion[0] );
 			} else {
@@ -636,22 +706,25 @@ class Browser {
 			}
 			$this->_browser_name = $this->BROWSER_OPERA_MINI;
 			$this->setMobile( true );
+
 			return true;
 		} else if ( stripos( $this->_agent, 'opera' ) !== false ) {
 			$resultant = stristr( $this->_agent, 'opera' );
 			if ( preg_match( '/Version\/(10.*)$/', $resultant, $matches ) ) {
 				$this->setVersion( $matches[1] );
 			} else if ( preg_match( '/\//', $resultant ) ) {
-				$aresult = explode( '/', str_replace( "(", " ", $resultant ) );
+				$aresult  = explode( '/', str_replace( "(", " ", $resultant ) );
 				$aversion = explode( ' ', $aresult[1] );
 				$this->setVersion( $aversion[0] );
 			} else {
 				$aversion = explode( ' ', stristr( $resultant, 'opera' ) );
-				$this->setVersion( isset( $aversion[1] )?$aversion[1]:"" );
+				$this->setVersion( isset( $aversion[1] ) ? $aversion[1] : "" );
 			}
 			$this->_browser_name = $this->BROWSER_OPERA;
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -662,12 +735,14 @@ class Browser {
 	 */
 	function checkBrowserChrome() {
 		if ( stripos( $this->_agent, 'Chrome' ) !== false ) {
-			$aresult = explode( '/', stristr( $this->_agent, 'Chrome' ) );
+			$aresult  = explode( '/', stristr( $this->_agent, 'Chrome' ) );
 			$aversion = explode( ' ', $aresult[1] );
 			$this->setVersion( $aversion[0] );
 			$this->setBrowser( $this->BROWSER_CHROME );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -679,12 +754,14 @@ class Browser {
 	 */
 	function checkBrowserWebTv() {
 		if ( stripos( $this->_agent, 'webtv' ) !== false ) {
-			$aresult = explode( '/', stristr( $this->_agent, 'webtv' ) );
+			$aresult  = explode( '/', stristr( $this->_agent, 'webtv' ) );
 			$aversion = explode( ' ', $aresult[1] );
 			$this->setVersion( $aversion[0] );
 			$this->setBrowser( $this->BROWSER_WEBTV );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -695,12 +772,14 @@ class Browser {
 	 */
 	function checkBrowserNetPositive() {
 		if ( stripos( $this->_agent, 'NetPositive' ) !== false ) {
-			$aresult = explode( '/', stristr( $this->_agent, 'NetPositive' ) );
+			$aresult  = explode( '/', stristr( $this->_agent, 'NetPositive' ) );
 			$aversion = explode( ' ', $aresult[1] );
 			$this->setVersion( str_replace( array( '(', ')', ';' ), '', $aversion[0] ) );
 			$this->setBrowser( $this->BROWSER_NETPOSITIVE );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -711,12 +790,14 @@ class Browser {
 	 */
 	function checkBrowserGaleon() {
 		if ( stripos( $this->_agent, 'galeon' ) !== false ) {
-			$aresult = explode( ' ', stristr( $this->_agent, 'galeon' ) );
+			$aresult  = explode( ' ', stristr( $this->_agent, 'galeon' ) );
 			$aversion = explode( '/', $aresult[0] );
 			$this->setVersion( $aversion[1] );
 			$this->setBrowser( $this->BROWSER_GALEON );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -727,12 +808,14 @@ class Browser {
 	 */
 	function checkBrowserKonqueror() {
 		if ( stripos( $this->_agent, 'Konqueror' ) !== false ) {
-			$aresult = explode( ' ', stristr( $this->_agent, 'Konqueror' ) );
+			$aresult  = explode( ' ', stristr( $this->_agent, 'Konqueror' ) );
 			$aversion = explode( '/', $aresult[0] );
 			$this->setVersion( $aversion[1] );
 			$this->setBrowser( $this->BROWSER_KONQUEROR );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -746,8 +829,10 @@ class Browser {
 			$aversion = explode( ' ', stristr( str_replace( '/', ' ', $this->_agent ), 'icab' ) );
 			$this->setVersion( $aversion[1] );
 			$this->setBrowser( $this->BROWSER_ICAB );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -758,12 +843,14 @@ class Browser {
 	 */
 	function checkBrowserOmniWeb() {
 		if ( stripos( $this->_agent, 'omniweb' ) !== false ) {
-			$aresult = explode( '/', stristr( $this->_agent, 'omniweb' ) );
-			$aversion = explode( ' ', isset( $aresult[1] )?$aresult[1]:"" );
+			$aresult  = explode( '/', stristr( $this->_agent, 'omniweb' ) );
+			$aversion = explode( ' ', isset( $aresult[1] ) ? $aresult[1] : "" );
 			$this->setVersion( $aversion[0] );
 			$this->setBrowser( $this->BROWSER_OMNIWEB );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -777,8 +864,10 @@ class Browser {
 			$aversion = explode( '/', stristr( $this->_agent, 'Phoenix' ) );
 			$this->setVersion( $aversion[1] );
 			$this->setBrowser( $this->BROWSER_PHOENIX );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -792,8 +881,10 @@ class Browser {
 			$aversion = explode( '/', stristr( $this->_agent, 'Firebird' ) );
 			$this->setVersion( $aversion[1] );
 			$this->setBrowser( $this->BROWSER_FIREBIRD );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -807,12 +898,15 @@ class Browser {
 		if ( stripos( $this->_agent, 'Firefox' ) !== false && preg_match( '/Navigator\/([^ ]*)/i', $this->_agent, $matches ) ) {
 			$this->setVersion( $matches[1] );
 			$this->setBrowser( $this->BROWSER_NETSCAPE_NAVIGATOR );
+
 			return true;
 		} else if ( stripos( $this->_agent, 'Firefox' ) === false && preg_match( '/Netscape6?\/([^ ]*)/i', $this->_agent, $matches ) ) {
 			$this->setVersion( $matches[1] );
 			$this->setBrowser( $this->BROWSER_NETSCAPE_NAVIGATOR );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -825,8 +919,10 @@ class Browser {
 		if ( stripos( $this->_agent, 'Mozilla' ) !== false && preg_match( '/Shiretoko\/([^ ]*)/i', $this->_agent, $matches ) ) {
 			$this->setVersion( $matches[1] );
 			$this->setBrowser( $this->BROWSER_SHIRETOKO );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -839,8 +935,10 @@ class Browser {
 		if ( stripos( $this->_agent, 'Mozilla' ) !== false && preg_match( '/IceCat\/([^ ]*)/i', $this->_agent, $matches ) ) {
 			$this->setVersion( $matches[1] );
 			$this->setBrowser( $this->BROWSER_ICECAT );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -858,8 +956,10 @@ class Browser {
 				$this->setBrowser( $this->BROWSER_NOKIA );
 			}
 			$this->setMobile( true );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -873,13 +973,16 @@ class Browser {
 			if ( preg_match( "/Firefox[\/ \(]([^ ;\)]+)/i", $this->_agent, $matches ) ) {
 				$this->setVersion( $matches[1] );
 				$this->setBrowser( $this->BROWSER_FIREFOX );
+
 				return true;
 			} else if ( preg_match( "/Firefox$/i", $this->_agent, $matches ) ) {
 				$this->setVersion( "" );
 				$this->setBrowser( $this->BROWSER_FIREFOX );
+
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -890,36 +993,43 @@ class Browser {
 	 */
 	function checkBrowserIceweasel() {
 		if ( stripos( $this->_agent, 'Iceweasel' ) !== false ) {
-			$aresult = explode( '/', stristr( $this->_agent, 'Iceweasel' ) );
+			$aresult  = explode( '/', stristr( $this->_agent, 'Iceweasel' ) );
 			$aversion = explode( ' ', $aresult[1] );
 			$this->setVersion( $aversion[0] );
 			$this->setBrowser( $this->BROWSER_ICEWEASEL );
+
 			return true;
 		}
+
 		return false;
 	}
+
 	/**
 	 * Determine if the browser is Mozilla or not (last updated 1.7)
 	 *
 	 * @return boolean True if the browser is Mozilla otherwise false
 	 */
 	function checkBrowserMozilla() {
-		if ( stripos( $this->_agent, 'mozilla' ) !== false  && preg_match( '/rv:[0-9].[0-9][a-b]?/i', $this->_agent ) && stripos( $this->_agent, 'netscape' ) === false ) {
+		if ( stripos( $this->_agent, 'mozilla' ) !== false && preg_match( '/rv:[0-9].[0-9][a-b]?/i', $this->_agent ) && stripos( $this->_agent, 'netscape' ) === false ) {
 			$aversion = explode( ' ', stristr( $this->_agent, 'rv:' ) );
 			preg_match( '/rv:[0-9].[0-9][a-b]?/i', $this->_agent, $aversion );
 			$this->setVersion( str_replace( 'rv:', '', $aversion[0] ) );
 			$this->setBrowser( $this->BROWSER_MOZILLA );
+
 			return true;
 		} else if ( stripos( $this->_agent, 'mozilla' ) !== false && preg_match( '/rv:[0-9]\.[0-9]/i', $this->_agent ) && stripos( $this->_agent, 'netscape' ) === false ) {
 			$aversion = explode( '', stristr( $this->_agent, 'rv:' ) );
 			$this->setVersion( str_replace( 'rv:', '', $aversion[0] ) );
 			$this->setBrowser( $this->BROWSER_MOZILLA );
+
 			return true;
-		} else if ( stripos( $this->_agent, 'mozilla' ) !== false  && preg_match( '/mozilla\/([^ ]*)/i', $this->_agent, $matches ) && stripos( $this->_agent, 'netscape' ) === false ) {
+		} else if ( stripos( $this->_agent, 'mozilla' ) !== false && preg_match( '/mozilla\/([^ ]*)/i', $this->_agent, $matches ) && stripos( $this->_agent, 'netscape' ) === false ) {
 			$this->setVersion( $matches[1] );
 			$this->setBrowser( $this->BROWSER_MOZILLA );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -930,12 +1040,14 @@ class Browser {
 	 */
 	function checkBrowserLynx() {
 		if ( stripos( $this->_agent, 'lynx' ) !== false ) {
-			$aresult = explode( '/', stristr( $this->_agent, 'Lynx' ) );
-			$aversion = explode( ' ', ( isset( $aresult[1] )?$aresult[1]:"" ) );
+			$aresult  = explode( '/', stristr( $this->_agent, 'Lynx' ) );
+			$aversion = explode( ' ', ( isset( $aresult[1] ) ? $aresult[1] : "" ) );
 			$this->setVersion( $aversion[0] );
 			$this->setBrowser( $this->BROWSER_LYNX );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -946,12 +1058,14 @@ class Browser {
 	 */
 	function checkBrowserAmaya() {
 		if ( stripos( $this->_agent, 'amaya' ) !== false ) {
-			$aresult = explode( '/', stristr( $this->_agent, 'Amaya' ) );
+			$aresult  = explode( '/', stristr( $this->_agent, 'Amaya' ) );
 			$aversion = explode( ' ', $aresult[1] );
 			$this->setVersion( $aversion[0] );
 			$this->setBrowser( $this->BROWSER_AMAYA );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -970,8 +1084,10 @@ class Browser {
 				$this->setVersion( $this->VERSION_UNKNOWN );
 			}
 			$this->setBrowser( $this->BROWSER_SAFARI );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -991,8 +1107,10 @@ class Browser {
 			}
 			$this->setMobile( true );
 			$this->setBrowser( $this->BROWSER_IPHONE );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -1012,8 +1130,10 @@ class Browser {
 			}
 			$this->setMobile( true );
 			$this->setBrowser( $this->BROWSER_IPAD );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -1033,8 +1153,10 @@ class Browser {
 			}
 			$this->setMobile( true );
 			$this->setBrowser( $this->BROWSER_IPOD );
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -1054,8 +1176,10 @@ class Browser {
 			}
 			$this->setMobile( true );
 			$this->setBrowser( $this->BROWSER_ANDROID );
+
 			return true;
 		}
+
 		return false;
 	}
 

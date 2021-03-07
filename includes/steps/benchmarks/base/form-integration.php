@@ -140,18 +140,18 @@ abstract class Form_Integration extends Benchmark {
 			$row = $this->normalize_field( $key, $field );
 
 			// If there is no row Id we cannot serve the field
-			if ( ! $row[ 'id' ] ) {
+			if ( ! $row['id'] ) {
 				continue;
 			}
 
 			$rows[] = [
-				$row[ 'id' ],
-				$row[ 'label' ],
+				$row['id'],
+				$row['label'],
 				html()->dropdown( [
 					'option_none' => '* Do Not Map *',
 					'options'     => get_mappable_fields(),
-					'selected'    => get_array_var( $field_map, $row[ 'id' ] ),
-					'name'        => $this->setting_name_prefix( 'field_map' ) . sprintf( '[%s]', $row[ 'id' ] ),
+					'selected'    => get_array_var( $field_map, $row['id'] ),
+					'name'        => $this->setting_name_prefix( 'field_map' ) . sprintf( '[%s]', $row['id'] ),
 				] )
 			];
 
@@ -215,7 +215,7 @@ abstract class Form_Integration extends Benchmark {
 		}
 		/**
 		 * Did not work need to test
-		*/
+		 */
 //		$sanitized_array = map_deep( $posted_data, function ( $item ){
 //			return is_array( $item ) ? implode( ',', array_flatten( $item ) ) : $item;
 //		} );

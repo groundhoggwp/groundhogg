@@ -84,11 +84,9 @@ class Radio extends Dropdown {
 		$options = get_array_var( $config['atts'], 'options', '' );
 
 		// No input given but the field is required
-		if ( get_array_var( $config['atts'], 'required' ) && ! $input ){
+		if ( get_array_var( $config['atts'], 'required' ) && ! $input ) {
 			return new \WP_Error( 'invalid_input', __( 'Please select a valid option.', 'groundhogg' ) );
-		}
-
-		// Input is provided but isn't a valid option
+		} // Input is provided but isn't a valid option
 		else if ( $input && strpos( $options, $input ) === false ) {
 			return new \WP_Error( 'invalid_input', __( 'Please select a valid option.', 'groundhogg' ) );
 		}

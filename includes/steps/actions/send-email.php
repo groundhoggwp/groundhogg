@@ -200,8 +200,8 @@ class Send_Email extends Action {
 		) );
 
 		?>
-        <hr>
-        <p class="report">
+		<hr>
+		<p class="report">
         <span class="opens"><?php _ex( 'Opens', 'stats', 'groundhogg' ); ?>:&nbsp;
             <strong>
                 <a href="<?php echo add_query_arg( [
@@ -215,7 +215,7 @@ class Send_Email extends Action {
                 ], admin_url( 'admin.php?page=gh_contacts' ) ); ?>" target="_blank"><?php echo $num_opens; ?></a>
             </strong>
         </span> |
-            <span class="clicks"><?php _ex( 'Clicks', 'stats', 'groundhogg' ); ?>:&nbsp;
+			<span class="clicks"><?php _ex( 'Clicks', 'stats', 'groundhogg' ); ?>:&nbsp;
                 <strong>
                 <a href="<?php echo add_query_arg( [
 	                'activity' => [
@@ -228,20 +228,22 @@ class Send_Email extends Action {
                 ], admin_url( 'admin.php?page=gh_contacts' ) ); ?>" target="_blank"><?php echo $num_clicks; ?></a>
             </strong>
         </span> |
-            <span class="ctr"><?php _ex( 'C.T.R', 'stats', 'groundhogg' ); ?>:&nbsp;<strong><?php echo round( ( $num_clicks / ( ( $num_opens > 0 ) ? $num_opens : 1 ) * 100 ), 2 ); ?></strong>%</span>
-        </p>
+			<span
+				class="ctr"><?php _ex( 'C.T.R', 'stats', 'groundhogg' ); ?>:&nbsp;<strong><?php echo round( ( $num_clicks / ( ( $num_opens > 0 ) ? $num_opens : 1 ) * 100 ), 2 ); ?></strong>%</span>
+		</p>
 		<?php
 	}
 
 	/**
 	 * @param Step $step Reporting v2
-     * @deprecated  version 2.2 use Dashbord APi for adding graphs
+	 *
+	 * @deprecated  version 2.2 use Dashbord APi for adding graphs
 	 */
 	public function reporting_v2( $step ) {
 		parent::reporting_v2( $step );
 
 		?>
-        <div class="reporting-results"><?php
+		<div class="reporting-results"><?php
 		$times = $this->get_reporting_interval();
 
 		$start_time = $times['start_time'];
@@ -301,57 +303,57 @@ class Send_Email extends Action {
 //		if ( $graph->has_data() ):
 
 		?>
-        <div class="chart">
-            <div class="inside" style="height: 250px;">
+		<div class="chart">
+			<div class="inside" style="height: 250px;">
 				<?php $graph->render(); ?>
 
-	            <canvas id="action_email_send" ></canvas>
+				<canvas id="action_email_send"></canvas>
 
-                <script>
-                    //(function ($) {
-                    //    var myChart;
-					//
-                    //    var chart = $('#action_email_send');
-					//
-                    //    if (myChart != null) {
-                    //        myChart.destroy();
-                    //    }
-					//
-                    //    var ctx = chart[0].getContext('2d');
-                    //    myChart = new Chart(ctx, {
-                    //        "type": "line",
-                    //        "data": {
-					//
-                    //            "datasets": <?php // echo json_encode( [
-					//				array_merge( [
-					//					'label' => __( 'sent', 'groundhogg' ),
-					//					'data'  => $sent,
-					//
-					//				], $line_chart->get_line_style() ),
-					//				array_merge( [
-					//					'label' => __( 'Open', 'groundhogg' ),
-					//					'data'  => $opens,
-					//
-					//				], $line_chart->get_line_style() ),
-					//				array_merge( [
-					//					'label' => __( 'clicked', 'groundhogg' ),
-					//					'data'  => $clicks,
-					//
-					//				], $line_chart->get_line_style() ),
-					//			] );  ?>
-                    //        },
-                    //        "options": <?php //echo json_encode( $line_chart->get_options() ); ?>
-                    //    });
-                    //})(jQuery);
-                </script>
-            </div>
-        </div>
+				<script>
+                  //(function ($) {
+                  //    var myChart;
+                  //
+                  //    var chart = $('#action_email_send');
+                  //
+                  //    if (myChart != null) {
+                  //        myChart.destroy();
+                  //    }
+                  //
+                  //    var ctx = chart[0].getContext('2d');
+                  //    myChart = new Chart(ctx, {
+                  //        "type": "line",
+                  //        "data": {
+                  //
+                  //            "datasets": <?php // echo json_encode( [
+				  //				array_merge( [
+				  //					'label' => __( 'sent', 'groundhogg' ),
+				  //					'data'  => $sent,
+				  //
+				  //				], $line_chart->get_line_style() ),
+				  //				array_merge( [
+				  //					'label' => __( 'Open', 'groundhogg' ),
+				  //					'data'  => $opens,
+				  //
+				  //				], $line_chart->get_line_style() ),
+				  //				array_merge( [
+				  //					'label' => __( 'clicked', 'groundhogg' ),
+				  //					'data'  => $clicks,
+				  //
+				  //				], $line_chart->get_line_style() ),
+				  //			] );  ?>
+                  //        },
+                  //        "options": <?php //echo json_encode( $line_chart->get_options() ); ?>
+                  //    });
+                  //})(jQuery);
+				</script>
+			</div>
+		</div>
 		<?php
 
 //		endif;
 
 		?>
-        <h3><?php _e( 'Activity', 'groundhogg' ); ?></h3>
+		<h3><?php _e( 'Activity', 'groundhogg' ); ?></h3>
 		<?php
 
 		html()->list_table(

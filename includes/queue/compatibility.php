@@ -1,10 +1,11 @@
 <?php
+
 namespace Groundhogg\Queue;
 
 /**
  * Class ActionScheduler_Compatibility
  */
-class Compatibility{
+class Compatibility {
 
 	/**
 	 * Converts a shorthand byte value to an integer byte value.
@@ -15,6 +16,7 @@ class Compatibility{
 	 * @link https://secure.php.net/manual/en/faq.using.php#faq.using.shorthandbytes
 	 *
 	 * @param string $value A (PHP ini) byte value, either shorthand or ordinary.
+	 *
 	 * @return int An integer byte value.
 	 */
 	public static function convert_hr_to_bytes( $value ) {
@@ -54,7 +56,7 @@ class Compatibility{
 		$current_limit     = @ini_get( 'memory_limit' );
 		$current_limit_int = self::convert_hr_to_bytes( $current_limit );
 
-		if ( -1 === $current_limit_int ) {
+		if ( - 1 === $current_limit_int ) {
 			return false;
 		}
 
@@ -63,19 +65,20 @@ class Compatibility{
 		$filtered_limit     = apply_filters( 'admin_memory_limit', $wp_max_limit );
 		$filtered_limit_int = self::convert_hr_to_bytes( $filtered_limit );
 
-		if ( -1 === $filtered_limit_int || ( $filtered_limit_int > $wp_max_limit_int && $filtered_limit_int > $current_limit_int ) ) {
+		if ( - 1 === $filtered_limit_int || ( $filtered_limit_int > $wp_max_limit_int && $filtered_limit_int > $current_limit_int ) ) {
 			if ( false !== @ini_set( 'memory_limit', $filtered_limit ) ) {
 				return $filtered_limit;
 			} else {
 				return false;
 			}
-		} elseif ( -1 === $wp_max_limit_int || $wp_max_limit_int > $current_limit_int ) {
+		} elseif ( - 1 === $wp_max_limit_int || $wp_max_limit_int > $current_limit_int ) {
 			if ( false !== @ini_set( 'memory_limit', $wp_max_limit ) ) {
 				return $wp_max_limit;
 			} else {
 				return false;
 			}
 		}
+
 		return false;
 	}
 
