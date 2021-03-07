@@ -332,6 +332,7 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 * TWEAKED Refactored contact files as an info card widget.
 * TWEAKED Merged Install & Updates tabs in the tools screen.
 * TWEAKED Improved method of dequeueing styles on the managed pages.
+* TWEAKED Quick add form to consolidate fields and add mobile phone field.
 * FIXED Typo in filter of title actions.
 * FIXED PHP Warnings & Notices during uninstall.
 * FIXED Dequeue Avada theme styles on the managed page.

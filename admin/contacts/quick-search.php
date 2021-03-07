@@ -10,11 +10,30 @@ use function Groundhogg\html;
 
 ?>
 <div class="wp-clearfix"></div>
-<form method="get">
-	<?php html()->hidden_GET_inputs( true ); ?>
-    <div id="quick-search" class="postbox">
-        <div class="left">
-            <div class="tag-quick-search-wrap">
+<?php html()->hidden_GET_inputs( true ); ?>
+<div id="quick-search" class="postbox">
+	<div class="left">
+		<form method="post">
+			<?php
+
+			wp_nonce_field( 'load_search' );
+			action_input( 'load_search' );
+
+			echo html()->dropdown( [
+				'name'     => 'saved_search',
+				'class'    => 'saved-search',
+				'options'  => Saved_Searches::instance()->get_for_select(),
+				'selected' => get_url_var( 'saved_search_id' ),
+				'option_none' => __( 'Select a saved search', 'groundhogg' )
+			] );
+
+			html()->submit( [ 'text' => __( 'Load Search', 'groundhogg' ), 'class' => 'button button-secondary' ], true )
+			?>
+		</form>
+	</div>
+	<div class="right">
+		<form method="get">
+			<div class="tag-quick-search-wrap">
 				<?php
 
 				$includes = html()->dropdown( [
@@ -40,31 +59,19 @@ use function Groundhogg\html;
 				printf( __( "Has %s of these tags %s", 'groundhogg' ), $includes, $tags );
 
 				?>
-            </div>
-            <span>
-                <?php
-
-                printf( "Owner is %s", html()->dropdown_owners( [
-					'name'     => 'owner',
-					'class'    => 'owner',
-					'selected' => absint( get_url_var( 'owner' ) ),
-                    'option_none' => __( 'Any owner', 'groundhogg' )
-				] ) );
-
-                ?>
-            </span>
-        </div>
-        <div class="right">
-			<?php
-			echo html()->input( [
-				'name'        => 's',
-				'placeholder' => __( 'Name or Email', 'groundhogg' ),
-				'class'       => 'input',
-				'value'       => sanitize_text_field( get_url_var( 's' ) )
-			] ) ?>
-			<?php echo html()->submit( [
-				'text' => 'Search'
-			] ) ?>
-        </div>
-    </div>
-</form>
+			</div>
+			<div class="quick-search">
+				<?php
+				echo html()->input( [
+					'name'        => 's',
+					'placeholder' => __( 'Name or Email', 'groundhogg' ),
+					'class'       => 'input',
+					'value'       => sanitize_text_field( get_url_var( 's' ) )
+				] ) ?>
+				<?php echo html()->submit( [
+					'text' => 'Search'
+				] ) ?>
+			</div>
+		</form>
+	</div>
+</div>

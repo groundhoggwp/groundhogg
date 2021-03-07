@@ -113,6 +113,16 @@ a.change-status.complained:hover {
     margin-right: 20px;
 }
 
+#quick-search .right form{
+    display: flex;
+    justify-content: space-between;
+}
+
+#quick-search .right form .quick-search{
+    display: flex;
+    width: auto;
+}
+
 .or-separator {
     /*border: 1px solid #cccccc;*/
     height: 2px;

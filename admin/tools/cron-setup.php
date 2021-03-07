@@ -168,7 +168,7 @@ switch ( $step ):
 					<?php html()->e( 'a', [
 						'href'  => admin_page_url( [ 'tab' => 'cron', 'step' => 'verify' ] ),
 						'class' => 'button button-primary'
-					], __( 'Try again!', 'groundhogg' ), false, true ); ?>
+					], __( 'Try again! &olarr;', 'groundhogg' ), false, true ); ?>
 				<?php endif; ?>
 			</div>
 		</div>
