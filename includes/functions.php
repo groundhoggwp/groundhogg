@@ -1478,14 +1478,14 @@ function convert_user_to_contact_when_user_registered( $userId ) {
  */
 function get_form_list() {
 
-	$forms = Plugin::$instance->dbs->get_db( 'steps' )->query( [
+	$forms = get_db( 'steps' )->query( [
 		'step_type' => 'form_fill'
 	] );
 
 	$form_options = array();
 
 	foreach ( $forms as $form ) {
-		$step = Plugin::$instance->utils->get_step( $form->ID );
+		$step = new Step( $form->ID );
 		if ( $step->is_active() ) {
 			$form_options[ $form->ID ] = $form->step_title;
 		}

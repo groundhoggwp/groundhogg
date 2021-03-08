@@ -70,11 +70,12 @@ class Utils {
 	public function get_object( $id = 0, $by = 'ID', $object = 'contact', $get_from_cache = true ) {
 
 
-		$cache_key = md5( $id . '|' . $by . '|' . $object );
+		$cache_key = $id . ':' . $by . ':' . $object;
 
 		if ( $get_from_cache ) {
-			if ( key_exists( $cache_key, self::$object_cache ) ) {
-				return self::$object_cache[ $cache_key ];
+			$cache_value = wp_cache_get( $cache_key, 'groundhogg/objects' );
+			if ( $cache_value ){
+				return $cache_value;
 			}
 		}
 
@@ -91,7 +92,7 @@ class Utils {
 		$object = new $class( $id, $by );
 
 		if ( $object && $object->exists() ) {
-			self::$object_cache[ $cache_key ] = $object;
+			wp_cache_set( $cache_key, $object, 'groundhogg/objects' );
 
 			return $object;
 		}

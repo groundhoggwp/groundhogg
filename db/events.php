@@ -206,7 +206,17 @@ class Events extends DB {
 	public function get_by( $column, $row_id ) {
 		global $wpdb;
 		$column  = esc_sql( $column );
+
+		$cache_key   = "get_by:$column:$row_id";
+		$cache_value = $this->cache_get( $cache_key );
+
+		if ( $cache_value ) {
+			return $cache_value;
+		}
+
 		$results = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $this->table_name WHERE `$column` = %s ORDER BY `ID` DESC LIMIT 1;", $row_id ) );
+
+		$this->cache_set( $cache_key, $results );
 
 		return apply_filters( 'groundhogg/db/get/' . $this->get_object_type(), $results );
 	}

@@ -350,10 +350,10 @@ abstract class DB {
 		global $wpdb;
 		$column = esc_sql( $column );
 
-		$cache_key   = "$column:$row_id";
-		$cache_value = $this->cache_get( $cache_key );
+		$cache_key   = "get_by:$column:$row_id";
+		$cache_value = $this->cache_get( $cache_key, $found );
 
-		if ( $cache_value ) {
+		if ( $found ) {
 			return $cache_value;
 		}
 
@@ -475,14 +475,16 @@ abstract class DB {
 	/**
 	 * Get the results from the cache
 	 *
-	 * @param $cache_key
+	 * @param $cache_key string
+	 * @param $found bool if a result was found
 	 *
 	 * @return false|mixed
 	 */
-	public function cache_get( $cache_key ) {
+	public function cache_get( $cache_key, &$found = null ) {
 		$last_changed = $this->get_last_changed();
 		$cache_key    = "$cache_key:$last_changed";
-		return wp_cache_get( $cache_key, $this->get_cache_group() );
+
+		return wp_cache_get( $cache_key, $this->get_cache_group(), false, $found );
 	}
 
 	/**
@@ -493,9 +495,10 @@ abstract class DB {
 	 *
 	 * @return bool
 	 */
-	public function cache_set( $cache_key, $results ){
+	public function cache_set( $cache_key, $results ) {
 		$last_changed = $this->get_last_changed();
 		$cache_key    = "$cache_key:$last_changed";
+
 		return wp_cache_set( $cache_key, $results, $this->get_cache_group() );
 	}
 
@@ -505,7 +508,7 @@ abstract class DB {
 	 * @return string
 	 */
 	public function get_cache_group() {
-		return 'gh_' . $this->get_object_type() . 's';
+		return 'groundhogg/db/' . $this->get_object_type();
 	}
 
 	/**
@@ -779,11 +782,14 @@ abstract class DB {
 	 */
 	public function advanced_query( $query_vars = [], $from_cache = true ) {
 
-		$cache_key = md5( serialize( $query_vars ) );
+		ksort( $query_vars );
 
-		$cache_value = $this->cache_get( $cache_key );
+		$cache_key = "query:" . md5( serialize( $query_vars ) );
 
-		if ( $cache_value && $from_cache !== false ) {
+
+		$cache_value = $this->cache_get( $cache_key, $found );
+
+		if ( $found && $from_cache !== false ) {
 			return $cache_value;
 		}
 
@@ -825,7 +831,9 @@ abstract class DB {
 		}
 
 		$last_changed = wp_cache_get( 'last_changed', $this->get_cache_group() );
+
 		if ( ! $last_changed ) {
+			$last_changed = microtime();
 			wp_cache_set( 'last_changed', $last_changed, $this->get_cache_group() );
 		}
 
