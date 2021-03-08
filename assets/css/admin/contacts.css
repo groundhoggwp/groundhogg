@@ -119,7 +119,6 @@ a.change-status.complained:hover {
 }
 
 #quick-search .right form .quick-search{
-    display: flex;
     width: auto;
 }
 
