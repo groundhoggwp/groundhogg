@@ -1170,8 +1170,8 @@ class Contact_Query {
 		}
 
 		self::$filters[ $type ] = [
-			'type'             => $type,
-			'filter_callback'  => $filter_callback,
+			'type'            => $type,
+			'filter_callback' => $filter_callback,
 		];
 
 		return true;
@@ -1184,17 +1184,17 @@ class Contact_Query {
 
 		self::register_filter(
 			'first_name',
-			[ self::class, 'contact_generic_text_filter_compare' ],
+			[ self::class, 'contact_generic_text_filter_compare' ]
 		);
 
 		self::register_filter(
 			'last_name',
-			[ self::class, 'contact_generic_text_filter_compare' ],
+			[ self::class, 'contact_generic_text_filter_compare' ]
 		);
 
 		self::register_filter(
 			'email',
-			[ self::class, 'contact_generic_text_filter_compare' ],
+			[ self::class, 'contact_generic_text_filter_compare' ]
 		);
 	}
 
