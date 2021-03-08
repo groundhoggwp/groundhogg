@@ -333,6 +333,7 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 * TWEAKED Merged Install & Updates tabs in the tools screen.
 * TWEAKED Improved method of dequeueing styles on the managed pages.
 * TWEAKED Quick add form to consolidate fields and add mobile phone field.
+* TWEAKED Optimized use of Object Caching in the parent DB class. Now used by multiple methods and not just the main `query` method.
 * FIXED Typo in filter of title actions.
 * FIXED PHP Warnings & Notices during uninstall.
 * FIXED Dequeue Avada theme styles on the managed page.
