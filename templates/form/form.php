@@ -8,9 +8,11 @@
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 1.0.20
  */
+use Groundhogg\Step;
+
 $form_id = get_query_var( 'form_id' );
 
-$step = \Groundhogg\new Step( $form_id );
+$step = new Step( $form_id );
 
 if ( ! $step ){
     wp_die( 'No form found...' );
