@@ -36,7 +36,7 @@ $checklist_items = [
 	[
 		'title'       => __( 'Configure Cron Jobs', 'groundhogg' ),
 		'description' => __( 'This is a best practice and will improve the performance of your site.', 'groundhogg' ),
-		'completed'   => $gh_cron_setup && $wp_cron_setup && gh_cron_installed() && defined( 'DISABLE_WP_CRON' ),
+		'completed'   => apply_filters( 'groundhogg/cron/verified', $gh_cron_setup && $wp_cron_setup && gh_cron_installed() && defined( 'DISABLE_WP_CRON' ) ),
 		'fix'         => admin_page_url( 'gh_tools', [ 'tab' => 'cron' ] ),
 		'cap'         => 'manage_options'
 	],

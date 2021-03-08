@@ -9,4 +9,4 @@
  * Webpack is compiling as the input file.
  */
 
-import './form/index.js';
+import './form/index.js'

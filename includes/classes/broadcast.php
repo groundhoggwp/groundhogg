@@ -47,7 +47,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 		switch ( $this->get_broadcast_type() ) {
 			case self::TYPE_EMAIL:
-				$this->object = Plugin::$instance->utils->get_email( $this->get_object_id() );
+				$this->object = new Email( $this->get_object_id() );
 				break;
 			case self::TYPE_SMS:
 

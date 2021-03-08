@@ -5,7 +5,7 @@ namespace Groundhogg\Admin\Broadcasts;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Broadcast;
 use Groundhogg\Bulk_Jobs\Broadcast_Scheduler;
-use Groundhogg\Contact_Query;
+use Groundhogg\Email;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 use Groundhogg\Saved_Searches;
@@ -134,7 +134,7 @@ class Broadcasts_Page extends Admin_Page {
 
 		if ( $meta['object_type'] === 'email' ) {
 
-			$email = Plugin::$instance->utils->get_email( $object_id );
+			$email = new Email( $object_id );
 
 			if ( $email->is_draft() ) {
 				return new \WP_Error( 'email_in_draft_mode', __( 'You cannot schedule an email while it is in draft mode.', 'groundhogg' ) );

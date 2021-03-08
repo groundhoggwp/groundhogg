@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 include GROUNDHOGG_PATH . 'templates/managed-page.php';
 
 $email_id = absint( get_query_var( 'email_id' ) );
-$email = Plugin::$instance->utils->get_email( $email_id );
+$email = new Email( $email_id );
 
 if ( ! $email ){
     wp_die( __( 'Could not load email...' ) );

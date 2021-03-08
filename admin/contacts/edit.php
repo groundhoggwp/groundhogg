@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Contacts;
 use Groundhogg\Plugin;
 use function Groundhogg\current_user_is;
 use function Groundhogg\dashicon_e;
+use function Groundhogg\get_contactdata;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
@@ -15,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $id = absint( get_request_var( 'contact' ) );
 
-$contact = Plugin::$instance->utils->get_contact( $id );
+$contact = get_contactdata( $id );
 
 if ( ! $contact || ! $contact->exists() ) {
 	wp_die( _x( 'This contact has been deleted.', 'contact_record', 'groundhogg' ) );

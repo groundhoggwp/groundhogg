@@ -183,7 +183,7 @@ class Rewrites {
 				$link_id = absint( get_query_var( 'link_id' ) );
 				$contact = get_contactdata();
 
-				$step = Plugin::$instance->utils->get_step( $link_id );
+				$step = new Step( $link_id );
 
 				if ( ! $step ) {
 					return;

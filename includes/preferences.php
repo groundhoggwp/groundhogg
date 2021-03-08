@@ -134,7 +134,7 @@ class Preferences {
 	 * @return bool|string
 	 */
 	public function get_optin_status_text( $id_or_email ) {
-		$contact = Plugin::instance()->utils->get_contact( $id_or_email );
+		$contact = get_contactdata( $id_or_email );
 
 		if ( ! $contact ) {
 			return _x( 'No Contact', 'notice', 'groundhogg' );
@@ -275,7 +275,7 @@ class Preferences {
 	 * @return bool
 	 */
 	public function is_marketable( $id_or_email ) {
-		$contact = Plugin::instance()->utils->get_contact( $id_or_email );
+		$contact = get_contactdata( $id_or_email );
 
 		if ( ! $contact ) {
 			return _x( 'No Contact', 'notice', 'groundhogg' );
@@ -371,7 +371,7 @@ class Preferences {
 	 */
 	public function is_in_grace_period( $id_or_email ) {
 
-		$contact = Plugin::instance()->utils->get_contact( $id_or_email );
+		$contact = get_contactdata( $id_or_email );
 
 		$grace = absint( $this->get_grace_period() ) * 24 * HOUR_IN_SECONDS;
 

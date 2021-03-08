@@ -28,7 +28,7 @@ $cron_jobs_active = array_reduce( $cron_jobs, function ( $carry, $cron_job ) {
 	return $carry && $cron_job['active'];
 }, true );
 
-if ( $cron_jobs_active && gh_cron_installed() && defined( 'DISABLE_WP_CRON' ) ) {
+if ( apply_filters( 'groundhogg/cron/verified', $cron_jobs_active && gh_cron_installed() && defined( 'DISABLE_WP_CRON' ) ) ) {
 	$step = 'verify';
 }
 
@@ -144,6 +144,17 @@ switch ( $step ):
 			<div class="gh-tools-box">
 				<p><?php _e( "Let's check to make sure you set up everything up correctly.", 'groundhogg' ); ?></p>
 				<hr/>
+				<?php if ( ! gh_cron_installed() ): ?>
+					<p>❌ <?php _e( 'The <code>gh-cron.php</code> file is not installed.', 'groundhogg' ); ?></p>
+					<p><a class=""
+					      href="<?php echo esc_url( action_url( 'install_gh_cron' ) ); ?>">
+							<?php _e( 'Install It Now!', 'groundhogg' ); ?>
+						</a></p>
+				<?php else: ?>
+					<p>✅️ <?php _e( "The <code>gh-cron.php</code> file is installed!", 'groundhogg' ); ?></p>
+				<?php endif; ?>
+				<hr/>
+				<?php do_action( 'groundhogg/cron/verify_files_installed' ); ?>
 				<?php foreach ( $cron_jobs as $cron_job_id => $cron_job ): ?>
 					<?php if ( ! $cron_job[ 'active' ] ): ?>
 						<p>❌ <?php printf( __( 'It looks like your cron job for <b>%s</b> is not working.', 'groundhogg' ), $cron_job['purpose'] ); ?></p>

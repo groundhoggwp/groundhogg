@@ -158,7 +158,7 @@ class Contacts_Page extends Admin_Page {
 				break;
 			case 'edit':
 				$contact_id = get_request_var( 'contact' );
-				$contact    = Plugin::$instance->utils->get_contact( absint( $contact_id ) );
+				$contact    = get_contactdata( absint( $contact_id ) );
 
 				if ( $contact ) {
 					$prefix      = $contact->get_first_name() ? $contact->get_full_name() : $contact->get_email();
@@ -382,7 +382,7 @@ class Contacts_Page extends Admin_Page {
 				break;
 			case 'edit':
 				$contacts = $this->get_items();
-				$contact  = Plugin::$instance->utils->get_contact( array_shift( $contacts ) ); //todo check
+				$contact  = get_contactdata( array_shift( $contacts ) ); //todo check
 				if ( $contact ) {
 					return sprintf( _x( 'Edit Contact: %s', 'page_title', 'groundhogg' ), $contact->get_full_name() );
 				} else {
@@ -394,7 +394,7 @@ class Contacts_Page extends Admin_Page {
 
 				if ( key_exists( 'contact', $_GET ) ) {
 					$contacts = $this->get_items();
-					$contact  = Plugin::$instance->utils->get_contact( array_shift( $contacts ) ); // todo check
+					$contact  = get_contactdata( array_shift( $contacts ) ); // todo check
 
 					return sprintf( _x( 'Submit Form For %s', 'page_title', 'groundhogg' ), $contact->get_full_name() );
 				} else {
@@ -918,7 +918,7 @@ class Contacts_Page extends Admin_Page {
 			$tags = validate_tags( get_request_var( 'bulk_tags' ) );
 
 			foreach ( $this->get_items() as $id ) {
-				$contact = Plugin::$instance->utils->get_contact( $id );
+				$contact = get_contactdata( $id );
 				$contact->apply_tag( $tags );
 			}
 
@@ -947,7 +947,7 @@ class Contacts_Page extends Admin_Page {
 			$tags = wp_parse_id_list( get_request_var( 'bulk_tags' ) );
 
 			foreach ( $this->get_items() as $id ) {
-				$contact = Plugin::$instance->utils->get_contact( $id );
+				$contact = get_contactdata( $id );
 				$contact->remove_tag( $tags );
 			}
 

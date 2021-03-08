@@ -203,7 +203,7 @@ class Form {
 			$form .= "<input type='hidden' name='gh_submit_form' value='" . $this->get_id() . "'>";
 		}
 
-		$step = Plugin::$instance->utils->get_step( $this->get_id() );
+		$step = new Step( $this->get_id() );
 
 		if ( ! $step ) {
 			return sprintf( "<p>%s</p>", __( "<b>Configuration Error:</b> This form has been deleted." ) );

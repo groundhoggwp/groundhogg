@@ -1,6 +1,7 @@
 <?php
 namespace Groundhogg\Admin\Contacts;
 
+use Groundhogg\Step;
 use function Groundhogg\get_form_list;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
@@ -23,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 $form_id = absint( get_request_var( 'form' ) );
 
-$step = Plugin::$instance->utils->get_step( $form_id ); //todo check
+$step = new Step( $form_id ); //todo check
 
 $forms = get_form_list();
 ?>

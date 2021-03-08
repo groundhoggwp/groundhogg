@@ -725,7 +725,7 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function set_contact( $contact ) {
 		if ( is_numeric( $contact ) ) {
-			$contact = Plugin::$instance->utils->get_contact( $contact );
+			$contact = get_contactdata( $contact );
 		}
 
 		$this->contact = $contact;
@@ -776,7 +776,7 @@ class Email extends Base_Object_With_Meta {
 			return new WP_Error( 'email_not_ready', sprintf( __( 'Emails cannot be sent in %s mode.', 'groundhogg' ), $this->get_status() ) );
 		}
 
-		$contact = $contact_id_or_email instanceof Contact ? $contact_id_or_email : Plugin::$instance->utils->get_contact( $contact_id_or_email );
+		$contact = $contact_id_or_email instanceof Contact ? $contact_id_or_email : get_contactdata( $contact_id_or_email );
 
 		if ( ! $contact ) {
 			return new WP_Error( 'no_recipient', __( 'No valid recipient was provided.' ) );

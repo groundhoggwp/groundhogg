@@ -19,7 +19,7 @@ class Submission extends Base_Object_With_Meta {
 	 * @return DB
 	 */
 	protected function get_db() {
-		return Plugin::$instance->dbs->get_db( 'submissions' );
+		return get_db( 'submissions' );
 	}
 
 	/**
@@ -28,7 +28,7 @@ class Submission extends Base_Object_With_Meta {
 	 * @return Meta_DB
 	 */
 	protected function get_meta_db() {
-		return Plugin::$instance->dbs->get_db( 'submissionmeta' );
+		return get_db( 'submissionmeta' );
 	}
 
 	/**
@@ -72,7 +72,7 @@ class Submission extends Base_Object_With_Meta {
 	}
 
 	public function get_contact() {
-		return Plugin::$instance->utils->get_contact( $this->get_contact_id() );
+		return get_contactdata( $this->get_contact_id() );
 	}
 
 	/**

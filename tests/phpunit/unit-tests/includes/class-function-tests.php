@@ -54,7 +54,7 @@ class Function_Tests extends GH_UnitTestCase {
 
 		$contact = get_contactdata( $user_id, true );
 
-		$this->assertTrue( $contact->has_tag( 'subscriber' ) );
+		$this->assertTrue( $contact->has_tag( 'Subscriber' ) );
 	}
 
 	public function test_preg_quote_except() {
@@ -72,14 +72,5 @@ class Function_Tests extends GH_UnitTestCase {
 			$this->assertEquals( preg_quote_except( $test[0], $test[1] ), $test[2] );
 		}
 	}
-
-//	public function test_url_exclusions(){
-//
-//		// url, expected
-//		$tests = [
-//
-//		];
-//
-//	}
 
 }

@@ -185,7 +185,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'name'  => 'email',
 						'value' => $contact->get_email(),
 					);
-					echo Plugin::$instance->utils->html->input( $args ); ?>
+					echo html()->input( $args ); ?>
                     <span class="row-actions"><a
                                 title="<?php printf( esc_attr__( 'Visit %s', 'groundhogg' ), substr( $contact->get_email(), strpos( $contact->get_email(), '@' ) + 1 ) ); ?>"
                                 style="text-decoration: none" target="_blank"
@@ -266,7 +266,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'name'  => 'primary_phone',
 						'value' => $contact->get_meta( 'primary_phone' ),
 					);
-					echo Plugin::$instance->utils->html->input( $args ); ?>
+					echo html()->input( $args ); ?>
 					<?php _e( 'ext.', 'groundhogg' ) ?>
 					<?php $args = array(
 						'id'    => 'primary_phone_extension',
@@ -274,7 +274,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'class' => 'phone-ext',
 						'value' => $contact->get_meta( 'primary_phone_extension' ),
 					);
-					echo Plugin::$instance->utils->html->input( $args ); ?>
+					echo html()->input( $args ); ?>
                 </td>
             </tr>
             <tr>
@@ -288,12 +288,12 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'name'  => 'mobile_phone',
 						'value' => $contact->get_meta( 'mobile_phone' ),
 					);
-					echo Plugin::$instance->utils->html->input( $args ); ?>
+					echo html()->input( $args ); ?>
                 </td>
             </tr>
             <tr>
                 <th><?php _ex( 'Contact Owner', 'contact_record', 'groundhogg' ); ?></th>
-                <td><?php echo Plugin::$instance->utils->html->dropdown_owners( array( 'selected' => ( $contact->get_ownerdata() ) ? $contact->get_owner_id() : 0 ) ); ?>
+                <td><?php echo html()->dropdown_owners( array( 'selected' => ( $contact->get_ownerdata() ) ? $contact->get_owner_id() : 0 ) ); ?>
                 </td>
             </tr>
             </tbody>
@@ -311,7 +311,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 				'style'    => [ 'min-width' => '600px' ]
 
 			);
-			echo Plugin::$instance->utils->html->tag_picker( $args ); ?>
+			echo html()->tag_picker( $args ); ?>
             <p class="description"><?php _ex( 'Add new tags by hitting <code>Enter</code> or by typing a <code>,</code>.', 'contact_record', 'groundhogg' ); ?></p>
         </div>
         <h2><?php _e( 'User Account' ); ?></h2>
@@ -430,7 +430,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'name'  => 'company_name',
 						'value' => $contact->get_meta( 'company_name' ),
 					);
-					echo Plugin::$instance->utils->html->input( $args ); ?>
+					echo html()->input( $args ); ?>
                 </td>
             </tr>
             <tr>
@@ -440,7 +440,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'name'  => 'job_title',
 						'value' => $contact->get_meta( 'job_title' ),
 					);
-					echo Plugin::$instance->utils->html->input( $args ); ?>
+					echo html()->input( $args ); ?>
                 </td>
             </tr>
             <tr>
@@ -452,7 +452,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'name'  => 'company_address',
 						'value' => $contact->get_meta( 'company_address' ),
 					);
-					echo Plugin::$instance->utils->html->input( $args ); ?>
+					echo html()->input( $args ); ?>
                 </td>
             </tr>
             <tr>
@@ -466,7 +466,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'name'  => 'company_phone',
 						'value' => $contact->get_meta( 'company_phone' ),
 					);
-					echo Plugin::$instance->utils->html->input( $args ); ?>
+					echo html()->input( $args ); ?>
 					<?php _e( 'ext.', 'groundhogg' ) ?>
 					<?php $args = array(
 						'id'    => 'company_phone_extension',
@@ -474,7 +474,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'class' => 'phone-ext',
 						'value' => $contact->get_meta( 'company_phone_extension' ),
 					);
-					echo Plugin::$instance->utils->html->input( $args ); ?>
+					echo html()->input( $args ); ?>
                 </td>
             </tr>
         </table>
@@ -494,7 +494,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'name'  => 'street_address_1',
 						'value' => $contact->get_meta( 'street_address_1' ),
 					);
-					echo Plugin::$instance->utils->html->input( $args ); ?>
+					echo html()->input( $args ); ?>
                 </td>
             </tr>
             <tr>
@@ -506,7 +506,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'name'  => 'street_address_2',
 						'value' => $contact->get_meta( 'street_address_2' ),
 					);
-					echo Plugin::$instance->utils->html->input( $args ); ?>
+					echo html()->input( $args ); ?>
                 </td>
             </tr>
             <tr>
@@ -516,7 +516,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'name'  => 'city',
 						'value' => $contact->get_meta( 'city' ),
 					);
-					echo Plugin::$instance->utils->html->input( $args ); ?>
+					echo html()->input( $args ); ?>
                 </td>
             </tr>
             <tr>
@@ -528,7 +528,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'name'  => 'postal_zip',
 						'value' => $contact->get_meta( 'postal_zip' ),
 					);
-					echo Plugin::$instance->utils->html->input( $args ); ?>
+					echo html()->input( $args ); ?>
                 </td>
             </tr>
             <tr>
@@ -539,7 +539,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'name'  => 'region',
 						'value' => $contact->get_meta( 'region' ),
 					);
-					echo Plugin::$instance->utils->html->input( $args ); ?>
+					echo html()->input( $args ); ?>
                 </td>
             </tr>
             <tr>
@@ -553,7 +553,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 							'data'        => Plugin::$instance->utils->location->get_countries_list(),
 							'placeholder' => _x( 'Select a Country', 'contact_record', 'groundhogg' ),
 						);
-						echo Plugin::$instance->utils->html->select2( $args ); ?>
+						echo html()->select2( $args ); ?>
                     </div>
                 </td>
             </tr>
@@ -565,7 +565,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'name'  => 'ip_address',
 						'value' => $contact->get_meta( 'ip_address' ),
 					);
-					echo Plugin::$instance->utils->html->input( $args ); ?>
+					echo html()->input( $args ); ?>
 					<?php if ( $contact->get_ip_address() && $contact->get_ip_address() !== '::1' ): ?>
                         <span class="button-actions">
                     <?php submit_button( _x( 'Extrapolate Location', 'action', 'groundhogg' ), 'secondary', 'extrapolate_location', false ); ?>
@@ -584,7 +584,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 							'data'     => Plugin::$instance->utils->location->get_time_zones(),
 							'selected' => $contact->get_meta( 'time_zone' ),
 						);
-						echo Plugin::$instance->utils->html->select2( $args ); ?></div>
+						echo html()->select2( $args ); ?></div>
                 </td>
             </tr>
             </tbody>
@@ -633,7 +633,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'name'  => 'source_page',
 						'value' => $contact->get_meta( 'source_page' ),
 					);
-					echo Plugin::$instance->utils->html->input( $args ); ?>
+					echo html()->input( $args ); ?>
                     <span class="row-actions">
                     <a style="text-decoration: none" target="_blank"
                        href="<?php echo esc_url( $contact->get_meta( 'source_page' ) ); ?>"><span
@@ -651,7 +651,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'name'  => 'lead_source',
 						'value' => $contact->get_meta( 'lead_source' ),
 					);
-					echo Plugin::$instance->utils->html->input( $args ); ?>
+					echo html()->input( $args ); ?>
                     <span class="row-actions">
                     <a style="text-decoration: none" target="_blank"
                        href="<?php echo esc_url( $contact->get_meta( 'lead_source' ) ); ?>"><span
@@ -724,7 +724,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 							'readonly' => true,
 							'style'    => [ 'width' => '820px' ]
 						);
-						echo Plugin::$instance->utils->html->textarea( $args ); ?>
+						echo html()->textarea( $args ); ?>
                     </td>
                 </tr>
                 </tbody>
@@ -747,7 +747,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                 <th><?php _ex( 'Send Email', 'contact_record', 'groundhogg' ); ?></th>
                 <td>
                     <div style="max-width: 400px">
-						<?php echo Plugin::$instance->utils->html->dropdown_emails( array() ); ?>
+						<?php echo html()->dropdown_emails( array() ); ?>
                         <div class="button-actions">
                             <button type="submit" name="send_email" value="send"
                                     class="button"><?php _e( 'Send' ); ?></button>
@@ -762,13 +762,15 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                     <div style="max-width: 400px">
 						<?php
 
-						$steps   = Plugin::$instance->dbs->get_db( 'steps' )->query( [
+						$steps   = get_db( 'steps' )->query( [
 							'orderby' => 'step_order',
 							'order'   => 'asc'
 						] );
+						
 						$options = array();
+						
 						foreach ( $steps as $step ) {
-							$step = Plugin::$instance->utils->get_step( $step->ID );
+							$step = new Step( $step->ID );
 							if ( $step && $step->is_active() ) {
 
 								$funnel_name                          = $step->get_funnel()->get_title();
@@ -776,7 +778,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 							}
 						}
 
-						echo Plugin::$instance->utils->html->select2( [
+						echo html()->select2( [
 							'name'     => 'add_contacts_to_funnel_step_picker',
 							'id'       => 'add_contacts_to_funnel_step_picker',
 							'data'     => $options,
@@ -802,7 +804,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 
 						$default = get_array_var( array_keys( $form_options ), 0 );
 
-						echo Plugin::$instance->utils->html->select2( [
+						echo html()->select2( [
 							'name'        => 'manual_form_submission',
 							'id'          => 'manual_form_submission',
 							'class'       => 'manual-submission gh-select2',
@@ -946,21 +948,21 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 									'type'     => 'text',
 									'readonly' => true
 								);
-								echo Plugin::$instance->utils->html->input( $args );
+								echo html()->input( $args );
 							} else if ( strpos( $value, PHP_EOL ) !== false ) {
 								$args = array(
 									'name'  => 'meta[' . $meta_key . ']',
 									'id'    => $meta_key,
 									'value' => $value
 								);
-								echo Plugin::$instance->utils->html->textarea( $args );
+								echo html()->textarea( $args );
 							} else {
 								$args = array(
 									'name'  => 'meta[' . $meta_key . ']',
 									'id'    => $meta_key,
 									'value' => $value
 								);
-								echo Plugin::$instance->utils->html->input( $args );
+								echo html()->input( $args );
 							}
 							?>
                             <span class="row-actions"><span class="delete">
@@ -1092,7 +1094,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
         </p>
     </div>
 
-	<?php echo Plugin::$instance->utils->html->input( array(
+	<?php echo html()->input( array(
 		'type' => 'hidden',
 		'name' => 'active_tab',
 		'id'   => 'active-tab'

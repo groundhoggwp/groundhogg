@@ -43,7 +43,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return Steps
 	 */
 	protected function get_db() {
-		return Plugin::$instance->dbs->get_db( 'steps' );
+		return get_db( 'steps' );
 	}
 
 	/**
@@ -118,7 +118,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return Funnel
 	 */
 	public function get_funnel() {
-		return Plugin::$instance->utils->get_funnel( $this->get_funnel_id() );
+		return new Funnel( $this->get_funnel_id() );
 	}
 
 	/**

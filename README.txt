@@ -309,6 +309,10 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.4.2 (2021-03-08) =
+* TWEAKED New complex object caching causing some weird behaviour on some installs, refactored to bypass any complex object caching and only do root DB level object caching.
+* TWEAKED Added additional filters to the cron setup tool.
+
 = 2.4.1 (2021-03-08) =
 * FIXED Erroneous comma causing fatal error on contacts screen.
 

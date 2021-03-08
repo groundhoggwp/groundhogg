@@ -7,6 +7,7 @@ use Groundhogg\Funnel;
 use Groundhogg\Library;
 use function Groundhogg\dashicon;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_store_products;
@@ -898,7 +899,7 @@ class Funnels_Page extends Admin_Page {
 
 		$step_id = absint( intval( $_POST['step_id'] ) );
 
-		$step = Plugin::$instance->utils->get_step( $step_id );
+		$step = new Step( $step_id );
 
 		if ( ! $step ) {
 			wp_send_json_error();
@@ -984,16 +985,16 @@ class Funnels_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		$tags = array_map( 'intval', $_POST['tags'] );
+		$tags = array_map( 'intval', get_post_var( 'tags' ) );
 
 		$query    = new Contact_Query();
 		$contacts = $query->query( array( 'tags_include' => $tags ) );
 
-		$step = Plugin::$instance->utils->get_step( intval( $_POST['step'] ) );
+		$step = new Step( intval( get_post_var( 'step' ) ) );
 
 		foreach ( $contacts as $contact ) {
 
-			$contact = Plugin::$instance->utils->get_contact( $contact->ID );
+			$contact = get_contactdata( $contact->ID );
 			$step->enqueue( $contact );
 
 		}

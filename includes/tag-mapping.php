@@ -102,7 +102,7 @@ class Tag_Mapping extends Bulk_Job {
 	 * @param $old_roles string[]
 	 */
 	public function apply_tags_to_contact_from_changed_roles( $user_id, $role, $old_roles ) {
-		$contact = Plugin::$instance->utils->get_contact( $user_id, true );
+		$contact = get_contactdata( $user_id, true );
 
 		if ( ! $contact || ! $contact->exists() ) {
 			return;
@@ -124,7 +124,7 @@ class Tag_Mapping extends Bulk_Job {
 	 * @param $role    string
 	 */
 	public function remove_tags_from_contact_from_remove_roles( $user_id, $role ) {
-		$contact = Plugin::$instance->utils->get_contact( $user_id, true );
+		$contact = get_contactdata( $user_id, true );
 
 		if ( ! $contact || ! $contact->exists() ) {
 			return;

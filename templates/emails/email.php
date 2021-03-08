@@ -7,7 +7,7 @@ if ( ! $email_id ){
     wp_die( __( 'Could not load this email', 'groundhogg' ), __( 'Error loading email.', 'groundhogg' ) );
 }
 
-$email = Plugin::$instance->utils->get_email( $email_id );
+$email = new Email( $email_id );
 
 if ( ! $email ){
     wp_die( 'Invalid email.' );

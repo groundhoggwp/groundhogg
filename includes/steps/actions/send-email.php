@@ -104,7 +104,7 @@ class Send_Email extends Action {
 		$html = Plugin::$instance->utils->html;
 
 		$email_id = $this->get_setting( 'email_id' );
-		$email    = Plugin::$instance->utils->get_email( $email_id );
+		$email    = new Email( $email_id );
 
 		$html->start_form_table();
 
@@ -412,7 +412,7 @@ class Send_Email extends Action {
 	public function run( $contact, $event ) {
 
 		$email_id = absint( $this->get_setting( 'email_id' ) );
-		$email    = Plugin::$instance->utils->get_email( $email_id );
+		$email    = new Email( $email_id );
 
 		if ( ! $email ) {
 			return new \WP_Error( 'email_dne', 'Invalid email ID provided.' );
@@ -478,7 +478,7 @@ class Send_Email extends Action {
 	public function export( $args, $step ) {
 		$email_id = absint( $step->get_meta( 'email_id' ) );
 
-		$email = Plugin::$instance->utils->get_email( $email_id );
+		$email = new Email( $email_id );
 
 		if ( ! $email || ! $email->exists() ) {
 			return $args;

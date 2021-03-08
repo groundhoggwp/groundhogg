@@ -1,10 +1,10 @@
 /**
  * Import internationalization
  */
-import './i18n.js';
+import './i18n.js'
 
 /**
  * Import registerBlockType blocks
  */
 
-import './form/index.js';
+import './form/index.js'

@@ -983,7 +983,7 @@ class HTML {
 
 		foreach ( $a['selected'] as $email_id ) {
 
-			$email = Plugin::$instance->utils->get_email( $email_id );
+			$email = new Email( $email_id );
 
 			if ( $email ) {
 				$a['data'][ $email_id ] = $email->get_title() . ' (' . $email->get_status() . ')';
@@ -1049,7 +1049,7 @@ class HTML {
 
 		foreach ( $a['selected'] as $benchmark_id ) {
 
-			$step = Plugin::$instance->utils->get_step( $benchmark_id );
+			$step = new Step( $benchmark_id );
 
 			if ( $step ) {
 				$funnel_name                            = $step->get_funnel_title();
@@ -1067,10 +1067,10 @@ class HTML {
 	 * @return string
 	 */
 	public function step_picker( $args ) {
-		$steps   = Plugin::$instance->dbs->get_db( 'steps' )->query( [], 'step_order' );
+		$steps   = get_db( 'steps' )->query( [], 'step_order' );
 		$options = array();
 		foreach ( $steps as $step ) {
-			$step = Plugin::$instance->utils->get_step( $step->ID );
+			$step = new Step( $step->ID );
 			if ( $step && $step->is_active() ) {
 
 				$funnel_name                          = $step->get_funnel()->get_title();
@@ -1532,7 +1532,7 @@ class HTML {
 
 		foreach ( $data as $i => $step ) {
 
-			$step = Plugin::$instance->utils->get_step( absint( $step->ID ) );
+			$step = new Step( absint( $step->ID ) );
 
 			if ( $step->is_active() ) {
 

@@ -280,7 +280,7 @@ class Event extends Base_Object {
 
 		switch ( $this->get_event_type() ) {
 			case self::FUNNEL:
-				$this->step = Plugin::$instance->utils->get_step( $this->get_step_id() );
+				$this->step = new Step( $this->get_step_id() );
 				break;
 			case self::EMAIL_NOTIFICATION:
 				$this->step = new Email_Notification( $this->get_step_id() );
