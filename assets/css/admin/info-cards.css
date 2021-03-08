@@ -35,6 +35,10 @@ ul.regular-list li {
     margin: 0;
 }
 
+div.info-card.postbox{
+    max-width: 300px;
+}
+
 .info-card .postbox-header .hndle {
     justify-content: left;
 }
@@ -341,6 +345,7 @@ ul.regular-list li {
 
 #personal-email-form .replacements-dropdown-wrap {
     margin-bottom: 10px;
+    max-width: 100%;
     /*text-align: right;*/
 }
 
