@@ -309,7 +309,10 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
-= 2.4 (2021-02-16) =
+= 2.4.1 (2021-03-08) =
+* FIXED Erroneous comma causing fatal error on contacts screen.
+
+= 2.4 (2021-03-08) =
 * ADDED Expand/Collapse all contact info cards.
 * ADDED View/Display management for info cards so you can hide ones you don't use.
 * ADDED Company phone & mobile phone contact fields.
