@@ -178,6 +178,8 @@ class Events extends DB {
 		if ( $delete_from_history === true ) {
 			$wpdb->query( "DELETE FROM $events WHERE $where;" );
 		}
+
+		$this->cache_set_last_changed();
 	}
 
 	/**

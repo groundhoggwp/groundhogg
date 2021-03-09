@@ -682,19 +682,19 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				),
 			),
-//            'gh_use_classic_builder' => array(
-//                'id' => 'gh_use_classic_builder',
-//                'section' => 'misc_info',
-//                'label' => _x('Use the classic funnel builder.', 'settings', 'groundhogg'),
-//                'desc' => _x("Don't like the new funnel builder? You can use the original one by enabling this option.", 'settings', 'groundhogg'),
-//                'type' => 'checkbox',
-//                'atts' => array(
-//                    'label' => __('Enable'),
-//                    'name' => 'gh_use_classic_builder',
-//                    'id' => 'gh_use_classic_builder',
-//                    'value' => 'on',
-//                ),
-//            ),
+			'gh_bypass_object_cache'                        => array(
+				'id'      => 'gh_bypass_object_cache',
+				'section' => 'misc_info',
+				'label'   => _x( 'Bypass Object Caching', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'Groundhogg will use Object caching by default to improve performance. Bypass it if you are experiencing strange behaviour.', 'settings', 'groundhogg' ),
+				'type'    => 'checkbox',
+				'atts'    => array(
+					'label' => __( 'Enable' ),
+					'name'  => 'gh_bypass_object_cache',
+					'id'    => 'gh_bypass_object_cache',
+					'value' => 'on',
+				),
+			),
 			'gh_ignore_user_precedence'              => array(
 				'id'      => 'gh_ignore_user_precedence',
 				'section' => 'misc_info',

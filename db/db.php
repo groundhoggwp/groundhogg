@@ -4,6 +4,7 @@ namespace Groundhogg\DB;
 
 // Exit if accessed directly
 use function Groundhogg\get_array_var;
+use function Groundhogg\is_option_enabled;
 use function Groundhogg\isset_not_empty;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -484,6 +485,11 @@ abstract class DB {
 		$last_changed = $this->get_last_changed();
 		$cache_key    = "$cache_key:$last_changed";
 
+		if ( is_option_enabled( 'gh_bypass_object_cache' ) ){
+			$found = false;
+			return false;
+		}
+
 		return wp_cache_get( $cache_key, $this->get_cache_group(), false, $found );
 	}
 
@@ -498,6 +504,10 @@ abstract class DB {
 	public function cache_set( $cache_key, $results ) {
 		$last_changed = $this->get_last_changed();
 		$cache_key    = "$cache_key:$last_changed";
+
+		if ( is_option_enabled( 'gh_bypass_object_cache' ) ){
+			return false;
+		}
 
 		return wp_cache_set( $cache_key, $results, $this->get_cache_group() );
 	}

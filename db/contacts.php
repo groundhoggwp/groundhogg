@@ -167,23 +167,6 @@ class Contacts extends DB {
 	}
 
 	/**
-	 * Insert a new contact
-	 *
-	 * @access  public
-	 * @return  int
-	 * @since   2.1
-	 */
-	public function insert( $data ) {
-		$result = parent::insert( $data );
-
-		if ( $result ) {
-			$this->cache_set_last_changed();
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Update a contact
 	 *
 	 * @access  public

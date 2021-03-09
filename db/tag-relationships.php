@@ -182,6 +182,8 @@ class Tag_Relationships extends DB {
 
 		do_action( 'groundhogg/db/post_delete/tag_relationship', $args );
 
+		$this->cache_set_last_changed();
+
 		return true;
 
 	}

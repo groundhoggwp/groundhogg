@@ -98,7 +98,10 @@ class Event_Queue extends DB {
 			SELECT $queue_columns
 			FROM $event_queue
 			WHERE $where" );
+
 		$wpdb->query( "DELETE FROM $event_queue WHERE $where;" );
+
+		$this->cache_set_last_changed();
 	}
 
 
