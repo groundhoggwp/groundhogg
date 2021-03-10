@@ -746,32 +746,6 @@ class Contacts_Page extends Admin_Page {
 			$contact->remove_tag( $contact->get_tags() );
 		}
 
-		// Check if needing to unsubscribe.
-		if ( get_request_var( 'unsubscribe' ) ) {
-			$contact->unsubscribe();
-			$this->add_notice(
-				esc_attr( 'unsubscribed' ),
-				_x( 'This contact will no longer receive marketing.', 'notice', 'groundhogg' ),
-				'info'
-			);
-		}
-
-		// Check if we are manually confirming the email naually
-		if ( get_request_var( 'manual_confirm' ) ) {
-			if ( get_request_var( 'confirmation_reason' ) ) {
-				$contact->change_marketing_preference( Preferences::CONFIRMED );
-				$contact->update_meta( 'manual_confirmation_reason', sanitize_textarea_field( get_request_var( 'confirmation_reason' ) ) );
-				$this->add_notice(
-					esc_attr( 'confirmed' ),
-					_x( 'This contact\'s email address has been confirmed.', 'notice', 'groundhogg' ),
-					'info'
-				);
-			} else {
-				return new \WP_Error( 'manual_confirmation_error', __( 'A reason is required to change the email confirmation status.', 'groundhogg' ) );
-
-			}
-		}
-
 		if ( isset( $_POST['send_email'] ) && isset( $_POST['email_id'] ) && current_user_can( 'send_emails' ) ) {
 			$mail_id = intval( $_POST['email_id'] );
 			if ( send_email_notification( $mail_id, $contact->get_id() ) ) {

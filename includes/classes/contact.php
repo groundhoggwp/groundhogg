@@ -458,6 +458,8 @@ class Contact extends Base_Object_With_Meta {
 
 		$tags = $this->get_tags_db()->validate( $tags );
 
+		$tags = array_diff( $tags, array_values( Plugin::$instance->tag_mapping->get_tag_map() ) );
+
 		foreach ( $tags as $tag_id ) {
 
 			if ( ! $this->has_tag( $tag_id ) ) {
@@ -497,6 +499,8 @@ class Contact extends Base_Object_With_Meta {
 		}
 
 		$tags = $this->get_tags_db()->validate( $tags );
+
+		$tags = array_diff( $tags, array_values( Plugin::$instance->tag_mapping->get_tag_map() ) );
 
 		foreach ( $tags as $tag_id ) {
 
