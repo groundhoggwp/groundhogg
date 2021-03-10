@@ -59,7 +59,7 @@ class Tag_Mapping extends Bulk_Job {
 	}
 
 	/**
-	 * Filter out optin status tags from being applie or removed.
+	 * Filter out optin status tags from being applied or removed.
 	 *
 	 * @param $tags
 	 *
