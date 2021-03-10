@@ -456,9 +456,7 @@ class Contact extends Base_Object_With_Meta {
 			return false;
 		}
 
-		$tags = $this->get_tags_db()->validate( $tags );
-
-		$tags = array_diff( $tags, array_values( Plugin::$instance->tag_mapping->get_tag_map() ) );
+		$tags = apply_filters( 'groundhogg/contacts/add_tag/before', $this->get_tags_db()->validate( $tags ) );
 
 		foreach ( $tags as $tag_id ) {
 
@@ -498,9 +496,7 @@ class Contact extends Base_Object_With_Meta {
 			return false;
 		}
 
-		$tags = $this->get_tags_db()->validate( $tags );
-
-		$tags = array_diff( $tags, array_values( Plugin::$instance->tag_mapping->get_tag_map() ) );
+		$tags = apply_filters( 'groundhogg/contacts/remove_tag/before', $this->get_tags_db()->validate( $tags ) );
 
 		foreach ( $tags as $tag_id ) {
 

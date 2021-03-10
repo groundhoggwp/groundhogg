@@ -52,7 +52,26 @@ class Tag_Mapping extends Bulk_Job {
 
 		add_action( 'admin_init', [ $this, 'reset_tags' ] );
 
+		add_filter( 'groundhogg/contacts/add_tag/before', [ $this, 'filter_out_optin_status_tags' ] );
+		add_filter( 'groundhogg/contacts/remove_tag/before', [ $this, 'filter_out_optin_status_tags' ] );
+
 		parent::__construct();
+	}
+
+	/**
+	 * Filter out optin status tags from being applie or removed.
+	 *
+	 * @param $tags
+	 *
+	 * @return array
+	 */
+	public function filter_out_optin_status_tags( $tags ){
+
+		if ( $this->mapping_tags ){
+			return $tags;
+		}
+
+		return array_diff( $tags, array_values( $this->get_tag_map() ) );
 	}
 
 	public function reset_tags() {
@@ -335,6 +354,17 @@ class Tag_Mapping extends Bulk_Job {
 		$this->optin_status_changed( $contact_id, $contact->get_optin_status() );
 	}
 
+	protected $mapping_tags = false;
+
+	/**
+	 * Set if mapping tags
+	 *
+	 * @param $set
+	 */
+	protected function set_mapping_tags( $set ){
+		$this->mapping_tags = (bool) $set;
+	}
+
 	/**
 	 * Perform the tag mapping.
 	 *
@@ -350,6 +380,8 @@ class Tag_Mapping extends Bulk_Job {
 		if ( ! is_a_contact( $contact ) ) {
 			return;
 		}
+
+		$this->set_mapping_tags( true );
 
 		$non_marketable_tag = $this->get_status_tag( self::NON_MARKETABLE );
 		$marketable_tag     = $this->get_status_tag( self::MARKETABLE );
@@ -383,6 +415,7 @@ class Tag_Mapping extends Bulk_Job {
 		/* Add the tags */
 		$contact->apply_tag( $add_tags );
 
+		$this->set_mapping_tags( false );
 	}
 
 	/**
