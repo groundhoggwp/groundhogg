@@ -15,6 +15,9 @@ class Info_Cards {
 		add_action( 'wp_ajax_groundhogg_save_card_order', [ $this, 'save_card_atts' ] );
 	}
 
+	/**
+	 * Register the info cards as metaboxes on the screen so they show as screen options
+	 */
 	public static function register_as_metaboxes_for_screen_options() {
 		global $wp_meta_boxes;
 
@@ -51,7 +54,7 @@ class Info_Cards {
 
 		self::register( 'user', __( 'WordPress User', 'groundhogg' ), function ( $contact ) {
 			include __DIR__ . '/cards/user.php';
-		} );
+		}, 100, 'edit_users' );
 
 		self::register( 'notes', __( 'Notes', 'groundhogg' ), function ( $contact ) {
 			include __DIR__ . '/cards/notes.php';
@@ -68,10 +71,10 @@ class Info_Cards {
 //		self::register( 'email_activity', __( 'Email Activity', 'groundhogg' ), function ( $contact ) {
 //			include __DIR__ . '/cards/email-activity.php';
 //		} );
-
-		self::register( 'formatting-example', __( 'Formatting Example', 'groundhogg' ), function ( $contact ) {
-			include __DIR__ . '/cards/example.php';
-		} );
+//
+//		self::register( 'formatting-example', __( 'Formatting Example', 'groundhogg' ), function ( $contact ) {
+//			include __DIR__ . '/cards/example.php';
+//		} );
 
 		do_action( 'groundhogg/admin/contacts/register_info_cards', $this );
 
@@ -110,6 +113,15 @@ class Info_Cards {
 			'should_display_callback' => $should_display_callback,
 			'args'                    => [] // metabox compat only
 		];
+	}
+
+	/**
+	 * Unregister unwanted cards
+	 *
+	 * @param $id
+	 */
+	public static function unregister( $id ){
+		unset( self::$info_cards[ $id ] );
 	}
 
 	/**

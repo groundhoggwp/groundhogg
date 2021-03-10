@@ -306,6 +306,10 @@ class Contact_Query {
 		}
 	}
 
+	public function __get( $name ) {
+		return $this->$name;
+	}
+
 	/**
 	 * Sets up the query for retrieving contacts.
 	 *
@@ -973,7 +977,7 @@ class Contact_Query {
 
 		$searches = array();
 		foreach ( $columns as $column ) {
-			$searches[] = $wpdb->prepare( "$column LIKE %s", $like );
+			$searches[] = $wpdb->prepare( "{$this->table_name}.$column LIKE %s", $like );
 		}
 
 		return '(' . implode( ' OR ', $searches ) . ')';
@@ -1052,7 +1056,7 @@ class Contact_Query {
 			return "$this->table_name.$orderby";
 		}
 
-		return '';
+		return empty( $orderby ) ? '' : $orderby;
 	}
 
 	/**
@@ -1091,7 +1095,7 @@ class Contact_Query {
 	 *
 	 */
 	protected function get_allowed_orderby_keys() {
-		return array_keys( $this->gh_db_contacts->get_columns() );
+		return apply_filters( 'groundhogg/contact_query/allowed_orderby_keys', array_keys( $this->gh_db_contacts->get_columns() ) );
 	}
 
 	/**

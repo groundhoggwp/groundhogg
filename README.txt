@@ -309,6 +309,11 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.4.3.1 (2021-03-09) =
+* TWEAKED meta tables get their own object cache group.
+* FIXED New personal email feature sending email in plain text when should be text/html.
+* FIXED Notes using contacts object cache group.
+
 = 2.4.3 (2021-03-08) =
 * ADDED Option to bypass object caching altogether.
 * TWEAKED correctly set last changed cache when tag relationships updated

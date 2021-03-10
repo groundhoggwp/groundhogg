@@ -22,6 +22,13 @@ class Contact_Table_Columns {
 		add_filter( 'manage_groundhogg_page_gh_contacts_columns', [ $this, 'add_columns_to_screen_options' ] );
 	}
 
+	public function sort_columns(){
+		// Sort the meta boxes by priority
+		uasort( self::$columns, function ( $a, $b ) {
+			return $a['priority'] - $b['priority'];
+		} );
+	}
+
 	/**
 	 * Add the columns to the contacts table
 	 *
@@ -30,6 +37,8 @@ class Contact_Table_Columns {
 	 * @return mixed
 	 */
 	public function add_columns_to_table( $columns ) {
+
+		$this->sort_columns();
 
 		foreach ( self::$columns as $column ) {
 
@@ -72,6 +81,8 @@ class Contact_Table_Columns {
 	 * @return mixed
 	 */
 	public function add_columns_to_screen_options( $columns ) {
+
+		$this->sort_columns();
 
 		foreach ( self::$columns as $column ) {
 

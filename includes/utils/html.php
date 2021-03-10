@@ -59,6 +59,33 @@ class HTML {
 	}
 
 	/**
+	 * @param $inputs
+	 * @param string $prefix
+	 */
+	public function hidden_inputs( $inputs, $prefix = '' ) {
+
+		if ( empty( $inputs ) ) {
+			return;
+		}
+
+		foreach ( $inputs as $name => $value ) {
+
+			$name = $prefix ? sprintf( '%s[%s]', $prefix, $name ) : $name;
+
+			if ( is_array( $value ) ) {
+				$this->hidden_inputs( $value, $name );
+			} else {
+				echo $this->input( [
+					'type'  => 'hidden',
+					'name'  => $name,
+					'value' => $value
+				] );
+			}
+		}
+
+	}
+
+	/**
 	 * Turn the GET into inputs for a nav form
 	 *
 	 * @param bool $echo
@@ -69,6 +96,7 @@ class HTML {
 		$html = '';
 
 		foreach ( $_GET as $key => $value ) {
+
 			$html .= $this->input( [
 				'type'  => 'hidden',
 				'name'  => sanitize_key( $key ),
@@ -456,12 +484,20 @@ class HTML {
 	/**
 	 * Output a button
 	 *
+	 * @param string $text
 	 * @param array $args
 	 * @param bool $echo
 	 *
 	 * @return string
 	 */
-	public function button( $args = [], $echo = false ) {
+	public function button( $text = '', $args = [], $echo = false ) {
+
+		if ( is_array( $text ) ) {
+			$args = $text;
+			$echo = $args;
+			$text = null;
+		}
+
 		$a = wp_parse_args( $args, array(
 			'type'  => 'button',
 			'text'  => '',
@@ -471,10 +507,37 @@ class HTML {
 			'value' => '',
 		) );
 
-		$text = $a['text'];
-		unset( $a['text'] );
+		if ( ! $text ) {
+			$text = $a['text'];
+			unset( $a['text'] );
+		}
 
 		return apply_filters( 'groundhogg/html/button', $this->e( 'button', $a, $text, false, $echo ), $a );
+	}
+
+	/**
+	 * @param string $text
+	 * @param array $options
+	 * @param string $type
+	 * @param callable $option_callback
+	 *
+	 * @return string
+	 */
+	public function dropdown_button( $text = '', $options = [], $type = 'secondary', $option_callback = null ) {
+
+		if ( ! is_callable( $option_callback ) ) {
+			$option_callback = function ( $option, $key ) {
+				return html()->e( 'li', [ 'class' => 'option', 'id' => 'option-' . $key ], $option );
+			};
+		}
+
+		return html()->e( 'div', [ 'class' => 'dropdown-button' ], [
+			html()->button( $text, [
+				'class' => implode( ' ', [ 'button', 'button-' . $type, 'dropdown' ] ),
+				'type'  => 'button'
+			] ),
+			html()->e( 'ul', [ 'class' => 'dropdown menu' ], array_map_with_keys( $options, $option_callback ) )
+		] );
 	}
 
 	/**

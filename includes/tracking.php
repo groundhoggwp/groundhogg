@@ -409,6 +409,13 @@ class Tracking {
 	}
 
 	/**
+	 * @return int
+	 */
+	public function get_current_event_id(){
+		return absint( $this->get_tracking_cookie_param( 'event_id' ) );
+	}
+
+	/**
 	 * Get the contact which is currently being tracked.
 	 *
 	 * @return Event|false

@@ -100,6 +100,10 @@ ul.gh-form-errors{
     padding-right: 0;
 }
 
+#gdpr-checkboxes-wrap label {
+    display: block;
+}
+
 .gh-form-column.col-1-of-1{width: 100%;}
 .gh-form-column.col-1-of-2{width: 50%}
 .gh-form-column.col-1-of-3{width: 33.33%}

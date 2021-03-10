@@ -30,6 +30,15 @@ abstract class Meta_DB extends DB {
 		return 'meta_id';
 	}
 
+	/**
+	 * Add meta to the cache group to avoid conflicts
+	 *
+	 * @return string
+	 */
+	public function get_cache_group() {
+		return parent::get_cache_group() . '_meta';
+	}
+
 	protected function add_additional_actions() {
 //        $this->register_table();
 

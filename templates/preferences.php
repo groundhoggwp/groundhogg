@@ -196,7 +196,7 @@ if ( ! $can_edit_preferences || ! is_a_contact( $contact ) ) {
 	$action = 'unidentified';
 }
 
-if ( current_user_can( 'view_contacts' ) && ! tracking()->tracking_cookie_matches_logged_in_user() ){
+if ( current_user_can( 'view_contacts' ) && ! tracking()->tracking_cookie_matches_logged_in_user() ) {
 	add_notice( 'notice_admin_logged_in_testing_warning' );
 }
 
@@ -215,20 +215,20 @@ switch ( $action ):
 
 		managed_page_head( __( 'Manage Preferences', 'groundhogg' ), 'manage' );
 		?>
-        <form method="post">
+		<form method="post">
 			<?php wp_nonce_field( 'request_email_confirmation' ); ?>
-            <h3><?php _e( 'Whoops! We were unable to confirm your identity.', 'groundhogg' ); ?></h3>
-            <p><?php _e( 'This may have occurred if you clicked an expired link or your browser is blocking cookies.', 'groundhogg' ); ?></p>
-            <p><?php _e( 'If you are trying to change your email preferences please enter your email address and we will send you an email with a special link.', 'groundhogg' ); ?></p>
-            <p>
-                <label><?php _e( 'Your Email Address', 'groundhogg' ); ?>
-                    <input type="email" name="email" required>
-                </label>
-            </p>
-            <p>
-                <button type="submit" class="button"><?php _e( 'Submit' ) ?></button>
-            </p>
-        </form>
+			<h3><?php _e( 'Whoops! We were unable to confirm your identity.', 'groundhogg' ); ?></h3>
+			<p><?php _e( 'This may have occurred if you clicked an expired link or your browser is blocking cookies.', 'groundhogg' ); ?></p>
+			<p><?php _e( 'If you are trying to change your email preferences please enter your email address and we will send you an email with a special link.', 'groundhogg' ); ?></p>
+			<p>
+				<label><?php _e( 'Your Email Address', 'groundhogg' ); ?>
+					<input type="email" name="email" required>
+				</label>
+			</p>
+			<p>
+				<button type="submit" class="button"><?php _e( 'Submit' ) ?></button>
+			</p>
+		</form>
 		<?php
 
 		managed_page_footer();
@@ -285,20 +285,16 @@ switch ( $action ):
 			$processing_consent = get_post_var( 'gdpr_consent' );
 			$marketing_consent  = get_post_var( 'marketing_consent' );
 
-			if ( $processing_consent !== 'yes' ){
-				$contact->delete_meta( 'gdpr_consent' );
-				$contact->delete_meta( 'gdpr_consent_date' );
+			if ( $processing_consent !== 'yes' ) {
+				$contact->revoke_gdpr_consent();
 			} else {
-				$contact->update_meta( 'gdpr_consent', 'yes' );
-				$contact->update_meta( 'gdpr_consent_date', $contact->get_meta( 'gdpr_consent_date' ) ?: date_i18n( get_date_time_format() ) );
+				$contact->set_gdpr_consent();
 			}
 
-			if ( $marketing_consent !== 'yes' ){
-				$contact->delete_meta( 'marketing_consent' );
-				$contact->delete_meta( 'marketing_consent_date' );
+			if ( $marketing_consent !== 'yes' ) {
+				$contact->revoke_gdpr_consent( 'marketing' );
 			} else {
-				$contact->update_meta( 'marketing_consent', 'yes' );
-				$contact->update_meta( 'marketing_consent_date', $contact->get_meta( 'marketing_consent_date' ) ?: date_i18n( get_date_time_format() ) );
+				$contact->set_gdpr_consent( 'marketing' );
 			}
 
 		}
@@ -306,48 +302,48 @@ switch ( $action ):
 		managed_page_head( __( 'Update Profile', 'groundhogg' ), 'profile' );
 
 		?>
-        <form action="" id="preferences" method="post">
-            <p>
-                <b><?php printf( __( 'Update information for <span class="contact-name">%s (%s)</span>.', 'groundhogg' ), $contact->get_full_name(), obfuscate_email( $contact->get_email() ) ) ?></b>
-            </p>
-            <p><?php _e( 'Use the form below to update your information to the most current.', 'groundhogg' ) ?></p>
+		<form action="" id="preferences" method="post">
+			<p>
+				<b><?php printf( __( 'Update information for <span class="contact-name">%s (%s)</span>.', 'groundhogg' ), $contact->get_full_name(), obfuscate_email( $contact->get_email() ) ) ?></b>
+			</p>
+			<p><?php _e( 'Use the form below to update your information to the most current.', 'groundhogg' ) ?></p>
 			<?php wp_nonce_field( 'update_contact_profile' ); ?>
-            <p>
-                <label><?php _e( 'First Name', 'groundhogg' ); ?>
-                    <input type="text" name="first_name" required>
-                </label>
-            </p>
-            <p>
-                <label><?php _e( 'Last Name', 'groundhogg' ); ?>
-                    <input type="text" name="last_name" required>
-                </label>
-            </p>
-            <p>
-                <label><?php _e( 'Confirm Email Address', 'groundhogg' ); ?>
-                    <input type="email" name="email" required>
-                </label>
-            </p>
+			<p>
+				<label><?php _e( get_default_field_label( 'first_name' ) ); ?>
+					<input type="text" name="first_name" required>
+				</label>
+			</p>
+			<p>
+				<label><?php _e( get_default_field_label( 'last_name' ) ); ?>
+					<input type="text" name="last_name" required>
+				</label>
+			</p>
+			<p>
+				<label><?php _e( 'Confirm Email Address', 'groundhogg' ); ?>
+					<input type="email" name="email" required>
+				</label>
+			</p>
 			<?php do_action( 'groundhogg/preferences/profile_form' ); ?>
-            <p>
-                <input id="submit" type="submit" class="button"
-                       value="<?php esc_attr_e( 'Save Changes', 'groundhogg' ); ?>">
-            </p>
-        </form>
-        <div class="box">
-            <p><?php _e( 'Click below to manage your communication preferences and determine when and how you would like to receive communication from us.', 'groundhogg' ) ?></p>
-            <p>
-                <a id="gotopreferences" class="button"
-                   href="<?php echo esc_url( managed_page_url( 'preferences/manage/' ) ); ?>"><?php _e( 'Change Email Preferences', 'groundhogg' ) ?></a>
-            </p>
-        </div>
+			<p>
+				<input id="submit" type="submit" class="button"
+				       value="<?php esc_attr_e( 'Save Changes', 'groundhogg' ); ?>">
+			</p>
+		</form>
+		<div class="box">
+			<p><?php _e( 'Click below to manage your communication preferences and determine when and how you would like to receive communication from us.', 'groundhogg' ) ?></p>
+			<p>
+				<a id="gotopreferences" class="button"
+				   href="<?php echo esc_url( managed_page_url( 'preferences/manage/' ) ); ?>"><?php _e( 'Change Email Preferences', 'groundhogg' ) ?></a>
+			</p>
+		</div>
 		<?php if ( Plugin::$instance->preferences->is_gdpr_enabled() ): ?>
-        <div class="box">
-            <p><?php _e( 'If you wish to update your consent please do so below. Changes to your consent will be honored instantly.', 'groundhogg' ) ?></p>
-            <form class="gdpr-consent" method="post">
+		<div class="box">
+			<p><?php _e( 'If you wish to update your consent please do so below. Changes to your consent will be honored instantly.', 'groundhogg' ) ?></p>
+			<form class="gdpr-consent" method="post">
 				<?php wp_nonce_field( 'update_gdpr_consent' ); ?>
-                <p>
+				<p>
 					<?php echo html()->checkbox( [
-						'label'   => sprintf( _x( "I agree to %s's storage and processing of my personal data.", 'form_default', 'groundhogg' ), get_bloginfo() ),
+						'label'   => get_default_field_label( 'gdpr_consent' ),
 						'name'    => 'gdpr_consent',
 						'id'      => 'gdpr_consent',
 						'class'   => 'gh-gdpr',
@@ -355,10 +351,10 @@ switch ( $action ):
 						'title'   => _x( 'I Consent', 'form_default', 'groundhogg' ),
 						'checked' => $contact->get_meta( 'gdpr_consent' ) === 'yes',
 					] ) ?>
-                </p>
-                <p>
+				</p>
+				<p>
 					<?php echo html()->checkbox( [
-						'label'   => sprintf( _x( "I agree to receive marketing offers and updates from %s.", 'form_default', 'groundhogg' ), get_bloginfo() ),
+						'label'   => get_default_field_label( 'marketing_consent' ),
 						'name'    => 'marketing_consent',
 						'id'      => 'marketing_consent',
 						'class'   => 'gh-gdpr',
@@ -366,17 +362,17 @@ switch ( $action ):
 						'title'   => _x( 'I Consent', 'form_default', 'groundhogg' ),
 						'checked' => $contact->get_meta( 'marketing_consent' ) === 'yes',
 					] ) ?>
-                </p>
-                <button class="button" type="submit"><?php _e( 'Update Consent', 'groundhogg' ); ?></button>
-            </form>
-            <p><?php _e( 'Click below to email yourself an audit of all personal information currently on file. Or if you wish for us to no longer have access to this information you can request a data erasure in accordance with your privacy rights.', 'groundhogg' ) ?></p>
-            <p>
-                <a id="downloadprofile" class="button"
-                   href="<?php echo esc_url( wp_nonce_url( managed_page_url( 'preferences/download/' ), 'download_profile' ) ); ?>"><?php _e( 'Download Profile', 'groundhogg' ) ?></a>
-                <a id="eraseprofile" class="button danger right"
-                   href="<?php echo esc_url( managed_page_url( 'preferences/erase/' ) ); ?>"><?php _e( 'Erase Profile', 'groundhogg' ) ?></a>
-            </p>
-        </div>
+				</p>
+				<button class="button" type="submit"><?php _e( 'Update Consent', 'groundhogg' ); ?></button>
+			</form>
+			<p><?php _e( 'Click below to email yourself an audit of all personal information currently on file. Or if you wish for us to no longer have access to this information you can request a data erasure in accordance with your privacy rights.', 'groundhogg' ) ?></p>
+			<p>
+				<a id="downloadprofile" class="button"
+				   href="<?php echo esc_url( wp_nonce_url( managed_page_url( 'preferences/download/' ), 'download_profile' ) ); ?>"><?php _e( 'Download Profile', 'groundhogg' ) ?></a>
+				<a id="eraseprofile" class="button danger right"
+				   href="<?php echo esc_url( managed_page_url( 'preferences/erase/' ) ); ?>"><?php _e( 'Erase Profile', 'groundhogg' ) ?></a>
+			</p>
+		</div>
 	<?php endif; ?>
 		<?php do_action( 'groundhogg/preferences/profile_form/after' ); ?>
 		<?php
@@ -408,7 +404,7 @@ switch ( $action ):
 					break;
 				case 'gdpr_delete':
 
-				    $contact->unsubscribe();
+					$contact->unsubscribe();
 
 					$redirect = managed_page_url( 'preferences/erase/' );
 					break;
@@ -444,24 +440,24 @@ switch ( $action ):
 		do_action( 'groundhogg/preferences/manage/form/before' );
 
 		?>
-        <div class="box">
-            <p>
-                <b><?php printf( __( 'Managing preferences for <span class="contact-name">%s (%s)</span>.', 'groundhogg' ), $contact->get_full_name(), obfuscate_email( $contact->get_email() ) ) ?></b>
-            </p>
+		<div class="box">
+			<p>
+				<b><?php printf( __( 'Managing preferences for <span class="contact-name">%s (%s)</span>.', 'groundhogg' ), $contact->get_full_name(), obfuscate_email( $contact->get_email() ) ) ?></b>
+			</p>
 			<?php wp_nonce_field( 'manage_email_preferences' ); ?>
 			<?php do_action( 'groundhogg/preferences/manage/form/inside' ); ?>
 			<?php foreach ( $preferences as $preference => $text ): ?>
-                <div class="preference-option">
-                    <a href="<?php echo wp_nonce_url( managed_page_url( 'preferences/manage/' ) . '?preference=' . $preference, 'manage_email_preferences' ); ?>"
-                       class="preference-<?php esc_attr_e( $preference ); ?>"
-                    ><?php echo $text; ?></a>
-                </div>
+				<div class="preference-option">
+					<a href="<?php echo wp_nonce_url( managed_page_url( 'preferences/manage/' ) . '?preference=' . $preference, 'manage_email_preferences' ); ?>"
+					   class="preference-<?php esc_attr_e( $preference ); ?>"
+					><?php echo $text; ?></a>
+				</div>
 			<?php endforeach; ?>
-            <p class="align-center">
-                <a id="gotoprofile" class="button"
-                   href="<?php echo esc_url( managed_page_url( 'preferences/profile/' ) ); ?>"><?php _e( 'Cancel' ) ?></a>
-            </p>
-        </div>
+			<p class="align-center">
+				<a id="gotoprofile" class="button"
+				   href="<?php echo esc_url( managed_page_url( 'preferences/profile/' ) ); ?>"><?php _e( 'Cancel' ) ?></a>
+			</p>
+		</div>
 		<?php
 
 		do_action( 'groundhogg/preferences/manage/form/after' );
@@ -482,16 +478,16 @@ switch ( $action ):
 		managed_page_head( __( 'Unsubscribed', 'groundhogg' ), 'unsubscribe' );
 
 		?>
-        <div class="box">
-            <p>
-                <b><?php printf( __( 'Your email address %s has just been unsubscribed.', 'groundhogg' ), obfuscate_email( $contact->get_email() ) ) ?></b>
-            </p>
-            <p><?php _e( 'Further interactions with our site may be interpreted as re-subscribing to our list and will result in further electronic communication.', 'groundhogg' ); ?></p>
-            <div class="preference-option">
-                <a href="<?php echo wp_nonce_url( managed_page_url( 'preferences/manage/' ) . '?preference=confirm', 'manage_email_preferences' ); ?>"
-                   class="preference-confirm"><?php _e( "Oops, I didn't mean to unsubscribe! Re-subscribe me!", 'groundhogg' ); ?></a>
-            </div>
-        </div>
+		<div class="box">
+			<p>
+				<b><?php printf( __( 'Your email address %s has just been unsubscribed.', 'groundhogg' ), obfuscate_email( $contact->get_email() ) ) ?></b>
+			</p>
+			<p><?php _e( 'Further interactions with our site may be interpreted as re-subscribing to our list and will result in further electronic communication.', 'groundhogg' ); ?></p>
+			<div class="preference-option">
+				<a href="<?php echo wp_nonce_url( managed_page_url( 'preferences/manage/' ) . '?preference=confirm', 'manage_email_preferences' ); ?>"
+				   class="preference-confirm"><?php _e( "Oops, I didn't mean to unsubscribe! Re-subscribe me!", 'groundhogg' ); ?></a>
+			</div>
+		</div>
 		<?php
 
 		managed_page_footer();
@@ -510,16 +506,16 @@ switch ( $action ):
 		managed_page_head( __( 'Confirmed', 'groundhogg' ), 'confirm' );
 
 		?>
-        <div class="box">
-            <p>
-                <b><?php printf( __( 'Your email address %s has just been confirmed!', 'groundhogg' ), obfuscate_email( $contact->get_email() ) ) ?></b>
-            </p>
-            <p><?php printf( __( 'You will now receive electronic communication from %1$s. Should you wish to change your communication preferences you may do so at any time by clicking the <b>Manage Preferences</b> link or <b>Unsubscribe</b> link in the footer of any email sent by %1$s.', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ); ?></p>
-            <p>
-                <a id="gotosite" class="button"
-                   href="<?php echo esc_url( home_url() ); ?>"><?php printf( __( 'Return to %s', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ); ?></a>
-            </p>
-        </div>
+		<div class="box">
+			<p>
+				<b><?php printf( __( 'Your email address %s has just been confirmed!', 'groundhogg' ), obfuscate_email( $contact->get_email() ) ) ?></b>
+			</p>
+			<p><?php printf( __( 'You will now receive electronic communication from %1$s. Should you wish to change your communication preferences you may do so at any time by clicking the <b>Manage Preferences</b> link or <b>Unsubscribe</b> link in the footer of any email sent by %1$s.', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ); ?></p>
+			<p>
+				<a id="gotosite" class="button"
+				   href="<?php echo esc_url( home_url() ); ?>"><?php printf( __( 'Return to %s', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ); ?></a>
+			</p>
+		</div>
 		<?php
 
 		managed_page_footer();
@@ -533,31 +529,31 @@ switch ( $action ):
 			managed_page_head( __( 'Erase your profile', 'groundhogg' ), 'erase' );
 
 			?>
-            <div class="box">
-                <p><b><?php _e( 'Are you sure you want to erase your profile?', 'groundhogg' ); ?></b></p>
-                <p><?php _e( "Erasing your profile will mean that you will no longer receive critical updates and communications from us.", 'groundhogg' ); ?></p>
-	            <p><b><?php _e( "What will be erased?", 'groundhogg' ); ?></b></p>
-	            <ul>
-		            <li><?php _e( "Your profile details.", 'groundhogg' ); ?></li>
-		            <li><?php _e( "Your profile marketing history.", 'groundhogg' ); ?></li>
-		            <li><?php _e( "Tracking data associated with your profile.", 'groundhogg' ); ?></li>
-	            </ul>
-	            <p><b><?php _e( "What will be <u>NOT</u> erased?", 'groundhogg' ); ?></b></p>
-	            <ul>
-		            <?php if ( $contact->get_user_id() ): ?>
-		                <li><?php _e( "Your user account. <i>To erase your user account contact us.</i>", 'groundhogg' ); ?></li>
-		                <li><?php _e( "Tracking data and historic details associated with your user account.", 'groundhogg' ); ?></li>
+			<div class="box">
+				<p><b><?php _e( 'Are you sure you want to erase your profile?', 'groundhogg' ); ?></b></p>
+				<p><?php _e( "Erasing your profile will mean that you will no longer receive critical updates and communications from us.", 'groundhogg' ); ?></p>
+				<p><b><?php _e( "What will be erased?", 'groundhogg' ); ?></b></p>
+				<ul>
+					<li><?php _e( "Your profile details.", 'groundhogg' ); ?></li>
+					<li><?php _e( "Your profile marketing history.", 'groundhogg' ); ?></li>
+					<li><?php _e( "Tracking data associated with your profile.", 'groundhogg' ); ?></li>
+				</ul>
+				<p><b><?php _e( "What will be <u>NOT</u> erased?", 'groundhogg' ); ?></b></p>
+				<ul>
+					<?php if ( $contact->get_user_id() ): ?>
+						<li><?php _e( "Your user account. <i>To erase your user account contact us.</i>", 'groundhogg' ); ?></li>
+						<li><?php _e( "Tracking data and historic details associated with your user account.", 'groundhogg' ); ?></li>
 					<?php endif; ?>
-		            <li><?php _e( "Associated purchase history and orders.", 'groundhogg' ); ?></li>
-		            <li><?php _e( "Legal documents associated with your profile.", 'groundhogg' ); ?></li>
-	            </ul>
-                <p>
-	                <a id="gotoprofile" class="button"
-	                   href="<?php echo esc_url( managed_page_url( 'preferences/profile/' ) ); ?>"><?php _e( "Nevermind! Don't erase my profile.", 'groundhogg' ) ?></a>
-	                <a id="eraseprofile" class="button danger right"
-	                   href="<?php echo esc_url( wp_nonce_url( managed_page_url( 'preferences/erase/' ), 'erase_profile' ) ); ?>"><?php _e( 'Erase Profile', 'groundhogg' ) ?></a>
-                </p>
-            </div>
+					<li><?php _e( "Associated purchase history and orders.", 'groundhogg' ); ?></li>
+					<li><?php _e( "Legal documents associated with your profile.", 'groundhogg' ); ?></li>
+				</ul>
+				<p>
+					<a id="gotoprofile" class="button"
+					   href="<?php echo esc_url( managed_page_url( 'preferences/profile/' ) ); ?>"><?php _e( "Nevermind! Don't erase my profile.", 'groundhogg' ) ?></a>
+					<a id="eraseprofile" class="button danger right"
+					   href="<?php echo esc_url( wp_nonce_url( managed_page_url( 'preferences/erase/' ), 'erase_profile' ) ); ?>"><?php _e( 'Erase Profile', 'groundhogg' ) ?></a>
+				</p>
+			</div>
 			<?php
 			managed_page_footer();
 
@@ -576,14 +572,14 @@ switch ( $action ):
 		managed_page_head( __( 'Erased', 'groundhogg' ), 'erase' );
 
 		?>
-        <div class="box">
-            <p><b><?php _e( 'Your profile has been erased!', 'groundhogg' ); ?></b></p>
-            <p><?php _e( 'Further interactions with our site may be interpreted as re-subscribing to our list and will result in further communication.', 'groundhogg' ); ?></p>
-            <p>
-                <a id="gotosite" class="button"
-                   href="<?php echo esc_url( home_url() ); ?>"><?php printf( __( 'Return to %s', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ); ?></a>
-            </p>
-        </div>
+		<div class="box">
+			<p><b><?php _e( 'Your profile has been erased!', 'groundhogg' ); ?></b></p>
+			<p><?php _e( 'Further interactions with our site may be interpreted as re-subscribing to our list and will result in further communication.', 'groundhogg' ); ?></p>
+			<p>
+				<a id="gotosite" class="button"
+				   href="<?php echo esc_url( home_url() ); ?>"><?php printf( __( 'Return to %s', 'groundhogg' ), get_bloginfo( 'title', 'display' ) ); ?></a>
+			</p>
+		</div>
 		<?php
 		managed_page_footer();
 		break;

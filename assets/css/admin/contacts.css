@@ -62,7 +62,7 @@
     width: 400px;
 }
 
-.wp-list-table th[id^='field_'],
+.wp-list-table th,
 .wp-list-table #first_name,
 .wp-list-table #user_id,
 .wp-list-table #owner_id,
@@ -80,6 +80,8 @@
     width: 300px;
 }
 
+li#option-delete a,
+a.danger,
 a.change-status.unsubscribed,
 a.change-status.spam,
 a.change-status.bounced,
@@ -87,6 +89,8 @@ a.change-status.complained {
     color: #a00;
 }
 
+li#option-delete a:hover,
+a.danger:hover,
 a.change-status.unsubscribed:hover,
 a.change-status.spam:hover,
 a.change-status.bounced:hover,
@@ -254,4 +258,3 @@ tfoot th.column-email {
 .alternate, .striped > tbody > :nth-child(even) th {
     background-color: #ffffff;
 }
-

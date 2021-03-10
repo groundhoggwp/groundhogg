@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Form\Fields;
 
+use function Groundhogg\get_default_field_label;
 use function Groundhogg\html;
 
 /**
@@ -13,8 +14,8 @@ use function Groundhogg\html;
 class GDPR extends Checkbox {
 	public function get_default_args() {
 		return [
-			'label'    => sprintf( _x( "I agree to %s's storage and processing of my personal data.", 'form_default', 'groundhogg' ), get_bloginfo() ),
-			'label-2'  => sprintf( _x( "I agree to receive marketing offers and updates from %s.", 'form_default', 'groundhogg' ), get_bloginfo() ),
+			'label'    => get_default_field_label( 'gdpr_consent' ),
+			'label-2'  => get_default_field_label( 'marketing_consent' ),
 			'name'     => 'gdpr_consent',
 			'id'       => 'gdpr_consent',
 			'name-2'   => 'marketing_consent',

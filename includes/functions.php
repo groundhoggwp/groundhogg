@@ -4421,3 +4421,42 @@ function uninstall_groundhogg() {
 		file_put_contents( __DIR__ . '/../groundhogg-uninstall-errors.txt', ob_get_contents() );
 	}
 }
+
+/**
+ * Get the field label
+ *
+ * @param string $field
+ *
+ * @return mixed|void
+ */
+function get_default_field_label( $field = '' ) {
+
+	switch ( $field ) {
+		default:
+			$label = "";
+			break;
+		case 'first_name':
+			$label = _x( 'First Name', 'field_label', 'groundhogg' );
+			break;
+		case 'last_name':
+			$label = _x( 'Last Name', 'field_label', 'groundhogg' );
+			break;
+		case 'full_name':
+			$label = _x( 'Full Name', 'field_label', 'groundhogg' );
+			break;
+		case 'email':
+			$label = _x( 'Email Address', 'field_label', 'groundhogg' );
+			break;
+		case 'gdpr_consent':
+			$label = sprintf( _x( "I agree to %s's storage and processing of my personal data.", 'field_label', 'groundhogg' ), get_bloginfo() );
+			break;
+		case 'marketing_consent':
+			$label = sprintf( _x( "I agree to receive marketing offers and updates from %s.", 'field_label', 'groundhogg' ), get_bloginfo() );
+			break;
+		case 'terms_agreement':
+			$label = sprintf( _x( "I agree to terms and conditions of %s.", 'field_label', 'groundhogg' ), get_bloginfo() );
+			break;
+	}
+
+	return apply_filters( 'groundhogg/default_field_label', $label, $field );
+}

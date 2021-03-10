@@ -40,7 +40,7 @@ class Broadcast_Meta extends Meta_DB {
 	}
 
 	/**
-	 * Get the object type we're inserting/updateing/deleting.
+	 * Get the object type we're inserting/updating/deleting.
 	 *
 	 * @return string
 	 */

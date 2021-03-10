@@ -27,7 +27,7 @@ class Contact_Notes extends DB {
 	}
 
 	public function get_object_type() {
-		return 'contact';
+		return 'note';
 	}
 
 	/**

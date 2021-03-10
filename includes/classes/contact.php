@@ -899,5 +899,73 @@ class Contact extends Base_Object_With_Meta {
 		return $this->get_meta( 'job_title' );
 	}
 
+	protected function set_compliance_and_date_meta( $id ) {
+		$this->update_meta( $id, 'yes' );
+		$this->update_meta( "{$id}_date", date_i18n( get_date_time_format() ) );
+	}
+
+	protected function has_compliance_and_date_meta( $id ) {
+		return $this->get_meta( $id ) === 'yes' && $this->get_meta( "{$id}_date" ) !== false;
+	}
+
+	protected function delete_compliance_and_date_meta( $id ) {
+		$this->delete_meta( $id );
+		$this->delete_meta( "{$id}_date" );
+	}
+
+	/**
+	 * Set various forms of GDPR consent
+	 *
+	 * @param string $type
+	 */
+	public function set_gdpr_consent( $type = 'gdpr' ) {
+		// Either GDPR or MARKETING always
+		$type = $type === 'gdpr' ? 'gdpr' : 'marketing';
+
+		$this->set_compliance_and_date_meta( "{$type}_consent" );
+
+		do_action( "groundhogg/contact/added_{$type}_consent", $this );
+	}
+
+	/**
+	 * Set the marketing consent
+	 */
+	public function set_marketing_consent(){
+		$this->set_gdpr_consent( 'marketing' );
+	}
+
+	/**
+	 * Revoke various forms of GDPR consent
+	 *
+	 * @param string $type
+	 */
+	public function revoke_gdpr_consent( $type = 'gdpr' ) {
+		// Either GDPR or MARKETING always
+		$type = $type === 'gdpr' ? 'gdpr' : 'marketing';
+
+		$this->delete_compliance_and_date_meta( "{$type}_consent" );
+
+		do_action( "groundhogg/contact/revoked_{$type}_consent", $this );
+	}
+
+	/**
+	 * @param string $type
+	 *
+	 * @return bool
+	 */
+	public function has_gdpr_consent( $type = 'gdpr' ){
+		$type = $type === 'gdpr' ? 'gdpr' : 'marketing';
+
+		return $this->has_compliance_and_date_meta( "{$type}_consent" );
+	}
+
+	/**
+	 * ahve the contact agree to the terms and conditions
+	 */
+	public function set_terms_agreement() {
+		$this->set_compliance_and_date_meta( 'terms_agreement' );
+
+		do_action( "groundhogg/contact/agreed_to_terms", $this );
+	}
 
 }

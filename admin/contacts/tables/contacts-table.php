@@ -75,6 +75,8 @@ class Contacts_Table extends WP_List_Table {
 		$hidden   = get_hidden_columns( 'groundhogg_page_gh_contacts' );
 		$sortable = $this->get_sortable_columns();
 
+		new Contact_Table_Actions();
+
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 	}
 
@@ -621,47 +623,7 @@ class Contacts_Table extends WP_List_Table {
         <div class="alignleft gh-actions">
 			<?php
 
-			if ( current_user_can( 'export_contacts' ) && $this->get_pagination_arg( 'total_items' ) > 0 ) {
-				$export_query = $this->query;
-
-
-				unset( $export_query['number'] );
-				unset( $export_query['limit'] );
-				unset( $export_query['offset'] );
-
-				$export_url = admin_page_url( 'gh_tools', [
-					'tab'    => 'export',
-					'action' => 'choose_columns',
-					'query'  => $export_query,
-				] );
-
-				?>
-                <a class="button action export-contacts"
-                   href="<?php echo esc_url( $export_url ); ?>"><?php printf( _nx( 'Export %s contact', 'Export %s contacts', $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?></a>
-				<?php
-			}
-
-			if ( current_user_can( 'schedule_broadcasts' ) && $this->get_pagination_arg( 'total_items' ) > 0 ) {
-
-				$broadcast_query = $this->query;
-
-				unset( $broadcast_query['number'] );
-				unset( $broadcast_query['limit'] );
-				unset( $broadcast_query['offset'] );
-
-				$broadcast_url = admin_page_url( 'gh_broadcasts', [
-					'action' => 'add',
-					'type'   => 'email',
-					'query'  => $broadcast_query,
-				] );
-
-				?>
-                <a class="button action broadcast-contacts"
-                   href="<?php echo esc_url( $broadcast_url ); ?>">
-					<?php printf( _nx( 'Send a broadcast to %s contact', 'Send a broadcast to %s contacts', $this->get_pagination_arg( 'total_items' ), 'action', 'groundhogg' ), number_format_i18n( $this->get_pagination_arg( 'total_items' ) ) ); ?>
-                </a>
-				<?php
-			}
+			Contact_Table_Actions::do_contact_actions( $this->query, $this->get_pagination_arg( 'total_items' ), $this );
 
 			do_action( 'groundhogg/admin/contacts/table/extra_tablenav', $this );
 

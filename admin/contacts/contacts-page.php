@@ -1262,7 +1262,8 @@ class Contacts_Page extends Admin_Page {
 		$content   = do_replacements( wpautop( kses_wrapper( get_post_var( 'email_content' ) ) ), $contact );
 
 		$headers = [
-			'From: ' . $from
+			'From: ' . $from,
+			'Content-Type: text/html',
 		];
 
 		if ( ! empty( $cc ) ) {
@@ -1273,14 +1274,11 @@ class Contacts_Page extends Admin_Page {
 			$headers[] = 'Bcc: ' . $bcc;
 		}
 
-//		wp_send_json([
-//            $content,
-//            $headers
-//        ]);
-
 		add_action( 'wp_mail_failed', [ $this, 'catch_personal_email_error' ] );
 
-		\Groundhogg_Email_Services::send_wordpress( $contact->get_email(), $subject, $content, $headers );
+		if ( \Groundhogg_Email_Services::send_wordpress( $contact->get_email(), $subject, $content, $headers ) ){
+			$this->add_notice( 'sent', __( 'Email sent!', 'groundhogg' ) );
+		}
 
 		return $this->admin_url( [
 			'action'  => 'edit',

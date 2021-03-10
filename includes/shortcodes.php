@@ -170,6 +170,7 @@ class Shortcodes {
 				return do_shortcode( $content );
 				break;
 			case 'one':
+			case 'any':
 			case 'single':
 			case '1':
 				foreach ( $tags as $tag ) {
@@ -223,6 +224,7 @@ class Shortcodes {
 				break;
 			case 'one':
 			case 'single':
+			case 'any':
 			case '1':
 				foreach ( $tags as $tag ) {
 					if ( ! $contact->has_tag( $tag ) ) {

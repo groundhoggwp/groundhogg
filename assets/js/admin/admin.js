@@ -120,6 +120,18 @@
     buildPickers()
   })
 
+  $(document).on('click', '.dropdown-button .button.dropdown', function (){
+    var $button = $(this)
+    $button.next().toggleClass( 'show' );
+    $( "<div class='dropdown-overlay'></div>" ).insertAfter( $button );
+  } );
+
+  $(document).on('click', '.dropdown-button .dropdown-overlay', function (){
+    var $overlay = $(this)
+    $overlay.next().toggleClass( 'show' );
+    $overlay.remove();
+  } );
+
   gh.pickers = {}
 
   // Map functions to Groundhogg object.
