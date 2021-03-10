@@ -127,16 +127,12 @@ export default ({ document, history }) => {
     subject: defaultSubjectValue,
     pre_header: defaultPreHeaderValue,
     content: defaultContentValue,
-    // editorType,
+    editorType,
   } = document.data;
 
-  let editorType = 'funnel'
-
-
-
   // Global States
-  const [changeTracker, setChangeTracker] = useState(0);
-  const [blockChangeData, setBlockChangeData] = useState([defaultContentValue]);
+  const [blocksVersionTracker, setBlocksVersionTracker] = useState(0);
+  const [blockVersionHistory, setBlockVersionHistory] = useState([defaultContentValue]);
 
   // Editor Contents
   const [title, setTitle] = useState(defaultTitleValue);
@@ -160,8 +156,6 @@ export default ({ document, history }) => {
   const [subject, setSubject] = useState(defaultSubjectValue);
   const [preHeader, setPreHeader] = useState(defaultPreHeaderValue);
 
-  // Unused Old
-  // const [testEmail, setTestEmail] = useState([]);
 
   const { editorMode, isSaving, item } = useSelect(
     (select) => ({
@@ -172,52 +166,20 @@ export default ({ document, history }) => {
     []
   );
 
-  if (!item.hasOwnProperty("ID")) {
-    return null;
-  }
+  // Probably not needed don't delete yet
+  // if (!item.hasOwnProperty("ID")) {
+  //   return null;
+  // }
 
+
+
+
+  /*
+   Header Handlers
+  */
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
   };
-
-  const handleSubjectChange = (e) => {
-    setSubject(e.target.value);
-  };
-  const handlePreHeaderChange = (e) => {
-    setPreHeader(e.target.value);
-  };
-
-  const handleContentChangeDraggedBlock = () => {
-    // if(!startInteractJS){return;}
-    let newBlocks = blocks;
-    newBlocks.splice(draggedBlockIndex, 0, createBlock(draggedBlock.name));
-    handleUpdateBlocks(newBlocks);
-    startInteractJS = false;
-  };
-
-  const handleUpdateBlocks = (blocks) => {
-    console.log("update", blocks);
-    // console.log("update", serialize(blocks));
-    updateBlocks(blocks);
-
-    if (Array.isArray(blocks)) {
-    setContent(serialize(blocks));
-    }
-  };
-
-  // Delete this
-  // const saveDraft = (e) => {
-  //   dispatch.updateItem(document.ID, {
-  //     data: {
-  //       subject,
-  //       title,
-  //       pre_header: preHeader,
-  //       status: "draft",
-  //       content,
-  //       last_updated: getLuxonDate("last_updated"),
-  //     },
-  //   });
-  // };
 
   const handleOpen = () => {
     setOpen(true);
@@ -227,7 +189,20 @@ export default ({ document, history }) => {
     setOpen(false);
   };
 
-  const updateDoc = (e) => {
+  const emailStepBackward = () => {
+    const newBlocksVersionTracker = blocksVersionTracker-1
+    setBlocksVersionTracker(newBlocksVersionTracker)
+
+  }
+  const emailStepForward = () => {
+    const newBlocksVersionTracker = blocksVersionTracker+1
+    setBlocksVersionTracker(newBlocksVersionTracker)
+  }
+
+  /*
+    Saves Funnel or Email
+  */
+  const updateItem = (e) => {
     dispatch.updateItem(document.ID, {
       data: {
         subject,
@@ -240,11 +215,63 @@ export default ({ document, history }) => {
     });
   };
 
-  const closeEditor = (e) => {
-    // Doesn't work without local routing
-    // history.goBack();
+  /*
+    Email Content Handlers
+  */
+  const handleSubTitleChange = (e) => {
+    setSubTitle(e.target.value)
+  }
+
+  const toggleSubTitleDisable = () => {
+    setDisableSubTitle(disableSubTitle ? false : true)
+  }
+
+  const handleSubjectChange = (e) => {
+    setSubject(e.target.value);
+  };
+  const handlePreHeaderChange = (e) => {
+    setPreHeader(e.target.value);
   };
 
+
+  /*
+    Block Handlers
+  */
+  const handleContentChangeDraggedBlock = () => {
+    // if(!startInteractJS){return;}
+    let newBlocks = blocks;
+    newBlocks.splice(draggedBlockIndex, 0, createBlock(draggedBlock.name));
+    handleUpdateBlocks(newBlocks);
+    startInteractJS = false;
+  };
+
+  const handleUpdateBlocks = (blocks, updateHistory) => {
+    // On load this stops a null error
+    if (!Array.isArray(blocks)) {
+      return;
+    }
+
+    // Standard calls for the block editor
+    updateBlocks(blocks);
+    setContent(serialize(blocks));
+    console.log("update", blocks);
+
+    if(updateHistory){
+      // Build up the history tracker
+      const newBlocksVersionTracker = blocksVersionTracker+1;
+      const newblockVersionHistory = blockVersionHistory
+      newblockVersionHistory.splice(blocksVersionTracker, 0, blocks);
+
+      setBlocksVersionTracker(newBlocksVersionTracker)
+      setBlockVersionHistory(newblockVersionHistory)
+    }
+
+    console.log(blocksVersionTracker, blockVersionHistory[blocksVersionTracker])
+  };
+
+  /*
+    Drag Handlers
+  */
   const dragMoveListener = (event) => {
     const target = event.target;
     event.target.classList.add("drop-active");
@@ -340,7 +367,6 @@ export default ({ document, history }) => {
     });
 
     interact(".side-bar-drag-drop-block").draggable({
-    // interact(".side-bar-drag-drop-block, .wp-block").draggable({
       cursorChecker(action, interactable, element, interacting) {
         return "grab";
       },
@@ -357,8 +383,10 @@ export default ({ document, history }) => {
     });
   };
 
+  /*
+    Sidebar Handlers
+  */
   const handleViewTypeChange = (type) => {
-    console.log(type)
     setViewType(type);
   };
 
@@ -376,9 +404,6 @@ export default ({ document, history }) => {
       subject: subject,
     });
   };
-  // const handleTestEmailChange = (e) => {
-  //   setTestEmail(e.target.value);
-  // };
   const handleAltBodyContent = (e) => {
     console.log('alt body content', altBodyContent)
     setAltBodyContent(e.target.value);
@@ -389,13 +414,14 @@ export default ({ document, history }) => {
   };
 
   useEffect(() => {
+    console.log(content)
     if (content) {
       handleUpdateBlocks(() => parse(content));
     }
 
     console.log('use effect')
     setupInteractJS();
-  }, []);
+  }, [blocksVersionTracker]);
 
 
   const useStyles = makeStyles((theme) => ({
@@ -517,36 +543,6 @@ export default ({ document, history }) => {
     </div>
   }
 
-  const emailStepBackward = () => {
-    console.log(changeTracker)
-
-    if(changeTracker === 0){
-      return;
-    }
-
-    const newChangeTracker = changeTracker -1
-    setChangeTracker(newChangeTracker)
-    setBlockChangeData(blockChangeData[newChangeTracker])
-  }
-  const emailStepForward = () => {
-    console.log(changeTracker)
-
-    if(!blockChangeData[newChangeTracker]){
-      return;
-    }
-
-    const newChangeTracker = changeTracker + 1
-    setChangeTracker(newChangeTracker)
-    setBlockChangeData(blockChangeData[newChangeTracker])
-  }
-
-  const handleSubTitleChange = (e) => {
-    setSubTitle(e.target.value)
-  }
-
-  const toggleSubTitleDisable = () => {
-    setDisableSubTitle(disableSubTitle ? false : true)
-  }
 
   // console.log('rebuild', blocks)
 
@@ -562,8 +558,8 @@ export default ({ document, history }) => {
               <Header
                 document={document}
                 history={history}
-                updateDoc={updateDoc}
-                closeEditor={closeEditor}
+                updateItem={updateItem}
+                closeEditor={() => {}}
                 isSaving={isSaving}
                 title={title}
                 handleTitleChange={handleTitleChange}
@@ -622,15 +618,6 @@ export default ({ document, history }) => {
             </FocusReturnProvider>
           </DropZoneProvider>
         </SlotFillProvider>
-
-        {/* formatting is off not working lets hide until its good
-          <div className={classes.contentFooter}>
-          <Panel header={__("Blocks")} style={{marginTop:'500px'}}>
-            <PanelBody title="My Block Settings"  initialOpen={ true } style={{backgroundColor:'#ccc'}}>
-                <PanelRow>My Panel Inputs and Labels</PanelRow>
-            </PanelBody>
-          </Panel>
-        </div>*/}
       </div>
     </>
   );
