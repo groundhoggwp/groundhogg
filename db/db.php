@@ -3,6 +3,7 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use Groundhogg\Plugin;
 use function Groundhogg\get_array_var;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\isset_not_empty;
@@ -373,10 +374,7 @@ abstract class DB {
 	 * @since   2.1
 	 */
 	public function get_column( $column, $row_id ) {
-		global $wpdb;
-		$column = esc_sql( $column );
-
-		return apply_filters( 'groundhogg/db/get_column/' . $this->get_object_type(), $wpdb->get_var( $wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $this->primary_key = %s LIMIT 1;", $row_id ) ) );
+		return $this->get_column_by( $column, $this->primary_key, $row_id );
 	}
 
 	/**
@@ -391,7 +389,18 @@ abstract class DB {
 		$column_where = esc_sql( $column_where );
 		$column       = esc_sql( $column );
 
-		return apply_filters( 'groundhogg/db/get_column/' . $this->get_object_type(), $wpdb->get_var( $wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $column_where = %s LIMIT 1;", $column_value ) ) );
+		$cache_key   = "get_column_by:$column:$column_where:$column_value";
+		$cache_value = $this->cache_get( $cache_key, $found );
+
+		if ( $found ) {
+			return $cache_value;
+		}
+
+		$results = apply_filters( 'groundhogg/db/get_column/' . $this->get_object_type(), $wpdb->get_var( $wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $column_where = %s LIMIT 1;", $column_value ) ) );
+
+		$this->cache_set( $cache_key, $results );
+
+		return $results;
 	}
 
 	/**
@@ -454,9 +463,7 @@ abstract class DB {
 		$wpdb->insert( $this->table_name, $data, $column_formats );
 		$wpdb_insert_id = $wpdb->insert_id;
 
-		if ( $wpdb_insert_id ) {
-			$this->cache_set_last_changed();
-		}
+		$this->cache_set_last_changed();
 
 		do_action( 'groundhogg/db/post_insert/' . $this->get_object_type(), $wpdb_insert_id, $data );
 
@@ -470,8 +477,63 @@ abstract class DB {
 	 * @since  2.8
 	 */
 	public function cache_set_last_changed() {
+
+		// Use our own cache instead
+		if ( ! is_option_enabled( 'gh_use_object_cache' ) ) {
+			self::$cache[ $this->get_cache_group() ]['last_changed'] = microtime();
+
+			return;
+		}
+
 		wp_cache_set( 'last_changed', microtime(), $this->get_cache_group() );
 	}
+
+	/**
+	 * Retrieves the value of the last_changed cache key for contacts.
+	 *
+	 * @access public
+	 * @since  2.8
+	 */
+	public function cache_get_last_changed() {
+
+		// Use our own cache instead
+		if ( ! is_option_enabled( 'gh_use_object_cache' ) ) {
+			if ( $this->_exists( 'last_changed', $this->get_cache_group() ) ) {
+				return self::$cache[ $this->get_cache_group() ]['last_changed'];
+			} else {
+				$last_changed                                            = microtime();
+				self::$cache[ $this->get_cache_group() ]['last_changed'] = $last_changed;
+
+				return $last_changed;
+			}
+		}
+
+		if ( function_exists( 'wp_cache_get_last_changed' ) ) {
+			return wp_cache_get_last_changed( $this->get_cache_group() );
+		}
+
+		$last_changed = wp_cache_get( 'last_changed', $this->get_cache_group() );
+
+		if ( ! $last_changed ) {
+			$last_changed = microtime();
+			wp_cache_set( 'last_changed', $last_changed, $this->get_cache_group() );
+		}
+
+		return $last_changed;
+	}
+
+	/**
+	 * Utility function
+	 *
+	 * @param $key
+	 * @param $group
+	 *
+	 * @return bool
+	 */
+	protected function _exists( $key, $group ) {
+		return isset( self::$cache[ $group ] ) && ( isset( self::$cache[ $group ][ $key ] ) || array_key_exists( $key, self::$cache[ $group ] ) );
+	}
+
 
 	/**
 	 * Get the results from the cache
@@ -482,11 +544,26 @@ abstract class DB {
 	 * @return false|mixed
 	 */
 	public function cache_get( $cache_key, &$found = null ) {
-		$last_changed = $this->get_last_changed();
+		$last_changed = $this->cache_get_last_changed();
 		$cache_key    = "$cache_key:$last_changed";
 
-		if ( is_option_enabled( 'gh_bypass_object_cache' ) ){
+		// Use our own cache instead
+		if ( ! is_option_enabled( 'gh_use_object_cache' ) ) {
+
+			if ( $this->_exists( $cache_key, $this->get_cache_group() ) ) {
+
+				$data  = self::$cache[ $this->get_cache_group() ][ $cache_key ];
+				$found = true;
+
+				if ( is_object( $data ) ) {
+					return clone $data;
+				} else {
+					return $data;
+				}
+			}
+
 			$found = false;
+
 			return false;
 		}
 
@@ -497,19 +574,28 @@ abstract class DB {
 	 * Set the value in the cache
 	 *
 	 * @param $cache_key
-	 * @param $results
+	 * @param $data
 	 *
 	 * @return bool
 	 */
-	public function cache_set( $cache_key, $results ) {
-		$last_changed = $this->get_last_changed();
+	public function cache_set( $cache_key, $data ) {
+		$last_changed = $this->cache_get_last_changed();
 		$cache_key    = "$cache_key:$last_changed";
 
-		if ( is_option_enabled( 'gh_bypass_object_cache' ) ){
+		// Use our own cache instead
+		if ( ! is_option_enabled( 'gh_use_object_cache' ) ) {
+
+			if ( is_object( $data ) ) {
+				$data = clone $data;
+			}
+
+			self::$cache[ $this->get_cache_group() ][ $cache_key ] = $data;
+
+
 			return false;
 		}
 
-		return wp_cache_set( $cache_key, $results, $this->get_cache_group() );
+		return wp_cache_set( $cache_key, $data, $this->get_cache_group() );
 	}
 
 	/**
@@ -827,27 +913,6 @@ abstract class DB {
 		$this->cache_set( $cache_key, $results );
 
 		return $results;
-	}
-
-	/**
-	 * Retrieves the value of the last_changed cache key for contacts.
-	 *
-	 * @access public
-	 * @since  2.8
-	 */
-	public function get_last_changed() {
-		if ( function_exists( 'wp_cache_get_last_changed' ) ) {
-			return wp_cache_get_last_changed( $this->get_cache_group() );
-		}
-
-		$last_changed = wp_cache_get( 'last_changed', $this->get_cache_group() );
-
-		if ( ! $last_changed ) {
-			$last_changed = microtime();
-			wp_cache_set( 'last_changed', $last_changed, $this->get_cache_group() );
-		}
-
-		return $last_changed;
 	}
 
 	/**

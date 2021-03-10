@@ -82,6 +82,9 @@ class HTML {
 				] );
 			}
 		}
+	}
+
+	public function contact_query_form() {
 
 	}
 
@@ -490,13 +493,7 @@ class HTML {
 	 *
 	 * @return string
 	 */
-	public function button( $text = '', $args = [], $echo = false ) {
-
-		if ( is_array( $text ) ) {
-			$args = $text;
-			$echo = $args;
-			$text = null;
-		}
+	public function button( $args = [], $echo = false ) {
 
 		$a = wp_parse_args( $args, array(
 			'type'  => 'button',
@@ -507,10 +504,8 @@ class HTML {
 			'value' => '',
 		) );
 
-		if ( ! $text ) {
-			$text = $a['text'];
-			unset( $a['text'] );
-		}
+		$text = $a['text'];
+		unset( $a['text'] );
 
 		return apply_filters( 'groundhogg/html/button', $this->e( 'button', $a, $text, false, $echo ), $a );
 	}
@@ -532,7 +527,8 @@ class HTML {
 		}
 
 		return html()->e( 'div', [ 'class' => 'dropdown-button' ], [
-			html()->button( $text, [
+			html()->button( [
+				'text'  => $text,
 				'class' => implode( ' ', [ 'button', 'button-' . $type, 'dropdown' ] ),
 				'type'  => 'button'
 			] ),

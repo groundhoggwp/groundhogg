@@ -41,7 +41,7 @@ class Process_Events extends Bulk_Job {
 		// Max 3 minutes
 		$requests = ceil( $num_queued_events / 18 );
 
-		if ( $requests < 1 ){
+		if ( $requests < 1 ) {
 			$requests = 1;
 		}
 
@@ -110,18 +110,18 @@ class Process_Events extends Bulk_Job {
 		$end  = microtime( true );
 		$diff = round( $end - $start, 2 );
 
-		if ( $failed === 0 ){
+		if ( $failed === 0 ) {
 			$msg = sprintf( __( 'Processed %d events in %s seconds.', 'groundhogg' ), $completed, $diff );
 		} else {
 			$msg = sprintf( __( 'Processed %d events in %s seconds. %d events failed.', 'groundhogg' ), $completed - $failed, $diff, $failed );
 		}
 
 		$response = [
-			'complete' => 1,
-			'skipped'  => 0,
+			'complete'         => 1,
+			'skipped'          => 0,
 			'completed_events' => $completed - $failed,
-			'failed'   => $failed,
-			'message'  => esc_html( $msg ),
+			'failed'           => $failed,
+			'message'          => esc_html( $msg ),
 		];
 
 		$the_end = get_post_var( 'the_end', false );

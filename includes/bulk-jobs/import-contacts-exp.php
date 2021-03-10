@@ -1,4 +1,5 @@
 <?php
+
 namespace Groundhogg\Bulk_Jobs;
 
 use function Groundhogg\admin_page_url;
@@ -9,151 +10,126 @@ use Groundhogg\Preferences;
 use function Groundhogg\get_url_var;
 use function Groundhogg\guided_setup_finished;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-class Import_Contacts_Exp extends Bulk_Job
-{
+class Import_Contacts_Exp extends Bulk_Job {
 
-    protected $field_map = [];
-    protected $import_tags = [];
-    protected $records = [];
-    protected $confirm_contacts = false;
+	protected $field_map = [];
+	protected $import_tags = [];
+	protected $records = [];
+	protected $confirm_contacts = false;
 
-    /**
-     * Get the action reference.
-     *
-     * @return string
-     */
-    function get_action(){
-        return 'gh_import_contacts';
-    }
+	/**
+	 * Get the action reference.
+	 *
+	 * @return string
+	 */
+	function get_action() {
+		return 'gh_import_contacts';
+	}
 
-    /**
-     * Get an array of items someway somehow
-     *
-     * @param $items array
-     * @return array
-     */
-    public function query($items)
-    {
-        if ( ! current_user_can( 'import_contacts' ) ){
-            return $items;
-        }
+	/**
+	 * Get an array of items someway somehow
+	 *
+	 * @param $items array
+	 *
+	 * @return array
+	 */
+	public function query( $items ) {
+		if ( ! current_user_can( 'import_contacts' ) ) {
+			return $items;
+		}
 
-        $file_name = sanitize_file_name( get_url_var( 'import' ) );
+		$file_name = sanitize_file_name( get_url_var( 'import' ) );
 
-        set_transient( 'gh_import_file_name', $file_name, WEEK_IN_SECONDS );
+		set_transient( 'gh_import_file_name', $file_name, WEEK_IN_SECONDS );
 
-        $file_path = wp_normalize_path( Plugin::$instance->utils->files->get_csv_imports_dir( $file_name ) );
+		$file_path = wp_normalize_path( Plugin::$instance->utils->files->get_csv_imports_dir( $file_name ) );
 
-        $items = get_items_from_csv( $file_path );
+		$items = get_items_from_csv( $file_path );
 
-        $total_items = count( $items );
+		$total_items = count( $items );
 
-        $return = [];
+		$return = [];
 
-        for ( $i=0; $i<$total_items; $i++){
-            $return[] = $i;
-        }
+		for ( $i = 0; $i < $total_items; $i ++ ) {
+			$return[] = $i;
+		}
 
-        return $return;
-    }
+		return $return;
+	}
 
-    /**
-     * Get the maximum number of items which can be processed at a time.
-     *
-     * @param $max int
-     * @param $items array
-     * @return int
-     */
-    public function max_items($max, $items)
-    {
-//        $item = array_shift( $items );
-//        $fields = count( array_keys( $item ) );
-//
-//        $max = intval( ini_get( 'max_input_vars' ) );
-//        $max_items = floor( $max / $fields );
-//
-//        $max_override = absint( get_url_var( 'max_items' ) );
-//
-//        if ( $max_override > 0 ){
-//        	return $max_override;
-//        }
+	/**
+	 * Process an item
+	 *
+	 * @param $item mixed
+	 *
+	 * @return void
+	 */
+	protected function process_item( $item ) {
+		$record  = get_array_var( $this->records, $item );
+		$contact = \Groundhogg\generate_contact_with_map( $record, $this->field_map );
 
-        return 100;
-    }
+		if ( $contact ) {
+			$contact->apply_tag( $this->import_tags );
 
-    /**
-     * Process an item
-     *
-     * @param $item mixed
-     * @return void
-     */
-    protected function process_item( $item )
-    {
-        $record = get_array_var( $this->records, $item );
-        $contact = \Groundhogg\generate_contact_with_map( $record, $this->field_map );
+			if ( $this->confirm_contacts ) {
+				$contact->change_marketing_preference( Preferences::CONFIRMED );
+			}
+		}
+	}
 
-        if ( $contact ) {
-            $contact->apply_tag( $this->import_tags );
+	/**
+	 * Do stuff before the loop
+	 *
+	 * @return void
+	 */
+	protected function pre_loop() {
+		$file_name = get_transient( 'gh_import_file_name' );
+		$file_path = wp_normalize_path( Plugin::$instance->utils->files->get_csv_imports_dir( $file_name ) );
 
-            if ( $this->confirm_contacts ){
-                $contact->change_marketing_preference( Preferences::CONFIRMED );
-            }
-        }
-    }
+		$this->records = get_items_from_csv( $file_path );
 
-    /**
-     * Do stuff before the loop
-     *
-     * @return void
-     */
-    protected function pre_loop()
-    {
-        $file_name = get_transient( 'gh_import_file_name' );
-        $file_path = wp_normalize_path( Plugin::$instance->utils->files->get_csv_imports_dir( $file_name ) );
+		$this->field_map        = Plugin::$instance->settings->get_transient( 'gh_import_map' );
+		$this->import_tags      = wp_parse_id_list( Plugin::$instance->settings->get_transient( 'gh_import_tags' ) );
+		$this->confirm_contacts = Plugin::$instance->settings->get_transient( 'gh_import_confirm_contacts' );
+	}
 
-        $this->records = get_items_from_csv( $file_path );
+	/**
+	 * do stuff after the loop
+	 *
+	 * @return void
+	 */
+	protected function post_loop() {
+	}
 
-        $this->field_map    = Plugin::$instance->settings->get_transient( 'gh_import_map' );
-        $this->import_tags  = wp_parse_id_list( Plugin::$instance->settings->get_transient( 'gh_import_tags' ) );
-        $this->confirm_contacts = Plugin::$instance->settings->get_transient( 'gh_import_confirm_contacts' );
-    }
+	/**
+	 * Cleanup any options/transients/notices after the bulk job has been processed.
+	 *
+	 * @return void
+	 */
+	protected function clean_up() {
+		Plugin::$instance->settings->delete_transient( 'gh_import_map' );
+		Plugin::$instance->settings->delete_transient( 'gh_import_tags' );
+		Plugin::$instance->settings->delete_transient( 'gh_import_confirm_contacts' );
+		Plugin::$instance->settings->delete_transient( 'gh_import_file_name' );
+	}
 
-    /**
-     * do stuff after the loop
-     *
-     * @return void
-     */
-    protected function post_loop(){}
+	/**
+	 * Get the return URL
+	 *
+	 * @return string
+	 */
+	protected function get_return_url() {
+		$url = admin_page_url( 'gh_contacts' );
 
-    /**
-     * Cleanup any options/transients/notices after the bulk job has been processed.
-     *
-     * @return void
-     */
-    protected function clean_up()
-    {
-        Plugin::$instance->settings->delete_transient( 'gh_import_map' );
-        Plugin::$instance->settings->delete_transient( 'gh_import_tags' );
-        Plugin::$instance->settings->delete_transient( 'gh_import_confirm_contacts' );
-        Plugin::$instance->settings->delete_transient( 'gh_import_file_name' );
-    }
+		// Return to guided setup if it's not yet complete.
+		if ( ! guided_setup_finished() ) {
+			$url = admin_page_url( 'gh_guided_setup', [ 'step' => 4 ] );
+		}
 
-    /**
-     * Get the return URL
-     *
-     * @return string
-     */
-    protected function get_return_url()
-    {
-        $url = admin_page_url( 'gh_contacts' );
-
-        // Return to guided setup if it's not yet complete.
-        if ( ! guided_setup_finished() ){
-            $url = admin_page_url( 'gh_guided_setup', [ 'step' => 4 ] );
-        }
-
-        return $url;
-    }
+		return $url;
+	}
 }

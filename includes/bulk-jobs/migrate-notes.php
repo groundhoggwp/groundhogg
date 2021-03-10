@@ -93,7 +93,7 @@ class Migrate_Notes extends Bulk_Job {
 
 		for ( $i = 0; $i < count( $notes ); $i ++ ) {
 
-			$time = strtotime( $dates[$i] );
+			$time = strtotime( $dates[ $i ] );
 
 			$note_to_add = [
 				'contact_id'   => $item,

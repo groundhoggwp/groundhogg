@@ -535,13 +535,51 @@ class Contact extends Base_Object_With_Meta {
 		return in_array( $tag_id, $this->tags );
 	}
 
-	/**
-	 * Change the owner of the contact...
-	 *
-	 * @param $user WP_User|int
-	 */
-	public function change_owner( $user ) {
+	public function update( $data = [] ) {
 
+		$preference_updated = false;
+		$old_preference     = $this->get_optin_status();
+		$new_preference     = Preferences::sanitize( get_array_var( $data, 'optin_status' ), $old_preference );
+
+		if ( $old_preference !== $new_preference ) {
+			$preference_updated                = true;
+			$data['optin_status']              = $new_preference;
+			$data['date_optin_status_changed'] = current_time( 'mysql' );
+		} else {
+			unset( $data['optin_status'] );
+		}
+
+		$updated = parent::update( $data );
+
+		if ( $updated && $preference_updated ) {
+
+			$this->update_meta( 'preferences_changed', time() );
+
+			/**
+			 * When the preference is updated
+			 *
+			 * @param $id int
+			 * @param $new_preference
+			 * @param $old_preference
+			 * @param $contact
+			 */
+			do_action( 'groundhogg/contact/preferences/updated', $this->ID, $new_preference, $old_preference, $this );
+
+			if ( $new_preference === Preferences::UNSUBSCRIBED ) {
+
+				/**
+				 * When the contact is unsubscribed
+				 *
+				 * @param $id int
+				 * @param $new_preference
+				 * @param $old_preference
+				 * @param $contact
+				 */
+				do_action( 'groundhogg/contact/preferences/unsubscribed', $this->ID, $new_preference, $old_preference, $this );
+			}
+		}
+
+		return $updated;
 	}
 
 	/**
@@ -550,28 +588,20 @@ class Contact extends Base_Object_With_Meta {
 	 * @param $preference
 	 */
 	public function change_marketing_preference( $preference ) {
-		$old_preference = $this->get_optin_status();
-
-		$preference = Preferences::sanitize( $preference, $old_preference );
-
-		// Don't do anything if the preference didn't change
-		if ( $old_preference === $preference ) {
-			return;
-		}
-
 		$this->update( [
-			'optin_status'              => $preference,
-			'date_optin_status_changed' => current_time( 'mysql' )
+			'optin_status' => $preference
 		] );
+	}
 
-		$this->update_meta( 'preferences_changed', time() );
-
-		do_action( 'groundhogg/contact/preferences/updated', $this->ID, $preference, $old_preference );
-
-		if ( $preference === Preferences::UNSUBSCRIBED ) {
-			do_action( 'groundhogg/contact/preferences/unsubscribed', $this->ID, $preference, $old_preference );
-		}
-
+	/**
+	 * Change the owner Id
+	 *
+	 * @param $owner_id
+	 */
+	public function change_owner( $owner_id ) {
+		$this->update( [
+			'owner_id' => $owner_id
+		] );
 	}
 
 	/**
@@ -930,7 +960,7 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * Set the marketing consent
 	 */
-	public function set_marketing_consent(){
+	public function set_marketing_consent() {
 		$this->set_gdpr_consent( 'marketing' );
 	}
 
@@ -953,7 +983,7 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @return bool
 	 */
-	public function has_gdpr_consent( $type = 'gdpr' ){
+	public function has_gdpr_consent( $type = 'gdpr' ) {
 		$type = $type === 'gdpr' ? 'gdpr' : 'marketing';
 
 		return $this->has_compliance_and_date_meta( "{$type}_consent" );

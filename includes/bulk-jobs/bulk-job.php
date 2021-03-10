@@ -6,6 +6,7 @@ namespace Groundhogg\Bulk_Jobs;
 use function Groundhogg\_nf;
 use function Groundhogg\get_post_var;
 use Groundhogg\Plugin;
+use function Groundhogg\get_url_var;
 use function Groundhogg\isset_not_empty;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -90,12 +91,28 @@ abstract class Bulk_Job {
 	/**
 	 * Get the maximum number of items which can be processed at a time.
 	 *
-	 * @param $max   int
+	 * @param $max int
 	 * @param $items array
 	 *
 	 * @return int
 	 */
-	abstract public function max_items( $max, $items );
+	public function max_items( $max, $items ) {
+
+		$item = array_shift( $items );
+
+		$fields = is_array( $item ) ? count( array_keys( $item ) ) : 1;
+
+		$max       = intval( ini_get( 'max_input_vars' ) );
+		$max_items = floor( $max / $fields );
+
+		$max_override = absint( get_url_var( 'max_items' ) );
+
+		if ( $max_override > 0 ) {
+			return $max_override;
+		}
+
+		return min( $max_items, 100 );
+	}
 
 	/**
 	 * Check to see if the current process will be the final one.

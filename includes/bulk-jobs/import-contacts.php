@@ -85,16 +85,16 @@ class Import_Contacts extends Bulk_Job {
 	 */
 	protected function process_item( $item ) {
 
-		if ( isset_not_empty( $this->compliance, 'is_confirmed' ) ){
-			$item[ 'optin_status' ] = Preferences::CONFIRMED;
+		if ( isset_not_empty( $this->compliance, 'is_confirmed' ) ) {
+			$item['optin_status'] = Preferences::CONFIRMED;
 		}
 
-		if ( isset_not_empty( $this->compliance, 'gdpr_consent' ) ){
-			$item[ 'gdpr_consent' ] = 'yes';
+		if ( isset_not_empty( $this->compliance, 'gdpr_consent' ) ) {
+			$item['gdpr_consent'] = 'yes';
 		}
 
-		if ( isset_not_empty( $this->compliance, 'marketing_consent' ) ){
-			$item[ 'marketing_consent' ] = 'yes';
+		if ( isset_not_empty( $this->compliance, 'marketing_consent' ) ) {
+			$item['marketing_consent'] = 'yes';
 		}
 
 		$contact = generate_contact_with_map( $item, $this->field_map );
@@ -114,16 +114,16 @@ class Import_Contacts extends Bulk_Job {
 		$this->import_tags = get_transient( 'gh_import_tags' );
 		$this->compliance  = get_transient( 'gh_import_compliance' );
 
-		if ( isset_not_empty( $this->compliance, 'is_confirmed' ) ){
-			$this->field_map[ 'optin_status' ] = 'optin_status';
+		if ( isset_not_empty( $this->compliance, 'is_confirmed' ) ) {
+			$this->field_map['optin_status'] = 'optin_status';
 		}
 
-		if ( isset_not_empty( $this->compliance, 'gdpr_consent' ) ){
-			$this->field_map[ 'gdpr_consent' ] = 'gdpr_consent';
+		if ( isset_not_empty( $this->compliance, 'gdpr_consent' ) ) {
+			$this->field_map['gdpr_consent'] = 'gdpr_consent';
 		}
 
-		if ( isset_not_empty( $this->compliance, 'marketing_consent' ) ){
-			$this->field_map[ 'marketing_consent' ] = 'marketing_consent';
+		if ( isset_not_empty( $this->compliance, 'marketing_consent' ) ) {
+			$this->field_map['marketing_consent'] = 'marketing_consent';
 		}
 
 	}

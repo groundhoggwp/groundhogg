@@ -682,16 +682,16 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				),
 			),
-			'gh_bypass_object_cache'                        => array(
-				'id'      => 'gh_bypass_object_cache',
+			'gh_use_object_cache'                        => array(
+				'id'      => 'gh_use_object_cache',
 				'section' => 'misc_info',
-				'label'   => _x( 'Bypass Object Caching', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'Groundhogg will use Object caching by default to improve performance. Bypass it if you are experiencing strange behaviour.', 'settings', 'groundhogg' ),
+				'label'   => _x( 'Enable Object Caching', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'Use the WordPress core object caching system to improve performance. This may cause strange behaviour on some hosts.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => array(
 					'label' => __( 'Enable' ),
-					'name'  => 'gh_bypass_object_cache',
-					'id'    => 'gh_bypass_object_cache',
+					'name'  => 'gh_use_object_cache',
+					'id'    => 'gh_use_object_cache',
 					'value' => 'on',
 				),
 			),

@@ -9,9 +9,12 @@ use Groundhogg\Saved_Searches;
 use Groundhogg\Scripts;
 use Groundhogg\Step;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\bulk_jobs;
 use function Groundhogg\do_replacements;
+use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
+use function Groundhogg\get_mappable_fields;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_db;
@@ -1068,6 +1071,7 @@ class Contacts_Page extends Admin_Page {
 		$args['first_name']   = sanitize_text_field( get_request_var( 'first_name' ) );
 		$args['last_name']    = sanitize_text_field( get_request_var( 'last_name' ) );
 		$args['owner_id']     = absint( get_request_var( 'owner' ) );
+		$args['optin_status'] = absint( get_request_var( 'optin_status' ) );
 
 		$meta_keys = [
 			'mobile_phone',
@@ -1098,14 +1102,10 @@ class Contacts_Page extends Admin_Page {
 			exit;
 		}
 
-		$contact->update( $args );
-
-		$contact->change_marketing_preference( get_request_var( 'optin_status' ) );
-
 		// Process any tag removals.
 		if ( get_request_var( 'tags' ) ) {
 
-			$tags = Plugin::$instance->dbs->get_db( 'tags' )->validate( get_request_var( 'tags' ) );
+			$tags = validate_tags( get_request_var( 'tags' ) );
 
 			$cur_tags = $contact->get_tags();
 			$new_tags = $tags;
@@ -1125,6 +1125,8 @@ class Contacts_Page extends Admin_Page {
 		} else {
 			$contact->remove_tag( $contact->get_tags() );
 		}
+
+		$contact->update( $args );
 
 		do_action( 'groundhogg/admin/contact/save_inline/after', $id, $contact );
 
@@ -1276,7 +1278,7 @@ class Contacts_Page extends Admin_Page {
 
 		add_action( 'wp_mail_failed', [ $this, 'catch_personal_email_error' ] );
 
-		if ( \Groundhogg_Email_Services::send_wordpress( $contact->get_email(), $subject, $content, $headers ) ){
+		if ( \Groundhogg_Email_Services::send_wordpress( $contact->get_email(), $subject, $content, $headers ) ) {
 			$this->add_notice( 'sent', __( 'Email sent!', 'groundhogg' ) );
 		}
 
@@ -1307,7 +1309,7 @@ class Contacts_Page extends Admin_Page {
 		include __DIR__ . '/quick-search.php';
 
 		?>
-        <form method="post">
+		<form method="post">
 			<?php
 			$contacts_table->prepare_items();
 			$contacts_table->display();
@@ -1315,8 +1317,44 @@ class Contacts_Page extends Admin_Page {
 			if ( $contacts_table->has_items() ) {
 				$contacts_table->inline_edit();
 			} ?>
-        </form>
+		</form>
 		<?php
+	}
+
+	function bulk_edit() {
+		if ( ! current_user_can( 'edit_contacts' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		include __DIR__ . '/bulk-edit.php';
+	}
+
+	function process_bulk_edit() {
+		if ( ! current_user_can( 'edit_contacts' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$query = get_post_var( 'query' );
+
+		$exclude_keys = [
+			'_wpnonce'         => '',
+			'_wp_http_referer' => '',
+			'query'            => '',
+			'submit'           => '',
+		];
+
+		$edits = array_diff_key( $_POST, $exclude_keys );
+
+		set_transient( 'gh_bulk_edit_fields', array_filter( $edits ) );
+		set_transient( 'gh_bulk_edit_query', $query );
+
+//		wp_send_json( [
+//			'query'    => $query,
+//			'edits'    => $edits,
+//			'mappable' => array_keys( get_mappable_fields() )
+//		] );
+
+		bulk_jobs()->bulk_edit_contacts->start( $query );
 	}
 
 	/**

@@ -54,7 +54,6 @@ class Funnels_Page extends Admin_Page {
 		add_action( 'wp_ajax_gh_add_contacts_to_funnel', array( $this, 'add_contacts_to_funnel' ) );
 	}
 
-
 	public function admin_title( $admin_title, $title ) {
 		switch ( $this->get_current_action() ) {
 			case 'add':
@@ -1044,13 +1043,35 @@ class Funnels_Page extends Admin_Page {
 		$funnels_table->views();
 		$this->search_form( __( 'Search Funnels', 'groundhogg' ) );
 		?>
-        <form method="post" class="wp-clearfix">
+		<form method="post" class="wp-clearfix">
 			<?php $funnels_table->prepare_items(); ?>
 			<?php $funnels_table->display(); ?>
-        </form>
+		</form>
 		<?php
 	}
 
+	public function add_to_funnel() {
+		if ( ! current_user_can( 'edit_funnels' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		include __DIR__ . '/add-to-funnel.php';
+	}
+
+	public function process_add_to_funnel() {
+		if ( ! current_user_can( 'edit_funnels' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$query     = get_post_var( 'query' );
+		$step_id   = absint( get_post_var( 'step' ) );
+
+		$query[ 'step_id' ] = $step_id;
+
+		$query = array_filter( $query );
+
+		Plugin::$instance->bulk_jobs->add_contacts_to_funnel->start( $query );
+	}
 
 	public function funnel_settings() {
 
@@ -1140,13 +1161,13 @@ class Funnels_Page extends Admin_Page {
 
 			foreach ( $products->products as $product ):
 				?>
-                <div class="postbox" style="margin-right:20px;width: 400px;display: inline-block;">
-                    <div class="">
-                        <img height="200" src="<?php echo $product->info->thumbnail; ?>" width="100%">
-                    </div>
-                    <h2 class="hndle"><?php echo $product->info->title; ?></h2>
-                    <div class="inside">
-                        <p style="line-height:1.2em;  height:3.6em;  overflow:hidden;"><?php echo $product->info->excerpt; ?></p>
+				<div class="postbox" style="margin-right:20px;width: 400px;display: inline-block;">
+					<div class="">
+						<img height="200" src="<?php echo $product->info->thumbnail; ?>" width="100%">
+					</div>
+					<h2 class="hndle"><?php echo $product->info->title; ?></h2>
+					<div class="inside">
+						<p style="line-height:1.2em;  height:3.6em;  overflow:hidden;"><?php echo $product->info->excerpt; ?></p>
 
 						<?php $pricing = (array) $product->pricing;
 						if ( count( $pricing ) > 1 ) {
@@ -1155,8 +1176,8 @@ class Funnels_Page extends Admin_Page {
 							$price2 = max( $pricing );
 
 							?>
-                            <a class="button-primary" target="_blank"
-                               href="<?php echo $product->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
+							<a class="button-primary" target="_blank"
+							   href="<?php echo $product->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
 							<?php
 						} else {
 
@@ -1164,24 +1185,24 @@ class Funnels_Page extends Admin_Page {
 
 							if ( $price > 0.00 ) {
 								?>
-                                <a class="button-primary" target="_blank"
-                                   href="<?php echo $product->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
+								<a class="button-primary" target="_blank"
+								   href="<?php echo $product->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
 								<?php
 							} else {
 								?>
-                                <a class="button-primary" target="_blank"
-                                   href="<?php echo $product->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
+								<a class="button-primary" target="_blank"
+								   href="<?php echo $product->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
 								<?php
 							}
 						}
 
 						?>
-                    </div>
-                </div>
+					</div>
+				</div>
 			<?php endforeach;
 		} else {
 			?>
-            <p style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no templates were found.', 'notice', 'groundhogg' ); ?></p> <?php
+			<p style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no templates were found.', 'notice', 'groundhogg' ); ?></p> <?php
 		}
 	}
 

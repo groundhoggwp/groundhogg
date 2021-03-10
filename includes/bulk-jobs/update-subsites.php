@@ -44,8 +44,8 @@ class Update_Subsites extends Bulk_Job {
 
 	protected function process_item( $item ) {
 
-		$blog_id = absint( $item[ 'blog_id' ] );
-		$updater = sanitize_text_field( $item[ 'updater' ] );
+		$blog_id = absint( $item['blog_id'] );
+		$updater = sanitize_text_field( $item['updater'] );
 
 		switch_to_blog( $blog_id );
 		do_action( "groundhogg/updater/$updater/force_updates" );

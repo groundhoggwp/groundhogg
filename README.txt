@@ -309,10 +309,12 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
-= 2.4.3.1 (2021-03-09) =
+= 2.4.4 (2021-03-10) =
+* TWEAKED using the core WordPress object cache will be disabled by default, fallback to custom non-persistent object cache. This should fix any strange behaviour being seen on some installs.
 * TWEAKED meta tables get their own object cache group.
 * FIXED New personal email feature sending email in plain text when should be text/html.
 * FIXED Notes using contacts object cache group.
+* FIXED Removed the example formatting card.
 
 = 2.4.3 (2021-03-08) =
 * ADDED Option to bypass object caching altogether.

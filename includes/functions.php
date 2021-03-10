@@ -34,9 +34,9 @@ function get_current_contact() {
  */
 function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 
-//	static $cache = [];
-//
-//	$cache_key = is_numeric( $contact_id_or_email ) ? $contact_id_or_email . ':' . $by_user_id : $contact_id_or_email;
+	static $cache = [];
+
+	$cache_key = is_numeric( $contact_id_or_email ) ? $contact_id_or_email . ':' . $by_user_id : $contact_id_or_email;
 
 	if ( ! $contact_id_or_email ) {
 
@@ -47,16 +47,16 @@ function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 		return Plugin::$instance->tracking->get_current_contact();
 	}
 
-//	else if ( in_array( $cache_key, $cache ) ) {
-//		return $cache[ $cache_key ];
-//	}
+	else if ( in_array( $cache_key, $cache ) ) {
+		return $cache[ $cache_key ];
+	}
 
 	$contact = new Contact( $contact_id_or_email, $by_user_id );
 
 	if ( $contact->exists() ) {
 
-		// Set the contact in the cache
-//		$cache[ $cache_key ] = $contact;
+//		Set the contact in the cache
+		$cache[ $cache_key ] = $contact;
 
 		return $contact;
 	}
@@ -250,6 +250,10 @@ function tracking() {
  */
 function utils() {
 	return Plugin::$instance->utils;
+}
+
+function bulk_jobs() {
+	return Plugin::instance()->bulk_jobs;
 }
 
 /**
@@ -1948,6 +1952,302 @@ function get_mappable_fields( $extra = [] ) {
 
 	return apply_filters( 'groundhogg/mappable_fields', $fields );
 
+}
+
+/**
+ * Update an existing contact with mapped data
+ *
+ * @param $contact Contact
+ * @param $fields array
+ * @param $map array
+ *
+ * @return false|Contact
+ */
+function update_contact_with_map( $contact, array $fields, array $map = [] ) {
+
+	if ( ! is_a_contact( $contact ) && ( is_int( $contact ) || is_email( $contact ) ) ) {
+		$contact = get_contactdata( $contact );
+	}
+
+	if ( empty( $map ) ) {
+		$keys = array_keys( $fields );
+		$map  = array_combine( $keys, $keys );
+	}
+
+	$meta        = [];
+	$tags        = [];
+	$remove_tags = [];
+	$notes       = [];
+	$args        = [];
+	$files       = [];
+	$copy        = [];
+
+	foreach ( $fields as $column => $value ) {
+
+		// ignore if we are not mapping it.
+		if ( ! key_exists( $column, $map ) ) {
+			continue;
+		}
+
+		$value = wp_unslash( $value );
+
+		$field = $map[ $column ];
+
+		switch ( $field ) {
+			default:
+
+				/**
+				 * Default filter for unknown contact fields
+				 *
+				 * @param $field  string the field in question
+				 * @param $value  mixed the value to store
+				 * @param &$args  array general contact information
+				 * @param &$meta  array list of contact data
+				 * @param &$tags  array list of tags to add to the contact
+				 * @param &$notes array add notes to the contact
+				 * @param &$files array files to upload to the contact record
+				 */
+				do_action_ref_array( 'groundhogg/update_contact_with_map/default', [
+					$field,
+					$value,
+					&$args,
+					&$meta,
+					&$tags,
+					&$notes,
+					&$files
+				] );
+
+				break;
+			case 'full_name':
+				$parts              = split_name( $value );
+				$args['first_name'] = sanitize_text_field( $parts[0] );
+				$args['last_name']  = sanitize_text_field( $parts[1] );
+				break;
+			case 'first_name':
+			case 'last_name':
+				$args[ $field ] = sanitize_text_field( $value );
+				break;
+			case 'email':
+				$args[ $field ] = sanitize_email( $value );
+				break;
+			case 'date_created':
+			case 'date_optin_status_changed':
+				$args[ $field ] = date( 'Y-m-d H:i:s', strtotime( $value ) );
+				break;
+			case 'optin_status':
+
+				// Will default to unconfirmed
+				if ( ! is_numeric( $value ) ) {
+					$value = Preferences::string_to_preference( $value );
+				}
+
+				$args[ $field ] = absint( $value );
+				break;
+			case 'user_id':
+			case 'owner_id':
+
+				// Email Passed
+				if ( is_email( $value ) ) {
+					$by = 'email';
+					// Username passed
+				} else if ( is_string( $value ) && ! is_numeric( $value ) ) {
+					$by = 'login';
+					// ID Passed
+				} else {
+					$by    = 'id';
+					$value = absint( $value );
+				}
+
+				$user = get_user_by( $by, $value );
+
+				// Make sure User exists
+				if ( $user ) {
+					// Check the mapped owner can actually own contacts.
+					if ( $field !== 'owner_id' || user_can( $user->ID, 'edit_contacts' ) ) {
+						$args[ $field ] = $user->ID;
+					}
+				}
+
+				break;
+			case 'mobile_phone':
+			case 'primary_phone':
+			case 'primary_phone_extension':
+			case 'company_phone':
+			case 'company_phone_extension':
+			case 'street_address_1' :
+			case 'street_address_2':
+			case 'city':
+			case 'postal_zip':
+			case 'region':
+			case 'company_name':
+			case 'company_address':
+			case 'job_title':
+			case 'lead_source':
+			case 'source_page':
+			case 'utm_campaign':
+			case 'utm_medium':
+			case 'utm_content':
+			case 'utm_term':
+			case 'utm_source':
+				$meta[ $field ] = sanitize_text_field( $value );
+				break;
+			// Only checks whether value is not empty.
+			case 'terms_agreement':
+				if ( ! empty( $value ) ) {
+					$meta['terms_agreement']      = 'yes';
+					$meta['terms_agreement_date'] = date_i18n( get_date_time_format() );
+				}
+				break;
+			// Only checks whether value is not empty.
+			case 'gdpr_consent':
+				if ( ! empty( $value ) ) {
+					$meta['gdpr_consent']      = 'yes';
+					$meta['gdpr_consent_date'] = date_i18n( get_date_time_format() );
+				}
+				break;
+			case 'marketing_consent':
+				if ( ! empty( $value ) ) {
+					$meta['marketing_consent']      = 'yes';
+					$meta['marketing_consent_date'] = date_i18n( get_date_time_format() );
+				}
+				break;
+			case 'country':
+				if ( strlen( $value ) !== 2 ) {
+					$countries = Plugin::$instance->utils->location->get_countries_list();
+					$code      = array_search( $value, $countries );
+					if ( $code ) {
+						$value = $code;
+					}
+				}
+				$meta[ $field ] = $value;
+				break;
+			case 'tags':
+				if ( is_array( $value ) ) {
+					$tags = array_merge( $tags, $value );
+				} else {
+					$maybe_tags = explode( ',', $value );
+					$tags       = array_merge( $tags, $maybe_tags );
+				}
+				break;
+			case 'remove_tags':
+				if ( is_array( $value ) ) {
+					$remove_tags = array_merge( $remove_tags, $value );
+				} else {
+					$maybe_tags  = explode( ',', $value );
+					$remove_tags = array_merge( $remove_tags, $maybe_tags );
+				}
+				break;
+			case 'meta':
+				$meta[ get_key_from_column_label( $column ) ] = sanitize_text_field( $value );
+				break;
+			case 'files':
+				if ( isset_not_empty( $_FILES, $column ) ) {
+					$files[ $column ] = wp_unslash( get_array_var( $_FILES, $column ) );
+				}
+				break;
+
+			case 'copy_file':
+				// used to copy file uploaded using form builder
+				if ( ! function_exists( 'download_url' ) ) {
+					require_once( ABSPATH . '/wp-admin/includes/file.php' );
+				}
+				if ( download_url( $value ) ) {
+					$copy [] = $value;
+				}
+
+				break;
+			case 'notes':
+				$notes[] = sanitize_textarea_field( $value );
+				break;
+			case 'time_zone':
+				$zones = Plugin::$instance->utils->location->get_time_zones();
+				$code  = array_search( $value, $zones );
+				if ( $code ) {
+					$meta[ $field ] = $code;
+				}
+				break;
+			case 'ip_address':
+				$ip = filter_var( $value, FILTER_VALIDATE_IP );
+				if ( $ip ) {
+					$meta[ $field ] = $ip;
+				}
+				break;
+			case 'birthday':
+
+				if ( is_string( $value ) ) {
+					$date  = date( 'Y-m-d', strtotime( $value ) );
+					$parts = map_deep( explode( '-', $date ), 'absint' );
+
+					$meta['birthday_year']  = $parts[0];
+					$meta['birthday_month'] = $parts[1];
+					$meta['birthday_day']   = $parts[2];
+					$meta['birthday']       = $date;
+				} else if ( is_array( $value ) ) {
+
+					$year  = absint( $value['year'] );
+					$month = absint( $value['month'] );
+					$day   = absint( $value['day'] );
+
+					$meta['birthday_year']  = $year;
+					$meta['birthday_month'] = $month;
+					$meta['birthday_day']   = $day;
+					$meta['birthday']       = date( 'Y-m-d',
+						mktime( 0, 0, 0, $month, $day, $year )
+					);
+				}
+
+				break;
+		}
+
+	}
+
+	$contact->update( $args );
+
+	// Add Tags
+	if ( ! empty( $tags ) ) {
+		$contact->apply_tag( $tags );
+	}
+
+	// Remove tags
+	if ( ! empty( $remove_tags ) ){
+		$contact->remove_tag( $remove_tags );
+	}
+
+	// Add notes
+	if ( ! empty( $notes ) ) {
+		foreach ( $notes as $note ) {
+			$contact->add_note( $note, 'system' );
+		}
+	}
+
+	// update meta data
+	if ( ! empty( $meta ) ) {
+		foreach ( $meta as $key => $value ) {
+			$contact->update_meta( $key, $value );
+		}
+	}
+
+	if ( ! empty( $files ) ) {
+		foreach ( $files as $file ) {
+			$contact->upload_file( $file );
+		}
+	}
+
+	// copy files
+	if ( ! empty( $copy ) ) {
+		foreach ( $copy as $url ) {
+			$contact->copy_file( $url );
+		}
+	}
+
+	/**
+	 * @param $contact Contact the contact record
+	 * @param $map     array the map of given data to contact data
+	 * @param $fields  array the values of the given fields
+	 */
+	do_action( 'groundhogg/update_contact_with_map/after', $contact, $map, $fields );
+
+	return $contact;
 }
 
 /**

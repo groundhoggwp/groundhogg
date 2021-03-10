@@ -129,8 +129,8 @@ class Export_Contacts extends Bulk_Job {
 			//write the headers to the export.
 			$fp = fopen( $file_path, "w" );
 
-			if ( $header_type === 'pretty' ){
-				$file_headers = array_map( function ( $header ){
+			if ( $header_type === 'pretty' ) {
+				$file_headers = array_map( function ( $header ) {
 					return export_header_pretty_name( $header );
 				}, $headers );
 			} else {

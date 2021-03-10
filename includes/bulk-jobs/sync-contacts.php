@@ -51,22 +51,6 @@ class Sync_Contacts extends Bulk_Job {
 	}
 
 	/**
-	 * Get the maximum number of items which can be processed at a time.
-	 *
-	 * @param $max int
-	 * @param $items array
-	 *
-	 * @return int
-	 */
-	public function max_items( $max, $items ) {
-		if ( ! current_user_can( 'add_contacts' ) ) {
-			return $max;
-		}
-
-		return min( 100, intval( ini_get( 'max_input_vars' ) ) );
-	}
-
-	/**
 	 * Process an item
 	 *
 	 * @param $item mixed

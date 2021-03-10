@@ -38,8 +38,8 @@ class Update_Marketing_Consent extends Bulk_Job {
 	 */
 	public function query( $items ) {
 
-		$query = new Contact_Query();
-		$contacts = $query->query([]);
+		$query    = new Contact_Query();
+		$contacts = $query->query( [] );
 		$ids      = wp_list_pluck( $contacts, 'ID' );
 
 		return $ids;
@@ -67,11 +67,11 @@ class Update_Marketing_Consent extends Bulk_Job {
 	protected function process_item( $item ) {
 		$contact = get_contactdata( $item );
 
-		if ( ! is_a_contact( $contact ) ){
+		if ( ! is_a_contact( $contact ) ) {
 			return;
 		}
 
-		if ( $contact->get_meta( 'gdpr_consent' ) === 'yes' ){
+		if ( $contact->get_meta( 'gdpr_consent' ) === 'yes' ) {
 			// Assume confirmation same as GDPR consent dates
 			$contact->update_meta( 'marketing_consent', 'yes' );
 			$contact->update_meta( 'marketing_consent_date', $contact->get_meta( 'gdpr_consent_date' ) );

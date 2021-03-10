@@ -22,7 +22,7 @@ class Tag_Mapping extends Bulk_Job {
 	public function __construct() {
 
 		// Listen for an explicit status change.
-		add_action( 'groundhogg/contact/preferences/updated', [ $this, 'optin_status_changed' ], 10, 3 );
+		add_action( 'groundhogg/contact/preferences/updated', [ $this, 'optin_status_changed' ], 10, 4 );
 		add_action( 'groundhogg/db/post_insert/contact', [ $this, 'optin_status_set' ], 10, 1 );
 //		add_action( 'groundhogg/contact/tag_applied', [ $this, 'listen_for_tag_change' ], 10, 2 );
 
@@ -64,8 +64,8 @@ class Tag_Mapping extends Bulk_Job {
 
 	public function reset_tags_ui() {
 		?>
-        <a href="<?php echo wp_nonce_url( $_SERVER['REQUEST_URI'], 'reset_tags', 'reset_tags' ); ?>"
-           class="button-secondary"><?php _ex( 'Reset Tags', 'action', 'groundhogg' ) ?></a>
+		<a href="<?php echo wp_nonce_url( $_SERVER['REQUEST_URI'], 'reset_tags', 'reset_tags' ); ?>"
+		   class="button-secondary"><?php _ex( 'Reset Tags', 'action', 'groundhogg' ) ?></a>
 		<?php
 	}
 
@@ -91,7 +91,7 @@ class Tag_Mapping extends Bulk_Job {
 	 * @param $contact Contact
 	 */
 	public function change_marketing_preference( $id, $data, $contact ) {
-		$contact->change_marketing_preference( $contact->get_optin_status() );
+		$this->optin_status_changed( $id, $contact->get_optin_status(), $contact->get_optin_status(), $contact );
 	}
 
 	/**
@@ -338,22 +338,18 @@ class Tag_Mapping extends Bulk_Job {
 	/**
 	 * Perform the tag mapping.
 	 *
-	 * @param     $contact_id int the ID of the contact
+	 * @param int $contact_id the ID of the contact
 	 * @param int $status the status.
 	 * @param int $old_status the previous status.
+	 * @param Contact $contact
 	 *
 	 * @return void
 	 */
-	public function optin_status_changed( $contact_id = 0, $status = 0, $old_status = 0 ) {
+	public function optin_status_changed( $contact_id = 0, $status = 0, $old_status = 0, $contact = null ) {
 
-
-		$contact = get_contactdata( $contact_id );
-
-		if ( ! $contact ) {
+		if ( ! is_a_contact( $contact ) ) {
 			return;
 		}
-
-//		remove_action( 'groundhogg/contact/tag_applied', [ $this, 'listen_for_tag_change' ] );
 
 		$non_marketable_tag = $this->get_status_tag( self::NON_MARKETABLE );
 		$marketable_tag     = $this->get_status_tag( self::MARKETABLE );
@@ -387,8 +383,6 @@ class Tag_Mapping extends Bulk_Job {
 		/* Add the tags */
 		$contact->apply_tag( $add_tags );
 
-//		add_action( 'groundhogg/contact/tag_applied', [ $this, 'listen_for_tag_change' ], 10, 2 );
-
 	}
 
 	/**
@@ -407,7 +401,7 @@ class Tag_Mapping extends Bulk_Job {
 
 		$preference = array_search( $tag_id, $this->get_tag_map() );
 
-		if ( is_int( $preference ) ){
+		if ( is_int( $preference ) ) {
 			$contact->change_marketing_preference( $preference );
 		}
 	}

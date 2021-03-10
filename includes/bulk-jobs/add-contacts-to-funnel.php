@@ -1,135 +1,134 @@
 <?php
+
 namespace Groundhogg\Bulk_Jobs;
 
 use Groundhogg\Contact_Query;
 use function Groundhogg\get_contactdata;
+use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
 use function Groundhogg\is_option_enabled;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-class Add_Contacts_To_Funnel extends Bulk_Job
-{
+class Add_Contacts_To_Funnel extends Bulk_Job {
 
-    /**
-     * @var Step
-     */
-    protected $step = null;
+	/**
+	 * @var Step
+	 */
+	protected $step = null;
 
-    /**
-     * Get the action reference.
-     *
-     * @return string
-     */
-    function get_action(){
-        return 'add_contacts_to_funnel';
-    }
+	/**
+	 * Get the action reference.
+	 *
+	 * @return string
+	 */
+	function get_action() {
+		return 'add_contacts_to_funnel';
+	}
 
-    /**
-     * Get an array of items someway somehow
-     *
-     * @param $items array
-     * @return array
-     */
-    public function query( $items )
-    {
-        if ( ! current_user_can( 'edit_contacts' ) ){
-            return $items;
-        }
+	/**
+	 * Get an array of items someway somehow
+	 *
+	 * @param $items array
+	 *
+	 * @return array
+	 */
+	public function query( $items ) {
+		if ( ! current_user_can( 'edit_contacts' ) ) {
+			return $items;
+		}
 
-        set_transient( 'gh_step_id', absint( get_request_var( 'step_id' ) ), HOUR_IN_SECONDS );
+		$query_vars = get_request_query();
 
-        $query = new Contact_Query();
-        $args = [
-            'tags_include' => wp_parse_id_list( get_request_var( 'tags_include' ) ),
-            'tags_exclude' => wp_parse_id_list( get_request_var( 'tags_exclude' ) ),
-            'tags_include_needs_all' => absint( get_request_var( 'tags_include_needs_all' ) ),
-            'tags_exclude_needs_all' => absint( get_request_var( 'tags_exclude_needs_all' ) ),
-        ];
+		set_transient( 'gh_step_id', absint( $query_vars['step_id'] ), HOUR_IN_SECONDS );
+		unset( $query_vars[ 'step_id' ] );
 
-        $contacts = $query->query( $args );
-        $ids = wp_list_pluck( $contacts, 'ID' );
+		$query = new Contact_Query();
 
-        return $ids;
-    }
+		$contacts = $query->query( $query_vars );
+		$ids      = wp_list_pluck( $contacts, 'ID' );
 
-    /**
-     * Get the maximum number of items which can be processed at a time.
-     *
-     * @param $max int
-     * @param $items array
-     * @return int
-     */
-    public function max_items($max, $items)
-    {
-        if ( ! current_user_can( 'edit_contacts' ) ){
-            return $max;
-        }
+		return $ids;
+	}
 
-        return min( 100, intval( ini_get( 'max_input_vars' ) ) ) ;
-    }
+	/**
+	 * Get the maximum number of items which can be processed at a time.
+	 *
+	 * @param $max int
+	 * @param $items array
+	 *
+	 * @return int
+	 */
+	public function max_items( $max, $items ) {
+		if ( ! current_user_can( 'edit_contacts' ) ) {
+			return $max;
+		}
 
-    /**
-     * Process an item
-     *
-     * @param $item mixed
-     * @return void
-     */
-    protected function process_item( $item )
-    {
-        $this->step->enqueue( get_contactdata( absint( $item )) );
-    }
+		return min( 100, intval( ini_get( 'max_input_vars' ) ) );
+	}
 
-    /**
-     * Do stuff before the loop
-     *
-     * @return void
-     */
-    protected function pre_loop(){
-        $step_id = absint( get_transient( 'gh_step_id' ) );
-        $this->step = new Step( $step_id );
+	/**
+	 * Process an item
+	 *
+	 * @param $item mixed
+	 *
+	 * @return void
+	 */
+	protected function process_item( $item ) {
+		$this->step->enqueue( get_contactdata( absint( $item ) ) );
+	}
 
-        if ( ! $this->step->exists() ){
-            wp_send_json_error();
-        }
-    }
+	/**
+	 * Do stuff before the loop
+	 *
+	 * @return void
+	 */
+	protected function pre_loop() {
+		$step_id    = absint( get_transient( 'gh_step_id' ) );
+		$this->step = new Step( $step_id );
 
-    /**
-     * do stuff after the loop
-     *
-     * @return void
-     */
-    protected function post_loop(){}
+		if ( ! $this->step->exists() ) {
+			wp_send_json_error();
+		}
+	}
 
-    /**
-     * Cleanup any options/transients/notices after the bulk job has been processed.
-     *
-     * @return void
-     */
-    protected function clean_up()
-    {
-        delete_transient( 'gh_step_id' );
-    }
+	/**
+	 * do stuff after the loop
+	 *
+	 * @return void
+	 */
+	protected function post_loop() {
+	}
 
-    /**
-     * Get the return URL
-     *
-     * @return string
-     */
-    protected function get_return_url()
-    {
-        $edit_url = add_query_arg( [
-            'page' => 'gh_funnels',
-            'action' => 'edit',
-            'funnel' => $this->step->get_funnel_id(),
-        ], admin_url( 'admin.php' ) );
+	/**
+	 * Cleanup any options/transients/notices after the bulk job has been processed.
+	 *
+	 * @return void
+	 */
+	protected function clean_up() {
+		delete_transient( 'gh_step_id' );
+	}
 
-        if ( is_option_enabled( 'gh_use_builder_version_2' ) ){
-            $edit_url = add_query_arg( [ 'version' => '2' ], $edit_url );
-        }
+	/**
+	 * Get the return URL
+	 *
+	 * @return string
+	 */
+	protected function get_return_url() {
+		$edit_url = add_query_arg( [
+			'page'   => 'gh_funnels',
+			'action' => 'edit',
+			'funnel' => $this->step->get_funnel_id(),
+		], admin_url( 'admin.php' ) );
 
-        return $edit_url;
-    }
+		if ( is_option_enabled( 'gh_use_builder_version_2' ) ) {
+			$edit_url = add_query_arg( [ 'version' => '2' ], $edit_url );
+		}
+
+		return $edit_url;
+	}
 }

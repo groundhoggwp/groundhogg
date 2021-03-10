@@ -470,7 +470,7 @@ class Contact_Query {
 		// $args can include anything. Only use the args defined in the query_var_defaults to compute the key.
 		$key = md5( serialize( wp_array_slice_assoc( $this->query_vars, array_keys( $this->query_var_defaults ) ) ) );
 
-		$last_changed = $this->gh_db_contacts->get_last_changed();
+		$last_changed = $this->gh_db_contacts->cache_get_last_changed();
 
 		$cache_key   = "query:$key:$last_changed:$this->date_key";
 		$cache_value = wp_cache_get( $cache_key, $this->cache_group );

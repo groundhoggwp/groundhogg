@@ -19,14 +19,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since       File available since Release 0.1
  */
 class Tag_Relationships extends DB {
-	/**
-	 * The name of the cache group.
-	 *
-	 * @access public
-	 * @since  2.8
-	 * @var string
-	 */
-	public $cache_group = 'contact_tag_relationships';
 
 	/**
 	 * Get the DB suffix
@@ -200,9 +192,6 @@ class Tag_Relationships extends DB {
 			return false;
 		}
 
-//		global $wpdb;
-
-//		$results = $wpdb->get_col( "SELECT $return FROM $this->table_name WHERE $column = $value ORDER BY $this->primary_key DESC" );
 		$results = $this->query( [
 			'select'  => $return,
 			$column   => $value,

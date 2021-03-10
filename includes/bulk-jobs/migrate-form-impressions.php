@@ -75,7 +75,7 @@ class Migrate_Form_Impressions extends Bulk_Job {
 	 * @return void
 	 */
 	protected function process_item( $item ) {
-		$item = absint( $item );
+		$item     = absint( $item );
 		$activity = new Activity( $item );
 		if ( $activity->exists() ) {
 			get_db( 'form_impressions' )->add( [

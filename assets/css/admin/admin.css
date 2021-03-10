@@ -509,3 +509,7 @@ table.wp-list-table.funnels td.column-active_contacts {
     bottom: 0;
     z-index: 998;
 }
+
+label.block{
+    display: block;
+}

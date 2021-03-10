@@ -98,6 +98,13 @@ class Contact_Table_Actions {
 	 */
 	public function register_core_actions() {
 
+		self::register( 'bulk-edit',
+			__( 'Edit %d contact', 'groundhogg' ),
+			__( 'Edit %d contacts', 'groundhogg' ),
+			[ $this, 'bulk_edit_callback' ],
+			'edit_contacts'
+		);
+
 		self::register( 'export',
 			__( 'Export %d contact', 'groundhogg' ),
 			__( 'Export %d contacts', 'groundhogg' ),
@@ -110,6 +117,13 @@ class Contact_Table_Actions {
 			__( 'Send a broadcast to %d contacts', 'groundhogg' ),
 			[ $this, 'broadcast_callback' ],
 			'schedule_broadcasts'
+		);
+
+		self::register( 'funnel',
+			__( 'Add %d contact to a funnel', 'groundhogg' ),
+			__( 'Add %d contacts to a funnel', 'groundhogg' ),
+			[ $this, 'funnel_callback' ],
+			'edit_funnels'
 		);
 
 		self::register( 'delete',
@@ -181,6 +195,40 @@ class Contact_Table_Actions {
 		return admin_page_url( 'gh_tools', [
 			'tab'   => 'delete',
 			'query' => $query,
+		] );
+	}
+
+	/**
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public function funnel_callback( $query ) {
+
+		unset( $query['number'] );
+		unset( $query['limit'] );
+		unset( $query['offset'] );
+
+		return admin_page_url( 'gh_funnels', [
+			'action' => 'add_to_funnel',
+			'query'  => $query,
+		] );
+	}
+
+	/**
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public function bulk_edit_callback( $query ) {
+
+		unset( $query['number'] );
+		unset( $query['limit'] );
+		unset( $query['offset'] );
+
+		return admin_page_url( 'gh_contacts', [
+			'action' => 'bulk_edit',
+			'query'  => $query,
 		] );
 	}
 }
