@@ -136,8 +136,8 @@ class Settings_Page extends Admin_Page {
 		$api_keys_table = new API_Keys_Table();
 		$api_keys_table->prepare_items();
 		?>
-        <h3><?php _e( 'API Keys', 'groundhogg' ); ?></h3>
-        <div style="max-width: 900px;"><?php
+		<h3><?php _e( 'API Keys', 'groundhogg' ); ?></h3>
+		<div style="max-width: 900px;"><?php
 		$api_keys_table->display();
 		?></div><?php
 	}
@@ -147,7 +147,7 @@ class Settings_Page extends Admin_Page {
 		$extensions = Extension::get_extensions();
 
 		?>
-        <div id="poststuff">
+		<div id="poststuff">
 			<?php wp_nonce_field(); ?>
 			<?php
 
@@ -158,13 +158,13 @@ class Settings_Page extends Admin_Page {
 					$verify_license_url = Plugin::instance()->bulk_jobs->check_licenses->get_start_url();
 
 					?>
-                    <p><?php printf( __( 'Enter your extension license keys here to receive updates for purchased extensions. If your license key has expired, <a href="https://groundhogg.io/account/">please renew your license</a>. If you have recently renewed your license <a href="%s">click here to re-verify it</a>.', 'groundhogg' ), $verify_license_url ); ?></p>
+					<p><?php printf( __( 'Enter your extension license keys here to receive updates for purchased extensions. If your license key has expired, <a href="https://groundhogg.io/account/">please renew your license</a>. If you have recently renewed your license <a href="%s">click here to re-verify it</a>.', 'groundhogg' ), $verify_license_url ); ?></p>
 				<?php
 
 				endif;
 
 				?>
-                <div class="post-box-grid"><?php
+				<div class="post-box-grid"><?php
 
 				foreach ( $extensions as $extension ):
 					echo $extension;
@@ -173,7 +173,7 @@ class Settings_Page extends Admin_Page {
 				?></div><?php
 			else:
 				?>
-                <style>
+				<style>
                     .masonry {
                         columns: 1;
                         column-gap: 1.5em;
@@ -195,15 +195,15 @@ class Settings_Page extends Admin_Page {
                             columns: 5;
                         }
                     }
-                </style>
-                <p><?php _e( 'You have no extensions installed. Want some?', 'groundhogg' ); ?> <a
-                            href="https://groundhogg.io/pricing/"><?php _e( 'Get your first extension!', 'groundhogg' ) ?></a>
-                </p>
-                <div class="extensions">
+				</style>
+				<p><?php _e( 'You have no extensions installed. Want some?', 'groundhogg' ); ?> <a
+						href="https://groundhogg.io/pricing/"><?php _e( 'Get your first extension!', 'groundhogg' ) ?></a>
+				</p>
+				<div class="extensions">
 					<?php include __DIR__ . '/extensions.php'; ?>
-                </div>
+				</div>
 			<?php endif; ?>
-        </div>
+		</div>
 		<?php
 	}
 
@@ -397,7 +397,7 @@ class Settings_Page extends Admin_Page {
 				'tab'      => 'email',
 				'callback' => function () {
 					?>
-                    <div id="email-logging"></div><?php
+					<div id="email-logging"></div><?php
 				}
 			),
 			'bounces'               => array(
@@ -682,7 +682,7 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				),
 			),
-			'gh_use_object_cache'                        => array(
+			'gh_use_object_cache'                    => array(
 				'id'      => 'gh_use_object_cache',
 				'section' => 'misc_info',
 				'label'   => _x( 'Enable Object Caching', 'settings', 'groundhogg' ),
@@ -1210,8 +1210,8 @@ class Settings_Page extends Admin_Page {
 				'section' => 'wp_cron',
 				'label'   => _x( 'Disable WP Cron.', 'settings', 'groundhogg' ),
 				'desc'    => defined( 'DISABLE_WP_CRON' ) && ! defined( 'GH_SHOW_DISABLE_WP_CRON_OPTION' )
-                    ? _x( 'WP Cron has been disabled by your host or in your <code>wp-config.php</code> file already.', 'settings', 'groundhogg' )
-                    : _x( 'Disable the built-in WP Cron system. This is recommended if you are using an external cron job.', 'settings', 'groundhogg' ),
+					? _x( 'WP Cron has been disabled by your host or in your <code>wp-config.php</code> file already.', 'settings', 'groundhogg' )
+					: _x( 'Disable the built-in WP Cron system. This is recommended if you are using an external cron job.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
 					'label'    => __( 'Disable' ),
@@ -1387,19 +1387,19 @@ class Settings_Page extends Admin_Page {
 //    public function settings_content()
 	public function view() {
 		?>
-        <style>
+		<style>
             .select2 {
                 max-width: 300px;
             }
-        </style>
-        <div class="wrap">
+		</style>
+		<div class="wrap">
 			<?php
 			settings_errors();
 			$action = $this->tab_has_settings( $this->active_tab() ) ? 'options.php' : ''; ?>
-            <form method="POST" enctype="multipart/form-data" action="<?php echo $action; ?>">
+			<form method="POST" enctype="multipart/form-data" action="<?php echo $action; ?>">
 
-                <!-- BEGIN TABS -->
-                <h2 class="nav-tab-wrapper">
+				<!-- BEGIN TABS -->
+				<h2 class="nav-tab-wrapper">
 					<?php foreach ( $this->tabs as $id => $tab ):
 
 						// Check for cap restriction on the tab...
@@ -1412,13 +1412,13 @@ class Settings_Page extends Admin_Page {
 
 						?>
 
-                        <a href="?page=gh_settings&tab=<?php echo $tab['id']; ?>"
-                           class="nav-tab <?php echo $this->active_tab() == $tab['id'] ? 'nav-tab-active' : ''; ?>"><?php _e( $tab['title'], 'groundhogg' ); ?></a>
+						<a href="?page=gh_settings&tab=<?php echo $tab['id']; ?>"
+						   class="nav-tab <?php echo $this->active_tab() == $tab['id'] ? 'nav-tab-active' : ''; ?>"><?php _e( $tab['title'], 'groundhogg' ); ?></a>
 					<?php endforeach; ?>
-                </h2>
-                <!-- END TABS -->
+				</h2>
+				<!-- END TABS -->
 
-                <!-- BEGIN SETTINGS -->
+				<!-- BEGIN SETTINGS -->
 				<?php
 				if ( $this->tab_has_settings() && $this->user_can_access_tab() ) {
 
@@ -1431,10 +1431,10 @@ class Settings_Page extends Admin_Page {
 
 				do_action( "groundhogg/admin/settings/{$this->active_tab()}/after_submit" );
 				?>
-                <!-- END SETTINGS -->
-            </form>
+				<!-- END SETTINGS -->
+			</form>
 			<?php do_action( "groundhogg/admin/settings/{$this->active_tab()}/after_form" ); ?>
-        </div> <?php
+		</div> <?php
 	}
 
 	public function settings_callback( $field ) {

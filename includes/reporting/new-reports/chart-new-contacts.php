@@ -21,15 +21,15 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 		for ( $i = 0; $i < count( $new ); $i ++ ) {
 
 			$n[] = [
-				't'     => $new[ $i ][ 't' ],
-				'label' => sprintf( " %s (%s): %s", __( 'Contacts', 'groundhogg' ), date( get_option( 'date_format' ) . " " . get_option( 'time_format' ), strtotime( $new[ $i ][ 't' ] ) ), $new[ $i ][ 'y' ] ),
-				'y'     => $new[ $i ][ 'y' ]
+				't'     => $new[ $i ]['t'],
+				'label' => sprintf( " %s (%s): %s", __( 'Contacts', 'groundhogg' ), date( get_option( 'date_format' ) . " " . get_option( 'time_format' ), strtotime( $new[ $i ]['t'] ) ), $new[ $i ]['y'] ),
+				'y'     => $new[ $i ]['y']
 			];
 
 			$p[] = [
-				't'     => $new[ $i ][ 't' ],
-				'label' => sprintf( " %s (%s): %s", __( 'Contacts', 'groundhogg' ), date( get_option( 'date_format' ) . " " . get_option( 'time_format' ), strtotime( $previous[ $i ][ 't' ] ) ), $previous[ $i ][ 'y' ] ),
-				'y'     => $previous[ $i ][ 'y' ],
+				't'     => $new[ $i ]['t'],
+				'label' => sprintf( " %s (%s): %s", __( 'Contacts', 'groundhogg' ), date( get_option( 'date_format' ) . " " . get_option( 'time_format' ), strtotime( $previous[ $i ]['t'] ) ), $previous[ $i ]['y'] ),
+				'y'     => $previous[ $i ]['y'],
 			];
 
 		}
@@ -88,7 +88,7 @@ class Chart_New_Contacts extends Base_Time_Chart_Report {
 
 		$grouped_data = $this->group_by_time( $data, true );
 
-		return $this->normalize_data($grouped_data);
+		return $this->normalize_data( $grouped_data );
 
 	}
 }

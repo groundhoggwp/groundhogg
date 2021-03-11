@@ -221,67 +221,66 @@ class Tags_Page extends Admin_Page {
 		$this->search_form( __( 'Search Tags', 'groundhogg' ) );
 
 		?>
-        <div id="col-container" class="wp-clearfix">
-            <div id="col-left">
-                <div class="col-wrap">
-                    <div class="form-wrap">
-                        <h2><?php _e( 'Add New Tag', 'groundhogg' ) ?></h2>
-                        <form id="addtag" method="post" action="">
-                            <input type="hidden" name="action" value="add">
+		<div id="col-container" class="wp-clearfix">
+			<div id="col-left">
+				<div class="col-wrap">
+					<div class="form-wrap">
+						<h2><?php _e( 'Add New Tag', 'groundhogg' ) ?></h2>
+						<form id="addtag" method="post" action="">
+							<input type="hidden" name="action" value="add">
 							<?php wp_nonce_field(); ?>
-                            <div class="form-field term-name-wrap">
-                                <label for="tag-name"><?php _e( 'Tag Name', 'groundhogg' ) ?></label>
-                                <input name="tag_name" id="tag-name" type="text" value="" size="40">
-                                <p><?php _e( 'Name a tag something simple so you do not forget it.', 'groundhogg' ); ?></p>
-                            </div>
-                            <div class="form-field term-description-wrap">
-                                <label for="tag-description"><?php _e( 'Description', 'groundhogg' ) ?></label>
-                                <textarea name="tag_description" id="tag-description" rows="5" cols="40"></textarea>
-                                <p><?php _e( 'Tag descriptions are only visible to admins and will never be seen by contacts.', 'groundhogg' ); ?></p>
-                            </div>
-                            <div class="form-field term-bulk-wrap hidden">
-                                <label for="tag-bulk"><?php _e( 'Bulk Add Tags', 'groundhogg' ) ?></label>
-                                <textarea name="bulk_tags" id="tag-bulk" rows="5" cols="40" maxlength="1000"></textarea>
-                                <p><?php _e( 'Enter 1 tag per line.', 'groundhogg' ); ?></p>
-                            </div>
-                            <div class="form-field term-toggle-bulk-wrap">
-                                <label for="tag-bulk-toggle"><input name="bulk_add" id="tag-bulk-toggle"
-                                                                    type="checkbox"><?php _e( 'Add tags in bulk?', 'groundhogg' ) ?>
-                                </label>
-                            </div>
-                            <script>
+							<div class="form-field term-name-wrap">
+								<label for="tag-name"><?php _e( 'Tag Name', 'groundhogg' ) ?></label>
+								<input name="tag_name" id="tag-name" type="text" value="" size="40">
+								<p><?php _e( 'Name a tag something simple so you do not forget it.', 'groundhogg' ); ?></p>
+							</div>
+							<div class="form-field term-description-wrap">
+								<label for="tag-description"><?php _e( 'Description', 'groundhogg' ) ?></label>
+								<textarea name="tag_description" id="tag-description" rows="5" cols="40"></textarea>
+								<p><?php _e( 'Tag descriptions are only visible to admins and will never be seen by contacts.', 'groundhogg' ); ?></p>
+							</div>
+							<div class="form-field term-bulk-wrap hidden">
+								<label for="tag-bulk"><?php _e( 'Bulk Add Tags', 'groundhogg' ) ?></label>
+								<textarea name="bulk_tags" id="tag-bulk" rows="5" cols="40" maxlength="1000"></textarea>
+								<p><?php _e( 'Enter 1 tag per line.', 'groundhogg' ); ?></p>
+							</div>
+							<div class="form-field term-toggle-bulk-wrap">
+								<label for="tag-bulk-toggle"><input name="bulk_add" id="tag-bulk-toggle"
+								                                    type="checkbox"><?php _e( 'Add tags in bulk?', 'groundhogg' ) ?>
+								</label>
+							</div>
+							<script>
                               jQuery(function ($) {
                                 $('#tag-bulk-toggle').change(function () {
                                   if ($(this).is(':checked')) {
                                     $('.term-name-wrap').addClass('hidden')
                                     $('.term-description-wrap').addClass('hidden')
                                     $('.term-bulk-wrap').removeClass('hidden')
-                                  }
-                                  else {
+                                  } else {
                                     $('.term-name-wrap').removeClass('hidden')
                                     $('.term-description-wrap').removeClass('hidden')
                                     $('.term-bulk-wrap').addClass('hidden')
                                   }
                                 })
                               })
-                            </script>
+							</script>
 
 							<?php do_action( 'groundhogg/admin/tags/add/form' ); ?>
 
 							<?php submit_button( _x( 'Add New Tag', 'action', 'groundhogg' ), 'primary', 'add_tag' ); ?>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <div id="col-right">
-                <div class="col-wrap">
-                    <form id="posts-filter" method="post">
+						</form>
+					</div>
+				</div>
+			</div>
+			<div id="col-right">
+				<div class="col-wrap">
+					<form id="posts-filter" method="post">
 						<?php $tags_table->prepare_items(); ?>
 						<?php $tags_table->display(); ?>
-                    </form>
-                </div>
-            </div>
-        </div>
+					</form>
+				</div>
+			</div>
+		</div>
 		<?php
 	}
 

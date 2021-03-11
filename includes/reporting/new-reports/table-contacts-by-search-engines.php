@@ -41,7 +41,7 @@ class Table_Contacts_By_Search_Engines extends Base_Table_Report {
 				foreach ( $search_engines as $engine_name => $atts ) {
 					$urls = $atts[0]['urls'];
 					if ( $this->in_urls( $test_lead_source, $urls ) ) {
-						if ( isset( $return[ $engine_name ] ) ){
+						if ( isset( $return[ $engine_name ] ) ) {
 							$return[ $engine_name ] += $num_contacts;
 						} else {
 							$return[ $engine_name ] = $num_contacts;
@@ -100,7 +100,7 @@ class Table_Contacts_By_Search_Engines extends Base_Table_Report {
 			include_once GROUNDHOGG_PATH . 'includes/lib/yaml/Spyc.php';
 		}
 
-		Return \Spyc::YAMLLoad( GROUNDHOGG_PATH . 'includes/lib/potential-known-leadsources/SearchEngines.yml' );
+		return \Spyc::YAMLLoad( GROUNDHOGG_PATH . 'includes/lib/potential-known-leadsources/SearchEngines.yml' );
 	}
 
 	/**

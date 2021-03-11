@@ -7,7 +7,7 @@ use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 
 $funnel_id = absint( get_request_var( 'funnel' ) );
-$funnel = new Funnel( $funnel_id );
+$funnel    = new Funnel( $funnel_id );
 
 ?>
 <form class="" method="post">

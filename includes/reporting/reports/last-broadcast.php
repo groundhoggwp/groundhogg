@@ -36,10 +36,11 @@ class Last_Broadcast extends Report {
 	}
 
 	public function get_broadcast() {
-		$all_broadcasts = get_db( 'broadcasts' )->query( [ 'status'  => 'sent',
-		                                                   'orderby' => 'send_time',
-		                                                   'order'   => 'desc',
-		                                                   'limit'   => 10
+		$all_broadcasts = get_db( 'broadcasts' )->query( [
+			'status'  => 'sent',
+			'orderby' => 'send_time',
+			'order'   => 'desc',
+			'limit'   => 10
 		] );
 
 		if ( empty( $all_broadcasts ) ) {

@@ -10,7 +10,7 @@ use function Groundhogg\html;
 
 ?>
 <div id="search-filters" class="postbox <?php echo ( get_url_var( 'is_searching' ) ) ? '' : 'hidden'; ?>">
-    <form method="get">
+	<form method="get">
 		<?php echo html()->input( [
 			'type'  => 'hidden',
 			'name'  => 'is_searching',
@@ -18,13 +18,13 @@ use function Groundhogg\html;
 		] ); ?>
 		<?php html()->hidden_GET_inputs(); ?>
 
-        <div class="first-name-search inline-block search-param">
+		<div class="first-name-search inline-block search-param">
 
 			<?php
 
 			echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Filter By First Name', 'groundhogg' ) );
 			?>
-            <p><?php
+			<p><?php
 
 				echo html()->dropdown( [
 					'name'        => 'first_name_compare',
@@ -40,7 +40,7 @@ use function Groundhogg\html;
 					'id'          => '',
 				] );
 				?></p>
-            <p><?php
+			<p><?php
 
 				echo html()->input( [
 					'name'        => 'first_name',
@@ -49,14 +49,14 @@ use function Groundhogg\html;
 					'placeholder' => __( 'John' )
 				] );
 				?></p>
-        </div>
-        <div class="last-name-search inline-block search-param">
+		</div>
+		<div class="last-name-search inline-block search-param">
 
 			<?php
 
 			echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Filter By Last Name', 'groundhogg' ) );
 			?>
-            <p><?php
+			<p><?php
 
 				echo html()->dropdown( [
 					'name'        => 'last_name_compare',
@@ -72,7 +72,7 @@ use function Groundhogg\html;
 					'id'          => '',
 				] );
 				?></p>
-            <p><?php
+			<p><?php
 
 
 				echo html()->input( [
@@ -82,12 +82,12 @@ use function Groundhogg\html;
 					'placeholder' => __( 'Doe' )
 				] );
 				?></p>
-        </div>
-        <div class="email-search inline-block search-param">
-	        <?php
-	        echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Filter By Email', 'groundhogg' ) );
-	        ?>
-            <p><?php
+		</div>
+		<div class="email-search inline-block search-param">
+			<?php
+			echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Filter By Email', 'groundhogg' ) );
+			?>
+			<p><?php
 				echo html()->dropdown( [
 					'name'        => 'email_compare',
 					'class'       => 'email-compare',
@@ -102,7 +102,7 @@ use function Groundhogg\html;
 					'id'          => '',
 				] );
 				?></p>
-            <p><?php
+			<p><?php
 
 				echo html()->input( [
 					'name'        => 'email',
@@ -111,9 +111,9 @@ use function Groundhogg\html;
 					'placeholder' => __( 'example@mydomain.com' )
 				] );
 				?></p>
-            <p>
-        </div>
-        <div class="optin-status inline-block search-param">
+			<p>
+		</div>
+		<div class="optin-status inline-block search-param">
 
 			<?php
 
@@ -139,8 +139,8 @@ use function Groundhogg\html;
 			] ), 'p' );
 
 			?>
-        </div>
-        <div class="meta-search inline-block search-param">
+		</div>
+		<div class="meta-search inline-block search-param">
 
 			<?php
 
@@ -160,7 +160,7 @@ use function Groundhogg\html;
 				] );
 
 				?></p>
-            <p><?php
+			<p><?php
 
 
 				echo html()->dropdown( [
@@ -179,7 +179,7 @@ use function Groundhogg\html;
 					'id'          => '',
 				] );
 				?></p>
-            <p><?php
+			<p><?php
 
 
 				echo html()->input( [
@@ -190,9 +190,9 @@ use function Groundhogg\html;
 				] );
 
 				?>
-            </p>
-        </div>
-        <div class="date-search inline-block search-param">
+			</p>
+		</div>
+		<div class="date-search inline-block search-param">
 
 			<?php
 
@@ -211,7 +211,7 @@ use function Groundhogg\html;
 				] );
 
 				?></p>
-            <p><?php
+			<p><?php
 
 				_e( 'To: ' );
 				echo '<br/>';
@@ -224,8 +224,8 @@ use function Groundhogg\html;
 				] );
 
 				?></p>
-        </div>
-        <div class="owner-search inline-block search-param">
+		</div>
+		<div class="owner-search inline-block search-param">
 			<?php
 
 			echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Filter By Owner', 'groundhogg' ) );
@@ -239,77 +239,77 @@ use function Groundhogg\html;
 				] );
 
 				?></p>
-        </div>
-        <div class="tags-filter search-param">
-		    <?php echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Filter By Tags', 'groundhogg' ) ); ?>
-            <div class="filters">
-                <div class="tags-include inline-block search-param">
-				    <?php
+		</div>
+		<div class="tags-filter search-param">
+			<?php echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Filter By Tags', 'groundhogg' ) ); ?>
+			<div class="filters">
+				<div class="tags-include inline-block search-param">
+					<?php
 
-				    echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Includes contacts with', 'groundhogg' ) );
-				    echo "&nbsp;";
-				    echo html()->dropdown( [
-					    'name'        => 'tags_include_needs_all',
-					    'id'          => 'tags_include_needs_all',
-					    'class'       => '',
-					    'options'     => array(
-						    0 => __( 'Any', 'groundhogg' ),
-						    1 => __( 'All', 'groundhogg' )
-					    ),
-					    'selected'    => absint( get_url_var( 'tags_include_needs_all' ) ),
-					    'option_none' => false
-				    ] );
+					echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Includes contacts with', 'groundhogg' ) );
+					echo "&nbsp;";
+					echo html()->dropdown( [
+						'name'        => 'tags_include_needs_all',
+						'id'          => 'tags_include_needs_all',
+						'class'       => '',
+						'options'     => array(
+							0 => __( 'Any', 'groundhogg' ),
+							1 => __( 'All', 'groundhogg' )
+						),
+						'selected'    => absint( get_url_var( 'tags_include_needs_all' ) ),
+						'option_none' => false
+					] );
 
-				    echo html()->e( 'p', [], [
-					    html()->tag_picker( [
-						    'name'     => 'tags_include[]',
-						    'id'       => 'tags_include',
-						    'selected' => wp_parse_id_list( get_url_var( 'tags_include' ) )
-					    ] )
+					echo html()->e( 'p', [], [
+						html()->tag_picker( [
+							'name'     => 'tags_include[]',
+							'id'       => 'tags_include',
+							'selected' => wp_parse_id_list( get_url_var( 'tags_include' ) )
+						] )
 
-				    ] );
+					] );
 
-				    ?>
-                </div>
-                <div class="tags-exclude inline-block search-param">
-				    <?php
+					?>
+				</div>
+				<div class="tags-exclude inline-block search-param">
+					<?php
 
-				    echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Excludes contacts with', 'groundhogg' ) );
-				    echo "&nbsp;";
+					echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Excludes contacts with', 'groundhogg' ) );
+					echo "&nbsp;";
 
-				    echo html()->dropdown( [
-					    'name'        => 'tags_exclude_needs_all',
-					    'id'          => 'tags_exclude_needs_all',
-					    'class'       => '',
-					    'options'     => array(
-						    0 => __( 'Any', 'groundhogg' ),
-						    1 => __( 'All', 'groundhogg' )
-					    ),
-					    'selected'    => absint( get_url_var( 'tags_exclude_needs_all' ) ),
-					    'option_none' => false
-				    ] );
+					echo html()->dropdown( [
+						'name'        => 'tags_exclude_needs_all',
+						'id'          => 'tags_exclude_needs_all',
+						'class'       => '',
+						'options'     => array(
+							0 => __( 'Any', 'groundhogg' ),
+							1 => __( 'All', 'groundhogg' )
+						),
+						'selected'    => absint( get_url_var( 'tags_exclude_needs_all' ) ),
+						'option_none' => false
+					] );
 
-				    echo html()->e( 'p', [], [
-					    html()->tag_picker( [
-						    'name'     => 'tags_exclude[]',
-						    'id'       => 'tags_exclude',
-						    'selected' => wp_parse_id_list( get_url_var( 'tags_exclude' ) )
-					    ] )
-				    ] );
+					echo html()->e( 'p', [], [
+						html()->tag_picker( [
+							'name'     => 'tags_exclude[]',
+							'id'       => 'tags_exclude',
+							'selected' => wp_parse_id_list( get_url_var( 'tags_exclude' ) )
+						] )
+					] );
 
-				    ?>
-                </div>
-            </div>
-        </div>
+					?>
+				</div>
+			</div>
+		</div>
 		<?php do_action( 'groundhogg/admin/contacts/search' ); ?>
 
-        <div class="start-search">
+		<div class="start-search">
 			<?php submit_button( __( 'Search' ), 'primary', 'submit', false ); ?>
-        </div>
-    </form>
-    <div class="saved-search-form">
-        <div class="inline-block search-param">
-            <form method="post">
+		</div>
+	</form>
+	<div class="saved-search-form">
+		<div class="inline-block search-param">
+			<form method="post">
 				<?php
 
 				wp_nonce_field( 'load_search' );
@@ -328,12 +328,12 @@ use function Groundhogg\html;
 
 					?></p>
 				<?php submit_button( __( 'Load Search', 'groundhogg' ), 'secondary', 'submit', false ); ?>
-            </form>
-        </div>
+			</form>
+		</div>
 
 		<?php if ( get_url_var( 'is_searching' ) === 'on' ): ?>
-            <div class="inline-block search-param">
-                <form method="post" class="save-this-search">
+			<div class="inline-block search-param">
+				<form method="post" class="save-this-search">
 					<?php
 
 					wp_nonce_field( 'save_this_search' );
@@ -350,31 +350,31 @@ use function Groundhogg\html;
 
 						?></p>
 					<?php submit_button( __( 'Save Search', 'groundhogg' ), 'secondary', 'submit', false ); ?>
-                </form>
-            </div>
+				</form>
+			</div>
 		<?php endif; ?>
 		<?php
 		$search_id = get_url_var( 'saved_search_id' );
-        if ( $search_id && Saved_Searches::instance()->get( $search_id ) ): ?>
-            <div class="inline-block search-param">
-                <form method="post" class="delete-search">
+		if ( $search_id && Saved_Searches::instance()->get( $search_id ) ): ?>
+			<div class="inline-block search-param">
+				<form method="post" class="delete-search">
 					<?php
 
 					wp_nonce_field( 'delete_search' );
 					action_input( 'delete_search' );
 
 					echo html()->input( [
-                        'type' => 'hidden',
-                        'name' => 'saved_search',
-                        'value' => $search_id
-                    ] );
+						'type'  => 'hidden',
+						'name'  => 'saved_search',
+						'value' => $search_id
+					] );
 
 					echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Delete Current Search', 'groundhogg' ) ); ?>
-                    <p>
+					<p>
 						<?php submit_button( __( 'Delete Search', 'groundhogg' ), 'secondary', 'submit', false ); ?>
-                    </p>
-                </form>
-            </div>
+					</p>
+				</form>
+			</div>
 		<?php endif; ?>
-    </div>
+	</div>
 </div>

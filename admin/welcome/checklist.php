@@ -103,26 +103,27 @@ $hidden = get_user_option( 'gh_hide_groundhogg_quickstart' ) !== false;
 
 ?>
 <div class="col">
-    <div id="checklist" class="postbox onboarding-checklist <?php esc_attr_e( $hidden ? 'closed' : 'open' );?>">
-        <div class="postbox-header">
-            <h3 class="hndle"><span>🚀 <?php _e( 'Quickstart Checklist', 'groundhogg' ) ?></span></h3>
-	        <div class="handle-actions">
-		        <?php html()->e( 'a', [ 'href' => action_url( $hidden ? 'show_checklist' : 'hide_checklist' ) ], $hidden ? __( 'Show', 'groundhogg' ) : __( 'Hide', 'groundhogg' ), false, true ); ?>
-	        </div>
-        </div>
+	<div id="checklist" class="postbox onboarding-checklist <?php esc_attr_e( $hidden ? 'closed' : 'open' ); ?>">
+		<div class="postbox-header">
+			<h3 class="hndle"><span>🚀 <?php _e( 'Quickstart Checklist', 'groundhogg' ) ?></span></h3>
+			<div class="handle-actions">
+				<?php html()->e( 'a', [ 'href' => action_url( $hidden ? 'show_checklist' : 'hide_checklist' ) ], $hidden ? __( 'Show', 'groundhogg' ) : __( 'Hide', 'groundhogg' ), false, true ); ?>
+			</div>
+		</div>
 		<?php
 
 		if ( $all_completed ):
-            ?>
-            <div class="inside checklist-complete">
-	            <?php
-	            html()->e( 'img', [
-	            	'src' => GROUNDHOGG_ASSETS_URL . 'images/phil-confetti.png'
-	            ], false, true, true )
-	            ?>
-                <p>🎉 <?php _e( "Yay! You finished the quickstart checklist! Groundhogg is now completely configured and you're ready to launch!", 'groundhogg' ); ?></p>
-            </div>
-            <?php
+			?>
+			<div class="inside checklist-complete">
+				<?php
+				html()->e( 'img', [
+					'src' => GROUNDHOGG_ASSETS_URL . 'images/phil-confetti.png'
+				], false, true, true )
+				?>
+				<p>
+					🎉 <?php _e( "Yay! You finished the quickstart checklist! Groundhogg is now completely configured and you're ready to launch!", 'groundhogg' ); ?></p>
+			</div>
+		<?php
 		else :
 
 			foreach ( $checklist_items as $item ):
@@ -130,23 +131,24 @@ $hidden = get_user_option( 'gh_hide_groundhogg_quickstart' ) !== false;
 				if ( ! current_user_can( $item['cap'] ) ) {
 					continue;
 				} ?>
-                <div class="checklist-row">
-                    <div class="item-status <?php echo $item['completed'] ? 'done' : 'todo' ?>">
+				<div class="checklist-row">
+					<div class="item-status <?php echo $item['completed'] ? 'done' : 'todo' ?>">
 						<?php if ( $item['completed'] ): ?>
-                            ✅
+							✅
 						<?php else: ?>
-                            ❌
+							❌
 						<?php endif; ?>
-                    </div>
-                    <div class="details">
-                        <h3 class="item-title"><?php echo $item['title']; ?></h3>
-                        <p class="description"><?php echo $item['description']; ?></p>
-                    </div>
+					</div>
+					<div class="details">
+						<h3 class="item-title"><?php echo $item['title']; ?></h3>
+						<p class="description"><?php echo $item['description']; ?></p>
+					</div>
 					<?php if ( ! $item['completed'] ): ?>
-                        <span class="fix-link"><?php echo html()->e( 'a', [ 'href' => $item['fix'] ], __( 'Fix', 'groundhogg' ) ); ?></span>
+						<span
+							class="fix-link"><?php echo html()->e( 'a', [ 'href' => $item['fix'] ], __( 'Fix', 'groundhogg' ) ); ?></span>
 					<?php endif; ?>
-                </div>
+				</div>
 			<?php endforeach;
 		endif; ?>
-    </div>
+	</div>
 </div>

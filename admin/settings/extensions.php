@@ -40,18 +40,18 @@ usort( $downloads, function ( $a, $b ) {
 		}
 
 		?>
-        <div class="postbox">
-            <div class="card-top">
-                <h3 class="extension-title">
+		<div class="postbox">
+			<div class="card-top">
+				<h3 class="extension-title">
 					<?php esc_html_e( $download->info->title ); ?>
-                    <img class="thumbnail" src="<?php echo esc_url( $extension->info->thumbnail ); ?>"
-                         alt="<?php esc_attr_e( $extension->info->title ); ?>">
-                </h3>
-                <p class="extension-description">
+					<img class="thumbnail" src="<?php echo esc_url( $extension->info->thumbnail ); ?>"
+					     alt="<?php esc_attr_e( $extension->info->title ); ?>">
+				</h3>
+				<p class="extension-description">
 					<?php esc_html_e( $extension->info->excerpt ); ?>
-                </p>
-            </div>
-            <div class="install-actions">
+				</p>
+			</div>
+			<div class="install-actions">
 
 				<?php if ( $extension->info->link ): ?>
 					<?php
@@ -63,8 +63,8 @@ usort( $downloads, function ( $a, $b ) {
 						$price2 = max( $pricing );
 
 						?>
-                        <a class="button-secondary" target="_blank"
-                           href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
+						<a class="button-secondary" target="_blank"
+						   href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
 						<?php
 					} else {
 
@@ -72,13 +72,13 @@ usort( $downloads, function ( $a, $b ) {
 
 						if ( $price > 0.00 ) {
 							?>
-                            <a class="button-secondary" target="_blank"
-                               href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
+							<a class="button-secondary" target="_blank"
+							   href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
 							<?php
 						} else {
 							?>
-                            <a class="button-secondary" target="_blank"
-                               href="<?php echo $extension->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
+							<a class="button-secondary" target="_blank"
+							   href="<?php echo $extension->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
 							<?php
 						}
 					}
@@ -89,8 +89,8 @@ usort( $downloads, function ( $a, $b ) {
 					'target' => '_blank',
 					'class'  => 'more-details',
 				], __( 'More details' ) ); ?>
-            </div>
-        </div>
+			</div>
+		</div>
 
 	<?php
 	endforeach;

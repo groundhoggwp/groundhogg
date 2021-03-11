@@ -50,8 +50,8 @@ class Tags_Table extends WP_List_Table {
 	}
 
 	/**
-	 * @see WP_List_Table::::single_row_columns()
 	 * @return array An associative array containing column information.
+	 * @see WP_List_Table::::single_row_columns()
 	 */
 	public function get_columns() {
 		$columns = array(
@@ -79,21 +79,21 @@ class Tags_Table extends WP_List_Table {
 
 	protected function extra_tablenav( $which ) {
 		?>
-        <div class="alignleft gh-actions">
-            <a class="button action" href="<?php echo wp_nonce_url( add_query_arg( [
+		<div class="alignleft gh-actions">
+			<a class="button action" href="<?php echo wp_nonce_url( add_query_arg( [
 				'page'   => 'gh_tags',
 				'action' => 'recount'
 			], admin_url( 'admin.php' ) ) ) ?>"><?php _ex( 'Recount Contacts', 'action', 'groundhogg' ); ?></a>
-        </div>
+		</div>
 		<?php
 	}
 
 	/**
 	 * Generates content for a single row of the table
 	 *
-	 * @since 3.1.0
-	 *
 	 * @param object $item The current item
+	 *
+	 * @since 3.1.0
 	 *
 	 */
 	public function single_row( $item ) {
@@ -137,7 +137,7 @@ class Tags_Table extends WP_List_Table {
 	/**
 	 * Get default column value.
 	 *
-	 * @param object $tag         A singular item (one full row's worth of data).
+	 * @param object $tag A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string Text or HTML to be placed inside the column <td>.
@@ -227,7 +227,7 @@ class Tags_Table extends WP_List_Table {
 	 *
 	 * @param        $tag         Tag      Contact being acted upon.
 	 * @param string $column_name Current column name.
-	 * @param string $primary     Primary column name.
+	 * @param string $primary Primary column name.
 	 *
 	 * @return string Row steps output for posts.
 	 */

@@ -184,7 +184,7 @@ class Events_Table extends WP_List_Table {
 				break;
 		}
 
-		if ( $event->get_time() < time() && $event->is_waiting() ){
+		if ( $event->get_time() < time() && $event->is_waiting() ) {
 			return '<abbr title="' . date_i18n( get_date_time_format(), $event->get_time() ) . '">' . __( 'Running now...', 'groundhogg' ) . '</abbr>';
 		}
 
@@ -330,8 +330,9 @@ class Events_Table extends WP_List_Table {
 				case 'skipped':
 				case 'failed':
 					$actions['execute_again'] = html()->e( 'a', [
-						'href' => action_url( 'execute_again', [ 'event'  => $event->get_id(),
-						                                         'status' => $this->get_view()
+						'href' => action_url( 'execute_again', [
+							'event'  => $event->get_id(),
+							'status' => $this->get_view()
 						] ),
 					], __( 'Run Again', 'groundhogg' ) );
 					break;
@@ -373,16 +374,19 @@ class Events_Table extends WP_List_Table {
 	protected function extra_tablenav( $which ) {
 
 		?>
-        <div class="alignleft gh-actions">
-            <a class="button action"
-               href="<?php echo Plugin::instance()->bulk_jobs->process_events->get_start_url(); ?>"><?php _ex( 'Process Events', 'action', 'groundhogg' ); ?></a>
-            <a class="button action"
-               href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'cleanup' ], $_SERVER['REQUEST_URI'] ), 'cleanup' ); ?>"><?php _ex( 'Cleanup', 'action', 'groundhogg' ); ?></a>
+		<div class="alignleft gh-actions">
+			<a class="button action"
+			   href="<?php echo Plugin::instance()->bulk_jobs->process_events->get_start_url(); ?>"><?php _ex( 'Process Events', 'action', 'groundhogg' ); ?></a>
+			<a class="button action"
+			   href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'cleanup' ], $_SERVER['REQUEST_URI'] ), 'cleanup' ); ?>"><?php _ex( 'Cleanup', 'action', 'groundhogg' ); ?></a>
 			<?php if ( in_array( $this->get_view(), [ 'failed', 'skipped', 'cancelled' ] ) ): ?>
-                <a class="button action"
-                   href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'purge', 'status' => $this->get_view() ], $_SERVER['REQUEST_URI'] ), 'purge' ); ?>"><?php _ex( 'Purge events', 'action', 'groundhogg' ); ?></a>
+				<a class="button action"
+				   href="<?php echo wp_nonce_url( add_query_arg( [
+					   'action' => 'purge',
+					   'status' => $this->get_view()
+				   ], $_SERVER['REQUEST_URI'] ), 'purge' ); ?>"><?php _ex( 'Purge events', 'action', 'groundhogg' ); ?></a>
 			<?php endif; ?>
-        </div>
+		</div>
 		<?php
 	}
 

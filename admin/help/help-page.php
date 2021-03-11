@@ -31,7 +31,7 @@ class Help_Page extends Tabbed_Admin_Page {
 		if ( ! is_pro_features_active() ) {
 			add_action( 'admin_print_styles', function () {
 				?>
-                <style>
+				<style>
                     .nav-tab-wrapper a[href="?page=gh_help&tab=support"] {
                         color: #DB741A;
                     }
@@ -39,7 +39,7 @@ class Help_Page extends Tabbed_Admin_Page {
                     .nav-tab-wrapper a[href="?page=gh_help&tab=support"] .dashicons {
                         margin-right: 4px;
                     }
-                </style>
+				</style>
 				<?php
 			} );
 		}
@@ -132,13 +132,13 @@ class Help_Page extends Tabbed_Admin_Page {
 
 	public function docs_view() {
 		?>
-        <div id="poststuff">
-            <div id="docs" class="post-box-grid">
+		<div id="poststuff">
+			<div id="docs" class="post-box-grid">
 
-                <!-- getting Started -->
-                <div class="postbox">
-                    <h2><?php _e( 'New to Groundhogg?', 'groundhogg' ); ?></h2>
-                    <p class="inner"><?php _e( 'If you are new to Groundhogg, try browsing our getting started articles to learn what you need to know!', 'groundhogg' ); ?></p>
+				<!-- getting Started -->
+				<div class="postbox">
+					<h2><?php _e( 'New to Groundhogg?', 'groundhogg' ); ?></h2>
+					<p class="inner"><?php _e( 'If you are new to Groundhogg, try browsing our getting started articles to learn what you need to know!', 'groundhogg' ); ?></p>
 					<?php
 
 					echo html()->e( 'a', [
@@ -148,12 +148,12 @@ class Help_Page extends Tabbed_Admin_Page {
 					], __( 'I need help getting started!', 'groundhogg' ) ); ?>
 
 
-                </div>
+				</div>
 
-                <!-- Building something -->
-                <div class="postbox">
-                    <h2><?php _e( 'Building something?', 'groundhogg' ); ?></h2>
-                    <p class="inner"><?php _e( 'Are you building something custom with Groundhogg? Take a look at our developer oriented articles.', 'groundhogg' ); ?></p>
+				<!-- Building something -->
+				<div class="postbox">
+					<h2><?php _e( 'Building something?', 'groundhogg' ); ?></h2>
+					<p class="inner"><?php _e( 'Are you building something custom with Groundhogg? Take a look at our developer oriented articles.', 'groundhogg' ); ?></p>
 					<?php
 
 					echo html()->e( 'a', [
@@ -162,12 +162,12 @@ class Help_Page extends Tabbed_Admin_Page {
 						'href'   => 'https://help.groundhogg.io/collection/141-developers',
 					], __( 'I need help with development!', 'groundhogg' ) ); ?>
 
-                </div>
+				</div>
 
-                <!-- FAQ -->
-                <div class="postbox">
-                    <h2><?php _e( 'Have a question?', 'groundhogg' ); ?></h2>
-                    <p class="inner"><?php _e( 'Someone else may have already asked your question. Check out our FAQs to see if there is an answer for you.', 'groundhogg' ); ?></p>
+				<!-- FAQ -->
+				<div class="postbox">
+					<h2><?php _e( 'Have a question?', 'groundhogg' ); ?></h2>
+					<p class="inner"><?php _e( 'Someone else may have already asked your question. Check out our FAQs to see if there is an answer for you.', 'groundhogg' ); ?></p>
 					<?php
 
 					echo html()->e( 'a', [
@@ -175,12 +175,12 @@ class Help_Page extends Tabbed_Admin_Page {
 						'target' => '_blank',
 						'href'   => 'https://help.groundhogg.io/collection/6-faqs'
 					], __( 'I have a question!', 'groundhogg' ) ); ?>
-                </div>
+				</div>
 
-                <!-- Extension -->
-                <div class="postbox">
-                    <h2><?php _e( 'Installing an extension?', 'groundhogg' ); ?></h2>
-                    <p class="inner"><?php _e( 'We have detailed setup guides for all of our premium extensions. Find the one you need!', 'groundhogg' ); ?></p>
+				<!-- Extension -->
+				<div class="postbox">
+					<h2><?php _e( 'Installing an extension?', 'groundhogg' ); ?></h2>
+					<p class="inner"><?php _e( 'We have detailed setup guides for all of our premium extensions. Find the one you need!', 'groundhogg' ); ?></p>
 					<?php
 
 					echo html()->e( 'a', [
@@ -188,12 +188,12 @@ class Help_Page extends Tabbed_Admin_Page {
 						'target' => '_blank',
 						'href'   => 'https://help.groundhogg.io/collection/24-extensions'
 					], __( 'I need help with an extension!', 'groundhogg' ) ); ?>
-                </div>
+				</div>
 
-                <!-- Extension -->
-                <div class="postbox">
-                    <h2><?php _e( "Didn't find what you need?", 'groundhogg' ); ?></h2>
-                    <p class="inner"><?php _e( "If you didn't find what you were looking for then you can join our support group and ask the community!", 'groundhogg' ); ?></p>
+				<!-- Extension -->
+				<div class="postbox">
+					<h2><?php _e( "Didn't find what you need?", 'groundhogg' ); ?></h2>
+					<p class="inner"><?php _e( "If you didn't find what you were looking for then you can join our support group and ask the community!", 'groundhogg' ); ?></p>
 					<?php
 
 					echo html()->e( 'a', [
@@ -201,21 +201,21 @@ class Help_Page extends Tabbed_Admin_Page {
 						'target' => '_blank',
 						'href'   => 'https://www.groundhogg.io/fb/'
 					], __( 'Join the community!', 'groundhogg' ) ); ?>
-                </div>
+				</div>
 
-                <!-- Support ticket -->
-                <div class="postbox">
-                    <h2><?php _e( "Need technical help?", 'groundhogg' ); ?></h2>
-                    <p class="inner"><?php _e( "If you require technical assistance then the best option is to open a support ticket with our advanced support team.", 'groundhogg' ); ?></p>
+				<!-- Support ticket -->
+				<div class="postbox">
+					<h2><?php _e( "Need technical help?", 'groundhogg' ); ?></h2>
+					<p class="inner"><?php _e( "If you require technical assistance then the best option is to open a support ticket with our advanced support team.", 'groundhogg' ); ?></p>
 					<?php
 
 					echo html()->e( 'a', [
 						'class' => 'button big-button',
 						'href'  => admin_page_url( 'gh_help', [ 'tab' => 'support' ] )
 					], __( 'Open a ticket!', 'groundhogg' ) ); ?>
-                </div>
-            </div>
-        </div>
+				</div>
+			</div>
+		</div>
 		<?php
 	}
 
@@ -238,7 +238,7 @@ class Help_Page extends Tabbed_Admin_Page {
 			}
 
 			?>
-            <style>
+			<style>
                 .support-ad {
                     display: block;
                     max-width: 500px;
@@ -258,24 +258,24 @@ class Help_Page extends Tabbed_Admin_Page {
                     font-size: 16px;
                 }
 
-            </style>
-            <div class="support-ad">
+			</style>
+			<div class="support-ad">
 
-                <h1><b>Need Support?</b></h1>
-                <p>Unlock <b>premium technical support</b> when you upgrade to any premium plan.</p>
-                <p>There are many benefits to upgrading, like advanced integrations with your favorite tools, more
-                    features, and of course premium support.</p>
-                <p style="text-align: center">
-                    <a id="pricing-button" class="button-primary big-button"
-                       href="<?php echo esc_url( $pricing_url ); ?>"
-                       target="_blank"><?php dashicon_e( 'star-filled' );
+				<h1><b>Need Support?</b></h1>
+				<p>Unlock <b>premium technical support</b> when you upgrade to any premium plan.</p>
+				<p>There are many benefits to upgrading, like advanced integrations with your favorite tools, more
+					features, and of course premium support.</p>
+				<p style="text-align: center">
+					<a id="pricing-button" class="button-primary big-button"
+					   href="<?php echo esc_url( $pricing_url ); ?>"
+					   target="_blank"><?php dashicon_e( 'star-filled' );
 						_e( 'Yes, I Want To Upgrade!' ); ?></a>
-                </p>
-                <p style="text-align: center">
-                    <a href="https://www.groundhogg.io/fb/"
-                       target="_blank"><?php _e( 'Ask my question on Facebook.', 'groundhogg' ); ?></a>
-                </p>
-            </div>
+				</p>
+				<p style="text-align: center">
+					<a href="https://www.groundhogg.io/fb/"
+					   target="_blank"><?php _e( 'Ask my question on Facebook.', 'groundhogg' ); ?></a>
+				</p>
+			</div>
 		<?php
 
 		endif;

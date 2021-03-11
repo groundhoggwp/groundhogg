@@ -91,11 +91,11 @@ class Info_Cards {
 	/**
 	 * Register a new info box.
 	 *
-	 * @param string   $id                      the ID of the info card
-	 * @param string   $title                   the title of the info card
-	 * @param callable $callback                callback to display the data
-	 * @param int      $priority                how high in the cards it should be displayed
-	 * @param string   $capability              the minimum capability for the viewing user to see the data in this card.
+	 * @param string $id the ID of the info card
+	 * @param string $title the title of the info card
+	 * @param callable $callback callback to display the data
+	 * @param int $priority how high in the cards it should be displayed
+	 * @param string $capability the minimum capability for the viewing user to see the data in this card.
 	 * @param callable $should_display_callback an optional function you can define that will conditionally show the info card based on external parameters. Returns true or false. Returning false will hide the card.
 	 */
 	public static function register( $id, $title, $callback, $priority = 100, $capability = 'view_contacts', $should_display_callback = null ) {
@@ -120,7 +120,7 @@ class Info_Cards {
 	 *
 	 * @param $id
 	 */
-	public static function unregister( $id ){
+	public static function unregister( $id ) {
 		unset( self::$info_cards[ $id ] );
 	}
 
@@ -193,13 +193,13 @@ class Info_Cards {
 			] );
 
 			/**
-			 * @var int      $id
-			 * @var string   $title
+			 * @var int $id
+			 * @var string $title
 			 * @var callable $callback
-			 * @var int      $priority
-			 * @var string   $capability
-			 * @var bool     $open
-			 * @var bool     $hidden
+			 * @var int $priority
+			 * @var string $capability
+			 * @var bool $open
+			 * @var bool $hidden
 			 * @var callable $should_display_callback
 			 */
 
@@ -210,40 +210,40 @@ class Info_Cards {
 			}
 
 			?>
-            <div id="<?php esc_attr_e( $id ); ?>"
-                 class="postbox info-card <?php esc_attr_e( $id ); ?> <?php esc_attr_e( ! $open ? 'closed' : '' ); ?> <?php esc_attr_e( $hidden ? 'hidden' : '' ); ?>">
-                <div class="postbox-header">
-                    <h2 class="hndle"><?php echo $title; ?></h2>
-                    <div class="handle-actions hide-if-no-js">
-                        <button type="button" class="handle-order-higher" aria-disabled="false"
-                                aria-describedby="<?php esc_attr_e( $id ); ?>-handle-order-higher-description">
-                            <span class="screen-reader-text"><?php _e( 'Move up' ); ?></span>
-                            <span class="order-higher-indicator" aria-hidden="true"></span>
-                        </button>
-                        <span class="hidden" id="pageparentdiv-handle-order-higher-description">
+			<div id="<?php esc_attr_e( $id ); ?>"
+			     class="postbox info-card <?php esc_attr_e( $id ); ?> <?php esc_attr_e( ! $open ? 'closed' : '' ); ?> <?php esc_attr_e( $hidden ? 'hidden' : '' ); ?>">
+				<div class="postbox-header">
+					<h2 class="hndle"><?php echo $title; ?></h2>
+					<div class="handle-actions hide-if-no-js">
+						<button type="button" class="handle-order-higher" aria-disabled="false"
+						        aria-describedby="<?php esc_attr_e( $id ); ?>-handle-order-higher-description">
+							<span class="screen-reader-text"><?php _e( 'Move up' ); ?></span>
+							<span class="order-higher-indicator" aria-hidden="true"></span>
+						</button>
+						<span class="hidden" id="pageparentdiv-handle-order-higher-description">
                                 <?php _e( 'Move info box up', 'groundhogg' ); ?>
                             </span>
-                        <button type="button" class="handle-order-lower" aria-disabled="false"
-                                aria-describedby="<?php esc_attr_e( $id ); ?>-handle-order-lower-description">
-                            <span class="screen-reader-text"><?php _e( 'Move down' ); ?></span>
-                            <span class="order-lower-indicator" aria-hidden="true"></span>
-                        </button>
-                        <span class="hidden" id="<?php esc_attr_e( $id ); ?>-handle-order-lower-description">
+						<button type="button" class="handle-order-lower" aria-disabled="false"
+						        aria-describedby="<?php esc_attr_e( $id ); ?>-handle-order-lower-description">
+							<span class="screen-reader-text"><?php _e( 'Move down' ); ?></span>
+							<span class="order-lower-indicator" aria-hidden="true"></span>
+						</button>
+						<span class="hidden" id="<?php esc_attr_e( $id ); ?>-handle-order-lower-description">
                                 <?php _e( 'Move info box down', 'grounhogg' ); ?>
                             </span>
-                        <button type="button" class="handlediv" aria-expanded="true">
+						<button type="button" class="handlediv" aria-expanded="true">
                                 <span class="screen-reader-text">
                                     <?php _e( 'Toggle info box panel', 'grounhogg' ); ?>
                                 </span>
-                            <span class="toggle-indicator" aria-hidden="true"></span>
-                        </button>
-                    </div>
-                </div>
-                <div class="inside">
+							<span class="toggle-indicator" aria-hidden="true"></span>
+						</button>
+					</div>
+				</div>
+				<div class="inside">
 					<?php call_user_func( $callback, $contact ); ?>
 					<?php do_action( "groundhogg/admin/contact/info_card/{$id}", $contact ); ?>
-                </div>
-            </div>
+				</div>
+			</div>
 		<?php
 		endforeach;
 

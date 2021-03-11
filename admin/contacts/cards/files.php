@@ -12,7 +12,7 @@ use function Groundhogg\html;
 <form method="post" enctype="multipart/form-data">
 	<?php action_input( 'upload_file' ); ?>
 	<?php wp_nonce_field( 'upload_file' ); ?>
-    <input class="gh-file-uploader" type="file" name="files[]" multiple>
+	<input class="gh-file-uploader" type="file" name="files[]" multiple>
 	<?php echo html()->wrap( html()->button( [
 		'id'   => 'upload-file',
 		'name' => 'upload_file',
@@ -30,11 +30,11 @@ use function Groundhogg\html;
 		$info = pathinfo( $item['file_path'] );
 
 		?>
-        <li class="file">
-        <span class="data">
+		<li class="file">
+		<span class="data">
 		<?php printf( "<a href='%s' class='file-download' target='_blank'>%s</a>", esc_url( $item['file_url'] ), esc_html( $info['basename'] ) ); ?>
         </span>
-        <span class="light-text subdata">
+		<span class="light-text subdata">
 		<?php
 		printf( "%s | %s", size_format( filesize( $item['file_path'] ) ), strtoupper( $info['extension'] ) );
 //		printf( "%s", $info['extension'] );
@@ -51,7 +51,7 @@ use function Groundhogg\html;
 					] )
 				], __( 'Delete' ) ) ),
 		] ) ?>
-        </span><?php
+		</span><?php
 
 
 //		esc_html( size_format( filesize( $item['file_path'] ) ) ),

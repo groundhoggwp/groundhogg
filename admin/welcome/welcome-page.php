@@ -144,7 +144,7 @@ class Welcome_Page extends Admin_Page {
 		do_action( "groundhogg/admin/{$this->get_slug()}/before" );
 
 		?>
-        <div class="wrap">
+		<div class="wrap">
 			<?php
 
 			if ( method_exists( $this, $this->get_current_action() ) ) {
@@ -156,7 +156,7 @@ class Welcome_Page extends Admin_Page {
 			}
 
 			?>
-        </div>
+		</div>
 		<?php
 
 		do_action( "groundhogg/admin/{$this->get_slug()}/after" );
@@ -169,17 +169,17 @@ class Welcome_Page extends Admin_Page {
 	public function view() {
 		?>
 
-        <div id="welcome-page" class="welcome-page">
-            <div id="poststuff">
-                <div class="welcome-header">
-                    <h1><?php echo sprintf( __( 'Welcome to %s', 'groundhogg' ), groundhogg_logo( 'black', 300, false ) ); ?></h1>
-                </div>
+		<div id="welcome-page" class="welcome-page">
+			<div id="poststuff">
+				<div class="welcome-header">
+					<h1><?php echo sprintf( __( 'Welcome to %s', 'groundhogg' ), groundhogg_logo( 'black', 300, false ) ); ?></h1>
+				</div>
 				<?php $this->notices(); ?>
-                <hr class="wp-header-end">
-                <div class="col">
-                    <div class="postbox" id="ghmenu">
-                        <div class="inside" style="padding: 0;margin: 0">
-                            <ul>
+				<hr class="wp-header-end">
+				<div class="col">
+					<div class="postbox" id="ghmenu">
+						<div class="inside" style="padding: 0;margin: 0">
+							<ul>
 								<?php
 
 								$links = [
@@ -241,13 +241,13 @@ class Welcome_Page extends Admin_Page {
 								}
 
 								?>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <?php include __DIR__ . '/checklist.php' ?>
-                <div class="col">
-                    <div class="postbox">
+							</ul>
+						</div>
+					</div>
+				</div>
+				<?php include __DIR__ . '/checklist.php' ?>
+				<div class="col">
+					<div class="postbox">
 						<?php
 
 						echo html()->e( 'a', [
@@ -275,13 +275,13 @@ class Welcome_Page extends Admin_Page {
 						], __( 'Take The Quickstart Course!', 'groundhogg' ) );
 
 						?>
-                    </div>
-                </div>
+					</div>
+				</div>
 
-                <div class="left-col col">
+				<div class="left-col col">
 
-                    <!-- Import your list -->
-                    <div class="postbox">
+					<!-- Import your list -->
+					<div class="postbox">
 						<?php
 
 						echo html()->modal_link( [
@@ -310,16 +310,16 @@ class Welcome_Page extends Admin_Page {
 						], __( 'Read the full guide', 'groundhogg' ) );
 
 						?>
-                        <div class="hidden" id="import-list-video">
-                            <iframe width="800" height="450" src="https://www.youtube.com/embed/BmTmVAoWSb0"
-                                    frameborder="0"
-                                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                                    allowfullscreen></iframe>
-                        </div>
-                    </div>
+						<div class="hidden" id="import-list-video">
+							<iframe width="800" height="450" src="https://www.youtube.com/embed/BmTmVAoWSb0"
+							        frameborder="0"
+							        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+							        allowfullscreen></iframe>
+						</div>
+					</div>
 
-                    <!-- Create a funnel -->
-                    <div class="postbox">
+					<!-- Create a funnel -->
+					<div class="postbox">
 						<?php
 
 						echo html()->modal_link( [
@@ -348,18 +348,18 @@ class Welcome_Page extends Admin_Page {
 						], __( 'Read the full guide', 'groundhogg' ) );
 
 						?>
-                        <div class="hidden" id="create-your-first-funnel-video">
-                            <iframe width="800" height="450" src="https://www.youtube.com/embed/W1dwQrqEPVw"
-                                    frameborder="0"
-                                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                                    allowfullscreen></iframe>
-                        </div>
-                    </div>
-                </div>
-                <div class="right-col col">
+						<div class="hidden" id="create-your-first-funnel-video">
+							<iframe width="800" height="450" src="https://www.youtube.com/embed/W1dwQrqEPVw"
+							        frameborder="0"
+							        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+							        allowfullscreen></iframe>
+						</div>
+					</div>
+				</div>
+				<div class="right-col col">
 
-                    <!-- Send a Broadcast -->
-                    <div class="postbox">
+					<!-- Send a Broadcast -->
+					<div class="postbox">
 						<?php
 
 						echo html()->modal_link( [
@@ -387,16 +387,16 @@ class Welcome_Page extends Admin_Page {
 							'target' => '_blank'
 						], __( 'Read the full guide', 'groundhogg' ) ); ?>
 
-                        <div class="hidden" id="send-your-first-broadcast-video">
-                            <iframe width="800" height="450" src="https://www.youtube.com/embed/bwIbcsEG7Kg"
-                                    frameborder="0"
-                                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                                    allowfullscreen></iframe>
-                        </div>
-                    </div>
+						<div class="hidden" id="send-your-first-broadcast-video">
+							<iframe width="800" height="450" src="https://www.youtube.com/embed/bwIbcsEG7Kg"
+							        frameborder="0"
+							        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+							        allowfullscreen></iframe>
+						</div>
+					</div>
 
-                    <!-- Configure CRON -->
-                    <div class="postbox">
+					<!-- Configure CRON -->
+					<div class="postbox">
 						<?php
 						echo html()->modal_link( [
 							'title'              => __( 'Configure WP-Cron', 'groundhogg' ),
@@ -422,30 +422,30 @@ class Welcome_Page extends Admin_Page {
 							'href'   => 'https://help.groundhogg.io/article/45-how-to-disable-builtin-wp-cron',
 							'target' => '_blank'
 						], __( 'Read the full guide', 'groundhogg' ) ); ?>
-                        <div class="hidden" id="configure-wp-cron">
-                            <iframe width="800" height="450" src="https://www.youtube.com/embed/1-csY3W-WP0"
-                                    frameborder="0"
-                                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                                    allowfullscreen></iframe>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+						<div class="hidden" id="configure-wp-cron">
+							<iframe width="800" height="450" src="https://www.youtube.com/embed/1-csY3W-WP0"
+							        frameborder="0"
+							        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+							        allowfullscreen></iframe>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 		<?php
 	}
 
 	/**
 	 * Hides the quickstart check list
 	 */
-	public function process_hide_checklist(){
+	public function process_hide_checklist() {
 		update_user_option( get_current_user_id(), 'gh_hide_groundhogg_quickstart', true );
 	}
 
 	/**
 	 * Shows the quickstart check list
 	 */
-	public function process_show_checklist(){
+	public function process_show_checklist() {
 		delete_user_option( get_current_user_id(), 'gh_hide_groundhogg_quickstart' );
 	}
 

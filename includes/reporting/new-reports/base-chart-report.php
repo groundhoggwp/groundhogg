@@ -51,11 +51,11 @@ abstract class Base_Chart_Report extends Base_Report {
 
 	public function get_pie_chart_options() {
 		return [
-			'legend' => [
+			'legend'   => [
 				'display' => false
 			],
 //			'responsive' => true,
-			'tooltips'   => [
+			'tooltips' => [
 				'backgroundColor' => '#FFF',
 				'bodyFontColor'   => '#000',
 				'borderColor'     => '#727272',

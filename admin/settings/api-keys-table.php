@@ -145,17 +145,19 @@ class API_Keys_Table extends \WP_List_Table {
 
 		$actions['reissue'] = sprintf(
 			'<a href="%s" class="wpgh-regenerate-api-key">%s</a>',
-			esc_url( wp_nonce_url( add_query_arg( array( 'user_id'          => $item['id'],
-			                                             'wpgh_action'      => 'process_api_key',
-			                                             'wpgh_api_process' => 'regenerate'
+			esc_url( wp_nonce_url( add_query_arg( array(
+				'user_id'          => $item['id'],
+				'wpgh_action'      => 'process_api_key',
+				'wpgh_api_process' => 'regenerate'
 			) ), 'wpgh-api-nonce' ) ),
 			_x( 'Reissue', 'action', 'groundhogg' )
 		);
 		$actions['revoke']  = sprintf(
 			'<a href="%s" class="wpgh-revoke-api-key wpgh-delete">%s</a>',
-			esc_url( wp_nonce_url( add_query_arg( array( 'user_id'          => $item['id'],
-			                                             'wpgh_action'      => 'process_api_key',
-			                                             'wpgh_api_process' => 'revoke'
+			esc_url( wp_nonce_url( add_query_arg( array(
+				'user_id'          => $item['id'],
+				'wpgh_action'      => 'process_api_key',
+				'wpgh_api_process' => 'revoke'
 			) ), 'wpgh-api-nonce' ) ),
 			_x( 'Revoke', 'action', 'groundhogg' )
 		);
@@ -197,14 +199,14 @@ class API_Keys_Table extends \WP_List_Table {
 		}
 		?>
 
-        <form id="api-key-generate-form" method="post"
-              action="<?php echo admin_url( 'admin.php?page=gh_settings&tab=api_tab' ); ?>">
-            <input type="hidden" name="wpgh_action" value="process_api_key"/>
-            <input type="hidden" name="wpgh_api_process" value="generate"/>
+		<form id="api-key-generate-form" method="post"
+		      action="<?php echo admin_url( 'admin.php?page=gh_settings&tab=api_tab' ); ?>">
+			<input type="hidden" name="wpgh_action" value="process_api_key"/>
+			<input type="hidden" name="wpgh_api_process" value="generate"/>
 			<?php wp_nonce_field( 'wpgh-api-nonce' ); ?>
 			<?php echo Plugin::$instance->utils->html->dropdown_owners( array( 'option_none' => __( 'Please Select a User', 'groundhogg' ) ) ); ?>
 			<?php submit_button( _x( 'Generate New API Keys', 'action', 'groundhogg' ), 'secondary', 'submit', false ); ?>
-        </form>
+		</form>
 		<?php
 		$wpgh_api_is_bottom = true;
 	}
@@ -222,18 +224,18 @@ class API_Keys_Table extends \WP_List_Table {
 			wp_nonce_field( 'bulk-' . $this->_args['plural'] );
 		}
 		?>
-        <div class="tablenav <?php echo esc_attr( $which ); ?>">
+		<div class="tablenav <?php echo esc_attr( $which ); ?>">
 
-            <div class="alignleft actions bulkactions">
+			<div class="alignleft actions bulkactions">
 				<?php $this->bulk_actions( $which ); ?>
-            </div>
+			</div>
 			<?php
 			$this->extra_tablenav( $which );
 			$this->pagination( $which );
 			?>
 
-            <br class="clear"/>
-        </div>
+			<br class="clear"/>
+		</div>
 		<?php
 	}
 

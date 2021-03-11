@@ -12,7 +12,11 @@ if ( $query ) {
 }
 
 $funnels = get_db( 'funnels' )->query( [ 'status' => 'active' ] );
-$steps   = get_db( 'steps' )->query( [ 'funnel_id' => wp_list_pluck( $funnels, 'ID' ), 'orderby' => 'step_order', 'order' => 'asc' ] );
+$steps   = get_db( 'steps' )->query( [
+	'funnel_id' => wp_list_pluck( $funnels, 'ID' ),
+	'orderby'   => 'step_order',
+	'order'     => 'asc'
+] );
 
 $json = [
 	'funnels' => $funnels,
@@ -25,43 +29,43 @@ wp_enqueue_style( 'select2' );
 ?>
 <div class="gh-tools-wrap">
 	<script>
-	  (function ($){
+      (function ($) {
 
-	    var json = <?php echo wp_json_encode( $json ); ?>;
+        var json = <?php echo wp_json_encode( $json ); ?>;
 
-	    $(function (){
+        $(function () {
 
-	      $( '#funnel' ).select2({
-	        data: json.funnels.map( f => {
-	          return {
-	            id: f.ID,
-	            text: f.title
-	          }
-	        })
-	      }).on('select2:select', function (e){
-	        var funnelId = e.params.data.id
+          $('#funnel').select2({
+            data: json.funnels.map(f => {
+              return {
+                id: f.ID,
+                text: f.title
+              }
+            })
+          }).on('select2:select', function (e) {
+            var funnelId = e.params.data.id
 
-	        console.log( funnelId )
+            console.log(funnelId)
 
-	        var steps = json.steps.filter( s => s.funnel_id == funnelId ).map( s => {
+            var steps = json.steps.filter(s => s.funnel_id == funnelId).map(s => {
               return {
                 id: s.ID,
                 text: s.step_title
               }
-            });
+            })
 
-	        console.log(steps)
+            console.log(steps)
 
-            $( '#step' ).empty().select2({
+            $('#step').empty().select2({
               data: steps
             })
-	      })
+          })
 
-          $( '#step' ).select2();
+          $('#step').select2()
 
-	    })
+        })
 
-	  })(jQuery)
+      })(jQuery)
 	</script>
 	<p class="tools-help"><?php _e( 'Add contacts to a funnel', 'groundhogg' ); ?></p>
 	<form method="post" class="gh-tools-box">

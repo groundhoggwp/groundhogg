@@ -19,14 +19,16 @@ use function Groundhogg\html;
 			action_input( 'load_search' );
 
 			echo html()->dropdown( [
-				'name'     => 'saved_search',
-				'class'    => 'saved-search',
-				'options'  => Saved_Searches::instance()->get_for_select(),
-				'selected' => get_url_var( 'saved_search_id' ),
+				'name'        => 'saved_search',
+				'class'       => 'saved-search',
+				'options'     => Saved_Searches::instance()->get_for_select(),
+				'selected'    => get_url_var( 'saved_search_id' ),
 				'option_none' => __( 'Select a saved search', 'groundhogg' )
 			] );
 
-			html()->submit( [ 'text' => __( 'Load Search', 'groundhogg' ), 'class' => 'button button-secondary' ], true )
+			html()->submit( [ 'text'  => __( 'Load Search', 'groundhogg' ),
+			                  'class' => 'button button-secondary'
+			], true )
 			?>
 		</form>
 	</div>

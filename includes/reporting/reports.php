@@ -660,43 +660,43 @@ class Reports {
 		return $report->get_data();
 	}
 
-	public function table_form_activity(){
+	public function table_form_activity() {
 		$report = new Table_Form_Activity( $this->start, $this->end );
 
 		return $report->get_data();
 	}
 
-	public function table_email_stats(){
+	public function table_email_stats() {
 		$report = new Table_Email_Stats( $this->start, $this->end );
 
 		return $report->get_data();
 	}
 
-	public function table_email_links_clicked(){
+	public function table_email_links_clicked() {
 		$report = new Table_Email_Links_Clicked( $this->start, $this->end );
 
 		return $report->get_data();
 	}
 
-	public function chart_donut_email_stats(){
+	public function chart_donut_email_stats() {
 		$report = new Chart_Donut_Email_Stats( $this->start, $this->end );
 
 		return $report->get_data();
 	}
 
-	public function table_funnel_stats(){
+	public function table_funnel_stats() {
 		$report = new Table_Funnel_Stats( $this->start, $this->end );
 
 		return $report->get_data();
 	}
 
-	public function table_email_funnels_used_in(){
+	public function table_email_funnels_used_in() {
 		$report = new Table_Email_Funnels_Used_In( $this->start, $this->end );
 
 		return $report->get_data();
 	}
 
-	public function table_list_engagement(){
+	public function table_list_engagement() {
 		$report = new Table_List_Engagement( $this->start, $this->end );
 
 		return $report->get_data();

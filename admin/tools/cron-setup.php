@@ -156,14 +156,17 @@ switch ( $step ):
 				<hr/>
 				<?php do_action( 'groundhogg/cron/verify_files_installed' ); ?>
 				<?php foreach ( $cron_jobs as $cron_job_id => $cron_job ): ?>
-					<?php if ( ! $cron_job[ 'active' ] ): ?>
-						<p>❌ <?php printf( __( 'It looks like your cron job for <b>%s</b> is not working.', 'groundhogg' ), $cron_job['purpose'] ); ?></p>
+					<?php if ( ! $cron_job['active'] ): ?>
+						<p>
+							❌ <?php printf( __( 'It looks like your cron job for <b>%s</b> is not working.', 'groundhogg' ), $cron_job['purpose'] ); ?></p>
 						<p><?php printf( __( 'This cron job is for <b>%s</b>, and should execute <code>%s</code>', 'groundhogg' ), $cron_job['purpose'], $cron_job['interval'] ); ?></p>
-					<p><input type="text" class="code regular-text" onfocus="this.select()"
-					          value="<?php esc_attr_e( home_url( sprintf( '%s.php', $cron_job_id ) ) ); ?>" readonly>
-					</p>
+						<p><input type="text" class="code regular-text" onfocus="this.select()"
+						          value="<?php esc_attr_e( home_url( sprintf( '%s.php', $cron_job_id ) ) ); ?>"
+						          readonly>
+						</p>
 					<?php else: ?>
-						<p>✅️ <?php printf( __( "Success! Your cron job for <b>%s</b> is working.", 'groundhogg' ), $cron_job['purpose'] ); ?></p>
+						<p>
+							✅️ <?php printf( __( "Success! Your cron job for <b>%s</b> is working.", 'groundhogg' ), $cron_job['purpose'] ); ?></p>
 					<?php endif; ?>
 					<hr/>
 				<?php endforeach; ?>

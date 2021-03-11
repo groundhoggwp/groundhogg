@@ -156,17 +156,17 @@ class Contact_Activity_Table extends WP_List_Table {
 	 *
 	 * @return string
 	 */
-	public function column_sent( $event ){
+	public function column_sent( $event ) {
 		return scheduled_time_column( $event->get_time(), true, $event->get_contact() );
 	}
 
 	public function display_tablenav( $which ) {
 		if ( $which === 'top' ):
 			?>
-            <div class="tablenav <?php echo esc_attr( $which ); ?>">
+			<div class="tablenav <?php echo esc_attr( $which ); ?>">
 				<?php $this->extra_tablenav( $which ); ?>
-                <br class="clear"/>
-            </div>
+				<br class="clear"/>
+			</div>
 		<?php
 		endif;
 	}

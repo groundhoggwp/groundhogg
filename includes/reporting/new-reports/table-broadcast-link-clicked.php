@@ -66,13 +66,13 @@ class Table_Broadcast_Link_Clicked extends Base_Table_Report {
 		foreach ( $links as $hash => $link ) {
 			$data[] = [
 				'label'   => html()->wrap( $link['referer'], 'a', [
-					'href'  => $link['referer'],
-					'class' => 'number-total',
-					'title' => $link['referer'],
+					'href'   => $link['referer'],
+					'class'  => 'number-total',
+					'title'  => $link['referer'],
 					'target' => '_blank',
 				] ),
 				'uniques' => html()->wrap( $link['uniques'], 'a', [
-					'href'   => add_query_arg(
+					'href'  => add_query_arg(
 						[
 							'activity' => [
 								'activity_type' => Activity::EMAIL_CLICKED,
@@ -83,7 +83,7 @@ class Table_Broadcast_Link_Clicked extends Base_Table_Report {
 						],
 						admin_url( sprintf( 'admin.php?page=gh_contacts' ) )
 					),
-					'class'  => 'number-total'
+					'class' => 'number-total'
 				] ),
 				'clicks'  => html()->wrap( $link['clicks'], 'span', [ 'class' => 'number-total' ] ),
 			];

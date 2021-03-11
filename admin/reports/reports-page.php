@@ -134,7 +134,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 				'table_contacts_by_search_engines',
 				'table_contacts_by_source_page',
 				'table_contacts_by_social_media',
-                'table_list_engagement'
+				'table_list_engagement'
 			],
 			'email'      => [
 				'chart_email_activity',
@@ -175,7 +175,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 				'email_open_rate',
 				'email_click_rate',
 				'chart_donut_email_stats',
-                'table_email_funnels_used_in'
+				'table_email_funnels_used_in'
 			],
 			'forms'      => [
 				'table_form_activity',
@@ -289,20 +289,20 @@ class Reports_Page extends Tabbed_Admin_Page {
 		include __DIR__ . '/views/functions.php';
 
 		?>
-        <div class="loader-wrap">
-            <div class="gh-loader-overlay" style="display:none;"></div>
-            <div class="gh-loader" style="display: none"></div>
-        </div>
-        <div class="wrap blurred">
+		<div class="loader-wrap">
+			<div class="gh-loader-overlay" style="display:none;"></div>
+			<div class="gh-loader" style="display: none"></div>
+		</div>
+		<div class="wrap blurred">
 			<?php if ( ! is_white_labeled() ): ?>
-                <h1 class="wp-heading-inline"><?php groundhogg_logo( 'black' ); ?></h1>
+				<h1 class="wp-heading-inline"><?php groundhogg_logo( 'black' ); ?></h1>
 			<?php else: ?>
-                <h1 class="wp-heading-inline"><?php printf( "%s Reporting", esc_html( white_labeled_name() ) ); ?></h1>
+				<h1 class="wp-heading-inline"><?php printf( "%s Reporting", esc_html( white_labeled_name() ) ); ?></h1>
 			<?php endif; ?>
 			<?php $this->do_title_actions(); ?>
 			<?php $this->range_picker(); ?>
 			<?php $this->notices(); ?>
-            <hr class="wp-header-end">
+			<hr class="wp-header-end">
 			<?php $this->do_page_tabs(); ?>
 			<?php
 
@@ -329,7 +329,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 			}
 
 			?>
-        </div>
+		</div>
 		<?php
 
 	}
@@ -339,12 +339,12 @@ class Reports_Page extends Tabbed_Admin_Page {
 	 */
 	protected function range_picker() {
 		?>
-        <div id="groundhogg-datepicker-wrap">
-            <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker"></div>
-        </div>
-        <!--        <div id="groundhogg-datepicker-wrap">-->
-        <!--            <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker-compare"></div>-->
-        <!--        </div>-->
+		<div id="groundhogg-datepicker-wrap">
+			<div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker"></div>
+		</div>
+		<!--        <div id="groundhogg-datepicker-wrap">-->
+		<!--            <div class="daterange daterange--double groundhogg-datepicker" id="groundhogg-datepicker-compare"></div>-->
+		<!--        </div>-->
 		<?php
 	}
 

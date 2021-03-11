@@ -173,8 +173,8 @@ $count = get_db( 'contacts' )->count( $query );
 			</th>
 			<td><?php
 				echo html()->input( [
-					'id'    => 'company_name',
-					'name'  => 'company_name',
+					'id'   => 'company_name',
+					'name' => 'company_name',
 				] ); ?>
 			</td>
 		</tr>
@@ -182,19 +182,20 @@ $count = get_db( 'contacts' )->count( $query );
 			<th><label for="job_title"><?php echo _x( 'Job Title', 'contact_record', 'groundhogg' ) ?></label></th>
 			<td><?php
 				echo html()->input( [
-					'id'    => 'job_title',
-					'name'  => 'job_title',
+					'id'   => 'job_title',
+					'name' => 'job_title',
 				] ); ?>
 			</td>
 		</tr>
 		<tr>
 			<th>
-				<label for="company_address"><?php echo _x( 'Full Company Address', 'contact_record', 'groundhogg' ) ?></label>
+				<label
+					for="company_address"><?php echo _x( 'Full Company Address', 'contact_record', 'groundhogg' ) ?></label>
 			</th>
 			<td><?php
 				echo html()->input( [
-					'id'    => 'company_address',
-					'name'  => 'company_address',
+					'id'   => 'company_address',
+					'name' => 'company_address',
 				] ); ?>
 			</td>
 		</tr>
@@ -211,7 +212,7 @@ $count = get_db( 'contacts' )->count( $query );
 				] ); ?>
 				<?php _e( 'ext.', 'groundhogg' ) ?>
 				<?php
-				echo html()->input(  [
+				echo html()->input( [
 					'id'    => 'company_phone_extension',
 					'name'  => 'company_phone_extension',
 					'class' => 'phone-ext',

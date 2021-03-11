@@ -34,7 +34,7 @@ class Table_Funnel_Stats extends Base_Table_Report {
 	 */
 	protected function get_table_data() {
 		//get list of benchmark
-		$funnel = new Funnel( absint( $this->get_funnel_id()) );
+		$funnel = new Funnel( absint( $this->get_funnel_id() ) );
 		$steps  = $funnel->get_steps();
 
 		$data = [];
@@ -67,17 +67,17 @@ class Table_Funnel_Stats extends Base_Table_Report {
 
 			$count_waiting = count( $query->query( $args ) );
 
-			$url_waiting  = admin_page_url( 'gh_contacts', $args );
+			$url_waiting = admin_page_url( 'gh_contacts', $args );
 
 			$title = sprintf( '<img src="%s" class="step-icon"> <b>%s</b> (%s)', $step->icon(), $step->get_title(), key_to_words( $step->get_type() ) );
 
-			$data[] =[
-				'step' => $title,
-				'completed' =>  html()->wrap( _nf( $count_completed ), 'a', [
+			$data[] = [
+				'step'      => $title,
+				'completed' => html()->wrap( _nf( $count_completed ), 'a', [
 					'href'  => $url_completed,
 					'class' => 'number-total'
 				] ),
-				'waiting' => html()->wrap( _nf( $count_waiting ), 'a', [
+				'waiting'   => html()->wrap( _nf( $count_waiting ), 'a', [
 					'href'  => $url_waiting,
 					'class' => 'number-total'
 				] )
@@ -86,10 +86,10 @@ class Table_Funnel_Stats extends Base_Table_Report {
 		}
 
 
-		return  $data;
+		return $data;
 
 
-		}
+	}
 
 	protected function normalize_datum( $item_key, $item_data ) {
 		// TODO: Implement normalize_datum() method.

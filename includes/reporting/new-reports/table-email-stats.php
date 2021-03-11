@@ -41,7 +41,7 @@ class Table_Email_Stats extends Base_Table_Report {
 					'href'  => add_query_arg(
 						[
 							'report' => [
-								'step'   => $stats[ 'steps' ],
+								'step'   => $stats['steps'],
 								'type'   => Event::FUNNEL,
 								'status' => Event::COMPLETE,
 								'before' => $this->end,

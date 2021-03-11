@@ -2,7 +2,7 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
-abstract class Base_Line_Chart_Report extends Base_Chart_Report{
+abstract class Base_Line_Chart_Report extends Base_Chart_Report {
 
 	/**
 	 * @return string
@@ -19,7 +19,7 @@ abstract class Base_Line_Chart_Report extends Base_Chart_Report{
 
 //			'responsive' => true,
 			'maintainAspectRatio' => false,
-			'tooltips'   => [
+			'tooltips'            => [
 				'mode'            => 'index',
 				'intersect'       => false,
 				'backgroundColor' => '#FFF',
@@ -28,7 +28,7 @@ abstract class Base_Line_Chart_Report extends Base_Chart_Report{
 				'borderWidth'     => 2,
 				'titleFontColor'  => '#000'
 			],
-			'scales'     => [
+			'scales'              => [
 				'yAxes' => [
 					0 => [
 						'ticks'      => [
@@ -47,7 +47,8 @@ abstract class Base_Line_Chart_Report extends Base_Chart_Report{
 
 	protected function get_line_style() {
 
-		$color =   $this->get_random_color() ;
+		$color = $this->get_random_color();
+
 		return [
 //			"fill"                      => false,
 			'lineTension'               => 0,

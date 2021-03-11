@@ -19,10 +19,10 @@ abstract class Base_Funnel_Quick_Stat_Report extends Base_Quick_Stat_Percent {
 	 *
 	 * @return int
 	 */
-	protected function get_num_contacts_by_step( $step_id, $start=0, $end=0 ){
+	protected function get_num_contacts_by_step( $step_id, $start = 0, $end = 0 ) {
 
-		$start = $start?:$this->start;
-		$end = $end?:$this->end;
+		$start = $start ?: $this->start;
+		$end   = $end ?: $this->end;
 
 		return get_db( 'events' )->count( [
 			'where'  => [

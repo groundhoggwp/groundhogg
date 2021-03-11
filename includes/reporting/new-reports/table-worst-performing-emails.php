@@ -30,7 +30,7 @@ class Table_Worst_Performing_Emails extends Base_Email_Performance_Table_Report 
 
 	protected function should_include( $sent, $opened, $clicked ) {
 
-		if ( $this->get_funnel_id() ){
+		if ( $this->get_funnel_id() ) {
 			return percentage( $sent, $opened ) <= 20 || percentage( $opened, $clicked ) <= 10;
 		}
 

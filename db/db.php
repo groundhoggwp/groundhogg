@@ -800,6 +800,7 @@ abstract class DB {
 			'order'   => 'desc',
 			'select'  => '*',
 			'search'  => false,
+			'func'    => false,
 		] );
 
 		$where = [ 'relationship' => 'AND' ];
@@ -849,6 +850,9 @@ abstract class DB {
 				case 'ORDER':
 					$query_vars['order'] = $val;
 					break;
+				case 'func':
+					$query_vars['func'] = strtoupper( $val );
+					break;
 				default:
 					if ( in_array( $key, $this->get_allowed_columns() ) ) {
 						$where[] = [ 'col' => $key, 'val' => $val, 'compare' => '=' ];
@@ -856,7 +860,6 @@ abstract class DB {
 
 					break;
 			}
-
 		}
 
 		if ( $ORDER_BY ) {
@@ -1144,6 +1147,25 @@ abstract class DB {
 	 */
 	public function get_date_key() {
 		return 'date_created';
+	}
+
+	/**
+	 * Get the sum of a column
+	 *
+	 * @param $column
+	 * @param $args
+	 *
+	 * @return array|array[]|bool|int|object|object[]|null
+	 */
+	public function sum( $column, $args ) {
+		unset( $args['offset'] );
+		unset( $args['limit'] );
+		unset( $args['LIMIT'] );
+
+		$args['select'] = $column;
+		$args['func']   = 'SUM';
+
+		return $this->query( $args );
 	}
 
 	/**

@@ -21,22 +21,23 @@ class Admin_User {
 	 */
 	public function show_fields( $profile_user ) {
 
-	    // Do nto show for non relevant users...
-	    if ( ! user_can( $profile_user, 'view_contacts' ) ){
-	        return;
-        }
+		// Do nto show for non relevant users...
+		if ( ! user_can( $profile_user, 'view_contacts' ) ) {
+			return;
+		}
 
 		?>
-        <h2><?php _e( 'Groundhogg', 'groundhogg' ); ?></h2>
-        <table class="form-table">
-            <tr>
-                <th><?php _e( 'Signature', 'groundhogg' ); ?></th>
-                <td>
-                    <textarea name="signature" rows="4" cols="20"><?php esc_html_e( $profile_user->signature ); ?></textarea>
-                    <p class="description"><?php _e( 'Accepts HTML. The signature can be merged using the <code>{owner_signature}</code> in any email.', 'groundhogg' ); ?></p>
-                </td>
-            </tr>
-        </table>
+		<h2><?php _e( 'Groundhogg', 'groundhogg' ); ?></h2>
+		<table class="form-table">
+			<tr>
+				<th><?php _e( 'Signature', 'groundhogg' ); ?></th>
+				<td>
+					<textarea name="signature" rows="4"
+					          cols="20"><?php esc_html_e( $profile_user->signature ); ?></textarea>
+					<p class="description"><?php _e( 'Accepts HTML. The signature can be merged using the <code>{owner_signature}</code> in any email.', 'groundhogg' ); ?></p>
+				</td>
+			</tr>
+		</table>
 		<?php
 	}
 

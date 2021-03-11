@@ -1,4 +1,5 @@
 <?php
+
 namespace Groundhogg\Reporting\Reports;
 
 
@@ -15,46 +16,41 @@ use Groundhogg\Reporting\Reporting;
  * Date: 2019-01-03
  * Time: 3:24 PM
  */
+class New_Contacts extends Report {
 
-class New_Contacts extends Report
-{
+	/**
+	 * Get the report ID
+	 *
+	 * @return string
+	 */
+	public function get_id() {
+		return 'new_contacts';
+	}
 
-    /**
-     * Get the report ID
-     *
-     * @return string
-     */
-    public function get_id()
-    {
-        return 'new_contacts';
-    }
+	/**
+	 * Get the report name
+	 *
+	 * @return string
+	 */
+	public function get_name() {
+		return __( 'New Contacts', 'groundhogg' );
+	}
 
-    /**
-     * Get the report name
-     *
-     * @return string
-     */
-    public function get_name()
-    {
-        return __( 'New Contacts', 'groundhogg' );
-    }
+	/**
+	 * Get the report data
+	 *
+	 * @return array
+	 */
+	public function get_data() {
+		$query = new Contact_Query();
 
-    /**
-     * Get the report data
-     *
-     * @return array
-     */
-    public function get_data()
-    {
-        $query = new Contact_Query();
+		$data = $query->query( [
+			'date_query' => [
+				'after'  => date( 'Y-m-d H:i:s', $this->get_start_time() ),
+				'before' => date( 'Y-m-d H:i:s', $this->get_end_time() ),
+			]
+		] );
 
-        $data = $query->query( [
-            'date_query' => [
-                'after'  => date('Y-m-d H:i:s', $this->get_start_time() ),
-                'before'  => date('Y-m-d H:i:s', $this->get_end_time() ),
-            ]
-        ] );
-
-        return $data;
-    }
+		return $data;
+	}
 }

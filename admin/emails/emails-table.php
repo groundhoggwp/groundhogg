@@ -99,10 +99,10 @@ class Emails_Table extends WP_List_Table {
 			return;
 		}
 		?>
-        <div class="alignleft gh-actions">
-            <a class="button"
-               href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=trash&action=empty_trash' ), 'empty_trash' ); ?>"><?php _e( 'Empty Trash' ); ?></a>
-        </div>
+		<div class="alignleft gh-actions">
+			<a class="button"
+			   href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=trash&action=empty_trash' ), 'empty_trash' ); ?>"><?php _e( 'Empty Trash' ); ?></a>
+		</div>
 		<?php
 	}
 
@@ -167,11 +167,11 @@ class Emails_Table extends WP_List_Table {
 			$actions['restore'] = "<a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=all&action=restore&email=' . $id ), 'restore' ) . "'>" . __( 'Restore' ) . "</a>";
 			$actions['delete']  = "<a href='" . wp_nonce_url( admin_url( 'admin.php?page=gh_emails&view=archived&action=delete&email=' . $id ), 'delete' ) . "'>" . __( 'Delete Permanently' ) . "</a>";
 		} else {
-			$actions['edit']   = "<a href='" . admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $id ) . "'>" . __( 'Edit' ) . "</a>";
+			$actions['edit'] = "<a href='" . admin_url( 'admin.php?page=gh_emails&action=edit&email=' . $id ) . "'>" . __( 'Edit' ) . "</a>";
 
-			if ( $email->is_ready() ){
+			if ( $email->is_ready() ) {
 				$actions['report'] = "<a href='" . esc_url( admin_page_url( 'gh_reporting', [
-						'tab' => 'email_step',
+						'tab'   => 'email_step',
 						'email' => $id,
 					] ) ) . "'>" . __( 'Report', 'groundhogg' ) . "</a>";
 			}

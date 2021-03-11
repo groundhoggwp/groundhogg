@@ -176,7 +176,7 @@ class Email_Log_Table extends Table {
 			return '';
 		}
 //
-		$actions['resend']       = "<a href='" . action_url( 'resend', [
+		$actions['resend'] = "<a href='" . action_url( 'resend', [
 				'email' => $email->get_id()
 			] ) . "'>" . __( 'Resend', 'groundhogg' ) . "</a>";
 
@@ -255,7 +255,7 @@ class Email_Log_Table extends Table {
 			case 'delivered':
 
 				?>
-                <span class="email-sent"><?php _e( 'Sent', 'groundhogg' ) ?></span>
+				<span class="email-sent"><?php _e( 'Sent', 'groundhogg' ) ?></span>
 				<?php
 
 				break;
@@ -264,7 +264,7 @@ class Email_Log_Table extends Table {
 			case 'softfail':
 
 				?>
-                <span class="email-failed"><?php _e( 'Failed', 'groundhogg' ) ?></span>
+				<span class="email-failed"><?php _e( 'Failed', 'groundhogg' ) ?></span>
 				<?php
 
 				break;

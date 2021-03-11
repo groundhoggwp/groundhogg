@@ -85,10 +85,10 @@ class Contact_Events_Table extends Events\Events_Table {
 		if ( $which === 'top' ):
 
 			?>
-            <div class="tablenav <?php echo esc_attr( $which ); ?>">
+			<div class="tablenav <?php echo esc_attr( $which ); ?>">
 				<?php $this->extra_tablenav( $which ); ?>
-                <br class="clear"/>
-            </div>
+				<br class="clear"/>
+			</div>
 		<?php
 		endif;
 	}
@@ -97,14 +97,14 @@ class Contact_Events_Table extends Events\Events_Table {
 		$contact_id = absint( get_request_var( 'contact' ) );
 
 		?>
-        <div class="alignleft gh-actions">
-            <a class="button button-secondary"
-               href="<?php echo admin_url( 'admin.php?page=gh_events&contact_id=' . $contact_id . '&status=' . $this->status ); ?>"><?php _ex( 'View All Events', 'contact_record', 'groundhogg' ); ?></a>
+		<div class="alignleft gh-actions">
+			<a class="button button-secondary"
+			   href="<?php echo admin_url( 'admin.php?page=gh_events&contact_id=' . $contact_id . '&status=' . $this->status ); ?>"><?php _ex( 'View All Events', 'contact_record', 'groundhogg' ); ?></a>
 			<?php if ( $this->status === Event::WAITING ): ?>
-                <a class="button action"
-                   href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'process_queue' ], admin_url( 'admin.php?page=gh_events&return_to_contact=' . $contact_id ) ), 'process_queue' ); ?>"><?php _ex( 'Process Events', 'action', 'groundhogg' ); ?></a>
+				<a class="button action"
+				   href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'process_queue' ], admin_url( 'admin.php?page=gh_events&return_to_contact=' . $contact_id ) ), 'process_queue' ); ?>"><?php _ex( 'Process Events', 'action', 'groundhogg' ); ?></a>
 			<?php endif; ?>
-        </div>
+		</div>
 		<?php
 	}
 

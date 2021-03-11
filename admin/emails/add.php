@@ -54,7 +54,7 @@ function get_dummy_text() {
 
 ?>
 <form method="post" id="email-form">
-    <!-- Before-->
+	<!-- Before-->
 	<?php wp_nonce_field( 'add' );
 
 	$test_email = get_user_meta( get_current_user_id(), 'preferred_test_email', true );
@@ -65,19 +65,19 @@ function get_dummy_text() {
 		'id'    => 'test-email',
 		'value' => $test_email
 	] ); ?>
-    <div id='poststuff'>
-        <div id="post-body" class="metabox-holder columns-2  align-email-center" style="clear: both">
-            <div id="postbox-container-1" class="postbox-container sidebar">
-                <div id="save" class="postbox">
-                    <span class="spinner"></span>
-                    <h2><?php _e( 'Save', 'groundhogg' ); ?></h2>
-                    <div class="inside">
+	<div id='poststuff'>
+		<div id="post-body" class="metabox-holder columns-2  align-email-center" style="clear: both">
+			<div id="postbox-container-1" class="postbox-container sidebar">
+				<div id="save" class="postbox">
+					<span class="spinner"></span>
+					<h2><?php _e( 'Save', 'groundhogg' ); ?></h2>
+					<div class="inside">
 						<?php submit_button( __( 'Create', 'groundhogg' ), 'primary', 'update', false ); ?>
-                    </div>
-                </div>
+					</div>
+				</div>
 
-                <h3><?php _e( 'Status', 'groundhogg' ); ?></h3>
-                <p>
+				<h3><?php _e( 'Status', 'groundhogg' ); ?></h3>
+				<p>
 					<?php echo Plugin::$instance->utils->html->toggle( [
 						'name'    => 'email_status',
 						'id'      => 'status-toggle',
@@ -86,8 +86,8 @@ function get_dummy_text() {
 						'on'      => 'Ready',
 						'off'     => 'Draft',
 					] ); ?>
-                </p>
-                <h3><?php _e( 'From', 'groundhogg' ); ?></h3>
+				</p>
+				<h3><?php _e( 'From', 'groundhogg' ); ?></h3>
 				<?php $args = array(
 					'option_none' => __( 'The Contact\'s Owner' ),
 					'id'          => 'from_user',
@@ -95,27 +95,27 @@ function get_dummy_text() {
 					'selected'    => get_current_user_id(),
 					'style'       => [ 'max-width' => '100%' ]
 				); ?>
-                <p><?php echo Plugin::$instance->utils->html->dropdown_owners( $args ); ?></p>
+				<p><?php echo Plugin::$instance->utils->html->dropdown_owners( $args ); ?></p>
 				<?php echo html()->description( __( 'Choose who this email comes from.' ) ); ?>
 
-                <h3><?php _e( 'Reply To', 'groundhogg' ); ?></h3>
+				<h3><?php _e( 'Reply To', 'groundhogg' ); ?></h3>
 				<?php $args = [
 					'type'  => 'email',
 					'name'  => 'reply_to_override',
 					'id'    => 'reply_to_override',
 					'style' => [ 'max-width' => '100%' ]
 				]; ?>
-                <p><?php echo Plugin::$instance->utils->html->input( $args ); ?></p>
+				<p><?php echo Plugin::$instance->utils->html->input( $args ); ?></p>
 				<?php echo html()->description( __( 'Override the email address replies are sent to. Leave empty to default to the sender address.' ) ); ?>
 
-                <h3><?php _e( 'Alignment' ); ?></h3>
-                <p>
-                    <select id="email-align" name="email_alignment">
-                        <option value="left"><?php _e( 'Left' ); ?></option>
-                        <option value="center"><?php _e( 'Center' ); ?></option>
-                    </select>
-                </p>
-                <h3><?php _e( 'Message Type' ); ?></h3>
+				<h3><?php _e( 'Alignment' ); ?></h3>
+				<p>
+					<select id="email-align" name="email_alignment">
+						<option value="left"><?php _e( 'Left' ); ?></option>
+						<option value="center"><?php _e( 'Center' ); ?></option>
+					</select>
+				</p>
+				<h3><?php _e( 'Message Type' ); ?></h3>
 				<?php $args = [
 					'type'              => 'email',
 					'name'              => 'message_type',
@@ -129,9 +129,9 @@ function get_dummy_text() {
 					'option_none'       => '',
 					'option_none_value' => '',
 				]; ?>
-                <p><?php echo Plugin::$instance->utils->html->dropdown( $args ); ?></p>
-                <h3><?php _e( 'Additional' ); ?></h3>
-                <p>
+				<p><?php echo Plugin::$instance->utils->html->dropdown( $args ); ?></p>
+				<h3><?php _e( 'Additional' ); ?></h3>
+				<p>
 					<?php echo Plugin::$instance->utils->html->checkbox( [
 						'label' => __( 'Enable browser view', 'groundhogg' ),
 						'name'  => 'browser_view',
@@ -139,8 +139,8 @@ function get_dummy_text() {
 						'class' => '',
 						'value' => '1',
 					] ); ?>
-                </p>
-                <p>
+				</p>
+				<p>
 					<?php echo Plugin::$instance->utils->html->checkbox( [
 						'label' => __( 'Save as template', 'groundhogg' ),
 						'name'  => 'save_as_template',
@@ -148,8 +148,8 @@ function get_dummy_text() {
 						'class' => '',
 						'value' => '1',
 					] ); ?>
-                </p>
-                <p>
+				</p>
+				<p>
 					<?php echo Plugin::$instance->utils->html->checkbox( [
 						'label' => __( 'Use custom Alt-Body', 'groundhogg' ),
 						'name'  => 'use_custom_alt_body',
@@ -157,39 +157,41 @@ function get_dummy_text() {
 						'class' => '',
 						'value' => '1',
 					] ); ?>
-                </p>
-            </div>
-            <div id="post-body-content">
+				</p>
+			</div>
+			<div id="post-body-content">
 
-                <div id="title-wrap">
-                    <!-- Title -->
-                    <input placeholder="<?php echo __( 'Admin title', 'groundhogg' ); ?>" type="text" name="title"
-                           size="30" value="" id="title" spellcheck="true"
-                           autocomplete="off" required>
-                </div>
+				<div id="title-wrap">
+					<!-- Title -->
+					<input placeholder="<?php echo __( 'Admin title', 'groundhogg' ); ?>" type="text" name="title"
+					       size="30" value="" id="title" spellcheck="true"
+					       autocomplete="off" required>
+				</div>
 
-                <div id="subject-wrap">
-                    <h3><?php _e( 'Subject & Preview', 'groundhogg' ); ?></h3>
-                    <!-- Subject Line -->
-	                <span>
+				<div id="subject-wrap">
+					<h3><?php _e( 'Subject & Preview', 'groundhogg' ); ?></h3>
+					<!-- Subject Line -->
+					<span>
 	                <label for="subject"><?php _e( 'Subject:', 'groundhogg' ); ?></label>
-	                <input placeholder="<?php echo __( 'Used to capture the attention of the reader.', 'groundhogg' ); ?>"
-	                       type="text" name="subject" size="30"
-	                       value="" id="subject" spellcheck="true"
-	                       autocomplete="off" required>
+	                <input
+		                placeholder="<?php echo __( 'Used to capture the attention of the reader.', 'groundhogg' ); ?>"
+		                type="text" name="subject" size="30"
+		                value="" id="subject" spellcheck="true"
+		                autocomplete="off" required>
 	                </span>
 
-                    <!-- Pre Header-->
-	                <span>
+					<!-- Pre Header-->
+					<span>
 	                <label for="preview-text"><?php _e( 'Preview:', 'groundhogg' ); ?></label>
-                    <input placeholder="<?php echo __( 'Shows in the email preview in the inbox before the content.', 'groundhogg' ); ?>"
-                           type="text" name="pre_header" size="30"
-                           value="" id="preview-text" spellcheck="true"
-                           autocomplete="off">
+                    <input
+	                    placeholder="<?php echo __( 'Shows in the email preview in the inbox before the content.', 'groundhogg' ); ?>"
+	                    type="text" name="pre_header" size="30"
+	                    value="" id="preview-text" spellcheck="true"
+	                    autocomplete="off">
 	                </span>
-                </div>
-                <div id="content-wrap">
-                    <div id="postdivrich" class="postarea<?php echo $_wp_editor_expand_class; ?>">
+				</div>
+				<div id="content-wrap">
+					<div id="postdivrich" class="postarea<?php echo $_wp_editor_expand_class; ?>">
 						<?php
 
 						add_action( 'media_buttons', [
@@ -212,9 +214,9 @@ function get_dummy_text() {
 
 
 						?>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </form>

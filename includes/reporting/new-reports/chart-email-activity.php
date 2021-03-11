@@ -1,4 +1,5 @@
 <?php
+
 namespace Groundhogg\Reporting\New_Reports;
 
 use Groundhogg\Classes\Activity;

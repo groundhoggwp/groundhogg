@@ -22,7 +22,7 @@ class Contact_Table_Columns {
 		add_filter( 'manage_groundhogg_page_gh_contacts_columns', [ $this, 'add_columns_to_screen_options' ] );
 	}
 
-	public function sort_columns(){
+	public function sort_columns() {
 		// Sort the meta boxes by priority
 		uasort( self::$columns, function ( $a, $b ) {
 			return $a['priority'] - $b['priority'];
@@ -234,11 +234,11 @@ class Contact_Table_Columns {
 	 */
 	protected static function column_tags( Contact $contact ) {
 		?>
-        <div class="tags" title="<?php esc_attr_e( 'Tags' ); ?>">
+		<div class="tags" title="<?php esc_attr_e( 'Tags' ); ?>">
 			<?php foreach ( $contact->get_tags() as $tag ):
 				$tag = new Tag( $tag ) ?><span
-                    class="tag"><?php esc_html_e( $tag->get_name() ); ?></span><?php endforeach; ?>
-        </div>
+				class="tag"><?php esc_html_e( $tag->get_name() ); ?></span><?php endforeach; ?>
+		</div>
 		<?php
 	}
 
@@ -266,15 +266,18 @@ class Contact_Table_Columns {
 	 */
 	protected static function column_tel_numbers( Contact $contact ) {
 		if ( $contact->get_phone_number() ): ?>
-            <div class="phone" title="<?php esc_attr_e( 'Primary phone number', 'groundhogg' );?>"><?php dashicon_e( 'phone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_phone_number() ], $contact->get_phone_number() ) ?>
+			<div class="phone"
+			     title="<?php esc_attr_e( 'Primary phone number', 'groundhogg' ); ?>"><?php dashicon_e( 'phone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_phone_number() ], $contact->get_phone_number() ) ?>
 				<?php if ( $contact->get_phone_extension() ): ?>
-                    <span class="extension"><?php printf( __( 'ext. %s', 'groundhogg' ), $contact->get_phone_extension() ) ?></span>
+					<span
+						class="extension"><?php printf( __( 'ext. %s', 'groundhogg' ), $contact->get_phone_extension() ) ?></span>
 				<?php endif; ?>
-            </div>
+			</div>
 		<?php endif;
 		if ( $contact->get_mobile_number() ): ?>
-            <div class="phone" title="<?php esc_attr_e( 'Mobile phone number', 'groundhogg' );?>"><?php dashicon_e( 'smartphone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_mobile_number() ], $contact->get_mobile_number() ) ?>
-            </div>
+			<div class="phone"
+			     title="<?php esc_attr_e( 'Mobile phone number', 'groundhogg' ); ?>"><?php dashicon_e( 'smartphone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_mobile_number() ], $contact->get_mobile_number() ) ?>
+			</div>
 		<?php endif;
 	}
 
@@ -287,19 +290,19 @@ class Contact_Table_Columns {
 
 		if ( count( $contact->get_address() ) > 0 ):
 			?>
-            <div class="address">
+			<div class="address">
 				<?php echo html()->e( 'a', [
 					'href'   => 'https://www.google.com/maps/place/' . implode( ',+', $contact->get_address() ),
 					'target' => '_blank'
 				], implode( ', ', $contact->get_address() ) ) ?>
-            </div>
+			</div>
 		<?php
 		endif;
 		?><span class="sub"><?php
 
 		if ( $contact->get_ip_address() ) {
 			?>
-            <span class="ip-address"><?php echo $contact->get_ip_address(); ?></span>
+			<span class="ip-address"><?php echo $contact->get_ip_address(); ?></span>
 			<?php
 		}
 
@@ -310,7 +313,8 @@ class Contact_Table_Columns {
 			}
 
 			?>
-            <span class="time-zone"><?php echo $contact->get_time_zone(); ?> (<?php printf( __( "UTC %s%s", 'groundhogg' ), intval( $contact->get_time_zone_offset() ) < 0 ? '-' : '+', absint( $contact->get_time_zone_offset() / HOUR_IN_SECONDS ) ) ?>)</span>
+			<span
+				class="time-zone"><?php echo $contact->get_time_zone(); ?> (<?php printf( __( "UTC %s%s", 'groundhogg' ), intval( $contact->get_time_zone_offset() ) < 0 ? '-' : '+', absint( $contact->get_time_zone_offset() / HOUR_IN_SECONDS ) ) ?>)</span>
 			<?php
 		}
 		?></span><?php

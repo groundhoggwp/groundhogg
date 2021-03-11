@@ -36,11 +36,11 @@ class Table_Form_Activity extends Base_Table_Report {
 
 		$data = [];
 
-		foreach ( $forms as $form_id => $form_name ){
+		foreach ( $forms as $form_id => $form_name ) {
 
 			$form_step = new Step( $form_id );
 
-			if ( $this->get_funnel_id() && $this->get_funnel_id() !== $form_step->get_funnel_id() ){
+			if ( $this->get_funnel_id() && $this->get_funnel_id() !== $form_step->get_funnel_id() ) {
 				continue;
 			}
 
@@ -53,33 +53,33 @@ class Table_Form_Activity extends Base_Table_Report {
 				], $form_name ),
 			];
 
-			$unique_impressions = get_db( 'form_impressions' )->count([
+			$unique_impressions = get_db( 'form_impressions' )->count( [
 				'form_id' => $form_id,
 				'before'  => $this->end,
 				'after'   => $this->start
-			]);
+			] );
 
-			$form_stats[ 'unique_impressions' ] = _nf( $unique_impressions );
+			$form_stats['unique_impressions'] = _nf( $unique_impressions );
 
-			$total_impressions = get_db( 'form_impressions' )->query([
+			$total_impressions = get_db( 'form_impressions' )->query( [
 				'select'  => 'views',
 				'func'    => 'sum',
- 				'form_id' => $form_id,
+				'form_id' => $form_id,
 				'before'  => $this->end,
 				'after'   => $this->start
-			]);
+			] );
 
-			$form_stats[ 'total_impressions' ] = _nf( absint( $total_impressions ) );
+			$form_stats['total_impressions'] = _nf( absint( $total_impressions ) );
 
-			$submissions = absint( get_db('events' )->count( [
+			$submissions = absint( get_db( 'events' )->count( [
 				'step_id' => $form_id,
 				'status'  => Event::COMPLETE,
 				'before'  => $this->end,
 				'after'   => $this->start
 			] ) );
 
-			if ( $submissions > 0 ){
-				$form_stats[ 'submissions' ] = html()->e( 'a', [
+			if ( $submissions > 0 ) {
+				$form_stats['submissions'] = html()->e( 'a', [
 					'href' => admin_page_url( 'gh_contacts', [
 						'report' => [
 							'step_id' => $form_id,
@@ -90,13 +90,13 @@ class Table_Form_Activity extends Base_Table_Report {
 					] ),
 				], _nf( $submissions ) ?: '0', false );
 			} else {
-				$form_stats[ 'submissions' ] = 0;
+				$form_stats['submissions'] = 0;
 			}
 
 
 			$conversion_rate = percentage( $unique_impressions, $submissions, 2 );
 
-			$form_stats[ 'conversion_rate' ] = $conversion_rate . '%';
+			$form_stats['conversion_rate'] = $conversion_rate . '%';
 
 			$data[] = $form_stats;
 
@@ -115,7 +115,7 @@ class Table_Form_Activity extends Base_Table_Report {
 	 * @return mixed
 	 */
 	public function sort( $a, $b ) {
-		return absint( $b[ 'conversion_rate' ] ) - absint( $a[ 'conversion_rate' ] );
+		return absint( $b['conversion_rate'] ) - absint( $a['conversion_rate'] );
 	}
 
 	protected function normalize_datum( $item_key, $item_data ) {

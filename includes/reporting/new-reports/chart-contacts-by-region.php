@@ -41,7 +41,7 @@ class Chart_Contacts_By_Region extends Base_Doughnut_Chart_Report {
 		] );
 
 		$contacts_in_country = wp_parse_id_list( wp_list_pluck( $country_meta, 'contact_id' ) );
-		$contacts = array_intersect( $this->get_new_contact_ids_in_time_period(), $contacts_in_country );
+		$contacts            = array_intersect( $this->get_new_contact_ids_in_time_period(), $contacts_in_country );
 
 		if ( empty( $contacts ) ) {
 			return [

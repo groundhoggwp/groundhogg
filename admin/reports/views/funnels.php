@@ -29,106 +29,107 @@ foreach ( $funnels as $funnel ) {
 }
 
 ?>
-<div class="actions" style="margin-bottom: 25px; float: right">
-	<form method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>">
-		<?php
+	<div class="actions" style="margin-bottom: 25px; float: right">
+		<form method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>">
+			<?php
 
-		echo html()->input( [
-			'type' => 'hidden',
-			'name' => 'page',
-			'value' => 'gh_funnels'
-		] );
+			echo html()->input( [
+				'type'  => 'hidden',
+				'name'  => 'page',
+				'value' => 'gh_funnels'
+			] );
 
-		echo html()->input( [
-			'type' => 'hidden',
-			'name' => 'action',
-			'value' => 'edit'
-		] );
+			echo html()->input( [
+				'type'  => 'hidden',
+				'name'  => 'action',
+				'value' => 'edit'
+			] );
 
-		$args = array(
-			'name'        => 'funnel',
-			'id'          => 'funnel-id',
-			'class'       => 'post-data',
-			'options'     => $options,
-			'selected'    => absint( get_request_var( 'funnel', get_cookie( 'gh_reporting_funnel_id' ) ) ),
-			'option_none' => false,
-		);
+			$args = array(
+				'name'        => 'funnel',
+				'id'          => 'funnel-id',
+				'class'       => 'post-data',
+				'options'     => $options,
+				'selected'    => absint( get_request_var( 'funnel', get_cookie( 'gh_reporting_funnel_id' ) ) ),
+				'option_none' => false,
+			);
 
-		echo html()->dropdown( $args );
+			echo html()->dropdown( $args );
 
-		echo html()->e( 'button', [
-			'type'  => 'submit',
-			'class' => 'button'
-		], __( 'View Funnel', 'groundhogg' ) );
+			echo html()->e( 'button', [
+				'type'  => 'submit',
+				'class' => 'button'
+			], __( 'View Funnel', 'groundhogg' ) );
 
-		?>
-	</form>
-</div>
-<div style="clear: both;"></div>
+			?>
+		</form>
+	</div>
+	<div style="clear: both;"></div>
 
-<div class="groundhogg-report">
-    <h2 class="title"><?php _e( 'Funnel Breakdown', 'groundhogg' ); ?></h2>
-    <div class="big-chart-wrap">
-        <canvas id="chart_funnel_breakdown"></canvas>
-    </div>
-</div>
-<div class="groundhogg-quick-stats">
-    <div class="groundhogg-report">
+	<div class="groundhogg-report">
+		<h2 class="title"><?php _e( 'Funnel Breakdown', 'groundhogg' ); ?></h2>
+		<div class="big-chart-wrap">
+			<canvas id="chart_funnel_breakdown"></canvas>
+		</div>
+	</div>
+	<div class="groundhogg-quick-stats">
+		<div class="groundhogg-report">
 
-		<?php quick_stat_report( [
-			'id'    => 'total_contacts_in_funnel',
-			'title' => __( 'Active Contacts', 'groundhogg' ),
-			'style' => [ 'width' => '33%' ]
-		] ); ?>
+			<?php quick_stat_report( [
+				'id'    => 'total_contacts_in_funnel',
+				'title' => __( 'Active Contacts', 'groundhogg' ),
+				'style' => [ 'width' => '33%' ]
+			] ); ?>
 
-		<?php quick_stat_report( [
-			'id'    => 'total_funnel_conversion_rate',
-			'title' => __( 'Conversion Rate', 'groundhogg' ),
-			'style' => [ 'width' => '33%' ]
-		] ); ?>
+			<?php quick_stat_report( [
+				'id'    => 'total_funnel_conversion_rate',
+				'title' => __( 'Conversion Rate', 'groundhogg' ),
+				'style' => [ 'width' => '33%' ]
+			] ); ?>
 
-<!--		--><?php //quick_stat_report( [
-//			'id'    => 'total_benchmark_conversion_rate',
-//			'title' => __( 'Benchmark Conversion Rate', 'groundhogg' ),
-//		] ); ?>
+			<!--		--><?php //quick_stat_report( [
+			//			'id'    => 'total_benchmark_conversion_rate',
+			//			'title' => __( 'Benchmark Conversion Rate', 'groundhogg' ),
+			//		] );
+			?>
 
-		<?php quick_stat_report( [
-			'id'    => 'total_abandonment_rate',
-			'title' => __( 'Abandonment Rate', 'groundhogg' ),
-			'style' => [ 'width' => '33%' ]
-		] );
-		?>
-    </div>
-</div>
+			<?php quick_stat_report( [
+				'id'    => 'total_abandonment_rate',
+				'title' => __( 'Abandonment Rate', 'groundhogg' ),
+				'style' => [ 'width' => '33%' ]
+			] );
+			?>
+		</div>
+	</div>
+	<?php do_action( 'groundhogg/admin/reports/pages/funnels/after_quick_stats' ); ?>
+	<div class="groundhogg-chart-wrapper">
+		<div class="groundhogg-chart-no-padding">
+			<h2 class="title"><?php _e( 'Top Performing Emails in Funnel', 'groundhogg' ); ?></h2>
+			<div id="table_top_performing_emails" class="emails-list"></div>
+		</div>
+		<div class="groundhogg-chart-no-padding">
+			<h2 class="title"><?php _e( 'Emails Needing Improvement', 'groundhogg' ); ?></h2>
+			<div id="table_worst_performing_emails" class="emails-list"></div>
+		</div>
+	</div>
 
-<div class="groundhogg-chart-wrapper">
-    <div class="groundhogg-chart-no-padding">
-        <h2 class="title"><?php _e( 'Top Performing Emails in Funnel', 'groundhogg' ); ?></h2>
-        <div id="table_top_performing_emails" class="emails-list"></div>
-    </div>
-    <div class="groundhogg-chart-no-padding">
-        <h2 class="title"><?php _e( 'Emails Needing Improvement', 'groundhogg' ); ?></h2>
-        <div id="table_worst_performing_emails" class="emails-list"></div>
-    </div>
-</div>
+	<div class="groundhogg-chart-wrapper">
+		<div class="groundhogg-chart-no-padding full-width">
+			<h2 class="title"><?php _e( 'Benchmark Conversion Rate', 'groundhogg' ); ?></h2>
+			<div id="table_benchmark_conversion_rate"></div>
+		</div>
+	</div>
+	<div class="groundhogg-chart-wrapper">
+		<div class="groundhogg-chart-no-padding full-width">
+			<h2 class="title"><?php _e( 'Forms', 'groundhogg' ); ?></h2>
+			<div id="table_form_activity"></div>
+		</div>
+	</div>
+	<div class="groundhogg-chart-wrapper">
+		<div class="groundhogg-chart-no-padding full-width">
+			<h2 class="title"><?php _e( 'Activity', 'groundhogg' ); ?></h2>
+			<div id="table_funnel_stats"></div>
+		</div>
+	</div>
 
-<div class="groundhogg-chart-wrapper">
-    <div class="groundhogg-chart-no-padding full-width">
-        <h2 class="title"><?php _e( 'Benchmark Conversion Rate', 'groundhogg' ); ?></h2>
-        <div id="table_benchmark_conversion_rate"></div>
-    </div>
-</div>
-<div class="groundhogg-chart-wrapper">
-    <div class="groundhogg-chart-no-padding full-width">
-        <h2 class="title"><?php _e( 'Forms', 'groundhogg' ); ?></h2>
-        <div id="table_form_activity"></div>
-    </div>
-</div>
-<div class="groundhogg-chart-wrapper">
-    <div class="groundhogg-chart-no-padding full-width">
-        <h2 class="title"><?php _e( 'Activity', 'groundhogg' ); ?></h2>
-        <div id="table_funnel_stats"></div>
-    </div>
-</div>
-
-<?php do_action(  'groundhogg/admin/reports/pages/funnels/after_reports' ); ?>
+	<?php do_action( 'groundhogg/admin/reports/pages/funnels/after_reports' ); ?>

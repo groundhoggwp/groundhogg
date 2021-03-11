@@ -1001,8 +1001,9 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 //		wp_send_json( $_POST );
 
-		if ( $query = get_post_var( 'query' ) ){
+		if ( $query = get_post_var( 'query' ) ) {
 			$this->deleter->start( $query );
+
 			return;
 		}
 

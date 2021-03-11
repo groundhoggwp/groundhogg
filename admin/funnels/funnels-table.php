@@ -81,8 +81,8 @@ class Funnels_Table extends WP_List_Table {
 			'date_created'    => _x( 'Date Created', 'Column label', 'groundhogg' ),
 		);
 
-		if ( $this->get_view() !== 'active' ){
-			unset( $columns[ 'active_contacts' ] );
+		if ( $this->get_view() !== 'active' ) {
+			unset( $columns['active_contacts'] );
 		}
 
 		return apply_filters( 'groundhogg_funnels_get_columns', $columns );
@@ -123,7 +123,7 @@ class Funnels_Table extends WP_List_Table {
 		);
 
 		// If there are no scheduled broadcasts, go to the sent view
-		if ( $count[ 'active' ] === 0 && $this->get_view() === 'active' ){
+		if ( $count['active'] === 0 && $this->get_view() === 'active' ) {
 			$this->default_view = 'inactive';
 		}
 

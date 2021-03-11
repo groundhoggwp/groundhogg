@@ -44,21 +44,21 @@ $funnel = new Funnel( $funnel_id );
 		'value' => $funnel_id
 	);
 	echo Plugin::$instance->utils->html->input( $args ); ?>
-    <div class="header-wrap">
-        <div class="funnel-editor-header">
-            <div class="title-section">
-                <div class="title-view">
+	<div class="header-wrap">
+		<div class="funnel-editor-header">
+			<div class="title-section">
+				<div class="title-view">
 					<?php printf( __( 'Now editing %s', 'groundhogg' ), html()->e( 'span', [ 'class' => 'title' ], $funnel->get_title() ) ); ?>
-                </div>
-                <div class="title-edit hidden">
-                    <input class="title" placeholder="<?php echo __( 'Enter Funnel Name Here', 'groundhogg' ); ?>"
-                           type="text"
-                           name="funnel_title" size="30" value="<?php esc_attr_e( $funnel->get_title() ); ?>" id="title"
-                           spellcheck="true" autocomplete="off">
-                </div>
-            </div>
-            <div class="status-options">
-                <div id="status">
+				</div>
+				<div class="title-edit hidden">
+					<input class="title" placeholder="<?php echo __( 'Enter Funnel Name Here', 'groundhogg' ); ?>"
+					       type="text"
+					       name="funnel_title" size="30" value="<?php esc_attr_e( $funnel->get_title() ); ?>" id="title"
+					       spellcheck="true" autocomplete="off">
+				</div>
+			</div>
+			<div class="status-options">
+				<div id="status">
 					<?php echo Plugin::$instance->utils->html->toggle( [
 						'name'    => 'funnel_status',
 						'id'      => 'status-toggle',
@@ -68,8 +68,8 @@ $funnel = new Funnel( $funnel_id );
 						'on'      => 'Active',
 						'off'     => 'Inactive',
 					] ); ?>
-                </div>
-                <div id="save">
+				</div>
+				<div id="save">
 					<?php
 					echo html()->button( [
 						'type'  => 'submit',
@@ -80,9 +80,9 @@ $funnel = new Funnel( $funnel_id );
 						'value' => 'save',
 					] );
 					?>
-                </div>
-            </div>
-            <div id="close">
+				</div>
+			</div>
+			<div id="close">
 				<?php
 
 				echo html()->e( 'a', [
@@ -91,12 +91,12 @@ $funnel = new Funnel( $funnel_id );
 				], dashicon( 'no' ) );
 
 				?>
-            </div>
-        </div>
-        <div class="funnel-editor-header sub-header">
+			</div>
+		</div>
+		<div class="funnel-editor-header sub-header">
 
-            <div class="toolbar-buttons">
-                <div>
+			<div class="toolbar-buttons">
+				<div>
 					<?php echo Plugin::$instance->utils->html->modal_link( array(
 						'title'              => __( 'Settings', 'groundhogg' ),
 						'text'               => dashicon( 'admin-generic' ) . __( 'Settings', 'groundhogg' ),
@@ -110,8 +110,8 @@ $funnel = new Funnel( $funnel_id );
 						'width'              => 900,
 						'footer_button_text' => __( 'Close' ),
 					) ); ?>
-                </div>
-                <div>
+				</div>
+				<div>
 					<?php echo Plugin::$instance->utils->html->modal_link( array(
 						'title'              => __( 'Replacements', 'groundhogg' ),
 						'text'               => dashicon( 'admin-users' ) . __( 'Replacements', 'groundhogg' ),
@@ -122,8 +122,8 @@ $funnel = new Funnel( $funnel_id );
 						'height'             => 900,
 						'width'              => 700,
 					) ); ?>
-                </div>
-                <div id="add-contacts" class="<?php if ( ! $funnel->is_active() ) {
+				</div>
+				<div id="add-contacts" class="<?php if ( ! $funnel->is_active() ) {
 					echo 'hidden';
 				} ?>">
 					<?php echo html()->modal_link( [
@@ -137,36 +137,36 @@ $funnel = new Funnel( $funnel_id );
 						'width'              => 600,
 						'footer'             => 'true',
 					] ); ?>
-                </div>
-                <div id="export">
-                    <a id="copy-share-link" href="#" class="button"><span
-                                title="<?php esc_attr_e( 'Copy share link', 'groundhogg' ) ?>"
-                                class="dashicons dashicons-share"></span> <?php _e( 'Share', 'groundhogg' ); ?></a>
-                    <input id="share-link" type="hidden" value="<?php echo esc_attr( $funnel->export_url() ); ?>">
-                    <a href="<?php echo esc_url( $funnel->export_url() ); ?>" class="button"><span
-                                title="<?php esc_attr_e( 'Export', 'groundhogg' ) ?>"
-                                class="dashicons dashicons-download"></span> <?php _e( 'Export', 'groundhogg' ); ?></a>
-                </div>
-                <div id="report">
-                    <a href="<?php echo admin_url( sprintf( 'admin.php?page=gh_reporting&tab=funnels&funnel=%s', $funnel_id ) ); ?>"
-                       class="button"><span
-                                title="<?php esc_attr_e( 'Reports', 'groundhogg' ) ?>"
-                                class="dashicons dashicons-chart-area"
-                                style="width: auto;height: auto;vertical-align: middle;font-size: 20px;margin-right: 3px;"></span> <?php _e( 'Reports', 'groundhogg' ); ?>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id='poststuff' class="wpgh-funnel-builder" style="overflow: hidden">
-        <div id="post-body" class="metabox-holder columns-2 main" style="clear: both">
-            <div id="postbox-container-1" class="postbox-container sidebar">
-                <div id="step-sortable" class=" ui-sortable">
+				</div>
+				<div id="export">
+					<a id="copy-share-link" href="#" class="button"><span
+							title="<?php esc_attr_e( 'Copy share link', 'groundhogg' ) ?>"
+							class="dashicons dashicons-share"></span> <?php _e( 'Share', 'groundhogg' ); ?></a>
+					<input id="share-link" type="hidden" value="<?php echo esc_attr( $funnel->export_url() ); ?>">
+					<a href="<?php echo esc_url( $funnel->export_url() ); ?>" class="button"><span
+							title="<?php esc_attr_e( 'Export', 'groundhogg' ) ?>"
+							class="dashicons dashicons-download"></span> <?php _e( 'Export', 'groundhogg' ); ?></a>
+				</div>
+				<div id="report">
+					<a href="<?php echo admin_url( sprintf( 'admin.php?page=gh_reporting&tab=funnels&funnel=%s', $funnel_id ) ); ?>"
+					   class="button"><span
+							title="<?php esc_attr_e( 'Reports', 'groundhogg' ) ?>"
+							class="dashicons dashicons-chart-area"
+							style="width: auto;height: auto;vertical-align: middle;font-size: 20px;margin-right: 3px;"></span> <?php _e( 'Reports', 'groundhogg' ); ?>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id='poststuff' class="wpgh-funnel-builder" style="overflow: hidden">
+		<div id="post-body" class="metabox-holder columns-2 main" style="clear: both">
+			<div id="postbox-container-1" class="postbox-container sidebar">
+				<div id="step-sortable" class=" ui-sortable">
 					<?php foreach ( $funnel->get_steps() as $step ): ?>
 						<?php $step->sortable_item(); ?>
 					<?php endforeach; ?>
-                </div>
-                <div class="add-step-bottom-wrap">
+				</div>
+				<div class="add-step-bottom-wrap">
 					<?php
 					echo html()->modal_link( [
 						'title'              => __( 'Add Step', 'groundhogg' ),
@@ -181,12 +181,12 @@ $funnel = new Funnel( $funnel_id );
 						'preventSave'        => 'true',
 					] );
 					?>
-                </div>
-            </div>
-            <div id="postbox-container-2" class="postbox-container">
-                <div id="postbox-container-2-inner">
+				</div>
+			</div>
+			<div id="postbox-container-2" class="postbox-container">
+				<div id="postbox-container-2-inner">
 					<?php Plugin::$instance->notices->print_notices(); ?>
-                    <div id="intro">
+					<div id="intro">
 						<?php
 
 						if ( ! is_white_labeled() ) :
@@ -207,20 +207,20 @@ $funnel = new Funnel( $funnel_id );
 							] );
 
 							?>
-                            <div class="hidden" id="funnel-builder-guided-tour">
-                                <iframe width="800" height="450" src="https://www.youtube.com/embed/Bof5kMEpXrY"
-                                        frameborder="0"
-                                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                                        allowfullscreen></iframe>
-                            </div>
+							<div class="hidden" id="funnel-builder-guided-tour">
+								<iframe width="800" height="450" src="https://www.youtube.com/embed/Bof5kMEpXrY"
+								        frameborder="0"
+								        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+								        allowfullscreen></iframe>
+							</div>
 						<?php else:
 
 							// White labeled option
-                            do_action( 'groundhogg/admin/funnel_builder/white_labeled', $funnel );
+							do_action( 'groundhogg/admin/funnel_builder/white_labeled', $funnel );
 
 						endif; ?>
-                    </div>
-                    <div class="step-settings">
+					</div>
+					<div class="step-settings">
 						<?php
 
 						$step_active = false;
@@ -233,19 +233,19 @@ $funnel = new Funnel( $funnel_id );
 							}
 
 						endforeach; ?>
-                    </div>
-                </div>
+					</div>
+				</div>
 
-            </div>
-            <div style="clear: both;"></div>
-        </div>
-    </div>
+			</div>
+			<div style="clear: both;"></div>
+		</div>
+	</div>
 </form>
 <?php if ( $step_active ): ?>
-    <script>jQuery("html").addClass("active-step");</script>
+	<script>jQuery('html').addClass('active-step')</script>
 <?php endif; ?>
 <div class="hidden" id="steps">
-    <div class="steps-select">
+	<div class="steps-select">
 		<?php
 
 		html()->tabs( [
@@ -254,11 +254,11 @@ $funnel = new Funnel( $funnel_id );
 		], 'benchmarks-tab' );
 
 		?>
-        <div id='benchmarks'>
-            <div class="elements-inner inside">
-                <table>
-                    <tbody>
-                    <tr><?php
+		<div id='benchmarks'>
+			<div class="elements-inner inside">
+				<table>
+					<tbody>
+					<tr><?php
 						$benchmarks = Plugin::$instance->step_manager->get_benchmarks();
 						$i          = 0;
 						foreach ( $benchmarks
@@ -266,32 +266,32 @@ $funnel = new Funnel( $funnel_id );
 						as $benchmark ):
 						if ( ( $i % 4 ) == 0 ):
 						?></tr>
-                    <tr><?php
+					<tr><?php
 						endif;
 						?>
-                        <td class="step-icon">
-                            <div id='<?php echo $benchmark->get_type(); ?>'
-                                 title="<?php esc_attr_e( $benchmark->get_description() ); ?>"
-                                 class="wpgh-element ui-draggable">
-                                <div class="step-icon"><img width="60"
-                                                            src="<?php echo esc_url( $benchmark->get_icon() ); ?>">
-                                </div>
-                                <p><?php echo $benchmark->get_name() ?></p></div>
-                        </td><?php
+						<td class="step-icon">
+							<div id='<?php echo $benchmark->get_type(); ?>'
+							     title="<?php esc_attr_e( $benchmark->get_description() ); ?>"
+							     class="wpgh-element ui-draggable">
+								<div class="step-icon"><img width="60"
+								                            src="<?php echo esc_url( $benchmark->get_icon() ); ?>">
+								</div>
+								<p><?php echo $benchmark->get_name() ?></p></div>
+						</td><?php
 						$i ++;
 
 						endforeach;
 
 						?></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div id='actions' class="hidden">
-            <div class="inside">
-                <table>
-                    <tbody>
-                    <tr><?php
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div id='actions' class="hidden">
+			<div class="inside">
+				<table>
+					<tbody>
+					<tr><?php
 						$actions = Plugin::$instance->step_manager->get_actions();
 						$i       = 0;
 						foreach ( $actions
@@ -299,75 +299,75 @@ $funnel = new Funnel( $funnel_id );
 						as $action ):
 						if ( ( $i % 4 ) == 0 ):
 						?></tr>
-                    <tr><?php
+					<tr><?php
 						endif;
 						?>
-                        <td class="step-icon">
-                            <div id='<?php echo $action->get_type(); ?>'
-                                 title="<?php esc_attr_e( $action->get_description() ); ?>"
-                                 class="wpgh-element ui-draggable">
-                                <div class="step-icon"><img width="60"
-                                                            src="<?php echo esc_url( $action->get_icon() ); ?>">
-                                </div>
-                                <p><?php echo $action->get_name() ?></p></div>
-                        </td><?php
+						<td class="step-icon">
+							<div id='<?php echo $action->get_type(); ?>'
+							     title="<?php esc_attr_e( $action->get_description() ); ?>"
+							     class="wpgh-element ui-draggable">
+								<div class="step-icon"><img width="60"
+								                            src="<?php echo esc_url( $action->get_icon() ); ?>">
+								</div>
+								<p><?php echo $action->get_name() ?></p></div>
+						</td><?php
 						$i ++;
 
 						endforeach;
 
 						?></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    <!-- End Action Icons-->
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- End Action Icons-->
 </div>
 <script>
-    jQuery(function ($) {
+  jQuery(function ($) {
 
-        var $benchmarks = $("#benchmarks");
-        var $actions = $("#actions");
-        var $tabs = $(".nav-tab");
+    var $benchmarks = $('#benchmarks')
+    var $actions = $('#actions')
+    var $tabs = $('.nav-tab')
 
-        $("#actions-tab").on("click", function (e) {
-            e.preventDefault();
+    $('#actions-tab').on('click', function (e) {
+      e.preventDefault()
 
-            $tabs.removeClass("nav-tab-active");
-            $(this).addClass("nav-tab-active");
+      $tabs.removeClass('nav-tab-active')
+      $(this).addClass('nav-tab-active')
 
-            $benchmarks.addClass("hidden");
-            $actions.removeClass("hidden");
-        });
+      $benchmarks.addClass('hidden')
+      $actions.removeClass('hidden')
+    })
 
-        $("#benchmarks-tab").on("click", function (e) {
-            e.preventDefault();
+    $('#benchmarks-tab').on('click', function (e) {
+      e.preventDefault()
 
-            $tabs.removeClass("nav-tab-active");
-            $(this).addClass("nav-tab-active");
+      $tabs.removeClass('nav-tab-active')
+      $(this).addClass('nav-tab-active')
 
-            $actions.addClass("hidden");
-            $benchmarks.removeClass("hidden");
-        });
+      $actions.addClass('hidden')
+      $benchmarks.removeClass('hidden')
+    })
 
-    });
+  })
 </script>
 
 <div class="hidden" id="add-contact-modal" style="display: none;">
-    <form method="post">
+	<form method="post">
 		<?php wp_nonce_field(); ?>
 		<?php wp_nonce_field( 'add_contacts_to_funnel', 'add_contacts_nonce' ); ?>
-        <div>
-            <div class="add-contacts-response hidden"></div>
-            <table class="add-contact-form" style="width: 100%;">
-                <tbody>
-                <tr>
-                    <th>
+		<div>
+			<div class="add-contacts-response hidden"></div>
+			<table class="add-contact-form" style="width: 100%;">
+				<tbody>
+				<tr>
+					<th>
 						<?php _e( 'Add contacts with these tags:', 'groundhogg' ); ?>
-                    </th>
-                </tr>
-                <tr>
-                    <td>
+					</th>
+				</tr>
+				<tr>
+					<td>
 						<?php
 
 						echo html()->dropdown( [
@@ -389,16 +389,16 @@ $funnel = new Funnel( $funnel_id );
 						) );
 
 						?>
-                        <p class="description"><?php _e( 'Select one or more tags, contacts that have these tags will be added to the funnel.', 'groundhogg' ); ?></p>
-                    </td>
-                </tr>
-                <tr>
-                    <th>
+						<p class="description"><?php _e( 'Select one or more tags, contacts that have these tags will be added to the funnel.', 'groundhogg' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th>
 						<?php _e( 'Exclude contacts with these tags:', 'groundhogg' ); ?>
-                    </th>
-                </tr>
-                <tr>
-                    <td>
+					</th>
+				</tr>
+				<tr>
+					<td>
 						<?php
 
 						echo html()->dropdown( [
@@ -420,16 +420,16 @@ $funnel = new Funnel( $funnel_id );
 						) );
 
 						?>
-                        <p class="description"><?php _e( 'Any contacts with the tags will not be added.', 'groundhogg' ); ?></p>
-                    </td>
-                </tr>
-                <tr>
-                    <th>
+						<p class="description"><?php _e( 'Any contacts with the tags will not be added.', 'groundhogg' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th>
 						<?php _e( 'Select where to start:', 'groundhogg' ); ?>
-                    </th>
-                </tr>
-                <tr>
-                    <td>
+					</th>
+				</tr>
+				<tr>
+					<td>
 						<?php
 
 						$options = [];
@@ -449,14 +449,14 @@ $funnel = new Funnel( $funnel_id );
 						) );
 
 						?>
-                        <p class="description"><?php _e( 'Select which step you want these contacts to start from.', 'groundhogg' ); ?></p>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+						<p class="description"><?php _e( 'Select which step you want these contacts to start from.', 'groundhogg' ); ?></p>
+					</td>
+				</tr>
+				</tbody>
+			</table>
 			<?php submit_button( __( 'Add Contacts to Funnel', 'groundhogg' ) ); ?>
-        </div>
-    </form>
+		</div>
+	</form>
 </div>
 
 

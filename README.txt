@@ -309,6 +309,11 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.4.4.1 (2021-03-11) =
+* ADDED Additional developer actions to the reports pages to add more relevant ecommerce reports.
+* ADDED SUM() helper function to the DB class API.
+* TWEAKED Reformatted a lot of code to bring it up to core WP standards.
+
 = 2.4.4 (2021-03-10) =
 * ADDED Contact bulk editing (finally).
 * ADDED Add contacts to a funnel from the contacts table in the more actions dropdown.

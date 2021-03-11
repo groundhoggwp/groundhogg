@@ -198,4 +198,11 @@ abstract class Base_Report {
 		return absint( get_array_var( get_request_var( 'data', [] ), 'step_id' ) );
 	}
 
+	/**
+	 * @return mixed
+	 */
+	protected function get_broadcast_id() {
+		return absint( get_array_var( get_request_var( 'data', [] ), 'broadcast_id' ) );
+	}
+
 }

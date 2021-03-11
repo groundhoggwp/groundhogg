@@ -13,14 +13,14 @@ use function Groundhogg\html;
 wp_enqueue_editor();
 
 ?>
-    <div id="email-form-wrap">
-        <form method="post" id="personal-email-form"><?php
+	<div id="email-form-wrap">
+		<form method="post" id="personal-email-form"><?php
 
 			action_input( 'send_personal_email' );
 			wp_nonce_field( 'send_personal_email' );
 
 			?>
-            <div class="section"><?php
+			<div class="section"><?php
 				echo html()->e( 'label', [ 'for' => 'subject' ], __( 'Subject:', 'groundhogg' ) );
 				echo html()->input( [
 					'id'          => 'subject',
@@ -28,7 +28,7 @@ wp_enqueue_editor();
 					'placeholder' => __( 'Following up...', 'groundhogg' )
 				] );
 				?></div>
-            <div class="section"><?php
+			<div class="section"><?php
 
 				echo html()->e( 'label', [ 'for' => 'from' ], __( 'From:', 'groundhogg' ) );
 				echo html()->dropdown_owners( [
@@ -49,12 +49,12 @@ wp_enqueue_editor();
 			] ), 'div', [ 'class' => 'mce-wrap' ] )
 
 			?>
-            <div class="ic-section">
-                <div class="ic-section-header additional-options">
+			<div class="ic-section">
+				<div class="ic-section-header additional-options">
 					<?php _e( 'Additional options', 'groundhogg' ); ?>
-                </div>
-                <div class="ic-section-content">
-                    <div class="section"><?php
+				</div>
+				<div class="ic-section-content">
+					<div class="section"><?php
 						echo html()->e( 'label', [ 'for' => 'cc' ], __( 'Cc:', 'groundhogg' ) );
 						echo html()->input( [
 							'id'          => 'cc',
@@ -62,7 +62,7 @@ wp_enqueue_editor();
 							'placeholder' => __( '', 'groundhogg' )
 						] );
 						?></div>
-                    <div class="section"><?php
+					<div class="section"><?php
 						echo html()->e( 'label', [ 'for' => 'bcc' ], __( 'Bcc:', 'groundhogg' ) );
 						echo html()->input( [
 							'id'          => 'bcc',
@@ -70,8 +70,8 @@ wp_enqueue_editor();
 							'placeholder' => __( '', 'groundhogg' )
 						] );
 						?></div>
-                </div>
-            </div>
+				</div>
+			</div>
 			<?php
 
 			echo html()->button( [
@@ -81,6 +81,6 @@ wp_enqueue_editor();
 			] )
 
 			?></form>
-    </div>
+	</div>
 <?php
 

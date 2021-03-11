@@ -184,8 +184,8 @@ class Contacts_Table extends WP_List_Table {
 	}
 
 	/**
-	 * @see WP_List_Table::::single_row_columns()
 	 * @return array An associative array containing column information.
+	 * @see WP_List_Table::::single_row_columns()
 	 */
 	public function get_columns() {
 		$columns = array(
@@ -215,7 +215,7 @@ class Contacts_Table extends WP_List_Table {
 
 	/**
 	 * @param object|Contact $contact
-	 * @param int            $level
+	 * @param int $level
 	 */
 	public function single_row( $contact, $level = 0 ) {
 
@@ -224,9 +224,9 @@ class Contacts_Table extends WP_List_Table {
 		}
 
 		?>
-        <tr id="contact-<?php echo $contact->get_id(); ?>">
+		<tr id="contact-<?php echo $contact->get_id(); ?>">
 			<?php $this->single_row_columns( $contact ); ?>
-        </tr>
+		</tr>
 		<?php
 	}
 
@@ -237,33 +237,33 @@ class Contacts_Table extends WP_List_Table {
 	 */
 	public function inline_edit() {
 		?>
-        <table style="display: none">
-            <tbody id="inlineedit">
-            <tr id="inline-edit"
-                class="inline-edit-row inline-edit-row-contact quick-edit-row quick-edit-row-contact inline-edit-contact inline-editor"
-                style="display: none">
-                <td colspan="<?php echo $this->get_column_count(); ?>" class="colspanchange">
-                    <fieldset class="inline-edit-col-left">
-                        <legend class="inline-edit-legend"><?php echo __( 'Quick Edit' ); ?></legend>
-                        <div class="inline-edit-col">
-                            <label>
-                                <span class="title"><?php _e( 'Email' ); ?></span>
-                                <span class="input-text-wrap"><input type="text" name="email"
-                                                                     class="cemail regular-text" value=""/></span>
-                            </label>
-                            <label>
-                                <span class="title"><?php _e( 'First Name', 'groundhogg' ); ?></span>
-                                <span class="input-text-wrap"><input type="text" name="first_name"
-                                                                     class="cfirst_name regular-text" value=""/></span>
-                            </label>
-                            <label>
-                                <span class="title"><?php _e( 'Last Name', 'groundhogg' ); ?></span>
-                                <span class="input-text-wrap"><input type="text" name="last_name"
-                                                                     class="clast_name regular-text" value=""/></span>
-                            </label>
-                            <label>
-                                <span class="title"><?php _e( 'Owner', 'groundhogg' ); ?></span>
-                                <span class="input-text-wrap">
+		<table style="display: none">
+			<tbody id="inlineedit">
+			<tr id="inline-edit"
+			    class="inline-edit-row inline-edit-row-contact quick-edit-row quick-edit-row-contact inline-edit-contact inline-editor"
+			    style="display: none">
+				<td colspan="<?php echo $this->get_column_count(); ?>" class="colspanchange">
+					<fieldset class="inline-edit-col-left">
+						<legend class="inline-edit-legend"><?php echo __( 'Quick Edit' ); ?></legend>
+						<div class="inline-edit-col">
+							<label>
+								<span class="title"><?php _e( 'Email' ); ?></span>
+								<span class="input-text-wrap"><input type="text" name="email"
+								                                     class="cemail regular-text" value=""/></span>
+							</label>
+							<label>
+								<span class="title"><?php _e( 'First Name', 'groundhogg' ); ?></span>
+								<span class="input-text-wrap"><input type="text" name="first_name"
+								                                     class="cfirst_name regular-text" value=""/></span>
+							</label>
+							<label>
+								<span class="title"><?php _e( 'Last Name', 'groundhogg' ); ?></span>
+								<span class="input-text-wrap"><input type="text" name="last_name"
+								                                     class="clast_name regular-text" value=""/></span>
+							</label>
+							<label>
+								<span class="title"><?php _e( 'Owner', 'groundhogg' ); ?></span>
+								<span class="input-text-wrap">
                                     <?php $args = array(
 	                                    'id'    => 'owner',
 	                                    'name'  => 'owner',
@@ -271,25 +271,25 @@ class Contacts_Table extends WP_List_Table {
                                     ); ?>
                                     <?php echo html()->dropdown_owners( $args ); ?>
                                 </span>
-                            </label>
-                            <label>
-                                <span class="title"><?php _e( 'Status', 'groundhogg' ); ?></span>
-                                <span class="input-text-wrap">
+							</label>
+							<label>
+								<span class="title"><?php _e( 'Status', 'groundhogg' ); ?></span>
+								<span class="input-text-wrap">
                                     <?php echo html()->dropdown( [
 	                                    'id'      => 'optin_status',
 	                                    'name'    => 'optin_status',
 	                                    'options' => Preferences::get_preference_names()
                                     ] ); ?>
                                 </span>
-                            </label>
-                        </div>
-                    </fieldset>
-                    <fieldset class="inline-edit-col-right">
-                        <legend class="inline-edit-legend">&nbsp;</legend>
-                        <div class="inline-edit-col">
-                            <label>
-                                <span class="title"><?php _e( 'Primary', 'groundhogg' ); ?></span>
-                                <span class="input-text-wrap">
+							</label>
+						</div>
+					</fieldset>
+					<fieldset class="inline-edit-col-right">
+						<legend class="inline-edit-legend">&nbsp;</legend>
+						<div class="inline-edit-col">
+							<label>
+								<span class="title"><?php _e( 'Primary', 'groundhogg' ); ?></span>
+								<span class="input-text-wrap">
 	                            <?php echo html()->input( [
 		                            'type'  => 'tel',
 		                            'class' => 'input',
@@ -303,10 +303,10 @@ class Contacts_Table extends WP_List_Table {
 		                            'class' => 'phone-ext',
 	                            ] ); ?>
                                 </span>
-                            </label>
-                            <label>
-                                <span class="title"><?php _e( 'Mobile', 'groundhogg' ); ?></span>
-                                <span class="input-text-wrap">
+							</label>
+							<label>
+								<span class="title"><?php _e( 'Mobile', 'groundhogg' ); ?></span>
+								<span class="input-text-wrap">
 								<?php echo html()->input( [
 									'type'  => 'tel',
 									'class' => 'input',
@@ -314,33 +314,33 @@ class Contacts_Table extends WP_List_Table {
 									'name'  => 'mobile_phone',
 								] ); ?>
                                 </span>
-                            </label>
-                            <label>
-                                <span class="title"><?php _e( 'Tags' ); ?></span>
-                                <span class="input-text-wrap">
+							</label>
+							<label>
+								<span class="title"><?php _e( 'Tags' ); ?></span>
+								<span class="input-text-wrap">
 								<?php echo html()->dropdown( [
 									'id'   => 'tags',
 									'name' => 'tags[]'
 								] ); ?>
                                 </span>
-                            </label>
-                        </div>
-                    </fieldset>
-                    <div class="submit inline-edit-save">
-                        <button type="button" class="button cancel alignleft"><?php _e( 'Cancel' ); ?></button>
+							</label>
+						</div>
+					</fieldset>
+					<div class="submit inline-edit-save">
+						<button type="button" class="button cancel alignleft"><?php _e( 'Cancel' ); ?></button>
 						<?php wp_nonce_field( 'inlineeditnonce', '_inline_edit' ); ?>
-                        <button type="button"
-                                class="button button-primary save alignright"><?php _e( 'Update' ); ?></button>
-                        <span class="spinner"></span>
-                        <br class="clear"/>
-                        <div class="notice notice-error notice-alt inline hidden">
-                            <p class="error"></p>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+						<button type="button"
+						        class="button button-primary save alignright"><?php _e( 'Update' ); ?></button>
+						<span class="spinner"></span>
+						<br class="clear"/>
+						<div class="notice notice-error notice-alt inline hidden">
+							<p class="error"></p>
+						</div>
+					</div>
+				</td>
+			</tr>
+			</tbody>
+		</table>
 		<?php
 	}
 
@@ -392,7 +392,7 @@ class Contacts_Table extends WP_List_Table {
 	/**
 	 * Get default column value.
 	 *
-	 * @param object $contact     A singular item (one full row's worth of data).
+	 * @param object $contact A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string Text or HTML to be placed inside the column <td>.
@@ -527,7 +527,7 @@ class Contacts_Table extends WP_List_Table {
 	 *
 	 * @param        $contact     Contact Contact being acted upon.
 	 * @param string $column_name Current column name.
-	 * @param string $primary     Primary column name.
+	 * @param string $primary Primary column name.
 	 *
 	 * @return string Row steps output for posts.
 	 */
@@ -594,21 +594,20 @@ class Contacts_Table extends WP_List_Table {
 	 */
 	protected function extra_tablenav( $which ) {
 		if ( $which === 'top' ) : ?>
-            <script>
+			<script>
               jQuery(function ($) {
                 $('#bulk-action-selector-top,#bulk-action-selector-bottom').on('change', function () {
                   var $bulk = $(this)
                   if ($bulk.val() === 'apply_tag' || $bulk.val() === 'remove_tag') {
                     $('.bulk-tag-action').removeClass('hidden')
-                  }
-                  else {
+                  } else {
                     $('.bulk-tag-action').addClass('hidden')
                   }
                 })
               })
-            </script>
-            <div class="alignleft gh-actions bulk-tag-action hidden">
-                <div style="width: 300px;display: inline-block;margin: 0 20px 5px 0"><?php echo html()->tag_picker( [
+			</script>
+			<div class="alignleft gh-actions bulk-tag-action hidden">
+				<div style="width: 300px;display: inline-block;margin: 0 20px 5px 0"><?php echo html()->tag_picker( [
 						'name'        => 'bulk_tags[]',
 						'id'          => 'bulk_tags',
 						'class'       => 'gh-tag-picker',
@@ -618,9 +617,9 @@ class Contacts_Table extends WP_List_Table {
 						'placeholder' => __( 'Bulk Apply/Remove Tags', 'groundhogg' ),
 						'tags'        => true,
 					] ); ?></div>
-            </div>
+			</div>
 		<?php endif; ?>
-        <div class="alignleft gh-actions">
+		<div class="alignleft gh-actions">
 			<?php
 
 			Contact_Table_Actions::do_contact_actions( $this->query, $this->get_pagination_arg( 'total_items' ), $this );
@@ -641,34 +640,34 @@ class Contacts_Table extends WP_List_Table {
 
 		$this->screen->render_screen_reader_content( 'heading_list' );
 		?>
-        <div class="table-wrap">
-            <div class="table-scroll">
-                <table class="wp-list-table <?php echo implode( ' ', $this->get_table_classes() ); ?>">
-                    <thead>
-                    <tr>
-				        <?php $this->print_column_headers(); ?>
-                    </tr>
-                    </thead>
+		<div class="table-wrap">
+			<div class="table-scroll">
+				<table class="wp-list-table <?php echo implode( ' ', $this->get_table_classes() ); ?>">
+					<thead>
+					<tr>
+						<?php $this->print_column_headers(); ?>
+					</tr>
+					</thead>
 
-                    <tbody id="the-list"
-				        <?php
-				        if ( $singular ) {
-					        echo " data-wp-lists='list:$singular'";
-				        }
-				        ?>
-                    >
-			        <?php $this->display_rows_or_placeholder(); ?>
-                    </tbody>
+					<tbody id="the-list"
+						<?php
+						if ( $singular ) {
+							echo " data-wp-lists='list:$singular'";
+						}
+						?>
+					>
+					<?php $this->display_rows_or_placeholder(); ?>
+					</tbody>
 
-                    <tfoot>
-                    <tr>
-				        <?php $this->print_column_headers( false ); ?>
-                    </tr>
-                    </tfoot>
+					<tfoot>
+					<tr>
+						<?php $this->print_column_headers( false ); ?>
+					</tr>
+					</tfoot>
 
-                </table>
-            </div>
-        </div>
+				</table>
+			</div>
+		</div>
 		<?php
 		$this->display_tablenav( 'bottom' );
 	}

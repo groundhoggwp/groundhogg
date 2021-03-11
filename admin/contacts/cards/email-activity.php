@@ -20,24 +20,24 @@ $events = get_db( 'events' )->query( [
 	'limit'      => 10,
 ] );
 
-$activity = get_db( 'activity' )->query([
+$activity = get_db( 'activity' )->query( [
 	'contact_id' => $contact->get_id(),
 	'orderby'    => 'timestamp',
 	'order'      => 'DESC',
 	'limit'      => 10,
-]);
+] );
 
 $events = array_map( function ( $event ) {
 	return new Event( $event->ID );
 }, $events );
 
-$activity = array_map( function ( $a ){
+$activity = array_map( function ( $a ) {
 	return new Activity( $a->ID );
 }, $activity );
 
 $merged_history = array_merge( $events, $activity );
 
-usort( $merged_history, function ( $a, $b ){
+usort( $merged_history, function ( $a, $b ) {
 	return $a->get_time() - $b->get_time();
 } );
 
@@ -48,11 +48,11 @@ usort( $merged_history, function ( $a, $b ){
 ?>
 <ul class="info-list with-icon">
 	<?php foreach ( $merged_history as $h ): ?>
-        <li>
+		<li>
 			<?php if ( is_a( $h, Event::class ) ): ?>
-	        <?php elseif ( is_a( $h, Activity::class  )) : ?>
-	        <?php endif; ?>
-        </li>
+			<?php elseif ( is_a( $h, Activity::class ) ) : ?>
+			<?php endif; ?>
+		</li>
 	<?php endforeach; ?>
 </ul>
 

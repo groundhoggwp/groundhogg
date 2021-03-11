@@ -47,7 +47,7 @@ abstract class Base_Doughnut_Chart_Report extends Base_Chart_Report {
 	 *
 	 * @return array
 	 */
-	protected function normalize_data( $data ){
+	protected function normalize_data( $data ) {
 
 		$values = wp_list_pluck( $data, 'meta_value' );
 		$counts = array_count_values( $values );

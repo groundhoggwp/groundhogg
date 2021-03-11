@@ -45,7 +45,7 @@ class Contacts_By_Social_Media extends Contacts_By_Meta {
 			include_once GROUNDHOGG_PATH . 'includes/lib/yaml/Spyc.php';
 		}
 
-		Return \Spyc::YAMLLoad( GROUNDHOGG_PATH . 'includes/lib/potential-known-leadsources/Socials.yml' );
+		return \Spyc::YAMLLoad( GROUNDHOGG_PATH . 'includes/lib/potential-known-leadsources/Socials.yml' );
 	}
 
 	/**

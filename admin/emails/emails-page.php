@@ -146,8 +146,8 @@ class Emails_Page extends Admin_Page {
 		$reporting_args = [ 'tab' => 'email' ];
 
 		if ( $email = Groundhogg\get_request_var( 'email' ) ) {
-			$broadcast_args[ 'email' ] = absint( $email );
-			$reporting_args            = [
+			$broadcast_args['email'] = absint( $email );
+			$reporting_args          = [
 				'tab'   => 'email_step',
 				'email' => $email,
 			];
@@ -302,13 +302,13 @@ class Emails_Page extends Admin_Page {
 					return new \WP_Error( 'error', 'Invalid email ID!' );
 				}
 
-				$args[ 'content' ]    = $from_email->get_content();
-				$args[ 'subject' ]    = $from_email->get_subject_line();
-				$args[ 'title' ]      = sprintf( "%s - (copy)", $from_email->get_title() );
-				$args[ 'pre_header' ] = $from_email->get_pre_header();
+				$args['content']    = $from_email->get_content();
+				$args['subject']    = $from_email->get_subject_line();
+				$args['title']      = sprintf( "%s - (copy)", $from_email->get_title() );
+				$args['pre_header'] = $from_email->get_pre_header();
 
-				$args[ 'author' ]    = get_current_user_id();
-				$args[ 'from_user' ] = $from_email->get_from_user_id();
+				$args['author']    = get_current_user_id();
+				$args['from_user'] = $from_email->get_from_user_id();
 
 				$email = new Email( $args );
 
@@ -355,14 +355,14 @@ class Emails_Page extends Admin_Page {
 		$pre_header = sanitize_text_field( Groundhogg\get_request_var( 'pre_header' ) );
 		$content    = apply_filters( 'groundhogg/admin/emails/sanitize_email_content', Groundhogg\get_request_var( 'email_content' ) );
 
-		$args[ 'status' ]       = $status;
-		$args[ 'from_user' ]    = $from_user;
-		$args[ 'subject' ]      = $subject;
-		$args[ 'title' ]        = sanitize_text_field( Groundhogg\get_request_var( 'title', $subject ) );
-		$args[ 'pre_header' ]   = $pre_header;
-		$args[ 'content' ]      = $content;
-		$args[ 'last_updated' ] = current_time( 'mysql' );
-		$args[ 'is_template' ]  = key_exists( 'save_as_template', $_POST ) ? 1 : 0;
+		$args['status']       = $status;
+		$args['from_user']    = $from_user;
+		$args['subject']      = $subject;
+		$args['title']        = sanitize_text_field( Groundhogg\get_request_var( 'title', $subject ) );
+		$args['pre_header']   = $pre_header;
+		$args['content']      = $content;
+		$args['last_updated'] = current_time( 'mysql' );
+		$args['is_template']  = key_exists( 'save_as_template', $_POST ) ? 1 : 0;
 
 
 		if ( $email->update( $args ) ) {
@@ -392,9 +392,9 @@ class Emails_Page extends Admin_Page {
 		if ( $headers_key && $headers_value ) {
 			for ( $i = 0; $i < count( $headers_key ); $i ++ ) {
 				if ( $headers_key[ $i ] ) {
-					$header_key   = strtolower( sanitize_key( $headers_key[ $i ] ) );
-					$header_value = $headers_value[ $i ];
-					$headers[$header_key] = Groundhogg\sanitize_email_header( $header_value, $header_key );
+					$header_key             = strtolower( sanitize_key( $headers_key[ $i ] ) );
+					$header_value           = $headers_value[ $i ];
+					$headers[ $header_key ] = Groundhogg\sanitize_email_header( $header_value, $header_key );
 				}
 			}
 		}
@@ -453,10 +453,10 @@ class Emails_Page extends Admin_Page {
 		$this->search_form( __( 'Search Emails', 'groundhogg' ) );
 
 		?>
-        <form method="post">
+		<form method="post">
 			<?php $emails_table->prepare_items(); ?>
 			<?php $emails_table->display(); ?>
-        </form>
+		</form>
 		<?php
 	}
 
@@ -487,23 +487,23 @@ class Emails_Page extends Admin_Page {
 
 		if ( empty( $emails ) ):
 			?> <p
-                style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no emails were found.', 'notice', 'groundhogg' ); ?></p> <?php
+			style="text-align: center;font-size: 24px;"><?php _ex( 'Sorry, no emails were found.', 'notice', 'groundhogg' ); ?></p> <?php
 		else:
 			?>
 			<?php foreach ( $emails as $email ):
 			$email = new Email( $email->ID );
 			?>
-            <div class="postbox">
-                <h2 class="hndle"><?php echo $email->get_title(); ?></h2>
-                <div class="inside">
-                    <p><?php echo __( 'Subject: ', 'groundhogg' ) . $email->get_subject_line(); ?></p>
-                    <p><?php echo __( 'Pre-Header: ', 'groundhogg' ) . $email->get_pre_header(); ?></p>
-                    <iframe class="email-container" style="margin-bottom: 10px; border: 1px solid #e5e5e5;" width="100%"
-                            height="500" src="<?php echo managed_page_url( 'emails/' . $email->get_id() ); ?>"></iframe>
-                    <button class="choose-template button-primary" name="email_id"
-                            value="<?php echo $email->get_id(); ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
-                </div>
-            </div>
+			<div class="postbox">
+				<h2 class="hndle"><?php echo $email->get_title(); ?></h2>
+				<div class="inside">
+					<p><?php echo __( 'Subject: ', 'groundhogg' ) . $email->get_subject_line(); ?></p>
+					<p><?php echo __( 'Pre-Header: ', 'groundhogg' ) . $email->get_pre_header(); ?></p>
+					<iframe class="email-container" style="margin-bottom: 10px; border: 1px solid #e5e5e5;" width="100%"
+					        height="500" src="<?php echo managed_page_url( 'emails/' . $email->get_id() ); ?>"></iframe>
+					<button class="choose-template button-primary" name="email_id"
+					        value="<?php echo $email->get_id(); ?>"><?php _e( 'Start Writing', 'groundhogg' ); ?></button>
+				</div>
+			</div>
 		<?php endforeach;
 
 		endif;

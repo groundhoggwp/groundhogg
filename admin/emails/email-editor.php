@@ -50,7 +50,7 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 <style>
 </style>
 <form method="post" id="email-form">
-    <!-- Before-->
+	<!-- Before-->
 	<?php wp_nonce_field( 'edit' );
 
 	$test_email = get_user_meta( get_current_user_id(), 'preferred_test_email', true );
@@ -61,15 +61,15 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 		'id'    => 'test-email',
 		'value' => $test_email
 	] ); ?>
-    <div id='poststuff'>
-        <div id="post-body" class="metabox-holder columns-2  <?php if ( $email->get_meta( 'alignment' ) === 'center' ) {
+	<div id='poststuff'>
+		<div id="post-body" class="metabox-holder columns-2  <?php if ( $email->get_meta( 'alignment' ) === 'center' ) {
 			echo 'align-email-center';
 		} ?>" style="clear: both">
-            <div id="postbox-container-1" class="postbox-container sidebar">
-                <div id="save" class="postbox">
-                    <span class="spinner"></span>
-                    <h2><?php _e( 'Save & Preview', 'groundhogg' ); ?></h2>
-                    <div class="inside">
+			<div id="postbox-container-1" class="postbox-container sidebar">
+				<div id="save" class="postbox">
+					<span class="spinner"></span>
+					<h2><?php _e( 'Save & Preview', 'groundhogg' ); ?></h2>
+					<div class="inside">
 						<?php submit_button( __( 'Update', 'groundhogg' ), 'primary', 'update', false ); ?>
 						<?php submit_button( __( 'Update & Test', 'groundhogg' ), 'secondary', 'update_and_test', false ); ?>
 						<?php echo html()->button( [
@@ -82,11 +82,11 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 							'text'  => '<span class="dashicons dashicons-desktop"></span>',
 							'class' => 'button button-secondary dash-button show-email-preview',
 						] ); ?>
-                    </div>
-                </div>
+					</div>
+				</div>
 
-                <h3><?php _e( 'Status', 'groundhogg' ); ?></h3>
-                <p>
+				<h3><?php _e( 'Status', 'groundhogg' ); ?></h3>
+				<p>
 					<?php echo Plugin::$instance->utils->html->toggle( [
 						'name'    => 'email_status',
 						'id'      => 'status-toggle',
@@ -95,8 +95,8 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 						'on'      => 'Ready',
 						'off'     => 'Draft',
 					] ); ?>
-                </p>
-                <h3><?php _e( 'From', 'groundhogg' ); ?></h3>
+				</p>
+				<h3><?php _e( 'From', 'groundhogg' ); ?></h3>
 				<?php $args = array(
 					'option_none' => __( 'The Contact\'s Owner' ),
 					'id'          => 'from_user',
@@ -104,10 +104,10 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 					'selected'    => $email->from_user,
 					'style'       => [ 'max-width' => '100%' ]
 				); ?>
-                <p><?php echo Plugin::$instance->utils->html->dropdown_owners( $args ); ?></p>
+				<p><?php echo Plugin::$instance->utils->html->dropdown_owners( $args ); ?></p>
 				<?php echo html()->description( __( 'Choose who this email comes from.' ) ); ?>
 
-                <h3><?php _e( 'Reply To', 'groundhogg' ); ?></h3>
+				<h3><?php _e( 'Reply To', 'groundhogg' ); ?></h3>
 				<?php $args = [
 					'type'  => 'email',
 					'name'  => 'reply_to_override',
@@ -115,22 +115,22 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 					'value' => $email->get_meta( 'reply_to_override' ),
 					'style' => [ 'max-width' => '100%' ]
 				]; ?>
-                <p><?php echo Plugin::$instance->utils->html->input( $args ); ?></p>
+				<p><?php echo Plugin::$instance->utils->html->input( $args ); ?></p>
 				<?php echo html()->description( __( 'Override the email address replies are sent to. Leave empty to default to the sender address.' ) ); ?>
 
-                <h3><?php _e( 'Alignment' ); ?></h3>
-                <p>
-                    <select id="email-align" name="email_alignment">
-                        <option value="left" <?php if ( $email->get_meta( 'alignment' ) === 'left' ) {
+				<h3><?php _e( 'Alignment' ); ?></h3>
+				<p>
+					<select id="email-align" name="email_alignment">
+						<option value="left" <?php if ( $email->get_meta( 'alignment' ) === 'left' ) {
 							echo 'selected';
 						} ?> ><?php _e( 'Left' ); ?></option>
-                        <option value="center" <?php if ( $email->get_meta( 'alignment' ) === 'center' ) {
+						<option value="center" <?php if ( $email->get_meta( 'alignment' ) === 'center' ) {
 							echo 'selected';
 						} ?>><?php _e( 'Center' ); ?></option>
-                    </select>
-                </p>
+					</select>
+				</p>
 
-                <h3><?php _e( 'Message Type' ); ?></h3>
+				<h3><?php _e( 'Message Type' ); ?></h3>
 				<?php $args = [
 					'type'              => 'email',
 					'name'              => 'message_type',
@@ -144,9 +144,9 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 					'option_none'       => '',
 					'option_none_value' => '',
 				]; ?>
-                <p><?php echo Plugin::$instance->utils->html->dropdown( $args ); ?></p>
-                <h3><?php _e( 'Additional' ); ?></h3>
-                <p>
+				<p><?php echo Plugin::$instance->utils->html->dropdown( $args ); ?></p>
+				<h3><?php _e( 'Additional' ); ?></h3>
+				<p>
 					<?php echo Plugin::$instance->utils->html->checkbox( [
 						'label'   => __( 'Enable browser view', 'groundhogg' ),
 						'name'    => 'browser_view',
@@ -155,8 +155,8 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 						'value'   => '1',
 						'checked' => $email->browser_view_enabled( false ),
 					] ); ?>
-                </p>
-                <p>
+				</p>
+				<p>
 					<?php echo Plugin::$instance->utils->html->checkbox( [
 						'label'   => __( 'Save as template', 'groundhogg' ),
 						'name'    => 'save_as_template',
@@ -165,8 +165,8 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 						'value'   => '1',
 						'checked' => $email->is_template(),
 					] ); ?>
-                </p>
-                <p>
+				</p>
+				<p>
 					<?php echo Plugin::$instance->utils->html->checkbox( [
 						'label'   => __( 'Enable custom plain text version', 'groundhogg' ),
 						'name'    => 'use_custom_alt_body',
@@ -175,38 +175,40 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 						'value'   => '1',
 						'checked' => $email->has_custom_alt_body(),
 					] ); ?>
-                </p>
-            </div>
-            <div id="post-body-content">
+				</p>
+			</div>
+			<div id="post-body-content">
 
-                <div id="title-wrap">
-                    <!-- Title -->
-                    <input placeholder="<?php echo __( 'Admin Title', 'groundhogg' ); ?>" type="text" name="title"
-                           size="30" value="<?php echo esc_attr( $email->get_title() ); ?>" id="title" spellcheck="true"
-                           autocomplete="off" required>
-                </div>
-	            <div id="subject-wrap">
-		            <h3><?php _e( 'Subject & Preview', 'groundhogg' ); ?></h3>
-		            <!-- Subject Line -->
-		            <span>
+				<div id="title-wrap">
+					<!-- Title -->
+					<input placeholder="<?php echo __( 'Admin Title', 'groundhogg' ); ?>" type="text" name="title"
+					       size="30" value="<?php echo esc_attr( $email->get_title() ); ?>" id="title" spellcheck="true"
+					       autocomplete="off" required>
+				</div>
+				<div id="subject-wrap">
+					<h3><?php _e( 'Subject & Preview', 'groundhogg' ); ?></h3>
+					<!-- Subject Line -->
+					<span>
 	                <label for="subject"><?php _e( 'Subject:', 'groundhogg' ); ?></label>
-	                <input placeholder="<?php echo __( 'Used to capture the attention of the reader.', 'groundhogg' ); ?>"
-	                       type="text" name="subject" size="30"
-	                       value="<?php echo esc_attr( $email->get_subject_line() ); ?>" id="subject" spellcheck="true"
-	                       autocomplete="off" required>
+	                <input
+		                placeholder="<?php echo __( 'Used to capture the attention of the reader.', 'groundhogg' ); ?>"
+		                type="text" name="subject" size="30"
+		                value="<?php echo esc_attr( $email->get_subject_line() ); ?>" id="subject" spellcheck="true"
+		                autocomplete="off" required>
 	                </span>
 
-		            <!-- Pre Header-->
-		            <span>
+					<!-- Pre Header-->
+					<span>
 	                <label for="preview-text"><?php _e( 'Preview:', 'groundhogg' ); ?></label>
-                    <input placeholder="<?php echo __( 'Shows in the email preview in the inbox before the content.', 'groundhogg' ); ?>"
-                           type="text" name="pre_header" size="30"
-                           value="<?php echo esc_attr( $email->get_pre_header() ); ?>" id="preview-text" spellcheck="true"
-                           autocomplete="off">
+                    <input
+	                    placeholder="<?php echo __( 'Shows in the email preview in the inbox before the content.', 'groundhogg' ); ?>"
+	                    type="text" name="pre_header" size="30"
+	                    value="<?php echo esc_attr( $email->get_pre_header() ); ?>" id="preview-text" spellcheck="true"
+	                    autocomplete="off">
 	                </span>
-	            </div>
-                <div id="content-wrap">
-                    <div id="postdivrich" class="postarea<?php echo $_wp_editor_expand_class; ?>">
+				</div>
+				<div id="content-wrap">
+					<div id="postdivrich" class="postarea<?php echo $_wp_editor_expand_class; ?>">
 
 						<?php
 
@@ -236,23 +238,23 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 						] );
 
 						?>
-                    </div>
-                </div>
+					</div>
+				</div>
 
 				<?php if ( $email->has_custom_alt_body() ) : ?>
-                    <div id="alt-wrap">
-                        <h3><?php _e( 'Alternate Plain Text Version', 'groundhogg' ); ?></h3>
-                        <p><?php printf( __( 'Having a custom plain text version will improve the deliverability of your emails. %s automatically generates one for you but if you want full control over it you can define it below.', 'groundhogg' ), white_labeled_name() ); ?></p>
-                        <textarea id="alt-body-input" name="alt_body" style="width: 100%" rows="8"><?php
+					<div id="alt-wrap">
+						<h3><?php _e( 'Alternate Plain Text Version', 'groundhogg' ); ?></h3>
+						<p><?php printf( __( 'Having a custom plain text version will improve the deliverability of your emails. %s automatically generates one for you but if you want full control over it you can define it below.', 'groundhogg' ), white_labeled_name() ); ?></p>
+						<textarea id="alt-body-input" name="alt_body" style="width: 100%" rows="8"><?php
 							$alt_body = $email->get_alt_body();
 							esc_html_e( $alt_body );
 							?></textarea>
-                    </div>
+					</div>
 				<?php endif; ?>
-                <div id="header-wrap">
-                    <h3><?php _e( 'Custom Headers', 'groundhogg-pro' ); ?></h3>
-                    <p><?php printf( __( 'You can define custom email headers and override existing ones. For example <code>X-Custom-Header</code> <code>From</code> <code>Bcc</code> <code>Cc</code>', 'groundhogg' ), white_labeled_name() ); ?></p>
-                    <?php
+				<div id="header-wrap">
+					<h3><?php _e( 'Custom Headers', 'groundhogg-pro' ); ?></h3>
+					<p><?php printf( __( 'You can define custom email headers and override existing ones. For example <code>X-Custom-Header</code> <code>From</code> <code>Bcc</code> <code>Cc</code>', 'groundhogg' ), white_labeled_name() ); ?></p>
+					<?php
 					$headers        = [];
 					$custom_headers = $email->get_meta( 'custom_headers', true );
 
@@ -286,9 +288,9 @@ wp_enqueue_script( 'groundhogg-admin-email-editor-expand' );
 						__( 'Actions' )
 					], $headers, false );
 					?>
-                </div>
-            </div>
-        </div>
-    </div>
+				</div>
+			</div>
+		</div>
+	</div>
 </form>
 <?php include __DIR__ . '/preview.php'; ?>

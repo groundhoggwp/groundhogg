@@ -1063,10 +1063,10 @@ class Funnels_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		$query     = get_post_var( 'query' );
-		$step_id   = absint( get_post_var( 'step' ) );
+		$query   = get_post_var( 'query' );
+		$step_id = absint( get_post_var( 'step' ) );
 
-		$query[ 'step_id' ] = $step_id;
+		$query['step_id'] = $step_id;
 
 		$query = array_filter( $query );
 

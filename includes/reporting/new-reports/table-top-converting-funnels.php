@@ -88,7 +88,7 @@ class Table_Top_Converting_Funnels extends Base_Table_Report {
 
 	protected function get_conversion_rate( $funnel_id ) {
 
-		$funnel = new Funnel( $funnel_id );
+		$funnel          = new Funnel( $funnel_id );
 		$conversion_step = $funnel->get_conversion_step_id();
 
 		$where = [

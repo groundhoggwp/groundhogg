@@ -53,10 +53,10 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 <form method="post" class="" enctype="multipart/form-data">
 	<?php wp_nonce_field( 'edit' ); ?>
 
-    <div class="contact-details">
+	<div class="contact-details">
 
-        <!-- Photo -->
-        <div class="contact-picture">
+		<!-- Photo -->
+		<div class="contact-picture">
 			<?php echo html()->e( 'img', [
 				'class'  => 'profile-picture',
 				'title'  => __( 'Profile Picture' ),
@@ -64,11 +64,11 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 				'height' => 150,
 				'src'    => $contact->get_profile_picture()
 			] ); ?>
-        </div>
-        <div class="basic-details">
-            <!-- FIRST -->
-            <div class="full-name"><?php dashicon_e( 'admin-users' ); ?><?php echo $contact->get_full_name(); ?></div>
-            <div class="email">
+		</div>
+		<div class="basic-details">
+			<!-- FIRST -->
+			<div class="full-name"><?php dashicon_e( 'admin-users' ); ?><?php echo $contact->get_full_name(); ?></div>
+			<div class="email">
 				<?php dashicon_e( 'email' ); ?><?php echo html()->e( 'a', [
 					'class' => 'trigger-popup',
 					'href'  => modal_link_url( [
@@ -81,58 +81,61 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'preventSave'        => 'true',
 					] )
 				], $contact->get_email() ) ?>
-                <span class="status <?php echo $contact->is_marketable() ? 'green' : 'red'; ?>"><?php echo Preferences::get_preference_pretty_name( $contact->get_optin_status() ); ?></span>
-            </div>
+				<span
+					class="status <?php echo $contact->is_marketable() ? 'green' : 'red'; ?>"><?php echo Preferences::get_preference_pretty_name( $contact->get_optin_status() ); ?></span>
+			</div>
 			<?php if ( $contact->get_phone_number() ): ?>
-                <div class="phone"><?php dashicon_e( 'phone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_phone_number() ], $contact->get_phone_number() ) ?>
+				<div
+					class="phone"><?php dashicon_e( 'phone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_phone_number() ], $contact->get_phone_number() ) ?>
 					<?php if ( $contact->get_phone_extension() ): ?>
-                        <span class="extension"><?php printf( __( 'ext. %s', 'groundhogg' ), $contact->get_phone_extension() ) ?></span>
+						<span
+							class="extension"><?php printf( __( 'ext. %s', 'groundhogg' ), $contact->get_phone_extension() ) ?></span>
 					<?php endif; ?>
-                </div>
+				</div>
 			<?php endif; ?>
 			<?php if ( $contact->get_mobile_number() ): ?>
-                <div class="mobile"><?php dashicon_e( 'smartphone' ); ?>
+				<div class="mobile"><?php dashicon_e( 'smartphone' ); ?>
 					<?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_mobile_number() ], $contact->get_mobile_number() ) ?>
-                </div>
+				</div>
 			<?php endif; ?>
 			<?php if ( count( $contact->get_address() ) > 0 ): ?>
-                <div class="location" title="<?php esc_attr_e( 'Location', 'groundhogg' ); ?>">
+				<div class="location" title="<?php esc_attr_e( 'Location', 'groundhogg' ); ?>">
 					<?php dashicon_e( 'admin-site' ); ?>
-                    <div class="address">
+					<div class="address">
 						<?php echo html()->e( 'a', [
 							'href'   => 'https://www.google.com/maps/place/' . implode( ',+', $contact->get_address() ),
 							'target' => '_blank'
 						], implode( ', ', $contact->get_address() ) ) ?>
-                    </div>
-                </div>
+					</div>
+				</div>
 			<?php endif; ?>
-            <div class="localtime" title="<?php esc_attr_e( 'Local time', 'groundhogg' ); ?>">
+			<div class="localtime" title="<?php esc_attr_e( 'Local time', 'groundhogg' ); ?>">
 				<?php dashicon_e( 'clock' ); ?><?php echo date_i18n( get_date_time_format(), $contact->get_local_time() ) ?>
-            </div>
-        </div>
-        <div class="wp-clearfix"></div>
-        <div class="tags" title="<?php esc_attr_e( 'Tags' ); ?>"><?php dashicon_e( 'tag' ); ?>
+			</div>
+		</div>
+		<div class="wp-clearfix"></div>
+		<div class="tags" title="<?php esc_attr_e( 'Tags' ); ?>"><?php dashicon_e( 'tag' ); ?>
 			<?php foreach ( $contact->get_tags() as $tag ):
 				$tag = new Tag( $tag ) ?><span
-                    class="tag"><?php esc_html_e( $tag->get_name() ); ?></span><?php endforeach; ?>
-        </div>
-    </div>
-    <div class="wp-clearfix"></div>
+				class="tag"><?php esc_html_e( $tag->get_name() ); ?></span><?php endforeach; ?>
+		</div>
+	</div>
+	<div class="wp-clearfix"></div>
 
 	<?php do_action( 'groundhogg/contact/record/nav/before', $contact ); ?>
 
-    <!-- BEGIN TABS -->
-    <h2 class="nav-tab-wrapper">
+	<!-- BEGIN TABS -->
+	<h2 class="nav-tab-wrapper">
 		<?php foreach ( $tabs as $id => $tab ): ?>
-            <a href="javascript:void(0)" class="nav-tab <?php echo $active_tab == $id ? 'nav-tab-active' : ''; ?>"
-               id="<?php echo 'tab_' . esc_attr( $id ); ?>"><?php _e( $tab, 'groundhogg' ); ?></a>
+			<a href="javascript:void(0)" class="nav-tab <?php echo $active_tab == $id ? 'nav-tab-active' : ''; ?>"
+			   id="<?php echo 'tab_' . esc_attr( $id ); ?>"><?php _e( $tab, 'groundhogg' ); ?></a>
 		<?php endforeach; ?>
 		<?php do_action( 'groundhogg/contact/record/nav/inside', $contact ); ?>
-    </h2>
+	</h2>
 
 	<?php do_action( 'groundhogg/contact/record/nav/after', $contact ); ?>
 
-    <!-- END TABS -->
+	<!-- END TABS -->
 	<?php
 
 	add_action( 'groundhogg/admin/contact/record/tab/general', __NAMESPACE__ . '\contact_record_general_info' );
@@ -140,21 +143,21 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 	/**
 	 * Contact Info
 	 *
-	 * @throws \Exception
-	 *
 	 * @param $contact Contact
+	 *
+	 * @throws \Exception
 	 *
 	 */
 	function contact_record_general_info( $contact ) {
 		?>
-        <h2><?php _e( 'Contact Information' ); ?></h2>
-        <!-- GENERAL NAME INFO -->
-        <table class="form-table">
-            <tbody>
-            <tr>
-                <th><label for="first_name"><?php echo _x( 'First Name', 'contact_record', 'groundhogg' ) ?></label>
-                </th>
-                <td><?php
+		<h2><?php _e( 'Contact Information' ); ?></h2>
+		<!-- GENERAL NAME INFO -->
+		<table class="form-table">
+			<tbody>
+			<tr>
+				<th><label for="first_name"><?php echo _x( 'First Name', 'contact_record', 'groundhogg' ) ?></label>
+				</th>
+				<td><?php
 					echo html()->input( [
 						'name'        => 'first_name',
 						'title'       => __( 'First Name' ),
@@ -163,10 +166,10 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'placeholder' => __( 'First Name' )
 					] );
 					?></td>
-            </tr>
-            <tr>
-                <th><label for="last_name"><?php echo _x( 'Last Name', 'contact_record', 'groundhogg' ) ?></label></th>
-                <td><?php
+			</tr>
+			<tr>
+				<th><label for="last_name"><?php echo _x( 'Last Name', 'contact_record', 'groundhogg' ) ?></label></th>
+				<td><?php
 					echo html()->input( [
 						'name'        => 'last_name',
 						'title'       => __( 'Last Name' ),
@@ -175,22 +178,22 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'placeholder' => __( 'Last Name' )
 					] );
 					?></td>
-            </tr>
-            <tr>
-                <th><label for="email"><?php echo _x( 'Email', 'contact_record', 'groundhogg' ) ?></label></th>
+			</tr>
+			<tr>
+				<th><label for="email"><?php echo _x( 'Email', 'contact_record', 'groundhogg' ) ?></label></th>
 
-                <td><?php $args = array(
+				<td><?php $args = array(
 						'type'  => 'email',
 						'id'    => 'email',
 						'name'  => 'email',
 						'value' => $contact->get_email(),
 					);
 					echo html()->input( $args ); ?>
-                    <span class="row-actions"><a
-                                title="<?php printf( esc_attr__( 'Visit %s', 'groundhogg' ), substr( $contact->get_email(), strpos( $contact->get_email(), '@' ) + 1 ) ); ?>"
-                                style="text-decoration: none" target="_blank"
-                                href="<?php echo esc_url( substr( $contact->get_email(), strpos( $contact->get_email(), '@' ) + 1 ) ); ?>"><span
-                                    class="dashicons dashicons-external"></span></a>
+					<span class="row-actions"><a
+							title="<?php printf( esc_attr__( 'Visit %s', 'groundhogg' ), substr( $contact->get_email(), strpos( $contact->get_email(), '@' ) + 1 ) ); ?>"
+							style="text-decoration: none" target="_blank"
+							href="<?php echo esc_url( substr( $contact->get_email(), strpos( $contact->get_email(), '@' ) + 1 ) ); ?>"><span
+								class="dashicons dashicons-external"></span></a>
                 <a class="trigger-popup" title="<?php esc_attr_e( 'Send email.', 'groundhogg' ); ?>"
                    style="text-decoration: none"
                    target="_blank" href="<?php echo modal_link_url( [
@@ -203,10 +206,10 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 	                'preventSave'        => 'true',
                 ] ) ?>">
                     <span class="dashicons dashicons-email"></span></a></span>
-                    <div class="email-status">
-                        <p><?php echo '<b>' . _x( 'Email Status', 'contact_record', 'groundhogg' ) . ': </b>' . Plugin::$instance->preferences->get_optin_status_text( $contact->get_id() ); ?></p>
+					<div class="email-status">
+						<p><?php echo '<b>' . _x( 'Email Status', 'contact_record', 'groundhogg' ) . ': </b>' . Plugin::$instance->preferences->get_optin_status_text( $contact->get_id() ); ?></p>
 						<?php do_action( 'groundhogg/contact/record/email_status/after', $contact ); ?>
-                    </div>
+					</div>
 
 					<?php
 
@@ -236,7 +239,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 					}
 
 					?>
-                    <span class="status-actions">
+					<span class="status-actions">
                         <?php _e( 'Change status:', 'groundhogg' ); ?>
                         <?php echo implode( ' | ', array_map_with_keys( $status_actions, function ( $text, $status ) use ( $contact ) {
 	                        return html()->e( 'a', [
@@ -253,13 +256,14 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 					do_action( 'groundhogg/contact/record/email/after', $contact );
 
 					?>
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    <label for="primary_phone"><?php echo _x( 'Primary Phone', 'contact_record', 'groundhogg' ) ?></label>
-                </th>
-                <td><?php $args = array(
+				</td>
+			</tr>
+			<tr>
+				<th>
+					<label
+						for="primary_phone"><?php echo _x( 'Primary Phone', 'contact_record', 'groundhogg' ) ?></label>
+				</th>
+				<td><?php $args = array(
 						'type'  => 'tel',
 						'class' => 'input',
 						'id'    => 'primary_phone',
@@ -275,13 +279,13 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'value' => $contact->get_meta( 'primary_phone_extension' ),
 					);
 					echo html()->input( $args ); ?>
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    <label for="mobile_phone"><?php echo _x( 'Mobile Phone', 'contact_record', 'groundhogg' ) ?></label>
-                </th>
-                <td><?php $args = array(
+				</td>
+			</tr>
+			<tr>
+				<th>
+					<label for="mobile_phone"><?php echo _x( 'Mobile Phone', 'contact_record', 'groundhogg' ) ?></label>
+				</th>
+				<td><?php $args = array(
 						'type'  => 'tel',
 						'class' => 'input',
 						'id'    => 'mobile_phone',
@@ -289,17 +293,17 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'value' => $contact->get_meta( 'mobile_phone' ),
 					);
 					echo html()->input( $args ); ?>
-                </td>
-            </tr>
-            <tr>
-                <th><?php _ex( 'Contact Owner', 'contact_record', 'groundhogg' ); ?></th>
-                <td><?php echo html()->dropdown_owners( array( 'selected' => ( $contact->get_ownerdata() ) ? $contact->get_owner_id() : 0 ) ); ?>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-        <h2><?php _e( 'Tags' ); ?></h2>
-        <div style="max-width: 600px;">
+				</td>
+			</tr>
+			<tr>
+				<th><?php _ex( 'Contact Owner', 'contact_record', 'groundhogg' ); ?></th>
+				<td><?php echo html()->dropdown_owners( array( 'selected' => ( $contact->get_ownerdata() ) ? $contact->get_owner_id() : 0 ) ); ?>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+		<h2><?php _e( 'Tags' ); ?></h2>
+		<div style="max-width: 600px;">
 			<?php
 
 			//print_r( $contact->tags );
@@ -312,52 +316,54 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 
 			);
 			echo html()->tag_picker( $args ); ?>
-            <p class="description"><?php _ex( 'Add new tags by hitting <code>Enter</code> or by typing a <code>,</code>.', 'contact_record', 'groundhogg' ); ?></p>
-        </div>
-        <h2><?php _e( 'User Account' ); ?></h2>
-        <table class="form-table">
+			<p class="description"><?php _ex( 'Add new tags by hitting <code>Enter</code> or by typing a <code>,</code>.', 'contact_record', 'groundhogg' ); ?></p>
+		</div>
+		<h2><?php _e( 'User Account' ); ?></h2>
+		<table class="form-table">
 			<?php if ( $contact->get_userdata() ): ?>
 
-                <tr>
-                    <th><label for="username"><?php _e( 'Username' ) ?></label></th>
-                    <td><?php printf( "<a href='%s'>%s</a>", admin_url( 'user-edit.php?user_id=' . $contact->get_user_id() ), $contact->get_userdata()->user_login ); ?>
-                        <span class="row-actions">
+				<tr>
+					<th><label for="username"><?php _e( 'Username' ) ?></label></th>
+					<td><?php printf( "<a href='%s'>%s</a>", admin_url( 'user-edit.php?user_id=' . $contact->get_user_id() ), $contact->get_userdata()->user_login ); ?>
+						<span class="row-actions">
                     <?php submit_button( _x( 'Unlink', 'action', 'groundhogg' ), 'secondary', 'unlink_user', false ); ?>
                 </span>
-                    </td>
-                </tr>
+					</td>
+				</tr>
 			<?php else: ?>
-                <tr>
-                    <th>
-                        <label for="create_account"><?php echo _x( 'Create New Account?', 'contact_record', 'groundhogg' ) ?></label>
-                    </th>
-                    <td>
-                        <button type="button"
-                                class="button button-secondary create-user-account"><?php _e( 'Create User Account' ); ?></button>
-                        <p class="description"><?php _ex( 'This contact does not have an associated user account? Would you like to create one?', 'contact_record', 'groundhogg' ); ?></p>
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        <label for="link_existing"><?php echo _x( 'Link Existing Account?', 'contact_record', 'groundhogg' ) ?></label>
-                    </th>
-                    <td><?php wp_dropdown_users( array(
+				<tr>
+					<th>
+						<label
+							for="create_account"><?php echo _x( 'Create New Account?', 'contact_record', 'groundhogg' ) ?></label>
+					</th>
+					<td>
+						<button type="button"
+						        class="button button-secondary create-user-account"><?php _e( 'Create User Account' ); ?></button>
+						<p class="description"><?php _ex( 'This contact does not have an associated user account? Would you like to create one?', 'contact_record', 'groundhogg' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th>
+						<label
+							for="link_existing"><?php echo _x( 'Link Existing Account?', 'contact_record', 'groundhogg' ) ?></label>
+					</th>
+					<td><?php wp_dropdown_users( array(
 							'show_option_none'  => _x( 'Select a User Account (optional)', 'contact_record', 'groundhogg' ),
 							'option_none_value' => 0
 						) ); ?>
-                        <p class="description"><?php _ex( 'You can link an existing user account to this contact.', 'contact_record', 'groundhogg' ); ?></p>
-                    </td>
-                </tr>
+						<p class="description"><?php _ex( 'You can link an existing user account to this contact.', 'contact_record', 'groundhogg' ); ?></p>
+					</td>
+				</tr>
 			<?php endif; ?>
-        </table>
+		</table>
 		<?php do_action( 'groundhogg/admin/contact/record/user/after', $contact ); ?>
-        <!-- GENERAL CONTACT INFO -->
-        <h2><?php _e( 'Personal Info' ); ?></h2>
-        <table class="form-table">
-            <tbody>
-            <tr>
-                <th><?php echo _x( 'Birthday', 'contact_record', 'groundhogg' ) ?></th>
-                <td><?php
+		<!-- GENERAL CONTACT INFO -->
+		<h2><?php _e( 'Personal Info' ); ?></h2>
+		<table class="form-table">
+			<tbody>
+			<tr>
+				<th><?php echo _x( 'Birthday', 'contact_record', 'groundhogg' ) ?></th>
+				<td><?php
 
 					$years  = array_reverse( range( date( 'Y' ) - 100, date( 'Y' ) ) );
 					$years  = array_combine( $years, $years );
@@ -413,53 +419,55 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 					}
 
 					?></td>
-            </tr>
-            </tbody>
-        </table>
+			</tr>
+			</tbody>
+		</table>
 
 		<?php do_action( 'groundhogg/contact/record/contact_info/after', $contact ); ?>
 
-        <!-- Company info -->
-        <h2><?php _ex( 'Company Info', 'contact_record', 'groundhogg' ); ?></h2>
-        <table class="form-table">
-            <tr>
-                <th><label for="company_name"><?php echo _x( 'Company Name', 'contact_record', 'groundhogg' ) ?></label>
-                </th>
-                <td><?php $args = array(
+		<!-- Company info -->
+		<h2><?php _ex( 'Company Info', 'contact_record', 'groundhogg' ); ?></h2>
+		<table class="form-table">
+			<tr>
+				<th><label for="company_name"><?php echo _x( 'Company Name', 'contact_record', 'groundhogg' ) ?></label>
+				</th>
+				<td><?php $args = array(
 						'id'    => 'company_name',
 						'name'  => 'company_name',
 						'value' => $contact->get_meta( 'company_name' ),
 					);
 					echo html()->input( $args ); ?>
-                </td>
-            </tr>
-            <tr>
-                <th><label for="job_title"><?php echo _x( 'Job Title', 'contact_record', 'groundhogg' ) ?></label></th>
-                <td><?php $args = array(
+				</td>
+			</tr>
+			<tr>
+				<th><label for="job_title"><?php echo _x( 'Job Title', 'contact_record', 'groundhogg' ) ?></label></th>
+				<td><?php $args = array(
 						'id'    => 'job_title',
 						'name'  => 'job_title',
 						'value' => $contact->get_meta( 'job_title' ),
 					);
 					echo html()->input( $args ); ?>
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    <label for="company_address"><?php echo _x( 'Full Company Address', 'contact_record', 'groundhogg' ) ?></label>
-                </th>
-                <td><?php $args = array(
+				</td>
+			</tr>
+			<tr>
+				<th>
+					<label
+						for="company_address"><?php echo _x( 'Full Company Address', 'contact_record', 'groundhogg' ) ?></label>
+				</th>
+				<td><?php $args = array(
 						'id'    => 'company_address',
 						'name'  => 'company_address',
 						'value' => $contact->get_meta( 'company_address' ),
 					);
 					echo html()->input( $args ); ?>
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    <label for="company_phone"><?php echo _x( 'Company Phone', 'contact_record', 'groundhogg' ) ?></label>
-                </th>
-                <td><?php $args = array(
+				</td>
+			</tr>
+			<tr>
+				<th>
+					<label
+						for="company_phone"><?php echo _x( 'Company Phone', 'contact_record', 'groundhogg' ) ?></label>
+				</th>
+				<td><?php $args = array(
 						'type'  => 'tel',
 						'class' => 'input',
 						'id'    => 'company_phone',
@@ -475,77 +483,80 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'value' => $contact->get_meta( 'company_phone_extension' ),
 					);
 					echo html()->input( $args ); ?>
-                </td>
-            </tr>
-        </table>
+				</td>
+			</tr>
+		</table>
 
 		<?php do_action( 'groundhogg/contact/record/company_info/after', $contact ); ?>
 
-        <!-- ADDRESS -->
-        <h2><?php _ex( 'Location', 'contact_record', 'groundhogg' ); ?></h2>
-        <table class="form-table">
-            <tbody>
-            <tr>
-                <th>
-                    <label for="street_address_1"><?php echo _x( 'Street Address 1', 'contact_record', 'groundhogg' ) ?></label>
-                </th>
-                <td><?php $args = array(
+		<!-- ADDRESS -->
+		<h2><?php _ex( 'Location', 'contact_record', 'groundhogg' ); ?></h2>
+		<table class="form-table">
+			<tbody>
+			<tr>
+				<th>
+					<label
+						for="street_address_1"><?php echo _x( 'Street Address 1', 'contact_record', 'groundhogg' ) ?></label>
+				</th>
+				<td><?php $args = array(
 						'id'    => 'street_address_1',
 						'name'  => 'street_address_1',
 						'value' => $contact->get_meta( 'street_address_1' ),
 					);
 					echo html()->input( $args ); ?>
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    <label for="street_address_2"><?php echo _x( 'Street Address 2', 'contact_record', 'groundhogg' ) ?></label>
-                </th>
-                <td><?php $args = array(
+				</td>
+			</tr>
+			<tr>
+				<th>
+					<label
+						for="street_address_2"><?php echo _x( 'Street Address 2', 'contact_record', 'groundhogg' ) ?></label>
+				</th>
+				<td><?php $args = array(
 						'id'    => 'street_address_2',
 						'name'  => 'street_address_2',
 						'value' => $contact->get_meta( 'street_address_2' ),
 					);
 					echo html()->input( $args ); ?>
-                </td>
-            </tr>
-            <tr>
-                <th><label for="city"><?php echo _x( 'City', 'contact_record', 'groundhogg' ) ?></label></th>
-                <td><?php $args = array(
+				</td>
+			</tr>
+			<tr>
+				<th><label for="city"><?php echo _x( 'City', 'contact_record', 'groundhogg' ) ?></label></th>
+				<td><?php $args = array(
 						'id'    => 'city',
 						'name'  => 'city',
 						'value' => $contact->get_meta( 'city' ),
 					);
 					echo html()->input( $args ); ?>
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    <label for="postal_zip"><?php echo _x( 'Postal/Zip Code', 'contact_record', 'groundhogg' ) ?></label>
-                </th>
-                <td><?php $args = array(
+				</td>
+			</tr>
+			<tr>
+				<th>
+					<label
+						for="postal_zip"><?php echo _x( 'Postal/Zip Code', 'contact_record', 'groundhogg' ) ?></label>
+				</th>
+				<td><?php $args = array(
 						'id'    => 'postal_zip',
 						'name'  => 'postal_zip',
 						'value' => $contact->get_meta( 'postal_zip' ),
 					);
 					echo html()->input( $args ); ?>
-                </td>
-            </tr>
-            <tr>
-                <th><label for="region"><?php echo _x( 'State/Province', 'contact_record', 'groundhogg' ) ?></label>
-                </th>
-                <td><?php $args = array(
+				</td>
+			</tr>
+			<tr>
+				<th><label for="region"><?php echo _x( 'State/Province', 'contact_record', 'groundhogg' ) ?></label>
+				</th>
+				<td><?php $args = array(
 						'id'    => 'region',
 						'name'  => 'region',
 						'value' => $contact->get_meta( 'region' ),
 					);
 					echo html()->input( $args ); ?>
-                </td>
-            </tr>
-            <tr>
-                <th><label for="country"><?php echo _x( 'Country', 'contact_record', 'groundhogg' ) ?></label></th>
-                <td>
-                    <div style="max-width: 338px">
+				</td>
+			</tr>
+			<tr>
+				<th><label for="country"><?php echo _x( 'Country', 'contact_record', 'groundhogg' ) ?></label></th>
+				<td>
+					<div style="max-width: 338px">
 						<?php $args = array(
 							'id'          => 'country',
 							'name'        => 'country',
@@ -554,30 +565,30 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 							'placeholder' => _x( 'Select a Country', 'contact_record', 'groundhogg' ),
 						);
 						echo html()->select2( $args ); ?>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <th><label for="ip_address"><?php echo _x( 'IP Address', 'contact_record', 'groundhogg' ) ?></label>
-                </th>
-                <td><?php $args = array(
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th><label for="ip_address"><?php echo _x( 'IP Address', 'contact_record', 'groundhogg' ) ?></label>
+				</th>
+				<td><?php $args = array(
 						'id'    => 'ip_address',
 						'name'  => 'ip_address',
 						'value' => $contact->get_meta( 'ip_address' ),
 					);
 					echo html()->input( $args ); ?>
 					<?php if ( $contact->get_ip_address() && $contact->get_ip_address() !== '::1' ): ?>
-                        <span class="button-actions">
+						<span class="button-actions">
                     <?php submit_button( _x( 'Extrapolate Location', 'action', 'groundhogg' ), 'secondary', 'extrapolate_location', false ); ?>
                 </span>
 						<?php ?>
 					<?php endif; ?>
-                </td>
-            </tr>
-            <tr>
-                <th><label for="time_zone"><?php echo _x( 'Time Zone', 'contact_record', 'groundhogg' ) ?></label></th>
-                <td>
-                    <div style="max-width: 338px">
+				</td>
+			</tr>
+			<tr>
+				<th><label for="time_zone"><?php echo _x( 'Time Zone', 'contact_record', 'groundhogg' ) ?></label></th>
+				<td>
+					<div style="max-width: 338px">
 						<?php $args = array(
 							'id'       => 'time_zone',
 							'name'     => 'time_zone',
@@ -585,31 +596,31 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 							'selected' => $contact->get_meta( 'time_zone' ),
 						);
 						echo html()->select2( $args ); ?></div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+				</td>
+			</tr>
+			</tbody>
+		</table>
 		<?php contact_record_section_source( $contact ); ?>
-        <!-- MARKETING COMPLIANCE INFORMATION -->
-        <h2><?php _ex( 'Compliance', 'contact_record', 'groundhogg' ); ?></h2>
-        <table class="form-table">
-            <tbody>
-            <tr>
-                <th><?php _ex( 'Agreed To Terms', 'contact_record', 'groundhogg' ); ?></th>
-                <td><?php echo ( $contact->get_meta( 'terms_agreement' ) === 'yes' ) ? sprintf( "%s: %s", __( 'Agreed' ), $contact->get_meta( 'terms_agreement_date' ) ) : '&#x2014;'; ?></td>
-            </tr>
+		<!-- MARKETING COMPLIANCE INFORMATION -->
+		<h2><?php _ex( 'Compliance', 'contact_record', 'groundhogg' ); ?></h2>
+		<table class="form-table">
+			<tbody>
+			<tr>
+				<th><?php _ex( 'Agreed To Terms', 'contact_record', 'groundhogg' ); ?></th>
+				<td><?php echo ( $contact->get_meta( 'terms_agreement' ) === 'yes' ) ? sprintf( "%s: %s", __( 'Agreed' ), $contact->get_meta( 'terms_agreement_date' ) ) : '&#x2014;'; ?></td>
+			</tr>
 			<?php if ( Plugin::$instance->preferences->is_gdpr_enabled() ): ?>
-                <tr>
-                    <th><?php _e( 'Data Processing Consent' ); ?></th>
-                    <td><?php echo ( $contact->get_meta( 'gdpr_consent' ) === 'yes' ) ? sprintf( "%s: %s", __( 'Agreed' ), $contact->get_meta( 'gdpr_consent_date' ) ) : '&#x2014;'; ?></td>
-                </tr>
-                <tr>
-                    <th><?php _e( 'Marketing Consent' ); ?></th>
-                    <td><?php echo ( $contact->get_meta( 'marketing_consent' ) === 'yes' ) ? sprintf( "%s: %s", __( 'Agreed' ), $contact->get_meta( 'marketing_consent_date' ) ) : '&#x2014;'; ?></td>
-                </tr>
+				<tr>
+					<th><?php _e( 'Data Processing Consent' ); ?></th>
+					<td><?php echo ( $contact->get_meta( 'gdpr_consent' ) === 'yes' ) ? sprintf( "%s: %s", __( 'Agreed' ), $contact->get_meta( 'gdpr_consent_date' ) ) : '&#x2014;'; ?></td>
+				</tr>
+				<tr>
+					<th><?php _e( 'Marketing Consent' ); ?></th>
+					<td><?php echo ( $contact->get_meta( 'marketing_consent' ) === 'yes' ) ? sprintf( "%s: %s", __( 'Agreed' ), $contact->get_meta( 'marketing_consent_date' ) ) : '&#x2014;'; ?></td>
+				</tr>
 			<?php endif; ?>
-            </tbody>
-        </table>
+			</tbody>
+		</table>
 
 		<?php
 	}
@@ -622,46 +633,46 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 	function contact_record_section_source( $contact ) {
 		?>
 
-        <!-- SEGMENTATION AND LEADSOURCE -->
-        <h2><?php _ex( 'Source', 'contact_record', 'groundhogg' ); ?></h2>
-        <table class="form-table">
-            <tbody>
-            <tr>
-                <th><?php _ex( 'Source Page', 'contact_record', 'groundhogg' ); ?></th>
-                <td><?php $args = array(
+		<!-- SEGMENTATION AND LEADSOURCE -->
+		<h2><?php _ex( 'Source', 'contact_record', 'groundhogg' ); ?></h2>
+		<table class="form-table">
+			<tbody>
+			<tr>
+				<th><?php _ex( 'Source Page', 'contact_record', 'groundhogg' ); ?></th>
+				<td><?php $args = array(
 						'id'    => 'source_page',
 						'name'  => 'source_page',
 						'value' => $contact->get_meta( 'source_page' ),
 					);
 					echo html()->input( $args ); ?>
-                    <span class="row-actions">
+					<span class="row-actions">
                     <a style="text-decoration: none" target="_blank"
                        href="<?php echo esc_url( $contact->get_meta( 'source_page' ) ); ?>"><span
-                                class="dashicons dashicons-external"></span></a>
+		                    class="dashicons dashicons-external"></span></a>
                 </span>
-                    <p class="description">
+					<p class="description">
 						<?php _e( "This is the page which the contact first submitted a form.", 'groundhogg' ); ?>
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <th><?php _ex( 'Lead Source', 'contact_record', 'groundhogg' ); ?></th>
-                <td><?php $args = array(
+					</p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php _ex( 'Lead Source', 'contact_record', 'groundhogg' ); ?></th>
+				<td><?php $args = array(
 						'id'    => 'lead_source',
 						'name'  => 'lead_source',
 						'value' => $contact->get_meta( 'lead_source' ),
 					);
 					echo html()->input( $args ); ?>
-                    <span class="row-actions">
+					<span class="row-actions">
                     <a style="text-decoration: none" target="_blank"
                        href="<?php echo esc_url( $contact->get_meta( 'lead_source' ) ); ?>"><span
-                                class="dashicons dashicons-external"></span></a>
+		                    class="dashicons dashicons-external"></span></a>
                 </span>
-                    <p class="description"><?php _e( "This is where the contact originated from.", 'groundhogg' ); ?></p>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+					<p class="description"><?php _e( "This is where the contact originated from.", 'groundhogg' ); ?></p>
+				</td>
+			</tr>
+			</tbody>
+		</table>
 		<?php
 	}
 
@@ -672,12 +683,12 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 	 */
 	function contact_record_section_notes( $contact ) {
 		?>
-        <!-- NOTES -->
-        <h2><?php _e( 'Notes' ); ?></h2>
-        <table class="form-table">
-            <tr>
-                <th><?php _ex( 'Add Note', 'contact_record', 'groundhogg' ); ?></th>
-                <td><?php $args = array(
+		<!-- NOTES -->
+		<h2><?php _e( 'Notes' ); ?></h2>
+		<table class="form-table">
+			<tr>
+				<th><?php _ex( 'Add Note', 'contact_record', 'groundhogg' ); ?></th>
+				<td><?php $args = array(
 						'id'         => 'add-new-note',
 						'name'       => 'add_new_note',
 						'value'      => '',
@@ -696,10 +707,10 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 					] ), 'p' );
 
 					?>
-                </td>
-            </tr>
-        </table>
-        <div id="gh-notes"><?php
+				</td>
+			</tr>
+		</table>
+		<div id="gh-notes"><?php
 
 		$notes = $contact->get_all_notes();
 
@@ -712,10 +723,10 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 		// Legacy notes...
 		if ( $contact->get_meta( 'notes' ) ) {
 			?>
-            <table>
-                <tbody>
-                <tr>
-                    <td>
+			<table>
+				<tbody>
+				<tr>
+					<td>
 						<?php $args = array(
 							'id'       => 'notes',
 							'name'     => 'notes',
@@ -725,10 +736,10 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 							'style'    => [ 'width' => '820px' ]
 						);
 						echo html()->textarea( $args ); ?>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+					</td>
+				</tr>
+				</tbody>
+			</table>
 			<?php
 		}
 	}
@@ -740,35 +751,35 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 	 */
 	function contact_record_section_actions( $contact ) {
 		?>
-        <!-- ACTIONS -->
-        <h2><?php _e( 'Actions' ); ?></h2>
-        <table class="form-table">
-            <tr>
-                <th><?php _ex( 'Send Email', 'contact_record', 'groundhogg' ); ?></th>
-                <td>
-                    <div style="max-width: 400px">
+		<!-- ACTIONS -->
+		<h2><?php _e( 'Actions' ); ?></h2>
+		<table class="form-table">
+			<tr>
+				<th><?php _ex( 'Send Email', 'contact_record', 'groundhogg' ); ?></th>
+				<td>
+					<div style="max-width: 400px">
 						<?php echo html()->dropdown_emails( array() ); ?>
-                        <div class="button-actions">
-                            <button type="submit" name="send_email" value="send"
-                                    class="button"><?php _e( 'Send' ); ?></button>
-                        </div>
-                    </div>
-                </td>
-            </tr>
+						<div class="button-actions">
+							<button type="submit" name="send_email" value="send"
+							        class="button"><?php _e( 'Send' ); ?></button>
+						</div>
+					</div>
+				</td>
+			</tr>
 
-            <tr>
-                <th><?php _ex( 'Add To Funnel', 'contact_record', 'groundhogg' ); ?></th>
-                <td>
-                    <div style="max-width: 400px">
+			<tr>
+				<th><?php _ex( 'Add To Funnel', 'contact_record', 'groundhogg' ); ?></th>
+				<td>
+					<div style="max-width: 400px">
 						<?php
 
-						$steps   = get_db( 'steps' )->query( [
+						$steps = get_db( 'steps' )->query( [
 							'orderby' => 'step_order',
 							'order'   => 'asc'
 						] );
-						
+
 						$options = array();
-						
+
 						foreach ( $steps as $step ) {
 							$step = new Step( $step->ID );
 							if ( $step && $step->is_active() ) {
@@ -786,17 +797,17 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						] );
 
 						?>
-                        <div class="button-actions">
-                            <button type="submit" name="start_funnel" value="start"
-                                    class="button"><?php _e( 'Start' ); ?></button>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <th><?php _ex( 'Internal Form', 'contact_record', 'groundhogg' ); ?></th>
-                <td>
-                    <div style="max-width: 400px;">
+						<div class="button-actions">
+							<button type="submit" name="start_funnel" value="start"
+							        class="button"><?php _e( 'Start' ); ?></button>
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th><?php _ex( 'Internal Form', 'contact_record', 'groundhogg' ); ?></th>
+				<td>
+					<div style="max-width: 400px;">
 
 						<?php
 
@@ -815,14 +826,14 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						] );
 
 						?>
-                        <div class="button-actions">
-                            <button type="submit" name="switch_form" value="switch_form"
-                                    class="button"><?php _e( 'Submit Form', 'groundhogg' ); ?></button>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        </table>
+						<div class="button-actions">
+							<button type="submit" name="switch_form" value="switch_form"
+							        class="button"><?php _e( 'Submit Form', 'groundhogg' ); ?></button>
+						</div>
+					</div>
+				</td>
+			</tr>
+		</table>
 		<?php
 	}
 
@@ -833,10 +844,10 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 	 */
 	function contact_record_section_files( $contact ) {
 		?>
-        <!-- BEGIN FILES -->
-        <h2><?php _ex( 'Files', 'contact_record', 'groundhogg' ); ?></h2>
-        <div style="max-width: 800px;">
-            <style>
+		<!-- BEGIN FILES -->
+		<h2><?php _ex( 'Files', 'contact_record', 'groundhogg' ); ?></h2>
+		<div style="max-width: 800px;">
+			<style>
                 .wp-admin .gh-file-uploader {
                     width: 100%;
                     margin: auto;
@@ -847,7 +858,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                     text-align: center;
                     margin-top: 10px;
                 }
-            </style>
+			</style>
 
 			<?php
 
@@ -886,11 +897,11 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 				_x( 'Actions', 'contact_record', 'groundhogg' ),
 			], $rows );
 			?>
-            <div>
-                <input class="gh-file-uploader" type="file" name="files[]" multiple>
-            </div>
-        </div>
-        <!-- END FILES -->
+			<div>
+				<input class="gh-file-uploader" type="file" name="files[]" multiple>
+			</div>
+		</div>
+		<!-- END FILES -->
 		<?php
 	}
 
@@ -901,20 +912,20 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 	 */
 	function contact_record_section_custom_meta( $contact ) {
 		?>
-        <!-- META -->
-        <h2><?php _ex( 'Custom Meta', 'contact_record', 'groundhogg' ); ?></h2>
-        <table id='meta-table' class="form-table">
-            <tbody>
-            <tr>
-                <th>
-                    <button type="button"
-                            class="button-secondary addmeta"><?php _ex( 'Add Meta', 'contact_record', 'groundhogg' ); ?></button>
-                    <div class="hidden">
-                        <span class="metakeyplaceholder"><?php esc_attr_e( 'Key' ); ?></span>
-                        <span class="metavalueplaceholder"><?php esc_attr_e( 'Value' ); ?></span>
-                    </div>
-                </th>
-            </tr>
+		<!-- META -->
+		<h2><?php _ex( 'Custom Meta', 'contact_record', 'groundhogg' ); ?></h2>
+		<table id='meta-table' class="form-table">
+			<tbody>
+			<tr>
+				<th>
+					<button type="button"
+					        class="button-secondary addmeta"><?php _ex( 'Add Meta', 'contact_record', 'groundhogg' ); ?></button>
+					<div class="hidden">
+						<span class="metakeyplaceholder"><?php esc_attr_e( 'Key' ); ?></span>
+						<span class="metavalueplaceholder"><?php esc_attr_e( 'Value' ); ?></span>
+					</div>
+				</th>
+			</tr>
 			<?php
 
 			//this meta data will not be shown in the meta data section.
@@ -927,17 +938,17 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 				// Exclude serialized values...
 				if ( ! in_array( $meta_key, $meta_exclude_list ) ): ?>
 
-                    <tr id="meta-<?php esc_attr_e( $meta_key ) ?>">
-                        <th>
+					<tr id="meta-<?php esc_attr_e( $meta_key ) ?>">
+						<th>
 							<?php esc_html_e( $meta_key ); ?>
-                            <p>
-                                <code class="meta-replacement-code"
-                                      title="<?php esc_attr_e( 'Replacement code', 'groundhogg' ); ?>">
-                                    {_<?php esc_html_e( $meta_key ); ?>}
-                                </code>
-                            </p>
-                        </th>
-                        <td>
+							<p>
+								<code class="meta-replacement-code"
+								      title="<?php esc_attr_e( 'Replacement code', 'groundhogg' ); ?>">
+									{_<?php esc_html_e( $meta_key ); ?>}
+								</code>
+							</p>
+						</th>
+						<td>
 							<?php
 
 							if ( is_serialized( $value ) || is_array( $value ) || is_object( $value ) ) {
@@ -965,19 +976,19 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 								echo html()->input( $args );
 							}
 							?>
-                            <span class="row-actions"><span class="delete">
+							<span class="row-actions"><span class="delete">
                                     <a style="text-decoration: none"
                                        href="javascript:void(0)"
                                        class="deletemeta">
                                         <span class="dashicons dashicons-trash"></span>
                                     </a>
                                 </span></span>
-                        </td>
-                    </tr>
+						</td>
+					</tr>
 				<?php endif;
 			endforeach; ?>
-            </tbody>
-        </table>
+			</tbody>
+		</table>
 
 		<?php
 	}
@@ -990,35 +1001,35 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 	 */
 	function contact_record_section_activity( $contact ) {
 		?>
-        <!-- UPCOMING EVENTS -->
-        <div style="max-width: 800px">
-            <h2><?php _ex( 'Upcoming Events', 'contact_record', 'groundhogg' ); ?></h2>
-            <p class="description"><?php _ex( 'Any upcoming funnel steps will show up here. you can choose to cancel them or to run them immediately.', 'contact_record', 'groundhogg' ); ?></p>
+		<!-- UPCOMING EVENTS -->
+		<div style="max-width: 800px">
+			<h2><?php _ex( 'Upcoming Events', 'contact_record', 'groundhogg' ); ?></h2>
+			<p class="description"><?php _ex( 'Any upcoming funnel steps will show up here. you can choose to cancel them or to run them immediately.', 'contact_record', 'groundhogg' ); ?></p>
 			<?php
 
 			$table = new Tables\Contact_Events_Table( 'waiting' );
 			$table->prepare_items();
 			$table->display(); ?>
-            <!-- FUNNNEL HISTORY -->
-            <h2><?php _ex( 'Recent Funnel History', 'contact_record', 'groundhogg' ); ?></h2>
-            <p class="description"><?php _ex( 'Any previous funnel steps will show up here. You can choose run them again.<br/>This report only shows the 10 most recent events, to see more you can see all this contact\'s history in the event queue.', 'contact_record', 'groundhogg' ); ?></p>
+			<!-- FUNNNEL HISTORY -->
+			<h2><?php _ex( 'Recent Funnel History', 'contact_record', 'groundhogg' ); ?></h2>
+			<p class="description"><?php _ex( 'Any previous funnel steps will show up here. You can choose run them again.<br/>This report only shows the 10 most recent events, to see more you can see all this contact\'s history in the event queue.', 'contact_record', 'groundhogg' ); ?></p>
 			<?php
 			$table = new Tables\Contact_Events_Table( 'complete' );
 			$table->prepare_items();
 			$table->display(); ?>
-        </div>
-        <!-- EMAIL HISTORY -->
-        <h2><?php _ex( 'Recent Email History', 'contact_record', 'groundhogg' ); ?></h2>
-        <div style="max-width: 800px">
-            <p class="description"><?php _ex( 'This is where you can check if this contact is interacting with your emails.', 'contact_record', 'groundhogg' ); ?></p>
+		</div>
+		<!-- EMAIL HISTORY -->
+		<h2><?php _ex( 'Recent Email History', 'contact_record', 'groundhogg' ); ?></h2>
+		<div style="max-width: 800px">
+			<p class="description"><?php _ex( 'This is where you can check if this contact is interacting with your emails.', 'contact_record', 'groundhogg' ); ?></p>
 			<?php $table = new Tables\Contact_Activity_Table();
 			$table->prepare_items();
 			$table->display(); ?>
-        </div>
-        <!-- Form Submissions -->
-        <h2><?php _ex( 'Form Submissions', 'contact_record', 'groundhogg' ); ?></h2>
-        <div style="max-width: 800px">
-            <p class="description"><?php _ex( 'Any previous form submissions from this contact will show below as of version 2.0.', 'contact_record', 'groundhogg' ); ?></p>
+		</div>
+		<!-- Form Submissions -->
+		<h2><?php _ex( 'Form Submissions', 'contact_record', 'groundhogg' ); ?></h2>
+		<div style="max-width: 800px">
+			<p class="description"><?php _ex( 'Any previous form submissions from this contact will show below as of version 2.0.', 'contact_record', 'groundhogg' ); ?></p>
 			<?php
 
 			$submission_ids = wp_parse_id_list( wp_list_pluck( get_db( 'submissions' )->query( [ 'contact_id' => $contact->get_id() ] ), 'ID' ) );
@@ -1062,14 +1073,14 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 			);
 
 			?>
-        </div>
+		</div>
 		<?php
 	}
 
 	foreach ( $tabs as $tab => $tab_name ):
 
 		?>
-    <div class="tab-content-wrapper <?php if ( $tab !== $active_tab ) {
+	<div class="tab-content-wrapper <?php if ( $tab !== $active_tab ) {
 		echo 'hidden';
 	}; ?>" id="<?php echo 'tab_' . esc_attr( $tab ) . '_content'; ?>">
 		<?php
@@ -1080,19 +1091,19 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 		 * @param $tab     string if of the current tab
 		 */
 		do_action( "groundhogg/admin/contact/record/tab/{$tab}", $contact, $tab ); ?>
-        </div><?php
+		</div><?php
 
 	endforeach;
 
 	?>
-    <!-- THE END -->
-    <div class="edit-contact-actions">
-        <p class="submit">
+	<!-- THE END -->
+	<div class="edit-contact-actions">
+		<p class="submit">
 			<?php \submit_button( _x( 'Update Contact', 'action', 'groundhogg' ), 'primary', 'update', false ); ?>
-            <span id="delete-link"><a class="delete"
-                                      href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_contacts&action=delete&contact=' . $contact->get_id() ), 'delete' ) ?>"><?php _e( 'Delete' ); ?></a></span>
-        </p>
-    </div>
+			<span id="delete-link"><a class="delete"
+			                          href="<?php echo wp_nonce_url( admin_url( 'admin.php?page=gh_contacts&action=delete&contact=' . $contact->get_id() ), 'delete' ) ?>"><?php _e( 'Delete' ); ?></a></span>
+		</p>
+	</div>
 
 	<?php echo html()->input( array(
 		'type' => 'hidden',
@@ -1102,17 +1113,17 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 
 </form>
 <?php if ( ! $contact->get_userdata() ): ?>
-    <form id="create-user-form" action="<?php echo admin_url( 'user-new.php' ); ?>" method="post">
-        <input type="hidden" name="createuser" value="1">
-        <input type="hidden" name="first_name" value="<?php esc_attr_e( $contact->get_first_name() ); ?>">
-        <input type="hidden" name="last_name" value="<?php esc_attr_e( $contact->get_last_name() ); ?>">
-        <input type="hidden" name="email" value="<?php esc_attr_e( $contact->get_email() ); ?>">
-        <input type="hidden" name="user_login" value="<?php esc_attr_e( $contact->get_email() ); ?>">
-    </form>
-    <div id="manual-submission-container" class="hidden">
-        <!-- Form Content -->
-        hi
-    </div>
+	<form id="create-user-form" action="<?php echo admin_url( 'user-new.php' ); ?>" method="post">
+		<input type="hidden" name="createuser" value="1">
+		<input type="hidden" name="first_name" value="<?php esc_attr_e( $contact->get_first_name() ); ?>">
+		<input type="hidden" name="last_name" value="<?php esc_attr_e( $contact->get_last_name() ); ?>">
+		<input type="hidden" name="email" value="<?php esc_attr_e( $contact->get_email() ); ?>">
+		<input type="hidden" name="user_login" value="<?php esc_attr_e( $contact->get_email() ); ?>">
+	</form>
+	<div id="manual-submission-container" class="hidden">
+		<!-- Form Content -->
+		hi
+	</div>
 <?php endif;
 
 do_action( 'groundhogg/contact/record/after', $contact );

@@ -24,12 +24,12 @@ class Email_Open_Rate extends Base_Quick_Stat_Percent {
 
 		$query = [
 			'activity_type' => Activity::EMAIL_OPENED,
-			'before' => $end,
-			'after' => $start
+			'before'        => $end,
+			'after'         => $start
 		];
 
-		if ( $this->get_email_id() ){
-			$query[ 'email_id' ] = $this->get_email_id();
+		if ( $this->get_email_id() ) {
+			$query['email_id'] = $this->get_email_id();
 		}
 
 		return $db->count( $query );

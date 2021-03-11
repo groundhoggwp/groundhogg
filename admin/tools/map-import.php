@@ -51,15 +51,15 @@ $sample_item = $items[ $selected ];
 		'name'  => 'import',
 		'value' => $file_name
 	] ); ?>
-    <h2><?php _e( 'Map Contact Fields', 'groundhogg' ); ?></h2>
-    <p class="description"><?php _e( 'Map your CSV columns to the contact records fields below.', 'groundhogg' ); ?></p>
-    <style>
+	<h2><?php _e( 'Map Contact Fields', 'groundhogg' ); ?></h2>
+	<p class="description"><?php _e( 'Map your CSV columns to the contact records fields below.', 'groundhogg' ); ?></p>
+	<style>
         select {
             vertical-align: top !important;
         }
-    </style>
-    <div class="import-table tablenav top">
-        <div class="actions bulkactions alignleft">
+	</style>
+	<div class="import-table tablenav top">
+		<div class="actions bulkactions alignleft">
 			<?php
 
 			$base_admin_url = add_query_arg( [
@@ -85,11 +85,12 @@ $sample_item = $items[ $selected ];
 			}
 
 			?>
-        </div>
-        <div class="tablenav-pages one-page">
-            <span class="displaying-num"><?php printf( _n( "%s contact", "%s contacts", $total_items, 'groundhogg' ), $total_items ); ?></span>
-        </div>
-    </div>
+		</div>
+		<div class="tablenav-pages one-page">
+			<span
+				class="displaying-num"><?php printf( _n( "%s contact", "%s contacts", $total_items, 'groundhogg' ), $total_items ); ?></span>
+		</div>
+	</div>
 	<?php
 
 	html()->list_table( [
@@ -118,17 +119,17 @@ $sample_item = $items[ $selected ];
 	}, array_keys( $sample_item ) ) );
 
 	?>
-    <table class="form-table">
-        <tbody>
-        <tr>
-            <th><?php _e( 'Add additional tags to this import', 'groundhogg' ) ?></th>
-            <td>
-                <div style="max-width: 500px"><?php echo html()->tag_picker( [] ); ?></div>
-            </td>
-        </tr>
-        <tr>
-            <th><?php _e( 'These contacts have previously confirmed their email address.', 'groundhogg' ) ?></th>
-            <td><?php echo html()->checkbox( [
+	<table class="form-table">
+		<tbody>
+		<tr>
+			<th><?php _e( 'Add additional tags to this import', 'groundhogg' ) ?></th>
+			<td>
+				<div style="max-width: 500px"><?php echo html()->tag_picker( [] ); ?></div>
+			</td>
+		</tr>
+		<tr>
+			<th><?php _e( 'These contacts have previously confirmed their email address.', 'groundhogg' ) ?></th>
+			<td><?php echo html()->checkbox( [
 					'label'   => __( 'Yes, these contacts have confirmed their email address.', 'groundhogg' ),
 					'name'    => 'email_is_confirmed',
 					'id'      => 'email_is_confirmed',
@@ -138,14 +139,14 @@ $sample_item = $items[ $selected ];
 					'title'   => 'I have confirmed.',
 				] );
 
-	            echo html()->description( __( "If you are importing the <b>optin status</b> per contact in your CSV leave this unchecked.", 'groundhogg' ) )
+				echo html()->description( __( "If you are importing the <b>optin status</b> per contact in your CSV leave this unchecked.", 'groundhogg' ) )
 
-	            ?></td>
-        </tr>
+				?></td>
+		</tr>
 		<?php if ( Plugin::$instance->preferences->is_gdpr_enabled() ): ?>
-            <tr>
-                <th><?php _e( 'These contacts have previously given data processing consent.', 'groundhogg' ) ?></th>
-                <td><?php echo html()->checkbox( [
+			<tr>
+				<th><?php _e( 'These contacts have previously given data processing consent.', 'groundhogg' ) ?></th>
+				<td><?php echo html()->checkbox( [
 						'label'   => __( 'Yes, these contacts have previously given consent.', 'groundhogg' ),
 						'name'    => 'data_processing_consent_given',
 						'id'      => 'data_processing_consent_given',
@@ -158,10 +159,10 @@ $sample_item = $items[ $selected ];
 					echo html()->description( __( "If you are importing <b>data processing consent</b> per contact in your CSV leave this unchecked.", 'groundhogg' ) )
 
 					?></td>
-            </tr>
-            <tr>
-                <th><?php _e( 'These contacts have previously given marketing consent.', 'groundhogg' ) ?></th>
-                <td><?php echo html()->checkbox( [
+			</tr>
+			<tr>
+				<th><?php _e( 'These contacts have previously given marketing consent.', 'groundhogg' ) ?></th>
+				<td><?php echo html()->checkbox( [
 						'label'   => __( 'Yes, these contacts have previously given consent.', 'groundhogg' ),
 						'name'    => 'marketing_consent_given',
 						'id'      => 'marketing_consent_given',
@@ -174,9 +175,9 @@ $sample_item = $items[ $selected ];
 					echo html()->description( __( "If you are importing <b>marketing consent</b> per contact in your CSV leave this unchecked.", 'groundhogg' ) )
 
 					?></td>
-            </tr>
+			</tr>
 		<?php endif; ?>
-        </tbody>
-    </table>
+		</tbody>
+	</table>
 	<?php submit_button( __( 'Import Contacts', 'groundhogg' ) ) ?>
 </form>

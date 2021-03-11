@@ -1,4 +1,5 @@
 <?php
+
 namespace Groundhogg\Admin\Dashboard;
 
 use Groundhogg\Admin\Dashboard\Widgets\Country_Widget;
@@ -26,129 +27,123 @@ use Groundhogg\Reporting\Reports\Last_Broadcast;
  * Date: 2019-01-03
  * Time: 1:54 PM
  */
+class Dashboard_Widgets {
 
-class Dashboard_Widgets
-{
+	/**
+	 * @var Dashboard_Widget[] an array of all the available widgets
+	 */
+	public $widgets = array();
 
-    /**
-     * @var Dashboard_Widget[] an array of all the available widgets
-     */
-    public $widgets = array();
+	/**
+	 * WPGH_Dashboard_Widgets constructor.
+	 */
+	public function __construct() {
+		add_action( 'admin_init', array( $this, 'setup_widgets' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
+		add_action( 'wp_dashboard_setup', array( $this, 'setup_dashboard_widgets' ) );
+	}
 
-    /**
-     * WPGH_Dashboard_Widgets constructor.
-     */
-    public function __construct()
-    {
-        add_action( 'admin_init', array( $this, 'setup_widgets' ) );
-        add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
-        add_action( 'wp_dashboard_setup', array( $this, 'setup_dashboard_widgets' ) );
-    }
+	/**
+	 * Allow for use of dashboard widgets on other pages
+	 */
+	public function setup_dashboard_widgets() {
+		do_action( 'groundhogg/reporting/load' );
+	}
 
-    /**
-     * Allow for use of dashboard widgets on other pages
-     */
-    public function setup_dashboard_widgets()
-    {
-       do_action( 'groundhogg/reporting/load' );
-    }
+	public function __set( $key, $val ) {
+		$this->widgets[ $key ] = $val;
+	}
 
-    public function __set( $key, $val ){
-        $this->widgets[ $key ] = $val;
-    }
+	public function __get( $key ) {
+		return get_array_var( $this->widgets, $key );
+	}
 
-    public function __get( $key )
-    {
-        return get_array_var( $this->widgets, $key );
-    }
+	public function setup_widgets() {
 
-    public function setup_widgets()
-    {
+		if ( ! current_user_can( 'view_reports' ) ) {
+			return;
+		}
 
-        if ( ! current_user_can( 'view_reports' ) ){
-            return;
-        }
+		$widgets = [
+			new Time_Range_Picker(),
+			new Country_Widget(),
+			new Region_Widget(),
+			new Optin_Status_Widget(),
+			new Last_Broadcast_Widget(),
+			new Email_Activity(),
+			new New_Contacts(),
+			new Form_Activity(),
+			new Funnel_Breakdown(),
+			new Search_Engines(),
+			new Lead_Sources(),
+			new Social_Platforms(),
+			new Source_Pages(),
+			new UTM_Campaigns(),
+		];
 
-        $widgets = [
-            new Time_Range_Picker(),
-            new Country_Widget(),
-            new Region_Widget(),
-            new Optin_Status_Widget(),
-            new Last_Broadcast_Widget(),
-            new Email_Activity(),
-            new New_Contacts(),
-            new Form_Activity(),
-            new Funnel_Breakdown(),
-            new Search_Engines(),
-            new Lead_Sources(),
-            new Social_Platforms(),
-            new Source_Pages(),
-            new UTM_Campaigns(),
-        ];
+		/**
+		 * @param $widget Dashboard_Widget
+		 *
+		 */
+		foreach ( $widgets as $widget ) {
+			$this->add_widget( $widget );
+		}
 
-        /**
-         * @param $widget Dashboard_Widget
-         *
-         */
-        foreach ( $widgets as $widget ){
-            $this->add_widget( $widget );
-        }
+		do_action( 'groundhogg/dashboard/widgets/init', $this );
+	}
 
-        do_action( 'groundhogg/dashboard/widgets/init', $this );
-    }
+	/**
+	 * @param $key
+	 *
+	 * @return Dashboard_Widget
+	 */
+	public function get_widget( $key ) {
+		return get_array_var( $this->widgets, $key );
+	}
 
-    /**
-     * @param $key
-     * @return Dashboard_Widget
-     */
-    public function get_widget( $key )
-    {
-        return get_array_var( $this->widgets, $key );
-    }
+	public function scripts( $hook_suffix ) {
 
-    public function scripts( $hook_suffix )
-    {
+		// Show only on dashbaord
+		if ( $hook_suffix !== 'index.php' ) {
+			return;
+		}
 
-        // Show only on dashbaord
-        if ( $hook_suffix !== 'index.php' ){
-            return;
-        }
+		if ( ! current_user_can( 'view_reports' ) ) {
+			return;
+		}
 
-        if ( ! current_user_can( 'view_reports' ) ){ return; }
+		wp_enqueue_style( 'groundhogg-admin-dashboard' );
+		wp_enqueue_script( 'groundhogg-admin-dashboard' );
 
-        wp_enqueue_style( 'groundhogg-admin-dashboard' );
-        wp_enqueue_script( 'groundhogg-admin-dashboard' );
-
-        wp_localize_script( 'groundhogg-admin-dashboard', 'GroundhoggDashboard', array(
-            'date_range' => $this->range,
-            'custom_date_range_start' => esc_attr( get_request_var( 'custom_date_range_start' ) ),
-            'custom_date_range_end' => esc_attr( get_request_var( 'custom_date_range_end' ) )
-        ) );
+		wp_localize_script( 'groundhogg-admin-dashboard', 'GroundhoggDashboard', array(
+			'date_range'              => $this->range,
+			'custom_date_range_start' => esc_attr( get_request_var( 'custom_date_range_start' ) ),
+			'custom_date_range_end'   => esc_attr( get_request_var( 'custom_date_range_end' ) )
+		) );
 
 
-        wp_enqueue_script( 'jquery-flot' );
-        wp_enqueue_script( 'jquery-flot-pie' );
-        wp_enqueue_script( 'jquery-flot-categories' );
-        wp_enqueue_script( 'jquery-flot-time' );
+		wp_enqueue_script( 'jquery-flot' );
+		wp_enqueue_script( 'jquery-flot-pie' );
+		wp_enqueue_script( 'jquery-flot-categories' );
+		wp_enqueue_script( 'jquery-flot-time' );
 
-	    wp_enqueue_script( 'chart-js' );
+		wp_enqueue_script( 'chart-js' );
 
-    }
+	}
 
-    /**
-     * @param $widget Dashboard_Widget
-     *
-     * @return bool whether the widget was added or not.
-     */
-    public function add_widget( $widget )
-    {
-        if ( ! current_user_can( 'view_reports' ) ){
-            return false;
-        }
+	/**
+	 * @param $widget Dashboard_Widget
+	 *
+	 * @return bool whether the widget was added or not.
+	 */
+	public function add_widget( $widget ) {
+		if ( ! current_user_can( 'view_reports' ) ) {
+			return false;
+		}
 
-        $this->widgets[ $widget->get_id() ] = $widget;
+		$this->widgets[ $widget->get_id() ] = $widget;
 
-        return true;
-    }
+		return true;
+	}
 
 }

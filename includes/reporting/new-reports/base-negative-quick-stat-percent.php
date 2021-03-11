@@ -15,7 +15,7 @@ abstract class Base_Negative_Quick_Stat_Percent extends Base_Quick_Stat_Percent 
 	 *
 	 * @return array
 	 */
-	protected function get_arrow_properties( $current_data, $compare_data ){
+	protected function get_arrow_properties( $current_data, $compare_data ) {
 
 		$direction = '';
 		$color     = '';
@@ -23,7 +23,7 @@ abstract class Base_Negative_Quick_Stat_Percent extends Base_Quick_Stat_Percent 
 		if ( $current_data < $compare_data ) {
 			$direction = 'up';
 			$color     = 'green';
-		} else if ( $current_data > $compare_data  ) {
+		} else if ( $current_data > $compare_data ) {
 			$direction = 'down';
 			$color     = 'red';
 		}

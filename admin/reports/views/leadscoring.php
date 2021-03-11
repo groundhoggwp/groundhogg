@@ -12,7 +12,8 @@
 		<img id="leadscore-ad" src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/leadscoring-ad.png'; ?>">
 		<div class="notice-no-data">
 			<p><?php _e( 'Please install the <b>Lead Scoring</b> extension to view this report.', 'groundhogg' ); ?></p>
-			<p><a href="https://www.groundhogg.io/downloads/lead-scoring/" target="_blank" class="button"><?php _e( 'Get it now!', 'groundhogg' ); ?></a></p>
+			<p><a href="https://www.groundhogg.io/downloads/lead-scoring/" target="_blank"
+			      class="button"><?php _e( 'Get it now!', 'groundhogg' ); ?></a></p>
 		</div>
 	<?php endif; ?>
 </div>

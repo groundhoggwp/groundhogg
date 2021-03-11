@@ -19,11 +19,13 @@ use function Groundhogg\file_access_url;
  */
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 // WP_List_Table is not loaded automatically so we need to load it in our application
-if( ! class_exists( 'WP_List_Table' ) ) {
-	require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
+if ( ! class_exists( 'WP_List_Table' ) ) {
+	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
 class Imports_Table extends WP_List_Table {
@@ -44,39 +46,42 @@ class Imports_Table extends WP_List_Table {
 	}
 
 	/**
-	 * @see WP_List_Table::::single_row_columns()
 	 * @return array An associative array containing column information.
+	 * @see WP_List_Table::::single_row_columns()
 	 */
 	public function get_columns() {
 		$columns = array(
 			'cb'   => '<input type="checkbox" />', // Render a checkbox instead of text.
 			'file' => _x( 'File', 'Column label', 'groundhogg' ),
-            'rows' => _x( 'Rows', 'Column label', 'groundhogg' ),
-            'date' => _x( 'Date Uploaded', 'Column label', 'groundhogg' ),
+			'rows' => _x( 'Rows', 'Column label', 'groundhogg' ),
+			'date' => _x( 'Date Uploaded', 'Column label', 'groundhogg' ),
 		);
+
 		return $columns;
 	}
+
 	/**
 	 * @return array An associative array containing all the columns that should be sortable.
 	 */
 	protected function get_sortable_columns() {
 		$sortable_columns = array(
-			'file'   => array( 'file', false ),
-			'rows'   => array( 'rows', false ),
-			'date'   => array( 'date', false ),
+			'file' => array( 'file', false ),
+			'rows' => array( 'rows', false ),
+			'date' => array( 'date', false ),
 		);
+
 		return $sortable_columns;
 	}
 
-    /**
-     * Get the rule title
-     *
-     * @param $import array
-     * @return string
-     */
-	protected function column_file( $import )
-	{
-		$download_url = $import[ 'file_url' ];
+	/**
+	 * Get the rule title
+	 *
+	 * @param $import array
+	 *
+	 * @return string
+	 */
+	protected function column_file( $import ) {
+		$download_url = $import['file_url'];
 
 		$html = "<strong>";
 		$html .= "<a class='row-title' href='$download_url'>{$import['file']}</a>";
@@ -85,49 +90,54 @@ class Imports_Table extends WP_List_Table {
 		return $html;
 	}
 
-    /**
-     * Get the rule type
-     *
-     * @param $import array
-     * @return mixed
-     */
-	protected function column_rows( $import )
-	{
+	/**
+	 * Get the rule type
+	 *
+	 * @param $import array
+	 *
+	 * @return mixed
+	 */
+	protected function column_rows( $import ) {
 		return $import['rows'];
 	}
 
-    /**
-     * Show the points to add.
-     *
-     * @param $import array
-     * @return string
-     */
-	protected function column_date( $import )
-	{
-	    $strdate = date_i18n( 'Y-m-d H:i:s', intval( $import[ 'date' ] ) );
+	/**
+	 * Show the points to add.
+	 *
+	 * @param $import array
+	 *
+	 * @return string
+	 */
+	protected function column_date( $import ) {
+		$strdate = date_i18n( 'Y-m-d H:i:s', intval( $import['date'] ) );
+
 		return '<abbr title="' . $strdate . '">' . $strdate . '</abbr>';
 	}
 
 	/**
 	 * Get default column value.
-	 * @param object $import        A singular item (one full row's worth of data).
+	 *
+	 * @param object $import A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
+	 *
 	 * @return string Text or HTML to be placed inside the column <td>.
 	 */
 	protected function column_default( $import, $column_name ) {
 
-		return print_r( $import[$column_name], true );
+		return print_r( $import[ $column_name ], true );
 
 	}
+
 	/**
 	 * @param object $import A singular item (one full row's worth of data).
+	 *
 	 * @return string Text to be placed inside the column <td>.
 	 */
 	protected function column_cb( $import ) {
 		return sprintf(
 			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
 			$this->_args['singular'],  // Let's simply repurpose the table's singular label ("movie").
-			$import[ 'file' ]               // The value of the checkbox should be the record's ID.
+			$import['file']               // The value of the checkbox should be the record's ID.
 		);
 	}
 
@@ -144,7 +154,6 @@ class Imports_Table extends WP_List_Table {
 
 	/**
 	 * Prepares the list of items for displaying.
-
 	 * @global $wpdb \wpdb
 	 * @uses $this->_column_headers
 	 * @uses $this->items
@@ -163,32 +172,35 @@ class Imports_Table extends WP_List_Table {
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-        $data = [];
+		$data = [];
 
-        if ( file_exists( Plugin::$instance->utils->files->get_csv_imports_dir() ) )  {
+		if ( file_exists( Plugin::$instance->utils->files->get_csv_imports_dir() ) ) {
 
-            $scanned_directory = array_diff(scandir( Plugin::$instance->utils->files->get_csv_imports_dir() ), ['..', '.']);
+			$scanned_directory = array_diff( scandir( Plugin::$instance->utils->files->get_csv_imports_dir() ), [
+				'..',
+				'.'
+			] );
 
-            foreach ($scanned_directory as $filename) {
+			foreach ( $scanned_directory as $filename ) {
 
-                $filepath = Plugin::$instance->utils->files->get_csv_imports_dir( $filename );
+				$filepath = Plugin::$instance->utils->files->get_csv_imports_dir( $filename );
 
-                $file = [
-                    'file' => $filename,
-                    'file_path' => $filepath,
-                    'file_url' => file_access_url( '/imports/' . $filename, true ),
-                    'date' => filemtime($filepath),
-                    'rows' => count(file($filepath, FILE_SKIP_EMPTY_LINES)) - 1,
-                ];
+				$file = [
+					'file'      => $filename,
+					'file_path' => $filepath,
+					'file_url'  => file_access_url( '/imports/' . $filename, true ),
+					'date'      => filemtime( $filepath ),
+					'rows'      => count( file( $filepath, FILE_SKIP_EMPTY_LINES ) ) - 1,
+				];
 
-                $data[] = $file;
+				$data[] = $file;
 
-            }
-        }
+			}
+		}
 
-        /*
-         * Sort the data
-         */
+		/*
+		 * Sort the data
+		 */
 		usort( $data, array( $this, 'usort_reorder' ) );
 
 		$current_page = $this->get_pagenum();
@@ -205,8 +217,8 @@ class Imports_Table extends WP_List_Table {
 			'total_pages' => ceil( $total_items / $per_page ), // WE have to calculate the total number of pages.
 		) );
 	}
-	
-    /**
+
+	/**
 	 * Callback to allow sorting of example data.
 	 *
 	 * @param string $a First value.
@@ -223,15 +235,17 @@ class Imports_Table extends WP_List_Table {
 		$order = ! empty( $_REQUEST['order'] ) ? wp_unslash( $_REQUEST['order'] ) : 'asc'; // WPCS: Input var ok.
 		// Determine sort order.
 		$result = strnatcmp( $a[ $orderby ], $b[ $orderby ] );
+
 		return ( 'desc' === $order ) ? $result : - $result;
 	}
 
 	/**
 	 * Generates and displays row action rule.
 	 *
-	 * @param array $import       Contact being acted upon.
+	 * @param array $import Contact being acted upon.
 	 * @param string $column_name Current column name.
-	 * @param string $primary     Primary column name.
+	 * @param string $primary Primary column name.
+	 *
 	 * @return string Row steps output for posts.
 	 */
 	protected function handle_row_actions( $import, $column_name, $primary ) {
@@ -244,14 +258,14 @@ class Imports_Table extends WP_List_Table {
 		$actions['import'] = sprintf(
 			'<a href="%s" class="edit" aria-label="%s">%s</a>',
 			/* translators: %s: title */
-			admin_url( 'admin.php?page=gh_tools&tab=import&action=map&import=' . $import[ 'file' ] ),
+			admin_url( 'admin.php?page=gh_tools&tab=import&action=map&import=' . $import['file'] ),
 			esc_attr( 'Import' ),
 			__( 'Import' )
 		);
 
 		$actions['delete'] = sprintf(
 			'<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-			wp_nonce_url(admin_url( 'admin.php?page=gh_tools&tab=import&action=delete&import=' . $import[ 'file' ] )),
+			wp_nonce_url( admin_url( 'admin.php?page=gh_tools&tab=import&action=delete&import=' . $import['file'] ) ),
 			/* translators: %s: title */
 			esc_attr( 'Delete Permanently' ),
 			__( 'Delete Import' )
