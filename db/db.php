@@ -618,7 +618,7 @@ abstract class DB {
 
 		global $wpdb;
 
-		if ( is_numeric( $row_id ) ) {
+		if ( is_numeric( $row_id ) && ! empty( $row_id ) ) {
 			$where = [ $this->get_primary_key() => absint( $row_id ) ];
 		} else if ( is_array( $row_id ) ){
 			$where = $row_id;
