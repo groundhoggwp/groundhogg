@@ -309,6 +309,10 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.4.4.2 (2021-03-11) =
+* TWEAKED Updated the DB update function to accept an array as the first parameter.
+* TWEAKED Added an action to the contact details card to add more information from third party plugins.
+
 = 2.4.4.1 (2021-03-11) =
 * ADDED Additional developer actions to the reports pages to add more relevant ecommerce reports.
 * ADDED SUM() helper function to the DB class API.

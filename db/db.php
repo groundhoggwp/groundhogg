@@ -618,10 +618,10 @@ abstract class DB {
 
 		global $wpdb;
 
-		$row_id = absint( $row_id );
-
-		if ( ! empty( $row_id ) ) {
-			$where = [ $this->get_primary_key() => $row_id ];
+		if ( is_numeric( $row_id ) ) {
+			$where = [ $this->get_primary_key() => absint( $row_id ) ];
+		} else if ( is_array( $row_id ) ){
+			$where = $row_id;
 		}
 
 		if ( empty( $where ) ) {
@@ -855,7 +855,11 @@ abstract class DB {
 					break;
 				default:
 					if ( in_array( $key, $this->get_allowed_columns() ) ) {
-						$where[] = [ 'col' => $key, 'val' => $val, 'compare' => '=' ];
+						if ( is_array( $val ) && array_key_exists( 'compare', $val ) && array_key_exists( 'val', $val ) ){
+							$where[] = [ 'col' => $key, 'val' => $val['val'], 'compare' => $val['compare'] ];
+						} else {
+							$where[] = [ 'col' => $key, 'val' => $val, 'compare' => '=' ];
+						}
 					}
 
 					break;

@@ -112,6 +112,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 			<div class="localtime" title="<?php esc_attr_e( 'Local time', 'groundhogg' ); ?>">
 				<?php dashicon_e( 'clock' ); ?><?php echo date_i18n( get_date_time_format(), $contact->get_local_time() ) ?>
 			</div>
+			<?php do_action( 'groundhogg/admin/contact/basic_details', $contact ); ?>
 		</div>
 		<div class="wp-clearfix"></div>
 		<div class="tags" title="<?php esc_attr_e( 'Tags' ); ?>"><?php dashicon_e( 'tag' ); ?>
