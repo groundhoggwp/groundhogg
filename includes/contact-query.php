@@ -667,26 +667,26 @@ class Contact_Query {
 
 		if ( ! empty( $this->query_vars['include'] ) ) {
 			$include_ids      = implode( ',', wp_parse_id_list( $this->query_vars['include'] ) );
-			$where['include'] = "$this->primary_key IN ( $include_ids )";
+			$where['include'] = "$this->table_name.$this->primary_key IN ( $include_ids )";
 		}
 
 		if ( ! empty( $this->query_vars['exclude'] ) ) {
 			$exclude_ids      = implode( ',', wp_parse_id_list( $this->query_vars['exclude'] ) );
-			$where['exclude'] = "$this->primary_key NOT IN ( $exclude_ids )";
+			$where['exclude'] = "$this->table_name.$this->primary_key NOT IN ( $exclude_ids )";
 		}
 
 		if ( ! empty( $this->query_vars['users_include'] ) ) {
 			$users_include_ids      = implode( ',', wp_parse_id_list( $this->query_vars['users_include'] ) );
-			$where['users_include'] = "user_id IN ( $users_include_ids )";
+			$where['users_include'] = "$this->table_name.user_id IN ( $users_include_ids )";
 		}
 
 		if ( ! empty( $this->query_vars['users_exclude'] ) ) {
 			$users_exclude_ids      = implode( ',', wp_parse_id_list( $this->query_vars['users_exclude'] ) );
-			$where['users_exclude'] = "user_id NOT IN ( $users_exclude_ids )";
+			$where['users_exclude'] = "$this->table_name.user_id NOT IN ( $users_exclude_ids )";
 		}
 
 		if ( ! empty( $this->query_vars['has_user'] ) ) {
-			$where['has_user'] = "user_id > 0";
+			$where['has_user'] = "$this->table_name.user_id > 0";
 		}
 
 		if ( $this->query_vars['optin_status'] !== 'any' ) {
@@ -697,7 +697,7 @@ class Contact_Query {
 				$this->query_vars['optin_status'] = absint( $this->query_vars['optin_status'] );
 			}
 
-			$where['optin_status'] = "optin_status IN ( {$this->query_vars['optin_status']} )";
+			$where['optin_status'] = "$this->table_name.optin_status IN ( {$this->query_vars['optin_status']} )";
 		}
 
 		if ( $this->query_vars['optin_status_exclude'] !== false ) {
@@ -708,11 +708,11 @@ class Contact_Query {
 				$this->query_vars['optin_status_exclude'] = absint( $this->query_vars['optin_status_exclude'] );
 			}
 
-			$where['optin_status_exclude'] = "optin_status NOT IN ( {$this->query_vars['optin_status_exclude']} )";
+			$where['optin_status_exclude'] = "$this->table_name.optin_status NOT IN ( {$this->query_vars['optin_status_exclude']} )";
 		}
 
 		if ( $this->query_vars['owner'] ) {
-			$where['owner'] = "owner_id IN ( {$this->query_vars['owner']} )";
+			$where['owner'] = "$this->table_name.owner_id IN ( {$this->query_vars['owner']} )";
 		}
 
 		if ( strlen( $this->query_vars['email'] ) ) {
