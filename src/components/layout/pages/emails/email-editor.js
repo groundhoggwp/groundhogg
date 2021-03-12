@@ -46,7 +46,7 @@ export const EmailEditor = () => {
 
 	return (
 		<Fragment>
-			<BlockEditor document={email} />
+			<BlockEditor editorItem={email} />
 		</Fragment>
 	)
 }

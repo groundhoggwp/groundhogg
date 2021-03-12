@@ -117,7 +117,7 @@ const IOSSwitch = withStyles((theme) => ({
   );
 });
 
-export default ({ document, history }) => {
+export default ({ editorItem, history, ...rest }) => {
   setDefaultBlockName("groundhogg/paragraph");
 
   const dispatch = useDispatch(EMAILS_STORE_NAME);
@@ -128,7 +128,7 @@ export default ({ document, history }) => {
     pre_header: defaultPreHeaderValue,
     content: defaultContentValue,
     editorType,
-  } = document.data;
+  } = editorItem.data;
 
   // Global States
   const [blocksVersionTracker, setBlocksVersionTracker] = useState(0);
@@ -161,7 +161,7 @@ export default ({ document, history }) => {
     (select) => ({
       editorMode: select(CORE_STORE_NAME).getEditorMode(),
       isSaving: select(CORE_STORE_NAME).isItemsUpdating(),
-      item: select(EMAILS_STORE_NAME).getItem(document.ID),
+      item: select(EMAILS_STORE_NAME).getItem(editorItem.ID),
     }),
     []
   );
@@ -203,7 +203,7 @@ export default ({ document, history }) => {
     Saves Funnel or Email
   */
   const updateItem = (e) => {
-    dispatch.updateItem(document.ID, {
+    dispatch.updateItem(editorItem.ID, {
       data: {
         subject,
         title,
@@ -239,6 +239,7 @@ export default ({ document, history }) => {
   */
   const handleContentChangeDraggedBlock = () => {
     // if(!startInteractJS){return;}
+    console.log('asdfasdf', draggedBlockIndex)
     let newBlocks = blocks;
     newBlocks.splice(draggedBlockIndex, 0, createBlock(draggedBlock.name));
     handleUpdateBlocks(newBlocks);
@@ -294,39 +295,46 @@ export default ({ document, history }) => {
 
     if(!y){return;}
     draggedBlockIndex = 0;
-    let adjustedY = y + 433+55; //Offset by header and block size
+    let adjustedY = y + 505+55; //Offset by header and block size
     let classToApply = '';
     let saveBlock = false
 
-    // document.querySelectorAll('.wp-block').forEach((block, i)=>{
-      // block.classList.remove('dragged-over-top')
-
-      // if(adjustedY >= block.getBoundingClientRect().top && adjustedY <= block.getBoundingClientRect().bottom ){
-      //   draggedBlockIndex = i
-      //   saveBlock = block
-      //   // if(block.getBoundingClientRect().bottom - block.getBoundingClientRect().top &&)
-      // }
-
-      // if(draggedBlock === 0){
-      //   console.log(block, y, block.getBoundingClientRect().bottom)
-      // }
-    // })
+    document.querySelectorAll('.wp-block').forEach((block, i)=>{
+      block.style.borderTop = ''
+      block.style.borderBottom = ''
 
 
-    // if(draggedBlockIndex === 0){
-    //   console.log(event.target)
-    //   return;
-    // }
-    // document.querySelectorAll('.wp-block')[draggedBlockIndex].classList.add('dragged-over-top');
+      if(adjustedY >= block.getBoundingClientRect().top && adjustedY <= block.getBoundingClientRect().bottom ){
+        draggedBlockIndex = i
+        saveBlock = block
+        // if(block.getBoundingClientRect().bottom - block.getBoundingClientRect().top &&)
+      }
+
+      if(draggedBlock === 0){
+        console.log(block, y, block.getBoundingClientRect().bottom)
+      }
+
+    })
+
+
+    if(draggedBlockIndex === 0){
+      // console.log(event.target)
+      // return;
+    }
+    document.querySelectorAll('.wp-block')[draggedBlockIndex].style.borderBottom = '1px solid #0075FF';
   };
 
   const dragStartListener = (event) => {
-    console.log('drag start', event)
+    // console.log('drag start', event)
     // document.querySelector('.interface-interface-skeleton__sidebar').scrollTop = 0;
     // document.querySelector('.interface-interface-skeleton__sidebar').classList.add("show-overflow");
   };
   const dragEndListener = (event) => {
-    // document.querySelector('.interface-interface-skeleton__sidebar').classList.remove("show-overflow");
+    document.querySelectorAll('.wp-block').forEach((block, i)=>{
+      block.style.borderTop = ''
+      block.style.borderBottom = ''
+    });
+
     const target = event.target;
 
     // keep the dragged position in the data-x/data-y attributes
@@ -343,7 +351,7 @@ export default ({ document, history }) => {
   };
 
   const setupInteractJS = async () => {
-    interact(".groundhogg-email-editor__email-content").dropzone({
+    interact(".block-editor__typewriter").dropzone({
       overlap: 0.75,
       ondropactivate: (event) => {},
 
@@ -434,7 +442,7 @@ export default ({ document, history }) => {
     sendEmailComponent:{
       position: 'absolute',
       top: '147px',
-      left: editorType === 'email' ? '40px' : '305px',
+      left: editorType === 'email' ? '0px' : '305px',
       width: editorType === 'email' ? 'calc(100% - 412px)' : 'calc(100% - 729px)',
       padding: '33px 25px 18px 25px'
     },
@@ -465,8 +473,7 @@ export default ({ document, history }) => {
     subTitleContainer: {
       position: 'absolute',
       top: '347px',
-      left: '320px',
-      marginLeft: '20px',
+      left: editorType === 'email' ? '20px' : '320px',
       "& label": {
         fontSize: "12px",
       },
@@ -543,9 +550,6 @@ export default ({ document, history }) => {
     </div>
   }
 
-
-  // console.log('rebuild', blocks)
-
   return (
     <>
       <div className="Groundhogg-BlockEditor">
@@ -556,7 +560,7 @@ export default ({ document, history }) => {
           <DropZoneProvider>
             <FocusReturnProvider>
               <Header
-                document={document}
+                editorItem={editorItem}
                 history={history}
                 updateItem={updateItem}
                 closeEditor={() => {}}

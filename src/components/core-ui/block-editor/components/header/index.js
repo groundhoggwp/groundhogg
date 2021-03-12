@@ -110,7 +110,8 @@ const useStyles = makeStyles((theme) => ({
 export default function Header({
   email,
   history,
-  updateDoc,
+  editorItem,
+  updateItem,
   isSaving,
   handleTitleChange,
   title,
@@ -156,7 +157,7 @@ export default function Header({
             <ArrowCurveLeft />
           </span>
 
-          <Button className={classes.updateButton} onClick={updateDoc}>
+          <Button className={classes.updateButton} onClick={updateItem}>
             {buttonText}
             <SendMail />
           </Button>
