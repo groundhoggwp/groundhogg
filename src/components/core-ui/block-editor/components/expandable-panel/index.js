@@ -9,58 +9,60 @@ import { Inserter } from "@wordpress/block-editor";
 /**
  * External dependencies
  */
- import { Button, Card, TextField } from "@material-ui/core";
+import { Button, Card, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ReplayIcon from "@material-ui/icons/Replay";
 /**
  * Internal dependencies
  */
- import ArrowDown from "components/svg/ArrowDown/";
+import ArrowDown from "components/svg/ArrowDown/";
 
-
-
-export default function EditorSteps({contents, title, fontSize, width, margin}) {
-
+export default function EditorSteps({
+  contents,
+  title,
+  fontSize,
+  width,
+  margin,
+}) {
   const [open, setOpen] = useState(false);
 
   const useStyles = makeStyles((theme) => ({
     root: {
-
       fontSize,
       width: width,
       margin,
-      display: 'block',
-      height: open ? 'auto' : (parseInt(fontSize.replace('px', ''))+25)+'px',
-      overflowY: open ? 'visible' : 'hidden',
-      cursor: 'pointer',
+      display: "block",
+      height: open ? "auto" : parseInt(fontSize.replace("px", "")) + 25 + "px",
+      overflowY: open ? "visible" : "hidden",
+      cursor: "pointer",
       borderRadius: "7px",
-      background: '#fff',
+      background: "#fff",
 
       "& svg": {
-        float: 'right',
-        margin: '8px 25px'
+        float: "right",
+        margin: "8px 25px",
       },
     },
     title: {
       fontWeight: "600",
       background: "#E7EEFB",
-      padding:"10px 0 13px 25px"
-    }
+      padding: "10px 0 13px 25px",
+    },
   }));
 
   const classes = useStyles();
 
-
   const toggleroot = () => {
-    console.log('select step')
-    setOpen(open ? false : true)
-  }
+    console.log("select step");
+    setOpen(open ? false : true);
+  };
 
   return (
-
     <div className={classes.root}>
-      <div className={classes.title} onClick={toggleroot}>{title} <ArrowDown/></div>
+      <div className={classes.title} onClick={toggleroot}>
+        {title} <ArrowDown />
+      </div>
       <br />
       {contents}
     </div>

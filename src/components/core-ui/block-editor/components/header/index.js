@@ -32,7 +32,7 @@ import MoreDots from "components/svg/MoreDots/";
 const useStyles = makeStyles((theme) => ({
   root: {
     position: "absolute",
-    display: 'flex',
+    display: "flex",
     top: "0",
     left: "-20px",
     overflow: "visible",
@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
       fontSize: "12px",
     },
     '& input[type="text"], & input[type="text"]:focus': {
-      color: '#000',
+      color: "#000",
       fontSize: "24px",
       outline: "none",
       border: "none",
@@ -62,35 +62,35 @@ const useStyles = makeStyles((theme) => ({
       marginLeft: "-1px",
     },
   },
-  editTitleBtn:{
-    cursor: 'pointer',
-    margin: '20px 0 0 5px'
+  editTitleBtn: {
+    cursor: "pointer",
+    margin: "20px 0 0 5px",
   },
-  moreBtn:{
-    display: 'inline-flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '44px',
-    height: '22px',
-    border: '0.5px solid rgba(16, 38, 64, 0.25)',
-    borderRadius: '5px',
-    margin: '15px 0 0 25px',
-    cursor: 'pointer'
+  moreBtn: {
+    display: "inline-flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "44px",
+    height: "22px",
+    border: "0.5px solid rgba(16, 38, 64, 0.25)",
+    borderRadius: "5px",
+    margin: "15px 0 0 25px",
+    cursor: "pointer",
   },
   updateContainer: {
-    display: 'inline-flex',
-    alignItems: 'center',
+    display: "inline-flex",
+    alignItems: "center",
     marginRight: "20px",
-    width: '100%'
+    width: "100%",
   },
   stepUpdateButton: {
     width: "15px",
     margin: "16px 10px 0px 10px",
-    justifySelf: 'end',
-    cursor: 'pointer'
+    justifySelf: "end",
+    cursor: "pointer",
   },
-  stepUpdateButtonFirst:{
-    marginLeft: 'calc(100% - 535px)'
+  stepUpdateButtonFirst: {
+    marginLeft: "calc(100% - 535px)",
   },
   updateButton: {
     width: "320px",
@@ -100,7 +100,7 @@ const useStyles = makeStyles((theme) => ({
     textTransform: "none",
     margin: "9px 0 0 70px",
     borderRadius: "7px",
-    justifySelf: 'end',
+    justifySelf: "end",
     "& svg": {
       marginLeft: "145px",
     },
@@ -118,51 +118,57 @@ export default function Header({
   editorType,
   handleOpen,
   emailStepBackward,
-  emailStepForward
+  emailStepForward,
 }) {
-
   const [disableTitle, setDisableTitle] = useState(true);
 
   const classes = useStyles();
   const buttonText =
     editorType === "email" ? __("Update Email") : __("Update Funnel");
 
-  const toggleTitle = () =>{
-    setDisableTitle(disableTitle ? false : true )
-  }
+  const toggleTitle = () => {
+    setDisableTitle(disableTitle ? false : true);
+  };
 
   return (
     <Card className={classes.root}>
-        <span className={classes.backButton}>
-          <ArrowLeft href="./admin.php?page=gh_emails" />
+      <span className={classes.backButton}>
+        <ArrowLeft href="./admin.php?page=gh_emails" />
+      </span>
+
+      <span className={classes.titleContainer}>
+        <TextField
+          label="Email Info"
+          value={title}
+          onChange={handleTitleChange}
+          InputProps={{ disableUnderline: true, disabled: disableTitle }}
+        />
+      </span>
+
+      <span className={classes.updateContainer}>
+        <span className={classes.editTitleBtn} onClick={toggleTitle}>
+          <EditPen />
         </span>
 
-        <span className={classes.titleContainer}>
-          <TextField
-            label="Email Info"
-            value={title}
-            onChange={handleTitleChange}
-            InputProps={{ disableUnderline: true, disabled: disableTitle }}
-          />
+        <span className={classes.moreBtn} onClick={handleOpen}>
+          <MoreDots />
+        </span>
+        <span
+          className={`${classes.stepUpdateButton} ${classes.stepUpdateButtonFirst}`}
+          onClick={emailStepBackward}
+        >
+          <ArrowCurveRight />
+        </span>
+        <span className={classes.stepUpdateButton} onClick={emailStepForward}>
+          <ArrowCurveLeft />
         </span>
 
-        <span className={classes.updateContainer}>
-          <span className={classes.editTitleBtn} onClick={toggleTitle}><EditPen /></span>
-
-          <span className={classes.moreBtn} onClick={handleOpen}><MoreDots/></span>
-          <span className={`${classes.stepUpdateButton} ${classes.stepUpdateButtonFirst}`} onClick={emailStepBackward}>
-            <ArrowCurveRight />
-          </span>
-          <span className={classes.stepUpdateButton} onClick={emailStepForward}>
-            <ArrowCurveLeft />
-          </span>
-
-          <Button className={classes.updateButton} onClick={updateItem}>
-            {buttonText}
-            <SendMail />
-          </Button>
-        </span>
-        <PinnedItems.Slot scope="gh/v4/core" />
+        <Button className={classes.updateButton} onClick={updateItem}>
+          {buttonText}
+          <SendMail />
+        </Button>
+      </span>
+      <PinnedItems.Slot scope="gh/v4/core" />
     </Card>
   );
 }

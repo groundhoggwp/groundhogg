@@ -38,7 +38,7 @@ import {
 /**
  * Internal dependencies
  */
- import ExpandablePanel from "../expandable-panel/";
+import ExpandablePanel from "../expandable-panel/";
 import ArrowDown from "components/svg/ArrowDown/";
 import Desktop from "components/svg/Desktop/";
 import Phone from "components/svg/Phone/";
@@ -49,7 +49,6 @@ import BlocksHeading from "components/svg/block-editor/BlocksHeading/";
 import BlocksImage from "components/svg/block-editor/BlocksImage/";
 import BlocksSpacer from "components/svg/block-editor/BlocksSpacer/";
 import BlocksText from "components/svg/block-editor/BlocksText/";
-
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -65,15 +64,15 @@ const useStyles = makeStyles((theme) => ({
   },
   inputText: {
     width: "calc(100% - 10px)",
-    padding: '5px 0px 5px 17px',
+    padding: "5px 0px 5px 17px",
     marginTop: "10px",
   },
   blockPanel: {
     marginTop: "20px",
     overflow: "visible",
-    '&:last-of-type':{
-      paddingBottom: '20px'
-    }
+    "&:last-of-type": {
+      paddingBottom: "20px",
+    },
   },
   emailControls: {
     height: "auto",
@@ -103,74 +102,71 @@ const useStyles = makeStyles((theme) => ({
     display: "inline-block",
     margin: "20px 0px 3px 0px",
     width: "115px",
-
   },
-  alignmentBtn:{
-    display: 'inline-block',
-    width: '27px',
-    height: '27px',
-    borderRadius: '7px',
-    margin: '15px 15px 34px 0px',
-    cursor: 'pointer'
+  alignmentBtn: {
+    display: "inline-block",
+    width: "27px",
+    height: "27px",
+    borderRadius: "7px",
+    margin: "15px 15px 34px 0px",
+    cursor: "pointer",
   },
   messageTypeContainer: {
     display: "inline-block",
     // marginTop: "20px",
-    '& select' : {
-      marginTop: '5px',
-      padding: '7px 74px 7px 17px',
-      border: '1.5px solid rgba(16, 38, 64, 0.1)'
-    }
+    "& select": {
+      marginTop: "5px",
+      padding: "7px 74px 7px 17px",
+      border: "1.5px solid rgba(16, 38, 64, 0.1)",
+    },
   },
-  selectMessageType : {
-    width: '100px',
-    padding: '7px 0px 7px 17px'
+  selectMessageType: {
+    width: "100px",
+    padding: "7px 0px 7px 17px",
   },
 
-  blocksTitle:{
-    display: 'block',
-    fontSize: '18px',
-    width: '50px',
-    fontWeight: '500',
-    margin: '18px auto 5px auto',
-    paddingTop: '20px'
-
+  blocksTitle: {
+    display: "block",
+    fontSize: "18px",
+    width: "50px",
+    fontWeight: "500",
+    margin: "18px auto 5px auto",
+    paddingTop: "20px",
   },
-  block:{
-    position: 'relative',
-    display: 'inline-block',
-    margin: '10px',
-    width: '82px',
-    height: '78px',
-    border: '1.2px solid rgba(0, 117, 255, 0.2)',
-    borderRadius: '5px',
-    textAlign: 'center',
-    fontWeight: '500',
-    color: '#102640',
-    '& svg, & path':{
-      stroke: '#102640'
+  block: {
+    position: "relative",
+    display: "inline-block",
+    margin: "10px",
+    width: "82px",
+    height: "78px",
+    border: "1.2px solid rgba(0, 117, 255, 0.2)",
+    borderRadius: "5px",
+    textAlign: "center",
+    fontWeight: "500",
+    color: "#102640",
+    "& svg, & path": {
+      stroke: "#102640",
     },
-    '&:hover':{
-      color: '#fff',
-      background: '#0075FF'
+    "&:hover": {
+      color: "#fff",
+      background: "#0075FF",
     },
-    '&:hover svg, &:hover path':{
-      stroke: '#fff',
-      fill: '#fff',
-      color: '#fff'
-    }
+    "&:hover svg, &:hover path": {
+      stroke: "#fff",
+      fill: "#fff",
+      color: "#fff",
+    },
   },
   blockIcon: {
-    margin: '15px 0 0 0',
-
+    margin: "15px 0 0 0",
   },
-  blockName:{
-    position: 'absolute',
-    bottom: '5px',
-    width: '100%',
-    textAlign: 'center',
-    fontWeight: '500'
-  }
+  blockName: {
+    position: "absolute",
+    bottom: "5px",
+    width: "100%",
+    textAlign: "center",
+    fontWeight: "500",
+  },
 }));
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
@@ -217,55 +213,52 @@ const Sidebar = ({
     <>
       <div className={classes.blocksTitle}>Blocks</div>
       {blocks.map((block) => {
+        const title = block.title.replace("Groundhogg - ", "");
 
-        const title = block.title.replace('Groundhogg - ', '')
-
-        let icon = <BlocksImage/>
+        let icon = <BlocksImage />;
         switch (title) {
-          case 'Spacer':
-            icon = <BlocksSpacer stroke={''} fill={'none'}/>
+          case "Spacer":
+            icon = <BlocksSpacer stroke={""} fill={"none"} />;
             break;
-          case 'Divider':
-            icon = <BlocksDivider  stroke={''} fill={'#000'} fillSecondary={'#ccc'}/>
+          case "Divider":
+            icon = (
+              <BlocksDivider stroke={""} fill={"#000"} fillSecondary={"#ccc"} />
+            );
             break;
-          case 'HTML':
-            icon = <BlocksImage/>
+          case "HTML":
+            icon = <BlocksImage />;
             break;
-          case 'Button':
-            icon = <BlocksImage/>
+          case "Button":
+            icon = <BlocksImage />;
             break;
-          case 'Image':
-            icon = <BlocksImage/>
+          case "Image":
+            icon = <BlocksImage />;
             break;
-          case 'Heading':
-            icon = <BlocksHeading/>
+          case "Heading":
+            icon = <BlocksHeading />;
             break;
-          case 'paragraph':
-            icon = <BlocksText/>
+          case "paragraph":
+            icon = <BlocksText />;
             break;
         }
 
         return (
           <div
             data-block={JSON.stringify(block)}
-            className={classes.block+" block-editor-block side-bar-drag-drop-block"}
+            className={
+              classes.block + " block-editor-block side-bar-drag-drop-block"
+            }
           >
-            <div className={classes.blockIcon}>
-              {icon}
-            </div>
+            <div className={classes.blockIcon}>{icon}</div>
 
-            <div className={classes.blockName}>
-              {title}
-            </div>
+            <div className={classes.blockName}>{title}</div>
           </div>
         );
       })}
     </>
   );
 
-  const toggleAdditionalInfoContainer = () => {
-
-  }
+  const toggleAdditionalInfoContainer = () => {};
 
   // <PerfectScrollbar>
   // </PerfectScrollbar>
@@ -319,23 +312,28 @@ const Sidebar = ({
 
         <div className={classes.alignmentContainer}>
           <div>{__("Alignment:")}</div>
-          <span className={classes.alignmentBtn}><AlignLeft /></span>
-          <span className={classes.alignmentBtn}><AlignCenter /></span>
+          <span className={classes.alignmentBtn}>
+            <AlignLeft />
+          </span>
+          <span className={classes.alignmentBtn}>
+            <AlignCenter />
+          </span>
         </div>
 
         <div className={classes.messageTypeContainer}>
           <div>{__("Message Type:")}</div>
-          <select
-            value={''}
-            onChange={()=>{}}
-            label=""
-          >
+          <select value={""} onChange={() => {}} label="">
             <option value={10}>none</option>
             <option value={20}>Marketing</option>
           </select>
         </div>
 
-        <ExpandablePanel title={'Additional options:'} fontSize={'12px'} width={'calc(100% + 44px)'} margin={'0px 0px 0px -22px'}/>
+        <ExpandablePanel
+          title={"Additional options:"}
+          fontSize={"12px"}
+          width={"calc(100% + 44px)"}
+          margin={"0px 0px 0px -22px"}
+        />
       </Card>
 
       <Card className={classes.blockPanel}>{blockPanel}</Card>

@@ -39,7 +39,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import Sidebar from "../sidebar";
 import ExpandablePanel from "../expandable-panel/";
 
-
 //TODO Implement block persistence with email data store.
 //TODO Potentially use our own alerts data store (core).
 
@@ -52,7 +51,7 @@ function BlockEditor({
   viewType,
   handleUpdateBlocks,
   blocks,
-  editorType
+  editorType,
 }) {
   const useStyles = makeStyles((theme) => ({
     root: {
@@ -76,31 +75,30 @@ function BlockEditor({
       // }
     },
     subjectHeaderRow: {
-      display: 'block',
-      width: 'calc(100% - 75px)',
-      margin: '0 auto 0 auto',
-      fontSize: '16px',
+      display: "block",
+      width: "calc(100% - 75px)",
+      margin: "0 auto 0 auto",
+      fontSize: "16px",
       padding: "20px",
 
-      borderBottom: '1px solid rgba(16, 38, 64, 0.15)',
-      '& label':{
-        fontWeight: '500'
-      }
+      borderBottom: "1px solid rgba(16, 38, 64, 0.15)",
+      "& label": {
+        fontWeight: "500",
+      },
     },
     subjectInputs: {
-      display: 'inline-block',
-      width: 'calc(100% - 140px)',
-      fontSize: '16px',
+      display: "inline-block",
+      width: "calc(100% - 140px)",
+      fontSize: "16px",
       outline: "none",
       border: "none",
       boxShadow: "none",
       marginLeft: "10px",
-
     },
     emailContainer: {
-      width: editorType === 'email' ? 'calc(100% - 360px)' : 'calc(100% - 680px)',
-      marginLeft: editorType === 'email' ? '0px' : '305px'
-
+      width:
+        editorType === "email" ? "calc(100% - 360px)" : "calc(100% - 680px)",
+      marginLeft: editorType === "email" ? "0px" : "305px",
     },
     emailContent: {
       position: "relative",
@@ -153,8 +151,6 @@ function BlockEditor({
     });
   });
 
-
-
   return (
     <div className={classes.root} ref={blockEditorEl}>
       <BlockEditorProvider
@@ -163,11 +159,10 @@ function BlockEditor({
         onInput={handleUpdateBlocks}
         onChange={handleUpdateBlocks}
       >
-
-          <div className={classes.emailContainer}>
-            <Card>
-              <form noValidate autoComplete="off" className={classes.emailHeader}>
-                <div className={classes.subjectHeaderRow}>
+        <div className={classes.emailContainer}>
+          <Card>
+            <form noValidate autoComplete="off" className={classes.emailHeader}>
+              <div className={classes.subjectHeaderRow}>
                 <label>Subject:</label>
                 <input
                   className={classes.subjectInputs}
@@ -175,9 +170,9 @@ function BlockEditor({
                   label={"Subject"}
                   value={subject}
                 />
-                <br/>
-                </div>
-                <div className={classes.subjectHeaderRow}>
+                <br />
+              </div>
+              <div className={classes.subjectHeaderRow}>
                 <label>Pre Header Text:</label>
                 <input
                   className={classes.subjectInputs}
@@ -185,36 +180,39 @@ function BlockEditor({
                   label={"Pre Header"}
                   value={preHeader === "" ? "Pre Header" : preHeader}
                 />
-                </div>
-              </form>
-
-
-              <div className={classes.emailContent}>
-                <BlockSelectionClearer className={classes}>
-                  <VisualEditorGlobalKeyboardShortcuts />
-                  <MultiSelectScrollIntoView />
-                  {/* Add Block Button */}
-                  <BlockEditorKeyboardShortcuts.Register />
-                  <Popover.Slot left={300} top={500} />
-                  <Popover.Slot name="block-toolbar" left={300} top={500} />{" "}
-                  <Typewriter>
-                    <CopyHandler>
-                      <WritingFlow>
-                        <ObserveTyping>
-                          {/* Rendered blocks */}
-                          <BlockList />
-                        </ObserveTyping>
-                      </WritingFlow>
-                    </CopyHandler>
-                  </Typewriter>
-                </BlockSelectionClearer>
               </div>
-            </Card>
+            </form>
 
-            <ExpandablePanel title={'Advanced'} fontSize={'16px'} width={'calc(100%)'} margin={'20px 0px 0px 0px'} contents={<div>contents</div>}/>
-          </div>
+            <div className={classes.emailContent}>
+              <BlockSelectionClearer className={classes}>
+                <VisualEditorGlobalKeyboardShortcuts />
+                <MultiSelectScrollIntoView />
+                {/* Add Block Button */}
+                <BlockEditorKeyboardShortcuts.Register />
+                <Popover.Slot left={300} top={500} />
+                <Popover.Slot name="block-toolbar" left={300} top={500} />{" "}
+                <Typewriter>
+                  <CopyHandler>
+                    <WritingFlow>
+                      <ObserveTyping>
+                        {/* Rendered blocks */}
+                        <BlockList />
+                      </ObserveTyping>
+                    </WritingFlow>
+                  </CopyHandler>
+                </Typewriter>
+              </BlockSelectionClearer>
+            </div>
+          </Card>
 
-
+          <ExpandablePanel
+            title={"Advanced"}
+            fontSize={"16px"}
+            width={"calc(100%)"}
+            margin={"20px 0px 0px 0px"}
+            contents={<div>contents</div>}
+          />
+        </div>
 
         <Sidebar.InspectorFill>
           <Popover name="block-toolbar" />
