@@ -239,7 +239,7 @@ export default ({ editorItem, history, ...rest }) => {
   */
   const handleContentChangeDraggedBlock = () => {
     // if(!startInteractJS){return;}
-    console.log('asdfasdf', draggedBlockIndex)
+    // console.log('asdfasdf', draggedBlockIndex)
     let newBlocks = blocks;
     newBlocks.splice(draggedBlockIndex, 0, createBlock(draggedBlock.name));
     handleUpdateBlocks(newBlocks);
@@ -267,7 +267,7 @@ export default ({ editorItem, history, ...rest }) => {
       setBlockVersionHistory(newblockVersionHistory)
     }
 
-    console.log(blocksVersionTracker, blockVersionHistory[blocksVersionTracker])
+    // console.log(blocksVersionTracker, blockVersionHistory[blocksVersionTracker])
   };
 
   /*
@@ -307,18 +307,18 @@ export default ({ editorItem, history, ...rest }) => {
       if(adjustedY >= block.getBoundingClientRect().top && adjustedY <= block.getBoundingClientRect().bottom ){
         draggedBlockIndex = i
         saveBlock = block
-        // if(block.getBoundingClientRect().bottom - block.getBoundingClientRect().top &&)
+        console.log(block.getBoundingClientRect().bottom, block.getBoundingClientRect().top)
       }
 
       if(draggedBlock === 0){
-        console.log(block, y, block.getBoundingClientRect().bottom)
+        // console.log(block, y, block.getBoundingClientRect().bottom)
       }
 
     })
 
 
     if(draggedBlockIndex === 0){
-      // console.log(event.target)
+      console.log(event.target)
       // return;
     }
     document.querySelectorAll('.wp-block')[draggedBlockIndex].style.borderBottom = '1px solid #0075FF';
@@ -349,47 +349,46 @@ export default ({ editorItem, history, ...rest }) => {
     target.setAttribute("data-x", 0);
     target.setAttribute("data-y", 0);
   };
+  interact(".block-editor__typewriter").unset()
+  interact(".block-editor__typewriter").dropzone({
+    overlap: 0.75,
+    ondropactivate: (event) => {},
 
-  const setupInteractJS = async () => {
-    interact(".block-editor__typewriter").dropzone({
-      overlap: 0.75,
-      ondropactivate: (event) => {},
+    ondragenter: (event) => {
+      // var draggableElement = event.relatedTarget;
+      // console.log('drag enter')
+      startInteractJS = true
+      var dropzoneElement = event.target.classList.add("active");
 
-      ondragenter: (event) => {
-        // var draggableElement = event.relatedTarget;
-        console.log('drag enter')
-        startInteractJS = true
-        var dropzoneElement = event.target.classList.add("active");
+    },
+    ondragleave: (event) => {
+      var dropzoneElement = event.target.classList.remove("active");
+    },
+    ondrop: (event) => {
+      console.log('dropped')
+      var dropzoneElement = event.target.classList.remove("active");
 
-      },
-      ondragleave: (event) => {
-        var dropzoneElement = event.target.classList.remove("active");
-      },
-      ondrop: (event) => {
-        console.log('dropped')
-        var dropzoneElement = event.target.classList.remove("active");
+      handleContentChangeDraggedBlock();
+    },
+    ondropdeactivate: (event) => {},
+  });
 
-        handleContentChangeDraggedBlock();
-      },
-      ondropdeactivate: (event) => {},
-    });
-
-    interact(".side-bar-drag-drop-block").draggable({
-      cursorChecker(action, interactable, element, interacting) {
-        return "grab";
-      },
-      onstart: dragStartListener,
-      onend: dragEndListener,
-      listeners: { move: dragMoveListener },
-      modifiers: [
-        interact.modifiers.restrict({
-          restriction: interact(".groundhogg-email-editor__email-content"),
-          elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
-          endOnly: true,
-        }),
-      ],
-    });
-  };
+  interact(".side-bar-drag-drop-block").unset()
+  interact(".side-bar-drag-drop-block").draggable({
+    cursorChecker(action, interactable, element, interacting) {
+      return "grab";
+    },
+    onstart: dragStartListener,
+    onend: dragEndListener,
+    listeners: { move: dragMoveListener },
+    modifiers: [
+      interact.modifiers.restrict({
+        restriction: interact(".groundhogg-email-editor__email-content"),
+        elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
+        endOnly: true,
+      }),
+    ],
+  });
 
   /*
     Sidebar Handlers
@@ -403,7 +402,7 @@ export default ({ editorItem, history, ...rest }) => {
     if (!matchEmailRegex(testEmail)) {
       return;
     }
-    console.log("valid let send", testEmail);
+    // console.log("valid let send", testEmail);
     sendEmailRaw({
       to: replyTo,
       from,
@@ -413,24 +412,13 @@ export default ({ editorItem, history, ...rest }) => {
     });
   };
   const handleAltBodyContent = (e) => {
-    console.log('alt body content', altBodyContent)
+    // console.log('alt body content', altBodyContent)
     setAltBodyContent(e.target.value);
   };
   const handleAltBodyEnable = (e) => {
-    console.log('alt body enable',   altBodyEnable)
+    // console.log('alt body enable',   altBodyEnable)
     setAltBodyContent(e.target.value);
   };
-
-  useEffect(() => {
-    console.log(content)
-    if (content) {
-      handleUpdateBlocks(() => parse(content));
-    }
-
-    console.log('use effect')
-    setupInteractJS();
-  }, [blocksVersionTracker]);
-
 
   const useStyles = makeStyles((theme) => ({
     root: {
@@ -507,7 +495,7 @@ export default ({ editorItem, history, ...rest }) => {
   }
 
 
-
+  console.log('blocks', blocks)
   const classes = useStyles();
 
   let editorPanel;

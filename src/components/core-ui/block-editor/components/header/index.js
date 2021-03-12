@@ -149,11 +149,11 @@ export default function Header({
         <span className={classes.updateContainer}>
           <span className={classes.editTitleBtn} onClick={toggleTitle}><EditPen /></span>
 
-          <span className={classes.moreBtn} onClick={()=>{handleOpen()}}><MoreDots/></span>
-          <span className={`${classes.stepUpdateButton} ${classes.stepUpdateButtonFirst}`} onClick={() => {emailStepBackward()}}>
+          <span className={classes.moreBtn} onClick={handleOpen}><MoreDots/></span>
+          <span className={`${classes.stepUpdateButton} ${classes.stepUpdateButtonFirst}`} onClick={emailStepBackward}>
             <ArrowCurveRight />
           </span>
-          <span className={classes.stepUpdateButton} onClick={() => {emailStepForward()}}>
+          <span className={classes.stepUpdateButton} onClick={emailStepForward}>
             <ArrowCurveLeft />
           </span>
 

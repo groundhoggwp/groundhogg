@@ -31,7 +31,7 @@ export default function EditorSteps({contents, title, fontSize, width, margin}) 
       width: width,
       margin,
       display: 'block',
-      height: open ? 'auto' : (parseInt(fontSize.replace('px', ''))+29)+'px',
+      height: open ? 'auto' : (parseInt(fontSize.replace('px', ''))+25)+'px',
       overflowY: open ? 'visible' : 'hidden',
       cursor: 'pointer',
       borderRadius: "7px",
