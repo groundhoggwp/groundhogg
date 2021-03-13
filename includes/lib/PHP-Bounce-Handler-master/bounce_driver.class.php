@@ -91,6 +91,11 @@ class BounceHandler {
 
 		include __DIR__ . '/bounce_responses.php';
 
+		/**
+		 * @var $bouncelist
+		 * @var $autorespondlist
+		 * @var $bouncesubj
+		 */
 		$this->bouncelist      = $bouncelist;
 		$this->autorespondlist = $autorespondlist;
 		$this->bouncesubj      = $bouncesubj;
@@ -692,9 +697,15 @@ class BounceHandler {
 	}
 
 	function fetch_status_messages( $code ) {
+
 		require_once __DIR__ . "/bounce_statuscodes.php";
 		$ret = $this->format_status_code( $code );
 		$arr = explode( '.', $ret['code'] );
+
+		/**
+		 * @var $status_code_classes
+		 * @var $status_code_subclasses
+		 */
 		$str = "<p><b>" . $status_code_classes[ $arr[0] ]['title'] . "</b> - " . $status_code_classes[ $arr[0] ]['descr'] . "  <b>" . $status_code_subclasses[ $arr[1] . "." . $arr[2] ]['title'] . "</b> - " . $status_code_subclasses[ $arr[1] . "." . $arr[2] ]['descr'] . "</p>";
 
 		return $str;

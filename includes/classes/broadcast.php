@@ -200,6 +200,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 	/**
 	 * Cancel the broadcast
+	 * @noinspection PhpPossiblePolymorphicInvocationInspection
 	 */
 	public function cancel() {
 		get_db( 'event_queue' )->mass_update(

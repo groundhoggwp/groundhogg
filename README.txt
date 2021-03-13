@@ -309,6 +309,9 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.4.4.4 (2021-03-13) =
+* FIXED Illegal syntax causing fatal error in PHP 8.0.3
+
 = 2.4.4.3 (2021-03-11) =
 * FIXED API bug caused by DB class update.
 

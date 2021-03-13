@@ -255,7 +255,7 @@ class Preferences {
 	 * @return false|int|mixed
 	 */
 	public static function sanitize( $preference, $old_preference = false ){
-		return self::is_valid( absint( $preference ) ) ? absint( $preference ) : $old_preference ?: self::UNCONFIRMED;
+		return self::is_valid( absint( $preference ) ) ? absint( $preference ) : ( $old_preference ?: self::UNCONFIRMED );
 	}
 
 	/**
