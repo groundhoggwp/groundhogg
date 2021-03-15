@@ -56,7 +56,7 @@ A symbolic links is used to link your repo to XAMP's directory. Below is an exam
 
 
 ```
-mklink /J "C:\Link To Folder inside Xamp" "C:\repo\Groundhogg"
+mklink /J C:\xampp\htdocs\wordpress\wp-content\plugins\core C:\repo\Groundhogg\core
 ```
 
 # Development Tips
