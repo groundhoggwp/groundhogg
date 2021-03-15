@@ -63,9 +63,16 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   inputText: {
+    fontSize: '12px',
     width: "calc(100% - 10px)",
-    padding: "5px 0px 5px 17px",
+    padding: "6px 0px 6px 17px",
     marginTop: "10px",
+    border: '1.2px solid rgba(16, 38, 64, 0.15)',
+    "&:focus": {
+      outline: 'none',
+      border: '1.2px solid rgba(16, 38, 64, 0.15)',
+      boxShadow: 'none'
+    }
   },
   blockPanel: {
     marginTop: "20px",
@@ -74,9 +81,25 @@ const useStyles = makeStyles((theme) => ({
       paddingBottom: "20px",
     },
   },
+  notesPanel: {
+    marginTop: '20px'
+  },
+  notesPanelTitle: {
+      color: '#102640',
+      fontSize: '12px',
+      fontWeight: '500',
+    margin: '12.5px 0px 12.5px 20.5px'
+  },
+  notesPanelTextArea: {
+    outline: 'none',
+    border: 'none',
+    width: 'calc(100% - 41px)',
+    margin: '0px 20.5px 23px 20.5px'
+
+  },
   emailControls: {
     height: "auto",
-    padding: "10px 22px 0 22px",
+    padding: "20px 22px 0 22px",
   },
   sendTestButton: {
     fontSize: "12px",
@@ -99,32 +122,41 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   alignmentContainer: {
+    float:'left',
     display: "inline-block",
     margin: "20px 0px 3px 0px",
     width: "115px",
   },
   alignmentBtn: {
     display: "inline-block",
-    width: "27px",
-    height: "27px",
     borderRadius: "7px",
-    margin: "15px 15px 34px 0px",
+    margin: "7px 15px 20px 0px",
     cursor: "pointer",
+    '& svg':{
+      stroke: '#707d8c',
+      padding: '7px'
+    },
+    '&:first-of-type':{
+      background: '#0075ff'
+    },
+    '&:first-of-type svg':{
+      stroke: '#fff',
+    }
   },
   messageTypeContainer: {
     display: "inline-block",
-    // marginTop: "20px",
+    float:'left',
+    marginTop:'21px',
     "& select": {
+      fontSize: '12px',
       marginTop: "5px",
-      padding: "7px 74px 7px 17px",
+      padding: "0px 74px 0px 17px",
       border: "1.5px solid rgba(16, 38, 64, 0.1)",
     },
   },
-  selectMessageType: {
-    width: "100px",
-    padding: "7px 0px 7px 17px",
+  clearFloat: {
+    clear: 'both'
   },
-
   blocksTitle: {
     display: "block",
     fontSize: "18px",
@@ -208,7 +240,7 @@ const Sidebar = ({
   //   }
   // };
 
-  const blockPanel = isInspecting ? (
+  const blockPanel = !isInspecting ? (
     <InspectorSlot bubblesVirtually />
   ) : (
     <>
@@ -327,6 +359,7 @@ const Sidebar = ({
           </select>
         </div>
 
+        <div className={classes.clearFloat}/>
         <ExpandablePanel
           title={"Additional options:"}
           fontSize={"12px"}
@@ -336,6 +369,11 @@ const Sidebar = ({
       </Card>
 
       <Card className={classes.blockPanel}>{blockPanel}</Card>
+      <Card className={classes.notesPanel}>
+      <div className={classes.notesPanelTitle}>Notes</div>
+      <textarea className={classes.notesPanelTextArea} placeholder="Click here to add a custom note..."/>
+
+      </Card>
     </div>
   );
 };

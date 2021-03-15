@@ -7,7 +7,6 @@ import { setDefaultBlockName } from "@wordpress/blocks";
  */
 import { __ } from "@wordpress/i18n";
 import {
-  Popover,
   SlotFillProvider,
   DropZoneProvider,
   FocusReturnProvider,
@@ -15,7 +14,7 @@ import {
   PanelBody,
   PanelRow
 } from "@wordpress/components";
-import { useEffect, useState } from "@wordpress/element";
+import { useEffect, useState, useRef } from "@wordpress/element";
 import { useSelect, useDispatch } from "@wordpress/data";
 import {
   serialize,
@@ -66,18 +65,18 @@ let startInteractJS = false;
 
 const IOSSwitch = withStyles((theme) => ({
   root: {
-    width: 42,
-    height: 26,
+    width: 34,
+    height: 20,
     padding: 0,
     margin: theme.spacing(1),
   },
   switchBase: {
     padding: 1,
     '&$checked': {
-      transform: 'translateX(16px)',
+      transform: 'translateX(14px)',
       color: theme.palette.common.white,
       '& + $track': {
-        backgroundColor: '#52d869',
+        backgroundColor: '#0075FF',
         opacity: 1,
         border: 'none',
       },
@@ -88,8 +87,8 @@ const IOSSwitch = withStyles((theme) => ({
     },
   },
   thumb: {
-    width: 24,
-    height: 24,
+    width: 18,
+    height: 18,
   },
   track: {
     borderRadius: 26 / 2,
@@ -240,7 +239,7 @@ export default ({ editorItem, history, ...rest }) => {
   const handleSetFrom = (e) => {
     setFrom(e.target.value.trim());
   };
-  const handleSetReplyTo = (e) => {    
+  const handleSetReplyTo = (e) => {
     setReplyTo(e.target.value.trim());
   };
 
@@ -289,7 +288,6 @@ export default ({ editorItem, history, ...rest }) => {
     event.target.classList.add("drop-active");
 
     draggedBlock = JSON.parse(target.getAttribute("data-block"));
-    // setDraggedBlock(JSON.parse(target.getAttribute("data-block"));
 
     // keep the dragged position in the data-x/data-y attributes
     const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
@@ -329,7 +327,7 @@ export default ({ editorItem, history, ...rest }) => {
 
 
     if(draggedBlockIndex === 0){
-      console.log(event.target)
+      // console.log(event.target)
       // return;
     }
     document.querySelectorAll('.wp-block')[draggedBlockIndex].style.borderBottom = '1px solid #0075FF';
@@ -360,46 +358,49 @@ export default ({ editorItem, history, ...rest }) => {
     target.setAttribute("data-x", 0);
     target.setAttribute("data-y", 0);
   };
-  interact(".block-editor__typewriter").unset()
-  interact(".block-editor__typewriter").dropzone({
-    overlap: 0.75,
-    ondropactivate: (event) => {},
+  const setupDragNDrop = () =>{
+      interact(".block-editor__typewriter").unset()
+      interact(".block-editor__typewriter").dropzone({
+        overlap: 0.75,
+        ondropactivate: (event) => {},
 
-    ondragenter: (event) => {
-      // var draggableElement = event.relatedTarget;
-      // console.log('drag enter')
-      startInteractJS = true
-      var dropzoneElement = event.target.classList.add("active");
+        ondragenter: (event) => {
+          // var draggableElement = event.relatedTarget;
+          console.log('drag enter')
+          startInteractJS = true
+          var dropzoneElement = event.target.classList.add("active");
 
-    },
-    ondragleave: (event) => {
-      var dropzoneElement = event.target.classList.remove("active");
-    },
-    ondrop: (event) => {
-      console.log('dropped')
-      var dropzoneElement = event.target.classList.remove("active");
+        },
+        ondragleave: (event) => {
+          var dropzoneElement = event.target.classList.remove("active");
+        },
+        ondrop: (event) => {
+          console.log('dropped')
+          var dropzoneElement = event.target.classList.remove("active");
 
-      handleContentChangeDraggedBlock();
-    },
-    ondropdeactivate: (event) => {},
-  });
+          handleContentChangeDraggedBlock();
+        },
+        ondropdeactivate: (event) => {},
+      });
 
-  interact(".side-bar-drag-drop-block").unset()
-  interact(".side-bar-drag-drop-block").draggable({
-    cursorChecker(action, interactable, element, interacting) {
-      return "grab";
-    },
-    onstart: dragStartListener,
-    onend: dragEndListener,
-    listeners: { move: dragMoveListener },
-    modifiers: [
-      interact.modifiers.restrict({
-        restriction: interact(".groundhogg-email-editor__email-content"),
-        elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
-        endOnly: true,
-      }),
-    ],
-  });
+      interact(".side-bar-drag-drop-block").unset()
+      interact(".side-bar-drag-drop-block").draggable({
+        cursorChecker(action, interactable, element, interacting) {
+          return "grab";
+        },
+        onstart: dragStartListener,
+        onend: dragEndListener,
+        listeners: { move: dragMoveListener },
+        modifiers: [
+          interact.modifiers.restrict({
+            restriction: interact(".groundhogg-email-editor__email-content"),
+            elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
+            endOnly: true,
+          }),
+        ],
+      });
+      }
+
 
   /*
     Sidebar Handlers
@@ -457,17 +458,32 @@ export default ({ editorItem, history, ...rest }) => {
     skipEmail:{
       fontSize: '14px',
       fontWeight: '300',
-      margin: '10px 0px 0px 20px'
+      margin: '10px 0px 0px 20px',
+      "& label": {
+        fontSize: "14px",
+        fontWeight: '300'
+      },
     },
     newEmailButton:{
+      display: 'flex',
+      alignItems: 'center',
+      fontSize: '14px',
+      fontWeight: '400',
       color: '#0075FF',
-      float: 'right'
+      float: 'right',
+      '& svg':{
+        border: '0.3px solid #0075FF',
+        borderRadius: '4px',
+        marginRight: '5px',
+        padding: '4px'
+      }
     },
     sendEmailSelect:{
       // Importants are needed while we are still inside wordpress, remove this later
       display: 'block',
       width: 'calc(100%) !important',
       maxWidth: 'calc(100%) !important',
+      padding: '5px 20px 5px 20px',
       border: '1.2px solid rgba(16, 38, 64, 0.15) !important'
     },
     subTitleContainer: {
@@ -505,6 +521,12 @@ export default ({ editorItem, history, ...rest }) => {
   const toggleSubTitle = () =>{
     setDisableTitle(disableSubTitle ? false : true )
   }
+
+  useEffect(() => {
+    setupDragNDrop()
+  }, [blocks]);
+
+
 
 
   console.log('blocks', blocks)
@@ -581,9 +603,10 @@ export default ({ editorItem, history, ...rest }) => {
                     <div className={classes.sendEmailComponentLabel}>Select an email to send:</div>
 
                     <div className={classes.newEmailButton}>
-                      <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="1.56641" y="0.75" width="14.0265" height="14.5" rx="3.25" fill="white" stroke="#0075FF" stroke-width="1.5"/>
+                      <svg width="6" height="6" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5.64932 2.46589V2.31589H5.49932H3.62312V0.389893V0.239893H3.47312H2.48331H2.33331V0.389893V2.31589H0.46875H0.31875V2.46589V3.54589V3.69589H0.46875H2.33331V5.60989V5.75989H2.48331H3.47312H3.62312V5.60989V3.69589H5.49932H5.64932V3.54589V2.46589Z" fill="#0075FF" stroke="#0075FF" stroke-width="0.3"/>
                       </svg>
+
                       new email
                     </div>
 
@@ -599,7 +622,7 @@ export default ({ editorItem, history, ...rest }) => {
 
                     <div className={classes.skipEmail}>
                       <label>Skip email step if confirmed:</label>
-                      <IOSSwitch checked={false} onChange={()=>{}} name="checkedB" />
+                      <IOSSwitch checked={true} onChange={()=>{}} name="checkedB" />
                     </div>
                   </Card>
                   <div className={classes.subTitleContainer}>

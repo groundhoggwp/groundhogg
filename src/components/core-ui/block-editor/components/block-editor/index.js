@@ -104,6 +104,7 @@ function BlockEditor({
       position: "relative",
       display: "block",
       width: viewType === "desktop" ? "600px" : "320px",
+      minHeight: "300px", // Needed for new emails so drag & drop works
       margin: "10px auto 30px auto",
       padding: "10px",
     },
@@ -189,8 +190,8 @@ function BlockEditor({
                 <MultiSelectScrollIntoView />
                 {/* Add Block Button */}
                 <BlockEditorKeyboardShortcuts.Register />
-                <Popover.Slot left={300} top={500} />
-                <Popover.Slot name="block-toolbar" left={300} top={500} />{" "}
+                <Popover.Slot left={300} top={550} />
+                <Popover.Slot name="block-toolbar" left={300} top={550} />
                 <Typewriter>
                   <CopyHandler>
                     <WritingFlow>
@@ -215,7 +216,6 @@ function BlockEditor({
         </div>
 
         <Sidebar.InspectorFill>
-          <Popover name="block-toolbar" />
           <BlockInspector />
         </Sidebar.InspectorFill>
       </BlockEditorProvider>
