@@ -58,7 +58,7 @@ function ensure_logo_is_there() {
 		}
 
 		?>
-        <style type="text/css">
+		<style type="text/css">
             #main h1 a {
                 background-image: url(<?php echo esc_url( $image[0] ); ?>);
                 -webkit-background-size: <?php echo absint( $image[1] )?>px;
@@ -66,7 +66,7 @@ function ensure_logo_is_there() {
                 height: <?php echo absint( $image[2] ) ?>px;
                 width: <?php echo absint( $image[1] ) ?>px;
             }
-        </style>
+		</style>
 	<?php
 	endif;
 }
@@ -81,8 +81,9 @@ function managed_page_head( $title = '', $action = '' ) {
 	add_action( 'wp_print_styles', 'Groundhogg\enqueue_managed_page_styles' );
 	add_action( 'wp_enqueue_scripts', 'Groundhogg\enqueue_managed_page_scripts' );
 
-	add_action( 'wp_head', 'noindex' );
-	add_action( 'wp_head', 'wp_sensitive_page_meta' );
+	add_filter( 'wp_robots', 'wp_robots_noindex' );
+	add_filter( 'wp_robots', 'wp_robots_sensitive_page' );
+
 	add_action( 'wp_head', 'Groundhogg\ensure_logo_is_there' );
 
 	status_header( 200 );
@@ -118,30 +119,31 @@ function managed_page_head( $title = '', $action = '' ) {
 	}
 
 	?><!DOCTYPE html>
-    <html <?php language_attributes(); ?>>
-    <head>
-        <meta charset="<?php bloginfo( 'charset' ); ?>">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-	    <?php no_index_tag(); ?>
-        <link rel="profile" href="http://gmpg.org/xfn/11">
-        <title><?php echo $mp_title; ?></title>
-        <?php wp_head(); ?>
-    </head>
-    <body class="managed-page <?php echo esc_attr( implode( ' ', $classes ) ); ?>">
-    <div id="main">
+	<html <?php language_attributes(); ?>>
+	<head>
+		<meta charset="<?php bloginfo( 'charset' ); ?>">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<?php no_index_tag(); ?>
+		<link rel="profile" href="http://gmpg.org/xfn/11">
+		<title><?php echo $mp_title; ?></title>
+		<?php wp_head(); ?>
+	</head>
+	<body class="managed-page <?php echo esc_attr( implode( ' ', $classes ) ); ?>">
+	<?php wp_body_open(); ?>
+	<div id="main">
 	<?php if ( has_custom_logo() ): ?>
-        <h1><a href="<?php echo esc_url( $header_url ); ?>"
-               title="<?php echo esc_attr( $header_title ); ?>"><?php echo $header_text; ?></a></h1>
+		<h1><a href="<?php echo esc_url( $header_url ); ?>"
+		       title="<?php echo esc_attr( $header_title ); ?>"><?php echo $header_text; ?></a></h1>
 	<?php endif;
 
-	if ( $notice = get_url_var( 'notice' ) ){
-	    add_notice( sanitize_key( $notice ) );
-    }
+	if ( $notice = get_url_var( 'notice' ) ) {
+		add_notice( sanitize_key( $notice ) );
+	}
 
 	print_notices();
 
 	?>
-    <div id="content">
+	<div id="content">
 	<?php
 }
 
@@ -159,14 +161,30 @@ function managed_page_footer() {
 	] );
 
 	?>
-    </div>
-    <p id="extralinks"><?php echo $html; ?></p>
-    </div>
+	</div>
+	<p id="extralinks"><?php echo $html; ?></p>
+	<?php if ( is_option_enabled( 'gh_affiliate_link_in_email' ) ): ?>
+		<p id="credit">
+			<?php printf( __( "Powered by %s", 'groundhogg' ), html()->e( 'a', [
+				'target' => '_blank',
+				'href'   => add_query_arg( [
+					'utm_source'   => 'email',
+					'utm_medium'   => 'footer-link',
+					'utm_campaign' => 'email-affiliate',
+					'aff'          => absint( get_option( 'gh_affiliate_id' ) ),
+				], 'https://www.groundhogg.io/pricing/' )
+			], html()->e( 'img', [
+				'width' => 85,
+				'src'   => GROUNDHOGG_ASSETS_URL . 'images/groundhogg-logo-email-footer.png'
+			], null, true ) ) ); ?>
+		</p>
+	<?php endif; ?>
+	</div>
 	<?php
 	wp_footer();
 	?>
-    <div class="clear"></div>
-    </body>
-    </html>
+	<div class="clear"></div>
+	</body>
+	</html>
 	<?php
 }

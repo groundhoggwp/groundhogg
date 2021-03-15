@@ -3,7 +3,7 @@ Contributors: trainingbusinesspros, Groundhogg, Dhrumit, Adrian Tobey
 Tags: wordpress crm, marketing automation, crm, email marketing, email automation
 Donate link: https://www.groundhogg.io/try/
 Requires at least: 4.9
-Tested up to: 5.6
+Tested up to: 5.7
 Requires PHP: 5.6
 Stable tag: trunk
 License: GPLv3
@@ -308,6 +308,12 @@ You can purchase a premium plan for access to support and our premium extensions
 Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/monthly/).
 
 == Changelog ==
+
+= 2.4.4.5 (2021-03-15) =
+* ADDED Powered by Groundhogg credit to preferences page IF the include affiliate image in emails option is enabled.
+* TWEAKED Added MINUTE in seconds expiration to wp_cache_set calls
+* FIXED Form CSS not showing in the block editor
+* FIXED Calls to functions deprecated in 5.7
 
 = 2.4.4.4 (2021-03-13) =
 * FIXED Illegal syntax causing fatal error in PHP 8.0.3

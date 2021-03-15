@@ -485,7 +485,7 @@ abstract class DB {
 			return;
 		}
 
-		wp_cache_set( 'last_changed', microtime(), $this->get_cache_group() );
+		wp_cache_set( 'last_changed', microtime(), $this->get_cache_group(), MINUTE_IN_SECONDS );
 	}
 
 	/**
@@ -516,7 +516,7 @@ abstract class DB {
 
 		if ( ! $last_changed ) {
 			$last_changed = microtime();
-			wp_cache_set( 'last_changed', $last_changed, $this->get_cache_group() );
+			wp_cache_set( 'last_changed', $last_changed, $this->get_cache_group(), MINUTE_IN_SECONDS );
 		}
 
 		return $last_changed;
@@ -595,7 +595,7 @@ abstract class DB {
 			return false;
 		}
 
-		return wp_cache_set( $cache_key, $data, $this->get_cache_group() );
+		return wp_cache_set( $cache_key, $data, $this->get_cache_group(), MINUTE_IN_SECONDS );
 	}
 
 	/**

@@ -101,9 +101,14 @@ label {
     cursor: pointer;
 }
 
+p#credit,
 #extralinks {
     color: #555d66;
     text-align: center;
+}
+
+p#credit img{
+    vertical-align: middle;
 }
 
 #main .preference-option a {

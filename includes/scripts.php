@@ -14,6 +14,13 @@ class Scripts {
 
 		add_action( 'admin_enqueue_scripts', [ $this, 'register_admin_styles' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'register_admin_scripts' ] );
+
+		add_action( 'enqueue_block_editor_assets', [ $this, 'register_block_editor_assets' ] );
+	}
+
+	public function register_block_editor_assets(){
+		wp_register_style( 'groundhogg-form', GROUNDHOGG_ASSETS_URL . 'css/frontend/form.css', [], GROUNDHOGG_VERSION );
+		wp_enqueue_style( 'groundhogg-form' );
 	}
 
 	public function is_script_debug_enabled() {
