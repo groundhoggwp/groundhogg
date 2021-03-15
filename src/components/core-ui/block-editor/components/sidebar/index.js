@@ -185,27 +185,28 @@ const Sidebar = ({
   const classes = useStyles();
 
   const [blocks, setBlocks] = useState(getBlockTypes());
-  const [search, setSearch] = useState("");
+  // const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    updateBlocks();
-  }, [search]);
-
-  const handleOnChange = (e) => {
-    setSearch(e.target.value.trim());
-  };
-
-  const updateBlocks = () => {
-    if (search === "") {
-      setBlocks(getBlockTypes());
-    } else {
-      const newBlocks = getBlockTypes().filter(
-        (block) =>
-          block.title.split(" - ")[1].toLowerCase().indexOf(search) !== -1
-      );
-      setBlocks(newBlocks);
-    }
-  };
+  // No search is left
+  // useEffect(() => {
+  //   updateBlocks();
+  // }, [search]);
+  //
+  // const handleOnChange = (e) => {
+  //   setSearch(e.target.value.trim());
+  // };
+  //
+  // const updateBlocks = () => {
+  //   if (search === "") {
+  //     setBlocks(getBlockTypes());
+  //   } else {
+  //     const newBlocks = getBlockTypes().filter(
+  //       (block) =>
+  //         block.title.split(" - ")[1].toLowerCase().indexOf(search) !== -1
+  //     );
+  //     setBlocks(newBlocks);
+  //   }
+  // };
 
   const blockPanel = isInspecting ? (
     <InspectorSlot bubblesVirtually />
@@ -272,9 +273,7 @@ const Sidebar = ({
       <Card className={classes.emailControls}>
         <Button
           className={classes.sendTestButton}
-          onClick={() => {
-            sendTestEmail();
-          }}
+          onClick={sendTestEmail}
         >
           {__("Send test email")}
         </Button>
@@ -299,14 +298,14 @@ const Sidebar = ({
           className={classes.inputText}
           value={from}
           placeholder={"From"}
-          onChange={handleOnChange}
+          onChange={handleSetFrom}
           fullWidth
         />
         <input
           className={classes.inputText}
           value={replyTo}
           placeholder={"Reply to"}
-          onChange={handleOnChange}
+          onChange={handleSetReplyTo}
           fullWidth
         />
 

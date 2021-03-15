@@ -235,6 +235,17 @@ export default ({ editorItem, history, ...rest }) => {
 
 
   /*
+    Side Bar
+  */
+  const handleSetFrom = (e) => {
+    setFrom(e.target.value.trim());
+  };
+  const handleSetReplyTo = (e) => {    
+    setReplyTo(e.target.value.trim());
+  };
+
+
+  /*
     Block Handlers
   */
   const handleContentChangeDraggedBlock = () => {
@@ -399,10 +410,11 @@ export default ({ editorItem, history, ...rest }) => {
 
 
   const sendTestEmail = (e) => {
-    if (!matchEmailRegex(testEmail)) {
+    if (!matchEmailRegex(replyTo)) {
+      // console.log('invliad email', replyTo, from, content, subject)
       return;
     }
-    // console.log("valid let send", testEmail);
+    // console.log("valid let send");
     sendEmailRaw({
       to: replyTo,
       from,
@@ -603,7 +615,7 @@ export default ({ editorItem, history, ...rest }) => {
                   {editorPanel}
               </div>
 
-              <Sidebar isInspecting={isInspecting} sendTestEmail={sendTestEmail} handleViewTypeChange={handleViewTypeChange} />
+              <Sidebar isInspecting={isInspecting} sendTestEmail={sendTestEmail} handleViewTypeChange={handleViewTypeChange} handleSetFrom={handleSetFrom} handleSetReplyTo={handleSetReplyTo} />
 
               <ComplementaryArea.Slot scope="gh/v4/core" />
 
