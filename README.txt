@@ -309,6 +309,10 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.4.4.6 (2021-03-16) =
+* TWEAKED Info card CSS
+* FIXED Admin Notification SMS not working.
+
 = 2.4.4.5 (2021-03-15) =
 * ADDED Powered by Groundhogg credit to preferences page IF the include affiliate image in emails option is enabled.
 * TWEAKED Added MINUTE in seconds expiration to wp_cache_set calls

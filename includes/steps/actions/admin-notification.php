@@ -295,17 +295,11 @@ class Admin_Notification extends Action {
 				return new \WP_Error( 'sms_inactive', 'The SMS extension was not found.' );
 			}
 
-			$to = $this->get_setting( 'send_to_sms' );
-
-			$to = explode( ',', do_replacements( $to, $contact->get_id() ) );
-
+			$to   = do_replacements( $this->get_setting( 'send_to_sms' ), $contact );
 			$sent = false;
 
-			foreach ( $to as $number ) {
-
-				if ( function_exists( '\GroundhoggSMS\send_sms' ) ) {
-					$sent = \GroundhoggSMS\send_sms( $number, $finished_note );
-				}
+			if ( class_exists( '\GroundhoggSMS\SMS_Services' ) ) {
+				$sent = \GroundhoggSMS\SMS_Services::send_transactional( $to, $finished_note );
 			}
 
 			return $sent;
