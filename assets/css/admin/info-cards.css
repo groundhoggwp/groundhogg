@@ -22,10 +22,6 @@
     margin-bottom: 10px;
 }
 
-.info-card ul.info-list {
-    margin-bottom: 0;
-}
-
 ul.regular-list {
     list-style: disc;
     padding-left: 20px;
@@ -43,12 +39,16 @@ div.info-card.postbox{
     justify-content: left;
 }
 
+.info-card a.no-underline{
+    text-decoration: none;
+}
+
 .info-card .postbox-header img.emoji {
     margin-right: 10px !important;
 }
 
-.info-card ul.info-list li:not(:last-child) {
-    margin-bottom: 10px;
+.info-card ul.info-list {
+    margin: 0;
 }
 
 .info-card ul.info-list li span.label,
@@ -56,11 +56,14 @@ div.info-card.postbox{
     display: block;
 }
 
+.info-card ul.info-list li {
+    margin-bottom: 0;
+}
+
 .info-card ul.info-list li span.label {
     font-weight: 500;
     color: #808080;
-    font-size: 12px;
-    text-transform: uppercase;
+    font-size: 14px;
 }
 
 .info-card ul.info-list li span.data {
@@ -84,7 +87,7 @@ div.info-card.postbox{
 
 .ic-section > .ic-section-content {
     display: none;
-    padding: 10px 0;
+    padding: 0 0 10px 0;
     background-color: #fff;
 }
 
@@ -364,4 +367,18 @@ div.info-card.postbox{
 .section.inline-label select {
     padding-left: 30px;
     width: 100%;
+}
+
+.info-card table{
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.info-card table th{
+    text-align: left;
+    font-weight: 500;
+}
+
+.info-card table td:last-child{
+    text-align: right;
 }
