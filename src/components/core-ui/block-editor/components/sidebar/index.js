@@ -63,16 +63,16 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   inputText: {
-    fontSize: '12px',
+    fontSize: "12px",
     width: "calc(100% - 10px)",
     padding: "6px 0px 6px 17px",
     marginTop: "10px",
-    border: '1.2px solid rgba(16, 38, 64, 0.15)',
+    border: "1.2px solid rgba(16, 38, 64, 0.15)",
     "&:focus": {
-      outline: 'none',
-      border: '1.2px solid rgba(16, 38, 64, 0.15)',
-      boxShadow: 'none'
-    }
+      outline: "none",
+      border: "1.2px solid rgba(16, 38, 64, 0.15)",
+      boxShadow: "none",
+    },
   },
   blockPanel: {
     marginTop: "20px",
@@ -82,20 +82,19 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   notesPanel: {
-    marginTop: '20px'
+    marginTop: "20px",
   },
   notesPanelTitle: {
-      color: '#102640',
-      fontSize: '12px',
-      fontWeight: '500',
-    margin: '12.5px 0px 12.5px 20.5px'
+    color: "#102640",
+    fontSize: "12px",
+    fontWeight: "500",
+    margin: "12.5px 0px 12.5px 20.5px",
   },
   notesPanelTextArea: {
-    outline: 'none',
-    border: 'none',
-    width: 'calc(100% - 41px)',
-    margin: '0px 20.5px 23px 20.5px'
-
+    outline: "none",
+    border: "none",
+    width: "calc(100% - 41px)",
+    margin: "0px 20.5px 23px 20.5px",
   },
   emailControls: {
     height: "auto",
@@ -122,7 +121,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   alignmentContainer: {
-    float:'left',
+    float: "left",
     display: "inline-block",
     margin: "20px 0px 3px 0px",
     width: "115px",
@@ -132,30 +131,30 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: "7px",
     margin: "7px 15px 20px 0px",
     cursor: "pointer",
-    '& svg':{
-      stroke: '#707d8c',
-      padding: '7px'
+    "& svg": {
+      stroke: "#707d8c",
+      padding: "7px",
     },
-    '&:first-of-type':{
-      background: '#0075ff'
+    "&:first-of-type": {
+      background: "#0075ff",
     },
-    '&:first-of-type svg':{
-      stroke: '#fff',
-    }
+    "&:first-of-type svg": {
+      stroke: "#fff",
+    },
   },
   messageTypeContainer: {
     display: "inline-block",
-    float:'left',
-    marginTop:'21px',
+    float: "left",
+    marginTop: "21px",
     "& select": {
-      fontSize: '12px',
+      fontSize: "12px",
       marginTop: "5px",
       padding: "0px 74px 0px 17px",
       border: "1.5px solid rgba(16, 38, 64, 0.1)",
     },
   },
   clearFloat: {
-    clear: 'both'
+    clear: "both",
   },
   blocksTitle: {
     display: "block",
@@ -240,7 +239,7 @@ const Sidebar = ({
   //   }
   // };
 
-  const blockPanel = !isInspecting ? (
+  const blockPanel = isInspecting ? (
     <InspectorSlot bubblesVirtually />
   ) : (
     <>
@@ -303,10 +302,7 @@ const Sidebar = ({
       tabIndex="-1"
     >
       <Card className={classes.emailControls}>
-        <Button
-          className={classes.sendTestButton}
-          onClick={sendTestEmail}
-        >
+        <Button className={classes.sendTestButton} onClick={sendTestEmail}>
           {__("Send test email")}
         </Button>
         <div
@@ -359,7 +355,7 @@ const Sidebar = ({
           </select>
         </div>
 
-        <div className={classes.clearFloat}/>
+        <div className={classes.clearFloat} />
         <ExpandablePanel
           title={"Additional options:"}
           fontSize={"12px"}
@@ -370,9 +366,11 @@ const Sidebar = ({
 
       <Card className={classes.blockPanel}>{blockPanel}</Card>
       <Card className={classes.notesPanel}>
-      <div className={classes.notesPanelTitle}>Notes</div>
-      <textarea className={classes.notesPanelTextArea} placeholder="Click here to add a custom note..."/>
-
+        <div className={classes.notesPanelTitle}>Notes</div>
+        <textarea
+          className={classes.notesPanelTextArea}
+          placeholder="Click here to add a custom note..."
+        />
       </Card>
     </div>
   );

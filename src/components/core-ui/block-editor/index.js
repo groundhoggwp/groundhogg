@@ -1,7 +1,3 @@
-import "./index.scss";
-import "./components/blocks";
-import { setDefaultBlockName } from "@wordpress/blocks";
-
 /**
  * WordPress dependencies
  */
@@ -27,6 +23,7 @@ import {
   insertDefaultBlock,
   getBlockTypes,
   getBlockInsertionPoint,
+  setDefaultBlockName
 } from "@wordpress/blocks";
 
 /**
@@ -57,6 +54,9 @@ import { getLuxonDate, matchEmailRegex } from "utils/index";
 import EditPen from "components/svg/EditPen/";
 
 import { CORE_STORE_NAME, EMAILS_STORE_NAME } from "data";
+
+import "./index.scss";
+import "./components/blocks";
 
 let draggedBlockIndex = {};
 let draggedBlock = {};
@@ -131,7 +131,7 @@ export default ({ editorItem, history, ...rest }) => {
 
   // Global States
   const [blocksVersionTracker, setBlocksVersionTracker] = useState(0);
-  const [blockVersionHistory, setBlockVersionHistory] = useState([defaultContentValue]);
+  const [blockVersionHistory, setBlockVersionHistory] = useState([parse(defaultContentValue)]);
 
   // Editor Contents
   const [title, setTitle] = useState(defaultTitleValue);
@@ -165,14 +165,6 @@ export default ({ editorItem, history, ...rest }) => {
     []
   );
 
-  // Probably not needed don't delete yet
-  // if (!item.hasOwnProperty("ID")) {
-  //   return null;
-  // }
-
-
-
-
   /*
    Header Handlers
   */
@@ -190,12 +182,20 @@ export default ({ editorItem, history, ...rest }) => {
 
   const emailStepBackward = () => {
     const newBlocksVersionTracker = blocksVersionTracker-1
+    if(!blockVersionHistory[newBlocksVersionTracker]){
+      return;
+    }
     setBlocksVersionTracker(newBlocksVersionTracker)
+    handleUpdateBlocks(blockVersionHistory[newBlocksVersionTracker], {}, true);
 
   }
   const emailStepForward = () => {
     const newBlocksVersionTracker = blocksVersionTracker+1
+    if(!blockVersionHistory[newBlocksVersionTracker]){
+      return;
+    }
     setBlocksVersionTracker(newBlocksVersionTracker)
+    handleUpdateBlocks(blockVersionHistory[newBlocksVersionTracker], {}, true);
   }
 
   /*
@@ -252,12 +252,13 @@ export default ({ editorItem, history, ...rest }) => {
     // console.log('asdfasdf', draggedBlockIndex)
     let newBlocks = blocks;
     newBlocks.splice(draggedBlockIndex, 0, createBlock(draggedBlock.name));
-    handleUpdateBlocks(newBlocks);
+    handleUpdateBlocks(newBlocks, {},false);
     startInteractJS = false;
   };
 
-  const handleUpdateBlocks = (blocks, updateHistory) => {
+  const handleUpdateBlocks = (blocks, selectionObj, updateFromHistory) => {
     // On load this stops a null error
+    console.log(blocks, selectionObj, updateFromHistory)
     if (!Array.isArray(blocks)) {
       return;
     }
@@ -265,19 +266,17 @@ export default ({ editorItem, history, ...rest }) => {
     // Standard calls for the block editor
     updateBlocks(blocks);
     setContent(serialize(blocks));
-    console.log("update", blocks);
 
-    if(updateHistory){
-      // Build up the history tracker
-      const newBlocksVersionTracker = blocksVersionTracker+1;
-      const newblockVersionHistory = blockVersionHistory
-      newblockVersionHistory.splice(blocksVersionTracker, 0, blocks);
+
+    if(!updateFromHistory){
+      // Build up the history tracker, except when we're going back and forth
+      const newBlocksVersionTracker = blockVersionHistory.length;
+      const newBlockVersionHistory = blockVersionHistory
+      newBlockVersionHistory.push(blocks);
 
       setBlocksVersionTracker(newBlocksVersionTracker)
-      setBlockVersionHistory(newblockVersionHistory)
+      setBlockVersionHistory(newBlockVersionHistory)
     }
-
-    // console.log(blocksVersionTracker, blockVersionHistory[blocksVersionTracker])
   };
 
   /*
@@ -529,7 +528,7 @@ export default ({ editorItem, history, ...rest }) => {
 
 
 
-  console.log('blocks', blocks)
+  // console.log('blocks', blocks)
   const classes = useStyles();
 
   let editorPanel;
