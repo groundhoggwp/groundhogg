@@ -77,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
 export default function PrimaryLayout (props) {
   const classes = useStyles()
   const { children } = props
-  console.log(props)
+
   return (
     <Page className={ `groundhogg-layout__primary ${ classes.root }` } title="Dashboard">
       <div className={ classes.appBarSpacer }/>

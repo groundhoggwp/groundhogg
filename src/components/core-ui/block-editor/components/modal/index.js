@@ -2,19 +2,20 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Modal from "@material-ui/core/Modal";
 
-function rand() {
-  return Math.round(Math.random() * 20) - 10;
-}
+import { createTheme } from '../../../../../theme';
+const theme = createTheme({});
+
 
 function getModalStyle() {
-  const top = 50 + rand();
-  const left = 50 + rand();
+  const top = 50
+  const left = 50
 
   return {
     top: `${top}%`,
     left: `${left}%`,
     transform: `translate(-${top}%, -${left}%)`,
   };
+
 }
 
 const useStyles = makeStyles((theme) => ({

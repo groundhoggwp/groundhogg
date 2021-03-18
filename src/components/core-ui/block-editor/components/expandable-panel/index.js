@@ -18,6 +18,9 @@ import ReplayIcon from "@material-ui/icons/Replay";
  */
 import ArrowDown from "components/svg/ArrowDown/";
 
+import { createTheme } from '../../../../../theme';
+const theme = createTheme({});
+
 export default function EditorSteps({
   contents,
   title,

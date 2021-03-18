@@ -38,6 +38,8 @@ import { makeStyles } from "@material-ui/core/styles";
  */
 import Sidebar from "../sidebar";
 import ExpandablePanel from "../expandable-panel/";
+import { createTheme } from '../../../../../theme';
+const theme = createTheme({});
 
 //TODO Implement block persistence with email data store.
 //TODO Potentially use our own alerts data store (core).

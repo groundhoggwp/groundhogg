@@ -19,6 +19,9 @@ import ReplayIcon from "@material-ui/icons/Replay";
 import Step from "./step";
 import Mail from "components/svg/Mail/";
 
+import { createTheme } from '../../../../../theme';
+const theme = createTheme({});
+
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "265px",

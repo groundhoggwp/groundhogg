@@ -29,6 +29,9 @@ import EditPen from "components/svg/EditPen/";
 import SendMail from "components/svg/SendMail/";
 import MoreDots from "components/svg/MoreDots/";
 
+import { createTheme } from '../../../../../theme';
+const theme = createTheme({});
+
 const useStyles = makeStyles((theme) => ({
   root: {
     position: "absolute",
@@ -95,7 +98,8 @@ const useStyles = makeStyles((theme) => ({
   updateButton: {
     width: "320px",
     color: "#fff",
-    background: "#9ECE38",
+    background: theme.palette.secondary.main,
+    // background: "#9ECE38",
     fontSize: "18px",
     textTransform: "none",
     margin: "9px 0 0 70px",

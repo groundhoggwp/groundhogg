@@ -126,6 +126,7 @@ export default ({ editorItem, history, ...rest }) => {
     subject: defaultSubjectValue,
     pre_header: defaultPreHeaderValue,
     content: defaultContentValue,
+    notes: defaultNotes,
     editorType,
   } = editorItem.data;
 
@@ -147,9 +148,13 @@ export default ({ editorItem, history, ...rest }) => {
   const [replyTo, setReplyTo] = useState("");
   const [from, setFrom] = useState("");
   const [viewType, setViewType] = useState("desktop");
+  const [messageType, setMessageType] = useState("marketing");
+  const [emailAlignment, setEmailAlignment] = useState("left");
+  const [sideBarBlockDisplayType, setSideBarBlockDisplayType] = useState("blocks");
+  const [notes, setNotes] = useState(defaultNotes);
 
   // Unused
-  const [isInspecting, setIsInspecting] = useState(false);
+
   const [altBodyContent, setAltBodyContent] = useState('');
   const [altBodyEnable, setAltBodyEnable] = useState('');
   const [subject, setSubject] = useState(defaultSubjectValue);
@@ -220,6 +225,10 @@ export default ({ editorItem, history, ...rest }) => {
   const handleSubTitleChange = (e) => {
     setSubTitle(e.target.value)
   }
+  const handleInsertReplacement = (e) => {
+    console.log(e)
+    // setSubTitle(e.target.value)
+  }
 
   const toggleSubTitleDisable = () => {
     setDisableSubTitle(disableSubTitle ? false : true)
@@ -242,6 +251,12 @@ export default ({ editorItem, history, ...rest }) => {
   const handleSetReplyTo = (e) => {
     setReplyTo(e.target.value.trim());
   };
+  const handleEmailAlignmentChange = (alignment) => {
+    setEmailAlignment(alignment);
+  };
+  const handleMessageType = (e) => {
+    setMessageType(e.target.value);
+  };
 
 
   /*
@@ -251,14 +266,18 @@ export default ({ editorItem, history, ...rest }) => {
     // if(!startInteractJS){return;}
     // console.log('asdfasdf', draggedBlockIndex)
     let newBlocks = blocks;
-    newBlocks.splice(draggedBlockIndex, 0, createBlock(draggedBlock.name));
-    handleUpdateBlocks(newBlocks, {},false);
-    startInteractJS = false;
+    newBlocks.push(newBlocks[0])
+    // newBlocks.splice(draggedBlockIndex, 0, createBlock(draggedBlock.name));
+    // console.log('drag blocks', newBlocks)
+    updateBlocks(newBlocks);
+    setContent(serialize(newBlocks));
+    // handleUpdateBlocks(newBlocks, {},false);
+    // startInteractJS = false;
   };
 
   const handleUpdateBlocks = (blocks, selectionObj, updateFromHistory) => {
     // On load this stops a null error
-    console.log(blocks, selectionObj, updateFromHistory)
+    // console.log('handle update', blocks)
     if (!Array.isArray(blocks)) {
       return;
     }
@@ -315,7 +334,7 @@ export default ({ editorItem, history, ...rest }) => {
       if(adjustedY >= block.getBoundingClientRect().top && adjustedY <= block.getBoundingClientRect().bottom ){
         draggedBlockIndex = i
         saveBlock = block
-        console.log(block.getBoundingClientRect().bottom, block.getBoundingClientRect().top)
+        // console.log(block.getBoundingClientRect().bottom, block.getBoundingClientRect().top)
       }
 
       if(draggedBlock === 0){
@@ -432,6 +451,14 @@ export default ({ editorItem, history, ...rest }) => {
     setAltBodyContent(e.target.value);
   };
 
+  const handleIsInpsecting = (type) => {
+    setSideBarBlockDisplayType(type === 'blocks' ? 'inspector' : 'blocks');
+  };
+  const handleChangeNotes = (e) => {
+    // console.log('alt body enable',   altBodyEnable)
+    setNotes(e.target.value);
+  };
+
   const useStyles = makeStyles((theme) => ({
     root: {
 
@@ -506,6 +533,23 @@ export default ({ editorItem, history, ...rest }) => {
         padding: "0",
         marginLeft: "-1px",
       },
+    },
+    selectInsertReplacement:{
+      position: 'absolute',
+      minWidth: '209px',
+      top: '345px',
+      left: '747px',
+      fontSize: '13px !important',
+      lineHeight: '13px !important',
+      fontWeight: '400',
+      padding: '6.5px 16.5px 6.5px 16.5px !important',//!Importants can be removed once we\re out of the wordpress space
+      borderRadius: '7px !important',
+      border: '1.2px solid rgba(16, 38, 64, 0.15) !important',
+      boxShadow: 'none',
+      outline: 'none',
+      '&:focus':{
+        border: 'none'
+      }
     },
     contentSideBar:{
 
@@ -621,7 +665,7 @@ export default ({ editorItem, history, ...rest }) => {
 
                     <div className={classes.skipEmail}>
                       <label>Skip email step if confirmed:</label>
-                      <IOSSwitch checked={true} onChange={()=>{}} name="checkedB" />
+                      <IOSSwitch checked={true} onChange={()=>{}} name="checked" />
                     </div>
                   </Card>
                   <div className={classes.subTitleContainer}>
@@ -634,10 +678,18 @@ export default ({ editorItem, history, ...rest }) => {
                     <EditPen onClick={toggleSubTitleDisable}/>
                   </div>
 
+
+                    <select  onChange={handleInsertReplacement} label="" className={classes.selectInsertReplacement}>
+                      <option value="" selected disabled hidden>Insert replacement</option>
+                      <option value={'something'}>somethinhg</option>
+                    </select>
+
+
+
                   {editorPanel}
               </div>
 
-              <Sidebar isInspecting={isInspecting} sendTestEmail={sendTestEmail} handleViewTypeChange={handleViewTypeChange} handleSetFrom={handleSetFrom} handleSetReplyTo={handleSetReplyTo} />
+              <Sidebar sideBarBlockDisplayType={sideBarBlockDisplayType} handleIsInpsecting={handleIsInpsecting} sendTestEmail={sendTestEmail} handleViewTypeChange={handleViewTypeChange} handleSetFrom={handleSetFrom} handleSetReplyTo={handleSetReplyTo}  messageType={messageType} handleMessageType={handleMessageType} emailAlignment={emailAlignment} handleEmailAlignmentChange={handleEmailAlignmentChange} notes={notes} handleChangeNotes={handleChangeNotes}/>
 
               <ComplementaryArea.Slot scope="gh/v4/core" />
 
