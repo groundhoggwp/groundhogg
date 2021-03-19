@@ -6,10 +6,17 @@
 @import "~@wordpress/base-styles/z-index";
 @import "~@wordpress/interface/src/style.scss";
 
-
-// .block-editor__typewriter{
-//   min-height: 300px
+@import '../../../fonts/montserrat-v15-latin-100.ttf';
+// @font-face {
+//     font-family: 'Montserrat';
+//     src: url('') format('ttf');
 // }
+
+
+.Groundhogg-BlockEditor{
+  min-height: 300px;
+  font-family: 'Montserrat, Arial';
+}
 //
 // // Internal
 // // @import "components/header/styles";

@@ -9,6 +9,24 @@ const paths = {
   buildDIr: path.resolve(rootDir, "build"),
 };
 
+// defaultConfig.module.rules.push(      {
+//         test: /\.scss$/,
+//         loader: 'style-loader!css-loader!sass-loader'
+//       })
+defaultConfig.module.rules.push({
+    test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+    use: [
+      {
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
+          // outputPath: 'fonts/'
+        }
+      }
+    ]
+  }
+)
+
 module.exports = {
   ...defaultConfig,
   resolve: {

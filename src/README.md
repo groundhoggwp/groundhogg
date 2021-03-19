@@ -46,6 +46,10 @@ $ npm -v
 $ npm i
 ```
 
+#### Install Python
+Nothing is written in python but you'll need it for webpack. https://www.python.org/downloads/
+
+
 #### Start Groundhogg
 ```
 $ npm start

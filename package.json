@@ -84,6 +84,7 @@
     "classnames": "2.2.6",
     "cross-fetch": "^3.0.6",
     "dagre": "^0.8.5",
+    "file-loader": "^6.2.0",
     "interactjs": "^1.10.0",
     "luxon": "^1.25.0",
     "memize": "^1.1.0",
@@ -105,6 +106,7 @@
     "react-virtuoso": "^1.1.2",
     "react-xarrows": "^1.5.0",
     "recharts": "^1.8.5",
+    "typeface-montserrat": "^1.1.13",
     "uniqid": "5.2.0"
   }
 }
