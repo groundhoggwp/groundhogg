@@ -617,6 +617,7 @@ export default ({ editorItem, history, ...rest }) => {
 
   return (
     <>
+      <img src={require('./webpack-test.jpg').default}/>
       <div className="Groundhogg-BlockEditor">
         {steps}
         <SimpleModal open={open}/>
