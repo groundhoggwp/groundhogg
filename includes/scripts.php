@@ -113,7 +113,7 @@ class Scripts {
 		wp_register_script( 'beautify-html', GROUNDHOGG_ASSETS_URL . 'lib/js-beautify/beautify-html.min.js' );
 
 		// Vue JS
-		wp_register_script( 'vuejs', 'https://unpkg.com/vue@next' );
+//		wp_register_script( 'vuejs', 'https://unpkg.com/vue@next' );
 
 		// PapaParse
 		wp_register_script( 'papaparse', GROUNDHOGG_ASSETS_URL . 'lib/papa-parse/papaparse' . $dot_min . '.js' );
@@ -160,24 +160,24 @@ class Scripts {
 			'jquery',
 		], GROUNDHOGG_VERSION, true );
 
-		wp_register_script( 'groundhogg-admin-contact-advanced-search', GROUNDHOGG_ASSETS_URL . 'js/admin/filtersApp/app.js', [
-			'vuejs',
-		], GROUNDHOGG_VERSION, true );
-
-		wp_register_script( 'groundhogg-admin-contact-advanced-search-mounting', GROUNDHOGG_ASSETS_URL . 'js/admin/filtersApp/mount.js', [
-			'groundhogg-admin-contact-advanced-search',
-		], GROUNDHOGG_VERSION, true );
-
-		$components = [
-			'filterGroup',
-			'orSeparator'
-		];
-
-		foreach ( $components as $component ) {
-			wp_register_script( 'groundhogg-admin-contact-advanced-search-' . $component, GROUNDHOGG_ASSETS_URL . 'js/admin/filtersApp/components/' . $component . '.js', [
-				'groundhogg-admin-contact-advanced-search',
-			], GROUNDHOGG_VERSION, true );
-		}
+//		wp_register_script( 'groundhogg-admin-contact-advanced-search', GROUNDHOGG_ASSETS_URL . 'js/admin/filtersApp/app.js', [
+//			'vuejs',
+//		], GROUNDHOGG_VERSION, true );
+//
+//		wp_register_script( 'groundhogg-admin-contact-advanced-search-mounting', GROUNDHOGG_ASSETS_URL . 'js/admin/filtersApp/mount.js', [
+//			'groundhogg-admin-contact-advanced-search',
+//		], GROUNDHOGG_VERSION, true );
+//
+//		$components = [
+//			'filterGroup',
+//			'orSeparator'
+//		];
+//
+//		foreach ( $components as $component ) {
+//			wp_register_script( 'groundhogg-admin-contact-advanced-search-' . $component, GROUNDHOGG_ASSETS_URL . 'js/admin/filtersApp/components/' . $component . '.js', [
+//				'groundhogg-admin-contact-advanced-search',
+//			], GROUNDHOGG_VERSION, true );
+//		}
 
 		wp_register_script( 'groundhogg-admin-contact-inline', GROUNDHOGG_ASSETS_URL . 'js/admin/inline-edit-contacts' . $dot_min . '.js', [
 			'jquery',

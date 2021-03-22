@@ -88,7 +88,19 @@
 }
 
 .popup-content table.wp-list-table.striped {
-    border: none;
+    border-width: 0;
+}
+
+.popup-content table.wp-list-table.replacements-table{
+    border-width: 1px 0 1px 0;
+}
+
+.popup-content h3.replacements-group{
+    padding: 30px 20px 20px 20px;
+    font-size: 18px;
+    /* text-transform: uppercase; */
+    background: #f7f7f7;
+    margin: 0;
 }
 
 .select2-dropdown{

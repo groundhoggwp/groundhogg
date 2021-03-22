@@ -35,46 +35,6 @@ if ( current_user_is( 'sales_manager' ) ) {
 		<?php include __DIR__ . '/contact-editor.php'; ?>
 	</div>
 	<div class="contact-info-cards">
-		<div class="info-card-actions postbox">
-			<div class="inside">
-				<a class="expand-all"
-				   href="javascript:void(0)"><?php _e( 'Expand All', 'groundhogg' ); ?><?php dashicon_e( 'arrow-up' ); ?></a>
-				<a class="collapse-all"
-				   href="javascript:void(0)"><?php _e( 'Collapse All', 'groundhogg' ); ?><?php dashicon_e( 'arrow-down' ); ?></a>
-				<a class="view-cards"
-				   href="javascript:void(0)"><?php _e( 'Cards', 'groundhogg' ); ?><?php dashicon_e( 'visibility' ); ?></a>
-			</div>
-		</div>
-		<div class="info-card-views postbox hidden">
-			<div class="inside">
-				<p><?php _e( 'Select which cards you want visible.', 'groundhogg' ); ?></p>
-				<ul>
-					<?php
-
-					foreach ( Info_Cards::get_user_info_cards() as $id => $card ):
-
-						?>
-						<li><?php
-						echo html()->checkbox( [
-							'label'   => $card['title'],
-							'name'    => sprintf( 'cards_display[%s]', $id ),
-							'class'   => 'hide-card',
-							'value'   => $id,
-							'checked' => ! isset_not_empty( $card, 'hidden' )
-						] );
-						?></li><?php
-
-					endforeach;
-
-					?>
-				</ul>
-				<p>
-					<a class="view-cards" href="javascript:void(0)"><?php _e( 'Close', 'groundhogg' ); ?></a>
-				</p>
-			</div>
-		</div>
-		<div class="meta-box-sortables">
-			<?php Info_Cards::do_info_cards( $contact ); ?>
-		</div>
+		<?php Info_Cards::display( $contact ); ?>
 	</div>
 </div>

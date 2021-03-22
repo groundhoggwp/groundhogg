@@ -52,23 +52,6 @@ use function Groundhogg\html;
 				], __( 'Delete' ) ) ),
 		] ) ?>
 		</span><?php
-
-
-//		esc_html( size_format( filesize( $item['file_path'] ) ) ),
-//		esc_html( $info['extension'] ),
-//		html()->e( 'span', [ 'class' => 'row-actions' ], [
-//			html()->e( 'span', [ 'class' => 'delete' ],
-//				html()->e( 'a', [
-//					'class' => 'delete',
-//					'href'  => admin_page_url( 'gh_contacts', [
-//						'action'   => 'remove_file',
-//						'file'     => $info['basename'],
-//						'contact'  => $contact->get_id(),
-//						'_wpnonce' => wp_create_nonce( 'remove_file' )
-//					] )
-//				], __( 'Delete' ) ) ),
-//		] )
-//	];
 		?></li><?php
 	endforeach; ?>
 </ul>

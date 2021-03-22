@@ -309,6 +309,11 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.4.4.7 (2021-03-16) =
+* TWEAKED Replacements table modal to be separated into categories, add names of replacement codes.
+* FIXED Remove wp_register_script for Vue JS
+* FIXED Contact quick edit not usable when table columns spill over width of the page
+
 = 2.4.4.6 (2021-03-16) =
 * TWEAKED Info card CSS
 * FIXED Admin Notification SMS not working.

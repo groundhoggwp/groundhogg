@@ -236,13 +236,16 @@ class Contacts_Table extends WP_List_Table {
 	 * @global string $mode List table view mode.
 	 */
 	public function inline_edit() {
+
+		$colspan = min( $this->get_column_count(), 7 );
+
 		?>
 		<table style="display: none">
 			<tbody id="inlineedit">
 			<tr id="inline-edit"
 			    class="inline-edit-row inline-edit-row-contact quick-edit-row quick-edit-row-contact inline-edit-contact inline-editor"
 			    style="display: none">
-				<td colspan="<?php echo $this->get_column_count(); ?>" class="colspanchange">
+				<td colspan="<?php echo $colspan ?>" class="colspanchange">
 					<fieldset class="inline-edit-col-left">
 						<legend class="inline-edit-legend"><?php echo __( 'Quick Edit' ); ?></legend>
 						<div class="inline-edit-col">

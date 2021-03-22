@@ -4125,14 +4125,14 @@ function generate_permissions_key( $contact = false, $usage = 'preferences', $ex
 	}
 
 	// Cache key is a combo of the contact ID and the usage case
-	$cache_key = $contact->get_id() . '-' . $usage;
+	$cache_key = $contact->get_id() . ':' . $usage . ':' . $expiration;
 
 	// If a key was already created for the given contact within the current runtime
-	$found = wp_cache_get( $cache_key, 'permissions_keys' );
+	$key = wp_cache_get( $cache_key, 'permissions_keys', false, $found );
 
 	// use it instead of creating a new one
 	if ( $found ) {
-		return $found;
+		return $key;
 	}
 
 	$key = wp_generate_password( 20, false );
@@ -4147,7 +4147,7 @@ function generate_permissions_key( $contact = false, $usage = 'preferences', $ex
 	] );
 
 	// set the key for the given contact in the cache
-	wp_cache_set( $cache_key, $key, 'permissions_keys' );
+	wp_cache_set( $cache_key, $key, 'permissions_keys', MINUTE_IN_SECONDS );
 
 	return $key;
 }

@@ -66,7 +66,7 @@ class Replacements {
 
 		$groups = [
 			'contact'    => __( 'Contact', 'groundhogg' ),
-			'user'       => __( 'Contact WP User', 'groundhogg' ),
+			'user'       => __( 'WP User', 'groundhogg' ),
 			'owner'      => __( 'Contact Owner', 'groundhogg' ),
 			'company'    => __( 'Contact Company', 'groundhogg' ),
 			'site'       => __( 'Site', 'groundhogg' ),
@@ -199,6 +199,7 @@ class Replacements {
 			[
 				'code'        => 'user',
 				'group'       => 'user',
+				'default_args' => 'attribute',
 				'callback'    => [ $this, 'replacement_user' ],
 				'name'        => __( 'User Data', 'groundhogg' ),
 				'description' => _x( 'Any data related to the contact\'s linked user record. Usage: {user.attribute}', 'replacement', 'groundhogg' ),
@@ -570,42 +571,54 @@ class Replacements {
 
 	}
 
-	public function get_table() {
+	public function replacements_in_footer() {
 		?>
-        <table class="wp-list-table widefat fixed striped replacements-table">
-            <thead>
-            <tr>
-                <th><?php _e( 'Replacement Code' ); ?></th>
-                <th><?php _e( 'Description' ); ?></th>
-            </tr>
-            </thead>
-            <tbody>
-
-			<?php foreach ( $this->get_replacements() as $code => $replacement ): ?>
-                <tr>
-                    <td>
-                        <input class="replacement-selector"
-                               style="border: none;outline: none;background: transparent;width: 100%;"
-                               onfocus="this.select();"
-                               value="<?php echo get_array_var( $replacement, 'insert', '{' . $code . '}' ) ?>"
-                               readonly>
-                    </td>
-                    <td>
-                        <span><?php esc_html_e( $replacement['description'] ); ?></span>
-                    </td>
-                </tr>
-			<?php endforeach; ?>
-            </tbody>
-        </table>
+		<div id="footer-replacement-codes" class="hidden">
+			<?php $this->get_table(); ?>
+		</div>
 		<?php
 	}
 
-	public function replacements_in_footer() {
-		?>
-        <div id="footer-replacement-codes" class="hidden">
-			<?php $this->get_table(); ?>
-        </div>
+	public function get_table() {
+
+		foreach ( $this->replacement_code_groups as $group => $name ):
+
+			$codes = array_filter( $this->get_replacements(), function ( $code ) use ( $group ){
+				return $code[ 'group' ] === $group;
+			} );
+
+			?>
+			<h3 class="replacements-group"><?php _e( $name ) ?></h3>
+			<table class="wp-list-table widefat fixed striped replacements-table">
+				<thead>
+				<tr>
+					<th><?php _e( 'Name' ); ?></th>
+					<th><?php _e( 'Code' ); ?></th>
+					<th><?php _e( 'Description' ); ?></th>
+				</tr>
+				</thead>
+				<tbody>
+
+				<?php foreach ( $codes as $code => $replacement ): ?>
+					<tr>
+						<td><?php _e( get_array_var( $replacement, 'name' ) ); ?></td>
+						<td>
+							<input class="replacement-selector code"
+							       type="text"
+							       style="border: none;outline: none;background: transparent;width: 100%;"
+							       onfocus="this.select();"
+							       value="<?php echo get_array_var( $replacement, 'insert', '{' . $code . '}' ) ?>"
+							       readonly>
+						</td>
+						<td>
+							<span class="description"><?php esc_html_e( $replacement['description'] ); ?></span>
+						</td>
+					</tr>
+				<?php endforeach; ?>
+				</tbody>
+			</table>
 		<?php
+		endforeach;
 	}
 
 	public function show_replacements_button( $short = false ) {

@@ -4,7 +4,9 @@ namespace Groundhogg\Admin\Contacts;
 
 
 use Groundhogg\Contact;
+use function Groundhogg\dashicon_e;
 use function Groundhogg\get_post_var;
+use function Groundhogg\html;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\isset_not_empty;
 
@@ -12,7 +14,16 @@ class Info_Cards {
 
 	public function __construct() {
 		add_action( 'admin_init', [ $this, 'register_core_cards' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'scripts' ] );
 		add_action( 'wp_ajax_groundhogg_save_card_order', [ $this, 'save_card_atts' ] );
+	}
+
+	public function scripts() {
+		wp_enqueue_style( 'groundhogg-admin-contact-info-cards' );
+		wp_enqueue_script( 'groundhogg-admin-contact-info-cards' );
+		wp_enqueue_style( 'buttons' );
+		wp_enqueue_style( 'media-views' );
+		wp_enqueue_script( 'postbox' );
 	}
 
 	/**
@@ -249,5 +260,57 @@ class Info_Cards {
 
 	}
 
+	/**
+	 * Output the whole info card module
+	 *
+	 * @param $contact
+	 */
+	public static function display( $contact ) {
+		?>
+		<div class="info-cards-wrap">
+			<div class="info-card-actions postbox">
+				<div class="inside">
+					<a class="expand-all"
+					   href="javascript:void(0)"><?php _e( 'Expand All', 'groundhogg' ); ?><?php dashicon_e( 'arrow-up' ); ?></a>
+					<a class="collapse-all"
+					   href="javascript:void(0)"><?php _e( 'Collapse All', 'groundhogg' ); ?><?php dashicon_e( 'arrow-down' ); ?></a>
+					<a class="view-cards"
+					   href="javascript:void(0)"><?php _e( 'Cards', 'groundhogg' ); ?><?php dashicon_e( 'visibility' ); ?></a>
+				</div>
+			</div>
+			<div class="info-card-views postbox hidden">
+				<div class="inside">
+					<p><?php _e( 'Select which cards you want visible.', 'groundhogg' ); ?></p>
+					<ul>
+						<?php
+
+						foreach ( Info_Cards::get_user_info_cards() as $id => $card ):
+
+							?>
+							<li><?php
+							echo html()->checkbox( [
+								'label'   => $card['title'],
+								'name'    => sprintf( 'cards_display[%s]', $id ),
+								'class'   => 'hide-card',
+								'value'   => $id,
+								'checked' => ! isset_not_empty( $card, 'hidden' )
+							] );
+							?></li><?php
+
+						endforeach;
+
+						?>
+					</ul>
+					<p>
+						<a class="view-cards" href="javascript:void(0)"><?php _e( 'Close', 'groundhogg' ); ?></a>
+					</p>
+				</div>
+			</div>
+			<div class="meta-box-sortables">
+				<?php Info_Cards::do_info_cards( $contact ); ?>
+			</div>
+		</div>
+		<?php
+	}
 
 }

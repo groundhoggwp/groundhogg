@@ -11,14 +11,14 @@
     padding: 10px;
 }
 
-.contact-info-cards .stuffbox > h3, .contact-info-cards h2, .contact-info-cards h3.hndle {
+.info-cards-wrap .stuffbox > h3, .info-cards-wrap h2, .info-cards-wrap h3.hndle {
     font-size: 14px;
     padding: 8px 12px;
     margin: 0;
     line-height: 1.4;
 }
 
-.contact-info-cards .postbox {
+.info-cards-wrap .postbox {
     margin-bottom: 10px;
 }
 
@@ -32,7 +32,7 @@ ul.regular-list li {
 }
 
 div.info-card.postbox{
-    max-width: 300px;
+    /*max-width: 300px;*/
 }
 
 .info-card .postbox-header .hndle {
@@ -381,4 +381,12 @@ div.info-card.postbox{
 
 .info-card table td:last-child{
     text-align: right;
+}
+
+.block{
+    display: block;
+}
+
+.inline-block{
+    display: inline-block;
 }
