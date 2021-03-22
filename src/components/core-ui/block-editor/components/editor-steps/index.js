@@ -16,7 +16,7 @@ import ReplayIcon from "@material-ui/icons/Replay";
 /**
  * Internal dependencies
  */
-import Step from "./step";
+import Step from "./components/step";
 import Mail from "components/svg/Mail/";
 
 import { createTheme } from '../../../../../theme';
@@ -33,19 +33,19 @@ const useStyles = makeStyles((theme) => ({
     display: "block",
     width: "265px",
     height: "1px",
-    background: "#0075FF",
+    background: theme.palette.primary.main,
     textAlign: "center",
     zIndex: "999",
   },
   addStepHoverPlus: {
-    color: "#0075FF",
+    color: theme.palette.primary.main,
     position: "absolute",
     top: "calc(50% - 8px)",
     left: "calc(50% - 8px)",
     width: "16px",
     height: "16px",
     background: "#fff",
-    border: "1px solid #0075FF",
+    border: `1px solid ${theme.palette.primary.main}`,
     borderRadius: "4px",
   },
   addStepBtn: {
@@ -55,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function EditorSteps({}) {
+export default function({}) {
   const classes = useStyles();
 
   const selectStep = () => {

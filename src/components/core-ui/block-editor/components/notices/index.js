@@ -7,7 +7,7 @@
 import { useSelect, useDispatch } from "@wordpress/data";
 import { SnackbarList } from "@wordpress/components";
 
-export default function Notices() {
+export default function () {
   const notices = useSelect(
     (select) =>
       select("core/notices")

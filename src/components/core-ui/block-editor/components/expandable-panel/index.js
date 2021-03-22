@@ -21,7 +21,7 @@ import ArrowDown from "components/svg/ArrowDown/";
 import { createTheme } from '../../../../../theme';
 const theme = createTheme({});
 
-export default function EditorSteps({
+export default function ({
   contents,
   title,
   fontSize,

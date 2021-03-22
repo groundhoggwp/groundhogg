@@ -37,10 +37,8 @@ import { makeStyles } from "@material-ui/core/styles";
  */
 import Sidebar from "../sidebar";
 
-//TODO Implement block persistence with email data store.
-//TODO Potentially use our own alerts data store (core).
 
-function TextEditor({
+export default function ({
   settings: _settings,
   subject,
   handleSubjectChange,
@@ -98,9 +96,9 @@ function TextEditor({
 
   const blockEditorEl = useRef(null);
 
-  useEffect(() => {
-    blockEditorEl.current.removeEventListener("scroll", () => {});
-    blockEditorEl.current.addEventListener("scroll", (event) => {
+  // useEffect(() => {
+  //   blockEditorEl.current.removeEventListener("scroll", () => {});
+  //   blockEditorEl.current.addEventListener("scroll", (event) => {
       // const popOverEl = document.querySelector('.components-popover.block-editor-block-list__block-popover');
       // // const popOverEl = document.querySelector('.components-popover.block-editor-block-list__block-popover');
       // if(popOverEl){
@@ -108,8 +106,8 @@ function TextEditor({
       //   // document.querySelector('.components-popover.block-editor-block-list__block-popover').style.top = `${blockEditorEl.current.scrollTop}px`;
       //   // document.querySelector('.components-popover.block-editor-block-list__block-popover').style.transform = `translateY(${blockEditorEl.current.scrollTop}px)`;
       // }
-    });
-  });
+  //   });
+  // });
 
   return (
     <div className="groundhogg-block-editor" ref={blockEditorEl}>
@@ -151,5 +149,3 @@ function TextEditor({
     </div>
   );
 }
-
-export default TextEditor;

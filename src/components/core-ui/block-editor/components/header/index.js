@@ -111,7 +111,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Header({
+export default function ({
   email,
   history,
   editorItem,

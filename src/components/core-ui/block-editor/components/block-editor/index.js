@@ -41,10 +41,7 @@ import ExpandablePanel from "../expandable-panel/";
 import { createTheme } from '../../../../../theme';
 const theme = createTheme({});
 
-//TODO Implement block persistence with email data store.
-//TODO Potentially use our own alerts data store (core).
-
-function BlockEditor({
+export default function({
   settings: _settings,
   subject,
   handleSubjectChange,
@@ -69,12 +66,6 @@ function BlockEditor({
       overflowX: "hidden",
     },
     emailHeader: {
-      // '& input:nth-of-type(1)':{
-      //   width: 'calc(100% - 50px)'
-      // },
-      // '& input:nth-of-type(2)':{
-      //   width: 'calc(100% - 150px)'
-      // }
     },
     subjectHeaderRow: {
       display: "block",
@@ -141,18 +132,6 @@ function BlockEditor({
 
   const blockEditorEl = useRef(null);
 
-  useEffect(() => {
-    blockEditorEl.current.removeEventListener("scroll", () => {});
-    blockEditorEl.current.addEventListener("scroll", (event) => {
-      // const popOverEl = document.querySelector('.components-popover.block-editor-block-list__block-popover');
-      // // const popOverEl = document.querySelector('.components-popover.block-editor-block-list__block-popover');
-      // if(popOverEl){
-      //   console.log('scroll', popOverEl)
-      //   // document.querySelector('.components-popover.block-editor-block-list__block-popover').style.top = `${blockEditorEl.current.scrollTop}px`;
-      //   // document.querySelector('.components-popover.block-editor-block-list__block-popover').style.transform = `translateY(${blockEditorEl.current.scrollTop}px)`;
-      // }
-    });
-  });
 
   return (
     <div className={classes.root} ref={blockEditorEl}>
@@ -224,5 +203,3 @@ function BlockEditor({
     </div>
   );
 }
-
-export default BlockEditor;

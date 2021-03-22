@@ -76,7 +76,7 @@ const IOSSwitch = withStyles((theme) => ({
       transform: 'translateX(14px)',
       color: theme.palette.common.white,
       '& + $track': {
-        backgroundColor: '#0075FF',
+        backgroundColor: theme.palette.primary.main,
         opacity: 1,
         border: 'none',
       },
@@ -265,14 +265,17 @@ export default ({ editorItem, history, ...rest }) => {
   const handleContentChangeDraggedBlock = () => {
     // if(!startInteractJS){return;}
     // console.log('asdfasdf', draggedBlockIndex)
+
     let newBlocks = blocks;
-    newBlocks.push(newBlocks[0])
-    // newBlocks.splice(draggedBlockIndex, 0, createBlock(draggedBlock.name));
+    // newBlocks.push(newBlocks[0])
+    newBlocks.splice(draggedBlockIndex, 0, createBlock(draggedBlock.name));
+    console.log(newBlocks)
     // console.log('drag blocks', newBlocks)
-    updateBlocks(newBlocks);
-    setContent(serialize(newBlocks));
+    // updateBlocks(newBlocks);
+    // setContent(serialize(newBlocks));
     // handleUpdateBlocks(newBlocks, {},false);
     // startInteractJS = false;
+    // emailStepBackward()
   };
 
   const handleUpdateBlocks = (blocks, selectionObj, updateFromHistory) => {
@@ -495,10 +498,10 @@ export default ({ editorItem, history, ...rest }) => {
       alignItems: 'center',
       fontSize: '14px',
       fontWeight: '400',
-      color: '#0075FF',
+      color: theme.palette.primary.main,
       float: 'right',
       '& svg':{
-        border: '0.3px solid #0075FF',
+        border: `0.3px solid ${theme.palette.primary.main}`,
         borderRadius: '4px',
         marginRight: '5px',
         padding: '4px'
@@ -566,8 +569,9 @@ export default ({ editorItem, history, ...rest }) => {
   }
 
   useEffect(() => {
+    console.log('usee effect this should hppaen 1')
     setupDragNDrop()
-  }, [blocks]);
+  }, []);
 
 
 

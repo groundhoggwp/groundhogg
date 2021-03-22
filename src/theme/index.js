@@ -80,10 +80,13 @@ const themesOptions = [
         paper: colors.common.white
       },
       primary: {
-        main: '#f18f01'
+        main: '#0075FF'
       },
       secondary: {
-        main: '#006e90'
+        main: '#9ECE38'
+      },
+      ghOrange: {
+        main: '#F58115'
       },
       text: {
         primary: colors.blueGrey[900],
