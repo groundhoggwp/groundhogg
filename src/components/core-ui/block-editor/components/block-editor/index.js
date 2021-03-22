@@ -38,10 +38,10 @@ import { makeStyles } from "@material-ui/core/styles";
  */
 import Sidebar from "../sidebar";
 import ExpandablePanel from "../expandable-panel/";
-import { createTheme } from '../../../../../theme';
+import { createTheme } from "../../../../../theme";
 const theme = createTheme({});
 
-export default function({
+export default function ({
   settings: _settings,
   subject,
   handleSubjectChange,
@@ -65,8 +65,7 @@ export default function({
       overflowY: "auto",
       overflowX: "hidden",
     },
-    emailHeader: {
-    },
+    emailHeader: {},
     subjectHeaderRow: {
       display: "block",
       width: "calc(100% - 75px)",
@@ -131,7 +130,6 @@ export default function({
   }
 
   const blockEditorEl = useRef(null);
-
 
   return (
     <div className={classes.root} ref={blockEditorEl}>

@@ -10,35 +10,33 @@ const paths = {
 };
 
 defaultConfig.module.rules.push({
-    test: /\.(png|jpe?g|gif)$/i,
-    use: [
-      {
-        loader: 'file-loader',
-        options: {
-          name: '[name].[ext]',
-          outputPath: '/img',
-          esModule: false
-        }
-      }
-    ]
-  }
-)
+  test: /\.(png|jpe?g|gif)$/i,
+  use: [
+    {
+      loader: "file-loader",
+      options: {
+        name: "[name].[ext]",
+        outputPath: "/img",
+        esModule: false,
+      },
+    },
+  ],
+});
 defaultConfig.module.rules.push({
-    test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
-    use: [
-      {
-        loader: 'file-loader',
-        options: {
-          name: '[name].[ext]',
-          outputPath: '/fonts',
-          esModule: false
-        }
-      }
-    ]
-  }
-)
+  test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+  use: [
+    {
+      loader: "file-loader",
+      options: {
+        name: "[name].[ext]",
+        outputPath: "/fonts",
+        esModule: false,
+      },
+    },
+  ],
+});
 
-console.log(defaultConfig.module.rules)
+console.log(defaultConfig.module.rules);
 module.exports = {
   ...defaultConfig,
   resolve: {

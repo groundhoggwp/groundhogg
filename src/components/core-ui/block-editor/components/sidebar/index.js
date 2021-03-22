@@ -42,7 +42,7 @@ import EmailControls from "./components/email-controls";
 import BlocksPanel from "./components/blocks-panel";
 import Notes from "./components/notes";
 
-import { createTheme } from '../../../../../theme';
+import { createTheme } from "../../../../../theme";
 const theme = createTheme({});
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
   "GroundhoggEmailBuilderSidebarInspector"
@@ -75,9 +75,6 @@ const Sidebar = ({
         height: "100%",
       },
     },
-
-
-
   }));
 
   const classes = useStyles();
@@ -89,13 +86,21 @@ const Sidebar = ({
       aria-label={__("Groundhogg Email Sidebar advanced settings.")}
       tabIndex="-1"
     >
-
-      <EmailControls sendTestEmail={sendTestEmail} messageType={messageType} handleMessageType={handleMessageType} from={from} handleSetFrom={handleSetFrom } replyTo={replyTo} handleSetReplyTo={handleSetReplyTo} emailAlignment={emailAlignment} handleEmailAlignmentChange={handleEmailAlignmentChange}/>
+      <EmailControls
+        sendTestEmail={sendTestEmail}
+        messageType={messageType}
+        handleMessageType={handleMessageType}
+        from={from}
+        handleSetFrom={handleSetFrom}
+        replyTo={replyTo}
+        handleSetReplyTo={handleSetReplyTo}
+        emailAlignment={emailAlignment}
+        handleEmailAlignmentChange={handleEmailAlignmentChange}
+      />
 
       <BlocksPanel sideBarBlockDisplayType={sideBarBlockDisplayType} />
 
-      <Notes   notes={notes} handleChangeNotes={handleChangeNotes}/>
-
+      <Notes notes={notes} handleChangeNotes={handleChangeNotes} />
     </div>
   );
 };

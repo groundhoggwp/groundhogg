@@ -19,7 +19,7 @@ import ReplayIcon from "@material-ui/icons/Replay";
 import Step from "./components/step";
 import Mail from "components/svg/Mail/";
 
-import { createTheme } from '../../../../../theme';
+import { createTheme } from "../../../../../theme";
 const theme = createTheme({});
 
 const useStyles = makeStyles((theme) => ({
@@ -55,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function({}) {
+export default function ({}) {
   const classes = useStyles();
 
   const selectStep = () => {

@@ -37,7 +37,6 @@ import { makeStyles } from "@material-ui/core/styles";
  */
 import Sidebar from "../sidebar";
 
-
 export default function ({
   settings: _settings,
   subject,
@@ -99,13 +98,13 @@ export default function ({
   // useEffect(() => {
   //   blockEditorEl.current.removeEventListener("scroll", () => {});
   //   blockEditorEl.current.addEventListener("scroll", (event) => {
-      // const popOverEl = document.querySelector('.components-popover.block-editor-block-list__block-popover');
-      // // const popOverEl = document.querySelector('.components-popover.block-editor-block-list__block-popover');
-      // if(popOverEl){
-      //   console.log('scroll', popOverEl)
-      //   // document.querySelector('.components-popover.block-editor-block-list__block-popover').style.top = `${blockEditorEl.current.scrollTop}px`;
-      //   // document.querySelector('.components-popover.block-editor-block-list__block-popover').style.transform = `translateY(${blockEditorEl.current.scrollTop}px)`;
-      // }
+  // const popOverEl = document.querySelector('.components-popover.block-editor-block-list__block-popover');
+  // // const popOverEl = document.querySelector('.components-popover.block-editor-block-list__block-popover');
+  // if(popOverEl){
+  //   console.log('scroll', popOverEl)
+  //   // document.querySelector('.components-popover.block-editor-block-list__block-popover').style.top = `${blockEditorEl.current.scrollTop}px`;
+  //   // document.querySelector('.components-popover.block-editor-block-list__block-popover').style.transform = `translateY(${blockEditorEl.current.scrollTop}px)`;
+  // }
   //   });
   // });
 

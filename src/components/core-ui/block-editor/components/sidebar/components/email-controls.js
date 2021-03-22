@@ -9,20 +9,30 @@ import { Inserter } from "@wordpress/block-editor";
 /**
  * External dependencies
  */
- import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import { Button, Card, TextField } from "@material-ui/core";
 
 /**
  * Internal dependencies
  */
- import ExpandablePanel from "../../expandable-panel/";
- import ArrowDown from "components/svg/ArrowDown/";
- import Desktop from "components/svg/Desktop/";
- import Phone from "components/svg/Phone/";
- import AlignCenter from "components/svg/AlignCenter/";
- import AlignLeft from "components/svg/AlignLeft/";
+import ExpandablePanel from "../../expandable-panel/";
+import ArrowDown from "components/svg/ArrowDown/";
+import Desktop from "components/svg/Desktop/";
+import Phone from "components/svg/Phone/";
+import AlignCenter from "components/svg/AlignCenter/";
+import AlignLeft from "components/svg/AlignLeft/";
 
-export default function ({sendTestEmail, from, handleSetFrom,   messageType, handleMessageType, replyTo, handleSetReplyTo, emailAlignment, handleEmailAlignmentChange }) {
+export default function ({
+  sendTestEmail,
+  from,
+  handleSetFrom,
+  messageType,
+  handleMessageType,
+  replyTo,
+  handleSetReplyTo,
+  emailAlignment,
+  handleEmailAlignmentChange,
+}) {
   const useStyles = makeStyles((theme) => ({
     root: {},
     inputText: {
@@ -77,7 +87,6 @@ export default function ({sendTestEmail, from, handleSetFrom,   messageType, han
         stroke: "#707d8c",
         padding: "7px",
       },
-
     },
     alignmentBtnSelected: {
       display: "inline-block",
@@ -106,10 +115,7 @@ export default function ({sendTestEmail, from, handleSetFrom,   messageType, han
     },
   }));
 
-
-
   const classes = useStyles();
-
 
   return (
     <Card className={classes.emailControls}>
@@ -150,10 +156,28 @@ export default function ({sendTestEmail, from, handleSetFrom,   messageType, han
 
       <div className={classes.alignmentContainer}>
         <div>{__("Alignment:")}</div>
-        <span className={emailAlignment === 'left' ? classes.alignmentBtnSelected : classes.alignmentBtn} onClick={()=>{handleEmailAlignmentChange('left')}}>
+        <span
+          className={
+            emailAlignment === "left"
+              ? classes.alignmentBtnSelected
+              : classes.alignmentBtn
+          }
+          onClick={() => {
+            handleEmailAlignmentChange("left");
+          }}
+        >
           <AlignLeft />
         </span>
-        <span className={emailAlignment === 'center' ? classes.alignmentBtnSelected : classes.alignmentBtn} onClick={()=>{handleEmailAlignmentChange('center')}}>
+        <span
+          className={
+            emailAlignment === "center"
+              ? classes.alignmentBtnSelected
+              : classes.alignmentBtn
+          }
+          onClick={() => {
+            handleEmailAlignmentChange("center");
+          }}
+        >
           <AlignCenter />
         </span>
       </div>
@@ -161,8 +185,8 @@ export default function ({sendTestEmail, from, handleSetFrom,   messageType, han
       <div className={classes.messageTypeContainer}>
         <div>{__("Message Type:")}</div>
         <select value={messageType} onChange={handleMessageType} label="">
-          <option value={'marketing'}>Marketing</option>
-          <option value={'transactional'}>Transactional</option>
+          <option value={"marketing"}>Marketing</option>
+          <option value={"transactional"}>Transactional</option>
         </select>
       </div>
 

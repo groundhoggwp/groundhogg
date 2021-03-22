@@ -17,7 +17,7 @@ import ReplayIcon from "@material-ui/icons/Replay";
  * Internal dependencies
  */
 
-export default function ({ notes, handleChangeNotes}) {
+export default function ({ notes, handleChangeNotes }) {
   const useStyles = makeStyles((theme) => ({
     root: {
       marginTop: "20px",

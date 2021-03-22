@@ -18,16 +18,10 @@ import ReplayIcon from "@material-ui/icons/Replay";
  */
 import ArrowDown from "components/svg/ArrowDown/";
 
-import { createTheme } from '../../../../../theme';
+import { createTheme } from "../../../../../theme";
 const theme = createTheme({});
 
-export default function ({
-  contents,
-  title,
-  fontSize,
-  width,
-  margin,
-}) {
+export default function ({ contents, title, fontSize, width, margin }) {
   const [open, setOpen] = useState(false);
 
   const useStyles = makeStyles((theme) => ({

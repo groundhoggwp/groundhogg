@@ -17,16 +17,12 @@ import ReplayIcon from "@material-ui/icons/Replay";
  * Internal dependencies
  */
 
-export default function ({ }) {
+export default function ({}) {
   const useStyles = makeStyles((theme) => ({
-    root: {}
+    root: {},
   }));
 
   const classes = useStyles();
 
-  return (
-    <Card className={classes.root}>
-
-    </Card>
-  );
+  return <Card className={classes.root}></Card>;
 }
