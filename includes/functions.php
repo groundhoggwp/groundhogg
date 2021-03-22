@@ -2262,7 +2262,12 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
  *
  */
 function generate_contact_with_map( $fields, $map = [] ) {
-
+	
+	do_action_ref_array( 'groundhogg/generate_contact_with_map/before',[
+	    &$fields,
+	    &$map
+	]);
+	
 	if ( empty( $map ) ) {
 		$keys = array_keys( $fields );
 		$map  = array_combine( $keys, $keys );
