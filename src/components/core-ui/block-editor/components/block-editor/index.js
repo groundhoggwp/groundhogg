@@ -36,7 +36,7 @@ import { makeStyles } from "@material-ui/core/styles";
 /**
  * Internal dependencies
  */
-import Sidebar from "../sidebar";
+import BlocksPanel from "../sidebar/components/blocks-panel.js";
 import ExpandablePanel from "../expandable-panel/";
 import { createTheme } from "../../../../../theme";
 const theme = createTheme({});
@@ -194,9 +194,9 @@ export default function ({
           />
         </div>
 
-        <Sidebar.InspectorFill>
+        <BlocksPanel.InspectorFill>
           <BlockInspector />
-        </Sidebar.InspectorFill>
+        </BlocksPanel.InspectorFill>
       </BlockEditorProvider>
     </div>
   );

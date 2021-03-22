@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { createSlotFill, Panel, Box } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
 import { Fragment, useState } from "@wordpress/element";
 import { PinnedItems } from "@wordpress/interface";
@@ -23,7 +24,11 @@ import BlocksImage from "components/svg/block-editor/BlocksImage/";
 import BlocksSpacer from "components/svg/block-editor/BlocksSpacer/";
 import BlocksText from "components/svg/block-editor/BlocksText/";
 
-export default function ({ blocks, sideBarBlockDisplayType }) {
+const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
+  "GroundhoggEmailBuilderSidebarInspector"
+);
+
+const BlocksPanel = ({ blocks, sideBarBlockDisplayType }) => {
   const useStyles = makeStyles((theme) => ({
     root: {
       marginTop: "20px",
@@ -171,4 +176,8 @@ export default function ({ blocks, sideBarBlockDisplayType }) {
       {blockPanel}
     </Card>
   );
-}
+};
+
+BlocksPanel.InspectorFill = InspectorFill;
+
+export default BlocksPanel;

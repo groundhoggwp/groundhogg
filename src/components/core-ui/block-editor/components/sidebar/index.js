@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill, Panel, Box } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
 import {
   BlockEditorKeyboardShortcuts,
@@ -44,9 +43,6 @@ import Notes from "./components/notes";
 
 import { createTheme } from "../../../../../theme";
 const theme = createTheme({});
-const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
-  "GroundhoggEmailBuilderSidebarInspector"
-);
 
 const Sidebar = ({
   sideBarBlockDisplayType,
@@ -104,7 +100,5 @@ const Sidebar = ({
     </div>
   );
 };
-
-Sidebar.InspectorFill = InspectorFill;
 
 export default Sidebar;
