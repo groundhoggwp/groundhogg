@@ -36,7 +36,6 @@ defaultConfig.module.rules.push({
   ],
 });
 
-console.log(defaultConfig.module.rules);
 module.exports = {
   ...defaultConfig,
   resolve: {

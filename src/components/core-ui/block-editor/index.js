@@ -646,7 +646,7 @@ export default ({ editorItem, history, ...rest }) => {
 
               <div className={classes.content}>
                   {/*Notices probably needs to be re-wrote*/}
-                  <Notices />
+                  {/*<Notices />
                   <Card className={classes.sendEmailComponent}>
                     <div className={classes.sendEmailComponentLabel}>Select an email to send:</div>
 
@@ -687,7 +687,7 @@ export default ({ editorItem, history, ...rest }) => {
                     <select  onChange={handleInsertReplacement} label="" className={classes.selectInsertReplacement}>
                       <option value="" selected disabled hidden>Insert replacement</option>
                       <option value={'something'}>somethinhg</option>
-                    </select>
+                    </select>*/}
 
 
 

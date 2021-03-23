@@ -55,7 +55,8 @@ export default function ({
   const useStyles = makeStyles((theme) => ({
     root: {
       position: "absolute",
-      top: "385px",
+      top: "147px",
+      // top: "385px",
       right: "0",
       bottom: "0",
       left: "0",
@@ -67,6 +68,7 @@ export default function ({
     },
     emailHeader: {},
     subjectHeaderRow: {
+      position: "relative",
       display: "block",
       width: "calc(100% - 75px)",
       margin: "0 auto 0 auto",
@@ -75,17 +77,24 @@ export default function ({
 
       borderBottom: "1px solid rgba(16, 38, 64, 0.15)",
       "& label": {
+        position: "absolute",
+        left: "25px",
+        top: "23px",
         fontWeight: "500",
       },
     },
     subjectInputs: {
+      width: "calc(100% - 70px)",
       display: "inline-block",
-      width: "calc(100% - 140px)",
       fontSize: "16px",
       outline: "none",
       border: "none",
       boxShadow: "none",
-      marginLeft: "10px",
+      marginLeft: "73px",
+    },
+    preHeaderInput:{
+      width: "calc(100% - 140px)",
+      marginLeft: "143px",
     },
     emailContainer: {
       width:
@@ -155,7 +164,7 @@ export default function ({
               <div className={classes.subjectHeaderRow}>
                 <label>Pre Header Text:</label>
                 <input
-                  className={classes.subjectInputs}
+                  className={`${classes.subjectInputs} ${classes.preHeaderInput}`}
                   onChange={handlePreHeaderChange}
                   label={"Pre Header"}
                   value={preHeader === "" ? "Pre Header" : preHeader}

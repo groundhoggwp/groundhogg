@@ -11,6 +11,7 @@ import { getBlockTypes } from "@wordpress/blocks";
 /**
  * External dependencies
  */
+import _ from 'lodash';
 import { Button, Card, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
@@ -23,6 +24,8 @@ import BlocksHeading from "components/svg/block-editor/BlocksHeading/";
 import BlocksImage from "components/svg/block-editor/BlocksImage/";
 import BlocksSpacer from "components/svg/block-editor/BlocksSpacer/";
 import BlocksText from "components/svg/block-editor/BlocksText/";
+import BlocksButton from "components/svg/block-editor/BlocksButton/";
+import BlocksHTML from "components/svg/block-editor/BlocksHTML/";
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
   "GroundhoggEmailBuilderSidebarInspector"
@@ -121,11 +124,11 @@ const BlocksPanel = ({ blocks, sideBarBlockDisplayType }) => {
               );
               break;
             case "HTML":
-              icon = <BlocksImage />;
+              icon = <BlocksHTML />;
               fillHoverClass = classes.fillHover;
               break;
             case "Button":
-              icon = <BlocksImage />;
+              icon = <BlocksButton />;
               fillHoverClass = classes.fillHover;
               break;
             case "Image":
@@ -148,7 +151,7 @@ const BlocksPanel = ({ blocks, sideBarBlockDisplayType }) => {
               className={`${classes.block} ${fillHoverClass} block-editor-block side-bar-drag-drop-block`}
             >
               <div className={classes.icon}>{icon}</div>
-              <div className={classes.name}>{title}</div>
+              <div className={classes.name}>{_.startCase(title)}</div>
             </div>
           );
         })}

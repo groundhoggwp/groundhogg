@@ -5,3 +5,7 @@
 // @import "~@wordpress/base-styles/animations";
 // @import "~@wordpress/base-styles/z-index";
 // @import "~@wordpress/interface/src/style.scss";
+
+#wpfooter, #footer-thankyou{
+  display: none !important;
+}
