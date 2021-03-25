@@ -139,7 +139,7 @@ class Admin_Notification extends Action {
 				'label'       => __( 'Send To:', 'groundhogg' ),
 				'type'        => HTML::INPUT,
 				'default'     => get_option( 'gh_business_phone' ),
-				'description' => __( 'Use any mobile phone number. Include country code! Also accepts {owner_phone}', 'groundhogg' )
+				'description' => __( 'Use any mobile phone number. Include country code and <code>+</code>! Also accepts {owner_phone}', 'groundhogg' )
 			] );
 		}
 
@@ -199,7 +199,7 @@ class Admin_Notification extends Action {
 				$sanitized_numbers = array();
 
 				foreach ( $numbers as $number ) {
-					$sanitized_numbers[] = ( $number === '{owner_phone}' ) ? '{owner_phone}' : preg_replace( '/[^0-9]/', '', $number );
+					$sanitized_numbers[] = ( $number === '{owner_phone}' ) ? '{owner_phone}' : preg_replace( '/[^+0-9]/', '', $number );
 				}
 
 				$send_to = implode( ', ', $sanitized_numbers );

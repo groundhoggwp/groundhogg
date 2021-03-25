@@ -1,11 +1,51 @@
 <?php
 
+namespace Groundhogg\Admin\Tools\Cron;
+
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_url_var;
 use function Groundhogg\gh_cron_installed;
 use function Groundhogg\html;
 use function Groundhogg\white_labeled_name;
+
+function create_cron_job_instructions() {
+
+	$host = groundhogg_get_host();
+
+	switch ( $host ):
+		case 'SiteGround':
+			?>
+			<p><?php _e( 'Not sure how to create an external cron job?', 'groundhogg' ); ?></p>
+			<ul style="list-style-type: disc; padding-left: 20px">
+				<li>
+					<a target="_blank"
+					   href="https://help.groundhogg.io/article/469-setting-up-a-cron-job-on-siteground"><?php _e( 'Create a cron job using <b>SiteGround</b>.', 'groundhogg' ) ?></a>
+				</li>
+			</ul>
+			<?php
+			break;
+		default:
+			?>
+			<p><?php _e( 'Not sure how to create an external cron job?', 'groundhogg' ); ?></p>
+			<ul style="list-style-type: disc; padding-left: 20px">
+				<li>
+					<a target="_blank"
+					   href="https://help.groundhogg.io/article/49-add-an-external-cron-job-cron-job-org"><?php _e( 'Create a cron job using <b>cron-job.org</b>.', 'groundhogg' ) ?></a> <?php _e( '(Recommended)', 'groundhogg' ) ?>
+				</li>
+				<li>
+					<a target="_blank"
+					   href="https://help.groundhogg.io/article/51-add-an-external-cron-job-cpanel"><?php _e( 'Create a cron job using <b>cPanel</b>.', 'groundhogg' ) ?></a>
+				</li>
+				<li>
+					<a target="_blank"
+					   href="https://help.groundhogg.io/article/469-setting-up-a-cron-job-on-siteground"><?php _e( 'Create a cron job using <b>SiteGround</b>.', 'groundhogg' ) ?></a>
+				</li>
+			</ul>
+			<?php
+			break;
+	endswitch;
+}
 
 $cron_jobs = [
 	'wp-cron' => [
@@ -112,20 +152,9 @@ switch ( $step ):
 					          value="<?php esc_attr_e( home_url( sprintf( '%s.php', $cron_job_id ) ) ); ?>" readonly>
 					</p>
 					<hr/>
-				<?php endforeach; ?>
-				<p><?php _e( 'Not sure how to create an external cron job?', 'groundhogg' ); ?></p>
-				<ul style="list-style-type: disc; padding-left: 20px">
-					<li>
-						<a target="_blank"
-						   href="https://help.groundhogg.io/article/49-add-an-external-cron-job-cron-job-org"><?php _e( 'Create a cron job using <b>cron-job.org</b>.', 'groundhogg' ) ?></a> <?php _e( '(Recommended)', 'groundhogg' ) ?>
-					</li>
-					<li>
-						<a target="_blank"
-						   href="https://help.groundhogg.io/article/51-add-an-external-cron-job-cpanel"><?php _e( 'Create a cron job using <b>cPanel</b>.', 'groundhogg' ) ?></a>
-					</li>
-				</ul>
-				<p><?php _e( "When finished, advance to the next step to verify your setup.", 'groundhogg' ); ?></p>
-				<?php
+				<?php endforeach;
+
+				create_cron_job_instructions();
 
 				html()->e( 'a', [
 					'href'  => admin_page_url( [ 'tab' => 'cron', 'step' => 'verify' ] ),
@@ -179,7 +208,11 @@ switch ( $step ):
 					], __( 'Finish', 'groundhogg' ), false, true ); ?>
 				<?php else: ?>
 					<p><?php _e( "Uh oh... one or more of your cron jobs could not be verified. Please re-check your setup and click the button below to re-verify.", 'groundhogg' ); ?></p>
-					<?php html()->e( 'a', [
+					<?php
+
+					create_cron_job_instructions();
+
+					html()->e( 'a', [
 						'href'  => admin_page_url( [ 'tab' => 'cron', 'step' => 'verify' ] ),
 						'class' => 'button button-primary'
 					], __( 'Try again! &olarr;', 'groundhogg' ), false, true ); ?>

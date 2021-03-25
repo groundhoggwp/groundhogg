@@ -310,7 +310,10 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 == Changelog ==
 
 = 2.4.4.7 (2021-03-16) =
+* TWEAKED Can now add `+` to phone numbers in the admin notification.
 * TWEAKED Replacements table modal to be separated into categories, add names of replacement codes.
+* TWEAKED Move info card CSS and JS around to make it more modular and usable in extensions.
+* TWEAKED Added SiteGround cron job instructions to the Cron Job setup flow.
 * FIXED Remove wp_register_script for Vue JS
 * FIXED Contact quick edit not usable when table columns spill over width of the page
 
