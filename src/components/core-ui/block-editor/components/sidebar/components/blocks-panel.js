@@ -19,19 +19,19 @@ import ReplayIcon from "@material-ui/icons/Replay";
 /**
  * Internal dependencies
  */
-import BlocksDivider from "components/svg/block-editor/BlocksDivider/";
-import BlocksHeading from "components/svg/block-editor/BlocksHeading/";
-import BlocksImage from "components/svg/block-editor/BlocksImage/";
-import BlocksSpacer from "components/svg/block-editor/BlocksSpacer/";
-import BlocksText from "components/svg/block-editor/BlocksText/";
-import BlocksButton from "components/svg/block-editor/BlocksButton/";
-import BlocksHTML from "components/svg/block-editor/BlocksHTML/";
+import BlocksDivider from "components/svg/BlockEditor/BlocksDivider/";
+import BlocksHeading from "components/svg/BlockEditor/BlocksHeading/";
+import BlocksImage from "components/svg/BlockEditor/BlocksImage/";
+import BlocksSpacer from "components/svg/BlockEditor/BlocksSpacer/";
+import BlocksText from "components/svg/BlockEditor/BlocksText/";
+import BlocksButton from "components/svg/BlockEditor/BlocksButton/";
+import BlocksHTML from "components/svg/BlockEditor/BlocksHTML/";
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
   "GroundhoggEmailBuilderSidebarInspector"
 );
 
-const BlocksPanel = ({ blocks, sideBarBlockDisplayType }) => {
+const BlocksPanel = ({ blocks }) => {
   const useStyles = makeStyles((theme) => ({
     root: {
       marginTop: "20px",
@@ -81,10 +81,20 @@ const BlocksPanel = ({ blocks, sideBarBlockDisplayType }) => {
       },
     },
     fillHover: {
-      "&:hover svg, &:hover path": {
+      "&:hover svg, &:hover path, &:hover .svgHighlighted": {
         fill: "#fff",
       },
     },
+    fillOnly: {
+      "& svg, & path": {
+        stroke: "none",
+        fill: "#102640",
+      },
+      "&:hover svg, &:hover path, &:hover .svgHighlighted": {
+        fill: "#fff",
+      },
+    },
+
     icon: {
       margin: "15px 0 0 0",
     },
@@ -99,6 +109,13 @@ const BlocksPanel = ({ blocks, sideBarBlockDisplayType }) => {
 
   const classes = useStyles();
   // const blocks = ;
+
+  const [sideBarBlockDisplayType, setSideBarBlockDisplayType] = useState("blocks");
+
+  const handleIsInpsecting = (type) => {
+    console.log('hiii')
+    setSideBarBlockDisplayType(sideBarBlockDisplayType === 'blocks' ? 'inspector' : 'blocks');
+  };
 
   const blockPanel =
     sideBarBlockDisplayType === "inspector" ? (
@@ -122,6 +139,7 @@ const BlocksPanel = ({ blocks, sideBarBlockDisplayType }) => {
                   fillSecondary={"#ccc"}
                 />
               );
+              fillHoverClass = classes.fillHover;
               break;
             case "HTML":
               icon = <BlocksHTML />;
@@ -141,7 +159,7 @@ const BlocksPanel = ({ blocks, sideBarBlockDisplayType }) => {
               break;
             case "paragraph":
               icon = <BlocksText />;
-              fillHoverClass = classes.fillHover;
+              fillHoverClass = classes.fillOnly;
               break;
           }
 
@@ -161,14 +179,14 @@ const BlocksPanel = ({ blocks, sideBarBlockDisplayType }) => {
   return (
     <Card className={classes.root}>
       <div className={classes.blocksTitles}>
-        <span
+        <span onClick={handleIsInpsecting}
           className={
             sideBarBlockDisplayType === "blocks" ? classes.panelTitle : ""
           }
         >
           Blocks
         </span>
-        <span
+        <span onClick={handleIsInpsecting}
           className={
             sideBarBlockDisplayType === "inspector" ? classes.panelTitle : ""
           }

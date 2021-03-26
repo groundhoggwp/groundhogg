@@ -134,6 +134,8 @@ export default ({ editorItem, history, ...rest }) => {
   const [blocksVersionTracker, setBlocksVersionTracker] = useState(0);
   const [blockVersionHistory, setBlockVersionHistory] = useState([parse(defaultContentValue)]);
 
+  const [noticeText, setNoticeText] = useState('');
+
   // Editor Contents
   const [title, setTitle] = useState(defaultTitleValue);
   const [content, setContent] = useState(defaultContentValue);
@@ -150,7 +152,7 @@ export default ({ editorItem, history, ...rest }) => {
   const [viewType, setViewType] = useState("desktop");
   const [messageType, setMessageType] = useState("marketing");
   const [emailAlignment, setEmailAlignment] = useState("left");
-  const [sideBarBlockDisplayType, setSideBarBlockDisplayType] = useState("blocks");
+
   const [notes, setNotes] = useState(defaultNotes);
 
   // Unused
@@ -217,6 +219,8 @@ export default ({ editorItem, history, ...rest }) => {
         last_updated: getLuxonDate("last_updated"),
       },
     });
+
+    setNoticeText("Email Updated")
   };
 
   /*
@@ -351,7 +355,7 @@ export default ({ editorItem, history, ...rest }) => {
       // console.log(event.target)
       // return;
     }
-    document.querySelectorAll('.wp-block')[draggedBlockIndex].style.borderBottom = '1px solid #0075FF';
+    // document.querySelectorAll('.wp-block')[draggedBlockIndex].style.borderBottom = '1px solid #0075FF';
   };
 
   const dragStartListener = (event) => {
@@ -454,9 +458,7 @@ export default ({ editorItem, history, ...rest }) => {
     setAltBodyContent(e.target.value);
   };
 
-  const handleIsInpsecting = (type) => {
-    setSideBarBlockDisplayType(type === 'blocks' ? 'inspector' : 'blocks');
-  };
+
   const handleChangeNotes = (e) => {
     // console.log('alt body enable',   altBodyEnable)
     setNotes(e.target.value);
@@ -625,7 +627,10 @@ export default ({ editorItem, history, ...rest }) => {
       <div className="Groundhogg-BlockEditor">
         {steps}
         <SimpleModal open={open}/>
+
+
         <FullscreenMode isActive={false} />
+        <Notices text={noticeText}/>
         <SlotFillProvider>
           <DropZoneProvider>
             <FocusReturnProvider>
@@ -645,8 +650,8 @@ export default ({ editorItem, history, ...rest }) => {
 
 
               <div className={classes.content}>
-                  {/*Notices probably needs to be re-wrote*/}
-                  {/*<Notices />
+
+                  {/*
                   <Card className={classes.sendEmailComponent}>
                     <div className={classes.sendEmailComponentLabel}>Select an email to send:</div>
 
@@ -694,13 +699,15 @@ export default ({ editorItem, history, ...rest }) => {
                   {editorPanel}
               </div>
 
-              <Sidebar sideBarBlockDisplayType={sideBarBlockDisplayType} handleIsInpsecting={handleIsInpsecting} sendTestEmail={sendTestEmail} handleViewTypeChange={handleViewTypeChange} handleSetFrom={handleSetFrom} handleSetReplyTo={handleSetReplyTo}  messageType={messageType} handleMessageType={handleMessageType} emailAlignment={emailAlignment} handleEmailAlignmentChange={handleEmailAlignmentChange} notes={notes} handleChangeNotes={handleChangeNotes}/>
+              <Sidebar sendTestEmail={sendTestEmail} handleViewTypeChange={handleViewTypeChange} handleSetFrom={handleSetFrom} handleSetReplyTo={handleSetReplyTo}  messageType={messageType} handleMessageType={handleMessageType} emailAlignment={emailAlignment} handleEmailAlignmentChange={handleEmailAlignmentChange} notes={notes} handleChangeNotes={handleChangeNotes}/>
 
               <ComplementaryArea.Slot scope="gh/v4/core" />
 
             </FocusReturnProvider>
           </DropZoneProvider>
         </SlotFillProvider>
+
+
       </div>
     </>
   );
