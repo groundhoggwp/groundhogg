@@ -391,7 +391,7 @@ export default ({ editorItem, history, ...rest }) => {
 
         ondragenter: (event) => {
           // var draggableElement = event.relatedTarget;
-          console.log('drag enter')
+          // console.log('drag enter')
           startInteractJS = true
           var dropzoneElement = event.target.classList.add("active");
 
@@ -400,7 +400,7 @@ export default ({ editorItem, history, ...rest }) => {
           var dropzoneElement = event.target.classList.remove("active");
         },
         ondrop: (event) => {
-          console.log('dropped')
+          // console.log('dropped')
           var dropzoneElement = event.target.classList.remove("active");
 
           handleContentChangeDraggedBlock();
@@ -620,6 +620,8 @@ export default ({ editorItem, history, ...rest }) => {
       <EditorSteps/>
     </div>
   }
+
+  console.log('Re-render', blocks)
 
   return (
     <>

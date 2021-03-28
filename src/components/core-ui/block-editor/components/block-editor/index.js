@@ -16,13 +16,14 @@ import {
   ObserveTyping,
   Typewriter,
   CopyHandler,
-  BlockSelectionClearer,
+   BlockSelectionClearer,
   MultiSelectScrollIntoView,
 } from "@wordpress/block-editor";
 
 import { VisualEditorGlobalKeyboardShortcuts } from "@wordpress/editor";
+import { withState } from '@wordpress/compose';
 
-import { Popover } from "@wordpress/components";
+import { Popover, SlotFillProvider } from "@wordpress/components";
 
 /**
  * External dependencies
@@ -40,6 +41,7 @@ import BlocksPanel from "../sidebar/components/blocks-panel.js";
 import ExpandablePanel from "../expandable-panel/";
 import { createTheme } from "../../../../../theme";
 const theme = createTheme({});
+
 
 export default function ({
   settings: _settings,
@@ -141,6 +143,10 @@ export default function ({
 
   const blockEditorEl = useRef(null);
 
+  const handleyerclose = () => {
+    console.log('asdfasdfasdf')
+  }
+
   return (
     <div className={classes.root} ref={blockEditorEl}>
       <BlockEditorProvider
@@ -173,14 +179,44 @@ export default function ({
               </div>
             </form>
 
+            <SlotFillProvider>
             <div className={classes.emailContent}>
               <BlockSelectionClearer className={classes}>
                 <VisualEditorGlobalKeyboardShortcuts />
                 <MultiSelectScrollIntoView />
-                {/* Add Block Button */}
+                {/* Add Block Button *
+                  anchorEl={anchorEl}
+                  */}
                 <BlockEditorKeyboardShortcuts.Register />
-                <Popover.Slot left={300} top={550} />
-                <Popover.Slot name="block-toolbar" left={300} top={550} />
+
+                <Popover.Slot name="block-search-modal"
+                id={'search' + '-popover'}
+                open={true}
+
+                onClose={()=>{console.log('closee search')}}
+                anchorOrigin={{
+                  vertical: 'center',
+                  horizontal: 'right'
+                }}
+                transformOrigin={{
+                  vertical: 'center',
+                  horizontal: 'left'
+                }}
+                />
+                <Popover.Slot name="block-toolbar" onClose={()=>{console.log('closed')}}
+                id={'toolbar' + '-popover'}
+                open={true}
+
+                onClose={handleyerclose}
+                anchorOrigin={{
+                  vertical: 'center',
+                  horizontal: 'right'
+                }}
+                transformOrigin={{
+                  vertical: 'center',
+                  horizontal: 'left'
+                }}/>
+
                 <Typewriter>
                   <CopyHandler>
                     <WritingFlow>
@@ -193,6 +229,7 @@ export default function ({
                 </Typewriter>
               </BlockSelectionClearer>
             </div>
+            </SlotFillProvider>
           </Card>
 
           <ExpandablePanel
