@@ -65,6 +65,7 @@ export default function ({
       paddingBottom: "280px",
       overflowY: "auto",
       overflowX: "hidden",
+      background: '#f0f0f1' //remove once we're out of the wordpress view
     },
     emailHeader: {},
     subjectHeaderRow: {

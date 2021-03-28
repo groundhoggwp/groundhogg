@@ -268,16 +268,16 @@ export default ({ editorItem, history, ...rest }) => {
   */
   const handleContentChangeDraggedBlock = () => {
     // if(!startInteractJS){return;}
-    // console.log('asdfasdf', draggedBlockIndex)
+    console.log('handle drop', draggedBlockIndex)
 
     let newBlocks = blocks;
     // newBlocks.push(newBlocks[0])
     newBlocks.splice(draggedBlockIndex, 0, createBlock(draggedBlock.name));
-    console.log(newBlocks)
+    // console.log(newBlocks)
     // console.log('drag blocks', newBlocks)
     // updateBlocks(newBlocks);
     // setContent(serialize(newBlocks));
-    // handleUpdateBlocks(newBlocks, {},false);
+    handleUpdateBlocks(newBlocks, {},false);
     // startInteractJS = false;
     // emailStepBackward()
   };

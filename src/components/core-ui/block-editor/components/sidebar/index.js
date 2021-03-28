@@ -84,6 +84,7 @@ const Sidebar = ({
     >
       <EmailControls
         sendTestEmail={sendTestEmail}
+        handleViewTypeChange={handleViewTypeChange}
         messageType={messageType}
         handleMessageType={handleMessageType}
         from={from}

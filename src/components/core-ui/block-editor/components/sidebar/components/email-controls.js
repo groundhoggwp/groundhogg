@@ -24,6 +24,7 @@ import AlignLeft from "components/svg/AlignLeft/";
 
 export default function ({
   sendTestEmail,
+  handleViewTypeChange,
   from,
   handleSetFrom,
   messageType,
