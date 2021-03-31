@@ -391,7 +391,7 @@ switch ( $action ):
 
 			switch ( $preference ) {
 				case 'unsubscribe':
-					$redirect = managed_page_url( 'preferences/unsubscribe/' );
+					$redirect = nonce_url_no_amp( managed_page_url( 'preferences/unsubscribe/' ), 'unsubscribe' );
 					break;
 				case 'confirm':
 					$redirect = managed_page_url( 'preferences/confirm/' );
