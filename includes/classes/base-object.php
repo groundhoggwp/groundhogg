@@ -3,10 +3,11 @@
 namespace Groundhogg;
 
 use Groundhogg\DB\DB;
+use JsonSerializable;
 use Serializable;
 use ArrayAccess;
 
-abstract class Base_Object extends Supports_Errors implements Serializable, ArrayAccess {
+abstract class Base_Object extends Supports_Errors implements Serializable, ArrayAccess, JsonSerializable {
 
 	/**
 	 * The ID of the object
@@ -492,5 +493,9 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			'ID'   => $this->get_id(),
 			'data' => $this->data
 		] );
+	}
+
+	public function jsonSerialize() {
+		return $this->get_as_array();
 	}
 }
