@@ -63,6 +63,132 @@ let draggedBlock = {};
 let startInteractJS = false;
 
 
+const SendEmailComponent = withStyles((theme) => ({
+  root: {
+  },
+  sendEmailComponent:{
+    position: 'absolute',
+    top: '147px',
+    left: editorType === 'email' ? '0px' : '305px',
+    width: editorType === 'email' ? 'calc(100% - 412px)' : 'calc(100% - 729px)',
+    padding: '33px 25px 18px 25px'
+  },
+  sendEmailComponentLabel:{
+    color: '#102640',
+    width: '250px',
+    display: 'inline-block',
+    marginBottom: '20px',
+    fontSize: '16px',
+    fontWeight: '500'
+  },
+  newEmailButton:{
+    display: 'flex',
+    alignItems: 'center',
+    fontSize: '14px',
+    fontWeight: '400',
+    color: theme.palette.primary.main,
+    float: 'right',
+    '& svg':{
+      border: `0.3px solid ${theme.palette.primary.main}`,
+      borderRadius: '4px',
+      marginRight: '5px',
+      padding: '4px'
+    }
+  },
+  sendEmailSelect:{
+    // Importants are needed while we are still inside wordpress, remove this later
+    display: 'block',
+    width: 'calc(100%) !important',
+    maxWidth: 'calc(100%) !important',
+    padding: '5px 20px 5px 20px',
+    border: '1.2px solid rgba(16, 38, 64, 0.15) !important'
+  },
+  subTitleContainer: {
+    position: 'absolute',
+    top: '347px',
+    left: editorType === 'email' ? '20px' : '320px',
+    "& label": {
+      fontSize: "12px",
+    },
+    "& svg": {
+      cursor: 'pointer',
+      marginTop: '10px'
+    },
+    '& input[type="text"], & input[type="text"]:focus': {
+      color: '#000',
+      background: 'none',
+      fontSize: "16px",
+      outline: "none",
+      border: "none",
+      boxShadow: "none",
+      padding: "0",
+      marginLeft: "-1px",
+    },
+  },
+  selectInsertReplacement:{
+    position: 'absolute',
+    minWidth: '209px',
+    top: '345px',
+    left: '747px',
+    fontSize: '13px !important',
+    lineHeight: '13px !important',
+    fontWeight: '400',
+    padding: '6.5px 16.5px 6.5px 16.5px !important',//!Importants can be removed once we\re out of the wordpress space
+    borderRadius: '7px !important',
+    border: '1.2px solid rgba(16, 38, 64, 0.15) !important',
+    boxShadow: 'none',
+    outline: 'none',
+    '&:focus':{
+      border: 'none'
+    }
+  },
+}))(({ classes, ...props }) => {
+  return (
+    <>
+    <Card className={classes.sendEmailComponent}>
+      <div className={classes.sendEmailComponentLabel}>Select an email to send:</div>
+
+      <div className={classes.newEmailButton}>
+        <svg width="6" height="6" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5.64932 2.46589V2.31589H5.49932H3.62312V0.389893V0.239893H3.47312H2.48331H2.33331V0.389893V2.31589H0.46875H0.31875V2.46589V3.54589V3.69589H0.46875H2.33331V5.60989V5.75989H2.48331H3.47312H3.62312V5.60989V3.69589H5.49932H5.64932V3.54589V2.46589Z" fill="#0075FF" stroke="#0075FF" stroke-width="0.3"/>
+        </svg>
+
+        new email
+      </div>
+
+      <select
+        className={classes.sendEmailSelect}
+        value={''}
+        onChange={()=>{}}
+        label=""
+      >
+        <option value={10}>none</option>
+        <option value={20}>Marketing</option>
+      </select>
+
+      <div className={classes.skipEmail}>
+        <label>Skip email step if confirmed:</label>
+        <IOSSwitch checked={true} onChange={()=>{}} name="checked" />
+      </div>
+    </Card>
+    <div className={classes.subTitleContainer}>
+      <TextField
+        label=""
+        value={subTitle}
+        onChange={handleSubTitleChange}
+        InputProps={{ disableUnderline: true, disabled: disableSubTitle }}
+      />
+      <EditPen onClick={toggleSubTitleDisable}/>
+    </div>
+
+
+      <select  onChange={handleInsertReplacement} label="" className={classes.selectInsertReplacement}>
+        <option value="" selected disabled hidden>Insert replacement</option>
+        <option value={'something'}>somethinhg</option>
+      </select>
+    </>
+  );
+});
 const IOSSwitch = withStyles((theme) => ({
   root: {
     width: 34,
@@ -117,6 +243,34 @@ const IOSSwitch = withStyles((theme) => ({
 });
 
 export default ({ editorItem, history, ...rest }) => {
+  const useStyles = makeStyles((theme) => ({
+    root: {
+
+    },
+    contentMain:{
+
+    },
+
+    skipEmail:{
+      fontSize: '14px',
+      fontWeight: '300',
+      margin: '10px 0px 0px 20px',
+      "& label": {
+        fontSize: "14px",
+        fontWeight: '300'
+      },
+    },
+    contentSideBar:{
+
+    },
+    contentFooter:{
+      posiion: 'absolute',
+      bottom: '0'
+    }
+
+  }));
+  const classes = useStyles();
+
   setDefaultBlockName("groundhogg/paragraph");
 
   const dispatch = useDispatch(EMAILS_STORE_NAME);
@@ -139,7 +293,7 @@ export default ({ editorItem, history, ...rest }) => {
   // Editor Contents
   const [title, setTitle] = useState(defaultTitleValue);
   const [content, setContent] = useState(defaultContentValue);
-  const [blocks, updateBlocks] = useState(parse(defaultContentValue));
+  const [blocks, setBlocks] = useState(parse(defaultContentValue));
   const [subTitle, setSubTitle] = useState(defaultTitleValue);
   const [disableSubTitle, setDisableSubTitle] = useState(false);
 
@@ -205,6 +359,26 @@ export default ({ editorItem, history, ...rest }) => {
     handleUpdateBlocks(blockVersionHistory[newBlocksVersionTracker], {}, true);
   }
 
+  // ()
+  const addBlock = () => {
+    // const newBlocksVersionTracker = blocksVersionTracker-1
+    // if(!blockVersionHistory[newBlocksVersionTracker]){
+    //   return;
+    // }
+    // setBlocksVersionTracker(newBlocksVersionTracker)
+    // handleUpdateBlocks(blockVersionHistory[newBlocksVersionTracker], {}, true);
+
+
+    console.log(blocks)
+    let newBlocks = blocks
+    newBlocks.push(blocks[0])
+    setBlocks(newBlocks);
+  }
+
+  const handleUpdateBlocks  = (blocks) => {
+    setBlocks(blocks)
+  }
+
   /*
     Saves Funnel or Email
   */
@@ -267,31 +441,15 @@ export default ({ editorItem, history, ...rest }) => {
     Block Handlers
   */
   const handleContentChangeDraggedBlock = () => {
-    // if(!startInteractJS){return;}
-    console.log('handle drop', draggedBlockIndex)
-
     let newBlocks = blocks;
-    // newBlocks.push(newBlocks[0])
     newBlocks.splice(draggedBlockIndex, 0, createBlock(draggedBlock.name));
-    // console.log(newBlocks)
-    // console.log('drag blocks', newBlocks)
-    // updateBlocks(newBlocks);
-    // setContent(serialize(newBlocks));
     handleUpdateBlocks(newBlocks, {},false);
-    // startInteractJS = false;
-    // emailStepBackward()
   };
 
-  const handleUpdateBlocks = (blocks, selectionObj, updateFromHistory) => {
-    // On load this stops a null error
-    // console.log('handle update', blocks)
-    if (!Array.isArray(blocks)) {
-      return;
-    }
-
+  const handlesetBlocks = (blocks, selectionObj, updateFromHistory) => {
     // Standard calls for the block editor
-    updateBlocks(blocks);
-    setContent(serialize(blocks));
+    setBlocks(blocks);
+    // setContent(serialize(blocks));
 
 
     if(!updateFromHistory){
@@ -349,29 +507,17 @@ export default ({ editorItem, history, ...rest }) => {
       }
 
     })
-
-
-    if(draggedBlockIndex === 0){
-      // console.log(event.target)
-      // return;
-    }
-    // document.querySelectorAll('.wp-block')[draggedBlockIndex].style.borderBottom = '1px solid #0075FF';
+    document.querySelectorAll('.wp-block')[draggedBlockIndex].style.borderBottom = '1px solid #0075FF';
   };
 
-  const dragStartListener = (event) => {
-    // console.log('drag start', event)
-    // document.querySelector('.interface-interface-skeleton__sidebar').scrollTop = 0;
-    // document.querySelector('.interface-interface-skeleton__sidebar').classList.add("show-overflow");
-  };
   const dragEndListener = (event) => {
     document.querySelectorAll('.wp-block').forEach((block, i)=>{
       block.style.borderTop = ''
       block.style.borderBottom = ''
     });
 
-    const target = event.target;
-
     // keep the dragged position in the data-x/data-y attributes
+    const target = event.target;
     const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
     const y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
 
@@ -390,8 +536,6 @@ export default ({ editorItem, history, ...rest }) => {
         ondropactivate: (event) => {},
 
         ondragenter: (event) => {
-          // var draggableElement = event.relatedTarget;
-          // console.log('drag enter')
           startInteractJS = true
           var dropzoneElement = event.target.classList.add("active");
 
@@ -401,6 +545,8 @@ export default ({ editorItem, history, ...rest }) => {
         },
         ondrop: (event) => {
           // console.log('dropped')
+          console.log(blocks)
+          x.a = '1123'
           var dropzoneElement = event.target.classList.remove("active");
 
           handleContentChangeDraggedBlock();
@@ -413,7 +559,7 @@ export default ({ editorItem, history, ...rest }) => {
         cursorChecker(action, interactable, element, interacting) {
           return "grab";
         },
-        onstart: dragStartListener,
+        // onstart: dragStartListener,
         onend: dragEndListener,
         listeners: { move: dragMoveListener },
         modifiers: [
@@ -425,6 +571,26 @@ export default ({ editorItem, history, ...rest }) => {
         ],
       });
       }
+      let x = {
+          aInternal: 10,
+          aListener: function(val) {},
+          set a(val) {
+            this.aInternal = val;
+            this.aListener(val);
+          },
+          get a() {
+            return this.aInternal;
+          },
+          registerListener: function(listener) {
+            this.aListener = listener;
+          }
+        }
+      x.registerListener(function(val) {
+        emailStepBackward()
+        emailStepForward()
+        console.log("Someone changed the value of x.a to " + val);
+      });
+
 
 
   /*
@@ -437,10 +603,9 @@ export default ({ editorItem, history, ...rest }) => {
 
   const sendTestEmail = (e) => {
     if (!matchEmailRegex(replyTo)) {
-      // console.log('invliad email', replyTo, from, content, subject)
       return;
-    }
-    // console.log("valid let send");
+    };
+
     sendEmailRaw({
       to: replyTo,
       from,
@@ -449,122 +614,18 @@ export default ({ editorItem, history, ...rest }) => {
       subject: subject,
     });
   };
+
   const handleAltBodyContent = (e) => {
-    // console.log('alt body content', altBodyContent)
-    setAltBodyContent(e.target.value);
-  };
-  const handleAltBodyEnable = (e) => {
-    // console.log('alt body enable',   altBodyEnable)
     setAltBodyContent(e.target.value);
   };
 
+  const handleAltBodyEnable = (e) => {
+    setAltBodyContent(e.target.value);
+  };
 
   const handleChangeNotes = (e) => {
-    // console.log('alt body enable',   altBodyEnable)
     setNotes(e.target.value);
   };
-
-  const useStyles = makeStyles((theme) => ({
-    root: {
-
-    },
-    contentMain:{
-
-    },
-    sendEmailComponent:{
-      position: 'absolute',
-      top: '147px',
-      left: editorType === 'email' ? '0px' : '305px',
-      width: editorType === 'email' ? 'calc(100% - 412px)' : 'calc(100% - 729px)',
-      padding: '33px 25px 18px 25px'
-    },
-    sendEmailComponentLabel:{
-      color: '#102640',
-      width: '250px',
-      display: 'inline-block',
-      marginBottom: '20px',
-      fontSize: '16px',
-      fontWeight: '500'
-    },
-    skipEmail:{
-      fontSize: '14px',
-      fontWeight: '300',
-      margin: '10px 0px 0px 20px',
-      "& label": {
-        fontSize: "14px",
-        fontWeight: '300'
-      },
-    },
-    newEmailButton:{
-      display: 'flex',
-      alignItems: 'center',
-      fontSize: '14px',
-      fontWeight: '400',
-      color: theme.palette.primary.main,
-      float: 'right',
-      '& svg':{
-        border: `0.3px solid ${theme.palette.primary.main}`,
-        borderRadius: '4px',
-        marginRight: '5px',
-        padding: '4px'
-      }
-    },
-    sendEmailSelect:{
-      // Importants are needed while we are still inside wordpress, remove this later
-      display: 'block',
-      width: 'calc(100%) !important',
-      maxWidth: 'calc(100%) !important',
-      padding: '5px 20px 5px 20px',
-      border: '1.2px solid rgba(16, 38, 64, 0.15) !important'
-    },
-    subTitleContainer: {
-      position: 'absolute',
-      top: '347px',
-      left: editorType === 'email' ? '20px' : '320px',
-      "& label": {
-        fontSize: "12px",
-      },
-      "& svg": {
-        cursor: 'pointer',
-        marginTop: '10px'
-      },
-      '& input[type="text"], & input[type="text"]:focus': {
-        color: '#000',
-        background: 'none',
-        fontSize: "16px",
-        outline: "none",
-        border: "none",
-        boxShadow: "none",
-        padding: "0",
-        marginLeft: "-1px",
-      },
-    },
-    selectInsertReplacement:{
-      position: 'absolute',
-      minWidth: '209px',
-      top: '345px',
-      left: '747px',
-      fontSize: '13px !important',
-      lineHeight: '13px !important',
-      fontWeight: '400',
-      padding: '6.5px 16.5px 6.5px 16.5px !important',//!Importants can be removed once we\re out of the wordpress space
-      borderRadius: '7px !important',
-      border: '1.2px solid rgba(16, 38, 64, 0.15) !important',
-      boxShadow: 'none',
-      outline: 'none',
-      '&:focus':{
-        border: 'none'
-      }
-    },
-    contentSideBar:{
-
-    },
-    contentFooter:{
-      posiion: 'absolute',
-      bottom: '0'
-    }
-
-  }));
 
   const toggleSubTitle = () =>{
     setDisableTitle(disableSubTitle ? false : true )
@@ -572,47 +633,32 @@ export default ({ editorItem, history, ...rest }) => {
 
   useEffect(() => {
     console.log('usee effect this should hppaen 1')
-    setupDragNDrop()
+    // setupDragNDrop()
   }, []);
 
 
-
-
-  // console.log('blocks', blocks)
-  const classes = useStyles();
-
-  let editorPanel;
-  switch (editorMode) {
-    case "text":
-    editorPanel = (
-      <TextEditor
-        settings={window.Groundhogg.preloadSettings}
-        subject={subject}
-        handleSubjectChange={handleSubjectChange}
-        preHeader={preHeader}
-        handlePreHeaderChange={handlePreHeaderChange}
-        viewType={viewType}
-        handleUpdateBlocks={handleUpdateBlocks}
-        blocks={blocks}
-      />
-    );
-
-      break;
-    default:
-      editorPanel = (
-        <BlockEditor
-          settings={window.Groundhogg.preloadSettings}
-          subject={subject}
-          handleSubjectChange={handleSubjectChange}
-          preHeader={preHeader}
-          handlePreHeaderChange={handlePreHeaderChange}
-          viewType={viewType}
-          handleUpdateBlocks={handleUpdateBlocks}
-          blocks={blocks}
-          editorType={editorType}
-        />
-      );
-  }
+  // let editorPanel;
+  // switch (editorMode) {
+  //   case "text":
+  //   editorPanel = (
+  //     <TextEditor
+  //       settings={window.Groundhogg.preloadSettings}
+  //       subject={subject}
+  //       handleSubjectChange={handleSubjectChange}
+  //       preHeader={preHeader}
+  //       handlePreHeaderChange={handlePreHeaderChange}
+  //       viewType={viewType}
+  //       handleUpdateBlocks={handleUpdateBlocks}
+  //       blocks={blocks}
+  //     />
+  //   );
+  //
+  //     break;
+  //   default:
+  //     editorPanel = (
+  //
+  //     );
+  // }
 
   let steps = <div/>
   if(editorType === 'funnel'){
@@ -621,7 +667,7 @@ export default ({ editorItem, history, ...rest }) => {
     </div>
   }
 
-  console.log('Re-render', blocks)
+  // console.log('Re-render', blocks)
 
   return (
     <>
@@ -654,51 +700,23 @@ export default ({ editorItem, history, ...rest }) => {
               <div className={classes.content}>
 
                   {/*
-                  <Card className={classes.sendEmailComponent}>
-                    <div className={classes.sendEmailComponentLabel}>Select an email to send:</div>
-
-                    <div className={classes.newEmailButton}>
-                      <svg width="6" height="6" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5.64932 2.46589V2.31589H5.49932H3.62312V0.389893V0.239893H3.47312H2.48331H2.33331V0.389893V2.31589H0.46875H0.31875V2.46589V3.54589V3.69589H0.46875H2.33331V5.60989V5.75989H2.48331H3.47312H3.62312V5.60989V3.69589H5.49932H5.64932V3.54589V2.46589Z" fill="#0075FF" stroke="#0075FF" stroke-width="0.3"/>
-                      </svg>
-
-                      new email
-                    </div>
-
-                    <select
-                      className={classes.sendEmailSelect}
-                      value={''}
-                      onChange={()=>{}}
-                      label=""
-                    >
-                      <option value={10}>none</option>
-                      <option value={20}>Marketing</option>
-                    </select>
-
-                    <div className={classes.skipEmail}>
-                      <label>Skip email step if confirmed:</label>
-                      <IOSSwitch checked={true} onChange={()=>{}} name="checked" />
-                    </div>
-                  </Card>
-                  <div className={classes.subTitleContainer}>
-                    <TextField
-                      label=""
-                      value={subTitle}
-                      onChange={handleSubTitleChange}
-                      InputProps={{ disableUnderline: true, disabled: disableSubTitle }}
-                    />
-                    <EditPen onClick={toggleSubTitleDisable}/>
-                  </div>
-
-
-                    <select  onChange={handleInsertReplacement} label="" className={classes.selectInsertReplacement}>
-                      <option value="" selected disabled hidden>Insert replacement</option>
-                      <option value={'something'}>somethinhg</option>
-                    </select>*/}
+                  <SendEmailComponent/>
+                  */}
 
 
 
-                  {editorPanel}
+                  <BlockEditor
+                    settings={window.Groundhogg.preloadSettings}
+                    subject={subject}
+                    handleSubjectChange={handleSubjectChange}
+                    preHeader={preHeader}
+                    handlePreHeaderChange={handlePreHeaderChange}
+                    viewType={viewType}
+                    handleUpdateBlocks={handleUpdateBlocks}
+                    blocks={blocks}
+                    editorType={editorType}
+                    addBlock={addBlock}
+                  />
               </div>
 
               <Sidebar sendTestEmail={sendTestEmail} handleViewTypeChange={handleViewTypeChange} handleSetFrom={handleSetFrom} handleSetReplyTo={handleSetReplyTo}  messageType={messageType} handleMessageType={handleMessageType} emailAlignment={emailAlignment} handleEmailAlignmentChange={handleEmailAlignmentChange} notes={notes} handleChangeNotes={handleChangeNotes}/>

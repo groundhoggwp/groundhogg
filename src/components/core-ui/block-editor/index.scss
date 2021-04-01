@@ -17,3 +17,29 @@
 .block-editor__typewriter{
   min-height: 300px;
 }
+
+.block-editor-block-types-list{
+  background: #fff;
+  padding-top: 30px;
+
+
+}
+
+.block-editor-inserter__search-input {
+  position: absolute !important;
+  width: 90% !important;
+  top: 16px !important;
+}
+
+.block-editor-inserter__search-icon{
+  top: 41px !important;
+}
+
+[draggable=true] {
+  cursor: grab;
+  // opacity: 1.0;
+}
+
+.block-editor-block{
+
+}

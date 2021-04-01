@@ -42,7 +42,7 @@ import ExpandablePanel from "../expandable-panel/";
 import { createTheme } from "../../../../../theme";
 const theme = createTheme({});
 
-
+let timeout;
 export default function ({
   settings: _settings,
   subject,
@@ -53,6 +53,7 @@ export default function ({
   handleUpdateBlocks,
   blocks,
   editorType,
+  addBlock
 }) {
   const useStyles = makeStyles((theme) => ({
     root: {
@@ -152,10 +153,20 @@ export default function ({
       <BlockEditorProvider
         value={blocks}
         settings={settings}
-        onInput={handleUpdateBlocks}
-        onChange={handleUpdateBlocks}
+        onInput={ ( blocks ) => handleUpdateBlocks( blocks ) }
+        onChange={ ( blocks ) => handleUpdateBlocks( blocks ) }
       >
-        <div className={classes.emailContainer}>
+        <div className={classes.emailContainer}
+        onDragOver={(e) => {
+        clearTimeout(timeout)
+        timeout = setTimeout(()=> {
+          console.log('drag over')
+          addBlock()
+        },50);
+
+      }}
+        onDrop={()=>{console.log('on drop')}}
+        >
           <Card>
             <form noValidate autoComplete="off" className={classes.emailHeader}>
               <div className={classes.subjectHeaderRow}>
@@ -179,43 +190,26 @@ export default function ({
               </div>
             </form>
 
-            <SlotFillProvider>
-            <div className={classes.emailContent}>
+            <div className={classes.emailContent}
+            onDrop={()=>{console.log('dropped')}}>
               <BlockSelectionClearer className={classes}>
                 <VisualEditorGlobalKeyboardShortcuts />
                 <MultiSelectScrollIntoView />
                 {/* Add Block Button *
+                  open={true}
                   anchorEl={anchorEl}
+                  onClose={handleyerclose}
+                  anchorOrigin={{
+                    vertical: 'center',
+                    horizontal: 'right'
+                  }}
+                  transformOrigin={{
+                    vertical: 'center',
+                    horizontal: 'left'
+                  }}
                   */}
                 <BlockEditorKeyboardShortcuts.Register />
 
-                <Popover.Slot name="block-search-modal"
-                id={'search' + '-popover'}
-                open={true}
-
-                onClose={()=>{console.log('closee search')}}
-                anchorOrigin={{
-                  vertical: 'center',
-                  horizontal: 'right'
-                }}
-                transformOrigin={{
-                  vertical: 'center',
-                  horizontal: 'left'
-                }}
-                />
-                <Popover.Slot name="block-toolbar" onClose={()=>{console.log('closed')}}
-                id={'toolbar' + '-popover'}
-                open={true}
-
-                onClose={handleyerclose}
-                anchorOrigin={{
-                  vertical: 'center',
-                  horizontal: 'right'
-                }}
-                transformOrigin={{
-                  vertical: 'center',
-                  horizontal: 'left'
-                }}/>
 
                 <Typewriter>
                   <CopyHandler>
@@ -229,7 +223,7 @@ export default function ({
                 </Typewriter>
               </BlockSelectionClearer>
             </div>
-            </SlotFillProvider>
+
           </Card>
 
           <ExpandablePanel

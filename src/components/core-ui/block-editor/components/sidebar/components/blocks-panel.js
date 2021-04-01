@@ -167,6 +167,7 @@ const BlocksPanel = ({ blocks }) => {
             <div
               data-block={JSON.stringify(block)}
               className={`${classes.block} ${fillHoverClass} block-editor-block side-bar-drag-drop-block`}
+              draggable="true"              
             >
               <div className={classes.icon}>{icon}</div>
               <div className={classes.name}>{_.startCase(title)}</div>
