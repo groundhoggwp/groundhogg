@@ -11,7 +11,7 @@ import { getBlockTypes } from "@wordpress/blocks";
 /**
  * External dependencies
  */
-import _ from 'lodash';
+import _ from "lodash";
 import { Button, Card, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
@@ -110,11 +110,15 @@ const BlocksPanel = ({ blocks }) => {
   const classes = useStyles();
   // const blocks = ;
 
-  const [sideBarBlockDisplayType, setSideBarBlockDisplayType] = useState("blocks");
+  const [sideBarBlockDisplayType, setSideBarBlockDisplayType] = useState(
+    "blocks"
+  );
 
   const handleIsInpsecting = (type) => {
-    console.log('hiii')
-    setSideBarBlockDisplayType(sideBarBlockDisplayType === 'blocks' ? 'inspector' : 'blocks');
+    console.log("hiii");
+    setSideBarBlockDisplayType(
+      sideBarBlockDisplayType === "blocks" ? "inspector" : "blocks"
+    );
   };
 
   const blockPanel =
@@ -167,7 +171,7 @@ const BlocksPanel = ({ blocks }) => {
             <div
               data-block={JSON.stringify(block)}
               className={`${classes.block} ${fillHoverClass} block-editor-block side-bar-drag-drop-block`}
-              draggable="true"              
+              draggable="true"
             >
               <div className={classes.icon}>{icon}</div>
               <div className={classes.name}>{_.startCase(title)}</div>
@@ -180,14 +184,16 @@ const BlocksPanel = ({ blocks }) => {
   return (
     <Card className={classes.root}>
       <div className={classes.blocksTitles}>
-        <span onClick={handleIsInpsecting}
+        <span
+          onClick={handleIsInpsecting}
           className={
             sideBarBlockDisplayType === "blocks" ? classes.panelTitle : ""
           }
         >
           Blocks
         </span>
-        <span onClick={handleIsInpsecting}
+        <span
+          onClick={handleIsInpsecting}
           className={
             sideBarBlockDisplayType === "inspector" ? classes.panelTitle : ""
           }

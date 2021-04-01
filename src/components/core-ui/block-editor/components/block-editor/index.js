@@ -16,12 +16,12 @@ import {
   ObserveTyping,
   Typewriter,
   CopyHandler,
-   BlockSelectionClearer,
+  BlockSelectionClearer,
   MultiSelectScrollIntoView,
 } from "@wordpress/block-editor";
 
 import { VisualEditorGlobalKeyboardShortcuts } from "@wordpress/editor";
-import { withState } from '@wordpress/compose';
+import { withState } from "@wordpress/compose";
 
 import { Popover, SlotFillProvider } from "@wordpress/components";
 
@@ -53,7 +53,7 @@ export default function ({
   handleUpdateBlocks,
   blocks,
   editorType,
-  addBlock
+  addBlock,
 }) {
   const useStyles = makeStyles((theme) => ({
     root: {
@@ -68,7 +68,7 @@ export default function ({
       paddingBottom: "280px",
       overflowY: "auto",
       overflowX: "hidden",
-      background: '#f0f0f1' //remove once we're out of the wordpress view
+      background: "#f0f0f1", //remove once we're out of the wordpress view
     },
     emailHeader: {},
     subjectHeaderRow: {
@@ -96,7 +96,7 @@ export default function ({
       boxShadow: "none",
       marginLeft: "73px",
     },
-    preHeaderInput:{
+    preHeaderInput: {
       width: "calc(100% - 140px)",
       marginLeft: "143px",
     },
@@ -145,27 +145,29 @@ export default function ({
   const blockEditorEl = useRef(null);
 
   const handleyerclose = () => {
-    console.log('asdfasdfasdf')
-  }
+    console.log("asdfasdfasdf");
+  };
 
   return (
     <div className={classes.root} ref={blockEditorEl}>
       <BlockEditorProvider
         value={blocks}
         settings={settings}
-        onInput={ handleUpdateBlocks }
-        onChange={ handleUpdateBlocks }
+        onInput={handleUpdateBlocks}
+        onChange={handleUpdateBlocks}
       >
-        <div className={classes.emailContainer}
-        onDragOver={(e) => {
-        clearTimeout(timeout)
-        timeout = setTimeout(()=> {
-          console.log('drag over')
-          addBlock()
-        },50);
-
-      }}
-        onDrop={()=>{console.log('on drop')}}
+        <div
+          className={classes.emailContainer}
+          onDragOver={(e) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+              console.log("drag over");
+              addBlock();
+            }, 50);
+          }}
+          onDrop={() => {
+            console.log("on drop");
+          }}
         >
           <Card>
             <form noValidate autoComplete="off" className={classes.emailHeader}>
@@ -190,8 +192,12 @@ export default function ({
               </div>
             </form>
 
-            <div className={classes.emailContent}
-            onDrop={()=>{console.log('dropped')}}>
+            <div
+              className={classes.emailContent}
+              onDrop={() => {
+                console.log("dropped");
+              }}
+            >
               <BlockSelectionClearer className={classes}>
                 <VisualEditorGlobalKeyboardShortcuts />
                 <MultiSelectScrollIntoView />
@@ -210,7 +216,6 @@ export default function ({
                   */}
                 <BlockEditorKeyboardShortcuts.Register />
 
-
                 <Typewriter>
                   <CopyHandler>
                     <WritingFlow>
@@ -223,7 +228,6 @@ export default function ({
                 </Typewriter>
               </BlockSelectionClearer>
             </div>
-
           </Card>
 
           <ExpandablePanel

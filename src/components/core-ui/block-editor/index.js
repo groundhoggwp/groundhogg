@@ -105,6 +105,12 @@ export default ({ editorItem, history, ...rest }) => {
   const [blockVersionHistory, setBlockVersionHistory] = useState([parse(defaultContentValue)]);
   const [noticeText, setNoticeText] = useState('');
 
+  // Header States
+  const [altBodyContent, setAltBodyContent] = useState('');
+  const [altBodyEnable, setAltBodyEnable] = useState('');
+  const [subject, setSubject] = useState(defaultSubjectValue);
+  const [preHeader, setPreHeader] = useState(defaultPreHeaderValue);
+
   // Editor Contents
   const [title, setTitle] = useState(defaultTitleValue);
   const [content, setContent] = useState(defaultContentValue);
@@ -120,16 +126,8 @@ export default ({ editorItem, history, ...rest }) => {
   const [from, setFrom] = useState("");
   const [viewType, setViewType] = useState("desktop");
   const [messageType, setMessageType] = useState("marketing");
-  const [emailAlignment, setEmailAlignment] = useState("left");
-
+  const [emailAlignment, setEmailAlignment] = useState("left")
   const [notes, setNotes] = useState(defaultNotes);
-
-  // Unused
-  const [altBodyContent, setAltBodyContent] = useState('');
-  const [altBodyEnable, setAltBodyEnable] = useState('');
-  const [subject, setSubject] = useState(defaultSubjectValue);
-  const [preHeader, setPreHeader] = useState(defaultPreHeaderValue);
-
 
   const { editorMode, isSaving, item } = useSelect(
     (select) => ({
