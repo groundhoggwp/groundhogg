@@ -153,8 +153,8 @@ export default function ({
       <BlockEditorProvider
         value={blocks}
         settings={settings}
-        onInput={ ( blocks ) => handleUpdateBlocks( blocks ) }
-        onChange={ ( blocks ) => handleUpdateBlocks( blocks ) }
+        onInput={ handleUpdateBlocks }
+        onChange={ handleUpdateBlocks }
       >
         <div className={classes.emailContainer}
         onDragOver={(e) => {

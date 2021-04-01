@@ -6,7 +6,7 @@
 // @import "~@wordpress/base-styles/z-index";
 // @import "~@wordpress/interface/src/style.scss";
 
-#wpfooter, #footer-thankyou{
+#wpfooter, #footer-thankyou, #updates_required{
   display: none !important;
 }
 
@@ -26,13 +26,13 @@
 }
 
 .block-editor-inserter__search-input {
-  position: absolute !important;
-  width: 90% !important;
-  top: 16px !important;
+  // position: absolute !important;
+  // width: 90% !important;
+  // top: 16px !important;
 }
 
 .block-editor-inserter__search-icon{
-  top: 41px !important;
+  // top: 41px !important;
 }
 
 [draggable=true] {

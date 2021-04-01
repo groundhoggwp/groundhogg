@@ -10,7 +10,7 @@ import {
   PanelBody,
   PanelRow
 } from "@wordpress/components";
-import { useEffect, useState, useRef } from "@wordpress/element";
+import { useEffect, useState, useRef, createElement } from "@wordpress/element";
 import { useSelect, useDispatch } from "@wordpress/data";
 import {
   serialize,
@@ -18,8 +18,8 @@ import {
   pasteHandler,
   rawHandler,
   createBlock,
-  insertBlock,
-  insertBlocks,
+  // insertBlock,
+  // insertBlocks,
   insertDefaultBlock,
   getBlockTypes,
   getBlockInsertionPoint,
@@ -39,13 +39,6 @@ import {
 import interact from "interactjs";
 import { DateTime } from "luxon";
 import { withStyles } from '@material-ui/core/styles';
-
-// import {
-//   BlockSettingsMenu,
-//   BlocksPreview,
-//   BlockToolbar
-// } from '@wordpress/block-editor';
-
 
 /**
  * Internal dependencies
@@ -70,196 +63,11 @@ let draggedBlock = {};
 let startInteractJS = false;
 
 
-const SendEmailComponent = withStyles((theme) => ({
-  root: {
-  },
-  sendEmailComponent:{
-    position: 'absolute',
-    top: '147px',
-    left: editorType === 'email' ? '0px' : '305px',
-    width: editorType === 'email' ? 'calc(100% - 412px)' : 'calc(100% - 729px)',
-    padding: '33px 25px 18px 25px'
-  },
-  sendEmailComponentLabel:{
-    color: '#102640',
-    width: '250px',
-    display: 'inline-block',
-    marginBottom: '20px',
-    fontSize: '16px',
-    fontWeight: '500'
-  },
-  newEmailButton:{
-    display: 'flex',
-    alignItems: 'center',
-    fontSize: '14px',
-    fontWeight: '400',
-    color: theme.palette.primary.main,
-    float: 'right',
-    '& svg':{
-      border: `0.3px solid ${theme.palette.primary.main}`,
-      borderRadius: '4px',
-      marginRight: '5px',
-      padding: '4px'
-    }
-  },
-  sendEmailSelect:{
-    // Importants are needed while we are still inside wordpress, remove this later
-    display: 'block',
-    width: 'calc(100%) !important',
-    maxWidth: 'calc(100%) !important',
-    padding: '5px 20px 5px 20px',
-    border: '1.2px solid rgba(16, 38, 64, 0.15) !important'
-  },
-  subTitleContainer: {
-    position: 'absolute',
-    top: '347px',
-    left: editorType === 'email' ? '20px' : '320px',
-    "& label": {
-      fontSize: "12px",
-    },
-    "& svg": {
-      cursor: 'pointer',
-      marginTop: '10px'
-    },
-    '& input[type="text"], & input[type="text"]:focus': {
-      color: '#000',
-      background: 'none',
-      fontSize: "16px",
-      outline: "none",
-      border: "none",
-      boxShadow: "none",
-      padding: "0",
-      marginLeft: "-1px",
-    },
-  },
-  selectInsertReplacement:{
-    position: 'absolute',
-    minWidth: '209px',
-    top: '345px',
-    left: '747px',
-    fontSize: '13px !important',
-    lineHeight: '13px !important',
-    fontWeight: '400',
-    padding: '6.5px 16.5px 6.5px 16.5px !important',//!Importants can be removed once we\re out of the wordpress space
-    borderRadius: '7px !important',
-    border: '1.2px solid rgba(16, 38, 64, 0.15) !important',
-    boxShadow: 'none',
-    outline: 'none',
-    '&:focus':{
-      border: 'none'
-    }
-  },
-}))(({ classes, ...props }) => {
-  return (
-    <>
-
-    <Card className={classes.sendEmailComponent}>
-
-      <div className={classes.sendEmailComponentLabel}>Select an email to send:</div>
-
-      <div className={classes.newEmailButton}>
-        <svg width="6" height="6" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M5.64932 2.46589V2.31589H5.49932H3.62312V0.389893V0.239893H3.47312H2.48331H2.33331V0.389893V2.31589H0.46875H0.31875V2.46589V3.54589V3.69589H0.46875H2.33331V5.60989V5.75989H2.48331H3.47312H3.62312V5.60989V3.69589H5.49932H5.64932V3.54589V2.46589Z" fill="#0075FF" stroke="#0075FF" stroke-width="0.3"/>
-        </svg>
-
-        new email
-      </div>
-
-      <select
-        className={classes.sendEmailSelect}
-        value={''}
-        onChange={()=>{}}
-        label=""
-      >
-        <option value={10}>none</option>
-        <option value={20}>Marketing</option>
-      </select>
-
-      <div className={classes.skipEmail}>
-        <label>Skip email step if confirmed:</label>
-        <IOSSwitch checked={true} onChange={()=>{}} name="checked" />
-      </div>
-    </Card>
-    <div className={classes.subTitleContainer}>
-      <TextField
-        label=""
-        value={subTitle}
-        onChange={handleSubTitleChange}
-        InputProps={{ disableUnderline: true, disabled: disableSubTitle }}
-      />
-      <EditPen onClick={toggleSubTitleDisable}/>
-    </div>
-
-
-      <select  onChange={handleInsertReplacement} label="" className={classes.selectInsertReplacement}>
-        <option value="" selected disabled hidden>Insert replacement</option>
-        <option value={'something'}>somethinhg</option>
-      </select>
-    </>
-  );
-});
-const IOSSwitch = withStyles((theme) => ({
-  root: {
-    width: 34,
-    height: 20,
-    padding: 0,
-    margin: theme.spacing(1),
-  },
-  switchBase: {
-    padding: 1,
-    '&$checked': {
-      transform: 'translateX(14px)',
-      color: theme.palette.common.white,
-      '& + $track': {
-        backgroundColor: theme.palette.primary.main,
-        opacity: 1,
-        border: 'none',
-      },
-    },
-    '&$focusVisible $thumb': {
-      color: '#52d869',
-      border: '6px solid #fff',
-    },
-  },
-  thumb: {
-    width: 18,
-    height: 18,
-  },
-  track: {
-    borderRadius: 26 / 2,
-    border: `1px solid ${theme.palette.grey[400]}`,
-    backgroundColor: theme.palette.grey[50],
-    opacity: 1,
-    transition: theme.transitions.create(['background-color', 'border']),
-  },
-  checked: {},
-  focusVisible: {},
-}))(({ classes, ...props }) => {
-  return (
-    <Switch
-      focusVisibleClassName={classes.focusVisible}
-      disableRipple
-      classes={{
-        root: classes.root,
-        switchBase: classes.switchBase,
-        thumb: classes.thumb,
-        track: classes.track,
-        checked: classes.checked,
-      }}
-      {...props}
-    />
-  );
-});
-
 export default ({ editorItem, history, ...rest }) => {
   const useStyles = makeStyles((theme) => ({
     root: {
 
     },
-    contentMain:{
-
-    },
-
     skipEmail:{
       fontSize: '14px',
       fontWeight: '300',
@@ -283,6 +91,7 @@ export default ({ editorItem, history, ...rest }) => {
   setDefaultBlockName("groundhogg/paragraph");
 
   const dispatch = useDispatch(EMAILS_STORE_NAME);
+
   const { sendEmailById, sendEmailRaw } = useDispatch(EMAILS_STORE_NAME);
   const {
     title: defaultTitleValue,
@@ -295,6 +104,7 @@ export default ({ editorItem, history, ...rest }) => {
 
   // Global States
   const [blocksVersionTracker, setBlocksVersionTracker] = useState(0);
+  console.log(defaultContentValue)
   const [blockVersionHistory, setBlockVersionHistory] = useState([parse(defaultContentValue)]);
 
   const [noticeText, setNoticeText] = useState('');
@@ -319,7 +129,6 @@ export default ({ editorItem, history, ...rest }) => {
   const [notes, setNotes] = useState(defaultNotes);
 
   // Unused
-
   const [altBodyContent, setAltBodyContent] = useState('');
   const [altBodyEnable, setAltBodyEnable] = useState('');
   const [subject, setSubject] = useState(defaultSubjectValue);
@@ -368,22 +177,6 @@ export default ({ editorItem, history, ...rest }) => {
     handleUpdateBlocks(blockVersionHistory[newBlocksVersionTracker], {}, true);
   }
 
-  // ()
-  const addBlock = () => {
-    // const newBlocksVersionTracker = blocksVersionTracker-1
-    // if(!blockVersionHistory[newBlocksVersionTracker]){
-    //   return;
-    // }
-    // setBlocksVersionTracker(newBlocksVersionTracker)
-    // handleUpdateBlocks(blockVersionHistory[newBlocksVersionTracker], {}, true);
-
-
-    console.log(blocks)
-    let newBlocks = blocks
-    newBlocks.push(blocks[0])
-    setBlocks(newBlocks);
-  }
-
   const handleUpdateBlocks  = (blocks) => {
     setBlocks(blocks)
   }
@@ -392,6 +185,7 @@ export default ({ editorItem, history, ...rest }) => {
     Saves Funnel or Email
   */
   const updateItem = (e) => {
+    console.log(content)
     dispatch.updateItem(editorItem.ID, {
       data: {
         subject,
@@ -450,16 +244,13 @@ export default ({ editorItem, history, ...rest }) => {
     Block Handlers
   */
   const handleContentChangeDraggedBlock = () => {
-    // let newBlocks = blocks;
-    // newBlocks.splice(draggedBlockIndex, 0, createBlock(draggedBlock.name));
-    insertBlock(createBlock(draggedBlock.name))
-    // handleUpdateBlocks(newBlocks, {},false);
+
   };
 
   const handlesetBlocks = (blocks, selectionObj, updateFromHistory) => {
     // Standard calls for the block editor
     setBlocks(blocks);
-    // setContent(serialize(blocks));
+    setContent(serialize(blocks));
 
 
     if(!updateFromHistory){
@@ -677,6 +468,67 @@ export default ({ editorItem, history, ...rest }) => {
     </div>
   }
 
+
+  // const dispatchBlockEditor = useDispatch("core/block-editor");
+  //
+  //
+  //
+  // var content123 = "Test content";
+  // var el = createElement();
+  // var name = 'groundhogg/html';
+  // let insertedBlock = createBlock(name, {
+  //     content: "asdfasdfasdf",
+  // });
+  //
+  // dispatchBlockEditor.insertBlock(insertedBlock);
+  // // let newBlocks = blocks;
+  // // newBlocks.splice(draggedBlockIndex, 0, createBlock(draggedBlock.name));
+  // var name = 'core/paragraph';
+  // // var name = 'core/html';
+  // // insertedBlock = wp.blocks.createBlock(name, {
+  // //     content: content,
+  // // });
+  // var content = "Test content";
+  // const newBLock = createBlock(name, {
+  //     content: content,
+  // });
+  // insertBlock(newBLock)
+  // console.log('create Block')
+  // // handleUpdateBlocks(newBlocks, {},false);
+
+  // const { clientId } = ownProps;
+  // const { replaceInnerBlocks, selectBlock, insertBlock } = useDispatch(CORE_STORE_NAME);
+
+  // const {
+//     insertBlock
+//     // isDefaultColumns,
+//     // innerColumns = [],
+//     // hasParents,
+//     // parentBlockAlignment,
+//     // editorSidebarOpened,
+//   } = useSelect(
+//   (select) => ({
+//     insertBlock: select(CORE_STORE_NAME).insertBlock(),
+//     // isSaving: select(CORE_STORE_NAME).isItemsUpdating(),
+//     // item: select(CORE_STORE_NAME).getItem(editorItem.ID),
+//   }),
+//   []
+// );
+
+  // Get verticalAlignment from Columns block to set the same to new Column
+  // const { verticalAlignment } = getBlockAttributes(clientId);
+
+  // const innerBlocks = getBlocks(clientId);
+
+  // const insertedBlock = createBlock("groundhogg/paragraph", {
+  //   content: "asdfasdf"
+  // });
+  //
+  // insertBlock(insertedBlock)
+
+  // replaceInnerBlocks(clientId, [...innerBlocks, insertedBlock], true);
+  // selectBlock(insertedBlock.clientId);
+
   // console.log('Re-render', blocks)
 
   return (
@@ -715,11 +567,6 @@ export default ({ editorItem, history, ...rest }) => {
                   <BlocksPreview blocks={blocks}/>
                   */}
 
-                  <div>
-                    nathan
-                    nathan
-                  </div>
-
                   <BlockEditor
                     settings={window.Groundhogg.preloadSettings}
                     subject={subject}
@@ -730,7 +577,6 @@ export default ({ editorItem, history, ...rest }) => {
                     handleUpdateBlocks={handleUpdateBlocks}
                     blocks={blocks}
                     editorType={editorType}
-                    addBlock={addBlock}
                   />
               </div>
 
