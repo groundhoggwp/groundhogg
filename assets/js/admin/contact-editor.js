@@ -72,6 +72,14 @@
       $('#add-note').click(function (event) {
         add_note()
       })
+
+      $('#view-more-tags').on('click', function (e){
+        e.preventDefault()
+
+        $(this).parent().html( editor.contact.tags.map( tag => {
+          return `<span class="tag">${tag.data.tag_name}</span>`;
+        } ).join('' ) );
+      })
     }
   })
 

@@ -141,6 +141,13 @@ class Replacements {
 				'description' => _x( 'The contact\'s phone number.', 'replacement', 'groundhogg' ),
 			],
 			[
+				'code'        => 'phone_ext',
+				'group'       => 'contact',
+				'callback'    => [ $this, 'replacement_phone_ext' ],
+				'name'        => __( 'Primary Phone (with extension)', 'groundhogg' ),
+				'description' => _x( 'The contact\'s phone number with the extension if available.', 'replacement', 'groundhogg' ),
+			],
+			[
 				'code'        => 'mobile_phone',
 				'group'       => 'contact',
 				'callback'    => [ $this, 'replacement_mobile_phone' ],
@@ -814,6 +821,17 @@ class Replacements {
 	 *
 	 * @return string the first name
 	 */
+	function replacement_mobile_phone( $contact_id ) {
+		return $this->get_current_contact()->get_mobile_number();
+	}
+
+	/**
+	 * Return back the phone # ot the contact.
+	 *
+	 * @param $contact_id int the contact_id
+	 *
+	 * @return string the first name
+	 */
 	function replacement_phone( $contact_id ) {
 		return $this->get_current_contact()->get_phone_number();
 	}
@@ -826,7 +844,14 @@ class Replacements {
 	 * @return string the first name
 	 */
 	function replacement_phone_ext( $contact_id ) {
-		return $this->get_current_contact()->get_phone_extension();
+
+		$ext = $this->get_current_contact()->get_phone_extension();
+
+		if ( $ext ){
+			return sprintf( "%s ext. %s", $this->current_contact->get_phone_number(), $this->current_contact->get_phone_extension() );
+		} else {
+			return $this->current_contact->get_phone_number();
+		}
 	}
 
 	/**

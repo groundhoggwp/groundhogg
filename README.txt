@@ -309,6 +309,15 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.4.5 (2021-03-31) =
+* ADDED files for Rest API v4, none active for now.
+* ADDED jsonSerialization to Base_Object class for easier creation of API responses.
+* ADDED New replacement codes for `mobile_phone`, `primary_phone_ext`.
+* TWEAKED First 10 tags show in the contact details card, then click a link to see all of them.
+* TWEAKED First 10 tags show in tags column in the contact list.
+* FIXED Unsubscribe link nonce missing.
+* FIXED Typo in admin preferences notice.
+
 = 2.4.4.7 (2021-03-16) =
 * TWEAKED Can now add `+` to phone numbers in the admin notification.
 * TWEAKED Replacements table modal to be separated into categories, add names of replacement codes.

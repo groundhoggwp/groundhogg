@@ -233,11 +233,18 @@ class Contact_Table_Columns {
 	 * @param $contact Contact
 	 */
 	protected static function column_tags( Contact $contact ) {
+
 		?>
 		<div class="tags" title="<?php esc_attr_e( 'Tags' ); ?>">
-			<?php foreach ( $contact->get_tags() as $tag ):
+			<?php
+			$tags = $contact->get_tags();
+
+			foreach ( array_splice( $tags, 0, 10 ) as $tag ):
 				$tag = new Tag( $tag ) ?><span
 				class="tag"><?php esc_html_e( $tag->get_name() ); ?></span><?php endforeach; ?>
+			<?php if ( count( $tags ) > 0 ):  ?>
+				<?php printf( __( 'and %s more...', 'groundhogg' ), count( $tags ) ); ?>
+			<?php endif; ?>
 		</div>
 		<?php
 	}

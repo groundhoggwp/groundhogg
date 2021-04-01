@@ -116,16 +116,18 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 		</div>
 		<div class="wp-clearfix"></div>
 		<div class="tags" title="<?php esc_attr_e( 'Tags' ); ?>"><?php dashicon_e( 'tag' ); ?>
-			<?php
+			<span class="tags-wrap">
+				<?php
 
-			$tags = $contact->get_tags();
+				$tags = $contact->get_tags();
 
-			foreach ( array_splice( $tags, 0, 10 ) as $tag ):
-				$tag = new Tag( $tag ) ?><span
-				class="tag"><?php esc_html_e( $tag->get_name() ); ?></span><?php endforeach; ?>
-			<?php if ( count( $tags ) > 0 ):  ?>
-				<a href="javascript:void(0)" id="view-more-tags"><?php printf( __( 'and %s more...', 'groundhogg' ), count( $tags ) ); ?></a>
-			<?php endif; ?>
+				foreach ( array_splice( $tags, 0, 10 ) as $tag ):
+					$tag = new Tag( $tag ) ?><span
+					class="tag"><?php esc_html_e( $tag->get_name() ); ?></span><?php endforeach; ?>
+				<?php if ( count( $tags ) > 0 ):  ?>
+					<a href="javascript:void(0)" id="view-more-tags"><?php printf( __( 'and %s more...', 'groundhogg' ), count( $tags ) ); ?></a>
+				<?php endif; ?>
+			</span>
 		</div>
 	</div>
 	<div class="wp-clearfix"></div>

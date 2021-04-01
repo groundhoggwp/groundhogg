@@ -4566,6 +4566,125 @@ function track_gh_cron_ping() {
 add_action( 'groundhogg_process_queue', __NAMESPACE__ . '\track_gh_cron_ping', 9 );
 
 /**
+ * Takes a string or int and returns a mysql friendly date
+ *
+ * @param $date string|int
+ *
+ * @return string|false
+ */
+function convert_to_mysql_date( $date ) {
+	if ( ! is_int( $date ) && ! is_string( $date ) ) {
+		return false;
+	}
+
+	return is_int( $date ) ? date( 'Y-m-d H:i:s', $date ) : date( 'Y-m-d H:i:s', strtotime( $date ) );
+}
+
+/**
+ * Map a function to the value of attr in an array or an object
+ *
+ * @param &$arr array|object
+ * @param $key string
+ * @param $func callable
+ */
+function map_func_to_attr( &$arr, $key, $func ) {
+	if ( isset_not_empty( $arr, $key ) ) {
+		if ( is_array( $arr ) ) {
+			$arr[ $key ] = call_user_func( $func, $arr[ $key ] );
+		} else if ( is_object( $arr ) ) {
+			$arr->$key = call_user_func( $func, $arr->$key );
+		}
+	}
+}
+
+/**
+ * Handle sanitization of contact meta is most likely situations.
+ *
+ * @param mixed $meta_value
+ * @param string $meta_key
+ * @param string $object_type
+ *
+ * @return string
+ */
+function sanitize_object_meta( $meta_value, $meta_key = '', $object_type = '' ) {
+	if ( is_string( $meta_value ) && strpos( $meta_value, PHP_EOL ) !== false ) {
+		$meta_value = sanitize_textarea_field( $meta_value );
+	} else if ( is_string( $meta_value ) ) {
+		$meta_value = sanitize_text_field( $meta_value );
+	}
+
+	/**
+	 * Filter the object meta
+	 *
+	 * @param mixed $meta_value
+	 * @param string $meta_key
+	 * @param string $object_type
+	 */
+	return apply_filters( 'groundhogg/sanitize_object_meta', $meta_value, $meta_key, $object_type );
+}
+
+/**
+ * Check if the email address is in use
+ * You can pass a contact record to double check against the current contact as well.
+ *
+ * @param string $email_address
+ * @param bool|Contact $current_contact
+ *
+ * @return bool
+ */
+function is_email_address_in_use( $email_address, $current_contact = false ) {
+
+	$contact = get_contactdata( $email_address );
+
+	// If there is no contact record
+	if ( ! is_a_contact( $contact ) ) {
+		return false;
+		// If there is a contact but it's the same as the one we are passing...
+	} else if ( is_a_contact( $current_contact ) && $contact->get_id() === $current_contact->get_id() ) {
+		return false;
+		// Otherwise
+	} else {
+		return true;
+	}
+}
+
+/**
+ * Get CSV file info
+ *
+ * @param $file_path string
+ *
+ * @return array|bool
+ */
+function get_csv_file_info( $file_path ) {
+
+	if ( ! file_exists( $file_path ) ) {
+		return false;
+	}
+
+	return [
+		'file_name' => basename( $file_path ),
+		'file_path' => $file_path,
+		'file_url'  => file_access_url( basename( dirname( $file_path ) ) . '/' . basename( $file_path ), true ),
+		'timestamp' => filemtime( $file_path ),
+		'rows'      => count( file( $file_path, FILE_SKIP_EMPTY_LINES ) ) - 1,
+	];
+}
+
+/**
+ * Parse list of Ids into classes
+ *
+ * @param $list
+ * @param $class
+ *
+ * @return array
+ */
+function id_list_to_class( $list, $class ) {
+	return array_map( function ( $id ) use ( &$class ) {
+		return new $class( $id );
+	}, wp_parse_id_list( $list ) );
+}
+
+/**
  * Same as array_map, but passes both the key AND the value
  *
  * @param $array    array

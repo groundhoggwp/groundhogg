@@ -44,7 +44,7 @@ function notice_admin_logged_in_testing_warning(){
 	?>
     <div class="notice notice-warning">
         <p><?php printf( __( "You are currently logged in as an <b>%s</b>. This means any actions you take will affect the contact record associated with your user account.", 'groundhogg' ), get_role( array_shift( wp_get_current_user()->roles ) )->name ); ?></p>
-        <p><?php _e( "If you are trying to test with another contact record (not the one associated with your suer account) use an incognito window, logout, or <a href='https://help.groundhogg.io/article/294-why-is-my-email-not-being-confirmed'>disable logged in user precedence in the settings</a>.", 'groundhogg' ); ?></p>
+        <p><?php _e( "If you are trying to test with another contact record (not the one associated with your user account) use an incognito window, logout, or <a href='https://help.groundhogg.io/article/294-why-is-my-email-not-being-confirmed'>disable logged in user precedence in the settings</a>.", 'groundhogg' ); ?></p>
     </div>
 	<?php
 }
