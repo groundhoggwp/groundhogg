@@ -905,7 +905,7 @@ class Contact extends Base_Object_With_Meta {
 				'ID'    => $this->get_id(),
 				'data'  => $contact,
 				'meta'  => $this->get_meta(),
-				'tags'  => $this->get_tags(),
+				'tags'  => id_list_to_class( $this->get_tags(), Tag::class ),
 				'files' => $this->get_files()
 			]
 		);
