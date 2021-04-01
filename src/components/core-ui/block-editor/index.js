@@ -40,6 +40,13 @@ import interact from "interactjs";
 import { DateTime } from "luxon";
 import { withStyles } from '@material-ui/core/styles';
 
+// import {
+//   BlockSettingsMenu,
+//   BlocksPreview,
+//   BlockToolbar
+// } from '@wordpress/block-editor';
+
+
 /**
  * Internal dependencies
  */
@@ -145,7 +152,9 @@ const SendEmailComponent = withStyles((theme) => ({
 }))(({ classes, ...props }) => {
   return (
     <>
+
     <Card className={classes.sendEmailComponent}>
+
       <div className={classes.sendEmailComponentLabel}>Select an email to send:</div>
 
       <div className={classes.newEmailButton}>
@@ -441,9 +450,10 @@ export default ({ editorItem, history, ...rest }) => {
     Block Handlers
   */
   const handleContentChangeDraggedBlock = () => {
-    let newBlocks = blocks;
-    newBlocks.splice(draggedBlockIndex, 0, createBlock(draggedBlock.name));
-    handleUpdateBlocks(newBlocks, {},false);
+    // let newBlocks = blocks;
+    // newBlocks.splice(draggedBlockIndex, 0, createBlock(draggedBlock.name));
+    insertBlock(createBlock(draggedBlock.name))
+    // handleUpdateBlocks(newBlocks, {},false);
   };
 
   const handlesetBlocks = (blocks, selectionObj, updateFromHistory) => {
@@ -701,9 +711,14 @@ export default ({ editorItem, history, ...rest }) => {
 
                   {/*
                   <SendEmailComponent/>
+
+                  <BlocksPreview blocks={blocks}/>
                   */}
 
-
+                  <div>
+                    nathan
+                    nathan
+                  </div>
 
                   <BlockEditor
                     settings={window.Groundhogg.preloadSettings}
