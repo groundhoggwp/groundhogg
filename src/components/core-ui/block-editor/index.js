@@ -88,8 +88,6 @@ export default ({ editorItem, history, ...rest }) => {
   }));
   const classes = useStyles();
 
-  setDefaultBlockName("groundhogg/paragraph");
-
   const dispatch = useDispatch(EMAILS_STORE_NAME);
 
   const { sendEmailById, sendEmailRaw } = useDispatch(EMAILS_STORE_NAME);
@@ -104,15 +102,13 @@ export default ({ editorItem, history, ...rest }) => {
 
   // Global States
   const [blocksVersionTracker, setBlocksVersionTracker] = useState(0);
-  console.log(defaultContentValue)
   const [blockVersionHistory, setBlockVersionHistory] = useState([parse(defaultContentValue)]);
-
   const [noticeText, setNoticeText] = useState('');
 
   // Editor Contents
   const [title, setTitle] = useState(defaultTitleValue);
   const [content, setContent] = useState(defaultContentValue);
-  const [blocks, setBlocks] = useState(parse(defaultContentValue));
+  const [blocks, setBlocks] = useState(parse(defaultContentValue).length === 0 ? [createBlock("groundhogg/paragraph", {content: defaultContentValue})] : parse(defaultContentValue));
   const [subTitle, setSubTitle] = useState(defaultTitleValue);
   const [disableSubTitle, setDisableSubTitle] = useState(false);
 
