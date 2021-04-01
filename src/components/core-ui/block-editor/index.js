@@ -171,9 +171,6 @@ export default ({ editorItem, history, ...rest }) => {
     handleUpdateBlocks(blockVersionHistory[newBlocksVersionTracker], {}, true);
   }
 
-  const handleUpdateBlocks  = (blocks) => {
-    setBlocks(blocks)
-  }
 
   /*
     Saves Funnel or Email
@@ -188,6 +185,7 @@ export default ({ editorItem, history, ...rest }) => {
         status: "ready",
         content,
         last_updated: getLuxonDate("last_updated"),
+        notes
       },
     });
 
@@ -241,7 +239,7 @@ export default ({ editorItem, history, ...rest }) => {
 
   };
 
-  const handlesetBlocks = (blocks, selectionObj, updateFromHistory) => {
+  const handleUpdateBlocks = (blocks, selectionObj, updateFromHistory) => {
     // Standard calls for the block editor
     setBlocks(blocks);
     setContent(serialize(blocks));
