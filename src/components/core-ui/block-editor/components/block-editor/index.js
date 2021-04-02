@@ -195,19 +195,7 @@ export default function ({
               <BlockSelectionClearer className={classes}>
                 <VisualEditorGlobalKeyboardShortcuts />
                 <MultiSelectScrollIntoView />
-                {/* Add Block Button *
-                  open={true}
-                  anchorEl={anchorEl}
-                  onClose={handleyerclose}
-                  anchorOrigin={{
-                    vertical: 'center',
-                    horizontal: 'right'
-                  }}
-                  transformOrigin={{
-                    vertical: 'center',
-                    horizontal: 'left'
-                  }}
-                  */}
+                
                 <Popover.Slot />
                 <Popover.Slot name="block-toolbar"/>
                 <BlockEditorKeyboardShortcuts.Register />
