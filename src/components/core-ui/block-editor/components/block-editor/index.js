@@ -208,6 +208,8 @@ export default function ({
                     horizontal: 'left'
                   }}
                   */}
+                <Popover.Slot />
+                <Popover.Slot name="block-toolbar"/>
                 <BlockEditorKeyboardShortcuts.Register />
 
                 <Typewriter>
