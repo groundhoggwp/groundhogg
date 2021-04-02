@@ -146,41 +146,6 @@ class Tag_Relationships extends DB {
 	}
 
 	/**
-	 * Delete a tag relationship
-	 *
-	 * @access  public
-	 * @since   2.3.1
-	 */
-	public function delete( $args = array() ) {
-
-		global $wpdb;
-
-		// Initialise column format array
-		$column_formats = $this->get_columns();
-
-		// Force fields to lower case
-		$data = array_change_key_case( $args );
-
-		// White list columns
-		$data = array_intersect_key( $data, $column_formats );
-
-		// Reorder $column_formats to match the order of columns given in $data
-		$data_keys      = array_keys( $data );
-		$column_formats = array_merge( array_flip( $data_keys ), $column_formats );
-
-		if ( false === $wpdb->delete( $this->table_name, $data, $column_formats ) ) {
-			return false;
-		}
-
-		do_action( 'groundhogg/db/post_delete/tag_relationship', $args );
-
-		$this->cache_set_last_changed();
-
-		return true;
-
-	}
-
-	/**
 	 * Retrieve tags from the database
 	 *
 	 * @access  public

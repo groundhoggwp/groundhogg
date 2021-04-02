@@ -724,29 +724,44 @@ abstract class DB {
 	 * Delete a row identified by the primary key
 	 *
 	 * @access  public
+	 *
+	 * @param mixed $where
+	 *
 	 * @return  bool
 	 * @since   2.1
 	 */
-	public function delete( $row_id = 0 ) {
+	public function delete( $where = null ) {
 
 		global $wpdb;
 
-		// Row ID must be positive integer
-		$row_id = absint( $row_id );
-
-		if ( empty( $row_id ) ) {
-			return false;
+		if ( is_numeric( $where ) ){
+			$where = [
+				$this->primary_key => absint( $where )
+			];
 		}
 
-		do_action( 'groundhogg/db/pre_delete/' . $this->get_object_type(), $row_id );
+		// Initialise column format array
+		$column_formats = $this->get_columns();
 
-		if ( false === $wpdb->query( $wpdb->prepare( "DELETE FROM $this->table_name WHERE $this->primary_key = %d", $row_id ) ) ) {
+		// Force fields to lower case
+		$where = array_change_key_case( $where );
+
+		// White list columns
+		$where = array_intersect_key( $where, $column_formats );
+
+		// Reorder $column_formats to match the order of columns given in $data
+		$data_keys      = array_keys( $where );
+		$column_formats = array_merge( array_flip( $data_keys ), $column_formats );
+
+		do_action( 'groundhogg/db/pre_delete/' . $this->get_object_type(), $where );
+
+		if ( false === $wpdb->delete( $this->table_name, $where, $column_formats ) ) {
 			return false;
 		}
 
 		$this->cache_set_last_changed();
 
-		do_action( 'groundhogg/db/post_delete/' . $this->get_object_type(), $row_id );
+		do_action( 'groundhogg/db/post_delete/' . $this->get_object_type(), $where );
 
 		return true;
 	}

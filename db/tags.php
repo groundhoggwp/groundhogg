@@ -314,15 +314,17 @@ class Tags extends DB {
 	 * @param $args
 	 */
 	public function increase_contact_count( $insert_id = 0, $args = [] ) {
-		$tag_id = absint( $args['tag_id'] );
-
-		if ( ! $this->exists( $tag_id ) ) {
+		if ( ! isset_not_empty( $args, 'tag_id' ) ) {
 			return;
 		}
 
-		$tag                = $this->get_tag( $tag_id );
-		$tag->contact_count = intval( $tag->contact_count ) + 1;
-		$this->update( $tag_id, array( 'contact_count' => $tag->contact_count ), $this->primary_key );
+		$tag_id = absint( $args[ 'tag_id' ] );
+
+		global $wpdb;
+
+		$wpdb->query( "UPDATE {$this->table_name} SET contact_count = contact_count+1 WHERE tag_id = {$tag_id}" );
+
+		$this->cache_set_last_changed();
 	}
 
 	/**
@@ -336,15 +338,13 @@ class Tags extends DB {
 			return;
 		}
 
-		$tag_id = absint( $args['tag_id'] );
+		$tag_id = absint( $args[ 'tag_id' ] );
 
-		if ( ! $this->exists( $tag_id ) ) {
-			return;
-		}
+		global $wpdb;
 
-		$tag                = $this->get_tag( $tag_id );
-		$tag->contact_count = intval( $tag->contact_count ) - 1;
-		$this->update( $tag_id, array( 'contact_count' => $tag->contact_count ), $this->primary_key );
+		$wpdb->query( "UPDATE {$this->table_name} SET contact_count = contact_count-1 WHERE tag_id = {$tag_id}" );
+
+		$this->cache_set_last_changed();
 	}
 
 	/**
