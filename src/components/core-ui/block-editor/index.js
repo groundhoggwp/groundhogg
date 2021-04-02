@@ -18,13 +18,16 @@ import {
   pasteHandler,
   rawHandler,
   createBlock,
-  // insertBlock,
-  // insertBlocks,
   insertDefaultBlock,
   getBlockTypes,
   getBlockInsertionPoint,
+  getBlocksByClientId,
   setDefaultBlockName
 } from "@wordpress/blocks";
+import {
+  insertBlock
+} from "@wordpress/block-editor";
+
 
 /**
  * External dependencies
@@ -113,7 +116,7 @@ export default ({ editorItem, history, ...rest }) => {
   // Editor Contents
   const [title, setTitle] = useState(defaultTitleValue);
   const [content, setContent] = useState(defaultContentValue);
-  const [blocks, setBlocks] = useState(parse(defaultContentValue).length === 0 ? [createBlock("groundhogg/paragraph", {content: defaultContentValue})] : parse(defaultContentValue));
+  const [blocks, setBlocks] = useState(parse(defaultContentValue).length === 0 ? [createBlock("groundhogg/paragraph", {content: defaultContentValue})] : parse(defaultContentValue)); // Old emails need to be converted to blocks
   const [subTitle, setSubTitle] = useState(defaultTitleValue);
   const [disableSubTitle, setDisableSubTitle] = useState(false);
 
@@ -234,10 +237,12 @@ export default ({ editorItem, history, ...rest }) => {
     Block Handlers
   */
   const handleContentChangeDraggedBlock = () => {
-    let newBlocks = blocks
-    newBlocks.splice(draggedBlockIndex, 0, draggedBlock);
-    handleUpdateBlocks(newBlocks, {}, false);
+    // let newBlocks = blocks
+    // newBlocks.splice(draggedBlockIndex, 0, draggedBlock);
+    // handleUpdateBlocks(newBlocks, {}, false);
 
+    blocks.push(createBlock('groundhogg/paragraph'))
+    setBlocks(blocks)
   };
 
   const handleUpdateBlocks = (blocks, object, updateFromHistory) => {
@@ -402,6 +407,8 @@ export default ({ editorItem, history, ...rest }) => {
 
   useEffect(() => {
     setupDragNDrop()
+    blocks.push(createBlock('groundhogg/paragraph'))
+    setBlocks(blocks)
   }, []);
   // }, [blocks]);
 
@@ -436,66 +443,36 @@ export default ({ editorItem, history, ...rest }) => {
     </div>
   }
 
+  // Works in the console!
+  // wp.data.dispatch( 'core/block-editor' ).insertBlock( wp.blocks.createBlock( 'groundhogg/paragraph' ) );
+
+
+  // All API Calls here
+  // https://developer.wordpress.org/block-editor/reference-guides/data/data-core-block-editor/
 
   // const dispatchBlockEditor = useDispatch("core/block-editor");
-  //
-  //
-  //
-  // var content123 = "Test content";
-  // var el = createElement();
-  // var name = 'groundhogg/html';
-  // let insertedBlock = createBlock(name, {
-  //     content: "asdfasdfasdf",
-  // });
-  //
-  // dispatchBlockEditor.insertBlock(insertedBlock);
-  // // let newBlocks = blocks;
-  // // newBlocks.splice(draggedBlockIndex, 0, createBlock(draggedBlock.name));
-  // var name = 'core/paragraph';
-  // // var name = 'core/html';
-  // // insertedBlock = wp.blocks.createBlock(name, {
-  // //     content: content,
-  // // });
-  // var content = "Test content";
-  // const newBLock = createBlock(name, {
-  //     content: content,
-  // });
-  // insertBlock(newBLock)
-  // console.log('create Block')
-  // // handleUpdateBlocks(newBlocks, {},false);
+  // const dispatchBlocks = useDispatch("core/blocks");
 
-  // const { clientId } = ownProps;
-  // const { replaceInnerBlocks, selectBlock, insertBlock } = useDispatch(CORE_STORE_NAME);
+  // console.log(dispatchBlockEditor)
 
-  // const {
-//     insertBlock
-//     // isDefaultColumns,
-//     // innerColumns = [],
-//     // hasParents,
-//     // parentBlockAlignment,
-//     // editorSidebarOpened,
-//   } = useSelect(
-//   (select) => ({
-//     insertBlock: select(CORE_STORE_NAME).insertBlock(),
-//     // isSaving: select(CORE_STORE_NAME).isItemsUpdating(),
-//     // item: select(CORE_STORE_NAME).getItem(editorItem.ID),
-//   }),
-//   []
-// );
+  // dispatchBlockEditor.getBlockRootClientId();
+  // dispatchBlockEditor.getBlocksByClientId();
 
-  // Get verticalAlignment from Columns block to set the same to new Column
-  // const { verticalAlignment } = getBlockAttributes(clientId);
+  // dispatchBlockEditor.getBlocksByClientId();
 
-  // const innerBlocks = getBlocks(clientId);
+  // console.log(dispatchBlockEditor.insertBlock(createBlock('groundhogg/paragraph'), 0))
+  // console.log(dispatchBlocks.getBlockType({},'groundhogg/paragraph'))
+  console.log(getBlockTypes())
+  console.log(createBlock('groundhogg/paragraph'), 0)
 
-  // const insertedBlock = createBlock("groundhogg/paragraph", {
-  //   content: "asdfasdf"
-  // });
-  //
-  // insertBlock(insertedBlock)
 
-  // replaceInnerBlocks(clientId, [...innerBlocks, insertedBlock], true);
-  // selectBlock(insertedBlock.clientId);
+  // insertDefaultBlock('groundhogg/paragraph')
+
+  // console.log(blocks[0].clientId)
+
+  // getBlockRootClientId({}, blocks[0].clientId)
+  // dispatchBlockEditor.getBlockRootClientId({}, blocks[0].clientId)
+  // getBlockRootClientId()
 
   console.log('Re-render', blocks)
 

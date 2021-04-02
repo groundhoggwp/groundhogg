@@ -142,14 +142,8 @@ export default function ({
     settings.__experimentalBlockPatterns = [];
   }
 
-  const blockEditorEl = useRef(null);
-
-  const handleyerclose = () => {
-    console.log("asdfasdfasdf");
-  };
-
   return (
-    <div className={classes.root} ref={blockEditorEl}>
+    <div className={classes.root}>
       <BlockEditorProvider
         value={blocks}
         settings={settings}
