@@ -161,12 +161,12 @@ export default function ({
           onDragOver={(e) => {
             clearTimeout(timeout);
             timeout = setTimeout(() => {
-              console.log("drag over");
-              addBlock();
+              // console.log("drag over");
+              // addBlock();
             }, 50);
           }}
           onDrop={() => {
-            console.log("on drop");
+            // console.log("on drop");
           }}
         >
           <Card>

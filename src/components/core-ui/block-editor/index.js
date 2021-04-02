@@ -174,16 +174,16 @@ export default ({ editorItem, history, ...rest }) => {
   /*
     Saves Funnel or Email
   */
-  const updateItem = (e) => {    
+  const updateItem = (e) => {
     dispatch.updateItem(editorItem.ID, {
       data: {
         subject,
         title,
         pre_header: preHeader,
         status: "ready",
-        content,
+        content: serialize(blocks),
         last_updated: getLuxonDate("last_updated"),
-        notes
+        notes //API isn't accepting these
       },
     });
 
@@ -234,13 +234,15 @@ export default ({ editorItem, history, ...rest }) => {
     Block Handlers
   */
   const handleContentChangeDraggedBlock = () => {
+    let newBlocks = blocks
+    newBlocks.splice(draggedBlockIndex, 0, draggedBlock);
+    handleUpdateBlocks(newBlocks, {}, false);
 
   };
 
-  const handleUpdateBlocks = (blocks, selectionObj, updateFromHistory) => {
+  const handleUpdateBlocks = (blocks, object, updateFromHistory) => {
     // Standard calls for the block editor
     setBlocks(blocks);
-    setContent(serialize(blocks));
 
 
     if(!updateFromHistory){
@@ -335,8 +337,6 @@ export default ({ editorItem, history, ...rest }) => {
         },
         ondrop: (event) => {
           // console.log('dropped')
-          console.log(blocks)
-          x.a = '1123'
           var dropzoneElement = event.target.classList.remove("active");
 
           handleContentChangeDraggedBlock();
@@ -401,9 +401,9 @@ export default ({ editorItem, history, ...rest }) => {
   }
 
   useEffect(() => {
-    console.log('usee effect this should hppaen 1')
-    // setupDragNDrop()
+    setupDragNDrop()
   }, []);
+  // }, [blocks]);
 
 
   // let editorPanel;
@@ -497,7 +497,7 @@ export default ({ editorItem, history, ...rest }) => {
   // replaceInnerBlocks(clientId, [...innerBlocks, insertedBlock], true);
   // selectBlock(insertedBlock.clientId);
 
-  // console.log('Re-render', blocks)
+  console.log('Re-render', blocks)
 
   return (
     <>
