@@ -60,7 +60,6 @@ import "./components/blocks";
 
 let draggedBlockIndex = {};
 let draggedBlock = {};
-let startInteractJS = false;
 
 
 export default ({ editorItem, history, ...rest }) => {
@@ -175,8 +174,7 @@ export default ({ editorItem, history, ...rest }) => {
   /*
     Saves Funnel or Email
   */
-  const updateItem = (e) => {
-    console.log(content)
+  const updateItem = (e) => {    
     dispatch.updateItem(editorItem.ID, {
       data: {
         subject,
@@ -329,7 +327,6 @@ export default ({ editorItem, history, ...rest }) => {
         ondropactivate: (event) => {},
 
         ondragenter: (event) => {
-          startInteractJS = true
           var dropzoneElement = event.target.classList.add("active");
 
         },
@@ -364,27 +361,6 @@ export default ({ editorItem, history, ...rest }) => {
         ],
       });
       }
-      let x = {
-          aInternal: 10,
-          aListener: function(val) {},
-          set a(val) {
-            this.aInternal = val;
-            this.aListener(val);
-          },
-          get a() {
-            return this.aInternal;
-          },
-          registerListener: function(listener) {
-            this.aListener = listener;
-          }
-        }
-      x.registerListener(function(val) {
-        emailStepBackward()
-        emailStepForward()
-        console.log("Someone changed the value of x.a to " + val);
-      });
-
-
 
   /*
     Sidebar Handlers
