@@ -18,14 +18,14 @@ import {
   pasteHandler,
   rawHandler,
   createBlock,
-  insertDefaultBlock,
   getBlockTypes,
   getBlockInsertionPoint,
   getBlocksByClientId,
   setDefaultBlockName
 } from "@wordpress/blocks";
 import {
-  insertBlock
+  insertBlock,
+  insertDefaultBlock
 } from "@wordpress/block-editor";
 
 
@@ -460,12 +460,21 @@ export default ({ editorItem, history, ...rest }) => {
 
   // dispatchBlockEditor.getBlocksByClientId();
 
-  // console.log(dispatchBlockEditor.insertBlock(createBlock('groundhogg/paragraph'), 0))
+
   // console.log(dispatchBlocks.getBlockType({},'groundhogg/paragraph'))
   console.log(getBlockTypes())
-  console.log(createBlock('groundhogg/paragraph'), 0)
+  // console.log(createBlock('groundhogg/paragraph'), 0)
+
+  console.log(blocks[0])
 
 
+  // const { insertBlocks, insertDefaultBlock } = useDispatch(
+  //   (select) => ({
+  //     insertBlocks: dispatch('core/block-editor').insertBlocks(),
+  //     insertDefaultBlock: dispatch('core/block-editor').insertDefaultBlock(),
+  //   }),
+  //   []
+  // );
   // insertDefaultBlock('groundhogg/paragraph')
 
   // console.log(blocks[0].clientId)
@@ -474,7 +483,11 @@ export default ({ editorItem, history, ...rest }) => {
   // dispatchBlockEditor.getBlockRootClientId({}, blocks[0].clientId)
   // getBlockRootClientId()
 
+  // insertBlock(createBlock('groundhogg/paragraph'), 0)
   console.log('Re-render', blocks)
+
+  // Dynamic default blocks
+  // setDefaultBlockName(blocks[0].name);
 
   return (
     <>
