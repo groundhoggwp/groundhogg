@@ -312,6 +312,9 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 = 2.4.5.1 (2021-04-03) =
 * ADDED Document event support for replacement codes
 * ADDED Additional hooks for the email build process.
+* TWEAKED `db->delete` method now supports an array `WHERE` format as well as row IDs.
+* TWEAKED Update the `last_changed` in the object cache when tag counts are changed.
+* TWEAKED Optimized the tag count increment/decrement functions to only require 1 mySQL call instead of 2.
 
 = 2.4.5 (2021-03-31) =
 * ADDED files for Rest API v4, none active for now.
