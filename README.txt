@@ -309,6 +309,10 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.4.5.1 (2021-04-03) =
+* ADDED Document event support for replacement codes
+* ADDED Additional hooks for the email build process.
+
 = 2.4.5 (2021-03-31) =
 * ADDED files for Rest API v4, none active for now.
 * ADDED jsonSerialization to Base_Object class for easier creation of API responses.
