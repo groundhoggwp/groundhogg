@@ -1,6 +1,8 @@
 var ReplacementsInsertListener = {};
 (function ($, replacements, modal) {
 
+  var $doc = $(document)
+
   function insertAtCursor (myField, myValue) {
     //IE support
     if (document.selection) {
@@ -33,35 +35,43 @@ var ReplacementsInsertListener = {};
 
       var self = this
 
-      $(document).on('click', '.replacements-button', function () {
+      $doc.on( 'ghClearReplacementTarget', function ( ){
+        self.to_mce = false;
+        self.active = false;
+      } )
+
+      $doc.on('click', '.replacements-button', function () {
         self.inserting = true
       })
 
       // GO TO MCE
-      $(document).on('to_mce', function () {
+      $doc.on('to_mce', function () {
         self.to_mce = true
+        $doc.trigger('ghReplacementTargetChanged')
       })
 
       // NOPE, GO TO TEXT
-      $(document).on('click', '#wpbody input, #wpbody textarea', function () {
+      $doc.on('click', '#wpbody input, #wpbody textarea', function () {
         self.active = this
         self.to_mce = false
+        $doc.trigger('ghReplacementTargetChanged')
       })
 
-      $(document).on('click', '.replacement-selector', function () {
+      $doc.on('click', '.replacement-selector', function () {
         self.text = $(this).val()
       })
 
-      $(document).on('dblclick', '.replacement-selector', function () {
+      $doc.on('dblclick', '.replacement-selector', function () {
         self.text = $(this).val()
         self.insert()
         modal.close()
       })
 
-      $(document).on('change', '.replacement-code-dropdown', function () {
+      $doc.on('change', '.replacement-code-dropdown', function () {
         self.text = $(this).val()
         self.insert()
         $('.replacement-code-dropdown option').prop('selected', false)
+        $doc.trigger( 'ghInsertReplacement', [ self.text, self ] )
       })
 
       $('#popup-close-footer').on('click', function () {

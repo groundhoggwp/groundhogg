@@ -389,7 +389,7 @@ class Email extends Base_Object_With_Meta {
 		);
 
 		// Autop non blocked emails.
-		if ( strpos( $content, 'data-block' ) === false ) {
+		if ( strpos( $content, 'data-block' ) === false && apply_filters( 'groundhogg/email/should_autop', true ) ) {
 			$content = wpautop( $content );
 		}
 
@@ -565,6 +565,8 @@ class Email extends Base_Object_With_Meta {
 	public function build() {
 		$templates = new Template_Loader();
 
+		do_action( 'groundhogg/email/build/before', $this );
+
 		$this->add_filters();
 
 		ob_start();
@@ -606,6 +608,8 @@ class Email extends Base_Object_With_Meta {
 		$content = apply_filters( 'groundhogg/email/the_content', $content );
 
 		$this->remove_filters();
+
+		do_action( 'groundhogg/email/build/after', $this );
 
 		return $content;
 	}
