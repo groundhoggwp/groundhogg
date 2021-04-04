@@ -734,17 +734,15 @@ abstract class DB {
 
 		global $wpdb;
 
-		if ( is_numeric( $where ) ){
+		if ( is_numeric( $where ) || is_int( $where ) ){
 			$where = [
 				$this->primary_key => absint( $where )
 			];
 		}
 
+
 		// Initialise column format array
 		$column_formats = $this->get_columns();
-
-		// Force fields to lower case
-		$where = array_change_key_case( $where );
 
 		// White list columns
 		$where = array_intersect_key( $where, $column_formats );

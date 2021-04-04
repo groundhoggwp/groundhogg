@@ -309,6 +309,9 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
+= 2.4.5.2 (2021-04-04) =
+* HOT FIX Updated `DB->delete()` method not accepting capitalized ID index.
+
 = 2.4.5.1 (2021-04-03) =
 * ADDED Document event support for replacement codes
 * ADDED Additional hooks for the email build process.
