@@ -111,7 +111,7 @@ $sample_item = $items[ $selected ];
 			html()->dropdown( [
 				'name'        => sprintf( 'map[%s]', $key ),
 				'id'          => sprintf( 'map_%s', $key ),
-				'selected'    => get_key_from_column_label( $key ),
+				'selected'    => apply_filters( 'groundhogg/default_field_mappings', get_key_from_column_label( $key )),
 				'options'     => get_mappable_fields(),
 				'option_none' => '* Do Not Map *'
 			] )
