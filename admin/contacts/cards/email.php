@@ -59,7 +59,7 @@ wp_enqueue_editor();
 						echo html()->input( [
 							'id'          => 'cc',
 							'name'        => 'cc',
-							'placeholder' => __( '', 'groundhogg' )
+							'placeholder' => ''
 						] );
 						?></div>
 					<div class="section"><?php
@@ -67,7 +67,7 @@ wp_enqueue_editor();
 						echo html()->input( [
 							'id'          => 'bcc',
 							'name'        => 'bcc',
-							'placeholder' => __( '', 'groundhogg' )
+							'placeholder' => ''
 						] );
 						?></div>
 				</div>

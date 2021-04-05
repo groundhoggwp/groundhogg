@@ -32,11 +32,11 @@ class Contact_Table_Actions {
 	/**
 	 * Register a new contact table column
 	 *
-	 * @param string $id the ID of the info card
-	 * @param string $name
-	 * @param string $name_plural
+	 * @param string   $id         the ID of the info card
+	 * @param string   $name
+	 * @param string   $name_plural
 	 * @param callable $callback
-	 * @param string $capability the minimum capability for the viewing user to see the data in this card.
+	 * @param string   $capability the minimum capability for the viewing user to see the data in this card.
 	 */
 	public static function register( string $id, string $name, string $name_plural, callable $callback, $capability = 'view_contacts' ) {
 
@@ -73,11 +73,11 @@ class Contact_Table_Actions {
 			extract( $action );
 
 			/**
-			 * @var int $id
-			 * @var string $name
-			 * @var string $name_plural
+			 * @var int      $id
+			 * @var string   $name
+			 * @var string   $name_plural
 			 * @var callable $callback
-			 * @var string $capability
+			 * @var string   $capability
 			 */
 
 			if ( ! current_user_can( $capability ) ) {
@@ -99,36 +99,36 @@ class Contact_Table_Actions {
 	public function register_core_actions() {
 
 		self::register( 'bulk-edit',
-			__( 'Edit %d contact', 'groundhogg' ),
-			__( 'Edit %d contacts', 'groundhogg' ),
+			_x( 'Edit %d contact', 'table-actions', 'groundhogg' ),
+			_x( 'Edit %d contacts', 'table-actions', 'groundhogg' ),
 			[ $this, 'bulk_edit_callback' ],
 			'edit_contacts'
 		);
 
 		self::register( 'export',
-			__( 'Export %d contact', 'groundhogg' ),
-			__( 'Export %d contacts', 'groundhogg' ),
+			_x( 'Export %d contact', 'table-actions', 'groundhogg' ),
+			_x( 'Export %d contacts', 'table-actions', 'groundhogg' ),
 			[ $this, 'export_callback' ],
 			'export_contacts'
 		);
 
 		self::register( 'broadcast',
-			__( 'Send a broadcast to %d contact', 'groundhogg' ),
-			__( 'Send a broadcast to %d contacts', 'groundhogg' ),
+			_x( 'Send a broadcast to %d contact', 'table-actions', 'groundhogg' ),
+			_x( 'Send a broadcast to %d contacts', 'table-actions', 'groundhogg' ),
 			[ $this, 'broadcast_callback' ],
 			'schedule_broadcasts'
 		);
 
 		self::register( 'funnel',
-			__( 'Add %d contact to a funnel', 'groundhogg' ),
-			__( 'Add %d contacts to a funnel', 'groundhogg' ),
+			_x( 'Add %d contact to a funnel', 'table-actions', 'groundhogg' ),
+			_x( 'Add %d contacts to a funnel', 'table-actions', 'groundhogg' ),
 			[ $this, 'funnel_callback' ],
 			'edit_funnels'
 		);
 
 		self::register( 'delete',
-			__( 'Delete  %d contact', 'groundhogg' ),
-			__( 'Delete %d contacts', 'groundhogg' ),
+			_x( 'Delete  %d contact', 'table-actions', 'groundhogg' ),
+			_x( 'Delete %d contacts', 'table-actions', 'groundhogg' ),
 			[ $this, 'delete_callback' ],
 			'delete_contacts'
 		);
@@ -139,9 +139,9 @@ class Contact_Table_Actions {
 	# =============== COLUMN CALLBACKS FOR CORE ACTIONS =============== #
 
 	/**
-	 * @param $query array
+	 * @param $query          array
 	 * @param $total_contacts int
-	 * @param $table Contacts_Table
+	 * @param $table          Contacts_Table
 	 *
 	 * @return string
 	 */

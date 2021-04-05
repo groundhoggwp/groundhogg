@@ -310,8 +310,11 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 == Changelog ==
 
 = 2.4.5.3 (2021-04-05) =
+* TWEAKED Updated JS dependencies.
 * TWEAKED The `groundhogg/email/to` filter also passes the `$contact` and `$this`
-* TWEAKED The Admin Notification step will now accept any replacement code.
+* TWEAKED The Admin Notification step will now accept any replacement code in the `To` field.
+* TWEAKED New developer actions and filters to the import & field mapping process. Thanks @petervkay!
+* TWEAKED Updated the translations file and fixed some translations.
 
 = 2.4.5.2 (2021-04-04) =
 * HOT FIX Updated `DB->delete()` method not accepting capitalized ID index.
