@@ -599,12 +599,26 @@ abstract class DB {
 	}
 
 	/**
+	 * Clears the cache group
+	 */
+	public function clear_cache(){
+		unset( self::$cache[ $this->get_cache_group() ] );
+	}
+
+	/**
+	 * Clears the whole cache, all groups and keys
+	 */
+	public static function clear_whole_cache(){
+		self::$cache = [];
+	}
+
+	/**
 	 * Get the cache group
 	 *
 	 * @return string
 	 */
 	public function get_cache_group() {
-		return 'groundhogg/db/' . $this->get_object_type();
+		return $this->table_name . '/groundhogg/db/' . $this->get_object_type();
 	}
 
 	/**
