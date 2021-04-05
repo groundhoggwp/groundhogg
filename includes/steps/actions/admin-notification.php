@@ -10,6 +10,7 @@ use function Groundhogg\get_default_from_name;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use function Groundhogg\is_replacement_code_format;
 use function Groundhogg\is_sms_plugin_active;
 use function Groundhogg\validate_mobile_number;
 
@@ -180,13 +181,11 @@ class Admin_Notification extends Action {
 		if ( $send_to ) {
 			$send_to          = sanitize_text_field( $send_to );
 			$emails           = array_map( 'trim', explode( ',', $send_to ) );
-			$sanitized_emails = array();
+			$emails = array_filter( $emails, function ( $email ){
+				return is_email( $email ) || is_replacement_code_format( $email );
+			} );
 
-			foreach ( $emails as $email ) {
-				$sanitized_emails[] = ( $email === '{owner_email}' ) ? '{owner_email}' : sanitize_email( $email );
-			}
-
-			$send_to = implode( ',', $sanitized_emails );
+			$send_to = implode( ',', $emails );
 			$this->save_setting( 'send_to', $send_to );
 		}
 

@@ -337,7 +337,15 @@ class Email extends Base_Object_With_Meta {
 	 * @return  string
 	 */
 	public function get_to_address() {
-		return apply_filters( 'groundhogg/email/to', $this->get_contact()->get_email() );
+
+		/**
+		 * Filter the to address
+		 *
+		 * @param string $email
+		 * @param Contact $contact
+		 * @param Email $email
+		 */
+		return apply_filters( 'groundhogg/email/to', $this->get_contact()->get_email(), $this->get_contact(), $this );
 	}
 
 	/**

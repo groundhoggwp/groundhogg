@@ -3046,6 +3046,20 @@ function dashicon_e( $icon, $wrap = 'span', $atts = [] ) {
 	dashicon( $icon, $wrap, $atts, true );
 }
 
+/**
+ * Whether the given string is a replacement code
+ *
+ * Checks format ONLY, not whether the code callback is actually valid.
+ *
+ * @param string $code
+ * @param bool   $exact
+ *
+ * @return false|int
+ */
+function is_replacement_code_format( string $code, $exact=true ){
+	$format = $exact ? "^{([^{}]+)}$" : "{([^{}]+)}";
+	return preg_match( "/$format/", $code );
+}
 
 /**
  * Whather the current admin page is a groundhogg page.
