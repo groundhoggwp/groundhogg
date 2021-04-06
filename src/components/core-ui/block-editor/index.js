@@ -85,6 +85,14 @@ export default ({ editorItem, history, ...rest }) => {
     contentFooter:{
       posiion: 'absolute',
       bottom: '0'
+    },
+    addBlock:{
+      display: "block",
+      width: "200px",
+      height: "200px",
+      position: "absolute",
+      top: "0px",
+      left: "0px"
     }
 
   }));
@@ -387,6 +395,8 @@ export default ({ editorItem, history, ...rest }) => {
       content: content,
       subject: subject,
     });
+
+    setNoticeText(`Test Email Sent`)
   };
 
   const handleAltBodyContent = (e) => {
@@ -462,10 +472,10 @@ export default ({ editorItem, history, ...rest }) => {
 
 
   // console.log(dispatchBlocks.getBlockType({},'groundhogg/paragraph'))
-  console.log(getBlockTypes())
+
   // console.log(createBlock('groundhogg/paragraph'), 0)
 
-  console.log(blocks[0])
+
 
 
   // const { insertBlocks, insertDefaultBlock } = useDispatch(
@@ -489,6 +499,12 @@ export default ({ editorItem, history, ...rest }) => {
   // Dynamic default blocks
   // setDefaultBlockName(blocks[0].name);
 
+  const addBlock = () => {
+    console.log('hiii')
+    let newBlocks = blocks
+    newBlocks.push(blocks[0])
+    setBlocks(newBlocks)
+  }
   return (
     <>
       <img src={require('./webpack-test.jpg').default}/>
@@ -496,7 +512,7 @@ export default ({ editorItem, history, ...rest }) => {
         {steps}
         <SimpleModal open={open}/>
 
-
+        <div className={classes.addBlock} onClick={addBlock}>Add blocks </div>
         <FullscreenMode isActive={false} />
         <Notices text={noticeText}/>
         <SlotFillProvider>
