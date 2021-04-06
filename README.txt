@@ -312,6 +312,8 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 = 2.4.5.4 (2021-04-05) =
 * TWEAKED Better DB cache support for multisite functionality.
 * TWEAKED Change DB cache group when blog changes using `switch_to_blog`.
+* TWEAKED Improve tag mapping for changes in marketing and GDPR consent.
+* FIXED GDPR marketing consent not saving in Groundhogg form submissions.
 
 = 2.4.5.3 (2021-04-05) =
 * TWEAKED Updated JS dependencies.
