@@ -5,7 +5,6 @@ import { PanelBody, ResizableBox, RangeControl } from "@wordpress/components";
 
 import BlocksSpacer from "components/svg/BlockEditor/BlocksSpacer/";
 
-
 registerBlockType("groundhogg/spacer", {
   title: __("Groundhogg - Spacer"), // Block title.
   icon: BlocksSpacer, // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.

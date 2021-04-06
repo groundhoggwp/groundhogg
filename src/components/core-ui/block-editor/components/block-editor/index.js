@@ -195,9 +195,9 @@ export default function ({
               <BlockSelectionClearer className={classes}>
                 <VisualEditorGlobalKeyboardShortcuts />
                 <MultiSelectScrollIntoView />
-                
+
                 <Popover.Slot />
-                <Popover.Slot name="block-toolbar"/>
+                <Popover.Slot name="block-toolbar" />
                 <BlockEditorKeyboardShortcuts.Register />
 
                 <Typewriter>

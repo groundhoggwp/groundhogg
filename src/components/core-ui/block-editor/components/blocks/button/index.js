@@ -3,12 +3,7 @@ import { registerBlockType } from "@wordpress/blocks";
 import { InspectorControls, PanelColorSettings } from "@wordpress/block-editor";
 import { PanelBody, SelectControl, TextControl } from "@wordpress/components";
 
-
-
-
-
 import BlocksButton from "components/svg/BlockEditor/BlocksButton/";
-
 
 registerBlockType("groundhogg/button", {
   title: __("Groundhogg - Button"), // Block title.

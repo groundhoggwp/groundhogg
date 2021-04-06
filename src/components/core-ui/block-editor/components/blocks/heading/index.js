@@ -6,7 +6,6 @@ import { PanelBody, SelectControl, RangeControl } from "@wordpress/components";
 //https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/rich-text/README.md
 import BlocksHeading from "components/svg/BlockEditor/BlocksHeading/";
 
-
 registerBlockType("groundhogg/heading", {
   title: __("Groundhogg - Heading"), // Block title.
   icon: BlocksHeading, // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.

@@ -3,9 +3,7 @@ import { registerBlockType } from "@wordpress/blocks";
 import { InspectorControls, PanelColorSettings } from "@wordpress/block-editor";
 import { PanelBody, RangeControl } from "@wordpress/components";
 
-
 import BlocksDivider from "components/svg/BlockEditor/BlocksDivider/";
-
 
 registerBlockType("groundhogg/divider", {
   title: __("Groundhogg - Divider"), // Block title.
