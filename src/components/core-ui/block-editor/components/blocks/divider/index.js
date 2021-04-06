@@ -3,9 +3,14 @@ import { registerBlockType } from "@wordpress/blocks";
 import { InspectorControls, PanelColorSettings } from "@wordpress/block-editor";
 import { PanelBody, RangeControl } from "@wordpress/components";
 
+
+import BlocksDivider from "components/svg/BlockEditor/BlocksDivider/";
+
+
 registerBlockType("groundhogg/divider", {
   title: __("Groundhogg - Divider"), // Block title.
-  icon: "shield", // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
+  icon: BlocksDivider, // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
+  // icon: "editor-paragraph", // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
   category: "common", // Block category — Group blocks together based on common traits E.g. common, formatting, layout widgets, embed.
   description: "Add Space in your email",
   keywords: [__("Groundhogg - Divider")],

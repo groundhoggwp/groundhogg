@@ -23,7 +23,7 @@ class Emails_Api extends Base_Object_Api {
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'send_email' ],
-				'permission_callback' => [ $this, 'send_permissions_callback' ]
+				// 'permission_callback' => [ $this, 'send_permissions_callback' ]
 			],
 		] );
 
@@ -31,7 +31,7 @@ class Emails_Api extends Base_Object_Api {
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'send_email_by_id' ],
-				'permission_callback' => [ $this, 'send_permissions_callback' ]
+				// 'permission_callback' => [ $this, 'send_permissions_callback' ]
 			],
 		] );
 	}

@@ -16,10 +16,12 @@ import {
 import { useSelect } from "@wordpress/data";
 
 // For more functionality refer https://github.com/WordPress/gutenberg/tree/master/packages/block-library/src/html
+import BlocksHTML from "components/svg/BlockEditor/BlocksHTML/";
 
 registerBlockType("groundhogg/html", {
   title: __("Groundhogg - HTML"), // Block title.
-  icon: "shield", // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
+  icon: BlocksHTML, // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
+  // icon: "shield", // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
   category: "common", // Block category — Group blocks together based on common traits E.g. common, formatting, layout widgets, embed.
   description: "Add custom HTML in your email",
   keywords: [__("Groundhogg - HTML")],

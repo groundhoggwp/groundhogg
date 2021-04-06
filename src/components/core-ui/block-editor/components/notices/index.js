@@ -25,7 +25,7 @@ export default function ({ text }) {
       position: "absolute",
       left: "25px",
       bottom: "25px",
-      width: "320px",
+      minWidth: "320px",
       color: "#fff",
       zIndex: "1",
       background: theme.palette.secondary.main,

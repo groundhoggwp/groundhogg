@@ -8,9 +8,12 @@ import {
   TextControl,
 } from "@wordpress/components";
 
+import BlocksImage from "components/svg/BlockEditor/BlocksImage/";
+
 registerBlockType("groundhogg/image", {
   title: __("Groundhogg - Image"), // Block title.
-  icon: "shield", // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
+  icon: BlocksImage, // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
+  // icon: "shield", // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
   category: "common", // Block category — Group blocks together based on common traits E.g. common, formatting, layout widgets, embed.
   keywords: [__("Groundhogg - Image"), __("Image"), __("groundhogg")],
   attributes: {

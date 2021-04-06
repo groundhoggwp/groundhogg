@@ -4,10 +4,12 @@ import { RichText, InspectorControls } from "@wordpress/block-editor";
 import { PanelBody, SelectControl, RangeControl } from "@wordpress/components";
 
 //https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/rich-text/README.md
+import BlocksText from "components/svg/BlockEditor/BlocksText/";
 
 registerBlockType("groundhogg/paragraph", {
   title: __("Groundhogg - paragraph"), // Block title.
-  icon: "shield", // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
+  icon: BlocksText, // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
+  // icon: "shield", // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
   category: "common", // Block category — Group blocks together based on common traits E.g. common, formatting, layout widgets, embed.
   keywords: [__("Groundhogg-paragraph"), __("text")],
   attributes: {

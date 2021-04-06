@@ -3,9 +3,13 @@ import { registerBlockType } from "@wordpress/blocks";
 import { InspectorControls, useBlockProps } from "@wordpress/block-editor";
 import { PanelBody, ResizableBox, RangeControl } from "@wordpress/components";
 
+import BlocksSpacer from "components/svg/BlockEditor/BlocksSpacer/";
+
+
 registerBlockType("groundhogg/spacer", {
   title: __("Groundhogg - Spacer"), // Block title.
-  icon: "shield", // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
+  icon: BlocksSpacer, // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
+  // icon: "shield", // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
   category: "common", // Block category — Group blocks together based on common traits E.g. common, formatting, layout widgets, embed.
   description: "Add Space in your email",
   keywords: [__("Groundhogg - Spacer"), __("spacer")],
