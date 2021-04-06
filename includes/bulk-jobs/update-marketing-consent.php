@@ -73,8 +73,8 @@ class Update_Marketing_Consent extends Bulk_Job {
 
 		if ( $contact->get_meta( 'gdpr_consent' ) === 'yes' ) {
 			// Assume confirmation same as GDPR consent dates
-			$contact->update_meta( 'marketing_consent', 'yes' );
-			$contact->update_meta( 'marketing_consent_date', $contact->get_meta( 'gdpr_consent_date' ) );
+			$contact->set_gdpr_consent();
+			$contact->set_marketing_consent();
 		}
 	}
 

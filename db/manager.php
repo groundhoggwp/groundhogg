@@ -68,9 +68,7 @@ class Manager {
 		$this->contactnotes      = new Contact_Notes();
 		$this->permissions_keys  = new Permissions_Keys();
 		$this->email_log         = new Email_Log();
-
-		//new queue table
-		$this->event_queue = new Event_Queue();
+		$this->event_queue       = new Event_Queue();
 
 		/**
 		 * Runs when the DB Manager is setup and all the standard DBs have been initialized.

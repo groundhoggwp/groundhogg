@@ -44,11 +44,11 @@ class Tag_Mapping extends Bulk_Job {
 		add_action( 'set_user_role', [ $this, 'apply_tags_to_contact_from_changed_roles' ], 10, 3 );
 		add_action( 'remove_user_role', [ $this, 'remove_tags_from_contact_from_remove_roles' ], 10, 2 );
 
-		add_action( 'admin_init', function () {
-			if ( ! get_option( 'gh_confirmed_tag' ) ) {
-				Plugin::$instance->tag_mapping->install_default_tags();
-			}
-		} );
+		// GDPR consent management
+		add_action( 'groundhogg/contact/added_gdpr_consent', [ $this, 'consent_changed' ] );
+		add_action( 'groundhogg/contact/added_marketing_consent', [ $this, 'consent_changed' ] );
+		add_action( 'groundhogg/contact/revoked_gdpr_consent', [ $this, 'consent_changed' ] );
+		add_action( 'groundhogg/contact/revoked_marketing_consent', [ $this, 'consent_changed' ] );
 
 		add_action( 'admin_init', [ $this, 'reset_tags' ] );
 
@@ -59,15 +59,35 @@ class Tag_Mapping extends Bulk_Job {
 	}
 
 	/**
+	 * Change tags if the contact is marketing/unmarketable
+	 *
+	 * @param Contact $contact
+	 */
+	public function consent_changed( Contact $contact ) {
+
+		$this->set_mapping_tags( true );
+
+		if ( $contact->is_marketable() ) {
+			$contact->apply_tag( $this->get_status_tag( self::MARKETABLE ) );
+			$contact->remove_tag( $this->get_status_tag( self::NON_MARKETABLE ) );
+		} else {
+			$contact->remove_tag( $this->get_status_tag( self::MARKETABLE ) );
+			$contact->apply_tag( $this->get_status_tag( self::NON_MARKETABLE ) );
+		}
+
+		$this->set_mapping_tags( false );
+	}
+
+	/**
 	 * Filter out optin status tags from being applied or removed.
 	 *
 	 * @param $tags
 	 *
 	 * @return array
 	 */
-	public function filter_out_optin_status_tags( $tags ){
+	public function filter_out_optin_status_tags( $tags ) {
 
-		if ( $this->mapping_tags ){
+		if ( $this->mapping_tags ) {
 			return $tags;
 		}
 
@@ -361,16 +381,16 @@ class Tag_Mapping extends Bulk_Job {
 	 *
 	 * @param $set
 	 */
-	protected function set_mapping_tags( $set ){
+	protected function set_mapping_tags( $set ) {
 		$this->mapping_tags = (bool) $set;
 	}
 
 	/**
 	 * Perform the tag mapping.
 	 *
-	 * @param int $contact_id the ID of the contact
-	 * @param int $status the status.
-	 * @param int $old_status the previous status.
+	 * @param int     $contact_id the ID of the contact
+	 * @param int     $status     the status.
+	 * @param int     $old_status the previous status.
 	 * @param Contact $contact
 	 *
 	 * @return void
@@ -422,7 +442,7 @@ class Tag_Mapping extends Bulk_Job {
 	 * Update the optin status if a mapped optin status tag is applied.
 	 *
 	 * @param $contact Contact
-	 * @param $tag_id int
+	 * @param $tag_id  int
 	 *
 	 * @return void
 	 */

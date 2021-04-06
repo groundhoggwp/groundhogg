@@ -302,10 +302,10 @@ class Plugin {
 		$this->reporting    = new Reporting();
 
 		$this->bounce_checker   = new Bounce_Checker();
-		$this->sending_service  = new Sending_Service();
+//		$this->sending_service  = new Sending_Service();
 		$this->proxy_service    = new Proxy_Service();
 		$this->stats_collection = new Stats_Collection();
-
+//
 		$this->event_queue = new Event_Queue();
 
 		if ( is_admin() ) {
@@ -328,16 +328,12 @@ class Plugin {
 		if ( ! is_white_labeled() ) {
 			new Reviews();
 			new License_Notice();
-//            new Upgrade_Notice();
 		}
 
 		new Extension_Upgrader();
 		new Plugin_Compatibility();
 		new Email_Logger();
 		new User_Syncing();
-
-		// Partner
-		SendWp::instance();
 
 		\Groundhogg_Email_Services::init();
 	}

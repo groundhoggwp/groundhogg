@@ -12,6 +12,7 @@ use function Groundhogg\file_access_url;
 use function Groundhogg\form_errors;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_current_contact;
+use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
 use function Groundhogg\split_name;
@@ -241,26 +242,6 @@ class Submission_Handler extends Supports_Errors {
 					}
 
 					break;
-				// Only checks whether value is not empty.
-				case 'terms_agreement':
-					if ( ! empty( $value ) ) {
-						$meta['terms_agreement']      = 'yes';
-						$meta['terms_agreement_date'] = date_i18n( get_option( 'date_format' ) );
-					}
-					break;
-				// Only checks whether value is not empty.
-				case 'gdpr_consent':
-					if ( ! empty( $value ) ) {
-						$meta['gdpr_consent']      = 'yes';
-						$meta['gdpr_consent_date'] = date_i18n( get_option( 'date_format' ) );
-					}
-					break;
-				case 'marketing_consent':
-					if ( ! empty( $value ) ) {
-						$meta['marketing_consent']      = 'yes';
-						$meta['marketing_consent_date'] = date_i18n( get_option( 'date_format' ) );
-					}
-					break;
 				case 'country':
 					if ( strlen( $value ) !== 2 ) {
 						$countries = Plugin::$instance->utils->location->get_countries_list();
@@ -327,6 +308,18 @@ class Submission_Handler extends Supports_Errors {
 
 		if ( ! $contact || ! $contact->exists() ) {
 			return $this->add_error( 'no_record', __( 'Unable to create contact record.', 'groundhogg' ) );
+		}
+
+		if ( get_post_var( 'marketing_consent' ) ){
+			$contact->set_marketing_consent();
+		}
+
+		if ( get_post_var( 'gdpr_consent' ) ){
+			$contact->set_gdpr_consent();
+		}
+
+		if ( get_post_var( 'terms_agreement' ) ){
+			$contact->set_terms_agreement();
 		}
 
 		// Create the submission
