@@ -65,6 +65,10 @@ let draggedBlockIndex = {};
 let draggedBlock = {};
 
 
+// Most Complete Documentation can be found here
+// https://developer.wordpress.org/block-editor/reference-guides/data/data-core-block-editor/
+// Works in the console! and in the code
+// wp.data.dispatch( 'core/block-editor' ).insertBlock( wp.blocks.createBlock( 'groundhogg/paragraph' ) );
 export default ({ editorItem, history, ...rest }) => {
   const useStyles = makeStyles((theme) => ({
     root: {
@@ -244,15 +248,6 @@ export default ({ editorItem, history, ...rest }) => {
   /*
     Block Handlers
   */
-  const handleContentChangeDraggedBlock = () => {
-    // let newBlocks = blocks
-    // newBlocks.splice(draggedBlockIndex, 0, draggedBlock);
-    // handleUpdateBlocks(newBlocks, {}, false);
-
-    blocks.push(createBlock('groundhogg/paragraph'))
-    setBlocks(blocks)
-  };
-
   const handleUpdateBlocks = (blocks, object, updateFromHistory) => {
     // Standard calls for the block editor
     setBlocks(blocks);
@@ -313,7 +308,7 @@ export default ({ editorItem, history, ...rest }) => {
       }
 
     })
-    document.querySelectorAll('.wp-block')[draggedBlockIndex].style.borderBottom = '1px solid #0075FF';
+    document.querySelectorAll('.wp-block')[draggedBlockIndex].style.borderBottom = '4px solid #0075FF';
   };
 
   const dragEndListener = (event) => {
@@ -335,27 +330,21 @@ export default ({ editorItem, history, ...rest }) => {
     target.setAttribute("data-x", 0);
     target.setAttribute("data-y", 0);
   };
-  const setupDragNDrop = () =>{
+  const setupDragNDrop = (createBlock, setBlocks) =>{
       interact(".block-editor__typewriter").unset()
       interact(".block-editor__typewriter").dropzone({
         overlap: 0.75,
-        ondropactivate: (event) => {},
-
-        ondragenter: (event) => {
-          var dropzoneElement = event.target.classList.add("active");
-
-        },
-        ondragleave: (event) => {
-          var dropzoneElement = event.target.classList.remove("active");
-        },
         ondrop: (event) => {
-          // console.log('dropped')
-          var dropzoneElement = event.target.classList.remove("active");
-
-          handleContentChangeDraggedBlock();
+          let newBlocks = blocks;
+          newBlocks.push(draggedBlock)
+          handleUpdateBlocks(newBlocks)
         },
+        ondropactivate: (event) => {},
+        ondragenter: (event) => {},
+        ondragleave: (event) => {},
         ondropdeactivate: (event) => {},
-      });
+
+      })
 
       interact(".side-bar-drag-drop-block").unset()
       interact(".side-bar-drag-drop-block").draggable({
@@ -381,7 +370,6 @@ export default ({ editorItem, history, ...rest }) => {
   const handleViewTypeChange = (type) => {
     setViewType(type);
   };
-
 
   const sendTestEmail = (e) => {
     if (!matchEmailRegex(replyTo)) {
@@ -416,9 +404,7 @@ export default ({ editorItem, history, ...rest }) => {
   }
 
   useEffect(() => {
-    setupDragNDrop()
-    blocks.push(createBlock('groundhogg/paragraph'))
-    setBlocks(blocks)
+    setupDragNDrop(createBlock, setBlocks)
   }, []);
   // }, [blocks]);
 
@@ -453,58 +439,37 @@ export default ({ editorItem, history, ...rest }) => {
     </div>
   }
 
-  // Works in the console!
-  // wp.data.dispatch( 'core/block-editor' ).insertBlock( wp.blocks.createBlock( 'groundhogg/paragraph' ) );
 
+  // TESTING GROUNDS
+  // TESTING GROUNDS
+  // TESTING GROUNDS
+  // TESTING GROUNDS
+  // TESTING GROUNDS
 
-  // All API Calls here
-  // https://developer.wordpress.org/block-editor/reference-guides/data/data-core-block-editor/
+  wp.data.dispatch( 'core/block-editor' ).insertBlock( wp.blocks.createBlock( 'groundhogg/paragraph' ) )
+  console.log(wp.data.dispatch( 'core/block-editor' ).insertBlock( wp.blocks.createBlock( 'groundhogg/paragraph' ) ))
 
-  // const dispatchBlockEditor = useDispatch("core/block-editor");
-  // const dispatchBlocks = useDispatch("core/blocks");
-
-  // console.log(dispatchBlockEditor)
-
-  // dispatchBlockEditor.getBlockRootClientId();
-  // dispatchBlockEditor.getBlocksByClientId();
-
-  // dispatchBlockEditor.getBlocksByClientId();
-
-
-  // console.log(dispatchBlocks.getBlockType({},'groundhogg/paragraph'))
-
-  // console.log(createBlock('groundhogg/paragraph'), 0)
-
-
-
-
-  // const { insertBlocks, insertDefaultBlock } = useDispatch(
-  //   (select) => ({
-  //     insertBlocks: dispatch('core/block-editor').insertBlocks(),
-  //     insertDefaultBlock: dispatch('core/block-editor').insertDefaultBlock(),
-  //   }),
-  //   []
-  // );
-  // insertDefaultBlock('groundhogg/paragraph')
-
-  // console.log(blocks[0].clientId)
-
-  // getBlockRootClientId({}, blocks[0].clientId)
-  // dispatchBlockEditor.getBlockRootClientId({}, blocks[0].clientId)
-  // getBlockRootClientId()
-
-  // insertBlock(createBlock('groundhogg/paragraph'), 0)
-  console.log('Re-render', blocks)
-
-  // Dynamic default blocks
-  // setDefaultBlockName(blocks[0].name);
+  const handleOnDrop = () => {
+    console.log(blocks)
+    blocks.push(createBlock('groundhogg/paragraph'))
+    setBlocks(blocks)
+  }
 
   const addBlock = () => {
     console.log('hiii')
     let newBlocks = blocks
     newBlocks.push(blocks[0])
     setBlocks(newBlocks)
+    handleUpdateBlocks(newBlocks)
   }
+
+  const { ...rest123 } = useDispatch('core/block-editor');
+  const { ...rest4576 } = useDispatch('core/blocks');
+  console.log(rest123)
+  console.log(rest4576)
+
+
+  console.log('Re-render', blocks)
   return (
     <>
       <img src={require('./webpack-test.jpg').default}/>

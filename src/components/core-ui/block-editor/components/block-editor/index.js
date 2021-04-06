@@ -52,8 +52,7 @@ export default function ({
   viewType,
   handleUpdateBlocks,
   blocks,
-  editorType,
-  addBlock,
+  editorType
 }) {
   const useStyles = makeStyles((theme) => ({
     root: {
@@ -152,16 +151,6 @@ export default function ({
       >
         <div
           className={classes.emailContainer}
-          onDragOver={(e) => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-              // console.log("drag over");
-              // addBlock();
-            }, 50);
-          }}
-          onDrop={() => {
-            // console.log("on drop");
-          }}
         >
           <Card>
             <form noValidate autoComplete="off" className={classes.emailHeader}>
@@ -188,9 +177,6 @@ export default function ({
 
             <div
               className={classes.emailContent}
-              onDrop={() => {
-                console.log("dropped");
-              }}
             >
               <BlockSelectionClearer className={classes}>
                 <VisualEditorGlobalKeyboardShortcuts />
