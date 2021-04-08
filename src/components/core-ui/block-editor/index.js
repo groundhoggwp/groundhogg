@@ -249,6 +249,7 @@ export default ({ editorItem, history, ...rest }) => {
     Block Handlers
   */
   const handleUpdateBlocks = (blocks, object, updateFromHistory) => {
+    console.log(blocks, object, updateFromHistory)
     // Standard calls for the block editor
     setBlocks(blocks);
 
@@ -308,7 +309,7 @@ export default ({ editorItem, history, ...rest }) => {
       }
 
     })
-    document.querySelectorAll('.wp-block')[draggedBlockIndex].style.borderBottom = '4px solid #0075FF';
+    // document.querySelectorAll('.wp-block')[draggedBlockIndex].style.borderBottom = '4px solid #0075FF';
   };
 
   const dragEndListener = (event) => {
@@ -445,10 +446,6 @@ export default ({ editorItem, history, ...rest }) => {
   // TESTING GROUNDS
   // TESTING GROUNDS
   // TESTING GROUNDS
-
-  wp.data.dispatch( 'core/block-editor' ).insertBlock( wp.blocks.createBlock( 'groundhogg/paragraph' ) )
-  console.log(wp.data.dispatch( 'core/block-editor' ).insertBlock( wp.blocks.createBlock( 'groundhogg/paragraph' ) ))
-
   const handleOnDrop = () => {
     console.log(blocks)
     blocks.push(createBlock('groundhogg/paragraph'))
@@ -456,20 +453,28 @@ export default ({ editorItem, history, ...rest }) => {
   }
 
   const addBlock = () => {
-    console.log('hiii')
-    let newBlocks = blocks
-    newBlocks.push(blocks[0])
-    setBlocks(newBlocks)
-    handleUpdateBlocks(newBlocks)
+    const newBlocksVersionTracker = blocksVersionTracker-1
+    if(!blockVersionHistory[newBlocksVersionTracker]){
+      return;
+    }
+    // This Works
+    // let newBlocks = [blockVersionHistory[newBlocksVersionTracker][0], blockVersionHistory[newBlocksVersionTracker][1]]
+
+
+
+    // This works
+    console.log(createBlock('groundhogg/paragraph'))
+    let newBlocks = blockVersionHistory[newBlocksVersionTracker].concat([blockVersionHistory[newBlocksVersionTracker][1]])
+
+    // let newBlocks = blockVersionHistory[newBlocksVersionTracker].concat([createBlock('groundhogg/paragraph')])
+
+    // This throws a bizarre JS error for what reason I do not know
+    // let newBlocks = blockVersionHistory[newBlocksVersionTracker].push(blockVersionHistory[newBlocksVersionTracker][1])
+
+    setBlocksVersionTracker(newBlocksVersionTracker)
+    handleUpdateBlocks(newBlocks, {}, true);
   }
 
-  const { ...rest123 } = useDispatch('core/block-editor');
-  const { ...rest4576 } = useDispatch('core/blocks');
-  console.log(rest123)
-  console.log(rest4576)
-
-
-  console.log('Re-render', blocks)
   return (
     <>
       <img src={require('./webpack-test.jpg').default}/>
