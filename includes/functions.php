@@ -1654,6 +1654,11 @@ function send_event_failure_notification( $event ) {
 		return;
 	}
 
+	// Ensure contact and event are existing
+	if ( ! $event->exists() || ! is_a_contact( $event->get_contact() ) ){
+		return;
+	}
+
 	$subject = sprintf( "Event (%s) failed for %s on %s", $event->get_step_title(), $event->get_contact()->get_email(), esc_html( get_bloginfo( 'title' ) ) );
 	$message = sprintf( "This is to let you know that an event \"%s\" in funnel \"%s\" has failed for \"%s (%s)\"", $event->get_step_title(), $event->get_funnel_title(), $event->get_contact()->get_full_name(), $event->get_contact()->get_email() );
 	$message .= sprintf( "\nFailure Reason: %s", $event->get_failure_reason() );
