@@ -328,44 +328,6 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 			echo html()->tag_picker( $args ); ?>
 			<p class="description"><?php _ex( 'Add new tags by hitting <code>Enter</code> or by typing a <code>,</code>.', 'contact_record', 'groundhogg' ); ?></p>
 		</div>
-		<h2><?php _e( 'User Account' ); ?></h2>
-		<table class="form-table">
-			<?php if ( $contact->get_userdata() ): ?>
-
-				<tr>
-					<th><label for="username"><?php _e( 'Username' ) ?></label></th>
-					<td><?php printf( "<a href='%s'>%s</a>", admin_url( 'user-edit.php?user_id=' . $contact->get_user_id() ), $contact->get_userdata()->user_login ); ?>
-						<span class="row-actions">
-                    <?php submit_button( _x( 'Unlink', 'action', 'groundhogg' ), 'secondary', 'unlink_user', false ); ?>
-                </span>
-					</td>
-				</tr>
-			<?php else: ?>
-				<tr>
-					<th>
-						<label
-							for="create_account"><?php echo _x( 'Create New Account?', 'contact_record', 'groundhogg' ) ?></label>
-					</th>
-					<td>
-						<button type="button"
-						        class="button button-secondary create-user-account"><?php _e( 'Create User Account' ); ?></button>
-						<p class="description"><?php _ex( 'This contact does not have an associated user account? Would you like to create one?', 'contact_record', 'groundhogg' ); ?></p>
-					</td>
-				</tr>
-				<tr>
-					<th>
-						<label
-							for="link_existing"><?php echo _x( 'Link Existing Account?', 'contact_record', 'groundhogg' ) ?></label>
-					</th>
-					<td><?php wp_dropdown_users( array(
-							'show_option_none'  => _x( 'Select a User Account (optional)', 'contact_record', 'groundhogg' ),
-							'option_none_value' => 0
-						) ); ?>
-						<p class="description"><?php _ex( 'You can link an existing user account to this contact.', 'contact_record', 'groundhogg' ); ?></p>
-					</td>
-				</tr>
-			<?php endif; ?>
-		</table>
 		<?php do_action( 'groundhogg/admin/contact/record/user/after', $contact ); ?>
 		<!-- GENERAL CONTACT INFO -->
 		<h2><?php _e( 'Personal Info' ); ?></h2>
