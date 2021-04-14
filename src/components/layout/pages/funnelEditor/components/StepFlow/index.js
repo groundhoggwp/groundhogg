@@ -18,7 +18,6 @@ const useStyles = makeStyles((theme) => ({
  * @param edges
  */
 function processPath (steps, edges) {
-
   const levels = {}
 
   function processNode (node, prev_level, level) {
@@ -34,11 +33,13 @@ function processPath (steps, edges) {
 
     levels[node] = level
 
-    const children = edges.filter(edge => edge.from_id === node)
-    const parents = edges.filter(edge => edge.to_id === node)
+    if (edges) {
+      const children = edges.filter(edge => edge.from_id === node)
+      const parents = edges.filter(edge => edge.to_id === node)
 
-    children.forEach(child => processNode(child, level + 1))
-    parents.forEach(parent => processNode(parent, level - 1))
+      children.forEach(child => processNode(child, level + 1))
+      parents.forEach(parent => processNode(parent, level - 1))
+    }
   }
 
   processNode(steps[0], 1)
@@ -52,7 +53,6 @@ function processPath (steps, edges) {
 }
 
 export default (props) => {
-
   const classes = useStyles()
   const { path } = useRouteMatch()
 
@@ -94,7 +94,6 @@ const MainPath = ({steps, edges}) => {
 }
 
 const BranchPath = ({steps, edges}) => {
-
   const { branch, branchPath } = useParams()
   const stepPath = processPath(steps, edges).filter( step => {
     return step.data.path === branchPath && step.data.branch === branch
