@@ -260,12 +260,14 @@ class Funnel extends Base_Object_With_Meta {
 		}
 
 		// Add edges using the ID map to fetch the real step ID
-		foreach ( $edges as $edge ) {
-			get_db( 'step_edges' )->add( [
-				'funnel_id' => $this->get_id(),
-				'from_id'   => $id_map[ $edge['from_id'] ],
-				'to_id'     => $id_map[ $edge['to_id'] ],
-			] );
+		if (!empty($edges)) {
+			foreach ( $edges as $edge ) {
+				get_db( 'step_edges' )->add( [
+					'funnel_id' => $this->get_id(),
+					'from_id'   => $id_map[ $edge['from_id'] ],
+					'to_id'     => $id_map[ $edge['to_id'] ],
+				] );
+			}
 		}
 
 		return $funnel_id;
