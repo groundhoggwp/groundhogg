@@ -45,6 +45,8 @@ import { createTheme } from "../../../../../theme";
 const theme = createTheme({});
 
 const Sidebar = ({
+  handleDragStart,
+  handleDragEnd,
   sideBarBlockDisplayType,
   sendTestEmail,
   handleViewTypeChange,
@@ -95,7 +97,11 @@ const Sidebar = ({
         handleEmailAlignmentChange={handleEmailAlignmentChange}
       />
 
-      <BlocksPanel sideBarBlockDisplayType={sideBarBlockDisplayType} />
+      <BlocksPanel
+        sideBarBlockDisplayType={sideBarBlockDisplayType}
+        handleDragStart={handleDragStart}
+        handleDragEnd={handleDragEnd}
+      />
 
       <Notes notes={notes} handleChangeNotes={handleChangeNotes} />
     </div>

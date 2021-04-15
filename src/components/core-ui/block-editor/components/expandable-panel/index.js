@@ -51,7 +51,6 @@ export default function ({ contents, title, fontSize, width, margin }) {
   const classes = useStyles();
 
   const toggleroot = () => {
-    console.log("select step");
     setOpen(open ? false : true);
   };
 

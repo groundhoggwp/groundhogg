@@ -31,7 +31,7 @@ const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
   "GroundhoggEmailBuilderSidebarInspector"
 );
 
-const BlocksPanel = ({ blocks }) => {
+const BlocksPanel = ({ blocks, handleDragStart, handleDragEnd }) => {
   const useStyles = makeStyles((theme) => ({
     root: {
       marginTop: "20px",
@@ -67,6 +67,7 @@ const BlocksPanel = ({ blocks }) => {
       textAlign: "center",
       fontWeight: "500",
       color: "#102640",
+      userSelect: 'none',
       "& svg, & path": {
         stroke: "#102640",
       },
@@ -108,14 +109,12 @@ const BlocksPanel = ({ blocks }) => {
   }));
 
   const classes = useStyles();
-  // const blocks = ;
 
   const [sideBarBlockDisplayType, setSideBarBlockDisplayType] = useState(
     "blocks"
   );
 
   const handleIsInpsecting = (type) => {
-    console.log("hiii");
     setSideBarBlockDisplayType(
       sideBarBlockDisplayType === "blocks" ? "inspector" : "blocks"
     );
@@ -169,9 +168,14 @@ const BlocksPanel = ({ blocks }) => {
 
           return (
             <div
-              data-block={JSON.stringify(block)}
-              className={`${classes.block} ${fillHoverClass} block-editor-block side-bar-drag-drop-block`}
+              className={`${classes.block} ${fillHoverClass} nathan-testing`}
               draggable="true"
+              onDrag={(e) => {
+                handleDragStart(block.name, e);
+              }}
+              ondDragend={(e) => {
+                handleDragEnd();
+              }}
             >
               <div className={classes.icon}>{icon}</div>
               <div className={classes.name}>{_.startCase(title)}</div>

@@ -52,7 +52,7 @@ export default function ({
   viewType,
   handleUpdateBlocks,
   blocks,
-  editorType
+  editorType,
 }) {
   const useStyles = makeStyles((theme) => ({
     root: {
@@ -149,9 +149,7 @@ export default function ({
         onInput={handleUpdateBlocks}
         onChange={handleUpdateBlocks}
       >
-        <div
-          className={classes.emailContainer}
-        >
+        <div className={classes.emailContainer}>
           <Card>
             <form noValidate autoComplete="off" className={classes.emailHeader}>
               <div className={classes.subjectHeaderRow}>
@@ -175,9 +173,7 @@ export default function ({
               </div>
             </form>
 
-            <div
-              className={classes.emailContent}
-            >
+            <div className={classes.emailContent}>
               <BlockSelectionClearer className={classes}>
                 <VisualEditorGlobalKeyboardShortcuts />
                 <MultiSelectScrollIntoView />
