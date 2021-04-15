@@ -25,7 +25,6 @@ export default function ({ text }) {
       position: "absolute",
       left: "25px",
       bottom: "25px",
-      minWidth: "320px",
       color: "#fff",
       zIndex: "1",
       background: theme.palette.secondary.main,
@@ -33,8 +32,8 @@ export default function ({ text }) {
       textTransform: "none",
       borderRadius: "7px",
       justifySelf: "end",
-
       opacity: "0%",
+      transition: "opacity 500ms ease",
       "&:hover": {
         background: theme.palette.secondary.main,
       },
@@ -43,27 +42,32 @@ export default function ({ text }) {
         marginLeft: "145px",
       },
     },
+    text: {
+      display: "inline-block",
+      minWidth: "128px"
+    },
   }));
 
   const classes = useStyles();
-
   const noticeRef = useRef(null);
 
   useEffect(() => {
     if (text.length > 0) {
-      noticeRef.current.style.transition = "0";
       noticeRef.current.style.opacity = "100%";
 
       setTimeout(() => {
-        noticeRef.current.style.transition = "opacity 1s ease";
         noticeRef.current.style.opacity = "0%";
       }, 1000);
+    } else {
+      noticeRef.current.style.opacity = "0%";
     }
   }, [text]);
 
+  console.log(text)
+
   return (
     <Button className={`${classes.root}`} ref={noticeRef}>
-      {text}
+      <span className={classes.text}>{text}</span>
       <Error />
     </Button>
   );

@@ -48,3 +48,11 @@
 .wp-block textarea {
   width: 100%;
 }
+
+[draggable="true"] {
+    /*
+   To prevent user selecting inside the drag source
+  */
+
+
+}

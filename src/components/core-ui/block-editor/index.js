@@ -39,7 +39,6 @@ import {
   FullscreenMode,
   ComplementaryArea,
 } from "@wordpress/interface";
-import interact from "interactjs";
 import { DateTime } from "luxon";
 import { withStyles } from '@material-ui/core/styles';
 
@@ -61,14 +60,12 @@ import { CORE_STORE_NAME, EMAILS_STORE_NAME } from "data";
 import "./index.scss";
 import "./components/blocks";
 
-let draggedBlockIndex = {};
-let draggedBlock = {};
-
 
 // Most Complete Documentation can be found here
 // https://developer.wordpress.org/block-editor/reference-guides/data/data-core-block-editor/
 // Works in the console! and in the code
 // wp.data.dispatch( 'core/block-editor' ).insertBlock( wp.blocks.createBlock( 'groundhogg/paragraph' ) );
+// But just standard insertBlock works as well
 export default ({ editorItem, history, ...rest }) => {
   const useStyles = makeStyles((theme) => ({
     root: {
@@ -89,16 +86,7 @@ export default ({ editorItem, history, ...rest }) => {
     contentFooter:{
       posiion: 'absolute',
       bottom: '0'
-    },
-    addBlock:{
-      display: "block",
-      width: "200px",
-      height: "200px",
-      position: "absolute",
-      top: "0px",
-      left: "0px"
     }
-
   }));
   const classes = useStyles();
 
@@ -131,6 +119,13 @@ export default ({ editorItem, history, ...rest }) => {
   const [blocks, setBlocks] = useState(parse(defaultContentValue).length === 0 ? [createBlock("groundhogg/paragraph", {content: defaultContentValue})] : parse(defaultContentValue)); // Old emails need to be converted to blocks
   const [subTitle, setSubTitle] = useState(defaultTitleValue);
   const [disableSubTitle, setDisableSubTitle] = useState(false);
+
+  // Drag States
+  const [dragNDropBlock, setDragNDropBlock] = useState('');
+  const [dragPosition, setDragPosition] = useState(0);
+  // Drag Timers
+  let dragTimer;
+  let dragOverTimer;
 
   // Modal
   const [open, setOpen] = useState(false);
@@ -203,6 +198,9 @@ export default ({ editorItem, history, ...rest }) => {
     });
 
     setNoticeText("Email Updated")
+    setTimeout(() => {
+      setNoticeText("")
+    }, 1000)
   };
 
   /*
@@ -213,7 +211,6 @@ export default ({ editorItem, history, ...rest }) => {
   }
   const handleInsertReplacement = (e) => {
     console.log(e)
-    // setSubTitle(e.target.value)
   }
 
   const toggleSubTitleDisable = () => {
@@ -244,18 +241,72 @@ export default ({ editorItem, history, ...rest }) => {
     setMessageType(e.target.value);
   };
 
+  /*
+    Drag & Drop Events
+  */
+  const handleDrop = () => {
+    // This will get re-setup every time the component updates, need to kill it here
+    document.addEventListener("dragover", (e)=>{}, false)
+
+    let upperBound = false;
+    let lowerBound = false
+    let dragIndex = 0;
+    // Run through existing blocks to find their coords and where to drop the block
+    document.querySelectorAll('.wp-block').forEach((ele, i)=>{
+      if(!upperBound && (dragPosition > ele.getBoundingClientRect().y)){
+        upperBound = ele.getBoundingClientRect().y
+      }
+
+      if(!lowerBound && (dragPosition < ele.getBoundingClientRect().y)){
+        dragIndex = i
+        lowerBound = ele.getBoundingClientRect().y
+      }
+    })
+
+    let newBlocks = []
+    // For some reason the .splice version won't update the view, no idea why this is the case to a manual splice function is needed
+    blockVersionHistory[blocksVersionTracker].forEach((block, i)=>{
+      if(dragIndex === i){
+        newBlocks.push(createBlock(dragNDropBlock))
+      }
+      newBlocks.push(block)
+    })
+    handleUpdateBlocks(newBlocks, {}, false);
+  }
+
+  const handleDragStart = (blockName, e) => {
+    clearTimeout(dragTimer)
+    dragTimer = setTimeout(()=>{
+      setDragNDropBlock(blockName)
+    }, 10);
+  }
+
+  const handleDragEnd = (e, obj) => {
+    setDragNDropBlock('')
+  }
+
+  document.addEventListener("dragover", (e)=>{
+    clearTimeout(dragOverTimer)
+    dragOverTimer = setTimeout(()=>{
+      e = e || window.event;
+
+
+      if(setDragPosition !== e.pageY){
+        console.log("X: "+e.pageY+" Y: "+e.pageY);
+        setDragPosition(e.pageY)
+      }
+    }, 50)
+  }, false);
+
 
   /*
     Block Handlers
   */
   const handleUpdateBlocks = (blocks, object, updateFromHistory) => {
-    console.log(blocks, object, updateFromHistory)
-    // Standard calls for the block editor
     setBlocks(blocks);
 
-
+    // Build up the history tracker, except when we're going back and forth
     if(!updateFromHistory){
-      // Build up the history tracker, except when we're going back and forth
       const newBlocksVersionTracker = blockVersionHistory.length;
       const newBlockVersionHistory = blockVersionHistory
       newBlockVersionHistory.push(blocks);
@@ -264,106 +315,6 @@ export default ({ editorItem, history, ...rest }) => {
       setBlockVersionHistory(newBlockVersionHistory)
     }
   };
-
-  /*
-    Drag Handlers
-  */
-  const dragMoveListener = (event) => {
-    const target = event.target;
-    event.target.classList.add("drop-active");
-
-    draggedBlock = JSON.parse(target.getAttribute("data-block"));
-
-    // keep the dragged position in the data-x/data-y attributes
-    const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
-    const y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
-
-    // translate the element
-    target.style.webkitTransform = target.style.transform =
-      "translate(" + x + "px, " + y + "px)";
-
-    // update the posiion attributes
-    target.setAttribute("data-x", x);
-    target.setAttribute("data-y", y);
-
-
-    if(!y){return;}
-    draggedBlockIndex = 0;
-    let adjustedY = y + 505+55; //Offset by header and block size
-    let classToApply = '';
-    let saveBlock = false
-
-    document.querySelectorAll('.wp-block').forEach((block, i)=>{
-      block.style.borderTop = ''
-      block.style.borderBottom = ''
-
-
-      if(adjustedY >= block.getBoundingClientRect().top && adjustedY <= block.getBoundingClientRect().bottom ){
-        draggedBlockIndex = i
-        saveBlock = block
-        // console.log(block.getBoundingClientRect().bottom, block.getBoundingClientRect().top)
-      }
-
-      if(draggedBlock === 0){
-        // console.log(block, y, block.getBoundingClientRect().bottom)
-      }
-
-    })
-    // document.querySelectorAll('.wp-block')[draggedBlockIndex].style.borderBottom = '4px solid #0075FF';
-  };
-
-  const dragEndListener = (event) => {
-    document.querySelectorAll('.wp-block').forEach((block, i)=>{
-      block.style.borderTop = ''
-      block.style.borderBottom = ''
-    });
-
-    // keep the dragged position in the data-x/data-y attributes
-    const target = event.target;
-    const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
-    const y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
-
-    // translate the element
-    target.style.webkitTransform = target.style.transform =
-      "translate(" + 0 + "px, " + 0 + "px)";
-
-    // update the posiion attributes
-    target.setAttribute("data-x", 0);
-    target.setAttribute("data-y", 0);
-  };
-  const setupDragNDrop = (createBlock, setBlocks) =>{
-      interact(".block-editor__typewriter").unset()
-      interact(".block-editor__typewriter").dropzone({
-        overlap: 0.75,
-        ondrop: (event) => {
-          let newBlocks = blocks;
-          newBlocks.push(draggedBlock)
-          handleUpdateBlocks(newBlocks)
-        },
-        ondropactivate: (event) => {},
-        ondragenter: (event) => {},
-        ondragleave: (event) => {},
-        ondropdeactivate: (event) => {},
-
-      })
-
-      interact(".side-bar-drag-drop-block").unset()
-      interact(".side-bar-drag-drop-block").draggable({
-        cursorChecker(action, interactable, element, interacting) {
-          return "grab";
-        },
-        // onstart: dragStartListener,
-        onend: dragEndListener,
-        listeners: { move: dragMoveListener },
-        modifiers: [
-          interact.modifiers.restrict({
-            restriction: interact(".groundhogg-email-editor__email-content"),
-            elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
-            endOnly: true,
-          }),
-        ],
-      });
-      }
 
   /*
     Sidebar Handlers
@@ -380,7 +331,7 @@ export default ({ editorItem, history, ...rest }) => {
     sendEmailRaw({
       to: replyTo,
       from,
-      from_name: "TEST D",
+      from_name: "Groundhogg Test Email",
       content: content,
       subject: subject,
     });
@@ -403,12 +354,6 @@ export default ({ editorItem, history, ...rest }) => {
   const toggleSubTitle = () =>{
     setDisableTitle(disableSubTitle ? false : true )
   }
-
-  useEffect(() => {
-    setupDragNDrop(createBlock, setBlocks)
-  }, []);
-  // }, [blocks]);
-
 
   // let editorPanel;
   // switch (editorMode) {
@@ -439,42 +384,6 @@ export default ({ editorItem, history, ...rest }) => {
       <EditorSteps/>
     </div>
   }
-
-
-  // TESTING GROUNDS
-  // TESTING GROUNDS
-  // TESTING GROUNDS
-  // TESTING GROUNDS
-  // TESTING GROUNDS
-  const handleOnDrop = () => {
-    console.log(blocks)
-    blocks.push(createBlock('groundhogg/paragraph'))
-    setBlocks(blocks)
-  }
-
-  const addBlock = () => {
-    const newBlocksVersionTracker = blocksVersionTracker-1
-    if(!blockVersionHistory[newBlocksVersionTracker]){
-      return;
-    }
-    // This Works
-    // let newBlocks = [blockVersionHistory[newBlocksVersionTracker][0], blockVersionHistory[newBlocksVersionTracker][1]]
-
-
-
-    // This works
-    console.log(createBlock('groundhogg/paragraph'))
-    let newBlocks = blockVersionHistory[newBlocksVersionTracker].concat([blockVersionHistory[newBlocksVersionTracker][1]])
-
-    // let newBlocks = blockVersionHistory[newBlocksVersionTracker].concat([createBlock('groundhogg/paragraph')])
-
-    // This throws a bizarre JS error for what reason I do not know
-    // let newBlocks = blockVersionHistory[newBlocksVersionTracker].push(blockVersionHistory[newBlocksVersionTracker][1])
-
-    setBlocksVersionTracker(newBlocksVersionTracker)
-    handleUpdateBlocks(newBlocks, {}, true);
-  }
-
   return (
     <>
       <img src={require('./webpack-test.jpg').default}/>
@@ -482,12 +391,10 @@ export default ({ editorItem, history, ...rest }) => {
         {steps}
         <SimpleModal open={open}/>
 
-        <div className={classes.addBlock} onClick={addBlock}>Add blocks </div>
         <FullscreenMode isActive={false} />
         <Notices text={noticeText}/>
         <SlotFillProvider>
           <DropZoneProvider>
-            <FocusReturnProvider>
               <Header
                 editorItem={editorItem}
                 history={history}
@@ -503,14 +410,7 @@ export default ({ editorItem, history, ...rest }) => {
               />
 
 
-              <div className={classes.content}>
-
-                  {/*
-                  <SendEmailComponent/>
-
-                  <BlocksPreview blocks={blocks}/>
-                  */}
-
+              <div className={classes.content} onDrop={handleDrop}>
                   <BlockEditor
                     settings={window.Groundhogg.preloadSettings}
                     subject={subject}
@@ -524,11 +424,11 @@ export default ({ editorItem, history, ...rest }) => {
                   />
               </div>
 
-              <Sidebar sendTestEmail={sendTestEmail} handleViewTypeChange={handleViewTypeChange} handleSetFrom={handleSetFrom} handleSetReplyTo={handleSetReplyTo}  messageType={messageType} handleMessageType={handleMessageType} emailAlignment={emailAlignment} handleEmailAlignmentChange={handleEmailAlignmentChange} notes={notes} handleChangeNotes={handleChangeNotes}/>
+              <Sidebar handleDragStart={handleDragStart} handleDragEnd={handleDragEnd} sendTestEmail={sendTestEmail} handleViewTypeChange={handleViewTypeChange} handleSetFrom={handleSetFrom} handleSetReplyTo={handleSetReplyTo}  messageType={messageType} handleMessageType={handleMessageType} emailAlignment={emailAlignment} handleEmailAlignmentChange={handleEmailAlignmentChange} notes={notes} handleChangeNotes={handleChangeNotes}/>
 
               <ComplementaryArea.Slot scope="gh/v4/core" />
 
-            </FocusReturnProvider>
+
           </DropZoneProvider>
         </SlotFillProvider>
 
