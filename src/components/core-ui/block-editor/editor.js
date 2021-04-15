@@ -31,7 +31,8 @@ function Editor( { settings } ) {
 							sidebar={<Sidebar />}
 							content={
 								<>
-
+									<Notices />
+									<BlockEditor settings={settings} />
 								</>
 							}
 						/>

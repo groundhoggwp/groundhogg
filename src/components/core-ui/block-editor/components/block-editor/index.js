@@ -48,7 +48,7 @@ function BlockEditor( { settings: _settings } ) {
 	}, [ canUserCreateMedia, _settings ] );
 
 	useEffect( () => {
-		const storedBlocks = window.localStorage.getItem( 'getdavesbeBlocks' );
+		const storedBlocks = window.localStorage.getItem( 'groundhoggBlocks' );
 
 		if ( storedBlocks?.length ) {
 			handleUpdateBlocks(() => parse(storedBlocks));
@@ -71,7 +71,7 @@ function BlockEditor( { settings: _settings } ) {
 
 	function handlePersistBlocks( newBlocks ) {
 		updateBlocks( newBlocks );
-		window.localStorage.setItem( 'getdavesbeBlocks', serialize( newBlocks ) );
+		window.localStorage.setItem( 'groundhoggBlocks', serialize( newBlocks ) );
 	}
 
 	return (

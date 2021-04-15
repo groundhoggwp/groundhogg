@@ -8,6 +8,5 @@ import './styles.scss';
 domReady( function() {
 	const settings = window.getdaveSbeSettings || {};
 	registerCoreBlocks();
-	render( <Editor settings={ settings } />, document.getElementById( 'getdave-sbe-block-editor' ) );
+	render( <Editor settings={ settings } />, document.getElementById( 'gh-react-app-root' ) );
 } );
-
