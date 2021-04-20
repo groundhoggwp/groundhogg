@@ -142,16 +142,17 @@ export default function ({
     settings.__experimentalBlockPatterns = [];
   }
 
+   // 
+   // onDrop={()=>{console.log('drop')}}
+   // onDragOver={(e)=>{
+   //   // e.stopPropagation();
+   //   e.preventDefault();
+   //   console.log('over')
+   // }}
+   // onDragEnter={()=>{console.log('enter')}}
+   // onDragLeave={()=>{console.log('leave'); handleDrop()}}
   return (
-    <div className={classes.root}
-     onDrop={()=>{console.log('drop')}}
-     onDragOver={(e)=>{
-       // e.stopPropagation();
-       e.preventDefault();
-       console.log('over')
-     }}
-     onDragEnter={()=>{console.log('enter')}}
-     onDragLeave={()=>{console.log('leave'); handleDrop()}}>
+    <div className={classes.root}>
       <BlockEditorProvider
         value={blocks}
         settings={settings}

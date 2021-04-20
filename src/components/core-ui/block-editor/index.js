@@ -246,7 +246,6 @@ export default ({ editorItem, history, ...rest }) => {
     Drag & Drop Events
   */
   const handleDrop = () => {
-    console.log('dropping')
     // This will get re-setup every time the component updates, need to kill it here
     document.addEventListener("dragover", (e)=>{}, false)
 
@@ -273,7 +272,6 @@ export default ({ editorItem, history, ...rest }) => {
       }
       newBlocks.push(block)
     })
-    console.log(newBlocks)
     handleUpdateBlocks(newBlocks, {}, false);
   }
 
@@ -285,7 +283,6 @@ export default ({ editorItem, history, ...rest }) => {
   }
 
   const handleDragEnd = (e, obj) => {
-    console.log('dropping')
     // This will get re-setup every time the component updates, need to kill it here
     document.addEventListener("dragover", (e)=>{}, false)
 
@@ -312,9 +309,8 @@ export default ({ editorItem, history, ...rest }) => {
       }
       newBlocks.push(block)
     })
-    console.log(newBlocks)
     handleUpdateBlocks(newBlocks, {}, false);
-    
+
     setDragNDropBlock('')
   }
 
@@ -325,7 +321,7 @@ export default ({ editorItem, history, ...rest }) => {
 
 
       if(setDragPosition !== e.pageY){
-        console.log("X: "+e.pageY+" Y: "+e.pageY);
+        // console.log("X: "+e.pageY+" Y: "+e.pageY);
         setDragPosition(e.pageY)
       }
     }, 50)

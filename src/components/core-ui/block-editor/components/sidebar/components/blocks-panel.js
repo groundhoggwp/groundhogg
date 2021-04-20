@@ -173,8 +173,7 @@ const BlocksPanel = ({ blocks, handleDragStart, handleDragEnd }) => {
               onDrag={(e) => {
                 handleDragStart(block.name, e);
               }}
-              ondDragEnd={(e) => {
-                console.log('on drag end')
+              onDragEnd={(e) => {
                 handleDragEnd();
               }}
             >
