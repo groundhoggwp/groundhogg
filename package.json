@@ -17,7 +17,9 @@
     "start": "wp-scripts start",
     "test:e2e": "wp-scripts test-e2e",
     "test:unit": "wp-scripts test-unit-js",
-    "wp-env": "wp-env"
+    "wp-env": "wp-env",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "browserslist": [
     ">0.2%",
@@ -26,6 +28,10 @@
     "not op_mini all"
   ],
   "devDependencies": {
+    "@storybook/addon-actions": "^6.2.8",
+    "@storybook/addon-essentials": "^6.2.8",
+    "@storybook/addon-links": "^6.2.8",
+    "@storybook/react": "^6.2.8",
     "@wordpress/babel-preset-default": "^4.17.0",
     "@wordpress/env": "^2.0.0",
     "@wordpress/eslint-plugin": "^7.2.0",
