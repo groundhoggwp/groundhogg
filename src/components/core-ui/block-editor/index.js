@@ -8,7 +8,8 @@ import {
   FocusReturnProvider,
   Panel,
   PanelBody,
-  PanelRow
+  PanelRow,
+  Popover
 } from "@wordpress/components";
 import { useEffect, useState, useRef, createElement } from "@wordpress/element";
 import { useSelect, useDispatch } from "@wordpress/data";
@@ -106,6 +107,8 @@ export default ({ editorItem, history, ...rest }) => {
   const [blocksVersionTracker, setBlocksVersionTracker] = useState(0);
   const [blockVersionHistory, setBlockVersionHistory] = useState([parse(defaultContentValue)]);
   const [noticeText, setNoticeText] = useState('');
+  const [showTextEditor, setShowTextEditor] = useState(true);
+
 
   // Header States
   const [altBodyContent, setAltBodyContent] = useState('');
@@ -282,6 +285,34 @@ export default ({ editorItem, history, ...rest }) => {
   }
 
   const handleDragEnd = (e, obj) => {
+    // This will get re-setup every time the component updates, need to kill it here
+    document.addEventListener("dragover", (e)=>{}, false)
+
+    let upperBound = false;
+    let lowerBound = false
+    let dragIndex = 0;
+    // Run through existing blocks to find their coords and where to drop the block
+    document.querySelectorAll('.wp-block').forEach((ele, i)=>{
+      if(!upperBound && (dragPosition > ele.getBoundingClientRect().y)){
+        upperBound = ele.getBoundingClientRect().y
+      }
+
+      if(!lowerBound && (dragPosition < ele.getBoundingClientRect().y)){
+        dragIndex = i
+        lowerBound = ele.getBoundingClientRect().y
+      }
+    })
+
+    let newBlocks = []
+    // For some reason the .splice version won't update the view, no idea why this is the case to a manual splice function is needed
+    blockVersionHistory[blocksVersionTracker].forEach((block, i)=>{
+      if(dragIndex === i){
+        newBlocks.push(createBlock(dragNDropBlock))
+      }
+      newBlocks.push(block)
+    })
+    handleUpdateBlocks(newBlocks, {}, false);
+
     setDragNDropBlock('')
   }
 
@@ -292,7 +323,7 @@ export default ({ editorItem, history, ...rest }) => {
 
 
       if(setDragPosition !== e.pageY){
-        console.log("X: "+e.pageY+" Y: "+e.pageY);
+        // console.log("X: "+e.pageY+" Y: "+e.pageY);
         setDragPosition(e.pageY)
       }
     }, 50)
@@ -355,28 +386,19 @@ export default ({ editorItem, history, ...rest }) => {
     setDisableTitle(disableSubTitle ? false : true )
   }
 
-  // let editorPanel;
-  // switch (editorMode) {
-  //   case "text":
-  //   editorPanel = (
-  //     <TextEditor
-  //       settings={window.Groundhogg.preloadSettings}
-  //       subject={subject}
-  //       handleSubjectChange={handleSubjectChange}
-  //       preHeader={preHeader}
-  //       handlePreHeaderChange={handlePreHeaderChange}
-  //       viewType={viewType}
-  //       handleUpdateBlocks={handleUpdateBlocks}
-  //       blocks={blocks}
-  //     />
-  //   );
-  //
-  //     break;
-  //   default:
-  //     editorPanel = (
-  //
-  //     );
-  // }
+  let textEditor = <div/>;
+  if(showTextEditor) {
+    textEditor = <TextEditor
+        settings={window.Groundhogg.preloadSettings}
+        subject={subject}
+        handleSubjectChange={handleSubjectChange}
+        preHeader={preHeader}
+        handlePreHeaderChange={handlePreHeaderChange}
+        viewType={viewType}
+        handleUpdateBlocks={handleUpdateBlocks}
+        blocks={blocks}
+      />
+  }
 
   let steps = <div/>
   if(editorType === 'funnel'){
@@ -385,8 +407,6 @@ export default ({ editorItem, history, ...rest }) => {
     </div>
   }
   return (
-    <>
-      <img src={require('./webpack-test.jpg').default}/>
       <div className="Groundhogg-BlockEditor">
         {steps}
         <SimpleModal open={open}/>
@@ -395,45 +415,41 @@ export default ({ editorItem, history, ...rest }) => {
         <Notices text={noticeText}/>
         <SlotFillProvider>
           <DropZoneProvider>
-              <Header
-                editorItem={editorItem}
-                history={history}
-                updateItem={updateItem}
-                closeEditor={() => {}}
-                isSaving={isSaving}
-                title={title}
-                handleTitleChange={handleTitleChange}
-                editorType={editorType}
-                handleOpen={handleOpen}
-                emailStepBackward={emailStepBackward}
-                emailStepForward={emailStepForward}
-              />
+            <FocusReturnProvider>
+                <Header
+                  editorItem={editorItem}
+                  history={history}
+                  updateItem={updateItem}
+                  closeEditor={() => {}}
+                  isSaving={isSaving}
+                  title={title}
+                  handleTitleChange={handleTitleChange}
+                  editorType={editorType}
+                  handleOpen={handleOpen}
+                  emailStepBackward={emailStepBackward}
+                  emailStepForward={emailStepForward}
+                />
 
+                <BlockEditor
+                  settings={window.Groundhogg.preloadSettings}
+                  subject={subject}
+                  handleSubjectChange={handleSubjectChange}
+                  preHeader={preHeader}
+                  handlePreHeaderChange={handlePreHeaderChange}
+                  viewType={viewType}
+                  handleUpdateBlocks={handleUpdateBlocks}
+                  blocks={blocks}
+                  editorType={editorType}
+                  handleDrop={handleDrop}
+                />
 
-              <div className={classes.content} onDrop={handleDrop}>
-                  <BlockEditor
-                    settings={window.Groundhogg.preloadSettings}
-                    subject={subject}
-                    handleSubjectChange={handleSubjectChange}
-                    preHeader={preHeader}
-                    handlePreHeaderChange={handlePreHeaderChange}
-                    viewType={viewType}
-                    handleUpdateBlocks={handleUpdateBlocks}
-                    blocks={blocks}
-                    editorType={editorType}
-                  />
-              </div>
+                {textEditor}
 
-              <Sidebar handleDragStart={handleDragStart} handleDragEnd={handleDragEnd} sendTestEmail={sendTestEmail} handleViewTypeChange={handleViewTypeChange} handleSetFrom={handleSetFrom} handleSetReplyTo={handleSetReplyTo}  messageType={messageType} handleMessageType={handleMessageType} emailAlignment={emailAlignment} handleEmailAlignmentChange={handleEmailAlignmentChange} notes={notes} handleChangeNotes={handleChangeNotes}/>
-
-              <ComplementaryArea.Slot scope="gh/v4/core" />
-
-
+                <Sidebar handleDragStart={handleDragStart} handleDragEnd={handleDragEnd} sendTestEmail={sendTestEmail} handleViewTypeChange={handleViewTypeChange} handleSetFrom={handleSetFrom} handleSetReplyTo={handleSetReplyTo}  messageType={messageType} handleMessageType={handleMessageType} emailAlignment={emailAlignment} handleEmailAlignmentChange={handleEmailAlignmentChange} notes={notes} handleChangeNotes={handleChangeNotes}/>
+                <Popover.Slot />
+            </FocusReturnProvider>
           </DropZoneProvider>
         </SlotFillProvider>
-
-
       </div>
-    </>
   );
 };

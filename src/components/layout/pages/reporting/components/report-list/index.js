@@ -1,6 +1,6 @@
 import { Fragment, useState } from '@wordpress/element'
 import { useSelect, useDispatch } from '@wordpress/data'
-import { ListTable } from 'components/core-ui/list-table/new'
+import  ListTable  from 'components/core-ui/list-table/'
 import { getChartType, registerReportsPanel } from 'data/reports-registry'
 import Grid from '@material-ui/core/Grid'
 import { Box, Divider } from '@material-ui/core'

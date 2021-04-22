@@ -44,7 +44,7 @@ export default function ({ text }) {
     },
     text: {
       display: "inline-block",
-      minWidth: "128px"
+      minWidth: "128px",
     },
   }));
 
@@ -63,7 +63,7 @@ export default function ({ text }) {
     }
   }, [text]);
 
-  console.log(text)
+  console.log(text);
 
   return (
     <Button className={`${classes.root}`} ref={noticeRef}>

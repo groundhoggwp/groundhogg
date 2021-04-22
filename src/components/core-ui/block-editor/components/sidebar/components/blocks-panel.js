@@ -67,7 +67,7 @@ const BlocksPanel = ({ blocks, handleDragStart, handleDragEnd }) => {
       textAlign: "center",
       fontWeight: "500",
       color: "#102640",
-      userSelect: 'none',
+      userSelect: "none",
       "& svg, & path": {
         stroke: "#102640",
       },
@@ -168,12 +168,12 @@ const BlocksPanel = ({ blocks, handleDragStart, handleDragEnd }) => {
 
           return (
             <div
-              className={`${classes.block} ${fillHoverClass} nathan-testing`}
+              className={`${classes.block} ${fillHoverClass}`}
               draggable="true"
               onDrag={(e) => {
                 handleDragStart(block.name, e);
               }}
-              ondDragend={(e) => {
+              onDragEnd={(e) => {
                 handleDragEnd();
               }}
             >
