@@ -28,10 +28,7 @@ import { Popover, SlotFillProvider } from "@wordpress/components";
 /**
  * External dependencies
  */
-import Card from "@material-ui/core/Card";
-import Paper from "@material-ui/core/Paper";
-import Grid from "@material-ui/core/Grid";
-import TextField from "@material-ui/core/TextField";
+import {Card, Grid, Paper, TextField} from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
 /**
@@ -40,6 +37,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import BlocksPanel from "../sidebar/components/blocks-panel.js";
 import ExpandablePanel from "../expandable-panel/";
 import { createTheme } from "../../../../../theme";
+import AddWithBorder from "components/svg/AddWithBorder/";
+import Trash from "components/svg/Trash/";
 const theme = createTheme({});
 
 let timeout;
@@ -113,6 +112,29 @@ export default function ({
       margin: "10px auto 30px auto",
       padding: "10px",
     },
+    inputText: {
+      display: "inline-block",
+      fontSize: "12px",
+      width: "200px",
+      padding: "6px 0px 6px 17px",
+      marginTop: "10px",
+      border: "1.2px solid rgba(16, 38, 64, 0.15)",
+      borderRadius: "3px",
+      "&:focus": {
+        outline: "none",
+        border: "1.2px solid rgba(16, 38, 64, 0.15)",
+        boxShadow: "none",
+      },
+    },
+    customHeaderBtn: {
+      display: "inline-block",
+      width: "20px",
+      height: "20px",
+      "& svg": {
+        stroke: '#000',
+        fill: '#000'
+      }
+    }
   }));
 
   const { createInfoNotice } = useDispatch("core/notices");
@@ -142,15 +164,10 @@ export default function ({
     settings.__experimentalBlockPatterns = [];
   }
 
-   // 
-   // onDrop={()=>{console.log('drop')}}
-   // onDragOver={(e)=>{
-   //   // e.stopPropagation();
-   //   e.preventDefault();
-   //   console.log('over')
-   // }}
-   // onDragEnter={()=>{console.log('enter')}}
-   // onDragLeave={()=>{console.log('leave'); handleDrop()}}
+  const hanldeCustomHeaderInput = () => {
+
+  }
+
   return (
     <div className={classes.root}>
       <BlockEditorProvider
@@ -205,7 +222,22 @@ export default function ({
             fontSize={"16px"}
             width={"calc(100%)"}
             margin={"20px 0px 0px 0px"}
-            contents={<div>contents</div>}
+            contents={<div>
+              <input
+                      className={classes.inputText}
+                      value={0}
+                      placeholder={""}
+                      onChange={hanldeCustomHeaderInput}
+                    />
+              <input
+                      className={classes.inputText}
+                      value={0}
+                      placeholder={""}
+                      onChange={hanldeCustomHeaderInput}
+                    />
+              <span className={classes.customHeaderBtn}><AddWithBorder/></span>
+              <span className={classes.customHeaderBtn}><Trash/></span>
+              </div>}
           />
         </div>
 
