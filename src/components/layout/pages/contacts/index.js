@@ -18,7 +18,7 @@ import {
 import {
 	CONTACTS_STORE_NAME,
 } from '../../../../data'
-import { ListTable } from '../../../core-ui/list-table/new'
+import  ListTable  from '../../../core-ui/list-table/'
 import { SingleView } from './single-view'
 import { makeStyles } from '@material-ui/core/styles'
 import Chip from '@material-ui/core/Chip'

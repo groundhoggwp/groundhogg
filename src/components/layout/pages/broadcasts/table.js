@@ -12,7 +12,7 @@ import Button from '@material-ui/core/Button';
  */
 import {BROADCASTS_STORE_NAME} from 'data/broadcasts';
 import Box from "@material-ui/core/Box";
-import {ListTable} from "components/core-ui/list-table/new";
+import {ListTable} from "components/core-ui/list-table/";
 import {Link} from "react-router-dom";
 import {Tooltip} from "@material-ui/core";
 import Chip from "@material-ui/core/Chip";
