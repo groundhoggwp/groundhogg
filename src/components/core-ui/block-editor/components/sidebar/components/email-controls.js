@@ -10,7 +10,13 @@ import { Inserter } from "@wordpress/block-editor";
  * External dependencies
  */
 import { makeStyles } from "@material-ui/core/styles";
-import { Button, Card, Checkbox, FormControlLabel, TextField } from "@material-ui/core";
+import {
+  Button,
+  Card,
+  Checkbox,
+  FormControlLabel,
+  TextField,
+} from "@material-ui/core";
 
 /**
  * Internal dependencies
@@ -198,26 +204,28 @@ export default function ({
         fontSize={"12px"}
         width={"calc(100% + 44px)"}
         margin={"0px 0px 0px -22px"}
-        contents={<div>
-          <FormControlLabel
-            value="top"
-            control={<Checkbox color="primary" />}
-            label="Enable Browser View"
-            labelPlacement="start"
-          />
-          <FormControlLabel
-            value="top"
-            control={<Checkbox color="primary" />}
-            label="Save as template"
-            labelPlacement="start"
-          />
-          <FormControlLabel
-            value="top"
-            control={<Checkbox color="primary" />}
-            label="Plain Text Version"
-            labelPlacement="start"
-          />
-        </div>}
+        contents={
+          <div>
+            <FormControlLabel
+              value="top"
+              control={<Checkbox color="primary" />}
+              label="Enable Browser View"
+              labelPlacement="start"
+            />
+            <FormControlLabel
+              value="top"
+              control={<Checkbox color="primary" />}
+              label="Save as template"
+              labelPlacement="start"
+            />
+            <FormControlLabel
+              value="top"
+              control={<Checkbox color="primary" />}
+              label="Plain Text Version"
+              labelPlacement="start"
+            />
+          </div>
+        }
       />
     </Card>
   );

@@ -28,7 +28,7 @@ import { Popover, SlotFillProvider } from "@wordpress/components";
 /**
  * External dependencies
  */
-import {Card, Grid, Paper, TextField} from "@material-ui/core";
+import { Card, Grid, Paper, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
 /**
@@ -131,10 +131,10 @@ export default function ({
       width: "20px",
       height: "20px",
       "& svg": {
-        stroke: '#000',
-        fill: '#000'
-      }
-    }
+        stroke: "#000",
+        fill: "#000",
+      },
+    },
   }));
 
   const { createInfoNotice } = useDispatch("core/notices");
@@ -164,9 +164,7 @@ export default function ({
     settings.__experimentalBlockPatterns = [];
   }
 
-  const hanldeCustomHeaderInput = () => {
-
-  }
+  const hanldeCustomHeaderInput = () => {};
 
   return (
     <div className={classes.root}>
@@ -176,10 +174,7 @@ export default function ({
         onInput={handleUpdateBlocks}
         onChange={handleUpdateBlocks}
       >
-        <div
-          className={classes.emailContainer}
-
-        >
+        <div className={classes.emailContainer}>
           <Card>
             <form noValidate autoComplete="off" className={classes.emailHeader}>
               <div className={classes.subjectHeaderRow}>
@@ -203,10 +198,13 @@ export default function ({
               </div>
             </form>
 
-            <div className={classes.emailContent} onDrop={() => {
-              console.log("asdfasdf");
-              handleDrop();
-            }}>
+            <div
+              className={classes.emailContent}
+              onDrop={() => {
+                console.log("asdfasdf");
+                handleDrop();
+              }}
+            >
               <BlockEditorKeyboardShortcuts />
               <WritingFlow>
                 <ObserveTyping>
@@ -222,22 +220,28 @@ export default function ({
             fontSize={"16px"}
             width={"calc(100%)"}
             margin={"20px 0px 0px 0px"}
-            contents={<div>
-              <input
-                      className={classes.inputText}
-                      value={0}
-                      placeholder={""}
-                      onChange={hanldeCustomHeaderInput}
-                    />
-              <input
-                      className={classes.inputText}
-                      value={0}
-                      placeholder={""}
-                      onChange={hanldeCustomHeaderInput}
-                    />
-              <span className={classes.customHeaderBtn}><AddWithBorder/></span>
-              <span className={classes.customHeaderBtn}><Trash/></span>
-              </div>}
+            contents={
+              <div>
+                <input
+                  className={classes.inputText}
+                  value={0}
+                  placeholder={""}
+                  onChange={hanldeCustomHeaderInput}
+                />
+                <input
+                  className={classes.inputText}
+                  value={0}
+                  placeholder={""}
+                  onChange={hanldeCustomHeaderInput}
+                />
+                <span className={classes.customHeaderBtn}>
+                  <AddWithBorder />
+                </span>
+                <span className={classes.customHeaderBtn}>
+                  <Trash />
+                </span>
+              </div>
+            }
           />
         </div>
 
