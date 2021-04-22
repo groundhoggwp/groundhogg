@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n'
 import { Fragment, useState } from '@wordpress/element'
 import { useSelect, useDispatch } from '@wordpress/data'
-import { ListTable } from '../../../core-ui/list-table/new'
+import  ListTable  from '../../../core-ui/list-table/'
 import { TAGS_STORE_NAME } from '../../../../data/tags'
 import LocalOfferIcon from '@material-ui/icons/LocalOffer'
 import DeleteIcon from '@material-ui/icons/Delete'

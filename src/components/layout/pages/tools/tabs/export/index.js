@@ -3,7 +3,7 @@ import {Fragment, render} from "@wordpress/element";
 import {__} from "@wordpress/i18n";
 import {useDispatch, useSelect} from "@wordpress/data";
 import Box from "@material-ui/core/Box";
-import {ListTable} from "components/core-ui/list-table/new";
+import {ListTable} from "components/core-ui/list-table/";
 import {EXPORT_STORE_NAME} from "data/export";
 import RowActions from "components/core-ui/row-actions";
 import Tooltip from "@material-ui/core/Tooltip/Tooltip";

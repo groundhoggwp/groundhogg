@@ -19,7 +19,7 @@ import {
 import {
 	EMAILS_STORE_NAME
 } from '../../../../data';
-import { ListTable } from '../../../core-ui/list-table/new'
+import  ListTable  from '../../../core-ui/list-table/'
 import { EmailRowPrimaryItem } from './email-row-primary-item'
 import { SingleView } from './single-view'
 import {getLuxonDate} from "utils/index";

@@ -3,7 +3,7 @@
  */
 import { Fragment, useState } from '@wordpress/element'
 import { useSelect, useDispatch } from '@wordpress/data'
-import { ListTable } from 'components/core-ui/list-table/new'
+import  ListTable  from 'components/core-ui/list-table/'
 import DeleteIcon from '@material-ui/icons/Delete'
 import SettingsIcon from '@material-ui/icons/Settings'
 import TimelineIcon from '@material-ui/icons/Timeline'

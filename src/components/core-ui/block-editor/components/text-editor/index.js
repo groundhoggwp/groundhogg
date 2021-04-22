@@ -48,15 +48,7 @@ export default function ({
   blocks,
 }) {
   const useStyles = makeStyles((theme) => ({
-    subjectHeader: {
-      padding: "20px",
-      marginBottom: "10px",
-    },
-    subjectInputs: {
-      width: "100%",
-      padding: "",
-      marginBottom: "10px",
-    },
+    root: {},
     emailContent: {
       position: "relative",
       display: "block",
@@ -93,58 +85,14 @@ export default function ({
     settings.__experimentalBlockPatterns = [];
   }
 
-  const blockEditorEl = useRef(null);
-
-  // useEffect(() => {
-  //   blockEditorEl.current.removeEventListener("scroll", () => {});
-  //   blockEditorEl.current.addEventListener("scroll", (event) => {
-  // const popOverEl = document.querySelector('.components-popover.block-editor-block-list__block-popover');
-  // // const popOverEl = document.querySelector('.components-popover.block-editor-block-list__block-popover');
-  // if(popOverEl){
-  //   console.log('scroll', popOverEl)
-  //   // document.querySelector('.components-popover.block-editor-block-list__block-popover').style.top = `${blockEditorEl.current.scrollTop}px`;
-  //   // document.querySelector('.components-popover.block-editor-block-list__block-popover').style.transform = `translateY(${blockEditorEl.current.scrollTop}px)`;
-  // }
-  //   });
-  // });
-
   return (
-    <div className="groundhogg-block-editor" ref={blockEditorEl}>
-      <div className="groundhogg-block-editor__email-container">
-        <Card className={classes.subjectHeader}>
-          <form noValidate autoComplete="off">
-            <TextField
-              className={classes.subjectInputs}
-              onChange={handleSubjectChange}
-              label={"Subject"}
-              value={subject}
-            />
-            <TextField
-              className={classes.subjectInputs}
-              onChange={handlePreHeaderChange}
-              label={"Pre Header"}
-              value={preHeader}
-              placeholder={__(
-                "Pre Header Text: Used to summarize the content of the email."
-              )}
-            />
-          </form>
-        </Card>
-        <Paper>
-          <div
-            className={
-              classes.emailContent + " groundhogg-email-editor__email-content"
-            }
-          >
-            <PostTextEditor
-              value={blocks}
-              onChange={() => {
-                console.log("changes");
-              }}
-            />
-          </div>
-        </Paper>
-      </div>
-    </div>
+    <Paper className={classes.root}>
+      <PostTextEditor
+        value={blocks}
+        onChange={() => {
+          console.log("changes");
+        }}
+      />
+    </Paper>
   );
 }

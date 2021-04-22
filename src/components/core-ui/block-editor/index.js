@@ -107,6 +107,8 @@ export default ({ editorItem, history, ...rest }) => {
   const [blocksVersionTracker, setBlocksVersionTracker] = useState(0);
   const [blockVersionHistory, setBlockVersionHistory] = useState([parse(defaultContentValue)]);
   const [noticeText, setNoticeText] = useState('');
+  const [showTextEditor, setShowTextEditor] = useState(true);
+
 
   // Header States
   const [altBodyContent, setAltBodyContent] = useState('');
@@ -384,28 +386,19 @@ export default ({ editorItem, history, ...rest }) => {
     setDisableTitle(disableSubTitle ? false : true )
   }
 
-  // let editorPanel;
-  // switch (editorMode) {
-  //   case "text":
-  //   editorPanel = (
-  //     <TextEditor
-  //       settings={window.Groundhogg.preloadSettings}
-  //       subject={subject}
-  //       handleSubjectChange={handleSubjectChange}
-  //       preHeader={preHeader}
-  //       handlePreHeaderChange={handlePreHeaderChange}
-  //       viewType={viewType}
-  //       handleUpdateBlocks={handleUpdateBlocks}
-  //       blocks={blocks}
-  //     />
-  //   );
-  //
-  //     break;
-  //   default:
-  //     editorPanel = (
-  //
-  //     );
-  // }
+  let textEditor = <div/>;
+  if(showTextEditor) {
+    textEditor = <TextEditor
+        settings={window.Groundhogg.preloadSettings}
+        subject={subject}
+        handleSubjectChange={handleSubjectChange}
+        preHeader={preHeader}
+        handlePreHeaderChange={handlePreHeaderChange}
+        viewType={viewType}
+        handleUpdateBlocks={handleUpdateBlocks}
+        blocks={blocks}
+      />
+  }
 
   let steps = <div/>
   if(editorType === 'funnel'){
@@ -449,6 +442,8 @@ export default ({ editorItem, history, ...rest }) => {
                   editorType={editorType}
                   handleDrop={handleDrop}
                 />
+
+                {textEditor}
 
                 <Sidebar handleDragStart={handleDragStart} handleDragEnd={handleDragEnd} sendTestEmail={sendTestEmail} handleViewTypeChange={handleViewTypeChange} handleSetFrom={handleSetFrom} handleSetReplyTo={handleSetReplyTo}  messageType={messageType} handleMessageType={handleMessageType} emailAlignment={emailAlignment} handleEmailAlignmentChange={handleEmailAlignmentChange} notes={notes} handleChangeNotes={handleChangeNotes}/>
                 <Popover.Slot />

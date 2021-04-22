@@ -1,5 +1,5 @@
 import {Fragment, render, useCallback, useEffect, useState} from '@wordpress/element'
-import {ListTable} from 'components/core-ui/list-table/new'
+import {ListTable} from 'components/core-ui/list-table/'
 import React from 'react'
 import TextField from "@material-ui/core/TextField";
 import Paper from "@material-ui/core/Paper";
