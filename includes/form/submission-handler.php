@@ -514,7 +514,7 @@ class Submission_Handler extends Supports_Errors {
 			$this->check_first_and_last()
 		];
 
-		return in_array( true, $checks );
+		return apply_filters( 'groundhogg/form/submission_handler/is_spam', in_array( true, $checks ) );
 	}
 
 	/**
