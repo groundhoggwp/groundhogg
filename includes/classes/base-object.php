@@ -45,7 +45,20 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		}
 
 		// Assume we are creating an object...
-		if ( is_array( $identifier_or_args ) ) {
+		if ( is_array( $identifier_or_args ) || is_object( $identifier_or_args ) ) {
+
+			if ( $primary = get_array_var( $identifier_or_args, $this->get_identifier_key() ) ){
+
+				$object = $this->get_from_db( $this->get_identifier_key(), $primary );
+
+				if ( ! $object || empty( $object ) || ! is_object( $object ) ) {
+					return false;
+				}
+
+				$this->setup_object( $object );
+
+				return;
+			}
 
 			$query = $this->get_db()->query( $identifier_or_args );
 

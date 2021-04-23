@@ -161,14 +161,19 @@ class Utils {
 	/**
 	 * @param      $id
 	 * @param bool $get_from_cache
-	 * @deprecated 2.1.14
 	 *
 	 * @return Sms
+	 * @deprecated 2.1.14
+	 *
 	 * @deprecated 2.1.14
 	 */
 	public function get_sms( $id, $get_from_cache = true ) {
 		return $this->get_object( $id, 'ID', 'sms', $get_from_cache );
 	}
+
+	static $secret_key = '';
+	static $secret_iv = '';
+	static $encrypt_method = "AES-256-CBC";
 
 	/**
 	 * Provides a quick way to instill a contact session and tie events to a particluar contact.
@@ -179,31 +184,41 @@ class Utils {
 	 * @return bool|string false if failur, the result and success.
 	 */
 	public function encrypt_decrypt( $string, $action = 'e' ) {
+
 		// you may change these values to your own
 		$encrypt_method = "AES-256-CBC";
 
-		if ( ! Plugin::$instance->settings->get_option( 'gh_secret_key', false ) ) {
-			update_option( 'gh_secret_key', bin2hex( openssl_random_pseudo_bytes( 32 ) ) );
+		if ( ! self::$secret_key ){
+
+			self::$secret_key = get_option( 'gh_secret_key', false );
+
+			if ( ! self::$secret_key ){
+				self::$secret_key = bin2hex( openssl_random_pseudo_bytes( 32 ) );
+				update_option( 'gh_secret_key', self::$secret_key );
+			}
 		}
 
-		if ( ! Plugin::$instance->settings->get_option( 'gh_secret_iv', false ) ) {
-			update_option( 'gh_secret_iv', bin2hex( openssl_random_pseudo_bytes( 16 ) ) );
+		if ( ! self::$secret_iv ){
+
+			self::$secret_iv = get_option( 'gh_secret_key', false );
+
+			if ( ! self::$secret_iv ){
+				self::$secret_iv = bin2hex( openssl_random_pseudo_bytes( 16 ) );
+				update_option( 'gh_secret_key', self::$secret_iv );
+			}
 		}
 
-		if ( in_array( $encrypt_method, openssl_get_cipher_methods() ) ) {
-
-			$secret_key = Plugin::$instance->settings->get_option( 'gh_secret_key' );
-			$secret_iv  = Plugin::$instance->settings->get_option( 'gh_secret_iv' );
+		if ( in_array( self::$encrypt_method, openssl_get_cipher_methods() ) ) {
 
 			//backwards compat
-			if ( ctype_xdigit( $secret_key ) ) {
-				$secret_key = hex2bin( $secret_key );
-				$secret_iv  = hex2bin( $secret_iv );
+			if ( ctype_xdigit( self::$secret_key ) ) {
+				self::$secret_key = hex2bin( self::$secret_key );
+				self::$secret_iv  = hex2bin( self::$secret_iv );
 			}
 
 			$output = false;
-			$key    = substr( hash( 'sha256', $secret_key ), 0, 32 );
-			$iv     = substr( hash( 'sha256', $secret_iv ), 0, 16 );
+			$key    = substr( hash( 'sha256', self::$secret_key ), 0, 32 );
+			$iv     = substr( hash( 'sha256', self::$secret_iv ), 0, 16 );
 
 			if ( $action == 'e' ) {
 				$output = base64_encode( openssl_encrypt( $string, $encrypt_method, $key, 0, $iv ) );
