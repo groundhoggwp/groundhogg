@@ -44,7 +44,7 @@ import SettingsInputAntennaSharpIcon from '@material-ui/icons/SettingsInputAnten
 import BuildIcon from '@material-ui/icons/Build';
 import {
 	Dashboard,
-	Reports,
+	// Reports,
 	Emails,
 	Tags,
 	Contacts,
@@ -66,14 +66,14 @@ const navSections = [
         path: '/',
         link: '/',
     	},
-      {
-        title: 'Reports',
-        component: Reports,
-        icon: BarChartIcon,
-        href: '/reports/:routeId',
-        path: '/reports/:routeId',
-        link: '/reports/:routeId'
-    	},
+      // {
+      //   title: 'Reports',
+      //   component: Reports,
+      //   icon: BarChartIcon,
+      //   href: '/reports/:routeId',
+      //   path: '/reports/:routeId',
+      //   link: '/reports/:routeId'
+    	// },
       {
         title: 'Broadcasts',
         component: Broadcasts,
