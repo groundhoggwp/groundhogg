@@ -17,7 +17,7 @@ function getModalStyle() {
 }
 
 const useStyles = makeStyles((theme) => ({
-  paper: {
+  root: {
     position: "absolute",
     width: 400,
     backgroundColor: theme.palette.background.paper,
@@ -27,16 +27,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ({ open }) {
+export default function ({ open, handleClose }) {
   const classes = useStyles();
   const [modalStyle] = React.useState(getModalStyle);
 
   const body = (
-    <div style={modalStyle} className={classes.paper}>
-      <h2 id="simple-modal-title">Go to send email as a broadcast screen</h2>
-      <p id="simple-modal-description">
-        Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-      </p>
+    <div style={modalStyle} className={classes.root}>
+      <a href="./admin.php?page=gh_broadcasts&action=add&type=email&email=5">
+        <h2 id="simple-modal-title">Go to send email as a broadcast screen</h2>
+        <p id="simple-modal-description">
+          Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
+        </p>
+      </a>
       <h2 id="simple-modal-title">See funnels reporting info</h2>
       <p id="simple-modal-description">
         Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
@@ -49,7 +51,7 @@ export default function ({ open }) {
   );
 
   return (
-    <div>
+    <div onClick={handleClose}>
       <Modal
         open={open}
         onClose={() => {}}

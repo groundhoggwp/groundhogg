@@ -52,7 +52,7 @@ import Sidebar from "./components/sidebar";
 import BlockEditor from "./components/block-editor";
 import TextEditor from "./components/text-editor";
 import EditorSteps from "./components/editor-steps";
-import SimpleModal from "./components/Modal";
+import Modal from "./components/Modal";
 import { getLuxonDate, matchEmailRegex } from "utils/index";
 import EditPen from "components/svg/EditPen/";
 
@@ -161,7 +161,7 @@ export default ({ editorItem, history, ...rest }) => {
     setOpen(true);
   };
 
-  const handleClose = () => {
+  const handleModalClose = () => {
     setOpen(false);
   };
 
@@ -420,7 +420,7 @@ export default ({ editorItem, history, ...rest }) => {
   return (
       <div className="Groundhogg-BlockEditor">
         {steps}
-        <SimpleModal open={open}/>
+        <Modal open={open} handleClose={handleModalClose}/>
 
         <FullscreenMode isActive={false} />
         <Notices text={noticeText}/>
