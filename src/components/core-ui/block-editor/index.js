@@ -284,9 +284,17 @@ export default ({ editorItem, history, ...rest }) => {
     }, 10);
   }
 
-  const handleDragEnd = (e, obj) => {
-    // This will get re-setup every time the component updates, need to kill it here
-    document.addEventListener("dragover", (e)=>{}, false)
+  const handleDragEnd = (e) => {
+    // Check that its over the droppable component, again onDrop is overwritten so this is the manual solution
+    if(document.querySelector('.block-editor-writing-flow').getBoundingClientRect().top > e.clientY){
+      return;
+    } else if(document.querySelector('.block-editor-writing-flow').getBoundingClientRect().bottom < e.clientY){
+      return;
+    } else if(document.querySelector('.block-editor-writing-flow').getBoundingClientRect().left > e.clientX){
+      return;
+    } else if(document.querySelector('.block-editor-writing-flow').getBoundingClientRect().right < e.clientX){
+      return;
+    }
 
     let upperBound = false;
     let lowerBound = false
@@ -303,17 +311,20 @@ export default ({ editorItem, history, ...rest }) => {
       }
     })
 
-    let newBlocks = []
+
     // For some reason the .splice version won't update the view, no idea why this is the case to a manual splice function is needed
+    let newBlocks = [];
     blockVersionHistory[blocksVersionTracker].forEach((block, i)=>{
       if(dragIndex === i){
         newBlocks.push(createBlock(dragNDropBlock))
       }
       newBlocks.push(block)
     })
-    handleUpdateBlocks(newBlocks, {}, false);
 
+    // Clear the block state
+    document.addEventListener("dragover", (e)=>{}, false)
     setDragNDropBlock('')
+    handleUpdateBlocks(newBlocks, {}, false);
   }
 
   document.addEventListener("dragover", (e)=>{

@@ -16,6 +16,7 @@ import {
   Checkbox,
   FormControlLabel,
   TextField,
+  Typography
 } from "@material-ui/core";
 
 /**
@@ -121,6 +122,9 @@ export default function ({
     clearFloat: {
       clear: "both",
     },
+    formControlLabel:{
+      fontSize: '11px'
+    }
   }));
 
   const classes = useStyles();
@@ -208,21 +212,21 @@ export default function ({
           <div>
             <FormControlLabel
               value="top"
-              control={<Checkbox color="primary" />}
-              label="Enable Browser View"
-              labelPlacement="start"
+              control={<Checkbox color="primary"/>}
+              label={<Typography className={classes.formControlLabel}>Enable Browser View</Typography>}
+              labelPlacement="end"
             />
             <FormControlLabel
               value="top"
               control={<Checkbox color="primary" />}
-              label="Save as template"
-              labelPlacement="start"
+              label={<Typography className={classes.formControlLabel}>Save as template</Typography>}
+              labelPlacement="end"
             />
             <FormControlLabel
               value="top"
               control={<Checkbox color="primary" />}
-              label="Plain Text Version"
-              labelPlacement="start"
+              label={<Typography className={classes.formControlLabel}>Plain Text Version</Typography>}
+              labelPlacement="end"
             />
           </div>
         }

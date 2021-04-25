@@ -173,9 +173,7 @@ const BlocksPanel = ({ blocks, handleDragStart, handleDragEnd }) => {
               onDrag={(e) => {
                 handleDragStart(block.name, e);
               }}
-              onDragEnd={(e) => {
-                handleDragEnd();
-              }}
+              onDragEnd={handleDragEnd}
             >
               <div className={classes.icon}>{icon}</div>
               <div className={classes.name}>{_.startCase(title)}</div>
