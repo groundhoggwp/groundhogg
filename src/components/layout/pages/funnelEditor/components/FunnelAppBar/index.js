@@ -5,6 +5,7 @@ import Toolbar from '@material-ui/core/Toolbar'
 import makeStyles from '@material-ui/core/styles/makeStyles'
 import Box from '@material-ui/core/Box'
 import Button from '@material-ui/core/Button'
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 
 import FunnelTitleEdit from '../FunnelTitleEdit'
 import FunnelStatus from '../FunnelStatus'
@@ -31,10 +32,13 @@ export default ({ funnel, width }) => {
     <div className={classes.appBar}>
       <AppBar style={{ top: 32, width: width }}>
         <Toolbar>
-          <Box display={'flex'} justifyContent={ 'space-between' } flexGrow={1}>
-            <Box flexGrow={2}>
+          <Box display={'flex'} flexGrow={1}>
+            <Box>
               <FunnelTitleEdit id={id} data={data}/>
             </Box>
+            <Button  variant="outlined">
+              <MoreHorizIcon/>
+            </Button>
             <Box display={ 'flex' }  flexGrow={1} justifyContent={ 'flex-end' }>
               <FunnelStatus id={id} data={data}/>
             </Box>
