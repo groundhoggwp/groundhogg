@@ -4,6 +4,6 @@ export { Emails } from './emails';
 export { Funnels } from './funnels'
 export { Settings } from './settings';
 export { Tags } from './tags';
-export { Reporting } from './reporting';
+// export { Reporting } from './reporting';
 export { Broadcasts } from './broadcasts';
 export { Tools } from './tools';
