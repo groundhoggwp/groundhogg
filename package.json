@@ -114,5 +114,11 @@
     "recharts": "^1.8.5",
     "typeface-montserrat": "^1.1.13",
     "uniqid": "5.2.0"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "useTabs": true,
+    "trailingComma": "all"
   }
 }
