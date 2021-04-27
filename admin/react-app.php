@@ -266,10 +266,24 @@ class React_App {
 		add_action( 'admin_head', function () {
 			?>
             <style>
+                body {
+                    height: auto;
+                    min-height: 100%;
+                }
+
+                #wpbody-content {
+                    min-height: 100vh;
+                    padding-bottom: 0;
+                }
+
                 .wrap {
                     margin: 0;
-                    min-height: 300vh;
+                    min-height: 100vh;
                 }
+                #gh-react-app-root {
+                    min-height: 100vh;
+                }
+
                 #wpcontent {
                     padding-left: 0 !important;
                 }
