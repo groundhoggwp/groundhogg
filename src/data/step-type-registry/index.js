@@ -1,48 +1,48 @@
-import { dispatch, registerStore, select } from '@wordpress/data'
+import { dispatch, registerStore, select } from "@wordpress/data";
 
-export const STEP_TYPES_STORE_NAME = 'gh/stepTypes'
+export const STEP_TYPES_STORE_NAME = "gh/stepTypes";
 
 const DEFAULT_STATE = {
-  types: {}
-}
+  types: {},
+};
 
 const actions = {
-  addType (stepType, atts) {
+  addType(stepType, atts) {
     return {
-      type: 'ADD_TYPE',
+      type: "ADD_TYPE",
       stepType,
-      atts
-    }
-  }
-}
+      atts,
+    };
+  },
+};
 
 registerStore(STEP_TYPES_STORE_NAME, {
-  reducer (state = DEFAULT_STATE, { type, stepType, atts }) {
+  reducer(state = DEFAULT_STATE, { type, stepType, atts }) {
     switch (type) {
-      case 'ADD_TYPE':
+      case "ADD_TYPE":
         return {
           ...state,
           types: {
             ...state.types,
-            [stepType]: atts
-          }
-        }
+            [stepType]: atts,
+          },
+        };
     }
 
-    return state
+    return state;
   },
 
   actions,
 
   selectors: {
-    getType (state, type) {
+    getType(state, type) {
       return state.types[type];
     },
 
-    getGroup (state, group) {
-      return Object.values( state.types ).filter( type => type.group === group );
-    }
-  }
+    getGroup(state, group) {
+      return Object.values(state.types).filter((type) => type.group === group);
+    },
+  },
 });
 
 /**
@@ -51,9 +51,9 @@ registerStore(STEP_TYPES_STORE_NAME, {
  * @param type
  * @param atts
  */
-export function registerStepType ( type, atts ) {
+export function registerStepType(type, atts) {
   atts.type = type;
-  dispatch( STEP_TYPES_STORE_NAME ).addType( type, atts )
+  dispatch(STEP_TYPES_STORE_NAME).addType(type, atts);
 }
 
 /**
@@ -61,15 +61,15 @@ export function registerStepType ( type, atts ) {
  * @param type
  * @returns {{StepFlow: (boolean|(function({data: *, meta: *, read: *}): *)|STEP_DEFAULTS.flow|(function({data: *, meta: *, icon: *, read: *}): *)|BENCHMARK_TYPE_DEFAULTS.flow|(function({data: *, meta: *, read: *}): *)|*), StepRead: *, StepEdit: *}}
  */
-export function useStepType ( type ) {
-  let StepType = getStepType( type )
+export function useStepType(type) {
+  let StepType = getStepType(type);
 
   return {
     StepEdit: StepType.edit,
     StepRead: StepType.read,
     StepFlow: StepType.flow,
-    StepIcon: StepType.icon
-  }
+    StepIcon: StepType.icon,
+  };
 }
 
 /**
@@ -78,15 +78,14 @@ export function useStepType ( type ) {
  * @param type
  * @returns {*|string}
  */
-export function getStepType ( type ) {
-
+export function getStepType(type) {
   let StepType = select(STEP_TYPES_STORE_NAME).getType(type);
 
-  if ( ! StepType ){
-    StepType = select(STEP_TYPES_STORE_NAME).getType('error');
+  if (!StepType) {
+    StepType = select(STEP_TYPES_STORE_NAME).getType("error");
   }
 
-  return StepType
+  return StepType;
 }
 
 /**
@@ -94,8 +93,8 @@ export function getStepType ( type ) {
  * @param group
  * @returns {*}
  */
-export function getStepGroup ( group ) {
-  return select(STEP_TYPES_STORE_NAME).getGroup(group)
+export function getStepGroup(group) {
+  return select(STEP_TYPES_STORE_NAME).getGroup(group);
 }
 
 /**
@@ -103,6 +102,6 @@ export function getStepGroup ( group ) {
  * @param group
  * @returns {*}
  */
-export function getAllSteps ( group ) {
-  return select(STEP_TYPES_STORE_NAME).getGroup(group)
+export function getAllSteps(group) {
+  return select(STEP_TYPES_STORE_NAME).getGroup(group);
 }
