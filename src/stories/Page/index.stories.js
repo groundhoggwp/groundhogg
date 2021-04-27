@@ -11,11 +11,11 @@ export default {
 const Template = (args) => <Page {...args} />;
 
 export const LoggedIn = Template.bind({});
-LoggedIn.args = {
-  ...HeaderStories.LoggedIn.args,
-};
-
+// PageStory.args = {
+//   ...HeaderStories.PageStory.args,
+// };
+//
 export const LoggedOut = Template.bind({});
-LoggedOut.args = {
-  ...HeaderStories.LoggedOut.args,
-};
+// LoggedOut.args = {
+//   ...HeaderStories.LoggedOut.args,
+// };
