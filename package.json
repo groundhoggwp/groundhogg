@@ -28,10 +28,14 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "@storybook/addon-actions": "^6.2.8",
-    "@storybook/addon-essentials": "^6.2.8",
-    "@storybook/addon-links": "^6.2.8",
-    "@storybook/react": "^6.2.8",
+    "@babel/core": "^7.13.16",
+    "@babel/preset-env": "^7.13.15",
+    "@storybook/addon-actions": "^6.2.9",
+    "@storybook/addon-essentials": "^6.2.9",
+    "@storybook/addon-links": "^6.2.9",
+    "@storybook/node-logger": "^6.2.9",
+    "@storybook/preset-create-react-app": "^3.1.7",
+    "@storybook/react": "^6.2.9",
     "@wordpress/babel-preset-default": "^4.17.0",
     "@wordpress/env": "^2.0.0",
     "@wordpress/eslint-plugin": "^7.2.0",
@@ -39,7 +43,7 @@
     "autoprefixer": "^9.8.6",
     "babel-core": "^6.26.3",
     "babel-eslint": "^10.1.0",
-    "babel-loader": "^8.1.0",
+    "babel-loader": "^8.2.2",
     "classnames": "^2.2.6",
     "clsx": "latest",
     "cross-env": "^7.0.2",
@@ -56,7 +60,7 @@
     "raw-loader": "^4.0.1",
     "sass-loader": "^10.0.2",
     "style-loader": "^1.2.1",
-    "webpack": "^4.44.1",
+    "webpack": "^4.46.0",
     "webpack-cli": "^3.3.12"
   },
   "dependencies": {
@@ -107,6 +111,7 @@
     "react-perfect-scrollbar": "^1.5.8",
     "react-redux": "^7.2.2",
     "react-router-dom": "5.1.2",
+    "react-scripts": "^4.0.3",
     "react-select": "^3.1.0",
     "react-transition-group": "4.3.0",
     "react-virtuoso": "^1.1.2",
@@ -115,10 +120,16 @@
     "typeface-montserrat": "^1.1.13",
     "uniqid": "5.2.0"
   },
-  "prettier": {
-    "printWidth": 100,
-    "singleQuote": true,
-    "useTabs": true,
-    "trailingComma": "all"
+  "eslintConfig": {
+    "overrides": [
+      {
+        "files": [
+          "**/*.stories.*"
+        ],
+        "rules": {
+          "import/no-anonymous-default-export": "off"
+        }
+      }
+    ]
   }
 }
