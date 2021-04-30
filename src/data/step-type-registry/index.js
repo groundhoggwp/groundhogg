@@ -69,6 +69,7 @@ export function useStepType(type) {
     StepRead: StepType.read,
     StepFlow: StepType.flow,
     StepIcon: StepType.icon,
+    StepName: StepType.name,
   };
 }
 

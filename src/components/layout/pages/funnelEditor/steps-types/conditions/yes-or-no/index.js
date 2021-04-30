@@ -53,7 +53,7 @@ const stepAtts = {
     return <></>;
   },
 
-  flow: ({ icon, read }) => {
+  flow: ({ icon, name, read }) => {
     const classes = useStyles();
 
     return (

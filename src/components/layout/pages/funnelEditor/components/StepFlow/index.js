@@ -69,14 +69,16 @@ const MainPath = ({ steps, edges }) => {
   return (
     <>
       {stepPath.map((step) => {
-        const { StepIcon, StepRead, StepFlow } = useStepType(
+        const { StepIcon, StepRead, StepFlow, StepName } = useStepType(
           step.data.step_type
         );
 
         return (
-          <div className={"step-block"}>
-            <StepFlow icon={StepIcon} read={<StepRead {...step} />} />
-          </div>
+          <StepFlow
+            icon={StepIcon}
+            name={StepName}
+            read={<StepRead {...step} />}
+          />
         );
       })}
     </>
@@ -94,14 +96,16 @@ const BranchPath = ({ steps, edges }) => {
     <>
       {"Branch..."}
       {stepPath.map((step) => {
-        const { StepIcon, StepRead, StepFlow } = useStepType(
+        const { StepIcon, StepRead, StepFlow, StepName } = useStepType(
           step.data.step_type
         );
 
         return (
-          <div className={"step-block"}>
-            <StepFlow icon={<StepIcon />} read={<StepRead {...step} />} />
-          </div>
+          <StepFlow
+            icon={<StepIcon />}
+            name={StepName}
+            read={<StepRead {...step} />}
+          />
         );
       })}
     </>
