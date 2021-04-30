@@ -102,7 +102,7 @@ abstract class DB {
 		 * Filter the table name...
 		 *
 		 * @param string $table_name
-		 * @param DB $db
+		 * @param DB     $db
 		 */
 		$this->table_name = apply_filters( 'groundhogg/db/render_table_name', $table_name, $this );
 	}
@@ -281,7 +281,7 @@ abstract class DB {
 	/**
 	 * Create a where clause given an array
 	 *
-	 * @param array $args
+	 * @param array  $args
 	 * @param string $operator
 	 *
 	 * @return string
@@ -539,7 +539,7 @@ abstract class DB {
 	 * Get the results from the cache
 	 *
 	 * @param $cache_key string
-	 * @param $found bool if a result was found
+	 * @param $found     bool if a result was found
 	 *
 	 * @return false|mixed
 	 */
@@ -601,14 +601,14 @@ abstract class DB {
 	/**
 	 * Clears the cache group
 	 */
-	public function clear_cache(){
+	public function clear_cache() {
 		unset( self::$cache[ $this->get_cache_group() ] );
 	}
 
 	/**
 	 * Clears the whole cache, all groups and keys
 	 */
-	public static function clear_whole_cache(){
+	public static function clear_whole_cache() {
 		self::$cache = [];
 	}
 
@@ -632,9 +632,9 @@ abstract class DB {
 
 		global $wpdb;
 
-		if ( is_numeric( $row_id ) && ! empty( $row_id ) ) {
-			$where = [ $this->get_primary_key() => absint( $row_id ) ];
-		} else if ( is_array( $row_id ) ){
+		if ( is_string( $row_id ) || is_numeric( $row_id ) ) {
+			$where = [ $this->get_primary_key() => $row_id ];
+		} else if ( is_array( $row_id ) ) {
 			$where = $row_id;
 		}
 
@@ -748,7 +748,7 @@ abstract class DB {
 
 		global $wpdb;
 
-		if ( is_numeric( $where ) || is_int( $where ) ){
+		if ( is_numeric( $where ) || is_int( $where ) ) {
 			$where = [
 				$this->primary_key => absint( $where )
 			];
@@ -765,7 +765,7 @@ abstract class DB {
 		$data_keys      = array_keys( $where );
 		$column_formats = array_merge( array_flip( $data_keys ), $column_formats );
 
-		do_action( 'groundhogg/db/pre_delete/' . $this->get_object_type(), $where );
+		do_action( 'groundhogg/db/pre_delete/' . $this->get_object_type(), $where, $column_formats, $this );
 
 		if ( false === $wpdb->delete( $this->table_name, $where, $column_formats ) ) {
 			return false;
@@ -773,7 +773,7 @@ abstract class DB {
 
 		$this->cache_set_last_changed();
 
-		do_action( 'groundhogg/db/post_delete/' . $this->get_object_type(), $where );
+		do_action( 'groundhogg/db/post_delete/' . $this->get_object_type(), $where, $column_formats, $this );
 
 		return true;
 	}
@@ -808,9 +808,9 @@ abstract class DB {
 	}
 
 	/**
-	 * @param array $data
+	 * @param array        $data
 	 * @param string|false $ORDER_BY
-	 * @param bool $from_cache
+	 * @param bool         $from_cache
 	 *
 	 * @return array|bool|null|object
 	 */
@@ -882,7 +882,7 @@ abstract class DB {
 					break;
 				default:
 					if ( in_array( $key, $this->get_allowed_columns() ) ) {
-						if ( is_array( $val ) && array_key_exists( 'compare', $val ) && array_key_exists( 'val', $val ) ){
+						if ( is_array( $val ) && array_key_exists( 'compare', $val ) && array_key_exists( 'val', $val ) ) {
 							$where[] = [ 'col' => $key, 'val' => $val['val'], 'compare' => $val['compare'] ];
 						} else {
 							$where[] = [ 'col' => $key, 'val' => $val, 'compare' => '=' ];
@@ -906,7 +906,7 @@ abstract class DB {
 	 * New and improved query function to access DB in more complex and interesting ways.
 	 *
 	 * @param array $query_vars
-	 * @param bool $from_cache
+	 * @param bool  $from_cache
 	 *
 	 * @return object[]|array[]|int
 	 */
@@ -1283,5 +1283,12 @@ abstract class DB {
 	 * Create the DB
 	 */
 	abstract public function create_table();
+
+	/**
+	 * Delete orphaned meta
+	 */
+	public function delete_orphaned_meta(){
+		do_action( 'groundhogg/db/delete_orphaned_meta/' . $this->get_object_type(), $this );
+	}
 
 }
