@@ -5,6 +5,7 @@ namespace Groundhogg\Form;
 use function Groundhogg\after_form_submit_handler;
 use function Groundhogg\blacklist_check;
 use Groundhogg\Contact;
+use function Groundhogg\contact_and_user_match;
 use function Groundhogg\decrypt;
 use function Groundhogg\do_replacements;
 use function Groundhogg\doing_rest;
@@ -310,15 +311,15 @@ class Submission_Handler extends Supports_Errors {
 			return $this->add_error( 'no_record', __( 'Unable to create contact record.', 'groundhogg' ) );
 		}
 
-		if ( get_post_var( 'marketing_consent' ) ){
+		if ( get_post_var( 'marketing_consent' ) ) {
 			$contact->set_marketing_consent();
 		}
 
-		if ( get_post_var( 'gdpr_consent' ) ){
+		if ( get_post_var( 'gdpr_consent' ) ) {
 			$contact->set_gdpr_consent();
 		}
 
-		if ( get_post_var( 'terms_agreement' ) ){
+		if ( get_post_var( 'terms_agreement' ) ) {
 			$contact->set_terms_agreement();
 		}
 
@@ -350,13 +351,23 @@ class Submission_Handler extends Supports_Errors {
 		// Apply the tags
 		$contact->add_tag( $tags );
 
-		// No need for this if is in the admin
-		if ( ! $this->is_admin_submission() ) {
+		// Update the owner ID when the admin is creating the contact record
+		if ( $this->is_admin_submission() ) {
 
 			// Set the owner to the current user who added the contact
 			$contact->update( [
 				'owner_id' => get_current_user_id()
 			] );
+
+		// User and contact are the same person, link them
+		} else if ( is_user_logged_in() && contact_and_user_match( $contact ) ) {
+
+			$contact->update( [
+				'user_id' => get_current_user_id()
+			] );
+
+			after_form_submit_handler( $contact );
+		} else {
 
 			after_form_submit_handler( $contact );
 		}
@@ -373,8 +384,8 @@ class Submission_Handler extends Supports_Errors {
 			 * After a successful submission.
 			 *
 			 * @param $submission Submission
-			 * @param $contact Contact
-			 * @param $this Submission_Handler
+			 * @param $contact    Contact
+			 * @param $this       Submission_Handler
 			 */
 			do_action( 'groundhogg/form/submission_handler/after', $submission, $contact, $this );
 
@@ -521,7 +532,7 @@ class Submission_Handler extends Supports_Errors {
 	 * Check to see if the first and last match known spam filters.
 	 *
 	 * @param $first string
-	 * @param $last string
+	 * @param $last  string
 	 *
 	 * @return bool true if spam, false otherwise.
 	 */
