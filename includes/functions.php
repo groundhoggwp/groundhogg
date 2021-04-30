@@ -4377,10 +4377,12 @@ function is_ignore_user_tracking_precedence_enabled() {
  *
  * @return bool
  */
-function contact_and_user_match( $contact, $user ) {
+function contact_and_user_match( $contact=false, $user=false ) {
 
 	if ( is_int( $contact ) ) {
 		$contact = get_contactdata( $contact );
+	} else if ( ! $contact ){
+		$contact = get_contactdata();
 	}
 
 	if ( ! is_a_contact( $contact ) ) {
@@ -4389,6 +4391,8 @@ function contact_and_user_match( $contact, $user ) {
 
 	if ( is_int( $user ) ) {
 		$user = get_userdata( $user );
+	} else if ( ! $user ){
+		$$user = wp_get_current_user();
 	}
 
 	if ( ! is_a_user( $user ) ) {
