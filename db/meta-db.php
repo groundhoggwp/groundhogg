@@ -351,9 +351,9 @@ abstract class Meta_DB extends DB {
 
 		global $wpdb;
 
-		$object_query = "SELECT objects.{$object_table->primary_key} FROM {$object_table->table_name} as objects";
+		$object_query = "SELECT {$object_table->primary_key} FROM {$object_table->table_name}";
 
-		$wpdb->query( "DELETE FROM {$this->table_name} as meta WHERE meta.{$this->get_object_id_col()} NOT IN ( $object_query )" );
+		$wpdb->query( "DELETE FROM {$this->table_name} WHERE {$this->get_object_id_col()} NOT IN ( $object_query )" );
 
 		$this->cache_set_last_changed();
 	}
