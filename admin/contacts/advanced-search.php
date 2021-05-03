@@ -8,6 +8,17 @@ use function Groundhogg\get_db;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 
+$string_comparisons = [
+	''            => __( 'Compare', 'groundhogg' ),
+	'equals'      => __( 'Equals', 'groundhogg' ),
+	'contains'    => __( 'Contains', 'groundhogg' ),
+	'starts_with' => __( 'Starts with', 'groundhogg' ),
+	'ends_with'   => __( 'Ends with', 'groundhogg' ),
+	'empty'       => __( 'Empty', 'groundhogg' ),
+	'not_empty'   => __( 'Not empty', 'groundhogg' ),
+	'regex'       => __( 'Regex', 'groundhogg' ),
+];
+
 ?>
 <div id="search-filters" class="postbox <?php echo ( get_url_var( 'is_searching' ) ) ? '' : 'hidden'; ?>">
 	<form method="get">
@@ -29,15 +40,9 @@ use function Groundhogg\html;
 				echo html()->dropdown( [
 					'name'        => 'first_name_compare',
 					'class'       => 'first-name-compare',
-					'options'     => [
-						'equals'      => __( 'Equals', 'groundhogg' ),
-						'contains'    => __( 'Contains', 'groundhogg' ),
-						'starts_with' => __( 'Starts with', 'groundhogg' ),
-						'ends_with'   => __( 'Ends with', 'groundhogg' ),
-					],
+					'options'     => $string_comparisons,
 					'selected'    => sanitize_text_field( get_url_var( 'first_name_compare' ) ),
 					'option_none' => false,
-					'id'          => '',
 				] );
 				?></p>
 			<p><?php
@@ -61,15 +66,9 @@ use function Groundhogg\html;
 				echo html()->dropdown( [
 					'name'        => 'last_name_compare',
 					'class'       => 'last-name-compare',
-					'options'     => [
-						'equals'      => __( 'Equals', 'groundhogg' ),
-						'contains'    => __( 'Contains', 'groundhogg' ),
-						'starts_with' => __( 'Starts with', 'groundhogg' ),
-						'ends_with'   => __( 'Ends with', 'groundhogg' ),
-					],
+					'options'     => $string_comparisons,
 					'selected'    => sanitize_text_field( get_url_var( 'last_name_compare' ) ),
 					'option_none' => false,
-					'id'          => '',
 				] );
 				?></p>
 			<p><?php
@@ -91,15 +90,9 @@ use function Groundhogg\html;
 				echo html()->dropdown( [
 					'name'        => 'email_compare',
 					'class'       => 'email-compare',
-					'options'     => [
-						'equals'      => __( 'Equals', 'groundhogg' ),
-						'contains'    => __( 'Contains', 'groundhogg' ),
-						'starts_with' => __( 'Starts with', 'groundhogg' ),
-						'ends_with'   => __( 'Ends with', 'groundhogg' ),
-					],
+					'options'     => $string_comparisons,
 					'selected'    => sanitize_text_field( get_url_var( 'email_compare' ) ),
 					'option_none' => false,
-					'id'          => '',
 				] );
 				?></p>
 			<p><?php

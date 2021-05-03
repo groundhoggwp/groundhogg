@@ -191,12 +191,12 @@ class Contact_Query {
 	 *
 	 * @access public
 	 *
-	 * @param string|array $query {
+	 * @param string|array $query          {
 	 *                                     Optional. Array or query string of contact query parameters. Default empty.
 	 *
-	 * @type int $number Maximum number of contacts to retrieve. Default 20.
-	 * @type int $offset Number of contacts to offset the query. Default 0.
-	 * @type string|array $orderby Customer status or array of statuses. To use 'meta_value'
+	 * @type int           $number         Maximum number of contacts to retrieve. Default 20.
+	 * @type int           $offset         Number of contacts to offset the query. Default 0.
+	 * @type string|array  $orderby        Customer status or array of statuses. To use 'meta_value'
 	 *                                        or 'meta_value_num', `$meta_key` must also be provided.
 	 *                                        To sort by a specific `$meta_query` clause, use that
 	 *                                        clause's array key. Accepts 'ID', 'user_id', 'first_name',
@@ -205,33 +205,33 @@ class Contact_Query {
 	 *                                        the value of `$meta_key`, and the array keys of `$meta_query`.
 	 *                                        Also accepts false, an empty array, or 'none' to disable the
 	 *                                        `ORDER BY` clause. Default 'ID'.
-	 * @type string $order How to order retrieved contacts. Accepts 'ASC', 'DESC'.
+	 * @type string        $order          How to order retrieved contacts. Accepts 'ASC', 'DESC'.
 	 *                                        Default 'DESC'.
-	 * @type string|array $include String or array of contact IDs to include. Default empty.
-	 * @type string|array $exclude String or array of contact IDs to exclude. Default empty.
-	 * @type string|array $users_include String or array of contact user IDs to include. Default
+	 * @type string|array  $include        String or array of contact IDs to include. Default empty.
+	 * @type string|array  $exclude        String or array of contact IDs to exclude. Default empty.
+	 * @type string|array  $users_include  String or array of contact user IDs to include. Default
 	 *                                        empty.
-	 * @type string|array $users_exclude String or array of contact user IDs to exclude. Default
+	 * @type string|array  $users_exclude  String or array of contact user IDs to exclude. Default
 	 *                                        empty.
-	 * @type string|array $tags_include String or array of tags the contact should have
-	 * @type string|array $tags_exclude String or array of tags the contact should not have
-	 * @type string|array $email Limit results to those contacts affiliated with one of
+	 * @type string|array  $tags_include   String or array of tags the contact should have
+	 * @type string|array  $tags_exclude   String or array of tags the contact should not have
+	 * @type string|array  $email          Limit results to those contacts affiliated with one of
 	 *                                        the given emails. Default empty.
-	 * @type string|array $report array of args for an activity report.
-	 * @type string $search Search term(s) to retrieve matching contacts for. Searches
+	 * @type string|array  $report         array of args for an activity report.
+	 * @type string        $search         Search term(s) to retrieve matching contacts for. Searches
 	 *                                        through contact names. Default empty.
-	 * @type string|array $search_columns Columns to search using the value of `$search`. Default 'first_name'.
-	 * @type string $meta_key Include contacts with a matching contact meta key.
+	 * @type string|array  $search_columns Columns to search using the value of `$search`. Default 'first_name'.
+	 * @type string        $meta_key       Include contacts with a matching contact meta key.
 	 *                                        Default empty.
-	 * @type string $meta_value Include contacts with a matching contact meta value.
+	 * @type string        $meta_value     Include contacts with a matching contact meta value.
 	 *                                        Requires `$meta_key` to be set. Default empty.
-	 * @type array $meta_query Meta query clauses to limit retrieved contacts by.
+	 * @type array         $meta_query     Meta query clauses to limit retrieved contacts by.
 	 *                                        See `WP_Meta_Query`. Default empty.
-	 * @type array $date_query Date query clauses to limit retrieved contacts by.
+	 * @type array         $date_query     Date query clauses to limit retrieved contacts by.
 	 *                                        See `WP_Date_Query`. Default empty.
-	 * @type bool $count Whether to return a count (true) instead of an array of
+	 * @type bool          $count          Whether to return a count (true) instead of an array of
 	 *                                        contact objects. Default false.
-	 * @type bool $no_found_rows Whether to disable the `SQL_CALC_FOUND_ROWS` query.
+	 * @type bool          $no_found_rows  Whether to disable the `SQL_CALC_FOUND_ROWS` query.
 	 *                                        Default true.
 	 * }
 	 * @since  2.8
@@ -567,8 +567,8 @@ class Contact_Query {
 		 * Filter the sql clauses before they are used in building the request.
 		 *
 		 * @param $sql_clauses array
-		 * @param $query_vars array
-		 * @param $query Contact_Query
+		 * @param $query_vars  array
+		 * @param $query       Contact_Query
 		 */
 		$this->sql_clauses = apply_filters( 'groundhogg/contact_query/query_items/sql_clauses', $this->sql_clauses, $this->query_vars, $this );
 
@@ -594,8 +594,8 @@ class Contact_Query {
 			/**
 			 * Filters the query used to retrieve the count of found contacts.
 			 *
-			 * @param Contact_Query $contact_query The `WPGH_Contact_Query` instance.
-			 * @param string $found_contacts_query SQL query. Default 'SELECT FOUND_ROWS()'.
+			 * @param Contact_Query $contact_query        The `WPGH_Contact_Query` instance.
+			 * @param string        $found_contacts_query SQL query. Default 'SELECT FOUND_ROWS()'.
 			 *
 			 * @since 2.8
 			 *
@@ -715,11 +715,6 @@ class Contact_Query {
 			$where['owner'] = "$this->table_name.owner_id IN ( {$this->query_vars['owner']} )";
 		}
 
-		if ( strlen( $this->query_vars['email'] ) ) {
-			$search_email   = $this->compare_string( $this->query_vars['email'], $this->query_vars['email_compare'] );
-			$where['email'] = $this->get_search_sql( $search_email, array( 'email' ) );
-		}
-
 		if ( $this->query_vars['report'] && is_array( $this->query_vars['report'] ) ) {
 
 			$map = [
@@ -835,15 +830,27 @@ class Contact_Query {
 			$where['search'] = $this->get_search_sql( $this->query_vars['search'], $search_columns );
 		}
 
-		if ( strlen( $this->query_vars['first_name'] ) ) {
+		if ( strlen( $this->query_vars['first_name'] ) || strlen( $this->query_vars['first_name_compare'] ) ) {
 
-			$search_first        = $this->compare_string( $this->query_vars['first_name'], $this->query_vars['first_name_compare'] );
-			$where['first_name'] = $this->get_search_sql( $search_first, array( 'first_name' ) );
+			$where['first_name'] = self::generic_text_filter_compare( [
+				'value'   => $this->query_vars['first_name'],
+				'compare' => $this->query_vars['first_name_compare'],
+			], "{$this->table_name}.first_name" );
 		}
 
-		if ( strlen( $this->query_vars['last_name'] ) ) {
-			$search_last        = $this->compare_string( $this->query_vars['last_name'], $this->query_vars['last_name_compare'] );
-			$where['last_name'] = $this->get_search_sql( $search_last, array( 'last_name' ) );
+		if ( strlen( $this->query_vars['last_name'] ) || strlen( $this->query_vars['last_name_compare'] ) ) {
+
+			$where['last_name'] = self::generic_text_filter_compare( [
+				'value'   => $this->query_vars['last_name'],
+				'compare' => $this->query_vars['last_name_compare'],
+			], "{$this->table_name}.last_name" );
+		}
+
+		if ( strlen( $this->query_vars['email'] ) || strlen( $this->query_vars['email_compare'] ) ) {
+			$where['email'] = self::generic_text_filter_compare( [
+				'value'   => $this->query_vars['email'],
+				'compare' => $this->query_vars['email_compare'],
+			], "{$this->table_name}.email" );
 		}
 
 
@@ -955,13 +962,13 @@ class Contact_Query {
 	 *
 	 * @access protected
 	 *
-	 * @param array $columns Columns to search.
-	 * @param string $string Search string.
+	 * @param array  $columns Columns to search.
+	 * @param string $string  Search string.
 	 *
 	 * @return string Search SQL.
 	 * @since  2.8
 	 *
-	 * @global \wpdb $wpdb WordPress database abstraction object.
+	 * @global \wpdb $wpdb    WordPress database abstraction object.
 	 *
 	 */
 	protected function get_search_sql( $string, $columns ) {
@@ -1163,7 +1170,7 @@ class Contact_Query {
 	/**
 	 * Register a filter callback which will return an SQL statement
 	 *
-	 * @param string $type
+	 * @param string   $type
 	 * @param callable $filter_callback
 	 *
 	 * @return bool
@@ -1206,7 +1213,7 @@ class Contact_Query {
 	 * Generic filter for text comparison
 	 *
 	 * @param $filter_vars array
-	 * @param $column_key string
+	 * @param $column_key  string
 	 *
 	 * @return string
 	 */
@@ -1223,21 +1230,23 @@ class Contact_Query {
 		switch ( $filter_vars['compare'] ) {
 			default:
 			case 'equals':
-				return sprintf( "`%s` = '%s'", $column_key, $value );
+				return sprintf( "%s = '%s'", $column_key, $value );
 			case 'not_equals':
-				return sprintf( "`%s` != '%s'", $column_key, $value );
+				return sprintf( "%s != '%s'", $column_key, $value );
 			case 'contains':
-				return sprintf( "`%s` RLIKE '%s'", $column_key, $value );
+				return sprintf( "%s RLIKE '%s'", $column_key, $value );
 			case 'not_contains':
-				return sprintf( "`%s` NOT RLIKE '%s'", $column_key, $value );
+				return sprintf( "%s NOT RLIKE '%s'", $column_key, $value );
 			case 'begins_with':
-				return sprintf( "`%s` LIKE '%s'", $column_key, $wpdb->esc_like( $value ) . '%s' );
+				return sprintf( "%s LIKE '%s'", $column_key, $wpdb->esc_like( $value ) . '%s' );
 			case 'ends_with':
-				return sprintf( "`%s` LIKE '%s'", $column_key, '%' . $wpdb->esc_like( $value ) );
-			case 'is_empty':
-				return sprintf( "`%s` = ''", $column_key );
+				return sprintf( "%s LIKE '%s'", $column_key, '%' . $wpdb->esc_like( $value ) );
+			case 'empty':
+				return sprintf( "%s = ''", $column_key );
 			case 'not_empty':
-				return sprintf( "`%s` != ''", $column_key );
+				return sprintf( "%s != ''", $column_key );
+			case 'regex':
+				return sprintf( "%s REGEXP BINARY '%s'", $column_key, $value );
 		}
 	}
 
@@ -1245,7 +1254,7 @@ class Contact_Query {
 	 * Generic filter for text comparison
 	 *
 	 * @param $filter_vars array
-	 * @param $column_key string
+	 * @param $column_key  string
 	 *
 	 * @return string
 	 */

@@ -343,7 +343,7 @@ function get_post_var( $key = '', $default = false ) {
  * @return mixed
  */
 function get_url_var( $key = '', $default = false ) {
-	return urldecode_deep( get_array_var( $_GET, $key, $default ) );
+	return wp_unslash( urldecode_deep( get_array_var( $_GET, $key, $default ) ) );
 }
 
 /**
