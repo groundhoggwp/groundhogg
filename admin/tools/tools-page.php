@@ -198,6 +198,11 @@ class Tools_Page extends Tabbed_Admin_Page {
 				'slug' => 'cron',
 				'cap'  => 'manage_options'
 			],
+			[
+				'name' => __( 'Misc', 'groundhogg' ),
+				'slug' => 'misc',
+				'cap'  => 'manage_options'
+			],
 		];
 
 		// If old customer updating to new version.
@@ -1253,5 +1258,11 @@ class Tools_Page extends Tabbed_Admin_Page {
 		return false;
 	}
 
+	/**
+	 * Misc view
+	 */
+	public function misc_view(){
+		include __DIR__ . '/misc.php';
+	}
 
 }
