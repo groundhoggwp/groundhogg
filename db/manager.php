@@ -178,4 +178,33 @@ class Manager {
 		$this->dbs[ $key ] = $value;
 	}
 
+	public function get_object_db_by_object_type( $type ) {
+
+		$dbs = array_filter( $this->dbs, function ( $db ) use ($type){
+			return $db->get_object_type() === $type && ! method_exists( $db, 'add_meta' );
+		} );
+
+		return array_shift( $dbs );
+	}
+
+	public function get_meta_db_by_object_type( $type ) {
+
+		$dbs = array_filter( $this->dbs, function ( $db ) use ($type){
+			return $db->get_object_type() === $type && method_exists( $db, 'add_meta' );
+		} );
+
+		return array_shift( $dbs );
+	}
+
+	public function get_all_meta_tables(){
+		return array_filter( $this->dbs, function ( $db ){
+			return method_exists( $db, 'add_meta' );
+		} );
+	}
+
+	public function get_all_object_tables(){
+		return array_filter( $this->dbs, function ( $db ){
+			return ! method_exists( $db, 'add_meta' );
+		} );
+	}
 }
