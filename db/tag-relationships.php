@@ -2,6 +2,8 @@
 
 namespace Groundhogg\DB;
 
+use function Groundhogg\get_db;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -60,8 +62,8 @@ class Tag_Relationships extends DB {
 	 * Clean up after tag/contact is deleted.
 	 */
 	protected function add_additional_actions() {
-		add_action( 'groundhogg/db/post_delete/contact', [ $this, 'contact_deleted' ] );
-		add_action( 'groundhogg/db/post_delete/tag', [ $this, 'tag_deleted' ] );
+		add_action( 'groundhogg/db/post_delete/contact', [ $this, 'contact_deleted' ], 10, 3 );
+		add_action( 'groundhogg/db/post_delete/tag', [ $this, 'tag_deleted' ], 10, 3 );
 		parent::add_additional_actions();
 	}
 
@@ -120,8 +122,13 @@ class Tag_Relationships extends DB {
 	 *
 	 * @return bool
 	 */
-	public function tag_deleted( $tag_id ) {
-		return $this->delete( [ 'tag_id' => $tag_id ] );
+	public function tag_deleted( $where, $formats, $table ) {
+
+		if ( is_numeric( $where ) ) {
+			return $this->delete( [ 'tag_id' => $where ] );
+		}
+
+		return false;
 	}
 
 	/**
@@ -131,18 +138,21 @@ class Tag_Relationships extends DB {
 	 *
 	 * @return bool
 	 */
-	public function contact_deleted( $contact_id ) {
+	public function contact_deleted( $where, $formats, $table ) {
+		if ( is_numeric( $where ) ) {
 
-		$tags = $this->get_tags_by_contact( $contact_id );
+			$tags = $this->get_tags_by_contact( $where );
 
-		if ( empty( $tags ) ) {
-			return false;
+			if ( empty( $tags ) ) {
+				return false;
+			}
+
+			do_action( 'groundhogg/db/pre_bulk_delete/tag_relationships', wp_parse_id_list( $tags ) );
+
+			return $this->delete( [ 'contact_id' => $where ] );
 		}
 
-		do_action( 'groundhogg/db/pre_bulk_delete/tag_relationships', wp_parse_id_list( $tags ) );
-
-		return $this->delete( [ 'contact_id' => $contact_id ] );
-
+		return false;
 	}
 
 	/**
@@ -162,7 +172,7 @@ class Tag_Relationships extends DB {
 			$column   => $value,
 			'orderby' => $this->primary_key,
 			'order'   => 'DESC'
-  		] );
+		] );
 
 		if ( empty( $results ) ) {
 			return false;
@@ -192,7 +202,24 @@ class Tag_Relationships extends DB {
 	 */
 	public function get_contacts_by_tag( $tag_id = 0 ) {
 		return $this->get_relationships( $tag_id, 'tag_id', 'contact_id' );
+	}
 
+	/**
+	 * Deletes any relationships that ar no longer available
+	 */
+	public function delete_orphaned_relationships() {
+
+		$tags_table     = get_db( 'tags' );
+		$contacts_table = get_db( 'contacts' );
+
+		global $wpdb;
+
+		$tag_query      = "SELECT tags.tag_id FROM {$tags_table->table_name} AS tags";
+		$contacts_query = "SELECT contacts.ID FROM {$contacts_table->table_name} as contacts";
+
+		$wpdb->query( "DELETE FROM {$this->table_name} WHERE tag_id NOT IN ( $tag_query ) OR contact_id NOT IN ( $contacts_query )" );
+
+		$this->cache_set_last_changed();
 	}
 
 	/**

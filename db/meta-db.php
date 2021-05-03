@@ -3,6 +3,8 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use Groundhogg\Plugin;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -40,7 +42,6 @@ abstract class Meta_DB extends DB {
 	}
 
 	protected function add_additional_actions() {
-//        $this->register_table();
 
 		add_action( 'groundhogg/db/pre_delete/' . $this->get_object_type(), [
 			$this,
@@ -108,25 +109,32 @@ abstract class Meta_DB extends DB {
 	 * @return false|int
 	 */
 	public function delete_associated_meta( $where, $formats, $object_table ) {
-
 		global $wpdb;
 
-		$w = [];
+		if ( is_numeric( $where ) ){
 
-		foreach ( $where as $col => $value ) {
-			if ( in_array( $col, $object_table->get_allowed_columns() ) ) {
-				$w[] = [ 'col' => $col, 'val' => $value, 'compare' => is_array( $value ) ? 'IN' : '=' ];
+			$result = $wpdb->delete( $this->table_name, [ $this->get_object_id_col() => $where ], [ '%d' ] );
+
+		} else {
+
+			$w = [];
+
+			foreach ( $where as $col => $value ) {
+				if ( in_array( $col, $object_table->get_allowed_columns() ) ) {
+					$w[] = [ 'col' => $col, 'val' => $value, 'compare' => is_array( $value ) ? 'IN' : '=' ];
+				}
 			}
+
+			$object_query = $object_table->get_sql( [
+				'where'   => $w,
+				'select'  => $object_table->get_primary_key(),
+				'order'   => false, // don't need
+				'orderby' => false  // don't need
+			] );
+
+			$result = $wpdb->query( "DELETE FROM {$this->table_name} WHERE `{$this->get_object_id_col()}` IN ( $object_query);" );
+
 		}
-
-		$object_query = $object_table->get_sql( [
-			'where'   => $w,
-			'select'  => $object_table->get_primary_key(),
-			'order'   => false, // don't need
-			'orderby' => false  // don't need
-		] );
-
-		$result = $wpdb->query( "DELETE FROM {$this->table_name} WHERE `{$this->get_object_id_col()}` IN ( $object_query);" );
 
 		$this->cache_set_last_changed();
 
@@ -343,10 +351,15 @@ abstract class Meta_DB extends DB {
 
 		global $wpdb;
 
-		$object_query = "SELECT {$object_table->primary_key} FROM {$object_table->table_name}";
+		$object_query = "SELECT objects.{$object_table->primary_key} FROM {$object_table->table_name} as objects";
 
-		$wpdb->query( "DELETE FROM {$this->table_name} WHERE `{$this->get_object_id_col()}` NOT IN ( $object_query )" );
+		$wpdb->query( "DELETE FROM {$this->table_name} as meta WHERE meta.{$this->get_object_id_col()} NOT IN ( $object_query )" );
 
 		$this->cache_set_last_changed();
+	}
+
+	public function delete_orphaned_meta() {
+		$db = Plugin::instance()->dbs->get_object_db_by_object_type( $this->get_object_type() );
+		$this->_delete_orphaned_meta( $db );
 	}
 }

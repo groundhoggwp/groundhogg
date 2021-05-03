@@ -122,6 +122,17 @@ function admin_page_url( $page, $args = [], $fragment = '' ) {
 }
 
 /**
+ * Removes evertything after the ? from the URL
+ *
+ * @param $url
+ *
+ * @return string
+ */
+function remove_query_string_from_url( $url ){
+	return preg_replace( '@\?.*@', '', $url );
+}
+
+/**
  * Provides a modal link URL
  *
  * @param $args
@@ -1290,13 +1301,17 @@ function wpgh_get_referer() {
  * Recount the contacts per tag...
  */
 function recount_tag_contacts_count() {
-	/* Recount tag relationships */
-	$tags = Plugin::$instance->dbs->get_db( 'tags' )->query();
+
+	// Delete the orphaned relationships
+	get_db( 'tag_relationships' )->delete_orphaned_relationships();
+
+	// Recount the tags
+	$tags = get_db( 'tags' )->query();
 
 	if ( ! empty( $tags ) ) {
 		foreach ( $tags as $tag ) {
-			$count = Plugin::$instance->dbs->get_db( 'tag_relationships' )->count( [ 'tag_id' => absint( $tag->tag_id ) ] );
-			Plugin::$instance->dbs->get_db( 'tags' )->update( absint( $tag->tag_id ), [ 'contact_count' => $count ] );
+			$count = get_db( 'tag_relationships' )->count( [ 'tag_id' => absint( $tag->tag_id ) ] );
+			get_db( 'tags' )->update( absint( $tag->tag_id ), [ 'contact_count' => $count ] );
 		}
 	}
 }
@@ -4820,6 +4835,8 @@ function sanitize_email_header( $header_value, $header_type ): string {
 	return $header_value;
 }
 
+
+
 /**
  * Uninstall Groundhogg
  *
@@ -4837,26 +4854,6 @@ function uninstall_groundhogg() {
 
 	//Delete DBS
 	Plugin::$instance->dbs->drop_dbs();
-
-	$other_tables = [
-		'gh_contractmeta',
-		'gh_contracts',
-		'gh_dealmeta',
-		'gh_deals',
-		'gh_pipelines_stages',
-		'gh_pipelines',
-		'gh_proof',
-		'gh_calendarmeta',
-		'gh_calendar',
-		'gh_appointmentmeta',
-		'gh_appointments'
-
-	];
-
-	foreach ( $other_tables as $table ) {
-		$table_name = $wpdb->prefix . $table;
-		$wpdb->query( "DROP TABLE IF EXISTS " . $table_name );
-	}
 
 	//Remove Roles & Caps
 	Plugin::$instance->roles->remove_roles_and_caps();

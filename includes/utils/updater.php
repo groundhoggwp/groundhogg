@@ -217,7 +217,7 @@ abstract class Updater {
 			Plugin::$instance->notices->add( new \WP_Error( 'update_failed', __( 'Update failed.', 'groundhogg' ) ) );
 		}
 
-		wp_safe_redirect( admin_page_url( 'gh_tools', [ 'tab' => 'updates' ] ) );
+		wp_safe_redirect( admin_page_url( 'gh_tools', [ 'tab' => 'install_updates' ] ) );
 		die();
 	}
 

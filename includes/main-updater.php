@@ -386,6 +386,17 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Verify all the license statuses
+	 */
+	public function version_2_4_5_5() {
+		recount_tag_contacts_count();
+
+		foreach ( Plugin::instance()->dbs->get_all_object_tables() as $table ){
+			$table->delete_orphaned_meta();
+		}
+	}
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -429,7 +440,8 @@ class Main_Updater extends Updater {
 			'2.2.23',
 			'2.2.23.3',
 			'2.3',
-			'2.3.3'
+			'2.3.3',
+			'2.4.5.5'
 		];
 	}
 
@@ -491,6 +503,7 @@ class Main_Updater extends Updater {
 			'2.2.22.3'      => __( 'Re-install the gh-cron.php file to include a constant <code>DOING_GH_CRON</code>.', 'groundhogg' ),
 			'2.3'           => __( 'Add the new database tables for the new Email Logging feature.', 'groundhogg' ),
 			'2.3.3'         => __( 'Separate GDPR consent into Data Processing consent and Marketing consent', 'groundhogg' ),
+			'2.4.5.5'       => __( 'Fix tag counts and delete orphaned object meta.', 'groundhogg' ),
 		];
 	}
 }
