@@ -6,8 +6,11 @@ use Groundhogg\Classes\Activity;
 use Groundhogg\Email;
 use Groundhogg\Plugin;
 use function Groundhogg\_nf;
+use function Groundhogg\generate_referer_hash;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
+use function Groundhogg\managed_page_url;
+use function Groundhogg\remove_query_string_from_url;
 
 class Table_Email_Links_Clicked extends Base_Table_Report {
 
@@ -36,6 +39,12 @@ class Table_Email_Links_Clicked extends Base_Table_Report {
 		$links = [];
 
 		foreach ( $activity as $event ) {
+
+			// Links with permissions keys
+			if ( strpos( $event->referer, '?pk=' ) !== false ) {
+				$event->referer      = remove_query_string_from_url( $event->referer );
+				$event->referer_hash = generate_referer_hash( $event->referer_hash );
+			}
 
 			if ( ! isset( $links[ $event->referer_hash ] ) ) {
 				$links[ $event->referer_hash ] = [

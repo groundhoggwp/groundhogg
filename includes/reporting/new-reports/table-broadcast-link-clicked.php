@@ -12,6 +12,7 @@ use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use function Groundhogg\percentage;
+use function Groundhogg\remove_query_string_from_url;
 
 class Table_Broadcast_Link_Clicked extends Base_Table_Report {
 
@@ -41,6 +42,12 @@ class Table_Broadcast_Link_Clicked extends Base_Table_Report {
 		$links = [];
 
 		foreach ( $activity as $event ) {
+
+			// Links with permissions keys
+			if ( strpos( $event->referer, '?pk=' ) !== false ) {
+				$event->referer      = remove_query_string_from_url( $event->referer );
+				$event->referer_hash = generate_referer_hash( $event->referer_hash );
+			}
 
 			if ( ! isset( $links[ $event->referer_hash ] ) ) {
 				$links[ $event->referer_hash ] = [
