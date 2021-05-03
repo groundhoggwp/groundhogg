@@ -13,7 +13,8 @@ export const CONDITIONS = "conditions";
 
 const useStyles = makeStyles((theme) => ({
   card: {
-    marginBottom: "10px",
+    background: "white",
+    // marginBottom: "10px",
     "& h4": {
       color: "black",
     },

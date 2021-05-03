@@ -73,22 +73,10 @@ const reorder = (list, startIndex, endIndex) => {
 };
 
 const getItemStyle = (isDragging, draggableStyle) => ({
-  // some basic styles to make the items look a bit nicer
   userSelect: "none",
-  padding: 10 * 2,
-  margin: `0 0 ${10}px 0`,
-
-  // change background colour if dragging
-  background: isDragging ? "lightgreen" : "grey",
-
-  // styles we need to apply on draggables
+  boxShadow: isDragging ? "5px 5px 8px 0px #00000040" : "none",
+  marginBottom: "10px",
   ...draggableStyle,
-});
-
-const getListStyle = (isDraggingOver) => ({
-  background: isDraggingOver ? "lightblue" : "lightgrey",
-  padding: 10,
-  width: 250,
 });
 
 const MainPath = ({ steps, edges }) => {
@@ -135,10 +123,10 @@ const MainPath = ({ steps, edges }) => {
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      // style={getItemStyle(
-                      //   snapshot.isDragging,
-                      //   provided.draggableProps.style
-                      // )}
+                      style={getItemStyle(
+                        snapshot.isDragging,
+                        provided.draggableProps.style
+                      )}
                     >
                       <StepFlow
                         icon={StepIcon}
