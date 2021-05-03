@@ -4,9 +4,64 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { makeStyles } from "@material-ui/core/styles";
 import { unSlash } from "utils/core";
 import { getStepType, useStepType } from "data/step-type-registry";
+import Button from "@material-ui/core/Button";
+import AddIcon from "@material-ui/icons/Add";
 
 const useStyles = makeStyles((theme) => ({
   root: {},
+  block: {
+    alignItems: "center",
+    display: "flex",
+    justifyContent: "center",
+    width: "100%",
+  },
+  draggableWrapper: {
+    position: "relative",
+  },
+  addStepDivider: {
+    alignItems: "center",
+    bottom: "-23px",
+    cursor: "pointer",
+    display: "flex",
+    left: 0,
+    opacity: 0,
+    position: "absolute",
+    width: "100%",
+    zIndex: 1,
+    "&:hover": {
+      opacity: 1,
+    },
+    "& div": {
+      background: "white",
+      display: "flex",
+      width: 36,
+      height: 36,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: "50%",
+    },
+    "& div svg": {
+      border: "2px solid #0075FF",
+      borderRadius: "4px",
+      color: "#0075FF",
+      height: ".618rem",
+      width: ".618rem",
+    },
+    "&::before": {
+      background: "#0075FF",
+      content: '""',
+      display: "block",
+      flexGrow: 1,
+      height: 1,
+    },
+    "&::after": {
+      background: "#0075FF",
+      content: '""',
+      display: "block",
+      flexGrow: 1,
+      height: 1,
+    },
+  },
 }));
 
 /**
@@ -82,6 +137,7 @@ const getItemStyle = (isDragging, draggableStyle) => ({
 const MainPath = ({ steps, edges }) => {
   window.console.log("MainPath");
 
+  const classes = useStyles();
   const [stepPath, updateStepPath] = useState(processPath(steps, edges));
 
   function onDragEnd(result) {
@@ -113,32 +169,47 @@ const MainPath = ({ steps, edges }) => {
                 step.data.step_type
               );
               return (
-                <Draggable
-                  key={step.ID}
-                  draggableId={String(step.ID)}
-                  index={index}
-                >
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      style={getItemStyle(
-                        snapshot.isDragging,
-                        provided.draggableProps.style
-                      )}
-                    >
-                      <StepFlow
-                        icon={StepIcon}
-                        name={StepName}
-                        read={<StepRead {...step} />}
-                      />
+                <div className={classes.draggableWrapper}>
+                  <Draggable
+                    key={step.ID}
+                    draggableId={String(step.ID)}
+                    index={index}
+                  >
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        style={getItemStyle(
+                          snapshot.isDragging,
+                          provided.draggableProps.style
+                        )}
+                      >
+                        <StepFlow
+                          icon={StepIcon}
+                          name={StepName}
+                          read={<StepRead {...step} />}
+                        />
+                      </div>
+                    )}
+                  </Draggable>
+                  <div className={classes.addStepDivider}>
+                    <div>
+                      <AddIcon />
                     </div>
-                  )}
-                </Draggable>
+                  </div>
+                </div>
               );
             })}
             {provided.placeholder}
+            <Button
+              variant="outlined"
+              color="primary"
+              className={classes.block}
+            >
+              <AddIcon />
+              Add new Step
+            </Button>
           </div>
         )}
       </Droppable>
