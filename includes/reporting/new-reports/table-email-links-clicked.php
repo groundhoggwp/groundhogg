@@ -43,7 +43,7 @@ class Table_Email_Links_Clicked extends Base_Table_Report {
 			// Links with permissions keys
 			if ( strpos( $event->referer, '?pk=' ) !== false ) {
 				$event->referer      = remove_query_string_from_url( $event->referer );
-				$event->referer_hash = generate_referer_hash( $event->referer_hash );
+				$event->referer_hash = generate_referer_hash( $event->referer );
 			}
 
 			if ( ! isset( $links[ $event->referer_hash ] ) ) {
