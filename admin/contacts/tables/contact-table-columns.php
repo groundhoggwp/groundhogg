@@ -156,11 +156,11 @@ class Contact_Table_Columns {
 		self::register( 'first_name', __( 'First Name', 'groundhogg' ), [
 			self::class,
 			'column_first_name'
-		], 'first_name', 10 );
+		], 'first_name', 9 );
 		self::register( 'last_name', __( 'Last Name', 'groundhogg' ), [
 			self::class,
 			'column_last_name'
-		], 'last_name', 10 );
+		], 'last_name', 9 );
 		self::register( 'user_id', __( 'Username', 'groundhogg' ), [ self::class, 'column_user_id' ], 'user_id', 10 );
 		self::register( 'owner_id', __( 'Owner', 'groundhogg' ), [ self::class, 'column_owner_id' ], 'owner_id', 10 );
 		self::register( 'tel_numbers', __( 'Phone', 'groundhogg' ), [ self::class, 'column_tel_numbers' ], false, 10 );
