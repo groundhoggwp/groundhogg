@@ -3,16 +3,12 @@
 namespace Groundhogg\Admin\Tools;
 
 use Groundhogg\Plugin;
-use function Groundhogg\action_input;
-use function Groundhogg\get_request_var;
 use function Groundhogg\html;
-use function Groundhogg\is_groundhogg_network_active;
-use function Groundhogg\white_labeled_name;
 
 ?>
 	<div id="poststuff">
 		<div class="post-box-grid">
-			<div class="postbox">
+			<div class="postbox tool">
 				<div class="postbox-header">
 					<h2 class="hndle"><?php _e( 'Refresh optin status tags', 'groundhogg' ); ?></h2>
 				</div>
@@ -24,6 +20,7 @@ use function Groundhogg\white_labeled_name;
 						], __( 'Process', 'groundhogg' ) ) ?></p>
 				</div>
 			</div>
+			<?php do_action( 'groundhogg/tools/misc' ); ?>
 		</div>
 	</div>
 <?php
