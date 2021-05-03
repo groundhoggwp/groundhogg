@@ -59,9 +59,9 @@ class Info_Cards {
 	 */
 	public function register_core_cards() {
 
-		self::register( 'intro', __( '🎉 New Feature!', 'groundhogg' ), function ( $contact ) {
-			include __DIR__ . '/cards/intro.php';
-		} );
+//		self::register( 'intro', __( '🎉 New Feature!', 'groundhogg' ), function ( $contact ) {
+//			include __DIR__ . '/cards/intro.php';
+//		} );
 
 		self::register( 'user', __( 'WordPress User', 'groundhogg' ), function ( $contact ) {
 			include __DIR__ . '/cards/user.php';
