@@ -739,21 +739,26 @@ abstract class DB {
 	 *
 	 * @access  public
 	 *
-	 * @param mixed $where
+	 * @param mixed $id
 	 *
 	 * @return  bool
 	 * @since   2.1
 	 */
-	public function delete( $where = null ) {
+	public function delete( $id = null ) {
 
 		global $wpdb;
 
-		if ( is_numeric( $where ) || is_int( $where ) ) {
-			$where = [
-				$this->primary_key => absint( $where )
-			];
-		}
+		$by_primary = false;
 
+		if ( is_numeric( $id ) ) {
+			$id         = absint( $id );
+			$where      = [
+				$this->primary_key => $id
+			];
+			$by_primary = true;
+		} else if ( is_array( $id ) ) {
+			$where = $id;
+		}
 
 		// Initialise column format array
 		$column_formats = $this->get_columns();
@@ -765,7 +770,7 @@ abstract class DB {
 		$data_keys      = array_keys( $where );
 		$column_formats = array_merge( array_flip( $data_keys ), $column_formats );
 
-		do_action( 'groundhogg/db/pre_delete/' . $this->get_object_type(), $where, $column_formats, $this );
+		do_action( 'groundhogg/db/pre_delete/' . $this->get_object_type(), $by_primary ? $id : $where, $column_formats, $this );
 
 		if ( false === $wpdb->delete( $this->table_name, $where, $column_formats ) ) {
 			return false;
@@ -773,7 +778,7 @@ abstract class DB {
 
 		$this->cache_set_last_changed();
 
-		do_action( 'groundhogg/db/post_delete/' . $this->get_object_type(), $where, $column_formats, $this );
+		do_action( 'groundhogg/db/post_delete/' . $this->get_object_type(), $by_primary ? $id : $where, $column_formats, $this );
 
 		return true;
 	}
@@ -1287,7 +1292,7 @@ abstract class DB {
 	/**
 	 * Delete orphaned meta
 	 */
-	public function delete_orphaned_meta(){
+	public function delete_orphaned_meta() {
 		do_action( 'groundhogg/db/delete_orphaned_meta/' . $this->get_object_type(), $this );
 	}
 
