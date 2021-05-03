@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/try/
 Requires at least: 4.9
 Tested up to: 5.7
 Requires PHP: 5.6
-Stable tag: trunk
+Stable tag: 2.4.5.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -331,6 +331,19 @@ You can purchase a premium plan for access to support and our premium extensions
 Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/monthly/).
 
 == Changelog ==
+
+= 2.4.5.5 (2021-05-03) =
+* ADDED Default values for `contact_and_user_match()`.
+* ADDED `is_spam` filter to the form submission spam check.
+* ADDED New MISC tab in the tools panel to add tools too that do not need to be top level.
+* ADDED Search by Email, Not Empty, and REGEX support for First, Last, and Email in the advanced search.
+* TWEAKED Strip slashes from `get_url_vars()`.
+* TWEAKED Removed the "new feature" info card.
+* TWEAKED First & Last name columns have highest priority in the contact table.
+* TWEAKED Clicks in the reports with ?pk= in the URL will be grouped together.
+* FIXED Tag associations count not working
+* FIXED Meta not being deleted when the associated object is deleted.
+* FIXED Owner being removed when a contact uploads a file through a form on the frontend.
 
 = 2.4.5.4 (2021-04-05) =
 * TWEAKED Better DB cache support for multisite functionality.
