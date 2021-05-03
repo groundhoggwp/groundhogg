@@ -1,8 +1,6 @@
 <?php
 namespace Groundhogg;
 
-use Groundhogg\Queue\Event_Queue;
-
 /**
  * Uninstall Groundhogg
  *
@@ -31,6 +29,6 @@ include_once __DIR__ . '/groundhogg.php';
 
 global $wpdb;
 
-if( Plugin::$instance->settings->is_option_enabled( 'gh_uninstall_on_delete' ) ) {
+if( is_option_enabled( 'gh_uninstall_on_delete' ) ) {
 	uninstall_groundhogg();
 }
