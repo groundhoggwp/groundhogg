@@ -30,11 +30,6 @@ class Tag_Mapping extends Bulk_Job {
 		// So instead we'll listen for an event failed. #goodenough
 		add_action( 'groundhogg/event/failed', [ $this, 'listen_for_non_marketable' ] );
 
-
-		if ( get_option( 'gh_optin_status_job', false ) ) {
-			add_action( 'admin_init', [ $this, 'add_upgrade_notice' ] );
-		}
-
 		// Quick hook to update the marketing preference automatically when a contact is created for the first time.
 		add_action( 'groundhogg/contact/post_create', [ $this, 'change_marketing_preference' ], 10, 3 );
 		add_action( 'groundhogg/contact/post_create', [ $this, 'auto_map_roles' ], 10, 3 );
@@ -233,18 +228,6 @@ class Tag_Mapping extends Bulk_Job {
 	}
 
 	/**
-	 * Add a notice promting the user to perform the retroactive bulk action.
-	 */
-	public function add_upgrade_notice() {
-		$notice = sprintf(
-			__( "New features are now available, but we need to perform an upgrade process first! %s", 'groundhogg' ),
-			sprintf( "&nbsp;&nbsp;<a href='%s' class='button button-secondary'>Start Upgrade</a>", $this->get_start_url() )
-		);
-
-		Plugin::$instance->notices->add( 'status_tag_upgrade_notice', $notice, 'info' );
-	}
-
-	/**
 	 * Get the list of default tags and option names...
 	 *
 	 * @return array
@@ -389,13 +372,13 @@ class Tag_Mapping extends Bulk_Job {
 	 * Perform the tag mapping.
 	 *
 	 * @param int     $contact_id the ID of the contact
-	 * @param int     $status     the status.
+	 * @param int     $new_status the status.
 	 * @param int     $old_status the previous status.
 	 * @param Contact $contact
 	 *
 	 * @return void
 	 */
-	public function optin_status_changed( $contact_id = 0, $status = 0, $old_status = 0, $contact = null ) {
+	public function optin_status_changed( $contact_id = 0, $new_status = 0, $old_status = 0, $contact = null ) {
 
 		if ( ! is_a_contact( $contact ) ) {
 			return;
@@ -406,31 +389,27 @@ class Tag_Mapping extends Bulk_Job {
 		$non_marketable_tag = $this->get_status_tag( self::NON_MARKETABLE );
 		$marketable_tag     = $this->get_status_tag( self::MARKETABLE );
 
-		/* Tags to remove */
-		$remove_tags = [
-			$this->get_status_tag( $old_status ),
-		];
+		$remove_tags = [];
 
-		/* Marketable decision */
-		if ( $contact->is_marketable() ) {
-			$remove_tags[] = $non_marketable_tag;
-		} else if ( ! $contact->is_marketable() ) {
-			$remove_tags[] = $marketable_tag;
+		// Remove old status tags
+		if ( $old_status ) {
+			$remove_tags[] = $this->get_status_tag( $old_status );
 		}
+
+		// Remove the non marketable if contact can receive marketing
+		$remove_tags[] = $contact->is_marketable() ? $non_marketable_tag : $marketable_tag;
 
 		/* Remove all the un-needed tags */
 		$contact->remove_tag( $remove_tags );
 
-		/* Tags to add */
-		$add_tags = [
-			$this->get_status_tag( $status ),
-		];
+		$add_tags = [];
 
-		if ( $contact->is_marketable() ) {
-			$add_tags[] = $marketable_tag;
-		} else if ( ! $contact->is_marketable() ) {
-			$add_tags[] = $non_marketable_tag;
+		if ( $new_status ) {
+			$add_tags[] = $this->get_status_tag( $new_status );
 		}
+
+		// Add the marketable if contact can receive marketing
+		$add_tags[] = $contact->is_marketable() ? $marketable_tag : $non_marketable_tag;
 
 		/* Add the tags */
 		$contact->apply_tag( $add_tags );
@@ -549,46 +528,14 @@ class Tag_Mapping extends Bulk_Job {
 	protected function process_item( $item ) {
 		$contact = get_contactdata( absint( $item ) );
 
-		if ( $contact && $contact->exists() ) {
-
-			// First, remove all tags so we have a clean slate.
-			$remove_tags = array_values( $this->get_tag_map() );
-			$contact->remove_tag( $remove_tags );
-
-			// Generate list of appropriate tags to add.
-			$apply_tags = [];
-
-			// The tag for the optin status
-			$apply_tags[] = $this->get_status_tag( $contact->get_optin_status() );
-			// Marketable/Unmarketable
-			$apply_tags[] = $contact->is_marketable() ? $this->get_status_tag( self::MARKETABLE ) : $this->get_status_tag( self::NON_MARKETABLE );
-
-			// Role tag
-			if ( $contact->get_user_id() ) {
-				$role_tags  = $this->get_roles_pretty_names( $contact->get_userdata()->roles );
-				$apply_tags = array_merge( $apply_tags, $role_tags );
-			}
-
-			// Add the tags
-			$contact->apply_tag( $apply_tags );
-
-		}
+		$this->optin_status_changed( $contact->get_id(), $contact->get_optin_status(), null, $contact );
 	}
 
-	/**
-	 * Cleanup any options/transients/notices after the bulk job has been processed.
-	 *
-	 * @return void
-	 */
+	protected function get_return_url() {
+		return admin_page_url( 'gh_tools', [ 'tab' => 'misc' ] );
+	}
+
 	protected function clean_up() {
-		Plugin::$instance->notices->remove( 'status_tag_upgrade_notice' );
-		Plugin::$instance->settings->delete_option( 'gh_optin_status_job' );
-	}
-
-	/**
-	 * @return string
-	 */
-	protected function get_finished_notice() {
-		return _x( 'Job finished! Optin status & User Role tag mapping has now been enabled.', 'notice', 'groundhogg' );
+		// TODO: Implement clean_up() method.
 	}
 }
