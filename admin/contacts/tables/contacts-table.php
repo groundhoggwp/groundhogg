@@ -169,7 +169,7 @@ class Contacts_Table extends WP_List_Table {
 		$total = get_db( 'contacts' )->count( $query );
 
 		$this->items = array_map( function ( $item ) {
-			return get_contactdata( $item->ID );
+			return new Contact( $item );
 		}, $data );
 
 		// Add condition to be sure we don't divide by zero.

@@ -56,7 +56,7 @@ class Contact extends Base_Object_With_Meta {
 	public function __construct( $_id_or_email_or_args = false, $by_user_id = false ) {
 		$field = false;
 
-		if ( ! is_array( $_id_or_email_or_args ) ) {
+		if ( ! is_array( $_id_or_email_or_args ) && ! is_object( $_id_or_email_or_args ) ) {
 			if ( false === $_id_or_email_or_args || ( is_numeric( $_id_or_email_or_args ) && (int) $_id_or_email_or_args !== absint( $_id_or_email_or_args ) ) ) {
 				return;
 			}

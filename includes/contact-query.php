@@ -323,9 +323,15 @@ class Contact_Query {
 	 * @see    WPGH_Contact_Query::__construct()
 	 *
 	 */
-	public function query( $query ) {
+	public function query( $query, $as_contact_object=false ) {
 		$this->query_vars = wp_parse_args( $query );
 		$items            = $this->get_items();
+
+		if ( $as_contact_object ){
+			$items = array_map( function ( $contact ){
+				return new Contact( $contact );
+			}, $items );
+		}
 
 		return $items;
 	}

@@ -332,7 +332,7 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
-= 2.4.5.5 (2021-05-03) =
+= 2.4.6 (2021-05-03) =
 * ADDED Default values for `contact_and_user_match()`.
 * ADDED `is_spam` filter to the form submission spam check.
 * ADDED New MISC tab in the tools panel to add tools too that do not need to be top level.
@@ -341,9 +341,11 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 * TWEAKED Removed the "new feature" info card.
 * TWEAKED First & Last name columns have highest priority in the contact table.
 * TWEAKED Clicks in the reports with ?pk= in the URL will be grouped together.
+* TWEAKED You can now pass raw objects to Base_Object so your SQL queries become 1 instead of N+1, super savings!
 * FIXED Tag associations count not working
 * FIXED Meta not being deleted when the associated object is deleted.
 * FIXED Owner being removed when a contact uploads a file through a form on the frontend.
+* FIXED Bounce checker username and password missing at runtime.
 
 = 2.4.5.4 (2021-04-05) =
 * TWEAKED Better DB cache support for multisite functionality.
