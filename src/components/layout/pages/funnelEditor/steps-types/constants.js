@@ -1,8 +1,10 @@
 import { makeStyles } from "@material-ui/core/styles";
+import { Link, useRouteMatch } from "react-router-dom";
 import Typography from "@material-ui/core/Typography";
 import Card from "@material-ui/core/Card";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
+import { unSlash } from "utils/core";
 
 export const ACTION = "action";
 export const ACTIONS = "actions";
@@ -30,6 +32,9 @@ const useStyles = makeStyles((theme) => ({
   },
   type: {
     textTransform: "uppercase",
+  },
+  link: {
+    textDecoration: "none",
   },
   // root: {
   //   marginBottom: 35,
@@ -71,30 +76,34 @@ export const STEP_DEFAULTS = {
       </>
     );
   },
-  flow: ({ icon, name, read }) => {
+  flow: ({ ID, icon, name, read }) => {
     const classes = useStyles();
+    const { url } = useRouteMatch();
 
     return (
-      <Box
-        alignItems="center"
-        display="flex"
-        border={1}
-        borderRadius={5}
-        borderColor="grey.200"
-        p={2}
-        mb={1}
-        className={`step-block ${classes.card} ${classes.step}`}
-      >
-        <Grid item pr={2} xs={2}>
-          {icon}
-        </Grid>
-        <Grid item xs={10} className="read">
-          <Typography component={"div"} className={classes.name}>
-            {read}
-          </Typography>
-          <small className={classes.type}>{name}</small>
-        </Grid>
-      </Box>
+      <Link to={`${unSlash(url)}/${ID}/edit`} className={classes.link}>
+        <Box
+          alignItems="center"
+          display="flex"
+          border={1}
+          borderRadius={5}
+          borderColor="grey.200"
+          p={2}
+          mb={1}
+          className={`step-block ${classes.card} ${classes.step}`}
+          data-title={`Step id #${ID}}`}
+        >
+          <Grid item pr={2} xs={2}>
+            {icon}
+          </Grid>
+          <Grid item xs={10} className="read">
+            <Typography component={"div"} className={classes.name}>
+              {read}
+            </Typography>
+            <small className={classes.type}>{name}</small>
+          </Grid>
+        </Box>
+      </Link>
     );
   },
 };
@@ -102,30 +111,33 @@ export const STEP_DEFAULTS = {
 export const BENCHMARK_TYPE_DEFAULTS = {
   ...STEP_DEFAULTS,
 
-  flow: ({ icon, name, read }) => {
+  flow: ({ ID, icon, name, read }) => {
     const classes = useStyles();
+    const { url } = useRouteMatch();
 
     return (
-      <Box
-        alignItems="center"
-        display="flex"
-        border={1}
-        borderRadius={5}
-        borderColor="grey.200"
-        p={2}
-        mb={1}
-        className={`step-block ${classes.card} ${classes.benchmark}`}
-      >
-        <Grid item pr={2} xs={2}>
-          {icon}
-        </Grid>
-        <Grid item xs={10} className="read">
-          <Typography component={"div"} className={classes.name}>
-            {read}
-          </Typography>
-          <small className={classes.type}>{name}</small>
-        </Grid>
-      </Box>
+      <Link to={`${unSlash(url)}/${ID}/edit`} className={classes.link}>
+        <Box
+          alignItems="center"
+          display="flex"
+          border={1}
+          borderRadius={5}
+          borderColor="grey.200"
+          p={2}
+          mb={1}
+          className={`step-block ${classes.card} ${classes.benchmark}`}
+        >
+          <Grid item pr={2} xs={2}>
+            {icon}
+          </Grid>
+          <Grid item xs={10} className="read">
+            <Typography component={"div"} className={classes.name}>
+              {read}
+            </Typography>
+            <small className={classes.type}>{name}</small>
+          </Grid>
+        </Box>
+      </Link>
     );
   },
 };

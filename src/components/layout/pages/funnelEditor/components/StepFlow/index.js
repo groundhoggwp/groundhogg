@@ -62,6 +62,9 @@ const useStyles = makeStyles((theme) => ({
       height: 1,
     },
   },
+  link: {
+    textDecoration: "none",
+  },
 }));
 
 /**
@@ -139,6 +142,7 @@ const MainPath = ({ steps, edges }) => {
 
   const classes = useStyles();
   const [stepPath, updateStepPath] = useState(processPath(steps, edges));
+  const { url } = useRouteMatch();
 
   function onDragEnd(result) {
     // dropped outside the list
@@ -186,6 +190,7 @@ const MainPath = ({ steps, edges }) => {
                         )}
                       >
                         <StepFlow
+                          ID={step.ID}
                           icon={StepIcon}
                           name={StepName}
                           read={<StepRead {...step} />}
@@ -193,23 +198,27 @@ const MainPath = ({ steps, edges }) => {
                       </div>
                     )}
                   </Draggable>
-                  <div className={classes.addStepDivider}>
-                    <div>
-                      <AddIcon />
+                  <Link to={`${unSlash(url)}/add`} className={classes.link}>
+                    <div className={classes.addStepDivider}>
+                      <div>
+                        <AddIcon />
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 </div>
               );
             })}
             {provided.placeholder}
-            <Button
-              variant="outlined"
-              color="primary"
-              className={classes.block}
-            >
-              <AddIcon />
-              Add new Step
-            </Button>
+            <Link to={`${unSlash(url)}/add`} className={classes.link}>
+              <Button
+                variant="outlined"
+                color="primary"
+                className={classes.block}
+              >
+                <AddIcon />
+                Add new Step
+              </Button>
+            </Link>
           </div>
         )}
       </Droppable>
@@ -241,17 +250,5 @@ const BranchPath = ({ steps, edges }) => {
         );
       })}
     </>
-  );
-};
-
-const StepLink = (step) => {
-  const { url } = useRouteMatch();
-
-  return (
-    <li>
-      <Link to={`${unSlash(url)}/${step.ID}/edit`}>
-        {step.ID}: {step.data.step_type}
-      </Link>
-    </li>
   );
 };
