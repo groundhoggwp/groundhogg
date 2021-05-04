@@ -203,6 +203,9 @@ class Bounce_Checker {
 	 * Check the inbox for bounces.
 	 */
 	public function check() {
+
+		$this->setup();
+
 		if ( ! function_exists( 'imap_open' ) ) {
 			return;
 		}
@@ -250,7 +253,7 @@ class Bounce_Checker {
 
 				$contact = get_contactdata( $the['recipient'] );
 
-				if ( ! $contact->exists() ) {
+				if ( ! is_a_contact( $contact ) ) {
 					continue;
 				}
 
