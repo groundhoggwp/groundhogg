@@ -2,11 +2,34 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import  Header  from '../Header/';
+// <Header user={user} onLogin={onLogin} onLogout={onLogout} onCreateAccount={onCreateAccount} />
+import  Button  from '../Button/';
+
 import './styles.css';
+
+
+// primary: PropTypes.bool,
+// /**
+//  * What background color to use
+//  */
+// backgroundColor: PropTypes.string,
+// /**
+//  * How large should the button be?
+//  */
+// size: PropTypes.oneOf(['small', 'medium', 'large']),
+// /**
+//  * Button contents
+//  */
+// label: PropTypes.string.isRequired,
+// /**
+//  * Optional click handler
+//  */
+// onClick: PropTypes.func,
+// <Button label="asdfasdf" background="#000" size={"small"} onClick={()=>{console.log('asdf')}}/>
 
 export const Page = ({ user, onLogin, onLogout, onCreateAccount }) => (
   <article>
-    <Header user={user} onLogin={onLogin} onLogout={onLogout} onCreateAccount={onCreateAccount} />
+
 
     <section>
       <h2>Pages in Storybook</h2>
