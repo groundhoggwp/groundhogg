@@ -1,7 +1,7 @@
 import React from 'react';
 
-const Trash = ({fill}) => (
-  <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+const Trash = ({fill, className}) => (
+  <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" class={className}>
   <path opacity="0.5" d="M10.6826 16.2128L10.6826 7.90509M7.22108 4.44355H14.1442M7.22108 4.44355V3.05893C7.22108 2.29423 7.84099 1.67432 8.60569 1.67432H12.7595C13.5242 1.67432 14.1442 2.29423 14.1442 3.05893V4.44355M7.22108 4.44355H3.75954M14.1442 4.44355H17.6057M17.6057 4.44355H19.6826M17.6057 4.44355V16.9051C17.6057 18.4345 16.3659 19.6743 14.8365 19.6743H6.52877C4.99937 19.6743 3.75954 18.4345 3.75954 16.9051V4.44355M1.68262 4.44355H3.75954" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
 
