@@ -35,16 +35,15 @@ export default function ({ contents, title, fontSize, width, margin }) {
       cursor: "pointer",
       borderRadius: "7px",
       background: "#fff",
-
-      "& svg": {
-        float: "right",
-        margin: "8px 25px",
-      },
     },
     title: {
       fontWeight: "600",
       background: "#E7EEFB",
       padding: "10px 0 13px 25px",
+    },
+    arrow: {
+      float: "right",
+      marginRight: "25px",
     },
   }));
 
@@ -57,7 +56,7 @@ export default function ({ contents, title, fontSize, width, margin }) {
   return (
     <div className={classes.root}>
       <div className={classes.title} onClick={toggleroot}>
-        {title} <ArrowDown />
+        {title} <div className={classes.arrow}><ArrowDown /></div>
       </div>
       <br />
       {contents}

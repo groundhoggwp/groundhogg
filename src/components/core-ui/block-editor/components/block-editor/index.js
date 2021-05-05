@@ -130,11 +130,19 @@ export default function ({
       display: "inline-block",
       width: "20px",
       height: "20px",
-      "& svg": {
-        stroke: "#000",
-        fill: "#000",
-      },
+      margin: '0',
+      stroke: "#000",
+      fill: "#000",
+      marginRight: '25px'
     },
+    addButton:{
+      stroke: theme.palette.secondary.main,
+      fill: theme.palette.secondary.main,
+    },
+    trashButton:{
+      stroke: theme.palette.error.dark,
+      fill: theme.palette.error.dark,
+    }
   }));
 
   const { createInfoNotice } = useDispatch("core/notices");
@@ -224,22 +232,17 @@ export default function ({
               <div>
                 <input
                   className={classes.inputText}
-                  value={0}
                   placeholder={""}
                   onChange={hanldeCustomHeaderInput}
                 />
                 <input
                   className={classes.inputText}
-                  value={0}
                   placeholder={""}
                   onChange={hanldeCustomHeaderInput}
                 />
-                <span className={classes.customHeaderBtn}>
-                  <AddWithBorder />
-                </span>
-                <span className={classes.customHeaderBtn}>
-                  <Trash />
-                </span>
+                <AddWithBorder className={`${classes.customHeaderBtn} ${classes.addButton}`}/>
+                <Trash className={`${classes.customHeaderBtn} ${classes.trashButton}`}/>
+
               </div>
             }
           />
