@@ -87,7 +87,7 @@ class Manager {
 		}
 
 		foreach ( $this->dbs as $db ) {
-			$db->create_table();
+			$db && $db->create_table();
 		}
 	}
 

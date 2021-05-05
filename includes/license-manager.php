@@ -75,7 +75,7 @@ class License_Manager {
 		self::init_licenses();
 
 		return array_unique( wp_list_pluck( array_filter( self::$extensions, function ( $license ) {
-			return $license['status'] === 'invalid';
+			return $license['status'] === 'invalid' || ( $license['expiry'] !== 'lifetime' && strtotime( $license['expiry'] < time() ) );
 		} ), 'license' ) );
 	}
 
@@ -271,12 +271,14 @@ class License_Manager {
 			case 'site_inactive' :
 				$message = _x( 'Your license is not active for this URL.', 'notice', 'groundhogg' );
 				break;
-			case 'invalid_item_id' :
 			case 'key_mismatch' :
+			case 'invalid_item_id' :
 			case 'item_name_mismatch' :
+				$message = sprintf( _x( 'The extension you are licensing is unrecognized.', 'notice', 'groundhogg' ) );
+				break;
 			case 'missing_url' :
 			case 'missing' :
-				$message = sprintf( _x( 'This appears to be an invalid license key', 'notice', 'groundhogg' ) );
+				$message = sprintf( _x( 'This appears to be an invalid license key.', 'notice', 'groundhogg' ) );
 				break;
 			case 'no_activations_left':
 				$message = _x( 'Your license key has reached its activation limit.', 'notice', 'groundhogg' );
@@ -286,7 +288,7 @@ class License_Manager {
 				break;
 		}
 
-		return $message;
+		return $message . ' (' . $error . ')';
 	}
 
 	/**
@@ -471,7 +473,9 @@ class License_Manager {
 			$code    = $license_data->license;
 			$message = self::get_license_error_message( $code, $license_data->expires );
 
-			notices()->add( new \WP_Error( $code, $message ) );
+			notices()->add( new \WP_Error( $code, $message, [
+				'response' => $license_data
+			] ) );
 
 			self::update_license_status( $item_id, 'invalid', $license_data->expires );
 
@@ -631,27 +635,27 @@ class License_Manager {
 		], $extension->info->link );
 
 		?>
-        <div class="postbox">
+		<div class="postbox">
 			<?php if ( $extension->info->title ): ?>
-                <h2 class="hndle"><b><?php echo $extension->info->title; ?></b></h2>
+				<h2 class="hndle"><b><?php echo $extension->info->title; ?></b></h2>
 			<?php endif; ?>
-            <div class="inside" style="padding: 0;margin: 0">
+			<div class="inside" style="padding: 0;margin: 0">
 				<?php if ( $extension->info->thumbnail ): ?>
-                    <div class="img-container">
-                        <a href="<?php echo $extension->info->link; ?>" target="_blank">
-                            <img src="<?php echo $extension->info->thumbnail; ?>"
-                                 style="width: 100%;max-width: 100%;border-bottom: 1px solid #ddd">
-                        </a>
-                    </div>
+					<div class="img-container">
+						<a href="<?php echo $extension->info->link; ?>" target="_blank">
+							<img src="<?php echo $extension->info->thumbnail; ?>"
+							     style="width: 100%;max-width: 100%;border-bottom: 1px solid #ddd">
+						</a>
+					</div>
 				<?php endif; ?>
 				<?php if ( $extension->info->excerpt ): ?>
-                    <div class="article-description" style="padding: 10px;">
+					<div class="article-description" style="padding: 10px;">
 						<?php echo $extension->info->excerpt; ?>
-                    </div>
-                    <hr/>
+					</div>
+					<hr/>
 				<?php endif; ?>
 				<?php if ( $extension->info->link ): ?>
-                    <div class="buy" style="padding: 10px">
+					<div class="buy" style="padding: 10px">
 						<?php $pricing = (array) $extension->pricing;
 						if ( count( $pricing ) > 1 ) {
 
@@ -659,8 +663,8 @@ class License_Manager {
 							$price2 = max( $pricing );
 
 							?>
-                            <a class="button-secondary" target="_blank"
-                               href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
+							<a class="button-secondary" target="_blank"
+							   href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ); ?></a>
 							<?php
 						} else {
 
@@ -668,22 +672,22 @@ class License_Manager {
 
 							if ( $price > 0.00 ) {
 								?>
-                                <a class="button-secondary" target="_blank"
-                                   href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
+								<a class="button-secondary" target="_blank"
+								   href="<?php echo $extension->info->link; ?>"> <?php printf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ); ?></a>
 								<?php
 							} else {
 								?>
-                                <a class="button-secondary" target="_blank"
-                                   href="<?php echo $extension->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
+								<a class="button-secondary" target="_blank"
+								   href="<?php echo $extension->info->link; ?>"> <?php _ex( 'Download', 'action', 'groundhogg' ); ?></a>
 								<?php
 							}
 						}
 
 						?>
-                    </div>
+					</div>
 				<?php endif; ?>
-            </div>
-        </div>
+			</div>
+		</div>
 
 		<?php
 

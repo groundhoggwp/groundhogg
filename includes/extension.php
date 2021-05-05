@@ -28,6 +28,7 @@ abstract class Extension {
 
 	/**
 	 * TODO Override this static var in child class.
+	 *
 	 * @var Extension
 	 */
 	public static $instance = null;
@@ -86,11 +87,11 @@ abstract class Extension {
 	 *
 	 * Ensures only one instance of the plugin class is loaded or can be loaded.
 	 *
+	 * @return Extension
 	 * @since  1.0.0
 	 * @access public
 	 * @static
 	 *
-	 * @return Extension
 	 */
 	public static function instance() {
 
@@ -457,7 +458,12 @@ abstract class Extension {
 	 * @return bool|string
 	 */
 	public function get_expiry() {
-		return date_i18n( get_date_time_format(), strtotime( get_array_var( $this->get_extension_details(), 'expiry' ) ) );
+
+		if ( get_array_var( $this->get_extension_details(), 'expiry' ) === 'lifetime' ) {
+			return false;
+		}
+
+		return date_i18n( get_option( 'date_format' ), strtotime( get_array_var( $this->get_extension_details(), 'expiry' ) ) );
 	}
 
 	/**
@@ -502,10 +508,21 @@ abstract class Extension {
 	}
 
 	/**
+	 *
+	 */
+	public function license_status() {
+		$status  = get_array_var( $this->get_extension_details(), 'status' );
+		$status  = html()->e( 'span', [ 'class' => 'status-' . $status ], $status === 'valid' ? __( 'valid', 'groundhogg' ) : __( 'invalid', 'groundhogg' ) );
+		$expires = $this->get_expiry() ? sprintf( __( 'expires on <abbr title="%1$s">%1$s</abbr>', 'groundhogg' ), $this->get_expiry() ) : __( 'never expires', 'groundhogg' );
+
+		return sprintf( __( "Your license is <b>%s</b> and %s.", 'groundhogg' ), $status, $expires );
+	}
+
+	/**
 	 * @return string
 	 */
 	public function __toString() {
-		$content = "<div class='postbox'>";
+		$content = "<div class='postbox '>";
 		$content .= "<h2 class='hndle'>{$this->get_display_name()}</h2>";
 		$content .= "<div class=\"inside\">";
 		$content .= "<p>" . $this->get_display_description() . "</p>";
@@ -518,7 +535,7 @@ abstract class Extension {
 
 		if ( $this->get_license_key() ) {
 			$content .= "<p>";
-			$content .= sprintf( __( "Your license expires on %s", 'groundhogg' ), $this->get_expiry() );
+			$content .= $this->license_status();
 			$content .= "</p>";
 
 			$content .= html()->wrap( [
