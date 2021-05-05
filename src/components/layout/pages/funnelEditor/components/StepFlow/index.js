@@ -142,7 +142,7 @@ const MainPath = ({ steps, edges }) => {
 
   const classes = useStyles();
   const [stepPath, updateStepPath] = useState(processPath(steps, edges));
-  const { url } = useRouteMatch();
+  const { url, path } = useRouteMatch();
 
   function onDragEnd(result) {
     // dropped outside the list
@@ -172,6 +172,9 @@ const MainPath = ({ steps, edges }) => {
               const { StepIcon, StepRead, StepFlow, StepName } = useStepType(
                 step.data.step_type
               );
+
+              let match = useRouteMatch(`${unSlash(path)}/${step.ID}/edit`);
+
               return (
                 <div className={classes.draggableWrapper}>
                   <Draggable
@@ -190,6 +193,7 @@ const MainPath = ({ steps, edges }) => {
                         )}
                       >
                         <StepFlow
+                          isEditing={!!match}
                           ID={step.ID}
                           icon={StepIcon}
                           name={StepName}

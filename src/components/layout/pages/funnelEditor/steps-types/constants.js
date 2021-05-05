@@ -76,7 +76,7 @@ export const STEP_DEFAULTS = {
       </>
     );
   },
-  flow: ({ ID, icon, name, read }) => {
+  flow: ({ ID, icon, name, read, isEditing }) => {
     const classes = useStyles();
     const { url } = useRouteMatch();
 
@@ -85,9 +85,9 @@ export const STEP_DEFAULTS = {
         <Box
           alignItems="center"
           display="flex"
-          border={1}
           borderRadius={5}
-          borderColor="grey.200"
+          border={isEditing ? 2 : 1}
+          borderColor={`${isEditing ? "" : "grey.200"}`}
           p={2}
           mb={1}
           className={`step-block ${classes.card} ${classes.step}`}
@@ -111,7 +111,7 @@ export const STEP_DEFAULTS = {
 export const BENCHMARK_TYPE_DEFAULTS = {
   ...STEP_DEFAULTS,
 
-  flow: ({ ID, icon, name, read }) => {
+  flow: ({ ID, icon, name, read, isEditing }) => {
     const classes = useStyles();
     const { url } = useRouteMatch();
 
@@ -120,9 +120,9 @@ export const BENCHMARK_TYPE_DEFAULTS = {
         <Box
           alignItems="center"
           display="flex"
-          border={1}
           borderRadius={5}
-          borderColor="grey.200"
+          border={isEditing ? 2 : 1}
+          borderColor={`${isEditing ? "" : "grey.200"}`}
           p={2}
           mb={1}
           className={`step-block ${classes.card} ${classes.benchmark}`}
