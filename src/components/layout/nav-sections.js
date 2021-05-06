@@ -44,7 +44,7 @@ import SettingsInputAntennaSharpIcon from '@material-ui/icons/SettingsInputAnten
 import BuildIcon from '@material-ui/icons/Build';
 import {
 	Dashboard,
-	// Reports,
+	Reports,
 	Emails,
 	Tags,
 	Contacts,

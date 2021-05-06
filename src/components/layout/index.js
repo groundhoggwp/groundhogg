@@ -23,8 +23,8 @@ import { applyFilters } from '@wordpress/hooks';
 import './index.scss'
 import { Controller } from './controller'
 import navSections from './nav-sections'
-import NavBar from './nav-bar'
-import TopBar from './top-bar'
+import NavBar from '../core-ui/nav-bar'
+import TopBar from '../core-ui/top-bar'
 import BreadCrumb from '../core-ui/bread-crumb'
 import { SnackbarArea } from './snackbar'
 import { withSettingsHydration } from '../../data';

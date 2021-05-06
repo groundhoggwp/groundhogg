@@ -24,7 +24,7 @@ import Logo from '../../Logo';
 // import useAuth from 'src/hooks/useAuth';
 import NavItem from './NavItem';
 
-import navSections from '../nav-sections'
+import navSections from '../../layout/nav-sections'
 
 
 
