@@ -128,7 +128,7 @@ function admin_page_url( $page, $args = [], $fragment = '' ) {
  *
  * @return string
  */
-function remove_query_string_from_url( $url ){
+function remove_query_string_from_url( $url ) {
 	return preg_replace( '@\?.*@', '', $url );
 }
 
@@ -1670,7 +1670,7 @@ function send_event_failure_notification( $event ) {
 	}
 
 	// Ensure contact and event are existing
-	if ( ! $event->exists() || ! is_a_contact( $event->get_contact() ) ){
+	if ( ! $event->exists() || ! is_a_contact( $event->get_contact() ) ) {
 		return;
 	}
 
@@ -2223,15 +2223,15 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 
 	$contact->update( $args );
 
-	if ( $gdpr_consent ){
+	if ( $gdpr_consent ) {
 		$contact->set_gdpr_consent();
 	}
 
-	if ( $marketing_consent ){
+	if ( $marketing_consent ) {
 		$contact->set_marketing_consent();
 	}
 
-	if ( $terms_agreement ){
+	if ( $terms_agreement ) {
 		$contact->set_terms_agreement();
 	}
 
@@ -2548,15 +2548,15 @@ function generate_contact_with_map( $fields, $map = [] ) {
 		return false;
 	}
 
-	if ( $gdpr_consent ){
+	if ( $gdpr_consent ) {
 		$contact->set_gdpr_consent();
 	}
 
-	if ( $marketing_consent ){
+	if ( $marketing_consent ) {
 		$contact->set_marketing_consent();
 	}
 
-	if ( $terms_agreement ){
+	if ( $terms_agreement ) {
 		$contact->set_terms_agreement();
 	}
 
@@ -4392,11 +4392,11 @@ function is_ignore_user_tracking_precedence_enabled() {
  *
  * @return bool
  */
-function contact_and_user_match( $contact=false, $user=false ) {
+function contact_and_user_match( $contact = false, $user = false ) {
 
 	if ( is_int( $contact ) ) {
 		$contact = get_contactdata( $contact );
-	} else if ( ! $contact ){
+	} else if ( ! $contact ) {
 		$contact = get_contactdata();
 	}
 
@@ -4406,7 +4406,7 @@ function contact_and_user_match( $contact=false, $user=false ) {
 
 	if ( is_int( $user ) ) {
 		$user = get_userdata( $user );
-	} else if ( ! $user ){
+	} else if ( ! $user ) {
 		$$user = wp_get_current_user();
 	}
 
@@ -4836,7 +4836,6 @@ function sanitize_email_header( $header_value, $header_type ): string {
 }
 
 
-
 /**
  * Uninstall Groundhogg
  *
@@ -4929,4 +4928,29 @@ function get_default_field_label( $field = '' ) {
 	}
 
 	return apply_filters( 'groundhogg/default_field_label', $label, $field );
+}
+
+/**
+ * Map items in an array to a specific class
+ *
+ * @param $array
+ * @param $class
+ */
+function array_map_to_class( &$array, $class ) {
+	foreach ( $array as &$mixed ) {
+		$mixed = new $class( $mixed );
+	}
+}
+
+/**
+ * Get objects as ID list
+ *
+ * @param $array
+ *
+ * @return array
+ */
+function get_object_ids( $array ) {
+	return array_map( function ( $object ) {
+		return $object->get_id();
+	}, $array );
 }
