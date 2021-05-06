@@ -37,11 +37,11 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 	/**
 	 * @return array
 	 */
-	protected function parsed_tabs(){
+	protected function parsed_tabs() {
 
 		$tabs = $this->get_tabs();
 
-		$tabs = array_map( function ( $tab ){
+		$tabs = array_map( function ( $tab ) {
 			return wp_parse_args( $tab, [
 				'name' => '',
 				'slug' => 'gh_tab',
@@ -49,7 +49,7 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 			] );
 		}, $tabs );
 
-		return array_filter( $tabs, function ( $tab ){
+		return array_filter( $tabs, function ( $tab ) {
 			return current_user_can( $tab['cap'] );
 		} );
 
@@ -67,20 +67,20 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 	}
 
 	/**
-     * Retrieves the cap for the current tab
-     *
+	 * Retrieves the cap for the current tab
+	 *
 	 * @return bool
 	 */
-	public function get_current_tab_cap(){
+	public function get_current_tab_cap() {
 
-		foreach ( $this->parsed_tabs() as $tab ){
-		    if ( $tab[ 'slug' ] === $this->get_current_tab() ){
-		        return $tab[ 'cap' ];
-            }
-        }
+		foreach ( $this->parsed_tabs() as $tab ) {
+			if ( $tab['slug'] === $this->get_current_tab() ) {
+				return $tab['cap'];
+			}
+		}
 
-	    return false;
-    }
+		return false;
+	}
 
 	/**
 	 * Output HTML for the page tabs
@@ -88,14 +88,16 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 	protected function do_page_tabs() {
 
 		?>
-        <!-- BEGIN TABS -->
-        <h2 class="nav-tab-wrapper">
+		<!-- BEGIN TABS -->
+		<h2 class="nav-tab-wrapper">
 			<?php foreach ( $this->parsed_tabs() as $id => $tab ): ?>
-                <?php if ( ! current_user_can( $tab['cap'] ) ) continue; ?>
-                <a href="?page=<?php echo $this->get_slug(); ?>&tab=<?php echo $tab['slug']; ?>"
-                   class="nav-tab <?php echo $this->get_current_tab() == $tab['slug'] ? 'nav-tab-active' : ''; ?>"><?php _e( $tab['name'], 'groundhogg' ); ?></a>
+				<?php if ( ! current_user_can( $tab['cap'] ) ) {
+					continue;
+				} ?>
+				<a href="?page=<?php echo $this->get_slug(); ?>&tab=<?php echo $tab['slug']; ?>"
+				   class="nav-tab <?php echo $this->get_current_tab() == $tab['slug'] ? 'nav-tab-active' : ''; ?>"><?php _e( $tab['name'], 'groundhogg' ); ?></a>
 			<?php endforeach; ?>
-        </h2>
+		</h2>
 		<?php
 	}
 
@@ -111,24 +113,24 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 		$base_url = remove_query_arg( [ '_wpnonce', 'action' ], wp_get_referer() );
 
 		$callbacks = [
-            "process_{$this->get_current_tab()}_{$this->get_current_action()}",
-            "{$this->get_current_tab()}_{$this->get_current_action()}_process",
-            "process_{$this->get_current_action()}",
-            "{$this->get_current_action()}_process",
-        ];
+			"process_{$this->get_current_tab()}_{$this->get_current_action()}",
+			"{$this->get_current_tab()}_{$this->get_current_action()}_process",
+			"process_{$this->get_current_action()}",
+			"{$this->get_current_action()}_process",
+		];
 
 		$exitCode = null;
 
 		// Loop through potential callbacks and use first match.
-		foreach ( $callbacks as $callback ){
+		foreach ( $callbacks as $callback ) {
 			if ( method_exists( $this, $callback ) ) {
 				$exitCode = call_user_func( [ $this, $callback ] );
 				break;
-			} else if ( has_filter( "groundhogg/admin/{$this->get_slug()}/{$callback}" ) ){
+			} else if ( has_filter( "groundhogg/admin/{$this->get_slug()}/{$callback}" ) ) {
 				$exitCode = apply_filters( "groundhogg/admin/{$this->get_slug()}/{$callback}", $exitCode );
 				break;
 			}
-        }
+		}
 
 		set_transient( 'groundhogg_last_action', $this->get_current_action(), 30 );
 
@@ -168,22 +170,24 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 		do_action( "groundhogg/admin/{$this->get_slug()}/{$this->get_current_tab()}", $this );
 
 		?>
-        <div class="wrap">
-            <h1 class="wp-heading-inline"><?php echo $this->get_title(); ?></h1>
+		<div class="wrap">
+			<h1 class="wp-heading-inline"><?php echo $this->get_title(); ?></h1>
 			<?php $this->do_title_actions(); ?>
 			<?php $this->notices(); ?>
-            <hr class="wp-header-end">
+			<hr class="wp-header-end">
 			<?php $this->do_page_tabs(); ?>
 			<?php
 
-			if ( current_user_can( $this->get_current_tab_cap() ) ){
+			if ( current_user_can( $this->get_current_tab_cap() ) ) {
 
 				$methods = [
 					"{$this->get_current_tab()}_{$this->get_current_action()}",
 					"{$this->get_current_action()}_{$this->get_current_tab()}",
 					"{$this->get_current_tab()}_view",
 					"view_{$this->get_current_tab()}",
-					"view"
+					$this->get_current_tab(),
+					$this->get_current_action(),
+					"view",
 				];
 
 				foreach ( $methods as $method ) {
@@ -199,7 +203,7 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 			}
 
 			?>
-        </div>
+		</div>
 		<?php
 	}
 
