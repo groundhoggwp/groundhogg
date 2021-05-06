@@ -107,13 +107,13 @@ $email_width          = $is_showing_in_iframe ? '100%' : $email_width;
 
 <!-- HEAD -->
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="x-apple-disable-message-reformatting"/>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="x-apple-disable-message-reformatting"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-    <title><?php echo $email_title; ?></title>
-    <base target="_parent">
-    <style>
+	<title><?php echo $email_title; ?></title>
+	<base target="_parent">
+	<style>
 
         img {
             max-width: 100% !important;
@@ -144,8 +144,8 @@ $email_width          = $is_showing_in_iframe ? '100%' : $email_width;
 
         @media only screen and (max-width: 480px) {
 
-            .alignright,
-            .alignleft {
+            .alignright:not(.keep-float),
+            .alignleft:not(.keep-float) {
                 display: block !important;
                 float: none !important;
                 margin-left: auto !important;
@@ -153,13 +153,10 @@ $email_width          = $is_showing_in_iframe ? '100%' : $email_width;
                 margin-bottom: 20px !important;
             }
 
-            /*td.container {*/
-            /*    padding: 0 10px !important;*/
-            /*}*/
         }
 
-        <?php do_action( 'groundhogg/templates/email/head/style' ); ?>
-    </style>
+		<?php do_action( 'groundhogg/templates/email/head/style' ); ?>
+	</style>
 	<?php do_action( 'groundhogg/templates/email/head/after' ); ?>
 </head>
 <!-- /HEAD -->
@@ -167,27 +164,28 @@ $email_width          = $is_showing_in_iframe ? '100%' : $email_width;
 <!-- BODY -->
 <body class="email" style="<?php echo $body; ?>">
 <table border="0" cellpadding="0" cellspacing="0" class="body" style="<?php echo $wrapper; ?>">
-    <tr>
-        <td class="container" style="<?php echo $template_container; ?>" align="<?php echo $alignment; ?>">
-            <table border="0" cellpadding="0" cellspacing="0" class="body" style="max-width: <?php echo $email_width;?>px">
-                <tr>
-                    <td align="center">
-                        <div class="content" style="<?php echo $template_content; ?>">
+	<tr>
+		<td class="container" style="<?php echo $template_container; ?>" align="<?php echo $alignment; ?>">
+			<table border="0" cellpadding="0" cellspacing="0" class="body"
+			       style="max-width: <?php echo $email_width; ?>px">
+				<tr>
+					<td align="center">
+						<div class="content" style="<?php echo $template_content; ?>">
 
-                            <!-- PREHEADER -->
-                            <span class="preheader"
-                                  style="<?php echo $preheader; ?>"><?php echo apply_filters( 'groundhogg/email_template/pre_header_text', '' ); ?></span>
-                            <!-- /PREHEADER -->
+							<!-- PREHEADER -->
+							<span class="preheader"
+							      style="<?php echo $preheader; ?>"><?php echo apply_filters( 'groundhogg/email_template/pre_header_text', '' ); ?></span>
+							<!-- /PREHEADER -->
 
-                            <!-- BROWSER VIEW -->
+							<!-- BROWSER VIEW -->
 							<?php if ( apply_filters( 'groundhogg/email_template/show_browser_view', false ) ): ?>
-                                <div class="header" style="text-align: center;margin-bottom: 25px;">
+								<div class="header" style="text-align: center;margin-bottom: 25px;">
                                     <span class="apple-link" style="<?php echo $apple_link; ?>">
                                         <a href="<?php echo esc_url_raw( apply_filters( 'groundhogg/email_template/browser_view_link', home_url() ) ); ?>">
                                             <?php _e( apply_filters( 'groundhogg/email_template/browser_view_text', __( 'View In Browser...', 'groundhogg' ) ), 'groundhogg' ); ?>
                                         </a>
                                     </span>
-                                </div>
-                                <!-- /BROWSER VIEW -->
+								</div>
+								<!-- /BROWSER VIEW -->
 							<?php endif; ?>
 

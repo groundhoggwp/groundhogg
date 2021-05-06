@@ -544,6 +544,7 @@ class Email extends Base_Object_With_Meta {
 		add_filter( 'groundhogg/email_template/open_tracking_link', [ $this, 'get_open_tracking_link' ] );
 		add_filter( 'groundhogg/email/the_content', [ $this, 'convert_to_tracking_links' ] );
 		add_filter( 'groundhogg/email/the_content', [ $this, 'minify' ] );
+		add_filter( 'groundhogg/email_template/title', [ $this, 'get_merged_subject_line' ] );
 	}
 
 
