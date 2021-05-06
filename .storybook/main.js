@@ -1,7 +1,9 @@
 module.exports = {
   "stories": [
     "../src/components/core-ui/**/*.stories.mdx",
-    "../src/components/core-ui/**/*.stories.@(js|jsx|ts|tsx)"    
+    // Delete this entry later, just want the init in one place
+    "../src/components/storybook-example/**/*.stories.@(js|jsx|ts|tsx)",
+    "../src/components/core-ui/**/*.stories.@(js|jsx|ts|tsx)"
   ],
   "addons": [
     "@storybook/addon-links",
