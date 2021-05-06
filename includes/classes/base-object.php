@@ -35,6 +35,11 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 * @param $field string the file to query
 	 */
 	public function __construct( $identifier_or_args = 0, $field = null ) {
+
+		if ( ! $identifier_or_args ){
+			return;
+		}
+
 		// Fallback plan
 		if ( ! are_dbs_initialised() ) {
 			emergency_init_dbs();
@@ -160,7 +165,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			$this->$key = $value;
 		}
 
-		$this->data['ID'] = $this->get_id();
+		$this->data[$this->get_identifier_key()] = $this->get_id();
 
 		$this->post_setup();
 
