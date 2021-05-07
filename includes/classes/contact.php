@@ -51,7 +51,7 @@ class Contact extends Base_Object_With_Meta {
 	 * Contact constructor.
 	 *
 	 * @param bool|int|string|array $_id_or_email_or_args
-	 * @param bool $by_user_id
+	 * @param bool                  $by_user_id
 	 */
 	public function __construct( $_id_or_email_or_args = false, $by_user_id = false ) {
 		$field = false;
@@ -89,8 +89,8 @@ class Contact extends Base_Object_With_Meta {
 
 		/**
 		 * @param $profile_picture string link to the current profile picture
-		 * @param $contact_id int the contact id
-		 * @param $contact Contact the contact
+		 * @param $contact_id      int the contact id
+		 * @param $contact         Contact the contact
 		 */
 		return apply_filters( 'groundhogg/contact/profile_picture', $profile_pic, $this->get_id(), $this );
 	}
@@ -170,8 +170,20 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @return array
 	 */
-	public function get_tags() {
+	public function get_tags_ids() {
 		return wp_parse_id_list( $this->tags );
+	}
+
+	/**
+	 * Get the tag objects.
+	 *
+	 * @return Tag[]
+	 */
+	public function get_tags( $as_object = false ) {
+
+		return $as_object ? array_map( function ( $tag_id ) {
+			return new Tag( $tag_id );
+		}, $this->get_tag_ids() ) : $this->get_tags_ids();
 	}
 
 	/**
@@ -198,18 +210,7 @@ class Contact extends Base_Object_With_Meta {
 	 * @return Note[]
 	 */
 	public function get_all_notes() {
-		$raw = get_db( 'contactnotes' )->query( [
-			'contact_id' => $this->get_id(),
-			'orderby'    => 'timestamp'
-		] );
-
-		$notes = [];
-
-		foreach ( $raw as $note ) {
-			$notes[] = new Note( absint( $note->ID ) );
-		}
-
-		return $notes;
+		return $this->get_notes();
 	}
 
 
@@ -390,42 +391,51 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * Adds nots to the contact
 	 *
-	 * @param String $note
-	 * @param string $context
+	 * @param String   $note
+	 * @param string   $context
 	 * @param bool|int $user_id
 	 *
-	 * @return bool
+	 * @return $note
 	 */
 	public function add_note( $note, $context = 'system', $user_id = false ) {
 		if ( ! $note || ! is_string( $note ) ) {
 			return false;
 		}
 
-		$notes = [
-			'contact_id' => $this->get_id(),
-			'context'    => $context,
-			'content'    => sanitize_textarea_field( $note ),
-			'user_id'    => $user_id,
+		$note_data = [
+			'object_id'   => $this->get_id(),
+			'object_type' => $this->get_object_type(),
+			'context'     => $context,
+			'content'     => wp_kses_post( $note ),
+			'user_id'     => $user_id ?: get_current_user_id(),
 		];
 
 		if ( $context == 'user' && ! $user_id ) {
-			$notes['user_id'] = get_current_user_id();
+			$note_data['user_id'] = get_current_user_id();
 		}
 
-		get_db( 'contactnotes' )->add( $notes );
+		$note = new Note( $note_data );
 
 		do_action( 'groundhogg/contact/note/added', $this->ID, $note, $this );
 
-		return true;
+		return $note;
 	}
 
 	/**
 	 * get the contact's notes
 	 *
-	 * @return string
+	 * @return Note[]
 	 */
 	public function get_notes() {
-		return $this->get_meta( 'notes' );
+
+		$notes = get_db( 'notes' )->query( [
+			'object_id'   => $this->get_id(),
+			'object_type' => $this->get_object_type()
+		] );
+
+		array_map_to_class( $notes, Note::class );
+
+		return $notes;
 	}
 
 	/**
@@ -535,6 +545,13 @@ class Contact extends Base_Object_With_Meta {
 		return in_array( $tag_id, $this->tags );
 	}
 
+	/**
+	 * Contact update wrapper
+	 *
+	 * @param array $data
+	 *
+	 * @return bool
+	 */
 	public function update( $data = [] ) {
 
 		$preference_updated = false;
@@ -869,6 +886,20 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Delete a file
+	 *
+	 * @param $file_name string
+	 */
+	public function delete_file( $file_name ) {
+		$file_name = basename( $file_name );
+		foreach ( $this->get_files() as $file ) {
+			if ( $file_name === $file['file_name'] ) {
+				unlink( $file['file_path'] );
+			}
+		}
+	}
+
+	/**
 	 * Get the age of the contact
 	 *
 	 * @return int
@@ -905,8 +936,10 @@ class Contact extends Base_Object_With_Meta {
 				'ID'    => $this->get_id(),
 				'data'  => $contact,
 				'meta'  => $this->get_meta(),
-				'tags'  => id_list_to_class( $this->get_tags(), Tag::class ),
-				'files' => $this->get_files()
+				'tags'  => $this->get_tags( true ),
+				'files' => $this->get_files(),
+				'user'  => $this->user,
+				'notes' => $this->get_notes()
 			]
 		);
 	}
@@ -919,7 +952,6 @@ class Contact extends Base_Object_With_Meta {
 	public function __toString() {
 		return sprintf( "%s (%s)", $this->get_full_name(), $this->get_email() );
 	}
-
 
 	public function get_company() {
 		return $this->get_meta( 'company_name' );
@@ -997,5 +1029,4 @@ class Contact extends Base_Object_With_Meta {
 
 		do_action( "groundhogg/contact/agreed_to_terms", $this );
 	}
-
 }

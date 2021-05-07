@@ -10,8 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class Notes_Api
  *
- * todo refactor contactNotes to notes so that this works...
- *
  * @package Groundhogg\Api\V4
  */
 class Notes_Api extends Base_Object_Api {

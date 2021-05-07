@@ -96,14 +96,15 @@ class Migrate_Notes extends Bulk_Job {
 			$time = strtotime( $dates[ $i ] );
 
 			$note_to_add = [
-				'contact_id'   => $item,
+				'object_type'  => 'contact',
+				'object_id'    => $item,
 				'context'      => 'system',
-				'content'      => sanitize_textarea_field( $notes[ $i ] ),
+				'content'      => wp_kses_post( $notes[ $i ] ),
 				'date_created' => date( 'Y-m-d H:i:s', $time ),
 				'timestamp'    => $time,
 			];
 
-			get_db( 'contactnotes' )->add( $note_to_add );
+			get_db( 'notes' )->add( $note_to_add );
 		}
 
 		$contact->delete_meta( 'notes' );

@@ -348,11 +348,11 @@ abstract class Base_Object_Api extends Base_Api {
 				$data = get_array_var( $item, 'data', [] );
 				$meta = get_array_var( $item, 'meta', [] );
 
+				$object->update( $data );
+
 				// If the current object supports meta data...
 				if ( method_exists( $object, 'update_meta' ) ) {
-					$object->update( $data, $meta );
-				} else {
-					$object->update( $data );
+					$object->update_meta( $meta );
 				}
 
 				$updated[] = $object;
@@ -376,11 +376,11 @@ abstract class Base_Object_Api extends Base_Api {
 		 */
 		foreach ( $items as $object ) {
 
+			$object->update( $data );
+
 			// If the current object supports meta data...
 			if ( method_exists( $object, 'update_meta' ) ) {
-				$object->update( $data, $meta );
-			} else {
-				$object->update( $data );
+				$object->update_meta( $meta );
 			}
 		}
 
@@ -499,9 +499,7 @@ abstract class Base_Object_Api extends Base_Api {
 
 		// If the current object supports meta data...
 		if ( method_exists( $object, 'update_meta' ) ) {
-			$object->update( $data, $meta );
-		} else {
-			$object->update( $data );
+			$object->update_meta( $meta );
 		}
 
 		return self::SUCCESS_RESPONSE( [ 'item' => $object ] );

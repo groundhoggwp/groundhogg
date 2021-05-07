@@ -2,6 +2,8 @@
 
 namespace Groundhogg;
 
+use WP_Error;
+
 class Files {
 
 	/**
@@ -196,6 +198,70 @@ class Files {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * @var array
+	 */
+	protected $uploads_path = [];
+
+	/**
+	 * Change the default upload directory
+	 *
+	 * @param $param
+	 *
+	 * @return mixed
+	 */
+	public function files_upload_dir( $param ) {
+		$param['path']   = $this->uploads_path['path'];
+		$param['url']    = $this->uploads_path['url'];
+		$param['subdir'] = $this->uploads_path['subdir'];
+
+		return $param;
+	}
+
+	/**
+	 * Initialize the base upload path
+	 *
+	 * @param string $where
+	 */
+	private function set_uploads_path( $where='imports' ) {
+		$this->uploads_path['subdir'] = Plugin::$instance->utils->files->get_base_uploads_dir();
+		$this->uploads_path['path']   = Plugin::$instance->utils->files->get_uploads_dir( $where, '', true );
+		$this->uploads_path['url']    = Plugin::$instance->utils->files->get_uploads_dir( $where, '', true );
+	}
+
+	/**
+	 * Upload a file to the Groundhogg file directory
+	 *
+	 * @param        $file array
+	 * @param string $where
+	 *
+	 * @return array|bool|WP_Error
+	 */
+	function upload( &$file, $where='imports' ) {
+		$upload_overrides = array( 'test_form' => false );
+
+		if ( ! function_exists( 'wp_handle_upload' ) ) {
+			require_once( ABSPATH . '/wp-admin/includes/file.php' );
+		}
+
+		$this->set_uploads_path( $where );
+
+		add_filter( 'upload_dir', array( $this, 'files_upload_dir' ) );
+		$mfile = wp_handle_upload( $file, $upload_overrides );
+		remove_filter( 'upload_dir', array( $this, 'files_upload_dir' ) );
+
+		if ( isset( $mfile['error'] ) ) {
+
+			if ( empty( $mfile['error'] ) ) {
+				$mfile['error'] = _x( 'Could not upload file.', 'error', 'groundhogg' );
+			}
+
+			return new WP_Error( 'BAD_UPLOAD', $mfile['error'] );
+		}
+
+		return $mfile;
 	}
 
 }

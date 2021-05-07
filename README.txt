@@ -341,7 +341,8 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 * TWEAKED Removed the "new feature" info card.
 * TWEAKED First & Last name columns have highest priority in the contact table.
 * TWEAKED Clicks in the reports with ?pk= in the URL will be grouped together.
-* TWEAKED You can now pass raw objects to Base_Object so your SQL queries become 1 instead of N+1, super savings!
+* TWEAKED You can now pass raw objects to Base_Object so your SQL queries become 1 instead of N+1, super memory savings!
+* TWEAKED Refactored contact notes to an abstract table capable of storing notes for multiple object types.
 * FIXED Tag associations count not working
 * FIXED Meta not being deleted when the associated object is deleted.
 * FIXED Owner being removed when a contact uploads a file through a form on the frontend.

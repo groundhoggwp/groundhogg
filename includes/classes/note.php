@@ -13,6 +13,6 @@ class Note extends Base_Object {
 	}
 
 	protected function get_db() {
-		return get_db( 'contactnotes' );
+		return get_db( 'notes' );
 	}
 }

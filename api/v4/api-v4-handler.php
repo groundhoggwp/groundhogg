@@ -39,12 +39,12 @@ class API_V4_HANDLER {
 	public function declare_base_endpoints() {
 
 		$this->contacts        = new Contacts_Api();
-//		$this->notes_api       = new Notes_Api();
+		$this->notes_api       = new Notes_Api();
 		$this->tags            = new Tags_Api();
 		$this->emails          = new Emails_Api();
-		$this->broadcasts      = new Broadcasts_Api();
-		$this->funnels_api     = new Funnels_Api();
-		$this->steps_api       = new Steps_Api();
+//		$this->broadcasts      = new Broadcasts_Api();
+//		$this->funnels_api     = new Funnels_Api();
+//		$this->steps_api       = new Steps_Api();
 		$this->activity_api    = new Activity_Api();
 		$this->events_api      = new Events_Api();
 		$this->event_queue_api = new Event_Queue_Api();
@@ -52,7 +52,7 @@ class API_V4_HANDLER {
 		$this->files_api       = new Files_Api();
 		$this->reports         = new Reports_Api();
 		$this->settings        = new Settings_Api();
-		$this->bulk_job        = new Bulk_Job_Api();
+//		$this->bulk_job        = new Bulk_Job_Api();
 
 //		$this->tracking        = new Tracking_Api();
 //		$this->report_pages    = new Report_Pages_Api();

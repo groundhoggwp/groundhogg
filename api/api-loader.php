@@ -38,7 +38,7 @@ class Api_Loader {
 		define( 'DOING_GROUNDHOGG_REST_REQUEST', true );
 
 		$this->v3 = new API_V3();
-//		$this->v4 = new API_V4_HANDLER();
+		$this->v4 = new API_V4_HANDLER();
 	}
 
 

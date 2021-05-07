@@ -244,7 +244,25 @@ add_filter( 'groundhogg/admin/emails/sanitize_email_content', __NAMESPACE__ . '\
 add_filter( 'groundhogg/admin/emails/sanitize_email_content', __NAMESPACE__ . '\add_safe_style_attributes_to_email', 10 );
 add_filter( 'groundhogg/admin/emails/sanitize_email_content', __NAMESPACE__ . '\kses_wrapper', 11 );
 
+/**
+ * Backwards compate
+ *
+ * @param $content
+ *
+ * @return string
+ */
 function kses_wrapper( $content ){
+	return email_kses( $content );
+}
+
+/**
+ * Compat for email links and replacements
+ *
+ * @param $content
+ *
+ * @return string
+ */
+function email_kses( $content ){
 
 	// Basic protocols
 	$basic_protocols = [ 'http', 'https', 'mailto','mms', 'sms', 'svn', 'tel', 'fax' ];

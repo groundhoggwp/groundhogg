@@ -984,14 +984,9 @@ class Contacts_Page extends Admin_Page {
 		$note       = sanitize_textarea_field( get_post_var( 'note' ) );
 		$contact_id = absint( get_post_var( 'contact' ) );
 
-		$id = get_db( 'contactnotes' )->add( [
-			'contact_id' => $contact_id,
-			'context'    => 'user',
-			'user_id'    => get_current_user_id(),
-			'content'    => $note,
-		] );
+		$contact = get_contactdata( $contact_id );
 
-		$note = new Note( $id );
+		$note = $contact->add_note( $note, 'user', get_current_user_id() );
 
 		ob_start();
 		include __DIR__ . '/note.php';
@@ -1014,7 +1009,7 @@ class Contacts_Page extends Admin_Page {
 
 		$note_id = absint( get_request_var( 'note_id' ) );
 
-		get_db( 'contactnotes' )->delete( $note_id );
+		get_db( 'notes' )->delete( $note_id );
 
 		wp_send_json_success( [
 			'msg' => __( 'Note deleted successfully.', 'groundhogg' )
