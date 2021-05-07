@@ -27,10 +27,6 @@ class API_V4_HANDLER {
 		$this->declare_base_endpoints();
 
 		do_action( 'groundhogg/api/v4/init', $this );
-
-		// Todo remove this after done testing
-//		sleep( 1 );
-
 	}
 
 	/**
@@ -38,10 +34,11 @@ class API_V4_HANDLER {
 	 */
 	public function declare_base_endpoints() {
 
-		$this->contacts        = new Contacts_Api();
-		$this->notes_api       = new Notes_Api();
-		$this->tags            = new Tags_Api();
-		$this->emails          = new Emails_Api();
+		$this->contacts  = new Contacts_Api();
+		$this->notes_api = new Notes_Api();
+		$this->tags      = new Tags_Api();
+		$this->fields    = new Fields_Api();
+		$this->emails    = new Emails_Api();
 //		$this->broadcasts      = new Broadcasts_Api();
 //		$this->funnels_api     = new Funnels_Api();
 //		$this->steps_api       = new Steps_Api();
@@ -50,8 +47,8 @@ class API_V4_HANDLER {
 		$this->event_queue_api = new Event_Queue_Api();
 		$this->submissions_api = new Submissions_Api();
 		$this->files_api       = new Files_Api();
-		$this->reports         = new Reports_Api();
 		$this->settings        = new Settings_Api();
+//		$this->reports         = new Reports_Api();
 //		$this->bulk_job        = new Bulk_Job_Api();
 
 //		$this->tracking        = new Tracking_Api();
