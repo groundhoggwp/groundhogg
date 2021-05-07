@@ -170,7 +170,7 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @return array
 	 */
-	public function get_tags_ids() {
+	public function get_tag_ids() {
 		return wp_parse_id_list( $this->tags );
 	}
 
@@ -183,7 +183,7 @@ class Contact extends Base_Object_With_Meta {
 
 		return $as_object ? array_map( function ( $tag_id ) {
 			return new Tag( $tag_id );
-		}, $this->get_tag_ids() ) : $this->get_tags_ids();
+		}, $this->get_tag_ids() ) : $this->get_tag_ids();
 	}
 
 	/**

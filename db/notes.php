@@ -98,7 +98,7 @@ class Notes extends DB {
 	 * Add new object_type column
 	 * Set the object type to contact because up to this point all notes where for contacts.
 	 */
-	public function change_to_abstract_notes_class(){
+	public function update_2_4_6(){
 
 		global $wpdb;
 

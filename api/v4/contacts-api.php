@@ -128,8 +128,8 @@ class Contacts_Api extends Base_Object_Api {
 		}
 
 		return self::SUCCESS_RESPONSE( [
-			'items'       => $added,
 			'total_items' => count( $added ),
+			'items'       => $added,
 		] );
 	}
 
@@ -167,8 +167,8 @@ class Contacts_Api extends Base_Object_Api {
 		}, $contacts );
 
 		return self::SUCCESS_RESPONSE( [
-			'items'       => $contacts,
 			'total_items' => $count,
+			'items'       => $contacts,
 		] );
 	}
 
@@ -240,8 +240,8 @@ class Contacts_Api extends Base_Object_Api {
 			}
 
 			return self::SUCCESS_RESPONSE( [
-				'items'       => $contacts,
 				'total_items' => count( $contacts ),
+				'items'       => $contacts,
 			] );
 		}
 
@@ -275,8 +275,8 @@ class Contacts_Api extends Base_Object_Api {
 		}
 
 		return self::SUCCESS_RESPONSE( [
-			'items'       => $contacts,
 			'total_items' => $count,
+			'items'       => $contacts,
 		] );
 	}
 
@@ -496,8 +496,8 @@ class Contacts_Api extends Base_Object_Api {
 		}
 
 		return self::SUCCESS_RESPONSE( [
+			'total_items' => count( $contact->get_files() ),
 			'items'       => $contact->get_files(),
-			'total_items' => count( $contact->get_files() )
 		] );
 	}
 
@@ -523,8 +523,8 @@ class Contacts_Api extends Base_Object_Api {
 		$offset = absint( $request->get_param( 'offset' ) ) ?: 0;
 
 		return self::SUCCESS_RESPONSE( [
-			'items'       => array_slice( $data, $offset, $limit ),
-			'total_items' => count( $data )
+			'total_items' => count( $data ),
+			'items'       => array_slice( $data, $offset, $limit )
 		] );
 
 	}
@@ -557,8 +557,8 @@ class Contacts_Api extends Base_Object_Api {
 		}
 
 		return self::SUCCESS_RESPONSE( [
+			'total_items' => count( $contact->get_files() ),
 			'items'       => $contact->get_files(),
-			'total_items' => count( $contact->get_files() )
 		] );
 	}
 

@@ -18,6 +18,7 @@ use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Step;
 use Groundhogg\Tag;
+
 //use Groundhogg\Webhook;
 use function Groundhogg\get_array_var;
 use WP_REST_Server;
@@ -280,8 +281,8 @@ abstract class Base_Object_Api extends Base_Api {
 		}
 
 		return self::SUCCESS_RESPONSE( [
-			'items'       => $added,
 			'total_items' => count( $added ),
+			'items'       => $added,
 		] );
 	}
 
@@ -309,7 +310,10 @@ abstract class Base_Object_Api extends Base_Api {
 
 		$items = array_map( [ $this, 'map_raw_object_to_class' ], $items );
 
-		return self::SUCCESS_RESPONSE( [ 'items' => $items, 'total_items' => $total ] );
+		return self::SUCCESS_RESPONSE( [
+			'total_items' => $total,
+			'items'       => $items
+		] );
 	}
 
 	/**
@@ -359,8 +363,8 @@ abstract class Base_Object_Api extends Base_Api {
 			}
 
 			return self::SUCCESS_RESPONSE( [
-				'items'       => $updated,
 				'total_items' => count( $updated ),
+				'items'       => $updated,
 			] );
 		}
 
@@ -385,8 +389,8 @@ abstract class Base_Object_Api extends Base_Api {
 		}
 
 		return self::SUCCESS_RESPONSE( [
-			'items'       => $items,
 			'total_items' => count( $items ),
+			'items'       => $items,
 		] );
 	}
 

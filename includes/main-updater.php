@@ -391,9 +391,16 @@ class Main_Updater extends Updater {
 	public function version_2_4_5_5() {
 		recount_tag_contacts_count();
 
-		foreach ( Plugin::instance()->dbs->get_all_object_tables() as $table ){
+		foreach ( Plugin::instance()->dbs->get_all_object_tables() as $table ) {
 			$table->delete_orphaned_meta();
 		}
+	}
+
+	/**
+	 * Refactor notes db
+	 */
+	public function version_2_4_6(){
+		get_db( 'notes' )->update_2_4_6();
 	}
 
 	/**
@@ -441,7 +448,8 @@ class Main_Updater extends Updater {
 			'2.2.23.3',
 			'2.3',
 			'2.3.3',
-			'2.4.5.5'
+			'2.4.5.5',
+			'2.4.6'
 		];
 	}
 
@@ -504,6 +512,7 @@ class Main_Updater extends Updater {
 			'2.3'           => __( 'Add the new database tables for the new Email Logging feature.', 'groundhogg' ),
 			'2.3.3'         => __( 'Separate GDPR consent into Data Processing consent and Marketing consent', 'groundhogg' ),
 			'2.4.5.5'       => __( 'Fix tag counts and delete orphaned object meta.', 'groundhogg' ),
+			'2.4.6'         => __( 'Refactor notes to abstract data type for support across more objects.', 'groundhogg' ),
 		];
 	}
 }
