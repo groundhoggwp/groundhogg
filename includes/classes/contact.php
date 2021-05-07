@@ -961,6 +961,72 @@ class Contact extends Base_Object_With_Meta {
 		return $this->get_meta( 'job_title' );
 	}
 
+//	protected function sanitize_columns( $data = [] ) {
+//
+//		map_func_to_attr( $data, 'first_name', 'sanitize_text_field' );
+//		map_func_to_attr( $data, 'last_name', 'sanitize_text_field' );
+//		map_func_to_attr( $data, 'email', 'sanitize_email' );
+//		map_func_to_attr( $data, 'optin_status', 'sanitize_text_field' );
+//		map_func_to_attr( $data, 'owner_id', 'absint' );
+//		map_func_to_attr( $data, 'user_id', 'absint' );
+//		map_func_to_attr( $data, 'date_created', function ( $date ) {
+//			return convert_to_mysql_date( $date );
+//		} );
+//		map_func_to_attr( $data, 'date_optin_status_changed', function ( $date ) {
+//			return convert_to_mysql_date( $date );
+//		} );
+//
+//		return $data;
+//	}
+
+	/**
+	 * Merge $other into $this
+	 * - Fills out missing info in $this from $other
+	 * - Updates all events for $other with $this' ID
+	 * - Updates all activity for $other with $this' ID
+	 * - Updates all notes for $other with $this' ID
+	 * - Move all files to $this' file folder
+	 * - Deletes $other
+	 *
+	 * @param int|string|Contact $other
+	 *
+	 * @return bool
+	 */
+	public function merge( $other ) {
+
+		$other = get_contactdata( $other );
+		if ( ! is_a_contact( $other ) ) {
+			return false;
+		}
+
+		$data = array_merge( $other->data, $this->data );
+		$this->update( $data );
+
+		// May use this later...
+		$this->update_meta( 'previous_merge_data', $other->data );
+		$uploads_dir = $this->get_uploads_folder();
+
+		// Move any files to this contacts uploads folder.
+		foreach ( $other->get_files() as $file ) {
+			$file_path = $file['file_path'];
+			$file_name = $file['file_name'];
+
+			rename( $file_path, $uploads_dir['path'] . '/' . $file_name );
+		}
+
+		/**
+		 * Fires before the $other is permanently deleted.
+		 *
+		 * @param $primary Contact
+		 * @param $other Contact
+		 */
+		do_action( 'groundhogg/contact/merge', $this, $other );
+
+		$other->delete();
+
+		return true;
+	}
+
 	protected function set_compliance_and_date_meta( $id ) {
 		$this->update_meta( $id, 'yes' );
 		$this->update_meta( "{$id}_date", date_i18n( get_date_time_format() ) );
