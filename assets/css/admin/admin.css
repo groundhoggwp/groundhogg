@@ -255,6 +255,27 @@ input[type=range].slider:focus::-ms-fill-upper {
     margin: 0 0 5px 0 !important;
 }
 
+a.danger{
+    color: #a00;
+}
+
+a.danger:hover{
+    color: #dc3232;
+}
+
+.wp-core-ui .button.danger{
+    background-color: #a00;
+    border-color: #a00;
+    color: #FFFFFF;
+}
+
+.wp-core-ui .button.danger:hover {
+    background-color: #dc3232;
+    border-color: #dc3232;
+    color: #FFFFFF;
+}
+
+
 #wpbody .big-button {
     position: relative;
     font-size: 16px;
