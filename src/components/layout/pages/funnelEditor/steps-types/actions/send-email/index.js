@@ -1,4 +1,4 @@
-import EmailIcon from "@material-ui/icons/Email";
+import Mail from "components/svg/Mail/";
 
 import { ACTION, ACTION_TYPE_DEFAULTS } from "../../constants";
 import { registerStepType } from "data/step-type-registry";
@@ -14,14 +14,13 @@ const stepAtts = {
 
   name: "Send Email",
 
-  icon: <EmailIcon />,
+  icon: <Mail />,
 
   read: ({ data, meta, stats }) => {
     return <>Email is sent</>;
   },
 
   edit: ({ data, meta, stats }) => {
-    return <>edit</>;
   },
 };
 

@@ -1,4 +1,5 @@
-import PersonAddIcon from "@material-ui/icons/PersonAdd";
+import NewUser from "components/svg/NewUser/";
+
 import { ACTION, ACTION_TYPE_DEFAULTS } from "../../constants";
 import { registerStepType } from "data/step-type-registry";
 
@@ -13,7 +14,7 @@ const stepAtts = {
 
   name: "Create User",
 
-  icon: <PersonAddIcon />,
+  icon: <NewUser />,
 
   // read: ({ data, meta, stats }) => {
   //   return <></>;
