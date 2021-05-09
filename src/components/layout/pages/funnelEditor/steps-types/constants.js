@@ -23,6 +23,9 @@ const useStyles = makeStyles((theme) => ({
   },
   step: {
     color: "#F58115",
+    '& svg':{
+      fill: '#F58115'
+    }
   },
   benchmark: {
     color: "#90C71C",

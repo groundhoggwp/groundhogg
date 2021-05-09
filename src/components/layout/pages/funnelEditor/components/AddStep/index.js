@@ -30,6 +30,9 @@ const useStyles = makeStyles((theme) => ({
     height: "4rem",
     width: "4rem",
     margin: "0 auto 1rem",
+    '& svg':{
+      fill: '#F58115'
+    }
   },
   svg: {
     width: "2rem",
