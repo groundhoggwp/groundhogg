@@ -3,6 +3,8 @@
 namespace Groundhogg\Admin\Settings;
 
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Api\V3\Base;
+use Groundhogg\Api\V4\Base_Api;
 use Groundhogg\Extension;
 use Groundhogg\Mailhawk;
 use Groundhogg\SendWp;
@@ -140,6 +142,30 @@ class Settings_Page extends Admin_Page {
 		<div style="max-width: 900px;"><?php
 		$api_keys_table->display();
 		?></div><?php
+
+		html()->start_form_table();
+		html()->start_row();
+		html()->th( __( 'API v4 Route', 'groundhogg' ) );
+		html()->td( html()->input( [
+				'class'    => 'code input regular-text',
+				'readonly' => true,
+				'value'    => rest_url( Base_Api::NAME_SPACE ),
+				'onfocus'  => 'this.select()'
+			]
+		) );
+		html()->end_row();
+		html()->start_row();
+		html()->th( __( 'API v3 Route', 'groundhogg' ) );
+		html()->td( html()->input( [
+				'class'    => 'code input regular-text',
+				'readonly' => true,
+				'value'    => rest_url( Base::NAME_SPACE ),
+				'onfocus'  => 'this.select()'
+			]
+		) );
+		html()->end_row();
+
+		html()->end_form_table();
 	}
 
 	public function show_extensions() {
@@ -1254,7 +1280,7 @@ class Settings_Page extends Admin_Page {
 	/**
 	 * Add a tab to the settings page
 	 *
-	 * @param string $id if of the tab
+	 * @param string $id    if of the tab
 	 * @param string $title title of the tab
 	 *
 	 * @return bool
@@ -1276,9 +1302,9 @@ class Settings_Page extends Admin_Page {
 	/**
 	 * Add a section to a tab
 	 *
-	 * @param string $id id of the section
+	 * @param string $id    id of the section
 	 * @param string $title title of the section
-	 * @param string $tab the tab
+	 * @param string $tab   the tab
 	 *
 	 * @return bool
 	 */
