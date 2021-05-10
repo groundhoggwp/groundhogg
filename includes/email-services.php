@@ -238,6 +238,24 @@ class Groundhogg_Email_Services {
 	}
 
 	/**
+	 * Handler for unknown email type.
+	 *
+	 * @param string|array $to          Array or comma-separated list of email addresses to send message.
+	 * @param string       $subject     Email subject
+	 * @param string       $message     Message contents
+	 * @param string|array $headers     Optional. Additional headers.
+	 * @param string|array $attachments Optional. Files to attach.
+	 *
+	 * @return bool Whether the email contents were sent successfully.
+	 */
+	public static function send_type( $type, $to, $subject, $message, $headers = '', $attachments = array() ) {
+		$service                    = self::get_saved_service( $type );
+		self::$current_message_type = $type;
+
+		return self::send( $service, $to, $subject, $message, $headers, $attachments );
+	}
+
+	/**
 	 * Handler for transactional emails.
 	 *
 	 * @param string|array $to          Array or comma-separated list of email addresses to send message.

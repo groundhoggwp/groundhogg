@@ -333,6 +333,7 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 == Changelog ==
 
 = 2.4.6 (2021-05-03) =
+* ADDED Enabled Version 4 of the REST API.
 * ADDED Default values for `contact_and_user_match()`.
 * ADDED `is_spam` filter to the form submission spam check.
 * ADDED New MISC tab in the tools panel to add tools too that do not need to be top level.

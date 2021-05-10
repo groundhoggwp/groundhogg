@@ -89,14 +89,15 @@ class Emails_Api extends Base_Object_Api {
 	public function send_email( \WP_REST_Request $request ) {
 
 		$to         = sanitize_email( $request->get_param( 'to' ) );
-		$from_email = sanitize_email( $request->get_param( 'from_email' ) ) ? : get_default_from_email();
-		$from_name  = sanitize_email( $request->get_param( 'from_name' ) ) ? : get_default_from_name();
+		$from_email = sanitize_email( $request->get_param( 'from_email' ) ) ?: get_default_from_email();
+		$from_name  = sanitize_email( $request->get_param( 'from_name' ) ) ?: get_default_from_name();
 		$content    = email_kses( $request->get_param( 'content' ) );
 		$subject    = sanitize_text_field( $request->get_param( 'subject' ) );
+		$type       = sanitize_text_field( $request->get_param( 'type' ) ?: 'marketing' );
 
 		add_action( 'wp_mail_failed', [ $this, 'handle_wp_mail_error' ] );
 
-		$result = wp_mail( $to, $subject, $content, [
+		$result = \Groundhogg_Email_Services::send_type( $type, $to, $subject, $content, [
 			sprintf( "From: %s <%s>", $from_name, $from_email )
 		] );
 
