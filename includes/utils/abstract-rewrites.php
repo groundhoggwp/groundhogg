@@ -11,6 +11,7 @@ abstract class Abstract_Rewrites {
 	 * Rewrites constructor.
 	 */
 	public function __construct() {
+		add_action( 'groundhogg/install_custom_rewrites', [ $this, 'add_rewrite_rules' ] );
 		add_action( 'init', [ $this, 'add_rewrite_rules' ] );
 		add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
 		add_filter( 'request', [ $this, 'parse_query' ] );

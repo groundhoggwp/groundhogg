@@ -1863,7 +1863,7 @@ function get_exportable_fields( $extra = [] ) {
 		'gdpr_consent_date'         => __( 'Data Processing Consent Data', 'groundhogg' ),
 		'marketing_consent'         => __( 'Marketing Consent', 'groundhogg' ),
 		'marketing_consent_date'    => __( 'Marketing Consent Date', 'groundhogg' ),
-//		'notes'                     => __( 'Notes', 'groundhogg ),
+		'notes'                     => __( 'Notes', 'groundhogg' ),
 		'tags'                      => __( 'Tags', 'groundhogg' ),
 		'utm_campaign'              => __( 'UTM Campaign', 'groundhogg' ),
 		'utm_content'               => __( 'UTM Content', 'groundhogg' ),
@@ -1895,14 +1895,13 @@ function export_field( $contact, $field = '' ) {
 			$return = $contact->$field;
 			break;
 		case 'notes':
-			$return = '';
+			$return = wp_json_encode( $contact->get_notes() );
 			break;
 		case 'tags':
-			$raw_tags = get_db( 'tags' )->query( [ 'tag_id' => $contact->get_tags() ] );
+			$tags = $contact->get_tags( true );
 
-			if ( $raw_tags ) {
-				$names = wp_list_pluck( $raw_tags, 'tag_name' );
-
+			if ( $tags ) {
+				$names = array_map( function ( $tag ){ return $tag->get_name(); }, $tags );
 				$return = implode( ',', $names );
 			}
 
