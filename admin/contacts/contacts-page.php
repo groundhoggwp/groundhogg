@@ -1170,6 +1170,34 @@ class Contacts_Page extends Admin_Page {
 	}
 
 	/**
+	 * Save the search
+	 */
+	public function process_update_this_search() {
+		if ( ! current_user_can( 'view_contacts' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$search_id    = get_url_var( 'saved_search_id' );
+		$saved_search = $search_id ? Saved_Searches::instance()->get( $search_id ) : false;
+
+		if ( get_url_var( 'is_searching' ) !== 'on' || ! $saved_search ) {
+			return new \WP_Error( 'error', __( 'Invalid search' ) );
+		}
+
+		$query    = get_request_query();
+
+		Saved_Searches::instance()->update( $search_id, [
+			'query' => $query,
+		] );
+
+		$this->add_notice( 'saved', __( 'Search saved!', 'groundhogg' ) );
+
+		// stay on page...
+
+		return admin_page_url( 'gh_contacts', $query );
+	}
+
+	/**
 	 * Load the search!
 	 *
 	 * @return string|\WP_Error

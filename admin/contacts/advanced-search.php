@@ -19,6 +19,9 @@ $string_comparisons = [
 	'regex'       => __( 'Regex', 'groundhogg' ),
 ];
 
+$search_id    = get_url_var( 'saved_search_id' );
+$saved_search = $search_id ? Saved_Searches::instance()->get( $search_id ) : false;
+
 ?>
 <div id="search-filters" class="postbox <?php echo ( get_url_var( 'is_searching' ) ) ? '' : 'hidden'; ?>">
 	<form method="get">
@@ -324,7 +327,7 @@ $string_comparisons = [
 			</form>
 		</div>
 
-		<?php if ( get_url_var( 'is_searching' ) === 'on' ): ?>
+		<?php if ( get_url_var( 'is_searching' ) === 'on' && ! $saved_search ): ?>
 			<div class="inline-block search-param">
 				<form method="post" class="save-this-search">
 					<?php
@@ -345,10 +348,30 @@ $string_comparisons = [
 					<?php submit_button( __( 'Save Search', 'groundhogg' ), 'secondary', 'submit', false ); ?>
 				</form>
 			</div>
+		<?php else: ?>
+			<div class="inline-block search-param">
+				<form method="post" class="save-this-search">
+					<?php
+
+					wp_nonce_field( 'update_this_search' );
+					action_input( 'update_this_search' );
+
+					echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Update This Search', 'groundhogg' ) );
+					?>
+					<p>
+						<?php html()->button( [
+							'type'  => 'submit',
+							'text'  => __( 'Update Search', 'groundhogg' ),
+							'name'  => 'update_search',
+							'id'    => 'update_search',
+							'value' => 'update_search',
+						], true ); ?>
+					</p>
+				</form>
+			</div>
 		<?php endif; ?>
 		<?php
-		$search_id = get_url_var( 'saved_search_id' );
-		if ( $search_id && Saved_Searches::instance()->get( $search_id ) ): ?>
+		if ( $saved_search ): ?>
 			<div class="inline-block search-param">
 				<form method="post" class="delete-search">
 					<?php
@@ -364,7 +387,14 @@ $string_comparisons = [
 
 					echo html()->e( 'label', [ 'class' => 'search-label' ], __( 'Delete Current Search', 'groundhogg' ) ); ?>
 					<p>
-						<?php submit_button( __( 'Delete Search', 'groundhogg' ), 'secondary', 'submit', false ); ?>
+						<?php html()->button( [
+							'type'  => 'submit',
+							'text'  => __( 'Delete Search', 'groundhogg' ),
+							'name'  => 'delete_search',
+							'id'    => 'delete_search',
+							'class' => 'button danger',
+							'value' => 'delete_search',
+						], true ); ?>
 					</p>
 				</form>
 			</div>

@@ -652,13 +652,18 @@ function dequeue_theme_css_compat() {
 	$themes_uri = get_theme_root_uri();
 
 	foreach ( $wp_styles->registered as $wp_style ) {
-		if ( strpos( $wp_style->src, $themes_uri ) !== false ) {
+		if ( strpos( $wp_style->src, $themes_uri ) !== false || strpos( $wp_style->handle, $theme_name ) !== false ) {
 			wp_dequeue_style( $wp_style->handle );
 		}
 	}
 
-	// Additional compat
-	wp_dequeue_style( 'fusion-dynamic-css' );
+	$additional = [
+		'fusion-dynamic-css'
+	];
+
+	foreach ( $additional as $style ){
+		wp_dequeue_style( $style );
+	}
 }
 
 /**
