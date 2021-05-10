@@ -1,11 +1,11 @@
 === WordPress CRM, Email & Marketing Automation for WordPress | Award Winner — Groundhogg ===
-Contributors: trainingbusinesspros, Groundhogg, Dhrumit, Adrian Tobey
+Contributors: trainingbusinesspros, Groundhogg, Adrian Tobey
 Tags: wordpress crm, marketing automation, crm, email marketing, email automation
-Donate link: https://www.groundhogg.io/try/
+Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 4.9
 Tested up to: 5.7
 Requires PHP: 5.6
-Stable tag: 2.4.5.5
+Stable tag: 2.4.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -332,7 +332,7 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 
 == Changelog ==
 
-= 2.4.6 (2021-05-03) =
+= 2.4.6 (2021-05-10) =
 * ADDED Enabled Version 4 of the REST API.
 * ADDED Default values for `contact_and_user_match()`.
 * ADDED `is_spam` filter to the form submission spam check.
