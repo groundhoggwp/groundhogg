@@ -398,25 +398,35 @@ class Contact extends Base_Object_With_Meta {
 	 * @return $note
 	 */
 	public function add_note( $note, $context = 'system', $user_id = false ) {
-		if ( ! $note || ! is_string( $note ) ) {
+		if ( ! is_string( $note ) || ! is_array( $note ) ) {
 			return false;
 		}
 
-		$note_data = [
-			'object_id'   => $this->get_id(),
-			'object_type' => $this->get_object_type(),
-			'context'     => $context,
-			'content'     => wp_kses_post( $note ),
-			'user_id'     => $user_id ?: get_current_user_id(),
-		];
+		if ( is_string( $note ) ) {
+			$note_data = [
+				'object_id'   => $this->get_id(),
+				'object_type' => $this->get_object_type(),
+				'context'     => $context,
+				'content'     => wp_kses_post( $note ),
+				'user_id'     => $user_id ?: get_current_user_id(),
+			];
 
-		if ( $context == 'user' && ! $user_id ) {
-			$note_data['user_id'] = get_current_user_id();
+			if ( $context == 'user' && ! $user_id ) {
+				$note_data['user_id'] = get_current_user_id();
+			}
+
+			$note = new Note( $note_data );
+
+			do_action( 'groundhogg/contact/note/added', $this->ID, $note, $this );
+		} else if ( is_array( $note ) ) {
+			// imported note
+			$note_data = array_merge( $note, [
+				'object_id'   => $this->get_id(),
+				'object_type' => $this->get_object_type(),
+			] );
+
+			$note = new Note( $note_data );
 		}
-
-		$note = new Note( $note_data );
-
-		do_action( 'groundhogg/contact/note/added', $this->ID, $note, $this );
 
 		return $note;
 	}
@@ -1018,7 +1028,7 @@ class Contact extends Base_Object_With_Meta {
 		 * Fires before the $other is permanently deleted.
 		 *
 		 * @param $primary Contact
-		 * @param $other Contact
+		 * @param $other   Contact
 		 */
 		do_action( 'groundhogg/contact/merge', $this, $other );
 

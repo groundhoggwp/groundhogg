@@ -204,12 +204,12 @@ class Replacements {
 				'description'  => _x( 'Any meta data related to the contact. Usage: {meta.attribute}', 'replacement', 'groundhogg' ),
 			],
 			[
-				'code'        => 'user',
-				'group'       => 'user',
+				'code'         => 'user',
+				'group'        => 'user',
 				'default_args' => 'attribute',
-				'callback'    => [ $this, 'replacement_user' ],
-				'name'        => __( 'User Data', 'groundhogg' ),
-				'description' => _x( 'Any data related to the contact\'s linked user record. Usage: {user.attribute}', 'replacement', 'groundhogg' ),
+				'callback'     => [ $this, 'replacement_user' ],
+				'name'         => __( 'User Data', 'groundhogg' ),
+				'description'  => _x( 'Any data related to the contact\'s linked user record. Usage: {user.attribute}', 'replacement', 'groundhogg' ),
 			],
 			[
 				'code'        => 'business_name',
@@ -352,12 +352,12 @@ class Replacements {
 	/**
 	 * Add a replacement code
 	 *
-	 * @param string $code the code
-	 * @param callable $callback the callback function
-	 * @param string $description string description of the code
-	 * @param string $name the display name of the replacement for the dropdown
-	 * @param string $group the group where it should be displayed
-	 * @param string $default_args the default args that should be inserted when selected
+	 * @param string   $code         the code
+	 * @param callable $callback     the callback function
+	 * @param string   $description  string description of the code
+	 * @param string   $name         the display name of the replacement for the dropdown
+	 * @param string   $group        the group where it should be displayed
+	 * @param string   $default_args the default args that should be inserted when selected
 	 *
 	 * @return bool
 	 */
@@ -590,8 +590,8 @@ class Replacements {
 
 		foreach ( $this->replacement_code_groups as $group => $name ):
 
-			$codes = array_filter( $this->get_replacements(), function ( $code ) use ( $group ){
-				return $code[ 'group' ] === $group;
+			$codes = array_filter( $this->get_replacements(), function ( $code ) use ( $group ) {
+				return $code['group'] === $group;
 			} );
 
 			?>
@@ -646,7 +646,7 @@ class Replacements {
 
 	}
 
-	public function show_replacements_dropdown( $short = false ) {
+	public function show_replacements_dropdown( $echo = true ) {
 		wp_enqueue_script( 'groundhogg-admin-replacements' );
 
 		$options = [];
@@ -664,7 +664,7 @@ class Replacements {
 			} );
 		}
 
-		echo html()->e( 'div', [
+		$return = html()->e( 'div', [
 			'class' => 'replacements-dropdown-wrap'
 		], [
 			'<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>',
@@ -676,6 +676,14 @@ class Replacements {
 				'options'     => $options
 			] )
 		] );
+
+		if ( $echo ) {
+			echo $return;
+
+			return true;
+		}
+
+		return $return;
 	}
 
 
@@ -847,7 +855,7 @@ class Replacements {
 
 		$ext = $this->get_current_contact()->get_phone_extension();
 
-		if ( $ext ){
+		if ( $ext ) {
 			return sprintf( "%s ext. %s", $this->current_contact->get_phone_number(), $this->current_contact->get_phone_extension() );
 		} else {
 			return $this->current_contact->get_phone_number();
@@ -1027,7 +1035,7 @@ class Replacements {
 	 * Return the owner's signature
 	 *
 	 * @param mixed $attr the attribute to fetch...
-	 * @param int $contact_id
+	 * @param int   $contact_id
 	 *
 	 * @return mixed|string
 	 */

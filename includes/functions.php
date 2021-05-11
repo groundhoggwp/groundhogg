@@ -2181,7 +2181,11 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 
 				break;
 			case 'notes':
-				$notes[] = sanitize_textarea_field( $value );
+				if ( $json = json_decode( $value, true ) ){
+					$notes = array_merge( $notes, $json );
+				} else {
+					$notes[] = sanitize_textarea_field( $value );
+				}
 				break;
 			case 'time_zone':
 				$zones = Plugin::$instance->utils->location->get_time_zones();
@@ -2481,7 +2485,13 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 				break;
 			case 'notes':
-				$notes[] = sanitize_textarea_field( $value );
+
+				if ( $json = json_decode( $value, true ) ){
+					$notes = array_merge( $notes, $json );
+				} else {
+					$notes[] = sanitize_textarea_field( $value );
+				}
+
 				break;
 			case 'time_zone':
 				$zones = Plugin::$instance->utils->location->get_time_zones();

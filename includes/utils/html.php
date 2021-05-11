@@ -1621,4 +1621,15 @@ class HTML {
 		$this->send_picker_response( $json );
 	}
 
+	/**
+	 * Non echo version of the replacement dropdown.
+	 *
+	 * @param false $short
+	 *
+	 * @return string
+	 */
+	public function replacements_dropdown() {
+		return Plugin::instance()->replacements->show_replacements_dropdown( false );
+	}
+
 }
