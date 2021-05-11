@@ -350,6 +350,7 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 * FIXED Meta not being deleted when the associated object is deleted.
 * FIXED Owner being removed when a contact uploads a file through a form on the frontend.
 * FIXED Bounce checker username and password missing at runtime.
+* FIXED MailHawk showing in guided setup screen twice.
 
 = 2.4.5.4 (2021-04-05) =
 * TWEAKED Better DB cache support for multisite functionality.

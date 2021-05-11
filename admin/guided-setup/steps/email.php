@@ -40,26 +40,27 @@ class Email extends Step {
 	}
 
 	public function get_content() {
-	    
-	    ?>
-        <div class="postbox">
-            <div class="card-top">
-                <h3 class="extension-title">
+
+		?>
+		<div class="postbox">
+			<div class="card-top">
+				<h3 class="extension-title">
 					MailHawk
-                    <img class="thumbnail" src="<?php echo esc_url( GROUNDHOGG_ASSETS_URL . 'images/recommended/mailhawk.png' ); ?>"
-                         alt="MailHawk">
-                </h3>
-                <p class="extension-description">
-	                <?php _e( '<a href="https://mailhawk.com/" target="_blank">MailHawk</a> makes WordPress email delivery as simple as a few clicks, starting at <b>$14.97/month</b>.', 'groundhogg' ); ?>
-                </p>
-            </div>
-            <div class="install-actions">
+					<img class="thumbnail"
+					     src="<?php echo esc_url( GROUNDHOGG_ASSETS_URL . 'images/recommended/mailhawk.png' ); ?>"
+					     alt="MailHawk">
+				</h3>
+				<p class="extension-description">
+					<?php _e( '<a href="https://mailhawk.com/" target="_blank">MailHawk</a> makes WordPress email delivery as simple as a few clicks, starting at <b>$14.97/month</b>.', 'groundhogg' ); ?>
+				</p>
+			</div>
+			<div class="install-actions">
 
 				<?php
 
 				echo html()->e( 'a', [
-					'href' => '#',
-					'id' => 'groundhogg-mailhawk-connect',
+					'href'  => '#',
+					'id'    => 'groundhogg-mailhawk-connect',
 					'class' => 'button',
 				], __( 'Integrate this service!' ) );
 
@@ -70,10 +71,10 @@ class Email extends Step {
 					'target' => '_blank',
 					'class'  => 'more-details',
 				], __( 'More details' ) ); ?>
-            </div>
-        </div>
+			</div>
+		</div>
 
-        <?php Mailhawk::instance()->output_js(); ?>
+		<?php Mailhawk::instance()->output_js(); ?>
 
 		<?php
 
@@ -84,11 +85,16 @@ class Email extends Step {
 		foreach ( $downloads->products as $download ):
 			$extension = (object) $download;
 
+			// Skip MailHawk
+			if ( $extension->info->id === 90048 ) {
+				continue;
+			}
+
 			?>
 			<div class="postbox">
 				<div class="card-top">
 					<h3 class="extension-title">
-						<?php esc_html_e( $download->info->title ); ?>
+						<?php esc_html_e( $extension->info->title ); ?>
 						<img class="thumbnail" src="<?php echo esc_url( $extension->info->thumbnail ); ?>"
 						     alt="<?php esc_attr_e( $extension->info->title ); ?>">
 					</h3>
@@ -101,8 +107,8 @@ class Email extends Step {
 					<?php
 
 					echo html()->e( 'a', [
-						'href' => $extension->info->link,
-						'class' => 'button',
+						'href'   => $extension->info->link,
+						'class'  => 'button',
 						'target' => '_blank'
 					], __( 'Integrate this service!' ) );
 

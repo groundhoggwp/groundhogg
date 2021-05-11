@@ -96,7 +96,12 @@ class Email_Api extends Base {
 		$is_for_select  = filter_var( $request->get_param( 'select' ), FILTER_VALIDATE_BOOLEAN );
 		$is_for_select2 = filter_var( $request->get_param( 'select2' ), FILTER_VALIDATE_BOOLEAN );
 
-		$emails = Plugin::$instance->dbs->get_db( 'emails' )->query( $query, 'ID' );
+		if ( $is_for_select2 ) {
+			$query['orderby'] = 'ID';
+			$query['order']   = 'DESC';
+		}
+
+		$emails = Plugin::$instance->dbs->get_db( 'emails' )->query( $query );
 
 		if ( $is_for_select2 ) {
 			$json = array();
@@ -111,8 +116,6 @@ class Email_Api extends Base {
 				);
 
 			}
-
-			usort( $json, sort_by_string_in_array( 'text' ) );
 
 			$results = array( 'results' => $json, 'more' => false );
 
