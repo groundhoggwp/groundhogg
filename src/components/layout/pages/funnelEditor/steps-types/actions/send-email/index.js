@@ -22,7 +22,7 @@ import { withStyles } from '@material-ui/core/styles';
  	EMAILS_STORE_NAME
 } from '../../../../../../../data';
 import Mail from "components/svg/Mail/";
-import Toggle from "./components/toggle/";
+import Toggle from "../../../components/toggle/";
 import { ACTION, ACTION_TYPE_DEFAULTS } from "../../constants";
 import { registerStepType } from "data/step-type-registry";
 import { createTheme }  from "../../../../../../../theme";
@@ -92,7 +92,7 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: "4px",
     border: "1.2px solid rgba(16, 38, 64, 0.15) !important",
   },
-  toggleSection:{
+  inputRow:{
     margin: '10px 0px 0px 15px'
   }
 }));
@@ -190,12 +190,12 @@ const stepAtts = {
               }
             </select>
 
-            <div className={classes.toggleSection}>
+            <div className={classes.inputRow}>
               <label>Skip email step if confirmed:</label>
               <Toggle checked={emailSkip} onChange={toggleEmailSkip} name="checked" />
             </div>
 
-            <div className={classes.toggleSection}>
+            <div className={classes.inputRow}>
               <label>Enable conditional logic:</label>
               <Toggle checked={conditionalLogic} onChange={toggleConditionalLogic} name="checked" />
             </div>

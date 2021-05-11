@@ -37,8 +37,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import BlocksPanel from "../sidebar/components/blocks-panel.js";
 import ExpandablePanel from "../expandable-panel/";
 import { createTheme } from "../../../../../theme";
-import AddWithBorder from "components/svg/AddWithBorder/";
-import Trash from "components/svg/Trash/";
 const theme = createTheme({});
 
 let timeout;
@@ -126,23 +124,7 @@ export default function ({
         boxShadow: "none",
       },
     },
-    customHeaderBtn: {
-      display: "inline-block",
-      width: "20px",
-      height: "20px",
-      margin: '0',
-      stroke: "#000",
-      fill: "#000",
-      marginRight: '25px'
-    },
-    addButton:{
-      stroke: theme.palette.secondary.main,
-      fill: theme.palette.secondary.main,
-    },
-    trashButton:{
-      stroke: theme.palette.error.dark,
-      fill: theme.palette.error.dark,
-    }
+
   }));
 
   const { createInfoNotice } = useDispatch("core/notices");
@@ -230,18 +212,7 @@ export default function ({
             margin={"20px 0px 0px 0px"}
             contents={
               <div>
-                <input
-                  className={classes.inputText}
-                  placeholder={""}
-                  onChange={hanldeCustomHeaderInput}
-                />
-                <input
-                  className={classes.inputText}
-                  placeholder={""}
-                  onChange={hanldeCustomHeaderInput}
-                />
-                <AddWithBorder className={`${classes.customHeaderBtn} ${classes.addButton}`}/>
-                <Trash className={`${classes.customHeaderBtn} ${classes.trashButton}`}/>
+
 
               </div>
             }
