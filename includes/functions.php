@@ -481,6 +481,7 @@ function decrypt( $data ) {
 	return Plugin::$instance->utils->encrypt_decrypt( $data, 'd' );
 }
 
+
 /**
  * Get a variable from an array or default if it doesn't exist.
  *
@@ -661,7 +662,7 @@ function dequeue_theme_css_compat() {
 		'fusion-dynamic-css'
 	];
 
-	foreach ( $additional as $style ){
+	foreach ( $additional as $style ) {
 		wp_dequeue_style( $style );
 	}
 }
@@ -1533,24 +1534,22 @@ function get_form_list() {
 /**
  * Schedule a 1 off email notification
  *
- * @param int        $email_id            the ID of the email to send
- * @param int|string $contact_id_or_email the ID of the contact to send to
- * @param int        $time                time time to send at, defaults to time()
+ * @param int|Email          $email_id            the ID of the email to send
+ * @param int|string|Contact $contact_id_or_email the ID of the contact to send to
+ * @param int                $time                time time to send at, defaults to time()
  *
  * @return bool whether the scheduling was successful.
  */
 function send_email_notification( $email_id, $contact_id_or_email, $time = 0 ) {
 
-	$contact = get_contactdata( $contact_id_or_email );
-	$email   = new Email( $email_id );
+	$contact = is_a_contact( $contact_id_or_email ) ? $contact_id_or_email : get_contactdata( $contact_id_or_email );
+	$email   = is_numeric( $email_id ) ? new Email( $email_id ) : $email_id;
 
 	if ( ! $contact || ! $email ) {
 		return false;
 	}
 
-	if ( ! $time ) {
-		$time = time();
-	}
+	$time = $time ? ( is_string( $time ) ? strtotime( $time ) : $time ) : time();
 
 	$event = [
 		'time'       => $time,
@@ -1901,7 +1900,9 @@ function export_field( $contact, $field = '' ) {
 			$tags = $contact->get_tags( true );
 
 			if ( $tags ) {
-				$names = array_map( function ( $tag ){ return $tag->get_name(); }, $tags );
+				$names  = array_map( function ( $tag ) {
+					return $tag->get_name();
+				}, $tags );
 				$return = implode( ',', $names );
 			}
 
@@ -2181,7 +2182,7 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 
 				break;
 			case 'notes':
-				if ( $json = json_decode( $value, true ) ){
+				if ( $json = json_decode( $value, true ) ) {
 					$notes = array_merge( $notes, $json );
 				} else {
 					$notes[] = sanitize_textarea_field( $value );
@@ -2486,7 +2487,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				break;
 			case 'notes':
 
-				if ( $json = json_decode( $value, true ) ){
+				if ( $json = json_decode( $value, true ) ) {
 					$notes = array_merge( $notes, $json );
 				} else {
 					$notes[] = sanitize_textarea_field( $value );

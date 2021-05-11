@@ -45,11 +45,11 @@ class Contacts_Api extends Base_Object_Api {
 		] );
 
 		register_rest_route( self::NAME_SPACE, '/contacts/(?P<ID>\d+)/files', [
-			[
-				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'create_files' ],
-				'permission_callback' => [ $this, 'create_files_permissions_callback' ]
-			],
+//			[
+//				'methods'             => WP_REST_Server::CREATABLE,
+//				'callback'            => [ $this, 'create_files' ],
+//				'permission_callback' => [ $this, 'create_files_permissions_callback' ]
+//			],
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'read_files' ],
@@ -143,7 +143,7 @@ class Contacts_Api extends Base_Object_Api {
 	public function read( WP_REST_Request $request ) {
 
 		// Might have passed root level query
-		$query  = (array) $request->get_param( 'query' ) ?: $request->get_params();
+		$query  = (array) $request->get_param( 'query' ) ?: $request->get_json_params();
 		$search = sanitize_text_field( wp_unslash( $request->get_param( 'search' ) ) );
 
 		if ( ! key_exists( 'search', $query ) && ! empty( $search ) ) {
@@ -162,9 +162,8 @@ class Contacts_Api extends Base_Object_Api {
 
 		$count    = $contact_query->count( $query );
 		$contacts = $contact_query->query( $query );
-		$contacts = array_map( function ( $contact ) {
-			return new Contact( $contact->ID );
-		}, $contacts );
+
+		$contacts = array_map( [ $this, 'map_raw_object_to_class' ], $contacts );
 
 		return self::SUCCESS_RESPONSE( [
 			'total_items' => $count,
@@ -250,9 +249,7 @@ class Contacts_Api extends Base_Object_Api {
 		$count    = $contact_query->count( $query );
 		$contacts = $contact_query->query( $query );
 
-		$contacts = array_map( function ( $contact ) {
-			return new Contact( $contact->ID );
-		}, $contacts );
+		$contacts = array_map( [ $this, 'map_raw_object_to_class' ], $contacts );
 
 		/**
 		 * @var $contact Contact
@@ -277,36 +274,6 @@ class Contacts_Api extends Base_Object_Api {
 		return self::SUCCESS_RESPONSE( [
 			'total_items' => $count,
 			'items'       => $contacts,
-		] );
-	}
-
-	/**
-	 * Delete contacts
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return mixed|WP_Error|WP_REST_Response
-	 */
-	public function delete( WP_REST_Request $request ) {
-
-		$query = (array) $request->get_param( 'query' ) ?: [];
-
-		// avoid deleting all contacts when query is empty
-		if ( empty( $query ) ) {
-			return self::ERROR_401();
-		}
-
-		$contact_query = new Contact_Query();
-
-		$count    = $contact_query->count( $query );
-		$contacts = $contact_query->query( $query );
-
-		array_map( function ( $contact ) {
-			get_contactdata( $contact )->delete();
-		}, $contacts );
-
-		return self::SUCCESS_RESPONSE( [
-			'total_items' => $count
 		] );
 	}
 

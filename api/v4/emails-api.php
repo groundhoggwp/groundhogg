@@ -3,9 +3,11 @@
 namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
+use Groundhogg\Email;
 use Groundhogg\Plugin;
 use WP_REST_Server;
 use function Groundhogg\email_kses;
+use function Groundhogg\get_contactdata;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
 use function Groundhogg\send_email_notification;
@@ -46,21 +48,24 @@ class Emails_Api extends Base_Object_Api {
 	 */
 	public function send_email_by_id( \WP_REST_Request $request ) {
 
+		//get email
+		$email_id = absint( $request->get_param( $this->get_primary_key() ) );
 
-		$contact = self::get_contact_from_request( $request );
-		if ( is_wp_error( $contact ) ) {
-			return $contact;
+		$email = new Email( $email_id );
+
+		if ( ! $email->exists() ) {
+			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
-		//get email
-		$email_id = absint( $request->get_param( 'id' ) );
+		$to      = $request->get_param( 'to' );
+		$contact = get_contactdata( $to );
 
-		if ( ! Plugin::$instance->dbs->get_db( 'emails' )->exists( $email_id ) ) {
-			return self::ERROR_400( 'no_email', sprintf( _x( 'Email with ID %d not found.', 'api', 'groundhogg' ), $email_id ) );
+		if ( ! $contact ) {
+			return self::ERROR_404( 'error', 'Contact not found' );
 		}
 
 		//send emails
-		$status = send_email_notification( $email_id, $contact->get_id() );
+		$status = send_email_notification( $email, $contact, $request->get_param( 'when' ) );
 
 		if ( ! $status ) {
 			return self::ERROR_UNKNOWN();
