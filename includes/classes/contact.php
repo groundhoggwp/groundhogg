@@ -398,7 +398,7 @@ class Contact extends Base_Object_With_Meta {
 	 * @return $note
 	 */
 	public function add_note( $note, $context = 'system', $user_id = false ) {
-		if ( ! is_string( $note ) || ! is_array( $note ) ) {
+		if ( ! is_string( $note ) && ! is_array( $note ) ) {
 			return false;
 		}
 
