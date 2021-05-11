@@ -338,12 +338,14 @@ Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/mo
 * ADDED `is_spam` filter to the form submission spam check.
 * ADDED New MISC tab in the tools panel to add tools too that do not need to be top level.
 * ADDED Search by Email, Not Empty, and REGEX support for First, Last, and Email in the advanced search.
+* ADDED Ability to import/export contact notes in contact CSVs.
 * TWEAKED Strip slashes from `get_url_vars()`.
 * TWEAKED Removed the "new feature" info card.
 * TWEAKED First & Last name columns have highest priority in the contact table.
 * TWEAKED Clicks in the reports with ?pk= in the URL will be grouped together.
 * TWEAKED You can now pass raw objects to Base_Object so your SQL queries become 1 instead of N+1, super memory savings!
 * TWEAKED Refactored contact notes to an abstract table capable of storing notes for multiple object types.
+* TWEAKED Removed Apply/Remove tag bulk actions because the Bulk Edit function now exists.
 * FIXED Tag associations count not working
 * FIXED Meta not being deleted when the associated object is deleted.
 * FIXED Owner being removed when a contact uploads a file through a form on the frontend.

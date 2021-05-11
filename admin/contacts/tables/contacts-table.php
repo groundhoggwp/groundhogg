@@ -82,6 +82,7 @@ class Contacts_Table extends WP_List_Table {
 
 	/**
 	 * Prepares the list of items for displaying.
+	 *
 	 * @global $wpdb \wpdb
 	 * @uses $this->_column_headers
 	 * @uses $this->items
@@ -203,6 +204,7 @@ class Contacts_Table extends WP_List_Table {
 	 * 'internal-name' => array( 'orderby', true )
 	 *
 	 * The second format will make the initial sorting order be descending
+	 *
 	 * @return array An associative array containing all the columns that should be sortable.
 	 */
 	protected function get_sortable_columns() {
@@ -215,7 +217,7 @@ class Contacts_Table extends WP_List_Table {
 
 	/**
 	 * @param object|Contact $contact
-	 * @param int $level
+	 * @param int            $level
 	 */
 	public function single_row( $contact, $level = 0 ) {
 
@@ -395,7 +397,7 @@ class Contacts_Table extends WP_List_Table {
 	/**
 	 * Get default column value.
 	 *
-	 * @param object $contact A singular item (one full row's worth of data).
+	 * @param object $contact     A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string Text or HTML to be placed inside the column <td>.
@@ -425,13 +427,12 @@ class Contacts_Table extends WP_List_Table {
 	/**
 	 * Get an associative array ( option_name => option_title ) with the list
 	 * of bulk steps available on this table.
+	 *
 	 * @return array An associative array containing all the bulk steps.
 	 */
 	protected function get_bulk_actions() {
 
 		$actions = array(
-			'apply_tag'   => _x( 'Apply Tag', 'List table bulk action', 'groundhogg' ),
-			'remove_tag'  => _x( 'Remove Tag', 'List table bulk action', 'groundhogg' ),
 			'delete'      => _x( 'Delete', 'List table bulk action', 'groundhogg' ),
 			'spam'        => _x( 'Spam', 'List table bulk action', 'groundhogg' ),
 			'resubscribe' => _x( 'Re-subscribe', 'List table bulk action', 'groundhogg' ),
@@ -530,7 +531,7 @@ class Contacts_Table extends WP_List_Table {
 	 *
 	 * @param        $contact     Contact Contact being acted upon.
 	 * @param string $column_name Current column name.
-	 * @param string $primary Primary column name.
+	 * @param string $primary     Primary column name.
 	 *
 	 * @return string Row steps output for posts.
 	 */
@@ -596,41 +597,15 @@ class Contacts_Table extends WP_List_Table {
 	 * @param string $which
 	 */
 	protected function extra_tablenav( $which ) {
-		if ( $which === 'top' ) : ?>
-			<script>
-              jQuery(function ($) {
-                $('#bulk-action-selector-top,#bulk-action-selector-bottom').on('change', function () {
-                  var $bulk = $(this)
-                  if ($bulk.val() === 'apply_tag' || $bulk.val() === 'remove_tag') {
-                    $('.bulk-tag-action').removeClass('hidden')
-                  } else {
-                    $('.bulk-tag-action').addClass('hidden')
-                  }
-                })
-              })
-			</script>
-			<div class="alignleft gh-actions bulk-tag-action hidden">
-				<div style="width: 300px;display: inline-block;margin: 0 20px 5px 0"><?php echo html()->tag_picker( [
-						'name'        => 'bulk_tags[]',
-						'id'          => 'bulk_tags',
-						'class'       => 'gh-tag-picker',
-						'data'        => array(),
-						'selected'    => array(),
-						'multiple'    => true,
-						'placeholder' => __( 'Bulk Apply/Remove Tags', 'groundhogg' ),
-						'tags'        => true,
-					] ); ?></div>
-			</div>
-		<?php endif; ?>
+		?>
 		<div class="alignleft gh-actions">
-			<?php
+		<?php
 
-			Contact_Table_Actions::do_contact_actions( $this->query, $this->get_pagination_arg( 'total_items' ), $this );
+		Contact_Table_Actions::do_contact_actions( $this->query, $this->get_pagination_arg( 'total_items' ), $this );
 
-			do_action( 'groundhogg/admin/contacts/table/extra_tablenav', $this );
+		do_action( 'groundhogg/admin/contacts/table/extra_tablenav', $this );
 
-			?></div><?php
-
+		?></div><?php
 	}
 
 	/**

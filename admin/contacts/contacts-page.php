@@ -886,60 +886,6 @@ class Contacts_Page extends Admin_Page {
 		return $this->process_status_change();
 	}
 
-	public function process_apply_tag() {
-		if ( ! current_user_can( 'edit_contacts' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		if ( get_request_var( 'bulk_tags', false ) ) {
-
-			$tags = validate_tags( get_request_var( 'bulk_tags' ) );
-
-			foreach ( $this->get_items() as $id ) {
-				$contact = get_contactdata( $id );
-				$contact->apply_tag( $tags );
-			}
-
-			$this->add_notice(
-				esc_attr( 'applied_tags' ),
-				sprintf( _nx( 'Applied %d tags to %d contact', 'Applied %d tags to %d contacts', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $tags ), count( $this->get_items() ) ),
-				'success'
-			);
-		}
-
-		return false;
-	}
-
-	/**
-	 * Remove tags from the contact.
-	 *
-	 * @return bool
-	 */
-	public function process_remove_tag() {
-		if ( ! current_user_can( 'edit_contacts' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		if ( get_request_var( 'bulk_tags', false ) ) {
-
-			$tags = wp_parse_id_list( get_request_var( 'bulk_tags' ) );
-
-			foreach ( $this->get_items() as $id ) {
-				$contact = get_contactdata( $id );
-				$contact->remove_tag( $tags );
-			}
-
-			$this->add_notice(
-				esc_attr( 'removed_tags' ),
-				sprintf( _nx( 'Removed %d tags from %d contact', 'Removed %d tags from %d contacts', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $tags ), count( $this->get_items() ) ),
-				'success'
-			);
-
-		}
-
-		return false;
-	}
-
 	/**
 	 * Edit a note...
 	 */
