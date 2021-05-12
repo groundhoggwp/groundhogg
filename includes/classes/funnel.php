@@ -152,31 +152,12 @@ class Funnel extends Base_Object_With_Meta {
 	 * @return array|bool
 	 */
 	public function get_as_array() {
-		$export          = [];
-		$export['title'] = sprintf( "%s - Copy", $this->get_title() );
-		$export['steps'] = [];
-
-		$steps = $this->get_steps();
-
-		if ( ! $steps ) {
-			return false;
-		}
-
-		foreach ( $steps as $i => $step ) {
-
-			$export['steps'][ $i ]          = [];
-			$export['steps'][ $i ]['title'] = $step->get_title();
-			$export['steps'][ $i ]['group'] = $step->get_group();
-			$export['steps'][ $i ]['order'] = $step->get_order();
-			$export['steps'][ $i ]['type']  = $step->get_type();
-			$export['steps'][ $i ]['meta']  = $step->get_meta();
-			$export['steps'][ $i ]['args']  = $step->export();
-		}
-
-
-		$export = apply_filters( 'groundhogg/funnel/export', $export, $this );
-
-		return $export;
+		return apply_filters( "groundhogg/{$this->get_object_type()}/get_as_array", [
+			'ID'    => $this->get_id(),
+			'data'  => $this->data,
+			'meta'  => $this->meta,
+			'steps' => $this->get_steps(),
+		] );
 	}
 
 	/**

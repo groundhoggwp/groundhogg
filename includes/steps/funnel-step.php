@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * complete()
  *
- * @see WPGH_Form_Filled for an example.
+ * @see         WPGH_Form_Filled for an example.
  *
  * @package     Elements
  * @subpackage  Elements/Benchmarks
@@ -44,7 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.9
  */
-abstract class Funnel_Step extends Supports_Errors {
+abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable {
 	protected static $step_properties = [];
 
 	/**
@@ -256,7 +256,7 @@ abstract class Funnel_Step extends Supports_Errors {
 
 	/**
 	 * @param string $setting
-	 * @param array $args
+	 * @param array  $args
 	 */
 	protected function add_control( $setting = '', $args = [] ) {
 		$args = wp_parse_args( $args, [
@@ -328,7 +328,7 @@ abstract class Funnel_Step extends Supports_Errors {
 	 * Retrieves a setting from the settings array provide by the step meta.
 	 *
 	 * @param string $key
-	 * @param bool $default
+	 * @param bool   $default
 	 *
 	 * @return mixed
 	 */
@@ -365,7 +365,7 @@ abstract class Funnel_Step extends Supports_Errors {
 	 * Retrieves a setting from the posted settings when saving.
 	 *
 	 * @param string $key
-	 * @param bool $default
+	 * @param bool   $default
 	 *
 	 * @return mixed
 	 */
@@ -613,6 +613,7 @@ abstract class Funnel_Step extends Supports_Errors {
 
 	/**
 	 * Get similar steps which can be used by benchmarks.
+	 *
 	 * @return Step[]
 	 */
 	public function get_like_steps( $query = [] ) {
@@ -972,7 +973,7 @@ abstract class Funnel_Step extends Supports_Errors {
 	 * Setup args before the action/benchmark is run
 	 *
 	 * @param $contact Contact
-	 * @param $event Event
+	 * @param $event   Event
 	 *
 	 * @return Contact
 	 */
@@ -987,7 +988,7 @@ abstract class Funnel_Step extends Supports_Errors {
 	 * Run the action/benchmark
 	 *
 	 * @param $contact Contact
-	 * @param $event Event
+	 * @param $event   Event
 	 *
 	 * @return bool
 	 */
@@ -1042,5 +1043,18 @@ abstract class Funnel_Step extends Supports_Errors {
 	public function export( $args, $step ) {
 		//silence is golden
 		return $args;
+	}
+
+	public function __toString() {
+		// TODO: Implement __toString() method.
+	}
+
+	public function jsonSerialize() {
+		return [
+			'icon'  => $this->get_icon(),
+			'name'  => $this->get_name(),
+			'type'  => $this->get_type(),
+			'group' => $this->get_group(),
+		];
 	}
 }

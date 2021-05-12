@@ -1,0 +1,243 @@
+.editor {
+    background-color: #F6F9FB;
+}
+
+.editor-header {
+    padding: 8px;
+    background-color: #FFFFFF;
+    box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+}
+
+.editor-header .header-stuff {
+    display: flex;
+    justify-content: space-between;
+}
+
+.editor-header .header-stuff .header-actions .undo-and-redo,
+.editor-header .header-stuff .header-actions .publish-actions,
+.editor-header .header-stuff .header-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+}
+
+.undo-and-redo .undo,
+.undo-and-redo .redo {
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.undo-and-redo .undo:hover,
+.undo-and-redo .redo:hover {
+    opacity: 0.8;
+}
+
+
+.title-wrap .above-title {
+    color: #102640;
+    opacity: 0.6;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+.title-wrap .title {
+    position: relative;
+    cursor: pointer;
+}
+
+.title-wrap .title input.funnel-title-edit,
+.title-wrap .title .title-inner {
+
+    font-style: normal;
+    font-weight: normal;
+    font-size: 24px;
+    line-height: 29px;
+    color: #102640;
+    padding: 0;
+    border-width: 0;
+}
+
+.title-wrap .title .pencil {
+    position: absolute;
+    margin-left: 10px;
+    bottom: 0;
+    opacity: 0.3;
+    color: #102640;
+}
+
+.title-wrap .title:hover .pencil {
+    opacity: 0.5;
+}
+
+.flow-and-edit {
+    display: flex;
+    min-height: 400px;
+}
+
+.flow-and-edit .step-flow {
+    width: 250px;
+    background-color: #FFFFFF;
+    flex-shrink: 0;
+}
+
+.flow-and-edit .step-edit,
+.flow-and-edit .step-add {
+    width: 100%;
+}
+
+.step-flow .steps {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    flex-direction: column;
+    padding: 15px 15px 0 0;
+}
+
+.step-flow .add-new-step {
+    margin-top: 10px;
+}
+
+.step-flow .steps .step {
+    display: flex;
+    justify-content: space-between;
+    background: #FFFFFF;
+    border: 1px solid rgba(16, 38, 64, 0.15);
+    box-sizing: border-box;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.step-flow .step .icon {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+    width: 32px;
+    height: 32px;
+}
+
+.step.benchmark .icon .dashicons {
+    color: #F58115;
+}
+
+.step.action .icon .dashicons {
+    color: #90C71C;
+}
+
+.step.benchmark .details .step-type {
+    color: #F58115;
+}
+
+.step.action .details .step-type {
+    color: #90C71C;
+}
+
+.step.benchmark.active {
+    border-color: #F58115;
+}
+
+.step.action.active {
+    border-color: #9ECE38;
+}
+
+.step-flow .steps .step.active {
+    border-width: 2px;
+    padding: 9px;
+}
+
+.step .step-status {
+    display: flex;
+    align-items: center;
+}
+
+.step .step-status .status {
+    visibility: hidden;
+    display: inline-block;
+    background-color: #0075FF;
+    border-radius: 50%;
+    height: 9px;
+    width: 9px;
+}
+
+.step .step-status.config-error .status {
+    visibility: visible;
+    background-color: #E91F4F;
+}
+
+.step .step-status.edited .status {
+    visibility: visible;
+}
+
+.step .details {
+    width: 165px;
+}
+
+.step .details .step-title {
+    font-style: normal;
+    font-weight: normal;
+    font-size: 13px;
+    line-height: 15px;
+}
+
+.step .details .step-type {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 8px;
+    text-transform: uppercase;
+}
+
+.type-select {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.type-select button {
+    background: #FFFFFF;
+    box-sizing: border-box;
+    box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+    padding: 8px 12px;
+    cursor: pointer;
+    border: 2px solid #FFFFFF;
+}
+
+.type-select button:first-child{
+    border-radius: 5px 0 0 5px;
+}
+
+.type-select button:last-child{
+    border-radius: 0 5px 5px 0;
+}
+
+.type-select button.actions.active{
+    border: 2px solid #9ECE38;
+}
+
+.type-select button.benchmarks.active{
+    border: 2px solid #F58115;
+}
+
+.step-add .types{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 20px 0 0 20px;
+}
+
+.step-add .types .add-step{
+    width: 100px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.step-add .types .add-step .step-icon{
+    background: #FFFFFF;
+    box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+    border-radius: 7px;
+    padding: 5px;
+    width: 50px;
+}
