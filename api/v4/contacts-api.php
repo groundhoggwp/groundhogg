@@ -113,13 +113,16 @@ class Contacts_Api extends Base_Object_Api {
 			$email_address = get_array_var( $data, 'email' );
 
 			// skip if an email address was not provided
-			// or if another contact is already using this address
-			if ( ! $email_address || get_contactdata( $email_address ) ) {
+			if ( ! $email_address ) {
 				continue;
+			} // If the email address is in use, update the contact instead
+			else if ( is_email_address_in_use( $email_address ) ) {
+				$contact = new Contact( $email_address );
+				$contact->update( $data );
+			} // Otherwise, create the contact record
+			else {
+				$contact = new Contact( $data );
 			}
-
-			// Create the contact record...
-			$contact = new Contact( $data );
 
 			$contact->update_meta( $meta );
 			$contact->apply_tag( $tags );
@@ -298,13 +301,14 @@ class Contacts_Api extends Base_Object_Api {
 			return self::ERROR_422( 'error', 'An email address is required.' );
 		}
 
-		// will return false if the email address is not being used
+		// If the email address is in use, treat as an update
 		if ( is_email_address_in_use( $email_address ) ) {
-			return self::ERROR_409( 'error', 'Email address already in use.' );
+			$contact = new Contact( $email_address );
+			$contact->update( $data );
+		} // Create new contact record
+		else {
+			$contact = new Contact( $data );
 		}
-
-		// Create the contact record...
-		$contact = new Contact( $data );
 
 		$contact->update_meta( $meta );
 
