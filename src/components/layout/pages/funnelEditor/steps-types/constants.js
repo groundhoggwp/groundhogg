@@ -72,10 +72,10 @@ export const STEP_DEFAULTS = {
   edit: ({}) => {
     return <></>;
   },
-  read: ({ ID, data }) => {
+  read: ({ data }) => {
     return (
       <>
-        {ID}: {data.step_type}
+        {data.step_title}
       </>
     );
   },
@@ -119,28 +119,29 @@ export const BENCHMARK_TYPE_DEFAULTS = {
     const { url } = useRouteMatch();
 
     return (
-      <Link to={`${unSlash(url)}/${ID}/edit`} className={classes.link}>
-        <Box
-          alignItems="center"
-          display="flex"
-          borderRadius={5}
-          border={isEditing ? 2 : 1}
-          borderColor={`${isEditing ? "" : "grey.200"}`}
-          p={2}
-          mb={1}
-          className={`step-block ${classes.card} ${classes.benchmark}`}
-        >
-          <Grid item pr={2} xs={2}>
-            {icon}
-          </Grid>
-          <Grid item xs={10} className="read">
-            <Typography component={"div"} className={classes.name}>
-              {read}
-            </Typography>
-            <small className={classes.type}>{name}</small>
-          </Grid>
-        </Box>
-      </Link>
+        <Link to={`${unSlash(url)}/${ID}/edit`} className={classes.link}>
+          <Box
+              alignItems="center"
+              display="flex"
+              borderRadius={5}
+              border={isEditing ? 2 : 1}
+              borderColor={`${isEditing ? "" : "grey.200"}`}
+              p={2}
+              mb={1}
+              className={`step-block ${classes.card} ${classes.benchmark}`}
+              data-title={`Step id #${ID}}`}
+          >
+            <Grid item pr={2} xs={2}>
+              {icon}
+            </Grid>
+            <Grid item xs={10} className="read">
+              <Typography component={"div"} className={classes.name}>
+                {read}
+              </Typography>
+              <small className={classes.type}>{name}</small>
+            </Grid>
+          </Box>
+        </Link>
     );
   },
 };
