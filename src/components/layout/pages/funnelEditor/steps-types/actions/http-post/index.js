@@ -24,7 +24,7 @@ import {
 import Tag from "components/svg/Tag/";
 import AddWithBorder from "components/svg/AddWithBorder/";
 import Trash from "components/svg/Trash/";
-import Toggle from "../../../components/toggle/";
+import Toggle from "components/core-ui/toggle/";
 import { ACTION, ACTION_TYPE_DEFAULTS } from "../../constants";
 import { registerStepType } from "data/step-type-registry";
 import { createTheme }  from "../../../../../../../theme";

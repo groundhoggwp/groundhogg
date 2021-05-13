@@ -1,30 +1,26 @@
+
 /**
  * WordPress dependencies
  */
-import { __ } from "@wordpress/i18n";
-import { Fragment, useState } from "@wordpress/element";
-import { PinnedItems } from "@wordpress/interface";
-import { Inserter } from "@wordpress/block-editor";
+// none so far
 
 /**
  * External dependencies
  */
-import { Button, Card, Switch, TextField } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
-import ReplayIcon from "@material-ui/icons/Replay";
+import { Switch } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
+import { makeStyles } from "@material-ui/core/styles";
 /**
  * Internal dependencies
  */
-import { createTheme }  from "../../../../../../theme";
+import  { createTheme }   from "../../../theme";
 
 const STEP_TYPE = "send_email";
 
 const theme = createTheme({});
 
-
-const Toggle = withStyles((theme) => ({
+export const Toggle = withStyles((theme) => ({
   root: {
     width: 34,
     height: 18,
@@ -60,7 +56,9 @@ const Toggle = withStyles((theme) => ({
   },
   checked: {},
   focusVisible: {},
-}))(({ classes, ...props }) => {
+}))(({ classes, label, ...props }) => {
+  console.log(props)
+
   return (
     <Switch
       focusVisibleClassName={classes.focusVisible}
@@ -77,4 +75,14 @@ const Toggle = withStyles((theme) => ({
   );
 });
 
-export default Toggle;
+
+Toggle.propTypes = {
+  /**
+   * is the on or off
+   */
+  on: PropTypes.bool
+};
+
+Toggle.defaultProps = {
+  on: false,
+};

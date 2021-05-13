@@ -22,7 +22,7 @@ import { withStyles } from '@material-ui/core/styles';
  	TAGS_STORE_NAME
 } from '../../../../../../../data';
 import Tag from "components/svg/Tag/";
-import Toggle from "../../../components/toggle/";
+import Toggle from "components/core-ui/toggle/";
 import { ACTION, ACTION_TYPE_DEFAULTS } from "../../constants";
 import { registerStepType } from "data/step-type-registry";
 import { createTheme }  from "../../../../../../../theme";
