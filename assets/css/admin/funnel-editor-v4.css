@@ -190,6 +190,10 @@
     visibility: visible;
     background-color: #E91F4F;
 }
+.step .step-status.new .status {
+    visibility: visible;
+    background-color: #90C71C;
+}
 
 .step .step-status.edited .status {
     visibility: visible;
