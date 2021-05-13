@@ -18,7 +18,7 @@ import  { createTheme }   from "../../../theme";
 
 const theme = createTheme({});
 
-export const Textfield = withStyles((theme) => ({
+export const DatePicker = withStyles((theme) => ({
   root: {
     fontSize: "12px",
     marginTop: "5px",
@@ -26,29 +26,28 @@ export const Textfield = withStyles((theme) => ({
     border: "1.5px solid rgba(16, 38, 64, 0.1)",
     borderRadius: "2px"
   },
-}))(({ classes, onChange, options, text, ...props }) => {
-  console.log(props, options)
+}))(({ classes, ...props }) => {
+  // console.log(props, options)
   // value={text}
   // placeholder={placeholder}
-  //
+  // onChange={onChange}
+        // fullWidth
   return (
     <input
       className={classes.root}
-      value={text}
-      onChange={onChange}
-      fullWidth
+
     />
   );
 });
 
 
-Textfield.propTypes = {
+TimePicker.propTypes = {
   /**
    * is the on or off
    */
-  on: PropTypes.bool
+  text: PropTypes.string
 };
 
-Textfield.defaultProps = {
-  on: false,
+TimePicker.defaultProps = {
+  text: '',
 };
