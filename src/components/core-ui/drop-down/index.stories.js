@@ -12,7 +12,7 @@ export default {
 
 const Template = (args) => <DropDown {...args} />;
 
-export const DropDownDefault = Template.bind({});
+export const Default = Template.bind({});
 
 const options = [
   { display: 'Marketing',
@@ -22,10 +22,6 @@ const options = [
     value: 0
   },
 ]
-DropDownDefault.args = {
+Default.args = {
   options
 };
-// export const DropDownOpen = Template.bind({});
-// DropDownOpen.args = {
-//   options
-// };

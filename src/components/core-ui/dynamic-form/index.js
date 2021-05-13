@@ -16,32 +16,29 @@ import { makeStyles } from "@material-ui/core/styles";
  */
 import  { createTheme }   from "../../../theme";
 
+const STEP_TYPE = "send_email";
+
 const theme = createTheme({});
 
-export const DatePicker = withStyles((theme) => ({
+export const DynamicForm = withStyles((theme) => ({
   root: {
-    fontSize: "12px",
-    marginTop: "5px",
-    padding: "0px 74px 0px 7px",
-    border: "1.5px solid rgba(16, 38, 64, 0.1)",
-    borderRadius: "2px"
   },
-}))(({ classes, onChange, options, value, ...props }) => {
-  console.log(props, options)
+}))(({ classes, children, ...rest }) => {
+  console.log(rest)
 
   return (
-    <div> date picker</div>
+    <div>form</div>
   );
 });
 
 
-DatePicker.propTypes = {
+DynamicForm.propTypes = {
   /**
-   * is the on or off
+   * React components that build this form
    */
-  on: PropTypes.bool
+  children: PropTypes.node.isRequired,
 };
 
-DatePicker.defaultProps = {
-  on: false,
+DynamicForm.defaultProps = {
+  // on: false,
 };
