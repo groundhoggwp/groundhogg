@@ -6,7 +6,7 @@ export default {
   title: 'Groundhogg Core UI/Textfield',
   component: Textfield,
   argTypes: {
-    backgroundColor: { control: 'color' },
+    // value: { control: 'string' },
   },
 };
 
@@ -14,20 +14,24 @@ const Template = (args) => <Textfield {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
-  text: ''
+  value: '',
+  placeholder: 'placeholder'
 };
 
 export const Filled = Template.bind({});
 Filled.args = {
-  text: 'Filled',
+  value: 'Filled',
+  placeholder: 'placeholder'
 };
 
 export const DefaultMultiline = Template.bind({});
 DefaultMultiline.args = {
-  text: 'Multi-line',
+  value: 'Multi-line',
+  placeholder: 'placeholder'
 };
 
 export const FilledMultiline = Template.bind({});
 FilledMultiline.args = {
-  text: 'Multi-line filled',
+  value: 'Multi-line filled',
+  placeholder: 'placeholder'
 };

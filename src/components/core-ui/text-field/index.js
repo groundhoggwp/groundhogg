@@ -21,20 +21,27 @@ const theme = createTheme({});
 export const Textfield = withStyles((theme) => ({
   root: {
     fontSize: "12px",
-    marginTop: "5px",
-    padding: "0px 74px 0px 7px",
-    border: "1.5px solid rgba(16, 38, 64, 0.1)",
-    borderRadius: "2px"
+    width: "calc(100% - 10px)",
+    padding: "6px 0px 6px 17px",
+    marginTop: "10px",
+    border: "1.2px solid rgba(16, 38, 64, 0.15)",
+    borderRadius: "3px",
+    "&:focus": {
+      outline: "none",
+      border: "1.2px solid rgba(16, 38, 64, 0.15)",
+      boxShadow: "none",
+    },
   },
-}))(({ classes, onChange, options, text, ...props }) => {
-  console.log(props, options)
+}))(({ classes, onChange, placeholder, value, ...props }) => {
+  // console.log(props, props)
   // value={text}
   // placeholder={placeholder}
   //
   return (
     <input
       className={classes.root}
-      value={text}
+      placeholder={placeholder}
+      value={value}
       onChange={onChange}
       fullWidth
     />

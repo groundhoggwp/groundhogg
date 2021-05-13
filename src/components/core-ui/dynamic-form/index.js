@@ -7,6 +7,7 @@
 /**
  * External dependencies
  */
+import React from 'react';
 import { Switch } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
@@ -23,11 +24,18 @@ const theme = createTheme({});
 export const DynamicForm = withStyles((theme) => ({
   root: {
   },
-}))(({ classes, children, ...rest }) => {
-  console.log(rest)
+}))(({ classes, children, hanldeFormChange, ...rest }) => {
+  // console.log(rest, children[0])
+
+
 
   return (
-    <div>form</div>
+    <>{
+      children.map((row)=>{
+        // row.props.onChange = handleChange()
+        return row;
+      })
+    }</>
   );
 });
 

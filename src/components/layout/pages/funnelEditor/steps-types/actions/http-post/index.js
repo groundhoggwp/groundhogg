@@ -78,33 +78,10 @@ const stepAtts = {
 
 
 
-    const addRow = (e) => {
 
-      keyPairSection.push(keyPairRow)
-      console.log('asdfasdf', keyPairSection)
-      setKeyPairSection(keyPairSection)
-    }
-    const deleteRow = (e) => {
-
-    }
-
-    const keyPairRow = <div className={classes.inputRow}>
-      <input
-        className={classes.inputText}
-        placeholder={""}
-        onChange={handleChange}
-      />
-      <input
-        className={classes.inputText}
-        placeholder={""}
-        onChange={handleChange}
-      />
-      <div className={`${classes.customHeaderBtn} ${classes.addButton}`} onClick={()=>{addRow()}}> <Trash /></div>
-      <div className={`${classes.customHeaderBtn} ${classes.trashButton}`} onClick={deleteRow}> <Trash /></div>
-    </div>
 
     const [formData, setFormData] = React.useState({});
-    const [keyPairSection, setKeyPairSection] = React.useState([keyPairRow]);
+
 
 
     console.log(keyPairSection)
@@ -122,7 +99,7 @@ const stepAtts = {
     return <Card className={classes.root}>
 
 
-            {keyPairSection}
+
 
 
             <div className={classes.inputRow}>
