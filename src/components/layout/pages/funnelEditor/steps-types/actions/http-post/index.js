@@ -1,8 +1,63 @@
-import HttpIcon from "@material-ui/icons/Http";
+/**
+ * WordPress dependencies
+ */
+import { __ } from "@wordpress/i18n";
+import { Fragment, useState } from "@wordpress/element";
+import { PinnedItems } from "@wordpress/interface";
+import { Inserter } from "@wordpress/block-editor";
+import { useSelect, useDispatch } from '@wordpress/data'
+
+/**
+ * External dependencies
+ */
+import { Button, Card, Switch, TextField } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
+import ReplayIcon from "@material-ui/icons/Replay";
+import { withStyles } from '@material-ui/core/styles';
+import {
+  KeyboardTimePicker,
+} from '@material-ui/pickers';
+/**
+ * Internal dependencies
+ */
+import Tag from "components/svg/Tag/";
+import AddWithBorder from "components/svg/AddWithBorder/";
+import Trash from "components/svg/Trash/";
+import Toggle from "../../../components/toggle/";
 import { ACTION, ACTION_TYPE_DEFAULTS } from "../../constants";
 import { registerStepType } from "data/step-type-registry";
+import { createTheme }  from "../../../../../../../theme";
 
 const STEP_TYPE = "http_post";
+
+const theme = createTheme({});
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: "calc(100% - 50px)",
+    padding: "33px 25px 18px 25px"
+  },
+  inputRow:{
+    margin: '10px 0px 0px 15px'
+  },
+  customHeaderBtn: {
+    display: "inline-block",
+    width: "20px",
+    height: "20px",
+    margin: '0',
+    stroke: "#000",
+    fill: "#000",
+    marginRight: '25px'
+  },
+  addButton:{
+    stroke: theme.palette.secondary.main,
+    fill: theme.palette.secondary.main,
+  },
+  trashButton:{
+    stroke: theme.palette.error.dark,
+    fill: theme.palette.error.dark,
+  }
+}));
 
 const stepAtts = {
   ...ACTION_TYPE_DEFAULTS,
@@ -11,15 +66,88 @@ const stepAtts = {
 
   group: ACTION,
 
-  name: "Http Post",
+  name: "HTTP Post",
 
-  icon: <HttpIcon />,
+  icon: <Tag />,
+  read: ({ data, meta, stats }) => {
+    return <>Delay Timer</>;
+  },
 
-  // read: ({ data, meta, stats }) => {
-  //   return <></>;
-  // },
   edit: ({ data, meta, stats }) => {
-    return <></>;
+    const classes = useStyles();
+
+
+
+    const addRow = (e) => {
+
+      keyPairSection.push(keyPairRow)
+      console.log('asdfasdf', keyPairSection)
+      setKeyPairSection(keyPairSection)
+    }
+    const deleteRow = (e) => {
+
+    }
+
+    const keyPairRow = <div className={classes.inputRow}>
+      <input
+        className={classes.inputText}
+        placeholder={""}
+        onChange={handleChange}
+      />
+      <input
+        className={classes.inputText}
+        placeholder={""}
+        onChange={handleChange}
+      />
+      <div className={`${classes.customHeaderBtn} ${classes.addButton}`} onClick={()=>{addRow()}}> <Trash /></div>
+      <div className={`${classes.customHeaderBtn} ${classes.trashButton}`} onClick={deleteRow}> <Trash /></div>
+    </div>
+
+    const [formData, setFormData] = React.useState({});
+    const [keyPairSection, setKeyPairSection] = React.useState([keyPairRow]);
+
+
+    console.log(keyPairSection)
+    const handleChange = (e) => {
+      console.log(e.target.name, e.target.value)
+      formData[e.target.id] = e.target.value
+      setFormData(formData)
+    }
+
+
+
+
+
+
+    return <Card className={classes.root}>
+
+
+            {keyPairSection}
+
+
+            <div className={classes.inputRow}>
+              <label>Method:</label>
+              <TextField
+                 name="method"
+                 value={formData['method']}
+                  onChange={handleChange}
+                 defaultValue="Default Value"
+               />
+            </div>
+            <div className={classes.inputRow}>
+              <label>Target URL:</label>
+              <TextField
+                 name="target-url"
+                 value={formData['target-url']}
+                  onChange={handleChange}
+                 defaultValue="Default Value"
+               />
+            </div>
+            <div className={classes.inputRow}>
+              <label>toggle:</label>
+              <Toggle checked={formData['toggle']} onChange={handleChange} name="toggle" />
+            </div>
+          </Card>
   },
 };
 
