@@ -79,6 +79,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return void
 	 */
 	protected function post_setup() {
+		$this->step_order = absint( $this->step_order );
+		$this->funnel_id  = absint( $this->funnel_id );
 	}
 
 	/**
@@ -123,6 +125,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 	/**
 	 * Get an array of contacts which are "waiting'
+	 *
 	 * @return Contact[] | false
 	 */
 	public function get_waiting_contacts() {
@@ -143,6 +146,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 	/**
 	 * Get an array of waiting events
+	 *
 	 * @return Event[]|false
 	 */
 	public function get_waiting_events() {

@@ -18,7 +18,7 @@ class Scripts {
 		add_action( 'enqueue_block_editor_assets', [ $this, 'register_block_editor_assets' ] );
 	}
 
-	public function register_block_editor_assets(){
+	public function register_block_editor_assets() {
 		wp_register_style( 'groundhogg-form', GROUNDHOGG_ASSETS_URL . 'css/frontend/form.css', [], GROUNDHOGG_VERSION );
 		wp_enqueue_style( 'groundhogg-form' );
 	}
@@ -179,8 +179,10 @@ class Scripts {
 			'jquery-ui-draggable',
 			'jquery-ui-sortable',
 			'groundhogg-admin-functions',
+			'groundhogg-admin-context-menu'
 		], GROUNDHOGG_VERSION, true );
 
+		wp_register_script( 'groundhogg-admin-context-menu', GROUNDHOGG_ASSETS_URL . 'js/admin/context-menu' . $dot_min . '.js', [], GROUNDHOGG_VERSION, true );
 		wp_register_script( 'groundhogg-admin-form-builder', GROUNDHOGG_ASSETS_URL . 'js/admin/form-builder' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
 		wp_register_script( 'groundhogg-admin-iframe', GROUNDHOGG_ASSETS_URL . 'js/admin/iframe-checker' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, false );
 		wp_register_script( 'groundhogg-admin-import-export', GROUNDHOGG_ASSETS_URL . 'js/admin/import-export' . $dot_min . '.js', [

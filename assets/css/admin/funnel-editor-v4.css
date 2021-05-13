@@ -6,11 +6,16 @@
     padding: 8px;
     background-color: #FFFFFF;
     box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+    min-height: 50px;
+    display: flex;
+    align-items: center;
 }
 
 .editor-header .header-stuff {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    flex-grow: 1;
 }
 
 .editor-header .header-stuff .header-actions .undo-and-redo,
@@ -54,10 +59,22 @@
     font-style: normal;
     font-weight: normal;
     font-size: 24px;
-    line-height: 29px;
+    line-height: 1;
     color: #102640;
     padding: 0;
     border-width: 0;
+    outline: none;
+    border-radius: 1px;
+    margin: 0;
+    display: inline-block;
+}
+
+.title-wrap .title input.funnel-title-edit{
+    border-bottom: 1px solid;
+}
+.title-wrap .title input.funnel-title-edit:focus{
+    outline: none;
+    box-shadow: none;
 }
 
 .title-wrap .title .pencil {
@@ -100,6 +117,7 @@
     margin-top: 10px;
 }
 
+.step-flow .step-placeholder,
 .step-flow .steps .step {
     display: flex;
     justify-content: space-between;
@@ -108,7 +126,13 @@
     box-sizing: border-box;
     border-radius: 5px;
     padding: 10px;
+    min-height: 52px;
     cursor: pointer;
+}
+
+.step-flow .step-placeholder{
+    border-style: dashed;
+    opacity: 0.9;
 }
 
 .step-flow .step .icon {
@@ -227,6 +251,7 @@
     padding: 20px 0 0 20px;
 }
 
+.step-flow .add-step,
 .step-add .types .add-step{
     width: 100px;
     display: flex;
@@ -234,10 +259,56 @@
     flex-direction: column;
 }
 
+.step-flow .add-step .step-icon,
 .step-add .types .add-step .step-icon{
     background: #FFFFFF;
     box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
     border-radius: 7px;
     padding: 5px;
     width: 50px;
+}
+
+/* context menu */
+
+.step-context-menu {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    padding: 12px 0;
+    width: 120px;
+    background-color: #fff;
+    border: solid 1px #dfdfdf;
+    box-shadow: 1px 1px 2px #cfcfcf;
+}
+
+.step-context-menu--active {
+    display: block;
+}
+
+.step-context-menu__items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.step-context-menu__item {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.step-context-menu__item:last-child {
+    margin-bottom: 0;
+}
+
+.step-context-menu__link {
+    display: block;
+    padding: 4px 12px;
+    color: #0066aa;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.step-context-menu__link:hover {
+    color: #fff;
+    background-color: #0066aa;
 }
