@@ -24,7 +24,7 @@ import {
 import Tag from "components/svg/Tag/";
 import AddWithBorder from "components/svg/AddWithBorder/";
 import Trash from "components/svg/Trash/";
-import Toggle from "../../../components/toggle/";
+import Toggle from "components/core-ui/toggle/";
 import { ACTION, ACTION_TYPE_DEFAULTS } from "../../constants";
 import { registerStepType } from "data/step-type-registry";
 import { createTheme }  from "../../../../../../../theme";
@@ -78,33 +78,10 @@ const stepAtts = {
 
 
 
-    const addRow = (e) => {
 
-      keyPairSection.push(keyPairRow)
-      console.log('asdfasdf', keyPairSection)
-      setKeyPairSection(keyPairSection)
-    }
-    const deleteRow = (e) => {
-
-    }
-
-    const keyPairRow = <div className={classes.inputRow}>
-      <input
-        className={classes.inputText}
-        placeholder={""}
-        onChange={handleChange}
-      />
-      <input
-        className={classes.inputText}
-        placeholder={""}
-        onChange={handleChange}
-      />
-      <div className={`${classes.customHeaderBtn} ${classes.addButton}`} onClick={()=>{addRow()}}> <Trash /></div>
-      <div className={`${classes.customHeaderBtn} ${classes.trashButton}`} onClick={deleteRow}> <Trash /></div>
-    </div>
 
     const [formData, setFormData] = React.useState({});
-    const [keyPairSection, setKeyPairSection] = React.useState([keyPairRow]);
+
 
 
     console.log(keyPairSection)
@@ -122,7 +99,7 @@ const stepAtts = {
     return <Card className={classes.root}>
 
 
-            {keyPairSection}
+
 
 
             <div className={classes.inputRow}>

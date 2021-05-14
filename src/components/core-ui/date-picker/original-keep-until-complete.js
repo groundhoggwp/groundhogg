@@ -2,12 +2,15 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { createMuiTheme } from '@material-ui/core/styles';
-import { useState, useRef, useEffect, Fragment } from '@wordpress/element';
-import PropTypes from 'prop-types';
 // import { getLuxonDate } from "utils/index";
+import { useState, useRef, useEffect, Fragment } from '@wordpress/element';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
+// const useStyles = makeStyles((theme) => ({
+//
+// }));
+
+export const DatePicker = withStyles((theme) => ({
+  textField: {
     minWidth: '150px',
     marginLeft: '30px',
   },
@@ -16,33 +19,27 @@ const useStyles = makeStyles((theme) => ({
       border: 'none'
     }
 }
-}));
-
-
-
-export const DatePicker = (({ ...rest }) => {
+}))(({ classes, onChange, options, value, ...props }) => {
 
   const [date, setDate] = useState( selectedDate );
-
-  const classes = useStyles();
 
   const validDateChange = (newDate) => {
 
     // The date picker can move forward months and years back and forth these conditions block updates and improves the UX
     // More conditions may be needed
-    if(getLuxonDate('one_month_back', date) === newDate){
-      return false;
-    }
-    if(getLuxonDate('one_month_forward', date) === newDate){
-      return false;
-    }
-    if(getLuxonDate('one_year_back', date) === newDate){
-      return false;
-    }
-    if(getLuxonDate('one_year_forward', date) === newDate){
-      return false;
-    }
-    return true;
+  //   if(getLuxonDate('one_month_back', date) === newDate){
+  //     return false;
+  //   }
+  //   if(getLuxonDate('one_month_forward', date) === newDate){
+  //     return false;
+  //   }
+  //   if(getLuxonDate('one_year_back', date) === newDate){
+  //     return false;
+  //   }
+  //   if(getLuxonDate('one_year_forward', date) === newDate){
+  //     return false;
+  //   }
+  //   return true;
   }
 
   const handleChange = (ele) => {
@@ -55,11 +52,10 @@ export const DatePicker = (({ ...rest }) => {
     setDate(newDate);
   };
   return (
-    // value=selectedDate
     <form  noValidate>
       <TextField
         type='date'
-        className={classes.root}
+        className={classes.textField}
         id={id}
         label={label}
         value={selectedDate}
@@ -74,17 +70,3 @@ export const DatePicker = (({ ...rest }) => {
     </form>
   );
 });
-
-
-DatePicker.propTypes = {
-  /**
-   * is the on or off
-   */
-  text: PropTypes.bool,
-  backgroundColor: PropTypes.string
-};
-
-DatePicker.defaultProps = {
-  text: false,
-  backgroundColor: '2020-12-01'
-};
