@@ -2,14 +2,11 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { createMuiTheme } from '@material-ui/core/styles';
-// import { getLuxonDate } from "utils/index";
 import { useState, useRef, useEffect, Fragment } from '@wordpress/element';
+import PropTypes from 'prop-types';
+// import { getLuxonDate } from "utils/index";
 
-// const useStyles = makeStyles((theme) => ({
-//
-// }));
-
-export const DatePicker = withStyles((theme) => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     minWidth: '150px',
     marginLeft: '30px',
@@ -19,37 +16,43 @@ export const DatePicker = withStyles((theme) => ({
       border: 'none'
     }
 }
-}))(({ classes, ...rest }) => {
+}));
 
-  // const [date, setDate] = useState( selectedDate );
+
+
+export const DatePicker = (({ ...rest }) => {
+
+  const [date, setDate] = useState( selectedDate );
+
+  const classes = useStyles();
 
   const validDateChange = (newDate) => {
 
     // The date picker can move forward months and years back and forth these conditions block updates and improves the UX
     // More conditions may be needed
-  //   if(getLuxonDate('one_month_back', date) === newDate){
-  //     return false;
-  //   }
-  //   if(getLuxonDate('one_month_forward', date) === newDate){
-  //     return false;
-  //   }
-  //   if(getLuxonDate('one_year_back', date) === newDate){
-  //     return false;
-  //   }
-  //   if(getLuxonDate('one_year_forward', date) === newDate){
-  //     return false;
-  //   }
-  //   return true;
+    if(getLuxonDate('one_month_back', date) === newDate){
+      return false;
+    }
+    if(getLuxonDate('one_month_forward', date) === newDate){
+      return false;
+    }
+    if(getLuxonDate('one_year_back', date) === newDate){
+      return false;
+    }
+    if(getLuxonDate('one_year_forward', date) === newDate){
+      return false;
+    }
+    return true;
   }
 
   const handleChange = (ele) => {
-    // const newDate = ele.target.value;
+    const newDate = ele.target.value;
 
-    // if(validDateChange(newDate)){
-    //   dateChange(id, newDate);
-    // }
-    //
-    // setDate(newDate);
+    if(validDateChange(newDate)){
+      dateChange(id, newDate);
+    }
+
+    setDate(newDate);
   };
   return (
     // value=selectedDate
@@ -59,7 +62,7 @@ export const DatePicker = withStyles((theme) => ({
         className={classes.root}
         id={id}
         label={label}
-        value={'2020-20-01'}
+        value={selectedDate}
         onChange={handleChange}
         KeyboardButtonProps={{
           'aria-label': 'change date',

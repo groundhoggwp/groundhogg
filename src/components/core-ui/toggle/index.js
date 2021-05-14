@@ -21,7 +21,7 @@ const theme = createTheme({});
 
 
 
-export const Toggle = (({ backgroundColor, on, ...rest }) => {
+export const Toggle = (({ id, backgroundColor, checked, onChange, ...rest }) => {
   const useStyles = makeStyles((theme) => ({
     root: {
       width: 34,
@@ -64,10 +64,11 @@ export const Toggle = (({ backgroundColor, on, ...rest }) => {
 
   return (
     <Switch
+      id={id}
       focusVisibleClassName={classes.focusVisible}
       disableRipple
-      checked={on}
-      onChange={()=>{console.log('checked')}}
+      checked={checked}
+      onChange={onChange}
       classes={{
         root: classes.root,
         switchBase: classes.switchBase,

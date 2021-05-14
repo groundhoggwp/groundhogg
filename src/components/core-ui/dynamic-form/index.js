@@ -24,16 +24,17 @@ const theme = createTheme({});
 export const DynamicForm = withStyles((theme) => ({
   root: {
   },
+  inputRow:{
+    margin: '10px 0px 0px 15px'
+  }
 }))(({ classes, children, hanldeFormChange, ...rest }) => {
-  // console.log(rest, children[0])
-
-
-
   return (
     <>{
       children.map((row)=>{
-        // row.props.onChange = handleChange()
-        return row;
+        return <div className={classes.inputRow}>
+          <label>{row.label}</label>
+          {row.component}
+        </div>
       })
     }</>
   );
