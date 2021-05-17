@@ -41,7 +41,12 @@ const stepAtts = {
   },
 
   edit: ({ data, meta, updateSettings }) => {
-    const { tag_ids } = meta;
+    if (!meta) {
+      meta = {
+        tag_ids: [],
+        condition: "",
+      };
+    }
 
     const handleTagsChosen = (tagIds) => {
       updateSettings({
@@ -73,7 +78,10 @@ const stepAtts = {
           </FormControl>
         </SettingsRow>
         <SettingsRow>
-          <TagPicker selected={tag_ids || []} onChange={handleTagsChosen} />
+          <TagPicker
+            selected={meta.tag_ids || []}
+            onChange={handleTagsChosen}
+          />
         </SettingsRow>
       </>
     );
