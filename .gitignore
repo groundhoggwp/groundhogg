@@ -5,3 +5,4 @@
 /.idea/
 /build/*
 build/index.js*
+.DS_Store
