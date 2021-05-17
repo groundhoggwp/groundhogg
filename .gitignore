@@ -3,6 +3,5 @@
 /wp-cli.phar
 /composer.phar
 /.idea/
-/build/*
-build/index.js*
+/build/
 .DS_Store

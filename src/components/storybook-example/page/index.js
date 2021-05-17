@@ -1,13 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+<<<<<<< HEAD:src/components/storybook-full-example/Page/index.js
 import  { Header } from '../Header/';
+=======
+import  { Header }  from '../Header/';
+
+>>>>>>> react-rebuild:src/components/storybook-example/page/index.js
 import './styles.css';
+
 
 export const Page = ({ user, onLogin, onLogout, onCreateAccount }) => (
   <article>
-    <Header user={user} onLogin={onLogin} onLogout={onLogout} onCreateAccount={onCreateAccount} />
 
+    <Header user={user} onLogin={onLogin} onLogout={onLogout} onCreateAccount={onCreateAccount} />
     <section>
       <h2>Pages in Storybook</h2>
       <p>
