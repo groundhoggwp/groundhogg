@@ -7,7 +7,8 @@
 /**
  * External dependencies
  */
-import { Switch } from "@material-ui/core";
+ import React from "react";
+ import { TextField } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import { makeStyles } from "@material-ui/core/styles";
@@ -18,7 +19,7 @@ import  { createTheme }   from "../../../theme";
 
 const theme = createTheme({});
 
-export const DatePicker = withStyles((theme) => ({
+export const TimePicker = withStyles((theme) => ({
   root: {
     fontSize: "12px",
     marginTop: "5px",
@@ -33,9 +34,8 @@ export const DatePicker = withStyles((theme) => ({
   // onChange={onChange}
         // fullWidth
   return (
-    <input
-      className={classes.root}
-
+    <TextField
+      type='time'
     />
   );
 });

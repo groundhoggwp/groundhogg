@@ -4,7 +4,7 @@ import TextField from '@material-ui/core/TextField';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useState, useRef, useEffect, Fragment } from '@wordpress/element';
 import PropTypes from 'prop-types';
-// import { getLuxonDate } from "utils/index";
+// import { getLuxonDate } from "../../../utils/index";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -20,9 +20,10 @@ const useStyles = makeStyles((theme) => ({
 
 
 
-export const DatePicker = (({ ...rest }) => {
+export const DatePicker = (({ id, label, ...rest }) => {
 
-  const [date, setDate] = useState( selectedDate );
+  const [date, setDate] = useState( '12-12-2020' );
+  // const [date, setDate] = useState( selectedDate );
 
   const classes = useStyles();
 
@@ -30,27 +31,28 @@ export const DatePicker = (({ ...rest }) => {
 
     // The date picker can move forward months and years back and forth these conditions block updates and improves the UX
     // More conditions may be needed
-    if(getLuxonDate('one_month_back', date) === newDate){
-      return false;
-    }
-    if(getLuxonDate('one_month_forward', date) === newDate){
-      return false;
-    }
-    if(getLuxonDate('one_year_back', date) === newDate){
-      return false;
-    }
-    if(getLuxonDate('one_year_forward', date) === newDate){
-      return false;
-    }
+    // if(getLuxonDate('one_month_back', date) === newDate){
+    //   return false;
+    // }
+    // if(getLuxonDate('one_month_forward', date) === newDate){
+    //   return false;
+    // }
+    // if(getLuxonDate('one_year_back', date) === newDate){
+    //   return false;
+    // }
+    // if(getLuxonDate('one_year_forward', date) === newDate){
+    //   return false;
+    // }
     return true;
   }
 
   const handleChange = (ele) => {
     const newDate = ele.target.value;
 
-    if(validDateChange(newDate)){
-      dateChange(id, newDate);
-    }
+    // Remove this
+    // if(validDateChange(newDate)){
+    //   dateChange(id, newDate);
+    // }
 
     setDate(newDate);
   };
@@ -62,7 +64,7 @@ export const DatePicker = (({ ...rest }) => {
         className={classes.root}
         id={id}
         label={label}
-        value={selectedDate}
+        value={date}
         onChange={handleChange}
         KeyboardButtonProps={{
           'aria-label': 'change date',

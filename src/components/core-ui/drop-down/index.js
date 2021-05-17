@@ -27,11 +27,11 @@ export const DropDown = withStyles((theme) => ({
     borderRadius: "2px"
   },
 }))(({ classes, id, onChange, options, value, ...props }) => {
-
+  // Optional, none currently use this
+  // <option selected="selected">default</option>
   return (
     <select id={id} className={classes.root} value={value} onChange={onChange}>
-      <option selected="selected">default</option>
-      {options.map((option)=>{        
+      {options.map((option)=>{
         return <option value={option.value}>{option.display}</option>
       })}
     </select>

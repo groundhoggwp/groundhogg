@@ -7,6 +7,7 @@
 /**
  * External dependencies
  */
+import React from 'react';
 import { Switch } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
@@ -14,8 +15,8 @@ import { makeStyles } from "@material-ui/core/styles";
 /**
  * Internal dependencies
  */
-import AddWithBorder from "components/svg/AddWithBorder/";
-import Trash from "components/svg/Trash/";
+import AddWithBorder from "../../../components/svg/AddWithBorder/";
+import Trash from "../../../components/svg/Trash/";
 import  { createTheme }   from "../../../theme";
 
 const STEP_TYPE = "send_email";
@@ -53,7 +54,7 @@ export const DynamicKeyPairs = withStyles((theme) => ({
       placeholder={""}
       onChange={handleChange}
     />
-    <div className={`${classes.customHeaderBtn} ${classes.addButton}`} onClick={()=>{addRow()}}> <Trash /></div>
+    <div className={`${classes.customHeaderBtn} ${classes.addButton}`} onClick={()=>{addRow()}}> <AddWithBorder /></div>
     <div className={`${classes.customHeaderBtn} ${classes.trashButton}`} onClick={deleteRow}> <Trash /></div>
   </div>
   const [keyPairSection, setKeyPairSection] = React.useState([keyPairRow]);

@@ -15,16 +15,16 @@ import { makeStyles } from "@material-ui/core/styles";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ReplayIcon from "@material-ui/icons/Replay";
 import { withStyles } from '@material-ui/core/styles';
-import {
-  KeyboardTimePicker,
-} from '@material-ui/pickers';
 /**
  * Internal dependencies
  */
-import Tag from "components/svg/Tag/";
-import AddWithBorder from "components/svg/AddWithBorder/";
-import Trash from "components/svg/Trash/";
-import Toggle from "components/core-ui/toggle/";
+ import {
+ 	EMAILS_STORE_NAME
+} from '../../../../../../../data';
+import NewUser from "components/svg/NewUser/";
+import { Toggle } from "components/core-ui/toggle/";
+import { DropDown } from "components/core-ui/drop-down/";
+import { DynamicForm } from "components/core-ui/dynamic-form/";
 import { ACTION, ACTION_TYPE_DEFAULTS } from "../../constants";
 import { registerStepType } from "data/step-type-registry";
 import { createTheme }  from "../../../../../../../theme";
@@ -37,26 +37,14 @@ const useStyles = makeStyles((theme) => ({
     width: "calc(100% - 50px)",
     padding: "33px 25px 18px 25px"
   },
-  inputRow:{
-    margin: '10px 0px 0px 15px'
-  },
-  customHeaderBtn: {
+  actionLabel: {
+    color: "#102640",
+    width: "250px",
     display: "inline-block",
-    width: "20px",
-    height: "20px",
-    margin: '0',
-    stroke: "#000",
-    fill: "#000",
-    marginRight: '25px'
+    marginBottom: "10px",
+    fontSize: "16px",
+    fontWeight: "500",
   },
-  addButton:{
-    stroke: theme.palette.secondary.main,
-    fill: theme.palette.secondary.main,
-  },
-  trashButton:{
-    stroke: theme.palette.error.dark,
-    fill: theme.palette.error.dark,
-  }
 }));
 
 const stepAtts = {
@@ -66,65 +54,83 @@ const stepAtts = {
 
   group: ACTION,
 
-  name: "HTTP Post",
+  name: "Delay Timer",
 
-  icon: <Tag />,
+  icon: <NewUser />,
+
   read: ({ data, meta, stats }) => {
-    return <>Delay Timer</>;
+    return <>HTTP Post</>;
   },
 
   edit: ({ data, meta, stats }) => {
+
+    const timeOptions = [
+      {
+        display: 'Minutes',
+        value: 'minutes'
+      },
+      {
+        display: 'Hours',
+        value: 'hours'
+      },
+      {
+        display: 'Days',
+        value: 'days'
+      },
+      {
+        display: 'Weeks',
+        value: 'weeks'
+      },
+      {
+        display: 'Months',
+        value: 'months'
+      }
+    ]
+    const runOptions = [
+      {
+        display: 'Immediately',
+        value: 'immediately'
+      },
+      {
+        display: 'At time of day',
+        value: 'at-time-of-day'
+      }
+    ]
+
+    const [formData, setFormData] = useState({});
     const classes = useStyles();
 
+    const hanldeFormChange = (e) => {
+      if(e.target.type === 'checkbox'){
+        formData[e.target.id] = e.target.checked
+      } else {
+        formData[e.target.id] = e.target.value
+      }
 
-
-
-
-    const [formData, setFormData] = React.useState({});
-
-
-
-    console.log(keyPairSection)
-    const handleChange = (e) => {
-      console.log(e.target.name, e.target.value)
-      formData[e.target.id] = e.target.value
       setFormData(formData)
     }
 
 
 
-
-
-
+    const formElements = [
+      {
+        label: 'And run:',
+        component: <><Toggle checked={formData['toggle']} onChange={hanldeFormChange} name="toggle" /></>
+      },
+      {
+      label: 'Enable conditional logic:',
+      component: <Toggle id={'conditional-logic'} checked={formData['conditional-logic']} onChange={hanldeFormChange} backgroundColor={theme.palette.primary.main} name="checked" />
+    }
+  ]
     return <Card className={classes.root}>
+      <div className={classes.actionLabel}>
+        HTTP Post
+      </div>
 
+      <DynamicForm children={formElements} hanldeFormChange={hanldeFormChange}/>
 
+    </Card>
 
-
-
-            <div className={classes.inputRow}>
-              <label>Method:</label>
-              <TextField
-                 name="method"
-                 value={formData['method']}
-                  onChange={handleChange}
-                 defaultValue="Default Value"
-               />
-            </div>
-            <div className={classes.inputRow}>
-              <label>Target URL:</label>
-              <TextField
-                 name="target-url"
-                 value={formData['target-url']}
-                  onChange={handleChange}
-                 defaultValue="Default Value"
-               />
-            </div>
-            <div className={classes.inputRow}>
-              <label>toggle:</label>
-              <Toggle checked={formData['toggle']} onChange={handleChange} name="toggle" />
-            </div>
-          </Card>
   },
 };
 
