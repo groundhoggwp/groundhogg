@@ -37,33 +37,7 @@ const useStyles = makeStyles((theme) => ({
     width: "calc(100% - 50px)",
     padding: "33px 25px 18px 25px"
   },
-  addStepHoverBtn: {
-    position: "relative",
-    display: "block",
-    width: "265px",
-    height: "1px",
-    background: theme.palette.primary.main,
-    textAlign: "center",
-    zIndex: "999",
-  },
-  addStepHoverPlus: {
-    color: theme.palette.primary.main,
-    position: "absolute",
-    top: "calc(50% - 8px)",
-    left: "calc(50% - 8px)",
-    width: "16px",
-    height: "16px",
-    background: "#fff",
-    border: `1px solid ${theme.palette.primary.main}`,
-    borderRadius: "4px",
-  },
-  addStepBtn: {
-    width: "265px",
-    textAlign: "center",
-    textTransform: "none",
-  },
-
-  sendEmailComponentLabel: {
+  actionLabel: {
     color: "#102640",
     width: "250px",
     display: "inline-block",
@@ -85,15 +59,7 @@ const useStyles = makeStyles((theme) => ({
       padding: "4px",
     },
   },
-  sendEmailSelect: {
-    // Importants are needed while we are still inside wordpress, remove this later
-    display: "block",
-    width: "calc(100%) !important",
-    maxWidth: "calc(100%) !important",
-    padding: "5px 20px 5px 5px",
-    borderRadius: "4px",
-    border: "1.2px solid rgba(16, 38, 64, 0.15) !important",
-  },
+
 }));
 
 const stepAtts = {
@@ -161,7 +127,7 @@ const stepAtts = {
 
   ]
     return <Card className={classes.root}>
-      <div className={classes.sendEmailComponentLabel}>
+      <div className={classes.actionLabel}>
         Select an email to send:
       </div>
 
