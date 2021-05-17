@@ -4,3 +4,4 @@
 /composer.phar
 /.idea/
 /build/
+.DS_Store
