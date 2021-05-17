@@ -56,9 +56,9 @@ function setIsDeletingStepError (error) {
 
 export default (endpoint) => ( {
   endpoint,
-  * createStep (stepData, funnelId) {
+  * createStep (funnelId, stepData) {
     yield setIsCreatingStep(true)
-
+    console.log(stepData, funnelId)
     try {
       const result = yield apiFetch({
         method: 'POST',
