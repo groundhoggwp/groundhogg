@@ -29,11 +29,11 @@ const funnelReducer = (
 				...state,
 				item: state.item.ID === funnelId ? {
 					...state.item,
-					edges
+					edges: edges
 				} : state.item,
 				items: state.items.map( item => item.ID === funnelId ? {
 					...item,
-					edges
+					edges: edges
 				} : item )
 			}
 
