@@ -76,21 +76,24 @@ function processPath(steps, edges) {
   const levels = {};
 
   function processNode(node, prev_level, level) {
-    if (levels.hasOwnProperty(node)) {
-      if (levels[node] === level) {
+
+    const { ID } = node;
+
+    if (levels.hasOwnProperty(ID)) {
+      if (levels[ID] === level) {
         return;
-      } else if (prev_level < level && prev_level < levels[node]) {
+      } else if (prev_level < level && prev_level < levels[ID]) {
         return;
-      } else if (prev_level > level && prev_level > levels[node]) {
+      } else if (prev_level > level && prev_level > levels[ID]) {
         return;
       }
     }
 
-    levels[node] = level;
+    levels[ID] = level;
 
     if (edges) {
-      const children = edges.filter((edge) => edge.from_id === node);
-      const parents = edges.filter((edge) => edge.to_id === node);
+      const children = edges.filter((edge) => edge.from_id === ID);
+      const parents = edges.filter((edge) => edge.to_id === ID);
 
       children.forEach((child) => processNode(child, level + 1));
       parents.forEach((parent) => processNode(parent, level - 1));
