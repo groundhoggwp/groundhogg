@@ -31,7 +31,7 @@ export default ({ funnel }) => {
     <>
       <Grid container>
         <Grid item xs={3} className={classes.StepsPath}>
-          <StepsPath steps={steps} edges={edges} />
+          <StepsPath {...funnel} />
         </Grid>
         <Grid className={classes.StepOptions} item xs={9}>
           <Route path={`${unSlash(path)}/:stepId/edit`}>
