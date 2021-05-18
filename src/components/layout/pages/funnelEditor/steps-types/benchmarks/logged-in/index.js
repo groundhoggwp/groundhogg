@@ -3,7 +3,7 @@ import { BENCHMARK } from "../../constants";
 import { registerStepType } from "data/step-type-registry";
 import { BENCHMARK_TYPE_DEFAULTS } from "components/layout/pages/funnels/editor/steps-types/constants";
 
-const STEP_TYPE = "Logged_in";
+const STEP_TYPE = "logged_in";
 
 const stepAtts = {
   ...BENCHMARK_TYPE_DEFAULTS,
