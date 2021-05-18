@@ -3,6 +3,8 @@ import { Link, Route, useParams, useRouteMatch } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { makeStyles } from "@material-ui/core/styles";
 import { unSlash } from "utils/core";
+import { useDispatch } from "@wordpress/data";
+import { FUNNELS_STORE_NAME } from "data/funnels";
 import { getStepType, useStepType } from "data/step-type-registry";
 import Button from "@material-ui/core/Button";
 import AddIcon from "@material-ui/icons/Add";
@@ -76,7 +78,6 @@ function processPath(steps, edges) {
   const levels = {};
 
   function processNode(node, prev_level, level) {
-
     if (levels.hasOwnProperty(node)) {
       if (levels[node] === level) {
         return;
@@ -94,7 +95,9 @@ function processPath(steps, edges) {
       const parents = edges.filter((edge) => edge.to_id === node);
 
       children.forEach((child) => processNode(child.to_id, level, level + 1));
-      parents.forEach((parent) => processNode(parent.from_id, level, level - 1));
+      parents.forEach((parent) =>
+        processNode(parent.from_id, level, level - 1)
+      );
     }
   }
 
@@ -138,12 +141,13 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   ...draggableStyle,
 });
 
-const MainPath = ({ steps, edges }) => {
-  window.console.log("MainPath");
+const MainPath = ({ steps, edges, ID }) => {
+  window.console.log("MainPath", steps, edges);
 
   const classes = useStyles();
-  const [stepPath, updateStepPath] = useState(processPath(steps, edges));
+  const stepPath = processPath(steps, edges);
   const { url, path } = useRouteMatch();
+  const { updateEdges } = useDispatch(FUNNELS_STORE_NAME);
 
   function onDragEnd(result) {
     // dropped outside the list
@@ -157,7 +161,23 @@ const MainPath = ({ steps, edges }) => {
       result.destination.index
     );
 
-    updateStepPath(items);
+    // Create a new levels object with the new order.
+    const newEdges = [];
+    items.map((item, i) => {
+      if (!items[i + 1]) {
+        return false;
+      }
+
+      newEdges.push({
+        from_id: item.ID,
+        to_id: items[i + 1].ID,
+        funnel_id: ID,
+      });
+
+      return true;
+    });
+
+    updateEdges(ID, newEdges);
   }
 
   return (
