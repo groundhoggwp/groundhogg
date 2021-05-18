@@ -2,6 +2,9 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Api\V4\Base_Api;
+use Groundhogg\Api\V4\Tags_Api;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -175,6 +178,7 @@ class Scripts {
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-funnel-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-editor-v4' . $dot_min . '.js', [
+			'select2',
 			'jquery',
 			'jquery-ui-draggable',
 			'jquery-ui-sortable',
@@ -244,6 +248,10 @@ class Scripts {
 			'emails'   => rest_url( 'gh/v3/emails?select2=true&status[]=ready&status[]=draft' ),
 			'sms'      => rest_url( 'gh/v3/sms?select2=true' ),
 			'contacts' => rest_url( 'gh/v3/contacts?select2=true' ),
+			'v4'       => [
+				'tags'    => rest_url( Base_Api::NAME_SPACE . '/tags' ),
+				'funnels' => rest_url( Base_Api::NAME_SPACE . '/funnels' )
+			]
 		] );
 
 		wp_localize_script( 'groundhogg-admin', 'groundhogg_nonces', [

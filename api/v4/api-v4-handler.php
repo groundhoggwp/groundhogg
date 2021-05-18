@@ -40,7 +40,7 @@ class API_V4_HANDLER {
 		$this->fields    = new Fields_Api();
 		$this->emails    = new Emails_Api();
 //		$this->broadcasts      = new Broadcasts_Api();
-//		$this->funnels_api     = new Funnels_Api();
+		$this->funnels_api     = new Funnels_Api();
 //		$this->steps_api       = new Steps_Api();
 		$this->activity_api    = new Activity_Api();
 		$this->events_api      = new Events_Api();
