@@ -25,8 +25,8 @@ import {
  * Internal dependencies
  */
 import Tag from "components/svg/Tag/";
-import DatePicker from "components/core-ui/date-picker";
-import Toggle from "components/core-ui/toggle/";
+import { DatePicker } from "components/core-ui/date-picker";
+import { Toggle } from "components/core-ui/toggle/";
 import { ACTION, ACTION_TYPE_DEFAULTS } from "../../constants";
 import { registerStepType } from "data/step-type-registry";
 import { createTheme }  from "../../../../../../../theme";
