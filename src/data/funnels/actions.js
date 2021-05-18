@@ -54,8 +54,32 @@ function setIsDeletingStepError (error) {
   }
 }
 
+
 export default (endpoint) => ( {
   endpoint,
+
+  /**
+   * Update the steps
+   *
+   * @param funnelId
+   * @param edges
+   * @returns {Generator<{funnelId, edges, type: string}, void, *>}
+   */
+  * updateEdges ( funnelId, edges ){
+    yield {
+      type: TYPES.UPDATE_EDGES,
+      funnelId,
+      edges
+    }
+  },
+
+  /**
+   * Create a step
+   *
+   * @param funnelId
+   * @param stepData
+   * @returns {Generator<{request: Object, type: string}|{item, type: string}|{type: *, error}|{isCreating, type: *}, void, *>}
+   */
   * createStep (funnelId, stepData) {
     yield setIsCreatingStep(true)
     console.log(stepData, funnelId)

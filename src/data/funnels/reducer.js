@@ -15,12 +15,23 @@ const funnelReducer = (
 		type,
 		error,
 		item,
+		funnelId,
+		edges,
 		isCreating,
 		isUpdating,
 		isDeleting,
 	}
 ) => {
 	switch ( type ) {
+		case TYPES.UPDATE_EDGES:
+
+			if ( state.item.ID === funnelId ){
+				state.item.edges = edges
+			}
+
+			state.items.find( item => item.ID === funnelId )?.edges = edges
+
+			break;
 		// Create
 		case TYPES.CREATE_STEP:
 			state = {

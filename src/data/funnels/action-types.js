@@ -7,6 +7,8 @@ const TYPES = {
 
 	// Delete Types
 	DELETE_STEP: 'DELETE_STEP',
+
+	UPDATE_EDGES: 'UPDATE_EDGES',
 };
 
 export default TYPES;
