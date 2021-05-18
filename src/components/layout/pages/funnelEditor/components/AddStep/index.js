@@ -1,4 +1,4 @@
-import { useState } from "@wordpress/element";
+import { useState, useEffect } from "@wordpress/element";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
@@ -15,11 +15,13 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     justifyContent: "center",
+    marginBottom: "2rem",
   },
   "& button": {
     background: "white",
   },
   step: {
+    cursor: "pointer",
     textAlign: "center",
   },
   stepIcon: {
@@ -30,9 +32,9 @@ const useStyles = makeStyles((theme) => ({
     height: "4rem",
     width: "4rem",
     margin: "0 auto 1rem",
-    '& svg':{
-      fill: '#F58115'
-    }
+    "& svg": {
+      fill: "#F58115",
+    },
   },
   svg: {
     width: "2rem",
@@ -43,9 +45,12 @@ const useStyles = makeStyles((theme) => ({
 export default () => {
   const { funnelId, createStep } = useCurrentFunnel();
   const [stepGroup, setStepGroup] = useState(ACTION);
+  const [steps, setSteps] = useState(getStepGroup(stepGroup));
   const classes = useStyles();
 
-  const steps = getStepGroup(stepGroup);
+  useEffect(() => {
+    setSteps(getStepGroup(stepGroup));
+  }, [stepGroup]);
 
   const choseStepType = (type, group) => {
     createStep(funnelId, {
@@ -61,8 +66,8 @@ export default () => {
     <>
       <div className={classes.root}>
         <ButtonGroup aria-label=" button group">
-          <Button>Actions</Button>
-          <Button>Benchmarks</Button>
+          <Button onClick={(e) => setStepGroup("action")}>Actions</Button>
+          <Button onClick={(e) => setStepGroup("benchmark")}>Benchmarks</Button>
           <Button>Conditional Logic</Button>
           <Button>All</Button>
         </ButtonGroup>
