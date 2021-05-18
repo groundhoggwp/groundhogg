@@ -28,15 +28,14 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	 */
 	protected function setup_object( $object ) {
 
-		$object = (object) $object;
+		$object     = (object) $object;
+		$identifier = $this->get_identifier_key();
 
-		if ( ! is_object( $object ) ) {
+		if ( ! is_object( $object ) || ! isset( $object->$identifier ) ) {
 			return false;
 		}
 
-		$identifier = $this->get_identifier_key();
-
-		$this->set_id( $object->$identifier );
+		$this->set_id( is_numeric( $object->$identifier ) ? absint( $object->$identifier ) : $object->$identifier );
 
 		//Lets just make sure we all good here.
 		$object = apply_filters( "groundhogg/{$this->get_object_type()}/setup", $object );
@@ -45,6 +44,8 @@ abstract class Base_Object_With_Meta extends Base_Object {
 		foreach ( $object as $key => $value ) {
 			$this->$key = $value;
 		}
+
+		$this->data[$this->get_identifier_key()] = $this->get_id();
 
 		// Get all the meta data.
 		$this->get_all_meta();
