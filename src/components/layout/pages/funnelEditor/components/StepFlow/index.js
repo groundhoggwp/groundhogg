@@ -87,14 +87,14 @@ function processPath(steps, edges) {
       }
     }
 
-    levels[ID] = level;
+    levels[node] = level;
 
     if (edges) {
       const children = edges.filter((edge) => edge.from_id === node);
       const parents = edges.filter((edge) => edge.to_id === node);
 
-      children.forEach((child) => processNode(child, level + 1));
-      parents.forEach((parent) => processNode(parent, level - 1));
+      children.forEach((child) => processNode(child, level, level + 1));
+      parents.forEach((parent) => processNode(parent, level, level - 1));
     }
   }
 
