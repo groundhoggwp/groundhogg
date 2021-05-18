@@ -25,11 +25,17 @@ const funnelReducer = (
 	switch ( type ) {
 		case TYPES.UPDATE_EDGES:
 
-			if ( state.item.ID === funnelId ){
-				state.item.edges = edges
+			state = {
+				...state,
+				item: state.item.ID === funnelId ? {
+					...state.item,
+					edges
+				} : state.item,
+				items: state.items.map( item => item.ID === funnelId ? {
+					...item,
+					edges
+				} : item )
 			}
-
-			state.items.find( item => item.ID === funnelId )?.edges = edges
 
 			break;
 		// Create
