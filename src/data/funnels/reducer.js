@@ -13,100 +13,99 @@ const funnelReducer = (
 	state = INITIAL_STATE,
 	{
 		type,
-		error,
 		item,
 		funnelId,
 		edges,
-		isCreating,
-		isUpdating,
-		isDeleting,
+		step,
 	}
 ) => {
 	switch ( type ) {
+
 		case TYPES.UPDATE_EDGES:
+
+			const updateEdges = (item, edges) => ({
+				...item,
+				meta: {
+					...item.meta,
+					edited: {
+						...item.meta.edited,
+						edges
+					}
+				}
+			})
 
 			state = {
 				...state,
-				item: state.item.ID === funnelId ? {
-					...state.item,
-					edges: edges
-				} : state.item,
-				items: state.items.map( item => item.ID === funnelId ? {
-					...item,
-					edges: edges
-				} : item )
+				item: state.item.ID === funnelId ? updateEdges( state.item, edges ) : state.item,
+				items: state.items.map( _item => _item.ID === funnelId ? updateEdges( _item, edges ) : _item )
 			}
 
 			break;
+
 		// Create
 		case TYPES.CREATE_STEP:
+
+			const addStep = ( item, step ) => ({
+				...item,
+				meta: {
+					...item.meta,
+					edited: {
+						...item.meta.edited,
+						steps: [
+							...item.meta.edited.steps,
+							step
+						]
+					}
+				}
+			})
+
 			state = {
 				...state,
-				item: item,
-				items: state.items.map(_item => _item.ID === item.ID ? item : _item),
+				item: state.item.ID === funnelId ? addStep( state.item, step ) : state.item,
+				items: state.items.map( _item => _item.ID === funnelId ? addStep( _item, step ) : _item )
 			}
-			break
-		case TYPES.SET_IS_CREATING:
-			state = {
-				...state,
-				isCreating,
-			}
-			break
-		case TYPES.SET_CREATING_ERROR:
-			state = {
-				...state,
-				creatingErrors: {
-					error,
-				},
-				isCreating: false,
-			}
+
 			break
 
 		// Update
 		case TYPES.UPDATE_STEP:
+
+			const updateStep = ( item, step ) => ({
+				...item,
+				meta: {
+					...item.meta,
+					edited: {
+						...item.meta.edited,
+						steps: item.meta.edited.steps.map( _step => _step.ID === step.ID ? step : _step )
+					}
+				}
+			})
+
 			state = {
 				...state,
-				item: item,
-				items: state.items.map(_item => _item.ID === item.ID ? item : _item),
-			}
-			break
-		case TYPES.SET_IS_UPDATING:
-			state = {
-				...state,
-				isUpdating,
-			}
-			break
-		case TYPES.SET_UPDATING_ERROR:
-			state = {
-				...state,
-				updatingErrors: {
-					error,
-				},
-				isUpdating: false,
+				item: state.item.ID === funnelId? updateStep( state.item, step ) : state.item,
+				items: state.items.map( _item => _item.ID === funnelId ? updateStep( _item, step ) : _item ),
 			}
 			break
 
 		// Delete
 		case TYPES.DELETE_STEP:
+
+			const deleteStep = ( item, step ) => ({
+				...item,
+				meta: {
+					...item.meta,
+					edited: {
+						...item.meta.edited,
+						steps: item.meta.edited.steps.filter( _step => _step.ID !== step.ID )
+					}
+				}
+			})
+
 			state = {
 				...state,
-				item: item,
-				items: state.items.map(_item => _item.ID === item.ID ? item : _item),
-			}
-			break
-		case TYPES.SET_IS_DELETING:
-			state = {
-				...state,
-				isDeleting,
-			}
-			break
-		case TYPES.SET_DELETING_ERROR:
-			state = {
-				...state,
-				deletingErrors: {
-					error,
-				},
-				isDeleting: false,
+				item: state.item.ID === funnelId? deleteStep( state.item, step ) : state.item,
+				items: state.items.map( _item => _item.ID === funnelId ? deleteStep( _item, step ) : _item ),
 			}
 			break
 	}

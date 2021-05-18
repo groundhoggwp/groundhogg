@@ -8,6 +8,7 @@ import { FUNNELS_STORE_NAME } from "data/funnels";
 import { getStepType, useStepType } from "data/step-type-registry";
 import Button from "@material-ui/core/Button";
 import AddIcon from "@material-ui/icons/Add";
+import { autoSaveFunnel } from '../../utils/hooks'
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -141,12 +142,15 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   ...draggableStyle,
 });
 
-const MainPath = ({ steps, edges, ID }) => {
-  window.console.log("MainPath", steps, edges);
+const MainPath = ({ data, meta, steps, edges, ID }) => {
+  window.console.log('MainPath')
 
-  const classes = useStyles();
-  const stepPath = processPath(steps, edges);
-  const { url, path } = useRouteMatch();
+  const editedSteps = meta.edited?.steps
+  const editedEdges = meta.edited?.edges
+
+  const classes = useStyles()
+  const stepPath = processPath(editedSteps || steps, editedEdges || edges)
+  const { url, path } = useRouteMatch()
   const { updateEdges } = useDispatch(FUNNELS_STORE_NAME);
 
   function onDragEnd(result) {
@@ -177,7 +181,7 @@ const MainPath = ({ steps, edges, ID }) => {
       return true;
     });
 
-    updateEdges(ID, newEdges);
+    updateEdges(ID, newEdges).then( autoSaveFunnel );
   }
 
   return (

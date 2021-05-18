@@ -1,14 +1,25 @@
 const TYPES = {
-	// Create Types
-	CREATE_STEP: 'CREATE_STEP',
 
-	// Update Types
-	UPDATE_STEP: 'UPDATE_STEP',
+  // Auto Save
+  AUTO_SAVE: 'AUTO_SAVE',
 
-	// Delete Types
-	DELETE_STEP: 'DELETE_STEP',
+  // Create Step
+  CREATE_STEP: 'CREATE_STEP',
 
-	UPDATE_EDGES: 'UPDATE_EDGES',
-};
+  // Update Types
+  UPDATE_STEP: 'UPDATE_STEP',
 
-export default TYPES;
+  // Delete Types
+  DELETE_STEP: 'DELETE_STEP',
+
+  // Create Edge
+  CREATE_EDGE: 'CREATE_EDGE',
+
+  // Delete Edge
+  DELETE_EDGE: 'DELETE_EDGE',
+
+  // Update Edges
+  UPDATE_EDGES: 'UPDATE_EDGES',
+}
+
+export default TYPES

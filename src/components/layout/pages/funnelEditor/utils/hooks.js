@@ -3,6 +3,15 @@ import { FUNNELS_STORE_NAME } from 'data/funnels'
 import { getStepType } from 'data/step-type-registry'
 import { useParams } from 'react-router-dom'
 
+export const autoSaveFunnel = () => {
+  const { autoSave } = useDispatch( FUNNELS_STORE_NAME )
+  const { funnel } = useSelect( (select) => {
+    funnel: select(FUNNELS_STORE_NAME).getItem()
+  } )
+
+  autoSave( funnel );
+}
+
 export const useCurrentStep = () => {
 
   const { stepId } = useParams()

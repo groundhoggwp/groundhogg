@@ -2,12 +2,14 @@
  * Internal dependencies
  */
 import TYPES from './action-types'
+import { UPDATE_ITEM } from '../base-object/action-types'
 import { NAMESPACE } from '../constants';
 
 /**
  * External dependencies
  */
 import { apiFetch } from '@wordpress/data-controls'
+import { setIsUpdating, setUpdatingError } from '../events/actions'
 
 // Creating
 function setIsCreatingStep (isCreating) {
@@ -59,7 +61,9 @@ export default (endpoint) => ( {
   endpoint,
 
   /**
-   * Update the steps
+   * Update the edges
+   *
+   * Assume a well formed array of edges
    *
    * @param funnelId
    * @param edges
@@ -76,69 +80,79 @@ export default (endpoint) => ( {
   /**
    * Create a step
    *
+   * Assume we have a well formed step object
+   *
    * @param funnelId
-   * @param stepData
+   * @param step
    * @returns {Generator<{request: Object, type: string}|{item, type: string}|{type: *, error}|{isCreating, type: *}, void, *>}
    */
-  * createStep (funnelId, stepData) {
-    yield setIsCreatingStep(true)
-    console.log(stepData, funnelId)
+  * createStep (funnelId, step) {
+    yield {
+      type: TYPES.CREATE_STEP,
+      funnelId,
+      step
+    }
+  },
+
+  /**
+   * Assume we have a well formed step object
+   *
+   * @param funnelId
+   * @param step
+   * @returns {Generator<{funnelId, step, type: string}, void, *>}
+   */
+  * deleteStep (funnelId, step){
+    yield {
+      type: TYPES.DELETE_STEP,
+      funnelId,
+      step
+    }
+  },
+
+  /**
+   * Assume we have a well formed step object
+   *
+   * @param funnelId
+   * @param step
+   * @returns {Generator<{funnelId, step, type: string}, void, *>}
+   */
+  * updateStep (funnelId, step){
+    yield {
+      type: TYPES.UPDATE_STEP,
+      funnelId,
+      step
+    }
+  },
+
+
+  /**
+   * Auto save the funnel
+   *
+   * Assume we have a well formed funnel object
+   *
+   * @param funnel
+   * @returns {Generator<{request: Object, type: string}|{item, type: string}|{type: *, error}|{isCreating, type: *}, void, *>}
+   */
+  * autoSave (funnel) {
+    yield setIsUpdating(true)
+
     try {
       const result = yield apiFetch({
         method: 'POST',
-        path: `${NAMESPACE}/${ endpoint }/${funnelId}/step/`,
-        data: stepData
+        path: `${NAMESPACE}/${ endpoint }/${funnel.ID}`,
+        ...funnel
       })
 
-      yield setIsCreatingStep(false)
+      yield setIsUpdating(false)
       yield {
-        type: TYPES.CREATE_STEP,
+        type: UPDATE_ITEM,
         item: result.item,
       }
     }
     catch (e) {
-      yield setCreatingStepError(e)
+      yield setUpdatingError(e)
     }
   },
 
-  * deleteStep (stepId, funnelId){
-    yield setIsDeletingStep(true)
-
-    try {
-      const result = yield apiFetch({
-        method: 'DELETE',
-        path: `${NAMESPACE}/${ endpoint }/${funnelId}/step/${stepId}`
-      })
-
-      yield setIsDeletingStep(false)
-      yield {
-        type: TYPES.DELETE_STEP,
-        item: result.item,
-      }
-    }
-    catch (e) {
-      yield setIsDeletingStepError(e)
-    }
-  },
-  * updateStep (funnelId, stepId, stepData){
-    yield setIsUpdatingStep(true)
-
-    try {
-      const result = yield apiFetch({
-        method: 'PATCH',
-        path: `${NAMESPACE}/${ endpoint }/${funnelId}/step/${stepId}`,
-        data: stepData
-      })
-
-      yield setIsUpdatingStep(false)
-      yield {
-        type: TYPES.UPDATE_STEP,
-        item: result.item,
-      }
-    }
-    catch (e) {
-      yield setIsUpdatingStepError(e)
-    }
-  },
 
 } )
