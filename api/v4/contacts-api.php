@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
+use function Groundhogg\array_map_keys;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use WP_REST_Server;
@@ -44,11 +45,11 @@ class Contacts_Api extends Base_Object_Api {
 		] );
 
 		register_rest_route( self::NAME_SPACE, '/contacts/(?P<ID>\d+)/files', [
-			[
-				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'create_files' ],
-				'permission_callback' => [ $this, 'create_files_permissions_callback' ]
-			],
+//			[
+//				'methods'             => WP_REST_Server::CREATABLE,
+//				'callback'            => [ $this, 'create_files' ],
+//				'permission_callback' => [ $this, 'create_files_permissions_callback' ]
+//			],
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'read_files' ],
@@ -112,26 +113,26 @@ class Contacts_Api extends Base_Object_Api {
 			$email_address = get_array_var( $data, 'email' );
 
 			// skip if an email address was not provided
-			// or if another contact is already using this address
-			if ( ! $email_address || get_contactdata( $email_address ) ) {
+			if ( ! $email_address ) {
 				continue;
+			} // If the email address is in use, update the contact instead
+			else if ( is_email_address_in_use( $email_address ) ) {
+				$contact = new Contact( $email_address );
+				$contact->update( $data );
+			} // Otherwise, create the contact record
+			else {
+				$contact = new Contact( $data );
 			}
 
-			// Create the contact record...
-			$contact = new Contact( $data );
-
-			foreach ( $meta as $key => $value ) {
-				$contact->update_meta( $key, $value );
-			}
-
+			$contact->update_meta( $meta );
 			$contact->apply_tag( $tags );
 
 			$added[] = $contact;
 		}
 
 		return self::SUCCESS_RESPONSE( [
-			'items'       => $added,
 			'total_items' => count( $added ),
+			'items'       => $added,
 		] );
 	}
 
@@ -145,7 +146,7 @@ class Contacts_Api extends Base_Object_Api {
 	public function read( WP_REST_Request $request ) {
 
 		// Might have passed root level query
-		$query  = (array) $request->get_param( 'query' ) ?: $request->get_params();
+		$query  = (array) $request->get_param( 'query' ) ?: $request->get_json_params();
 		$search = sanitize_text_field( wp_unslash( $request->get_param( 'search' ) ) );
 
 		if ( ! key_exists( 'search', $query ) && ! empty( $search ) ) {
@@ -164,13 +165,12 @@ class Contacts_Api extends Base_Object_Api {
 
 		$count    = $contact_query->count( $query );
 		$contacts = $contact_query->query( $query );
-		$contacts = array_map( function ( $contact ) {
-			return new Contact( $contact->ID );
-		}, $contacts );
+
+		$contacts = array_map( [ $this, 'map_raw_object_to_class' ], $contacts );
 
 		return self::SUCCESS_RESPONSE( [
-			'items'       => $contacts,
 			'total_items' => $count,
+			'items'       => $contacts,
 		] );
 	}
 
@@ -195,11 +195,11 @@ class Contacts_Api extends Base_Object_Api {
 		$add_tags    = $request->get_param( 'add_tags' ) ?: $request->get_param( 'apply_tags' );
 		$remove_tags = $request->get_param( 'remove_tags' );
 
-		if ( empty( $query ) && empty( $data) && empty( $meta ) && empty( $add_tags ) && empty( $remove_tags ) ){
+		if ( empty( $query ) && empty( $data ) && empty( $meta ) && empty( $add_tags ) && empty( $remove_tags ) ) {
 
 			$items = $request->get_json_params();
 
-			if ( empty( $items ) ){
+			if ( empty( $items ) ) {
 				return self::ERROR_422();
 			}
 
@@ -207,16 +207,16 @@ class Contacts_Api extends Base_Object_Api {
 
 			foreach ( $items as $item ) {
 
-				$id     = get_array_var( $item, 'ID' );
+				$id      = get_array_var( $item, 'ID' );
 				$contact = new Contact( $id );
 
-				if ( ! $contact->exists() ){
+				if ( ! $contact->exists() ) {
 					continue;
 				}
 
-				$data = get_array_var( $item, 'data', [] );
-				$meta = get_array_var( $item, 'meta', [] );
-				$add_tags = get_array_var( $item, 'add_tags', get_array_var( $item, 'apply_tags', [] ) );
+				$data        = get_array_var( $item, 'data', [] );
+				$meta        = get_array_var( $item, 'meta', [] );
+				$add_tags    = get_array_var( $item, 'add_tags', get_array_var( $item, 'apply_tags', [] ) );
 				$remove_tags = get_array_var( $item, 'remove_tags', [] );
 
 				// get the email address
@@ -231,9 +231,8 @@ class Contacts_Api extends Base_Object_Api {
 
 				// If the current object supports meta data...
 				if ( ! empty( $meta ) && is_array( $meta ) ) {
-					foreach ( $meta as $key => $value ) {
-						$contact->update_meta( $key, $value );
-					}
+					$contact->update_meta( $meta );
+
 				}
 
 				$contact->apply_tag( $add_tags );
@@ -243,8 +242,8 @@ class Contacts_Api extends Base_Object_Api {
 			}
 
 			return self::SUCCESS_RESPONSE( [
-				'items'       => $contacts,
 				'total_items' => count( $contacts ),
+				'items'       => $contacts,
 			] );
 		}
 
@@ -253,9 +252,7 @@ class Contacts_Api extends Base_Object_Api {
 		$count    = $contact_query->count( $query );
 		$contacts = $contact_query->query( $query );
 
-		$contacts = array_map( function ( $contact ) {
-			return new Contact( $contact->ID );
-		}, $contacts );
+		$contacts = array_map( [ $this, 'map_raw_object_to_class' ], $contacts );
 
 		/**
 		 * @var $contact Contact
@@ -271,49 +268,15 @@ class Contacts_Api extends Base_Object_Api {
 			}
 
 			$contact->update( $data );
-
-			foreach ( $meta as $key => $value ) {
-				$contact->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
-			}
-
+			$contact->update_meta( $meta );
 			$contact->apply_tag( $add_tags );
 			$contact->remove_tag( $remove_tags );
 
 		}
 
 		return self::SUCCESS_RESPONSE( [
-			'items'       => $contacts,
 			'total_items' => $count,
-		] );
-	}
-
-	/**
-	 * Delete contacts
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return mixed|WP_Error|WP_REST_Response
-	 */
-	public function delete( WP_REST_Request $request ) {
-
-		$query = (array) $request->get_param( 'query' ) ?: [];
-
-		// avoid deleting all contacts when query is empty
-		if ( empty( $query ) ) {
-			return self::ERROR_401();
-		}
-
-		$contact_query = new Contact_Query();
-
-		$count    = $contact_query->count( $query );
-		$contacts = $contact_query->query( $query );
-
-		array_map( function ( $contact ) {
-			get_contactdata( $contact )->delete();
-		}, $contacts );
-
-		return self::SUCCESS_RESPONSE( [
-			'total_items' => $count
+			'items'       => $contacts,
 		] );
 	}
 
@@ -338,17 +301,16 @@ class Contacts_Api extends Base_Object_Api {
 			return self::ERROR_422( 'error', 'An email address is required.' );
 		}
 
-		// will return false if the email address is not being used
+		// If the email address is in use, treat as an update
 		if ( is_email_address_in_use( $email_address ) ) {
-			return self::ERROR_409( 'error', 'Email address already in use.' );
+			$contact = new Contact( $email_address );
+			$contact->update( $data );
+		} // Create new contact record
+		else {
+			$contact = new Contact( $data );
 		}
 
-		// Create the contact record...
-		$contact = new Contact( $data );
-
-		foreach ( $meta as $key => $value ) {
-			$contact->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
-		}
+		$contact->update_meta( $meta );
 
 		$contact->apply_tag( $tags );
 
@@ -481,7 +443,7 @@ class Contacts_Api extends Base_Object_Api {
 	 *
 	 * @return WP_Error|WP_REST_Response
 	 */
-	public function create_files( WP_REST_Request $request ){
+	public function create_files( WP_REST_Request $request ) {
 
 
 		$ID = absint( $request->get_param( 'ID' ) );
@@ -492,21 +454,21 @@ class Contacts_Api extends Base_Object_Api {
 			return self::ERROR_CONTACT_NOT_FOUND();
 		}
 
-		if ( empty( $_FILES ) ){
+		if ( empty( $_FILES ) ) {
 			return self::ERROR_422( 'error', 'No files provided.' );
 		}
 
-		foreach ( $_FILES as $file ){
+		foreach ( $_FILES as $file ) {
 			$result = $contact->upload_file( $file );
 
-			if ( is_wp_error( $request ) ){
+			if ( is_wp_error( $request ) ) {
 				return $result;
 			}
 		}
 
 		return self::SUCCESS_RESPONSE( [
+			'total_items' => count( $contact->get_files() ),
 			'items'       => $contact->get_files(),
-			'total_items' => count( $contact->get_files() )
 		] );
 	}
 
@@ -528,12 +490,12 @@ class Contacts_Api extends Base_Object_Api {
 
 		$data = $contact->get_files();
 
-		$limit   = absint( $request->get_param( 'limit' ) ) ?: 25 ;
-		$offset  = absint( $request->get_param( 'offset' ) ) ?: 0 ;
+		$limit  = absint( $request->get_param( 'limit' ) ) ?: 25;
+		$offset = absint( $request->get_param( 'offset' ) ) ?: 0;
 
 		return self::SUCCESS_RESPONSE( [
-			'items'       => array_slice( $data ,$offset , $limit ),
-			'total_items' => count( $data )
+			'total_items' => count( $data ),
+			'items'       => array_slice( $data, $offset, $limit )
 		] );
 
 	}
@@ -545,7 +507,7 @@ class Contacts_Api extends Base_Object_Api {
 	 *
 	 * @return WP_Error|WP_REST_Response
 	 */
-	public function delete_files( WP_REST_Request $request ){
+	public function delete_files( WP_REST_Request $request ) {
 
 		$ID = absint( $request->get_param( 'ID' ) );
 
@@ -557,17 +519,17 @@ class Contacts_Api extends Base_Object_Api {
 
 		$files_to_delete = $request->get_json_params();
 
-		if ( empty( $files_to_delete ) ){
+		if ( empty( $files_to_delete ) ) {
 			return self::ERROR_422( 'error', 'Did not specify a file to delete.' );
 		}
 
-		foreach ( $files_to_delete as $file_name ){
+		foreach ( $files_to_delete as $file_name ) {
 			$contact->delete_file( $file_name );
 		}
 
 		return self::SUCCESS_RESPONSE( [
+			'total_items' => count( $contact->get_files() ),
 			'items'       => $contact->get_files(),
-			'total_items' => count( $contact->get_files() )
 		] );
 	}
 

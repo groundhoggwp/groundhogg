@@ -7,7 +7,7 @@ use Groundhogg\Lib\Mobile\Iso3166;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
 use WP_Error;
-use function foo\func;
+
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -33,27 +33,33 @@ function get_current_contact() {
  * @return false|Contact
  */
 function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
+
+	static $cache = [];
+
+	$cache_key = is_numeric( $contact_id_or_email ) ? $contact_id_or_email . ':' . $by_user_id : $contact_id_or_email;
+
 	if ( ! $contact_id_or_email ) {
 
-		if ( is_a_contact( $contact_id_or_email ) ) {
-			return $contact_id_or_email;
-		} else if ( ! $contact_id_or_email ) {
-			if ( Event_Queue::is_processing() ) {
-				return Plugin::instance()->event_queue->get_current_contact();
-			}
-
-			return Plugin::$instance->tracking->get_current_contact();
+		if ( Event_Queue::is_processing() ) {
+			return Plugin::instance()->event_queue->get_current_contact();
 		}
+
+		return Plugin::$instance->tracking->get_current_contact();
+	} else if ( in_array( $cache_key, $cache ) ) {
+		return $cache[ $cache_key ];
 	}
 
 	$contact = new Contact( $contact_id_or_email, $by_user_id );
 
 	if ( $contact->exists() ) {
+
+//		Set the contact in the cache
+		$cache[ $cache_key ] = $contact;
+
 		return $contact;
 	}
 
 	return false;
-
 }
 
 /**
@@ -152,7 +158,19 @@ function emergency_init_dbs() {
  * @return bool
  */
 function is_option_enabled( $option = '' ) {
-	return Plugin::$instance->settings->is_option_enabled( $option );
+	$option = get_option( $option );
+
+	if ( ! is_array( $option ) && $option ) {
+		return true;
+	}
+
+	/**
+	 * Whether the option is enabled or not.
+	 *
+	 * @param $enabled bool
+	 * @param $option  string
+	 */
+	return apply_filters( 'groundhogg/io_option_enabled', is_array( $option ) && in_array( 'on', $option ), $option );
 }
 
 /**
@@ -181,19 +199,29 @@ function tracking() {
 }
 
 /**
- * @return Event_Queue
+ * @return Utils
  */
-function event_queue() {
-	return Plugin::instance()->event_queue;
+function utils() {
+	return Plugin::$instance->utils;
+}
+
+function bulk_jobs() {
+	return Plugin::instance()->bulk_jobs;
 }
 
 /**
  * @return Files
  */
 function files() {
-	return Plugin::$instance->utils->files;
+	return utils()->files;
 }
 
+/**
+ * @return Event_Queue
+ */
+function event_queue() {
+	return Plugin::instance()->event_queue;
+}
 
 /**
  * Return if a value in an array isset and is not empty
@@ -217,8 +245,8 @@ function isset_not_empty( $array, $key = '' ) {
  * Get a variable from the $_REQUEST global
  *
  * @param string $key
- * @param bool $default
- * @param bool $post_only
+ * @param bool   $default
+ * @param bool   $post_only
  *
  * @return mixed
  */
@@ -242,7 +270,7 @@ function set_request_var( $key, $value ) {
  * Get a variable from the $_POST global
  *
  * @param string $key
- * @param bool $default
+ * @param bool   $default
  *
  * @return mixed
  */
@@ -254,19 +282,19 @@ function get_post_var( $key = '', $default = false ) {
  * Get a variable from the $_GET global
  *
  * @param string $key
- * @param bool $default
+ * @param bool   $default
  *
  * @return mixed
  */
 function get_url_var( $key = '', $default = false ) {
-	return urldecode_deep( get_array_var( $_GET, $key, $default ) );
+	return wp_unslash( urldecode_deep( get_array_var( $_GET, $key, $default ) ) );
 }
 
 /**
  * Get a variable from the $_GET global
  *
  * @param string $key
- * @param bool $default
+ * @param bool   $default
  *
  * @return mixed
  */
@@ -277,8 +305,8 @@ function get_url_param( $key = '', $default = false ) {
 /**
  * Get a db query from the URL.
  *
- * @param array $default a default query if the given is empty
- * @param array $force for the query to include the given
+ * @param array $default       a default query if the given is empty
+ * @param array $force         for the query to include the given
  * @param array $accepted_keys for the query to include the given
  *
  * @return array|string
@@ -291,6 +319,7 @@ function get_request_query( $default = [], $force = [], $accepted_keys = [] ) {
 		'paged',
 		'ids',
 		'tab',
+		'view',
 		'action',
 		'bulk_action',
 		'_wpnonce',
@@ -356,7 +385,7 @@ function validate_tags( $maybe_tags ) {
 /**
  * Replacements Wrapper.
  *
- * @param string $content
+ * @param string      $content
  * @param int|Contact $contact_id
  *
  * @return string
@@ -396,12 +425,13 @@ function decrypt( $data ) {
 	return Plugin::$instance->utils->encrypt_decrypt( $data, 'd' );
 }
 
+
 /**
  * Get a variable from an array or default if it doesn't exist.
  *
  * @param        $array
  * @param string $key
- * @param bool $default
+ * @param bool   $default
  *
  * @return mixed
  */
@@ -563,13 +593,21 @@ function dequeue_theme_css_compat() {
 	wp_dequeue_style( $theme_name );
 	wp_dequeue_style( 'style' );
 
-	// Extra compat.
-	global $wp_styles;
-	$maybe_dequeue = $wp_styles->queue;
-	foreach ( $maybe_dequeue as $style ) {
-		if ( strpos( $style, $theme_name ) !== false ) {
-			wp_dequeue_style( $style );
+	$wp_styles  = wp_styles();
+	$themes_uri = get_theme_root_uri();
+
+	foreach ( $wp_styles->registered as $wp_style ) {
+		if ( strpos( $wp_style->src, $themes_uri ) !== false || strpos( $wp_style->handle, $theme_name ) !== false ) {
+			wp_dequeue_style( $wp_style->handle );
 		}
+	}
+
+	$additional = [
+		'fusion-dynamic-css'
+	];
+
+	foreach ( $additional as $style ) {
+		wp_dequeue_style( $style );
 	}
 }
 
@@ -584,6 +622,14 @@ function dequeue_wc_css_compat() {
 			wp_dequeue_style( $style );
 		}
 	}
+}
+
+/**
+ * Enqueue any iframe compat scripts
+ */
+function iframe_compat() {
+	wp_enqueue_script( 'groundhogg-admin-iframe' );
+	wp_enqueue_style( 'groundhogg-admin-iframe' );
 }
 
 /**
@@ -681,7 +727,7 @@ function array_to_css( $atts ) {
  * Get a cookie value
  *
  * @param string $cookie
- * @param bool $default
+ * @param bool   $default
  *
  * @return mixed
  */
@@ -693,8 +739,8 @@ function get_cookie( $cookie = '', $default = false ) {
  * Set a cookie the WP way
  *
  * @param string $cookie
- * @param mixed $value
- * @param int $expiration
+ * @param mixed  $value
+ * @param int    $expiration
  *
  * @return bool
  */
@@ -762,15 +808,15 @@ function get_return_path_email() {
  * Overwrite the regular WP_Mail with an identical function but use our modified PHPMailer class instead
  * which sends the email to the Groundhogg Sending Service.
  *
- * @param string $message Message contents
+ * @param string|array $to          Array or comma-separated list of email addresses to send message.
  *
- * @param string|array $headers Optional. Additional headers.
+ * @param string       $subject     Email subject
+ *
+ * @param string       $message     Message contents
+ *
+ * @param string|array $headers     Optional. Additional headers.
  *
  * @param string|array $attachments Optional. Files to attach.
- *
- * @param string|array $to Array or comma-separated list of email addresses to send message.
- *
- * @param string $subject Email subject
  *
  * @return bool Whether the email contents were sent successfully.
  * @throws \Exception
@@ -1205,13 +1251,17 @@ function wpgh_get_referer() {
  * Recount the contacts per tag...
  */
 function recount_tag_contacts_count() {
-	/* Recount tag relationships */
-	$tags = Plugin::$instance->dbs->get_db( 'tags' )->query();
+
+	// Delete the orphaned relationships
+	get_db( 'tag_relationships' )->delete_orphaned_relationships();
+
+	// Recount the tags
+	$tags = get_db( 'tags' )->query();
 
 	if ( ! empty( $tags ) ) {
 		foreach ( $tags as $tag ) {
-			$count = Plugin::$instance->dbs->get_db( 'tag_relationships' )->count( [ 'tag_id' => absint( $tag->tag_id ) ] );
-			Plugin::$instance->dbs->get_db( 'tags' )->update( absint( $tag->tag_id ), [ 'contact_count' => $count ] );
+			$count = get_db( 'tag_relationships' )->count( [ 'tag_id' => absint( $tag->tag_id ) ] );
+			get_db( 'tags' )->update( absint( $tag->tag_id ), [ 'contact_count' => $count ] );
 		}
 	}
 }
@@ -1237,39 +1287,55 @@ function create_contact_from_user( $user, $sync_meta = false ) {
 		return false;
 	}
 
-	$contact = get_contactdata( $user->user_email );
+	$contact = get_contactdata( $user->ID, true );
 
-	/**
-	 * Do not continue if the contact already exists. Just return it...
-	 */
-	if ( $contact && $contact->exists() ) {
-		$contact->update( [ 'user_id' => $user->ID ] );
-		$contact->update_meta( 'user_login', $user->user_login );
-
-		return $contact;
+	// If not available by user ID try by email
+	if ( ! is_a_contact( $contact ) ) {
+		$contact = get_contactdata( $user->user_email );
 	}
 
-	/**
-	 * Setup the initial args..
-	 */
-	$args = array(
-		'first_name'   => $user->first_name,
-		'last_name'    => $user->last_name,
-		'email'        => $user->user_email,
-		'user_id'      => $user->ID,
-		'optin_status' => Preferences::UNCONFIRMED
-	);
+	if ( is_a_contact( $contact ) ) {
 
-	if ( empty( $args['first_name'] ) ) {
-		$args['first_name'] = $user->display_name;
-	}
+		/**
+		 * Setup the initial args..
+		 */
+		$args = array(
+			'first_name' => $user->first_name,
+			'last_name'  => $user->last_name,
+			'email'      => $user->user_email,
+			'user_id'    => $user->ID,
+		);
 
-	$contact = new Contact();
+		if ( empty( $args['first_name'] ) ) {
+			$args['first_name'] = $user->display_name;
+		}
 
-	$id = $contact->create( $args );
+		$contact->update( $args );
 
-	if ( ! $id ) {
-		return new \WP_Error( 'db_error', __( 'Could not create contact.', 'groundhogg' ) );
+	} else {
+
+		/**
+		 * Setup the initial args..
+		 */
+		$args = array(
+			'first_name'   => $user->first_name,
+			'last_name'    => $user->last_name,
+			'email'        => $user->user_email,
+			'user_id'      => $user->ID,
+			'optin_status' => Preferences::UNCONFIRMED
+		);
+
+		if ( empty( $args['first_name'] ) ) {
+			$args['first_name'] = $user->display_name;
+		}
+
+		$contact = new Contact();
+
+		$id = $contact->create( $args );
+
+		if ( ! $id ) {
+			return new \WP_Error( 'db_error', __( 'Could not create contact.', 'groundhogg' ) );
+		}
 	}
 
 	// Save the login
@@ -1279,10 +1345,14 @@ function create_contact_from_user( $user, $sync_meta = false ) {
 
 		$user_meta = get_user_meta( $user->ID );
 
-		$contact->update_meta( 'user_meta', $user_meta );
-
 		// Note: $values will be an array as single is false
 		foreach ( $user_meta as $key => $values ) {
+
+			// Don't sync some keys
+			if ( User_Syncing::is_meta_ignored( $key ) ) {
+				continue;
+			}
+
 			$contact->update_meta( $key, array_shift( $values ) );
 		}
 
@@ -1303,7 +1373,7 @@ function create_contact_from_user( $user, $sync_meta = false ) {
  * Create a user from a contact
  *
  * @param        $contact       Contact
- * @param string $role string
+ * @param string $role          string
  * @param string $notifications string|bool
  *
  * @return int|false
@@ -1359,13 +1429,13 @@ function convert_user_to_contact_when_user_registered( $userId ) {
 		return;
 	}
 
-	$contact = create_contact_from_user( $user );
+	$contact = create_contact_from_user( $user, is_option_enabled( 'gh_sync_user_meta' ) );
 
 	if ( ! $contact || is_wp_error( $contact ) ) {
 		return;
 	}
 
-	// Do not run when in admin or QUEUE is proccessing
+	// Do not run when in admin or QUEUE is processing
 	if ( ! is_admin() && ! Event_Queue::is_processing() ) {
 
 		/* register front end which is technically an optin */
@@ -1381,9 +1451,6 @@ function convert_user_to_contact_when_user_registered( $userId ) {
 	do_action( 'groundhogg/contact_created_from_user', $user, $contact );
 }
 
-// Ensure runs before tag mapping stuff...
-add_action( 'user_register', __NAMESPACE__ . '\convert_user_to_contact_when_user_registered' );
-
 /**
  * Used for blocks...
  *
@@ -1391,14 +1458,14 @@ add_action( 'user_register', __NAMESPACE__ . '\convert_user_to_contact_when_user
  */
 function get_form_list() {
 
-	$forms = Plugin::$instance->dbs->get_db( 'steps' )->query( [
+	$forms = get_db( 'steps' )->query( [
 		'step_type' => 'form_fill'
 	] );
 
 	$form_options = array();
 
 	foreach ( $forms as $form ) {
-		$step = Plugin::$instance->utils->get_step( $form->ID );
+		$step = new Step( $form->ID );
 		if ( $step->is_active() ) {
 			$form_options[ $form->ID ] = $form->step_title;
 		}
@@ -1411,24 +1478,22 @@ function get_form_list() {
 /**
  * Schedule a 1 off email notification
  *
- * @param int $email_id the ID of the email to send
- * @param int|string $contact_id_or_email the ID of the contact to send to
- * @param int $time time time to send at, defaults to time()
+ * @param int|Email          $email_id            the ID of the email to send
+ * @param int|string|Contact $contact_id_or_email the ID of the contact to send to
+ * @param int                $time                time time to send at, defaults to time()
  *
  * @return bool whether the scheduling was successful.
  */
 function send_email_notification( $email_id, $contact_id_or_email, $time = 0 ) {
 
-	$contact = Plugin::$instance->utils->get_contact( $contact_id_or_email );
-	$email   = Plugin::$instance->utils->get_email( $email_id );
+	$contact = is_a_contact( $contact_id_or_email ) ? $contact_id_or_email : get_contactdata( $contact_id_or_email );
+	$email   = is_numeric( $email_id ) ? new Email( $email_id ) : $email_id;
 
 	if ( ! $contact || ! $email ) {
 		return false;
 	}
 
-	if ( ! $time ) {
-		$time = time();
-	}
+	$time = $time ? ( is_string( $time ) ? strtotime( $time ) : $time ) : time();
 
 	$event = [
 		'time'       => $time,
@@ -1552,6 +1617,11 @@ function send_event_failure_notification( $event ) {
 		return;
 	}
 
+	// Ensure contact and event are existing
+	if ( ! $event->exists() || ! is_a_contact( $event->get_contact() ) ) {
+		return;
+	}
+
 	$subject = sprintf( "Event (%s) failed for %s on %s", $event->get_step_title(), $event->get_contact()->get_email(), esc_html( get_bloginfo( 'title' ) ) );
 	$message = sprintf( "This is to let you know that an event \"%s\" in funnel \"%s\" has failed for \"%s (%s)\"", $event->get_step_title(), $event->get_funnel_title(), $event->get_contact()->get_full_name(), $event->get_contact()->get_email() );
 	$message .= sprintf( "\nFailure Reason: %s", $event->get_failure_reason() );
@@ -1560,7 +1630,7 @@ function send_event_failure_notification( $event ) {
 
 	do_action( 'groundhogg/send_event_failure_notification/before' );
 
-	if ( wp_mail( $to, $subject, $message ) ) {
+	if ( \Groundhogg_Email_Services::send_wordpress( $to, $subject, $message ) ) {
 		set_transient( 'gh_hold_failed_event_notification', true, MINUTE_IN_SECONDS );
 	}
 
@@ -1627,7 +1697,7 @@ function get_csv_delimiter( $file_path ) {
  *
  * @param string $file_path
  *
- * @param bool $delimiter
+ * @param bool   $delimiter
  *
  * @return array
  */
@@ -1672,6 +1742,128 @@ function get_items_from_csv( $file_path = '', $delimiter = false ) {
 }
 
 /**
+ * Get the pretty name for the header in the export file
+ *
+ * @param string $key
+ *
+ * @return mixed|string
+ */
+function export_header_pretty_name( $key = '' ) {
+	static $keys;
+
+	if ( empty( $keys ) ) {
+		$keys = get_exportable_fields();
+	}
+
+	if ( isset_not_empty( $keys, $key ) ) {
+		return $keys[ $key ];
+	}
+
+	return key_to_words( $key );
+}
+
+/**
+ * Get a list of mappable fields as well as extra fields
+ *
+ * @param array $extra
+ *
+ * @return array
+ */
+function get_exportable_fields( $extra = [] ) {
+
+	$defaults = [
+		'ID'                        => __( 'Contact ID', 'groundhogg' ),
+		'full_name'                 => __( 'Full Name', 'groundhogg' ),
+		'first_name'                => __( 'First Name', 'groundhogg' ),
+		'last_name'                 => __( 'Last Name', 'groundhogg' ),
+		'email'                     => __( 'Email Address', 'groundhogg' ),
+		'optin_status'              => __( 'Optin Status', 'groundhogg' ),
+		'user_id'                   => __( 'User Id', 'groundhogg' ),
+		'owner_id'                  => __( 'Owner Id', 'groundhogg' ),
+		'date_created'              => __( 'Date Created', 'groundhogg' ),
+		'date_optin_status_changed' => __( 'Date Optin Status Changed', 'groundhogg' ),
+		'birthday'                  => __( 'Birthday', 'groundhogg' ),
+		'mobile_phone'              => __( 'Mobile Phone Number', 'groundhogg' ),
+		'primary_phone'             => __( 'Primary Phone Number', 'groundhogg' ),
+		'primary_phone_extension'   => __( 'Primary Phone Number Extension', 'groundhogg' ),
+		'company_phone'             => __( 'Company Phone Number', 'groundhogg' ),
+		'company_phone_extension'   => __( 'Company Phone Number Extension', 'groundhogg' ),
+		'street_address_1'          => __( 'Street Address 1', 'groundhogg' ),
+		'street_address_2'          => __( 'Street Address 2', 'groundhogg' ),
+		'city'                      => __( 'City', 'groundhogg' ),
+		'postal_zip'                => __( 'Postal/Zip', 'groundhogg' ),
+		'region'                    => __( 'Province/State/Region', 'groundhogg' ),
+		'country'                   => __( 'Country', 'groundhogg' ),
+		'company_name'              => __( 'Company Name', 'groundhogg' ),
+		'company_address'           => __( 'Full Company Address', 'groundhogg' ),
+		'job_title'                 => __( 'Job Title', 'groundhogg' ),
+		'time_zone'                 => __( 'Time Zone', 'groundhogg' ),
+		'ip_address'                => __( 'IP Address', 'groundhogg' ),
+		'lead_source'               => __( 'Lead Source', 'groundhogg' ),
+		'source_page'               => __( 'Source Page', 'groundhogg' ),
+		'terms_agreement'           => __( 'Terms Agreement', 'groundhogg' ),
+		'gdpr_consent'              => __( 'Data Processing Consent', 'groundhogg' ),
+		'gdpr_consent_date'         => __( 'Data Processing Consent Data', 'groundhogg' ),
+		'marketing_consent'         => __( 'Marketing Consent', 'groundhogg' ),
+		'marketing_consent_date'    => __( 'Marketing Consent Date', 'groundhogg' ),
+		'notes'                     => __( 'Notes', 'groundhogg' ),
+		'tags'                      => __( 'Tags', 'groundhogg' ),
+		'utm_campaign'              => __( 'UTM Campaign', 'groundhogg' ),
+		'utm_content'               => __( 'UTM Content', 'groundhogg' ),
+		'utm_medium'                => __( 'UTM Medium', 'groundhogg' ),
+		'utm_term'                  => __( 'UTM Term', 'groundhogg' ),
+		'utm_source'                => __( 'UTM Source', 'groundhogg' ),
+	];
+
+	$fields = array_merge( $defaults, $extra );
+
+	return apply_filters( 'groundhogg/exportable_fields', $fields );
+
+}
+
+/**
+ * Export a field for the contact exporter
+ *
+ * @param Contact $contact
+ * @param string  $field
+ *
+ * @return mixed
+ */
+function export_field( $contact, $field = '' ) {
+
+	$return = '';
+
+	switch ( $field ) {
+		default:
+			$return = $contact->$field;
+			break;
+		case 'notes':
+			$return = wp_json_encode( $contact->get_notes() );
+			break;
+		case 'tags':
+			$tags = $contact->get_tags( true );
+
+			if ( $tags ) {
+				$names  = array_map( function ( $tag ) {
+					return $tag->get_name();
+				}, $tags );
+				$return = implode( ',', $names );
+			}
+
+			break;
+	}
+
+	/**
+	 * Filter the exported data from a field in the contact record.
+	 *
+	 * @param $return  mixed
+	 * @param $contact Contact
+	 * @param $field   string
+	 */
+	return apply_filters( 'groundhogg/export_field', $return, $contact, $field );
+}
+
+/**
  * Get a list of mappable fields as well as extra fields
  *
  * @param array $extra
@@ -1681,42 +1873,46 @@ function get_items_from_csv( $file_path = '', $delimiter = false ) {
 function get_mappable_fields( $extra = [] ) {
 
 	$defaults = [
-		'full_name'                 => __( 'Full Name' ),
-		'first_name'                => __( 'First Name' ),
-		'last_name'                 => __( 'Last Name' ),
-		'email'                     => __( 'Email Address' ),
-		'optin_status'              => __( 'Optin Status' ),
-		'user_id'                   => __( 'User Id' ),
-		'owner_id'                  => __( 'Owner Id' ),
-		'date_created'              => __( 'Date Created' ),
-		'date_optin_status_changed' => __( 'Date Optin Status Changed' ),
-		'birthday'                  => __( 'Birthday' ),
-		'primary_phone'             => __( 'Phone Number' ),
-		'primary_phone_extension'   => __( 'Phone Number Extension' ),
-		'street_address_1'          => __( 'Street Address 1' ),
-		'street_address_2'          => __( 'Street Address 2' ),
-		'city'                      => __( 'City' ),
-		'postal_zip'                => __( 'Postal/Zip' ),
-		'region'                    => __( 'Province/State/Region' ),
-		'country'                   => __( 'Country' ),
-		'company_name'              => __( 'Company Name' ),
-		'company_address'           => __( 'Full Company Address' ),
-		'job_title'                 => __( 'Job Title' ),
-		'time_zone'                 => __( 'Time Zone' ),
-		'ip_address'                => __( 'IP Address' ),
-		'lead_source'               => __( 'Lead Source' ),
-		'source_page'               => __( 'Source Page' ),
-		'terms_agreement'           => __( 'Terms Agreement' ),
-		'gdpr_consent'              => __( 'GDPR Consent' ),
-		'notes'                     => __( 'Add To Notes' ),
-		'tags'                      => __( 'Apply Value as Tag' ),
-		'meta'                      => __( 'Add as Custom Meta' ),
-		'copy_file'                 => __( 'Add as File' ),
-		'utm_campaign'              => __( 'UTM Campaign' ),
-		'utm_content'               => __( 'UTM Content' ),
-		'utm_medium'                => __( 'UTM Medium' ),
-		'utm_term'                  => __( 'UTM Term' ),
-		'utm_source'                => __( 'UTM Source' ),
+		'full_name'                 => __( 'Full Name', 'groundhogg' ),
+		'first_name'                => __( 'First Name', 'groundhogg' ),
+		'last_name'                 => __( 'Last Name', 'groundhogg' ),
+		'email'                     => __( 'Email Address', 'groundhogg' ),
+		'optin_status'              => __( 'Optin Status', 'groundhogg' ),
+		'user_id'                   => __( 'User Id', 'groundhogg' ),
+		'owner_id'                  => __( 'Owner Id', 'groundhogg' ),
+		'date_created'              => __( 'Date Created', 'groundhogg' ),
+		'date_optin_status_changed' => __( 'Date Optin Status Changed', 'groundhogg' ),
+		'birthday'                  => __( 'Birthday', 'groundhogg' ),
+		'mobile_phone'              => __( 'Mobile Phone Number', 'groundhogg' ),
+		'primary_phone'             => __( 'Primary Phone Number', 'groundhogg' ),
+		'primary_phone_extension'   => __( 'Primary Phone Number Extension', 'groundhogg' ),
+		'company_phone'             => __( 'Company Phone Number', 'groundhogg' ),
+		'company_phone_extension'   => __( 'Company Phone Number Extension', 'groundhogg' ),
+		'street_address_1'          => __( 'Street Address 1', 'groundhogg' ),
+		'street_address_2'          => __( 'Street Address 2', 'groundhogg' ),
+		'city'                      => __( 'City', 'groundhogg' ),
+		'postal_zip'                => __( 'Postal/Zip', 'groundhogg' ),
+		'region'                    => __( 'Province/State/Region', 'groundhogg' ),
+		'country'                   => __( 'Country', 'groundhogg' ),
+		'company_name'              => __( 'Company Name', 'groundhogg' ),
+		'company_address'           => __( 'Full Company Address', 'groundhogg' ),
+		'job_title'                 => __( 'Job Title', 'groundhogg' ),
+		'time_zone'                 => __( 'Time Zone', 'groundhogg' ),
+		'ip_address'                => __( 'IP Address', 'groundhogg' ),
+		'lead_source'               => __( 'Lead Source', 'groundhogg' ),
+		'source_page'               => __( 'Source Page', 'groundhogg' ),
+		'terms_agreement'           => __( 'Terms Agreement', 'groundhogg' ),
+		'gdpr_consent'              => __( 'Data Processing Consent', 'groundhogg' ),
+		'marketing_consent'         => __( 'Marketing Consent', 'groundhogg' ),
+		'notes'                     => __( 'Add To Notes', 'groundhogg' ),
+		'tags'                      => __( 'Apply Value as Tag', 'groundhogg' ),
+		'meta'                      => __( 'Add as Custom Meta', 'groundhogg' ),
+		'copy_file'                 => __( 'Add as File', 'groundhogg' ),
+		'utm_campaign'              => __( 'UTM Campaign', 'groundhogg' ),
+		'utm_content'               => __( 'UTM Content', 'groundhogg' ),
+		'utm_medium'                => __( 'UTM Medium', 'groundhogg' ),
+		'utm_term'                  => __( 'UTM Term', 'groundhogg' ),
+		'utm_source'                => __( 'UTM Source', 'groundhogg' ),
 	];
 
 	$fields = array_merge( $defaults, $extra );
@@ -1726,17 +1922,336 @@ function get_mappable_fields( $extra = [] ) {
 }
 
 /**
+ * Update an existing contact with mapped data
+ *
+ * @param $contact Contact
+ * @param $fields  array
+ * @param $map     array
+ *
+ * @return false|Contact
+ */
+function update_contact_with_map( $contact, array $fields, array $map = [] ) {
+
+	if ( ! is_a_contact( $contact ) && ( is_int( $contact ) || is_email( $contact ) ) ) {
+		$contact = get_contactdata( $contact );
+	}
+
+	if ( empty( $map ) ) {
+		$keys = array_keys( $fields );
+		$map  = array_combine( $keys, $keys );
+	}
+
+	$meta        = [];
+	$tags        = [];
+	$remove_tags = [];
+	$notes       = [];
+	$args        = [];
+	$files       = [];
+	$copy        = [];
+
+	// flags
+	$gdpr_consent      = false;
+	$marketing_consent = false;
+	$terms_agreement   = false;
+
+	foreach ( $fields as $column => $value ) {
+
+		// ignore if we are not mapping it.
+		if ( ! key_exists( $column, $map ) ) {
+			continue;
+		}
+
+		$value = wp_unslash( $value );
+
+		$field = $map[ $column ];
+
+		switch ( $field ) {
+			default:
+
+				/**
+				 * Default filter for unknown contact fields
+				 *
+				 * @param $field  string the field in question
+				 * @param $value  mixed the value to store
+				 * @param &$args  array general contact information
+				 * @param &$meta  array list of contact data
+				 * @param &$tags  array list of tags to add to the contact
+				 * @param &$notes array add notes to the contact
+				 * @param &$files array files to upload to the contact record
+				 */
+				do_action_ref_array( 'groundhogg/update_contact_with_map/default', [
+					$field,
+					$value,
+					&$args,
+					&$meta,
+					&$tags,
+					&$notes,
+					&$files
+				] );
+
+				break;
+			case 'full_name':
+				$parts              = split_name( $value );
+				$args['first_name'] = sanitize_text_field( $parts[0] );
+				$args['last_name']  = sanitize_text_field( $parts[1] );
+				break;
+			case 'first_name':
+			case 'last_name':
+				$args[ $field ] = sanitize_text_field( $value );
+				break;
+			case 'email':
+				$args[ $field ] = sanitize_email( $value );
+				break;
+			case 'date_created':
+			case 'date_optin_status_changed':
+				$args[ $field ] = date( 'Y-m-d H:i:s', strtotime( $value ) );
+				break;
+			case 'optin_status':
+
+				// Will default to unconfirmed
+				if ( ! is_numeric( $value ) ) {
+					$value = Preferences::string_to_preference( $value );
+				}
+
+				$args[ $field ] = absint( $value );
+				break;
+			case 'user_id':
+			case 'owner_id':
+
+				// Email Passed
+				if ( is_email( $value ) ) {
+					$by = 'email';
+					// Username passed
+				} else if ( is_string( $value ) && ! is_numeric( $value ) ) {
+					$by = 'login';
+					// ID Passed
+				} else {
+					$by    = 'id';
+					$value = absint( $value );
+				}
+
+				$user = get_user_by( $by, $value );
+
+				// Make sure User exists
+				if ( $user ) {
+					// Check the mapped owner can actually own contacts.
+					if ( $field !== 'owner_id' || user_can( $user->ID, 'edit_contacts' ) ) {
+						$args[ $field ] = $user->ID;
+					}
+				}
+
+				break;
+			case 'mobile_phone':
+			case 'primary_phone':
+			case 'primary_phone_extension':
+			case 'company_phone':
+			case 'company_phone_extension':
+			case 'street_address_1' :
+			case 'street_address_2':
+			case 'city':
+			case 'postal_zip':
+			case 'region':
+			case 'company_name':
+			case 'company_address':
+			case 'job_title':
+			case 'lead_source':
+			case 'source_page':
+			case 'utm_campaign':
+			case 'utm_medium':
+			case 'utm_content':
+			case 'utm_term':
+			case 'utm_source':
+				$meta[ $field ] = sanitize_text_field( $value );
+				break;
+			// Only checks whether value is not empty.
+			case 'terms_agreement':
+				if ( ! empty( $value ) ) {
+					$terms_agreement = true;
+				}
+				break;
+			// Only checks whether value is not empty.
+			case 'gdpr_consent':
+				if ( ! empty( $value ) ) {
+					$gdpr_consent = true;
+				}
+				break;
+			case 'marketing_consent':
+				if ( ! empty( $value ) ) {
+					$marketing_consent = true;
+				}
+				break;
+			case 'country':
+				if ( strlen( $value ) !== 2 ) {
+					$countries = Plugin::$instance->utils->location->get_countries_list();
+					$code      = array_search( $value, $countries );
+					if ( $code ) {
+						$value = $code;
+					}
+				}
+				$meta[ $field ] = $value;
+				break;
+			case 'tags':
+				if ( is_array( $value ) ) {
+					$tags = array_merge( $tags, $value );
+				} else {
+					$maybe_tags = explode( ',', $value );
+					$tags       = array_merge( $tags, $maybe_tags );
+				}
+				break;
+			case 'remove_tags':
+				if ( is_array( $value ) ) {
+					$remove_tags = array_merge( $remove_tags, $value );
+				} else {
+					$maybe_tags  = explode( ',', $value );
+					$remove_tags = array_merge( $remove_tags, $maybe_tags );
+				}
+				break;
+			case 'meta':
+				$meta[ get_key_from_column_label( $column ) ] = sanitize_text_field( $value );
+				break;
+			case 'files':
+				if ( isset_not_empty( $_FILES, $column ) ) {
+					$files[ $column ] = wp_unslash( get_array_var( $_FILES, $column ) );
+				}
+				break;
+
+			case 'copy_file':
+				// used to copy file uploaded using form builder
+				if ( ! function_exists( 'download_url' ) ) {
+					require_once( ABSPATH . '/wp-admin/includes/file.php' );
+				}
+				if ( download_url( $value ) ) {
+					$copy [] = $value;
+				}
+
+				break;
+			case 'notes':
+				if ( $json = json_decode( $value, true ) ) {
+					$notes = array_merge( $notes, $json );
+				} else {
+					$notes[] = sanitize_textarea_field( $value );
+				}
+				break;
+			case 'time_zone':
+				$zones = Plugin::$instance->utils->location->get_time_zones();
+				$code  = array_search( $value, $zones );
+				if ( $code ) {
+					$meta[ $field ] = $code;
+				}
+				break;
+			case 'ip_address':
+				$ip = filter_var( $value, FILTER_VALIDATE_IP );
+				if ( $ip ) {
+					$meta[ $field ] = $ip;
+				}
+				break;
+			case 'birthday':
+
+				if ( is_string( $value ) ) {
+					$date  = date( 'Y-m-d', strtotime( $value ) );
+					$parts = map_deep( explode( '-', $date ), 'absint' );
+
+					$meta['birthday_year']  = $parts[0];
+					$meta['birthday_month'] = $parts[1];
+					$meta['birthday_day']   = $parts[2];
+					$meta['birthday']       = $date;
+				} else if ( is_array( $value ) ) {
+
+					$year  = absint( $value['year'] );
+					$month = absint( $value['month'] );
+					$day   = absint( $value['day'] );
+
+					$meta['birthday_year']  = $year;
+					$meta['birthday_month'] = $month;
+					$meta['birthday_day']   = $day;
+					$meta['birthday']       = date( 'Y-m-d',
+						mktime( 0, 0, 0, $month, $day, $year )
+					);
+				}
+
+				break;
+		}
+
+	}
+
+	$contact->update( $args );
+
+	if ( $gdpr_consent ) {
+		$contact->set_gdpr_consent();
+	}
+
+	if ( $marketing_consent ) {
+		$contact->set_marketing_consent();
+	}
+
+	if ( $terms_agreement ) {
+		$contact->set_terms_agreement();
+	}
+
+	// Add Tags
+	if ( ! empty( $tags ) ) {
+		$contact->apply_tag( $tags );
+	}
+
+	// Remove tags
+	if ( ! empty( $remove_tags ) ) {
+		$contact->remove_tag( $remove_tags );
+	}
+
+	// Add notes
+	if ( ! empty( $notes ) ) {
+		foreach ( $notes as $note ) {
+			$contact->add_note( $note, 'system' );
+		}
+	}
+
+	// update meta data
+	if ( ! empty( $meta ) ) {
+		foreach ( $meta as $key => $value ) {
+			$contact->update_meta( $key, $value );
+		}
+	}
+
+	if ( ! empty( $files ) ) {
+		foreach ( $files as $file ) {
+			$contact->upload_file( $file );
+		}
+	}
+
+	// copy files
+	if ( ! empty( $copy ) ) {
+		foreach ( $copy as $url ) {
+			$contact->copy_file( $url );
+		}
+	}
+
+	/**
+	 * @param $contact Contact the contact record
+	 * @param $map     array the map of given data to contact data
+	 * @param $fields  array the values of the given fields
+	 */
+	do_action( 'groundhogg/update_contact_with_map/after', $contact, $map, $fields );
+
+	return $contact;
+}
+
+/**
  * Generate a contact from given associative array and a field map.
  *
- * @param $fields array the raw data from the source
- *
  * @param $map    array map of field_ids to contact keys
+ *
+ * @param $fields array the raw data from the source
  *
  * @return Contact|false
  * @throws \Exception
  *
  */
 function generate_contact_with_map( $fields, $map = [] ) {
+
+	do_action_ref_array( 'groundhogg/generate_contact_with_map/before', [
+		&$fields,
+		&$map
+	] );
 
 	if ( empty( $map ) ) {
 		$keys = array_keys( $fields );
@@ -1749,6 +2264,11 @@ function generate_contact_with_map( $fields, $map = [] ) {
 	$args  = [];
 	$files = [];
 	$copy  = [];
+
+	// flags
+	$gdpr_consent      = false;
+	$marketing_consent = false;
+	$terms_agreement   = false;
 
 	foreach ( $fields as $column => $value ) {
 
@@ -1837,8 +2357,11 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				}
 
 				break;
+			case 'mobile_phone':
 			case 'primary_phone':
 			case 'primary_phone_extension':
+			case 'company_phone':
+			case 'company_phone_extension':
 			case 'street_address_1' :
 			case 'street_address_2':
 			case 'city':
@@ -1859,15 +2382,18 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			// Only checks whether value is not empty.
 			case 'terms_agreement':
 				if ( ! empty( $value ) ) {
-					$meta['terms_agreement']      = 'yes';
-					$meta['terms_agreement_date'] = date_i18n( get_date_time_format() );
+					$terms_agreement = true;
 				}
 				break;
 			// Only checks whether value is not empty.
 			case 'gdpr_consent':
 				if ( ! empty( $value ) ) {
-					$meta['gdpr_consent']      = 'yes';
-					$meta['gdpr_consent_date'] = date_i18n( get_date_time_format() );
+					$gdpr_consent = true;
+				}
+				break;
+			case 'marketing_consent':
+				if ( ! empty( $value ) ) {
+					$marketing_consent = true;
 				}
 				break;
 			case 'country':
@@ -1904,7 +2430,13 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 				break;
 			case 'notes':
-				$notes[] = sanitize_textarea_field( $value );
+
+				if ( $json = json_decode( $value, true ) ) {
+					$notes = array_merge( $notes, $json );
+				} else {
+					$notes[] = sanitize_textarea_field( $value );
+				}
+
 				break;
 			case 'time_zone':
 				$zones = Plugin::$instance->utils->location->get_time_zones();
@@ -1934,6 +2466,11 @@ function generate_contact_with_map( $fields, $map = [] ) {
 	}
 
 	$contact = false;
+
+	// If the current user can add a contact and a contact owner has not been explicitly defined.
+	if ( current_user_can( 'add_contacts' ) && ! isset_not_empty( $args, 'owner_id' ) ) {
+		$args['owner_id'] = get_current_user_id();
+	}
 
 	// No point in trying if there is no email field
 	if ( isset( $args['email'] ) ) {
@@ -1966,9 +2503,20 @@ function generate_contact_with_map( $fields, $map = [] ) {
 		}
 	}
 
-
 	if ( ! $contact ) {
 		return false;
+	}
+
+	if ( $gdpr_consent ) {
+		$contact->set_gdpr_consent();
+	}
+
+	if ( $marketing_consent ) {
+		$contact->set_marketing_consent();
+	}
+
+	if ( $terms_agreement ) {
+		$contact->set_terms_agreement();
 	}
 
 	// Add Tags
@@ -2083,12 +2631,40 @@ function scheduled_time( $time, $date_prefix = 'on' ) {
 }
 
 /**
+ * Get a time string representing when something should be completed.
+ *
+ * @param        $time
+ *
+ * @return string
+ */
+function time_ago( $time ) {
+
+	if ( is_string( $time ) ) {
+		$time = strtotime( $time );
+	}
+
+	// Get the current time.
+	$cur_time = (int) current_time( 'timestamp' );
+
+	$time_diff = $time - $cur_time;
+
+	if ( absint( $time_diff ) > DAY_IN_SECONDS ) {
+		$time = date_i18n( get_date_time_format(), intval( $time ) );
+	} else {
+		$format = $time_diff <= 0 ? _x( "%s ago", 'status', 'groundhogg' ) : _x( "in %s", 'status', 'groundhogg' );
+		$time   = sprintf( $format, human_time_diff( $time, $cur_time ) );
+	}
+
+	return $time;
+}
+
+/**
  * Render html for a time column with an associated contact
  *
- * @param int $time the time to display
- * @param bool $show_local_time whether to also show local time
- * @param bool|Contact $contact the contact to get the local time from.
- * @param string $date_prefix
+ * @param int          $time            the time to display
+ * @param bool         $show_local_time whether to also show local time
+ * @param bool|Contact $contact         the contact to get the local time from.
+ * @param string       $date_prefix
  *
  * @return string
  */
@@ -2156,14 +2732,14 @@ function show_groundhogg_branding() {
  */
 function floating_phil() {
 	?><img style="position: fixed;bottom: -80px;right: -80px;transform: rotate(-20deg);" class="phil"
-           src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png'; ?>" width="340" height="340"><?php
+	       src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png'; ?>" width="340" height="340"><?php
 }
 
 /**
  * Show the logo.
  *
  * @param string $color
- * @param int $width
+ * @param int    $width
  *
  * @return string|bool
  */
@@ -2382,7 +2958,7 @@ function is_managed_page() {
  */
 function no_index_tag() {
 	?>
-    <meta name="robots" content="noindex">
+	<meta name="robots" content="noindex">
 	<?php
 }
 
@@ -2417,11 +2993,11 @@ function install_custom_rewrites() {
 /**
  * Retrieve URL with nonce added to URL query.
  *
- * @param int|string $action Optional. Nonce action name. Default -1.
+ * @param string     $name      Optional. Nonce name. Default '_wpnonce'.
  *
- * @param string $name Optional. Nonce name. Default '_wpnonce'.
+ * @param string     $actionurl URL to add nonce action.
  *
- * @param string $actionurl URL to add nonce action.
+ * @param int|string $action    Optional. Nonce action name. Default -1.
  *
  * @return string
  * @since 2.0.4
@@ -2448,16 +3024,16 @@ function no_and_amp( $url ) {
  *
  * @param        $icon
  * @param string $wrap
- * @param array $atts
+ * @param array  $atts
  *
  * @return string
  */
 function dashicon( $icon, $wrap = 'span', $atts = [], $echo = false ) {
 	$atts = wp_parse_args( $atts, [
-		'class' => 'dashicons dashicons-'
+		'class' => ''
 	] );
 
-	$atts['class'] .= $icon;
+	$atts['class'] .= ' dashicons dashicons-' . $icon;
 
 	$html = html()->e( $wrap, $atts, '', false );
 
@@ -2473,12 +3049,27 @@ function dashicon( $icon, $wrap = 'span', $atts = [], $echo = false ) {
  *
  * @param        $icon
  * @param string $wrap
- * @param array $atts
+ * @param array  $atts
  */
 function dashicon_e( $icon, $wrap = 'span', $atts = [] ) {
 	dashicon( $icon, $wrap, $atts, true );
 }
 
+/**
+ * Whether the given string is a replacement code
+ *
+ * Checks format ONLY, not whether the code callback is actually valid.
+ *
+ * @param string $code
+ * @param bool   $exact
+ *
+ * @return false|int
+ */
+function is_replacement_code_format( string $code, $exact = true ) {
+	$format = $exact ? "^{([^{}]+)}$" : "{([^{}]+)}";
+
+	return preg_match( "/$format/", $code );
+}
 
 /**
  * Whather the current admin page is a groundhogg page.
@@ -2547,10 +3138,10 @@ function is_main_blog() {
  * Glorified wp_remote_post wrapper
  *
  * @param string $url
- * @param array $body
+ * @param array  $body
  * @param string $method
- * @param array $headers
- * @param bool $as_array
+ * @param array  $headers
+ * @param bool   $as_array
  *
  * @return array|bool|WP_Error|object
  */
@@ -2665,9 +3256,9 @@ function file_access_url( $path, $download = false ) {
 /**
  * Triggers the API benchmark
  *
- * @param string $call_name the name you wish to call
+ * @param string $call_name   the name you wish to call
  * @param string $id_or_email id or email of the contact
- * @param bool $by_user_id whether the ID is the ID of a WP user
+ * @param bool   $by_user_id  whether the ID is the ID of a WP user
  */
 function do_api_trigger( $call_name = '', $id_or_email = '', $by_user_id = false ) {
 	do_action( 'groundhogg/steps/benchmarks/api', $call_name, $id_or_email, $by_user_id );
@@ -2678,7 +3269,7 @@ function do_api_trigger( $call_name = '', $id_or_email = '', $by_user_id = false
  *
  * @param string $call_name
  * @param string $id_or_email
- * @param bool $by_user_id
+ * @param bool   $by_user_id
  */
 function do_api_benchmark( $call_name = '', $id_or_email = '', $by_user_id = false ) {
 	do_api_trigger( $call_name, $id_or_email, $by_user_id );
@@ -2804,12 +3395,16 @@ function parse_inline_styles( $style ) {
  * echo an action input, similar to wp_nonce_field
  *
  * @param string $action
- * @param bool $echo
+ * @param bool   $echo
  *
  * @return bool|string
  */
-function action_input( $action = '', $echo = true ) {
+function action_input( $action = '', $echo = true, $nonce = false ) {
 	$input = html()->input( [ 'value' => $action, 'type' => 'hidden', 'name' => 'action' ] );
+
+	if ( $nonce ) {
+		$input .= wp_nonce_field( $action, '_wpnonce', true, false );
+	}
 
 	if ( $echo ) {
 		echo $input;
@@ -2902,7 +3497,7 @@ function mobile_validator() {
  *
  * @param        $number       string
  * @param string $country_code the country code of the supposed contact
- * @param bool $with_plus whether to return with the + or not
+ * @param bool   $with_plus    whether to return with the + or not
  *
  * @return bool|string
  */
@@ -3107,7 +3702,7 @@ add_action( 'admin_print_styles', function () {
 	}
 
 	?>
-    <style>
+	<style>
         #adminmenu #toplevel_page_groundhogg a.gh_go_pro .dashicons {
             font-size: 18px;
             margin-right: 8px;
@@ -3144,7 +3739,7 @@ add_action( 'admin_print_styles', function () {
         #adminmenu #toplevel_page_groundhogg li.gh_go_pro:before {
             margin-bottom: 8px;
         }
-    </style>
+	</style>
 	<?php
 } );
 
@@ -3213,11 +3808,29 @@ function is_wpengine() {
 }
 
 /**
- * Get the primary user.
+ * Renamed the function for better clarity
  *
  * @return bool|\WP_User
  */
 function get_primary_user() {
+	_doing_it_wrong( 'get_primary_user', "Use <code>get_primary_owner</code> instead.", GROUNDHOGG_VERSION );
+
+	return get_primary_owner();
+}
+
+/**
+ * Get the primary user.
+ *
+ * @return bool|\WP_User
+ */
+function get_primary_owner() {
+
+	static $user, $primary_user_id;
+
+	if ( is_a( $user, '\WP_User' ) ) {
+		return $user;
+	}
+
 	$primary_user_id = absint( get_option( 'gh_primary_user', 1 ) );
 
 	if ( ! $primary_user_id ) {
@@ -3283,7 +3896,7 @@ function get_user_test_email( $user_id = 0 ) {
  * Update a user's preferred test email address.
  *
  * @param string $email
- * @param int $user_id
+ * @param int    $user_id
  *
  * @return bool|int
  */
@@ -3309,7 +3922,29 @@ function gh_cron_installed() {
 }
 
 /**
- * Get an event from the event history table by referencing it's ID from the event queue
+ * Install the GH cron file
+ *
+ * @return bool
+ */
+function install_gh_cron_file() {
+
+	$gh_cron_php = file_get_contents( GROUNDHOGG_PATH . 'gh-cron.txt' );
+	$bytes       = file_put_contents( ABSPATH . 'gh-cron.php', $gh_cron_php );
+
+	return (bool) $bytes;
+}
+
+/**
+ * Remove the gh-cron.php file.
+ *
+ * @return bool
+ */
+function uninstall_gh_cron_file() {
+	return @unlink( ABSPATH . 'gh-cron.php' );
+}
+
+/**
+ * Get an event from the event history table by referencing its ID from the event queue
  *
  * @param $queued_id int
  *
@@ -3331,7 +3966,7 @@ function get_event_by_queued_id( $queued_id ) {
 }
 
 /**
- * Get an event from the event history table by referencing it's ID from the event queue
+ * Get an event from the event history table by referencing its ID from the event queue
  *
  * @param $event_id int
  *
@@ -3391,7 +4026,24 @@ function convert_to_local_time( $time ) {
  * @return \WP_User[]
  */
 function get_owners() {
-	return get_users( array( 'role__in' => Main_Roles::get_owner_roles() ) );
+
+	static $users;
+
+	if ( ! empty( $users ) ) {
+		return $users;
+	}
+
+	$roles__in = [];
+
+	foreach ( wp_roles()->roles as $role_slug => $role ) {
+		if ( isset_not_empty( $role['capabilities'], 'view_contacts' ) ) {
+			$roles__in[] = $role_slug;
+		}
+	}
+
+	$users = get_users( [ 'role__in' => ! empty( $roles__in ) ? $roles__in : Main_Roles::$owner_roles ] );
+
+	return apply_filters( 'groundhogg/owners', $users );
 }
 
 /**
@@ -3429,7 +4081,7 @@ function is_groundhogg_network_active() {
  * Do an action after a contact has been created or updated
  *
  * @param int|Contact|Email $contact
- * @param string $hook
+ * @param string            $hook
  *
  * @return bool
  */
@@ -3481,10 +4133,10 @@ function is_a_user( $user ) {
  * Generate a key which can be used to perform high level operations that requires a level of authentication
  * For example change email preferences or auto-login.
  *
- * @param bool $contact Contact
- * @param string $usage what they key should be used for
- * @param float|int $expiration the time at which the key expires
- * @param bool $delete_after_use whether to delete the key once it's been used
+ * @param bool      $contact          Contact
+ * @param string    $usage            what they key should be used for
+ * @param float|int $expiration       the time at which the key expires
+ * @param bool      $delete_after_use whether to delete the key once it's been used
  *
  * @return bool
  */
@@ -3497,14 +4149,14 @@ function generate_permissions_key( $contact = false, $usage = 'preferences', $ex
 	}
 
 	// Cache key is a combo of the contact ID and the usage case
-	$cache_key = $contact->get_id() . '-' . $usage;
+	$cache_key = $contact->get_id() . ':' . $usage . ':' . $expiration;
 
 	// If a key was already created for the given contact within the current runtime
-	$found = wp_cache_get( $cache_key, 'permissions_keys' );
+	$key = wp_cache_get( $cache_key, 'permissions_keys', false, $found );
 
 	// use it instead of creating a new one
 	if ( $found ) {
-		return $found;
+		return $key;
 	}
 
 	$key = wp_generate_password( 20, false );
@@ -3515,11 +4167,11 @@ function generate_permissions_key( $contact = false, $usage = 'preferences', $ex
 		'usage_type'       => sanitize_key( $usage ),
 		'permissions_key'  => wp_hash_password( $key ),
 		'delete_after_use' => $delete_after_use,
-		'expiration_date'  => ymd_his( time() + $expiration )
+		'expiration_date'  => Ymd_His( time() + $expiration )
 	] );
 
 	// set the key for the given contact in the cache
-	wp_cache_set( $cache_key, $key, 'permissions_keys' );
+	wp_cache_set( $cache_key, $key, 'permissions_keys', MINUTE_IN_SECONDS );
 
 	return $key;
 }
@@ -3528,8 +4180,8 @@ function generate_permissions_key( $contact = false, $usage = 'preferences', $ex
  * Check the validity of a permissions key
  *
  * @param        $key     string
- * @param string $usage string
- * @param bool $contact Contact
+ * @param string $usage   string
+ * @param bool   $contact Contact
  *
  * @return bool
  */
@@ -3576,11 +4228,11 @@ function check_permissions_key( $key, $contact = false, $usage = 'preferences' )
 /**
  * Generate a url with the permissions key on it.
  *
- * @param string $url the url to append the key to
- * @param Contact $contact the contact the key is to be created for
- * @param string $usage the usage type for the key
- * @param float|int $expiration the expiration time of the key in seconds, defaults to a week since the common use is for the preferences center.
- * @param bool $delete_after_use whether the key should be delete after it is used.
+ * @param string    $url              the url to append the key to
+ * @param Contact   $contact          the contact the key is to be created for
+ * @param string    $usage            the usage type for the key
+ * @param float|int $expiration       the expiration time of the key in seconds, defaults to a week since the common use is for the preferences center.
+ * @param bool      $delete_after_use whether the key should be delete after it is used.
  *
  * @return string
  */
@@ -3613,7 +4265,7 @@ function get_permissions_key() {
  *
  * @param       $str
  * @param array $except
- * @param null $delim
+ * @param null  $delim
  *
  * @return mixed|string
  */
@@ -3633,20 +4285,18 @@ function preg_quote_except( $str, $except = [], $delim = null ) {
 }
 
 /**
- * Check whether a specific URL is to be excluded from click tracking.
- *
- * @param       $url
+ * Get the regex for URLs to ignore tracking
  *
  * @param array $exclusions
  *
- * @return false|int
+ * @return false|string
  */
-function is_url_excluded_from_tracking( $url, $exclusions = [] ) {
+function get_url_exclusions_regex( $exclusions = [] ) {
 	static $exclusions_regex;
 
 	if ( ! $exclusions_regex ) {
 
-		$exclusions = get_option( 'gh_url_tracking_exclusions', $exclusions );
+		$exclusions = get_option( 'gh_url_tracking_exclusions' );
 
 		if ( ! is_array( $exclusions ) ) {
 			$exclusions = explode( PHP_EOL, $exclusions );
@@ -3656,18 +4306,32 @@ function is_url_excluded_from_tracking( $url, $exclusions = [] ) {
 			return false;
 		}
 
-		$exclusions       = array_map( function ( $exclusion ) {
-			return preg_quote_except( $exclusion, [ '$', '^' ] );
-		}, $exclusions );
+		$exclusions = array_map( function ( $exclusion ) {
+			return preg_quote_except( trim( $exclusion ), [ '$', '^' ] );
+		}, array_filter( $exclusions ) );
+
 		$exclusions_regex = implode( '|', $exclusions );
 	}
 
-	// No exclusions? Exit.
-	if ( empty( $exclusions_regex ) ) {
-		return false;
-	}
+	return ! empty( $exclusions_regex ) ? "@$exclusions_regex@" : false;
+}
 
-	return apply_filters( 'groundhogg/is_url_excluded_from_tracking', preg_match( "@$exclusions_regex@", $url ), $url, $exclusions_regex );
+/**
+ * Check whether a specific URL is to be excluded from click tracking.
+ *
+ * @param       $url
+ *
+ * @param array $exclusions
+ *
+ * @return false|int
+ */
+function is_url_excluded_from_tracking( $url, $exclusions = [] ) {
+
+	$exclusions_regex = get_url_exclusions_regex( $exclusions );
+
+	$matched = $exclusions_regex !== false ? preg_match( $exclusions_regex, $url ) : false;
+
+	return apply_filters( 'groundhogg/is_url_excluded_from_tracking', $matched, $url, $exclusions_regex );
 }
 
 /**
@@ -3687,10 +4351,12 @@ function is_ignore_user_tracking_precedence_enabled() {
  *
  * @return bool
  */
-function contact_and_user_match( $contact, $user ) {
+function contact_and_user_match( $contact = false, $user = false ) {
 
 	if ( is_int( $contact ) ) {
 		$contact = get_contactdata( $contact );
+	} else if ( ! $contact ) {
+		$contact = get_contactdata();
 	}
 
 	if ( ! is_a_contact( $contact ) ) {
@@ -3699,6 +4365,8 @@ function contact_and_user_match( $contact, $user ) {
 
 	if ( is_int( $user ) ) {
 		$user = get_userdata( $user );
+	} else if ( ! $user ) {
+		$$user = wp_get_current_user();
 	}
 
 	if ( ! is_a_user( $user ) ) {
@@ -3765,7 +4433,7 @@ function track_live_activity( $type, $details = [] ) {
 		'funnel_id'  => tracking()->get_current_funnel_id(),
 		'contact_id' => tracking()->get_current_contact_id(),
 		'email_id'   => tracking()->get_current_email_id(),
-		'event_id'   => tracking()->get_current_event()->get_id(),
+		'event_id'   => tracking()->get_current_event() ? tracking()->get_current_event()->get_id() : false,
 		'referer'    => tracking()->get_leadsource(),
 	];
 
@@ -3776,12 +4444,12 @@ function track_live_activity( $type, $details = [] ) {
  * Log an activity conducted by the contact while they are performing actions on the site.
  * Uses the cookie details for reporting.
  *
- * @param string $type string, an activity identifier
- * @param array $args the details for the activity
- * @param array $details details about that activity
+ * @param string  $type    string, an activity identifier
+ * @param array   $args    the details for the activity
+ * @param array   $details details about that activity
  * @param Contact $contact the contact to track
  */
-function track_activity( $contact, $type, $args, $details = [] ) {
+function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 
 	// If there is not one available, skip
 	if ( ! is_a_contact( $contact ) ) {
@@ -3861,6 +4529,16 @@ function handle_ajax_meta_picker() {
 
 add_action( 'wp_ajax_gh_meta_picker', __NAMESPACE__ . '\handle_ajax_meta_picker' );
 
+/**
+ * Quick formatting function for Y-m-d H:i:s date time.
+ *
+ * @param false $time
+ *
+ * @return false|string
+ */
+function Ymd_His( $time = false ) {
+	return date( 'Y-m-d H:i:s', $time ?: time() );
+}
 
 /**
  * Find which plugin has wp_mail defined.
@@ -3915,129 +4593,6 @@ function track_gh_cron_ping() {
 
 add_action( 'groundhogg_process_queue', __NAMESPACE__ . '\track_gh_cron_ping', 9 );
 
-
-/**
- * Parse shortcodes and return an array
- *
- * @param $content string
- *
- * @return array
- */
-function convert_shortcode_to_json( $content ) {
-
-	if ( ! $content ) {
-		return [];
-	}
-
-	// Remove newlines and whitespace...
-//	$content = preg_replace( '/(\])\s*(\[)/', "$1$2", $content );
-
-	// Find all registered tag names in $content.
-	preg_match_all( '@\[([^<>&/\[\]\x00-\x20=]++)@', $content, $matches );
-	$tagnames = $matches[1];
-
-	if ( empty( $tagnames ) ) {
-		return [];
-	}
-
-	$pattern = get_shortcode_regex( $tagnames );
-
-	preg_match_all( "/$pattern/", $content, $matches2 );
-
-	$json = [];
-
-	foreach ( $matches2[2] as $i => $tag ) {
-
-		// add the tag to the json output...
-		$json[] = array_filter( [
-			'type'       => $tag,
-			'attributes' => shortcode_parse_atts( $matches2[3][ $i ] ),
-			'children'   => convert_shortcode_to_json( $matches2[5][ $i ] ),
-		] );
-
-	}
-
-	return $json;
-}
-
-/**
- * Ensure a column is returned.
- *
- * @param $column
- *
- * @return array
- */
-function validate_form_column( $column ) {
-
-	if ( $column['type'] !== 'col' ) {
-		$column = [
-			'type'       => 'row',
-			'attributes' => [],
-			'children'   => $column
-		];
-	}
-
-	return $column;
-
-}
-
-/**
- * Ensure a row is returned
- *
- * @param $row
- *
- * @return array
- */
-function validate_form_row( $row ) {
-
-	if ( $row['type'] !== 'row' ) {
-		$row = [
-			'type'       => 'row',
-			'attributes' => [],
-			'children'   => $row
-		];
-	}
-
-	$row['content'] = array_map( __NAMESPACE__ . '\validate_form_column', $row['content'] ?: [] );
-
-	return $row;
-
-}
-
-/**
- * Validate the form markup
- *
- * @param $json
- *
- * @return array
- */
-function validate_form_json( $json ) {
-	$rows = array_map( __NAMESPACE__ . '\validate_form_row', $json );
-
-	//formatted to be row=>col=>field, now need to format to just field
-	$formatted = [];
-
-	foreach ( $rows as $row ) {
-
-		$cols = get_array_var( $row, 'children', [] );
-
-		foreach ( $cols as $col ) {
-
-			$attrs  = get_array_var( $col, 'attributes', [] );
-			$width  = get_array_var( $attrs, 'width', '1/1' );
-			$fields = get_array_var( $col, 'children', [] );
-
-			foreach ( $fields as $field ) {
-				$field['width'] = $width;
-				$field['id']    = uniqid( 'field_' );
-				$formatted[]    = $field;
-			}
-		}
-	}
-
-	return $formatted;
-}
-
 /**
  * Takes a string or int and returns a mysql friendly date
  *
@@ -4054,19 +4609,10 @@ function convert_to_mysql_date( $date ) {
 }
 
 /**
- * @param $form
- *
- * @return array
- */
-function convert_form_shortcode_to_json( $form ) {
-	return validate_form_json( convert_shortcode_to_json( $form ) );
-}
-
-/**
  * Map a function to the value of attr in an array or an object
  *
  * @param &$arr array|object
- * @param $key string
+ * @param $key  string
  * @param $func callable
  */
 function map_func_to_attr( &$arr, $key, $func ) {
@@ -4082,7 +4628,7 @@ function map_func_to_attr( &$arr, $key, $func ) {
 /**
  * Handle sanitization of contact meta is most likely situations.
  *
- * @param mixed $meta_value
+ * @param mixed  $meta_value
  * @param string $meta_key
  * @param string $object_type
  *
@@ -4098,7 +4644,7 @@ function sanitize_object_meta( $meta_value, $meta_key = '', $object_type = '' ) 
 	/**
 	 * Filter the object meta
 	 *
-	 * @param mixed $meta_value
+	 * @param mixed  $meta_value
 	 * @param string $meta_key
 	 * @param string $object_type
 	 */
@@ -4109,7 +4655,7 @@ function sanitize_object_meta( $meta_value, $meta_key = '', $object_type = '' ) 
  * Check if the email address is in use
  * You can pass a contact record to double check against the current contact as well.
  *
- * @param string $email_address
+ * @param string       $email_address
  * @param bool|Contact $current_contact
  *
  * @return bool
@@ -4167,37 +4713,203 @@ function id_list_to_class( $list, $class ) {
 }
 
 /**
- * NEW most used
+ * Same as array_map, but passes both the key AND the value
  *
- * @param $time
+ * @param $array    array
+ * @param $callback callable
  *
- * @return false|string
+ * @return array
  */
-function ymd_his( $time = false ) {
-	return date( 'Y-m-d H:i:s', $time || time() );
+function array_map_with_keys( array $array, callable $callback ): array {
+	foreach ( $array as $i => &$v ) {
+		$v = call_user_func( $callback, $v, $i );
+	}
+
+	return $array;
+}
+
+/**
+ * Same as array_map, but modifies the key instead of the value
+ *
+ * @param $array    array
+ * @param $callback callable
+ *
+ * @return array
+ */
+function array_map_keys( array $array, callable $callback ): array {
+
+	$new_array = [];
+
+	foreach ( $array as $i => $v ) {
+		$i               = call_user_func( $callback, $i, $v );
+		$new_array[ $i ] = $v;
+	}
+
+	return $new_array;
+}
+
+/**
+ * Sanitize any type email header
+ *
+ * @param $header_value
+ * @param $header_type
+ *
+ * @return string
+ */
+function sanitize_email_header( $header_value, $header_type ): string {
+	switch ( $header_type ) {
+		case 'from':
+			// If only the email is provided
+			if ( is_email( $header_value ) ) {
+				$header_value = has_replacements( $header_value ) ? sanitize_text_field( $header_value ) : sanitize_email( $header_value );
+			} else if ( preg_match( '/([^<]+) <([^>]+)>/', $header_value, $matches ) ) {
+				$email_address = has_replacements( $matches[2] ) ? sanitize_text_field( $matches[2] ) : sanitize_email( $matches[2] );
+				$name          = sanitize_text_field( $matches[1] );
+				$header_value  = sprintf( '%s <%s>', $name, $email_address );
+			} else {
+				$header_value = '';
+			}
+			break;
+		case 'bcc':
+		case 'cc':
+		case 'return-path':
+		case 'reply-to':
+			$emails       = explode( ',', $header_value );
+			$emails       = map_deep( $emails, 'trim' );
+			$emails       = map_deep( $emails, function ( $email ) {
+				if ( has_replacements( $email ) ) {
+					return sanitize_text_field( $email );
+				} else {
+					return sanitize_email( $email );
+				}
+			} );
+			$emails       = implode( ',', array_filter( $emails ) );
+			$header_value = $emails;
+			break;
+		default:
+			$header_value = sanitize_text_field( $header_value );
+			break;
+	}
+
+	return $header_value;
 }
 
 
-//
-///**
-// * Quick formatting function for Y-m-d H:i:s date time. - OLD
-// *
-// * @param false $time
-// *
-// * @return false|string
-// */
-//function Ymd_His( $time = false ) {
-//	return date( 'Y-m-d H:i:s', $time ?: time() );
-//}
+/**
+ * Uninstall Groundhogg
+ *
+ * Deletes
+ * - All DB tables
+ * - All Options/Transients
+ * - All Meta
+ * - All Cron Jobs
+ * - Any installed files
+ */
+function uninstall_groundhogg() {
 
+	global $wpdb;
+
+
+	//Delete DBS
+	Plugin::$instance->dbs->drop_dbs();
+
+	//Remove Roles & Caps
+	Plugin::$instance->roles->remove_roles_and_caps();
+
+	//Remove all files
+	Plugin::$instance->utils->files->delete_all_files();
+
+	/** Cleanup Cron Events */
+	wp_clear_scheduled_hook( Event_Queue::WP_CRON_HOOK );
+	wp_clear_scheduled_hook( Bounce_Checker::ACTION );
+	wp_clear_scheduled_hook( Stats_Collection::ACTION );
+	wp_clear_scheduled_hook( 'groundhogg/sending_service/verify_domain' );
+
+	//delete api keys from user_meta
+	delete_metadata( 'user', 0, 'wpgh_user_public_key', '', true );
+	delete_metadata( 'user', 0, 'wpgh_user_secret_key', '', true );
+
+	// Remove any transients and options we've left behind
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'gh\_%'" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'wpgh\_%'" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_transient\_wpgh\_%'" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_transient\_gh\_%'" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_site\_transient\_wpgh\_%'" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_site\_transient\_gh\_%'" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_transient\_timeout\_wpgh\_%'" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_transient\_timeout\_gh\_%'" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_site\_transient\_timeout\_wpgh\_%'" );
+	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '\_site\_transient\_timeout\_gh\_%'" );
+
+	uninstall_gh_cron_file();
+
+	do_action( 'groundhogg/uninstall' );
+
+	if ( ob_get_contents() ) {
+		file_put_contents( __DIR__ . '/../groundhogg-uninstall-errors.txt', ob_get_contents() );
+	}
+}
 
 /**
- *  test function to run something init while development
+ * Get the field label
+ *
+ * @param string $field
+ *
+ * @return mixed|void
  */
-    function  test() {
+function get_default_field_label( $field = '' ) {
 
-//	    get_db( 'notes' )->update_3_0();
-//    wp_die("here");
+	switch ( $field ) {
+		default:
+			$label = "";
+			break;
+		case 'first_name':
+			$label = _x( 'First Name', 'field_label', 'groundhogg' );
+			break;
+		case 'last_name':
+			$label = _x( 'Last Name', 'field_label', 'groundhogg' );
+			break;
+		case 'full_name':
+			$label = _x( 'Full Name', 'field_label', 'groundhogg' );
+			break;
+		case 'email':
+			$label = _x( 'Email Address', 'field_label', 'groundhogg' );
+			break;
+		case 'gdpr_consent':
+			$label = sprintf( _x( "I agree to %s's storage and processing of my personal data.", 'field_label', 'groundhogg' ), get_bloginfo() );
+			break;
+		case 'marketing_consent':
+			$label = sprintf( _x( "I agree to receive marketing offers and updates from %s.", 'field_label', 'groundhogg' ), get_bloginfo() );
+			break;
+		case 'terms_agreement':
+			$label = sprintf( _x( "I agree to terms and conditions of %s.", 'field_label', 'groundhogg' ), get_bloginfo() );
+			break;
+	}
 
-    }
-    add_action( "init" , __NAMESPACE__ .  '\test' );
+	return apply_filters( 'groundhogg/default_field_label', $label, $field );
+}
+
+/**
+ * Map items in an array to a specific class
+ *
+ * @param $array
+ * @param $class
+ */
+function array_map_to_class( &$array, $class ) {
+	foreach ( $array as &$mixed ) {
+		$mixed = new $class( $mixed );
+	}
+}
+
+/**
+ * Get objects as ID list
+ *
+ * @param $array
+ *
+ * @return array
+ */
+function get_object_ids( $array ) {
+	return array_map( function ( $object ) {
+		return $object->get_id();
+	}, $array );
+}

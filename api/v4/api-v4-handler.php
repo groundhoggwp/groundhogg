@@ -19,10 +19,6 @@ class API_V4_HANDLER {
 
 
 	public function __construct() {
-
-
-		define( 'DOING_GROUNDHOGG_REST_REQUEST', true );
-
 		/**
 		 * Use this action to declare extension endpoints...
 		 */
@@ -31,10 +27,6 @@ class API_V4_HANDLER {
 		$this->declare_base_endpoints();
 
 		do_action( 'groundhogg/api/v4/init', $this );
-
-		// Todo remove this after done testing
-//		sleep( 1 );
-
 	}
 
 	/**

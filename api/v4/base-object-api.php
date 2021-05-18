@@ -104,7 +104,7 @@ abstract class Base_Object_Api extends Base_Api {
 		return get_db( $this->get_db_table_name() );
 	}
 
-	protected function get_endpoint() {
+	protected function get_route() {
 		return $this->get_db_table_name();
 	}
 
@@ -141,11 +141,13 @@ abstract class Base_Object_Api extends Base_Api {
 	public function create_new_object( $data, $meta = [] ) {
 		$class_name = $this->get_object_class();
 
+		$object = new $class_name( $data );
+
 		if ( method_exists( $class_name, 'update_meta' ) && ! empty( $meta ) ) {
-			return new $class_name( $data, $meta );
+			$object->update_meta( $meta );
 		}
 
-		return new $class_name( $data );
+		return $object;
 	}
 
 	/**
@@ -157,10 +159,9 @@ abstract class Base_Object_Api extends Base_Api {
 	 */
 	public function map_raw_object_to_class( $item ) {
 
-		$class_name  = $this->get_object_class();
-		$primary_key = $this->get_primary_key();
+		$class_name = $this->get_object_class();
 
-		return is_object( $item ) ? new $class_name( $item->$primary_key ) : new $class_name( $item );
+		return new $class_name( $item );
 	}
 
 	/**
@@ -170,10 +171,10 @@ abstract class Base_Object_Api extends Base_Api {
 	 */
 	public function register_routes() {
 
-		$endpoint = $this->get_endpoint();
-		$key      = $this->get_primary_key();
+		$route = $this->get_route();
+		$key   = $this->get_primary_key();
 
-		register_rest_route( self::NAME_SPACE, "/{$endpoint}", [
+		register_rest_route( self::NAME_SPACE, "/{$route}", [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'create' ],
@@ -196,7 +197,7 @@ abstract class Base_Object_Api extends Base_Api {
 			],
 		] );
 
-		register_rest_route( self::NAME_SPACE, "/{$endpoint}/(?P<{$key}>\d+)", [
+		register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)", [
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'read_single' ],
@@ -216,7 +217,7 @@ abstract class Base_Object_Api extends Base_Api {
 
 		if ( method_exists( $this->get_object_class(), 'update_meta' ) ) {
 
-			register_rest_route( self::NAME_SPACE, "/{$endpoint}/(?P<{$key}>\d+)/meta", [
+			register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/meta", [
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => [ $this, 'create_meta' ],
@@ -280,8 +281,8 @@ abstract class Base_Object_Api extends Base_Api {
 		}
 
 		return self::SUCCESS_RESPONSE( [
-			'items'       => $added,
 			'total_items' => count( $added ),
+			'items'       => $added,
 		] );
 	}
 
@@ -294,22 +295,24 @@ abstract class Base_Object_Api extends Base_Api {
 	 */
 	public function read( WP_REST_Request $request ) {
 
-		$args = array(
-			'where'   => $request->get_param( 'where' ) ?: [],
-			'limit'   => absint( $request->get_param( 'limit' ) ) ?: 25,
-			'offset'  => absint( $request->get_param( 'offset' ) ) ?: 0,
-			'order'   => strtoupper( sanitize_text_field( $request->get_param( 'order' ) ) ) ?: 'DESC',
-			'orderBy' => sanitize_text_field( $request->get_param( 'orderBy' ) ) ?: $this->get_primary_key(),
-			'select'  => sanitize_text_field( $request->get_param( 'select' ) ) ?: '*',
-			'search'  => sanitize_text_field( $request->get_param( 'search' ) ),
-		);
+		$query = $request->get_json_params();
 
-		$total = $this->get_db_table()->count( $args );
-		$items = $this->get_db_table()->query( $args );
+		$query = wp_parse_args( $query, [
+			'select'  => '*',
+			'orderby' => $this->get_primary_key(),
+			'order'   => 'DESC',
+			'limit'   => 25,
+		] );
+
+		$total = $this->get_db_table()->count( $query );
+		$items = $this->get_db_table()->query( $query );
 
 		$items = array_map( [ $this, 'map_raw_object_to_class' ], $items );
 
-		return self::SUCCESS_RESPONSE( [ 'items' => $items, 'total_items' => $total ] );
+		return self::SUCCESS_RESPONSE( [
+			'total_items' => $total,
+			'items'       => $items
+		] );
 	}
 
 	/**
@@ -321,12 +324,12 @@ abstract class Base_Object_Api extends Base_Api {
 	 */
 	public function update( WP_REST_Request $request ) {
 
-		$where = $request->get_param( 'where' );
+		$query = $request->get_param( 'query' ) ?: [];
 		$data  = $request->get_param( 'data' ) ?: [];
 		$meta  = $request->get_param( 'meta' ) ?: [];
 
 		// assume updating in other format
-		if ( empty( $data ) || empty( $where ) ) {
+		if ( empty( $query ) && empty( $data ) ) {
 
 			$items = $request->get_json_params();
 
@@ -348,27 +351,23 @@ abstract class Base_Object_Api extends Base_Api {
 				$data = get_array_var( $item, 'data', [] );
 				$meta = get_array_var( $item, 'meta', [] );
 
+				$object->update( $data );
+
 				// If the current object supports meta data...
 				if ( method_exists( $object, 'update_meta' ) ) {
-					$object->update( $data, $meta );
-				} else {
-					$object->update( $data );
+					$object->update_meta( $meta );
 				}
 
 				$updated[] = $object;
 			}
 
 			return self::SUCCESS_RESPONSE( [
-				'items'       => $updated,
 				'total_items' => count( $updated ),
+				'items'       => $updated,
 			] );
 		}
 
-		$args = array(
-			'where' => $where,
-		);
-
-		$items = $this->get_db_table()->query( $args );
+		$items = $this->get_db_table()->query( $query );
 		$items = array_map( [ $this, 'map_raw_object_to_class' ], $items );
 
 		/**
@@ -376,17 +375,17 @@ abstract class Base_Object_Api extends Base_Api {
 		 */
 		foreach ( $items as $object ) {
 
+			$object->update( $data );
+
 			// If the current object supports meta data...
 			if ( method_exists( $object, 'update_meta' ) ) {
-				$object->update( $data, $meta );
-			} else {
-				$object->update( $data );
+				$object->update_meta( $meta );
 			}
 		}
 
 		return self::SUCCESS_RESPONSE( [
-			'items'       => $items,
 			'total_items' => count( $items ),
+			'items'       => $items,
 		] );
 	}
 
@@ -399,19 +398,15 @@ abstract class Base_Object_Api extends Base_Api {
 	 */
 	public function delete( WP_REST_Request $request ) {
 
-		$where = $request->get_param( 'where' );
+		$query = $request->get_param( 'query' );
 
-		if ( ! empty( $where ) ) {
-			$args = array(
-				'where' => $where,
-			);
-
-			$items = $this->get_db_table()->query( $args );
-			$items = array_map( [ $this, 'map_raw_object_to_class' ], $items );
+		if ( ! empty( $query ) ) {
+			$items = $this->get_db_table()->query( $query );
 		} else {
 			$items = $request->get_json_params();
-			$items = array_map( [ $this, 'create_new_object' ], $items );
 		}
+
+		$items = array_map( [ $this, 'map_raw_object_to_class' ], $items );
 
 		/**
 		 * @var $object Base_Object
@@ -470,7 +465,7 @@ abstract class Base_Object_Api extends Base_Api {
 		$object = $this->create_new_object( $primary_key );
 
 		if ( ! $object->exists() ) {
-			return self::ERROR_404();
+			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
 		return self::SUCCESS_RESPONSE( [ 'item' => $object ] );
@@ -489,7 +484,7 @@ abstract class Base_Object_Api extends Base_Api {
 		$object = $this->create_new_object( $primary_key );
 
 		if ( ! $object->exists() ) {
-			return self::ERROR_404();
+			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
 		$data = $request->get_param( 'data' );
@@ -499,9 +494,7 @@ abstract class Base_Object_Api extends Base_Api {
 
 		// If the current object supports meta data...
 		if ( method_exists( $object, 'update_meta' ) ) {
-			$object->update( $data, $meta );
-		} else {
-			$object->update( $data );
+			$object->update_meta( $meta );
 		}
 
 		return self::SUCCESS_RESPONSE( [ 'item' => $object ] );
@@ -520,7 +513,7 @@ abstract class Base_Object_Api extends Base_Api {
 		$object = $this->create_new_object( $primary_key );
 
 		if ( ! $object->exists() ) {
-			return self::ERROR_404();
+			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
 		$object->delete();
@@ -552,7 +545,7 @@ abstract class Base_Object_Api extends Base_Api {
 		$object = $this->create_new_object( $primary_key );
 
 		if ( ! $object->exists() ) {
-			return self::ERROR_404();
+			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
 		return self::SUCCESS_RESPONSE( [
@@ -572,14 +565,12 @@ abstract class Base_Object_Api extends Base_Api {
 		$object = $this->create_new_object( $primary_key );
 
 		if ( ! $object->exists() ) {
-			return self::ERROR_404();
+			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
 		$meta = $request->get_json_params();
 
-		foreach ( $meta as $key => $value ) {
-			$object->update_meta( $key, $value );
-		}
+		$object->update_meta( $meta );
 
 		return self::SUCCESS_RESPONSE( [
 			'item' => $object
@@ -598,14 +589,12 @@ abstract class Base_Object_Api extends Base_Api {
 		$object = $this->create_new_object( $primary_key );
 
 		if ( ! $object->exists() ) {
-			return self::ERROR_404();
+			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
 		$meta = $request->get_json_params();
 
-		foreach ( $meta as $key ) {
-			$object->delete_meta( $key );
-		}
+		$object->delete_meta( $meta );
 
 		return self::SUCCESS_RESPONSE( [
 			'item' => $object

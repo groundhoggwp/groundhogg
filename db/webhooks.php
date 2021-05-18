@@ -3,7 +3,7 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
-use function Groundhogg\ymd_his;
+use function Groundhogg\Ymd_His;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -101,8 +101,8 @@ class Webhooks extends DB {
 			'events'          => '',
 			'status'          => 'draft',
 			'last_event'      => '',
-			'date_created'    => ymd_his(),
-			'date_last_event' => ymd_his(),
+			'date_created'    => Ymd_His(),
+			'date_last_event' => Ymd_His(),
 		);
 	}
 

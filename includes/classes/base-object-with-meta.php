@@ -28,15 +28,14 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	 */
 	protected function setup_object( $object ) {
 
-		$object = (object) $object;
+		$object     = (object) $object;
+		$identifier = $this->get_identifier_key();
 
-		if ( ! is_object( $object ) ) {
+		if ( ! is_object( $object ) || ! isset( $object->$identifier ) ) {
 			return false;
 		}
 
-		$identifier = $this->get_identifier_key();
-
-		$this->set_id( $object->$identifier );
+		$this->set_id( is_numeric( $object->$identifier ) ? absint( $object->$identifier ) : $object->$identifier );
 
 		//Lets just make sure we all good here.
 		$object = apply_filters( "groundhogg/{$this->get_object_type()}/setup", $object );
@@ -45,6 +44,8 @@ abstract class Base_Object_With_Meta extends Base_Object {
 		foreach ( $object as $key => $value ) {
 			$this->$key = $value;
 		}
+
+		$this->data[$this->get_identifier_key()] = $this->get_id();
 
 		// Get all the meta data.
 		$this->get_all_meta();
@@ -89,42 +90,6 @@ abstract class Base_Object_With_Meta extends Base_Object {
 		return $data;
 	}
 
-	public function create( $data = [], $meta=[] ) {
-		$id = parent::create( $data );
-
-		if ( $id ){
-
-			foreach ( $meta as $key => $value ) {
-				$this->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
-			}
-		}
-
-		return $id;
-	}
-
-	/**
-	 * Wrapper for updated
-	 *
-	 * @param array $data
-	 * @param array $meta
-	 *
-	 * @return bool
-	 */
-	public function update( $data = [], $meta=[] ) {
-		$updated = parent::update( $data );
-
-		if ( ! empty( $meta ) && is_array( $meta ) ){
-
-			foreach ( $meta as $key => $value ) {
-				$this->update_meta( sanitize_key( $key ), sanitize_object_meta( $value ) );
-			}
-
-			$updated = true;
-		}
-
-		return $updated;
-	}
-
 	/**
 	 * Get all the meta data.
 	 *
@@ -136,6 +101,8 @@ abstract class Base_Object_With_Meta extends Base_Object {
 		}
 
 		$meta = $this->get_meta_db()->get_meta( $this->get_id() );
+
+//        var_dump( $meta );
 
 		if ( ! $meta ) {
 			return [];
@@ -158,7 +125,6 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	 * @return mixed
 	 */
 	public function get_meta( $key = false, $single = true ) {
-
 		if ( ! $key ) {
 			return $this->meta;
 		}
@@ -182,16 +148,20 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	 *
 	 * @return mixed
 	 */
-	public function update_meta( $key, $value ) {
+	public function update_meta( $key, $value = false ) {
 
-		$key = sanitize_key( $key );
-		$value = sanitize_object_meta( $value, $key, $this->get_object_type() );
-
-		if ( $this->get_meta_db()->update_meta( $this->get_id(), $key, $value ) ) {
+		if ( is_array( $key ) && ! $value ) {
+			foreach ( $key as $meta_key => $meta_value ) {
+				if ( ! $this->update_meta( $meta_key, $meta_value ) ) {
+					return false;
+				}
+			}
+		} else if ( $this->get_meta_db()->update_meta( $this->get_id(), $key, $value ) ) {
 			$this->meta[ $key ] = $value;
 
 			return true;
 		}
+
 
 		return false;
 	}
@@ -205,11 +175,13 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	 * @return mixed
 	 */
 	public function add_meta( $key, $value ) {
-
-		$key = sanitize_key( $key );
-		$value = sanitize_object_meta( $value, $key, $this->get_object_type() );
-
-		if ( $this->get_meta_db()->add_meta( $this->get_id(), $key, $value ) ) {
+		if ( is_array( $key ) && ! $value ) {
+			foreach ( $key as $meta_key => $meta_value ) {
+				if ( ! $this->add_meta( $meta_key, $meta_value ) ) {
+					return false;
+				}
+			}
+		} else if ( $this->get_meta_db()->add_meta( $this->get_id(), $key, $value ) ) {
 			$this->meta[ $key ] = $value;
 
 			return true;
@@ -227,6 +199,15 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	 * @return mixed
 	 */
 	public function delete_meta( $key ) {
+
+		if ( is_array( $key ) ){
+			foreach ( $key as $meta_key ){
+				$this->delete_meta( $meta_key );
+			}
+
+			return true;
+		}
+
 		unset( $this->meta[ $key ] );
 
 		return $this->get_meta_db()->delete_meta( $this->get_id(), $key );
@@ -237,7 +218,7 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	 */
 	public function get_as_array() {
 		return apply_filters( "groundhogg/{$this->get_object_type()}/get_as_array", [
-			'ID'    => $this->get_id(),
+			'ID'   => $this->get_id(),
 			'data' => $this->data,
 			'meta' => $this->meta
 		] );
