@@ -1049,12 +1049,17 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		// TODO: Implement __toString() method.
 	}
 
+	public function get_context(){
+		return null;
+	}
+
 	public function jsonSerialize() {
 		return [
-			'icon'  => $this->get_icon(),
-			'name'  => $this->get_name(),
-			'type'  => $this->get_type(),
-			'group' => $this->get_group(),
+			'icon'    => $this->get_icon(),
+			'name'    => $this->get_name(),
+			'type'    => $this->get_type(),
+			'group'   => $this->get_group(),
+			'context' => $this->get_context()
 		];
 	}
 }

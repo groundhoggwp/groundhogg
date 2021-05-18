@@ -10,6 +10,6 @@ use function Groundhogg\dashicon_e;
 
 	</div>
 	<div class="add-new-step">
-		<button class="button button-secondary"><?php _e( 'Add new step', 'groundhogg' ) ?></button>
+		<button class="button button-secondary add-new-step"><?php _e( 'Add new step', 'groundhogg' ) ?></button>
 	</div>
 </div>

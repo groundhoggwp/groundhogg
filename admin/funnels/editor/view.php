@@ -12,7 +12,7 @@ namespace Groundhogg\Admin\Funnels\Editor;
 		<?php
 		include __DIR__ . '/flow.php';
 		?>
-		<div class="panel">
+		<div id="control-panel">
 			<?php
 			include __DIR__ . '/step-add.php';
 			?>

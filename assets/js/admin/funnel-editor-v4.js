@@ -1,15 +1,81 @@
 (function (Funnel, $) {
 
+  const Tags = {
+
+    limit: 100,
+    offset: 0,
+    items: [],
+
+    get (id) {
+
+    },
+
+    validate (maybeTags, callback) {
+      var self = this
+
+      fetch(`${Groundhogg.endpoints.v4.tags}/validate`, {
+        method: 'POST',
+        headers: {
+          'X-WP-Nonce': Groundhogg.nonces._wprest,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(maybeTags)
+      }).then(r => r.json()).then(data => {
+
+        if (!data.items) {
+          return
+        }
+
+        data.items.forEach(tag => {
+          if (self.items.findIndex(t => t.ID === tag.ID) === -1) {
+            self.items.push(tag)
+          }
+        })
+
+        callback(data.items)
+      })
+    },
+
+    preloadTags () {
+
+      var self = this
+
+      fetch(`${Groundhogg.endpoints.v4.tags}?limit=${this.limit}&offset=${this.offset}`, {
+        headers: {
+          'X-WP-Nonce': Groundhogg.nonces._wprest,
+        }
+      }).then(r => r.json()).then(data => {
+
+        if (!data.items) {
+          return
+        }
+
+        Object.assign(self.items, data.items)
+
+        if (data.items.length === self.limit) {
+          self.offset += self.limit
+          self.preloadTags()
+        }
+
+      })
+    },
+
+  }
+
   const Editor = {
 
     activeAddType: 'actions',
-    view: 'add',
+    view: 'addingStep',
     activeStep: {},
     htmlModules: {},
     isEditingTitle: false,
-    isAddingStep: false,
     stepFlowContextMenu: null,
     stepOpenInContextMenu: null,
+    tagsCache: {
+      limit: 100,
+      offset: 0,
+      items: []
+    },
 
     /**
      * These gets overridden by the Funnel object passed in
@@ -45,6 +111,17 @@
         } else {
           return `<span class="title-inner">${title}</span><span class="pencil"><span class="dashicons dashicons-edit"></span></span>`
         }
+      },
+      stepEditPanel (step) {
+
+        const { ID, data, meta } = step
+        const { step_type, step_title, step_group } = data
+
+        //language=HTML
+        return `
+			<div class="step-edit">
+				${Editor.stepTypes[step_type].edit(step)}
+			</div>`
       },
       stepAddPanel (activeType) {
         //language=HTML
@@ -100,9 +177,10 @@
         //language=HTML
         return `
 			<div class="step ${step_type} ${step_group} ${activeStep === ID && 'active'}" data-id="${ID}">
-				<img alt="${Editor.stepTypes[step_type].name}" class="icon" src="${Editor.stepTypes[step_type].icon}"/>
+				<img alt="${Editor.stepTypes[step_type].name}" class="icon"
+				     src="${Editor.stepTypes[step_type].icon}"/>
 				<div class="details">
-					<div class="step-title">${step_title}</div>
+					<div class="step-title">${Editor.stepTypes[step_type].title(step)}</div>
 					<div class="step-type">${Editor.stepTypes[step_type].name}</div>
 				</div>
 				<div class="step-status ${status}"><span class="status"></span>
@@ -129,7 +207,16 @@
       $doc.on('click', '.step-flow .steps .step', function () {
         self.saveUndoState()
         self.activeStep = $(this).data('id')
+        self.view = 'editingStep'
         self.renderStepFlow()
+        self.renderStepEdit()
+      })
+
+      $doc.on('click', '.step-flow .add-new-step', function () {
+        self.activeStep = null
+        self.view = 'addingStep'
+        self.renderStepFlow()
+        self.renderStepAdd()
       })
 
       $doc.on('click', '.undo-and-redo .undo', function () {
@@ -157,9 +244,29 @@
         self.saveUndoState()
         self.funnel.data.title = e.target.value
         self.isEditingTitle = false
+        self.autoSaveEditedFunnel()
         self.renderTitle()
       })
 
+      Tags.preloadTags()
+
+      if (this.funnel.meta.edited) {
+        this.funnel.steps = this.funnel.meta.edited.steps
+        this.funnel.data.title = this.funnel.meta.edited.title
+      }
+
+      self.setupSortable()
+      self.setupStepTypes()
+      self.initStepFlowContextMenu()
+
+      self.render()
+    },
+
+    /**
+     * Init the sortable list of steps in the step flow
+     */
+    setupSortable () {
+      var self = this
       $('.step-flow .steps').sortable({
         placeholder: 'step-placeholder',
         update: function (e, ui) {
@@ -167,12 +274,28 @@
           self.syncOrderWithFlow()
         }
       }).disableSelection()
-
-      self.initStepFlowContextMenu()
-
-      self.render()
     },
 
+    /**
+     * Merge the step types passed from PHP with mthods defined in JS
+     */
+    setupStepTypes () {
+      for (var prop in this.stepTypes) {
+        if (Object.prototype.hasOwnProperty.call(this.stepTypes, prop)
+          && Object.prototype.hasOwnProperty.call(StepTypes, prop)) {
+          Object.assign(this.stepTypes[prop], {
+            ...StepTypes.default,
+            ...StepTypes[prop]
+          })
+        } else {
+          Object.assign(this.stepTypes[prop], StepTypes.default)
+        }
+      }
+    },
+
+    /**
+     * Setup the context menu for editing duplicating and deleting steps
+     */
     initStepFlowContextMenu () {
 
       var self = this
@@ -210,6 +333,9 @@
       this.stepFlowContextMenu.init()
     },
 
+    /**
+     * Renders the step flow
+     */
     renderStepFlow () {
 
       var self = this
@@ -222,8 +348,32 @@
       $('.step-flow .steps').html(steps)
     },
 
+    /**
+     * Renders the edit step panel for the current step in the controls panel
+     */
+    renderStepEdit () {
+
+      if (this.view !== 'editingStep') {
+        return
+      }
+
+      const step = this.funnel.steps.find(step => step.ID === this.activeStep)
+
+      $('#control-panel').html(this.htmlTemplates.stepEditPanel(step))
+
+      this.stepTypes[step.data.step_type].onMount()
+    },
+
+    /**
+     * Renders the add step panel for the current step in the controls panel
+     */
     renderStepAdd () {
-      $('.panel').html(this.htmlTemplates.stepAddPanel(this.activeAddType))
+
+      if (this.view !== 'addingStep') {
+        return
+      }
+
+      $('#control-panel').html(this.htmlTemplates.stepAddPanel(this.activeAddType))
 
       var self = this
 
@@ -257,6 +407,9 @@
       })
     },
 
+    /**
+     * Renders the funnel title edit component
+     */
     renderTitle () {
 
       $('.header-stuff .title').html(
@@ -271,10 +424,14 @@
       }
     },
 
+    /**
+     * Re-render the whole editor
+     */
     render () {
       this.renderTitle()
       this.renderStepFlow()
       this.renderStepAdd()
+      this.renderStepEdit()
     },
 
     /**
@@ -288,17 +445,30 @@
       })
     },
 
+    /**
+     * Saves the current state of the funnel for an undo slot
+     */
     saveUndoState () {
-      const { funnel, activeStep, activeAddType, view } = this
+      const {
+        view,
+        funnel,
+        activeStep,
+        activeAddType,
+        isEditingTitle
+      } = this
 
       this.undoStates.push({
         view,
         activeStep,
+        isEditingTitle,
         activeAddType,
         funnel: copyObject(funnel)
       })
     },
 
+    /**
+     * Undo the previous change
+     */
     undo () {
       var lastState = this.undoStates.pop()
 
@@ -306,17 +476,16 @@
         return
       }
 
-      const { funnel, activeStep, activeAddType, view } = lastState
-
-      Object.assign(this, {
-        funnel, activeStep, activeAddType, view
-      })
+      Object.assign(this, lastState)
 
       this.redoStates.push(lastState)
 
       this.render()
     },
 
+    /**
+     * Redo the previous change
+     */
     redo () {
       var lastState = this.redoStates.pop()
 
@@ -324,17 +493,18 @@
         return
       }
 
-      const { funnel, activeStep, activeAddType, view } = lastState
-
-      Object.assign(this, {
-        funnel, activeStep, activeAddType, view
-      })
+      Object.assign(this, lastState)
 
       this.undoStates.push(lastState)
 
       this.render()
     },
 
+    /**
+     * Add a step to the funnel
+     *
+     * @param step
+     */
     addStep (step) {
 
       if (!step) {
@@ -347,8 +517,15 @@
 
       this.syncOrderWithFlow()
       this.renderStepFlow()
+
+      this.autoSaveEditedFunnel()
     },
 
+    /**
+     * Delete a step from the funnel
+     *
+     * @param stepId
+     */
     deleteStep (stepId) {
 
       if (!stepId) {
@@ -361,6 +538,80 @@
 
       this.renderStepFlow()
       this.syncOrderWithFlow()
+
+      this.view = 'addingStep'
+      this.renderStepAdd()
+
+      this.autoSaveEditedFunnel()
+    },
+
+    /**
+     * Get the step object from the funnel
+     *
+     * @param stepId
+     * @returns {*}
+     */
+    getStep (stepId) {
+      return this.funnel.steps.find(step => step.ID === stepId)
+    },
+
+    /**
+     * Get the currently active step
+     *
+     * @returns {*}
+     */
+    getCurrentStep () {
+      return this.getStep(this.activeStep)
+    },
+
+    /**
+     * Update a step
+     *
+     * @param stepId
+     * @param newData
+     */
+    updateStep (stepId, newData) {
+
+      const step = this.getStep(stepId)
+
+      const newStep = {
+        ...step,
+        ...newData
+      }
+
+      console.log(newStep)
+
+      var toReplace = this.funnel.steps.findIndex(step => step.ID === stepId)
+
+      this.saveUndoState()
+
+      if (toReplace !== -1) {
+        this.funnel.steps[toReplace] = newStep
+      }
+
+      this.renderStepFlow()
+    },
+
+    /**
+     * Updates the current active step
+     *
+     * @param newData
+     */
+    updateCurrentStep (newData) {
+      this.updateStep(this.activeStep, newData)
+
+      this.autoSaveEditedFunnel()
+    },
+
+    autoSaveEditedFunnel () {
+      var self = this
+      apiPost(`${Groundhogg.endpoints.v4.funnels}/${self.funnel.ID}/meta`, {
+        edited: {
+          steps: self.funnel.steps,
+          title: self.funnel.data.title
+        }
+      })
+
     },
 
     ...Funnel,
@@ -374,10 +625,12 @@
    * Make a copy of the object
    *
    * @param object
+   * @param initial
    * @returns {*}
    */
-  function copyObject (object) {
-    return $.extend(true, {}, object)
+  function copyObject (object, initial) {
+    initial = initial || {}
+    return $.extend(true, initial, object)
   }
 
   /**
@@ -392,10 +645,339 @@
   }
 
   /**
+   * Fetch stuff from the API
+   * @param route
+   */
+  async function apiFetch (route) {
+    const response = fetch(route, {
+      headers: {
+        'X-WP-Nonce': Groundhogg.nonces._wprest,
+      }
+    })
+
+    return response.json()
+  }
+
+  /**
+   * Post data
+   *
+   * @param url
+   * @param data
+   * @returns {Promise<any>}
+   */
+  async function apiPost (url = '', data = {}) {
+    // Default options are marked with *
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-WP-Nonce': Groundhogg.nonces._wprest,
+      },
+      body: JSON.stringify(data) // body data type must match "Content-Type" header
+    })
+    return response.json() // parses JSON response into native JavaScript objects
+  }
+
+  /**
    *
    */
   function uniqid () {
     return Date.now()
   }
 
+  function andList (array) {
+    var lastItem = array.pop()
+    lastItem = 'and ' + lastItem
+    array.push(lastItem)
+    return array.join(', ')
+  }
+
+  function orList (array) {
+    var lastItem = array.pop()
+    lastItem = 'or ' + lastItem
+    array.push(lastItem)
+    return array.join(array.length > 2 ? ', ' : ' ')
+  }
+
+  const Elements = {
+    option: function (value, text, selected) {
+      //language=HTML
+      return `
+		  <option value="${value}" ${selected ? 'selected' : ''}>${text}</option>`
+    }
+  }
+
+  const StepTypes = {
+    /**
+     * Step type default fallbacks
+     */
+    default: {
+      title ({ ID, data, meta }) {
+        return data.step_title
+      },
+      edit ({ ID, data, meta }) {
+        //language=HTML
+        return `
+			<div class="panel"></div>`
+      },
+      onMount: function () {},
+      onDemount: function () {},
+    },
+
+    /**
+     * Account created
+     */
+    account_created: {
+
+      // Title
+      title ({ ID, data, meta }) {
+
+        const roles = Editor.stepTypes.account_created.context.roles
+
+        if (meta.role && meta.role.length === 1) {
+          return `${roles[meta.role[0]]} is created`
+        } else if (meta.role && meta.role.length > 1) {
+          return `${orList(meta.role.map(role => roles[role]))} is created`
+        } else {
+          return 'User Created'
+        }
+      },
+
+      // Edit
+      edit ({ ID, data, meta }) {
+
+        let options = []
+        let roles = Editor.stepTypes.account_created.context.roles
+
+        for (var role in roles) {
+          if (Object.prototype.hasOwnProperty.call(roles, role)) {
+            options.push(Elements.option(role, roles[role], meta.role?.indexOf(role) >= 0))
+          }
+        }
+
+        //language=HTML
+        return `
+			<div class="panel">
+				<div class="row">
+					<label class="row-label" for="roles">Select user roles.</label>
+					<select name="role" id="roles" multiple>
+						${options.join('')}
+					</select>
+					<p class="description">Runs when a new user is created with any of the defined roles.</p>
+				</div>
+			</div>`
+      },
+
+      // On mount
+      onMount () {
+
+        const $roles = $('#roles')
+        $roles.select2()
+        $roles.on('change', function (e) {
+          let roles = $(this).val()
+          Editor.updateCurrentStep({
+            meta: {
+              role: roles
+            }
+          })
+        })
+      },
+    },
+
+    /**
+     * Account created
+     */
+    create_user: {
+
+      // Title
+      title ({ ID, data, meta }) {
+
+        const roles = Editor.stepTypes.account_created.context.roles
+
+        if (meta.role) {
+          return `Create ${roles[meta.role]}`
+        } else {
+          return 'Create user'
+        }
+      },
+
+      // Edit
+      edit ({ ID, data, meta }) {
+
+        let options = []
+        let roles = Editor.stepTypes.account_created.context.roles
+
+        for (var role in roles) {
+          if (Object.prototype.hasOwnProperty.call(roles, role)) {
+            options.push(Elements.option(role, roles[role], meta.role === role))
+          }
+        }
+
+        //language=HTML
+        return `
+			<div class="panel">
+				<div class="row">
+					<label class="row-label" for="roles">Select the role of the new user.</label>
+					<select name="role" id="role">
+						${options.join('')}
+					</select>
+					<p class="description">Runs when a new user is created with any of the defined roles.</p>
+				</div>
+			</div>
+      <div class="panel">
+	      <div class="row">
+		      <label for="disable-notification">
+			      <input type="checkbox" id="disable-notification" value="1" ${ meta.disable_notification ? 'checked' : '' }>
+			      Disable the account created notification sent to the user.</label>
+	      </div>
+      </div>`
+      },
+
+      // On mount
+      onMount () {
+
+        const $role = $('#role')
+        $role.select2()
+
+        $role.on('change', function (e) {
+          let role = $(this).val()
+          Editor.updateCurrentStep({
+            meta: {
+              ...Editor.getCurrentStep().meta,
+              role: role
+            }
+          })
+        })
+
+        $( '#disable-notification' ).on('change', function (e) {
+
+          var checked = this.checked
+
+          Editor.updateCurrentStep({
+            meta: {
+              ...Editor.getCurrentStep().meta,
+              disable_notification: checked
+            }
+          })
+        })
+      },
+    },
+
+    /**
+     * Apply a tag
+     */
+    apply_tag: {
+      title ({ ID, data, meta }) {
+
+        if (!meta.tags) {
+          return 'Apply tags'
+        }
+
+        return `Apply ${meta.tags.length} ${meta.tags.length > 1 ? 'tags' : 'tag'}`
+      },
+
+      edit ({ ID, data, meta }) {
+
+        let options = Tags.items
+          .map(tag => Elements.option(tag.ID, tag.data.tag_name, meta.tags && meta.tags.indexOf(tag.ID) !== -1))
+
+        //language=HTML
+        return `
+			<div class="panel">
+				<div class="row">
+					<label class="row-label" for="tags">Select tags to add.</label>
+					<select name="tags" id="tags" multiple>${options.join('')}</select>
+					<p class="description">All of the defined tags will be added to the contact.</p>
+				</div>
+			</div>`
+      },
+
+      onMount () {
+
+        const $tags = $('#tags')
+        $tags.select2({
+          tags: true,
+          multiple: true,
+        })
+
+        $tags.on('change', function (e) {
+
+          Tags.validate($(this).val(), tags => {
+            Editor.updateCurrentStep({
+              meta: {
+                tags: tags.map(tag => tag.ID)
+              }
+            })
+          })
+        })
+      }
+    },
+
+    /**
+     * Remove a tag
+     */
+    remove_tag: {
+      title ({ ID, data, meta }) {
+
+        if (!meta.tags) {
+          return 'Remove tags'
+        }
+
+        return `Remove ${meta.tags.length} ${meta.tags.length > 1 ? 'tags' : 'tag'}`
+      },
+
+      edit ({ ID, data, meta }) {
+
+        let options = Tags.items
+          .map(tag => Elements.option(tag.ID, tag.data.tag_name, meta.tags && meta.tags.indexOf(tag.ID) !== -1))
+
+        //language=HTML
+        return `
+			<div class="panel">
+				<div class="row">
+					<label class="row-label" for="tags">Select tags to remove.</label>
+					<select name="tags" id="tags" multiple>${options.join('')}</select>
+					<p class="description">All of the defined tags will be removed from the contact.</p>
+				</div>
+			</div>`
+      },
+
+      onMount () {
+
+        const $tags = $('#tags')
+        $tags.select2({
+          tags: true,
+          multiple: true,
+        })
+
+        $tags.on('change', function (e) {
+
+          Tags.validate($(this).val(), tags => {
+            Editor.updateCurrentStep({
+              meta: {
+                tags: tags.map(tag => tag.ID)
+              }
+            })
+          })
+        })
+      }
+    },
+
+    /**
+     * Send email
+     */
+    send_email: {
+      title ({ ID, data, meta }) {
+        return `Send Email`
+      },
+      edit ({ ID, data, meta }) {
+
+        //language=HTML
+        return `
+			<div class="panel">
+
+			</div>`
+      }
+    }
+  }
 })(GroundhoggFunnel, jQuery)

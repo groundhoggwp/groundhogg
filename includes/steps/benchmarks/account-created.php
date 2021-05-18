@@ -143,4 +143,10 @@ class Account_Created extends Benchmark {
 
 		return ! empty( $like_roles );
 	}
+
+	public function get_context() {
+		return [
+			'roles' => Plugin::$instance->roles->get_roles_for_select(),
+		];
+	}
 }
