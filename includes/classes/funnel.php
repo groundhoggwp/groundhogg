@@ -151,7 +151,13 @@ class Funnel extends Base_Object_With_Meta {
 			$array['steps'][] = $step->get_as_array();
 		}
 
-		$array['edges'] = get_db( 'step_edges' )->query( [ 'funnel_id' => $this->get_id() ] );
+		$array['edges'] = array_map( function ( $edge ) {
+			return [
+				'from_id'   => absint( $edge->from_id ),
+				'to_id'     => absint( $edge->to_id ),
+				'funnel_id' => absint( $edge->funnel_id ),
+			];
+		}, get_db( 'step_edges' )->query( [ 'funnel_id' => $this->get_id() ] ) );
 
 		$array = apply_filters( 'groundhogg/funnel/export', $array, $this );
 
@@ -260,7 +266,7 @@ class Funnel extends Base_Object_With_Meta {
 		}
 
 		// Add edges using the ID map to fetch the real step ID
-		if (!empty($edges)) {
+		if ( ! empty( $edges ) ) {
 			foreach ( $edges as $edge ) {
 				get_db( 'step_edges' )->add( [
 					'funnel_id' => $this->get_id(),
