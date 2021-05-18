@@ -16,7 +16,7 @@ import {
   Route,
   Link,
 } from "react-router-dom";
-import DatePicker from "../../../core-ui/date-picker";
+import { DatePicker } from "../../../core-ui/date-picker";
 import { DateTime } from "luxon";
 import { getLuxonDate } from "utils/index";
 import TabPanel from "../../../core-ui/tab-panel";
