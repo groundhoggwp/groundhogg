@@ -187,10 +187,7 @@ class Step_Edges extends DB {
 		from_id bigint(20) unsigned NOT NULL,
 		to_id bigint(20) unsigned NOT NULL,
 		funnel_id bigint(20) unsigned NOT NULL,
-		PRIMARY KEY (from_id,to_id,path),
-		KEY from_id (from_id),
-		KEY to_id (to_id),
-		KEY funnel_id (funnel_id)
+		PRIMARY KEY (from_id,to_id,funnel_id)
 		) {$this->get_charset_collate()};";
 
 		dbDelta( $sql );
