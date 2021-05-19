@@ -9,12 +9,12 @@
       Element.prototype.msMatchesSelector ||
       Element.prototype.oMatchesSelector ||
       Element.prototype.webkitMatchesSelector ||
-      function(s) {
+      function (s) {
         var matches = (this.document || this.ownerDocument).querySelectorAll(s),
-          i = matches.length;
+          i = matches.length
         while (--i >= 0 && matches.item(i) !== this) {}
-        return i > -1;
-      };
+        return i > -1
+      }
   }
 
   /**
@@ -48,22 +48,14 @@
    * @return {Object} Returns the x and y position
    */
   function getPosition (e) {
-    var posx = 0
-    var posy = 0
 
-    if (!e) var e = window.event
+    console.log(e)
 
-    if (e.pageX || e.pageY) {
-      posx = e.pageX
-      posy = e.pageY
-    } else if (e.clientX || e.clientY) {
-      posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft
-      posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop
-    }
+    const { clientX, clientY } = e
 
     return {
-      x: posx,
-      y: posy
+      x: clientX,
+      y: clientY
     }
   }
 
@@ -93,9 +85,9 @@
     menuClassName = 'context-menu',
     targetSelector,
     items,
-    onSelect = function (){},
-    onOpen = function (){},
-    onClose = function (){},
+    onSelect = function () {},
+    onOpen = function () {},
+    onClose = function () {},
   }) => ({
 
     menuClassName,
@@ -141,6 +133,7 @@
       this.mount()
       this.contextListener()
       this.clickListener()
+      this.scrollListener()
       this.keyupListener()
       this.resizeListener()
     },
@@ -194,6 +187,18 @@
             self.toggleMenuOff(e)
           }
         }
+      })
+    },
+
+    /**
+     * Listens for click events.
+     */
+    scrollListener () {
+
+      const self = this
+
+      document.addEventListener('scroll', function (e) {
+        self.toggleMenuOff(e)
       })
     },
 
