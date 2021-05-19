@@ -3,11 +3,25 @@
 namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
+use Groundhogg\Step;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 class Steps_Api extends Base_Object_Api {
+
+	public function settings( \WP_REST_Request $request ) {
+
+		$step = new Step( $request->get_param( $this->get_primary_key() ) );
+
+		if ( ! $step->exists() ){
+			return $this->ERROR_RESOURCE_NOT_FOUND();
+		}
+
+		$step->html_v2();
+
+	}
 
 	/**
 	 * The name of the table resource to use

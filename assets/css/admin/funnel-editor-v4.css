@@ -1,14 +1,18 @@
-.editor {
+#wpcontent {
     background-color: #F6F9FB;
+    padding-left: 0;
 }
 
 .editor-header {
-    padding: 8px;
+    padding: 8px 12px;
     background-color: #FFFFFF;
     box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     min-height: 50px;
     display: flex;
     align-items: center;
+    position: sticky;
+    top: 32px;
+    z-index: 999;
 }
 
 .editor-header .header-stuff {
@@ -69,10 +73,11 @@
     display: inline-block;
 }
 
-.title-wrap .title input.funnel-title-edit{
+.title-wrap .title input.funnel-title-edit {
     border-bottom: 1px solid;
 }
-.title-wrap .title input.funnel-title-edit:focus{
+
+.title-wrap .title input.funnel-title-edit:focus {
     outline: none;
     box-shadow: none;
 }
@@ -95,9 +100,37 @@
 }
 
 .flow-and-edit .step-flow {
-    width: 250px;
-    background-color: #FFFFFF;
+    width: 300px;
+    /*background-color: #FFFFFF;*/
     flex-shrink: 0;
+    position: relative;
+}
+
+.flow-label {
+    margin: 30px auto 0;
+    position: relative;
+    z-index: 99;
+    text-align: center;
+    font-weight: 500;
+}
+
+.step-flow,
+.steps-background-wrap {
+    filter: drop-shadow(5px 5px 30px rgba(24, 45, 70, 0.05));
+}
+
+.steps-background {
+    width: 200px;
+    /*height: 200px;*/
+    background: #FFFFFF;
+    -webkit-clip-path: polygon(0 0, 100% 0, 90% 100%, 10% 100%, 10% 100%);
+    clip-path: polygon(0 0, 100% 0, 90% 100%, 10% 100%, 10% 100%);
+    margin: auto;
+    border-radius: 5px;
+    left: calc(50% - 100px);
+    position: absolute;
+    top: 20px;
+    bottom: -20px;
 }
 
 .flow-and-edit #control-panel,
@@ -106,16 +139,37 @@
     width: 100%;
 }
 
+.step-edit {
+    box-sizing: border-box;
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+}
+
+.step-edit .settings {
+    width: 100%;
+}
+
+.step-edit .actions-and-notes {
+    width: 250px;
+    flex-shrink: 0;
+}
+
 .step-flow .steps {
     display: flex;
     gap: 10px;
     justify-content: space-between;
     flex-direction: column;
-    padding: 15px 15px 0 0;
+    padding: 12px;
+    position: relative;
+    z-index: 99;
 }
 
 .step-flow .add-new-step {
     margin-top: 10px;
+    text-align: center;
+    position: relative;
+    z-index: 99;
 }
 
 .step-flow .step-placeholder,
@@ -132,7 +186,7 @@
     cursor: pointer;
 }
 
-.step-flow .step-placeholder{
+.step-flow .step-placeholder {
     border-style: dashed;
     opacity: 0.9;
 }
@@ -174,6 +228,11 @@
     padding: 9px;
 }
 
+.step-flow .steps .step.action{
+    margin: 0 15px;
+}
+
+
 .step .step-status {
     display: flex;
     align-items: center;
@@ -192,6 +251,7 @@
     visibility: visible;
     background-color: #E91F4F;
 }
+
 .step .step-status.new .status {
     visibility: visible;
     background-color: #90C71C;
@@ -222,7 +282,7 @@
 .type-select {
     display: flex;
     justify-content: center;
-    margin-top: 10px;
+    margin: 20px;
 }
 
 .type-select button {
@@ -234,23 +294,23 @@
     border: 2px solid #FFFFFF;
 }
 
-.type-select button:first-child{
+.type-select button:first-child {
     border-radius: 5px 0 0 5px;
 }
 
-.type-select button:last-child{
+.type-select button:last-child {
     border-radius: 0 5px 5px 0;
 }
 
-.type-select button.actions.active{
+.type-select button.actions.active {
     border: 2px solid #9ECE38;
 }
 
-.type-select button.benchmarks.active{
+.type-select button.benchmarks.active {
     border: 2px solid #F58115;
 }
 
-.step-add .types{
+.step-add .types {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
@@ -258,7 +318,7 @@
 }
 
 .step-flow .add-step,
-.step-add .types .add-step{
+.step-add .types .add-step {
     width: 100px;
     display: flex;
     align-items: center;
@@ -266,7 +326,7 @@
 }
 
 .step-flow .add-step .step-icon,
-.step-add .types .add-step .step-icon{
+.step-add .types .add-step .step-icon {
     background: #FFFFFF;
     box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
     border-radius: 7px;
@@ -274,17 +334,25 @@
     width: 50px;
 }
 
+.add-step p {
+    text-align: center;
+}
+
 /* Control panel */
 
-#control-panel .panel{
+#control-panel .panel {
     background: #FFFFFF;
     box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
     padding: 20px;
-    margin: 20px;
+    /*margin: 20px;*/
     border-radius: 5px;
 }
 
-#control-panel label.row-label{
+#control-panel .panel:not(:first-child) {
+    margin-top: 20px;
+}
+
+#control-panel label.row-label {
     display: block;
     margin-bottom: 10px;
     font-weight: 500;

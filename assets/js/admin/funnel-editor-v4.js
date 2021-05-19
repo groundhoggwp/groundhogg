@@ -120,7 +120,15 @@
         //language=HTML
         return `
 			<div class="step-edit">
-				${Editor.stepTypes[step_type].edit(step)}
+          <div class="settings">
+            ${Editor.stepTypes[step_type].edit(step)}
+          </div>
+          <div class="actions-and-notes">
+              <div class="panel">
+                  <label class="row-label"><span class="dashicons dashicons-admin-comments"></span> Notes</label>
+                  <textarea rows="4" id="step-notes" class="notes full-width" name="step_notes">${step.meta.step_notes || ''}</textarea>
+              </div>
+          </div>
 			</div>`
       },
       stepAddPanel (activeType) {
@@ -272,6 +280,7 @@
         update: function (e, ui) {
           self.saveUndoState()
           self.syncOrderWithFlow()
+          self.autoSaveEditedFunnel()
         }
       }).disableSelection()
     },

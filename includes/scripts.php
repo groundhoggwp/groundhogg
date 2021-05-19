@@ -139,12 +139,18 @@ class Scripts {
 		wp_register_script( 'moment-js', GROUNDHOGG_ASSETS_URL . 'lib/calendar/js/moment.min.js' );
 		wp_register_script( 'baremetrics-calendar', GROUNDHOGG_ASSETS_URL . 'lib/calendar/js/Calendar.min.js' );
 
+		wp_register_script( 'groundhogg-admin-data', GROUNDHOGG_ASSETS_URL . 'js/admin/data' . $dot_min . '.js', [
+			'jquery'
+		]);
+
 		// Basic Admin Scripts
 		wp_register_script( 'groundhogg-admin', GROUNDHOGG_ASSETS_URL . 'js/admin/admin' . $dot_min . '.js', [
 			'jquery',
 			'select2',
-			'jquery-ui-autocomplete'
+			'jquery-ui-autocomplete',
+			'groundhogg-admin-data'
 		], GROUNDHOGG_VERSION, true );
+
 		wp_register_script( 'groundhogg-admin-functions', GROUNDHOGG_ASSETS_URL . 'js/admin/functions' . $dot_min . '.js', [
 			'jquery',
 			'select2',
@@ -262,8 +268,24 @@ class Scripts {
 			'_ajax_linking_nonce' => wp_create_nonce( 'internal-linking' ),
 		] );
 
-		wp_localize_script( 'groundhogg-admin', 'Groundhogg', [
-			'test' => 'Hello World!'
+		wp_localize_script( 'groundhogg-admin-data', 'Groundhogg', [
+			'test'   => 'Hello World!',
+			'api' => [
+				'routes' => [
+					'v3' => [
+						'tags'     => rest_url( 'gh/v3/tags?select2=true' ),
+						'emails'   => rest_url( 'gh/v3/emails?select2=true&status[]=ready&status[]=draft' ),
+						'sms'      => rest_url( 'gh/v3/sms?select2=true' ),
+						'contacts' => rest_url( 'gh/v3/contacts?select2=true' ),
+					],
+					'v4' => [
+						'tags'     => rest_url( Base_Api::NAME_SPACE . '/tags' ),
+						'contacts' => rest_url( Base_Api::NAME_SPACE . '/contacts' ),
+						'emails'   => rest_url( Base_Api::NAME_SPACE . '/emails' ),
+						'funnels'  => rest_url( Base_Api::NAME_SPACE . '/funnels' )
+					]
+				]
+			],
 		] );
 
 		wp_register_script( 'groundhogg-admin-fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
