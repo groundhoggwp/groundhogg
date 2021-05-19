@@ -277,6 +277,10 @@
       var self = this
       $('.step-flow .steps').sortable({
         placeholder: 'step-placeholder',
+        start: function (e, ui) {
+          ui.placeholder.height(ui.item.height())
+          ui.placeholder.width(ui.item.width())
+        },
         update: function (e, ui) {
           self.saveUndoState()
           self.syncOrderWithFlow()

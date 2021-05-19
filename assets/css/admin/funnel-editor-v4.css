@@ -187,8 +187,10 @@
 }
 
 .step-flow .step-placeholder {
-    border-style: dashed;
-    opacity: 0.9;
+    border-style: none;
+    opacity: 0.1;
+    background: #000;
+    margin: auto;
 }
 
 .step-flow .step .icon {
