@@ -19,7 +19,7 @@ import "./benchmarks/field-changed";
 import "./benchmarks/form-filled";
 import "./benchmarks/link-clicked";
 import "./benchmarks/logged-in";
-import "./benchmarks/new-user";
+import "./benchmarks/user-registered";
 import "./benchmarks/page-visited";
 import "./benchmarks/plugin-api";
 import "./benchmarks/role-changed";
