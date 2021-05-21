@@ -534,3 +534,95 @@ table.wp-list-table.funnels td.column-active_contacts {
 label.block{
     display: block;
 }
+
+.picker-widget{
+    /*display: flex;*/
+    /*justify-content: space-between;*/
+    background: #FFFFFF;
+    border: 1px solid rgba(16, 38, 64, 0.15);
+    /* box-shadow: 5px 5px 30px rgb(24 45 70 / 5%); */
+    box-sizing: border-box;
+    border-radius: 5px;
+    position: fixed;
+    box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+}
+
+.picker-widget .search-bar{
+    border-bottom: 1px solid rgba(16, 38, 64, 0.15);
+    padding: 10px;
+}
+
+.picker-widget .search-bar input[type=search]{
+    width: 100%;
+}
+
+.picker-widget .emojis,
+.picker-widget .replacements{
+    padding: 10px;
+    max-height: 200px;
+    overflow: auto;
+}
+
+.picker-widget .emojis{
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 400px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    justify-content: flex-start;
+}
+
+.picker-widget .emoji-groups{
+    padding: 8px 5px 0 5px;
+    /*justify-content: space-between;*/
+    border-bottom: 1px solid rgba(16, 38, 64, 0.15);
+    /*flex-wrap: nowrap;*/
+}
+
+.picker-widget .emoji-groups .emoji-group{
+    border-width: 1px 1px 0 1px;
+    border-color: rgba(16, 38, 64, 0.15);
+    border-style: solid;
+    display: inline-block;
+    /*display: flex;*/
+    /*align-items: center;*/
+    /*justify-content: center;*/
+    border-radius: 3px 3px 0 0;
+    margin: 0 2px;
+    font-size: 20px;
+    padding: 4px 2px 2px 2px;
+    height: 22px;
+    text-align: center;
+    background: #f9f9f9;
+    cursor: pointer;
+}
+
+.picker-widget .emoji-groups .emoji-group.focused{
+    border-bottom: 1px solid #fff;
+    margin-bottom: -1px;
+    background: #FFFFFF;
+}
+
+.picker-widget .replacements .group{
+    font-weight: 500;
+}
+
+.picker-widget .replacements .replacement{
+    padding-left: 10px;
+    cursor: pointer;
+}
+
+.picker-widget .emojis .emoji:hover,
+.picker-widget .replacements .replacement:hover,
+.picker-widget .replacements .replacement.focused{
+    background: #0075FF;
+    color: #FFFFFF;
+}
+
+.picker-widget .emojis .emoji{
+    font-size: 17px;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    overflow: hidden;
+}
