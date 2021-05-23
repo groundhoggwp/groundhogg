@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-<<<<<<< HEAD:src/components/storybook-full-example/Page/index.js
+// <<<<<<< HEAD:src/components/storybook-full-example/Page/index.js
 import  { Header } from '../Header/';
-=======
-import  { Header }  from '../Header/';
+// =======
+// import  { Header }  from '../Header/';
 
->>>>>>> react-rebuild:src/components/storybook-example/page/index.js
+// >>>>>>> react-rebuild:src/components/storybook-example/page/index.js
 import './styles.css';
 
 
