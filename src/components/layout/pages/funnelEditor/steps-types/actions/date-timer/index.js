@@ -15,19 +15,20 @@ import { makeStyles } from "@material-ui/core/styles";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ReplayIcon from "@material-ui/icons/Replay";
 import { withStyles } from '@material-ui/core/styles';
-// import DateFnsUtils from '@date-io/date-fns';
-import {
-  // MuiPickersUtilsProvider,
-  KeyboardTimePicker,
-  // KeyboardDatePicker,
-} from '@material-ui/pickers';
 /**
  * Internal dependencies
  */
+ import {
+ 	EMAILS_STORE_NAME
+} from '../../../../../../../data';
+import NewUser from "components/svg/NewUser/";
 import Tag from "components/svg/Tag/";
-import { DatePicker } from "components/core-ui/date-picker";
 import { Toggle } from "components/core-ui/toggle/";
+import { DropDown } from "components/core-ui/drop-down/";
+import { DynamicForm } from "components/core-ui/dynamic-form/";
 import { ACTION, ACTION_TYPE_DEFAULTS } from "../../constants";
+import { DatePicker } from "components/core-ui/date-picker";
+import { TimePicker } from "components/core-ui/time-picker";
 import { registerStepType } from "data/step-type-registry";
 import { createTheme }  from "../../../../../../../theme";
 
@@ -39,9 +40,6 @@ const useStyles = makeStyles((theme) => ({
     width: "calc(100% - 50px)",
     padding: "33px 25px 18px 25px"
   },
-  inputRow:{
-    margin: '10px 0px 0px 15px'
-  }
 }));
 
 const stepAtts = {
@@ -51,43 +49,66 @@ const stepAtts = {
 
   group: ACTION,
 
-  name: "Date Timer",
+  name: "Add Note",
 
   icon: <Tag />,
+
   read: ({ data, meta, stats }) => {
-    return <>Apply Tag</>;
+    return <>Create User</>;
   },
 
   edit: ({ data, meta, stats }) => {
+    const [formData, setFormData] = useState({});
     const classes = useStyles();
 
-    const [date, setDate] = React.useState(getLuxonDate("today"));
+    const hanldeFormChange = (e) => {
+      if(e.target.type === 'checkbox'){
+        formData[e.target.id] = e.target.checked
+      } else {
+        formData[e.target.id] = e.target.value
+      }
 
-    const dateChange = (date) => {
-      setSelectedDate(date);
-    };
+      setFormData(formData)
+    }
 
-    console.log(data, meta, stats, items)
+    const formElements = [
+      {
+      label: 'Wait till:',
+      component: <>
+          <DatePicker
+            dateChange={dateChange}
+            selectedDate={date}
+            label={"start"}
+            id={"start"}
+          />
+          <TimePicker />
 
+            </>
 
+    },
+      {
+      label: 'If date has passed:',
+      component: <>
+          <DropDown id={formData['date-passed']} options={['Owner List goes here']} value={formData['date-passed']} onChange={hanldeFormChange}/>
+          <div>Choose what happens if a contact reaches this timer and the date has already passed.</div>
+
+            </>
+
+    },
+      {
+      label: 'Enable conditional logic:',
+      component: <Toggle id={'conditional-logic'} checked={formData['conditional-logic']} onChange={hanldeFormChange} backgroundColor={theme.palette.primary.main} name="checked" />
+    }
+
+  ]
     return <Card className={classes.root}>
+      <div className={classes.actionLabel}>
+        Create User
+      </div>
 
+      <DynamicForm children={formElements} hanldeFormChange={hanldeFormChange}/>
 
-            <div className={classes.inputRow}>
-              <DatePicker
-                dateChange={dateChange}
-                selectedDate={date}
-                label={"start"}
-                id={"start"}
-              />
-              <label>Content:</label>
-
-            </div>
-            <div className={classes.inputRow}>
-              <label>Enable conditional logic:</label>
-              <Toggle checked={conditionalLogic} onChange={toggleConditionalLogic} name="checked" />
-            </div>
-          </Card>
+    </Card>
 
   },
 };

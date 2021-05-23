@@ -18,8 +18,13 @@ import { withStyles } from '@material-ui/core/styles';
 /**
  * Internal dependencies
  */
-import  Tag  from "components/svg/Tag/";
+ import {
+ 	EMAILS_STORE_NAME
+} from '../../../../../../../data';
+import Tag from "components/svg/Tag/";
 import { Toggle } from "components/core-ui/toggle/";
+import { DropDown } from "components/core-ui/drop-down/";
+import { DynamicForm } from "components/core-ui/dynamic-form/";
 import { ACTION, ACTION_TYPE_DEFAULTS } from "../../constants";
 import { registerStepType } from "data/step-type-registry";
 import { createTheme }  from "../../../../../../../theme";
@@ -32,9 +37,6 @@ const useStyles = makeStyles((theme) => ({
     width: "calc(100% - 50px)",
     padding: "33px 25px 18px 25px"
   },
-  inputRow:{
-    margin: '10px 0px 0px 15px'
-  }
 }));
 
 const stepAtts = {
@@ -47,65 +49,137 @@ const stepAtts = {
   name: "Admin Notification",
 
   icon: <Tag />,
+
   read: ({ data, meta, stats }) => {
-    return <>Apply Tag</>;
+    return <>Create User</>;
   },
 
   edit: ({ data, meta, stats }) => {
+    const [formData, setFormData] = useState({});
     const classes = useStyles();
 
-    const [smsMode, setSmsMode] = useState(false);
-    const [note, setContent] = useState('');
-    const [sendTo, setSendTo] = useState('');
+    const hanldeFormChange = (e) => {
+      if(e.target.type === 'checkbox'){
+        formData[e.target.id] = e.target.checked
+      } else {
+        formData[e.target.id] = e.target.value
+      }
 
-
-    const handleContentChange = () => {
-      setContent(e.target.value)
-    }
-    const toggleSmsMode = () => {
-      setSmsMode(!smsMode)
-    }
-    const handleSendTo = () => {
-      setSendTo(e.target.value)
+      setFormData(formData)
     }
 
-    console.log(data, meta, stats, items)
+    const formElements = [
+      {
+      label: 'Send as SMS:',
+      component: <>
+        <Toggle id={'hide-admin-links'} checked={formData['hide-admin-links']} onChange={hanldeFormChange} backgroundColor={theme.palette.primary.main} name="checked" />
+        Send as text message instead of as an email
+        </>
+    },
+      {
+      label: 'Send To:',
+      component: <>
+                <TextField
+                   id="send-to"
+                   rows={4}
+                   value={note}
+                    onChange={handleNoteChange}
+                   defaultValue="Default Value"
+                 />
+                <div>Use any valid replacement codes</div>
+            </>
 
+    },
+      {
+      label: 'From:',
+      component: <>
+                <TextField
+                   id="from"
+                   rows={4}
+                   value={note}
+                    onChange={handleNoteChange}
+                   defaultValue="Default Value"
+                 />
+                <div>Use any valid replacement codes</div>
+            </>
+
+    },
+      {
+      label: 'Reply To:',
+      component: <>
+                <TextField
+                   id="reply-to"
+                   rows={4}
+                   value={note}
+                    onChange={handleNoteChange}
+                   defaultValue="Default Value"
+                 />
+                <div>Use any valid replacement codes</div>
+            </>
+
+    },
+      {
+      label: 'Subject:',
+      component: <>
+                <TextField
+                   id="subject"
+                   rows={4}
+                   value={note}
+                    onChange={handleNoteChange}
+                   defaultValue="Default Value"
+                 />
+                <div>Use any valid replacement codes</div>
+            </>
+
+    },
+      {
+      label: 'Content:',
+      component: <>
+                <TextField
+                   id="content"
+                   rows={4}
+                   value={note}
+                    onChange={handleNoteChange}
+                   defaultValue="Default Value"
+                 />
+                <div>Use any valid replacement codes</div>
+            </>
+
+    },
+      {
+      label: 'Content:',
+      component: <>
+                <TextField
+                   id="content"
+                   label="Multiline"
+                   multiline
+                   rows={4}
+                   value={formData['content']}
+                    onChange={handleNoteChange}
+                   defaultValue="Default Value"
+                 />
+                <div>Use any valid replacement codes</div>
+            </>
+
+    },
+      {
+      label: 'Hide admin links:',
+      component: <Toggle id={'hide-admin-links'} checked={formData['hide-admin-links']} onChange={hanldeFormChange} backgroundColor={theme.palette.primary.main} name="checked" />
+    },
+      {
+      label: 'Enable conditional logic:',
+      component: <Toggle id={'conditional-logic'} checked={formData['conditional-logic']} onChange={hanldeFormChange} backgroundColor={theme.palette.primary.main} name="checked" />
+    }
+
+  ]
     return <Card className={classes.root}>
+      <div className={classes.actionLabel}>
+        Admin Notification
+      </div>
 
+      <DynamicForm children={formElements} hanldeFormChange={hanldeFormChange}/>
 
-            <div className={classes.inputRow}>
-              <label>Send as SMS:</label>
-              <Toggle checked={smsMode} onChange={toggleSmsMode} name="checked" />
-            </div>
-            <div className={classes.inputRow}>
-              <label>Send to:</label>
-              <TextField
-                 id="standard-multiline-static"
-                 label="Send To"
-                 value={sendTo}
-                  onChange={handleSendTo}
-                 defaultValue="Default Value"
-               />
-            </div>
-            <div className={classes.inputRow}>
-              <label>Content:</label>
-              <TextField
-                 id="standard-multiline-static"
-                 label="Multiline"
-                 multiline
-                 rows={4}
-                 value={note}
-                  onChange={handleContentChange}
-                 defaultValue="Default Value"
-               />
-              <div>Use any valid replacement codes</div>
-            </div>
-            <div className={classes.inputRow}>
-              <label>Enable conditional logic:</label>
-              <Toggle checked={conditionalLogic} onChange={toggleConditionalLogic} name="checked" />
-            </div>
-          </Card>
+    </Card>
 
   },
 };

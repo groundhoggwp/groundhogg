@@ -22,28 +22,23 @@ import { withStyles } from '@material-ui/core/styles';
  	EMAILS_STORE_NAME
 } from '../../../../../../../data';
 import NewUser from "components/svg/NewUser/";
+import Tag from "components/svg/Tag/";
 import { Toggle } from "components/core-ui/toggle/";
 import { DropDown } from "components/core-ui/drop-down/";
 import { DynamicForm } from "components/core-ui/dynamic-form/";
 import { ACTION, ACTION_TYPE_DEFAULTS } from "../../constants";
+import { DatePicker } from "components/core-ui/date-picker";
+import { TimePicker } from "components/core-ui/time-picker";
 import { registerStepType } from "data/step-type-registry";
 import { createTheme }  from "../../../../../../../theme";
 
-const STEP_TYPE = "delay_timer";
+const STEP_TYPE = "add_note";
 
 const theme = createTheme({});
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "calc(100% - 50px)",
     padding: "33px 25px 18px 25px"
-  },
-  actionLabel: {
-    color: "#102640",
-    width: "250px",
-    display: "inline-block",
-    marginBottom: "10px",
-    fontSize: "16px",
-    fontWeight: "500",
   },
 }));
 
@@ -54,49 +49,15 @@ const stepAtts = {
 
   group: ACTION,
 
-  name: "Delay Timer",
+  name: "Add Note",
 
-  icon: <NewUser />,
+  icon: <Tag />,
 
   read: ({ data, meta, stats }) => {
-    return <>Delay Timer</>;
+    return <>Create User</>;
   },
 
   edit: ({ data, meta, stats }) => {
-
-    const timeOptions = [
-      {
-        display: 'Minutes',
-        value: 'minutes'
-      },
-      {
-        display: 'Hours',
-        value: 'hours'
-      },
-      {
-        display: 'Days',
-        value: 'days'
-      },
-      {
-        display: 'Weeks',
-        value: 'weeks'
-      },
-      {
-        display: 'Months',
-        value: 'months'
-      }
-    ]
-    const runOptions = [
-      {
-        display: 'Immediately',
-        value: 'immediately'
-      },
-      {
-        display: 'At time of day',
-        value: 'at-time-of-day'
-      }
-    ]
-
     const [formData, setFormData] = useState({});
     const classes = useStyles();
 
@@ -110,18 +71,34 @@ const stepAtts = {
       setFormData(formData)
     }
 
-
-
     const formElements = [
+
       {
-      label: 'Wait at least',
-      component: <><input id={'wait-time'} value={formData['wait-time']} type="number" onChange={hanldeFormChange}/><DropDown id={'time-format'} options={timeOptions} value={formData['time-format']} onChange={hanldeFormChange}/>
-      <br/>This role will be added to the new user. If the user already exists, the role will be added in addition to existing roles.</>
+      label: 'Wait at least:',
+      component: <>
+          <TextField
+             id="standard-multiline-static"
+             label="Multiline"
+             multiline
+             rows={4}
+             value={note}
+              onChange={handleNoteChange}
+             defaultValue="Default Value"
+           />
+          <DropDown id={formData['date-passed']} options={['Owner List goes here']} value={formData['date-passed']} onChange={hanldeFormChange}/>
+          <div>Choose what happens if a contact reaches this timer and the date has already passed.</div>
+
+            </>
+
     },
       {
       label: 'And run:',
-      component: <><DropDown id={'execution-time'} options={runOptions} value={formData['execution-time']} onChange={hanldeFormChange}/>
-      <br/><Toggle id={'run-in-localtime'} checked={formData['run-in-localtime']} onChange={hanldeFormChange} backgroundColor={theme.palette.primary.main} name="checked" /> Run in the contact's local time.</>
+      component: <>          
+          <DropDown id={formData['date-passed']} options={['Owner List goes here']} value={formData['date-passed']} onChange={hanldeFormChange}/>
+          <Toggle id={'conditional-logic'} checked={formData['conditional-logic']} onChange={hanldeFormChange} backgroundColor={theme.palette.primary.main} name="checked" />
+
+            </>
+
     },
       {
       label: 'Enable conditional logic:',
@@ -131,7 +108,7 @@ const stepAtts = {
   ]
     return <Card className={classes.root}>
       <div className={classes.actionLabel}>
-        Delay Timer
+        Create User
       </div>
 
       <DynamicForm children={formElements} hanldeFormChange={hanldeFormChange}/>

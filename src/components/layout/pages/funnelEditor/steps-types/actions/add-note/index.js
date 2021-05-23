@@ -18,8 +18,14 @@ import { withStyles } from '@material-ui/core/styles';
 /**
  * Internal dependencies
  */
+ import {
+ 	EMAILS_STORE_NAME
+} from '../../../../../../../data';
+import NewUser from "components/svg/NewUser/";
 import Tag from "components/svg/Tag/";
 import { Toggle } from "components/core-ui/toggle/";
+import { DropDown } from "components/core-ui/drop-down/";
+import { DynamicForm } from "components/core-ui/dynamic-form/";
 import { ACTION, ACTION_TYPE_DEFAULTS } from "../../constants";
 import { registerStepType } from "data/step-type-registry";
 import { createTheme }  from "../../../../../../../theme";
@@ -32,9 +38,6 @@ const useStyles = makeStyles((theme) => ({
     width: "calc(100% - 50px)",
     padding: "33px 25px 18px 25px"
   },
-  inputRow:{
-    margin: '10px 0px 0px 15px'
-  }
 }));
 
 const stepAtts = {
@@ -47,43 +50,56 @@ const stepAtts = {
   name: "Add Note",
 
   icon: <Tag />,
+
   read: ({ data, meta, stats }) => {
-    return <>Apply Tag</>;
+    return <>Create User</>;
   },
 
   edit: ({ data, meta, stats }) => {
+    const [formData, setFormData] = useState({});
     const classes = useStyles();
 
-    const [note, setNote] = useState('');
+    const hanldeFormChange = (e) => {
+      if(e.target.type === 'checkbox'){
+        formData[e.target.id] = e.target.checked
+      } else {
+        formData[e.target.id] = e.target.value
+      }
 
-
-    const handleNoteChange = () => {
-      setNote(e.target.value)
+      setFormData(formData)
     }
 
-    console.log(data, meta, stats, items)
+    const formElements = [
+      {
+      label: 'Content:',
+      component: <>
+                <TextField
+                   id="standard-multiline-static"
+                   label="Multiline"
+                   multiline
+                   rows={4}
+                   value={note}
+                    onChange={handleNoteChange}
+                   defaultValue="Default Value"
+                 />
+                <div>Use any valid replacement codes</div>
+            </>
 
+    },
+      {
+      label: 'Enable conditional logic:',
+      component: <Toggle id={'conditional-logic'} checked={formData['conditional-logic']} onChange={hanldeFormChange} backgroundColor={theme.palette.primary.main} name="checked" />
+    }
+
+  ]
     return <Card className={classes.root}>
+      <div className={classes.actionLabel}>
+        Create User
+      </div>
 
+      <DynamicForm children={formElements} hanldeFormChange={hanldeFormChange}/>
 
-            <div className={classes.inputRow}>
-              <label>Content:</label>
-              <TextField
-                 id="standard-multiline-static"
-                 label="Multiline"
-                 multiline
-                 rows={4}
-                 value={note}
-                  onChange={handleNoteChange}
-                 defaultValue="Default Value"
-               />
-              <div>Use any valid replacement codes</div>
-            </div>
-            <div className={classes.inputRow}>
-              <label>Enable conditional logic:</label>
-              <Toggle checked={conditionalLogic} onChange={toggleConditionalLogic} name="checked" />
-            </div>
-          </Card>
+    </Card>
 
   },
 };

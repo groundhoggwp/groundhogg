@@ -22,10 +22,13 @@ import { withStyles } from '@material-ui/core/styles';
  	EMAILS_STORE_NAME
 } from '../../../../../../../data';
 import NewUser from "components/svg/NewUser/";
+import Tag from "components/svg/Tag/";
 import { Toggle } from "components/core-ui/toggle/";
 import { DropDown } from "components/core-ui/drop-down/";
 import { DynamicForm } from "components/core-ui/dynamic-form/";
 import { ACTION, ACTION_TYPE_DEFAULTS } from "../../constants";
+import { DatePicker } from "components/core-ui/date-picker";
+import { TimePicker } from "components/core-ui/time-picker";
 import { registerStepType } from "data/step-type-registry";
 import { createTheme }  from "../../../../../../../theme";
 
@@ -37,14 +40,6 @@ const useStyles = makeStyles((theme) => ({
     width: "calc(100% - 50px)",
     padding: "33px 25px 18px 25px"
   },
-  actionLabel: {
-    color: "#102640",
-    width: "250px",
-    display: "inline-block",
-    marginBottom: "10px",
-    fontSize: "16px",
-    fontWeight: "500",
-  },
 }));
 
 const stepAtts = {
@@ -54,49 +49,15 @@ const stepAtts = {
 
   group: ACTION,
 
-  name: "Delay Timer",
+  name: "http post",
 
-  icon: <NewUser />,
+  icon: <Tag />,
 
   read: ({ data, meta, stats }) => {
-    return <>HTTP Post</>;
+    return <>Create User</>;
   },
 
   edit: ({ data, meta, stats }) => {
-
-    const timeOptions = [
-      {
-        display: 'Minutes',
-        value: 'minutes'
-      },
-      {
-        display: 'Hours',
-        value: 'hours'
-      },
-      {
-        display: 'Days',
-        value: 'days'
-      },
-      {
-        display: 'Weeks',
-        value: 'weeks'
-      },
-      {
-        display: 'Months',
-        value: 'months'
-      }
-    ]
-    const runOptions = [
-      {
-        display: 'Immediately',
-        value: 'immediately'
-      },
-      {
-        display: 'At time of day',
-        value: 'at-time-of-day'
-      }
-    ]
-
     const [formData, setFormData] = useState({});
     const classes = useStyles();
 
@@ -110,17 +71,66 @@ const stepAtts = {
       setFormData(formData)
     }
 
-
-
     const formElements = [
+
       {
-        label: 'And run:',
-        component: <><Toggle checked={formData['toggle']} onChange={hanldeFormChange} name="toggle" /></>
-      },
+      label: 'Wait at least:',
+      component: <>
+          <TextField
+             id="standard-multiline-static"
+             label="Multiline"
+             multiline
+             rows={4}
+             value={note}
+              onChange={handleNoteChange}
+             defaultValue="Default Value"
+           />
+          <DropDown id={formData['date-passed']} options={['Owner List goes here']} value={formData['date-passed']} onChange={hanldeFormChange}/>
+          <DropDown id={formData['date-passed']} options={['Owner List goes here']} value={formData['date-passed']} onChange={hanldeFormChange}/>
+          <div>Choose what happens if a contact reaches this timer and the date has already passed.</div>
+
+            </>
+
+    },
+      {
+      label: 'Date Field:',
+      component: <>
+          <TextField
+             id="standard-multiline-static"
+             label="Multiline"
+             multiline
+             rows={4}
+             value={note}
+              onChange={handleNoteChange}
+             defaultValue="Default Value"
+           />
+
+            </>
+
+    },
+      {
+      label: 'And run:',
+      component: <>
+          <DropDown id={formData['date-passed']} options={['Owner List goes here']} value={formData['date-passed']} onChange={hanldeFormChange}/>
+          <Toggle id={'conditional-logic'} checked={formData['conditional-logic']} onChange={hanldeFormChange} backgroundColor={theme.palette.primary.main} name="checked" />
+
+            </>
+
+    },
+      {
+      label: 'If date has passed:',
+      component: <>
+          <DropDown id={formData['date-passed']} options={['Owner List goes here']} value={formData['date-passed']} onChange={hanldeFormChange}/>
+          <Toggle id={'conditional-logic'} checked={formData['conditional-logic']} onChange={hanldeFormChange} backgroundColor={theme.palette.primary.main} name="checked" />
+
+            </>
+
+    },
       {
       label: 'Enable conditional logic:',
       component: <Toggle id={'conditional-logic'} checked={formData['conditional-logic']} onChange={hanldeFormChange} backgroundColor={theme.palette.primary.main} name="checked" />
     }
+
   ]
     return <Card className={classes.root}>
       <div className={classes.actionLabel}>
