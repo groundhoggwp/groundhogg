@@ -52,7 +52,7 @@ const stepAtts = {
   icon: <Tag />,
 
   read: ({ data, meta, stats }) => {
-    return <>Create User</>;
+    return <>HTTP Post</>;
   },
 
   edit: ({ data, meta, stats }) => {

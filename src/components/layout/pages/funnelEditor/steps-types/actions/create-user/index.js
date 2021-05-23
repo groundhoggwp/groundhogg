@@ -52,7 +52,53 @@ const stepAtts = {
   },
 
   edit: ({ data, meta, stats }) => {
-    const ownerTypes = ["Sales Manager"];
+    const [formData, setFormData] = useState({});
+    const classes = useStyles();
+
+    const hanldeFormChange = (e) => {
+      if (e.target.type === "checkbox") {
+        formData[e.target.id] = e.target.checked;
+      } else {
+        formData[e.target.id] = e.target.value;
+      }
+
+      setFormData(formData);
+    };
+
+    const ownerTypes = [
+      {
+        display: "Sales Representative",
+        value: "sales-Representative",
+      },
+      {
+        display: "Sales Manager",
+        value: "sales-manager",
+      },
+      {
+        display: "Marketer",
+        value: "marketer",
+      },
+      {
+        display: "Subscriber",
+        value: "subscriber",
+      },
+      {
+        display: "Contributor",
+        value: "contributor",
+      },
+      {
+        display: "Author",
+        value: "author",
+      },
+      {
+        display: "Editor",
+        value: "editor",
+      },
+      {
+        display: "Adminstrator",
+        value: "adminstrator",
+      },
+    ];
     const formElements = [
       {
         label: "User Role",
@@ -60,12 +106,13 @@ const stepAtts = {
           <>
             <DropDown
               id={formData["owner"]}
-              options={["Owner List goes here"]}
+              options={ownerTypes}
               value={formData["owner"]}
               onChange={hanldeFormChange}
             />
             <br />
-            Selecting more than 1 owner will create a round robin..
+            This role will be added to the new user. If the user already exists,
+            the role will be added in addition to existing roles.
           </>
         ),
       },

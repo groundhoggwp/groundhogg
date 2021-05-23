@@ -30,7 +30,7 @@ import { TimePicker } from "components/core-ui/time-picker";
 import { registerStepType } from "data/step-type-registry";
 import { createTheme } from "../../../../../../../theme";
 
-const STEP_TYPE = "add_note";
+const STEP_TYPE = "delay_timer";
 
 const theme = createTheme({});
 const useStyles = makeStyles((theme) => ({
@@ -47,7 +47,7 @@ const stepAtts = {
 
   group: ACTION,
 
-  name: "Add Note",
+  name: "Delay Timer",
 
   icon: <Tag />,
 
@@ -69,30 +69,56 @@ const stepAtts = {
       setFormData(formData);
     };
 
+    const timeOptions = [
+      {
+        display: "Minutes",
+        value: "minutes",
+      },
+      {
+        display: "Hours",
+        value: "hours",
+      },
+      {
+        display: "Days",
+        value: "days",
+      },
+      {
+        display: "Weeks",
+        value: "weeks",
+      },
+      {
+        display: "Months",
+        value: "months",
+      },
+    ];
+
+    const runTimeOptions = [
+      {
+        display: "Immediately",
+        value: "immediately",
+      },
+      {
+        display: "At time of day",
+        value: "at-time-of-day",
+      },
+    ];
+
     const formElements = [
       {
         label: "Wait at least:",
         component: (
           <>
-            <TextField
-              id="standard-multiline-static"
-              label="Multiline"
-              multiline
-              rows={4}
-              value={note}
-              onChange={handleNoteChange}
-              defaultValue="Default Value"
-            />
-            <DropDown
-              id={formData["date-passed"]}
-              options={["Owner List goes here"]}
-              value={formData["date-passed"]}
+            <input
+              id="wait-time-number"
+              value={formData["wait-time-number"]}
               onChange={hanldeFormChange}
             />
-            <div>
-              Choose what happens if a contact reaches this timer and the date
-              has already passed.
-            </div>
+            <DropDown
+              id={"wait-time-type"}
+              options={timeOptions}
+              value={formData["wait-time-type"]}
+              onChange={hanldeFormChange}
+            />
           </>
         ),
       },
@@ -102,17 +128,21 @@ const stepAtts = {
           <>
             <DropDown
               id={formData["date-passed"]}
-              options={["Owner List goes here"]}
+              options={runTimeOptions}
               value={formData["date-passed"]}
               onChange={hanldeFormChange}
             />
-            <Toggle
-              id={"conditional-logic"}
-              checked={formData["conditional-logic"]}
-              onChange={hanldeFormChange}
-              backgroundColor={theme.palette.primary.main}
-              name="checked"
-            />
+
+            <div>
+              Run in the contact's local time.
+              <Toggle
+                id={"conditional-logic"}
+                checked={formData["conditional-logic"]}
+                onChange={hanldeFormChange}
+                backgroundColor={theme.palette.primary.main}
+                name="checked"
+              />
+            </div>
           </>
         ),
       },
@@ -131,7 +161,7 @@ const stepAtts = {
     ];
     return (
       <Card className={classes.root}>
-        <div className={classes.actionLabel}>Create User</div>
+        <div className={classes.actionLabel}>Delay Timer</div>
 
         <DynamicForm
           children={formElements}
