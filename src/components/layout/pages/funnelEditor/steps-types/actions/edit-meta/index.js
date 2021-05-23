@@ -5,7 +5,7 @@ import { __ } from "@wordpress/i18n";
 import { Fragment, useState } from "@wordpress/element";
 import { PinnedItems } from "@wordpress/interface";
 import { Inserter } from "@wordpress/block-editor";
-import { useSelect, useDispatch } from '@wordpress/data'
+import { useSelect, useDispatch } from "@wordpress/data";
 
 /**
  * External dependencies
@@ -14,13 +14,11 @@ import { Button, Card, Switch, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ReplayIcon from "@material-ui/icons/Replay";
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from "@material-ui/core/styles";
 /**
  * Internal dependencies
  */
- import {
- 	EMAILS_STORE_NAME
-} from '../../../../../../../data';
+import { EMAILS_STORE_NAME } from "../../../../../../../data";
 import NewUser from "components/svg/NewUser/";
 import Tag from "components/svg/Tag/";
 import { Toggle } from "components/core-ui/toggle/";
@@ -30,7 +28,7 @@ import { ACTION, ACTION_TYPE_DEFAULTS } from "../../constants";
 import { DatePicker } from "components/core-ui/date-picker";
 import { TimePicker } from "components/core-ui/time-picker";
 import { registerStepType } from "data/step-type-registry";
-import { createTheme }  from "../../../../../../../theme";
+import { createTheme } from "../../../../../../../theme";
 
 const STEP_TYPE = "add_note";
 
@@ -38,7 +36,7 @@ const theme = createTheme({});
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "calc(100% - 50px)",
-    padding: "33px 25px 18px 25px"
+    padding: "33px 25px 18px 25px",
   },
 }));
 
@@ -62,69 +60,111 @@ const stepAtts = {
     const classes = useStyles();
 
     const hanldeFormChange = (e) => {
-      if(e.target.type === 'checkbox'){
-        formData[e.target.id] = e.target.checked
+      if (e.target.type === "checkbox") {
+        formData[e.target.id] = e.target.checked;
       } else {
-        formData[e.target.id] = e.target.value
+        formData[e.target.id] = e.target.value;
       }
 
-      setFormData(formData)
-    }
+      setFormData(formData);
+    };
 
     const formElements = [
-
       {
-      label: 'Wait at least:',
-      component: <>
-          <TextField
-             id="standard-multiline-static"
-             label="Multiline"
-             multiline
-             rows={4}
-             value={note}
+        label: "Wait at least:",
+        component: (
+          <>
+            <TextField
+              id="standard-multiline-static"
+              label="Multiline"
+              multiline
+              rows={4}
+              value={note}
               onChange={handleNoteChange}
-             defaultValue="Default Value"
-           />
-          <DropDown id={formData['date-passed']} options={['Owner List goes here']} value={formData['date-passed']} onChange={hanldeFormChange}/>
-          <DropDown id={formData['date-passed']} options={['Owner List goes here']} value={formData['date-passed']} onChange={hanldeFormChange}/>
-          <div>Choose what happens if a contact reaches this timer and the date has already passed.</div>
-
-            </>
-
-    },
+              defaultValue="Default Value"
+            />
+            <DropDown
+              id={formData["date-passed"]}
+              options={["Owner List goes here"]}
+              value={formData["date-passed"]}
+              onChange={hanldeFormChange}
+            />
+            <DropDown
+              id={formData["date-passed"]}
+              options={["Owner List goes here"]}
+              value={formData["date-passed"]}
+              onChange={hanldeFormChange}
+            />
+            <div>
+              Choose what happens if a contact reaches this timer and the date
+              has already passed.
+            </div>
+          </>
+        ),
+      },
       {
-      label: 'And run:',
-      component: <>
-          <DropDown id={formData['date-passed']} options={['Owner List goes here']} value={formData['date-passed']} onChange={hanldeFormChange}/>
-          <Toggle id={'conditional-logic'} checked={formData['conditional-logic']} onChange={hanldeFormChange} backgroundColor={theme.palette.primary.main} name="checked" />
-
-            </>
-
-    },
+        label: "And run:",
+        component: (
+          <>
+            <DropDown
+              id={formData["date-passed"]}
+              options={["Owner List goes here"]}
+              value={formData["date-passed"]}
+              onChange={hanldeFormChange}
+            />
+            <Toggle
+              id={"conditional-logic"}
+              checked={formData["conditional-logic"]}
+              onChange={hanldeFormChange}
+              backgroundColor={theme.palette.primary.main}
+              name="checked"
+            />
+          </>
+        ),
+      },
       {
-      label: 'If date has passed:',
-      component: <>
-          <DropDown id={formData['date-passed']} options={['Owner List goes here']} value={formData['date-passed']} onChange={hanldeFormChange}/>
-          <Toggle id={'conditional-logic'} checked={formData['conditional-logic']} onChange={hanldeFormChange} backgroundColor={theme.palette.primary.main} name="checked" />
-
-            </>
-
-    },
+        label: "If date has passed:",
+        component: (
+          <>
+            <DropDown
+              id={formData["date-passed"]}
+              options={["Owner List goes here"]}
+              value={formData["date-passed"]}
+              onChange={hanldeFormChange}
+            />
+            <Toggle
+              id={"conditional-logic"}
+              checked={formData["conditional-logic"]}
+              onChange={hanldeFormChange}
+              backgroundColor={theme.palette.primary.main}
+              name="checked"
+            />
+          </>
+        ),
+      },
       {
-      label: 'Enable conditional logic:',
-      component: <Toggle id={'conditional-logic'} checked={formData['conditional-logic']} onChange={hanldeFormChange} backgroundColor={theme.palette.primary.main} name="checked" />
-    }
+        label: "Enable conditional logic:",
+        component: (
+          <Toggle
+            id={"conditional-logic"}
+            checked={formData["conditional-logic"]}
+            onChange={hanldeFormChange}
+            backgroundColor={theme.palette.primary.main}
+            name="checked"
+          />
+        ),
+      },
+    ];
+    return (
+      <Card className={classes.root}>
+        <div className={classes.actionLabel}>Create User</div>
 
-  ]
-    return <Card className={classes.root}>
-      <div className={classes.actionLabel}>
-        Create User
-      </div>
-
-      <DynamicForm children={formElements} hanldeFormChange={hanldeFormChange}/>
-
-    </Card>
-
+        <DynamicForm
+          children={formElements}
+          hanldeFormChange={hanldeFormChange}
+        />
+      </Card>
+    );
   },
 };
 

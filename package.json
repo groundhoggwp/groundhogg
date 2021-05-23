@@ -12,7 +12,7 @@
     "lint:md": "wp-scripts lint-md",
     "lint:pkg-json": "wp-scripts lint-pkg-json",
     "packages-update": "wp-scripts packages-update",
-    "prettier": "prettier --write {,src/components/core-ui/block-editor/*/**/}*.{js,scss}",
+    "prettier": "prettier --write {,src/components/layout/pages/funnelEditor/steps-types/actions/**/}*.{js,scss}",
     "prettier-all": "prettier --check {,src/*/**/}*.{js,scss}",
     "start": "wp-scripts start",
     "test:e2e": "wp-scripts test-e2e",
