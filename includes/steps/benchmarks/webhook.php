@@ -44,7 +44,7 @@ class Webhook extends Benchmark {
 	 * @return string
 	 */
 	public function get_type() {
-		return 'webhook';
+		return 'webhook_listener';
 	}
 
 	/**
