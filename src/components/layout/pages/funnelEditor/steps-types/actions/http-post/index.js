@@ -10,7 +10,13 @@ import { useSelect, useDispatch } from "@wordpress/data";
 /**
  * External dependencies
  */
-import { Button, Card, Switch, TextField } from "@material-ui/core";
+import {
+  Button,
+  Card,
+  CardContent,
+  Switch,
+  TextField,
+} from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ReplayIcon from "@material-ui/icons/Replay";
@@ -35,8 +41,8 @@ const STEP_TYPE = "http_post";
 const theme = createTheme({});
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: "calc(100% - 50px)",
-    padding: "33px 25px 18px 25px",
+    // width: "calc(100% - 50px)",
+    // padding: "33px 25px 18px 25px",
   },
 }));
 
@@ -71,36 +77,36 @@ const stepAtts = {
 
     const methodOptions = [
       {
-        display: 'POST',
-        value: 'post'
+        display: "POST",
+        value: "post",
       },
       {
-        display: 'PUT',
-        value: 'put'
+        display: "PUT",
+        value: "put",
       },
       {
-        display: 'PATCH',
-        value: 'patch'
+        display: "PATCH",
+        value: "patch",
       },
       {
-        display: 'GET',
-        value: 'GET'
+        display: "GET",
+        value: "GET",
       },
       {
-        display: 'DELETE',
-        value: 'delete'
-      }
-    ]
+        display: "DELETE",
+        value: "delete",
+      },
+    ];
     const contentTypeOptions = [
       {
-        display: 'x-www-form-urlencoded',
-        value: 'x-www-form-urlencoded'
+        display: "x-www-form-urlencoded",
+        value: "x-www-form-urlencoded",
       },
       {
-        display: 'JSON',
-        value: 'json'
+        display: "JSON",
+        value: "json",
       },
-    ]
+    ];
 
     const formElements = [
       {
@@ -108,12 +114,11 @@ const stepAtts = {
         component: (
           <>
             <DropDown
-              id={'method'}
+              id={"method"}
               options={methodOptions}
               value={formData["method"]}
               onChange={hanldeFormChange}
             />
-
           </>
         ),
       },
@@ -121,14 +126,12 @@ const stepAtts = {
         label: "Target URL:",
         component: (
           <>
-
             <input
               id="target-url"
-              value={formData['target-url']}
+              value={formData["target-url"]}
               onChange={handleFormChange}
               defaultValue="Default Value"
             />
-
           </>
         ),
       },
@@ -137,12 +140,11 @@ const stepAtts = {
         component: (
           <>
             <DropDown
-              id={'method'}
+              id={"method"}
               options={contentTypeOptions}
               value={formData["method"]}
               onChange={hanldeFormChange}
             />
-
           </>
         ),
       },
@@ -161,12 +163,14 @@ const stepAtts = {
     ];
     return (
       <Card className={classes.root}>
-        <div className={classes.actionLabel}>HTTP Post</div>
+        <CardContent>
+          <div className={classes.actionLabel}>HTTP Post</div>
 
-        <DynamicForm
-          children={formElements}
-          hanldeFormChange={hanldeFormChange}
-        />
+          <DynamicForm
+            children={formElements}
+            hanldeFormChange={hanldeFormChange}
+          />
+        </CardContent>
       </Card>
     );
   },

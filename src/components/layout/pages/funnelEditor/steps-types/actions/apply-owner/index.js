@@ -10,7 +10,13 @@ import { useSelect, useDispatch } from "@wordpress/data";
 /**
  * External dependencies
  */
-import { Button, Card, Switch, TextField } from "@material-ui/core";
+import {
+  Button,
+  Card,
+  CardContent,
+  Switch,
+  TextField,
+} from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ReplayIcon from "@material-ui/icons/Replay";
@@ -32,8 +38,8 @@ const STEP_TYPE = "apply_owner";
 const theme = createTheme({});
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: "calc(100% - 50px)",
-    padding: "33px 25px 18px 25px",
+    // width: "calc(100% - 50px)",
+    // padding: "33px 25px 18px 25px",
   },
 }));
 
@@ -84,12 +90,14 @@ const stepAtts = {
     ];
     return (
       <Card className={classes.root}>
-        <div className={classes.actionLabel}>Apply Owner</div>
+        <CardContent>
+          <div className={classes.actionLabel}>Apply Owner</div>
 
-        <DynamicForm
-          children={formElements}
-          hanldeFormChange={hanldeFormChange}
-        />
+          <DynamicForm
+            children={formElements}
+            hanldeFormChange={hanldeFormChange}
+          />
+        </CardContent>
       </Card>
     );
   },
