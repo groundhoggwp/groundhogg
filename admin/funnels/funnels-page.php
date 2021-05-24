@@ -159,6 +159,7 @@ class Funnels_Page extends Admin_Page {
 	 * enqueue editor scripts
 	 */
 	public function scripts() {
+		wp_enqueue_editor();
 		wp_enqueue_style( 'groundhogg-admin' );
 		wp_enqueue_style( 'groundhogg-admin-funnel-editor' );
 		wp_enqueue_script( 'groundhogg-admin-funnel-editor' );

@@ -138,28 +138,54 @@ class Scripts {
 //		wp_deregister_script( 'moment-js' );
 		wp_register_script( 'moment-js', GROUNDHOGG_ASSETS_URL . 'lib/calendar/js/moment.min.js' );
 		wp_register_script( 'baremetrics-calendar', GROUNDHOGG_ASSETS_URL . 'lib/calendar/js/Calendar.min.js' );
-
-		wp_register_script( 'groundhogg-admin-data', GROUNDHOGG_ASSETS_URL . 'js/admin/data' . $dot_min . '.js', [
-			'jquery'
-		]);
+//
+//		wp_register_script( 'groundhogg-tinymce-plugin', GROUNDHOGG_ASSETS_URL . 'js/admin/tiny-mce-groundhogg-plugin' . $dot_min . '.js', [], GROUNDHOGG_VERSION, true );
+//
+//		add_action( 'wp_enqueue_editor', function (){
+//			wp_enqueue_script( 'groundhogg-tinymce-plugin' );
+//		} );
 
 		// Basic Admin Scripts
 		wp_register_script( 'groundhogg-admin', GROUNDHOGG_ASSETS_URL . 'js/admin/admin' . $dot_min . '.js', [
 			'jquery',
 			'select2',
 			'jquery-ui-autocomplete',
-			'groundhogg-admin-data'
 		], GROUNDHOGG_VERSION, true );
+
+		wp_register_script( 'groundhogg-admin-data', GROUNDHOGG_ASSETS_URL . 'js/admin/data' . $dot_min . '.js', [
+			'jquery',
+			'groundhogg-admin',
+		] );
+
+		wp_register_script( 'groundhogg-admin-insert-at-cursor', GROUNDHOGG_ASSETS_URL . 'js/admin/insert-at-cursor' . $dot_min . '.js', [
+			'jquery',
+		], GROUNDHOGG_VERSION );
+
+		wp_register_script( 'groundhogg-admin-replacements-picker', GROUNDHOGG_ASSETS_URL . 'js/admin/replacements-picker' . $dot_min . '.js', [
+			'jquery',
+			'groundhogg-admin',
+			'groundhogg-admin-insert-at-cursor'
+		] );
+
+		wp_register_script( 'groundhogg-admin-emojis-picker', GROUNDHOGG_ASSETS_URL . 'js/admin/emoji-picker' . $dot_min . '.js', [
+			'jquery',
+			'groundhogg-admin',
+			'groundhogg-admin-insert-at-cursor',
+		] );
+
+		wp_localize_script( 'groundhogg-admin-emojis-picker', 'Emojis', json_decode( file_get_contents( GROUNDHOGG_ASSETS_PATH . 'lib/emojis.json' ), true ) );
 
 		wp_register_script( 'groundhogg-admin-functions', GROUNDHOGG_ASSETS_URL . 'js/admin/functions' . $dot_min . '.js', [
 			'jquery',
 			'select2',
 			'jquery-ui-autocomplete'
 		], GROUNDHOGG_VERSION, true );
+
 		wp_register_script( 'groundhogg-admin-color', GROUNDHOGG_ASSETS_URL . 'js/admin/color-picker' . $dot_min . '.js', [
 			'jquery',
 			'wp-color-picker'
 		], GROUNDHOGG_VERSION, true );
+
 		wp_register_script( 'groundhogg-admin-contact-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/contact-editor' . $dot_min . '.js', [
 			'jquery',
 			'jquery-ui-sortable'
@@ -188,8 +214,13 @@ class Scripts {
 			'jquery',
 			'jquery-ui-draggable',
 			'jquery-ui-sortable',
+			'groundhogg-admin',
+			'groundhogg-admin-data',
 			'groundhogg-admin-functions',
-			'groundhogg-admin-context-menu'
+			'groundhogg-admin-context-menu',
+			'groundhogg-admin-replacements-picker',
+			'groundhogg-admin-emojis-picker',
+//			'groundhogg-tinymce-plugin'
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-context-menu', GROUNDHOGG_ASSETS_URL . 'js/admin/context-menu' . $dot_min . '.js', [], GROUNDHOGG_VERSION, true );
@@ -257,7 +288,7 @@ class Scripts {
 			'v4'       => [
 				'tags'    => rest_url( Base_Api::NAME_SPACE . '/tags' ),
 				'funnels' => rest_url( Base_Api::NAME_SPACE . '/funnels' )
-			]
+			],
 		] );
 
 		wp_localize_script( 'groundhogg-admin', 'groundhogg_nonces', [
@@ -268,9 +299,9 @@ class Scripts {
 			'_ajax_linking_nonce' => wp_create_nonce( 'internal-linking' ),
 		] );
 
-		wp_localize_script( 'groundhogg-admin-data', 'Groundhogg', [
-			'test'   => 'Hello World!',
-			'api' => [
+		wp_localize_script( 'groundhogg-admin', 'Groundhogg', [
+			'test'         => 'Hello World!',
+			'api'          => [
 				'routes' => [
 					'v3' => [
 						'tags'     => rest_url( 'gh/v3/tags?select2=true' ),
@@ -285,6 +316,10 @@ class Scripts {
 						'funnels'  => rest_url( Base_Api::NAME_SPACE . '/funnels' )
 					]
 				]
+			],
+			'replacements' => [
+				'groups' => Plugin::instance()->replacements->replacement_code_groups,
+				'codes'  => Plugin::instance()->replacements->replacement_codes
 			],
 		] );
 

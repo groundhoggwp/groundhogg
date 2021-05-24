@@ -1,66 +1,6 @@
 (function (Funnel, $) {
 
-  const Tags = {
-
-    limit: 100,
-    offset: 0,
-    items: [],
-
-    get (id) {
-
-    },
-
-    validate (maybeTags, callback) {
-      var self = this
-
-      fetch(`${Groundhogg.endpoints.v4.tags}/validate`, {
-        method: 'POST',
-        headers: {
-          'X-WP-Nonce': Groundhogg.nonces._wprest,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(maybeTags)
-      }).then(r => r.json()).then(data => {
-
-        if (!data.items) {
-          return
-        }
-
-        data.items.forEach(tag => {
-          if (self.items.findIndex(t => t.ID === tag.ID) === -1) {
-            self.items.push(tag)
-          }
-        })
-
-        callback(data.items)
-      })
-    },
-
-    preloadTags () {
-
-      var self = this
-
-      fetch(`${Groundhogg.endpoints.v4.tags}?limit=${this.limit}&offset=${this.offset}`, {
-        headers: {
-          'X-WP-Nonce': Groundhogg.nonces._wprest,
-        }
-      }).then(r => r.json()).then(data => {
-
-        if (!data.items) {
-          return
-        }
-
-        Object.assign(self.items, data.items)
-
-        if (data.items.length === self.limit) {
-          self.offset += self.limit
-          self.preloadTags()
-        }
-
-      })
-    },
-
-  }
+  const Tags = Groundhogg.stores.tags
 
   const Editor = {
 
@@ -103,6 +43,9 @@
     undoStates: [],
     redoStates: [],
 
+    stepErrors: {},
+    funnelErrors: [],
+
     htmlTemplates: {
       funnelTitleEdit (title, isEditing) {
         //language=HTML
@@ -117,18 +60,33 @@
         const { ID, data, meta } = step
         const { step_type, step_title, step_group } = data
 
+        let hasErrors = false
+        let errors = []
+
+        if (Editor.stepErrors.hasOwnProperty(ID) && Editor.stepErrors[ID].length > 0) {
+          hasErrors = true
+          errors = Editor.stepErrors[ID]
+        }
+
         //language=HTML
         return `
+			${hasErrors ?
+				`<div class="step-errors">
+                <ul>
+                    ${errors.map(error => `<li class="step-error"><span class="dashicons dashicons-warning"></span> ${error}</li>`).join('')}
+                </ul>
+            </div>` : ''}
 			<div class="step-edit">
-          <div class="settings">
-            ${Editor.stepTypes[step_type].edit(step)}
-          </div>
-          <div class="actions-and-notes">
-              <div class="panel">
-                  <label class="row-label"><span class="dashicons dashicons-admin-comments"></span> Notes</label>
-                  <textarea rows="4" id="step-notes" class="notes full-width" name="step_notes">${step.meta.step_notes || ''}</textarea>
-              </div>
-          </div>
+				<div class="settings">
+					${Editor.stepTypes[step_type].edit(step)}
+				</div>
+				<div class="actions-and-notes">
+					<div class="panel">
+						<label class="row-label"><span class="dashicons dashicons-admin-comments"></span> Notes</label>
+						<textarea rows="4" id="step-notes" class="notes full-width"
+						          name="step_notes">${step.meta.step_notes || ''}</textarea>
+					</div>
+				</div>
 			</div>`
       },
       stepAddPanel (activeType) {
@@ -171,20 +129,34 @@
       stepFlowCard (step, activeStep) {
 
         const { ID, data, meta } = step
-        const { step_type, step_title, step_group } = data
+        const { step_type, step_title, step_group, step_order } = data
 
         const origStep = Editor.origFunnel.steps.find(s => s.ID === ID)
         let status
+        let hasErrors = false
 
-        if (origStep && !objectEquals(step, origStep)) {
+        if (Editor.stepErrors.hasOwnProperty(ID) && Editor.stepErrors[ID].length > 0) {
+          status = 'config-error'
+          hasErrors = true
+        } else if (origStep && !objectEquals(step, origStep)) {
           status = 'edited'
         } else if (!origStep) {
           status = 'new'
         }
 
+        const nextStep = Editor.funnel.steps.find(step => step.data.step_order === step_order + 1)
+        const prevStep = Editor.funnel.steps.find(step => step.data.step_order === step_order - 1)
+
         //language=HTML
         return `
-			<div class="step ${step_type} ${step_group} ${activeStep === ID && 'active'}" data-id="${ID}">
+			${step_group === 'benchmark' ?
+				(step_order === 1 ?
+					`<div class="text-helper until-helper"><span class="dashicons dashicons-filter"></span> Start the funnel when...</div>`
+					: (prevStep && prevStep.data.step_group !== 'benchmark' ? '<div class="until-helper text-helper">Until...</div>' : ''))
+				: ''}
+			<div
+				class="step ${step_type} ${step_group} ${activeStep === ID ? 'active' : ''} ${hasErrors ? 'has-errors' : ''}"
+				data-id="${ID}">
 				<img alt="${Editor.stepTypes[step_type].name}" class="icon"
 				     src="${Editor.stepTypes[step_type].icon}"/>
 				<div class="details">
@@ -193,7 +165,9 @@
 				</div>
 				<div class="step-status ${status}"><span class="status"></span>
 				</div>
-			</div>`
+			</div>
+			${step_group === 'benchmark' && nextStep ? (nextStep.data.step_group === 'benchmark' ? `<div class="or-helper text-helper">Or...</div>` : '<div class="then-helper text-helper">Then...</div>') : ''}
+        `
       }
     },
 
@@ -214,6 +188,7 @@
 
       $doc.on('click', '.step-flow .steps .step', function () {
         self.saveUndoState()
+        self.previousActiveStep = self.activeStep
         self.activeStep = $(this).data('id')
         self.view = 'editingStep'
         self.renderStepFlow()
@@ -240,6 +215,15 @@
           self.isEditingTitle = true
           self.renderTitle()
         }
+      })
+
+      $(document).on('tinymce-editor-setup', function (event, editor) {
+        editor.settings.toolbar1 = 'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,wp_adv,dfw,groundhoggreplacementbtn,groundhoggemojibtn'
+        editor.settings.toolbar2 = 'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help'
+        editor.settings.height = 200
+        editor.on('click', function (ed, e) {
+          $(document).trigger('to_mce')
+        })
       })
 
       $doc.on('blur change keydown', '.funnel-title-edit', function (e) {
@@ -277,14 +261,44 @@
       var self = this
       $('.step-flow .steps').sortable({
         placeholder: 'step-placeholder',
+        cancel: '.text-helper',
         start: function (e, ui) {
           ui.placeholder.height(ui.item.height())
           ui.placeholder.width(ui.item.width())
         },
+        receive: function (e, ui) {
+
+          console.log('received', ui)
+
+          self.saveUndoState()
+
+          var type = $(ui.helper).data('type')
+          var group = $(ui.helper).data('group')
+
+          var id = Date.now()
+
+          $(ui.helper).addClass('step')
+          $(ui.helper).data('id', id)
+
+          self.addStep({
+            ID: id,
+            data: {
+              ID: id,
+              step_type: type,
+              step_group: group,
+              step_order: $(ui.helper).prevAll('.step').length
+            },
+            meta: {}
+          })
+        },
         update: function (e, ui) {
+
+          console.log('updated', ui)
+
           self.saveUndoState()
           self.syncOrderWithFlow()
           self.autoSaveEditedFunnel()
+          self.renderStepFlow()
         }
       }).disableSelection()
     },
@@ -353,12 +367,41 @@
 
       var self = this
 
+      this.checkForStepErrors()
+
       var steps = this.funnel.steps
         .sort((a, b) => a.data.step_order - b.data.step_order)
         .map(step => self.htmlTemplates.stepFlowCard(step, self.activeStep))
         .join('')
 
       $('.step-flow .steps').html(steps)
+    },
+
+    checkForStepErrors () {
+
+      const self = this
+
+      this.funnel.steps.forEach(step => {
+
+        const errors = []
+
+        self.stepErrors[step.ID] = errors
+
+        const { step_group, step_order, step_type } = step.data
+
+        if (step_group === 'action' && step_order === 1) {
+          errors.push(
+            'Actions cannot be at the start of a funnel.'
+          )
+        }
+
+        const typeHandler = StepTypes.getType(step_type)
+        if (typeHandler) {
+          typeHandler.validate(step, errors)
+        }
+      })
+
+      console.log(self.stepErrors)
     },
 
     /**
@@ -370,11 +413,18 @@
         return
       }
 
+      // const activeElementId = document.activeElement.id
+
       const step = this.funnel.steps.find(step => step.ID === this.activeStep)
+      const previousStep = this.funnel.steps.find(step => step.ID === this.previousActiveStep)
+
+      if (previousStep) {
+        this.stepTypes[previousStep.data.step_type].onDemount(previousStep)
+      }
 
       $('#control-panel').html(this.htmlTemplates.stepEditPanel(step))
 
-      this.stepTypes[step.data.step_type].onMount()
+      this.stepTypes[step.data.step_type].onMount(step)
     },
 
     /**
@@ -395,28 +445,6 @@
         helper: 'clone',
         revert: 'invalid',
         revertDuration: 0,
-        stop: function (e, ui) {
-
-          self.saveUndoState()
-
-          var type = $(ui.helper).data('type')
-          var group = $(ui.helper).data('group')
-
-          var id = Date.now()
-
-          $(ui.helper).addClass('step')
-          $(ui.helper).data('id', id)
-
-          self.addStep({
-            ID: id,
-            data: {
-              ID: id,
-              step_type: type,
-              step_group: group,
-            },
-            meta: {}
-          })
-        }
       })
     },
 
@@ -456,6 +484,10 @@
       $('.step-flow .steps .step').each(function (i) {
         self.funnel.steps.find(step => step.ID === $(this).data('id')).data.step_order = i + 1
       })
+
+      this.fixStepOrders()
+
+      console.log('synced', self.funnel.steps.map(step => step.data))
     },
 
     /**
@@ -520,6 +552,8 @@
      */
     addStep (step) {
 
+      console.log('add-step')
+
       if (!step) {
         return
       }
@@ -528,10 +562,18 @@
 
       this.funnel.steps.push(step)
 
-      this.syncOrderWithFlow()
+      this.fixStepOrders()
       this.renderStepFlow()
 
       this.autoSaveEditedFunnel()
+    },
+
+    fixStepOrders () {
+      let newOrder = 1
+      this.funnel.steps.sort((a, b) => a.data.step_order - b.data.step_order).forEach(step => {
+        step.data.step_order = newOrder
+        newOrder++
+      })
     },
 
     /**
@@ -545,15 +587,20 @@
         return
       }
 
+      console.log('delete-step')
+
       this.saveUndoState()
 
       this.funnel.steps = this.funnel.steps.filter(step => step.ID !== stepId)
 
+      this.fixStepOrders()
       this.renderStepFlow()
-      this.syncOrderWithFlow()
 
-      this.view = 'addingStep'
-      this.renderStepAdd()
+      if (this.activeStep === stepId) {
+        this.view = 'addingStep'
+        this.renderStepAdd()
+        this.activeStep = null
+      }
 
       this.autoSaveEditedFunnel()
     },
@@ -612,6 +659,25 @@
      */
     updateCurrentStep (newData) {
       this.updateStep(this.activeStep, newData)
+
+      this.autoSaveEditedFunnel()
+    },
+
+    /**
+     * Updates the current active step
+     *
+     * @param newMeta
+     */
+    updateCurrentStepMeta (newMeta) {
+
+      const { meta } = this.getCurrentStep()
+
+      this.updateStep(this.activeStep, {
+        meta: {
+          ...meta,
+          ...newMeta
+        }
+      })
 
       this.autoSaveEditedFunnel()
     },
@@ -698,29 +764,248 @@
     return Date.now()
   }
 
-  function andList (array) {
-    var lastItem = array.pop()
-    lastItem = 'and ' + lastItem
-    array.push(lastItem)
-    return array.join(', ')
+  function andList (array, text = 'and') {
+    if (array.length === 1) {
+      return array[0]
+    }
+    return `${array.slice(0, -1).join(', ')} ${text} ${array[array.length - 1]}`
   }
 
   function orList (array) {
-    var lastItem = array.pop()
-    lastItem = 'or ' + lastItem
-    array.push(lastItem)
-    return array.join(array.length > 2 ? ', ' : ' ')
+    return andList(array, 'or')
+  }
+
+  function isString (string) {
+    return typeof string === 'string'
+  }
+
+  const specialChars = (string) => {
+    return isString(string) && string.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;').replace(/"/g, '&quot;')
   }
 
   const Elements = {
     option: function (value, text, selected) {
       //language=HTML
       return `
-		  <option value="${value}" ${selected ? 'selected' : ''}>${text}</option>`
+		  <option value="${specialChars(value)}" ${selected ? 'selected' : ''}>${text}</option>`
+    },
+    inputWithReplacementsAndEmojis ({
+      type = 'text',
+      name,
+      id,
+      value,
+      className,
+      placeholder = ''
+    }, replacements = true, emojis = true) {
+      //language=HTML
+      return `
+		  <div class="input-wrap input-with-replacements input-with-emojis">
+			  <input type="${type}" id="${id}" name="${name}" value="${specialChars(value) || ''}" class="${className}"
+			         placeholder="${specialChars(placeholder)}">
+			  ${emojis ? `<button class="emoji-picker-start" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
+			  </button>` : ''}
+			  ${replacements ? `		  <button class="replacements-picker-start" title="insert replacement"><span
+				  class="dashicons dashicons-admin-users"></span></button>` : ''}
+		  </div>`
+    },
+    inputWithReplacements: function (atts) {
+      return Elements.inputWithReplacementsAndEmojis(atts, true, false)
+    },
+    inputWithEmojis: function (atts) {
+      return Elements.inputWithReplacementsAndEmojis(atts, false, true)
+    },
+    textAreaWithReplacementsAndEmojis: function ({ name, id, value }) {
+
+    },
+    textAreaWithReplacements: function ({ name, id, value }) {
+
+    },
+    textAreaWithEmojis: function ({ name, id, value }) {
+
     }
   }
 
+  /**
+   * Create a list of options
+   *
+   * @param options
+   * @param selected
+   * @returns {string}
+   */
+  const createOptions = (options, selected) => {
+
+    const optionsString = []
+
+    for (const option in options) {
+      if (options.hasOwnProperty(option)) {
+        optionsString.push(Elements.option(
+          option, options[option],
+          Array.isArray(selected)
+            ? selected.indexOf(option) !== -1
+            : option === selected))
+      }
+    }
+
+    return optionsString.join('')
+  }
+
+  const tagWithConditionOnMount = (step) => {
+    tagOnMount(step)
+
+    $('#condition').change(function (e) {
+
+      const { meta } = Editor.getCurrentStep()
+
+      Editor.updateCurrentStep({
+        meta: {
+          ...meta,
+          condition: $(this).val()
+        }
+      })
+    })
+  }
+
+  function ordinal_suffix_of (i) {
+    var j = i % 10,
+      k = i % 100
+    if (j == 1 && k != 11) {
+      return i + 'st'
+    }
+    if (j == 2 && k != 12) {
+      return i + 'nd'
+    }
+    if (j == 3 && k != 13) {
+      return i + 'rd'
+    }
+    return i + 'th'
+  }
+
+  const tagOnMount = (step) => {
+
+    const $tags = $('#tags')
+    $tags.select2({
+      tags: true,
+      multiple: true,
+    })
+
+    $tags.on('change', function (e) {
+
+      const { meta } = Editor.getCurrentStep()
+
+      Tags.validate($(this).val()).then(tags => {
+        Editor.updateCurrentStep({
+          meta: {
+            ...meta,
+            tags: tags.map(tag => tag.ID)
+          }
+        })
+      })
+    })
+  }
+
+  const delayTimerName = ({
+    delay_amount,
+    delay_type,
+    run_on_type,
+    run_when,
+    run_time,
+    send_in_timezone,
+    run_time_to,
+    run_on_dow_type, // Run on days of week type
+    run_on_dow, // Run on days of week
+    run_on_month_type, // Run on month type
+    run_on_months, // Run on months
+    run_on_dom, // Run on days of month
+  }) => {
+
+    const preview = []
+
+    // Deal with the easiest cases first
+    if (delay_type === 'none' && run_on_type === 'any') {
+      switch (run_when) {
+        default:
+        case 'now':
+          return `Run at any time`
+        case 'later':
+          return `Run at <b>${run_time}</b>`
+        case 'between':
+          return `Run between <b>${run_time}</b> and <b>${run_time_to}</b>`
+      }
+    }
+
+    if (delay_type !== 'none') {
+      preview.push(`Wait at least <b>${delay_amount} ${delay_type}</b> and then`)
+    }
+
+    if (run_on_type !== 'any') {
+      preview.push(preview.length > 0 ? 'run on' : 'Run on')
+    }
+
+    switch (run_on_type) {
+      default:
+      case 'any':
+        // preview.push()
+        break
+      case 'weekday':
+        preview.push('<b>a weekday</b>')
+        break
+      case 'weekend':
+        preview.push('<b>a weekend</b>')
+        break
+      case 'day_of_week':
+
+        let dowList = orList(run_on_dow.map(i => `<b>${i}</b>`))
+        dowList = `${run_on_dow_type === 'any' ? `any ${dowList}` : `the ${run_on_dow_type} ${dowList}`}`
+
+        if (run_on_month_type === 'specific') {
+          preview.push(`${dowList} in ${orList(run_on_months.map(i => `<b>${i}</b>`))}`)
+        } else {
+          preview.push(`${dowList} of <b>any month</b>`)
+        }
+
+        break
+      case 'day_of_month':
+
+        const dayList = run_on_dom.length > 0
+          ? `the ${orList(run_on_dom.map(i => `<b>${ordinal_suffix_of(i)}</b>`))}`
+          : `<b>any day</b>`
+
+        if (run_on_month_type === 'specific') {
+          preview.push(`${dayList} in ${orList(run_on_months.map(i => `<b>${i}</b>`))}`)
+        } else {
+          preview.push(`${dayList} of <b>any month</b>`)
+        }
+
+        break
+    }
+
+    switch (run_when) {
+      default:
+      case 'now':
+        preview.push(`at any time`)
+        break
+      case 'later':
+        preview.push(`at <b>${run_time}</b>`)
+        break
+      case 'between':
+        preview.push(`between <b>${run_time}</b> and <b>${run_time_to}</b>`)
+        break
+    }
+
+    return preview.join(' ')
+  }
+
   const StepTypes = {
+
+    getType (type) {
+
+      if (!this.hasOwnProperty(type)) {
+        return false
+      }
+
+      return Object.assign({}, this.default, this[type])
+    },
+
     /**
      * Step type default fallbacks
      */
@@ -735,6 +1020,124 @@
       },
       onMount: function () {},
       onDemount: function () {},
+      validate: function (step, errors) {},
+    },
+
+    apply_note: {
+      title ({ meta }) {
+        return 'Apply Note'
+      },
+      edit ({ meta }) {
+
+        const { note_text } = meta
+
+        //language=html
+        return `
+			<div class="panel">
+				<div class="row">
+					<label class="row-label" for="note_text">Add the following note the the contact...</label>
+					<textarea id="note_text" name="note_text">${ note_text || '' }</textarea>
+				</div>
+			</div>`
+      },
+      onMount(){
+        wp.editor.initialize(
+          'note_text',
+          {
+            tinymce: true,
+            quicktags: true
+          }
+        )
+
+        $( '#note_next' ).on('change', function ( e){
+          Editor.updateCurrentStepMeta( {
+            note_text: $(this).val()
+          })
+        })
+      },
+      onDemount(){
+        wp.editor.remove(
+          'note_text'
+        )
+      }
+    },
+
+    admin_notification: {
+      title ({ meta }) {
+
+        const { to } = meta
+
+        return `Send notification to ${to}`
+
+      },
+      edit ({ meta }) {
+//language=HTML
+        return `
+			<div class="panel">
+				<div class="row">
+					<label class="row-label" for="to">Send this notification to...</label>
+					${Elements.inputWithReplacements({
+						type: 'text',
+						id: 'to',
+						name: 'to',
+						className: 'regular-text',
+						value: meta.to || '{owner_email}'
+					})}
+					<p class="description">Comma separated list of emails addresses.</p>
+				</div>
+				<div class="row">
+					<label class="row-label" for="from">This notification should be sent from...</label>
+					${Elements.inputWithReplacements({
+						type: 'text',
+						id: 'from',
+						name: 'from',
+						className: 'regular-text',
+						value: meta.from || '{owner_email}'
+					})}
+					<p class="description">A single email address which you'd like the notification to come from.</p>
+				</div>
+				<div class="row">
+					<label class="row-label" for="reply-to">Replies should go to...</label>
+					${Elements.inputWithReplacements({
+						type: 'text',
+						id: 'reply-to',
+						name: 'reply_to',
+						className: 'regular-text',
+						value: meta.reply_to || '{email}'
+					})}
+					<p class="description">A single email address which replies to this notification should be sent
+						to.</p>
+				</div>
+				<div class="row">
+					<label class="row-label" for="subject">Subject line</label>
+					${Elements.inputWithReplacementsAndEmojis({
+						type: 'text',
+						id: 'subject',
+						name: 'subject',
+						className: 'regular-text',
+						value: meta.subject || 'Notification from "{full_name}"'
+					})}
+					<p class="description">The subject line of the notification.</p>
+				</div>
+				<div class="row">
+					<textarea id="note_text" name="note_text">${specialChars(meta.note_text || '')}</textarea>
+				</div>
+			</div>`
+      },
+      onMount () {
+        wp.editor.initialize(
+          'note_text',
+          {
+            tinymce: true,
+            quicktags: true
+          }
+        )
+      },
+      onDemount () {
+        wp.editor.remove(
+          'note_text'
+        )
+      }
     },
 
     /**
@@ -837,13 +1240,14 @@
 					<p class="description">Runs when a new user is created with any of the defined roles.</p>
 				</div>
 			</div>
-      <div class="panel">
-	      <div class="row">
-		      <label for="disable-notification">
-			      <input type="checkbox" id="disable-notification" value="1" ${ meta.disable_notification ? 'checked' : '' }>
-			      Disable the account created notification sent to the user.</label>
-	      </div>
-      </div>`
+			<div class="panel">
+				<div class="row">
+					<label for="disable-notification">
+						<input type="checkbox" id="disable-notification" value="1"
+						       ${meta.disable_notification ? 'checked' : ''}>
+						Disable the account created notification sent to the user.</label>
+				</div>
+			</div>`
       },
 
       // On mount
@@ -862,7 +1266,7 @@
           })
         })
 
-        $( '#disable-notification' ).on('change', function (e) {
+        $('#disable-notification').on('change', function (e) {
 
           var checked = this.checked
 
@@ -880,6 +1284,9 @@
      * Apply a tag
      */
     apply_tag: {
+
+      ...this.default,
+
       title ({ ID, data, meta }) {
 
         if (!meta.tags) {
@@ -905,24 +1312,8 @@
 			</div>`
       },
 
-      onMount () {
-
-        const $tags = $('#tags')
-        $tags.select2({
-          tags: true,
-          multiple: true,
-        })
-
-        $tags.on('change', function (e) {
-
-          Tags.validate($(this).val(), tags => {
-            Editor.updateCurrentStep({
-              meta: {
-                tags: tags.map(tag => tag.ID)
-              }
-            })
-          })
-        })
+      onMount (step) {
+        tagOnMount(step)
       }
     },
 
@@ -930,6 +1321,7 @@
      * Remove a tag
      */
     remove_tag: {
+
       title ({ ID, data, meta }) {
 
         if (!meta.tags) {
@@ -955,31 +1347,305 @@
 			</div>`
       },
 
-      onMount () {
-
-        const $tags = $('#tags')
-        $tags.select2({
-          tags: true,
-          multiple: true,
-        })
-
-        $tags.on('change', function (e) {
-
-          Tags.validate($(this).val(), tags => {
-            Editor.updateCurrentStep({
-              meta: {
-                tags: tags.map(tag => tag.ID)
-              }
-            })
-          })
-        })
+      onMount (step) {
+        tagOnMount(step)
       }
+    },
+
+    /**
+     * When a tag is applied
+     */
+    tag_applied: {
+
+      title ({ ID, data, meta }) {
+
+        if (!meta.tags) {
+          return 'Tag is applied'
+        }
+
+        const { tags, condition } = meta
+
+        if (tags.length > 1) {
+          return condition === 'all' ? `${tags.length} tags are applied` : `Any of ${tags.length} tags are applied`
+        } else if (tags.length === 1) {
+          return `${tags.length} tag is applied`
+        } else {
+          return 'Tag is applied'
+        }
+      },
+
+      edit ({ ID, data, meta }) {
+
+        let options = Tags.items
+          .map(tag => Elements.option(tag.ID, tag.data.tag_name, meta.tags && meta.tags.indexOf(tag.ID) !== -1))
+
+        const { condition } = meta
+
+        //language=HTML
+        return `
+			<div class="panel">
+				<div class="row">
+					<label class="row-label" for="tags">When <select id="condition">
+						<option value="any" ${condition === 'any' ? 'selected' : ''}>Any</option>
+						<option value="all" ${condition === 'all' ? 'selected' : ''}>All</option>
+					</select> of the defined tags are applied</label>
+					<select name="tags" id="tags" multiple>${options.join('')}</select>
+					<p class="description">Runs when ${condition || 'any'} of the provided tags are applied.</p>
+				</div>
+			</div>`
+      },
+
+      onMount (step) {
+        tagWithConditionOnMount(step)
+      }
+    },
+
+    /**
+     * When a tag is remvoed
+     */
+    tag_removed: {
+
+      title ({ ID, data, meta }) {
+
+        if (!meta.tags) {
+          return 'Tag is removed'
+        }
+
+        const { tags, condition } = meta
+
+        if (tags.length > 1) {
+          return condition === 'all' ? `${tags.length} tags are removed` : `Any of ${tags.length} tags are removed`
+        } else if (tags.length === 1) {
+          return `${tags.length} tag is removed`
+        } else {
+          return 'Tag is removed'
+        }
+      },
+
+      edit ({ ID, data, meta }) {
+
+        let options = Tags.items
+          .map(tag => Elements.option(tag.ID, tag.data.tag_name, meta.tags && meta.tags.indexOf(tag.ID) !== -1))
+
+        const { condition } = meta
+
+        //language=HTML
+        return `
+			<div class="panel">
+				<div class="row">
+					<label class="row-label" for="tags">When <select id="condition">
+						<option value="any" ${condition === 'any' ? 'selected' : ''}>Any</option>
+						<option value="all" ${condition === 'all' ? 'selected' : ''}>All</option>
+					</select> of the defined tags are removed</label>
+					<select name="tags" id="tags" multiple>${options.join('')}</select>
+					<p class="description">Runs when ${condition || 'any'} of the provided tags are removed.</p>
+				</div>
+			</div>`
+      },
+
+      onMount (step) {
+        tagWithConditionOnMount(step)
+      }
+    },
+
+    delay_timer: {
+      title ({ meta }) {
+        return delayTimerName(meta)
+      },
+
+      edit ({ ID, data, meta }) {
+
+        const {
+          delay_amount,
+          delay_type,
+          run_on_type,
+          run_when,
+          run_time,
+          send_in_timezone,
+          run_time_to,
+          run_on_dow_type, // Run on days of week type
+          run_on_dow, // Run on days of week
+          run_on_month_type, // Run on month type
+          run_on_months, // Run on months
+          run_on_dom, // Run on days of month
+
+        } = meta
+
+        const delayTypes = {
+          minutes: 'Minutes',
+          hours: 'Hours',
+          days: 'Days',
+          weeks: 'Weeks',
+          months: 'Months',
+          years: 'Years',
+          none: 'No delay',
+        }
+
+        const runOnTypes = {
+          any: 'Any day',
+          weekday: 'Weekday',
+          weekend: 'Weekend',
+          day_of_week: 'Day of week',
+          day_of_month: 'Day of month',
+        }
+
+        const runWhenTypes = {
+          now: 'Any time',
+          later: 'Specific time',
+        }
+
+        if (delay_type === 'minutes' || delay_type === 'hours') {
+          runWhenTypes.between = 'Between'
+        }
+
+        const runOnDOWTypes = {
+          any: 'Any',
+          first: 'First',
+          second: 'Second',
+          third: 'Third',
+          fourth: 'Fourth',
+          last: 'Last',
+        }
+
+        const runOnDaysOfMonth = {}
+
+        for (let i = 1; i < 32; i++) {
+          runOnDaysOfMonth[i] = i
+        }
+
+        runOnDaysOfMonth.last = 'last'
+
+        const runOnMonthTypes = {
+          any: 'Of any month',
+          specific: 'Of specific month(s)',
+        }
+
+        const runOnDaysOfWeek = {
+          monday: 'Monday',
+          tuesday: 'Tuesday',
+          wednesday: 'Wednesday',
+          thursday: 'Thursday',
+          friday: 'Friday',
+          saturday: 'Saturday',
+          sunday: 'Sunday',
+        }
+
+        const runOnMonths = {
+          january: 'January',
+          february: 'February',
+          march: 'March',
+          april: 'April',
+          may: 'May',
+          june: 'June',
+          july: 'July',
+          august: 'August',
+          september: 'September',
+          october: 'October',
+          november: 'November',
+          december: 'December',
+        }
+
+        //language=HTML
+        const runOnMonthOptions = `
+			<div style="margin-top: 10px"><select
+				class="delay-input re-render"
+				name="run_on_month_type">
+				${createOptions(runOnMonthTypes, run_on_month_type)}</select>
+				${run_on_month_type === 'specific' ? `<select class="select2" name="run_on_months" multiple>${createOptions(runOnMonths, run_on_months)}</select>` : ''}
+			</div>`
+
+        //language=HTML
+        const daysOfWeekOptions = `
+			<div style="margin-top: 10px"><select
+				class="delay-input" name="run_on_dow_type">
+				${createOptions(runOnDOWTypes, run_on_dow_type)}</select>
+				<select class="select2" name="run_on_dow"
+				        multiple>${createOptions(runOnDaysOfWeek, run_on_dow)}</select></div>
+			${runOnMonthOptions}`
+
+        //language=HTML
+        const daysOfMonthOptions = `
+			<div style="margin-top: 10px"><select class="select2"
+			                                      name="run_on_dom"
+			                                      multiple>${createOptions(runOnDaysOfMonth, run_on_dom)}</select></div>
+			${runOnMonthOptions}`
+
+        //language=HTML
+        return `
+			<div class="panel">
+				<div class="row">
+					<h3 class="delay-preview" style="font-weight: normal">${delayTimerName(meta)}</h3>
+				</div>
+				<div class="row">
+					<label class="row-label">Wait at least...</label>
+					<input class="delay-input" type="number" name="delay_amount" value="${delay_amount || 3}"
+					       placeholder="3"
+					       ${delay_type === 'none' ? 'disabled' : ''}>
+					<select class="delay-input re-render" name="delay_type">
+						${createOptions(delayTypes, delay_type)}
+					</select>
+				</div>
+				<div class="row">
+					<label class="row-label">Then run on...</label>
+					<select class="delay-input re-render" name="run_on_type">
+						${createOptions(runOnTypes, run_on_type)}
+					</select>
+					${run_on_type === 'day_of_week' ? daysOfWeekOptions : ''}
+					${run_on_type === 'day_of_month' ? daysOfMonthOptions : ''}
+				</div>
+				<div class="row">
+					<label class="row-label">Then run at...</label>
+					<select class="delay-input re-render" name="run_when">
+						${createOptions(runWhenTypes, run_when)}
+					</select>
+					${run_when === 'later' ? `<input class="delay-input" type="time" name="run_time" value="${run_time}">` : ''}
+					${run_when === 'between' ? `<input class="delay-input" type="time" name="run_time" value="${run_time}"> and <input class="delay-input" type="time" name="run_time_to" value="${run_time_to}">` : ''}
+				</div>
+			</div>`
+      },
+
+      onMount (step) {
+
+        const updatePreview = () => {
+          const { meta } = Editor.getCurrentStep()
+          $('.delay-preview').html(delayTimerName(meta))
+        }
+
+        $('.select2').select2().on('change', function (e) {
+          console.log(e)
+          Editor.updateCurrentStepMeta({
+            [$(this).attr('name')]: $(this).val()
+          })
+          updatePreview()
+        })
+
+        $('.delay-input').on('change', function (e) {
+          console.log(e)
+
+          Editor.updateCurrentStepMeta({
+            [e.target.name]: e.target.value
+          })
+
+          if (e.target.classList.contains('re-render')) {
+            Editor.renderStepEdit()
+            $(`[name=${e.target.name}]`).focus()
+          } else {
+            updatePreview()
+          }
+        })
+
+        $('.delay-input').on('blur', function (e) {
+          updatePreview()
+        })
+
+      },
     },
 
     /**
      * Send email
      */
     send_email: {
+
       title ({ ID, data, meta }) {
         return `Send Email`
       },

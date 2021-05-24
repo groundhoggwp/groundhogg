@@ -67,7 +67,7 @@ class Tag_Removed extends Benchmark {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/tag-removed.png';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/tag-removed.png';
 	}
 
 	/**

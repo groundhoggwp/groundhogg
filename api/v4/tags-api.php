@@ -54,7 +54,7 @@ class Tags_Api extends Base_Object_Api {
 	 * @inheritDoc
 	 */
 	public function read_permissions_callback() {
-		return current_user_can( 'view_tags' );
+		return current_user_can( 'manage_tags' );
 	}
 
 	/**

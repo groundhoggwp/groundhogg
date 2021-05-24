@@ -81,7 +81,7 @@ class Admin_Notification extends Action {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/admin-notification.png';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/admin-notification.png';
 	}
 
 	protected function is_sms() {

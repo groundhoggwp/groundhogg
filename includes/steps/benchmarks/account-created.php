@@ -74,7 +74,7 @@ class Account_Created extends Benchmark {
 	 * @return string
 	 */
 	public function get_icon() {
-		return GROUNDHOGG_ASSETS_URL . '/images/funnel-icons/account-created.png';
+		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/account-created.png';
 	}
 
 	/**

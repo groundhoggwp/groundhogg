@@ -85,7 +85,7 @@ var ReplacementsInsertListener = {};
 
     },
 
-    insert: function () {
+    insert: function ( ) {
 
       // CHECK TINY MCE
       if (typeof tinymce != 'undefined' && tinymce.activeEditor != null && this.to_mce) {

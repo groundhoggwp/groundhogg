@@ -206,9 +206,11 @@
      * Listens for keyup events.
      */
     keyupListener () {
+
+      var self=this;
       window.onkeyup = function (e) {
         if (e.keyCode === 27) {
-          this.toggleMenuOff(e)
+          self.toggleMenuOff(e)
         }
       }
     },
@@ -217,8 +219,10 @@
      * Window resize event listener
      */
     resizeListener () {
+      var self=this;
+
       window.onresize = function (e) {
-        this.toggleMenuOff(e)
+        self.toggleMenuOff(e)
       }
     },
 

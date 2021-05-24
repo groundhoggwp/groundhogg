@@ -1,3 +1,7 @@
+.wp-core-ui select{
+    vertical-align: initial;
+}
+
 #wpcontent {
     background-color: #F6F9FB;
     padding-left: 0;
@@ -135,8 +139,21 @@
 
 .flow-and-edit #control-panel,
 .flow-and-edit .step-edit,
+.flow-and-edit .step-errors,
 .flow-and-edit .step-add {
     width: 100%;
+}
+
+.step-errors{
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+li.step-error{
+    padding: 5px 10px;
+    background: #E91F4F;
+    color: #FFFFFF;
+    border-radius: 5px;
 }
 
 .step-edit {
@@ -157,12 +174,13 @@
 
 .step-flow .steps {
     display: flex;
-    gap: 10px;
+    gap: 15px;
     justify-content: space-between;
     flex-direction: column;
     padding: 12px;
     position: relative;
     z-index: 99;
+    min-height: 100px;
 }
 
 .step-flow .add-new-step {
@@ -184,6 +202,40 @@
     padding: 10px;
     min-height: 52px;
     cursor: pointer;
+}
+
+.step-flow .steps .step:last-child{
+    margin-bottom: 20px;
+}
+
+.step-flow .steps .step.has-errors{
+    border: 1px solid rgba(233, 31, 79, 1);
+}
+
+.step-flow .text-helper{
+    text-align: center;
+}
+
+.step-flow .until-helper,
+.step-flow .then-helper,
+.step-flow .or-helper{
+    background: #0075FF;
+    color: #FFFFFF;
+    display: inline-block;
+    padding: 2px 8px;
+    margin: -20px auto;
+    position: relative;
+    border-radius: 5px;
+}
+
+.step-flow .then-helper{
+    background: #90C71C;
+    margin: auto auto;
+}
+
+.step-flow .until-helper{
+    background: #F58115;
+    margin: auto auto;
 }
 
 .step-flow .step-placeholder {
@@ -284,7 +336,7 @@
 .type-select {
     display: flex;
     justify-content: center;
-    margin: 20px;
+    padding: 20px;
 }
 
 .type-select button {
@@ -341,6 +393,11 @@
 }
 
 /* Control panel */
+#control-panel .step-add,
+#control-panel .step-edit{
+    position: sticky;
+    top: 100px;
+}
 
 #control-panel .panel {
     background: #FFFFFF;
@@ -360,7 +417,11 @@
     font-weight: 500;
 }
 
-/* context menu */
+#control-panel .row:not(:last-child){
+    margin-bottom: 20px;
+}
+
+    /* context menu */
 
 .step-context-menu {
     display: none;
@@ -403,4 +464,41 @@
 .step-context-menu__link:hover {
     color: #fff;
     background-color: #0066aa;
+}
+
+.input-wrap{
+    display: flex;
+    justify-content: flex-start;
+}
+
+.input-wrap > *:last-child{
+    border-top-right-radius: 4px !important;
+    border-bottom-right-radius: 4px !important;
+    border-left: none !important;
+}
+
+.input-wrap > *:nth-child(2):not(:last-child){
+    border-left: none !important;
+}
+
+.input-wrap.input-with-emojis input,
+.input-wrap.input-with-replacements input{
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-right: 0;
+}
+
+.input-wrap.input-with-emojis button.emoji-picker-start,
+.input-wrap.input-with-replacements button.replacements-picker-start{
+    box-shadow: 0 0 0 transparent;
+    border-radius: 0;
+    border: 1px solid #8c8f94;
+    background-color: #fff;
+    color: #2c3338;
+    cursor: pointer;
+}
+
+.input-wrap.input-with-emojis button.emoji-picker-start:hover,
+.input-wrap.input-with-replacements button.replacements-picker-start:hover{
+    background-color: #F6F9FB;
 }
