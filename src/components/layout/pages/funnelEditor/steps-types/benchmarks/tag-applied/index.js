@@ -2,7 +2,7 @@ import LocalOfferIcon from "@material-ui/icons/LocalOffer";
 import { BENCHMARK, BENCHMARK_TYPE_DEFAULTS } from "../../constants";
 import { registerStepType } from "data/step-type-registry";
 import TagPicker from "components/core-ui/tag-picker";
-import { makeStyles } from "@material-ui/core/styles";
+import { Card, CardContent } from "@material-ui/core";
 import Box from "@material-ui/core/Box";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
@@ -56,34 +56,36 @@ const stepAtts = {
     };
 
     return (
-      <>
-        <SettingsRow>
-          <FormControl variant="outlined">
-            <InputLabel id="tag-requires-label">{"Requires"}</InputLabel>
-            <Select
-              labelId="tag-requires"
-              id="demo-simple-select-outlined"
-              value={meta.condition || "any"}
-              onChange={(e) =>
-                updateSettings({
-                  ...meta,
-                  condition: e.target.value,
-                })
-              }
-              label="Requires"
-            >
-              <MenuItem value={"any"}>{"Any of the following tags"}</MenuItem>
-              <MenuItem value={"all"}>{"All of the following tags"}</MenuItem>
-            </Select>
-          </FormControl>
-        </SettingsRow>
-        <SettingsRow>
-          <TagPicker
-            selected={meta.tag_ids || []}
-            onChange={handleTagsChosen}
-          />
-        </SettingsRow>
-      </>
+      <Card>
+        <CardContent>
+          <SettingsRow>
+            <FormControl variant="outlined">
+              <InputLabel id="tag-requires-label">{"Requires"}</InputLabel>
+              <Select
+                labelId="tag-requires"
+                id="demo-simple-select-outlined"
+                value={meta.condition || "any"}
+                onChange={(e) =>
+                  updateSettings({
+                    ...meta,
+                    condition: e.target.value,
+                  })
+                }
+                label="Requires"
+              >
+                <MenuItem value={"any"}>{"Any of the following tags"}</MenuItem>
+                <MenuItem value={"all"}>{"All of the following tags"}</MenuItem>
+              </Select>
+            </FormControl>
+          </SettingsRow>
+          <SettingsRow>
+            <TagPicker
+              selected={meta.tag_ids || []}
+              onChange={handleTagsChosen}
+            />
+          </SettingsRow>
+        </CardContent>
+      </Card>
     );
   },
 };
