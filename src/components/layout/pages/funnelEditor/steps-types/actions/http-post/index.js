@@ -69,92 +69,80 @@ const stepAtts = {
       setFormData(formData);
     };
 
+    const methodOptions = [
+      {
+        display: 'POST',
+        value: 'post'
+      },
+      {
+        display: 'PUT',
+        value: 'put'
+      },
+      {
+        display: 'PATCH',
+        value: 'patch'
+      },
+      {
+        display: 'GET',
+        value: 'GET'
+      },
+      {
+        display: 'DELETE',
+        value: 'delete'
+      }
+    ]
+    const contentTypeOptions = [
+      {
+        display: 'x-www-form-urlencoded',
+        value: 'x-www-form-urlencoded'
+      },
+      {
+        display: 'JSON',
+        value: 'json'
+      },
+    ]
+
     const formElements = [
       {
-        label: "Wait at least:",
+        label: "Method:",
         component: (
           <>
-            <TextField
-              id="standard-multiline-static"
-              label="Multiline"
-              multiline
-              rows={4}
-              value={note}
-              onChange={handleNoteChange}
+            <DropDown
+              id={'method'}
+              options={methodOptions}
+              value={formData["method"]}
+              onChange={hanldeFormChange}
+            />
+
+          </>
+        ),
+      },
+      {
+        label: "Target URL:",
+        component: (
+          <>
+
+            <input
+              id="target-url"
+              value={formData['target-url']}
+              onChange={handleFormChange}
               defaultValue="Default Value"
             />
-            <DropDown
-              id={formData["date-passed"]}
-              options={["Owner List goes here"]}
-              value={formData["date-passed"]}
-              onChange={hanldeFormChange}
-            />
-            <DropDown
-              id={formData["date-passed"]}
-              options={["Owner List goes here"]}
-              value={formData["date-passed"]}
-              onChange={hanldeFormChange}
-            />
-            <div>
-              Choose what happens if a contact reaches this timer and the date
-              has already passed.
-            </div>
+
           </>
         ),
       },
       {
-        label: "Date Field:",
-        component: (
-          <>
-            <TextField
-              id="standard-multiline-static"
-              label="Multiline"
-              multiline
-              rows={4}
-              value={note}
-              onChange={handleNoteChange}
-              defaultValue="Default Value"
-            />
-          </>
-        ),
-      },
-      {
-        label: "And run:",
+        label: "Content-Type:",
         component: (
           <>
             <DropDown
-              id={formData["date-passed"]}
-              options={["Owner List goes here"]}
-              value={formData["date-passed"]}
+              id={'method'}
+              options={contentTypeOptions}
+              value={formData["method"]}
               onChange={hanldeFormChange}
             />
-            <Toggle
-              id={"conditional-logic"}
-              checked={formData["conditional-logic"]}
-              onChange={hanldeFormChange}
-              backgroundColor={theme.palette.primary.main}
-              name="checked"
-            />
-          </>
-        ),
-      },
-      {
-        label: "If date has passed:",
-        component: (
-          <>
-            <DropDown
-              id={formData["date-passed"]}
-              options={["Owner List goes here"]}
-              value={formData["date-passed"]}
-              onChange={hanldeFormChange}
-            />
-            <Toggle
-              id={"conditional-logic"}
-              checked={formData["conditional-logic"]}
-              onChange={hanldeFormChange}
-              backgroundColor={theme.palette.primary.main}
-              name="checked"
-            />
+
           </>
         ),
       },

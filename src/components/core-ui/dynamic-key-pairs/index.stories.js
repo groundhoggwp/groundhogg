@@ -14,6 +14,11 @@ const Template = (args) => <DynamicKeyPairs {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
-  // primary: true,
-  // label: 'Toggle On',
+  rowData: [
+    {
+      'id' : '1',
+      'label' : 'Dynamic Key Pairs',
+    }
+  ],
+  label: 'Toggle On',
 };
