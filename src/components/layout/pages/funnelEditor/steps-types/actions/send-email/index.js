@@ -10,7 +10,13 @@ import { useSelect, useDispatch } from "@wordpress/data";
 /**
  * External dependencies
  */
-import { Button, Card, Switch, TextField } from "@material-ui/core";
+import {
+  Button,
+  Card,
+  CardContent,
+  Switch,
+  TextField,
+} from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ReplayIcon from "@material-ui/icons/Replay";
@@ -32,8 +38,8 @@ const STEP_TYPE = "send_email";
 const theme = createTheme({});
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: "calc(100% - 50px)",
-    padding: "33px 25px 18px 25px",
+    // width: "calc(100% - 50px)",
+    // padding: "33px 25px 18px 25px",
   },
   actionLabel: {
     color: "#102640",
@@ -134,30 +140,32 @@ const stepAtts = {
     ];
     return (
       <Card className={classes.root}>
-        <div className={classes.actionLabel}>Select an email to send:</div>
+        <CardContent>
+          <div className={classes.actionLabel}>Select an email to send:</div>
 
-        <div className={classes.newEmailButton}>
-          <svg
-            width="6"
-            height="6"
-            viewBox="0 0 6 6"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M5.64932 2.46589V2.31589H5.49932H3.62312V0.389893V0.239893H3.47312H2.48331H2.33331V0.389893V2.31589H0.46875H0.31875V2.46589V3.54589V3.69589H0.46875H2.33331V5.60989V5.75989H2.48331H3.47312H3.62312V5.60989V3.69589H5.49932H5.64932V3.54589V2.46589Z"
-              fill="#0075FF"
-              stroke="#0075FF"
-              stroke-width="0.3"
-            />
-          </svg>
-          new email
-        </div>
+          <div className={classes.newEmailButton}>
+            <svg
+              width="6"
+              height="6"
+              viewBox="0 0 6 6"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M5.64932 2.46589V2.31589H5.49932H3.62312V0.389893V0.239893H3.47312H2.48331H2.33331V0.389893V2.31589H0.46875H0.31875V2.46589V3.54589V3.69589H0.46875H2.33331V5.60989V5.75989H2.48331H3.47312H3.62312V5.60989V3.69589H5.49932H5.64932V3.54589V2.46589Z"
+                fill="#0075FF"
+                stroke="#0075FF"
+                stroke-width="0.3"
+              />
+            </svg>
+            new email
+          </div>
 
-        <DynamicForm
-          children={formElements}
-          hanldeFormChange={hanldeFormChange}
-        />
+          <DynamicForm
+            children={formElements}
+            hanldeFormChange={hanldeFormChange}
+          />
+        </CardContent>
       </Card>
     );
   },
