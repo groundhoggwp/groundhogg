@@ -22,9 +22,9 @@ export const DropDown = withStyles((theme) => ({
   root: {
     fontSize: "12px",
     marginTop: "5px",
-    padding: "0px 74px 0px 7px",
+    padding: "7px 74px 7px 7px",
     border: "1.5px solid rgba(16, 38, 64, 0.1)",
-    borderRadius: "2px"
+    borderRadius: "4px"
   },
 }))(({ classes, id, onChange, options, value, ...props }) => {
   // Optional, none currently use this

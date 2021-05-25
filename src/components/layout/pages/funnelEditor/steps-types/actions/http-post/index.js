@@ -24,9 +24,11 @@ import Tag from "components/svg/Tag/";
 import { Toggle } from "components/core-ui/toggle/";
 import { DropDown } from "components/core-ui/drop-down/";
 import { DynamicForm } from "components/core-ui/dynamic-form/";
+import { Textfield } from "components/core-ui/text-field/";
 import { ACTION, ACTION_TYPE_DEFAULTS } from "../../constants";
 import { DatePicker } from "components/core-ui/date-picker";
 import { TimePicker } from "components/core-ui/time-picker";
+import { DynamicKeyPairs } from "components/core-ui/dynamic-key-pairs";
 import { registerStepType } from "data/step-type-registry";
 import { createTheme } from "../../../../../../../theme";
 
@@ -59,8 +61,13 @@ const stepAtts = {
     const [formData, setFormData] = useState({});
     const classes = useStyles();
 
-    const hanldeFormChange = (e) => {
-      if (e.target.type === "checkbox") {
+    const handleFormChange = (e) => {
+      console.log(e)
+      if(e === 'key-pair-add' ){
+
+      } else if(e === 'key-pair-delete'){
+
+      } else if (e.target.type === "checkbox") {
         formData[e.target.id] = e.target.checked;
       } else {
         formData[e.target.id] = e.target.value;
@@ -111,7 +118,7 @@ const stepAtts = {
               id={'method'}
               options={methodOptions}
               value={formData["method"]}
-              onChange={hanldeFormChange}
+              onChange={handleFormChange}
             />
 
           </>
@@ -121,27 +128,30 @@ const stepAtts = {
         label: "Target URL:",
         component: (
           <>
-
-            <input
-              id="target-url"
+            <Textfield
+              id={"target-url"}
               value={formData['target-url']}
               onChange={handleFormChange}
-              defaultValue="Default Value"
+              placeholder="Default Value"
             />
 
           </>
         ),
       },
       {
-        label: "Content-Type:",
+        label: "",
         component: (
           <>
-            <DropDown
-              id={'method'}
-              options={contentTypeOptions}
-              value={formData["method"]}
-              onChange={hanldeFormChange}
-            />
+            <DynamicKeyPairs label={"Headers"} dataset={formData['headers']} onChange={handleFormChange} />
+          </>
+        ),
+      },
+
+      {
+        label: "",
+        component: (
+          <>
+            <DynamicKeyPairs label={"Params"} dataset={formData['params']} onChange={handleFormChange} />
 
           </>
         ),
@@ -152,7 +162,7 @@ const stepAtts = {
           <Toggle
             id={"conditional-logic"}
             checked={formData["conditional-logic"]}
-            onChange={hanldeFormChange}
+            onChange={handleFormChange}
             backgroundColor={theme.palette.primary.main}
             name="checked"
           />
@@ -165,7 +175,7 @@ const stepAtts = {
 
         <DynamicForm
           children={formElements}
-          hanldeFormChange={hanldeFormChange}
+          handleFormChange={handleFormChange}
         />
       </Card>
     );

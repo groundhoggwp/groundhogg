@@ -32,18 +32,14 @@ export const Textfield = withStyles((theme) => ({
       boxShadow: "none",
     },
   },
-}))(({ classes, onChange, placeholder, value, ...props }) => {
-  // console.log(props, props)
-  // value={text}
-  // placeholder={placeholder}
-  //
+}))(({ classes, id, className, onChange, placeholder, value, ...rest }) => {
+
   return (
     <input
-      className={classes.root}
+      className={`${classes.root} ${className}`}
       placeholder={placeholder}
       value={value}
       onChange={onChange}
-      fullWidth
     />
   );
 });
