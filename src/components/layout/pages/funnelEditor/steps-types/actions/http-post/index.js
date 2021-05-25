@@ -65,7 +65,7 @@ const stepAtts = {
     const [formData, setFormData] = useState({});
     const classes = useStyles();
 
-    const hanldeFormChange = (e) => {
+    const handleFormChange = (e) => {
       if (e.target.type === "checkbox") {
         formData[e.target.id] = e.target.checked;
       } else {
@@ -117,7 +117,7 @@ const stepAtts = {
               id={"method"}
               options={methodOptions}
               value={formData["method"]}
-              onChange={hanldeFormChange}
+              onChange={handleFormChange}
             />
           </>
         ),
@@ -143,7 +143,7 @@ const stepAtts = {
               id={"method"}
               options={contentTypeOptions}
               value={formData["method"]}
-              onChange={hanldeFormChange}
+              onChange={handleFormChange}
             />
           </>
         ),
@@ -154,7 +154,7 @@ const stepAtts = {
           <Toggle
             id={"conditional-logic"}
             checked={formData["conditional-logic"]}
-            onChange={hanldeFormChange}
+            onChange={handleFormChange}
             backgroundColor={theme.palette.primary.main}
             name="checked"
           />
@@ -168,7 +168,7 @@ const stepAtts = {
 
           <DynamicForm
             children={formElements}
-            hanldeFormChange={hanldeFormChange}
+            handleFormChange={handleFormChange}
           />
         </CardContent>
       </Card>
