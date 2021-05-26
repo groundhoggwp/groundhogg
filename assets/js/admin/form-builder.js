@@ -1,4 +1,4 @@
-var FormBuilder = {};
+// var FormBuilder = {};
 
 (function($,builder){
 
