@@ -99,19 +99,55 @@
     }
 }
 
-
-
 .flow-and-edit {
     display: flex;
     flex-grow: 1;
     min-height: 400px;
+
 }
 
-.flow-and-edit .step-flow {
+.step-flow {
+    display: flex;
+    flex-direction: column;
     width: 300px;
-    /*background-color: #FFFFFF;*/
     flex-shrink: 0;
     position: relative;
+
+    &:after {
+        content: '';
+        display: block;
+        width: 200px;
+        /*height: 200px;*/
+        background: #FFFFFF;
+        -webkit-clip-path: polygon(0 0, 100% 0, 98% 10%, 75% 20%, 60% 100%, 40% 100%, 25% 20%, 2% 10%);
+        clip-path: polygon(0 0, 100% 0, 98% 10%, 75% 20%, 60% 100%, 40% 100%, 25% 20%, 2% 10%);
+        margin: auto;
+        border-radius: 5px;
+        left: calc(50% - 100px);
+        position: absolute;
+        top: 20px;
+        bottom: -20px;
+    }
+
+    .steps {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        gap: 15px;
+        padding: 12px;
+        position: relative;
+        z-index: 99;
+        min-height: 100px;
+        justify-content: flex-start;
+        align-items: center;
+        align-content: center;
+    }
+
+    .add-new-step {
+        text-align: center;
+        position: relative;
+        z-index: 99;
+    }
 }
 
 .flow-label {
@@ -120,25 +156,6 @@
     z-index: 99;
     text-align: center;
     font-weight: 500;
-}
-
-.step-flow,
-.steps-background-wrap {
-    filter: drop-shadow(5px 5px 30px rgba(24, 45, 70, 0.05));
-}
-
-.steps-background {
-    width: 200px;
-    /*height: 200px;*/
-    background: #FFFFFF;
-    -webkit-clip-path: polygon(0 0, 100% 0, 98% 10%, 75% 20%, 60% 100%, 40% 100%, 25% 20%, 2% 10%);
-    clip-path: polygon(0 0, 100% 0, 98% 10%, 75% 20%, 60% 100%, 40% 100%, 25% 20%, 2% 10%);
-    margin: auto;
-    border-radius: 5px;
-    left: calc(50% - 100px);
-    position: absolute;
-    top: 20px;
-    bottom: -20px;
 }
 
 .flow-and-edit #control-panel,
@@ -174,24 +191,6 @@ li.step-error{
 .step-edit .actions-and-notes {
     width: 250px;
     flex-shrink: 0;
-}
-
-.step-flow .steps {
-    display: flex;
-    gap: 15px;
-    justify-content: space-between;
-    flex-direction: column;
-    padding: 12px;
-    position: relative;
-    z-index: 99;
-    min-height: 100px;
-}
-
-.step-flow .add-new-step {
-    margin-top: 10px;
-    text-align: center;
-    position: relative;
-    z-index: 99;
 }
 
 .step-flow .step-placeholder,
