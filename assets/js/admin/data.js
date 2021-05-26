@@ -39,6 +39,20 @@
     item: {},
     route: route,
 
+    /**
+     * get a specific item
+     *
+     * @param id
+     * @returns {{}|*}
+     */
+    get (id) {
+      if (this.item.ID === id) {
+        return this.item
+      }
+
+      return this.items.find(item => item.ID === id)
+    },
+
     async fetch (params) {
 
       var self = this

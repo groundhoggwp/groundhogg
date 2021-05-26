@@ -11,11 +11,6 @@
     isEditingTitle: false,
     stepFlowContextMenu: null,
     stepOpenInContextMenu: null,
-    tagsCache: {
-      limit: 100,
-      offset: 0,
-      items: []
-    },
 
     /**
      * These gets overridden by the Funnel object passed in
@@ -288,7 +283,7 @@
               step_group: group,
               step_order: $(ui.helper).prevAll('.step').length
             },
-            meta: {}
+            meta: StepTypes.getType(type).defaults
           })
         },
         update: function (e, ui) {
@@ -304,7 +299,7 @@
     },
 
     /**
-     * Merge the step types passed from PHP with mthods defined in JS
+     * Merge the step types passed from PHP with methods defined in JS
      */
     setupStepTypes () {
       for (var prop in this.stepTypes) {
@@ -682,14 +677,23 @@
       this.autoSaveEditedFunnel()
     },
 
+    autoSaveTimeout: null,
+
     autoSaveEditedFunnel () {
       var self = this
-      apiPost(`${Groundhogg.endpoints.v4.funnels}/${self.funnel.ID}/meta`, {
-        edited: {
-          steps: self.funnel.steps,
-          title: self.funnel.data.title
-        }
-      })
+
+      if (this.autoSaveTimeout) {
+        clearTimeout(this.autoSaveTimeout)
+      }
+
+      this.autoSaveTimeout = setTimeout(function () {
+        apiPost(`${Groundhogg.endpoints.v4.funnels}/${self.funnel.ID}/meta`, {
+          edited: {
+            steps: self.funnel.steps,
+            title: self.funnel.data.title
+          }
+        })
+      }, 3000)
 
     },
 
@@ -779,8 +783,18 @@
     return typeof string === 'string'
   }
 
+  /**
+   * If it's not a string just return the value
+   *
+   * @param string
+   * @returns {*}
+   */
   const specialChars = (string) => {
-    return isString(string) && string.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;').replace(/"/g, '&quot;')
+    if (!isString(string)) {
+      return string
+    }
+
+    return string.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;').replace(/"/g, '&quot;')
   }
 
   const Elements = {
@@ -892,15 +906,52 @@
 
       const { meta } = Editor.getCurrentStep()
 
-      Tags.validate($(this).val()).then(tags => {
+      const tags = []
+      const newTags = []
+
+      $(this).val().forEach(tag => {
+
+        if (Tags.get(parseInt(tag))) {
+          tags.push(parseInt(tag))
+        } else {
+          newTags.push(tag)
+        }
+
+      })
+
+      if (newTags.length > 0) {
+        Tags.validate($(this).val()).then(tags => {
+          Editor.updateCurrentStep({
+            meta: {
+              ...meta,
+              tags: tags.map(tag => tag.ID)
+            }
+          })
+        })
+      } else {
         Editor.updateCurrentStep({
           meta: {
             ...meta,
-            tags: tags.map(tag => tag.ID)
+            tags
           }
         })
-      })
+      }
     })
+  }
+
+  const delayTimerDefaults = {
+    delay_amount: 3,
+    delay_type: 'days',
+    run_on_type: 'any',
+    run_when: 'now',
+    run_time: '',
+    send_in_timezone: true,
+    run_time_to: '',
+    run_on_dow_type: 'any', // Run on days of week type
+    run_on_dow: [], // Run on days of week
+    run_on_month_type: 'any', // Run on month type
+    run_on_months: [], // Run on months
+    run_on_dom: [], // Run on days of month
   }
 
   const delayTimerName = ({
@@ -1000,7 +1051,7 @@
     getType (type) {
 
       if (!this.hasOwnProperty(type)) {
-        return false
+        return this.default
       }
 
       return Object.assign({}, this.default, this[type])
@@ -1021,6 +1072,7 @@
       onMount: function () {},
       onDemount: function () {},
       validate: function (step, errors) {},
+      defaults: {}
     },
 
     apply_note: {
@@ -1036,11 +1088,11 @@
 			<div class="panel">
 				<div class="row">
 					<label class="row-label" for="note_text">Add the following note the the contact...</label>
-					<textarea id="note_text" name="note_text">${ note_text || '' }</textarea>
+					<textarea id="note_text" name="note_text">${note_text || ''}</textarea>
 				</div>
 			</div>`
       },
-      onMount(){
+      onMount () {
         wp.editor.initialize(
           'note_text',
           {
@@ -1049,13 +1101,13 @@
           }
         )
 
-        $( '#note_next' ).on('change', function ( e){
-          Editor.updateCurrentStepMeta( {
+        $('#note_next').on('change', function (e) {
+          Editor.updateCurrentStepMeta({
             note_text: $(this).val()
           })
         })
       },
-      onDemount(){
+      onDemount () {
         wp.editor.remove(
           'note_text'
         )
@@ -1063,11 +1115,17 @@
     },
 
     admin_notification: {
+      defaults: {
+        to: '{owner_email}',
+        from: '{owner_email}',
+        reply_to: '{email}',
+        note_text: '',
+      },
       title ({ meta }) {
 
         const { to } = meta
 
-        return `Send notification to ${to}`
+        return `Send notification to <b>${to}</b>`
 
       },
       edit ({ meta }) {
@@ -1151,9 +1209,9 @@
         const roles = Editor.stepTypes.account_created.context.roles
 
         if (meta.role && meta.role.length === 1) {
-          return `${roles[meta.role[0]]} is created`
+          return `<b>${roles[meta.role[0]]}</b> is created`
         } else if (meta.role && meta.role.length > 1) {
-          return `${orList(meta.role.map(role => roles[role]))} is created`
+          return `${orList(meta.role.map(role => `<b>${roles[role]}</b>`))} is created`
         } else {
           return 'User Created'
         }
@@ -1211,7 +1269,7 @@
         const roles = Editor.stepTypes.account_created.context.roles
 
         if (meta.role) {
-          return `Create ${roles[meta.role]}`
+          return `Create <b>${roles[meta.role]}</b>`
         } else {
           return 'Create user'
         }
@@ -1293,7 +1351,7 @@
           return 'Apply tags'
         }
 
-        return `Apply ${meta.tags.length} ${meta.tags.length > 1 ? 'tags' : 'tag'}`
+        return `Apply <b>${meta.tags.length}</b> ${meta.tags.length > 1 ? 'tags' : 'tag'}`
       },
 
       edit ({ ID, data, meta }) {
@@ -1328,7 +1386,7 @@
           return 'Remove tags'
         }
 
-        return `Remove ${meta.tags.length} ${meta.tags.length > 1 ? 'tags' : 'tag'}`
+        return `Remove <b>${meta.tags.length}</b> ${meta.tags.length > 1 ? 'tags' : 'tag'}`
       },
 
       edit ({ ID, data, meta }) {
@@ -1366,9 +1424,9 @@
         const { tags, condition } = meta
 
         if (tags.length > 1) {
-          return condition === 'all' ? `${tags.length} tags are applied` : `Any of ${tags.length} tags are applied`
+          return condition === 'all' ? `<b>${tags.length}</b> tags are applied` : `Any of <b>${tags.length}</b> tags are applied`
         } else if (tags.length === 1) {
-          return `${tags.length} tag is applied`
+          return `<b>${tags.length}</b> tag is applied`
         } else {
           return 'Tag is applied'
         }
@@ -1414,9 +1472,9 @@
         const { tags, condition } = meta
 
         if (tags.length > 1) {
-          return condition === 'all' ? `${tags.length} tags are removed` : `Any of ${tags.length} tags are removed`
+          return condition === 'all' ? `<b>${tags.length}</b> tags are removed` : `Any of <b>${tags.length}</b> tags are removed`
         } else if (tags.length === 1) {
-          return `${tags.length} tag is removed`
+          return `<b>${tags.length}</b> tag is removed`
         } else {
           return 'Tag is removed'
         }
@@ -1450,7 +1508,10 @@
 
     delay_timer: {
       title ({ meta }) {
-        return delayTimerName(meta)
+        return delayTimerName({
+          ...delayTimerDefaults,
+          ...meta
+        })
       },
 
       edit ({ ID, data, meta }) {
@@ -1469,7 +1530,10 @@
           run_on_months, // Run on months
           run_on_dom, // Run on days of month
 
-        } = meta
+        } = {
+          ...delayTimerDefaults,
+          ...meta
+        }
 
         const delayTypes = {
           minutes: 'Minutes',
@@ -1574,7 +1638,10 @@
         return `
 			<div class="panel">
 				<div class="row">
-					<h3 class="delay-preview" style="font-weight: normal">${delayTimerName(meta)}</h3>
+					<h3 class="delay-preview" style="font-weight: normal">${delayTimerName({
+						...meta,
+						...delayTimerDefaults
+					})}</h3>
 				</div>
 				<div class="row">
 					<label class="row-label">Wait at least...</label>
@@ -1608,7 +1675,10 @@
 
         const updatePreview = () => {
           const { meta } = Editor.getCurrentStep()
-          $('.delay-preview').html(delayTimerName(meta))
+          $('.delay-preview').html(delayTimerName({
+            ...delayTimerDefaults,
+            ...meta
+          }))
         }
 
         $('.select2').select2().on('change', function (e) {
@@ -1656,6 +1726,24 @@
 			<div class="panel">
 
 			</div>`
+      }
+    },
+
+    form_fill: {
+      title ({}) {
+        return 'form'
+      },
+      edit ({ meta }) {
+        //language=HTML
+        return `
+			<div id="edit-form"></div>
+			<div class="panel">
+				<div class=""></div>
+			</div>`
+      },
+      onMount ({}) {
+        const editor = FormBuilder(document.querySelector('#edit-form'),)
+        editor.init()
       }
     }
   }
