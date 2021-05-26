@@ -18,6 +18,7 @@ import { makeStyles } from "@material-ui/core/styles";
  */
 import AddWithBorder from "../../../components/svg/AddWithBorder/";
 import Trash from "../../../components/svg/Trash/";
+import { Textfield } from "../text-field/";
 import  { createTheme }   from "../../../theme";
 
 
@@ -28,24 +29,49 @@ export const KeyPairRow = withStyles((theme) => ({
     fontSize: '18px',
     fontWeight: '700'
   },
+  inputField: {
+    display: 'inline-block',
+    width: 'calc(50% - 100px)',
+    margin: '0 20px 0 20px'
+  },
+  addButton:{
+    display: 'inline-block',
+    '& svg': {
+    width: '20px',
+    height: '20px',
+    fill: theme.palette.secondary.main
+    }
+  },
+  trashButton:{
+    display: 'inline-block',
+    marginLeft: '20px',
+    '& svg': {
+    width: '20px',
+    height: '20px',
+    stroke: '#102640'
+    }
+  }
 }))(({ classes, id, addRow, deleteRow, handleFormChange, ...rest }) => {
 
   return (
     <div className={classes.root}>
-      <input
+
+      <Textfield
         id={`key-${id}`}
-        className={classes.inputText}
+        className={classes.inputField}
         placeholder={""}
+        value={""}
         onChange={handleFormChange}
       />
-      <input
+      <Textfield
         id={`value-${id}`}
-        className={classes.inputText}
+        className={classes.inputField}
         placeholder={""}
+        value={""}
         onChange={handleFormChange}
       />
-      <div className={`${classes.customHeaderBtn} ${classes.addButton}`} onClick={addRow}>add <AddWithBorder /></div>
-      <div className={`${classes.customHeaderBtn} ${classes.trashButton}`} onClick={deleteRow}> delete<Trash /></div>
+      <div className={`${classes.addButton}`} onClick={addRow}><AddWithBorder /></div>
+      <div className={`${classes.trashButton}`} onClick={deleteRow}><Trash /></div>
     </div>
   );
 });
@@ -55,34 +81,24 @@ export const DynamicKeyPairs = withStyles((theme) => ({
     fontSize: '18px',
     fontWeight: '700'
   },
-}))(({ classes, label, rowData, ...rest }) => {
-  console.log(label, rowData, rest)
-  const [keyPairSection, setKeyPairSection] = useState([
-    {
-      id: "1"
-    }
-  ]);
+}))(({ classes, label, dataset, handleFormChange, ...rest }) => {
+  console.log(label, dataset, rest)
 
-  const addRow = (e) => {
-    keyPairSection.push(<KeyPairRow addRow={addRow} deleteRow={deleteRow} handleFormChange={handleFormChange}/>)
-    setKeyPairSection(keyPairSection)
+  // {
+  //   id: "1"
+  // }
+  const addRow = () =>{
+    handleFormChange('key-pair-add')
   }
-  const deleteRow = (e) => {
-    keyPairSection.pop()
-
-    setKeyPairSection(keyPairSection)
+  const deleteRow = () =>{
+    handleFormChange('key-pair-delete')
   }
-
-  const handleFormChange = () => {
-
-  }
-
   return (
     <>
       <div className={classes.label}>{label}</div>
-      {rowData.map((row)=>{
-        console.log(row)
-        return <KeyPairRow id={row.id} addRow={addRow} deleteRow={deleteRow} handleFormChange={handleFormChange}/>
+      {dataset.map((data)=>{
+        console.log(data)
+        return <KeyPairRow id={data.id} addRow={addRow} deleteRow={deleteRow} handleFormChange={handleFormChange}/>
       })}
     </>
   );
@@ -94,12 +110,12 @@ DynamicKeyPairs.propTypes = {
    * React components that build this form
    */
   label: PropTypes.node.isRequired,
-  rowData: PropTypes.node.isRequired,
+  dataset: PropTypes.node.isRequired,
 };
 
 DynamicKeyPairs.defaultProps = {
   label: 'default',
-  rowData: [
+  dataset: [
     {
       'id' : '1',
       'label' : 'Dynamic Key Pairs',
