@@ -45,9 +45,6 @@
     }
 }
 
-
-
-
 .undo-and-redo .undo,
 .undo-and-redo .redo {
     cursor: pointer;
@@ -119,8 +116,9 @@
         width: 200px;
         /*height: 200px;*/
         background: #FFFFFF;
-        -webkit-clip-path: polygon(0 0, 100% 0, 98% 10%, 75% 20%, 60% 100%, 40% 100%, 25% 20%, 2% 10%);
-        clip-path: polygon(0 0, 100% 0, 98% 10%, 75% 20%, 60% 100%, 40% 100%, 25% 20%, 2% 10%);
+        clip-path: polygon(0 0, 100% 0, 60% 100%, 40% 100%);
+        //-webkit-clip-path: polygon(0 0, 100% 0, 98% 10%, 75% 20%, 60% 100%, 40% 100%, 25% 20%, 2% 10%);
+        //clip-path: polygon(0 0, 100% 0, 98% 10%, 75% 20%, 60% 100%, 40% 100%, 25% 20%, 2% 10%);
         margin: auto;
         border-radius: 5px;
         left: calc(50% - 100px);
@@ -157,6 +155,7 @@
     text-align: center;
     font-weight: 500;
 }
+
 
 .flow-and-edit #control-panel,
 .flow-and-edit .step-edit,
