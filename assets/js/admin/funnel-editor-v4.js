@@ -1078,6 +1078,14 @@
     },
 
     apply_note: {
+      //language=HTML
+      svg: `
+		  <svg viewBox="0 0 42 37" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path d="M41.508 31.654h-10m5-5v10" stroke="currentColor" stroke-width="2"/>
+			  <path
+				  d="M27.508 11.988h1a1 1 0 00-.293-.708l-.707.708zm-7.084-7.084l.708-.707a1 1 0 00-.708-.293v1zm0 7.084h-1v1h1v-1zm7.084 17.416h-1 1zm-18.834 2h17.834v-2H8.674v2zm-2-25.5v23.5h2v-23.5h-2zm21.834 23.5V11.988h-2v17.416h2zm-8.084-25.5H8.674v2h11.75v-2zm7.79 7.376l-7.082-7.083-1.415 1.414 7.084 7.084 1.414-1.415zm-8.79-6.376v7.084h2V4.904h-2zm1 8.084h7.084v-2h-7.084v2zm-8.5 5.666h11.334v-2H11.925v2zm0 5.667h11.334v-2H11.925v2zm14.584 7.083a2 2 0 002-2h-2v2zm-17.834-2h-2a2 2 0 002 2v-2zm0-23.5v-2a2 2 0 00-2 2h2z"
+				  fill="currentColor"/>
+		  </svg>`,
       title ({ meta }) {
         return 'Apply Note'
       },
@@ -1117,6 +1125,21 @@
     },
 
     admin_notification: {
+      //language=HTML
+      svg: `
+		  <svg viewBox="0 0 31 43" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <mask id="a" fill="#fff">
+				  <path d="M16.956 12.576a1.368 1.368 0 11-2.737 0h2.737z"/>
+			  </mask>
+			  <path
+				  d="M16.956 12.576h1.5v-1.5h-1.5v1.5zm-2.737 0v-1.5h-1.5v1.5h1.5zm1.237 0c0-.072.059-.131.131-.131v3a2.868 2.868 0 002.869-2.869h-3zm.131-.131c.073 0 .132.059.132.131h-3a2.868 2.868 0 002.868 2.869v-3zm-1.368 1.631H16.955v-1.5-1.5h-.001-.001-.002-.003-.001-.001-.001-.001-.001-.001-.001-.004-.001-.004-.002-.001-.002-.001-.002-.002-.001-.002-.002-.003-.002-.002-.002-.002-.002-.002-.002-.005-.002-.002-.005-.002-.005-.005-.005-.003-.005-.003-.003-.011-.003-.003-.003-.003-.016-.02-.007-.007H16.76 16.683 14.22v3z"
+				  fill="currentColor" mask="url(#a)"/>
+			  <path
+				  d="M20.376 11.208v.75A.75.75 0 0021 10.792l-.624.416zm-1.369-2.053h-.75a.75.75 0 00.126.417l.624-.417zm-6.842 0l.624.417a.75.75 0 00.126-.417h-.75zm-1.368 2.053l-.624-.416a.75.75 0 00.624 1.166v-.75zm2.118-4.79a2.671 2.671 0 012.671-2.67v-1.5a4.171 4.171 0 00-4.17 4.17h1.5zm2.671-2.67a2.671 2.671 0 012.671 2.67h1.5a4.171 4.171 0 00-4.17-4.17v1.5zm-3.42 8.21h6.841v-1.5h-6.842v1.5zm6.841 0h1.369v-1.5h-1.369v1.5zm.75-2.803V6.42h-1.5v2.736h1.5zM21 10.792L19.63 8.74l-1.248.833 1.369 2.052L21 10.792zM11.415 6.42v2.736h1.5V6.42h-1.5zm.126 2.32l-1.368 2.053 1.248.832 1.368-2.052-1.248-.833zm-.744 3.22h1.368v-1.5h-1.368v1.5zm5.54-8.961V.945h-1.5v2.053h1.5z"
+				  fill="currentColor"/>
+			  <path d="M29.413 14.097L1.08 25.43l8.5 2.5 19.833-13.833zm0 0l-12.75 26.916-2.5-8.5 15.25-18.416z"
+			        stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+		  </svg>`,
       defaults: {
         to: '{owner_email}',
         from: '{owner_email}',
@@ -1362,7 +1385,15 @@
      */
     apply_tag: {
 
-      ...this.default,
+      //language=HTML
+      svg: `
+		  <svg viewBox="0 0 35 37" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path
+				  d="M5.682 20.946L18.848 7.78a1 1 0 01.707-.293h8.503a1 1 0 011 1v8.502a1 1 0 01-.293.707L15.598 30.863a1 1 0 01-1.414 0L5.682 22.36a1 1 0 010-1.414z"
+				  stroke="currentColor" stroke-width="2"/>
+			  <circle r="1.525" transform="matrix(-1 0 0 1 24.1 12.445)" stroke="currentColor" stroke-width="1.2"/>
+			  <path d="M34.246 31.738h-10m5-5v10" stroke="currentColor" stroke-width="2"/>
+		  </svg>`,
 
       title ({ ID, data, meta }) {
 
@@ -1399,6 +1430,15 @@
      */
     remove_tag: {
 
+      //language=HTML
+      svg: `
+		  <svg viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path
+				  d="M5.682 20.946L18.848 7.78a1 1 0 01.707-.293h8.503a1 1 0 011 1v8.502a1 1 0 01-.293.707L15.598 30.863a1 1 0 01-1.414 0L5.682 22.36a1 1 0 010-1.414z"
+				  stroke="currentColor" stroke-width="2"/>
+			  <circle r="1.525" transform="matrix(-1 0 0 1 24.1 12.445)" stroke="currentColor" stroke-width="1.2"/>
+			  <path d="M34.246 31.738h-10" stroke="currentColor" stroke-width="2"/>
+		  </svg>`,
       title ({ ID, data, meta }) {
 
         if (!meta.tags) {
@@ -1548,6 +1588,19 @@
     },
 
     delay_timer: {
+
+      //language=HTML
+      svg: `
+		  <svg viewBox="0 0 43 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path
+				  d="M36.684 8.982a.75.75 0 00-1.5 0h1.5zm-1.5.42a.75.75 0 001.5 0h-1.5zm1.5-5.464a.75.75 0 00-1.5 0h1.5zm-1.5 3.363a.75.75 0 001.5 0h-1.5zm5.464-.42a4.715 4.715 0 01-4.714 4.714v1.5a6.215 6.215 0 006.214-6.215h-1.5zm-4.714 4.714a4.715 4.715 0 01-4.715-4.715h-1.5a6.215 6.215 0 006.215 6.215v-1.5zM31.219 6.88a4.715 4.715 0 014.715-4.714v-1.5a6.215 6.215 0 00-6.215 6.214h1.5zm4.715-4.714a4.715 4.715 0 014.714 4.714h1.5A6.215 6.215 0 0035.934.666v1.5zm-.75 6.816v.42h1.5v-.42h-1.5zm0-5.044V7.3h1.5V3.938h-1.5z"
+				  fill="currentColor"/>
+			  <path
+				  d="M30.47 21.654c0 8.054-6.53 14.583-14.584 14.583-8.054 0-14.583-6.529-14.583-14.583S7.832 7.071 15.886 7.071 30.47 13.6 30.47 21.654z"
+				  stroke="currentColor" stroke-width="2"/>
+		  </svg>
+      `,
+
       title ({ meta }) {
         return delayTimerName({
           ...delayTimerDefaults,
@@ -1756,7 +1809,15 @@
      * Send email
      */
     send_email: {
-
+      //language=HTML
+      svg: `
+		  <svg viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path d="M32.007 16.695V8.487a1 1 0 00-1-1H4.674a1 1 0 00-1 1V26.32a1 1 0 001 1H17.84"
+			        stroke="currentColor"
+			        stroke-width="2"/>
+			  <path d="M3.674 8.903l14.166 8.5 14.167-8.5M20.674 24.487h11.333m0 0l-4.25-4.25m4.25 4.25l-4.25 4.25"
+			        stroke="currentColor" stroke-width="2"/>
+		  </svg>`,
       title ({ ID, data, meta }) {
         return `Send Email`
       },

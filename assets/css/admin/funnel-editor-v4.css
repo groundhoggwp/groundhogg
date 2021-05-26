@@ -262,6 +262,8 @@ li.step-error {
   color: #F58115;
 }
 
+.add-step.action .step-icon-svg svg,
+.step.action .icon-svg svg,
 .step.action .icon .dashicons {
   color: #90C71C;
 }
