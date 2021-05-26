@@ -130,7 +130,6 @@
     .steps {
         display: flex;
         flex-direction: column;
-        flex-grow: 1;
         gap: 15px;
         padding: 12px;
         position: relative;
@@ -141,10 +140,13 @@
         align-content: center;
     }
 
-    .add-new-step {
-        text-align: center;
-        position: relative;
+    .add-new-step-wrapper {
+        bottom: 0;
+        left: 0;
+        position: absolute;
         z-index: 99;
+        text-align: center;
+        width: 100%;
     }
 }
 

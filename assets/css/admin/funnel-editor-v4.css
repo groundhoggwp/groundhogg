@@ -115,7 +115,6 @@
 .step-flow .steps {
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
   gap: 15px;
   padding: 12px;
   position: relative;
@@ -125,10 +124,13 @@
   align-items: center;
   align-content: center;
 }
-.step-flow .add-new-step {
-  text-align: center;
-  position: relative;
+.step-flow .add-new-step-wrapper {
+  bottom: 0;
+  left: 0;
+  position: absolute;
   z-index: 99;
+  text-align: center;
+  width: 100%;
 }
 
 .flow-label {
