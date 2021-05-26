@@ -176,6 +176,22 @@ li.step-error {
   flex-shrink: 0;
 }
 
+#dynamic-step-settings .gh-loader {
+  display: block;
+  margin: 50px auto;
+  font-size: 15px;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  position: relative;
+  text-indent: -9999em;
+  -webkit-animation: load5 1.1s infinite ease;
+  animation: load5 1.1s infinite ease;
+  -webkit-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
 .step-flow .step-placeholder,
 .step-flow .steps .step {
   display: flex;

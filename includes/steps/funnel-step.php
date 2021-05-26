@@ -4,7 +4,9 @@ namespace Groundhogg\Steps;
 
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
+use Groundhogg\Temp_Step;
 use function Groundhogg\dashicon;
+use function Groundhogg\doing_rest;
 use function Groundhogg\ensure_array;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
@@ -71,7 +73,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	public function __construct() {
 		add_filter( "groundhogg/steps/{$this->get_group()}s", [ $this, 'register' ] );
 
-		if ( is_admin() && ( $this->is_editing_screen() || wp_doing_ajax() ) ) {
+		if ( doing_rest() ) {
 
 			/**
 			 * New filters/actions for better usability and extendability
@@ -321,7 +323,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 * @return string
 	 */
 	protected function setting_name_prefix( $setting = '' ) {
-		return sprintf( 'steps[%d][%s]', $this->get_current_step()->get_id(), $setting );
+		return doing_rest() ? $setting : sprintf( 'steps[%d][%s]', $this->get_current_step()->get_id(), $setting );
 	}
 
 	/**
@@ -374,16 +376,16 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	}
 
 	/**
-	 * @return Step
+	 * @return Step|Temp_Step
 	 */
 	public function get_current_step() {
 		return $this->current_step;
 	}
 
 	/**
-	 * @param Step $step
+	 * @param Step|Temp_Step $step
 	 */
-	protected function set_current_step( Step $step ) {
+	protected function set_current_step( $step ) {
 		$this->current_step = $step;
 	}
 
@@ -638,9 +640,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	}
 
 	/**
-	 * @param Step $step
+	 * @param Step|Temp_Step $step
 	 */
-	public function pre_html( Step $step ) {
+	public function pre_html( $step ) {
 		$this->set_current_step( $step );
 	}
 
@@ -732,7 +734,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	}
 
 	/**
-	 * @param $step Step
+	 * @param $step Step|Temp_Step
 	 */
 	public function html_v2( $step ) {
 		do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step );

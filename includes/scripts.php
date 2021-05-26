@@ -314,7 +314,8 @@ class Scripts {
 						'tags'     => rest_url( Base_Api::NAME_SPACE . '/tags' ),
 						'contacts' => rest_url( Base_Api::NAME_SPACE . '/contacts' ),
 						'emails'   => rest_url( Base_Api::NAME_SPACE . '/emails' ),
-						'funnels'  => rest_url( Base_Api::NAME_SPACE . '/funnels' )
+						'funnels'  => rest_url( Base_Api::NAME_SPACE . '/funnels' ),
+						'steps'    => rest_url( Base_Api::NAME_SPACE . '/steps' )
 					]
 				]
 			],
@@ -347,7 +348,8 @@ class Scripts {
 		wp_register_style( 'groundhogg-admin-email-wysiwyg', GROUNDHOGG_ASSETS_URL . 'css/admin/email-wysiwyg-style.css', [], GROUNDHOGG_VERSION ); //todo I think un used
 		wp_register_style( 'groundhogg-admin-email-preview', GROUNDHOGG_ASSETS_URL . 'css/admin/email-preview.css', [], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-funnel-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/funnel-editor-v4.css', [
-			'groundhogg-admin-form-builder'
+			'groundhogg-admin-form-builder',
+			'groundhogg-loader'
 		], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-form-builder', GROUNDHOGG_ASSETS_URL . 'css/admin/form-builder.css', [], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-dashboard', GROUNDHOGG_ASSETS_URL . 'css/admin/dashboard.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );

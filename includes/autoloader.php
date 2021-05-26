@@ -71,6 +71,7 @@ class Autoloader {
 		'Broadcast'                         => 'includes/classes/broadcast.php',
 		'Funnel'                            => 'includes/classes/funnel.php',
 		'Step'                              => 'includes/classes/step.php',
+		'Temp_Step'                         => 'includes/classes/temp-step.php',
 		'Bulk_Jobs\Bulk_Job'                => 'includes/bulk-jobs/bulk-job.php',
 		'Bulk_Jobs\Broadcast_Bulk_Job'      => 'includes/bulk-jobs/broadcast-bulk-job.php',
 		'Event_Process'                     => 'includes/interfaces/event-process.php',

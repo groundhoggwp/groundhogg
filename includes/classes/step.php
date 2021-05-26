@@ -540,7 +540,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		if ( has_action( "groundhogg/steps/{$this->get_type()}/html_v2" ) ) {
 			do_action( "groundhogg/steps/{$this->get_type()}/html_v2", $this );
 		} else {
-			do_action( "groundhogg/steps/error/html_v2", $this );
+			_e( 'This step has no settings.', 'groundhogg' );
 		}
 	}
 

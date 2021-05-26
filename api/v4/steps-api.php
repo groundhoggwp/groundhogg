@@ -3,7 +3,10 @@
 namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
+use Groundhogg\Plugin;
 use Groundhogg\Step;
+use Groundhogg\Temp_Step;
+use WP_REST_Server;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -11,16 +14,47 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Steps_Api extends Base_Object_Api {
 
-	public function settings( \WP_REST_Request $request ) {
+	public function register_routes() {
 
-		$step = new Step( $request->get_param( $this->get_primary_key() ) );
+		$route = $this->get_route();
+		$key   = $this->get_primary_key();
 
-		if ( ! $step->exists() ){
-			return $this->ERROR_RESOURCE_NOT_FOUND();
-		}
+		parent::register_routes();
+
+		register_rest_route( self::NAME_SPACE, "/{$route}/html", [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'step_html' ],
+				'permission_callback' => [ $this, 'read_permissions_callback' ]
+			],
+		] );
+	}
+
+	/**
+	 * Gets the STEP HTML
+	 *
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return \WP_Error|\WP_REST_Response
+	 */
+	public function step_html( \WP_REST_Request $request ) {
+
+		$step = new Temp_Step(
+			$request->get_param( 'ID' ),
+			$request->get_param( 'data' ),
+			$request->get_param( 'meta' )
+		);
+
+		ob_start();
 
 		$step->html_v2();
 
+		$html = ob_get_clean();
+
+		return self::SUCCESS_RESPONSE( [
+			'html' => $html,
+			'step' => $step
+		] );
 	}
 
 	/**
@@ -38,7 +72,7 @@ class Steps_Api extends Base_Object_Api {
 	 * @return bool
 	 */
 	public function read_permissions_callback() {
-		return current_user_can('edit_funnels' );
+		return current_user_can( 'edit_funnels' );
 	}
 
 	/**
@@ -47,7 +81,7 @@ class Steps_Api extends Base_Object_Api {
 	 * @return mixed
 	 */
 	public function update_permissions_callback() {
-		return current_user_can('edit_funnels' );
+		return current_user_can( 'edit_funnels' );
 	}
 
 	/**
@@ -56,7 +90,7 @@ class Steps_Api extends Base_Object_Api {
 	 * @return mixed
 	 */
 	public function create_permissions_callback() {
-		return current_user_can('edit_funnels' );
+		return current_user_can( 'edit_funnels' );
 	}
 
 	/**
@@ -65,6 +99,6 @@ class Steps_Api extends Base_Object_Api {
 	 * @return mixed
 	 */
 	public function delete_permissions_callback() {
-		return current_user_can('edit_funnels' );
+		return current_user_can( 'edit_funnels' );
 	}
 }

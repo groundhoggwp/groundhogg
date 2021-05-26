@@ -4,9 +4,12 @@
    * Fetch stuff from the API
    * @param route
    * @param params
+   * @param opts
    */
-  async function apiFetch (route, params) {
+  async function apiGet (route, params= {}, opts = {}) {
+
     const response = await fetch(route + '?' + $.param(params), {
+      ...opts,
       headers: {
         'X-WP-Nonce': Groundhogg.nonces._wprest,
       }
@@ -20,10 +23,12 @@
    *
    * @param url
    * @param data
+   * @param opts
    * @returns {Promise<any>}
    */
-  async function apiPost (url = '', data = {}) {
+  async function apiPost (url = '', data = {}, opts = {}) {
     const response = await fetch(url, {
+      ...opts,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -57,7 +62,7 @@
 
       var self = this
 
-      return apiFetch(this.route, params).then(r => {
+      return apiGet(this.route, params).then(r => {
         self.items = r.items
       })
     },
@@ -97,7 +102,7 @@
   })
 
   Groundhogg.api.post = apiPost
-  Groundhogg.api.get = apiFetch
+  Groundhogg.api.get = apiGet
 
   Groundhogg.stores = {
     tags: ObjectStore(Groundhogg.api.routes.v4.tags, {
@@ -135,7 +140,7 @@
 
         var self = this
 
-        return apiFetch(this.route, {
+        return apiGet(this.route, {
           limit: self.limit,
           offet: self.offset
         }).then(data => {

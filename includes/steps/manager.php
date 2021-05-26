@@ -51,6 +51,7 @@ class Manager {
 	public function __construct() {
 		// RIGHT AFTER THE DBS.
 		add_action( 'setup_theme', [ $this, 'init_steps' ], 2 );
+		add_action( 'groundhogg/api/v4/pre_init', [ $this, 'init_steps' ], 2 );
 	}
 
 	/**
@@ -61,7 +62,6 @@ class Manager {
 //		if ( ! empty( $this->elements ) ){
 //			return;
 //		}
-
 
 		/* actions */
 		$this->add_step( new Send_Email() );

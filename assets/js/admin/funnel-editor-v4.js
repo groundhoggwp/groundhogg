@@ -1,6 +1,26 @@
 (function (Funnel, $) {
 
   const Tags = Groundhogg.stores.tags
+  const apiGet = Groundhogg.api.get
+  const apiPost = Groundhogg.api.post
+  const apiRoutes = Groundhogg.api.routes.v4
+
+  $.fn.serializeFormJSON = function () {
+
+    var o = {}
+    var a = this.serializeArray()
+    $.each(a, function () {
+      if (o[this.name]) {
+        if (!o[this.name].push) {
+          o[this.name] = [o[this.name]]
+        }
+        o[this.name].push(this.value || '')
+      } else {
+        o[this.name] = this.value || ''
+      }
+    })
+    return o
+  }
 
   const Editor = {
 
@@ -689,7 +709,7 @@
       }
 
       this.autoSaveTimeout = setTimeout(function () {
-        apiPost(`${Groundhogg.endpoints.v4.funnels}/${self.funnel.ID}/meta`, {
+        apiPost(`${apiRoutes.funnels}/${self.funnel.ID}/meta`, {
           edited: {
             steps: self.funnel.steps,
             title: self.funnel.data.title
@@ -727,40 +747,6 @@
    */
   function objectEquals (a, b) {
     return JSON.stringify(a) === JSON.stringify(b)
-  }
-
-  /**
-   * Fetch stuff from the API
-   * @param route
-   */
-  async function apiFetch (route) {
-    const response = fetch(route, {
-      headers: {
-        'X-WP-Nonce': Groundhogg.nonces._wprest,
-      }
-    })
-
-    return response.json()
-  }
-
-  /**
-   * Post data
-   *
-   * @param url
-   * @param data
-   * @returns {Promise<any>}
-   */
-  async function apiPost (url = '', data = {}) {
-    // Default options are marked with *
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-WP-Nonce': Groundhogg.nonces._wprest,
-      },
-      body: JSON.stringify(data) // body data type must match "Content-Type" header
-    })
-    return response.json() // parses JSON response into native JavaScript objects
   }
 
   /**
@@ -1063,16 +1049,50 @@
      * Step type default fallbacks
      */
     default: {
+      promiseController: null,
       title ({ ID, data, meta }) {
         return data.step_title
       },
       edit ({ ID, data, meta }) {
         //language=HTML
         return `
-			<div class="panel"></div>`
+			<div class="panel">
+				<form id="settings-form" method="post" action="">
+					<div id="dynamic-step-settings">
+						<div class="gh-loader"></div>
+					</div>
+				</form>
+			</div>`
       },
-      onMount: function () {},
-      onDemount: function () {},
+      onMount (step) {
+        var self = this
+
+        self.promiseController = new AbortController()
+        const { signal } = self.promiseController
+
+        apiPost(`${apiRoutes.steps}/html`, step, {
+          signal
+        }).then(r => {
+          $('#dynamic-step-settings').html(r.html)
+          $(document).trigger('gh-init-pickers')
+          const $form = $('#settings-form')
+          $form.on('submit', function (e) {
+            e.preventDefault()
+            return false
+          }).on('change', function (e) {
+            e.preventDefault()
+            const meta = $(this).serializeFormJSON()
+            console.log(meta)
+            Editor.updateCurrentStepMeta(meta)
+          })
+          self.promiseController = null
+        }).catch(() => {})
+      },
+      onDemount () {
+        if (this.promiseController) {
+          this.promiseController.abort()
+        }
+      },
       validate: function (step, errors) {},
       defaults: {}
     },
