@@ -115,8 +115,8 @@
   width: 200px;
   /*height: 200px;*/
   background: #FFFFFF;
-  -webkit-clip-path: polygon(0 0, 100% 0, 98% 10%, 75% 20%, 60% 100%, 40% 100%, 25% 20%, 2% 10%);
-  clip-path: polygon(0 0, 100% 0, 98% 10%, 75% 20%, 60% 100%, 40% 100%, 25% 20%, 2% 10%);
+  -webkit-clip-path: polygon(0 0, 100% 0, 60% 100%, 40% 100%);
+  clip-path: polygon(0 0, 100% 0, 60% 100%, 40% 100%);
   margin: auto;
   border-radius: 5px;
   left: calc(50% - 100px);
