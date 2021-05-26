@@ -3,8 +3,18 @@
 }
 
 #wpcontent {
-  background-color: blue;
+  background-color: #F6F9FB;
   padding-left: 0;
+}
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 100px);
+  padding-right: 20px;
+  position: relative;
 }
 
 .editor-header {
@@ -18,17 +28,15 @@
   top: 32px;
   z-index: 999;
 }
-
 .editor-header .header-stuff {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-grow: 1;
 }
-
-.editor-header .header-stuff .header-actions .undo-and-redo,
-.editor-header .header-stuff .header-actions .publish-actions,
-.editor-header .header-stuff .header-actions {
+.editor-header .undo-and-redo,
+.editor-header .publish-actions,
+.editor-header .header-actions {
   display: flex;
   justify-content: space-between;
   gap: 10px;
@@ -54,50 +62,32 @@
   font-size: 12px;
   line-height: 15px;
 }
-
 .title-wrap .title {
   position: relative;
   cursor: pointer;
 }
 
-.title-wrap .title input.funnel-title-edit,
-.title-wrap .title .title-inner {
-  font-style: normal;
-  font-weight: normal;
-  font-size: 24px;
-  line-height: 1;
-  color: #102640;
-  padding: 0;
-  border-width: 0;
-  outline: none;
-  border-radius: 1px;
-  margin: 0;
-  display: inline-block;
-}
-
-.title-wrap .title input.funnel-title-edit {
+.title-wrap input.funnel-title-edit {
   border-bottom: 1px solid;
 }
-
-.title-wrap .title input.funnel-title-edit:focus {
+.title-wrap input.funnel-title-edit:focus {
   outline: none;
   box-shadow: none;
 }
-
-.title-wrap .title .pencil {
+.title-wrap .pencil {
   position: absolute;
   margin-left: 10px;
   bottom: 0;
   opacity: 0.3;
   color: #102640;
 }
-
 .title-wrap .title:hover .pencil {
   opacity: 0.5;
 }
 
 .flow-and-edit {
   display: flex;
+  flex-grow: 1;
   min-height: 400px;
 }
 
