@@ -253,6 +253,13 @@ li.step-error{
     height: 32px;
 }
 
+.step-flow .step .icon-svg svg{
+    width: 32px;
+    height: 32px;
+}
+
+.add-step.benchmark .step-icon-svg svg,
+.step.benchmark .icon-svg svg,
 .step.benchmark .icon .dashicons {
     color: #F58115;
 }
@@ -386,6 +393,20 @@ li.step-error{
     border-radius: 7px;
     padding: 5px;
     width: 50px;
+}
+
+.step-add .types .add-step .step-icon-svg{
+    background: #FFFFFF;
+    box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+    border-radius: 7px;
+    padding: 10px;
+    /*width: 50px;*/
+}
+
+.step-add .types .add-step .step-icon-svg svg{
+    vertical-align: middle;
+    height: 40px;
+    width: 40px;
 }
 
 .add-step p {

@@ -118,7 +118,9 @@
         //language=HTML
         return `
 			<div class="add-step ${step.type} ${step.group}" data-type="${step.type}" data-group="${step.group}"
-			     title="${step.name}"><img alt="${step.name}" class="step-icon" src="${step.icon}">
+			     title="${step.name}">
+				${Editor.stepTypes[step.type].hasOwnProperty('svg') ? `<div class="step-icon-svg">${Editor.stepTypes[step.type].svg}</div>` : `<img alt="${Editor.stepTypes[step.type].name}" class="step-icon"
+				     src="${Editor.stepTypes[step.type].icon}"/>`}
 				<p>${step.name}</p></div>`
       },
       stepFlowCard (step, activeStep) {
@@ -152,8 +154,8 @@
 			<div
 				class="step ${step_type} ${step_group} ${activeStep === ID ? 'active' : ''} ${hasErrors ? 'has-errors' : ''}"
 				data-id="${ID}">
-				<img alt="${Editor.stepTypes[step_type].name}" class="icon"
-				     src="${Editor.stepTypes[step_type].icon}"/>
+				${Editor.stepTypes[step_type].hasOwnProperty('svg') ? `<div class="icon-svg">${Editor.stepTypes[step_type].svg}</div>` : `<img alt="${Editor.stepTypes[step_type].name}" class="icon"
+				     src="${Editor.stepTypes[step_type].icon}"/>`}
 				<div class="details">
 					<div class="step-title">${Editor.stepTypes[step_type].title(step)}</div>
 					<div class="step-type">${Editor.stepTypes[step_type].name}</div>
@@ -1203,6 +1205,23 @@
      */
     account_created: {
 
+      //language=HTML
+      svg: `
+		  <svg viewBox="0 0 35 35" xmlns="http://www.w3.org/2000/svg">
+			  <g clip-path="url(#clip0)">
+				  <path
+					  d="M4.473 31.684l-.96-.284a1 1 0 00.96 1.284v-1zm25.5 0v1a1 1 0 00.959-1.284l-.96.284zm-12.75-15.166a6.083 6.083 0 01-6.084-6.084h-2a8.083 8.083 0 008.084 8.084v-2zm-6.084-6.084a6.083 6.083 0 016.084-6.083v-2a8.083 8.083 0 00-8.084 8.083h2zM5.431 31.968c1.59-5.368 6.297-9.2 11.792-9.2v-2c-6.471 0-11.894 4.505-13.71 10.632l1.918.568zm11.792-9.2c5.495 0 10.2 3.832 11.79 9.2l1.918-.568c-1.815-6.127-7.237-10.632-13.708-10.632v2zm-12.75 9.916h25.5v-2h-25.5v2zm12.75-28.333a6.05 6.05 0 013.04.813l1.002-1.731a8.05 8.05 0 00-4.042-1.082v2z"
+					  fill="currentColor"/>
+				  <path d="M34.223 11.85H20.057m7.083-7.082v14.166" stroke="currentColor" stroke-width="2"/>
+			  </g>
+			  <defs>
+				  <clipPath id="clip0">
+					  <path fill="#fff" transform="translate(.223 .518)" d="M0 0h34v34H0z"/>
+				  </clipPath>
+			  </defs>
+		  </svg>
+      `,
+
       // Title
       title ({ ID, data, meta }) {
 
@@ -1415,6 +1434,16 @@
      */
     tag_applied: {
 
+      //language=HTML
+      svg: `
+		  <svg viewBox="0 0 39 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path
+				  d="M5.356 21.311L18.522 8.145a1 1 0 01.707-.293h8.503a1 1 0 011 1v8.502a1 1 0 01-.293.707L15.272 31.228a1 1 0 01-1.414 0l-8.502-8.502a1 1 0 010-1.415z"
+				  stroke="currentColor" stroke-width="2"/>
+			  <circle r="1.525" transform="matrix(-1 0 0 1 23.773 12.81)" stroke="currentColor" stroke-width="1.2"/>
+			  <path d="M38.105 23.435l-8.5 8.5-4.25-4.25" stroke="currentColor" stroke-width="2"/>
+		  </svg>`,
+
       title ({ ID, data, meta }) {
 
         if (!meta.tags) {
@@ -1462,6 +1491,18 @@
      * When a tag is remvoed
      */
     tag_removed: {
+
+      // language=HTML
+      svg: `
+		  <svg viewBox="0 0 37 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path
+				  d="M5.649 21.311L18.815 8.145a1 1 0 01.707-.293h8.503a1 1 0 011 1v8.502a1 1 0 01-.293.707L15.565 31.228a1 1 0 01-1.414 0l-8.502-8.502a1 1 0 010-1.415z"
+				  stroke="currentColor" stroke-width="2"/>
+			  <circle r="1.525" transform="matrix(-1 0 0 1 24.066 12.81)" stroke="currentColor" stroke-width="1.2"/>
+			  <path
+				  d="M33.703 27.6a.6.6 0 10-.848-.848l.848.848zm-4.354 2.657a.6.6 0 10.849.848l-.849-.848zm3.506.848a.6.6 0 10.848-.848l-.848.848zm-2.657-4.353a.6.6 0 10-.849.848l.849-.848zm2.657 0l-3.506 3.505.849.848 3.505-3.505-.848-.848zm.848 3.505l-3.505-3.505-.849.848 3.506 3.505.848-.848zm1.724-1.35a3.9 3.9 0 01-3.9 3.901v1.2a5.1 5.1 0 005.1-5.1h-1.2zm-3.9 3.901a3.9 3.9 0 01-3.902-3.9h-1.2a5.1 5.1 0 005.101 5.1v-1.2zm-3.902-3.9a3.9 3.9 0 013.901-3.902v-1.2a5.1 5.1 0 00-5.1 5.101h1.2zm3.901-3.902a3.9 3.9 0 013.901 3.901h1.2a5.1 5.1 0 00-5.1-5.1v1.2z"
+				  fill="currentColor"/>
+		  </svg>`,
 
       title ({ ID, data, meta }) {
 
@@ -1729,7 +1770,38 @@
       }
     },
 
+    link_click: {
+      //language=HTML
+      svg: `
+		  <svg viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path d="M8.594 4.671v22.305l5.329-5.219 3.525 8.607 3.278-1.23-3.688-8.718h7.14L8.593 4.67z"
+			        stroke="currentColor" stroke-width="2"/>
+		  </svg>`
+    },
+
+    email_confirmed: {
+      //language=HTML
+      svg: `
+		  <svg viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path d="M31.685 16.81V8.6a1 1 0 00-1-1H4.352a1 1 0 00-1 1v17.834a1 1 0 001 1h13.166"
+			        stroke="currentColor"
+			        stroke-width="2"/>
+			  <path d="M3.352 9.018l14.166 8.5 14.167-8.5M33.102 20.35l-8.5 8.5-4.25-4.25" stroke="currentColor"
+			        stroke-width="2"/>
+		  </svg>`
+    },
+
     form_fill: {
+      //language=HTML
+      svg: `
+		  <svg viewBox="0 0 35 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path
+				  d="M1.5 29.802a.25.25 0 01-.25-.25v-6a.25.25 0 01.25-.25h32a.25.25 0 01.25.25v6a.25.25 0 01-.25.25h-32z"
+				  fill="currentColor" stroke="currentColor" stroke-width="1.5"/>
+			  <path
+				  d="M1.5 7.733a.25.25 0 01-.25-.25v-6a.25.25 0 01.25-.25h32a.25.25 0 01.25.25v6a.25.25 0 01-.25.25h-32zm0 11a.25.25 0 01-.25-.25v-6a.25.25 0 01.25-.25h32a.25.25 0 01.25.25v6a.25.25 0 01-.25.25h-32z"
+				  stroke="currentColor" stroke-width="1.5"/>
+		  </svg>`,
       title ({}) {
         return 'form'
       },
