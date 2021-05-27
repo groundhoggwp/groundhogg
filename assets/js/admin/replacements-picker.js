@@ -281,7 +281,7 @@
           break
         case 'Enter':
 
-          this.codePicked(this.getCodes()[this.focusedIndex]?.insert, e)
+          this.codePicked(this.getCodes()[this.focusedIndex-1]?.insert, e)
           break
       }
     },

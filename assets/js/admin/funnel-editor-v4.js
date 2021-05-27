@@ -798,6 +798,26 @@
     return string.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;').replace(/"/g, '&quot;')
   }
 
+  const kebabize = str => {
+    return str.split('').map((letter, idx) => {
+      return letter.toUpperCase() === letter
+        ? `${idx !== 0 ? '-' : ''}${letter.toLowerCase()}`
+        : letter
+    }).join('')
+  }
+
+  const objectToStyle = (object) => {
+    const props = []
+
+    for (const prop in object) {
+      if (object.hasOwnProperty(prop)) {
+        props.push(`${kebabize(prop)}:${specialChars(object[prop])}`)
+      }
+    }
+
+    return props.join(';')
+  }
+
   /**
    * Convert an object of HTML props into a string
    *
@@ -809,7 +829,18 @@
 
     for (const prop in object) {
       if (object.hasOwnProperty(prop)) {
-        props.push(`${prop}="${specialChars(object[prop])}"`)
+
+        switch (prop) {
+          case 'className':
+            props.push(`class="${specialChars(object[prop])}"`)
+            break
+          case 'style':
+            props.push(`style="${specialChars(objectToStyle(object[prop]))}"`)
+            break
+          default:
+            props.push(`${kebabize(prop)}="${specialChars(object[prop])}"`)
+            break
+        }
       }
     }
 
@@ -824,6 +855,9 @@
       //language=HTML
       return `
 		  <option value="${specialChars(value)}" ${selected ? 'selected' : ''}>${text}</option>`
+    },
+    mappableFields (props, selected) {
+      return Elements.select(props, Groundhogg.fields.mappable, selected)
     },
     inputWithReplacementsAndEmojis ({
       type = 'text',
@@ -1966,16 +2000,24 @@
     }
   }
 
+  Groundhogg.helpers = {
+    objectToProps,
+    specialChars,
+    isString,
+  }
   Groundhogg.funnelEditor = Editor
   Groundhogg.funnelEditor.functions = {
-    registerStepType ( type, opts ) {
-      return StepTypes.register( type, opts )
+    registerStepType (type, opts) {
+      return StepTypes.register(type, opts)
     },
     updateCurrentStepMeta (newMeta) {
       return Editor.updateCurrentStepMeta(newMeta)
     },
     renderStepEdit () {
       return Editor.renderStepEdit()
+    },
+    getCurrentStep () {
+      return Editor.getCurrentStep()
     }
   }
   Groundhogg.funnelEditor.elements = Elements

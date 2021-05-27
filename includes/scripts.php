@@ -311,6 +311,7 @@ class Scripts {
 						'contacts' => rest_url( 'gh/v3/contacts?select2=true' ),
 					],
 					'v4' => [
+						'root'     => rest_url( Base_Api::NAME_SPACE ),
 						'tags'     => rest_url( Base_Api::NAME_SPACE . '/tags' ),
 						'contacts' => rest_url( Base_Api::NAME_SPACE . '/contacts' ),
 						'emails'   => rest_url( Base_Api::NAME_SPACE . '/emails' ),
@@ -323,6 +324,9 @@ class Scripts {
 				'groups' => Plugin::instance()->replacements->replacement_code_groups,
 				'codes'  => Plugin::instance()->replacements->replacement_codes
 			],
+			'fields' => [
+				'mappable' => get_mappable_fields()
+			]
 		] );
 
 		wp_register_script( 'groundhogg-admin-fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );

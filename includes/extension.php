@@ -6,6 +6,7 @@ use Groundhogg\Admin\Admin_Menu;
 use Groundhogg\Admin\Contacts\Info_Cards;
 use Groundhogg\Admin\Contacts\Tables\Contact_Table_Columns;
 use Groundhogg\Admin\Dashboard\Dashboard_Widgets;
+use Groundhogg\Api\V4\API_V4_HANDLER;
 use Groundhogg\DB\Manager;
 use Groundhogg\Reporting\Reports\Report;
 
@@ -194,6 +195,7 @@ abstract class Extension {
 
 		add_action( 'groundhogg/db/manager/init', [ $this, 'register_dbs' ] );
 		add_action( 'groundhogg/api/v3/pre_init', [ $this, 'register_apis' ] );
+		add_action( 'groundhogg/api/v4/pre_init', [ $this, 'register_v4_apis' ] );
 		add_action( 'groundhogg/bulk_jobs/init', [ $this, 'register_bulk_jobs' ] );
 		add_action( 'groundhogg/admin/init', [ $this, 'register_admin_pages' ] );
 		add_action( 'groundhogg/steps/init', [ $this, 'register_funnel_steps' ] );
@@ -385,6 +387,16 @@ abstract class Extension {
 	 * @return void
 	 */
 	public function register_apis( $api_manager ) {
+	}
+
+	/**
+	 * Register any api endpoints.
+	 *
+	 * @param $api_manager API_V4_HANDLER
+	 *
+	 * @return void
+	 */
+	public function register_v4_apis( $api_manager ) {
 	}
 
 	/**
