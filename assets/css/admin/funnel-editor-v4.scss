@@ -13,7 +13,7 @@
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 100px);
-  padding-right: 20px;
+  //padding-right: 20px;
   position: relative;
 }
 
@@ -63,17 +63,18 @@
     opacity: 0.6;
     font-style: normal;
     font-weight: normal;
-    font-size: 12px;
-    line-height: 15px;
+    font-size: 8px;
+    line-height: 9px;
+    text-transform: uppercase;
   }
 
   .title {
     position: relative;
     cursor: pointer;
+    font-size: 20px;
+    font-weight: 500;
   }
-}
 
-.title-wrap {
   input.funnel-title-edit {
     border-bottom: 1px solid;
   }
@@ -274,6 +275,7 @@ li.step-error {
 }
 
 .step-flow .step .icon-svg svg {
+  margin-right: 10px;
   width: 32px;
   height: 32px;
 }
@@ -417,6 +419,7 @@ li.step-error {
   width: 50px;
 }
 
+.step-flow .add-step .step-icon-svg,
 .step-add .types .add-step .step-icon-svg {
   background: #FFFFFF;
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
@@ -425,6 +428,7 @@ li.step-error {
   /*width: 50px;*/
 }
 
+.step-flow .add-step .step-icon-svg svg,
 .step-add .types .add-step .step-icon-svg svg {
   vertical-align: middle;
   height: 40px;
@@ -552,7 +556,7 @@ li.step-error {
     border-bottom-left-radius: 0;
   }
 
-  input, select{
+  input, select {
     margin: 0;
   }
 
@@ -584,11 +588,11 @@ li.step-error {
     background: #F6F9FB;
     cursor: pointer;
 
-    a{
+    a {
       color: #2c3338;
     }
 
-    &.active{
+    &.active {
       font-weight: 500;
       border-bottom: 1px solid #fff;
       margin-bottom: -1px;

@@ -171,9 +171,9 @@
       return Object.values(ghr.codes)
         .filter(code => {
           if (Picker.search) {
-            return code.name.match(regexp(Picker.search)) || code.code.match(regexp(Picker.search))
+            return (code.name.match(regexp(Picker.search)) || code.code.match(regexp(Picker.search))) && code.group.length > 0
           }
-          return code.group && true
+          return code.group.length > 0
         })
     },
 
@@ -280,8 +280,7 @@
 
           break
         case 'Enter':
-
-          this.codePicked(this.getCodes()[this.focusedIndex-1]?.insert, e)
+          this.codePicked($('.replacement.focused').data('insert'), e)
           break
       }
     },
@@ -290,11 +289,11 @@
      * Listens for keyup events.
      */
     keyupListener () {
-      window.addEventListener('keydown', keyupHandler )
+      window.addEventListener('keydown', keyupHandler)
     },
 
     removeKeyupListener () {
-      window.removeEventListener('keydown', keyupHandler )
+      window.removeEventListener('keydown', keyupHandler)
     },
 
     /**
@@ -347,8 +346,8 @@
       // this.togglePickerOff(e)
       console.log(code)
 
-      if (! InsertAtCursor.inserting()) {
-        InsertAtCursor.setActive( this.backupInputTarget )
+      if (!InsertAtCursor.inserting()) {
+        InsertAtCursor.setActive(this.backupInputTarget)
       }
 
       let el = InsertAtCursor.insert(code)

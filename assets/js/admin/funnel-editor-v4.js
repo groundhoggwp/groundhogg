@@ -65,7 +65,8 @@
       funnelTitleEdit (title, isEditing) {
         //language=HTML
         if (isEditing) {
-          return `<input type="text" class="funnel-title-edit" name="funnel_title" value="${title}">`
+          return `<input type="text" class="funnel-title-edit regular-text" id="funnel-title-edit" name="funnel_title"
+		                 value="${title}">`
         } else {
           return `<span class="title-inner">${title}</span><span class="pencil"><span class="dashicons dashicons-edit"></span></span>`
         }
@@ -99,7 +100,7 @@
 					<div class="panel">
 						<label class="row-label"><span class="dashicons dashicons-admin-comments"></span> Notes</label>
 						<textarea rows="4" id="step-notes" class="notes full-width"
-						          name="step_notes">${step.meta.step_notes || ''}</textarea>
+						          name="step_notes">${specialChars(meta.step_notes || '')}</textarea>
 					</div>
 				</div>
 			</div>`
@@ -254,6 +255,7 @@
 
         // If the event is key down do nothing if the key wasn't enter
         if (e.type === 'keydown' && e.keyCode !== 13) {
+          self.resizeTitleEdit()
           return
         }
 
@@ -441,6 +443,8 @@
         return
       }
 
+      var self = this
+
       // const activeElementId = document.activeElement.id
 
       const step = this.funnel.steps.find(step => step.ID === this.activeStep)
@@ -453,6 +457,13 @@
       $('#control-panel').html(this.htmlTemplates.stepEditPanel(step))
 
       this.stepTypes[step.data.step_type].onMount(step)
+
+      // Step notes listener
+      $('#step-notes').on('change', function (e) {
+        self.updateCurrentStepMeta({
+          step_notes: $(this).val()
+        })
+      })
     },
 
     /**
@@ -489,8 +500,13 @@
       )
 
       if (this.isEditingTitle) {
-        $('.funnel-title-edit').focus().width((this.funnel.data.title.length + 1) + 'ch')
+        $('.funnel-title-edit').focus()
+        this.resizeTitleEdit()
       }
+    },
+
+    resizeTitleEdit () {
+      $('.funnel-title-edit').width((this.funnel.data.title.length + 1) + 'ch')
     },
 
     /**
@@ -1704,13 +1720,10 @@
 
       //language=HTML
       svg: `
-		  <svg viewBox="0 0 43 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+		  <svg viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
 			  <path
-				  d="M36.684 8.982a.75.75 0 00-1.5 0h1.5zm-1.5.42a.75.75 0 001.5 0h-1.5zm1.5-5.464a.75.75 0 00-1.5 0h1.5zm-1.5 3.363a.75.75 0 001.5 0h-1.5zm5.464-.42a4.715 4.715 0 01-4.714 4.714v1.5a6.215 6.215 0 006.214-6.215h-1.5zm-4.714 4.714a4.715 4.715 0 01-4.715-4.715h-1.5a6.215 6.215 0 006.215 6.215v-1.5zM31.219 6.88a4.715 4.715 0 014.715-4.714v-1.5a6.215 6.215 0 00-6.215 6.214h1.5zm4.715-4.714a4.715 4.715 0 014.714 4.714h1.5A6.215 6.215 0 0035.934.666v1.5zm-.75 6.816v.42h1.5v-.42h-1.5zm0-5.044V7.3h1.5V3.938h-1.5z"
-				  fill="currentColor"/>
-			  <path
-				  d="M30.47 21.654c0 8.054-6.53 14.583-14.584 14.583-8.054 0-14.583-6.529-14.583-14.583S7.832 7.071 15.886 7.071 30.47 13.6 30.47 21.654z"
-				  stroke="currentColor" stroke-width="2"/>
+				  d="M7.327 4.489c3.468 0 6.279 2.652 6.279 5.923s-2.811 5.923-6.279 5.923c-3.467 0-6.278-2.652-6.278-5.923a5.7 5.7 0 011.427-3.76m1.997 1.337l2.854 2.961M5.33 1.335h4.28"
+				  stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
 		  </svg>
       `,
 
