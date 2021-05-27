@@ -1240,11 +1240,38 @@
           }
         )
 
-        $('#note_next').on('change', function (e) {
-          Editor.updateCurrentStepMeta({
-            note_text: $(this).val()
-          })
-        })
+        for(id in tinymce.editors){
+          if(id.trim()){
+            elementReady(id);
+          }
+        }
+
+        // Wait for non-initialised editors to initialise
+        tinymce.on('AddEditor', function (e) {
+          elementReady(e.editor.id);
+        });
+
+        // function to call when tinymce-editor has initialised
+        function elementReady(editor_id){
+
+          // get tinymce editor based on instance-id
+          var _editor = tinymce.editors[editor_id];
+
+          // Timer for saving on pause.
+          let saveTimer = null;
+
+          _editor.on("keyup", function(e){
+            // Reset timer.
+            clearTimeout(saveTimer);
+
+            // Only save after a second.
+            saveTimer = setTimeout(function () {
+              Editor.updateCurrentStepMeta({
+                note_text: tinyMCE.activeEditor.getContent({format : 'raw'})
+              })
+            }, 1000);
+          });
+        }
       },
       onDemount () {
         wp.editor.remove(
