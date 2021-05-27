@@ -269,6 +269,10 @@ li.step-error {
   height: 32px;
 }
 
+.step {
+  position: relative;
+}
+
 .step-flow .step .icon-svg svg {
   margin-right: 10px;
   width: 32px;
@@ -312,32 +316,70 @@ li.step-error {
   margin: 0 15px;
 }
 
-.step .step-status {
+.step-status:before {
+  color: white;
+  font-size: 8px;
+  position: absolute;
+  right: -5px;
+  text-transform: uppercase;
+  transform: rotate(15deg);
+  top: -5px;
+  line-height: 1;
+  padding: 3px;
+  border-radius: 3px;
+}
+.step-status.config-error:before {
+  background: tomato;
+  content: "Error";
+}
+.step-status.new:before {
+  background: yellowgreen;
+  content: "New";
+}
+.step-status.edited:before {
+  background: DodgerBlue;
+  content: "Edited";
+}
+
+.step:hover .step-menu {
   display: flex;
+}
+
+.step-menu {
   align-items: center;
+  display: none;
+  justify-content: center;
+  position: absolute;
+  height: 100%;
+  top: 0rem;
+  right: 0rem;
+  width: 2rem;
 }
-
-.step .step-status .status {
-  visibility: hidden;
-  display: inline-block;
-  background-color: #0075FF;
-  border-radius: 50%;
-  height: 9px;
-  width: 9px;
+.step-menu svg {
+  fill: #0005;
 }
-
-.step .step-status.config-error .status {
-  visibility: visible;
-  background-color: #E91F4F;
+.step-menu:hover ul {
+  display: block;
 }
-
-.step .step-status.new .status {
-  visibility: visible;
-  background-color: #90C71C;
+.step-menu ul {
+  background: #FFF;
+  border: 1px solid #0002;
+  border-radius: 3px;
+  box-shadow: 2px 2px 3px 0 #0001;
+  display: none;
+  right: 0;
+  list-style: none;
+  margin: 0;
+  position: absolute;
+  top: 90%;
+  z-index: 2;
 }
-
-.step .step-status.edited .status {
-  visibility: visible;
+.step-menu ul li {
+  margin: 0;
+  padding: 0.236rem 0.382rem;
+}
+.step-menu ul li:hover {
+  background: #0001;
 }
 
 .step .details {

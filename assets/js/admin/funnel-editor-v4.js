@@ -181,8 +181,14 @@
 					<div class="step-title">${Editor.stepTypes[step_type].title(step)}</div>
 					<div class="step-type">${Editor.stepTypes[step_type].name}</div>
 				</div>
-				<div class="step-status ${status}"><span class="status"></span>
-				</div>
+				<div class="step-status ${status}"></div>
+              <div class="step-menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 16a3.001 3.001 0 010 6 3.001 3.001 0 010-6zm0 1a2 2 0 11-.001 4.001A2 2 0 0112 17zm0-8a3.001 3.001 0 010 6 3.001 3.001 0 010-6zm0 1a2 2 0 11-.001 4.001A2 2 0 0112 10zm0-8a3.001 3.001 0 010 6 3.001 3.001 0 010-6zm0 1a2 2 0 11-.001 4.001A2 2 0 0112 3z"/></svg>
+                <ul>
+                    <li class="step-menu-duplicate">Duplicate</li>
+                    <li class="step-menu-delete">Delete</li>
+                </ul>
+              </div>
 			</div>
 			${step_group === 'benchmark' && nextStep ? (nextStep.data.step_group === 'benchmark' ? `<div class="or-helper text-helper">Or...</div>` : '<div class="then-helper text-helper">Then...</div>') : ''}
         `

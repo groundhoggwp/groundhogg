@@ -149,7 +149,7 @@
     z-index: 100;
 
     &:before {
-      background: linear-gradient( 0deg, #F6F9FB 0%, #F6F9FB00 100%);
+      background: linear-gradient(0deg, #F6F9FB 0%, #F6F9FB00 100%);
       bottom: 100%;
       content: "";
       display: block;
@@ -285,6 +285,10 @@ li.step-error {
   height: 32px;
 }
 
+.step {
+  position: relative;
+}
+
 .step-flow .step .icon-svg svg {
   margin-right: 10px;
   width: 32px;
@@ -330,31 +334,109 @@ li.step-error {
 
 
 .step .step-status {
-  display: flex;
+  //display: flex;
+  //align-items: center;
+}
+
+//.step .step-status .status {
+//  visibility: hidden;
+//  display: inline-block;
+//  background-color: #0075FF;
+//  border-radius: 50%;
+//  height: 9px;
+//  width: 9px;
+//}
+
+.step-status {
+  &:before {
+    color: white;
+    font-size: 8px;
+    position: absolute;
+    right: -5px;
+    text-transform: uppercase;
+    transform: rotate(15deg);
+    top: -5px;
+    line-height: 1;
+    padding: 3px;
+    border-radius: 3px;
+  }
+
+  &.config-error:before {
+    background: tomato;
+    content: 'Error';
+  }
+
+  &.new:before {
+    background: yellowgreen;
+    content: 'New';
+  }
+
+  &.edited:before {
+    background: DodgerBlue;
+    content: 'Edited';
+  }
+}
+
+//.step .step-status.config-error .status {
+//  visibility: visible;
+//  background-color: #E91F4F;
+//}
+//
+//.step .step-status.new .status {
+//  visibility: visible;
+//  background-color: #90C71C;
+//}
+//
+//.step .step-status.edited {
+//  visibility: visible;
+//}
+
+.step:hover {
+  .step-menu {
+    display: flex;
+  }
+}
+
+.step-menu {
   align-items: center;
-}
+  display: none;
+  justify-content: center;
+  position: absolute;
+  height: 100%;
+  top: 0rem;
+  right: 0rem;
+  width: 2rem;
 
-.step .step-status .status {
-  visibility: hidden;
-  display: inline-block;
-  background-color: #0075FF;
-  border-radius: 50%;
-  height: 9px;
-  width: 9px;
-}
+  svg {
+    fill: #0005;
+  }
 
-.step .step-status.config-error .status {
-  visibility: visible;
-  background-color: #E91F4F;
-}
+  &:hover {
+    ul {
+      display: block;
+    }
+  }
 
-.step .step-status.new .status {
-  visibility: visible;
-  background-color: #90C71C;
-}
-
-.step .step-status.edited .status {
-  visibility: visible;
+  ul {
+    background: #FFF;
+    border: 1px solid #0002;
+    border-radius: 3px;
+    box-shadow: 2px 2px 3px 0 #0001;
+    display: none;
+    right: 0;
+    list-style: none;
+    margin: 0;
+    position: absolute;
+    top: 90%;
+    z-index: 2;
+    li {
+      margin: 0;
+      padding: .236rem .382rem;
+      &:hover {
+        background: #0001;
+      }
+    }
+  }
 }
 
 .step .details {
