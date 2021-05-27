@@ -112,20 +112,17 @@
   position: relative;
 
   &:after {
+    background: #FFFFFF;
+    border-radius: 5px;
+    bottom: 0px;
+    clip-path: polygon(0 0, 100% 0, 60% 100%, 40% 100%);
     content: '';
     display: block;
-    width: 200px;
-    /*height: 200px;*/
-    background: #FFFFFF;
-    clip-path: polygon(0 0, 100% 0, 60% 100%, 40% 100%);
-    //-webkit-clip-path: polygon(0 0, 100% 0, 98% 10%, 75% 20%, 60% 100%, 40% 100%, 25% 20%, 2% 10%);
-    //clip-path: polygon(0 0, 100% 0, 98% 10%, 75% 20%, 60% 100%, 40% 100%, 25% 20%, 2% 10%);
-    margin: auto;
-    border-radius: 5px;
     left: calc(50% - 100px);
+    margin: auto;
     position: absolute;
     top: 20px;
-    bottom: -20px;
+    width: 200px;
   }
 
   .steps {
@@ -142,12 +139,26 @@
   }
 
   .add-new-step-wrapper {
+    background: #F6F9FB;
     bottom: 0;
-    left: 0;
-    position: absolute;
-    z-index: 99;
+    margin-top: auto;
+    padding: 10px 0;
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
     text-align: center;
-    width: 100%;
+    z-index: 100;
+
+    &:before {
+      background: linear-gradient( 0deg, #F6F9FB 0%, #F6F9FB00 100%);
+      bottom: 100%;
+      content: "";
+      display: block;
+      height: 2rem;
+      left: 0;
+      pointer-events: none;
+      position: absolute;
+      width: 100%;
+    }
   }
 }
 

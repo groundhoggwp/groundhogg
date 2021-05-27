@@ -100,18 +100,17 @@
   position: relative;
 }
 .step-flow:after {
+  background: #FFFFFF;
+  border-radius: 5px;
+  bottom: 0px;
+  clip-path: polygon(0 0, 100% 0, 60% 100%, 40% 100%);
   content: "";
   display: block;
-  width: 200px;
-  /*height: 200px;*/
-  background: #FFFFFF;
-  clip-path: polygon(0 0, 100% 0, 60% 100%, 40% 100%);
-  margin: auto;
-  border-radius: 5px;
   left: calc(50% - 100px);
+  margin: auto;
   position: absolute;
   top: 20px;
-  bottom: -20px;
+  width: 200px;
 }
 .step-flow .steps {
   display: flex;
@@ -126,11 +125,25 @@
   align-content: center;
 }
 .step-flow .add-new-step-wrapper {
+  background: #F6F9FB;
   bottom: 0;
-  left: 0;
-  position: absolute;
-  z-index: 99;
+  margin-top: auto;
+  padding: 10px 0;
+  position: -webkit-sticky;
+  /* Safari */
+  position: sticky;
   text-align: center;
+  z-index: 100;
+}
+.step-flow .add-new-step-wrapper:before {
+  background: linear-gradient(0deg, #F6F9FB 0%, #F6F9FB00 100%);
+  bottom: 100%;
+  content: "";
+  display: block;
+  height: 2rem;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
   width: 100%;
 }
 
