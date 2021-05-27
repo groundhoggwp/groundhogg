@@ -183,6 +183,7 @@ abstract class Extension {
 
 		$this->init_components();
 
+		add_action( 'groundhogg_funnel_scripts', [ $this, 'funnel_editor_scripts' ] );
 		add_action( 'groundhogg/scripts/after_register_admin_scripts', [ $this, 'register_admin_scripts' ], 10, 2 );
 		add_action( 'groundhogg/scripts/after_register_admin_styles', [ $this, 'register_admin_styles' ] );
 		add_action( 'groundhogg/scripts/after_register_frontend_scripts', [
@@ -211,6 +212,14 @@ abstract class Extension {
 		add_filter( 'groundhogg/templates/funnels', [ $this, 'register_funnel_templates' ] );
 
 		$this->get_edd_updater();
+	}
+
+	/**
+	 * scripts and styles for the funnel editor
+	 *
+	 * @param $funnel Funnel
+	 */
+	public function funnel_editor_scripts( $funnel ) {
 	}
 
 	/**

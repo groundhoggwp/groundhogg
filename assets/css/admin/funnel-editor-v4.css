@@ -526,4 +526,48 @@ li.step-error {
   background-color: #F6F9FB;
 }
 
+.input-wrap select + input {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.input-wrap input, .input-wrap select {
+  margin: 0;
+}
+.input-wrap select:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.tabs {
+  /*display: flex;*/
+  /*justify-content: center;*/
+  border-bottom: 1px solid rgba(16, 38, 64, 0.15);
+  padding: 5px 10px 0 10px;
+}
+.tabs .tab {
+  border-width: 1px 1px 0 1px;
+  border-color: rgba(16, 38, 64, 0.15);
+  border-style: solid;
+  display: inline-block;
+  /* display: flex; */
+  /* align-items: center; */
+  /* justify-content: center; */
+  border-radius: 3px 3px 0 0;
+  margin: 0 2px;
+  font-size: 16px;
+  padding: 6px 12px 6px 12px;
+  text-align: center;
+  background: #F6F9FB;
+  cursor: pointer;
+}
+.tabs .tab a {
+  color: #2c3338;
+}
+.tabs .tab.active {
+  font-weight: 500;
+  border-bottom: 1px solid #fff;
+  margin-bottom: -1px;
+  background: #FFFFFF;
+}
+
 /*# sourceMappingURL=funnel-editor-v4.css.map */

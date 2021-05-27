@@ -159,14 +159,22 @@ class Funnels_Page extends Admin_Page {
 	 * enqueue editor scripts
 	 */
 	public function scripts() {
-		wp_enqueue_editor();
-		wp_enqueue_style( 'groundhogg-admin' );
-		wp_enqueue_style( 'groundhogg-admin-funnel-editor' );
-		wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
-		wp_localize_script( 'groundhogg-admin-funnel-editor', 'GroundhoggFunnel', [
-			'funnel'    => new Funnel( get_url_var( 'funnel' ) ),
-			'stepTypes' => Plugin::instance()->step_manager->get_elements()
-		] );
+
+		if ( $this->get_current_action() === 'edit' ) {
+
+			$funnel = new Funnel(get_url_var( 'funnel' ));
+
+			wp_enqueue_editor();
+			wp_enqueue_style( 'groundhogg-admin' );
+			wp_enqueue_style( 'groundhogg-admin-funnel-editor' );
+			wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
+			wp_localize_script( 'groundhogg-admin-funnel-editor', 'GroundhoggFunnel', [
+				'funnel'    => $funnel,
+				'stepTypes' => Plugin::instance()->step_manager->get_elements()
+			] );
+
+			do_action( 'groundhogg_funnel_scripts', $funnel );
+		}
 	}
 
 	/**

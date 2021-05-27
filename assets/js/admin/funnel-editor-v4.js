@@ -204,9 +204,16 @@
       })
 
       $doc.on('click', '.step-flow .steps .step', function () {
+
+        const clickedStep = parseInt($(this).data('id'))
+
+        if (clickedStep === self.activeStep) {
+          return
+        }
+
         self.saveUndoState()
         self.previousActiveStep = self.activeStep
-        self.activeStep = $(this).data('id')
+        self.activeStep = clickedStep
         self.view = 'editingStep'
         self.renderStepFlow()
         self.renderStepEdit()
@@ -285,7 +292,7 @@
         },
         receive: function (e, ui) {
 
-          console.log('received', ui)
+          // console.log('received', ui)
 
           self.saveUndoState()
 
@@ -301,6 +308,7 @@
             ID: id,
             data: {
               ID: id,
+              funnel_id: Editor.funnel.ID,
               step_type: type,
               step_group: group,
               step_order: $(ui.helper).prevAll('.step').length
@@ -310,7 +318,7 @@
         },
         update: function (e, ui) {
 
-          console.log('updated', ui)
+          // console.log('updated', ui)
 
           self.saveUndoState()
           self.syncOrderWithFlow()
@@ -324,6 +332,9 @@
      * Merge the step types passed from PHP with methods defined in JS
      */
     setupStepTypes () {
+
+      // console.log('setup-step-types')
+
       for (var prop in this.stepTypes) {
         if (Object.prototype.hasOwnProperty.call(this.stepTypes, prop)
           && Object.prototype.hasOwnProperty.call(StepTypes, prop)) {
@@ -418,7 +429,7 @@
         }
       })
 
-      console.log(self.stepErrors)
+      // console.log(self.stepErrors)
     },
 
     /**
@@ -504,7 +515,7 @@
 
       this.fixStepOrders()
 
-      console.log('synced', self.funnel.steps.map(step => step.data))
+      // console.log('synced', self.funnel.steps.map(step => step.data))
     },
 
     /**
@@ -569,7 +580,7 @@
      */
     addStep (step) {
 
-      console.log('add-step')
+      // console.log('add-step')
 
       if (!step) {
         return
@@ -604,7 +615,7 @@
         return
       }
 
-      console.log('delete-step')
+      // console.log('delete-step')
 
       this.saveUndoState()
 
@@ -656,7 +667,7 @@
         ...newData
       }
 
-      console.log(newStep)
+      // console.log(newStep)
 
       var toReplace = this.funnel.steps.findIndex(step => step.ID === stepId)
 
@@ -686,6 +697,8 @@
      * @param newMeta
      */
     updateCurrentStepMeta (newMeta) {
+
+      console.log(this)
 
       const { meta } = this.getCurrentStep()
 
@@ -785,7 +798,28 @@
     return string.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;').replace(/"/g, '&quot;')
   }
 
+  /**
+   * Convert an object of HTML props into a string
+   *
+   * @param object
+   * @returns {string}
+   */
+  const objectToProps = (object) => {
+    const props = []
+
+    for (const prop in object) {
+      if (object.hasOwnProperty(prop)) {
+        props.push(`${prop}="${specialChars(object[prop])}"`)
+      }
+    }
+
+    return props.join(' ')
+  }
+
   const Elements = {
+    select (props, options, selected) {
+      return `<select ${objectToProps(props)}>${createOptions(options, selected)}</select>`
+    },
     option: function (value, text, selected) {
       //language=HTML
       return `
@@ -799,14 +833,18 @@
       className,
       placeholder = ''
     }, replacements = true, emojis = true) {
+      const classList = [
+        replacements && 'input-with-replacements',
+        emojis && 'input-with-emojis'
+      ]
       //language=HTML
       return `
-		  <div class="input-wrap input-with-replacements input-with-emojis">
+		  <div class="input-wrap ${classList.filter(c => c).join()}">
 			  <input type="${type}" id="${id}" name="${name}" value="${specialChars(value) || ''}" class="${className}"
 			         placeholder="${specialChars(placeholder)}">
 			  ${emojis ? `<button class="emoji-picker-start" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
 			  </button>` : ''}
-			  ${replacements ? `		  <button class="replacements-picker-start" title="insert replacement"><span
+			  ${replacements ? `<button class="replacements-picker-start" title="insert replacement"><span
 				  class="dashicons dashicons-admin-users"></span></button>` : ''}
 		  </div>`
     },
@@ -838,13 +876,26 @@
 
     const optionsString = []
 
-    for (const option in options) {
-      if (options.hasOwnProperty(option)) {
+    // Options is an array format
+    if (Array.isArray(options)) {
+      options.forEach(option => {
         optionsString.push(Elements.option(
-          option, options[option],
+          option, option,
           Array.isArray(selected)
             ? selected.indexOf(option) !== -1
             : option === selected))
+      })
+    }
+    // Assume object
+    else {
+      for (const option in options) {
+        if (options.hasOwnProperty(option)) {
+          optionsString.push(Elements.option(
+            option, options[option],
+            Array.isArray(selected)
+              ? selected.indexOf(option) !== -1
+              : option === selected))
+        }
       }
     }
 
@@ -1036,6 +1087,14 @@
 
   const StepTypes = {
 
+    register (type, opts) {
+      this[type] = {
+        type: type,
+        ...opts
+      }
+      // console.log('step-registered', type, opts, this)
+    },
+
     getType (type) {
 
       if (!this.hasOwnProperty(type)) {
@@ -1082,7 +1141,7 @@
           }).on('change', function (e) {
             e.preventDefault()
             const meta = $(this).serializeFormJSON()
-            console.log(meta)
+            // console.log(meta)
             Editor.updateCurrentStepMeta(meta)
           })
           self.promiseController = null
@@ -1796,7 +1855,7 @@
         }
 
         $('.select2').select2().on('change', function (e) {
-          console.log(e)
+          // console.log(e)
           Editor.updateCurrentStepMeta({
             [$(this).attr('name')]: $(this).val()
           })
@@ -1804,7 +1863,7 @@
         })
 
         $('.delay-input').on('change', function (e) {
-          console.log(e)
+          // console.log(e)
 
           Editor.updateCurrentStepMeta({
             [e.target.name]: e.target.value
@@ -1900,4 +1959,25 @@
       }
     }
   }
+
+  for (const func in Editor) {
+    if (Editor.hasOwnProperty(func) && typeof func === 'function') {
+      Editor[func] = Editor[func].bind(Editor)
+    }
+  }
+
+  Groundhogg.funnelEditor = Editor
+  Groundhogg.funnelEditor.functions = {
+    registerStepType ( type, opts ) {
+      return StepTypes.register( type, opts )
+    },
+    updateCurrentStepMeta (newMeta) {
+      return Editor.updateCurrentStepMeta(newMeta)
+    },
+    renderStepEdit () {
+      return Editor.renderStepEdit()
+    }
+  }
+  Groundhogg.funnelEditor.elements = Elements
+
 })(GroundhoggFunnel, jQuery)
