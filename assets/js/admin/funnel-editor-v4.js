@@ -22,6 +22,96 @@
     return o
   }
 
+  const slot = (name, ...args) => {
+    return SlotFillProvider.slot(name, ...args)
+  }
+
+  const fill = (name, component) => {
+    return SlotFillProvider.fill(name, component)
+  }
+
+  const slotsMounted = () => {
+    return SlotFillProvider.slotsMounted()
+  }
+
+  const slotsDemounted = () => {
+    return SlotFillProvider.slotsDemounted()
+  }
+
+  const SlotFillProvider = {
+
+    fills: [],
+    _slotsMounted: [],
+    _slotsDemounted: [],
+
+    /**
+     * Render a slot name
+     *
+     * @param slotName
+     * @param args
+     * @returns {string}
+     */
+    slot (slotName, ...args) {
+      this._slotsMounted.push({
+        name: slotName,
+        args: args
+      })
+      return this.fills.filter(fill => fill.slot === slotName).map(fill => fill.render(...args)).join('')
+    },
+
+    /**
+     * Call this after any slots have been added to the DOM
+     */
+    slotsMounted () {
+      let slot
+
+      while (this._slotsMounted.length > 0) {
+        // Get the next mounted slot
+        slot = this._slotsMounted.pop()
+        this.fills.filter(fill => fill.slot === slot.name).forEach(fill => {
+          fill.onMount(...slot.args)
+        })
+
+        // After a slot has been mounted, remember it has been so it can be demounted later
+        this._slotsDemounted.push(slot)
+      }
+    },
+
+    /**
+     * Any callbacks to demount a slot
+     * Call before any slots are removed from the DOM
+     */
+    slotsDemounted () {
+      let slot
+
+      while (this._slotsDemounted.length > 0) {
+        // get the next demounted slot
+        slot = this._slotsDemounted.pop()
+        this.fills.filter(fill => fill.slot === slot.name).forEach(fill => {
+          fill.onDemount(...slot.args)
+        })
+      }
+    },
+
+    /**
+     * Register a fill for a slot
+     *
+     * @param slot
+     * @param component
+     */
+    fill (slot, component) {
+      this.fills.push({
+        slot,
+        ...{
+          render () {},
+          onMount () {},
+          onDemount () {},
+          ...component
+        }
+      })
+    }
+  }
+
   const Editor = {
 
     activeAddType: 'actions',
@@ -94,14 +184,18 @@
             </div>` : ''}
 			<div class="step-edit">
 				<div class="settings">
+					${slot('beforeStepSettings', step)}
 					${Editor.stepTypes[step_type].edit(step)}
+					${slot('afterStepSettings', step)}
 				</div>
 				<div class="actions-and-notes">
+					${slot('beforeStepNotes', step)}
 					<div class="panel">
 						<label class="row-label"><span class="dashicons dashicons-admin-comments"></span> Notes</label>
 						<textarea rows="4" id="step-notes" class="notes full-width"
 						          name="step_notes">${specialChars(meta.step_notes || '')}</textarea>
 					</div>
+					${slot('afterStepNotes', step)}
 				</div>
 			</div>`
       },
@@ -460,6 +554,8 @@
         this.stepTypes[previousStep.data.step_type].onDemount(previousStep)
       }
 
+      slotsDemounted()
+
       $('#control-panel').html(this.htmlTemplates.stepEditPanel(step))
 
       this.stepTypes[step.data.step_type].onMount(step)
@@ -470,6 +566,8 @@
           step_notes: $(this).val()
         })
       })
+
+      slotsMounted()
     },
 
     /**
@@ -663,6 +761,15 @@
      */
     getStep (stepId) {
       return this.funnel.steps.find(step => step.ID === stepId)
+    },
+
+    /**
+     * Get all the funnel steps
+     *
+     * @returns {[]}
+     */
+    getSteps () {
+      return this.funnel.steps
     },
 
     /**
@@ -870,6 +977,15 @@
   }
 
   const Elements = {
+    input (props) {
+      props = {
+        type: 'text',
+        className: 'input',
+        ...props
+      }
+
+      return `<input ${objectToProps(props)}/>`
+    },
     select (props, options, selected) {
       return `<select ${objectToProps(props)}>${createOptions(options, selected)}</select>`
     },
@@ -1429,7 +1545,7 @@
 
         for (var role in roles) {
           if (Object.prototype.hasOwnProperty.call(roles, role)) {
-            options.push(Elements.option(role, roles[role], meta.role?.indexOf(role) >= 0))
+            options.push(Elements.option(role, roles[role], meta.role.indexOf(role) >= 0))
           }
         }
 
@@ -2053,6 +2169,16 @@
   }
   Groundhogg.funnelEditor = Editor
   Groundhogg.funnelEditor.functions = {
+    slot,
+    fill,
+    slotsDemounted,
+    slotsMounted,
+    getSteps () {
+      return Editor.getSteps()
+    },
+    stepTitle (step) {
+      return StepTypes.getType(step.data.step_type).title(step)
+    },
     registerStepType (type, opts) {
       return StepTypes.register(type, opts)
     },
@@ -2066,6 +2192,7 @@
       return Editor.getCurrentStep()
     }
   }
+
   Groundhogg.funnelEditor.elements = Elements
 
 })(GroundhoggFunnel, jQuery)
