@@ -222,6 +222,10 @@
         })
 
         onChange(self.filters)
+
+        self.isAddingFilter = false
+        self.currentGroup = group
+        self.currentFilter = self.filters[group].length - 1
         reMount()
       }
 
@@ -328,6 +332,10 @@
           }
 
         } else if (clickedOnAddFilterSearch) {
+
+          const clickedOnClose = clickInsideElement(e, '.close')
+          self.isAddingFilter = false
+          reMount()
 
         } else {
           self.currentFilter = false
@@ -473,7 +481,7 @@
     }
   }, 'Date Created')
 
-  const { optin_status, owners  } = Groundhogg.filters
+  const { optin_status, owners } = Groundhogg.filters
 
   console.log({
     optin_status,
