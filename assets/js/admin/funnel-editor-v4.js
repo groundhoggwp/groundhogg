@@ -276,14 +276,18 @@
 					<div class="step-type">${Editor.stepTypes[step_type].name}</div>
 				</div>
 				<div class="step-status ${status}"></div>
-              <div class="step-menu">
-                <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 16a3.001 3.001 0 010 6 3.001 3.001 0 010-6zm0 1a2 2 0 11-.001 4.001A2 2 0 0112 17zm0-8a3.001 3.001 0 010 6 3.001 3.001 0 010-6zm0 1a2 2 0 11-.001 4.001A2 2 0 0112 10zm0-8a3.001 3.001 0 010 6 3.001 3.001 0 010-6zm0 1a2 2 0 11-.001 4.001A2 2 0 0112 3z"/></svg>
-                <ul>
-                    <li class="step-menu-edit">Edit</li>
-                    <li class="step-menu-duplicate">Duplicate</li>
-                    <li class="step-menu-delete">Delete</li>
-                </ul>
-              </div>
+				<div class="step-menu">
+					<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+					     fill-rule="evenodd" clip-rule="evenodd">
+						<path
+							d="M12 16a3.001 3.001 0 010 6 3.001 3.001 0 010-6zm0 1a2 2 0 11-.001 4.001A2 2 0 0112 17zm0-8a3.001 3.001 0 010 6 3.001 3.001 0 010-6zm0 1a2 2 0 11-.001 4.001A2 2 0 0112 10zm0-8a3.001 3.001 0 010 6 3.001 3.001 0 010-6zm0 1a2 2 0 11-.001 4.001A2 2 0 0112 3z"/>
+					</svg>
+					<ul>
+						<li class="step-menu-edit">Edit</li>
+						<li class="step-menu-duplicate">Duplicate</li>
+						<li class="step-menu-delete">Delete</li>
+					</ul>
+				</div>
 			</div>
 			${step_group === 'benchmark' && nextStep ? (nextStep.data.step_group === 'benchmark' ? `<div class="or-helper text-helper">Or...</div>` : '<div class="then-helper text-helper">Then...</div>') : ''}
         `
@@ -306,36 +310,36 @@
       })
 
       $doc.on('mouseleave', '.step-flow .steps .step', function (e) {
-        const $step = $(this);
-        $('.step-menu ul', $step).hide();
+        const $step = $(this)
+        $('.step-menu ul', $step).hide()
       })
 
       $doc.on('click', '.step-flow .steps .step', function (e) {
 
-        const $step = $(this);
+        const $step = $(this)
 
         switch (true) {
-          case ( $(e.target).is('.step-menu-duplicate') ) :
-              window.console.log('duplicate');
+          case ($(e.target).is('.step-menu-duplicate')) :
+            window.console.log('duplicate')
             const stepToCopy = self.funnel.steps
-                .find(step => step.ID === self.stepOpenInContextMenu)
+              .find(step => step.ID === parseInt($step.data('id')))
 
             const newStep = copyObject(stepToCopy)
             newStep.ID = uniqid()
             self.addStep(newStep)
-            break;
-          case ( $(e.target).is('.step-menu-delete') ) :
-              window.console.log('delete');
-            self.deleteStep(self.stepOpenInContextMenu);
-            break;
-          case ( $(e.target).is('.step-menu') || $(e.target).parent('.step-menu').length > 0 ) :
-              window.console.log('toggle menu');
-            $('.step-menu ul', $step).toggle();
-            break;
-          case ( $(e.target).is('.step-menu-edit') ) :
+            break
+          case ($(e.target).is('.step-menu-delete')) :
+            window.console.log('delete')
+            self.deleteStep(parseInt($step.data('id')))
+            break
+          case ($(e.target).is('.step-menu') || $(e.target).parent('.step-menu').length > 0) :
+            window.console.log('toggle menu')
+            $('.step-menu ul', $step).toggle()
+            break
+          case ($(e.target).is('.step-menu-edit')) :
           default:
-              window.console.log('edit');
-            const clickedStep = parseInt($(this).data('id'))
+            window.console.log('edit')
+            const clickedStep = parseInt($step.data('id'))
 
             if (clickedStep === self.activeStep) {
               return
@@ -1392,37 +1396,37 @@
           }
         )
 
-        for(id in tinymce.editors){
-          if(id.trim()){
-            elementReady(id);
+        for (id in tinymce.editors) {
+          if (id.trim()) {
+            elementReady(id)
           }
         }
 
         // Wait for non-initialised editors to initialise
         tinymce.on('AddEditor', function (e) {
-          elementReady(e.editor.id);
-        });
+          elementReady(e.editor.id)
+        })
 
         // function to call when tinymce-editor has initialised
-        function elementReady(editor_id){
+        function elementReady (editor_id) {
 
           // get tinymce editor based on instance-id
-          var _editor = tinymce.editors[editor_id];
+          var _editor = tinymce.editors[editor_id]
 
           // Timer for saving on pause.
-          let saveTimer = null;
+          let saveTimer = null
 
-          _editor.on("keyup", function(e){
+          _editor.on('keyup', function (e) {
             // Reset timer.
-            clearTimeout(saveTimer);
+            clearTimeout(saveTimer)
 
             // Only save after a second.
             saveTimer = setTimeout(function () {
               Editor.updateCurrentStepMeta({
-                note_text: tinyMCE.activeEditor.getContent({format : 'raw'})
+                note_text: tinyMCE.activeEditor.getContent({ format: 'raw' })
               })
-            }, 1000);
-          });
+            }, 1000)
+          })
         }
       },
       onDemount () {
