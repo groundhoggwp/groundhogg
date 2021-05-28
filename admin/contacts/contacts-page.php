@@ -79,6 +79,8 @@ class Contacts_Page extends Admin_Page {
 		add_action( 'wp_ajax_groundhogg_edit_notes', [ $this, 'edit_note_ajax' ] );
 		add_action( 'wp_ajax_groundhogg_delete_notes', [ $this, 'delete_note_ajax' ] );
 		add_action( 'wp_ajax_groundhogg_add_notes', [ $this, 'add_note_ajax' ] );
+		add_action( 'wp_ajax_groundhogg_get_contacts_table', [ $this, 'ajax_get_table' ] );
+		add_action( 'wp_ajax_nopriv_groundhogg_get_contacts_table', [ $this, 'ajax_get_table' ] );
 	}
 
 	/**
@@ -151,7 +153,13 @@ class Contacts_Page extends Admin_Page {
 			wp_enqueue_script( 'groundhogg-admin-contact-inline' );
 
 			// Advanced Search
-			wp_enqueue_script( 'groundhogg-admin-search-filters' );
+			wp_enqueue_script( 'groundhogg-admin-contact-search' );
+
+			wp_localize_script( 'groundhogg-admin-contact-search', 'SavedSearches', Saved_Searches::instance()->get_all() );
+			wp_localize_script( 'groundhogg-admin-contact-search', 'page', [
+				'url'   => admin_page_url( 'gh_contacts' ),
+				'query' => get_request_query()
+			] );
 		}
 	}
 
@@ -887,6 +895,36 @@ class Contacts_Page extends Admin_Page {
 		return $this->process_status_change();
 	}
 
+
+	public function ajax_get_table() {
+
+//		if ( ! current_user_can( 'view_contacts' ) ){
+//			return;
+//		}
+
+		ob_start();
+
+		$contacts_table = new Tables\Contacts_Table();
+
+		?>
+		<form method="post" id="contacts-table-form">
+			<?php
+			$contacts_table->prepare_items();
+			$contacts_table->display();
+
+			if ( $contacts_table->has_items() ) {
+				$contacts_table->inline_edit();
+			} ?>
+		</form>
+		<?php
+
+		$table = ob_get_clean();
+
+		wp_send_json_success( [
+			'html' => $table
+		] );
+	}
+
 	/**
 	 * Edit a note...
 	 */
@@ -1131,7 +1169,7 @@ class Contacts_Page extends Admin_Page {
 			return new \WP_Error( 'error', __( 'Invalid search' ) );
 		}
 
-		$query    = get_request_query();
+		$query = get_request_query();
 
 		Saved_Searches::instance()->update( $search_id, [
 			'query' => $query,
@@ -1247,14 +1285,14 @@ class Contacts_Page extends Admin_Page {
 
 		$contacts_table = new Tables\Contacts_Table();
 
-		include __DIR__ . '/advanced-search-new.php';
+//		include __DIR__ . '/advanced-search-new.php';
 
 		$contacts_table->views();
 
 		include __DIR__ . '/quick-search.php';
 
 		?>
-		<form method="post">
+		<form method="post" id="contacts-table-form">
 			<?php
 			$contacts_table->prepare_items();
 			$contacts_table->display();

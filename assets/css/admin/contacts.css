@@ -11,14 +11,26 @@
     font-size: 14px;
 }
 
-#search-filters {
+#search-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-top: 20px;
 }
 
-#search-filters .saved-search-form {
-    border-top: 1px solid #ccd0d4;
-    margin-top: 20px;
-    padding-top: 10px;
+#search-panel .filters{
+    display: flex;
+    justify-content: flex-start;
+    /*align-items: center;*/
+    gap: 5px;
+}
+
+#search-panel button.enable-filters{
+    background: #FFFFFF;
+    border: 1px solid #8c8f94;
+    border-radius: 5px;
+    padding: 5px;
+    cursor: pointer;
 }
 
 .search-param {

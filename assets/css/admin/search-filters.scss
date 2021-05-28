@@ -1,7 +1,3 @@
-#search-filters {
-  padding: 10px;
-}
-
 #search-filters-editor {
   display: flex;
   flex-wrap: wrap;
@@ -13,6 +9,17 @@
     background: none;
     border: none;
     cursor: pointer;
+
+    &.add-filter{
+      padding: 5px;
+    }
+
+    &.white{
+      //padding: 5px 8px;
+      background: #FFFFFF;
+      border: 1px solid #8c8f94;
+      border-radius: 5px;
+    }
   }
 
   .add-filter-wrap {
@@ -21,7 +28,7 @@
     .add-filter {
       position: absolute;
       z-index: 999;
-      border: 1px solid #e5e5e5;
+      border: 1px solid #8c8f94;
       display: flex;
       flex-direction: column;
       gap: 5px;
@@ -33,7 +40,7 @@
         padding: 5px;
         display: flex;
         justify-content: space-between;
-        border-bottom: 1px solid #e5e5e5;
+        border-bottom: 1px solid #8c8f94;
         gap: 20px;
       }
 
@@ -72,8 +79,8 @@
 
     &.filter-view {
       padding: 5px 8px;
-      background: #f9f9f9;
-      border: 1px solid #e5e5e5;
+      background: #FFFFFF;
+      border: 1px solid #8c8f94;
       border-radius: 5px;
     }
 
@@ -82,7 +89,7 @@
       min-width: 200px;
 
       .filter-edit {
-        border: 1px solid #e5e5e5;
+        border: 1px solid #8c8f94;
         padding: 10px;
         display: flex;
         flex-direction: column;

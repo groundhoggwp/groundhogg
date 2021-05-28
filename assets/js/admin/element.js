@@ -293,6 +293,128 @@
     return false
   }
 
+  const searchOptionsWidget = ({
+    selector,
+    options = [],
+    groups = {},
+    filterOption = (option, search) => option.match(regexp(search)),
+    renderOption = (option) => option,
+    noOptions = `No options...`,
+    onSelect = (option) => console.log(option),
+    onClose = () => {},
+    onOpen = () => {}
+  }) => ({
+    selector,
+    options,
+    filterOption,
+    renderOption,
+    onClose,
+    onSelect,
+    groups,
+
+    search: '',
+    render () {
+      //language=HTML
+      return `
+		  <div class="search-options-widget-wrap">
+			  <div class="search-options-widget">
+				  <div class="header">
+					  ${Elements.input({
+						  name: 'search',
+						  type: 'search',
+						  className: 'search-for-options',
+						  autocomplete: 'off',
+						  placeholder: 'Search...'
+					  })}
+					  <button class="close">
+						  <span class="dashicons dashicons-no-alt"></span>
+					  </button>
+				  </div>
+				  <div class="search-options ${this.hasGroups() ? 'has-groups' : 'no-groups'}"></div>
+			  </div>
+		  </div>`
+    },
+    getOptions () {
+      return options.filter((option, i) => {
+        if (this.search) {
+          return filterOption(option, this.search)
+        }
+
+        return true
+      })
+    },
+    hasGroups () {
+      return Object.keys(groups).length > 0
+    },
+    renderSearchOptions () {
+
+      const searchOptions = []
+
+      if (Object.keys(groups).length > 0) {
+
+        Object.keys(groups).forEach((group, g) => {
+          const options = []
+
+          this.getOptions().filter(option => option.group === group).forEach((option, o) => {
+            options.push(`<div class="option" data-option="${o}" data-group="${group}">${renderOption(option)}</div>`)
+          })
+
+          if (options.length > 0) {
+            searchOptions.push(`<div class="option-group" data-group="${group}">${groups[group]}</div>`, ...options)
+          }
+
+        })
+
+      } else {
+        this.getOptions().forEach((option, o) => {
+          searchOptions.push(`<div class="option" data-option="${o}">${renderOption(option)}</div>`)
+        })
+      }
+
+      return searchOptions.length ? searchOptions.join('') : `<div class="no-options">${noOptions}</div>`
+    },
+    mountOptions () {
+
+      var self = this;
+      $(`${selector} .search-options`).html(this.renderSearchOptions())
+      $(`${selector} .option`).on('click', function (e) {
+        const optionId = parseInt($(this).data('option'))
+        const groupId = parseInt($(this).data('group'))
+        if ( ! self.hasGroups() ){
+          onSelect( self.getOptions()[optionId] )
+          onClose()
+        } else {
+          Object.keys(groups).forEach((group, g) => {
+            this.getOptions().filter(option => option.group === group).forEach((option, o) => {
+              if ( g === groupId && o === optionId ){
+                onSelect( option )
+                onClose()
+                return
+              }
+            })
+          })
+        }
+      })
+    },
+    mount () {
+      var self = this
+
+      $(selector).html(self.render())
+      this.mountOptions()
+
+      $(`${selector} input.search-for-options`).on('change input', function (e) {
+        self.search = $(this).val()
+        self.mountOptions()
+      })
+
+      $(`${selector} button.close`).on('click', function (e) {
+        onClose()
+      })
+
+      onOpen()
+    }
+  })
+
   Groundhogg.element = {
     ...Elements,
     specialChars,
@@ -302,7 +424,8 @@
     objectToStyle,
     createOptions,
     createSlotFillProvider,
-    clickInsideElement
+    clickInsideElement,
+    searchOptionsWidget
   }
 
 })(jQuery)

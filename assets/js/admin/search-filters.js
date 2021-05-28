@@ -68,7 +68,7 @@
     equals: 'Equals',
     not_equals: 'Not equals',
     contains: 'Contains',
-    does_not_contain: 'Does not contain',
+    not_contains: 'Does not contain',
     starts_with: 'Starts with',
     ends_with: 'Ends with',
     does_not_start_with: 'Does not start with',
@@ -183,6 +183,10 @@
       this.eventHandlers()
     },
 
+    demount () {
+
+    },
+
     eventHandlers () {
 
       var self = this
@@ -217,6 +221,11 @@
 
       const addFilter = (opts, group) => {
         group = group >= 0 ? group : 0
+
+        if (self.filters.length === 0) {
+          group = 0
+          self.filters.push([])
+        }
 
         self.filters[group].push({
           ...opts
@@ -268,7 +277,7 @@
         self.filters[group].splice(key, 1)
 
         // If the group is empty, remove it as well
-        if (self.filters[group].length === 0) {
+        if ( group !== 0 && self.filters[group].length === 0) {
           self.filters.splice(group, 1)
         }
 
@@ -336,8 +345,8 @@
         } else if (clickedOnAddFilterSearch) {
 
           const clickedOnClose = clickInsideElement(e, '.close')
-          
-          if ( clickedOnClose ){
+
+          if (clickedOnClose) {
             self.isAddingFilter = false
             reMount()
           }
@@ -357,28 +366,6 @@
   Groundhogg.filters.functions = {
     createFilters
   }
-
-  $(function () {
-
-    const defaultFilters = [
-      [
-        {
-          type: 'first_name',
-          compare: 'equals',
-          value: 'adrian'
-        }
-      ]
-    ]
-
-    const app = createFilters('#search-filters', defaultFilters, function (filters) {
-      console.log(filters)
-    })
-
-    app.mount()
-
-    console.log('mounted')
-
-  })
 
 //  REGISTER ALL FILTERS HERE
   const BasicTextFilter = (name) => ({
@@ -494,11 +481,6 @@
   }, 'Date Created')
 
   const { optin_status, owners } = Groundhogg.filters
-
-  console.log({
-    optin_status,
-    owners,
-  })
 
   //  Filter by Optin Status
   //  Filter by Contact Owner

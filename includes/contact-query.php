@@ -301,6 +301,11 @@ class Contact_Query {
 		 */
 		$this->query_var_defaults = apply_filters( 'groundhogg/contact_query/query_var_defaults', $defaults );
 
+		if ( empty( self::$filters ) ) {
+			self::setup_default_filters();
+			do_action( 'groundhogg/contact_query/register_filters', $this );
+		}
+
 		if ( ! empty( $query ) ) {
 			$this->query( $query );
 		}
@@ -323,12 +328,12 @@ class Contact_Query {
 	 * @see    WPGH_Contact_Query::__construct()
 	 *
 	 */
-	public function query( $query, $as_contact_object=false ) {
+	public function query( $query, $as_contact_object = false ) {
 		$this->query_vars = wp_parse_args( $query );
 		$items            = $this->get_items();
 
-		if ( $as_contact_object ){
-			$items = array_map( function ( $contact ){
+		if ( $as_contact_object ) {
+			$items = array_map( function ( $contact ) {
 				return new Contact( $contact );
 			}, $items );
 		}
@@ -1139,12 +1144,12 @@ class Contact_Query {
 		$or_clauses = [];
 
 		// Or Group
-		foreach ( $filters as $filter_and_group ) {
+		foreach ( $filters as $filter_group ) {
 
 			$and_clauses = [];
 
 			// And Group
-			foreach ( $filter_and_group as $filter ) {
+			foreach ( $filter_group as $filter ) {
 				$clause = $this->parse_filter( $filter );
 				if ( $clause !== false ) {
 					$and_clauses[] = $clause;
@@ -1179,7 +1184,7 @@ class Contact_Query {
 			return false;
 		}
 
-		return call_user_func( $handler['filter_callback'], $filter );
+		return call_user_func( $handler['filter_callback'], $filter, $this );
 	}
 
 	/**
@@ -1260,7 +1265,8 @@ class Contact_Query {
 			case 'not_contains':
 				return sprintf( "%s NOT RLIKE '%s'", $column_key, $value );
 			case 'begins_with':
-				return sprintf( "%s LIKE '%s'", $column_key, $wpdb->esc_like( $value ) . '%s' );
+			case 'starts_with':
+				return sprintf( "%s LIKE '%s'", $column_key, $wpdb->esc_like( $value ) . '%' );
 			case 'ends_with':
 				return sprintf( "%s LIKE '%s'", $column_key, '%' . $wpdb->esc_like( $value ) );
 			case 'empty':
@@ -1318,8 +1324,8 @@ class Contact_Query {
 	 *
 	 * @return string
 	 */
-	public static function contact_generic_text_filter_compare( array $filter_vars ): string {
-		return self::generic_text_filter_compare( $filter_vars, $filter_vars['type'] );
+	public static function contact_generic_text_filter_compare( array $filter_vars, $query ): string {
+		return self::generic_text_filter_compare( $filter_vars, $query->table_name . '.' . $filter_vars['type'] );
 	}
 
 	/**

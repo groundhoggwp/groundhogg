@@ -336,6 +336,8 @@ class Plugin {
 		new User_Syncing();
 
 		\Groundhogg_Email_Services::init();
+
+		Contact_Query::setup_default_filters();
 	}
 
 	/**
