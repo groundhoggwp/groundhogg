@@ -198,6 +198,7 @@
       const setActiveFilter = (group, filter) => {
         self.currentFilter = filter
         self.currentGroup = group
+        self.isAddingFilter = false
 
         reMount()
 
@@ -223,10 +224,7 @@
 
         onChange(self.filters)
 
-        self.isAddingFilter = false
-        self.currentGroup = group
-        self.currentFilter = self.filters[group].length - 1
-        reMount()
+        setActiveFilter(group, self.filters[group].length - 1)
       }
 
       const updateFilter = (opts) => {
@@ -237,6 +235,8 @@
           ...self.tempFilterSettings,
           ...opts
         }
+
+        return self.tempFilterSettings
       }
 
       const commitFilter = (group, key) => {
@@ -300,6 +300,8 @@
         if (clickedOnAddFilter) {
 
           self.isAddingFilter = true
+          self.currentFilter = false
+          self.currentGroup = false
           reMount()
 
         } else if (clickedOnFilterView) {
@@ -438,11 +440,11 @@
       //language=HTMl
       switch (compare) {
         case 'before':
-          return `is before <b>${value}</b>`
+          return `<b>Date created</b> is before <b>${value}</b>`
         case 'after':
-          return `is after <b>${value}</b>`
+          return `<b>Date created</b> is after <b>${value}</b>`
         case 'between':
-          return `is between <b>${value}</b> and <b>${value2}</b>`
+          return `<b>Date created</b> is between <b>${value}</b> and <b>${value2}</b>`
       }
     },
     edit ({ compare, value, value2 }, filterGroupIndex, filterIndex) {
@@ -463,15 +465,22 @@
 		  type: 'date',
 		  value: value2,
 		  id: 'filter-value2',
+		  className: 'hidden',
 		  name: 'value2'
 	  })}`
     },
     onMount (filter, updateFilter) {
       $('#filter-compare, #filter-value, #filter-value2').on('change', function (e) {
         const $el = $(this)
-        updateFilter({
+        const { compare } = updateFilter({
           [$el.prop('name')]: $el.val()
         })
+
+        if (compare === 'between') {
+          $('#filter-value2').removeClass('hidden')
+        } else {
+          $('#filter-value2').addClass('hidden')
+        }
       })
     },
     defaults: {
