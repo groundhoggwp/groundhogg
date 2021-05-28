@@ -38,7 +38,12 @@
       }
 
       .filter-options {
-        padding: 5px;
+        padding: 5px 8px;
+
+        * {
+          padding-top: 3px;
+          padding-bottom: 3px;
+        }
 
         .option-group {
           font-weight: 500;
@@ -46,6 +51,12 @@
 
         .option {
           padding-left: 10px;
+          cursor: pointer;
+
+          &:hover{
+            background: #0d79e5;
+            color: #FFFFFF;
+          }
         }
       }
     }

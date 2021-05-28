@@ -336,8 +336,11 @@
         } else if (clickedOnAddFilterSearch) {
 
           const clickedOnClose = clickInsideElement(e, '.close')
-          self.isAddingFilter = false
-          reMount()
+          
+          if ( clickedOnClose ){
+            self.isAddingFilter = false
+            reMount()
+          }
 
         } else {
           self.currentFilter = false

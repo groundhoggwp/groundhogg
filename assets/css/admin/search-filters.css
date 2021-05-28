@@ -36,13 +36,22 @@
   gap: 20px;
 }
 #search-filters-editor .add-filter-wrap .add-filter .filter-options {
-  padding: 5px;
+  padding: 5px 8px;
+}
+#search-filters-editor .add-filter-wrap .add-filter .filter-options * {
+  padding-top: 3px;
+  padding-bottom: 3px;
 }
 #search-filters-editor .add-filter-wrap .add-filter .filter-options .option-group {
   font-weight: 500;
 }
 #search-filters-editor .add-filter-wrap .add-filter .filter-options .option {
   padding-left: 10px;
+  cursor: pointer;
+}
+#search-filters-editor .add-filter-wrap .add-filter .filter-options .option:hover {
+  background: #0d79e5;
+  color: #FFFFFF;
 }
 #search-filters-editor .filter {
   float: none;
