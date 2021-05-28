@@ -358,9 +358,6 @@ li.step-error {
 .step-menu svg {
   fill: #0005;
 }
-.step-menu:hover ul {
-  display: block;
-}
 .step-menu ul {
   background: #FFF;
   border: 1px solid #0002;
