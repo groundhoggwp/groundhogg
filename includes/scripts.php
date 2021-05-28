@@ -152,10 +152,19 @@ class Scripts {
 			'jquery-ui-autocomplete',
 		], GROUNDHOGG_VERSION, true );
 
+		wp_register_script( 'groundhogg-admin-element', GROUNDHOGG_ASSETS_URL . 'js/admin/element' . $dot_min . '.js', [
+			'groundhogg-admin',
+		], GROUNDHOGG_VERSION );
+
 		wp_register_script( 'groundhogg-admin-data', GROUNDHOGG_ASSETS_URL . 'js/admin/data' . $dot_min . '.js', [
 			'jquery',
 			'groundhogg-admin',
-		] );
+		], GROUNDHOGG_VERSION );
+
+		wp_register_script( 'groundhogg-admin-search-filters', GROUNDHOGG_ASSETS_URL . 'js/admin/search-filters' . $dot_min . '.js', [
+			'groundhogg-admin-element',
+			'groundhogg-admin-data'
+		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-admin-insert-at-cursor', GROUNDHOGG_ASSETS_URL . 'js/admin/insert-at-cursor' . $dot_min . '.js', [
 			'jquery',
@@ -220,7 +229,8 @@ class Scripts {
 			'groundhogg-admin-context-menu',
 			'groundhogg-admin-replacements-picker',
 			'groundhogg-admin-emojis-picker',
-			'groundhogg-admin-form-builder'
+			'groundhogg-admin-form-builder',
+			'groundhogg-admin-search-filters',
 //			'groundhogg-tinymce-plugin'
 		], GROUNDHOGG_VERSION, true );
 
@@ -324,8 +334,12 @@ class Scripts {
 				'groups' => Plugin::instance()->replacements->replacement_code_groups,
 				'codes'  => Plugin::instance()->replacements->replacement_codes
 			],
-			'fields' => [
+			'fields'       => [
 				'mappable' => get_mappable_fields()
+			],
+			'filters'      => [
+				'optin_status' => Preferences::get_preference_names(),
+				'owners'       => get_owners(),
 			]
 		] );
 
@@ -346,6 +360,7 @@ class Scripts {
 		wp_register_style( 'groundhogg-admin-welcome', GROUNDHOGG_ASSETS_URL . 'css/admin/welcome.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-contact-inline', GROUNDHOGG_ASSETS_URL . 'css/admin/contacts.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-contact-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/contact-editor.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
+		wp_register_style( 'groundhogg-admin-search-filters', GROUNDHOGG_ASSETS_URL . 'css/admin/search-filters.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-contact-info-cards', GROUNDHOGG_ASSETS_URL . 'css/admin/info-cards.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
 //        wp_register_style('groundhogg-admin-email-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/email-editor.css', [], GROUNDHOGG_VERSION);
 		wp_register_style( 'groundhogg-admin-email-editor-plain', GROUNDHOGG_ASSETS_URL . 'css/admin/email-editor-plain.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
@@ -374,21 +389,6 @@ class Scripts {
 		wp_register_style( 'groundhogg-loader', GROUNDHOGG_ASSETS_URL . 'css/frontend/loader.css', [], GROUNDHOGG_VERSION );
 
 		do_action( 'groundhogg/scripts/after_register_admin_styles' );
-	}
-
-	public static function enqueue_advanced_search_filters_scripts() {
-		wp_enqueue_script( 'groundhogg-admin-contact-advanced-search' );
-
-		$components = [
-			'filterGroup',
-			'orSeparator'
-		];
-
-		foreach ( $components as $component ) {
-			wp_enqueue_script( 'groundhogg-admin-contact-advanced-search-' . $component );
-		}
-
-		wp_enqueue_script( 'groundhogg-admin-contact-advanced-search-mounting' );
 	}
 
 }
