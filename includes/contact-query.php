@@ -894,7 +894,10 @@ class Contact_Query {
 		}
 
 		if ( ! empty( $this->query_vars['filters'] ) ) {
-			$where['filters'] = $this->parse_filters( $this->query_vars['filters'] );
+			$filters = $this->parse_filters( $this->query_vars['filters'] );
+			if ( ! empty( $filters ) ) {
+				$where['filters'] = $filters;
+			}
 		}
 
 		return $where;
@@ -1154,6 +1157,10 @@ class Contact_Query {
 				if ( $clause !== false ) {
 					$and_clauses[] = $clause;
 				}
+			}
+
+			if ( empty( $and_clauses ) ) {
+				continue;
 			}
 
 			$or_clauses[] = '(' . implode( ' AND ', $and_clauses ) . ')';

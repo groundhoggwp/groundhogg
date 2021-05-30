@@ -75,8 +75,8 @@
     does_not_end_with: 'Does not end with',
     less_than: 'Less than',
     greater_than: 'Greater than',
-    is_empty: 'Is empty',
-    is_not_empty: 'Is not empty'
+    empty: 'Is empty',
+    not_empty: 'Is not empty'
   }
 
   const FilterSearch = (addFilter) => ({
@@ -277,7 +277,7 @@
         self.filters[group].splice(key, 1)
 
         // If the group is empty, remove it as well
-        if ( group !== 0 && self.filters[group].length === 0) {
+        if (group !== 0 && self.filters[group].length === 0) {
           self.filters.splice(group, 1)
         }
 
@@ -372,8 +372,8 @@
     name,
     view ({ compare, value }, filterGroupIndex, filterIndex) {
       switch (compare) {
-        case '_':
-        case '!_':
+        case 'empty':
+        case 'not_empty':
           return `<b>${name}</b> ${Comparisons[compare].toLowerCase()}`
         default:
           return `<b>${name}</b> ${Comparisons[compare].toLowerCase()} <b>${specialChars(value)}</b>`
@@ -479,6 +479,61 @@
       value2: ''
     }
   }, 'Date Created')
+
+  registerFilter('meta', 'contact', {
+    view ({ meta, compare, value }) {
+      //language=HTMl
+      switch (compare) {
+        case 'empty':
+        case 'not_empty':
+          return `<b>${meta}</b> ${Comparisons[compare].toLowerCase()}`
+        default:
+          return `<b>${meta}</b> ${Comparisons[compare].toLowerCase()} <b>${specialChars(value)}</b>`
+      }
+    },
+    edit ({ meta, compare, value }, filterGroupIndex, filterIndex) {
+      // language=html
+      return `
+		  ${input({
+			  id: 'filter-meta',
+			  name: 'meta',
+			  className: 'meta-picker',
+			  dataGroup: filterIndex,
+			  dataKey: filterIndex,
+			  value: meta
+		  })}
+		  ${select({
+			  id: 'filter-compare',
+			  name: 'compare',
+			  dataGroup: filterIndex,
+			  dataKey: filterIndex,
+		  }, Comparisons, compare)} ${input({
+			  id: 'filter-value',
+			  name: 'value',
+			  dataGroup: filterIndex,
+			  dataKey: filterIndex,
+			  value
+		  })}`
+    },
+    onMount (filter, updateFilter) {
+
+      const { metaPicker } = Groundhogg.pickers
+
+      metaPicker('#filter-meta')
+
+      $('#filter-compare, #filter-value, #filter-meta').on('change', function (e) {
+        const $el = $(this)
+        const { compare } = updateFilter({
+          [$el.prop('name')]: $el.val()
+        })
+      })
+    },
+    defaults: {
+      meta: '',
+      compare: 'equals',
+      value: ''
+    }
+  }, 'Custom meta')
 
   const { optin_status, owners } = Groundhogg.filters
 
