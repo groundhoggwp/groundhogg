@@ -20,12 +20,6 @@ use function Groundhogg\dashicon_e;
 				<div class="undo"><?php dashicon_e( 'undo' ); ?></div>
 			</div>
 			<div class="publish-actions">
-				<div class="update">
-					<button type="button" class="button update button-primary"><?php _e( 'Update', 'groundhogg' ) ?></button>
-				</div>
-				<div class="pause">
-					<button type="button" class="button pause"><?php _e( 'Pause', 'groundhogg' ) ?></button>
-				</div>
 			</div>
 		</div>
 	</div>

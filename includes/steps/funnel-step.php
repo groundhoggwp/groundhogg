@@ -852,37 +852,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 */
 	public function pre_save( Step $step ) {
 		$this->set_current_step( $step );
-		$this->posted_settings = wp_unslash( $_POST['steps'][ $step->get_id() ] );
-
-		$args = array(
-			'step_title'  => sanitize_text_field( $this->get_posted_data( 'title' ) ),
-			'step_order'  => $this->get_posted_order(),
-			'step_status' => 'ready',
-		);
-
-		$step->update( $args );
+		$this->posted_settings = $step->get_meta();
 
 		$step->update_meta( 'step_notes', sanitize_textarea_field( $this->get_posted_data( 'step_notes' ) ) );
-
-		if ( $this->get_posted_data( 'blog_id', false ) ) {
-			$step->update_meta( 'blog_id', absint( $this->get_posted_data( 'blog_id', false ) ) );
-		} else {
-			$step->delete_meta( 'blog_id' );
-		}
-
-		if ( $this->get_posted_data( 'is_active', false ) ) {
-			$step->update_meta( 'is_active', 1 );
-		} else {
-			$step->delete_meta( 'is_active' );
-		}
-
-		if ( $this->get_posted_data( 'is_closed', false ) ) {
-			$step->update_meta( 'is_closed', 1 );
-		} else {
-			$step->delete_meta( 'is_closed' );
-		}
-
-		$step->delete_meta( 'has_errors' );
 	}
 
 	/**
@@ -900,13 +872,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 		if ( $this->has_errors() ) {
 			foreach ( $this->get_errors() as $error ) {
-				notices()->add( $error );
-			}
-		}
-
-		if ( $step->has_errors() ) {
-			foreach ( $step->get_errors() as $error ) {
-				notices()->add( $error );
+				$step->add_error( $error );
 			}
 		}
 	}

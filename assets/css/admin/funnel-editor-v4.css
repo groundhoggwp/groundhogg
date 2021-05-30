@@ -2,6 +2,10 @@
   vertical-align: initial;
 }
 
+button {
+  cursor: pointer;
+}
+
 #wpcontent {
   background-color: #F6F9FB;
   padding-left: 0;
@@ -242,6 +246,7 @@ li.step-error {
   margin: -20px auto;
   position: relative;
   border-radius: 5px;
+  z-index: 999;
 }
 
 .step-flow .then-helper {
@@ -624,6 +629,38 @@ li.step-error {
   border-bottom: 1px solid #fff;
   margin-bottom: -1px;
   background: #FFFFFF;
+}
+
+.publish-actions button {
+  border: none;
+  color: #FFFFFF;
+  border-radius: 5px;
+  display: flex;
+  gap: 20px;
+  padding: 6px 10px;
+  font-size: 16px;
+  font-weight: 400;
+  align-items: center;
+}
+.publish-actions button.update-and-launch {
+  background: #9ECE38;
+}
+.publish-actions button.update-and-launch svg {
+  width: 25px;
+  height: 25px;
+}
+.publish-actions button.update {
+  background: #0075FF;
+}
+.publish-actions button.deactivate {
+  background: #e91f4f;
+}
+.publish-actions button.deactivate svg {
+  width: 15px;
+  height: 15px;
+}
+.publish-actions button:hover {
+  opacity: 0.8;
 }
 
 /*# sourceMappingURL=funnel-editor-v4.css.map */

@@ -152,6 +152,31 @@
     funnelErrors: [],
 
     htmlTemplates: {
+      publishActions (status) {
+
+        // Todo switch back
+        if (status === 'inactive') {
+          //language=HTML
+          return `
+			  <button class="update-and-launch">Launch
+				  <svg viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					  <path
+						  d="M8.888 7.173a21.621 21.621 0 017.22-4.783m-7.22 4.783a21.766 21.766 0 00-2.97 3.697m2.97-3.697c-1.445-.778-4.935-1.2-7.335 3.334l2.364 2.364 2-2m10.19-8.481A21.709 21.709 0 0123.22.843a21.708 21.708 0 01-1.546 7.112M16.108 2.39l5.565 5.565M5.917 10.87l1.885 4.057m9.088.248a21.62 21.62 0 004.783-7.22m-4.783 7.22a21.771 21.771 0 01-3.698 2.97m3.698-2.97c.778 1.445 1.2 4.934-3.334 7.335l-2.364-2.364 2-2m0 0L9.136 16.26m0 0l-1.334-1.334m1.334 1.334l-2.71 2.71-.667-.666-.667-.667 2.71-2.71m6.42-5.087a1.886 1.886 0 112.668-2.667 1.886 1.886 0 01-2.668 2.667z"
+						  stroke="currentColor" stroke-width="1.5"/>
+				  </svg>
+			  </button>`
+        } else {
+          //language=HTML
+          return `
+			  <button class="update">Update</button>
+			  <button class="deactivate">Deactivate
+				  <svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+					  <path d="M16.337 15.535h-4.8V.735h4.8v14.8zm-10 0h-4.8V.735h4.8v14.8z" fill="#fff" stroke="#fff"
+					        stroke-width="1.2"/>
+				  </svg>
+			  </button>`
+        }
+      },
       funnelTitleEdit (title, isEditing) {
         //language=HTML
         if (isEditing) {
@@ -299,9 +324,7 @@
       var self = this
       var $doc = $(document)
 
-      // Copy from the orig included data
-      // self.funnel = copyObject(self.funnel)
-      self.origFunnel = copyObject(self.funnel)
+      this.loadFunnel();
 
       $doc.on('click', '.step-add .select-type', function () {
         self.saveUndoState()
@@ -376,6 +399,14 @@
         }
       })
 
+      $doc.on('click', '.publish-actions .deactivate', function () {
+        self.deactivate()
+      })
+
+      $doc.on('click', '.publish-actions .update-and-launch, .publish-actions .update', function () {
+        self.commitChanges()
+      })
+
       $(document).on('tinymce-editor-setup', function (event, editor) {
         editor.settings.toolbar1 = 'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,wp_adv,dfw,groundhoggreplacementbtn,groundhoggemojibtn'
         editor.settings.toolbar2 = 'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help'
@@ -402,16 +433,30 @@
 
       Tags.preloadTags()
 
-      if (this.funnel.meta.edited) {
-        this.funnel.steps = this.funnel.meta.edited.steps
-        this.funnel.data.title = this.funnel.meta.edited.title
-      }
-
       self.setupSortable()
       self.setupStepTypes()
       self.initStepFlowContextMenu()
 
       self.render()
+    },
+
+    loadFunnel ( funnel ) {
+
+      funnel = funnel || this.funnel
+
+      this.funnel = {
+        ...this.funnel,
+        ...funnel
+      }
+
+      // Copy from the orig included data
+      // self.funnel = copyObject(self.funnel)
+      this.origFunnel = copyObject(this.funnel)
+
+      if (this.funnel.meta.edited) {
+        this.funnel.steps = this.funnel.meta.edited.steps
+        this.funnel.data.title = this.funnel.meta.edited.title
+      }
     },
 
     /**
@@ -652,9 +697,17 @@
      */
     render () {
       this.renderTitle()
+      this.renderPublishActions()
       this.renderStepFlow()
       this.renderStepAdd()
       this.renderStepEdit()
+    },
+
+    /**
+     * Publish actions
+     */
+    renderPublishActions () {
+      $('.publish-actions').html(this.htmlTemplates.publishActions(this.funnel.data.status))
     },
 
     /**
@@ -668,8 +721,6 @@
       })
 
       this.fixStepOrders()
-
-      // console.log('synced', self.funnel.steps.map(step => step.data))
     },
 
     /**
@@ -725,6 +776,53 @@
       this.undoStates.push(lastState)
 
       this.render()
+    },
+
+    activate() {
+      var self = this
+
+      apiPost(`${apiRoutes.funnels}/${self.funnel.ID}`, {
+        data: {
+          status: 'active'
+        }
+      }).then(data => {
+        if ( data.item ){
+          self.loadFunnel( data.item )
+          self.render()
+        }
+      })
+    },
+
+    deactivate () {
+
+      var self = this
+
+      apiPost(`${apiRoutes.funnels}/${self.funnel.ID}`, {
+        data: {
+          status: 'inactive'
+        }
+      }).then(data => {
+        if ( data.item ){
+          self.loadFunnel( data.item )
+          self.render()
+        }
+      })
+
+    },
+
+    commitChanges () {
+      var self = this
+
+      if ( objectEquals( this.funnel.steps, this.origFunnel.steps ) ){
+        return this.activate();
+      }
+
+      apiPost(`${apiRoutes.funnels}/${self.funnel.ID}/commit`, {}).then(data => {
+        if ( data.item ){
+          self.loadFunnel( data.item )
+          self.render()
+        }
+      })
     },
 
     /**
@@ -1045,7 +1143,7 @@
       ]
       //language=HTML
       return `
-		  <div class="input-wrap ${classList.filter(c => c).join()}">
+		  <div class="input-wrap ${classList.filter(c => c).join(' ')}">
 			  <input type="${type}" id="${id}" name="${name}" value="${specialChars(value) || ''}" class="${className}"
 			         placeholder="${specialChars(placeholder)}">
 			  ${emojis ? `<button class="emoji-picker-start" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
@@ -1556,6 +1654,10 @@
 			  </defs>
 		  </svg>
       `,
+
+      defaults: {
+        role: []
+      },
 
       // Title
       title ({ ID, data, meta }) {

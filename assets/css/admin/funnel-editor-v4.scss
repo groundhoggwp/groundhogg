@@ -2,6 +2,10 @@
   vertical-align: initial;
 }
 
+button{
+  cursor: pointer;
+}
+
 #wpcontent {
   background-color: #F6F9FB;
   padding-left: 0;
@@ -258,6 +262,7 @@ li.step-error {
   margin: -20px auto;
   position: relative;
   border-radius: 5px;
+  z-index: 999;
 }
 
 .step-flow .then-helper {
@@ -429,9 +434,11 @@ li.step-error {
     position: absolute;
     top: 90%;
     z-index: 2;
+
     li {
       margin: 0;
       padding: .236rem .382rem;
+
       &:hover {
         background: #0001;
       }
@@ -690,6 +697,48 @@ li.step-error {
       border-bottom: 1px solid #fff;
       margin-bottom: -1px;
       background: #FFFFFF;
+    }
+  }
+}
+
+.publish-actions {
+  button {
+    border: none;
+    color: #FFFFFF;
+    border-radius: 5px;
+    display: flex;
+    gap: 20px;
+    padding: 6px 10px;
+    font-size: 16px;
+    font-weight: 400;
+    align-items: center;
+    //transition: 0.4s;
+
+    &.update-and-launch{
+      background: #9ECE38;
+
+      svg{
+        width: 25px;
+        height: 25px;
+      }
+    }
+
+    &.update{
+      background: #0075FF;
+    }
+
+    &.deactivate{
+      background: #e91f4f;
+
+      svg{
+        width: 15px;
+        height: 15px;
+      }
+    }
+
+    &:hover{
+      opacity: 0.8;
+      //transition: 0.4s;
     }
   }
 }

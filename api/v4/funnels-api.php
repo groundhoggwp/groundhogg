@@ -18,6 +18,53 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Funnels_Api extends Base_Object_Api {
 
 	/**
+	 * register the commit route
+	 *
+	 * @return mixed|void
+	 */
+	public function register_routes() {
+		parent::register_routes();
+
+		$route = $this->get_route();
+		$key   = $this->get_primary_key();
+
+		register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/commit", [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'commit' ],
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
+			],
+		] );
+	}
+
+	/**
+	 * Commit the funnel
+	 *
+	 * @param \WP_REST_Request $request
+	 */
+	public function commit( \WP_REST_Request $request ) {
+
+		$funnel = new Funnel( $request->get_param( $this->get_primary_key() ) );
+
+		// If the commit was successful, meaning no errors, return he updated funnel
+		if ( $funnel->commit() ) {
+
+			return self::SUCCESS_RESPONSE( [
+				'item' => $funnel
+			] );
+
+		} // If the commit failed, return all the errors
+		else {
+
+			return self::ERROR_400( 'error', 'Unable to commit changes.', [
+				'errors' => $funnel->get_errors(),
+				'item'   => $funnel
+			] );
+		}
+
+	}
+
+	/**
 	 * The name of the table resource to use
 	 *
 	 * @return string
