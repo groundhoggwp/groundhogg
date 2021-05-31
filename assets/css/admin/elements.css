@@ -1,0 +1,53 @@
+.search-options-widget-wrap {
+  position: relative;
+}
+.search-options-widget-wrap .search-options-widget {
+  position: absolute;
+  z-index: 999;
+  border: 1px solid #8c8f94;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: #FFFFFF;
+  border-radius: 5px;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+}
+.search-options-widget-wrap .search-options-widget .header {
+  padding: 5px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #8c8f94;
+  gap: 20px;
+}
+.search-options-widget-wrap .search-options-widget .header button.close {
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0.8;
+}
+.search-options-widget-wrap .search-options-widget .header button.close:hover {
+  opacity: 1;
+}
+.search-options-widget-wrap .search-options-widget .search-options {
+  padding: 5px 8px;
+}
+.search-options-widget-wrap .search-options-widget .search-options.has-groups .option {
+  padding-left: 10px;
+}
+.search-options-widget-wrap .search-options-widget .search-options * {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+.search-options-widget-wrap .search-options-widget .search-options .option-group {
+  font-weight: 500;
+}
+.search-options-widget-wrap .search-options-widget .search-options .option {
+  cursor: pointer;
+}
+.search-options-widget-wrap .search-options-widget .search-options .option:hover {
+  background: #0d79e5;
+  color: #FFFFFF;
+}
+
+/*# sourceMappingURL=elements.css.map */

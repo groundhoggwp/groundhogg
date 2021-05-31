@@ -645,6 +645,10 @@
 
       step = step || this.funnel.steps.find(s => s.ID === this.activeStep)
 
+      if ( ! step ){
+        return;
+      }
+
       const updateStepMeta = (meta) => {
         return this.updateCurrentStepMeta(meta)
       }
@@ -661,6 +665,10 @@
     demountStep (step) {
 
       step = step || this.funnel.steps.find(s => s.ID === this.lastStepEditMounted)
+
+      if ( ! step ){
+        return;
+      }
 
       const updateStepMeta = (meta) => {
         return this.updateCurrentStepMeta(meta)
