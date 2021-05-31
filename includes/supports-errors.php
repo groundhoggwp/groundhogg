@@ -23,21 +23,10 @@ abstract class Supports_Errors {
 	 */
 	public function add_error( $code = '', $message = '', $data = [] ) {
 
-		// Pass in an array of errors?
-		if ( is_array( $code ) ) {
-			foreach ( $code as $error ) {
-				if ( is_wp_error( $error ) ) {
-					$this->errors[] = $error;
-				}
-			}
-		}
-		// A single error
-		else {
-			$error = is_wp_error( $code ) ? $code : new \WP_Error( $code, $message, $data );
+		$error = is_wp_error( $code ) ? $code : new \WP_Error( $code, $message, $data );
 
-			if ( is_wp_error( $error ) ) {
-				$this->errors[] = $error;
-			}
+		if ( is_wp_error( $error ) ) {
+			$this->errors[] = $error;
 		}
 
 		return false;

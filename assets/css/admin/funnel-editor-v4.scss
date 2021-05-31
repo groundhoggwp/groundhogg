@@ -1,3 +1,12 @@
+$primary-blue: #0075FF;
+$primary-dark: #102640;
+$error-red: #E91F4F;
+$secondary-purple: #6C19AD;
+$alert-yellow: #FFEE58;
+$benchmark-orange: #F58115;
+$action-green: #9ECE38;
+$box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+
 .wp-core-ui select {
   vertical-align: initial;
 }
@@ -24,7 +33,7 @@ button{
 .editor-header {
   padding: 8px 12px;
   background-color: #FFFFFF;
-  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  box-shadow: $box-shadow;
   min-height: 50px;
   display: flex;
   align-items: center;
@@ -63,7 +72,7 @@ button{
 
 .title-wrap {
   .above-title {
-    color: #102640;
+    color:$primary-dark;
     opacity: 0.6;
     font-style: normal;
     font-weight: normal;
@@ -93,7 +102,7 @@ button{
     margin-left: 10px;
     bottom: 0;
     opacity: 0.3;
-    color: #102640;
+    color:$primary-dark;
   }
 
   .title:hover .pencil {
@@ -189,7 +198,7 @@ button{
 
 li.step-error {
   padding: 5px 10px;
-  background: #E91F4F;
+  background: $error-red;
   color: #FFFFFF;
   border-radius: 5px;
 }
@@ -245,7 +254,7 @@ li.step-error {
 }
 
 .step-flow .steps .step.has-errors {
-  border: 1px solid rgba(233, 31, 79, 1);
+  border: 1px solid $error-red;
 }
 
 .step-flow .text-helper {
@@ -255,7 +264,7 @@ li.step-error {
 .step-flow .until-helper,
 .step-flow .then-helper,
 .step-flow .or-helper {
-  background: #0075FF;
+  background: $primary-blue;
   color: #FFFFFF;
   display: inline-block;
   padding: 2px 8px;
@@ -266,12 +275,12 @@ li.step-error {
 }
 
 .step-flow .then-helper {
-  background: #90C71C;
+  background: $action-green;
   margin: auto auto;
 }
 
 .step-flow .until-helper {
-  background: #F58115;
+  background: $benchmark-orange;
   margin: auto auto;
 }
 
@@ -303,29 +312,29 @@ li.step-error {
 .add-step.benchmark .step-icon-svg svg,
 .step.benchmark .icon-svg svg,
 .step.benchmark .icon .dashicons {
-  color: #F58115;
+  color: $benchmark-orange;
 }
 
 .add-step.action .step-icon-svg svg,
 .step.action .icon-svg svg,
 .step.action .icon .dashicons {
-  color: #90C71C;
+  color: $action-green;
 }
 
 .step.benchmark .details .step-type {
-  color: #F58115;
+  color: $benchmark-orange;
 }
 
 .step.action .details .step-type {
-  color: #90C71C;
+  color: $action-green;
 }
 
 .step.benchmark.active {
-  border-color: #F58115;
+  border-color: $benchmark-orange;
 }
 
 .step.action.active {
-  border-color: #9ECE38;
+  border-color: $action-green;
 }
 
 .step-flow .steps .step.active {
@@ -346,7 +355,7 @@ li.step-error {
 //.step .step-status .status {
 //  visibility: hidden;
 //  display: inline-block;
-//  background-color: #0075FF;
+//  background-color: $primary-blue;
 //  border-radius: 50%;
 //  height: 9px;
 //  width: 9px;
@@ -367,24 +376,24 @@ li.step-error {
   }
 
   &.config-error:before {
-    background: tomato;
+    background: $error-red;
     content: 'Error';
   }
 
   &.new:before {
-    background: yellowgreen;
+    background: $action-green;
     content: 'New';
   }
 
   &.edited:before {
-    background: DodgerBlue;
+    background: $primary-blue;
     content: 'Edited';
   }
 }
 
 //.step .step-status.config-error .status {
 //  visibility: visible;
-//  background-color: #E91F4F;
+//  background-color: $error-red;
 //}
 //
 //.step .step-status.new .status {
@@ -488,11 +497,11 @@ li.step-error {
 }
 
 .type-select button.actions.active {
-  border: 2px solid #9ECE38;
+  border: 2px solid $action-green;
 }
 
 .type-select button.benchmarks.active {
-  border: 2px solid #F58115;
+  border: 2px solid $benchmark-orange;
 }
 
 .step-add .types {
@@ -715,30 +724,37 @@ li.step-error {
     //transition: 0.4s;
 
     &.update-and-launch{
-      background: #9ECE38;
+      background: $action-green;
 
       svg{
         width: 25px;
         height: 25px;
       }
+
+      &:hover{
+        background: darken( $action-green, 10 );
+      }
     }
 
     &.update{
-      background: #0075FF;
+      background: $primary-blue;
+
+      &:hover{
+        background: darken( $primary-blue, 10 );
+      }
     }
 
     &.deactivate{
-      background: #e91f4f;
+      background: $error-red;
+
+      &:hover{
+        background: darken( $error-red, 10 );
+      }
 
       svg{
         width: 15px;
         height: 15px;
       }
-    }
-
-    &:hover{
-      opacity: 0.8;
-      //transition: 0.4s;
     }
   }
 }

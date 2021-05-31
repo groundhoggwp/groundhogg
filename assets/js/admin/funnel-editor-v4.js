@@ -324,7 +324,7 @@
       var self = this
       var $doc = $(document)
 
-      this.loadFunnel();
+      this.loadFunnel()
 
       $doc.on('click', '.step-add .select-type', function () {
         self.saveUndoState()
@@ -440,7 +440,7 @@
       self.render()
     },
 
-    loadFunnel ( funnel ) {
+    loadFunnel (funnel) {
 
       funnel = funnel || this.funnel
 
@@ -505,6 +505,7 @@
           self.syncOrderWithFlow()
           self.autoSaveEditedFunnel()
           self.renderStepFlow()
+          self.renderStepEdit()
         }
       }).disableSelection()
     },
@@ -586,6 +587,23 @@
       $('.step-flow .steps').html(steps)
     },
 
+    /**
+     * Add the step error
+     *
+     * @param id
+     * @param error
+     */
+    addStepError (id, error) {
+      if (!this.stepErrors.hasOwnProperty(id)) {
+        this.stepErrors[id] = []
+      }
+
+      this.stepErrors[id].push(error)
+    },
+
+    /**
+     * Check for step errors
+     */
     checkForStepErrors () {
 
       const self = this
@@ -593,8 +611,6 @@
       this.funnel.steps.forEach(step => {
 
         const errors = []
-
-        self.stepErrors[step.ID] = errors
 
         const { step_group, step_order, step_type } = step.data
 
@@ -608,9 +624,9 @@
         if (typeHandler) {
           typeHandler.validate(step, errors)
         }
-      })
 
-      // console.log(self.stepErrors)
+        errors.forEach( error => this.addStepError( step.ID, error ) )
+      })
     },
 
     /**
@@ -778,7 +794,7 @@
       this.render()
     },
 
-    activate() {
+    activate () {
       var self = this
 
       apiPost(`${apiRoutes.funnels}/${self.funnel.ID}`, {
@@ -786,8 +802,8 @@
           status: 'active'
         }
       }).then(data => {
-        if ( data.item ){
-          self.loadFunnel( data.item )
+        if (data.item) {
+          self.loadFunnel(data.item)
           self.render()
         }
       })
@@ -802,8 +818,8 @@
           status: 'inactive'
         }
       }).then(data => {
-        if ( data.item ){
-          self.loadFunnel( data.item )
+        if (data.item) {
+          self.loadFunnel(data.item)
           self.render()
         }
       })
@@ -813,13 +829,34 @@
     commitChanges () {
       var self = this
 
-      if ( objectEquals( this.funnel.steps, this.origFunnel.steps ) ){
-        return this.activate();
+      if (objectEquals(this.funnel.steps, this.origFunnel.steps)) {
+        return this.activate()
       }
 
       apiPost(`${apiRoutes.funnels}/${self.funnel.ID}/commit`, {}).then(data => {
-        if ( data.item ){
-          self.loadFunnel( data.item )
+        if (data.item) {
+          self.loadFunnel(data.item)
+          self.render()
+        } else if (data.code === 'error') {
+
+          // confusion I know...
+          const { errors } = data.data.data
+
+          errors.forEach(error => {
+
+            const { errors, error_data } = error
+
+            for (const code in errors) {
+              if (errors.hasOwnProperty(code)) {
+                console.log(errors[code][0], error_data[code])
+
+                self.addStepError(error_data[code].step.ID, errors[code][0])
+              }
+            }
+          })
+
+          console.log(self.stepErrors)
+
           self.render()
         }
       })

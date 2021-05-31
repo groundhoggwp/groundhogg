@@ -229,7 +229,7 @@ li.step-error {
 }
 
 .step-flow .steps .step.has-errors {
-  border: 1px solid #e91f4f;
+  border: 1px solid #E91F4F;
 }
 
 .step-flow .text-helper {
@@ -250,7 +250,7 @@ li.step-error {
 }
 
 .step-flow .then-helper {
-  background: #90C71C;
+  background: #9ECE38;
   margin: auto auto;
 }
 
@@ -293,7 +293,7 @@ li.step-error {
 .add-step.action .step-icon-svg svg,
 .step.action .icon-svg svg,
 .step.action .icon .dashicons {
-  color: #90C71C;
+  color: #9ECE38;
 }
 
 .step.benchmark .details .step-type {
@@ -301,7 +301,7 @@ li.step-error {
 }
 
 .step.action .details .step-type {
-  color: #90C71C;
+  color: #9ECE38;
 }
 
 .step.benchmark.active {
@@ -334,15 +334,15 @@ li.step-error {
   border-radius: 3px;
 }
 .step-status.config-error:before {
-  background: tomato;
+  background: #E91F4F;
   content: "Error";
 }
 .step-status.new:before {
-  background: yellowgreen;
+  background: #9ECE38;
   content: "New";
 }
 .step-status.edited:before {
-  background: DodgerBlue;
+  background: #0075FF;
   content: "Edited";
 }
 
@@ -649,18 +649,24 @@ li.step-error {
   width: 25px;
   height: 25px;
 }
+.publish-actions button.update-and-launch:hover {
+  background: #80a92a;
+}
 .publish-actions button.update {
   background: #0075FF;
 }
+.publish-actions button.update:hover {
+  background: #005ecc;
+}
 .publish-actions button.deactivate {
-  background: #e91f4f;
+  background: #E91F4F;
+}
+.publish-actions button.deactivate:hover {
+  background: #c2133d;
 }
 .publish-actions button.deactivate svg {
   width: 15px;
   height: 15px;
-}
-.publish-actions button:hover {
-  opacity: 0.8;
 }
 
 /*# sourceMappingURL=funnel-editor-v4.css.map */

@@ -112,22 +112,31 @@ class Funnel extends Base_Object_With_Meta {
 			return false;
 		}
 
-		$edited_steps = $edited['steps'];
+		$edited_steps = array_map( function ( $edited_step ) {
+			return new Temp_Step( $edited_step );
+		}, $edited['steps'] );
 
 		// Create a copy of the "previous" steps pre-commit
 		$previous_steps = $this->get_steps();
 
-		// Loop thru all the edited steps
-		foreach ( $edited_steps as &$edited_step ) {
+		$loop = [];
 
-			// Use the temp step object
-			$edited_step = new Temp_Step( $edited_step );
+		// Loop thru all the edited steps
+		foreach ( $edited_steps as $edited_step ) {
+
+			$loop[] = $edited_step;
 
 			// validate the step settings through the use of the save method from the Funnel_Step()
 			$edited_step->validate();
 
 			if ( $edited_step->has_errors() ) {
-				$this->add_error( $edited_step->get_errors() );
+
+				$loop[] = $edited_step->get_errors();
+
+				foreach ( $edited_step->get_errors() as $error ) {
+					$error->add_data( [ 'step' => $edited_step ] );
+					$this->add_error( $error );
+				}
 			}
 		}
 
@@ -144,9 +153,6 @@ class Funnel extends Base_Object_With_Meta {
 
 			return false;
 		}
-
-		// clean up reference from foreach
-		unset( $edited_step );
 
 		// There were no errors, so we can commit the changes to the funnel
 		foreach ( $edited_steps as $edited_step ) {
