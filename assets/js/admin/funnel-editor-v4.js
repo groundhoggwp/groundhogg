@@ -2437,6 +2437,9 @@
     },
     getCurrentStep () {
       return Editor.getCurrentStep()
+    },
+    getCurrentStepMeta(){
+      return Editor.getCurrentStep().meta
     }
   }
 

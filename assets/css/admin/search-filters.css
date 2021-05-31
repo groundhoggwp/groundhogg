@@ -54,6 +54,9 @@
   border-radius: 5px;
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
 }
+#search-filters-editor .add-filter-wrap .add-filter.mount-from-bottom {
+  bottom: 0;
+}
 #search-filters-editor .add-filter-wrap .add-filter .header {
   padding: 5px;
   display: flex;

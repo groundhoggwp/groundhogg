@@ -386,19 +386,20 @@
     },
     mountOptions () {
 
-      var self = this;
+      var self = this
       $(`${selector} .search-options`).html(this.renderSearchOptions())
       $(`${selector} .option`).on('click', function (e) {
-        const optionId = parseInt($(this).data('option'))
-        const groupId = parseInt($(this).data('group'))
-        if ( ! self.hasGroups() ){
-          onSelect( self.getOptions()[optionId] )
+        const optionId = $(this).data('option')
+        const groupId = $(this).data('group')
+
+        if (!self.hasGroups()) {
+          onSelect(self.getOptions()[optionId])
           onClose()
         } else {
           Object.keys(groups).forEach((group, g) => {
-            this.getOptions().filter(option => option.group === group).forEach((option, o) => {
-              if ( g === groupId && o === optionId ){
-                onSelect( option )
+            self.getOptions().filter(option => option.group == group).forEach((option, o) => {
+              if (group == groupId && o == optionId) {
+                onSelect(option)
                 onClose()
                 return
               }
@@ -417,6 +418,13 @@
         self.search = $(this).val()
         self.mountOptions()
       })
+
+      const el = document.querySelector('.search-options-widget')
+
+      // if current Y position (relative to window) + height > height of window
+      if ((el + $(el).height()) > window.innerHeight) {
+        el.classList.add('mount-from-bottom')
+      }
 
       $(`${selector} button.close`).on('click', function (e) {
         onClose()

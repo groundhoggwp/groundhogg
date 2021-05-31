@@ -1,6 +1,15 @@
 (function ($) {
 
-  const { input, select, regexp, specialChars, clickInsideElement, orList, andList } = Groundhogg.element
+  const {
+    input,
+    select,
+    regexp,
+    specialChars,
+    clickInsideElement,
+    orList,
+    andList,
+    searchOptionsWidget
+  } = Groundhogg.element
 
   const Filters = {
     view () {},
@@ -79,73 +88,6 @@
     not_empty: 'Is not empty'
   }
 
-  const FilterSearch = (addFilter) => ({
-    search: '',
-    render () {
-      //language=HTML
-      return `
-		  <div class="add-filter">
-			  <div class="header">
-				  ${input({
-					  id: 'filter-search',
-					  name: 'search',
-					  type: 'search',
-					  autocomplete: 'off',
-					  placeholder: 'Search...'
-				  })}
-				  <button class="close"><span class="dashicons dashicons-no-alt"></span></button>
-			  </div>
-			  <div class="filter-options">
-			  </div>
-		  </div>`
-    },
-    renderFilters () {
-
-      const options = []
-
-      const self = this
-
-      Object.keys(Filters.groups).forEach(group => {
-
-        const filters = []
-
-        Object.values(Filters.types).filter(f => f.group === group).forEach(filter => {
-          if (!self.search || (self.search && filter.name.match(regexp(self.search)))) {
-            filters.push(`<div class="option" data-type="${filter.type}">${filter.name}</div>`)
-          }
-        })
-
-        if (filters.length > 0) {
-          options.push(`<div class="option-group" data-group="${group}">${Filters.groups[group]}</div>`, ...filters)
-        }
-      })
-
-      return options.join('')
-    },
-    mountFilters () {
-      $('.filter-options').html(this.renderFilters())
-      $('.filter-options .option').on('click', function (e) {
-        const type = $(this).data('type')
-        const filter = {
-          type,
-          ...Filters.types[type].defaults
-        }
-        addFilter(filter)
-      })
-    },
-    mount () {
-      var self = this
-
-      $('.add-filter-wrap').html(self.render())
-      this.mountFilters()
-
-      $('#filter-search').on('change input', function (e) {
-        self.search = $(this).val()
-        self.mountFilters()
-      })
-    }
-  })
-
   const createFilters = (el, filters, onChange) => ({
     onChange,
     filters,
@@ -154,6 +96,7 @@
     currentFilter: false,
     isAddingFilterToGroup: false,
     tempFilterSettings: {},
+    selectFiltersWidget: null,
 
     render () {
       var self = this
@@ -297,9 +240,32 @@
         reMount()
       }
 
+      this.filterPicker = searchOptionsWidget({
+        selector: '.add-filter-wrap',
+        options: Object.values( Filters.types ),
+        groups: Filters.groups,
+        onSelect: (option) => {
+
+          console.log( option )
+
+          addFilter({
+            type: option.type,
+            ...option.defaults
+          })
+        },
+        filterOption: (option, search) => {
+          return option.name.match(regexp(search))
+        },
+        renderOption: (option) => option.name,
+        onClose: () => {
+          this.isAddingFilterToGroup = false
+          this.mount()
+        },
+        noOptions: 'No matching filters...'
+      })
+
       if (this.isAddingFilterToGroup !== false) {
-        const adding = FilterSearch(addFilter)
-        adding.mount()
+        this.filterPicker.mount()
       }
 
       $(`${el} #search-filters-editor`).on('click', function (e) {
@@ -307,7 +273,7 @@
         // console.log(e)
 
         const clickedOnAddFilter = clickInsideElement(e, 'button.add-filter')
-        const clickedOnAddFilterSearch = clickInsideElement(e, 'div.add-filter')
+        const clickedOnAddFilterSearch = clickInsideElement(e, 'div.add-filter-wrap')
         const clickedOnFilterView = clickInsideElement(e, '.filter.filter-view')
         const clickedOnFilterEdit = clickInsideElement(e, '.filter-edit')
 
@@ -354,13 +320,6 @@
           }
 
         } else if (clickedOnAddFilterSearch) {
-
-          const clickedOnClose = clickInsideElement(e, '.close')
-
-          if (clickedOnClose) {
-            self.isAddingFilterToGroup = false
-            reMount()
-          }
 
         } else {
           self.currentFilter = false
