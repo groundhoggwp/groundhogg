@@ -641,6 +641,40 @@
       })
     },
 
+    mountStep (step) {
+
+      step = step || this.funnel.steps.find(s => s.ID === this.activeStep)
+
+      const updateStepMeta = (meta) => {
+        return this.updateCurrentStepMeta(meta)
+      }
+
+      const updateStep = (data) => {
+        return this.updateCurrentStep(data)
+      }
+
+      this.stepTypes[step.data.step_type].onMount(step, updateStepMeta, updateStep)
+
+      this.lastStepEditMounted = this.activeStep
+    },
+
+    demountStep (step) {
+
+      step = step || this.funnel.steps.find(s => s.ID === this.lastStepEditMounted)
+
+      const updateStepMeta = (meta) => {
+        return this.updateCurrentStepMeta(meta)
+      }
+
+      const updateStep = (data) => {
+        return this.updateCurrentStep(data)
+      }
+
+      this.stepTypes[step.data.step_type].onDemount(step, updateStepMeta, updateStep)
+
+      this.lastStepEditMounted = null
+    },
+
     /**
      * Renders the edit step panel for the current step in the controls panel
      */
@@ -657,23 +691,18 @@
       const step = this.funnel.steps.find(step => step.ID === this.activeStep)
       const previousStep = this.funnel.steps.find(step => step.ID === this.previousActiveStep)
 
-      if (previousStep) {
-        this.stepTypes[previousStep.data.step_type].onDemount(previousStep)
+      // Handle remounting the step
+      if (this.activeStep === this.lastStepEditMounted) {
+        this.demountStep(step)
+      } else if (previousStep) {
+        this.demountStep(previousStep)
       }
 
       slotsDemounted()
 
       $('#control-panel').html(this.htmlTemplates.stepEditPanel(step))
 
-      const updateStepMeta = (meta) => {
-        return this.updateCurrentStepMeta(meta)
-      }
-
-      const updateStep = (data) => {
-        return this.updateCurrentStep(data)
-      }
-
-      this.stepTypes[step.data.step_type].onMount(step, updateStepMeta, updateStep)
+      this.mountStep(step)
 
       // Step notes listener
       $('#step-notes').on('change', function (e) {
@@ -694,9 +723,10 @@
         return
       }
 
-      $('#control-panel').html(this.htmlTemplates.stepAddPanel(this.activeAddType))
+      this.demountStep()
 
-      var self = this
+      $('#control-panel').html(this.htmlTemplates.stepAddPanel(this.activeAddType))
+      this.renderStepFlow()
 
       $('.add-step').draggable({
         connectToSortable: '.step-flow .steps',
