@@ -152,7 +152,7 @@
     el,
     currentGroup: false,
     currentFilter: false,
-    isAddingFilter: false,
+    isAddingFilterToGroup: false,
     tempFilterSettings: {},
 
     render () {
@@ -165,16 +165,24 @@
         filterGroup.forEach((filter, k) => {
           filters.push(self.currentGroup === j && self.currentFilter === k ? renderFilterEdit(filter, j, k) : renderFilterView(filter, j, k))
         })
+        filters.push(self.isAddingFilterToGroup === j ? `<div class="add-filter-wrap"></div>` : `<button data-group="${j}" class="add-filter">
+				  <span class="dashicons dashicons-plus-alt2"></span>
+			  </button>`)
         groups.push(filters.join(''))
       })
+
+      const separator = `<div class="or-separator"><span class="or-circle">Or...</span></div>`
 
       //language=HTML
       return `
 		  <div id="search-filters-editor">
-			  ${groups.join('<div class="or-separator"></div>')}
-			  ${this.isAddingFilter ? `<div class="add-filter-wrap"></div>` : `<button class="add-filter">
+			  ${groups.length > 0 ? `${groups.map(group => `<div class="group">${group}</div>`).join(separator)}
+			  ${separator}` : ''}
+			  <div class="group" data-group="${groups.length}">
+				  ${self.isAddingFilterToGroup === groups.length ? `<div class="add-filter-wrap"></div>` : `<button data-group="${groups.length}" class="add-filter">
 				  <span class="dashicons dashicons-plus-alt2"></span>
 			  </button>`}
+			  </div>
 		  </div>`
     },
 
@@ -202,7 +210,7 @@
       const setActiveFilter = (group, filter) => {
         self.currentFilter = filter
         self.currentGroup = group
-        self.isAddingFilter = false
+        self.isAddingFilterToGroup = false
 
         reMount()
 
@@ -220,11 +228,14 @@
       }
 
       const addFilter = (opts, group) => {
-        group = group >= 0 ? group : 0
+        group = group >= 0 ? group : this.isAddingFilterToGroup
 
         if (self.filters.length === 0) {
           group = 0
           self.filters.push([])
+        } else if (!self.filters[group]) {
+          self.filters.push([])
+          group = self.filters.length - 1
         }
 
         self.filters[group].push({
@@ -286,7 +297,7 @@
         reMount()
       }
 
-      if (this.isAddingFilter) {
+      if (this.isAddingFilterToGroup !== false) {
         const adding = FilterSearch(addFilter)
         adding.mount()
       }
@@ -308,7 +319,7 @@
 
         if (clickedOnAddFilter) {
 
-          self.isAddingFilter = true
+          self.isAddingFilterToGroup = parseInt(clickedOnAddFilter.dataset.group)
           self.currentFilter = false
           self.currentGroup = false
           reMount()
@@ -347,7 +358,7 @@
           const clickedOnClose = clickInsideElement(e, '.close')
 
           if (clickedOnClose) {
-            self.isAddingFilter = false
+            self.isAddingFilterToGroup = false
             reMount()
           }
 
@@ -586,12 +597,12 @@
 
   registerFilter('owner', 'contact', {
     view ({ compare, value }) {
-      
-      const ownerName = ( ID ) => {
-        let user = owners.find( owner => owner.ID == ID )
+
+      const ownerName = (ID) => {
+        let user = owners.find(owner => owner.ID == ID)
         return `${user.data.user_login} (${user.data.user_email})`
       }
-      
+
       //language=HTMl
       switch (compare) {
         default:

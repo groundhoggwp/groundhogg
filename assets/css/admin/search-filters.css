@@ -1,5 +1,27 @@
 #search-filters-editor {
   display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+#search-filters-editor .or-separator {
+  /*border: 1px solid #cccccc;*/
+  height: 1px;
+  background: #6C19AD;
+  position: relative;
+  margin: 15px 0;
+}
+#search-filters-editor .or-separator .or-circle {
+  display: inline-block;
+  position: absolute;
+  background: #6C19AD;
+  border-radius: 5px;
+  left: 10px;
+  top: -10px;
+  padding: 1px 5px;
+  color: #FFFFFF;
+}
+#search-filters-editor .group {
+  display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
   gap: 5px;

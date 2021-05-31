@@ -138,27 +138,6 @@ a.change-status.complained:hover {
     width: auto;
 }
 
-.or-separator {
-    /*border: 1px solid #cccccc;*/
-    height: 2px;
-    background: #cccccc;
-    position: relative;
-    margin: 15px 0;
-}
-
-.or-separator .or-circle {
-    height: 30px;
-    width: 30px;
-    position: absolute;
-    background: #cccccc;
-    border-radius: 50%;
-    left: 20px;
-    top: -14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .filter-group-wrap {
     padding: 20px
 }

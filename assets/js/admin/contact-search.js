@@ -56,9 +56,15 @@
       if (this.filtersEnabled) {
         //language=HTML
         return `
-			<button class="enable-filters white"><span class="dashicons dashicons-filter"></button>
-			<div id="search-filters"></div>
-			<button id="search-contacts" class="button button-primary">Search</button>`
+			<div class="enable-filters-wrap">
+				<button class="enable-filters white"><span class="dashicons dashicons-filter"></button>
+			</div>
+			<div class="seach-filters-warp">
+				<div id="search-filters"></div>
+				<div class="search-contacts-wrap">
+					<button id="search-contacts" class="button button-primary">Search</button>
+				</div>
+			</div>`
       }
 
       //language=HTML

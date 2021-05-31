@@ -199,6 +199,20 @@
           errors = Editor.stepErrors[ID]
         }
 
+        const updateStepMeta = (meta) => {
+          return Editor.updateCurrentStepMeta(meta)
+        }
+
+        const updateStep = (data) => {
+          return Editor.updateCurrentStep(data)
+        }
+
+        const slotArgs = [
+          step,
+          updateStepMeta,
+          updateStep
+        ]
+
         //language=HTML
         return `
 			${hasErrors ?
@@ -209,18 +223,18 @@
             </div>` : ''}
 			<div class="step-edit">
 				<div class="settings">
-					${slot('beforeStepSettings', step)}
-					${Editor.stepTypes[step_type].edit(step)}
-					${slot('afterStepSettings', step)}
+					${slot('beforeStepSettings', ...slotArgs)}
+					${Editor.stepTypes[step_type].edit(...slotArgs)}
+					${slot('afterStepSettings', ...slotArgs)}
 				</div>
 				<div class="actions-and-notes">
-					${slot('beforeStepNotes', step)}
+					${slot('beforeStepNotes', ...slotArgs)}
 					<div class="panel">
 						<label class="row-label"><span class="dashicons dashicons-admin-comments"></span> Notes</label>
 						<textarea rows="4" id="step-notes" class="notes full-width"
 						          name="step_notes">${specialChars(meta.step_notes || '')}</textarea>
 					</div>
-					${slot('afterStepNotes', step)}
+					${slot('afterStepNotes', ...slotArgs)}
 				</div>
 			</div>`
       },
@@ -651,7 +665,15 @@
 
       $('#control-panel').html(this.htmlTemplates.stepEditPanel(step))
 
-      this.stepTypes[step.data.step_type].onMount(step)
+      const updateStepMeta = (meta) => {
+        return this.updateCurrentStepMeta(meta)
+      }
+
+      const updateStep = (data) => {
+        return this.updateCurrentStep(data)
+      }
+
+      this.stepTypes[step.data.step_type].onMount(step, updateStepMeta, updateStep)
 
       // Step notes listener
       $('#step-notes').on('change', function (e) {

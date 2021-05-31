@@ -1,8 +1,44 @@
+$primary-blue: #0075FF;
+$primary-dark: #102640;
+$error-red: #E91F4F;
+$secondary-purple: #6C19AD;
+$alert-yellow: #FFEE58;
+$benchmark-orange: #F58115;
+$action-green: #9ECE38;
+$box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+
 #search-filters-editor {
+
   display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
+  flex-direction: column;
   gap: 5px;
+
+  .or-separator {
+    /*border: 1px solid #cccccc;*/
+    height: 1px;
+    background: $secondary-purple;
+    position: relative;
+    margin: 15px 0;
+
+    .or-circle {
+
+      display: inline-block;
+      position: absolute;
+      background: $secondary-purple;
+      border-radius: 5px;
+      left: 10px;
+      top: -10px;
+      padding: 1px 5px;
+      color: #FFFFFF;
+    }
+  }
+
+  .group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 5px;
+  }
 
   button {
     padding: 0;
