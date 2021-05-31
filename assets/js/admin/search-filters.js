@@ -535,7 +535,164 @@
     }
   }, 'Custom meta')
 
-  const { optin_status, owners } = Groundhogg.filters
+  
+    const { optin_status, owners , meta_keys } = Groundhogg.filters
+  
+    console.log({
+      optin_status,
+      owners,
+      meta_keys
+    })
+  
+    registerFilter('optin_status', 'contact', {
+      view ({ compare, value, value2 }, filterGroupIndex, filterIndex) {
+        //language=HTMl
+        switch (compare) {/*
+          case 'before':
+            return `is before <b>${value}</b>`
+          case 'after':
+            return `is after <b>${value}</b>`
+          case 'between':
+            return `is between <b>${value}</b> and <b>${value2}</b>`*/
+        }
+        return `selected value <b>${value}</b>`
+      },
+      edit ({ compare, value }, filterGroupIndex, filterIndex ) {
+        
+        var defaultValues = {};
+        $.map(optin_status, function(value, index){
+                 defaultValues[index] =   value;
+              })
+        // language=html  
+        return `${select({
+        id: 'filter-value-optin-status',
+        name: 'value[]',
+        class: 'gh-select2',
+        multiple : 'multiple'
+      },    
+          defaultValues
+      )} `
+      },
+      onMount (filter, updateFilter) {
+        $('#filter-value').on('change', function (e) {
+          const $el = $(this)
+          console.log($el.val());
+          updateFilter({
+            [$el.prop('name')]: $el.val()
+          })
+        })
+      },
+      defaults: {
+        compare: 'equals',
+      /*  value: '',
+        value2: ''*/
+      }
+    }, 'Optin Status')
+  
+    registerFilter('owner', 'contact', {
+      view ({ compare, value, value2 }, filterGroupIndex, filterIndex) {
+        //language=HTMl
+        switch (compare) {/*
+          case 'before':
+            return `is before <b>${value}</b>`
+          case 'after':
+            return `is after <b>${value}</b>`
+          case 'between':
+            return `is between <b>${value}</b> and <b>${value2}</b>`*/
+        }
+        return `selected value <b>${value}</b>`
+      },
+      edit ({ compare, value }, filterGroupIndex, filterIndex ) {
+        
+        var defaultValues = {};
+        $.map(owners, function(value, index){
+          defaultValues[value['data']['ID']] =   value['data']['user_login'] +'('+ value['data']['user_email'] +')';
+        })
+        console.log(defaultValues);
+        // language=html  
+        return `${select({
+        id: 'owner_id',
+        name: 'value',
+        class: 'gh-select2',
+      },    
+          defaultValues
+      )} `
+      },
+      onMount (filter, updateFilter) {
+        $('#filter-value').on('change', function (e) {
+          const $el = $(this)
+          console.log($el.val());
+          updateFilter({
+            [$el.prop('name')]: $el.val()
+          })
+        })
+      },
+      defaults: {
+        compare: 'equals',
+      /*  value: '',
+        value2: ''*/
+      }
+    }, 'Owner')
+  
+    //filter by meta data
+    registerFilter('meta_data', 'contact', {
+      view ({ compare, value, value2 }, filterGroupIndex, filterIndex) {
+        //language=HTMl
+        switch (compare) {/*
+          case 'before':
+            return `is before <b>${value}</b>`
+          case 'after':
+            return `is after <b>${value}</b>`
+          case 'between':
+            return `is between <b>${value}</b> and <b>${value2}</b>`*/
+        }
+        return `selected value <b>${value}</b>`
+      },
+      edit ({ compare, value }, filterGroupIndex, filterIndex ) {
+        
+        var defaultValues = {};
+        $.map(meta_keys, function(value, index){
+          defaultValues[index] = value;
+        })
+        //console.log(defaultValues);
+        // language=html  
+        return `${select({
+        id: 'filter-compare',
+        name: 'compare'
+      }, {
+        equal: 'Equal',
+        notequal: 'Not Equal',
+        greaterthan: 'Greater Than',
+        lessthan: 'Less Than',
+        contains: 'Contains',
+        doesnotcontain: 'Does Not Contains',
+      }, compare)} ${select({
+        id: 'meta_key',
+        name: 'value',
+        class: 'meta_key',
+      },    
+          defaultValues
+      )} ${input({
+        id: 'filter-value',
+        name: 'value',
+        value:''
+      })}` 
+      },
+      onMount (filter, updateFilter) {
+        $('#filter-value, #meta_key, #filter-value').on('change', function (e) {
+          const $el = $(this)
+          console.log($el.val());
+          updateFilter({
+            [$el.prop('name')]: $el.val()
+          })
+        })
+      },
+      defaults: {
+        compare: 'equals',
+      /*  value: '',
+        value2: ''*/
+      }
+    }, 'Meta Data')
 
   //  Filter by Optin Status
   //  Filter by Contact Owner

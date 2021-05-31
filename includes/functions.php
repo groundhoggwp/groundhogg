@@ -5046,5 +5046,21 @@ function register_mce_button( $buttons ) {
 var_dump($buttons);
 	return $buttons;
 }
+/**
+* Returns an array of all the meta keys in a table.
+*
+* @return array
+*/
+function get_keys() {
+	global $wpdb;
+	$table = get_db( 'contactmeta' );
+
+	$keys = $wpdb->get_col(
+		"SELECT DISTINCT meta_key FROM {$table->get_table_name()} ORDER BY meta_key ASC"
+	);
+
+	$key_array = array_combine( $keys, $keys );
+	return $key_array;
+}
 
 add_filter( 'mce_buttons', __NAMESPACE__ . '\register_mce_button' );

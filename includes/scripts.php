@@ -344,7 +344,8 @@ class Scripts {
 			'filters'      => [
 				'optin_status' => Preferences::get_preference_names(),
 				'owners'       => get_owners(),
-				'current'      => get_request_var( 'filters', [] )
+				'current'      => get_request_var( 'filters', [] ),
+				'meta_keys'	   => get_keys(),
 			]
 		] );
 
