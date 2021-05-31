@@ -1,5 +1,16 @@
 (function ($) {
 
+  function andList (array, text = 'and') {
+    if (array.length === 1) {
+      return array[0]
+    }
+    return `${array.slice(0, -1).join(', ')} ${text} ${array[array.length - 1]}`
+  }
+
+  function orList (array) {
+    return andList(array, 'or')
+  }
+
   const createSlotFillProvider = () => ({
 
     fills: [],
@@ -418,6 +429,8 @@
   Groundhogg.element = {
     ...Elements,
     specialChars,
+    andList,
+    orList,
     kebabize,
     regexp,
     objectToProps,
