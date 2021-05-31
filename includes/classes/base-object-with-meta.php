@@ -45,7 +45,7 @@ abstract class Base_Object_With_Meta extends Base_Object {
 			$this->$key = $value;
 		}
 
-		$this->data[$this->get_identifier_key()] = $this->get_id();
+		$this->data[ $this->get_identifier_key() ] = $this->get_id();
 
 		// Get all the meta data.
 		$this->get_all_meta();
@@ -151,17 +151,22 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	public function update_meta( $key, $value = false ) {
 
 		if ( is_array( $key ) && ! $value ) {
+
+			$updated = true;
+
 			foreach ( $key as $meta_key => $meta_value ) {
-				if ( ! $this->update_meta( $meta_key, $meta_value ) ) {
-					return false;
-				}
+				$updated = $this->update_meta( $meta_key, $meta_value ) && $updated;
 			}
+
+			return $updated;
+
 		} else if ( $this->get_meta_db()->update_meta( $this->get_id(), $key, $value ) ) {
 			$this->meta[ $key ] = $value;
 
 			return true;
 		}
 
+//		print_r( [ $this->get_id(), $key, $value ] );
 
 		return false;
 	}
@@ -181,6 +186,8 @@ abstract class Base_Object_With_Meta extends Base_Object {
 					return false;
 				}
 			}
+
+			return true;
 		} else if ( $this->get_meta_db()->add_meta( $this->get_id(), $key, $value ) ) {
 			$this->meta[ $key ] = $value;
 
@@ -200,8 +207,8 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	 */
 	public function delete_meta( $key ) {
 
-		if ( is_array( $key ) ){
-			foreach ( $key as $meta_key ){
+		if ( is_array( $key ) ) {
+			foreach ( $key as $meta_key ) {
 				$this->delete_meta( $meta_key );
 			}
 

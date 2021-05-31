@@ -191,6 +191,22 @@ function get_db( $name ) {
 }
 
 /**
+ * @return string
+ */
+function last_db_error(){
+	global $wpdb;
+	return $wpdb->last_error;
+}
+
+/**
+ * @return string
+ */
+function last_db_query(){
+	global $wpdb;
+	return $wpdb->last_query;
+}
+
+/**
  * Can the dbs be used?
  *
  * @return bool

@@ -2,13 +2,6 @@
 
 namespace Groundhogg;
 
-use Groundhogg\DB\DB;
-use Groundhogg\DB\Event_Queue;
-use Groundhogg\DB\Events;
-use Groundhogg\DB\Meta_DB;
-use Groundhogg\DB\Step_Meta;
-use Groundhogg\DB\Steps;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -34,7 +27,7 @@ class Temp_Step extends Step {
 			$id = $id_or_array;
 		}
 
-		$this->set_id( $id );
+		$this->set_id( absint( $id ) );
 		$this->data = $data;
 		$this->meta = $meta;
 
@@ -73,7 +66,7 @@ class Temp_Step extends Step {
 		}
 
 		// Update all the step attributes
-		$this->update_meta( $temp_meta );
+		$updated = $this->update_meta( $temp_meta );
 
 		// No longer committing
 		$this->committing = false;
@@ -153,19 +146,20 @@ class Temp_Step extends Step {
 
 		// If we're not committing, only make changes to the meta data in the object, not the DB
 		if ( ! $this->committing ) {
+
 			if ( is_array( $key ) && ! $value ) {
+				$updated = true;
+
 				foreach ( $key as $meta_key => $meta_value ) {
-					if ( ! $this->update_meta( $meta_key, $meta_value ) ) {
-						return false;
-					}
+					$updated = $this->update_meta( $meta_key, $meta_value ) && $updated;
 				}
+
+				return $updated;
 			} else {
 				$this->meta[ $key ] = $value;
 
 				return true;
 			}
-
-			return false;
 		}
 
 		// Otherwise we are committing and we'll use the parent method.

@@ -181,9 +181,9 @@
         //language=HTML
         if (isEditing) {
           return `<input type="text" class="funnel-title-edit regular-text" id="funnel-title-edit" name="funnel_title"
-		                 value="${title}">`
+		                 value="${specialChars(title)}">`
         } else {
-          return `<span class="title-inner">${title}</span><span class="pencil"><span class="dashicons dashicons-edit"></span></span>`
+          return `<span class="title-inner">${specialChars(title)}</span><span class="pencil"><span class="dashicons dashicons-edit"></span></span>`
         }
       },
       stepEditPanel (step) {
@@ -324,7 +324,7 @@
       var self = this
       var $doc = $(document)
 
-      this.loadFunnel()
+      this.loadFunnel(this.funnel)
 
       $doc.on('click', '.step-add .select-type', function () {
         self.saveUndoState()
@@ -427,7 +427,11 @@
         self.saveUndoState()
         self.funnel.data.title = e.target.value
         self.isEditingTitle = false
-        self.autoSaveEditedFunnel()
+        self.update({
+          data: {
+            title: e.target.value
+          }
+        }, false)
         self.renderTitle()
       })
 
@@ -442,20 +446,14 @@
 
     loadFunnel (funnel) {
 
-      funnel = funnel || this.funnel
-
-      this.funnel = {
-        ...this.funnel,
-        ...funnel
-      }
+      this.funnel = funnel
 
       // Copy from the orig included data
       // self.funnel = copyObject(self.funnel)
-      this.origFunnel = copyObject(this.funnel)
+      this.origFunnel = copyObject(funnel)
 
       if (this.funnel.meta.edited) {
         this.funnel.steps = this.funnel.meta.edited.steps
-        this.funnel.data.title = this.funnel.meta.edited.title
       }
     },
 
@@ -794,36 +792,31 @@
       this.render()
     },
 
-    activate () {
+    update (data, reload = true) {
       var self = this
 
-      apiPost(`${apiRoutes.funnels}/${self.funnel.ID}`, {
-        data: {
-          status: 'active'
-        }
-      }).then(data => {
-        if (data.item) {
+      apiPost(`${apiRoutes.funnels}/${self.funnel.ID}`, data).then(data => {
+        if (data.item && reload) {
           self.loadFunnel(data.item)
           self.render()
         }
       })
     },
 
+    activate () {
+      this.update({
+        data: {
+          status: 'active'
+        }
+      })
+    },
+
     deactivate () {
-
-      var self = this
-
-      apiPost(`${apiRoutes.funnels}/${self.funnel.ID}`, {
+      this.update({
         data: {
           status: 'inactive'
         }
-      }).then(data => {
-        if (data.item) {
-          self.loadFunnel(data.item)
-          self.render()
-        }
       })
-
     },
 
     commitChanges () {
@@ -841,8 +834,7 @@
 
       apiPost(`${apiRoutes.funnels}/${self.funnel.ID}/commit`, {
         edited: {
-          steps: self.funnel.steps,
-          title: self.funnel.data.title
+          steps: self.funnel.steps
         }
       }).then(data => {
         if (data.item) {
@@ -1033,7 +1025,7 @@
 
       this.autoSaveTimeout = setTimeout(() => {
 
-        self.autoSaveTimeout = null;
+        self.autoSaveTimeout = null
         self.abortController = new AbortController()
         const { signal } = self.abortController
 
@@ -1183,7 +1175,10 @@
 		  <option value="${specialChars(value)}" ${selected ? 'selected' : ''}>${text}</option>`
     },
     mappableFields (props, selected) {
-      return Elements.select(props, Groundhogg.fields.mappable, selected)
+      return Elements.select(props, {
+        0: '-- Do not map --',
+        ...Groundhogg.fields.mappable
+      }, selected)
     },
     inputWithReplacementsAndEmojis ({
       type = 'text',
@@ -1394,7 +1389,7 @@
     switch (run_on_type) {
       default:
       case 'any':
-        // preview.push()
+        preview.push('run')
         break
       case 'weekday':
         preview.push('<b>a weekday</b>')

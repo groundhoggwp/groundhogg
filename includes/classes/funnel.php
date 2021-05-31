@@ -179,11 +179,15 @@ class Funnel extends Base_Object_With_Meta {
 		// Unpause any active events which haven't been+ deleted as a result of the associated step being deleted
 		$this->unpause_events();
 
-		$this->delete_meta( 'edited' );
-
 		// Update the status of the funnel to active
 		$this->update( [
 			'status' => 'active'
+		] );
+
+		$this->update_meta( [
+			'edited' => [
+				'steps' => $this->get_steps()
+			]
 		] );
 
 		return true;
@@ -279,7 +283,7 @@ class Funnel extends Base_Object_With_Meta {
 			'order'     => 'ASC',
 		] );
 
-		return wp_parse_id_list( wp_list_pluck( $this->get_steps_db()->get_steps( $query ), 'ID' ) );
+		return wp_parse_id_list( wp_list_pluck( $this->get_steps_db()->query( $query ), 'ID' ) );
 	}
 
 	/**
