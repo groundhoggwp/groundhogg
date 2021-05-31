@@ -625,7 +625,7 @@
           typeHandler.validate(step, errors)
         }
 
-        errors.forEach( error => this.addStepError( step.ID, error ) )
+        errors.forEach(error => this.addStepError(step.ID, error))
       })
     },
 
@@ -833,7 +833,18 @@
         return this.activate()
       }
 
-      apiPost(`${apiRoutes.funnels}/${self.funnel.ID}/commit`, {}).then(data => {
+      if (this.autoSaveTimeout) {
+        clearTimeout(this.autoSaveTimeout)
+      } else if (this.abortController) {
+        this.abortController.abort()
+      }
+
+      apiPost(`${apiRoutes.funnels}/${self.funnel.ID}/commit`, {
+        edited: {
+          steps: self.funnel.steps,
+          title: self.funnel.data.title
+        }
+      }).then(data => {
         if (data.item) {
           self.loadFunnel(data.item)
           self.render()
@@ -1011,6 +1022,7 @@
     },
 
     autoSaveTimeout: null,
+    abortController: null,
 
     autoSaveEditedFunnel () {
       var self = this
@@ -1019,13 +1031,20 @@
         clearTimeout(this.autoSaveTimeout)
       }
 
-      this.autoSaveTimeout = setTimeout(function () {
+      this.autoSaveTimeout = setTimeout(() => {
+
+        self.autoSaveTimeout = null;
+        self.abortController = new AbortController()
+        const { signal } = self.abortController
+
         apiPost(`${apiRoutes.funnels}/${self.funnel.ID}/meta`, {
           edited: {
             steps: self.funnel.steps,
             title: self.funnel.data.title
           }
-        })
+        }, {
+          signal
+        }).then(data => self.abortController = null)
       }, 3000)
 
     },

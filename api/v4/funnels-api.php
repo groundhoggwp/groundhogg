@@ -46,6 +46,8 @@ class Funnels_Api extends Base_Object_Api {
 
 		$funnel = new Funnel( $request->get_param( $this->get_primary_key() ) );
 
+		$funnel->update_meta( $request->get_json_params() );
+
 		// If the commit was successful, meaning no errors, return he updated funnel
 		if ( $funnel->commit() ) {
 
