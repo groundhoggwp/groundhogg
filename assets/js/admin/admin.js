@@ -1,4 +1,4 @@
-( function ($, nonces, endpoints, gh) {
+(function ($, nonces, endpoints, gh) {
 
   // Serialize better
   $.fn.serializeFormJSON = function () {
@@ -11,8 +11,7 @@
           o[this.name] = [o[this.name]]
         }
         o[this.name].push(this.value || '')
-      }
-      else {
+      } else {
         o[this.name] = this.value || ''
       }
     })
@@ -23,20 +22,28 @@
     $(selector).select2(args)
   }
 
-  function apiPicker (selector, endpoint, multiple, tags) {
+  function apiPicker (selector, endpoint, multiple, tags, getResults) {
+
+    multiple = multiple || false
+    tags = tags || false
+    getResults = getResults || function (data) {
+      return data.results
+    }
+
     $(selector).select2({
       tags: tags,
       multiple: multiple,
       tokenSeparators: ['/', ',', ';'],
       ajax: {
         url: endpoint,
+        delay: 250,
         dataType: 'json',
         beforeSend: function (xhr) {
           xhr.setRequestHeader('X-WP-Nonce', nonces._wprest)
         },
-        results: function (data, page) {
+        processResults: function (data, page) {
           return {
-            results: data.results,
+            results: getResults(data, page)
           }
         },
       },
@@ -96,11 +103,29 @@
     })
   }
 
+  function getTagsFromResponse (data) {
+    return data.items.map(item => {
+      return {
+        id: item.ID,
+        text: `${item.data.tag_name} (${item.data.contact_count})`
+      }
+    })
+  }
+
+  /**
+   * Api based tag picker
+   *
+   * @param selector
+   * @param multiple
+   */
+  function tagPicker( selector, multiple=true ) {
+    apiPicker( selector, gh.api.routes.v4.tags, multiple, true, getTagsFromResponse )
+  }
+
   function buildPickers () {
     picker('.gh-select2', {})
-    apiPicker('.gh-tag-picker', endpoints.tags, true, true)
-    apiPicker('.gh-single-tag-picker', endpoints.tags, false, false)
-    apiPicker('.gh-single-tag-picker', endpoints.tags, false, false)
+    tagPicker('.gh-tag-picker', true )
+    tagPicker('.gh-single-tag-picker', false )
     apiPicker('.gh-email-picker', endpoints.emails, false, false)
     apiPicker('.gh-email-picker-multiple', endpoints.emails, true, false)
     apiPicker('.gh-sms-picker', endpoints.sms, false, false)
@@ -120,26 +145,28 @@
     buildPickers()
   })
 
-  $(document).on('click', '.dropdown-button .button.dropdown', function (){
+  $(document).on('click', '.dropdown-button .button.dropdown', function () {
     var $button = $(this)
-    $button.next().toggleClass( 'show' );
-    $( "<div class='dropdown-overlay'></div>" ).insertAfter( $button );
-  } );
+    $button.next().toggleClass('show')
+    $('<div class=\'dropdown-overlay\'></div>').insertAfter($button)
+  })
 
-  $(document).on('click', '.dropdown-button .dropdown-overlay', function (){
+  $(document).on('click', '.dropdown-button .dropdown-overlay', function () {
     var $overlay = $(this)
-    $overlay.next().toggleClass( 'show' );
-    $overlay.remove();
-  } );
+    $overlay.next().toggleClass('show')
+    $overlay.remove()
+  })
 
-  gh.pickers = {}
+  gh.pickers = {
+    picker,
+    tagPicker,
+    apiPicker,
+    linkPicker,
+    metaPicker
+  }
 
   // Map functions to Groundhogg object.
-  gh.pickers.picker = picker
-  gh.pickers.apiPicker = apiPicker
-  gh.pickers.linkPicker = linkPicker
-  gh.pickers.metaPicker = metaPicker
   gh.nonces = nonces
   gh.endpoints = endpoints
 
-} )(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)
+})(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)

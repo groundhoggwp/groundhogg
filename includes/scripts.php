@@ -235,6 +235,7 @@ class Scripts {
 			'groundhogg-admin-emojis-picker',
 			'groundhogg-admin-form-builder',
 			'groundhogg-admin-search-filters',
+			'groundhogg-admin-element',
 //			'groundhogg-tinymce-plugin'
 		], GROUNDHOGG_VERSION, true );
 
