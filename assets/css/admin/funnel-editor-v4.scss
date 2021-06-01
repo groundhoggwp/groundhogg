@@ -442,11 +442,12 @@ li.step-error {
     margin: 0;
     position: absolute;
     top: 90%;
-    z-index: 2;
+    z-index: 1000;
 
     li {
       margin: 0;
       padding: .236rem .382rem;
+      white-space: nowrap;
 
       &:hover {
         background: #0001;
