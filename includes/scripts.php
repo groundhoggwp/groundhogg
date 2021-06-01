@@ -346,7 +346,10 @@ class Scripts {
 				'optin_status' => Preferences::get_preference_names(),
 				'owners'       => get_owners(),
 				'current'      => get_request_var( 'filters', [] ),
-				'meta_keys'	   => get_keys(),
+				'meta_keys'    => get_keys(),
+			],
+			'managed_page' => [
+				'root' => managed_page_url()
 			]
 		] );
 

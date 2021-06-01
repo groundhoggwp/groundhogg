@@ -6,7 +6,7 @@
    * @param params
    * @param opts
    */
-  async function apiGet (route, params= {}, opts = {}) {
+  async function apiGet (route, params = {}, opts = {}) {
 
     const response = await fetch(route + '?' + $.param(params), {
       ...opts,
@@ -56,6 +56,10 @@
       }
 
       return this.items.find(item => item.ID === id)
+    },
+
+    hasItems () {
+      return this.items.length > 0
     },
 
     async fetch (params) {

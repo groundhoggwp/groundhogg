@@ -5,6 +5,8 @@
   const apiPost = Groundhogg.api.post
   const apiRoutes = Groundhogg.api.routes.v4
 
+  const { linkPicker } = Groundhogg.pickers
+
   $.fn.serializeFormJSON = function () {
 
     var o = {}
@@ -517,6 +519,7 @@
             data: {
               ID: id,
               funnel_id: Editor.funnel.ID,
+              step_title: Editor.stepTypes[type].name,
               step_type: type,
               step_group: group,
               step_order: $(ui.helper).prevAll('.step').length
@@ -1043,10 +1046,10 @@
         ...newData
       }
 
-      // console.log(newStep)
-
+      newStep.data.step_title = StepTypes.getType(newStep.data.step_type).title(newStep)
       var toReplace = this.funnel.steps.findIndex(step => step.ID === stepId)
 
+      this.autoSaveEditedFunnel()
       this.saveUndoState()
 
       if (toReplace !== -1) {
@@ -1063,8 +1066,6 @@
      */
     updateCurrentStep (newData) {
       this.updateStep(this.activeStep, newData)
-
-      this.autoSaveEditedFunnel()
     },
 
     /**
@@ -1076,7 +1077,7 @@
 
       console.log(this)
 
-      const { meta } = this.getCurrentStep()
+      const { data, meta } = this.getCurrentStep()
 
       this.updateStep(this.activeStep, {
         meta: {
@@ -1084,8 +1085,6 @@
           ...newMeta
         }
       })
-
-      this.autoSaveEditedFunnel()
     },
 
     autoSaveTimeout: null,
@@ -1587,6 +1586,11 @@
     },
 
     apply_note: {
+
+      defaults: {
+        note_text: ''
+      },
+
       //language=HTML
       svg: `
 		  <svg viewBox="0 0 42 37" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1764,6 +1768,10 @@
      */
     account_created: {
 
+      defaults: {
+        role: []
+      },
+
       //language=HTML
       svg: `
 		  <svg viewBox="0 0 35 35" xmlns="http://www.w3.org/2000/svg">
@@ -1780,10 +1788,6 @@
 			  </defs>
 		  </svg>
       `,
-
-      defaults: {
-        role: []
-      },
 
       // Title
       title ({ ID, data, meta }) {
@@ -1925,6 +1929,10 @@
      */
     apply_tag: {
 
+      defaults: {
+        tags: []
+      },
+
       //language=HTML
       svg: `
 		  <svg viewBox="0 0 35 37" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1937,11 +1945,15 @@
 
       title ({ ID, data, meta }) {
 
-        if (!meta.tags) {
-          return 'Apply tags'
-        }
+        const { tags } = meta
 
-        return `Apply <b>${meta.tags.length}</b> ${meta.tags.length > 1 ? 'tags' : 'tag'}`
+        if (tags.length === 0) {
+          return 'Apply tags'
+        } else if (tags.length < 4 && Tags.hasItems()) {
+          return `Apply ${andList(tags.map(id => `<b>${Tags.get(id).data.tag_name}</b>`))}`
+        } else {
+          return `Apply <b>${tags.length}</b> tags`
+        }
       },
 
       edit ({ ID, data, meta }) {
@@ -1969,7 +1981,9 @@
      * Remove a tag
      */
     remove_tag: {
-
+      defaults: {
+        tags: []
+      },
       //language=HTML
       svg: `
 		  <svg viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1981,11 +1995,15 @@
 		  </svg>`,
       title ({ ID, data, meta }) {
 
-        if (!meta.tags) {
-          return 'Remove tags'
-        }
+        const { tags } = meta
 
-        return `Remove <b>${meta.tags.length}</b> ${meta.tags.length > 1 ? 'tags' : 'tag'}`
+        if (tags.length === 0) {
+          return 'Remove tags'
+        } else if (tags.length < 4 && Tags.hasItems()) {
+          return `Remove ${andList(tags.map(id => `<b>${Tags.get(id).data.tag_name}</b>`))}`
+        } else {
+          return `Remove <b>${tags.length}</b> tags`
+        }
       },
 
       edit ({ ID, data, meta }) {
@@ -2013,6 +2031,10 @@
      * When a tag is applied
      */
     tag_applied: {
+
+      defaults: {
+        tags: []
+      },
 
       //language=HTML
       svg: `
@@ -2072,6 +2094,10 @@
      */
     tag_removed: {
 
+      defaults: {
+        tags: []
+      },
+
       // language=HTML
       svg: `
 		  <svg viewBox="0 0 37 35" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -2128,6 +2154,21 @@
     },
 
     delay_timer: {
+
+      defaults: {
+        delay_amount: 3,
+        delay_type: 'days',
+        run_on_type: 'any',
+        run_when: 'now',
+        run_time: '09:00:00',
+        send_in_timezone: false,
+        run_time_to: '05:00:00',
+        run_on_dow_type: 'any',
+        run_on_dow: [],
+        run_on_month_type: 'any',
+        run_on_months: [],
+        run_on_dom: [],
+      },
 
       //language=HTML
       svg: `
@@ -2369,12 +2410,69 @@
     },
 
     link_click: {
+
+      defaults: {
+        redirect_to: ''
+      },
+
       //language=HTML
       svg: `
 		  <svg viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
 			  <path d="M8.594 4.671v22.305l5.329-5.219 3.525 8.607 3.278-1.23-3.688-8.718h7.14L8.593 4.67z"
 			        stroke="currentColor" stroke-width="2"/>
-		  </svg>`
+		  </svg>`,
+
+      title ({ meta }) {
+
+        const { redirect_to } = meta
+        if (redirect_to) {
+
+          const targetUrl = new URL(redirect_to)
+          const homeUrl = new URL(Groundhogg.managed_page.root)
+
+          if (targetUrl.hostname === homeUrl.hostname){
+            return `Clicked to <b>${targetUrl.pathname}</b>`
+          } else {
+            return `Clicked to <b>${targetUrl.hostname}</b>`
+          }
+        } else {
+          return 'Clicked a tracking link'
+        }
+      },
+
+      edit ({ meta }) {
+        //language=HTML
+        return `
+			<div class="panel">
+				<div class="row">
+					<label class="row-label" for="copy-this">Copy this link</label>
+					<input type="url" id="copy-this" class="code input regular-text"
+					       value="${Groundhogg.managed_page.root}/link/click/${'some-value'}" onfocus="this.select()"
+					       readonly>
+					<p class="description">Paste this link in any email or page. Once a contact clicks it the benchmark
+						will be completed and the contact will be redirected to the page set below.</p>
+				</div>
+				<div class="row">
+					<label class="row-label" for="copy">Then redirect contacts to...</label>
+					${Elements.inputWithReplacements({
+						type: 'url',
+						id: 'redirect-to',
+						name: 'redirect_to',
+						className: 'regular-text',
+						value: meta.redirect_to
+					})}
+					<p class="description">Upon clicking the tracking link contacts will be redirected to this page.</p>
+				</div>
+			</div>`
+      },
+      onMount ({ meta }, updateStepMeta) {
+        $('#redirect-to').on('change', function (e) {
+          updateStepMeta({
+            redirect_to: $(this).val()
+          })
+        })
+        linkPicker('#redirect-to')
+      }
     },
 
     email_confirmed: {
@@ -2412,8 +2510,8 @@
 			</div>`
       },
       onMount ({}) {
-        const editor = FormBuilder(document.querySelector('#edit-form'),)
-        editor.init()
+        // const editor = FormBuilder(document.querySelector('#edit-form'),)
+        // editor.init()
       }
     }
   }
