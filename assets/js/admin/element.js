@@ -218,15 +218,15 @@
     },
   }
 
-  const tinymceElement = ( editor_id, config, callback ) => {
+  const tinymceElement = (editor_id, config, onChange) => {
     wp.editor.initialize(
-        editor_id,
-        config
+      editor_id,
+      config
     )
 
-    if (callback) {
-      callback.call(this, editor_id)
-    }
+    tinymce.get(editor_id).on('keyup', function (e) {
+      onChange(tinyMCE.activeEditor.getContent({ format: 'raw' }), tinyMCE.activeEditor.getContent({ format: 'raw' }))
+    })
   }
 
   /**

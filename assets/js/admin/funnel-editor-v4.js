@@ -1415,9 +1415,9 @@
     delay_type: 'days',
     run_on_type: 'any',
     run_when: 'now',
-    run_time: '',
-    send_in_timezone: true,
-    run_time_to: '',
+    run_time: '09:00:00',
+    send_in_timezone: false,
+    run_time_to: '17:00:00',
     run_on_dow_type: 'any', // Run on days of week type
     run_on_dow: [], // Run on days of week
     run_on_month_type: 'any', // Run on month type
@@ -1618,31 +1618,28 @@
 				</div>
 			</div>`
       },
-      onMount () {
+      onMount (step, updateStepMeta) {
+
+        let saveTimer
+
         tinymceElement(
           'note_text',
           {
             tinymce: true,
             quicktags: true
           },
-           (editor_id) => {
-            let saveTimer;
+          (content) => {
 
-            // get tinymce editor based on instance-id
-            tinymce.get(editor_id).on('keyup', function (e) {
+            // Reset timer.
+            clearTimeout(saveTimer)
 
-              // Reset timer.
-              clearTimeout(saveTimer)
-
-              // Only save after a second.
-              saveTimer = setTimeout(function () {
-                Editor.updateCurrentStepMeta({
-                  note_text: tinyMCE.activeEditor.getContent({format: 'raw'})
-                })
-              }, 1000)
-            })
-          }
-        )
+            // Only save after a second.
+            saveTimer = setTimeout(function () {
+              updateStepMeta({
+                note_text: content
+              })
+            }, 300)
+          })
       },
       onDemount () {
         wp.editor.remove(
@@ -1671,13 +1668,14 @@
         to: '{owner_email}',
         from: '{owner_email}',
         reply_to: '{email}',
+        subject: 'Notification from "{first}"',
         note_text: '',
       },
       title ({ meta }) {
 
         const { to } = meta
 
-        return `Send notification to <b>${to}</b>`
+        return `Send notification to ${andList(to.split(',').map(address => `<b>${address.trim()}</b>`))}`
 
       },
       edit ({ meta }) {
@@ -1691,7 +1689,7 @@
 						id: 'to',
 						name: 'to',
 						className: 'regular-text',
-						value: meta.to || '{owner_email}'
+						value: meta.to
 					})}
 					<p class="description">Comma separated list of emails addresses.</p>
 				</div>
@@ -1702,7 +1700,7 @@
 						id: 'from',
 						name: 'from',
 						className: 'regular-text',
-						value: meta.from || '{owner_email}'
+						value: meta.from
 					})}
 					<p class="description">A single email address which you'd like the notification to come from.</p>
 				</div>
@@ -1713,7 +1711,7 @@
 						id: 'reply-to',
 						name: 'reply_to',
 						className: 'regular-text',
-						value: meta.reply_to || '{email}'
+						value: meta.reply_to
 					})}
 					<p class="description">A single email address which replies to this notification should be sent
 						to.</p>
@@ -1725,23 +1723,46 @@
 						id: 'subject',
 						name: 'subject',
 						className: 'regular-text',
-						value: meta.subject || 'Notification from "{full_name}"'
+						value: meta.subject
 					})}
 					<p class="description">The subject line of the notification.</p>
 				</div>
 				<div class="row">
-					<textarea id="note_text" name="note_text">${specialChars(meta.note_text || '')}</textarea>
+					<textarea id="note_text" name="note_text">${specialChars(meta.note_text)}</textarea>
 				</div>
 			</div>`
       },
-      onMount () {
-        wp.editor.initialize(
+      onMount (step, updateStepMeta) {
+
+        $('#subject, #reply-to, #from, #to').on('change', function (e) {
+          const $this = $(this)
+          updateStepMeta({
+            [$this.prop('name')]: $this.val()
+          })
+        })
+
+        let saveTimer
+
+        tinymceElement(
           'note_text',
           {
             tinymce: true,
             quicktags: true
-          }
-        )
+          },
+          (content) => {
+
+            console.log( content )
+
+            // Reset timer.
+            clearTimeout(saveTimer)
+
+            // Only save after a second.
+            saveTimer = setTimeout(function () {
+              updateStepMeta({
+                note_text: content
+              })
+            }, 300)
+          })
       },
       onDemount () {
         wp.editor.remove(
@@ -2143,18 +2164,7 @@
     delay_timer: {
 
       defaults: {
-        delay_amount: 3,
-        delay_type: 'days',
-        run_on_type: 'any',
-        run_when: 'now',
-        run_time: '09:00:00',
-        send_in_timezone: false,
-        run_time_to: '05:00:00',
-        run_on_dow_type: 'any',
-        run_on_dow: [],
-        run_on_month_type: 'any',
-        run_on_months: [],
-        run_on_dom: [],
+        ...delayTimerDefaults
       },
 
       //language=HTML
@@ -2417,7 +2427,7 @@
           const targetUrl = new URL(redirect_to)
           const homeUrl = new URL(Groundhogg.managed_page.root)
 
-          if (targetUrl.hostname === homeUrl.hostname){
+          if (targetUrl.hostname === homeUrl.hostname) {
             return `Clicked to <b>${targetUrl.pathname}</b>`
           } else {
             return `Clicked to <b>${targetUrl.hostname}</b>`
