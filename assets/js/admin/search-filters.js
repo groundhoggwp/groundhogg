@@ -219,7 +219,7 @@
         self.filters[group].splice(key, 1)
 
         // If the group is empty, remove it as well
-        if (group !== 0 && self.filters[group].length === 0) {
+        if (self.filters.length > 1 && self.filters[group].length === 0) {
           self.filters.splice(group, 1)
         }
 
