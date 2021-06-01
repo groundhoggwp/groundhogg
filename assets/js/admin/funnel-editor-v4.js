@@ -334,6 +334,10 @@
 					</svg>
 					<ul>
 						<li class="step-menu-edit">Edit</li>
+						<li class="step-menu-move-up">Move up</li>
+						<li class="step-menu-move-up">Move down</li>
+						<li class="step-menu-new-step-before">Insert a step before</li>
+						<li class="step-menu-new-step-after">Insert a step after</li>
 						<li class="step-menu-duplicate">Duplicate</li>
 						<li class="step-menu-delete">Delete</li>
 					</ul>

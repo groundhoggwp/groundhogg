@@ -374,11 +374,12 @@ li.step-error {
   margin: 0;
   position: absolute;
   top: 90%;
-  z-index: 2;
+  z-index: 1000;
 }
 .step-menu ul li {
   margin: 0;
   padding: 0.236rem 0.382rem;
+  white-space: nowrap;
 }
 .step-menu ul li:hover {
   background: #0001;
