@@ -176,8 +176,9 @@
 					  <path
 						  d="M1 21.956V2.995c0-.748.606-1.355 1.354-1.355H17.93l4.74 4.74v15.576c0 .748-.606 1.354-1.354 1.354H2.354A1.354 1.354 0 011 21.956z"
 						  stroke="currentColor" stroke-width="1.5"/>
-					  <path d="M14.544 16.539a2.709 2.709 0 11-5.418 0 2.709 2.709 0 015.418 0z" stroke="currentColor"
+					  <path d="M14.544 16.539a2.709 2.709 0 11-5.418 0 2.709 2.709 0 015.418 0z" stroke="#fff"
 					        stroke-width="1.5"/>
+					  <path fill="currentColor" d="M5.619 6.298h9.634v2.846H5.619z"/>
 				  </svg>
 				  Update
 			  </button>
@@ -2441,6 +2442,14 @@
     },
     getCurrentStepMeta () {
       return Editor.getCurrentStep().meta
+    },
+    getProceedingSteps (stepId) {
+      const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep()
+      return Editor.getSteps().filter(_step => _step.data.step_order > step.data.step_order).sort((a, b) => a.data.step_order - b.data.step_order)
+    },
+    getPrecedingSteps (stepId) {
+      const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep()
+      return Editor.getSteps().filter(_step => _step.data.step_order < step.data.step_order).sort((a, b) => a.data.step_order - b.data.step_order)
     }
   }
 
