@@ -4,6 +4,9 @@
   const apiGet = Groundhogg.api.get
   const apiPost = Groundhogg.api.post
   const apiRoutes = Groundhogg.api.routes.v4
+  const {
+    tinymceElement
+  } = Groundhogg.element
 
   $.fn.serializeFormJSON = function () {
 
@@ -1611,46 +1614,30 @@
 			</div>`
       },
       onMount () {
-        wp.editor.initialize(
+        tinymceElement(
           'note_text',
           {
             tinymce: true,
             quicktags: true
+          },
+           (editor_id) => {
+            let saveTimer;
+
+            // get tinymce editor based on instance-id
+            tinymce.get(editor_id).on('keyup', function (e) {
+
+              // Reset timer.
+              clearTimeout(saveTimer)
+
+              // Only save after a second.
+              saveTimer = setTimeout(function () {
+                Editor.updateCurrentStepMeta({
+                  note_text: tinyMCE.activeEditor.getContent({format: 'raw'})
+                })
+              }, 1000)
+            })
           }
         )
-
-        for (id in tinymce.editors) {
-          if (id.trim()) {
-            elementReady(id)
-          }
-        }
-
-        // Wait for non-initialised editors to initialise
-        tinymce.on('AddEditor', function (e) {
-          elementReady(e.editor.id)
-        })
-
-        // function to call when tinymce-editor has initialised
-        function elementReady (editor_id) {
-
-          // get tinymce editor based on instance-id
-          var _editor = tinymce.editors[editor_id]
-
-          // Timer for saving on pause.
-          let saveTimer = null
-
-          _editor.on('keyup', function (e) {
-            // Reset timer.
-            clearTimeout(saveTimer)
-
-            // Only save after a second.
-            saveTimer = setTimeout(function () {
-              Editor.updateCurrentStepMeta({
-                note_text: tinyMCE.activeEditor.getContent({ format: 'raw' })
-              })
-            }, 1000)
-          })
-        }
       },
       onDemount () {
         wp.editor.remove(
