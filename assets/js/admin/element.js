@@ -215,6 +215,17 @@
     },
     textAreaWithEmojis: function ({ name, id, value }) {
 
+    },
+  }
+
+  const tinymceElement = ( editor_id, config, callback ) => {
+    wp.editor.initialize(
+        editor_id,
+        config
+    )
+
+    if (callback) {
+      callback.call(this, editor_id)
     }
   }
 
@@ -534,7 +545,8 @@
     createOptions,
     createSlotFillProvider,
     clickInsideElement,
-    searchOptionsWidget
+    searchOptionsWidget,
+    tinymceElement
   }
 
 })(jQuery)
