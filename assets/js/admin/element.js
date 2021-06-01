@@ -455,6 +455,8 @@
 
       $(`${selector} input.search-for-options`).on('change input', function (e) {
         self.search = $(this).val()
+        self.focusedOptionId = false
+        self.previousFocusedOptionId = false
         self.mountOptions()
       }).focus()
 
@@ -470,7 +472,6 @@
       })
 
       const handleKeyDown = (e) => {
-        e.preventDefault()
 
         const { type, key, keyCode } = e
 
@@ -481,6 +482,7 @@
             break
           case 'Down':
           case 'ArrowDown':
+            e.preventDefault()
 
             if (this.focusedOptionId === this.getOptions().length - 1) {
               return
@@ -493,6 +495,7 @@
             break
           case 'Up':
           case 'ArrowUp':
+            e.preventDefault()
 
             if (this.focusedOptionId === 0) {
               return
@@ -504,6 +507,7 @@
 
             break
           case 'Enter':
+            e.preventDefault()
 
             const $focused = $(`${selector} .option.focused`)
             this.selectOption($focused.data('option'), $focused.data('group'))

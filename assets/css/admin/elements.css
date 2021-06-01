@@ -34,7 +34,7 @@
 }
 .search-options-widget-wrap .search-options-widget .search-options {
   padding: 5px 8px;
-  max-height: 100px;
+  max-height: 300px;
   overflow: auto;
 }
 .search-options-widget-wrap .search-options-widget .search-options.has-groups .option {

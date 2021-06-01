@@ -279,8 +279,20 @@
               break
           }
 
-        })
+        }).focus()
       }
+
+      $(`${el} .filter-view`).on('keydown', function (e) {
+
+        console.log(this)
+
+        switch (e.key) {
+          case 'Enter':
+          case 'Space':
+            setActiveFilter($(this).data('group'), $(this).data('key'))
+            break
+        }
+      })
 
       $(`${el} #search-filters-editor`).on('click', function (e) {
 

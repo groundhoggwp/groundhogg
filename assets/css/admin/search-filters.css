@@ -95,6 +95,9 @@
   border: 1px solid #8c8f94;
   border-radius: 5px;
 }
+#search-filters-editor .filter.filter-view:focus {
+  background: #f9f9f9;
+}
 #search-filters-editor .filter.filter-edit-wrap {
   position: relative;
   min-width: 200px;

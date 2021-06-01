@@ -122,6 +122,10 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
       background: #FFFFFF;
       border: 1px solid #8c8f94;
       border-radius: 5px;
+
+      &:focus{
+        background: #f9f9f9;
+      }
     }
 
     &.filter-edit-wrap {
