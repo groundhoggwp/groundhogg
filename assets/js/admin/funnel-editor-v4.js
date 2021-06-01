@@ -180,7 +180,8 @@
 			  </button>
 			  <button class="deactivate">Deactivate
 				  <svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-					  <path d="M16.337 15.535h-4.8V.735h4.8v14.8zm-10 0h-4.8V.735h4.8v14.8z" fill="currentColor" stroke="currentColor"
+					  <path d="M16.337 15.535h-4.8V.735h4.8v14.8zm-10 0h-4.8V.735h4.8v14.8z" fill="currentColor"
+					        stroke="currentColor"
 					        stroke-width="1.2"/>
 				  </svg>
 			  </button>`
@@ -2264,8 +2265,8 @@
 			<div class="panel">
 				<div class="row">
 					<h3 class="delay-preview" style="font-weight: normal">${delayTimerName({
+						...delayTimerDefaults,
 						...meta,
-						...delayTimerDefaults
 					})}</h3>
 				</div>
 				<div class="row">
