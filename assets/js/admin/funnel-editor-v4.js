@@ -168,10 +168,19 @@
         } else {
           //language=HTML
           return `
-			  <button class="update">Update</button>
+			  <button class="update">
+				  <svg viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+					  <path
+						  d="M1 21.956V2.995c0-.748.606-1.355 1.354-1.355H17.93l4.74 4.74v15.576c0 .748-.606 1.354-1.354 1.354H2.354A1.354 1.354 0 011 21.956z"
+						  stroke="currentColor" stroke-width="1.5"/>
+					  <path d="M14.544 16.539a2.709 2.709 0 11-5.418 0 2.709 2.709 0 015.418 0z" stroke="currentColor"
+					        stroke-width="1.5"/>
+				  </svg>
+				  Update
+			  </button>
 			  <button class="deactivate">Deactivate
 				  <svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-					  <path d="M16.337 15.535h-4.8V.735h4.8v14.8zm-10 0h-4.8V.735h4.8v14.8z" fill="#fff" stroke="#fff"
+					  <path d="M16.337 15.535h-4.8V.735h4.8v14.8zm-10 0h-4.8V.735h4.8v14.8z" fill="currentColor" stroke="currentColor"
 					        stroke-width="1.2"/>
 				  </svg>
 			  </button>`
@@ -645,8 +654,8 @@
 
       step = step || this.funnel.steps.find(s => s.ID === this.activeStep)
 
-      if ( ! step ){
-        return;
+      if (!step) {
+        return
       }
 
       const updateStepMeta = (meta) => {
@@ -666,8 +675,8 @@
 
       step = step || this.funnel.steps.find(s => s.ID === this.lastStepEditMounted)
 
-      if ( ! step ){
-        return;
+      if (!step) {
+        return
       }
 
       const updateStepMeta = (meta) => {
@@ -2438,7 +2447,7 @@
     getCurrentStep () {
       return Editor.getCurrentStep()
     },
-    getCurrentStepMeta(){
+    getCurrentStepMeta () {
       return Editor.getCurrentStep().meta
     }
   }

@@ -1,3 +1,12 @@
+$primary-blue: #0075FF;
+$primary-dark: #102640;
+$error-red: #E91F4F;
+$secondary-purple: #6C19AD;
+$alert-yellow: #FFEE58;
+$benchmark-orange: #F58115;
+$action-green: #9ECE38;
+$box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+
 .search-options-widget-wrap {
   position: relative;
 
@@ -11,6 +20,10 @@
     background: #FFFFFF;
     border-radius: 5px;
     box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+
+    &.mount-from-bottom {
+      bottom: 0;
+    }
 
     .header {
       padding: 5px;
@@ -34,6 +47,8 @@
 
     .search-options {
       padding: 5px 8px;
+      max-height: 100px;
+      overflow: auto;
 
       &.has-groups{
         .option{
@@ -42,8 +57,8 @@
       }
 
       * {
-        padding-top: 3px;
-        padding-bottom: 3px;
+        //padding-top: 3px;
+        //padding-bottom: 3px;
       }
 
       .option-group {
@@ -53,8 +68,9 @@
       .option {
         cursor: pointer;
 
+        &.focused,
         &:hover{
-          background: #0d79e5;
+          background: $primary-blue;
           color: #FFFFFF;
         }
       }

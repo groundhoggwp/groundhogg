@@ -742,6 +742,12 @@ li.step-error {
       &:hover{
         background: darken( $primary-blue, 10 );
       }
+
+      svg {
+        color: #FFFFFF;
+        height: 20px;
+        width: 20px;
+      }
     }
 
     &.deactivate{

@@ -324,11 +324,14 @@
     groups,
 
     search: '',
+    focusedOptionId: 0,
+    previousFocusedOptionId: false,
+    focusedOption: false,
     render () {
       //language=HTML
       return `
 		  <div class="search-options-widget-wrap">
-			  <div class="search-options-widget">
+			  <div class="search-options-widget" tabindex="0">
 				  <div class="header">
 					  ${Elements.input({
 						  name: 'search',
@@ -361,13 +364,22 @@
 
       const searchOptions = []
 
+      let focusedIndex = 0
+
+      var self = this
+
+      const optionDiv = (option, group, id, index) => {
+        return `<div class="option ${index === this.focusedOptionId ? 'focused' : ''}" data-option="${id}" data-group="${group}">${renderOption(option)}</div>`
+      }
+
       if (Object.keys(groups).length > 0) {
 
         Object.keys(groups).forEach((group, g) => {
           const options = []
 
           this.getOptions().filter(option => option.group === group).forEach((option, o) => {
-            options.push(`<div class="option" data-option="${o}" data-group="${group}">${renderOption(option)}</div>`)
+            options.push(optionDiv(option, group, o, focusedIndex))
+            focusedIndex++
           })
 
           if (options.length > 0) {
@@ -378,38 +390,65 @@
 
       } else {
         this.getOptions().forEach((option, o) => {
-          searchOptions.push(`<div class="option" data-option="${o}">${renderOption(option)}</div>`)
+          searchOptions.push(optionDiv(option, null, o, focusedIndex))
+          focusedIndex++
         })
       }
 
       return searchOptions.length ? searchOptions.join('') : `<div class="no-options">${noOptions}</div>`
     },
+    selectOption (optionId, groupId) {
+      if (!this.hasGroups()) {
+        onSelect(this.getOptions()[optionId])
+        onClose()
+      } else {
+        Object.keys(groups).forEach((group, g) => {
+          this.getOptions().filter(option => option.group == group).forEach((option, o) => {
+            if (group == groupId && o == optionId) {
+              onSelect(option)
+              onClose()
+              return
+            }
+          })
+        })
+      }
+    },
     mountOptions () {
 
       var self = this
-      $(`${selector} .search-options`).html(this.renderSearchOptions())
+      const $options = $(`${selector} .search-options`)
+
+      $options.html(this.renderSearchOptions())
       $(`${selector} .option`).on('click', function (e) {
         const optionId = $(this).data('option')
         const groupId = $(this).data('group')
 
-        if (!self.hasGroups()) {
-          onSelect(self.getOptions()[optionId])
-          onClose()
-        } else {
-          Object.keys(groups).forEach((group, g) => {
-            self.getOptions().filter(option => option.group == group).forEach((option, o) => {
-              if (group == groupId && o == optionId) {
-                onSelect(option)
-                onClose()
-                return
-              }
-            })
-          })
-        }
+        self.selectOption(optionId, groupId)
       })
+
+      const $focused = $(`${selector} .option.focused`)
+
+      let offset
+
+      // Moving down
+      if (this.focusedOptionId > this.previousFocusedOptionId) {
+        offset = $focused.height() * ($focused.index() + 1)
+        if (offset > $options.height())
+          $options.scrollTop(offset - $options.height())
+      }
+      // Moving up
+      else if (this.focusedOptionId < this.previousFocusedOptionId) {
+        offset = $focused.height() * ($focused.index())
+        if (offset < $options.scrollTop())
+          $options.scrollTop(offset)
+      }
     },
     mount () {
       var self = this
+
+      const handleClose = () => {
+        onClose()
+      }
 
       $(selector).html(self.render())
       this.mountOptions()
@@ -417,18 +456,63 @@
       $(`${selector} input.search-for-options`).on('change input', function (e) {
         self.search = $(this).val()
         self.mountOptions()
-      })
+      }).focus()
 
       const el = document.querySelector('.search-options-widget')
 
       // if current Y position (relative to window) + height > height of window
-      if ((el + $(el).height()) > window.innerHeight) {
+      if ((el.getBoundingClientRect().y + $(el).height()) > window.innerHeight) {
         el.classList.add('mount-from-bottom')
       }
 
       $(`${selector} button.close`).on('click', function (e) {
-        onClose()
+        handleClose()
       })
+
+      const handleKeyDown = (e) => {
+        e.preventDefault()
+
+        const { type, key, keyCode } = e
+
+        switch (key) {
+          case 'Esc':
+          case 'Escape':
+            handleClose()
+            break
+          case 'Down':
+          case 'ArrowDown':
+
+            if (this.focusedOptionId === this.getOptions().length - 1) {
+              return
+            }
+
+            this.previousFocusedOptionId = this.focusedOptionId
+            this.focusedOptionId++
+            this.mountOptions()
+
+            break
+          case 'Up':
+          case 'ArrowUp':
+
+            if (this.focusedOptionId === 0) {
+              return
+            }
+
+            this.previousFocusedOptionId = this.focusedOptionId
+            this.focusedOptionId--
+            this.mountOptions()
+
+            break
+          case 'Enter':
+
+            const $focused = $(`${selector} .option.focused`)
+            this.selectOption($focused.data('option'), $focused.data('group'))
+
+            break
+        }
+      }
+
+      $('.search-options-widget').on('keydown', handleKeyDown)
 
       onOpen()
     }

@@ -375,6 +375,7 @@ class Scripts {
 		wp_register_style( 'groundhogg-admin-email-preview', GROUNDHOGG_ASSETS_URL . 'css/admin/email-preview.css', [], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-funnel-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/funnel-editor-v4.css', [
 			'groundhogg-admin-form-builder',
+			'groundhogg-admin-elements',
 			'groundhogg-loader'
 		], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-form-builder', GROUNDHOGG_ASSETS_URL . 'css/admin/form-builder.css', [], GROUNDHOGG_VERSION );

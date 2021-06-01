@@ -21,7 +21,7 @@
   const renderFilterView = (filter, filterGroupIndex, filterIndex) => {
     //language=HTML
     return `
-		<div class="filter filter-view" data-key="${filterIndex}" data-group="${filterGroupIndex}">
+		<div class="filter filter-view" data-key="${filterIndex}" data-group="${filterGroupIndex}" tabindex="0">
 			${Filters.types[filter.type].view(filter, filterGroupIndex, filterIndex)}
 			<button class="delete-filter"><span class="dashicons dashicons-no-alt"></span></button>
 		</div>`
@@ -31,7 +31,7 @@
     //language=HTML
     return `
 		<div class="filter filter-edit-wrap" data-key="${filterIndex}" data-group="${filterGroupIndex}">
-			<div class="filter-edit">
+			<div class="filter-edit" tabindex="0">
 				<div class="header">
 					<b>${Filters.types[filter.type].name}</b>
 					<button class="close-edit"><span class="dashicons dashicons-no-alt"></span></button>
@@ -156,18 +156,6 @@
         self.isAddingFilterToGroup = false
 
         reMount()
-
-        if (self.currentGroup !== false && self.currentFilter !== false) {
-          const $filterEdit = $('.filter-edit')
-
-          $filterEdit.parent().width($filterEdit.width())
-
-          const filterSettings = getFilterSettings(self.currentGroup, self.currentFilter)
-          self.tempFilterSettings = filterSettings
-          const { type } = filterSettings
-
-          Filters.types[type].onMount(filterSettings, updateFilter)
-        }
       }
 
       const addFilter = (opts, group) => {
@@ -194,12 +182,12 @@
 
         console.log(opts)
 
-        self.tempFilterSettings = {
-          ...self.tempFilterSettings,
+        this.tempFilterSettings = {
+          ...this.tempFilterSettings,
           ...opts
         }
 
-        return self.tempFilterSettings
+        return this.tempFilterSettings
       }
 
       const commitFilter = (group, key) => {
@@ -242,12 +230,9 @@
 
       this.filterPicker = searchOptionsWidget({
         selector: '.add-filter-wrap',
-        options: Object.values( Filters.types ),
+        options: Object.values(Filters.types),
         groups: Filters.groups,
         onSelect: (option) => {
-
-          console.log( option )
-
           addFilter({
             type: option.type,
             ...option.defaults
@@ -268,6 +253,35 @@
         this.filterPicker.mount()
       }
 
+      if (this.currentGroup !== false && this.currentFilter !== false) {
+        const $filterEdit = $('.filter-edit')
+
+        $filterEdit.parent().width($filterEdit.width())
+
+        const filterSettings = getFilterSettings(this.currentGroup, this.currentFilter)
+        this.tempFilterSettings = filterSettings
+        const { type } = filterSettings
+
+        Filters.types[type].onMount(filterSettings, updateFilter)
+
+        $filterEdit.on('keydown', (e) => {
+
+          const { key } = e
+
+          switch (key) {
+            case 'Esc':
+            case 'Escape':
+              setActiveFilter(false, false)
+              break
+            case 'Enter':
+              // Todo should only do this on inputs which support it
+              // commitFilter()
+              break
+          }
+
+        })
+      }
+
       $(`${el} #search-filters-editor`).on('click', function (e) {
 
         // console.log(e)
@@ -276,12 +290,6 @@
         const clickedOnAddFilterSearch = clickInsideElement(e, 'div.add-filter-wrap')
         const clickedOnFilterView = clickInsideElement(e, '.filter.filter-view')
         const clickedOnFilterEdit = clickInsideElement(e, '.filter-edit')
-
-        // console.log({
-        //   clickedOnFilterView,
-        //   clickedOnFilterEdit,
-        //   e
-        // })
 
         if (clickedOnAddFilter) {
 
@@ -365,10 +373,10 @@
 	  })}`
     },
     onMount (filter, updateFilter) {
-      console.log(filter)
+      // console.log(filter)
 
       $('#filter-compare, #filter-value').on('change', function (e) {
-        console.log(e)
+        // console.log(e)
         const $el = $(this)
         updateFilter({
           [$el.prop('name')]: $el.val()
@@ -542,7 +550,7 @@
       $('#filter-value').select2()
       $('#filter-value, #filter-compare').on('change', function (e) {
         const $el = $(this)
-        console.log($el.val())
+        // console.log($el.val())
         updateFilter({
           [$el.prop('name')]: $el.val()
         })
@@ -600,7 +608,7 @@
       $('#filter-value').select2()
       $('#filter-value, #filter-compare').on('change', function (e) {
         const $el = $(this)
-        console.log($el.val())
+        // console.log($el.val())
         updateFilter({
           [$el.prop('name')]: $el.val()
         })
@@ -661,7 +669,7 @@
     onMount (filter, updateFilter) {
       $('#filter-value, #meta_key, #filter-value').on('change', function (e) {
         const $el = $(this)
-        console.log($el.val())
+        // console.log($el.val())
         updateFilter({
           [$el.prop('name')]: $el.val()
         })

@@ -12,6 +12,9 @@
   border-radius: 5px;
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
 }
+.search-options-widget-wrap .search-options-widget.mount-from-bottom {
+  bottom: 0;
+}
 .search-options-widget-wrap .search-options-widget .header {
   padding: 5px;
   display: flex;
@@ -31,13 +34,11 @@
 }
 .search-options-widget-wrap .search-options-widget .search-options {
   padding: 5px 8px;
+  max-height: 100px;
+  overflow: auto;
 }
 .search-options-widget-wrap .search-options-widget .search-options.has-groups .option {
   padding-left: 10px;
-}
-.search-options-widget-wrap .search-options-widget .search-options * {
-  padding-top: 3px;
-  padding-bottom: 3px;
 }
 .search-options-widget-wrap .search-options-widget .search-options .option-group {
   font-weight: 500;
@@ -45,8 +46,8 @@
 .search-options-widget-wrap .search-options-widget .search-options .option {
   cursor: pointer;
 }
-.search-options-widget-wrap .search-options-widget .search-options .option:hover {
-  background: #0d79e5;
+.search-options-widget-wrap .search-options-widget .search-options .option.focused, .search-options-widget-wrap .search-options-widget .search-options .option:hover {
+  background: #0075FF;
   color: #FFFFFF;
 }
 

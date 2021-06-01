@@ -658,6 +658,11 @@ li.step-error {
 .publish-actions button.update:hover {
   background: #005ecc;
 }
+.publish-actions button.update svg {
+  color: #FFFFFF;
+  height: 20px;
+  width: 20px;
+}
 .publish-actions button.deactivate {
   background: #E91F4F;
 }
