@@ -2455,6 +2455,14 @@
     },
     getCurrentStepMeta () {
       return Editor.getCurrentStep().meta
+    },
+    getProceedingSteps (stepId) {
+      const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep()
+      return Editor.getSteps().filter(_step => _step.data.step_order > step.data.step_order).sort((a, b) => a.data.step_order - b.data.step_order)
+    },
+    getPrecedingSteps (stepId) {
+      const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep()
+      return Editor.getSteps().filter(_step => _step.data.step_order < step.data.step_order).sort((a, b) => a.data.step_order - b.data.step_order)
     }
   }
 
