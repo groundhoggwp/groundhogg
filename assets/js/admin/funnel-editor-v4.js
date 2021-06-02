@@ -402,12 +402,25 @@
             self.addStep(newStep)
             break
           case ($(e.target).is('.step-menu-delete')) :
-            // window.console.log('delete')
             self.deleteStep(parseInt($step.data('id')))
             break
           case ($(e.target).is('.step-menu') || $(e.target).parent('.step-menu').length > 0) :
-            // window.console.log('toggle menu')
-            $('.step-menu ul', $step).toggle()
+            const $menu = $('.step-menu ul', $step).toggle()
+
+            const p = $menu.offset();
+            const h = $menu.outerHeight();
+            if ( p.top + h > $( window ).height() ) {
+              $menu.css({
+                bottom: '90%',
+                top: 'auto',
+              })
+            } else {
+              $menu.css({
+                top: '90%',
+                bottom: 'auto',
+              })
+            }
+
             break
           case ($(e.target).is('.step-menu-edit')) :
           default:
