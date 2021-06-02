@@ -204,6 +204,14 @@ button {
     justify-content: flex-start;
     align-items: center;
     align-content: center;
+
+    .action {
+      margin: 0 15px;
+    }
+
+    .step:last-child {
+      margin-bottom: 100px;
+    }
   }
 
   .add-new-step-wrapper {
@@ -304,10 +312,6 @@ li.step-error {
   cursor: pointer;
 }
 
-.step-flow .steps .step:last-child {
-  margin-bottom: 20px;
-}
-
 .step-flow .steps .step.has-errors {
   border: 1px solid $error-red;
 
@@ -400,11 +404,6 @@ li.step-error {
   border-width: 2px;
   padding: 9px;
 }
-
-.step-flow .steps .step.action {
-  margin: 0 15px;
-}
-
 
 .step .step-status {
   //display: flex;
