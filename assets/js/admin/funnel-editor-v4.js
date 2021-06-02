@@ -117,6 +117,10 @@
     }
   }
 
+  const getStepType = (type) => {
+    return Editor.stepTypes.hasOwnProperty(type) ? Editor.stepTypes[type] : StepTypes.getType('error')
+  }
+
   const Editor = {
 
     activeAddType: 'actions',
@@ -207,6 +211,8 @@
         const { ID, data, meta } = step
         const { step_type, step_title, step_group } = data
 
+        const StepType = getStepType(step_type)
+
         let hasErrors = false
         let errors = []
 
@@ -240,7 +246,7 @@
 			<div class="step-edit">
 				<div class="settings">
 					${slot('beforeStepSettings', ...slotArgs)}
-					${Editor.stepTypes[step_type].edit(...slotArgs)}
+					${StepType.edit(...slotArgs)}
 					${slot('afterStepSettings', ...slotArgs)}
 				</div>
 				<div class="actions-and-notes">
@@ -298,7 +304,9 @@
         const { ID, data, meta } = step
         const { step_type, step_title, step_group, step_order } = data
 
+        const StepType = getStepType(step_type)
         const origStep = Editor.origFunnel.steps.find(s => s.ID === ID)
+
         let status
         let hasErrors = false
 
@@ -309,6 +317,8 @@
           status = 'edited'
         } else if (!origStep) {
           status = 'new'
+        } else if (StepType.type === 'error') {
+          hasErrors = true
         }
 
         const nextStep = Editor.funnel.steps.find(step => step.data.step_order === step_order + 1)
@@ -324,11 +334,11 @@
 			<div
 				class="step ${step_type} ${step_group} ${activeStep === ID ? 'active' : ''} ${hasErrors ? 'has-errors' : ''}"
 				data-id="${ID}">
-				${Editor.stepTypes[step_type].hasOwnProperty('svg') ? `<div class="icon-svg">${Editor.stepTypes[step_type].svg}</div>` : `<img alt="${Editor.stepTypes[step_type].name}" class="icon"
-				     src="${Editor.stepTypes[step_type].icon}"/>`}
+				${StepType.hasOwnProperty('svg') ? `<div class="icon-svg">${StepType.svg}</div>` : `<img alt="${StepType.name}" class="icon"
+				     src="${StepType.icon}"/>`}
 				<div class="details">
-					<div class="step-title">${Editor.stepTypes[step_type].title(step)}</div>
-					<div class="step-type">${Editor.stepTypes[step_type].name}</div>
+					<div class="step-title">${StepType.title(step)}</div>
+					<div class="step-type">${StepType.name}</div>
 				</div>
 				<div class="step-status ${status}"></div>
 				<div class="step-menu">
@@ -557,10 +567,17 @@
             ...StepTypes.default,
             ...StepTypes[prop]
           })
+          Object.assign(StepTypes[prop], {
+            ...this.stepTypes[prop],
+          })
         } else {
           Object.assign(this.stepTypes[prop], StepTypes.default)
         }
       }
+    },
+
+    getStepType (type) {
+
     },
 
     /**
@@ -641,19 +658,28 @@
 
       const self = this
 
+      this.stepErrors = []
+
       this.funnel.steps.forEach(step => {
 
         const errors = []
 
         const { step_group, step_order, step_type } = step.data
 
+        const typeHandler = getStepType( step_type )
+
         if (step_group === 'action' && step_order === 1) {
           errors.push(
             'Actions cannot be at the start of a funnel.'
           )
+        } else if ( typeHandler.type === 'error' ) {
+          errors.push(
+            'Settings not found.'
+          )
         }
 
-        const typeHandler = StepTypes.getType(step_type)
+        console.log(typeHandler)
+
         if (typeHandler) {
           typeHandler.validate(step, errors)
         }
@@ -678,7 +704,9 @@
         return this.updateCurrentStep(data)
       }
 
-      this.stepTypes[step.data.step_type].onMount(step, updateStepMeta, updateStep)
+      const StepType = getStepType(step.data.step_type)
+
+      StepType.onMount(step, updateStepMeta, updateStep)
 
       this.lastStepEditMounted = this.activeStep
     },
@@ -699,7 +727,9 @@
         return this.updateCurrentStep(data)
       }
 
-      this.stepTypes[step.data.step_type].onDemount(step, updateStepMeta, updateStep)
+      const StepType = getStepType(step.data.step_type)
+
+      StepType.onDemount(step, updateStepMeta, updateStep)
 
       this.lastStepEditMounted = null
     },
@@ -1536,10 +1566,37 @@
       return Object.assign({}, this.default, this[type])
     },
 
+    error: {
+      svg: `
+		  <svg viewBox="0 0 20 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path d="M10.733.534a1 1 0 00-1.656 0L.462 13.25a1 1 0 00.828 1.56h17.23a1 1 0 00.827-1.56L10.733.534z"
+			        fill="#E91F4F"/>
+			  <path
+				  d="M10.48 9.322a.092.092 0 00-.011.036c0 .008-.004.016-.012.024-.016.016-.076.024-.18.024h-.888c-.032 0-.048-.008-.048-.024-.024-.024-.036-.092-.036-.204l-.168-5.496c-.008-.168 0-.268.024-.3.024-.032.092-.048.204-.048h1.068c.112 0 .176.016.192.048.024.032.032.132.024.3l-.168 5.496v.144zm-.587 2.496a.794.794 0 01-.6-.252.8.8 0 01-.24-.589.84.84 0 01.24-.6.794.794 0 01.6-.252c.24 0 .44.085.6.252a.82.82 0 01.252.6.78.78 0 01-.252.588.794.794 0 01-.6.253z"
+				  fill="#fff"/>
+		  </svg>`,
+      name: 'Error',
+      type: 'error',
+      title ({data}) {
+        return `<b>${data.step_type}</b> settings not found`
+      },
+      edit ({ ID, data, meta }) {
+        //language=HTML
+        return `
+			<div class="panel">
+				<p>The settings for this step could not be found. This may be because you deactivated an extension or
+					integration which registered this step type.</p>
+				<p>Reactivate the plugin or delete this step to continue.</p>
+			</div>`
+      },
+      onMount () {}
+    },
+
     /**
      * Step type default fallbacks
      */
     default: {
+      // language=html
       promiseController: null,
       title ({ ID, data, meta }) {
         return data.step_title
@@ -1751,7 +1808,7 @@
           },
           (content) => {
 
-            console.log( content )
+            console.log(content)
 
             // Reset timer.
             clearTimeout(saveTimer)
@@ -2481,7 +2538,16 @@
 			        stroke-width="2"/>
 			  <path d="M3.352 9.018l14.166 8.5 14.167-8.5M33.102 20.35l-8.5 8.5-4.25-4.25" stroke="currentColor"
 			        stroke-width="2"/>
-		  </svg>`
+		  </svg>`,
+      edit ({}) {
+        //language=html
+        return `
+			<div class="panel">
+				<p>This benchmark is completed whenever a <a target="_blank"
+				                                             href="https://help.groundhogg.io/article/381-how-to-confirm-an-email-address">contact
+					confirms their email address.</a> It does not have any settings.</p>
+			</div>`
+      }
     },
 
     form_fill: {

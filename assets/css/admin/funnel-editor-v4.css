@@ -231,6 +231,9 @@ li.step-error {
 .step-flow .steps .step.has-errors {
   border: 1px solid #E91F4F;
 }
+.step-flow .steps .step.has-errors .step-type {
+  color: #E91F4F;
+}
 
 .step-flow .text-helper {
   text-align: center;

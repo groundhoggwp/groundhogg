@@ -255,6 +255,10 @@ li.step-error {
 
 .step-flow .steps .step.has-errors {
   border: 1px solid $error-red;
+
+  .step-type{
+    color: $error-red;
+  }
 }
 
 .step-flow .text-helper {
