@@ -152,13 +152,14 @@ class Scripts {
 			'jquery-ui-autocomplete',
 		], GROUNDHOGG_VERSION, true );
 
-		wp_register_script( 'groundhogg-admin-element', GROUNDHOGG_ASSETS_URL . 'js/admin/element' . $dot_min . '.js', [
-			'groundhogg-admin',
-		], GROUNDHOGG_VERSION );
-
 		wp_register_script( 'groundhogg-admin-data', GROUNDHOGG_ASSETS_URL . 'js/admin/data' . $dot_min . '.js', [
 			'jquery',
 			'groundhogg-admin',
+		], GROUNDHOGG_VERSION );
+
+		wp_register_script( 'groundhogg-admin-element', GROUNDHOGG_ASSETS_URL . 'js/admin/element' . $dot_min . '.js', [
+			'groundhogg-admin',
+			'groundhogg-admin-data'
 		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-admin-search-filters', GROUNDHOGG_ASSETS_URL . 'js/admin/search-filters' . $dot_min . '.js', [

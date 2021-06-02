@@ -22,12 +22,15 @@
     return $(selector).select2(args)
   }
 
-  function apiPicker (selector, endpoint, multiple, tags, getResults) {
+  function apiPicker (selector, endpoint, multiple, tags, getResults, params) {
 
     multiple = multiple || false
     tags = tags || false
     getResults = getResults || function (data) {
       return data.results
+    }
+    params = params || function (params) {
+      return params
     }
 
     return $(selector).select2({
@@ -38,6 +41,7 @@
         url: endpoint,
         delay: 250,
         dataType: 'json',
+        data: params,
         beforeSend: function (xhr) {
           xhr.setRequestHeader('X-WP-Nonce', nonces._wprest)
         },
@@ -103,15 +107,6 @@
     })
   }
 
-  function getTagsFromResponse (data) {
-    return data.items.map(item => {
-      return {
-        id: item.ID,
-        text: `${item.data.tag_name} (${item.data.contact_count})`
-      }
-    })
-  }
-
   /**
    * Api based tag picker
    *
@@ -119,7 +114,20 @@
    * @param multiple
    */
   function tagPicker (selector, multiple = true) {
-    return apiPicker(selector, gh.api.routes.v4.tags, multiple, true, getTagsFromResponse)
+    return apiPicker(selector, gh.api.routes.v4.tags, multiple, true,
+      (data) => {
+        return data.items.map(item => {
+          return {
+            id: item.ID,
+            text: `${item.data.tag_name}`
+          }
+        })
+      },
+      (query) => {
+        return {
+          search: query.term
+        }
+      })
   }
 
   /**
@@ -130,13 +138,18 @@
    */
   function emailPicker (selector, multiple = false) {
     return apiPicker(selector, gh.api.routes.v4.emails, multiple, true, (data) => {
-      return data.items.map(item => {
+        return data.items.map(item => {
+          return {
+            id: item.ID,
+            text: `${item.data.title} (${item.data.status})`
+          }
+        })
+      },
+      (query) => {
         return {
-          id: item.ID,
-          text: `${item.data.title} (${item.data.status})`
+          search: query.term
         }
       })
-    })
   }
 
   function buildPickers () {

@@ -26,6 +26,7 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
 use function Groundhogg\get_db;
+use function Groundhogg\last_db_query;
 
 abstract class Base_Object_Api extends Base_Api {
 
@@ -296,7 +297,7 @@ abstract class Base_Object_Api extends Base_Api {
 	 */
 	public function read( WP_REST_Request $request ) {
 
-		$query = $request->get_json_params();
+		$query = $request->get_params();
 
 		$query = wp_parse_args( $query, [
 			'select'  => '*',
@@ -307,6 +308,8 @@ abstract class Base_Object_Api extends Base_Api {
 
 		$total = $this->get_db_table()->count( $query );
 		$items = $this->get_db_table()->query( $query );
+
+//		wp_send_json_success( last_db_query() );
 
 		$items = array_map( [ $this, 'map_raw_object_to_class' ], $items );
 

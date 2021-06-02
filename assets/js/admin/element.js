@@ -218,7 +218,7 @@
     },
   }
 
-  const tinymceElement = (editor_id, config={}, onChange = (v) => {
+  const tinymceElement = (editor_id, config = {}, onChange = (v) => {
     console.log(v)
   }) => {
     wp.editor.initialize(
