@@ -51,23 +51,54 @@
      * @returns {{}|*}
      */
     get (id) {
+
+      let item
+
       if (this.item.ID === id) {
-        return this.item
+        item = this.item
+      } else {
+        item = this.items.find(item => item.ID === id)
       }
 
-      return this.items.find(item => item.ID === id)
+      return item
+    },
+
+    getItems () {
+      return this.items
+    },
+
+    hasItem (id) {
+      return this.item.ID === id || this.items.find(item => item.ID === id)
     },
 
     hasItems () {
       return this.items.length > 0
     },
 
-    async fetch (params) {
+    async fetchItems (params) {
 
       var self = this
 
       return apiGet(this.route, params).then(r => {
-        self.items = r.items
+        self.items = [
+          ...r.items, // new items
+          ...self.items.filter(item => !r.items.find(_item => _item.ID === item.ID))
+        ]
+        return r
+      })
+    },
+
+    async fetchItem (id) {
+
+      var self = this
+
+      return apiGet(`${this.route}/${id}`).then(r => {
+        self.item = r.item
+        self.items = [
+          ...self.items,
+          r.item,
+        ]
+        return r
       })
     },
 
@@ -76,6 +107,7 @@
 
       return apiPost(this.route, data).then(r => {
         self.items.push(r.item)
+        return r
       })
     },
 
@@ -124,19 +156,18 @@
         var self = this
 
         return await apiPost(`${this.route}/validate`, maybeTags)
-          .then(data => {
+          .then(r => {
 
-            if (!data.items) {
+            if (!r.items) {
               return []
             }
 
-            data.items.forEach(tag => {
-              if (self.items.findIndex(t => t.ID === tag.ID) === -1) {
-                self.items.push(tag)
-              }
-            })
+            self.items = [
+              ...r.items, // new items
+              ...self.items.filter(item => !r.items.find(_item => _item.ID === item.ID))
+            ]
 
-            return data.items
+            return r.items
           })
       },
 

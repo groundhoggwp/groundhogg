@@ -859,6 +859,12 @@ abstract class DB {
 					$where[] = $search;
 
 					break;
+				case 'include':
+					$where[] = [ 'col' => $this->get_primary_key(), 'val' => $val, 'compare' => 'IN' ];
+					break;
+				case 'exclude':
+					$where[] = [ 'col' => $this->get_primary_key(), 'val' => $val, 'compare' => 'NOT IN' ];
+					break;
 				case 'before':
 					$where[] = [ 'col' => $this->get_date_key(), 'val' => $val, 'compare' => '<=' ];
 					break;
@@ -920,7 +926,6 @@ abstract class DB {
 		ksort( $query_vars );
 
 		$cache_key = "query:" . md5( serialize( $query_vars ) );
-
 
 		$cache_value = $this->cache_get( $cache_key, $found );
 
@@ -1108,7 +1113,10 @@ abstract class DB {
 					$value = $condition['val'];
 
 					if ( is_array( $value ) ) {
-						$condition['compare'] = 'IN';
+						$condition['compare'] = in_array( $condition['compare'], [
+							'IN',
+							'NOT IN'
+						] ) ? $condition['compare'] : 'IN';
 						$value                = map_deep( $value, 'sanitize_text_field' );
 
 						$value = map_deep( $value, function ( $i ) {
@@ -1126,7 +1134,7 @@ abstract class DB {
 
 						$value = sprintf( "(%s)", implode( ',', $value ) );
 
-						$clause[] = "{$condition[ 'col' ]} IN {$value}";
+						$clause[] = "{$condition[ 'col' ]} {$condition['compare']} {$value}";
 
 					} else {
 
@@ -1175,6 +1183,7 @@ abstract class DB {
 			'LIKE',
 			'RLIKE',
 			'IN',
+			'NOT IN',
 		];
 	}
 

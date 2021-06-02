@@ -1,6 +1,7 @@
 (function (Funnel, $) {
 
-  const Tags = Groundhogg.stores.tags
+  const TagsStore = Groundhogg.stores.tags
+  const EmailsStore = Groundhogg.stores.emails
   const apiGet = Groundhogg.api.get
   const apiPost = Groundhogg.api.post
   const apiRoutes = Groundhogg.api.routes.v4
@@ -9,7 +10,7 @@
     select
   } = Groundhogg.element
 
-  const { linkPicker, emailPicker } = Groundhogg.pickers
+  const { linkPicker, emailPicker, tagPicker } = Groundhogg.pickers
 
   $.fn.serializeFormJSON = function () {
 
@@ -392,7 +393,7 @@
 
         switch (true) {
           case ($(e.target).is('.step-menu-duplicate')) :
-            window.console.log('duplicate')
+            // window.console.log('duplicate')
             const stepToCopy = self.funnel.steps
               .find(step => step.ID === parseInt($step.data('id')))
 
@@ -401,16 +402,16 @@
             self.addStep(newStep)
             break
           case ($(e.target).is('.step-menu-delete')) :
-            window.console.log('delete')
+            // window.console.log('delete')
             self.deleteStep(parseInt($step.data('id')))
             break
           case ($(e.target).is('.step-menu') || $(e.target).parent('.step-menu').length > 0) :
-            window.console.log('toggle menu')
+            // window.console.log('toggle menu')
             $('.step-menu ul', $step).toggle()
             break
           case ($(e.target).is('.step-menu-edit')) :
           default:
-            window.console.log('edit')
+            // window.console.log('edit')
             const clickedStep = parseInt($step.data('id'))
 
             if (clickedStep === self.activeStep) {
@@ -484,13 +485,35 @@
         self.renderTitle()
       })
 
-      Tags.preloadTags()
-
       self.setupSortable()
       self.setupStepTypes()
       self.initStepFlowContextMenu()
 
-      self.render()
+      // If there are tag enabled step
+      if (self.funnel.steps.find(step => step.meta.tags && step.meta.tags.length > 0)) {
+
+        const preloadTags = self.funnel.steps.reduce((tagsArr, { meta }) => {
+          const { tags } = meta
+          if (tags) {
+            tagsArr.push(...tags)
+          }
+          return tagsArr
+        }, [])
+
+        // Load tags in use by tag supported steps
+        TagsStore.fetchItems({
+          include: preloadTags,
+          limit: preloadTags.length
+        }).then(() => {
+
+          // Once the tags are loaded we can render...
+          self.render()
+        })
+      }
+      // Otherwise we can render right away.
+      else {
+        self.render()
+      }
     },
 
     loadFunnel (funnel) {
@@ -683,7 +706,7 @@
           )
         }
 
-        console.log(typeHandler)
+        // console.log(typeHandler)
 
         if (typeHandler) {
           typeHandler.validate(step, errors)
@@ -967,14 +990,14 @@
 
             for (const code in errors) {
               if (errors.hasOwnProperty(code)) {
-                console.log(errors[code][0], error_data[code])
+                // console.log(errors[code][0], error_data[code])
 
                 self.addStepError(error_data[code].step.ID, errors[code][0])
               }
             }
           })
 
-          console.log(self.stepErrors)
+          // console.log(self.stepErrors)
 
           self.render()
         }
@@ -1113,7 +1136,7 @@
      */
     updateCurrentStepMeta (newMeta) {
 
-      console.log(this)
+      // console.log(this)
 
       const { data, meta } = this.getCurrentStep()
 
@@ -1369,22 +1392,6 @@
     return optionsString.join('')
   }
 
-  const tagWithConditionOnMount = (step) => {
-    tagOnMount(step)
-
-    $('#condition').change(function (e) {
-
-      const { meta } = Editor.getCurrentStep()
-
-      Editor.updateCurrentStep({
-        meta: {
-          ...meta,
-          condition: $(this).val()
-        }
-      })
-    })
-  }
-
   function ordinal_suffix_of (i) {
     var j = i % 10,
       k = i % 100
@@ -1400,46 +1407,45 @@
     return i + 'th'
   }
 
-  const tagOnMount = (step) => {
+  /**
+   * Handler for the tag picker step when a condition is also present.
+   *
+   * @param step
+   * @param updateStepMeta
+   */
+  const tagWithConditionOnMount = (step, updateStepMeta) => {
+    tagOnMount(step, updateStepMeta)
 
-    const $tags = $('#tags')
-    $tags.select2({
-      tags: true,
-      multiple: true,
-    })
-
-    $tags.on('change', function (e) {
-
-      const { meta } = Editor.getCurrentStep()
-
-      const tags = []
-      const newTags = []
-
-      $(this).val().forEach(tag => {
-
-        if (Tags.get(parseInt(tag))) {
-          tags.push(parseInt(tag))
-        } else {
-          newTags.push(tag)
-        }
-
+    $('#condition').change(function (e) {
+      updateStepMeta({
+        condition: $(this).val()
       })
+    })
+  }
+
+  /**
+   * Handler for the tag picker step
+   *
+   * @param step
+   * @param updateStepMeta
+   * @returns {*|define.amd.jQuery}
+   */
+  const tagOnMount = (step, updateStepMeta) => {
+
+    return tagPicker('#tags').on('change', function (e) {
+
+      const tags = $(this).val()
+      const newTags = tags.filter(tag => !TagsStore.hasItem(parseInt(tag)))
 
       if (newTags.length > 0) {
-        Tags.validate($(this).val()).then(tags => {
-          Editor.updateCurrentStep({
-            meta: {
-              ...meta,
-              tags: tags.map(tag => tag.ID)
-            }
+        TagsStore.validate(tags).then(tags => {
+          updateStepMeta({
+            tags: tags.map(tag => tag.ID)
           })
         })
       } else {
-        Editor.updateCurrentStep({
-          meta: {
-            ...meta,
-            tags
-          }
+        updateStepMeta({
+          tags: tags.map(tag => parseInt(tag))
         })
       }
     })
@@ -1813,7 +1819,7 @@
           },
           (content) => {
 
-            console.log(content)
+            // console.log(content)
 
             // Reset timer.
             clearTimeout(saveTimer)
@@ -2019,8 +2025,8 @@
 
         if ('undefined' === typeof tags || tags.length === 0) {
           return 'Apply tags'
-        } else if (tags.length < 4 && Tags.hasItems()) {
-          return `Apply ${andList(tags.map(id => `<b>${Tags.get(id).data.tag_name}</b>`))}`
+        } else if (tags.length < 4 && TagsStore.hasItems()) {
+          return `Apply ${andList(tags.map(id => `<b>${TagsStore.get(id).data.tag_name}</b>`))}`
         } else {
           return `Apply <b>${tags.length}</b> tags`
         }
@@ -2028,7 +2034,7 @@
 
       edit ({ ID, data, meta }) {
 
-        let options = Tags.items
+        let options = TagsStore.items
           .map(tag => Elements.option(tag.ID, tag.data.tag_name, meta.tags && meta.tags.indexOf(tag.ID) !== -1))
 
         //language=HTML
@@ -2042,8 +2048,8 @@
 			</div>`
       },
 
-      onMount (step) {
-        tagOnMount(step)
+      onMount (step, updateStepMeta) {
+        tagOnMount(step, updateStepMeta)
       }
     },
 
@@ -2069,8 +2075,8 @@
 
         if (tags.length === 0) {
           return 'Remove tags'
-        } else if (tags.length < 4 && Tags.hasItems()) {
-          return `Remove ${andList(tags.map(id => `<b>${Tags.get(id).data.tag_name}</b>`))}`
+        } else if (tags.length < 4 && TagsStore.hasItems()) {
+          return `Remove ${andList(tags.map(id => `<b>${TagsStore.get(id).data.tag_name}</b>`))}`
         } else {
           return `Remove <b>${tags.length}</b> tags`
         }
@@ -2078,7 +2084,7 @@
 
       edit ({ ID, data, meta }) {
 
-        let options = Tags.items
+        let options = TagsStore.items
           .map(tag => Elements.option(tag.ID, tag.data.tag_name, meta.tags && meta.tags.indexOf(tag.ID) !== -1))
 
         //language=HTML
@@ -2092,8 +2098,8 @@
 			</div>`
       },
 
-      onMount (step) {
-        tagOnMount(step)
+      onMount (step, updateStepMeta) {
+        tagOnMount(step, updateStepMeta)
       }
     },
 
@@ -2118,16 +2124,17 @@
 
       title ({ ID, data, meta }) {
 
-        if (!meta.tags) {
-          return 'Tag is applied'
-        }
-
         const { tags, condition } = meta
 
-        if (tags.length > 1) {
+        if (!tags) {
+          return 'Tag is applied'
+        } else if (tags.length >= 4) {
           return condition === 'all' ? `<b>${tags.length}</b> tags are applied` : `Any of <b>${tags.length}</b> tags are applied`
+        } else if (tags.length > 1 && tags.length < 4 && TagsStore.hasItems()) {
+          const tagNames = tags.map(tag => `<b>${TagsStore.get(tag).data.tag_name}</b>`)
+          return condition === 'all' ? `${andList(tagNames)} are applied` : `${orList(tagNames)} is applied`
         } else if (tags.length === 1) {
-          return `<b>${tags.length}</b> tag is applied`
+          return `<b>${TagsStore.get(tags[0]).data.tag_name}</b> is applied`
         } else {
           return 'Tag is applied'
         }
@@ -2135,7 +2142,7 @@
 
       edit ({ ID, data, meta }) {
 
-        let options = Tags.items
+        let options = TagsStore.items
           .map(tag => Elements.option(tag.ID, tag.data.tag_name, meta.tags && meta.tags.indexOf(tag.ID) !== -1))
 
         const { condition } = meta
@@ -2154,8 +2161,8 @@
 			</div>`
       },
 
-      onMount (step) {
-        tagWithConditionOnMount(step)
+      onMount (step, updateStepMeta) {
+        tagWithConditionOnMount(step, updateStepMeta)
       }
     },
 
@@ -2182,16 +2189,17 @@
 
       title ({ ID, data, meta }) {
 
-        if (!meta.tags) {
-          return 'Tag is removed'
-        }
-
         const { tags, condition } = meta
 
-        if (tags.length > 1) {
+        if (!tags) {
+          return 'Tag is removed'
+        } else if (tags.length >= 4) {
           return condition === 'all' ? `<b>${tags.length}</b> tags are removed` : `Any of <b>${tags.length}</b> tags are removed`
+        } else if (tags.length > 1 && tags.length < 4 && TagsStore.hasItems()) {
+          const tagNames = tags.map(tag => `<b>${TagsStore.get(tag).data.tag_name}</b>`)
+          return condition === 'all' ? `${andList(tagNames)} are applied` : `${orList(tagNames)} is removed`
         } else if (tags.length === 1) {
-          return `<b>${tags.length}</b> tag is removed`
+          return `<b>${TagsStore.get(tags[0]).data.tag_name}</b> is removed`
         } else {
           return 'Tag is removed'
         }
@@ -2199,7 +2207,7 @@
 
       edit ({ ID, data, meta }) {
 
-        let options = Tags.items
+        let options = TagsStore.items
           .map(tag => Elements.option(tag.ID, tag.data.tag_name, meta.tags && meta.tags.indexOf(tag.ID) !== -1))
 
         const { condition } = meta
@@ -2218,8 +2226,8 @@
 			</div>`
       },
 
-      onMount (step) {
-        tagWithConditionOnMount(step)
+      onMount (step, updateStepMeta) {
+        tagWithConditionOnMount(step, updateStepMeta)
       }
     },
 
@@ -2478,10 +2486,11 @@
 			</div>`
       },
       onMount (step, updateStepMeta) {
-        emailPicker('#email-picker').on('change', function (e){
+        emailPicker('#email-picker').on('change', function (e) {
           updateStepMeta({
-            email_id: parseInt( $(this).val() )
+            email_id: parseInt($(this).val())
           })
+
           Editor.renderStepEdit()
         })
       }
