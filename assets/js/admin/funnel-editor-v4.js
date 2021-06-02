@@ -2124,16 +2124,17 @@
 
       title ({ ID, data, meta }) {
 
-        if (!meta.tags) {
-          return 'Tag is applied'
-        }
-
         const { tags, condition } = meta
 
-        if (tags.length > 1) {
+        if (!tags) {
+          return 'Tag is applied'
+        } else if (tags.length >= 4) {
           return condition === 'all' ? `<b>${tags.length}</b> tags are applied` : `Any of <b>${tags.length}</b> tags are applied`
+        } else if (tags.length > 1 && tags.length < 4 && TagsStore.hasItems()) {
+          const tagNames = tags.map(tag => `<b>${TagsStore.get(tag).data.tag_name}</b>`)
+          return condition === 'all' ? `${andList(tagNames)} are applied` : `${orList(tagNames)} is applied`
         } else if (tags.length === 1) {
-          return `<b>${tags.length}</b> tag is applied`
+          return `<b>${TagsStore.get(tags[0]).data.tag_name}</b> is applied`
         } else {
           return 'Tag is applied'
         }
@@ -2188,16 +2189,17 @@
 
       title ({ ID, data, meta }) {
 
-        if (!meta.tags) {
-          return 'Tag is removed'
-        }
-
         const { tags, condition } = meta
 
-        if (tags.length > 1) {
+        if (!tags) {
+          return 'Tag is removed'
+        } else if (tags.length >= 4) {
           return condition === 'all' ? `<b>${tags.length}</b> tags are removed` : `Any of <b>${tags.length}</b> tags are removed`
+        } else if (tags.length > 1 && tags.length < 4 && TagsStore.hasItems()) {
+          const tagNames = tags.map(tag => `<b>${TagsStore.get(tag).data.tag_name}</b>`)
+          return condition === 'all' ? `${andList(tagNames)} are applied` : `${orList(tagNames)} is removed`
         } else if (tags.length === 1) {
-          return `<b>${tags.length}</b> tag is removed`
+          return `<b>${TagsStore.get(tags[0]).data.tag_name}</b> is removed`
         } else {
           return 'Tag is removed'
         }
