@@ -162,7 +162,7 @@ class Funnels_Page extends Admin_Page {
 
 		if ( $this->get_current_action() === 'edit' ) {
 
-			$funnel = new Funnel(get_url_var( 'funnel' ));
+			$funnel = new Funnel( get_url_var( 'funnel' ) );
 
 			wp_enqueue_editor();
 			wp_enqueue_style( 'groundhogg-admin' );
@@ -172,6 +172,7 @@ class Funnels_Page extends Admin_Page {
 				'funnel'    => $funnel,
 				'stepTypes' => Plugin::instance()->step_manager->get_elements()
 			] );
+			wp_enqueue_script( 'groundhogg-admin-email-editor-step' );
 
 			do_action( 'groundhogg_funnel_scripts', $funnel );
 		}

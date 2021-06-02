@@ -218,10 +218,16 @@
     },
   }
 
-  const tinymceElement = (editor_id, config, onChange) => {
+  const tinymceElement = (editor_id, config={}, onChange = (v) => {
+    console.log(v)
+  }) => {
     wp.editor.initialize(
       editor_id,
-      config
+      {
+        tinymce: true,
+        quicktags: true,
+        ...config
+      }
     )
 
     tinymce.get(editor_id).on('keyup', function (e) {

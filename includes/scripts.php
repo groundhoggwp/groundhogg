@@ -216,10 +216,15 @@ class Scripts {
 			'jquery',
 			'papaparse'
 		], GROUNDHOGG_VERSION, true );
+
 		wp_register_script( 'groundhogg-admin-email-editor-plain', GROUNDHOGG_ASSETS_URL . 'js/admin/email-editor-plain' . $dot_min . '.js', [
 			'jquery',
 			'groundhogg-admin-functions',
 			'groundhogg-admin-iframe'
+		], GROUNDHOGG_VERSION, true );
+
+		wp_register_script( 'groundhogg-admin-email-editor-step', GROUNDHOGG_ASSETS_URL . 'js/admin/email-editor-step' . $dot_min . '.js', [
+			'groundhogg-admin-funnel-editor',
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-funnel-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-editor-v4' . $dot_min . '.js', [

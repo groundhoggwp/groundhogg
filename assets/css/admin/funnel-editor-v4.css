@@ -5,6 +5,51 @@
 button {
   cursor: pointer;
 }
+button.gh-button {
+  border: none;
+  color: #FFFFFF;
+  border-radius: 5px;
+  padding: 6px 10px;
+  font-size: 16px;
+  font-weight: 400;
+}
+button.gh-button.primary {
+  background: #0075FF;
+}
+button.gh-button.primary:hover {
+  background: #005ecc;
+}
+button.gh-button.secondary {
+  border: 1px solid #0075FF;
+  background: #FFFFFF;
+  color: #0075FF;
+  padding: 5px 10px;
+}
+button.gh-button.secondary:hover {
+  color: #005ecc;
+  border-color: #005ecc;
+}
+button.gh-button.danger {
+  background: #E91F4F;
+}
+button.gh-button.danger:hover {
+  background: #c2133d;
+}
+button.gh-button.icon {
+  background: #FFFFFF;
+  border: 1.2px solid rgba(16, 38, 64, 0.15);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  color: #0075FF;
+}
+button.gh-button.icon svg {
+  width: 20px;
+  height: 20px;
+}
+button.gh-button.icon:hover {
+  border-color: rgba(16, 38, 64, 0.25);
+}
 
 #wpcontent {
   background-color: #F6F9FB;
@@ -676,6 +721,107 @@ li.step-error {
 .publish-actions button.deactivate svg {
   width: 15px;
   height: 15px;
+}
+
+#email-options.panel label.row-label {
+  margin-bottom: 2px;
+}
+#email-options.panel .row:not(:last-child) {
+  margin-bottom: 10px;
+}
+#email-options.panel .email-actions {
+  display: flex;
+  gap: 5px;
+}
+#email-options.panel .email-actions .send-test-email {
+  flex-grow: 1;
+}
+#email-options.panel input, #email-options.panel select {
+  width: 100%;
+}
+#email-options.panel #alignment-and-message-type,
+#email-options.panel #alignment {
+  display: flex;
+  gap: 5px;
+  justify-content: space-between;
+}
+
+#email-editor .inline-label {
+  display: flex;
+  gap: 10px;
+  border-bottom: 1px solid rgba(16, 38, 64, 0.15);
+  align-items: center;
+  padding-bottom: 5px;
+}
+#email-editor .inline-label label {
+  font-weight: 500;
+  font-size: 18px;
+}
+#email-editor .inline-label input {
+  box-shadow: none;
+  width: 100%;
+  border: none;
+  font-size: 18px;
+  outline: 0;
+  padding: 0;
+}
+
+#advanced-email-options .button-end {
+  display: flex;
+  justify-content: flex-end;
+}
+#advanced-email-options .button-end > button {
+  box-shadow: 0 0 0 transparent;
+  border-radius: 0;
+  border: solid #8c8f94;
+  border-width: 0 1px 1px 1px;
+  background-color: #fff;
+  color: #2c3338;
+  cursor: pointer;
+  padding: 6.5px;
+}
+#advanced-email-options .button-end > button .dashicons {
+  font-size: 17px;
+  height: 17px;
+  width: 17px;
+}
+#advanced-email-options .key-value-row {
+  display: flex;
+}
+#advanced-email-options .key-value-row:not(:first-of-type) input, #advanced-email-options .key-value-row:not(:first-of-type) button {
+  border-top: none !important;
+}
+#advanced-email-options .key-value-row > input:first-child {
+  border-right: none;
+}
+#advanced-email-options .key-value-row input {
+  flex-grow: 1;
+  background: #f9f9f9;
+}
+#advanced-email-options .key-value-row input:focus {
+  background: #FFFFFF;
+}
+#advanced-email-options .key-value-row .input-wrap {
+  flex-grow: 2;
+}
+#advanced-email-options .key-value-row input[type=text], #advanced-email-options .key-value-row button {
+  border-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  margin: 0;
+}
+#advanced-email-options .key-value-row > button {
+  box-shadow: 0 0 0 transparent;
+  border-radius: 0;
+  border: solid #8c8f94;
+  border-width: 1px 1px 1px 0;
+  background-color: #fff;
+  color: #2c3338;
+  cursor: pointer;
+  padding: 5px;
+}
+#advanced-email-options .key-value-row > button:hover {
+  opacity: 1;
 }
 
 /*# sourceMappingURL=funnel-editor-v4.css.map */

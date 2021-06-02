@@ -5,10 +5,11 @@
   const apiPost = Groundhogg.api.post
   const apiRoutes = Groundhogg.api.routes.v4
   const {
-    tinymceElement
+    tinymceElement,
+    select
   } = Groundhogg.element
 
-  const { linkPicker } = Groundhogg.pickers
+  const { linkPicker, emailPicker } = Groundhogg.pickers
 
   $.fn.serializeFormJSON = function () {
 
@@ -235,10 +236,9 @@
           updateStep
         ]
 
-        //language=HTML
         return `
 			${hasErrors ?
-				`<div class="step-errors">
+          `<div class="step-errors">
                 <ul>
                     ${errors.map(error => `<li class="step-error"><span class="dashicons dashicons-warning"></span> ${error}</li>`).join('')}
                 </ul>
@@ -246,19 +246,24 @@
 			<div class="step-edit">
 				<div class="settings">
 					${slot('beforeStepSettings', ...slotArgs)}
+					${slot(`beforeStepSettings.${step_type}`, ...slotArgs)}
 					${StepType.edit(...slotArgs)}
+					${slot(`afterStepSettings.${step_type}`, ...slotArgs)}
 					${slot('afterStepSettings', ...slotArgs)}
 				</div>
 				<div class="actions-and-notes">
 					${slot('beforeStepNotes', ...slotArgs)}
+					${slot(`beforeStepNotes.${step_type}`, ...slotArgs)}
 					<div class="panel">
 						<label class="row-label"><span class="dashicons dashicons-admin-comments"></span> Notes</label>
 						<textarea rows="4" id="step-notes" class="notes full-width"
 						          name="step_notes">${specialChars(meta.step_notes || '')}</textarea>
 					</div>
+					${slot(`afterStepNotes.${step_type}`, ...slotArgs)}
 					${slot('afterStepNotes', ...slotArgs)}
 				</div>
 			</div>`
+        //language=HTML
       },
       stepAddPanel (activeType) {
         //language=HTML
@@ -666,13 +671,13 @@
 
         const { step_group, step_order, step_type } = step.data
 
-        const typeHandler = getStepType( step_type )
+        const typeHandler = getStepType(step_type)
 
         if (step_group === 'action' && step_order === 1) {
           errors.push(
             'Actions cannot be at the start of a funnel.'
           )
-        } else if ( typeHandler.type === 'error' ) {
+        } else if (typeHandler.type === 'error') {
           errors.push(
             'Settings not found.'
           )
@@ -1577,7 +1582,7 @@
 		  </svg>`,
       name: 'Error',
       type: 'error',
-      title ({data}) {
+      title ({ data }) {
         return `<b>${data.step_type}</b> settings not found`
       },
       edit ({ ID, data, meta }) {
@@ -2441,6 +2446,9 @@
      * Send email
      */
     send_email: {
+      defaults: {
+        email_id: null
+      },
       //language=HTML
       svg: `
 		  <svg viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -2455,11 +2463,27 @@
       },
       edit ({ ID, data, meta }) {
 
+        const { email_id } = meta
+
         //language=HTML
         return `
 			<div class="panel">
-
+				<div class="row">
+					<label class="row-label">Select an email to send...</label>
+					${select({
+						id: 'email-picker',
+						name: 'email_id'
+					})}
+				</div>
 			</div>`
+      },
+      onMount (step, updateStepMeta) {
+        emailPicker('#email-picker').on('change', function (e){
+          updateStepMeta({
+            email_id: parseInt( $(this).val() )
+          })
+          Editor.renderStepEdit()
+        })
       }
     },
 

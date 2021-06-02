@@ -19,7 +19,7 @@
   }
 
   function picker (selector, args) {
-    $(selector).select2(args)
+    return $(selector).select2(args)
   }
 
   function apiPicker (selector, endpoint, multiple, tags, getResults) {
@@ -30,7 +30,7 @@
       return data.results
     }
 
-    $(selector).select2({
+    return $(selector).select2({
       tags: tags,
       multiple: multiple,
       tokenSeparators: ['/', ',', ';'],
@@ -51,7 +51,7 @@
   }
 
   function linkPicker (selector) {
-    $(selector).autocomplete({
+    return $(selector).autocomplete({
       source: function (request, response) {
         $.ajax({
           url: ajaxurl,
@@ -82,7 +82,7 @@
   }
 
   function metaPicker (selector) {
-    $(selector).autocomplete({
+    return $(selector).autocomplete({
       source: function (request, response) {
         $.ajax({
           url: ajaxurl,
@@ -118,16 +118,33 @@
    * @param selector
    * @param multiple
    */
-  function tagPicker( selector, multiple=true ) {
-    apiPicker( selector, gh.api.routes.v4.tags, multiple, true, getTagsFromResponse )
+  function tagPicker (selector, multiple = true) {
+    return apiPicker(selector, gh.api.routes.v4.tags, multiple, true, getTagsFromResponse)
+  }
+
+  /**
+   * Api based email picker
+   *
+   * @param selector
+   * @param multiple
+   */
+  function emailPicker (selector, multiple = false) {
+    return apiPicker(selector, gh.api.routes.v4.emails, multiple, true, (data) => {
+      return data.items.map(item => {
+        return {
+          id: item.ID,
+          text: `${item.data.title} (${item.data.status})`
+        }
+      })
+    })
   }
 
   function buildPickers () {
     picker('.gh-select2', {})
-    tagPicker('.gh-tag-picker', true )
-    tagPicker('.gh-single-tag-picker', false )
-    apiPicker('.gh-email-picker', endpoints.emails, false, false)
-    apiPicker('.gh-email-picker-multiple', endpoints.emails, true, false)
+    tagPicker('.gh-tag-picker', true)
+    tagPicker('.gh-single-tag-picker', false)
+    emailPicker('.gh-email-picker', false)
+    emailPicker('.gh-email-picker-multiple', true)
     apiPicker('.gh-sms-picker', endpoints.sms, false, false)
     apiPicker('.gh-contact-picker', endpoints.contacts, false, false)
     apiPicker('.gh-contact-picker-multiple', endpoints.contacts, true, false)
@@ -160,6 +177,7 @@
   gh.pickers = {
     picker,
     tagPicker,
+    emailPicker,
     apiPicker,
     linkPicker,
     metaPicker

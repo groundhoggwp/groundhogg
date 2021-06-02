@@ -11,8 +11,63 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   vertical-align: initial;
 }
 
-button{
+button {
   cursor: pointer;
+
+  &.gh-button {
+    border: none;
+    color: #FFFFFF;
+    border-radius: 5px;
+    padding: 6px 10px;
+    font-size: 16px;
+    font-weight: 400;
+
+    &.primary {
+      background: $primary-blue;
+
+      &:hover {
+        background: darken($primary-blue, 10);
+      }
+    }
+
+    &.secondary {
+      border: 1px solid $primary-blue;
+      background: #FFFFFF;
+      color: $primary-blue;
+      padding: 5px 10px;
+
+      &:hover {
+        color: darken($primary-blue, 10);
+        border-color: darken($primary-blue, 10);
+      }
+    }
+
+    &.danger {
+      background: $error-red;
+
+      &:hover {
+        background: darken($error-red, 10);
+      }
+    }
+
+    &.icon {
+      background: #FFFFFF;
+      border: 1.2px solid rgba(16, 38, 64, 0.15);
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      color: $primary-blue;
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      &:hover {
+        border-color: rgba(16, 38, 64, 0.25);
+      }
+    }
+  }
 }
 
 #wpcontent {
@@ -72,7 +127,7 @@ button{
 
 .title-wrap {
   .above-title {
-    color:$primary-dark;
+    color: $primary-dark;
     opacity: 0.6;
     font-style: normal;
     font-weight: normal;
@@ -102,7 +157,7 @@ button{
     margin-left: 10px;
     bottom: 0;
     opacity: 0.3;
-    color:$primary-dark;
+    color: $primary-dark;
   }
 
   .title:hover .pencil {
@@ -256,7 +311,7 @@ li.step-error {
 .step-flow .steps .step.has-errors {
   border: 1px solid $error-red;
 
-  .step-type{
+  .step-type {
     color: $error-red;
   }
 }
@@ -728,24 +783,24 @@ li.step-error {
     align-items: center;
     //transition: 0.4s;
 
-    &.update-and-launch{
+    &.update-and-launch {
       background: $action-green;
 
-      svg{
+      svg {
         width: 25px;
         height: 25px;
       }
 
-      &:hover{
-        background: darken( $action-green, 10 );
+      &:hover {
+        background: darken($action-green, 10);
       }
     }
 
-    &.update{
+    &.update {
       background: $primary-blue;
 
-      &:hover{
-        background: darken( $primary-blue, 10 );
+      &:hover {
+        background: darken($primary-blue, 10);
       }
 
       svg {
@@ -755,17 +810,148 @@ li.step-error {
       }
     }
 
-    &.deactivate{
+    &.deactivate {
       background: $error-red;
 
-      &:hover{
-        background: darken( $error-red, 10 );
+      &:hover {
+        background: darken($error-red, 10);
       }
 
-      svg{
+      svg {
         width: 15px;
         height: 15px;
       }
+    }
+  }
+}
+
+
+#email-options.panel {
+
+  label.row-label{
+    margin-bottom: 2px;
+  }
+
+  .row:not(:last-child) {
+    margin-bottom: 10px;
+  }
+
+  .email-actions {
+    display: flex;
+    gap: 5px;
+
+    .send-test-email {
+      flex-grow: 1
+    }
+  }
+
+  input, select{
+    width: 100%;
+  }
+
+  #alignment-and-message-type,
+  #alignment{
+    display: flex;
+    gap: 5px;
+    justify-content: space-between;
+  }
+
+}
+
+
+#email-editor{
+  .inline-label{
+    display: flex;
+    gap: 10px;
+    border-bottom: 1px solid rgba(16, 38, 64, 0.15);
+    align-items: center;
+    padding-bottom: 5px;
+
+    label{
+      font-weight: 500;
+      font-size: 18px;
+    }
+
+    input{
+      box-shadow: none;
+      width: 100%;
+      border: none;
+      font-size: 18px;
+      outline: 0;
+      padding: 0;
+    }
+  }
+}
+
+#advanced-email-options {
+  .button-end{
+    display: flex;
+    justify-content: flex-end;
+
+    > button {
+      box-shadow: 0 0 0 transparent;
+      border-radius: 0;
+      border: solid #8c8f94;
+      border-width: 0 1px 1px 1px;
+      background-color: #fff;
+      color: #2c3338;
+      cursor: pointer;
+      padding: 6.5px;
+
+      .dashicons{
+        font-size: 17px;
+        height: 17px;
+        width: 17px;
+      }
+    }
+  }
+
+  .key-value-row {
+    display: flex;
+
+    &:not(:first-of-type) {
+      input, button {
+        border-top: none !important;
+      }
+    }
+
+    > input:first-child {
+      border-right: none;
+    }
+
+    input {
+      flex-grow: 1;
+      background: #f9f9f9;
+    }
+
+    input:focus {
+      background: #FFFFFF;
+    }
+
+    .input-wrap {
+      flex-grow: 2;
+    }
+
+    input[type='text'], button {
+      border-radius: 0 !important;
+      border-top-right-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+      margin: 0;
+    }
+
+    > button {
+      box-shadow: 0 0 0 transparent;
+      border-radius: 0;
+      border: solid #8c8f94;
+      border-width: 1px 1px 1px 0;
+      background-color: #fff;
+      color: #2c3338;
+      cursor: pointer;
+      padding: 5px;
+    }
+
+    > button:hover {
+      opacity: 1;
     }
   }
 }
