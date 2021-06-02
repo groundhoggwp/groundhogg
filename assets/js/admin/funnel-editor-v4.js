@@ -2017,7 +2017,7 @@
 
         const { tags } = meta
 
-        if (tags.length === 0) {
+        if ('undefined' === typeof tags || tags.length === 0) {
           return 'Apply tags'
         } else if (tags.length < 4 && Tags.hasItems()) {
           return `Apply ${andList(tags.map(id => `<b>${Tags.get(id).data.tag_name}</b>`))}`
