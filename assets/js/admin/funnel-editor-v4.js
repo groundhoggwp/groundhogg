@@ -488,32 +488,40 @@
       self.setupSortable()
       self.setupStepTypes()
       self.initStepFlowContextMenu()
+      self.maybePreloadTagsAndEmails()
+    },
 
-      // If there are tag enabled step
-      if (self.funnel.steps.find(step => step.meta.tags && step.meta.tags.length > 0)) {
+    async maybePreloadTagsAndEmails () {
 
-        const preloadTags = self.funnel.steps.reduce((tagsArr, { meta }) => {
-          const { tags } = meta
-          if (tags) {
-            tagsArr.push(...tags)
-          }
-          return tagsArr
-        }, [])
+      const preloadTags = []
+      const preloadEmails = []
 
-        // Load tags in use by tag supported steps
-        TagsStore.fetchItems({
-          include: preloadTags,
-          limit: preloadTags.length
-        }).then(() => {
+      this.funnel.steps.forEach(({ meta }) => {
+        const { tags, email_id } = meta
+        if (tags) {
+          preloadTags.push(...tags)
+        } else if (email_id) {
+          preloadEmails.push(email_id)
+        }
+      })
 
-          // Once the tags are loaded we can render...
-          self.render()
+      if (preloadEmails.length === 0 && preloadTags.length === 0) {
+        this.render()
+      }
+
+      if (preloadTags.length > 0) {
+        await TagsStore.fetchItems({
+          include: preloadTags
         })
       }
-      // Otherwise we can render right away.
-      else {
-        self.render()
+
+      if (preloadEmails.length > 0) {
+        await EmailsStore.fetchItems({
+          include: preloadEmails
+        })
       }
+
+      this.render()
     },
 
     loadFunnel (funnel) {
@@ -2023,7 +2031,9 @@
 
         const { tags } = meta
 
-        if (tags.length === 0) {
+        if ( ! tags ){
+          return 'Apply tag'
+        } else if (tags.length === 0) {
           return 'Apply tags'
         } else if (tags.length < 4 && TagsStore.hasItems()) {
           return `Apply ${andList(tags.map(id => `<b>${TagsStore.get(id).data.tag_name}</b>`))}`
@@ -2073,7 +2083,9 @@
 
         const { tags } = meta
 
-        if (tags.length === 0) {
+        if ( ! tags ){
+          return 'Apply tag'
+        } else if (tags.length === 0) {
           return 'Remove tags'
         } else if (tags.length < 4 && TagsStore.hasItems()) {
           return `Remove ${andList(tags.map(id => `<b>${TagsStore.get(id).data.tag_name}</b>`))}`
@@ -2455,7 +2467,8 @@
      */
     send_email: {
       defaults: {
-        email_id: null
+        email_id: null,
+        tempEmail: false
       },
       //language=HTML
       svg: `
@@ -2467,11 +2480,28 @@
 			        stroke="currentColor" stroke-width="2"/>
 		  </svg>`,
       title ({ ID, data, meta }) {
-        return `Send Email`
+
+        const { email_id } = meta
+
+        if (!email_id) {
+          return 'Send email'
+        }
+
+        const email = EmailsStore.get(email_id)
+
+        return `Send <b>${email.data.title || email.data.subject_line}</b>`
       },
       edit ({ ID, data, meta }) {
 
         const { email_id } = meta
+
+        if (!email_id) {
+
+          //language=HTML
+          return `
+			 
+          `
+        }
 
         //language=HTML
         return `
@@ -2481,18 +2511,48 @@
 					${select({
 						id: 'email-picker',
 						name: 'email_id'
-					})}
+					}, {
+						[email_id]: EmailsStore.get(email_id).data.title
+					}, email_id)}
 				</div>
 			</div>`
       },
-      onMount (step, updateStepMeta) {
-        emailPicker('#email-picker').on('change', function (e) {
-          updateStepMeta({
-            email_id: parseInt($(this).val())
+      onMount ({ meta }, updateStepMeta) {
+
+        const { email_id } = meta
+
+        if (!email_id) {
+
+          $('.panel.choice').on('click', function (e) {
+            const choice = $(this).data('choice')
+            switch (choice) {
+              case 'scratch':
+
+                updateStepMeta( {
+                  email: {}
+                } )
+
+                break;
+              case 'template':
+                break;
+              case 'existing':
+                break;
+            }
           })
 
-          Editor.renderStepEdit()
-        })
+        } else {
+          emailPicker('#email-picker').on('change', function (e) {
+
+            const emailId = parseInt($(this).val())
+
+            EmailsStore.fetchItem(emailId).then(item => {
+              updateStepMeta({
+                email_id: emailId
+              })
+              Editor.renderStepEdit()
+            })
+          })
+        }
       }
     },
 

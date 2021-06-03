@@ -14,20 +14,104 @@
     getSteps
   } = Groundhogg.funnelEditor.functions
 
-  const { select, input, tinymceElement, specialChars } = Groundhogg.element
+  const EmailsStore = Groundhogg.stores.emails
+
+  const { select, input, tinymceElement, specialChars, inputWithReplacementsAndEmojis } = Groundhogg.element
+
+  const CreateEmail = (selector, onSelect) => ({
+
+    view: 'choices',
+    renderTemplates () {
+
+    },
+
+    renderTemplates () {
+
+    },
+
+    renderChoices () {
+      //language=html
+      return `
+		  <div id="email-creation-choices">
+			  <button data-choice="template" class="choice panel">
+				  <svg viewBox="0 0 42 53" fill="none" xmlns="http://www.w3.org/2000/svg">
+					  <path
+						  d="M40.883 15.046h1a1 1 0 00-.293-.707l-.707.707zM26.993 1.157l.708-.707a1 1 0 00-.707-.293v1zm0 13.89h-1v1h1v-1zm13.89 35.11h-1 1zm-37.89 2h36.89v-2H2.993v2zm-2-50v48h2v-48h-2zm40.89 48v-35.11h-2v35.11h2zm-14.89-50h-24v2h24v-2zM41.59 14.34L27.7.45l-1.414 1.414 13.889 13.89 1.414-1.415zM25.994 1.157v13.89h2V1.156h-2zm1 14.89h13.889v-2h-13.89v2zm12.889 36.11a2 2 0 002-2h-2v2zm-36.89-2h-2a2 2 0 002 2v-2zm0-48v-2a2 2 0 00-2 2h2z"
+						  fill="currentColor"/>
+				  </svg>
+				  <p>Use a template</p>
+			  </button>
+			  <button data-choice="existing" class="choice panel">
+				  <svg viewBox="0 0 73 53" fill="none" xmlns="http://www.w3.org/2000/svg">
+					  <path d="M68.463 22.788V2.12a1 1 0 00-1-1H2.797a1 1 0 00-1 1v44.667a1 1 0 001 1H35.13"
+					        stroke="currentColor" stroke-width="2"/>
+					  <path d="M1.797 4.454l33.333 20 33.333-20M71.796 31.121l-20 20-10-10" stroke="currentColor"
+					        stroke-width="2"/>
+				  </svg>
+				  <p>Use an existing email</p>
+			  </button>
+			  <button data-choice="scratch" class="choice panel">
+				  <svg viewBox="0 0 49 49" fill="none" xmlns="http://www.w3.org/2000/svg">
+					  <path d="M1.91 47.788V39.1L34.618 6.393l4.68-4.68 8.688 8.687-4.68 4.68-32.708 32.708H1.91z"
+					        stroke="currentColor" stroke-width="2"/>
+				  </svg>
+				  <p>Start from scratch</p>
+			  </button>
+		  </div>`
+    },
+    mount () {
+
+      const reMount = () => {
+        this.mount();
+      }
+
+      const setView = ( view ) => {
+        this.view = view
+        reMount();
+      }
+
+      $(selector).html(this.render())
+
+      switch ( this.view ) {
+        case 'choices' :
+
+          $(`${selector} .choice`).on('click', function (e) {
+            const choice = $(this).data('choice')
+            switch (choice) {
+              case 'template':
+                setView( 'template' )
+                break;
+              case 'existing':
+                setView( 'existing' )
+                break;
+              case 'scratch':
+
+
+
+                break;
+            }
+          })
+
+          break;
+      }
+    }
+
+  })
 
   fill('beforeStepNotes.send_email', {
     render ({ data, meta }) {
 
       const { email_id } = meta
 
-      if (!email_id) {
+      const email = EmailsStore.get(email_id)
+
+      if (!email_id || !email) {
         return ''
       }
 
-      const ownerOptions = {}
+      const fromOptions = {}
       Groundhogg.filters.owners.forEach(owner => {
-        ownerOptions[owner.ID] = `${owner.data.display_name} (${owner.data.user_email})`
+        fromOptions[owner.ID] = `${owner.data.display_name} (${owner.data.user_email})`
       })
 
       //language=html
@@ -55,27 +139,30 @@
 				  ${select({
 					  id: 'from-user',
 					  name: 'form_user'
-				  }, ownerOptions)}
+				  }, fromOptions, email.data.from_user)}
 			  </div>
 			  <div class="row">
 				  <label class="row-label">Replies are sent to...</label>
 				  ${input({
 					  id: 'reply-to',
-					  name: 'reply_to'
+					  name: 'reply_to',
+					  value: email.meta.reply_to_override
 				  })}
 			  </div>
 			  <div id="alignment-and-message-type" class="row">
 				  <div class="col">
 					  <label class="row-label">Alignment</label>
 					  <div id="alignment">
-						  <button class="gh-button icon align-left">
+						  <button
+							  class="gh-button icon align-left ${email.meta.alignment === 'left' ? 'focused' : ''}">
 							  <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
 								  <path d="M1.593 13.166h5.67m-5.67-4.123h11.34M1.592.796h11.34M1.592 4.919h5.67"
 								        stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
 								        stroke-linejoin="round"/>
 							  </svg>
 						  </button>
-						  <button class="gh-button icon align-center">
+						  <button
+							  class="gh-button icon align-center ${email.meta.alignment !== 'left' ? 'focused' : ''}">
 							  <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
 								  <path opacity=".6"
 								        d="M12.347 9.003H1.007M12.347.756H1.007m8.763 12.37H4.1m5.67-8.247H4.1"
@@ -88,19 +175,29 @@
 				  <div class="row">
 					  <label class="row-label">Message Type</label>
 					  ${select({
-						  id: 'message-type',
-						  name: 'message_type'
-					  }, {
-						  marketing: 'Marketing',
-						  transactional: 'Transactional'
-					  })}
+							  id: 'message-type',
+							  name: 'message_type'
+						  }, {
+							  marketing: 'Marketing',
+							  transactional: 'Transactional'
+						  },
+						  email.meta.message_type)}
 				  </div>
 			  </div>
 		  </div>`
+    },
+    onMount ({ meta }, updateStepMeta) {
+
+      const { email_id } = meta
+
+      if (!email_id) {
+        return
+      }
+
     }
   })
 
-  fill('afterStepSettings.send_email', {
+  fill('beforeStepSettings.send_email', {
     render ({ data, meta }) {
 
       const { email_id } = meta
@@ -147,14 +244,14 @@
 			  <div class="row">
 				  <div class="inline-label subject-wrap">
 					  <label>Subject:</label>
-					  ${input({
+					  ${inputWithReplacementsAndEmojis({
 						  name: 'subject',
 						  placeholder: 'Subject line...'
 					  })}
 				  </div>
 				  <div class="inline-label subject-wrap">
 					  <label>Preview:</label>
-					  ${input({
+					  ${inputWithReplacementsAndEmojis({
 						  name: 'preview',
 						  placeholder: 'Preview text...'
 					  })}
@@ -176,7 +273,13 @@
 			  </div>
 		  </div>`
     },
-    onMount (step, updateStepMeta, updateStep) {
+    onMount ({ meta }, updateStepMeta, updateStep) {
+      const { email_id } = meta
+
+      if (!email_id) {
+        return
+      }
+
       tinymceElement('email-content', {}, (content) => {
         console.log(content)
       })

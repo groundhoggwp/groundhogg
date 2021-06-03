@@ -757,9 +757,20 @@ li.step-error {
   font-weight: 500;
   font-size: 18px;
 }
-#email-editor .inline-label input {
-  box-shadow: none;
+#email-editor .inline-label .input-wrap {
   width: 100%;
+}
+#email-editor .inline-label .input-wrap button {
+  background: none;
+  border: none;
+  opacity: 0.5;
+}
+#email-editor .inline-label .input-wrap button:hover, #email-editor .inline-label .input-wrap button:focus {
+  opacity: 1;
+}
+#email-editor .inline-label .input-wrap input {
+  width: 100%;
+  box-shadow: none;
   border: none;
   font-size: 18px;
   outline: 0;
@@ -822,6 +833,31 @@ li.step-error {
 }
 #advanced-email-options .key-value-row > button:hover {
   opacity: 1;
+}
+
+#email-creation-choices {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+#email-creation-choices .panel {
+  margin: 0 !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+#email-creation-choices .panel svg {
+  height: 50px;
+  width: 50px;
+  color: #0075FF;
+}
+#email-creation-choices .panel p {
+  text-align: center;
+  font-weight: 500;
+}
+#email-creation-choices .panel:hover svg {
+  color: #005ecc;
 }
 
 /*# sourceMappingURL=funnel-editor-v4.css.map */

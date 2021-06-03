@@ -828,7 +828,7 @@ li.step-error {
 
 #email-options.panel {
 
-  label.row-label{
+  label.row-label {
     margin-bottom: 2px;
   }
 
@@ -845,12 +845,12 @@ li.step-error {
     }
   }
 
-  input, select{
+  input, select {
     width: 100%;
   }
 
   #alignment-and-message-type,
-  #alignment{
+  #alignment {
     display: flex;
     gap: 5px;
     justify-content: space-between;
@@ -859,32 +859,48 @@ li.step-error {
 }
 
 
-#email-editor{
-  .inline-label{
+#email-editor {
+  .inline-label {
     display: flex;
     gap: 10px;
     border-bottom: 1px solid rgba(16, 38, 64, 0.15);
     align-items: center;
     padding-bottom: 5px;
 
-    label{
+    label {
       font-weight: 500;
       font-size: 18px;
     }
 
-    input{
-      box-shadow: none;
+    .input-wrap{
+
       width: 100%;
-      border: none;
-      font-size: 18px;
-      outline: 0;
-      padding: 0;
+
+      button{
+        background: none;
+        border: none;
+        opacity: 0.5;
+
+        &:hover,
+        &:focus{
+          opacity: 1;
+        }
+      }
+
+      input {
+        width: 100%;
+        box-shadow: none;
+        border: none;
+        font-size: 18px;
+        outline: 0;
+        padding: 0;
+      }
     }
   }
 }
 
 #advanced-email-options {
-  .button-end{
+  .button-end {
     display: flex;
     justify-content: flex-end;
 
@@ -898,7 +914,7 @@ li.step-error {
       cursor: pointer;
       padding: 6.5px;
 
-      .dashicons{
+      .dashicons {
         font-size: 17px;
         height: 17px;
         width: 17px;
@@ -952,6 +968,37 @@ li.step-error {
 
     > button:hover {
       opacity: 1;
+    }
+  }
+}
+
+#email-creation-choices {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+
+  .panel {
+    margin: 0 !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+
+    svg {
+      height: 50px;
+      width: 50px;
+      color: $primary-blue;
+    }
+
+    p {
+      text-align: center;
+      font-weight: 500;
+    }
+
+    &:hover {
+      svg {
+        color: darken($primary-blue, 10)
+      }
     }
   }
 }
