@@ -173,6 +173,12 @@ button.gh-button.icon:hover {
   align-items: center;
   align-content: center;
 }
+.step-flow .steps .action {
+  margin: 0 15px;
+}
+.step-flow .steps .step:last-child {
+  margin-bottom: 100px;
+}
 .step-flow .add-new-step-wrapper {
   background: #F6F9FB;
   bottom: 0;
@@ -269,10 +275,6 @@ li.step-error {
   cursor: pointer;
 }
 
-.step-flow .steps .step:last-child {
-  margin-bottom: 20px;
-}
-
 .step-flow .steps .step.has-errors {
   border: 1px solid #E91F4F;
 }
@@ -363,10 +365,6 @@ li.step-error {
 .step-flow .steps .step.active {
   border-width: 2px;
   padding: 9px;
-}
-
-.step-flow .steps .step.action {
-  margin: 0 15px;
 }
 
 .step-status:before {

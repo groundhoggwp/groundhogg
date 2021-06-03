@@ -402,12 +402,25 @@
             self.addStep(newStep)
             break
           case ($(e.target).is('.step-menu-delete')) :
-            // window.console.log('delete')
             self.deleteStep(parseInt($step.data('id')))
             break
           case ($(e.target).is('.step-menu') || $(e.target).parent('.step-menu').length > 0) :
-            // window.console.log('toggle menu')
-            $('.step-menu ul', $step).toggle()
+            const $menu = $('.step-menu ul', $step).toggle()
+
+            const p = $menu.offset();
+            const h = $menu.outerHeight();
+            if ( p.top + h > $( window ).height() ) {
+              $menu.css({
+                bottom: '90%',
+                top: 'auto',
+              })
+            } else {
+              $menu.css({
+                top: '90%',
+                bottom: 'auto',
+              })
+            }
+
             break
           case ($(e.target).is('.step-menu-edit')) :
           default:
@@ -2083,9 +2096,7 @@
 
         const { tags } = meta
 
-        if ( ! tags ){
-          return 'Apply tag'
-        } else if (tags.length === 0) {
+        if (tags.length === 0) {
           return 'Remove tags'
         } else if (tags.length < 4 && TagsStore.hasItems()) {
           return `Remove ${andList(tags.map(id => `<b>${TagsStore.get(id).data.tag_name}</b>`))}`
@@ -2467,8 +2478,7 @@
      */
     send_email: {
       defaults: {
-        email_id: null,
-        tempEmail: false
+        email_id: null
       },
       //language=HTML
       svg: `
@@ -2480,28 +2490,11 @@
 			        stroke="currentColor" stroke-width="2"/>
 		  </svg>`,
       title ({ ID, data, meta }) {
-
-        const { email_id } = meta
-
-        if (!email_id) {
-          return 'Send email'
-        }
-
-        const email = EmailsStore.get(email_id)
-
-        return `Send <b>${email.data.title || email.data.subject_line}</b>`
+        return `Send Email`
       },
       edit ({ ID, data, meta }) {
 
         const { email_id } = meta
-
-        if (!email_id) {
-
-          //language=HTML
-          return `
-			 
-          `
-        }
 
         //language=HTML
         return `
@@ -2511,48 +2504,18 @@
 					${select({
 						id: 'email-picker',
 						name: 'email_id'
-					}, {
-						[email_id]: EmailsStore.get(email_id).data.title
-					}, email_id)}
+					})}
 				</div>
 			</div>`
       },
-      onMount ({ meta }, updateStepMeta) {
-
-        const { email_id } = meta
-
-        if (!email_id) {
-
-          $('.panel.choice').on('click', function (e) {
-            const choice = $(this).data('choice')
-            switch (choice) {
-              case 'scratch':
-
-                updateStepMeta( {
-                  email: {}
-                } )
-
-                break;
-              case 'template':
-                break;
-              case 'existing':
-                break;
-            }
+      onMount (step, updateStepMeta) {
+        emailPicker('#email-picker').on('change', function (e) {
+          updateStepMeta({
+            email_id: parseInt($(this).val())
           })
 
-        } else {
-          emailPicker('#email-picker').on('change', function (e) {
-
-            const emailId = parseInt($(this).val())
-
-            EmailsStore.fetchItem(emailId).then(item => {
-              updateStepMeta({
-                email_id: emailId
-              })
-              Editor.renderStepEdit()
-            })
-          })
-        }
+          Editor.renderStepEdit()
+        })
       }
     },
 
