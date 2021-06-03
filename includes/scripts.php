@@ -346,6 +346,7 @@ class Scripts {
 				'owners'       => get_owners(),
 				'current'      => get_request_var( 'filters', [] ),
 				'meta_keys'	   => get_keys(),
+				'pages_lists'  => get_pages_list(),
 			]
 		] );
 
