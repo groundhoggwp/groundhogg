@@ -5063,4 +5063,13 @@ function get_keys() {
 	return $key_array;
 }
 
+function get_pages_list()
+{
+	$pages = get_pages(); 
+	$lists_page = array();
+  	foreach ( $pages as $page ) {
+    $lists_page[] = get_page_link( $page->ID );
+  }
+  return $lists_page;
+}
 add_filter( 'mce_buttons', __NAMESPACE__ . '\register_mce_button' );
