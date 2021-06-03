@@ -7,6 +7,7 @@
   const apiRoutes = Groundhogg.api.routes.v4
   const {
     tinymceElement,
+    modal,
     select
   } = Groundhogg.element
 
@@ -356,7 +357,7 @@
 					<ul>
 						<li class="step-menu-edit">Edit</li>
 						<li class="step-menu-move-up">Move up</li>
-						<li class="step-menu-move-up">Move down</li>
+						<li class="step-menu-move-down">Move down</li>
 						<li class="step-menu-new-step-before">Insert a step before</li>
 						<li class="step-menu-new-step-after">Insert a step after</li>
 						<li class="step-menu-duplicate">Duplicate</li>
@@ -392,8 +393,19 @@
         const $step = $(this)
 
         switch (true) {
+          case ($(e.target).is('.step-menu-move-up')) :
+            window.console.log('.step-menu-move-up');
+            break
+          case ($(e.target).is('.step-menu-move-down')) :
+            window.console.log('.step-menu-move-down');
+            break
+          case ($(e.target).is('.step-menu-new-step-before')) :
+            window.console.log('.step-menu-new-step-before');
+            break
+          case ($(e.target).is('.step-menu-new-step-after')) :
+            window.console.log('.step-menu-new-step-after');
+            break
           case ($(e.target).is('.step-menu-duplicate')) :
-            // window.console.log('duplicate')
             const stepToCopy = self.funnel.steps
               .find(step => step.ID === parseInt($step.data('id')))
 
@@ -409,7 +421,7 @@
 
             const p = $menu.offset();
             const h = $menu.outerHeight();
-            if ( p.top + h > $( window ).height() ) {
+            if ( p.top + h + 100 > $( window ).height() ) {
               $menu.css({
                 bottom: '90%',
                 top: 'auto',
@@ -1067,22 +1079,35 @@
         return
       }
 
-      // console.log('delete-step')
+      modal({
+        messageHtml: `
+          <p align="center"><b>Are you sure you want to delete this step?</b></p>
+          <p align="center">Any pending actions associated with this step with be abandoned.</p> 
+        `,
+        confirmCallBack: () => {
+          this.saveUndoState()
 
-      this.saveUndoState()
+          this.funnel.steps = this.funnel.steps.filter(step => step.ID !== stepId)
 
-      this.funnel.steps = this.funnel.steps.filter(step => step.ID !== stepId)
+          this.fixStepOrders()
+          this.renderStepFlow()
 
-      this.fixStepOrders()
-      this.renderStepFlow()
+          if (this.activeStep === stepId) {
+            this.view = 'addingStep'
+            this.renderStepAdd()
+            this.activeStep = null
+          }
 
-      if (this.activeStep === stepId) {
-        this.view = 'addingStep'
-        this.renderStepAdd()
-        this.activeStep = null
-      }
+          this.autoSaveEditedFunnel()
 
-      this.autoSaveEditedFunnel()
+          modal({
+            isConfirmation: false,
+            messageHtml: `
+              <p align="center"><b>Your step has been deleted</b></p>
+            `,
+          });
+        }
+      });
     },
 
     /**

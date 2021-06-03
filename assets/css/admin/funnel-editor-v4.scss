@@ -1001,3 +1001,38 @@ li.step-error {
     }
   }
 }
+
+.gh-modal {
+  align-items: center;
+  background: rgba(darken($primary-blue, 20), .618);
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 100%;
+  z-index: 100000;
+
+  &-dialog {
+    background: white;
+    border-radius: 1rem;
+    position: relative;
+    height: 70vh;
+    padding: 3rem;
+    width: 70vw;
+  }
+
+  &-button-close-top {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+  }
+
+  &-confirmation-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+}

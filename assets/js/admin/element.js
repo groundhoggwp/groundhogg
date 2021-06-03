@@ -236,6 +236,75 @@
   }
 
   /**
+   * Custom modal appended to the body.
+   *
+   * options:
+   * (bool) isConfirmation Shows confirmation button if true.
+   * (bool) closeOnOverlayClick Close the modal when the background overlay is clicked.
+   * (bool) showCloseButton Show the close button at the top of the modal.
+   * (string) messageHtml Html to be showed at the top of the modal.
+   * (function) confirmCallBack Called when "confirm" button is clicked.
+   *
+   * @param (object) options Config options to overwrite defaults.
+   */
+  const modal = (options) => {
+    const config = {
+      isConfirmation: true,
+      closeOnOverlayClick: true,
+      showCloseButton: true,
+      messageHtml: `<p align="center">Are you sure you want to do that?</p>`,
+      confirmCallBack: () => {},
+      ...options
+    };
+
+    const html = `
+        <div class="gh-modal">
+          <div class="gh-modal-dialog">
+            ${config.showCloseButton ? `
+              <button type="button" class="button button-secondary gh-modal-button-close-top gh-modal-button-close">Close</button>
+              `: ''}
+              ${config.messageHtml}
+                <div class="gh-modal-confirmation-buttons">
+              ${config.isConfirmation ? `
+                <button type="button" class="button button-secondary gh-modal-button-confirm">Confirm</button>
+                <button type="button" class="button button-secondary gh-modal-button-close">Cancel</button>
+              ` : `
+                <button type="button" class="button button-secondary gh-modal-button-close">Okay</button>
+              `}
+            </div>
+            </div>
+        </div>
+    `;
+
+    const $modal = $(html);
+    $modal
+    .on('click', (e) => {
+      const $target = $(e.target);
+
+      switch (true) {
+        case $target.is('.gh-modal-button-close') :
+          modalClose();
+          break;
+        case $target.is('.gh-modal-button-confirm') :
+          modalClose(); // Called first, so callback could open another modal.
+          config.confirmCallBack();
+          break;
+        default:
+          if ( !$target.is('.gh-modal-dialog') && config.closeOnOverlayClick ) {
+            modalClose();
+          }
+      }
+    });
+
+    modalClose();
+    $('body').append($modal);
+  }
+
+  const modalClose = () => {
+    $('.gh-modal').remove();
+  }
+
+  /**
    * Create a list of options
    *
    * @param options
@@ -552,7 +621,8 @@
     createSlotFillProvider,
     clickInsideElement,
     searchOptionsWidget,
-    tinymceElement
+    tinymceElement,
+    modal
   }
 
 })(jQuery)

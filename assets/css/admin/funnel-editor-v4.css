@@ -858,4 +858,36 @@ li.step-error {
   color: #005ecc;
 }
 
+.gh-modal {
+  align-items: center;
+  background: rgba(0, 70, 153, 0.618);
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 100%;
+  z-index: 100000;
+}
+.gh-modal-dialog {
+  background: white;
+  border-radius: 1rem;
+  position: relative;
+  height: 70vh;
+  padding: 3rem;
+  width: 70vw;
+}
+.gh-modal-button-close-top {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+}
+.gh-modal-confirmation-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
 /*# sourceMappingURL=funnel-editor-v4.css.map */
