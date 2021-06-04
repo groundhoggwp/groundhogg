@@ -252,14 +252,16 @@
       isConfirmation: true,
       closeOnOverlayClick: true,
       showCloseButton: true,
+      showOkayButton: true,
       messageHtml: `<p align="center">Are you sure you want to do that?</p>`,
       confirmCallBack: () => {},
+      dialogStyles: '',
       ...options
     };
 
     const html = `
         <div class="gh-modal">
-          <div class="gh-modal-dialog">
+          <div class="gh-modal-dialog" style="${config.dialogStyles}">
             ${config.showCloseButton ? `
               <button type="button" class="button button-secondary gh-modal-button-close-top gh-modal-button-close">Close</button>
               `: ''}
@@ -268,9 +270,10 @@
               ${config.isConfirmation ? `
                 <button type="button" class="button button-secondary gh-modal-button-confirm">Confirm</button>
                 <button type="button" class="button button-secondary gh-modal-button-close">Cancel</button>
-              ` : `
+              ` : ''}
+              ${!config.isConfirmation && config.showOkayButton ? `
                 <button type="button" class="button button-secondary gh-modal-button-close">Okay</button>
-              `}
+              ` : ''}
             </div>
             </div>
         </div>

@@ -883,11 +883,22 @@
      * Re-render the whole editor
      */
     render () {
+      modal({
+        isConfirmation: false,
+        closeOnOverlayClick: false,
+        showCloseButton: false,
+        showOkayButton: false,
+        messageHtml: `<p align="center" style="font-size: 2rem;">Loading...</p>`,
+        dialogStyles: 'width: auto; height: auto;'
+      });
+
       this.renderTitle()
       this.renderPublishActions()
       this.renderStepFlow()
       this.renderStepAdd()
       this.renderStepEdit()
+
+      setTimeout(modalClose, 1000);
     },
 
     /**
