@@ -8,6 +8,7 @@
   const {
     tinymceElement,
     modal,
+    modalClose,
     select
   } = Groundhogg.element
 

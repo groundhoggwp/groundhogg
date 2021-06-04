@@ -622,7 +622,8 @@
     clickInsideElement,
     searchOptionsWidget,
     tinymceElement,
-    modal
+    modal,
+    modalClose
   }
 
 })(jQuery)
