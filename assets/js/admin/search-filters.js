@@ -696,7 +696,7 @@
   }, 'Meta Data')
 
   const standardActivityDateFilterOnMount = (filter, updateFilter) => {
-    $('#filter-date-range, #filter-date, #filter-date2').on('change', function (e) {
+    $('#filter-date-range, #filter-date, #filter-date2 ,#filter-page-url').on('change', function (e) {
       const $el = $(this)
       updateFilter({
         [$el.prop('name')]: $el.val()
@@ -711,6 +711,13 @@
       }
     })
   }
+
+  function getHomeUrl() {
+  var href = window.location.href;
+  var index = href.indexOf('/wp-admin');
+  var homeUrl = href.substring(0, index);
+  return homeUrl;
+}
 
   const dateRanges = {
     '24_hours': 'In the last 24 hours',
@@ -786,19 +793,17 @@
 
   //filter by Page Visited
   registerFilter('page_visited', 'activity', {
-    view ({ compare, value, value2 }, filterGroupIndex, filterIndex) {
+    view ({  page_url, date_range, date, date2 }, filterGroupIndex, filterIndex) {
+      console.log(page_url);
       //language=HTMl
-      switch (compare) {/*
-          case 'before':
-            return `is before <b>${value}</b>`
-          case 'after':
-            return `is after <b>${value}</b>`
-          case 'between':
-            return `is between <b>${value}</b> and <b>${value2}</b>`*/
-      }
-      return `selected value <b>${value}</b>`
+      switch (date_range) {
+        default:
+          return `<b>${page_url} visited</b> ${dateRanges[date_range]}`
+        case 'custom':
+          return `<b>${page_url} Visited</b> between <b>${date}</b> and <b>${date2}</b>`    }
+    
     },
-    edit ({ compare, meta_key, value, value2 }, filterGroupIndex, filterIndex) {
+    edit ({ page_url, date_range, date, date2 }, filterGroupIndex, filterIndex) {
 
       /*var defaultValues = {}
       $.map(meta_keys, function (value, index) {
@@ -807,50 +812,40 @@
       //console.log(defaultValues);
       // language=html
       return `${select({
-			  id: 'filter-compare',
-			  name: 'compare'
-		  }, pages_lists
-		  , compare)} ${select({
-			  id: 'meta_key',
-			  name: 'meta_key',
-			  class: 'meta_key',
-		  },
-		  {
-			  '24hours': 'In the last 24 hours',
-			  '7days': 'In the last 7 days',
-			  '30days': 'In the last 30 days',
-			  '365days': 'In the last 365 days',
-			  'custom': 'Custom Date Range',
-		  }
-	  )} ${input({
-		  type: 'date',
-		  value: value,
-		  id: 'value',
-		  className: 'value',
-		  name: 'value'
-	  })}
+        id: 'filter-page-url',
+        name: 'page_url'
+      }, pages_lists
+      )} 
+      ${select({
+        id: 'filter-date-range',
+        name: 'date_range'
+      }, dateRanges, date_range)} 
+      
+      ${input({
+        type: 'date',
+        value: date,
+        id: 'filter-date',
+        className: `date ${date_range === 'custom' ? '' : 'hidden'}`,
+        name: 'date'
+      })}
 
-	  ${input({
-		  type: 'date',
-		  value: value2,
-		  id: 'value2',
-		  className: 'value',
-		  name: 'value2'
-	  })}`
+      ${input({
+        type: 'date',
+        value: date2,
+        id: 'filter-date2',
+        className: `value ${date_range === 'custom' ? '' : 'hidden'}`,
+        name: 'date2'
+      })}`
+
     },
     onMount (filter, updateFilter) {
-      $('#value, #value2, #meta_key , #filter-compare').on('change', function (e) {
-        const $el = $(this)
-        console.log($el.val())
-        updateFilter({
-          [$el.prop('name')]: $el.val()
-        })
-      })
+      standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
-      meta_key: '24hours',
-      /*  value: '',
-        value2: ''*/
+     time: '24hours',
+      date: '',
+      date2: '',
+      page_url : getHomeUrl(),
     }
   }, 'Page Visited')
 
@@ -899,149 +894,103 @@
 
   //filter by User Not Logged In
   registerFilter('not_logged_in', 'activity', {
-    view ({ compare, value, value2 }, filterGroupIndex, filterIndex) {
+    view ({ date_range, date, date2 }, filterGroupIndex, filterIndex) {
       //language=HTMl
-      switch (compare) {/*
-          case 'before':
-            return `is before <b>${value}</b>`
-          case 'after':
-            return `is after <b>${value}</b>`
-          case 'between':
-            return `is between <b>${value}</b> and <b>${value2}</b>`*/
-      }
-      return `selected value <b>${compare}</b>`
+      switch (date_range) {
+        default:
+          return `<b>Has Not Logged In</b> ${dateRanges[date_range]}`
+        case 'custom':
+          return `<b>Has Not Logged In</b> between <b>${date}</b> and <b>${date2}</b>`    }
     },
-    edit ({ compare, value, value2 }, filterGroupIndex, filterIndex) {
-
-      /*var defaultValues = {}
-      $.map(meta_keys, function (value, index) {
-        defaultValues[index] = value
-      })*/
-      //console.log(defaultValues);
-      // language=html
+    edit ({ date_range, date, date2 }, filterGroupIndex, filterIndex) {
       return `${select({
-		  id: 'filter-compare',
-		  name: 'compare'
-	  }, {
-		  '24hours': 'In the last 24 hours',
-		  '7days': 'In the last 7 days',
-		  '30days': 'In the last 30 days',
-		  '365days': 'In the last 365 days',
-		  'custom': 'Custom Date Range',
+        id: 'filter-date-range',
+        name: 'date_range'
+      }, dateRanges, date_range)} 
+      
+      ${input({
+        type: 'date',
+        value: date,
+        id: 'filter-date',
+        className: `date ${date_range === 'custom' ? '' : 'hidden'}`,
+        name: 'date'
+      })}
 
-	  }, compare)}
-	  ${input({
-		  type: 'date',
-		  value: value,
-		  id: 'value',
-		  className: 'value',
-		  name: 'value'
-	  })}
-
-	  ${input({
-		  type: 'date',
-		  value: value2,
-		  id: 'value2',
-		  className: 'value',
-		  name: 'value2'
-	  })}`
+      ${input({
+        type: 'date',
+        value: date2,
+        id: 'filter-date2',
+        className: `value ${date_range === 'custom' ? '' : 'hidden'}`,
+        name: 'date2'
+      })}`
     },
     onMount (filter, updateFilter) {
-      $('#filter-compare, #value2, #value').on('change', function (e) {
-        const $el = $(this)
-        console.log($el.val())
-        updateFilter({
-          [$el.prop('name')]: $el.val()
-        })
-      })
+      standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
-      compare: 'equals',
-      /*  value: '',
-        value2: ''*/
+      date_range: '24hours',
+      date: '',
+      date2: '',
     }
   }, 'Has Not Logged In')
 
   //filter by User Was Active
   registerFilter('was_active', 'activity', {
-    view ({ compare, value, value2 }, filterGroupIndex, filterIndex) {
+    view ({ date_range, date, date2 }, filterGroupIndex, filterIndex) {
       //language=HTMl
-      switch (compare) {/*
-          case 'before':
-            return `is before <b>${value}</b>`
-          case 'after':
-            return `is after <b>${value}</b>`
-          case 'between':
-            return `is between <b>${value}</b> and <b>${value2}</b>`*/
+      switch (date_range) {
+        default:
+          return `<b>Was active in</b> ${dateRanges[date_range]}`
+        case 'custom':
+          return `<b>Was active in</b> between <b>${date}</b> and <b>${date2}</b>` 
       }
-      return `selected value <b>${compare}</b>`
     },
-    edit ({ compare, value, value2 }, filterGroupIndex, filterIndex) {
+    edit( { date_range, date, date2 }, filterGroupIndex, filterIndex) {
 
-      /*var defaultValues = {}
-      $.map(meta_keys, function (value, index) {
-        defaultValues[index] = value
-      })*/
-      //console.log(defaultValues);
-      // language=html
       return `${select({
-		  id: 'filter-compare',
-		  name: 'compare'
-	  }, {
-		  '24hours': 'In the last 24 hours',
-		  '7days': 'In the last 7 days',
-		  '30days': 'In the last 30 days',
-		  '365days': 'In the last 365 days',
-		  'custom': 'Custom Date Range',
+        id: 'filter-date-range',
+        name: 'date_range'
+      }, dateRanges, date_range)} 
+      
+      ${input({
+        type: 'date',
+        value: date,
+        id: 'filter-date',
+        className: `date ${date_range === 'custom' ? '' : 'hidden'}`,
+        name: 'date'
+      })}
 
-	  }, compare)}
-	  ${input({
-		  type: 'date',
-		  value: value,
-		  id: 'value',
-		  className: 'value',
-		  name: 'value'
-	  })}
-
-	  ${input({
-		  type: 'date',
-		  value: value2,
-		  id: 'value2',
-		  className: 'value',
-		  name: 'value2'
-	  })}`
+      ${input({
+        type: 'date',
+        value: date2,
+        id: 'filter-date2',
+        className: `value ${date_range === 'custom' ? '' : 'hidden'}`,
+        name: 'date2'
+      })}`
     },
     onMount (filter, updateFilter) {
-      $('#filter-compare, #value2, #value').on('change', function (e) {
-        const $el = $(this)
-        console.log($el.val())
-        updateFilter({
-          [$el.prop('name')]: $el.val()
-        })
-      })
+      standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
-      compare: 'equals',
-      /*  value: '',
-        value2: ''*/
+      time: '24hours',
+      date: '',
+      date2: '',
     }
   }, 'Was Active')
 
   //filter By User Was Not Active
   registerFilter('was_not_active', 'activity', {
-    view ({ compare, value, value2 }, filterGroupIndex, filterIndex) {
+    view ({date_range, date, date2}, filterGroupIndex, filterIndex) {
       //language=HTMl
-      switch (compare) {/*
-          case 'before':
-            return `is before <b>${value}</b>`
-          case 'after':
-            return `is after <b>${value}</b>`
-          case 'between':
-            return `is between <b>${value}</b> and <b>${value2}</b>`*/
+      switch (date_range) {
+        default:
+          return `<b>Was not active in</b> ${dateRanges[date_range]}`
+        case 'custom':
+          return `<b>Was not active in</b> between <b>${date}</b> and <b>${date2}</b>`    
       }
       return `selected value <b>${compare}</b>`
     },
-    edit ({ compare, value, value2 }, filterGroupIndex, filterIndex) {
+    edit ({ date_range, date, date2 }, filterGroupIndex, filterIndex) {
 
       /*var defaultValues = {}
       $.map(meta_keys, function (value, index) {
@@ -1050,110 +999,78 @@
       //console.log(defaultValues);
       // language=html
       return `${select({
-		  id: 'filter-compare',
-		  name: 'compare'
-	  }, {
-		  '24hours': 'In the last 24 hours',
-		  '7days': 'In the last 7 days',
-		  '30days': 'In the last 30 days',
-		  '365days': 'In the last 365 days',
-		  'custom': 'Custom Date Range',
+        id: 'filter-date-range',
+        name: 'date_range'
+      }, dateRanges, date_range)} 
+      
+      ${input({
+        type: 'date',
+        value: date,
+        id: 'filter-date',
+        className: `date ${date_range === 'custom' ? '' : 'hidden'}`,
+        name: 'date'
+      })}
 
-	  }, compare)}
-	  ${input({
-		  type: 'date',
-		  value: value,
-		  id: 'value',
-		  className: 'value',
-		  name: 'value'
-	  })}
-
-	  ${input({
-		  type: 'date',
-		  value: value2,
-		  id: 'value2',
-		  className: 'value',
-		  name: 'value2'
-	  })}`
+      ${input({
+        type: 'date',
+        value: date2,
+        id: 'filter-date2',
+        className: `value ${date_range === 'custom' ? '' : 'hidden'}`,
+        name: 'date2'
+      })}`
     },
     onMount (filter, updateFilter) {
-      $('#filter-compare, #value2, #value').on('change', function (e) {
-        const $el = $(this)
-        console.log($el.val())
-        updateFilter({
-          [$el.prop('name')]: $el.val()
-        })
-      })
+      standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
-      compare: 'equals',
-      /*  value: '',
-        value2: ''*/
+      time: '24hours',
+      date: '',
+      date2: '',
     }
   }, 'Was Not Active')
 
   //filter by Completed Funnel Action
   registerFilter('completed_funnel_action', 'activity', {
-    view ({ compare, value, value2 }, filterGroupIndex, filterIndex) {
+    view ({ date_range, date, date2 }, filterGroupIndex, filterIndex) {
       //language=HTMl
-      switch (compare) {/*
-          case 'before':
-            return `is before <b>${value}</b>`
-          case 'after':
-            return `is after <b>${value}</b>`
-          case 'between':
-            return `is between <b>${value}</b> and <b>${value2}</b>`*/
+      switch (date_range) {
+        default:
+          return `<b>Completed funnel action in</b> ${dateRanges[date_range]}`
+        case 'custom':
+          return `<b>Completed funnel action in</b> between <b>${date}</b> and <b>${date2}</b>` 
       }
       return `selected value <b>${compare}</b>`
     },
-    edit ({ compare, value, value2 }, filterGroupIndex, filterIndex) {
+    edit ( { date_range, date, date2 }, filterGroupIndex, filterIndex) {
 
-      /*var defaultValues = {}
-      $.map(meta_keys, function (value, index) {
-        defaultValues[index] = value
-      })*/
-      //console.log(defaultValues);
-      // language=html
       return `${select({
-		  id: 'filter-compare',
-		  name: 'compare'
-	  }, {
-		  '24hours': 'In the last 24 hours',
-		  '7days': 'In the last 7 days',
-		  '30days': 'In the last 30 days',
-		  '365days': 'In the last 365 days',
-		  'custom': 'Custom Date Range',
+        id: 'filter-date-range',
+        name: 'date_range'
+      }, dateRanges, date_range)} 
+      
+      ${input({
+        type: 'date',
+        value: date,
+        id: 'filter-date',
+        className: `date ${date_range === 'custom' ? '' : 'hidden'}`,
+        name: 'date'
+      })}
 
-	  }, compare)}
-	  ${input({
-		  type: 'date',
-		  value: value,
-		  id: 'value',
-		  className: 'value',
-		  name: 'value'
-	  })}
-
-	  ${input({
-		  type: 'date',
-		  value: value2,
-		  id: 'value2',
-		  className: 'value',
-		  name: 'value2'
-	  })}`
+      ${input({
+        type: 'date',
+        value: date2,
+        id: 'filter-date2',
+        className: `value ${date_range === 'custom' ? '' : 'hidden'}`,
+        name: 'date2'
+      })}`
     },
     onMount (filter, updateFilter) {
-      $('#filter-compare, #value2, #value').on('change', function (e) {
-        const $el = $(this)
-        console.log($el.val())
-        updateFilter({
-          [$el.prop('name')]: $el.val()
-        })
-      })
+      standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
-      compare: 'equals',
-      /*  value: '',
-        value2: ''*/
+      date_range: '24hours',
+      date: '',
+      date2: '',
     }
   }, 'Completed Funnel Action')
 
