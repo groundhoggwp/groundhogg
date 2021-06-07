@@ -2,24 +2,25 @@
 
 namespace Groundhogg\DB;
 
-// Exit if accessed directly
+use function Groundhogg\isset_not_empty;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 /**
- * Funnels DB
+ * Tags DB
  *
- * Store information about funnels
+ * Store campaigns
  *
- * @package     Includes
+ * @since       File available since Release 0.1
  * @subpackage  includes/DB
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2018, Groundhogg Inc.
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
- * @since       File available since Release 0.1
+ * @package     Includes
  */
-class Funnels extends DB {
+class Campaigns extends DB {
 
 	/**
 	 * Get the DB suffix
@@ -27,7 +28,7 @@ class Funnels extends DB {
 	 * @return string
 	 */
 	public function get_db_suffix() {
-		return 'gh_funnels';
+		return 'gh_campaigns';
 	}
 
 	/**
@@ -49,12 +50,15 @@ class Funnels extends DB {
 	}
 
 	/**
-	 * Get the object type we're inserting/updating/deleting.
+	 * Get the object type we're inserting/updateing/deleting.
 	 *
 	 * @return string
 	 */
 	public function get_object_type() {
-		return 'funnel';
+		return 'campaign';
+	}
+
+	protected function add_additional_actions() {
 	}
 
 	/**
@@ -65,13 +69,10 @@ class Funnels extends DB {
 	 */
 	public function get_columns() {
 		return array(
-			'ID'              => '%d',
-			'author'          => '%d',
-			'title'           => '%s',
-			'status'          => '%s',
-			'date_created'    => '%s',
-			'last_updated'    => '%s',
-			'conversion_step' => '%d'
+			'ID'          => '%d',
+			'name'        => '%s',
+			'slug'        => '%s',
+			'description' => '%s',
 		);
 	}
 
@@ -83,18 +84,15 @@ class Funnels extends DB {
 	 */
 	public function get_column_defaults() {
 		return array(
-			'ID'              => 0,
-			'author'          => get_current_user_id(),
-			'title'           => '',
-			'status'          => 'inactive',
-			'date_created'    => current_time( 'mysql' ),
-			'last_updated'    => current_time( 'mysql' ),
-			'conversion_step' => 0
+			'ID'          => 0,
+			'name'        => '',
+			'slug'        => '',
+			'description' => '',
 		);
 	}
 
 	/**
-	 * Add a funnel
+	 * Add a campaign
 	 *
 	 * @access  public
 	 * @since   2.1
@@ -106,8 +104,15 @@ class Funnels extends DB {
 			$this->get_column_defaults()
 		);
 
-		if ( empty( $args['title'] ) ) {
+		if ( empty( $args['name'] ) ) {
 			return false;
+		}
+
+		$args['slug'] = sanitize_title( $args['name'] );
+		if ( $this->exists( [ 'slug' => $args['slug'] ]  ) ) {
+			$campaign = $this->get_by( 'slug', $args['slug'] );
+
+			return $campaign->ID;
 		}
 
 		return $this->insert( $args );
@@ -126,20 +131,15 @@ class Funnels extends DB {
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
 		$sql = "CREATE TABLE " . $this->table_name . " (
-		ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-        title text NOT NULL,
-        status varchar(20) NOT NULL,
-        author bigint(20) unsigned NOT NULL,
-        active_contacts bigint(20) unsigned NOT NULL,
-        last_updated datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-        date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-        conversion_step bigint(20) unsigned NOT NULL,
-        PRIMARY KEY (ID)
+        ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+        slug varchar({$this->get_max_index_length()}) NOT NULL,
+        name mediumtext NOT NULL,
+        description text NOT NULL,
+        PRIMARY KEY (ID),
+        UNIQUE KEY slug (slug)
 		) {$this->get_charset_collate()};";
 
 		dbDelta( $sql );
-
-		$wpdb->query( "ALTER TABLE $this->table_name AUTO_INCREMENT = 2" );
 
 		update_option( $this->table_name . '_db_version', $this->version );
 	}

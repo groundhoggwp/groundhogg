@@ -397,18 +397,25 @@
 
         switch (true) {
           case ($(e.target).is('.step-menu-move-up')) :
+<<<<<<< HEAD
             window.console.log('.step-menu-move-up');
             self.moveStepUp(step)
             break
           case ($(e.target).is('.step-menu-move-down')) :
             window.console.log('.step-menu-move-down');
             self.moveStepDown(step)
+=======
+            window.console.log('.step-menu-move-up')
+            break
+          case ($(e.target).is('.step-menu-move-down')) :
+            window.console.log('.step-menu-move-down')
+>>>>>>> 5df49735f55a9c6ff947d8ff3e5758cd6f3fd686
             break
           case ($(e.target).is('.step-menu-new-step-before')) :
-            window.console.log('.step-menu-new-step-before');
+            window.console.log('.step-menu-new-step-before')
             break
           case ($(e.target).is('.step-menu-new-step-after')) :
-            window.console.log('.step-menu-new-step-after');
+            window.console.log('.step-menu-new-step-after')
             break
           case ($(e.target).is('.step-menu-duplicate')) :
             const newStep = copyObject(step)
@@ -421,9 +428,9 @@
           case ($(e.target).is('.step-menu') || $(e.target).parent('.step-menu').length > 0) :
             const $menu = $('.step-menu ul', $step).toggle()
 
-            const p = $menu.offset();
-            const h = $menu.outerHeight();
-            if ( p.top + h + 100 > $( window ).height() ) {
+            const p = $menu.offset()
+            const h = $menu.outerHeight()
+            if (p.top + h + 100 > $(window).height()) {
               $menu.css({
                 bottom: '90%',
                 top: 'auto',
@@ -891,7 +898,7 @@
         showOkayButton: false,
         messageHtml: `<p align="center" style="font-size: 2rem;">Loading...</p>`,
         dialogStyles: 'width: auto; height: auto;'
-      });
+      })
 
       this.renderTitle()
       this.renderPublishActions()
@@ -899,7 +906,7 @@
       this.renderStepAdd()
       this.renderStepEdit()
 
-      setTimeout(modalClose, 1000);
+      setTimeout(modalClose, 1000)
     },
 
     /**
@@ -1145,9 +1152,9 @@
             messageHtml: `
               <p align="center"><b>Your step has been deleted</b></p>
             `,
-          });
+          })
         }
-      });
+      })
     },
 
     /**
@@ -2107,13 +2114,12 @@
 
       title ({ ID, data, meta }) {
 
-        const { tags } = meta
+        let { tags } = meta
+        tags = tags.map(id => parseInt(id))
 
-        if ( ! tags ){
+        if (!tags || tags.length === 0) {
           return 'Apply tag'
-        } else if (tags.length === 0) {
-          return 'Apply tags'
-        } else if (tags.length < 4 && TagsStore.hasItems()) {
+        } else if (tags.length < 4 && TagsStore.hasItems(tags)) {
           return `Apply ${andList(tags.map(id => `<b>${TagsStore.get(id).data.tag_name}</b>`))}`
         } else {
           return `Apply <b>${tags.length}</b> tags`
@@ -2122,15 +2128,24 @@
 
       edit ({ ID, data, meta }) {
 
-        let options = TagsStore.items
-          .map(tag => Elements.option(tag.ID, tag.data.tag_name, meta.tags && meta.tags.indexOf(tag.ID) !== -1))
+        let options = TagsStore.getItems()
+          .map(tag => {
+            return {
+              text: tag.data.tag_name,
+              value: tag.ID
+            }
+          })
 
         //language=HTML
         return `
 			<div class="panel">
 				<div class="row">
 					<label class="row-label" for="tags">Select tags to add.</label>
-					<select name="tags" id="tags" multiple>${options.join('')}</select>
+					${select({
+						name: 'tags',
+						id: 'tags',
+						multiple: true,
+					}, options, meta.tags.map(id => parseInt(id)))}
 					<p class="description">All of the defined tags will be added to the contact.</p>
 				</div>
 			</div>`
@@ -2159,11 +2174,12 @@
 		  </svg>`,
       title ({ ID, data, meta }) {
 
-        const { tags } = meta
+        let { tags } = meta
+        tags = tags.map(id => parseInt(id))
 
         if (tags.length === 0) {
           return 'Remove tags'
-        } else if (tags.length < 4 && TagsStore.hasItems()) {
+        } else if (tags.length < 4 && TagsStore.hasItems(tags)) {
           return `Remove ${andList(tags.map(id => `<b>${TagsStore.get(id).data.tag_name}</b>`))}`
         } else {
           return `Remove <b>${tags.length}</b> tags`
@@ -2171,16 +2187,24 @@
       },
 
       edit ({ ID, data, meta }) {
-
-        let options = TagsStore.items
-          .map(tag => Elements.option(tag.ID, tag.data.tag_name, meta.tags && meta.tags.indexOf(tag.ID) !== -1))
+        let options = TagsStore.getItems()
+          .map(tag => {
+            return {
+              text: tag.data.tag_name,
+              value: tag.ID
+            }
+          })
 
         //language=HTML
         return `
 			<div class="panel">
 				<div class="row">
 					<label class="row-label" for="tags">Select tags to remove.</label>
-					<select name="tags" id="tags" multiple>${options.join('')}</select>
+					${select({
+						name: 'tags',
+						id: 'tags',
+						multiple: true,
+					}, options, meta.tags.map(id => parseInt(id)))}
 					<p class="description">All of the defined tags will be removed from the contact.</p>
 				</div>
 			</div>`
@@ -2212,13 +2236,14 @@
 
       title ({ ID, data, meta }) {
 
-        const { tags, condition } = meta
+        let { tags, condition } = meta
+        tags = tags.map(id => parseInt(id))
 
         if (!tags) {
           return 'Tag is applied'
         } else if (tags.length >= 4) {
           return condition === 'all' ? `<b>${tags.length}</b> tags are applied` : `Any of <b>${tags.length}</b> tags are applied`
-        } else if (tags.length > 1 && tags.length < 4 && TagsStore.hasItems()) {
+        } else if (tags.length > 1 && tags.length < 4 && TagsStore.hasItems(tags)) {
           const tagNames = tags.map(tag => `<b>${TagsStore.get(tag).data.tag_name}</b>`)
           return condition === 'all' ? `${andList(tagNames)} are applied` : `${orList(tagNames)} is applied`
         } else if (tags.length === 1) {
@@ -2230,8 +2255,13 @@
 
       edit ({ ID, data, meta }) {
 
-        let options = TagsStore.items
-          .map(tag => Elements.option(tag.ID, tag.data.tag_name, meta.tags && meta.tags.indexOf(tag.ID) !== -1))
+        let options = TagsStore.getItems()
+          .map(tag => {
+            return {
+              text: tag.data.tag_name,
+              value: tag.ID
+            }
+          })
 
         const { condition } = meta
 
@@ -2243,7 +2273,11 @@
 						<option value="any" ${condition === 'any' ? 'selected' : ''}>Any</option>
 						<option value="all" ${condition === 'all' ? 'selected' : ''}>All</option>
 					</select> of the defined tags are applied</label>
-					<select name="tags" id="tags" multiple>${options.join('')}</select>
+					${select({
+						name: 'tags',
+						id: 'tags',
+						multiple: true,
+					}, options, meta.tags.map(id => parseInt(id)))}
 					<p class="description">Runs when ${condition || 'any'} of the provided tags are applied.</p>
 				</div>
 			</div>`
@@ -2277,13 +2311,14 @@
 
       title ({ ID, data, meta }) {
 
-        const { tags, condition } = meta
+        let { tags, condition } = meta
+        tags = tags.map(id => parseInt(id))
 
         if (!tags) {
           return 'Tag is removed'
         } else if (tags.length >= 4) {
           return condition === 'all' ? `<b>${tags.length}</b> tags are removed` : `Any of <b>${tags.length}</b> tags are removed`
-        } else if (tags.length > 1 && tags.length < 4 && TagsStore.hasItems()) {
+        } else if (tags.length > 1 && tags.length < 4 && TagsStore.hasItems(tags)) {
           const tagNames = tags.map(tag => `<b>${TagsStore.get(tag).data.tag_name}</b>`)
           return condition === 'all' ? `${andList(tagNames)} are applied` : `${orList(tagNames)} is removed`
         } else if (tags.length === 1) {
@@ -2295,8 +2330,13 @@
 
       edit ({ ID, data, meta }) {
 
-        let options = TagsStore.items
-          .map(tag => Elements.option(tag.ID, tag.data.tag_name, meta.tags && meta.tags.indexOf(tag.ID) !== -1))
+        let options = TagsStore.getItems()
+          .map(tag => {
+            return {
+              text: tag.data.tag_name,
+              value: tag.ID
+            }
+          })
 
         const { condition } = meta
 
@@ -2308,7 +2348,11 @@
 						<option value="any" ${condition === 'any' ? 'selected' : ''}>Any</option>
 						<option value="all" ${condition === 'all' ? 'selected' : ''}>All</option>
 					</select> of the defined tags are removed</label>
-					<select name="tags" id="tags" multiple>${options.join('')}</select>
+					${select({
+						name: 'tags',
+						id: 'tags',
+						multiple: true,
+					}, options, meta.tags.map(id => parseInt(id)))}
 					<p class="description">Runs when ${condition || 'any'} of the provided tags are removed.</p>
 				</div>
 			</div>`
@@ -2622,7 +2666,7 @@
 				<div class="row">
 					<label class="row-label" for="copy-this">Copy this link</label>
 					<input type="url" id="copy-this" class="code input regular-text"
-					       value="${Groundhogg.managed_page.root}/link/click/${'some-value'}" onfocus="this.select()"
+					       value="${Groundhogg.managed_page.root}link/click/${'some-value'}" onfocus="this.select()"
 					       readonly>
 					<p class="description">Paste this link in any email or page. Once a contact clicks it the benchmark
 						will be completed and the contact will be redirected to the page set below.</p>

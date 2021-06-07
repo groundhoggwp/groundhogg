@@ -3,7 +3,7 @@
 namespace Groundhogg\Admin\Funnels\Editor;
 
 ?>
-<div class="editor">
+<div id="funnel-editor" class="editor">
 	<?php
 
 	include __DIR__ . '/header.php';

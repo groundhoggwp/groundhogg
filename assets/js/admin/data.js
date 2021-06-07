@@ -71,8 +71,22 @@
       return this.item.ID === id || this.items.find(item => item.ID === id)
     },
 
-    hasItems () {
-      return this.items.length > 0
+    hasItems (itemIds) {
+
+      if (!itemIds) {
+        return this.items.length > 0
+      }
+
+      for (let i = 0; i < itemIds.length; i++) {
+        const itemId = itemIds[i]
+        if (!this.items.find(item => {
+          return item.ID === itemId
+        })) {
+          return false
+        }
+      }
+
+      return true
     },
 
     async fetchItems (params) {

@@ -1,71 +1,107 @@
-.wp-core-ui select {
-  vertical-align: initial;
+#add-funnel * {
+  box-sizing: border-box;
 }
-
-button {
+#add-funnel #header {
+  display: flex;
+  justify-content: space-between;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  align-items: center;
+  padding: 0 20px;
+  background: #FFFFFF;
+}
+#add-funnel #funnel-import,
+#add-funnel #funnel-title-input {
+  padding: 40px;
+}
+#add-funnel #funnel-import h1,
+#add-funnel #funnel-title-input h1 {
+  text-align: center;
+  font-weight: 200;
+  margin-bottom: 40px;
+}
+#add-funnel #funnel-import #import-file,
+#add-funnel #funnel-title-input #import-file {
+  padding: 40px;
+  border: 2px dashed rgba(16, 38, 64, 0.15);
+  background: #FFFFFF;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  border-radius: 5px;
+  margin: auto;
+  display: block;
+}
+#add-funnel #funnel-import p.error,
+#add-funnel #funnel-title-input p.error {
+  color: #e91f4f;
+  text-align: center;
+}
+#add-funnel #funnel-import #title,
+#add-funnel #funnel-title-input #title {
+  font-size: 26px;
+  width: 100%;
+  text-align: center;
+  border-radius: 0;
+  border-width: 0 0 1px 0;
+  box-shadow: none;
+}
+#add-funnel #funnel-import .submit,
+#add-funnel #funnel-title-input .submit {
+  text-align: center;
+}
+#add-funnel #funnel-import > p,
+#add-funnel #funnel-title-input > p {
+  text-align: center;
+}
+#add-funnel #funnel-import a.cancel,
+#add-funnel #funnel-title-input a.cancel {
+  font-size: 16px;
   cursor: pointer;
 }
-button.gh-button {
-  border: none;
-  color: #FFFFFF;
-  border-radius: 5px;
-  padding: 6px 10px;
-  font-size: 16px;
-  font-weight: 400;
-}
-button.gh-button.primary {
-  background: #0075FF;
-}
-button.gh-button.primary:hover {
-  background: #005ecc;
-}
-button.gh-button.secondary {
-  border: 1px solid #0075FF;
-  background: #FFFFFF;
-  color: #0075FF;
-  padding: 5px 10px;
-}
-button.gh-button.secondary:hover {
-  color: #005ecc;
-  border-color: #005ecc;
-}
-button.gh-button.danger {
-  background: #E91F4F;
-}
-button.gh-button.danger:hover {
-  background: #c2133d;
-}
-button.gh-button.icon {
-  background: #FFFFFF;
-  border: 1.2px solid rgba(16, 38, 64, 0.15);
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  color: #0075FF;
-}
-button.gh-button.icon svg {
-  width: 20px;
-  height: 20px;
-}
-button.gh-button.icon:hover {
-  border-color: rgba(16, 38, 64, 0.25);
-}
-
-#wpcontent {
-  background-color: #F6F9FB;
-  padding-left: 0;
-}
-
-.editor {
+#add-funnel #templates {
   display: flex;
   flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+}
+#add-funnel #templates .row {
+  display: flex;
+  gap: 20px;
+}
+#add-funnel #templates .row > * {
+  width: 100%;
+}
+#add-funnel #templates .row .template button:not(:focus) {
+  visibility: hidden;
+}
+#add-funnel #templates .row .template.enabled:focus, #add-funnel #templates .row .template.enabled:hover {
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.15);
+}
+#add-funnel #templates .row .template.enabled:focus button, #add-funnel #templates .row .template.enabled:hover button {
+  visibility: visible;
+}
+#add-funnel #templates .row .template.disabled {
+  opacity: 0.8;
+}
+#add-funnel #templates .row .template .inside {
+  padding-top: 0;
+}
+#add-funnel #templates .row .template .template-header {
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#funnel-editor {
+  /* Control panel */
+  /* context menu */
+}
+#funnel-editor .editor {
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 100px);
   position: relative;
 }
-
-.editor-header {
+#funnel-editor .editor-header {
   padding: 8px 12px;
   background-color: #FFFFFF;
   box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
@@ -76,33 +112,30 @@ button.gh-button.icon:hover {
   top: 32px;
   z-index: 999;
 }
-.editor-header .header-stuff {
+#funnel-editor .editor-header .header-stuff {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-grow: 1;
 }
-.editor-header .undo-and-redo,
-.editor-header .publish-actions,
-.editor-header .header-actions {
+#funnel-editor .editor-header .undo-and-redo,
+#funnel-editor .editor-header .publish-actions,
+#funnel-editor .editor-header .header-actions {
   display: flex;
   justify-content: space-between;
   gap: 10px;
   align-items: center;
 }
-
-.undo-and-redo .undo,
-.undo-and-redo .redo {
+#funnel-editor .undo-and-redo .undo,
+#funnel-editor .undo-and-redo .redo {
   cursor: pointer;
   opacity: 0.6;
 }
-
-.undo-and-redo .undo:hover,
-.undo-and-redo .redo:hover {
+#funnel-editor .undo-and-redo .undo:hover,
+#funnel-editor .undo-and-redo .redo:hover {
   opacity: 0.8;
 }
-
-.title-wrap .above-title {
+#funnel-editor .title-wrap .above-title {
   color: #102640;
   opacity: 0.6;
   font-style: normal;
@@ -111,44 +144,42 @@ button.gh-button.icon:hover {
   line-height: 9px;
   text-transform: uppercase;
 }
-.title-wrap .title {
+#funnel-editor .title-wrap .title {
   position: relative;
   cursor: pointer;
   font-size: 20px;
   font-weight: 500;
 }
-.title-wrap input.funnel-title-edit {
+#funnel-editor .title-wrap input.funnel-title-edit {
   border-bottom: 1px solid;
 }
-.title-wrap input.funnel-title-edit:focus {
+#funnel-editor .title-wrap input.funnel-title-edit:focus {
   outline: none;
   box-shadow: none;
 }
-.title-wrap .pencil {
+#funnel-editor .title-wrap .pencil {
   position: absolute;
   margin-left: 10px;
   bottom: 0;
   opacity: 0.3;
   color: #102640;
 }
-.title-wrap .title:hover .pencil {
+#funnel-editor .title-wrap .title:hover .pencil {
   opacity: 0.5;
 }
-
-.flow-and-edit {
+#funnel-editor .flow-and-edit {
   display: flex;
   flex-grow: 1;
   min-height: 400px;
 }
-
-.step-flow {
+#funnel-editor .step-flow {
   display: flex;
   flex-direction: column;
   width: 300px;
   flex-shrink: 0;
   position: relative;
 }
-.step-flow:after {
+#funnel-editor .step-flow:after {
   background: #FFFFFF;
   border-radius: 5px;
   bottom: 0px;
@@ -161,7 +192,7 @@ button.gh-button.icon:hover {
   top: 20px;
   width: 200px;
 }
-.step-flow .steps {
+#funnel-editor .step-flow .steps {
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -173,13 +204,13 @@ button.gh-button.icon:hover {
   align-items: center;
   align-content: center;
 }
-.step-flow .steps .action {
+#funnel-editor .step-flow .steps .action {
   margin: 0 15px;
 }
-.step-flow .steps .step:last-child {
+#funnel-editor .step-flow .steps .step:last-child {
   margin-bottom: 100px;
 }
-.step-flow .add-new-step-wrapper {
+#funnel-editor .step-flow .add-new-step-wrapper {
   background: #F6F9FB;
   bottom: 0;
   margin-top: auto;
@@ -190,7 +221,7 @@ button.gh-button.icon:hover {
   text-align: center;
   z-index: 100;
 }
-.step-flow .add-new-step-wrapper:before {
+#funnel-editor .step-flow .add-new-step-wrapper:before {
   background: linear-gradient(0deg, #F6F9FB 0%, #F6F9FB00 100%);
   bottom: 100%;
   content: "";
@@ -201,51 +232,43 @@ button.gh-button.icon:hover {
   position: absolute;
   width: 100%;
 }
-
-.flow-label {
+#funnel-editor .flow-label {
   margin: 30px auto 0;
   position: relative;
   z-index: 99;
   text-align: center;
   font-weight: 500;
 }
-
-.flow-and-edit #control-panel,
-.flow-and-edit .step-edit,
-.flow-and-edit .step-errors,
-.flow-and-edit .step-add {
+#funnel-editor .flow-and-edit #control-panel,
+#funnel-editor .flow-and-edit .step-edit,
+#funnel-editor .flow-and-edit .step-errors,
+#funnel-editor .flow-and-edit .step-add {
   width: 100%;
 }
-
-.step-errors {
+#funnel-editor .step-errors {
   padding: 0 20px;
   box-sizing: border-box;
 }
-
-li.step-error {
+#funnel-editor li.step-error {
   padding: 5px 10px;
-  background: #E91F4F;
+  background: #e91f4f;
   color: #FFFFFF;
   border-radius: 5px;
 }
-
-.step-edit {
+#funnel-editor .step-edit {
   box-sizing: border-box;
   display: flex;
   padding: 20px;
   gap: 20px;
 }
-
-.step-edit .settings {
+#funnel-editor .step-edit .settings {
   width: 100%;
 }
-
-.step-edit .actions-and-notes {
+#funnel-editor .step-edit .actions-and-notes {
   width: 250px;
   flex-shrink: 0;
 }
-
-#dynamic-step-settings .gh-loader {
+#funnel-editor #dynamic-step-settings .gh-loader {
   display: block;
   margin: 50px auto;
   font-size: 15px;
@@ -260,9 +283,8 @@ li.step-error {
   -ms-transform: translateZ(0);
   transform: translateZ(0);
 }
-
-.step-flow .step-placeholder,
-.step-flow .steps .step {
+#funnel-editor .step-flow .step-placeholder,
+#funnel-editor .step-flow .steps .step {
   display: flex;
   justify-content: space-between;
   background: #FFFFFF;
@@ -274,22 +296,19 @@ li.step-error {
   min-height: 52px;
   cursor: pointer;
 }
-
-.step-flow .steps .step.has-errors {
-  border: 1px solid #E91F4F;
+#funnel-editor .step-flow .steps .step.has-errors {
+  border: 1px solid #e91f4f;
 }
-.step-flow .steps .step.has-errors .step-type {
-  color: #E91F4F;
+#funnel-editor .step-flow .steps .step.has-errors .step-type {
+  color: #e91f4f;
 }
-
-.step-flow .text-helper {
+#funnel-editor .step-flow .text-helper {
   text-align: center;
 }
-
-.step-flow .until-helper,
-.step-flow .then-helper,
-.step-flow .or-helper {
-  background: #6C19AD;
+#funnel-editor .step-flow .until-helper,
+#funnel-editor .step-flow .then-helper,
+#funnel-editor .step-flow .or-helper {
+  background: #6c19ad;
   color: #FFFFFF;
   display: inline-block;
   padding: 2px 8px;
@@ -298,76 +317,62 @@ li.step-error {
   border-radius: 5px;
   z-index: 999;
 }
-
-.step-flow .then-helper {
-  background: #9ECE38;
+#funnel-editor .step-flow .then-helper {
+  background: #9ece38;
   margin: auto auto;
 }
-
-.step-flow .until-helper {
-  background: #F58115;
+#funnel-editor .step-flow .until-helper {
+  background: #f58115;
   margin: auto auto;
 }
-
-.step-flow .step-placeholder {
+#funnel-editor .step-flow .step-placeholder {
   border-style: none;
   opacity: 0.1;
   background: #000;
   margin: auto;
 }
-
-.step-flow .step .icon {
+#funnel-editor .step-flow .step .icon {
   display: flex;
   align-items: center;
   margin-right: 8px;
   width: 32px;
   height: 32px;
 }
-
-.step {
+#funnel-editor .step {
   position: relative;
 }
-
-.step-flow .step .icon-svg svg {
+#funnel-editor .step-flow .step .icon-svg svg {
   margin-right: 10px;
   width: 32px;
   height: 32px;
 }
-
-.add-step.benchmark .step-icon-svg svg,
-.step.benchmark .icon-svg svg,
-.step.benchmark .icon .dashicons {
-  color: #F58115;
+#funnel-editor .add-step.benchmark .step-icon-svg svg,
+#funnel-editor .step.benchmark .icon-svg svg,
+#funnel-editor .step.benchmark .icon .dashicons {
+  color: #f58115;
 }
-
-.add-step.action .step-icon-svg svg,
-.step.action .icon-svg svg,
-.step.action .icon .dashicons {
-  color: #9ECE38;
+#funnel-editor .add-step.action .step-icon-svg svg,
+#funnel-editor .step.action .icon-svg svg,
+#funnel-editor .step.action .icon .dashicons {
+  color: #9ece38;
 }
-
-.step.benchmark .details .step-type {
-  color: #F58115;
+#funnel-editor .step.benchmark .details .step-type {
+  color: #f58115;
 }
-
-.step.action .details .step-type {
-  color: #9ECE38;
+#funnel-editor .step.action .details .step-type {
+  color: #9ece38;
 }
-
-.step.benchmark.active {
-  border-color: #F58115;
+#funnel-editor .step.benchmark.active {
+  border-color: #f58115;
 }
-
-.step.action.active {
-  border-color: #9ECE38;
+#funnel-editor .step.action.active {
+  border-color: #9ece38;
 }
-
-.step-flow .steps .step.active {
+#funnel-editor .step-flow .steps .step.active {
   border-width: 2px;
   padding: 9px;
 }
-
-.step-status:before {
+#funnel-editor .step-status:before {
   color: white;
   font-size: 8px;
   position: absolute;
@@ -379,24 +384,22 @@ li.step-error {
   padding: 3px;
   border-radius: 3px;
 }
-.step-status.config-error:before {
-  background: #E91F4F;
+#funnel-editor .step-status.config-error:before {
+  background: #e91f4f;
   content: "Error";
 }
-.step-status.new:before {
-  background: #9ECE38;
+#funnel-editor .step-status.new:before {
+  background: #9ece38;
   content: "New";
 }
-.step-status.edited:before {
-  background: #0075FF;
+#funnel-editor .step-status.edited:before {
+  background: #0075ff;
   content: "Edited";
 }
-
-.step:hover .step-menu {
+#funnel-editor .step:hover .step-menu {
   display: flex;
 }
-
-.step-menu {
+#funnel-editor .step-menu {
   align-items: center;
   display: none;
   justify-content: center;
@@ -406,10 +409,10 @@ li.step-error {
   right: 0rem;
   width: 2rem;
 }
-.step-menu svg {
+#funnel-editor .step-menu svg {
   fill: #0005;
 }
-.step-menu ul {
+#funnel-editor .step-menu ul {
   background: #FFF;
   border: 1px solid #0002;
   border-radius: 3px;
@@ -422,40 +425,35 @@ li.step-error {
   top: 90%;
   z-index: 1000;
 }
-.step-menu ul li {
+#funnel-editor .step-menu ul li {
   margin: 0;
   padding: 0.236rem 0.382rem;
   white-space: nowrap;
 }
-.step-menu ul li:hover {
+#funnel-editor .step-menu ul li:hover {
   background: #0001;
 }
-
-.step .details {
+#funnel-editor .step .details {
   width: 165px;
 }
-
-.step .details .step-title {
+#funnel-editor .step .details .step-title {
   font-style: normal;
   font-weight: normal;
   font-size: 13px;
   line-height: 15px;
 }
-
-.step .details .step-type {
+#funnel-editor .step .details .step-type {
   font-style: normal;
   font-weight: 500;
   font-size: 8px;
   text-transform: uppercase;
 }
-
-.type-select {
+#funnel-editor .type-select {
   display: flex;
   justify-content: center;
   padding: 20px;
 }
-
-.type-select button {
+#funnel-editor .type-select button {
   background: #FFFFFF;
   box-sizing: border-box;
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
@@ -463,98 +461,80 @@ li.step-error {
   cursor: pointer;
   border: 2px solid #FFFFFF;
 }
-
-.type-select button:first-child {
+#funnel-editor .type-select button:first-child {
   border-radius: 5px 0 0 5px;
 }
-
-.type-select button:last-child {
+#funnel-editor .type-select button:last-child {
   border-radius: 0 5px 5px 0;
 }
-
-.type-select button.actions.active {
-  border: 2px solid #9ECE38;
+#funnel-editor .type-select button.actions.active {
+  border: 2px solid #9ece38;
 }
-
-.type-select button.benchmarks.active {
-  border: 2px solid #F58115;
+#funnel-editor .type-select button.benchmarks.active {
+  border: 2px solid #f58115;
 }
-
-.step-add .types {
+#funnel-editor .step-add .types {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   padding: 20px 0 0 20px;
 }
-
-.step-flow .add-step,
-.step-add .types .add-step {
+#funnel-editor .step-flow .add-step,
+#funnel-editor .step-add .types .add-step {
   width: 100px;
   display: flex;
   align-items: center;
   flex-direction: column;
 }
-
-.step-flow .add-step .step-icon,
-.step-add .types .add-step .step-icon {
+#funnel-editor .step-flow .add-step .step-icon,
+#funnel-editor .step-add .types .add-step .step-icon {
   background: #FFFFFF;
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
   border-radius: 7px;
   padding: 5px;
   width: 50px;
 }
-
-.step-flow .add-step .step-icon-svg,
-.step-add .types .add-step .step-icon-svg {
+#funnel-editor .step-flow .add-step .step-icon-svg,
+#funnel-editor .step-add .types .add-step .step-icon-svg {
   background: #FFFFFF;
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
   border-radius: 7px;
   padding: 10px;
   /*width: 50px;*/
 }
-
-.step-flow .add-step .step-icon-svg svg,
-.step-add .types .add-step .step-icon-svg svg {
+#funnel-editor .step-flow .add-step .step-icon-svg svg,
+#funnel-editor .step-add .types .add-step .step-icon-svg svg {
   vertical-align: middle;
   height: 40px;
   width: 40px;
 }
-
-.add-step p {
+#funnel-editor .add-step p {
   text-align: center;
 }
-
-/* Control panel */
-#control-panel .step-add,
-#control-panel .step-edit {
+#funnel-editor #control-panel .step-add,
+#funnel-editor #control-panel .step-edit {
   position: sticky;
   top: 100px;
 }
-
-#control-panel .panel {
+#funnel-editor #control-panel .panel {
   background: #FFFFFF;
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
   padding: 20px;
   /*margin: 20px;*/
   border-radius: 5px;
 }
-
-#control-panel .panel:not(:first-child) {
+#funnel-editor #control-panel .panel:not(:first-child) {
   margin-top: 20px;
 }
-
-#control-panel label.row-label {
+#funnel-editor #control-panel label.row-label {
   display: block;
   margin-bottom: 10px;
   font-weight: 500;
 }
-
-#control-panel .row:not(:last-child) {
+#funnel-editor #control-panel .row:not(:last-child) {
   margin-bottom: 20px;
 }
-
-/* context menu */
-.step-context-menu {
+#funnel-editor .step-context-menu {
   display: none;
   position: fixed;
   z-index: 999;
@@ -564,63 +544,52 @@ li.step-error {
   border: solid 1px #dfdfdf;
   box-shadow: 1px 1px 2px #cfcfcf;
 }
-
-.step-context-menu--active {
+#funnel-editor .step-context-menu--active {
   display: block;
 }
-
-.step-context-menu__items {
+#funnel-editor .step-context-menu__items {
   list-style: none;
   margin: 0;
   padding: 0;
 }
-
-.step-context-menu__item {
+#funnel-editor .step-context-menu__item {
   display: block;
   margin-bottom: 4px;
 }
-
-.step-context-menu__item:last-child {
+#funnel-editor .step-context-menu__item:last-child {
   margin-bottom: 0;
 }
-
-.step-context-menu__link {
+#funnel-editor .step-context-menu__link {
   display: block;
   padding: 4px 12px;
   color: #0066aa;
   text-decoration: none;
   cursor: pointer;
 }
-
-.step-context-menu__link:hover {
+#funnel-editor .step-context-menu__link:hover {
   color: #fff;
   background-color: #0066aa;
 }
-
-.input-wrap {
+#funnel-editor .input-wrap {
   display: flex;
   justify-content: flex-start;
 }
-
-.input-wrap > *:last-child {
+#funnel-editor .input-wrap > *:last-child {
   border-top-right-radius: 4px !important;
   border-bottom-right-radius: 4px !important;
   border-left: none !important;
 }
-
-.input-wrap > *:nth-child(2):not(:last-child) {
+#funnel-editor .input-wrap > *:nth-child(2):not(:last-child) {
   border-left: none !important;
 }
-
-.input-wrap.input-with-emojis input,
-.input-wrap.input-with-replacements input {
+#funnel-editor .input-wrap.input-with-emojis input,
+#funnel-editor .input-wrap.input-with-replacements input {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
   margin-right: 0;
 }
-
-.input-wrap.input-with-emojis button.emoji-picker-start,
-.input-wrap.input-with-replacements button.replacements-picker-start {
+#funnel-editor .input-wrap.input-with-emojis button.emoji-picker-start,
+#funnel-editor .input-wrap.input-with-replacements button.replacements-picker-start {
   box-shadow: 0 0 0 transparent;
   border-radius: 0;
   border: 1px solid #8c8f94;
@@ -628,31 +597,28 @@ li.step-error {
   color: #2c3338;
   cursor: pointer;
 }
-
-.input-wrap.input-with-emojis button.emoji-picker-start:hover,
-.input-wrap.input-with-replacements button.replacements-picker-start:hover {
+#funnel-editor .input-wrap.input-with-emojis button.emoji-picker-start:hover,
+#funnel-editor .input-wrap.input-with-replacements button.replacements-picker-start:hover {
   background-color: #F6F9FB;
 }
-
-.input-wrap select + input {
+#funnel-editor .input-wrap select + input {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
-.input-wrap input, .input-wrap select {
+#funnel-editor .input-wrap input, #funnel-editor .input-wrap select {
   margin: 0;
 }
-.input-wrap select:first-child {
+#funnel-editor .input-wrap select:first-child {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
-
-.tabs {
+#funnel-editor .tabs {
   /*display: flex;*/
   /*justify-content: center;*/
   border-bottom: 1px solid rgba(16, 38, 64, 0.15);
   padding: 5px 10px 0 10px;
 }
-.tabs .tab {
+#funnel-editor .tabs .tab {
   border-width: 1px 1px 0 1px;
   border-color: rgba(16, 38, 64, 0.15);
   border-style: solid;
@@ -668,17 +634,16 @@ li.step-error {
   background: #F6F9FB;
   cursor: pointer;
 }
-.tabs .tab a {
+#funnel-editor .tabs .tab a {
   color: #2c3338;
 }
-.tabs .tab.active {
+#funnel-editor .tabs .tab.active {
   font-weight: 500;
   border-bottom: 1px solid #fff;
   margin-bottom: -1px;
   background: #FFFFFF;
 }
-
-.publish-actions button {
+#funnel-editor .publish-actions button {
   border: none;
   color: #FFFFFF;
   border-radius: 5px;
@@ -689,84 +654,82 @@ li.step-error {
   font-weight: 400;
   align-items: center;
 }
-.publish-actions button.update-and-launch {
-  background: #9ECE38;
+#funnel-editor .publish-actions button.update-and-launch {
+  background: #9ece38;
 }
-.publish-actions button.update-and-launch svg {
+#funnel-editor .publish-actions button.update-and-launch svg {
   width: 25px;
   height: 25px;
 }
-.publish-actions button.update-and-launch:hover {
+#funnel-editor .publish-actions button.update-and-launch:hover {
   background: #80a92a;
 }
-.publish-actions button.update {
-  background: #0075FF;
+#funnel-editor .publish-actions button.update {
+  background: #0075ff;
 }
-.publish-actions button.update:hover {
+#funnel-editor .publish-actions button.update:hover {
   background: #005ecc;
 }
-.publish-actions button.update svg {
+#funnel-editor .publish-actions button.update svg {
   color: #FFFFFF;
   height: 20px;
   width: 20px;
 }
-.publish-actions button.deactivate {
-  background: #E91F4F;
+#funnel-editor .publish-actions button.deactivate {
+  background: #e91f4f;
 }
-.publish-actions button.deactivate:hover {
+#funnel-editor .publish-actions button.deactivate:hover {
   background: #c2133d;
 }
-.publish-actions button.deactivate svg {
+#funnel-editor .publish-actions button.deactivate svg {
   width: 15px;
   height: 15px;
 }
-
-#email-options.panel label.row-label {
+#funnel-editor #email-options.panel label.row-label {
   margin-bottom: 2px;
 }
-#email-options.panel .row:not(:last-child) {
+#funnel-editor #email-options.panel .row:not(:last-child) {
   margin-bottom: 10px;
 }
-#email-options.panel .email-actions {
+#funnel-editor #email-options.panel .email-actions {
   display: flex;
   gap: 5px;
 }
-#email-options.panel .email-actions .send-test-email {
+#funnel-editor #email-options.panel .email-actions .send-test-email {
   flex-grow: 1;
 }
-#email-options.panel input, #email-options.panel select {
+#funnel-editor #email-options.panel input, #funnel-editor #email-options.panel select {
   width: 100%;
 }
-#email-options.panel #alignment-and-message-type,
-#email-options.panel #alignment {
+#funnel-editor #email-options.panel #alignment-and-message-type,
+#funnel-editor #email-options.panel #alignment {
   display: flex;
   gap: 5px;
   justify-content: space-between;
 }
-
-#email-editor .inline-label {
+#funnel-editor #email-editor .inline-label {
   display: flex;
   gap: 10px;
   border-bottom: 1px solid rgba(16, 38, 64, 0.15);
   align-items: center;
   padding-bottom: 5px;
 }
-#email-editor .inline-label label {
+#funnel-editor #email-editor .inline-label label {
   font-weight: 500;
   font-size: 18px;
 }
-#email-editor .inline-label .input-wrap {
+#funnel-editor #email-editor .inline-label .input-wrap {
   width: 100%;
 }
-#email-editor .inline-label .input-wrap button {
+#funnel-editor #email-editor .inline-label .input-wrap button {
   background: none;
   border: none;
   opacity: 0.5;
 }
-#email-editor .inline-label .input-wrap button:hover, #email-editor .inline-label .input-wrap button:focus {
+#funnel-editor #email-editor .inline-label .input-wrap button:hover, #funnel-editor #email-editor .inline-label .input-wrap button:focus {
   opacity: 1;
 }
-#email-editor .inline-label .input-wrap input {
+#funnel-editor #email-editor .inline-label .input-wrap input {
   width: 100%;
   box-shadow: none;
   border: none;
@@ -774,12 +737,11 @@ li.step-error {
   outline: 0;
   padding: 0;
 }
-
-#advanced-email-options .button-end {
+#funnel-editor #advanced-email-options .button-end {
   display: flex;
   justify-content: flex-end;
 }
-#advanced-email-options .button-end > button {
+#funnel-editor #advanced-email-options .button-end > button {
   box-shadow: 0 0 0 transparent;
   border-radius: 0;
   border: solid #8c8f94;
@@ -789,37 +751,37 @@ li.step-error {
   cursor: pointer;
   padding: 6.5px;
 }
-#advanced-email-options .button-end > button .dashicons {
+#funnel-editor #advanced-email-options .button-end > button .dashicons {
   font-size: 17px;
   height: 17px;
   width: 17px;
 }
-#advanced-email-options .key-value-row {
+#funnel-editor #advanced-email-options .key-value-row {
   display: flex;
 }
-#advanced-email-options .key-value-row:not(:first-of-type) input, #advanced-email-options .key-value-row:not(:first-of-type) button {
+#funnel-editor #advanced-email-options .key-value-row:not(:first-of-type) input, #funnel-editor #advanced-email-options .key-value-row:not(:first-of-type) button {
   border-top: none !important;
 }
-#advanced-email-options .key-value-row > input:first-child {
+#funnel-editor #advanced-email-options .key-value-row > input:first-child {
   border-right: none;
 }
-#advanced-email-options .key-value-row input {
+#funnel-editor #advanced-email-options .key-value-row input {
   flex-grow: 1;
   background: #f9f9f9;
 }
-#advanced-email-options .key-value-row input:focus {
+#funnel-editor #advanced-email-options .key-value-row input:focus {
   background: #FFFFFF;
 }
-#advanced-email-options .key-value-row .input-wrap {
+#funnel-editor #advanced-email-options .key-value-row .input-wrap {
   flex-grow: 2;
 }
-#advanced-email-options .key-value-row input[type=text], #advanced-email-options .key-value-row button {
+#funnel-editor #advanced-email-options .key-value-row input[type=text], #funnel-editor #advanced-email-options .key-value-row button {
   border-radius: 0 !important;
   border-top-right-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
   margin: 0;
 }
-#advanced-email-options .key-value-row > button {
+#funnel-editor #advanced-email-options .key-value-row > button {
   box-shadow: 0 0 0 transparent;
   border-radius: 0;
   border: solid #8c8f94;
@@ -829,65 +791,32 @@ li.step-error {
   cursor: pointer;
   padding: 5px;
 }
-#advanced-email-options .key-value-row > button:hover {
+#funnel-editor #advanced-email-options .key-value-row > button:hover {
   opacity: 1;
 }
-
-#email-creation-choices {
+#funnel-editor #email-creation-choices {
   display: flex;
   justify-content: center;
   gap: 20px;
 }
-#email-creation-choices .panel {
+#funnel-editor #email-creation-choices .panel {
   margin: 0 !important;
   display: flex;
   flex-direction: column;
   align-items: center;
   cursor: pointer;
 }
-#email-creation-choices .panel svg {
+#funnel-editor #email-creation-choices .panel svg {
   height: 50px;
   width: 50px;
-  color: #0075FF;
+  color: #0075ff;
 }
-#email-creation-choices .panel p {
+#funnel-editor #email-creation-choices .panel p {
   text-align: center;
   font-weight: 500;
 }
-#email-creation-choices .panel:hover svg {
+#funnel-editor #email-creation-choices .panel:hover svg {
   color: #005ecc;
-}
-
-.gh-modal {
-  align-items: center;
-  background: rgba(0, 70, 153, 0.618);
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  left: 0;
-  position: fixed;
-  right: 0;
-  top: 0;
-  width: 100%;
-  z-index: 100000;
-}
-.gh-modal-dialog {
-  background: white;
-  border-radius: 1rem;
-  position: relative;
-  height: 70vh;
-  padding: 3rem;
-  width: 70vw;
-}
-.gh-modal-button-close-top {
-  position: absolute;
-  right: 1rem;
-  top: 1rem;
-}
-.gh-modal-confirmation-buttons {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
 }
 
 /*# sourceMappingURL=funnel-editor-v4.css.map */

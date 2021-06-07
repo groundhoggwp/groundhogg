@@ -193,16 +193,18 @@ function get_db( $name ) {
 /**
  * @return string
  */
-function last_db_error(){
+function last_db_error() {
 	global $wpdb;
+
 	return $wpdb->last_error;
 }
 
 /**
  * @return string
  */
-function last_db_query(){
+function last_db_query() {
 	global $wpdb;
+
 	return $wpdb->last_query;
 }
 
@@ -5043,14 +5045,16 @@ add_filter( 'mce_external_plugins', __NAMESPACE__ . '\add_tiny_mce_plugin' );
 // register new button in the editor
 function register_mce_button( $buttons ) {
 	array_push( $buttons, 'groundhoggreplacementbtn', 'groundhoggemojibtn' );
-var_dump($buttons);
+	var_dump( $buttons );
+
 	return $buttons;
 }
+
 /**
-* Returns an array of all the meta keys in a table.
-*
-* @return array
-*/
+ * Returns an array of all the meta keys in a table.
+ *
+ * @return array
+ */
 function get_keys() {
 	global $wpdb;
 	$table = get_db( 'contactmeta' );
@@ -5060,16 +5064,83 @@ function get_keys() {
 	);
 
 	$key_array = array_combine( $keys, $keys );
+
 	return $key_array;
 }
 
-function get_pages_list()
-{
-	$pages = get_pages(); 
-	$lists_page = array();
-  	foreach ( $pages as $page ) {
-    $lists_page[] = get_page_link( $page->ID );
-  }
-  return $lists_page;
-}
 add_filter( 'mce_buttons', __NAMESPACE__ . '\register_mce_button' );
+
+function get_pages_list() {
+	$pages      = get_pages();
+	$lists_page = array();
+	foreach ( $pages as $page ) {
+		$lists_page[] = get_page_link( $page->ID );
+	}
+
+	return $lists_page;
+}
+
+/**
+ * Creates a relationship between two objects
+ *
+ * @param $primary   Base_Object
+ * @param $secondary Base_Object
+ *
+ * @return bool
+ */
+function create_object_relationship( $primary, $secondary ) {
+	return (bool) get_db( 'object_relationships' )->add( [
+		'primary_object_id'     => $primary->get_id(),
+		'primary_object_type'   => $primary->get_object_type,
+		'secondary_object_id'   => $secondary->get_id(),
+		'secondary_object_type' => $secondary->get_object_type,
+	] );
+}
+
+/**
+ * Delete a relationship between two objects
+ *
+ * @param Base_Object $primary
+ * @param Base_Object $secondary
+ *
+ * @return bool
+ */
+function delete_object_relationship( $primary, $secondary ) {
+	return get_db( 'object_relationships' )->delete( [
+		'primary_object_id'     => $primary->get_id(),
+		'primary_object_type'   => $primary->get_object_type,
+		'secondary_object_id'   => $secondary->get_id(),
+		'secondary_object_type' => $secondary->get_object_type,
+	] );
+}
+
+
+/**
+ * Delete a relationship between two objects
+ *
+ * @param Base_Object $primary
+ * @param Base_Object $secondary
+ *
+ * @return bool
+ */
+function has_object_relationship( $primary, $secondary ) {
+	return get_db( 'object_relationships' )->exists( [
+		'primary_object_id'     => $primary->get_id(),
+		'primary_object_type'   => $primary->get_object_type,
+		'secondary_object_id'   => $secondary->get_id(),
+		'secondary_object_type' => $secondary->get_object_type,
+	] );
+}
+
+/**
+ * Get relationships for an object
+ *
+ * @param Base_Object $object
+ * @param bool        $is_primary
+ */
+function get_object_relationships( $object, $is_primary = true ) {
+	return get_db( 'object_relationships' )->query( [
+		$is_primary ? 'primary_object_id' : 'secondary_object_id'     => $object->get_id(),
+		$is_primary ? 'primary_object_type' : 'secondary_object_type' => $object->get_object_type,
+	] );
+}

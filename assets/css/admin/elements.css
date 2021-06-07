@@ -1,3 +1,95 @@
+#wpcontent {
+  background-color: #F6F9FB;
+  padding-left: 0;
+}
+
+.pill {
+  background: rgba(0, 117, 255, 0.07);
+  border-radius: 5px;
+  margin: 0 5px 5px 0;
+  display: inline-block;
+  padding: 3px 8px;
+}
+.pill.orange {
+  background: rgba(245, 129, 21, 0.5);
+}
+.pill.blue {
+  background: rgba(0, 117, 255, 0.5);
+}
+.pill.green {
+  background: rgba(158, 206, 56, 0.5);
+}
+.pill.red {
+  background: rgba(233, 31, 79, 0.5);
+}
+
+.gh-panel {
+  background: #FFFFFF;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  /*margin: 20px;*/
+  border-radius: 5px;
+}
+.gh-panel .inside {
+  padding: 20px;
+}
+
+.wp-core-ui select {
+  vertical-align: initial;
+}
+
+button {
+  cursor: pointer;
+}
+button.gh-button {
+  border: none;
+  color: #FFFFFF;
+  border-radius: 5px;
+  padding: 6px 10px;
+  font-size: 16px;
+  font-weight: 400;
+}
+button.gh-button:disabled {
+  opacity: 0.5;
+  cursor: initial;
+}
+button.gh-button.primary {
+  background: #0075ff;
+}
+button.gh-button.primary:hover:not(:disabled) {
+  background: #005ecc;
+}
+button.gh-button.secondary {
+  border: 1px solid rgba(0, 117, 255, 0.6);
+  background: #FFFFFF;
+  color: #0075ff;
+  padding: 5px 10px;
+}
+button.gh-button.secondary:hover:not(:disabled) {
+  color: #005ecc;
+  border-color: #0075ff;
+}
+button.gh-button.danger {
+  background: #e91f4f;
+}
+button.gh-button.danger:hover:not(:disabled) {
+  background: #c2133d;
+}
+button.gh-button.icon {
+  background: #FFFFFF;
+  border: 1.2px solid rgba(16, 38, 64, 0.15);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  color: #0075ff;
+}
+button.gh-button.icon svg {
+  width: 20px;
+  height: 20px;
+}
+button.gh-button.icon:hover:not(:disabled) {
+  border-color: rgba(16, 38, 64, 0.25);
+}
+
 .search-options-widget-wrap {
   position: relative;
 }
@@ -47,8 +139,40 @@
   cursor: pointer;
 }
 .search-options-widget-wrap .search-options-widget .search-options .option.focused, .search-options-widget-wrap .search-options-widget .search-options .option:hover {
-  background: #0075FF;
+  background: #0075ff;
   color: #FFFFFF;
+}
+
+.gh-modal {
+  align-items: center;
+  background: rgba(0, 70, 153, 0.618);
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 100%;
+  z-index: 100000;
+}
+.gh-modal-dialog {
+  background: white;
+  border-radius: 1rem;
+  position: relative;
+  height: 70vh;
+  padding: 3rem;
+  width: 70vw;
+}
+.gh-modal-button-close-top {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+}
+.gh-modal-confirmation-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
 }
 
 /*# sourceMappingURL=elements.css.map */

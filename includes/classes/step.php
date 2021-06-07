@@ -496,29 +496,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return $result;
 	}
 
-
-	/**
-	 * Output the HTML of a step.
-	 */
-	public function sortable_item() {
-		if ( has_action( "groundhogg/steps/{$this->get_type()}/sortable" ) ) {
-			do_action( "groundhogg/steps/{$this->get_type()}/sortable", $this );
-		} else {
-			do_action( "groundhogg/steps/error/sortable", $this );
-		}
-	}
-
-	/**
-	 * Output the HTML of a step.
-	 */
-	public function html() {
-		if ( has_action( "groundhogg/steps/{$this->get_type()}/html" ) ) {
-			do_action( "groundhogg/steps/{$this->get_type()}/html", $this );
-		} else {
-			do_action( "groundhogg/steps/error/html", $this );
-		}
-	}
-
 	/**
 	 * Output icon html
 	 */
@@ -564,6 +541,20 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return apply_filters( "groundhogg/steps/{$this->get_type()}/export", [], $this );
 	}
 
+	public function get_as_array() {
+		return apply_filters( "groundhogg/{$this->get_object_type()}/get_as_array", [
+			'ID'     => $this->get_id(),
+			'data'   => $this->data,
+			'meta'   => $this->meta,
+			'export' => $this->export(),
+		] );
+	}
+
+	/**
+	 * Import any contextual args from the given template
+	 *
+	 * @param array $import_args
+	 */
 	public function import( $import_args = [] ) {
 		do_action( "groundhogg/steps/{$this->get_type()}/import", $import_args, $this );
 	}
@@ -590,81 +581,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return false;
 	}
 
-	/**
-	 * Get the HTML of the step and return it.
-	 *
-	 * @return false|string
-	 */
-	public function __toString() {
-		ob_start();
-
-		$this->html();
-
-		$html = ob_get_clean();
-
-		return $html;
-	}
-
-	/**
-	 * Return whether or not the current action can run.
-	 * This was implement so that WPMU could be effectively implemented with the GLOBAL DB option enabled.
-	 *
-	 * Always return true if not a multisite or multisite global is not enabled
-	 * otherwise compare the current blog ID to the blg ID associated with the step.
-	 *
-	 * @deprecated
-	 */
 	public function can_run() {
-
-		if ( Plugin::$instance->settings->is_global_multisite() ) {
-
-			$blog_id = $this->get_meta( 'blog_id' );
-
-			/* all blogs */
-			if ( ! $blog_id ) {
-
-				return true;
-
-				/* Current blog */
-			} else if ( intval( $blog_id ) === get_current_blog_id() ) {
-
-				return true;
-
-				/* Wrong Blog */
-			} else {
-
-				return false;
-
-			}
-
-		}
-
 		return true;
-
-	}
-
-	/**
-	 * Restore the process to the current blog.
-	 *
-	 * @deprecated since 2.0
-	 */
-	public function restore_current_blog() {
-		if ( Plugin::$instance->settings->is_global_multisite() && ms_is_switched() ) {
-			restore_current_blog();
-		}
-	}
-
-	/**
-	 * Switches to the blog which the step can run on.
-	 *
-	 * @deprecated since 2.0
-	 */
-	public function switch_to_blog() {
-		if ( Plugin::$instance->settings->is_global_multisite() ) {
-			$blog_id = $this->get_meta( 'blog_id' );
-			if ( $blog_id && intval( $blog_id ) !== get_current_blog_id() ) {
-				switch_to_blog( $blog_id );
-			}
-		}
 	}
 }
