@@ -397,19 +397,10 @@
 
         switch (true) {
           case ($(e.target).is('.step-menu-move-up')) :
-<<<<<<< HEAD
-            window.console.log('.step-menu-move-up');
             self.moveStepUp(step)
             break
           case ($(e.target).is('.step-menu-move-down')) :
-            window.console.log('.step-menu-move-down');
             self.moveStepDown(step)
-=======
-            window.console.log('.step-menu-move-up')
-            break
-          case ($(e.target).is('.step-menu-move-down')) :
-            window.console.log('.step-menu-move-down')
->>>>>>> 5df49735f55a9c6ff947d8ff3e5758cd6f3fd686
             break
           case ($(e.target).is('.step-menu-new-step-before')) :
             window.console.log('.step-menu-new-step-before')
