@@ -122,7 +122,7 @@ class Emails_Api extends Base_Object_Api {
 	}
 
 	public function read_permissions_callback() {
-		return current_user_can( 'send_emails' );
+		return current_user_can( 'edit_emails' );
 	}
 
 	public function update_permissions_callback() {

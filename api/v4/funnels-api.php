@@ -81,7 +81,7 @@ class Funnels_Api extends Base_Object_Api {
 	 * @return bool
 	 */
 	public function read_permissions_callback() {
-		return current_user_can( 'view_funnels' );
+		return current_user_can( 'export_funnels' );
 	}
 
 	/**
