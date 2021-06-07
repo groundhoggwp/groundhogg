@@ -392,13 +392,17 @@
       $doc.on('click', '.step-flow .steps .step', function (e) {
 
         const $step = $(this)
+        const step = self.funnel.steps
+            .find(step => step.ID === parseInt($step.data('id')))
 
         switch (true) {
           case ($(e.target).is('.step-menu-move-up')) :
             window.console.log('.step-menu-move-up');
+            self.moveStepUp(step)
             break
           case ($(e.target).is('.step-menu-move-down')) :
             window.console.log('.step-menu-move-down');
+            self.moveStepDown(step)
             break
           case ($(e.target).is('.step-menu-new-step-before')) :
             window.console.log('.step-menu-new-step-before');
@@ -407,10 +411,7 @@
             window.console.log('.step-menu-new-step-after');
             break
           case ($(e.target).is('.step-menu-duplicate')) :
-            const stepToCopy = self.funnel.steps
-              .find(step => step.ID === parseInt($step.data('id')))
-
-            const newStep = copyObject(stepToCopy)
+            const newStep = copyObject(step)
             newStep.ID = uniqid()
             self.addStep(newStep)
             break
@@ -1070,6 +1071,33 @@
       this.renderStepFlow()
 
       this.autoSaveEditedFunnel()
+    },
+
+    moveStep(step, direction) {
+      if (!step) {
+        return
+      }
+
+      const move = 'up' === direction ? -1.1 : 1.1;
+
+      this.saveUndoState()
+
+      step.data.step_order = step.data.step_order + move;
+
+      window.console.log('steps', this.funnel.steps);
+
+      this.fixStepOrders()
+      this.renderStepFlow()
+
+      this.autoSaveEditedFunnel()
+    },
+
+    moveStepUp (step) {
+      this.moveStep(step, 'up')
+    },
+
+    moveStepDown (step) {
+      this.moveStep(step, 'down')
     },
 
     fixStepOrders () {
