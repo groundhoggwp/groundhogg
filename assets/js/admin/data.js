@@ -73,8 +73,6 @@
 
     hasItems (itemIds) {
 
-      console.log(itemIds)
-
       if (!itemIds) {
         return this.items.length > 0
       }

@@ -2276,7 +2276,7 @@
 
       title ({ ID, data, meta }) {
 
-        const { tags, condition } = meta
+        let { tags, condition } = meta
         tags = tags.map(id => parseInt(id))
 
         if (!tags) {
