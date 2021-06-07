@@ -18,16 +18,16 @@
     init () {
 
       const handleUpdateFilters = (filters) => {
-        console.log(filters)
         this.filters = filters
         getContacts(filters)
-        // updateUrl(filters)
       }
 
       this.filters = Groundhogg.filters.current
-      if (searches.length === 0) {
+      if (this.filters) {
         this.filtersEnabled = true
+        $('.contact-quick-search').hide()
       }
+
       this.filtersApp = createFilters('#search-filters', this.filters, handleUpdateFilters)
       this.initSavedSearches()
       this.mount()
@@ -59,12 +59,13 @@
 			<div class="enable-filters-wrap">
 				<button class="enable-filters white"><span class="dashicons dashicons-filter"></button>
 			</div>
-			<div class="seach-filters-warp">
+			<div class="search-filters-wrap">
 				<div id="search-filters"></div>
 				<div class="search-contacts-wrap">
 					<button id="search-contacts" class="button button-primary">Search</button>
 				</div>
-			</div>`
+			</div>
+        `
       }
 
       //language=HTML
@@ -88,6 +89,11 @@
 
       const enableFilters = () => {
         this.filtersEnabled = !this.filtersEnabled
+        if (this.filtersEnabled) {
+          $('.contact-quick-search').hide()
+        } else {
+          $('.contact-quick-search').show()
+        }
         remount()
       }
 

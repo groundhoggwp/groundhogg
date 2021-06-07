@@ -11,6 +11,8 @@
     searchOptionsWidget
   } = Groundhogg.element
 
+  const { tagPicker, linkPicker } = Groundhogg.pickers
+
   const Filters = {
     view () {},
     edit () {},
@@ -180,8 +182,6 @@
 
       const updateFilter = (opts) => {
 
-        console.log(opts)
-
         this.tempFilterSettings = {
           ...this.tempFilterSettings,
           ...opts
@@ -209,11 +209,6 @@
       const deleteFilter = (group, key) => {
         group = group >= 0 ? group : self.currentGroup
         key = key >= 0 ? key : self.currentFilter
-
-        console.log({
-          group,
-          key,
-        })
 
         // remove the filter
         self.filters[group].splice(key, 1)
@@ -283,8 +278,6 @@
       }
 
       $(`${el} .filter-view`).on('keydown', function (e) {
-
-        console.log(this)
 
         switch (e.key) {
           case 'Enter':
@@ -533,12 +526,12 @@
       switch (compare) {
         default:
         case 'in':
-          return `<b>Optin status</b> is one of ${orList(value.map(v => `<b>${optin_status[v]}</b>`))}`
+          return `<b>Optin status</b> is ${orList(value.map(v => `<b>${optin_status[v]}</b>`))}`
         case 'not_in':
-          return `<b>Optin status</b> is not one of ${orList(value.map(v => `<b>${optin_status[v]}</b>`))}`
+          return `<b>Optin status</b> is not ${orList(value.map(v => `<b>${optin_status[v]}</b>`))}`
       }
     },
-    edit ({ compare, value }, filterGroupIndex, filterIndex) {
+    edit ({ compare, value }) {
       // language=html
       return `
 		  ${select({
@@ -587,12 +580,12 @@
       switch (compare) {
         default:
         case 'in':
-          return `<b>Optin status</b> is one of ${orList(value.map(v => `<b>${ownerName(v)}</b>`))}`
+          return `<b>Contact owner</b> is ${orList(value.map(v => `<b>${ownerName(v)}</b>`))}`
         case 'not_in':
-          return `<b>Optin status</b> is not one of ${orList(value.map(v => `<b>${ownerName(v)}</b>`))}`
+          return `<b>Contact owner</b> is not ${orList(value.map(v => `<b>${ownerName(v)}</b>`))}`
       }
     },
-    edit ({ compare, value }, filterGroupIndex, filterIndex) {
+    edit ({ compare, value }) {
 
       var values = {}
       $.map(owners, function (user, index) {
@@ -635,68 +628,8 @@
     }
   }, 'Owner')
 
-  //filter by meta data
-  registerFilter('meta_data', 'contact', {
-    view ({ compare, value, value2 }, filterGroupIndex, filterIndex) {
-      //language=HTMl
-      switch (compare) {/*
-          case 'before':
-            return `is before <b>${value}</b>`
-          case 'after':
-            return `is after <b>${value}</b>`
-          case 'between':
-            return `is between <b>${value}</b> and <b>${value2}</b>`*/
-      }
-      return `selected value <b>${value}</b>`
-    },
-    edit ({ compare, value }, filterGroupIndex, filterIndex) {
-
-      var defaultValues = {}
-      $.map(meta_keys, function (value, index) {
-        defaultValues[index] = value
-      })
-      //console.log(defaultValues);
-      // language=html
-      return `${select({
-		  id: 'filter-compare',
-		  name: 'compare'
-	  }, {
-		  equal: 'Equal',
-		  notequal: 'Not Equal',
-		  greaterthan: 'Greater Than',
-		  lessthan: 'Less Than',
-		  contains: 'Contains',
-		  doesnotcontain: 'Does Not Contains',
-	  }, compare)} ${select({
-			  id: 'meta_key',
-			  name: 'value',
-			  class: 'meta_key',
-		  },
-		  defaultValues
-	  )} ${input({
-		  id: 'filter-value',
-		  name: 'value',
-		  value: ''
-	  })}`
-    },
-    onMount (filter, updateFilter) {
-      $('#filter-value, #meta_key, #filter-value').on('change', function (e) {
-        const $el = $(this)
-        console.log($el.val())
-        updateFilter({
-          [$el.prop('name')]: $el.val()
-        })
-      })
-    },
-    defaults: {
-      compare: 'equals',
-      /*  value: '',
-        value2: ''*/
-    }
-  }, 'Meta Data')
-
   const standardActivityDateFilterOnMount = (filter, updateFilter) => {
-    $('#filter-date-range, #filter-date, #filter-date2 ,#filter-page-url').on('change', function (e) {
+    $('#filter-date-range, #filter-date, #filter-date2, #filter-page-url').on('change', function (e) {
       const $el = $(this)
       updateFilter({
         [$el.prop('name')]: $el.val()
@@ -712,110 +645,96 @@
     })
   }
 
-  function getHomeUrl() {
-  var href = window.location.href;
-  var index = href.indexOf('/wp-admin');
-  var homeUrl = href.substring(0, index);
-  return homeUrl;
-}
-
   const dateRanges = {
     '24_hours': 'In the last 24 hours',
     '7_days': 'In the last 7 days',
     '30_days': 'In the last 30 days',
-    '365_days': 'In the last 365 days',
+    '60_days': 'In the last 60 days',
+    '90_days': 'In the last 90 days',
+    '365_days': 'In the last year',
     'custom': 'Custom date range',
   }
 
   //filter by Email Opened
   registerFilter('email_opened', 'activity', {
-    view ({ compare, value, value2 }, filterGroupIndex, filterIndex) {
-      //language=HTMl
-      switch (compare) {/*
-          case 'before':
-            return `is before <b>${value}</b>`
-          case 'after':
-            return `is after <b>${value}</b>`
-          case 'between':
-            return `is between <b>${value}</b> and <b>${value2}</b>`*/
-      }
-      return `selected value <b>${value}</b>`
-    },
-    edit ({ compare, value }, filterGroupIndex, filterIndex) {
+    view ({ page_url, date_range, date, date2 }) {
 
-      /*var defaultValues = {}
-      $.map(meta_keys, function (value, index) {
-        defaultValues[index] = value
-      })*/
-      //console.log(defaultValues);
+      //language=HTMl
+      switch (date_range) {
+        default:
+          return `Visited <b>${page_url}</b> ${dateRanges[date_range].toLowerCase()}`
+        case 'custom':
+          return `Visited <b>${page_url}</b> between <b>${date}</b> and <b>${date2}</b>`
+      }
+
+    },
+    edit ({ email, date_range, date, date2 }) {
+
       // language=html
-      return `${select({
-		  id: 'filter-compare',
-		  name: 'compare'
-	  }, {
-		  anyemail: 'Any Email',
-		  selectedemail: 'Selected Email',
-		  anotheremail: 'Another Email',
-		  thirdemail: 'A Third Email',
-	  }, compare)} ${select({
-			  id: 'meta_key',
-			  name: 'value',
-			  class: 'meta_key',
-		  },
-		  {
-			  '24hours': 'In the last 24 hours',
-			  '7days': 'In the last 7 days',
-			  '30days': 'In the last 30 days',
-			  '365days': 'In the last 365 days',
-			  'custom': 'Custom Date Range',
-		  }
-	  )} ${input({
-		  id: 'filter-value',
-		  name: 'value',
-		  value: ''
-	  })}`
+      return `
+		  ${select({
+			  id: 'filter-email',
+			  name: 'email',
+		  }, {}, email)}
+
+		  ${select({
+			  id: 'filter-date-range',
+			  name: 'date_range'
+		  }, dateRanges, date_range)}
+
+		  ${input({
+			  type: 'date',
+			  value: date,
+			  id: 'filter-date',
+			  className: `date ${date_range === 'custom' ? '' : 'hidden'}`,
+			  name: 'date'
+		  })}
+
+		  ${input({
+			  type: 'date',
+			  value: date2,
+			  id: 'filter-date2',
+			  className: `value ${date_range === 'custom' ? '' : 'hidden'}`,
+			  name: 'date2'
+		  })}`
     },
     onMount (filter, updateFilter) {
       $('#filter-value, #meta_key, #filter-value').on('change', function (e) {
         const $el = $(this)
-        console.log($el.val())
         updateFilter({
           [$el.prop('name')]: $el.val()
         })
       })
     },
     defaults: {
-      compare: 'anyemail',
-      /*  value: '',
-        value2: ''*/
+      date_range: '24_hours',
+      date: '',
+      date2: '',
+      page_url: '',
     }
   }, 'Email Opened')
 
   //filter by Page Visited
   registerFilter('page_visited', 'activity', {
-    view ({  page_url, date_range, date, date2 }, filterGroupIndex, filterIndex) {
-      console.log(page_url);
+    view ({ page_url, date_range, date, date2 }) {
+
       //language=HTMl
       switch (date_range) {
         default:
-          return `<b>${page_url} visited</b> ${dateRanges[date_range]}`
+          return `Visited <b>${page_url}</b> ${dateRanges[date_range].toLowerCase()}`
         case 'custom':
-          return `<b>${page_url} Visited</b> between <b>${date}</b> and <b>${date2}</b>`    }
-    
-    },
-    edit ({ page_url, date_range, date, date2 }, filterGroupIndex, filterIndex) {
+          return `Visited <b>${page_url}</b> between <b>${date}</b> and <b>${date2}</b>`
+      }
 
-      /*var defaultValues = {}
-      $.map(meta_keys, function (value, index) {
-        defaultValues[index] = value
-      })*/
-      //console.log(defaultValues);
-      // language=html
-      return `${select({
+    },
+    edit ({ page_url, date_range, date, date2 }) {
+
+      return `${input({
         id: 'filter-page-url',
-        name: 'page_url'
-      }, pages_lists
-      )} 
+        name: 'page_url',
+        value: page_url
+      })} 
+      
       ${select({
         id: 'filter-date-range',
         name: 'date_range'
@@ -839,27 +758,29 @@
 
     },
     onMount (filter, updateFilter) {
+      linkPicker('#filter-page-url')
       standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
-     time: '24hours',
+      date_range: '24_hours',
       date: '',
       date2: '',
-      page_url : getHomeUrl(),
+      page_url: '',
     }
   }, 'Page Visited')
 
   //filter by User Logged In
   registerFilter('logged_in', 'activity', {
-    view ({ date_range, date, date2 }, filterGroupIndex, filterIndex) {
+    view ({ date_range, date, date2 }) {
       //language=HTMl
       switch (date_range) {
         default:
-          return `<b>Logged in</b> ${dateRanges[date_range]}`
+          return `<b>Logged in</b> ${dateRanges[date_range].toLowerCase()}`
         case 'custom':
-          return `<b>Logged in</b> between <b>${date}</b> and <b>${date2}</b>`    }
+          return `<b>Logged in</b> between <b>${date}</b> and <b>${date2}</b>`
+      }
     },
-    edit ({ date_range, date, date2 }, filterGroupIndex, filterIndex) {
+    edit ({ date_range, date, date2 }) {
 
       return `${select({
         id: 'filter-date-range',
@@ -886,7 +807,7 @@
       standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
-      time: '24hours',
+      date_range: '24_hours',
       date: '',
       date2: '',
     }
@@ -894,15 +815,16 @@
 
   //filter by User Not Logged In
   registerFilter('not_logged_in', 'activity', {
-    view ({ date_range, date, date2 }, filterGroupIndex, filterIndex) {
+    view ({ date_range, date, date2 }) {
       //language=HTMl
       switch (date_range) {
         default:
-          return `<b>Has Not Logged In</b> ${dateRanges[date_range]}`
+          return `<b>Has not logged in</b> ${dateRanges[date_range].toLowerCase()}`
         case 'custom':
-          return `<b>Has Not Logged In</b> between <b>${date}</b> and <b>${date2}</b>`    }
+          return `<b>Has not logged in</b> between <b>${date}</b> and <b>${date2}</b>`
+      }
     },
-    edit ({ date_range, date, date2 }, filterGroupIndex, filterIndex) {
+    edit ({ date_range, date, date2 }) {
       return `${select({
         id: 'filter-date-range',
         name: 'date_range'
@@ -928,7 +850,7 @@
       standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
-      date_range: '24hours',
+      date_range: '24_hours',
       date: '',
       date2: '',
     }
@@ -936,16 +858,16 @@
 
   //filter by User Was Active
   registerFilter('was_active', 'activity', {
-    view ({ date_range, date, date2 }, filterGroupIndex, filterIndex) {
+    view ({ date_range, date, date2 }) {
       //language=HTMl
       switch (date_range) {
         default:
-          return `<b>Was active in</b> ${dateRanges[date_range]}`
+          return `<b>Was active</b> ${dateRanges[date_range]}`
         case 'custom':
-          return `<b>Was active in</b> between <b>${date}</b> and <b>${date2}</b>` 
+          return `<b>Was active</b> between <b>${date}</b> and <b>${date2}</b>`
       }
     },
-    edit( { date_range, date, date2 }, filterGroupIndex, filterIndex) {
+    edit ({ date_range, date, date2 }) {
 
       return `${select({
         id: 'filter-date-range',
@@ -972,7 +894,7 @@
       standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
-      time: '24hours',
+      date_range: '24_hours',
       date: '',
       date2: '',
     }
@@ -980,50 +902,43 @@
 
   //filter By User Was Not Active
   registerFilter('was_not_active', 'activity', {
-    view ({date_range, date, date2}, filterGroupIndex, filterIndex) {
+    view ({ date_range, date, date2 }) {
       //language=HTMl
       switch (date_range) {
         default:
           return `<b>Was not active in</b> ${dateRanges[date_range]}`
         case 'custom':
-          return `<b>Was not active in</b> between <b>${date}</b> and <b>${date2}</b>`    
+          return `<b>Was not active in</b> between <b>${date}</b> and <b>${date2}</b>`
       }
-      return `selected value <b>${compare}</b>`
     },
-    edit ({ date_range, date, date2 }, filterGroupIndex, filterIndex) {
-
-      /*var defaultValues = {}
-      $.map(meta_keys, function (value, index) {
-        defaultValues[index] = value
-      })*/
-      //console.log(defaultValues);
+    edit ({ date_range, date, date2 }) {
       // language=html
       return `${select({
-        id: 'filter-date-range',
-        name: 'date_range'
-      }, dateRanges, date_range)} 
-      
-      ${input({
-        type: 'date',
-        value: date,
-        id: 'filter-date',
-        className: `date ${date_range === 'custom' ? '' : 'hidden'}`,
-        name: 'date'
-      })}
+		  id: 'filter-date-range',
+		  name: 'date_range'
+	  }, dateRanges, date_range)}
 
-      ${input({
-        type: 'date',
-        value: date2,
-        id: 'filter-date2',
-        className: `value ${date_range === 'custom' ? '' : 'hidden'}`,
-        name: 'date2'
-      })}`
+	  ${input({
+		  type: 'date',
+		  value: date,
+		  id: 'filter-date',
+		  className: `date ${date_range === 'custom' ? '' : 'hidden'}`,
+		  name: 'date'
+	  })}
+
+	  ${input({
+		  type: 'date',
+		  value: date2,
+		  id: 'filter-date2',
+		  className: `value ${date_range === 'custom' ? '' : 'hidden'}`,
+		  name: 'date2'
+	  })}`
     },
     onMount (filter, updateFilter) {
       standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
-      time: '24hours',
+      date_range: '24_hours',
       date: '',
       date2: '',
     }
@@ -1031,17 +946,16 @@
 
   //filter by Completed Funnel Action
   registerFilter('completed_funnel_action', 'activity', {
-    view ({ date_range, date, date2 }, filterGroupIndex, filterIndex) {
+    view ({ date_range, date, date2 }) {
       //language=HTMl
       switch (date_range) {
         default:
           return `<b>Completed funnel action in</b> ${dateRanges[date_range]}`
         case 'custom':
-          return `<b>Completed funnel action in</b> between <b>${date}</b> and <b>${date2}</b>` 
+          return `<b>Completed funnel action in</b> between <b>${date}</b> and <b>${date2}</b>`
       }
-      return `selected value <b>${compare}</b>`
     },
-    edit ( { date_range, date, date2 }, filterGroupIndex, filterIndex) {
+    edit ({ date_range, date, date2 }) {
 
       return `${select({
         id: 'filter-date-range',
@@ -1068,15 +982,10 @@
       standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
-      date_range: '24hours',
+      date_range: '24_hours',
       date: '',
       date2: '',
     }
   }, 'Completed Funnel Action')
-
-  //  Filter by Optin Status
-  //  Filter by Contact Owner
-  //  Filter by Tags (complex)
-  //  Filter by Meta Data (complex)
 
 })(jQuery)

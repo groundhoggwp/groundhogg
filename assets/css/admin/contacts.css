@@ -22,7 +22,23 @@
     display: flex;
     justify-content: flex-start;
     /*align-items: center;*/
+    width: 100%;
     gap: 5px;
+}
+
+#search-panel .contact-quick-search{
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+#search-panel .search-filters-wrap{
+    width: 100%;
+}
+
+#search-panel .search-contacts-wrap{
+    display: flex;
+    justify-content: flex-end;
 }
 
 #search-panel button.enable-filters{
