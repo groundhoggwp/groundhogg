@@ -84,7 +84,7 @@ class Funnels extends DB {
 	public function get_column_defaults() {
 		return array(
 			'ID'              => 0,
-			'author'          => 0,
+			'author'          => get_current_user_id(),
 			'title'           => '',
 			'status'          => 'inactive',
 			'date_created'    => current_time( 'mysql' ),

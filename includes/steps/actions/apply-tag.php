@@ -7,7 +7,9 @@ use Groundhogg\Event;
 use Groundhogg\HTML;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use Groundhogg\Tag;
 use function Groundhogg\get_db;
+use function Groundhogg\id_list_to_class;
 use function Groundhogg\validate_tags;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -103,7 +105,7 @@ class Apply_Tag extends Action {
 	 * Process the apply tag step...
 	 *
 	 * @param $contact Contact
-	 * @param $event Event
+	 * @param $event   Event
 	 *
 	 * @return true
 	 */
@@ -115,42 +117,26 @@ class Apply_Tag extends Action {
 
 	/**
 	 * @param array $args
-	 * @param Step $step
+	 * @param Step  $step
 	 */
 	public function import( $args, $step ) {
 		if ( empty( $args['tags'] ) ) {
 			return;
 		}
 
-		$tags = get_db( 'tags' )->validate( $args['tags'] );
+		$tags = validate_tags( $args['tags'] );
 
 		$this->save_setting( 'tags', $tags );
 	}
 
 	/**
 	 * @param array $args
-	 * @param Step $step
+	 * @param Step  $step
 	 *
 	 * @return array
 	 */
 	public function export( $args, $step ) {
-		$args['tags'] = array();
-
-		$tags = wp_parse_id_list( $this->get_setting( 'tags' ) );
-
-		if ( empty( $tags ) ) {
-			return $args;
-		}
-
-		foreach ( $tags as $tag_id ) {
-
-			$tag = get_db( 'tags' )->get( $tag_id );
-
-			if ( $tag ) {
-				$args['tags'][] = $tag->tag_name;
-			}
-
-		}
+		$args['tags'] = id_list_to_class( $step->get_meta( 'tags' ), Tag::class );
 
 		return $args;
 	}

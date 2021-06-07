@@ -8,6 +8,7 @@ use Groundhogg\Step;
 use WP_REST_Server;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
+use function Groundhogg\isset_not_empty;
 use function Groundhogg\map_func_to_attr;
 use function Groundhogg\sanitize_object_meta;
 
@@ -28,6 +29,14 @@ class Funnels_Api extends Base_Object_Api {
 		$route = $this->get_route();
 		$key   = $this->get_primary_key();
 
+		register_rest_route( self::NAME_SPACE, "/{$route}/import", [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'import' ],
+				'permission_callback' => [ $this, 'create_permissions_callback' ]
+			],
+		] );
+
 		register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/commit", [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
@@ -38,9 +47,69 @@ class Funnels_Api extends Base_Object_Api {
 	}
 
 	/**
+	 * Import the provided template, create the new funnel and return the item
+	 *
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return bool|int|\WP_Error|\WP_REST_Response
+	 */
+	public function import( \WP_REST_Request $request ) {
+
+		// Get the template
+		$template = $request->get_json_params();
+
+		// Is this a legacy funnel template or a new template?
+
+		// New template, old templates to not have the 'data' prop
+		if ( isset_not_empty( $template, 'data' ) ) {
+
+			// Create the funnel
+			$funnel = new Funnel();
+
+			$funnel->create( [
+				'title' => $template['data']['title']
+			] );
+
+			// Import the steps with their settings
+			$steps = $template['steps'];
+
+			// Import the steps
+			foreach ( $steps as $_step ) {
+
+				// Override the funnel ID to the newly created one
+				$_step['data'] = array_merge( $_step['data'], [
+					'funnel_id' => $funnel->get_id()
+				] );
+
+				$step = new Step();
+
+				$step->create( $_step['data'] ); // use create method to ensure uniqueness
+				$step->update_meta( $_step['meta'] ); // save all that meta data!
+			}
+
+			// Etc...
+
+		} // Old template from pre 2.5
+		else {
+			$funnel = new Funnel();
+			$result = $funnel->legacy_import( $template );
+
+			if ( is_wp_error( $result ) ) {
+				return $result;
+			}
+		}
+
+		return self::SUCCESS_RESPONSE( [
+			'item' => $funnel
+		] );
+	}
+
+	/**
 	 * Commit the funnel
 	 *
 	 * @param \WP_REST_Request $request
+	 *
+	 * @return \WP_Error|\WP_REST_Response
 	 */
 	public function commit( \WP_REST_Request $request ) {
 

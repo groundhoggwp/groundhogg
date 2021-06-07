@@ -432,7 +432,7 @@ class Funnels_Page extends Admin_Page {
 			$json = $funnel->export();
 
 			$new_funnel = new Funnel();
-			$id         = $new_funnel->import( $json );
+			$id         = $new_funnel->legacy_import( $json );
 
 			$this->add_notice(
 				esc_attr( 'duplicated' ),
@@ -583,7 +583,7 @@ class Funnels_Page extends Admin_Page {
 
 		$funnel = new Funnel();
 
-		return $funnel->import( $import );
+		return $funnel->legacy_import( $import );
 	}
 
 	/**
@@ -1030,7 +1030,7 @@ class Funnels_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		include __DIR__ . '/add-funnel.php';
+		include __DIR__ . '/add.php';
 	}
 
 	public function view() {

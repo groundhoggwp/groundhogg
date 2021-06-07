@@ -340,21 +340,21 @@ class Funnel extends Base_Object_With_Meta {
 	/**
 	 * Import a funnel
 	 *
-	 * @param $import
+	 * @param $template
 	 *
 	 * @return bool|int|\WP_Error
 	 */
-	public function import( $import ) {
+	public function legacy_import( $template ) {
 
-		if ( is_string( $import ) ) {
-			$import = json_decode( $import, true );
+		if ( is_string( $template ) ) {
+			$template = json_decode( $template, true );
 		}
 
-		if ( ! is_array( $import ) || empty( $import ) ) {
+		if ( ! is_array( $template ) || empty( $template ) ) {
 			return new \WP_Error( 'invalid_funnel', 'Invalid funnel markup.' );
 		}
 
-		$title = $import['title'];
+		$title = $template['title'];
 
 		$args = [
 			'title'  => $title,
@@ -368,7 +368,7 @@ class Funnel extends Base_Object_With_Meta {
 			return new \WP_Error( 'db_error', 'Could not add to the DB.' );
 		}
 
-		$steps = $import['steps'];
+		$steps = $template['steps'];
 
 		foreach ( $steps as $i => $step_args ) {
 
@@ -394,14 +394,7 @@ class Funnel extends Base_Object_With_Meta {
 			$step_meta = $step_args['meta'];
 
 			foreach ( $step_meta as $key => $value ) {
-
-				// Replace URL
-				if ( is_string( $value ) ) {
-					$value = search_and_replace_domain( $value );
-				}
-
 				$step->update_meta( $key, $value );
-
 			}
 
 			$import_args = $step_args['args'];

@@ -37,7 +37,7 @@ class Main_Roles extends Roles {
 	 *
 	 * @return mixed|void
 	 */
-	public static function get_owner_roles (){
+	public static function get_owner_roles() {
 		return apply_filters( 'groundhogg/owner_roles', self::$owner_roles );
 	}
 
@@ -263,6 +263,8 @@ class Main_Roles extends Roles {
 			'delete_emails',
 			'edit_emails',
 			'send_emails',
+			'export_emails',
+			'import_emails',
 		);
 
 		return apply_filters( 'groundhogg/roles/caps/emails', $caps );

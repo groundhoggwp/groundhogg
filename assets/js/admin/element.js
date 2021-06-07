@@ -166,11 +166,6 @@
       return `<select ${objectToProps(props)}>${createOptions(options, selected)}</select>`
     },
     option: function (value, text, selected) {
-      if (typeof value === 'object') {
-        value = value.value
-        text = value.text
-      }
-
       //language=HTML
       return `
 		  <option value="${specialChars(value)}" ${selected ? 'selected' : ''}>${text}</option>`
@@ -322,10 +317,10 @@
     if (Array.isArray(options)) {
       options.forEach(option => {
         optionsString.push(Elements.option(
-          option, option,
+          option.value, option.text,
           Array.isArray(selected)
-            ? selected.indexOf(option) !== -1
-            : option === selected))
+            ? selected.indexOf(option.value) !== -1
+            : option.value === selected))
       })
     }
     // Assume object
