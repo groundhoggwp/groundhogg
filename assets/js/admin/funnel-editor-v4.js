@@ -2106,7 +2106,10 @@
       title ({ ID, data, meta }) {
 
         let { tags } = meta
-        tags = tags.map(id => parseInt(id))
+
+        if (tags) {
+          tags = tags.map(id => parseInt(id))
+        }
 
         if (!tags || tags.length === 0) {
           return 'Apply tag'
