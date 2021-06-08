@@ -123,6 +123,12 @@
     return props.join(';')
   }
 
+  function uuid() { // Public Domain/MIT
+    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+  }
+
   /**
    * Convert an object of HTML props into a string
    *
@@ -153,6 +159,16 @@
   }
 
   const Elements = {
+    toggle ({ id, name, className, value, onLabel = 'on', offLabel = 'off', checked }) {
+      //language=HTML
+      return `
+		  <label class="gh-switch ${className}">
+			  <input id="${id}" name="${name}" value="${value}" type="checkbox" ${checked ? 'checked' : ''}>
+			  <span class="slider round"></span>
+			  <span class="on">${onLabel}</span>
+			  <span class="off">${offLabel}</span>
+		  </label>`
+    },
     input (props) {
       props = {
         type: 'text',
@@ -284,7 +300,8 @@
 
     return {
       close,
-      confirm
+      confirm,
+      $modal
     }
   }
 
@@ -661,9 +678,10 @@
     clickInsideElement,
     searchOptionsWidget,
     tinymceElement,
-    modal,
     loadingModal,
-    confirmationModal
+    confirmationModal,
+    uuid,
+    modal
   }
 
 })(jQuery)

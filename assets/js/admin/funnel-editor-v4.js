@@ -12,6 +12,8 @@
     select
   } = Groundhogg.element
 
+  const { formBuilder } = Groundhogg
+
   const { linkPicker, emailPicker, tagPicker } = Groundhogg.pickers
 
   $.fn.serializeFormJSON = function () {
@@ -2731,8 +2733,8 @@
 			</div>`
       },
       onMount ({}) {
-        // const editor = FormBuilder(document.querySelector('#edit-form'),)
-        // editor.init()
+        const editor = formBuilder('#edit-form')
+        editor.init()
       }
     }
   }

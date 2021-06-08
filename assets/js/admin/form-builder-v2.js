@@ -1,12 +1,13 @@
 (function ($) {
 
+  const { toggle, input, inputWithReplacements } = Groundhogg.element
+
   const defaultField = {
-    id: '',
-    className: '',
-    type: '',
-    name: '',
+    className: 'text',
+    type: 'text',
+    name: 'text',
     value: '',
-    label: '',
+    label: 'New field',
     required: false,
   }
 
@@ -36,37 +37,27 @@
     ]
   }
 
-  const Elements = {
-    switch ({ id, name, className, value, onLabel = 'on', offLabel = 'off', checked }) {
-      //language=HTML
-      return `
-		  <label class="gh-switch ${className}">
-			  <input id="${id}" name="${name}" value="${value}" type="checkbox" ${checked ? 'checked' : ''}>
-			  <span class="slider round"></span>
-			  <span class="on">${onLabel}</span>
-			  <span class="off">${offLabel}</span>
-		  </label>`
-    },
-    input ({ id, name, className, type = 'text', value, placeholder }) {
-      return `<input type="${type}" id="${id}" name="${name}" class="${className}" value="${value}" placeholder="${placeholder}"/>`
-    }
-  }
-
   const Settings = {
     basic (label, atts) {
       const { id } = atts
-      return `<label for="${id}">${label}</label> ${Elements.input(atts)}`
+      return `<label for="${id}">${label}</label> <div class="setting">${input(atts)}</div>`
+    },
+    basicWithReplacements (label, atts) {
+      const { id } = atts
+      return `<label for="${id}">${label}</label> ${inputWithReplacements(atts)}`
     },
     required (required) {
       //language=HTML
-      return `<label for="required">Required</label> ${Elements.switch({
+      return `<label for="required">Required</label>
+	  <div class="setting">${toggle({
 		  id: 'required',
 		  name: 'required',
 		  className: 'required',
 		  onLabel: 'Yes',
 		  offLabel: 'No',
 		  checked: required
-	  })}`
+	  })}
+	  </div>`
     },
     label (label) {
       return this.basic('Label', {
@@ -78,10 +69,10 @@
       })
     },
     value (value) {
-      return this.basic('Value', {
+      return this.basicWithReplacements('Value', {
         id: 'value',
         name: 'value',
-        className: 'value',
+        className: 'value regular-text',
         value: value,
         placeholder: ''
       })
@@ -115,7 +106,30 @@
     },
   }
 
-  const Fields = {
+  /**
+   *
+   * @param type
+   * @returns {(*&{advanced(*): [], contentOnMount(*), advancedOnMount(*), name: string, content(*): []})|boolean}
+   */
+  const getFieldType = (type) => {
+    if (!FieldTypes.hasOwnProperty(type)) {
+      return false
+    }
+
+    return {
+      ...FieldTypes.default,
+      ...FieldTypes[type]
+    }
+  }
+
+  const FieldTypes = {
+    default: {
+      name: 'default',
+      content (field) { return []},
+      advanced (field) { return []},
+      contentOnMount (field) {},
+      advancedOnMount (field) {},
+    },
     first: {
       name: 'First Name',
       content (field) {
@@ -159,6 +173,34 @@
           Settings.placeholder(field.placeholder),
         ]
       },
+      contentOnMount (field, updateField) {
+
+      },
+      advanced (field) {
+        return [
+          Settings.value(field.value),
+          Settings.id(field.id),
+          Settings.className(field.className),
+        ]
+      },
+      advancedOnMount (field, updateField) {
+
+      }
+    },
+    phone: {},
+    gdpr: {},
+    terms: {},
+    recaptcha: {},
+    submit: {},
+    text: {
+      name: 'Text',
+      content (field) {
+        return [
+          Settings.required(field.required),
+          Settings.label(field.label),
+          Settings.placeholder(field.placeholder),
+        ]
+      },
       advanced (field) {
         return [
           Settings.value(field.value),
@@ -167,12 +209,6 @@
         ]
       }
     },
-    phone: {},
-    gdpr: {},
-    terms: {},
-    recaptcha: {},
-    submit: {},
-    text: {},
     textarea: {},
     number: {},
     dropdown: {},
@@ -190,7 +226,10 @@
   const Templates = {
 
     settings (field, settingsTab) {
-      const settings = settingsTab === 'advanced' ? Fields[field.type].advanced(field) : Fields[field.type].content(field)
+
+      const fieldType = getFieldType(field.type)
+
+      const settings = settingsTab === 'advanced' ? fieldType.advanced(field) : fieldType.content(field)
 
       // language=HTML
       return `
@@ -205,18 +244,21 @@
 
       const { type, label } = field
 
+      const fieldType = getFieldType(type)
+
       //language=HTML
       return `
 		  <div class="form-field" data-key="${key}">
 			  <div class="field-header">
 				  <div class="details">
 					  <div class="field-label">${label}</div>
-					  <div class="field-type">${Fields[type]?.name}</div>
+					  <div class="field-type">${fieldType.name}</div>
 				  </div>
 				  <div class="actions">
 					  <!-- Duplicate/Delete -->
-					  <button class="duplicate"><span class="dashicons dashicons-admin-page"></span></button>
-					  <button class="delete"><span class="dashicons dashicons-no"></span></button>
+					  <button class="duplicate" data-key="${key}"><span class="dashicons dashicons-admin-page"></span>
+					  </button>
+					  <button class="delete" data-key="${key}"><span class="dashicons dashicons-no"></span></button>
 				  </div>
 			  </div>
 			  ${isEditing ?
@@ -230,11 +272,11 @@
       //language=HTML
       return `
 		  <div id="form-builder" data-id="${form.id}">
-			  <div id="editor" class="editor">
+			  <div id="fields-editor" class="fields-editor">
 				  <div id="form-fields">
 					  ${form.fields.map((field, index) => Templates.field(index, field, activeField === index, settingsTab)).join('')}
 				  </div>
-				  <button>Add Field</button>
+				  <button class="add-field gh-button secondary">Add Field</button>
 			  </div>
 			  <div id="form-preview" class="panel">
 				  <!-- Preview -->
@@ -244,37 +286,119 @@
 
   }
 
-  window.FormBuilder = (el, form, onChange) => ({
+  const FormBuilder = (
+    selector,
+    form = defaultForm,
+    onChange = (form) => {
+      console.log(form)
+    }) => ({
 
     form,
-    builder: null,
+    el: null,
     activeField: false,
     activeFieldTab: 'content',
 
     init () {
-      this.builder = $(el)
-      this.render()
-      this.fieldClickListener()
+      this.el = $(selector)
+      this.mount()
     },
 
-    fieldClickListener () {
+    mount () {
+      this.render()
+      this.onMount()
+    },
+
+    onMount () {
       var self = this
 
-      this.builder.on('click', '.form-field', function (e) {
-        const fieldKey = parseInt($(this).data('key'))
-        if (fieldKey !== self.activeField) {
-          self.activeField = fieldKey
+      const render = () => {
+        this.mount()
+      }
+
+      const currentField = () => {
+        return this.form.fields[this.activeField]
+      }
+
+      const setActiveField = (id) => {
+        self.activeField = id
+        self.activeFieldTab = 'content'
+        render()
+      }
+
+      const addField = () => {
+        this.form.fields.push(defaultField)
+        onChange(this.form)
+        setActiveField(this.form.fields.length - 1)
+      }
+
+      const deleteField = (id) => {
+        this.form.fields.splice(id, 1)
+
+        if (this.activeField === id) {
+          this.activeField = false
           self.activeFieldTab = 'content'
-          self.render()
-        } else if (e.target.classList.contains('settings-tab')) {
-          self.activeFieldTab = e.target.dataset.tab
-          self.render()
+        }
+
+        onChange(this.form)
+        render()
+      }
+
+      const duplicateField = (id) => {
+
+        const field = this.form.fields[id]
+
+        this.form.fields.splice(id, 0, field)
+
+        onChange(this.form)
+        setActiveField(id + 1)
+      }
+
+      const updateField = (atts) => {
+        this.form.fields[this.activeField] = {
+          ...this.form.fields[this.activeField],
+          ...atts
+        }
+
+        onChange(this.form)
+        render()
+      }
+
+      const $builder = $('#form-builder')
+
+      $builder.on('click', '.add-field', addField)
+
+      $builder.on('click', '.form-field', (e) => {
+
+        const $field = $(e.currentTarget)
+        const $target = $(e.target)
+
+        const fieldKey = parseInt($field.data('key'))
+
+        if ($target.is('button.delete, button.delete .dashicons')) {
+          deleteField(fieldKey)
+        } else if ($target.is('button.duplicate, button.duplicate .dashicons')) {
+          duplicateField(fieldKey)
+        } else {
+          if (fieldKey !== self.activeField) {
+            setActiveField(fieldKey)
+          } else if (e.target.classList.contains('settings-tab')) {
+            self.activeFieldTab = e.target.dataset.tab
+            render()
+          }
+        }
+
+        if (self.activeField) {
+          if (self.activeFieldTab === 'content') {
+            getFieldType(currentField().type).contentOnMount(currentField(), updateField)
+          } else {
+            getFieldType(currentField().type).advancedOnMount(currentField(), updateField)
+          }
         }
       })
     },
 
     render () {
-      this.builder.html(Templates.builder(defaultForm, this.activeField, this.activeFieldTab))
+      this.el.html(Templates.builder(this.form, this.activeField, this.activeFieldTab))
     },
 
     deMount () {},
@@ -283,5 +407,7 @@
     renderPreview () {},
 
   })
+
+  Groundhogg.formBuilder = FormBuilder
 
 })(jQuery)
