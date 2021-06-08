@@ -23,7 +23,7 @@
       }
 
       this.filters = Groundhogg.filters.current
-      if (this.filters) {
+      if (this.filters.length > 0) {
         this.filtersEnabled = true
         $('.contact-quick-search').hide()
       }

@@ -7,10 +7,12 @@
   const apiRoutes = Groundhogg.api.routes.v4
   const {
     tinymceElement,
-    modal,
-    modalClose,
+    confirmationModal,
+    loadingModal,
     select
   } = Groundhogg.element
+
+  const { formBuilder } = Groundhogg
 
   const { linkPicker, emailPicker, tagPicker } = Groundhogg.pickers
 
@@ -373,6 +375,8 @@
 
     init () {
 
+      this.loadingClose = loadingModal().close
+
       var self = this
       var $doc = $(document)
 
@@ -393,7 +397,7 @@
 
         const $step = $(this)
         const step = self.funnel.steps
-            .find(step => step.ID === parseInt($step.data('id')))
+          .find(step => step.ID === parseInt($step.data('id')))
 
         switch (true) {
           case ($(e.target).is('.step-menu-move-up')) :
@@ -516,6 +520,19 @@
       self.setupStepTypes()
       self.initStepFlowContextMenu()
       self.maybePreloadTagsAndEmails()
+    },
+
+    /**
+     * Re-render the whole editor
+     */
+    render () {
+      this.renderTitle()
+      this.renderPublishActions()
+      this.renderStepFlow()
+      this.renderStepAdd()
+      this.renderStepEdit()
+
+      this.loadingClose()
     },
 
     async maybePreloadTagsAndEmails () {
@@ -910,28 +927,6 @@
     },
 
     /**
-     * Re-render the whole editor
-     */
-    render () {
-      modal({
-        isConfirmation: false,
-        closeOnOverlayClick: false,
-        showCloseButton: false,
-        showOkayButton: false,
-        messageHtml: `<p align="center" style="font-size: 2rem;">Loading...</p>`,
-        dialogStyles: 'width: auto; height: auto;'
-      })
-
-      this.renderTitle()
-      this.renderPublishActions()
-      this.renderStepFlow()
-      this.renderStepAdd()
-      this.renderStepEdit()
-
-      setTimeout(modalClose, 1000)
-    },
-
-    /**
      * Publish actions
      */
     renderPublishActions () {
@@ -1106,18 +1101,18 @@
       this.autoSaveEditedFunnel()
     },
 
-    moveStep(step, direction) {
+    moveStep (step, direction) {
       if (!step) {
         return
       }
 
-      const move = 'up' === direction ? -1.1 : 1.1;
+      const move = 'up' === direction ? -1.1 : 1.1
 
       this.saveUndoState()
 
-      step.data.step_order = step.data.step_order + move;
+      step.data.step_order = step.data.step_order + move
 
-      window.console.log('steps', this.funnel.steps);
+      window.console.log('steps', this.funnel.steps)
 
       this.fixStepOrders()
       this.renderStepFlow()
@@ -1183,35 +1178,41 @@
         return
       }
 
-      modal({
-        messageHtml: `
-          <p align="center"><b>Are you sure you want to delete this step?</b></p>
-          <p align="center">Any pending actions associated with this step with be abandoned.</p> 
-        `,
-        confirmCallBack: () => {
-          this.saveUndoState()
+      const removeStep = () => {
+        this.saveUndoState()
 
-          this.funnel.steps = this.funnel.steps.filter(step => step.ID !== stepId)
+        this.funnel.steps = this.funnel.steps.filter(step => step.ID !== stepId)
 
-          this.fixStepOrders()
-          this.renderStepFlow()
+        this.fixStepOrders()
+        this.renderStepFlow()
 
-          if (this.activeStep === stepId) {
-            this.view = 'addingStep'
-            this.renderStepAdd()
-            this.activeStep = null
-          }
-
-          this.autoSaveEditedFunnel()
-
-          modal({
-            isConfirmation: false,
-            messageHtml: `
-              <p align="center"><b>Your step has been deleted</b></p>
-            `,
-          })
+        if (this.activeStep === stepId) {
+          this.view = 'addingStep'
+          this.renderStepAdd()
+          this.activeStep = null
         }
-      })
+
+        this.autoSaveEditedFunnel()
+      }
+
+      const origStep = Editor.origFunnel.steps.find(s => s.ID === stepId)
+
+      if (origStep) {
+
+        confirmationModal({
+          alert: `
+          <p><b>Are you sure you want to delete this step?</b></p>
+          <p>Any pending actions associated with this step will be cancelled when the funnel is updated.</p> 
+        `,
+          confirmText: 'Delete',
+          onConfirm: () => {
+            removeStep()
+          }
+        })
+
+      } else {
+        removeStep()
+      }
     },
 
     /**
@@ -2803,8 +2804,8 @@
 			</div>`
       },
       onMount ({}) {
-        // const editor = FormBuilder(document.querySelector('#edit-form'),)
-        // editor.init()
+        const editor = formBuilder('#edit-form')
+        editor.init()
       }
     }
   }

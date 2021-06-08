@@ -1,117 +1,110 @@
 #form-builder {
-    display: flex;
-    gap: 20px;
+  display: flex;
+  gap: 20px;
+}
+#form-builder #fields-editor,
+#form-builder #form-preview {
+  width: 100%;
+  margin-top: 0 !important;
+}
+#form-builder #fields-editor .add-field {
+  width: 100%;
+  margin-top: 10px;
+}
+#form-builder #fields-editor #form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+#form-builder #fields-editor #form-fields .form-field {
+  background: #FFFFFF;
+  border-radius: 3px;
+  border: 1px solid rgba(16, 38, 64, 0.15);
+  overflow: hidden;
+}
+#form-builder #fields-editor #form-fields .form-field .settings {
+  box-sizing: border-box;
+  padding: 10px;
+}
+#form-builder #fields-editor #form-fields .form-field .settings .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#form-builder #fields-editor #form-fields .form-field .settings .row > label {
+  width: 100%;
+}
+#form-builder #fields-editor #form-fields .form-field .settings .row > .setting {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+#form-builder #fields-editor #form-fields .form-field .settings .row:not(:last-child) {
+  margin-bottom: 5px;
+}
+#form-builder #fields-editor #form-fields .form-field .settings-tabs {
+  /*display: flex;*/
+  /*justify-content: center;*/
+  border-top: 1px solid rgba(16, 38, 64, 0.15);
+  border-bottom: 1px solid rgba(16, 38, 64, 0.15);
+  padding: 5px 10px 0 10px;
+}
+#form-builder #fields-editor #form-fields .form-field .settings-tabs a.settings-tab {
+  color: #2c3338;
+}
+#form-builder #fields-editor #form-fields .form-field .settings-tabs .settings-tab {
+  border-width: 1px 1px 0 1px;
+  border-color: rgba(16, 38, 64, 0.15);
+  border-style: solid;
+  display: inline-block;
+  /*display: flex;*/
+  /*align-items: center;*/
+  /*justify-content: center;*/
+  border-radius: 3px 3px 0 0;
+  margin: 0 2px;
+  font-size: 13px;
+  padding: 4px 8px 2px 8px;
+  /*height: ?22px;*/
+  text-align: center;
+  background: #f9f9f9;
+  cursor: pointer;
+}
+#form-builder #fields-editor #form-fields .form-field .settings-tabs .settings-tab.active {
+  font-weight: 500;
+  border-bottom: 1px solid #fff;
+  margin-bottom: -1px;
+  background: #FFFFFF;
+}
+#form-builder #fields-editor #form-fields .form-field .field-header {
+  padding-left: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#form-builder #fields-editor #form-fields .form-field .field-header .field-type {
+  font-size: 8px;
+  opacity: 0.7;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+#form-builder #fields-editor #form-fields .form-field .field-header .field-label {
+  font-size: 13px;
+}
+#form-builder #fields-editor #form-fields .form-field .field-header .actions {
+  display: flex;
+}
+#form-builder #fields-editor #form-fields .form-field .field-header .actions button {
+  background: #FFFFFF;
+  width: 40px;
+  height: 40px;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+  border-left: 1px solid rgba(16, 38, 64, 0.15);
+  cursor: pointer;
+}
+#form-builder #fields-editor #form-fields .form-field .field-header .actions button:hover {
+  background: #f1f1f1;
 }
 
-#form-builder #editor,
-#form-preview{
-    width: 100%;
-}
-
-#form-fields {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-#form-fields .form-field {
-    background: #FFFFFF;
-    border-radius: 3px;
-    border: 1px solid rgba(16, 38, 64, 0.15);
-    overflow: hidden;
-}
-
-#form-fields .form-field .field-header {
-    padding-left: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-#form-fields .form-field .field-header .actions {
-    display: flex;
-}
-
-#form-fields .form-field .field-header .actions button {
-    background: #FFFFFF;
-    width: 40px;
-    height: 40px;
-    border-top: none;
-    border-right: none;
-    border-bottom: none;
-    border-left: 1px solid rgba(16, 38, 64, 0.15);
-    cursor: pointer;
-}
-
-#form-fields .form-field .field-header .actions button:hover {
-    background: #f1f1f1;
-}
-
-#form-fields .form-field .field-header .field-label {
-    font-size: 13px;
-}
-
-
-#form-fields .form-field .field-header .field-type {
-    font-size: 8px;
-    opacity: 0.7;
-    text-transform: uppercase;
-    font-weight: 500;
-}
-
-#form-fields .form-field .settings {
-    box-sizing: border-box;
-    padding: 10px;
-}
-
-#form-fields .form-field .settings-tabs {
-    /*display: flex;*/
-    /*justify-content: center;*/
-    border-top: 1px solid rgba(16, 38, 64, 0.15);
-    border-bottom: 1px solid rgba(16, 38, 64, 0.15);
-    padding: 5px 10px 0 10px;
-}
-
-#form-fields .form-field .settings-tabs .settings-tab {
-    border-width: 1px 1px 0 1px;
-    border-color: rgba(16, 38, 64, 0.15);
-    border-style: solid;
-    display: inline-block;
-    /*display: flex;*/
-    /*align-items: center;*/
-    /*justify-content: center;*/
-    border-radius: 3px 3px 0 0;
-    margin: 0 2px;
-    font-size: 13px;
-    padding: 4px 8px 2px 8px;
-    /*height: ?22px;*/
-    text-align: center;
-    background: #f9f9f9;
-    cursor: pointer;
-}
-
-
-#form-fields .form-field .settings-tabs .settings-tab.active {
-    font-weight: 500;
-    border-bottom: 1px solid #fff;
-    margin-bottom: -1px;
-    background: #FFFFFF;
-}
-
-#form-fields .form-field .settings-tabs a.settings-tab{
-    color: #2c3338;
-}
-
-#form-fields .form-field .row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-#form-fields .form-field .row:not(:last-child) {
-    margin-bottom: 5px;
-}
-
-#form-fields .form-field .row input {
-    max-width: 50%;
-}
+/*# sourceMappingURL=form-builder.css.map */

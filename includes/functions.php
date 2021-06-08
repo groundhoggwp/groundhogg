@@ -5144,3 +5144,24 @@ function get_object_relationships( $object, $is_primary = true ) {
 		$is_primary ? 'primary_object_type' : 'secondary_object_type' => $object->get_object_type,
 	] );
 }
+
+/**
+ * Compare two dates
+ *
+ * @param $before
+ * @param $after
+ */
+function compare_dates( &$before, &$after ) {
+
+	if ( strtotime( $before ) < strtotime( $after ) ) {
+		return true;
+	} else if ( strtotime( $after ) < strtotime( $before ) ) {
+		$temp   = $before;
+		$before = $after;
+		$after  = $temp;
+
+		return true;
+	} else {
+		return false;
+	}
+}

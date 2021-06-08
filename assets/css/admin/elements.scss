@@ -25,7 +25,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   display: inline-block;
   padding: 3px 8px;
 
-  &.orange{
+  &.orange {
     background: $benchmark-orange-50;
   }
 
@@ -59,6 +59,16 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
 button {
   cursor: pointer;
+
+  &.dashicon-button {
+    border: none;
+    background: none;
+    opacity: 0.8;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
 
   &.gh-button {
     border: none;
@@ -120,6 +130,22 @@ button {
     }
   }
 }
+
+
+.gh-button-group {
+
+  button.gh-button:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  button.gh-button:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+}
+
 
 .search-options-widget-wrap {
   position: relative;
@@ -194,35 +220,60 @@ button {
 
 .gh-modal {
   align-items: center;
-  background: rgba(darken($primary-blue, 20), .618);
-  bottom: 0;
   display: flex;
   justify-content: center;
-  left: 0;
   position: fixed;
-  right: 0;
-  top: 0;
   width: 100%;
   z-index: 100000;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+
+  &-overlay {
+    position: fixed;
+    background: rgba(darken($primary-blue, 20), .618);
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+  }
 
   &-dialog {
     background: white;
-    border-radius: 1rem;
+    border-radius: 5px;
     position: relative;
-    height: 70vh;
-    padding: 3rem;
-    width: 70vw;
+    //height: 70vh;
+    padding: 30px;
+    max-width: 50vw;
+
+    &-alert {
+      p {
+        font-size: 18px;
+      }
+
+      p:first-child {
+        margin-top: 0;
+      }
+    }
   }
 
   &-button-close-top {
     position: absolute;
-    right: 1rem;
-    top: 1rem;
+    right: 15px;
+    top: 15px;
+    padding: 0;
   }
 
   &-confirmation-buttons {
+
+    button {
+      width: 100%;
+      //padding: 20px;
+    }
+
     display: flex;
-    gap: 1rem;
+    //gap: 1rem;
     justify-content: center;
   }
 }
