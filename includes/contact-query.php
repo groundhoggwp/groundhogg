@@ -4,6 +4,7 @@ namespace Groundhogg;
 
 // Exit if accessed directly
 use Groundhogg\DB\Contacts;
+use phpDocumentor\Reflection\DocBlock\Tags\Deprecated;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -859,25 +860,18 @@ class Contact_Query {
 
 		if ( strlen( $this->query_vars['first_name'] ) || strlen( $this->query_vars['first_name_compare'] ) ) {
 
-			$where['first_name'] = self::generic_text_filter_compare( [
-				'value'   => $this->query_vars['first_name'],
-				'compare' => $this->query_vars['first_name_compare'],
-			], "{$this->table_name}.first_name" );
+			$where['first_name'] = self::generic_text_compare( "{$this->table_name}.first_name", $this->query_vars['first_name_compare'], $this->query_vars['first_name'] );
 		}
 
 		if ( strlen( $this->query_vars['last_name'] ) || strlen( $this->query_vars['last_name_compare'] ) ) {
 
-			$where['last_name'] = self::generic_text_filter_compare( [
-				'value'   => $this->query_vars['last_name'],
-				'compare' => $this->query_vars['last_name_compare'],
-			], "{$this->table_name}.last_name" );
+			$where['last_name'] = self::generic_text_compare( "{$this->table_name}.last_name", $this->query_vars['last_name_compare'], $this->query_vars['last_name'] );
 		}
 
 		if ( strlen( $this->query_vars['email'] ) || strlen( $this->query_vars['email_compare'] ) ) {
-			$where['email'] = self::generic_text_filter_compare( [
-				'value'   => $this->query_vars['email'],
-				'compare' => $this->query_vars['email_compare'],
-			], "{$this->table_name}.email" );
+			$where['email'] = self::generic_text_compare( "{$this->table_name}.email",
+				$this->query_vars['email_compare'],
+				$this->query_vars['email'] );
 		}
 
 
@@ -1241,6 +1235,65 @@ class Contact_Query {
 			'email',
 			[ self::class, 'contact_generic_text_filter_compare' ]
 		);
+
+		self::register_filter(
+			'date_created',
+			[ self::class, 'filter_date_created' ]
+		);
+
+		self::register_filter( 'meta', [ self::class, 'filter_meta' ] );
+	}
+
+	/**
+	 * @param $filter_vars
+	 * @param $query Contact_Query
+	 *
+	 * @return string
+	 */
+	public static function filter_date_created( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'compare' => 'before',
+			'value'   => Ymd_His(),
+			'value2'  => Ymd_His(),
+		] );
+
+		switch ( $filter_vars['compare'] ) {
+			default:
+			case 'before':
+				$clause = sprintf( "< '%s'", $filter_vars['value'] );
+				break;
+			case 'after':
+				$clause = sprintf( "> '%s'", $filter_vars['value'] );
+				break;
+			case 'between':
+				compare_dates( $filter_vars['value'], $filter_vars['value2'] );
+				$clause = sprintf( "BETWEEN '%s 00:00:00' AND '%s 23:59:59'", $filter_vars['value'], $filter_vars['value2'] );
+				break;
+		}
+
+		return "{$query->table_name}.date_created $clause";
+	}
+
+	/**
+	 * @param $filter_vars
+	 * @param $query Contact_Query
+	 *
+	 * @return string
+	 */
+	public static function filter_meta( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'meta'    => '',
+			'compare' => '',
+			'value'   => ''
+		] );
+
+		$meta_table_name = get_db( 'contactmeta' )->table_name;
+		$clause1         = self::generic_text_compare( $meta_table_name . '.meta_key', '=', $filter_vars['meta'] );
+		$clause2         = self::generic_text_compare( $meta_table_name . '.meta_value', $filter_vars['compare'], $filter_vars['value'] );
+
+		return "{$query->table_name}.ID IN ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$clause1} AND {$clause2} ) ";
 	}
 
 	/**
@@ -1251,37 +1304,39 @@ class Contact_Query {
 	 *
 	 * @return string
 	 */
-	public static function generic_text_filter_compare( array $filter_vars, string $column_key ): string {
-		$filter_vars = wp_parse_args( $filter_vars, [
-			'value'   => '',
-			'compare' => '',
-		] );
+	public static function generic_text_compare( $column, $compare, $value ) {
 
 		global $wpdb;
 
-		$value = sanitize_text_field( $filter_vars['value'] );
+		$value = sanitize_text_field( $value );
 
-		switch ( $filter_vars['compare'] ) {
+		switch ( $compare ) {
 			default:
 			case 'equals':
-				return sprintf( "%s = '%s'", $column_key, $value );
+			case '=':
+				return sprintf( "%s = '%s'", $column, $value );
+			case '!=':
 			case 'not_equals':
-				return sprintf( "%s != '%s'", $column_key, $value );
+				return sprintf( "%s != '%s'", $column, $value );
 			case 'contains':
-				return sprintf( "%s RLIKE '%s'", $column_key, $value );
+				return sprintf( "%s RLIKE '%s'", $column, $value );
 			case 'not_contains':
-				return sprintf( "%s NOT RLIKE '%s'", $column_key, $value );
+				return sprintf( "%s NOT RLIKE '%s'", $column, $value );
 			case 'begins_with':
 			case 'starts_with':
-				return sprintf( "%s LIKE '%s'", $column_key, $wpdb->esc_like( $value ) . '%' );
+				return sprintf( "%s LIKE '%s'", $column, $wpdb->esc_like( $value ) . '%' );
 			case 'ends_with':
-				return sprintf( "%s LIKE '%s'", $column_key, '%' . $wpdb->esc_like( $value ) );
+				return sprintf( "%s LIKE '%s'", $column, '%' . $wpdb->esc_like( $value ) );
 			case 'empty':
-				return sprintf( "%s = ''", $column_key );
+				return sprintf( "%s = ''", $column );
 			case 'not_empty':
-				return sprintf( "%s != ''", $column_key );
+				return sprintf( "%s != ''", $column );
 			case 'regex':
-				return sprintf( "%s REGEXP BINARY '%s'", $column_key, $value );
+				return sprintf( "%s REGEXP BINARY '%s'", $column, $value );
+			case 'less_than':
+				return sprintf( "%s < %s", $column, is_numeric( $value ) ? $value : "'$value'" );
+			case 'greater_than':
+				return sprintf( "%s > %s", $column, is_numeric( $value ) ? $value : "'$value'" );
 		}
 	}
 
@@ -1332,7 +1387,7 @@ class Contact_Query {
 	 * @return string
 	 */
 	public static function contact_generic_text_filter_compare( array $filter_vars, $query ): string {
-		return self::generic_text_filter_compare( $filter_vars, $query->table_name . '.' . $filter_vars['type'] );
+		return self::generic_text_compare( $query->table_name . '.' . $filter_vars['type'], $filter_vars['compare'], $filter_vars['value'] );
 	}
 
 	/**

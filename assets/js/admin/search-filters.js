@@ -409,6 +409,10 @@
     ...BasicTextFilter('Email Address')
   })
 
+  // registerFilter('primary_phone', 'contact', {}, 'Primary Phone')
+  // registerFilter('mobile_phone', 'contact', {}, 'Mobile Phone')
+  // registerFilter('birthday', 'contact', {}, 'Birthday')
+
   registerFilter('date_created', 'contact', {
     view ({ compare, value, value2 }, filterGroupIndex, filterIndex) {
       //language=HTMl
@@ -439,7 +443,7 @@
 		  type: 'date',
 		  value: value2,
 		  id: 'filter-value2',
-		  className: 'hidden',
+		  className: compare === 'between' ? '' : 'hidden',
 		  name: 'value2'
 	  })}`
     },
@@ -464,62 +468,7 @@
     }
   }, 'Date Created')
 
-  registerFilter('meta', 'contact', {
-    view ({ meta, compare, value }) {
-      //language=HTMl
-      switch (compare) {
-        case 'empty':
-        case 'not_empty':
-          return `<b>${meta}</b> ${Comparisons[compare].toLowerCase()}`
-        default:
-          return `<b>${meta}</b> ${Comparisons[compare].toLowerCase()} <b>${specialChars(value)}</b>`
-      }
-    },
-    edit ({ meta, compare, value }, filterGroupIndex, filterIndex) {
-      // language=html
-      return `
-		  ${input({
-			  id: 'filter-meta',
-			  name: 'meta',
-			  className: 'meta-picker',
-			  dataGroup: filterIndex,
-			  dataKey: filterIndex,
-			  value: meta
-		  })}
-		  ${select({
-			  id: 'filter-compare',
-			  name: 'compare',
-			  dataGroup: filterIndex,
-			  dataKey: filterIndex,
-		  }, Comparisons, compare)} ${input({
-			  id: 'filter-value',
-			  name: 'value',
-			  dataGroup: filterIndex,
-			  dataKey: filterIndex,
-			  value
-		  })}`
-    },
-    onMount (filter, updateFilter) {
-
-      const { metaPicker } = Groundhogg.pickers
-
-      metaPicker('#filter-meta')
-
-      $('#filter-compare, #filter-value, #filter-meta').on('change', function (e) {
-        const $el = $(this)
-        const { compare } = updateFilter({
-          [$el.prop('name')]: $el.val()
-        })
-      })
-    },
-    defaults: {
-      meta: '',
-      compare: 'equals',
-      value: ''
-    }
-  }, 'Custom meta')
-
-  const { optin_status, owners, meta_keys, pages_lists } = Groundhogg.filters
+  const { optin_status, owners } = Groundhogg.filters
 
   registerFilter('optin_status', 'contact', {
     view ({ compare, value }) {
@@ -627,6 +576,120 @@
         value2: ''*/
     }
   }, 'Owner')
+
+  registerFilter('tags', 'contact', {
+    view ({ tags, compare, compare2 }) {
+
+      const tagNames = tags.map(id => `<b>${id}</b>`)
+
+      //language=HTMl
+      switch (compare2) {
+        case 'any':
+          return `<b>Tags</b> ${compare} ${orList(tagNames)}`
+        default:
+        case 'all':
+          return `<b>Tags</b> ${compare} ${andList(tagNames)}`
+      }
+    },
+    edit ({ tags, compare, compare2 }, filterGroupIndex, filterIndex) {
+      // language=html
+      return `
+		  ${select({
+			  id: 'filter-compare',
+			  name: 'compare',
+		  }, {
+			  includes: 'Includes',
+			  excludes: 'Excludes',
+		  }, compare)}
+
+		  ${select({
+			  id: 'filter-compare2',
+			  name: 'compare2',
+		  }, {
+			  any: 'Any',
+			  all: 'All',
+		  }, compare2)}
+
+		  ${select({
+			  id: 'filter-tags',
+			  name: 'tags',
+			  className: 'tag-picker',
+		  }, {}, tags)}`
+    },
+    onMount (filter, updateFilter) {
+
+      const { metaPicker } = Groundhogg.pickers
+
+      metaPicker('#filter-meta')
+
+      $('#filter-compare, #filter-value, #filter-meta').on('change', function (e) {
+        const $el = $(this)
+        const { compare } = updateFilter({
+          [$el.prop('name')]: $el.val()
+        })
+      })
+    },
+    defaults: {
+      meta: '',
+      compare: 'equals',
+      value: ''
+    }
+  }, 'Tags')
+
+  registerFilter('meta', 'contact', {
+    view ({ meta, compare, value }) {
+      //language=HTMl
+      switch (compare) {
+        case 'empty':
+        case 'not_empty':
+          return `<b>${meta}</b> ${Comparisons[compare].toLowerCase()}`
+        default:
+          return `<b>${meta}</b> ${Comparisons[compare].toLowerCase()} <b>${specialChars(value)}</b>`
+      }
+    },
+    edit ({ meta, compare, value }, filterGroupIndex, filterIndex) {
+      // language=html
+      return `
+		  ${input({
+			  id: 'filter-meta',
+			  name: 'meta',
+			  className: 'meta-picker',
+			  dataGroup: filterIndex,
+			  dataKey: filterIndex,
+			  value: meta
+		  })}
+		  ${select({
+			  id: 'filter-compare',
+			  name: 'compare',
+			  dataGroup: filterIndex,
+			  dataKey: filterIndex,
+		  }, Comparisons, compare)} ${input({
+			  id: 'filter-value',
+			  name: 'value',
+			  dataGroup: filterIndex,
+			  dataKey: filterIndex,
+			  value
+		  })}`
+    },
+    onMount (filter, updateFilter) {
+
+      const { metaPicker } = Groundhogg.pickers
+
+      metaPicker('#filter-meta')
+
+      $('#filter-compare, #filter-value, #filter-meta').on('change', function (e) {
+        const $el = $(this)
+        const { compare } = updateFilter({
+          [$el.prop('name')]: $el.val()
+        })
+      })
+    },
+    defaults: {
+      meta: '',
+      compare: 'equals',
+      value: ''
+    }
+  }, 'Custom meta')
 
   const standardActivityDateFilterOnMount = (filter, updateFilter) => {
     $('#filter-date-range, #filter-date, #filter-date2, #filter-page-url').on('change', function (e) {
@@ -987,5 +1050,10 @@
       date2: '',
     }
   }, 'Completed Funnel Action')
+
+  // Other Filters to Add
+  // Location (Country,Province)
+  // Phones (Primary,Mobile)
+  // Tags
 
 })(jQuery)
