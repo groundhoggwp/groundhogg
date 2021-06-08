@@ -230,6 +230,64 @@
     })
   }
 
+  const loadingModal = () => {
+    return modal({
+      content: '<h1>Loading...</h1>',
+      canClose: false,
+    })
+  }
+
+  /**
+   *
+   * @param alert
+   * @param confirmText
+   * @param closeText
+   * @param onConfirm
+   * @param onClose
+   */
+  const confirmationModal = ({
+    alert = '',
+    confirmText = 'Confirm',
+    closeText = 'Cancel',
+    onConfirm = () => {},
+    onClose = () => {},
+  }) => {
+
+    //language=html
+    const content = `
+		<button type="button" class="dashicon-button gh-modal-button-close-top gh-modal-button-close">
+			<span class="dashicons dashicons-no-alt"></span>
+		</button>
+		<div class="gh-modal-dialog-alert">
+			${alert}
+		</div>
+		<div class="gh-modal-confirmation-buttons gh-button-group">
+			<button type="button" class="gh-button danger gh-modal-button-close">${closeText}</button>
+			<button type="button" class="gh-button primary gh-modal-button-confirm">${confirmText}</button>
+		</div>`
+
+    const { close, $modal } = modal({
+      content,
+      onClose
+    })
+
+    const confirm = () => {
+      onConfirm()
+      close()
+    }
+
+    const handleConfirm = () => {
+      confirm()
+    }
+
+    $('.gh-modal-button-confirm').on('click', handleConfirm)
+
+    return {
+      close,
+      confirm
+    }
+  }
+
   /**
    * Custom modal appended to the body.
    *
@@ -242,64 +300,47 @@
    *
    * @param (object) options Config options to overwrite defaults.
    */
-  const modal = (options) => {
-    const config = {
-      isConfirmation: true,
-      closeOnOverlayClick: true,
-      showCloseButton: true,
-      showOkayButton: true,
-      messageHtml: `<p align="center">Are you sure you want to do that?</p>`,
-      confirmCallBack: () => {},
-      dialogStyles: '',
-      ...options
-    };
+  const modal = ({
+    content = '',
+    onClose = () => {},
+    canClose = true
+  }) => {
 
+    //language=html
     const html = `
-        <div class="gh-modal">
-          <div class="gh-modal-dialog" style="${config.dialogStyles}">
-            ${config.showCloseButton ? `
-              <button type="button" class="button button-secondary gh-modal-button-close-top gh-modal-button-close">Close</button>
-              `: ''}
-              ${config.messageHtml}
-                <div class="gh-modal-confirmation-buttons">
-              ${config.isConfirmation ? `
-                <button type="button" class="button button-secondary gh-modal-button-confirm">Confirm</button>
-                <button type="button" class="button button-secondary gh-modal-button-close">Cancel</button>
-              ` : ''}
-              ${!config.isConfirmation && config.showOkayButton ? `
-                <button type="button" class="button button-secondary gh-modal-button-close">Okay</button>
-              ` : ''}
-            </div>
-            </div>
-        </div>
-    `;
+		<div class="gh-modal">
+			<div class="gh-modal-overlay"></div>
+			<div class="gh-modal-dialog">
+				${canClose ? `	<button type="button" class="dashicon-button gh-modal-button-close-top gh-modal-button-close">
+					<span class="dashicons dashicons-no-alt"></span>
+				</button>` : ''}
+				<div class="gh-modal-dialog-content">
+					${content}
+				</div>
+			</div>
+		</div>`
 
-    const $modal = $(html);
-    $modal
-    .on('click', (e) => {
-      const $target = $(e.target);
+    const $modal = $(html)
 
-      switch (true) {
-        case $target.is('.gh-modal-button-close') :
-          modalClose();
-          break;
-        case $target.is('.gh-modal-button-confirm') :
-          modalClose(); // Called first, so callback could open another modal.
-          config.confirmCallBack();
-          break;
-        default:
-          if ( !$target.is('.gh-modal-dialog') && config.closeOnOverlayClick ) {
-            modalClose();
-          }
-      }
-    });
+    const close = () => {
+      $modal.remove()
+      onClose()
+    }
 
-    modalClose();
-    $('body').append($modal);
-  }
+    const handleClose = () => {
+      close()
+    }
 
-  const modalClose = () => {
-    $('.gh-modal').remove();
+    $('body').append($modal)
+
+    if (canClose) {
+      $('.gh-modal-overlay, .gh-modal-button-close').on('click', handleClose)
+    }
+
+    return {
+      $modal,
+      close,
+    }
   }
 
   /**
@@ -621,7 +662,8 @@
     searchOptionsWidget,
     tinymceElement,
     modal,
-    modalClose
+    loadingModal,
+    confirmationModal
   }
 
 })(jQuery)
