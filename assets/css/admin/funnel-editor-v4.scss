@@ -411,8 +411,8 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
 
   .step-flow .step-placeholder {
     border-style: none;
-    opacity: 0.1;
-    background: #000;
+    background: #0001;
+    flex-direction: column;
     margin: auto;
   }
 

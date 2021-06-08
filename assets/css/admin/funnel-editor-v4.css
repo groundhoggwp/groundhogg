@@ -332,8 +332,8 @@
 }
 #funnel-editor .step-flow .step-placeholder {
   border-style: none;
-  opacity: 0.1;
-  background: #000;
+  background: #0001;
+  flex-direction: column;
   margin: auto;
 }
 #funnel-editor .step-flow .step .icon {

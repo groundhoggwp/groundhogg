@@ -403,10 +403,12 @@
             self.moveStepDown(step)
             break
           case ($(e.target).is('.step-menu-new-step-before')) :
-            window.console.log('.step-menu-new-step-before')
+            self.insertPlaceholderStep(step, 'before')
+
             break
           case ($(e.target).is('.step-menu-new-step-after')) :
-            window.console.log('.step-menu-new-step-after')
+            self.insertPlaceholderStep(step, 'after')
+
             break
           case ($(e.target).is('.step-menu-duplicate')) :
             const newStep = copyObject(step)
@@ -843,17 +845,46 @@
         return
       }
 
-      this.demountStep()
+      const self = this;
 
-      $('#control-panel').html(this.htmlTemplates.stepAddPanel(this.activeAddType))
-      this.renderStepFlow()
+      self.demountStep()
 
-      $('.add-step').draggable({
-        connectToSortable: '.step-flow .steps',
-        helper: 'clone',
-        revert: 'invalid',
-        revertDuration: 0,
-      })
+      $('#control-panel').html(self.htmlTemplates.stepAddPanel(self.activeAddType))
+      self.renderStepFlow()
+
+      if ( self.addingStepOrder ) {
+        $('.add-step').on(
+            'click',
+            function () {
+              const $button = $(this);
+              var type = $button.data('type')
+              var group = $button.data('group')
+
+              var id = Date.now()
+
+              self.addStep({
+                ID: id,
+                data: {
+                  ID: id,
+                  funnel_id: Editor.funnel.ID,
+                  step_title: Editor.stepTypes[type].name,
+                  step_type: type,
+                  step_group: group,
+                  step_order: self.addingStepOrder
+                },
+                meta: StepTypes.getType(type).defaults
+              })
+
+            }
+        );
+      } else {
+        $('.add-step').draggable({
+          connectToSortable: '.step-flow .steps',
+          helper: 'clone',
+          revert: 'invalid',
+          revertDuration: 0,
+        })
+      }
     },
 
     /**
@@ -1064,9 +1095,13 @@
       this.saveUndoState()
 
       this.funnel.steps.push(step)
-
       this.fixStepOrders()
+
+      delete this.addingStepOrder;
+      this.activeStep = step.ID
+      this.view = 'editingStep'
       this.renderStepFlow()
+      this.renderStepEdit()
 
       this.autoSaveEditedFunnel()
     },
@@ -1096,6 +1131,37 @@
 
     moveStepDown (step) {
       this.moveStep(step, 'down')
+    },
+
+    insertPlaceholderStep (step, beforeAfter) {
+      const self = this;
+
+      self.previousActiveStep = step.ID
+
+      self.view = 'addingStep'
+      self.addingStepOrder = 'before' === beforeAfter ? parseInt(step.data.step_order)-.1 : parseInt(step.data.step_order)+.1
+      self.renderStepFlow()
+      self.renderStepAdd()
+      const $html = $(`<div class="step-placeholder">Choose a step to add here &rarr;<button type="button" class="button button-secondary">Cancel</button></div>`);
+
+      $('button', $html).on(
+          'click',
+          function () {
+            delete self.addingStepOrder;
+            $html.remove();
+
+            self.activeStep = self.previousActiveStep
+            self.view = 'editingStep'
+            self.renderStepFlow()
+            self.renderStepEdit()
+          }
+      );
+
+      if ( 'before' === beforeAfter ) {
+        $html.insertBefore(`.steps [data-id="${step.ID}"]`);
+      } else {
+        $html.insertAfter(`.steps [data-id="${step.ID}"]`);
+      }
     },
 
     fixStepOrders () {
@@ -2135,11 +2201,16 @@
 			<div class="panel">
 				<div class="row">
 					<label class="row-label" for="tags">Select tags to add.</label>
-					${select({
-						name: 'tags',
-						id: 'tags',
-						multiple: true,
-					}, options, meta.tags.map(id => parseInt(id)))}
+					${select(
+					    {
+                          name: 'tags',
+                          id: 'tags',
+                          multiple: true,
+                        }, 
+                        options,
+                        meta.tags ? meta.tags.map(id => parseInt(id)) : []
+                    )
+                    }
 					<p class="description">All of the defined tags will be added to the contact.</p>
 				</div>
 			</div>`
