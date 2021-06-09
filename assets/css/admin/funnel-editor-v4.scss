@@ -173,6 +173,15 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
       gap: 10px;
       align-items: center;
     }
+
+    .header-actions {
+      &:before {
+        content: attr(data-lastSaved);
+        pointer-events: none;
+        opacity: .382;
+        font-style: italic;
+      }
+    }
   }
 
   .undo-and-redo .undo,

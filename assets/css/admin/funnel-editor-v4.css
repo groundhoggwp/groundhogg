@@ -131,6 +131,12 @@
   gap: 10px;
   align-items: center;
 }
+#funnel-editor .editor-header .header-actions:before {
+  content: attr(data-lastSaved);
+  pointer-events: none;
+  opacity: 0.382;
+  font-style: italic;
+}
 #funnel-editor .undo-and-redo .undo,
 #funnel-editor .undo-and-redo .redo {
   cursor: pointer;
