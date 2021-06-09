@@ -409,7 +409,12 @@ class Settings_Page extends Admin_Page {
 			],
 			'overrides'             => [
 				'id'    => 'overrides',
-				'title' => _x( 'Overrides', 'settings_sections', 'groundhogg' ),
+				'title' => _x( 'Defaults', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'email'
+			],
+			'footer'             => [
+				'id'    => 'footer',
+				'title' => _x( 'Footer', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'email'
 			],
 			'tracking'              => array(
@@ -947,7 +952,7 @@ class Settings_Page extends Admin_Page {
 				'id'      => 'gh_override_from_name',
 				'section' => 'overrides',
 				'label'   => _x( 'Default From Name', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'Override the default <code>wp_mail</code> from name.', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'If no <b>From Name</b> is available default to this.', 'settings', 'groundhogg' ),
 				'type'    => 'input',
 				'atts'    => array(
 					'name'        => 'gh_override_from_name',
@@ -959,7 +964,7 @@ class Settings_Page extends Admin_Page {
 				'id'      => 'gh_override_from_email',
 				'section' => 'overrides',
 				'label'   => _x( 'Default From Email', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'Override the default <code>wp_mail</code> from email.', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'If no <b>From Email Address</b> is available default to this.', 'settings', 'groundhogg' ),
 				'type'    => 'input',
 				'atts'    => array(
 					'type'        => 'email',
@@ -970,7 +975,7 @@ class Settings_Page extends Admin_Page {
 			],
 			'gh_email_footer_alignment'              => [
 				'id'      => 'gh_email_footer_alignment',
-				'section' => 'overrides',
+				'section' => 'footer',
 				'label'   => _x( 'Email Footer Alignment', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'The alignment of the email footer in all emails.', 'settings', 'groundhogg' ),
 				'type'    => 'dropdown',
@@ -986,7 +991,7 @@ class Settings_Page extends Admin_Page {
 			],
 			'gh_custom_email_footer_text'            => [
 				'id'      => 'gh_custom_email_footer_text',
-				'section' => 'overrides',
+				'section' => 'footer',
 				'label'   => _x( 'Custom Footer Text', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'Text that will appear before the footer in every email. Accepts HTML and plain text.', 'settings', 'groundhogg' ),
 				'type'    => 'editor',
