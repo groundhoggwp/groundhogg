@@ -1005,6 +1005,7 @@
       var self = this
 
       apiPost(`${apiRoutes.funnels}/${self.funnel.ID}`, data).then(data => {
+        self.setLastSaved()
         if (data.item && reload) {
           self.loadFunnel(data.item)
           self.render()
@@ -1046,6 +1047,7 @@
           steps: self.funnel.steps
         }
       }).then(data => {
+        self.setLastSaved()
         if (data.item) {
           self.loadFunnel(data.item)
           self.render()
@@ -1072,6 +1074,50 @@
           self.render()
         }
       })
+    },
+    
+    setLastSaved () {
+      clearInterval(self.lastSavedTimer)
+
+      self.lastSavedTimer = setInterval(this.updateLastSaved, 30*1000, new Date()) // 30 seconds
+      this.updateLastSaved(new Date())
+    },
+
+    /**
+     * Update the header-actions attr
+     *
+     * @param Date lastSaved The `new Date`
+     *
+     * @link https://stackoverflow.com/a/7641812
+     */
+    updateLastSaved (lastSaved) {
+        var delta = Math.round((+new Date - lastSaved) / 1000);
+
+        var minute = 60,
+            hour = minute * 60,
+            day = hour * 24,
+            week = day * 7;
+
+        var fuzzy = 'Saved ';
+
+        if (delta < 30) {
+          fuzzy += 'just now';
+        } else if (delta < minute) {
+          fuzzy += delta + ' seconds ago';
+        } else if (delta < 2 * minute) {
+          fuzzy += 'a minute ago'
+        } else if (delta < hour) {
+          fuzzy += Math.floor(delta / minute) + ' minutes ago.';
+        } else if (Math.floor(delta / hour) == 1) {
+          fuzzy += '1 hour ago'
+        } else if (delta < day) {
+          fuzzy = Math.floor(delta / hour) + ' hours ago.';
+        } else if (delta < day * 2) {
+          fuzzy += 'yesterday';
+        }
+
+        $('.header-actions').attr('data-lastSaved', fuzzy);
+
     },
 
     /**
@@ -1322,7 +1368,10 @@
           }
         }, {
           signal
-        }).then(data => self.abortController = null)
+        }).then(data => {
+          self.setLastSaved()
+          self.abortController = null
+        })
       }, 3000)
 
     },
