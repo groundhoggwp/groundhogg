@@ -36,7 +36,7 @@
             align-items: center;
 
             > label {
-              width: 100%;
+              flex-basis: 150px;
             }
 
             > .setting{
@@ -44,6 +44,14 @@
 
               display: flex;
               justify-content: flex-end;
+
+              input {
+                width: 100%;
+              }
+            }
+
+            .input-wrap {
+              width: 100%;
             }
 
             &:not(:last-child) {
@@ -57,7 +65,7 @@
           /*justify-content: center;*/
           border-top: 1px solid rgba(16, 38, 64, 0.15);
           border-bottom: 1px solid rgba(16, 38, 64, 0.15);
-          padding: 5px 10px 0 10px;
+          padding: 10px 10px 0 10px;
 
           a.settings-tab {
             color: #2c3338;

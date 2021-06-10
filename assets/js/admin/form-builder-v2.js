@@ -1,6 +1,6 @@
 (function ($) {
 
-  const { toggle, input, inputWithReplacements } = Groundhogg.element
+  const { toggle, input, select, inputWithReplacements } = Groundhogg.element
 
   const defaultField = {
     className: 'text',
@@ -38,9 +38,21 @@
   }
 
   const Settings = {
+    type (type) {
+
+      // language=html
+      return `<label for="type">Type</label>
+	  <div class="setting">
+		  ${select({
+			  id: 'type',
+			  name: 'type',
+		  }, getFieldTypeOptions(), type)}
+	  </div>`
+    },
     basic (label, atts) {
       const { id } = atts
-      return `<label for="${id}">${label}</label> <div class="setting">${input(atts)}</div>`
+      return `<label for="${id}">${label}</label>
+	  <div class="setting">${input(atts)}</div>`
     },
     basicWithReplacements (label, atts) {
       const { id } = atts
@@ -122,6 +134,22 @@
     }
   }
 
+  const getFieldTypeOptions = () => {
+
+    const options = []
+
+    for (const type in FieldTypes) {
+      if (FieldTypes.hasOwnProperty(type) && FieldTypes[type].hasOwnProperty('name') && !FieldTypes[type].hasOwnProperty('hide')) {
+        options.push({
+          value: type,
+          text: FieldTypes[type].name
+        })
+      }
+    }
+
+    return options
+  }
+
   const FieldTypes = {
     default: {
       name: 'default',
@@ -129,6 +157,7 @@
       advanced (field) { return []},
       contentOnMount (field) {},
       advancedOnMount (field) {},
+      hide: true
     },
     first: {
       name: 'First Name',
@@ -237,7 +266,10 @@
 			  <a class="settings-tab ${settingsTab === 'content' ? 'active' : ''}" data-tab="content">Content</a>
 			  <a class="settings-tab ${settingsTab === 'advanced' ? 'active' : ''}" data-tab="advanced">Advanced</a>
 		  </div>
-		  <div class="settings">${settings.map(setting => `<div class="row">${setting}</div>`).join('')}</div>`
+		  <div class="settings">
+			  ${settingsTab === 'content' ? `<div class="row">${Settings.type(field.type)}</div>` : ''}
+			  ${settings.map(setting => `<div class="row">${setting}</div>`).join('')}
+		  </div>`
     },
 
     field (key, field, isEditing, settingsTab) {
@@ -389,6 +421,13 @@
 
         if (self.activeField) {
           if (self.activeFieldTab === 'content') {
+
+            $('#type').on('change', (e) => {
+              updateField({
+                type: e.target.value
+              })
+            })
+
             getFieldType(currentField().type).contentOnMount(currentField(), updateField)
           } else {
             getFieldType(currentField().type).advancedOnMount(currentField(), updateField)

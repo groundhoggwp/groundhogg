@@ -32,12 +32,18 @@
   align-items: center;
 }
 #form-builder #fields-editor #form-fields .form-field .settings .row > label {
-  width: 100%;
+  flex-basis: 150px;
 }
 #form-builder #fields-editor #form-fields .form-field .settings .row > .setting {
   width: 100%;
   display: flex;
   justify-content: flex-end;
+}
+#form-builder #fields-editor #form-fields .form-field .settings .row > .setting input {
+  width: 100%;
+}
+#form-builder #fields-editor #form-fields .form-field .settings .row .input-wrap {
+  width: 100%;
 }
 #form-builder #fields-editor #form-fields .form-field .settings .row:not(:last-child) {
   margin-bottom: 5px;
@@ -47,7 +53,7 @@
   /*justify-content: center;*/
   border-top: 1px solid rgba(16, 38, 64, 0.15);
   border-bottom: 1px solid rgba(16, 38, 64, 0.15);
-  padding: 5px 10px 0 10px;
+  padding: 10px 10px 0 10px;
 }
 #form-builder #fields-editor #form-fields .form-field .settings-tabs a.settings-tab {
   color: #2c3338;

@@ -1139,10 +1139,10 @@
       this.fixStepOrders()
 
       delete this.addingStepOrder;
-      this.activeStep = step.ID
-      this.view = 'editingStep'
+      // this.activeStep = step.ID
+      // this.view = 'editingStep'
       this.renderStepFlow()
-      this.renderStepEdit()
+      // this.renderStepEdit()
 
       this.autoSaveEditedFunnel()
     },
