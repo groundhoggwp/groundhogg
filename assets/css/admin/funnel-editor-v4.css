@@ -581,48 +581,6 @@
   color: #fff;
   background-color: #0066aa;
 }
-#funnel-editor .input-wrap {
-  display: flex;
-  justify-content: flex-start;
-}
-#funnel-editor .input-wrap > *:last-child {
-  border-top-right-radius: 4px !important;
-  border-bottom-right-radius: 4px !important;
-  border-left: none !important;
-}
-#funnel-editor .input-wrap > *:nth-child(2):not(:last-child) {
-  border-left: none !important;
-}
-#funnel-editor .input-wrap.input-with-emojis input,
-#funnel-editor .input-wrap.input-with-replacements input {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  margin-right: 0;
-}
-#funnel-editor .input-wrap.input-with-emojis button.emoji-picker-start,
-#funnel-editor .input-wrap.input-with-replacements button.replacements-picker-start {
-  box-shadow: 0 0 0 transparent;
-  border-radius: 0;
-  border: 1px solid #8c8f94;
-  background-color: #fff;
-  color: #2c3338;
-  cursor: pointer;
-}
-#funnel-editor .input-wrap.input-with-emojis button.emoji-picker-start:hover,
-#funnel-editor .input-wrap.input-with-replacements button.replacements-picker-start:hover {
-  background-color: #F6F9FB;
-}
-#funnel-editor .input-wrap select + input {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-}
-#funnel-editor .input-wrap input, #funnel-editor .input-wrap select {
-  margin: 0;
-}
-#funnel-editor .input-wrap select:first-child {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
 #funnel-editor .tabs {
   /*display: flex;*/
   /*justify-content: center;*/
@@ -675,22 +633,10 @@
 #funnel-editor .publish-actions button.update-and-launch:hover {
   background: #80a92a;
 }
-#funnel-editor .publish-actions button.update {
-  background: #0075ff;
-}
-#funnel-editor .publish-actions button.update:hover {
-  background: #005ecc;
-}
 #funnel-editor .publish-actions button.update svg {
   color: #FFFFFF;
   height: 20px;
   width: 20px;
-}
-#funnel-editor .publish-actions button.deactivate {
-  background: #e91f4f;
-}
-#funnel-editor .publish-actions button.deactivate:hover {
-  background: #c2133d;
 }
 #funnel-editor .publish-actions button.deactivate svg {
   width: 15px;
@@ -718,29 +664,41 @@
   gap: 5px;
   justify-content: space-between;
 }
-#funnel-editor #email-editor .inline-label {
+#funnel-editor .inline-label {
   display: flex;
   gap: 10px;
   border-bottom: 1px solid rgba(16, 38, 64, 0.15);
   align-items: center;
   padding-bottom: 5px;
 }
-#funnel-editor #email-editor .inline-label label {
+#funnel-editor .inline-label:focus-within {
+  border-color: #0075ff;
+}
+#funnel-editor .inline-label.form-name {
+  margin-bottom: 10px;
+}
+#funnel-editor .inline-label.form-name label {
+  flex-basis: 120px;
+}
+#funnel-editor .inline-label.form-name input {
+  background: transparent;
+}
+#funnel-editor .inline-label label {
   font-weight: 500;
   font-size: 18px;
 }
-#funnel-editor #email-editor .inline-label .input-wrap {
+#funnel-editor .inline-label .input-wrap {
   width: 100%;
 }
-#funnel-editor #email-editor .inline-label .input-wrap button {
+#funnel-editor .inline-label .input-wrap button {
   background: none;
   border: none;
   opacity: 0.5;
 }
-#funnel-editor #email-editor .inline-label .input-wrap button:hover, #funnel-editor #email-editor .inline-label .input-wrap button:focus {
+#funnel-editor .inline-label .input-wrap button:hover, #funnel-editor .inline-label .input-wrap button:focus {
   opacity: 1;
 }
-#funnel-editor #email-editor .inline-label .input-wrap input {
+#funnel-editor .inline-label .input-wrap input {
   width: 100%;
   box-shadow: none;
   border: none;

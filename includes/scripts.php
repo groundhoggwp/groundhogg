@@ -400,7 +400,9 @@ class Scripts {
 			'groundhogg-admin-element',
 			'groundhogg-loader'
 		], GROUNDHOGG_VERSION );
-		wp_register_style( 'groundhogg-admin-form-builder', GROUNDHOGG_ASSETS_URL . 'css/admin/form-builder.css', [], GROUNDHOGG_VERSION );
+		wp_register_style( 'groundhogg-admin-form-builder', GROUNDHOGG_ASSETS_URL . 'css/admin/form-builder.css', [
+			'groundhogg-form'
+		], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-dashboard', GROUNDHOGG_ASSETS_URL . 'css/admin/dashboard.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-modal', GROUNDHOGG_ASSETS_URL . 'css/admin/modal.css', [ 'wp-color-picker' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-extensions', GROUNDHOGG_ASSETS_URL . 'css/admin/extensions.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );

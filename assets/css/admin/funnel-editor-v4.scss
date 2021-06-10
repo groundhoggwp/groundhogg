@@ -42,7 +42,7 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
   #funnel-title-input {
     padding: 40px;
 
-    h1{
+    h1 {
       text-align: center;
       font-weight: 200;
       margin-bottom: 40px;
@@ -58,7 +58,7 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
       display: block;
     }
 
-    p.error{
+    p.error {
       color: $error-red;
       text-align: center;
     }
@@ -72,7 +72,7 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
       box-shadow: none;
     }
 
-    .submit{
+    .submit {
       text-align: center;
     }
 
@@ -80,7 +80,7 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
       text-align: center;
     }
 
-    a.cancel{
+    a.cancel {
       font-size: 16px;
       cursor: pointer;
     }
@@ -118,7 +118,7 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
           }
         }
 
-        &.disabled{
+        &.disabled {
           opacity: 0.8;
         }
 
@@ -752,59 +752,6 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
     background-color: #0066aa;
   }
 
-  .input-wrap {
-    display: flex;
-    justify-content: flex-start;
-  }
-
-  .input-wrap > *:last-child {
-    border-top-right-radius: 4px !important;
-    border-bottom-right-radius: 4px !important;
-    border-left: none !important;
-  }
-
-  .input-wrap > *:nth-child(2):not(:last-child) {
-    border-left: none !important;
-  }
-
-  .input-wrap.input-with-emojis input,
-  .input-wrap.input-with-replacements input {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    margin-right: 0;
-  }
-
-  .input-wrap.input-with-emojis button.emoji-picker-start,
-  .input-wrap.input-with-replacements button.replacements-picker-start {
-    box-shadow: 0 0 0 transparent;
-    border-radius: 0;
-    border: 1px solid #8c8f94;
-    background-color: #fff;
-    color: #2c3338;
-    cursor: pointer;
-  }
-
-  .input-wrap.input-with-emojis button.emoji-picker-start:hover,
-  .input-wrap.input-with-replacements button.replacements-picker-start:hover {
-    background-color: #F6F9FB;
-  }
-
-  .input-wrap {
-    select + input {
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
-    }
-
-    input, select {
-      margin: 0;
-    }
-
-    select:first-child {
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-    }
-  }
-
   .tabs {
     /*display: flex;*/
     /*justify-content: center;*/
@@ -867,12 +814,6 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
       }
 
       &.update {
-        background: $primary-blue;
-
-        &:hover {
-          background: darken($primary-blue, 10);
-        }
-
         svg {
           color: #FFFFFF;
           height: 20px;
@@ -881,12 +822,6 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
       }
 
       &.deactivate {
-        background: $error-red;
-
-        &:hover {
-          background: darken($error-red, 10);
-        }
-
         svg {
           width: 15px;
           height: 15px;
@@ -928,45 +863,60 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
 
   }
 
-  #email-editor {
-    .inline-label {
-      display: flex;
-      gap: 10px;
-      border-bottom: 1px solid rgba(16, 38, 64, 0.15);
-      align-items: center;
-      padding-bottom: 5px;
+  .inline-label {
+    display: flex;
+    gap: 10px;
+    border-bottom: 1px solid rgba(16, 38, 64, 0.15);
+    align-items: center;
+    padding-bottom: 5px;
 
-      label {
-        font-weight: 500;
-        font-size: 18px;
+    &:focus-within{
+      border-color: $primary-blue;
+    }
+
+    &.form-name{
+      margin-bottom: 10px;
+
+      label{
+        flex-basis: 120px;
       }
 
-      .input-wrap {
+      input{
+        background: transparent;
+      }
+    }
 
+    label {
+      font-weight: 500;
+      font-size: 18px;
+    }
+
+    .input-wrap {
+
+      width: 100%;
+
+      button {
+        background: none;
+        border: none;
+        opacity: 0.5;
+
+        &:hover,
+        &:focus {
+          opacity: 1;
+        }
+      }
+
+      input {
         width: 100%;
-
-        button {
-          background: none;
-          border: none;
-          opacity: 0.5;
-
-          &:hover,
-          &:focus {
-            opacity: 1;
-          }
-        }
-
-        input {
-          width: 100%;
-          box-shadow: none;
-          border: none;
-          font-size: 18px;
-          outline: 0;
-          padding: 0;
-        }
+        box-shadow: none;
+        border: none;
+        font-size: 18px;
+        outline: 0;
+        padding: 0;
       }
     }
   }
+
 
   #advanced-email-options {
     .button-end {

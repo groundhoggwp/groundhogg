@@ -6,6 +6,10 @@
   #form-preview {
     width: 100%;
     margin-top: 0 !important;
+
+    * {
+      box-sizing: border-box;
+    }
   }
 
   #fields-editor {
@@ -19,6 +23,14 @@
       display: flex;
       flex-direction: column;
       gap: 5px;
+
+      .field-placeholder{
+        //border-style: none;
+        background: #0001;
+        border-radius: 5px;
+        //flex-direction: column;
+        //margin: auto;
+      }
 
       .form-field {
         background: #FFFFFF;

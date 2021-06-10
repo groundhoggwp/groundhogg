@@ -7,6 +7,10 @@
   width: 100%;
   margin-top: 0 !important;
 }
+#form-builder #fields-editor *,
+#form-builder #form-preview * {
+  box-sizing: border-box;
+}
 #form-builder #fields-editor .add-field {
   width: 100%;
   margin-top: 10px;
@@ -15,6 +19,10 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
+}
+#form-builder #fields-editor #form-fields .field-placeholder {
+  background: #0001;
+  border-radius: 5px;
 }
 #form-builder #fields-editor #form-fields .form-field {
   background: #FFFFFF;

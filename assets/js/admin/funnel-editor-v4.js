@@ -9,7 +9,13 @@
     tinymceElement,
     confirmationModal,
     loadingModal,
-    select
+    modal,
+    select,
+    input,
+    textarea,
+    toggle,
+    textAreaWithReplacements,
+    textAreaWithReplacementsAndEmojis,
   } = Groundhogg.element
 
   const { formBuilder } = Groundhogg
@@ -47,6 +53,10 @@
 
   const slotsDemounted = () => {
     return SlotFillProvider.slotsDemounted()
+  }
+
+  const stepIsReal = (stepId) => {
+    return Editor.origFunnel.steps.find(step => step.ID === stepId)
   }
 
   const SlotFillProvider = {
@@ -183,7 +193,7 @@
         } else {
           //language=HTML
           return `
-			  <button class="update">
+			  <button class="update gh-button primary" ${objectEquals( Editor.funnel.steps, Editor.origFunnel.steps ) ? 'disabled' : '' }>
 				  <svg viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
 					  <path
 						  d="M1 21.956V2.995c0-.748.606-1.355 1.354-1.355H17.93l4.74 4.74v15.576c0 .748-.606 1.354-1.354 1.354H2.354A1.354 1.354 0 011 21.956z"
@@ -194,7 +204,7 @@
 				  </svg>
 				  Update
 			  </button>
-			  <button class="deactivate">Deactivate
+			  <button class="deactivate gh-button danger">Deactivate
 				  <svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
 					  <path d="M16.337 15.535h-4.8V.735h4.8v14.8zm-10 0h-4.8V.735h4.8v14.8z" fill="currentColor"
 					        stroke="currentColor"
@@ -227,12 +237,12 @@
           errors = Editor.stepErrors[ID]
         }
 
-        const updateStepMeta = (meta) => {
-          return Editor.updateCurrentStepMeta(meta)
+        const updateStepMeta = (meta, reRenderStepEdit = false) => {
+          return Editor.updateCurrentStepMeta(meta, reRenderStepEdit)
         }
 
-        const updateStep = (data) => {
-          return Editor.updateCurrentStep(data)
+        const updateStep = (data, reRenderStepEdit = false) => {
+          return Editor.updateCurrentStep(data, reRenderStepEdit)
         }
 
         const slotArgs = [
@@ -715,6 +725,8 @@
         .join('')
 
       $('.step-flow .steps').html(steps)
+
+      this.renderPublishActions()
     },
 
     /**
@@ -776,12 +788,12 @@
         return
       }
 
-      const updateStepMeta = (meta) => {
-        return this.updateCurrentStepMeta(meta)
+      const updateStepMeta = (meta, reRenderStepEdit = false) => {
+        return this.updateCurrentStepMeta(meta, reRenderStepEdit)
       }
 
-      const updateStep = (data) => {
-        return this.updateCurrentStep(data)
+      const updateStep = (data, reRenderStepEdit = false) => {
+        return this.updateCurrentStep(data, reRenderStepEdit)
       }
 
       const StepType = getStepType(step.data.step_type)
@@ -862,38 +874,38 @@
         return
       }
 
-      const self = this;
+      const self = this
 
       self.demountStep()
 
       $('#control-panel').html(self.htmlTemplates.stepAddPanel(self.activeAddType))
       self.renderStepFlow()
 
-      if ( self.addingStepOrder ) {
+      if (self.addingStepOrder) {
         $('.add-step').on(
-            'click',
-            function () {
-              const $button = $(this);
-              var type = $button.data('type')
-              var group = $button.data('group')
+          'click',
+          function () {
+            const $button = $(this)
+            var type = $button.data('type')
+            var group = $button.data('group')
 
-              var id = Date.now()
+            var id = Date.now()
 
-              self.addStep({
+            self.addStep({
+              ID: id,
+              data: {
                 ID: id,
-                data: {
-                  ID: id,
-                  funnel_id: Editor.funnel.ID,
-                  step_title: Editor.stepTypes[type].name,
-                  step_type: type,
-                  step_group: group,
-                  step_order: self.addingStepOrder
-                },
-                meta: StepTypes.getType(type).defaults
-              })
+                funnel_id: Editor.funnel.ID,
+                step_title: Editor.stepTypes[type].name,
+                step_type: type,
+                step_group: group,
+                step_order: self.addingStepOrder
+              },
+              meta: StepTypes.getType(type).defaults
+            })
 
-            }
-        );
+          }
+        )
       } else {
         $('.add-step').draggable({
           connectToSortable: '.step-flow .steps',
@@ -1042,6 +1054,11 @@
         this.abortController.abort()
       }
 
+      const { close } = modal({
+        content: '<h1>Saving...</h1>',
+        canClose: false
+      })
+
       apiPost(`${apiRoutes.funnels}/${self.funnel.ID}/commit`, {
         edited: {
           steps: self.funnel.steps
@@ -1070,16 +1087,15 @@
           })
 
           // console.log(self.stepErrors)
-
           self.render()
         }
-      })
+      }).then( () => close() )
     },
-    
+
     setLastSaved () {
       clearInterval(self.lastSavedTimer)
 
-      self.lastSavedTimer = setInterval(this.updateLastSaved, 30*1000, new Date()) // 30 seconds
+      self.lastSavedTimer = setInterval(this.updateLastSaved, 30 * 1000, new Date()) // 30 seconds
       this.updateLastSaved(new Date())
     },
 
@@ -1091,32 +1107,32 @@
      * @link https://stackoverflow.com/a/7641812
      */
     updateLastSaved (lastSaved) {
-        var delta = Math.round((+new Date - lastSaved) / 1000);
+      var delta = Math.round((+new Date - lastSaved) / 1000)
 
-        var minute = 60,
-            hour = minute * 60,
-            day = hour * 24,
-            week = day * 7;
+      var minute = 60,
+        hour = minute * 60,
+        day = hour * 24,
+        week = day * 7
 
-        var fuzzy = 'Saved ';
+      var fuzzy = 'Saved '
 
-        if (delta < 30) {
-          fuzzy += 'just now';
-        } else if (delta < minute) {
-          fuzzy += delta + ' seconds ago';
-        } else if (delta < 2 * minute) {
-          fuzzy += 'a minute ago'
-        } else if (delta < hour) {
-          fuzzy += Math.floor(delta / minute) + ' minutes ago.';
-        } else if (Math.floor(delta / hour) == 1) {
-          fuzzy += '1 hour ago'
-        } else if (delta < day) {
-          fuzzy = Math.floor(delta / hour) + ' hours ago.';
-        } else if (delta < day * 2) {
-          fuzzy += 'yesterday';
-        }
+      if (delta < 30) {
+        fuzzy += 'just now'
+      } else if (delta < minute) {
+        fuzzy += delta + ' seconds ago'
+      } else if (delta < 2 * minute) {
+        fuzzy += 'a minute ago'
+      } else if (delta < hour) {
+        fuzzy += Math.floor(delta / minute) + ' minutes ago.'
+      } else if (Math.floor(delta / hour) == 1) {
+        fuzzy += '1 hour ago'
+      } else if (delta < day) {
+        fuzzy = Math.floor(delta / hour) + ' hours ago.'
+      } else if (delta < day * 2) {
+        fuzzy += 'yesterday'
+      }
 
-        $('.header-actions').attr('data-lastSaved', fuzzy);
+      $('.header-actions').attr('data-lastSaved', fuzzy)
 
     },
 
@@ -1138,7 +1154,7 @@
       this.funnel.steps.push(step)
       this.fixStepOrders()
 
-      delete this.addingStepOrder;
+      delete this.addingStepOrder
       // this.activeStep = step.ID
       // this.view = 'editingStep'
       this.renderStepFlow()
@@ -1175,33 +1191,33 @@
     },
 
     insertPlaceholderStep (step, beforeAfter) {
-      const self = this;
+      const self = this
 
       self.previousActiveStep = step.ID
 
       self.view = 'addingStep'
-      self.addingStepOrder = 'before' === beforeAfter ? parseInt(step.data.step_order)-.1 : parseInt(step.data.step_order)+.1
+      self.addingStepOrder = 'before' === beforeAfter ? parseInt(step.data.step_order) - .1 : parseInt(step.data.step_order) + .1
       self.renderStepFlow()
       self.renderStepAdd()
-      const $html = $(`<div class="step-placeholder">Choose a step to add here &rarr;<button type="button" class="button button-secondary">Cancel</button></div>`);
+      const $html = $(`<div class="step-placeholder">Choose a step to add here &rarr;<button type="button" class="button button-secondary">Cancel</button></div>`)
 
       $('button', $html).on(
-          'click',
-          function () {
-            delete self.addingStepOrder;
-            $html.remove();
+        'click',
+        function () {
+          delete self.addingStepOrder
+          $html.remove()
 
-            self.activeStep = self.previousActiveStep
-            self.view = 'editingStep'
-            self.renderStepFlow()
-            self.renderStepEdit()
-          }
-      );
+          self.activeStep = self.previousActiveStep
+          self.view = 'editingStep'
+          self.renderStepFlow()
+          self.renderStepEdit()
+        }
+      )
 
-      if ( 'before' === beforeAfter ) {
-        $html.insertBefore(`.steps [data-id="${step.ID}"]`);
+      if ('before' === beforeAfter) {
+        $html.insertBefore(`.steps [data-id="${step.ID}"]`)
       } else {
-        $html.insertAfter(`.steps [data-id="${step.ID}"]`);
+        $html.insertAfter(`.steps [data-id="${step.ID}"]`)
       }
     },
 
@@ -1321,17 +1337,23 @@
      * Updates the current active step
      *
      * @param newData
+     * @param reRenderStepEdit
      */
-    updateCurrentStep (newData) {
+    updateCurrentStep (newData, reRenderStepEdit = false) {
       this.updateStep(this.activeStep, newData)
+
+      if (reRenderStepEdit) {
+        this.renderStepEdit()
+      }
     },
 
     /**
      * Updates the current active step
      *
      * @param newMeta
+     * @param reRenderStepEdit
      */
-    updateCurrentStepMeta (newMeta) {
+    updateCurrentStepMeta (newMeta, reRenderStepEdit = false) {
 
       // console.log(this)
 
@@ -1343,6 +1365,10 @@
           ...newMeta
         }
       })
+
+      if (reRenderStepEdit) {
+        this.renderStepEdit()
+      }
     },
 
     autoSaveTimeout: null,
@@ -2252,15 +2278,15 @@
 				<div class="row">
 					<label class="row-label" for="tags">Select tags to add.</label>
 					${select(
-					    {
-                          name: 'tags',
-                          id: 'tags',
-                          multiple: true,
-                        }, 
-                        options,
-                        meta.tags ? meta.tags.map(id => parseInt(id)) : []
-                    )
-                    }
+						{
+							name: 'tags',
+							id: 'tags',
+							multiple: true,
+						},
+						options,
+						meta.tags ? meta.tags.map(id => parseInt(id)) : []
+					)
+					}
 					<p class="description">All of the defined tags will be added to the contact.</p>
 				</div>
 			</div>`
@@ -2800,12 +2826,11 @@
 			</div>`
       },
       onMount ({ meta }, updateStepMeta) {
-        $('#redirect-to').on('change', function (e) {
+        linkPicker('#redirect-to').on('change', function (e) {
           updateStepMeta({
             redirect_to: $(this).val()
           })
         })
-        linkPicker('#redirect-to')
       }
     },
 
@@ -2841,19 +2866,88 @@
 				  d="M1.5 7.733a.25.25 0 01-.25-.25v-6a.25.25 0 01.25-.25h32a.25.25 0 01.25.25v6a.25.25 0 01-.25.25h-32zm0 11a.25.25 0 01-.25-.25v-6a.25.25 0 01.25-.25h32a.25.25 0 01.25.25v6a.25.25 0 01-.25.25h-32z"
 				  stroke="currentColor" stroke-width="1.5"/>
 		  </svg>`,
-      title ({}) {
-        return 'form'
+      title ({ meta }) {
+        return `Submits <b>${meta.form_name || 'a form'}</b>`
       },
       edit ({ meta }) {
+
+        // language=html
+        const redirectToURL = `<label class="row-label">Redirect to this URL...</label>
+		${Elements.inputWithReplacements({
+			id: 'success-page',
+			name: 'success_page',
+			className: 'regular-text',
+			value: meta.success_page || ''
+		})}`
+
+        // language=html
+        const stayOnPage = `<label class="row-label">Show this message...</label>
+		${textAreaWithReplacementsAndEmojis({
+			id: 'success-message',
+			name: 'success_message',
+			className: 'regular-text',
+			value: meta.success_message || ''
+		})}`
+
         //language=HTML
         return `
+			<div class="inline-label form-name" tabindex="0">
+				<label>Form name:</label>
+				<div class="input-wrap">
+					${input({
+						name: 'form_name',
+						id: 'form-name',
+						placeholder: 'Form name...',
+						value: meta.form_name
+					})}
+				</div>
+			</div>
 			<div id="edit-form"></div>
 			<div class="panel">
-				<div class=""></div>
+				<div class="row">
+					<p>Stay on page after submitting? ${toggle({
+						name: 'enable_ajax',
+						id: 'enable-ajax',
+						checked: meta.enable_ajax
+					})}</p>
+				</div>
+				<div class="row">
+					${meta.enable_ajax ? stayOnPage : redirectToURL}
+				</div>
 			</div>`
       },
-      onMount ({}) {
-        const editor = formBuilder('#edit-form')
+      onMount ({ meta }, updateStepMeta) {
+
+        linkPicker('#success-page').on('change', (e) => {
+          updateStepMeta({
+            success_page: e.target.value
+          })
+        })
+
+        $('#success-message').on('change', (e) => {
+          updateStepMeta({
+            success_message: e.target.value
+          })
+        })
+
+        $('#enable-ajax').on('change', (e) => {
+          updateStepMeta({
+            enable_ajax: e.target.checked
+          }, true)
+        })
+
+        $('#form-name').on('change', (e) => {
+          updateStepMeta({
+            form_name: e.target.value
+          })
+        })
+
+        const editor = formBuilder('#edit-form', meta.form, (form) => {
+          updateStepMeta({
+            form
+          })
+        })
+
         editor.init()
       }
     }
@@ -2908,5 +3002,36 @@
   }
 
   Groundhogg.funnelEditor.elements = Elements
+
+  fill('beforeStepNotes.form_fill', {
+    render ({ ID, meta }) {
+
+      if (!stepIsReal(ID)) {
+        return ''
+      }
+
+      const copyValue = (toCopy) => {
+        return input({
+          className: 'code',
+          value: toCopy,
+          onfocus: 'this.select()',
+          readonly: true,
+        })
+      }
+
+      //language=HTML
+      return `
+		  <div id="form-embed-options" class="panel">
+			  <div class="row">
+				  <label class="row-label">Embed via Shortcode</label>
+				  <div class="embed-option">${copyValue(`[gh_form id="${ID}"]`)}</div>
+			  </div>
+			  <div class="row">
+				  <label class="row-label">Embed via iFrame</label>
+				  <div class="embed-option">${copyValue(`[gh_form id="${ID}"]`)}</div>
+			  </div>
+		  </div>`
+    }
+  })
 
 })(GroundhoggFunnel, jQuery)

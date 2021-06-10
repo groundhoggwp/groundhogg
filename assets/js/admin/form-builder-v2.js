@@ -1,14 +1,63 @@
 (function ($) {
 
-  const { toggle, input, select, inputWithReplacements } = Groundhogg.element
+  const { toggle, input, select, inputWithReplacements, uuid } = Groundhogg.element
+
+  const columnWidths = {
+    '1/1': 1,
+    '1/2': 0.5,
+    '1/3': 0.33333,
+    '1/4': 0.25,
+    '2/3': 0.66666,
+    '3/4': 0.75,
+  }
+
+  const columnClasses = {
+    '1/1': 'col-1-of-1',
+    '1/2': 'col-1-of-2',
+    '1/3': 'col-1-of-3',
+    '1/4': 'col-1-of-4',
+    '2/3': 'col-2-of-3',
+    '3/4': 'col-3-of-4',
+  }
+
+  const fieldWidth = ({ column_width }) => {
+    return columnWidths[column_width]
+  }
+
+  /**
+   * Group into rows based on their field width
+   *
+   * @param fields
+   * @returns {*}
+   */
+  const groupFieldsInRows = ({ fields }) => {
+    return fields.reduce((rows, field) => {
+
+      const rowWidth = rows[rows.length - 1].reduce((width, field) => {
+        return width + fieldWidth(field)
+      }, 0)
+
+      if (rowWidth + fieldWidth(field) > 1) {
+        rows.push([])
+      }
+
+      rows[rows.length - 1].push(field)
+
+      return rows
+    }, [[]])
+
+  }
 
   const defaultField = {
-    className: 'text',
+    className: '',
+    id: '',
     type: 'text',
     name: 'text',
     value: '',
     label: 'New field',
+    hide_label: false,
     required: false,
+    column_width: '1/1'
   }
 
   const defaultForm = {
@@ -38,19 +87,10 @@
   }
 
   const Settings = {
-    type (type) {
 
-      // language=html
-      return `<label for="type">Type</label>
-	  <div class="setting">
-		  ${select({
-			  id: 'type',
-			  name: 'type',
-		  }, getFieldTypeOptions(), type)}
-	  </div>`
-    },
     basic (label, atts) {
       const { id } = atts
+      // language=html
       return `<label for="${id}">${label}</label>
 	  <div class="setting">${input(atts)}</div>`
     },
@@ -58,64 +98,229 @@
       const { id } = atts
       return `<label for="${id}">${label}</label> ${inputWithReplacements(atts)}`
     },
-    required (required) {
-      //language=HTML
-      return `<label for="required">Required</label>
-	  <div class="setting">${toggle({
-		  id: 'required',
-		  name: 'required',
-		  className: 'required',
-		  onLabel: 'Yes',
-		  offLabel: 'No',
-		  checked: required
-	  })}
-	  </div>`
+
+    type: {
+      type: 'type',
+      edit ({ type = 'text' }) {
+        //language=HTML
+        return `<label for="type">Type</label>
+		<div class="setting">
+			${select({
+				id: 'type',
+				name: 'type',
+			}, getFieldTypeOptions(), type)}
+		</div>`
+      },
+      onMount (field, updateField) {
+        $('#type').on('change', (e) => {
+          updateField({
+            type: e.target.value
+          }, true)
+        })
+      }
     },
-    label (label) {
-      return this.basic('Label', {
-        id: 'label',
-        name: 'label',
-        className: 'label',
-        value: label,
-        placeholder: ''
-      })
+    required: {
+      type: 'required',
+      edit ({ required = false }) {
+        //language=HTML
+        return `<label for="required">Required</label>
+		<div class="setting">${toggle({
+			id: 'required',
+			name: 'required',
+			className: 'required',
+			onLabel: 'Yes',
+			offLabel: 'No',
+			checked: required
+		})}
+		</div>`
+      },
+      onMount (field, updateField) {
+        $('#required').on('change', (e) => {
+          updateField({
+            required: e.target.checked
+          })
+        })
+      }
     },
-    value (value) {
-      return this.basicWithReplacements('Value', {
-        id: 'value',
-        name: 'value',
-        className: 'value regular-text',
-        value: value,
-        placeholder: ''
-      })
+    label: {
+      type: 'label',
+      edit ({ label = '' }) {
+        return Settings.basic('Label', {
+          id: 'label',
+          name: 'label',
+          className: 'label',
+          value: label,
+          placeholder: ''
+        })
+      },
+      onMount (field, updateField) {
+        $('#label').on('change', (e) => {
+          updateField({
+            label: e.target.value
+          }, true)
+        })
+      }
     },
-    placeholder (placeholder) {
-      return this.basic('Placeholder', {
-        id: 'placeholder',
-        name: 'Placeholder',
-        className: 'placeholder',
-        value: placeholder,
-        placeholder: ''
-      })
+    hideLabel: {
+      type: 'hideLabel',
+      edit ({ hide_label = false }) {
+        //language=HTML
+        return `<label for="required">Hide label</label>
+		<div class="setting">${toggle({
+			id: 'hide-label',
+			name: 'hide_label',
+			className: 'hide-label',
+			onLabel: 'Yes',
+			offLabel: 'No',
+			checked: hide_label
+		})}
+		</div>`
+      },
+      onMount (field, updateField) {
+        $('#hide-label').on('change', (e) => {
+          updateField({
+            hide_label: e.target.checked
+          })
+        })
+      }
     },
-    id (id) {
-      return this.basic('CSS Id', {
-        id: 'css-id',
-        name: 'id',
-        className: 'css-id',
-        value: id,
-        placeholder: 'css-id'
-      })
+    value: {
+      type: 'value',
+      edit ({ value = '' }) {
+        return Settings.basicWithReplacements('Value', {
+          id: 'value',
+          name: 'value',
+          className: 'value regular-text',
+          value: value,
+          placeholder: ''
+        })
+      },
+      onMount (field, updateField) {
+        $('#value').on('change', (e) => {
+          updateField({
+            value: e.target.value
+          })
+        })
+      }
     },
-    className (className) {
-      return this.basic('CSS Class', {
-        id: 'className',
-        name: 'className',
-        className: 'css-class-name',
-        value: className,
-        placeholder: 'css-class-name'
-      })
+    placeholder: {
+      type: 'placeholder',
+      edit ({ placeholder = '' }) {
+        return Settings.basic('Placeholder', {
+          id: 'placeholder',
+          name: 'Placeholder',
+          className: 'placeholder',
+          value: placeholder,
+          placeholder: ''
+        })
+      },
+      onMount (field, updateField) {
+        $('#placeholder').on('change', (e) => {
+          updateField({
+            placeholder: e.target.value
+          })
+        })
+      }
     },
+    id: {
+      type: 'id',
+      edit ({ id = '' }) {
+        return Settings.basic('CSS Id', {
+          id: 'css-id',
+          name: 'id',
+          className: 'css-id',
+          value: id,
+          placeholder: 'css-id'
+        })
+      },
+      onMount (field, updateField) {
+        $('#id').on('change', (e) => {
+          updateField({
+            id: e.target.value
+          })
+        })
+      }
+    },
+    className: {
+      type: 'className',
+      edit ({ className = '' }) {
+        return Settings.basic('CSS Class', {
+          id: 'className',
+          name: 'className',
+          className: 'css-class-name',
+          value: className,
+          placeholder: 'css-class-name'
+        })
+      },
+      onMount (field, updateField) {
+        $('#className').on('change', (e) => {
+          updateField({
+            className: e.target.value
+          })
+        })
+      }
+    },
+    phoneType: {
+      type: 'phoneType',
+      edit ({ phone_type = 'primary' }) {
+        //language=HTML
+        return `<label for="phone-type">Phone Type</label>
+		<div class="setting">${select({
+			id: 'phone-type',
+			name: 'phone_type',
+			className: 'phone-type',
+		}, {
+			primary: 'Primary Phone',
+			mobile: 'Mobile Phone',
+			company: 'Company Phone',
+		}, phone_type)}
+		</div>`
+      },
+      onMount (field, updateField) {
+        $('#phone-type').on('change', (e) => {
+          updateField({
+            phone_type: e.target.value
+          })
+        })
+      }
+    },
+    columnWidth: {
+      type: 'columnWidth',
+      edit ({ column_width }) {
+        //language=HTML
+        return `<label for="column-widtg">Column Width</label>
+		<div class="setting">${select({
+			id: 'column-width',
+			name: 'column_width',
+			className: 'column-width',
+		}, {
+			'1/1': '1/1',
+			'1/2': '1/2',
+			'1/3': '1/3',
+			'1/4': '1/4',
+			'2/3': '2/3',
+			'3/4': '3/4',
+		}, column_width)}
+		</div>`
+      },
+      onMount (field, updateField) {
+        $('#column-width').on('change', (e) => {
+          updateField({
+            column_width: e.target.value
+          })
+        })
+      }
+    }
+  }
+
+  /**
+   * Render a preview of the field
+   *
+   * @param field
+   * @returns {*}
+   */
+  const previewField = (field) => {
+    return getFieldType(field.type).preview(field)
   }
 
   /**
@@ -150,93 +355,88 @@
     return options
   }
 
+  const standardContentSettings = [
+    Settings.type.type,
+    Settings.required.type,
+    Settings.hideLabel.type,
+    Settings.label.type,
+    Settings.placeholder.type,
+    Settings.columnWidth.type
+  ]
+
+  const standardAdvancedSettings = [
+    Settings.value.type,
+    Settings.id.type,
+    Settings.className.type
+  ]
+
   const FieldTypes = {
     default: {
       name: 'default',
-      content (field) { return []},
-      advanced (field) { return []},
-      contentOnMount (field) {},
-      advancedOnMount (field) {},
-      hide: true
+      content: [],
+      advanced: [],
+      hide: true,
+      preview ({
+        id = uuid(),
+        name = 'name',
+        placeholder = '',
+        value = '',
+        label = '',
+        hide_label = false,
+        required = false,
+        className = ''
+      }) {
+
+        const inputField = input({
+          id: id,
+          name: 'name',
+          placeholder: placeholder,
+          value: value,
+          className: `gh-input ${className}`
+        })
+
+        if (hide_label) {
+          return inputField
+        }
+
+        if (required) {
+          label += ' <span class="required">*</span>'
+        }
+
+        return `<label class="gh-input-label" for="${id}">${label}</label><div class="gh-form-field-input">${inputField}</div>`
+      }
     },
     first: {
       name: 'First Name',
-      content (field) {
-        return [
-          Settings.required(field.required),
-          Settings.label(field.label),
-          Settings.placeholder(field.placeholder),
-        ]
-      },
-      advanced (field) {
-        return [
-          Settings.value(field.value),
-          Settings.id(field.id),
-          Settings.className(field.className),
-        ]
-      }
+      content: standardContentSettings,
+      advanced: standardAdvancedSettings
     },
     last: {
       name: 'Last Name',
-      content (field) {
-        return [
-          Settings.required(field.required),
-          Settings.label(field.label),
-          Settings.placeholder(field.placeholder),
-        ]
-      },
-      advanced (field) {
-        return [
-          Settings.value(field.value),
-          Settings.id(field.id),
-          Settings.className(field.className),
-        ]
-      }
+      content: standardContentSettings,
+      advanced: standardAdvancedSettings
     },
     email: {
       name: 'Email',
-      content (field) {
-        return [
-          Settings.required(field.required),
-          Settings.label(field.label),
-          Settings.placeholder(field.placeholder),
-        ]
-      },
-      contentOnMount (field, updateField) {
-
-      },
-      advanced (field) {
-        return [
-          Settings.value(field.value),
-          Settings.id(field.id),
-          Settings.className(field.className),
-        ]
-      },
-      advancedOnMount (field, updateField) {
-
-      }
+      content: standardContentSettings,
+      advanced: standardAdvancedSettings
     },
-    phone: {},
+    phone: {
+      name: 'Phone Number',
+      content: [
+        ...standardContentSettings,
+        Settings.phoneType.type
+      ],
+      advanced: standardAdvancedSettings
+    },
     gdpr: {},
     terms: {},
     recaptcha: {},
     submit: {},
     text: {
       name: 'Text',
-      content (field) {
-        return [
-          Settings.required(field.required),
-          Settings.label(field.label),
-          Settings.placeholder(field.placeholder),
-        ]
-      },
-      advanced (field) {
-        return [
-          Settings.value(field.value),
-          Settings.id(field.id),
-          Settings.className(field.className),
-        ]
-      }
+      content: standardContentSettings,
+      advanced: standardAdvancedSettings
     },
     textarea: {},
     number: {},
@@ -258,7 +458,7 @@
 
       const fieldType = getFieldType(field.type)
 
-      const settings = settingsTab === 'advanced' ? fieldType.advanced(field) : fieldType.content(field)
+      const settings = settingsTab === 'advanced' ? fieldType.advanced : fieldType.content
 
       // language=HTML
       return `
@@ -267,8 +467,7 @@
 			  <a class="settings-tab ${settingsTab === 'advanced' ? 'active' : ''}" data-tab="advanced">Advanced</a>
 		  </div>
 		  <div class="settings">
-			  ${settingsTab === 'content' ? `<div class="row">${Settings.type(field.type)}</div>` : ''}
-			  ${settings.map(setting => `<div class="row">${setting}</div>`).join('')}
+			  ${settings.map(setting => `<div class="row">${Settings[setting].edit(field)}</div>`).join('')}
 		  </div>`
     },
 
@@ -311,10 +510,47 @@
 				  <button class="add-field gh-button secondary">Add Field</button>
 			  </div>
 			  <div id="form-preview" class="panel">
-				  <!-- Preview -->
+				  ${this.preview(form)}
 			  </div>
 		  </div>`
     },
+
+    /**
+     *
+     * @param form
+     * @returns {string}
+     */
+    preview (form) {
+
+      const rows = groupFieldsInRows(form)
+
+      const formHTML = rows.map(row => {
+
+        const rowHTML = row.map(field => {
+
+          const { column_width } = field
+
+          // language=HTML
+          return `
+			  <div class="gh-form-column ${columnClasses[column_width]}">
+				  <div class="gh-form-field">
+					  ${previewField(field)}
+				  </div>
+			  </div>`
+
+        }).join('')
+
+        // language=HTML
+        return `
+			<div class="gh-form-row">${rowHTML}</div>`
+      }).join('')
+
+      //language=HTML
+      return `
+		  <form>
+			  ${formHTML}
+		  </form>`
+    }
 
   }
 
@@ -345,6 +581,10 @@
 
       const render = () => {
         this.mount()
+      }
+
+      const renderPreview = () => {
+        this.renderPreview()
       }
 
       const currentField = () => {
@@ -385,14 +625,22 @@
         setActiveField(id + 1)
       }
 
-      const updateField = (atts) => {
+      const updateField = (atts, reRenderSettings = false, reRenderPreview = true) => {
+
+        console.log(atts)
+
         this.form.fields[this.activeField] = {
           ...this.form.fields[this.activeField],
           ...atts
         }
 
         onChange(this.form)
-        render()
+
+        if (reRenderSettings) {
+          render()
+        } else if (reRenderPreview) {
+          renderPreview()
+        }
       }
 
       const $builder = $('#form-builder')
@@ -419,31 +667,56 @@
           }
         }
 
-        if (self.activeField) {
+        if (self.activeField !== false) {
           if (self.activeFieldTab === 'content') {
-
-            $('#type').on('change', (e) => {
-              updateField({
-                type: e.target.value
-              })
+            getFieldType(currentField().type).content.forEach(setting => {
+              Settings[setting].onMount(currentField(), updateField)
             })
-
-            getFieldType(currentField().type).contentOnMount(currentField(), updateField)
           } else {
-            getFieldType(currentField().type).advancedOnMount(currentField(), updateField)
+            getFieldType(currentField().type).advanced.forEach(setting => {
+              Settings[setting].onMount(currentField(), updateField)
+            })
           }
+        }
+      })
+
+      $('#form-fields').sortable({
+        placeholder: 'field-placeholder',
+        handle: '.field-header',
+        start: function (e, ui) {
+          ui.placeholder.height(ui.item.height())
+          ui.placeholder.width(ui.item.width())
+        },
+        update: function (e, ui) {
+          const newFields = []
+
+          $('.form-field').each(function (i) {
+            const fieldId = parseInt($(this).data('key'))
+            newFields.push(self.form.fields[fieldId])
+          })
+
+          self.form.fields = newFields
+
+          onChange( self.form )
+          render()
         }
       })
     },
 
+    renderPreview () {
+      $('#form-preview').html(Templates.preview(this.form))
+    },
+
     render () {
+      const activeElementId = document.activeElement.id
       this.el.html(Templates.builder(this.form, this.activeField, this.activeFieldTab))
+      if (activeElementId) {
+        document.querySelector('#' + activeElementId).focus()
+      }
     },
 
     deMount () {},
-
     renderSettings () {},
-    renderPreview () {},
 
   })
 

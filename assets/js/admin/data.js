@@ -109,8 +109,8 @@
       return apiGet(`${this.route}/${id}`).then(r => {
         self.item = r.item
         self.items = [
-          ...self.items,
           r.item,
+          ...self.items.filter( item => item.ID !== r.item.ID ),
         ]
         return r
       })

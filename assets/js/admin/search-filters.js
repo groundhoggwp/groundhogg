@@ -11,7 +11,9 @@
     searchOptionsWidget
   } = Groundhogg.element
 
-  const { tagPicker, linkPicker } = Groundhogg.pickers
+  const { tagPicker, emailPicker, linkPicker } = Groundhogg.pickers
+
+  const { emails } = Groundhogg.stores
 
   const Filters = {
     view () {},
@@ -720,25 +722,31 @@
 
   //filter by Email Opened
   registerFilter('email_opened', 'activity', {
-    view ({ page_url, date_range, date, date2 }) {
+    view ({ email_id, date_range, date, date2 }) {
+
+      const email = emails.get(email_id)
 
       //language=HTMl
       switch (date_range) {
         default:
-          return `Visited <b>${page_url}</b> ${dateRanges[date_range].toLowerCase()}`
+          return `Opened <b>${email.data.title}</b> ${dateRanges[date_range].toLowerCase()}`
         case 'custom':
-          return `Visited <b>${page_url}</b> between <b>${date}</b> and <b>${date2}</b>`
+          return `Opened <b>${email.data.title}</b> between <b>${date}</b> and <b>${date2}</b>`
       }
 
     },
-    edit ({ email, date_range, date, date2 }) {
+    edit ({ email_id, date_range, date, date2 }) {
+
+      const pickerOptions = email_id ? {
+        [email_id]: emails.get(email_id).data.title
+      } : {}
 
       // language=html
       return `
 		  ${select({
 			  id: 'filter-email',
-			  name: 'email',
-		  }, {}, email)}
+			  name: 'email_id',
+		  }, pickerOptions, email_id)}
 
 		  ${select({
 			  id: 'filter-date-range',
@@ -756,13 +764,24 @@
 		  ${input({
 			  type: 'date',
 			  value: date2,
+			  name: 'date2',
 			  id: 'filter-date2',
-			  className: `value ${date_range === 'custom' ? '' : 'hidden'}`,
-			  name: 'date2'
+			  className: `value ${date_range === 'custom' ? '' : 'hidden'}`
 		  })}`
     },
     onMount (filter, updateFilter) {
-      $('#filter-value, #meta_key, #filter-value').on('change', function (e) {
+      emailPicker('#filter-email').on('change', (e) => {
+
+        const email_id = parseInt(e.target.value)
+
+        emails.fetchItem(email_id).then(data => {
+          updateFilter({
+            email_id: email_id
+          })
+        })
+      })
+
+      $('#filter-date-range, #filter-date, #filter-date2').on('change', function (e) {
         const $el = $(this)
         updateFilter({
           [$el.prop('name')]: $el.val()
@@ -773,7 +792,7 @@
       date_range: '24_hours',
       date: '',
       date2: '',
-      page_url: '',
+      email_id: 0,
     }
   }, 'Email Opened')
 

@@ -1,5 +1,17 @@
 (function ($) {
 
+  Object.filter = function (obj, predicate) {
+    let result = {}, key
+
+    for (key in obj) {
+      if (obj.hasOwnProperty(key) && predicate(key, obj[key])) {
+        result[key] = obj[key]
+      }
+    }
+
+    return result
+  }
+
   function andList (array, text = 'and') {
     if (array.length === 1) {
       return array[0]
@@ -123,10 +135,10 @@
     return props.join(';')
   }
 
-  function uuid() { // Public Domain/MIT
-    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+  function uuid () { // Public Domain/MIT
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
       (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-    );
+    )
   }
 
   /**
@@ -159,7 +171,7 @@
   }
 
   const Elements = {
-    toggle ({ id, name, className, value, onLabel = 'on', offLabel = 'off', checked }) {
+    toggle ({ id, name, className, value = '1', onLabel = 'on', offLabel = 'off', checked }) {
       //language=HTML
       return `
 		  <label class="gh-switch ${className}">
@@ -189,6 +201,9 @@
     mappableFields (props, selected) {
       return Elements.select(props, Groundhogg.fields.mappable, selected)
     },
+    textarea (props) {
+      return `<textarea ${objectToProps(Object.filter(props, key => key !== 'value'))}>${specialChars(props.value)}</textarea>`
+    },
     inputWithReplacementsAndEmojis ({
       type = 'text',
       name,
@@ -203,7 +218,7 @@
       ]
       //language=HTML
       return `
-		  <div class="input-wrap ${classList.filter(c => c).join()}">
+		  <div class="input-wrap ${classList.filter(c => c).join(' ')}">
 			  <input type="${type}" id="${id}" name="${name}" value="${specialChars(value) || ''}" class="${className}"
 			         placeholder="${specialChars(placeholder)}">
 			  ${emojis ? `<button class="emoji-picker-start" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
@@ -218,15 +233,36 @@
     inputWithEmojis: function (atts) {
       return Elements.inputWithReplacementsAndEmojis(atts, false, true)
     },
-    textAreaWithReplacementsAndEmojis: function ({ name, id, value }) {
-
+    textAreaWithReplacementsAndEmojis: function ({
+      name,
+      id,
+      value,
+      className,
+      placeholder = ''
+    }, replacements = true, emojis = true) {
+      const classList = [
+        replacements && 'input-with-replacements',
+        emojis && 'input-with-emojis'
+      ]
+      //language=HTML
+      return `
+		  <div class="input-wrap ${classList.filter(c => c).join(' ')}" xmlns="http://www.w3.org/1999/html">
+			  <textarea id="${id}" name="${name}" class="${className}"
+	              placeholder="${specialChars(placeholder)}">${specialChars(value) || ''}</textarea>
+			  <div class="buttons">
+		    ${replacements ? `<button class="replacements-picker-start" title="insert replacement"><span
+				  class="dashicons dashicons-admin-users"></span></button>` : ''}
+				  ${emojis ? `<button class="emoji-picker-start" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
+			  </button>` : ''}
+			  </div>
+		  </div>`
     },
-    textAreaWithReplacements: function ({ name, id, value }) {
-
+    textAreaWithReplacements: function (atts) {
+      return Elements.textAreaWithReplacementsAndEmojis(atts, true, false)
     },
-    textAreaWithEmojis: function ({ name, id, value }) {
-
-    },
+    textAreaWithEmojis: function (atts) {
+      return Elements.textAreaWithReplacementsAndEmojis(atts, false, true)
+    }
   }
 
   const tinymceElement = (editor_id, config = {}, onChange = (v) => {
