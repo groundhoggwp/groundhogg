@@ -28,9 +28,16 @@
    * Group into rows based on their field width
    *
    * @param fields
+   * @param button
    * @returns {*}
    */
-  const groupFieldsInRows = ({ fields }) => {
+  const groupFieldsInRows = ({ fields, button }) => {
+
+    fields = [
+      ...fields,
+      button
+    ]
+
     return fields.reduce((rows, field) => {
 
       const rowWidth = rows[rows.length - 1].reduce((width, field) => {
@@ -61,6 +68,12 @@
   }
 
   const defaultForm = {
+    button: {
+      type: 'button',
+      text: 'Submit',
+      label: 'Submit',
+      column_width: '1/1'
+    },
     fields: [
       {
         ...defaultField,
@@ -184,6 +197,25 @@
         })
       }
     },
+    text: {
+      type: 'text',
+      edit ({ text = '' }) {
+        return Settings.basicWithReplacements('Button Text', {
+          id: 'text',
+          name: 'text',
+          className: 'text regular-text',
+          value: text,
+          placeholder: ''
+        })
+      },
+      onMount (field, updateField) {
+        $('#text').on('change', (e) => {
+          updateField({
+            text: e.target.value
+          })
+        })
+      }
+    },
     value: {
       type: 'value',
       edit ({ value = '' }) {
@@ -234,7 +266,7 @@
         })
       },
       onMount (field, updateField) {
-        $('#id').on('change', (e) => {
+        $('#css-id').on('change', (e) => {
           updateField({
             id: e.target.value
           })
@@ -406,6 +438,21 @@
         return `<label class="gh-input-label" for="${id}">${label}</label><div class="gh-form-field-input">${inputField}</div>`
       }
     },
+    button: {
+      name: 'Button',
+      hide: true,
+      content: [
+        Settings.text.type,
+        Settings.columnWidth.type
+      ],
+      advanced: [
+        Settings.id.type,
+        Settings.className.type,
+      ],
+      preview ({ text, id, className }) {
+        return `<button id="${id}" class="gh-button secondary ${className}">${text}</button>`
+      }
+    },
     first: {
       name: 'First Name',
       content: standardContentSettings,
@@ -508,8 +555,14 @@
 					  ${form.fields.map((field, index) => Templates.field(index, field, activeField === index, settingsTab)).join('')}
 				  </div>
 				  <button class="add-field gh-button secondary">Add Field</button>
+				  <div id="button-settings">
+					  ${this.field('button', form.button, activeField === 'button', settingsTab)}
+				  </div>
 			  </div>
 			  <div id="form-preview" class="panel">
+				  <div class="row">
+					  <label class="row-label">Preview...</label>
+				  </div>
 				  ${this.preview(form)}
 			  </div>
 		  </div>`
@@ -547,9 +600,9 @@
 
       //language=HTML
       return `
-		  <form>
+		  <div class="gh-form-wrapper">
 			  ${formHTML}
-		  </form>`
+		  </div>`
     }
 
   }
@@ -561,7 +614,10 @@
       console.log(form)
     }) => ({
 
-    form,
+    form: {
+      ...defaultForm,
+      ...form
+    },
     el: null,
     activeField: false,
     activeFieldTab: 'content',
@@ -588,7 +644,13 @@
       }
 
       const currentField = () => {
-        return this.form.fields[this.activeField]
+
+        switch (this.activeField) {
+          case 'button':
+            return this.form.button
+          default:
+            return this.form.fields[this.activeField]
+        }
       }
 
       const setActiveField = (id) => {
@@ -627,11 +689,19 @@
 
       const updateField = (atts, reRenderSettings = false, reRenderPreview = true) => {
 
-        console.log(atts)
-
-        this.form.fields[this.activeField] = {
-          ...this.form.fields[this.activeField],
-          ...atts
+        switch (this.activeField) {
+          case 'button' :
+            this.form.button = {
+              ...this.form.button,
+              ...atts
+            }
+            break
+          default:
+            this.form.fields[this.activeField] = {
+              ...this.form.fields[this.activeField],
+              ...atts
+            }
+            break
         }
 
         onChange(this.form)
@@ -652,7 +722,11 @@
         const $field = $(e.currentTarget)
         const $target = $(e.target)
 
-        const fieldKey = parseInt($field.data('key'))
+        let fieldKey = $field.data('key')
+
+        if (fieldKey !== 'button') {
+          fieldKey = parseInt(fieldKey)
+        }
 
         if ($target.is('button.delete, button.delete .dashicons')) {
           deleteField(fieldKey)
@@ -690,14 +764,14 @@
         update: function (e, ui) {
           const newFields = []
 
-          $('.form-field').each(function (i) {
+          $('#form-fields .form-field').each(function (i) {
             const fieldId = parseInt($(this).data('key'))
             newFields.push(self.form.fields[fieldId])
           })
 
           self.form.fields = newFields
 
-          onChange( self.form )
+          onChange(self.form)
           render()
         }
       })

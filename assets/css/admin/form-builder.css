@@ -15,58 +15,61 @@
   width: 100%;
   margin-top: 10px;
 }
-#form-builder #fields-editor #form-fields {
+#form-builder #fields-editor #button-settings {
+  margin-top: 20px;
+}
+#form-builder #fields-editor #form-fields, #form-builder #fields-editor #button-settings {
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
-#form-builder #fields-editor #form-fields .field-placeholder {
+#form-builder #fields-editor #form-fields .field-placeholder, #form-builder #fields-editor #button-settings .field-placeholder {
   background: #0001;
   border-radius: 5px;
 }
-#form-builder #fields-editor #form-fields .form-field {
+#form-builder #fields-editor #form-fields .form-field, #form-builder #fields-editor #button-settings .form-field {
   background: #FFFFFF;
   border-radius: 3px;
   border: 1px solid rgba(16, 38, 64, 0.15);
   overflow: hidden;
 }
-#form-builder #fields-editor #form-fields .form-field .settings {
+#form-builder #fields-editor #form-fields .form-field .settings, #form-builder #fields-editor #button-settings .form-field .settings {
   box-sizing: border-box;
   padding: 10px;
 }
-#form-builder #fields-editor #form-fields .form-field .settings .row {
+#form-builder #fields-editor #form-fields .form-field .settings .row, #form-builder #fields-editor #button-settings .form-field .settings .row {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-#form-builder #fields-editor #form-fields .form-field .settings .row > label {
+#form-builder #fields-editor #form-fields .form-field .settings .row > label, #form-builder #fields-editor #button-settings .form-field .settings .row > label {
   flex-basis: 150px;
 }
-#form-builder #fields-editor #form-fields .form-field .settings .row > .setting {
+#form-builder #fields-editor #form-fields .form-field .settings .row > .setting, #form-builder #fields-editor #button-settings .form-field .settings .row > .setting {
   width: 100%;
   display: flex;
   justify-content: flex-end;
 }
-#form-builder #fields-editor #form-fields .form-field .settings .row > .setting input {
+#form-builder #fields-editor #form-fields .form-field .settings .row > .setting input, #form-builder #fields-editor #button-settings .form-field .settings .row > .setting input {
   width: 100%;
 }
-#form-builder #fields-editor #form-fields .form-field .settings .row .input-wrap {
+#form-builder #fields-editor #form-fields .form-field .settings .row .input-wrap, #form-builder #fields-editor #button-settings .form-field .settings .row .input-wrap {
   width: 100%;
 }
-#form-builder #fields-editor #form-fields .form-field .settings .row:not(:last-child) {
+#form-builder #fields-editor #form-fields .form-field .settings .row:not(:last-child), #form-builder #fields-editor #button-settings .form-field .settings .row:not(:last-child) {
   margin-bottom: 5px;
 }
-#form-builder #fields-editor #form-fields .form-field .settings-tabs {
+#form-builder #fields-editor #form-fields .form-field .settings-tabs, #form-builder #fields-editor #button-settings .form-field .settings-tabs {
   /*display: flex;*/
   /*justify-content: center;*/
   border-top: 1px solid rgba(16, 38, 64, 0.15);
   border-bottom: 1px solid rgba(16, 38, 64, 0.15);
   padding: 10px 10px 0 10px;
 }
-#form-builder #fields-editor #form-fields .form-field .settings-tabs a.settings-tab {
+#form-builder #fields-editor #form-fields .form-field .settings-tabs a.settings-tab, #form-builder #fields-editor #button-settings .form-field .settings-tabs a.settings-tab {
   color: #2c3338;
 }
-#form-builder #fields-editor #form-fields .form-field .settings-tabs .settings-tab {
+#form-builder #fields-editor #form-fields .form-field .settings-tabs .settings-tab, #form-builder #fields-editor #button-settings .form-field .settings-tabs .settings-tab {
   border-width: 1px 1px 0 1px;
   border-color: rgba(16, 38, 64, 0.15);
   border-style: solid;
@@ -83,31 +86,31 @@
   background: #f9f9f9;
   cursor: pointer;
 }
-#form-builder #fields-editor #form-fields .form-field .settings-tabs .settings-tab.active {
+#form-builder #fields-editor #form-fields .form-field .settings-tabs .settings-tab.active, #form-builder #fields-editor #button-settings .form-field .settings-tabs .settings-tab.active {
   font-weight: 500;
   border-bottom: 1px solid #fff;
   margin-bottom: -1px;
   background: #FFFFFF;
 }
-#form-builder #fields-editor #form-fields .form-field .field-header {
+#form-builder #fields-editor #form-fields .form-field .field-header, #form-builder #fields-editor #button-settings .form-field .field-header {
   padding-left: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-#form-builder #fields-editor #form-fields .form-field .field-header .field-type {
+#form-builder #fields-editor #form-fields .form-field .field-header .field-type, #form-builder #fields-editor #button-settings .form-field .field-header .field-type {
   font-size: 8px;
   opacity: 0.7;
   text-transform: uppercase;
   font-weight: 500;
 }
-#form-builder #fields-editor #form-fields .form-field .field-header .field-label {
+#form-builder #fields-editor #form-fields .form-field .field-header .field-label, #form-builder #fields-editor #button-settings .form-field .field-header .field-label {
   font-size: 13px;
 }
-#form-builder #fields-editor #form-fields .form-field .field-header .actions {
+#form-builder #fields-editor #form-fields .form-field .field-header .actions, #form-builder #fields-editor #button-settings .form-field .field-header .actions {
   display: flex;
 }
-#form-builder #fields-editor #form-fields .form-field .field-header .actions button {
+#form-builder #fields-editor #form-fields .form-field .field-header .actions button, #form-builder #fields-editor #button-settings .form-field .field-header .actions button {
   background: #FFFFFF;
   width: 40px;
   height: 40px;
@@ -117,7 +120,7 @@
   border-left: 1px solid rgba(16, 38, 64, 0.15);
   cursor: pointer;
 }
-#form-builder #fields-editor #form-fields .form-field .field-header .actions button:hover {
+#form-builder #fields-editor #form-fields .form-field .field-header .actions button:hover, #form-builder #fields-editor #button-settings .form-field .field-header .actions button:hover {
   background: #f1f1f1;
 }
 

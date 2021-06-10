@@ -19,7 +19,11 @@
       margin-top: 10px;
     }
 
-    #form-fields {
+    #button-settings{
+      margin-top: 20px;
+    }
+
+    #form-fields, #button-settings {
       display: flex;
       flex-direction: column;
       gap: 5px;

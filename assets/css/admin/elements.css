@@ -272,4 +272,8 @@ button.gh-button.icon:hover:not(:disabled) {
   border-bottom-right-radius: 0;
 }
 
+.commit-errors {
+  color: #e91f4f;
+}
+
 /*# sourceMappingURL=elements.css.map */

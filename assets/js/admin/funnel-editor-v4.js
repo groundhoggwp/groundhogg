@@ -492,11 +492,26 @@
       })
 
       $doc.on('click', '.publish-actions .deactivate', function () {
-        self.deactivate()
+        confirmationModal({
+          // language=HTML
+          alert: `<p><b>Are you sure you want to deactivate the funnel?</b></p>
+		  <p>Any pending events will be paused and contacts will not be able to move forward in the funnel.</p>
+		  <p>Reactivating the funnel will restart any paused events.</p>`,
+          onConfirm: () => {
+            self.deactivate()
+          }
+        })
       })
 
       $doc.on('click', '.publish-actions .update-and-launch, .publish-actions .update', function () {
-        self.commitChanges()
+        confirmationModal({
+          // language=HTML
+          alert: `<p><b>Are you sure you want to commit these changes?</b></p><p>The changes made will take immediate
+			  effect to anyone currently in the funnel.</p>`,
+          onConfirm: () => {
+            self.commitChanges()
+          }
+        })
       })
 
       $(document).on('tinymce-editor-setup', function (event, editor) {
@@ -1017,7 +1032,7 @@
     update (data, reload = true) {
       var self = this
 
-      apiPost(`${apiRoutes.funnels}/${self.funnel.ID}`, data).then(data => {
+      return apiPost(`${apiRoutes.funnels}/${self.funnel.ID}`, data).then(data => {
         self.setLastSaved()
         if (data.item && reload) {
           self.loadFunnel(data.item)
@@ -1027,19 +1042,31 @@
     },
 
     activate () {
+
+      const { close } = modal({
+        content: '<p>Launching...</p>',
+        canClose: false
+      })
+
       this.update({
         data: {
           status: 'active'
         }
-      })
+      }).then(() => close())
     },
 
     deactivate () {
+
+      const { close } = modal({
+        content: '<h1>Deactivating...</h1>',
+        canClose: false
+      })
+
       this.update({
         data: {
           status: 'inactive'
         }
-      })
+      }).then(() => close())
     },
 
     commitChanges () {
@@ -1074,6 +1101,10 @@
           // confusion I know...
           const { errors } = data.data.data
 
+          const errorHTML = errors.map(({ errors, error_data }) => {
+            return `<p>${Object.keys(errors).map( code => errors[code][0])}</p>`
+          })
+
           errors.forEach(error => {
 
             const { errors, error_data } = error
@@ -1089,6 +1120,12 @@
 
           // console.log(self.stepErrors)
           self.render()
+
+          confirmationModal({
+            // language=HTML
+            alert: `<p>Your funnel could not be launched due to <b>${errors.length}</b> errors. Please rectify the following errors and try again.</p>
+            <div class="commit-errors">${errorHTML}</div>`
+          })
         }
       }).then(() => close())
     },
@@ -2736,7 +2773,7 @@
 		  </svg>`,
       title ({ ID, data, meta }) {
 
-        const title = meta.email_id ? EmailsStore.get(meta.email_id).data.title : 'an email';
+        const title = meta.email_id ? EmailsStore.get(parseInt(meta.email_id)).data.title : 'an email'
 
         return `Send <b>${title}</b>`
       },
@@ -2757,7 +2794,7 @@
 							text: item.data.title,
 							value: item.ID
 						}
-					}, email_id ))}
+					}, email_id))}
 				</div>
 			</div>`
       },
