@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 4.9
 Tested up to: 5.7
 Requires PHP: 5.6
-Stable tag: 2.4.6.1
+Stable tag: 2.4.6.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -331,6 +331,10 @@ You can purchase a premium plan for access to support and our premium extensions
 Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/monthly/).
 
 == Changelog ==
+
+= 2.4.6.2 (2021-06-09) =
+* TWEAKED Iframe resizer checks for same origin before attempting to resize a frame.
+* TWEAKED Changed verbiage and organization of the email "Override" settings section to "Defaults" & "Footer" to be more clear as to their purpose.
 
 = 2.4.6.1 (2021-05-12) =
 * TWEAKED POST /contacts will update a contact record if it already exists, based on email address.
