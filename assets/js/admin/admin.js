@@ -112,10 +112,14 @@
    *
    * @param selector
    * @param multiple
+   * @param onReceiveItems
    */
-  function tagPicker (selector, multiple = true) {
+  function tagPicker (selector, multiple = true, onReceiveItems = (items) => {}) {
     return apiPicker(selector, gh.api.routes.v4.tags, multiple, true,
       (data) => {
+
+        onReceiveItems(data.items)
+
         return data.items.map(item => {
           return {
             id: item.ID,
@@ -135,9 +139,13 @@
    *
    * @param selector
    * @param multiple
+   * @param onReceiveItems
    */
-  function emailPicker (selector, multiple = false) {
+  function emailPicker (selector, multiple = false, onReceiveItems = (items) => {}) {
     return apiPicker(selector, gh.api.routes.v4.emails, multiple, true, (data) => {
+
+      onReceiveItems(data.items)
+
         return data.items.map(item => {
           return {
             id: item.ID,

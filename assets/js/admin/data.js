@@ -102,6 +102,13 @@
       })
     },
 
+    itemsFetched ( items ) {
+      this.items = [
+        ...items, // new items
+        ...this.items.filter(item => !items.find(_item => _item.ID === item.ID))
+      ]
+    },
+
     async fetchItem (id) {
 
       var self = this

@@ -193,7 +193,8 @@
         } else {
           //language=HTML
           return `
-			  <button class="update gh-button primary" ${objectEquals( Editor.funnel.steps, Editor.origFunnel.steps ) ? 'disabled' : '' }>
+			  <button class="update gh-button primary"
+			          ${objectEquals(Editor.funnel.steps, Editor.origFunnel.steps) ? 'disabled' : ''}>
 				  <svg viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
 					  <path
 						  d="M1 21.956V2.995c0-.748.606-1.355 1.354-1.355H17.93l4.74 4.74v15.576c0 .748-.606 1.354-1.354 1.354H2.354A1.354 1.354 0 011 21.956z"
@@ -1089,7 +1090,7 @@
           // console.log(self.stepErrors)
           self.render()
         }
-      }).then( () => close() )
+      }).then(() => close())
     },
 
     setLastSaved () {
@@ -1658,7 +1659,10 @@
    */
   const tagOnMount = (step, updateStepMeta) => {
 
-    return tagPicker('#tags').on('change', function (e) {
+    return tagPicker('#tags', true, (items) => {
+      console.log(items)
+      TagsStore.itemsFetched(items)
+    }).on('change', function (e) {
 
       const tags = $(this).val()
       const newTags = tags.filter(tag => !TagsStore.hasItem(parseInt(tag)))
@@ -2108,39 +2112,30 @@
       // Edit
       edit ({ ID, data, meta }) {
 
-        let options = []
         let roles = Editor.stepTypes.account_created.context.roles
-
-        for (var role in roles) {
-          if (Object.prototype.hasOwnProperty.call(roles, role)) {
-            options.push(Elements.option(role, roles[role], meta.role.indexOf(role) >= 0))
-          }
-        }
 
         //language=HTML
         return `
 			<div class="panel">
 				<div class="row">
 					<label class="row-label" for="roles">Select user roles.</label>
-					<select name="role" id="roles" multiple>
-						${options.join('')}
-					</select>
+					${select({
+						id: 'roles',
+						name: 'role',
+						multiple: true,
+					}, roles, meta.role)}
 					<p class="description">Runs when a new user is created with any of the defined roles.</p>
 				</div>
 			</div>`
       },
 
       // On mount
-      onMount () {
+      onMount (step, updateStepMeta) {
 
-        const $roles = $('#roles')
-        $roles.select2()
-        $roles.on('change', function (e) {
+        $('#roles').select2().on('change', function (e) {
           let roles = $(this).val()
-          Editor.updateCurrentStep({
-            meta: {
-              role: roles
-            }
+          updateStepMeta({
+            role: roles
           })
         })
       },
@@ -2740,7 +2735,10 @@
 			        stroke="currentColor" stroke-width="2"/>
 		  </svg>`,
       title ({ ID, data, meta }) {
-        return `Send Email`
+
+        const title = meta.email_id ? EmailsStore.get(meta.email_id).data.title : 'an email';
+
+        return `Send <b>${title}</b>`
       },
       edit ({ ID, data, meta }) {
 
@@ -2754,12 +2752,19 @@
 					${select({
 						id: 'email-picker',
 						name: 'email_id'
-					})}
+					}, EmailsStore.getItems().map(item => {
+						return {
+							text: item.data.title,
+							value: item.ID
+						}
+					}, email_id ))}
 				</div>
 			</div>`
       },
       onMount (step, updateStepMeta) {
-        emailPicker('#email-picker').on('change', function (e) {
+        emailPicker('#email-picker', false, (items) => {
+          EmailsStore.itemsFetched(items)
+        }).on('change', function (e) {
           updateStepMeta({
             email_id: parseInt($(this).val())
           })
