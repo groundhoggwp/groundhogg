@@ -1,6 +1,9 @@
 (function ($) {
 
   const { toggle, input, select, inputWithReplacements, uuid } = Groundhogg.element
+  const {
+    metaPicker
+  } = Groundhogg.pickers
 
   const columnWidths = {
     '1/1': 1,
@@ -132,6 +135,29 @@
         })
       }
     },
+
+    name: {
+      type: 'name',
+      edit ({ name = '' }) {
+        //language=HTML
+        return `<label for="type">Name</label>
+		<div class="setting">
+			${input({
+				id: 'name',
+				name: 'name',
+				value: name
+			})}
+		</div>`
+      },
+      onMount (field, updateField) {
+        metaPicker('#name').on('change', (e) => {
+          updateField({
+            name: e.target.value
+          })
+        })
+      }
+    },
+
     required: {
       type: 'required',
       edit ({ required = false }) {
@@ -178,7 +204,7 @@
       type: 'hideLabel',
       edit ({ hide_label = false }) {
         //language=HTML
-        return `<label for="required">Hide label</label>
+        return `<label for="hide-label">Hide label</label>
 		<div class="setting">${toggle({
 			id: 'hide-label',
 			name: 'hide_label',
@@ -200,7 +226,7 @@
     text: {
       type: 'text',
       edit ({ text = '' }) {
-        return Settings.basicWithReplacements('Button Text', {
+        return Settings.basic('Button Text', {
           id: 'text',
           name: 'text',
           className: 'text regular-text',
@@ -396,6 +422,16 @@
     Settings.columnWidth.type
   ]
 
+  const standardMetaContentSettings = [
+    Settings.type.type,
+    Settings.name.type,
+    Settings.required.type,
+    Settings.hideLabel.type,
+    Settings.label.type,
+    Settings.placeholder.type,
+    Settings.columnWidth.type
+  ]
+
   const standardAdvancedSettings = [
     Settings.value.type,
     Settings.id.type,
@@ -421,7 +457,7 @@
 
         const inputField = input({
           id: id,
-          name: 'name',
+          name: name,
           placeholder: placeholder,
           value: value,
           className: `gh-input ${className}`
@@ -482,7 +518,7 @@
     submit: {},
     text: {
       name: 'Text',
-      content: standardContentSettings,
+      content: standardMetaContentSettings,
       advanced: standardAdvancedSettings
     },
     textarea: {},
@@ -518,7 +554,7 @@
 		  </div>`
     },
 
-    field (key, field, isEditing, settingsTab) {
+    field (key, field, isEditing, settingsTab, isSpecial = false) {
 
       const { type, label } = field
 
@@ -533,10 +569,13 @@
 					  <div class="field-type">${fieldType.name}</div>
 				  </div>
 				  <div class="actions">
+					  ${!isSpecial ? `
 					  <!-- Duplicate/Delete -->
 					  <button class="duplicate" data-key="${key}"><span class="dashicons dashicons-admin-page"></span>
 					  </button>
-					  <button class="delete" data-key="${key}"><span class="dashicons dashicons-no"></span></button>
+					  <button class="delete" data-key="${key}"><span class="dashicons dashicons-no"></span></button>`
+						  // language=html
+						  : `<button class="open" data-key="${key}"><span class="dashicons ${isEditing ? 'dashicons-arrow-up' : 'dashicons-arrow-down'}"></span></button>`}
 				  </div>
 			  </div>
 			  ${isEditing ?
@@ -556,7 +595,7 @@
 				  </div>
 				  <button class="add-field gh-button secondary">Add Field</button>
 				  <div id="button-settings">
-					  ${this.field('button', form.button, activeField === 'button', settingsTab)}
+					  ${this.field('button', form.button, activeField === 'button', settingsTab, true)}
 				  </div>
 			  </div>
 			  <div id="form-preview" class="panel">
