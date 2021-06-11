@@ -346,7 +346,7 @@
       type: 'columnWidth',
       edit ({ column_width }) {
         //language=HTML
-        return `<label for="column-widtg">Column Width</label>
+        return `<label for="column-width">Column Width</label>
 		<div class="setting">${select({
 			id: 'column-width',
 			name: 'column_width',
@@ -368,7 +368,80 @@
           })
         })
       }
+    },
+    options: {
+      type: 'options',
+      edit ({ options = [''] }) {
+
+        const selectOption = (option, i) => {
+          // language=HTML
+          return `
+			  <div class="input-wrap select-option-wrap">
+				  ${input({
+					  id: `select-option-${i}`,
+					  className: 'select-option',
+					  value: option,
+					  dataKey: i
+				  })}
+				  <button class="dashicon-button remove-option" data-key="${i}"><span
+					  class="dashicons dashicons-no-alt"></span></button>
+			  </div>`
+        }
+
+        // language=HTML
+        return `
+			<div class="options">
+				<label>Options</label>
+				<div class="select-options">
+					${options.map((option, i) => selectOption(option, i)).join('')}
+					<div class="select-option-add">
+						<button id="add-option" class="dashicon-button">
+							<span class="dashicons dashicons-plus-alt2"></span></button>
+					</div>
+				</div>
+			</div>`
+      },
+      onMount ({ options = [''] }, updateField, currentField) {
+
+        $('#add-option').on('click', (e) => {
+
+          const { options } = currentField()
+
+          updateField({
+            options: [
+              ...options,
+              ''
+            ]
+          }, true)
+        })
+
+        $('.select-option').on('change', (e) => {
+
+          const key = parseInt(e.target.dataset.key)
+
+          const { options } = currentField()
+
+          updateField({
+            options: [
+              ...options.map((opt, i) => i === key ? e.target.value : opt)
+            ]
+          })
+        })
+
+        $('.remove-option').on('click', (e) => {
+
+          const { options } = currentField()
+
+          updateField({
+            options: [
+              ...options.filter((option, i) => i !== parseInt(e.currentTarget.dataset.key))
+            ]
+          }, true)
+        })
+
+      }
     }
+
   }
 
   /**
@@ -594,8 +667,88 @@
         type: 'number',
       })
     },
-    dropdown: {},
-    radio: {},
+    dropdown: {
+      name: 'Dropdown',
+      content: [
+        Settings.type.type,
+        Settings.required.type,
+        Settings.hideLabel.type,
+        Settings.label.type,
+        Settings.options.type,
+        Settings.columnWidth.type
+      ],
+      advanced: standardAdvancedSettings,
+      preview: ({
+        id = uuid(),
+        name = 'name',
+        options = [],
+        label = '',
+        hide_label = false,
+        required = false,
+        className = ''
+      }) => {
+
+        const inputField = select({
+          id: id,
+          name: name,
+          className: `gh-input ${className}`
+        }, options.map(opt => ({
+          text: opt,
+          value: opt
+        })))
+
+        if (hide_label) {
+          return inputField
+        }
+
+        if (required) {
+          label += ' <span class="required">*</span>'
+        }
+
+        return `<label class="gh-input-label" for="${id}">${label}</label><div class="gh-form-field-input">${inputField}</div>`
+      }
+    },
+    radio: {
+      name: 'Radio',
+      content: [
+        Settings.type.type,
+        Settings.required.type,
+        // Settings.hideLabel.type,
+        Settings.label.type,
+        Settings.options.type,
+        Settings.columnWidth.type
+      ],
+      advanced: standardAdvancedSettings,
+      preview: ({
+        id = uuid(),
+        name = 'name',
+        options = [],
+        label = '',
+        // hide_label = false,
+        required = false,
+        className = ''
+      }) => {
+
+        const inputField = options.map(opt => {
+          // language=HTML
+          return `
+			  <div class="gh-radio-wrapper">
+				  <label class="gh-radio-label">
+					  ${input({
+						  type: 'radio',
+						  id,
+						  required,
+						  className,
+						  name,
+						  value: opt,
+					  })} ${opt}
+				  </label>
+			  </div>`
+        }).join('')
+
+        return `<label class="gh-input-label" for="${id}">${label}</label><div class="gh-form-field-input">${inputField}</div>`
+      }
+    },
     checkbox: {},
     address: {},
     birthday: {},
@@ -686,7 +839,7 @@
 				  </div>
 			  </div>
 			  <div id="form-preview-wrap" class="panel">
-            <label class="row-label">Preview...</label>
+				  <label class="row-label">Preview...</label>
 				  <div id="form-preview">
 					  ${this.preview(form)}
 				  </div>
@@ -866,19 +1019,19 @@
             render()
           }
         }
-
-        if (self.activeField !== false) {
-          if (self.activeFieldTab === 'content') {
-            getFieldType(currentField().type).content.forEach(setting => {
-              Settings[setting].onMount(currentField(), updateField)
-            })
-          } else {
-            getFieldType(currentField().type).advanced.forEach(setting => {
-              Settings[setting].onMount(currentField(), updateField)
-            })
-          }
-        }
       })
+
+      if (self.activeField !== false) {
+        if (self.activeFieldTab === 'content') {
+          getFieldType(currentField().type).content.forEach(setting => {
+            Settings[setting].onMount(currentField(), updateField, currentField)
+          })
+        } else {
+          getFieldType(currentField().type).advanced.forEach(setting => {
+            Settings[setting].onMount(currentField(), updateField, currentField)
+          })
+        }
+      }
 
       $('#form-fields').sortable({
         placeholder: 'field-placeholder',
@@ -908,11 +1061,11 @@
     },
 
     render () {
-      const activeElementId = document.activeElement.id
+      // const activeElementId = document.activeElement.id
       this.el.html(Templates.builder(this.form, this.activeField, this.activeFieldTab))
-      if (activeElementId) {
-        document.querySelector('#' + activeElementId).focus()
-      }
+      // if (activeElementId) {
+      //   document.querySelector('#' + activeElementId).focus()
+      // }
     },
 
     deMount () {},
