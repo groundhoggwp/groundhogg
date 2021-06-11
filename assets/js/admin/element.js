@@ -250,7 +250,7 @@
 			  <textarea id="${id}" name="${name}" class="${className}"
 	              placeholder="${specialChars(placeholder)}">${specialChars(value) || ''}</textarea>
 			  <div class="buttons">
-		    ${replacements ? `<button class="replacements-picker-start" title="insert replacement"><span
+				  ${replacements ? `<button class="replacements-picker-start" title="insert replacement"><span
 				  class="dashicons dashicons-admin-users"></span></button>` : ''}
 				  ${emojis ? `<button class="emoji-picker-start" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
 			  </button>` : ''}
@@ -393,6 +393,27 @@
     return {
       $modal,
       close,
+    }
+  }
+
+  const loadingDots = (selector) => {
+
+    const $el = $(selector)
+
+    const stop = () => {
+      clearInterval(interval)
+    }
+
+    const interval = setInterval(() => {
+      if ($el.html().length >= 3) {
+        $el.html('')
+      } else {
+        $el.html($el.html() + '.')
+      }
+    }, 500)
+
+    return {
+      stop
     }
   }
 
@@ -717,7 +738,8 @@
     loadingModal,
     confirmationModal,
     uuid,
-    modal
+    modal,
+    loadingDots
   }
 
 })(jQuery)

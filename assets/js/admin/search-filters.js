@@ -8,12 +8,13 @@
     clickInsideElement,
     orList,
     andList,
-    searchOptionsWidget
+    searchOptionsWidget,
+    loadingDots
   } = Groundhogg.element
 
   const { tagPicker, emailPicker, linkPicker } = Groundhogg.pickers
 
-  const { emails } = Groundhogg.stores
+  const { emails: EmailsStore, tags: TagsStore } = Groundhogg.stores
 
   const Filters = {
     view () {},
@@ -96,6 +97,7 @@
     onChange,
     filters,
     el,
+    initFlag: false,
     currentGroup: false,
     currentFilter: false,
     isAddingFilterToGroup: false,
@@ -133,9 +135,66 @@
 		  </div>`
     },
 
+    init () {
+      if (this.initFlag) {
+        this.mount()
+      } else {
+        this.initFlag = true
+        this.preLoad()
+      }
+    },
+
     mount () {
       $(el).html(this.render())
       this.eventHandlers()
+    },
+
+    async preLoad () {
+      const preloadTags = []
+      const preloadEmails = []
+
+      this.filters.forEach(group => {
+        group.forEach(filter => {
+          const { tags, email_id, emails } = filter
+
+          if (tags && !TagsStore.hasItems(tags.map(tag => parseInt(tag)))) {
+            preloadTags.push(...tags)
+          } else if (emails && !EmailsStore.hasItems(emails.map(email => parseInt(email)))) {
+            preloadEmails.push(...emails)
+          } else if (email_id && !EmailsStore.hasItem(parseInt(email_id))) {
+            preloadEmails.push(email_id)
+          }
+        })
+      })
+
+      console.log({
+        preloadTags,
+        preloadEmails
+      })
+
+      if (preloadEmails.length === 0 && preloadTags.length === 0) {
+        this.mount()
+        return
+      }
+
+      $(el).html('<p>Loading<span id="dots"></span></p>')
+
+      const { stop: stopDots } = loadingDots('#dots')
+
+      if (preloadEmails.length > 0) {
+        await EmailsStore.fetchItems({
+          include: preloadEmails
+        })
+      }
+
+      if (preloadTags.length > 0) {
+        await TagsStore.fetchItems({
+          include: preloadTags
+        })
+      }
+
+      stopDots()
+      this.mount()
     },
 
     demount () {
@@ -580,9 +639,13 @@
   }, 'Owner')
 
   registerFilter('tags', 'contact', {
-    view ({ tags, compare, compare2 }) {
+    view ({ tags = [], compare, compare2 }) {
 
-      const tagNames = tags.map(id => `<b>${id}</b>`)
+      if (!tags) {
+        return 'tags'
+      }
+
+      const tagNames = tags.map(id => `<b>${TagsStore.get(parseInt(id)).data.tag_name}</b>`)
 
       //language=HTMl
       switch (compare2) {
@@ -593,7 +656,10 @@
           return `<b>Tags</b> ${compare} ${andList(tagNames)}`
       }
     },
-    edit ({ tags, compare, compare2 }, filterGroupIndex, filterIndex) {
+    edit ({ tags, compare, compare2 }) {
+
+      tags = tags.map( id => parseInt( id ) )
+
       // language=html
       return `
 		  ${select({
@@ -616,25 +682,33 @@
 			  id: 'filter-tags',
 			  name: 'tags',
 			  className: 'tag-picker',
-		  }, {}, tags)}`
+			  multiple: true,
+		  }, tags.map(id => ({
+			  value: id,
+			  text: TagsStore.get(id).data.tag_name
+		  })), tags)}`
     },
     onMount (filter, updateFilter) {
 
-      const { metaPicker } = Groundhogg.pickers
+      tagPicker('#filter-tags', true, (items) => {
+        TagsStore.itemsFetched(items)
+      }).on('change', (e) => {
+        updateFilter({
+          tags: $(e.target).val()
+        })
+      })
 
-      metaPicker('#filter-meta')
-
-      $('#filter-compare, #filter-value, #filter-meta').on('change', function (e) {
+      $('#filter-compare, #filter-compare2').on('change', function (e) {
         const $el = $(this)
-        const { compare } = updateFilter({
+        updateFilter({
           [$el.prop('name')]: $el.val()
         })
       })
     },
     defaults: {
-      meta: '',
-      compare: 'equals',
-      value: ''
+      compare: 'includes',
+      compare2: 'any',
+      tags: []
     }
   }, 'Tags')
 
@@ -724,21 +798,21 @@
   registerFilter('email_opened', 'activity', {
     view ({ email_id, date_range, date, date2 }) {
 
-      const email = emails.get(email_id)
+      const emailName = email_id ? EmailsStore.get(email_id).data.title : 'any email'
 
       //language=HTMl
       switch (date_range) {
         default:
-          return `Opened <b>${email.data.title}</b> ${dateRanges[date_range].toLowerCase()}`
+          return `Opened <b>${emailName}</b> ${dateRanges[date_range].toLowerCase()}`
         case 'custom':
-          return `Opened <b>${email.data.title}</b> between <b>${date}</b> and <b>${date2}</b>`
+          return `Opened <b>${emailName}</b> between <b>${date}</b> and <b>${date2}</b>`
       }
 
     },
     edit ({ email_id, date_range, date, date2 }) {
 
       const pickerOptions = email_id ? {
-        [email_id]: emails.get(email_id).data.title
+        [email_id]: EmailsStore.get(email_id).data.title
       } : {}
 
       // language=html
@@ -770,14 +844,11 @@
 		  })}`
     },
     onMount (filter, updateFilter) {
-      emailPicker('#filter-email').on('change', (e) => {
-
-        const email_id = parseInt(e.target.value)
-
-        emails.fetchItem(email_id).then(data => {
-          updateFilter({
-            email_id: email_id
-          })
+      emailPicker('#filter-email', false, (items) => {
+        EmailsStore.itemsFetched(items)
+      }).on('change', (e) => {
+        updateFilter({
+          email_id: parseInt(e.target.value)
         })
       })
 

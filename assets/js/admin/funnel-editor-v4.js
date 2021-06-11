@@ -577,6 +577,7 @@
 
       if (preloadEmails.length === 0 && preloadTags.length === 0) {
         this.render()
+        return
       }
 
       if (preloadTags.length > 0) {

@@ -103,7 +103,7 @@
       }
 
       if (this.filtersEnabled) {
-        this.filtersApp.mount()
+        this.filtersApp.init()
       }
 
       if (this.savedSearchEnabled) {
