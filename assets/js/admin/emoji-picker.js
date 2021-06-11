@@ -17,6 +17,7 @@
       Element.prototype.msMatchesSelector ||
       Element.prototype.oMatchesSelector ||
       Element.prototype.webkitMatchesSelector ||
+
       function (s) {
         var matches = (this.document || this.ownerDocument).querySelectorAll(s),
           i = matches.length

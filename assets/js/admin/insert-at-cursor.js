@@ -17,6 +17,7 @@
         + myValue
         + myField.value.substring(endPos, myField.value.length)
     } else {
+
       myField.value += myValue
     }
 

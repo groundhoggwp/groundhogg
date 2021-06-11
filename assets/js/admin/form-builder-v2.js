@@ -26,7 +26,7 @@
   const fieldWidth = ({ column_width }) => {
     return columnWidths[column_width]
   }
-
+  
   /**
    * Group into rows based on their field width
    *
