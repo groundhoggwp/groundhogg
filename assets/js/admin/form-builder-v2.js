@@ -1,6 +1,6 @@
 (function ($) {
 
-  const { toggle, input, select, inputWithReplacements, uuid } = Groundhogg.element
+  const { toggle, textarea, input, select, inputWithReplacements, uuid } = Groundhogg.element
   const {
     metaPicker
   } = Groundhogg.pickers
@@ -196,7 +196,7 @@
         $('#label').on('change', (e) => {
           updateField({
             label: e.target.value
-          }, true)
+          })
         })
       }
     },
@@ -438,41 +438,48 @@
     Settings.className.type
   ]
 
+  const fieldPreview = ({
+    type = 'text',
+    id = uuid(),
+    name = 'name',
+    placeholder = '',
+    value = '',
+    label = '',
+    hide_label = false,
+    required = false,
+    className = ''
+  }) => {
+
+    const inputField = input({
+      id: id,
+      type: type,
+      name: name,
+      placeholder: placeholder,
+      value: value,
+      className: `gh-input ${className}`
+    })
+
+    if (hide_label) {
+      return inputField
+    }
+
+    if (required) {
+      label += ' <span class="required">*</span>'
+    }
+
+    return `<label class="gh-input-label" for="${id}">${label}</label><div class="gh-form-field-input">${inputField}</div>`
+  }
+
   const FieldTypes = {
     default: {
       name: 'default',
       content: [],
       advanced: [],
       hide: true,
-      preview ({
-        id = uuid(),
-        name = 'name',
-        placeholder = '',
-        value = '',
-        label = '',
-        hide_label = false,
-        required = false,
-        className = ''
-      }) {
-
-        const inputField = input({
-          id: id,
-          name: name,
-          placeholder: placeholder,
-          value: value,
-          className: `gh-input ${className}`
-        })
-
-        if (hide_label) {
-          return inputField
-        }
-
-        if (required) {
-          label += ' <span class="required">*</span>'
-        }
-
-        return `<label class="gh-input-label" for="${id}">${label}</label><div class="gh-form-field-input">${inputField}</div>`
-      }
+      preview: (field) => fieldPreview({
+        ...field,
+        type: 'text'
+      })
     },
     button: {
       name: 'Button',
@@ -492,17 +499,32 @@
     first: {
       name: 'First Name',
       content: standardContentSettings,
-      advanced: standardAdvancedSettings
+      advanced: standardAdvancedSettings,
+      preview: (field) => fieldPreview({
+        ...field,
+        name: 'first_name',
+        type: 'text'
+      })
     },
     last: {
       name: 'Last Name',
       content: standardContentSettings,
-      advanced: standardAdvancedSettings
+      advanced: standardAdvancedSettings,
+      preview: (field) => fieldPreview({
+        ...field,
+        name: 'last_name',
+        type: 'text'
+      })
     },
     email: {
       name: 'Email',
       content: standardContentSettings,
-      advanced: standardAdvancedSettings
+      advanced: standardAdvancedSettings,
+      preview: (field) => fieldPreview({
+        ...field,
+        type: 'email',
+        name: 'email'
+      })
     },
     phone: {
       name: 'Phone Number',
@@ -510,7 +532,12 @@
         ...standardContentSettings,
         Settings.phoneType.type
       ],
-      advanced: standardAdvancedSettings
+      advanced: standardAdvancedSettings,
+      preview: (field) => fieldPreview({
+        ...field,
+        type: 'tel',
+        name: field.phoneType + '_phone'
+      })
     },
     gdpr: {},
     terms: {},
@@ -519,10 +546,54 @@
     text: {
       name: 'Text',
       content: standardMetaContentSettings,
-      advanced: standardAdvancedSettings
+      advanced: standardAdvancedSettings,
+      preview: (field) => fieldPreview(field)
     },
-    textarea: {},
-    number: {},
+    textarea: {
+      name: 'Textarea',
+      content: standardMetaContentSettings,
+      advanced: standardAdvancedSettings,
+      preview: ({
+        type = 'text',
+        id = uuid(),
+        name = 'name',
+        placeholder = '',
+        value = '',
+        label = '',
+        hide_label = false,
+        required = false,
+        className = ''
+      }) => {
+
+        const inputField = textarea({
+          id: id,
+          type: type,
+          name: name,
+          placeholder: placeholder,
+          value: value,
+          className: `gh-input ${className}`
+        })
+
+        if (hide_label) {
+          return inputField
+        }
+
+        if (required) {
+          label += ' <span class="required">*</span>'
+        }
+
+        return `<label class="gh-input-label" for="${id}">${label}</label><div class="gh-form-field-input">${inputField}</div>`
+      }
+    },
+    number: {
+      name: 'Number',
+      content: standardMetaContentSettings,
+      advanced: standardAdvancedSettings,
+      preview: (field) => fieldPreview({
+        ...field,
+        type: 'number',
+      })
+    },
     dropdown: {},
     radio: {},
     checkbox: {},
@@ -530,8 +601,24 @@
     birthday: {},
     // row: {},
     // col: {},
-    date: {},
-    time: {},
+    date: {
+      name: 'Date',
+      content: standardMetaContentSettings,
+      advanced: standardAdvancedSettings,
+      preview: (field) => fieldPreview({
+        ...field,
+        type: 'date',
+      })
+    },
+    time: {
+      name: 'Time',
+      content: standardMetaContentSettings,
+      advanced: standardAdvancedSettings,
+      preview: (field) => fieldPreview({
+        ...field,
+        type: 'time',
+      })
+    },
     file: {},
   }
 
@@ -598,11 +685,11 @@
 					  ${this.field('button', form.button, activeField === 'button', settingsTab, true)}
 				  </div>
 			  </div>
-			  <div id="form-preview" class="panel">
-				  <div class="row">
-					  <label class="row-label">Preview...</label>
+			  <div id="form-preview-wrap" class="panel">
+            <label class="row-label">Preview...</label>
+				  <div id="form-preview">
+					  ${this.preview(form)}
 				  </div>
-				  ${this.preview(form)}
 			  </div>
 		  </div>`
     },
@@ -835,4 +922,5 @@
 
   Groundhogg.formBuilder = FormBuilder
 
-})(jQuery)
+})
+(jQuery)

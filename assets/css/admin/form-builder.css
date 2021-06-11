@@ -3,12 +3,12 @@
   gap: 20px;
 }
 #form-builder #fields-editor,
-#form-builder #form-preview {
+#form-builder #form-preview-wrap {
   width: 100%;
   margin-top: 0 !important;
 }
 #form-builder #fields-editor *,
-#form-builder #form-preview * {
+#form-builder #form-preview-wrap * {
   box-sizing: border-box;
 }
 #form-builder #fields-editor .add-field {

@@ -244,7 +244,7 @@ class Scripts {
 			'groundhogg-admin-data',
 			'groundhogg-admin-element',
 			'groundhogg-admin-functions',
-			'groundhogg-admin-context-menu',
+//			'groundhogg-admin-context-menu',
 			'groundhogg-admin-replacements-picker',
 			'groundhogg-admin-emojis-picker',
 			'groundhogg-admin-form-builder',

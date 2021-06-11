@@ -544,7 +544,7 @@
 
       self.setupSortable()
       self.setupStepTypes()
-      self.initStepFlowContextMenu()
+      // self.initStepFlowContextMenu()
       self.maybePreloadTagsAndEmails()
     },
 
@@ -1102,7 +1102,7 @@
           const { errors } = data.data.data
 
           const errorHTML = errors.map(({ errors, error_data }) => {
-            return `<p>${Object.keys(errors).map( code => errors[code][0])}</p>`
+            return `<p>${Object.keys(errors).map(code => errors[code][0])}</p>`
           })
 
           errors.forEach(error => {
@@ -1123,8 +1123,9 @@
 
           confirmationModal({
             // language=HTML
-            alert: `<p>Your funnel could not be launched due to <b>${errors.length}</b> errors. Please rectify the following errors and try again.</p>
-            <div class="commit-errors">${errorHTML}</div>`
+            alert: `<p>Your funnel could not be launched due to <b>${errors.length}</b> errors. Please rectify the
+				following errors and try again.</p>
+			<div class="commit-errors">${errorHTML}</div>`
           })
         }
       }).then(() => close())
@@ -2950,7 +2951,9 @@
 					<p>Stay on page after submitting? ${toggle({
 						name: 'enable_ajax',
 						id: 'enable-ajax',
-						checked: meta.enable_ajax
+						checked: meta.enable_ajax,
+						onLabel: 'YES',
+						offLabel: 'NO'
 					})}</p>
 				</div>
 				<div class="row">
