@@ -2942,7 +2942,7 @@
 						name: 'form_name',
 						id: 'form-name',
 						placeholder: 'Form name...',
-						value: meta.form_name
+						value: meta.form_name || ''
 					})}
 				</div>
 			</div>

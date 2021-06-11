@@ -22,6 +22,17 @@
     return $(selector).select2(args)
   }
 
+  /**
+   * This is an API picker!
+   *
+   * @param selector
+   * @param endpoint
+   * @param multiple
+   * @param tags
+   * @param getResults
+   * @param params
+   * @returns {*|define.amd.jQuery}
+   */
   function apiPicker (selector, endpoint, multiple, tags, getResults, params) {
 
     multiple = multiple || false
@@ -39,7 +50,7 @@
       tokenSeparators: ['/', ',', ';'],
       ajax: {
         url: endpoint,
-        delay: 250,
+        // delay: 250,
         dataType: 'json',
         data: params,
         beforeSend: function (xhr) {
