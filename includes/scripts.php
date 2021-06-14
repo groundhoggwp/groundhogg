@@ -332,7 +332,7 @@ class Scripts {
 		] );
 
 		wp_localize_script( 'groundhogg-admin', 'Groundhogg', [
-			'test'         => 'Hello World!',
+			'locale'       => get_locale(),
 			'api'          => [
 				'routes' => [
 					'v3' => [

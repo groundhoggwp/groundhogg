@@ -265,7 +265,7 @@
 					  ${toggle({
 						  name: 'is_conversion',
 						  id: 'is-conversion',
-						  checked: Editor.funnel.data.conversion_step == ID,
+						  checked: Editor.funnel.data.conversion_step === ID,
 						  onLabel: 'YES',
 						  offLabel: 'NO'
 					  })}
@@ -1012,10 +1012,7 @@
       this.fixStepOrders()
     },
 
-    /**
-     * Saves the current state of the funnel for an undo slot
-     */
-    saveUndoState () {
+    currentState () {
       const {
         view,
         funnel,
@@ -1024,13 +1021,20 @@
         isEditingTitle
       } = this
 
-      this.undoStates.push({
+      return {
         view,
         activeStep,
         isEditingTitle,
         activeAddType,
         funnel: copyObject(funnel)
-      })
+      }
+    },
+
+    /**
+     * Saves the current state of the funnel for an undo slot
+     */
+    saveUndoState () {
+      this.undoStates.push(this.currentState())
     },
 
     /**
@@ -1043,9 +1047,9 @@
         return
       }
 
-      Object.assign(this, lastState)
+      this.redoStates.push(this.currentState())
 
-      this.redoStates.push(lastState)
+      Object.assign(this, lastState)
 
       this.render()
     },
@@ -1060,9 +1064,9 @@
         return
       }
 
-      Object.assign(this, lastState)
+      this.undoStates.push(this.currentState())
 
-      this.undoStates.push(lastState)
+      Object.assign(this, lastState)
 
       this.render()
     },
@@ -2751,16 +2755,17 @@
 				</div>
 				<div class="row">
 					<label class="row-label">Then run at...</label>
-					<select class="delay-input re-render" name="run_when">
-						${createOptions(runWhenTypes, run_when)}
-					</select>
+					${select({
+						className: 'delay-input re-render',
+						name: 'run_when'
+					}, runWhenTypes, run_when)}
 					${run_when === 'later' ? `<input class="delay-input" type="time" name="run_time" value="${run_time}">` : ''}
 					${run_when === 'between' ? `<input class="delay-input" type="time" name="run_time" value="${run_time}"> and <input class="delay-input" type="time" name="run_time_to" value="${run_time_to}">` : ''}
 				</div>
 			</div>`
       },
 
-      onMount (step) {
+      onMount (step, updateStepMeta) {
 
         const updatePreview = () => {
           const { meta } = Editor.getCurrentStep()
@@ -3072,7 +3077,7 @@
           })
         })
 
-        const editor = formBuilder('#edit-form', meta.form, (form) => {
+        const editor = formBuilder('#edit-form', copyObject(meta.form), (form) => {
           updateStepMeta({
             form
           })

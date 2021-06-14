@@ -949,8 +949,8 @@
 
       const addField = () => {
         this.form.fields.push(defaultField)
-        onChange(this.form)
         setActiveField(this.form.fields.length - 1)
+        onChange(this.form)
       }
 
       const deleteField = (id) => {
@@ -961,8 +961,8 @@
           self.activeFieldTab = 'content'
         }
 
-        onChange(this.form)
         render()
+        onChange(this.form)
       }
 
       const duplicateField = (id) => {
@@ -971,8 +971,8 @@
 
         this.form.fields.splice(id, 0, field)
 
-        onChange(this.form)
         setActiveField(id + 1)
+        onChange(this.form)
       }
 
       const updateField = (atts, reRenderSettings = false, reRenderPreview = true) => {
@@ -992,13 +992,14 @@
             break
         }
 
-        onChange(this.form)
-
         if (reRenderSettings) {
+
           render()
         } else if (reRenderPreview) {
           renderPreview()
         }
+
+        onChange(this.form)
       }
 
       const $builder = $('#form-builder')
@@ -1059,8 +1060,8 @@
 
           self.form.fields = newFields
 
-          onChange(self.form)
           render()
+          onChange(self.form)
         }
       })
     },
@@ -1070,15 +1071,8 @@
     },
 
     render () {
-      // const activeElementId = document.activeElement.id
       this.el.html(Templates.builder(this.form, this.activeField, this.activeFieldTab))
-      // if (activeElementId) {
-      //   document.querySelector('#' + activeElementId).focus()
-      // }
     },
-
-    deMount () {},
-    renderSettings () {},
 
   })
 
