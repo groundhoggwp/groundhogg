@@ -376,7 +376,7 @@
         const selectOption = (option, i) => {
           // language=HTML
           return `
-			  <div class="input-wrap select-option-wrap">
+			  <div class="select-option-wrap">
 				  ${input({
 					  id: `select-option-${i}`,
 					  className: 'select-option',
@@ -395,6 +395,7 @@
 				<div class="select-options">
 					${options.map((option, i) => selectOption(option, i)).join('')}
 					<div class="select-option-add">
+						<div class="spacer"></div>
 						<button id="add-option" class="dashicon-button">
 							<span class="dashicons dashicons-plus-alt2"></span></button>
 					</div>
@@ -438,6 +439,13 @@
             ]
           }, true)
         })
+
+      }
+    },
+
+    optionNone : {
+      type: 'optionNone',
+      edit( { option_none } ) {
 
       }
     }
@@ -671,6 +679,7 @@
       name: 'Dropdown',
       content: [
         Settings.type.type,
+        Settings.name.type,
         Settings.required.type,
         Settings.hideLabel.type,
         Settings.label.type,

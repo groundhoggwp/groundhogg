@@ -177,9 +177,9 @@
         return
       }
 
-      $(el).html('<p>Loading<span id="dots"></span></p>')
+      $(el).html('<p><span id="search-loading-dots-pill">Loading<span id="search-loading-dots"></span></span></p>')
 
-      const { stop: stopDots } = loadingDots('#dots')
+      const { stop: stopDots } = loadingDots('#search-loading-dots')
 
       if (preloadEmails.length > 0) {
         await EmailsStore.fetchItems({

@@ -194,7 +194,7 @@
           //language=HTML
           return `
 			  <button class="update gh-button primary"
-			          ${objectEquals(Editor.funnel.steps, Editor.origFunnel.steps) ? 'disabled' : ''}>
+			          ${objectEquals(Editor.funnel.steps, Editor.origFunnel.steps) || Object.keys(Editor.stepErrors).length > 0 ? 'disabled' : ''}>
 				  <svg viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
 					  <path
 						  d="M1 21.956V2.995c0-.748.606-1.355 1.354-1.355H17.93l4.74 4.74v15.576c0 .748-.606 1.354-1.354 1.354H2.354A1.354 1.354 0 011 21.956z"
@@ -246,6 +246,34 @@
           return Editor.updateCurrentStep(data, reRenderStepEdit)
         }
 
+        const benchmarkPanel = () => {
+          // language=HTML
+          return `
+			  <div class="panel benchmark-settings">
+				  <div class="row">
+					  <label class="row-label">Allow contacts to enter the funnel at this step?</label>
+					  ${toggle({
+						  name: 'is_entry_point',
+						  id: 'is-entry-point',
+						  checked: meta.is_entry_point,
+						  onLabel: 'YES',
+						  offLabel: 'NO'
+					  })}
+				  </div>
+				  <div class="row">
+					  <label class="row-label">Track a conversion whenever this step is completed.</label>
+					  ${toggle({
+						  name: 'is_conversion',
+						  id: 'is-conversion',
+						  checked: Editor.funnel.data.conversion_step == ID,
+						  onLabel: 'YES',
+						  offLabel: 'NO'
+					  })}
+					  <p class="description">Only one step can be recorded as the conversion step.</p>
+				  </div>
+			  </div>`
+        }
+
         const slotArgs = [
           step,
           updateStepMeta,
@@ -259,7 +287,7 @@
                     ${errors.map(error => `<li class="step-error"><span class="dashicons dashicons-warning"></span> ${error}</li>`).join('')}
                 </ul>
             </div>` : ''}
-			<div class="step-edit">
+			<div class="step-edit ${step_type} ${step_group}">
 				<div class="settings">
 					${slot('beforeStepSettings', ...slotArgs)}
 					${slot(`beforeStepSettings.${step_type}`, ...slotArgs)}
@@ -275,6 +303,7 @@
 						<textarea rows="4" id="step-notes" class="notes full-width"
 						          name="step_notes">${specialChars(meta.step_notes || '')}</textarea>
 					</div>
+					${step_group === 'benchmark' ? benchmarkPanel() : ''}
 					${slot(`afterStepNotes.${step_type}`, ...slotArgs)}
 					${slot('afterStepNotes', ...slotArgs)}
 				</div>
@@ -813,6 +842,21 @@
         return this.updateCurrentStep(data, reRenderStepEdit)
       }
 
+      // Step notes listener
+      $('#step-notes').on('change', function (e) {
+        updateStepMeta({
+          step_notes: $(this).val()
+        })
+      })
+
+      if (step.data.step_group === 'benchmark') {
+        $('#is-entry-point').on('change', (e) => {
+          updateStepMeta({
+            is_entry_point: e.target.checked
+          })
+        })
+      }
+
       const StepType = getStepType(step.data.step_type)
 
       StepType.onMount(step, updateStepMeta, updateStep)
@@ -871,13 +915,6 @@
       $('#control-panel').html(this.htmlTemplates.stepEditPanel(step))
 
       this.mountStep(step)
-
-      // Step notes listener
-      $('#step-notes').on('change', function (e) {
-        self.updateCurrentStepMeta({
-          step_notes: $(this).val()
-        })
-      })
 
       slotsMounted()
     },
@@ -1371,6 +1408,8 @@
       }
 
       this.renderStepFlow()
+
+      return newStep
     },
 
     /**
@@ -1380,11 +1419,13 @@
      * @param reRenderStepEdit
      */
     updateCurrentStep (newData, reRenderStepEdit = false) {
-      this.updateStep(this.activeStep, newData)
+      const step = this.updateStep(this.activeStep, newData)
 
       if (reRenderStepEdit) {
         this.renderStepEdit()
       }
+
+      return step
     },
 
     /**
@@ -1399,7 +1440,7 @@
 
       const { data, meta } = this.getCurrentStep()
 
-      this.updateStep(this.activeStep, {
+      const step = this.updateStep(this.activeStep, {
         meta: {
           ...meta,
           ...newMeta
@@ -1409,6 +1450,8 @@
       if (reRenderStepEdit) {
         this.renderStepEdit()
       }
+
+      return step
     },
 
     autoSaveTimeout: null,
@@ -2783,8 +2826,33 @@
 
         const { email_id } = meta
 
+        const iframePreview = () => {
+
+          const email = EmailsStore.get(email_id)
+          const { context } = email
+
+          // language=HTML
+          return `
+			  <div class="panel">
+				  <div class="row">
+					  <h3 class="subject-line">${email.data.subject}</h3>
+					  <div id="from-line">
+						  <img class="avatar" alt="avatar" src="${context.avatar}"/>
+						  <div class="from">
+							  <span class="from-name">${context.from_name}</span>
+							  <span class="from-email">&lt;${context.from_email}&gt;</span>
+						  </div>
+					  </div>
+				  </div>
+				  <div class="loading-iframe">
+					  <iframe id="email-preview" src="${Groundhogg.managed_page.root}/emails/${email_id}"></iframe>
+				  </div>
+			  </div>`
+        }
+
         //language=HTML
         return `
+			${email_id ? iframePreview() : ''}
 			<div class="panel">
 				<div class="row">
 					<label class="row-label">Select an email to send...</label>
@@ -2798,6 +2866,10 @@
 						}
 					}, email_id))}
 				</div>
+				<div class="row">
+					<label class="row-label">Or...</label>
+					<button class="gh-button secondary">Create a new email</button>
+				</div>
 			</div>`
       },
       onMount (step, updateStepMeta) {
@@ -2806,10 +2878,22 @@
         }).on('change', function (e) {
           updateStepMeta({
             email_id: parseInt($(this).val())
-          })
-
-          Editor.renderStepEdit()
+          }, true)
         })
+
+        $('#email-preview').on('load', function (e) {
+          this.height = this.contentWindow.document.body.offsetHeight
+          this.style.height = this.contentWindow.document.body.offsetHeight + 'px'
+        })
+      },
+      validate ({ meta }, errors) {
+
+        const { email_id } = meta
+        const email = EmailsStore.get(email_id)
+
+        if (email_id && email && email.data.status !== 'ready') {
+          errors.push('Email is in draft mode. Please update status to ready!')
+        }
       }
     },
 

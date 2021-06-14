@@ -1,3 +1,11 @@
+#search-loading-dots-pill {
+  display: inline-block;
+  background: #6C19AD;
+  border-radius: 5px;
+  padding: 1px 5px;
+  color: #FFFFFF;
+}
+
 #search-filters-editor {
   display: flex;
   flex-direction: column;

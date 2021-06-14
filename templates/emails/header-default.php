@@ -112,7 +112,7 @@ $email_width          = $is_showing_in_iframe ? '100%' : $email_width;
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 	<title><?php echo $email_title; ?></title>
-	<base target="_parent">
+	<base target="_blank">
 	<style>
 
         img {

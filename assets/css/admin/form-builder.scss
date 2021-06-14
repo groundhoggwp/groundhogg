@@ -86,12 +86,12 @@
 
                   input {
                     width: 100%;
+                    border-right: none;
                     border-radius: 0;
                   }
 
                   button{
                     border: 1px solid #8c8f94;
-                    border-left: none;
                     border-radius: 0 !important;
                     padding: 6px;
                   }
@@ -121,7 +121,11 @@
 
                 .select-option-add{
                   display: flex;
-                  justify-content: flex-end;
+                  //justify-content: flex-end;
+
+                  .spacer{
+                    width: 100%;
+                  }
 
                   button{
                     padding: 5px 6px;

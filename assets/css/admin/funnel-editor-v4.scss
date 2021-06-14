@@ -342,6 +342,35 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
     display: flex;
     padding: 20px;
     gap: 20px;
+
+    &.send_email {
+
+      .loading-iframe {
+        display: flex;
+        min-height: 220px;
+        background: url(../../images/loading.gif) center center no-repeat;
+      }
+
+      iframe {
+        width: 100%;
+      }
+
+      #from-line {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .from-name {
+          font-weight: 500;
+          font-size: 16px;
+        }
+
+        img.avatar {
+          border-radius: 50%;
+        }
+      }
+
+    }
   }
 
   .step-edit .settings {
@@ -870,18 +899,18 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
     align-items: center;
     padding-bottom: 5px;
 
-    &:focus-within{
+    &:focus-within {
       border-color: $primary-blue;
     }
 
-    &.form-name{
+    &.form-name {
       margin-bottom: 10px;
 
-      label{
+      label {
         flex-basis: 120px;
       }
 
-      input{
+      input {
         background: transparent;
       }
     }

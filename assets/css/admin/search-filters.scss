@@ -7,6 +7,14 @@ $benchmark-orange: #F58115;
 $action-green: #9ECE38;
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
+#search-loading-dots-pill{
+  display: inline-block;
+  background: $secondary-purple;
+  border-radius: 5px;
+  padding: 1px 5px;
+  color: #FFFFFF;
+}
+
 #search-filters-editor {
 
   display: flex;

@@ -131,6 +131,8 @@ class Scripts {
 		wp_register_script( 'jquery-flot-time', GROUNDHOGG_ASSETS_URL . 'lib/flot/jquery.flot.time' . $dot_min . '.js', [ 'jquery-flot' ] );
 		wp_register_script( 'jquery-flot-categories', GROUNDHOGG_ASSETS_URL . 'lib/flot/jquery.flot.categories' . $dot_min . '.js', [ 'jquery-flot' ] );
 
+		wp_register_script( 'jquery-vhtml', GROUNDHOGG_ASSETS_URL . 'js/admin/jquery-vhtml' . $dot_min . '.js', [ 'jquery' ] );
+
 		//chartjs
 		wp_deregister_script( 'chart-js' );
 		wp_register_script( 'chart-js', GROUNDHOGG_ASSETS_URL . 'lib/chart/Chart.bundle.min.js' );
@@ -238,6 +240,7 @@ class Scripts {
 		wp_register_script( 'groundhogg-admin-funnel-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-editor-v4' . $dot_min . '.js', [
 			'select2',
 			'jquery',
+			'jquery-vhtml',
 			'jquery-ui-draggable',
 			'jquery-ui-sortable',
 			'groundhogg-admin',

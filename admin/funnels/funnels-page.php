@@ -162,7 +162,8 @@ class Funnels_Page extends Admin_Page {
 					'funnel'    => $funnel,
 					'stepTypes' => Plugin::instance()->step_manager->get_elements()
 				] );
-				wp_enqueue_script( 'groundhogg-admin-email-editor-step' );
+
+//				wp_enqueue_script( 'groundhogg-admin-email-editor-step' );
 
 				do_action( 'groundhogg_funnel_scripts', $funnel );
 

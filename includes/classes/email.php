@@ -341,9 +341,9 @@ class Email extends Base_Object_With_Meta {
 		/**
 		 * Filter the to address
 		 *
-		 * @param string $email
+		 * @param string  $email
 		 * @param Contact $contact
-		 * @param Email $email
+		 * @param Email   $email
 		 */
 		return apply_filters( 'groundhogg/email/to', $this->get_contact()->get_email(), $this->get_contact(), $this );
 	}
@@ -1065,6 +1065,22 @@ class Email extends Base_Object_With_Meta {
 			'all_clicks'   => $all_clicked,
 			'unsubscribed' => $unsubscribed,
 		];
+	}
+
+	public function get_as_array() {
+		return apply_filters( "groundhogg/{$this->get_object_type()}/get_as_array", [
+			'ID'      => $this->get_id(),
+			'data'    => $this->data,
+			'meta'    => $this->meta,
+			'context' => [
+				'from_name'  => $this->get_from_name(),
+				'from_email' => $this->get_from_email(),
+				'from_user'  => $this->get_from_user(),
+				'avatar'     => get_avatar_url( $this->get_from_user_id(), [
+					'size' => 30
+				] )
+			]
+		] );
 	}
 
 

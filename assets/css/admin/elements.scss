@@ -134,6 +134,8 @@ button {
 
 .gh-button-group {
 
+  display: flex;
+
   button.gh-button:not(:first-child) {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;

@@ -93,6 +93,9 @@ button.gh-button.icon:hover:not(:disabled) {
   border-color: rgba(16, 38, 64, 0.25);
 }
 
+.gh-button-group {
+  display: flex;
+}
 .gh-button-group button.gh-button:not(:first-child) {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
