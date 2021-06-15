@@ -1,10 +1,9 @@
 (function (Funnel, $) {
-
-  const TagsStore = Groundhogg.stores.tags
-  const EmailsStore = Groundhogg.stores.emails
-  const apiGet = Groundhogg.api.get
-  const apiPost = Groundhogg.api.post
-  const apiRoutes = Groundhogg.api.routes.v4
+  const TagsStore = Groundhogg.stores.tags;
+  const EmailsStore = Groundhogg.stores.emails;
+  const apiGet = Groundhogg.api.get;
+  const apiPost = Groundhogg.api.post;
+  const apiRoutes = Groundhogg.api.routes.v4;
   const {
     tinymceElement,
     confirmationModal,
@@ -16,51 +15,49 @@
     toggle,
     textAreaWithReplacements,
     textAreaWithReplacementsAndEmojis,
-  } = Groundhogg.element
+  } = Groundhogg.element;
 
-  const { formBuilder } = Groundhogg
+  const { formBuilder } = Groundhogg;
 
-  const { linkPicker, emailPicker, tagPicker } = Groundhogg.pickers
+  const { linkPicker, emailPicker, tagPicker } = Groundhogg.pickers;
 
   $.fn.serializeFormJSON = function () {
-
-    var o = {}
-    var a = this.serializeArray()
+    var o = {};
+    var a = this.serializeArray();
     $.each(a, function () {
       if (o[this.name]) {
         if (!o[this.name].push) {
-          o[this.name] = [o[this.name]]
+          o[this.name] = [o[this.name]];
         }
-        o[this.name].push(this.value || '')
+        o[this.name].push(this.value || "");
       } else {
-        o[this.name] = this.value || ''
+        o[this.name] = this.value || "";
       }
-    })
-    return o
-  }
+    });
+    return o;
+  };
 
   const slot = (name, ...args) => {
-    return SlotFillProvider.slot(name, ...args)
-  }
+    return SlotFillProvider.slot(name, ...args);
+  };
 
   const fill = (name, component) => {
-    return SlotFillProvider.fill(name, component)
-  }
+    return SlotFillProvider.fill(name, component);
+  };
 
   const slotsMounted = () => {
-    return SlotFillProvider.slotsMounted()
-  }
+    return SlotFillProvider.slotsMounted();
+  };
 
   const slotsDemounted = () => {
-    return SlotFillProvider.slotsDemounted()
-  }
+    return SlotFillProvider.slotsDemounted();
+  };
 
   const stepIsReal = (stepId) => {
-    return Editor.origFunnel.steps.find(step => step.ID === stepId)
-  }
+    return Editor.origFunnel.steps.find((step) => step.ID === stepId);
+  };
 
   const SlotFillProvider = {
-
     fills: [],
     _slotsMounted: [],
     _slotsDemounted: [],
@@ -72,29 +69,34 @@
      * @param args
      * @returns {string}
      */
-    slot (slotName, ...args) {
+    slot(slotName, ...args) {
       this._slotsMounted.push({
         name: slotName,
-        args: args
-      })
-      return this.fills.filter(fill => fill.slot === slotName).map(fill => fill.render(...args)).join('')
+        args: args,
+      });
+      return this.fills
+        .filter((fill) => fill.slot === slotName)
+        .map((fill) => fill.render(...args))
+        .join("");
     },
 
     /**
      * Call this after any slots have been added to the DOM
      */
-    slotsMounted () {
-      let slot
+    slotsMounted() {
+      let slot;
 
       while (this._slotsMounted.length > 0) {
         // Get the next mounted slot
-        slot = this._slotsMounted.pop()
-        this.fills.filter(fill => fill.slot === slot.name).forEach(fill => {
-          fill.onMount(...slot.args)
-        })
+        slot = this._slotsMounted.pop();
+        this.fills
+          .filter((fill) => fill.slot === slot.name)
+          .forEach((fill) => {
+            fill.onMount(...slot.args);
+          });
 
         // After a slot has been mounted, remember it has been so it can be demounted later
-        this._slotsDemounted.push(slot)
+        this._slotsDemounted.push(slot);
       }
     },
 
@@ -102,15 +104,17 @@
      * Any callbacks to demount a slot
      * Call before any slots are removed from the DOM
      */
-    slotsDemounted () {
-      let slot
+    slotsDemounted() {
+      let slot;
 
       while (this._slotsDemounted.length > 0) {
         // get the next demounted slot
-        slot = this._slotsDemounted.pop()
-        this.fills.filter(fill => fill.slot === slot.name).forEach(fill => {
-          fill.onDemount(...slot.args)
-        })
+        slot = this._slotsDemounted.pop();
+        this.fills
+          .filter((fill) => fill.slot === slot.name)
+          .forEach((fill) => {
+            fill.onDemount(...slot.args);
+          });
       }
     },
 
@@ -120,27 +124,28 @@
      * @param slot
      * @param component
      */
-    fill (slot, component) {
+    fill(slot, component) {
       this.fills.push({
         slot,
         ...{
-          render () {},
-          onMount () {},
-          onDemount () {},
-          ...component
-        }
-      })
-    }
-  }
+          render() {},
+          onMount() {},
+          onDemount() {},
+          ...component,
+        },
+      });
+    },
+  };
 
   const getStepType = (type) => {
-    return Editor.stepTypes.hasOwnProperty(type) ? Editor.stepTypes[type] : StepTypes.getType('error')
-  }
+    return Editor.stepTypes.hasOwnProperty(type)
+      ? Editor.stepTypes[type]
+      : StepTypes.getType("error");
+  };
 
   const Editor = {
-
-    activeAddType: 'actions',
-    view: 'addingStep',
+    activeAddType: "actions",
+    view: "addingStep",
     activeStep: {},
     htmlModules: {},
     isEditingTitle: false,
@@ -153,7 +158,7 @@
     funnel: {
       ID: 0,
       data: {},
-      steps: []
+      steps: [],
     },
 
     /**
@@ -162,7 +167,7 @@
     origFunnel: {
       ID: 0,
       data: {},
-      steps: []
+      steps: [],
     },
 
     stepTypes: {},
@@ -177,10 +182,9 @@
     funnelErrors: [],
 
     htmlTemplates: {
-      publishActions (status) {
-
+      publishActions(status) {
         // Todo switch back
-        if (status === 'inactive') {
+        if (status === "inactive") {
           //language=HTML
           return `
 			  <button class="update-and-launch">Launch
@@ -189,12 +193,17 @@
 						  d="M8.888 7.173a21.621 21.621 0 017.22-4.783m-7.22 4.783a21.766 21.766 0 00-2.97 3.697m2.97-3.697c-1.445-.778-4.935-1.2-7.335 3.334l2.364 2.364 2-2m10.19-8.481A21.709 21.709 0 0123.22.843a21.708 21.708 0 01-1.546 7.112M16.108 2.39l5.565 5.565M5.917 10.87l1.885 4.057m9.088.248a21.62 21.62 0 004.783-7.22m-4.783 7.22a21.771 21.771 0 01-3.698 2.97m3.698-2.97c.778 1.445 1.2 4.934-3.334 7.335l-2.364-2.364 2-2m0 0L9.136 16.26m0 0l-1.334-1.334m1.334 1.334l-2.71 2.71-.667-.666-.667-.667 2.71-2.71m6.42-5.087a1.886 1.886 0 112.668-2.667 1.886 1.886 0 01-2.668 2.667z"
 						  stroke="currentColor" stroke-width="1.5"/>
 				  </svg>
-			  </button>`
+			  </button>`;
         } else {
           //language=HTML
           return `
 			  <button class="update gh-button primary"
-			          ${objectEquals(Editor.funnel.steps, Editor.origFunnel.steps) || Object.keys(Editor.stepErrors).length > 0 ? 'disabled' : ''}>
+			          ${
+                  objectEquals(Editor.funnel.steps, Editor.origFunnel.steps) ||
+                  Object.keys(Editor.stepErrors).length > 0
+                    ? "disabled"
+                    : ""
+                }>
 				  <svg viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
 					  <path
 						  d="M1 21.956V2.995c0-.748.606-1.355 1.354-1.355H17.93l4.74 4.74v15.576c0 .748-.606 1.354-1.354 1.354H2.354A1.354 1.354 0 011 21.956z"
@@ -211,40 +220,44 @@
 					        stroke="currentColor"
 					        stroke-width="1.2"/>
 				  </svg>
-			  </button>`
+			  </button>`;
         }
       },
-      funnelTitleEdit (title, isEditing) {
+      funnelTitleEdit(title, isEditing) {
         //language=HTML
         if (isEditing) {
           return `<input type="text" class="funnel-title-edit regular-text" id="funnel-title-edit" name="funnel_title"
-		                 value="${specialChars(title)}">`
+		                 value="${specialChars(title)}">`;
         } else {
-          return `<span class="title-inner">${specialChars(title)}</span><span class="pencil"><span class="dashicons dashicons-edit"></span></span>`
+          return `<span class="title-inner">${specialChars(
+            title
+          )}</span><span class="pencil"><span class="dashicons dashicons-edit"></span></span>`;
         }
       },
-      stepEditPanel (step) {
+      stepEditPanel(step) {
+        const { ID, data, meta } = step;
+        const { step_type, step_title, step_group } = data;
 
-        const { ID, data, meta } = step
-        const { step_type, step_title, step_group } = data
+        const StepType = getStepType(step_type);
 
-        const StepType = getStepType(step_type)
+        let hasErrors = false;
+        let errors = [];
 
-        let hasErrors = false
-        let errors = []
-
-        if (Editor.stepErrors.hasOwnProperty(ID) && Editor.stepErrors[ID].length > 0) {
-          hasErrors = true
-          errors = Editor.stepErrors[ID]
+        if (
+          Editor.stepErrors.hasOwnProperty(ID) &&
+          Editor.stepErrors[ID].length > 0
+        ) {
+          hasErrors = true;
+          errors = Editor.stepErrors[ID];
         }
 
         const updateStepMeta = (meta, reRenderStepEdit = false) => {
-          return Editor.updateCurrentStepMeta(meta, reRenderStepEdit)
-        }
+          return Editor.updateCurrentStepMeta(meta, reRenderStepEdit);
+        };
 
         const updateStep = (data, reRenderStepEdit = false) => {
-          return Editor.updateCurrentStep(data, reRenderStepEdit)
-        }
+          return Editor.updateCurrentStep(data, reRenderStepEdit);
+        };
 
         const benchmarkPanel = () => {
           // language=HTML
@@ -253,139 +266,178 @@
 				  <div class="row">
 					  <label class="row-label">Allow contacts to enter the funnel at this step?</label>
 					  ${toggle({
-						  name: 'is_entry_point',
-						  id: 'is-entry-point',
-						  checked: meta.is_entry_point,
-						  onLabel: 'YES',
-						  offLabel: 'NO'
-					  })}
+              name: "is_entry_point",
+              id: "is-entry-point",
+              checked: meta.is_entry_point,
+              onLabel: "YES",
+              offLabel: "NO",
+            })}
 				  </div>
 				  <div class="row">
 					  <label class="row-label">Track a conversion whenever this step is completed.</label>
 					  ${toggle({
-						  name: 'is_conversion',
-						  id: 'is-conversion',
-						  checked: Editor.funnel.data.conversion_step === ID,
-						  onLabel: 'YES',
-						  offLabel: 'NO'
-					  })}
+              name: "is_conversion",
+              id: "is-conversion",
+              checked: Editor.funnel.data.conversion_step === ID,
+              onLabel: "YES",
+              offLabel: "NO",
+            })}
 					  <p class="description">Only one step can be recorded as the conversion step.</p>
 				  </div>
-			  </div>`
-        }
+			  </div>`;
+        };
 
-        const slotArgs = [
-          step,
-          updateStepMeta,
-          updateStep
-        ]
+        const slotArgs = [step, updateStepMeta, updateStep];
 
         return `
-			${hasErrors ?
-          `<div class="step-errors">
+			${
+        hasErrors
+          ? `<div class="step-errors">
                 <ul>
-                    ${errors.map(error => `<li class="step-error"><span class="dashicons dashicons-warning"></span> ${error}</li>`).join('')}
+                    ${errors
+                      .map(
+                        (error) =>
+                          `<li class="step-error"><span class="dashicons dashicons-warning"></span> ${error}</li>`
+                      )
+                      .join("")}
                 </ul>
-            </div>` : ''}
+            </div>`
+          : ""
+      }
 			<div class="step-edit ${step_type} ${step_group}">
 				<div class="settings">
-					${slot('beforeStepSettings', ...slotArgs)}
+					${slot("beforeStepSettings", ...slotArgs)}
 					${slot(`beforeStepSettings.${step_type}`, ...slotArgs)}
 					${StepType.edit(...slotArgs)}
 					${slot(`afterStepSettings.${step_type}`, ...slotArgs)}
-					${slot('afterStepSettings', ...slotArgs)}
+					${slot("afterStepSettings", ...slotArgs)}
 				</div>
 				<div class="actions-and-notes">
-					${slot('beforeStepNotes', ...slotArgs)}
+					${slot("beforeStepNotes", ...slotArgs)}
 					${slot(`beforeStepNotes.${step_type}`, ...slotArgs)}
 					<div class="panel">
 						<label class="row-label"><span class="dashicons dashicons-admin-comments"></span> Notes</label>
 						<textarea rows="4" id="step-notes" class="notes full-width"
-						          name="step_notes">${specialChars(meta.step_notes || '')}</textarea>
+						          name="step_notes">${specialChars(meta.step_notes || "")}</textarea>
 					</div>
-					${step_group === 'benchmark' ? benchmarkPanel() : ''}
+					${step_group === "benchmark" ? benchmarkPanel() : ""}
 					${slot(`afterStepNotes.${step_type}`, ...slotArgs)}
-					${slot('afterStepNotes', ...slotArgs)}
+					${slot("afterStepNotes", ...slotArgs)}
 				</div>
-			</div>`
+			</div>`;
         //language=HTML
       },
-      stepAddPanel (activeType) {
+      stepAddPanel(activeType) {
         //language=HTML
         return `
 			<div class="step-add">
 				<div class="type-select">
-					<button class="select-type actions ${activeType === 'actions' && 'active'}" data-type="actions">
-						${'Actions'}
+					<button class="select-type actions ${
+            activeType === "actions" && "active"
+          }" data-type="actions">
+						${"Actions"}
 					</button>
-					<button class="select-type benchmarks ${activeType === 'benchmarks' && 'active'}"
+					<button class="select-type benchmarks ${
+            activeType === "benchmarks" && "active"
+          }"
 					        data-type="benchmarks">
-						${'Benchmarks'}
+						${"Benchmarks"}
 					</button>
 				</div>
 				<div class="types">
-					${Object.values(Editor.stepTypes).filter(step => step.group + 's' === activeType).map(Editor.htmlTemplates.addStepCard).join('')}
+					${Object.values(Editor.stepTypes)
+            .filter((step) => step.group + "s" === activeType)
+            .map(Editor.htmlTemplates.addStepCard)
+            .join("")}
 				</div>
-			</div>`
+			</div>`;
       },
-      stepTypeSelect (type) {
+      stepTypeSelect(type) {
         //language=HTML
         return `
 			<div class="type-select">
-				<button class="select-type actions ${type === 'actions' && 'active'}" data-type="actions">
-					${'Actions'}
+				<button class="select-type actions ${
+          type === "actions" && "active"
+        }" data-type="actions">
+					${"Actions"}
 				</button>
-				<button class="select-type benchmarks ${type === 'benchmarks' && 'active'}" data-type="benchmarks">
-					${'Benchmarks'}
+				<button class="select-type benchmarks ${
+          type === "benchmarks" && "active"
+        }" data-type="benchmarks">
+					${"Benchmarks"}
 				</button>
-			</div>`
+			</div>`;
       },
-      addStepCard (step) {
+      addStepCard(step) {
         //language=HTML
         return `
-			<div class="add-step ${step.type} ${step.group}" data-type="${step.type}" data-group="${step.group}"
+			<div class="add-step ${step.type} ${step.group}" data-type="${
+          step.type
+        }" data-group="${step.group}"
 			     title="${step.name}">
-				${Editor.stepTypes[step.type].hasOwnProperty('svg') ? `<div class="step-icon-svg">${Editor.stepTypes[step.type].svg}</div>` : `<img alt="${Editor.stepTypes[step.type].name}" class="step-icon"
-				     src="${Editor.stepTypes[step.type].icon}"/>`}
-				<p>${step.name}</p></div>`
+				${
+          Editor.stepTypes[step.type].hasOwnProperty("svg")
+            ? `<div class="step-icon-svg">${
+                Editor.stepTypes[step.type].svg
+              }</div>`
+            : `<img alt="${Editor.stepTypes[step.type].name}" class="step-icon"
+				     src="${Editor.stepTypes[step.type].icon}"/>`
+        }
+				<p>${step.name}</p></div>`;
       },
-      stepFlowCard (step, activeStep) {
+      stepFlowCard(step, activeStep) {
+        const { ID, data, meta } = step;
+        const { step_type, step_title, step_group, step_order } = data;
 
-        const { ID, data, meta } = step
-        const { step_type, step_title, step_group, step_order } = data
+        const StepType = getStepType(step_type);
+        const origStep = Editor.origFunnel.steps.find((s) => s.ID === ID);
 
-        const StepType = getStepType(step_type)
-        const origStep = Editor.origFunnel.steps.find(s => s.ID === ID)
+        let status;
+        let hasErrors = false;
 
-        let status
-        let hasErrors = false
-
-        if (Editor.stepErrors.hasOwnProperty(ID) && Editor.stepErrors[ID].length > 0) {
-          status = 'config-error'
-          hasErrors = true
+        if (
+          Editor.stepErrors.hasOwnProperty(ID) &&
+          Editor.stepErrors[ID].length > 0
+        ) {
+          status = "config-error";
+          hasErrors = true;
         } else if (origStep && !objectEquals(step, origStep)) {
-          status = 'edited'
+          status = "edited";
         } else if (!origStep) {
-          status = 'new'
-        } else if (StepType.type === 'error') {
-          hasErrors = true
+          status = "new";
+        } else if (StepType.type === "error") {
+          hasErrors = true;
         }
 
-        const nextStep = Editor.funnel.steps.find(step => step.data.step_order === step_order + 1)
-        const prevStep = Editor.funnel.steps.find(step => step.data.step_order === step_order - 1)
+        const nextStep = Editor.funnel.steps.find(
+          (step) => step.data.step_order === step_order + 1
+        );
+        const prevStep = Editor.funnel.steps.find(
+          (step) => step.data.step_order === step_order - 1
+        );
 
         //language=HTML
         return `
-			${step_group === 'benchmark' ?
-				(step_order === 1 ?
-					`<div class="text-helper until-helper"><span class="dashicons dashicons-filter"></span> Start the funnel when...</div>`
-					: (prevStep && prevStep.data.step_group !== 'benchmark' ? '<div class="until-helper text-helper">Until...</div>' : ''))
-				: ''}
+			${
+        step_group === "benchmark"
+          ? step_order === 1
+            ? `<div class="text-helper until-helper"><span class="dashicons dashicons-filter"></span> Start the funnel when...</div>`
+            : prevStep && prevStep.data.step_group !== "benchmark"
+            ? '<div class="until-helper text-helper">Until...</div>'
+            : ""
+          : ""
+      }
 			<div
-				class="step ${step_type} ${step_group} ${activeStep === ID ? 'active' : ''} ${hasErrors ? 'has-errors' : ''}"
+				class="step ${step_type} ${step_group} ${activeStep === ID ? "active" : ""} ${
+          hasErrors ? "has-errors" : ""
+        }"
 				data-id="${ID}">
-				${StepType.hasOwnProperty('svg') ? `<div class="icon-svg">${StepType.svg}</div>` : `<img alt="${StepType.name}" class="icon"
-				     src="${StepType.icon}"/>`}
+				${
+          StepType.hasOwnProperty("svg")
+            ? `<div class="icon-svg">${StepType.svg}</div>`
+            : `<img alt="${StepType.name}" class="icon"
+				     src="${StepType.icon}"/>`
+        }
 				<div class="details">
 					<div class="step-title">${StepType.title(step)}</div>
 					<div class="step-type">${StepType.name}</div>
@@ -408,542 +460,281 @@
 					</ul>
 				</div>
 			</div>
-			${step_group === 'benchmark' && nextStep ? (nextStep.data.step_group === 'benchmark' ? `<div class="or-helper text-helper">Or...</div>` : '<div class="then-helper text-helper">Then...</div>') : ''}
-        `
+			${
+        step_group === "benchmark" && nextStep
+          ? nextStep.data.step_group === "benchmark"
+            ? `<div class="or-helper text-helper">Or...</div>`
+            : '<div class="then-helper text-helper">Then...</div>'
+          : ""
       }
+        `;
+      },
+      emailEditor(step) {
+        //language=HTML
+        return `
+            <div class="email-edit">
+              <div class="panel">
+				Email editor
+              </div>
+			</div>`;
+      },
     },
 
-    init () {
+    init() {
+      this.loadingClose = loadingModal().close;
 
-      this.loadingClose = loadingModal().close
+      var self = this;
+      var $doc = $(document);
 
-      var self = this
-      var $doc = $(document)
+      this.loadFunnel(this.funnel);
 
-      this.loadFunnel(this.funnel)
+      $doc.on("click", ".step-add .select-type", function () {
+        self.saveUndoState();
+        self.activeAddType = $(this).data("type");
+        self.renderStepAdd();
+      });
 
-      $doc.on('click', '.step-add .select-type', function () {
-        self.saveUndoState()
-        self.activeAddType = $(this).data('type')
-        self.renderStepAdd()
-      })
+      $doc.on("mouseleave", ".step-flow .steps .step", function (e) {
+        const $step = $(this);
+        $(".step-menu ul", $step).hide();
+      });
 
-      $doc.on('mouseleave', '.step-flow .steps .step', function (e) {
-        const $step = $(this)
-        $('.step-menu ul', $step).hide()
-      })
-
-      $doc.on('click', '.step-flow .steps .step', function (e) {
-
-        const $step = $(this)
-        const step = self.funnel.steps
-          .find(step => step.ID === parseInt($step.data('id')))
+      $doc.on("click", ".step-flow .steps .step", function (e) {
+        const $step = $(this);
+        const step = self.funnel.steps.find(
+          (step) => step.ID === parseInt($step.data("id"))
+        );
 
         switch (true) {
-          case ($(e.target).is('.step-menu-move-up')) :
-            self.moveStepUp(step)
-            break
-          case ($(e.target).is('.step-menu-move-down')) :
-            self.moveStepDown(step)
-            break
-          case ($(e.target).is('.step-menu-new-step-before')) :
-            self.insertPlaceholderStep(step, 'before')
+          case $(e.target).is(".step-menu-move-up"):
+            self.moveStepUp(step);
+            break;
+          case $(e.target).is(".step-menu-move-down"):
+            self.moveStepDown(step);
+            break;
+          case $(e.target).is(".step-menu-new-step-before"):
+            self.insertPlaceholderStep(step, "before");
 
-            break
-          case ($(e.target).is('.step-menu-new-step-after')) :
-            self.insertPlaceholderStep(step, 'after')
+            break;
+          case $(e.target).is(".step-menu-new-step-after"):
+            self.insertPlaceholderStep(step, "after");
 
-            break
-          case ($(e.target).is('.step-menu-duplicate')) :
-            const newStep = copyObject(step)
-            newStep.ID = uniqid()
-            self.addStep(newStep)
-            break
-          case ($(e.target).is('.step-menu-delete')) :
-            self.deleteStep(parseInt($step.data('id')))
-            break
-          case ($(e.target).is('.step-menu') || $(e.target).parent('.step-menu').length > 0) :
-            const $menu = $('.step-menu ul', $step).toggle()
+            break;
+          case $(e.target).is(".step-menu-duplicate"):
+            const newStep = copyObject(step);
+            newStep.ID = uniqid();
+            self.addStep(newStep);
+            break;
+          case $(e.target).is(".step-menu-delete"):
+            self.deleteStep(parseInt($step.data("id")));
+            break;
+          case $(e.target).is(".step-menu") ||
+            $(e.target).parent(".step-menu").length > 0:
+            const $menu = $(".step-menu ul", $step).toggle();
 
-            const p = $menu.offset()
-            const h = $menu.outerHeight()
+            const p = $menu.offset();
+            const h = $menu.outerHeight();
             if (p.top + h + 100 > $(window).height()) {
               $menu.css({
-                bottom: '90%',
-                top: 'auto',
-              })
+                bottom: "90%",
+                top: "auto",
+              });
             } else {
               $menu.css({
-                top: '90%',
-                bottom: 'auto',
-              })
+                top: "90%",
+                bottom: "auto",
+              });
             }
 
-            break
-          case ($(e.target).is('.step-menu-edit')) :
+            break;
+          case $(e.target).is(".step-menu-edit"):
           default:
             // window.console.log('edit')
-            const clickedStep = parseInt($step.data('id'))
+            const clickedStep = parseInt($step.data("id"));
 
             if (clickedStep === self.activeStep) {
-              return
+              return;
             }
 
-            self.saveUndoState()
-            self.previousActiveStep = self.activeStep
-            self.activeStep = clickedStep
-            self.view = 'editingStep'
-            self.renderStepFlow()
-            self.renderStepEdit()
+            self.saveUndoState();
+            self.previousActiveStep = self.activeStep;
+            self.activeStep = clickedStep;
+            self.view = "editingStep";
+            self.renderStepFlow();
+            self.renderStepEdit();
         }
-      })
+      });
 
-      $doc.on('click', '.step-flow .add-new-step', function () {
-        self.activeStep = null
-        self.view = 'addingStep'
-        self.renderStepFlow()
-        self.renderStepAdd()
-      })
+      $doc.on("click", ".step-flow .add-new-step", function () {
+        self.activeStep = null;
+        self.view = "addingStep";
+        self.renderStepFlow();
+        self.renderStepAdd();
+      });
 
-      $doc.on('click', '.undo-and-redo .undo', function () {
-        self.undo()
-      })
+      $doc.on("click", ".undo-and-redo .undo", function () {
+        self.undo();
+      });
 
-      $doc.on('click', '.undo-and-redo .redo', function () {
-        self.redo()
-      })
+      $doc.on("click", ".undo-and-redo .redo", function () {
+        self.redo();
+      });
 
-      $doc.on('click', '.header-stuff .title', function () {
+      $doc.on("click", ".header-stuff .title", function () {
         if (!self.isEditingTitle) {
-          self.isEditingTitle = true
-          self.renderTitle()
+          self.isEditingTitle = true;
+          self.renderTitle();
         }
-      })
+      });
 
-      $doc.on('click', '.publish-actions .deactivate', function () {
+      $doc.on("click", ".publish-actions .deactivate", function () {
         confirmationModal({
           // language=HTML
           alert: `<p><b>Are you sure you want to deactivate the funnel?</b></p>
 		  <p>Any pending events will be paused and contacts will not be able to move forward in the funnel.</p>
 		  <p>Reactivating the funnel will restart any paused events.</p>`,
           onConfirm: () => {
-            self.deactivate()
-          }
-        })
-      })
+            self.deactivate();
+          },
+        });
+      });
 
-      $doc.on('click', '.publish-actions .update-and-launch, .publish-actions .update', function () {
-        confirmationModal({
-          // language=HTML
-          alert: `<p><b>Are you sure you want to commit these changes?</b></p><p>The changes made will take immediate
+      $doc.on(
+        "click",
+        ".publish-actions .update-and-launch, .publish-actions .update",
+        function () {
+          confirmationModal({
+            // language=HTML
+            alert: `<p><b>Are you sure you want to commit these changes?</b></p><p>The changes made will take immediate
 			  effect to anyone currently in the funnel.</p>`,
-          onConfirm: () => {
-            self.commitChanges()
-          }
-        })
-      })
+            onConfirm: () => {
+              self.commitChanges();
+            },
+          });
+        }
+      );
 
-      $(document).on('tinymce-editor-setup', function (event, editor) {
-        editor.settings.toolbar1 = 'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,wp_adv,dfw,groundhoggreplacementbtn,groundhoggemojibtn'
-        editor.settings.toolbar2 = 'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help'
-        editor.settings.height = 200
-        editor.on('click', function (ed, e) {
-          $(document).trigger('to_mce')
-        })
-      })
+      $(document).on("tinymce-editor-setup", function (event, editor) {
+        editor.settings.toolbar1 =
+          "formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,wp_adv,dfw,groundhoggreplacementbtn,groundhoggemojibtn";
+        editor.settings.toolbar2 =
+          "strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help";
+        editor.settings.height = 200;
+        editor.on("click", function (ed, e) {
+          $(document).trigger("to_mce");
+        });
+      });
 
-      $doc.on('blur change keydown', '.funnel-title-edit', function (e) {
-
+      $doc.on("blur change keydown", ".funnel-title-edit", function (e) {
         // If the event is key down do nothing if the key wasn't enter
-        if (e.type === 'keydown' && e.keyCode !== 13) {
-          self.resizeTitleEdit()
-          return
+        if (e.type === "keydown" && e.keyCode !== 13) {
+          self.resizeTitleEdit();
+          return;
         }
 
-        self.saveUndoState()
-        self.funnel.data.title = e.target.value
-        self.isEditingTitle = false
-        self.update({
-          data: {
-            title: e.target.value
-          }
-        }, false)
-        self.renderTitle()
-      })
+        self.saveUndoState();
+        self.funnel.data.title = e.target.value;
+        self.isEditingTitle = false;
+        self.update(
+          {
+            data: {
+              title: e.target.value,
+            },
+          },
+          false
+        );
+        self.renderTitle();
+      });
 
-      self.setupSortable()
-      self.setupStepTypes()
+      self.setupSortable();
+      self.setupStepTypes();
       // self.initStepFlowContextMenu()
-      self.maybePreloadTagsAndEmails()
+      self.maybePreloadTagsAndEmails();
     },
 
     /**
      * Re-render the whole editor
      */
-    render () {
-      this.renderTitle()
-      this.renderPublishActions()
-      this.renderStepFlow()
-      this.renderStepAdd()
-      this.renderStepEdit()
+    render() {
+      this.renderTitle();
+      this.renderPublishActions();
+      this.renderStepFlow();
+      this.renderStepAdd();
+      this.renderStepEdit();
 
-      this.loadingClose()
+      this.loadingClose();
     },
 
-    async maybePreloadTagsAndEmails () {
-
-      const preloadTags = []
-      const preloadEmails = []
+    async maybePreloadTagsAndEmails() {
+      const preloadTags = [];
+      const preloadEmails = [];
 
       this.funnel.steps.forEach(({ meta }) => {
-        const { tags, email_id } = meta
+        const { tags, email_id } = meta;
         if (tags) {
-          preloadTags.push(...tags)
+          preloadTags.push(...tags);
         } else if (email_id) {
-          preloadEmails.push(email_id)
+          preloadEmails.push(email_id);
         }
-      })
+      });
 
       if (preloadEmails.length === 0 && preloadTags.length === 0) {
-        this.render()
-        return
+        this.render();
+        return;
       }
 
       if (preloadTags.length > 0) {
         await TagsStore.fetchItems({
-          include: preloadTags
-        })
+          include: preloadTags,
+        });
       }
 
       if (preloadEmails.length > 0) {
         await EmailsStore.fetchItems({
-          include: preloadEmails
-        })
+          include: preloadEmails,
+        });
       }
 
-      this.render()
+      this.render();
     },
 
-    loadFunnel (funnel) {
-
-      this.funnel = funnel
+    loadFunnel(funnel) {
+      this.funnel = funnel;
 
       // Copy from the orig included data
       // self.funnel = copyObject(self.funnel)
-      this.origFunnel = copyObject(funnel)
+      this.origFunnel = copyObject(funnel);
 
       if (this.funnel.meta.edited) {
-        this.funnel.steps = this.funnel.meta.edited.steps
+        this.funnel.steps = this.funnel.meta.edited.steps;
       }
     },
 
     /**
      * Init the sortable list of steps in the step flow
      */
-    setupSortable () {
-      var self = this
-      $('.step-flow .steps').sortable({
-        placeholder: 'step-placeholder',
-        cancel: '.text-helper',
-        start: function (e, ui) {
-          ui.placeholder.height(ui.item.height())
-          ui.placeholder.width(ui.item.width())
-        },
-        receive: function (e, ui) {
-
-          // console.log('received', ui)
-
-          self.saveUndoState()
-
-          var type = $(ui.helper).data('type')
-          var group = $(ui.helper).data('group')
-
-          var id = Date.now()
-
-          $(ui.helper).addClass('step')
-          $(ui.helper).data('id', id)
-
-          self.addStep({
-            ID: id,
-            data: {
-              ID: id,
-              funnel_id: Editor.funnel.ID,
-              step_title: Editor.stepTypes[type].name,
-              step_type: type,
-              step_group: group,
-              step_order: $(ui.helper).prevAll('.step').length
-            },
-            meta: StepTypes.getType(type).defaults
-          })
-        },
-        update: function (e, ui) {
-
-          // console.log('updated', ui)
-
-          self.saveUndoState()
-          self.syncOrderWithFlow()
-          self.autoSaveEditedFunnel()
-          self.renderStepFlow()
-          self.renderStepEdit()
-        }
-      }).disableSelection()
-    },
-
-    /**
-     * Merge the step types passed from PHP with methods defined in JS
-     */
-    setupStepTypes () {
-
-      // console.log('setup-step-types')
-
-      for (var prop in this.stepTypes) {
-        if (Object.prototype.hasOwnProperty.call(this.stepTypes, prop)
-          && Object.prototype.hasOwnProperty.call(StepTypes, prop)) {
-          Object.assign(this.stepTypes[prop], {
-            ...StepTypes.default,
-            ...StepTypes[prop]
-          })
-          Object.assign(StepTypes[prop], {
-            ...this.stepTypes[prop],
-          })
-        } else {
-          Object.assign(this.stepTypes[prop], StepTypes.default)
-        }
-      }
-    },
-
-    getStepType (type) {
-
-    },
-
-    /**
-     * Setup the context menu for editing duplicating and deleting steps
-     */
-    initStepFlowContextMenu () {
-
-      var self = this
-
-      this.stepFlowContextMenu = createContextMenu({
-        menuClassName: 'step-context-menu',
-        targetSelector: '.step-flow .steps .step',
-        items: [
-          { key: 'duplicate', text: 'Duplicate' },
-          { key: 'delete', text: 'Delete' },
-        ],
-        onOpen (e, el) {
-          self.stepOpenInContextMenu = parseInt(el.dataset.id)
-        },
-        onSelect (key) {
-          switch (key) {
-            case 'delete':
-
-              self.deleteStep(self.stepOpenInContextMenu)
-              break
-            case 'duplicate':
-
-              const stepToCopy = self.funnel.steps
-                .find(step => step.ID === self.stepOpenInContextMenu)
-
-              const newStep = copyObject(stepToCopy)
-              newStep.ID = uniqid()
-              self.addStep(newStep)
-
-              break
-          }
-        }
-      })
-
-      this.stepFlowContextMenu.init()
-    },
-
-    /**
-     * Renders the step flow
-     */
-    renderStepFlow () {
-
-      var self = this
-
-      this.checkForStepErrors()
-
-      var steps = this.funnel.steps
-        .sort((a, b) => a.data.step_order - b.data.step_order)
-        .map(step => self.htmlTemplates.stepFlowCard(step, self.activeStep))
-        .join('')
-
-      $('.step-flow .steps').html(steps)
-
-      this.renderPublishActions()
-    },
-
-    /**
-     * Add the step error
-     *
-     * @param id
-     * @param error
-     */
-    addStepError (id, error) {
-      if (!this.stepErrors.hasOwnProperty(id)) {
-        this.stepErrors[id] = []
-      }
-
-      this.stepErrors[id].push(error)
-    },
-
-    /**
-     * Check for step errors
-     */
-    checkForStepErrors () {
-
-      const self = this
-
-      this.stepErrors = []
-
-      this.funnel.steps.forEach(step => {
-
-        const errors = []
-
-        const { step_group, step_order, step_type } = step.data
-
-        const typeHandler = getStepType(step_type)
-
-        if (step_group === 'action' && step_order === 1) {
-          errors.push(
-            'Actions cannot be at the start of a funnel.'
-          )
-        } else if (typeHandler.type === 'error') {
-          errors.push(
-            'Settings not found.'
-          )
-        }
-
-        // console.log(typeHandler)
-
-        if (typeHandler) {
-          typeHandler.validate(step, errors)
-        }
-
-        errors.forEach(error => this.addStepError(step.ID, error))
-      })
-    },
-
-    mountStep (step) {
-
-      step = step || this.funnel.steps.find(s => s.ID === this.activeStep)
-
-      if (!step) {
-        return
-      }
-
-      const updateStepMeta = (meta, reRenderStepEdit = false) => {
-        return this.updateCurrentStepMeta(meta, reRenderStepEdit)
-      }
-
-      const updateStep = (data, reRenderStepEdit = false) => {
-        return this.updateCurrentStep(data, reRenderStepEdit)
-      }
-
-      // Step notes listener
-      $('#step-notes').on('change', function (e) {
-        updateStepMeta({
-          step_notes: $(this).val()
-        })
-      })
-
-      if (step.data.step_group === 'benchmark') {
-        $('#is-entry-point').on('change', (e) => {
-          updateStepMeta({
-            is_entry_point: e.target.checked
-          })
-        })
-      }
-
-      const StepType = getStepType(step.data.step_type)
-
-      StepType.onMount(step, updateStepMeta, updateStep)
-
-      this.lastStepEditMounted = this.activeStep
-    },
-
-    demountStep (step) {
-
-      step = step || this.funnel.steps.find(s => s.ID === this.lastStepEditMounted)
-
-      if (!step) {
-        return
-      }
-
-      const updateStepMeta = (meta) => {
-        return this.updateCurrentStepMeta(meta)
-      }
-
-      const updateStep = (data) => {
-        return this.updateCurrentStep(data)
-      }
-
-      const StepType = getStepType(step.data.step_type)
-
-      StepType.onDemount(step, updateStepMeta, updateStep)
-
-      this.lastStepEditMounted = null
-    },
-
-    /**
-     * Renders the edit step panel for the current step in the controls panel
-     */
-    renderStepEdit () {
-
-      if (this.view !== 'editingStep') {
-        return
-      }
-
-      var self = this
-
-      // const activeElementId = document.activeElement.id
-
-      const step = this.funnel.steps.find(step => step.ID === this.activeStep)
-      const previousStep = this.funnel.steps.find(step => step.ID === this.previousActiveStep)
-
-      // Handle remounting the step
-      if (this.activeStep === this.lastStepEditMounted) {
-        this.demountStep(step)
-      } else if (previousStep) {
-        this.demountStep(previousStep)
-      }
-
-      slotsDemounted()
-
-      $('#control-panel').html(this.htmlTemplates.stepEditPanel(step))
-
-      this.mountStep(step)
-
-      slotsMounted()
-    },
-
-    /**
-     * Renders the add step panel for the current step in the controls panel
-     */
-    renderStepAdd () {
-
-      if (this.view !== 'addingStep') {
-        return
-      }
-
-      const self = this
-
-      self.demountStep()
-
-      $('#control-panel').html(self.htmlTemplates.stepAddPanel(self.activeAddType))
-      self.renderStepFlow()
-
-      if (self.addingStepOrder) {
-        $('.add-step').on(
-          'click',
-          function () {
-            const $button = $(this)
-            var type = $button.data('type')
-            var group = $button.data('group')
-
-            var id = Date.now()
+    setupSortable() {
+      var self = this;
+      $(".step-flow .steps")
+        .sortable({
+          placeholder: "step-placeholder",
+          cancel: ".text-helper",
+          start: function (e, ui) {
+            ui.placeholder.height(ui.item.height());
+            ui.placeholder.width(ui.item.width());
+          },
+          receive: function (e, ui) {
+            // console.log('received', ui)
+
+            self.saveUndoState();
+
+            var type = $(ui.helper).data("type");
+            var group = $(ui.helper).data("group");
+
+            var id = Date.now();
+
+            $(ui.helper).addClass("step");
+            $(ui.helper).data("id", id);
 
             self.addStep({
               ID: id,
@@ -953,231 +744,538 @@
                 step_title: Editor.stepTypes[type].name,
                 step_type: type,
                 step_group: group,
-                step_order: self.addingStepOrder
+                step_order: $(ui.helper).prevAll(".step").length,
               },
-              meta: StepTypes.getType(type).defaults
-            })
+              meta: StepTypes.getType(type).defaults,
+            });
+          },
+          update: function (e, ui) {
+            // console.log('updated', ui)
 
-          }
-        )
-      } else {
-        $('.add-step').draggable({
-          connectToSortable: '.step-flow .steps',
-          helper: 'clone',
-          revert: 'invalid',
-          revertDuration: 0,
+            self.saveUndoState();
+            self.syncOrderWithFlow();
+            self.autoSaveEditedFunnel();
+            self.renderStepFlow();
+            self.renderStepEdit();
+          },
         })
+        .disableSelection();
+    },
+
+    /**
+     * Merge the step types passed from PHP with methods defined in JS
+     */
+    setupStepTypes() {
+      // console.log('setup-step-types')
+
+      for (var prop in this.stepTypes) {
+        if (
+          Object.prototype.hasOwnProperty.call(this.stepTypes, prop) &&
+          Object.prototype.hasOwnProperty.call(StepTypes, prop)
+        ) {
+          Object.assign(this.stepTypes[prop], {
+            ...StepTypes.default,
+            ...StepTypes[prop],
+          });
+          Object.assign(StepTypes[prop], {
+            ...this.stepTypes[prop],
+          });
+        } else {
+          Object.assign(this.stepTypes[prop], StepTypes.default);
+        }
       }
+    },
+
+    getStepType(type) {},
+
+    /**
+     * Setup the context menu for editing duplicating and deleting steps
+     */
+    initStepFlowContextMenu() {
+      var self = this;
+
+      this.stepFlowContextMenu = createContextMenu({
+        menuClassName: "step-context-menu",
+        targetSelector: ".step-flow .steps .step",
+        items: [
+          { key: "duplicate", text: "Duplicate" },
+          { key: "delete", text: "Delete" },
+        ],
+        onOpen(e, el) {
+          self.stepOpenInContextMenu = parseInt(el.dataset.id);
+        },
+        onSelect(key) {
+          switch (key) {
+            case "delete":
+              self.deleteStep(self.stepOpenInContextMenu);
+              break;
+            case "duplicate":
+              const stepToCopy = self.funnel.steps.find(
+                (step) => step.ID === self.stepOpenInContextMenu
+              );
+
+              const newStep = copyObject(stepToCopy);
+              newStep.ID = uniqid();
+              self.addStep(newStep);
+
+              break;
+          }
+        },
+      });
+
+      this.stepFlowContextMenu.init();
+    },
+
+    /**
+     * Renders the step flow
+     */
+    renderStepFlow() {
+      var self = this;
+
+      this.checkForStepErrors();
+
+      var steps = this.funnel.steps
+        .sort((a, b) => a.data.step_order - b.data.step_order)
+        .map((step) => self.htmlTemplates.stepFlowCard(step, self.activeStep))
+        .join("");
+
+      $(".step-flow .steps").html(steps);
+
+      this.renderPublishActions();
+    },
+
+    /**
+     * Add the step error
+     *
+     * @param id
+     * @param error
+     */
+    addStepError(id, error) {
+      if (!this.stepErrors.hasOwnProperty(id)) {
+        this.stepErrors[id] = [];
+      }
+
+      this.stepErrors[id].push(error);
+    },
+
+    /**
+     * Check for step errors
+     */
+    checkForStepErrors() {
+      const self = this;
+
+      this.stepErrors = [];
+
+      this.funnel.steps.forEach((step) => {
+        const errors = [];
+
+        const { step_group, step_order, step_type } = step.data;
+
+        const typeHandler = getStepType(step_type);
+
+        if (step_group === "action" && step_order === 1) {
+          errors.push("Actions cannot be at the start of a funnel.");
+        } else if (typeHandler.type === "error") {
+          errors.push("Settings not found.");
+        }
+
+        // console.log(typeHandler)
+
+        if (typeHandler) {
+          typeHandler.validate(step, errors);
+        }
+
+        errors.forEach((error) => this.addStepError(step.ID, error));
+      });
+    },
+
+    mountStep(step) {
+      step = step || this.funnel.steps.find((s) => s.ID === this.activeStep);
+
+      if (!step) {
+        return;
+      }
+
+      const updateStepMeta = (meta, reRenderStepEdit = false) => {
+        return this.updateCurrentStepMeta(meta, reRenderStepEdit);
+      };
+
+      const updateStep = (data, reRenderStepEdit = false) => {
+        return this.updateCurrentStep(data, reRenderStepEdit);
+      };
+
+      // Step notes listener
+      $("#step-notes").on("change", function (e) {
+        updateStepMeta({
+          step_notes: $(this).val(),
+        });
+      });
+
+      if (step.data.step_group === "benchmark") {
+        $("#is-entry-point").on("change", (e) => {
+          updateStepMeta({
+            is_entry_point: e.target.checked,
+          });
+        });
+      }
+
+      const StepType = getStepType(step.data.step_type);
+
+      StepType.onMount(step, updateStepMeta, updateStep);
+
+      this.lastStepEditMounted = this.activeStep;
+    },
+
+    demountStep(step) {
+      step =
+        step ||
+        this.funnel.steps.find((s) => s.ID === this.lastStepEditMounted);
+
+      if (!step) {
+        return;
+      }
+
+      const updateStepMeta = (meta) => {
+        return this.updateCurrentStepMeta(meta);
+      };
+
+      const updateStep = (data) => {
+        return this.updateCurrentStep(data);
+      };
+
+      const StepType = getStepType(step.data.step_type);
+
+      StepType.onDemount(step, updateStepMeta, updateStep);
+
+      this.lastStepEditMounted = null;
+    },
+
+    /**
+     * Renders the edit step panel for the current step in the controls panel
+     */
+    renderStepEdit() {
+      if (this.view !== "editingStep") {
+        return;
+      }
+
+      var self = this;
+
+      // const activeElementId = document.activeElement.id
+
+      const step = this.funnel.steps.find(
+        (step) => step.ID === this.activeStep
+      );
+      const previousStep = this.funnel.steps.find(
+        (step) => step.ID === this.previousActiveStep
+      );
+
+      // Handle remounting the step
+      if (this.activeStep === this.lastStepEditMounted) {
+        this.demountStep(step);
+      } else if (previousStep) {
+        this.demountStep(previousStep);
+      }
+
+      slotsDemounted();
+
+      $("#control-panel").html(this.htmlTemplates.stepEditPanel(step));
+
+      this.mountStep(step);
+
+      slotsMounted();
+    },
+
+    /**
+     * Renders the add step panel for the current step in the controls panel
+     */
+    renderStepAdd() {
+      if (this.view !== "addingStep") {
+        return;
+      }
+
+      const self = this;
+
+      self.demountStep();
+
+      $("#control-panel").html(
+        self.htmlTemplates.stepAddPanel(self.activeAddType)
+      );
+      self.renderStepFlow();
+
+      if (self.addingStepOrder) {
+        $(".add-step").on("click", function () {
+          const $button = $(this);
+          var type = $button.data("type");
+          var group = $button.data("group");
+
+          var id = Date.now();
+
+          self.addStep({
+            ID: id,
+            data: {
+              ID: id,
+              funnel_id: Editor.funnel.ID,
+              step_title: Editor.stepTypes[type].name,
+              step_type: type,
+              step_group: group,
+              step_order: self.addingStepOrder,
+            },
+            meta: StepTypes.getType(type).defaults,
+          });
+        });
+      } else {
+        $(".add-step").draggable({
+          connectToSortable: ".step-flow .steps",
+          helper: "clone",
+          revert: "invalid",
+          revertDuration: 0,
+        });
+      }
+    },
+
+    renderEmailEditor() {
+      window.console.log("renderEmailEditor");
+
+      if (this.view !== "editingEmail") {
+        return;
+      }
+
+      var self = this;
+
+      const step = this.funnel.steps.find(
+        (step) => step.ID === this.activeStep
+      );
+      const previousStep = this.funnel.steps.find(
+        (step) => step.ID === this.previousActiveStep
+      );
+
+      // Handle remounting the step
+      // if (this.activeStep === this.lastStepEditMounted) {
+      //   this.demountStep(step)
+      // } else if (previousStep) {
+      //   this.demountStep(previousStep)
+      // }
+      //
+      // slotsDemounted()
+
+      $("#control-panel").html(this.htmlTemplates.emailEditor(step));
+
+      // this.mountStep(step)
+
+      // slotsMounted()
     },
 
     /**
      * Renders the funnel title edit component
      */
-    renderTitle () {
-
-      $('.header-stuff .title').html(
+    renderTitle() {
+      $(".header-stuff .title").html(
         this.htmlTemplates.funnelTitleEdit(
           this.funnel.data.title,
           this.isEditingTitle
         )
-      )
+      );
 
       if (this.isEditingTitle) {
-        $('.funnel-title-edit').focus()
-        this.resizeTitleEdit()
+        $(".funnel-title-edit").focus();
+        this.resizeTitleEdit();
       }
     },
 
-    resizeTitleEdit () {
-      $('.funnel-title-edit').width((this.funnel.data.title.length + 1) + 'ch')
+    resizeTitleEdit() {
+      $(".funnel-title-edit").width(this.funnel.data.title.length + 1 + "ch");
     },
 
     /**
      * Publish actions
      */
-    renderPublishActions () {
-      $('.publish-actions').html(this.htmlTemplates.publishActions(this.funnel.data.status))
+    renderPublishActions() {
+      $(".publish-actions").html(
+        this.htmlTemplates.publishActions(this.funnel.data.status)
+      );
     },
 
     /**
      * Syncs the order of the steps in the state with that of the order which the steps appear in the flow
      */
-    syncOrderWithFlow () {
-      var self = this
+    syncOrderWithFlow() {
+      var self = this;
 
-      $('.step-flow .steps .step').each(function (i) {
-        self.funnel.steps.find(step => step.ID === $(this).data('id')).data.step_order = i + 1
-      })
+      $(".step-flow .steps .step").each(function (i) {
+        self.funnel.steps.find(
+          (step) => step.ID === $(this).data("id")
+        ).data.step_order = i + 1;
+      });
 
-      this.fixStepOrders()
+      this.fixStepOrders();
     },
 
-    currentState () {
-      const {
-        view,
-        funnel,
-        activeStep,
-        activeAddType,
-        isEditingTitle
-      } = this
+    currentState() {
+      const { view, funnel, activeStep, activeAddType, isEditingTitle } = this;
 
       return {
         view,
         activeStep,
         isEditingTitle,
         activeAddType,
-        funnel: copyObject(funnel)
-      }
+        funnel: copyObject(funnel),
+      };
     },
 
     /**
      * Saves the current state of the funnel for an undo slot
      */
-    saveUndoState () {
-      this.undoStates.push(this.currentState())
+    saveUndoState() {
+      this.undoStates.push(this.currentState());
     },
 
     /**
      * Undo the previous change
      */
-    undo () {
-      var lastState = this.undoStates.pop()
+    undo() {
+      var lastState = this.undoStates.pop();
 
       if (!lastState) {
-        return
+        return;
       }
 
-      this.redoStates.push(this.currentState())
+      this.redoStates.push(this.currentState());
 
-      Object.assign(this, lastState)
+      Object.assign(this, lastState);
 
-      this.render()
+      this.render();
     },
 
     /**
      * Redo the previous change
      */
-    redo () {
-      var lastState = this.redoStates.pop()
+    redo() {
+      var lastState = this.redoStates.pop();
 
       if (!lastState) {
-        return
+        return;
       }
 
-      this.undoStates.push(this.currentState())
+      this.undoStates.push(this.currentState());
 
-      Object.assign(this, lastState)
+      Object.assign(this, lastState);
 
-      this.render()
+      this.render();
     },
 
-    update (data, reload = true) {
-      var self = this
+    update(data, reload = true) {
+      var self = this;
 
-      return apiPost(`${apiRoutes.funnels}/${self.funnel.ID}`, data).then(data => {
-        self.setLastSaved()
-        if (data.item && reload) {
-          self.loadFunnel(data.item)
-          self.render()
+      return apiPost(`${apiRoutes.funnels}/${self.funnel.ID}`, data).then(
+        (data) => {
+          self.setLastSaved();
+          if (data.item && reload) {
+            self.loadFunnel(data.item);
+            self.render();
+          }
         }
-      })
+      );
     },
 
-    activate () {
-
+    activate() {
       const { close } = modal({
-        content: '<p>Launching...</p>',
-        canClose: false
-      })
+        content: "<p>Launching...</p>",
+        canClose: false,
+      });
 
       this.update({
         data: {
-          status: 'active'
-        }
-      }).then(() => close())
+          status: "active",
+        },
+      }).then(() => close());
     },
 
-    deactivate () {
-
+    deactivate() {
       const { close } = modal({
-        content: '<h1>Deactivating...</h1>',
-        canClose: false
-      })
+        content: "<h1>Deactivating...</h1>",
+        canClose: false,
+      });
 
       this.update({
         data: {
-          status: 'inactive'
-        }
-      }).then(() => close())
+          status: "inactive",
+        },
+      }).then(() => close());
     },
 
-    commitChanges () {
-      var self = this
+    commitChanges() {
+      var self = this;
 
       if (objectEquals(this.funnel.steps, this.origFunnel.steps)) {
-        return this.activate()
+        return this.activate();
       }
 
       if (this.autoSaveTimeout) {
-        clearTimeout(this.autoSaveTimeout)
+        clearTimeout(this.autoSaveTimeout);
       } else if (this.abortController) {
-        this.abortController.abort()
+        this.abortController.abort();
       }
 
       const { close } = modal({
-        content: '<h1>Saving...</h1>',
-        canClose: false
-      })
+        content: "<h1>Saving...</h1>",
+        canClose: false,
+      });
 
       apiPost(`${apiRoutes.funnels}/${self.funnel.ID}/commit`, {
         edited: {
-          steps: self.funnel.steps
-        }
-      }).then(data => {
-        self.setLastSaved()
-        if (data.item) {
-          self.loadFunnel(data.item)
-          self.render()
-        } else if (data.code === 'error') {
+          steps: self.funnel.steps,
+        },
+      })
+        .then((data) => {
+          self.setLastSaved();
+          if (data.item) {
+            self.loadFunnel(data.item);
+            self.render();
+          } else if (data.code === "error") {
+            // confusion I know...
+            const { errors } = data.data.data;
 
-          // confusion I know...
-          const { errors } = data.data.data
+            const errorHTML = errors.map(({ errors, error_data }) => {
+              return `<p>${Object.keys(errors).map(
+                (code) => errors[code][0]
+              )}</p>`;
+            });
 
-          const errorHTML = errors.map(({ errors, error_data }) => {
-            return `<p>${Object.keys(errors).map(code => errors[code][0])}</p>`
-          })
+            errors.forEach((error) => {
+              const { errors, error_data } = error;
 
-          errors.forEach(error => {
+              for (const code in errors) {
+                if (errors.hasOwnProperty(code)) {
+                  // console.log(errors[code][0], error_data[code])
 
-            const { errors, error_data } = error
-
-            for (const code in errors) {
-              if (errors.hasOwnProperty(code)) {
-                // console.log(errors[code][0], error_data[code])
-
-                self.addStepError(error_data[code].step.ID, errors[code][0])
+                  self.addStepError(error_data[code].step.ID, errors[code][0]);
+                }
               }
-            }
-          })
+            });
 
-          // console.log(self.stepErrors)
-          self.render()
+            // console.log(self.stepErrors)
+            self.render();
 
-          confirmationModal({
-            // language=HTML
-            alert: `<p>Your funnel could not be launched due to <b>${errors.length}</b> errors. Please rectify the
+            confirmationModal({
+              // language=HTML
+              alert: `<p>Your funnel could not be launched due to <b>${errors.length}</b> errors. Please rectify the
 				following errors and try again.</p>
-			<div class="commit-errors">${errorHTML}</div>`
-          })
-        }
-      }).then(() => close())
+			<div class="commit-errors">${errorHTML}</div>`,
+            });
+          }
+        })
+        .then(() => close());
     },
 
-    setLastSaved () {
-      clearInterval(self.lastSavedTimer)
+    setLastSaved() {
+      clearInterval(self.lastSavedTimer);
 
-      self.lastSavedTimer = setInterval(this.updateLastSaved, 30 * 1000, new Date()) // 30 seconds
-      this.updateLastSaved(new Date())
+      self.lastSavedTimer = setInterval(
+        this.updateLastSaved,
+        30 * 1000,
+        new Date()
+      ); // 30 seconds
+      this.updateLastSaved(new Date());
     },
 
     /**
@@ -1187,34 +1285,33 @@
      *
      * @link https://stackoverflow.com/a/7641812
      */
-    updateLastSaved (lastSaved) {
-      var delta = Math.round((+new Date - lastSaved) / 1000)
+    updateLastSaved(lastSaved) {
+      var delta = Math.round((+new Date() - lastSaved) / 1000);
 
       var minute = 60,
         hour = minute * 60,
         day = hour * 24,
-        week = day * 7
+        week = day * 7;
 
-      var fuzzy = 'Saved '
+      var fuzzy = "Saved ";
 
       if (delta < 30) {
-        fuzzy += 'just now'
+        fuzzy += "just now";
       } else if (delta < minute) {
-        fuzzy += delta + ' seconds ago'
+        fuzzy += delta + " seconds ago";
       } else if (delta < 2 * minute) {
-        fuzzy += 'a minute ago'
+        fuzzy += "a minute ago";
       } else if (delta < hour) {
-        fuzzy += Math.floor(delta / minute) + ' minutes ago.'
+        fuzzy += Math.floor(delta / minute) + " minutes ago.";
       } else if (Math.floor(delta / hour) == 1) {
-        fuzzy += '1 hour ago'
+        fuzzy += "1 hour ago";
       } else if (delta < day) {
-        fuzzy = Math.floor(delta / hour) + ' hours ago.'
+        fuzzy = Math.floor(delta / hour) + " hours ago.";
       } else if (delta < day * 2) {
-        fuzzy += 'yesterday'
+        fuzzy += "yesterday";
       }
 
-      $('.header-actions').attr('data-lastSaved', fuzzy)
-
+      $(".header-actions").attr("data-lastSaved", fuzzy);
     },
 
     /**
@@ -1222,92 +1319,95 @@
      *
      * @param step
      */
-    addStep (step) {
-
+    addStep(step) {
       // console.log('add-step')
 
       if (!step) {
-        return
+        return;
       }
 
-      this.saveUndoState()
+      this.saveUndoState();
 
-      this.funnel.steps.push(step)
-      this.fixStepOrders()
+      this.funnel.steps.push(step);
+      this.fixStepOrders();
 
-      delete this.addingStepOrder
+      delete this.addingStepOrder;
       // this.activeStep = step.ID
       // this.view = 'editingStep'
-      this.renderStepFlow()
+      this.renderStepFlow();
       // this.renderStepEdit()
 
-      this.autoSaveEditedFunnel()
+      this.autoSaveEditedFunnel();
     },
 
-    moveStep (step, direction) {
+    moveStep(step, direction) {
       if (!step) {
-        return
+        return;
       }
 
-      const move = 'up' === direction ? -1.1 : 1.1
+      const move = "up" === direction ? -1.1 : 1.1;
 
-      this.saveUndoState()
+      this.saveUndoState();
 
-      step.data.step_order = step.data.step_order + move
+      step.data.step_order = step.data.step_order + move;
 
-      window.console.log('steps', this.funnel.steps)
+      window.console.log("steps", this.funnel.steps);
 
-      this.fixStepOrders()
-      this.renderStepFlow()
+      this.fixStepOrders();
+      this.renderStepFlow();
 
-      this.autoSaveEditedFunnel()
+      this.autoSaveEditedFunnel();
     },
 
-    moveStepUp (step) {
-      this.moveStep(step, 'up')
+    moveStepUp(step) {
+      this.moveStep(step, "up");
     },
 
-    moveStepDown (step) {
-      this.moveStep(step, 'down')
+    moveStepDown(step) {
+      this.moveStep(step, "down");
     },
 
-    insertPlaceholderStep (step, beforeAfter) {
-      const self = this
+    insertPlaceholderStep(step, beforeAfter) {
+      const self = this;
 
-      self.previousActiveStep = step.ID
+      self.previousActiveStep = step.ID;
 
-      self.view = 'addingStep'
-      self.addingStepOrder = 'before' === beforeAfter ? parseInt(step.data.step_order) - .1 : parseInt(step.data.step_order) + .1
-      self.renderStepFlow()
-      self.renderStepAdd()
-      const $html = $(`<div class="step-placeholder">Choose a step to add here &rarr;<button type="button" class="button button-secondary">Cancel</button></div>`)
+      self.view = "addingStep";
+      self.addingStepOrder =
+        "before" === beforeAfter
+          ? parseInt(step.data.step_order) - 0.1
+          : parseInt(step.data.step_order) + 0.1;
+      self.renderStepFlow();
+      self.renderStepAdd();
+      const $html = $(
+        `<div class="step-placeholder">Choose a step to add here &rarr;<button type="button" class="button button-secondary">Cancel</button></div>`
+      );
 
-      $('button', $html).on(
-        'click',
-        function () {
-          delete self.addingStepOrder
-          $html.remove()
+      $("button", $html).on("click", function () {
+        delete self.addingStepOrder;
+        $html.remove();
 
-          self.activeStep = self.previousActiveStep
-          self.view = 'editingStep'
-          self.renderStepFlow()
-          self.renderStepEdit()
-        }
-      )
+        self.activeStep = self.previousActiveStep;
+        self.view = "editingStep";
+        self.renderStepFlow();
+        self.renderStepEdit();
+      });
 
-      if ('before' === beforeAfter) {
-        $html.insertBefore(`.steps [data-id="${step.ID}"]`)
+      if ("before" === beforeAfter) {
+        $html.insertBefore(`.steps [data-id="${step.ID}"]`);
       } else {
-        $html.insertAfter(`.steps [data-id="${step.ID}"]`)
+        $html.insertAfter(`.steps [data-id="${step.ID}"]`);
       }
     },
 
-    fixStepOrders () {
-      let newOrder = 1
-      this.funnel.steps.sort((a, b) => a.data.step_order - b.data.step_order).forEach(step => {
-        step.data.step_order = newOrder
-        newOrder++
-      })
+    fixStepOrders() {
+      let newOrder = 1;
+      this.funnel.steps
+        .sort((a, b) => a.data.step_order - b.data.step_order)
+        .forEach((step) => {
+          step.data.step_order = newOrder;
+          newOrder++;
+        });
     },
 
     /**
@@ -1315,46 +1415,45 @@
      *
      * @param stepId
      */
-    deleteStep (stepId) {
-
+    deleteStep(stepId) {
       if (!stepId) {
-        return
+        return;
       }
 
       const removeStep = () => {
-        this.saveUndoState()
+        this.saveUndoState();
 
-        this.funnel.steps = this.funnel.steps.filter(step => step.ID !== stepId)
+        this.funnel.steps = this.funnel.steps.filter(
+          (step) => step.ID !== stepId
+        );
 
-        this.fixStepOrders()
-        this.renderStepFlow()
+        this.fixStepOrders();
+        this.renderStepFlow();
 
         if (this.activeStep === stepId) {
-          this.view = 'addingStep'
-          this.renderStepAdd()
-          this.activeStep = null
+          this.view = "addingStep";
+          this.renderStepAdd();
+          this.activeStep = null;
         }
 
-        this.autoSaveEditedFunnel()
-      }
+        this.autoSaveEditedFunnel();
+      };
 
-      const origStep = Editor.origFunnel.steps.find(s => s.ID === stepId)
+      const origStep = Editor.origFunnel.steps.find((s) => s.ID === stepId);
 
       if (origStep) {
-
         confirmationModal({
           alert: `
           <p><b>Are you sure you want to delete this step?</b></p>
           <p>Any pending actions associated with this step will be cancelled when the funnel is updated.</p> 
         `,
-          confirmText: 'Delete',
+          confirmText: "Delete",
           onConfirm: () => {
-            removeStep()
-          }
-        })
-
+            removeStep();
+          },
+        });
       } else {
-        removeStep()
+        removeStep();
       }
     },
 
@@ -1364,8 +1463,8 @@
      * @param stepId
      * @returns {*}
      */
-    getStep (stepId) {
-      return this.funnel.steps.find(step => step.ID === stepId)
+    getStep(stepId) {
+      return this.funnel.steps.find((step) => step.ID === stepId);
     },
 
     /**
@@ -1373,8 +1472,8 @@
      *
      * @returns {[]}
      */
-    getSteps () {
-      return this.funnel.steps
+    getSteps() {
+      return this.funnel.steps;
     },
 
     /**
@@ -1382,8 +1481,8 @@
      *
      * @returns {*}
      */
-    getCurrentStep () {
-      return this.getStep(this.activeStep)
+    getCurrentStep() {
+      return this.getStep(this.activeStep);
     },
 
     /**
@@ -1392,28 +1491,29 @@
      * @param stepId
      * @param newData
      */
-    updateStep (stepId, newData) {
-
-      const step = this.getStep(stepId)
+    updateStep(stepId, newData) {
+      const step = this.getStep(stepId);
 
       const newStep = {
         ...step,
-        ...newData
-      }
+        ...newData,
+      };
 
-      newStep.data.step_title = StepTypes.getType(newStep.data.step_type).title(newStep)
-      var toReplace = this.funnel.steps.findIndex(step => step.ID === stepId)
+      newStep.data.step_title = StepTypes.getType(newStep.data.step_type).title(
+        newStep
+      );
+      var toReplace = this.funnel.steps.findIndex((step) => step.ID === stepId);
 
-      this.autoSaveEditedFunnel()
-      this.saveUndoState()
+      this.autoSaveEditedFunnel();
+      this.saveUndoState();
 
       if (toReplace !== -1) {
-        this.funnel.steps[toReplace] = newStep
+        this.funnel.steps[toReplace] = newStep;
       }
 
-      this.renderStepFlow()
+      this.renderStepFlow();
 
-      return newStep
+      return newStep;
     },
 
     /**
@@ -1422,14 +1522,14 @@
      * @param newData
      * @param reRenderStepEdit
      */
-    updateCurrentStep (newData, reRenderStepEdit = false) {
-      const step = this.updateStep(this.activeStep, newData)
+    updateCurrentStep(newData, reRenderStepEdit = false) {
+      const step = this.updateStep(this.activeStep, newData);
 
       if (reRenderStepEdit) {
-        this.renderStepEdit()
+        this.renderStepEdit();
       }
 
-      return step
+      return step;
     },
 
     /**
@@ -1438,63 +1538,64 @@
      * @param newMeta
      * @param reRenderStepEdit
      */
-    updateCurrentStepMeta (newMeta, reRenderStepEdit = false) {
-
+    updateCurrentStepMeta(newMeta, reRenderStepEdit = false) {
       // console.log(this)
 
-      const { data, meta } = this.getCurrentStep()
+      const { data, meta } = this.getCurrentStep();
 
       const step = this.updateStep(this.activeStep, {
         meta: {
           ...meta,
-          ...newMeta
-        }
-      })
+          ...newMeta,
+        },
+      });
 
       if (reRenderStepEdit) {
-        this.renderStepEdit()
+        this.renderStepEdit();
       }
 
-      return step
+      return step;
     },
 
     autoSaveTimeout: null,
     abortController: null,
 
-    autoSaveEditedFunnel () {
-      var self = this
+    autoSaveEditedFunnel() {
+      var self = this;
 
       if (this.autoSaveTimeout) {
-        clearTimeout(this.autoSaveTimeout)
+        clearTimeout(this.autoSaveTimeout);
       }
 
       this.autoSaveTimeout = setTimeout(() => {
+        self.autoSaveTimeout = null;
+        self.abortController = new AbortController();
+        const { signal } = self.abortController;
 
-        self.autoSaveTimeout = null
-        self.abortController = new AbortController()
-        const { signal } = self.abortController
-
-        apiPost(`${apiRoutes.funnels}/${self.funnel.ID}/meta`, {
-          edited: {
-            steps: self.funnel.steps,
-            title: self.funnel.data.title
+        apiPost(
+          `${apiRoutes.funnels}/${self.funnel.ID}/meta`,
+          {
+            edited: {
+              steps: self.funnel.steps,
+              title: self.funnel.data.title,
+            },
+          },
+          {
+            signal,
           }
-        }, {
-          signal
-        }).then(data => {
-          self.setLastSaved()
-          self.abortController = null
-        })
-      }, 3000)
-
+        ).then((data) => {
+          self.setLastSaved();
+          self.abortController = null;
+        });
+      }, 3000);
     },
 
     ...Funnel,
-  }
+  };
 
   $(function () {
-    Editor.init()
-  })
+    Editor.init();
+  });
 
   /**
    * Make a copy of the object
@@ -1503,9 +1604,9 @@
    * @param initial
    * @returns {*}
    */
-  function copyObject (object, initial) {
-    initial = initial || {}
-    return $.extend(true, initial, object)
+  function copyObject(object, initial) {
+    initial = initial || {};
+    return $.extend(true, initial, object);
   }
 
   /**
@@ -1515,30 +1616,32 @@
    * @param b
    * @returns {boolean}
    */
-  function objectEquals (a, b) {
-    return JSON.stringify(a) === JSON.stringify(b)
+  function objectEquals(a, b) {
+    return JSON.stringify(a) === JSON.stringify(b);
   }
 
   /**
    *
    */
-  function uniqid () {
-    return Date.now()
+  function uniqid() {
+    return Date.now();
   }
 
-  function andList (array, text = 'and') {
+  function andList(array, text = "and") {
     if (array.length === 1) {
-      return array[0]
+      return array[0];
     }
-    return `${array.slice(0, -1).join(', ')} ${text} ${array[array.length - 1]}`
+    return `${array.slice(0, -1).join(", ")} ${text} ${
+      array[array.length - 1]
+    }`;
   }
 
-  function orList (array) {
-    return andList(array, 'or')
+  function orList(array) {
+    return andList(array, "or");
   }
 
-  function isString (string) {
-    return typeof string === 'string'
+  function isString(string) {
+    return typeof string === "string";
   }
 
   /**
@@ -1549,31 +1652,38 @@
    */
   const specialChars = (string) => {
     if (!isString(string)) {
-      return string
+      return string;
     }
 
-    return string.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;').replace(/"/g, '&quot;')
-  }
+    return string
+      .replace(/&/g, "&amp;")
+      .replace(/>/g, "&gt;")
+      .replace(/</g, "&lt;")
+      .replace(/"/g, "&quot;");
+  };
 
-  const kebabize = str => {
-    return str.split('').map((letter, idx) => {
-      return letter.toUpperCase() === letter
-        ? `${idx !== 0 ? '-' : ''}${letter.toLowerCase()}`
-        : letter
-    }).join('')
-  }
+  const kebabize = (str) => {
+    return str
+      .split("")
+      .map((letter, idx) => {
+        return letter.toUpperCase() === letter
+          ? `${idx !== 0 ? "-" : ""}${letter.toLowerCase()}`
+          : letter;
+      })
+      .join("");
+  };
 
   const objectToStyle = (object) => {
-    const props = []
+    const props = [];
 
     for (const prop in object) {
       if (object.hasOwnProperty(prop)) {
-        props.push(`${kebabize(prop)}:${specialChars(object[prop])}`)
+        props.push(`${kebabize(prop)}:${specialChars(object[prop])}`);
       }
     }
 
-    return props.join(';')
-  }
+    return props.join(";");
+  };
 
   /**
    * Convert an object of HTML props into a string
@@ -1582,91 +1692,100 @@
    * @returns {string}
    */
   const objectToProps = (object) => {
-    const props = []
+    const props = [];
 
     for (const prop in object) {
       if (object.hasOwnProperty(prop)) {
-
         switch (prop) {
-          case 'className':
-            props.push(`class="${specialChars(object[prop])}"`)
-            break
-          case 'style':
-            props.push(`style="${specialChars(objectToStyle(object[prop]))}"`)
-            break
+          case "className":
+            props.push(`class="${specialChars(object[prop])}"`);
+            break;
+          case "style":
+            props.push(`style="${specialChars(objectToStyle(object[prop]))}"`);
+            break;
           default:
-            props.push(`${kebabize(prop)}="${specialChars(object[prop])}"`)
-            break
+            props.push(`${kebabize(prop)}="${specialChars(object[prop])}"`);
+            break;
         }
       }
     }
 
-    return props.join(' ')
-  }
+    return props.join(" ");
+  };
 
   const Elements = {
-    input (props) {
+    input(props) {
       props = {
-        type: 'text',
-        className: 'input',
-        ...props
-      }
+        type: "text",
+        className: "input",
+        ...props,
+      };
 
-      return `<input ${objectToProps(props)}/>`
+      return `<input ${objectToProps(props)}/>`;
     },
-    select (props, options, selected) {
-      return `<select ${objectToProps(props)}>${createOptions(options, selected)}</select>`
+    select(props, options, selected) {
+      return `<select ${objectToProps(props)}>${createOptions(
+        options,
+        selected
+      )}</select>`;
     },
     option: function (value, text, selected) {
       //language=HTML
       return `
-		  <option value="${specialChars(value)}" ${selected ? 'selected' : ''}>${text}</option>`
+		  <option value="${specialChars(value)}" ${
+        selected ? "selected" : ""
+      }>${text}</option>`;
     },
-    mappableFields (props, selected) {
-      return Elements.select(props, {
-        0: '-- Do not map --',
-        ...Groundhogg.fields.mappable
-      }, selected)
+    mappableFields(props, selected) {
+      return Elements.select(
+        props,
+        {
+          0: "-- Do not map --",
+          ...Groundhogg.fields.mappable,
+        },
+        selected
+      );
     },
-    inputWithReplacementsAndEmojis ({
-      type = 'text',
-      name,
-      id,
-      value,
-      className,
-      placeholder = ''
-    }, replacements = true, emojis = true) {
+    inputWithReplacementsAndEmojis(
+      { type = "text", name, id, value, className, placeholder = "" },
+      replacements = true,
+      emojis = true
+    ) {
       const classList = [
-        replacements && 'input-with-replacements',
-        emojis && 'input-with-emojis'
-      ]
+        replacements && "input-with-replacements",
+        emojis && "input-with-emojis",
+      ];
       //language=HTML
       return `
-		  <div class="input-wrap ${classList.filter(c => c).join(' ')}">
-			  <input type="${type}" id="${id}" name="${name}" value="${specialChars(value) || ''}" class="${className}"
+		  <div class="input-wrap ${classList.filter((c) => c).join(" ")}">
+			  <input type="${type}" id="${id}" name="${name}" value="${
+        specialChars(value) || ""
+      }" class="${className}"
 			         placeholder="${specialChars(placeholder)}">
-			  ${emojis ? `<button class="emoji-picker-start" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
-			  </button>` : ''}
-			  ${replacements ? `<button class="replacements-picker-start" title="insert replacement"><span
-				  class="dashicons dashicons-admin-users"></span></button>` : ''}
-		  </div>`
+			  ${
+          emojis
+            ? `<button class="emoji-picker-start" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
+			  </button>`
+            : ""
+        }
+			  ${
+          replacements
+            ? `<button class="replacements-picker-start" title="insert replacement"><span
+				  class="dashicons dashicons-admin-users"></span></button>`
+            : ""
+        }
+		  </div>`;
     },
     inputWithReplacements: function (atts) {
-      return Elements.inputWithReplacementsAndEmojis(atts, true, false)
+      return Elements.inputWithReplacementsAndEmojis(atts, true, false);
     },
     inputWithEmojis: function (atts) {
-      return Elements.inputWithReplacementsAndEmojis(atts, false, true)
+      return Elements.inputWithReplacementsAndEmojis(atts, false, true);
     },
-    textAreaWithReplacementsAndEmojis: function ({ name, id, value }) {
-
-    },
-    textAreaWithReplacements: function ({ name, id, value }) {
-
-    },
-    textAreaWithEmojis: function ({ name, id, value }) {
-
-    }
-  }
+    textAreaWithReplacementsAndEmojis: function ({ name, id, value }) {},
+    textAreaWithReplacements: function ({ name, id, value }) {},
+    textAreaWithEmojis: function ({ name, id, value }) {},
+  };
 
   /**
    * Create a list of options
@@ -1676,48 +1795,55 @@
    * @returns {string}
    */
   const createOptions = (options, selected) => {
-
-    const optionsString = []
+    const optionsString = [];
 
     // Options is an array format
     if (Array.isArray(options)) {
-      options.forEach(option => {
-        optionsString.push(Elements.option(
-          option, option,
-          Array.isArray(selected)
-            ? selected.indexOf(option) !== -1
-            : option === selected))
-      })
+      options.forEach((option) => {
+        optionsString.push(
+          Elements.option(
+            option,
+            option,
+            Array.isArray(selected)
+              ? selected.indexOf(option) !== -1
+              : option === selected
+          )
+        );
+      });
     }
     // Assume object
     else {
       for (const option in options) {
         if (options.hasOwnProperty(option)) {
-          optionsString.push(Elements.option(
-            option, options[option],
-            Array.isArray(selected)
-              ? selected.indexOf(option) !== -1
-              : option === selected))
+          optionsString.push(
+            Elements.option(
+              option,
+              options[option],
+              Array.isArray(selected)
+                ? selected.indexOf(option) !== -1
+                : option === selected
+            )
+          );
         }
       }
     }
 
-    return optionsString.join('')
-  }
+    return optionsString.join("");
+  };
 
-  function ordinal_suffix_of (i) {
+  function ordinal_suffix_of(i) {
     var j = i % 10,
-      k = i % 100
+      k = i % 100;
     if (j == 1 && k != 11) {
-      return i + 'st'
+      return i + "st";
     }
     if (j == 2 && k != 12) {
-      return i + 'nd'
+      return i + "nd";
     }
     if (j == 3 && k != 13) {
-      return i + 'rd'
+      return i + "rd";
     }
-    return i + 'th'
+    return i + "th";
   }
 
   /**
@@ -1727,14 +1853,14 @@
    * @param updateStepMeta
    */
   const tagWithConditionOnMount = (step, updateStepMeta) => {
-    tagOnMount(step, updateStepMeta)
+    tagOnMount(step, updateStepMeta);
 
-    $('#condition').change(function (e) {
+    $("#condition").change(function (e) {
       updateStepMeta({
-        condition: $(this).val()
-      })
-    })
-  }
+        condition: $(this).val(),
+      });
+    });
+  };
 
   /**
    * Handler for the tag picker step
@@ -1744,43 +1870,41 @@
    * @returns {*|define.amd.jQuery}
    */
   const tagOnMount = (step, updateStepMeta) => {
-
-    return tagPicker('#tags', true, (items) => {
-      console.log(items)
-      TagsStore.itemsFetched(items)
-    }).on('change', function (e) {
-
-      const tags = $(this).val()
-      const newTags = tags.filter(tag => !TagsStore.hasItem(parseInt(tag)))
+    return tagPicker("#tags", true, (items) => {
+      console.log(items);
+      TagsStore.itemsFetched(items);
+    }).on("change", function (e) {
+      const tags = $(this).val();
+      const newTags = tags.filter((tag) => !TagsStore.hasItem(parseInt(tag)));
 
       if (newTags.length > 0) {
-        TagsStore.validate(tags).then(tags => {
+        TagsStore.validate(tags).then((tags) => {
           updateStepMeta({
-            tags: tags.map(tag => tag.ID)
-          })
-        })
+            tags: tags.map((tag) => tag.ID),
+          });
+        });
       } else {
         updateStepMeta({
-          tags: tags.map(tag => parseInt(tag))
-        })
+          tags: tags.map((tag) => parseInt(tag)),
+        });
       }
-    })
-  }
+    });
+  };
 
   const delayTimerDefaults = {
     delay_amount: 3,
-    delay_type: 'days',
-    run_on_type: 'any',
-    run_when: 'now',
-    run_time: '09:00:00',
+    delay_type: "days",
+    run_on_type: "any",
+    run_when: "now",
+    run_time: "09:00:00",
     send_in_timezone: false,
-    run_time_to: '17:00:00',
-    run_on_dow_type: 'any', // Run on days of week type
+    run_time_to: "17:00:00",
+    run_on_dow_type: "any", // Run on days of week type
     run_on_dow: [], // Run on days of week
-    run_on_month_type: 'any', // Run on month type
+    run_on_month_type: "any", // Run on month type
     run_on_months: [], // Run on months
     run_on_dom: [], // Run on days of month
-  }
+  };
 
   const delayTimerName = ({
     delay_amount,
@@ -1796,101 +1920,109 @@
     run_on_months, // Run on months
     run_on_dom, // Run on days of month
   }) => {
-
-    const preview = []
+    const preview = [];
 
     // Deal with the easiest cases first
-    if (delay_type === 'none' && run_on_type === 'any') {
+    if (delay_type === "none" && run_on_type === "any") {
       switch (run_when) {
         default:
-        case 'now':
-          return `Run at any time`
-        case 'later':
-          return `Run at <b>${run_time}</b>`
-        case 'between':
-          return `Run between <b>${run_time}</b> and <b>${run_time_to}</b>`
+        case "now":
+          return `Run at any time`;
+        case "later":
+          return `Run at <b>${run_time}</b>`;
+        case "between":
+          return `Run between <b>${run_time}</b> and <b>${run_time_to}</b>`;
       }
     }
 
-    if (delay_type !== 'none') {
-      preview.push(`Wait at least <b>${delay_amount} ${delay_type}</b> and then`)
+    if (delay_type !== "none") {
+      preview.push(
+        `Wait at least <b>${delay_amount} ${delay_type}</b> and then`
+      );
     }
 
-    if (run_on_type !== 'any') {
-      preview.push(preview.length > 0 ? 'run on' : 'Run on')
+    if (run_on_type !== "any") {
+      preview.push(preview.length > 0 ? "run on" : "Run on");
     }
 
     switch (run_on_type) {
       default:
-      case 'any':
-        preview.push('run')
-        break
-      case 'weekday':
-        preview.push('<b>a weekday</b>')
-        break
-      case 'weekend':
-        preview.push('<b>a weekend</b>')
-        break
-      case 'day_of_week':
+      case "any":
+        preview.push("run");
+        break;
+      case "weekday":
+        preview.push("<b>a weekday</b>");
+        break;
+      case "weekend":
+        preview.push("<b>a weekend</b>");
+        break;
+      case "day_of_week":
+        let dowList = orList(run_on_dow.map((i) => `<b>${i}</b>`));
+        dowList = `${
+          run_on_dow_type === "any"
+            ? `any ${dowList}`
+            : `the ${run_on_dow_type} ${dowList}`
+        }`;
 
-        let dowList = orList(run_on_dow.map(i => `<b>${i}</b>`))
-        dowList = `${run_on_dow_type === 'any' ? `any ${dowList}` : `the ${run_on_dow_type} ${dowList}`}`
-
-        if (run_on_month_type === 'specific') {
-          preview.push(`${dowList} in ${orList(run_on_months.map(i => `<b>${i}</b>`))}`)
+        if (run_on_month_type === "specific") {
+          preview.push(
+            `${dowList} in ${orList(run_on_months.map((i) => `<b>${i}</b>`))}`
+          );
         } else {
-          preview.push(`${dowList} of <b>any month</b>`)
+          preview.push(`${dowList} of <b>any month</b>`);
         }
 
-        break
-      case 'day_of_month':
+        break;
+      case "day_of_month":
+        const dayList =
+          run_on_dom.length > 0
+            ? `the ${orList(
+                run_on_dom.map((i) => `<b>${ordinal_suffix_of(i)}</b>`)
+              )}`
+            : `<b>any day</b>`;
 
-        const dayList = run_on_dom.length > 0
-          ? `the ${orList(run_on_dom.map(i => `<b>${ordinal_suffix_of(i)}</b>`))}`
-          : `<b>any day</b>`
-
-        if (run_on_month_type === 'specific') {
-          preview.push(`${dayList} in ${orList(run_on_months.map(i => `<b>${i}</b>`))}`)
+        if (run_on_month_type === "specific") {
+          preview.push(
+            `${dayList} in ${orList(run_on_months.map((i) => `<b>${i}</b>`))}`
+          );
         } else {
-          preview.push(`${dayList} of <b>any month</b>`)
+          preview.push(`${dayList} of <b>any month</b>`);
         }
 
-        break
+        break;
     }
 
     switch (run_when) {
       default:
-      case 'now':
-        preview.push(`at any time`)
-        break
-      case 'later':
-        preview.push(`at <b>${run_time}</b>`)
-        break
-      case 'between':
-        preview.push(`between <b>${run_time}</b> and <b>${run_time_to}</b>`)
-        break
+      case "now":
+        preview.push(`at any time`);
+        break;
+      case "later":
+        preview.push(`at <b>${run_time}</b>`);
+        break;
+      case "between":
+        preview.push(`between <b>${run_time}</b> and <b>${run_time_to}</b>`);
+        break;
     }
 
-    return preview.join(' ')
-  }
+    return preview.join(" ");
+  };
 
   const StepTypes = {
-
-    register (type, opts) {
+    register(type, opts) {
       this[type] = {
         type: type,
-        ...opts
-      }
+        ...opts,
+      };
       // console.log('step-registered', type, opts, this)
     },
 
-    getType (type) {
-
+    getType(type) {
       if (!this.hasOwnProperty(type)) {
-        return this.default
+        return this.default;
       }
 
-      return Object.assign({}, this.default, this[type])
+      return Object.assign({}, this.default, this[type]);
     },
 
     error: {
@@ -1902,21 +2034,21 @@
 				  d="M10.48 9.322a.092.092 0 00-.011.036c0 .008-.004.016-.012.024-.016.016-.076.024-.18.024h-.888c-.032 0-.048-.008-.048-.024-.024-.024-.036-.092-.036-.204l-.168-5.496c-.008-.168 0-.268.024-.3.024-.032.092-.048.204-.048h1.068c.112 0 .176.016.192.048.024.032.032.132.024.3l-.168 5.496v.144zm-.587 2.496a.794.794 0 01-.6-.252.8.8 0 01-.24-.589.84.84 0 01.24-.6.794.794 0 01.6-.252c.24 0 .44.085.6.252a.82.82 0 01.252.6.78.78 0 01-.252.588.794.794 0 01-.6.253z"
 				  fill="#fff"/>
 		  </svg>`,
-      name: 'Error',
-      type: 'error',
-      title ({ data }) {
-        return `<b>${data.step_type}</b> settings not found`
+      name: "Error",
+      type: "error",
+      title({ data }) {
+        return `<b>${data.step_type}</b> settings not found`;
       },
-      edit ({ ID, data, meta }) {
+      edit({ ID, data, meta }) {
         //language=HTML
         return `
 			<div class="panel">
 				<p>The settings for this step could not be found. This may be because you deactivated an extension or
 					integration which registered this step type.</p>
 				<p>Reactivate the plugin or delete this step to continue.</p>
-			</div>`
+			</div>`;
       },
-      onMount () {}
+      onMount() {},
     },
 
     /**
@@ -1925,10 +2057,10 @@
     default: {
       // language=html
       promiseController: null,
-      title ({ ID, data, meta }) {
-        return data.step_title
+      title({ ID, data, meta }) {
+        return data.step_title;
       },
-      edit ({ ID, data, meta }) {
+      edit({ ID, data, meta }) {
         //language=HTML
         return `
 			<div class="panel">
@@ -1937,45 +2069,48 @@
 						<div class="gh-loader"></div>
 					</div>
 				</form>
-			</div>`
+			</div>`;
       },
-      onMount (step) {
-        var self = this
+      onMount(step) {
+        var self = this;
 
-        self.promiseController = new AbortController()
-        const { signal } = self.promiseController
+        self.promiseController = new AbortController();
+        const { signal } = self.promiseController;
 
         apiPost(`${apiRoutes.steps}/html`, step, {
-          signal
-        }).then(r => {
-          $('#dynamic-step-settings').html(r.html)
-          $(document).trigger('gh-init-pickers')
-          const $form = $('#settings-form')
-          $form.on('submit', function (e) {
-            e.preventDefault()
-            return false
-          }).on('change', function (e) {
-            e.preventDefault()
-            const meta = $(this).serializeFormJSON()
-            // console.log(meta)
-            Editor.updateCurrentStepMeta(meta)
+          signal,
+        })
+          .then((r) => {
+            $("#dynamic-step-settings").html(r.html);
+            $(document).trigger("gh-init-pickers");
+            const $form = $("#settings-form");
+            $form
+              .on("submit", function (e) {
+                e.preventDefault();
+                return false;
+              })
+              .on("change", function (e) {
+                e.preventDefault();
+                const meta = $(this).serializeFormJSON();
+                // console.log(meta)
+                Editor.updateCurrentStepMeta(meta);
+              });
+            self.promiseController = null;
           })
-          self.promiseController = null
-        }).catch(() => {})
+          .catch(() => {});
       },
-      onDemount () {
+      onDemount() {
         if (this.promiseController) {
-          this.promiseController.abort()
+          this.promiseController.abort();
         }
       },
       validate: function (step, errors) {},
-      defaults: {}
+      defaults: {},
     },
 
     apply_note: {
-
       defaults: {
-        note_text: ''
+        note_text: "",
       },
 
       //language=HTML
@@ -1986,50 +2121,46 @@
 				  d="M27.508 11.988h1a1 1 0 00-.293-.708l-.707.708zm-7.084-7.084l.708-.707a1 1 0 00-.708-.293v1zm0 7.084h-1v1h1v-1zm7.084 17.416h-1 1zm-18.834 2h17.834v-2H8.674v2zm-2-25.5v23.5h2v-23.5h-2zm21.834 23.5V11.988h-2v17.416h2zm-8.084-25.5H8.674v2h11.75v-2zm7.79 7.376l-7.082-7.083-1.415 1.414 7.084 7.084 1.414-1.415zm-8.79-6.376v7.084h2V4.904h-2zm1 8.084h7.084v-2h-7.084v2zm-8.5 5.666h11.334v-2H11.925v2zm0 5.667h11.334v-2H11.925v2zm14.584 7.083a2 2 0 002-2h-2v2zm-17.834-2h-2a2 2 0 002 2v-2zm0-23.5v-2a2 2 0 00-2 2h2z"
 				  fill="currentColor"/>
 		  </svg>`,
-      title ({ meta }) {
-        return 'Apply Note'
+      title({ meta }) {
+        return "Apply Note";
       },
-      edit ({ meta }) {
-
-        const { note_text } = meta
+      edit({ meta }) {
+        const { note_text } = meta;
 
         //language=html
         return `
 			<div class="panel">
 				<div class="row">
 					<label class="row-label" for="note_text">Add the following note the the contact...</label>
-					<textarea id="note_text" name="note_text">${note_text || ''}</textarea>
+					<textarea id="note_text" name="note_text">${note_text || ""}</textarea>
 				</div>
-			</div>`
+			</div>`;
       },
-      onMount (step, updateStepMeta) {
-
-        let saveTimer
+      onMount(step, updateStepMeta) {
+        let saveTimer;
 
         tinymceElement(
-          'note_text',
+          "note_text",
           {
             tinymce: true,
-            quicktags: true
+            quicktags: true,
           },
           (content) => {
-
             // Reset timer.
-            clearTimeout(saveTimer)
+            clearTimeout(saveTimer);
 
             // Only save after a second.
             saveTimer = setTimeout(function () {
               updateStepMeta({
-                note_text: content
-              })
-            }, 300)
-          })
+                note_text: content,
+              });
+            }, 300);
+          }
+        );
       },
-      onDemount () {
-        wp.editor.remove(
-          'note_text'
-        )
-      }
+      onDemount() {
+        wp.editor.remove("note_text");
+      },
     },
 
     admin_notification: {
@@ -2049,119 +2180,117 @@
 			        stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
 		  </svg>`,
       defaults: {
-        to: '{owner_email}',
-        from: '{owner_email}',
-        reply_to: '{email}',
+        to: "{owner_email}",
+        from: "{owner_email}",
+        reply_to: "{email}",
         subject: 'Notification from "{first}"',
-        note_text: '',
+        note_text: "",
       },
-      title ({ meta }) {
+      title({ meta }) {
+        const { to } = meta;
 
-        const { to } = meta
-
-        return `Send notification to ${andList(to.split(',').map(address => `<b>${address.trim()}</b>`))}`
-
+        return `Send notification to ${andList(
+          to.split(",").map((address) => `<b>${address.trim()}</b>`)
+        )}`;
       },
-      edit ({ meta }) {
-//language=HTML
+      edit({ meta }) {
+        //language=HTML
         return `
 			<div class="panel">
 				<div class="row">
 					<label class="row-label" for="to">Send this notification to...</label>
 					${Elements.inputWithReplacements({
-						type: 'text',
-						id: 'to',
-						name: 'to',
-						className: 'regular-text',
-						value: meta.to
-					})}
+            type: "text",
+            id: "to",
+            name: "to",
+            className: "regular-text",
+            value: meta.to,
+          })}
 					<p class="description">Comma separated list of emails addresses.</p>
 				</div>
 				<div class="row">
 					<label class="row-label" for="from">This notification should be sent from...</label>
 					${Elements.inputWithReplacements({
-						type: 'text',
-						id: 'from',
-						name: 'from',
-						className: 'regular-text',
-						value: meta.from
-					})}
+            type: "text",
+            id: "from",
+            name: "from",
+            className: "regular-text",
+            value: meta.from,
+          })}
 					<p class="description">A single email address which you'd like the notification to come from.</p>
 				</div>
 				<div class="row">
 					<label class="row-label" for="reply-to">Replies should go to...</label>
 					${Elements.inputWithReplacements({
-						type: 'text',
-						id: 'reply-to',
-						name: 'reply_to',
-						className: 'regular-text',
-						value: meta.reply_to
-					})}
+            type: "text",
+            id: "reply-to",
+            name: "reply_to",
+            className: "regular-text",
+            value: meta.reply_to,
+          })}
 					<p class="description">A single email address which replies to this notification should be sent
 						to.</p>
 				</div>
 				<div class="row">
 					<label class="row-label" for="subject">Subject line</label>
 					${Elements.inputWithReplacementsAndEmojis({
-						type: 'text',
-						id: 'subject',
-						name: 'subject',
-						className: 'regular-text',
-						value: meta.subject
-					})}
+            type: "text",
+            id: "subject",
+            name: "subject",
+            className: "regular-text",
+            value: meta.subject,
+          })}
 					<p class="description">The subject line of the notification.</p>
 				</div>
 				<div class="row">
-					<textarea id="note_text" name="note_text">${specialChars(meta.note_text)}</textarea>
+					<textarea id="note_text" name="note_text">${specialChars(
+            meta.note_text
+          )}</textarea>
 				</div>
-			</div>`
+			</div>`;
       },
-      onMount (step, updateStepMeta) {
-
-        $('#subject, #reply-to, #from, #to').on('change', function (e) {
-          const $this = $(this)
+      onMount(step, updateStepMeta) {
+        $("#subject, #reply-to, #from, #to").on("change", function (e) {
+          const $this = $(this);
           updateStepMeta({
-            [$this.prop('name')]: $this.val()
-          })
-        })
+            [$this.prop("name")]: $this.val(),
+          });
+        });
 
-        let saveTimer
+        let saveTimer;
 
         tinymceElement(
-          'note_text',
+          "note_text",
           {
             tinymce: true,
-            quicktags: true
+            quicktags: true,
           },
           (content) => {
-
             // console.log(content)
 
             // Reset timer.
-            clearTimeout(saveTimer)
+            clearTimeout(saveTimer);
 
             // Only save after a second.
             saveTimer = setTimeout(function () {
               updateStepMeta({
-                note_text: content
-              })
-            }, 300)
-          })
+                note_text: content,
+              });
+            }, 300);
+          }
+        );
       },
-      onDemount () {
-        wp.editor.remove(
-          'note_text'
-        )
-      }
+      onDemount() {
+        wp.editor.remove("note_text");
+      },
     },
 
     /**
      * Account created
      */
     account_created: {
-
       defaults: {
-        role: []
+        role: [],
       },
 
       //language=HTML
@@ -2175,48 +2304,53 @@
       `,
 
       // Title
-      title ({ ID, data, meta }) {
-
-        const roles = Editor.stepTypes.account_created.context.roles
+      title({ ID, data, meta }) {
+        const roles = Editor.stepTypes.account_created.context.roles;
 
         if (meta.role && meta.role.length === 1) {
-          return `<b>${roles[meta.role[0]]}</b> is created`
+          return `<b>${roles[meta.role[0]]}</b> is created`;
         } else if (meta.role && meta.role.length > 1) {
-          return `${orList(meta.role.map(role => `<b>${roles[role]}</b>`))} is created`
+          return `${orList(
+            meta.role.map((role) => `<b>${roles[role]}</b>`)
+          )} is created`;
         } else {
-          return 'User Created'
+          return "User Created";
         }
       },
 
       // Edit
-      edit ({ ID, data, meta }) {
-
-        let roles = Editor.stepTypes.account_created.context.roles
+      edit({ ID, data, meta }) {
+        let roles = Editor.stepTypes.account_created.context.roles;
 
         //language=HTML
         return `
 			<div class="panel">
 				<div class="row">
 					<label class="row-label" for="roles">Select user roles.</label>
-					${select({
-						id: 'roles',
-						name: 'role',
-						multiple: true,
-					}, roles, meta.role)}
+					${select(
+            {
+              id: "roles",
+              name: "role",
+              multiple: true,
+            },
+            roles,
+            meta.role
+          )}
 					<p class="description">Runs when a new user is created with any of the defined roles.</p>
 				</div>
-			</div>`
+			</div>`;
       },
 
       // On mount
-      onMount (step, updateStepMeta) {
-
-        $('#roles').select2().on('change', function (e) {
-          let roles = $(this).val()
-          updateStepMeta({
-            role: roles
-          })
-        })
+      onMount(step, updateStepMeta) {
+        $("#roles")
+          .select2()
+          .on("change", function (e) {
+            let roles = $(this).val();
+            updateStepMeta({
+              role: roles,
+            });
+          });
       },
     },
 
@@ -2224,9 +2358,8 @@
      * Apply a tag
      */
     apply_tag: {
-
       defaults: {
-        tags: []
+        tags: [],
       },
 
       //language=HTML
@@ -2239,32 +2372,31 @@
 			  <path d="M34.246 31.738h-10m5-5v10" stroke="currentColor" stroke-width="2"/>
 		  </svg>`,
 
-      title ({ ID, data, meta }) {
-
-        let { tags } = meta
+      title({ ID, data, meta }) {
+        let { tags } = meta;
 
         if (tags) {
-          tags = tags.map(id => parseInt(id))
+          tags = tags.map((id) => parseInt(id));
         }
 
         if (!tags || tags.length === 0) {
-          return 'Apply tag'
+          return "Apply tag";
         } else if (tags.length < 4 && TagsStore.hasItems(tags)) {
-          return `Apply ${andList(tags.map(id => `<b>${TagsStore.get(id).data.tag_name}</b>`))}`
+          return `Apply ${andList(
+            tags.map((id) => `<b>${TagsStore.get(id).data.tag_name}</b>`)
+          )}`;
         } else {
-          return `Apply <b>${tags.length}</b> tags`
+          return `Apply <b>${tags.length}</b> tags`;
         }
       },
 
-      edit ({ ID, data, meta }) {
-
-        let options = TagsStore.getItems()
-          .map(tag => {
-            return {
-              text: tag.data.tag_name,
-              value: tag.ID
-            }
-          })
+      edit({ ID, data, meta }) {
+        let options = TagsStore.getItems().map((tag) => {
+          return {
+            text: tag.data.tag_name,
+            value: tag.ID,
+          };
+        });
 
         //language=HTML
         return `
@@ -2272,23 +2404,22 @@
 				<div class="row">
 					<label class="row-label" for="tags">Select tags to add.</label>
 					${select(
-						{
-							name: 'tags',
-							id: 'tags',
-							multiple: true,
-						},
-						options,
-						meta.tags ? meta.tags.map(id => parseInt(id)) : []
-					)
-					}
+            {
+              name: "tags",
+              id: "tags",
+              multiple: true,
+            },
+            options,
+            meta.tags ? meta.tags.map((id) => parseInt(id)) : []
+          )}
 					<p class="description">All of the defined tags will be added to the contact.</p>
 				</div>
-			</div>`
+			</div>`;
       },
 
-      onMount (step, updateStepMeta) {
-        tagOnMount(step, updateStepMeta)
-      }
+      onMount(step, updateStepMeta) {
+        tagOnMount(step, updateStepMeta);
+      },
     },
 
     /**
@@ -2296,7 +2427,7 @@
      */
     remove_tag: {
       defaults: {
-        tags: []
+        tags: [],
       },
       //language=HTML
       svg: `
@@ -2307,56 +2438,59 @@
 			  <circle r="1.525" transform="matrix(-1 0 0 1 24.1 12.445)" stroke="currentColor" stroke-width="1.2"/>
 			  <path d="M34.246 31.738h-10" stroke="currentColor" stroke-width="2"/>
 		  </svg>`,
-      title ({ ID, data, meta }) {
-
-        let { tags } = meta
-        tags = tags.map(id => parseInt(id))
+      title({ ID, data, meta }) {
+        let { tags } = meta;
+        tags = tags.map((id) => parseInt(id));
 
         if (tags.length === 0) {
-          return 'Remove tags'
+          return "Remove tags";
         } else if (tags.length < 4 && TagsStore.hasItems(tags)) {
-          return `Remove ${andList(tags.map(id => `<b>${TagsStore.get(id).data.tag_name}</b>`))}`
+          return `Remove ${andList(
+            tags.map((id) => `<b>${TagsStore.get(id).data.tag_name}</b>`)
+          )}`;
         } else {
-          return `Remove <b>${tags.length}</b> tags`
+          return `Remove <b>${tags.length}</b> tags`;
         }
       },
 
-      edit ({ ID, data, meta }) {
-        let options = TagsStore.getItems()
-          .map(tag => {
-            return {
-              text: tag.data.tag_name,
-              value: tag.ID
-            }
-          })
+      edit({ ID, data, meta }) {
+        let options = TagsStore.getItems().map((tag) => {
+          return {
+            text: tag.data.tag_name,
+            value: tag.ID,
+          };
+        });
 
         //language=HTML
         return `
 			<div class="panel">
 				<div class="row">
 					<label class="row-label" for="tags">Select tags to remove.</label>
-					${select({
-						name: 'tags',
-						id: 'tags',
-						multiple: true,
-					}, options, meta.tags.map(id => parseInt(id)))}
+					${select(
+            {
+              name: "tags",
+              id: "tags",
+              multiple: true,
+            },
+            options,
+            meta.tags.map((id) => parseInt(id))
+          )}
 					<p class="description">All of the defined tags will be removed from the contact.</p>
 				</div>
-			</div>`
+			</div>`;
       },
 
-      onMount (step, updateStepMeta) {
-        tagOnMount(step, updateStepMeta)
-      }
+      onMount(step, updateStepMeta) {
+        tagOnMount(step, updateStepMeta);
+      },
     },
 
     /**
      * When a tag is applied
      */
     tag_applied: {
-
       defaults: {
-        tags: []
+        tags: [],
       },
 
       //language=HTML
@@ -2369,67 +2503,79 @@
 			  <path d="M38.105 23.435l-8.5 8.5-4.25-4.25" stroke="currentColor" stroke-width="2"/>
 		  </svg>`,
 
-      title ({ ID, data, meta }) {
-
-        let { tags, condition } = meta
-        tags = tags.map(id => parseInt(id))
+      title({ ID, data, meta }) {
+        let { tags, condition } = meta;
+        tags = tags.map((id) => parseInt(id));
 
         if (!tags) {
-          return 'Tag is applied'
+          return "Tag is applied";
         } else if (tags.length >= 4) {
-          return condition === 'all' ? `<b>${tags.length}</b> tags are applied` : `Any of <b>${tags.length}</b> tags are applied`
-        } else if (tags.length > 1 && tags.length < 4 && TagsStore.hasItems(tags)) {
-          const tagNames = tags.map(tag => `<b>${TagsStore.get(tag).data.tag_name}</b>`)
-          return condition === 'all' ? `${andList(tagNames)} are applied` : `${orList(tagNames)} is applied`
+          return condition === "all"
+            ? `<b>${tags.length}</b> tags are applied`
+            : `Any of <b>${tags.length}</b> tags are applied`;
+        } else if (
+          tags.length > 1 &&
+          tags.length < 4 &&
+          TagsStore.hasItems(tags)
+        ) {
+          const tagNames = tags.map(
+            (tag) => `<b>${TagsStore.get(tag).data.tag_name}</b>`
+          );
+          return condition === "all"
+            ? `${andList(tagNames)} are applied`
+            : `${orList(tagNames)} is applied`;
         } else if (tags.length === 1) {
-          return `<b>${TagsStore.get(tags[0]).data.tag_name}</b> is applied`
+          return `<b>${TagsStore.get(tags[0]).data.tag_name}</b> is applied`;
         } else {
-          return 'Tag is applied'
+          return "Tag is applied";
         }
       },
 
-      edit ({ ID, data, meta }) {
+      edit({ ID, data, meta }) {
+        let options = TagsStore.getItems().map((tag) => {
+          return {
+            text: tag.data.tag_name,
+            value: tag.ID,
+          };
+        });
 
-        let options = TagsStore.getItems()
-          .map(tag => {
-            return {
-              text: tag.data.tag_name,
-              value: tag.ID
-            }
-          })
-
-        const { condition } = meta
+        const { condition } = meta;
 
         //language=HTML
         return `
 			<div class="panel">
 				<div class="row">
 					<label class="row-label" for="tags">When <select id="condition">
-						<option value="any" ${condition === 'any' ? 'selected' : ''}>Any</option>
-						<option value="all" ${condition === 'all' ? 'selected' : ''}>All</option>
+						<option value="any" ${condition === "any" ? "selected" : ""}>Any</option>
+						<option value="all" ${condition === "all" ? "selected" : ""}>All</option>
 					</select> of the defined tags are applied</label>
-					${select({
-						name: 'tags',
-						id: 'tags',
-						multiple: true,
-					}, options, meta.tags.map(id => parseInt(id)))}
-					<p class="description">Runs when ${condition || 'any'} of the provided tags are applied.</p>
+					${select(
+            {
+              name: "tags",
+              id: "tags",
+              multiple: true,
+            },
+            options,
+            meta.tags.map((id) => parseInt(id))
+          )}
+					<p class="description">Runs when ${
+            condition || "any"
+          } of the provided tags are applied.</p>
 				</div>
-			</div>`
+			</div>`;
       },
 
-      onMount (step, updateStepMeta) {
-        tagWithConditionOnMount(step, updateStepMeta)
-      }
+      onMount(step, updateStepMeta) {
+        tagWithConditionOnMount(step, updateStepMeta);
+      },
     },
 
     /**
      * When a tag is remvoed
      */
     tag_removed: {
-
       defaults: {
-        tags: []
+        tags: [],
       },
 
       // language=HTML
@@ -2444,64 +2590,76 @@
 				  fill="currentColor"/>
 		  </svg>`,
 
-      title ({ ID, data, meta }) {
-
-        let { tags, condition } = meta
-        tags = tags.map(id => parseInt(id))
+      title({ ID, data, meta }) {
+        let { tags, condition } = meta;
+        tags = tags.map((id) => parseInt(id));
 
         if (!tags) {
-          return 'Tag is removed'
+          return "Tag is removed";
         } else if (tags.length >= 4) {
-          return condition === 'all' ? `<b>${tags.length}</b> tags are removed` : `Any of <b>${tags.length}</b> tags are removed`
-        } else if (tags.length > 1 && tags.length < 4 && TagsStore.hasItems(tags)) {
-          const tagNames = tags.map(tag => `<b>${TagsStore.get(tag).data.tag_name}</b>`)
-          return condition === 'all' ? `${andList(tagNames)} are applied` : `${orList(tagNames)} is removed`
+          return condition === "all"
+            ? `<b>${tags.length}</b> tags are removed`
+            : `Any of <b>${tags.length}</b> tags are removed`;
+        } else if (
+          tags.length > 1 &&
+          tags.length < 4 &&
+          TagsStore.hasItems(tags)
+        ) {
+          const tagNames = tags.map(
+            (tag) => `<b>${TagsStore.get(tag).data.tag_name}</b>`
+          );
+          return condition === "all"
+            ? `${andList(tagNames)} are applied`
+            : `${orList(tagNames)} is removed`;
         } else if (tags.length === 1) {
-          return `<b>${TagsStore.get(tags[0]).data.tag_name}</b> is removed`
+          return `<b>${TagsStore.get(tags[0]).data.tag_name}</b> is removed`;
         } else {
-          return 'Tag is removed'
+          return "Tag is removed";
         }
       },
 
-      edit ({ ID, data, meta }) {
+      edit({ ID, data, meta }) {
+        let options = TagsStore.getItems().map((tag) => {
+          return {
+            text: tag.data.tag_name,
+            value: tag.ID,
+          };
+        });
 
-        let options = TagsStore.getItems()
-          .map(tag => {
-            return {
-              text: tag.data.tag_name,
-              value: tag.ID
-            }
-          })
-
-        const { condition } = meta
+        const { condition } = meta;
 
         //language=HTML
         return `
 			<div class="panel">
 				<div class="row">
 					<label class="row-label" for="tags">When <select id="condition">
-						<option value="any" ${condition === 'any' ? 'selected' : ''}>Any</option>
-						<option value="all" ${condition === 'all' ? 'selected' : ''}>All</option>
+						<option value="any" ${condition === "any" ? "selected" : ""}>Any</option>
+						<option value="all" ${condition === "all" ? "selected" : ""}>All</option>
 					</select> of the defined tags are removed</label>
-					${select({
-						name: 'tags',
-						id: 'tags',
-						multiple: true,
-					}, options, meta.tags.map(id => parseInt(id)))}
-					<p class="description">Runs when ${condition || 'any'} of the provided tags are removed.</p>
+					${select(
+            {
+              name: "tags",
+              id: "tags",
+              multiple: true,
+            },
+            options,
+            meta.tags.map((id) => parseInt(id))
+          )}
+					<p class="description">Runs when ${
+            condition || "any"
+          } of the provided tags are removed.</p>
 				</div>
-			</div>`
+			</div>`;
       },
 
-      onMount (step, updateStepMeta) {
-        tagWithConditionOnMount(step, updateStepMeta)
-      }
+      onMount(step, updateStepMeta) {
+        tagWithConditionOnMount(step, updateStepMeta);
+      },
     },
 
     delay_timer: {
-
       defaults: {
-        ...delayTimerDefaults
+        ...delayTimerDefaults,
       },
 
       //language=HTML
@@ -2513,15 +2671,14 @@
 		  </svg>
       `,
 
-      title ({ meta }) {
+      title({ meta }) {
         return delayTimerName({
           ...delayTimerDefaults,
-          ...meta
-        })
+          ...meta,
+        });
       },
 
-      edit ({ ID, data, meta }) {
-
+      edit({ ID, data, meta }) {
         const {
           delay_amount,
           delay_type,
@@ -2535,85 +2692,84 @@
           run_on_month_type, // Run on month type
           run_on_months, // Run on months
           run_on_dom, // Run on days of month
-
         } = {
           ...delayTimerDefaults,
-          ...meta
-        }
+          ...meta,
+        };
 
         const delayTypes = {
-          minutes: 'Minutes',
-          hours: 'Hours',
-          days: 'Days',
-          weeks: 'Weeks',
-          months: 'Months',
-          years: 'Years',
-          none: 'No delay',
-        }
+          minutes: "Minutes",
+          hours: "Hours",
+          days: "Days",
+          weeks: "Weeks",
+          months: "Months",
+          years: "Years",
+          none: "No delay",
+        };
 
         const runOnTypes = {
-          any: 'Any day',
-          weekday: 'Weekday',
-          weekend: 'Weekend',
-          day_of_week: 'Day of week',
-          day_of_month: 'Day of month',
-        }
+          any: "Any day",
+          weekday: "Weekday",
+          weekend: "Weekend",
+          day_of_week: "Day of week",
+          day_of_month: "Day of month",
+        };
 
         const runWhenTypes = {
-          now: 'Any time',
-          later: 'Specific time',
-        }
+          now: "Any time",
+          later: "Specific time",
+        };
 
-        if (delay_type === 'minutes' || delay_type === 'hours') {
-          runWhenTypes.between = 'Between'
+        if (delay_type === "minutes" || delay_type === "hours") {
+          runWhenTypes.between = "Between";
         }
 
         const runOnDOWTypes = {
-          any: 'Any',
-          first: 'First',
-          second: 'Second',
-          third: 'Third',
-          fourth: 'Fourth',
-          last: 'Last',
-        }
+          any: "Any",
+          first: "First",
+          second: "Second",
+          third: "Third",
+          fourth: "Fourth",
+          last: "Last",
+        };
 
-        const runOnDaysOfMonth = {}
+        const runOnDaysOfMonth = {};
 
         for (let i = 1; i < 32; i++) {
-          runOnDaysOfMonth[i] = i
+          runOnDaysOfMonth[i] = i;
         }
 
-        runOnDaysOfMonth.last = 'last'
+        runOnDaysOfMonth.last = "last";
 
         const runOnMonthTypes = {
-          any: 'Of any month',
-          specific: 'Of specific month(s)',
-        }
+          any: "Of any month",
+          specific: "Of specific month(s)",
+        };
 
         const runOnDaysOfWeek = {
-          monday: 'Monday',
-          tuesday: 'Tuesday',
-          wednesday: 'Wednesday',
-          thursday: 'Thursday',
-          friday: 'Friday',
-          saturday: 'Saturday',
-          sunday: 'Sunday',
-        }
+          monday: "Monday",
+          tuesday: "Tuesday",
+          wednesday: "Wednesday",
+          thursday: "Thursday",
+          friday: "Friday",
+          saturday: "Saturday",
+          sunday: "Sunday",
+        };
 
         const runOnMonths = {
-          january: 'January',
-          february: 'February',
-          march: 'March',
-          april: 'April',
-          may: 'May',
-          june: 'June',
-          july: 'July',
-          august: 'August',
-          september: 'September',
-          october: 'October',
-          november: 'November',
-          december: 'December',
-        }
+          january: "January",
+          february: "February",
+          march: "March",
+          april: "April",
+          may: "May",
+          june: "June",
+          july: "July",
+          august: "August",
+          september: "September",
+          october: "October",
+          november: "November",
+          december: "December",
+        };
 
         //language=HTML
         const runOnMonthOptions = `
@@ -2621,8 +2777,15 @@
 				class="delay-input re-render"
 				name="run_on_month_type">
 				${createOptions(runOnMonthTypes, run_on_month_type)}</select>
-				${run_on_month_type === 'specific' ? `<select class="select2" name="run_on_months" multiple>${createOptions(runOnMonths, run_on_months)}</select>` : ''}
-			</div>`
+				${
+          run_on_month_type === "specific"
+            ? `<select class="select2" name="run_on_months" multiple>${createOptions(
+                runOnMonths,
+                run_on_months
+              )}</select>`
+            : ""
+        }
+			</div>`;
 
         //language=HTML
         const daysOfWeekOptions = `
@@ -2631,29 +2794,34 @@
 				${createOptions(runOnDOWTypes, run_on_dow_type)}</select>
 				<select class="select2" name="run_on_dow"
 				        multiple>${createOptions(runOnDaysOfWeek, run_on_dow)}</select></div>
-			${runOnMonthOptions}`
+			${runOnMonthOptions}`;
 
         //language=HTML
         const daysOfMonthOptions = `
 			<div style="margin-top: 10px"><select class="select2"
 			                                      name="run_on_dom"
-			                                      multiple>${createOptions(runOnDaysOfMonth, run_on_dom)}</select></div>
-			${runOnMonthOptions}`
+			                                      multiple>${createOptions(
+                                              runOnDaysOfMonth,
+                                              run_on_dom
+                                            )}</select></div>
+			${runOnMonthOptions}`;
 
         //language=HTML
         return `
 			<div class="panel">
 				<div class="row">
 					<h3 class="delay-preview" style="font-weight: normal">${delayTimerName({
-						...delayTimerDefaults,
-						...meta,
-					})}</h3>
+            ...delayTimerDefaults,
+            ...meta,
+          })}</h3>
 				</div>
 				<div class="row">
 					<label class="row-label">Wait at least...</label>
-					<input class="delay-input" type="number" name="delay_amount" value="${delay_amount || 3}"
+					<input class="delay-input" type="number" name="delay_amount" value="${
+            delay_amount || 3
+          }"
 					       placeholder="3"
-					       ${delay_type === 'none' ? 'disabled' : ''}>
+					       ${delay_type === "none" ? "disabled" : ""}>
 					<select class="delay-input re-render" name="delay_type">
 						${createOptions(delayTypes, delay_type)}
 					</select>
@@ -2663,58 +2831,72 @@
 					<select class="delay-input re-render" name="run_on_type">
 						${createOptions(runOnTypes, run_on_type)}
 					</select>
-					${run_on_type === 'day_of_week' ? daysOfWeekOptions : ''}
-					${run_on_type === 'day_of_month' ? daysOfMonthOptions : ''}
+					${run_on_type === "day_of_week" ? daysOfWeekOptions : ""}
+					${run_on_type === "day_of_month" ? daysOfMonthOptions : ""}
 				</div>
 				<div class="row">
 					<label class="row-label">Then run at...</label>
-					${select({
-						className: 'delay-input re-render',
-						name: 'run_when'
-					}, runWhenTypes, run_when)}
-					${run_when === 'later' ? `<input class="delay-input" type="time" name="run_time" value="${run_time}">` : ''}
-					${run_when === 'between' ? `<input class="delay-input" type="time" name="run_time" value="${run_time}"> and <input class="delay-input" type="time" name="run_time_to" value="${run_time_to}">` : ''}
+					${select(
+            {
+              className: "delay-input re-render",
+              name: "run_when",
+            },
+            runWhenTypes,
+            run_when
+          )}
+					${
+            run_when === "later"
+              ? `<input class="delay-input" type="time" name="run_time" value="${run_time}">`
+              : ""
+          }
+					${
+            run_when === "between"
+              ? `<input class="delay-input" type="time" name="run_time" value="${run_time}"> and <input class="delay-input" type="time" name="run_time_to" value="${run_time_to}">`
+              : ""
+          }
 				</div>
-			</div>`
+			</div>`;
       },
 
-      onMount (step, updateStepMeta) {
-
+      onMount(step, updateStepMeta) {
         const updatePreview = () => {
-          const { meta } = Editor.getCurrentStep()
-          $('.delay-preview').html(delayTimerName({
-            ...delayTimerDefaults,
-            ...meta
-          }))
-        }
+          const { meta } = Editor.getCurrentStep();
+          $(".delay-preview").html(
+            delayTimerName({
+              ...delayTimerDefaults,
+              ...meta,
+            })
+          );
+        };
 
-        $('.select2').select2().on('change', function (e) {
+        $(".select2")
+          .select2()
+          .on("change", function (e) {
+            // console.log(e)
+            Editor.updateCurrentStepMeta({
+              [$(this).attr("name")]: $(this).val(),
+            });
+            updatePreview();
+          });
+
+        $(".delay-input").on("change", function (e) {
           // console.log(e)
-          Editor.updateCurrentStepMeta({
-            [$(this).attr('name')]: $(this).val()
-          })
-          updatePreview()
-        })
-
-        $('.delay-input').on('change', function (e) {
-          // console.log(e)
 
           Editor.updateCurrentStepMeta({
-            [e.target.name]: e.target.value
-          })
+            [e.target.name]: e.target.value,
+          });
 
-          if (e.target.classList.contains('re-render')) {
-            Editor.renderStepEdit()
-            $(`[name=${e.target.name}]`).focus()
+          if (e.target.classList.contains("re-render")) {
+            Editor.renderStepEdit();
+            $(`[name=${e.target.name}]`).focus();
           } else {
-            updatePreview()
+            updatePreview();
           }
-        })
+        });
 
-        $('.delay-input').on('blur', function (e) {
-          updatePreview()
-        })
-
+        $(".delay-input").on("blur", function (e) {
+          updatePreview();
+        });
       },
     },
 
@@ -2723,7 +2905,7 @@
      */
     send_email: {
       defaults: {
-        email_id: null
+        email_id: null,
       },
       //language=HTML
       svg: `
@@ -2734,19 +2916,19 @@
 			  <path d="M3.674 8.903l14.166 8.5 14.167-8.5M20.674 24.487h11.333m0 0l-4.25-4.25m4.25 4.25l-4.25 4.25"
 			        stroke="currentColor" stroke-width="2"/>
 		  </svg>`,
-      title ({ ID, data, meta }) {
+      title({ ID, data, meta }) {
+        const title = meta.email_id
+          ? EmailsStore.get(parseInt(meta.email_id)).data.title
+          : "an email";
 
-        const title = meta.email_id ? EmailsStore.get(parseInt(meta.email_id)).data.title : 'an email'
-
-        return `Send <b>${title}</b>`
+        return `Send <b>${title}</b>`;
       },
-      edit ({ ID, data, meta }) {
-
-        const { email_id } = meta
-        const email = EmailsStore.get(parseInt(email_id))
+      edit({ ID, data, meta }) {
+        const { email_id } = meta;
+        const email = EmailsStore.get(parseInt(email_id));
 
         const iframePreview = (email) => {
-          const { context } = email
+          const { context } = email;
 
           // language=HTML
           return `
@@ -2764,60 +2946,73 @@
 				  <div class="loading-iframe">
 					  <iframe id="email-preview" src="${Groundhogg.managed_page.root}/emails/${email_id}"></iframe>
 				  </div>
-			  </div>`
-        }
+                <button class="gh-button secondary" id="render-email-edit">Edit this email</button>
+			  </div>`;
+        };
 
         //language=HTML
         return `
-			${email_id && email ? iframePreview(email) : ''}
+			${email_id && email ? iframePreview(email) : ""}
 			<div class="panel">
 				<div class="row">
 					<label class="row-label">Select an email to send...</label>
-					${select({
-						id: 'email-picker',
-						name: 'email_id'
-					}, EmailsStore.getItems().map(item => {
-						return {
-							text: item.data.title,
-							value: item.ID
-						}
-					}, email_id))}
+					${select(
+            {
+              id: "email-picker",
+              name: "email_id",
+            },
+            EmailsStore.getItems().map((item) => {
+              return {
+                text: item.data.title,
+                value: item.ID,
+              };
+            }, email_id)
+          )}
 				</div>
 				<div class="row">
 					<label class="row-label">Or...</label>
 					<button class="gh-button secondary">Create a new email</button>
 				</div>
-			</div>`
+			</div>`;
       },
-      onMount (step, updateStepMeta) {
-        emailPicker('#email-picker', false, (items) => {
-          EmailsStore.itemsFetched(items)
-        }).on('change', function (e) {
-          updateStepMeta({
-            email_id: parseInt($(this).val())
-          }, true)
-        })
+      onMount(step, updateStepMeta) {
+        const self = this;
 
-        $('#email-preview').on('load', function (e) {
-          this.height = this.contentWindow.document.body.offsetHeight
-          this.style.height = this.contentWindow.document.body.offsetHeight + 'px'
-        })
+        emailPicker("#email-picker", false, (items) => {
+          EmailsStore.itemsFetched(items);
+        }).on("change", function (e) {
+          updateStepMeta(
+            {
+              email_id: parseInt($(this).val()),
+            },
+            true
+          );
+        });
+
+        $("#email-preview").on("load", function (e) {
+          this.height = this.contentWindow.document.body.offsetHeight;
+          this.style.height =
+            this.contentWindow.document.body.offsetHeight + "px";
+        });
+
+        $("#render-email-edit").on("click", function () {
+          Editor.view = "editingEmail";
+          Editor.renderEmailEditor();
+        });
       },
-      validate ({ meta }, errors) {
+      validate({ meta }, errors) {
+        const { email_id } = meta;
+        const email = EmailsStore.get(email_id);
 
-        const { email_id } = meta
-        const email = EmailsStore.get(email_id)
-
-        if (email_id && email && email.data.status !== 'ready') {
-          errors.push('Email is in draft mode. Please update status to ready!')
+        if (email_id && email && email.data.status !== "ready") {
+          errors.push("Email is in draft mode. Please update status to ready!");
         }
-      }
+      },
     },
 
     link_click: {
-
       defaults: {
-        redirect_to: ''
+        redirect_to: "",
       },
 
       //language=HTML
@@ -2827,32 +3022,32 @@
 			        stroke="currentColor" stroke-width="2"/>
 		  </svg>`,
 
-      title ({ meta }) {
-
-        const { redirect_to } = meta
+      title({ meta }) {
+        const { redirect_to } = meta;
         if (redirect_to) {
-
-          const targetUrl = new URL(redirect_to)
-          const homeUrl = new URL(Groundhogg.managed_page.root)
+          const targetUrl = new URL(redirect_to);
+          const homeUrl = new URL(Groundhogg.managed_page.root);
 
           if (targetUrl.hostname === homeUrl.hostname) {
-            return `Clicked to <b>${targetUrl.pathname}</b>`
+            return `Clicked to <b>${targetUrl.pathname}</b>`;
           } else {
-            return `Clicked to <b>${targetUrl.hostname}</b>`
+            return `Clicked to <b>${targetUrl.hostname}</b>`;
           }
         } else {
-          return 'Clicked a tracking link'
+          return "Clicked a tracking link";
         }
       },
 
-      edit ({ meta }) {
+      edit({ meta }) {
         //language=HTML
         return `
 			<div class="panel">
 				<div class="row">
 					<label class="row-label" for="copy-this">Copy this link</label>
 					<input type="url" id="copy-this" class="code input regular-text"
-					       value="${Groundhogg.managed_page.root}link/click/${'some-value'}" onfocus="this.select()"
+					       value="${
+                   Groundhogg.managed_page.root
+                 }link/click/${"some-value"}" onfocus="this.select()"
 					       readonly>
 					<p class="description">Paste this link in any email or page. Once a contact clicks it the benchmark
 						will be completed and the contact will be redirected to the page set below.</p>
@@ -2860,23 +3055,23 @@
 				<div class="row">
 					<label class="row-label" for="copy">Then redirect contacts to...</label>
 					${Elements.inputWithReplacements({
-						type: 'url',
-						id: 'redirect-to',
-						name: 'redirect_to',
-						className: 'regular-text',
-						value: meta.redirect_to
-					})}
+            type: "url",
+            id: "redirect-to",
+            name: "redirect_to",
+            className: "regular-text",
+            value: meta.redirect_to,
+          })}
 					<p class="description">Upon clicking the tracking link contacts will be redirected to this page.</p>
 				</div>
-			</div>`
+			</div>`;
       },
-      onMount ({ meta }, updateStepMeta) {
-        linkPicker('#redirect-to').on('change', function (e) {
+      onMount({ meta }, updateStepMeta) {
+        linkPicker("#redirect-to").on("change", function (e) {
           updateStepMeta({
-            redirect_to: $(this).val()
-          })
-        })
-      }
+            redirect_to: $(this).val(),
+          });
+        });
+      },
     },
 
     email_confirmed: {
@@ -2889,15 +3084,15 @@
 			  <path d="M3.352 9.018l14.166 8.5 14.167-8.5M33.102 20.35l-8.5 8.5-4.25-4.25" stroke="currentColor"
 			        stroke-width="2"/>
 		  </svg>`,
-      edit ({}) {
+      edit({}) {
         //language=html
         return `
 			<div class="panel">
 				<p>This benchmark is completed whenever a <a target="_blank"
 				                                             href="https://help.groundhogg.io/article/381-how-to-confirm-an-email-address">contact
 					confirms their email address.</a> It does not have any settings.</p>
-			</div>`
-      }
+			</div>`;
+      },
     },
 
     form_fill: {
@@ -2911,28 +3106,27 @@
 				  d="M1.5 7.733a.25.25 0 01-.25-.25v-6a.25.25 0 01.25-.25h32a.25.25 0 01.25.25v6a.25.25 0 01-.25.25h-32zm0 11a.25.25 0 01-.25-.25v-6a.25.25 0 01.25-.25h32a.25.25 0 01.25.25v6a.25.25 0 01-.25.25h-32z"
 				  stroke="currentColor" stroke-width="1.5"/>
 		  </svg>`,
-      title ({ meta }) {
-        return `Submits <b>${meta.form_name || 'a form'}</b>`
+      title({ meta }) {
+        return `Submits <b>${meta.form_name || "a form"}</b>`;
       },
-      edit ({ meta }) {
-
+      edit({ meta }) {
         // language=html
         const redirectToURL = `<label class="row-label">Redirect to this URL...</label>
 		${Elements.inputWithReplacements({
-			id: 'success-page',
-			name: 'success_page',
-			className: 'regular-text',
-			value: meta.success_page || ''
-		})}`
+      id: "success-page",
+      name: "success_page",
+      className: "regular-text",
+      value: meta.success_page || "",
+    })}`;
 
         // language=html
         const stayOnPage = `<label class="row-label">Show this message...</label>
 		${textAreaWithReplacementsAndEmojis({
-			id: 'success-message',
-			name: 'success_message',
-			className: 'regular-text',
-			value: meta.success_message || ''
-		})}`
+      id: "success-message",
+      name: "success_message",
+      className: "regular-text",
+      value: meta.success_message || "",
+    })}`;
 
         //language=HTML
         return `
@@ -2940,69 +3134,75 @@
 				<label>Form name:</label>
 				<div class="input-wrap">
 					${input({
-						name: 'form_name',
-						id: 'form-name',
-						placeholder: 'Form name...',
-						value: meta.form_name || ''
-					})}
+            name: "form_name",
+            id: "form-name",
+            placeholder: "Form name...",
+            value: meta.form_name || "",
+          })}
 				</div>
 			</div>
 			<div id="edit-form"></div>
 			<div class="panel">
 				<div class="row">
 					<p>Stay on page after submitting? ${toggle({
-						name: 'enable_ajax',
-						id: 'enable-ajax',
-						checked: meta.enable_ajax,
-						onLabel: 'YES',
-						offLabel: 'NO'
-					})}</p>
+            name: "enable_ajax",
+            id: "enable-ajax",
+            checked: meta.enable_ajax,
+            onLabel: "YES",
+            offLabel: "NO",
+          })}</p>
 				</div>
 				<div class="row">
 					${meta.enable_ajax ? stayOnPage : redirectToURL}
 				</div>
-			</div>`
+			</div>`;
       },
-      onMount ({ meta }, updateStepMeta) {
-
-        linkPicker('#success-page').on('change', (e) => {
+      onMount({ meta }, updateStepMeta) {
+        linkPicker("#success-page").on("change", (e) => {
           updateStepMeta({
-            success_page: e.target.value
-          })
-        })
+            success_page: e.target.value,
+          });
+        });
 
-        $('#success-message').on('change', (e) => {
+        $("#success-message").on("change", (e) => {
           updateStepMeta({
-            success_message: e.target.value
-          })
-        })
+            success_message: e.target.value,
+          });
+        });
 
-        $('#enable-ajax').on('change', (e) => {
+        $("#enable-ajax").on("change", (e) => {
+          updateStepMeta(
+            {
+              enable_ajax: e.target.checked,
+            },
+            true
+          );
+        });
+
+        $("#form-name").on("change", (e) => {
           updateStepMeta({
-            enable_ajax: e.target.checked
-          }, true)
-        })
+            form_name: e.target.value,
+          });
+        });
 
-        $('#form-name').on('change', (e) => {
-          updateStepMeta({
-            form_name: e.target.value
-          })
-        })
+        const editor = formBuilder(
+          "#edit-form",
+          copyObject(meta.form),
+          (form) => {
+            updateStepMeta({
+              form,
+            });
+          }
+        );
 
-        const editor = formBuilder('#edit-form', copyObject(meta.form), (form) => {
-          updateStepMeta({
-            form
-          })
-        })
-
-        editor.init()
-      }
-    }
-  }
+        editor.init();
+      },
+    },
+  };
 
   for (const func in Editor) {
-    if (Editor.hasOwnProperty(func) && typeof func === 'function') {
-      Editor[func] = Editor[func].bind(Editor)
+    if (Editor.hasOwnProperty(func) && typeof func === "function") {
+      Editor[func] = Editor[func].bind(Editor);
     }
   }
 
@@ -3010,61 +3210,64 @@
     objectToProps,
     specialChars,
     isString,
-  }
-  Groundhogg.funnelEditor = Editor
+  };
+  Groundhogg.funnelEditor = Editor;
   Groundhogg.funnelEditor.functions = {
     slot,
     fill,
     slotsDemounted,
     slotsMounted,
-    getSteps () {
+    getSteps() {
+      return Editor.getSteps();
+    },
+    stepTitle(step) {
+      return StepTypes.getType(step.data.step_type).title(step);
+    },
+    registerStepType(type, opts) {
+      return StepTypes.register(type, opts);
+    },
+    updateCurrentStepMeta(newMeta) {
+      return Editor.updateCurrentStepMeta(newMeta);
+    },
+    renderStepEdit() {
+      return Editor.renderStepEdit();
+    },
+    getCurrentStep() {
+      return Editor.getCurrentStep();
+    },
+    getCurrentStepMeta() {
+      return Editor.getCurrentStep().meta;
+    },
+    getProceedingSteps(stepId) {
+      const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep();
       return Editor.getSteps()
+        .filter((_step) => _step.data.step_order > step.data.step_order)
+        .sort((a, b) => a.data.step_order - b.data.step_order);
     },
-    stepTitle (step) {
-      return StepTypes.getType(step.data.step_type).title(step)
+    getPrecedingSteps(stepId) {
+      const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep();
+      return Editor.getSteps()
+        .filter((_step) => _step.data.step_order < step.data.step_order)
+        .sort((a, b) => a.data.step_order - b.data.step_order);
     },
-    registerStepType (type, opts) {
-      return StepTypes.register(type, opts)
-    },
-    updateCurrentStepMeta (newMeta) {
-      return Editor.updateCurrentStepMeta(newMeta)
-    },
-    renderStepEdit () {
-      return Editor.renderStepEdit()
-    },
-    getCurrentStep () {
-      return Editor.getCurrentStep()
-    },
-    getCurrentStepMeta () {
-      return Editor.getCurrentStep().meta
-    },
-    getProceedingSteps (stepId) {
-      const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep()
-      return Editor.getSteps().filter(_step => _step.data.step_order > step.data.step_order).sort((a, b) => a.data.step_order - b.data.step_order)
-    },
-    getPrecedingSteps (stepId) {
-      const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep()
-      return Editor.getSteps().filter(_step => _step.data.step_order < step.data.step_order).sort((a, b) => a.data.step_order - b.data.step_order)
-    }
-  }
+  };
 
-  Groundhogg.funnelEditor.elements = Elements
+  Groundhogg.funnelEditor.elements = Elements;
 
-  fill('beforeStepNotes.form_fill', {
-    render ({ ID, meta }) {
-
+  fill("beforeStepNotes.form_fill", {
+    render({ ID, meta }) {
       if (!stepIsReal(ID)) {
-        return ''
+        return "";
       }
 
       const copyValue = (toCopy) => {
         return input({
-          className: 'code',
+          className: "code",
           value: toCopy,
-          onfocus: 'this.select()',
+          onfocus: "this.select()",
           readonly: true,
-        })
-      }
+        });
+      };
 
       //language=HTML
       return `
@@ -3077,8 +3280,7 @@
 				  <label class="row-label">Embed via iFrame</label>
 				  <div class="embed-option">${copyValue(`[gh_form id="${ID}"]`)}</div>
 			  </div>
-		  </div>`
-    }
-  })
-
-})(GroundhoggFunnel, jQuery)
+		  </div>`;
+    },
+  });
+})(GroundhoggFunnel, jQuery);

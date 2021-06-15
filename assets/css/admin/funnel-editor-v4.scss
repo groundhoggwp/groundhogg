@@ -337,7 +337,8 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
     border-radius: 5px;
   }
 
-  .step-edit {
+  .step-edit,
+  .email-edit {
     box-sizing: border-box;
     display: flex;
     padding: 20px;
@@ -380,6 +381,12 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
   .step-edit .actions-and-notes {
     width: 250px;
     flex-shrink: 0;
+  }
+
+  .email-edit {
+    .panel {
+      width: 100%;
+    }
   }
 
   #dynamic-step-settings .gh-loader {
