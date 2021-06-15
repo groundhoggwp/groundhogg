@@ -546,6 +546,8 @@
 #funnel-editor #control-panel .step-edit {
   position: sticky;
   top: 100px;
+  max-height: calc(100vh - 100px);
+  overflow: auto;
 }
 #funnel-editor #control-panel .panel {
   background: #FFFFFF;
