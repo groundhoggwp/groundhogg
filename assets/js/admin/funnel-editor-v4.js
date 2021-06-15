@@ -2166,18 +2166,11 @@
 
       //language=HTML
       svg: `
-		  <svg viewBox="0 0 35 35" xmlns="http://www.w3.org/2000/svg">
-			  <g clip-path="url(#clip0)">
-				  <path
-					  d="M4.473 31.684l-.96-.284a1 1 0 00.96 1.284v-1zm25.5 0v1a1 1 0 00.959-1.284l-.96.284zm-12.75-15.166a6.083 6.083 0 01-6.084-6.084h-2a8.083 8.083 0 008.084 8.084v-2zm-6.084-6.084a6.083 6.083 0 016.084-6.083v-2a8.083 8.083 0 00-8.084 8.083h2zM5.431 31.968c1.59-5.368 6.297-9.2 11.792-9.2v-2c-6.471 0-11.894 4.505-13.71 10.632l1.918.568zm11.792-9.2c5.495 0 10.2 3.832 11.79 9.2l1.918-.568c-1.815-6.127-7.237-10.632-13.708-10.632v2zm-12.75 9.916h25.5v-2h-25.5v2zm12.75-28.333a6.05 6.05 0 013.04.813l1.002-1.731a8.05 8.05 0 00-4.042-1.082v2z"
-					  fill="currentColor"/>
-				  <path d="M34.223 11.85H20.057m7.083-7.082v14.166" stroke="currentColor" stroke-width="2"/>
-			  </g>
-			  <defs>
-				  <clipPath id="clip0">
-					  <path fill="#fff" transform="translate(.223 .518)" d="M0 0h34v34H0z"/>
-				  </clipPath>
-			  </defs>
+		  <svg viewBox="0 0 32 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path
+				  d="M1.473 29.667l-.96-.284a1 1 0 00.96 1.284v-1zm25.5 0v1a1 1 0 00.959-1.284l-.96.284zM14.223 14.5a6.083 6.083 0 01-6.084-6.083h-2a8.083 8.083 0 008.084 8.083v-2zM8.139 8.417a6.083 6.083 0 016.084-6.084v-2a8.083 8.083 0 00-8.084 8.084h2zM2.431 29.95c1.59-5.368 6.297-9.201 11.792-9.201v-2c-6.471 0-11.894 4.505-13.71 10.633l1.918.568zm11.792-9.201c5.495 0 10.2 3.833 11.79 9.2l1.918-.567c-1.815-6.128-7.237-10.633-13.708-10.633v2zm-12.75 9.917h25.5v-2h-25.5v2zm12.75-28.334a6.05 6.05 0 013.04.814l1.002-1.732A8.05 8.05 0 0014.223.333v2z"
+				  fill="currentColor"/>
+			  <path d="M31.223 9.833H17.057M24.14 2.75v14.167" stroke="currentColor" stroke-width="2"/>
 		  </svg>
       `,
 
@@ -2222,86 +2215,6 @@
           let roles = $(this).val()
           updateStepMeta({
             role: roles
-          })
-        })
-      },
-    },
-
-    /**
-     * Account created
-     */
-    create_user: {
-
-      // Title
-      title ({ ID, data, meta }) {
-
-        const roles = Editor.stepTypes.account_created.context.roles
-
-        if (meta.role) {
-          return `Create <b>${roles[meta.role]}</b>`
-        } else {
-          return 'Create user'
-        }
-      },
-
-      // Edit
-      edit ({ ID, data, meta }) {
-
-        let options = []
-        let roles = Editor.stepTypes.account_created.context.roles
-
-        for (var role in roles) {
-          if (Object.prototype.hasOwnProperty.call(roles, role)) {
-            options.push(Elements.option(role, roles[role], meta.role === role))
-          }
-        }
-
-        //language=HTML
-        return `
-			<div class="panel">
-				<div class="row">
-					<label class="row-label" for="roles">Select the role of the new user.</label>
-					<select name="role" id="role">
-						${options.join('')}
-					</select>
-					<p class="description">Runs when a new user is created with any of the defined roles.</p>
-				</div>
-			</div>
-			<div class="panel">
-				<div class="row">
-					<label for="disable-notification">
-						<input type="checkbox" id="disable-notification" value="1"
-						       ${meta.disable_notification ? 'checked' : ''}>
-						Disable the account created notification sent to the user.</label>
-				</div>
-			</div>`
-      },
-
-      // On mount
-      onMount () {
-
-        const $role = $('#role')
-        $role.select2()
-
-        $role.on('change', function (e) {
-          let role = $(this).val()
-          Editor.updateCurrentStep({
-            meta: {
-              ...Editor.getCurrentStep().meta,
-              role: role
-            }
-          })
-        })
-
-        $('#disable-notification').on('change', function (e) {
-
-          var checked = this.checked
-
-          Editor.updateCurrentStep({
-            meta: {
-              ...Editor.getCurrentStep().meta,
-              disable_notification: checked
-            }
           })
         })
       },

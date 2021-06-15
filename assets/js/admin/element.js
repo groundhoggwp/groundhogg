@@ -184,7 +184,7 @@
     input (props) {
       props = {
         type: 'text',
-        className: 'input',
+        className: 'input regular-text',
         ...props
       }
 

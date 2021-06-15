@@ -3350,6 +3350,17 @@ function do_api_benchmark( $call_name = '', $id_or_email = '', $by_user_id = fal
 }
 
 /**
+ * Better named alias for do_api_trigger
+ *
+ * @param string $call_name
+ * @param string $id_or_email
+ * @param false  $by_user_id
+ */
+function do_plugin_api_benchmark( $call_name = '', $id_or_email = '', $by_user_id = false ) {
+	do_api_trigger( $call_name, $id_or_email, $by_user_id );
+}
+
+/**
  * Get the value of an option.
  *
  * @param string $option
