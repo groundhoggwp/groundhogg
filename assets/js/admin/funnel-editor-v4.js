@@ -2743,10 +2743,9 @@
       edit ({ ID, data, meta }) {
 
         const { email_id } = meta
+        const email = EmailsStore.get(parseInt(email_id))
 
-        const iframePreview = () => {
-
-          const email = EmailsStore.get(email_id)
+        const iframePreview = (email) => {
           const { context } = email
 
           // language=HTML
@@ -2770,7 +2769,7 @@
 
         //language=HTML
         return `
-			${email_id ? iframePreview() : ''}
+			${email_id && email ? iframePreview(email) : ''}
 			<div class="panel">
 				<div class="row">
 					<label class="row-label">Select an email to send...</label>
