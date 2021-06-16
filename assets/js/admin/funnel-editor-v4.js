@@ -410,7 +410,16 @@
 			</div>
 			${step_group === 'benchmark' && nextStep ? (nextStep.data.step_group === 'benchmark' ? `<div class="or-helper text-helper">Or...</div>` : '<div class="then-helper text-helper">Then...</div>') : ''}
         `
-      }
+      },
+      emailEditor(step) {
+        //language=HTML
+        return `
+            <div class="email-edit">
+              <div class="panel">
+				Email editor
+              </div>
+			</div>`;
+      },
     },
 
     init () {
@@ -969,6 +978,38 @@
           revertDuration: 0,
         })
       }
+    },
+
+    renderEmailEditor() {
+      window.console.log("renderEmailEditor");
+
+      if (this.view !== "editingEmail") {
+        return;
+      }
+
+      var self = this;
+
+      const step = this.funnel.steps.find(
+        (step) => step.ID === this.activeStep
+      );
+      const previousStep = this.funnel.steps.find(
+        (step) => step.ID === this.previousActiveStep
+      );
+
+      // Handle remounting the step
+      // if (this.activeStep === this.lastStepEditMounted) {
+      //   this.demountStep(step)
+      // } else if (previousStep) {
+      //   this.demountStep(previousStep)
+      // }
+      //
+      // slotsDemounted()
+
+      $("#control-panel").html(this.htmlTemplates.emailEditor(step));
+
+      // this.mountStep(step)
+
+      // slotsMounted()
     },
 
     /**
@@ -2804,6 +2845,11 @@
           this.style.height = this.contentWindow.document.body.offsetHeight + 'px'
           $(window).trigger('resize');
         })
+
+        $("#render-email-edit").on("click", function () {
+          Editor.view = "editingEmail";
+          Editor.renderEmailEditor();
+        });
       },
       validate ({ meta }, errors) {
 
