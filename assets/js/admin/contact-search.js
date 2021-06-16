@@ -63,6 +63,7 @@
 				<div id="search-filters"></div>
 				<div class="search-contacts-wrap">
 					<button id="search-contacts" class="button button-primary">Search</button>
+					<button id="save-search" class="button button-secondary">Save this search</button>
 				</div>
 			</div>
         `
@@ -70,7 +71,7 @@
 
       //language=HTML
       return `
-		  <button class="enable-filters white"><span class="dashicons dashicons-filter"></span></button>
+		  <button class="enable-filters white" style="padding-right: 10px"><span class="dashicons dashicons-filter"></span> Filter Contacts</button>
 		  ${this.savedSearchEnabled ? `<div id="searches-picker"></div>` : (searches.length ? `<button id="load-saved-search" class="button button-secondary">Load saved search</button>` : '')}`
     },
 

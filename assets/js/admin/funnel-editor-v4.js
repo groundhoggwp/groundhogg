@@ -588,6 +588,7 @@
       this.renderStepEdit()
 
       this.loadingClose()
+      $(window).trigger('resize');
     },
 
     async maybePreloadTagsAndEmails () {
@@ -2801,6 +2802,7 @@
         $('#email-preview').on('load', function (e) {
           this.height = this.contentWindow.document.body.offsetHeight
           this.style.height = this.contentWindow.document.body.offsetHeight + 'px'
+          $(window).trigger('resize');
         })
       },
       validate ({ meta }, errors) {

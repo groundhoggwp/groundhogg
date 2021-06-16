@@ -39,6 +39,28 @@
     return response.json()
   }
 
+  /**
+   * Post data
+   *
+   * @param url
+   * @param data
+   * @param opts
+   * @returns {Promise<any>}
+   */
+  async function apiPatch (url = '', data = {}, opts = {}) {
+    const response = await fetch(url, {
+      ...opts,
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-WP-Nonce': Groundhogg.nonces._wprest,
+      },
+      body: JSON.stringify(data)
+    })
+    return response.json()
+  }
+
+
   const ObjectStore = (route, extra = {}) => ({
     items: [],
     item: {},
@@ -160,6 +182,7 @@
 
   Groundhogg.api.post = apiPost
   Groundhogg.api.get = apiGet
+  Groundhogg.api.patch = apiPatch
 
   Groundhogg.stores = {
     tags: ObjectStore(Groundhogg.api.routes.v4.tags, {

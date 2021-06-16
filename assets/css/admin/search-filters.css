@@ -102,8 +102,9 @@
   background: #FFFFFF;
   border: 1px solid #8c8f94;
   border-radius: 5px;
+  cursor: pointer;
 }
-#search-filters-editor .filter.filter-view:focus {
+#search-filters-editor .filter.filter-view:hover, #search-filters-editor .filter.filter-view:focus {
   background: #f9f9f9;
 }
 #search-filters-editor .filter.filter-edit-wrap {
@@ -111,6 +112,7 @@
   min-width: 200px;
 }
 #search-filters-editor .filter.filter-edit-wrap .filter-edit {
+  min-width: 200px;
   border: 1px solid #8c8f94;
   padding: 10px;
   display: flex;

@@ -39,6 +39,7 @@
 #search-panel .search-contacts-wrap{
     display: flex;
     justify-content: flex-end;
+    gap: 10px;
 }
 
 #search-panel button.enable-filters{

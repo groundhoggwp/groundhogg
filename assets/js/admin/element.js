@@ -12,6 +12,24 @@
     return result
   }
 
+  /**
+   * Make a copy of the object
+   *
+   * @param object
+   * @param initial
+   * @returns {*}
+   */
+  function copyObject (object, initial) {
+    initial = initial || {}
+    return $.extend(true, initial, object)
+  }
+
+  /**
+   *
+   * @param array
+   * @param text
+   * @returns {string|*}
+   */
   function andList (array, text = 'and') {
     if (array.length === 1) {
       return array[0]
@@ -739,6 +757,7 @@
     confirmationModal,
     uuid,
     modal,
+    copyObject,
     loadingDots
   }
 
