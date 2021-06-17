@@ -30,19 +30,17 @@
    * @param multiple
    * @param tags
    * @param getResults
-   * @param params
+   * @param getParams
    * @returns {*|define.amd.jQuery}
    */
-  function apiPicker (selector, endpoint, multiple, tags, getResults, params) {
-
-    multiple = multiple || false
-    tags = tags || false
-    getResults = getResults || function (data) {
-      return data.results
-    }
-    params = params || function (params) {
-      return params
-    }
+  function apiPicker (
+    selector,
+    endpoint,
+    multiple = false,
+    tags = false,
+    getResults = (d) => d.results,
+    getParams = (p) => p
+  ) {
 
     return $(selector).select2({
       tags: tags,
@@ -52,7 +50,7 @@
         url: endpoint,
         // delay: 250,
         dataType: 'json',
-        data: params,
+        data: getParams,
         beforeSend: function (xhr) {
           xhr.setRequestHeader('X-WP-Nonce', nonces._wprest)
         },
@@ -131,12 +129,10 @@
 
         onReceiveItems(data.items)
 
-        return data.items.map(item => {
-          return {
-            id: item.ID,
-            text: `${item.data.tag_name}`
-          }
-        })
+        return data.items.map(item => ({
+          id: item.ID,
+          text: `${item.data.tag_name}`
+        }))
       },
       (query) => {
         return {
@@ -155,14 +151,12 @@
   function emailPicker (selector, multiple = false, onReceiveItems = (items) => {}) {
     return apiPicker(selector, gh.api.routes.v4.emails, multiple, true, (data) => {
 
-      onReceiveItems(data.items)
+        onReceiveItems(data.items)
 
-        return data.items.map(item => {
-          return {
-            id: item.ID,
-            text: `${item.data.title} (${item.data.status})`
-          }
-        })
+        return data.items.map(item => ({
+          id: item.ID,
+          text: `${item.data.title} (${item.data.status})`
+        }))
       },
       (query) => {
         return {

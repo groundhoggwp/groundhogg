@@ -739,6 +739,34 @@
     }
   })
 
+  /**
+   * Global Functions
+   */
+  const flattenObject = (obj, parent_key = '') => {
+    if (typeof obj !== 'object') {
+      return {}
+    }
+
+    const flattened = {}
+
+    let key_prefix = parent_key ? parent_key + '.' : ''
+
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+
+        let value = obj[key]
+
+        if (typeof value !== 'object') {
+          flattened[key_prefix + key] = value
+        } else {
+          Object.assign(flattened, flattenObject(value, key_prefix + key))
+        }
+      }
+    }
+
+    return flattened
+  }
+
   Groundhogg.element = {
     ...Elements,
     specialChars,
@@ -758,7 +786,8 @@
     uuid,
     modal,
     copyObject,
-    loadingDots
+    loadingDots,
+    flattenObject
   }
 
 })(jQuery)

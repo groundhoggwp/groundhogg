@@ -5,6 +5,7 @@ namespace Groundhogg\Steps\Benchmarks;
 use function Groundhogg\after_form_submit_handler;
 use Groundhogg\Contact;
 use function Groundhogg\array_flatten;
+use function Groundhogg\array_map_with_keys;
 use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_mappable_fields;
@@ -101,6 +102,39 @@ abstract class Form_Integration extends Benchmark {
 	abstract protected function get_forms_for_select_2();
 
 	/**
+	 * Forms and fields in standard format for all form integrations
+	 *
+	 * @return array
+	 */
+	public function get_forms_for_api() {
+
+		$forms = $this->get_forms_for_select_2();
+
+		$response = [];
+
+		foreach ( $forms as $form_id => $form_name ) {
+			$response[] = [
+				'id'     => $form_id,
+				'name'   => $form_name,
+				'fields' => $this->__get_form_fields( $form_id )
+			];
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Get the form fields
+	 *
+	 * @param $form_id
+	 *
+	 * @return array
+	 */
+	public function __get_form_fields( $form_id ) {
+		return array_map_with_keys( $this->get_form_fields( $form_id ), [ $this, '__normalize_field' ] );
+	}
+
+	/**
 	 * Returns an array of Ids => Labels for easy mapping.
 	 *
 	 * @param $form_id
@@ -110,9 +144,21 @@ abstract class Form_Integration extends Benchmark {
 	abstract protected function get_form_fields( $form_id );
 
 	/**
+	 * handler for api
+	 *
+	 * @param $field
+	 * @param $key
+	 *
+	 * @return array
+	 */
+	public function __normalize_field( $field, $key ) {
+		return $this->normalize_field( $key, $field );
+	}
+
+	/**
 	 * Parse the filed into a normalize array.
 	 *
-	 * @param $key int|string
+	 * @param $key   int|string
 	 * @param $field array|string
 	 *
 	 * @return array
@@ -236,8 +282,7 @@ abstract class Form_Integration extends Benchmark {
 	 *
 	 * @return bool
 	 */
-	public
-	function can_complete_step() {
+	public function can_complete_step() {
 		return absint( $this->get_data( 'form_id' ) ) === absint( $this->get_setting( 'form_id' ) );
 	}
 }

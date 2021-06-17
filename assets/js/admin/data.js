@@ -60,8 +60,31 @@
     return response.json()
   }
 
+  /**
+   * Post data
+   *
+   * @param url
+   * @param data
+   * @param opts
+   * @returns {Promise<any>}
+   */
+  async function apiDelete (url = '', data = {}, opts = {}) {
+    const response = await fetch(url, {
+      ...opts,
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-WP-Nonce': Groundhogg.nonces._wprest,
+      },
+      body: JSON.stringify(data)
+    })
+    return response.json()
+  }
 
   const ObjectStore = (route, extra = {}) => ({
+    primaryKey: 'ID',
+    getItemFromResponse: (r) => r.item,
+    getItemsFromResponse: (r) => r.items,
     items: [],
     item: {},
     route: route,
@@ -76,10 +99,10 @@
 
       let item
 
-      if (this.item.ID === id) {
+      if (this.item[this.primaryKey] === id) {
         item = this.item
       } else {
-        item = this.items.find(item => item.ID === id)
+        item = this.items.find(item => item[this.primaryKey] === id)
       }
 
       return item
@@ -90,7 +113,7 @@
     },
 
     hasItem (id) {
-      return this.item.ID === id || this.items.find(item => item.ID === id)
+      return this.item[this.primaryKey] === id || this.items.find(item => item[this.primaryKey] === id)
     },
 
     hasItems (itemIds) {
@@ -102,7 +125,7 @@
       for (let i = 0; i < itemIds.length; i++) {
         const itemId = itemIds[i]
         if (!this.items.find(item => {
-          return item.ID === itemId
+          return item[this.primaryKey] === itemId
         })) {
           return false
         }
@@ -112,79 +135,83 @@
     },
 
     async fetchItems (params) {
-
-      var self = this
-
-      return apiGet(this.route, params).then(r => {
-        self.items = [
-          ...r.items, // new items
-          ...self.items.filter(item => !r.items.find(_item => _item.ID === item.ID))
-        ]
-        return r
-      })
+      return apiGet(this.route, params)
+        .then(r => this.getItemsFromResponse(r))
+        .then(items => {
+          this.items = [
+            ...items, // new items
+            ...this.items.filter(item => !items.find(_item => _item[this.primaryKey] === item[this.primaryKey]))
+          ]
+          return items
+        })
     },
 
-    itemsFetched ( items ) {
+    itemsFetched (items) {
       this.items = [
         ...items, // new items
-        ...this.items.filter(item => !items.find(_item => _item.ID === item.ID))
+        ...this.items.filter(item => !items.find(_item => _item[this.primaryKey] === item[this.primaryKey]))
       ]
     },
 
     async fetchItem (id) {
-
-      var self = this
-
-      return apiGet(`${this.route}/${id}`).then(r => {
-        self.item = r.item
-        self.items = [
-          r.item,
-          ...self.items.filter( item => item.ID !== r.item.ID ),
-        ]
-        return r
-      })
+      return apiGet(`${this.route}/${id}`)
+        .then(r => this.getItemFromResponse(r))
+        .then(item => {
+          this.item = item
+          this.items = [
+            item,
+            ...this.items.filter(item => item[this.primaryKey] !== item[this.primaryKey]),
+          ]
+          return item
+        })
     },
 
     async post (data) {
-      var self = this
-
-      return apiPost(this.route, data).then(r => {
-        self.items.push(r.item)
-        return r
-      })
+      return apiPost(this.route, data)
+        .then(r => this.getItemFromResponse(r))
+        .then(item => {
+          this.items.push(item)
+          return item
+        })
     },
 
     async patch (id, data) {
-      const response = await fetch(this.route + '/' + id, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-WP-Nonce': Groundhogg.nonces._wprest,
-        },
-        body: JSON.stringify(data)
-      })
-      return response.json()
+      return apiPatch(`${this.route}/${id}`, data)
+        .then(r => this.getItemFromResponse(r))
+        .then(item => {
+          this.item = item
+          this.items = [
+            item,
+            ...this.items.filter(item => item[this.primaryKey] !== item[this.primaryKey]),
+          ]
+          return item
+        })
     },
 
     async delete (id) {
-      const response = await fetch(this.route + '/' + id, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-WP-Nonce': Groundhogg.nonces._wprest,
-        }
-      })
-      return response.json()
+      return apiDelete(`${this.route}/${id}`)
+        .then(r => {
+
+          if (this.item[this.primaryKey] === id) {
+            this.item = {}
+          }
+
+          this.items = [
+            ...this.items.filter(item => item[this.primaryKey] !== item[this.primaryKey]),
+          ]
+        })
     },
 
-    ...extra
+    ...extra,
   })
 
   Groundhogg.api.post = apiPost
   Groundhogg.api.get = apiGet
   Groundhogg.api.patch = apiPatch
+  Groundhogg.api.delete = apiDelete
 
   Groundhogg.stores = {
+
     tags: ObjectStore(Groundhogg.api.routes.v4.tags, {
 
       limit: 100,
@@ -208,7 +235,7 @@
 
             self.items = [
               ...r.items, // new items
-              ...self.items.filter(item => !r.items.find(_item => _item.ID === item.ID))
+              ...self.items.filter(item => !r.items.find(_item => _item[this.primaryKey] === item[this.primaryKey]))
             ]
 
             return r.items
@@ -240,4 +267,11 @@
     contacts: ObjectStore(Groundhogg.api.routes.v4.contacts),
     emails: ObjectStore(Groundhogg.api.routes.v4.emails),
   }
+
+  Groundhogg.createStore = (id, route = '', extra = {}) => {
+    const store = ObjectStore(route, extra)
+    Groundhogg.stores[id] = store
+    return store
+  }
+
 })(jQuery)

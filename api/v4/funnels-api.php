@@ -4,6 +4,7 @@ namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
 use Groundhogg\Funnel;
+use Groundhogg\Plugin;
 use Groundhogg\Step;
 use WP_REST_Server;
 use function Groundhogg\get_array_var;
@@ -43,6 +44,36 @@ class Funnels_Api extends Base_Object_Api {
 				'callback'            => [ $this, 'commit' ],
 				'permission_callback' => [ $this, 'update_permissions_callback' ]
 			],
+		] );
+
+		register_rest_route( self::NAME_SPACE, "/{$route}/form-integration", [
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'form_integration' ],
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
+			],
+		] );
+	}
+
+	/**
+	 * Get the field mapping data for a form integration step
+	 *
+	 * @param \WP_REST_Request $request
+	 */
+	public function form_integration( \WP_REST_Request $request ) {
+
+		$type = $request->get_param( 'type' );
+
+		$step = Plugin::instance()->step_manager->elements[ $type ];
+
+		if ( ! method_exists( $step, 'get_forms_for_api' ) ){
+			return self::ERROR_401();
+		}
+
+		$forms = $step->get_forms_for_api();
+
+		return self::SUCCESS_RESPONSE( [
+			'forms' => $forms,
 		] );
 	}
 

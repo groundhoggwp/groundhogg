@@ -16,11 +16,12 @@
     toggle,
     textAreaWithReplacements,
     textAreaWithReplacementsAndEmojis,
+    flattenObject
   } = Groundhogg.element
 
   const { formBuilder } = Groundhogg
 
-  const { linkPicker, emailPicker, tagPicker } = Groundhogg.pickers
+  const { linkPicker, emailPicker, tagPicker, apiPicker } = Groundhogg.pickers
 
   $.fn.serializeFormJSON = function () {
 
@@ -314,14 +315,22 @@
         //language=HTML
         return `
 			<div class="step-add">
-				<div class="type-select">
-					<button class="select-type actions ${activeType === 'actions' && 'active'}" data-type="actions">
-						${'Actions'}
-					</button>
-					<button class="select-type benchmarks ${activeType === 'benchmarks' && 'active'}"
-					        data-type="benchmarks">
-						${'Benchmarks'}
-					</button>
+				<div class="step-add-filters">
+					<div class="type-select">
+						<button class="select-type actions ${activeType === 'actions' && 'active'}" data-type="actions">
+							${'Actions'}
+						</button>
+						<button class="select-type benchmarks ${activeType === 'benchmarks' && 'active'}"
+						        data-type="benchmarks">
+							${'Benchmarks'}
+						</button>
+					</div>
+						${input({
+							id: 'search-steps',
+							name: 'search_steps',
+							type: 'search',
+							placeholder: 'search'
+						})}
 				</div>
 				<div class="types">
 					${Object.values(Editor.stepTypes).filter(step => step.group + 's' === activeType).map(Editor.htmlTemplates.addStepCard).join('')}
@@ -341,13 +350,22 @@
 			</div>`
       },
       addStepCard (step) {
+
+        const pack = StepPacks.get(step.pack)
+
         //language=HTML
         return `
 			<div class="add-step ${step.type} ${step.group}" data-type="${step.type}" data-group="${step.group}"
 			     title="${step.name}">
+				${slot('beforeAddStepCard', step)}
+				${slot('beforeAddStepCard.' + step.type, step)}
+				${typeof pack !== 'undefined' && pack.id !== 'core' ? `<div class="pack">${pack.svg ? pack.svg : `<span class="pack-name">${pack.name}</span>`}</div>` : ''}
 				${Editor.stepTypes[step.type].hasOwnProperty('svg') ? `<div class="step-icon-svg">${Editor.stepTypes[step.type].svg}</div>` : `<img alt="${Editor.stepTypes[step.type].name}" class="step-icon"
 				     src="${Editor.stepTypes[step.type].icon}"/>`}
-				<p>${step.name}</p></div>`
+				<p>${step.name}</p>
+				${slot('afterAddStepCard.' + step.type, step)}
+				${slot('afterAddStepCard', step)}
+			</div>`
       },
       stepFlowCard (step, activeStep) {
 
@@ -411,14 +429,14 @@
 			${step_group === 'benchmark' && nextStep ? (nextStep.data.step_group === 'benchmark' ? `<div class="or-helper text-helper">Or...</div>` : '<div class="then-helper text-helper">Then...</div>') : ''}
         `
       },
-      emailEditor(step) {
+      emailEditor (step) {
         //language=HTML
         return `
-            <div class="email-edit">
-              <div class="panel">
-				Email editor
-              </div>
-			</div>`;
+			<div class="email-edit">
+				<div class="panel">
+					Email editor
+				</div>
+			</div>`
       },
     },
 
@@ -597,24 +615,40 @@
       this.renderStepEdit()
 
       this.loadingClose()
-      $(window).trigger('resize');
+      $(window).trigger('resize')
     },
 
     async maybePreloadTagsAndEmails () {
 
       const preloadTags = []
       const preloadEmails = []
+      const promises = []
 
-      this.funnel.steps.forEach(({ meta }) => {
+      this.funnel.steps.forEach(step => {
+        const { meta, data } = step
         const { tags, email_id } = meta
+
         if (tags) {
           preloadTags.push(...tags)
         } else if (email_id) {
           preloadEmails.push(email_id)
         }
+
+        const type = StepTypes.getType(data.step_type)
+        const promise = type.preload(step)
+
+        // console.log(data.step_type, type, promise)
+
+        if (typeof promise !== 'undefined') {
+          if (Array.isArray(promise)) {
+            promises.push(...promise)
+          } else {
+            promises.push(promise)
+          }
+        }
       })
 
-      if (preloadEmails.length === 0 && preloadTags.length === 0) {
+      if (preloadEmails.length === 0 && preloadTags.length === 0 && promises.length === 0) {
         this.render()
         return
       }
@@ -629,6 +663,11 @@
         await EmailsStore.fetchItems({
           include: preloadEmails
         })
+      }
+
+      if (promises.length > 0) {
+        console.log(promises)
+        await Promise.all(promises)
       }
 
       this.render()
@@ -980,21 +1019,21 @@
       }
     },
 
-    renderEmailEditor() {
-      window.console.log("renderEmailEditor");
+    renderEmailEditor () {
+      window.console.log('renderEmailEditor')
 
-      if (this.view !== "editingEmail") {
-        return;
+      if (this.view !== 'editingEmail') {
+        return
       }
 
-      var self = this;
+      var self = this
 
       const step = this.funnel.steps.find(
         (step) => step.ID === this.activeStep
-      );
+      )
       const previousStep = this.funnel.steps.find(
         (step) => step.ID === this.previousActiveStep
-      );
+      )
 
       // Handle remounting the step
       // if (this.activeStep === this.lastStepEditMounted) {
@@ -1005,7 +1044,7 @@
       //
       // slotsDemounted()
 
-      $("#control-panel").html(this.htmlTemplates.emailEditor(step));
+      $('#control-panel').html(this.htmlTemplates.emailEditor(step))
 
       // this.mountStep(step)
 
@@ -1916,6 +1955,22 @@
     return preview.join(' ')
   }
 
+  const StepPacks = {
+    packs: {},
+    add (id, name = '', svg = '') {
+      this.packs[id] = {
+        id,
+        name,
+        svg
+      }
+    },
+    get (id) {
+      return this.packs[id]
+    }
+  }
+
+  StepPacks.add('core', 'Groundhogg')
+
   const StepTypes = {
 
     register (type, opts) {
@@ -2011,6 +2066,7 @@
         }
       },
       validate: function (step, errors) {},
+      preload (step) {},
       defaults: {}
     },
 
@@ -2778,7 +2834,9 @@
 		  </svg>`,
       title ({ ID, data, meta }) {
 
-        const title = meta.email_id ? EmailsStore.get(parseInt(meta.email_id)).data.title : 'an email'
+        const email = EmailsStore.get(parseInt(meta.email_id))
+
+        const title = meta.email_id && email ? email.data.title : 'an email'
 
         return `Send <b>${title}</b>`
       },
@@ -2843,13 +2901,13 @@
         $('#email-preview').on('load', function (e) {
           this.height = this.contentWindow.document.body.offsetHeight
           this.style.height = this.contentWindow.document.body.offsetHeight + 'px'
-          $(window).trigger('resize');
+          $(window).trigger('resize')
         })
 
-        $("#render-email-edit").on("click", function () {
-          Editor.view = "editingEmail";
-          Editor.renderEmailEditor();
-        });
+        $('#render-email-edit').on('click', function () {
+          Editor.view = 'editingEmail'
+          Editor.renderEmailEditor()
+        })
       },
       validate ({ meta }, errors) {
 
@@ -3054,49 +3112,170 @@
     }
   }
 
-  Groundhogg.helpers = {
-    objectToProps,
-    specialChars,
-    isString,
-  }
-  Groundhogg.funnelEditor = Editor
-  Groundhogg.funnelEditor.functions = {
-    slot,
-    fill,
-    slotsDemounted,
-    slotsMounted,
-    getSteps () {
-      return Editor.getSteps()
-    },
-    stepTitle (step) {
-      return StepTypes.getType(step.data.step_type).title(step)
-    },
-    registerStepType (type, opts) {
-      return StepTypes.register(type, opts)
-    },
-    updateCurrentStepMeta (newMeta) {
-      return Editor.updateCurrentStepMeta(newMeta)
-    },
-    renderStepEdit () {
-      return Editor.renderStepEdit()
-    },
-    getCurrentStep () {
-      return Editor.getCurrentStep()
-    },
-    getCurrentStepMeta () {
-      return Editor.getCurrentStep().meta
-    },
-    getProceedingSteps (stepId) {
-      const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep()
-      return Editor.getSteps().filter(_step => _step.data.step_order > step.data.step_order).sort((a, b) => a.data.step_order - b.data.step_order)
-    },
-    getPrecedingSteps (stepId) {
-      const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep()
-      return Editor.getSteps().filter(_step => _step.data.step_order < step.data.step_order).sort((a, b) => a.data.step_order - b.data.step_order)
-    }
+  const fieldMappingTable = ({
+    fields = {},
+    fieldMap = {}
+  }) => {
+
+    const mappable = fields.map(({ id, label }, i) => {
+      return `<tr>
+				<td><code>${specialChars(id)}</code></td>
+				<td><code>${specialChars(label)}</code></td>
+				<td>${Elements.mappableFields({
+        dataKey: id,
+        className: 'mappable-field'
+      }, fieldMap && fieldMap.hasOwnProperty(id) ? fieldMap[id] : (Groundhogg.fields.mappable.hasOwnProperty(id) ? Groundhogg.fields.mappable[id] : []))}
+				</td>
+			</tr>`
+    })
+
+    //language=HTML
+    return `
+		<table class="mapping-table">
+			<thead>
+			<tr>
+				<th>Field ID</th>
+				<th>Field Label</th>
+				<th>Map to</th>
+			</tr>
+			</thead>
+			<tbody>${mappable.join('')}</tbody>
+		</table>`
   }
 
-  Groundhogg.funnelEditor.elements = Elements
+  const fieldMappingTableOnMount = (updateStepMeta) => {
+    $('.mappable-field').select2().on('change', function (e) {
+      const { meta } = Editor.getCurrentStep()
+      updateStepMeta({
+        field_map: {
+          ...meta.field_map,
+          [$(this).data('key')]: $(this).val()
+        }
+      })
+    })
+  }
+
+  /**
+   * Form Picker
+   *
+   * @param selector
+   * @param type
+   * @param onReceiveItems
+   * @returns {*|define.amd.jQuery}
+   */
+  const formPicker = (selector, type, onReceiveItems = (i) => {}) => {
+    return apiPicker(
+      selector,
+      `${apiRoutes.funnels}/form-integration`,
+      false,
+      false,
+      getResults = (d) => {
+        onReceiveItems(d.forms)
+        return d.forms.map(form => ({ id: form.id, text: form.name }))
+      },
+      getParams = (q) => ({ ...q, type })
+    )
+  }
+
+  const formsCache = {
+    _cache: {},
+
+    set (type, forms) {
+      this._cache[type] = forms
+    },
+
+    getAll (type) {
+      return this._cache[type]
+    },
+
+    hasType (type) {
+      return typeof this._cache[type] !== 'undefined'
+    },
+
+    get (type, id) {
+      return this.hasType(type) ? this._cache[type].find(f => f.id === id) : false
+    },
+  }
+
+  /**
+   *
+   * @param type
+   * @param opts
+   */
+  const registerFormIntegration = (type, opts) => {
+    StepTypes.register(type, FormIntegration({
+      type,
+      ...opts
+    }))
+  }
+
+  /**
+   * Form all form integration steps
+   *
+   * @param type
+   * @param getForm
+   * @param rest
+   * @returns {*&{onMount(*, *): void, formsCache: {}, edit({meta: *}): string, title()}}
+   * @constructor
+   */
+  const FormIntegration = ({ type, ...rest }) => ({
+    ...rest,
+    defaults: {
+      form_id: 0,
+      field_map: {}
+    },
+    title ({ meta }) {
+
+      const { form_id } = meta
+      const form = formsCache.get(type, form_id)
+
+      if (form) {
+        return `Submits <b>${form.name}</b>`
+      } else {
+        return `Submits <b></b>`
+      }
+    },
+    edit ({ meta }) {
+
+      const { form_id, field_map } = meta
+      const form = formsCache.get(type, form_id)
+
+      //language=HTML
+      return `
+		  <div class="panel">
+			  <div class="row">
+				  <label class="row-label">Select a form...</label>
+				  ${select({
+						  id: 'form-id',
+						  name: 'form_id'
+					  },
+					  formsCache.hasType(type ) ? formsCache.getAll(type).map(form => ({ value: form.id, text: form.name })) : [],
+					  form_id)}
+			  </div>
+			  <div class="row">
+				  <div id="field-mapping">
+					  ${form ? fieldMappingTable({
+						  fields: form.fields,
+						  fieldMap: field_map
+					  }) : ''}
+				  </div>
+			  </div>
+		  </div>`
+    },
+    onMount (step, updateStepMeta) {
+
+      formPicker('#form-id', type, (items) => {
+        formsCache.set(type, items)
+      }).on('change', (e) => {
+        updateStepMeta({
+          form_id: parseInt(e.target.value)
+        }, true)
+      })
+
+      fieldMappingTableOnMount(updateStepMeta)
+
+    },
+  })
 
   fill('beforeStepNotes.form_fill', {
     render ({ ID, meta }) {
@@ -3128,5 +3307,54 @@
 		  </div>`
     }
   })
+
+  Groundhogg.helpers = {
+    objectToProps,
+    specialChars,
+    isString,
+  }
+  Groundhogg.funnelEditor = Editor
+  Groundhogg.funnelEditor.functions = {
+    slot,
+    fill,
+    slotsDemounted,
+    slotsMounted,
+    FormIntegration,
+    registerFormIntegration,
+    getSteps () {
+      return Editor.getSteps()
+    },
+    stepTitle (step) {
+      return StepTypes.getType(step.data.step_type).title(step)
+    },
+    registerStepType (type, opts) {
+      return StepTypes.register(type, opts)
+    },
+    registerStepPack (id, name, svg) {
+      return StepPacks.add(id, name, svg)
+    },
+    updateCurrentStepMeta (newMeta) {
+      return Editor.updateCurrentStepMeta(newMeta)
+    },
+    renderStepEdit () {
+      return Editor.renderStepEdit()
+    },
+    getCurrentStep () {
+      return Editor.getCurrentStep()
+    },
+    getCurrentStepMeta () {
+      return Editor.getCurrentStep().meta
+    },
+    getProceedingSteps (stepId) {
+      const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep()
+      return Editor.getSteps().filter(_step => _step.data.step_order > step.data.step_order).sort((a, b) => a.data.step_order - b.data.step_order)
+    },
+    getPrecedingSteps (stepId) {
+      const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep()
+      return Editor.getSteps().filter(_step => _step.data.step_order < step.data.step_order).sort((a, b) => a.data.step_order - b.data.step_order)
+    }
+  }
+
+  Groundhogg.funnelEditor.elements = Elements
 
 })(GroundhoggFunnel, jQuery)

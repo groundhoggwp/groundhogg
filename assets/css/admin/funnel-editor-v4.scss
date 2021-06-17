@@ -639,35 +639,41 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
     text-transform: uppercase;
   }
 
-  .type-select {
-    display: flex;
-    justify-content: center;
+  .step-add-filters {
+
     padding: 20px;
-  }
+    display: flex;
+    gap: 20px;
 
-  .type-select button {
-    background: #FFFFFF;
-    box-sizing: border-box;
-    box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
-    padding: 8px 12px;
-    cursor: pointer;
-    border: 2px solid #FFFFFF;
-  }
+    .type-select {
+      display: flex;
+      justify-content: center;
 
-  .type-select button:first-child {
-    border-radius: 5px 0 0 5px;
-  }
+      button {
+        background: #FFFFFF;
+        box-sizing: border-box;
+        box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+        padding: 8px 12px;
+        cursor: pointer;
+        border: 2px solid #FFFFFF;
 
-  .type-select button:last-child {
-    border-radius: 0 5px 5px 0;
-  }
+        &:first-child {
+          border-radius: 5px 0 0 5px;
+        }
 
-  .type-select button.actions.active {
-    border: 2px solid $action-green;
-  }
+        &:last-child {
+          border-radius: 0 5px 5px 0;
+        }
 
-  .type-select button.benchmarks.active {
-    border: 2px solid $benchmark-orange;
+        &.actions.active {
+          border: 2px solid $action-green;
+        }
+
+        &.benchmarks.active {
+          border: 2px solid $benchmark-orange;
+        }
+      }
+    }
   }
 
   .step-add .types {
@@ -683,6 +689,17 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
     display: flex;
     align-items: center;
     flex-direction: column;
+    position: relative;
+
+    .pack {
+      svg {
+        position: absolute;
+        right: 10px;
+        top: -10px;
+        height: 20px;
+        width: 20px;
+      }
+    }
   }
 
   .step-flow .add-step .step-icon,

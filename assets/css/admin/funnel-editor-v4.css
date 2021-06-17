@@ -488,12 +488,16 @@
   font-size: 8px;
   text-transform: uppercase;
 }
-#funnel-editor .type-select {
+#funnel-editor .step-add-filters {
+  padding: 20px;
+  display: flex;
+  gap: 20px;
+}
+#funnel-editor .step-add-filters .type-select {
   display: flex;
   justify-content: center;
-  padding: 20px;
 }
-#funnel-editor .type-select button {
+#funnel-editor .step-add-filters .type-select button {
   background: #FFFFFF;
   box-sizing: border-box;
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
@@ -501,16 +505,16 @@
   cursor: pointer;
   border: 2px solid #FFFFFF;
 }
-#funnel-editor .type-select button:first-child {
+#funnel-editor .step-add-filters .type-select button:first-child {
   border-radius: 5px 0 0 5px;
 }
-#funnel-editor .type-select button:last-child {
+#funnel-editor .step-add-filters .type-select button:last-child {
   border-radius: 0 5px 5px 0;
 }
-#funnel-editor .type-select button.actions.active {
+#funnel-editor .step-add-filters .type-select button.actions.active {
   border: 2px solid #9ece38;
 }
-#funnel-editor .type-select button.benchmarks.active {
+#funnel-editor .step-add-filters .type-select button.benchmarks.active {
   border: 2px solid #f58115;
 }
 #funnel-editor .step-add .types {
@@ -525,6 +529,15 @@
   display: flex;
   align-items: center;
   flex-direction: column;
+  position: relative;
+}
+#funnel-editor .step-flow .add-step .pack svg,
+#funnel-editor .step-add .types .add-step .pack svg {
+  position: absolute;
+  right: 10px;
+  top: -10px;
+  height: 20px;
+  width: 20px;
 }
 #funnel-editor .step-flow .add-step .step-icon,
 #funnel-editor .step-add .types .add-step .step-icon {
