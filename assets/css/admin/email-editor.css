@@ -1,3 +1,43 @@
-
+#email-editor {
+  margin-right: 20px;
+  padding-top: 20px;
+}
+#email-editor-header {
+  background: #FFFFFF;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  padding: 20px;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+}
+#email-editor-body {
+  display: flex;
+  gap: 1rem;
+}
+#email-editor-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 61.8%;
+}
+#email-editor-sidebar {
+  background: #FFFFFF;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  padding: 20px;
+  border-radius: 5px;
+  flex: 1;
+}
+#email-editor-content {
+  background: #FFFFFF;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  padding: 20px;
+  border-radius: 5px;
+  flex: 1;
+}
+#email-editor-controls {
+  background: #FFFFFF;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  padding: 20px;
+  border-radius: 5px;
+}
 
 /*# sourceMappingURL=email-editor.css.map */

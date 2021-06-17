@@ -17,3 +17,49 @@ $benchmark-orange-50: rgba(245, 129, 21, 0.50);
 $action-green: rgb(158, 206, 56);
 $action-green-50: rgba(158, 206, 56, 0.5);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+
+$margin: 1rem;
+
+@mixin panel ()
+{
+  background: #FFFFFF;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  padding: 20px;
+  border-radius: 5px;
+}
+
+#email-editor {
+  margin-right: 20px;
+  padding-top: 20px;
+
+  &-header {
+    @include panel();
+    margin-bottom: $margin;
+  }
+
+  &-body {
+    display: flex;
+    gap: $margin;
+  }
+
+  &-main {
+    display: flex;
+    flex-direction: column;
+    gap: $margin;
+    width: 61.8%;
+  }
+
+  &-sidebar {
+    @include panel();
+    flex: 1;
+  }
+
+  &-content {
+    @include panel();
+    flex: 1;
+  }
+
+  &-controls {
+    @include panel();
+  }
+}
