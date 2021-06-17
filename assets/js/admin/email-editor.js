@@ -1,10 +1,20 @@
 (function ($) {
+  const {
+    copyObject,
+    select,
+    input,
+    tinymceElement,
+    specialChars,
+    inputWithReplacementsAndEmojis,
+  } = Groundhogg.element;
+  const { post, get, patch, routes } = Groundhogg.api;
 
-  const { copyObject } = Groundhogg.element
-  const { post, get, patch, routes } = Groundhogg.api
-
-  const EmailEditor = ({ selector, email, onChange = (email) => {}, onCommit = (email) => {} }) => ({
-
+  const EmailEditor = ({
+    selector,
+    email,
+    onChange = (email) => {},
+    onCommit = (email) => {},
+  }) => ({
     selector,
     email: copyObject(email),
     origEmail: copyObject(email),
@@ -17,162 +27,205 @@
     },
 
     components: {
-
-      editor ({ data, meta, ID }) {
-
+      editor() {
+        return `
+          <div id="email-editor-header">
+              ${this.components.header.call(this)}
+          </div>
+          <div id="email-editor-body">
+            <div id="email-editor-main">
+              <div id="email-editor-content">
+                  ${this.components.content.call(this)}
+              </div>
+              <div id="email-editor-controls">
+                  ${this.components.controls.call(this)}
+              </div>
+            </div>
+            <div id="email-editor-sidebar">
+                ${this.components.sidebar.call(this)}
+            </div>
+          </div>
+        `;
       },
 
-      header ({}) {
-
+      header() {
+        return `
+          header
+        `;
       },
 
-      content ({ subject }) {
+      content() {
+        const fromOptions = {};
+        Groundhogg.filters.owners.forEach((owner) => {
+          fromOptions[
+            owner.ID
+          ] = `${owner.data.display_name} (${owner.data.user_email})`;
+        });
 
+        return `
+          <p>
+            <label class="row-label">Send this email from...</label>
+            ${select(
+              {
+                id: "from-user",
+                name: "form_user",
+              },
+              fromOptions,
+              this.email.data.from_user
+            )}
+				  </p>
+				  <p>
+				  <label class="row-label">Replies are sent to...</label>
+				  ${input({
+            id: "reply-to",
+            name: "reply_to",
+            value: this.email.meta.reply_to_override,
+          })}
+          </p>
+          <p>
+          <label>Subject:</label>
+					  ${inputWithReplacementsAndEmojis({
+              name: "subject",
+              placeholder: "Subject line...",
+            })}
+          </p>
+        `;
       },
 
-      sidebar ({}) {
-
+      sidebar() {
+        return `
+          sidebar
+        `;
       },
 
-      controls () {
-
+      controls() {
+        return `
+          controls
+        `;
       },
 
-      inspector () {
-
-      }
-
+      inspector() {},
     },
 
-    autoSaveChanges () {
-
-      this.saveUndoState()
+    autoSaveChanges() {
+      this.saveUndoState();
 
       post(`${routes.v4.emails}/${this.email.ID}/meta`, {
-        edited: this.edited
-      })
-
+        edited: this.edited,
+      });
     },
 
-    commitChanges () {
+    commitChanges() {
       patch(`${routes.v4.emails}/${this.email.ID}`, {
         data: this.edited.data,
-        meta: this.edited.meta
-      }).then(d => {
-        this.loadEmail( d.item )
-        onCommit( this.email )
-      })
+        meta: this.edited.meta,
+      }).then((d) => {
+        this.loadEmail(d.item);
+        onCommit(this.email);
+      });
     },
 
-    updateEmailData (newData) {
-
+    updateEmailData(newData) {
       this.edited.data = {
         ...this.email.edited.data,
-        ...newData
-      }
+        ...newData,
+      };
 
-      this.autoSaveChanges()
+      this.autoSaveChanges();
     },
 
-    updateEmailMeta (newMeta) {
-
+    updateEmailMeta(newMeta) {
       this.edited.meta = {
         ...this.email.edited.meta,
-        ...newMeta
-      }
+        ...newMeta,
+      };
 
-      this.autoSaveChanges()
+      this.autoSaveChanges();
 
-      onChange(this.edited, this.email)
+      onChange(this.edited, this.email);
     },
 
-    render () {
-      return this.components.editor(this.edited)
+    render() {
+      return this.components.editor.call(this);
     },
 
-    mount () {
+    mount() {
+      console.log("Hello World!");
 
-      console.log( 'Hello World!' )
-
-      this.loadEmail(this.email)
-      this.$el.html(this.render())
-      this.onMount()
+      this.loadEmail(this.email);
+      this.$el.html(this.render());
+      this.onMount();
     },
 
-    loadEmail (email) {
+    loadEmail(email) {
+      console.log(email);
 
-      console.log( email )
-
-      this.email = copyObject(email)
+      this.email = copyObject(email);
 
       if (email.meta.edited) {
-        this.edited = copyObject(email.meta.edited)
+        this.edited = copyObject(email.meta.edited);
       } else {
-        this.edited = copyObject(email)
+        this.edited = copyObject(email);
       }
     },
 
-    onMount () {
+    onMount() {
       // Event listeners
     },
 
-    currentState () {
-      const {
-        email,
-      } = this
+    currentState() {
+      const { email } = this;
 
       return {
-        email: copyObject(email)
-      }
+        email: copyObject(email),
+      };
     },
 
     /**
      * Saves the current state of the funnel for an undo slot
      */
-    saveUndoState () {
-      this.undoStates.push(this.currentState())
+    saveUndoState() {
+      this.undoStates.push(this.currentState());
     },
 
     /**
      * Undo the previous change
      */
-    undo () {
-      var lastState = this.undoStates.pop()
+    undo() {
+      var lastState = this.undoStates.pop();
 
       if (!lastState) {
-        return
+        return;
       }
 
-      this.redoStates.push(this.currentState())
+      this.redoStates.push(this.currentState());
 
-      Object.assign(this, lastState)
+      Object.assign(this, lastState);
 
-      this.render()
+      this.render();
     },
 
     /**
      * Redo the previous change
      */
-    redo () {
-      var lastState = this.redoStates.pop()
+    redo() {
+      var lastState = this.redoStates.pop();
 
       if (!lastState) {
-        return
+        return;
       }
 
-      this.undoStates.push(this.currentState())
+      this.undoStates.push(this.currentState());
 
-      Object.assign(this, lastState)
+      Object.assign(this, lastState);
 
-      this.render()
+      this.render();
     },
+  });
 
-  })
-
-  Groundhogg.EmailEditor = EmailEditor
+  Groundhogg.EmailEditor = EmailEditor;
 
   //usage
   // const editor = EmailEditor('#editor', { content: 'HI!' })
   // editor.mount()
-
-})(jQuery)
+})(jQuery);
