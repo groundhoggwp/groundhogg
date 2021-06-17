@@ -13,6 +13,7 @@
     select,
     input,
     textarea,
+    regexp,
     toggle,
     textAreaWithReplacements,
     textAreaWithReplacementsAndEmojis,
@@ -311,7 +312,7 @@
 			</div>`
         //language=HTML
       },
-      stepAddPanel (activeType) {
+      stepAddPanel (activeType, search = '', pack = '') {
         //language=HTML
         return `
 			<div class="step-add">
@@ -325,15 +326,23 @@
 							${'Benchmarks'}
 						</button>
 					</div>
-						${input({
-							id: 'search-steps',
-							name: 'search_steps',
-							type: 'search',
-							placeholder: 'search'
-						})}
+					${input({
+						id: 'search-steps',
+						name: 'search_steps',
+						type: 'search',
+						className: 'search-steps',
+						placeholder: 'Search...',
+						value: search
+					})}
+					${select({
+						id: 'pack-filter',
+						name: 'pack_filter',
+					}, [{ text: 'Filter by pack...', value: '' }, ...Object.values(StepPacks.packs).map(pack => ({
+						value: pack.id,
+						text: pack.name
+					}))], pack)}
 				</div>
-				<div class="types">
-					${Object.values(Editor.stepTypes).filter(step => step.group + 's' === activeType).map(Editor.htmlTemplates.addStepCard).join('')}
+				<div id="types" class="types">
 				</div>
 			</div>`
       },
@@ -981,42 +990,66 @@
 
       self.demountStep()
 
-      $('#control-panel').html(self.htmlTemplates.stepAddPanel(self.activeAddType))
+      $('#control-panel').html(self.htmlTemplates.stepAddPanel(self.activeAddType, self.stepSearch, self.packFilter))
+
       self.renderStepFlow()
 
-      if (self.addingStepOrder) {
-        $('.add-step').on(
-          'click',
-          function () {
-            const $button = $(this)
-            var type = $button.data('type')
-            var group = $button.data('group')
+      const mountSteps = () => {
 
-            var id = Date.now()
+        const sr = regexp(self.stepSearch)
 
-            self.addStep({
-              ID: id,
-              data: {
+        $('#types').html(Object.values(Editor.stepTypes)
+          .filter(step => step.group + 's' === self.activeAddType)
+          .filter(step => step.name.match(sr) || step.pack.match(sr))
+          .filter(step => !self.packFilter || step.pack === self.packFilter)
+          .map(Editor.htmlTemplates.addStepCard).join(''))
+
+        if (self.addingStepOrder) {
+          $('.add-step').on(
+            'click',
+            function () {
+              const $button = $(this)
+              var type = $button.data('type')
+              var group = $button.data('group')
+
+              var id = Date.now()
+
+              self.addStep({
                 ID: id,
-                funnel_id: Editor.funnel.ID,
-                step_title: Editor.stepTypes[type].name,
-                step_type: type,
-                step_group: group,
-                step_order: self.addingStepOrder
-              },
-              meta: StepTypes.getType(type).defaults
-            })
+                data: {
+                  ID: id,
+                  funnel_id: Editor.funnel.ID,
+                  step_title: Editor.stepTypes[type].name,
+                  step_type: type,
+                  step_group: group,
+                  step_order: self.addingStepOrder
+                },
+                meta: StepTypes.getType(type).defaults
+              })
 
-          }
-        )
-      } else {
-        $('.add-step').draggable({
-          connectToSortable: '.step-flow .steps',
-          helper: 'clone',
-          revert: 'invalid',
-          revertDuration: 0,
-        })
+            }
+          )
+        } else {
+          $('.add-step').draggable({
+            connectToSortable: '.step-flow .steps',
+            helper: 'clone',
+            revert: 'invalid',
+            revertDuration: 0,
+          })
+        }
       }
+
+      mountSteps()
+
+      $('#search-steps').on('change input', (e) => {
+        this.stepSearch = e.target.value
+        mountSteps()
+      })
+
+      $('#pack-filter').on('change', (e) => {
+        this.packFilter = e.target.value
+        mountSteps()
+      })
     },
 
     renderEmailEditor () {
@@ -2020,6 +2053,7 @@
      * Step type default fallbacks
      */
     default: {
+      pack: 'core',
       // language=html
       promiseController: null,
       title ({ ID, data, meta }) {
@@ -3249,7 +3283,10 @@
 						  id: 'form-id',
 						  name: 'form_id'
 					  },
-					  formsCache.hasType(type ) ? formsCache.getAll(type).map(form => ({ value: form.id, text: form.name })) : [],
+					  formsCache.hasType(type) ? formsCache.getAll(type).map(form => ({
+						  value: form.id,
+						  text: form.name
+					  })) : [],
 					  form_id)}
 			  </div>
 			  <div class="row">
