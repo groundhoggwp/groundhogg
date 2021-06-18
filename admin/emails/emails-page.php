@@ -84,6 +84,8 @@ class Emails_Page extends Admin_Page {
 
 		switch ( $this->get_current_action() ) {
 			case 'edit':
+				wp_enqueue_editor();
+
 				$email = new Email( get_url_var( 'email' ) );
 				wp_enqueue_style( 'groundhogg-admin-email-editor' );
 				wp_enqueue_script( 'groundhogg-admin-email-editor' );

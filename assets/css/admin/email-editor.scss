@@ -62,4 +62,8 @@ $margin: 1rem;
   &-controls {
     @include panel();
   }
+
+  label {
+    display: block;
+  }
 }

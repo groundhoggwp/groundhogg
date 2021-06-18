@@ -39,5 +39,8 @@
   padding: 20px;
   border-radius: 5px;
 }
+#email-editor label {
+  display: block;
+}
 
 /*# sourceMappingURL=email-editor.css.map */

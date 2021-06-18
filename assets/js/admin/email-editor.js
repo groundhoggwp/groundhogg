@@ -37,9 +37,10 @@
               <div id="email-editor-content">
                   ${this.components.content.call(this)}
               </div>
-              <div id="email-editor-controls">
+              <details open id="email-editor-controls">
+                <Summary>Advanced</Summary>
                   ${this.components.controls.call(this)}
-              </div>
+              </details>
             </div>
             <div id="email-editor-sidebar">
                 ${this.components.sidebar.call(this)}
@@ -50,7 +51,14 @@
 
       header() {
         return `
-          header
+          <p>
+				  <label class="row-label">Title</label>
+				  ${input({
+            id: "title",
+            name: "title",
+            value: this.email.data.title,
+          })}
+          </p>
         `;
       },
 
@@ -87,7 +95,14 @@
 					  ${inputWithReplacementsAndEmojis({
               name: "subject",
               placeholder: "Subject line...",
+              value: this.email.data.subject,
             })}
+          </p>
+          <p>
+          <label>Content:</label>
+          <textarea id="content" name="content">${
+            this.email.data.content || ""
+          }</textarea>
           </p>
         `;
       },
@@ -100,7 +115,7 @@
 
       controls() {
         return `
-          controls
+          <label>Custom headers:</label>
         `;
       },
 
@@ -170,7 +185,28 @@
     },
 
     onMount() {
-      // Event listeners
+      let saveTimer;
+
+      tinymceElement(
+        "content",
+        {
+          tinymce: true,
+          quicktags: true,
+        },
+        (content) => {
+          window.console.log("onchange");
+          // Reset timer.
+          clearTimeout(saveTimer);
+
+          // Only save after a second.
+          saveTimer = setTimeout(function () {
+            window.console.log("save");
+            // updateStepMeta({
+            //   note_text: content
+            // })
+          }, 300);
+        }
+      );
     },
 
     currentState() {
