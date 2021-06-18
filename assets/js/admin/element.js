@@ -416,7 +416,8 @@
 
   const loadingDots = (selector) => {
 
-    const $el = $(selector)
+    const $el = $('<span class="loading-dots"></span>')
+    $(selector).append( $el )
 
     const stop = () => {
       clearInterval(interval)
@@ -767,6 +768,17 @@
     return flattened
   }
 
+  /**
+   * Whether 2 objects are equal
+   *
+   * @param a
+   * @param b
+   * @returns {boolean}
+   */
+  function objectEquals (a, b) {
+    return JSON.stringify(a) === JSON.stringify(b)
+  }
+
   Groundhogg.element = {
     ...Elements,
     specialChars,
@@ -787,7 +799,8 @@
     modal,
     copyObject,
     loadingDots,
-    flattenObject
+    flattenObject,
+    objectEquals
   }
 
 })(jQuery)

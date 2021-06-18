@@ -159,6 +159,10 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
           display: flex;
           flex-direction: column;
           gap: 5px;
+
+          .regular-text{
+            width: auto;
+          }
         }
 
         .actions, .header {

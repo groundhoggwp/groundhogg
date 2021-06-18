@@ -1,31 +1,56 @@
-(function ($, searches) {
+(function ($) {
 
   const { createFilters } = Groundhogg.filters.functions
-  const { searchOptionsWidget, regexp } = Groundhogg.element
+  const { searchOptionsWidget, regexp, specialChars, modal, input, loadingDots, copyObject, objectEquals } = Groundhogg.element
+  const { post, get, patch, routes } = Groundhogg.api
+  const { searches: SearchesStore } = Groundhogg.stores
 
-  const updateUrl = (filters) => {
-    // window.history.pushState({ filters }, document.title, page.url + '?' + $.param({ filters }))
+  SearchesStore.itemsFetched(ContactSearch.searches)
+
+  const loadFilters = (filters) => {
+    window.location.href = ContactSearch.url + '&filters=' + btoa(JSON.stringify(filters))
   }
 
-  const ContactSearch = {
+  const loadSearch = (search) => {
+    window.location.href = ContactSearch.url + '&saved_search=' + search
+  }
+
+  const SearchApp = {
 
     filtersEnabled: false,
     savedSearchEnabled: false,
     filters: [],
     filtersApp: null,
     searchesApp: null,
+    currentSearch: null,
 
     init () {
 
       const handleUpdateFilters = (filters) => {
         this.filters = filters
         getContacts(filters)
+
+        // console.log(this.filters, this.currentSearch.query.filters)
+
+        if (this.currentSearch) {
+          if (objectEquals(this.filters, this.currentSearch.query.filters)) {
+            $('#update-search').prop('disabled', true)
+          } else {
+            $('#update-search').prop('disabled', false)
+          }
+        }
+
       }
 
-      this.filters = Groundhogg.filters.current
-      if (this.filters.length > 0) {
+      this.filters = ContactSearch.filters || []
+      if (this.filters && this.filters.length > 0) {
         this.filtersEnabled = true
         $('.contact-quick-search').hide()
+      } else if (ContactSearch.currentSearch) {
+        this.currentSearch = copyObject(ContactSearch.currentSearch)
+        if (this.currentSearch.query.filters) {
+          this.filters = copyObject(this.currentSearch.query.filters, [])
+        }
       }
 
       this.filtersApp = createFilters('#search-filters', this.filters, handleUpdateFilters)
@@ -37,7 +62,7 @@
 
       this.searchesApp = searchOptionsWidget({
         selector: '#searches-picker',
-        options: searches,
+        options: SearchesStore.getItems(),
         filterOption: (option, search) => {
           return option.name.match(regexp(search))
         },
@@ -45,6 +70,9 @@
         onClose: () => {
           this.savedSearchEnabled = false
           this.mount()
+        },
+        onSelect: (option) => {
+          loadSearch(option.id)
         },
         noOptions: 'No matching searches...'
       })
@@ -63,7 +91,7 @@
 				<div id="search-filters"></div>
 				<div class="search-contacts-wrap">
 					<button id="search-contacts" class="button button-primary">Search</button>
-					<button id="save-search" class="button button-secondary">Save this search</button>
+					${!this.currentSearch ? '<button id="save-search" class="button button-secondary">Save this search</button>' : `<button id="update-search" class="button button-secondary" ${objectEquals(this.filters, this.currentSearch.query.filters) ? 'disabled' : ''}>Update "${this.currentSearch.name}"</button>`}
 				</div>
 			</div>
         `
@@ -71,8 +99,10 @@
 
       //language=HTML
       return `
-		  <button class="enable-filters white" style="padding-right: 10px"><span class="dashicons dashicons-filter"></span> Filter Contacts</button>
-		  ${this.savedSearchEnabled ? `<div id="searches-picker"></div>` : (searches.length ? `<button id="load-saved-search" class="button button-secondary">Load saved search</button>` : '')}`
+		  <button class="enable-filters white" style="padding-right: 10px"><span
+			  class="dashicons dashicons-filter"></span> Filter Contacts
+		  </button>
+		  ${this.savedSearchEnabled ? `<div id="searches-picker"></div>` : (ContactSearch.searches.length ? `<button id="load-saved-search" class="button button-secondary"><span class="dashicons dashicons-search"></span> Load saved search</button>` : '')}`
     },
 
     mount () {
@@ -119,19 +149,119 @@
         enableSavedSearch()
       })
 
-      $('#search-contacts').on('click', function () {
-        console.log(self.filters)
-        window.location.href = page.url + '&' + $.param({ filters: self.filters })
+      $('#search-contacts').on('click', () => {
+        if (this.currentSearch && objectEquals(this.filters, this.currentSearch.query.filters)) {
+          loadSearch(this.currentSearch.id)
+        } else {
+          loadFilters(this.filters)
+        }
       })
 
-    }
+      $('#update-search').on('click', (e) => {
 
+        const $button = $(e.target)
+        $button.prop('disabled', true)
+        $button.html('Updating')
+        const { stop } = loadingDots('#update-search')
+
+        SearchesStore.patch(this.currentSearch.id, {
+          query: {
+            filters: this.filters
+          }
+        }).then(search => {
+
+          stop()
+          this.currentSearch = search
+          $button.html('Updated!')
+
+          setTimeout(() => {
+            this.mount()
+          }, 1000)
+        })
+      })
+
+      $('span#search-name').on('click', (e) => {
+
+        const $span = $(e.target)
+
+        $span.html(input({
+          name: 'search_name',
+          id: 'saved-search-name-edit',
+          value: this.currentSearch.name
+        }))
+
+        $('#saved-search-name-edit').focus().on('change blur keydown', (e) => {
+
+          if ( e.type === 'keydown' && e.key !== 'Enter' ){
+            return;
+          }
+
+          $span.html( specialChars( e.target.value ) )
+          SearchesStore.patch(this.currentSearch.id, {
+            name: e.target.value
+          }).then( s => this.currentSearch = s ).then( () => $span.html( this.currentSearch.name ) )
+        })
+      })
+
+      $('#save-search').on('click', () => {
+        const {
+          $modal,
+          close
+        } = modal({
+          //language=html
+          content: `
+			  <h2>Name your search...</h2>
+			  <p>${input({
+				  id: 'search-name',
+				  placeholder: 'My saved search...'
+			  })}</p>
+			  <button id="save" disabled class="gh-button primary">Save</button>`
+        })
+
+        $('input#search-name').on('change input', (e) => {
+          this.newSearchName = e.target.value
+          if (!this.newSearchName) {
+            $('#save').prop('disabled', true)
+          } else {
+            $('#save').prop('disabled', false)
+          }
+
+        }).focus()
+
+        $('#save.gh-button').on('click', (e) => {
+
+          if (!this.newSearchName) {
+            return
+          }
+
+          const $button = $(e.target)
+          $button.prop('disabled', true)
+          $button.html('Saving')
+          const { stop } = loadingDots('#save.gh-button')
+
+          SearchesStore.post({
+            name: this.newSearchName,
+            query: {
+              filters: this.filters
+            }
+          }).then(search => {
+
+            stop()
+            $button.html('Saved!')
+
+            this.currentSearch = search
+            this.mount()
+
+            setTimeout(close, 1000)
+          })
+        })
+      })
+    }
   }
 
   let abortHandler
 
   const getContacts = (filters) => {
-    const { post, get, routes } = Groundhogg.api
 
     if (abortHandler) {
       abortHandler.abort()
@@ -151,7 +281,7 @@
   }
 
   $(function () {
-    ContactSearch.init()
+    SearchApp.init()
   })
 
-})(jQuery, SavedSearches)
+})(jQuery)

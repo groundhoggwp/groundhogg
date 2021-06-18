@@ -266,6 +266,9 @@
     }),
     contacts: ObjectStore(Groundhogg.api.routes.v4.contacts),
     emails: ObjectStore(Groundhogg.api.routes.v4.emails),
+    searches: ObjectStore(Groundhogg.api.routes.v4.searches, {
+      primaryKey: 'id'
+    }),
   }
 
   Groundhogg.createStore = (id, route = '', extra = {}) => {

@@ -131,7 +131,7 @@ abstract class Form_Integration extends Benchmark {
 	 * @return array
 	 */
 	public function __get_form_fields( $form_id ) {
-		return array_map_with_keys( $this->get_form_fields( $form_id ), [ $this, '__normalize_field' ] );
+		return array_values( array_map_with_keys( $this->get_form_fields( $form_id ), [ $this, '__normalize_field' ] ) );
 	}
 
 	/**

@@ -47,6 +47,7 @@ class API_V4_HANDLER {
 		$this->event_queue_api = new Event_Queue_Api();
 		$this->submissions_api = new Submissions_Api();
 		$this->files_api       = new Files_Api();
+		$this->searches_api    = new Searches_Api();
 //		$this->settings        = new Settings_Api();
 //		$this->reports         = new Reports_Api();
 //		$this->bulk_job        = new Bulk_Job_Api();

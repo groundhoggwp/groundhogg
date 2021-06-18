@@ -354,7 +354,8 @@ class Scripts {
 						'contacts' => rest_url( Base_Api::NAME_SPACE . '/contacts' ),
 						'emails'   => rest_url( Base_Api::NAME_SPACE . '/emails' ),
 						'funnels'  => rest_url( Base_Api::NAME_SPACE . '/funnels' ),
-						'steps'    => rest_url( Base_Api::NAME_SPACE . '/steps' )
+						'steps'    => rest_url( Base_Api::NAME_SPACE . '/steps' ),
+						'searches' => rest_url( Base_Api::NAME_SPACE . '/searches' )
 					]
 				]
 			],

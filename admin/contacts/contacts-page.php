@@ -22,6 +22,7 @@ use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use function Groundhogg\is_a_contact;
+use function Groundhogg\isset_not_empty;
 use function Groundhogg\kses_wrapper;
 use function Groundhogg\modal_link_url;
 use function Groundhogg\normalize_files;
@@ -152,13 +153,23 @@ class Contacts_Page extends Admin_Page {
 			wp_enqueue_style( 'groundhogg-admin-search-filters' );
 			wp_enqueue_script( 'groundhogg-admin-contact-inline' );
 
+			$current_filters = [];
+			$saved_search    = false;
+
+			if ( $filters = get_url_var( 'filters' ) ) {
+				$current_filters = json_decode( base64_decode( $filters ), true );
+			} else if ( $saved_search = get_url_var( 'saved_search' ) ) {
+				$saved_search = Saved_Searches::instance()->get( $saved_search );
+			}
+
 			// Advanced Search
 			wp_enqueue_script( 'groundhogg-admin-contact-search' );
-
-			wp_localize_script( 'groundhogg-admin-contact-search', 'SavedSearches', Saved_Searches::instance()->get_all() );
-			wp_localize_script( 'groundhogg-admin-contact-search', 'page', [
-				'url'   => admin_page_url( 'gh_contacts' ),
-				'query' => get_request_query()
+			wp_localize_script( 'groundhogg-admin-contact-search', 'ContactSearch', [
+				'url'           => admin_page_url( 'gh_contacts' ),
+				'query'         => get_request_query(),
+				'filters'       => $current_filters,
+				'searches'      => array_values( Saved_Searches::instance()->get_all() ),
+				'currentSearch' => $saved_search
 			] );
 		}
 	}

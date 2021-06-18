@@ -374,6 +374,12 @@ class Contact_Query {
 	 * @since  2.8
 	 */
 	protected function parse_query() {
+
+		if( $this->query_vars['saved_search']){
+			$saved_search = Saved_Searches::instance()->get( $this->query_vars[ 'saved_search' ] );
+			$this->query_vars = wp_parse_args( $saved_search['query'], $this->query_vars );
+		}
+
 		$this->query_vars = wp_parse_args( $this->query_vars, $this->query_var_defaults );
 
 		if ( intval( $this->query_vars['number'] ) < 1 ) {

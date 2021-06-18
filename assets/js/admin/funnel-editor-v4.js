@@ -1041,7 +1041,7 @@
 
       mountSteps()
 
-      $('#search-steps').on('change input', (e) => {
+      $('#search-steps').on('input', (e) => {
         this.stepSearch = e.target.value
         mountSteps()
       })
@@ -3253,7 +3253,7 @@
    * @constructor
    */
   const FormIntegration = ({ type, ...rest }) => ({
-    ...rest,
+    type,
     defaults: {
       form_id: 0,
       field_map: {}
@@ -3312,6 +3312,7 @@
       fieldMappingTableOnMount(updateStepMeta)
 
     },
+    ...rest,
   })
 
   fill('beforeStepNotes.form_fill', {

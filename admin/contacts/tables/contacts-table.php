@@ -100,8 +100,11 @@ class Contacts_Table extends WP_List_Table {
 		$order    = get_url_var( 'order', 'DESC' );
 		$orderby  = get_url_var( 'orderby', 'ID' );
 
-
 		$query = get_request_query();
+
+		if ( $query['filters'] ) {
+			$query['filters'] = json_decode( base64_decode( $query['filters'] ), true );
+		}
 
 		$full_name = split_name( $search );
 
