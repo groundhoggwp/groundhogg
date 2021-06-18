@@ -1,16 +1,16 @@
 (function ($) {
-
   Object.filter = function (obj, predicate) {
-    let result = {}, key
+    let result = {},
+      key;
 
     for (key in obj) {
       if (obj.hasOwnProperty(key) && predicate(key, obj[key])) {
-        result[key] = obj[key]
+        result[key] = obj[key];
       }
     }
 
-    return result
-  }
+    return result;
+  };
 
   /**
    * Make a copy of the object
@@ -19,9 +19,9 @@
    * @param initial
    * @returns {*}
    */
-  function copyObject (object, initial) {
-    initial = initial || {}
-    return $.extend(true, initial, object)
+  function copyObject(object, initial) {
+    initial = initial || {};
+    return $.extend(true, initial, object);
   }
 
   /**
@@ -30,19 +30,20 @@
    * @param text
    * @returns {string|*}
    */
-  function andList (array, text = 'and') {
+  function andList(array, text = "and") {
     if (array.length === 1) {
-      return array[0]
+      return array[0];
     }
-    return `${array.slice(0, -1).join(', ')} ${text} ${array[array.length - 1]}`
+    return `${array.slice(0, -1).join(", ")} ${text} ${
+      array[array.length - 1]
+    }`;
   }
 
-  function orList (array) {
-    return andList(array, 'or')
+  function orList(array) {
+    return andList(array, "or");
   }
 
   const createSlotFillProvider = () => ({
-
     fills: [],
     _slotsMounted: [],
     _slotsDemounted: [],
@@ -54,29 +55,34 @@
      * @param args
      * @returns {string}
      */
-    slot (slotName, ...args) {
+    slot(slotName, ...args) {
       this._slotsMounted.push({
         name: slotName,
-        args: args
-      })
-      return this.fills.filter(fill => fill.slot === slotName).map(fill => fill.render(...args)).join('')
+        args: args,
+      });
+      return this.fills
+        .filter((fill) => fill.slot === slotName)
+        .map((fill) => fill.render(...args))
+        .join("");
     },
 
     /**
      * Call this after any slots have been added to the DOM
      */
-    slotsMounted () {
-      let slot
+    slotsMounted() {
+      let slot;
 
       while (this._slotsMounted.length > 0) {
         // Get the next mounted slot
-        slot = this._slotsMounted.pop()
-        this.fills.filter(fill => fill.slot === slot.name).forEach(fill => {
-          fill.onMount(...slot.args)
-        })
+        slot = this._slotsMounted.pop();
+        this.fills
+          .filter((fill) => fill.slot === slot.name)
+          .forEach((fill) => {
+            fill.onMount(...slot.args);
+          });
 
         // After a slot has been mounted, remember it has been so it can be demounted later
-        this._slotsDemounted.push(slot)
+        this._slotsDemounted.push(slot);
       }
     },
 
@@ -84,15 +90,17 @@
      * Any callbacks to demount a slot
      * Call before any slots are removed from the DOM
      */
-    slotsDemounted () {
-      let slot
+    slotsDemounted() {
+      let slot;
 
       while (this._slotsDemounted.length > 0) {
         // get the next demounted slot
-        slot = this._slotsDemounted.pop()
-        this.fills.filter(fill => fill.slot === slot.name).forEach(fill => {
-          fill.onDemount(...slot.args)
-        })
+        slot = this._slotsDemounted.pop();
+        this.fills
+          .filter((fill) => fill.slot === slot.name)
+          .forEach((fill) => {
+            fill.onDemount(...slot.args);
+          });
       }
     },
 
@@ -102,21 +110,21 @@
      * @param slot
      * @param component
      */
-    fill (slot, component) {
+    fill(slot, component) {
       this.fills.push({
         slot,
         ...{
-          render () {},
-          onMount () {},
-          onDemount () {},
-          ...component
-        }
-      })
-    }
-  })
+          render() {},
+          onMount() {},
+          onDemount() {},
+          ...component,
+        },
+      });
+    },
+  });
 
-  function isString (string) {
-    return typeof string === 'string'
+  function isString(string) {
+    return typeof string === "string";
   }
 
   /**
@@ -127,36 +135,47 @@
    */
   const specialChars = (string) => {
     if (!isString(string)) {
-      return string
+      return string;
     }
 
-    return string.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;').replace(/"/g, '&quot;')
-  }
+    return string
+      .replace(/&/g, "&amp;")
+      .replace(/>/g, "&gt;")
+      .replace(/</g, "&lt;")
+      .replace(/"/g, "&quot;");
+  };
 
-  const kebabize = str => {
-    return str.split('').map((letter, idx) => {
-      return letter.toUpperCase() === letter
-        ? `${idx !== 0 ? '-' : ''}${letter.toLowerCase()}`
-        : letter
-    }).join('')
-  }
+  const kebabize = (str) => {
+    return str
+      .split("")
+      .map((letter, idx) => {
+        return letter.toUpperCase() === letter
+          ? `${idx !== 0 ? "-" : ""}${letter.toLowerCase()}`
+          : letter;
+      })
+      .join("");
+  };
 
   const objectToStyle = (object) => {
-    const props = []
+    const props = [];
 
     for (const prop in object) {
       if (object.hasOwnProperty(prop)) {
-        props.push(`${kebabize(prop)}:${specialChars(object[prop])}`)
+        props.push(`${kebabize(prop)}:${specialChars(object[prop])}`);
       }
     }
 
-    return props.join(';')
-  }
+    return props.join(";");
+  };
 
-  function uuid () { // Public Domain/MIT
-    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
-      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-    )
+  function uuid() {
+    // Public Domain/MIT
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
+      (
+        c ^
+        (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
+      ).toString(16)
+    );
   }
 
   /**
@@ -166,146 +185,183 @@
    * @returns {string}
    */
   const objectToProps = (object) => {
-    const props = []
+    const props = [];
 
     for (const prop in object) {
       if (object.hasOwnProperty(prop)) {
-
         switch (prop) {
-          case 'className':
-            props.push(`class="${specialChars(object[prop])}"`)
-            break
-          case 'style':
-            props.push(`style="${specialChars(objectToStyle(object[prop]))}"`)
-            break
+          case "className":
+            props.push(`class="${specialChars(object[prop])}"`);
+            break;
+          case "style":
+            props.push(`style="${specialChars(objectToStyle(object[prop]))}"`);
+            break;
           default:
-            props.push(`${kebabize(prop)}="${specialChars(object[prop])}"`)
-            break
+            props.push(`${kebabize(prop)}="${specialChars(object[prop])}"`);
+            break;
         }
       }
     }
 
-    return props.join(' ')
-  }
+    return props.join(" ");
+  };
 
   const Elements = {
-    toggle ({ id, name, className, value = '1', onLabel = 'on', offLabel = 'off', checked }) {
+    toggle({
+      id,
+      name,
+      className,
+      value = "1",
+      onLabel = "on",
+      offLabel = "off",
+      checked,
+    }) {
       //language=HTML
       return `
 		  <label class="gh-switch ${className}">
-			  <input id="${id}" name="${name}" value="${value}" type="checkbox" ${checked ? 'checked' : ''}>
+			  <input id="${id}" name="${name}" value="${value}" type="checkbox" ${
+        checked ? "checked" : ""
+      }>
 			  <span class="slider round"></span>
 			  <span class="on">${onLabel}</span>
 			  <span class="off">${offLabel}</span>
-		  </label>`
+		  </label>`;
     },
-    input (props) {
+    input(props) {
       props = {
-        type: 'text',
-        className: 'input regular-text',
-        ...props
-      }
+        type: "text",
+        className: "input regular-text",
+        ...props,
+      };
 
-      return `<input ${objectToProps(props)}/>`
+      return `<input ${objectToProps(props)}/>`;
     },
-    select (props, options, selected) {
-      return `<select ${objectToProps(props)}>${createOptions(options, selected)}</select>`
+    select(props, options, selected) {
+      return `<select ${objectToProps(props)}>${createOptions(
+        options,
+        selected
+      )}</select>`;
     },
     option: function (value, text, selected) {
       //language=HTML
       return `
-		  <option value="${specialChars(value)}" ${selected ? 'selected' : ''}>${text}</option>`
+		  <option value="${specialChars(value)}" ${
+        selected ? "selected" : ""
+      }>${text}</option>`;
     },
-    mappableFields (props, selected) {
-      return Elements.select(props, Groundhogg.fields.mappable, selected)
+    mappableFields(props, selected) {
+      return Elements.select(props, Groundhogg.fields.mappable, selected);
     },
-    textarea (props) {
-      return `<textarea ${objectToProps(Object.filter(props, key => key !== 'value'))}>${specialChars(props.value)}</textarea>`
+    textarea(props) {
+      return `<textarea ${objectToProps(
+        Object.filter(props, (key) => key !== "value")
+      )}>${specialChars(props.value)}</textarea>`;
     },
-    inputWithReplacementsAndEmojis ({
-      type = 'text',
-      name,
-      id,
-      value,
-      className,
-      placeholder = ''
-    }, replacements = true, emojis = true) {
+    inputWithReplacementsAndEmojis(
+      { type = "text", name, id, value, className, placeholder = "" },
+      replacements = true,
+      emojis = true
+    ) {
       const classList = [
-        replacements && 'input-with-replacements',
-        emojis && 'input-with-emojis'
-      ]
+        replacements && "input-with-replacements",
+        emojis && "input-with-emojis",
+      ];
       //language=HTML
       return `
-		  <div class="input-wrap ${classList.filter(c => c).join(' ')}">
-			  <input type="${type}" id="${id}" name="${name}" value="${specialChars(value) || ''}" class="${className}"
+		  <div class="input-wrap ${classList.filter((c) => c).join(" ")}">
+			  <input type="${type}" id="${id}" name="${name}" value="${
+        specialChars(value) || ""
+      }" class="${className}"
 			         placeholder="${specialChars(placeholder)}">
-			  ${emojis ? `<button class="emoji-picker-start" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
-			  </button>` : ''}
-			  ${replacements ? `<button class="replacements-picker-start" title="insert replacement"><span
-				  class="dashicons dashicons-admin-users"></span></button>` : ''}
-		  </div>`
+			  ${
+          emojis
+            ? `<button class="emoji-picker-start" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
+			  </button>`
+            : ""
+        }
+			  ${
+          replacements
+            ? `<button class="replacements-picker-start" title="insert replacement"><span
+				  class="dashicons dashicons-admin-users"></span></button>`
+            : ""
+        }
+		  </div>`;
     },
     inputWithReplacements: function (atts) {
-      return Elements.inputWithReplacementsAndEmojis(atts, true, false)
+      return Elements.inputWithReplacementsAndEmojis(atts, true, false);
     },
     inputWithEmojis: function (atts) {
-      return Elements.inputWithReplacementsAndEmojis(atts, false, true)
+      return Elements.inputWithReplacementsAndEmojis(atts, false, true);
     },
-    textAreaWithReplacementsAndEmojis: function ({
-      name,
-      id,
-      value,
-      className,
-      placeholder = ''
-    }, replacements = true, emojis = true) {
+    textAreaWithReplacementsAndEmojis: function (
+      { name, id, value, className, placeholder = "" },
+      replacements = true,
+      emojis = true
+    ) {
       const classList = [
-        replacements && 'input-with-replacements',
-        emojis && 'input-with-emojis'
-      ]
+        replacements && "input-with-replacements",
+        emojis && "input-with-emojis",
+      ];
       //language=HTML
       return `
-		  <div class="input-wrap ${classList.filter(c => c).join(' ')}" xmlns="http://www.w3.org/1999/html">
+		  <div class="input-wrap ${classList
+        .filter((c) => c)
+        .join(" ")}" xmlns="http://www.w3.org/1999/html">
 			  <textarea id="${id}" name="${name}" class="${className}"
-	              placeholder="${specialChars(placeholder)}">${specialChars(value) || ''}</textarea>
+	              placeholder="${specialChars(placeholder)}">${
+        specialChars(value) || ""
+      }</textarea>
 			  <div class="buttons">
-				  ${replacements ? `<button class="replacements-picker-start" title="insert replacement"><span
-				  class="dashicons dashicons-admin-users"></span></button>` : ''}
-				  ${emojis ? `<button class="emoji-picker-start" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
-			  </button>` : ''}
+				  ${
+            replacements
+              ? `<button class="replacements-picker-start" title="insert replacement"><span
+				  class="dashicons dashicons-admin-users"></span></button>`
+              : ""
+          }
+				  ${
+            emojis
+              ? `<button class="emoji-picker-start" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
+			  </button>`
+              : ""
+          }
 			  </div>
-		  </div>`
+		  </div>`;
     },
     textAreaWithReplacements: function (atts) {
-      return Elements.textAreaWithReplacementsAndEmojis(atts, true, false)
+      return Elements.textAreaWithReplacementsAndEmojis(atts, true, false);
     },
     textAreaWithEmojis: function (atts) {
-      return Elements.textAreaWithReplacementsAndEmojis(atts, false, true)
+      return Elements.textAreaWithReplacementsAndEmojis(atts, false, true);
+    },
+  };
+
+  const tinymceElement = (
+    editor_id,
+    config = {},
+    onChange = (v) => {
+      console.log(v);
     }
-  }
+  ) => {
+    wp.editor.initialize(editor_id, {
+      tinymce: true,
+      quicktags: true,
+      ...config,
+    });
 
-  const tinymceElement = (editor_id, config = {}, onChange = (v) => {
-    console.log(v)
-  }) => {
-    wp.editor.initialize(
-      editor_id,
-      {
-        tinymce: true,
-        quicktags: true,
-        ...config
-      }
-    )
-
-    tinymce.get(editor_id).on('keyup', function (e) {
-      onChange(tinyMCE.activeEditor.getContent({ format: 'raw' }), tinyMCE.activeEditor.getContent({ format: 'raw' }))
-    })
-  }
+    // tinyMCE.get(editor_id).on("keyup", function (e) {
+    //   onChange(
+    //     tinyMCE.activeEditor.getContent({ format: "raw" }),
+    //     tinyMCE.activeEditor.getContent({ format: "raw" })
+    //   );
+    // });
+  };
 
   const loadingModal = () => {
     return modal({
-      content: '<h1>Loading...</h1>',
+      content: "<h1>Loading...</h1>",
       canClose: false,
-    })
-  }
+    });
+  };
 
   /**
    *
@@ -316,13 +372,12 @@
    * @param onClose
    */
   const confirmationModal = ({
-    alert = '',
-    confirmText = 'Confirm',
-    closeText = 'Cancel',
+    alert = "",
+    confirmText = "Confirm",
+    closeText = "Cancel",
     onConfirm = () => {},
     onClose = () => {},
   }) => {
-
     //language=html
     const content = `
 		<button type="button" class="dashicon-button gh-modal-button-close-top gh-modal-button-close">
@@ -334,30 +389,30 @@
 		<div class="gh-modal-confirmation-buttons gh-button-group">
 			<button type="button" class="gh-button danger gh-modal-button-close">${closeText}</button>
 			<button type="button" class="gh-button primary gh-modal-button-confirm">${confirmText}</button>
-		</div>`
+		</div>`;
 
     const { close, $modal } = modal({
       content,
-      onClose
-    })
+      onClose,
+    });
 
     const confirm = () => {
-      onConfirm()
-      close()
-    }
+      onConfirm();
+      close();
+    };
 
     const handleConfirm = () => {
-      confirm()
-    }
+      confirm();
+    };
 
-    $('.gh-modal-button-confirm').on('click', handleConfirm)
+    $(".gh-modal-button-confirm").on("click", handleConfirm);
 
     return {
       close,
       confirm,
-      $modal
-    }
-  }
+      $modal,
+    };
+  };
 
   /**
    * Custom modal appended to the body.
@@ -371,70 +426,68 @@
    *
    * @param (object) options Config options to overwrite defaults.
    */
-  const modal = ({
-    content = '',
-    onClose = () => {},
-    canClose = true
-  }) => {
-
+  const modal = ({ content = "", onClose = () => {}, canClose = true }) => {
     //language=html
     const html = `
 		<div class="gh-modal">
 			<div class="gh-modal-overlay"></div>
 			<div class="gh-modal-dialog">
-				${canClose ? `	<button type="button" class="dashicon-button gh-modal-button-close-top gh-modal-button-close">
+				${
+          canClose
+            ? `	<button type="button" class="dashicon-button gh-modal-button-close-top gh-modal-button-close">
 					<span class="dashicons dashicons-no-alt"></span>
-				</button>` : ''}
+				</button>`
+            : ""
+        }
 				<div class="gh-modal-dialog-content">
 					${content}
 				</div>
 			</div>
-		</div>`
+		</div>`;
 
-    const $modal = $(html)
+    const $modal = $(html);
 
     const close = () => {
-      $modal.remove()
-      onClose()
-    }
+      $modal.remove();
+      onClose();
+    };
 
     const handleClose = () => {
-      close()
-    }
+      close();
+    };
 
-    $('body').append($modal)
+    $("body").append($modal);
 
     if (canClose) {
-      $('.gh-modal-overlay, .gh-modal-button-close').on('click', handleClose)
+      $(".gh-modal-overlay, .gh-modal-button-close").on("click", handleClose);
     }
 
     return {
       $modal,
       close,
-    }
-  }
+    };
+  };
 
   const loadingDots = (selector) => {
-
-    const $el = $('<span class="loading-dots"></span>')
-    $(selector).append( $el )
+    const $el = $('<span class="loading-dots"></span>');
+    $(selector).append($el);
 
     const stop = () => {
-      clearInterval(interval)
-    }
+      clearInterval(interval);
+    };
 
     const interval = setInterval(() => {
       if ($el.html().length >= 3) {
-        $el.html('')
+        $el.html("");
       } else {
-        $el.html($el.html() + '.')
+        $el.html($el.html() + ".");
       }
-    }, 500)
+    }, 500);
 
     return {
-      stop
-    }
-  }
+      stop,
+    };
+  };
 
   /**
    * Create a list of options
@@ -444,34 +497,41 @@
    * @returns {string}
    */
   const createOptions = (options, selected) => {
-
-    const optionsString = []
+    const optionsString = [];
 
     // Options is an array format
     if (Array.isArray(options)) {
-      options.forEach(option => {
-        optionsString.push(Elements.option(
-          option.value, option.text,
-          Array.isArray(selected)
-            ? selected.indexOf(option.value) !== -1
-            : option.value === selected))
-      })
+      options.forEach((option) => {
+        optionsString.push(
+          Elements.option(
+            option.value,
+            option.text,
+            Array.isArray(selected)
+              ? selected.indexOf(option.value) !== -1
+              : option.value === selected
+          )
+        );
+      });
     }
     // Assume object
     else {
       for (const option in options) {
         if (options.hasOwnProperty(option)) {
-          optionsString.push(Elements.option(
-            option, options[option],
-            Array.isArray(selected)
-              ? selected.indexOf(option) !== -1
-              : option === selected))
+          optionsString.push(
+            Elements.option(
+              option,
+              options[option],
+              Array.isArray(selected)
+                ? selected.indexOf(option) !== -1
+                : option === selected
+            )
+          );
         }
       }
     }
 
-    return optionsString.join('')
-  }
+    return optionsString.join("");
+  };
 
   /**
    * Helper for regex
@@ -480,8 +540,8 @@
    * @returns {RegExp}
    */
   const regexp = (str) => {
-    return new RegExp(str, 'i')
-  }
+    return new RegExp(str, "i");
+  };
 
   if (!Element.prototype.matches) {
     Element.prototype.matches =
@@ -492,10 +552,10 @@
       Element.prototype.webkitMatchesSelector ||
       function (s) {
         var matches = (this.document || this.ownerDocument).querySelectorAll(s),
-          i = matches.length
+          i = matches.length;
         while (--i >= 0 && matches.item(i) !== this) {}
-        return i > -1
-      }
+        return i > -1;
+      };
   }
 
   /**
@@ -506,20 +566,20 @@
    * @param {String} selector The class name to check against
    * @return {Boolean}
    */
-  function clickInsideElement (e, selector) {
-    var el = e.srcElement || e.target
+  function clickInsideElement(e, selector) {
+    var el = e.srcElement || e.target;
 
     if (el && el.matches(selector)) {
-      return el
+      return el;
     } else {
-      while (el = el.parentNode) {
-        if (typeof el.matches !== 'undefined' && el.matches(selector)) {
-          return el
+      while ((el = el.parentNode)) {
+        if (typeof el.matches !== "undefined" && el.matches(selector)) {
+          return el;
         }
       }
     }
 
-    return false
+    return false;
   }
 
   const searchOptionsWidget = ({
@@ -531,7 +591,7 @@
     noOptions = `No options...`,
     onSelect = (option) => console.log(option),
     onClose = () => {},
-    onOpen = () => {}
+    onOpen = () => {},
   }) => ({
     selector,
     options,
@@ -541,232 +601,241 @@
     onSelect,
     groups,
 
-    search: '',
+    search: "",
     focusedOptionId: 0,
     previousFocusedOptionId: false,
     focusedOption: false,
-    render () {
+    render() {
       //language=HTML
       return `
 		  <div class="search-options-widget-wrap">
 			  <div class="search-options-widget" tabindex="0">
 				  <div class="header">
 					  ${Elements.input({
-						  name: 'search',
-						  type: 'search',
-						  className: 'search-for-options',
-						  autocomplete: 'off',
-						  placeholder: 'Search...'
-					  })}
+              name: "search",
+              type: "search",
+              className: "search-for-options",
+              autocomplete: "off",
+              placeholder: "Search...",
+            })}
 					  <button class="close">
 						  <span class="dashicons dashicons-no-alt"></span>
 					  </button>
 				  </div>
-				  <div class="search-options ${this.hasGroups() ? 'has-groups' : 'no-groups'}"></div>
+				  <div class="search-options ${
+            this.hasGroups() ? "has-groups" : "no-groups"
+          }"></div>
 			  </div>
-		  </div>`
+		  </div>`;
     },
-    getOptions () {
+    getOptions() {
       return options.filter((option, i) => {
         if (this.search) {
-          return filterOption(option, this.search)
+          return filterOption(option, this.search);
         }
 
-        return true
-      })
+        return true;
+      });
     },
-    hasGroups () {
-      return Object.keys(groups).length > 0
+    hasGroups() {
+      return Object.keys(groups).length > 0;
     },
-    renderSearchOptions () {
+    renderSearchOptions() {
+      const searchOptions = [];
 
-      const searchOptions = []
+      let focusedIndex = 0;
 
-      let focusedIndex = 0
-
-      var self = this
+      var self = this;
 
       const optionDiv = (option, group, id, index) => {
-        return `<div class="option ${index === this.focusedOptionId ? 'focused' : ''}" data-option="${id}" data-group="${group}">${renderOption(option)}</div>`
-      }
+        return `<div class="option ${
+          index === this.focusedOptionId ? "focused" : ""
+        }" data-option="${id}" data-group="${group}">${renderOption(
+          option
+        )}</div>`;
+      };
 
       if (Object.keys(groups).length > 0) {
-
         Object.keys(groups).forEach((group, g) => {
-          const options = []
+          const options = [];
 
-          this.getOptions().filter(option => option.group === group).forEach((option, o) => {
-            options.push(optionDiv(option, group, o, focusedIndex))
-            focusedIndex++
-          })
+          this.getOptions()
+            .filter((option) => option.group === group)
+            .forEach((option, o) => {
+              options.push(optionDiv(option, group, o, focusedIndex));
+              focusedIndex++;
+            });
 
           if (options.length > 0) {
-            searchOptions.push(`<div class="option-group" data-group="${group}">${groups[group]}</div>`, ...options)
+            searchOptions.push(
+              `<div class="option-group" data-group="${group}">${groups[group]}</div>`,
+              ...options
+            );
           }
-
-        })
-
+        });
       } else {
         this.getOptions().forEach((option, o) => {
-          searchOptions.push(optionDiv(option, null, o, focusedIndex))
-          focusedIndex++
-        })
+          searchOptions.push(optionDiv(option, null, o, focusedIndex));
+          focusedIndex++;
+        });
       }
 
-      return searchOptions.length ? searchOptions.join('') : `<div class="no-options">${noOptions}</div>`
+      return searchOptions.length
+        ? searchOptions.join("")
+        : `<div class="no-options">${noOptions}</div>`;
     },
-    selectOption (optionId, groupId) {
+    selectOption(optionId, groupId) {
       if (!this.hasGroups()) {
-        onSelect(this.getOptions()[optionId])
-        onClose()
+        onSelect(this.getOptions()[optionId]);
+        onClose();
       } else {
         Object.keys(groups).forEach((group, g) => {
-          this.getOptions().filter(option => option.group == group).forEach((option, o) => {
-            if (group == groupId && o == optionId) {
-              onSelect(option)
-              onClose()
-              return
-            }
-          })
-        })
+          this.getOptions()
+            .filter((option) => option.group == group)
+            .forEach((option, o) => {
+              if (group == groupId && o == optionId) {
+                onSelect(option);
+                onClose();
+                return;
+              }
+            });
+        });
       }
     },
-    mountOptions () {
+    mountOptions() {
+      var self = this;
+      const $options = $(`${selector} .search-options`);
 
-      var self = this
-      const $options = $(`${selector} .search-options`)
+      $options.html(this.renderSearchOptions());
+      $(`${selector} .option`).on("click", function (e) {
+        const optionId = $(this).data("option");
+        const groupId = $(this).data("group");
 
-      $options.html(this.renderSearchOptions())
-      $(`${selector} .option`).on('click', function (e) {
-        const optionId = $(this).data('option')
-        const groupId = $(this).data('group')
+        self.selectOption(optionId, groupId);
+      });
 
-        self.selectOption(optionId, groupId)
-      })
+      const $focused = $(`${selector} .option.focused`);
 
-      const $focused = $(`${selector} .option.focused`)
-
-      let offset
+      let offset;
 
       // Moving down
       if (this.focusedOptionId > this.previousFocusedOptionId) {
-        offset = $focused.height() * ($focused.index() + 1)
+        offset = $focused.height() * ($focused.index() + 1);
         if (offset > $options.height())
-          $options.scrollTop(offset - $options.height())
+          $options.scrollTop(offset - $options.height());
       }
       // Moving up
       else if (this.focusedOptionId < this.previousFocusedOptionId) {
-        offset = $focused.height() * ($focused.index())
-        if (offset < $options.scrollTop())
-          $options.scrollTop(offset)
+        offset = $focused.height() * $focused.index();
+        if (offset < $options.scrollTop()) $options.scrollTop(offset);
       }
     },
-    mount () {
-      var self = this
+    mount() {
+      var self = this;
 
       const handleClose = () => {
-        onClose()
-      }
+        onClose();
+      };
 
-      $(selector).html(self.render())
-      this.mountOptions()
+      $(selector).html(self.render());
+      this.mountOptions();
 
-      $(`${selector} input.search-for-options`).on('change input', function (e) {
-        self.search = $(this).val()
-        self.focusedOptionId = false
-        self.previousFocusedOptionId = false
-        self.mountOptions()
-      }).focus()
+      $(`${selector} input.search-for-options`)
+        .on("change input", function (e) {
+          self.search = $(this).val();
+          self.focusedOptionId = false;
+          self.previousFocusedOptionId = false;
+          self.mountOptions();
+        })
+        .focus();
 
-      const el = document.querySelector('.search-options-widget')
+      const el = document.querySelector(".search-options-widget");
 
       // if current Y position (relative to window) + height > height of window
-      if ((el.getBoundingClientRect().y + $(el).height()) > window.innerHeight) {
-        el.classList.add('mount-from-bottom')
+      if (el.getBoundingClientRect().y + $(el).height() > window.innerHeight) {
+        el.classList.add("mount-from-bottom");
       }
 
-      $(`${selector} button.close`).on('click', function (e) {
-        handleClose()
-      })
+      $(`${selector} button.close`).on("click", function (e) {
+        handleClose();
+      });
 
       const handleKeyDown = (e) => {
-
-        const { type, key, keyCode } = e
+        const { type, key, keyCode } = e;
 
         switch (key) {
-          case 'Esc':
-          case 'Escape':
-            handleClose()
-            break
-          case 'Down':
-          case 'ArrowDown':
-            e.preventDefault()
+          case "Esc":
+          case "Escape":
+            handleClose();
+            break;
+          case "Down":
+          case "ArrowDown":
+            e.preventDefault();
 
             if (this.focusedOptionId === this.getOptions().length - 1) {
-              return
+              return;
             }
 
-            this.previousFocusedOptionId = this.focusedOptionId
-            this.focusedOptionId++
-            this.mountOptions()
+            this.previousFocusedOptionId = this.focusedOptionId;
+            this.focusedOptionId++;
+            this.mountOptions();
 
-            break
-          case 'Up':
-          case 'ArrowUp':
-            e.preventDefault()
+            break;
+          case "Up":
+          case "ArrowUp":
+            e.preventDefault();
 
             if (this.focusedOptionId === 0) {
-              return
+              return;
             }
 
-            this.previousFocusedOptionId = this.focusedOptionId
-            this.focusedOptionId--
-            this.mountOptions()
+            this.previousFocusedOptionId = this.focusedOptionId;
+            this.focusedOptionId--;
+            this.mountOptions();
 
-            break
-          case 'Enter':
-            e.preventDefault()
+            break;
+          case "Enter":
+            e.preventDefault();
 
-            const $focused = $(`${selector} .option.focused`)
-            this.selectOption($focused.data('option'), $focused.data('group'))
+            const $focused = $(`${selector} .option.focused`);
+            this.selectOption($focused.data("option"), $focused.data("group"));
 
-            break
+            break;
         }
-      }
+      };
 
-      $('.search-options-widget').on('keydown', handleKeyDown)
+      $(".search-options-widget").on("keydown", handleKeyDown);
 
-      onOpen()
-    }
-  })
+      onOpen();
+    },
+  });
 
   /**
    * Global Functions
    */
-  const flattenObject = (obj, parent_key = '') => {
-    if (typeof obj !== 'object') {
-      return {}
+  const flattenObject = (obj, parent_key = "") => {
+    if (typeof obj !== "object") {
+      return {};
     }
 
-    const flattened = {}
+    const flattened = {};
 
-    let key_prefix = parent_key ? parent_key + '.' : ''
+    let key_prefix = parent_key ? parent_key + "." : "";
 
     for (const key in obj) {
       if (obj.hasOwnProperty(key)) {
+        let value = obj[key];
 
-        let value = obj[key]
-
-        if (typeof value !== 'object') {
-          flattened[key_prefix + key] = value
+        if (typeof value !== "object") {
+          flattened[key_prefix + key] = value;
         } else {
-          Object.assign(flattened, flattenObject(value, key_prefix + key))
+          Object.assign(flattened, flattenObject(value, key_prefix + key));
         }
       }
     }
 
-    return flattened
-  }
+    return flattened;
+  };
 
   /**
    * Whether 2 objects are equal
@@ -775,8 +844,8 @@
    * @param b
    * @returns {boolean}
    */
-  function objectEquals (a, b) {
-    return JSON.stringify(a) === JSON.stringify(b)
+  function objectEquals(a, b) {
+    return JSON.stringify(a) === JSON.stringify(b);
   }
 
   Groundhogg.element = {
@@ -800,7 +869,6 @@
     copyObject,
     loadingDots,
     flattenObject,
-    objectEquals
-  }
-
-})(jQuery)
+    objectEquals,
+  };
+})(jQuery);
