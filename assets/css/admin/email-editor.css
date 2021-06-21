@@ -42,5 +42,19 @@
 #email-editor label {
   display: block;
 }
+#email-editor-sidebar-controls {
+  display: flex;
+  gap: 10px;
+}
+#email-editor-sidebar-controls button:first-child {
+  flex-grow: 1;
+}
+#email-editor-sidebar-options {
+  display: flex;
+  gap: 20px;
+}
+#email-editor-sidebar-message_type {
+  flex-grow: 1;
+}
 
 /*# sourceMappingURL=email-editor.css.map */

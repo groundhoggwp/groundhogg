@@ -66,4 +66,25 @@ $margin: 1rem;
   label {
     display: block;
   }
+
+  &-sidebar {
+    &-controls {
+      display: flex;
+      gap: 10px;
+
+      button:first-child {
+        flex-grow: 1;
+      }
+    }
+
+    &-options {
+      display: flex;
+      gap: 20px;
+
+    }
+
+    &-message_type {
+      flex-grow: 1;
+    }
+  }
 }
