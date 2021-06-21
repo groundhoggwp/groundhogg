@@ -73,6 +73,7 @@
       edit (filter) {},
       onMount (filter) {},
       onDemount (filter) {},
+      preload () {},
       defaults: {},
       ...opts
     }
@@ -152,10 +153,11 @@
     async preLoad () {
       const preloadTags = []
       const preloadEmails = []
+      const promises = []
 
       this.filters.forEach(group => {
         group.forEach(filter => {
-          const { tags, email_id, emails } = filter
+          const { type, tags, email_id, emails } = filter
 
           if (tags && !TagsStore.hasItems(tags.map(tag => parseInt(tag)))) {
             preloadTags.push(...tags)
@@ -164,15 +166,22 @@
           } else if (email_id && !EmailsStore.hasItem(parseInt(email_id))) {
             preloadEmails.push(email_id)
           }
+
+          const filterType = Filters.types[type]
+          const promise = filterType.preload(filter)
+
+          if (typeof promise !== 'undefined') {
+            if (Array.isArray(promise)) {
+              promises.push(...promise)
+            } else {
+              promises.push(promise)
+            }
+          }
+
         })
       })
 
-      console.log({
-        preloadTags,
-        preloadEmails
-      })
-
-      if (preloadEmails.length === 0 && preloadTags.length === 0) {
+      if (promises.length === 0 && preloadEmails.length === 0 && preloadTags.length === 0) {
         this.mount()
         return
       }
@@ -181,16 +190,20 @@
 
       const { stop: stopDots } = loadingDots('#search-loading-dots')
 
-      if (preloadEmails.length > 0) {
-        await EmailsStore.fetchItems({
-          include: preloadEmails
-        })
+      if (preloadTags.length > 0) {
+        promises.push(TagsStore.fetchItems({
+          include: preloadTags
+        }))
       }
 
-      if (preloadTags.length > 0) {
-        await TagsStore.fetchItems({
-          include: preloadTags
-        })
+      if (preloadEmails.length > 0) {
+        promises.push(EmailsStore.fetchItems({
+          include: preloadEmails
+        }))
+      }
+
+      if (promises.length > 0) {
+        await Promise.all(promises)
       }
 
       stopDots()
@@ -213,10 +226,10 @@
         return self.filters[group][key]
       }
 
-      const setActiveFilter = (group, filter) => {
+      const setActiveFilter = (group, filter, addingToGroup = false) => {
         self.currentFilter = filter
         self.currentGroup = group
-        self.isAddingFilterToGroup = false
+        self.isAddingFilterToGroup = addingToGroup
 
         reMount()
       }
@@ -359,10 +372,7 @@
 
         if (clickedOnAddFilter) {
 
-          self.isAddingFilterToGroup = parseInt(clickedOnAddFilter.dataset.group)
-          self.currentFilter = false
-          self.currentGroup = false
-          reMount()
+          setActiveFilter(false, false, parseInt(clickedOnAddFilter.dataset.group))
 
         } else if (clickedOnFilterView) {
 
@@ -389,17 +399,12 @@
             commitFilter()
           } else if (clickedOnDeleteFilter) {
             deleteFilter()
-          } else {
-
           }
 
         } else if (clickedOnAddFilterSearch) {
 
         } else {
-          self.currentFilter = false
-          self.currentGroup = false
-
-          reMount()
+          // setActiveFilter(false, false)
         }
 
       })
@@ -411,10 +416,97 @@
     createFilters
   }
 
+  const dateRanges = {
+    '24_hours': 'In the last 24 hours',
+    '7_days': 'In the last 7 days',
+    '30_days': 'In the last 30 days',
+    '60_days': 'In the last 60 days',
+    '90_days': 'In the last 90 days',
+    '365_days': 'In the last 365 days',
+    'before': 'Before',
+    'after': 'After',
+    'between': 'Between',
+  }
+
+  const standardActivityDateFilterOnMount = (filter, updateFilter) => {
+    $('#filter-date-range, #filter-date, #filter-date2').on('change', function (e) {
+      const $el = $(this)
+      updateFilter({
+        [$el.prop('name')]: $el.val()
+      })
+
+      if ($el.prop('name') === 'date_range') {
+
+        const $date = $('#filter-date')
+        const $date2 = $('#filter-date2')
+
+        switch ($el.val()) {
+          case 'between':
+            $date.removeClass('hidden')
+            $date2.removeClass('hidden')
+            break
+          case 'after':
+          case 'before':
+            $date.removeClass('hidden')
+            $date2.addClass('hidden')
+            break
+          default:
+            $date.addClass('hidden')
+            $date2.addClass('hidden')
+            break
+        }
+      }
+    })
+  }
+
+  const standardActivityDateTitle = (before, { date_range, date, date2 }) => {
+
+    switch (date_range) {
+      default:
+        return `${before} ${dateRanges[date_range].toLowerCase()}`
+      case 'between':
+        return `${before} between <b>${date}</b> and <b>${date2}</b>`
+      case 'before':
+        return `${before} before <b>${date}</b>`
+      case 'after':
+        return `${before} after <b>${date}</b>`
+    }
+  }
+
+  const standardActivityDateDefaults = {
+    date_range: '24_hours',
+    date: '',
+    date2: ''
+  }
+
+  const standardActivityDateOptions = ({ date_range = '24_hours', date = '', date2 = '' }) => {
+
+    return ` ${select({
+      id: 'filter-date-range',
+      name: 'date_range'
+    }, dateRanges, date_range)}
+
+		  ${input({
+      type: 'date',
+      value: date,
+      id: 'filter-date',
+      className: `date ${['between', 'after', 'before'].includes(date_range) ? '' : 'hidden'}`,
+      name: 'date'
+    })}
+
+		  ${input({
+      type: 'date',
+      value: date2,
+      name: 'date2',
+      id: 'filter-date2',
+      className: `value ${date_range === 'between' ? '' : 'hidden'}`
+    })}`
+  }
+
 //  REGISTER ALL FILTERS HERE
   const BasicTextFilter = (name) => ({
     name,
-    view ({ compare, value }, filterGroupIndex, filterIndex) {
+    view ({ compare, value }) {
       switch (compare) {
         case 'empty':
         case 'not_empty':
@@ -423,18 +515,14 @@
           return `<b>${name}</b> ${Comparisons[compare].toLowerCase()} <b>${specialChars(value)}</b>`
       }
     },
-    edit ({ compare, value }, filterGroupIndex, filterIndex) {
+    edit ({ compare, value }) {
       // language=html
       return `${select({
 		  id: 'filter-compare',
 		  name: 'compare',
-		  dataGroup: filterIndex,
-		  dataKey: filterIndex,
 	  }, Comparisons, compare)} ${input({
 		  id: 'filter-value',
 		  name: 'value',
-		  dataGroup: filterIndex,
-		  dataKey: filterIndex,
 		  value
 	  })}`
     },
@@ -470,62 +558,74 @@
     ...BasicTextFilter('Email Address')
   })
 
+  const phoneTypes = {
+    primary: 'Primary Phone',
+    mobile: 'Mobile Phone',
+    company: 'Company Phone'
+  }
+
+  registerFilter('phone', 'contact', {
+    name: 'Phone Number',
+    view ({ phone_type = 'primary', compare, value }) {
+      switch (compare) {
+        case 'empty':
+        case 'not_empty':
+          return `<b>${phoneTypes[phone_type]}</b> ${Comparisons[compare].toLowerCase()}`
+        default:
+          return `<b>${phoneTypes[phone_type]}</b> ${Comparisons[compare].toLowerCase()} <b>${specialChars(value)}</b>`
+      }
+    },
+    edit ({ phone_type, compare, value }) {
+      // language=html
+      return `${select({
+		  id: 'filter-phone-type',
+		  name: 'phone_type',
+	  }, phoneTypes, phone_type)}
+	  ${select({
+		  id: 'filter-compare',
+		  name: 'compare',
+	  }, Comparisons, compare)} ${input({
+		  id: 'filter-value',
+		  name: 'value',
+		  value
+	  })}`
+    },
+    onMount (filter, updateFilter) {
+      // console.log(filter)
+
+      $('#filter-phone-type, #filter-compare, #filter-value').on('change', function (e) {
+        // console.log(e)
+        const $el = $(this)
+        updateFilter({
+          [$el.prop('name')]: $el.val()
+        })
+      })
+    },
+    defaults: {
+      phone_type: 'primary',
+      compare: 'equals',
+      value: ''
+    }
+  })
+
   // registerFilter('primary_phone', 'contact', {}, 'Primary Phone')
   // registerFilter('mobile_phone', 'contact', {}, 'Mobile Phone')
   // registerFilter('birthday', 'contact', {}, 'Birthday')
 
   registerFilter('date_created', 'contact', {
-    view ({ compare, value, value2 }, filterGroupIndex, filterIndex) {
+    view (filter) {
       //language=HTMl
-      switch (compare) {
-        case 'before':
-          return `<b>Date created</b> is before <b>${value}</b>`
-        case 'after':
-          return `<b>Date created</b> is after <b>${value}</b>`
-        case 'between':
-          return `<b>Date created</b> is between <b>${value}</b> and <b>${value2}</b>`
-      }
+      return standardActivityDateTitle('<b>Created</b>', filter)
     },
-    edit ({ compare, value, value2 }, filterGroupIndex, filterIndex) {
+    edit (filter) {
       // language=html
-      return `${select({
-		  id: 'filter-compare',
-		  name: 'compare'
-	  }, {
-		  before: 'Before',
-		  after: 'After',
-		  between: 'Between'
-	  }, compare)} ${input({
-		  type: 'date',
-		  value: value,
-		  id: 'filter-value',
-		  name: 'value'
-	  })} ${input({
-		  type: 'date',
-		  value: value2,
-		  id: 'filter-value2',
-		  className: compare === 'between' ? '' : 'hidden',
-		  name: 'value2'
-	  })}`
+      return standardActivityDateOptions(filter)
     },
     onMount (filter, updateFilter) {
-      $('#filter-compare, #filter-value, #filter-value2').on('change', function (e) {
-        const $el = $(this)
-        const { compare } = updateFilter({
-          [$el.prop('name')]: $el.val()
-        })
-
-        if (compare === 'between') {
-          $('#filter-value2').removeClass('hidden')
-        } else {
-          $('#filter-value2').addClass('hidden')
-        }
-      })
+      standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
-      compare: 'before',
-      value: '',
-      value2: ''
+      ...standardActivityDateDefaults
     }
   }, 'Date Created')
 
@@ -538,7 +638,7 @@
         case 'in':
           return `<b>Optin status</b> is ${orList(value.map(v => `<b>${optin_status[v]}</b>`))}`
         case 'not_in':
-          return `<b>Optin status</b> is not ${orList(value.map(v => `<b>${optin_status[v]}</b>`))}`
+          return `<b>Optin status</b> is not ${andList(value.map(v => `<b>${optin_status[v]}</b>`))}`
       }
     },
     edit ({ compare, value }) {
@@ -658,7 +758,7 @@
     },
     edit ({ tags, compare, compare2 }) {
 
-      tags = tags.map( id => parseInt( id ) )
+      tags = tags.map(id => parseInt(id))
 
       // language=html
       return `
@@ -767,47 +867,13 @@
     }
   }, 'Custom meta')
 
-  const standardActivityDateFilterOnMount = (filter, updateFilter) => {
-    $('#filter-date-range, #filter-date, #filter-date2, #filter-page-url').on('change', function (e) {
-      const $el = $(this)
-      updateFilter({
-        [$el.prop('name')]: $el.val()
-      })
-
-      if ($el.prop('name') === 'date_range') {
-        if ($el.val() === 'custom') {
-          $('#filter-date, #filter-date2').removeClass('hidden')
-        } else {
-          $('#filter-date, #filter-date2').addClass('hidden')
-        }
-      }
-    })
-  }
-
-  const dateRanges = {
-    '24_hours': 'In the last 24 hours',
-    '7_days': 'In the last 7 days',
-    '30_days': 'In the last 30 days',
-    '60_days': 'In the last 60 days',
-    '90_days': 'In the last 90 days',
-    '365_days': 'In the last year',
-    'custom': 'Custom date range',
-  }
-
   //filter by Email Opened
   registerFilter('email_opened', 'activity', {
     view ({ email_id, date_range, date, date2 }) {
 
       const emailName = email_id ? EmailsStore.get(email_id).data.title : 'any email'
 
-      //language=HTMl
-      switch (date_range) {
-        default:
-          return `Opened <b>${emailName}</b> ${dateRanges[date_range].toLowerCase()}`
-        case 'custom':
-          return `Opened <b>${emailName}</b> between <b>${date}</b> and <b>${date2}</b>`
-      }
-
+      return standardActivityDateTitle(`Opened <b>${emailName}</b>`, { date_range, date, date2 })
     },
     edit ({ email_id, date_range, date, date2 }) {
 
@@ -822,25 +888,8 @@
 			  name: 'email_id',
 		  }, pickerOptions, email_id)}
 
-		  ${select({
-			  id: 'filter-date-range',
-			  name: 'date_range'
-		  }, dateRanges, date_range)}
-
-		  ${input({
-			  type: 'date',
-			  value: date,
-			  id: 'filter-date',
-			  className: `date ${date_range === 'custom' ? '' : 'hidden'}`,
-			  name: 'date'
-		  })}
-
-		  ${input({
-			  type: 'date',
-			  value: date2,
-			  name: 'date2',
-			  id: 'filter-date2',
-			  className: `value ${date_range === 'custom' ? '' : 'hidden'}`
+		  ${standardActivityDateOptions({
+			  date_range, date, date2
 		  })}`
     },
     onMount (filter, updateFilter) {
@@ -852,294 +901,168 @@
         })
       })
 
-      $('#filter-date-range, #filter-date, #filter-date2').on('change', function (e) {
-        const $el = $(this)
-        updateFilter({
-          [$el.prop('name')]: $el.val()
-        })
-      })
+      standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
-      date_range: '24_hours',
-      date: '',
-      date2: '',
+      ...standardActivityDateDefaults,
       email_id: 0,
     }
   }, 'Email Opened')
 
-  //filter by Page Visited
-  registerFilter('page_visited', 'activity', {
-    view ({ page_url, date_range, date, date2 }) {
+  //filter by Email Opened
+  registerFilter('email_link_clicked', 'activity', {
+    view ({ email_id, date_range, date, date2 }) {
 
-      //language=HTMl
-      switch (date_range) {
-        default:
-          return `Visited <b>${page_url}</b> ${dateRanges[date_range].toLowerCase()}`
-        case 'custom':
-          return `Visited <b>${page_url}</b> between <b>${date}</b> and <b>${date2}</b>`
-      }
+      const emailName = email_id ? EmailsStore.get(email_id).data.title : 'any email'
 
+      return standardActivityDateTitle(`Clicked a link in <b>${emailName}</b>`, { date_range, date, date2 })
     },
-    edit ({ page_url, date_range, date, date2 }) {
+    edit ({ email_id, date_range, date, date2 }) {
 
-      return `${input({
-        id: 'filter-page-url',
-        name: 'page_url',
-        value: page_url
-      })} 
-      
-      ${select({
-        id: 'filter-date-range',
-        name: 'date_range'
-      }, dateRanges, date_range)} 
-      
-      ${input({
-        type: 'date',
-        value: date,
-        id: 'filter-date',
-        className: `date ${date_range === 'custom' ? '' : 'hidden'}`,
-        name: 'date'
-      })}
+      const pickerOptions = email_id ? {
+        [email_id]: EmailsStore.get(email_id).data.title
+      } : {}
 
-      ${input({
-        type: 'date',
-        value: date2,
-        id: 'filter-date2',
-        className: `value ${date_range === 'custom' ? '' : 'hidden'}`,
-        name: 'date2'
-      })}`
+      // language=html
+      return `
+		  ${select({
+			  id: 'filter-email',
+			  name: 'email_id',
+		  }, pickerOptions, email_id)}
 
+		  ${standardActivityDateOptions({
+			  date_range, date, date2
+		  })}`
     },
     onMount (filter, updateFilter) {
-      linkPicker('#filter-page-url')
+      emailPicker('#filter-email', false, (items) => {
+        EmailsStore.itemsFetched(items)
+      }).on('change', (e) => {
+        updateFilter({
+          email_id: parseInt(e.target.value)
+        })
+      })
+
       standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
-      date_range: '24_hours',
-      date: '',
-      date2: '',
-      page_url: '',
+      ...standardActivityDateDefaults,
+      email_id: 0,
     }
-  }, 'Page Visited')
+  }, 'Email Link Clicked')
+
+  //filter by Page Visited
+  // registerFilter('page_visited', 'activity', {
+  //   view ({ page_url, date_range, date, date2 }) {
+  //     return standardActivityDateTitle(`Visited <b>${page_url}</b>`, { date_range, date, date2 })
+  //   },
+  //   edit ({ page_url, date_range, date, date2 }) {
+  //
+  //     return `${input({
+  //       id: 'filter-page-url',
+  //       name: 'page_url',
+  //       placeholder: 'Start typing...',
+  //       value: page_url
+  //     })}
+  //
+  //     ${standardActivityDateOptions({
+  //       date_range, date, date2
+  //     })}`
+  //
+  //   },
+  //   onMount (filter, updateFilter) {
+  //     linkPicker('#filter-page-url').on('change', (e) => {
+  //       updateFilter({
+  //         page_url: e.target.value
+  //       })
+  //     })
+  //     standardActivityDateFilterOnMount(filter, updateFilter)
+  //   },
+  //   defaults: {
+  //     ...standardActivityDateDefaults,
+  //     page_url: '',
+  //   }
+  // }, 'Page Visited')
 
   //filter by User Logged In
   registerFilter('logged_in', 'activity', {
     view ({ date_range, date, date2 }) {
-      //language=HTMl
-      switch (date_range) {
-        default:
-          return `<b>Logged in</b> ${dateRanges[date_range].toLowerCase()}`
-        case 'custom':
-          return `<b>Logged in</b> between <b>${date}</b> and <b>${date2}</b>`
-      }
+      return standardActivityDateTitle('<b>Logged in</b>', { date_range, date, date2 })
     },
     edit ({ date_range, date, date2 }) {
-
-      return `${select({
-        id: 'filter-date-range',
-        name: 'date_range'
-      }, dateRanges, date_range)} 
-      
-      ${input({
-        type: 'date',
-        value: date,
-        id: 'filter-date',
-        className: `date ${date_range === 'custom' ? '' : 'hidden'}`,
-        name: 'date'
-      })}
-
-      ${input({
-        type: 'date',
-        value: date2,
-        id: 'filter-date2',
-        className: `value ${date_range === 'custom' ? '' : 'hidden'}`,
-        name: 'date2'
-      })}`
+      return standardActivityDateOptions({ date_range, date, date2 })
     },
     onMount (filter, updateFilter) {
       standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
-      date_range: '24_hours',
-      date: '',
-      date2: '',
+      ...standardActivityDateDefaults,
     }
   }, 'Logged In')
 
   //filter by User Not Logged In
   registerFilter('not_logged_in', 'activity', {
     view ({ date_range, date, date2 }) {
-      //language=HTMl
-      switch (date_range) {
-        default:
-          return `<b>Has not logged in</b> ${dateRanges[date_range].toLowerCase()}`
-        case 'custom':
-          return `<b>Has not logged in</b> between <b>${date}</b> and <b>${date2}</b>`
-      }
+      return standardActivityDateTitle('<b>Has not logged in</b>', { date_range, date, date2 })
     },
     edit ({ date_range, date, date2 }) {
-      return `${select({
-        id: 'filter-date-range',
-        name: 'date_range'
-      }, dateRanges, date_range)} 
-      
-      ${input({
-        type: 'date',
-        value: date,
-        id: 'filter-date',
-        className: `date ${date_range === 'custom' ? '' : 'hidden'}`,
-        name: 'date'
-      })}
-
-      ${input({
-        type: 'date',
-        value: date2,
-        id: 'filter-date2',
-        className: `value ${date_range === 'custom' ? '' : 'hidden'}`,
-        name: 'date2'
-      })}`
+      return standardActivityDateOptions({ date_range, date, date2 })
     },
     onMount (filter, updateFilter) {
       standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
-      date_range: '24_hours',
-      date: '',
-      date2: '',
+      ...standardActivityDateDefaults,
     }
   }, 'Has Not Logged In')
 
   //filter by User Was Active
   registerFilter('was_active', 'activity', {
     view ({ date_range, date, date2 }) {
-      //language=HTMl
-      switch (date_range) {
-        default:
-          return `<b>Was active</b> ${dateRanges[date_range]}`
-        case 'custom':
-          return `<b>Was active</b> between <b>${date}</b> and <b>${date2}</b>`
-      }
+      return standardActivityDateTitle('<b>Was active</b>', { date_range, date, date2 })
     },
     edit ({ date_range, date, date2 }) {
-
-      return `${select({
-        id: 'filter-date-range',
-        name: 'date_range'
-      }, dateRanges, date_range)} 
-      
-      ${input({
-        type: 'date',
-        value: date,
-        id: 'filter-date',
-        className: `date ${date_range === 'custom' ? '' : 'hidden'}`,
-        name: 'date'
-      })}
-
-      ${input({
-        type: 'date',
-        value: date2,
-        id: 'filter-date2',
-        className: `value ${date_range === 'custom' ? '' : 'hidden'}`,
-        name: 'date2'
-      })}`
+      return standardActivityDateOptions({ date_range, date, date2 })
     },
     onMount (filter, updateFilter) {
       standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
-      date_range: '24_hours',
-      date: '',
-      date2: '',
+      ...standardActivityDateDefaults,
     }
   }, 'Was Active')
 
   //filter By User Was Not Active
   registerFilter('was_not_active', 'activity', {
     view ({ date_range, date, date2 }) {
-      //language=HTMl
-      switch (date_range) {
-        default:
-          return `<b>Was not active in</b> ${dateRanges[date_range]}`
-        case 'custom':
-          return `<b>Was not active in</b> between <b>${date}</b> and <b>${date2}</b>`
-      }
+      return standardActivityDateTitle('<b>Was not active</b>', { date_range, date, date2 })
     },
     edit ({ date_range, date, date2 }) {
-      // language=html
-      return `${select({
-		  id: 'filter-date-range',
-		  name: 'date_range'
-	  }, dateRanges, date_range)}
-
-	  ${input({
-		  type: 'date',
-		  value: date,
-		  id: 'filter-date',
-		  className: `date ${date_range === 'custom' ? '' : 'hidden'}`,
-		  name: 'date'
-	  })}
-
-	  ${input({
-		  type: 'date',
-		  value: date2,
-		  id: 'filter-date2',
-		  className: `value ${date_range === 'custom' ? '' : 'hidden'}`,
-		  name: 'date2'
-	  })}`
+      return standardActivityDateOptions({ date_range, date, date2 })
     },
     onMount (filter, updateFilter) {
       standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
-      date_range: '24_hours',
-      date: '',
-      date2: '',
+      ...standardActivityDateDefaults,
     }
   }, 'Was Not Active')
 
   //filter by Completed Funnel Action
-  registerFilter('completed_funnel_action', 'activity', {
-    view ({ date_range, date, date2 }) {
-      //language=HTMl
-      switch (date_range) {
-        default:
-          return `<b>Completed funnel action in</b> ${dateRanges[date_range]}`
-        case 'custom':
-          return `<b>Completed funnel action in</b> between <b>${date}</b> and <b>${date2}</b>`
-      }
-    },
-    edit ({ date_range, date, date2 }) {
-
-      return `${select({
-        id: 'filter-date-range',
-        name: 'date_range'
-      }, dateRanges, date_range)} 
-      
-      ${input({
-        type: 'date',
-        value: date,
-        id: 'filter-date',
-        className: `date ${date_range === 'custom' ? '' : 'hidden'}`,
-        name: 'date'
-      })}
-
-      ${input({
-        type: 'date',
-        value: date2,
-        id: 'filter-date2',
-        className: `value ${date_range === 'custom' ? '' : 'hidden'}`,
-        name: 'date2'
-      })}`
-    },
-    onMount (filter, updateFilter) {
-      standardActivityDateFilterOnMount(filter, updateFilter)
-    },
-    defaults: {
-      date_range: '24_hours',
-      date: '',
-      date2: '',
-    }
-  }, 'Completed Funnel Action')
+  // registerFilter('past_funnel_activity', 'activity', {
+  //   view ({ funnel, step, date_range, date, date2 }) {
+  //     return standardActivityDateTitle('<b></b>', { date_range, date, date2 })
+  //   },
+  //   edit ({ date_range, date, date2 }) {
+  //     return standardActivityDateOptions({ date_range, date, date2 })
+  //   },
+  //   onMount (filter, updateFilter) {
+  //     standardActivityDateFilterOnMount(filter, updateFilter)
+  //   },
+  //   defaults: {
+  //     ...standardActivityDateDefaults,
+  //   }
+  // }, 'Completed Funnel Action')
 
   // Other Filters to Add
   // Location (Country,Province)

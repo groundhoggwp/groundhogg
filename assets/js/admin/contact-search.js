@@ -1,7 +1,16 @@
 (function ($) {
 
   const { createFilters } = Groundhogg.filters.functions
-  const { searchOptionsWidget, regexp, specialChars, modal, input, loadingDots, copyObject, objectEquals } = Groundhogg.element
+  const {
+    searchOptionsWidget,
+    regexp,
+    specialChars,
+    modal,
+    input,
+    loadingDots,
+    copyObject,
+    objectEquals
+  } = Groundhogg.element
   const { post, get, patch, routes } = Groundhogg.api
   const { searches: SearchesStore } = Groundhogg.stores
 
@@ -72,6 +81,7 @@
           this.mount()
         },
         onSelect: (option) => {
+          this.loadingSearch = true
           loadSearch(option.id)
         },
         noOptions: 'No matching searches...'
@@ -91,7 +101,9 @@
 				<div id="search-filters"></div>
 				<div class="search-contacts-wrap">
 					<button id="search-contacts" class="button button-primary">Search</button>
-					${!this.currentSearch ? '<button id="save-search" class="button button-secondary">Save this search</button>' : `<button id="update-search" class="button button-secondary" ${objectEquals(this.filters, this.currentSearch.query.filters) ? 'disabled' : ''}>Update "${this.currentSearch.name}"</button>`}
+					${!this.currentSearch
+						? '<button id="save-search" class="button button-secondary">Save this search</button>'
+						: `<button id="update-search" class="button button-secondary" ${objectEquals(this.filters, this.currentSearch.query.filters) ? 'disabled' : ''}>Update "${this.currentSearch.name}"</button>`}
 				</div>
 			</div>
         `
@@ -100,9 +112,14 @@
       //language=HTML
       return `
 		  <button class="enable-filters white" style="padding-right: 10px"><span
-			  class="dashicons dashicons-filter"></span> Filter Contacts
+			  class="dashicons dashicons-filter"></span> ${ this.currentSearch ? 'Edit Filters' : 'Filter Contacts' }
 		  </button>
-		  ${this.savedSearchEnabled ? `<div id="searches-picker"></div>` : (ContactSearch.searches.length ? `<button id="load-saved-search" class="button button-secondary"><span class="dashicons dashicons-search"></span> Load saved search</button>` : '')}`
+		  ${this.savedSearchEnabled
+			  ? `<div id="searches-picker"></div>`
+			  : (ContactSearch.searches.length
+					  ? `<button id="load-saved-search" class="has-dashicon button button-secondary"><span class="dashicons dashicons-search"></span> <span class="text">${this.loadingSearch ? 'Loading search' : 'Load saved search'}</span></button>`
+					  : ''
+			  )}`
     },
 
     mount () {
@@ -149,7 +166,14 @@
         enableSavedSearch()
       })
 
-      $('#search-contacts').on('click', () => {
+      if (this.loadingSearch) {
+        $('#load-saved-search').prop('disabled', true)
+        loadingDots('#load-saved-search span.text')
+      }
+
+      $('#search-contacts').on('click', (e) => {
+        $(e.target).html('Searching').prop('disabled', true)
+        loadingDots('#search-contacts')
         if (this.currentSearch && objectEquals(this.filters, this.currentSearch.query.filters)) {
           loadSearch(this.currentSearch.id)
         } else {
@@ -192,14 +216,19 @@
 
         $('#saved-search-name-edit').focus().on('change blur keydown', (e) => {
 
-          if ( e.type === 'keydown' && e.key !== 'Enter' ){
-            return;
+          if (e.type === 'keydown' && e.key !== 'Enter') {
+            return
           }
 
-          $span.html( specialChars( e.target.value ) )
-          SearchesStore.patch(this.currentSearch.id, {
-            name: e.target.value
-          }).then( s => this.currentSearch = s ).then( () => $span.html( this.currentSearch.name ) )
+          const newName = e.target.value
+
+          $span.html(specialChars(newName))
+
+          if (newName !== this.currentSearch.name) {
+            SearchesStore.patch(this.currentSearch.id, {
+              name: newName
+            }).then(s => this.currentSearch = s).then(() => $span.html(specialChars(this.currentSearch.name)))
+          }
         })
       })
 

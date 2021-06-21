@@ -375,8 +375,8 @@ class Contact_Query {
 	 */
 	protected function parse_query() {
 
-		if( $this->query_vars['saved_search']){
-			$saved_search = Saved_Searches::instance()->get( $this->query_vars[ 'saved_search' ] );
+		if ( isset_not_empty( $this->query_vars, 'saved_search' ) ) {
+			$saved_search     = Saved_Searches::instance()->get( $this->query_vars['saved_search'] );
 			$this->query_vars = wp_parse_args( $saved_search['query'], $this->query_vars );
 		}
 
@@ -1166,7 +1166,7 @@ class Contact_Query {
 			$or_clauses[] = '(' . implode( ' AND ', $and_clauses ) . ')';
 		}
 
-		return implode( " OR ", $or_clauses );
+		return '( ' . implode( " OR ", $or_clauses ) . ' )';
 	}
 
 	/**
@@ -1247,7 +1247,170 @@ class Contact_Query {
 			[ self::class, 'filter_date_created' ]
 		);
 
+		self::register_filter(
+			'tags',
+			[ self::class, 'filter_tags' ]
+		);
+
+		self::register_filter(
+			'optin_status',
+			[ self::class, 'filter_optin_status' ]
+		);
+
 		self::register_filter( 'meta', [ self::class, 'filter_meta' ] );
+	}
+
+	/**
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_optin_status( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'compare' => 'in',
+			'value'   => []
+		] );
+
+		$optin_statuses = array_filter( $filter_vars['value'], function ( $status ) {
+			return Preferences::is_valid( $status );
+		} );
+
+		switch ( $filter_vars['compare'] ) {
+			default:
+			case 'in':
+				return sprintf( "{$query->table_name}.optin_status IN ( %s )", implode( ',', $optin_statuses ) );
+			case 'not_in':
+				return sprintf( "{$query->table_name}.optin_status NOT IN ( %s )", implode( ',', $optin_statuses ) );
+		}
+
+	}
+
+	/**
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_tags( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'compare'  => 'includes',
+			'compare2' => 'any',
+			'tags'     => []
+		] );
+
+		switch ( $filter_vars['compare'] ) {
+			default:
+			case 'includes':
+				switch ( $filter_vars['compare2'] ) {
+					default:
+					case 'any':
+						$tag_query = get_db( 'tag_relationships' )->get_sql( [
+							'select'  => 'contact_id',
+							'where'   => [
+								[ 'tag_id', 'IN', wp_parse_id_list( $filter_vars['tags'] ) ]
+							],
+							'orderby' => false,
+							'order'   => false,
+						] );
+
+						return "{$query->table_name}.ID IN ( $tag_query )";
+
+					case 'all':
+						return '(' . implode( ' AND ', array_map( function ( $tag ) use ( $query ) {
+
+								$tag_query = get_db( 'tag_relationships' )->get_sql( [
+									'select'  => 'contact_id',
+									'where'   => [
+										[ 'tag_id', '=', absint( $tag ) ]
+									],
+									'orderby' => false,
+									'order'   => false,
+								] );
+
+								return "{$query->table_name}.ID IN ( $tag_query )";
+
+							}, $filter_vars['tags'] ) ) . ')';
+				}
+			case 'excludes':
+				switch ( $filter_vars['compare2'] ) {
+					default:
+					case 'any':
+						return '(' . implode( ' OR ', array_map( function ( $tag ) use ( $query ) {
+
+								$tag_query = get_db( 'tag_relationships' )->get_sql( [
+									'select'  => 'contact_id',
+									'where'   => [
+										[ 'tag_id', '=', absint( $tag ) ]
+									],
+									'orderby' => false,
+									'order'   => false,
+								] );
+
+								return "{$query->table_name}.ID NOT IN ( $tag_query )";
+
+							}, $filter_vars['tags'] ) ) . ')';
+
+					case 'all':
+						$tag_query = get_db( 'tag_relationships' )->get_sql( [
+							'select'  => 'contact_id',
+							'where'   => [
+								[ 'tag_id', 'IN', wp_parse_id_list( $filter_vars['tags'] ) ]
+							],
+							'orderby' => false,
+							'order'   => false,
+						] );
+
+						return "{$query->table_name}.ID NOT IN ( $tag_query )";
+				}
+		}
+	}
+
+	public static function standard_activity_filter_clause( $filter_vars, $as_int = false ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'date_range' => '24_hours',
+			'date'       => Ymd_His(),
+			'date2'      => Ymd_His(),
+		] );
+
+		switch ( $filter_vars['date_range'] ) {
+			default:
+			case '24_hours':
+				$clause = $as_int ? sprintf( "> %d", time() - DAY_IN_SECONDS ) : sprintf( "> '%s'", Ymd_His( time() - DAY_IN_SECONDS ) );
+				break;
+			case '7_days':
+				$clause = $as_int ? sprintf( "> %d", time() - ( 7 * DAY_IN_SECONDS ) ) : sprintf( "> '%s'", Ymd_His( time() - ( 7 * DAY_IN_SECONDS ) ) );
+				break;
+			case '30_days':
+				$clause = $as_int ? sprintf( "> %d", time() - ( 30 * DAY_IN_SECONDS ) ) : sprintf( "> '%s'", Ymd_His( time() - ( 30 * DAY_IN_SECONDS ) ) );
+				break;
+			case '60_days':
+				$clause = $as_int ? sprintf( "> %d", time() - ( 60 * DAY_IN_SECONDS ) ) : sprintf( "> '%s'", Ymd_His( time() - ( 60 * DAY_IN_SECONDS ) ) );
+				break;
+			case '90_days':
+				$clause = $as_int ? sprintf( "> %d", time() - ( 90 * DAY_IN_SECONDS ) ) : sprintf( "> '%s'", Ymd_His( time() - ( 90 * DAY_IN_SECONDS ) ) );
+				break;
+			case '365_days':
+				$clause = $as_int ? sprintf( "> %d", time() - YEAR_IN_SECONDS ) : sprintf( "> '%s'", Ymd_His( time() - YEAR_IN_SECONDS ) );
+				break;
+			case 'before':
+				$clause = $as_int ? sprintf( "< %d", $filter_vars['date'] ) : sprintf( "< '%s'", $filter_vars['date'] );
+				break;
+			case 'after':
+				$clause = $as_int ? sprintf( "> %d", $filter_vars['date'] ) : sprintf( "> '%s'", $filter_vars['date'] );
+				break;
+			case 'between':
+				compare_dates( $filter_vars['date'], $filter_vars['date2'] );
+				$clause = $as_int
+					? sprintf( "BETWEEN %d AND %d", $filter_vars['date'], absint( $filter_vars['date2'] ) + DAY_IN_SECONDS - 1 )
+					: sprintf( "BETWEEN '%s 00:00:00' AND '%s 23:59:59'", $filter_vars['date'], $filter_vars['date2'] );
+				break;
+		}
+
+		return $clause;
 	}
 
 	/**
@@ -1258,25 +1421,7 @@ class Contact_Query {
 	 */
 	public static function filter_date_created( $filter_vars, $query ) {
 
-		$filter_vars = wp_parse_args( $filter_vars, [
-			'compare' => 'before',
-			'value'   => Ymd_His(),
-			'value2'  => Ymd_His(),
-		] );
-
-		switch ( $filter_vars['compare'] ) {
-			default:
-			case 'before':
-				$clause = sprintf( "< '%s'", $filter_vars['value'] );
-				break;
-			case 'after':
-				$clause = sprintf( "> '%s'", $filter_vars['value'] );
-				break;
-			case 'between':
-				compare_dates( $filter_vars['value'], $filter_vars['value2'] );
-				$clause = sprintf( "BETWEEN '%s 00:00:00' AND '%s 23:59:59'", $filter_vars['value'], $filter_vars['value2'] );
-				break;
-		}
+		$clause = self::standard_activity_filter_clause( $filter_vars );
 
 		return "{$query->table_name}.date_created $clause";
 	}

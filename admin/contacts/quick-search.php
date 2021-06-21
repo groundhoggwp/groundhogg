@@ -22,6 +22,9 @@ if ( $saved_search = get_url_var( 'saved_search' ) ) :
 	<div class="contact-quick-search">
 		<form method="get">
 			<?php
+
+			html()->hidden_GET_inputs();
+
 			echo html()->input( [
 				'name'        => 's',
 				'placeholder' => __( 'Name or Email', 'groundhogg' ),

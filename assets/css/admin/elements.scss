@@ -53,12 +53,28 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   }
 }
 
-.wp-core-ui select {
-  vertical-align: initial;
+.wp-core-ui {
+
+  select{
+    vertical-align: initial;
+  }
+
+  button{
+
+    &.button {
+      &.has-dashicon{
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+    }
+  }
 }
 
 button {
   cursor: pointer;
+
+
 
   &.dashicon-button {
     border: none;

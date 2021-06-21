@@ -42,6 +42,10 @@
     gap: 10px;
 }
 
+span#search-name{
+    cursor: pointer;
+}
+
 #search-panel button.enable-filters{
     background: #FFFFFF;
     border: 1px solid #8c8f94;
