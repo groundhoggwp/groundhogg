@@ -2,12 +2,23 @@
   margin-right: 20px;
   padding-top: 20px;
 }
+#email-editor input[type=text],
+#email-editor select {
+  width: 100%;
+}
+#email-editor .email-editor-p {
+  line-height: 1.5;
+  margin: 1em 0;
+}
 #email-editor-header {
   background: #FFFFFF;
-  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
-  padding: 20px;
   border-radius: 5px;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
   margin-bottom: 1rem;
+  padding: 20px;
+}
+#email-editor-header input {
+  font-size: 1.618rem;
 }
 #email-editor-body {
   display: flex;
@@ -16,28 +27,30 @@
 #email-editor-main {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
   width: 61.8%;
 }
 #email-editor-sidebar {
   background: #FFFFFF;
-  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
-  padding: 20px;
   border-radius: 5px;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  margin-bottom: 1rem;
+  padding: 20px;
   flex: 1;
 }
 #email-editor-content {
   background: #FFFFFF;
-  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
-  padding: 20px;
   border-radius: 5px;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  margin-bottom: 1rem;
+  padding: 20px;
   flex: 1;
 }
 #email-editor-controls {
   background: #FFFFFF;
-  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
-  padding: 20px;
   border-radius: 5px;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  margin-bottom: 1rem;
+  padding: 20px;
 }
 #email-editor label {
   display: block;
@@ -59,9 +72,10 @@
 }
 #email-editor-advanced {
   background: #FFFFFF;
-  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
-  padding: 20px;
   border-radius: 5px;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  margin-bottom: 1rem;
+  padding: 20px;
 }
 #email-editor-advanced-headers {
   padding-top: 1rem;
@@ -71,8 +85,7 @@
   width: 100%;
 }
 #email-editor-advanced-headers table td {
-  box-shadow: 0 1px 0 0 #0003;
-  padding: 0.618rem 0;
+  padding: 0.382rem 0;
 }
 #email-editor-advanced-headers table td:last-child:hover button {
   opacity: 1;
@@ -92,7 +105,7 @@
 #email-editor-advanced-headers table th:first-child {
   text-align: left;
 }
-#email-editor-advanced-headers table input {
+#email-editor-advanced-headers table input[type=text] {
   width: calc(100% - 1rem);
 }
 #email-editor-advanced-headers table svg {

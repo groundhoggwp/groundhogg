@@ -37,7 +37,7 @@
               <div id="email-editor-content">
                   ${this.components.content.call(this)}
               </div>
-              <details open id="email-editor-advanced">
+              <details id="email-editor-advanced">
                 <Summary>Advanced</Summary>
                   ${this.components.controls.call(this)}
               </details>
@@ -51,35 +51,33 @@
 
       header() {
         return `
-          <p>
-				  <label class="row-label">Title</label>
+				  <label class="">Title:</label>
 				  ${input({
             id: "title",
             name: "title",
             value: this.email.data.title,
           })}
-          </p>
         `;
       },
 
       content() {
         return `
 				  <p>
-				  <label class="row-label">Replies are sent to...</label>
+				  <label class="">Replies are sent to:</label>
 				  ${input({
             id: "reply-to",
             name: "reply_to",
             value: this.email.meta.reply_to_override,
           })}
           </p>
-          <p>
+          <div class="email-editor-p">
             <label>Subject:</label>
 					  ${inputWithReplacementsAndEmojis({
               name: "subject",
               placeholder: "Subject line...",
               value: this.email.data.subject,
             })}
-          </p>
+          </div>
           <p>
             <label>Preview text:</label>
 					  ${input({
@@ -88,12 +86,12 @@
               value: this.email.data.pre_header,
             })}
           </p>
-          <p>
+          <div class="email-editor-p">
           <label>Content:</label>
           <textarea id="content" name="content">${
             this.email.data.content || ""
           }</textarea>
-          </p>
+          </div>
         `;
       },
 
@@ -128,7 +126,7 @@
           </button>
           </div>
           <p>
-            <label class="row-label">Send this email from...</label>
+            <label class="">Send this email from:</label>
             ${select(
               {
                 id: "from-user",
@@ -140,7 +138,7 @@
 				  </p>
 				  <div id="email-editor-sidebar-options">
             <div>
-            <label class="row-label">Alignment:</label>
+            <label class="">Alignment:</label>
               <button class="gh-button secondary">
                 <svg width="13" height="14" viewBox="0 0 13 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M0.777832 13.1662H6.4477M0.777832 9.0427H12.1176M0.777832 0.795624H12.1176M0.777832 4.91916H6.4477" stroke="#102640" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -153,7 +151,7 @@
               </button>
             </div>
           <div id="email-editor-sidebar-message_type">
-            <label class="row-label">Messaging type:</label>
+            <label class="">Messaging type:</label>
             ${select(
               {
                 id: "message-type",

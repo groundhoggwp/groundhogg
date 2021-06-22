@@ -23,18 +23,32 @@ $margin: 1rem;
 @mixin panel ()
 {
   background: #FFFFFF;
-  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
-  padding: 20px;
   border-radius: 5px;
+  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+  margin-bottom: $margin;
+  padding: 20px;
 }
 
 #email-editor {
   margin-right: 20px;
   padding-top: 20px;
 
+  input[type=text],
+  select {
+    width: 100%;
+  }
+
+  .email-editor-p {
+    line-height: 1.5;
+    margin: 1em 0;
+  }
+
   &-header {
     @include panel();
-    margin-bottom: $margin;
+
+    input {
+      font-size: 1.618rem;
+    }
   }
 
   &-body {
@@ -45,7 +59,6 @@ $margin: 1rem;
   &-main {
     display: flex;
     flex-direction: column;
-    gap: $margin;
     width: 61.8%;
   }
 
@@ -99,8 +112,7 @@ $margin: 1rem;
         width: 100%;
 
         td {
-          box-shadow: 0 1px 0 0 #0003;
-          padding: .618rem 0;
+          padding: .382rem 0;
 
           &:last-child {
             &:hover {
@@ -130,7 +142,7 @@ $margin: 1rem;
           }
         }
 
-        input {
+        input[type=text] {
           width: calc(100% - 1rem);
         }
 
