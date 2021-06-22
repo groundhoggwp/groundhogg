@@ -1,0 +1,220 @@
+$primary-blue: rgb(0, 117, 255);
+$primary-blue-60: rgba(0, 117, 255, 0.60);
+$primary-blue-50: rgba(0, 117, 255, 0.50);
+$primary-blue-20: rgba(0, 117, 255, 0.20);
+$primary-blue-7: rgba(0, 117, 255, 0.07);
+$primary-blue-2: rgba(0, 117, 255, 0.02);
+$primary-dark: rgb(16, 38, 64);
+$primary-dark-50: rgba(16, 38, 64, 0.5);
+$primary-dark-30: rgba(16, 38, 64, 0.3);
+$primary-dark-15: rgba(16, 38, 64, 0.15);
+$error-red: rgb(233, 31, 79);
+$error-red-50: rgba(233, 31, 79, 0.5);
+$secondary-purple: rgb(108, 25, 173);
+$alert-yellow: rgb(255, 238, 88);
+$benchmark-orange: rgb(245, 129, 21);
+$benchmark-orange-50: rgba(245, 129, 21, 0.50);
+$action-green: rgb(158, 206, 56);
+$action-green-50: rgba(158, 206, 56, 0.5);
+$box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+
+body {
+  background: $primary-blue-2;
+
+  #wpcontent {
+    padding: 0;
+  }
+}
+
+#app {
+
+  * {
+    box-sizing: border-box;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  }
+
+  .gh-reporting-dashboard {
+
+    position: relative;
+
+    &-header {
+
+      background: #FFFFFF;
+      box-shadow: $box-shadow;
+      position: sticky;
+      top: 32px;
+      z-index: 999;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-right: 20px;
+
+      .gh-logo {
+        padding: 5px 10px;
+        width: 300px;
+      }
+
+      .gh-reporting-nav {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+
+        &-item {
+
+          color: $primary-dark;
+          font-size: 18px;
+          text-decoration: none;
+          padding: 25px 0;
+          transition: none;
+
+          &.active,
+          &:hover {
+            //font-weight: 500;
+            padding-bottom: 22px;
+            color: $primary-blue;
+            border-bottom: 3px solid $primary-blue;
+          }
+
+          &:focus {
+            outline: none;
+            box-shadow: none;
+          }
+
+          &.active {
+            font-weight: 500;
+          }
+
+        }
+
+      }
+
+    }
+
+    &-reports-container {
+
+      padding: 20px;
+
+      .gh-report-column {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+
+        .gh-report-row {
+          display: flex;
+          gap: 20px;
+
+          .gh-report {
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+            &.gh-line-chart-report canvas{
+              min-height: 400px;
+            }
+
+            .gh-report-header {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 20px;
+
+              h2.gh-report-name {
+                margin: 0;
+                font-weight: 700;
+              }
+            }
+
+            .gh-report-details {
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-end;
+
+              .big-number {
+                font-size: 42px;
+                font-weight: 400;
+                line-height: 1;
+              }
+
+              .compare-and-range {
+
+                .gh-report-range {
+                  color: $primary-dark-50;
+                  text-align: right;
+                }
+
+                .gh-report-prev {
+
+                  display: flex;
+                  font-size: 20px;
+                  gap: 10px;
+                  justify-content: flex-end;
+
+                  &.gh-report-prev-green {
+                    color: $action-green;
+                  }
+
+                  &.gh-report-prev-red {
+                    color: $error-red;
+                  }
+
+                  &-arrow {
+                    width: 20px;
+                    height: 20px;
+                  }
+                }
+              }
+            }
+
+            &.gh-table-report{
+              padding: 0 0 12px 0;
+
+              .gh-report-header{
+                padding: 20px 20px 0 20px;
+              }
+
+              table.gh-report-table{
+                border-collapse: collapse;
+                width: 100%;
+
+                td,th{
+                  padding: 8px;
+                  font-size: 16px;
+
+                  &:first-child{
+                    padding-left: 20px;
+                  }
+
+                  &:last-child{
+                    text-align: right;
+                    padding-right: 20px;
+                  }
+
+                  a{
+                    text-decoration: none;
+                  }
+
+                  span.row-count{
+                    margin-right: 10px;
+                  }
+                }
+
+                th{
+                  font-weight: 700;
+                  font-size: 16px;
+                  text-align: left;
+                }
+
+                tr:nth-child(even){
+                  background: $primary-blue-2;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+  }
+}

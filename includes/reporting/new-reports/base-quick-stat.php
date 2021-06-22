@@ -12,7 +12,7 @@ abstract class Base_Quick_Stat extends Base_Report {
 	 * Query the results
 	 *
 	 * @param $start int
-	 * @param $end int
+	 * @param $end   int
 	 *
 	 * @return mixed
 	 */
@@ -75,7 +75,28 @@ abstract class Base_Quick_Stat extends Base_Report {
 				'compare' => _nf( $compare_data )
 			]
 		];
+	}
 
+	public function get_data_3_0() {
+		$current_data = $this->query( $this->start, $this->end );
+		$compare_data = $this->query( $this->compare_start, $this->compare_end );
+
+		$compare_diff = $current_data - $compare_data;
+		$percentage   = percentage( $current_data, $compare_diff, 0 );
+		$arrow        = $this->get_arrow_properties( $current_data, $compare_data );
+
+		return [
+			'total'          => _nf( $current_data ),
+			'arrowDirection' => $arrow['direction'],
+			'arrowColor'     => $arrow['color'],
+			'prev'           => $percentage,
+			'prevRange'      => $this->num_days,
+			'isPercentage'   => false,
+			'data'           => [
+				'current' => _nf( $current_data ),
+				'compare' => _nf( $compare_data )
+			]
+		];
 	}
 
 }

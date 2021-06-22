@@ -21,25 +21,13 @@ class Reports_Api extends Base_Api {
 				'methods'              => WP_REST_Server::READABLE,
 				'callback'             => [ $this, 'read' ],
 				'permissions_callback' => [ $this, 'read_permissions_callback' ],
-//				'args' => [
-//					'start' => [
-//						'validate_callback' => [ $this, 'is_valid_report_date' ],
-//						'sanitize_callback' => [ $this, 'sanitize_report_data' ],
-//						'default' => function (){
-//							return ;
-//						}
-//					]
-//				],
-				'schema'               => [
-
-				]
 			],
 		] );
 
 		register_rest_route( self::NAME_SPACE, '/reports/(?P<id>\w+)', [
 			[
-				'methods'              => WP_REST_Server::READABLE,
-				'callback'             => [ $this, 'read_single' ],
+				'methods'  => WP_REST_Server::READABLE,
+				'callback' => [ $this, 'read_single' ],
 				// 'permissions_callback' => [ $this, 'read_permissions_callback' ],
 			],
 		] );
@@ -70,30 +58,29 @@ class Reports_Api extends Base_Api {
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function read( WP_REST_Request $request ) {
-		$start = strtotime( sanitize_text_field( $request->get_param( 'start' ) ? : date( 'Y-m-d', time() - MONTH_IN_SECONDS ) ) );
-		$end   = strtotime( sanitize_text_field( $request->get_param( 'end' ) ? : date( 'Y-m-d' ) ) ) + ( DAY_IN_SECONDS - 1 );
+		$start = strtotime( sanitize_text_field( $request->get_param( 'start' ) ?: date( 'Y-m-d', time() - MONTH_IN_SECONDS ) ) );
+		$end   = strtotime( sanitize_text_field( $request->get_param( 'end' ) ?: date( 'Y-m-d' ) ) ) + ( DAY_IN_SECONDS - 1 );
 
-		$context = $request->get_param( 'context' );
+		$params  = $request->get_param( 'params' );
 		$reports = map_deep( $request->get_param( 'reports' ), 'sanitize_key' );
 
-		$reporting = new Reports( $start, $end, $context );
+		$reporting = new Reports( $start, $end, $params );
 
 		if ( empty( $reports ) ) {
-			return self::SUCCESS_RESPONSE( [
-				'items' => $reporting->get_all_report_ids()
-			] );
+			return self::ERROR_404( 'error', 'report not found' );
 		}
 
 		$results = [];
 
 		foreach ( $reports as $report_id ) {
-			$results[ $report_id ] = $reporting->get_data( $report_id );
+			$data                  = $reporting->get_data_3_0( $report_id );
+			$results[ $report_id ] = array_merge( [ 'id' => $report_id ], $data );
 		}
 
 		return self::SUCCESS_RESPONSE( [
-			'start' => $start,
-			'end'   => $end,
-			'items' => $results
+			'start'   => $start,
+			'end'     => $end,
+			'reports' => $results
 		] );
 	}
 
@@ -106,8 +93,8 @@ class Reports_Api extends Base_Api {
 	 */
 	public function read_single( WP_REST_Request $request ) {
 
-		$start   = strtotime( sanitize_text_field( $request->get_param( 'start' ) ? : date( 'Y-m-d', time() - MONTH_IN_SECONDS ) ) );
-		$end     = strtotime( sanitize_text_field( $request->get_param( 'end' ) ? : date( 'Y-m-d' ) ) ) + ( DAY_IN_SECONDS - 1 );
+		$start   = strtotime( sanitize_text_field( $request->get_param( 'start' ) ?: date( 'Y-m-d', time() - MONTH_IN_SECONDS ) ) );
+		$end     = strtotime( sanitize_text_field( $request->get_param( 'end' ) ?: date( 'Y-m-d' ) ) ) + ( DAY_IN_SECONDS - 1 );
 		$context = $request->get_param( 'context' );
 
 		$report    = $request->get_param( 'id' );
