@@ -156,6 +156,7 @@ class Funnels_Page extends Admin_Page {
 				$funnel = new Funnel( get_url_var( 'funnel' ) );
 
 				wp_enqueue_editor();
+				wp_enqueue_style( 'groundhogg-admin-email-editor' );
 				wp_enqueue_style( 'groundhogg-admin-funnel-editor' );
 				wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
 				wp_localize_script( 'groundhogg-admin-funnel-editor', 'GroundhoggFunnel', [
