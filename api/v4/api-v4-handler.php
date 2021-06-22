@@ -49,7 +49,7 @@ class API_V4_HANDLER {
 		$this->files_api       = new Files_Api();
 		$this->searches_api    = new Searches_Api();
 //		$this->settings        = new Settings_Api();
-//		$this->reports         = new Reports_Api();
+		$this->reports         = new Reports_Api();
 //		$this->bulk_job        = new Bulk_Job_Api();
 
 //		$this->tracking        = new Tracking_Api();

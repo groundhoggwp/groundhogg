@@ -157,7 +157,13 @@ class Contacts_Page extends Admin_Page {
 			$saved_search    = false;
 
 			if ( $filters = get_url_var( 'filters' ) ) {
-				$current_filters = json_decode( base64_decode( $filters ), true );
+
+				$current_filters = $filters;
+
+				if ( is_string( $filters ) ) {
+					$current_filters = json_decode( base64_decode( $filters ), true );
+				}
+
 			} else if ( $saved_search = get_url_var( 'saved_search' ) ) {
 				$saved_search = Saved_Searches::instance()->get( $saved_search );
 			}

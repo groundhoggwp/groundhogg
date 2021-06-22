@@ -309,6 +309,16 @@ class Scripts {
 			'groundhogg-admin-modal'
 		], GROUNDHOGG_VERSION, true );
 
+		wp_register_script( 'groundhogg-admin-reporting-v3', GROUNDHOGG_ASSETS_URL . 'js/admin/reporting-v3' . $dot_min . '.js', [
+			'jquery',
+			'moment-js',
+			'chart-js',
+			'groundhogg-admin',
+			'groundhogg-admin-element',
+			'groundhogg-admin-functions',
+			'baremetrics-calendar',
+		], GROUNDHOGG_VERSION, true );
+
 		wp_register_script( 'groundhogg-admin-reporting', GROUNDHOGG_ASSETS_URL . 'js/admin/reporting' . $dot_min . '.js', [
 			'jquery',
 			'moment-js',
@@ -355,7 +365,8 @@ class Scripts {
 						'emails'   => rest_url( Base_Api::NAME_SPACE . '/emails' ),
 						'funnels'  => rest_url( Base_Api::NAME_SPACE . '/funnels' ),
 						'steps'    => rest_url( Base_Api::NAME_SPACE . '/steps' ),
-						'searches' => rest_url( Base_Api::NAME_SPACE . '/searches' )
+						'searches' => rest_url( Base_Api::NAME_SPACE . '/searches' ),
+						'reports' => rest_url( Base_Api::NAME_SPACE . '/reports' )
 					]
 				]
 			],
@@ -396,13 +407,16 @@ class Scripts {
 		wp_register_style( 'baremetrics-calendar', GROUNDHOGG_ASSETS_URL . 'lib/calendar/css/calendar.css' );
 
 		wp_register_style( 'groundhogg-admin', GROUNDHOGG_ASSETS_URL . 'css/admin/admin.css', [
-			'select2'
+			'select2',
 		], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-welcome', GROUNDHOGG_ASSETS_URL . 'css/admin/welcome.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-contact-inline', GROUNDHOGG_ASSETS_URL . 'css/admin/contacts.css', [ 'groundhogg-admin-element' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-contact-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/contact-editor.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-element', GROUNDHOGG_ASSETS_URL . 'css/admin/elements.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
-		wp_register_style( 'groundhogg-admin-search-filters', GROUNDHOGG_ASSETS_URL . 'css/admin/search-filters.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
+		wp_register_style( 'groundhogg-admin-search-filters', GROUNDHOGG_ASSETS_URL . 'css/admin/search-filters.css', [
+			'groundhogg-admin',
+			'groundhogg-admin-element'
+		], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-contact-info-cards', GROUNDHOGG_ASSETS_URL . 'css/admin/info-cards.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
 //        wp_register_style('groundhogg-admin-email-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/email-editor.css', [], GROUNDHOGG_VERSION);
 		wp_register_style( 'groundhogg-admin-email-editor-plain', GROUNDHOGG_ASSETS_URL . 'css/admin/email-editor-plain.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
@@ -427,10 +441,18 @@ class Scripts {
 		wp_register_style( 'groundhogg-admin-simple-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/simple-editor.css', [], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-guided-setup', GROUNDHOGG_ASSETS_URL . 'css/admin/setup.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-help', GROUNDHOGG_ASSETS_URL . 'css/admin/help.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
+
 		wp_register_style( 'groundhogg-admin-reporting', GROUNDHOGG_ASSETS_URL . 'css/admin/reporting.css', [
 			'groundhogg-admin',
 			'baremetrics-calendar'
 		], GROUNDHOGG_VERSION );
+
+		wp_register_style( 'groundhogg-admin-reporting-v3', GROUNDHOGG_ASSETS_URL . 'css/admin/reporting-v3.css', [
+			'groundhogg-admin',
+			'groundhogg-admin-element',
+			'baremetrics-calendar'
+		], GROUNDHOGG_VERSION );
+
 		wp_register_style( 'groundhogg-admin-loader', GROUNDHOGG_ASSETS_URL . 'css/admin/loader.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
 
 		wp_register_style( 'groundhogg-form', GROUNDHOGG_ASSETS_URL . 'css/frontend/form.css', [], GROUNDHOGG_VERSION );

@@ -663,19 +663,18 @@
       }
 
       if (preloadTags.length > 0) {
-        await TagsStore.fetchItems({
+        promises.push( TagsStore.fetchItems({
           include: preloadTags
-        })
+        }) )
       }
 
       if (preloadEmails.length > 0) {
-        await EmailsStore.fetchItems({
+        promises.push( EmailsStore.fetchItems({
           include: preloadEmails
-        })
+        }) )
       }
 
       if (promises.length > 0) {
-        console.log(promises)
         await Promise.all(promises)
       }
 
@@ -3229,6 +3228,12 @@
     get (type, id) {
       return this.hasType(type) ? this._cache[type].find(f => f.id === id) : false
     },
+
+    fetch (type) {
+      return apiGet(`${apiRoutes.funnels}/form-integration`, {
+        type,
+      }).then(d => this.set(type, d.forms))
+    }
   }
 
   /**
@@ -3311,6 +3316,11 @@
 
       fieldMappingTableOnMount(updateStepMeta)
 
+    },
+    preload ({ meta }) {
+      if ( meta.form_id ){
+        return formsCache.fetch( type )
+      }
     },
     ...rest,
   })

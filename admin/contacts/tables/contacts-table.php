@@ -102,7 +102,7 @@ class Contacts_Table extends WP_List_Table {
 
 		$query = get_request_query();
 
-		if ( $query['filters'] ) {
+		if ( isset_not_empty( $query, 'filters' ) && is_string( $query['filters'] ) ) {
 			$query['filters'] = json_decode( base64_decode( $query['filters'] ), true );
 		}
 

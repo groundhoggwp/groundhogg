@@ -41,7 +41,7 @@ abstract class Base_Report {
 	 * Reports constructor.
 	 *
 	 * @param $start int unix timestamps
-	 * @param $end int unix timestamps
+	 * @param $end   int unix timestamps
 	 */
 	public function __construct( $start, $end ) {
 
@@ -122,6 +122,10 @@ abstract class Base_Report {
 	 * @return mixed
 	 */
 	abstract public function get_data();
+
+	public function get_data_3_0() {
+		return $this->get_data();
+	}
 
 	/**
 	 * List of contact ids created in this timer period
