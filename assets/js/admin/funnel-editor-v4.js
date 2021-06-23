@@ -1150,7 +1150,23 @@
       //
       // slotsDemounted()
 
-      $("#funnel-editor").html('<div id="email-editor"></div>');
+      $("#funnel-editor").html(`
+        <div id="email-editor-wrapper">
+          <div class="editor-header">
+            <div class="header-stuff">
+              <div class="title-wrap">
+			          <div class="title">Email editor</div>
+              </div>
+              <div class="header-actions">
+                <button class="gh-button secondary">
+                  Back to your funnel
+                </button>
+              </div>
+	          </div>
+          </div>
+          <div id="email-editor"></div>
+        </div>
+      `);
 
       Groundhogg.EmailEditor({
         selector: "#email-editor",
