@@ -266,36 +266,30 @@
   color: #FFFFFF;
   border-radius: 5px;
 }
-#funnel-editor .step-edit,
-#funnel-editor .email-edit {
+#funnel-editor .step-edit {
   box-sizing: border-box;
   display: flex;
   padding: 20px;
   gap: 20px;
 }
-#funnel-editor .step-edit.send_email .loading-iframe,
-#funnel-editor .email-edit.send_email .loading-iframe {
+#funnel-editor .step-edit.send_email .loading-iframe {
   display: flex;
   min-height: 220px;
   background: url(../../images/loading.gif) center center no-repeat;
 }
-#funnel-editor .step-edit.send_email iframe,
-#funnel-editor .email-edit.send_email iframe {
+#funnel-editor .step-edit.send_email iframe {
   width: 100%;
 }
-#funnel-editor .step-edit.send_email #from-line,
-#funnel-editor .email-edit.send_email #from-line {
+#funnel-editor .step-edit.send_email #from-line {
   display: flex;
   align-items: center;
   gap: 10px;
 }
-#funnel-editor .step-edit.send_email #from-line .from-name,
-#funnel-editor .email-edit.send_email #from-line .from-name {
+#funnel-editor .step-edit.send_email #from-line .from-name {
   font-weight: 500;
   font-size: 16px;
 }
-#funnel-editor .step-edit.send_email #from-line img.avatar,
-#funnel-editor .email-edit.send_email #from-line img.avatar {
+#funnel-editor .step-edit.send_email #from-line img.avatar {
   border-radius: 50%;
 }
 #funnel-editor .step-edit .settings {
@@ -304,9 +298,6 @@
 #funnel-editor .step-edit .actions-and-notes {
   width: 250px;
   flex-shrink: 0;
-}
-#funnel-editor .email-edit .panel {
-  width: 100%;
 }
 #funnel-editor #dynamic-step-settings .gh-loader {
   display: block;
