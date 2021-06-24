@@ -175,7 +175,7 @@ class Event_Queue extends Supports_Errors {
 		Limits::start();
 
 		Limits::raise_memory_limit();
-		Limits::raise_time_limit( 10 );
+		Limits::raise_time_limit( MINUTE_IN_SECONDS );
 
 		$this->cleanup_unprocessed_events();
 
