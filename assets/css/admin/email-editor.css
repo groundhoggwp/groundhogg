@@ -30,8 +30,26 @@ body .test-email-address-wrap #initiate-test {
   padding: 5px 20px;
   border-radius: 0;
   display: flex;
+  gap: 20px;
   justify-content: space-between;
   align-items: center;
+}
+#email-editor-header h1 {
+  align-items: center;
+  flex-grow: 1;
+  position: relative;
+}
+#email-editor-header h1 #email_title {
+  flex-grow: 1;
+  font-size: 20px;
+}
+#email-editor-header h1 svg {
+  height: 20px;
+  width: 20px;
+  pointer-events: none;
+  position: absolute;
+  right: 10px;
+  top: 10px;
 }
 #email-editor-body {
   display: flex;
