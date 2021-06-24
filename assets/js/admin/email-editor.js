@@ -153,14 +153,14 @@
 						<label class="">Replies are sent to:</label>
 						${input({
 							id: 'reply-to',
-							name: 'reply_to',
+							name: 'reply_to_override',
 							value: reply_to_override,
 						})}
 					</p>
 					<div id="email-editor-sidebar-options">
 						<div>
 							<label class="">Alignment:</label>
-							<button data-alignment="left"
+							<button id="align-left" data-alignment="left"
 							        class="change-alignment gh-button ${alignment === 'left' ? 'primary' : 'secondary'}">
 								<svg width="13" height="14" viewBox="0 0 13 14" fill="none"
 								     xmlns="http://www.w3.org/2000/svg">
@@ -170,7 +170,7 @@
 										stroke-linejoin="round"/>
 								</svg>
 							</button>
-							<button data-alignment="center"
+							<button id="align-center" data-alignment="center"
 							        class="change-alignment gh-button ${alignment === 'center' ? 'primary' : 'secondary'}">
 								<svg width="14" height="14" viewBox="0 0 14 14" fill="none"
 								     xmlns="http://www.w3.org/2000/svg">
@@ -300,86 +300,108 @@
     onMount () {
       let saveTimer
 
-      tinymceElement(
-        'content',
-        {
-          tinymce: true,
-          quicktags: true,
-        },
-        (content) => {
-          window.console.log('onchange')
-          // Reset timer.
-          clearTimeout(saveTimer)
+      const mainContentMount = () => {
+        tinymceElement(
+          'content',
+          {
+            tinymce: true,
+            quicktags: true,
+          },
+          (content) => {
+            window.console.log('onchange')
+            // Reset timer.
+            clearTimeout(saveTimer)
 
-          // Only save after a second.
-          saveTimer = setTimeout(() => {
-            window.console.log('save')
-            this.updateEmailData({
-              content: content
+            // Only save after a second.
+            saveTimer = setTimeout(() => {
+              window.console.log('save')
+              this.updateEmailData({
+                content: content
+              })
+            }, 300)
+          }
+        )
+
+        $('#subject, #preview-text').on('change input', (e) => {
+          this.updateEmailData({
+            [e.target.name]: e.target.value
+          })
+        })
+
+        const getHeadersArray = () => {
+
+          const { headers = {} } = this.edited.meta
+
+          const rows = []
+
+          Object.keys(headers).forEach(key => {
+            rows.push([key, headers[key]])
+          })
+
+          if (!rows.length) {
+            rows.push(['', ''])
+          }
+
+          return rows
+        }
+
+        const headersEditor = inputRepeaterWidget({
+          selector: '#email-editor-advanced-headers',
+          rows: getHeadersArray(),
+          cellProps: [
+            { placeholder: 'Header...' },
+            { placeholder: 'Value...' },
+          ],
+          cellCallbacks: [
+            input,
+            inputWithReplacements
+          ],
+          onChange: (rows) => {
+
+            const headers = {}
+
+            rows.forEach(([key, value]) => {
+              headers[key] = value
             })
-          }, 300)
-        }
-      )
 
-      const getVal = (e) => {
-        return $(e.target).val()
+            this.updateEmailMeta({
+              headers
+            })
+          }
+        })
+
+        headersEditor.mount()
       }
 
-      $('#from-user').select2().on('change', (e) => {
-        this.updateEmailData({
-          from_user: e.target.value
-        })
-      })
-
-      $('#subject, #preview-text').on('change input', (e) => {
-        this.updateEmailData({
-          [e.target.name]: e.target.value
-        })
-      })
-
-      const getHeadersArray = () => {
-
-        const { headers = {} } = this.edited.meta
-
-        const rows = []
-
-        Object.keys(headers).forEach(key => {
-          rows.push([key, headers[key]])
-        })
-
-        if (!rows.length) {
-          rows.push(['', ''])
-        }
-
-        return rows
+      const mountSidebar = () => {
+        $('#email-editor-sidebar').html(this.components.sidebar.call(this))
+        sidebarMount()
       }
 
-      const headersEditor = inputRepeaterWidget({
-        selector: '#email-editor-advanced-headers',
-        rows: getHeadersArray(),
-        cellProps: [
-          { placeholder: 'Header...' },
-          { placeholder: 'Value...' },
-        ],
-        cellCallbacks: [
-          input,
-          inputWithReplacements
-        ],
-        onChange: (rows) => {
-
-          const headers = {}
-
-          rows.forEach(([key, value]) => {
-            headers[key] = value
+      const sidebarMount = () => {
+        $('#from-user').select2().on('change', (e) => {
+          this.updateEmailData({
+            from_user: e.target.value
           })
+        })
 
+        $('#reply-to, #message-type').on('change', (e) => {
           this.updateEmailMeta({
-            headers
+            [e.target.name]: e.target.value
           })
-        }
-      })
+        })
 
-      headersEditor.mount()
+        $('.change-alignment').on('click', (e) => {
+          this.updateEmailMeta({
+            alignment: e.currentTarget.dataset.alignment
+          })
+          mountSidebar()
+          $('#' + e.currentTarget.id).focus()
+        })
+      }
+
+      mainContentMount()
+      sidebarMount()
     },
 
     currentState () {
