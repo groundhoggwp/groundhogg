@@ -299,6 +299,18 @@ button {
   }
 }
 
+input.ui-autocomplete-input{
+  &.focus-visible{
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
+.ui-autocomplete {
+  z-index: 1000000;
+  //box-shadow: $box-shadow;
+  //border: 1px solid $primary-dark-15;
+}
 
 .input-wrap {
   display: flex;

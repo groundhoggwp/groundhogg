@@ -349,8 +349,9 @@ class Scripts {
 		] );
 
 		wp_localize_script( 'groundhogg-admin', 'Groundhogg', [
-			'locale'       => get_locale(),
-			'api'          => [
+			'locale'          => get_locale(),
+			'user_test_email' => get_user_test_email(),
+			'api'             => [
 				'routes' => [
 					'v3' => [
 						'tags'     => rest_url( 'gh/v3/tags?select2=true' ),
@@ -366,28 +367,28 @@ class Scripts {
 						'funnels'  => rest_url( Base_Api::NAME_SPACE . '/funnels' ),
 						'steps'    => rest_url( Base_Api::NAME_SPACE . '/steps' ),
 						'searches' => rest_url( Base_Api::NAME_SPACE . '/searches' ),
-						'reports' => rest_url( Base_Api::NAME_SPACE . '/reports' )
+						'reports'  => rest_url( Base_Api::NAME_SPACE . '/reports' )
 					]
 				]
 			],
-			'replacements' => [
+			'replacements'    => [
 				'groups' => Plugin::instance()->replacements->replacement_code_groups,
 				'codes'  => Plugin::instance()->replacements->replacement_codes
 			],
-			'fields'       => [
+			'fields'          => [
 				'mappable' => get_mappable_fields()
 			],
-			'filters'      => [
+			'filters'         => [
 				'optin_status' => Preferences::get_preference_names(),
 				'owners'       => get_owners(),
 				'current'      => get_request_var( 'filters', [] ),
 				'meta_keys'    => get_keys(),
 				'pages_lists'  => get_pages_list(),
 			],
-			'managed_page' => [
+			'managed_page'    => [
 				'root' => managed_page_url()
 			],
-			'url'          => [
+			'url'             => [
 				'admin' => admin_url(),
 				'home'  => home_url(),
 			]

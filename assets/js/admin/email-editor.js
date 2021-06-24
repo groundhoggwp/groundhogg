@@ -10,11 +10,13 @@
     inputWithReplacements,
     inputRepeaterWidget,
     textarea,
+    isValidEmail,
     modal,
     loadingDots,
     savingModal,
   } = Groundhogg.element
   const { post, get, patch, routes } = Groundhogg.api
+  const { user_test_email } = Groundhogg
 
   const EmailEditor = ({
     selector,
@@ -396,10 +398,22 @@
           })
         })
 
-        $('#reply-to, #message-type').on('change', (e) => {
+        $('#message-type').on('change', (e) => {
           this.updateEmailMeta({
-            [e.target.name]: e.target.value
+            message_type: e.target.value
           })
+        })
+
+        $('#reply-to').autocomplete({
+          change: (e) => {
+            this.updateEmailMeta({
+              reply_to_override: e.target.value
+            })
+          },
+          source: [
+            '{owner_email}',
+            ...Groundhogg.filters.owners.map(u => u.data.user_email)
+          ]
         })
 
         $('.change-alignment').on('click', (e) => {
@@ -411,6 +425,10 @@
         })
 
         $('#send-test').on('click', (e) => {
+
+          if (!this.testEmailAddress) {
+            this.testEmailAddress = user_test_email
+          }
 
           const modalContent = (isSending = false) => {
             //language=HTML
@@ -434,17 +452,19 @@
             content: modalContent()
           })
 
-          $('#email-address').on('change input', (e) => {
+          $('#email-address').autocomplete({
+            source: Groundhogg.filters.owners.map(u => u.data.user_email)
+          }).on('change input', (e) => {
             this.testEmailAddress = e.target.value
           })
 
           $('#initiate-test').on('click', () => {
-            console.log(this.testEmailAddress)
             setContent(modalContent(true))
             const { stop: stopDots } = loadingDots('#initiate-test')
 
             post(`${routes.v4.emails}/${this.email.ID}/test`, {
-              ...this.edited
+              to: this.testEmailAddress,
+              edited: this.edited
             }).then(r => {
               stopDots()
               closeModal()
