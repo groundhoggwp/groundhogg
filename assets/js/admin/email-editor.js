@@ -12,6 +12,7 @@
     textarea,
     modal,
     loadingDots,
+    savingModal,
   } = Groundhogg.element
   const { post, get, patch, routes } = Groundhogg.api
 
@@ -59,7 +60,7 @@
         return `
 			<h1>${specialChars(this.edited.data.title)}</h1>
 			<div class="actions">
-				<button class="gh-button primary">Update</button>
+				<button id="commit" class="gh-button primary">Update</button>
 			</div>
         `
       },
@@ -246,12 +247,15 @@
         this.abortController.abort()
       }
 
+      const { close } = savingModal()
+
       patch(`${routes.v4.emails}/${this.email.ID}`, {
         data: this.edited.data,
         meta: this.edited.meta,
       }).then((d) => {
         this.loadEmail(d.item)
         onCommit(this.email)
+        close()
       })
     },
 
@@ -303,6 +307,11 @@
       let saveTimer
 
       const mainContentMount = () => {
+
+        $('#commit').on('click', () => {
+          this.commitChanges()
+        })
+
         tinymceElement(
           'content',
           {

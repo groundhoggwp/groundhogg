@@ -328,6 +328,22 @@
     })
   }
 
+  const savingModal = () => {
+
+    let stop = () => {}
+
+    return modal({
+      content: '<h1>Saving</h1>',
+      canClose: false,
+      onOpen: () => {
+        stop = loadingDots('.gh-modal h1').stop
+      },
+      onClose: () => {
+        stop()
+      }
+    })
+  }
+
   /**
    *
    * @param alert
@@ -898,6 +914,7 @@
     searchOptionsWidget,
     tinymceElement,
     loadingModal,
+    savingModal,
     confirmationModal,
     uuid,
     modal,
