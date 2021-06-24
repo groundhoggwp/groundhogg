@@ -59,7 +59,7 @@ class HTML {
 	}
 
 	/**
-	 * @param $inputs
+	 * @param        $inputs
 	 * @param string $prefix
 	 */
 	public function hidden_inputs( $inputs, $prefix = '' ) {
@@ -148,7 +148,7 @@ class HTML {
 	 * @param array $args
 	 * @param array $cols
 	 * @param array $rows
-	 * @param bool $footer
+	 * @param bool  $footer
 	 */
 	public function list_table( $args = [], $cols = [], $rows = [], $footer = true ) {
 		$args = wp_parse_args( $args, [
@@ -298,7 +298,7 @@ class HTML {
 	 * Add a form table row
 	 *
 	 * @param array $args
-	 * @param bool $tr_wrap whether the control should be wrapped in a TR tag
+	 * @param bool  $tr_wrap whether the control should be wrapped in a TR tag
 	 */
 	public function add_form_control( $args = [], $tr_wrap = true ) {
 		$args = wp_parse_args( $args, [
@@ -343,7 +343,7 @@ class HTML {
 	 *
 	 * @param string $content
 	 * @param string $e
-	 * @param array $atts
+	 * @param array  $atts
 	 *
 	 * @return string
 	 */
@@ -359,10 +359,10 @@ class HTML {
 	 * Generate an html element.
 	 *
 	 * @param string $e
-	 * @param array $atts
+	 * @param array  $atts
 	 * @param string $content
-	 * @param bool $self_closing
-	 * @param bool $echo
+	 * @param bool   $self_closing
+	 * @param bool   $echo
 	 *
 	 * @return string
 	 */
@@ -488,8 +488,8 @@ class HTML {
 	 * Output a button
 	 *
 	 * @param string $text
-	 * @param array $args
-	 * @param bool $echo
+	 * @param array  $args
+	 * @param bool   $echo
 	 *
 	 * @return string
 	 */
@@ -511,9 +511,9 @@ class HTML {
 	}
 
 	/**
-	 * @param string $text
-	 * @param array $options
-	 * @param string $type
+	 * @param string   $text
+	 * @param array    $options
+	 * @param string   $type
 	 * @param callable $option_callback
 	 *
 	 * @return string
@@ -540,7 +540,7 @@ class HTML {
 	 * Submit button wrapper
 	 *
 	 * @param array $args
-	 * @param bool $echo
+	 * @param bool  $echo
 	 *
 	 * @return string
 	 */
@@ -707,7 +707,7 @@ class HTML {
 			'options'           => array(),
 			'selected'          => '',
 			'multiple'          => false,
-			'option_none'       => 'Please Select One',
+			'option_none'       => __( 'Please select one', 'groundhogg' ),
 			'option_none_value' => '',
 		) );
 
@@ -799,7 +799,7 @@ class HTML {
 			'options'           => array(),
 			'selected'          => '',
 			'multiple'          => false,
-			'option_none'       => 'Please Select an Owner',
+			'option_none'       => __( 'Please select an owner', 'groundhogg' ),
 			'option_none_value' => 0,
 		) );
 
