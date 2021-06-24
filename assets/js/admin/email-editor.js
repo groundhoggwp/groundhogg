@@ -453,9 +453,10 @@
           })
 
           $('#email-address').autocomplete({
-            source: Groundhogg.filters.owners.map(u => u.data.user_email)
-          }).on('change input', (e) => {
-            this.testEmailAddress = e.target.value
+            source: Groundhogg.filters.owners.map(u => u.data.user_email),
+            change: (e) => {
+              this.testEmailAddress = e.target.value
+            },
           })
 
           $('#initiate-test').on('click', () => {
@@ -467,7 +468,8 @@
               edited: this.edited
             }).then(r => {
               stopDots()
-              closeModal()
+              setContent( `<p>Test sent to <b>${this.testEmailAddress}</b></p>` )
+              setTimeout( closeModal, 2000 )
             })
           })
 
