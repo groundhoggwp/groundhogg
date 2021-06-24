@@ -12,6 +12,24 @@
     return result
   }
 
+  function improveTinyMCE () {
+
+    if (typeof this.flag !== 'undefined') {
+      return
+    }
+
+    $(document).on('tinymce-editor-setup', function (event, editor) {
+      editor.settings.toolbar1 =
+        'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,wp_adv,dfw,groundhoggreplacementbtn,groundhoggemojibtn'
+      editor.settings.toolbar2 =
+        'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help'
+      editor.settings.height = 200
+      editor.on('click', function (ed, e) {
+        $(document).trigger('to_mce')
+      })
+    })
+  }
+
   /**
    * Make a copy of the object
    *
@@ -222,13 +240,8 @@
     textarea (props) {
       return `<textarea ${objectToProps(Object.filter(props, key => key !== 'value'))}>${specialChars(props.value)}</textarea>`
     },
-    inputWithReplacementsAndEmojis ({
-      type = 'text',
-      name,
-      id,
-      value,
-      className,
-      placeholder = ''
+    inputWithReplacementsAndEmojis (inputProps = {
+      type: 'text'
     }, replacements = true, emojis = true) {
       const classList = [
         replacements && 'input-with-replacements',
@@ -237,8 +250,7 @@
       //language=HTML
       return `
 		  <div class="input-wrap ${classList.filter(c => c).join(' ')}">
-			  <input type="${type}" id="${id}" name="${name}" value="${specialChars(value) || ''}" class="${className}"
-			         placeholder="${specialChars(placeholder)}">
+			  ${Elements.input(inputProps)}
 			  ${emojis ? `<button class="emoji-picker-start" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
 			  </button>` : ''}
 			  ${replacements ? `<button class="replacements-picker-start" title="insert replacement"><span
@@ -308,7 +320,7 @@
       content: '<h1>Loading</h1>',
       canClose: false,
       onOpen: () => {
-        stop = loadingDots( '.gh-modal h1' ).stop
+        stop = loadingDots('.gh-modal h1').stop
       },
       onClose: () => {
         stop()
@@ -429,7 +441,7 @@
   const loadingDots = (selector) => {
 
     const $el = $('<span class="loading-dots"></span>')
-    $(selector).append( $el )
+    $(selector).append($el)
 
     const stop = () => {
       clearInterval(interval)
@@ -681,8 +693,8 @@
 
       const el = document.querySelector('.search-options-widget')
 
-      if ( ! el ){
-        return;
+      if (!el) {
+        return
       }
 
       const handleClose = () => {
@@ -756,6 +768,79 @@
     }
   })
 
+  const inputRepeaterWidget = ({
+    selector = '',
+    rows = [],
+    cellProps = [],
+    cellCallbacks = [],
+    onChange = (rows) => {
+      console.log(rows)
+    }
+  }) => ({
+
+    rows,
+
+    mount () {
+      $(selector).html(this.render())
+      this.onMount()
+    },
+
+    onMount () {
+
+      $(`${selector} .remove-row`).on('click', (e) => {
+        const row = parseInt(e.currentTarget.dataset.row)
+        this.rows.splice(row, 1)
+        onChange(this.rows)
+        this.mount()
+      })
+
+      $(`${selector} #add-row`).on('click', (e) => {
+        this.rows.push(Array(cellProps.length).fill(''))
+        onChange( this.rows )
+        this.mount()
+        $(`${selector} #add-row`).focus()
+      })
+
+      $(`${selector} input`).on('change', (e) => {
+        const row = parseInt(e.target.dataset.row)
+        const cell = parseInt(e.target.dataset.cell)
+        console.log({ row, cell })
+        this.rows[row][cell] = e.target.value
+        onChange(this.rows)
+      })
+
+    },
+
+    render () {
+
+      const renderRow = (row, rowIndex) => {
+        //language=HTML
+        return `
+			<div class="gh-input-repeater-row">
+				${row.map((cell, cellIndex) => cellCallbacks[cellIndex]({
+					...cellProps[cellIndex],
+					value: cell,
+					dataRow: rowIndex,
+					dataCell: cellIndex,
+				})).join('')}
+				<button class="dashicon-button remove-row" data-row="${rowIndex}"><span
+					class="dashicons dashicons-no-alt"></span></button>
+			</div>`
+      }
+
+      //language=HTML
+      return `
+		  <div class="gh-input-repeater">
+			  ${this.rows.map((row, i) => renderRow(row, i)).join('')}
+			  <div class="gh-input-repeater-row-add">
+				  <div class="spacer"></div>
+				  <button id="add-row" class="dashicon-button">
+					  <span class="dashicons dashicons-plus-alt2"></span></button>
+			  </div>
+		  </div>`
+    }
+  })
+
   /**
    * Global Functions
    */
@@ -815,7 +900,9 @@
     copyObject,
     loadingDots,
     flattenObject,
-    objectEquals
+    objectEquals,
+    inputRepeaterWidget,
+    improveTinyMCE
   }
 
 })(jQuery)

@@ -3,6 +3,7 @@
 namespace Groundhogg\Reporting\New_Reports;
 
 
+use Groundhogg\Base_Object;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Email;
 use Groundhogg\Event;
@@ -105,6 +106,14 @@ class Table_Form_Activity extends Base_Table_Report {
 		usort( $data, [ $this, 'sort' ] );
 
 		return $data;
+
+	}
+
+	public function get_data_3_0() {
+
+		return [
+			'rows' => $this->get_table_data()
+		];
 
 	}
 

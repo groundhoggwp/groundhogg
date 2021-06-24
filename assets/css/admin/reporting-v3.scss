@@ -17,6 +17,7 @@ $benchmark-orange-50: rgba(245, 129, 21, 0.50);
 $action-green: rgb(158, 206, 56);
 $action-green-50: rgba(158, 206, 56, 0.5);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+$box-shadow-darker: 5px 5px 30px 0 rgba(24, 45, 70, 0.15);
 
 body {
   background: $primary-blue-2;
@@ -37,6 +38,11 @@ body {
 
     position: relative;
 
+    .gh-logo {
+      padding: 5px 10px;
+      width: 300px;
+    }
+
     &-header {
 
       background: #FFFFFF;
@@ -48,12 +54,7 @@ body {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-right: 20px;
-
-      .gh-logo {
-        padding: 5px 10px;
-        width: 300px;
-      }
+      padding: 0 20px;
 
       .gh-reporting-nav {
         display: flex;
@@ -82,7 +83,7 @@ body {
           }
 
           &.active {
-            font-weight: 500;
+            font-weight: 700;
           }
 
         }
@@ -111,8 +112,20 @@ body {
             flex-direction: column;
             justify-content: space-between;
 
-            &.gh-line-chart-report canvas{
+            &.gh-line-chart-report canvas {
               min-height: 400px;
+            }
+
+            &.gh-quickstat-report {
+
+              &[data-url] {
+                cursor: pointer;
+              }
+
+              &:hover {
+                box-shadow: $box-shadow-darker;
+                transform: translate3d(0, -1px, 0);
+              }
             }
 
             .gh-report-header {
@@ -167,46 +180,46 @@ body {
               }
             }
 
-            &.gh-table-report{
+            &.gh-table-report {
               padding: 0 0 12px 0;
 
-              .gh-report-header{
+              .gh-report-header {
                 padding: 20px 20px 0 20px;
               }
 
-              table.gh-report-table{
+              table.gh-report-table {
                 border-collapse: collapse;
                 width: 100%;
 
-                td,th{
+                td, th {
                   padding: 8px;
                   font-size: 16px;
 
-                  &:first-child{
+                  &:first-child {
                     padding-left: 20px;
                   }
 
-                  &:last-child{
+                  &:last-child {
                     text-align: right;
                     padding-right: 20px;
                   }
 
-                  a{
+                  a {
                     text-decoration: none;
                   }
 
-                  span.row-count{
+                  span.row-count {
                     margin-right: 10px;
                   }
                 }
 
-                th{
+                th {
                   font-weight: 700;
                   font-size: 16px;
                   text-align: left;
                 }
 
-                tr:nth-child(even){
+                tr:nth-child(even) {
                   background: $primary-blue-2;
                 }
               }

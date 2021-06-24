@@ -900,6 +900,11 @@ class Contact_Query {
 			}
 		}
 
+		if ( ! empty( $this->query_vars['date_optin_status_changed'] ) && is_array( $this->query_vars['date_optin_status_changed'] ) ) {
+			$date_optin_status_changed_query    = new \WP_Date_Query( $this->query_vars['date_optin_status_changed'], $this->table_name . '.date_optin_status_changed' );
+			$where['date_optin_status_changed'] = $date_optin_status_changed_query->get_sql();
+		}
+
 		return $where;
 	}
 

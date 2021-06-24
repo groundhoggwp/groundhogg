@@ -45,6 +45,10 @@ abstract class Base_Quick_Stat extends Base_Report {
 		];
 	}
 
+	public function get_url( $start, $end ) {
+		return false;
+	}
+
 	/**
 	 * Get the report data
 	 *
@@ -86,6 +90,7 @@ abstract class Base_Quick_Stat extends Base_Report {
 		$arrow        = $this->get_arrow_properties( $current_data, $compare_data );
 
 		return [
+			'url'            => esc_url( $this->get_url( $this->start, $this->end ) ),
 			'total'          => _nf( $current_data ),
 			'arrowDirection' => $arrow['direction'],
 			'arrowColor'     => $arrow['color'],

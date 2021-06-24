@@ -1,7 +1,10 @@
-#email-editor {
-  margin-right: 20px;
-  padding-top: 20px;
+body {
+  background: rgba(0, 117, 255, 0.02);
 }
+body #wpcontent {
+  padding: 0;
+}
+
 #email-editor input[type=text],
 #email-editor select {
   width: 100%;
@@ -16,26 +19,25 @@
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
   margin-bottom: 1rem;
   padding: 20px;
-}
-#email-editor-header input {
-  font-size: 1.618rem;
+  padding: 5px 20px;
+  border-radius: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 #email-editor-body {
   display: flex;
   gap: 1rem;
+  padding: 0 20px;
 }
 #email-editor-main {
   display: flex;
   flex-direction: column;
-  width: 61.8%;
+  flex-grow: 1;
 }
 #email-editor-sidebar {
-  background: #FFFFFF;
-  border-radius: 5px;
-  box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
-  margin-bottom: 1rem;
-  padding: 20px;
-  flex: 1;
+  flex-basis: 300px;
+  flex-shrink: 0;
 }
 #email-editor-content {
   background: #FFFFFF;
@@ -52,13 +54,16 @@
   margin-bottom: 1rem;
   padding: 20px;
 }
-#email-editor label {
+#email-editor-sidebar label {
   display: block;
   padding-bottom: 0.382rem;
 }
-#email-editor-sidebar-controls {
+#email-editor-sidebar-controls button {
+  flex-basis: 40px;
+  justify-content: center;
   display: flex;
-  gap: 10px;
+  align-items: center;
+  padding: 6px;
 }
 #email-editor-sidebar-controls button:first-child {
   flex-grow: 1;
@@ -77,40 +82,39 @@
   margin-bottom: 1rem;
   padding: 20px;
 }
-#email-editor-advanced-headers {
-  padding-top: 1rem;
+#email-editor .inline-label {
+  display: flex;
+  gap: 10px;
+  border-bottom: 1px solid rgba(16, 38, 64, 0.15);
+  align-items: center;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
 }
-#email-editor-advanced-headers table {
-  border-collapse: collapse;
+#email-editor .inline-label:focus-within {
+  border-color: #0075ff;
+}
+#email-editor .inline-label label {
+  font-weight: 500;
+  font-size: 18px;
+}
+#email-editor .inline-label .input-wrap {
   width: 100%;
 }
-#email-editor-advanced-headers table td {
-  padding: 0.382rem 0;
+#email-editor .inline-label .input-wrap button {
+  background: none;
+  border: none;
+  opacity: 0.5;
 }
-#email-editor-advanced-headers table td:last-child:hover button {
+#email-editor .inline-label .input-wrap button:hover, #email-editor .inline-label .input-wrap button:focus {
   opacity: 1;
 }
-#email-editor-advanced-headers table td:last-child button {
-  background: none;
-  opacity: 0.382;
-}
-#email-editor-advanced-headers table th:last-child,
-#email-editor-advanced-headers table td:last-child {
-  white-space: nowrap;
-  width: 1%;
-}
-#email-editor-advanced-headers table th {
-  text-align: center;
-}
-#email-editor-advanced-headers table th:first-child {
-  text-align: left;
-}
-#email-editor-advanced-headers table input[type=text] {
-  width: calc(100% - 1rem);
-}
-#email-editor-advanced-headers table svg {
-  height: 1rem;
-  width: 1rem;
+#email-editor .inline-label .input-wrap input {
+  width: 100%;
+  box-shadow: none;
+  border: none;
+  font-size: 18px;
+  outline: 0;
+  padding: 0;
 }
 
 /*# sourceMappingURL=email-editor.css.map */

@@ -10,6 +10,7 @@ use Groundhogg\Reporting\New_Reports\Chart_Email_Activity;
 use Groundhogg\Reporting\New_Reports\Chart_Funnel_Breakdown;
 use Groundhogg\Reporting\New_Reports\Chart_Last_Broadcast;
 use Groundhogg\Reporting\New_Reports\Chart_New_Contacts;
+use Groundhogg\Reporting\New_Reports\Donut_Chart_Contact_Engagement;
 use Groundhogg\Reporting\New_Reports\Email_Click_Rate;
 use Groundhogg\Reporting\New_Reports\Email_Open_Rate;
 use Groundhogg\Reporting\New_Reports\Table_Benchmark_Conversion_Rate;
@@ -253,6 +254,10 @@ class Reports {
 			[
 				'id'       => 'table_list_engagement',
 				'callback' => [ $this, 'table_list_engagement' ]
+			],
+			[
+				'id'       => 'donut_chart_contact_engagement',
+				'callback' => [ $this, 'donut_chart_contact_engagement' ]
 			]
 		];
 
@@ -420,11 +425,13 @@ class Reports {
 	 * @return mixed
 	 */
 	public function chart_contacts_by_optin_status() {
-
-		$report = new Chart_Contacts_By_Optin_Status( $this->start, $this->end );
-
-		return $report->get_data();
-
+		return new Chart_Contacts_By_Optin_Status( $this->start, $this->end );
+	}
+	/**
+	 * @return mixed
+	 */
+	public function donut_chart_contact_engagement() {
+		return new Donut_Chart_Contact_Engagement( $this->start, $this->end );
 	}
 
 	/**
@@ -661,9 +668,7 @@ class Reports {
 	}
 
 	public function table_form_activity() {
-		$report = new Table_Form_Activity( $this->start, $this->end );
-
-		return $report->get_data();
+		return new Table_Form_Activity( $this->start, $this->end );
 	}
 
 	public function table_email_stats() {

@@ -55,14 +55,14 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
 .wp-core-ui {
 
-  select{
+  select {
     vertical-align: initial;
   }
 
-  button{
+  button {
 
     &.button {
-      &.has-dashicon{
+      &.has-dashicon {
         display: flex;
         align-items: center;
         gap: 5px;
@@ -73,7 +73,6 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
 button {
   cursor: pointer;
-
 
 
   &.dashicon-button {
@@ -115,7 +114,10 @@ button {
 
       &:hover:not(:disabled) {
         color: darken($primary-blue, 10);
-        border-color: $primary-blue
+        border-color: $primary-blue;
+        background-color: $primary-blue-2;
+        //border-width: 2px;
+        //padding: 3px 8px;
       }
     }
 
@@ -155,6 +157,7 @@ button {
   button.gh-button:not(:first-child) {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+    border-left-width: 0;
   }
 
   button.gh-button:not(:last-child) {
@@ -301,7 +304,7 @@ button {
   display: flex;
   justify-content: flex-start;
 
-  &.input-with-replacements{
+  &.input-with-replacements {
 
     textarea {
       border-top-right-radius: 0;
@@ -312,21 +315,21 @@ button {
       flex-direction: column;
 
 
-      button{
+      button {
         border-radius: 0;
         padding: 4px;
-        border-left: none !important;
+        border-left: none;
 
-        &:first-child{
-          border-top-right-radius: 4px !important;
+        &:first-child {
+          border-top-right-radius: 4px;
         }
 
-        &:not(:first-child){
-          border-top: none !important;
+        &:not(:first-child) {
+          border-top: none;
         }
 
-        &:last-child{
-          border-bottom-right-radius: 4px !important;
+        &:last-child {
+          border-bottom-right-radius: 4px;
         }
       }
     }
@@ -334,13 +337,13 @@ button {
 }
 
 .input-wrap > *:last-child {
-  border-top-right-radius: 4px !important;
-  border-bottom-right-radius: 4px !important;
-  border-left: none !important;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  border-left: none;
 }
 
 .input-wrap > *:nth-child(2):not(:last-child) {
-  border-left: none !important;
+  border-left: none;
 }
 
 .input-wrap.input-with-emojis input,
@@ -382,6 +385,86 @@ button {
 }
 
 p.error,
-.commit-errors{
+.commit-errors {
   color: $error-red;
+}
+
+.gh-input-repeater {
+
+  margin: 5px 0;
+
+  &-row {
+    display: flex;
+
+    input {
+      width: 100%;
+      border-right: none;
+      border-radius: 0;
+      margin: 0;
+    }
+
+    .input-wrap {
+      width: 100%;
+
+      > input {
+        border-radius: 0;
+        border-right-width: 1px;
+      }
+
+      > button.replacements-picker-start {
+        //border: solid #8c8f94;
+        border-right-width: 0;
+        border-radius: 0;
+      }
+    }
+
+    button {
+      border: 1px solid #8c8f94;
+      border-radius: 0;
+      padding: 6px;
+      border-top-width: 0;
+    }
+
+    &:first-child {
+      > input:first-child {
+        border-top-left-radius: 4px;
+      }
+
+      button {
+        border-top-width: 1px;
+      }
+
+      > button {
+        border-top-right-radius: 4px;
+      }
+    }
+
+    &:not(:first-child) {
+      input, button, .input-wrap button {
+        border-top-width: 0;
+      }
+    }
+
+    &:nth-last-child(2) {
+      > input:first-child {
+        border-bottom-left-radius: 4px;
+      }
+    }
+  }
+
+  &-row-add {
+    display: flex;
+    //justify-content: flex-end;
+
+    .spacer {
+      width: 100%;
+    }
+
+    button {
+      padding: 5px 6px;
+      border: 1px solid #8c8f94;
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+    }
+  }
 }

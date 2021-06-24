@@ -20,8 +20,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
 $margin: 1rem;
 
-@mixin panel ()
-{
+@mixin panel() {
   background: #FFFFFF;
   border-radius: 5px;
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
@@ -29,9 +28,16 @@ $margin: 1rem;
   padding: 20px;
 }
 
+body {
+  background: $primary-blue-2;
+
+  #wpcontent {
+    padding: 0;
+  }
+}
+
+
 #email-editor {
-  margin-right: 20px;
-  padding-top: 20px;
 
   input[type=text],
   select {
@@ -45,26 +51,29 @@ $margin: 1rem;
 
   &-header {
     @include panel();
-
-    input {
-      font-size: 1.618rem;
-    }
+    padding: 5px 20px;
+    border-radius: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   &-body {
     display: flex;
     gap: $margin;
+    padding: 0 20px;
   }
 
   &-main {
     display: flex;
     flex-direction: column;
-    width: 61.8%;
+    flex-grow: 1;
   }
 
   &-sidebar {
-    @include panel();
-    flex: 1;
+    //@include panel();
+    flex-basis: 300px;
+    flex-shrink: 0;
   }
 
   &-content {
@@ -76,18 +85,28 @@ $margin: 1rem;
     @include panel();
   }
 
-  label {
-    display: block;
-    padding-bottom: .382rem;
-  }
-
   &-sidebar {
-    &-controls {
-      display: flex;
-      gap: 10px;
 
-      button:first-child {
-        flex-grow: 1;
+    label {
+      display: block;
+      padding-bottom: .382rem;
+    }
+
+    &-controls {
+      //display: flex;
+      //gap: 10px;
+
+      button {
+
+        &:first-child {
+          flex-grow: 1;
+        }
+
+        flex-basis: 40px;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        padding: 6px;
       }
     }
 
@@ -104,52 +123,47 @@ $margin: 1rem;
 
   &-advanced {
     @include panel();
+  }
 
-    &-headers {
-      padding-top: 1rem;
-      table {
-        border-collapse: collapse;
+  .inline-label {
+    display: flex;
+    gap: 10px;
+    border-bottom: 1px solid rgba(16, 38, 64, 0.15);
+    align-items: center;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+
+    &:focus-within {
+      border-color: $primary-blue;
+    }
+
+    label {
+      font-weight: 500;
+      font-size: 18px;
+    }
+
+    .input-wrap {
+
+      width: 100%;
+
+      button {
+        background: none;
+        border: none;
+        opacity: 0.5;
+
+        &:hover,
+        &:focus {
+          opacity: 1;
+        }
+      }
+
+      input {
         width: 100%;
-
-        td {
-          padding: .382rem 0;
-
-          &:last-child {
-            &:hover {
-              button {
-                opacity: 1;
-              }
-            }
-
-            button {
-              background: none;
-              opacity: .382;
-            }
-          }
-        }
-
-        th:last-child,
-        td:last-child {
-          white-space: nowrap;
-          width: 1%;
-        }
-
-        th {
-          text-align: center;
-
-          &:first-child {
-            text-align: left;
-          }
-        }
-
-        input[type=text] {
-          width: calc(100% - 1rem);
-        }
-
-        svg {
-          height: 1rem;
-          width: 1rem;
-        }
+        box-shadow: none;
+        border: none;
+        font-size: 18px;
+        outline: 0;
+        padding: 0;
       }
     }
   }

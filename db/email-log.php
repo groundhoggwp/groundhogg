@@ -68,7 +68,7 @@ class Email_Log extends DB {
 	/**
 	 * Wrapper for update
 	 *
-	 * @param int $row_id
+	 * @param int   $row_id
 	 * @param array $data
 	 * @param array $where
 	 *
@@ -116,7 +116,7 @@ class Email_Log extends DB {
 	 * Wrapper to add maybe unserialize
 	 *
 	 * @param array $query_vars
-	 * @param bool $from_cache
+	 * @param bool  $from_cache
 	 *
 	 * @return array[]|int|object[]
 	 */
@@ -180,6 +180,10 @@ class Email_Log extends DB {
 			'retries'         => 0,
 			'date_sent'       => Ymd_His(),
 		);
+	}
+
+	public function get_date_key() {
+		return 'date_sent';
 	}
 
 	public function create_table() {
