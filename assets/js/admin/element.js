@@ -187,7 +187,7 @@
     const props = []
 
     for (const prop in object) {
-      if (object.hasOwnProperty(prop)) {
+      if (object.hasOwnProperty(prop) && object[prop]) {
 
         switch (prop) {
           case 'className':
@@ -423,6 +423,10 @@
     const handleClose = () => {
       close()
     }
+    
+    const setContent = ( content ) => {
+      $modal.find('.gh-modal-dialog-content').html(content)
+    }
 
     $('body').append($modal)
 
@@ -435,6 +439,7 @@
     return {
       $modal,
       close,
+      setContent
     }
   }
 

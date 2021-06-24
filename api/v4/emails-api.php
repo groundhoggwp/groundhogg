@@ -4,6 +4,7 @@ namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
 use Groundhogg\Email;
+use Groundhogg\Event;
 use Groundhogg\Plugin;
 use WP_REST_Server;
 use function Groundhogg\email_kses;
@@ -33,6 +34,14 @@ class Emails_Api extends Base_Object_Api {
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'send_email_by_id' ],
+				'permission_callback' => [ $this, 'send_permissions_callback' ]
+			],
+		] );
+
+		register_rest_route( self::NAME_SPACE, "/emails/(?P<id>\d+)/test", [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'sent_test' ],
 				'permission_callback' => [ $this, 'send_permissions_callback' ]
 			],
 		] );
@@ -111,6 +120,29 @@ class Emails_Api extends Base_Object_Api {
 		}
 
 		return self::SUCCESS_RESPONSE();
+	}
+
+	public function sent_test( \WP_REST_Request $request ) {
+
+		//get email
+		$email_id = absint( $request->get_param( $this->get_primary_key() ) );
+
+		$email = new Email( $email_id );
+
+		if ( ! $email->exists() ) {
+			return $this->ERROR_RESOURCE_NOT_FOUND();
+		}
+
+		$to      = $request->get_param( 'to' );
+		$contact = get_contactdata( $to );
+
+		$email->enable_test_mode();
+
+		$sent = $email->send( $contact, new Event() );
+
+		return self::SUCCESS_RESPONSE([
+			'sent' => $sent
+		]);
 	}
 
 	public function get_db_table_name() {

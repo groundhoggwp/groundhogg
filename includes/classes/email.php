@@ -226,6 +226,14 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function enable_test_mode() {
 		$this->testing = true;
+
+		$edited = $this->get_meta( 'edited' ) ?: [
+			'data' => $this->data,
+			'meta' => $this->meta,
+		];
+
+		$this->data = $edited['data'];
+		$this->meta = $edited['meta'];
 	}
 
 	/**

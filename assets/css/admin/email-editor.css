@@ -4,6 +4,14 @@ body {
 body #wpcontent {
   padding: 0;
 }
+body .test-email-address-wrap {
+  display: flex;
+  gap: 10px;
+}
+body .test-email-address-wrap #initiate-test {
+  gap: 0;
+  display: flex;
+}
 
 #email-editor input[type=text],
 #email-editor select {

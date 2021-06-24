@@ -10,6 +10,8 @@
     inputWithReplacements,
     inputRepeaterWidget,
     textarea,
+    modal,
+    loadingDots,
   } = Groundhogg.element
   const { post, get, patch, routes } = Groundhogg.api
 
@@ -117,8 +119,8 @@
 			<div class="gh-panel">
 				<div class="inside">
 					<div id="email-editor-sidebar-controls" class="gh-button-group">
-						<button class="gh-button secondary">Send test email</button>
-						<button class="gh-button secondary">
+						<button id="send-test" class="gh-button secondary">Send test email</button>
+						<button id="mobile-preview" class="gh-button secondary">
 							<svg width="12" height="19" viewBox="0 0 12 19" fill="none"
 							     xmlns="http://www.w3.org/2000/svg">
 								<path
@@ -126,7 +128,7 @@
 									fill="#0075FF"/>
 							</svg>
 						</button>
-						<button class="gh-button secondary">
+						<button id="desktop-preview" class="gh-button secondary">
 							<svg width="18" height="19" viewBox="0 0 18 19" fill="none"
 							     xmlns="http://www.w3.org/2000/svg">
 								<path
@@ -397,6 +399,49 @@
           })
           mountSidebar()
           $('#' + e.currentTarget.id).focus()
+        })
+
+        $('#send-test').on('click', (e) => {
+
+          const modalContent = (isSending = false) => {
+            //language=HTML
+            return `<h2>Send a test email to the following address...</h2>
+			<div class="test-email-address-wrap">
+				${input({
+					type: 'email',
+					id: 'email-address',
+					name: 'email-address',
+					placeholder: 'Your email...',
+					disabled: isSending,
+					value: this.testEmailAddress
+				})}
+				<button id="initiate-test" class="gh-button primary" ${isSending ? 'disabled' : ''}>
+					<span>${isSending ? 'Sending' : 'Send'}</span>
+				</button>
+			</div>`
+          }
+
+          const { $modal, close: closeModal, setContent } = modal({
+            content: modalContent()
+          })
+
+          $('#email-address').on('change input', (e) => {
+            this.testEmailAddress = e.target.value
+          })
+
+          $('#initiate-test').on('click', () => {
+            console.log(this.testEmailAddress)
+            setContent(modalContent(true))
+            const { stop: stopDots } = loadingDots('#initiate-test')
+
+            post(`${routes.v4.emails}/${this.email.ID}/test`, {
+              ...this.edited
+            }).then(r => {
+              stopDots()
+              closeModal()
+            })
+          })
+
         })
       }
 

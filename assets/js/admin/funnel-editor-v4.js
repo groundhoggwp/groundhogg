@@ -2644,7 +2644,7 @@
           </svg>`,
 
       title({ ID, data, meta }) {
-        let { tags, condition } = meta;
+        let { tags = [], condition='any' } = meta;
         tags = tags.map((id) => parseInt(id));
 
         if (!tags) {
@@ -2679,7 +2679,7 @@
           };
         });
 
-        const { condition } = meta;
+        const { tags = [], condition='any'  } = meta;
 
         //language=HTML
         return `
@@ -2702,7 +2702,7 @@
                         multiple: true,
                       },
                       options,
-                      meta.tags.map((id) => parseInt(id))
+                      tags.map((id) => parseInt(id))
                     )}
                     <p class="description">Runs when ${
                       condition || "any"
