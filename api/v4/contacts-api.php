@@ -7,6 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Groundhogg\Admin\Contacts\Tables\Contacts_Table;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use function Groundhogg\array_map_keys;
@@ -67,6 +68,14 @@ class Contacts_Api extends Base_Object_Api {
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'merge' ],
 				'permission_callback' => [ $this, 'update_permissions_callback' ]
+			],
+		] );
+
+		register_rest_route( self::NAME_SPACE, '/contacts/admin/table', [
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'admin_table' ],
+				'permission_callback' => [ $this, 'read_permissions_callback' ]
 			],
 		] );
 	}
@@ -146,7 +155,7 @@ class Contacts_Api extends Base_Object_Api {
 	public function read( WP_REST_Request $request ) {
 
 		// Might have passed root level query
-		$query  = (array) $request->get_param( 'query' ) ?: $request->get_json_params();
+		$query  = (array) $request->get_param( 'query' ) ?: $request->get_params();
 		$search = sanitize_text_field( wp_unslash( $request->get_param( 'search' ) ) );
 
 		if ( ! key_exists( 'search', $query ) && ! empty( $search ) ) {
@@ -171,6 +180,7 @@ class Contacts_Api extends Base_Object_Api {
 		return self::SUCCESS_RESPONSE( [
 			'total_items' => $count,
 			'items'       => $contacts,
+			'query'       => $contact_query->request
 		] );
 	}
 
@@ -638,5 +648,29 @@ class Contacts_Api extends Base_Object_Api {
 	 */
 	public function delete_files_permissions_callback() {
 		return current_user_can( 'download_contact_files' );
+	}
+
+	public function admin_table() {
+		ob_start();
+
+		$contacts_table = new Contacts_Table();
+
+		?>
+		<form method="post" id="contacts-table-form">
+			<?php
+			$contacts_table->prepare_items();
+			$contacts_table->display();
+
+			if ( $contacts_table->has_items() ) {
+				$contacts_table->inline_edit();
+			} ?>
+		</form>
+		<?php
+
+		$table = ob_get_clean();
+
+		return self::SUCCESS_RESPONSE( [
+			'html' => $table
+		] );
 	}
 }

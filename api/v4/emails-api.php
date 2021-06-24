@@ -3,7 +3,9 @@
 namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
+use Groundhogg\Contact;
 use Groundhogg\Email;
+use Groundhogg\Event;
 use Groundhogg\Plugin;
 use WP_REST_Server;
 use function Groundhogg\email_kses;
@@ -11,6 +13,7 @@ use function Groundhogg\get_contactdata;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
 use function Groundhogg\send_email_notification;
+use function Groundhogg\set_user_test_email;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -21,6 +24,9 @@ class Emails_Api extends Base_Object_Api {
 	public function register_routes() {
 		parent::register_routes();
 
+		$key   = $this->get_primary_key();
+		$route = $this->get_route();
+
 		register_rest_route( self::NAME_SPACE, "emails/send/", [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
@@ -29,10 +35,18 @@ class Emails_Api extends Base_Object_Api {
 			],
 		] );
 
-		register_rest_route( self::NAME_SPACE, "/emails/(?P<id>\d+)/send", [
+		register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/send", [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'send_email_by_id' ],
+				'permission_callback' => [ $this, 'send_permissions_callback' ]
+			],
+		] );
+
+		register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/test", [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'sent_test' ],
 				'permission_callback' => [ $this, 'send_permissions_callback' ]
 			],
 		] );
@@ -113,6 +127,45 @@ class Emails_Api extends Base_Object_Api {
 		return self::SUCCESS_RESPONSE();
 	}
 
+	/**
+	 * Send a test email address
+	 *
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return \WP_Error|\WP_REST_Response
+	 */
+	public function sent_test( \WP_REST_Request $request ) {
+
+		//get email
+		$email_id = absint( $request->get_param( $this->get_primary_key() ) );
+
+		$email = new Email( $email_id );
+
+		if ( ! $email->exists() ) {
+			return $this->ERROR_RESOURCE_NOT_FOUND();
+		}
+
+		$to = sanitize_email( $request->get_param( 'to' ) );
+
+		if ( ! is_email( $to ) ) {
+			return self::ERROR_401( 'error', 'Invalid email address provided' );
+		}
+
+		set_user_test_email( $to );
+
+		$contact = new Contact( [
+			'email' => $to
+		] );
+
+		$email->enable_test_mode();
+
+		$sent = $email->send( $contact, new Event() );
+
+		return self::SUCCESS_RESPONSE( [
+			'sent' => $sent
+		] );
+	}
+
 	public function get_db_table_name() {
 		return 'emails';
 	}
@@ -122,7 +175,7 @@ class Emails_Api extends Base_Object_Api {
 	}
 
 	public function read_permissions_callback() {
-		return current_user_can( 'view_emails' );
+		return current_user_can( 'edit_emails' );
 	}
 
 	public function update_permissions_callback() {

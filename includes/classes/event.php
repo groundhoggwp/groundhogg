@@ -391,7 +391,7 @@ class Event extends Base_Object {
 
 			$this->fail();
 
-			return apply_filters( 'groundhogg/event/run/failed_result', false, $this );
+			return apply_filters( 'groundhogg/event/run/failed_result', $result, $this );
 		}
 
 		$this->complete();

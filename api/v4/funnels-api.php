@@ -3,12 +3,13 @@
 namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
-use Groundhogg\DB\Step_Edges;
 use Groundhogg\Funnel;
+use Groundhogg\Plugin;
 use Groundhogg\Step;
 use WP_REST_Server;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
+use function Groundhogg\isset_not_empty;
 use function Groundhogg\map_func_to_attr;
 use function Groundhogg\sanitize_object_meta;
 
@@ -18,194 +19,151 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Funnels_Api extends Base_Object_Api {
 
+	/**
+	 * register the commit route
+	 *
+	 * @return mixed|void
+	 */
 	public function register_routes() {
 		parent::register_routes();
 
-		register_rest_route( self::NAME_SPACE, "/funnels/(?P<ID>\d+)/duplicate", [
+		$route = $this->get_route();
+		$key   = $this->get_primary_key();
+
+		register_rest_route( self::NAME_SPACE, "/{$route}/import", [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'duplicate' ],
+				'callback'            => [ $this, 'import' ],
 				'permission_callback' => [ $this, 'create_permissions_callback' ]
 			],
 		] );
 
-		register_rest_route( self::NAME_SPACE, "/funnels/(?P<ID>\d+)/step/?(?P<step_id>\d+)?", [
+		register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/commit", [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'create_step' ],
-				// 'permission_callback' => [ $this, 'create_permissions_callback' ]
+				'callback'            => [ $this, 'commit' ],
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
 			],
+		] );
+
+		register_rest_route( self::NAME_SPACE, "/{$route}/form-integration", [
 			[
-				'methods'             => WP_REST_Server::EDITABLE,
-				'callback'            => [ $this, 'update_step' ],
-				// 'permission_callback' => [ $this, 'update_permissions_callback' ]
-			],
-			[
-				'methods'             => WP_REST_Server::DELETABLE,
-				'callback'            => [ $this, 'delete_step' ],
-				// 'permission_callback' => [ $this, 'delete_permissions_callback' ]
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'form_integration' ],
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
 			],
 		] );
 	}
 
-	const NEW_STEP = 'new';
-
 	/**
-	 * @return Step_Edges
+	 * Get the field mapping data for a form integration step
+	 *
+	 * @param \WP_REST_Request $request
 	 */
-	function get_edges_db() {
-		return get_db( 'step_edges' );
+	public function form_integration( \WP_REST_Request $request ) {
+
+		$type = $request->get_param( 'type' );
+
+		$step = Plugin::instance()->step_manager->elements[ $type ];
+
+		if ( ! method_exists( $step, 'get_forms_for_api' ) ){
+			return self::ERROR_401();
+		}
+
+		$forms = $step->get_forms_for_api();
+
+		return self::SUCCESS_RESPONSE( [
+			'forms' => $forms,
+		] );
 	}
 
 	/**
-	 * @param $edges
-	 * @param $step Step
+	 * Import the provided template, create the new funnel and return the item
+	 *
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return bool|int|\WP_Error|\WP_REST_Response
 	 */
-	function handle_edges( $edges, $step ) {
+	public function import( \WP_REST_Request $request ) {
 
-		$new_edges    = get_array_var( $edges, 'new', [] );
-		$delete_edges = get_array_var( $edges, 'delete', [] );
+		// Get the template
+		$template = $request->get_json_params();
 
-		foreach ( $new_edges as $new_edge ) {
+		// Is this a legacy funnel template or a new template?
 
-			$new_edge = wp_parse_args( $new_edge, [
-				'from' => '',
-				'to'   => '',
+		// New template, old templates to not have the 'data' prop
+		if ( isset_not_empty( $template, 'data' ) ) {
+
+			// Create the funnel
+			$funnel = new Funnel();
+
+			$funnel->create( [
+				'title' => $template['data']['title']
 			] );
 
-			$from_id = $new_edge['from'] === self::NEW_STEP ? $step->get_id() : absint( $new_edge['from'] );
-			$to_id   = $new_edge['to'] === self::NEW_STEP ? $step->get_id() : absint( $new_edge['to'] );
+			// Import the steps with their settings
+			$steps = $template['steps'];
 
-			$this->get_edges_db()->add( [
-				'funnel_id' => $step->get_funnel_id(),
-				'from_id'   => $from_id,
-				'to_id'     => $to_id,
-			] );
+			// Import the steps
+			foreach ( $steps as $_step ) {
+
+				// Override the funnel ID to the newly created one
+				$_step['data'] = array_merge( $_step['data'], [
+					'funnel_id' => $funnel->get_id()
+				] );
+
+				$step = new Step();
+
+				$step->create( $_step['data'] ); // use create method to ensure uniqueness
+				$step->update_meta( $_step['meta'] ); // save all that meta data!
+			}
+
+			// Etc...
+
+		} // Old template from pre 2.5
+		else {
+			$funnel = new Funnel();
+			$result = $funnel->legacy_import( $template );
+
+			if ( is_wp_error( $result ) ) {
+				return $result;
+			}
 		}
 
-		foreach ( $delete_edges as $edge ) {
-
-			$edge = wp_parse_args( $edge, [
-				'from' => '',
-				'to'   => '',
-			] );
-
-			map_func_to_attr( $edge, 'from', 'absint' );
-			map_func_to_attr( $edge, 'to', 'absint' );
-
-			$this->get_edges_db()->delete( [
-				'funnel_id' => $step->get_funnel_id(),
-				'from_id'   => $edge['from'],
-				'to_id'     => $edge['to'],
-			] );
-		}
+		return self::SUCCESS_RESPONSE( [
+			'item' => $funnel
+		] );
 	}
 
 	/**
-	 * Create a step for a funnel
+	 * Commit the funnel
 	 *
 	 * @param \WP_REST_Request $request
 	 *
 	 * @return \WP_Error|\WP_REST_Response
 	 */
-	public function create_step( \WP_REST_Request $request ) {
+	public function commit( \WP_REST_Request $request ) {
 
-		$funnel_id = absint( $request->get_param( 'ID' ) );
-		$funnel    = new Funnel( $funnel_id );
+		$funnel = new Funnel( $request->get_param( $this->get_primary_key() ) );
 
-		if ( ! $funnel->exists() ) {
-			return self::ERROR_404();
+		$funnel->update_meta( $request->get_json_params() );
+
+		// If the commit was successful, meaning no errors, return he updated funnel
+		if ( $funnel->commit() ) {
+
+			return self::SUCCESS_RESPONSE( [
+				'item' => $funnel
+			] );
+
+		} // If the commit failed, return all the errors
+		else {
+
+			return self::ERROR_400( 'error', 'Unable to commit changes.', [
+				'errors' => $funnel->get_errors(),
+				'item'   => $funnel
+			] );
 		}
 
-		$data = $request->get_param( 'data' );
-		$meta = $request->get_param( 'meta' );
-
-		$edges = $request->get_param( 'edges' );
-
-		$data['funnel_id'] = $funnel_id;
-
-		$step = new Step();
-		$step->create( $data, $meta );
-
-		$this->handle_edges( $edges, $step );
-
-		return self::SUCCESS_RESPONSE( [
-			'item' => $funnel
-		] );
-	}
-
-	/**
-	 * Update a step in the funnel
-	 *
-	 * @param \WP_REST_Request $request
-	 *
-	 * @return \WP_REST_Response
-	 */
-	public function update_step( \WP_REST_Request $request ) {
-
-		$funnel_id = absint( $request->get_param( 'ID' ) );
-		$step_id   = absint( $request->get_param( 'step_id' ) );
-
-		$data = $request->get_param( 'data' );
-		$meta = $request->get_param( 'meta' );
-
-		$step = new Step( $step_id );
-
-		$step->update( $data, $meta );
-
-		$funnel = new Funnel( $funnel_id );
-
-		return self::SUCCESS_RESPONSE( [
-			'item' => $funnel
-		] );
-	}
-
-	/**
-	 * Delete a step from the funnel
-	 *
-	 * @param \WP_REST_Request $request
-	 *
-	 * @return \WP_REST_Response
-	 */
-	public function delete_step( \WP_REST_Request $request ) {
-
-		$funnel_id = absint( $request->get_param( 'ID' ) );
-		$step_id   = absint( $request->get_param( 'step_id' ) );
-
-		$step = new Step( $step_id );
-
-		$step->delete();
-
-		$funnel = new Funnel( $funnel_id );
-
-		return self::SUCCESS_RESPONSE( [
-			'item' => $funnel
-		] );
-	}
-
-	/**
-	 * Duplicate the funnel
-	 *
-	 * @param \WP_REST_Request $request
-	 *
-	 * @return \WP_Error|\WP_REST_Response
-	 */
-	public function duplicate( \WP_REST_Request $request ) {
-
-		$ID     = absint( $request->get_param( 'ID' ) );
-		$funnel = new Funnel( $ID );
-
-		if ( ! $funnel->exists() ) {
-			return self::ERROR_404();
-		}
-
-		$new_funnel = new Funnel();
-
-		$new_funnel->import( $funnel->export() );
-
-		return self::SUCCESS_RESPONSE( [
-			'item' => $new_funnel
-		] );
 	}
 
 	/**
@@ -223,8 +181,7 @@ class Funnels_Api extends Base_Object_Api {
 	 * @return bool
 	 */
 	public function read_permissions_callback() {
-		return true;
-		return current_user_can( 'view_funnels' );
+		return current_user_can( 'export_funnels' );
 	}
 
 	/**
