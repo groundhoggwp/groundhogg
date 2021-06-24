@@ -118,7 +118,7 @@ $saved_search = $search_id ? Saved_Searches::instance()->get( $search_id ) : fal
 
 			echo html()->wrap( html()->select2( [
 				'name'     => 'optin_status[]',
-				'id'       => 'optin_status',
+				'id'       => 'optin_status_advanced',
 				'class'    => 'gh-select2',
 				'options'  => [
 					1 => __( 'Unconfirmed', 'groundhogg' ),
@@ -246,7 +246,7 @@ $saved_search = $search_id ? Saved_Searches::instance()->get( $search_id ) : fal
 					echo "&nbsp;";
 					echo html()->dropdown( [
 						'name'        => 'tags_include_needs_all',
-						'id'          => 'tags_include_needs_all',
+						'id'          => 'tags_include_needs_all_advanced',
 						'class'       => '',
 						'options'     => array(
 							0 => __( 'Any', 'groundhogg' ),
@@ -259,7 +259,7 @@ $saved_search = $search_id ? Saved_Searches::instance()->get( $search_id ) : fal
 					echo html()->e( 'p', [], [
 						html()->tag_picker( [
 							'name'     => 'tags_include[]',
-							'id'       => 'tags_include',
+							'id'       => 'tags_include_advanced',
 							'selected' => wp_parse_id_list( get_url_var( 'tags_include' ) )
 						] )
 
@@ -275,7 +275,7 @@ $saved_search = $search_id ? Saved_Searches::instance()->get( $search_id ) : fal
 
 					echo html()->dropdown( [
 						'name'        => 'tags_exclude_needs_all',
-						'id'          => 'tags_exclude_needs_all',
+						'id'          => 'tags_exclude_needs_all_advanced',
 						'class'       => '',
 						'options'     => array(
 							0 => __( 'Any', 'groundhogg' ),
@@ -288,7 +288,7 @@ $saved_search = $search_id ? Saved_Searches::instance()->get( $search_id ) : fal
 					echo html()->e( 'p', [], [
 						html()->tag_picker( [
 							'name'     => 'tags_exclude[]',
-							'id'       => 'tags_exclude',
+							'id'       => 'tags_exclude_advanced',
 							'selected' => wp_parse_id_list( get_url_var( 'tags_exclude' ) )
 						] )
 					] );
@@ -300,7 +300,7 @@ $saved_search = $search_id ? Saved_Searches::instance()->get( $search_id ) : fal
 		<?php do_action( 'groundhogg/admin/contacts/search' ); ?>
 
 		<div class="start-search">
-			<?php submit_button( __( 'Search' ), 'primary', 'submit', false ); ?>
+			<?php submit_button( __( 'Search' ), 'primary', 'submit-advanced', false ); ?>
 		</div>
 	</form>
 	<div class="saved-search-form">
