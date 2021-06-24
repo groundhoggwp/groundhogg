@@ -522,17 +522,17 @@ class HTML {
 
 		if ( ! is_callable( $option_callback ) ) {
 			$option_callback = function ( $option, $key ) {
-				return html()->e( 'li', [ 'class' => 'option', 'id' => 'option-' . $key ], $option );
+				return html()->e( 'li', [ 'class' => 'gh-dropdown-menu-option', 'id' => 'option-' . $key ], $option );
 			};
 		}
 
-		return html()->e( 'div', [ 'class' => 'dropdown-button' ], [
+		return html()->e( 'div', [ 'class' => 'gh-dropdown-button-wrap' ], [
 			html()->button( [
 				'text'  => $text,
-				'class' => implode( ' ', [ 'button', 'button-' . $type, 'dropdown' ] ),
+				'class' => implode( ' ', [ 'gh-dropdown-button', 'button-' . $type, 'dropdown' ] ),
 				'type'  => 'button'
 			] ),
-			html()->e( 'ul', [ 'class' => 'dropdown menu' ], array_map_with_keys( $options, $option_callback ) )
+			html()->e( 'ul', [ 'class' => 'gh-dropdown-menu' ], array_map_with_keys( $options, $option_callback ) )
 		] );
 	}
 

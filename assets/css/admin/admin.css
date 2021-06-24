@@ -477,11 +477,11 @@ table.wp-list-table.funnels td.column-active_contacts {
     width: 100px;
 }
 
-.dropdown-button {
+.gh-dropdown-button-wrap {
     position: relative;
 }
 
-.dropdown-button .button.dropdown::after {
+.gh-dropdown-button-wrap button.gh-dropdown-button::after {
     content: "\f347";
     display: inline-block;
     font: normal 18px/1 dashicons;
@@ -493,13 +493,13 @@ table.wp-list-table.funnels td.column-active_contacts {
     text-decoration: none;
 }
 
-.dropdown-button ul.dropdown.menu {
+.gh-dropdown-button-wrap ul.gh-dropdown-menu {
     position: absolute;
     left: 0;
     display: none;
 }
 
-.dropdown-button ul.dropdown.menu.show {
+.gh-dropdown-button-wrap ul.gh-dropdown-menu.show {
     display: flex;
     flex-direction: column;
     z-index: 999;
@@ -512,17 +512,17 @@ table.wp-list-table.funnels td.column-active_contacts {
     border-radius: 3px;
 }
 
-.dropdown-button ul.dropdown.menu li a {
+.gh-dropdown-button-wrap ul.gh-dropdown-menu li.gh-dropdown-menu-option a {
     padding: 10px;
     display: block;
     text-decoration: none;
 }
 
-.dropdown-button ul.dropdown.menu li a:hover {
+.gh-dropdown-button-wrap ul.gh-dropdown-menu li.gh-dropdown-menu-option a:hover {
     background: #f7f7f7;
 }
 
-.dropdown-button .dropdown-overlay {
+.gh-dropdown-button-wrap .dropdown-overlay {
     position: fixed;
     top: 0;
     left: 0;

@@ -120,13 +120,13 @@
     buildPickers()
   })
 
-  $(document).on('click', '.dropdown-button .button.dropdown', function (){
+  $(document).on('click', '.gh-dropdown-button-wrap button.gh-dropdown-button', function (){
     var $button = $(this)
     $button.next().toggleClass( 'show' );
     $( "<div class='dropdown-overlay'></div>" ).insertAfter( $button );
   } );
 
-  $(document).on('click', '.dropdown-button .dropdown-overlay', function (){
+  $(document).on('click', '.gh-dropdown-button-wrap .dropdown-overlay', function (){
     var $overlay = $(this)
     $overlay.next().toggleClass( 'show' );
     $overlay.remove();
