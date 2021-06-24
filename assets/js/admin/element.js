@@ -187,7 +187,7 @@
     const props = []
 
     for (const prop in object) {
-      if (object.hasOwnProperty(prop) && object[prop]) {
+      if (object.hasOwnProperty(prop) && typeof object[prop] !== 'undefined' && object[prop] !== false ) {
 
         switch (prop) {
           case 'className':

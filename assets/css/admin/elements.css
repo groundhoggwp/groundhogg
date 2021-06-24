@@ -343,5 +343,9 @@ p.error,
   border-top: none;
   border-radius: 0 0 4px 4px;
 }
+.gh-input-repeater-row-add:first-child button {
+  border-top: 1px solid #8c8f94;
+  border-radius: 4px 4px 4px 4px;
+}
 
 /*# sourceMappingURL=elements.css.map */

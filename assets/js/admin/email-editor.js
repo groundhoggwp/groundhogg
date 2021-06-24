@@ -332,12 +332,12 @@
 
         const getHeadersArray = () => {
 
-          const { headers = {} } = this.edited.meta
+          const { custom_headers = {} } = this.edited.meta
 
           const rows = []
 
-          Object.keys(headers).forEach(key => {
-            rows.push([key, headers[key]])
+          Object.keys(custom_headers).forEach(key => {
+            rows.push([key, custom_headers[key]])
           })
 
           if (!rows.length) {
@@ -367,7 +367,7 @@
             })
 
             this.updateEmailMeta({
-              headers
+              custom_headers: headers
             })
           }
         })
