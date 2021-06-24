@@ -11,9 +11,11 @@ use Groundhogg\Event;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use Groundhogg\Plugin;
+use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\is_option_enabled;
+use function Groundhogg\Ymd_His;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -153,6 +155,7 @@ class Events_Page extends Tabbed_Admin_Page {
 
 	/**
 	 *  Sets the title of the page
+	 *
 	 * @return string
 	 */
 	public function get_title() {
@@ -424,6 +427,15 @@ class Events_Page extends Tabbed_Admin_Page {
 			<div id="modal-log-details-view"></div>
 		</div>
 		<?php
+	}
+
+	public function process_filter_logs() {
+		return admin_page_url( 'gh_events', [
+			'tab'         => 'emails',
+			'date_filter' => get_post_var( 'date_filter' ),
+			'before'      => get_post_var( 'before' ),
+			'after'       => get_post_var( 'after' ),
+		] );
 	}
 
 	/**
