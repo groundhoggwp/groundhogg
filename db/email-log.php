@@ -23,6 +23,10 @@ class Email_Log extends DB {
 		return 'log';
 	}
 
+	public function get_date_key() {
+		return 'date_sent';
+	}
+
 	/**
 	 * Maybe serialize the args...
 	 *
@@ -68,7 +72,7 @@ class Email_Log extends DB {
 	/**
 	 * Wrapper for update
 	 *
-	 * @param int $row_id
+	 * @param int   $row_id
 	 * @param array $data
 	 * @param array $where
 	 *
@@ -116,7 +120,7 @@ class Email_Log extends DB {
 	 * Wrapper to add maybe unserialize
 	 *
 	 * @param array $query_vars
-	 * @param bool $from_cache
+	 * @param bool  $from_cache
 	 *
 	 * @return array[]|int|object[]
 	 */
