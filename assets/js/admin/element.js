@@ -804,7 +804,6 @@
       $(`${selector} input`).on('change', (e) => {
         const row = parseInt(e.target.dataset.row)
         const cell = parseInt(e.target.dataset.cell)
-        console.log({ row, cell })
         this.rows[row][cell] = e.target.value
         onChange(this.rows)
       })

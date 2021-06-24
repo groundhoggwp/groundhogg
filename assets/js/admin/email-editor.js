@@ -9,6 +9,7 @@
     inputWithReplacementsAndEmojis,
     inputWithReplacements,
     inputRepeaterWidget,
+    textarea,
   } = Groundhogg.element
   const { post, get, patch, routes } = Groundhogg.api
 
@@ -62,6 +63,12 @@
       },
 
       content () {
+
+        const {
+          subject = '',
+          pre_header = '',
+          content = ''
+        } = this.edited.data
         //language=HTML
         return `
 			<div class="inline-label">
@@ -70,7 +77,7 @@
 					id: 'subject',
 					name: 'subject',
 					placeholder: 'Subject line...',
-					value: this.email.data.subject,
+					value: subject,
 				})}
 			</div>
 			<div class="inline-label">
@@ -78,13 +85,15 @@
 				${inputWithReplacementsAndEmojis({
 					id: 'preview-text',
 					name: 'pre_header',
-					value: this.email.data.pre_header,
+					value: pre_header,
 				})}
 			</div>
 			<div class="email-content-wrap">
-				<textarea id="content" name="content">${
-					this.email.data.content || ''
-				}</textarea>
+				${textarea({
+					id: 'content',
+					name: 'content',
+					value: content
+				})}
 			</div>
         `
       },
@@ -100,6 +109,7 @@
           reply_to_override = '',
           alignment = 'left',
           from_user = 0,
+          message_type = 'marketing'
         } = this.edited.meta
 
         // language=HTML
@@ -179,7 +189,7 @@
 									name: 'message_type',
 								},
 								message_typeOptions,
-								this.email.meta.message_type
+								message_type
 							)}
 						</div>
 					</div>
@@ -229,9 +239,9 @@
     commitChanges () {
 
       if (this.autoSaveTimeout) {
-        clearTimeout(this.autoSaveTimeout);
+        clearTimeout(this.autoSaveTimeout)
       } else if (this.abortController) {
-        this.abortController.abort();
+        this.abortController.abort()
       }
 
       patch(`${routes.v4.emails}/${this.email.ID}`, {
@@ -305,7 +315,7 @@
           saveTimer = setTimeout(() => {
             window.console.log('save')
             this.updateEmailData({
-              content
+              content: content
             })
           }, 300)
         }
@@ -318,6 +328,12 @@
       $('#from-user').select2().on('change', (e) => {
         this.updateEmailData({
           from_user: e.target.value
+        })
+      })
+
+      $('#subject, #preview-text').on('change input', (e) => {
+        this.updateEmailData({
+          [e.target.name]: e.target.value
         })
       })
 
