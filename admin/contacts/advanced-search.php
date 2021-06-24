@@ -300,7 +300,7 @@ $saved_search = $search_id ? Saved_Searches::instance()->get( $search_id ) : fal
 		<?php do_action( 'groundhogg/admin/contacts/search' ); ?>
 
 		<div class="start-search">
-			<?php submit_button( __( 'Search' ), 'primary', 'submit-advanced', false ); ?>
+			<?php submit_button( __( 'Search' ), 'primary', 'search-advanced', false ); ?>
 		</div>
 	</form>
 	<div class="saved-search-form">
@@ -323,7 +323,7 @@ $saved_search = $search_id ? Saved_Searches::instance()->get( $search_id ) : fal
 					] );
 
 					?></p>
-				<?php submit_button( __( 'Load Search', 'groundhogg' ), 'secondary', 'submit', false ); ?>
+				<?php submit_button( __( 'Load Search', 'groundhogg' ), 'secondary', 'load-search', false ); ?>
 			</form>
 		</div>
 
@@ -345,7 +345,7 @@ $saved_search = $search_id ? Saved_Searches::instance()->get( $search_id ) : fal
 						] );
 
 						?></p>
-					<?php submit_button( __( 'Save Search', 'groundhogg' ), 'secondary', 'submit', false ); ?>
+					<?php submit_button( __( 'Save Search', 'groundhogg' ), 'secondary', 'save-search', false ); ?>
 				</form>
 			</div>
 		<?php else: ?>
