@@ -35,21 +35,16 @@ body .test-email-address-wrap #initiate-test {
   align-items: center;
 }
 #email-editor-header h1 {
-  align-items: center;
   flex-grow: 1;
-  position: relative;
 }
 #email-editor-header h1 #email_title {
-  flex-grow: 1;
   font-size: 20px;
 }
-#email-editor-header h1 svg {
-  height: 20px;
-  width: 20px;
-  pointer-events: none;
-  position: absolute;
-  right: 10px;
-  top: 10px;
+#email-editor-header .actions {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
 }
 #email-editor-body {
   display: flex;

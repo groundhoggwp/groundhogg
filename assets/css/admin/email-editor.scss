@@ -69,23 +69,18 @@ body {
     align-items: center;
 
     h1 {
-      align-items: center;
-      flex-grow: 1;
-      position: relative;
+flex-grow: 1;
 
       #email_title {
-        flex-grow: 1;
         font-size: 20px;
       }
+    }
 
-      svg {
-        height: 20px;
-        width: 20px;
-        pointer-events: none;
-        position: absolute;
-        right: 10px;
-        top: 10px;
-      }
+    .actions {
+      align-items: center;
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
     }
   }
 

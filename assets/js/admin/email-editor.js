@@ -65,12 +65,11 @@
         name: "title",
         value: this.edited.data.title,
       })}
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path opacity="0.3" d="M6.75032 2.24985L1.1626 7.83757L1.1626 10.5351H3.86012L9.44784 4.94737M6.75032 2.24985L7.9064 1.09377C8.6513 0.34887 9.85902 0.348871 10.6039 1.09377C11.3488 1.83867 11.3488 3.04639 10.6039 3.79129L9.44784 4.94737M6.75032 2.24985L9.44784 4.94737" stroke="#102640" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
       </h1>
       
 			<div class="actions">
+          <div class="redo"><span class=" dashicons dashicons-redo"></span></div>
+          <div class="undo"><span class=" dashicons dashicons-undo"></span></div>
 				<button id="commit" class="gh-button primary">Update</button>
 			</div>
         `;
