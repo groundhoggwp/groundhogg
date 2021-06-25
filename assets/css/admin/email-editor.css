@@ -12,6 +12,14 @@ body .test-email-address-wrap #initiate-test {
   gap: 0;
   display: flex;
 }
+body iframe#preview.mobile {
+  height: 600px;
+  width: 350px;
+}
+body iframe#preview.desktop {
+  height: 600px;
+  width: 800px;
+}
 
 #email-editor input[type=text],
 #email-editor select {
@@ -102,6 +110,7 @@ body .test-email-address-wrap #initiate-test {
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
   margin-bottom: 1rem;
   padding: 20px;
+  margin-top: 20px;
 }
 #email-editor .inline-label {
   display: flex;

@@ -44,6 +44,18 @@ body {
       display: flex;
     }
   }
+
+  iframe#preview{
+    &.mobile {
+      height: 600px;
+      width: 350px;
+    }
+
+    &.desktop {
+      height: 600px;
+      width: 800px;
+    }
+  }
 }
 
 
@@ -149,6 +161,7 @@ flex-grow: 1;
 
   &-advanced {
     @include panel();
+    margin-top: 20px;
   }
 
   .inline-label {

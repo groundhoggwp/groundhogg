@@ -187,7 +187,7 @@
     const props = []
 
     for (const prop in object) {
-      if (object.hasOwnProperty(prop) && typeof object[prop] !== 'undefined' && object[prop] !== false ) {
+      if (object.hasOwnProperty(prop) && typeof object[prop] !== 'undefined' && object[prop] !== false) {
 
         switch (prop) {
           case 'className':
@@ -292,6 +292,60 @@
     },
     textAreaWithEmojis: function (atts) {
       return Elements.textAreaWithReplacementsAndEmojis(atts, false, true)
+    }
+  }
+
+
+  var codeMirror;
+  var codeMirrorIsFocused;
+  var $doc = $(document);
+
+  $doc.on('ghInsertReplacement', function (e, insert) {
+    if (codeMirrorIsFocused) {
+      codeMirror.doc.replaceSelection(insert)
+    }
+  })
+
+  $doc.on('ghReplacementTargetChanged', function () {
+    codeMirrorIsFocused = false
+  })
+
+  const codeEditor = ({
+    selector = '',
+    onChange = (content) => {},
+    initialContent = '',
+    height = 500,
+  }) => {
+
+    var editorSettings = wp.codeEditor.defaultSettings ? _.clone(wp.codeEditor.defaultSettings) : {}
+
+    editorSettings.codemirror = _.extend(
+      {},
+      editorSettings.codemirror,
+      {
+        indentUnit: 4,
+        tabSize: 4
+      }
+    )
+
+    codeMirror = wp.codeEditor.initialize($(selector), editorSettings).codemirror
+    // self.htmlCode = self.htmlCode.codemirror;
+
+    codeMirror.on('change', function () {
+      onChange(codeMirror.doc.getValue())
+    })
+
+    codeMirror.on('focus', function () {
+      codeMirrorIsFocused = true
+      $doc.trigger('ghClearReplacementTarget')
+    })
+
+    codeMirror.doc.setValue(html_beautify(initialContent, { indent_with_tabs: true }))
+
+    codeMirror.setSize(null, height)
+
+    return {
+      editor: codeMirror,
     }
   }
 
@@ -439,8 +493,8 @@
     const handleClose = () => {
       close()
     }
-    
-    const setContent = ( content ) => {
+
+    const setContent = (content) => {
       $modal.find('.gh-modal-dialog-content').html(content)
     }
 
@@ -817,7 +871,7 @@
 
       $(`${selector} #add-row`).on('click', (e) => {
         this.rows.push(Array(cellProps.length).fill(''))
-        onChange( this.rows )
+        onChange(this.rows)
         this.mount()
         $(`${selector} #add-row`).focus()
       })
@@ -900,8 +954,42 @@
   }
 
   const isValidEmail = (email) => {
-    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    return re.test(String(email).toLowerCase())
+  }
+
+  const primaryButton = ({ className, ...props }) => {
+    return button({
+      className: 'gh-button primary' + (className ? ' ' + className : ''),
+      ...props
+    })
+  }
+
+  const secondaryButton = ({ className, ...props }) => {
+    return button({
+      className: 'gh-button secondary' + (className ? ' ' + className : ''),
+      ...props
+    })
+  }
+
+  const dangerButton = ({ className, ...props }) => {
+    return button({
+      className: 'gh-button danger' + (className ? ' ' + className : ''),
+      ...props
+    })
+  }
+
+  const button = ({
+    text = '',
+    className = '',
+    ...props
+  }) => {
+    // language=HTML
+    return `
+		<button ${objectToProps({
+			className: 'gh-button' + (className ? ' ' + className : ''),
+			...props
+		})}>${text}</button>`
   }
 
   Groundhogg.element = {
@@ -929,7 +1017,12 @@
     flattenObject,
     objectEquals,
     inputRepeaterWidget,
-    improveTinyMCE
+    improveTinyMCE,
+    primaryButton,
+    dangerButton,
+    secondaryButton,
+    button,
+    codeEditor
   }
 
 })(jQuery)

@@ -32,11 +32,11 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 * Base_Object constructor.
 	 *
 	 * @param $identifier_or_args int|string the identifier to look for
-	 * @param $field string the file to query
+	 * @param $field              string the file to query
 	 */
 	public function __construct( $identifier_or_args = 0, $field = null ) {
 
-		if ( ! $identifier_or_args ){
+		if ( ! $identifier_or_args ) {
 			return;
 		}
 
@@ -53,9 +53,9 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		if ( is_array( $identifier_or_args ) || is_object( $identifier_or_args ) ) {
 
 			// Primary key is available, maybe it's a full raw object?
-			if ( $primary = get_array_var( $identifier_or_args, $this->get_identifier_key() ) ){
+			if ( $primary = get_array_var( $identifier_or_args, $this->get_identifier_key() ) ) {
 
-				if ( is_object( $identifier_or_args ) ){
+				if ( is_object( $identifier_or_args ) ) {
 					$object = $identifier_or_args;
 				} else {
 					$object = $this->get_from_db( $this->get_identifier_key(), $primary );
@@ -106,6 +106,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 */
 	public function get_id() {
 		$identifier = $this->get_identifier_key();
+
 		return $this->$identifier;
 	}
 
@@ -113,7 +114,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 * @param $id
 	 */
 	protected function set_id( $id ) {
-		$identifier = $this->get_identifier_key();
+		$identifier        = $this->get_identifier_key();
 		$this->$identifier = $id;
 	}
 
@@ -165,7 +166,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			$this->$key = $value;
 		}
 
-		$this->data[$this->get_identifier_key()] = $this->get_id();
+		$this->data[ $this->get_identifier_key() ] = $this->get_id();
 
 		$this->post_setup();
 
@@ -305,10 +306,10 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		/**
 		 * Fires before the object is updated...
 		 *
-		 * @param int $object_id the ID of the object
-		 * @param mixed[] $new_data the new data being saved
-		 * @param Base_Object $object the object class
-		 * @param mixed[] $old_data the current data
+		 * @param int         $object_id the ID of the object
+		 * @param mixed[]     $new_data  the new data being saved
+		 * @param Base_Object $object    the object class
+		 * @param mixed[]     $old_data  the current data
 		 */
 		do_action( "groundhogg/{$this->get_object_type()}/pre_update", $this->get_id(), $data, $this, $old_data );
 
@@ -320,10 +321,10 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			/**
 			 * Fires after the object is updated...
 			 *
-			 * @param int $object_id the ID of the object
-			 * @param mixed[] $new_data the new data being saved
-			 * @param Base_Object $object the object class
-			 * @param mixed[] $old_data the current data
+			 * @param int         $object_id the ID of the object
+			 * @param mixed[]     $new_data  the new data being saved
+			 * @param Base_Object $object    the object class
+			 * @param mixed[]     $old_data  the current data
 			 */
 			do_action( "groundhogg/{$this->get_object_type()}/post_update", $this->get_id(), $data, $this, $old_data );
 
@@ -349,9 +350,9 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		/**
 		 * Fires before the object is created...
 		 *
-		 * @param int $object_id the ID of the object
-		 * @param mixed[] $new_data the new data being saved
-		 * @param Base_Object $object the object class, at this point it's pretty useless though
+		 * @param int         $object_id the ID of the object
+		 * @param mixed[]     $new_data  the new data being saved
+		 * @param Base_Object $object    the object class, at this point it's pretty useless though
 		 */
 		do_action( "groundhogg/{$this->get_object_type()}/pre_create", $data, $this );
 
@@ -368,9 +369,9 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			/**
 			 * Fires after the object is created...
 			 *
-			 * @param int $object_id the ID of the object
-			 * @param mixed[] $new_data the new data being saved
-			 * @param Base_Object $object the object class
+			 * @param int         $object_id the ID of the object
+			 * @param mixed[]     $new_data  the new data being saved
+			 * @param Base_Object $object    the object class
 			 */
 			do_action( "groundhogg/{$this->get_object_type()}/post_create", $this->get_id(), $data, $this );
 
@@ -392,7 +393,8 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
 	/**
 	 * String representation of object
-	 * @link https://php.net/manual/en/serializable.serialize.php
+	 *
+	 * @link  https://php.net/manual/en/serializable.serialize.php
 	 * @return string the string representation of the object or null
 	 * @since 5.1.0
 	 */
@@ -415,11 +417,12 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
 	/**
 	 * Whether a offset exists
-	 * @link https://php.net/manual/en/arrayaccess.offsetexists.php
+	 *
+	 * @link  https://php.net/manual/en/arrayaccess.offsetexists.php
 	 *
 	 * @param mixed $offset <p>
-	 * An offset to check for.
-	 * </p>
+	 *                      An offset to check for.
+	 *                      </p>
 	 *
 	 * @return boolean true on success or false on failure.
 	 * </p>
@@ -437,11 +440,12 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
 	/**
 	 * Offset to retrieve
-	 * @link https://php.net/manual/en/arrayaccess.offsetget.php
+	 *
+	 * @link  https://php.net/manual/en/arrayaccess.offsetget.php
 	 *
 	 * @param mixed $offset <p>
-	 * The offset to retrieve.
-	 * </p>
+	 *                      The offset to retrieve.
+	 *                      </p>
 	 *
 	 * @return mixed Can return all value types.
 	 * @since 5.0.0
@@ -456,14 +460,15 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
 	/**
 	 * Offset to set
-	 * @link https://php.net/manual/en/arrayaccess.offsetset.php
+	 *
+	 * @link  https://php.net/manual/en/arrayaccess.offsetset.php
 	 *
 	 * @param mixed $offset <p>
-	 * The offset to assign the value to.
-	 * </p>
-	 * @param mixed $value <p>
-	 * The value to set.
-	 * </p>
+	 *                      The offset to assign the value to.
+	 *                      </p>
+	 * @param mixed $value  <p>
+	 *                      The value to set.
+	 *                      </p>
 	 *
 	 * @return void
 	 * @since 5.0.0
@@ -478,11 +483,12 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
 	/**
 	 * Offset to unset
-	 * @link https://php.net/manual/en/arrayaccess.offsetunset.php
+	 *
+	 * @link  https://php.net/manual/en/arrayaccess.offsetunset.php
 	 *
 	 * @param mixed $offset <p>
-	 * The offset to unset.
-	 * </p>
+	 *                      The offset to unset.
+	 *                      </p>
 	 *
 	 * @return void
 	 * @since 5.0.0
@@ -515,12 +521,20 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		 * @param mixed[] $array the array of args fot the object...
 		 */
 		return apply_filters( "groundhogg/{$this->get_object_type()}/get_as_array", [
-			'ID'   => $this->get_id(),
-			'data' => $this->data
+			'ID'    => $this->get_id(),
+			'data'  => $this->data,
+			'admin' => $this->admin_link()
 		] );
 	}
 
 	public function jsonSerialize() {
 		return $this->get_as_array();
+	}
+
+	public function admin_link() {
+		return admin_page_url( 'gh_' . $this->get_object_type() . 's', [
+			$this->get_object_type() => $this->get_id(),
+			'action'                 => 'edit'
+		] );
 	}
 }

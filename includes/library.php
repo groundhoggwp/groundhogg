@@ -68,6 +68,27 @@ class Library extends Supports_Errors {
 	}
 
 	/**
+	 * Get email templates
+	 *
+	 * @return mixed
+	 */
+	public function get_email_templates() {
+//		$emails = get_transient( 'groundhogg_email_templates' );
+//
+//		if ( ! empty( $emails ) ) {
+//			return $emails;
+//		}
+
+		$response = $this->request( 'emails', [ 'limit' => 999, 'status' => 'ready' ] );
+
+		$emails = get_array_var( $response, 'items', [] );
+
+		set_transient( 'groundhogg_email_templates', $emails, DAY_IN_SECONDS );
+
+		return $emails;
+	}
+
+	/**
 	 * Get a specific funnel template
 	 *
 	 * @param $id
@@ -78,29 +99,6 @@ class Library extends Supports_Errors {
 		$response = $this->request( "funnels/$id", [], 'GET' );
 
 		return get_array_var( $response, 'funnel', [] );
-	}
-
-	/**
-	 * Get email templates
-	 *
-	 * @return mixed
-	 */
-	public function get_email_templates() {
-		$emails = get_transient( 'groundhogg_email_templates' );
-
-		if ( ! empty( $emails ) ) {
-			return $emails;
-		}
-
-		$response = $this->request( 'email/templates', [
-			'installed' => Extension::$extension_ids
-		], 'GET' );
-
-		$emails = get_array_var( $response, 'emails', [] );
-
-		set_transient( 'groundhogg_email_templates', $emails, DAY_IN_SECONDS );
-
-		return $emails;
 	}
 
 	/**

@@ -18,6 +18,12 @@ $action-green: rgb(158, 206, 56);
 $action-green-50: rgba(158, 206, 56, 0.5);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
+a.action-link{
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 .pill {
   background: $primary-blue-7;
   border-radius: 5px;
@@ -146,6 +152,24 @@ button {
         border-color: rgba(16, 38, 64, 0.25);
       }
     }
+
+    &.big {
+      font-size: 24px;
+      padding: 15px 32px;
+    }
+
+    &.medium {
+      font-size: 18px;
+      padding: 11px 22px;
+    }
+
+    &.bold {
+      font-weight: 700;
+    }
+
+    &.loud {
+      text-transform: uppercase;
+    }
   }
 }
 
@@ -266,7 +290,7 @@ button {
     position: relative;
     //height: 70vh;
     padding: 30px;
-    max-width: 50vw;
+    max-width: 80vw;
 
     &-alert {
       p {
@@ -299,8 +323,8 @@ button {
   }
 }
 
-input.ui-autocomplete-input{
-  &.focus-visible{
+input.ui-autocomplete-input {
+  &.focus-visible {
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
   }
@@ -479,7 +503,7 @@ p.error,
       border-radius: 0 0 4px 4px;
     }
 
-    &:first-child button{
+    &:first-child button {
       border-top: 1px solid #8c8f94;
       border-radius: 4px 4px 4px 4px;
     }

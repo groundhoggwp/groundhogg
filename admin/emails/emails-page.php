@@ -23,6 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Allow the user to view & edit the emails
  * Contains add, save, delete, etc for the admin functions...
+ * Contains add, save, delete, etc for the admin functions...
  *
  * @since       File available since Release 0.1
  * @subpackage  Admin/Emails
@@ -83,8 +84,22 @@ class Emails_Page extends Admin_Page {
 	public function scripts() {
 
 		switch ( $this->get_current_action() ) {
+			case 'add':
+				wp_enqueue_style( 'groundhogg-admin-templates' );
+				wp_enqueue_script( 'groundhogg-admin-add-email' );
+
+				$library = new Groundhogg\Library();
+
+				wp_localize_script( 'groundhogg-admin-add-email', 'AddEmail', [
+					'templates' => $library->get_email_templates(),
+				] );
+
+				break;
 			case 'edit':
 				wp_enqueue_editor();
+				wp_enqueue_code_editor( [
+					'type' => 'text/html'
+				] );
 
 				$email = new Email( get_url_var( 'email' ) );
 				wp_enqueue_style( 'groundhogg-admin-email-editor' );
@@ -414,7 +429,7 @@ class Emails_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		include __DIR__ . '/add-new.php';
+		include __DIR__ . '/add.php';
 	}
 
 	public function edit() {
@@ -428,6 +443,9 @@ class Emails_Page extends Admin_Page {
 	public function page() {
 
 		switch ( $this->get_current_action() ){
+			case 'add':
+				$this->add();
+				return;
 			case 'edit':
 				$this->edit();
 				return;

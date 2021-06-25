@@ -1080,6 +1080,7 @@ class Email extends Base_Object_With_Meta {
 			'ID'      => $this->get_id(),
 			'data'    => $this->data,
 			'meta'    => $this->meta,
+			'admin'   => $this->admin_link(),
 			'context' => [
 				'from_name'  => $this->get_from_name(),
 				'from_email' => $this->get_from_email(),

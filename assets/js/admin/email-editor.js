@@ -13,10 +13,16 @@
     isValidEmail,
     modal,
     loadingDots,
+    codeEditor,
     savingModal,
-  } = Groundhogg.element;
-  const { post, get, patch, routes } = Groundhogg.api;
-  const { user_test_email } = Groundhogg;
+  } = Groundhogg.element
+  const { post, get, patch, routes } = Groundhogg.api
+  const { user_test_email } = Groundhogg
+
+  const setFrameContent = (frame, content) => {
+    var blob = new Blob([content], { type: 'text/html; charset=utf-8' })
+    frame.src = URL.createObjectURL(blob)
+  }
 
   const EmailEditor = ({
     selector,
@@ -36,7 +42,7 @@
     },
 
     components: {
-      editor() {
+      editor () {
         return `
           <div id="email-editor-header">
               ${this.components.header.call(this)}
@@ -46,6 +52,9 @@
               <div id="email-editor-content">
                   ${this.components.content.call(this)}
               </div>
+              <div id="email-editor-content-editor">
+                  ${this.components.contentEditor.call(this)}
+              </div>
               <div id="email-editor-advanced">
                   ${this.components.controls.call(this)}
               </div>
@@ -54,74 +63,84 @@
                 ${this.components.sidebar.call(this)}
             </div>
           </div>
-        `;
+        `
       },
 
-      header() {
+      header () {
         // language=HTML
         return `
 			<h1>${input({
-        id: "email_title",
-        name: "title",
-        value: this.edited.data.title,
-      })}
-      </h1>
-      
+				id: 'email_title',
+				name: 'title',
+				value: this.edited.data.title,
+			})}
+			</h1>
+
 			<div class="actions">
-          <div class="redo"><span class=" dashicons dashicons-redo"></span></div>
-          <div class="undo"><span class=" dashicons dashicons-undo"></span></div>
+				<div class="redo"><span class=" dashicons dashicons-redo"></span></div>
+				<div class="undo"><span class=" dashicons dashicons-undo"></span></div>
 				<button id="commit" class="gh-button primary">Update</button>
 			</div>
-        `;
+        `
       },
 
-      content() {
+      content () {
         const {
-          subject = "",
-          pre_header = "",
-          content = "",
-        } = this.edited.data;
+          subject = '',
+          pre_header = '',
+        } = this.edited.data
         //language=HTML
         return `
 			<div class="inline-label">
 				<label for="subject">Subject:</label>
 				${inputWithReplacementsAndEmojis({
-          id: "subject",
-          name: "subject",
-          placeholder: "Subject line...",
-          value: subject,
-        })}
+					id: 'subject',
+					name: 'subject',
+					placeholder: 'Subject line...',
+					value: subject,
+				})}
 			</div>
 			<div class="inline-label">
 				<label for="preview-text">Preview:</label>
 				${inputWithReplacementsAndEmojis({
-          id: "preview-text",
-          name: "pre_header",
-          value: pre_header,
-        })}
+					id: 'preview-text',
+					name: 'pre_header',
+					placeholder: 'Preview text...',
+					value: pre_header,
+				})}
 			</div>
-			<div class="email-content-wrap">
-				${textarea({
-          id: "content",
-          name: "content",
-          value: content,
-        })}
-			</div>
-        `;
+        `
       },
 
-      sidebar() {
-        const message_typeOptions = {
-          marketing: "Marketing",
-          transactional: "Transactional",
-        };
+      contentEditor () {
 
         const {
-          reply_to_override = "",
-          alignment = "left",
+          content = '',
+        } = this.edited.data
+
+        // language=HTML
+        return `
+			<div class="email-content-wrap">
+				${textarea({
+					id: 'content',
+					name: 'content',
+					value: content,
+				})}
+			</div>`
+      },
+
+      sidebar () {
+        const message_typeOptions = {
+          marketing: 'Marketing',
+          transactional: 'Transactional',
+        }
+
+        const {
+          reply_to_override = '',
+          alignment = 'left',
           from_user = 0,
-          message_type = "marketing",
-        } = this.edited.meta;
+          message_type = 'marketing',
+        } = this.edited.meta
 
         // language=HTML
         return `
@@ -129,7 +148,7 @@
 				<div class="inside">
 					<div id="email-editor-sidebar-controls" class="gh-button-group">
 						<button id="send-test" class="gh-button secondary">Send test email</button>
-						<button id="mobile-preview" class="gh-button secondary">
+						<button data-device="mobile" class="show-preview gh-button secondary">
 							<svg width="12" height="19" viewBox="0 0 12 19" fill="none"
 							     xmlns="http://www.w3.org/2000/svg">
 								<path
@@ -137,7 +156,7 @@
 									fill="#0075FF"/>
 							</svg>
 						</button>
-						<button id="desktop-preview" class="gh-button secondary">
+						<button data-device="desktop" class="show-preview gh-button secondary">
 							<svg width="18" height="19" viewBox="0 0 18 19" fill="none"
 							     xmlns="http://www.w3.org/2000/svg">
 								<path
@@ -149,32 +168,32 @@
 					<p>
 						<label class="">Send this email from:</label>
 						${select(
-              {
-                id: "from-user",
-                name: "from_user",
-              },
-              Groundhogg.filters.owners.map((owner) => ({
-                text: owner.data.user_email,
-                value: owner.ID,
-              })),
-              from_user
-            )}
+							{
+								id: 'from-user',
+								name: 'from_user',
+							},
+							Groundhogg.filters.owners.map((owner) => ({
+								text: owner.data.user_email,
+								value: owner.ID,
+							})),
+							from_user
+						)}
 					</p>
 					<p>
 						<label class="">Replies are sent to:</label>
 						${input({
-              id: "reply-to",
-              name: "reply_to_override",
-              value: reply_to_override,
-            })}
+							id: 'reply-to',
+							name: 'reply_to_override',
+							value: reply_to_override,
+						})}
 					</p>
 					<div id="email-editor-sidebar-options">
 						<div>
 							<label class="">Alignment:</label>
 							<button id="align-left" data-alignment="left"
 							        class="change-alignment gh-button ${
-                        alignment === "left" ? "primary" : "secondary"
-                      }">
+								        alignment === 'left' ? 'primary' : 'secondary'
+							        }">
 								<svg width="13" height="14" viewBox="0 0 13 14" fill="none"
 								     xmlns="http://www.w3.org/2000/svg">
 									<path
@@ -185,8 +204,8 @@
 							</button>
 							<button id="align-center" data-alignment="center"
 							        class="change-alignment gh-button ${
-                        alignment === "center" ? "primary" : "secondary"
-                      }">
+								        alignment === 'center' ? 'primary' : 'secondary'
+							        }">
 								<svg width="14" height="14" viewBox="0 0 14 14" fill="none"
 								     xmlns="http://www.w3.org/2000/svg">
 									<path opacity="0.6"
@@ -199,46 +218,46 @@
 						<div id="email-editor-sidebar-message_type">
 							<label class="">Messaging type:</label>
 							${select(
-                {
-                  id: "message-type",
-                  name: "message_type",
-                },
-                message_typeOptions,
-                message_type
-              )}
+								{
+									id: 'message-type',
+									name: 'message_type',
+								},
+								message_typeOptions,
+								message_type
+							)}
 						</div>
 					</div>
 				</div>
 			</div>
-        `;
+        `
       },
 
-      controls() {
+      controls () {
         // language=HTML
         return `
 			<h3>Custom email headers</h3>
 			<div id="email-editor-advanced-headers">
 			</div>
-        `;
+        `
       },
 
-      inspector() {},
+      inspector () {},
     },
 
     autoSaveTimeout: null,
     abortController: null,
 
-    autoSaveChanges() {
-      this.saveUndoState();
+    autoSaveChanges () {
+      this.saveUndoState()
 
       if (this.autoSaveTimeout) {
-        clearTimeout(this.autoSaveTimeout);
+        clearTimeout(this.autoSaveTimeout)
       }
 
       this.autoSaveTimeout = setTimeout(() => {
-        this.autoSaveTimeout = null;
-        this.abortController = new AbortController();
-        const { signal } = this.abortController;
+        this.autoSaveTimeout = null
+        this.abortController = new AbortController()
+        const { signal } = this.abortController
 
         post(
           `${routes.v4.emails}/${this.email.ID}/meta`,
@@ -249,192 +268,215 @@
             signal,
           }
         ).then(() => {
-          this.abortController = null;
-        });
-      }, 3000);
+          this.abortController = null
+        })
+      }, 3000)
     },
 
-    commitChanges() {
+    commitChanges () {
       if (this.autoSaveTimeout) {
-        clearTimeout(this.autoSaveTimeout);
+        clearTimeout(this.autoSaveTimeout)
       } else if (this.abortController) {
-        this.abortController.abort();
+        this.abortController.abort()
       }
 
-      const { close } = savingModal();
+      const { close } = savingModal()
 
       patch(`${routes.v4.emails}/${this.email.ID}`, {
         data: this.edited.data,
         meta: this.edited.meta,
       }).then((d) => {
-        this.loadEmail(d.item);
-        onCommit(this.email);
-        close();
-      });
+        this.loadEmail(d.item)
+        onCommit(this.email)
+        close()
+      })
     },
 
-    updateEmailData(newData) {
+    updateEmailData (newData) {
       this.edited.data = {
         ...this.edited.data,
         ...newData,
-      };
+      }
 
-      this.autoSaveChanges();
+      this.autoSaveChanges()
     },
 
-    updateEmailMeta(newMeta) {
+    updateEmailMeta (newMeta) {
       this.edited.meta = {
         ...this.edited.meta,
         ...newMeta,
-      };
+      }
 
-      this.autoSaveChanges();
+      this.autoSaveChanges()
 
-      onChange(this.edited, this.email);
+      onChange(this.edited, this.email)
     },
 
-    render() {
-      return this.components.editor.call(this);
+    render () {
+      return this.components.editor.call(this)
     },
 
-    mount() {
-      improveTinyMCE();
+    mount () {
+      improveTinyMCE()
 
-      this.loadEmail(this.email);
-      this.$el.html(this.render());
-      this.onMount();
+      this.loadEmail(this.email)
+      this.$el.html(this.render())
+      this.onMount()
     },
 
-    loadEmail(email) {
-      console.log(email);
+    loadEmail (email) {
+      console.log(email)
 
-      this.email = copyObject(email);
+      this.email = copyObject(email)
 
       if (email.meta.edited) {
-        this.edited = copyObject(email.meta.edited);
+        this.edited = copyObject(email.meta.edited)
       } else {
-        this.edited = copyObject(email);
+        this.edited = copyObject(email)
       }
     },
 
-    onMount() {
-      let saveTimer;
+    onMount () {
+      let saveTimer
+
+      const handleContentOnChange = (content) => {
+        clearTimeout(saveTimer)
+
+        // Only save after a second.
+        saveTimer = setTimeout(() => {
+          window.console.log('save')
+          this.updateEmailData({
+            content: content,
+          })
+        }, 300)
+      }
 
       const mainContentMount = () => {
-        $("#commit").on("click", () => {
-          this.commitChanges();
-        });
+        $('#commit').on('click', () => {
+          this.commitChanges()
+        })
 
-        tinymceElement(
-          "content",
-          {
-            tinymce: true,
-            quicktags: true,
-          },
-          (content) => {
-            window.console.log("onchange");
-            // Reset timer.
-            clearTimeout(saveTimer);
+        if (this.edited.meta.type === 'html') {
 
-            // Only save after a second.
-            saveTimer = setTimeout(() => {
-              window.console.log("save");
-              this.updateEmailData({
-                content: content,
-              });
-            }, 300);
-          }
-        );
+          const { editor } = codeEditor({
+            selector: '#content',
+            onChange: handleContentOnChange,
+            initialContent: this.edited.data.content
+          })
 
-        $("#email_title, #subject, #preview-text").on("change input", (e) => {
+        } else {
+          tinymceElement(
+            'content',
+            {
+              tinymce: true,
+              quicktags: true,
+            },
+            handleContentOnChange
+          )
+        }
+
+        $('#email_title, #subject, #preview-text').on('change input', (e) => {
           this.updateEmailData({
             [e.target.name]: e.target.value,
-          });
-        });
+          })
+        })
 
         const getHeadersArray = () => {
-          const { custom_headers = {} } = this.edited.meta;
+          const { custom_headers = {} } = this.edited.meta
 
-          const rows = [];
+          const rows = []
 
           Object.keys(custom_headers).forEach((key) => {
-            rows.push([key, custom_headers[key]]);
-          });
+            rows.push([key, custom_headers[key]])
+          })
 
           if (!rows.length) {
-            rows.push(["", ""]);
+            rows.push(['', ''])
           }
 
-          return rows;
-        };
+          return rows
+        }
 
         const headersEditor = inputRepeaterWidget({
-          selector: "#email-editor-advanced-headers",
+          selector: '#email-editor-advanced-headers',
           rows: getHeadersArray(),
           cellProps: [
-            { placeholder: "Header..." },
-            { placeholder: "Value..." },
+            { placeholder: 'Header...' },
+            { placeholder: 'Value...' },
           ],
           cellCallbacks: [input, inputWithReplacements],
           onChange: (rows) => {
-            const headers = {};
+            const headers = {}
 
             rows.forEach(([key, value]) => {
-              headers[key] = value;
-            });
+              headers[key] = value
+            })
 
             this.updateEmailMeta({
               custom_headers: headers,
-            });
+            })
           },
-        });
+        })
 
-        headersEditor.mount();
-      };
+        headersEditor.mount()
+      }
 
       const mountSidebar = () => {
-        $("#email-editor-sidebar").html(this.components.sidebar.call(this));
-        sidebarMount();
-      };
+        $('#email-editor-sidebar').html(this.components.sidebar.call(this))
+        sidebarMount()
+      }
 
       const sidebarMount = () => {
-        $("#from-user")
+
+        $('.show-preview').on('click', (e) => {
+
+          const device = e.currentTarget.dataset.device
+
+          modal({
+            content: `<iframe id="preview" class="${device}"></div>`
+          })
+
+          setFrameContent( $('#preview')[0], this.edited.data.content )
+
+        })
+
+        $('#from-user')
           .select2()
-          .on("change", (e) => {
+          .on('change', (e) => {
             this.updateEmailData({
               from_user: e.target.value,
-            });
-          });
+            })
+          })
 
-        $("#message-type").on("change", (e) => {
+        $('#message-type').on('change', (e) => {
           this.updateEmailMeta({
             message_type: e.target.value,
-          });
-        });
+          })
+        })
 
-        $("#reply-to").autocomplete({
+        $('#reply-to').autocomplete({
           change: (e) => {
             this.updateEmailMeta({
               reply_to_override: e.target.value,
-            });
+            })
           },
           source: [
-            "{owner_email}",
+            '{owner_email}',
             ...Groundhogg.filters.owners.map((u) => u.data.user_email),
           ],
-        });
+        })
 
-        $(".change-alignment").on("click", (e) => {
+        $('.change-alignment').on('click', (e) => {
           this.updateEmailMeta({
             alignment: e.currentTarget.dataset.alignment,
-          });
-          mountSidebar();
-          $("#" + e.currentTarget.id).focus();
-        });
+          })
+          mountSidebar()
+          $('#' + e.currentTarget.id).focus()
+        })
 
-        $("#send-test").on("click", (e) => {
+        $('#send-test').on('click', (e) => {
           if (!this.testEmailAddress) {
-            this.testEmailAddress = user_test_email;
+            this.testEmailAddress = user_test_email
           }
 
           const modalContent = (isSending = false) => {
@@ -442,101 +484,101 @@
             return `<h2>Send a test email to the following address...</h2>
 			<div class="test-email-address-wrap">
 				${input({
-          type: "email",
-          id: "email-address",
-          name: "email-address",
-          placeholder: "Your email...",
-          disabled: isSending,
-          value: this.testEmailAddress,
-        })}
+					type: 'email',
+					id: 'email-address',
+					name: 'email-address',
+					placeholder: 'Your email...',
+					disabled: isSending,
+					value: this.testEmailAddress,
+				})}
 				<button id="initiate-test" class="gh-button primary" ${
-          isSending ? "disabled" : ""
-        }>
-					<span>${isSending ? "Sending" : "Send"}</span>
+					isSending ? 'disabled' : ''
+				}>
+					<span>${isSending ? 'Sending' : 'Send'}</span>
 				</button>
-			</div>`;
-          };
+			</div>`
+          }
 
           const { $modal, close: closeModal, setContent } = modal({
             content: modalContent(),
-          });
+          })
 
-          $("#email-address").autocomplete({
+          $('#email-address').autocomplete({
             source: Groundhogg.filters.owners.map((u) => u.data.user_email),
             change: (e) => {
-              this.testEmailAddress = e.target.value;
+              this.testEmailAddress = e.target.value
             },
-          });
+          })
 
-          $("#initiate-test").on("click", () => {
-            setContent(modalContent(true));
-            const { stop: stopDots } = loadingDots("#initiate-test");
+          $('#initiate-test').on('click', () => {
+            setContent(modalContent(true))
+            const { stop: stopDots } = loadingDots('#initiate-test')
 
             post(`${routes.v4.emails}/${this.email.ID}/test`, {
               to: this.testEmailAddress,
               edited: this.edited,
             }).then((r) => {
-              stopDots();
-              setContent(`<p>Test sent to <b>${this.testEmailAddress}</b></p>`);
-              setTimeout(closeModal, 2000);
-            });
-          });
-        });
-      };
+              stopDots()
+              setContent(`<p>Test sent to <b>${this.testEmailAddress}</b></p>`)
+              setTimeout(closeModal, 2000)
+            })
+          })
+        })
+      }
 
-      mainContentMount();
-      sidebarMount();
+      mainContentMount()
+      sidebarMount()
     },
 
-    currentState() {
-      const { email } = this;
+    currentState () {
+      const { email } = this
 
       return {
         email: copyObject(email),
-      };
+      }
     },
 
     /**
      * Saves the current state of the funnel for an undo slot
      */
-    saveUndoState() {
-      this.undoStates.push(this.currentState());
+    saveUndoState () {
+      this.undoStates.push(this.currentState())
     },
 
     /**
      * Undo the previous change
      */
-    undo() {
-      var lastState = this.undoStates.pop();
+    undo () {
+      var lastState = this.undoStates.pop()
 
       if (!lastState) {
-        return;
+        return
       }
 
-      this.redoStates.push(this.currentState());
+      this.redoStates.push(this.currentState())
 
-      Object.assign(this, lastState);
+      Object.assign(this, lastState)
 
-      this.render();
+      this.render()
     },
 
     /**
      * Redo the previous change
      */
-    redo() {
-      var lastState = this.redoStates.pop();
+    redo () {
+      var lastState = this.redoStates.pop()
 
       if (!lastState) {
-        return;
+        return
       }
 
-      this.undoStates.push(this.currentState());
+      this.undoStates.push(this.currentState())
 
-      Object.assign(this, lastState);
+      Object.assign(this, lastState)
 
-      this.render();
+      this.render()
     },
-  });
+  })
 
-  Groundhogg.EmailEditor = EmailEditor;
-})(jQuery);
+  Groundhogg.EmailEditor = EmailEditor
+})(jQuery)
