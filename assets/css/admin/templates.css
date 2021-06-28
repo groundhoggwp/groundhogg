@@ -1,0 +1,184 @@
+body {
+  background-color: #F6F9FB;
+}
+
+#wpcontent {
+  padding-left: 0;
+}
+
+#template-name h2 {
+  font-size: 32px;
+  text-align: center;
+  font-weight: 300;
+}
+#template-name input {
+  font-size: 24px;
+  width: 500px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+#template-name button {
+  display: block;
+  margin: auto;
+}
+
+.templates-picker * {
+  box-sizing: border-box;
+}
+.templates-picker #header {
+  display: flex;
+  justify-content: space-between;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  align-items: center;
+  padding: 0 20px;
+  background: #FFFFFF;
+  position: sticky;
+  top: 32px;
+  z-index: 10000;
+}
+.templates-picker #import,
+.templates-picker #title-input {
+  padding: 40px;
+}
+.templates-picker #import h1,
+.templates-picker #title-input h1 {
+  text-align: center;
+  font-weight: 200;
+  margin-bottom: 40px;
+}
+.templates-picker #import #import-file,
+.templates-picker #title-input #import-file {
+  padding: 40px;
+  border: 2px dashed rgba(16, 38, 64, 0.15);
+  background: #FFFFFF;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  border-radius: 5px;
+  margin: auto;
+  display: block;
+}
+.templates-picker #import p.error,
+.templates-picker #title-input p.error {
+  color: #e91f4f;
+  text-align: center;
+}
+.templates-picker #import #title,
+.templates-picker #title-input #title {
+  font-size: 26px;
+  width: 100%;
+  text-align: center;
+  border-radius: 0;
+  border-width: 0 0 1px 0;
+  box-shadow: none;
+}
+.templates-picker #import .submit,
+.templates-picker #title-input .submit {
+  text-align: center;
+}
+.templates-picker #import > p,
+.templates-picker #title-input > p {
+  text-align: center;
+}
+.templates-picker #import a.cancel,
+.templates-picker #title-input a.cancel {
+  font-size: 16px;
+  cursor: pointer;
+}
+.templates-picker #import .template-preview-wrap,
+.templates-picker #title-input .template-preview-wrap {
+  display: flex;
+}
+.templates-picker #import .template-preview-wrap > *,
+.templates-picker #title-input .template-preview-wrap > * {
+  width: 100%;
+}
+.templates-picker #import .template-preview-wrap .template-actions,
+.templates-picker #title-input .template-preview-wrap .template-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 30px;
+}
+.templates-picker #import .template-preview-wrap #template-preview,
+.templates-picker #title-input .template-preview-wrap #template-preview {
+  width: 600px;
+  border-radius: 5px;
+  margin: auto;
+  display: block;
+  min-height: 500px;
+}
+.templates-picker #templates {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+}
+.templates-picker #templates .row {
+  display: flex;
+  gap: 20px;
+}
+.templates-picker #templates .row > * {
+  width: 100%;
+}
+.templates-picker #templates .row .template.enabled:focus, .templates-picker #templates .row .template.enabled:hover {
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.15);
+}
+.templates-picker #templates .row .template.enabled:focus button, .templates-picker #templates .row .template.enabled:hover button {
+  visibility: visible;
+}
+.templates-picker #templates .row .template.disabled {
+  opacity: 0.8;
+}
+.templates-picker #templates .row .template .inside {
+  padding-top: 0;
+}
+.templates-picker #templates .row .template .template-header {
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.templates-picker #templates .row .template .subject-and-preview {
+  margin-bottom: 10px;
+}
+.templates-picker #templates .row .template .subject-and-preview .subject-wrap, .templates-picker #templates .row .template .subject-and-preview .preview-wrap {
+  font-size: 14px;
+  padding: 8px 10px 0 10px;
+  font-weight: 300;
+}
+.templates-picker #templates .row .template .subject-and-preview .subject-wrap {
+  font-size: 16px;
+}
+.templates-picker #templates .row .template .subject-and-preview .subject,
+.templates-picker #templates .row .template .subject-and-preview .preview-text {
+  font-weight: 500;
+}
+.templates-picker #templates .row .template .template-preview {
+  position: relative;
+}
+.templates-picker #templates .row .template .template-preview .template-content {
+  zoom: 80%;
+  padding: 10px 10px 40px 10px;
+  max-height: 400px;
+  overflow: auto;
+  border-top: 1px solid rgba(16, 38, 64, 0.15);
+}
+.templates-picker #templates .row .template .template-preview .template-actions {
+  display: none;
+  position: absolute;
+  bottom: 0;
+  background-color: #FFFFFF;
+  border-top: 1px solid rgba(16, 38, 64, 0.15);
+  border-radius: 0 0 5px 5px;
+  padding: 10px;
+}
+.templates-picker #templates .row .template .template-preview .template-actions button {
+  width: 100%;
+}
+.templates-picker #templates .row .template .template-preview:hover .template-actions {
+  display: block;
+  left: 0;
+  right: 0;
+}
+
+/*# sourceMappingURL=templates.css.map */
