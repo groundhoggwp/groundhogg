@@ -528,6 +528,13 @@
 #funnel-editor #control-panel .row:not(:last-child) {
   margin-bottom: 20px;
 }
+#funnel-editor #control-panel .row.with-columns {
+  gap: 20px;
+  display: flex;
+}
+#funnel-editor #control-panel .row.with-columns .column {
+  width: 100%;
+}
 #funnel-editor .step-context-menu {
   display: none;
   position: fixed;

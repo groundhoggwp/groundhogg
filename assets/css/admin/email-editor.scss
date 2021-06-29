@@ -74,6 +74,7 @@ body {
   &-header {
     @include panel();
     padding: 8px 12px;
+    min-height: 50px;
     border-radius: 0;
     display: flex;
     gap: 20px;

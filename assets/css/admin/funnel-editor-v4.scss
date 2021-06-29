@@ -688,7 +688,20 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
     margin-bottom: 20px;
   }
 
-  /* context menu */
+  #control-panel{
+    .row{
+      &.with-columns{
+        gap: 20px;
+        display: flex;
+        .column{
+          width: 100%;
+        }
+      }
+    }
+  }
+
+
+    /* context menu */
 
   .step-context-menu {
     display: none;

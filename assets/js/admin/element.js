@@ -28,6 +28,8 @@
         $(document).trigger('to_mce')
       })
     })
+
+    this.flag = 'improved'
   }
 
   /**
@@ -561,7 +563,7 @@
           option.value, option.text,
           Array.isArray(selected)
             ? selected.indexOf(option.value) !== -1
-            : option.value === selected))
+            : option.value == selected))
       })
     }
     // Assume object
@@ -572,7 +574,7 @@
             option, options[option],
             Array.isArray(selected)
               ? selected.indexOf(option) !== -1
-              : option === selected))
+              : option == selected))
         }
       }
     }

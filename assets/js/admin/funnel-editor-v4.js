@@ -6,6 +6,7 @@
   const apiRoutes = Groundhogg.api.routes.v4
   const {
     tinymceElement,
+    improveTinyMCE,
     confirmationModal,
     dangerConfirmationModal,
     loadingModal,
@@ -189,6 +190,38 @@
     funnelErrors: [],
 
     htmlTemplates: {
+      container () {
+        //language=HTML
+        return `
+			<div id="funnel-editor" class="editor">
+				<div class="editor-header">
+					<div class="back-to-admin"></div>
+					<div class="header-stuff">
+						<div class="title-wrap">
+						</div>
+						<div class="header-actions">
+							<div class="undo-and-redo"></div>
+							<div class="publish-actions">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="flow-and-edit">
+					<div class="step-flow">
+						<div class="steps"></div>
+						<div class="add-new-step-wrapper">
+							<button
+								class="gh-button secondary add-new-step">Add New Step
+							</button>
+						</div>
+					</div>
+					<div id="control-panel">
+						<div class="step-add">
+						</div>
+					</div>
+				</div>
+			</div>`
+      },
       undoRedoActions () {
         //language=HTML
         return `
@@ -617,7 +650,6 @@
         }
       })
 
-
       $doc.on('blur change keydown', '#funnel-title-edit', function (e) {
         // If the event is key down do nothing if the key wasn't enter
         if (e.type === 'keydown' && e.key !== 'Enter') {
@@ -638,7 +670,6 @@
         )
         self.renderTitle()
       })
-
 
       $doc.on('click', '#more-menu', () => {
         moreMenu('#more-menu', {
@@ -765,27 +796,23 @@
         }
       )
 
-      $(document).on('tinymce-editor-setup', function (event, editor) {
-        editor.settings.toolbar1 =
-          'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,wp_adv,dfw,groundhoggreplacementbtn,groundhoggemojibtn'
-        editor.settings.toolbar2 =
-          'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help'
-        editor.settings.height = 200
-        editor.on('click', function (ed, e) {
-          $(document).trigger('to_mce')
-        })
-      })
+      improveTinyMCE()
 
-      self.setupSortable()
       self.setupStepTypes()
       // self.initStepFlowContextMenu()
       self.maybePreloadTagsAndEmails()
+    },
+
+    renderContainer () {
+      $('#app').html(this.htmlTemplates.container())
+      this.setupSortable()
     },
 
     /**
      * Re-render the whole editor
      */
     render () {
+      this.renderContainer()
       this.renderTitle()
       this.renderPublishActions()
       this.renderStepFlow()
@@ -1209,14 +1236,12 @@
 
         const $addSteps = $('.add-step')
 
-        if (!self.addingStepOrder) {
-          $addSteps.draggable({
-            connectToSortable: '.step-flow .steps',
-            helper: 'clone',
-            revert: 'invalid',
-            revertDuration: 0,
-          })
-        }
+        $addSteps.draggable({
+          connectToSortable: '.step-flow .steps',
+          helper: 'clone',
+          revert: 'invalid',
+          revertDuration: 0,
+        })
 
         $addSteps.on('click', function () {
           const $button = $(this)
@@ -1245,63 +1270,42 @@
       })
     },
 
-    renderEmailEditor () {
-      window.console.log('renderEmailEditor')
+    renderEmailEditor (email) {
 
       if (this.view !== 'editingEmail') {
         return
       }
 
-      var self = this
+      this.demountStep()
 
-      const step = this.funnel.steps.find(
-        (step) => step.ID === this.activeStep
-      )
-      const previousStep = this.funnel.steps.find(
-        (step) => step.ID === this.previousActiveStep
-      )
-
-      // Handle remounting the step
-      // if (this.activeStep === this.lastStepEditMounted) {
-      //   this.demountStep(step)
-      // } else if (previousStep) {
-      //   this.demountStep(previousStep)
-      // }
-      //
-      // slotsDemounted()
-
-      $('#funnel-editor').html(`
-        <div id="email-editor-wrapper">
-          <div class="editor-header">
-            <div class="header-stuff">
-              <div class="title-wrap">
-			          <div class="title">Email editor</div>
-              </div>
-              <div class="header-actions">
-                <button class="gh-button secondary">
-                  Back to your funnel
-                </button>
-              </div>
-	          </div>
-          </div>
-          <div id="email-editor"></div>
-        </div>
-      `)
-
-      Groundhogg.EmailEditor({
-        selector: '#email-editor',
-        email: EmailsStore.get(parseInt(step.meta.email_id)),
+      const editor = Groundhogg.EmailEditor({
+        selector: '#app',
+        email: email,
         onChange: (email) => {
           console.log(email)
         },
         onCommit: (email) => {
           console.log(email)
         },
-      }).mount()
+        onHeaderMount: () => {
+          $('#back-to-funnel,#close-email-editor').on('click', () => {
+            editor.demount()
+            this.view = 'editingStep'
+            this.render()
+          })
+        },
+        beforeBreadcrumbs: `<span class="root">Funnels</span><span class="sep">/</span><span id="back-to-funnel" style="cursor: pointer">${specialChars(this.funnel.data.title)}</span>`,
+        //language=html
+        afterPublishActions: `
+			<button id="close-email-editor" class="gh-button secondary text icon">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 365.7 365.7">
+					<path fill="currentColor"
+					      d="M243.2 182.9L356.3 69.7a32 32 0 000-45.2l-15-15.1a32 32 0 00-45.3 0L182.9 122.5 69.7 9.4a32 32 0 00-45.2 0l-15.1 15a32 32 0 000 45.3L122.5 183 9.4 295.9a32 32 0 000 45.3l15 15.1a32 32 0 0045.3 0L183 243.2l113 113.1a32 32 0 0045.3 0l15.1-15a32 32 0 000-45.3zm0 0"/>
+				</svg>
+			</button>`
+      })
 
-      // this.mountStep(step)
-
-      // slotsMounted()
+      editor.mount()
     },
 
     /**
@@ -3214,9 +3218,6 @@
 					  </div>
 				  </div>
 				  <iframe id="email-preview"></iframe>
-				  <button id="render-email-edit" class="gh-button secondary">
-					  Edit this email
-				  </button>
 			  </div>`
         }
 
@@ -3224,24 +3225,27 @@
         return `
 			${email_id && email ? iframePreview(email) : ''}
 			<div class="panel">
-				<div class="row">
-					<label class="row-label">Select an email to send...</label>
-					${select(
-						{
-							id: 'email-picker',
-							name: 'email_id',
-						},
-						EmailsStore.getItems().map((item) => {
-							return {
-								text: item.data.title,
-								value: item.ID,
-							}
-						}, email_id)
-					)}
-				</div>
-				<div class="row">
-					<label class="row-label">Or...</label>
-					<button class="gh-button secondary">Create a new email</button>
+				<div class="row with-columns">
+					<div class="column">
+						<label
+							class="row-label">${email ? 'Select a different email to send...' : 'Select an email to send...'}</label>
+						${select(
+							{
+								id: 'email-picker',
+								name: 'email_id',
+							},
+							EmailsStore.getItems().map((item) => {
+								return {
+									text: item.data.title,
+									value: item.ID,
+								}
+							}, parseInt(email_id))
+						)}
+					</div>
+					<div class="column">
+						<label class="row-label">Or...</label>
+						<button class="gh-button secondary">Create a new email</button>
+					</div>
 				</div>
 			</div>`
       },
@@ -3281,7 +3285,7 @@
 
           $('#render-email-edit').on('click', function () {
             Editor.view = 'editingEmail'
-            Editor.renderEmailEditor()
+            Editor.renderEmailEditor(email)
           })
         }
       },
@@ -3686,6 +3690,35 @@
       }
     },
     ...rest,
+  })
+
+  fill('beforeStepNotes.send_email', {
+    render ({ ID, meta }) {
+
+      const { email_id } = meta
+      const email = EmailsStore.get(email_id)
+
+      if (!email_id || !email) {
+        return ''
+      }
+
+      //language=HTML
+      return `
+		  <button style="width: 100%" id="edit-email-right" class="gh-button secondary">Edit Email</button>
+      `
+    },
+    onMount ({ ID, meta }) {
+
+      const { email_id } = meta
+      const email = EmailsStore.get(email_id)
+
+      if (email_id && email) {
+        $('#edit-email-right').on('click', () => {
+          Editor.view = 'editingEmail'
+          Editor.renderEmailEditor(email)
+        })
+      }
+    }
   })
 
   fill('beforeStepNotes.form_fill', {

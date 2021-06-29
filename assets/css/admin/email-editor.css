@@ -36,6 +36,7 @@ body iframe#preview.desktop {
   margin-bottom: 1rem;
   padding: 20px;
   padding: 8px 12px;
+  min-height: 50px;
   border-radius: 0;
   display: flex;
   gap: 20px;

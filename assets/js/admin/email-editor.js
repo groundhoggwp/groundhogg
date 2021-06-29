@@ -29,6 +29,9 @@
     email,
     onChange = (email) => {},
     onCommit = (email) => {},
+    beforeBreadcrumbs = '<span class="root">Emails</span>',
+    onHeaderMount = () => {},
+    afterPublishActions = ''
   }) => ({
     selector,
     email: copyObject(email),
@@ -43,26 +46,29 @@
 
     components: {
       editor () {
+        //language=HTML
         return `
-          <div id="email-editor-header">
-              ${this.components.header.call(this)}
-          </div>
-          <div id="email-editor-body">
-            <div id="email-editor-main">
-              <div id="email-editor-content">
-                  ${this.components.content.call(this)}
-              </div>
-              <div id="email-editor-content-editor">
-                  ${this.components.contentEditor.call(this)}
-              </div>
-              <div id="email-editor-advanced">
-                  ${this.components.controls.call(this)}
-              </div>
-            </div>
-            <div id="email-editor-sidebar">
-                ${this.components.sidebar.call(this)}
-            </div>
-          </div>
+			<div id="email-editor">
+				<div id="email-editor-header">
+					${this.components.header.call(this)}
+				</div>
+				<div id="email-editor-body">
+					<div id="email-editor-main">
+						<div id="email-editor-content">
+							${this.components.content.call(this)}
+						</div>
+						<div id="email-editor-content-editor">
+							${this.components.contentEditor.call(this)}
+						</div>
+						<div id="email-editor-advanced">
+							${this.components.controls.call(this)}
+						</div>
+					</div>
+					<div id="email-editor-sidebar">
+						${this.components.sidebar.call(this)}
+					</div>
+				</div>
+			</div>
         `
       },
 
@@ -83,7 +89,7 @@
         // language=HTML
         return `
 			<div class="title-wrap">
-				<h1 class="breadcrumbs"><span class="root">Emails</span><span
+				<h1 class="breadcrumbs">${beforeBreadcrumbs}<span
 					class="sep">/</span>${this.isEditingTitle ? titleEdit() : titleDisplay()}</h1>
 			</div>
 			<div class="actions">
@@ -96,6 +102,7 @@
 				<div class="publish-actions">
 					<button id="commit" class="gh-button primary">Update</button>
 				</div>
+				${afterPublishActions}
 			</div>
         `
       },
@@ -380,6 +387,8 @@
             initialContent: this.edited.data.content
           })
 
+          this.codemirror = editor
+
         } else {
           tinymceElement(
             'content',
@@ -459,6 +468,8 @@
             mountHeader()
           })
         }
+
+        onHeaderMount();
       }
 
       const mountSidebar = () => {
@@ -569,6 +580,19 @@
       mainContentMount()
       sidebarMount()
       headerMount()
+    },
+
+    demount () {
+      this.onDemount()
+    },
+
+    onDemount () {
+
+      if (this.edited.meta.type === 'html') {
+        this.codemirror.toTextArea()
+      } else {
+        wp.editor.remove('content')
+      }
     },
 
     currentState () {
