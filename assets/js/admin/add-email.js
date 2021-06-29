@@ -1,6 +1,6 @@
 (function ($, Templates) {
 
-  const { select, regexp, modal, input, primaryButton, loadingDots } = Groundhogg.element
+  const { breadcrumbs, select, regexp, modal, input, primaryButton, loadingDots } = Groundhogg.element
   const { templates } = Templates
   const { post, get, routes } = Groundhogg.api
 
@@ -51,10 +51,22 @@
     return row
   }
 
-  const Add = {
+  const EmailTemplatePicker = ({
+    selector,
+    breadcrumbs: crumbs = [
+      'Emails',
+      'Add New'
+    ],
+    onSelect = (email) => {
+      console.log(email)
+    },
+    afterHeaderActions = '',
+    onMount = () => {}
+  }) => ({
 
     search: '',
     selectedTemplate: '',
+    $el: $(selector),
 
     renderTemplate (template) {
 
@@ -81,9 +93,13 @@
     render () {
       //language=HTML
       return `
-		  <div>
-			  <div id="header">
-				  <h1>Choose a template</h1>
+		  <div class="templates-picker">
+			  <div id="header" class="gh-header is-sticky">
+				  <div class="title-wrap">
+					  <h1 class="breadcrumbs">
+						  ${breadcrumbs(crumbs)}
+					  </h1>
+				  </div>
 				  <div class="search-templates">
 					  ${select({
 						  id: 'campaign',
@@ -94,9 +110,10 @@
 					  })}
 					  <input type="search" id="search" name="search" placeholder="Search templates" value=""/>
 				  </div>
-				  <div class="alternate">
+				  <div class="template-actions">
 					  <button id="import-button" class="gh-button secondary">Import</button>
 					  <button id="scratch-button" class="gh-button secondary">Start From Scratch</button>
+					  ${afterHeaderActions}
 				  </div>
 			  </div>
 			  <div id="view"></div>
@@ -148,7 +165,7 @@
 
       const handleCreate = () => {
         setContent(modalContent(true))
-        loadingDots('#create')
+        loadingDots(`#create`)
 
         createEmail({
           ...this.selectedTemplate,
@@ -157,13 +174,14 @@
             title: this.newTitle
           },
         }).then(email => {
-          window.location.href = email.admin
+          close()
+          onSelect(email)
         })
       }
 
-      $('#create').on('click', handleCreate)
+      $(`#create`).on('click', handleCreate)
 
-      $('#title-input').focus().on('change input keydown', (e) => {
+      $(`#title-input`).focus().on('change input keydown', (e) => {
 
         this.newTitle = e.target.value
 
@@ -181,9 +199,9 @@
 
     mountTemplates () {
 
-      $('#view').html(this.renderTemplates())
+      $(`${selector} #view`).html(this.renderTemplates())
 
-      $('button.select-template').on('click', (e) => {
+      $(`${selector} button.select-template`).on('click', (e) => {
         const templateId = e.target.dataset.template
         const template = templates.find(t => t.ID == templateId)
         this.selectedTemplate = template
@@ -192,9 +210,9 @@
         this.titleModal()
       })
 
-      $('iframe.template-frame').each(function () {
+      $(`${selector} iframe.template-frame`).each(function () {
         const template = this.dataset.template
-        setFrameContent(this, templates.find( t => t.ID === template).context.built)
+        setFrameContent(this, templates.find(t => t.ID === template).context.built)
       })
     },
 
@@ -231,8 +249,8 @@
 		  </div>`
     },
 
-    mountImport () {
-      $('#view').html(this.renderImport())
+    mountImport: function () {
+      $(`${selector} #view`).html(this.renderImport())
 
       if (this.importTemplate) {
         setFrameContent($('#template-preview')[0], this.importTemplate.data.content)
@@ -280,12 +298,12 @@
         }
       }
 
-      $('a.cancel').on('click', () => {
+      $(`${selector} a.cancel`).on('click', () => {
         this.reset()
         this.mountTemplates()
       })
 
-      $('#import-file').on('change', (e) => {
+      $(`${selector} #import-file`).on('change', (e) => {
         const files = e.target.files
 
         const reader = new FileReader()
@@ -314,21 +332,22 @@
     },
 
     mount () {
-      $('#add-email').html(this.render())
+
+      this.$el.html(this.render())
       this.mountTemplates()
 
-      $('#search').on('input change', (e) => {
+      $(`${selector} #search`).on('input change', (e) => {
         this.search = e.target.value
         this.reset()
         this.mountTemplates()
       })
 
-      $('#import-button').on('click', (e) => {
+      $(`${selector} #import-button`).on('click', (e) => {
         this.reset()
         this.mountImport()
       })
 
-      $('#scratch-button').on('click', (e) => {
+      $(`${selector} #scratch-button`).on('click', (e) => {
         this.reset()
         this.selectedTemplate = {
           data: {},
@@ -336,12 +355,11 @@
         }
         this.titleModal()
       })
+
+      onMount()
     }
-
-  }
-
-  $(() => {
-    Add.mount()
   })
+
+  Groundhogg.EmailTemplatePicker = EmailTemplatePicker
 
 })(jQuery, AddEmail)

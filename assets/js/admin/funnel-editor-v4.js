@@ -45,6 +45,17 @@
     return o
   }
 
+  const toEditorButton = () => {
+    // language=HTML
+    return `
+		<button id="close-email-editor" class="gh-button secondary text icon">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 365.7 365.7">
+				<path fill="currentColor"
+				      d="M243.2 182.9L356.3 69.7a32 32 0 000-45.2l-15-15.1a32 32 0 00-45.3 0L182.9 122.5 69.7 9.4a32 32 0 00-45.2 0l-15.1 15a32 32 0 000 45.3L122.5 183 9.4 295.9a32 32 0 000 45.3l15 15.1a32 32 0 0045.3 0L183 243.2l113 113.1a32 32 0 0045.3 0l15.1-15a32 32 0 000-45.3zm0 0"/>
+			</svg>
+		</button>`
+  }
+
   const slot = (name, ...args) => {
     return SlotFillProvider.slot(name, ...args)
   }
@@ -1270,11 +1281,40 @@
       })
     },
 
-    renderEmailEditor (email) {
+    renderEmailTemplatePicker (updateStepMeta) {
 
-      if (this.view !== 'editingEmail') {
-        return
-      }
+      this.demountStep()
+
+      const picker = Groundhogg.EmailTemplatePicker({
+        selector: '#app',
+        breadcrumbs: [
+          'Funnels',
+          `<span id="back-to-funnel" style="cursor: pointer">${specialChars(this.funnel.data.title)}</span>`,
+          'Add Email'
+        ],
+        onSelect: (email) => {
+          this.render()
+          EmailsStore.itemsFetched([
+            email
+          ])
+          updateStepMeta({
+            email_id: email.ID
+          }, true)
+          this.renderEmailEditor(email)
+        },
+        afterHeaderActions: toEditorButton(),
+        onMount: () => {
+          $('#back-to-funnel,#close-email-editor').on('click', () => {
+            this.render()
+          })
+        }
+      })
+
+      picker.mount()
+
+    },
+
+    renderEmailEditor (email) {
 
       this.demountStep()
 
@@ -1290,19 +1330,15 @@
         onHeaderMount: () => {
           $('#back-to-funnel,#close-email-editor').on('click', () => {
             editor.demount()
-            this.view = 'editingStep'
             this.render()
           })
         },
-        beforeBreadcrumbs: `<span class="root">Funnels</span><span class="sep">/</span><span id="back-to-funnel" style="cursor: pointer">${specialChars(this.funnel.data.title)}</span>`,
+        breadcrumbs: [
+          'Funnels',
+          `<span id="back-to-funnel" style="cursor: pointer">${specialChars(this.funnel.data.title)}</span>`,
+        ],
         //language=html
-        afterPublishActions: `
-			<button id="close-email-editor" class="gh-button secondary text icon">
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 365.7 365.7">
-					<path fill="currentColor"
-					      d="M243.2 182.9L356.3 69.7a32 32 0 000-45.2l-15-15.1a32 32 0 00-45.3 0L182.9 122.5 69.7 9.4a32 32 0 00-45.2 0l-15.1 15a32 32 0 000 45.3L122.5 183 9.4 295.9a32 32 0 000 45.3l15 15.1a32 32 0 0045.3 0L183 243.2l113 113.1a32 32 0 0045.3 0l15.1-15a32 32 0 000-45.3zm0 0"/>
-				</svg>
-			</button>`
+        afterPublishActions: toEditorButton()
       })
 
       editor.mount()
@@ -3244,7 +3280,7 @@
 					</div>
 					<div class="column">
 						<label class="row-label">Or...</label>
-						<button class="gh-button secondary">Create a new email</button>
+						<button id="add-new-email" class="gh-button secondary">Create a new email</button>
 					</div>
 				</div>
 			</div>`
@@ -3268,6 +3304,10 @@
           )
         })
 
+        $('#add-new-email').on('click', () => {
+          Editor.renderEmailTemplatePicker(updateStepMeta)
+        })
+
         const fullFrame = (frame) => {
           frame.height = frame.contentWindow.document.body.offsetHeight
           frame.style.height =
@@ -3284,7 +3324,6 @@
           }, 100)
 
           $('#render-email-edit').on('click', function () {
-            Editor.view = 'editingEmail'
             Editor.renderEmailEditor(email)
           })
         }
@@ -3714,7 +3753,6 @@
 
       if (email_id && email) {
         $('#edit-email-right').on('click', () => {
-          Editor.view = 'editingEmail'
           Editor.renderEmailEditor(email)
         })
       }

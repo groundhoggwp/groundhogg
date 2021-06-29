@@ -12,6 +12,10 @@
     return result
   }
 
+  const breadcrumbs = ( parts ) => {
+    return parts.map( (p,i) => i < parts.length-1 ? `<span class="part">${p}</span>` : `<span class="base">${p}</span>` ).join(`<span class="sep">/</span>`)
+  }
+
   function improveTinyMCE () {
 
     if (typeof this.flag !== 'undefined') {
@@ -1092,7 +1096,8 @@
     dangerButton,
     secondaryButton,
     button,
-    codeEditor
+    codeEditor,
+    breadcrumbs
   }
 
 })(jQuery)

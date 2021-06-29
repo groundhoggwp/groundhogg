@@ -5,6 +5,7 @@
     input,
     tinymceElement,
     specialChars,
+    breadcrumbs,
     improveTinyMCE,
     inputWithReplacementsAndEmojis,
     inputWithReplacements,
@@ -29,7 +30,9 @@
     email,
     onChange = (email) => {},
     onCommit = (email) => {},
-    beforeBreadcrumbs = '<span class="root">Emails</span>',
+    breadcrumbs: crumbs = [
+      'Emails',
+    ],
     onHeaderMount = () => {},
     afterPublishActions = ''
   }) => ({
@@ -89,8 +92,10 @@
         // language=HTML
         return `
 			<div class="title-wrap">
-				<h1 class="breadcrumbs">${beforeBreadcrumbs}<span
-					class="sep">/</span>${this.isEditingTitle ? titleEdit() : titleDisplay()}</h1>
+          <h1 class="breadcrumbs">${breadcrumbs([
+              ...crumbs,
+              this.isEditingTitle ? titleEdit() : titleDisplay()
+          ])}</h1>
 			</div>
 			<div class="actions">
 				<div class="undo-and-redo">
@@ -469,7 +474,7 @@
           })
         }
 
-        onHeaderMount();
+        onHeaderMount()
       }
 
       const mountSidebar = () => {

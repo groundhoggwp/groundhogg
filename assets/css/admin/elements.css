@@ -1,3 +1,39 @@
+.gh-header {
+  display: flex;
+  justify-content: space-between;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  align-items: center;
+  background: #FFFFFF;
+  padding: 8px 12px;
+  min-height: 60px;
+  box-sizing: border-box;
+}
+.gh-header.is-sticky {
+  position: sticky;
+  top: 32px;
+  z-index: 10000;
+}
+.gh-header .title-wrap h1.breadcrumbs {
+  line-height: 1;
+  margin: 0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 1.6em;
+  white-space: nowrap;
+}
+.gh-header .title-wrap h1.breadcrumbs .sep,
+.gh-header .title-wrap h1.breadcrumbs .base {
+  font-weight: 400;
+  cursor: pointer;
+}
+.gh-header .title-wrap h1.breadcrumbs .part {
+  font-weight: 500;
+}
+.gh-header .title-wrap h1.breadcrumbs .dashicons {
+  color: rgba(16, 38, 64, 0.3);
+}
+
 a.action-link {
   font-size: 14px;
   text-decoration: none;

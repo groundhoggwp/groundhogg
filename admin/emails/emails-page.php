@@ -88,12 +88,6 @@ class Emails_Page extends Admin_Page {
 				wp_enqueue_style( 'groundhogg-admin-templates' );
 				wp_enqueue_script( 'groundhogg-admin-add-email' );
 
-				$library = new Groundhogg\Library();
-
-				wp_localize_script( 'groundhogg-admin-add-email', 'AddEmail', [
-					'templates' => $library->get_email_templates(),
-				] );
-
 				break;
 			case 'edit':
 				wp_enqueue_editor();
@@ -442,12 +436,14 @@ class Emails_Page extends Admin_Page {
 
 	public function page() {
 
-		switch ( $this->get_current_action() ){
+		switch ( $this->get_current_action() ) {
 			case 'add':
 				$this->add();
+
 				return;
 			case 'edit':
 				$this->edit();
+
 				return;
 		}
 

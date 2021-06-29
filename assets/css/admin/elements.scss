@@ -21,6 +21,50 @@ $action-green: rgb(158, 206, 56);
 $action-green-50: rgba(158, 206, 56, 0.5);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
+.gh-header {
+  display: flex;
+  justify-content: space-between;
+  box-shadow: $box-shadow;
+  align-items: center;
+  background: #FFFFFF;
+  padding: 8px 12px;
+  min-height: 60px;
+  box-sizing: border-box;
+
+  &.is-sticky{
+    position: sticky;
+    top: 32px;
+    z-index: 10000;
+  }
+
+  .title-wrap {
+
+    h1.breadcrumbs {
+      line-height: 1;
+      margin: 0;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-size: 1.6em;
+      white-space: nowrap;
+
+      .sep,
+      .base {
+        font-weight: 400;
+        cursor: pointer;
+      }
+
+      .part {
+        font-weight: 500;
+      }
+
+      .dashicons {
+        color: $primary-dark-30;
+      }
+    }
+  }
+}
+
 a.action-link {
   font-size: 14px;
   text-decoration: none;

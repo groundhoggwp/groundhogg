@@ -25,16 +25,9 @@ body {
 .templates-picker * {
   box-sizing: border-box;
 }
-.templates-picker #header {
+.templates-picker .template-actions {
   display: flex;
-  justify-content: space-between;
-  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
-  align-items: center;
-  padding: 0 20px;
-  background: #FFFFFF;
-  position: sticky;
-  top: 32px;
-  z-index: 10000;
+  gap: 10px;
 }
 .templates-picker #import,
 .templates-picker #title-input {
