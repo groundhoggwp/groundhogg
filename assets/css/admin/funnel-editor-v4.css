@@ -123,7 +123,6 @@
   align-items: center;
   flex-grow: 1;
 }
-#funnel-editor .editor-header .undo-and-redo,
 #funnel-editor .editor-header .publish-actions,
 #funnel-editor .editor-header .header-actions {
   display: flex;
@@ -137,46 +136,21 @@
   opacity: 0.382;
   font-style: italic;
 }
-#funnel-editor .undo-and-redo .undo,
-#funnel-editor .undo-and-redo .redo {
+#funnel-editor .title-wrap h1 {
+  line-height: 1;
+  margin: 0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 1.6em;
+}
+#funnel-editor .title-wrap h1 .sep,
+#funnel-editor .title-wrap h1 #title {
+  font-weight: 400;
   cursor: pointer;
-  opacity: 0.6;
 }
-#funnel-editor .undo-and-redo .undo:hover,
-#funnel-editor .undo-and-redo .redo:hover {
-  opacity: 0.8;
-}
-#funnel-editor .title-wrap .above-title {
-  color: #102640;
-  opacity: 0.6;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 8px;
-  line-height: 9px;
-  text-transform: uppercase;
-}
-#funnel-editor .title-wrap .title {
-  position: relative;
-  cursor: pointer;
-  font-size: 20px;
-  font-weight: 500;
-}
-#funnel-editor .title-wrap input.funnel-title-edit {
-  border-bottom: 1px solid;
-}
-#funnel-editor .title-wrap input.funnel-title-edit:focus {
-  outline: none;
-  box-shadow: none;
-}
-#funnel-editor .title-wrap .pencil {
-  position: absolute;
-  margin-left: 10px;
-  bottom: 0;
-  opacity: 0.3;
-  color: #102640;
-}
-#funnel-editor .title-wrap .title:hover .pencil {
-  opacity: 0.5;
+#funnel-editor .title-wrap h1 .dashicons {
+  color: rgba(16, 38, 64, 0.3);
 }
 #funnel-editor .flow-and-edit {
   display: flex;
@@ -272,13 +246,9 @@
   padding: 20px;
   gap: 20px;
 }
-#funnel-editor .step-edit.send_email .loading-iframe {
-  display: flex;
-  min-height: 220px;
-  background: url(../../images/loading.gif) center center no-repeat;
-}
-#funnel-editor .step-edit.send_email iframe {
+#funnel-editor .step-edit.send_email iframe#email-preview {
   width: 100%;
+  min-height: 400px;
 }
 #funnel-editor .step-edit.send_email #from-line {
   display: flex;
@@ -372,6 +342,21 @@
 #funnel-editor .step {
   position: relative;
 }
+#funnel-editor .step .step-menu-button {
+  height: 100%;
+  position: absolute;
+  right: 5px;
+  top: 0;
+  display: none;
+}
+#funnel-editor .step .step-menu-button svg {
+  width: 20px;
+  height: 100%;
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+}
+#funnel-editor .step:hover .step-menu-button, #funnel-editor .step:focus-within .step-menu-button {
+  display: block;
+}
 #funnel-editor .step-flow .step .icon-svg svg {
   margin-right: 10px;
   width: 32px;
@@ -426,43 +411,6 @@
 #funnel-editor .step-status.edited:before {
   background: #0075ff;
   content: "Edited";
-}
-#funnel-editor .step:hover .step-menu {
-  display: flex;
-}
-#funnel-editor .step-menu {
-  align-items: center;
-  display: none;
-  justify-content: center;
-  position: absolute;
-  height: 100%;
-  top: 0rem;
-  right: 0rem;
-  width: 2rem;
-}
-#funnel-editor .step-menu svg {
-  fill: #0005;
-}
-#funnel-editor .step-menu ul {
-  background: #FFF;
-  border: 1px solid #0002;
-  border-radius: 3px;
-  box-shadow: 2px 2px 3px 0 #0001;
-  display: none;
-  right: 0;
-  list-style: none;
-  margin: 0;
-  position: absolute;
-  top: 90%;
-  z-index: 1000;
-}
-#funnel-editor .step-menu ul li {
-  margin: 0;
-  padding: 0.236rem 0.382rem;
-  white-space: nowrap;
-}
-#funnel-editor .step-menu ul li:hover {
-  background: #0001;
 }
 #funnel-editor .step .details {
   width: 165px;
@@ -648,14 +596,8 @@
   background: #FFFFFF;
 }
 #funnel-editor .publish-actions button {
-  border: none;
-  color: #FFFFFF;
-  border-radius: 5px;
   display: flex;
   gap: 20px;
-  padding: 6px 10px;
-  font-size: 16px;
-  font-weight: 400;
   align-items: center;
 }
 #funnel-editor .publish-actions button.update-and-launch {

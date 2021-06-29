@@ -24,6 +24,11 @@ a.action-link {
   background: rgba(233, 31, 79, 0.5);
 }
 
+svg.danger,
+span.gh-text.danger {
+  color: #e91f4f;
+}
+
 .gh-panel {
   background: #FFFFFF;
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
@@ -54,6 +59,10 @@ button.dashicon-button {
 button.dashicon-button:hover {
   opacity: 1;
 }
+button.dashicon-button:disabled {
+  opacity: 0.5;
+  cursor: initial;
+}
 button.gh-button {
   border: none;
   color: #FFFFFF;
@@ -66,11 +75,25 @@ button.gh-button:disabled {
   opacity: 0.5;
   cursor: initial;
 }
+button.gh-button.action {
+  background: #9ece38;
+}
+button.gh-button.action:hover:not(:disabled) {
+  background: #80a92a;
+}
 button.gh-button.primary {
   background: #0075ff;
 }
+button.gh-button.primary.text {
+  background-color: transparent;
+  color: #0075ff;
+}
 button.gh-button.primary:hover:not(:disabled) {
   background: #005ecc;
+}
+button.gh-button.primary:hover:not(:disabled).text {
+  background-color: rgba(0, 117, 255, 0.1);
+  color: #0075ff;
 }
 button.gh-button.secondary {
   border: 1px solid rgba(0, 117, 255, 0.6);
@@ -78,31 +101,43 @@ button.gh-button.secondary {
   color: #0075ff;
   padding: 5px 10px;
 }
+button.gh-button.secondary.text {
+  border: none;
+  background: transparent;
+  color: #102640;
+}
 button.gh-button.secondary:hover:not(:disabled) {
   color: #005ecc;
   border-color: #0075ff;
   background-color: rgba(0, 117, 255, 0.02);
 }
+button.gh-button.secondary:hover:not(:disabled).text {
+  border: none;
+  background: rgba(16, 38, 64, 0.1);
+  color: #102640;
+}
 button.gh-button.danger {
   background: #e91f4f;
+}
+button.gh-button.danger.text {
+  color: #e91f4f;
+  background-color: transparent;
 }
 button.gh-button.danger:hover:not(:disabled) {
   background: #c2133d;
 }
+button.gh-button.danger:hover:not(:disabled).text {
+  color: #e91f4f;
+  background-color: rgba(233, 31, 79, 0.1);
+}
 button.gh-button.icon {
-  background: #FFFFFF;
-  border: 1.2px solid rgba(16, 38, 64, 0.15);
-  padding: 4px;
+  padding: 7px;
   display: flex;
   align-items: center;
-  color: #0075ff;
 }
 button.gh-button.icon svg {
   width: 20px;
   height: 20px;
-}
-button.gh-button.icon:hover:not(:disabled) {
-  border-color: rgba(16, 38, 64, 0.25);
 }
 button.gh-button.big {
   font-size: 24px;
@@ -205,6 +240,15 @@ button.gh-button.loud {
   right: 0;
   top: 0;
 }
+.gh-modal-confirmation {
+  width: 500px;
+}
+.gh-modal-loading {
+  width: 200px;
+}
+.gh-modal-loading h1 {
+  text-align: center;
+}
 .gh-modal-dialog {
   background: white;
   border-radius: 5px;
@@ -214,6 +258,8 @@ button.gh-button.loud {
 }
 .gh-modal-dialog-alert p {
   font-size: 18px;
+  margin: 0;
+  line-height: 1.6;
 }
 .gh-modal-dialog-alert p:first-child {
   margin-top: 0;
@@ -226,12 +272,10 @@ button.gh-button.loud {
 }
 .gh-modal-confirmation-buttons {
   display: flex;
-  justify-content: center;
+  margin-top: 20px;
+  gap: 10px;
+  justify-content: flex-end;
 }
-.gh-modal-confirmation-buttons button {
-  width: 100%;
-}
-
 input.ui-autocomplete-input.focus-visible {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
@@ -375,6 +419,31 @@ p.error,
 .gh-input-repeater-row-add:first-child button {
   border-top: 1px solid #8c8f94;
   border-radius: 4px 4px 4px 4px;
+}
+
+.gh-dropdown-menu {
+  z-index: 10000;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  min-width: 120px;
+  border-radius: 5px;
+  border: 1px solid rgba(16, 38, 64, 0.15);
+  padding: 5px;
+  gap: 5px;
+}
+.gh-dropdown-menu-item {
+  padding: 5px 10px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.gh-dropdown-menu-item:hover {
+  background-color: rgba(16, 38, 64, 0.1);
+  cursor: pointer;
 }
 
 /*# sourceMappingURL=elements.css.map */

@@ -193,6 +193,8 @@
     startDate: '',
     endDate: '',
 
+    ...GroundhoggReporting,
+
     setPage (page, params) {
 
       this.demountReports()
@@ -278,6 +280,7 @@
 
     },
     init () {
+
       this.mount()
     },
     mount () {

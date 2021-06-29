@@ -2,7 +2,6 @@
 
 namespace Groundhogg;
 
-use Composer\Repository\PackageRepository;
 use Groundhogg\Api\V3\Unsubscribe_Api;
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Email_Meta;
@@ -81,6 +80,9 @@ class Email extends Base_Object_With_Meta {
 	 * @return void
 	 */
 	protected function post_setup() {
+
+		$this->ID = absint( $this->ID );
+
 		if ( $this->get_from_user_id() ) {
 			$this->from_userdata = get_userdata( $this->get_from_user_id() );
 		}
@@ -95,9 +97,9 @@ class Email extends Base_Object_With_Meta {
 		return 'email';
 	}
 
-	public function get_id() {
-		return absint( $this->ID );
-	}
+//	public function get_id() {
+//		return absint( $this->ID );
+//	}
 
 	public function get_subject_line() {
 		return $this->subject;
@@ -1076,15 +1078,20 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	public function get_as_array() {
-		return apply_filters( "groundhogg/{$this->get_object_type()}/get_as_array", [
-			'ID'      => $this->get_id(),
-			'data'    => $this->data,
-			'meta'    => $this->meta,
-			'admin'   => $this->admin_link(),
+
+		if ( ! get_contactdata() ){
+			return parent::get_as_array();
+		}
+
+		$this->set_event( new Event() );
+		$this->set_contact( get_contactdata() );
+
+		return array_merge( parent::get_as_array(), [
 			'context' => [
 				'from_name'  => $this->get_from_name(),
 				'from_email' => $this->get_from_email(),
 				'from_user'  => $this->get_from_user(),
+				'built'      => $this->build(),
 				'avatar'     => get_avatar_url( $this->get_from_user_id(), [
 					'size' => 30
 				] )

@@ -190,9 +190,9 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	public function __set( $name, $value ) {
 		if ( property_exists( $this, $name ) ) {
 			$this->$name = $value;
+		} else {
+			$this->data[ $name ] = $value;
 		}
-
-		$this->data[ $name ] = $value;
 	}
 
 	/**

@@ -29,6 +29,7 @@ class Library extends Supports_Errors {
 	 */
 	public function request( $endpoint = '', $body = [] ) {
 
+//		$url = rest_url( 'gh/v4/' . $endpoint );
 		$url = self::PROXY_URL . '/' . $endpoint;
 
 		$result = remote_post_json( $url, $body, 'GET', [
@@ -82,6 +83,17 @@ class Library extends Supports_Errors {
 		$response = $this->request( 'emails', [ 'limit' => 999, 'status' => 'ready' ] );
 
 		$emails = get_array_var( $response, 'items', [] );
+
+		$emails = array_map( function ( $e ) {
+
+			$email       = new Email();
+			$email->data = (array) $e->data;
+			$email->meta = (array) $e->meta;
+			$email->ID   = uniqid( 'email-' );
+
+			return $email;
+
+		}, $emails );
 
 		set_transient( 'groundhogg_email_templates', $emails, DAY_IN_SECONDS );
 

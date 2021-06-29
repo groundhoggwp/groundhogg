@@ -311,11 +311,16 @@ class Funnel extends Base_Object_With_Meta {
 	 * @return array|bool
 	 */
 	public function get_as_array() {
-		return apply_filters( "groundhogg/{$this->get_object_type()}/get_as_array", [
-			'ID'    => $this->get_id(),
-			'data'  => $this->data,
-			'meta'  => $this->meta,
+		return array_merge( parent::get_as_array(), [
 			'steps' => $this->get_steps(),
+			'links' => [
+				'export' => $this->export_url(),
+				'report' => admin_page_url( 'gh_reporting', [
+					'tab'         => 'v3',
+					'currentPage' => 'funnels',
+					'params'      => [ 'funnel' => $this->get_id() ],
+				] ),
+			]
 		] );
 	}
 

@@ -1,12 +1,13 @@
 (function (Funnel, $) {
-  const TagsStore = Groundhogg.stores.tags;
-  const EmailsStore = Groundhogg.stores.emails;
-  const apiGet = Groundhogg.api.get;
-  const apiPost = Groundhogg.api.post;
-  const apiRoutes = Groundhogg.api.routes.v4;
+  const TagsStore = Groundhogg.stores.tags
+  const EmailsStore = Groundhogg.stores.emails
+  const apiGet = Groundhogg.api.get
+  const apiPost = Groundhogg.api.post
+  const apiRoutes = Groundhogg.api.routes.v4
   const {
     tinymceElement,
     confirmationModal,
+    dangerConfirmationModal,
     loadingModal,
     modal,
     select,
@@ -14,50 +15,54 @@
     textarea,
     regexp,
     toggle,
+    savingModal,
     textAreaWithReplacements,
     textAreaWithReplacementsAndEmojis,
     flattenObject,
-  } = Groundhogg.element;
+    setFrameContent,
+    moreMenu,
+    clickInsideElement
+  } = Groundhogg.element
 
-  const { formBuilder } = Groundhogg;
+  const { formBuilder } = Groundhogg
 
-  const { linkPicker, emailPicker, tagPicker, apiPicker } = Groundhogg.pickers;
+  const { linkPicker, emailPicker, tagPicker, apiPicker } = Groundhogg.pickers
 
   $.fn.serializeFormJSON = function () {
-    var o = {};
-    var a = this.serializeArray();
+    var o = {}
+    var a = this.serializeArray()
     $.each(a, function () {
       if (o[this.name]) {
         if (!o[this.name].push) {
-          o[this.name] = [o[this.name]];
+          o[this.name] = [o[this.name]]
         }
-        o[this.name].push(this.value || "");
+        o[this.name].push(this.value || '')
       } else {
-        o[this.name] = this.value || "";
+        o[this.name] = this.value || ''
       }
-    });
-    return o;
-  };
+    })
+    return o
+  }
 
   const slot = (name, ...args) => {
-    return SlotFillProvider.slot(name, ...args);
-  };
+    return SlotFillProvider.slot(name, ...args)
+  }
 
   const fill = (name, component) => {
-    return SlotFillProvider.fill(name, component);
-  };
+    return SlotFillProvider.fill(name, component)
+  }
 
   const slotsMounted = () => {
-    return SlotFillProvider.slotsMounted();
-  };
+    return SlotFillProvider.slotsMounted()
+  }
 
   const slotsDemounted = () => {
-    return SlotFillProvider.slotsDemounted();
-  };
+    return SlotFillProvider.slotsDemounted()
+  }
 
   const stepIsReal = (stepId) => {
-    return Editor.origFunnel.steps.find((step) => step.ID === stepId);
-  };
+    return Editor.origFunnel.steps.find((step) => step.ID === stepId)
+  }
 
   const SlotFillProvider = {
     fills: [],
@@ -71,34 +76,34 @@
      * @param args
      * @returns {string}
      */
-    slot(slotName, ...args) {
+    slot (slotName, ...args) {
       this._slotsMounted.push({
         name: slotName,
         args: args,
-      });
+      })
       return this.fills
         .filter((fill) => fill.slot === slotName)
         .map((fill) => fill.render(...args))
-        .join("");
+        .join('')
     },
 
     /**
      * Call this after any slots have been added to the DOM
      */
-    slotsMounted() {
-      let slot;
+    slotsMounted () {
+      let slot
 
       while (this._slotsMounted.length > 0) {
         // Get the next mounted slot
-        slot = this._slotsMounted.pop();
+        slot = this._slotsMounted.pop()
         this.fills
           .filter((fill) => fill.slot === slot.name)
           .forEach((fill) => {
-            fill.onMount(...slot.args);
-          });
+            fill.onMount(...slot.args)
+          })
 
         // After a slot has been mounted, remember it has been so it can be demounted later
-        this._slotsDemounted.push(slot);
+        this._slotsDemounted.push(slot)
       }
     },
 
@@ -106,17 +111,17 @@
      * Any callbacks to demount a slot
      * Call before any slots are removed from the DOM
      */
-    slotsDemounted() {
-      let slot;
+    slotsDemounted () {
+      let slot
 
       while (this._slotsDemounted.length > 0) {
         // get the next demounted slot
-        slot = this._slotsDemounted.pop();
+        slot = this._slotsDemounted.pop()
         this.fills
           .filter((fill) => fill.slot === slot.name)
           .forEach((fill) => {
-            fill.onDemount(...slot.args);
-          });
+            fill.onDemount(...slot.args)
+          })
       }
     },
 
@@ -126,28 +131,28 @@
      * @param slot
      * @param component
      */
-    fill(slot, component) {
+    fill (slot, component) {
       this.fills.push({
         slot,
         ...{
-          render() {},
-          onMount() {},
-          onDemount() {},
+          render () {},
+          onMount () {},
+          onDemount () {},
           ...component,
         },
-      });
+      })
     },
-  };
+  }
 
   const getStepType = (type) => {
     return Editor.stepTypes.hasOwnProperty(type)
       ? Editor.stepTypes[type]
-      : StepTypes.getType("error");
-  };
+      : StepTypes.getType('error')
+  }
 
   const Editor = {
-    activeAddType: "actions",
-    view: "addingStep",
+    activeAddType: 'actions',
+    view: 'addingStep',
     activeStep: {},
     htmlModules: {},
     isEditingTitle: false,
@@ -184,490 +189,445 @@
     funnelErrors: [],
 
     htmlTemplates: {
-      publishActions(status) {
-        // Todo switch back
-        if (status === "inactive") {
-          //language=HTML
-          return `
-              <button class="update-and-launch">Launch
-                  <svg viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path
-                              d="M8.888 7.173a21.621 21.621 0 017.22-4.783m-7.22 4.783a21.766 21.766 0 00-2.97 3.697m2.97-3.697c-1.445-.778-4.935-1.2-7.335 3.334l2.364 2.364 2-2m10.19-8.481A21.709 21.709 0 0123.22.843a21.708 21.708 0 01-1.546 7.112M16.108 2.39l5.565 5.565M5.917 10.87l1.885 4.057m9.088.248a21.62 21.62 0 004.783-7.22m-4.783 7.22a21.771 21.771 0 01-3.698 2.97m3.698-2.97c.778 1.445 1.2 4.934-3.334 7.335l-2.364-2.364 2-2m0 0L9.136 16.26m0 0l-1.334-1.334m1.334 1.334l-2.71 2.71-.667-.666-.667-.667 2.71-2.71m6.42-5.087a1.886 1.886 0 112.668-2.667 1.886 1.886 0 01-2.668 2.667z"
-                              stroke="currentColor" stroke-width="1.5"/>
-                  </svg>
-              </button>`;
-        } else {
-          //language=HTML
-          return `
-              <button class="update gh-button primary"
-                      ${
-                        objectEquals(
-                          Editor.funnel.steps,
-                          Editor.origFunnel.steps
-                        ) || Object.keys(Editor.stepErrors).length > 0
-                          ? "disabled"
-                          : ""
-                      }>
-                  <svg viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path
-                              d="M1 21.956V2.995c0-.748.606-1.355 1.354-1.355H17.93l4.74 4.74v15.576c0 .748-.606 1.354-1.354 1.354H2.354A1.354 1.354 0 011 21.956z"
-                              stroke="currentColor" stroke-width="1.5"/>
-                      <path d="M14.544 16.539a2.709 2.709 0 11-5.418 0 2.709 2.709 0 015.418 0z" stroke="#fff"
-                            stroke-width="1.5"/>
-                      <path fill="currentColor" d="M5.619 6.298h9.634v2.846H5.619z"/>
-                  </svg>
-                  Update
-              </button>
-              <button class="deactivate gh-button danger">Deactivate
-                  <svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M16.337 15.535h-4.8V.735h4.8v14.8zm-10 0h-4.8V.735h4.8v14.8z" fill="currentColor"
-                            stroke="currentColor"
-                            stroke-width="1.2"/>
-                  </svg>
-              </button>`;
-        }
-      },
-      funnelTitleEdit(title, isEditing) {
+      undoRedoActions () {
         //language=HTML
-        if (isEditing) {
-          return `<input type="text" class="funnel-title-edit regular-text" id="funnel-title-edit" name="funnel_title"
-                         value="${specialChars(title)}">`;
+        return `
+			<div class="undo-and-redo">
+				<button class="redo dashicon-button" ${Editor.redoStates.length ? '' : 'disabled'}><span
+					class="dashicons dashicons-redo"></span></button>
+				<button class="undo dashicon-button" ${Editor.undoStates.length ? '' : 'disabled'}><span
+					class="dashicons dashicons-undo"></span></button>
+			</div>`
+      },
+      publishActions (status) {
+        // Todo switch back
+        if (status === 'inactive') {
+          //language=HTML
+          return `
+			  <button class="gh-button action update-and-launch">Launch
+				  <svg viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					  <path
+						  d="M8.888 7.173a21.621 21.621 0 017.22-4.783m-7.22 4.783a21.766 21.766 0 00-2.97 3.697m2.97-3.697c-1.445-.778-4.935-1.2-7.335 3.334l2.364 2.364 2-2m10.19-8.481A21.709 21.709 0 0123.22.843a21.708 21.708 0 01-1.546 7.112M16.108 2.39l5.565 5.565M5.917 10.87l1.885 4.057m9.088.248a21.62 21.62 0 004.783-7.22m-4.783 7.22a21.771 21.771 0 01-3.698 2.97m3.698-2.97c.778 1.445 1.2 4.934-3.334 7.335l-2.364-2.364 2-2m0 0L9.136 16.26m0 0l-1.334-1.334m1.334 1.334l-2.71 2.71-.667-.666-.667-.667 2.71-2.71m6.42-5.087a1.886 1.886 0 112.668-2.667 1.886 1.886 0 01-2.668 2.667z"
+						  stroke="currentColor" stroke-width="1.5"/>
+				  </svg>
+			  </button>`
         } else {
-          return `<span class="title-inner">${specialChars(
-            title
-          )}</span><span class="pencil"><span class="dashicons dashicons-edit"></span></span>`;
+          //language=HTML
+          return `
+			  <button class="deactivate gh-button text danger">Deactivate</button>
+			  <button class="update gh-button primary"
+			          ${
+				          objectEquals(
+					          Editor.funnel.steps,
+					          Editor.origFunnel.steps
+				          ) || Object.keys(Editor.stepErrors).length > 0
+					          ? 'disabled'
+					          : ''
+			          }>
+				  <svg viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+					  <path
+						  d="M1 21.956V2.995c0-.748.606-1.355 1.354-1.355H17.93l4.74 4.74v15.576c0 .748-.606 1.354-1.354 1.354H2.354A1.354 1.354 0 011 21.956z"
+						  stroke="currentColor" stroke-width="1.5"/>
+					  <path d="M14.544 16.539a2.709 2.709 0 11-5.418 0 2.709 2.709 0 015.418 0z" stroke="#fff"
+					        stroke-width="1.5"/>
+					  <path fill="currentColor" d="M5.619 6.298h9.634v2.846H5.619z"/>
+				  </svg>
+				  Update
+			  </button>
+			  <button id="more-menu" class="gh-button secondary text icon">
+				  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 384">
+					  <circle fill="currentColor" cx="192" cy="42.7" r="42.7"/>
+					  <circle fill="currentColor" cx="192" cy="192" r="42.7"/>
+					  <circle fill="currentColor" cx="192" cy="341.3" r="42.7"/>
+				  </svg>
+			  </button>`
         }
       },
-      stepEditPanel(step) {
-        const { ID, data, meta } = step;
-        const { step_type, step_title, step_group } = data;
+      funnelTitleEdit (title, isEditing) {
 
-        const StepType = getStepType(step_type);
+        const titleEdit = () => {
+          return input({
+            id: 'funnel-title-edit',
+            name: 'funnel_title',
+            value: title
+          })
+        }
+        const titleDisplay = () => {
+          return `<span id="title">${specialChars(title)}</span><span class="dashicons dashicons-edit"></span>`
+        }
 
-        let hasErrors = false;
-        let errors = [];
+        return `<h1 class="breadcrumbs"><span class="root">Funnels</span><span class="sep">/</span>${isEditing ? titleEdit() : titleDisplay()}</h1>`
+      },
+      stepEditPanel (step) {
+        const { ID, data, meta } = step
+        const { step_type, step_title, step_group } = data
+
+        const StepType = getStepType(step_type)
+
+        let hasErrors = false
+        let errors = []
 
         if (
           Editor.stepErrors.hasOwnProperty(ID) &&
           Editor.stepErrors[ID].length > 0
         ) {
-          hasErrors = true;
-          errors = Editor.stepErrors[ID];
+          hasErrors = true
+          errors = Editor.stepErrors[ID]
         }
 
         const updateStepMeta = (meta, reRenderStepEdit = false) => {
-          return Editor.updateCurrentStepMeta(meta, reRenderStepEdit);
-        };
+          return Editor.updateCurrentStepMeta(meta, reRenderStepEdit)
+        }
 
         const updateStep = (data, reRenderStepEdit = false) => {
-          return Editor.updateCurrentStep(data, reRenderStepEdit);
-        };
+          return Editor.updateCurrentStep(data, reRenderStepEdit)
+        }
 
         const benchmarkPanel = () => {
           // language=HTML
           return `
-              <div class="panel benchmark-settings">
-                  <div class="row">
-                      <label class="row-label">Allow contacts to enter the funnel at this step?</label>
-                      ${toggle({
-                        name: "is_entry_point",
-                        id: "is-entry-point",
-                        checked: meta.is_entry_point,
-                        onLabel: "YES",
-                        offLabel: "NO",
-                      })}
-                  </div>
-                  <div class="row">
-                      <label class="row-label">Track a conversion whenever this step is completed.</label>
-                      ${toggle({
-                        name: "is_conversion",
-                        id: "is-conversion",
-                        checked: Editor.funnel.data.conversion_step === ID,
-                        onLabel: "YES",
-                        offLabel: "NO",
-                      })}
-                      <p class="description">Only one step can be recorded as the conversion step.</p>
-                  </div>
-              </div>`;
-        };
+			  <div class="panel benchmark-settings">
+				  <div class="row">
+					  <label class="row-label">Allow contacts to enter the funnel at this step?</label>
+					  ${toggle({
+						  name: 'is_entry_point',
+						  id: 'is-entry-point',
+						  checked: meta.is_entry_point,
+						  onLabel: 'YES',
+						  offLabel: 'NO',
+					  })}
+				  </div>
+				  <div class="row">
+					  <label class="row-label">Track a conversion whenever this step is completed.</label>
+					  ${toggle({
+						  name: 'is_conversion',
+						  id: 'is-conversion',
+						  checked: Editor.funnel.data.conversion_step === ID,
+						  onLabel: 'YES',
+						  offLabel: 'NO',
+					  })}
+					  <p class="description">Only one step can be recorded as the conversion step.</p>
+				  </div>
+			  </div>`
+        }
 
-        const slotArgs = [step, updateStepMeta, updateStep];
+        const slotArgs = [step, updateStepMeta, updateStep]
 
         return `
 			${
-        hasErrors
-          ? `<div class="step-errors">
+          hasErrors
+            ? `<div class="step-errors">
                 <ul>
                     ${errors
-                      .map(
-                        (error) =>
-                          `<li class="step-error"><span class="dashicons dashicons-warning"></span> ${error}</li>`
-                      )
-                      .join("")}
+              .map(
+                (error) =>
+                  `<li class="step-error"><span class="dashicons dashicons-warning"></span> ${error}</li>`
+              )
+              .join('')}
                 </ul>
             </div>`
-          : ""
-      }
+            : ''
+        }
 			<div class="step-edit ${step_type} ${step_group}">
 				<div class="settings">
-					${slot("beforeStepSettings", ...slotArgs)}
+					${slot('beforeStepSettings', ...slotArgs)}
 					${slot(`beforeStepSettings.${step_type}`, ...slotArgs)}
 					${StepType.edit(...slotArgs)}
 					${slot(`afterStepSettings.${step_type}`, ...slotArgs)}
-					${slot("afterStepSettings", ...slotArgs)}
+					${slot('afterStepSettings', ...slotArgs)}
 				</div>
 				<div class="actions-and-notes">
-					${slot("beforeStepNotes", ...slotArgs)}
+					${slot('beforeStepNotes', ...slotArgs)}
 					${slot(`beforeStepNotes.${step_type}`, ...slotArgs)}
 					<div class="panel">
 						<label class="row-label"><span class="dashicons dashicons-admin-comments"></span> Notes</label>
 						<textarea rows="4" id="step-notes" class="notes full-width"
-						          name="step_notes">${specialChars(meta.step_notes || "")}</textarea>
+						          name="step_notes">${specialChars(meta.step_notes || '')}</textarea>
 					</div>
-					${step_group === "benchmark" ? benchmarkPanel() : ""}
+					${step_group === 'benchmark' ? benchmarkPanel() : ''}
 					${slot(`afterStepNotes.${step_type}`, ...slotArgs)}
-					${slot("afterStepNotes", ...slotArgs)}
+					${slot('afterStepNotes', ...slotArgs)}
 				</div>
-			</div>`;
+			</div>`
         //language=HTML
       },
-      stepAddPanel(activeType, search = "", pack = "") {
-        //language=HTML
-        return `
-            <div class="step-add">
-                <div class="step-add-filters">
-                    <div class="type-select">
-                        <button class="select-type actions ${
-                          activeType === "actions" && "active"
-                        }" data-type="actions">
-                            ${"Actions"}
-                        </button>
-                        <button class="select-type benchmarks ${
-                          activeType === "benchmarks" && "active"
-                        }"
-                                data-type="benchmarks">
-                            ${"Benchmarks"}
-                        </button>
-                    </div>
-                    ${input({
-                      id: "search-steps",
-                      name: "search_steps",
-                      type: "search",
-                      className: "search-steps",
-                      placeholder: "Search...",
-                      value: search,
-                    })}
-                    ${select(
-                      {
-                        id: "pack-filter",
-                        name: "pack_filter",
-                      },
-                      [
-                        { text: "Filter by pack...", value: "" },
-                        ...Object.values(StepPacks.packs).map((pack) => ({
-                          value: pack.id,
-                          text: pack.name,
-                        })),
-                      ],
-                      pack
-                    )}
-                </div>
-                <div id="types" class="types">
-                </div>
-            </div>`;
-      },
-      stepTypeSelect(type) {
+      stepAddPanel (activeType, search = '', pack = '') {
         //language=HTML
         return `
-            <div class="type-select">
-                <button class="select-type actions ${
-                  type === "actions" && "active"
-                }" data-type="actions">
-                    ${"Actions"}
-                </button>
-                <button class="select-type benchmarks ${
-                  type === "benchmarks" && "active"
-                }" data-type="benchmarks">
-                    ${"Benchmarks"}
-                </button>
-            </div>`;
+			<div class="step-add">
+				<div class="step-add-filters">
+					<div class="type-select">
+						<button class="select-type actions ${
+							activeType === 'actions' && 'active'
+						}" data-type="actions">
+							${'Actions'}
+						</button>
+						<button class="select-type benchmarks ${
+							activeType === 'benchmarks' && 'active'
+						}"
+						        data-type="benchmarks">
+							${'Benchmarks'}
+						</button>
+					</div>
+					${input({
+						id: 'search-steps',
+						name: 'search_steps',
+						type: 'search',
+						className: 'search-steps',
+						placeholder: 'Search...',
+						value: search,
+					})}
+					${select(
+						{
+							id: 'pack-filter',
+							name: 'pack_filter',
+						},
+						[
+							{ text: 'Filter by pack...', value: '' },
+							...Object.values(StepPacks.packs).map((pack) => ({
+								value: pack.id,
+								text: pack.name,
+							})),
+						],
+						pack
+					)}
+				</div>
+				<div id="types" class="types">
+				</div>
+			</div>`
       },
-      addStepCard(step) {
-        const pack = StepPacks.get(step.pack);
+      stepTypeSelect (type) {
+        //language=HTML
+        return `
+			<div class="type-select">
+				<button class="select-type actions ${
+					type === 'actions' && 'active'
+				}" data-type="actions">
+					${'Actions'}
+				</button>
+				<button class="select-type benchmarks ${
+					type === 'benchmarks' && 'active'
+				}" data-type="benchmarks">
+					${'Benchmarks'}
+				</button>
+			</div>`
+      },
+      addStepCard (step) {
+        const pack = StepPacks.get(step.pack)
 
         //language=HTML
         return `
-            <div class="add-step ${step.type} ${step.group}" data-type="${
-          step.type
-        }" data-group="${step.group}"
-                 title="${step.name}">
-                ${slot("beforeAddStepCard", step)}
-                ${slot("beforeAddStepCard." + step.type, step)}
-                ${
-                  typeof pack !== "undefined" && pack.id !== "core"
-                    ? `<div class="pack">${
-                        pack.svg
-                          ? pack.svg
-                          : `<span class="pack-name">${pack.name}</span>`
-                      }</div>`
-                    : ""
-                }
-                ${
-                  Editor.stepTypes[step.type].hasOwnProperty("svg")
-                    ? `<div class="step-icon-svg">${
-                        Editor.stepTypes[step.type].svg
-                      }</div>`
-                    : `<img alt="${
-                        Editor.stepTypes[step.type].name
-                      }" class="step-icon"
+			<div class="add-step ${step.type} ${step.group}" data-type="${
+				step.type
+			}" data-group="${step.group}"
+			     title="${step.name}">
+				${slot('beforeAddStepCard', step)}
+				${slot('beforeAddStepCard.' + step.type, step)}
+				${
+					typeof pack !== 'undefined' && pack.id !== 'core'
+						? `<div class="pack">${
+							pack.svg
+								? pack.svg
+								: `<span class="pack-name">${pack.name}</span>`
+						}</div>`
+						: ''
+				}
+				${
+					Editor.stepTypes[step.type].hasOwnProperty('svg')
+						? `<div class="step-icon-svg">${
+							Editor.stepTypes[step.type].svg
+						}</div>`
+						: `<img alt="${
+							Editor.stepTypes[step.type].name
+						}" class="step-icon"
 				     src="${Editor.stepTypes[step.type].icon}"/>`
-                }
-                <p>${step.name}</p>
-                ${slot("afterAddStepCard." + step.type, step)}
-                ${slot("afterAddStepCard", step)}
-            </div>`;
+				}
+				<p>${step.name}</p>
+				${slot('afterAddStepCard.' + step.type, step)}
+				${slot('afterAddStepCard', step)}
+			</div>`
       },
-      stepFlowCard(step, activeStep) {
-        const { ID, data, meta } = step;
-        const { step_type, step_title, step_group, step_order } = data;
+      stepFlowCard (step, activeStep) {
+        const { ID, data, meta } = step
+        const { step_type, step_title, step_group, step_order } = data
 
-        const StepType = getStepType(step_type);
-        const origStep = Editor.origFunnel.steps.find((s) => s.ID === ID);
+        const StepType = getStepType(step_type)
+        const origStep = Editor.origFunnel.steps.find((s) => s.ID === ID)
 
-        let status;
-        let hasErrors = false;
+        let status
+        let hasErrors = false
 
         if (
           Editor.stepErrors.hasOwnProperty(ID) &&
           Editor.stepErrors[ID].length > 0
         ) {
-          status = "config-error";
-          hasErrors = true;
+          status = 'config-error'
+          hasErrors = true
         } else if (origStep && !objectEquals(step, origStep)) {
-          status = "edited";
+          status = 'edited'
         } else if (!origStep) {
-          status = "new";
-        } else if (StepType.type === "error") {
-          hasErrors = true;
+          status = 'new'
+        } else if (StepType.type === 'error') {
+          hasErrors = true
         }
 
         const nextStep = Editor.funnel.steps.find(
           (step) => step.data.step_order === step_order + 1
-        );
+        )
         const prevStep = Editor.funnel.steps.find(
           (step) => step.data.step_order === step_order - 1
-        );
+        )
 
         //language=HTML
         return `
-            ${
-              step_group === "benchmark"
-                ? step_order === 1
-                  ? `<div class="text-helper until-helper"><span class="dashicons dashicons-filter"></span> Start the funnel when...</div>`
-                  : prevStep && prevStep.data.step_group !== "benchmark"
-                  ? '<div class="until-helper text-helper">Until...</div>'
-                  : ""
-                : ""
-            }
-            <div
-                    class="step ${step_type} ${step_group} ${
-          activeStep === ID ? "active" : ""
-        } ${hasErrors ? "has-errors" : ""}"
-                    data-id="${ID}">
-                ${
-                  StepType.hasOwnProperty("svg")
-                    ? `<div class="icon-svg">${StepType.svg}</div>`
-                    : `<img alt="${StepType.name}" class="icon"
+			${
+				step_group === 'benchmark'
+					? step_order === 1
+					? `<div class="text-helper until-helper"><span class="dashicons dashicons-filter"></span> Start the funnel when...</div>`
+					: prevStep && prevStep.data.step_group !== 'benchmark'
+						? '<div class="until-helper text-helper">Until...</div>'
+						: ''
+					: ''
+			}
+			<div
+				class="step ${step_type} ${step_group} ${
+					activeStep === ID ? 'active' : ''
+				} ${hasErrors ? 'has-errors' : ''}"
+				data-id="${ID}">
+				${
+					StepType.hasOwnProperty('svg')
+						? `<div class="icon-svg">${StepType.svg}</div>`
+						: `<img alt="${StepType.name}" class="icon"
 				     src="${StepType.icon}"/>`
-                }
-                <div class="details">
-                    <div class="step-title">${StepType.title(step)}</div>
-                    <div class="step-type">${StepType.name}</div>
-                </div>
-                <div class="step-status ${status}"></div>
-                <div class="step-menu">
-                    <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
-                         fill-rule="evenodd" clip-rule="evenodd">
-                        <path
-                                d="M12 16a3.001 3.001 0 010 6 3.001 3.001 0 010-6zm0 1a2 2 0 11-.001 4.001A2 2 0 0112 17zm0-8a3.001 3.001 0 010 6 3.001 3.001 0 010-6zm0 1a2 2 0 11-.001 4.001A2 2 0 0112 10zm0-8a3.001 3.001 0 010 6 3.001 3.001 0 010-6zm0 1a2 2 0 11-.001 4.001A2 2 0 0112 3z"/>
-                    </svg>
-                    <ul>
-                        <li class="step-menu-edit">Edit</li>
-                        <li class="step-menu-move-up">Move up</li>
-                        <li class="step-menu-move-down">Move down</li>
-                        <li class="step-menu-new-step-before">Insert a step before</li>
-                        <li class="step-menu-new-step-after">Insert a step after</li>
-                        <li class="step-menu-duplicate">Duplicate</li>
-                        <li class="step-menu-delete">Delete</li>
-                    </ul>
-                </div>
-            </div>
-            ${
-              step_group === "benchmark" && nextStep
-                ? nextStep.data.step_group === "benchmark"
-                  ? `<div class="or-helper text-helper">Or...</div>`
-                  : '<div class="then-helper text-helper">Then...</div>'
-                : ""
-            }
-        `;
+				}
+				<div class="details">
+					<div class="step-title">${StepType.title(step)}</div>
+					<div class="step-type">${StepType.name}</div>
+					<div tabindex="0" class="step-menu-button">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 384">
+							<circle fill="currentColor" cx="192" cy="42.7" r="42.7"/>
+							<circle fill="currentColor" cx="192" cy="192" r="42.7"/>
+							<circle fill="currentColor" cx="192" cy="341.3" r="42.7"/>
+						</svg>
+					</div>
+				</div>
+				<div class="step-status ${status}"></div>
+			</div>
+			${
+				step_group === 'benchmark' && nextStep
+					? nextStep.data.step_group === 'benchmark'
+					? `<div class="or-helper text-helper">Or...</div>`
+					: '<div class="then-helper text-helper">Then...</div>'
+					: ''
+			}
+        `
       },
     },
 
-    init() {
-      this.loadingClose = loadingModal().close;
+    init () {
+      this.loadingClose = loadingModal().close
 
-      var self = this;
-      var $doc = $(document);
+      var self = this
+      var $doc = $(document)
 
-      this.loadFunnel(this.funnel);
+      this.loadFunnel(this.funnel)
 
-      $doc.on("click", ".step-add .select-type", function () {
-        self.saveUndoState();
-        self.activeAddType = $(this).data("type");
-        self.renderStepAdd();
-      });
+      $doc.on('click', '.step-add .select-type', function () {
+        self.saveUndoState()
+        self.activeAddType = $(this).data('type')
+        self.renderStepAdd()
+      })
 
-      $doc.on("mouseleave", ".step-flow .steps .step", function (e) {
-        const $step = $(this);
-        $(".step-menu ul", $step).hide();
-      });
+      $doc.on('click', '.step-flow .steps .step', function (e) {
 
-      $doc.on("click", ".step-flow .steps .step", function (e) {
-        const $step = $(this);
+        const $step = $(this)
         const step = self.funnel.steps.find(
-          (step) => step.ID === parseInt($step.data("id"))
-        );
+          (step) => step.ID === parseInt($step.data('id'))
+        )
 
-        switch (true) {
-          case $(e.target).is(".step-menu-move-up"):
-            self.moveStepUp(step);
-            break;
-          case $(e.target).is(".step-menu-move-down"):
-            self.moveStepDown(step);
-            break;
-          case $(e.target).is(".step-menu-new-step-before"):
-            self.insertPlaceholderStep(step, "before");
+        const setStepEdit = () => {
+          if (step.ID === self.activeStep) {
+            return
+          }
 
-            break;
-          case $(e.target).is(".step-menu-new-step-after"):
-            self.insertPlaceholderStep(step, "after");
-
-            break;
-          case $(e.target).is(".step-menu-duplicate"):
-            const newStep = copyObject(step);
-            newStep.ID = uniqid();
-            self.addStep(newStep);
-            break;
-          case $(e.target).is(".step-menu-delete"):
-            self.deleteStep(parseInt($step.data("id")));
-            break;
-          case $(e.target).is(".step-menu") ||
-            $(e.target).parent(".step-menu").length > 0:
-            const $menu = $(".step-menu ul", $step).toggle();
-
-            const p = $menu.offset();
-            const h = $menu.outerHeight();
-            if (p.top + h + 100 > $(window).height()) {
-              $menu.css({
-                bottom: "90%",
-                top: "auto",
-              });
-            } else {
-              $menu.css({
-                top: "90%",
-                bottom: "auto",
-              });
-            }
-
-            break;
-          case $(e.target).is(".step-menu-edit"):
-          default:
-            // window.console.log('edit')
-            const clickedStep = parseInt($step.data("id"));
-
-            if (clickedStep === self.activeStep) {
-              return;
-            }
-
-            self.saveUndoState();
-            self.previousActiveStep = self.activeStep;
-            self.activeStep = clickedStep;
-            self.view = "editingStep";
-            self.renderStepFlow();
-            self.renderStepEdit();
+          self.saveUndoState()
+          self.previousActiveStep = self.activeStep
+          self.activeStep = step.ID
+          self.view = 'editingStep'
+          self.renderStepFlow()
+          self.renderStepEdit()
         }
-      });
 
-      $doc.on("click", ".step-flow .add-new-step", function () {
-        self.activeStep = null;
-        self.view = "addingStep";
-        self.renderStepFlow();
-        self.renderStepAdd();
-      });
+        if (clickInsideElement(e, '.step-menu-button')) {
+          moreMenu(this, {
+            items: [
+              { key: 'edit', text: 'Edit' },
+              { key: 'move-up', text: 'Move up' },
+              { key: 'move-down', text: 'Move down' },
+              { key: 'duplicate', text: 'Duplicate' },
+              { key: 'delete', text: '<span class="gh-text danger">Delete</span>' },
+            ],
+            onSelect: (key) => {
+              switch (key) {
+                case 'move-up':
+                  self.moveStepUp(step)
+                  break
+                case 'move-down':
+                  self.moveStepDown(step)
+                  break
+                case 'duplicate':
+                  const newStep = copyObject(step)
+                  newStep.ID = uniqid()
+                  self.addStep(newStep)
+                  break
+                case 'delete':
+                  self.deleteStep(step.ID)
+                  break
+                case 'edit':
+                  setStepEdit()
+                  break
+              }
+            }
+          })
 
-      $doc.on("click", ".undo-and-redo .undo", function () {
-        self.undo();
-      });
+        } else {
+          setStepEdit()
+        }
+      })
 
-      $doc.on("click", ".undo-and-redo .redo", function () {
-        self.redo();
-      });
+      $doc.on('click', '.step-flow .add-new-step', function () {
+        self.activeStep = null
+        self.view = 'addingStep'
+        self.renderStepFlow()
+        self.renderStepAdd()
+      })
 
-      $doc.on("click", ".header-stuff .title", function () {
+      $doc.on('click', '.undo-and-redo .undo', function () {
+        self.undo()
+      })
+
+      $doc.on('click', '.undo-and-redo .redo', function () {
+        self.redo()
+      })
+
+      $doc.on('click', '.header-stuff #title', function () {
         if (!self.isEditingTitle) {
-          self.isEditingTitle = true;
-          self.renderTitle();
+          self.isEditingTitle = true
+          self.renderTitle()
         }
-      });
+      })
 
-      $doc.on("click", ".publish-actions .deactivate", function () {
-        confirmationModal({
-          // language=HTML
-          alert: `<p><b>Are you sure you want to deactivate the funnel?</b></p>
-          <p>Any pending events will be paused and contacts will not be able to move forward in the funnel.</p>
-          <p>Reactivating the funnel will restart any paused events.</p>`,
-          onConfirm: () => {
-            self.deactivate();
-          },
-        });
-      });
 
-      $doc.on(
-        "click",
-        ".publish-actions .update-and-launch, .publish-actions .update",
-        function () {
-          confirmationModal({
-            // language=HTML
-            alert: `<p><b>Are you sure you want to commit these changes?</b></p><p>The changes made will take immediate
-                effect to anyone currently in the funnel.</p>`,
-            onConfirm: () => {
-              self.commitChanges();
-            },
-          });
-        }
-      );
-
-      $(document).on("tinymce-editor-setup", function (event, editor) {
-        editor.settings.toolbar1 =
-          "formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,wp_adv,dfw,groundhoggreplacementbtn,groundhoggemojibtn";
-        editor.settings.toolbar2 =
-          "strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help";
-        editor.settings.height = 200;
-        editor.on("click", function (ed, e) {
-          $(document).trigger("to_mce");
-        });
-      });
-
-      $doc.on("blur change keydown", ".funnel-title-edit", function (e) {
+      $doc.on('blur change keydown', '#funnel-title-edit', function (e) {
         // If the event is key down do nothing if the key wasn't enter
-        if (e.type === "keydown" && e.keyCode !== 13) {
-          self.resizeTitleEdit();
-          return;
+        if (e.type === 'keydown' && e.key !== 'Enter') {
+          self.resizeTitleEdit()
+          return
         }
 
-        self.saveUndoState();
-        self.funnel.data.title = e.target.value;
-        self.isEditingTitle = false;
+        self.saveUndoState()
+        self.funnel.data.title = e.target.value
+        self.isEditingTitle = false
         self.update(
           {
             data: {
@@ -675,66 +635,203 @@
             },
           },
           false
-        );
-        self.renderTitle();
-      });
+        )
+        self.renderTitle()
+      })
 
-      self.setupSortable();
-      self.setupStepTypes();
+
+      $doc.on('click', '#more-menu', () => {
+        moreMenu('#more-menu', {
+          onSelect: (key) => {
+            switch (key) {
+              case 'export':
+                window.location.href = this.funnel.links.export
+                break
+              case 'share':
+
+                break
+              case 'reports':
+                window.location.href = this.funnel.links.report
+                break
+              case 'delete':
+
+                dangerConfirmationModal({
+                  //language=HTML
+                  alert: `<p><b>Delete this funnel?</b></p>
+				  <p>Any associated events, steps, and reports will also be deleted.</p>
+				  <p>This action cannot be undone. Are you sure?</p>`,
+                  confirmText: 'Delete',
+                  onConfirm: () => {
+                    console.log('yikes')
+                  }
+                })
+
+                break
+              case 'archive':
+
+                dangerConfirmationModal({
+                  //language=HTML
+                  alert: `<p><b>Archive this funnel?</b></p>
+				  <p>Any active contacts will be removed from the funnel permanently.</p>
+				  <p>The funnel will become un-editable until restored.</p>`,
+                  confirmText: 'Archive',
+                  onConfirm: () => {
+                    console.log('yikes')
+                  }
+                })
+
+                break
+            }
+          },
+          items: [
+            {
+              key: 'export',
+              //language=HTML
+              text: `
+				  <svg height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 367 367">
+					  <defs/>
+					  <path
+						  d="M363.6 247l.4-.5.5-.7.4-.6.3-.6.4-.7.3-.7.2-.6c0-.3.2-.5.3-.7l.1-.7.2-.8.1-.8.1-.6.1-1.5V236l-.2-.6v-.8l-.3-.8-.1-.7-.3-.7-.2-.6-.3-.7-.4-.7-.3-.6-.4-.6-.5-.7-.4-.5a15 15 0 00-1-1v-.1l-37.5-37.5a15 15 0 00-21.2 21.2l11.9 11.9H270v-78.6-.4a15 15 0 00-3.4-9.5 15.2 15.2 0 00-1-1.2c-.2 0-.3-.2-.4-.4L155.6 23a15 15 0 00-1-.9l-.3-.2a14.9 14.9 0 00-1.9-1.3l-.3-.2-1.1-.6-.5-.1a14.5 14.5 0 00-2.2-.7l-.4-.1-1.2-.2h-1.4l-.3-.1H15a15 15 0 00-15 15v300a15 15 0 0015 15h240a15 15 0 0015-15v-81h45.8l-12 11.9a15 15 0 0021.3 21.2l37.5-37.5 1-1zM160 69.7l58.8 58.8H160V69.7zm80 248.8H30v-270h100v95a15 15 0 0015 15h95v64h-65a15 15 0 000 30h65v66z"/>
+				  </svg> Export`
+            },
+            {
+              key: 'share',
+              //language=HTML
+              text: `
+				  <svg height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="-33 0 512 512">
+					  <path fill="currentColor"
+					        d="M361.8 344.4a83.6 83.6 0 00-62 27.4l-138-85.4a83.3 83.3 0 000-60.8l138-85.4a83.6 83.6 0 00145.8-56.4 83.9 83.9 0 10-161.9 30.4l-138 85.4A83.6 83.6 0 000 256a83.9 83.9 0 00145.8 56.4l138 85.4a83.9 83.9 0 10161.9 30.4 83.9 83.9 0 00-83.9-83.8zM308.6 83.8a53.3 53.3 0 11106.6.1 53.3 53.3 0 01-106.6-.1zM83.8 309.2a53.3 53.3 0 11.1-106.6 53.3 53.3 0 01-.1 106.6zm224.8 119a53.3 53.3 0 11106.6.1 53.3 53.3 0 01-106.6-.1zm0 0"/>
+				  </svg> Share`
+            },
+            {
+              key: 'reports',
+              //language=HTML
+              text: `
+				  <svg height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 510 510">
+					  <path fill="currentColor"
+					        d="M495 420h-14V161.8a15 15 0 00-15-15h-82.2a15 15 0 00-15 15V420h-42.3V75a15 15 0 00-15-15h-82.3a15 15 0 00-15 15v345H172V232.2a15 15 0 00-15-15H74.7a15 15 0 00-15 15V420H30V75a15 15 0 00-30 0v360a15 15 0 0015 15h480a15 15 0 000-30zm-405.3 0V247.2h52.2V420zm154.5 0V90h52.2v330zm154.6 0V176.8H451V420z"/>
+				  </svg> Reports`
+            },
+            {
+              key: 'archive',
+              //language=HTML
+              text: `
+				  <svg class="danger" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520">
+					  <defs/>
+					  <path fill="currentColor"
+					        d="M475 125V90a45 45 0 00-45-45H219.4l-7.9-12.8a15 15 0 00-12.7-7.2H45A45 45 0 000 70v380a45 45 0 0045 45h430a45 45 0 0045-45V170a45 45 0 00-45-45zm-45-50a15 15 0 0115 15v35H268.4l-20-32.8L237.7 75zm60 375a15 15 0 01-15 15H45a15 15 0 01-15-15V70a15 15 0 0115-15h145.3l7.9 12.8 29 47.3 20 32.8A15 15 0 00260 155h215a15 15 0 0115 15v280z"/>
+				  </svg><span class="gh-text danger">Archive</span>`
+            },
+            {
+              key: 'delete',
+              //language=HTML
+              text: `
+				  <svg class="danger" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+					  <defs/>
+					  <path fill="currentColor"
+					        d="M436 60h-75V45a45 45 0 00-45-45H196a45 45 0 00-45 45v15H76a45 45 0 00-14 87.8l26.8 323a45.3 45.3 0 0044.8 41.2h244.8c23.2 0 43-18.1 44.8-41.3l26.8-323A45 45 0 00436 60zM181 45a15 15 0 0115-15h120a15 15 0 0115 15v15H181V45zm212.3 423.2a15 15 0 01-14.9 13.8H133.6a15 15 0 01-15-13.7L92.4 150h327.4l-26.4 318.2zM436 120H76a15 15 0 010-30h360a15 15 0 010 30z"/>
+					  <path fill="currentColor"
+					        d="M196 436l-15-242a15 15 0 00-30 2l15 242a15 15 0 1030-2zM256 180a15 15 0 00-15 15v242a15 15 0 0030 0V195a15 15 0 00-15-15zM347 180a15 15 0 00-16 14l-15 242a15 15 0 0030 2l15-242a15 15 0 00-14-16z"/>
+				  </svg><span class="gh-text danger">Delete</span>`
+            },
+          ]
+        })
+      })
+
+      $doc.on('click', '.publish-actions .deactivate', function () {
+        dangerConfirmationModal({
+          // language=HTML
+          alert: `<p><b>Are you sure you want to deactivate the funnel?</b></p>
+		  <p>Active contacts will be paused until the funnel is reactivated.</p>`,
+          confirmText: 'Deactivate',
+          onConfirm: () => {
+            self.deactivate()
+          },
+        })
+      })
+
+      $doc.on(
+        'click',
+        '.publish-actions .update-and-launch, .publish-actions .update',
+        function () {
+          confirmationModal({
+            // language=HTML
+            alert: `<p><b>Are you sure you want to commit these changes?</b></p><p>The changes made will take immediate
+				effect to anyone currently in the funnel.</p>`,
+            onConfirm: () => {
+              self.commitChanges()
+            },
+          })
+        }
+      )
+
+      $(document).on('tinymce-editor-setup', function (event, editor) {
+        editor.settings.toolbar1 =
+          'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,wp_adv,dfw,groundhoggreplacementbtn,groundhoggemojibtn'
+        editor.settings.toolbar2 =
+          'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help'
+        editor.settings.height = 200
+        editor.on('click', function (ed, e) {
+          $(document).trigger('to_mce')
+        })
+      })
+
+      self.setupSortable()
+      self.setupStepTypes()
       // self.initStepFlowContextMenu()
-      self.maybePreloadTagsAndEmails();
+      self.maybePreloadTagsAndEmails()
     },
 
     /**
      * Re-render the whole editor
      */
-    render() {
-      this.renderTitle();
-      this.renderPublishActions();
-      this.renderStepFlow();
-      this.renderStepAdd();
-      this.renderStepEdit();
+    render () {
+      this.renderTitle()
+      this.renderPublishActions()
+      this.renderStepFlow()
+      this.renderStepAdd()
+      this.renderStepEdit()
 
-      this.loadingClose();
-      $(window).trigger("resize");
+      this.loadingClose()
+      $(window).trigger('resize')
     },
 
-    async maybePreloadTagsAndEmails() {
-      const preloadTags = [];
-      const preloadEmails = [];
-      const promises = [];
+    async maybePreloadTagsAndEmails () {
+      const preloadTags = []
+      const preloadEmails = []
+      const promises = []
 
       this.funnel.steps.forEach((step) => {
-        const { meta, data } = step;
-        const { tags, email_id } = meta;
+        const { meta, data } = step
+        const { tags, email_id } = meta
 
         if (tags) {
-          preloadTags.push(...tags);
+          preloadTags.push(...tags)
         } else if (email_id) {
-          preloadEmails.push(email_id);
+          preloadEmails.push(email_id)
         }
 
-        const type = StepTypes.getType(data.step_type);
-        const promise = type.preload(step);
+        const type = StepTypes.getType(data.step_type)
+        const promise = type.preload(step)
 
         // console.log(data.step_type, type, promise)
 
-        if (typeof promise !== "undefined") {
+        if (typeof promise !== 'undefined') {
           if (Array.isArray(promise)) {
-            promises.push(...promise);
+            promises.push(...promise)
           } else {
-            promises.push(promise);
+            promises.push(promise)
           }
         }
-      });
+      })
 
       if (
         preloadEmails.length === 0 &&
         preloadTags.length === 0 &&
         promises.length === 0
       ) {
-        this.render();
-        return;
+        this.render()
+        return
       }
 
       if (preloadTags.length > 0) {
@@ -742,7 +839,7 @@
           TagsStore.fetchItems({
             include: preloadTags,
           })
-        );
+        )
       }
 
       if (preloadEmails.length > 0) {
@@ -750,53 +847,53 @@
           EmailsStore.fetchItems({
             include: preloadEmails,
           })
-        );
+        )
       }
 
       if (promises.length > 0) {
-        await Promise.all(promises);
+        await Promise.all(promises)
       }
 
-      this.render();
+      this.render()
     },
 
-    loadFunnel(funnel) {
-      this.funnel = funnel;
+    loadFunnel (funnel) {
+      this.funnel = funnel
 
       // Copy from the orig included data
       // self.funnel = copyObject(self.funnel)
-      this.origFunnel = copyObject(funnel);
+      this.origFunnel = copyObject(funnel)
 
       if (this.funnel.meta.edited) {
-        this.funnel.steps = this.funnel.meta.edited.steps;
+        this.funnel.steps = this.funnel.meta.edited.steps
       }
     },
 
     /**
      * Init the sortable list of steps in the step flow
      */
-    setupSortable() {
-      var self = this;
-      $(".step-flow .steps")
+    setupSortable () {
+      var self = this
+      $('.step-flow .steps')
         .sortable({
-          placeholder: "step-placeholder",
-          cancel: ".text-helper",
+          placeholder: 'step-placeholder',
+          cancel: '.text-helper',
           start: function (e, ui) {
-            ui.placeholder.height(ui.item.height());
-            ui.placeholder.width(ui.item.width());
+            ui.placeholder.height(ui.item.height())
+            ui.placeholder.width(ui.item.width())
           },
           receive: function (e, ui) {
             // console.log('received', ui)
 
-            self.saveUndoState();
+            self.saveUndoState()
 
-            var type = $(ui.helper).data("type");
-            var group = $(ui.helper).data("group");
+            var type = $(ui.helper).data('type')
+            var group = $(ui.helper).data('group')
 
-            var id = Date.now();
+            var id = Date.now()
 
-            $(ui.helper).addClass("step");
-            $(ui.helper).data("id", id);
+            $(ui.helper).addClass('step')
+            $(ui.helper).data('id', id)
 
             self.addStep({
               ID: id,
@@ -806,28 +903,28 @@
                 step_title: Editor.stepTypes[type].name,
                 step_type: type,
                 step_group: group,
-                step_order: $(ui.helper).prevAll(".step").length,
+                step_order: $(ui.helper).prevAll('.step').length,
               },
               meta: StepTypes.getType(type).defaults,
-            });
+            })
           },
           update: function (e, ui) {
             // console.log('updated', ui)
 
-            self.saveUndoState();
-            self.syncOrderWithFlow();
-            self.autoSaveEditedFunnel();
-            self.renderStepFlow();
-            self.renderStepEdit();
+            self.saveUndoState()
+            self.syncOrderWithFlow()
+            self.autoSaveEditedFunnel()
+            self.renderStepFlow()
+            self.renderStepEdit()
           },
         })
-        .disableSelection();
+        .disableSelection()
     },
 
     /**
      * Merge the step types passed from PHP with methods defined in JS
      */
-    setupStepTypes() {
+    setupStepTypes () {
       // console.log('setup-step-types')
 
       for (var prop in this.stepTypes) {
@@ -838,72 +935,72 @@
           Object.assign(this.stepTypes[prop], {
             ...StepTypes.default,
             ...StepTypes[prop],
-          });
+          })
           Object.assign(StepTypes[prop], {
             ...this.stepTypes[prop],
-          });
+          })
         } else {
-          Object.assign(this.stepTypes[prop], StepTypes.default);
+          Object.assign(this.stepTypes[prop], StepTypes.default)
         }
       }
     },
 
-    getStepType(type) {},
+    getStepType (type) {},
 
     /**
      * Setup the context menu for editing duplicating and deleting steps
      */
-    initStepFlowContextMenu() {
-      var self = this;
+    initStepFlowContextMenu () {
+      var self = this
 
       this.stepFlowContextMenu = createContextMenu({
-        menuClassName: "step-context-menu",
-        targetSelector: ".step-flow .steps .step",
+        menuClassName: 'step-context-menu',
+        targetSelector: '.step-flow .steps .step',
         items: [
-          { key: "duplicate", text: "Duplicate" },
-          { key: "delete", text: "Delete" },
+          { key: 'duplicate', text: 'Duplicate' },
+          { key: 'delete', text: 'Delete' },
         ],
-        onOpen(e, el) {
-          self.stepOpenInContextMenu = parseInt(el.dataset.id);
+        onOpen (e, el) {
+          self.stepOpenInContextMenu = parseInt(el.dataset.id)
         },
-        onSelect(key) {
+        onSelect (key) {
           switch (key) {
-            case "delete":
-              self.deleteStep(self.stepOpenInContextMenu);
-              break;
-            case "duplicate":
+            case 'delete':
+              self.deleteStep(self.stepOpenInContextMenu)
+              break
+            case 'duplicate':
               const stepToCopy = self.funnel.steps.find(
                 (step) => step.ID === self.stepOpenInContextMenu
-              );
+              )
 
-              const newStep = copyObject(stepToCopy);
-              newStep.ID = uniqid();
-              self.addStep(newStep);
+              const newStep = copyObject(stepToCopy)
+              newStep.ID = uniqid()
+              self.addStep(newStep)
 
-              break;
+              break
           }
         },
-      });
+      })
 
-      this.stepFlowContextMenu.init();
+      this.stepFlowContextMenu.init()
     },
 
     /**
      * Renders the step flow
      */
-    renderStepFlow() {
-      var self = this;
+    renderStepFlow () {
+      var self = this
 
-      this.checkForStepErrors();
+      this.checkForStepErrors()
 
       var steps = this.funnel.steps
         .sort((a, b) => a.data.step_order - b.data.step_order)
         .map((step) => self.htmlTemplates.stepFlowCard(step, self.activeStep))
-        .join("");
+        .join('')
 
-      $(".step-flow .steps").html(steps);
+      $('.step-flow .steps').html(steps)
 
-      this.renderPublishActions();
+      this.renderPublishActions()
     },
 
     /**
@@ -912,234 +1009,257 @@
      * @param id
      * @param error
      */
-    addStepError(id, error) {
+    addStepError (id, error) {
       if (!this.stepErrors.hasOwnProperty(id)) {
-        this.stepErrors[id] = [];
+        this.stepErrors[id] = []
       }
 
-      this.stepErrors[id].push(error);
+      this.stepErrors[id].push(error)
     },
 
     /**
      * Check for step errors
      */
-    checkForStepErrors() {
-      const self = this;
+    checkForStepErrors () {
+      const self = this
 
-      this.stepErrors = [];
+      this.stepErrors = []
 
       this.funnel.steps.forEach((step) => {
-        const errors = [];
+        const errors = []
 
-        const { step_group, step_order, step_type } = step.data;
+        const { step_group, step_order, step_type } = step.data
 
-        const typeHandler = getStepType(step_type);
+        const typeHandler = getStepType(step_type)
 
-        if (step_group === "action" && step_order === 1) {
-          errors.push("Actions cannot be at the start of a funnel.");
-        } else if (typeHandler.type === "error") {
-          errors.push("Settings not found.");
+        if (step_group === 'action' && step_order === 1) {
+          errors.push('Actions cannot be at the start of a funnel.')
+        } else if (typeHandler.type === 'error') {
+          errors.push('Settings not found.')
         }
 
         // console.log(typeHandler)
 
         if (typeHandler) {
-          typeHandler.validate(step, errors);
+          typeHandler.validate(step, errors)
         }
 
-        errors.forEach((error) => this.addStepError(step.ID, error));
-      });
+        errors.forEach((error) => this.addStepError(step.ID, error))
+      })
     },
 
-    mountStep(step) {
-      step = step || this.funnel.steps.find((s) => s.ID === this.activeStep);
+    mountStep (step) {
+      step = step || this.funnel.steps.find((s) => s.ID === this.activeStep)
 
       if (!step) {
-        return;
+        return
       }
 
       const updateStepMeta = (meta, reRenderStepEdit = false) => {
-        return this.updateCurrentStepMeta(meta, reRenderStepEdit);
-      };
-
-      const updateStep = (data, reRenderStepEdit = false) => {
-        return this.updateCurrentStep(data, reRenderStepEdit);
-      };
-
-      // Step notes listener
-      $("#step-notes").on("change", function (e) {
-        updateStepMeta({
-          step_notes: $(this).val(),
-        });
-      });
-
-      if (step.data.step_group === "benchmark") {
-        $("#is-entry-point").on("change", (e) => {
-          updateStepMeta({
-            is_entry_point: e.target.checked,
-          });
-        });
+        return this.updateCurrentStepMeta(meta, reRenderStepEdit)
       }
 
-      const StepType = getStepType(step.data.step_type);
+      const updateStep = (data, reRenderStepEdit = false) => {
+        return this.updateCurrentStep(data, reRenderStepEdit)
+      }
 
-      StepType.onMount(step, updateStepMeta, updateStep);
+      // Step notes listener
+      $('#step-notes').on('change', function (e) {
+        updateStepMeta({
+          step_notes: $(this).val(),
+        })
+      })
 
-      this.lastStepEditMounted = this.activeStep;
+      if (step.data.step_group === 'benchmark') {
+        $('#is-entry-point').on('change', (e) => {
+          updateStepMeta({
+            is_entry_point: e.target.checked,
+          })
+        })
+      }
+
+      const StepType = getStepType(step.data.step_type)
+
+      StepType.onMount(step, updateStepMeta, updateStep)
+
+      this.lastStepEditMounted = this.activeStep
     },
 
-    demountStep(step) {
+    demountStep (step) {
       step =
         step ||
-        this.funnel.steps.find((s) => s.ID === this.lastStepEditMounted);
+        this.funnel.steps.find((s) => s.ID === this.lastStepEditMounted)
 
       if (!step) {
-        return;
+        return
       }
 
       const updateStepMeta = (meta) => {
-        return this.updateCurrentStepMeta(meta);
-      };
+        return this.updateCurrentStepMeta(meta)
+      }
 
       const updateStep = (data) => {
-        return this.updateCurrentStep(data);
-      };
+        return this.updateCurrentStep(data)
+      }
 
-      const StepType = getStepType(step.data.step_type);
+      const StepType = getStepType(step.data.step_type)
 
-      StepType.onDemount(step, updateStepMeta, updateStep);
+      StepType.onDemount(step, updateStepMeta, updateStep)
 
-      this.lastStepEditMounted = null;
+      this.lastStepEditMounted = null
     },
 
     /**
      * Renders the edit step panel for the current step in the controls panel
      */
-    renderStepEdit() {
-      if (this.view !== "editingStep") {
-        return;
+    renderStepEdit () {
+      if (this.view !== 'editingStep') {
+        return
       }
 
-      var self = this;
+      var self = this
 
       // const activeElementId = document.activeElement.id
 
       const step = this.funnel.steps.find(
         (step) => step.ID === this.activeStep
-      );
+      )
       const previousStep = this.funnel.steps.find(
         (step) => step.ID === this.previousActiveStep
-      );
+      )
+
+      if (!step) {
+        this.activeStep = false
+        this.previousActiveStep = false
+        this.view = 'addingStep'
+        this.renderStepAdd()
+        return
+      }
 
       // Handle remounting the step
       if (this.activeStep === this.lastStepEditMounted) {
-        this.demountStep(step);
+        this.demountStep(step)
       } else if (previousStep) {
-        this.demountStep(previousStep);
+        this.demountStep(previousStep)
       }
 
-      slotsDemounted();
+      slotsDemounted()
 
-      $("#control-panel").html(this.htmlTemplates.stepEditPanel(step));
+      $('#control-panel').html(this.htmlTemplates.stepEditPanel(step))
 
-      this.mountStep(step);
+      this.mountStep(step)
 
-      slotsMounted();
+      slotsMounted()
     },
 
     /**
      * Renders the add step panel for the current step in the controls panel
      */
-    renderStepAdd() {
-      if (this.view !== "addingStep") {
-        return;
+    renderStepAdd () {
+      if (this.view !== 'addingStep') {
+        return
       }
 
-      const self = this;
+      const self = this
 
-      self.demountStep();
+      self.demountStep()
 
-      $("#control-panel").html(
+      $('#control-panel').html(
         self.htmlTemplates.stepAddPanel(
           self.activeAddType,
           self.stepSearch,
           self.packFilter
         )
-      );
+      )
 
-      self.renderStepFlow();
+      self.renderStepFlow()
 
       const mountSteps = () => {
-        const sr = regexp(self.stepSearch);
+        const sr = regexp(self.stepSearch)
 
-        $("#types").html(
+        $('#types').html(
           Object.values(Editor.stepTypes)
-            .filter((step) => step.group + "s" === self.activeAddType)
+            .filter((step) => step.group + 's' === self.activeAddType)
             .filter((step) => step.name.match(sr) || step.pack.match(sr))
             .filter((step) => !self.packFilter || step.pack === self.packFilter)
             .map(Editor.htmlTemplates.addStepCard)
-            .join("")
-        );
+            .join('')
+        )
 
-        if (self.addingStepOrder) {
-          $(".add-step").on("click", function () {
-            const $button = $(this);
-            var type = $button.data("type");
-            var group = $button.data("group");
+        const addStepHere = ({
+          type,
+          group,
+          order,
+        }) => {
+          var id = Date.now()
 
-            var id = Date.now();
-
-            self.addStep({
+          self.addStep({
+            ID: id,
+            data: {
               ID: id,
-              data: {
-                ID: id,
-                funnel_id: Editor.funnel.ID,
-                step_title: Editor.stepTypes[type].name,
-                step_type: type,
-                step_group: group,
-                step_order: self.addingStepOrder,
-              },
-              meta: StepTypes.getType(type).defaults,
-            });
-          });
-        } else {
-          $(".add-step").draggable({
-            connectToSortable: ".step-flow .steps",
-            helper: "clone",
-            revert: "invalid",
-            revertDuration: 0,
-          });
+              funnel_id: Editor.funnel.ID,
+              step_title: Editor.stepTypes[type].name,
+              step_type: type,
+              step_group: group,
+              step_order: order,
+            },
+            meta: StepTypes.getType(type).defaults,
+          })
         }
-      };
 
-      mountSteps();
+        const $addSteps = $('.add-step')
 
-      $("#search-steps").on("input", (e) => {
-        this.stepSearch = e.target.value;
-        mountSteps();
-      });
+        if (!self.addingStepOrder) {
+          $addSteps.draggable({
+            connectToSortable: '.step-flow .steps',
+            helper: 'clone',
+            revert: 'invalid',
+            revertDuration: 0,
+          })
+        }
 
-      $("#pack-filter").on("change", (e) => {
-        this.packFilter = e.target.value;
-        mountSteps();
-      });
-    },
+        $addSteps.on('click', function () {
+          const $button = $(this)
+          var type = $button.data('type')
+          var group = $button.data('group')
+          addStepHere({
+            type,
+            group,
+            order: self.addingStepOrder || self.funnel.steps.length
+          })
+          self.addingStepOrder = false
+        })
 
-    renderEmailEditor() {
-      window.console.log("renderEmailEditor");
-
-      if (this.view !== "editingEmail") {
-        return;
       }
 
-      var self = this;
+      mountSteps()
+
+      $('#search-steps').on('input', (e) => {
+        this.stepSearch = e.target.value
+        mountSteps()
+      })
+
+      $('#pack-filter').on('change', (e) => {
+        this.packFilter = e.target.value
+        mountSteps()
+      })
+    },
+
+    renderEmailEditor () {
+      window.console.log('renderEmailEditor')
+
+      if (this.view !== 'editingEmail') {
+        return
+      }
+
+      var self = this
 
       const step = this.funnel.steps.find(
         (step) => step.ID === this.activeStep
-      );
+      )
       const previousStep = this.funnel.steps.find(
         (step) => step.ID === this.previousActiveStep
-      );
+      )
 
       // Handle remounting the step
       // if (this.activeStep === this.lastStepEditMounted) {
@@ -1150,7 +1270,7 @@
       //
       // slotsDemounted()
 
-      $("#funnel-editor").html(`
+      $('#funnel-editor').html(`
         <div id="email-editor-wrapper">
           <div class="editor-header">
             <div class="header-stuff">
@@ -1166,18 +1286,18 @@
           </div>
           <div id="email-editor"></div>
         </div>
-      `);
+      `)
 
       Groundhogg.EmailEditor({
-        selector: "#email-editor",
+        selector: '#email-editor',
         email: EmailsStore.get(parseInt(step.meta.email_id)),
         onChange: (email) => {
-          console.log(email);
+          console.log(email)
         },
         onCommit: (email) => {
-          console.log(email);
+          console.log(email)
         },
-      }).mount();
+      }).mount()
 
       // this.mountStep(step)
 
@@ -1187,50 +1307,53 @@
     /**
      * Renders the funnel title edit component
      */
-    renderTitle() {
-      $(".header-stuff .title").html(
+    renderTitle () {
+      $('.header-stuff .title-wrap').html(
         this.htmlTemplates.funnelTitleEdit(
           this.funnel.data.title,
           this.isEditingTitle
         )
-      );
+      )
 
       if (this.isEditingTitle) {
-        $(".funnel-title-edit").focus();
-        this.resizeTitleEdit();
+        $('#funnel-title-edit').focus()
+        this.resizeTitleEdit()
       }
     },
 
-    resizeTitleEdit() {
-      $(".funnel-title-edit").width(this.funnel.data.title.length + 1 + "ch");
+    resizeTitleEdit () {
+      $('#funnel-title-edit').width(this.funnel.data.title.length + 1 + 'ch')
     },
 
     /**
      * Publish actions
      */
-    renderPublishActions() {
-      $(".publish-actions").html(
+    renderPublishActions () {
+      $('.publish-actions').html(
         this.htmlTemplates.publishActions(this.funnel.data.status)
-      );
+      )
+      $('.undo-and-redo').replaceWith(
+        this.htmlTemplates.undoRedoActions()
+      )
     },
 
     /**
      * Syncs the order of the steps in the state with that of the order which the steps appear in the flow
      */
-    syncOrderWithFlow() {
-      var self = this;
+    syncOrderWithFlow () {
+      var self = this
 
-      $(".step-flow .steps .step").each(function (i) {
+      $('.step-flow .steps .step').each(function (i) {
         self.funnel.steps.find(
-          (step) => step.ID === $(this).data("id")
-        ).data.step_order = i + 1;
-      });
+          (step) => step.ID === $(this).data('id')
+        ).data.step_order = i + 1
+      })
 
-      this.fixStepOrders();
+      this.fixStepOrders()
     },
 
-    currentState() {
-      const { view, funnel, activeStep, activeAddType, isEditingTitle } = this;
+    currentState () {
+      const { view, funnel, activeStep, activeAddType, isEditingTitle } = this
 
       return {
         view,
@@ -1238,107 +1361,98 @@
         isEditingTitle,
         activeAddType,
         funnel: copyObject(funnel),
-      };
+      }
     },
 
     /**
      * Saves the current state of the funnel for an undo slot
      */
-    saveUndoState() {
-      this.undoStates.push(this.currentState());
+    saveUndoState () {
+      this.undoStates.push(this.currentState())
     },
 
     /**
      * Undo the previous change
      */
-    undo() {
-      var lastState = this.undoStates.pop();
+    undo () {
+      var lastState = this.undoStates.pop()
 
       if (!lastState) {
-        return;
+        return
       }
 
-      this.redoStates.push(this.currentState());
+      this.redoStates.push(this.currentState())
 
-      Object.assign(this, lastState);
+      Object.assign(this, lastState)
 
-      this.render();
+      this.render()
     },
 
     /**
      * Redo the previous change
      */
-    redo() {
-      var lastState = this.redoStates.pop();
+    redo () {
+      var lastState = this.redoStates.pop()
 
       if (!lastState) {
-        return;
+        return
       }
 
-      this.undoStates.push(this.currentState());
+      this.undoStates.push(this.currentState())
 
-      Object.assign(this, lastState);
+      Object.assign(this, lastState)
 
-      this.render();
+      this.render()
     },
 
-    update(data, reload = true) {
-      var self = this;
+    update (data, reload = true) {
+      var self = this
 
       return apiPost(`${apiRoutes.funnels}/${self.funnel.ID}`, data).then(
         (data) => {
-          self.setLastSaved();
+          self.setLastSaved()
           if (data.item && reload) {
-            self.loadFunnel(data.item);
-            self.render();
+            self.loadFunnel(data.item)
+            self.render()
           }
         }
-      );
+      )
     },
 
-    activate() {
-      const { close } = modal({
-        content: "<p>Launching...</p>",
-        canClose: false,
-      });
+    activate () {
+      const { close } = loadingModal('Launching')
 
       this.update({
         data: {
-          status: "active",
+          status: 'active',
         },
-      }).then(() => close());
+      }).then(() => close())
     },
 
-    deactivate() {
-      const { close } = modal({
-        content: "<h1>Deactivating...</h1>",
-        canClose: false,
-      });
+    deactivate () {
+      const { close } = loadingModal('Deactivating')
 
       this.update({
         data: {
-          status: "inactive",
+          status: 'inactive',
         },
-      }).then(() => close());
+      }).then(() => close())
     },
 
-    commitChanges() {
-      var self = this;
+    commitChanges () {
+      var self = this
 
       if (objectEquals(this.funnel.steps, this.origFunnel.steps)) {
-        return this.activate();
+        return this.activate()
       }
 
       if (this.autoSaveTimeout) {
-        clearTimeout(this.autoSaveTimeout);
+        clearTimeout(this.autoSaveTimeout)
       } else if (this.abortController) {
-        this.abortController.abort();
+        this.abortController.abort()
       }
 
-      const { close } = modal({
-        content: "<h1>Saving...</h1>",
-        canClose: false,
-      });
+      const { close } = savingModal()
 
       apiPost(`${apiRoutes.funnels}/${self.funnel.ID}/commit`, {
         edited: {
@@ -1346,55 +1460,55 @@
         },
       })
         .then((data) => {
-          self.setLastSaved();
+          self.setLastSaved()
           if (data.item) {
-            self.loadFunnel(data.item);
-            self.render();
-          } else if (data.code === "error") {
+            self.loadFunnel(data.item)
+            self.render()
+          } else if (data.code === 'error') {
             // confusion I know...
-            const { errors } = data.data.data;
+            const { errors } = data.data.data
 
             const errorHTML = errors.map(({ errors, error_data }) => {
               return `<p>${Object.keys(errors).map(
                 (code) => errors[code][0]
-              )}</p>`;
-            });
+              )}</p>`
+            })
 
             errors.forEach((error) => {
-              const { errors, error_data } = error;
+              const { errors, error_data } = error
 
               for (const code in errors) {
                 if (errors.hasOwnProperty(code)) {
                   // console.log(errors[code][0], error_data[code])
 
-                  self.addStepError(error_data[code].step.ID, errors[code][0]);
+                  self.addStepError(error_data[code].step.ID, errors[code][0])
                 }
               }
-            });
+            })
 
             // console.log(self.stepErrors)
-            self.render();
+            self.render()
 
             confirmationModal({
               // language=HTML
               alert: `<p>Your funnel could not be launched due to <b>${errors.length}</b> errors. Please rectify the
-                  following errors and try again.</p>
-              <div class="commit-errors">${errorHTML}</div>`,
-            });
+				  following errors and try again.</p>
+			  <div class="commit-errors">${errorHTML}</div>`,
+            })
           }
         })
-        .then(() => close());
+        .then(() => close())
     },
 
-    setLastSaved() {
-      clearInterval(self.lastSavedTimer);
+    setLastSaved () {
+      clearInterval(self.lastSavedTimer)
 
       self.lastSavedTimer = setInterval(
         this.updateLastSaved,
         30 * 1000,
         new Date()
-      ); // 30 seconds
-      this.updateLastSaved(new Date());
+      ) // 30 seconds
+      this.updateLastSaved(new Date())
     },
 
     /**
@@ -1404,33 +1518,33 @@
      *
      * @link https://stackoverflow.com/a/7641812
      */
-    updateLastSaved(lastSaved) {
-      var delta = Math.round((+new Date() - lastSaved) / 1000);
+    updateLastSaved (lastSaved) {
+      var delta = Math.round((+new Date() - lastSaved) / 1000)
 
       var minute = 60,
         hour = minute * 60,
         day = hour * 24,
-        week = day * 7;
+        week = day * 7
 
-      var fuzzy = "Saved ";
+      var fuzzy = 'Saved '
 
       if (delta < 30) {
-        fuzzy += "just now";
+        fuzzy += 'just now'
       } else if (delta < minute) {
-        fuzzy += delta + " seconds ago";
+        fuzzy += delta + ' seconds ago'
       } else if (delta < 2 * minute) {
-        fuzzy += "a minute ago";
+        fuzzy += 'a minute ago'
       } else if (delta < hour) {
-        fuzzy += Math.floor(delta / minute) + " minutes ago.";
+        fuzzy += Math.floor(delta / minute) + ' minutes ago.'
       } else if (Math.floor(delta / hour) == 1) {
-        fuzzy += "1 hour ago";
+        fuzzy += '1 hour ago'
       } else if (delta < day) {
-        fuzzy = Math.floor(delta / hour) + " hours ago.";
+        fuzzy = Math.floor(delta / hour) + ' hours ago.'
       } else if (delta < day * 2) {
-        fuzzy += "yesterday";
+        fuzzy += 'yesterday'
       }
 
-      $(".header-actions").attr("data-lastSaved", fuzzy);
+      $('.header-actions').attr('data-lastSaved', fuzzy)
     },
 
     /**
@@ -1438,95 +1552,95 @@
      *
      * @param step
      */
-    addStep(step) {
+    addStep (step) {
       // console.log('add-step')
 
       if (!step) {
-        return;
+        return
       }
 
-      this.saveUndoState();
+      this.saveUndoState()
 
-      this.funnel.steps.push(step);
-      this.fixStepOrders();
+      this.funnel.steps.push(step)
+      this.fixStepOrders()
 
-      delete this.addingStepOrder;
+      delete this.addingStepOrder
       // this.activeStep = step.ID
       // this.view = 'editingStep'
-      this.renderStepFlow();
+      this.renderStepFlow()
       // this.renderStepEdit()
 
-      this.autoSaveEditedFunnel();
+      this.autoSaveEditedFunnel()
     },
 
-    moveStep(step, direction) {
+    moveStep (step, direction) {
       if (!step) {
-        return;
+        return
       }
 
-      const move = "up" === direction ? -1.1 : 1.1;
+      const move = 'up' === direction ? -1.1 : 1.1
 
-      this.saveUndoState();
+      this.saveUndoState()
 
-      step.data.step_order = step.data.step_order + move;
+      step.data.step_order = step.data.step_order + move
 
-      window.console.log("steps", this.funnel.steps);
+      window.console.log('steps', this.funnel.steps)
 
-      this.fixStepOrders();
-      this.renderStepFlow();
+      this.fixStepOrders()
+      this.renderStepFlow()
 
-      this.autoSaveEditedFunnel();
+      this.autoSaveEditedFunnel()
     },
 
-    moveStepUp(step) {
-      this.moveStep(step, "up");
+    moveStepUp (step) {
+      this.moveStep(step, 'up')
     },
 
-    moveStepDown(step) {
-      this.moveStep(step, "down");
+    moveStepDown (step) {
+      this.moveStep(step, 'down')
     },
 
-    insertPlaceholderStep(step, beforeAfter) {
-      const self = this;
+    insertPlaceholderStep (step, beforeAfter) {
+      const self = this
 
-      self.previousActiveStep = step.ID;
+      self.previousActiveStep = step.ID
 
-      self.view = "addingStep";
+      self.view = 'addingStep'
       self.addingStepOrder =
-        "before" === beforeAfter
+        'before' === beforeAfter
           ? parseInt(step.data.step_order) - 0.1
-          : parseInt(step.data.step_order) + 0.1;
-      self.renderStepFlow();
-      self.renderStepAdd();
+          : parseInt(step.data.step_order) + 0.1
+      self.renderStepFlow()
+      self.renderStepAdd()
       const $html = $(
         `<div class="step-placeholder">Choose a step to add here &rarr;<button type="button" class="button button-secondary">Cancel</button></div>`
-      );
+      )
 
-      $("button", $html).on("click", function () {
-        delete self.addingStepOrder;
-        $html.remove();
+      $('button', $html).on('click', function () {
+        delete self.addingStepOrder
+        $html.remove()
 
-        self.activeStep = self.previousActiveStep;
-        self.view = "editingStep";
-        self.renderStepFlow();
-        self.renderStepEdit();
-      });
+        self.activeStep = self.previousActiveStep
+        self.view = 'editingStep'
+        self.renderStepFlow()
+        self.renderStepEdit()
+      })
 
-      if ("before" === beforeAfter) {
-        $html.insertBefore(`.steps [data-id="${step.ID}"]`);
+      if ('before' === beforeAfter) {
+        $html.insertBefore(`.steps [data-id="${step.ID}"]`)
       } else {
-        $html.insertAfter(`.steps [data-id="${step.ID}"]`);
+        $html.insertAfter(`.steps [data-id="${step.ID}"]`)
       }
     },
 
-    fixStepOrders() {
-      let newOrder = 1;
+    fixStepOrders () {
+      let newOrder = 1
       this.funnel.steps
         .sort((a, b) => a.data.step_order - b.data.step_order)
         .forEach((step) => {
-          step.data.step_order = newOrder;
-          newOrder++;
-        });
+          step.data.step_order = newOrder
+          newOrder++
+        })
     },
 
     /**
@@ -1534,45 +1648,45 @@
      *
      * @param stepId
      */
-    deleteStep(stepId) {
+    deleteStep (stepId) {
       if (!stepId) {
-        return;
+        return
       }
 
       const removeStep = () => {
-        this.saveUndoState();
+        this.saveUndoState()
 
         this.funnel.steps = this.funnel.steps.filter(
           (step) => step.ID !== stepId
-        );
+        )
 
-        this.fixStepOrders();
-        this.renderStepFlow();
+        this.fixStepOrders()
+        this.renderStepFlow()
 
         if (this.activeStep === stepId) {
-          this.view = "addingStep";
-          this.renderStepAdd();
-          this.activeStep = null;
+          this.view = 'addingStep'
+          this.renderStepAdd()
+          this.activeStep = null
         }
 
-        this.autoSaveEditedFunnel();
-      };
+        this.autoSaveEditedFunnel()
+      }
 
-      const origStep = Editor.origFunnel.steps.find((s) => s.ID === stepId);
+      const origStep = Editor.origFunnel.steps.find((s) => s.ID === stepId)
 
       if (origStep) {
-        confirmationModal({
+        dangerConfirmationModal({
           alert: `
-          <p><b>Are you sure you want to delete this step?</b></p>
-          <p>Any pending actions associated with this step will be cancelled when the funnel is updated.</p> 
+          <p><b>Delete this step?</b></p>
+          <p>Active contacts at this step will be removed from the funnel when it is updated.</p> 
         `,
-          confirmText: "Delete",
+          confirmText: 'Delete',
           onConfirm: () => {
-            removeStep();
+            removeStep()
           },
-        });
+        })
       } else {
-        removeStep();
+        removeStep()
       }
     },
 
@@ -1582,8 +1696,8 @@
      * @param stepId
      * @returns {*}
      */
-    getStep(stepId) {
-      return this.funnel.steps.find((step) => step.ID === stepId);
+    getStep (stepId) {
+      return this.funnel.steps.find((step) => step.ID === stepId)
     },
 
     /**
@@ -1591,8 +1705,8 @@
      *
      * @returns {[]}
      */
-    getSteps() {
-      return this.funnel.steps;
+    getSteps () {
+      return this.funnel.steps
     },
 
     /**
@@ -1600,8 +1714,8 @@
      *
      * @returns {*}
      */
-    getCurrentStep() {
-      return this.getStep(this.activeStep);
+    getCurrentStep () {
+      return this.getStep(this.activeStep)
     },
 
     /**
@@ -1610,29 +1724,29 @@
      * @param stepId
      * @param newData
      */
-    updateStep(stepId, newData) {
-      const step = this.getStep(stepId);
+    updateStep (stepId, newData) {
+      const step = this.getStep(stepId)
 
       const newStep = {
         ...step,
         ...newData,
-      };
+      }
 
       newStep.data.step_title = StepTypes.getType(newStep.data.step_type).title(
         newStep
-      );
-      var toReplace = this.funnel.steps.findIndex((step) => step.ID === stepId);
+      )
+      var toReplace = this.funnel.steps.findIndex((step) => step.ID === stepId)
 
-      this.autoSaveEditedFunnel();
-      this.saveUndoState();
+      this.autoSaveEditedFunnel()
+      this.saveUndoState()
 
       if (toReplace !== -1) {
-        this.funnel.steps[toReplace] = newStep;
+        this.funnel.steps[toReplace] = newStep
       }
 
-      this.renderStepFlow();
+      this.renderStepFlow()
 
-      return newStep;
+      return newStep
     },
 
     /**
@@ -1641,14 +1755,14 @@
      * @param newData
      * @param reRenderStepEdit
      */
-    updateCurrentStep(newData, reRenderStepEdit = false) {
-      const step = this.updateStep(this.activeStep, newData);
+    updateCurrentStep (newData, reRenderStepEdit = false) {
+      const step = this.updateStep(this.activeStep, newData)
 
       if (reRenderStepEdit) {
-        this.renderStepEdit();
+        this.renderStepEdit()
       }
 
-      return step;
+      return step
     },
 
     /**
@@ -1657,39 +1771,39 @@
      * @param newMeta
      * @param reRenderStepEdit
      */
-    updateCurrentStepMeta(newMeta, reRenderStepEdit = false) {
+    updateCurrentStepMeta (newMeta, reRenderStepEdit = false) {
       // console.log(this)
 
-      const { data, meta } = this.getCurrentStep();
+      const { data, meta } = this.getCurrentStep()
 
       const step = this.updateStep(this.activeStep, {
         meta: {
           ...meta,
           ...newMeta,
         },
-      });
+      })
 
       if (reRenderStepEdit) {
-        this.renderStepEdit();
+        this.renderStepEdit()
       }
 
-      return step;
+      return step
     },
 
     autoSaveTimeout: null,
     abortController: null,
 
-    autoSaveEditedFunnel() {
-      var self = this;
+    autoSaveEditedFunnel () {
+      var self = this
 
       if (this.autoSaveTimeout) {
-        clearTimeout(this.autoSaveTimeout);
+        clearTimeout(this.autoSaveTimeout)
       }
 
       this.autoSaveTimeout = setTimeout(() => {
-        self.autoSaveTimeout = null;
-        self.abortController = new AbortController();
-        const { signal } = self.abortController;
+        self.autoSaveTimeout = null
+        self.abortController = new AbortController()
+        const { signal } = self.abortController
 
         apiPost(
           `${apiRoutes.funnels}/${self.funnel.ID}/meta`,
@@ -1703,18 +1817,18 @@
             signal,
           }
         ).then((data) => {
-          self.setLastSaved();
-          self.abortController = null;
-        });
-      }, 3000);
+          self.setLastSaved()
+          self.abortController = null
+        })
+      }, 3000)
     },
 
     ...Funnel,
-  };
+  }
 
   $(function () {
-    Editor.init();
-  });
+    Editor.init()
+  })
 
   /**
    * Make a copy of the object
@@ -1723,9 +1837,9 @@
    * @param initial
    * @returns {*}
    */
-  function copyObject(object, initial) {
-    initial = initial || {};
-    return $.extend(true, initial, object);
+  function copyObject (object, initial) {
+    initial = initial || {}
+    return $.extend(true, initial, object)
   }
 
   /**
@@ -1735,32 +1849,32 @@
    * @param b
    * @returns {boolean}
    */
-  function objectEquals(a, b) {
-    return JSON.stringify(a) === JSON.stringify(b);
+  function objectEquals (a, b) {
+    return JSON.stringify(a) === JSON.stringify(b)
   }
 
   /**
    *
    */
-  function uniqid() {
-    return Date.now();
+  function uniqid () {
+    return Date.now()
   }
 
-  function andList(array, text = "and") {
+  function andList (array, text = 'and') {
     if (array.length === 1) {
-      return array[0];
+      return array[0]
     }
-    return `${array.slice(0, -1).join(", ")} ${text} ${
+    return `${array.slice(0, -1).join(', ')} ${text} ${
       array[array.length - 1]
-    }`;
+    }`
   }
 
-  function orList(array) {
-    return andList(array, "or");
+  function orList (array) {
+    return andList(array, 'or')
   }
 
-  function isString(string) {
-    return typeof string === "string";
+  function isString (string) {
+    return typeof string === 'string'
   }
 
   /**
@@ -1771,38 +1885,38 @@
    */
   const specialChars = (string) => {
     if (!isString(string)) {
-      return string;
+      return string
     }
 
     return string
-      .replace(/&/g, "&amp;")
-      .replace(/>/g, "&gt;")
-      .replace(/</g, "&lt;")
-      .replace(/"/g, "&quot;");
-  };
+      .replace(/&/g, '&amp;')
+      .replace(/>/g, '&gt;')
+      .replace(/</g, '&lt;')
+      .replace(/"/g, '&quot;')
+  }
 
   const kebabize = (str) => {
     return str
-      .split("")
+      .split('')
       .map((letter, idx) => {
         return letter.toUpperCase() === letter
-          ? `${idx !== 0 ? "-" : ""}${letter.toLowerCase()}`
-          : letter;
+          ? `${idx !== 0 ? '-' : ''}${letter.toLowerCase()}`
+          : letter
       })
-      .join("");
-  };
+      .join('')
+  }
 
   const objectToStyle = (object) => {
-    const props = [];
+    const props = []
 
     for (const prop in object) {
       if (object.hasOwnProperty(prop)) {
-        props.push(`${kebabize(prop)}:${specialChars(object[prop])}`);
+        props.push(`${kebabize(prop)}:${specialChars(object[prop])}`)
       }
     }
 
-    return props.join(";");
-  };
+    return props.join(';')
+  }
 
   /**
    * Convert an object of HTML props into a string
@@ -1811,101 +1925,101 @@
    * @returns {string}
    */
   const objectToProps = (object) => {
-    const props = [];
+    const props = []
 
     for (const prop in object) {
       if (object.hasOwnProperty(prop)) {
         switch (prop) {
-          case "className":
-            props.push(`class="${specialChars(object[prop])}"`);
-            break;
-          case "style":
-            props.push(`style="${specialChars(objectToStyle(object[prop]))}"`);
-            break;
+          case 'className':
+            props.push(`class="${specialChars(object[prop])}"`)
+            break
+          case 'style':
+            props.push(`style="${specialChars(objectToStyle(object[prop]))}"`)
+            break
           default:
-            props.push(`${kebabize(prop)}="${specialChars(object[prop])}"`);
-            break;
+            props.push(`${kebabize(prop)}="${specialChars(object[prop])}"`)
+            break
         }
       }
     }
 
-    return props.join(" ");
-  };
+    return props.join(' ')
+  }
 
   const Elements = {
-    input(props) {
+    input (props) {
       props = {
-        type: "text",
-        className: "input",
+        type: 'text',
+        className: 'input',
         ...props,
-      };
+      }
 
-      return `<input ${objectToProps(props)}/>`;
+      return `<input ${objectToProps(props)}/>`
     },
-    select(props, options, selected) {
+    select (props, options, selected) {
       return `<select ${objectToProps(props)}>${createOptions(
         options,
         selected
-      )}</select>`;
+      )}</select>`
     },
     option: function (value, text, selected) {
       //language=HTML
       return `
-          <option value="${specialChars(value)}" ${
-        selected ? "selected" : ""
-      }>${text}
-          </option>`;
+		  <option value="${specialChars(value)}" ${
+			  selected ? 'selected' : ''
+		  }>${text}
+		  </option>`
     },
-    mappableFields(props, selected) {
+    mappableFields (props, selected) {
       return Elements.select(
         props,
         {
-          0: "-- Do not map --",
+          0: '-- Do not map --',
           ...Groundhogg.fields.mappable,
         },
         selected
-      );
+      )
     },
-    inputWithReplacementsAndEmojis(
-      { type = "text", name, id, value, className, placeholder = "" },
+    inputWithReplacementsAndEmojis (
+      { type = 'text', name, id, value, className, placeholder = '' },
       replacements = true,
       emojis = true
     ) {
       const classList = [
-        replacements && "input-with-replacements",
-        emojis && "input-with-emojis",
-      ];
+        replacements && 'input-with-replacements',
+        emojis && 'input-with-emojis',
+      ]
       //language=HTML
       return `
-          <div class="input-wrap ${classList.filter((c) => c).join(" ")}">
-              <input type="${type}" id="${id}" name="${name}" value="${
-        specialChars(value) || ""
-      }" class="${className}"
-                     placeholder="${specialChars(placeholder)}">
-              ${
-                emojis
-                  ? `<button class="emoji-picker-start" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
+		  <div class="input-wrap ${classList.filter((c) => c).join(' ')}">
+			  <input type="${type}" id="${id}" name="${name}" value="${
+				  specialChars(value) || ''
+			  }" class="${className}"
+			         placeholder="${specialChars(placeholder)}">
+			  ${
+				  emojis
+					  ? `<button class="emoji-picker-start" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
 			  </button>`
-                  : ""
-              }
-              ${
-                replacements
-                  ? `<button class="replacements-picker-start" title="insert replacement"><span
+					  : ''
+			  }
+			  ${
+				  replacements
+					  ? `<button class="replacements-picker-start" title="insert replacement"><span
 				  class="dashicons dashicons-admin-users"></span></button>`
-                  : ""
-              }
-          </div>`;
+					  : ''
+			  }
+		  </div>`
     },
     inputWithReplacements: function (atts) {
-      return Elements.inputWithReplacementsAndEmojis(atts, true, false);
+      return Elements.inputWithReplacementsAndEmojis(atts, true, false)
     },
     inputWithEmojis: function (atts) {
-      return Elements.inputWithReplacementsAndEmojis(atts, false, true);
+      return Elements.inputWithReplacementsAndEmojis(atts, false, true)
     },
     textAreaWithReplacementsAndEmojis: function ({ name, id, value }) {},
     textAreaWithReplacements: function ({ name, id, value }) {},
     textAreaWithEmojis: function ({ name, id, value }) {},
-  };
+  }
 
   /**
    * Create a list of options
@@ -1915,7 +2029,7 @@
    * @returns {string}
    */
   const createOptions = (options, selected) => {
-    const optionsString = [];
+    const optionsString = []
 
     // Options is an array format
     if (Array.isArray(options)) {
@@ -1928,8 +2042,8 @@
               ? selected.indexOf(option) !== -1
               : option === selected
           )
-        );
-      });
+        )
+      })
     }
     // Assume object
     else {
@@ -1943,27 +2057,27 @@
                 ? selected.indexOf(option) !== -1
                 : option === selected
             )
-          );
+          )
         }
       }
     }
 
-    return optionsString.join("");
-  };
+    return optionsString.join('')
+  }
 
-  function ordinal_suffix_of(i) {
+  function ordinal_suffix_of (i) {
     var j = i % 10,
-      k = i % 100;
+      k = i % 100
     if (j == 1 && k != 11) {
-      return i + "st";
+      return i + 'st'
     }
     if (j == 2 && k != 12) {
-      return i + "nd";
+      return i + 'nd'
     }
     if (j == 3 && k != 13) {
-      return i + "rd";
+      return i + 'rd'
     }
-    return i + "th";
+    return i + 'th'
   }
 
   /**
@@ -1973,14 +2087,14 @@
    * @param updateStepMeta
    */
   const tagWithConditionOnMount = (step, updateStepMeta) => {
-    tagOnMount(step, updateStepMeta);
+    tagOnMount(step, updateStepMeta)
 
-    $("#condition").change(function (e) {
+    $('#condition').change(function (e) {
       updateStepMeta({
         condition: $(this).val(),
-      });
-    });
-  };
+      })
+    })
+  }
 
   /**
    * Handler for the tag picker step
@@ -1990,41 +2104,41 @@
    * @returns {*|define.amd.jQuery}
    */
   const tagOnMount = (step, updateStepMeta) => {
-    return tagPicker("#tags", true, (items) => {
-      console.log(items);
-      TagsStore.itemsFetched(items);
-    }).on("change", function (e) {
-      const tags = $(this).val();
-      const newTags = tags.filter((tag) => !TagsStore.hasItem(parseInt(tag)));
+    return tagPicker('#tags', true, (items) => {
+      console.log(items)
+      TagsStore.itemsFetched(items)
+    }).on('change', function (e) {
+      const tags = $(this).val()
+      const newTags = tags.filter((tag) => !TagsStore.hasItem(parseInt(tag)))
 
       if (newTags.length > 0) {
         TagsStore.validate(tags).then((tags) => {
           updateStepMeta({
             tags: tags.map((tag) => tag.ID),
-          });
-        });
+          })
+        })
       } else {
         updateStepMeta({
           tags: tags.map((tag) => parseInt(tag)),
-        });
+        })
       }
-    });
-  };
+    })
+  }
 
   const delayTimerDefaults = {
     delay_amount: 3,
-    delay_type: "days",
-    run_on_type: "any",
-    run_when: "now",
-    run_time: "09:00:00",
+    delay_type: 'days',
+    run_on_type: 'any',
+    run_when: 'now',
+    run_time: '09:00:00',
     send_in_timezone: false,
-    run_time_to: "17:00:00",
-    run_on_dow_type: "any", // Run on days of week type
+    run_time_to: '17:00:00',
+    run_on_dow_type: 'any', // Run on days of week type
     run_on_dow: [], // Run on days of week
-    run_on_month_type: "any", // Run on month type
+    run_on_month_type: 'any', // Run on month type
     run_on_months: [], // Run on months
     run_on_dom: [], // Run on days of month
-  };
+  }
 
   const delayTimerName = ({
     delay_amount,
@@ -2040,125 +2154,125 @@
     run_on_months, // Run on months
     run_on_dom, // Run on days of month
   }) => {
-    const preview = [];
+    const preview = []
 
     // Deal with the easiest cases first
-    if (delay_type === "none" && run_on_type === "any") {
+    if (delay_type === 'none' && run_on_type === 'any') {
       switch (run_when) {
         default:
-        case "now":
-          return `Run at any time`;
-        case "later":
-          return `Run at <b>${run_time}</b>`;
-        case "between":
-          return `Run between <b>${run_time}</b> and <b>${run_time_to}</b>`;
+        case 'now':
+          return `Run at any time`
+        case 'later':
+          return `Run at <b>${run_time}</b>`
+        case 'between':
+          return `Run between <b>${run_time}</b> and <b>${run_time_to}</b>`
       }
     }
 
-    if (delay_type !== "none") {
+    if (delay_type !== 'none') {
       preview.push(
         `Wait at least <b>${delay_amount} ${delay_type}</b> and then`
-      );
+      )
     }
 
-    if (run_on_type !== "any") {
-      preview.push(preview.length > 0 ? "run on" : "Run on");
+    if (run_on_type !== 'any') {
+      preview.push(preview.length > 0 ? 'run on' : 'Run on')
     }
 
     switch (run_on_type) {
       default:
-      case "any":
-        preview.push("run");
-        break;
-      case "weekday":
-        preview.push("<b>a weekday</b>");
-        break;
-      case "weekend":
-        preview.push("<b>a weekend</b>");
-        break;
-      case "day_of_week":
-        let dowList = orList(run_on_dow.map((i) => `<b>${i}</b>`));
+      case 'any':
+        preview.push('run')
+        break
+      case 'weekday':
+        preview.push('<b>a weekday</b>')
+        break
+      case 'weekend':
+        preview.push('<b>a weekend</b>')
+        break
+      case 'day_of_week':
+        let dowList = orList(run_on_dow.map((i) => `<b>${i}</b>`))
         dowList = `${
-          run_on_dow_type === "any"
+          run_on_dow_type === 'any'
             ? `any ${dowList}`
             : `the ${run_on_dow_type} ${dowList}`
-        }`;
+        }`
 
-        if (run_on_month_type === "specific") {
+        if (run_on_month_type === 'specific') {
           preview.push(
             `${dowList} in ${orList(run_on_months.map((i) => `<b>${i}</b>`))}`
-          );
+          )
         } else {
-          preview.push(`${dowList} of <b>any month</b>`);
+          preview.push(`${dowList} of <b>any month</b>`)
         }
 
-        break;
-      case "day_of_month":
+        break
+      case 'day_of_month':
         const dayList =
           run_on_dom.length > 0
             ? `the ${orList(
-                run_on_dom.map((i) => `<b>${ordinal_suffix_of(i)}</b>`)
-              )}`
-            : `<b>any day</b>`;
+            run_on_dom.map((i) => `<b>${ordinal_suffix_of(i)}</b>`)
+            )}`
+            : `<b>any day</b>`
 
-        if (run_on_month_type === "specific") {
+        if (run_on_month_type === 'specific') {
           preview.push(
             `${dayList} in ${orList(run_on_months.map((i) => `<b>${i}</b>`))}`
-          );
+          )
         } else {
-          preview.push(`${dayList} of <b>any month</b>`);
+          preview.push(`${dayList} of <b>any month</b>`)
         }
 
-        break;
+        break
     }
 
     switch (run_when) {
       default:
-      case "now":
-        preview.push(`at any time`);
-        break;
-      case "later":
-        preview.push(`at <b>${run_time}</b>`);
-        break;
-      case "between":
-        preview.push(`between <b>${run_time}</b> and <b>${run_time_to}</b>`);
-        break;
+      case 'now':
+        preview.push(`at any time`)
+        break
+      case 'later':
+        preview.push(`at <b>${run_time}</b>`)
+        break
+      case 'between':
+        preview.push(`between <b>${run_time}</b> and <b>${run_time_to}</b>`)
+        break
     }
 
-    return preview.join(" ");
-  };
+    return preview.join(' ')
+  }
 
   const StepPacks = {
     packs: {},
-    add(id, name = "", svg = "") {
+    add (id, name = '', svg = '') {
       this.packs[id] = {
         id,
         name,
         svg,
-      };
+      }
     },
-    get(id) {
-      return this.packs[id];
+    get (id) {
+      return this.packs[id]
     },
-  };
+  }
 
-  StepPacks.add("core", "Groundhogg");
+  StepPacks.add('core', 'Groundhogg')
 
   const StepTypes = {
-    register(type, opts) {
+    register (type, opts) {
       this[type] = {
         type: type,
         ...opts,
-      };
+      }
       // console.log('step-registered', type, opts, this)
     },
 
-    getType(type) {
+    getType (type) {
       if (!this.hasOwnProperty(type)) {
-        return this.default;
+        return this.default
       }
 
-      return Object.assign({}, this.default, this[type]);
+      return Object.assign({}, this.default, this[type])
     },
 
     error: {
@@ -2170,237 +2284,237 @@
 				  d="M10.48 9.322a.092.092 0 00-.011.036c0 .008-.004.016-.012.024-.016.016-.076.024-.18.024h-.888c-.032 0-.048-.008-.048-.024-.024-.024-.036-.092-.036-.204l-.168-5.496c-.008-.168 0-.268.024-.3.024-.032.092-.048.204-.048h1.068c.112 0 .176.016.192.048.024.032.032.132.024.3l-.168 5.496v.144zm-.587 2.496a.794.794 0 01-.6-.252.8.8 0 01-.24-.589.84.84 0 01.24-.6.794.794 0 01.6-.252c.24 0 .44.085.6.252a.82.82 0 01.252.6.78.78 0 01-.252.588.794.794 0 01-.6.253z"
 				  fill="#fff"/>
 		  </svg>`,
-      name: "Error",
-      type: "error",
-      title({ data }) {
-        return `<b>${data.step_type}</b> settings not found`;
+      name: 'Error',
+      type: 'error',
+      title ({ data }) {
+        return `<b>${data.step_type}</b> settings not found`
       },
-      edit({ ID, data, meta }) {
+      edit ({ ID, data, meta }) {
         //language=HTML
         return `
-            <div class="panel">
-                <p>The settings for this step could not be found. This may be because you deactivated an extension or
-                    integration which registered this step type.</p>
-                <p>Reactivate the plugin or delete this step to continue.</p>
-            </div>`;
+			<div class="panel">
+				<p>The settings for this step could not be found. This may be because you deactivated an extension or
+					integration which registered this step type.</p>
+				<p>Reactivate the plugin or delete this step to continue.</p>
+			</div>`
       },
-      onMount() {},
+      onMount () {},
     },
 
     /**
      * Step type default fallbacks
      */
     default: {
-      pack: "core",
+      pack: 'core',
       // language=html
       promiseController: null,
-      title({ ID, data, meta }) {
-        return data.step_title;
+      title ({ ID, data, meta }) {
+        return data.step_title
       },
-      edit({ ID, data, meta }) {
+      edit ({ ID, data, meta }) {
         //language=HTML
         return `
-            <div class="panel">
-                <form id="settings-form" method="post" action="">
-                    <div id="dynamic-step-settings">
-                        <div class="gh-loader"></div>
-                    </div>
-                </form>
-            </div>`;
+			<div class="panel">
+				<form id="settings-form" method="post" action="">
+					<div id="dynamic-step-settings">
+						<div class="gh-loader"></div>
+					</div>
+				</form>
+			</div>`
       },
-      onMount(step) {
-        var self = this;
+      onMount (step) {
+        var self = this
 
-        self.promiseController = new AbortController();
-        const { signal } = self.promiseController;
+        self.promiseController = new AbortController()
+        const { signal } = self.promiseController
 
         apiPost(`${apiRoutes.steps}/html`, step, {
           signal,
         })
           .then((r) => {
-            $("#dynamic-step-settings").html(r.html);
-            $(document).trigger("gh-init-pickers");
-            const $form = $("#settings-form");
+            $('#dynamic-step-settings').html(r.html)
+            $(document).trigger('gh-init-pickers')
+            const $form = $('#settings-form')
             $form
-              .on("submit", function (e) {
-                e.preventDefault();
-                return false;
+              .on('submit', function (e) {
+                e.preventDefault()
+                return false
               })
-              .on("change", function (e) {
-                e.preventDefault();
-                const meta = $(this).serializeFormJSON();
+              .on('change', function (e) {
+                e.preventDefault()
+                const meta = $(this).serializeFormJSON()
                 // console.log(meta)
-                Editor.updateCurrentStepMeta(meta);
-              });
-            self.promiseController = null;
+                Editor.updateCurrentStepMeta(meta)
+              })
+            self.promiseController = null
           })
-          .catch(() => {});
+          .catch(() => {})
       },
-      onDemount() {
+      onDemount () {
         if (this.promiseController) {
-          this.promiseController.abort();
+          this.promiseController.abort()
         }
       },
       validate: function (step, errors) {},
-      preload(step) {},
+      preload (step) {},
       defaults: {},
     },
 
     apply_note: {
       defaults: {
-        note_text: "",
+        note_text: '',
       },
 
       //language=HTML
       svg: `
-          <svg viewBox="0 0 42 37" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M41.508 31.654h-10m5-5v10" stroke="currentColor" stroke-width="2"/>
-              <path
-                      d="M27.508 11.988h1a1 1 0 00-.293-.708l-.707.708zm-7.084-7.084l.708-.707a1 1 0 00-.708-.293v1zm0 7.084h-1v1h1v-1zm7.084 17.416h-1 1zm-18.834 2h17.834v-2H8.674v2zm-2-25.5v23.5h2v-23.5h-2zm21.834 23.5V11.988h-2v17.416h2zm-8.084-25.5H8.674v2h11.75v-2zm7.79 7.376l-7.082-7.083-1.415 1.414 7.084 7.084 1.414-1.415zm-8.79-6.376v7.084h2V4.904h-2zm1 8.084h7.084v-2h-7.084v2zm-8.5 5.666h11.334v-2H11.925v2zm0 5.667h11.334v-2H11.925v2zm14.584 7.083a2 2 0 002-2h-2v2zm-17.834-2h-2a2 2 0 002 2v-2zm0-23.5v-2a2 2 0 00-2 2h2z"
-                      fill="currentColor"/>
-          </svg>`,
-      title({ meta }) {
-        return "Apply Note";
+		  <svg viewBox="0 0 42 37" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path d="M41.508 31.654h-10m5-5v10" stroke="currentColor" stroke-width="2"/>
+			  <path
+				  d="M27.508 11.988h1a1 1 0 00-.293-.708l-.707.708zm-7.084-7.084l.708-.707a1 1 0 00-.708-.293v1zm0 7.084h-1v1h1v-1zm7.084 17.416h-1 1zm-18.834 2h17.834v-2H8.674v2zm-2-25.5v23.5h2v-23.5h-2zm21.834 23.5V11.988h-2v17.416h2zm-8.084-25.5H8.674v2h11.75v-2zm7.79 7.376l-7.082-7.083-1.415 1.414 7.084 7.084 1.414-1.415zm-8.79-6.376v7.084h2V4.904h-2zm1 8.084h7.084v-2h-7.084v2zm-8.5 5.666h11.334v-2H11.925v2zm0 5.667h11.334v-2H11.925v2zm14.584 7.083a2 2 0 002-2h-2v2zm-17.834-2h-2a2 2 0 002 2v-2zm0-23.5v-2a2 2 0 00-2 2h2z"
+				  fill="currentColor"/>
+		  </svg>`,
+      title ({ meta }) {
+        return 'Apply Note'
       },
-      edit({ meta }) {
-        const { note_text } = meta;
+      edit ({ meta }) {
+        const { note_text } = meta
 
         //language=html
         return `
-            <div class="panel">
-                <div class="row">
-                    <label class="row-label" for="note_text">Add the following note the the contact...</label>
-                    <textarea id="note_text" name="note_text">${
-                      note_text || ""
-                    }</textarea>
-                </div>
-            </div>`;
+			<div class="panel">
+				<div class="row">
+					<label class="row-label" for="note_text">Add the following note the the contact...</label>
+					<textarea id="note_text" name="note_text">${
+						note_text || ''
+					}</textarea>
+				</div>
+			</div>`
       },
-      onMount(step, updateStepMeta) {
-        let saveTimer;
+      onMount (step, updateStepMeta) {
+        let saveTimer
 
         tinymceElement(
-          "note_text",
+          'note_text',
           {
             tinymce: true,
             quicktags: true,
           },
           (content) => {
             // Reset timer.
-            clearTimeout(saveTimer);
+            clearTimeout(saveTimer)
 
             // Only save after a second.
             saveTimer = setTimeout(function () {
               updateStepMeta({
                 note_text: content,
-              });
-            }, 300);
+              })
+            }, 300)
           }
-        );
+        )
       },
-      onDemount() {
-        wp.editor.remove("note_text");
+      onDemount () {
+        wp.editor.remove('note_text')
       },
     },
 
     admin_notification: {
       //language=HTML
       svg: `
-          <svg viewBox="0 0 31 43" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <mask id="a" fill="#fff">
-                  <path d="M16.956 12.576a1.368 1.368 0 11-2.737 0h2.737z"/>
-              </mask>
-              <path
-                      d="M16.956 12.576h1.5v-1.5h-1.5v1.5zm-2.737 0v-1.5h-1.5v1.5h1.5zm1.237 0c0-.072.059-.131.131-.131v3a2.868 2.868 0 002.869-2.869h-3zm.131-.131c.073 0 .132.059.132.131h-3a2.868 2.868 0 002.868 2.869v-3zm-1.368 1.631H16.955v-1.5-1.5h-.001-.001-.002-.003-.001-.001-.001-.001-.001-.001-.001-.004-.001-.004-.002-.001-.002-.001-.002-.002-.001-.002-.002-.003-.002-.002-.002-.002-.002-.002-.002-.005-.002-.002-.005-.002-.005-.005-.005-.003-.005-.003-.003-.011-.003-.003-.003-.003-.016-.02-.007-.007H16.76 16.683 14.22v3z"
-                      fill="currentColor" mask="url(#a)"/>
-              <path
-                      d="M20.376 11.208v.75A.75.75 0 0021 10.792l-.624.416zm-1.369-2.053h-.75a.75.75 0 00.126.417l.624-.417zm-6.842 0l.624.417a.75.75 0 00.126-.417h-.75zm-1.368 2.053l-.624-.416a.75.75 0 00.624 1.166v-.75zm2.118-4.79a2.671 2.671 0 012.671-2.67v-1.5a4.171 4.171 0 00-4.17 4.17h1.5zm2.671-2.67a2.671 2.671 0 012.671 2.67h1.5a4.171 4.171 0 00-4.17-4.17v1.5zm-3.42 8.21h6.841v-1.5h-6.842v1.5zm6.841 0h1.369v-1.5h-1.369v1.5zm.75-2.803V6.42h-1.5v2.736h1.5zM21 10.792L19.63 8.74l-1.248.833 1.369 2.052L21 10.792zM11.415 6.42v2.736h1.5V6.42h-1.5zm.126 2.32l-1.368 2.053 1.248.832 1.368-2.052-1.248-.833zm-.744 3.22h1.368v-1.5h-1.368v1.5zm5.54-8.961V.945h-1.5v2.053h1.5z"
-                      fill="currentColor"/>
-              <path d="M29.413 14.097L1.08 25.43l8.5 2.5 19.833-13.833zm0 0l-12.75 26.916-2.5-8.5 15.25-18.416z"
-                    stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-          </svg>`,
+		  <svg viewBox="0 0 31 43" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <mask id="a" fill="#fff">
+				  <path d="M16.956 12.576a1.368 1.368 0 11-2.737 0h2.737z"/>
+			  </mask>
+			  <path
+				  d="M16.956 12.576h1.5v-1.5h-1.5v1.5zm-2.737 0v-1.5h-1.5v1.5h1.5zm1.237 0c0-.072.059-.131.131-.131v3a2.868 2.868 0 002.869-2.869h-3zm.131-.131c.073 0 .132.059.132.131h-3a2.868 2.868 0 002.868 2.869v-3zm-1.368 1.631H16.955v-1.5-1.5h-.001-.001-.002-.003-.001-.001-.001-.001-.001-.001-.001-.004-.001-.004-.002-.001-.002-.001-.002-.002-.001-.002-.002-.003-.002-.002-.002-.002-.002-.002-.002-.005-.002-.002-.005-.002-.005-.005-.005-.003-.005-.003-.003-.011-.003-.003-.003-.003-.016-.02-.007-.007H16.76 16.683 14.22v3z"
+				  fill="currentColor" mask="url(#a)"/>
+			  <path
+				  d="M20.376 11.208v.75A.75.75 0 0021 10.792l-.624.416zm-1.369-2.053h-.75a.75.75 0 00.126.417l.624-.417zm-6.842 0l.624.417a.75.75 0 00.126-.417h-.75zm-1.368 2.053l-.624-.416a.75.75 0 00.624 1.166v-.75zm2.118-4.79a2.671 2.671 0 012.671-2.67v-1.5a4.171 4.171 0 00-4.17 4.17h1.5zm2.671-2.67a2.671 2.671 0 012.671 2.67h1.5a4.171 4.171 0 00-4.17-4.17v1.5zm-3.42 8.21h6.841v-1.5h-6.842v1.5zm6.841 0h1.369v-1.5h-1.369v1.5zm.75-2.803V6.42h-1.5v2.736h1.5zM21 10.792L19.63 8.74l-1.248.833 1.369 2.052L21 10.792zM11.415 6.42v2.736h1.5V6.42h-1.5zm.126 2.32l-1.368 2.053 1.248.832 1.368-2.052-1.248-.833zm-.744 3.22h1.368v-1.5h-1.368v1.5zm5.54-8.961V.945h-1.5v2.053h1.5z"
+				  fill="currentColor"/>
+			  <path d="M29.413 14.097L1.08 25.43l8.5 2.5 19.833-13.833zm0 0l-12.75 26.916-2.5-8.5 15.25-18.416z"
+			        stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+		  </svg>`,
       defaults: {
-        to: "{owner_email}",
-        from: "{owner_email}",
-        reply_to: "{email}",
+        to: '{owner_email}',
+        from: '{owner_email}',
+        reply_to: '{email}',
         subject: 'Notification from "{first}"',
-        note_text: "",
+        note_text: '',
       },
-      title({ meta }) {
-        const { to } = meta;
+      title ({ meta }) {
+        const { to } = meta
 
         return `Send notification to ${andList(
-          to.split(",").map((address) => `<b>${address.trim()}</b>`)
-        )}`;
+          to.split(',').map((address) => `<b>${address.trim()}</b>`)
+        )}`
       },
-      edit({ meta }) {
+      edit ({ meta }) {
         //language=HTML
         return `
-            <div class="panel">
-                <div class="row">
-                    <label class="row-label" for="to">Send this notification to...</label>
-                    ${Elements.inputWithReplacements({
-                      type: "text",
-                      id: "to",
-                      name: "to",
-                      className: "regular-text",
-                      value: meta.to,
-                    })}
-                    <p class="description">Comma separated list of emails addresses.</p>
-                </div>
-                <div class="row">
-                    <label class="row-label" for="from">This notification should be sent from...</label>
-                    ${Elements.inputWithReplacements({
-                      type: "text",
-                      id: "from",
-                      name: "from",
-                      className: "regular-text",
-                      value: meta.from,
-                    })}
-                    <p class="description">A single email address which you'd like the notification to come from.</p>
-                </div>
-                <div class="row">
-                    <label class="row-label" for="reply-to">Replies should go to...</label>
-                    ${Elements.inputWithReplacements({
-                      type: "text",
-                      id: "reply-to",
-                      name: "reply_to",
-                      className: "regular-text",
-                      value: meta.reply_to,
-                    })}
-                    <p class="description">A single email address which replies to this notification should be sent
-                        to.</p>
-                </div>
-                <div class="row">
-                    <label class="row-label" for="subject">Subject line</label>
-                    ${Elements.inputWithReplacementsAndEmojis({
-                      type: "text",
-                      id: "subject",
-                      name: "subject",
-                      className: "regular-text",
-                      value: meta.subject,
-                    })}
-                    <p class="description">The subject line of the notification.</p>
-                </div>
-                <div class="row">
-                    <textarea id="note_text" name="note_text">${specialChars(
-                      meta.note_text
-                    )}</textarea>
-                </div>
-            </div>`;
+			<div class="panel">
+				<div class="row">
+					<label class="row-label" for="to">Send this notification to...</label>
+					${Elements.inputWithReplacements({
+						type: 'text',
+						id: 'to',
+						name: 'to',
+						className: 'regular-text',
+						value: meta.to,
+					})}
+					<p class="description">Comma separated list of emails addresses.</p>
+				</div>
+				<div class="row">
+					<label class="row-label" for="from">This notification should be sent from...</label>
+					${Elements.inputWithReplacements({
+						type: 'text',
+						id: 'from',
+						name: 'from',
+						className: 'regular-text',
+						value: meta.from,
+					})}
+					<p class="description">A single email address which you'd like the notification to come from.</p>
+				</div>
+				<div class="row">
+					<label class="row-label" for="reply-to">Replies should go to...</label>
+					${Elements.inputWithReplacements({
+						type: 'text',
+						id: 'reply-to',
+						name: 'reply_to',
+						className: 'regular-text',
+						value: meta.reply_to,
+					})}
+					<p class="description">A single email address which replies to this notification should be sent
+						to.</p>
+				</div>
+				<div class="row">
+					<label class="row-label" for="subject">Subject line</label>
+					${Elements.inputWithReplacementsAndEmojis({
+						type: 'text',
+						id: 'subject',
+						name: 'subject',
+						className: 'regular-text',
+						value: meta.subject,
+					})}
+					<p class="description">The subject line of the notification.</p>
+				</div>
+				<div class="row">
+					<textarea id="note_text" name="note_text">${specialChars(
+						meta.note_text
+					)}</textarea>
+				</div>
+			</div>`
       },
-      onMount(step, updateStepMeta) {
-        $("#subject, #reply-to, #from, #to").on("change", function (e) {
-          const $this = $(this);
+      onMount (step, updateStepMeta) {
+        $('#subject, #reply-to, #from, #to').on('change', function (e) {
+          const $this = $(this)
           updateStepMeta({
-            [$this.prop("name")]: $this.val(),
-          });
-        });
+            [$this.prop('name')]: $this.val(),
+          })
+        })
 
-        let saveTimer;
+        let saveTimer
 
         tinymceElement(
-          "note_text",
+          'note_text',
           {
             tinymce: true,
             quicktags: true,
@@ -2409,19 +2523,19 @@
             // console.log(content)
 
             // Reset timer.
-            clearTimeout(saveTimer);
+            clearTimeout(saveTimer)
 
             // Only save after a second.
             saveTimer = setTimeout(function () {
               updateStepMeta({
                 note_text: content,
-              });
-            }, 300);
+              })
+            }, 300)
           }
-        );
+        )
       },
-      onDemount() {
-        wp.editor.remove("note_text");
+      onDemount () {
+        wp.editor.remove('note_text')
       },
     },
 
@@ -2435,62 +2549,62 @@
 
       //language=HTML
       svg: `
-          <svg viewBox="0 0 32 31" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                      d="M1.473 29.667l-.96-.284a1 1 0 00.96 1.284v-1zm25.5 0v1a1 1 0 00.959-1.284l-.96.284zM14.223 14.5a6.083 6.083 0 01-6.084-6.083h-2a8.083 8.083 0 008.084 8.083v-2zM8.139 8.417a6.083 6.083 0 016.084-6.084v-2a8.083 8.083 0 00-8.084 8.084h2zM2.431 29.95c1.59-5.368 6.297-9.201 11.792-9.201v-2c-6.471 0-11.894 4.505-13.71 10.633l1.918.568zm11.792-9.201c5.495 0 10.2 3.833 11.79 9.2l1.918-.567c-1.815-6.128-7.237-10.633-13.708-10.633v2zm-12.75 9.917h25.5v-2h-25.5v2zm12.75-28.334a6.05 6.05 0 013.04.814l1.002-1.732A8.05 8.05 0 0014.223.333v2z"
-                      fill="currentColor"/>
-              <path d="M31.223 9.833H17.057M24.14 2.75v14.167" stroke="currentColor" stroke-width="2"/>
-          </svg>
+		  <svg viewBox="0 0 32 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path
+				  d="M1.473 29.667l-.96-.284a1 1 0 00.96 1.284v-1zm25.5 0v1a1 1 0 00.959-1.284l-.96.284zM14.223 14.5a6.083 6.083 0 01-6.084-6.083h-2a8.083 8.083 0 008.084 8.083v-2zM8.139 8.417a6.083 6.083 0 016.084-6.084v-2a8.083 8.083 0 00-8.084 8.084h2zM2.431 29.95c1.59-5.368 6.297-9.201 11.792-9.201v-2c-6.471 0-11.894 4.505-13.71 10.633l1.918.568zm11.792-9.201c5.495 0 10.2 3.833 11.79 9.2l1.918-.567c-1.815-6.128-7.237-10.633-13.708-10.633v2zm-12.75 9.917h25.5v-2h-25.5v2zm12.75-28.334a6.05 6.05 0 013.04.814l1.002-1.732A8.05 8.05 0 0014.223.333v2z"
+				  fill="currentColor"/>
+			  <path d="M31.223 9.833H17.057M24.14 2.75v14.167" stroke="currentColor" stroke-width="2"/>
+		  </svg>
       `,
 
       // Title
-      title({ ID, data, meta }) {
-        const roles = Editor.stepTypes.account_created.context.roles;
+      title ({ ID, data, meta }) {
+        const roles = Editor.stepTypes.account_created.context.roles
 
         if (meta.role && meta.role.length === 1) {
-          return `<b>${roles[meta.role[0]]}</b> is created`;
+          return `<b>${roles[meta.role[0]]}</b> is created`
         } else if (meta.role && meta.role.length > 1) {
           return `${orList(
             meta.role.map((role) => `<b>${roles[role]}</b>`)
-          )} is created`;
+          )} is created`
         } else {
-          return "User Created";
+          return 'User Created'
         }
       },
 
       // Edit
-      edit({ ID, data, meta }) {
-        let roles = Editor.stepTypes.account_created.context.roles;
+      edit ({ ID, data, meta }) {
+        let roles = Editor.stepTypes.account_created.context.roles
 
         //language=HTML
         return `
-            <div class="panel">
-                <div class="row">
-                    <label class="row-label" for="roles">Select user roles.</label>
-                    ${select(
-                      {
-                        id: "roles",
-                        name: "role",
-                        multiple: true,
-                      },
-                      roles,
-                      meta.role
-                    )}
-                    <p class="description">Runs when a new user is created with any of the defined roles.</p>
-                </div>
-            </div>`;
+			<div class="panel">
+				<div class="row">
+					<label class="row-label" for="roles">Select user roles.</label>
+					${select(
+						{
+							id: 'roles',
+							name: 'role',
+							multiple: true,
+						},
+						roles,
+						meta.role
+					)}
+					<p class="description">Runs when a new user is created with any of the defined roles.</p>
+				</div>
+			</div>`
       },
 
       // On mount
-      onMount(step, updateStepMeta) {
-        $("#roles")
+      onMount (step, updateStepMeta) {
+        $('#roles')
           .select2()
-          .on("change", function (e) {
-            let roles = $(this).val();
+          .on('change', function (e) {
+            let roles = $(this).val()
             updateStepMeta({
               role: roles,
-            });
-          });
+            })
+          })
       },
     },
 
@@ -2504,61 +2618,61 @@
 
       //language=HTML
       svg: `
-          <svg viewBox="0 0 35 37" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                      d="M5.682 20.946L18.848 7.78a1 1 0 01.707-.293h8.503a1 1 0 011 1v8.502a1 1 0 01-.293.707L15.598 30.863a1 1 0 01-1.414 0L5.682 22.36a1 1 0 010-1.414z"
-                      stroke="currentColor" stroke-width="2"/>
-              <circle r="1.525" transform="matrix(-1 0 0 1 24.1 12.445)" stroke="currentColor" stroke-width="1.2"/>
-              <path d="M34.246 31.738h-10m5-5v10" stroke="currentColor" stroke-width="2"/>
-          </svg>`,
+		  <svg viewBox="0 0 35 37" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path
+				  d="M5.682 20.946L18.848 7.78a1 1 0 01.707-.293h8.503a1 1 0 011 1v8.502a1 1 0 01-.293.707L15.598 30.863a1 1 0 01-1.414 0L5.682 22.36a1 1 0 010-1.414z"
+				  stroke="currentColor" stroke-width="2"/>
+			  <circle r="1.525" transform="matrix(-1 0 0 1 24.1 12.445)" stroke="currentColor" stroke-width="1.2"/>
+			  <path d="M34.246 31.738h-10m5-5v10" stroke="currentColor" stroke-width="2"/>
+		  </svg>`,
 
-      title({ ID, data, meta }) {
-        let { tags } = meta;
+      title ({ ID, data, meta }) {
+        let { tags } = meta
 
         if (tags) {
-          tags = tags.map((id) => parseInt(id));
+          tags = tags.map((id) => parseInt(id))
         }
 
         if (!tags || tags.length === 0) {
-          return "Apply tag";
+          return 'Apply tag'
         } else if (tags.length < 4 && TagsStore.hasItems(tags)) {
           return `Apply ${andList(
             tags.map((id) => `<b>${TagsStore.get(id).data.tag_name}</b>`)
-          )}`;
+          )}`
         } else {
-          return `Apply <b>${tags.length}</b> tags`;
+          return `Apply <b>${tags.length}</b> tags`
         }
       },
 
-      edit({ ID, data, meta }) {
+      edit ({ ID, data, meta }) {
         let options = TagsStore.getItems().map((tag) => {
           return {
             text: tag.data.tag_name,
             value: tag.ID,
-          };
-        });
+          }
+        })
 
         //language=HTML
         return `
-            <div class="panel">
-                <div class="row">
-                    <label class="row-label" for="tags">Select tags to add.</label>
-                    ${select(
-                      {
-                        name: "tags",
-                        id: "tags",
-                        multiple: true,
-                      },
-                      options,
-                      meta.tags ? meta.tags.map((id) => parseInt(id)) : []
-                    )}
-                    <p class="description">All of the defined tags will be added to the contact.</p>
-                </div>
-            </div>`;
+			<div class="panel">
+				<div class="row">
+					<label class="row-label" for="tags">Select tags to add.</label>
+					${select(
+						{
+							name: 'tags',
+							id: 'tags',
+							multiple: true,
+						},
+						options,
+						meta.tags ? meta.tags.map((id) => parseInt(id)) : []
+					)}
+					<p class="description">All of the defined tags will be added to the contact.</p>
+				</div>
+			</div>`
       },
 
-      onMount(step, updateStepMeta) {
-        tagOnMount(step, updateStepMeta);
+      onMount (step, updateStepMeta) {
+        tagOnMount(step, updateStepMeta)
       },
     },
 
@@ -2571,57 +2685,57 @@
       },
       //language=HTML
       svg: `
-          <svg viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                      d="M5.682 20.946L18.848 7.78a1 1 0 01.707-.293h8.503a1 1 0 011 1v8.502a1 1 0 01-.293.707L15.598 30.863a1 1 0 01-1.414 0L5.682 22.36a1 1 0 010-1.414z"
-                      stroke="currentColor" stroke-width="2"/>
-              <circle r="1.525" transform="matrix(-1 0 0 1 24.1 12.445)" stroke="currentColor" stroke-width="1.2"/>
-              <path d="M34.246 31.738h-10" stroke="currentColor" stroke-width="2"/>
-          </svg>`,
-      title({ ID, data, meta }) {
-        let { tags } = meta;
-        tags = tags.map((id) => parseInt(id));
+		  <svg viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path
+				  d="M5.682 20.946L18.848 7.78a1 1 0 01.707-.293h8.503a1 1 0 011 1v8.502a1 1 0 01-.293.707L15.598 30.863a1 1 0 01-1.414 0L5.682 22.36a1 1 0 010-1.414z"
+				  stroke="currentColor" stroke-width="2"/>
+			  <circle r="1.525" transform="matrix(-1 0 0 1 24.1 12.445)" stroke="currentColor" stroke-width="1.2"/>
+			  <path d="M34.246 31.738h-10" stroke="currentColor" stroke-width="2"/>
+		  </svg>`,
+      title ({ ID, data, meta }) {
+        let { tags } = meta
+        tags = tags.map((id) => parseInt(id))
 
         if (tags.length === 0) {
-          return "Remove tags";
+          return 'Remove tags'
         } else if (tags.length < 4 && TagsStore.hasItems(tags)) {
           return `Remove ${andList(
             tags.map((id) => `<b>${TagsStore.get(id).data.tag_name}</b>`)
-          )}`;
+          )}`
         } else {
-          return `Remove <b>${tags.length}</b> tags`;
+          return `Remove <b>${tags.length}</b> tags`
         }
       },
 
-      edit({ ID, data, meta }) {
+      edit ({ ID, data, meta }) {
         let options = TagsStore.getItems().map((tag) => {
           return {
             text: tag.data.tag_name,
             value: tag.ID,
-          };
-        });
+          }
+        })
 
         //language=HTML
         return `
-            <div class="panel">
-                <div class="row">
-                    <label class="row-label" for="tags">Select tags to remove.</label>
-                    ${select(
-                      {
-                        name: "tags",
-                        id: "tags",
-                        multiple: true,
-                      },
-                      options,
-                      meta.tags.map((id) => parseInt(id))
-                    )}
-                    <p class="description">All of the defined tags will be removed from the contact.</p>
-                </div>
-            </div>`;
+			<div class="panel">
+				<div class="row">
+					<label class="row-label" for="tags">Select tags to remove.</label>
+					${select(
+						{
+							name: 'tags',
+							id: 'tags',
+							multiple: true,
+						},
+						options,
+						meta.tags.map((id) => parseInt(id))
+					)}
+					<p class="description">All of the defined tags will be removed from the contact.</p>
+				</div>
+			</div>`
       },
 
-      onMount(step, updateStepMeta) {
-        tagOnMount(step, updateStepMeta);
+      onMount (step, updateStepMeta) {
+        tagOnMount(step, updateStepMeta)
       },
     },
 
@@ -2635,24 +2749,24 @@
 
       //language=HTML
       svg: `
-          <svg viewBox="0 0 39 35" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                      d="M5.356 21.311L18.522 8.145a1 1 0 01.707-.293h8.503a1 1 0 011 1v8.502a1 1 0 01-.293.707L15.272 31.228a1 1 0 01-1.414 0l-8.502-8.502a1 1 0 010-1.415z"
-                      stroke="currentColor" stroke-width="2"/>
-              <circle r="1.525" transform="matrix(-1 0 0 1 23.773 12.81)" stroke="currentColor" stroke-width="1.2"/>
-              <path d="M38.105 23.435l-8.5 8.5-4.25-4.25" stroke="currentColor" stroke-width="2"/>
-          </svg>`,
+		  <svg viewBox="0 0 39 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path
+				  d="M5.356 21.311L18.522 8.145a1 1 0 01.707-.293h8.503a1 1 0 011 1v8.502a1 1 0 01-.293.707L15.272 31.228a1 1 0 01-1.414 0l-8.502-8.502a1 1 0 010-1.415z"
+				  stroke="currentColor" stroke-width="2"/>
+			  <circle r="1.525" transform="matrix(-1 0 0 1 23.773 12.81)" stroke="currentColor" stroke-width="1.2"/>
+			  <path d="M38.105 23.435l-8.5 8.5-4.25-4.25" stroke="currentColor" stroke-width="2"/>
+		  </svg>`,
 
-      title({ ID, data, meta }) {
-        let { tags = [], condition='any' } = meta;
-        tags = tags.map((id) => parseInt(id));
+      title ({ ID, data, meta }) {
+        let { tags = [], condition = 'any' } = meta
+        tags = tags.map((id) => parseInt(id))
 
         if (!tags) {
-          return "Tag is applied";
+          return 'Tag is applied'
         } else if (tags.length >= 4) {
-          return condition === "all"
+          return condition === 'all'
             ? `<b>${tags.length}</b> tags are applied`
-            : `Any of <b>${tags.length}</b> tags are applied`;
+            : `Any of <b>${tags.length}</b> tags are applied`
         } else if (
           tags.length > 1 &&
           tags.length < 4 &&
@@ -2660,59 +2774,59 @@
         ) {
           const tagNames = tags.map(
             (tag) => `<b>${TagsStore.get(tag).data.tag_name}</b>`
-          );
-          return condition === "all"
+          )
+          return condition === 'all'
             ? `${andList(tagNames)} are applied`
-            : `${orList(tagNames)} is applied`;
+            : `${orList(tagNames)} is applied`
         } else if (tags.length === 1) {
-          return `<b>${TagsStore.get(tags[0]).data.tag_name}</b> is applied`;
+          return `<b>${TagsStore.get(tags[0]).data.tag_name}</b> is applied`
         } else {
-          return "Tag is applied";
+          return 'Tag is applied'
         }
       },
 
-      edit({ ID, data, meta }) {
+      edit ({ ID, data, meta }) {
         let options = TagsStore.getItems().map((tag) => {
           return {
             text: tag.data.tag_name,
             value: tag.ID,
-          };
-        });
+          }
+        })
 
-        const { tags = [], condition='any'  } = meta;
+        const { tags = [], condition = 'any' } = meta
 
         //language=HTML
         return `
-            <div class="panel">
-                <div class="row">
-                    <label class="row-label" for="tags">When <select id="condition">
-                        <option value="any" ${
-                          condition === "any" ? "selected" : ""
-                        }>Any
-                        </option>
-                        <option value="all" ${
-                          condition === "all" ? "selected" : ""
-                        }>All
-                        </option>
-                    </select> of the defined tags are applied</label>
-                    ${select(
-                      {
-                        name: "tags",
-                        id: "tags",
-                        multiple: true,
-                      },
-                      options,
-                      tags.map((id) => parseInt(id))
-                    )}
-                    <p class="description">Runs when ${
-                      condition || "any"
-                    } of the provided tags are applied.</p>
-                </div>
-            </div>`;
+			<div class="panel">
+				<div class="row">
+					<label class="row-label" for="tags">When <select id="condition">
+						<option value="any" ${
+							condition === 'any' ? 'selected' : ''
+						}>Any
+						</option>
+						<option value="all" ${
+							condition === 'all' ? 'selected' : ''
+						}>All
+						</option>
+					</select> of the defined tags are applied</label>
+					${select(
+						{
+							name: 'tags',
+							id: 'tags',
+							multiple: true,
+						},
+						options,
+						tags.map((id) => parseInt(id))
+					)}
+					<p class="description">Runs when ${
+						condition || 'any'
+					} of the provided tags are applied.</p>
+				</div>
+			</div>`
       },
 
-      onMount(step, updateStepMeta) {
-        tagWithConditionOnMount(step, updateStepMeta);
+      onMount (step, updateStepMeta) {
+        tagWithConditionOnMount(step, updateStepMeta)
       },
     },
 
@@ -2726,26 +2840,26 @@
 
       // language=HTML
       svg: `
-          <svg viewBox="0 0 37 35" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                      d="M5.649 21.311L18.815 8.145a1 1 0 01.707-.293h8.503a1 1 0 011 1v8.502a1 1 0 01-.293.707L15.565 31.228a1 1 0 01-1.414 0l-8.502-8.502a1 1 0 010-1.415z"
-                      stroke="currentColor" stroke-width="2"/>
-              <circle r="1.525" transform="matrix(-1 0 0 1 24.066 12.81)" stroke="currentColor" stroke-width="1.2"/>
-              <path
-                      d="M33.703 27.6a.6.6 0 10-.848-.848l.848.848zm-4.354 2.657a.6.6 0 10.849.848l-.849-.848zm3.506.848a.6.6 0 10.848-.848l-.848.848zm-2.657-4.353a.6.6 0 10-.849.848l.849-.848zm2.657 0l-3.506 3.505.849.848 3.505-3.505-.848-.848zm.848 3.505l-3.505-3.505-.849.848 3.506 3.505.848-.848zm1.724-1.35a3.9 3.9 0 01-3.9 3.901v1.2a5.1 5.1 0 005.1-5.1h-1.2zm-3.9 3.901a3.9 3.9 0 01-3.902-3.9h-1.2a5.1 5.1 0 005.101 5.1v-1.2zm-3.902-3.9a3.9 3.9 0 013.901-3.902v-1.2a5.1 5.1 0 00-5.1 5.101h1.2zm3.901-3.902a3.9 3.9 0 013.901 3.901h1.2a5.1 5.1 0 00-5.1-5.1v1.2z"
-                      fill="currentColor"/>
-          </svg>`,
+		  <svg viewBox="0 0 37 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path
+				  d="M5.649 21.311L18.815 8.145a1 1 0 01.707-.293h8.503a1 1 0 011 1v8.502a1 1 0 01-.293.707L15.565 31.228a1 1 0 01-1.414 0l-8.502-8.502a1 1 0 010-1.415z"
+				  stroke="currentColor" stroke-width="2"/>
+			  <circle r="1.525" transform="matrix(-1 0 0 1 24.066 12.81)" stroke="currentColor" stroke-width="1.2"/>
+			  <path
+				  d="M33.703 27.6a.6.6 0 10-.848-.848l.848.848zm-4.354 2.657a.6.6 0 10.849.848l-.849-.848zm3.506.848a.6.6 0 10.848-.848l-.848.848zm-2.657-4.353a.6.6 0 10-.849.848l.849-.848zm2.657 0l-3.506 3.505.849.848 3.505-3.505-.848-.848zm.848 3.505l-3.505-3.505-.849.848 3.506 3.505.848-.848zm1.724-1.35a3.9 3.9 0 01-3.9 3.901v1.2a5.1 5.1 0 005.1-5.1h-1.2zm-3.9 3.901a3.9 3.9 0 01-3.902-3.9h-1.2a5.1 5.1 0 005.101 5.1v-1.2zm-3.902-3.9a3.9 3.9 0 013.901-3.902v-1.2a5.1 5.1 0 00-5.1 5.101h1.2zm3.901-3.902a3.9 3.9 0 013.901 3.901h1.2a5.1 5.1 0 00-5.1-5.1v1.2z"
+				  fill="currentColor"/>
+		  </svg>`,
 
-      title({ ID, data, meta }) {
-        let { tags, condition } = meta;
-        tags = tags.map((id) => parseInt(id));
+      title ({ ID, data, meta }) {
+        let { tags, condition } = meta
+        tags = tags.map((id) => parseInt(id))
 
         if (!tags) {
-          return "Tag is removed";
+          return 'Tag is removed'
         } else if (tags.length >= 4) {
-          return condition === "all"
+          return condition === 'all'
             ? `<b>${tags.length}</b> tags are removed`
-            : `Any of <b>${tags.length}</b> tags are removed`;
+            : `Any of <b>${tags.length}</b> tags are removed`
         } else if (
           tags.length > 1 &&
           tags.length < 4 &&
@@ -2753,59 +2867,59 @@
         ) {
           const tagNames = tags.map(
             (tag) => `<b>${TagsStore.get(tag).data.tag_name}</b>`
-          );
-          return condition === "all"
+          )
+          return condition === 'all'
             ? `${andList(tagNames)} are applied`
-            : `${orList(tagNames)} is removed`;
+            : `${orList(tagNames)} is removed`
         } else if (tags.length === 1) {
-          return `<b>${TagsStore.get(tags[0]).data.tag_name}</b> is removed`;
+          return `<b>${TagsStore.get(tags[0]).data.tag_name}</b> is removed`
         } else {
-          return "Tag is removed";
+          return 'Tag is removed'
         }
       },
 
-      edit({ ID, data, meta }) {
+      edit ({ ID, data, meta }) {
         let options = TagsStore.getItems().map((tag) => {
           return {
             text: tag.data.tag_name,
             value: tag.ID,
-          };
-        });
+          }
+        })
 
-        const { condition } = meta;
+        const { condition } = meta
 
         //language=HTML
         return `
-            <div class="panel">
-                <div class="row">
-                    <label class="row-label" for="tags">When <select id="condition">
-                        <option value="any" ${
-                          condition === "any" ? "selected" : ""
-                        }>Any
-                        </option>
-                        <option value="all" ${
-                          condition === "all" ? "selected" : ""
-                        }>All
-                        </option>
-                    </select> of the defined tags are removed</label>
-                    ${select(
-                      {
-                        name: "tags",
-                        id: "tags",
-                        multiple: true,
-                      },
-                      options,
-                      meta.tags.map((id) => parseInt(id))
-                    )}
-                    <p class="description">Runs when ${
-                      condition || "any"
-                    } of the provided tags are removed.</p>
-                </div>
-            </div>`;
+			<div class="panel">
+				<div class="row">
+					<label class="row-label" for="tags">When <select id="condition">
+						<option value="any" ${
+							condition === 'any' ? 'selected' : ''
+						}>Any
+						</option>
+						<option value="all" ${
+							condition === 'all' ? 'selected' : ''
+						}>All
+						</option>
+					</select> of the defined tags are removed</label>
+					${select(
+						{
+							name: 'tags',
+							id: 'tags',
+							multiple: true,
+						},
+						options,
+						meta.tags.map((id) => parseInt(id))
+					)}
+					<p class="description">Runs when ${
+						condition || 'any'
+					} of the provided tags are removed.</p>
+				</div>
+			</div>`
       },
 
-      onMount(step, updateStepMeta) {
-        tagWithConditionOnMount(step, updateStepMeta);
+      onMount (step, updateStepMeta) {
+        tagWithConditionOnMount(step, updateStepMeta)
       },
     },
 
@@ -2816,21 +2930,21 @@
 
       //language=HTML
       svg: `
-          <svg viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                      d="M7.327 4.489c3.468 0 6.279 2.652 6.279 5.923s-2.811 5.923-6.279 5.923c-3.467 0-6.278-2.652-6.278-5.923a5.7 5.7 0 011.427-3.76m1.997 1.337l2.854 2.961M5.33 1.335h4.28"
-                      stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+		  <svg viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path
+				  d="M7.327 4.489c3.468 0 6.279 2.652 6.279 5.923s-2.811 5.923-6.279 5.923c-3.467 0-6.278-2.652-6.278-5.923a5.7 5.7 0 011.427-3.76m1.997 1.337l2.854 2.961M5.33 1.335h4.28"
+				  stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+		  </svg>
       `,
 
-      title({ meta }) {
+      title ({ meta }) {
         return delayTimerName({
           ...delayTimerDefaults,
           ...meta,
-        });
+        })
       },
 
-      edit({ ID, data, meta }) {
+      edit ({ ID, data, meta }) {
         const {
           delay_amount,
           delay_type,
@@ -2847,213 +2961,213 @@
         } = {
           ...delayTimerDefaults,
           ...meta,
-        };
+        }
 
         const delayTypes = {
-          minutes: "Minutes",
-          hours: "Hours",
-          days: "Days",
-          weeks: "Weeks",
-          months: "Months",
-          years: "Years",
-          none: "No delay",
-        };
+          minutes: 'Minutes',
+          hours: 'Hours',
+          days: 'Days',
+          weeks: 'Weeks',
+          months: 'Months',
+          years: 'Years',
+          none: 'No delay',
+        }
 
         const runOnTypes = {
-          any: "Any day",
-          weekday: "Weekday",
-          weekend: "Weekend",
-          day_of_week: "Day of week",
-          day_of_month: "Day of month",
-        };
+          any: 'Any day',
+          weekday: 'Weekday',
+          weekend: 'Weekend',
+          day_of_week: 'Day of week',
+          day_of_month: 'Day of month',
+        }
 
         const runWhenTypes = {
-          now: "Any time",
-          later: "Specific time",
-        };
+          now: 'Any time',
+          later: 'Specific time',
+        }
 
-        if (delay_type === "minutes" || delay_type === "hours") {
-          runWhenTypes.between = "Between";
+        if (delay_type === 'minutes' || delay_type === 'hours') {
+          runWhenTypes.between = 'Between'
         }
 
         const runOnDOWTypes = {
-          any: "Any",
-          first: "First",
-          second: "Second",
-          third: "Third",
-          fourth: "Fourth",
-          last: "Last",
-        };
-
-        const runOnDaysOfMonth = {};
-
-        for (let i = 1; i < 32; i++) {
-          runOnDaysOfMonth[i] = i;
+          any: 'Any',
+          first: 'First',
+          second: 'Second',
+          third: 'Third',
+          fourth: 'Fourth',
+          last: 'Last',
         }
 
-        runOnDaysOfMonth.last = "last";
+        const runOnDaysOfMonth = {}
+
+        for (let i = 1; i < 32; i++) {
+          runOnDaysOfMonth[i] = i
+        }
+
+        runOnDaysOfMonth.last = 'last'
 
         const runOnMonthTypes = {
-          any: "Of any month",
-          specific: "Of specific month(s)",
-        };
+          any: 'Of any month',
+          specific: 'Of specific month(s)',
+        }
 
         const runOnDaysOfWeek = {
-          monday: "Monday",
-          tuesday: "Tuesday",
-          wednesday: "Wednesday",
-          thursday: "Thursday",
-          friday: "Friday",
-          saturday: "Saturday",
-          sunday: "Sunday",
-        };
+          monday: 'Monday',
+          tuesday: 'Tuesday',
+          wednesday: 'Wednesday',
+          thursday: 'Thursday',
+          friday: 'Friday',
+          saturday: 'Saturday',
+          sunday: 'Sunday',
+        }
 
         const runOnMonths = {
-          january: "January",
-          february: "February",
-          march: "March",
-          april: "April",
-          may: "May",
-          june: "June",
-          july: "July",
-          august: "August",
-          september: "September",
-          october: "October",
-          november: "November",
-          december: "December",
-        };
+          january: 'January',
+          february: 'February',
+          march: 'March',
+          april: 'April',
+          may: 'May',
+          june: 'June',
+          july: 'July',
+          august: 'August',
+          september: 'September',
+          october: 'October',
+          november: 'November',
+          december: 'December',
+        }
 
         //language=HTML
         const runOnMonthOptions = `
-            <div style="margin-top: 10px"><select
-                    class="delay-input re-render"
-                    name="run_on_month_type">
-                ${createOptions(runOnMonthTypes, run_on_month_type)}</select>
-                ${
-                  run_on_month_type === "specific"
-                    ? `<select class="select2" name="run_on_months" multiple>${createOptions(
-                        runOnMonths,
-                        run_on_months
-                      )}</select>`
-                    : ""
-                }
-            </div>`;
+			<div style="margin-top: 10px"><select
+				class="delay-input re-render"
+				name="run_on_month_type">
+				${createOptions(runOnMonthTypes, run_on_month_type)}</select>
+				${
+					run_on_month_type === 'specific'
+						? `<select class="select2" name="run_on_months" multiple>${createOptions(
+						runOnMonths,
+						run_on_months
+						)}</select>`
+						: ''
+				}
+			</div>`
 
         //language=HTML
         const daysOfWeekOptions = `
-            <div style="margin-top: 10px"><select
-                    class="delay-input" name="run_on_dow_type">
-                ${createOptions(runOnDOWTypes, run_on_dow_type)}</select>
-                <select class="select2" name="run_on_dow"
-                        multiple>${createOptions(
-                          runOnDaysOfWeek,
-                          run_on_dow
-                        )}</select></div>
-            ${runOnMonthOptions}`;
+			<div style="margin-top: 10px"><select
+				class="delay-input" name="run_on_dow_type">
+				${createOptions(runOnDOWTypes, run_on_dow_type)}</select>
+				<select class="select2" name="run_on_dow"
+				        multiple>${createOptions(
+					runOnDaysOfWeek,
+					run_on_dow
+				)}</select></div>
+			${runOnMonthOptions}`
 
         //language=HTML
         const daysOfMonthOptions = `
-            <div style="margin-top: 10px"><select class="select2"
-                                                  name="run_on_dom"
-                                                  multiple>${createOptions(
-                                                    runOnDaysOfMonth,
-                                                    run_on_dom
-                                                  )}</select></div>
-            ${runOnMonthOptions}`;
+			<div style="margin-top: 10px"><select class="select2"
+			                                      name="run_on_dom"
+			                                      multiple>${createOptions(
+				runOnDaysOfMonth,
+				run_on_dom
+			)}</select></div>
+			${runOnMonthOptions}`
 
         //language=HTML
         return `
-            <div class="panel">
-                <div class="row">
-                    <h3 class="delay-preview" style="font-weight: normal">${delayTimerName(
-                      {
-                        ...delayTimerDefaults,
-                        ...meta,
-                      }
-                    )}</h3>
-                </div>
-                <div class="row">
-                    <label class="row-label">Wait at least...</label>
-                    <input class="delay-input" type="number" name="delay_amount" value="${
-                      delay_amount || 3
-                    }"
-                           placeholder="3"
-                           ${delay_type === "none" ? "disabled" : ""}>
-                    <select class="delay-input re-render" name="delay_type">
-                        ${createOptions(delayTypes, delay_type)}
-                    </select>
-                </div>
-                <div class="row">
-                    <label class="row-label">Then run on...</label>
-                    <select class="delay-input re-render" name="run_on_type">
-                        ${createOptions(runOnTypes, run_on_type)}
-                    </select>
-                    ${run_on_type === "day_of_week" ? daysOfWeekOptions : ""}
-                    ${run_on_type === "day_of_month" ? daysOfMonthOptions : ""}
-                </div>
-                <div class="row">
-                    <label class="row-label">Then run at...</label>
-                    ${select(
-                      {
-                        className: "delay-input re-render",
-                        name: "run_when",
-                      },
-                      runWhenTypes,
-                      run_when
-                    )}
-                    ${
-                      run_when === "later"
-                        ? `<input class="delay-input" type="time" name="run_time" value="${run_time}">`
-                        : ""
-                    }
-                    ${
-                      run_when === "between"
-                        ? `<input class="delay-input" type="time" name="run_time" value="${run_time}"> and <input class="delay-input" type="time" name="run_time_to" value="${run_time_to}">`
-                        : ""
-                    }
-                </div>
-            </div>`;
+			<div class="panel">
+				<div class="row">
+					<h3 class="delay-preview" style="font-weight: normal">${delayTimerName(
+						{
+							...delayTimerDefaults,
+							...meta,
+						}
+					)}</h3>
+				</div>
+				<div class="row">
+					<label class="row-label">Wait at least...</label>
+					<input class="delay-input" type="number" name="delay_amount" value="${
+						delay_amount || 3
+					}"
+					       placeholder="3"
+					       ${delay_type === 'none' ? 'disabled' : ''}>
+					<select class="delay-input re-render" name="delay_type">
+						${createOptions(delayTypes, delay_type)}
+					</select>
+				</div>
+				<div class="row">
+					<label class="row-label">Then run on...</label>
+					<select class="delay-input re-render" name="run_on_type">
+						${createOptions(runOnTypes, run_on_type)}
+					</select>
+					${run_on_type === 'day_of_week' ? daysOfWeekOptions : ''}
+					${run_on_type === 'day_of_month' ? daysOfMonthOptions : ''}
+				</div>
+				<div class="row">
+					<label class="row-label">Then run at...</label>
+					${select(
+						{
+							className: 'delay-input re-render',
+							name: 'run_when',
+						},
+						runWhenTypes,
+						run_when
+					)}
+					${
+						run_when === 'later'
+							? `<input class="delay-input" type="time" name="run_time" value="${run_time}">`
+							: ''
+					}
+					${
+						run_when === 'between'
+							? `<input class="delay-input" type="time" name="run_time" value="${run_time}"> and <input class="delay-input" type="time" name="run_time_to" value="${run_time_to}">`
+							: ''
+					}
+				</div>
+			</div>`
       },
 
-      onMount(step, updateStepMeta) {
+      onMount (step, updateStepMeta) {
         const updatePreview = () => {
-          const { meta } = Editor.getCurrentStep();
-          $(".delay-preview").html(
+          const { meta } = Editor.getCurrentStep()
+          $('.delay-preview').html(
             delayTimerName({
               ...delayTimerDefaults,
               ...meta,
             })
-          );
-        };
+          )
+        }
 
-        $(".select2")
+        $('.select2')
           .select2()
-          .on("change", function (e) {
+          .on('change', function (e) {
             // console.log(e)
             Editor.updateCurrentStepMeta({
-              [$(this).attr("name")]: $(this).val(),
-            });
-            updatePreview();
-          });
+              [$(this).attr('name')]: $(this).val(),
+            })
+            updatePreview()
+          })
 
-        $(".delay-input").on("change", function (e) {
+        $('.delay-input').on('change', function (e) {
           // console.log(e)
 
           Editor.updateCurrentStepMeta({
             [e.target.name]: e.target.value,
-          });
+          })
 
-          if (e.target.classList.contains("re-render")) {
-            Editor.renderStepEdit();
-            $(`[name=${e.target.name}]`).focus();
+          if (e.target.classList.contains('re-render')) {
+            Editor.renderStepEdit()
+            $(`[name=${e.target.name}]`).focus()
           } else {
-            updatePreview();
+            updatePreview()
           }
-        });
+        })
 
-        $(".delay-input").on("blur", function (e) {
-          updatePreview();
-        });
+        $('.delay-input').on('blur', function (e) {
+          updatePreview()
+        })
       },
     },
 
@@ -3066,301 +3180,314 @@
       },
       //language=HTML
       svg: `
-          <svg viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M32.007 16.695V8.487a1 1 0 00-1-1H4.674a1 1 0 00-1 1V26.32a1 1 0 001 1H17.84"
-                    stroke="currentColor"
-                    stroke-width="2"/>
-              <path d="M3.674 8.903l14.166 8.5 14.167-8.5M20.674 24.487h11.333m0 0l-4.25-4.25m4.25 4.25l-4.25 4.25"
-                    stroke="currentColor" stroke-width="2"/>
-          </svg>`,
-      title({ ID, data, meta }) {
-        const email = EmailsStore.get(parseInt(meta.email_id));
-
-        const title = meta.email_id && email ? email.data.title : "an email";
-
-        return `Send <b>${title}</b>`;
+		  <svg viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path d="M32.007 16.695V8.487a1 1 0 00-1-1H4.674a1 1 0 00-1 1V26.32a1 1 0 001 1H17.84"
+			        stroke="currentColor"
+			        stroke-width="2"/>
+			  <path d="M3.674 8.903l14.166 8.5 14.167-8.5M20.674 24.487h11.333m0 0l-4.25-4.25m4.25 4.25l-4.25 4.25"
+			        stroke="currentColor" stroke-width="2"/>
+		  </svg>`,
+      title ({ ID, data, meta }) {
+        const { email_id } = meta
+        const email = EmailsStore.get(parseInt(email_id))
+        const title = email_id && email ? email.data.title : 'an email'
+        return `Send <b>${title}</b>`
       },
-      edit({ ID, data, meta }) {
-        const { email_id } = meta;
-        const email = EmailsStore.get(parseInt(email_id));
+      edit ({ ID, data, meta }) {
+        const { email_id } = meta
+        const email = EmailsStore.get(parseInt(email_id))
 
         const iframePreview = (email) => {
-          const { context } = email;
+          const { context } = email
 
           // language=HTML
           return `
-              <div class="panel">
-                  <div class="row">
-                      <h3 class="subject-line">${email.data.subject}</h3>
-                      <div id="from-line">
-                          <img class="avatar" alt="avatar" src="${context.avatar}"/>
-                          <div class="from">
-                              <span class="from-name">${context.from_name}</span>
-                              <span class="from-email">&lt;${context.from_email}&gt;</span>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="loading-iframe">
-                      <iframe id="email-preview" src="${Groundhogg.managed_page.root}/emails/${email_id}"></iframe>
-                  </div>
-                  <button id="render-email-edit" class="gh-button secondary">
-                      Edit this email
-                  </button>
-              </div>`;
-        };
+			  <div class="panel">
+				  <div class="row">
+					  <h3 class="subject-line">${email.data.subject}</h3>
+					  <div id="from-line">
+						  <img class="avatar" alt="avatar" src="${context.avatar}"/>
+						  <div class="from">
+							  <span class="from-name">${context.from_name}</span>
+							  <span class="from-email">&lt;${context.from_email}&gt;</span>
+						  </div>
+					  </div>
+				  </div>
+				  <iframe id="email-preview"></iframe>
+				  <button id="render-email-edit" class="gh-button secondary">
+					  Edit this email
+				  </button>
+			  </div>`
+        }
 
         //language=HTML
         return `
-            ${email_id && email ? iframePreview(email) : ""}
-            <div class="panel">
-                <div class="row">
-                    <label class="row-label">Select an email to send...</label>
-                    ${select(
-                      {
-                        id: "email-picker",
-                        name: "email_id",
-                      },
-                      EmailsStore.getItems().map((item) => {
-                        return {
-                          text: item.data.title,
-                          value: item.ID,
-                        };
-                      }, email_id)
-                    )}
-                </div>
-                <div class="row">
-                    <label class="row-label">Or...</label>
-                    <button class="gh-button secondary">Create a new email</button>
-                </div>
-            </div>`;
+			${email_id && email ? iframePreview(email) : ''}
+			<div class="panel">
+				<div class="row">
+					<label class="row-label">Select an email to send...</label>
+					${select(
+						{
+							id: 'email-picker',
+							name: 'email_id',
+						},
+						EmailsStore.getItems().map((item) => {
+							return {
+								text: item.data.title,
+								value: item.ID,
+							}
+						}, email_id)
+					)}
+				</div>
+				<div class="row">
+					<label class="row-label">Or...</label>
+					<button class="gh-button secondary">Create a new email</button>
+				</div>
+			</div>`
       },
-      onMount(step, updateStepMeta) {
-        emailPicker("#email-picker", false, (items) => {
-          EmailsStore.itemsFetched(items);
-        }).on("change", function (e) {
+      onMount ({ meta }, updateStepMeta) {
+
+        const { email_id } = meta
+        const email = EmailsStore.get(parseInt(email_id))
+
+        emailPicker('#email-picker', false, (items) => {
+          EmailsStore.itemsFetched(items)
+        }).on('change', function (e) {
+
+          $(this).select2('close')
+
           updateStepMeta(
             {
               email_id: parseInt($(this).val()),
             },
             true
-          );
-        });
+          )
+        })
 
-        $("#email-preview").on("load", function (e) {
-          this.height = this.contentWindow.document.body.offsetHeight;
-          this.style.height =
-            this.contentWindow.document.body.offsetHeight + "px";
-          $(window).trigger("resize");
-        });
+        const fullFrame = (frame) => {
+          frame.height = frame.contentWindow.document.body.offsetHeight
+          frame.style.height =
+            frame.contentWindow.document.body.offsetHeight + 'px'
+        }
 
-        $("#render-email-edit").on("click", function () {
-          Editor.view = "editingEmail";
-          Editor.renderEmailEditor();
-        });
+        if (email) {
+
+          const frame = document.querySelector('iframe#email-preview')
+
+          setFrameContent(frame, email.context.built)
+          setTimeout(() => {
+            fullFrame(frame)
+          }, 100)
+
+          $('#render-email-edit').on('click', function () {
+            Editor.view = 'editingEmail'
+            Editor.renderEmailEditor()
+          })
+        }
       },
-      validate({ meta }, errors) {
-        const { email_id } = meta;
-        const email = EmailsStore.get(email_id);
+      validate ({ meta }, errors) {
+        const { email_id } = meta
+        const email = EmailsStore.get(email_id)
 
-        if (email_id && email && email.data.status !== "ready") {
-          errors.push("Email is in draft mode. Please update status to ready!");
+        if (email_id && email && email.data.status !== 'ready') {
+          errors.push('Email is in draft mode. Please update status to ready!')
         }
       },
     },
 
     link_click: {
       defaults: {
-        redirect_to: "",
+        redirect_to: '',
       },
 
       //language=HTML
       svg: `
-          <svg viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8.594 4.671v22.305l5.329-5.219 3.525 8.607 3.278-1.23-3.688-8.718h7.14L8.593 4.67z"
-                    stroke="currentColor" stroke-width="2"/>
-          </svg>`,
+		  <svg viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path d="M8.594 4.671v22.305l5.329-5.219 3.525 8.607 3.278-1.23-3.688-8.718h7.14L8.593 4.67z"
+			        stroke="currentColor" stroke-width="2"/>
+		  </svg>`,
 
-      title({ meta }) {
-        const { redirect_to } = meta;
+      title ({ meta }) {
+        const { redirect_to } = meta
         if (redirect_to) {
-          const targetUrl = new URL(redirect_to);
-          const homeUrl = new URL(Groundhogg.managed_page.root);
+          const targetUrl = new URL(redirect_to)
+          const homeUrl = new URL(Groundhogg.managed_page.root)
 
           if (targetUrl.hostname === homeUrl.hostname) {
-            return `Clicked to <b>${targetUrl.pathname}</b>`;
+            return `Clicked to <b>${targetUrl.pathname}</b>`
           } else {
-            return `Clicked to <b>${targetUrl.hostname}</b>`;
+            return `Clicked to <b>${targetUrl.hostname}</b>`
           }
         } else {
-          return "Clicked a tracking link";
+          return 'Clicked a tracking link'
         }
       },
 
-      edit({ meta }) {
+      edit ({ meta }) {
         //language=HTML
         return `
-            <div class="panel">
-                <div class="row">
-                    <label class="row-label" for="copy-this">Copy this link</label>
-                    <input type="url" id="copy-this" class="code input regular-text"
-                           value="${
-                             Groundhogg.managed_page.root
-                           }link/click/${"some-value"}" onfocus="this.select()"
-                           readonly>
-                    <p class="description">Paste this link in any email or page. Once a contact clicks it the benchmark
-                        will be completed and the contact will be redirected to the page set below.</p>
-                </div>
-                <div class="row">
-                    <label class="row-label" for="copy">Then redirect contacts to...</label>
-                    ${Elements.inputWithReplacements({
-                      type: "url",
-                      id: "redirect-to",
-                      name: "redirect_to",
-                      className: "regular-text",
-                      value: meta.redirect_to,
-                    })}
-                    <p class="description">Upon clicking the tracking link contacts will be redirected to this page.</p>
-                </div>
-            </div>`;
+			<div class="panel">
+				<div class="row">
+					<label class="row-label" for="copy-this">Copy this link</label>
+					<input type="url" id="copy-this" class="code input regular-text"
+					       value="${
+						       Groundhogg.managed_page.root
+					       }link/click/${'some-value'}" onfocus="this.select()"
+					       readonly>
+					<p class="description">Paste this link in any email or page. Once a contact clicks it the benchmark
+						will be completed and the contact will be redirected to the page set below.</p>
+				</div>
+				<div class="row">
+					<label class="row-label" for="copy">Then redirect contacts to...</label>
+					${Elements.inputWithReplacements({
+						type: 'url',
+						id: 'redirect-to',
+						name: 'redirect_to',
+						className: 'regular-text',
+						value: meta.redirect_to,
+					})}
+					<p class="description">Upon clicking the tracking link contacts will be redirected to this page.</p>
+				</div>
+			</div>`
       },
-      onMount({ meta }, updateStepMeta) {
-        linkPicker("#redirect-to").on("change", function (e) {
+      onMount ({ meta }, updateStepMeta) {
+        linkPicker('#redirect-to').on('change', function (e) {
           updateStepMeta({
             redirect_to: $(this).val(),
-          });
-        });
+          })
+        })
       },
     },
 
     email_confirmed: {
       //language=HTML
       svg: `
-          <svg viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M31.685 16.81V8.6a1 1 0 00-1-1H4.352a1 1 0 00-1 1v17.834a1 1 0 001 1h13.166"
-                    stroke="currentColor"
-                    stroke-width="2"/>
-              <path d="M3.352 9.018l14.166 8.5 14.167-8.5M33.102 20.35l-8.5 8.5-4.25-4.25" stroke="currentColor"
-                    stroke-width="2"/>
-          </svg>`,
-      edit({}) {
+		  <svg viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path d="M31.685 16.81V8.6a1 1 0 00-1-1H4.352a1 1 0 00-1 1v17.834a1 1 0 001 1h13.166"
+			        stroke="currentColor"
+			        stroke-width="2"/>
+			  <path d="M3.352 9.018l14.166 8.5 14.167-8.5M33.102 20.35l-8.5 8.5-4.25-4.25" stroke="currentColor"
+			        stroke-width="2"/>
+		  </svg>`,
+      edit ({}) {
         //language=html
         return `
-            <div class="panel">
-                <p>This benchmark is completed whenever a <a target="_blank"
-                                                             href="https://help.groundhogg.io/article/381-how-to-confirm-an-email-address">contact
-                    confirms their email address.</a> It does not have any settings.</p>
-            </div>`;
+			<div class="panel">
+				<p>This benchmark is completed whenever a <a target="_blank"
+				                                             href="https://help.groundhogg.io/article/381-how-to-confirm-an-email-address">contact
+					confirms their email address.</a> It does not have any settings.</p>
+			</div>`
       },
     },
 
     form_fill: {
       //language=HTML
       svg: `
-          <svg viewBox="0 0 35 31" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                      d="M1.5 29.802a.25.25 0 01-.25-.25v-6a.25.25 0 01.25-.25h32a.25.25 0 01.25.25v6a.25.25 0 01-.25.25h-32z"
-                      fill="currentColor" stroke="currentColor" stroke-width="1.5"/>
-              <path
-                      d="M1.5 7.733a.25.25 0 01-.25-.25v-6a.25.25 0 01.25-.25h32a.25.25 0 01.25.25v6a.25.25 0 01-.25.25h-32zm0 11a.25.25 0 01-.25-.25v-6a.25.25 0 01.25-.25h32a.25.25 0 01.25.25v6a.25.25 0 01-.25.25h-32z"
-                      stroke="currentColor" stroke-width="1.5"/>
-          </svg>`,
-      title({ meta }) {
-        return `Submits <b>${meta.form_name || "a form"}</b>`;
+		  <svg viewBox="0 0 35 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+			  <path
+				  d="M1.5 29.802a.25.25 0 01-.25-.25v-6a.25.25 0 01.25-.25h32a.25.25 0 01.25.25v6a.25.25 0 01-.25.25h-32z"
+				  fill="currentColor" stroke="currentColor" stroke-width="1.5"/>
+			  <path
+				  d="M1.5 7.733a.25.25 0 01-.25-.25v-6a.25.25 0 01.25-.25h32a.25.25 0 01.25.25v6a.25.25 0 01-.25.25h-32zm0 11a.25.25 0 01-.25-.25v-6a.25.25 0 01.25-.25h32a.25.25 0 01.25.25v6a.25.25 0 01-.25.25h-32z"
+				  stroke="currentColor" stroke-width="1.5"/>
+		  </svg>`,
+      title ({ meta }) {
+        return `Submits <b>${meta.form_name || 'a form'}</b>`
       },
-      edit({ meta }) {
+      edit ({ meta }) {
         // language=html
         const redirectToURL = `<label class="row-label">Redirect to this URL...</label>
-        ${Elements.inputWithReplacements({
-          id: "success-page",
-          name: "success_page",
-          className: "regular-text",
-          value: meta.success_page || "",
-        })}`;
+		${Elements.inputWithReplacements({
+			id: 'success-page',
+			name: 'success_page',
+			className: 'regular-text',
+			value: meta.success_page || '',
+		})}`
 
         // language=html
         const stayOnPage = `<label class="row-label">Show this message...</label>
-        ${textAreaWithReplacementsAndEmojis({
-          id: "success-message",
-          name: "success_message",
-          className: "regular-text",
-          value: meta.success_message || "",
-        })}`;
+		${textAreaWithReplacementsAndEmojis({
+			id: 'success-message',
+			name: 'success_message',
+			className: 'regular-text',
+			value: meta.success_message || '',
+		})}`
 
         //language=HTML
         return `
-            <div class="inline-label form-name" tabindex="0">
-                <label>Form name:</label>
-                <div class="input-wrap">
-                    ${input({
-                      name: "form_name",
-                      id: "form-name",
-                      placeholder: "Form name...",
-                      value: meta.form_name || "",
-                    })}
-                </div>
-            </div>
-            <div id="edit-form"></div>
-            <div class="panel">
-                <div class="row">
-                    <p>Stay on page after submitting? ${toggle({
-                      name: "enable_ajax",
-                      id: "enable-ajax",
-                      checked: meta.enable_ajax,
-                      onLabel: "YES",
-                      offLabel: "NO",
-                    })}</p>
-                </div>
-                <div class="row">
-                    ${meta.enable_ajax ? stayOnPage : redirectToURL}
-                </div>
-            </div>`;
+			<div class="inline-label form-name" tabindex="0">
+				<label>Form name:</label>
+				<div class="input-wrap">
+					${input({
+						name: 'form_name',
+						id: 'form-name',
+						placeholder: 'Form name...',
+						value: meta.form_name || '',
+					})}
+				</div>
+			</div>
+			<div id="edit-form"></div>
+			<div class="panel">
+				<div class="row">
+					<p>Stay on page after submitting? ${toggle({
+						name: 'enable_ajax',
+						id: 'enable-ajax',
+						checked: meta.enable_ajax,
+						onLabel: 'YES',
+						offLabel: 'NO',
+					})}</p>
+				</div>
+				<div class="row">
+					${meta.enable_ajax ? stayOnPage : redirectToURL}
+				</div>
+			</div>`
       },
-      onMount({ meta }, updateStepMeta) {
-        linkPicker("#success-page").on("change", (e) => {
+      onMount ({ meta }, updateStepMeta) {
+        linkPicker('#success-page').on('change', (e) => {
           updateStepMeta({
             success_page: e.target.value,
-          });
-        });
+          })
+        })
 
-        $("#success-message").on("change", (e) => {
+        $('#success-message').on('change', (e) => {
           updateStepMeta({
             success_message: e.target.value,
-          });
-        });
+          })
+        })
 
-        $("#enable-ajax").on("change", (e) => {
+        $('#enable-ajax').on('change', (e) => {
           updateStepMeta(
             {
               enable_ajax: e.target.checked,
             },
             true
-          );
-        });
+          )
+        })
 
-        $("#form-name").on("change", (e) => {
+        $('#form-name').on('change', (e) => {
           updateStepMeta({
             form_name: e.target.value,
-          });
-        });
+          })
+        })
 
         const editor = formBuilder(
-          "#edit-form",
+          '#edit-form',
           copyObject(meta.form),
           (form) => {
             updateStepMeta({
               form,
-            });
+            })
           }
-        );
+        )
 
-        editor.init();
+        editor.init()
       },
     },
-  };
+  }
 
   for (const func in Editor) {
-    if (Editor.hasOwnProperty(func) && typeof func === "function") {
-      Editor[func] = Editor[func].bind(Editor);
+    if (Editor.hasOwnProperty(func) && typeof func === 'function') {
+      Editor[func] = Editor[func].bind(Editor)
     }
   }
 
@@ -3370,47 +3497,47 @@
 				<td><code>${specialChars(id)}</code></td>
 				<td><code>${specialChars(label)}</code></td>
 				<td>${Elements.mappableFields(
-          {
-            dataKey: id,
-            className: "mappable-field",
-          },
-          fieldMap && fieldMap.hasOwnProperty(id)
-            ? fieldMap[id]
-            : Groundhogg.fields.mappable.hasOwnProperty(id)
-            ? Groundhogg.fields.mappable[id]
-            : []
-        )}
+        {
+          dataKey: id,
+          className: 'mappable-field',
+        },
+        fieldMap && fieldMap.hasOwnProperty(id)
+          ? fieldMap[id]
+          : Groundhogg.fields.mappable.hasOwnProperty(id)
+          ? Groundhogg.fields.mappable[id]
+          : []
+      )}
 				</td>
-			</tr>`;
-    });
+			</tr>`
+    })
 
     //language=HTML
     return `
-        <table class="mapping-table">
-            <thead>
-            <tr>
-                <th>Field ID</th>
-                <th>Field Label</th>
-                <th>Map to</th>
-            </tr>
-            </thead>
-            <tbody>${mappable.join("")}</tbody>
-        </table>`;
-  };
+		<table class="mapping-table">
+			<thead>
+			<tr>
+				<th>Field ID</th>
+				<th>Field Label</th>
+				<th>Map to</th>
+			</tr>
+			</thead>
+			<tbody>${mappable.join('')}</tbody>
+		</table>`
+  }
 
   const fieldMappingTableOnMount = (updateStepMeta) => {
-    $(".mappable-field")
+    $('.mappable-field')
       .select2()
-      .on("change", function (e) {
-        const { meta } = Editor.getCurrentStep();
+      .on('change', function (e) {
+        const { meta } = Editor.getCurrentStep()
         updateStepMeta({
           field_map: {
             ...meta.field_map,
-            [$(this).data("key")]: $(this).val(),
+            [$(this).data('key')]: $(this).val(),
           },
-        });
-      });
-  };
+        })
+      })
+  }
 
   /**
    * Form Picker
@@ -3427,40 +3554,40 @@
       false,
       false,
       (getResults = (d) => {
-        onReceiveItems(d.forms);
-        return d.forms.map((form) => ({ id: form.id, text: form.name }));
+        onReceiveItems(d.forms)
+        return d.forms.map((form) => ({ id: form.id, text: form.name }))
       }),
       (getParams = (q) => ({ ...q, type }))
-    );
-  };
+    )
+  }
 
   const formsCache = {
     _cache: {},
 
-    set(type, forms) {
-      this._cache[type] = forms;
+    set (type, forms) {
+      this._cache[type] = forms
     },
 
-    getAll(type) {
-      return this._cache[type];
+    getAll (type) {
+      return this._cache[type]
     },
 
-    hasType(type) {
-      return typeof this._cache[type] !== "undefined";
+    hasType (type) {
+      return typeof this._cache[type] !== 'undefined'
     },
 
-    get(type, id) {
+    get (type, id) {
       return this.hasType(type)
         ? this._cache[type].find((f) => f.id === id)
-        : false;
+        : false
     },
 
-    fetch(type) {
+    fetch (type) {
       return apiGet(`${apiRoutes.funnels}/form-integration`, {
         type,
-      }).then((d) => this.set(type, d.forms));
+      }).then((d) => this.set(type, d.forms))
     },
-  };
+  }
 
   /**
    *
@@ -3474,8 +3601,8 @@
         type,
         ...opts,
       })
-    );
-  };
+    )
+  }
 
   /**
    * Form all form integration steps
@@ -3492,113 +3619,113 @@
       form_id: 0,
       field_map: {},
     },
-    title({ meta }) {
-      const { form_id } = meta;
-      const form = formsCache.get(type, form_id);
+    title ({ meta }) {
+      const { form_id } = meta
+      const form = formsCache.get(type, form_id)
 
       if (form) {
-        return `Submits <b>${form.name}</b>`;
+        return `Submits <b>${form.name}</b>`
       } else {
-        return `Submits <b></b>`;
+        return `Submits <b></b>`
       }
     },
-    edit({ meta }) {
-      const { form_id, field_map } = meta;
-      const form = formsCache.get(type, form_id);
+    edit ({ meta }) {
+      const { form_id, field_map } = meta
+      const form = formsCache.get(type, form_id)
 
       //language=HTML
       return `
-          <div class="panel">
-              <div class="row">
-                  <label class="row-label">Select a form...</label>
-                  ${select(
-                    {
-                      id: "form-id",
-                      name: "form_id",
-                    },
-                    formsCache.hasType(type)
-                      ? formsCache.getAll(type).map((form) => ({
-                          value: form.id,
-                          text: form.name,
-                        }))
-                      : [],
-                    form_id
-                  )}
-              </div>
-              <div class="row">
-                  <div id="field-mapping">
-                      ${
-                        form
-                          ? fieldMappingTable({
-                              fields: form.fields,
-                              fieldMap: field_map,
-                            })
-                          : ""
-                      }
-                  </div>
-              </div>
-          </div>`;
+		  <div class="panel">
+			  <div class="row">
+				  <label class="row-label">Select a form...</label>
+				  ${select(
+					  {
+						  id: 'form-id',
+						  name: 'form_id',
+					  },
+					  formsCache.hasType(type)
+						  ? formsCache.getAll(type).map((form) => ({
+							  value: form.id,
+							  text: form.name,
+						  }))
+						  : [],
+					  form_id
+				  )}
+			  </div>
+			  <div class="row">
+				  <div id="field-mapping">
+					  ${
+						  form
+							  ? fieldMappingTable({
+								  fields: form.fields,
+								  fieldMap: field_map,
+							  })
+							  : ''
+					  }
+				  </div>
+			  </div>
+		  </div>`
     },
-    onMount(step, updateStepMeta) {
-      formPicker("#form-id", type, (items) => {
-        formsCache.set(type, items);
-      }).on("change", (e) => {
+    onMount (step, updateStepMeta) {
+      formPicker('#form-id', type, (items) => {
+        formsCache.set(type, items)
+      }).on('change', (e) => {
         updateStepMeta(
           {
             form_id: parseInt(e.target.value),
           },
           true
-        );
-      });
+        )
+      })
 
-      fieldMappingTableOnMount(updateStepMeta);
+      fieldMappingTableOnMount(updateStepMeta)
     },
-    preload({ meta }) {
+    preload ({ meta }) {
       if (meta.form_id) {
-        return formsCache.fetch(type);
+        return formsCache.fetch(type)
       }
     },
     ...rest,
-  });
+  })
 
-  fill("beforeStepNotes.form_fill", {
-    render({ ID, meta }) {
+  fill('beforeStepNotes.form_fill', {
+    render ({ ID, meta }) {
       if (!stepIsReal(ID)) {
-        return "";
+        return ''
       }
 
       const copyValue = (toCopy) => {
         return input({
-          className: "code",
+          className: 'code',
           value: toCopy,
-          onfocus: "this.select()",
+          onfocus: 'this.select()',
           readonly: true,
-        });
-      };
+        })
+      }
 
       //language=HTML
       return `
-          <div id="form-embed-options" class="panel">
-              <div class="row">
-                  <label class="row-label">Embed via Shortcode</label>
-                  <div class="embed-option">${copyValue(`[gh_form id="${ID}"]`)}
-                  </div>
-              </div>
-              <div class="row">
-                  <label class="row-label">Embed via iFrame</label>
-                  <div class="embed-option">${copyValue(`[gh_form id="${ID}"]`)}
-                  </div>
-              </div>
-          </div>`;
+		  <div id="form-embed-options" class="panel">
+			  <div class="row">
+				  <label class="row-label">Embed via Shortcode</label>
+				  <div class="embed-option">${copyValue(`[gh_form id="${ID}"]`)}
+				  </div>
+			  </div>
+			  <div class="row">
+				  <label class="row-label">Embed via iFrame</label>
+				  <div class="embed-option">${copyValue(`[gh_form id="${ID}"]`)}
+				  </div>
+			  </div>
+		  </div>`
     },
-  });
+  })
 
   Groundhogg.helpers = {
     objectToProps,
     specialChars,
     isString,
-  };
-  Groundhogg.funnelEditor = Editor;
+  }
+  Groundhogg.funnelEditor = Editor
   Groundhogg.funnelEditor.functions = {
     slot,
     fill,
@@ -3606,43 +3733,43 @@
     slotsMounted,
     FormIntegration,
     registerFormIntegration,
-    getSteps() {
-      return Editor.getSteps();
+    getSteps () {
+      return Editor.getSteps()
     },
-    stepTitle(step) {
-      return StepTypes.getType(step.data.step_type).title(step);
+    stepTitle (step) {
+      return StepTypes.getType(step.data.step_type).title(step)
     },
-    registerStepType(type, opts) {
-      return StepTypes.register(type, opts);
+    registerStepType (type, opts) {
+      return StepTypes.register(type, opts)
     },
-    registerStepPack(id, name, svg) {
-      return StepPacks.add(id, name, svg);
+    registerStepPack (id, name, svg) {
+      return StepPacks.add(id, name, svg)
     },
-    updateCurrentStepMeta(newMeta) {
-      return Editor.updateCurrentStepMeta(newMeta);
+    updateCurrentStepMeta (newMeta) {
+      return Editor.updateCurrentStepMeta(newMeta)
     },
-    renderStepEdit() {
-      return Editor.renderStepEdit();
+    renderStepEdit () {
+      return Editor.renderStepEdit()
     },
-    getCurrentStep() {
-      return Editor.getCurrentStep();
+    getCurrentStep () {
+      return Editor.getCurrentStep()
     },
-    getCurrentStepMeta() {
-      return Editor.getCurrentStep().meta;
+    getCurrentStepMeta () {
+      return Editor.getCurrentStep().meta
     },
-    getProceedingSteps(stepId) {
-      const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep();
+    getProceedingSteps (stepId) {
+      const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep()
       return Editor.getSteps()
         .filter((_step) => _step.data.step_order > step.data.step_order)
-        .sort((a, b) => a.data.step_order - b.data.step_order);
+        .sort((a, b) => a.data.step_order - b.data.step_order)
     },
-    getPrecedingSteps(stepId) {
-      const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep();
+    getPrecedingSteps (stepId) {
+      const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep()
       return Editor.getSteps()
         .filter((_step) => _step.data.step_order < step.data.step_order)
-        .sort((a, b) => a.data.step_order - b.data.step_order);
+        .sort((a, b) => a.data.step_order - b.data.step_order)
     },
-  };
+  }
 
-  Groundhogg.funnelEditor.elements = Elements;
-})(GroundhoggFunnel, jQuery);
+  Groundhogg.funnelEditor.elements = Elements
+})(GroundhoggFunnel, jQuery)

@@ -2,14 +2,17 @@ $primary-blue: rgb(0, 117, 255);
 $primary-blue-60: rgba(0, 117, 255, 0.60);
 $primary-blue-50: rgba(0, 117, 255, 0.50);
 $primary-blue-20: rgba(0, 117, 255, 0.20);
+$primary-blue-10: rgba(0, 117, 255, 0.10);
 $primary-blue-7: rgba(0, 117, 255, 0.07);
 $primary-blue-2: rgba(0, 117, 255, 0.02);
 $primary-dark: rgb(16, 38, 64);
 $primary-dark-50: rgba(16, 38, 64, 0.5);
 $primary-dark-30: rgba(16, 38, 64, 0.3);
 $primary-dark-15: rgba(16, 38, 64, 0.15);
+$primary-dark-10: rgba(16, 38, 64, 0.10);
 $error-red: rgb(233, 31, 79);
 $error-red-50: rgba(233, 31, 79, 0.5);
+$error-red-10: rgba(233, 31, 79, 0.10);
 $secondary-purple: rgb(108, 25, 173);
 $alert-yellow: rgb(255, 238, 88);
 $benchmark-orange: rgb(245, 129, 21);
@@ -18,7 +21,7 @@ $action-green: rgb(158, 206, 56);
 $action-green-50: rgba(158, 206, 56, 0.5);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
-a.action-link{
+a.action-link {
   font-size: 14px;
   text-decoration: none;
   cursor: pointer;
@@ -45,6 +48,13 @@ a.action-link{
 
   &.red {
     background: $error-red-50;
+  }
+}
+
+svg,
+span.gh-text {
+  &.danger {
+    color: $error-red;
   }
 }
 
@@ -80,7 +90,6 @@ a.action-link{
 button {
   cursor: pointer;
 
-
   &.dashicon-button {
     border: none;
     background: none;
@@ -88,6 +97,11 @@ button {
 
     &:hover {
       opacity: 1;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: initial;
     }
   }
 
@@ -104,11 +118,29 @@ button {
       cursor: initial;
     }
 
+    &.action {
+      background: $action-green;
+
+      &:hover:not(:disabled) {
+        background: darken($action-green, 10);
+      }
+    }
+
     &.primary {
       background: $primary-blue;
 
+      &.text {
+        background-color: transparent;
+        color: $primary-blue;
+      }
+
       &:hover:not(:disabled) {
         background: darken($primary-blue, 10);
+
+        &.text {
+          background-color: $primary-blue-10;
+          color: $primary-blue;
+        }
       }
     }
 
@@ -118,10 +150,23 @@ button {
       color: $primary-blue;
       padding: 5px 10px;
 
+      &.text {
+        border: none;
+        background: transparent;
+        color: $primary-dark;
+      }
+
       &:hover:not(:disabled) {
         color: darken($primary-blue, 10);
         border-color: $primary-blue;
         background-color: $primary-blue-2;
+
+        &.text {
+          border: none;
+          background: $primary-dark-10;
+          color: $primary-dark;
+        }
+
         //border-width: 2px;
         //padding: 3px 8px;
       }
@@ -130,27 +175,37 @@ button {
     &.danger {
       background: $error-red;
 
+      &.text {
+        color: $error-red;
+        background-color: transparent;
+      }
+
       &:hover:not(:disabled) {
         background: darken($error-red, 10);
+
+        &.text {
+          color: $error-red;
+          background-color: $error-red-10;
+        }
       }
     }
 
     &.icon {
-      background: #FFFFFF;
-      border: 1.2px solid rgba(16, 38, 64, 0.15);
-      padding: 4px;
+      //background: #FFFFFF;
+      //border: 1.2px solid rgba(16, 38, 64, 0.15);
+      padding: 7px;
       display: flex;
       align-items: center;
-      color: $primary-blue;
+      //color: $primary-blue;
 
       svg {
         width: 20px;
         height: 20px;
       }
 
-      &:hover:not(:disabled) {
-        border-color: rgba(16, 38, 64, 0.25);
-      }
+      //&:hover:not(:disabled) {
+      //  border-color: rgba(16, 38, 64, 0.25);
+      //}
     }
 
     &.big {
@@ -284,6 +339,18 @@ button {
     top: 0;
   }
 
+  &-confirmation {
+    width: 500px;
+  }
+
+  &-loading {
+    width: 200px;
+
+    h1 {
+      text-align: center;
+    }
+  }
+
   &-dialog {
     background: white;
     border-radius: 5px;
@@ -295,6 +362,8 @@ button {
     &-alert {
       p {
         font-size: 18px;
+        margin: 0;
+        line-height: 1.6;
       }
 
       p:first-child {
@@ -313,13 +382,15 @@ button {
   &-confirmation-buttons {
 
     button {
-      width: 100%;
+      //width: 100%;
       //padding: 20px;
     }
 
     display: flex;
     //gap: 1rem;
-    justify-content: center;
+    margin-top: 20px;
+    gap: 10px;
+    justify-content: flex-end;
   }
 }
 
@@ -506,6 +577,34 @@ p.error,
     &:first-child button {
       border-top: 1px solid #8c8f94;
       border-radius: 4px 4px 4px 4px;
+    }
+  }
+}
+
+.gh-dropdown-menu {
+
+  z-index: 10000;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF;
+  box-shadow: $box-shadow;
+  min-width: 120px;
+  border-radius: 5px;
+  border: 1px solid $primary-dark-15;
+  padding: 5px;
+  gap: 5px;
+
+  &-item {
+    padding: 5px 10px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &:hover {
+      background-color: $primary-dark-10;
+      cursor: pointer;
     }
   }
 }

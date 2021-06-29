@@ -157,11 +157,12 @@ body {
   position: relative;
 }
 .templates-picker #templates .row .template .template-preview .template-content {
-  zoom: 80%;
-  padding: 10px 10px 40px 10px;
-  max-height: 400px;
-  overflow: auto;
   border-top: 1px solid rgba(16, 38, 64, 0.15);
+}
+.templates-picker #templates .row .template .template-preview .template-content iframe {
+  height: 400px;
+  width: 100%;
+  zoom: 80%;
 }
 .templates-picker #templates .row .template .template-preview .template-actions {
   display: none;

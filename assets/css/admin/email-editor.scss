@@ -73,18 +73,32 @@ body {
 
   &-header {
     @include panel();
-    padding: 5px 20px;
+    padding: 8px 12px;
     border-radius: 0;
     display: flex;
     gap: 20px;
     justify-content: space-between;
     align-items: center;
 
-    h1 {
-flex-grow: 1;
+    .title-wrap {
 
-      #email_title {
-        font-size: 20px;
+      h1 {
+        line-height: 1;
+        margin: 0;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        font-size: 1.6em;
+
+        .sep,
+        #email-title {
+          font-weight: 400;
+          cursor: pointer;
+        }
+
+        .dashicons {
+          color: $primary-dark-30;
+        }
       }
     }
 

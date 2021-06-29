@@ -67,19 +67,35 @@
       },
 
       header () {
+
+        const titleEdit = () => {
+          return input({
+            id: 'email-title-edit',
+            name: 'email-title',
+            value: this.email.data.title
+          })
+        }
+
+        const titleDisplay = () => {
+          return `<span id="email-title">${specialChars(this.email.data.title)}</span><span class="dashicons dashicons-edit"></span>`
+        }
+
         // language=HTML
         return `
-			<h1>${input({
-				id: 'email_title',
-				name: 'title',
-				value: this.edited.data.title,
-			})}
-			</h1>
-
+			<div class="title-wrap">
+				<h1 class="breadcrumbs"><span class="root">Emails</span><span
+					class="sep">/</span>${this.isEditingTitle ? titleEdit() : titleDisplay()}</h1>
+			</div>
 			<div class="actions">
-				<div class="redo"><span class=" dashicons dashicons-redo"></span></div>
-				<div class="undo"><span class=" dashicons dashicons-undo"></span></div>
-				<button id="commit" class="gh-button primary">Update</button>
+				<div class="undo-and-redo">
+					<button class="redo dashicon-button" ${this.redoStates.length ? '' : 'disabled'}><span
+						class="dashicons dashicons-redo"></span></button>
+					<button class="undo dashicon-button" ${this.undoStates.length ? '' : 'disabled'}><span
+						class="dashicons dashicons-undo"></span></button>
+				</div>
+				<div class="publish-actions">
+					<button id="commit" class="gh-button primary">Update</button>
+				</div>
 			</div>
         `
       },
@@ -375,7 +391,7 @@
           )
         }
 
-        $('#email_title, #subject, #preview-text').on('change input', (e) => {
+        $('#subject, #preview-text').on('change input', (e) => {
           this.updateEmailData({
             [e.target.name]: e.target.value,
           })
@@ -421,6 +437,30 @@
         headersEditor.mount()
       }
 
+      const mountHeader = () => {
+        $('#email-editor-header').html(this.components.header.call(this))
+        headerMount()
+      }
+
+      const headerMount = () => {
+
+        if (!this.isEditingTitle) {
+          $('#email-title').on('click', (e) => {
+            this.isEditingTitle = true
+            mountHeader()
+          })
+        } else {
+          $('#email-title-edit').focus().on('change blur keydown', (e) => {
+            if (e.type === 'keydown' && e.key !== 'Enter') {
+              return
+            }
+
+            this.isEditingTitle = false
+            mountHeader()
+          })
+        }
+      }
+
       const mountSidebar = () => {
         $('#email-editor-sidebar').html(this.components.sidebar.call(this))
         sidebarMount()
@@ -436,7 +476,7 @@
             content: `<iframe id="preview" class="${device}"></div>`
           })
 
-          setFrameContent( $('#preview')[0], this.edited.data.content )
+          setFrameContent($('#preview')[0], this.edited.data.content)
 
         })
 
@@ -528,6 +568,7 @@
 
       mainContentMount()
       sidebarMount()
+      headerMount()
     },
 
     currentState () {

@@ -295,10 +295,9 @@
     }
   }
 
-
-  var codeMirror;
-  var codeMirrorIsFocused;
-  var $doc = $(document);
+  var codeMirror
+  var codeMirrorIsFocused
+  var $doc = $(document)
 
   $doc.on('ghInsertReplacement', function (e, insert) {
     if (codeMirrorIsFocused) {
@@ -366,13 +365,14 @@
     })
   }
 
-  const loadingModal = () => {
+  const loadingModal = (text = 'Loading') => {
 
     let stop = () => {}
 
     return modal({
-      content: '<h1>Loading</h1>',
+      content: `<h1>${text}</h1>`,
       canClose: false,
+      dialogClasses: 'gh-modal-loading',
       onOpen: () => {
         stop = loadingDots('.gh-modal h1').stop
       },
@@ -383,18 +383,14 @@
   }
 
   const savingModal = () => {
+    return loadingModal('Saving')
+  }
 
-    let stop = () => {}
-
-    return modal({
-      content: '<h1>Saving</h1>',
-      canClose: false,
-      onOpen: () => {
-        stop = loadingDots('.gh-modal h1').stop
-      },
-      onClose: () => {
-        stop()
-      }
+  const dangerConfirmationModal = (props) => {
+    return confirmationModal({
+      ...props,
+      confirmButtonType: 'danger',
+      cancelButtonType: 'primary text'
     })
   }
 
@@ -405,6 +401,9 @@
    * @param closeText
    * @param onConfirm
    * @param onClose
+   * @param confirmButtonType
+   * @param cancelButtonType
+   * @param buttonSize
    */
   const confirmationModal = ({
     alert = '',
@@ -412,6 +411,9 @@
     closeText = 'Cancel',
     onConfirm = () => {},
     onClose = () => {},
+    confirmButtonType = 'primary',
+    cancelButtonType = 'danger text',
+    buttonSize = 'medium',
   }) => {
 
     //language=html
@@ -422,14 +424,19 @@
 		<div class="gh-modal-dialog-alert">
 			${alert}
 		</div>
-		<div class="gh-modal-confirmation-buttons gh-button-group">
-			<button type="button" class="gh-button danger gh-modal-button-close">${closeText}</button>
-			<button type="button" class="gh-button primary gh-modal-button-confirm">${confirmText}</button>
+		<div class="gh-modal-confirmation-buttons">
+			<button type="button" class="gh-button ${buttonSize} ${cancelButtonType} gh-modal-button-close">
+				${closeText}
+			</button>
+			<button type="button" class="gh-button ${buttonSize} ${confirmButtonType} gh-modal-button-confirm">
+				${confirmText}
+			</button>
 		</div>`
 
     const { close, $modal } = modal({
       content,
-      onClose
+      onClose,
+      dialogClasses: 'gh-modal-confirmation'
     })
 
     const confirm = () => {
@@ -466,14 +473,15 @@
     content = '',
     onClose = () => {},
     canClose = true,
-    onOpen = () => {}
+    onOpen = () => {},
+    dialogClasses = ''
   }) => {
 
     //language=html
     const html = `
 		<div class="gh-modal">
 			<div class="gh-modal-overlay"></div>
-			<div class="gh-modal-dialog">
+			<div class="gh-modal-dialog ${dialogClasses}">
 				${canClose ? `	<button type="button" class="dashicon-button gh-modal-button-close-top gh-modal-button-close">
 					<span class="dashicons dashicons-no-alt"></span>
 				</button>` : ''}
@@ -989,12 +997,70 @@
 		<button ${objectToProps({
 			className: 'gh-button' + (className ? ' ' + className : ''),
 			...props
-		})}>${text}</button>`
+		})}>${text}
+		</button>`
+  }
+
+  const setFrameContent = (frame, content) => {
+    var blob = new Blob([content], { type: 'text/html; charset=utf-8' })
+    frame.src = URL.createObjectURL(blob)
+  }
+
+  const moreMenu = (selector, {
+    items = [],
+    onSelect = (key) => { console.log(key) }
+
+  }) => {
+
+    // language=HTML
+    const menu = `
+		<div role="menu" class="gh-dropdown-menu" tabindex="0">
+			${items.map(({
+				key,
+				text
+			}) => `<div class="gh-dropdown-menu-item" data-key="${key}">${text}</div>`).join('')}
+		</div>`
+
+    const $menu = $(menu)
+
+    const handleDocClick = (e) => {
+      if (!clickInsideElement(e, 'gh-dropdown-menu')) {
+        close()
+      }
+    }
+
+    $(document).on('click', handleDocClick)
+
+    const close = () => {
+      $(document).off('click', handleDocClick)
+      $menu.remove()
+    }
+
+    $menu.on('click', '.gh-dropdown-menu-item', (e) => {
+      onSelect(e.currentTarget.dataset.key)
+      close()
+    })
+
+    $menu.on('blur', () => {
+      close()
+    })
+
+    const $el = $(selector)
+
+    $('body').append($menu)
+
+    $menu.css({
+      top: Math.min($el[0].getBoundingClientRect().bottom, window.innerHeight - $menu.height() - 20) + 'px',
+      left: ($el[0].getBoundingClientRect().right - $menu.width()) + 'px'
+    })
+
+    $menu.focus()
   }
 
   Groundhogg.element = {
     ...Elements,
     specialChars,
+    moreMenu,
     andList,
     orList,
     kebabize,
@@ -1010,8 +1076,10 @@
     loadingModal,
     savingModal,
     confirmationModal,
+    dangerConfirmationModal,
     uuid,
     modal,
+    setFrameContent,
     copyObject,
     loadingDots,
     flattenObject,

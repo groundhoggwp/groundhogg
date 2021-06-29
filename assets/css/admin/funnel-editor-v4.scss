@@ -165,7 +165,6 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
       flex-grow: 1;
     }
 
-    .undo-and-redo,
     .publish-actions,
     .header-actions {
       display: flex;
@@ -184,55 +183,25 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
     }
   }
 
-  .undo-and-redo .undo,
-  .undo-and-redo .redo {
-    cursor: pointer;
-    opacity: 0.6;
-  }
-
-  .undo-and-redo .undo:hover,
-  .undo-and-redo .redo:hover {
-    opacity: 0.8;
-  }
-
-
   .title-wrap {
-    .above-title {
-      color: $primary-dark;
-      opacity: 0.6;
-      font-style: normal;
-      font-weight: normal;
-      font-size: 8px;
-      line-height: 9px;
-      text-transform: uppercase;
-    }
 
-    .title {
-      position: relative;
-      cursor: pointer;
-      font-size: 20px;
-      font-weight: 500;
-    }
+    h1 {
+      line-height: 1;
+      margin: 0;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-size: 1.6em;
 
-    input.funnel-title-edit {
-      border-bottom: 1px solid;
-    }
+      .sep,
+      #title {
+        font-weight: 400;
+        cursor: pointer;
+      }
 
-    input.funnel-title-edit:focus {
-      outline: none;
-      box-shadow: none;
-    }
-
-    .pencil {
-      position: absolute;
-      margin-left: 10px;
-      bottom: 0;
-      opacity: 0.3;
-      color: $primary-dark;
-    }
-
-    .title:hover .pencil {
-      opacity: 0.5;
+      .dashicons {
+        color: $primary-dark-30;
+      }
     }
   }
 
@@ -345,14 +314,9 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
 
     &.send_email {
 
-      .loading-iframe {
-        display: flex;
-        min-height: 220px;
-        background: url(../../images/loading.gif) center center no-repeat;
-      }
-
-      iframe {
+      iframe#email-preview {
         width: 100%;
+        min-height: 400px;
       }
 
       #from-line {
@@ -464,6 +428,26 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
 
   .step {
     position: relative;
+
+    .step-menu-button {
+      height: 100%;
+      position: absolute;
+      right: 5px;
+      top: 0;
+      display: none;
+
+      svg {
+        width: 20px;
+        height: 100%;
+        box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+      }
+    }
+
+    &:hover, &:focus-within {
+      .step-menu-button {
+        display: block;
+      }
+    }
   }
 
   .step-flow .step .icon-svg svg {
@@ -562,57 +546,6 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
   //.step .step-status.edited {
   //  visibility: visible;
   //}
-
-  .step:hover {
-    .step-menu {
-      display: flex;
-    }
-  }
-
-  .step-menu {
-    align-items: center;
-    display: none;
-    justify-content: center;
-    position: absolute;
-    height: 100%;
-    top: 0rem;
-    right: 0rem;
-    width: 2rem;
-
-    svg {
-      fill: #0005;
-    }
-
-    //&:hover {
-    //  ul {
-    //    display: block;
-    //  }
-    //}
-
-    ul {
-      background: #FFF;
-      border: 1px solid #0002;
-      border-radius: 3px;
-      box-shadow: 2px 2px 3px 0 #0001;
-      display: none;
-      right: 0;
-      list-style: none;
-      margin: 0;
-      position: absolute;
-      top: 90%;
-      z-index: 1000;
-
-      li {
-        margin: 0;
-        padding: .236rem .382rem;
-        white-space: nowrap;
-
-        &:hover {
-          background: #0001;
-        }
-      }
-    }
-  }
 
   .step .details {
     width: 165px;
@@ -837,14 +770,8 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
 
   .publish-actions {
     button {
-      border: none;
-      color: #FFFFFF;
-      border-radius: 5px;
       display: flex;
       gap: 20px;
-      padding: 6px 10px;
-      font-size: 16px;
-      font-weight: 400;
       align-items: center;
       //transition: 0.4s;
 

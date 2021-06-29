@@ -211,11 +211,15 @@ body {
           position: relative;
 
           .template-content {
-            zoom: 80%;
-            padding: 10px 10px 40px 10px;
-            max-height: 400px;
-            overflow: auto;
             border-top: 1px solid $primary-dark-15;
+
+            iframe{
+              height: 400px;
+              width: 100%;
+              zoom: 80%;
+              //padding: 15px;
+              //padding-bottom: 40px;
+            }
           }
 
           .template-actions {

@@ -35,18 +35,28 @@ body iframe#preview.desktop {
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
   margin-bottom: 1rem;
   padding: 20px;
-  padding: 5px 20px;
+  padding: 8px 12px;
   border-radius: 0;
   display: flex;
   gap: 20px;
   justify-content: space-between;
   align-items: center;
 }
-#email-editor-header h1 {
-  flex-grow: 1;
+#email-editor-header .title-wrap h1 {
+  line-height: 1;
+  margin: 0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 1.6em;
 }
-#email-editor-header h1 #email_title {
-  font-size: 20px;
+#email-editor-header .title-wrap h1 .sep,
+#email-editor-header .title-wrap h1 #email-title {
+  font-weight: 400;
+  cursor: pointer;
+}
+#email-editor-header .title-wrap h1 .dashicons {
+  color: rgba(16, 38, 64, 0.3);
 }
 #email-editor-header .actions {
   align-items: center;

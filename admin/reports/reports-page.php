@@ -9,7 +9,9 @@ use Groundhogg\Reports;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_cookie;
 use function Groundhogg\get_post_var;
+use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
+use function Groundhogg\get_url_var;
 use function Groundhogg\groundhogg_logo;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
@@ -78,6 +80,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 		if ( $this->get_current_tab() === 'v3' ) {
 			wp_enqueue_script( 'groundhogg-admin-reporting-v3' );
 			wp_enqueue_style( 'groundhogg-admin-reporting-v3' );
+			wp_localize_script('groundhogg-admin-reporting-v3', 'GroundhoggReporting', get_request_query() );
 
 			return;
 		}

@@ -69,7 +69,7 @@
 			  </div>
 			  <div class="template-preview">
 				  <div class="template-content">
-					  ${data.content}
+					  <iframe class="template-frame" data-template="${ID}"></iframe>
 				  </div>
 				  <div class="template-actions">
 					  <button class="gh-button primary select-template" data-template="${ID}">Use Template</button>
@@ -190,6 +190,11 @@
         this.newTitle = this.selectedTemplate.data.title
 
         this.titleModal()
+      })
+
+      $('iframe.template-frame').each(function () {
+        const template = this.dataset.template
+        setFrameContent(this, templates.find( t => t.ID === template).context.built)
       })
     },
 
