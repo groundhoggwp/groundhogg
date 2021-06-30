@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 4.9
 Tested up to: 5.7
 Requires PHP: 5.6
-Stable tag: 2.4.7
+Stable tag: 2.4.7.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
