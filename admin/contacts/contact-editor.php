@@ -160,7 +160,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 	 */
 	function contact_record_general_info( $contact ) {
 		?>
-		<h2><?php _e( 'Contact Information' ); ?></h2>
+		<h2><?php _e( 'Contact Information', 'groundhogg' ); ?></h2>
 		<!-- GENERAL NAME INFO -->
 		<table class="form-table">
 			<tbody>

@@ -15,8 +15,10 @@ use function Groundhogg\enqueue_groundhogg_modal;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_date_time_format;
 use function Groundhogg\get_db;
+use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
+use function Groundhogg\Ymd_His;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -110,6 +112,88 @@ class Email_Log_Table extends Table {
 	 */
 	function get_default_query() {
 		return [];
+	}
+
+	protected function extra_tablenav( $which ) {
+		if ( $which !== 'top' ) {
+			return;
+		}
+
+		?>
+		<script>(function ($) {
+            $(() => {
+
+              const $before = $('#before')
+              const $after = $('#after')
+              const $search = $('#search-by-date')
+
+              $('#date-filter').on('change', (e) => {
+                switch (e.target.value) {
+                  default:
+                    $before.addClass('hidden').val('')
+                    $after.addClass('hidden').val('')
+                    $search.addClass('hidden')
+                    break
+                  case 'before':
+                    $search.removeClass('hidden')
+                    $before.removeClass('hidden')
+                    $after.addClass('hidden').val('')
+	                break
+                  case 'after':
+                    $search.removeClass('hidden')
+                    $after.removeClass('hidden')
+                    $before.addClass('hidden').val('')
+                    break
+                  case 'between':
+                    $search.removeClass('hidden')
+                    $before.removeClass('hidden')
+                    $after.removeClass('hidden')
+                    break
+                }
+              })
+            })
+          })(jQuery)</script>
+		<div class="alignleft gh-actions" style="display: flex;gap: 3px;align-items: center">
+			<?php
+
+			echo html()->dropdown( [
+				'id'          => 'date-filter',
+				'name'        => 'date_filter',
+				'option_none' => __( 'Filter by date' ),
+				'options'     => [
+					'before'  => __( 'Before', 'groundhogg' ),
+					'after'   => __( 'After', 'groundhogg' ),
+					'between' => __( 'Between', 'groundhogg' ),
+				],
+				'selected'    => get_url_var( 'date_filter' )
+			] );
+
+			echo html()->input( [
+				'type'  => 'date',
+				'id'    => 'before',
+				'name'  => 'before',
+				'value' => get_url_var( 'before' ),
+				'class' => 'input' . ( get_url_var( 'before' ) ? '' : ' hidden' )
+			] );
+
+			echo html()->input( [
+				'type'  => 'date',
+				'id'    => 'after',
+				'name'  => 'after',
+				'value' => get_url_var( 'after' ),
+				'class' => 'input' . ( get_url_var( 'after' ) ? '' : ' hidden' )
+			] );
+
+			echo html()->button( [
+				'text'  => __( 'Search' ),
+				'id'    => 'search-by-date',
+				'type'  => 'submit',
+				'value' => 'filter_logs',
+				'name'  => 'action',
+				'class' => 'button button-secondary' . ( get_url_var( 'before' ) || get_url_var( 'after' )  ? '' : ' hidden' )
+			] )
+
+			?></div><?php
 	}
 
 	/**
@@ -297,7 +381,7 @@ class Email_Log_Table extends Table {
 	 * For more detailed insight into how columns are handled, take a look at
 	 * WP_List_Table::single_row_columns()
 	 *
-	 * @param object $email A singular item (one full row's worth of data).
+	 * @param object $email       A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string|void Text or HTML to be placed inside the column <td>.
@@ -330,9 +414,6 @@ class Email_Log_Table extends Table {
 	protected function get_bulk_actions() {
 
 		$actions = [
-//			'retry'     => __( 'Retry', 'groundhogg' ),
-//			'blacklist' => __( 'Blacklist', 'groundhogg' ),
-//			'whitelist' => __( 'Whitelist', 'groundhogg' ),
 			'resend' => __( 'Resend', 'groundhogg' ),
 			'delete' => __( 'Delete', 'groundhogg' ),
 		];

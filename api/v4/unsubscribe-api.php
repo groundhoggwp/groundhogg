@@ -22,7 +22,7 @@ class Unsubscribe_Api extends Base_Api {
 			[
 				'methods'              => WP_REST_Server::EDITABLE,
 				'callback'             => [ $this, 'unsubscribe' ],
-				'permissions_callback' => '__return_true',
+				'permission_callback' => '__return_true',
 				'args'                 => [
 					'contact' => [
 						'description' => 'Encrypted contact ID or Email address',

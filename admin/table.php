@@ -212,30 +212,16 @@ abstract class Table extends \WP_List_Table {
 		$order    = get_url_var( 'order', 'DESC' );
 		$orderby  = get_url_var( 'orderby', $this->get_db()->get_primary_key() );
 
-		$relation     = strtoupper( get_url_var( 'relation' ) );
-		$relationship = in_array( $relation, [ 'AND', 'OR' ] ) ? $relation : 'AND';
-
-		$where = [
-			'relationship' => $relationship,
-		];
-
-		$query = get_request_query();
-
-		foreach ( $query as $param => $val ) {
-			$where[] = [ 'col' => $param, 'val' => $val, 'compare' => '=' ];
-		}
-
-		$args = array(
-			'where'   => $where,
+		$query = array_merge( get_request_query(), [
 			'limit'   => $per_page,
 			'offset'  => $offset,
 			'order'   => $order,
 			'search'  => $search,
 			'orderby' => $orderby,
-		);
+		] );
 
-		$items = $this->get_db()->query( $args );
-		$total = $this->get_db()->count( $args );
+		$items = $this->get_db()->query( $query );
+		$total = $this->get_db()->count( $query );
 
 		foreach ( $items as $i => $item ) {
 			$items[ $i ] = $this->parse_item( $item );

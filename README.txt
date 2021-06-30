@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 4.9
 Tested up to: 5.7
 Requires PHP: 5.6
-Stable tag: 2.4.6.2
+Stable tag: 2.4.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -331,6 +331,16 @@ You can purchase a premium plan for access to support and our premium extensions
 Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/monthly/).
 
 == Changelog ==
+
+= 2.4.7 (2021-06-24) =
+* ADDED Date search filters for email logs
+* ADDED Rest route for email logs in V4 REST API
+* TWEAKED Fixed several capability checks for the REST API and typo for `permission_callback`
+* TWEAKED Returning `FALSE` from a step will still soft fail, but the funnel will continue instead of hard stopping.
+* TWEAKED Added more CSS specificity to the dropdown button widget
+* FIXED Raise time limit to 60 seconds instead of 10 ahead of running the queue, solving slow processing for server based cron jobs.
+* FIXED Missing text domain for some strings
+* FIXED Console verbose warnings for duplicate IDs
 
 = 2.4.6.2 (2021-06-09) =
 * TWEAKED Iframe resizer checks for same origin before attempting to resize a frame.

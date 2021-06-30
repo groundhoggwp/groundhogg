@@ -23,6 +23,10 @@ class Email_Log extends DB {
 		return 'log';
 	}
 
+	public function get_date_key() {
+		return 'date_sent';
+	}
+
 	/**
 	 * Maybe serialize the args...
 	 *
