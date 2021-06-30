@@ -373,6 +373,7 @@ class Main_Roles extends Roles {
 		$caps = array(
 			'perform_bulk_actions',
 			'manage_gh_licenses',
+			'manage_campaigns',
 		);
 
 		return apply_filters( 'groundhogg/roles/caps/other', $caps );
