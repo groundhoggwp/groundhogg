@@ -198,6 +198,7 @@
     redoStates: [],
 
     stepErrors: {},
+    stepWarnings: {},
     funnelErrors: [],
 
     htmlTemplates: {
@@ -310,6 +311,8 @@
 
         let hasErrors = false
         let errors = []
+        let hasWarnings = false
+        let warnings = []
 
         if (
           Editor.stepErrors.hasOwnProperty(ID) &&
@@ -317,6 +320,14 @@
         ) {
           hasErrors = true
           errors = Editor.stepErrors[ID]
+        }
+
+        if (
+          Editor.stepWarnings.hasOwnProperty(ID) &&
+          Editor.stepWarnings[ID].length > 0
+        ) {
+          hasWarnings = true
+          warnings = Editor.stepWarnings[ID]
         }
 
         const updateStepMeta = (meta, reRenderStepEdit = false) => {
@@ -366,6 +377,20 @@
               .map(
                 (error) =>
                   `<li class="step-error"><span class="dashicons dashicons-warning"></span> ${error}</li>`
+              )
+              .join('')}
+                </ul>
+            </div>`
+            : ''
+        }
+			${
+          hasWarnings
+            ? `<div class="step-warnings">
+                <ul>
+                    ${warnings
+              .map(
+                (warning) =>
+                  `<li class="step-warning"><span class="dashicons dashicons-warning"></span> ${warning}</li>`
               )
               .join('')}
                 </ul>
@@ -500,6 +525,7 @@
 
         let status
         let hasErrors = false
+        let hasWarnings = false
 
         if (
           Editor.stepErrors.hasOwnProperty(ID) &&
@@ -507,6 +533,10 @@
         ) {
           status = 'config-error'
           hasErrors = true
+        } else if (Editor.stepWarnings.hasOwnProperty(ID) &&
+          Editor.stepWarnings[ID].length > 0) {
+          status = 'config-warning'
+          hasWarnings = true
         } else if (origStep && !objectEquals(step, origStep)) {
           status = 'edited'
         } else if (!origStep) {
@@ -536,7 +566,7 @@
 			<div
 				class="step ${step_type} ${step_group} ${
 					activeStep === ID ? 'active' : ''
-				} ${hasErrors ? 'has-errors' : ''}"
+				} ${hasErrors ? 'has-errors' : ''} ${hasWarnings ? 'has-warnings' : ''}"
 				data-id="${ID}">
 				${
 					StepType.hasOwnProperty('svg')
@@ -686,6 +716,29 @@
         moreMenu('#more-menu', {
           onSelect: (key) => {
             switch (key) {
+              case 'campaigns':
+
+                const campaignContent = () => {
+                  // language=HTML
+                  return `
+					  <div class="manage-campaigns">
+						  <p><b>Add this funnel to one or more campaigns...</b></p>
+						  <p>${select({
+							  id: 'manage-campaigns',
+							  multiple: true
+						  }, this.funnel.campaigns.map(c => ({
+							  text: c.data.name,
+							  value: c.ID
+						  })), this.funnel.campaigns.map(c => c.ID))}</p>
+						  <button class="gh-button primary">Save</button>
+					  </div>`
+                }
+
+                modal({
+                  content: ``
+                })
+
+                break
               case 'export':
                 window.location.href = this.funnel.links.export
                 break
@@ -727,12 +780,24 @@
           },
           items: [
             {
+              key: 'campaigns',
+              //language=HTML
+              text: `
+				  <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+					  <defs/>
+					  <path
+						  d="M343.2 49.7A45.1 45.1 0 00300 82L71.8 130a15 15 0 00-12 14.7v17.1H15a15 15 0 00-15 15V256a15 15 0 0015 15h44.9v21a15 15 0 0011.9 14.8l23.6 5v107.8a42.6 42.6 0 0069.2 33.5 42.5 42.5 0 0016.2-33.5V400h3c34 0 62.8-23.4 70.9-55l45.3 9.5a45.1 45.1 0 0088.3-12.5V94.7a45 45 0 00-45-45zM60 241H30v-49.2h29.9zm91 178.6a12.7 12.7 0 01-15.7 12.4 12.7 12.7 0 01-9.8-12.4V318l25.4 5.4v96.2zm33-49.5h-3v-40.5l44.4 9.4c-5.3 18-21.9 31-41.5 31zm114.3-46.5L89.9 280V157L298.2 113zm60 18.5a15 15 0 01-30 0V94.7a15 15 0 0130 0zM446.3 117a15 15 0 009.5-3.4l30.2-25a15 15 0 00-19.1-23l-30.2 24.8a15 15 0 009.6 26.6zM486 344.2l-30.2-25a15 15 0 00-19 23.2l30 25a15 15 0 0021.2-2 15 15 0 00-2-21.2zM497 201.4h-63.6a15 15 0 000 30H497a15 15 0 000-30z"/>
+				  </svg> Campaigns`
+            },
+            {
               key: 'export',
               //language=HTML
               text: `
 				  <svg height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 367 367">
 					  <defs/>
 					  <path
+						  fill="currentColor"
+						  stroke-width="1"
 						  d="M363.6 247l.4-.5.5-.7.4-.6.3-.6.4-.7.3-.7.2-.6c0-.3.2-.5.3-.7l.1-.7.2-.8.1-.8.1-.6.1-1.5V236l-.2-.6v-.8l-.3-.8-.1-.7-.3-.7-.2-.6-.3-.7-.4-.7-.3-.6-.4-.6-.5-.7-.4-.5a15 15 0 00-1-1v-.1l-37.5-37.5a15 15 0 00-21.2 21.2l11.9 11.9H270v-78.6-.4a15 15 0 00-3.4-9.5 15.2 15.2 0 00-1-1.2c-.2 0-.3-.2-.4-.4L155.6 23a15 15 0 00-1-.9l-.3-.2a14.9 14.9 0 00-1.9-1.3l-.3-.2-1.1-.6-.5-.1a14.5 14.5 0 00-2.2-.7l-.4-.1-1.2-.2h-1.4l-.3-.1H15a15 15 0 00-15 15v300a15 15 0 0015 15h240a15 15 0 0015-15v-81h45.8l-12 11.9a15 15 0 0021.3 21.2l37.5-37.5 1-1zM160 69.7l58.8 58.8H160V69.7zm80 248.8H30v-270h100v95a15 15 0 0015 15h95v64h-65a15 15 0 000 30h65v66z"/>
 				  </svg> Export`
             },
@@ -1056,33 +1121,51 @@
     },
 
     /**
+     * Add the step error
+     *
+     * @param id
+     * @param error
+     */
+    addStepWarning (id, error) {
+      if (!this.stepWarnings.hasOwnProperty(id)) {
+        this.stepWarnings[id] = []
+      }
+
+      this.stepWarnings[id].push(error)
+    },
+
+    /**
      * Check for step errors
      */
     checkForStepErrors () {
       const self = this
 
-      this.stepErrors = []
+      this.stepErrors = {}
+      this.stepWarnings = {}
 
       this.funnel.steps.forEach((step) => {
-        const errors = []
+
+        const addError = (error) => {
+          this.addStepError(step.ID, error)
+        }
+
+        const addWarning = (warning) => {
+          this.addStepWarning(step.ID, warning)
+        }
 
         const { step_group, step_order, step_type } = step.data
 
         const typeHandler = getStepType(step_type)
 
         if (step_group === 'action' && step_order === 1) {
-          errors.push('Actions cannot be at the start of a funnel.')
+          addError('Actions cannot be at the start of a funnel.')
         } else if (typeHandler.type === 'error') {
-          errors.push('Settings not found.')
+          addError('Settings not found.')
         }
-
-        // console.log(typeHandler)
 
         if (typeHandler) {
-          typeHandler.validate(step, errors)
+          typeHandler.validate(step, addError, addWarning)
         }
-
-        errors.forEach((error) => this.addStepError(step.ID, error))
       })
     },
 
@@ -2395,7 +2478,7 @@
           this.promiseController.abort()
         }
       },
-      validate: function (step, errors) {},
+      validate: function (step, addError, addWarning) {},
       preload (step) {},
       defaults: {},
     },
@@ -3328,12 +3411,12 @@
           })
         }
       },
-      validate ({ meta }, errors) {
+      validate ({ meta }, addError, addWarning) {
         const { email_id } = meta
         const email = EmailsStore.get(email_id)
 
         if (email_id && email && email.data.status !== 'ready') {
-          errors.push('Email is in draft mode. Please update status to ready!')
+          addWarning('Email is in draft mode. Please update status to ready!')
         }
       },
     },

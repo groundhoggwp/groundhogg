@@ -300,6 +300,13 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
     box-sizing: border-box;
   }
 
+  li.step-warning {
+    padding: 5px 10px;
+    background: $alert-yellow;
+    color: $primary-dark-50;
+    border-radius: 5px;
+  }
+
   li.step-error {
     padding: 5px 10px;
     background: $error-red;
@@ -375,6 +382,14 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
     padding: 10px;
     min-height: 52px;
     cursor: pointer;
+  }
+
+  .step-flow .steps .step.has-warnings {
+    border: 1px solid $alert-yellow;
+
+    .step-type {
+      color: $alert-yellow;
+    }
   }
 
   .step-flow .steps .step.has-errors {
@@ -516,6 +531,12 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
       line-height: 1;
       padding: 3px;
       border-radius: 3px;
+    }
+
+    &.config-warning:before {
+      background: $alert-yellow;
+      color: $primary-dark-50;
+      content: 'warning';
     }
 
     &.config-error:before {

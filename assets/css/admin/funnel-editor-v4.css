@@ -235,6 +235,12 @@
   padding: 0 20px;
   box-sizing: border-box;
 }
+#funnel-editor li.step-warning {
+  padding: 5px 10px;
+  background: #ffee58;
+  color: rgba(16, 38, 64, 0.5);
+  border-radius: 5px;
+}
 #funnel-editor li.step-error {
   padding: 5px 10px;
   background: #e91f4f;
@@ -297,6 +303,12 @@
   padding: 10px;
   min-height: 52px;
   cursor: pointer;
+}
+#funnel-editor .step-flow .steps .step.has-warnings {
+  border: 1px solid #ffee58;
+}
+#funnel-editor .step-flow .steps .step.has-warnings .step-type {
+  color: #ffee58;
 }
 #funnel-editor .step-flow .steps .step.has-errors {
   border: 1px solid #e91f4f;
@@ -400,6 +412,11 @@
   line-height: 1;
   padding: 3px;
   border-radius: 3px;
+}
+#funnel-editor .step-status.config-warning:before {
+  background: #ffee58;
+  color: rgba(16, 38, 64, 0.5);
+  content: "warning";
 }
 #funnel-editor .step-status.config-error:before {
   background: #e91f4f;
