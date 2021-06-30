@@ -25,23 +25,6 @@ WordPress CRM, Email & Marketing Automation
 
 ## Join 3,000+ Small Businesses in 35+ Countries!
 
-### 🍃 LAUNCH INTO SPRING SALE 🌳
-
-Until _May 16th, 2021_, get **1 year of Groundhogg CRM & Marketing Automation premium for FREE** when you pay for 2 years up front with our **3-year deal**!
-
-As we head into the 2nd quarter, having effective and high converting funnels has never been more important!
-
-Don't miss out on opportunities like:
-- [Adding an footer opt-in to your site to turn 1% of all traffic into subscribers!](https://www.groundhogg.io/strategies/heres-why-you-need-to-add-an-opt-in-form-to-your-wordpress-sites-footer/).
-- [Setting up a customer onboarding funnel to create lifetime clients!](https://www.groundhogg.io/how-to/how-to-increase-customer-retention-by-automating-on-boarding/).
-- [Reduce refunds and improve your attrition rates!](https://www.groundhogg.io/how-to/how-to-reduce-refunds-with-five-simple-strategies/)
-- [Get more 5 star reviews!](https://www.groundhogg.io/how-to/how-to-get-more-5-star-reviews/)
-- And more!
-
-**🤯 [Tell me more about the 3-year deal!](https://groundhogg.io/pricing/)**
-
-Oh, and use code **LAUNCHINTOSPRING** to get an extra **15% OFF**!
-
 ### Never let another lead get away!
 
 [youtube https://youtu.be/8S-9jhBiHrI]
@@ -331,6 +314,11 @@ You can purchase a premium plan for access to support and our premium extensions
 Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/monthly/).
 
 == Changelog ==
+
+= 2.4.7.1 (2021-06-29) =
+* FIXED When checking for the existence of an encryption algo force to lowercase
+* FIXED Using secret_key instead of secret_iv during encryption/decryption
+* FIXED Updated POT file with missing translations
 
 = 2.4.7 (2021-06-24) =
 * ADDED Date search filters for email logs

@@ -37,7 +37,7 @@ class Main_Roles extends Roles {
 	 *
 	 * @return mixed|void
 	 */
-	public static function get_owner_roles (){
+	public static function get_owner_roles() {
 		return apply_filters( 'groundhogg/owner_roles', self::$owner_roles );
 	}
 
@@ -87,27 +87,30 @@ class Main_Roles extends Roles {
 					'publish_pages'          => true,
 					'publish_posts'          => true,
 					'read_private_pages'     => true,
-					'read_private_posts'     => true
+					'read_private_posts'     => true,
+					'view_admin_dashboard'   => true,
 				]
 			],
 			[
 				'role' => 'sales_manager',
 				'name' => _x( 'Sales Manager', 'role', 'groundhogg' ),
 				'caps' => [
-					'read'         => true,
-					'edit_posts'   => false,
-					'upload_files' => true,
-					'delete_posts' => false
+					'view_admin_dashboard' => true,
+					'read'                 => true,
+					'edit_posts'           => false,
+					'upload_files'         => true,
+					'delete_posts'         => false
 				]
 			],
 			[
 				'role' => 'sales_rep',
 				'name' => _x( 'Sales Representative', 'role', 'groundhogg' ),
 				'caps' => [
-					'read'         => true,
-					'edit_posts'   => false,
-					'upload_files' => true,
-					'delete_posts' => false
+					'view_admin_dashboard' => true,
+					'read'                 => true,
+					'edit_posts'           => false,
+					'upload_files'         => true,
+					'delete_posts'         => false
 				]
 			]
 		] );

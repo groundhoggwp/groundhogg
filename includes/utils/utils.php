@@ -2,8 +2,6 @@
 
 namespace Groundhogg;
 
-use GroundhoggSMS\Classes\SMS;
-
 class Utils {
 	/**
 	 * @var Location
@@ -186,8 +184,6 @@ class Utils {
 	public function encrypt_decrypt( $string, $action = 'e' ) {
 
 		// you may change these values to your own
-		$encrypt_method = "AES-256-CBC";
-
 		if ( ! self::$secret_key ){
 
 			self::$secret_key = get_option( 'gh_secret_key', false );
@@ -200,18 +196,18 @@ class Utils {
 
 		if ( ! self::$secret_iv ){
 
-			self::$secret_iv = get_option( 'gh_secret_key', false );
+			self::$secret_iv = get_option( 'gh_secret_iv', false );
 
 			if ( ! self::$secret_iv ){
 				self::$secret_iv = bin2hex( openssl_random_pseudo_bytes( 16 ) );
-				update_option( 'gh_secret_key', self::$secret_iv );
+				update_option( 'gh_secret_iv', self::$secret_iv );
 			}
 		}
 
-		if ( in_array( self::$encrypt_method, openssl_get_cipher_methods() ) ) {
+		if ( in_array( strtolower( self::$encrypt_method ), map_deep( openssl_get_cipher_methods(), 'strtolower' ) ) ) {
 
 			//backwards compat
-			if ( ctype_xdigit( self::$secret_key ) ) {
+			if ( function_exists( 'ctype_xdigit' ) && ctype_xdigit( self::$secret_key ) ) {
 				self::$secret_key = hex2bin( self::$secret_key );
 				self::$secret_iv  = hex2bin( self::$secret_iv );
 			}
@@ -221,9 +217,9 @@ class Utils {
 			$iv     = substr( hash( 'sha256', self::$secret_iv ), 0, 16 );
 
 			if ( $action == 'e' ) {
-				$output = base64_encode( openssl_encrypt( $string, $encrypt_method, $key, 0, $iv ) );
+				$output = base64_encode( openssl_encrypt( $string, self::$encrypt_method, $key, 0, $iv ) );
 			} else if ( $action == 'd' ) {
-				$output = openssl_decrypt( base64_decode( $string ), $encrypt_method, $key, 0, $iv );
+				$output = openssl_decrypt( base64_decode( $string ), self::$encrypt_method, $key, 0, $iv );
 			}
 		} else {
 			if ( $action == 'e' ) {

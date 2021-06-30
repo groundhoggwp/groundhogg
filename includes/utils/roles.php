@@ -24,14 +24,12 @@ abstract class Roles {
 	 * Roles constructor.
 	 */
 	public function __construct() {
-		add_action( 'admin_init', [ $this, 'install_roles_and_caps' ] );
+		add_action( 'groundhogg/activated', [ $this, 'install_roles_and_caps' ] );
 	}
 
 	public function install_roles_and_caps() {
-		if ( ! $this->roles_are_installed() ) {
-			$this->add_roles();
-			$this->add_caps();
-		}
+		$this->add_roles();
+		$this->add_caps();
 	}
 
 	public function remove_roles_and_caps() {

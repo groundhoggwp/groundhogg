@@ -399,8 +399,20 @@ class Main_Updater extends Updater {
 	/**
 	 * Refactor notes db
 	 */
-	public function version_2_4_6(){
+	public function version_2_4_6() {
 		get_db( 'notes' )->update_2_4_6();
+	}
+
+	/**
+	 * Refactor notes db
+	 */
+	public function version_2_4_7_1() {
+		// Create missing table
+		get_db( 'activitymeta' )->create_table();
+
+		// For woocommerce, unable to see admin dashboard
+		wp_roles()->add_cap( 'sales_rep', 'view_admin_dashboard' );
+		wp_roles()->add_cap( 'sales_manager', 'view_admin_dashboard' );
 	}
 
 	/**
@@ -449,6 +461,7 @@ class Main_Updater extends Updater {
 			'2.3',
 			'2.3.3',
 			'2.4.5.5',
+			'2.4.7.1',
 			'2.4.6'
 		];
 	}
@@ -473,6 +486,7 @@ class Main_Updater extends Updater {
 			'2.2.22',
 			'2.2.22.3',
 			'2.3',
+			'2.4.7.1',
 		];
 	}
 
@@ -513,6 +527,7 @@ class Main_Updater extends Updater {
 			'2.3.3'         => __( 'Separate GDPR consent into Data Processing consent and Marketing consent', 'groundhogg' ),
 			'2.4.5.5'       => __( 'Fix tag counts and delete orphaned object meta.', 'groundhogg' ),
 			'2.4.6'         => __( 'Refactor notes to abstract data type for support across more objects.', 'groundhogg' ),
+			'2.4.7.1'       => __( 'Add <code>view_admin_dashboard</code> capability to Sales Representative and Sales Manager', 'groundhogg' ),
 		];
 	}
 }
