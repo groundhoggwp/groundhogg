@@ -2,8 +2,6 @@
 
 namespace Groundhogg\DB;
 
-use function Groundhogg\get_db;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -62,9 +60,24 @@ class Object_Relationships extends DB {
 	 * Clean up after tag/contact is deleted.
 	 */
 	protected function add_additional_actions() {
-		add_action( 'groundhogg/db/post_delete/contact', [ $this, 'contact_deleted' ], 10, 3 );
-		add_action( 'groundhogg/db/post_delete/tag', [ $this, 'tag_deleted' ], 10, 3 );
+		add_action( 'groundhogg/db/post_delete', [ $this, 'object_deleted' ], 10, 4 );
 		parent::add_additional_actions();
+	}
+
+	public function object_deleted( $object_type, $id_or_where, $formats, $table ) {
+
+		if ( is_int( $id_or_where ) ) {
+			$this->delete( [
+				'primary_object_type' => $object_type,
+				'primary_object_id'   => $id_or_where
+			] );
+
+			$this->delete( [
+				'secondary_object_type' => $object_type,
+				'secondary_object_id'   => $id_or_where
+			] );
+		}
+
 	}
 
 	/**

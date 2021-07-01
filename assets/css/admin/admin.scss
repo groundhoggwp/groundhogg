@@ -477,60 +477,6 @@ table.wp-list-table.funnels td.column-active_contacts {
     width: 100px;
 }
 
-.dropdown-button {
-    position: relative;
-}
-
-.dropdown-button .button.dropdown::after {
-    content: "\f347";
-    display: inline-block;
-    font: normal 18px/1 dashicons;
-    vertical-align: middle;
-    margin-left: 5px;
-    speak: never;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-decoration: none;
-}
-
-.dropdown-button ul.dropdown.menu {
-    position: absolute;
-    left: 0;
-    display: none;
-}
-
-.dropdown-button ul.dropdown.menu.show {
-    display: flex;
-    flex-direction: column;
-    z-index: 999;
-    margin: 0;
-    padding: 10px 0;
-    border: 1px solid #ccd0d4;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
-    background: #fff;
-    width: max-content;
-    border-radius: 3px;
-}
-
-.dropdown-button ul.dropdown.menu li a {
-    padding: 10px;
-    display: block;
-    text-decoration: none;
-}
-
-.dropdown-button ul.dropdown.menu li a:hover {
-    background: #f7f7f7;
-}
-
-.dropdown-button .dropdown-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 998;
-}
-
 label.block{
     display: block;
 }

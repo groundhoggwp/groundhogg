@@ -142,6 +142,31 @@
   }
 
   /**
+   * Api based tag picker
+   *
+   * @param selector
+   * @param multiple
+   * @param onReceiveItems
+   */
+  function campaignPicker (selector, multiple = true, onReceiveItems = (items) => {}) {
+    return apiPicker(selector, gh.api.routes.v4.campaigns, multiple, true,
+      (data) => {
+
+        onReceiveItems(data.items)
+
+        return data.items.map(item => ({
+          id: item.ID,
+          text: `${item.data.name}`
+        }))
+      },
+      (query) => {
+        return {
+          search: query.term
+        }
+      })
+  }
+
+  /**
    * Api based email picker
    *
    * @param selector
@@ -206,7 +231,8 @@
     emailPicker,
     apiPicker,
     linkPicker,
-    metaPicker
+    metaPicker,
+    campaignPicker
   }
 
   // Map functions to Groundhogg object.

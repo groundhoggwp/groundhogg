@@ -21,6 +21,14 @@ $action-green: rgb(158, 206, 56);
 $action-green-50: rgba(158, 206, 56, 0.5);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
+body{
+  &.modal-open{
+    .select2-dropdown{
+      z-index: 999999;
+    }
+  }
+}
+
 .gh-header {
   display: flex;
   justify-content: space-between;
@@ -31,7 +39,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   min-height: 60px;
   box-sizing: border-box;
 
-  &.is-sticky{
+  &.is-sticky {
     position: sticky;
     top: 32px;
     z-index: 10000;
@@ -131,6 +139,7 @@ span.gh-text {
   }
 }
 
+a,
 button {
   cursor: pointer;
 
@@ -150,6 +159,10 @@ button {
   }
 
   &.gh-button {
+
+    text-decoration: none;
+    white-space: nowrap;
+
     border: none;
     color: #FFFFFF;
     border-radius: 5px;
@@ -368,7 +381,7 @@ button {
   justify-content: center;
   position: fixed;
   width: 100%;
-  z-index: 100000;
+  z-index: 10000;
   bottom: 0;
   left: 0;
   right: 0;
@@ -627,6 +640,7 @@ p.error,
 
 .gh-dropdown-menu {
 
+  box-sizing: border-box;
   z-index: 10000;
   position: fixed;
   display: flex;
@@ -634,10 +648,14 @@ p.error,
   background: #FFFFFF;
   box-shadow: $box-shadow;
   min-width: 120px;
-  border-radius: 5px;
-  border: 1px solid $primary-dark-15;
+  border-radius: 5px 0 5px 5px;
+  border: 1px solid #8c8f94;
   padding: 5px;
   gap: 5px;
+
+  * {
+    box-sizing: border-box;
+  }
 
   &-item {
     padding: 5px 10px;

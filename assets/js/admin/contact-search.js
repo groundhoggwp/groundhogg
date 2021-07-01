@@ -9,10 +9,17 @@
     input,
     loadingDots,
     copyObject,
-    objectEquals
+    objectEquals,
+    moreMenu,
+    select,
+    dangerConfirmationModal,
+    confirmationModal,
+    clickInsideElement
+
   } = Groundhogg.element
   const { post, get, patch, routes } = Groundhogg.api
-  const { searches: SearchesStore } = Groundhogg.stores
+  const { searches: SearchesStore, contacts: ContactsStore, tags: TagsStore } = Groundhogg.stores
+  const { tagPicker } = Groundhogg.pickers
 
   SearchesStore.itemsFetched(ContactSearch.searches)
 
@@ -112,7 +119,7 @@
       //language=HTML
       return `
 		  <button class="enable-filters white" style="padding-right: 10px"><span
-			  class="dashicons dashicons-filter"></span> ${ this.currentSearch ? 'Edit Filters' : 'Filter Contacts' }
+			  class="dashicons dashicons-filter"></span> ${this.currentSearch ? 'Edit Filters' : 'Filter Contacts'}
 		  </button>
 		  ${this.savedSearchEnabled
 			  ? `<div id="searches-picker"></div>`
@@ -311,6 +318,179 @@
 
   $(function () {
     SearchApp.init()
+  })
+
+  // More Actions
+  $(() => {
+
+    $('.gh-actions').append(`<button type="button" class="more-actions button button-secondary">More Actions</button>`)
+    $('.more-actions').on('click', (e) => {
+
+      console.log(e.currentTarget)
+
+      moreMenu(e.currentTarget, {
+        items: [
+          {
+            key: 'delete',
+            text: `<span class="gh-text danger">Delete</span>`
+          }
+        ],
+        onSelect: (key) => {
+          switch (key) {
+            case 'delete':
+              dangerConfirmationModal({
+                alert: `<p>Are you sure you want to delete <b>${ContactsTable.total_items_formatted}</b> contacts?</p>`
+              })
+              break
+          }
+        }
+      })
+    })
+
+  })
+
+  // QuickEdit
+  $(() => {
+
+    ContactsStore.itemsFetched(ContactsTable.items)
+
+    $(document).on('click', '.editinline', (e) => {
+
+      const ID = parseInt(e.currentTarget.dataset.id)
+
+      const contact = ContactsStore.get(ID)
+
+      TagsStore.itemsFetched(contact.tags)
+
+      const quickEdit = (editingName = false) => {
+
+        // language=HTML
+        return `
+			<div class="contact-quick-edit" tabindex="0">
+				<div class="contact-quick-edit-header">
+					<div class="avatar-and-name">
+						<img height="50" width="50" src="${contact.data.gravatar}" alt="avatar"/>
+						<h2 class="contact-name">
+							${specialChars(`${contact.data.first_name} ${contact.data.last_name}`)}</h2>
+					</div>
+					<div class="actions">
+						<a class="gh-button secondary" href="${contact.admin}">Edit Full Profile</a>
+					</div>
+				</div>
+				<div class="contact-quick-edit-fields">
+					<div class="row">
+						<div class="col">
+							<label for="quick-edit-first-name">First Name</label>
+							${input({
+								id: 'quick-edit-first-name',
+								value: contact.data.first_name,
+							})}
+						</div>
+						<div class="col">
+							<label for="quick-edit-last-name">Last Name</label>
+							${input({
+								id: 'quick-edit-last-name',
+								value: contact.data.last_name,
+							})}
+						</div>
+					</div>
+					<div class="row">
+						<div class="col">
+							<label for="quick-edit-email">Email Address</label>
+							${input({
+								type: 'email',
+								id: 'quick-edit-email',
+								value: contact.data.email
+							})}
+						</div>
+						<div class="col">
+							<div class="row phone">
+								<div class="col">
+									<label for="quick-edit-primary-phone">Primary Phone</label>
+									${input({
+										type: 'tel',
+										id: 'quick-edit-primary-phone',
+										value: contact.meta.primary_phone
+									})}
+								</div>
+								<div class="primary-phone-ext">
+									<label for="quick-edit-primary-phone">Ext.</label>
+									${input({
+										type: 'number',
+										id: 'quick-edit-primary-phone-ext',
+										value: contact.meta.primary_phone_ext
+									})}
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col">
+							<label for="quick-edit-email">Optin Status</label>
+							${select({
+								id: 'quick-edit-optin-status',
+							}, Groundhogg.filters.optin_status, contact.data.optin_status)}
+						</div>
+						<div class="col">
+							<label for="quick-edit-primary-phone">Mobile Phone</label>
+							${input({
+								type: 'tel',
+								id: 'quick-edit-mobile-phone',
+								value: contact.meta.mobile_phone
+							})}
+						</div>
+					</div>
+					<div class="row">
+						<div class="col">
+							<label for="quick-edit-email">Owner</label>
+							${select({
+								id: 'quick-edit-owner',
+							}, Groundhogg.filters.owners.map(u => ({
+								text: u.data.user_email,
+								value: u.ID
+							})), contact.data.owner_id)}
+						</div>
+						<div class="col">
+							<label for="quick-edit-tags">Tags</label>
+							${select({
+								id: 'quick-edit-tags',
+								multiple: true
+							}, TagsStore.getItems().map(t => ({
+								value: t.ID,
+								text: t.data.tag_name
+							})), contact.tags.map(t => t.ID))}
+						</div>
+					</div>
+				</div>
+			</div>`
+      }
+
+      const { close, setContent } = modal({
+        content: quickEdit(),
+      })
+
+      const quickEditMounted = () => {
+
+        const $quickEdit = $('.contact-quick-edit')
+
+        $quickEdit.focus()
+
+        tagPicker('#quick-edit-tags', true, (items) => {TagsStore.itemsFetched(items)})
+
+        $('#quick-edit-first-name').on('change', (e) => {
+          const first_name = e.target.value
+
+          ContactsStore.patch(contact.ID, {
+            data: {
+              first_name
+            }
+          })
+        })
+      }
+
+      quickEditMounted()
+    })
+
   })
 
 })(jQuery)

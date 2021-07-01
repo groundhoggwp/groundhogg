@@ -175,7 +175,7 @@ class Scripts {
 
 		wp_register_script( 'groundhogg-admin-contact-search', GROUNDHOGG_ASSETS_URL . 'js/admin/contact-search' . $dot_min . '.js', [
 			'groundhogg-admin-search-filters',
-		], GROUNDHOGG_VERSION );
+		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-insert-at-cursor', GROUNDHOGG_ASSETS_URL . 'js/admin/insert-at-cursor' . $dot_min . '.js', [
 			'jquery',
@@ -219,6 +219,7 @@ class Scripts {
 			'jquery',
 			'groundhogg-admin'
 		], GROUNDHOGG_VERSION, true );
+
 		wp_register_script( 'groundhogg-admin-dashboard', GROUNDHOGG_ASSETS_URL . 'js/admin/dashboard' . $dot_min . '.js', [
 			'jquery',
 			'papaparse'
@@ -238,6 +239,7 @@ class Scripts {
 			'groundhogg-admin-functions',
 			'groundhogg-admin-replacements-picker',
 			'groundhogg-admin-emojis-picker',
+			'groundhogg-block-editor'
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-add-funnel', GROUNDHOGG_ASSETS_URL . '/js/admin/add-funnel' . $dot_min . '.js', [
@@ -375,14 +377,15 @@ class Scripts {
 						'contacts' => rest_url( 'gh/v3/contacts?select2=true' ),
 					],
 					'v4' => [
-						'root'     => rest_url( Base_Api::NAME_SPACE ),
-						'tags'     => rest_url( Base_Api::NAME_SPACE . '/tags' ),
-						'contacts' => rest_url( Base_Api::NAME_SPACE . '/contacts' ),
-						'emails'   => rest_url( Base_Api::NAME_SPACE . '/emails' ),
-						'funnels'  => rest_url( Base_Api::NAME_SPACE . '/funnels' ),
-						'steps'    => rest_url( Base_Api::NAME_SPACE . '/steps' ),
-						'searches' => rest_url( Base_Api::NAME_SPACE . '/searches' ),
-						'reports'  => rest_url( Base_Api::NAME_SPACE . '/reports' )
+						'root'      => rest_url( Base_Api::NAME_SPACE ),
+						'tags'      => rest_url( Base_Api::NAME_SPACE . '/tags' ),
+						'contacts'  => rest_url( Base_Api::NAME_SPACE . '/contacts' ),
+						'emails'    => rest_url( Base_Api::NAME_SPACE . '/emails' ),
+						'funnels'   => rest_url( Base_Api::NAME_SPACE . '/funnels' ),
+						'steps'     => rest_url( Base_Api::NAME_SPACE . '/steps' ),
+						'searches'  => rest_url( Base_Api::NAME_SPACE . '/searches' ),
+						'reports'   => rest_url( Base_Api::NAME_SPACE . '/reports' ),
+						'campaigns' => rest_url( Base_Api::NAME_SPACE . '/campaigns' )
 					]
 				]
 			],
@@ -410,6 +413,18 @@ class Scripts {
 		] );
 
 		wp_register_script( 'groundhogg-admin-fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
+
+		$asset_file = include_once( GROUNDHOGG_PATH . 'build/index.asset.php' );
+
+		wp_register_script(
+			'groundhogg-block-editor',
+			GROUNDHOGG_URL . 'build/index.js',
+			array_merge( [
+				'wp-core-data',
+			], (array)$asset_file['dependencies'] ),
+			$asset_file['version'],
+			true
+		);
 
 		do_action( 'groundhogg/scripts/after_register_admin_scripts', $this->is_script_debug_enabled(), $dot_min );
 	}

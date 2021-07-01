@@ -1,3 +1,7 @@
+body.modal-open .select2-dropdown {
+  z-index: 999999;
+}
+
 .gh-header {
   display: flex;
   justify-content: space-between;
@@ -84,22 +88,29 @@ span.gh-text.danger {
   gap: 5px;
 }
 
+a,
 button {
   cursor: pointer;
 }
+a.dashicon-button,
 button.dashicon-button {
   border: none;
   background: none;
   opacity: 0.8;
 }
+a.dashicon-button:hover,
 button.dashicon-button:hover {
   opacity: 1;
 }
+a.dashicon-button:disabled,
 button.dashicon-button:disabled {
   opacity: 0.5;
   cursor: initial;
 }
+a.gh-button,
 button.gh-button {
+  text-decoration: none;
+  white-space: nowrap;
   border: none;
   color: #FFFFFF;
   border-radius: 5px;
@@ -107,85 +118,106 @@ button.gh-button {
   font-size: 16px;
   font-weight: 400;
 }
+a.gh-button:disabled,
 button.gh-button:disabled {
   opacity: 0.5;
   cursor: initial;
 }
+a.gh-button.action,
 button.gh-button.action {
   background: #9ece38;
 }
+a.gh-button.action:hover:not(:disabled),
 button.gh-button.action:hover:not(:disabled) {
   background: #80a92a;
 }
+a.gh-button.primary,
 button.gh-button.primary {
   background: #0075ff;
 }
+a.gh-button.primary.text,
 button.gh-button.primary.text {
   background-color: transparent;
   color: #0075ff;
 }
+a.gh-button.primary:hover:not(:disabled),
 button.gh-button.primary:hover:not(:disabled) {
   background: #005ecc;
 }
+a.gh-button.primary:hover:not(:disabled).text,
 button.gh-button.primary:hover:not(:disabled).text {
   background-color: rgba(0, 117, 255, 0.1);
   color: #0075ff;
 }
+a.gh-button.secondary,
 button.gh-button.secondary {
   border: 1px solid rgba(0, 117, 255, 0.6);
   background: #FFFFFF;
   color: #0075ff;
   padding: 5px 10px;
 }
+a.gh-button.secondary.text,
 button.gh-button.secondary.text {
   border: none;
   background: transparent;
   color: #102640;
 }
+a.gh-button.secondary:hover:not(:disabled),
 button.gh-button.secondary:hover:not(:disabled) {
   color: #005ecc;
   border-color: #0075ff;
   background-color: rgba(0, 117, 255, 0.02);
 }
+a.gh-button.secondary:hover:not(:disabled).text,
 button.gh-button.secondary:hover:not(:disabled).text {
   border: none;
   background: rgba(16, 38, 64, 0.1);
   color: #102640;
 }
+a.gh-button.danger,
 button.gh-button.danger {
   background: #e91f4f;
 }
+a.gh-button.danger.text,
 button.gh-button.danger.text {
   color: #e91f4f;
   background-color: transparent;
 }
+a.gh-button.danger:hover:not(:disabled),
 button.gh-button.danger:hover:not(:disabled) {
   background: #c2133d;
 }
+a.gh-button.danger:hover:not(:disabled).text,
 button.gh-button.danger:hover:not(:disabled).text {
   color: #e91f4f;
   background-color: rgba(233, 31, 79, 0.1);
 }
+a.gh-button.icon,
 button.gh-button.icon {
   padding: 7px;
   display: flex;
   align-items: center;
 }
+a.gh-button.icon svg,
 button.gh-button.icon svg {
   width: 20px;
   height: 20px;
 }
+a.gh-button.big,
 button.gh-button.big {
   font-size: 24px;
   padding: 15px 32px;
 }
+a.gh-button.medium,
 button.gh-button.medium {
   font-size: 18px;
   padding: 11px 22px;
 }
+a.gh-button.bold,
 button.gh-button.bold {
   font-weight: 700;
 }
+a.gh-button.loud,
 button.gh-button.loud {
   text-transform: uppercase;
 }
@@ -262,7 +294,7 @@ button.gh-button.loud {
   justify-content: center;
   position: fixed;
   width: 100%;
-  z-index: 100000;
+  z-index: 10000;
   bottom: 0;
   left: 0;
   right: 0;
@@ -458,6 +490,7 @@ p.error,
 }
 
 .gh-dropdown-menu {
+  box-sizing: border-box;
   z-index: 10000;
   position: fixed;
   display: flex;
@@ -465,10 +498,13 @@ p.error,
   background: #FFFFFF;
   box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   min-width: 120px;
-  border-radius: 5px;
-  border: 1px solid rgba(16, 38, 64, 0.15);
+  border-radius: 5px 0 5px 5px;
+  border: 1px solid #8c8f94;
   padding: 5px;
   gap: 5px;
+}
+.gh-dropdown-menu * {
+  box-sizing: border-box;
 }
 .gh-dropdown-menu-item {
   padding: 5px 10px;

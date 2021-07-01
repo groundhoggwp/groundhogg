@@ -405,7 +405,7 @@ class Send_Email extends Action {
 	 * Process the apply note step...
 	 *
 	 * @param $contact Contact
-	 * @param $event Event
+	 * @param $event   Event
 	 *
 	 * @return bool|\WP_Error
 	 */
@@ -484,10 +484,7 @@ class Send_Email extends Action {
 			return $args;
 		}
 
-		$args['subject']    = $email->get_subject_line();
-		$args['title']      = $email->get_title();
-		$args['pre_header'] = $email->get_pre_header();
-		$args['content']    = $email->get_content();
+		$args['email'] = $email;
 
 		return $args;
 	}

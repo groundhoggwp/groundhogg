@@ -166,8 +166,6 @@ abstract class Base_Object_With_Meta extends Base_Object {
 			return true;
 		}
 
-//		print_r( [ $this->get_id(), $key, $value ] );
-
 		return false;
 	}
 

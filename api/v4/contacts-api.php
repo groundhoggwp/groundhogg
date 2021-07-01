@@ -355,7 +355,7 @@ class Contacts_Api extends Base_Object_Api {
 		$email_address = get_array_var( $data, 'email' );
 
 		// will return false if the email address is not being used
-		if ( is_email_address_in_use( $email_address, $contact ) ) {
+		if ( $email_address && is_email_address_in_use( $email_address, $contact ) ) {
 			return self::ERROR_409( 'error', 'Email address already in use.' );
 		}
 
@@ -660,10 +660,7 @@ class Contacts_Api extends Base_Object_Api {
 			<?php
 			$contacts_table->prepare_items();
 			$contacts_table->display();
-
-			if ( $contacts_table->has_items() ) {
-				$contacts_table->inline_edit();
-			} ?>
+			?>
 		</form>
 		<?php
 

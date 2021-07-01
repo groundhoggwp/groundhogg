@@ -3469,7 +3469,7 @@ function parse_inline_styles( $style ) {
 
 		$rule              = explode( ':', $bit );
 		$attribute         = sanitize_key( $rule[0] );
-		$value             = trim( $rule[1] );
+		$value             = trim( get_array_var( $rule, 1, '' ) );
 		$css[ $attribute ] = $value;
 	}
 
@@ -5175,4 +5175,17 @@ function compare_dates( &$before, &$after ) {
 	} else {
 		return false;
 	}
+}
+
+/**
+ * Create an Object extending Base_Object given very little information
+ *
+ * @param $object      mixed
+ * @param $object_type string
+ */
+function create_object_from_type( $object, $object_type ) {
+
+	$table = Plugin::instance()->dbs->get_object_db_by_object_type( $object_type );
+
+	return $table->create_object( $object );
 }

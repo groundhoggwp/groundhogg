@@ -183,6 +183,11 @@ class Manager {
 		$this->dbs[ $key ] = $value;
 	}
 
+	/**
+	 * @param $type
+	 *
+	 * @return DB
+	 */
 	public function get_object_db_by_object_type( $type ) {
 
 		$dbs = array_filter( $this->dbs, function ( $db ) use ( $type ) {

@@ -312,8 +312,9 @@ class Funnel extends Base_Object_With_Meta {
 	 */
 	public function get_as_array() {
 		return array_merge( parent::get_as_array(), [
-			'steps' => $this->get_steps(),
-			'links' => [
+			'steps'     => $this->get_steps(),
+			'campaigns' => $this->get_related_objects( 'campaign' ),
+			'links'     => [
 				'export' => $this->export_url(),
 				'report' => admin_page_url( 'gh_reporting', [
 					'tab'         => 'v3',

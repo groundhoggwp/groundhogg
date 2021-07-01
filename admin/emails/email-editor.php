@@ -11,7 +11,7 @@
         selector: '#email-editor',
         email: GroundhoggEmail,
         onChange: ( email ) => {
-          console.log( email )
+          // console.log( email )
         }
       }).mount()
 

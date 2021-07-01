@@ -537,4 +537,56 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			'action'                 => 'edit'
 		] );
 	}
+
+	protected function get_rel_db() {
+		return get_db( 'object_relationships' );
+	}
+
+	/**
+	 * Get any objects related to this object
+	 *
+	 * @param false $secondary_type
+	 */
+	public function get_related_objects( $secondary_type = false ) {
+
+		$relationships = $this->get_rel_db()->query( array_filter( [
+			'primary_object_id'     => $this->get_id(),
+			'primary_object_type'   => $this->get_object_type(),
+			'secondary_object_type' => $secondary_type
+		] ) );
+
+		return array_map( function ( $rel ) {
+			return create_object_from_type( $rel->secondary_object_id, $rel->secondary_object_type );
+		}, $relationships );
+	}
+
+	/**
+	 * Create a relationship between this object and another object
+	 *
+	 * @param $other Base_Object
+	 */
+	public function create_relationship( $other ) {
+		return $this->get_rel_db()->add( [
+			'primary_object_id'     => $this->get_id(),
+			'primary_object_type'   => $this->get_object_type(),
+			'secondary_object_id'   => $other->get_id(),
+			'secondary_object_type' => $other->get_object_type(),
+		] );
+	}
+
+	/**
+	 * Delete a relationship between this object and another object
+	 *
+	 * @param $other Base_Object
+	 *
+	 * @return false|int
+	 */
+	public function delete_relationship( $other ) {
+		return $this->get_rel_db()->delete( [
+			'primary_object_id'     => $this->get_id(),
+			'primary_object_type'   => $this->get_object_type(),
+			'secondary_object_id'   => $other->get_id(),
+			'secondary_object_type' => $other->get_object_type(),
+		] );
+	}
 }

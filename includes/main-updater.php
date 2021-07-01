@@ -399,7 +399,7 @@ class Main_Updater extends Updater {
 	/**
 	 * Refactor notes db
 	 */
-	public function version_2_4_6(){
+	public function version_2_4_6() {
 		get_db( 'notes' )->update_2_4_6();
 	}
 
@@ -421,6 +421,17 @@ class Main_Updater extends Updater {
 		// For woocommerce, unable to see admin dashboard
 		wp_roles()->add_cap( 'sales_rep', 'view_admin_dashboard' );
 		wp_roles()->add_cap( 'sales_manager', 'view_admin_dashboard' );
+	}
+
+	/**
+	 * Refactor notes db
+	 */
+	public function version_3_0() {
+		// For woocommerce, unable to see admin dashboard
+		wp_roles()->add_cap( 'marketer', 'manage_campaigns' );
+		wp_roles()->add_cap( 'marketer', 'export_funnels' );
+		wp_roles()->add_cap( 'administrator', 'manage_campaigns' );
+		wp_roles()->add_cap( 'administrator', 'export_funnels' );
 	}
 
 	/**
@@ -472,6 +483,7 @@ class Main_Updater extends Updater {
 			'2.4.6',
 			'2.4.7',
 			'2.4.7.1',
+			'3.0',
 		];
 	}
 
@@ -497,6 +509,7 @@ class Main_Updater extends Updater {
 			'2.3',
 			'2.4.7',
 			'2.4.7.1',
+			'3.0',
 		];
 	}
 

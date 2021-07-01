@@ -3,6 +3,9 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use Groundhogg\Base_Object;
+use Groundhogg\DB_Object;
+use Groundhogg\DB_Object_With_Meta;
 use Groundhogg\Plugin;
 use function Groundhogg\get_array_var;
 use function Groundhogg\is_option_enabled;
@@ -205,6 +208,28 @@ abstract class DB {
 	 * @return string
 	 */
 	abstract public function get_object_type();
+
+	/**
+	 * @param $object Base_Object
+	 */
+	public function create_object( $object ) {
+		$meta_table = $this->get_meta_table();
+
+		if ( $meta_table ) {
+			return new DB_Object_With_Meta( $this, $meta_table, $object );
+		}
+
+		return new DB_Object( $this, $object );
+	}
+
+	/**
+	 * Get the associated meta table
+	 *
+	 * @return mixed|null
+	 */
+	public function get_meta_table() {
+		return Plugin::instance()->dbs->get_meta_db_by_object_type( $this->get_object_type() );
+	}
 
 	/**
 	 * Gets the max index length
@@ -771,6 +796,7 @@ abstract class DB {
 		$column_formats = array_merge( array_flip( $data_keys ), $column_formats );
 
 		do_action( 'groundhogg/db/pre_delete/' . $this->get_object_type(), $by_primary ? $id : $where, $column_formats, $this );
+		do_action( 'groundhogg/db/pre_delete', $this->get_object_type(), $by_primary ? $id : $where, $column_formats, $this );
 
 		if ( false === $wpdb->delete( $this->table_name, $where, $column_formats ) ) {
 			return false;
@@ -779,6 +805,7 @@ abstract class DB {
 		$this->cache_set_last_changed();
 
 		do_action( 'groundhogg/db/post_delete/' . $this->get_object_type(), $by_primary ? $id : $where, $column_formats, $this );
+		do_action( 'groundhogg/db/post_delete', $this->get_object_type(), $by_primary ? $id : $where, $column_formats, $this );
 
 		return true;
 	}
@@ -1019,8 +1046,12 @@ abstract class DB {
 		$orderby = $query_vars['orderby'] && in_array( $query_vars['orderby'], $this->get_allowed_columns() ) ? sprintf( 'ORDER BY %s', $query_vars['orderby'] ) : '';
 		$groupby = $query_vars['groupby'] && in_array( $query_vars['groupby'], $this->get_allowed_columns() ) ? sprintf( 'GROUP BY %s', $query_vars['groupby'] ) : '';
 
-		$query_vars['order'] = strtoupper( $query_vars['order'] );
-		$order               = in_array( $query_vars['order'], [ 'ASC', 'DESC' ] ) ? $query_vars['order'] : '';
+		$order = '';
+
+		if ( $orderby ) {
+			$query_vars['order'] = strtoupper( $query_vars['order'] );
+			$order               = in_array( $query_vars['order'], [ 'ASC', 'DESC' ] ) ? $query_vars['order'] : '';
+		}
 
 		$clauses = [
 			'where'   => $where,

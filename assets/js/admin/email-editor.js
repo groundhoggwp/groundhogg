@@ -14,11 +14,13 @@
     isValidEmail,
     modal,
     loadingDots,
+    objectEquals,
     codeEditor,
     savingModal,
   } = Groundhogg.element
   const { post, get, patch, routes } = Groundhogg.api
   const { user_test_email } = Groundhogg
+  const { emails: EmailsStore } = Groundhogg.stores
 
   const setFrameContent = (frame, content) => {
     var blob = new Blob([content], { type: 'text/html; charset=utf-8' })
@@ -92,10 +94,10 @@
         // language=HTML
         return `
 			<div class="title-wrap">
-          <h1 class="breadcrumbs">${breadcrumbs([
-              ...crumbs,
-              this.isEditingTitle ? titleEdit() : titleDisplay()
-          ])}</h1>
+				<h1 class="breadcrumbs">${breadcrumbs([
+					...crumbs,
+					this.isEditingTitle ? titleEdit() : titleDisplay()
+				])}</h1>
 			</div>
 			<div class="actions">
 				<div class="undo-and-redo">
@@ -105,7 +107,8 @@
 						class="dashicons dashicons-undo"></span></button>
 				</div>
 				<div class="publish-actions">
-					<button id="commit" class="gh-button primary">Update</button>
+					${this.email.data.status === 'ready' ? `<button id="to-draft" class="gh-button danger text">Back to draft</button>
+					<button id="commit" class="gh-button primary" ${this.hasChanges() ? '' : 'disabled'}>Update</button>` : `<button id="commit" class="gh-button action">Publish</button>`}
 				</div>
 				${afterPublishActions}
 			</div>
@@ -149,11 +152,7 @@
         // language=HTML
         return `
 			<div class="email-content-wrap">
-				${textarea({
-					id: 'content',
-					name: 'content',
-					value: content,
-				})}
+				<div id="content"></div>
 			</div>`
       },
 
@@ -287,18 +286,23 @@
         this.abortController = new AbortController()
         const { signal } = this.abortController
 
-        post(
-          `${routes.v4.emails}/${this.email.ID}/meta`,
-          {
-            edited: this.edited,
+        EmailsStore.patch(this.email.ID, {
+            meta: {
+              edited: this.edited
+            },
           },
           {
             signal,
           }
-        ).then(() => {
+        ).then((e) => {
+          this.loadEmail(e)
           this.abortController = null
         })
       }, 3000)
+    },
+
+    hasChanges () {
+      return !objectEquals(this.email.data, this.edited.data)
     },
 
     commitChanges () {
@@ -310,12 +314,33 @@
 
       const { close } = savingModal()
 
-      patch(`${routes.v4.emails}/${this.email.ID}`, {
-        data: this.edited.data,
-        meta: this.edited.meta,
-      }).then((d) => {
-        this.loadEmail(d.item)
-        onCommit(this.email)
+      console.log({
+        data: {
+          ...this.edited.data,
+          status: 'ready',
+          title: this.email.data.title
+        },
+        meta: {
+          ...this.edited.meta
+        }
+      })
+
+      EmailsStore.patch(this.email.ID, {
+        data: {
+          ...this.edited.data,
+          status: 'ready',
+          title: this.email.data.title
+        },
+        meta: {
+          ...this.edited.meta,
+          edited: {
+            ...this.edited
+          }
+        },
+      }).then((e) => {
+        this.loadEmail(e)
+        this.mount()
+        onCommit(e)
         close()
       })
     },
@@ -347,13 +372,19 @@
     mount () {
       improveTinyMCE()
 
+      if (this.mounted) {
+        this.demount()
+      }
+
+      this.mounted = true
+
       this.loadEmail(this.email)
       this.$el.html(this.render())
       this.onMount()
     },
 
     loadEmail (email) {
-      console.log(email)
+      // console.log(email)
 
       this.email = copyObject(email)
 
@@ -376,13 +407,11 @@
           this.updateEmailData({
             content: content,
           })
-        }, 300)
+          mountHeader()
+        }, 150)
       }
 
       const mainContentMount = () => {
-        $('#commit').on('click', () => {
-          this.commitChanges()
-        })
 
         if (this.edited.meta.type === 'html') {
 
@@ -395,20 +424,14 @@
           this.codemirror = editor
 
         } else {
-          tinymceElement(
-            'content',
-            {
-              tinymce: true,
-              quicktags: true,
-            },
-            handleContentOnChange
-          )
+          GroundhoggBlockEditor( document.querySelector('#content'), this.edited.data.content, handleContentOnChange )
         }
 
-        $('#subject, #preview-text').on('change input', (e) => {
+        $('#subject, #preview-text').on('change', (e) => {
           this.updateEmailData({
             [e.target.name]: e.target.value,
           })
+          mountHeader()
         })
 
         const getHeadersArray = () => {
@@ -442,9 +465,12 @@
               headers[key] = value
             })
 
+            // console.log( headers )
+
             this.updateEmailMeta({
               custom_headers: headers,
             })
+            mountHeader()
           },
         })
 
@@ -453,10 +479,41 @@
 
       const mountHeader = () => {
         $('#email-editor-header').html(this.components.header.call(this))
-        headerMount()
+        headerMounted()
       }
 
-      const headerMount = () => {
+      const headerMounted = () => {
+
+        $('#commit').on('click', () => {
+          this.commitChanges()
+        })
+
+        $('#to-draft').on('click', () => {
+
+          const { close } = savingModal()
+
+          EmailsStore.patch(this.email.ID, {
+            data: {
+              status: 'draft'
+            }
+          }).then((e) => {
+            this.loadEmail(e)
+            close()
+            mountHeader()
+          })
+
+        })
+
+        $('.undo-and-redo .undo').on('click', (e) => {
+          this.undo()
+          $('.undo-and-redo .undo').focus()
+        })
+
+
+        $('.undo-and-redo .redo').on('click', (e) => {
+          this.redo()
+          $('.undo-and-redo .redo').focus()
+        })
 
         if (!this.isEditingTitle) {
           $('#email-title').on('click', (e) => {
@@ -469,8 +526,19 @@
               return
             }
 
+            const title = e.target.value
+
+            this.email.data.title = title
             this.isEditingTitle = false
             mountHeader()
+
+            EmailsStore.patch(this.email.ID, {
+              data: {
+                title
+              }
+            }).then((e) => {
+              this.loadEmail(e)
+            })
           })
         }
 
@@ -502,12 +570,14 @@
             this.updateEmailData({
               from_user: e.target.value,
             })
+            mountHeader()
           })
 
         $('#message-type').on('change', (e) => {
           this.updateEmailMeta({
             message_type: e.target.value,
           })
+          mountHeader()
         })
 
         $('#reply-to').autocomplete({
@@ -515,6 +585,7 @@
             this.updateEmailMeta({
               reply_to_override: e.target.value,
             })
+            mountHeader()
           },
           source: [
             '{owner_email}',
@@ -526,6 +597,7 @@
           this.updateEmailMeta({
             alignment: e.currentTarget.dataset.alignment,
           })
+          mountHeader()
           mountSidebar()
           $('#' + e.currentTarget.id).focus()
         })
@@ -563,6 +635,7 @@
             source: Groundhogg.filters.owners.map((u) => u.data.user_email),
             change: (e) => {
               this.testEmailAddress = e.target.value
+              mountHeader()
             },
           })
 
@@ -584,7 +657,7 @@
 
       mainContentMount()
       sidebarMount()
-      headerMount()
+      headerMounted()
     },
 
     demount () {
@@ -601,10 +674,11 @@
     },
 
     currentState () {
-      const { email } = this
+      const { email, edited } = this
 
       return {
         email: copyObject(email),
+        edited: copyObject(edited),
       }
     },
 
@@ -629,7 +703,7 @@
 
       Object.assign(this, lastState)
 
-      this.render()
+      this.mount()
     },
 
     /**
@@ -646,7 +720,7 @@
 
       Object.assign(this, lastState)
 
-      this.render()
+      this.mount()
     },
   })
 

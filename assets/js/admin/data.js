@@ -166,8 +166,8 @@
         })
     },
 
-    async post (data) {
-      return apiPost(this.route, data)
+    async post (data, opts={}) {
+      return apiPost(this.route, data, opts)
         .then(r => this.getItemFromResponse(r))
         .then(item => {
           this.items.push(item)
@@ -175,8 +175,8 @@
         })
     },
 
-    async patch (id, data) {
-      return apiPatch(`${this.route}/${id}`, data)
+    async patch (id, data, opts={}) {
+      return apiPatch(`${this.route}/${id}`, data, opts)
         .then(r => this.getItemFromResponse(r))
         .then(item => {
           this.item = item
@@ -265,6 +265,7 @@
       },
     }),
     contacts: ObjectStore(Groundhogg.api.routes.v4.contacts),
+    campaigns: ObjectStore(Groundhogg.api.routes.v4.campaigns),
     emails: ObjectStore(Groundhogg.api.routes.v4.emails),
     searches: ObjectStore(Groundhogg.api.routes.v4.searches, {
       primaryKey: 'id'

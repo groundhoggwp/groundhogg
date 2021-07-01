@@ -1,9 +1,21 @@
 (function (Funnel, $) {
-  const TagsStore = Groundhogg.stores.tags
-  const EmailsStore = Groundhogg.stores.emails
-  const apiGet = Groundhogg.api.get
-  const apiPost = Groundhogg.api.post
-  const apiRoutes = Groundhogg.api.routes.v4
+
+  const {
+    tags: TagsStore,
+    emails: EmailsStore,
+    campaigns: CampaignsStore
+  } = Groundhogg.stores
+
+  const {
+    get: apiGet,
+    post: apiPost,
+    delete: apiDelete,
+    patch: apiPatch,
+    routes
+  } = Groundhogg.api
+
+  const { v4: apiRoutes } = routes
+
   const {
     tinymceElement,
     improveTinyMCE,
@@ -27,7 +39,7 @@
 
   const { formBuilder } = Groundhogg
 
-  const { linkPicker, emailPicker, tagPicker, apiPicker } = Groundhogg.pickers
+  const { linkPicker, emailPicker, tagPicker, apiPicker, campaignPicker } = Groundhogg.pickers
 
   $.fn.serializeFormJSON = function () {
     var o = {}
@@ -730,12 +742,38 @@
 							  text: c.data.name,
 							  value: c.ID
 						  })), this.funnel.campaigns.map(c => c.ID))}</p>
-						  <button class="gh-button primary">Save</button>
 					  </div>`
                 }
 
                 modal({
-                  content: ``
+                  content: campaignContent()
+                })
+
+                campaignPicker('#manage-campaigns', true, (items) => {
+                  CampaignsStore.itemsFetched(items)
+                }).on('select2:select', async (e) => {
+                  let campaign = e.params.data
+                  // its a new campaign
+                  if (!CampaignsStore.hasItem(campaign.id)) {
+                    campaign = await CampaignsStore.post({
+                      data: {
+                        name: campaign.id
+                      }
+                    }).then((c) => ({ id: c.ID }))
+                  }
+                  // existing campaign
+                  apiPost(`${apiRoutes.funnels}/${this.funnel.ID}/relationships`, {
+                    other_id: campaign.id,
+                    other_type: 'campaign'
+                  }).then(r => this.loadFunnel(r.item))
+                }).on('select2:unselect', async (e) => {
+                  let campaign = e.params.data
+
+                  // existing campaign
+                  apiDelete(`${apiRoutes.funnels}/${this.funnel.ID}/relationships`, {
+                    other_id: campaign.id,
+                    other_type: 'campaign'
+                  }).then(r => this.loadFunnel(r.item))
                 })
 
                 break

@@ -12,8 +12,8 @@
     return result
   }
 
-  const breadcrumbs = ( parts ) => {
-    return parts.map( (p,i) => i < parts.length-1 ? `<span class="part">${p}</span>` : `<span class="base">${p}</span>` ).join(`<span class="sep">/</span>`)
+  const breadcrumbs = (parts) => {
+    return parts.map((p, i) => i < parts.length - 1 ? `<span class="part">${p}</span>` : `<span class="base">${p}</span>`).join(`<span class="sep">/</span>`)
   }
 
   function improveTinyMCE () {
@@ -501,6 +501,7 @@
 
     const close = () => {
       $modal.remove()
+      $('body').removeClass('modal-open')
       onClose()
     }
 
@@ -512,7 +513,7 @@
       $modal.find('.gh-modal-dialog-content').html(content)
     }
 
-    $('body').append($modal)
+    $('body').append($modal).addClass('modal-open')
 
     onOpen()
 
@@ -1029,17 +1030,9 @@
 
     const $menu = $(menu)
 
-    const handleDocClick = (e) => {
-      if (!clickInsideElement(e, 'gh-dropdown-menu')) {
-        close()
-      }
-    }
-
-    $(document).on('click', handleDocClick)
-
     const close = () => {
-      $(document).off('click', handleDocClick)
       $menu.remove()
+      console.log('closed')
     }
 
     $menu.on('click', '.gh-dropdown-menu-item', (e) => {
@@ -1055,9 +1048,16 @@
 
     $('body').append($menu)
 
+    const {
+      left,
+      right,
+      top,
+      bottom
+    } = $el[0].getBoundingClientRect()
+
     $menu.css({
-      top: Math.min($el[0].getBoundingClientRect().bottom, window.innerHeight - $menu.height() - 20) + 'px',
-      left: ($el[0].getBoundingClientRect().right - $menu.width()) + 'px'
+      top: Math.min(bottom, window.innerHeight - $menu.height() - 20) + 'px',
+      left: (right - $menu.outerWidth()) + 'px'
     })
 
     $menu.focus()

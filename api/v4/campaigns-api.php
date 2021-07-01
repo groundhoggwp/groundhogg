@@ -24,27 +24,27 @@ class Campaigns_Api extends Base_Object_Api {
 	 * @inheritDoc
 	 */
 	public function read_permissions_callback() {
-		return current_user_can( 'manage_tags' );
+		return current_user_can( 'manage_campaigns' );
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	public function update_permissions_callback() {
-		return current_user_can( 'edit_tags' );
+		return current_user_can( 'manage_campaigns' );
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	public function create_permissions_callback() {
-		return current_user_can( 'add_tags' );
+		return current_user_can( 'manage_campaigns' );
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	public function delete_permissions_callback() {
-		return current_user_can( 'delete_tags' );
+		return current_user_can( 'manage_campaigns' );
 	}
 }

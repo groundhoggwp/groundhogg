@@ -149,9 +149,10 @@ class Contacts_Page extends Admin_Page {
 		} else {
 			wp_enqueue_style( 'select2' );
 			wp_enqueue_script( 'select2' );
-			wp_enqueue_style( 'groundhogg-admin-contact-inline' );
 			wp_enqueue_style( 'groundhogg-admin-search-filters' );
-			wp_enqueue_script( 'groundhogg-admin-contact-inline' );
+			wp_enqueue_style( 'groundhogg-admin-contact-inline' );
+
+//			wp_enqueue_script( 'groundhogg-admin-contact-inline' );
 
 			$current_filters = [];
 			$saved_search    = false;
@@ -928,10 +929,7 @@ class Contacts_Page extends Admin_Page {
 			<?php
 			$contacts_table->prepare_items();
 			$contacts_table->display();
-
-			if ( $contacts_table->has_items() ) {
-				$contacts_table->inline_edit();
-			} ?>
+			?>
 		</form>
 		<?php
 
@@ -1313,10 +1311,7 @@ class Contacts_Page extends Admin_Page {
 			<?php
 			$contacts_table->prepare_items();
 			$contacts_table->display();
-
-			if ( $contacts_table->has_items() ) {
-				$contacts_table->inline_edit();
-			} ?>
+			?>
 		</form>
 		<?php
 	}
