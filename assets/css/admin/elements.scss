@@ -34,7 +34,7 @@ input {
 }
 
 body {
-  &.modal-open {
+  &.modal-open, &.groundhogg-toolbar-quick-search-open {
     .select2-dropdown {
       z-index: 999999;
     }
@@ -272,6 +272,13 @@ button {
         height: 20px;
       }
 
+      &.small {
+        svg {
+          width: 14px;
+          height: 14px;
+        }
+      }
+
       //&:hover:not(:disabled) {
       //  border-color: rgba(16, 38, 64, 0.25);
       //}
@@ -285,6 +292,11 @@ button {
     &.medium {
       font-size: 18px;
       padding: 11px 22px;
+    }
+
+    &.small {
+      font-size: 14px;
+      padding: 4px 6px;
     }
 
     &.bold {
@@ -399,9 +411,14 @@ button {
   z-index: 9999999;
   border-radius: 5px;
 
-  &.success {
+  &.gh-dialog-success {
     color: #FFFFFF;
     background-color: $action-green;
+  }
+
+  &.gh-dialog-error {
+    color: #FFFFFF;
+    background-color: $error-red;
   }
 }
 

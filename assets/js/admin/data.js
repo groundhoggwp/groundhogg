@@ -160,18 +160,6 @@
       return true
     },
 
-    async fetchItems (params) {
-      return apiGet(this.route, params)
-        .then(r => this.getItemsFromResponse(r))
-        .then(items => {
-          this.items = [
-            ...items, // new items
-            ...this.items.filter(item => !items.find(_item => _item[this.primaryKey] === item[this.primaryKey]))
-          ]
-          return items
-        })
-    },
-
     itemsFetched (items) {
       this.items = [
         ...items, // new items
@@ -179,15 +167,23 @@
       ]
     },
 
+    async fetchItems (params) {
+      return apiGet(this.route, params)
+        .then(r => this.getItemsFromResponse(r))
+        .then(items => {
+          this.itemsFetched(items)
+          return items
+        })
+    },
+
     async fetchItem (id) {
       return apiGet(`${this.route}/${id}`)
         .then(r => this.getItemFromResponse(r))
         .then(item => {
           this.item = item
-          this.items = [
-            item,
-            ...this.items.filter(item => item[this.primaryKey] !== item[this.primaryKey]),
-          ]
+          this.itemsFetched([
+            item
+          ])
           return item
         })
     },
@@ -196,7 +192,9 @@
       return apiPost(this.route, data, opts)
         .then(r => this.getItemFromResponse(r))
         .then(item => {
-          this.items.push(item)
+          this.itemsFetched([
+            item
+          ])
           return item
         })
     },
@@ -206,10 +204,9 @@
         .then(r => this.getItemFromResponse(r))
         .then(item => {
           this.item = item
-          this.items = [
-            item,
-            ...this.items.filter(_item => item[this.primaryKey] !== _item[this.primaryKey]),
-          ]
+          this.itemsFetched([
+            item
+          ])
           return item
         })
     },

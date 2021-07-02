@@ -528,9 +528,16 @@
     }
   }
 
+  const errorDialog = (props) => {
+    return dialog({
+      ...props,
+      type: 'error'
+    })
+  }
+
   const dialog = ({ message = '', animationDuration = 300, ttl = 3000, type = 'success' }) => {
 
-    const $dialog = $(`<div class="gh-dialog success">${message}</div>`)
+    const $dialog = $(`<div class="gh-dialog gh-dialog-${type}">${message}</div>`)
 
     $('body').append($dialog).addClass('dialog-open')
     $dialog.animate({
@@ -1120,7 +1127,8 @@
     button,
     codeEditor,
     breadcrumbs,
-    dialog
+    dialog,
+    errorDialog
   }
 
 })(jQuery)

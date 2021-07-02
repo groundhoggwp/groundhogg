@@ -3779,7 +3779,6 @@ add_action( 'admin_menu', function () {
 
 }, 99999999 );
 
-
 add_action( 'admin_print_styles', function () {
 
 	if ( is_white_labeled() ) {
@@ -3788,6 +3787,13 @@ add_action( 'admin_print_styles', function () {
 
 	?>
 	<style>
+
+        #wp-admin-bar-top-secondary #wp-admin-bar-groundhogg.groundhogg-admin-bar-menu .ab-item {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
         #adminmenu #toplevel_page_groundhogg a.gh_go_pro .dashicons {
             font-size: 18px;
             margin-right: 8px;

@@ -7,7 +7,7 @@ input:invalid:focus {
   outline: 2px solid transparent;
 }
 
-body.modal-open .select2-dropdown {
+body.modal-open .select2-dropdown, body.groundhogg-toolbar-quick-search-open .select2-dropdown {
   z-index: 999999;
 }
 
@@ -212,6 +212,11 @@ button.gh-button.icon svg {
   width: 20px;
   height: 20px;
 }
+a.gh-button.icon.small svg,
+button.gh-button.icon.small svg {
+  width: 14px;
+  height: 14px;
+}
 a.gh-button.big,
 button.gh-button.big {
   font-size: 24px;
@@ -221,6 +226,11 @@ a.gh-button.medium,
 button.gh-button.medium {
   font-size: 18px;
   padding: 11px 22px;
+}
+a.gh-button.small,
+button.gh-button.small {
+  font-size: 14px;
+  padding: 4px 6px;
 }
 a.gh-button.bold,
 button.gh-button.bold {
@@ -309,9 +319,13 @@ button.gh-button.loud {
   z-index: 9999999;
   border-radius: 5px;
 }
-.gh-dialog.success {
+.gh-dialog.gh-dialog-success {
   color: #FFFFFF;
   background-color: #9ece38;
+}
+.gh-dialog.gh-dialog-error {
+  color: #FFFFFF;
+  background-color: #e91f4f;
 }
 
 .gh-modal {

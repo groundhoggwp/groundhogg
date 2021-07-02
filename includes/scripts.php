@@ -177,6 +177,13 @@ class Scripts {
 			'groundhogg-admin-search-filters',
 		], GROUNDHOGG_VERSION, true );
 
+		wp_register_script( 'groundhogg-admin-toolbar', GROUNDHOGG_ASSETS_URL . 'js/admin/admin-bar' . $dot_min . '.js', [
+			'groundhogg-admin-element',
+			'groundhogg-admin-data',
+		], GROUNDHOGG_VERSION, true );
+
+		wp_enqueue_script( 'groundhogg-admin-toolbar' );
+
 		wp_register_script( 'groundhogg-admin-insert-at-cursor', GROUNDHOGG_ASSETS_URL . 'js/admin/insert-at-cursor' . $dot_min . '.js', [
 			'jquery',
 		], GROUNDHOGG_VERSION );
@@ -491,6 +498,11 @@ class Scripts {
 		], GROUNDHOGG_VERSION );
 
 		wp_register_style( 'groundhogg-admin-loader', GROUNDHOGG_ASSETS_URL . 'css/admin/loader.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
+		wp_register_style( 'groundhogg-admin-toolbar', GROUNDHOGG_ASSETS_URL . 'css/admin/admin-bar.css', [
+			'groundhogg-admin-element'
+		], GROUNDHOGG_VERSION );
+
+		wp_enqueue_style( 'groundhogg-admin-toolbar' );
 
 		wp_register_style( 'groundhogg-form', GROUNDHOGG_ASSETS_URL . 'css/frontend/form.css', [], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-loader', GROUNDHOGG_ASSETS_URL . 'css/frontend/loader.css', [], GROUNDHOGG_VERSION );
