@@ -71,10 +71,10 @@ class Contacts_Api extends Base_Object_Api {
 			],
 		] );
 
-		register_rest_route( self::NAME_SPACE, '/contacts/admin/table', [
+		register_rest_route( self::NAME_SPACE, '/contacts/table/row', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'admin_table' ],
+				'callback'            => [ $this, 'admin_table_row' ],
 				'permission_callback' => [ $this, 'read_permissions_callback' ]
 			],
 		] );
@@ -650,24 +650,26 @@ class Contacts_Api extends Base_Object_Api {
 		return current_user_can( 'download_contact_files' );
 	}
 
-	public function admin_table() {
+	/**
+	 * Get the admin table row
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function admin_table_row( WP_REST_Request $request ) {
+		$contact = get_contactdata( $request->get_param( 'contact' ) );
+
+		$contactTable = new Contacts_Table;
+
 		ob_start();
 
-		$contacts_table = new Contacts_Table();
+		$contactTable->single_row( $contact );
 
-		?>
-		<form method="post" id="contacts-table-form">
-			<?php
-			$contacts_table->prepare_items();
-			$contacts_table->display();
-			?>
-		</form>
-		<?php
-
-		$table = ob_get_clean();
+		$row = ob_get_clean();
 
 		return self::SUCCESS_RESPONSE( [
-			'html' => $table
+			'row' => $row
 		] );
 	}
 }

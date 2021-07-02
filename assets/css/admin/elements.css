@@ -1,3 +1,12 @@
+input:invalid {
+  border-color: #e91f4f;
+}
+input:invalid:focus {
+  border-color: #e91f4f;
+  box-shadow: 0 0 0 1px #e91f4f;
+  outline: 2px solid transparent;
+}
+
 body.modal-open .select2-dropdown {
   z-index: 999999;
 }
@@ -286,6 +295,23 @@ button.gh-button.loud {
 .search-options-widget-wrap .search-options-widget .search-options .option.focused, .search-options-widget-wrap .search-options-widget .search-options .option:hover {
   background: #0075ff;
   color: #FFFFFF;
+}
+
+.gh-dialog {
+  position: fixed;
+  top: -100px;
+  left: 50%;
+  /* bring your own prefixes */
+  transform: translate(-50%, 0);
+  margin: auto;
+  padding: 10px 20px;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  z-index: 9999999;
+  border-radius: 5px;
+}
+.gh-dialog.success {
+  color: #FFFFFF;
+  background-color: #9ece38;
 }
 
 .gh-modal {

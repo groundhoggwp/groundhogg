@@ -14,10 +14,10 @@
     select,
     dangerConfirmationModal,
     confirmationModal,
-    clickInsideElement
-
+    clickInsideElement,
+    dialog
   } = Groundhogg.element
-  const { post, get, patch, routes } = Groundhogg.api
+  const { post, get, patch, routes, ajax } = Groundhogg.api
   const { searches: SearchesStore, contacts: ContactsStore, tags: TagsStore } = Groundhogg.stores
   const { tagPicker } = Groundhogg.pickers
 
@@ -356,11 +356,15 @@
 
     $(document).on('click', '.editinline', (e) => {
 
+      e.preventDefault()
+
       const ID = parseInt(e.currentTarget.dataset.id)
 
       const contact = ContactsStore.get(ID)
 
-      TagsStore.itemsFetched(contact.tags)
+      if (contact && contact.tags) {
+        TagsStore.itemsFetched(contact.tags)
+      }
 
       const quickEdit = (editingName = false) => {
 
@@ -383,6 +387,7 @@
 							<label for="quick-edit-first-name">First Name</label>
 							${input({
 								id: 'quick-edit-first-name',
+								name: 'first_name',
 								value: contact.data.first_name,
 							})}
 						</div>
@@ -390,6 +395,7 @@
 							<label for="quick-edit-last-name">Last Name</label>
 							${input({
 								id: 'quick-edit-last-name',
+								name: 'last_name',
 								value: contact.data.last_name,
 							})}
 						</div>
@@ -399,6 +405,7 @@
 							<label for="quick-edit-email">Email Address</label>
 							${input({
 								type: 'email',
+								name: 'email',
 								id: 'quick-edit-email',
 								value: contact.data.email
 							})}
@@ -410,15 +417,17 @@
 									${input({
 										type: 'tel',
 										id: 'quick-edit-primary-phone',
+										name: 'primary_phone',
 										value: contact.meta.primary_phone
 									})}
 								</div>
 								<div class="primary-phone-ext">
-									<label for="quick-edit-primary-phone">Ext.</label>
+									<label for="quick-edit-primary-phone-extension">Ext.</label>
 									${input({
 										type: 'number',
-										id: 'quick-edit-primary-phone-ext',
-										value: contact.meta.primary_phone_ext
+										id: 'quick-edit-primary-phone-extension',
+										name: 'primary_phone_extension',
+										value: contact.meta.primary_phone_extension
 									})}
 								</div>
 							</div>
@@ -429,13 +438,15 @@
 							<label for="quick-edit-email">Optin Status</label>
 							${select({
 								id: 'quick-edit-optin-status',
+								name: 'optin_status'
 							}, Groundhogg.filters.optin_status, contact.data.optin_status)}
 						</div>
 						<div class="col">
-							<label for="quick-edit-primary-phone">Mobile Phone</label>
+							<label for="quick-edit-mobile-phone">Mobile Phone</label>
 							${input({
 								type: 'tel',
 								id: 'quick-edit-mobile-phone',
+								name: 'mobile_phone',
 								value: contact.meta.mobile_phone
 							})}
 						</div>
@@ -445,6 +456,7 @@
 							<label for="quick-edit-email">Owner</label>
 							${select({
 								id: 'quick-edit-owner',
+								name: 'owner_id'
 							}, Groundhogg.filters.owners.map(u => ({
 								text: u.data.user_email,
 								value: u.ID
@@ -471,18 +483,94 @@
 
       const quickEditMounted = () => {
 
+        let payload
+
+        const clearPayload = () => {
+          payload = {
+            data: {},
+            meta: {},
+            add_tags: [],
+            remove_tags: []
+          }
+        }
+
+        clearPayload()
+
+        const mergePayload = (data) => {
+          for (const dataKey in data) {
+            if (data.hasOwnProperty(dataKey)) {
+
+              if (Array.isArray(data[dataKey])) {
+                payload[dataKey] = [
+                  ...payload[dataKey],
+                  ...data[dataKey]
+                ]
+              } else {
+                payload[dataKey] = {
+                  ...payload[dataKey],
+                  ...data[dataKey]
+                }
+              }
+            }
+          }
+        }
+
+        let timeout
+
+        const updateContact = (data) => {
+
+          mergePayload(data)
+
+          if (timeout) {
+            clearTimeout(timeout)
+          }
+
+          timeout = setTimeout(() => {
+            ContactsStore.patch(contact.ID, payload).then(() => {
+              ajax({
+                action: 'groundhogg_contact_table_row',
+                contact: contact.ID
+              }).then((r) => {
+                dialog({
+                  message: 'Contact updated!'
+                })
+                $(`#contact-${contact.ID}`).replaceWith(r.data.row)
+              })
+            })
+            clearPayload()
+          }, 2000)
+        }
+
         const $quickEdit = $('.contact-quick-edit')
 
         $quickEdit.focus()
 
-        tagPicker('#quick-edit-tags', true, (items) => {TagsStore.itemsFetched(items)})
+        tagPicker('#quick-edit-tags', true, (items) => {TagsStore.itemsFetched(items)}).on('select2:unselect', (e) => {
+          updateContact({
+            remove_tags: [
+              e.params.data.id
+            ]
+          })
+        }).on('select2:select', (e) => {
+          updateContact({
+            add_tags: [
+              e.params.data.id
+            ]
+          })
+        })
 
-        $('#quick-edit-first-name').on('change', (e) => {
-          const first_name = e.target.value
-
-          ContactsStore.patch(contact.ID, {
+        $('#quick-edit-first-name,#quick-edit-last-name,#quick-edit-email,#quick-edit-optin-status,#quick-edit-owner').on('change', (e) => {
+          updateContact({
             data: {
-              first_name
+              [e.target.name]: e.target.value
+            }
+          })
+        })
+
+        $('#quick-edit-primary-phone,#quick-edit-primary-phone-extension,#quick-edit-mobile-phone').on('change', (e) => {
+          updateContact({
+            meta: {
+              [e.target.name]: e.target.value
             }
           })
         })

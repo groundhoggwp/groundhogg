@@ -9,10 +9,10 @@
   async function apiGet (route, params = {}, opts = {}) {
 
     const response = await fetch(route + '?' + $.param(params), {
-      ...opts,
       headers: {
         'X-WP-Nonce': Groundhogg.nonces._wprest,
-      }
+      },
+      ...opts
     })
 
     return response.json()
@@ -28,13 +28,39 @@
    */
   async function apiPost (url = '', data = {}, opts = {}) {
     const response = await fetch(url, {
-      ...opts,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-WP-Nonce': Groundhogg.nonces._wprest,
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
+      ...opts,
+    })
+    return response.json()
+  }
+
+  /**
+   * Post data
+   *
+   * @param data
+   * @param opts
+   * @returns {Promise<any>}
+   */
+  async function adminAjax (data = {}, opts = {}) {
+
+    const fData = new FormData()
+
+    for (const key in data) {
+      if (data.hasOwnProperty(key)) {
+        fData.append(key, data[key])
+      }
+    }
+
+    const response = await fetch(ajaxurl, {
+      method: 'POST',
+      credentials: 'same-origin',
+      body: fData,
+      ...opts,
     })
     return response.json()
   }
@@ -166,7 +192,7 @@
         })
     },
 
-    async post (data, opts={}) {
+    async post (data, opts = {}) {
       return apiPost(this.route, data, opts)
         .then(r => this.getItemFromResponse(r))
         .then(item => {
@@ -175,14 +201,14 @@
         })
     },
 
-    async patch (id, data, opts={}) {
+    async patch (id, data, opts = {}) {
       return apiPatch(`${this.route}/${id}`, data, opts)
         .then(r => this.getItemFromResponse(r))
         .then(item => {
           this.item = item
           this.items = [
             item,
-            ...this.items.filter(item => item[this.primaryKey] !== item[this.primaryKey]),
+            ...this.items.filter(_item => item[this.primaryKey] !== _item[this.primaryKey]),
           ]
           return item
         })
@@ -197,7 +223,7 @@
           }
 
           this.items = [
-            ...this.items.filter(item => item[this.primaryKey] !== item[this.primaryKey]),
+            ...this.items.filter(item => item[this.primaryKey] !== id),
           ]
         })
     },
@@ -209,6 +235,7 @@
   Groundhogg.api.get = apiGet
   Groundhogg.api.patch = apiPatch
   Groundhogg.api.delete = apiDelete
+  Groundhogg.api.ajax = adminAjax
 
   Groundhogg.stores = {
 

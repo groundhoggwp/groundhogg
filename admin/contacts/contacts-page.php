@@ -72,11 +72,11 @@ class Contacts_Page extends Admin_Page {
 	}
 
 	protected function add_ajax_actions() {
-
+		
 		new Contact_Table_Columns();
 		new Info_Cards();
 
-		add_action( 'wp_ajax_wpgh_inline_save_contacts', array( $this, 'save_inline' ) );
+		add_action( 'wp_ajax_groundhogg_contact_table_row', [ $this, 'ajax_contact_table_row' ] );
 		add_action( 'wp_ajax_groundhogg_edit_notes', [ $this, 'edit_note_ajax' ] );
 		add_action( 'wp_ajax_groundhogg_delete_notes', [ $this, 'delete_note_ajax' ] );
 		add_action( 'wp_ajax_groundhogg_add_notes', [ $this, 'add_note_ajax' ] );
@@ -1020,7 +1020,7 @@ class Contacts_Page extends Admin_Page {
 	/**
 	 * Save the contact during inline edit
 	 */
-	public function save_inline() {
+	public function ajax_contact_table_row() {
 
 		if ( ! wp_doing_ajax() ) {
 			return;
@@ -1030,80 +1030,19 @@ class Contacts_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		$id = absint( get_request_var( 'ID' ) );
-
-		$contact = get_contactdata( $id );
-
-		do_action( 'groundhogg/admin/contact/save_inline/before', $id, $contact );
-
-		$email = sanitize_email( get_request_var( 'email' ) );
-
-		$args['first_name']   = sanitize_text_field( get_request_var( 'first_name' ) );
-		$args['last_name']    = sanitize_text_field( get_request_var( 'last_name' ) );
-		$args['owner_id']     = absint( get_request_var( 'owner' ) );
-		$args['optin_status'] = absint( get_request_var( 'optin_status' ) );
-
-		$meta_keys = [
-			'mobile_phone',
-			'primary_phone',
-			'primary_phone_extension',
-		];
-
-		foreach ( $meta_keys as $meta_key ) {
-			$contact->update_meta( $meta_key, sanitize_text_field( get_request_var( $meta_key ) ) );
-		}
-
-		$err = array();
-
-		if ( ! $email ) {
-			$err[] = _x( 'Email cannot be blank.', 'notice', 'groundhogg' );
-		} else if ( ! is_email( $email ) ) {
-			$err[] = _x( 'Invalid email address.', 'notice', 'groundhogg' );
-		}
-
-		if ( $contact->get_email() === $email || ! Plugin::$instance->dbs->get_db( 'contacts' )->exists( $email ) ) {
-			$args['email'] = $email;
-		} else {
-			$err[] = sprintf( _x( 'Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg' ), $email );
-		}
-
-		if ( $err ) {
-			echo implode( ', ', $err );
-			exit;
-		}
-
-		// Process any tag removals.
-		if ( get_request_var( 'tags' ) ) {
-
-			$tags = validate_tags( get_request_var( 'tags' ) );
-
-			$cur_tags = $contact->get_tags();
-			$new_tags = $tags;
-
-			$delete_tags = array_diff( $cur_tags, $new_tags );
-			if ( ! empty( $delete_tags ) ) {
-				$contact->remove_tag( $delete_tags );
-			}
-
-			$add_tags = array_diff( $new_tags, $cur_tags );
-			if ( ! empty( $add_tags ) ) {
-				$result = $contact->add_tag( $add_tags );
-				if ( ! $result ) {
-					return new \WP_Error( 'bad-tag', __( 'Hmm, looks like we could not add the new tags...', 'groundhogg' ) );
-				}
-			}
-		} else {
-			$contact->remove_tag( $contact->get_tags() );
-		}
-
-		$contact->update( $args );
-
-		do_action( 'groundhogg/admin/contact/save_inline/after', $id, $contact );
+		$contact = get_contactdata( get_post_var( 'contact' ) );
 
 		$contactTable = new Tables\Contacts_Table;
 
+		ob_start();
+
 		$contactTable->single_row( $contact );
-		wp_die();
+
+		$row = ob_get_clean();
+
+		wp_send_json_success( [
+			'row' => $row
+		] );
 	}
 
 	/**

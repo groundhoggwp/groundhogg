@@ -528,6 +528,28 @@
     }
   }
 
+  const dialog = ({ message = '', animationDuration = 300, ttl = 3000, type = 'success' }) => {
+
+    const $dialog = $(`<div class="gh-dialog success">${message}</div>`)
+
+    $('body').append($dialog).addClass('dialog-open')
+    $dialog.animate({
+      top: 40,
+    }, animationDuration, 'swing', () => {
+      setTimeout(() => {
+        $dialog.animate({
+          top: -100,
+        }, animationDuration, 'swing', () => {
+          $dialog.remove()
+        })
+      }, ttl)
+    })
+
+    return {
+      $dialog
+    }
+  }
+
   const loadingDots = (selector) => {
 
     const $el = $('<span class="loading-dots"></span>')
@@ -1097,7 +1119,8 @@
     secondaryButton,
     button,
     codeEditor,
-    breadcrumbs
+    breadcrumbs,
+    dialog
   }
 
 })(jQuery)
