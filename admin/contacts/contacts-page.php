@@ -32,6 +32,8 @@ use function Groundhogg\sanitize_email_header;
 use function Groundhogg\send_email_notification;
 use function Groundhogg\set_request_var;
 use function Groundhogg\validate_tags;
+use function Groundhogg\Ymd;
+use function Groundhogg\Ymd_His;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -715,7 +717,9 @@ class Contacts_Page extends Admin_Page {
 
 			// If is valid date
 			if ( checkdate( $birthday[1], $birthday[2], $birthday[0] ) ) {
-				$birthday = implode( '-', $birthday );
+				$time     = mktime( 0, 0, 0, $birthday[1], $birthday[2], $birthday[0] );
+				$birthday = Ymd( $time );
+
 				$contact->update_meta( 'birthday', $birthday );
 			} else {
 				$this->add_notice( new \WP_Error( 'invalid_date', __( 'The birthday date provided is not a valid date.' ) ) );
@@ -1130,7 +1134,7 @@ class Contacts_Page extends Admin_Page {
 			return new \WP_Error( 'error', __( 'Invalid search' ) );
 		}
 
-		$query    = get_request_query();
+		$query = get_request_query();
 
 		Saved_Searches::instance()->update( $search_id, [
 			'query' => $query,

@@ -39,6 +39,7 @@ class Manager {
 		$this->check_licenses           = new Check_Licenses();
 		$this->update_marketing_consent = new Update_Marketing_Consent();
 		$this->bulk_edit_contacts       = new Edit_Contacts();
+		$this->fix_birthdays            = new Fix_Birthdays();
 
 		do_action( 'groundhogg/bulk_jobs/init', $this );
 	}
@@ -58,7 +59,7 @@ class Manager {
 	/**
 	 * Set the data to the given value
 	 *
-	 * @param $key string
+	 * @param $key   string
 	 * @param $value Bulk_Job
 	 */
 	public function __set( $key, $value ) {

@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 4.9
 Tested up to: 5.7
 Requires PHP: 5.6
-Stable tag: 2.4.7.2
+Stable tag: 2.4.7.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -311,6 +311,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.4.7.3 (2021-07-07) =
+* HOT FIX Birthdays being saved in `Y-n-j` format instead of `Y-m-d`. Added migration path prompt to fix formatting for contacts with birthdays
+* HOT FIX Contact meta queries with `>, <, <=, >=` not working when passed into `esc_url`
 
 = 2.4.7.2 (2021-07-07) =
 * FIXED Compatibility for BuddyBoss/BuddyPress core redirect to `/register/` when `$_SERVER['script']` is empty and `DOING_CRON` is defined

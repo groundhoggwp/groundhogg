@@ -416,6 +416,15 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Verify all the license statuses
+	 */
+	public function version_2_4_7_3() {
+		$this->remember_version_update( '2.4.7.3' );
+
+		Plugin::instance()->bulk_jobs->fix_birthdays->start();
+	}
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -463,6 +472,7 @@ class Main_Updater extends Updater {
 			'2.4.5.5',
 			'2.4.6',
 			'2.4.7.1',
+			'2.4.7.3',
 		];
 	}
 
@@ -528,6 +538,7 @@ class Main_Updater extends Updater {
 			'2.4.5.5'       => __( 'Fix tag counts and delete orphaned object meta.', 'groundhogg' ),
 			'2.4.6'         => __( 'Refactor notes to abstract data type for support across more objects.', 'groundhogg' ),
 			'2.4.7.1'       => __( 'Add <code>view_admin_dashboard</code> capability to Sales Representative and Sales Manager', 'groundhogg' ),
+			'2.4.7.3'       => __( 'Fix birthday date formatting.', 'groundhogg' ),
 		];
 	}
 }

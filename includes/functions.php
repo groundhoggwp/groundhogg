@@ -359,6 +359,24 @@ function get_url_param( $key = '', $default = false ) {
 }
 
 /**
+ * @param $query
+ *
+ * @return string
+ */
+function base64_json_encode( $query ) {
+	return base64_encode( wp_json_encode( $query ) );
+}
+
+/**
+ * @param $query
+ *
+ * @return mixed
+ */
+function base64_json_decode( $query ) {
+	return json_decode( base64_decode( $query ), true );
+}
+
+/**
  * Get a db query from the URL.
  *
  * @param array $default       a default query if the given is empty
@@ -2204,23 +2222,14 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 			case 'birthday':
 
 				if ( is_string( $value ) ) {
-					$date  = date( 'Y-m-d', strtotime( $value ) );
-					$parts = map_deep( explode( '-', $date ), 'absint' );
-
-					$meta['birthday_year']  = $parts[0];
-					$meta['birthday_month'] = $parts[1];
-					$meta['birthday_day']   = $parts[2];
-					$meta['birthday']       = $date;
+					$meta['birthday'] = Ymd( strtotime( $value ) );
 				} else if ( is_array( $value ) ) {
 
 					$year  = absint( $value['year'] );
 					$month = absint( $value['month'] );
 					$day   = absint( $value['day'] );
 
-					$meta['birthday_year']  = $year;
-					$meta['birthday_month'] = $month;
-					$meta['birthday_day']   = $day;
-					$meta['birthday']       = date( 'Y-m-d',
+					$meta['birthday'] = Ymd(
 						mktime( 0, 0, 0, $month, $day, $year )
 					);
 				}
@@ -2508,14 +2517,18 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				}
 				break;
 			case 'birthday':
+				if ( is_string( $value ) ) {
+					$meta['birthday'] = Ymd( strtotime( $value ) );
+				} else if ( is_array( $value ) ) {
 
-				$date  = date( 'Y-m-d', strtotime( $value ) );
-				$parts = map_deep( explode( '-', $date ), 'absint' );
+					$year  = absint( $value['year'] );
+					$month = absint( $value['month'] );
+					$day   = absint( $value['day'] );
 
-				$meta['birthday_year']  = $parts[0];
-				$meta['birthday_month'] = $parts[1];
-				$meta['birthday_day']   = $parts[2];
-				$meta['birthday']       = $date;
+					$meta['birthday'] = Ymd(
+						mktime( 0, 0, 0, $month, $day, $year )
+					);
+				}
 				break;
 		}
 
@@ -4586,6 +4599,17 @@ function handle_ajax_meta_picker() {
 add_action( 'wp_ajax_gh_meta_picker', __NAMESPACE__ . '\handle_ajax_meta_picker' );
 
 /**
+ * Current time or time provided
+ *
+ * @param $time
+ *
+ * @return false|int|mixed
+ */
+function get_time( $time ) {
+	return is_string( $time ) ? ( strtotime( $time ) ?: time() ) : ( $time ?: time() );
+}
+
+/**
  * Quick formatting function for Y-m-d H:i:s date time.
  *
  * @param false $time
@@ -4593,7 +4617,29 @@ add_action( 'wp_ajax_gh_meta_picker', __NAMESPACE__ . '\handle_ajax_meta_picker'
  * @return false|string
  */
 function Ymd_His( $time = false ) {
-	return date( 'Y-m-d H:i:s', $time ?: time() );
+	return date( 'Y-m-d H:i:s', get_time( $time ) );
+}
+
+/**
+ * Quick formatting function for H:i:s time.
+ *
+ * @param false $time
+ *
+ * @return false|string
+ */
+function His( $time = false ) {
+	return date( 'H:i:s', get_time( $time ) );
+}
+
+/**
+ * Quick formatting function for Y-m-d date.
+ *
+ * @param false $time
+ *
+ * @return false|string
+ */
+function Ymd( $time = false ) {
+	return date( 'Y-m-d', get_time( $time ) );
 }
 
 /**

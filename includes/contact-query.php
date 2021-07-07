@@ -323,12 +323,12 @@ class Contact_Query {
 	 * @see    WPGH_Contact_Query::__construct()
 	 *
 	 */
-	public function query( $query, $as_contact_object=false ) {
+	public function query( $query, $as_contact_object = false ) {
 		$this->query_vars = wp_parse_args( $query );
 		$items            = $this->get_items();
 
-		if ( $as_contact_object ){
-			$items = array_map( function ( $contact ){
+		if ( $as_contact_object ) {
+			$items = array_map( function ( $contact ) {
 				return new Contact( $contact );
 			}, $items );
 		}
@@ -378,6 +378,19 @@ class Contact_Query {
 
 		if ( ! empty( $this->query_vars['date_query'] ) && is_array( $this->query_vars['date_query'] ) ) {
 			$this->date_query = new \WP_Date_Query( $this->query_vars['date_query'], $this->table_name . '.' . $this->date_key );
+		}
+
+		if ( $this->query_vars['meta_compare'] ) {
+			$map = [
+				'gt'    => '>',
+				'gt_eq' => '>=',
+				'lt'    => '<',
+				'lt_eq' => '<=',
+			];
+
+			if ( isset_not_empty( $map, $this->query_vars['meta_compare'] ) ) {
+				$this->query_vars['meta_compare'] = $map[ $this->query_vars['meta_compare'] ];
+			}
 		}
 
 		$this->meta_query = new \WP_Meta_Query();
