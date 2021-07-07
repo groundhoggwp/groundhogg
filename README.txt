@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 4.9
 Tested up to: 5.7
 Requires PHP: 5.6
-Stable tag: 2.4.7.1
+Stable tag: 2.4.7.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -310,10 +310,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 = Where can I upgrade to premium? =
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
-= Are monthly billing options available for premium? =
-Yes, we now offer [monthly billing options](https://www.groundhogg.io/pricing/monthly/).
-
 == Changelog ==
+
+= 2.4.7.2 (2021-07-07) =
+* FIXED Compatibility for BuddyBoss/BuddyPress core redirect to `/register/` when `$_SERVER['script']` is empty and `DOING_CRON` is defined
 
 = 2.4.7.1 (2021-06-29) =
 * FIXED When checking for the existence of an encryption algo force to lowercase
