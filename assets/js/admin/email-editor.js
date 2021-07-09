@@ -152,7 +152,11 @@
         // language=HTML
         return `
 			<div class="email-content-wrap">
-				<div id="content"></div>
+				${textarea({
+					id: 'content',
+					className: 'wp-editor-area',
+					value: this.edited.data.content
+				})}
 			</div>`
       },
 
@@ -314,17 +318,6 @@
 
       const { close } = savingModal()
 
-      console.log({
-        data: {
-          ...this.edited.data,
-          status: 'ready',
-          title: this.email.data.title
-        },
-        meta: {
-          ...this.edited.meta
-        }
-      })
-
       EmailsStore.patch(this.email.ID, {
         data: {
           ...this.edited.data,
@@ -403,7 +396,6 @@
 
         // Only save after a second.
         saveTimer = setTimeout(() => {
-          window.console.log('save')
           this.updateEmailData({
             content: content,
           })
@@ -424,7 +416,14 @@
           this.codemirror = editor
 
         } else {
-          GroundhoggBlockEditor( document.querySelector('#content'), this.edited.data.content, handleContentOnChange )
+          tinymceElement(
+            'content',
+            {
+              tinymce: true,
+              quicktags: true,
+            },
+            handleContentOnChange
+          )
         }
 
         $('#subject, #preview-text').on('change', (e) => {
@@ -509,7 +508,6 @@
           $('.undo-and-redo .undo').focus()
         })
 
-
         $('.undo-and-redo .redo').on('click', (e) => {
           this.redo()
           $('.undo-and-redo .redo').focus()
@@ -560,7 +558,11 @@
             content: `<iframe id="preview" class="${device}"></div>`
           })
 
-          setFrameContent($('#preview')[0], this.edited.data.content)
+          const {
+            built, edited_preview
+          } = this.email.context
+
+          setFrameContent($('#preview')[0], edited_preview || built )
 
         })
 

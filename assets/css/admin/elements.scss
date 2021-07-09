@@ -34,6 +34,10 @@ input {
 }
 
 body {
+  .select2-dropdown {
+    z-index: 10001;
+  }
+
   &.modal-open, &.groundhogg-toolbar-quick-search-open {
     .select2-dropdown {
       z-index: 999999;
@@ -97,6 +101,7 @@ a.action-link {
   margin: 0 5px 5px 0;
   display: inline-block;
   padding: 3px 8px;
+  color: $primary-dark;
 
   &.orange {
     background: $benchmark-orange-50;

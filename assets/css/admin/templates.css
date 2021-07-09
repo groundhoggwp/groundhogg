@@ -25,9 +25,14 @@ body {
 .templates-picker * {
   box-sizing: border-box;
 }
+.templates-picker .search-templates,
 .templates-picker .template-actions {
   display: flex;
   gap: 10px;
+}
+.templates-picker .search-templates #campaign,
+.templates-picker .template-actions #campaign {
+  width: 300px;
 }
 .templates-picker #import,
 .templates-picker #title-input {
@@ -113,10 +118,13 @@ body {
 .templates-picker #templates .row > * {
   width: 100%;
 }
+.templates-picker #templates .row .template p.actions button:not(:focus) {
+  visibility: hidden;
+}
 .templates-picker #templates .row .template.enabled:focus, .templates-picker #templates .row .template.enabled:hover {
   box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.15);
 }
-.templates-picker #templates .row .template.enabled:focus button, .templates-picker #templates .row .template.enabled:hover button {
+.templates-picker #templates .row .template.enabled:focus p.actions button, .templates-picker #templates .row .template.enabled:hover p.actions button {
   visibility: visible;
 }
 .templates-picker #templates .row .template.disabled {

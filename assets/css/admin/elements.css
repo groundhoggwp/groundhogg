@@ -7,6 +7,9 @@ input:invalid:focus {
   outline: 2px solid transparent;
 }
 
+body .select2-dropdown {
+  z-index: 10001;
+}
 body.modal-open .select2-dropdown, body.groundhogg-toolbar-quick-search-open .select2-dropdown {
   z-index: 999999;
 }
@@ -59,6 +62,7 @@ a.action-link {
   margin: 0 5px 5px 0;
   display: inline-block;
   padding: 3px 8px;
+  color: #102640;
 }
 .pill.orange {
   background: rgba(245, 129, 21, 0.5);

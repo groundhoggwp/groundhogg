@@ -577,6 +577,30 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Get the edited preview
+	 *
+	 * @return string
+	 */
+	public function get_edited_preview() {
+
+		$e = $this->get_meta( 'edited' );
+
+		if ( ! $e ){
+			return false;
+		}
+
+		$email       = new Email();
+		$email->data = get_array_var( $e, 'data' );
+		$email->meta = get_array_var( $e, 'meta' );
+		$email->ID   = uniqid( 'email-' );
+
+		$email->set_event( $this->get_event() );
+		$email->set_contact( $this->get_contact() );
+
+		return $email->build();
+	}
+
+	/**
 	 * Build the email
 	 *
 	 * @return string
@@ -1079,20 +1103,24 @@ class Email extends Base_Object_With_Meta {
 
 	public function get_as_array() {
 
-		if ( ! get_contactdata() ){
+		if ( ! get_contactdata() ) {
 			return parent::get_as_array();
 		}
 
 		$this->set_event( new Event() );
 		$this->set_contact( get_contactdata() );
 
+		$live_preview   = $this->build();
+		$edited_preview = $this->get_edited_preview();
+
 		return array_merge( parent::get_as_array(), [
 			'context' => [
-				'from_name'  => $this->get_from_name(),
-				'from_email' => $this->get_from_email(),
-				'from_user'  => $this->get_from_user(),
-				'built'      => $this->build(),
-				'avatar'     => get_avatar_url( $this->get_from_user_id(), [
+				'from_name'      => $this->get_from_name(),
+				'from_email'     => $this->get_from_email(),
+				'from_user'      => $this->get_from_user(),
+				'built'          => $live_preview,
+				'edited_preview' => $edited_preview,
+				'avatar'         => get_avatar_url( $this->get_from_user_id(), [
 					'size' => 30
 				] )
 			]

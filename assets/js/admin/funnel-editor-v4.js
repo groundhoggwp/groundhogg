@@ -19,6 +19,7 @@
   const {
     tinymceElement,
     improveTinyMCE,
+    dialog,
     confirmationModal,
     dangerConfirmationModal,
     loadingModal,
@@ -263,13 +264,14 @@
       publishActions (status) {
 
         // language=HTML
-        const moreMenu = `<button id="more-menu" class="gh-button secondary text icon">
-				  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 384">
-					  <circle fill="currentColor" cx="192" cy="42.7" r="42.7"/>
-					  <circle fill="currentColor" cx="192" cy="192" r="42.7"/>
-					  <circle fill="currentColor" cx="192" cy="341.3" r="42.7"/>
-				  </svg>
-			  </button>`
+        const moreMenu = `
+			<button id="more-menu" class="gh-button secondary text icon">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 384">
+					<circle fill="currentColor" cx="192" cy="42.7" r="42.7"/>
+					<circle fill="currentColor" cx="192" cy="192" r="42.7"/>
+					<circle fill="currentColor" cx="192" cy="341.3" r="42.7"/>
+				</svg>
+			</button>`
 
         // Todo switch back
         if (status === 'inactive') {
@@ -767,7 +769,7 @@
                       data: {
                         name: campaign.id
                       }
-                    }).then((c) => ({ id: c.ID }))
+                    }).then((c) => ({ id: c.ID, name: c.data.name }))
                   }
                   // existing campaign
                   apiPost(`${apiRoutes.funnels}/${this.funnel.ID}/relationships`, {
@@ -1513,7 +1515,6 @@
         content: 'Redo'
       })
 
-
     },
 
     /**
@@ -1605,7 +1606,9 @@
         data: {
           status: 'active',
         },
-      }).then(() => close())
+      }).then(() => close()).then(() => dialog({
+        message: 'Funnel activated!'
+      }))
     },
 
     deactivate () {
@@ -1615,7 +1618,9 @@
         data: {
           status: 'inactive',
         },
-      }).then(() => close())
+      }).then(() => close()).then(() => dialog({
+        message: 'Funnel deactivated!'
+      }))
     },
 
     commitChanges () {
@@ -1643,6 +1648,9 @@
           if (data.item) {
             self.loadFunnel(data.item)
             self.render()
+            dialog({
+              message: 'Funnel updated!'
+            })
           } else if (data.code === 'error') {
             // confusion I know...
             const { errors } = data.data.data
@@ -2123,50 +2131,6 @@
     }
 
     return props.join(' ')
-  }
-
-  /**
-   * Create a list of options
-   *
-   * @param options
-   * @param selected
-   * @returns {string}
-   */
-  const createOptions = (options, selected) => {
-    const optionsString = []
-
-    // Options is an array format
-    if (Array.isArray(options)) {
-      options.forEach((option) => {
-        optionsString.push(
-          option(
-            option,
-            option,
-            Array.isArray(selected)
-              ? selected.indexOf(option) !== -1
-              : option === selected
-          )
-        )
-      })
-    }
-    // Assume object
-    else {
-      for (const option in options) {
-        if (options.hasOwnProperty(option)) {
-          optionsString.push(
-            option(
-              option,
-              options[option],
-              Array.isArray(selected)
-                ? selected.indexOf(option) !== -1
-                : option === selected
-            )
-          )
-        }
-      }
-    }
-
-    return optionsString.join('')
   }
 
   function ordinal_suffix_of (i) {
@@ -3161,40 +3125,38 @@
 
         //language=HTML
         const runOnMonthOptions = `
-			<div style="margin-top: 10px"><select
-				class="delay-input re-render"
-				name="run_on_month_type">
-				${createOptions(runOnMonthTypes, run_on_month_type)}</select>
-				${
-					run_on_month_type === 'specific'
-						? `<select class="select2" name="run_on_months" multiple>${createOptions(
-						runOnMonths,
-						run_on_months
-						)}</select>`
-						: ''
-				}
+			<div style="margin-top: 10px">${select({
+				className: 'delay-input re-render',
+				name: 'run_on_month_type'
+			}, runOnMonthTypes, run_on_month_type)}
+				${run_on_month_type === 'specific' ? select({
+					className: 'delay-input select2',
+					name: 'run_on_months',
+					multiple: true,
+				}, runOnMonths, run_on_months) : ''}
 			</div>`
 
         //language=HTML
         const daysOfWeekOptions = `
-			<div style="margin-top: 10px"><select
-				class="delay-input" name="run_on_dow_type">
-				${createOptions(runOnDOWTypes, run_on_dow_type)}</select>
-				<select class="select2" name="run_on_dow"
-				        multiple>${createOptions(
-					runOnDaysOfWeek,
-					run_on_dow
-				)}</select></div>
+			<div style="margin-top: 10px">${select({
+				className: 'delay-input',
+				name: 'run_on_dow_type'
+			}, runOnDOWTypes, run_on_dow_type)}
+				${select({
+					className: 'select2',
+					name: 'run_on_dow'
+				}, runOnDaysOfWeek, run_on_dow)}
+			</div>
 			${runOnMonthOptions}`
 
         //language=HTML
         const daysOfMonthOptions = `
-			<div style="margin-top: 10px"><select class="select2"
-			                                      name="run_on_dom"
-			                                      multiple>${createOptions(
-				runOnDaysOfMonth,
-				run_on_dom
-			)}</select></div>
+			<div style="margin-top: 10px">
+				${select({
+					className: 'select2',
+					name: 'run_on_dom'
+				}, runOnDaysOfMonth, run_on_dom)}
+			</div>
 			${runOnMonthOptions}`
 
         //language=HTML
@@ -3215,15 +3177,17 @@
 					}"
 					       placeholder="3"
 					       ${delay_type === 'none' ? 'disabled' : ''}>
-					<select class="delay-input re-render" name="delay_type">
-						${createOptions(delayTypes, delay_type)}
-					</select>
+					${select({
+						className: 'delay-input re-render',
+						name: 'delay_type'
+					}, delayTypes, delay_type)}
 				</div>
 				<div class="row">
 					<label class="row-label">Then run on...</label>
-					<select class="delay-input re-render" name="run_on_type">
-						${createOptions(runOnTypes, run_on_type)}
-					</select>
+					${select({
+						className: 'delay-input re-render',
+						name: 'run_on_type'
+					}, runOnTypes, run_on_type)}
 					${run_on_type === 'day_of_week' ? daysOfWeekOptions : ''}
 					${run_on_type === 'day_of_month' ? daysOfMonthOptions : ''}
 				</div>

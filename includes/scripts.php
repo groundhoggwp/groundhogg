@@ -281,8 +281,8 @@ class Scripts {
 		$library = new Library();
 
 		wp_localize_script( 'groundhogg-admin-add-email', 'AddEmail', [
-//			'templates' => $library->get_email_templates(),
-			'templates' => [],
+			'templates' => $library->get_email_templates(),
+//			'templates' => [],
 		] );
 
 		wp_register_script( 'groundhogg-admin-funnel-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-editor-v4' . $dot_min . '.js', [

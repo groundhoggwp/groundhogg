@@ -50,11 +50,15 @@ body {
     box-sizing: border-box;
   }
 
-  .template-actions{
+  .search-templates,
+  .template-actions {
     display: flex;
     gap: 10px;
-  }
 
+    #campaign {
+      width: 300px;
+    }
+  }
 
   #import,
   #title-input {
@@ -111,7 +115,7 @@ body {
         width: 100%;
       }
 
-      .template-actions{
+      .template-actions {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -147,16 +151,16 @@ body {
 
       .template {
 
-        //button:not(:focus) {
-        //  visibility: hidden;
-        //}
+        p.actions button:not(:focus) {
+          visibility: hidden;
+        }
 
         &.enabled:focus,
         &.enabled:hover {
 
           box-shadow: $box-shadow-darker;
 
-          button {
+          p.actions button {
             visibility: visible;
           }
         }
@@ -205,7 +209,7 @@ body {
           .template-content {
             border-top: 1px solid $primary-dark-15;
 
-            iframe{
+            iframe {
               height: 400px;
               width: 100%;
               zoom: 80%;

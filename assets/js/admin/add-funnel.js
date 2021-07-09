@@ -84,7 +84,7 @@
 
     renderTemplate: (template) => {
 
-      const { ID, data, meta, steps } = template
+      const { ID, data, meta, steps, campaigns } = template
 
       const stepCount = steps.length
       const canUse = hasRequiredSteps(steps)
@@ -92,9 +92,10 @@
       const numActions = steps.filter(({ data }) => data.step_group === 'action').length
       const numBenchmarks = steps.filter(({ data }) => data.step_group === 'benchmark').length
       const pills = [
-        `<span class="pill">${stepCount} steps</span>`,
-        `<span class="pill green">${numActions} ${numActions === 1 ? 'action' : 'actions'}</span>`,
         `<span class="pill orange">${numBenchmarks} ${numBenchmarks === 1 ? 'benchmark' : 'benchmarks'}</span>`,
+        `<span class="pill green">${numActions} ${numActions === 1 ? 'action' : 'actions'}</span>`,
+        `<span class="pill">Added ${moment(data.date_created).format('LL')}</span>`
+        // ...campaigns.map(c => `<span class="pill">${c.data.name}</span>`)
         // canUse ? 'enabled' : 'disabled',
       ]
 
@@ -103,16 +104,24 @@
 		  <div class="gh-panel template ${canUse ? 'enabled' : 'disabled'}" tabindex="0">
 			  <div class="template-header">
 				  <h2>${data.title}</h2>
-				  <div class="actions" tabindex="0">
-					  <button data-template="${ID}" class="select-template gh-button primary"
-					          ${canUse ? '' : 'disabled'}>Use Template
-					  </button>
-				  </div>
 			  </div>
 			  <div class="inside">
 				  <p>${meta.description || ''}</p>
 				  <p>
+					  <b>Details</b>
+				  </p>
+				  <p>
 					  ${pills.join('')}
+				  </p>
+				  <p>
+					  <b>Campaigns</b>
+				  </p>
+				  <p>
+					  ${campaigns.map(c => `<span class="pill">${c.data.name}</span>`).join('')}
+				  </p>
+				  <p class="actions">
+					  ${hasRequiredSteps(steps) ?
+						  `<button data-template="${ID}" class="gh-button primary small select-template">Import</button>` : `<span class="gh-text danger">You do not have the required extensions installed for this template.</span>`}
 				  </p>
 			  </div>
 		  </div>`
@@ -132,10 +141,19 @@
 					  ${select({
 						  id: 'campaign',
 						  name: 'campaign',
-					  }, {
-						  a: 'campaign a',
-						  b: 'campaign b',
-					  })}
+						  multiple: true,
+						  style: {
+							  width: '300px',
+						  }
+					  }, templates.reduce((carry, curr) => {
+						  if (curr.campaigns) {
+							  carry.push(...curr.campaigns.map(c => ({
+								  text: c.data.name,
+								  value: c.data.slug
+							  })).filter(c => !carry.find(_c => c.value === _c.value)))
+						  }
+						  return carry
+					  }, []))}
 					  <input type="search" id="search" name="search" placeholder="Search templates" value=""/>
 				  </div>
 				  <div class="template-actions">
@@ -163,7 +181,15 @@
         }
 
         return t.data.title.match(regexp(this.search))
-      })
+      }).filter(t => {
+
+        if (!this.campaign || !this.campaign.length) {
+          return true
+        }
+
+        return t.campaigns.find(c => this.campaign.includes(c.data.slug))
+
+      }).sort((a, b) => (hasRequiredSteps(a.steps) === hasRequiredSteps(b.steps)) ? 0 : hasRequiredSteps(a.steps) ? -1 : 1)
     },
 
     titleModal () {
@@ -171,7 +197,7 @@
 
         //language=HTML
         return `
-			<div id="template-name"><h2>Name your email</h2>
+			<div id="template-name"><h2>Name your funnel</h2>
 				${input({
 					id: 'title-input',
 					placeholder: 'Title',
@@ -181,7 +207,7 @@
 				${primaryButton({
 					id: 'create',
 					className: 'medium bold',
-					text: isCreating ? 'Creating' : 'Creat Email',
+					text: isCreating ? 'Importing' : 'Import Funnel',
 					disabled: isCreating || !this.newTitle
 				})}
 			</div>`
@@ -236,10 +262,6 @@
         this.newTitle = this.selectedTemplate.data.title
 
         this.titleModal()
-      })
-
-      $(`${selector} iframe.template-frame`).each(function () {
-        const template = this.dataset.template
       })
     },
 
@@ -362,6 +384,14 @@
 
       this.$el.html(this.render())
       this.mountTemplates()
+
+      $(`${selector} #campaign`).select2({
+        placeholder: 'Filter by campaign...'
+      }).on('change', (e) => {
+        this.campaign = $(e.target).val()
+        this.reset()
+        this.mountTemplates()
+      })
 
       $(`${selector} #search`).on('input change', (e) => {
         this.search = e.target.value
