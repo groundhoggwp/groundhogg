@@ -1,12 +1,13 @@
 <?php
 
-namespace Groundhogg\Steps\Actions\Base;
+namespace Groundhogg\Steps\Benchmarks\Base;
 
 use Groundhogg\Contact;
 use Groundhogg\Event;
 use Groundhogg\HTML;
 use Groundhogg\Step;
 use Groundhogg\Steps\Actions\Action;
+use Groundhogg\Steps\Benchmarks\Benchmark;
 use Groundhogg\Tag;
 use function Groundhogg\array_map_to_class;
 use function Groundhogg\class_list_to_ids;
@@ -30,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.9
  */
-abstract class Tags extends Action {
+abstract class Tags extends Benchmark {
 
 	/**
 	 * Save the step settings
@@ -39,6 +40,7 @@ abstract class Tags extends Action {
 	 */
 	public function save( $step ) {
 		$this->save_setting( 'tags', validate_tags( $this->get_posted_data( 'tags', [] ) ) );
+		$this->save_setting( 'condition', sanitize_text_field( $this->get_posted_data( 'condition', 'any' ) ) );
 	}
 
 	/**

@@ -235,7 +235,7 @@ input[type=range].slider:focus::-ms-fill-upper {
 .gh-metakey-picker,
 .gh-metakey-picker,
 .select2-container {
-    //width: 100% !important;
+    min-width: 200px;
     //max-width: 400px !important;
 }
 

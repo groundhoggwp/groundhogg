@@ -3321,7 +3321,7 @@
 									text: item.data.title,
 									value: item.ID,
 								}
-							}, parseInt(email_id))
+							}), email && email.ID
 						)}
 					</div>
 					<div class="column">
@@ -3376,7 +3376,7 @@
       },
       validate ({ meta }, addError, addWarning) {
         const { email_id } = meta
-        const email = EmailsStore.get(email_id)
+        const email = EmailsStore.get(parseInt(email_id))
 
         if (email_id && email && email.data.status !== 'ready') {
           addWarning('Email is in draft mode. Please update status to ready!')
@@ -3781,7 +3781,7 @@
     render ({ ID, meta }) {
 
       const { email_id } = meta
-      const email = EmailsStore.get(email_id)
+      const email = EmailsStore.get(parseInt(email_id))
 
       if (!email_id || !email) {
         return ''
@@ -3795,7 +3795,7 @@
     onMount ({ ID, meta }) {
 
       const { email_id } = meta
-      const email = EmailsStore.get(email_id)
+      const email = EmailsStore.get(parseInt(email_id))
 
       if (email_id && email) {
         $('#edit-email-right').on('click', () => {

@@ -4991,6 +4991,14 @@ function array_map_to_class( &$array, $class ) {
 	foreach ( $array as &$mixed ) {
 		$mixed = new $class( $mixed );
 	}
+
+	return $array;
+}
+
+function class_list_to_ids( $array ) {
+	return array_map( function ( $c ) {
+		return $c->get_id();
+	}, $array );
 }
 
 /**
@@ -5200,7 +5208,7 @@ function create_object_from_type( $object, $object_type ) {
 /**
  * Whether this site provides templates, if so then the gh/v4/emails READ and gh/v4/funnels READ will be public
  */
-function is_template_site(){
+function is_template_site() {
 	// Todo change this
 	return apply_filters( 'groundhogg/is_template_site', true );
 }

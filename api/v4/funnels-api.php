@@ -67,7 +67,7 @@ class Funnels_Api extends Base_Object_Api {
 
 		$step = Plugin::instance()->step_manager->elements[ $type ];
 
-		if ( ! method_exists( $step, 'get_forms_for_api' ) ){
+		if ( ! method_exists( $step, 'get_forms_for_api' ) ) {
 			return self::ERROR_401();
 		}
 
@@ -92,7 +92,7 @@ class Funnels_Api extends Base_Object_Api {
 
 		// Is this a legacy funnel template or a new template?
 
-		// New template, old templates to not have the 'data' prop
+		// New template, old templates does not have the 'data' prop
 		if ( isset_not_empty( $template, 'data' ) ) {
 
 			// Create the funnel
@@ -117,6 +117,7 @@ class Funnels_Api extends Base_Object_Api {
 
 				$step->create( $_step['data'] ); // use create method to ensure uniqueness
 				$step->update_meta( $_step['meta'] ); // save all that meta data!
+				$step->import( $_step['export'] ); // import any relevant exported information
 			}
 
 			// Etc...

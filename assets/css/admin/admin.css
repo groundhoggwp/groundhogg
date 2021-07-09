@@ -224,6 +224,20 @@ input[type=range].slider:focus::-ms-fill-upper {
   /*border-color: #0073aa #006799 #006799;*/
 }
 
+.gh-select2,
+.gh-tag-picker,
+.gh-single-tag-picker,
+.gh-single-tag-picker,
+.gh-email-picker,
+.gh-sms-picker,
+.gh-contact-picker,
+.gh-benchmark-picker,
+.gh-metakey-picker,
+.gh-metakey-picker,
+.select2-container {
+  min-width: 200px;
+}
+
 .select2-container .select2-search--inline .select2-search__field {
   min-height: 0;
   line-height: 1;

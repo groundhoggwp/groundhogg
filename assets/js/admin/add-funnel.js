@@ -43,9 +43,8 @@
   }
 
   const createFunnel = (template) => {
-    return post(`${routes.v4.funnels}`, {
+    return post(`${routes.v4.funnels}/import`, {
       ...template,
-      ID: false
     }).then(r => r.item)
   }
 
