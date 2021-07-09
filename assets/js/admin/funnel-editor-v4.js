@@ -365,27 +365,27 @@
           return `
 			  <div class="panel benchmark-settings">
 				  <div class="row">
-					  <label class="row-label">Allow contacts to enter the funnel at this step?</label>
+					  ${isStartingStep(step.ID) ? '' :
+						  `<label class="row-label">Allow contacts to enter the funnel at this step?</label>
 					  ${toggle({
-						  name: 'is_entry_point',
-						  id: 'is-entry-point',
-						  checked: meta.is_entry_point,
-						  onLabel: 'YES',
-						  offLabel: 'NO',
-					  })}
-				  </div>
-				  <div class="row">
-					  <label class="row-label">Track a conversion whenever this step is completed.</label>
-					  ${toggle({
-						  name: 'is_conversion',
-						  id: 'is-conversion',
-						  checked: Editor.funnel.data.conversion_step === ID,
-						  onLabel: 'YES',
-						  offLabel: 'NO',
-					  })}
-					  <p class="description">Only one step can be recorded as the conversion step.</p>
-				  </div>
-			  </div>`
+							  name: 'is_entry_point',
+							  id: 'is-entry-point',
+							  checked: data.is_entry,
+							  onLabel: 'YES',
+							  offLabel: 'NO',
+						  })}
+				  </div>`}
+					  <div class="row">
+						  <label class="row-label">Track a conversion whenever this step is completed.</label>
+						  ${toggle({
+							  name: 'is_conversion',
+							  id: 'is-conversion',
+							  checked: data.is_conversion,
+							  onLabel: 'YES',
+							  offLabel: 'NO',
+						  })}
+					  </div>
+				  </div>`
         }
 
         const slotArgs = [step, updateStepMeta, updateStep]
@@ -540,7 +540,7 @@
       },
       stepFlowCard (step, activeStep) {
         const { ID, data, meta } = step
-        const { step_type, step_title, step_group, step_order } = data
+        const { step_type, step_title, step_group, step_order, is_entry } = data
 
         const StepType = getStepType(step_type)
         const origStep = Editor.origFunnel.steps.find((s) => s.ID === ID)
@@ -590,6 +590,10 @@
 					activeStep === ID ? 'active' : ''
 				} ${hasErrors ? 'has-errors' : ''} ${hasWarnings ? 'has-warnings' : ''}"
 				data-id="${ID}">
+				${step_group === 'benchmark' && is_entry && !isStartingStep(ID) ? `<div class="is-entry"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <path fill="currentColor" d="M260.5 329.5a24 24 0 0034 34L385 273a24 24 0 000-34l-90.5-90.5a24 24 0 00-34 0 24 24 0 000 34l49.6 49.5H48a24 24 0 00-24 24 24 24 0 0024 24h262z"/>
+  <path fill="currentColor" d="M448 24H224a40 40 0 00-40 40v32a24 24 0 0048 0V72h208v368H232v-24a24 24 0 00-48 0v32a40 40 0 0040 40h224a40 40 0 0040-40V64a40 40 0 00-40-40z"/>
+</svg></div>` : ''}
 				${
 					StepType.hasOwnProperty('svg')
 						? `<div class="icon-svg">${StepType.svg}</div>`
@@ -1228,6 +1232,10 @@
         return this.updateCurrentStepMeta(meta, reRenderStepEdit)
       }
 
+      const updateStepData = (data, reRenderStepEdit = false) => {
+        return this.updateCurrentStepData(data, reRenderStepEdit)
+      }
+
       const updateStep = (data, reRenderStepEdit = false) => {
         return this.updateCurrentStep(data, reRenderStepEdit)
       }
@@ -1241,8 +1249,13 @@
 
       if (step.data.step_group === 'benchmark') {
         $('#is-entry-point').on('change', (e) => {
-          updateStepMeta({
-            is_entry_point: e.target.checked,
+          updateStepData({
+            is_entry: e.target.checked,
+          })
+        })
+        $('#is-conversion').on('change', (e) => {
+          updateStepData({
+            is_conversion: e.target.checked,
           })
         })
       }
@@ -1944,6 +1957,31 @@
      */
     updateCurrentStep (newData, reRenderStepEdit = false) {
       const step = this.updateStep(this.activeStep, newData)
+
+      if (reRenderStepEdit) {
+        this.renderStepEdit()
+      }
+
+      return step
+    },
+
+    /**
+     * Updates the current active step
+     *
+     * @param newData
+     * @param reRenderStepEdit
+     */
+    updateCurrentStepData (newData, reRenderStepEdit = false) {
+      // console.log(this)
+
+      const { data, meta } = this.getCurrentStep()
+
+      const step = this.updateStep(this.activeStep, {
+        data: {
+          ...data,
+          ...newData,
+        },
+      })
 
       if (reRenderStepEdit) {
         this.renderStepEdit()
@@ -3842,6 +3880,27 @@
     specialChars,
     isString,
   }
+
+  const isStartingStep = (stepId) => {
+    const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep()
+    return !getPrecedingSteps(step.ID)
+      .find(_step => _step.data.step_group === 'action')
+  }
+
+  const getProceedingSteps = (stepId) => {
+    const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep()
+    return Editor.getSteps()
+      .filter((_step) => _step.data.step_order > step.data.step_order)
+      .sort((a, b) => a.data.step_order - b.data.step_order)
+  }
+
+  const getPrecedingSteps = (stepId) => {
+    const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep()
+    return Editor.getSteps()
+      .filter((_step) => _step.data.step_order < step.data.step_order)
+      .sort((a, b) => a.data.step_order - b.data.step_order)
+  }
+
   Groundhogg.funnelEditor = Editor
   Groundhogg.funnelEditor.functions = {
     slot,
@@ -3874,18 +3933,8 @@
     getCurrentStepMeta () {
       return Editor.getCurrentStep().meta
     },
-    getProceedingSteps (stepId) {
-      const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep()
-      return Editor.getSteps()
-        .filter((_step) => _step.data.step_order > step.data.step_order)
-        .sort((a, b) => a.data.step_order - b.data.step_order)
-    },
-    getPrecedingSteps (stepId) {
-      const step = stepId ? Editor.getStep(stepId) : Editor.getCurrentStep()
-      return Editor.getSteps()
-        .filter((_step) => _step.data.step_order < step.data.step_order)
-        .sort((a, b) => a.data.step_order - b.data.step_order)
-    },
+    getProceedingSteps,
+    getPrecedingSteps,
   }
 
 })(GroundhoggFunnel, jQuery)

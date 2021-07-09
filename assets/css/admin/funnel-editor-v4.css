@@ -231,9 +231,18 @@
 #funnel-editor .flow-and-edit .step-add {
   width: 100%;
 }
+#funnel-editor .step-warnings,
 #funnel-editor .step-errors {
-  padding: 0 20px;
+  padding: 20px 20px 0 20px;
   box-sizing: border-box;
+}
+#funnel-editor .step-warnings ul,
+#funnel-editor .step-errors ul {
+  margin: 0;
+}
+#funnel-editor .step-warnings ul li:last-child,
+#funnel-editor .step-errors ul li:last-child {
+  margin: 0;
 }
 #funnel-editor li.step-warning {
   padding: 5px 10px;
@@ -303,6 +312,36 @@
   padding: 10px;
   min-height: 52px;
   cursor: pointer;
+}
+#funnel-editor .step-flow .step-placeholder .is-entry,
+#funnel-editor .step-flow .steps .step .is-entry {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  border-radius: 50%;
+  background-color: #FFF;
+  color: #f58115;
+  left: -12px;
+  top: -12px;
+}
+#funnel-editor .step-flow .step-placeholder .is-entry:before,
+#funnel-editor .step-flow .steps .step .is-entry:before {
+  content: "";
+  background-color: rgba(16, 38, 64, 0.15);
+  height: 27px;
+  width: 27px;
+  top: -1px;
+  left: -1px;
+  z-index: -1;
+  border-radius: 50%;
+  position: absolute;
+}
+#funnel-editor .step-flow .step-placeholder .is-entry svg,
+#funnel-editor .step-flow .steps .step .is-entry svg {
+  width: 15px;
+  height: 15px;
 }
 #funnel-editor .step-flow .steps .step.has-warnings {
   border: 1px solid #ffee58;
@@ -393,6 +432,17 @@
 }
 #funnel-editor .step.benchmark.active {
   border-color: #f58115;
+}
+#funnel-editor .step.benchmark.active .is-entry {
+  top: -13px;
+  left: -13px;
+}
+#funnel-editor .step.benchmark.active .is-entry:before {
+  background-color: #f58115;
+  width: 29px;
+  height: 29px;
+  top: -2px;
+  left: -2px;
 }
 #funnel-editor .step.action.active {
   border-color: #9ece38;

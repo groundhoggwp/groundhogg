@@ -551,7 +551,10 @@
 		  <option value="${specialChars(value)}" ${selected ? 'selected' : ''}>${text}</option>`
     },
     mappableFields (props, selected) {
-      return Elements.select(props, Groundhogg.fields.mappable, selected)
+      return Elements.select(props, {
+        '': '- Do not map -',
+        ...Groundhogg.fields.mappable
+      }, selected)
     },
     textarea (props) {
       return `<textarea ${objectToProps(Object.filter(props, key => key !== 'value'))}>${specialChars(props.value)}</textarea>`

@@ -295,9 +295,18 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
     width: 100%;
   }
 
+  .step-warnings,
   .step-errors {
-    padding: 0 20px;
+    padding: 20px 20px 0 20px;
     box-sizing: border-box;
+
+    ul {
+      margin: 0;
+
+      li:last-child {
+        margin: 0;
+      }
+    }
   }
 
   li.step-warning {
@@ -382,6 +391,37 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
     padding: 10px;
     min-height: 52px;
     cursor: pointer;
+
+    .is-entry {
+
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px;
+      border-radius: 50%;
+      background-color: #FFF;
+      color: $benchmark-orange;
+      left: -12px;
+      top: -12px;
+
+      &:before {
+        content: '';
+        background-color: $primary-dark-15;
+        height: 27px;
+        width: 27px;
+        top: -1px;
+        left: -1px;
+        z-index: -1;
+        border-radius: 50%;
+        position: absolute;
+      }
+
+      svg {
+        width: 15px;
+        height: 15px;
+      }
+    }
   }
 
   .step-flow .steps .step.has-warnings {
@@ -494,6 +534,20 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
 
   .step.benchmark.active {
     border-color: $benchmark-orange;
+
+    .is-entry {
+
+      top: -13px;
+      left: -13px;
+
+      &:before {
+        background-color: $benchmark-orange;
+        width: 29px;
+        height: 29px;
+        top: -2px;
+        left: -2px;
+      }
+    }
   }
 
   .step.action.active {
@@ -710,12 +764,13 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
     margin-bottom: 20px;
   }
 
-  #control-panel{
-    .row{
-      &.with-columns{
+  #control-panel {
+    .row {
+      &.with-columns {
         gap: 20px;
         display: flex;
-        .column{
+
+        .column {
           width: 100%;
         }
       }
@@ -723,7 +778,7 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
   }
 
 
-    /* context menu */
+  /* context menu */
 
   .step-context-menu {
     display: none;
