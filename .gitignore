@@ -5,3 +5,4 @@
 /.idea/
 /phpunit.phar
 .DS_Store
+/package-lock.json
