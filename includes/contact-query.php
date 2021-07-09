@@ -323,7 +323,7 @@ class Contact_Query {
 	 *
 	 * @param string|array $query Array or query string of parameters. See WPGH_Contact_Query::__construct().
 	 *
-	 * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
+	 * @return Object[]|Contact[]|int List of contacts, or number of contacts when 'count' is passed as a query var.
 	 * @since  2.8
 	 *
 	 * @see    WPGH_Contact_Query::__construct()

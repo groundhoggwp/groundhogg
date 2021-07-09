@@ -10,6 +10,7 @@ $primary-dark-50: rgba(16, 38, 64, 0.5);
 $primary-dark-30: rgba(16, 38, 64, 0.3);
 $primary-dark-15: rgba(16, 38, 64, 0.15);
 $primary-dark-10: rgba(16, 38, 64, 0.10);
+$primary-dark-5: rgba(16, 38, 64, 0.05);
 $error-red: rgb(233, 31, 79);
 $error-red-50: rgba(233, 31, 79, 0.5);
 $error-red-10: rgba(233, 31, 79, 0.10);
@@ -29,8 +30,9 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
   &-close{
     position: absolute;
-    right: 10px;
-    top: 10px;
+    right: 5px;
+    padding: 0;
+    top: 5px;
   }
 
   #close-quick-search{
@@ -82,7 +84,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     padding: 20px;
     box-shadow: $box-shadow;
     border-radius: 0 0 5px 5px;
-    z-index: 9999;
+    z-index: 99999;
   }
 
   &-tabs{
@@ -118,9 +120,21 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
       height: 30px;
     }
 
+    .actions{
+      width: 100%;
+      display: flex;
+      gap: 5px;
+      justify-content: flex-end;
+      visibility: hidden;
+    }
 
     &:hover {
-      background-color: $primary-dark-10
+
+      .actions{
+        visibility: visible;
+      }
+
+      background-color: $primary-dark-5
     }
   }
 

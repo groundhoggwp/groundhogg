@@ -172,9 +172,10 @@
    * @param selector
    * @param multiple
    * @param onReceiveItems
+   * @param queryOpts
    */
-  function emailPicker (selector, multiple = false, onReceiveItems = (items) => {}) {
-    return apiPicker(selector, gh.api.routes.v4.emails, multiple, true, (data) => {
+  function emailPicker (selector, multiple = false, onReceiveItems = (items) => {}, queryOpts = {}) {
+    return apiPicker(selector, gh.api.routes.v4.emails, multiple, false, (data) => {
 
         onReceiveItems(data.items)
 
@@ -185,7 +186,33 @@
       },
       (query) => {
         return {
-          search: query.term
+          search: query.term,
+          ...queryOpts
+        }
+      })
+  }
+
+  /**
+   * Api based email picker
+   *
+   * @param selector
+   * @param onReceiveItems
+   * @param queryOpts
+   */
+  function searchesPicker (selector, onReceiveItems = (items) => {}, queryOpts = {}) {
+    return apiPicker(selector, gh.api.routes.v4.searches, false, false, (data) => {
+
+        onReceiveItems(data.items)
+
+        return data.items.map(item => ({
+          id: item.id,
+          text: item.name
+        }))
+      },
+      (query) => {
+        return {
+          search: query.term,
+          ...queryOpts
         }
       })
   }
@@ -232,7 +259,8 @@
     apiPicker,
     linkPicker,
     metaPicker,
-    campaignPicker
+    campaignPicker,
+    searchesPicker
   }
 
   // Map functions to Groundhogg object.

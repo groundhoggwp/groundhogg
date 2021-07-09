@@ -27,6 +27,7 @@
     input,
     textarea,
     regexp,
+    tooltip,
     toggle,
     savingModal,
     textAreaWithReplacements,
@@ -34,7 +35,10 @@
     flattenObject,
     setFrameContent,
     moreMenu,
-    clickInsideElement
+    clickInsideElement,
+    inputWithReplacements,
+    inputWithReplacementsAndEmojis,
+    inputWithEmojis
   } = Groundhogg.element
 
   const { formBuilder } = Groundhogg
@@ -257,6 +261,16 @@
 			</div>`
       },
       publishActions (status) {
+
+        // language=HTML
+        const moreMenu = `<button id="more-menu" class="gh-button secondary text icon">
+				  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 384">
+					  <circle fill="currentColor" cx="192" cy="42.7" r="42.7"/>
+					  <circle fill="currentColor" cx="192" cy="192" r="42.7"/>
+					  <circle fill="currentColor" cx="192" cy="341.3" r="42.7"/>
+				  </svg>
+			  </button>`
+
         // Todo switch back
         if (status === 'inactive') {
           //language=HTML
@@ -267,7 +281,7 @@
 						  d="M8.888 7.173a21.621 21.621 0 017.22-4.783m-7.22 4.783a21.766 21.766 0 00-2.97 3.697m2.97-3.697c-1.445-.778-4.935-1.2-7.335 3.334l2.364 2.364 2-2m10.19-8.481A21.709 21.709 0 0123.22.843a21.708 21.708 0 01-1.546 7.112M16.108 2.39l5.565 5.565M5.917 10.87l1.885 4.057m9.088.248a21.62 21.62 0 004.783-7.22m-4.783 7.22a21.771 21.771 0 01-3.698 2.97m3.698-2.97c.778 1.445 1.2 4.934-3.334 7.335l-2.364-2.364 2-2m0 0L9.136 16.26m0 0l-1.334-1.334m1.334 1.334l-2.71 2.71-.667-.666-.667-.667 2.71-2.71m6.42-5.087a1.886 1.886 0 112.668-2.667 1.886 1.886 0 01-2.668 2.667z"
 						  stroke="currentColor" stroke-width="1.5"/>
 				  </svg>
-			  </button>`
+			  </button>${moreMenu}`
         } else {
           //language=HTML
           return `
@@ -291,13 +305,7 @@
 				  </svg>
 				  Update
 			  </button>
-			  <button id="more-menu" class="gh-button secondary text icon">
-				  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 384">
-					  <circle fill="currentColor" cx="192" cy="42.7" r="42.7"/>
-					  <circle fill="currentColor" cx="192" cy="192" r="42.7"/>
-					  <circle fill="currentColor" cx="192" cy="341.3" r="42.7"/>
-				  </svg>
-			  </button>`
+			  ${moreMenu}`
         }
       },
       funnelTitleEdit (title, isEditing) {
@@ -1496,6 +1504,16 @@
       $('.undo-and-redo').replaceWith(
         this.htmlTemplates.undoRedoActions()
       )
+
+      const { close: cUndo } = tooltip('.undo', {
+        content: 'Undo'
+      })
+
+      const { close: cRedo } = tooltip('.redo', {
+        content: 'Redo'
+      })
+
+
     },
 
     /**
@@ -2107,81 +2125,6 @@
     return props.join(' ')
   }
 
-  const Elements = {
-    input (props) {
-      props = {
-        type: 'text',
-        className: 'input',
-        ...props,
-      }
-
-      return `<input ${objectToProps(props)}/>`
-    },
-    select (props, options, selected) {
-      return `<select ${objectToProps(props)}>${createOptions(
-        options,
-        selected
-      )}</select>`
-    },
-    option: function (value, text, selected) {
-      //language=HTML
-      return `
-		  <option value="${specialChars(value)}" ${
-			  selected ? 'selected' : ''
-		  }>${text}
-		  </option>`
-    },
-    mappableFields (props, selected) {
-      return Elements.select(
-        props,
-        {
-          0: '-- Do not map --',
-          ...Groundhogg.fields.mappable,
-        },
-        selected
-      )
-    },
-    inputWithReplacementsAndEmojis (
-      { type = 'text', name, id, value, className, placeholder = '' },
-      replacements = true,
-      emojis = true
-    ) {
-      const classList = [
-        replacements && 'input-with-replacements',
-        emojis && 'input-with-emojis',
-      ]
-      //language=HTML
-      return `
-		  <div class="input-wrap ${classList.filter((c) => c).join(' ')}">
-			  <input type="${type}" id="${id}" name="${name}" value="${
-				  specialChars(value) || ''
-			  }" class="${className}"
-			         placeholder="${specialChars(placeholder)}">
-			  ${
-				  emojis
-					  ? `<button class="emoji-picker-start" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
-			  </button>`
-					  : ''
-			  }
-			  ${
-				  replacements
-					  ? `<button class="replacements-picker-start" title="insert replacement"><span
-				  class="dashicons dashicons-admin-users"></span></button>`
-					  : ''
-			  }
-		  </div>`
-    },
-    inputWithReplacements: function (atts) {
-      return Elements.inputWithReplacementsAndEmojis(atts, true, false)
-    },
-    inputWithEmojis: function (atts) {
-      return Elements.inputWithReplacementsAndEmojis(atts, false, true)
-    },
-    textAreaWithReplacementsAndEmojis: function ({ name, id, value }) {},
-    textAreaWithReplacements: function ({ name, id, value }) {},
-    textAreaWithEmojis: function ({ name, id, value }) {},
-  }
-
   /**
    * Create a list of options
    *
@@ -2196,7 +2139,7 @@
     if (Array.isArray(options)) {
       options.forEach((option) => {
         optionsString.push(
-          Elements.option(
+          option(
             option,
             option,
             Array.isArray(selected)
@@ -2211,7 +2154,7 @@
       for (const option in options) {
         if (options.hasOwnProperty(option)) {
           optionsString.push(
-            Elements.option(
+            option(
               option,
               options[option],
               Array.isArray(selected)
@@ -2535,19 +2478,27 @@
 				  fill="currentColor"/>
 		  </svg>`,
       title ({ meta }) {
-        return 'Apply Note'
+        const { note_text } = meta
+
+        if (note_text) {
+          return `Add <i>${note_text.replace(/(<([^>]+)>)/gi, '').substring(0, 30)}...</i>`
+        }
+
+        return 'Add Note'
       },
       edit ({ meta }) {
-        const { note_text } = meta
+        const { note_text = '' } = meta
 
         //language=html
         return `
 			<div class="panel">
 				<div class="row">
 					<label class="row-label" for="note_text">Add the following note the the contact...</label>
-					<textarea id="note_text" name="note_text">${
-						note_text || ''
-					}</textarea>
+					${textarea({
+						id: 'note_text',
+						className: 'wp-editor-area',
+						value: note_text
+					})}
 				</div>
 			</div>`
       },
@@ -2609,58 +2560,68 @@
         )}`
       },
       edit ({ meta }) {
+
+        const {
+          note_text = '',
+          to = '',
+          from = '',
+          reply_to = '',
+          subject = ''
+        } = meta
         //language=HTML
         return `
 			<div class="panel">
 				<div class="row">
 					<label class="row-label" for="to">Send this notification to...</label>
-					${Elements.inputWithReplacements({
+					${inputWithReplacements({
 						type: 'text',
 						id: 'to',
 						name: 'to',
 						className: 'regular-text',
-						value: meta.to,
+						value: to,
 					})}
 					<p class="description">Comma separated list of emails addresses.</p>
 				</div>
 				<div class="row">
 					<label class="row-label" for="from">This notification should be sent from...</label>
-					${Elements.inputWithReplacements({
+					${inputWithReplacements({
 						type: 'text',
 						id: 'from',
 						name: 'from',
 						className: 'regular-text',
-						value: meta.from,
+						value: from,
 					})}
 					<p class="description">A single email address which you'd like the notification to come from.</p>
 				</div>
 				<div class="row">
 					<label class="row-label" for="reply-to">Replies should go to...</label>
-					${Elements.inputWithReplacements({
+					${inputWithReplacements({
 						type: 'text',
 						id: 'reply-to',
 						name: 'reply_to',
 						className: 'regular-text',
-						value: meta.reply_to,
+						value: reply_to,
 					})}
 					<p class="description">A single email address which replies to this notification should be sent
 						to.</p>
 				</div>
 				<div class="row">
 					<label class="row-label" for="subject">Subject line</label>
-					${Elements.inputWithReplacementsAndEmojis({
+					${inputWithReplacementsAndEmojis({
 						type: 'text',
 						id: 'subject',
 						name: 'subject',
 						className: 'regular-text',
-						value: meta.subject,
+						value: subject,
 					})}
 					<p class="description">The subject line of the notification.</p>
 				</div>
 				<div class="row">
-					<textarea id="note_text" name="note_text">${specialChars(
-						meta.note_text
-					)}</textarea>
+					${textarea({
+						id: 'note_text',
+						className: 'wp-editor-area',
+						value: note_text
+					})}
 				</div>
 			</div>`
       },
@@ -3503,7 +3464,7 @@
 				</div>
 				<div class="row">
 					<label class="row-label" for="copy">Then redirect contacts to...</label>
-					${Elements.inputWithReplacements({
+					${inputWithReplacements({
 						type: 'url',
 						id: 'redirect-to',
 						name: 'redirect_to',
@@ -3561,7 +3522,7 @@
       edit ({ meta }) {
         // language=html
         const redirectToURL = `<label class="row-label">Redirect to this URL...</label>
-		${Elements.inputWithReplacements({
+		${inputWithReplacements({
 			id: 'success-page',
 			name: 'success_page',
 			className: 'regular-text',
@@ -3660,7 +3621,7 @@
       return `<tr>
 				<td><code>${specialChars(id)}</code></td>
 				<td><code>${specialChars(label)}</code></td>
-				<td>${Elements.mappableFields(
+				<td>${mappableFields(
         {
           dataKey: id,
           className: 'mappable-field',
@@ -3963,5 +3924,4 @@
     },
   }
 
-  Groundhogg.funnelEditor.elements = Elements
 })(GroundhoggFunnel, jQuery)

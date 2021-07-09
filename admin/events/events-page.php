@@ -196,6 +196,36 @@ class Events_Page extends Tabbed_Admin_Page {
 	}
 
 	/**
+	 * Cancels scheduled broadcast
+	 *
+	 * @return bool
+	 */
+	public function process_cancel_all() {
+
+		if ( ! current_user_can( 'cancel_events' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		global $wpdb;
+
+		$event_queue = get_db( 'event_queue' )->get_table_name();
+//		$event_ids   = implode( ',', $this->get_items() );
+		$cancelled = Event::CANCELLED;
+		$waiting   = Event::WAITING;
+
+		// Update the time
+		$wpdb->query( "UPDATE {$event_queue} SET `status` = '$cancelled' WHERE `status` = '$waiting'" );
+
+		// Move the items over...
+		get_db( 'event_queue' )->move_events_to_history( [ 'status' => Event::CANCELLED ] );
+
+		$this->add_notice( 'cancelled', __( 'Cancelled all waiting events.', 'groundhogg' ) );
+
+		//false return users to the main page
+		return false;
+	}
+
+	/**
 	 * Clean up the events DB if something goes wrong.
 	 *
 	 * @return bool

@@ -12,6 +12,7 @@ use function Groundhogg\email_kses;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
+use function Groundhogg\is_template_site;
 use function Groundhogg\send_email_notification;
 use function Groundhogg\set_user_test_email;
 
@@ -175,7 +176,7 @@ class Emails_Api extends Base_Object_Api {
 	}
 
 	public function read_permissions_callback() {
-		return current_user_can( 'edit_emails' );
+		return is_template_site() || current_user_can( 'edit_emails' );
 	}
 
 	public function update_permissions_callback() {

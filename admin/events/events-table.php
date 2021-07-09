@@ -85,6 +85,7 @@ class Events_Table extends WP_List_Table {
 	 * 'internal-name' => array( 'orderby', true )
 	 *
 	 * The second format will make the initial sorting order be descending
+	 *
 	 * @return array An associative array containing all the columns that should be sortable.
 	 */
 	protected function get_sortable_columns() {
@@ -213,7 +214,7 @@ class Events_Table extends WP_List_Table {
 	/**
 	 * Get default column value.
 	 *
-	 * @param Event $event A singular item (one full row's worth of data).
+	 * @param Event  $event       A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string Text or HTML to be placed inside the column <td>.
@@ -243,6 +244,7 @@ class Events_Table extends WP_List_Table {
 	/**
 	 * Get an associative array ( option_name => option_title ) with the list
 	 * of bulk steps available on this table.
+	 *
 	 * @return array An associative array containing all the bulk steps.
 	 */
 	protected function get_bulk_actions() {
@@ -297,9 +299,9 @@ class Events_Table extends WP_List_Table {
 	/**
 	 * Generates and displays row actions.
 	 *
-	 * @param Event $event Event being acted upon.
+	 * @param Event  $event       Event being acted upon.
 	 * @param string $column_name Current column name.
-	 * @param string $primary Primary column name.
+	 * @param string $primary     Primary column name.
 	 *
 	 * @return string Row steps output for posts.
 	 */
@@ -379,6 +381,10 @@ class Events_Table extends WP_List_Table {
 			   href="<?php echo Plugin::instance()->bulk_jobs->process_events->get_start_url(); ?>"><?php _ex( 'Process Events', 'action', 'groundhogg' ); ?></a>
 			<a class="button action"
 			   href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'cleanup' ], $_SERVER['REQUEST_URI'] ), 'cleanup' ); ?>"><?php _ex( 'Cleanup', 'action', 'groundhogg' ); ?></a>
+			<?php if ( $this->get_view() === Event::WAITING ): ?>
+				<a class="button action danger"
+				   href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'cancel_all' ], $_SERVER['REQUEST_URI'] ), 'cancel_all' ); ?>"><?php _ex( 'Cancel All', 'action', 'groundhogg' ); ?></a>
+			<?php endif; ?>
 			<?php if ( in_array( $this->get_view(), [ 'failed', 'skipped', 'cancelled' ] ) ): ?>
 				<a class="button action"
 				   href="<?php echo wp_nonce_url( add_query_arg( [
@@ -392,6 +398,7 @@ class Events_Table extends WP_List_Table {
 
 	/**
 	 * Prepares the list of items for displaying.
+	 *
 	 * @uses $this->_column_headers
 	 * @uses $this->items
 	 * @uses $this->get_columns()

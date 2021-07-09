@@ -1,5 +1,93 @@
 (function ($) {
 
+  var $doc = $(document)
+
+  function insertAtCursor (myField, myValue) {
+    //IE support
+    if (document.selection) {
+      myField.focus()
+      var sel = document.selection.createRange()
+      sel.text = myValue
+    }
+    //MOZILLA and others
+    else if (myField.selectionStart || myField.selectionStart == '0') {
+      var startPos = myField.selectionStart
+      var endPos = myField.selectionEnd
+      myField.value = myField.value.substring(0, startPos)
+        + myValue
+        + myField.value.substring(endPos, myField.value.length)
+    } else {
+
+      myField.value += myValue
+    }
+
+    $(myField).trigger('change')
+  }
+
+  const Insert = {
+
+    active: null,
+    text: '',
+    to_mce: false,
+
+    init: function () {
+
+      var self = this
+
+      $doc.on('ghClearInsertTarget', function () {
+        self.to_mce = false
+        self.active = false
+      })
+
+      // GO TO MCE
+      $doc.on('to_mce', function () {
+        self.to_mce = true
+        $doc.trigger('ghInsertTargetChanged')
+      })
+
+      // NOPE, GO TO TEXT
+      $doc.on('focus', 'input:not(.no-insert), textarea:not(.no-insert)', function () {
+        self.active = this
+        self.to_mce = false
+        $doc.trigger('ghInsertTargetChanged')
+      })
+
+    },
+
+    setActive (el) {
+      this.active = el
+    },
+
+    inserting () {
+      return this.active || this.to_mce
+    },
+
+    insert: function (text) {
+
+      console.log('insert', { text: text })
+
+      // CHECK TINY MCE
+      if (typeof tinymce != 'undefined' && tinymce.activeEditor != null && this.to_mce) {
+        tinymce.activeEditor.execCommand('mceInsertContent', false, text)
+        // INSERT REGULAR TEXT INPUT.
+      }
+
+      if (this.active != null && !this.to_mce) {
+
+        insertAtCursor(this.active, text)
+
+        return this.active
+      }
+    }
+
+  }
+
+  $(() => {
+    Insert.init()
+  })
+
+  window.InsertAtCursor = Insert
+
   Object.filter = function (obj, predicate) {
     let result = {}, key
 
@@ -12,6 +100,192 @@
     return result
   }
 
+  const tooltip = (selector, {
+    content = '',
+    position = 'bottom'
+  }) => {
+
+    const $el = $(selector)
+
+    const getPos = () => {
+      return $el[0].getBoundingClientRect()
+    }
+
+    // language=HTML
+    const $tip = $(`
+		<div class="gh-tooltip ${position}">
+			${content}
+		</div>`)
+
+    let isOpen = false
+
+    const open = () => {
+      if (isOpen) {
+        return
+      }
+
+      isOpen = true
+
+      let style
+
+      $('body').append($tip)
+
+      const {
+        top,
+        bottom,
+        left,
+        right
+      } = getPos()
+
+      switch (position) {
+        case 'top':
+          break
+        case 'right':
+          break
+        case 'bottom':
+          style = {
+            top: bottom + 5,
+            left: left + ($el.outerWidth() / 2)
+          }
+          break
+        case 'left':
+          break
+      }
+
+      $tip.css(style)
+    }
+
+    const close = () => {
+      isOpen = false
+      $tip.remove()
+    }
+
+    $el.on('mouseenter', open)
+
+    $el.on('mouseleave', close)
+
+    return {
+      open,
+      close
+    }
+  }
+
+  const stepNav = ({
+    labels,
+    currentStep,
+  }) => {
+
+    const stepNum = (label, num) => {
+      // language=HTML
+      return `
+		  <div data-step="${num}" class="gh-step-nav-step-num ${num === currentStep ? 'current' : ''}">
+			  <div class="gh-step-nav-step-num-circle">
+				  ${num + 1}
+			  </div>
+			  <div class="gh-step-nav-step-num-label">
+				  ${label}
+			  </div>
+		  </div>`
+    }
+
+    // language=HTML
+    return `
+		<div class="gh-step-nav">
+			${labels.map((l, i) => stepNum(l, i)).join(`<hr class="gh-step-nav-join"/>`)}
+		</div>`
+  }
+
+  const stepNavHandler = (selector, {
+    currentStep = 0,
+    steps = [],
+    onStepChange = (step) => { console.log(step)},
+    showNav = true,
+    labels,
+  }) => {
+
+    this.currStep = currentStep
+
+    const mountStep = () => {
+
+      const step = steps[this.currStep]
+
+      console.log({
+        step: this.currStep
+      })
+
+      //language=HTML
+      const html = `
+		  <div class="step-nav-handler">
+			  ${showNav ? stepNav({
+				  labels,
+				  currentStep: this.currStep
+			  }) : ''}
+			  <div class="step-nav-handler-step">
+				  ${step()}
+			  </div>
+		  </div>`
+
+      $el.html(html)
+
+      if (showNav) {
+        $('.gh-step-nav-step-num').on('click', ({ currentTarget }) => {
+          setStep(parseInt(currentTarget.dataset.step))
+        })
+      }
+
+      onStepChange(this.currStep, {
+        nextStep,
+        lastStep,
+        setStep
+      })
+    }
+
+    const $el = $(selector)
+
+    // move to the last step
+    const lastStep = () => {
+
+      if (this.currStep === 0) {
+        return
+      }
+
+      this.currStep--
+
+      mountStep()
+    }
+
+    // move to the next step
+    const nextStep = () => {
+
+      if (this.currStep === steps.length - 1) {
+        return
+      }
+
+      this.currStep++
+
+      mountStep()
+    }
+
+    const setStep = (step) => {
+      if (step > steps.length - 1 || step < 0) {
+        return
+      }
+
+      this.currStep = step
+
+      mountStep()
+    }
+
+    mountStep()
+
+    return {
+      $el,
+      nextStep,
+      lastStep,
+      setStep
+    }
+  }
+
   const breadcrumbs = (parts) => {
     return parts.map((p, i) => i < parts.length - 1 ? `<span class="part">${p}</span>` : `<span class="base">${p}</span>`).join(`<span class="sep">/</span>`)
   }
@@ -22,14 +296,14 @@
       return
     }
 
-    $(document).on('tinymce-editor-setup', function (event, editor) {
+    $doc.on('tinymce-editor-setup', function (event, editor) {
       editor.settings.toolbar1 =
         'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,wp_adv,dfw,groundhoggreplacementbtn,groundhoggemojibtn'
       editor.settings.toolbar2 =
         'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help'
       editor.settings.height = 200
       editor.on('click', function (ed, e) {
-        $(document).trigger('to_mce')
+        $doc.trigger('to_mce')
       })
     })
 
@@ -63,6 +337,42 @@
 
   function orList (array) {
     return andList(array, 'or')
+  }
+
+  const progressBar = (selector) => {
+
+    // language=HTML
+    const html = `
+		<div class="gh-progress-bar">
+			<div class="gh-progress-bar-fill"></div>
+		</div>`
+
+    const $bar = $(html)
+    const $fill = $bar.find('.gh-progress-bar-fill')
+
+    const $el = $(selector)
+    $el.html($bar)
+
+    const setProgress = (progress) => {
+
+      if (progress <= 1) {
+        progress = progress * 100
+      }
+
+      if (progress === 100) {
+        $bar.addClass('complete')
+      } else {
+        $bar.removeClass('complete')
+      }
+
+      $fill.css({
+        width: progress + '%'
+      })
+    }
+
+    return {
+      setProgress
+    }
   }
 
   const createSlotFillProvider = () => ({
@@ -257,9 +567,9 @@
       return `
 		  <div class="input-wrap ${classList.filter(c => c).join(' ')}">
 			  ${Elements.input(inputProps)}
-			  ${emojis ? `<button class="emoji-picker-start" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
+			  ${emojis ? `<button class="emoji-picker-start gh-button dashicon" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
 			  </button>` : ''}
-			  ${replacements ? `<button class="replacements-picker-start" title="insert replacement"><span
+			  ${replacements ? `<button class="replacements-picker-start gh-button dashicon" title="insert replacement"><span
 				  class="dashicons dashicons-admin-users"></span></button>` : ''}
 		  </div>`
     },
@@ -269,26 +579,22 @@
     inputWithEmojis: function (atts) {
       return Elements.inputWithReplacementsAndEmojis(atts, false, true)
     },
-    textAreaWithReplacementsAndEmojis: function ({
-      name,
-      id,
-      value,
-      className,
-      placeholder = ''
-    }, replacements = true, emojis = true) {
+    textAreaWithReplacementsAndEmojis: (props = {
+      placeholder: ''
+    }, replacements = true, emojis = true) => {
       const classList = [
-        replacements && 'input-with-replacements',
-        emojis && 'input-with-emojis'
+        'textarea-with-buttons',
+        replacements && 'textarea-with-replacements',
+        emojis && 'textarea-with-emojis'
       ]
       //language=HTML
       return `
-		  <div class="input-wrap ${classList.filter(c => c).join(' ')}" xmlns="http://www.w3.org/1999/html">
-			  <textarea id="${id}" name="${name}" class="${className}"
-	              placeholder="${specialChars(placeholder)}">${specialChars(value) || ''}</textarea>
+		  <div class="${classList.filter(c => c).join(' ')}" xmlns="http://www.w3.org/1999/html">
+			  ${Elements.textarea(props)}
 			  <div class="buttons">
-				  ${replacements ? `<button class="replacements-picker-start" title="insert replacement"><span
+				  ${replacements ? `<button class="replacements-picker-start gh-button dashicon" title="insert replacement"><span
 				  class="dashicons dashicons-admin-users"></span></button>` : ''}
-				  ${emojis ? `<button class="emoji-picker-start" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
+				  ${emojis ? `<button class="emoji-picker-start gh-button dashicon" title="insert emoji"><span class="dashicons dashicons-smiley"></span>
 			  </button>` : ''}
 			  </div>
 		  </div>`
@@ -303,7 +609,6 @@
 
   var codeMirror
   var codeMirrorIsFocused
-  var $doc = $(document)
 
   $doc.on('ghInsertReplacement', function (e, insert) {
     if (codeMirrorIsFocused) {
@@ -641,6 +946,10 @@
       }
   }
 
+  const clickedIn = (e, selector) => {
+    return clickInsideElement(e, selector)
+  }
+
   /**
    * Function to check if we clicked inside an element with a particular class
    * name.
@@ -666,7 +975,9 @@
   }
 
   const searchOptionsWidget = ({
-    selector,
+    selector = '.search-options-widget-wrap',
+    target = null,
+    position = 'inline',
     options = [],
     groups = {},
     filterOption = (option, search) => option.match(regexp(search)),
@@ -685,19 +996,19 @@
     groups,
 
     search: '',
-    focusedOptionId: 0,
+    focusedOptionId: -1,
     previousFocusedOptionId: false,
     focusedOption: false,
     render () {
       //language=HTML
       return `
 		  <div class="search-options-widget-wrap">
-			  <div class="search-options-widget" tabindex="0">
+			  <div class="search-options-widget ${position}" tabindex="0">
 				  <div class="header">
 					  ${Elements.input({
 						  name: 'search',
 						  type: 'search',
-						  className: 'search-for-options',
+						  className: 'search-for-options no-insert',
 						  autocomplete: 'off',
 						  placeholder: 'Search...'
 					  })}
@@ -758,15 +1069,20 @@
 
       return searchOptions.length ? searchOptions.join('') : `<div class="no-options">${noOptions}</div>`
     },
+    close () {
+      $('.search-options-widget-wrap').remove()
+    },
     selectOption (optionId, groupId) {
       if (!this.hasGroups()) {
         onSelect(this.getOptions()[optionId])
+        this.close()
         onClose()
       } else {
         Object.keys(groups).forEach((group, g) => {
           this.getOptions().filter(option => option.group == group).forEach((option, o) => {
             if (group == groupId && o == optionId) {
               onSelect(option)
+              this.close()
               onClose()
               return
             }
@@ -807,7 +1123,29 @@
     mount () {
       var self = this
 
-      $(selector).html(self.render())
+      switch (position) {
+        default:
+        case 'inline':
+          const $el = $(selector)
+
+          $el.html(self.render())
+          break
+        case 'fixed':
+          const {
+            left, top, right, bottom
+          } = target.getBoundingClientRect()
+          const $picker = $(self.render())
+          $('body').append($picker)
+          const $widget = $picker.find('.search-options-widget')
+          $widget.css({
+            top: top + $widget.outerHeight() > window.innerHeight ? 'initial' : top,
+            bottom: top + $widget.outerHeight() > window.innerHeight ? 5 : 'initial',
+            right: left + $widget.outerWidth() > window.innerWidth ? 5 : 'initial',
+            left: left + $widget.outerWidth() > window.innerWidth ? 'initial' : left
+          })
+          break
+      }
+
       this.mountOptions()
 
       const el = document.querySelector('.search-options-widget')
@@ -817,6 +1155,7 @@
       }
 
       const handleClose = () => {
+        this.close()
         onClose()
       }
 
@@ -887,11 +1226,49 @@
     }
   })
 
+  $(() => {
+
+    const { groups, codes } = Groundhogg.replacements
+    let isOpen = false
+    let widget
+
+    $doc.on('click', (e) => {
+      if (isOpen && !clickedIn(e, '.search-options-widget')) {
+        widget.close()
+      }
+
+      if (clickedIn(e, '.replacements-picker-start')) {
+
+        widget = searchOptionsWidget({
+          target: e.target.closest('.replacements-picker-start'),
+          position: 'fixed',
+          options: Object.values(codes),
+          groups,
+          filterOption: ({ name, code }, search) => name.match(regexp(search)) || code.match(regexp(search)),
+          renderOption: (option) => option.name,
+          onClose: () => {
+            isOpen = false
+          },
+          onSelect: (option) => {
+            let el = InsertAtCursor.insert(option.insert)
+            $(el).focus()
+          },
+          onOpen: () => {
+            isOpen = true
+          }
+        })
+
+        widget.mount()
+      }
+    })
+  })
+
   const inputRepeaterWidget = ({
     selector = '',
     rows = [],
     cellProps = [],
     cellCallbacks = [],
+    onMount = () => {},
     onChange = (rows) => {
       console.log(rows)
     }
@@ -927,6 +1304,7 @@
         onChange(this.rows)
       })
 
+      onMount()
     },
 
     render () {
@@ -941,7 +1319,7 @@
 					dataRow: rowIndex,
 					dataCell: cellIndex,
 				})).join('')}
-				<button class="dashicon-button remove-row" data-row="${rowIndex}"><span
+				<button class="gh-button dashicon remove-row" data-row="${rowIndex}"><span
 					class="dashicons dashicons-no-alt"></span></button>
 			</div>`
       }
@@ -952,7 +1330,7 @@
 			  ${this.rows.map((row, i) => renderRow(row, i)).join('')}
 			  <div class="gh-input-repeater-row-add">
 				  <div class="spacer"></div>
-				  <button id="add-row" class="dashicon-button">
+				  <button id="add-row" class="gh-button dashicon">
 					  <span class="dashicons dashicons-plus-alt2"></span></button>
 			  </div>
 		  </div>`
@@ -1128,7 +1506,12 @@
     codeEditor,
     breadcrumbs,
     dialog,
-    errorDialog
+    errorDialog,
+    stepNav,
+    stepNavHandler,
+    progressBar,
+    tooltip,
+    clickedIn
   }
 
 })(jQuery)

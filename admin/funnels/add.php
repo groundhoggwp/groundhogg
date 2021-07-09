@@ -1,2 +1,13 @@
-<?php ?>
-<div id="add-funnel" class="templates-picker"></div>
+<div id="app" class="templates-picker"></div>
+<script>
+  (function ($) {
+    $(() => {
+      Groundhogg.FunnelTemplatePicker({
+        selector: '#app',
+        onSelect: (funnel) => {
+          window.location.href = funnel.admin
+        }
+      }).mount()
+    })
+  })(jQuery)
+</script>

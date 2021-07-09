@@ -9,6 +9,7 @@ use Groundhogg\Step;
 use WP_REST_Server;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
+use function Groundhogg\is_template_site;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\map_func_to_attr;
 use function Groundhogg\sanitize_object_meta;
@@ -181,7 +182,7 @@ class Funnels_Api extends Base_Object_Api {
 	 * @return bool
 	 */
 	public function read_permissions_callback() {
-		return current_user_can( 'export_funnels' );
+		return is_template_site() || current_user_can( 'export_funnels' );
 	}
 
 	/**

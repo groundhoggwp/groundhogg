@@ -3,8 +3,9 @@
 }
 .groundhogg-toolbar-quick-search-close {
   position: absolute;
-  right: 10px;
-  top: 10px;
+  right: 5px;
+  padding: 0;
+  top: 5px;
 }
 .groundhogg-toolbar-quick-search #close-quick-search {
   float: right;
@@ -45,7 +46,7 @@
   padding: 20px;
   box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   border-radius: 0 0 5px 5px;
-  z-index: 9999;
+  z-index: 99999;
 }
 .groundhogg-toolbar-quick-search-tabs {
   margin-bottom: 10px;
@@ -76,8 +77,18 @@
   width: 30px;
   height: 30px;
 }
+.groundhogg-toolbar-quick-search-result .actions {
+  width: 100%;
+  display: flex;
+  gap: 5px;
+  justify-content: flex-end;
+  visibility: hidden;
+}
 .groundhogg-toolbar-quick-search-result:hover {
-  background-color: rgba(16, 38, 64, 0.1);
+  background-color: rgba(16, 38, 64, 0.05);
+}
+.groundhogg-toolbar-quick-search-result:hover .actions {
+  visibility: visible;
 }
 
 /*# sourceMappingURL=admin-bar.css.map */

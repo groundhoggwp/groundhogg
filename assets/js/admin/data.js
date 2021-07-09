@@ -288,7 +288,15 @@
         })
       },
     }),
-    contacts: ObjectStore(Groundhogg.api.routes.v4.contacts),
+    contacts: ObjectStore(Groundhogg.api.routes.v4.contacts, {
+      async count (params) {
+        return apiGet(`${this.route}`, {
+          count: true,
+          ...params,
+        })
+          .then(r => r.total_items)
+      }
+    }),
     campaigns: ObjectStore(Groundhogg.api.routes.v4.campaigns),
     emails: ObjectStore(Groundhogg.api.routes.v4.emails),
     searches: ObjectStore(Groundhogg.api.routes.v4.searches, {

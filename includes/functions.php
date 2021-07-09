@@ -3779,6 +3779,7 @@ add_action( 'admin_menu', function () {
 
 }, 99999999 );
 
+
 add_action( 'admin_print_styles', function () {
 
 	if ( is_white_labeled() ) {
@@ -5194,4 +5195,12 @@ function create_object_from_type( $object, $object_type ) {
 	$table = Plugin::instance()->dbs->get_object_db_by_object_type( $object_type );
 
 	return $table->create_object( $object );
+}
+
+/**
+ * Whether this site provides templates, if so then the gh/v4/emails READ and gh/v4/funnels READ will be public
+ */
+function is_template_site(){
+	// Todo change this
+	return apply_filters( 'groundhogg/is_template_site', true );
 }

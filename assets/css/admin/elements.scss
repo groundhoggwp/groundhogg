@@ -235,9 +235,6 @@ button {
           background: $primary-dark-10;
           color: $primary-dark;
         }
-
-        //border-width: 2px;
-        //padding: 3px 8px;
       }
     }
 
@@ -256,6 +253,17 @@ button {
           color: $error-red;
           background-color: $error-red-10;
         }
+      }
+    }
+
+    &.dashicon {
+      border: 1px solid $primary-dark-50;
+      color: $primary-dark;
+      background-color: #FFF;
+      padding: 4px 5px;
+
+      &:hover {
+        background-color: $primary-dark-10;
       }
     }
 
@@ -334,6 +342,12 @@ button {
   .search-options-widget {
     position: absolute;
     z-index: 999;
+
+    &.fixed {
+      z-index: 999999;
+      position: fixed;
+    }
+
     border: 1px solid #8c8f94;
     display: flex;
     flex-direction: column;
@@ -341,6 +355,7 @@ button {
     background: #FFFFFF;
     border-radius: 5px;
     box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
+    min-width: 170px;
 
     &.mount-from-bottom {
       bottom: 0;
@@ -478,8 +493,8 @@ button {
 
   &-button-close-top {
     position: absolute;
-    right: 15px;
-    top: 15px;
+    right: 3px;
+    top: 5px;
     padding: 0;
   }
 
@@ -511,85 +526,33 @@ input.ui-autocomplete-input {
   //border: 1px solid $primary-dark-15;
 }
 
+
+.gh-radio-group {
+  display: flex;
+  gap: 20px;
+}
+
+.gh-input-group,
 .input-wrap {
   display: flex;
   justify-content: flex-start;
 
-  &.input-with-replacements {
+  input, select, textarea {
+    flex-grow: 1;
+    margin: 0;
 
-    textarea {
-      border-top-right-radius: 0;
-    }
-
-    .buttons {
-      display: flex;
-      flex-direction: column;
-
-
-      button {
-        border-radius: 0;
-        padding: 4px;
-        border-left: none;
-
-        &:first-child {
-          border-top-right-radius: 4px;
-        }
-
-        &:not(:first-child) {
-          border-top: none;
-        }
-
-        &:last-child {
-          border-bottom-right-radius: 4px;
-        }
-      }
+    &.bigger {
+      flex-grow: 2;
     }
   }
-}
 
-.input-wrap > *:last-child {
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
-  border-left: none;
-}
-
-.input-wrap > *:nth-child(2):not(:last-child) {
-  border-left: none;
-}
-
-.input-wrap.input-with-emojis input,
-.input-wrap.input-with-replacements input {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  margin-right: 0;
-}
-
-.input-wrap.input-with-emojis button.emoji-picker-start,
-.input-wrap.input-with-replacements button.replacements-picker-start {
-  box-shadow: 0 0 0 transparent;
-  border-radius: 0;
-  border: 1px solid #8c8f94;
-  background-color: #fff;
-  color: #2c3338;
-  cursor: pointer;
-}
-
-.input-wrap.input-with-emojis button.emoji-picker-start:hover,
-.input-wrap.input-with-replacements button.replacements-picker-start:hover {
-  background-color: #F6F9FB;
-}
-
-.input-wrap {
-  select + input {
+  *:not(:first-child) {
+    border-left: 0 !important;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }
 
-  input, select {
-    margin: 0;
-  }
-
-  select:first-child {
+  *:not(:last-child) {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
@@ -600,11 +563,32 @@ p.error,
   color: $error-red;
 }
 
+.wp-editor-container {
+  textarea.wp-editor-area {
+    width: 100%;
+    margin: 0;
+    box-shadow: none;
+  }
+
+  .wp-editor-area {
+    font-family: Consolas, Monaco, monospace;
+    font-size: 13px;
+    padding: 10px;
+    margin: 1px 0 0;
+    line-height: 150%;
+    border: 0;
+    outline: 0;
+    display: block;
+    resize: vertical;
+    box-sizing: border-box;
+  }
+}
+
 .gh-input-repeater {
 
   margin: 5px 0;
 
-  &-row {
+  & &-row {
     display: flex;
 
     input {
@@ -663,7 +647,7 @@ p.error,
     }
   }
 
-  &-row-add {
+  & &-row-add {
     display: flex;
     //justify-content: flex-end;
 
@@ -714,6 +698,205 @@ p.error,
     &:hover {
       background-color: $primary-dark-10;
       cursor: pointer;
+    }
+  }
+}
+
+.gh-step-nav {
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 30px;
+
+  & &-join {
+    width: 100%;
+    border-top: 1px solid $primary-dark-50;
+    border-bottom: none;
+  }
+
+  & &-step-num {
+
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+
+    &-label {
+      position: absolute;
+      bottom: -20px;
+    }
+
+    &-circle {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1px solid $primary-dark-50;
+      background-color: #FFF;
+    }
+
+    &.current {
+      .gh-step-nav-step-num-label {
+        color: $primary-blue;
+      }
+
+      .gh-step-nav-step-num-circle {
+        color: #FFFFFF;
+        background-color: $primary-blue;
+        border-color: $primary-blue;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.gh-rows-and-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  label {
+    display: inline-block;
+    margin-bottom: 5px;
+  }
+
+  input:not([type=checkbox],[type=radio]), select {
+    width: 100%;
+  }
+
+  .gh-row {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+
+    .gh-col {
+      width: 100%;
+      //display: flex;
+      //flex-direction: column;
+      //gap: 10px;
+    }
+  }
+}
+
+#gh-send-broadcast-form {
+
+  #gh-broadcast-email-preview {
+    width: 100%;
+    height: 300px;
+    border-radius: 5px;
+    border: 1px solid $primary-dark-50;
+  }
+
+  label {
+    display: inline-block;
+    margin-bottom: 5px;
+  }
+}
+
+.gh-progress-bar {
+
+  border: 1px solid $primary-blue;
+  background-color: $primary-blue-2;
+  border-radius: 5px;
+  //position: relative;
+  //height: 25px;
+  //box-sizing: content-box;
+
+  .gh-progress-bar-fill {
+    //position: absolute;
+    //top: 0;
+    //left: 0;
+    //border-radius: 5px;
+    width: 1px;
+    background-color: $primary-blue;
+    height: 25px;
+  }
+
+  &.complete {
+    border-color: $action-green;
+
+    .gh-progress-bar-fill {
+      background-color: $action-green;
+    }
+  }
+}
+
+.gh-tooltip {
+  position: fixed;
+  background-color: $primary-dark;
+  color: #FFFFFF;
+  box-shadow: $box-shadow;
+  z-index: 999999;
+  padding: 5px 8px;
+  border-radius: 5px;
+  //position: relative;
+
+  &.bottom {
+    &:before {
+      position: absolute;
+      content: '';
+      display: inline-block;
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 5px solid $primary-dark;
+      transform: translate(-50%, 0);
+      top: -5px;
+      left: 50%;
+    }
+
+    transform: translate(-50%, 0);
+  }
+}
+
+.gh-input-inline-label {
+  position: relative;
+
+  label {
+    position: absolute;
+    opacity: 0.5;
+    display: inline-block;
+    left: 6px;
+    top: 6px;
+  }
+
+  input {
+    padding-left: 60px;
+  }
+}
+
+.textarea-with-buttons{
+  display: flex;
+
+  textarea{
+    flex-grow: 1;
+    border-top-right-radius: 0;
+  }
+
+  .buttons {
+    display: flex;
+    flex-direction: column;
+
+    button {
+      border-left-width: 0;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+
+      &:not(:first-child){
+        border-top-width: 0;
+        border-top-right-radius: 0;
+      }
+
+      &:not(:last-child){
+        border-bottom-right-radius: 0;
+      }
     }
   }
 }

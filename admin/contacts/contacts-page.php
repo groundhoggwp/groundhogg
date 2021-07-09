@@ -33,6 +33,7 @@ use function Groundhogg\sanitize_email_header;
 use function Groundhogg\send_email_notification;
 use function Groundhogg\set_request_var;
 use function Groundhogg\validate_tags;
+use function Groundhogg\Ymd_His;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -72,7 +73,7 @@ class Contacts_Page extends Admin_Page {
 	}
 
 	protected function add_ajax_actions() {
-		
+
 		new Contact_Table_Columns();
 		new Info_Cards();
 
@@ -736,7 +737,8 @@ class Contacts_Page extends Admin_Page {
 
 			// If is valid date
 			if ( checkdate( $birthday[1], $birthday[2], $birthday[0] ) ) {
-				$birthday = implode( '-', $birthday );
+				$time     = mktime( 0, 0, 0, $birthday[1], $birthday[2], $birthday[0] );
+				$birthday = Ymd_His( $time );
 				$contact->update_meta( 'birthday', $birthday );
 			} else {
 				$this->add_notice( new \WP_Error( 'invalid_date', __( 'The birthday date provided is not a valid date.' ) ) );

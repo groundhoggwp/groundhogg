@@ -37,6 +37,21 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	protected $object;
 
 	/**
+	 * Whether the object is transactional and thus avoids marketability.
+	 *
+	 * @return bool
+	 */
+	public function is_transactional() {
+
+		$object = $this->get_object();
+		if ( method_exists( $object, 'is_transactional' ) ) {
+			return $object->is_transactional();
+		}
+
+		return false;
+	}
+
+	/**
 	 * Do any post setup actions.
 	 *
 	 * @return void
@@ -200,6 +215,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 	/**
 	 * Cancel the broadcast
+	 *
 	 * @noinspection PhpPossiblePolymorphicInvocationInspection
 	 */
 	public function cancel() {
@@ -225,7 +241,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	 * Send the associated object to the given contact
 	 *
 	 * @param $contact Contact
-	 * @param $event Event
+	 * @param $event   Event
 	 *
 	 * @return bool|\WP_Error whether the email sent or not.
 	 */
@@ -235,8 +251,8 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		 * Fires before the broadcast is sent
 		 *
 		 * @param Broadcast $broadcast
-		 * @param Contact $contact
-		 * @param Event $event
+		 * @param Contact   $contact
+		 * @param Event     $event
 		 */
 		do_action( "groundhogg/broadcast/{$this->get_broadcast_type()}/before", $this, $contact, $event );
 
@@ -258,8 +274,8 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		 * Fires after the broadcast is sent
 		 *
 		 * @param Broadcast $broadcast
-		 * @param Contact $contact
-		 * @param Event $event
+		 * @param Contact   $contact
+		 * @param Event     $event
 		 */
 		do_action( "groundhogg/broadcast/{$this->get_broadcast_type()}/after", $this, $contact, $event );
 
@@ -373,17 +389,4 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 		return $data;
 	}
-
-	/**
-	 * @return array
-	 */
-	public function get_as_array() {
-		return [
-			'data'   => $this->data,
-			'title'  => $this->get_title(),
-			'report' => $this->get_report_data(),
-		];
-	}
-
-
 }

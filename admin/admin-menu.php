@@ -55,7 +55,7 @@ class Admin_Menu {
 	public function admin_bar( $admin_bar ) {
 		$admin_bar->add_node( [
 			'id'     => 'groundhogg',
-			'title'  => '<svg height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="11.4 13.2 212.1 237.9">
+			'title'  => is_white_labeled() ? white_labeled_name() : '<svg height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="11.4 13.2 212.1 237.9">
   <linearGradient id="a" x1="35.6" x2="199.3" y1="214" y2="50.4" gradientUnits="userSpaceOnUse">
     <stop offset="0.3" stop-color="#db851a"/>
     <stop offset="1" stop-color="#db6f1a"/>
@@ -67,7 +67,7 @@ class Admin_Menu {
 			'parent' => 'top-secondary',
 			'meta'   => [
 				'class' => 'groundhogg-admin-bar-menu',
-				'title' => 'Groundhogg',
+				'title' => white_labeled_name()
 			]
 		] );
 	}

@@ -172,9 +172,15 @@ class Contacts_Api extends Base_Object_Api {
 			'offset' => $default_offset,
 		] );
 
-		$count    = $contact_query->count( $query );
-		$contacts = $contact_query->query( $query );
+		$count = $contact_query->count( $query );
 
+		if ( $request->get_param( 'count' ) ) {
+			return self::SUCCESS_RESPONSE( [
+				'total_items' => $count,
+			] );
+		}
+
+		$contacts = $contact_query->query( $query );
 		$contacts = array_map( [ $this, 'map_raw_object_to_class' ], $contacts );
 
 		return self::SUCCESS_RESPONSE( [

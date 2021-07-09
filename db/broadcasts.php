@@ -89,10 +89,10 @@ class Broadcasts extends DB {
 			'ID'             => 0,
 			'object_id'      => 0,
 			'object_type'    => 'email',
-			'scheduled_by'   => 0,
+			'scheduled_by'   => get_current_user_id(),
 			'send_time'      => 0,
 			'query'          => [],
-			'status'         => 'scheduled',
+			'status'         => 'pending',
 			'date_scheduled' => current_time( 'mysql' ),
 		];
 	}

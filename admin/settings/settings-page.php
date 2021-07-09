@@ -437,11 +437,6 @@ class Settings_Page extends Admin_Page {
 				'tab'      => 'email',
 				'callback' => [ Plugin::$instance->bounce_checker, 'test_connection_ui' ],
 			),
-//			'api_settings'      => array(
-//				'id'    => 'api_settings',
-//				'title' => _x( 'API Settings', 'settings_sections', 'groundhogg' ),
-//				'tab'   => 'api_tab'
-//			),
 			'optin_status_tags'     => [
 				'id'       => 'optin_status_tags',
 				'title'    => _x( 'Optin Status Tags', 'settings_sections', 'groundhogg' ),

@@ -94,7 +94,7 @@
     not_empty: 'Is not empty'
   }
 
-  const createFilters = (el, filters, onChange) => ({
+  const createFilters = (el = '', filters = [], onChange = (f) => {console.log(f)}) => ({
     onChange,
     filters,
     el,
