@@ -462,19 +462,17 @@ class Contacts_Page extends Admin_Page {
 
 		do_action( 'groundhogg/admin/contacts/add/before' );
 
-		$_POST = wp_unslash( $_POST );
-
 		if ( ! get_request_var( 'email' ) ) {
 			return new \WP_Error( 'no_email', __( "Please enter a valid email address.", 'groundhogg' ) );
 		}
 
-		$args['first_name'] = sanitize_text_field( get_request_var( 'first_name' ) );
-		$args['last_name']  = sanitize_text_field( get_request_var( 'last_name' ) );
-		$args['owner_id']   = absint( get_request_var( 'owner_id', get_current_user_id() ) );
+		$args['first_name'] = sanitize_text_field( get_post_var( 'first_name' ) );
+		$args['last_name']  = sanitize_text_field( get_post_var( 'last_name' ) );
+		$args['owner_id']   = absint( get_post_var( 'owner_id', get_current_user_id() ) );
 
-		$email = sanitize_email( get_request_var( 'email' ) );
+		$email = sanitize_email( get_post_var( 'email' ) );
 
-		if ( ! Plugin::$instance->dbs->get_db( 'contacts' )->exists( $email ) ) {
+		if ( ! get_db( 'contacts' )->exists( $email ) ) {
 			$args['email'] = $email;
 		} else {
 			return new \WP_Error( 'email_exists', sprintf( _x( 'Sorry, the email %s already belongs to another contact.', 'page_title', 'groundhogg' ), $email ) );
@@ -490,13 +488,14 @@ class Contacts_Page extends Admin_Page {
 			return new \WP_Error( 'db_error', __( 'Could not add contact.', 'groundhogg' ) );
 		}
 
-		$contact->update_meta( 'primary_phone', sanitize_text_field( get_request_var( 'primary_phone' ) ) );
-		$contact->update_meta( 'primary_phone_extension', sanitize_text_field( get_request_var( 'primary_phone_extension' ) ) );
-		$contact->add_note( get_request_var( 'notes' ) );
+		$contact->update_meta( 'mobile_phone', sanitize_text_field( get_post_var( 'mobile_phone' ) ) );
+		$contact->update_meta( 'primary_phone', sanitize_text_field( get_post_var( 'primary_phone' ) ) );
+		$contact->update_meta( 'primary_phone_extension', sanitize_text_field( get_post_var( 'primary_phone_extension' ) ) );
+		$contact->add_note( get_post_var( 'notes' ) );
 
 
 		if ( get_request_var( 'tags' ) ) {
-			$contact->add_tag( get_request_var( 'tags' ) );
+			$contact->add_tag( get_post_var( 'tags' ) );
 		}
 
 		/**
