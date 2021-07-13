@@ -312,6 +312,12 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 2.4.7.4 (2021-07-12) =
+* ADDED Helpscout integration plugin ID for autoinstall support
+* FIXED Link to mailhawk.io instead of mailhawk.com
+* FIXED Dropdown field in forms with empty value causing error when not required
+* FIXED mobile phone not saving from contact quick add
+
 = 2.4.7.3 (2021-07-07) =
 * HOT FIX Birthdays being saved in `Y-n-j` format instead of `Y-m-d`. Added migration path prompt to fix formatting for contacts with birthdays
 * HOT FIX Contact meta queries with `>, <, <=, >=` not working when passed into `esc_url`
