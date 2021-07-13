@@ -3469,7 +3469,7 @@ msgstr ""
 
 #: admin/guided-setup/steps/email.php:54
 msgid ""
-"<a href=\"https://mailhawk.com/\" target=\"_blank\">MailHawk</a> makes "
+"<a href=\"https://mailhawk.io/\" target=\"_blank\">MailHawk</a> makes "
 "WordPress email delivery as simple as a few clicks, starting at <b>$14.97/"
 "month</b>."
 msgstr ""
