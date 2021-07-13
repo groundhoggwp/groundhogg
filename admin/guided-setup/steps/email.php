@@ -51,7 +51,7 @@ class Email extends Step {
 					     alt="MailHawk">
 				</h3>
 				<p class="extension-description">
-					<?php _e( '<a href="https://mailhawk.com/" target="_blank">MailHawk</a> makes WordPress email delivery as simple as a few clicks, starting at <b>$14.97/month</b>.', 'groundhogg' ); ?>
+					<?php _e( '<a href="https://mailhawk.io/" target="_blank">MailHawk</a> makes WordPress email delivery as simple as a few clicks, starting at <b>$14.97/month</b>.', 'groundhogg' ); ?>
 				</p>
 			</div>
 			<div class="install-actions">
