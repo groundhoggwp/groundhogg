@@ -424,7 +424,7 @@ abstract class Base_Object_Api extends Base_Api {
 	 */
 	public function delete( WP_REST_Request $request ) {
 
-		$query = $request->get_param( 'query' );
+		$query = wp_parse_args( $request->get_params() );
 
 		if ( ! empty( $query ) ) {
 			$items = $this->get_db_table()->query( $query );
@@ -434,14 +434,18 @@ abstract class Base_Object_Api extends Base_Api {
 
 		$items = array_map( [ $this, 'map_raw_object_to_class' ], $items );
 
+		$deleted_item_ids = [];
+
 		/**
 		 * @var $object Base_Object
 		 */
 		foreach ( $items as $object ) {
+			$deleted_item_ids[] = $object->get_id();
 			$object->delete();
 		}
 
 		return self::SUCCESS_RESPONSE( [
+			'items'       => $deleted_item_ids,
 			'total_items' => count( $items ),
 		] );
 	}

@@ -9,7 +9,10 @@
     errorDialog,
     setFrameContent,
     progressBar,
-    tooltip
+    tooltip,
+    loadingDots,
+    adminPageURL,
+    dialog
   } = Groundhogg.element
   const { emailPicker, searchesPicker } = Groundhogg.pickers
   const { emails: EmailsStore, searches: SearchesStore, contacts: ContactsStore } = Groundhogg.stores
@@ -18,14 +21,18 @@
 
   const SendBroadcast = (selector, {
     email = false,
-    query = {}
-  } = {}) => {
+    ...rest
+  } = {}, {
+    onScheduled = () => {}
+  }) => {
 
     let state = {
       email_id: email ? email.ID : false,
       when: 'now',
       which: 'filters',
-      query,
+      query: {},
+      total_contacts: 0,
+      ...rest
     }
 
     const setState = (newState) => {
@@ -143,6 +150,29 @@
 
     const step3 = () => {
 
+      const totalAndNext = () => {
+        // language=HTML
+        return `
+			<div class="gh-row">
+				<div class="gh-col">
+					<div id="${elPrefix}-total-contacts">
+						<p>Send to <b>${state.total_contacts}</b> contacts</p>
+					</div>
+				</div>
+			</div>
+			<div class="gh-row">
+				<div class="gh-col">
+					<button class="gh-next-step gh-button primary" ${state.total_contacts ? '' : 'disabled'}>Next
+						&rarr;
+					</button>
+				</div>
+			</div>`
+      }
+
+      if (state.which === 'from_table') {
+        return `<div class="gh-rows-and-columns">${totalAndNext()}</div>`
+      }
+
       // language=HTML
       return `
 		  <div class="gh-rows-and-columns">
@@ -180,18 +210,8 @@
 					  </div>
 				  </div>
 			  </div>
-			  <div class="gh-row">
-				  <div class="gh-col">
-					  <div id="${elPrefix}-total-contacts"></div>
-				  </div>
-			  </div>
-			  <div class="gh-row">
-				  <div class="gh-col">
-					  <button class="gh-next-step gh-button primary" ${state.total_contacts ? '' : 'disabled'}>Next
-						  &rarr;
-					  </button>
-				  </div>
-			  </div>`
+			  ${totalAndNext()}
+		  </div>`
     }
 
     const step4 = () => {
@@ -209,8 +229,9 @@
 		  <div class="gh-rows-and-columns">
 			  <div class="gh-row">
 				  <div class="gh-col">
-					  Send <b>${email.data.title}</b> to <b>${total_contacts}</b> contacts
-					  ${state.when === 'later' ? `on <b>${moment(`${state.date} ${state.time}`).format('LLLL')}</b>` : '<b>immediately</b>'}.
+					  <p>Send <b>${email.data.title}</b> to <b>${total_contacts}</b> contacts
+						  ${state.when === 'later' ? `on <b>${moment(`${state.date} ${state.time}`).format('LLLL')}</b>.` : '<b>immediately</b>.'}
+					  </p>
 				  </div>
 			  </div>
 			  <div class="gh-row">
@@ -311,7 +332,7 @@
               }
 
               ContactsStore.count(query).then(total => {
-                $(`#${elPrefix}-total-contacts`).html(`${total} contacts found`)
+                $(`#${elPrefix}-total-contacts`).html(`<p>Send to <b>${total}</b> contacts</p>`)
                 $('.gh-next-step').prop('disabled', total === 0)
                 setState({
                   total_contacts: total
@@ -371,10 +392,17 @@
                 send_in_local_time
               }).then(r => r.item).then(b => {
 
-                // console.log(b)
-                // return;
+                const scheduling = () => {
+                  // language=HTML
+                  return `
+					  <h2 id="broadcast-progress-header">Scheduling</h2>
+					  <div id="broadcast-progress"></div>`
+                }
 
-                const { setProgress } = progressBar('#gh-send-broadcast-form')
+                $('#gh-send-broadcast-form').html(scheduling())
+
+                const { stop: stopDots } = loadingDots('#broadcast-progress-header')
+                const { setProgress } = progressBar('#broadcast-progress')
 
                 const schedule = () => {
                   post(`${routes.v4.broadcasts}/${b.ID}/schedule`)
@@ -384,24 +412,13 @@
                         schedule()
                       } else {
                         setTimeout(() => {
-                          $(`#gh-send-broadcast-form`).html(
-                            //language=HTML
-                            `
-								<div><p>Broadcast scheduled!</p>
-									<p><a href="#" id="schedule-another-broadcast">&larr; Schedule another broadcast</a>
-									</p></div>`
-                          )
-
-                          $('#schedule-another-broadcast').on('click', () => {
-                            setState({
-                              email_id: false,
-                              when: 'now',
-                              which: 'filters',
-                              query: {}
-                            })
-                            setStep(0)
-
+                          stopDots()
+                          dialog({
+                            message: `Broadcast scheduled!`
                           })
+
+                          onScheduled()
+
                         }, 500)
                       }
                     }).catch(() => {
@@ -436,11 +453,15 @@
     $('#gh-schedule-broadcast').on('click', (e) => {
       e.preventDefault()
 
-      modal({
+      const { close } = modal({
         content: `<div id="gh-broadcast-form" style="width: 400px"></div>`
       })
 
-      SendBroadcast('#gh-broadcast-form')
+      SendBroadcast('#gh-broadcast-form', {}, {
+        onScheduled: () => {
+          window.location.href = adminPageURL('gh_broadcasts', { status: 'scheduled' })
+        }
+      })
     })
   })
 

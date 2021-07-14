@@ -229,6 +229,18 @@ td.column-tags_col .tags .tag {
   display: inline-block;
 }
 
+.more-actions:after {
+  content: "";
+  display: inline-block;
+  font: normal 18px/1 dashicons;
+  vertical-align: middle;
+  margin-left: 5px;
+  speak: never;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-decoration: none;
+}
+
 td.address .time-zone:before,
 td.address .ip-address:before {
   content: "";

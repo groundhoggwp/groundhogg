@@ -274,17 +274,17 @@
         // language=html
         return `
 			<div class="gh-rows-and-columns">
-            <div class="gh-row">
-                <div class="gh-col">
-                    <div class="gh-input-inline-label">
-	                    <label for="subject-line">Subject:</label>
-	                    ${inputWithReplacements({
-		                    id: 'subject-line'
-	                    })}
-                    </div>
-                </div>
-            </div>
-            <div class="gh-row"></div>
+				<div class="gh-row">
+					<div class="gh-col">
+						<div class="gh-input-inline-label">
+							<label for="subject-line">Subject:</label>
+							${inputWithReplacements({
+								id: 'subject-line'
+							})}
+						</div>
+					</div>
+				</div>
+				<div class="gh-row"></div>
 			</div>`
       },
       onMount: () => {},
@@ -302,8 +302,12 @@
         return `
 			<div id="send-broadcast"></div>`
       },
-      onMount: () => {
-        Groundhogg.SendBroadcast('#send-broadcast')
+      onMount: ({ setTab }) => {
+        Groundhogg.SendBroadcast('#send-broadcast', {}, {
+          onScheduled: () => {
+            setTab('broadcast')
+          }
+        })
       },
     }
   }
@@ -368,11 +372,16 @@
 
         $quickSearch.html(html)
 
-        $(`.${classPrefix}-tab-button`).on('click', ({ currentTarget }) => {
-          tab = currentTarget.dataset.tab
+        const setTab = (t) => {
+          tab = t
           mountQuickSearch()
+        }
+
+        $(`.${classPrefix}-tab-button`).on('click', ({ currentTarget }) => {
+          setTab(currentTarget.dataset.tab)
         })
-        Tabs[tab].onMount()
+
+        Tabs[tab].onMount({ setTab })
 
         Object.keys(Tabs).forEach(t => tooltip(`#gh-tab-${t}`, {
           content: Tabs[t].tooltip,

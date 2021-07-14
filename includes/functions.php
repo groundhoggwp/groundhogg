@@ -5212,3 +5212,7 @@ function is_template_site() {
 	// Todo change this
 	return apply_filters( 'groundhogg/is_template_site', true );
 }
+
+function enqueue_step_type_assets(){
+	do_action( 'groundhogg_enqueue_step_type_assets' );
+}

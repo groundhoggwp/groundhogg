@@ -7,6 +7,7 @@ use Groundhogg\Base_Object;
 use Groundhogg\Funnel;
 use Groundhogg\Library;
 use function Groundhogg\dashicon;
+use function Groundhogg\enqueue_step_type_assets;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
@@ -159,15 +160,16 @@ class Funnels_Page extends Admin_Page {
 				wp_enqueue_code_editor([
 					'type' => 'text/html'
 				]);
+
+				enqueue_step_type_assets();
+
 				wp_enqueue_style( 'groundhogg-admin-email-editor' );
 				wp_enqueue_style( 'groundhogg-admin-funnel-editor' );
 				wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
-				wp_localize_script( 'groundhogg-admin-funnel-editor', 'GroundhoggFunnel', [
-					'funnel'    => $funnel,
-					'stepTypes' => Plugin::instance()->step_manager->get_elements()
-				] );
 
-//				wp_enqueue_script( 'groundhogg-admin-email-editor-step' );
+				wp_localize_script( 'groundhogg-admin-funnel-editor', 'Funnel', [
+					'funnel'    => $funnel,
+				] );
 
 				do_action( 'groundhogg_funnel_scripts', $funnel );
 

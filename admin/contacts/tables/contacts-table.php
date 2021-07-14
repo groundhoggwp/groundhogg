@@ -162,19 +162,9 @@ class Contacts_Table extends WP_List_Table {
 
 		$this->query = $query;
 
-		$c_query = new Contact_Query();
-		$data    = $c_query->query( $query );
-
-		set_transient( 'groundhogg_contact_query_args', $c_query->query_vars, HOUR_IN_SECONDS );
-
-		// Unset number for the count full count
-		unset( $query['number'] );
-
-		$total = get_db( 'contacts' )->count( $query );
-
-		$this->items = array_map( function ( $item ) {
-			return new Contact( $item );
-		}, $data );
+		$c_query     = new Contact_Query();
+		$this->items = $c_query->query( $query, true );
+		$total       = $c_query->count( $query );
 
 		// Add condition to be sure we don't divide by zero.
 		// If $this->per_page is 0, then set total pages to 1.
@@ -192,6 +182,7 @@ class Contacts_Table extends WP_List_Table {
 			'items'                 => $this->items,
 			'per_page'              => $per_page,
 			'total_pages'           => $total_pages,
+			'query'                 => $query
 		] );
 	}
 

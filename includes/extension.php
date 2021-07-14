@@ -185,6 +185,7 @@ abstract class Extension {
 		$this->init_components();
 
 		add_action( 'groundhogg_funnel_scripts', [ $this, 'funnel_editor_scripts' ] );
+		add_action( 'groundhogg_enqueue_step_type_assets', [ $this, 'enqueue_step_type_assets' ] );
 		add_action( 'groundhogg/scripts/after_register_admin_scripts', [ $this, 'register_admin_scripts' ], 10, 2 );
 		add_action( 'groundhogg/scripts/after_register_admin_styles', [ $this, 'register_admin_styles' ] );
 		add_action( 'groundhogg/scripts/after_register_frontend_scripts', [
@@ -222,6 +223,11 @@ abstract class Extension {
 	 * @param $funnel Funnel
 	 */
 	public function funnel_editor_scripts( $funnel ) {
+	}
+
+	public function enqueue_step_type_assets() {
+		wp_enqueue_script( 'groundhogg-pro-register-steps' );
+		wp_enqueue_style( 'groundhogg-admin-funnel-advanced-steps' );
 	}
 
 	/**

@@ -1253,6 +1253,7 @@ abstract class DB {
 		unset( $args['offset'] );
 		unset( $args['limit'] );
 		unset( $args['LIMIT'] );
+		unset( $args['number'] );
 
 		if ( isset_not_empty( $args, 'where' ) ) {
 			$args['func'] = 'count';

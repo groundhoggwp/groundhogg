@@ -305,8 +305,7 @@
   display: flex;
   justify-content: space-between;
   background: #FFFFFF;
-  border: 1px solid rgba(16, 38, 64, 0.15);
-  /*box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);*/
+  box-shadow: 0 0 0 1px rgba(16, 38, 64, 0.15);
   box-sizing: border-box;
   border-radius: 5px;
   padding: 10px;
@@ -330,10 +329,9 @@
 #funnel-editor .step-flow .steps .step .is-entry:before {
   content: "";
   background-color: rgba(16, 38, 64, 0.15);
-  height: 27px;
-  width: 27px;
-  top: -1px;
-  left: -1px;
+  box-shadow: 0 0 0 1px rgba(16, 38, 64, 0.15);
+  height: 25px;
+  width: 25px;
   z-index: -1;
   border-radius: 50%;
   position: absolute;
@@ -344,13 +342,13 @@
   height: 15px;
 }
 #funnel-editor .step-flow .steps .step.has-warnings {
-  border: 1px solid #ffee58;
+  box-shadow: 0 0 0 1px #ffee58;
 }
 #funnel-editor .step-flow .steps .step.has-warnings .step-type {
   color: #ffee58;
 }
 #funnel-editor .step-flow .steps .step.has-errors {
-  border: 1px solid #e91f4f;
+  box-shadow: 0 0 0 1px #e91f4f;
 }
 #funnel-editor .step-flow .steps .step.has-errors .step-type {
   color: #e91f4f;
@@ -365,7 +363,7 @@
   color: #FFFFFF;
   display: inline-block;
   padding: 2px 8px;
-  margin: -20px auto;
+  margin: -10px auto;
   position: relative;
   border-radius: 5px;
   z-index: 999;
@@ -430,26 +428,15 @@
 #funnel-editor .step.action .details .step-type {
   color: #9ece38;
 }
-#funnel-editor .step.benchmark.active {
-  border-color: #f58115;
+#funnel-editor .step.active.action {
+  box-shadow: 0 0 0 2px #9ece38;
 }
-#funnel-editor .step.benchmark.active .is-entry {
-  top: -13px;
-  left: -13px;
+#funnel-editor .step.active.benchmark {
+  box-shadow: 0 0 0 2px #f58115;
 }
-#funnel-editor .step.benchmark.active .is-entry:before {
+#funnel-editor .step.active.benchmark .is-entry:before {
   background-color: #f58115;
-  width: 29px;
-  height: 29px;
-  top: -2px;
-  left: -2px;
-}
-#funnel-editor .step.action.active {
-  border-color: #9ece38;
-}
-#funnel-editor .step-flow .steps .step.active {
-  border-width: 2px;
-  padding: 9px;
+  box-shadow: 0 0 0 2px #f58115;
 }
 #funnel-editor .step-status:before {
   color: white;

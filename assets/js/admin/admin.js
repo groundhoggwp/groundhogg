@@ -193,6 +193,32 @@
   }
 
   /**
+   * Api based funnel picker
+   *
+   * @param selector
+   * @param multiple
+   * @param onReceiveItems
+   * @param queryOpts
+   */
+  function funnelPicker (selector, multiple = false, onReceiveItems = (items) => {}, queryOpts = {}) {
+    return apiPicker(selector, gh.api.routes.v4.funnels, multiple, false, (data) => {
+
+        onReceiveItems(data.items)
+
+        return data.items.map(item => ({
+          id: item.ID,
+          text: `${item.data.title}`
+        }))
+      },
+      (query) => {
+        return {
+          search: query.term,
+          ...queryOpts
+        }
+      })
+  }
+
+  /**
    * Api based email picker
    *
    * @param selector
@@ -260,7 +286,8 @@
     linkPicker,
     metaPicker,
     campaignPicker,
-    searchesPicker
+    searchesPicker,
+    funnelPicker
   }
 
   // Map functions to Groundhogg object.

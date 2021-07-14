@@ -15,11 +15,17 @@
     dangerConfirmationModal,
     confirmationModal,
     clickInsideElement,
-    dialog
+    progressBar,
+    dialog,
+    adminPageURL
   } = Groundhogg.element
   const { post, get, patch, routes, ajax } = Groundhogg.api
-  const { searches: SearchesStore, contacts: ContactsStore, tags: TagsStore } = Groundhogg.stores
-  const { tagPicker } = Groundhogg.pickers
+  const { searches: SearchesStore, contacts: ContactsStore, tags: TagsStore, funnels: FunnelsStore } = Groundhogg.stores
+  const { tagPicker, funnelPicker } = Groundhogg.pickers
+
+  const { StepTypes } = Groundhogg
+
+  StepTypes.setup()
 
   SearchesStore.itemsFetched(ContactSearch.searches)
 
@@ -326,20 +332,204 @@
     $('.gh-actions').append(`<button type="button" class="more-actions button button-secondary">More Actions</button>`)
     $('.more-actions').on('click', (e) => {
 
-      console.log(e.currentTarget)
+      const {
+        total_items: totalContacts,
+        total_items_formatted: totalContactsFormatted,
+        query: ContactQuery
+      } = ContactsTable
+
+      // console.log(e.currentTarget)
 
       moreMenu(e.currentTarget, {
         items: [
           {
+            key: 'edit',
+            text: `Edit ${totalContactsFormatted} contacts`
+          },
+          {
+            key: 'export',
+            text: `Export ${totalContactsFormatted} contacts`
+          },
+          {
+            key: 'broadcast',
+            text: `Send a broadcast to ${totalContactsFormatted} contacts`
+          },
+          {
+            key: 'funnel',
+            text: `Add ${totalContactsFormatted} contacts to a funnel`
+          },
+          {
             key: 'delete',
-            text: `<span class="gh-text danger">Delete</span>`
+            text: `<span class="gh-text danger">Delete ${totalContactsFormatted} contacts</span>`
           }
         ],
         onSelect: (key) => {
           switch (key) {
+            case 'funnel':
+
+              let funnel
+              let step
+
+              const addToFunnel = () => {
+
+                const steps = () => {
+                  // language=HTML
+                  return `
+					  <div class="gh-row">
+						  <div class="gh-col">
+							  <label class="block">Select a step</label>
+							  ${select({
+								  id: 'select-step',
+								  name: 'step'
+							  }, funnel.steps.sort((a, b) => a.data.step_order - b.data.step_order).map(s => ({
+								  value: s.ID,
+								  text: s.data.step_title
+							  })), step && step.ID)}
+						  </div>
+					  </div>`
+                }
+
+                // language=HTML
+                return `
+					<h2>Add contacts to a funnel</h2>
+					<div class="gh-rows-and-columns">
+						<div class="gh-row">
+							<div class="gh-col">
+								<label class="block">Select a funnel</label>
+								${select({
+									id: 'select-funnel',
+									name: 'funnel'
+								}, FunnelsStore.getItems().map(f => ({
+									value: f.ID,
+									text: f.data.title
+								})), funnel && funnel.ID)}
+							</div>
+						</div>
+						${funnel ? steps() : ''}
+						${funnel && step ? `<div class="gh-row"><div class="gh-col"><button class="gh-button primary">Add ${totalContactsFormatted} to <b>${funnel.data.title}</b></button></div></div>` : ''}
+					</div>`
+              }
+
+              const mounted = () => {
+                funnelPicker('#select-funnel', false, (items) => {
+                  FunnelsStore.itemsFetched(items)
+                }, {
+                  status: 'active'
+                }).on('change', ({ target }) => {
+                  funnel = FunnelsStore.get(parseInt($(target).val()))
+
+                  StepTypes.preloadSteps(funnel.steps).then(() => {
+                    step = false
+                    setContent(addToFunnel())
+                    mounted()
+                  })
+                })
+
+                const template = (opt) => {
+
+                  if (!opt.id) {
+                    return opt.text
+                  }
+
+                  const step = funnel.steps.find(s => s.ID === parseInt(opt.id))
+
+                  const { step_type, step_group } = step.data
+
+                  const StepType = StepTypes.getType(step.data.step_type)
+
+                  return $(`<div class="select2-step ${step_group} ${step_type}">${StepType.svg}<div class="step-name">${StepType.title(step)}</div></div>`)
+                }
+
+                $('#select-step').select2({
+                  templateSelection: template,
+                  templateResult: template
+                }).on('change', ({ target }) => {
+                  step = funnel.steps.find(s => s.ID === parseInt($(target).val()))
+                  setContent(addToFunnel())
+                  mounted()
+                })
+              }
+
+              const { setContent } = modal({
+                content: addToFunnel()
+              })
+
+              mounted()
+
+              break
+            case 'broadcast':
+
+              const { close: closeModal } = modal({
+                content: `<h2>Send a broadcast</h2><div id="gh-broadcast-form" style="width: 400px"></div>`
+              })
+
+              Groundhogg.SendBroadcast('#gh-broadcast-form', {
+                query: {
+                  ...ContactQuery,
+                  number: -1,
+                  offset: 0,
+                },
+                total_contacts: totalContacts,
+                which: 'from_table'
+
+              }, {
+                onScheduled: () => {
+                  closeModal()
+                }
+              })
+
+              break
             case 'delete':
+
+              let number = 100
+              let deleted = 0
+
+              const deleteContacts = (onDelete, onComplete) => {
+                ContactsStore.deleteMany({
+                  ...ContactQuery,
+                  number,
+                  offset: 0,
+                }).then(items => {
+
+                  deleted += items.length
+                  onDelete()
+
+                  if (items.length === 0) {
+                    onComplete()
+                    return
+                  }
+
+                  deleteContacts(onDelete, onComplete)
+                })
+              }
+
               dangerConfirmationModal({
-                alert: `<p>Are you sure you want to delete <b>${ContactsTable.total_items_formatted}</b> contacts?</p>`
+                alert: `<p>Are you sure you want to delete <b>${totalContactsFormatted}</b> contacts? This cannot be undone. Consider <i>exporting</i> first!</p>`,
+                onConfirm: () => {
+
+                  modal({
+                    content: `<div id="delete-progress"></div>`,
+                    canClose: false,
+                  })
+
+                  const { setProgress } = progressBar('#delete-progress')
+
+                  // Set the progress bar
+                  const onDelete = () => {
+                    setProgress(deleted / parseInt(totalContacts))
+                  }
+
+                  // Go back to the root contacts page
+                  const onComplete = () => {
+                    dialog({
+                      message: `<b>${deleted}</b> contacts deleted`
+                    })
+
+                    window.location.href = adminPageURL('gh_contacts')
+                  }
+
+                  deleteContacts(onDelete, onComplete)
+                }
               })
               break
           }

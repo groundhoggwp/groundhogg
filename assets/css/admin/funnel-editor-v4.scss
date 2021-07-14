@@ -384,8 +384,8 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
     display: flex;
     justify-content: space-between;
     background: #FFFFFF;
-    border: 1px solid rgba(16, 38, 64, 0.15);
-    /*box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);*/
+    //outline: 1px solid rgba(16, 38, 64, 0.15);
+    box-shadow: 0 0 0 1px rgba(16, 38, 64, 0.15);
     box-sizing: border-box;
     border-radius: 5px;
     padding: 10px;
@@ -408,10 +408,9 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
       &:before {
         content: '';
         background-color: $primary-dark-15;
-        height: 27px;
-        width: 27px;
-        top: -1px;
-        left: -1px;
+        box-shadow: 0 0 0 1px $primary-dark-15;
+        height: 25px;
+        width: 25px;
         z-index: -1;
         border-radius: 50%;
         position: absolute;
@@ -425,7 +424,7 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
   }
 
   .step-flow .steps .step.has-warnings {
-    border: 1px solid $alert-yellow;
+    box-shadow: 0 0 0 1px $alert-yellow;
 
     .step-type {
       color: $alert-yellow;
@@ -433,7 +432,7 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
   }
 
   .step-flow .steps .step.has-errors {
-    border: 1px solid $error-red;
+    box-shadow: 0 0 0 1px $error-red;
 
     .step-type {
       color: $error-red;
@@ -451,7 +450,7 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
     color: #FFFFFF;
     display: inline-block;
     padding: 2px 8px;
-    margin: -20px auto;
+    margin: -10px auto;
     position: relative;
     border-radius: 5px;
     z-index: 999;
@@ -532,31 +531,30 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
     color: $action-green;
   }
 
-  .step.benchmark.active {
-    border-color: $benchmark-orange;
+  .step.active {
 
-    .is-entry {
+    &.action {
+      box-shadow: 0 0 0 2px $action-green;
+    }
 
-      top: -13px;
-      left: -13px;
+    &.benchmark{
+      box-shadow: 0 0 0 2px $benchmark-orange;
 
-      &:before {
-        background-color: $benchmark-orange;
-        width: 29px;
-        height: 29px;
-        top: -2px;
-        left: -2px;
+      .is-entry {
+
+        //top: -13px;
+        //left: -13px;
+
+        &:before {
+          background-color: $benchmark-orange;
+          box-shadow: 0 0 0 2px $benchmark-orange;
+          //width: 29px;
+          //height: 29px;
+          //top: -2px;
+          //left: -2px;
+        }
       }
     }
-  }
-
-  .step.action.active {
-    border-color: $action-green;
-  }
-
-  .step-flow .steps .step.active {
-    border-width: 2px;
-    padding: 9px;
   }
 
   .step .step-status {

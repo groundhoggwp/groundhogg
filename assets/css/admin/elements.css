@@ -360,6 +360,9 @@ button.gh-button.loud {
   right: 0;
   top: 0;
 }
+.gh-modal h2 {
+  margin-top: 0;
+}
 .gh-modal-overlay {
   position: fixed;
   background: rgba(0, 70, 153, 0.618);
@@ -566,7 +569,8 @@ p.error,
   justify-content: space-between;
   align-items: center;
   gap: 0;
-  margin-bottom: 30px;
+  margin-top: 10px;
+  margin-bottom: 40px;
 }
 .gh-step-nav .gh-step-nav-join {
   width: 100%;
@@ -614,6 +618,9 @@ p.error,
   display: inline-block;
   margin-bottom: 5px;
 }
+.gh-rows-and-columns label.block {
+  display: block;
+}
 .gh-rows-and-columns input:not([type=checkbox], [type=radio]), .gh-rows-and-columns select {
   width: 100%;
 }
@@ -638,6 +645,7 @@ p.error,
 }
 
 .gh-progress-bar {
+  min-width: 300px;
   border: 1px solid #0075ff;
   background-color: rgba(0, 117, 255, 0.02);
   border-radius: 5px;
@@ -646,6 +654,13 @@ p.error,
   width: 1px;
   background-color: #0075ff;
   height: 25px;
+  display: flex;
+  align-items: center;
+}
+.gh-progress-bar .gh-progress-bar-fill .fill-amount {
+  font-size: 18px;
+  color: #FFFFFF;
+  margin-left: 10px;
 }
 .gh-progress-bar.complete {
   border-color: #9ece38;
@@ -716,6 +731,31 @@ p.error,
 }
 .textarea-with-buttons .buttons button:not(:last-child) {
   border-bottom-right-radius: 0;
+}
+
+.select2-step {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+.select2-step svg {
+  width: 25px;
+  height: 25px;
+}
+.select2-step.benchmark svg {
+  color: #f58115;
+}
+.select2-step.action svg {
+  color: #9ece38;
+}
+.select2-step .step-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.select2-container .select2-selection--single {
+  height: auto;
+  min-height: 28px;
 }
 
 /*# sourceMappingURL=elements.css.map */

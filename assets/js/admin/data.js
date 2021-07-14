@@ -211,7 +211,24 @@
         })
     },
 
+    async patchMeta (id, data, opts = {}) {
+      return apiPatch(`${this.route}/${id}/meta`, data, opts)
+        .then(r => this.getItemFromResponse(r))
+        .then(item => {
+          this.item = item
+          this.itemsFetched([
+            item
+          ])
+          return item
+        })
+    },
+
     async delete (id) {
+
+      if (typeof id === 'object') {
+        return this.deleteMany(id)
+      }
+
       return apiDelete(`${this.route}/${id}`)
         .then(r => {
 
@@ -222,6 +239,23 @@
           this.items = [
             ...this.items.filter(item => item[this.primaryKey] !== id),
           ]
+
+          return r
+        })
+    },
+
+    async deleteMany (query) {
+      return apiDelete(`${this.route}`, query)
+        .then(r => this.getItemsFromResponse(r))
+        .then(items => {
+
+          //items will be an int[] of the IDs of the deleted objects
+
+          this.items = [
+            ...this.items.filter(item => !items.includes(item[this.primaryKey])),
+          ]
+
+          return items
         })
     },
 
@@ -298,6 +332,51 @@
       }
     }),
     campaigns: ObjectStore(Groundhogg.api.routes.v4.campaigns),
+    funnels: ObjectStore(Groundhogg.api.routes.v4.funnels, {
+
+      async commit (id, data, opts = {}) {
+        return apiPost(`${this.route}/${id}/commit`, data, opts)
+          .then(r => this.getItemFromResponse(r))
+          .then(item => {
+
+            this.item = item
+            this.itemsFetched([
+              item
+            ])
+            return item
+          })
+      },
+
+      isStartingStep (funnelId, stepId, checkEdited = false) {
+        return !this.getPrecedingSteps(funnelId, stepId, checkEdited)
+          .find(_step => _step.data.step_group === 'action')
+      },
+
+      getSteps (funnelId, checkEdited = false) {
+        const funnel = funnelId ? this.items.find(f => f.ID === funnelId) : this.item
+        return !checkEdited ? funnel.steps : funnel.meta.edited.steps
+      },
+
+      getFunnelAndStep (funnelId, stepId, checkEdited = false) {
+        const funnel = funnelId ? this.items.find(f => f.ID === funnelId) : this.item
+        const step = !checkEdited ? funnel.steps.find(s => s.ID === stepId) : funnel.meta.edited.steps.find(s => s.ID === stepId)
+        return { funnel, step }
+      },
+
+      getProceedingSteps (funnelId, stepId, checkEdited = false) {
+        const { step, funnel } = this.getFunnelAndStep(funnelId, stepId, checkEdited)
+        return funnel.steps
+          .filter((_step) => _step.data.step_order > step.data.step_order)
+          .sort((a, b) => a.data.step_order - b.data.step_order)
+      },
+
+      getPrecedingSteps (funnelId, stepId, checkEdited = false) {
+        const { step, funnel } = this.getFunnelAndStep(funnelId, stepId, checkEdited)
+        return funnel.steps
+          .filter((_step) => _step.data.step_order < step.data.step_order)
+          .sort((a, b) => a.data.step_order - b.data.step_order)
+      }
+    }),
     emails: ObjectStore(Groundhogg.api.routes.v4.emails),
     searches: ObjectStore(Groundhogg.api.routes.v4.searches, {
       primaryKey: 'id'

@@ -253,6 +253,7 @@ class Contact_Query {
 
 		$defaults = array(
 			'number'                 => - 1,
+			'limit'                  => - 1,
 			'offset'                 => 0,
 			'orderby'                => 'ID',
 			'order'                  => 'DESC',
@@ -378,6 +379,12 @@ class Contact_Query {
 		if ( isset_not_empty( $this->query_vars, 'saved_search' ) ) {
 			$saved_search     = Saved_Searches::instance()->get( $this->query_vars['saved_search'] );
 			$this->query_vars = wp_parse_args( $saved_search['query'], $this->query_vars );
+		}
+
+		// Map "limit" to "number"
+		if ( isset_not_empty( $this->query_vars, 'limit' ) ) {
+			$this->query_vars['number'] = $this->query_vars['limit'];
+			unset( $this->query_vars['limit'] );
 		}
 
 		$this->query_vars = wp_parse_args( $this->query_vars, $this->query_var_defaults );

@@ -280,7 +280,6 @@
 
     },
     init () {
-
       this.mount()
     },
     mount () {
@@ -300,6 +299,7 @@
     mountReports () {
       $('#reports-container').html(ReportPages[this.currentPage].view(this.reports))
       this.onReportMount()
+      $(window).trigger('resize');
     },
 
     demountReports () {

@@ -11,6 +11,7 @@ use Groundhogg\Step;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\bulk_jobs;
 use function Groundhogg\do_replacements;
+use function Groundhogg\enqueue_step_type_assets;
 use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
@@ -169,6 +170,8 @@ class Contacts_Page extends Admin_Page {
 			} else if ( $saved_search = get_url_var( 'saved_search' ) ) {
 				$saved_search = Saved_Searches::instance()->get( $saved_search );
 			}
+
+			enqueue_step_type_assets();
 
 			// Advanced Search
 			wp_enqueue_script( 'groundhogg-admin-contact-search' );

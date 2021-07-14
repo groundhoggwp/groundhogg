@@ -68,11 +68,11 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
       display: flex;
       gap: 20px;
 
-      &.phone{
+      &.phone {
         gap: 5px;
       }
 
-      .primary-phone-ext{
+      .primary-phone-ext {
         width: 120px;
       }
 
@@ -265,6 +265,18 @@ td.column-tags_col .tags .tag {
   margin: 0 6px 6px 0;
   font-size: 12px;
   display: inline-block;
+}
+
+.more-actions:after {
+  content: "\f347";
+  display: inline-block;
+  font: normal 18px/1 dashicons;
+  vertical-align: middle;
+  margin-left: 5px;
+  speak: never;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-decoration: none;
 }
 
 td.address .time-zone:before,

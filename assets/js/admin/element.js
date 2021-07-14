@@ -322,6 +322,21 @@
     return $.extend(true, initial, object)
   }
 
+  function ordinal_suffix_of (i) {
+    var j = i % 10,
+      k = i % 100
+    if (j == 1 && k != 11) {
+      return i + 'st'
+    }
+    if (j == 2 && k != 12) {
+      return i + 'nd'
+    }
+    if (j == 3 && k != 13) {
+      return i + 'rd'
+    }
+    return i + 'th'
+  }
+
   /**
    *
    * @param array
@@ -344,7 +359,8 @@
     // language=HTML
     const html = `
 		<div class="gh-progress-bar">
-			<div class="gh-progress-bar-fill"></div>
+			<div class="gh-progress-bar-fill">
+			</div>
 		</div>`
 
     const $bar = $(html)
@@ -367,7 +383,7 @@
 
       $fill.css({
         width: progress + '%'
-      })
+      }).html(`<span class="fill-amount">${Math.ceil(progress)}%</span>`)
     }
 
     return {
@@ -1132,6 +1148,7 @@
           const $el = $(selector)
 
           $el.html(self.render())
+          this.mountOptions()
           break
         case 'fixed':
           const {
@@ -1139,6 +1156,7 @@
           } = target.getBoundingClientRect()
           const $picker = $(self.render())
           $('body').append($picker)
+          this.mountOptions()
           const $widget = $picker.find('.search-options-widget')
           $widget.css({
             top: top + $widget.outerHeight() > window.innerHeight ? 'initial' : top,
@@ -1148,8 +1166,6 @@
           })
           break
       }
-
-      this.mountOptions()
 
       const el = document.querySelector('.search-options-widget')
 
@@ -1442,7 +1458,7 @@
 
     const close = () => {
       $menu.remove()
-      console.log('closed')
+      // console.log('closed')
     }
 
     $menu.on('click', '.gh-dropdown-menu-item', (e) => {
@@ -1473,9 +1489,25 @@
     $menu.focus()
   }
 
+  const uniqid = () => {
+    return Date.now()
+  }
+
+  const adminPageURL = (page, params) => {
+
+    params = $.param({
+      page,
+      ...params
+    })
+
+    return `${Groundhogg.url.admin}/admin.php?${params}`
+  }
+
   Groundhogg.element = {
     ...Elements,
+    adminPageURL,
     specialChars,
+    uniqid,
     moreMenu,
     andList,
     orList,
@@ -1514,7 +1546,8 @@
     stepNavHandler,
     progressBar,
     tooltip,
-    clickedIn
+    clickedIn,
+    ordinal_suffix_of
   }
 
 })(jQuery)

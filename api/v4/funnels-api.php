@@ -3,6 +3,8 @@
 namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
+use Groundhogg\Base_Object;
+use Groundhogg\Contact_Query;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
@@ -47,6 +49,14 @@ class Funnels_Api extends Base_Object_Api {
 			],
 		] );
 
+		register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/start", [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'add_contacts' ],
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
+			],
+		] );
+
 		register_rest_route( self::NAME_SPACE, "/{$route}/form-integration", [
 			[
 				'methods'             => WP_REST_Server::READABLE,
@@ -54,6 +64,42 @@ class Funnels_Api extends Base_Object_Api {
 				'permission_callback' => [ $this, 'update_permissions_callback' ]
 			],
 		] );
+	}
+
+	/**
+	 * Add contacts to a funnel
+	 *
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return \WP_Error|\WP_REST_Response
+	 */
+	public function add_contacts( \WP_REST_Request $request ) {
+		$funnel = new Funnel( $request->get_param( $this->get_primary_key() ) );
+
+		if ( ! $funnel->is_active() ) {
+			return self::ERROR_401( 'error', 'Funnel is not active' );
+		}
+
+		// Search for contacts, may contain limit/offset
+		$query_vars = $request->get_param( 'query' );
+		$step_id    = absint( $request->get_param( 'step' ) );
+
+		$step = $step_id ? new Step( $step_id ) : new Step( $funnel->get_first_action_id() );
+
+		if ( ! $step->exists() || $step->get_funnel_id() !== $funnel->get_id() ) {
+			return self::ERROR_404( 'error', 'Given step not found', [
+				'step_id' => $step_id
+			] );
+		}
+
+		$query    = new Contact_Query();
+		$contacts = $query->query( $query_vars, true );
+
+		foreach ( $contacts as $contact ){
+			$step->enqueue( $contact );
+		}
+
+		return self::SUCCESS_RESPONSE();
 	}
 
 	/**
