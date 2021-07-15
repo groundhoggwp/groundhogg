@@ -342,23 +342,23 @@
 			  <div class="panel benchmark-settings">
 				  <div class="row">
 					  ${isStartingStep(step.ID) ? '' :
-						  `<label class="row-label">Allow contacts to enter the funnel at this step?</label>
+						  `<label class="row-label">${_x('Allow contacts to enter the funnel at this step?', 'funnel editor', 'groundhogg')}</label>
 					  ${toggle({
 							  name: 'is_entry_point',
 							  id: 'is-entry-point',
 							  checked: data.is_entry,
-							  onLabel: 'YES',
-							  offLabel: 'NO',
+							  onLabel: _x( 'YES', 'funnel editor', 'groundhogg' ),
+							  offLabel: _x( 'NO', 'funnel editor', 'groundhogg' ),
 						  })}
 				  </div>`}
 					  <div class="row">
-						  <label class="row-label">Track a conversion whenever this step is completed.</label>
+						  <label class="row-label">${_x('Track a conversion whenever this step is completed.', 'funnel editor', 'groundhogg')}</label>
 						  ${toggle({
 							  name: 'is_conversion',
 							  id: 'is-conversion',
 							  checked: data.is_conversion,
-							  onLabel: 'YES',
-							  offLabel: 'NO',
+							  onLabel: _x( 'YES', 'funnel editor', 'groundhogg' ),
+							  offLabel: _x( 'NO', 'funnel editor', 'groundhogg' ),
 						  })}
 					  </div>
 				  </div>`
@@ -374,7 +374,7 @@
                     ${errors
               .map(
                 (error) =>
-                  `<li class="step-error"><span class="dashicons dashicons-warning"></span> ${error}</li>`
+                  `<li class="step-error"><span class="dashicons dashicons-warning"></span> ${_x(error, 'funnel editor', 'groundhogg')}</li>`
               )
               .join('')}
                 </ul>
@@ -388,7 +388,7 @@
                     ${warnings
               .map(
                 (warning) =>
-                  `<li class="step-warning"><span class="dashicons dashicons-warning"></span> ${warning}</li>`
+                  `<li class="step-warning"><span class="dashicons dashicons-warning"></span> ${_x(warning, 'funnel editor', 'groundhogg')}</li>`
               )
               .join('')}
                 </ul>
@@ -407,7 +407,7 @@
 					${slot('beforeStepNotes', ...slotArgs)}
 					${slot(`beforeStepNotes.${step_type}`, ...slotArgs)}
 					<div class="panel">
-						<label class="row-label"><span class="dashicons dashicons-admin-comments"></span> Notes</label>
+						<label class="row-label"><span class="dashicons dashicons-admin-comments"></span> ${_x('Notes', 'funnel editor', 'groundhogg')}</label>
 						<textarea rows="4" id="step-notes" class="notes full-width"
 						          name="step_notes">${specialChars(meta.step_notes || '')}</textarea>
 					</div>
@@ -450,7 +450,7 @@
 							name: 'pack_filter',
 						},
 						[
-							{ text: 'Filter by pack...', value: '' },
+							{ text: _x('Filter by pack...', 'funnel editor', 'groundhogg'), value: '' },
 							...Object.values(StepPacks.packs).map((pack) => ({
 								value: pack.id,
 								text: pack.name,
@@ -470,12 +470,12 @@
 				<button class="select-type actions ${
 					type === 'actions' && 'active'
 				}" data-type="actions">
-					${'Actions'}
+					${_x('Actions', 'funnel editor', 'groundhogg')}
 				</button>
 				<button class="select-type benchmarks ${
 					type === 'benchmarks' && 'active'
 				}" data-type="benchmarks">
-					${'Benchmarks'}
+          ${_x('Benchmarks', 'funnel editor', 'groundhogg')}
 				</button>
 			</div>`
       },
@@ -555,9 +555,10 @@
 			${
 				step_group === 'benchmark'
 					? step_order === 1
-					? `<div class="text-helper until-helper"><span class="dashicons dashicons-filter"></span> Start the funnel when...</div>`
+					? `<div class="text-helper until-helper"><span class="dashicons dashicons-filter"></span>${_x('Start the funnel when...', 'funnel editor', 'groundhogg')}
+          </div>`
 					: prevStep && prevStep.data.step_group !== 'benchmark'
-						? '<div class="until-helper text-helper">Until...</div>'
+						? '<div class="until-helper text-helper">'+_x('Until...', 'funnel editor', 'groundhogg')+'</div>'
 						: ''
 					: ''
 			}
@@ -594,8 +595,8 @@
 			${
 				step_group === 'benchmark' && nextStep
 					? nextStep.data.step_group === 'benchmark'
-					? `<div class="or-helper text-helper">Or...</div>`
-					: '<div class="then-helper text-helper">Then...</div>'
+					? `<div class="or-helper text-helper">`+_x('Or...', 'funnel editor', 'groundhogg')+`</div>`
+					: '<div class="then-helper text-helper">'+_x('Then...', 'funnel editor', 'groundhogg')+'</div>'
 					: ''
 			}
         `
@@ -637,11 +638,11 @@
         if (clickInsideElement(e, '.step-menu-button')) {
           moreMenu(this, {
             items: [
-              { key: 'edit', text: 'Edit' },
-              { key: 'move-up', text: 'Move up' },
-              { key: 'move-down', text: 'Move down' },
-              { key: 'duplicate', text: 'Duplicate' },
-              { key: 'delete', text: '<span class="gh-text danger">Delete</span>' },
+              { key: 'edit', text: _x('Edit', 'funnel editor', 'groundhogg') },
+              { key: 'move-up', text: _x('Move up', 'funnel editor', 'groundhogg') },
+              { key: 'move-down', text: _x('Move down', 'funnel editor', 'groundhogg') },
+              { key: 'duplicate', text: _x('Edit', 'funnel editor', 'groundhogg') },
+              { key: 'delete', text: '<span class="gh-text danger">'+_x('Delete', 'funnel editor', 'groundhogg')+'</span>' },
             ],
             onSelect: (key) => {
               switch (key) {
@@ -724,7 +725,7 @@
                   // language=HTML
                   return `
 					  <div class="manage-campaigns">
-						  <p><b>Add this funnel to one or more campaigns...</b></p>
+						  <p><b>${_x('Add this funnel to one or more campaigns...', 'funnel editor', 'groundhogg')}</b></p>
 						  <p>${select({
 							  id: 'manage-campaigns',
 							  multiple: true
@@ -780,9 +781,9 @@
 
                 dangerConfirmationModal({
                   //language=HTML
-                  alert: `<p><b>Delete this funnel?</b></p>
-				  <p>Any associated events, steps, and reports will also be deleted.</p>
-				  <p>This action cannot be undone. Are you sure?</p>`,
+                  alert: `<p><b>${_x('Delete this funnel?', 'funnel editor', 'groundhogg')}</b></p>
+				  <p>${_x('Any associated events, steps, and reports will also be deleted.', 'funnel editor', 'groundhogg')}</p>
+				  <p>${_x('This action cannot be undone. Are you sure?', 'funnel editor', 'groundhogg')}</p>`,
                   confirmText: 'Delete',
                   onConfirm: () => {
                     console.log('yikes')
@@ -794,12 +795,12 @@
 
                 dangerConfirmationModal({
                   //language=HTML
-                  alert: `<p><b>Archive this funnel?</b></p>
-				  <p>Any active contacts will be removed from the funnel permanently.</p>
-				  <p>The funnel will become un-editable until restored.</p>`,
-                  confirmText: 'Archive',
+                  alert: `<p><b>${_x('Archive this funnel?', 'funnel editor', 'groundhogg')}</b></p>
+				  <p>${_x('Any active contacts will be removed from the funnel permanently.', 'funnel editor', 'groundhogg')}</p>
+				  <p>${_x('The funnel will become un-editable until restored.', 'funnel editor', 'groundhogg')}</p>`,
+                  confirmText: _x('Archive', 'funnel editor', 'groundhogg'),
                   onConfirm: () => {
-                    console.log('yikes')
+                  console.log('yikes')
                   }
                 })
 
@@ -876,9 +877,9 @@
       $doc.on('click', '.publish-actions .deactivate', function () {
         dangerConfirmationModal({
           // language=HTML
-          alert: `<p><b>Are you sure you want to deactivate the funnel?</b></p>
-		  <p>Active contacts will be paused until the funnel is reactivated.</p>`,
-          confirmText: 'Deactivate',
+          alert: `<p><b>${_x('Are you sure you want to deactivate the funnel?', 'funnel editor', 'groundhogg')}</b></p>
+		  <p>${_x('Active contacts will be paused until the funnel is reactivated.', 'funnel editor', 'groundhogg')}</p>`,
+          confirmText: _x('Deactivate', 'funnel editor', 'groundhogg'),
           onConfirm: () => {
             self.deactivate()
           },
@@ -891,8 +892,7 @@
         function () {
           confirmationModal({
             // language=HTML
-            alert: `<p><b>Are you sure you want to commit these changes?</b></p><p>The changes made will take immediate
-				effect to anyone currently in the funnel.</p>`,
+            alert: `<p><b>${_x('Are you sure you want to commit these changes?', 'funnel editor', 'groundhogg')}</b></p><p>${_x('The changes made will take immediate effect to anyone currently in the funnel.', 'funnel editor', 'groundhogg')}</p>`,
             onConfirm: () => {
               self.commitChanges()
             },
@@ -1107,9 +1107,10 @@
         const typeHandler = StepTypes.getType(step_type)
 
         if (step_group === 'action' && step_order === 1) {
-          addError('Actions cannot be at the start of a funnel.')
+          addError(_x('Actions cannot be at the start of a funnel.', 'funnel editor', 'groundhogg')
+          )
         } else if (typeHandler.type === 'error') {
-          addError('Settings not found.')
+          addError(_x('Settings not found.', 'funnel editor', 'groundhogg'))
         }
 
         if (typeHandler) {
@@ -1524,7 +1525,7 @@
           status: 'active',
         },
       }).then(() => close()).then(() => dialog({
-        message: 'Funnel activated!'
+        message: _x('Funnel activated!', 'funnel editor', 'groundhogg')
       }))
     },
 
@@ -1536,7 +1537,7 @@
           status: 'inactive',
         },
       }).then(() => close()).then(() => dialog({
-        message: 'Funnel deactivated!'
+        message: _x('Funnel deactivated!', 'funnel editor', 'groundhogg')
       }))
     },
 
@@ -1567,7 +1568,7 @@
           self.loadFunnel(item)
           self.render()
           dialog({
-            message: 'Funnel updated!'
+            message: _x('Funnel updated!', 'funnel editor', 'groundhogg')
           })
         }
       })
@@ -1687,7 +1688,7 @@
       self.renderStepFlow()
       self.renderStepAdd()
       const $html = $(
-        `<div class="step-placeholder">Choose a step to add here &rarr;<button type="button" class="button button-secondary">Cancel</button></div>`
+        `<div class="step-placeholder">${_x('Choose a step to add here', 'funnel editor', 'groundhogg')} &rarr;<button type="button" class="button button-secondary">${_x('Cancel', 'funnel editor', 'groundhogg')}</button></div>`
       )
 
       $('button', $html).on('click', function () {
@@ -1751,10 +1752,10 @@
       if (origStep) {
         dangerConfirmationModal({
           alert: `
-          <p><b>Delete this step?</b></p>
-          <p>Active contacts at this step will be removed from the funnel when it is updated.</p> 
+          <p><b>${_x('Delete this step?', 'funnel editor', 'groundhogg')}</b></p>
+          <p>${_x('Active contacts at this step will be removed from the funnel when it is updated.', 'funnel editor', 'groundhogg')}</p> 
         `,
-          confirmText: 'Delete',
+          confirmText:_x('Delete', 'funnel editor', 'groundhogg'),
           onConfirm: () => {
             removeStep()
           },
@@ -1939,7 +1940,7 @@
 
       //language=HTML
       return `
-		  <button style="width: 100%" id="edit-email-right" class="gh-button secondary">Edit Email</button>
+		  <button style="width: 100%" id="edit-email-right" class="gh-button secondary">${_x('Edit Email', 'funnel editor', 'groundhogg')}</button>
       `
     },
     onMount ({ ID, meta }) {
@@ -1974,12 +1975,12 @@
       return `
 		  <div id="form-embed-options" class="panel">
 			  <div class="row">
-				  <label class="row-label">Embed via Shortcode</label>
+				  <label class="row-label">${_x('Embed via Shortcode', 'funnel editor', 'groundhogg')}</label>
 				  <div class="embed-option">${copyValue(`[gh_form id="${ID}"]`)}
 				  </div>
 			  </div>
 			  <div class="row">
-				  <label class="row-label">Embed via iFrame</label>
+				  <label class="row-label">${_x('Embed via iFrame', 'funnel editor', 'groundhogg')}</label>
 				  <div class="embed-option">${copyValue(`[gh_form id="${ID}"]`)}
 				  </div>
 			  </div>
