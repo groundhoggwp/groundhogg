@@ -547,7 +547,7 @@ input.ui-autocomplete-input {
   justify-content: flex-start;
 
   input, select, textarea {
-    flex-grow: 1;
+    //flex-grow: 1;
     margin: 0;
 
     &.bigger {
@@ -605,6 +605,7 @@ p.error,
       border-right: none;
       border-radius: 0;
       margin: 0;
+      flex-grow: 1;
     }
 
     .input-wrap {
@@ -703,6 +704,8 @@ p.error,
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    gap: 10px;
 
     &:hover {
       background-color: $primary-dark-10;

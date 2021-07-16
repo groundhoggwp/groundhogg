@@ -18,6 +18,7 @@
   const { v4: apiRoutes } = routes
 
   const {
+    icons,
     improveTinyMCE,
     dialog,
     confirmationModal,
@@ -43,16 +44,13 @@
 
   const { StepTypes, StepPacks } = Groundhogg
 
-  const { __, _x, _n, _nx } = wp.i18n
+  const { __, _x, _n, _nx, sprintf } = wp.i18n
 
   const toEditorButton = () => {
     // language=HTML
     return `
 		<button id="close-email-editor" class="gh-button secondary text icon">
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 365.7 365.7">
-				<path fill="currentColor"
-				      d="M243.2 182.9L356.3 69.7a32 32 0 000-45.2l-15-15.1a32 32 0 00-45.3 0L182.9 122.5 69.7 9.4a32 32 0 00-45.2 0l-15.1 15a32 32 0 000 45.3L122.5 183 9.4 295.9a32 32 0 000 45.3l15 15.1a32 32 0 0045.3 0L183 243.2l113 113.1a32 32 0 0045.3 0l15.1-15a32 32 0 000-45.3zm0 0"/>
-			</svg>
+			${icons.close}
 		</button>`
   }
 
@@ -215,7 +213,7 @@
 						<div class="steps"></div>
 						<div class="add-new-step-wrapper">
 							<button class="gh-button secondary add-new-step">
-								${_x('Add New Step', 'funnel editor', 'groundhogg')}
+								${__('Add New Step', 'groundhogg')}
 							</button>
 						</div>
 					</div>
@@ -241,46 +239,30 @@
         // language=HTML
         const moreMenu = `
 			<button id="more-menu" class="gh-button secondary text icon">
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 384">
-					<circle fill="currentColor" cx="192" cy="42.7" r="42.7"/>
-					<circle fill="currentColor" cx="192" cy="192" r="42.7"/>
-					<circle fill="currentColor" cx="192" cy="341.3" r="42.7"/>
-				</svg>
+				${icons.verticalDots}
 			</button>`
-
-        // Todo switch back
         if (status === 'inactive') {
           //language=HTML
           return `
-			  <button class="gh-button action update-and-launch">${_x('Launch', 'funnel editor', 'groundhogg')}
-				  <svg viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-					  <path
-						  d="M8.888 7.173a21.621 21.621 0 017.22-4.783m-7.22 4.783a21.766 21.766 0 00-2.97 3.697m2.97-3.697c-1.445-.778-4.935-1.2-7.335 3.334l2.364 2.364 2-2m10.19-8.481A21.709 21.709 0 0123.22.843a21.708 21.708 0 01-1.546 7.112M16.108 2.39l5.565 5.565M5.917 10.87l1.885 4.057m9.088.248a21.62 21.62 0 004.783-7.22m-4.783 7.22a21.771 21.771 0 01-3.698 2.97m3.698-2.97c.778 1.445 1.2 4.934-3.334 7.335l-2.364-2.364 2-2m0 0L9.136 16.26m0 0l-1.334-1.334m1.334 1.334l-2.71 2.71-.667-.666-.667-.667 2.71-2.71m6.42-5.087a1.886 1.886 0 112.668-2.667 1.886 1.886 0 01-2.668 2.667z"
-						  stroke="currentColor" stroke-width="1.5"/>
-				  </svg>
+			  <button class="gh-button action update-and-launch">
+				  ${_x('Launch', 'when publishing a funnel', 'groundhogg')}
+				  ${icons.rocket}
 			  </button>${moreMenu}`
         } else {
           //language=HTML
           return `
-			  <button class="deactivate gh-button text danger">${_x('Deactivate', 'funnel editor', 'groundhogg')}
+			  <button class="deactivate gh-button text danger">
+				  ${_x('Deactivate', 'when deactivating a funnel', 'groundhogg')}
 			  </button>
 			  <button class="update gh-button primary"
-			          ${
-				          objectEquals(
-					          Editor.funnel.steps,
-					          Editor.origFunnel.steps
-				          ) || Object.keys(Editor.stepErrors).length > 0
-					          ? 'disabled'
-					          : ''
+			          ${objectEquals(
+				          Editor.funnel.steps,
+				          Editor.origFunnel.steps
+			          ) || Object.keys(Editor.stepErrors).length > 0
+				          ? 'disabled'
+				          : ''
 			          }>
-				  <svg viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-					  <path
-						  d="M1 21.956V2.995c0-.748.606-1.355 1.354-1.355H17.93l4.74 4.74v15.576c0 .748-.606 1.354-1.354 1.354H2.354A1.354 1.354 0 011 21.956z"
-						  stroke="currentColor" stroke-width="1.5"/>
-					  <path d="M14.544 16.539a2.709 2.709 0 11-5.418 0 2.709 2.709 0 015.418 0z" stroke="#fff"
-					        stroke-width="1.5"/>
-					  <path fill="currentColor" d="M5.619 6.298h9.634v2.846H5.619z"/>
-				  </svg>
+				  ${icons.save}
 				  ${_x('Update', 'funnel editor', 'groundhogg')}
 			  </button>
 			  ${moreMenu}`
@@ -299,7 +281,7 @@
           return `<span id="title">${specialChars(title)}</span><span class="dashicons dashicons-edit"></span>`
         }
 
-        return `<h1 class="breadcrumbs"><span class="root">${_x('Funnels', 'funnel editor', 'groundhogg')}</span><span class="sep">/</span>${isEditing ? titleEdit() : titleDisplay()}</h1>`
+        return `<h1 class="breadcrumbs"><span class="root">${__('Funnels', 'groundhogg')}</span><span class="sep">/</span>${isEditing ? titleEdit() : titleDisplay()}</h1>`
       },
       stepEditPanel (step) {
         const { ID, data, meta } = step
@@ -342,23 +324,24 @@
 			  <div class="panel benchmark-settings">
 				  <div class="row">
 					  ${isStartingStep(step.ID) ? '' :
-						  `<label class="row-label">${_x('Allow contacts to enter the funnel at this step?', 'funnel editor', 'groundhogg')}</label>
+						  `<label class="row-label">${__('Allow contacts to enter the funnel at this step?', 'groundhogg')}</label>
 					  ${toggle({
 							  name: 'is_entry_point',
 							  id: 'is-entry-point',
 							  checked: data.is_entry,
-							  onLabel: _x( 'YES', 'funnel editor', 'groundhogg' ),
-							  offLabel: _x( 'NO', 'funnel editor', 'groundhogg' ),
+							  onLabel: _x('YES', 'toggle switch', 'groundhogg'),
+							  offLabel: _x('NO', 'toggle switch', 'groundhogg'),
 						  })}
 				  </div>`}
 					  <div class="row">
-						  <label class="row-label">${_x('Track a conversion whenever this step is completed.', 'funnel editor', 'groundhogg')}</label>
+						  <label
+							  class="row-label">${__('Track a conversion whenever this step is completed.', 'groundhogg')}</label>
 						  ${toggle({
 							  name: 'is_conversion',
 							  id: 'is-conversion',
 							  checked: data.is_conversion,
-							  onLabel: _x( 'YES', 'funnel editor', 'groundhogg' ),
-							  offLabel: _x( 'NO', 'funnel editor', 'groundhogg' ),
+							  onLabel: _x('YES', 'toggle switch', 'groundhogg'),
+							  offLabel: _x('NO', 'toggle switch', 'groundhogg'),
 						  })}
 					  </div>
 				  </div>`
@@ -374,7 +357,7 @@
                     ${errors
               .map(
                 (error) =>
-                  `<li class="step-error"><span class="dashicons dashicons-warning"></span> ${_x(error, 'funnel editor', 'groundhogg')}</li>`
+                  `<li class="step-error"><span class="dashicons dashicons-warning"></span> ${error}</li>`
               )
               .join('')}
                 </ul>
@@ -388,7 +371,7 @@
                     ${warnings
               .map(
                 (warning) =>
-                  `<li class="step-warning"><span class="dashicons dashicons-warning"></span> ${_x(warning, 'funnel editor', 'groundhogg')}</li>`
+                  `<li class="step-warning"><span class="dashicons dashicons-warning"></span> ${warning}</li>`
               )
               .join('')}
                 </ul>
@@ -407,10 +390,15 @@
 					${slot('beforeStepNotes', ...slotArgs)}
 					${slot(`beforeStepNotes.${step_type}`, ...slotArgs)}
 					<div class="panel">
-						<label class="row-label"><span class="dashicons dashicons-admin-comments"></span> ${_x('Notes', 'funnel editor', 'groundhogg')}</label>
-						<textarea rows="4" id="step-notes" class="notes full-width"
-						          name="step_notes">${specialChars(meta.step_notes || '')}</textarea>
-					</div>
+						<label class="row-label"><span class="dashicons dashicons-admin-comments"></span> ${__('Notes', 'groundhogg')}</label>
+						${textarea({
+          rows: 4,
+          id: 'step-notes',
+          class: 'notes full-width',
+          name: 'step_notes',
+          value: meta.step_notes,
+          placeholder: __('Notes about the step...', 'groundhogg')
+        })}	</div>
 					${step_group === 'benchmark' ? benchmarkPanel() : ''}
 					${slot(`afterStepNotes.${step_type}`, ...slotArgs)}
 					${slot('afterStepNotes', ...slotArgs)}
@@ -427,13 +415,13 @@
 						<button class="select-type actions ${
 							activeType === 'actions' && 'active'
 						}" data-type="actions">
-							${_x('Actions', 'funnel editor', 'groundhogg')}
+							${_x('Actions', 'group of step types', 'groundhogg')}
 						</button>
 						<button class="select-type benchmarks ${
 							activeType === 'benchmarks' && 'active'
 						}"
 						        data-type="benchmarks">
-							${_x('Benchmarks', 'funnel editor', 'groundhogg')}
+							${_x('Benchmarks', 'group of step types', 'groundhogg')}
 						</button>
 					</div>
 					${input({
@@ -441,7 +429,7 @@
 						name: 'search_steps',
 						type: 'search',
 						className: 'search-steps',
-						placeholder: _x( 'Search...', 'funnel editor', 'groundhogg' ),
+						placeholder: _x('Search...', 'groundhogg'),
 						value: search,
 					})}
 					${select(
@@ -450,7 +438,7 @@
 							name: 'pack_filter',
 						},
 						[
-							{ text: _x('Filter by pack...', 'funnel editor', 'groundhogg'), value: '' },
+							{ text: __('Filter by pack...', 'groundhogg'), value: '' },
 							...Object.values(StepPacks.packs).map((pack) => ({
 								value: pack.id,
 								text: pack.name,
@@ -461,22 +449,6 @@
 				</div>
 				<div id="types" class="types">
 				</div>
-			</div>`
-      },
-      stepTypeSelect (type) {
-        //language=HTML
-        return `
-			<div class="type-select">
-				<button class="select-type actions ${
-					type === 'actions' && 'active'
-				}" data-type="actions">
-					${_x('Actions', 'funnel editor', 'groundhogg')}
-				</button>
-				<button class="select-type benchmarks ${
-					type === 'benchmarks' && 'active'
-				}" data-type="benchmarks">
-          ${_x('Benchmarks', 'funnel editor', 'groundhogg')}
-				</button>
 			</div>`
       },
       addStepCard (step) {
@@ -555,10 +527,10 @@
 			${
 				step_group === 'benchmark'
 					? step_order === 1
-					? `<div class="text-helper until-helper"><span class="dashicons dashicons-filter"></span>${_x('Start the funnel when...', 'funnel editor', 'groundhogg')}
+					? `<div class="text-helper until-helper"><span class="dashicons dashicons-filter"></span>${_x('Start the funnel when...', 'showing at the top of the step flow', 'groundhogg')}
           </div>`
 					: prevStep && prevStep.data.step_group !== 'benchmark'
-						? '<div class="until-helper text-helper">'+_x('Until...', 'funnel editor', 'groundhogg')+'</div>'
+						? `<div class="until-helper text-helper">${_x('Until...', 'before a group of benchmarks in the step flow', 'groundhogg')}</div>`
 						: ''
 					: ''
 			}
@@ -595,8 +567,8 @@
 			${
 				step_group === 'benchmark' && nextStep
 					? nextStep.data.step_group === 'benchmark'
-					? `<div class="or-helper text-helper">`+_x('Or...', 'funnel editor', 'groundhogg')+`</div>`
-					: '<div class="then-helper text-helper">'+_x('Then...', 'funnel editor', 'groundhogg')+'</div>'
+					? `<div class="or-helper text-helper">` + _x('Or...', 'between to benchmarks in the step flow', 'groundhogg') + `</div>`
+					: '<div class="then-helper text-helper">' + _x('Then...', 'before a group of actions in the step flow', 'groundhogg') + '</div>'
 					: ''
 			}
         `
@@ -638,11 +610,14 @@
         if (clickInsideElement(e, '.step-menu-button')) {
           moreMenu(this, {
             items: [
-              { key: 'edit', text: _x('Edit', 'funnel editor', 'groundhogg') },
-              { key: 'move-up', text: _x('Move up', 'funnel editor', 'groundhogg') },
-              { key: 'move-down', text: _x('Move down', 'funnel editor', 'groundhogg') },
-              { key: 'duplicate', text: _x('Edit', 'funnel editor', 'groundhogg') },
-              { key: 'delete', text: '<span class="gh-text danger">'+_x('Delete', 'funnel editor', 'groundhogg')+'</span>' },
+              { key: 'edit', text: __('Edit') },
+              { key: 'move-up', text: __('Move up', 'to move a step before another step', 'groundhogg') },
+              { key: 'move-down', text: _x('Move down', 'to move a step after another step', 'groundhogg') },
+              { key: 'duplicate', text: _x('Duplicate', 'to duplicate a step', 'groundhogg') },
+              {
+                key: 'delete',
+                text: '<span class="gh-text danger">' + __('Delete') + '</span>'
+              },
             ],
             onSelect: (key) => {
               switch (key) {
@@ -725,7 +700,8 @@
                   // language=HTML
                   return `
 					  <div class="manage-campaigns">
-						  <p><b>${_x('Add this funnel to one or more campaigns...', 'funnel editor', 'groundhogg')}</b></p>
+						  <p><b>${__('Add this funnel to one or more campaigns...', 'groundhogg')}</b>
+						  </p>
 						  <p>${select({
 							  id: 'manage-campaigns',
 							  multiple: true
@@ -781,10 +757,11 @@
 
                 dangerConfirmationModal({
                   //language=HTML
-                  alert: `<p><b>${_x('Delete this funnel?', 'funnel editor', 'groundhogg')}</b></p>
-				  <p>${_x('Any associated events, steps, and reports will also be deleted.', 'funnel editor', 'groundhogg')}</p>
-				  <p>${_x('This action cannot be undone. Are you sure?', 'funnel editor', 'groundhogg')}</p>`,
-                  confirmText: 'Delete',
+                  alert: `<p><b>${__('Delete this funnel?', 'groundhogg')}</b></p>
+				  <p>
+					  ${__('Any associated events, steps, and reports will also be deleted.', 'groundhogg')}</p>
+				  <p>${__('This action cannot be undone. Are you sure?', 'groundhogg')}</p>`,
+                  confirmText: __('Delete'),
                   onConfirm: () => {
                     console.log('yikes')
                   }
@@ -795,12 +772,15 @@
 
                 dangerConfirmationModal({
                   //language=HTML
-                  alert: `<p><b>${_x('Archive this funnel?', 'funnel editor', 'groundhogg')}</b></p>
-				  <p>${_x('Any active contacts will be removed from the funnel permanently.', 'funnel editor', 'groundhogg')}</p>
-				  <p>${_x('The funnel will become un-editable until restored.', 'funnel editor', 'groundhogg')}</p>`,
-                  confirmText: _x('Archive', 'funnel editor', 'groundhogg'),
+                  alert: `<p>
+					  <b>${_x('Archive this funnel?', 'archive is representing a verb in this phrase', 'groundhogg')}</b>
+				  </p>
+				  <p>
+					  ${__('Any active contacts will be removed from the funnel permanently.', 'groundhogg')}</p>
+				  <p>${__('The funnel will become un-editable until restored.', 'groundhogg')}</p>`,
+                  confirmText: _x('Archive', 'a verb meaning to add an item to an archive', 'groundhogg'),
                   onConfirm: () => {
-                  console.log('yikes')
+                    console.log('yikes')
                   }
                 })
 
@@ -811,64 +791,33 @@
             {
               key: 'campaigns',
               //language=HTML
-              text: `
-				  <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-					  <defs/>
-					  <path
-						  d="M343.2 49.7A45.1 45.1 0 00300 82L71.8 130a15 15 0 00-12 14.7v17.1H15a15 15 0 00-15 15V256a15 15 0 0015 15h44.9v21a15 15 0 0011.9 14.8l23.6 5v107.8a42.6 42.6 0 0069.2 33.5 42.5 42.5 0 0016.2-33.5V400h3c34 0 62.8-23.4 70.9-55l45.3 9.5a45.1 45.1 0 0088.3-12.5V94.7a45 45 0 00-45-45zM60 241H30v-49.2h29.9zm91 178.6a12.7 12.7 0 01-15.7 12.4 12.7 12.7 0 01-9.8-12.4V318l25.4 5.4v96.2zm33-49.5h-3v-40.5l44.4 9.4c-5.3 18-21.9 31-41.5 31zm114.3-46.5L89.9 280V157L298.2 113zm60 18.5a15 15 0 01-30 0V94.7a15 15 0 0130 0zM446.3 117a15 15 0 009.5-3.4l30.2-25a15 15 0 00-19.1-23l-30.2 24.8a15 15 0 009.6 26.6zM486 344.2l-30.2-25a15 15 0 00-19 23.2l30 25a15 15 0 0021.2-2 15 15 0 00-2-21.2zM497 201.4h-63.6a15 15 0 000 30H497a15 15 0 000-30z"/>
-				  </svg> Campaigns`
+              text: `${icons.megaphone} ${_x('Campaigns', 'noun meaning collection of marketing materials', 'groundhogg')}`
             },
             {
               key: 'export',
               //language=HTML
-              text: `
-				  <svg height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 367 367">
-					  <defs/>
-					  <path
-						  fill="currentColor"
-						  stroke-width="1"
-						  d="M363.6 247l.4-.5.5-.7.4-.6.3-.6.4-.7.3-.7.2-.6c0-.3.2-.5.3-.7l.1-.7.2-.8.1-.8.1-.6.1-1.5V236l-.2-.6v-.8l-.3-.8-.1-.7-.3-.7-.2-.6-.3-.7-.4-.7-.3-.6-.4-.6-.5-.7-.4-.5a15 15 0 00-1-1v-.1l-37.5-37.5a15 15 0 00-21.2 21.2l11.9 11.9H270v-78.6-.4a15 15 0 00-3.4-9.5 15.2 15.2 0 00-1-1.2c-.2 0-.3-.2-.4-.4L155.6 23a15 15 0 00-1-.9l-.3-.2a14.9 14.9 0 00-1.9-1.3l-.3-.2-1.1-.6-.5-.1a14.5 14.5 0 00-2.2-.7l-.4-.1-1.2-.2h-1.4l-.3-.1H15a15 15 0 00-15 15v300a15 15 0 0015 15h240a15 15 0 0015-15v-81h45.8l-12 11.9a15 15 0 0021.3 21.2l37.5-37.5 1-1zM160 69.7l58.8 58.8H160V69.7zm80 248.8H30v-270h100v95a15 15 0 0015 15h95v64h-65a15 15 0 000 30h65v66z"/>
-				  </svg> Export`
+              text: `${icons.export} ${_x('Export', 'a verb meaning to download', 'groundhogg')}`
             },
             {
               key: 'share',
               //language=HTML
-              text: `
-				  <svg height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="-33 0 512 512">
-					  <path fill="currentColor"
-					        d="M361.8 344.4a83.6 83.6 0 00-62 27.4l-138-85.4a83.3 83.3 0 000-60.8l138-85.4a83.6 83.6 0 00145.8-56.4 83.9 83.9 0 10-161.9 30.4l-138 85.4A83.6 83.6 0 000 256a83.9 83.9 0 00145.8 56.4l138 85.4a83.9 83.9 0 10161.9 30.4 83.9 83.9 0 00-83.9-83.8zM308.6 83.8a53.3 53.3 0 11106.6.1 53.3 53.3 0 01-106.6-.1zM83.8 309.2a53.3 53.3 0 11.1-106.6 53.3 53.3 0 01-.1 106.6zm224.8 119a53.3 53.3 0 11106.6.1 53.3 53.3 0 01-106.6-.1zm0 0"/>
-				  </svg> Share`
+              text: `${icons.share} ${_x('Share', 'a verb meaning to share something', 'groundhogg')}`
             },
             {
               key: 'reports',
               //language=HTML
-              text: `
-				  <svg height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 510 510">
-					  <path fill="currentColor"
-					        d="M495 420h-14V161.8a15 15 0 00-15-15h-82.2a15 15 0 00-15 15V420h-42.3V75a15 15 0 00-15-15h-82.3a15 15 0 00-15 15v345H172V232.2a15 15 0 00-15-15H74.7a15 15 0 00-15 15V420H30V75a15 15 0 00-30 0v360a15 15 0 0015 15h480a15 15 0 000-30zm-405.3 0V247.2h52.2V420zm154.5 0V90h52.2v330zm154.6 0V176.8H451V420z"/>
-				  </svg> Reports`
+              text: `${icons.chart} ${__('Reports', 'groundhogg')}`
             },
             {
               key: 'archive',
               //language=HTML
-              text: `
-				  <svg class="danger" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520">
-					  <defs/>
-					  <path fill="currentColor"
-					        d="M475 125V90a45 45 0 00-45-45H219.4l-7.9-12.8a15 15 0 00-12.7-7.2H45A45 45 0 000 70v380a45 45 0 0045 45h430a45 45 0 0045-45V170a45 45 0 00-45-45zm-45-50a15 15 0 0115 15v35H268.4l-20-32.8L237.7 75zm60 375a15 15 0 01-15 15H45a15 15 0 01-15-15V70a15 15 0 0115-15h145.3l7.9 12.8 29 47.3 20 32.8A15 15 0 00260 155h215a15 15 0 0115 15v280z"/>
-				  </svg><span class="gh-text danger">Archive</span>`
+              text: `${icons.folder} <span
+				  class="gh-text danger">${_x('Archive', 'a verb meaning to add an item to an archive', 'groundhogg')}</span>`
             },
             {
               key: 'delete',
               //language=HTML
-              text: `
-				  <svg class="danger" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-					  <defs/>
-					  <path fill="currentColor"
-					        d="M436 60h-75V45a45 45 0 00-45-45H196a45 45 0 00-45 45v15H76a45 45 0 00-14 87.8l26.8 323a45.3 45.3 0 0044.8 41.2h244.8c23.2 0 43-18.1 44.8-41.3l26.8-323A45 45 0 00436 60zM181 45a15 15 0 0115-15h120a15 15 0 0115 15v15H181V45zm212.3 423.2a15 15 0 01-14.9 13.8H133.6a15 15 0 01-15-13.7L92.4 150h327.4l-26.4 318.2zM436 120H76a15 15 0 010-30h360a15 15 0 010 30z"/>
-					  <path fill="currentColor"
-					        d="M196 436l-15-242a15 15 0 00-30 2l15 242a15 15 0 1030-2zM256 180a15 15 0 00-15 15v242a15 15 0 0030 0V195a15 15 0 00-15-15zM347 180a15 15 0 00-16 14l-15 242a15 15 0 0030 2l15-242a15 15 0 00-14-16z"/>
-				  </svg><span class="gh-text danger">Delete</span>`
+              text: `${icons.trash} <span class="gh-text danger">${__('Delete')}</span>`
             },
           ]
         })
@@ -877,9 +826,10 @@
       $doc.on('click', '.publish-actions .deactivate', function () {
         dangerConfirmationModal({
           // language=HTML
-          alert: `<p><b>${_x('Are you sure you want to deactivate the funnel?', 'funnel editor', 'groundhogg')}</b></p>
-		  <p>${_x('Active contacts will be paused until the funnel is reactivated.', 'funnel editor', 'groundhogg')}</p>`,
-          confirmText: _x('Deactivate', 'funnel editor', 'groundhogg'),
+          alert: `<p><b>${__('Are you sure you want to deactivate the funnel?', 'groundhogg')}</b></p>
+		  <p>
+			  ${__('Active contacts will be paused until the funnel is reactivated.', 'groundhogg')}</p>`,
+          confirmText: _x('Deactivate', 'when deactivating a funnel', 'groundhogg'),
           onConfirm: () => {
             self.deactivate()
           },
@@ -892,7 +842,9 @@
         function () {
           confirmationModal({
             // language=HTML
-            alert: `<p><b>${_x('Are you sure you want to commit these changes?', 'funnel editor', 'groundhogg')}</b></p><p>${_x('The changes made will take immediate effect to anyone currently in the funnel.', 'funnel editor', 'groundhogg')}</p>`,
+            alert: `<p><b>${__('Are you sure you want to commit these changes?', 'groundhogg')}</b></p>
+			<p>
+				${__('The changes made will take immediate effect to anyone currently in the funnel.', 'groundhogg')}</p>`,
             onConfirm: () => {
               self.commitChanges()
             },
@@ -1337,9 +1289,9 @@
       const picker = Groundhogg.EmailTemplatePicker({
         selector: '#app',
         breadcrumbs: [
-          'Funnels',
+          __('Funnels', 'groundhogg'),
           `<span id="back-to-funnel" style="cursor: pointer">${specialChars(this.funnel.data.title)}</span>`,
-          'Add Email'
+          __('Add Email', 'groundhogg')
         ],
         onSelect: (email) => {
           this.render()
@@ -1426,11 +1378,11 @@
       )
 
       const { close: cUndo } = tooltip('.undo', {
-        content: 'Undo'
+        content: __('Undo')
       })
 
       const { close: cRedo } = tooltip('.redo', {
-        content: 'Redo'
+        content: __('Redo')
       })
 
     },
@@ -1518,26 +1470,26 @@
     },
 
     activate () {
-      const { close } = loadingModal('Launching')
+      const { close } = loadingModal(__('Launching', 'groundhogg'))
 
       this.update({
         data: {
           status: 'active',
         },
       }).then(() => close()).then(() => dialog({
-        message: _x('Funnel activated!', 'funnel editor', 'groundhogg')
+        message: __('Funnel activated!', 'groundhogg')
       }))
     },
 
     deactivate () {
-      const { close } = loadingModal('Deactivating')
+      const { close } = loadingModal(__('Deactivating', 'groundhogg'))
 
       this.update({
         data: {
           status: 'inactive',
         },
       }).then(() => close()).then(() => dialog({
-        message: _x('Funnel deactivated!', 'funnel editor', 'groundhogg')
+        message: __('Funnel deactivated!', 'groundhogg')
       }))
     },
 
@@ -1568,7 +1520,7 @@
           self.loadFunnel(item)
           self.render()
           dialog({
-            message: _x('Funnel updated!', 'funnel editor', 'groundhogg')
+            message: __('Funnel updated!', 'groundhogg')
           })
         }
       })
@@ -1576,9 +1528,9 @@
     },
 
     setLastSaved () {
-      clearInterval(self.lastSavedTimer)
+      clearInterval(this.lastSavedTimer)
 
-      self.lastSavedTimer = setInterval(
+      this.lastSavedTimer = setInterval(
         this.updateLastSaved,
         30 * 1000,
         new Date()
@@ -1594,32 +1546,7 @@
      * @link https://stackoverflow.com/a/7641812
      */
     updateLastSaved (lastSaved) {
-      const delta = Math.round((+new Date() - lastSaved) / 1000)
-
-      const minute = 60,
-        hour = minute * 60,
-        day = hour * 24,
-        week = day * 7
-
-      let fuzzy = 'Saved '
-
-      if (delta < 30) {
-        fuzzy += 'just now'
-      } else if (delta < minute) {
-        fuzzy += delta + ' seconds ago'
-      } else if (delta < 2 * minute) {
-        fuzzy += 'a minute ago'
-      } else if (delta < hour) {
-        fuzzy += Math.floor(delta / minute) + ' minutes ago.'
-      } else if (Math.floor(delta / hour) == 1) {
-        fuzzy += '1 hour ago'
-      } else if (delta < day) {
-        fuzzy = Math.floor(delta / hour) + ' hours ago.'
-      } else if (delta < day * 2) {
-        fuzzy += 'yesterday'
-      }
-
-      $('.header-actions').attr('data-lastSaved', fuzzy)
+      $('.header-actions').attr('data-lastSaved', sprintf(_x('Saved %s ago', 'time passed since last update', 'groundhogg'), moment(lastSaved).fromNow(true)))
     },
 
     /**
@@ -1688,7 +1615,7 @@
       self.renderStepFlow()
       self.renderStepAdd()
       const $html = $(
-        `<div class="step-placeholder">${_x('Choose a step to add here', 'funnel editor', 'groundhogg')} &rarr;<button type="button" class="button button-secondary">${_x('Cancel', 'funnel editor', 'groundhogg')}</button></div>`
+        `<div class="step-placeholder">${__('Choose a step to add here', 'groundhogg')} &rarr;<button type="button" class="button button-secondary">${__('Cancel')}</button></div>`
       )
 
       $('button', $html).on('click', function () {
@@ -1752,10 +1679,10 @@
       if (origStep) {
         dangerConfirmationModal({
           alert: `
-          <p><b>${_x('Delete this step?', 'funnel editor', 'groundhogg')}</b></p>
-          <p>${_x('Active contacts at this step will be removed from the funnel when it is updated.', 'funnel editor', 'groundhogg')}</p> 
+          <p><b>${__('Delete this step?', 'groundhogg')}</b></p>
+          <p>${__('Active contacts at this step will be removed from the funnel when it is updated.', 'groundhogg')}</p> 
         `,
-          confirmText:_x('Delete', 'funnel editor', 'groundhogg'),
+          confirmText: __('Delete'),
           onConfirm: () => {
             removeStep()
           },
@@ -1940,7 +1867,9 @@
 
       //language=HTML
       return `
-		  <button style="width: 100%" id="edit-email-right" class="gh-button secondary">${_x('Edit Email', 'funnel editor', 'groundhogg')}</button>
+		  <button style="width: 100%" id="edit-email-right" class="gh-button secondary">
+			  ${__('Edit Email', 'groundhogg')}
+		  </button>
       `
     },
     onMount ({ ID, meta }) {
@@ -1975,12 +1904,12 @@
       return `
 		  <div id="form-embed-options" class="panel">
 			  <div class="row">
-				  <label class="row-label">${_x('Embed via Shortcode', 'funnel editor', 'groundhogg')}</label>
+				  <label class="row-label">${__('Embed via Shortcode', 'groundhogg')}</label>
 				  <div class="embed-option">${copyValue(`[gh_form id="${ID}"]`)}
 				  </div>
 			  </div>
 			  <div class="row">
-				  <label class="row-label">${_x('Embed via iFrame', 'funnel editor', 'groundhogg')}</label>
+				  <label class="row-label">${__('Embed via iFrame', 'groundhogg')}</label>
 				  <div class="embed-option">${copyValue(`[gh_form id="${ID}"]`)}
 				  </div>
 			  </div>

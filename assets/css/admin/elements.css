@@ -430,7 +430,6 @@ input.ui-autocomplete-input.focus-visible {
 .input-wrap input,
 .input-wrap select,
 .input-wrap textarea {
-  flex-grow: 1;
   margin: 0;
 }
 .gh-input-group input.bigger, .gh-input-group select.bigger, .gh-input-group textarea.bigger,
@@ -485,6 +484,7 @@ p.error,
   border-right: none;
   border-radius: 0;
   margin: 0;
+  flex-grow: 1;
 }
 .gh-input-repeater .gh-input-repeater-row .input-wrap {
   width: 100%;
@@ -558,6 +558,7 @@ p.error,
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
 }
 .gh-dropdown-menu-item:hover {
   background-color: rgba(16, 38, 64, 0.1);

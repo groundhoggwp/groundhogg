@@ -3,102 +3,12 @@
   padding-left: 0;
 }
 
-#add-funnel * {
-  box-sizing: border-box;
-}
-#add-funnel #header {
-  display: flex;
-  justify-content: space-between;
-  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
-  align-items: center;
-  padding: 0 20px;
-  background: #FFFFFF;
-}
-#add-funnel #funnel-import,
-#add-funnel #funnel-title-input {
-  padding: 40px;
-}
-#add-funnel #funnel-import h1,
-#add-funnel #funnel-title-input h1 {
-  text-align: center;
-  font-weight: 200;
-  margin-bottom: 40px;
-}
-#add-funnel #funnel-import #import-file,
-#add-funnel #funnel-title-input #import-file {
-  padding: 40px;
-  border: 2px dashed rgba(16, 38, 64, 0.15);
-  background: #FFFFFF;
-  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
-  border-radius: 5px;
-  margin: auto;
-  display: block;
-}
-#add-funnel #funnel-import p.error,
-#add-funnel #funnel-title-input p.error {
-  color: #e91f4f;
-  text-align: center;
-}
-#add-funnel #funnel-import #title,
-#add-funnel #funnel-title-input #title {
-  font-size: 26px;
-  width: 100%;
-  text-align: center;
-  border-radius: 0;
-  border-width: 0 0 1px 0;
-  box-shadow: none;
-}
-#add-funnel #funnel-import .submit,
-#add-funnel #funnel-title-input .submit {
-  text-align: center;
-}
-#add-funnel #funnel-import > p,
-#add-funnel #funnel-title-input > p {
-  text-align: center;
-}
-#add-funnel #funnel-import a.cancel,
-#add-funnel #funnel-title-input a.cancel {
-  font-size: 16px;
-  cursor: pointer;
-}
-#add-funnel #templates {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 20px;
-}
-#add-funnel #templates .row {
-  display: flex;
-  gap: 20px;
-}
-#add-funnel #templates .row > * {
-  width: 100%;
-}
-#add-funnel #templates .row .template button:not(:focus) {
-  visibility: hidden;
-}
-#add-funnel #templates .row .template.enabled:focus, #add-funnel #templates .row .template.enabled:hover {
-  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.15);
-}
-#add-funnel #templates .row .template.enabled:focus button, #add-funnel #templates .row .template.enabled:hover button {
-  visibility: visible;
-}
-#add-funnel #templates .row .template.disabled {
-  opacity: 0.8;
-}
-#add-funnel #templates .row .template .inside {
-  padding-top: 0;
-}
-#add-funnel #templates .row .template .template-header {
-  padding: 0 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 #funnel-editor {
   /* Control panel */
   /* context menu */
+}
+#funnel-editor input {
+  width: auto;
 }
 #funnel-editor .editor {
   display: flex;

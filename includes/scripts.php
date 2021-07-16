@@ -391,7 +391,7 @@ class Scripts {
 		] );
 
 		wp_localize_script( 'groundhogg-admin', 'Groundhogg', [
-			'locale'          => get_locale(),
+			'locale'          => str_replace( '_', '-', get_locale() ),
 			'user_test_email' => get_user_test_email(),
 			'api'             => [
 				'routes' => [
@@ -461,7 +461,7 @@ class Scripts {
 			'groundhogg-funnel-step-types'
 		];
 
-		foreach ( $js_handles as $handle ){
+		foreach ( $js_handles as $handle ) {
 			wp_set_script_translations( $handle, 'groundhogg' );
 		}
 

@@ -33,6 +33,8 @@
     copyObject
   } = Groundhogg.element
 
+  const { sprintf, __, _x, _n } = wp.i18n
+
   const { formBuilder, rawStepTypes } = Groundhogg
 
   const { linkPicker, emailPicker, tagPicker, apiPicker } = Groundhogg.pickers
@@ -67,7 +69,7 @@
     },
   }
 
-  StepPacks.add('core', 'Groundhogg')
+  StepPacks.add('core', __('Groundhogg', 'groundhogg'))
 
   /**
    * Handler for the tag picker step when a condition is also present.
@@ -112,123 +114,6 @@
         })
       }
     })
-  }
-
-  const delayTimerDefaults = {
-    delay_amount: 3,
-    delay_type: 'days',
-    run_on_type: 'any',
-    run_when: 'now',
-    run_time: '09:00:00',
-    send_in_timezone: false,
-    run_time_to: '17:00:00',
-    run_on_dow_type: 'any', // Run on days of week type
-    run_on_dow: [], // Run on days of week
-    run_on_month_type: 'any', // Run on month type
-    run_on_months: [], // Run on months
-    run_on_dom: [], // Run on days of month
-  }
-
-  const delayTimerName = ({
-    delay_amount,
-    delay_type,
-    run_on_type,
-    run_when,
-    run_time,
-    send_in_timezone,
-    run_time_to,
-    run_on_dow_type, // Run on days of week type
-    run_on_dow, // Run on days of week
-    run_on_month_type, // Run on month type
-    run_on_months, // Run on months
-    run_on_dom, // Run on days of month
-  }) => {
-    const preview = []
-
-    // Deal with the easiest cases first
-    if (delay_type === 'none' && run_on_type === 'any') {
-      switch (run_when) {
-        default:
-        case 'now':
-          return `Run at any time`
-        case 'later':
-          return `Run at <b>${run_time}</b>`
-        case 'between':
-          return `Run between <b>${run_time}</b> and <b>${run_time_to}</b>`
-      }
-    }
-
-    if (delay_type !== 'none') {
-      preview.push(
-        `Wait at least <b>${delay_amount} ${delay_type}</b> and then`
-      )
-    }
-
-    if (run_on_type !== 'any') {
-      preview.push(preview.length > 0 ? 'run on' : 'Run on')
-    }
-
-    switch (run_on_type) {
-      default:
-      case 'any':
-        preview.push('run')
-        break
-      case 'weekday':
-        preview.push('<b>a weekday</b>')
-        break
-      case 'weekend':
-        preview.push('<b>a weekend</b>')
-        break
-      case 'day_of_week':
-        let dowList = orList(run_on_dow.map((i) => `<b>${i}</b>`))
-        dowList = `${
-          run_on_dow_type === 'any'
-            ? `any ${dowList}`
-            : `the ${run_on_dow_type} ${dowList}`
-        }`
-
-        if (run_on_month_type === 'specific') {
-          preview.push(
-            `${dowList} in ${orList(run_on_months.map((i) => `<b>${i}</b>`))}`
-          )
-        } else {
-          preview.push(`${dowList} of <b>any month</b>`)
-        }
-
-        break
-      case 'day_of_month':
-        const dayList =
-          run_on_dom.length > 0
-            ? `the ${orList(
-            run_on_dom.map((i) => `<b>${ordinal_suffix_of(i)}</b>`)
-            )}`
-            : `<b>any day</b>`
-
-        if (run_on_month_type === 'specific') {
-          preview.push(
-            `${dayList} in ${orList(run_on_months.map((i) => `<b>${i}</b>`))}`
-          )
-        } else {
-          preview.push(`${dayList} of <b>any month</b>`)
-        }
-
-        break
-    }
-
-    switch (run_when) {
-      default:
-      case 'now':
-        preview.push(`at any time`)
-        break
-      case 'later':
-        preview.push(`at <b>${run_time}</b>`)
-        break
-      case 'between':
-        preview.push(`between <b>${run_time}</b> and <b>${run_time_to}</b>`)
-        break
-    }
-
-    return preview.join(' ')
   }
 
   const fieldMappingTable = ({ fields = {}, fieldMap = {} }) => {
@@ -412,6 +297,147 @@
     },
     ...rest,
   })
+
+  const delayTimerDefaults = {
+    delay_amount: 3,
+    delay_type: 'days',
+    run_on_type: 'any',
+    run_when: 'now',
+    run_time: '09:00:00',
+    send_in_timezone: false,
+    run_time_to: '17:00:00',
+    run_on_dow_type: 'any', // Run on days of week type
+    run_on_dow: [], // Run on days of week
+    run_on_month_type: 'any', // Run on month type
+    run_on_months: [], // Run on months
+    run_on_dom: [], // Run on days of month
+  }
+
+  const delay_timer_i18n = {
+    delay_duration_types: {
+      minutes: __('Minutes'),
+      hours: __('Hours'),
+      days: __('Days'),
+      weeks: __('Weeks'),
+      months: __('Months'),
+      years: __('Years'),
+      none: __('No delay', 'groundhogg'),
+    },
+    day_of_week_determiners: {
+      any: __('Any'),
+      first: __('First'),
+      second: __('Second'),
+      third: __('Third'),
+      fourth: __('Fourth'),
+      last: __('Last'),
+    },
+    days_of_week: {
+      monday: __('Monday'),
+      tuesday: __('Tuesday'),
+      wednesday: __('Wednesday'),
+      thursday: __('Thursday'),
+      friday: __('Friday'),
+      saturday: __('Saturday'),
+      sunday: __('Sunday'),
+    },
+    months: {
+      january: __('January'),
+      february: __('February'),
+      march: __('March'),
+      april: __('April'),
+      may: __('May'),
+      june: __('June'),
+      july: __('July'),
+      august: __('August'),
+      september: __('September'),
+      october: __('October'),
+      november: __('November'),
+      december: __('December'),
+    }
+  }
+
+  const delayTimerName = ({
+    delay_amount,
+    delay_type,
+    run_on_type,
+    run_when,
+    run_time,
+    send_in_timezone,
+    run_time_to,
+    run_on_dow_type, // Run on days of week type
+    run_on_dow = [], // Run on days of week
+    run_on_month_type, // Run on month type
+    run_on_months = [], // Run on months
+    run_on_dom = [], // Run on days of month
+  }) => {
+    const preview = []
+
+    const formatTime = (time) => {
+      return Intl.DateTimeFormat(Groundhogg.locale, {
+        timeStyle: 'short'
+      }).format(new Date(`2021-01-01 ${time}`))
+    }
+
+    switch (run_when) {
+      case 'now':
+        preview.unshift(_x('at any time', 'groundhogg'))
+        break
+      case 'later':
+        preview.unshift(sprintf(_x('at %s', 'at a specific time', 'groundhogg'), `<b>${formatTime(run_time)}</b>`))
+        break
+      case 'between':
+        preview.unshift(sprintf(_x('between %1$s and %2$s', 'within a time from', 'groundhogg'), `<b>${formatTime(run_time)}</b>`, `<b>${formatTime(run_time_to)}</b>`))
+        break
+    }
+
+    let days, months
+
+    console.log(run_on_months)
+
+    switch (run_on_type) {
+      default:
+      case 'any':
+        preview.unshift(_x('run', 'verb meaning to start a process', 'groundhogg'))
+        break
+      case 'weekday':
+        preview.unshift(_x('run on <b>a weekday</b>', 'verb meaning to start a process - on a weekday', 'groundhogg'))
+        break
+      case 'weekend':
+        preview.unshift(_x('run on <b>a weekend</b>', 'verb meaning to start a process - on a weekend', 'groundhogg'))
+        break
+      case 'day_of_week':
+        let dowList = orList(run_on_dow.map((i) => `<b>${delay_timer_i18n.days_of_week[i]}</b>`))
+        days = run_on_dow_type === 'any' ? sprintf(_x('any %s', 'any - day of the week', 'groundhogg'), dowList) : sprintf(_x('the %1$s %2$s', 'the - determiner - day of week', 'groundhogg'), delay_timer_i18n.day_of_week_determiners[run_on_dow_type].toLowerCase(), dowList)
+        months = run_on_month_type === 'specific' ? orList(run_on_months.map((i) => `<b>${delay_timer_i18n.months[i]}</b>`)) : `<b>${__('any month', 'groundhogg')}</b>`
+        preview.unshift(sprintf(_x('run on %1$s of %2$s', 'verb meaning to start on process - on a specific day of a specific month', 'groundhogg'), days, months))
+        break
+      case 'day_of_month':
+        days = run_on_dom.length > 0 ? sprintf(_x('the %s', 'the - ordinal day of month', 'groundhogg'), orList(run_on_dom.map((i) => `<b>${i === 'last' ? __('last day', 'groundhogg') : ordinal_suffix_of(i)}</b>`))) : `<b>${__('any day', 'groundhogg')}</b>`
+        months = run_on_month_type === 'specific' ? orList(run_on_months.map((i) => `<b>${delay_timer_i18n.months[i]}</b>`)) : `<b>${__('any month', 'groundhogg')}</b>`
+        preview.unshift(sprintf(_x('run on %1$s of %2$s', 'verb meaning to start on process - on a specific day of a specific month', 'groundhogg'), days, months))
+        break
+    }
+
+    if (delay_type !== 'none') {
+
+      delay_amount = parseInt(delay_amount)
+
+      const delayTypes = {
+        minutes: _n('minute', 'minutes', delay_amount),
+        hours: _n('hour', 'hours', delay_amount),
+        days: _n('day', 'days', delay_amount),
+        weeks: _n('week', 'weeks', delay_amount),
+        months: _n('month', 'months', delay_amount),
+        years: _n('year', 'years', delay_amount),
+      }
+
+      preview.unshift(
+        sprintf(_x('Wait at least %s and then', 'wait for a duration', 'groundhogg'), `<b>${delay_amount} ${delayTypes[delay_type]}</b>`)
+      )
+    }
+
+    return preview.join(' ')
+  }
 
   const StepTypes = {
 
@@ -1206,16 +1232,6 @@
           ...meta,
         }
 
-        const delayTypes = {
-          minutes: 'Minutes',
-          hours: 'Hours',
-          days: 'Days',
-          weeks: 'Weeks',
-          months: 'Months',
-          years: 'Years',
-          none: 'No delay',
-        }
-
         const runOnTypes = {
           any: 'Any day',
           weekday: 'Weekday',
@@ -1225,21 +1241,12 @@
         }
 
         const runWhenTypes = {
-          now: 'Any time',
-          later: 'Specific time',
+          now: __('Any time', 'groundhogg'),
+          later: __('Specific time', 'groundhogg'),
         }
 
-        if (delay_type === 'minutes' || delay_type === 'hours') {
-          runWhenTypes.between = 'Between'
-        }
-
-        const runOnDOWTypes = {
-          any: 'Any',
-          first: 'First',
-          second: 'Second',
-          third: 'Third',
-          fourth: 'Fourth',
-          last: 'Last',
+        if (['minutes', 'hours', 'none'].includes(delay_type)) {
+          runWhenTypes.between = __('Between', 'groundhogg')
         }
 
         const runOnDaysOfMonth = {}
@@ -1255,34 +1262,9 @@
           specific: 'Of specific month(s)',
         }
 
-        const runOnDaysOfWeek = {
-          monday: 'Monday',
-          tuesday: 'Tuesday',
-          wednesday: 'Wednesday',
-          thursday: 'Thursday',
-          friday: 'Friday',
-          saturday: 'Saturday',
-          sunday: 'Sunday',
-        }
-
-        const runOnMonths = {
-          january: 'January',
-          february: 'February',
-          march: 'March',
-          april: 'April',
-          may: 'May',
-          june: 'June',
-          july: 'July',
-          august: 'August',
-          september: 'September',
-          october: 'October',
-          november: 'November',
-          december: 'December',
-        }
-
         //language=HTML
         const runOnMonthOptions = `
-			<div style="margin-top: 10px">${select({
+			<div class="gh-input-group" style="margin-top: 10px">${select({
 				className: 'delay-input re-render',
 				name: 'run_on_month_type'
 			}, runOnMonthTypes, run_on_month_type)}
@@ -1290,28 +1272,30 @@
 					className: 'delay-input select2',
 					name: 'run_on_months',
 					multiple: true,
-				}, runOnMonths, run_on_months) : ''}
+				}, delay_timer_i18n.months, run_on_months) : ''}
 			</div>`
 
         //language=HTML
         const daysOfWeekOptions = `
-			<div style="margin-top: 10px">${select({
+			<div class="gh-input-group" style="margin-top: 10px">${select({
 				className: 'delay-input',
 				name: 'run_on_dow_type'
-			}, runOnDOWTypes, run_on_dow_type)}
+			}, delay_timer_i18n.day_of_week_determiners, run_on_dow_type)}
 				${select({
 					className: 'select2',
-					name: 'run_on_dow'
-				}, runOnDaysOfWeek, run_on_dow)}
+					name: 'run_on_dow',
+					multiple: true
+				}, delay_timer_i18n.days_of_week, run_on_dow)}
 			</div>
 			${runOnMonthOptions}`
 
         //language=HTML
         const daysOfMonthOptions = `
-			<div style="margin-top: 10px">
+			<div class="gh-input-group" style="margin-top: 10px">
 				${select({
 					className: 'select2',
-					name: 'run_on_dom'
+					name: 'run_on_dom',
+					multiple: true,
 				}, runOnDaysOfMonth, run_on_dom)}
 			</div>
 			${runOnMonthOptions}`
@@ -1337,7 +1321,7 @@
 					${select({
 						className: 'delay-input re-render',
 						name: 'delay_type'
-					}, delayTypes, delay_type)}
+					}, delay_timer_i18n.delay_duration_types, delay_type)}
 				</div>
 				<div class="row">
 					<label class="row-label">Then run on...</label>
@@ -1383,7 +1367,9 @@
         }
 
         $('.select2')
-          .select2()
+          .select2({
+            width: 'auto'
+          })
           .on('change', function (e) {
             // console.log(e)
             updateStepMeta({
@@ -1393,20 +1379,20 @@
           })
 
         $('.delay-input')
-          .on('change', function (e) {
+          .on('change', ({ target }) => {
 
-            const reRender = e.target.classList.contains('re-render')
+            const reRender = target.classList.contains('re-render')
 
             updateStepMeta({
-              [e.target.name]: e.target.value,
+              [target.name]: $(target).val(),
             }, reRender)
 
             if (reRender) {
-              $(`[name=${e.target.name}]`).focus()
+              $(`[name=${target.name}]`).focus()
             } else {
               updatePreview()
             }
-          }).on('blur', function (e) {
+          }).on('input', function (e) {
           updatePreview()
         })
       },
@@ -1497,12 +1483,9 @@
 
           $(this).select2('close')
 
-          updateStepMeta(
-            {
-              email_id: parseInt($(this).val()),
-            },
-            true
-          )
+          updateStepMeta({
+            email_id: parseInt($(this).val()),
+          }, true)
         })
 
         $('#add-new-email').on('click', () => {
@@ -1523,10 +1506,6 @@
           setTimeout(() => {
             fullFrame(frame)
           }, 100)
-
-          $('#render-email-edit').on('click', function () {
-            // Editor.renderEmailEditor(email) todo
-          })
         }
       },
       validate ({ meta }, addError, addWarning) {
