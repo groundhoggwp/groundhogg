@@ -96,7 +96,6 @@
    */
   const tagOnMount = (step, updateStepMeta) => {
     return tagPicker('#tags', true, (items) => {
-      console.log(items)
       TagsStore.itemsFetched(items)
     }).on('change', function (e) {
       const tags = $(this).val()
@@ -391,8 +390,6 @@
     }
 
     let days, months
-
-    console.log(run_on_months)
 
     switch (run_on_type) {
       default:
@@ -1291,7 +1288,7 @@
 
         //language=HTML
         const daysOfMonthOptions = `
-			<div class="gh-input-group" style="margin-top: 10px">
+			<div style="margin-top: 10px">
 				${select({
 					className: 'select2',
 					name: 'run_on_dom',
@@ -1313,18 +1310,20 @@
 				</div>
 				<div class="row">
 					<label class="row-label">${__('Wait at least...', 'groundhogg')}</label>
-					${input({
-						className: 'delay-input',
-						type: 'number',
-						name: 'delay_amount',
-						value: delay_amount,
-						placeholder: 3,
-						disabled: delay_type === 'none'
-					})}
-					${select({
-						className: 'delay-input re-render',
-						name: 'delay_type'
-					}, delay_timer_i18n.delay_duration_types, delay_type)}
+					<div class="gh-input-group">
+						${input({
+							className: 'delay-input',
+							type: 'number',
+							name: 'delay_amount',
+							value: delay_amount,
+							placeholder: 3,
+							disabled: delay_type === 'none'
+						})}
+						${select({
+							className: 'delay-input re-render',
+							name: 'delay_type'
+						}, delay_timer_i18n.delay_duration_types, delay_type)}
+					</div>
 				</div>
 				<div class="row">
 					<label

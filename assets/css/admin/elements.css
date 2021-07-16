@@ -438,14 +438,20 @@ input.ui-autocomplete-input.focus-visible {
 .input-wrap textarea.bigger {
   flex-grow: 2;
 }
-.gh-input-group *:not(:first-child),
-.input-wrap *:not(:first-child) {
+.gh-input-group > *:not(:first-child),
+.input-wrap > *:not(:first-child) {
   border-left: 0 !important;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
-.gh-input-group *:not(:last-child),
-.input-wrap *:not(:last-child) {
+.gh-input-group > *:not(:first-child) .select2-selection,
+.input-wrap > *:not(:first-child) .select2-selection {
+  border-left: 0 !important;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.gh-input-group > *:not(:last-child),
+.input-wrap > *:not(:last-child) {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }

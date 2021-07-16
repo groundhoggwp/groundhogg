@@ -555,13 +555,20 @@ input.ui-autocomplete-input {
     }
   }
 
-  *:not(:first-child) {
+  > *:not(:first-child) {
+
+    .select2-selection{
+      border-left: 0 !important;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+
     border-left: 0 !important;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }
 
-  *:not(:last-child) {
+  > *:not(:last-child) {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
