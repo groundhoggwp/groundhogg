@@ -1312,19 +1312,23 @@
 					)}</h3>
 				</div>
 				<div class="row">
-					<label class="row-label">Wait at least...</label>
-					<input class="delay-input" type="number" name="delay_amount" value="${
-						delay_amount || 3
-					}"
-					       placeholder="3"
-					       ${delay_type === 'none' ? 'disabled' : ''}>
+					<label class="row-label">${__('Wait at least...', 'groundhogg')}</label>
+					${input({
+						className: 'delay-input',
+						type: 'number',
+						name: 'delay_amount',
+						value: delay_amount,
+						placeholder: 3,
+						disabled: delay_type === 'none'
+					})}
 					${select({
 						className: 'delay-input re-render',
 						name: 'delay_type'
 					}, delay_timer_i18n.delay_duration_types, delay_type)}
 				</div>
 				<div class="row">
-					<label class="row-label">Then run on...</label>
+					<label
+						class="row-label">${_x('Then run on...', 'meaning to run a process on a certain date', 'groundhogg')}</label>
 					${select({
 						className: 'delay-input re-render',
 						name: 'run_on_type'
@@ -1333,9 +1337,9 @@
 					${run_on_type === 'day_of_month' ? daysOfMonthOptions : ''}
 				</div>
 				<div class="row">
-					<label class="row-label">Then run at...</label>
-					${select(
-						{
+					<label
+						class="row-label">${_x('Then run at...', 'meaning to run a process at a certain time', 'groundhogg')}</label>
+					${select({
 							className: 'delay-input re-render',
 							name: 'run_when',
 						},
@@ -1344,12 +1348,26 @@
 					)}
 					${
 						run_when === 'later'
-							? `<input class="delay-input" type="time" name="run_time" value="${run_time}">`
-							: ''
+							? input({
+								className: 'delay-input',
+								type: 'time',
+								name: 'run_time',
+								value: run_time
+							}) : ''
 					}
 					${
 						run_when === 'between'
-							? `<input class="delay-input" type="time" name="run_time" value="${run_time}"> and <input class="delay-input" type="time" name="run_time_to" value="${run_time_to}">`
+							? sprintf(_x('%s and %s', 'between start time and end time', 'groundhogg'), input({
+								className: 'delay-input',
+								type: 'time',
+								name: 'run_time',
+								value: run_time
+							}), input({
+								className: 'delay-input',
+								type: 'time',
+								name: 'run_time_to',
+								value: run_time_to
+							}))
 							: ''
 					}
 				</div>
