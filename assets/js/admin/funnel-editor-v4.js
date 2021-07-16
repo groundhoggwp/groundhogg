@@ -40,7 +40,7 @@
     clickInsideElement,
   } = Groundhogg.element
 
-  const { campaignPicker } = Groundhogg.pickers
+  const { campaignPicker, emailPicker } = Groundhogg.pickers
 
   const { StepTypes, StepPacks } = Groundhogg
 
@@ -1870,18 +1870,56 @@
 		  <button style="width: 100%" id="edit-email-right" class="gh-button secondary">
 			  ${__('Edit Email', 'groundhogg')}
 		  </button>
+		  <div class="panel">
+			  <div class="row">
+				  <div class="column">
+					  <label
+						  class="row-label">${__('Select a different email to send...', 'groundhogg')}</label>
+					  ${select({
+							  id: 'email-picker-right',
+							  name: 'email_id',
+						  },
+						  EmailsStore.getItems().map((item) => {
+							  return {
+								  text: item.data.title,
+								  value: item.ID,
+							  }
+						  }), email && email.ID
+					  )}
+				  </div>
+			  </div>
+			  <div class="row">
+				  <div class="column">
+					  <label class="row-label">Or...</label>
+					  <button id="add-new-email-right" class="gh-button secondary">
+						  ${__('Create a new email', 'groundhogg')}
+					  </button>
+				  </div>
+			  </div>
+		  </div>
       `
     },
-    onMount ({ ID, meta }) {
+    onMount ({ ID, meta }, updateStepMeta) {
 
       const { email_id } = meta
       const email = EmailsStore.get(parseInt(email_id))
 
-      if (email_id && email) {
-        $('#edit-email-right').on('click', () => {
-          Editor.renderEmailEditor(email)
-        })
+      if (!email_id || !email) {
+        return
       }
+
+      $('#edit-email-right').on('click', () => {
+        Editor.renderEmailEditor(email)
+      })
+
+      emailPicker('#email-picker-right', false, (items) => EmailsStore.itemsFetched(items), {}, { width: '100%' })
+        .on('change', (e) => {
+
+          updateStepMeta({
+            email_id: e.target.value
+          }, true)
+
+        })
     }
   })
 

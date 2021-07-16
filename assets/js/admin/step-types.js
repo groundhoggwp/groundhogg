@@ -97,6 +97,9 @@
   const tagOnMount = (step, updateStepMeta) => {
     return tagPicker('#tags', true, (items) => {
       TagsStore.itemsFetched(items)
+    }, {
+      width: '100%',
+      placeholder: __('Select one or more tags...', 'groundhogg')
     }).on('change', function (e) {
       const tags = $(this).val()
       const newTags = tags.filter((tag) => !TagsStore.hasItem(parseInt(tag)))
@@ -297,6 +300,16 @@
     ...rest,
   })
 
+  const preloadTags = ({ meta, export: exported }) => {
+    if (!exported) {
+      return TagsStore.fetchItems({
+        tag_id: meta.tags
+      })
+    }
+
+    TagsStore.itemsFetched(exported.tags)
+  }
+
   const delayTimerDefaults = {
     delay_amount: 3,
     delay_type: 'days',
@@ -446,8 +459,18 @@
 
         let p = this.getType(s.data.step_type).preload(s)
 
-        if (p && p.length > 0) {
+        if (!p) {
+          return
+        }
+
+        // multiple promises
+        if (Array.isArray(p) && p.length > 0) {
           promises.push(...p)
+
+        }
+        // Just the one promise
+        else {
+          promises.push(p)
         }
       })
 
@@ -596,10 +619,10 @@
         const { note_text } = meta
 
         if (note_text) {
-          return `Add <i>${note_text.replace(/(<([^>]+)>)/gi, '').substring(0, 30)}...</i>`
+          return sprintf( _x( 'Add %s', 'add - note text', 'groundhogg' ) , `<i>${note_text.replace(/(<([^>]+)>)/gi, '').substring(0, 30)}...</i>`)
         }
 
-        return 'Add Note'
+        return __( 'Add a note', 'groundhogg' )
       },
       edit ({ meta }) {
         const { note_text = '' } = meta
@@ -608,7 +631,7 @@
         return `
 			<div class="panel">
 				<div class="row">
-					<label class="row-label" for="note_text">Add the following note the the contact...</label>
+					<label class="row-label" for="note_text">${__('Add the following note the the contact...', 'groundhogg')}</label>
 					${textarea({
 						id: 'note_text',
 						className: 'wp-editor-area',
@@ -799,13 +822,13 @@
         const roles = this.context.roles
 
         if (meta.role && meta.role.length === 1) {
-          return `<b>${roles[meta.role[0]]}</b> is created`
+          return sprintf(__('%s is created', 'groundhogg'), `<b>${roles[meta.role[0]]}</b>`)
         } else if (meta.role && meta.role.length > 1) {
-          return `${orList(
+          return sprintf(__('%s is created', 'groundhogg'), orList(
             meta.role.map((role) => `<b>${roles[role]}</b>`)
-          )} is created`
+          ))
         } else {
-          return 'User Created'
+          return __('A <b>new user</b> is created', 'groundhogg')
         }
       },
 
@@ -817,7 +840,7 @@
         return `
 			<div class="panel">
 				<div class="row">
-					<label class="row-label" for="roles">Select user roles.</label>
+					<label class="row-label" for="roles">${__('Select user roles.', 'groundhogg')}</label>
 					${select(
 						{
 							id: 'roles',
@@ -827,7 +850,8 @@
 						roles,
 						meta.role
 					)}
-					<p class="description">Runs when a new user is created with any of the defined roles.</p>
+					<p class="description">
+						${__('Runs when a new user is created with any of the given roles. Leave empty to run for every new user.', 'groundhogg')}</p>
 				</div>
 			</div>`
       },
@@ -835,7 +859,10 @@
       // On mount
       onMount (step, updateStepMeta) {
         $('#roles')
-          .select2()
+          .select2({
+            width: '100%',
+            placeholder: __('Select one or more user roles...', 'groundhogg')
+          })
           .on('change', function (e) {
             let roles = $(this).val()
             updateStepMeta({
@@ -871,13 +898,13 @@
         }
 
         if (!tags || tags.length === 0) {
-          return 'Apply tag'
+          return __('Apply a tag', 'groundhogg')
         } else if (tags.length < 4 && TagsStore.hasItems(tags)) {
-          return `Apply ${andList(
+          return sprintf(_x('Apply %s', 'apply tags - list of tag names', 'groundhogg'), andList(
             tags.map((id) => `<b>${TagsStore.get(id).data.tag_name}</b>`)
-          )}`
+          ))
         } else {
-          return `Apply <b>${tags.length}</b> tags`
+          return sprintf(_x('Apply %s tags', 'apply tags - number', 'groundhogg'), `<b>${tags.length}</b>`)
         }
       },
 
@@ -893,9 +920,8 @@
         return `
 			<div class="panel">
 				<div class="row">
-					<label class="row-label" for="tags">Select tags to add.</label>
-					${select(
-						{
+					<label class="row-label" for="tags">${__('Select tags to apply.', 'groundhogg')}</label>
+					${select({
 							name: 'tags',
 							id: 'tags',
 							multiple: true,
@@ -903,7 +929,8 @@
 						options,
 						meta.tags ? meta.tags.map((id) => parseInt(id)) : []
 					)}
-					<p class="description">All of the defined tags will be added to the contact.</p>
+					<p class="description">
+						${__('All of the given tags will be applied to the contact.', 'groundhogg')}</p>
 				</div>
 			</div>`
       },
@@ -912,13 +939,7 @@
         tagOnMount(step, updateStepMeta)
       },
 
-      preload (step) {
-        if (!step.export) {
-          return
-        }
-
-        TagsStore.itemsFetched(step.export.tags)
-      }
+      preload: preloadTags
     },
 
     /**
@@ -942,13 +963,13 @@
         tags = tags.map((id) => parseInt(id))
 
         if (tags.length === 0) {
-          return 'Remove tags'
+          return __('Remove tags', 'groundhogg')
         } else if (tags.length < 4 && TagsStore.hasItems(tags)) {
-          return `Remove ${andList(
+          return sprintf(_x('Remove %s', 'remove - list of tag names', 'groundhogg'), andList(
             tags.map((id) => `<b>${TagsStore.get(id).data.tag_name}</b>`)
-          )}`
+          ))
         } else {
-          return `Remove <b>${tags.length}</b> tags`
+          return sprintf(_x('Remove %s tags', 'remove tags - number', 'groundhogg'), `<b>${tags.length}</b>`)
         }
       },
 
@@ -964,7 +985,7 @@
         return `
 			<div class="panel">
 				<div class="row">
-					<label class="row-label" for="tags">Select tags to remove.</label>
+					<label class="row-label" for="tags">${__('Select tags to remove.', 'groundhogg')}</label>
 					${select(
 						{
 							name: 'tags',
@@ -974,7 +995,8 @@
 						options,
 						meta.tags.map((id) => parseInt(id))
 					)}
-					<p class="description">All of the defined tags will be removed from the contact.</p>
+					<p class="description">
+						${__('All of the given tags will be removed from the contact.', 'groundhogg')}</p>
 				</div>
 			</div>`
       },
@@ -982,13 +1004,7 @@
       onMount (step, updateStepMeta) {
         tagOnMount(step, updateStepMeta)
       },
-      preload (step) {
-        if (!step.export) {
-          return
-        }
-
-        TagsStore.itemsFetched(step.export.tags)
-      }
+      preload: preloadTags
     },
 
     /**
@@ -1013,12 +1029,10 @@
         let { tags = [], condition = 'any' } = meta
         tags = tags.map((id) => parseInt(id))
 
-        if (!tags) {
-          return 'Tag is applied'
-        } else if (tags.length >= 4) {
+        if (tags.length >= 4) {
           return condition === 'all'
-            ? `<b>${tags.length}</b> tags are applied`
-            : `Any of <b>${tags.length}</b> tags are applied`
+            ? sprintf(__('%s tags are applied', 'groundhogg'), `<b>${tags.length}</b>`)
+            : sprintf(__('Any of %s tags are applied', 'groundhogg'), `<b>${tags.length}</b>`)
         } else if (
           tags.length > 1 &&
           tags.length < 4 &&
@@ -1028,12 +1042,12 @@
             (tag) => `<b>${TagsStore.get(tag).data.tag_name}</b>`
           )
           return condition === 'all'
-            ? `${andList(tagNames)} are applied`
-            : `${orList(tagNames)} is applied`
+            ? sprintf(_x('%s are applied', 'list of tags - are applied', 'groundhogg'), andList(tagNames))
+            : sprintf(_x('%s is applied', 'list of tags - is applied', 'groundhogg'), orList(tagNames))
         } else if (tags.length === 1) {
-          return `<b>${TagsStore.get(tags[0]).data.tag_name}</b> is applied`
+          return sprintf(_x('%s is applied', 'list of tags - is applied', 'groundhogg'), `<b>${TagsStore.get(tags[0]).data.tag_name}</b>`)
         } else {
-          return 'Tag is applied'
+          return __('A tag is applied', 'groundhogg')
         }
       },
 
@@ -1051,18 +1065,15 @@
         return `
 			<div class="panel">
 				<div class="row">
-					<label class="row-label" for="tags">When <select id="condition">
-						<option value="any" ${
-							condition === 'any' ? 'selected' : ''
-						}>Any
-						</option>
-						<option value="all" ${
-							condition === 'all' ? 'selected' : ''
-						}>All
-						</option>
-					</select> of the defined tags are applied</label>
-					${select(
-						{
+					<label class="row-label" for="tags">
+						${sprintf(_x('Run when %s of the following tags are applied...', '%s is any|all', 'groundhogg'), select({
+							id: 'condition'
+						}, {
+							any: __('Any', 'groundhogg'),
+							all: __('All', 'groundhogg'),
+						}, condition))}
+					</label>
+					${select({
 							name: 'tags',
 							id: 'tags',
 							multiple: true,
@@ -1070,9 +1081,6 @@
 						options,
 						tags.map((id) => parseInt(id))
 					)}
-					<p class="description">Runs when ${
-						condition || 'any'
-					} of the provided tags are applied.</p>
 				</div>
 			</div>`
       },
@@ -1080,13 +1088,7 @@
       onMount (step, updateStepMeta) {
         tagWithConditionOnMount(step, updateStepMeta)
       },
-      preload (step) {
-        if (!step.export) {
-          return
-        }
-
-        TagsStore.itemsFetched(step.export.tags)
-      }
+      preload: preloadTags
     },
 
     /**
@@ -1113,12 +1115,10 @@
         let { tags, condition } = meta
         tags = tags.map((id) => parseInt(id))
 
-        if (!tags) {
-          return 'Tag is removed'
-        } else if (tags.length >= 4) {
+        if (tags.length >= 4) {
           return condition === 'all'
-            ? `<b>${tags.length}</b> tags are removed`
-            : `Any of <b>${tags.length}</b> tags are removed`
+            ? sprintf(__('%s tags are removed', 'groundhogg'), `<b>${tags.length}</b>`)
+            : sprintf(__('Any of %s tags are removed', 'groundhogg'), `<b>${tags.length}</b>`)
         } else if (
           tags.length > 1 &&
           tags.length < 4 &&
@@ -1128,12 +1128,12 @@
             (tag) => `<b>${TagsStore.get(tag).data.tag_name}</b>`
           )
           return condition === 'all'
-            ? `${andList(tagNames)} are applied`
-            : `${orList(tagNames)} is removed`
+            ? sprintf(_x('%s are removed', 'list of tags - are removed', 'groundhogg'), andList(tagNames))
+            : sprintf(_x('%s is removed', 'list of tags - is removed', 'groundhogg'), orList(tagNames))
         } else if (tags.length === 1) {
-          return `<b>${TagsStore.get(tags[0]).data.tag_name}</b> is removed`
+          return sprintf(_x('%s is removed', 'list of tags - is removed', 'groundhogg'), `<b>${TagsStore.get(tags[0]).data.tag_name}</b>`)
         } else {
-          return 'Tag is removed'
+          return __('A tag is removed', 'groundhogg')
         }
       },
 
@@ -1151,16 +1151,13 @@
         return `
 			<div class="panel">
 				<div class="row">
-					<label class="row-label" for="tags">When <select id="condition">
-						<option value="any" ${
-							condition === 'any' ? 'selected' : ''
-						}>Any
-						</option>
-						<option value="all" ${
-							condition === 'all' ? 'selected' : ''
-						}>All
-						</option>
-					</select> of the defined tags are removed</label>
+					<label class="row-label" for="tags">
+						${sprintf(_x('Run when %s of the following tags are removed...', '%s is any|all', 'groundhogg'), select({
+							id: 'condition'
+						}, {
+							any: __('Any', 'groundhogg'),
+							all: __('All', 'groundhogg'),
+						}, condition))}</label>
 					${select(
 						{
 							name: 'tags',
@@ -1170,9 +1167,6 @@
 						options,
 						meta.tags.map((id) => parseInt(id))
 					)}
-					<p class="description">Runs when ${
-						condition || 'any'
-					} of the provided tags are removed.</p>
 				</div>
 			</div>`
       },
@@ -1180,13 +1174,7 @@
       onMount (step, updateStepMeta) {
         tagWithConditionOnMount(step, updateStepMeta)
       },
-      preload (step) {
-        if (!step.export) {
-          return
-        }
-
-        TagsStore.itemsFetched(step.export.tags)
-      }
+      preload: preloadTags
     },
 
     delay_timer: {
@@ -1434,8 +1422,7 @@
       title ({ ID, data, meta }) {
         const { email_id } = meta
         const email = EmailsStore.get(parseInt(email_id))
-        const title = email_id && email ? email.data.title : 'an email'
-        return `Send <b>${title}</b>`
+        return email_id && email ? sprintf(_x('Send %s', 'send - email title', 'groundhogg'), `<b>${email.data.title}</b>`) : __('Send <b>an email</b>', 'groundhogg')
       },
       edit ({ ID, data, meta }) {
         const { email_id } = meta
@@ -1464,50 +1451,35 @@
         //language=HTML
         return `
 			${email_id && email ? iframePreview(email) : ''}
+			${!email_id || !email ? `
 			<div class="panel">
 				<div class="row with-columns">
 					<div class="column">
 						<label
-							class="row-label">${email ? 'Select a different email to send...' : 'Select an email to send...'}</label>
-						${select(
-							{
-								id: 'email-picker',
-								name: 'email_id',
-							},
-							EmailsStore.getItems().map((item) => {
-								return {
-									text: item.data.title,
-									value: item.ID,
-								}
-							}), email && email.ID
-						)}
+							class="row-label">${__('Select an email to send...', 'groundhogg')}</label>
+						${select({
+					id: 'email-picker',
+					name: 'email_id',
+				},
+				EmailsStore.getItems().map((item) => {
+					return {
+						text: item.data.title,
+						value: item.ID,
+					}
+				}), email && email.ID
+			)}
 					</div>
 					<div class="column">
-						<label class="row-label">Or...</label>
-						<button id="add-new-email" class="gh-button secondary">Create a new email</button>
+						<label class="row-label">${_x('Or...', 'choice between two actions', 'groundhogg')}</label>
+						<button id="add-new-email" class="gh-button secondary">${__('Create a new email', 'groundhogg')}</button>
 					</div>
 				</div>
-			</div>`
+			</div>` : ''}`
       },
       onMount ({ meta }, updateStepMeta) {
 
         const { email_id } = meta
         const email = EmailsStore.get(parseInt(email_id))
-
-        emailPicker('#email-picker', false, (items) => {
-          EmailsStore.itemsFetched(items)
-        }).on('change', function (e) {
-
-          $(this).select2('close')
-
-          updateStepMeta({
-            email_id: parseInt($(this).val()),
-          }, true)
-        })
-
-        $('#add-new-email').on('click', () => {
-          // Editor.renderEmailTemplatePicker(updateStepMeta) todo
-        })
 
         const fullFrame = (frame) => {
           frame.height = frame.contentWindow.document.body.offsetHeight
@@ -1523,6 +1495,17 @@
           setTimeout(() => {
             fullFrame(frame)
           }, 100)
+
+        } else {
+
+          emailPicker('#email-picker', false, (items) => EmailsStore.itemsFetched(items)).on('change', (e) => {
+
+            updateStepMeta({
+              email_id: e.target.value
+            }, true)
+
+          })
+
         }
       },
       validate ({ meta }, addError, addWarning) {
@@ -1533,14 +1516,14 @@
           addWarning('Email is in draft mode. Please update status to ready!')
         }
       },
-      preload (step) {
+      preload ({ export: exported, meta }) {
 
-        if (!step.export) {
-          return
+        if (!exported) {
+          return EmailsStore.fetchItem(meta.email_id)
         }
 
         EmailsStore.itemsFetched([
-          step.export.email
+          exported.email
         ])
       }
     },

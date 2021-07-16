@@ -31,6 +31,7 @@
    * @param tags
    * @param getResults
    * @param getParams
+   * @param select2Opts
    * @returns {*|define.amd.jQuery}
    */
   function apiPicker (
@@ -39,7 +40,8 @@
     multiple = false,
     tags = false,
     getResults = (d) => d.results,
-    getParams = (p) => p
+    getParams = (p) => p,
+    select2Opts = {}
   ) {
 
     return $(selector).select2({
@@ -60,6 +62,7 @@
           }
         },
       },
+      ...select2Opts
     })
   }
 
@@ -122,8 +125,9 @@
    * @param selector
    * @param multiple
    * @param onReceiveItems
+   * @param select2Opts
    */
-  function tagPicker (selector, multiple = true, onReceiveItems = (items) => {}) {
+  function tagPicker (selector, multiple = true, onReceiveItems = (items) => {}, select2Opts = {}) {
     return apiPicker(selector, gh.api.routes.v4.tags, multiple, true,
       (data) => {
 
@@ -138,7 +142,7 @@
         return {
           search: query.term
         }
-      })
+      }, select2Opts)
   }
 
   /**
@@ -173,8 +177,9 @@
    * @param multiple
    * @param onReceiveItems
    * @param queryOpts
+   * @param select2Opts
    */
-  function emailPicker (selector, multiple = false, onReceiveItems = (items) => {}, queryOpts = {}) {
+  function emailPicker (selector, multiple = false, onReceiveItems = (items) => {}, queryOpts = {}, select2Opts = {}) {
     return apiPicker(selector, gh.api.routes.v4.emails, multiple, false, (data) => {
 
         onReceiveItems(data.items)
@@ -189,7 +194,7 @@
           search: query.term,
           ...queryOpts
         }
-      })
+      }, select2Opts)
   }
 
   /**

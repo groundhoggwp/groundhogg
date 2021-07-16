@@ -2,6 +2,8 @@
 
   var $doc = $(document)
 
+  const { sprintf, __, _x, _n } = wp.i18n
+
   function insertAtCursor (myField, myValue) {
     //IE support
     if (document.selection) {
@@ -348,11 +350,14 @@
     if (array.length === 1) {
       return array[0]
     }
-    return `${array.slice(0, -1).join(', ')} ${text} ${array[array.length - 1]}`
+    return sprintf(_x('%s and %s', 'and preceding the last item in a list', 'groundhogg'), array.slice(0, -1).join(', '), array[array.length - 1])
   }
 
   function orList (array) {
-    return andList(array, 'or')
+    if (array.length === 1) {
+      return array[0]
+    }
+    return sprintf(_x('%s or %s', 'or preceding the last item in a list', 'groundhogg'), array.slice(0, -1).join(', '), array[array.length - 1])
   }
 
   const progressBar = (selector) => {
@@ -574,7 +579,7 @@
       }, selected)
     },
     textarea (props) {
-      return `<textarea ${objectToProps(Object.filter(props, key => key !== 'value'))}>${specialChars(props.value)}</textarea>`
+      return `<textarea ${objectToProps(Object.filter(props, key => key !== 'value'))}>${specialChars(props.value || '')}</textarea>`
     },
     inputWithReplacementsAndEmojis (inputProps = {
       type: 'text'
