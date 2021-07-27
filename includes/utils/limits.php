@@ -219,7 +219,15 @@ class Limits {
 	 * @return float|int
 	 */
 	public static function get_time_limit() {
-		return min( MINUTE_IN_SECONDS, absint( ini_get( 'max_execution_time' ) ) );
+
+		$real_limit = absint( ini_get( 'max_execution_time' ) );
+
+		// If the real limit is 0 assume 60 seconds
+		if ( $real_limit === 0 ) {
+			return MINUTE_IN_SECONDS;
+		}
+
+		return min( MINUTE_IN_SECONDS, $real_limit );
 	}
 
 	/**
