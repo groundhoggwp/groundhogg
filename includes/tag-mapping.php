@@ -136,6 +136,12 @@ class Tag_Mapping extends Bulk_Job {
 	 * @param $old_roles string[]
 	 */
 	public function apply_tags_to_contact_from_changed_roles( $user_id, $role, $old_roles ) {
+
+		// Exit if installing because the tables would not have yet been installed...
+		if ( wp_installing() ){
+			return;
+		}
+
 		$contact = get_contactdata( $user_id, true );
 
 		if ( ! $contact || ! $contact->exists() ) {
