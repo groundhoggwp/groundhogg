@@ -33,9 +33,11 @@ class Activity_Handler {
 
 	/**
 	 * When someone logs out of WordPress
+	 *
+	 * @param $user_id int
 	 */
-	function wp_logout() {
-		track_live_activity( 'wp_logout' );
+	function wp_logout( $user_id ) {
+		track_activity( get_contactdata( $user_id, true ), 'wp_logout' );
 	}
 
 	/**
