@@ -201,7 +201,7 @@ class Limits {
 	 */
 	public static function time_likely_to_be_exceeded() {
 
-		if ( ! self::$total_processed_actions ) {
+		if ( ! self::$total_processed_actions || self::get_time_limit() === 0 ) {
 			return false;
 		}
 
@@ -219,6 +219,13 @@ class Limits {
 	 * @return float|int
 	 */
 	public static function get_time_limit() {
+
+		$real_time_limit = absint( ini_get( 'max_execution_time' ) );
+
+		if ( $real_time_limit === 0 ){
+			return MINUTE_IN_SECONDS;
+		}
+
 		return min( MINUTE_IN_SECONDS, absint( ini_get( 'max_execution_time' ) ) );
 	}
 

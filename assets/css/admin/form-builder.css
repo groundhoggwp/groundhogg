@@ -31,7 +31,6 @@
   background: #FFFFFF;
   border-radius: 3px;
   border: 1px solid rgba(16, 38, 64, 0.15);
-  overflow: hidden;
 }
 #form-builder #fields-editor #form-fields .form-field .settings, #form-builder #fields-editor #button-settings .form-field .settings {
   box-sizing: border-box;
@@ -58,49 +57,6 @@
 }
 #form-builder #fields-editor #form-fields .form-field .settings .row:not(:last-child), #form-builder #fields-editor #button-settings .form-field .settings .row:not(:last-child) {
   margin-bottom: 5px;
-}
-#form-builder #fields-editor #form-fields .form-field .settings .row .options, #form-builder #fields-editor #button-settings .form-field .settings .row .options {
-  width: 100%;
-}
-#form-builder #fields-editor #form-fields .form-field .settings .row .options .select-options, #form-builder #fields-editor #button-settings .form-field .settings .row .options .select-options {
-  margin: 5px 0;
-}
-#form-builder #fields-editor #form-fields .form-field .settings .row .options .select-options .select-option-wrap, #form-builder #fields-editor #button-settings .form-field .settings .row .options .select-options .select-option-wrap {
-  display: flex;
-}
-#form-builder #fields-editor #form-fields .form-field .settings .row .options .select-options .select-option-wrap input, #form-builder #fields-editor #button-settings .form-field .settings .row .options .select-options .select-option-wrap input {
-  width: 100%;
-  border-right: none;
-  border-radius: 0;
-}
-#form-builder #fields-editor #form-fields .form-field .settings .row .options .select-options .select-option-wrap button, #form-builder #fields-editor #button-settings .form-field .settings .row .options .select-options .select-option-wrap button {
-  border: 1px solid #8c8f94;
-  border-radius: 0 !important;
-  padding: 6px;
-}
-#form-builder #fields-editor #form-fields .form-field .settings .row .options .select-options .select-option-wrap:first-child input, #form-builder #fields-editor #button-settings .form-field .settings .row .options .select-options .select-option-wrap:first-child input {
-  border-top-left-radius: 4px;
-}
-#form-builder #fields-editor #form-fields .form-field .settings .row .options .select-options .select-option-wrap:first-child button, #form-builder #fields-editor #button-settings .form-field .settings .row .options .select-options .select-option-wrap:first-child button {
-  border-top-right-radius: 4px !important;
-}
-#form-builder #fields-editor #form-fields .form-field .settings .row .options .select-options .select-option-wrap:not(:first-child) input, #form-builder #fields-editor #form-fields .form-field .settings .row .options .select-options .select-option-wrap:not(:first-child) button, #form-builder #fields-editor #button-settings .form-field .settings .row .options .select-options .select-option-wrap:not(:first-child) input, #form-builder #fields-editor #button-settings .form-field .settings .row .options .select-options .select-option-wrap:not(:first-child) button {
-  border-top: none;
-}
-#form-builder #fields-editor #form-fields .form-field .settings .row .options .select-options .select-option-wrap:nth-last-child(2) input, #form-builder #fields-editor #button-settings .form-field .settings .row .options .select-options .select-option-wrap:nth-last-child(2) input {
-  border-bottom-left-radius: 4px;
-}
-#form-builder #fields-editor #form-fields .form-field .settings .row .options .select-options .select-option-add, #form-builder #fields-editor #button-settings .form-field .settings .row .options .select-options .select-option-add {
-  display: flex;
-}
-#form-builder #fields-editor #form-fields .form-field .settings .row .options .select-options .select-option-add .spacer, #form-builder #fields-editor #button-settings .form-field .settings .row .options .select-options .select-option-add .spacer {
-  width: 100%;
-}
-#form-builder #fields-editor #form-fields .form-field .settings .row .options .select-options .select-option-add button, #form-builder #fields-editor #button-settings .form-field .settings .row .options .select-options .select-option-add button {
-  padding: 5px 6px;
-  border: 1px solid #8c8f94;
-  border-top: none;
-  border-radius: 0 0 4px 4px !important;
 }
 #form-builder #fields-editor #form-fields .form-field .settings-tabs, #form-builder #fields-editor #button-settings .form-field .settings-tabs {
   /*display: flex;*/
@@ -165,6 +121,35 @@
 }
 #form-builder #fields-editor #form-fields .form-field .field-header .actions button:hover, #form-builder #fields-editor #button-settings .form-field .field-header .actions button:hover {
   background: #f1f1f1;
+}
+
+.inline-tag-picker {
+  position: relative;
+  border: 1px solid #8c8f94;
+  border-right-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 5px;
+  cursor: pointer;
+}
+.inline-tag-picker .show-on-hover {
+  display: none;
+}
+.inline-tag-picker:hover {
+  background-color: rgba(16, 38, 64, 0.15);
+}
+.inline-tag-picker:hover .show-on-hover {
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #FFFFFF;
+  padding: 5px;
+}
+.inline-tag-picker svg {
+  height: 20px;
+  width: 20px;
 }
 
 /*# sourceMappingURL=form-builder.css.map */

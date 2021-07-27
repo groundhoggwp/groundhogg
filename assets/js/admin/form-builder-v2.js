@@ -1,8 +1,19 @@
 (function ($) {
 
-  const { toggle, textarea, input, select, inputWithReplacements, uuid } = Groundhogg.element
   const {
-    metaPicker
+    toggle,
+    textarea,
+    input,
+    select,
+    inputWithReplacements,
+    uuid,
+    inputRepeaterWidget,
+    icons
+  } = Groundhogg.element
+  const { sprintf, __, _x } = wp.i18n
+  const {
+    metaPicker,
+    tagPicker,
   } = Groundhogg.pickers
 
   const columnWidths = {
@@ -26,7 +37,7 @@
   const fieldWidth = ({ column_width }) => {
     return columnWidths[column_width]
   }
-  
+
   /**
    * Group into rows based on their field width
    *
@@ -391,61 +402,46 @@
         // language=HTML
         return `
 			<div class="options">
-				<label>Options</label>
-				<div class="select-options">
-					${options.map((option, i) => selectOption(option, i)).join('')}
-					<div class="select-option-add">
-						<div class="spacer"></div>
-						<button id="add-option" class="dashicon-button">
-							<span class="dashicons dashicons-plus-alt2"></span></button>
-					</div>
-				</div>
+				<label>${_x('Options', 'label for dropdown options', 'groundhogg')}</label>
+				<div class="select-options"></div>
 			</div>`
       },
-      onMount ({ options = [''] }, updateField, currentField) {
+      onMount ({ options = [''], tags = {} }, updateField, currentField) {
 
-        $('#add-option').on('click', (e) => {
-
-          const { options } = currentField()
-
-          updateField({
-            options: [
-              ...options,
-              ''
-            ]
-          }, true)
-        })
-
-        $('.select-option').on('change', (e) => {
-
-          const key = parseInt(e.target.dataset.key)
-
-          const { options } = currentField()
-
-          updateField({
-            options: [
-              ...options.map((opt, i) => i === key ? e.target.value : opt)
-            ]
-          })
-        })
-
-        $('.remove-option').on('click', (e) => {
-
-          const { options } = currentField()
-
-          updateField({
-            options: [
-              ...options.filter((option, i) => i !== parseInt(e.currentTarget.dataset.key))
-            ]
-          }, true)
-        })
-
+        inputRepeaterWidget({
+          selector: '.select-options',
+          rows: options.map(v => [v, tags[v]]),
+          cellCallbacks: [input, (props) => {
+            console.log(props)
+            // language=HTML
+            return `
+				<div class="inline-tag-picker">
+					${icons.tag}
+            <div class="show-on-hover">
+                ${select({
+                    ...props,
+                    class: 'tag-picker'
+                }, {}, [])}
+            </div>
+				</div>`
+          }],
+          onMount: () => {
+            tagPicker('.tag-picker')
+          },
+          cellProps: [{ placeholder: _x('Value...', 'input placeholder', 'groundhogg') }],
+          onChange: (rows) => {
+            updateField({
+              options: rows.map(r => r[0]),
+              tags: {}
+            })
+          }
+        }).mount()
       }
     },
 
-    optionNone : {
+    optionNone: {
       type: 'optionNone',
-      edit( { option_none } ) {
+      edit ({ option_none }) {
 
       }
     }
@@ -623,7 +619,6 @@
     gdpr: {},
     terms: {},
     recaptcha: {},
-    submit: {},
     text: {
       name: 'Text',
       content: standardMetaContentSettings,

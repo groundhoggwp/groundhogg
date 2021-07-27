@@ -5213,6 +5213,175 @@ function is_template_site() {
 	return apply_filters( 'groundhogg/is_template_site', true );
 }
 
-function enqueue_step_type_assets(){
+/**
+ * Enqueue any step type registration assets
+ */
+function enqueue_step_type_assets() {
 	do_action( 'groundhogg_enqueue_step_type_assets' );
+}
+
+/**
+ * Changes the contact query vars in a query pre version 2.5 to a filters query so that
+ * the filters show in the new contact filtering search
+ *
+ * The search query pre 2.5 is all an AND clauses
+ *
+ * @param $query
+ *
+ * @return array the array of filters
+ */
+function get_filters_from_old_query_vars( $query = [] ) {
+
+	$filters = [];
+
+	$common_query_filters = [
+		'first_name',
+		'last_name',
+		'email',
+	];
+
+	// First Name | Last Name | Email
+	foreach ( $common_query_filters as $common_query_filter ) {
+		if ( isset_not_empty( $query, $common_query_filter ) ) {
+			$filters[] = [
+				'type'    => $common_query_filter,
+				'compare' => get_array_var( $common_query_filter . '_compare', 'contains' ),
+				'value'   => $query[ $common_query_filter ]
+			];
+		}
+	}
+
+	// Optin Status
+	if ( isset_not_empty( $query, 'optin_status' ) ) {
+		$filters[] = [
+			'type'    => 'optin_status',
+			'compare' => 'in',
+			'value'   => $query['optin_status']
+		];
+	}
+
+	// Optin Status
+	if ( isset_not_empty( $query, 'optin_status_exclude' ) ) {
+		$filters[] = [
+			'type'    => 'optin_status',
+			'compare' => 'not_in',
+			'value'   => $query['optin_status_exclude']
+		];
+	}
+
+	// Contact owner
+	if ( isset_not_empty( $query, 'owner' ) ) {
+		$filters[] = [
+			'type'    => 'owner',
+			'compare' => 'in',
+			'value'   => $query['owner']
+		];
+	}
+
+	// Tags
+	if ( isset_not_empty( $query, 'tags_include' ) ) {
+		$filters[] = [
+			'type'     => 'tags',
+			'compare'  => 'includes',
+			'compare2' => isset_not_empty( $query, 'tags_include_needs_all' ) ? 'any' : 'all',
+			'value'    => $query['tags_include'],
+		];
+	}
+
+	// Tags
+	if ( isset_not_empty( $query, 'tags_exclude' ) ) {
+		$filters[] = [
+			'type'     => 'tags',
+			'compare'  => 'excludes',
+			'compare2' => isset_not_empty( $query, 'tags_excludes_needs_all' ) ? 'any' : 'all',
+			'value'    => $query['tags_exclude'],
+		];
+	}
+
+	if ( isset_not_empty( $query, 'date_query' ) ) {
+
+		$date_query = $query['date_query'];
+
+		$compare = false;
+		// between
+		if ( isset_not_empty( $date_query, 'after' ) && isset_not_empty( $date_query, 'before' ) ) {
+			$compare = 'between';
+		} else if ( isset_not_empty( $date_query, 'after' ) ) {
+			$compare = 'after';
+		} else if ( isset_not_empty( $date_query, 'before' ) ) {
+			$compare = 'before';
+		}
+
+		$filters[] = [
+			'type'       => 'date_created',
+			'date_range' => $compare,
+			'date'       => get_array_var( $date_query, $compare === 'before' ? 'before' : 'after' ),
+			'date2'      => get_array_var( $date_query, 'before' )
+		];
+	}
+
+	if ( isset_not_empty( $query, 'report' ) ) {
+
+		$events_query = $query['report'];
+
+		$map = [
+			'step'   => 'step_id',
+			'funnel' => 'funnel_id',
+			'start'  => 'after',
+			'end'    => 'before',
+			'type'   => 'event_type',
+		];
+
+		foreach ( $map as $old_key => $new_key ) {
+			if ( $val = get_array_var( $events_query, $old_key ) ) {
+				$events_query[ $new_key ] = $val;
+			}
+		}
+
+		switch ( $events_query['event_type'] ) {
+			case Event::FUNNEL:
+			case Event::BROADCAST:
+			case Event::EMAIL_NOTIFICATION:
+		}
+
+
+	}
+
+	if ( isset_not_empty( $query, 'activity' ) ) {
+
+	}
+
+	// Meta
+	$meta_compare_map = [
+		'='          => 'equals',
+		'!='         => 'not_equals',
+		'>'          => 'greater_than',
+		'gt'         => 'greater_than',
+		'<'          => 'less_than',
+		'lt'         => 'less_than',
+		'>='         => 'greater_than_or_equal_to',
+		'gt_eq'      => 'greater_than_or_equal_to',
+		'<='         => 'less_than_or_equal_to',
+		'lt_eq'      => 'less_than_or_equal_to',
+		'REGEXP'     => 'contains',
+		'NOT REGEXP' => 'not_contains',
+		'EXISTS'     => 'not_empty',
+		'NOT EXISTS' => 'empty',
+	];
+
+	// Meta Key
+	if ( isset_not_empty( $query, 'meta_key' )
+	     && isset_not_empty( $query, 'meta_value' )
+	     && isset_not_empty( $query, 'meta_compare' )
+	) {
+		$filters[] = [
+			'type'    => 'meta',
+			'meta'    => $query['meta_key'],
+			'compare' => get_array_var( $meta_compare_map, $query['meta_compare'], 'equals' ),
+			'value'   => $query['meta_value']
+		];
+	}
+
+	// Filters is an array[] so wrap in another array
+	return [ $filters ];
 }

@@ -1541,9 +1541,9 @@
     /**
      * Update the header-actions attr
      *
-     * @param Date lastSaved The `new Date`
      *
      * @link https://stackoverflow.com/a/7641812
+     * @param lastSaved
      */
     updateLastSaved (lastSaved) {
       $('.header-actions').attr('data-lastSaved', sprintf(_x('Saved %s ago', 'time passed since last update', 'groundhogg'), moment(lastSaved).fromNow(true)))
@@ -1911,6 +1911,11 @@
       $('#edit-email-right').on('click', () => {
         Editor.renderEmailEditor(email)
       })
+
+      $('#add-new-email-right').on('click', () => {
+        Editor.renderEmailTemplatePicker(updateStepMeta)
+      })
+
 
       emailPicker('#email-picker-right', false, (items) => EmailsStore.itemsFetched(items), {}, { width: '100%' })
         .on('change', (e) => {

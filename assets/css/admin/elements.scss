@@ -652,7 +652,7 @@ p.error,
     }
 
     &:not(:first-child) {
-      input, button, .input-wrap button {
+      * {
         border-top-width: 0;
       }
     }

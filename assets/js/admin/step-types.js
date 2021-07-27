@@ -619,10 +619,10 @@
         const { note_text } = meta
 
         if (note_text) {
-          return sprintf( _x( 'Add %s', 'add - note text', 'groundhogg' ) , `<i>${note_text.replace(/(<([^>]+)>)/gi, '').substring(0, 30)}...</i>`)
+          return sprintf(_x('Add %s', 'add - note text', 'groundhogg'), `<i>${note_text.replace(/(<([^>]+)>)/gi, '').substring(0, 30)}...</i>`)
         }
 
-        return __( 'Add a note', 'groundhogg' )
+        return __('Add a note', 'groundhogg')
       },
       edit ({ meta }) {
         const { note_text = '' } = meta
@@ -631,7 +631,8 @@
         return `
 			<div class="panel">
 				<div class="row">
-					<label class="row-label" for="note_text">${__('Add the following note the the contact...', 'groundhogg')}</label>
+					<label class="row-label"
+					       for="note_text">${__('Add the following note the the contact...', 'groundhogg')}</label>
 					${textarea({
 						id: 'note_text',
 						className: 'wp-editor-area',
@@ -1625,11 +1626,18 @@
 				  stroke="currentColor" stroke-width="1.5"/>
 		  </svg>`,
       title ({ meta }) {
-        return `Submits <b>${meta.form_name || 'a form'}</b>`
+
+        const { form_name } = meta
+
+        if (!form_name) {
+          return __('Submits <b>a form</b>', 'groundhogg')
+        }
+
+        return sprintf(__('Submits %s', 'groundhogg'), `<b>${form_name}</b>`)
       },
       edit ({ meta }) {
         // language=html
-        const redirectToURL = `<label class="row-label">Redirect to this URL...</label>
+        const redirectToURL = `<label class="row-label">${__('Redirect to this URL...', 'groundhogg')}</label>
 		${inputWithReplacements({
 			id: 'success-page',
 			name: 'success_page',
@@ -1638,7 +1646,7 @@
 		})}`
 
         // language=html
-        const stayOnPage = `<label class="row-label">Show this message...</label>
+        const stayOnPage = `<label class="row-label">${__('Show this message...', 'groundhogg')}</label>
 		${textAreaWithReplacementsAndEmojis({
 			id: 'success-message',
 			name: 'success_message',
@@ -1649,12 +1657,12 @@
         //language=HTML
         return `
 			<div class="inline-label form-name" tabindex="0">
-				<label>Form name:</label>
+				<label for="form-name">${_x('Form name:', 'input label', 'groundhogg')}</label>
 				<div class="input-wrap">
 					${input({
 						name: 'form_name',
 						id: 'form-name',
-						placeholder: 'Form name...',
+						placeholder: _x('My registration form', 'input placeholder value', 'groundhogg'),
 						value: meta.form_name || '',
 					})}
 				</div>
@@ -1662,12 +1670,12 @@
 			<div id="edit-form"></div>
 			<div class="panel">
 				<div class="row">
-					<p>Stay on page after submitting? ${toggle({
+					<p>${__('Stay on page after submitting?', 'groundhogg')} ${toggle({
 						name: 'enable_ajax',
 						id: 'enable-ajax',
 						checked: meta.enable_ajax,
-						onLabel: 'YES',
-						offLabel: 'NO',
+						onLabel: _x('YES', 'toggle switch', 'groundhogg'),
+						offLabel: _x('NO', 'toggle switch', 'groundhogg'),
 					})}</p>
 				</div>
 				<div class="row">

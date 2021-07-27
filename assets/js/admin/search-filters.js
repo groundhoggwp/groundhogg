@@ -14,7 +14,7 @@
 
   const { tagPicker, emailPicker, linkPicker } = Groundhogg.pickers
 
-  const { emails: EmailsStore, tags: TagsStore } = Groundhogg.stores
+  const { emails: EmailsStore, tags: TagsStore, funnels: FunnelsStore } = Groundhogg.stores
 
   const Filters = {
     view () {},
@@ -64,7 +64,14 @@
    * @param opts
    * @param name
    */
-  const registerFilter = (type, group = 'general', opts = {}, name = '') => {
+  const registerFilter = (type, group = 'general', name = '', opts = {}) => {
+
+    if (typeof name === 'object') {
+      let tmpOpts = name
+      name = opts
+      opts = tmpOpts
+    }
+
     Filters.types[type] = {
       type,
       group,
@@ -141,7 +148,7 @@
         this.mount()
       } else {
         this.initFlag = true
-        this.preLoad()
+        this.preload()
       }
     },
 
@@ -150,38 +157,34 @@
       this.eventHandlers()
     },
 
-    async preLoad () {
-      const preloadTags = []
-      const preloadEmails = []
+    async preload () {
       const promises = []
 
       this.filters.forEach(group => {
         group.forEach(filter => {
-          const { type, tags, email_id, emails } = filter
-
-          if (tags && !TagsStore.hasItems(tags.map(tag => parseInt(tag)))) {
-            preloadTags.push(...tags)
-          } else if (emails && !EmailsStore.hasItems(emails.map(email => parseInt(email)))) {
-            preloadEmails.push(...emails)
-          } else if (email_id && !EmailsStore.hasItem(parseInt(email_id))) {
-            preloadEmails.push(email_id)
-          }
+          const { type } = filter
 
           const filterType = Filters.types[type]
-          const promise = filterType.preload(filter)
+          let p = filterType.preload(filter)
 
-          if (typeof promise !== 'undefined') {
-            if (Array.isArray(promise)) {
-              promises.push(...promise)
-            } else {
-              promises.push(promise)
-            }
+          if (!p) {
+            return
+          }
+
+          // multiple promises
+          if (Array.isArray(p) && p.length > 0) {
+            promises.push(...p)
+
+          }
+          // Just the one promise
+          else {
+            promises.push(p)
           }
 
         })
       })
 
-      if (promises.length === 0 && preloadEmails.length === 0 && preloadTags.length === 0) {
+      if (promises.length === 0) {
         this.mount()
         return
       }
@@ -189,18 +192,6 @@
       $(el).html('<p><span id="search-loading-dots-pill">Loading<span id="search-loading-dots"></span></span></p>')
 
       const { stop: stopDots } = loadingDots('#search-loading-dots')
-
-      if (preloadTags.length > 0) {
-        promises.push(TagsStore.fetchItems({
-          include: preloadTags
-        }))
-      }
-
-      if (preloadEmails.length > 0) {
-        promises.push(EmailsStore.fetchItems({
-          include: preloadEmails
-        }))
-      }
 
       if (promises.length > 0) {
         await Promise.all(promises)
@@ -555,7 +546,7 @@
   })
 
   registerFilter('email', 'contact', {
-    ...BasicTextFilter('Email Address')
+    ...BasicTextFilter('Email Address'),
   })
 
   const phoneTypes = {
@@ -809,6 +800,11 @@
       compare: 'includes',
       compare2: 'any',
       tags: []
+    },
+    preload: ({ tags }) => {
+      return TagsStore.fetchItems({
+        tag_id: tags
+      })
     }
   }, 'Tags')
 
@@ -870,9 +866,7 @@
   //filter by Email Opened
   registerFilter('email_opened', 'activity', {
     view ({ email_id, date_range, date, date2 }) {
-
       const emailName = email_id ? EmailsStore.get(email_id).data.title : 'any email'
-
       return standardActivityDateTitle(`Opened <b>${emailName}</b>`, { date_range, date, date2 })
     },
     edit ({ email_id, date_range, date, date2 }) {
@@ -906,16 +900,19 @@
     defaults: {
       ...standardActivityDateDefaults,
       email_id: 0,
+    },
+    preload: ({ email_id }) => {
+      return EmailsStore.fetchItem(parseInt(email_id))
     }
   }, 'Email Opened')
 
   //filter by Email Opened
   registerFilter('email_link_clicked', 'activity', {
-    view ({ email_id, date_range, date, date2 }) {
+    view ({ email_id, link, date_range, date, date2 }) {
 
       const emailName = email_id ? EmailsStore.get(email_id).data.title : 'any email'
 
-      return standardActivityDateTitle(`Clicked a link in <b>${emailName}</b>`, { date_range, date, date2 })
+      return standardActivityDateTitle(`Clicked ${link ? '<b>' + link + '</b>' : 'a link' } in <b>${emailName}</b>`, { date_range, date, date2 })
     },
     edit ({ email_id, date_range, date, date2 }) {
 
@@ -930,6 +927,13 @@
 			  name: 'email_id',
 		  }, pickerOptions, email_id)}
 
+		  ${input({
+			  id: 'filter-link',
+			  name: 'link',
+			  autocomplete: 'off',
+			  placeholder: 'Start typing...'
+		  })}
+
 		  ${standardActivityDateOptions({
 			  date_range, date, date2
 		  })}`
@@ -943,46 +947,20 @@
         })
       })
 
+      linkPicker('#filter-link').on('change input blur', ({ target }) => {
+        updateFilter({
+          link: target.value
+        })
+      })
+
       standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
       ...standardActivityDateDefaults,
+      link: '',
       email_id: 0,
     }
   }, 'Email Link Clicked')
-
-  //filter by Page Visited
-  // registerFilter('page_visited', 'activity', {
-  //   view ({ page_url, date_range, date, date2 }) {
-  //     return standardActivityDateTitle(`Visited <b>${page_url}</b>`, { date_range, date, date2 })
-  //   },
-  //   edit ({ page_url, date_range, date, date2 }) {
-  //
-  //     return `${input({
-  //       id: 'filter-page-url',
-  //       name: 'page_url',
-  //       placeholder: 'Start typing...',
-  //       value: page_url
-  //     })}
-  //
-  //     ${standardActivityDateOptions({
-  //       date_range, date, date2
-  //     })}`
-  //
-  //   },
-  //   onMount (filter, updateFilter) {
-  //     linkPicker('#filter-page-url').on('change', (e) => {
-  //       updateFilter({
-  //         page_url: e.target.value
-  //       })
-  //     })
-  //     standardActivityDateFilterOnMount(filter, updateFilter)
-  //   },
-  //   defaults: {
-  //     ...standardActivityDateDefaults,
-  //     page_url: '',
-  //   }
-  // }, 'Page Visited')
 
   //filter by User Logged In
   registerFilter('logged_in', 'activity', {
@@ -1048,25 +1026,42 @@
     }
   }, 'Was Not Active')
 
-  //filter by Completed Funnel Action
-  // registerFilter('past_funnel_activity', 'activity', {
-  //   view ({ funnel, step, date_range, date, date2 }) {
-  //     return standardActivityDateTitle('<b></b>', { date_range, date, date2 })
-  //   },
-  //   edit ({ date_range, date, date2 }) {
-  //     return standardActivityDateOptions({ date_range, date, date2 })
-  //   },
-  //   onMount (filter, updateFilter) {
-  //     standardActivityDateFilterOnMount(filter, updateFilter)
-  //   },
-  //   defaults: {
-  //     ...standardActivityDateDefaults,
-  //   }
-  // }, 'Completed Funnel Action')
-
   // Other Filters to Add
   // Location (Country,Province)
   // Phones (Primary,Mobile)
   // Tags
+
+  registerFilter('funnel_event_history', 'activity', 'Funnel History', {
+    view ({ funnel_id, step_id, date_range, date, date2 }) {
+
+      const funnel = FunnelsStore.get(funnel_id)
+      const step = funnel.steps.find(s => s.ID === step_id)
+
+      return standardActivityDateTitle(`Completed <b>${step.data.step_title}</b> in <b>${funnel.data.title}</b>`, {
+        date_range,
+        date,
+        date2
+      })
+    },
+    edit ({ date_range, date, date2 }) {
+      return standardActivityDateOptions({ date_range, date, date2 })
+    },
+    onMount (filter, updateFilter) {
+      standardActivityDateFilterOnMount(filter, updateFilter)
+    },
+    defaults: {
+      ...standardActivityDateDefaults,
+    }
+  })
+
+  // registerFilter( 'upcoming_funnel_events', 'activity', 'Funnel History', {
+  //   view ({}){},
+  //   edit ({}){},
+  //   onMount ({}){},
+  //   defaults: {},
+  //   preload: ({funnel_id}) => {
+  //     return FunnelsStore.fetchItem( funnel_id )
+  //   }
+  // } )
 
 })(jQuery)

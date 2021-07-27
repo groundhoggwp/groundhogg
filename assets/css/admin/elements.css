@@ -518,7 +518,7 @@ p.error,
 .gh-input-repeater .gh-input-repeater-row:first-child > button {
   border-top-right-radius: 4px;
 }
-.gh-input-repeater .gh-input-repeater-row:not(:first-child) input, .gh-input-repeater .gh-input-repeater-row:not(:first-child) button, .gh-input-repeater .gh-input-repeater-row:not(:first-child) .input-wrap button {
+.gh-input-repeater .gh-input-repeater-row:not(:first-child) * {
   border-top-width: 0;
 }
 .gh-input-repeater .gh-input-repeater-row:nth-last-child(2) > input:first-child {
