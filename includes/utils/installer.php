@@ -23,7 +23,8 @@ abstract class Installer {
 		register_deactivation_hook( $this->get_plugin_file(), [ $this, 'deactivation_hook' ] );
 		add_action( 'groundhogg/reset', [ $this, 'activation_hook' ] );
 
-		add_action( 'wp_insert_site', [ $this, 'new_blog_created' ], 10, 6 );
+//		add_action( 'wp_insert_site', [ $this, '_new_subsite_inserted' ], 99, 2 );
+		add_action( 'wp_initialize_site', [ $this, '_new_subsite_initialized' ], 99, 2 );
 		add_filter( 'wpmu_drop_tables', [ $this, 'wpmu_drop_tables' ], 10, 2 );
 		add_action( 'activated_plugin', [ $this, 'plugin_activated' ] );
 
@@ -206,13 +207,14 @@ abstract class Installer {
 	/**
 	 * When a new Blog is created in multisite, see if GH is network activated, and run the installer
 	 *
-	 * @since  2.5
-	 *
 	 * @param $blog \WP_Site
+	 * @param $args array
 	 *
 	 * @return void
+	 * @since  2.5
+	 *
 	 */
-	public function new_blog_created( $blog ) {
+	public function _new_subsite_initialized( $blog, $args ) {
 		if ( is_plugin_active_for_network( plugin_basename( $this->get_plugin_file() ) ) ) {
 			switch_to_blog( $blog->id );
 			$this->activation_wrapper();
