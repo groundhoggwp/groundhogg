@@ -2,8 +2,6 @@
 
 namespace Groundhogg;
 
-use Groundhogg\DB\Manager;
-
 class Main_Installer extends Installer {
 
 	/**
@@ -35,14 +33,14 @@ class Main_Installer extends Installer {
 		// Install Default tags for tag mapping.
 		Plugin::$instance->tag_mapping->install_default_tags();
 
+		Plugin::$instance->utils->files->mk_dir();
+
 		$settings = [
 			'gh_override_from_name'               => get_bloginfo( 'name' ),
 			'gh_override_from_email'              => get_bloginfo( 'admin_email' ),
 			'gh_confirmation_grace_period'        => 14,
 			'gh_event_failure_notification_email' => get_bloginfo( 'admin_email' ),
 		];
-
-		Plugin::$instance->utils->files->mk_dir();
 
 		foreach ( $settings as $setting_name => $value ) {
 			if ( ! get_option( $setting_name ) ) {
@@ -55,6 +53,8 @@ class Main_Installer extends Installer {
 
 		// Store previous updates
 		Plugin::instance()->updater->save_previous_updates_when_installed();
+
+		create_contact_from_user();
 	}
 
 	public function get_display_name() {
