@@ -1348,16 +1348,15 @@ function recount_tag_contacts_count() {
  *
  * @return Contact|false|WP_Error the new contact, false on failure, or WP_Error on error
  */
-function create_contact_from_user( $user, $sync_meta = false ) {
+function create_contact_from_user( $user = false, $sync_meta = false ) {
 
 	if ( is_int( $user ) ) {
 		$user = get_userdata( $user );
-		if ( ! $user ) {
-			return false;
-		}
+	} else if ( $user === false ){
+		$user = wp_get_current_user();
 	}
 
-	if ( ! $user instanceof \WP_User ) {
+	if ( ! is_a( $user, '\WP_User' ) ){
 		return false;
 	}
 
