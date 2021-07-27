@@ -290,7 +290,7 @@ class Contact_Query {
 		);
 
 		// Only show contacts associated with the current owner...
-		if ( current_user_can( 'view_contacts' ) && ! current_user_can( 'view_all_contacts' ) ) {
+		if ( current_user_can( 'view_own_contacts' ) || ! current_user_can( 'view_all_contacts' ) ) {
 			$defaults['owner'] = get_current_user_id();
 		}
 
@@ -317,7 +317,7 @@ class Contact_Query {
 	 *
 	 * @param string|array $query Array or query string of parameters. See WPGH_Contact_Query::__construct().
 	 *
-	 * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
+	 * @return Contact[]|int|object[] List of contacts, or number of contacts when 'count' is passed as a query var.
 	 * @since  2.8
 	 *
 	 * @see    WPGH_Contact_Query::__construct()
