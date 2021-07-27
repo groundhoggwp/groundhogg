@@ -21,6 +21,8 @@ class Manager {
 
 	protected $initialized = false;
 
+	protected $tables_installed = false;
+
 	/**
 	 * Manager constructor.
 	 */
@@ -82,6 +84,11 @@ class Manager {
 	 * Install all DBS.
 	 */
 	public function install_dbs() {
+
+		if ( $this->tables_installed ){
+			return;
+		}
+
 		if ( empty( $this->dbs ) ) {
 			$this->init_dbs();
 		}
@@ -89,6 +96,8 @@ class Manager {
 		foreach ( $this->dbs as $db ) {
 			$db && $db->create_table();
 		}
+
+		$this->tables_installed = true;
 	}
 
 	/**
