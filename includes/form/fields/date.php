@@ -2,6 +2,8 @@
 
 namespace Groundhogg\Form\Fields;
 
+use function Groundhogg\html;
+
 /**
  * Created by PhpStorm.
  * User: adria
@@ -13,6 +15,7 @@ namespace Groundhogg\Form\Fields;
  * TODO Support for file types....
  *
  * Class File
+ *
  * @package Groundhogg\Form\Fields
  */
 class Date extends Input {
@@ -68,27 +71,38 @@ class Date extends Input {
 
 		$uniq_id = uniqid( 'date_' );
 
-		$script = sprintf(
-			"<script>jQuery(function($){\$('#%s').datepicker({changeMonth: true,changeYear: true,minDate: '%s', maxDate: '%s',dateFormat:'%s'})});</script>",
-			$uniq_id,
-			$this->get_min_date(),
-			$this->get_max_date(),
-			$this->get_date_format()
-		);
+		ob_start();
 
-		return sprintf(
-			'<label class="gh-input-label">%1$s <input type="%2$s" name="%3$s" id="%4$s" class="gh-input %5$s" value="%6$s" placeholder="%7$s" title="%8$s" %9$s %10$s></label>%11$s',
+		?>
+		<script>
+          (($) => {
+            $(() => {
+              $('.<?php echo $uniq_id ?>').datepicker({
+                changeMonth: true,
+                changeYear: true,
+				  <?php echo $this->get_min_date() ? "minDate: '{$this->get_min_date()}'," : ''?>
+				  <?php echo $this->get_max_date() ? "maxDate: '{$this->get_max_date()}'," : ''?>
+				  <?php echo $this->get_date_format() ? "dateFormat: '{$this->get_date_format()}'," : ''?>
+              })
+            })
+          })(jQuery)
+		</script>
+		<?php
+
+		$script = ob_get_clean();
+
+		return html()->e( 'label', [], [
 			$this->get_label(),
-			$this->get_type(),
-			$this->get_name(),
-			$uniq_id,
-			$this->get_classes(),
-			$this->get_value(),
-			$this->get_placeholder(),
-			$this->get_title(),
-			$this->get_attributes(),
-			$this->is_required() ? 'required' : '',
-			$script
-		);
+			html()->input( [
+				'type'        => $this->get_type(),
+				'id'          => $this->get_id(),
+				'name'        => $this->get_name(),
+				'class'       => 'gh-input ' . $this->get_classes() . ' ' . $uniq_id,
+				'placeholder' => $this->get_placeholder(),
+				'title'       => $this->get_title(),
+				'required'    => $this->is_required(),
+			] ),
+			$script,
+		] );
 	}
 }
