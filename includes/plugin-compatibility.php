@@ -8,6 +8,26 @@ class Plugin_Compatibility {
 //        add_action( 'current_screen', [ $this, 'remove_unwanted_actions_and_filters_from_editors' ], 999 );
 		add_action( 'admin_enqueue_scripts', [ $this, 'remove_styles_and_scripts_from_editors' ], 999 );
 		add_action( 'mailhawk/bounced', [ $this, 'mailhawk_bounced' ], 10, 2 );
+		add_filter( 'bp_core_wpsignup_redirect', [ $this, 'prevent_buddyboss_redirect' ], 99 );
+	}
+
+	/**
+	 * BuddyBoss should know better, if access from PHP var SCRIPT_NAME is not guaranteed and thus is causing an unwanted redirect
+	 *
+	 * @see bp_core_wpsignup_redirect
+	 *
+	 * @param $redirect
+	 *
+	 * @return false|mixed
+	 */
+	public function prevent_buddyboss_redirect( $redirect ){
+
+		// If DOING_CRON is defined, return false and prevent any redirection from BuddyBoss
+		if ( defined( 'DOING_CRON' ) || defined( 'DOING_GH_CRON' ) ){
+			return false;
+		}
+
+		return $redirect;
 	}
 
 	/**

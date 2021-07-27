@@ -424,6 +424,15 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Verify all the license statuses
+	 */
+	public function version_2_4_7_3() {
+		$this->remember_version_update( '2.4.7.3' );
+
+		Plugin::instance()->bulk_jobs->fix_birthdays->start();
+	}
+
+	/**
 	 * Refactor notes db
 	 */
 	public function version_3_0() {
@@ -483,6 +492,7 @@ class Main_Updater extends Updater {
 			'2.4.6',
 			'2.4.7',
 			'2.4.7.1',
+			'2.4.7.3',
 			'3.0',
 		];
 	}
@@ -552,6 +562,7 @@ class Main_Updater extends Updater {
 			'2.4.6'         => __( 'Refactor notes to abstract data type for support across more objects.', 'groundhogg' ),
 			'2.4.7'         => __( 'Add new Other Activity tables for arbitrary historical logs.', 'groundhogg' ),
 			'2.4.7.1'       => __( 'Add <code>view_admin_dashboard</code> capability to Sales Representative and Sales Manager', 'groundhogg' ),
+			'2.4.7.3'       => __( 'Fix birthday date formatting.', 'groundhogg' ),
 		];
 	}
 }

@@ -21,6 +21,7 @@ use Groundhogg\Step;
 use Groundhogg\Submission;
 use Groundhogg\Supports_Errors;
 use function Groundhogg\track_live_activity;
+use function Groundhogg\Ymd;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -238,7 +239,8 @@ class Submission_Handler extends Supports_Errors {
 
 					// If is valid date
 					if ( checkdate( $birthday[1], $birthday[2], $birthday[0] ) ) {
-						$birthday         = implode( '-', $birthday );
+						$time             = mktime( 0, 0, 0, $birthday[1], $birthday[2], $birthday[0] );
+						$birthday         = Ymd( $time );
 						$meta['birthday'] = $birthday;
 					}
 
@@ -359,7 +361,7 @@ class Submission_Handler extends Supports_Errors {
 				'owner_id' => get_current_user_id()
 			] );
 
-		// User and contact are the same person, link them
+			// User and contact are the same person, link them
 		} else if ( is_user_logged_in() && contact_and_user_match( $contact ) ) {
 
 			$contact->update( [

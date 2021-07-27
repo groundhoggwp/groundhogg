@@ -7,6 +7,7 @@ use function Groundhogg\action_input;
 use function Groundhogg\get_db;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
+use function Groundhogg\isset_not_empty;
 
 $string_comparisons = [
 	''            => __( 'Compare', 'groundhogg' ),
@@ -158,6 +159,20 @@ $saved_search = $search_id ? Saved_Searches::instance()->get( $search_id ) : fal
 				?></p>
 			<p><?php
 
+				$meta_compare = get_url_var( 'meta_compare' );
+
+				if ( $meta_compare ) {
+					$map = [
+						'>'  => 'gt',
+						'>=' => 'gt_eq',
+						'<'  => 'lt',
+						'<=' => 'lt_eq',
+					];
+
+					if ( isset_not_empty( $map, $meta_compare ) ) {
+						$meta_compare = $map[ $meta_compare ];
+					}
+				}
 
 				echo html()->dropdown( [
 					'name'        => 'meta_compare',
@@ -165,12 +180,16 @@ $saved_search = $search_id ? Saved_Searches::instance()->get( $search_id ) : fal
 					'options'     => [
 						'='          => __( 'Equals', 'groundhogg' ),
 						'!='         => __( 'Not Equals', 'groundhogg' ),
-						'>'          => __( 'Greater than', 'groundhogg' ),
-						'<'          => __( 'Less than', 'groundhogg' ),
+						'gt'         => __( 'Greater than', 'groundhogg' ),
+						'lt'         => __( 'Less than', 'groundhogg' ),
+						'gt_eq'      => __( 'Greater than or equal to', 'groundhogg' ),
+						'lt_eq'      => __( 'Less than or equal to', 'groundhogg' ),
 						'REGEXP'     => __( 'Contains', 'groundhogg' ),
 						'NOT REGEXP' => __( 'Does not contain', 'groundhogg' ),
+						'EXISTS'     => __( 'Exists', 'groundhogg' ),
+						'NOT EXISTS' => __( 'Not Exists', 'groundhogg' ),
 					],
-					'selected'    => sanitize_text_field( get_url_var( 'meta_compare' ) ),
+					'selected'    => $meta_compare,
 					'option_none' => false,
 					'id'          => '',
 				] );
