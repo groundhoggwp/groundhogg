@@ -136,7 +136,7 @@ class Form {
 	/**
 	 * Set the data to the given value
 	 *
-	 * @param $key string
+	 * @param $key   string
 	 * @param $value Field
 	 */
 	public function __set( $key, $value ) {
@@ -285,7 +285,7 @@ class Form {
 
 //        do_action( 'groundhogg/form/shortcode/before', $this );
 
-		$content = do_replacements( do_shortcode( $this->step->get_meta( 'form' ) ) );
+		$content = do_shortcode( do_replacements( $this->step->get_meta( 'form' ) ) );
 
 //        do_action( 'groundhogg/form/shortcode/after', $this );
 
