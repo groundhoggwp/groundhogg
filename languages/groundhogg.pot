@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Groundhogg\n"
-"POT-Creation-Date: 2021-06-29 14:35-0400\n"
+"POT-Creation-Date: 2021-07-14 13:25-0400\n"
 "PO-Revision-Date: 2021-06-29 14:35-0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -30,7 +30,7 @@ msgid "Invalid permissions."
 msgstr ""
 
 #: admin/admin-page.php:437 admin/admin-page.php:453
-#: admin/contacts/contacts-page.php:434 admin/emails/emails-page.php:159
+#: admin/contacts/contacts-page.php:436 admin/emails/emails-page.php:159
 msgid "Add New"
 msgstr ""
 
@@ -61,8 +61,8 @@ msgid "Select contacts by tags."
 msgstr ""
 
 #: admin/broadcasts/add.php:96 admin/broadcasts/add.php:119
-#: admin/contacts/advanced-search.php:252
-#: admin/contacts/advanced-search.php:281 admin/contacts/quick-search.php:46
+#: admin/contacts/advanced-search.php:271
+#: admin/contacts/advanced-search.php:300 admin/contacts/quick-search.php:46
 #: admin/funnels/funnel-editor-v2.php:403
 #: admin/funnels/funnel-editor-v2.php:433
 #: admin/funnels/funnel-editor-v3.php:378
@@ -71,8 +71,8 @@ msgid "Any"
 msgstr ""
 
 #: admin/broadcasts/add.php:97 admin/broadcasts/add.php:120
-#: admin/contacts/advanced-search.php:253
-#: admin/contacts/advanced-search.php:282 admin/contacts/quick-search.php:47
+#: admin/contacts/advanced-search.php:272
+#: admin/contacts/advanced-search.php:301 admin/contacts/quick-search.php:47
 #: admin/contacts/tables/contacts-table.php:458
 #: admin/emails/emails-table.php:122 admin/events/email-log-table.php:76
 #: admin/funnels/funnel-editor-v2.php:404
@@ -500,8 +500,8 @@ msgstr ""
 #: admin/contacts/bulk-edit.php:28 admin/contacts/contact-editor.php:173
 #: admin/contacts/contact-editor.php:176
 #: admin/contacts/tables/contact-table-columns.php:156
-#: admin/contacts/tables/contacts-table.php:260 includes/functions.php:1833
-#: includes/functions.php:1933 includes/replacements.php:95
+#: admin/contacts/tables/contacts-table.php:260 includes/functions.php:1851
+#: includes/functions.php:1951 includes/replacements.php:95
 #: includes/replacements.php:246
 msgid "First Name"
 msgstr ""
@@ -510,8 +510,8 @@ msgstr ""
 #: admin/contacts/bulk-edit.php:39 admin/contacts/contact-editor.php:185
 #: admin/contacts/contact-editor.php:188
 #: admin/contacts/tables/contact-table-columns.php:160
-#: admin/contacts/tables/contacts-table.php:265 includes/functions.php:1834
-#: includes/functions.php:1934 includes/replacements.php:107
+#: admin/contacts/tables/contacts-table.php:265 includes/functions.php:1852
+#: includes/functions.php:1952 includes/replacements.php:107
 #: includes/replacements.php:253
 msgid "Last Name"
 msgstr ""
@@ -522,50 +522,50 @@ msgctxt "contact_record"
 msgid "Primary Phone"
 msgstr ""
 
-#: admin/contacts/add-contact.php:99 admin/contacts/bulk-edit.php:54
+#: admin/contacts/add-contact.php:100 admin/contacts/bulk-edit.php:54
 #: admin/contacts/bulk-edit.php:213 admin/contacts/contact-editor.php:284
 #: admin/contacts/contact-editor.php:450
 #: admin/contacts/tables/contacts-table.php:304
 msgid "ext."
 msgstr ""
 
-#: admin/contacts/add-contact.php:110 admin/contacts/bulk-edit.php:65
+#: admin/contacts/add-contact.php:112 admin/contacts/bulk-edit.php:65
 #: admin/contacts/contact-editor.php:296
 msgctxt "contact_record"
 msgid "Mobile Phone"
 msgstr ""
 
-#: admin/contacts/add-contact.php:122 admin/contacts/bulk-edit.php:86
+#: admin/contacts/add-contact.php:125 admin/contacts/bulk-edit.php:86
 #: admin/contacts/contact-editor.php:309
 msgctxt "contact_record"
 msgid "Contact Owner"
 msgstr ""
 
-#: admin/contacts/add-contact.php:127 admin/contacts/contact-editor.php:118
+#: admin/contacts/add-contact.php:130 admin/contacts/contact-editor.php:118
 #: admin/contacts/contact-editor.php:315
 #: admin/contacts/tables/contact-table-columns.php:173
 #: admin/contacts/tables/contact-table-columns.php:238
-#: admin/contacts/tables/contacts-table.php:324 includes/functions.php:1866
+#: admin/contacts/tables/contacts-table.php:324 includes/functions.php:1884
 msgid "Tags"
 msgstr ""
 
-#: admin/contacts/add-contact.php:141
+#: admin/contacts/add-contact.php:144
 msgctxt "action"
 msgid "Add Contact"
 msgstr ""
 
-#: admin/contacts/add-contact.php:148 admin/contacts/contact-editor.php:780
+#: admin/contacts/add-contact.php:151 admin/contacts/contact-editor.php:780
 #: admin/contacts/form-admin-submit.php:40
 msgctxt "contact_record"
 msgid "Internal Form"
 msgstr ""
 
-#: admin/contacts/add-contact.php:166 admin/contacts/contact-editor.php:797
+#: admin/contacts/add-contact.php:169 admin/contacts/contact-editor.php:797
 #: admin/contacts/form-admin-submit.php:55
 msgid "Please select a form"
 msgstr ""
 
-#: admin/contacts/add-contact.php:169 admin/contacts/form-admin-submit.php:58
+#: admin/contacts/add-contact.php:172 admin/contacts/form-admin-submit.php:58
 msgid "Switch Form"
 msgstr ""
 
@@ -573,74 +573,74 @@ msgstr ""
 msgid "Add Filter"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:12
+#: admin/contacts/advanced-search.php:13
 msgid "Compare"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:13 admin/contacts/advanced-search.php:166
+#: admin/contacts/advanced-search.php:14 admin/contacts/advanced-search.php:181
 msgid "Equals"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:14 admin/contacts/advanced-search.php:170
+#: admin/contacts/advanced-search.php:15 admin/contacts/advanced-search.php:187
 msgid "Contains"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:15
+#: admin/contacts/advanced-search.php:16
 msgid "Starts with"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:16
+#: admin/contacts/advanced-search.php:17
 msgid "Ends with"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:17
+#: admin/contacts/advanced-search.php:18
 msgid "Empty"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:18
+#: admin/contacts/advanced-search.php:19
 msgid "Not empty"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:19
+#: admin/contacts/advanced-search.php:20
 msgid "Regex"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:39
+#: admin/contacts/advanced-search.php:40
 msgid "Filter By First Name"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:57
+#: admin/contacts/advanced-search.php:58
 msgid "John"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:65
+#: admin/contacts/advanced-search.php:66
 msgid "Filter By Last Name"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:84
+#: admin/contacts/advanced-search.php:85
 msgid "Doe"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:90
+#: admin/contacts/advanced-search.php:91
 msgid "Filter By Email"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:107
+#: admin/contacts/advanced-search.php:108
 msgid "example@mydomain.com"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:116
+#: admin/contacts/advanced-search.php:117
 msgid "Filter By Optin Status"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:124
+#: admin/contacts/advanced-search.php:125
 #: admin/contacts/tables/contacts-table.php:463
 #: admin/dashboard/widgets/optin-status-widget.php:67
 #: includes/reporting/new-reports/chart-contacts-by-optin-status.php:54
 msgid "Unconfirmed"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:125 admin/contacts/contact-editor.php:231
+#: admin/contacts/advanced-search.php:126 admin/contacts/contact-editor.php:231
 #: admin/contacts/tables/contacts-table.php:468
 #: admin/dashboard/widgets/optin-status-widget.php:70
 #: includes/reporting/new-reports/chart-contacts-by-optin-status.php:57
@@ -648,7 +648,7 @@ msgstr ""
 msgid "Confirmed"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:126
+#: admin/contacts/advanced-search.php:127
 #: admin/contacts/tables/contacts-table.php:483
 #: admin/dashboard/widgets/optin-status-widget.php:79
 #: includes/reporting/new-reports/chart-contacts-by-optin-status.php:66
@@ -658,17 +658,17 @@ msgstr ""
 msgid "Unsubscribed"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:127
+#: admin/contacts/advanced-search.php:128
 #: admin/contacts/tables/contacts-table.php:473
 msgid "Weekly"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:128
+#: admin/contacts/advanced-search.php:129
 #: admin/contacts/tables/contacts-table.php:478
 msgid "Monthly"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:129 admin/contacts/contact-editor.php:234
+#: admin/contacts/advanced-search.php:130 admin/contacts/contact-editor.php:234
 #: admin/contacts/contact-editor.php:240
 #: admin/contacts/tables/contacts-table.php:493
 #: admin/dashboard/widgets/optin-status-widget.php:73
@@ -676,7 +676,7 @@ msgstr ""
 msgid "Bounced"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:130 admin/contacts/contact-editor.php:233
+#: admin/contacts/advanced-search.php:131 admin/contacts/contact-editor.php:233
 #: admin/contacts/contact-editor.php:239
 #: admin/contacts/tables/contacts-table.php:488
 #: admin/contacts/tables/contacts-table.php:569
@@ -686,107 +686,123 @@ msgstr ""
 msgid "Spam"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:131 admin/contacts/contact-editor.php:235
+#: admin/contacts/advanced-search.php:132 admin/contacts/contact-editor.php:235
 #: admin/contacts/contact-editor.php:241
 #: admin/contacts/tables/contacts-table.php:498
 msgid "Complained"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:143
+#: admin/contacts/advanced-search.php:144
 msgid "Filter By Meta"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:154
+#: admin/contacts/advanced-search.php:155
 msgid "Select a meta key"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:167
+#: admin/contacts/advanced-search.php:182
 msgid "Not Equals"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:168
+#: admin/contacts/advanced-search.php:183
 msgid "Greater than"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:169
+#: admin/contacts/advanced-search.php:184
 msgid "Less than"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:171
+#: admin/contacts/advanced-search.php:185
+msgid "Greater than or equal to"
+msgstr ""
+
+#: admin/contacts/advanced-search.php:186
+msgid "Less than or equal to"
+msgstr ""
+
+#: admin/contacts/advanced-search.php:188
 msgid "Does not contain"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:185 admin/contacts/contact-editor.php:897
+#: admin/contacts/advanced-search.php:189
+msgid "Exists"
+msgstr ""
+
+#: admin/contacts/advanced-search.php:190
+msgid "Not Exists"
+msgstr ""
+
+#: admin/contacts/advanced-search.php:204 admin/contacts/contact-editor.php:897
 #: admin/emails/email-editor.php:287
 #: includes/steps/benchmarks/form-filled.php:562
 msgid "Value"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:195
+#: admin/contacts/advanced-search.php:214
 msgid "Filter By Date"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:198
+#: admin/contacts/advanced-search.php:217
 msgid "From: "
 msgstr ""
 
-#: admin/contacts/advanced-search.php:212
+#: admin/contacts/advanced-search.php:231
 msgid "To: "
 msgstr ""
 
-#: admin/contacts/advanced-search.php:227
+#: admin/contacts/advanced-search.php:246
 msgid "Filter By Owner"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:240
+#: admin/contacts/advanced-search.php:259
 msgid "Filter By Tags"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:245
+#: admin/contacts/advanced-search.php:264
 msgid "Includes contacts with"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:273
+#: admin/contacts/advanced-search.php:292
 msgid "Excludes contacts with"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:303 admin/events/email-log-table.php:188
+#: admin/contacts/advanced-search.php:322 admin/events/email-log-table.php:188
 msgid "Search"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:314
+#: admin/contacts/advanced-search.php:333
 msgid "Saved Searches"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:326 admin/contacts/quick-search.php:29
+#: admin/contacts/advanced-search.php:345 admin/contacts/quick-search.php:29
 msgid "Load Search"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:338
+#: admin/contacts/advanced-search.php:357
 msgid "Save This Search"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:344
+#: admin/contacts/advanced-search.php:363
 msgid "My search name..."
 msgstr ""
 
-#: admin/contacts/advanced-search.php:348
+#: admin/contacts/advanced-search.php:367
 msgid "Save Search"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:359
+#: admin/contacts/advanced-search.php:378
 msgid "Update This Search"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:364
+#: admin/contacts/advanced-search.php:383
 msgid "Update Search"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:388
+#: admin/contacts/advanced-search.php:407
 msgid "Delete Current Search"
 msgstr ""
 
-#: admin/contacts/advanced-search.php:392
+#: admin/contacts/advanced-search.php:411
 msgid "Delete Search"
 msgstr ""
 
@@ -1251,13 +1267,13 @@ msgstr ""
 msgid "Agreed"
 msgstr ""
 
-#: admin/contacts/contact-editor.php:586 includes/functions.php:1861
-#: includes/functions.php:1961
+#: admin/contacts/contact-editor.php:586 includes/functions.php:1879
+#: includes/functions.php:1979
 msgid "Data Processing Consent"
 msgstr ""
 
-#: admin/contacts/contact-editor.php:590 includes/functions.php:1863
-#: includes/functions.php:1962
+#: admin/contacts/contact-editor.php:590 includes/functions.php:1881
+#: includes/functions.php:1980
 msgid "Marketing Consent"
 msgstr ""
 
@@ -1285,7 +1301,7 @@ msgid "This is where the contact originated from."
 msgstr ""
 
 #: admin/contacts/contact-editor.php:659 admin/contacts/info-cards.php:70
-#: includes/functions.php:1865
+#: includes/functions.php:1883
 msgid "Notes"
 msgstr ""
 
@@ -1430,21 +1446,21 @@ msgctxt "action"
 msgid "Update Contact"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:99 admin/contacts/contacts-page.php:414
+#: admin/contacts/contacts-page.php:101 admin/contacts/contacts-page.php:416
 msgctxt "page_title"
 msgid "Contacts"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:143
+#: admin/contacts/contacts-page.php:145
 msgid "Are you sure you want to delete this note?"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:161 admin/emails/emails-page.php:48
+#: admin/contacts/contacts-page.php:163 admin/emails/emails-page.php:48
 #: admin/funnels/funnels-page.php:60
 msgid "Add"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:169 admin/contacts/note.php:52
+#: admin/contacts/contacts-page.php:171 admin/contacts/note.php:52
 #: admin/contacts/note.php:54 admin/contacts/tables/contacts-table.php:559
 #: admin/contacts/tables/contacts-table.php:560 admin/emails/emails-page.php:58
 #: admin/emails/emails-table.php:170 admin/funnels/funnels-page.php:67
@@ -1452,99 +1468,99 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:186 admin/funnels/funnels-page.php:214
+#: admin/contacts/contacts-page.php:188 admin/funnels/funnels-page.php:214
 #: admin/reports/reports-page.php:244
 msgid "Overview"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:187
+#: admin/contacts/contacts-page.php:189
 msgid ""
 "This is where you can manage and view your contacts. Click the quick edit to "
 "quickly change contact details."
 msgstr ""
 
-#: admin/contacts/contacts-page.php:194 admin/funnels/funnels-page.php:231
+#: admin/contacts/contacts-page.php:196 admin/funnels/funnels-page.php:231
 msgid "Editing"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:195
+#: admin/contacts/contacts-page.php:197
 msgid ""
 "While editing a contact you can modify any of their personal information. "
 "There are several points of interest..."
 msgstr ""
 
-#: admin/contacts/contacts-page.php:197
+#: admin/contacts/contacts-page.php:199
 msgid ""
 "Manually unsubscribe a contact by checking the \"mark as unsubscribed\" "
 "button."
 msgstr ""
 
-#: admin/contacts/contacts-page.php:198
+#: admin/contacts/contacts-page.php:200
 msgid ""
 "Make sure your in compliance by ensuring the terms of agreement and GDPR "
 "consent are both checked under the compliance section."
 msgstr ""
 
-#: admin/contacts/contacts-page.php:199
+#: admin/contacts/contacts-page.php:201
 msgid "View the origin of the contact by looking at the lead source field."
 msgstr ""
 
-#: admin/contacts/contacts-page.php:200
+#: admin/contacts/contacts-page.php:202
 msgid ""
 "Add or remove custom information about the contact by enabling the \"Edit "
 "Meta\" section. Each meta also includes a replacement code to include it in "
 "an email."
 msgstr ""
 
-#: admin/contacts/contacts-page.php:201
+#: admin/contacts/contacts-page.php:203
 msgid ""
 "Re-run or cancel events for this contact by viewing the \"Upcoming Events\" "
 "or \"Recent History\" Section"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:202
+#: admin/contacts/contacts-page.php:204
 msgid ""
 "Monitor their engagement by looking in the \"Recent Email History\" section."
 msgstr ""
 
-#: admin/contacts/contacts-page.php:385
+#: admin/contacts/contacts-page.php:387
 msgctxt "page_title"
 msgid "Add Contact"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:391
+#: admin/contacts/contacts-page.php:393
 #, php-format
 msgctxt "page_title"
 msgid "Edit Contact: %s"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:393
+#: admin/contacts/contacts-page.php:395
 msgctxt "page_title"
 msgid "Oops!"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:403
+#: admin/contacts/contacts-page.php:405
 #, php-format
 msgctxt "page_title"
 msgid "Submit Form For %s"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:405
+#: admin/contacts/contacts-page.php:407
 msgctxt "page_title"
 msgid "Submit Form"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:410
+#: admin/contacts/contacts-page.php:412
 msgctxt "page_title"
 msgid "Search Contacts"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:440 admin/tools/imports-table.php:263
+#: admin/contacts/contacts-page.php:442 admin/tools/imports-table.php:263
 #: admin/tools/tools-page.php:172 admin/tools/tools-page.php:568
 msgid "Import"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:446
+#: admin/contacts/contacts-page.php:448
 msgid "Advanced Search"
 msgstr ""
 
@@ -1562,57 +1578,57 @@ msgstr ""
 msgid "Could not add contact."
 msgstr ""
 
-#: admin/contacts/contacts-page.php:505
+#: admin/contacts/contacts-page.php:506
 msgctxt "notice"
 msgid "Contact created!"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:560 admin/contacts/contacts-page.php:595
+#: admin/contacts/contacts-page.php:561 admin/contacts/contacts-page.php:596
 msgid "Contact id not found."
 msgstr ""
 
-#: admin/contacts/contacts-page.php:579
+#: admin/contacts/contacts-page.php:580
 #, php-format
 msgid "Uploaded file"
 msgid_plural "Uploaded %s files"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/contacts/contacts-page.php:650 admin/contacts/contacts-page.php:1013
+#: admin/contacts/contacts-page.php:651 admin/contacts/contacts-page.php:1016
 #, php-format
 msgctxt "notice"
 msgid "Sorry, the email %s already belongs to another contact."
 msgstr ""
 
-#: admin/contacts/contacts-page.php:694
+#: admin/contacts/contacts-page.php:695
 msgctxt "notice"
 msgid "Location updated."
 msgstr ""
 
-#: admin/contacts/contacts-page.php:721
+#: admin/contacts/contacts-page.php:724
 msgid "The birthday date provided is not a valid date."
 msgstr ""
 
-#: admin/contacts/contacts-page.php:742 admin/contacts/contacts-page.php:1038
+#: admin/contacts/contacts-page.php:745 admin/contacts/contacts-page.php:1041
 msgid "Hmm, looks like we could not add the new tags..."
 msgstr ""
 
-#: admin/contacts/contacts-page.php:753
+#: admin/contacts/contacts-page.php:756
 msgctxt "notice"
 msgid "The email has been added to the queue and will send shortly."
 msgstr ""
 
-#: admin/contacts/contacts-page.php:760
+#: admin/contacts/contacts-page.php:763
 msgctxt "notice"
 msgid "Contact added to funnel."
 msgstr ""
 
-#: admin/contacts/contacts-page.php:787
+#: admin/contacts/contacts-page.php:790
 msgctxt "notice"
 msgid "Contact updated!"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:810
+#: admin/contacts/contacts-page.php:813
 #, php-format
 msgctxt "notice"
 msgid "Deleted %d contact."
@@ -1620,7 +1636,7 @@ msgid_plural "Deleted %d contacts."
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/contacts/contacts-page.php:856
+#: admin/contacts/contacts-page.php:859
 #, php-format
 msgctxt "notice"
 msgid "Marked contact as %2$s."
@@ -1628,38 +1644,38 @@ msgid_plural "Marked %1$d contacts as %2$s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/contacts/contacts-page.php:961
+#: admin/contacts/contacts-page.php:964
 msgid "Note deleted successfully."
 msgstr ""
 
-#: admin/contacts/contacts-page.php:1005
+#: admin/contacts/contacts-page.php:1008
 msgctxt "notice"
 msgid "Email cannot be blank."
 msgstr ""
 
-#: admin/contacts/contacts-page.php:1007
+#: admin/contacts/contacts-page.php:1010
 msgctxt "notice"
 msgid "Invalid email address."
 msgstr ""
 
-#: admin/contacts/contacts-page.php:1082
+#: admin/contacts/contacts-page.php:1085
 msgid "File deleted."
 msgstr ""
 
-#: admin/contacts/contacts-page.php:1098 admin/contacts/contacts-page.php:1130
-#: admin/contacts/contacts-page.php:1161
+#: admin/contacts/contacts-page.php:1101 admin/contacts/contacts-page.php:1133
+#: admin/contacts/contacts-page.php:1164
 msgid "Invalid search"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:1111 admin/contacts/contacts-page.php:1139
+#: admin/contacts/contacts-page.php:1114 admin/contacts/contacts-page.php:1142
 msgid "Search saved!"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:1185
+#: admin/contacts/contacts-page.php:1188
 msgid "Search deleted!"
 msgstr ""
 
-#: admin/contacts/contacts-page.php:1226
+#: admin/contacts/contacts-page.php:1229
 msgid "Email sent!"
 msgstr ""
 
@@ -1954,12 +1970,12 @@ msgid "Phone"
 msgstr ""
 
 #: admin/contacts/tables/contact-table-columns.php:167
-#: includes/functions.php:1839 includes/functions.php:1939
+#: includes/functions.php:1857 includes/functions.php:1957
 msgid "Date Created"
 msgstr ""
 
 #: admin/contacts/tables/contact-table-columns.php:175
-#: includes/functions.php:1841 includes/functions.php:1941
+#: includes/functions.php:1859 includes/functions.php:1959
 #: includes/steps/benchmarks/form-filled.php:316
 msgid "Birthday"
 msgstr ""
@@ -2043,7 +2059,7 @@ msgstr ""
 #: admin/dashboard/widgets/country-widget.php:37
 #: admin/guided-setup/steps/business-info.php:60
 #: admin/settings/settings-page.php:535 includes/form/fields/address.php:97
-#: includes/functions.php:1852 includes/functions.php:1952
+#: includes/functions.php:1870 includes/functions.php:1970
 #: includes/reporting/new-reports/table-contacts-by-country.php:16
 msgid "Country"
 msgstr ""
@@ -2148,8 +2164,8 @@ msgstr ""
 msgid "Clicked"
 msgstr ""
 
-#: admin/dashboard/widgets/lead-sources.php:51 includes/functions.php:1858
-#: includes/functions.php:1958
+#: admin/dashboard/widgets/lead-sources.php:51 includes/functions.php:1876
+#: includes/functions.php:1976
 #: includes/reporting/new-reports/table-contacts-by-lead-source.php:24
 msgid "Lead Source"
 msgstr ""
@@ -2184,8 +2200,8 @@ msgstr ""
 msgid "Social Platform"
 msgstr ""
 
-#: admin/dashboard/widgets/source-pages.php:51 includes/functions.php:1859
-#: includes/functions.php:1959
+#: admin/dashboard/widgets/source-pages.php:51 includes/functions.php:1877
+#: includes/functions.php:1977
 #: includes/reporting/new-reports/table-contacts-by-source-pages.php:19
 msgid "Source Page"
 msgstr ""
@@ -2220,8 +2236,8 @@ msgstr ""
 msgid "Time Range"
 msgstr ""
 
-#: admin/dashboard/widgets/utm-campaigns.php:51 includes/functions.php:1867
-#: includes/functions.php:1967
+#: admin/dashboard/widgets/utm-campaigns.php:51 includes/functions.php:1885
+#: includes/functions.php:1985
 msgid "UTM Campaign"
 msgstr ""
 
@@ -3354,20 +3370,20 @@ msgid "Phone Number"
 msgstr ""
 
 #: admin/guided-setup/steps/business-info.php:40
-#: includes/form/fields/address.php:57 includes/functions.php:1847
-#: includes/functions.php:1947
+#: includes/form/fields/address.php:57 includes/functions.php:1865
+#: includes/functions.php:1965
 msgid "Street Address 1"
 msgstr ""
 
 #: admin/guided-setup/steps/business-info.php:44
-#: includes/form/fields/address.php:65 includes/functions.php:1848
-#: includes/functions.php:1948
+#: includes/form/fields/address.php:65 includes/functions.php:1866
+#: includes/functions.php:1966
 msgid "Street Address 2"
 msgstr ""
 
 #: admin/guided-setup/steps/business-info.php:48
 #: admin/settings/settings-page.php:499 includes/form/fields/address.php:73
-#: includes/functions.php:1849 includes/functions.php:1949
+#: includes/functions.php:1867 includes/functions.php:1967
 msgid "City"
 msgstr ""
 
@@ -5244,8 +5260,16 @@ msgid ""
 "can re-sync them using this tool."
 msgstr ""
 
-#: admin/tools/misc.php:20
+#: admin/tools/misc.php:20 admin/tools/misc.php:32
 msgid "Process"
+msgstr ""
+
+#: admin/tools/misc.php:25
+msgid "Fix birthdays"
+msgstr ""
+
+#: admin/tools/misc.php:28
+msgid "Fix contact birthday formatting."
 msgstr ""
 
 #: admin/tools/tools-page.php:114
@@ -6406,7 +6430,7 @@ msgctxt "form_default"
 msgid "Please select one"
 msgstr ""
 
-#: includes/form/fields/dropdown.php:138
+#: includes/form/fields/dropdown.php:142
 msgid "Please select a valid dropdown option."
 msgstr ""
 
@@ -6527,224 +6551,224 @@ msgstr ""
 msgid "(Edit Form)"
 msgstr ""
 
-#: includes/form/submission-handler.php:104
-#: includes/form/submission-handler.php:113
+#: includes/form/submission-handler.php:105
+#: includes/form/submission-handler.php:114
 msgid "This form does not exist."
 msgstr ""
 
-#: includes/form/submission-handler.php:117
+#: includes/form/submission-handler.php:118
 msgid "This form is not accepting submissions."
 msgstr ""
 
-#: includes/form/submission-handler.php:126
+#: includes/form/submission-handler.php:127
 msgid "This form is setup incorrectly."
 msgstr ""
 
-#: includes/form/submission-handler.php:139
+#: includes/form/submission-handler.php:140
 msgid "Submission flagged as spam."
 msgstr ""
 
-#: includes/form/submission-handler.php:165
-#: includes/form/submission-handler.php:175
+#: includes/form/submission-handler.php:166
+#: includes/form/submission-handler.php:176
 #, php-format
 msgid "<b>Missing a required field:</b> %s"
 msgstr ""
 
-#: includes/form/submission-handler.php:287
+#: includes/form/submission-handler.php:289
 msgid "First & last name should not be the same."
 msgstr ""
 
-#: includes/form/submission-handler.php:305
-#: includes/form/submission-handler.php:311
+#: includes/form/submission-handler.php:307
+#: includes/form/submission-handler.php:313
 msgid "Unable to create contact record."
 msgstr ""
 
-#: includes/form/submission-handler.php:397
+#: includes/form/submission-handler.php:399
 msgid "Your submission has been received!"
 msgstr ""
 
-#: includes/form/submission-handler.php:406
+#: includes/form/submission-handler.php:408
 msgctxt "notice"
 msgid "Form submitted"
 msgstr ""
 
-#: includes/functions.php:1393
+#: includes/functions.php:1411
 msgid "Could not create contact."
 msgstr ""
 
-#: includes/functions.php:1831 includes/replacements.php:88
+#: includes/functions.php:1849 includes/replacements.php:88
 msgid "Contact ID"
 msgstr ""
 
-#: includes/functions.php:1832 includes/functions.php:1932
+#: includes/functions.php:1850 includes/functions.php:1950
 #: includes/replacements.php:119
 msgid "Full Name"
 msgstr ""
 
-#: includes/functions.php:1835 includes/functions.php:1935
+#: includes/functions.php:1853 includes/functions.php:1953
 #: includes/replacements.php:133
 msgid "Email Address"
 msgstr ""
 
-#: includes/functions.php:1836 includes/functions.php:1936
+#: includes/functions.php:1854 includes/functions.php:1954
 msgid "Optin Status"
 msgstr ""
 
-#: includes/functions.php:1837 includes/functions.php:1937
+#: includes/functions.php:1855 includes/functions.php:1955
 msgid "User Id"
 msgstr ""
 
-#: includes/functions.php:1838 includes/functions.php:1938
+#: includes/functions.php:1856 includes/functions.php:1956
 msgid "Owner Id"
 msgstr ""
 
-#: includes/functions.php:1840 includes/functions.php:1940
+#: includes/functions.php:1858 includes/functions.php:1958
 msgid "Date Optin Status Changed"
 msgstr ""
 
-#: includes/functions.php:1842 includes/functions.php:1942
+#: includes/functions.php:1860 includes/functions.php:1960
 msgid "Mobile Phone Number"
 msgstr ""
 
-#: includes/functions.php:1843 includes/functions.php:1943
+#: includes/functions.php:1861 includes/functions.php:1961
 msgid "Primary Phone Number"
 msgstr ""
 
-#: includes/functions.php:1844 includes/functions.php:1944
+#: includes/functions.php:1862 includes/functions.php:1962
 msgid "Primary Phone Number Extension"
 msgstr ""
 
-#: includes/functions.php:1845 includes/functions.php:1945
+#: includes/functions.php:1863 includes/functions.php:1963
 msgid "Company Phone Number"
 msgstr ""
 
-#: includes/functions.php:1846 includes/functions.php:1946
+#: includes/functions.php:1864 includes/functions.php:1964
 msgid "Company Phone Number Extension"
 msgstr ""
 
-#: includes/functions.php:1850 includes/functions.php:1950
+#: includes/functions.php:1868 includes/functions.php:1968
 msgid "Postal/Zip"
 msgstr ""
 
-#: includes/functions.php:1851 includes/functions.php:1951
+#: includes/functions.php:1869 includes/functions.php:1969
 msgid "Province/State/Region"
 msgstr ""
 
-#: includes/functions.php:1853 includes/functions.php:1953
+#: includes/functions.php:1871 includes/functions.php:1971
 #: includes/replacements.php:168
 msgid "Company Name"
 msgstr ""
 
-#: includes/functions.php:1854 includes/functions.php:1954
+#: includes/functions.php:1872 includes/functions.php:1972
 msgid "Full Company Address"
 msgstr ""
 
-#: includes/functions.php:1855 includes/functions.php:1955
+#: includes/functions.php:1873 includes/functions.php:1973
 #: includes/replacements.php:175
 msgid "Job Title"
 msgstr ""
 
-#: includes/functions.php:1856 includes/functions.php:1956
+#: includes/functions.php:1874 includes/functions.php:1974
 msgid "Time Zone"
 msgstr ""
 
-#: includes/functions.php:1857 includes/functions.php:1957
+#: includes/functions.php:1875 includes/functions.php:1975
 msgid "IP Address"
 msgstr ""
 
-#: includes/functions.php:1860 includes/functions.php:1960
+#: includes/functions.php:1878 includes/functions.php:1978
 msgid "Terms Agreement"
 msgstr ""
 
-#: includes/functions.php:1862
+#: includes/functions.php:1880
 msgid "Data Processing Consent Data"
 msgstr ""
 
-#: includes/functions.php:1864
+#: includes/functions.php:1882
 msgid "Marketing Consent Date"
 msgstr ""
 
-#: includes/functions.php:1868 includes/functions.php:1968
+#: includes/functions.php:1886 includes/functions.php:1986
 msgid "UTM Content"
 msgstr ""
 
-#: includes/functions.php:1869 includes/functions.php:1969
+#: includes/functions.php:1887 includes/functions.php:1987
 msgid "UTM Medium"
 msgstr ""
 
-#: includes/functions.php:1870 includes/functions.php:1970
+#: includes/functions.php:1888 includes/functions.php:1988
 msgid "UTM Term"
 msgstr ""
 
-#: includes/functions.php:1871 includes/functions.php:1971
+#: includes/functions.php:1889 includes/functions.php:1989
 msgid "UTM Source"
 msgstr ""
 
-#: includes/functions.php:1963
+#: includes/functions.php:1981
 msgid "Add To Notes"
 msgstr ""
 
-#: includes/functions.php:1964
+#: includes/functions.php:1982
 msgid "Apply Value as Tag"
 msgstr ""
 
-#: includes/functions.php:1965
+#: includes/functions.php:1983
 msgid "Add as Custom Meta"
 msgstr ""
 
-#: includes/functions.php:1966
+#: includes/functions.php:1984
 msgid "Add as File"
 msgstr ""
 
-#: includes/functions.php:2682 includes/functions.php:2710
+#: includes/functions.php:2695 includes/functions.php:2723
 #, php-format
 msgctxt "status"
 msgid "%s ago"
 msgstr ""
 
-#: includes/functions.php:2682 includes/functions.php:2710
+#: includes/functions.php:2695 includes/functions.php:2723
 #, php-format
 msgctxt "status"
 msgid "in %s"
 msgstr ""
 
-#: includes/functions.php:2739
+#: includes/functions.php:2752
 msgid "local time"
 msgstr ""
 
-#: includes/functions.php:4923
+#: includes/functions.php:4969
 msgctxt "field_label"
 msgid "First Name"
 msgstr ""
 
-#: includes/functions.php:4926
+#: includes/functions.php:4972
 msgctxt "field_label"
 msgid "Last Name"
 msgstr ""
 
-#: includes/functions.php:4929
+#: includes/functions.php:4975
 msgctxt "field_label"
 msgid "Full Name"
 msgstr ""
 
-#: includes/functions.php:4932
+#: includes/functions.php:4978
 msgctxt "field_label"
 msgid "Email Address"
 msgstr ""
 
-#: includes/functions.php:4935
+#: includes/functions.php:4981
 #, php-format
 msgctxt "field_label"
 msgid "I agree to %s's storage and processing of my personal data."
 msgstr ""
 
-#: includes/functions.php:4938
+#: includes/functions.php:4984
 #, php-format
 msgctxt "field_label"
 msgid "I agree to receive marketing offers and updates from %s."
 msgstr ""
 
-#: includes/functions.php:4941
+#: includes/functions.php:4987
 #, php-format
 msgctxt "field_label"
 msgid "I agree to terms and conditions of %s."
@@ -6923,97 +6947,107 @@ msgctxt "role"
 msgid "Marketer"
 msgstr ""
 
-#: includes/main-roles.php:95
+#: includes/main-roles.php:96
 msgctxt "role"
 msgid "Sales Manager"
 msgstr ""
 
-#: includes/main-roles.php:105
+#: includes/main-roles.php:107
 msgctxt "role"
 msgid "Sales Representative"
 msgstr ""
 
-#: includes/main-updater.php:497
+#: includes/main-updater.php:521
 msgid "Added notes table."
 msgstr ""
 
-#: includes/main-updater.php:498
+#: includes/main-updater.php:522
 msgid "Refactor contact optin statuses to meet new format."
 msgstr ""
 
-#: includes/main-updater.php:499
+#: includes/main-updater.php:523
 msgid ""
 "Revert update 2.1.13 if rogue updated refactored optin status more than once."
 msgstr ""
 
-#: includes/main-updater.php:500
+#: includes/main-updater.php:524
 msgid "Give funnel events higher priority than broadcast events."
 msgstr ""
 
-#: includes/main-updater.php:501
+#: includes/main-updater.php:525
 msgid ""
 "Add micro_time column to events table for better display of events order."
 msgstr ""
 
-#: includes/main-updater.php:502
+#: includes/main-updater.php:526
 msgid "Add missing index on `claim` column."
 msgstr ""
 
-#: includes/main-updater.php:503
+#: includes/main-updater.php:527
 msgid "Event queue performance improvements."
 msgstr ""
 
-#: includes/main-updater.php:504
+#: includes/main-updater.php:528
 msgid "Reformat all tables."
 msgstr ""
 
-#: includes/main-updater.php:505
+#: includes/main-updater.php:529
 msgid "Migrate notes and update broadcasts table."
 msgstr ""
 
-#: includes/main-updater.php:506
+#: includes/main-updater.php:530
 msgid "Added Broadcast meta table."
 msgstr ""
 
-#: includes/main-updater.php:507
+#: includes/main-updater.php:531
 msgid "Add email_id column to events tables."
 msgstr ""
 
-#: includes/main-updater.php:508
+#: includes/main-updater.php:532
 msgid ""
 "Increased tag name size. Tag name can be 191 to 255 characters based on your "
 "hosted server."
 msgstr ""
 
-#: includes/main-updater.php:509
+#: includes/main-updater.php:533
 msgid "Update the permission keys table to support new usage."
 msgstr ""
 
-#: includes/main-updater.php:510
+#: includes/main-updater.php:534
 msgid "Show preferences page if url is just /gh/."
 msgstr ""
 
-#: includes/main-updater.php:511
+#: includes/main-updater.php:535
 msgid ""
 "Re-install the gh-cron.php file to include a constant <code>DOING_GH_CRON</"
 "code>."
 msgstr ""
 
-#: includes/main-updater.php:512
+#: includes/main-updater.php:536
 msgid "Add the new database tables for the new Email Logging feature."
 msgstr ""
 
-#: includes/main-updater.php:513
+#: includes/main-updater.php:537
 msgid ""
 "Separate GDPR consent into Data Processing consent and Marketing consent"
 msgstr ""
 
-#: includes/main-updater.php:514
+#: includes/main-updater.php:538
 msgid "Fix tag counts and delete orphaned object meta."
 msgstr ""
 
-#: includes/main-updater.php:515
+#: includes/main-updater.php:539
 msgid "Refactor notes to abstract data type for support across more objects."
+msgstr ""
+
+#: includes/main-updater.php:540
+msgid ""
+"Add <code>view_admin_dashboard</code> capability to Sales Representative and "
+"Sales Manager"
+msgstr ""
+
+#: includes/main-updater.php:541
+msgid "Fix birthday date formatting."
 msgstr ""
 
 #: includes/notices.php:84

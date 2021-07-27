@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 4.9
 Tested up to: 5.7
 Requires PHP: 5.6
-Stable tag: 2.4.7.3
+Stable tag: 2.4.7.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -312,8 +312,13 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.4.7.4 (2021-07-12) =
-* ADDED Helpscout integration plugin ID for autoinstall support
+= 2.4.7.4 (2021-07-27) =
+* ADDED HelpScout integration plugin ID for autoinstall support
+* FIXED Database warnings when adding a new subsite in a multisite install
+* FIXED Event queue not processing if the max_execution_time of a site is 0
+* FIXED Non-critical type warnings
+* FIXED Date field in forms not working
+* FIXED Funnel cookie being set more than once in the reports causing 500 error on some servers
 * FIXED Link to mailhawk.io instead of mailhawk.com
 * FIXED Dropdown field in forms with empty value causing error when not required
 * FIXED mobile phone not saving from contact quick add
