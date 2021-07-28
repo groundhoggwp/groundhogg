@@ -290,7 +290,7 @@ class Contact_Query {
 		);
 
 		// Only show contacts associated with the current owner...
-		if ( current_user_can( 'view_own_contacts' ) || ! current_user_can( 'view_all_contacts' ) ) {
+		if ( current_user_can( 'view_contacts' ) && ! current_user_can( 'view_all_contacts' ) ) {
 			$defaults['owner'] = get_current_user_id();
 		}
 

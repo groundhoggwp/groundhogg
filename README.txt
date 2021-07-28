@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 4.9
 Tested up to: 5.7
 Requires PHP: 5.6
-Stable tag: 2.4.7.4
+Stable tag: 2.4.7.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -311,6 +311,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.4.7.5 (2021-07-27) =
+* HOT FIX Reverted change to contact query for contact owners.
 
 = 2.4.7.4 (2021-07-27) =
 * ADDED HelpScout integration plugin ID for autoinstall support
