@@ -1592,6 +1592,10 @@
 
   }
 
+  const bold = (text) => {
+    return `<b>${text}</b>`
+  }
+
   Groundhogg.element = {
     icons,
     ...Elements,
@@ -1637,7 +1641,8 @@
     progressBar,
     tooltip,
     clickedIn,
-    ordinal_suffix_of
+    ordinal_suffix_of,
+    bold
   }
 
 })(jQuery)

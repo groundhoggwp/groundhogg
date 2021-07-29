@@ -125,9 +125,9 @@
    * @param selector
    * @param multiple
    * @param onReceiveItems
-   * @param select2Opts
+   * @param opts
    */
-  function tagPicker (selector, multiple = true, onReceiveItems = (items) => {}, select2Opts = {}) {
+  function tagPicker (selector, multiple = true, onReceiveItems = (items) => {}, ...opts) {
     return apiPicker(selector, gh.api.routes.v4.tags, multiple, true,
       (data) => {
 
@@ -142,7 +142,7 @@
         return {
           search: query.term
         }
-      }, select2Opts)
+      }, ...opts)
   }
 
   /**
@@ -151,8 +151,9 @@
    * @param selector
    * @param multiple
    * @param onReceiveItems
+   * @param opts
    */
-  function campaignPicker (selector, multiple = true, onReceiveItems = (items) => {}) {
+  function campaignPicker (selector, multiple = true, onReceiveItems = (items) => {}, ...opts) {
     return apiPicker(selector, gh.api.routes.v4.campaigns, multiple, true,
       (data) => {
 
@@ -167,7 +168,7 @@
         return {
           search: query.term
         }
-      })
+      }, ...opts)
   }
 
   /**
@@ -177,9 +178,9 @@
    * @param multiple
    * @param onReceiveItems
    * @param queryOpts
-   * @param select2Opts
+   * @param opts
    */
-  function emailPicker (selector, multiple = false, onReceiveItems = (items) => {}, queryOpts = {}, select2Opts = {}) {
+  function emailPicker (selector, multiple = false, onReceiveItems = (items) => {}, queryOpts = {}, ...opts) {
     return apiPicker(selector, gh.api.routes.v4.emails, multiple, false, (data) => {
 
         onReceiveItems(data.items)
@@ -194,7 +195,7 @@
           search: query.term,
           ...queryOpts
         }
-      }, select2Opts)
+      }, ...opts)
   }
 
   /**
@@ -204,8 +205,9 @@
    * @param multiple
    * @param onReceiveItems
    * @param queryOpts
+   * @param opts
    */
-  function funnelPicker (selector, multiple = false, onReceiveItems = (items) => {}, queryOpts = {}) {
+  function funnelPicker (selector, multiple = false, onReceiveItems = (items) => {}, queryOpts = {}, ...opts) {
     return apiPicker(selector, gh.api.routes.v4.funnels, multiple, false, (data) => {
 
         onReceiveItems(data.items)
@@ -220,7 +222,34 @@
           search: query.term,
           ...queryOpts
         }
-      })
+      }, ...opts )
+  }
+
+  /**
+   * Api based broadcast picker
+   *
+   * @param selector
+   * @param multiple
+   * @param onReceiveItems
+   * @param queryOpts
+   * @param opts
+   */
+  function broadcastPicker (selector, multiple = false, onReceiveItems = (items) => {}, queryOpts = {}, ...opts) {
+    return apiPicker(selector, gh.api.routes.v4.broadcasts, multiple, false, (data) => {
+
+        onReceiveItems(data.items)
+
+        return data.items.map(item => ({
+          id: item.ID,
+          text: `${item.object.data.title} (${item.date_sent_pretty})`
+        }))
+      },
+      (query) => {
+        return {
+          search: query.term,
+          ...queryOpts
+        }
+      }, ...opts )
   }
 
   /**
@@ -229,8 +258,9 @@
    * @param selector
    * @param onReceiveItems
    * @param queryOpts
+   * @param opts
    */
-  function searchesPicker (selector, onReceiveItems = (items) => {}, queryOpts = {}) {
+  function searchesPicker (selector, onReceiveItems = (items) => {}, queryOpts = {}, ...opts) {
     return apiPicker(selector, gh.api.routes.v4.searches, false, false, (data) => {
 
         onReceiveItems(data.items)
@@ -245,7 +275,7 @@
           search: query.term,
           ...queryOpts
         }
-      })
+      }, ...opts)
   }
 
   function buildPickers () {
@@ -292,7 +322,8 @@
     metaPicker,
     campaignPicker,
     searchesPicker,
-    funnelPicker
+    funnelPicker,
+    broadcastPicker
   }
 
   // Map functions to Groundhogg object.

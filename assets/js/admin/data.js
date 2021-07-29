@@ -378,6 +378,7 @@
       }
     }),
     emails: ObjectStore(Groundhogg.api.routes.v4.emails),
+    broadcasts: ObjectStore(Groundhogg.api.routes.v4.broadcasts),
     searches: ObjectStore(Groundhogg.api.routes.v4.searches, {
       primaryKey: 'id'
     }),

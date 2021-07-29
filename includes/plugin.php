@@ -334,6 +334,7 @@ class Plugin {
 		new Plugin_Compatibility();
 		new Email_Logger();
 		new User_Syncing();
+		new Activity_Handler();
 
 		\Groundhogg_Email_Services::init();
 

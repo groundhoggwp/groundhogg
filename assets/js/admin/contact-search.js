@@ -312,13 +312,12 @@
     abortHandler = new AbortController()
     const { signal } = abortHandler
 
-    get(routes.v4.contacts, {
-      filters
+    ContactsStore.count({
+      filters: btoa(JSON.stringify(filters))
     }, {
-      // credentials: 'same-origin',
       signal
-    }).then(data => {
-      $('#search-contacts').html(`Show ${data.total_items} contacts`)
+    }).then(total => {
+      $('#search-contacts').html(`Show ${total} contacts`)
     })
   }
 

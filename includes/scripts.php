@@ -428,7 +428,8 @@ class Scripts {
 				'current'      => get_request_var( 'filters', [] ),
 				'meta_keys'    => get_keys(),
 				'pages_lists'  => get_pages_list(),
-				'roles'        => Plugin::instance()->roles->get_roles_for_select()
+				'roles'        => Plugin::instance()->roles->get_roles_for_select(),
+				'countries'    => utils()->location->get_countries_list(),
 			],
 			'managed_page'    => [
 				'root' => managed_page_url()

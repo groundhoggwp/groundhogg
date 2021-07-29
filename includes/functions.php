@@ -3306,6 +3306,15 @@ function get_date_time_format() {
 }
 
 /**
+ * @param $time
+ *
+ * @return string
+ */
+function format_date( $time ) {
+	return date_i18n( get_date_time_format(), $time );
+}
+
+/**
  * Url to access protected files in the Groundhogg uploads folder.
  *
  * @param $path     string abspath to a file.
@@ -4117,12 +4126,32 @@ function generate_referer_hash( $referer ) {
 }
 
 /**
+ * Converts a date to an int
+ *
+ * @param $date
+ *
+ * @return false|int
+ */
+function date_as_int( $date ) {
+	return is_numeric( $date ) ? absint( $date ) : strtotime( $date );
+}
+
+/**
  * @param $time
  *
  * @return int
  */
 function convert_to_local_time( $time ) {
 	return Plugin::$instance->utils->date_time->convert_to_local_time( $time );
+}
+
+/**
+ * @param $time
+ *
+ * @return int
+ */
+function convert_to_utc_0( $time ) {
+	return Plugin::$instance->utils->date_time->convert_to_utc_0( $time );
 }
 
 /**
@@ -5225,9 +5254,9 @@ function get_object_relationships( $object, $is_primary = true ) {
  */
 function compare_dates( &$before, &$after ) {
 
-	if ( strtotime( $before ) < strtotime( $after ) ) {
+	if ( date_as_int( $after ) < date_as_int( $before ) ) {
 		return true;
-	} else if ( strtotime( $after ) < strtotime( $before ) ) {
+	} else if ( date_as_int( $after ) > date_as_int( $before ) ) {
 		$temp   = $before;
 		$before = $after;
 		$after  = $temp;
@@ -5267,6 +5296,17 @@ function enqueue_step_type_assets() {
 }
 
 /**
+ * Get the original link from the referer_hash
+ *
+ * @param $hash
+ *
+ * @return false|string
+ */
+function get_referer_from_referer_hash( $hash ) {
+	return get_db( 'activity' )->get_column_by( 'referer', 'referer_hash', $hash );
+}
+
+/**
  * Changes the contact query vars in a query pre version 2.5 to a filters query so that
  * the filters show in the new contact filtering search
  *
@@ -5274,7 +5314,7 @@ function enqueue_step_type_assets() {
  *
  * @param $query
  *
- * @return array the array of filters
+ * @return array|false
  */
 function get_filters_from_old_query_vars( $query = [] ) {
 
@@ -5302,7 +5342,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 		$filters[] = [
 			'type'    => 'optin_status',
 			'compare' => 'in',
-			'value'   => $query['optin_status']
+			'value'   => ensure_array( $query['optin_status'] )
 		];
 	}
 
@@ -5311,7 +5351,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 		$filters[] = [
 			'type'    => 'optin_status',
 			'compare' => 'not_in',
-			'value'   => $query['optin_status_exclude']
+			'value'   => wp_parse_id_list( ensure_array( $query['optin_status_exclude'] ) )
 		];
 	}
 
@@ -5320,7 +5360,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 		$filters[] = [
 			'type'    => 'owner',
 			'compare' => 'in',
-			'value'   => $query['owner']
+			'value'   => wp_parse_id_list( ensure_array( $query['owner'] ) )
 		];
 	}
 
@@ -5330,7 +5370,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 			'type'     => 'tags',
 			'compare'  => 'includes',
 			'compare2' => isset_not_empty( $query, 'tags_include_needs_all' ) ? 'any' : 'all',
-			'value'    => $query['tags_include'],
+			'tags'     => wp_parse_id_list( ensure_array( $query['tags_include'] ) )
 		];
 	}
 
@@ -5340,7 +5380,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 			'type'     => 'tags',
 			'compare'  => 'excludes',
 			'compare2' => isset_not_empty( $query, 'tags_excludes_needs_all' ) ? 'any' : 'all',
-			'value'    => $query['tags_exclude'],
+			'tags'     => wp_parse_id_list( ensure_array( $query['tags_exclude'] ) ),
 		];
 	}
 
@@ -5361,14 +5401,16 @@ function get_filters_from_old_query_vars( $query = [] ) {
 		$filters[] = [
 			'type'       => 'date_created',
 			'date_range' => $compare,
-			'date'       => get_array_var( $date_query, $compare === 'before' ? 'before' : 'after' ),
-			'date2'      => get_array_var( $date_query, 'before' )
+			'after'      => get_array_var( $date_query, 'after' ),
+			'before'     => get_array_var( $date_query, 'before' )
 		];
 	}
 
 	if ( isset_not_empty( $query, 'report' ) ) {
 
-		$events_query = $query['report'];
+		$events_query = wp_parse_args( $query['report'], [
+			'event_type' => Event::FUNNEL
+		] );
 
 		$map = [
 			'step'   => 'step_id',
@@ -5384,16 +5426,93 @@ function get_filters_from_old_query_vars( $query = [] ) {
 			}
 		}
 
-		switch ( $events_query['event_type'] ) {
+		switch ( absint( $events_query['event_type'] ) ) {
+			default:
 			case Event::FUNNEL:
+				$filters[] = [
+					'type'       => 'funnel_history',
+					'status'     => $events_query['status'],
+					'funnel_id'  => absint( get_array_var( $events_query, 'funnel_id' ) ),
+					'step_id'    => absint( get_array_var( $events_query, 'step_id' ) ),
+					'date_range' => 'between',
+					'after'      => Ymd_His( absint( get_array_var( $events_query, 'after' ) ) ),
+					'before'     => Ymd_His( absint( get_array_var( $events_query, 'before' ) ) )
+				];
+
+				break;
+
 			case Event::BROADCAST:
+				$filters[] = [
+					'type'         => 'received_broadcast',
+					'status'       => $events_query['status'],
+					'broadcast_id' => absint( get_array_var( $events_query, 'step_id' ) ),
+				];
+
+				break;
 			case Event::EMAIL_NOTIFICATION:
+				break;
 		}
-
-
 	}
 
 	if ( isset_not_empty( $query, 'activity' ) ) {
+
+		$activity_query = wp_parse_args( $query['activity'], [
+			'activity_type' => ''
+		] );
+
+		$map = [
+			'step'   => 'step_id',
+			'funnel' => 'funnel_id',
+			'start'  => 'after',
+			'end'    => 'before',
+		];
+
+		foreach ( $map as $old_key => $new_key ) {
+			if ( $val = get_array_var( $activity_query, $old_key ) ) {
+				$activity_query[ $new_key ] = $val;
+			}
+		}
+
+		switch ( $activity_query['activity_type'] ) {
+			default:
+				break;
+			case 'email_link_click':
+				if ( $activity_query['funnel_id'] == 1 ) {
+					$filters[] = [
+						'type'         => 'broadcast_link_clicked',
+						'broadcast_id' => absint( $activity_query['step_id'] ),
+						'link'         => get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) )
+					];
+				} else {
+					$filters[] = [
+						'type'     => 'email_link_clicked',
+						'email_id' => absint( $activity_query['email_id'] ),
+						'link'     => get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) ),
+						'after'    => Ymd_His( absint( get_array_var( $events_query, 'after' ) ) ),
+						'before'   => Ymd_His( absint( get_array_var( $events_query, 'before' ) ) )
+					];
+				}
+				break;
+			case 'email_opened':
+
+				if ( $activity_query['funnel_id'] == 1 ) {
+
+					$filters[] = [
+						'type'         => 'broadcast_opened',
+						'broadcast_id' => absint( $activity_query['step_id'] )
+					];
+
+				} else {
+					$filters[] = [
+						'type'     => 'email_opened',
+						'email_id' => absint( $activity_query['email_id'] ),
+						'after'    => Ymd_His( absint( get_array_var( $events_query, 'after' ) ) ),
+						'before'   => Ymd_His( absint( get_array_var( $events_query, 'before' ) ) )
+					];
+				}
+
+				break;
+		}
 
 	}
 
@@ -5429,5 +5548,5 @@ function get_filters_from_old_query_vars( $query = [] ) {
 	}
 
 	// Filters is an array[] so wrap in another array
-	return [ $filters ];
+	return ! empty( $filters ) ? [ $filters ] : false;
 }

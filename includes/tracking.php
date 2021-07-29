@@ -89,7 +89,7 @@ class Tracking {
 
 		// Actions which build the tracking cookie.
 		add_action( 'wp_login', [ $this, 'wp_login' ], 10, 2 );
-		add_action( 'wp_logout', [ $this, 'wp_logout' ], 10, 2 );
+//		add_action( 'wp_logout', [ $this, 'wp_logout' ], 10, 2 );
 
 		add_action( 'after_setup_theme', [ $this, 'deconstruct_tracking_cookie' ], 1 );
 		add_action( 'init', [ $this, 'add_rewrite_rules' ] );
@@ -563,15 +563,6 @@ class Tracking {
 		}
 
 		$this->build_tracking_cookie();
-
-		track_live_activity( 'login' );
-	}
-
-	/**
-	 * Track when a user logs out
-	 */
-	public function wp_logout() {
-		track_live_activity( 'logout' );
 	}
 
 	/**

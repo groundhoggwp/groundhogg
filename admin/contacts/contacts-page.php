@@ -15,6 +15,7 @@ use function Groundhogg\enqueue_step_type_assets;
 use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
+use function Groundhogg\get_filters_from_old_query_vars;
 use function Groundhogg\get_mappable_fields;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_query;
@@ -155,8 +156,6 @@ class Contacts_Page extends Admin_Page {
 			wp_enqueue_style( 'groundhogg-admin-search-filters' );
 			wp_enqueue_style( 'groundhogg-admin-contact-inline' );
 
-//			wp_enqueue_script( 'groundhogg-admin-contact-inline' );
-
 			$current_filters = [];
 			$saved_search    = false;
 
@@ -170,6 +169,8 @@ class Contacts_Page extends Admin_Page {
 
 			} else if ( $saved_search = get_url_var( 'saved_search' ) ) {
 				$saved_search = Saved_Searches::instance()->get( $saved_search );
+			} else {
+				$current_filters = get_filters_from_old_query_vars( get_request_query() );
 			}
 
 			enqueue_step_type_assets();

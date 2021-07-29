@@ -436,6 +436,19 @@ class Main_Updater extends Updater {
 	 * Refactor notes db
 	 */
 	public function version_3_0() {
+
+		get_db('activity')->update([
+			'activity_type' => 'login'
+		], [
+			'activity_type' => 'wp_login'
+		]);
+
+		get_db('activity')->update([
+			'activity_type' => 'logout'
+		], [
+			'activity_type' => 'wp_logout'
+		]);
+
 		// For woocommerce, unable to see admin dashboard
 		wp_roles()->add_cap( 'marketer', 'manage_campaigns' );
 		wp_roles()->add_cap( 'marketer', 'export_funnels' );
