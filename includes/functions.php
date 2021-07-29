@@ -1455,16 +1455,20 @@ function create_user_from_contact( $contact, $role = 'subscriber', $notification
 	// Remove this action to avoid looping when creating a the user
 	remove_action( 'user_register', __NAMESPACE__ . '\convert_user_to_contact_when_user_registered' );
 
-	$user_id = wp_insert_user( [
+	// Filter all the user args
+	$new_user_args = apply_filters( 'groundhogg/create_user_from_contact/new_user_args', [
 		'user_pass'     => wp_generate_password(),
 		'user_email'    => $contact->get_email(),
-		'user_login'    => $contact->get_email(),
+		// Filter the user login
+		'user_login'    => apply_filters( 'groundhogg/create_user_from_contact/user_login', $contact->get_email(), $contact ),
 		'user_nicename' => $contact->get_full_name(),
 		'display_name'  => $contact->get_full_name(),
 		'first_name'    => $contact->get_first_name(),
 		'last_name'     => $contact->get_last_name(),
 		'role'          => $role
-	] );
+	], $contact );
+
+	$user_id = wp_insert_user( $new_user_args );
 
 	// May need this action, restore it.
 	add_action( 'user_register', __NAMESPACE__ . '\convert_user_to_contact_when_user_registered' );

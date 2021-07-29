@@ -166,7 +166,7 @@ class Event_Queue extends Supports_Errors {
 	public function run_queue() {
 
 		// Let's make sure we are not over doing it.
-		if ( ! $this->is_enabled() || Limits::limits_exceeded() ) {
+		if ( ! $this->is_enabled() ) {
 			return 0;
 		}
 
@@ -301,7 +301,6 @@ class Event_Queue extends Supports_Errors {
 		}
 
 		return $this->process( $completed_events );
-//		return $completed_events;
 	}
 
 	/**
