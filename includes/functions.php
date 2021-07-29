@@ -5406,6 +5406,26 @@ function get_filters_from_old_query_vars( $query = [] ) {
 		];
 	}
 
+	if ( isset_not_empty( $query, 'date_before' ) || isset_not_empty( $query, 'date_after' ) ){
+
+		$compare = 'between';
+		// between
+		if ( isset_not_empty( $query, 'date_before' ) && isset_not_empty( $query, 'date_after' ) ) {
+			$compare = 'between';
+		} else if ( isset_not_empty( $query, 'date_after' ) ) {
+			$compare = 'after';
+		} else if ( isset_not_empty( $query, 'date_before' ) ) {
+			$compare = 'before';
+		}
+
+		$filters[] = [
+			'type'       => 'date_created',
+			'date_range' => $compare,
+			'after'      => get_array_var( $query, 'date_after' ),
+			'before'     => get_array_var( $query, 'date_before' )
+		];
+	}
+
 	if ( isset_not_empty( $query, 'report' ) ) {
 
 		$events_query = wp_parse_args( $query['report'], [
@@ -5488,8 +5508,8 @@ function get_filters_from_old_query_vars( $query = [] ) {
 						'type'     => 'email_link_clicked',
 						'email_id' => absint( $activity_query['email_id'] ),
 						'link'     => get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) ),
-						'after'    => Ymd_His( absint( get_array_var( $events_query, 'after' ) ) ),
-						'before'   => Ymd_His( absint( get_array_var( $events_query, 'before' ) ) )
+						'after'    => Ymd_His( absint( get_array_var( $activity_query, 'after' ) ) ),
+						'before'   => Ymd_His( absint( get_array_var( $activity_query, 'before' ) ) )
 					];
 				}
 				break;
@@ -5506,8 +5526,8 @@ function get_filters_from_old_query_vars( $query = [] ) {
 					$filters[] = [
 						'type'     => 'email_opened',
 						'email_id' => absint( $activity_query['email_id'] ),
-						'after'    => Ymd_His( absint( get_array_var( $events_query, 'after' ) ) ),
-						'before'   => Ymd_His( absint( get_array_var( $events_query, 'before' ) ) )
+						'after'    => Ymd_His( absint( get_array_var( $activity_query, 'after' ) ) ),
+						'before'   => Ymd_His( absint( get_array_var( $activity_query, 'before' ) ) )
 					];
 				}
 
@@ -5535,15 +5555,12 @@ function get_filters_from_old_query_vars( $query = [] ) {
 	];
 
 	// Meta Key
-	if ( isset_not_empty( $query, 'meta_key' )
-	     && isset_not_empty( $query, 'meta_value' )
-	     && isset_not_empty( $query, 'meta_compare' )
-	) {
+	if ( isset_not_empty( $query, 'meta_key' ) ) {
 		$filters[] = [
 			'type'    => 'meta',
 			'meta'    => $query['meta_key'],
-			'compare' => get_array_var( $meta_compare_map, $query['meta_compare'], 'equals' ),
-			'value'   => $query['meta_value']
+			'compare' => get_array_var( $meta_compare_map, get_array_var( $query, 'meta_compare' ), 'equals' ),
+			'value'   => get_array_var( $query, 'meta_value' )
 		];
 	}
 

@@ -354,12 +354,12 @@
 
       getSteps (funnelId, checkEdited = false) {
         const funnel = funnelId ? this.items.find(f => f.ID === funnelId) : this.item
-        return !checkEdited ? funnel.steps : funnel.meta.edited.steps
+        return checkEdited && funnel.meta.edited ? funnel.meta.edited.steps : funnel.steps
       },
 
       getFunnelAndStep (funnelId, stepId, checkEdited = false) {
         const funnel = funnelId ? this.items.find(f => f.ID === funnelId) : this.item
-        const step = !checkEdited ? funnel.steps.find(s => s.ID === stepId) : funnel.meta.edited.steps.find(s => s.ID === stepId)
+        const step = checkEdited && funnel.meta.edited  ? funnel.meta.edited.steps.find(s => s.ID === stepId) : funnel.steps.find(s => s.ID === stepId)
         return { funnel, step }
       },
 

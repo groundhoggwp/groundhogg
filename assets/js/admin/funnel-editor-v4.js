@@ -1295,12 +1295,15 @@
         ],
         onSelect: (email) => {
           this.render()
+
           EmailsStore.itemsFetched([
             email
           ])
+
           updateStepMeta({
             email_id: email.ID
-          }, true)
+          })
+
           this.renderEmailEditor(email)
         },
         afterHeaderActions: toEditorButton(),
@@ -1915,7 +1918,6 @@
       $('#add-new-email-right').on('click', () => {
         Editor.renderEmailTemplatePicker(updateStepMeta)
       })
-
 
       emailPicker('#email-picker-right', false, (items) => EmailsStore.itemsFetched(items), {}, { width: '100%' })
         .on('change', (e) => {

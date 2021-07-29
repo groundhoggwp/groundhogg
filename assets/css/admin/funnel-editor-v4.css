@@ -254,11 +254,17 @@
 #funnel-editor .step-flow .steps .step.has-warnings {
   box-shadow: 0 0 0 1px #ffee58;
 }
+#funnel-editor .step-flow .steps .step.has-warnings.active {
+  box-shadow: 0 0 0 2px #ffee58;
+}
 #funnel-editor .step-flow .steps .step.has-warnings .step-type {
   color: #ffee58;
 }
 #funnel-editor .step-flow .steps .step.has-errors {
   box-shadow: 0 0 0 1px #e91f4f;
+}
+#funnel-editor .step-flow .steps .step.has-errors.active {
+  box-shadow: 0 0 0 2px #e91f4f;
 }
 #funnel-editor .step-flow .steps .step.has-errors .step-type {
   color: #e91f4f;
@@ -347,6 +353,12 @@
 #funnel-editor .step.active.benchmark .is-entry:before {
   background-color: #f58115;
   box-shadow: 0 0 0 2px #f58115;
+}
+#funnel-editor .step.active.has-warnings {
+  box-shadow: 0 0 0 2px #ffee58;
+}
+#funnel-editor .step.active.has-errors {
+  box-shadow: 0 0 0 2px #e91f4f;
 }
 #funnel-editor .step-status:before {
   color: white;

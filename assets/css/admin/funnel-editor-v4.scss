@@ -314,6 +314,10 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
   .step-flow .steps .step.has-warnings {
     box-shadow: 0 0 0 1px $alert-yellow;
 
+    &.active{
+      box-shadow: 0 0 0 2px $alert-yellow;
+    }
+
     .step-type {
       color: $alert-yellow;
     }
@@ -321,6 +325,10 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
 
   .step-flow .steps .step.has-errors {
     box-shadow: 0 0 0 1px $error-red;
+
+    &.active{
+      box-shadow: 0 0 0 2px $error-red;
+    }
 
     .step-type {
       color: $error-red;
@@ -442,6 +450,14 @@ $border: 1px solid rgba(16, 38, 64, 0.15);
           //left: -2px;
         }
       }
+    }
+
+    &.has-warnings {
+      box-shadow: 0 0 0 2px $alert-yellow;
+    }
+
+    &.has-errors {
+      box-shadow: 0 0 0 2px $error-red;
     }
   }
 

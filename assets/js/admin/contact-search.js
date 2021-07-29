@@ -25,6 +25,8 @@
 
   const { StepTypes } = Groundhogg
 
+  const { sprintf, __, _x, _n } = wp.i18n
+
   StepTypes.setup()
 
   SearchesStore.itemsFetched(ContactSearch.searches)

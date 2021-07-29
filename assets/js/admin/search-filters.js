@@ -136,7 +136,9 @@
     does_not_start_with: _x('Does not start with', 'comparison', 'groundhogg'),
     does_not_end_with: _x('Does not end with', 'comparison', 'groundhogg'),
     less_than: _x('Less than', 'comparison', 'groundhogg'),
+    less_than_or_equal_to: _x('Less than or equal to', 'comparison', 'groundhogg'),
     greater_than: _x('Greater than', 'comparison', 'groundhogg'),
+    greater_than_or_equal_to: _x('Greater than or equal to', 'comparison', 'groundhogg'),
     empty: _x('Is empty', 'comparison', 'groundhogg'),
     not_empty: _x('Is not empty', 'comparison', 'groundhogg')
   }

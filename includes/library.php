@@ -115,21 +115,21 @@ class Library extends Supports_Errors {
 	 * @return mixed
 	 */
 	public function get_email_templates() {
-//		$emails = get_transient( 'groundhogg_email_templates' );
-//
-//		if ( ! empty( $emails ) ) {
-//			return $emails;
-//		}
 
 		$templates = $this->request( 'emails', [ 'limit' => 999, 'status' => 'ready' ] );
 
-//		var_dump( $templates );
-
 		$templates = array_map( function ( $e ) {
 
+			$data = get_array_var( $e, 'data' );
+			$meta = get_array_var( $e, 'meta' );
+
+			unset( $data['ID'] );
+			$data['from_user'] = get_current_user_id();
+			$data['author']    = get_current_user_id();
+
 			$email       = new Email();
-			$email->data = get_array_var( $e, 'data' );
-			$email->meta = get_array_var( $e, 'meta' );
+			$email->data = $data;
+			$email->meta = $meta;
 			$email->ID   = uniqid( 'email-' );
 
 			return $email;
