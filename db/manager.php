@@ -8,6 +8,7 @@ use function Groundhogg\isset_not_empty;
  * DB Manager to manage databases in Groundhogg
  *
  * Class Manager
+ *
  * @package Groundhogg\DB
  */
 class Manager {
@@ -20,8 +21,6 @@ class Manager {
 	protected $dbs = [];
 
 	protected $initialized = false;
-
-	protected $tables_installed = false;
 
 	/**
 	 * Manager constructor.
@@ -49,28 +48,32 @@ class Manager {
 	 * Setup the base DBs for the plugin
 	 */
 	public function init_dbs() {
-		$this->activity          = new Activity();
-		$this->activitymeta      = new Activity_Meta();
-		$this->broadcasts        = new Broadcasts();
-		$this->broadcastmeta     = new Broadcast_Meta();
-		$this->contactmeta       = new Contact_Meta();
-		$this->contacts          = new Contacts();
-		$this->emailmeta         = new Email_Meta();
-		$this->emails            = new Emails();
-		$this->events            = new Events();
-		$this->funnels           = new Funnels();
-		$this->funnelmeta        = new Funnel_Meta();
-		$this->stepmeta          = new Step_Meta();
-		$this->steps             = new Steps();
-		$this->tags              = new Tags();
-		$this->tag_relationships = new Tag_Relationships();
-		$this->submissions       = new Submissions();
-		$this->submissionmeta    = new Submission_Meta();
-		$this->form_impressions  = new Form_Impressions();
-		$this->notes             = new Notes();
-		$this->permissions_keys  = new Permissions_Keys();
-		$this->email_log         = new Email_Log();
-		$this->event_queue       = new Event_Queue();
+		$this->activity             = new Activity();
+		$this->other_activity       = new Other_Activity();
+		$this->activitymeta         = new Activity_Meta();
+		$this->other_activitymeta   = new Other_Activity_Meta();
+		$this->broadcasts           = new Broadcasts();
+		$this->broadcastmeta        = new Broadcast_Meta();
+		$this->contactmeta          = new Contact_Meta();
+		$this->contacts             = new Contacts();
+		$this->emailmeta            = new Email_Meta();
+		$this->emails               = new Emails();
+		$this->events               = new Events();
+		$this->funnels              = new Funnels();
+		$this->funnelmeta           = new Funnel_Meta();
+		$this->stepmeta             = new Step_Meta();
+		$this->steps                = new Steps();
+		$this->tags                 = new Tags();
+		$this->tag_relationships    = new Tag_Relationships();
+		$this->submissions          = new Submissions();
+		$this->submissionmeta       = new Submission_Meta();
+		$this->form_impressions     = new Form_Impressions();
+		$this->notes                = new Notes();
+		$this->permissions_keys     = new Permissions_Keys();
+		$this->email_log            = new Email_Log();
+		$this->event_queue          = new Event_Queue();
+		$this->campaigns            = new Campaigns();
+		$this->object_relationships = new Object_Relationships();
 
 		/**
 		 * Runs when the DB Manager is setup and all the standard DBs have been initialized.
@@ -84,11 +87,6 @@ class Manager {
 	 * Install all DBS.
 	 */
 	public function install_dbs() {
-
-		if ( $this->tables_installed ){
-			return;
-		}
-
 		if ( empty( $this->dbs ) ) {
 			$this->init_dbs();
 		}
@@ -96,8 +94,6 @@ class Manager {
 		foreach ( $this->dbs as $db ) {
 			$db && $db->create_table();
 		}
-
-		$this->tables_installed = true;
 	}
 
 	/**
@@ -187,9 +183,14 @@ class Manager {
 		$this->dbs[ $key ] = $value;
 	}
 
+	/**
+	 * @param $type
+	 *
+	 * @return DB
+	 */
 	public function get_object_db_by_object_type( $type ) {
 
-		$dbs = array_filter( $this->dbs, function ( $db ) use ($type){
+		$dbs = array_filter( $this->dbs, function ( $db ) use ( $type ) {
 			return $db->get_object_type() === $type && ! method_exists( $db, 'add_meta' );
 		} );
 
@@ -198,21 +199,21 @@ class Manager {
 
 	public function get_meta_db_by_object_type( $type ) {
 
-		$dbs = array_filter( $this->dbs, function ( $db ) use ($type){
+		$dbs = array_filter( $this->dbs, function ( $db ) use ( $type ) {
 			return $db->get_object_type() === $type && method_exists( $db, 'add_meta' );
 		} );
 
 		return array_shift( $dbs );
 	}
 
-	public function get_all_meta_tables(){
-		return array_filter( $this->dbs, function ( $db ){
+	public function get_all_meta_tables() {
+		return array_filter( $this->dbs, function ( $db ) {
 			return method_exists( $db, 'add_meta' );
 		} );
 	}
 
-	public function get_all_object_tables(){
-		return array_filter( $this->dbs, function ( $db ){
+	public function get_all_object_tables() {
+		return array_filter( $this->dbs, function ( $db ) {
 			return ! method_exists( $db, 'add_meta' );
 		} );
 	}

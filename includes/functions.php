@@ -191,6 +191,24 @@ function get_db( $name ) {
 }
 
 /**
+ * @return string
+ */
+function last_db_error() {
+	global $wpdb;
+
+	return $wpdb->last_error;
+}
+
+/**
+ * @return string
+ */
+function last_db_query() {
+	global $wpdb;
+
+	return $wpdb->last_query;
+}
+
+/**
  * Can the dbs be used?
  *
  * @return bool
@@ -3291,6 +3309,15 @@ function get_date_time_format() {
 }
 
 /**
+ * @param $time
+ *
+ * @return string
+ */
+function format_date( $time ) {
+	return date_i18n( get_date_time_format(), $time );
+}
+
+/**
  * Url to access protected files in the Groundhogg uploads folder.
  *
  * @param $path     string abspath to a file.
@@ -3344,6 +3371,17 @@ function do_api_trigger( $call_name = '', $id_or_email = '', $by_user_id = false
  * @param bool   $by_user_id
  */
 function do_api_benchmark( $call_name = '', $id_or_email = '', $by_user_id = false ) {
+	do_api_trigger( $call_name, $id_or_email, $by_user_id );
+}
+
+/**
+ * Better named alias for do_api_trigger
+ *
+ * @param string $call_name
+ * @param string $id_or_email
+ * @param false  $by_user_id
+ */
+function do_plugin_api_benchmark( $call_name = '', $id_or_email = '', $by_user_id = false ) {
 	do_api_trigger( $call_name, $id_or_email, $by_user_id );
 }
 
@@ -3775,6 +3813,13 @@ add_action( 'admin_print_styles', function () {
 
 	?>
 	<style>
+
+        #wp-admin-bar-top-secondary #wp-admin-bar-groundhogg.groundhogg-admin-bar-menu .ab-item {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
         #adminmenu #toplevel_page_groundhogg a.gh_go_pro .dashicons {
             font-size: 18px;
             margin-right: 8px;
@@ -4084,12 +4129,32 @@ function generate_referer_hash( $referer ) {
 }
 
 /**
+ * Converts a date to an int
+ *
+ * @param $date
+ *
+ * @return false|int
+ */
+function date_as_int( $date ) {
+	return is_numeric( $date ) ? absint( $date ) : strtotime( $date );
+}
+
+/**
  * @param $time
  *
  * @return int
  */
 function convert_to_local_time( $time ) {
 	return Plugin::$instance->utils->date_time->convert_to_local_time( $time );
+}
+
+/**
+ * @param $time
+ *
+ * @return int
+ */
+function convert_to_utc_0( $time ) {
+	return Plugin::$instance->utils->date_time->convert_to_utc_0( $time );
 }
 
 /**
@@ -5017,4 +5082,483 @@ function get_object_ids( $array ) {
 	return array_map( function ( $object ) {
 		return $object->get_id();
 	}, $array );
+}
+
+
+function disable_emoji_feature() {
+
+	// Prevent Emoji from loading on the front-end
+	remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+	remove_action( 'wp_print_styles', 'print_emoji_styles' );
+
+	// Remove from admin area also
+	remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+	remove_action( 'admin_print_styles', 'print_emoji_styles' );
+
+	// Remove from RSS feeds also
+	remove_filter( 'the_content_feed', 'wp_staticize_emoji' );
+	remove_filter( 'comment_text_rss', 'wp_staticize_emoji' );
+
+	// Remove from Embeds
+	remove_filter( 'embed_head', 'print_emoji_detection_script' );
+
+	// Remove from emails
+	remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
+
+	// Disable from TinyMCE editor. Currently disabled in block editor by default
+	add_filter( 'tiny_mce_plugins', __NAMESPACE__ . '\disable_emojis_tinymce' );
+
+	/** Finally, prevent character conversion too
+	 ** without this, emojis still work
+	 ** if it is available on the user's device
+	 */
+	add_filter( 'option_use_smilies', '__return_false' );
+
+}
+
+function disable_emojis_tinymce( $plugins ) {
+	if ( is_array( $plugins ) ) {
+		$plugins = array_diff( $plugins, array( 'wpemoji' ) );
+	}
+
+	return $plugins;
+}
+
+//add_action('init', __NAMESPACE__ . '\disable_emoji_feature');
+
+/**
+ * @param $plugins
+ */
+function add_tiny_mce_plugin( $plugins ) {
+	$plugins['groundhogg'] = GROUNDHOGG_ASSETS_URL . 'js/admin/tiny-mce-plugin.js';
+//	var_dump( $plugins );
+//	die();
+	return $plugins;
+}
+
+//add_filter( 'mce_external_plugins', __NAMESPACE__ . '\add_tiny_mce_plugin' );
+
+// register new button in the editor
+function register_mce_button( $buttons ) {
+	array_push( $buttons, 'groundhoggreplacementbtn', 'groundhoggemojibtn' );
+//	var_dump( $buttons );
+
+	return $buttons;
+}
+
+/**
+ * Returns an array of all the meta keys in a table.
+ *
+ * @return array
+ */
+function get_keys() {
+	global $wpdb;
+	$table = get_db( 'contactmeta' );
+
+	$keys = $wpdb->get_col(
+		"SELECT DISTINCT meta_key FROM {$table->get_table_name()} ORDER BY meta_key ASC"
+	);
+
+	$key_array = array_combine( $keys, $keys );
+
+	return $key_array;
+}
+
+add_filter( 'mce_buttons', __NAMESPACE__ . '\register_mce_button' );
+
+function get_pages_list() {
+	$pages      = get_pages();
+	$lists_page = array();
+	foreach ( $pages as $page ) {
+		$lists_page[] = get_page_link( $page->ID );
+	}
+
+	return $lists_page;
+}
+
+/**
+ * Creates a relationship between two objects
+ *
+ * @param $primary   Base_Object
+ * @param $secondary Base_Object
+ *
+ * @return bool
+ */
+function create_object_relationship( $primary, $secondary ) {
+	return (bool) get_db( 'object_relationships' )->add( [
+		'primary_object_id'     => $primary->get_id(),
+		'primary_object_type'   => $primary->get_object_type,
+		'secondary_object_id'   => $secondary->get_id(),
+		'secondary_object_type' => $secondary->get_object_type,
+	] );
+}
+
+/**
+ * Delete a relationship between two objects
+ *
+ * @param Base_Object $primary
+ * @param Base_Object $secondary
+ *
+ * @return bool
+ */
+function delete_object_relationship( $primary, $secondary ) {
+	return get_db( 'object_relationships' )->delete( [
+		'primary_object_id'     => $primary->get_id(),
+		'primary_object_type'   => $primary->get_object_type,
+		'secondary_object_id'   => $secondary->get_id(),
+		'secondary_object_type' => $secondary->get_object_type,
+	] );
+}
+
+
+/**
+ * Delete a relationship between two objects
+ *
+ * @param Base_Object $primary
+ * @param Base_Object $secondary
+ *
+ * @return bool
+ */
+function has_object_relationship( $primary, $secondary ) {
+	return get_db( 'object_relationships' )->exists( [
+		'primary_object_id'     => $primary->get_id(),
+		'primary_object_type'   => $primary->get_object_type,
+		'secondary_object_id'   => $secondary->get_id(),
+		'secondary_object_type' => $secondary->get_object_type,
+	] );
+}
+
+/**
+ * Get relationships for an object
+ *
+ * @param Base_Object $object
+ * @param bool        $is_primary
+ */
+function get_object_relationships( $object, $is_primary = true ) {
+	return get_db( 'object_relationships' )->query( [
+		$is_primary ? 'primary_object_id' : 'secondary_object_id'     => $object->get_id(),
+		$is_primary ? 'primary_object_type' : 'secondary_object_type' => $object->get_object_type,
+	] );
+}
+
+/**
+ * Compare two dates
+ *
+ * @param $before
+ * @param $after
+ */
+function compare_dates( &$before, &$after ) {
+
+	if ( strtotime( $before ) < strtotime( $after ) ) {
+		return true;
+	} else if ( strtotime( $after ) < strtotime( $before ) ) {
+		$temp   = $before;
+		$before = $after;
+		$after  = $temp;
+
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * Create an Object extending Base_Object given very little information
+ *
+ * @param $object      mixed
+ * @param $object_type string
+ */
+function create_object_from_type( $object, $object_type ) {
+
+	$table = Plugin::instance()->dbs->get_object_db_by_object_type( $object_type );
+
+	return $table->create_object( $object );
+}
+
+/**
+ * Whether this site provides templates, if so then the gh/v4/emails READ and gh/v4/funnels READ will be public
+ */
+function is_template_site() {
+	// Todo change this
+	return apply_filters( 'groundhogg/is_template_site', true );
+}
+
+/**
+ * Enqueue any step type registration assets
+ */
+function enqueue_step_type_assets() {
+	do_action( 'groundhogg_enqueue_step_type_assets' );
+}
+
+/**
+ * Get the original link from the referer_hash
+ *
+ * @param $hash
+ *
+ * @return false|string
+ */
+function get_referer_from_referer_hash( $hash ) {
+	return get_db( 'activity' )->get_column_by( 'referer', 'referer_hash', $hash );
+}
+
+/**
+ * Changes the contact query vars in a query pre version 2.5 to a filters query so that
+ * the filters show in the new contact filtering search
+ *
+ * The search query pre 2.5 is all an AND clauses
+ *
+ * @param $query
+ *
+ * @return array|false
+ */
+function get_filters_from_old_query_vars( $query = [] ) {
+
+	$filters = [];
+
+	$common_query_filters = [
+		'first_name',
+		'last_name',
+		'email',
+	];
+
+	// First Name | Last Name | Email
+	foreach ( $common_query_filters as $common_query_filter ) {
+		if ( isset_not_empty( $query, $common_query_filter ) ) {
+			$filters[] = [
+				'type'    => $common_query_filter,
+				'compare' => get_array_var( $common_query_filter . '_compare', 'contains' ),
+				'value'   => $query[ $common_query_filter ]
+			];
+		}
+	}
+
+	// Optin Status
+	if ( isset_not_empty( $query, 'optin_status' ) ) {
+		$filters[] = [
+			'type'    => 'optin_status',
+			'compare' => 'in',
+			'value'   => ensure_array( $query['optin_status'] )
+		];
+	}
+
+	// Optin Status
+	if ( isset_not_empty( $query, 'optin_status_exclude' ) ) {
+		$filters[] = [
+			'type'    => 'optin_status',
+			'compare' => 'not_in',
+			'value'   => wp_parse_id_list( ensure_array( $query['optin_status_exclude'] ) )
+		];
+	}
+
+	// Contact owner
+	if ( isset_not_empty( $query, 'owner' ) ) {
+		$filters[] = [
+			'type'    => 'owner',
+			'compare' => 'in',
+			'value'   => wp_parse_id_list( ensure_array( $query['owner'] ) )
+		];
+	}
+
+	// Tags
+	if ( isset_not_empty( $query, 'tags_include' ) ) {
+		$filters[] = [
+			'type'     => 'tags',
+			'compare'  => 'includes',
+			'compare2' => isset_not_empty( $query, 'tags_include_needs_all' ) ? 'any' : 'all',
+			'tags'     => wp_parse_id_list( ensure_array( $query['tags_include'] ) )
+		];
+	}
+
+	// Tags
+	if ( isset_not_empty( $query, 'tags_exclude' ) ) {
+		$filters[] = [
+			'type'     => 'tags',
+			'compare'  => 'excludes',
+			'compare2' => isset_not_empty( $query, 'tags_excludes_needs_all' ) ? 'any' : 'all',
+			'tags'     => wp_parse_id_list( ensure_array( $query['tags_exclude'] ) ),
+		];
+	}
+
+	if ( isset_not_empty( $query, 'date_query' ) ) {
+
+		$date_query = $query['date_query'];
+
+		$compare = false;
+		// between
+		if ( isset_not_empty( $date_query, 'after' ) && isset_not_empty( $date_query, 'before' ) ) {
+			$compare = 'between';
+		} else if ( isset_not_empty( $date_query, 'after' ) ) {
+			$compare = 'after';
+		} else if ( isset_not_empty( $date_query, 'before' ) ) {
+			$compare = 'before';
+		}
+
+		$filters[] = [
+			'type'       => 'date_created',
+			'date_range' => $compare,
+			'after'      => get_array_var( $date_query, 'after' ),
+			'before'     => get_array_var( $date_query, 'before' )
+		];
+	}
+
+	if ( isset_not_empty( $query, 'date_before' ) || isset_not_empty( $query, 'date_after' ) ){
+
+		$compare = 'between';
+		// between
+		if ( isset_not_empty( $query, 'date_before' ) && isset_not_empty( $query, 'date_after' ) ) {
+			$compare = 'between';
+		} else if ( isset_not_empty( $query, 'date_after' ) ) {
+			$compare = 'after';
+		} else if ( isset_not_empty( $query, 'date_before' ) ) {
+			$compare = 'before';
+		}
+
+		$filters[] = [
+			'type'       => 'date_created',
+			'date_range' => $compare,
+			'after'      => get_array_var( $query, 'date_after' ),
+			'before'     => get_array_var( $query, 'date_before' )
+		];
+	}
+
+	if ( isset_not_empty( $query, 'report' ) ) {
+
+		$events_query = wp_parse_args( $query['report'], [
+			'event_type' => Event::FUNNEL
+		] );
+
+		$map = [
+			'step'   => 'step_id',
+			'funnel' => 'funnel_id',
+			'start'  => 'after',
+			'end'    => 'before',
+			'type'   => 'event_type',
+		];
+
+		foreach ( $map as $old_key => $new_key ) {
+			if ( $val = get_array_var( $events_query, $old_key ) ) {
+				$events_query[ $new_key ] = $val;
+			}
+		}
+
+		switch ( absint( $events_query['event_type'] ) ) {
+			default:
+			case Event::FUNNEL:
+				$filters[] = [
+					'type'       => 'funnel_history',
+					'status'     => $events_query['status'],
+					'funnel_id'  => absint( get_array_var( $events_query, 'funnel_id' ) ),
+					'step_id'    => absint( get_array_var( $events_query, 'step_id' ) ),
+					'date_range' => 'between',
+					'after'      => Ymd_His( absint( get_array_var( $events_query, 'after' ) ) ),
+					'before'     => Ymd_His( absint( get_array_var( $events_query, 'before' ) ) )
+				];
+
+				break;
+
+			case Event::BROADCAST:
+				$filters[] = [
+					'type'         => 'received_broadcast',
+					'status'       => $events_query['status'],
+					'broadcast_id' => absint( get_array_var( $events_query, 'step_id' ) ),
+				];
+
+				break;
+			case Event::EMAIL_NOTIFICATION:
+				break;
+		}
+	}
+
+	if ( isset_not_empty( $query, 'activity' ) ) {
+
+		$activity_query = wp_parse_args( $query['activity'], [
+			'activity_type' => ''
+		] );
+
+		$map = [
+			'step'   => 'step_id',
+			'funnel' => 'funnel_id',
+			'start'  => 'after',
+			'end'    => 'before',
+		];
+
+		foreach ( $map as $old_key => $new_key ) {
+			if ( $val = get_array_var( $activity_query, $old_key ) ) {
+				$activity_query[ $new_key ] = $val;
+			}
+		}
+
+		switch ( $activity_query['activity_type'] ) {
+			default:
+				break;
+			case 'email_link_click':
+				if ( $activity_query['funnel_id'] == 1 ) {
+					$filters[] = [
+						'type'         => 'broadcast_link_clicked',
+						'broadcast_id' => absint( $activity_query['step_id'] ),
+						'link'         => get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) )
+					];
+				} else {
+					$filters[] = [
+						'type'     => 'email_link_clicked',
+						'email_id' => absint( $activity_query['email_id'] ),
+						'link'     => get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) ),
+						'after'    => Ymd_His( absint( get_array_var( $activity_query, 'after' ) ) ),
+						'before'   => Ymd_His( absint( get_array_var( $activity_query, 'before' ) ) )
+					];
+				}
+				break;
+			case 'email_opened':
+
+				if ( $activity_query['funnel_id'] == 1 ) {
+
+					$filters[] = [
+						'type'         => 'broadcast_opened',
+						'broadcast_id' => absint( $activity_query['step_id'] )
+					];
+
+				} else {
+					$filters[] = [
+						'type'     => 'email_opened',
+						'email_id' => absint( $activity_query['email_id'] ),
+						'after'    => Ymd_His( absint( get_array_var( $activity_query, 'after' ) ) ),
+						'before'   => Ymd_His( absint( get_array_var( $activity_query, 'before' ) ) )
+					];
+				}
+
+				break;
+		}
+
+	}
+
+	// Meta
+	$meta_compare_map = [
+		'='          => 'equals',
+		'!='         => 'not_equals',
+		'>'          => 'greater_than',
+		'gt'         => 'greater_than',
+		'<'          => 'less_than',
+		'lt'         => 'less_than',
+		'>='         => 'greater_than_or_equal_to',
+		'gt_eq'      => 'greater_than_or_equal_to',
+		'<='         => 'less_than_or_equal_to',
+		'lt_eq'      => 'less_than_or_equal_to',
+		'REGEXP'     => 'contains',
+		'NOT REGEXP' => 'not_contains',
+		'EXISTS'     => 'not_empty',
+		'NOT EXISTS' => 'empty',
+	];
+
+	// Meta Key
+	if ( isset_not_empty( $query, 'meta_key' ) ) {
+		$filters[] = [
+			'type'    => 'meta',
+			'meta'    => $query['meta_key'],
+			'compare' => get_array_var( $meta_compare_map, get_array_var( $query, 'meta_compare' ), 'equals' ),
+			'value'   => get_array_var( $query, 'meta_value' )
+		];
+	}
+
+	// Filters is an array[] so wrap in another array
+	return ! empty( $filters ) ? [ $filters ] : false;
 }

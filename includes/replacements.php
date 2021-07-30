@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @package     Includes
  */
-class Replacements {
+class Replacements implements \JsonSerializable {
 
 	/**
 	 * Array of replacement codes and their callback functions
@@ -1272,4 +1272,7 @@ class Replacements {
 		return $quotes[ $quote ];
 	}
 
+	public function jsonSerialize() {
+		return false;
+	}
 }

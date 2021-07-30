@@ -52,7 +52,7 @@ class License_Notice {
 		?>
         <div class="notice notice-warning is-dismissible">
             <img style="float: left;margin: 12px 10px 10px 0" height="80"
-                 src="<?php echo GROUNDHOGG_ASSETS_URL . '/images/phil-340x340.png'; ?>" alt="Phil">
+                 src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png'; ?>" alt="Phil">
             <p><?php printf( __( "<b>Oops!</b> Your Groundhogg license <code>%s</code> has expired. Please renew it to continue receiving critical updates and support.", 'groundhogg' ), $license_key ) ?></p>
             <p>
                 <a class="button button-primary" target="_blank"
@@ -93,7 +93,7 @@ class License_Notice {
 		?>
         <div class="notice notice-warning is-dismissible">
             <img style="float: left;margin: 12px 10px 10px 0" height="80"
-                 src="<?php echo GROUNDHOGG_ASSETS_URL . '/images/phil-340x340.png'; ?>" alt="Phil">
+                 src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png'; ?>" alt="Phil">
             <p><?php printf( __( "<b>License your extensions!</b> Some of your premium extensions are missing a license key. Remember to add your license key to receive critical updates and support.", 'groundhogg' ) ); ?></p>
             <p>
                 <a class="button button-primary"

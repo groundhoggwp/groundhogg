@@ -10,9 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Groundhogg\Base_Object;
 use Groundhogg\Base_Object_With_Meta;
 use Groundhogg\Broadcast;
+use Groundhogg\Campaign;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Classes\Note;
 use Groundhogg\Contact;
+use Groundhogg\DB_Object;
 use Groundhogg\Email;
 use Groundhogg\Event;
 use Groundhogg\Funnel;
@@ -20,6 +22,7 @@ use Groundhogg\Step;
 use Groundhogg\Tag;
 
 //use Groundhogg\Webhook;
+use function Groundhogg\create_object_from_type;
 use function Groundhogg\get_array_var;
 use WP_REST_Server;
 use WP_REST_Request;
@@ -50,13 +53,14 @@ abstract class Base_Object_Api extends Base_Api {
 			'broadcast' => Broadcast::class,
 			'event'     => Event::class,
 //			'webhook'   => Webhook::class,
-			'activity'  => Activity::class
+			'activity'  => Activity::class,
+			'campaign'  => Campaign::class
 		] );
 
 		$class = get_array_var( $object_type_class_map, $this->get_object_type() );
 
 		if ( ! $class ) {
-			return Base_Object::class;
+			return DB_Object::class;
 		}
 
 		return $class;
@@ -243,6 +247,24 @@ abstract class Base_Object_Api extends Base_Api {
 			] );
 
 		}
+
+		register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/relationships", [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'create_single_relationships' ],
+				'permission_callback' => [ $this, 'create_permissions_callback' ]
+			],
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'read_single_relationships' ],
+				'permission_callback' => [ $this, 'read_permissions_callback' ]
+			],
+			[
+				'methods'             => WP_REST_Server::DELETABLE,
+				'callback'            => [ $this, 'delete_single_relationships' ],
+				'permission_callback' => [ $this, 'delete_permissions_callback' ]
+			],
+		] );
 	}
 
 	/**
@@ -402,7 +424,7 @@ abstract class Base_Object_Api extends Base_Api {
 	 */
 	public function delete( WP_REST_Request $request ) {
 
-		$query = $request->get_param( 'query' );
+		$query = wp_parse_args( $request->get_params() );
 
 		if ( ! empty( $query ) ) {
 			$items = $this->get_db_table()->query( $query );
@@ -412,14 +434,18 @@ abstract class Base_Object_Api extends Base_Api {
 
 		$items = array_map( [ $this, 'map_raw_object_to_class' ], $items );
 
+		$deleted_item_ids = [];
+
 		/**
 		 * @var $object Base_Object
 		 */
 		foreach ( $items as $object ) {
+			$deleted_item_ids[] = $object->get_id();
 			$object->delete();
 		}
 
 		return self::SUCCESS_RESPONSE( [
+			'items'       => $deleted_item_ids,
 			'total_items' => count( $items ),
 		] );
 	}
@@ -599,6 +625,88 @@ abstract class Base_Object_Api extends Base_Api {
 		$meta = $request->get_json_params();
 
 		$object->delete_meta( $meta );
+
+		return self::SUCCESS_RESPONSE( [
+			'item' => $object
+		] );
+	}
+
+	/**
+	 * Create a relationship between the given object and another object
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function create_single_relationships( WP_REST_Request $request ) {
+
+		$primary_key = absint( $request->get_param( $this->get_primary_key() ) );
+
+		$object = $this->create_new_object( $primary_key );
+
+		if ( ! $object->exists() ) {
+			return $this->ERROR_RESOURCE_NOT_FOUND();
+		}
+
+		$other_id   = $request->get_param( 'other_id' );
+		$other_type = $request->get_param( 'other_type' );
+
+		$other = create_object_from_type( $other_id, $other_type );
+
+		$object->create_relationship( $other );
+
+		return self::SUCCESS_RESPONSE( [
+			'item' => $object
+		] );
+	}
+
+	/**
+	 * Create a relationship between the given object and another object
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function read_single_relationships( WP_REST_Request $request ) {
+
+		$primary_key = absint( $request->get_param( $this->get_primary_key() ) );
+
+		$object = $this->create_new_object( $primary_key );
+
+		if ( ! $object->exists() ) {
+			return $this->ERROR_RESOURCE_NOT_FOUND();
+		}
+
+		$other_type = $request->get_param( 'other_type' );
+
+		return self::SUCCESS_RESPONSE( [
+			'items' => $object->get_related_objects( $other_type )
+		] );
+	}
+
+	/**
+	 * Create a relationship between the given object and another object
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function delete_single_relationships( WP_REST_Request $request ) {
+
+		$primary_key = absint( $request->get_param( $this->get_primary_key() ) );
+
+		$object = $this->create_new_object( $primary_key );
+
+		if ( ! $object->exists() ) {
+			return $this->ERROR_RESOURCE_NOT_FOUND();
+		}
+
+		$other_id   = $request->get_param( 'other_id' );
+		$other_type = $request->get_param( 'other_type' );
+
+		$other = create_object_from_type( $other_id, $other_type );
+
+		$object->delete_relationship( $other );
 
 		return self::SUCCESS_RESPONSE( [
 			'item' => $object

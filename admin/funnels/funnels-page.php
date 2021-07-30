@@ -21,6 +21,7 @@ use Groundhogg\Contact_Query;
 use Groundhogg\Step;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\last_db_error;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -560,10 +561,6 @@ class Funnels_Page extends Admin_Page {
 
 		$edit_url = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel_id );
 
-//		if ( is_option_enabled( 'gh_use_builder_version_2' ) ) {
-//			$edit_url = add_query_arg( [ 'version' => '2' ], $edit_url );
-//		}
-
 		return $edit_url;
 
 	}
@@ -607,15 +604,8 @@ class Funnels_Page extends Admin_Page {
 
 		$result = [];
 
-//		$result['chartData'] = $this->get_chart_data();
-
-//		if ( ! $this->is_v2() ) {
-//			$result['steps'] = $this->get_step_html();
-//		} else {
 		$result['settings'] = $this->get_step_html();
 		$result['sortable'] = $this->get_step_sortable();
-//		}
-
 
 		$this->send_ajax_response( $result );
 
@@ -629,13 +619,9 @@ class Funnels_Page extends Admin_Page {
 
 		foreach ( $steps as $step ) {
 
-//			if ( ! $this->is_v2() ) {
-//				$html .= $step->__toString();
-//			} else {
 			ob_start();
 			$step->html_v2();
 			$html .= ob_get_clean();
-//			}
 
 		}
 
@@ -656,80 +642,6 @@ class Funnels_Page extends Admin_Page {
 
 		return $html;
 	}
-
-//	/**
-//	 * Chart Data
-//	 *
-//	 * @var array
-//	 */
-//	protected $chart_data = [];
-
-//	/**
-//	 * The chart data
-//	 *
-//	 * @return array
-//	 */
-//	public function get_chart_data() {
-//		if ( ! empty( $this->chart_data ) ) {
-//			return $this->chart_data;
-//		}
-//
-//		$funnel = new Funnel( absint( get_request_var( 'funnel' ) ) );
-//		$steps  = $funnel->get_steps();
-//
-//		$dataset1 = array();
-//		$dataset2 = array();
-//
-//		foreach ( $steps as $i => $step ) {
-//
-//			$query = new Contact_Query();
-//
-//			$args = array(
-//				'report' => array(
-//					'funnel' => $funnel->get_id(),
-//					'step'   => $step->get_id(),
-//					'status' => 'complete',
-//					'start'  => $this->get_reporting_start_time(),
-//					'end'    => $this->get_reporting_end_time(),
-//				)
-//			);
-//
-//			$count = count( $query->query( $args ) );
-//
-//			$url = add_query_arg( $args, admin_url( 'admin.php?page=gh_contacts' ) );
-//
-//			$dataset1[] = array( ( $i + 1 ) . '. ' . $step->get_title(), $count, $url );
-//
-//			$args = array(
-//				'report' => array(
-//					'funnel' => intval( $_REQUEST['funnel'] ),
-//					'step'   => $step->ID,
-//					'status' => 'waiting'
-//				)
-//			);
-//
-//			$count = count( $query->query( $args ) );
-//
-//			$url = add_query_arg( $args, admin_url( 'admin.php?page=gh_contacts' ) );
-//
-//			$dataset2[] = array( ( $i + 1 ) . '. ' . $step->get_title(), $count, $url );
-//
-//		}
-//
-//		$ds[] = array(
-//			'label' => _x( 'Completed Events', 'stats', 'groundhogg' ),
-//			'data'  => $dataset1
-//		);
-//
-//		$ds[] = array(
-//			'label' => __( 'Waiting Contacts', 'stats', 'groundhogg' ),
-//			'data'  => $dataset2
-//		);
-//
-//		$this->chart_data = $ds;
-//
-//		return $ds;
-//	}
 
 	/**
 	 * Save the funnel
@@ -820,6 +732,9 @@ class Funnels_Page extends Admin_Page {
 
 	}
 
+	/**
+	 * Add new step via admin ajax
+	 */
 	public function add_step() {
 		if ( ! current_user_can( 'edit_funnels' ) ) {
 			$this->wp_die_no_access();
@@ -830,15 +745,11 @@ class Funnels_Page extends Admin_Page {
 			return;
 		}
 
-		$step_type  = get_request_var( 'step_type' );
-		$step_order = absint( get_request_var( 'step_order' ) );
+		$step_type = get_request_var( 'step_type' );
 
-//		if ( $this->is_v2() ) {
 		$after_step = new Step( absint( get_request_var( 'after_step' ) ) );
 		$step_order = $after_step->get_order() + 1;
-//		}
-
-		$funnel_id = absint( get_request_var( 'funnel_id' ) );
+		$funnel_id  = $after_step->get_funnel_id();
 
 		$elements = Plugin::$instance->step_manager->get_elements();
 
@@ -859,12 +770,6 @@ class Funnels_Page extends Admin_Page {
 			wp_send_json_error();
 		}
 
-//		if ( ! $this->is_v2() ) {
-//			ob_start();
-//			$step->html();
-//			$content = ob_get_clean();
-//			$this->send_ajax_response( [ 'html' => $content ] );
-//		} else {
 		ob_start();
 		$step->sortable_item();
 		$sortable = ob_get_clean();
@@ -876,7 +781,6 @@ class Funnels_Page extends Admin_Page {
 			'settings' => $settings,
 			'id'       => $step->get_id(),
 		] );
-//		}
 
 		wp_send_json_error();
 	}
@@ -925,12 +829,6 @@ class Funnels_Page extends Admin_Page {
 			$new_step->update_meta( $key, $value );
 		}
 
-//		if ( ! $this->is_v2() ) {
-//			ob_start();
-//			$new_step->html();
-//			$content = ob_get_clean();
-//			wp_send_json_success( [ 'data' => [ 'html' => $content ] ] );
-//		} else {
 		ob_start();
 		$new_step->sortable_item();
 		$sortable = ob_get_clean();
@@ -942,7 +840,6 @@ class Funnels_Page extends Admin_Page {
 			'settings' => $settings,
 			'id'       => $new_step->get_id(),
 		] );
-//		}
 
 		wp_send_json_error();
 	}

@@ -1,65 +1,151 @@
+@charset "UTF-8";
+.row-title img {
+  border-radius: 5px;
+}
+
+.contact-quick-edit {
+  width: 500px;
+}
+.contact-quick-edit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.contact-quick-edit-header .avatar-and-name {
+  display: flex;
+  gap: 20px;
+}
+.contact-quick-edit-header .avatar-and-name img {
+  border-radius: 5px;
+}
+.contact-quick-edit-header .avatar-and-name .edit-name {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.contact-quick-edit-header .avatar-and-name .edit-name input {
+  width: 100%;
+}
+.contact-quick-edit-fields {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.contact-quick-edit-fields .row {
+  display: flex;
+  gap: 20px;
+}
+.contact-quick-edit-fields .row.phone {
+  gap: 5px;
+}
+.contact-quick-edit-fields .row .primary-phone-ext {
+  width: 120px;
+}
+.contact-quick-edit-fields .row .col {
+  width: 100%;
+}
+.contact-quick-edit-fields .row .col input, .contact-quick-edit-fields .row .col select {
+  max-width: 100%;
+  width: 100%;
+}
+
 #wpbody-content .inline-edit-row-contact .inline-edit-col-left {
-    width: 50%;
+  width: 50%;
 }
 
 #wpbody-content .inline-edit-row-contact .inline-edit-col-right {
-    width: 50%;
+  width: 50%;
 }
 
 .search-label {
-    font-weight: 500;
-    font-size: 14px;
+  font-weight: 500;
+  font-size: 14px;
 }
 
-#search-filters {
-    margin-top: 20px;
+#search-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
 }
 
-#search-filters .saved-search-form {
-    border-top: 1px solid #ccd0d4;
-    margin-top: 20px;
-    padding-top: 10px;
+#search-panel .filters {
+  display: flex;
+  justify-content: flex-start;
+  /*align-items: center;*/
+  width: 100%;
+  gap: 5px;
+}
+
+#search-panel .contact-quick-search {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+#search-panel .search-filters-wrap {
+  width: 100%;
+}
+
+#search-panel .search-contacts-wrap {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+span#search-name {
+  cursor: pointer;
+}
+
+#search-panel button.enable-filters {
+  background: #FFFFFF;
+  border: 1px solid #8c8f94;
+  border-radius: 5px;
+  padding: 5px;
+  cursor: pointer;
 }
 
 .search-param {
-    display: inline-block;
-    margin: 5px;
-    max-width: 300px;
-    /*min-height: 150px;*/
-    /*min-width: 300px;*/
-    vertical-align: top;
-    padding: 10px;
-    /*border: 1px solid #e5e5e5;*/
+  display: inline-block;
+  margin: 5px;
+  max-width: 300px;
+  /*min-height: 150px;*/
+  /*min-width: 300px;*/
+  vertical-align: top;
+  padding: 10px;
+  /*border: 1px solid #e5e5e5;*/
 }
 
 .search-param input,
 .search-param select {
-    max-width: 100%;
+  max-width: 100%;
 }
 
 #search-filters .tags-filter.search-param {
-    display: inline-block;
-    max-width: 700px;
+  display: inline-block;
+  max-width: 700px;
 }
 
 #search-filters .tags-filter .filters {
-    display: flex;
-    justify-content: left;
-    /*float: left;*/
+  display: flex;
+  justify-content: left;
+  /*float: left;*/
 }
 
 #search-filters .tags-filter .filters .search-param {
-    padding: 0;
-    margin: 10px 10px 0 0;
+  padding: 0;
+  margin: 10px 10px 0 0;
 }
 
 .start-search {
-    padding-left: 15px;
+  padding-left: 15px;
 }
 
 .wp-list-table th#email,
 .wp-list-table th#tags_col {
-    width: 400px;
+  width: 400px;
 }
 
 .wp-list-table th,
@@ -68,16 +154,16 @@
 .wp-list-table #owner_id,
 .wp-list-table #tel_numbers,
 .wp-list-table #last_name {
-    width: 125px;
+  width: 125px;
 }
 
 .wp-list-table #birthday,
 .wp-list-table #date_created {
-    width: 200px;
+  width: 200px;
 }
 
 .wp-list-table #address {
-    width: 300px;
+  width: 300px;
 }
 
 li#option-delete a,
@@ -86,7 +172,7 @@ a.change-status.unsubscribed,
 a.change-status.spam,
 a.change-status.bounced,
 a.change-status.complained {
-    color: #a00;
+  color: #a00;
 }
 
 li#option-delete a:hover,
@@ -95,166 +181,159 @@ a.change-status.unsubscribed:hover,
 a.change-status.spam:hover,
 a.change-status.bounced:hover,
 a.change-status.complained:hover {
-    color: #dc3232;
+  color: #dc3232;
 }
 
 #quick-search {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
-    background: #f9f9f9;
-    margin-top: 10px;
-    margin-bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background: #f9f9f9;
+  margin-top: 10px;
+  margin-bottom: 0;
 }
 
 #quick-search .small-select-wrap {
-    width: 250px;
-    display: inline-block;
+  width: 250px;
+  display: inline-block;
 }
 
 #quick-search .tag-quick-search-wrap {
-    display: inline-block;
-    margin-right: 20px;
+  display: inline-block;
+  margin-right: 20px;
 }
 
-#quick-search .right form{
-    display: flex;
-    justify-content: space-between;
+#quick-search .right form {
+  display: flex;
+  justify-content: space-between;
 }
 
-#quick-search .right form .quick-search{
-    width: auto;
-}
-
-.or-separator {
-    /*border: 1px solid #cccccc;*/
-    height: 2px;
-    background: #cccccc;
-    position: relative;
-    margin: 15px 0;
-}
-
-.or-separator .or-circle {
-    height: 30px;
-    width: 30px;
-    position: absolute;
-    background: #cccccc;
-    border-radius: 50%;
-    left: 20px;
-    top: -14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+#quick-search .right form .quick-search {
+  width: auto;
 }
 
 .filter-group-wrap {
-    padding: 20px
+  padding: 20px;
 }
 
 td.column-tags_col .tags {
-    white-space: normal;
+  white-space: normal;
 }
 
 td.column-tags_col .tags .tag {
-    background: #f2f2f2;
-    padding: 3px 9px;
-    border-radius: 3px;
-    margin: 0 6px 6px 0;
-    font-size: 12px;
-    display: inline-block;
+  background: #f2f2f2;
+  padding: 3px 9px;
+  border-radius: 3px;
+  margin: 0 6px 6px 0;
+  font-size: 12px;
+  display: inline-block;
+}
+
+.more-actions:after {
+  content: "";
+  display: inline-block;
+  font: normal 18px/1 dashicons;
+  vertical-align: middle;
+  margin-left: 5px;
+  speak: never;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-decoration: none;
 }
 
 td.address .time-zone:before,
 td.address .ip-address:before {
-    content: "\f11f";
-    display: inline-block;
-    font: normal 13px/1 dashicons;
-    speak: never;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-decoration: none;
-    margin-right: 3px;
-    vertical-align: middle;
+  content: "";
+  display: inline-block;
+  font: normal 13px/1 dashicons;
+  speak: never;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-decoration: none;
+  margin-right: 3px;
+  vertical-align: middle;
 }
 
 td.address .time-zone:before {
-    content: "\f469";
+  content: "";
 }
 
 td.tel_numbers .dashicons {
-    font-size: 13px !important;
-    margin-right: 5px !important;
-    vertical-align: middle;
+  font-size: 13px !important;
+  margin-right: 5px !important;
+  vertical-align: middle;
 }
 
 .phone-ext {
-    width: 100px;
+  width: 100px;
 }
 
 .table-scroll {
-    position: relative;
-    width: 100%;
-    z-index: 1;
-    margin: auto;
-    overflow-y: auto;
+  position: relative;
+  width: 100%;
+  z-index: 1;
+  margin: auto;
+  overflow-y: auto;
 }
 
 .table-scroll table {
-    width: 100%;
-    min-width: 1280px;
-    margin: auto;
+  width: 100%;
+  min-width: 1280px;
+  margin: auto;
 }
 
 .table-wrap {
-    position: relative;
+  position: relative;
 }
 
 .table-scroll thead th {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
 }
 
 /* safari and ios need the tfoot itself to be position:sticky also */
 .table-scroll tfoot,
 .table-scroll tfoot th,
 .table-scroll tfoot td {
-    position: -webkit-sticky;
-    position: sticky;
-    bottom: 0;
-    z-index: 2;
+  position: -webkit-sticky;
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
 }
 
 tbody th.check-column,
 tfoot td.check-column,
 thead td.check-column {
-    position: -webkit-sticky;
-    position: sticky;
-    left: 0;
-    z-index: 4;
+  position: -webkit-sticky;
+  position: sticky;
+  left: 0;
+  z-index: 4;
 }
 
 thead th.column-email,
 tfoot th.column-email,
 tbody td.column-email {
-    position: -webkit-sticky;
-    position: sticky;
-    left: 33px;
-    z-index: 4;
+  position: -webkit-sticky;
+  position: sticky;
+  left: 33px;
+  z-index: 4;
 }
 
 td.check-column,
 thead th.column-email,
 tfoot th.column-email {
-    background: #ffffff;
+  background: #ffffff;
 }
 
 .alternate, .striped > tbody > :nth-child(odd) td,
 .alternate, .striped > tbody > :nth-child(odd) th {
-    background-color: #f9f9f9;
+  background-color: #f9f9f9;
 }
 
 .alternate, .striped > tbody > :nth-child(even) td,
 .alternate, .striped > tbody > :nth-child(even) th {
-    background-color: #ffffff;
+  background-color: #ffffff;
 }
+
+/*# sourceMappingURL=contacts.css.map */

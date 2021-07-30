@@ -2,7 +2,6 @@
 
 namespace Groundhogg;
 
-use Composer\Repository\PackageRepository;
 use Groundhogg\Api\V3\Unsubscribe_Api;
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Email_Meta;
@@ -81,6 +80,9 @@ class Email extends Base_Object_With_Meta {
 	 * @return void
 	 */
 	protected function post_setup() {
+
+		$this->ID = absint( $this->ID );
+
 		if ( $this->get_from_user_id() ) {
 			$this->from_userdata = get_userdata( $this->get_from_user_id() );
 		}
@@ -95,9 +97,9 @@ class Email extends Base_Object_With_Meta {
 		return 'email';
 	}
 
-	public function get_id() {
-		return absint( $this->ID );
-	}
+//	public function get_id() {
+//		return absint( $this->ID );
+//	}
 
 	public function get_subject_line() {
 		return $this->subject;
@@ -226,6 +228,14 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function enable_test_mode() {
 		$this->testing = true;
+
+		$edited = $this->get_meta( 'edited' ) ?: [
+			'data' => $this->data,
+			'meta' => $this->meta,
+		];
+
+		$this->data = $edited['data'];
+		$this->meta = $edited['meta'];
 	}
 
 	/**
@@ -341,9 +351,9 @@ class Email extends Base_Object_With_Meta {
 		/**
 		 * Filter the to address
 		 *
-		 * @param string $email
+		 * @param string  $email
 		 * @param Contact $contact
-		 * @param Email $email
+		 * @param Email   $email
 		 */
 		return apply_filters( 'groundhogg/email/to', $this->get_contact()->get_email(), $this->get_contact(), $this );
 	}
@@ -508,7 +518,7 @@ class Email extends Base_Object_With_Meta {
 		$url = is_option_enabled( 'gh_enable_one_click_unsubscribe' ) ? managed_page_url( 'preferences/unsubscribe' ) : managed_page_url( 'preferences/manage' );
 
 		// only add permissions key if this is a real email being sent.
-		if ( ! $this->is_testing() && ! is_user_logged_in() ) {
+		if ( ! $this->is_testing() ) {
 			$url = permissions_key_url( $url, $this->get_contact(), 'preferences' );
 		}
 
@@ -564,6 +574,30 @@ class Email extends Base_Object_With_Meta {
 		remove_filter( 'groundhogg/email_template/open_tracking_link', [ $this, 'get_open_tracking_link' ] );
 		remove_filter( 'groundhogg/email/the_content', [ $this, 'convert_to_tracking_links' ] );
 		remove_filter( 'groundhogg/email/the_content', [ $this, 'minify' ] );
+	}
+
+	/**
+	 * Get the edited preview
+	 *
+	 * @return string
+	 */
+	public function get_edited_preview() {
+
+		$e = $this->get_meta( 'edited' );
+
+		if ( ! $e ){
+			return false;
+		}
+
+		$email       = new Email();
+		$email->data = get_array_var( $e, 'data' );
+		$email->meta = get_array_var( $e, 'meta' );
+		$email->ID   = uniqid( 'email-' );
+
+		$email->set_event( $this->get_event() );
+		$email->set_contact( $this->get_contact() );
+
+		return $email->build();
 	}
 
 	/**
@@ -631,7 +665,7 @@ class Email extends Base_Object_With_Meta {
 	public function get_from_name() {
 		if ( $this->get_from_user() ) {
 			return $this->get_from_user()->display_name;
-		} else if ( $this->get_contact()->get_ownerdata() ) {
+		} else if ( $this->get_contact() && $this->get_contact()->get_ownerdata() ) {
 			return $this->get_contact()->get_ownerdata()->display_name;
 		} else if ( get_primary_owner() ) {
 			return get_primary_owner()->display_name;
@@ -649,7 +683,7 @@ class Email extends Base_Object_With_Meta {
 	public function get_from_email() {
 		if ( $this->get_from_user() ) {
 			return $this->get_from_user()->user_email;
-		} else if ( $this->get_contact()->get_ownerdata() ) {
+		} else if ( $this->get_contact() && $this->get_contact()->get_ownerdata() ) {
 			return $this->get_contact()->get_ownerdata()->user_email;
 		} else if ( get_primary_owner() ) {
 			return get_primary_owner()->user_email;
@@ -1065,6 +1099,32 @@ class Email extends Base_Object_With_Meta {
 			'all_clicks'   => $all_clicked,
 			'unsubscribed' => $unsubscribed,
 		];
+	}
+
+	public function get_as_array() {
+
+		if ( ! get_contactdata() ) {
+			return parent::get_as_array();
+		}
+
+		$this->set_event( new Event() );
+		$this->set_contact( get_contactdata() );
+
+		$live_preview   = $this->build();
+		$edited_preview = $this->get_edited_preview();
+
+		return array_merge( parent::get_as_array(), [
+			'context' => [
+				'from_name'      => $this->get_from_name(),
+				'from_email'     => $this->get_from_email(),
+				'from_user'      => $this->get_from_user(),
+				'built'          => $live_preview,
+				'edited_preview' => $edited_preview,
+				'avatar'         => get_avatar_url( $this->get_from_user_id(), [
+					'size' => 30
+				] )
+			]
+		] );
 	}
 
 

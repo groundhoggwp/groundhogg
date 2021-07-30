@@ -71,10 +71,10 @@ class Contacts_Api extends Base_Object_Api {
 			],
 		] );
 
-		register_rest_route( self::NAME_SPACE, '/contacts/admin/table', [
+		register_rest_route( self::NAME_SPACE, '/contacts/table/row', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'admin_table' ],
+				'callback'            => [ $this, 'admin_table_row' ],
 				'permission_callback' => [ $this, 'read_permissions_callback' ]
 			],
 		] );
@@ -172,9 +172,15 @@ class Contacts_Api extends Base_Object_Api {
 			'offset' => $default_offset,
 		] );
 
-		$count    = $contact_query->count( $query );
-		$contacts = $contact_query->query( $query );
+		$count = $contact_query->count( $query );
 
+		if ( $request->get_param( 'count' ) ) {
+			return self::SUCCESS_RESPONSE( [
+				'total_items' => $count,
+			] );
+		}
+
+		$contacts = $contact_query->query( $query );
 		$contacts = array_map( [ $this, 'map_raw_object_to_class' ], $contacts );
 
 		return self::SUCCESS_RESPONSE( [
@@ -355,7 +361,7 @@ class Contacts_Api extends Base_Object_Api {
 		$email_address = get_array_var( $data, 'email' );
 
 		// will return false if the email address is not being used
-		if ( is_email_address_in_use( $email_address, $contact ) ) {
+		if ( $email_address && is_email_address_in_use( $email_address, $contact ) ) {
 			return self::ERROR_409( 'error', 'Email address already in use.' );
 		}
 
@@ -650,27 +656,26 @@ class Contacts_Api extends Base_Object_Api {
 		return current_user_can( 'download_contact_files' );
 	}
 
-	public function admin_table() {
+	/**
+	 * Get the admin table row
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function admin_table_row( WP_REST_Request $request ) {
+		$contact = get_contactdata( $request->get_param( 'contact' ) );
+
+		$contactTable = new Contacts_Table;
+
 		ob_start();
 
-		$contacts_table = new Contacts_Table();
+		$contactTable->single_row( $contact );
 
-		?>
-		<form method="post" id="contacts-table-form">
-			<?php
-			$contacts_table->prepare_items();
-			$contacts_table->display();
-
-			if ( $contacts_table->has_items() ) {
-				$contacts_table->inline_edit();
-			} ?>
-		</form>
-		<?php
-
-		$table = ob_get_clean();
+		$row = ob_get_clean();
 
 		return self::SUCCESS_RESPONSE( [
-			'html' => $table
+			'row' => $row
 		] );
 	}
 }

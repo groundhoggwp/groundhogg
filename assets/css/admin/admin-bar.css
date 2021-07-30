@@ -1,0 +1,97 @@
+.groundhogg-toolbar-quick-search #quick-search-input {
+  width: 100%;
+}
+.groundhogg-toolbar-quick-search-close {
+  position: absolute;
+  right: 5px;
+  padding: 0;
+  top: 5px;
+}
+.groundhogg-toolbar-quick-search #close-quick-search {
+  float: right;
+}
+.groundhogg-toolbar-quick-search .gh-button-group {
+  margin-bottom: 10px;
+}
+.groundhogg-toolbar-quick-search .gh-button-group button {
+  width: 100%;
+}
+.groundhogg-toolbar-quick-search-quick-add-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.groundhogg-toolbar-quick-search-quick-add-fields .row {
+  display: flex;
+  gap: 20px;
+}
+.groundhogg-toolbar-quick-search-quick-add-fields .row.phone {
+  gap: 5px;
+}
+.groundhogg-toolbar-quick-search-quick-add-fields .row .primary-phone-ext {
+  width: 120px;
+}
+.groundhogg-toolbar-quick-search-quick-add-fields .row .col {
+  width: 100%;
+}
+.groundhogg-toolbar-quick-search-quick-add-fields .row .col input, .groundhogg-toolbar-quick-search-quick-add-fields .row .col select {
+  max-width: 100%;
+  width: 100%;
+}
+.groundhogg-toolbar-quick-search#groundhogg-toolbar-quick-search {
+  box-sizing: border-box;
+  width: 400px;
+  position: fixed;
+  background: #FFFFFF;
+  padding: 20px;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  border-radius: 0 0 5px 5px;
+  z-index: 99999;
+}
+.groundhogg-toolbar-quick-search-tabs {
+  margin-bottom: 10px;
+  display: flex;
+  gap: 5px;
+}
+.groundhogg-toolbar-quick-search-tabs .gh-button {
+  position: relative;
+}
+.groundhogg-toolbar-quick-search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 500px;
+  overflow: auto;
+  margin-top: 10px;
+}
+.groundhogg-toolbar-quick-search-result {
+  display: flex;
+  gap: 10px;
+  border-radius: 5px;
+  padding: 10px;
+  cursor: pointer;
+  align-items: center;
+}
+.groundhogg-toolbar-quick-search-result .name {
+  font-weight: 500;
+}
+.groundhogg-toolbar-quick-search-result img.avatar {
+  border-radius: 5px;
+  width: 30px;
+  height: 30px;
+}
+.groundhogg-toolbar-quick-search-result .actions {
+  width: 100%;
+  display: flex;
+  gap: 5px;
+  justify-content: flex-end;
+  visibility: hidden;
+}
+.groundhogg-toolbar-quick-search-result:hover {
+  background-color: rgba(16, 38, 64, 0.05);
+}
+.groundhogg-toolbar-quick-search-result:hover .actions {
+  visibility: visible;
+}
+
+/*# sourceMappingURL=admin-bar.css.map */

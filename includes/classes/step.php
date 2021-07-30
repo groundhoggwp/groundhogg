@@ -79,6 +79,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return void
 	 */
 	protected function post_setup() {
+		$this->step_order = absint( $this->step_order );
+		$this->funnel_id  = absint( $this->funnel_id );
 	}
 
 	/**
@@ -123,6 +125,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 	/**
 	 * Get an array of contacts which are "waiting'
+	 *
 	 * @return Contact[] | false
 	 */
 	public function get_waiting_contacts() {
@@ -143,6 +146,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 	/**
 	 * Get an array of waiting events
+	 *
 	 * @return Event[]|false
 	 */
 	public function get_waiting_events() {
@@ -536,7 +540,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		if ( has_action( "groundhogg/steps/{$this->get_type()}/html_v2" ) ) {
 			do_action( "groundhogg/steps/{$this->get_type()}/html_v2", $this );
 		} else {
-			do_action( "groundhogg/steps/error/html_v2", $this );
+			_e( 'This step has no settings.', 'groundhogg' );
 		}
 	}
 
@@ -560,6 +564,20 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		return apply_filters( "groundhogg/steps/{$this->get_type()}/export", [], $this );
 	}
 
+	public function get_as_array() {
+		return apply_filters( "groundhogg/{$this->get_object_type()}/get_as_array", [
+			'ID'     => $this->get_id(),
+			'data'   => $this->data,
+			'meta'   => $this->meta,
+			'export' => $this->export(),
+		] );
+	}
+
+	/**
+	 * Import any contextual args from the given template
+	 *
+	 * @param array $import_args
+	 */
 	public function import( $import_args = [] ) {
 		do_action( "groundhogg/steps/{$this->get_type()}/import", $import_args, $this );
 	}
@@ -611,80 +629,6 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @deprecated
 	 */
 	public function can_run() {
-
-		if ( Plugin::$instance->settings->is_global_multisite() ) {
-
-			$blog_id = $this->get_meta( 'blog_id' );
-
-			/* all blogs */
-			if ( ! $blog_id ) {
-
-				return true;
-
-				/* Current blog */
-			} else if ( intval( $blog_id ) === get_current_blog_id() ) {
-
-				return true;
-
-				/* Wrong Blog */
-			} else {
-
-				return false;
-
-			}
-
-		}
-
 		return true;
-
-	}
-
-	/**
-	 * Restore the process to the current blog.
-	 *
-	 * @deprecated since 2.0
-	 */
-	public function restore_current_blog() {
-		if ( Plugin::$instance->settings->is_global_multisite() && ms_is_switched() ) {
-			restore_current_blog();
-		}
-	}
-
-	/**
-	 * Switches to the blog which the step can run on.
-	 *
-	 * @deprecated since 2.0
-	 */
-	public function switch_to_blog() {
-		if ( Plugin::$instance->settings->is_global_multisite() ) {
-			$blog_id = $this->get_meta( 'blog_id' );
-			if ( $blog_id && intval( $blog_id ) !== get_current_blog_id() ) {
-				switch_to_blog( $blog_id );
-			}
-		}
-	}
-
-	/**
-	 * Needs to handle the moving of contacts to another step...
-	 *
-	 * @return bool
-	 */
-	public function delete() {
-
-		// Maybe Move contacts forward...
-		$next_step = $this->get_next_action();
-
-		if ( $next_step && $next_step->is_active() ) {
-			$contacts = $this->get_waiting_contacts();
-
-			if ( ! empty( $contacts ) ) {
-				foreach ( $contacts as $contact ) {
-					$next_step->enqueue( $contact );
-				}
-			}
-
-		}
-
-		return parent::delete();
 	}
 }

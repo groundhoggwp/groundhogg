@@ -1,4 +1,4 @@
-( function ($, nonces, endpoints, gh) {
+(function ($, nonces, endpoints, gh) {
 
   // Serialize better
   $.fn.serializeFormJSON = function () {
@@ -11,8 +11,7 @@
           o[this.name] = [o[this.name]]
         }
         o[this.name].push(this.value || '')
-      }
-      else {
+      } else {
         o[this.name] = this.value || ''
       }
     })
@@ -20,31 +19,55 @@
   }
 
   function picker (selector, args) {
-    $(selector).select2(args)
+    return $(selector).select2(args)
   }
 
-  function apiPicker (selector, endpoint, multiple, tags) {
-    $(selector).select2({
+  /**
+   * This is an API picker!
+   *
+   * @param selector
+   * @param endpoint
+   * @param multiple
+   * @param tags
+   * @param getResults
+   * @param getParams
+   * @param select2Opts
+   * @returns {*|define.amd.jQuery}
+   */
+  function apiPicker (
+    selector,
+    endpoint,
+    multiple = false,
+    tags = false,
+    getResults = (d) => d.results,
+    getParams = (p) => p,
+    select2Opts = {}
+  ) {
+
+    return $(selector).select2({
       tags: tags,
       multiple: multiple,
       tokenSeparators: ['/', ',', ';'],
       ajax: {
         url: endpoint,
+        // delay: 250,
         dataType: 'json',
+        data: getParams,
         beforeSend: function (xhr) {
           xhr.setRequestHeader('X-WP-Nonce', nonces._wprest)
         },
-        results: function (data, page) {
+        processResults: function (data, page) {
           return {
-            results: data.results,
+            results: getResults(data, page)
           }
         },
       },
+      ...select2Opts
     })
   }
 
   function linkPicker (selector) {
-    $(selector).autocomplete({
+    return $(selector).autocomplete({
       source: function (request, response) {
         $.ajax({
           url: ajaxurl,
@@ -75,7 +98,7 @@
   }
 
   function metaPicker (selector) {
-    $(selector).autocomplete({
+    return $(selector).autocomplete({
       source: function (request, response) {
         $.ajax({
           url: ajaxurl,
@@ -96,13 +119,171 @@
     })
   }
 
+  /**
+   * Api based tag picker
+   *
+   * @param selector
+   * @param multiple
+   * @param onReceiveItems
+   * @param opts
+   */
+  function tagPicker (selector, multiple = true, onReceiveItems = (items) => {}, ...opts) {
+    return apiPicker(selector, gh.api.routes.v4.tags, multiple, true,
+      (data) => {
+
+        onReceiveItems(data.items)
+
+        return data.items.map(item => ({
+          id: item.ID,
+          text: `${item.data.tag_name}`
+        }))
+      },
+      (query) => {
+        return {
+          search: query.term
+        }
+      }, ...opts)
+  }
+
+  /**
+   * Api based tag picker
+   *
+   * @param selector
+   * @param multiple
+   * @param onReceiveItems
+   * @param opts
+   */
+  function campaignPicker (selector, multiple = true, onReceiveItems = (items) => {}, ...opts) {
+    return apiPicker(selector, gh.api.routes.v4.campaigns, multiple, true,
+      (data) => {
+
+        onReceiveItems(data.items)
+
+        return data.items.map(item => ({
+          id: item.ID,
+          text: `${item.data.name}`
+        }))
+      },
+      (query) => {
+        return {
+          search: query.term
+        }
+      }, ...opts)
+  }
+
+  /**
+   * Api based email picker
+   *
+   * @param selector
+   * @param multiple
+   * @param onReceiveItems
+   * @param queryOpts
+   * @param opts
+   */
+  function emailPicker (selector, multiple = false, onReceiveItems = (items) => {}, queryOpts = {}, ...opts) {
+    return apiPicker(selector, gh.api.routes.v4.emails, multiple, false, (data) => {
+
+        onReceiveItems(data.items)
+
+        return data.items.map(item => ({
+          id: item.ID,
+          text: `${item.data.title} (${item.data.status})`
+        }))
+      },
+      (query) => {
+        return {
+          search: query.term,
+          ...queryOpts
+        }
+      }, ...opts)
+  }
+
+  /**
+   * Api based funnel picker
+   *
+   * @param selector
+   * @param multiple
+   * @param onReceiveItems
+   * @param queryOpts
+   * @param opts
+   */
+  function funnelPicker (selector, multiple = false, onReceiveItems = (items) => {}, queryOpts = {}, ...opts) {
+    return apiPicker(selector, gh.api.routes.v4.funnels, multiple, false, (data) => {
+
+        onReceiveItems(data.items)
+
+        return data.items.map(item => ({
+          id: item.ID,
+          text: `${item.data.title}`
+        }))
+      },
+      (query) => {
+        return {
+          search: query.term,
+          ...queryOpts
+        }
+      }, ...opts )
+  }
+
+  /**
+   * Api based broadcast picker
+   *
+   * @param selector
+   * @param multiple
+   * @param onReceiveItems
+   * @param queryOpts
+   * @param opts
+   */
+  function broadcastPicker (selector, multiple = false, onReceiveItems = (items) => {}, queryOpts = {}, ...opts) {
+    return apiPicker(selector, gh.api.routes.v4.broadcasts, multiple, false, (data) => {
+
+        onReceiveItems(data.items)
+
+        return data.items.map(item => ({
+          id: item.ID,
+          text: `${item.object.data.title} (${item.date_sent_pretty})`
+        }))
+      },
+      (query) => {
+        return {
+          search: query.term,
+          ...queryOpts
+        }
+      }, ...opts )
+  }
+
+  /**
+   * Api based email picker
+   *
+   * @param selector
+   * @param onReceiveItems
+   * @param queryOpts
+   * @param opts
+   */
+  function searchesPicker (selector, onReceiveItems = (items) => {}, queryOpts = {}, ...opts) {
+    return apiPicker(selector, gh.api.routes.v4.searches, false, false, (data) => {
+
+        onReceiveItems(data.items)
+
+        return data.items.map(item => ({
+          id: item.id,
+          text: item.name
+        }))
+      },
+      (query) => {
+        return {
+          search: query.term,
+          ...queryOpts
+        }
+      }, ...opts)
+  }
+
   function buildPickers () {
     picker('.gh-select2', {})
-    apiPicker('.gh-tag-picker', endpoints.tags, true, true)
-    apiPicker('.gh-single-tag-picker', endpoints.tags, false, false)
-    apiPicker('.gh-single-tag-picker', endpoints.tags, false, false)
-    apiPicker('.gh-email-picker', endpoints.emails, false, false)
-    apiPicker('.gh-email-picker-multiple', endpoints.emails, true, false)
+    tagPicker('.gh-tag-picker', true)
+    tagPicker('.gh-single-tag-picker', false)
+    emailPicker('.gh-email-picker', false)
+    emailPicker('.gh-email-picker-multiple', true)
     apiPicker('.gh-sms-picker', endpoints.sms, false, false)
     apiPicker('.gh-contact-picker', endpoints.contacts, false, false)
     apiPicker('.gh-contact-picker-multiple', endpoints.contacts, true, false)
@@ -120,26 +301,33 @@
     buildPickers()
   })
 
-  $(document).on('click', '.gh-dropdown-button-wrap button.gh-dropdown-button', function (){
+  $(document).on('click', '.dropdown-button .button.dropdown', function () {
     var $button = $(this)
-    $button.next().toggleClass( 'show' );
-    $( "<div class='dropdown-overlay'></div>" ).insertAfter( $button );
-  } );
+    $button.next().toggleClass('show')
+    $('<div class=\'dropdown-overlay\'></div>').insertAfter($button)
+  })
 
-  $(document).on('click', '.gh-dropdown-button-wrap .dropdown-overlay', function (){
+  $(document).on('click', '.dropdown-button .dropdown-overlay', function () {
     var $overlay = $(this)
-    $overlay.next().toggleClass( 'show' );
-    $overlay.remove();
-  } );
+    $overlay.next().toggleClass('show')
+    $overlay.remove()
+  })
 
-  gh.pickers = {}
+  gh.pickers = {
+    picker,
+    tagPicker,
+    emailPicker,
+    apiPicker,
+    linkPicker,
+    metaPicker,
+    campaignPicker,
+    searchesPicker,
+    funnelPicker,
+    broadcastPicker
+  }
 
   // Map functions to Groundhogg object.
-  gh.pickers.picker = picker
-  gh.pickers.apiPicker = apiPicker
-  gh.pickers.linkPicker = linkPicker
-  gh.pickers.metaPicker = metaPicker
   gh.nonces = nonces
   gh.endpoints = endpoints
 
-} )(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)
+})(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)

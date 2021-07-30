@@ -4,7 +4,9 @@ namespace Groundhogg\Steps;
 
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
+use Groundhogg\Temp_Step;
 use function Groundhogg\dashicon;
+use function Groundhogg\doing_rest;
 use function Groundhogg\ensure_array;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
@@ -44,7 +46,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @since       File available since Release 0.9
  */
-abstract class Funnel_Step extends Supports_Errors {
+abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable {
 	protected static $step_properties = [];
 
 	/**
@@ -1044,5 +1046,23 @@ abstract class Funnel_Step extends Supports_Errors {
 	public function export( $args, $step ) {
 		//silence is golden
 		return $args;
+	}
+
+	public function __toString() {
+		// TODO: Implement __toString() method.
+	}
+
+	public function get_context() {
+		return null;
+	}
+
+	public function jsonSerialize() {
+		return [
+			'icon'    => $this->get_icon(),
+			'name'    => $this->get_name(),
+			'type'    => $this->get_type(),
+			'group'   => $this->get_group(),
+			'context' => $this->get_context()
+		];
 	}
 }

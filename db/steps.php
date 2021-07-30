@@ -79,13 +79,15 @@ class Steps extends DB {
 	 */
 	public function get_columns() {
 		return array(
-			'ID'          => '%d',
-			'funnel_id'   => '%d',
-			'step_title'  => '%s',
-			'step_status' => '%s',
-			'step_type'   => '%s',
-			'step_group'  => '%s',
-			'step_order'  => '%d',
+			'ID'            => '%d',
+			'funnel_id'     => '%d',
+			'step_title'    => '%s',
+			'step_status'   => '%s',
+			'step_type'     => '%s',
+			'step_group'    => '%s',
+			'step_order'    => '%d',
+			'is_entry'      => '%d',
+			'is_conversion' => '%d',
 		);
 	}
 
@@ -97,13 +99,15 @@ class Steps extends DB {
 	 */
 	public function get_column_defaults() {
 		return array(
-			'ID'          => 0,
-			'funnel_id'   => 0,
-			'step_title'  => __( 'New Step' ),
-			'step_status' => 'ready',
-			'step_type'   => 'send_email',
-			'step_group'  => 'action',
-			'step_order'  => 0,
+			'ID'            => 0,
+			'funnel_id'     => 0,
+			'step_title'    => __( 'New Step' ),
+			'step_status'   => 'ready',
+			'step_type'     => 'send_email',
+			'step_group'    => 'action',
+			'step_order'    => 0,
+			'is_entry'      => 0,
+			'is_conversion' => 0,
 		);
 	}
 
@@ -169,7 +173,7 @@ class Steps extends DB {
 	 * @access public
 	 *
 	 * @param string $field id or email
-	 * @param mixed $value The Customer ID or email to search
+	 * @param mixed  $value The Customer ID or email to search
 	 *
 	 * @return mixed          Upon success, an object of the step. Upon failure, NULL
 	 * @since  2.3
@@ -262,6 +266,8 @@ class Steps extends DB {
 		step_group varchar(20) NOT NULL,
 		step_status varchar(20) NOT NULL,
 		step_order int unsigned NOT NULL,
+		is_entry BIT(1) NOT NULL,
+		is_conversion BIT(1) NOT NULL,
 		PRIMARY KEY  (ID)
 		) {$this->get_charset_collate()};";
 

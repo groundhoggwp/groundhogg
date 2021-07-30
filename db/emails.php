@@ -110,7 +110,7 @@ class Emails extends DB {
 			'title'        => '',
 			'pre_header'   => '',
 			'content'      => '',
-			'author'       => 0,
+			'author'       => get_current_user_id(),
 			'from_user'    => 0,
 			'is_template'  => 0,
 			'status'       => 'draft',

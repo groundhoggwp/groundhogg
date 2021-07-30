@@ -3,7 +3,9 @@
 namespace Groundhogg;
 
 // Exit if accessed directly
+use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Contacts;
+use phpDocumentor\Reflection\DocBlock\Tags\Deprecated;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -252,6 +254,7 @@ class Contact_Query {
 
 		$defaults = array(
 			'number'                 => - 1,
+			'limit'                  => - 1,
 			'offset'                 => 0,
 			'orderby'                => 'ID',
 			'order'                  => 'DESC',
@@ -301,6 +304,11 @@ class Contact_Query {
 		 */
 		$this->query_var_defaults = apply_filters( 'groundhogg/contact_query/query_var_defaults', $defaults );
 
+		if ( empty( self::$filters ) ) {
+			self::setup_default_filters();
+			do_action( 'groundhogg/contact_query/register_filters', $this );
+		}
+
 		if ( ! empty( $query ) ) {
 			$this->query( $query );
 		}
@@ -317,7 +325,7 @@ class Contact_Query {
 	 *
 	 * @param string|array $query Array or query string of parameters. See WPGH_Contact_Query::__construct().
 	 *
-	 * @return Contact[]|int|object[] List of contacts, or number of contacts when 'count' is passed as a query var.
+	 * @return Object[]|Contact[]|int List of contacts, or number of contacts when 'count' is passed as a query var.
 	 * @since  2.8
 	 *
 	 * @see    WPGH_Contact_Query::__construct()
@@ -368,6 +376,18 @@ class Contact_Query {
 	 * @since  2.8
 	 */
 	protected function parse_query() {
+
+		if ( isset_not_empty( $this->query_vars, 'saved_search' ) ) {
+			$saved_search     = Saved_Searches::instance()->get( $this->query_vars['saved_search'] );
+			$this->query_vars = wp_parse_args( $saved_search['query'], $this->query_vars );
+		}
+
+		// Map "limit" to "number"
+		if ( isset_not_empty( $this->query_vars, 'limit' ) ) {
+			$this->query_vars['number'] = $this->query_vars['limit'];
+			unset( $this->query_vars['limit'] );
+		}
+
 		$this->query_vars = wp_parse_args( $this->query_vars, $this->query_var_defaults );
 
 		if ( intval( $this->query_vars['number'] ) < 1 ) {
@@ -867,25 +887,18 @@ class Contact_Query {
 
 		if ( strlen( $this->query_vars['first_name'] ) || strlen( $this->query_vars['first_name_compare'] ) ) {
 
-			$where['first_name'] = self::generic_text_filter_compare( [
-				'value'   => $this->query_vars['first_name'],
-				'compare' => $this->query_vars['first_name_compare'],
-			], "{$this->table_name}.first_name" );
+			$where['first_name'] = self::generic_text_compare( "{$this->table_name}.first_name", $this->query_vars['first_name_compare'], $this->query_vars['first_name'] );
 		}
 
 		if ( strlen( $this->query_vars['last_name'] ) || strlen( $this->query_vars['last_name_compare'] ) ) {
 
-			$where['last_name'] = self::generic_text_filter_compare( [
-				'value'   => $this->query_vars['last_name'],
-				'compare' => $this->query_vars['last_name_compare'],
-			], "{$this->table_name}.last_name" );
+			$where['last_name'] = self::generic_text_compare( "{$this->table_name}.last_name", $this->query_vars['last_name_compare'], $this->query_vars['last_name'] );
 		}
 
 		if ( strlen( $this->query_vars['email'] ) || strlen( $this->query_vars['email_compare'] ) ) {
-			$where['email'] = self::generic_text_filter_compare( [
-				'value'   => $this->query_vars['email'],
-				'compare' => $this->query_vars['email_compare'],
-			], "{$this->table_name}.email" );
+			$where['email'] = self::generic_text_compare( "{$this->table_name}.email",
+				$this->query_vars['email_compare'],
+				$this->query_vars['email'] );
 		}
 
 
@@ -902,7 +915,15 @@ class Contact_Query {
 		}
 
 		if ( ! empty( $this->query_vars['filters'] ) ) {
-			$where['filters'] = $this->parse_filters( $this->query_vars['filters'] );
+			$filters = $this->parse_filters( $this->query_vars['filters'] );
+			if ( ! empty( $filters ) ) {
+				$where['filters'] = $filters;
+			}
+		}
+
+		if ( ! empty( $this->query_vars['date_optin_status_changed'] ) && is_array( $this->query_vars['date_optin_status_changed'] ) ) {
+			$date_optin_status_changed_query    = new \WP_Date_Query( $this->query_vars['date_optin_status_changed'], $this->table_name . '.date_optin_status_changed' );
+			$where['date_optin_status_changed'] = $date_optin_status_changed_query->get_sql();
 		}
 
 		return $where;
@@ -1149,25 +1170,41 @@ class Contact_Query {
 	 */
 	protected function parse_filters( $filters ): string {
 
+		if ( ! is_array( $filters ) ) {
+			$filters = base64_json_decode( $filters );
+		}
+
 		$or_clauses = [];
 
+		if ( ! $filters ){
+			return false;
+		}
+
 		// Or Group
-		foreach ( $filters as $filter_and_group ) {
+		foreach ( $filters as $filter_group ) {
 
 			$and_clauses = [];
 
 			// And Group
-			foreach ( $filter_and_group as $filter ) {
+			foreach ( $filter_group as $filter ) {
 				$clause = $this->parse_filter( $filter );
 				if ( $clause !== false ) {
 					$and_clauses[] = $clause;
 				}
 			}
 
+			if ( empty( $and_clauses ) ) {
+				continue;
+			}
+
 			$or_clauses[] = '(' . implode( ' AND ', $and_clauses ) . ')';
 		}
 
-		return implode( " OR ", $or_clauses );
+		if ( empty( $or_clauses ) ) {
+			return false;
+		}
+
+		return '( ' . implode( " OR ", $or_clauses ) . ' )';
 	}
 
 	/**
@@ -1192,7 +1229,7 @@ class Contact_Query {
 			return false;
 		}
 
-		return call_user_func( $handler['filter_callback'], $filter );
+		return call_user_func( $handler['filter_callback'], $filter, $this );
 	}
 
 	/**
@@ -1242,6 +1279,712 @@ class Contact_Query {
 			'email',
 			[ self::class, 'contact_generic_text_filter_compare' ]
 		);
+
+		self::register_filter(
+			'date_created',
+			[ self::class, 'filter_date_created' ]
+		);
+
+		self::register_filter(
+			'tags',
+			[ self::class, 'filter_tags' ]
+		);
+
+		self::register_filter(
+			'optin_status',
+			[ self::class, 'filter_optin_status' ]
+		);
+
+		self::register_filter(
+			'owner',
+			[ self::class, 'filter_owner' ]
+		);
+
+		self::register_filter(
+			'meta',
+			[ self::class, 'filter_meta' ]
+		);
+
+		self::register_filter(
+			'phone',
+			[ self::class, 'filter_phone' ]
+		);
+
+		self::register_filter(
+			'country',
+			[ self::class, 'filter_country' ]
+		);
+
+		self::register_filter(
+			'funnel_history',
+			[ self::class, 'filter_funnel' ]
+		);
+
+		self::register_filter(
+			'broadcast_received',
+			[ self::class, 'filter_broadcast_received' ]
+		);
+
+		self::register_filter(
+			'broadcast_opened',
+			[ self::class, 'filter_broadcast_opened' ]
+		);
+
+		self::register_filter(
+			'broadcast_link_clicked',
+			[ self::class, 'filter_broadcast_link_clicked' ]
+		);
+
+		self::register_filter(
+			'logged_in',
+			[ self::class, 'filter_logged_in' ]
+		);
+
+		self::register_filter(
+			'logged_out',
+			[ self::class, 'filter_logged_out' ]
+		);
+
+		self::register_filter(
+			'not_logged_in',
+			[ self::class, 'filter_not_logged_in' ]
+		);
+
+		self::register_filter(
+			'was_active',
+			[ self::class, 'filter_was_active' ]
+		);
+
+		self::register_filter(
+			'was_not_active',
+			[ self::class, 'filter_was_not_active' ]
+		);
+	}
+
+	/**
+	 * Was inactive
+	 *
+	 * @param $filter_vars
+	 * @param $query Contact_Query
+	 *
+	 * @return string
+	 */
+	public static function filter_was_not_active( $filter_vars, $query ) {
+		$before_and_after = self::get_before_and_after_from_filter_date_range( $filter_vars );
+
+		$event_query = array_filter( array_merge( [
+			'exclude' => true,
+		], $before_and_after ) );
+
+		return self::filter_by_activity( $event_query, $query );
+	}
+
+	/**
+	 * Was active
+	 *
+	 * @param $filter_vars
+	 * @param $query Contact_Query
+	 *
+	 * @return string
+	 */
+	public static function filter_was_active( $filter_vars, $query ) {
+		$before_and_after = self::get_before_and_after_from_filter_date_range( $filter_vars );
+
+		$event_query = array_filter( $before_and_after );
+
+		return self::filter_by_activity( $event_query, $query );
+	}
+
+	/**
+	 * has not logged in
+	 *
+	 * @param $filter_vars
+	 * @param $query Contact_Query
+	 *
+	 * @return string
+	 */
+	public static function filter_not_logged_in( $filter_vars, $query ) {
+		$before_and_after = self::get_before_and_after_from_filter_date_range( $filter_vars );
+
+		$event_query = array_filter( array_merge( [
+			'activity_type' => 'wp_login',
+			'exclude'       => true,
+		], $before_and_after ) );
+
+		return self::filter_by_activity( $event_query, $query ) . " AND {$query->table_name}.user_id > 0";
+	}
+
+	/**
+	 * Logged out
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_logged_out( $filter_vars, $query ) {
+		$before_and_after = self::get_before_and_after_from_filter_date_range( $filter_vars );
+
+		$event_query = array_filter( array_merge( [
+			'activity_type' => 'wp_logout',
+		], $before_and_after ) );
+
+		return self::filter_by_activity( $event_query, $query );
+	}
+
+	/**
+	 * Logged in
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_logged_in( $filter_vars, $query ) {
+
+		$before_and_after = self::get_before_and_after_from_filter_date_range( $filter_vars );
+
+		$event_query = array_filter( array_merge( [
+			'activity_type' => 'wp_login',
+		], $before_and_after ) );
+
+		return self::filter_by_activity( $event_query, $query );
+	}
+
+	/**
+	 * Broadcast link clicked
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_broadcast_link_clicked( $filter_vars, $query ) {
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'broadcast_id' => 0,
+			'link'         => ''
+		] );
+
+		$event_query = array_filter( [
+			'activity_type' => Activity::EMAIL_CLICKED,
+			'funnel_id'     => Broadcast::FUNNEL_ID,
+			'step_id'       => $filter_vars['broadcast_id'],
+			'referer'       => $filter_vars['link']
+		] );
+
+		return self::filter_by_activity( $event_query, $query );
+	}
+
+	/**
+	 * Broadcast opened
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_broadcast_opened( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'broadcast_id' => 0,
+		] );
+
+		$event_query = array_filter( [
+			'activity_type' => Activity::EMAIL_OPENED,
+			'funnel_id'     => Broadcast::FUNNEL_ID,
+			'step_id'       => $filter_vars['broadcast_id'],
+		] );
+
+		return self::filter_by_activity( $event_query, $query );
+	}
+
+	/**
+	 * Filter by broadcast events
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_broadcast_received( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'broadcast_id' => 0,
+			'status'       => 'complete'
+		] );
+
+		$event_query = array_filter( [
+			'event_type' => Event::BROADCAST,
+			'funnel_id'  => Broadcast::FUNNEL_ID,
+			'step_id'    => $filter_vars['broadcast_id'],
+			'status'     => $filter_vars['status'],
+		] );
+
+		return self::filter_by_events( $event_query, $query );
+	}
+
+	/**
+	 * Filter by funnel events
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_funnel( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'funnel_id' => 0,
+			'step_id'   => 0,
+			'status'    => 'complete'
+		] );
+
+		$before_and_after = self::get_before_and_after_from_filter_date_range( $filter_vars );
+
+		$event_query = array_filter( [
+			'event_type' => Event::FUNNEL,
+			'funnel_id'  => $filter_vars['funnel_id'],
+			'step_id'    => $filter_vars['step_id'],
+			'status'     => $filter_vars['status'],
+			'before'     => $before_and_after['before'],
+			'after'      => $before_and_after['after'],
+		] );
+
+		return self::filter_by_events( $event_query, $query );
+	}
+
+	/**
+	 * Filter by owner
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_owner( $filter_vars, $query ) {
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'compare' => 'in',
+			'value'   => []
+		] );
+
+		$owners = wp_parse_id_list( $filter_vars['value'] );
+
+		switch ( $filter_vars['compare'] ) {
+			default:
+			case 'in':
+				return sprintf( "{$query->table_name}.owner_id IN ( %s )", implode( ',', $owners ) );
+			case 'not_in':
+				return sprintf( "{$query->table_name}.owner_id NOT IN ( %s )", implode( ',', $owners ) );
+		}
+	}
+
+	/**
+	 * Filter by optin status
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_optin_status( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'compare' => 'in',
+			'value'   => []
+		] );
+
+		$optin_statuses = array_filter( $filter_vars['value'], function ( $status ) {
+			return Preferences::is_valid( $status );
+		} );
+
+		switch ( $filter_vars['compare'] ) {
+			default:
+			case 'in':
+				return sprintf( "{$query->table_name}.optin_status IN ( %s )", implode( ',', $optin_statuses ) );
+			case 'not_in':
+				return sprintf( "{$query->table_name}.optin_status NOT IN ( %s )", implode( ',', $optin_statuses ) );
+		}
+
+	}
+
+	/**
+	 * Filter by tags
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_tags( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'compare'  => 'includes',
+			'compare2' => 'any',
+			'tags'     => []
+		] );
+
+		switch ( $filter_vars['compare'] ) {
+			default:
+			case 'includes':
+				switch ( $filter_vars['compare2'] ) {
+					default:
+					case 'any':
+						$tag_query = get_db( 'tag_relationships' )->get_sql( [
+							'select'  => 'contact_id',
+							'where'   => [
+								[ 'tag_id', 'IN', wp_parse_id_list( $filter_vars['tags'] ) ]
+							],
+							'orderby' => false,
+							'order'   => false,
+						] );
+
+						return "{$query->table_name}.ID IN ( $tag_query )";
+
+					case 'all':
+						return '(' . implode( ' AND ', array_map( function ( $tag ) use ( $query ) {
+
+								$tag_query = get_db( 'tag_relationships' )->get_sql( [
+									'select'  => 'contact_id',
+									'where'   => [
+										[ 'tag_id', '=', absint( $tag ) ]
+									],
+									'orderby' => false,
+									'order'   => false,
+								] );
+
+								return "{$query->table_name}.ID IN ( $tag_query )";
+
+							}, $filter_vars['tags'] ) ) . ')';
+				}
+			case 'excludes':
+				switch ( $filter_vars['compare2'] ) {
+					default:
+					case 'any':
+						return '(' . implode( ' OR ', array_map( function ( $tag ) use ( $query ) {
+
+								$tag_query = get_db( 'tag_relationships' )->get_sql( [
+									'select'  => 'contact_id',
+									'where'   => [
+										[ 'tag_id', '=', absint( $tag ) ]
+									],
+									'orderby' => false,
+									'order'   => false,
+								] );
+
+								return "{$query->table_name}.ID NOT IN ( $tag_query )";
+
+							}, $filter_vars['tags'] ) ) . ')';
+
+					case 'all':
+						$tag_query = get_db( 'tag_relationships' )->get_sql( [
+							'select'  => 'contact_id',
+							'where'   => [
+								[ 'tag_id', 'IN', wp_parse_id_list( $filter_vars['tags'] ) ]
+							],
+							'orderby' => false,
+							'order'   => false,
+						] );
+
+						return "{$query->table_name}.ID NOT IN ( $tag_query )";
+				}
+		}
+	}
+
+	/**
+	 * Wrapper function to filter by events easily
+	 *
+	 * @param $event_query
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_by_events( $event_query, $query ) {
+
+		$subwhere = [ 'relationship' => 'AND' ];
+
+		$event_query = wp_parse_args( $event_query, [
+			'event_type' => Event::FUNNEL,
+			'status'     => Event::COMPLETE,
+		] );
+
+		foreach ( $event_query as $col => $val ) {
+
+			if ( ! empty( $val ) ) {
+				switch ( $col ) {
+					default:
+						$compare = '=';
+						break;
+					case 'before':
+						$compare = '<=';
+						$col     = 'time';
+						break;
+					case 'after':
+						$compare = '>=';
+						$col     = 'time';
+						break;
+				}
+
+				$subwhere[] = [ 'col' => $col, 'val' => $val, 'compare' => $compare ];
+			}
+
+		}
+
+		$table = get_array_var( $event_query, 'status' ) === Event::WAITING ? 'event_queue' : 'events';
+
+		$sql = get_db( $table )->get_sql( [
+			'where'   => $subwhere,
+			'select'  => 'contact_id',
+			'orderby' => false,
+			'order'   => ''
+		] );
+
+		$in = isset_not_empty( $event_query, 'exclude' ) ? 'NOT IN' : 'IN';
+
+		return "$query->table_name.$query->primary_key $in ( $sql )";
+	}
+
+	/**
+	 * Wrapper function to filter by events easily
+	 *
+	 * @param $activity_query
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_by_activity( $activity_query, $query ) {
+
+		$subwhere = [ 'relationship' => 'AND' ];
+
+		$activity_query = wp_parse_args( $activity_query, [
+			'activity_type' => '',
+		] );
+
+		foreach ( $activity_query as $col => $val ) {
+
+			if ( ! empty( $val ) ) {
+				switch ( $col ) {
+					default:
+						$compare = '=';
+						break;
+					case 'before':
+						$compare = '<=';
+						$col     = 'time';
+						break;
+					case 'referer':
+						$compare = 'RLIKE';
+						$col     = 'referer';
+						break;
+					case 'after':
+						$compare = '>=';
+						$col     = 'time';
+						break;
+					case 'exclude':
+						continue 2;
+						break;
+				}
+
+				$subwhere[] = [ 'col' => $col, 'val' => $val, 'compare' => $compare ];
+			}
+		}
+
+		$sql = get_db( 'activity' )->get_sql( [
+			'where'   => $subwhere,
+			'select'  => 'contact_id',
+			'orderby' => false,
+			'order'   => ''
+		] );
+
+		$in = isset_not_empty( $activity_query, 'exclude' ) ? 'NOT IN' : 'IN';
+
+		return "$query->table_name.$query->primary_key $in ( $sql )";
+	}
+
+	/**
+	 * Build a standard date filter clause
+	 *
+	 * @param       $filter_vars
+	 * @param false $as_int
+	 *
+	 * @return string
+	 */
+	public static function standard_activity_filter_clause( $filter_vars, $as_int = false ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'date_range' => '24_hours',
+		] );
+
+		$before_and_after = self::get_before_and_after_from_filter_date_range( $filter_vars, true );
+
+		$before = $before_and_after['before'];
+		$after  = $before_and_after['after'];
+
+		switch ( $filter_vars['date_range'] ) {
+			default:
+			case '24_hours':
+			case '7_days':
+			case '30_days':
+			case '60_days':
+			case '90_days':
+			case '365_days':
+			case 'after':
+				$clause = $as_int ? sprintf( "> %d", $after ) : sprintf( "> '%s'", Ymd_His( $after ) );
+				break;
+			case 'before':
+				$clause = $as_int ? sprintf( "< %d", $before ) : sprintf( "< '%s'", Ymd_His( $before ) );
+				break;
+			case 'between':
+				$clause = $as_int
+					? sprintf( "BETWEEN %d AND %d", $after, $before )
+					: sprintf( "BETWEEN '%s' AND '%s'", Ymd_His( $after ), Ymd_His( $before ) );
+				break;
+		}
+
+		return $clause;
+	}
+
+	/**
+	 * Build a standard date filter clause
+	 *
+	 * @param array $filter_vars
+	 * @param bool  $as_int
+	 *
+	 * @return array
+	 */
+	public static function get_before_and_after_from_filter_date_range( $filter_vars, $as_int = true ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'date_range' => '24_hours',
+			'after'      => 0,
+			'before'     => 0,
+		] );
+
+		$after  = date_as_int( $filter_vars['after'] );
+		$before = date_as_int( $filter_vars['before'] );
+
+		switch ( $filter_vars['date_range'] ) {
+			default:
+			case '24_hours':
+				$after  = time() - DAY_IN_SECONDS;
+				$before = time();
+				break;
+			case '7_days':
+				$after  = time() - ( 7 * DAY_IN_SECONDS );
+				$before = time();
+				break;
+			case '30_days':
+				$after  = time() - ( 30 * DAY_IN_SECONDS );
+				$before = time();
+				break;
+			case '60_days':
+				$after  = time() - ( 60 * DAY_IN_SECONDS );
+				$before = time();
+				break;
+			case '90_days':
+				$after  = time() - ( 90 * DAY_IN_SECONDS );
+				$before = time();
+				break;
+			case '365_days':
+				$after  = time() - ( 365 * DAY_IN_SECONDS );
+				$before = time();
+				break;
+			case 'before':
+				$before = date_as_int( $before ) + ( DAY_IN_SECONDS - 1 );
+				$after  = 0;
+				break;
+			case 'after':
+				$before = 0;
+				$after  = date_as_int( $after );
+				break;
+			case 'between':
+				compare_dates( $before, $after );
+				$after  = date_as_int( $after );
+				$before = date_as_int( $before ) + ( DAY_IN_SECONDS - 1 );
+		}
+
+		return [
+			'before' => $as_int ? $before : Ymd_His( $before ),
+			'after'  => $as_int ? $after : Ymd_His( $after )
+		];
+	}
+
+	/**
+	 * @param $filter_vars
+	 * @param $query Contact_Query
+	 *
+	 * @return string
+	 */
+	public static function filter_date_created( $filter_vars, $query ) {
+
+		$clause = self::standard_activity_filter_clause( $filter_vars );
+
+		return "{$query->table_name}.date_created $clause";
+	}
+
+	/**
+	 * @param $filter_vars
+	 * @param $query Contact_Query
+	 *
+	 * @return string
+	 */
+	public static function filter_meta( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'meta'    => '',
+			'compare' => '',
+			'value'   => ''
+		] );
+
+		$meta_table_name = get_db( 'contactmeta' )->table_name;
+		$clause1         = self::generic_text_compare( $meta_table_name . '.meta_key', '=', $filter_vars['meta'] );
+		$clause2         = self::generic_text_compare( $meta_table_name . '.meta_value', $filter_vars['compare'], $filter_vars['value'] );
+
+		return "{$query->table_name}.ID IN ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$clause1} AND {$clause2} ) ";
+	}
+
+	/**
+	 * Filter by the phone number
+	 *
+	 * todo replace the phone number
+	 *
+	 * @param $filter_vars
+	 * @param $query Contact_Query
+	 *
+	 * @return string
+	 */
+	public static function filter_phone( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'phone_type' => 'primary',
+			'compare'    => '',
+			'value'      => ''
+		] );
+
+		$meta_table_name = get_db( 'contactmeta' )->table_name;
+		$clause1         = self::generic_text_compare( $meta_table_name . '.meta_key', '=', $filter_vars['phone_type'] . '_phone' );
+		$clause2         = self::generic_text_compare( "{$meta_table_name}.meta_value", $filter_vars['compare'], $filter_vars['value'] );
+
+		return "{$query->table_name}.ID IN ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$clause1} AND {$clause2} ) ";
+	}
+
+	/**
+	 * Filter by country
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_country( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'country' => '',
+		] );
+
+		$meta_table_name = get_db( 'contactmeta' )->table_name;
+		$clause1         = self::generic_text_compare( $meta_table_name . '.meta_key', '=', 'country' );
+		$clause2         = self::generic_text_compare( "{$meta_table_name}.meta_value", '=', $filter_vars['country'] );
+
+		return "{$query->table_name}.ID IN ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$clause1} AND {$clause2} ) ";
 	}
 
 	/**
@@ -1252,36 +1995,39 @@ class Contact_Query {
 	 *
 	 * @return string
 	 */
-	public static function generic_text_filter_compare( array $filter_vars, string $column_key ): string {
-		$filter_vars = wp_parse_args( $filter_vars, [
-			'value'   => '',
-			'compare' => '',
-		] );
+	public static function generic_text_compare( $column, $compare, $value ) {
 
 		global $wpdb;
 
-		$value = sanitize_text_field( $filter_vars['value'] );
+		$value = sanitize_text_field( $value );
 
-		switch ( $filter_vars['compare'] ) {
+		switch ( $compare ) {
 			default:
 			case 'equals':
-				return sprintf( "%s = '%s'", $column_key, $value );
+			case '=':
+				return sprintf( "%s = '%s'", $column, $value );
+			case '!=':
 			case 'not_equals':
-				return sprintf( "%s != '%s'", $column_key, $value );
+				return sprintf( "%s != '%s'", $column, $value );
 			case 'contains':
-				return sprintf( "%s RLIKE '%s'", $column_key, $value );
+				return sprintf( "%s RLIKE '%s'", $column, $value );
 			case 'not_contains':
-				return sprintf( "%s NOT RLIKE '%s'", $column_key, $value );
+				return sprintf( "%s NOT RLIKE '%s'", $column, $value );
 			case 'begins_with':
-				return sprintf( "%s LIKE '%s'", $column_key, $wpdb->esc_like( $value ) . '%s' );
+			case 'starts_with':
+				return sprintf( "%s LIKE '%s'", $column, $wpdb->esc_like( $value ) . '%' );
 			case 'ends_with':
-				return sprintf( "%s LIKE '%s'", $column_key, '%' . $wpdb->esc_like( $value ) );
+				return sprintf( "%s LIKE '%s'", $column, '%' . $wpdb->esc_like( $value ) );
 			case 'empty':
-				return sprintf( "%s = ''", $column_key );
+				return sprintf( "%s = ''", $column );
 			case 'not_empty':
-				return sprintf( "%s != ''", $column_key );
+				return sprintf( "%s != ''", $column );
 			case 'regex':
-				return sprintf( "%s REGEXP BINARY '%s'", $column_key, $value );
+				return sprintf( "%s REGEXP BINARY '%s'", $column, $value );
+			case 'less_than':
+				return sprintf( "%s < %s", $column, is_numeric( $value ) ? $value : "'$value'" );
+			case 'greater_than':
+				return sprintf( "%s > %s", $column, is_numeric( $value ) ? $value : "'$value'" );
 		}
 	}
 
@@ -1331,8 +2077,8 @@ class Contact_Query {
 	 *
 	 * @return string
 	 */
-	public static function contact_generic_text_filter_compare( array $filter_vars ): string {
-		return self::generic_text_filter_compare( $filter_vars, $filter_vars['type'] );
+	public static function contact_generic_text_filter_compare( array $filter_vars, $query ): string {
+		return self::generic_text_compare( $query->table_name . '.' . $filter_vars['type'], $filter_vars['compare'], $filter_vars['value'] );
 	}
 
 	/**

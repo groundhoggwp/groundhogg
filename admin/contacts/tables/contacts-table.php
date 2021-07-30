@@ -100,8 +100,11 @@ class Contacts_Table extends WP_List_Table {
 		$order    = get_url_var( 'order', 'DESC' );
 		$orderby  = get_url_var( 'orderby', 'ID' );
 
-
 		$query = get_request_query();
+
+		if ( isset_not_empty( $query, 'filters' ) && is_string( $query['filters'] ) ) {
+			$query['filters'] = json_decode( base64_decode( $query['filters'] ), true );
+		}
 
 		$full_name = split_name( $search );
 
@@ -159,19 +162,9 @@ class Contacts_Table extends WP_List_Table {
 
 		$this->query = $query;
 
-		$c_query = new Contact_Query();
-		$data    = $c_query->query( $query );
-
-		set_transient( 'groundhogg_contact_query_args', $c_query->query_vars, HOUR_IN_SECONDS );
-
-		// Unset number for the count full count
-		unset( $query['number'] );
-
-		$total = get_db( 'contacts' )->count( $query );
-
-		$this->items = array_map( function ( $item ) {
-			return new Contact( $item );
-		}, $data );
+		$c_query     = new Contact_Query();
+		$this->items = $c_query->query( $query, true );
+		$total       = $c_query->count( $query );
 
 		// Add condition to be sure we don't divide by zero.
 		// If $this->per_page is 0, then set total pages to 1.
@@ -182,6 +175,15 @@ class Contacts_Table extends WP_List_Table {
 			'per_page'    => $per_page,
 			'total_pages' => $total_pages,
 		) );
+
+		wp_localize_script( 'groundhogg-admin-contact-search', 'ContactsTable', [
+			'total_items'           => $total,
+			'total_items_formatted' => _nf( $total ),
+			'items'                 => $this->items,
+			'per_page'              => $per_page,
+			'total_pages'           => $total_pages,
+			'query'                 => $query
+		] );
 	}
 
 	/**
@@ -544,8 +546,9 @@ class Contacts_Table extends WP_List_Table {
 		$title   = $contact->get_email();
 
 		$actions['inline hide-if-no-js'] = sprintf(
-			'<a href="#" class="editinline" aria-label="%s">%s</a>',
+			'<a href="#" class="editinline" data-id="%d" aria-label="%s">%s</a>',
 			/* translators: %s: title */
+			esc_attr( $contact->get_id() ),
 			esc_attr( sprintf( __( 'Quick edit &#8220;%s&#8221; inline' ), $title ) ),
 			__( 'Quick&nbsp;Edit' )
 		);
@@ -601,7 +604,7 @@ class Contacts_Table extends WP_List_Table {
 		<div class="alignleft gh-actions">
 		<?php
 
-		Contact_Table_Actions::do_contact_actions( $this->query, $this->get_pagination_arg( 'total_items' ), $this );
+//		Contact_Table_Actions::do_contact_actions( $this->query, $this->get_pagination_arg( 'total_items' ), $this );
 
 		do_action( 'groundhogg/admin/contacts/table/extra_tablenav', $this );
 

@@ -379,6 +379,10 @@ class Events_Table extends WP_List_Table {
 			   href="<?php echo Plugin::instance()->bulk_jobs->process_events->get_start_url(); ?>"><?php _ex( 'Process Events', 'action', 'groundhogg' ); ?></a>
 			<a class="button action"
 			   href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'cleanup' ], $_SERVER['REQUEST_URI'] ), 'cleanup' ); ?>"><?php _ex( 'Cleanup', 'action', 'groundhogg' ); ?></a>
+			<?php if ( $this->get_view() === Event::WAITING ): ?>
+				<a class="button action danger"
+				   href="<?php echo wp_nonce_url( add_query_arg( [ 'action' => 'cancel_all' ], $_SERVER['REQUEST_URI'] ), 'cancel_all' ); ?>"><?php _ex( 'Cancel All', 'action', 'groundhogg' ); ?></a>
+			<?php endif; ?>
 			<?php if ( in_array( $this->get_view(), [ 'failed', 'skipped', 'cancelled' ] ) ): ?>
 				<a class="button action"
 				   href="<?php echo wp_nonce_url( add_query_arg( [

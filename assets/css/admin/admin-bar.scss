@@ -1,0 +1,145 @@
+$primary-blue: rgb(0, 117, 255);
+$primary-blue-60: rgba(0, 117, 255, 0.60);
+$primary-blue-50: rgba(0, 117, 255, 0.50);
+$primary-blue-20: rgba(0, 117, 255, 0.20);
+$primary-blue-10: rgba(0, 117, 255, 0.10);
+$primary-blue-7: rgba(0, 117, 255, 0.07);
+$primary-blue-2: rgba(0, 117, 255, 0.02);
+$primary-dark: rgb(16, 38, 64);
+$primary-dark-50: rgba(16, 38, 64, 0.5);
+$primary-dark-30: rgba(16, 38, 64, 0.3);
+$primary-dark-15: rgba(16, 38, 64, 0.15);
+$primary-dark-10: rgba(16, 38, 64, 0.10);
+$primary-dark-5: rgba(16, 38, 64, 0.05);
+$error-red: rgb(233, 31, 79);
+$error-red-50: rgba(233, 31, 79, 0.5);
+$error-red-10: rgba(233, 31, 79, 0.10);
+$secondary-purple: rgb(108, 25, 173);
+$alert-yellow: rgb(255, 238, 88);
+$benchmark-orange: rgb(245, 129, 21);
+$benchmark-orange-50: rgba(245, 129, 21, 0.50);
+$action-green: rgb(158, 206, 56);
+$action-green-50: rgba(158, 206, 56, 0.5);
+$box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+
+.groundhogg-toolbar-quick-search {
+
+  #quick-search-input {
+    width: 100%;
+  }
+
+  &-close{
+    position: absolute;
+    right: 5px;
+    padding: 0;
+    top: 5px;
+  }
+
+  #close-quick-search{
+    float: right;
+  }
+
+  .gh-button-group {
+    margin-bottom: 10px;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  &-quick-add-fields {
+    //margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .row {
+      display: flex;
+      gap: 20px;
+
+      &.phone{
+        gap: 5px;
+      }
+
+      .primary-phone-ext{
+        width: 120px;
+      }
+
+      .col {
+        width: 100%;
+
+        input, select {
+          max-width: 100%;
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  &#groundhogg-toolbar-quick-search {
+    box-sizing: border-box;
+    width: 400px;
+    position: fixed;
+    background: #FFFFFF;
+    padding: 20px;
+    box-shadow: $box-shadow;
+    border-radius: 0 0 5px 5px;
+    z-index: 99999;
+  }
+
+  &-tabs{
+    margin-bottom: 10px;
+    display: flex;
+    gap: 5px;
+
+    .gh-button{
+      position: relative;
+    }
+  }
+
+  &-results {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 500px;
+    overflow: auto;
+    margin-top: 10px;
+  }
+
+  &-result {
+    display: flex;
+    gap: 10px;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    align-items: center;
+
+    .name {
+      font-weight: 500;
+    }
+
+    img.avatar {
+      border-radius: 5px;
+      width: 30px;
+      height: 30px;
+    }
+
+    .actions{
+      width: 100%;
+      display: flex;
+      gap: 5px;
+      justify-content: flex-end;
+      visibility: hidden;
+    }
+
+    &:hover {
+
+      .actions{
+        visibility: visible;
+      }
+
+      background-color: $primary-dark-5
+    }
+  }
+
+}
