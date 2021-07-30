@@ -166,6 +166,8 @@ abstract class Base_Report {
 		return $contacts;
 	}
 
+	protected $funnel_cookie_set = false;
+
 	/**
 	 * Get the funnel IDs if available
 	 *
@@ -174,8 +176,9 @@ abstract class Base_Report {
 	protected function get_funnel_id() {
 		$funnel_id = absint( get_array_var( get_request_var( 'data', [] ), 'funnel_id' ) );
 
-		if ( absint( get_cookie( 'gh_reporting_funnel_id' ) ) !== $funnel_id ){
+		if ( absint( get_cookie( 'gh_reporting_funnel_id' ) ) !== $funnel_id && ! $this->funnel_cookie_set ){
 			set_cookie( 'gh_reporting_funnel_id', $funnel_id, MINUTE_IN_SECONDS );
+			$this->funnel_cookie_set = true;
 		}
 
 		return $funnel_id;

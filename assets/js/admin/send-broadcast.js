@@ -202,7 +202,8 @@
 					  <div id="${elPrefix}-search-method">
 						  ${state.which === 'searches' ? select({
 							  id: `${elPrefix}-search-method-searches`,
-							  name: 'searches'
+							  name: 'searches',
+							  dataPlaceholder: 'Please select a saved search...'
 						  }, SearchesStore.getItems().map(s => ({
 							  text: s.name,
 							  value: s.id
@@ -283,6 +284,8 @@
 
             emailPicker(`#${elPrefix}-email`, false, (items) => {EmailsStore.itemsFetched(items)}, {
               status: 'ready'
+            }, {
+              placeholder: 'Select an email to send...'
             }).on('change', ({ target }) => {
               setState({
                 email_id: parseInt(target.value)
@@ -342,7 +345,8 @@
 
             $('.change-search-which').on('change', ({ target }) => {
               setState({
-                which: $(target).val()
+                which: $(target).val(),
+                query: {}
               })
               setStep(2)
             })
@@ -357,7 +361,9 @@
                 updateTotal()
               }).mount()
             } else {
-              searchesPicker(`#${elPrefix}-search-method-searches`, (items) => { SearchesStore.itemsFetched(items)}).on('change', ({ target }) => {
+              searchesPicker(`#${elPrefix}-search-method-searches`, (items) => { SearchesStore.itemsFetched(items)}, {}, {
+                placeholder: 'Select a saved search...'
+              }).on('select2:select', ({ target }) => {
                 setState({
                   query: {
                     saved_search: $(target).val(),
@@ -366,6 +372,8 @@
                 updateTotal()
               })
             }
+
+            updateTotal()
 
             break
 

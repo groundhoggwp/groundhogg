@@ -64,12 +64,15 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	 * @return bool|mixed
 	 */
 	public function __get( $name ) {
+
+		$maybe = parent::__get( $name );
+
 		// Check meta data
-		if ( key_exists( $name, $this->meta ) ) {
-			return $this->meta[ $name ];
+		if ( ! $maybe && key_exists( $name, $this->meta ) ) {
+			$maybe = $this->meta[ $name ];
 		}
 
-		return parent::__get( $name );
+		return $maybe;
 	}
 
 	/**

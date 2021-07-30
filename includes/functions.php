@@ -5559,6 +5559,8 @@ function get_filters_from_old_query_vars( $query = [] ) {
 		];
 	}
 
+	$filters = apply_filters( 'groundhogg/get_filters_from_old_query_vars', $filters, $query );
+
 	// Filters is an array[] so wrap in another array
 	return ! empty( $filters ) ? [ $filters ] : false;
 }
