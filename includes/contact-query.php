@@ -292,11 +292,6 @@ class Contact_Query {
 			'filters'                => []
 		);
 
-		// Only show contacts associated with the current owner...
-		if ( current_user_can( 'view_contacts' ) && ! current_user_can( 'view_all_contacts' ) ) {
-			$defaults['owner'] = get_current_user_id();
-		}
-
 		/**
 		 * Filter the query var defaults
 		 *
@@ -390,6 +385,12 @@ class Contact_Query {
 
 		$this->query_vars = wp_parse_args( $this->query_vars, $this->query_var_defaults );
 
+		// Only show contacts associated with the current owner...
+		if ( ! current_user_can( 'view_all_contacts' ) ) {
+			$this->query_vars['owner'] = get_current_user_id();
+		}
+
+		// Fix number
 		if ( intval( $this->query_vars['number'] ) < 1 ) {
 			$this->query_vars['number'] = false;
 		}
