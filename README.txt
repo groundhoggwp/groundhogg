@@ -312,6 +312,10 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 2.4.7.6 (2021-07-30) =
+* FIXED Sales manager unable to edit contacts even though they can see them
+* FIXED Sales representatives able to view and edit other's contacts if using the advanced search tools
+
 = 2.4.7.5 (2021-07-27) =
 * HOT FIX Reverted change to contact query for contact owners.
 

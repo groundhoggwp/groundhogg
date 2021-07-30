@@ -22,11 +22,9 @@ if ( ! $contact || ! $contact->exists() ) {
 	wp_die( _x( 'This contact has been deleted.', 'contact_record', 'groundhogg' ) );
 }
 
-/* Quit if */
-if ( current_user_is( 'sales_manager' ) ) {
-	if ( $contact->get_owner_id() !== get_current_user_id() ) {
-		wp_die( _x( 'You are not the owner of this contact.', 'contact_record', 'groundhogg' ) );
-	}
+// The current user cannot edit this contact because they are not the owner
+if ( ! current_user_can( 'view_all_contacts' ) && $contact->get_owner_id() !== get_current_user_id() ) {
+	wp_die( _x( 'You are not the owner of this contact.', 'contact_record', 'groundhogg' ) );
 }
 
 ?>
