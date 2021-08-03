@@ -312,6 +312,13 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 2.5 =
+* ADDED All new contact filtering system replaces the old advanced search filters to give a superior contact searching experience.
+* ADDED New "Groundhogg" widget to the admin bar for contact searching, adding contacts, and scheduling broadcasts.
+* ADDED Unquantifiable levels of Groundhogg 3.0 preparation.
+* TWEAKED New contact quick editing UI.
+* TWEAKED New broadcast scheduling UI.
+
 = 2.4.7.6 (2021-07-30) =
 * FIXED Sales manager unable to edit contacts even though they can see them
 * FIXED Sales representatives able to view and edit other's contacts if using the advanced search tools

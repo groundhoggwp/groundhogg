@@ -5291,6 +5291,16 @@ function enqueue_step_type_assets() {
 }
 
 /**
+ * Enqueue any step type registration assets
+ */
+function enqueue_filter_assets() {
+
+	wp_enqueue_script( 'groundhogg-admin-search-filters' );
+
+	do_action( 'groundhogg_enqueue_filter_assets' );
+}
+
+/**
  * Get the original link from the referer_hash
  *
  * @param $hash
