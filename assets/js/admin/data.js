@@ -111,8 +111,10 @@
     primaryKey: 'ID',
     getItemFromResponse: (r) => r.item,
     getItemsFromResponse: (r) => r.items,
+    getTotalItemsFromResponse: (r) => r.total_items,
     items: [],
     item: {},
+    total_items: 0,
     route: route,
 
     /**
@@ -160,6 +162,10 @@
       return true
     },
 
+    getTotalItems () {
+      return this.total_items
+    },
+
     itemsFetched (items) {
 
       if (!Array.isArray(items)) {
@@ -174,8 +180,10 @@
 
     async fetchItems (params) {
       return apiGet(this.route, params)
-        .then(r => this.getItemsFromResponse(r))
-        .then(items => {
+        .then(r => {
+          this.total_items = this.getTotalItemsFromResponse(r)
+          return this.getItemsFromResponse(r)
+        }).then(items => {
           this.itemsFetched(items)
           return items
         })
@@ -344,7 +352,7 @@
           query,
           step_id,
           funnel_id,
-        }, opts).then( d => d.added )
+        }, opts).then(d => d.added)
       },
 
       async commit (id, data, opts = {}) {

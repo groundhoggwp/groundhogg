@@ -1177,7 +1177,7 @@ class Contact_Query {
 
 		$or_clauses = [];
 
-		if ( ! $filters ){
+		if ( ! $filters ) {
 			return false;
 		}
 
@@ -1360,6 +1360,39 @@ class Contact_Query {
 			'was_not_active',
 			[ self::class, 'filter_was_not_active' ]
 		);
+
+		self::register_filter(
+			'is_user',
+			[ self::class, 'filter_is_user' ]
+		);
+
+		self::register_filter(
+			'user_role_is',
+			[ self::class, 'filter_user_role_is' ]
+		);
+	}
+
+	public static function filter_user_role_is( $filter_vars, $query ) {
+
+		global $wpdb;
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'role' => ''
+		] );
+
+		$role = sanitize_text_field( $filter_vars['role']);
+
+		return "$query->table_name.user_id IN ( SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = 'wp_capabilities' AND meta_value RLIKE '\"$role\"' )";
+	}
+
+	/**
+	 * @param $filter_vars
+	 * @param $query Contact_Query
+	 *
+	 * @return string
+	 */
+	public static function filter_is_user( $filter_vars, $query ) {
+		return "$query->table_name.user_id > 0";
 	}
 
 	/**
@@ -1765,26 +1798,20 @@ class Contact_Query {
 			if ( ! empty( $val ) ) {
 				switch ( $col ) {
 					default:
-						$compare = '=';
+						$subwhere[] = [ 'col' => $col, 'compare' => '=', 'val' => $val ];
 						break;
 					case 'before':
-						$compare = '<=';
-						$col     = 'time';
-						break;
-					case 'referer':
-						$compare = 'RLIKE';
-						$col     = 'referer';
+						$subwhere[] = [ 'col' => 'timestamp', 'compare' => '<=', 'val' => $val ];
 						break;
 					case 'after':
-						$compare = '>=';
-						$col     = 'time';
+						$subwhere[] = [ 'col' => 'timestamp', 'compare' => '>=', 'val' => $val ];
+						break;
+					case 'referer':
+						$subwhere[] = [ 'col' => 'referer', 'compare' => 'RLIKE', 'val' => $val ];
 						break;
 					case 'exclude':
-						continue 2;
 						break;
 				}
-
-				$subwhere[] = [ 'col' => $col, 'val' => $val, 'compare' => $compare ];
 			}
 		}
 

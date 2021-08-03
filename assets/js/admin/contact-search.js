@@ -18,15 +18,17 @@
     progressBar,
     dialog,
     bold,
+    tooltip,
     adminPageURL
   } = Groundhogg.element
   const { post, get, patch, routes, ajax } = Groundhogg.api
   const { searches: SearchesStore, contacts: ContactsStore, tags: TagsStore, funnels: FunnelsStore } = Groundhogg.stores
   const { tagPicker, funnelPicker } = Groundhogg.pickers
+  const { userHasCap } = Groundhogg.user
+  const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
+  const { sprintf, __, _x, _n } = wp.i18n
 
   // const { StepTypes } = Groundhogg
-
-  const { sprintf, __, _x, _n } = wp.i18n
 
   // StepTypes.setup()
 
@@ -173,6 +175,10 @@
 
       if (this.filtersEnabled) {
         this.filtersApp.init()
+        tooltip('.enable-filters', {
+          content: __('Turn off filters', 'groundhogg'),
+          position: 'top'
+        })
       }
 
       if (this.savedSearchEnabled) {
@@ -325,7 +331,7 @@
     }, {
       signal
     }).then(total => {
-      $('#search-contacts').html(sprintf(__('Show %d contacts', 'groundhogg'), total))
+      $('#search-contacts').html(sprintf(_n('Show %s contact', 'Show %s contacts', total, 'groundhogg'), formatNumber(total)))
     })
   }
 
@@ -347,29 +353,36 @@
 
       // console.log(e.currentTarget)
 
+      const items = [
+        {
+          key: 'edit',
+          cap: 'edit_contacts',
+          text: sprintf(__('Edit %s contacts', 'groundhogg'), totalContactsFormatted)
+        },
+        {
+          key: 'export',
+          cap: 'export_contacts',
+          text: sprintf(__('Export %s contacts', 'groundhogg'), totalContactsFormatted)
+        },
+        {
+          key: 'broadcast',
+          cap: 'schedule_broadcasts',
+          text: sprintf(__('Send a broadcast to %s contacts', 'groundhogg'), totalContactsFormatted)
+        },
+        {
+          key: 'funnel',
+          cap: 'edit_contacts',
+          text: sprintf(__('Add %s contacts to a funnel', 'groundhogg'), totalContactsFormatted)
+        },
+        {
+          key: 'delete',
+          cap: 'delete_contacts',
+          text: `<span class="gh-text danger">${sprintf(__('Delete %s contacts', 'groundhogg'), totalContactsFormatted)}</span>`
+        }
+      ]
+
       moreMenu(e.currentTarget, {
-        items: [
-          {
-            key: 'edit',
-            text: sprintf(__('Edit %s contacts', 'groundhogg'), totalContactsFormatted)
-          },
-          {
-            key: 'export',
-            text: sprintf(__('Export %s contacts', 'groundhogg'), totalContactsFormatted)
-          },
-          {
-            key: 'broadcast',
-            text: sprintf(__('Send a broadcast to %s contacts', 'groundhogg'), totalContactsFormatted)
-          },
-          {
-            key: 'funnel',
-            text: sprintf(__('Add %s contacts to a funnel', 'groundhogg'), totalContactsFormatted)
-          },
-          {
-            key: 'delete',
-            text: `<span class="gh-text danger">${sprintf(__('Delete %s contacts', 'groundhogg'), totalContactsFormatted)}</span>`
-          }
-        ],
+        items: items.filter(i => userHasCap(i.cap)),
         onSelect: (key) => {
           switch (key) {
             case 'edit':
@@ -603,8 +616,41 @@
     })
   })
 
+  $(() => {
+
+    if (!userHasCap('delete_contacts')) {
+      return
+    }
+
+    $(document).on('click', 'table .delete-contact', (e) => {
+      e.preventDefault()
+
+      const ID = parseInt(e.currentTarget.dataset.id)
+
+      const contact = ContactsStore.get(ID)
+
+      dangerConfirmationModal({
+        confirmText: __('Delete'),
+        alert: `<p>${sprintf(__('Are you sure you want to delete %s?', 'groundhogg'), bold(`${contact.data.first_name} ${contact.data.last_name}`))}</p>`,
+        onConfirm: () => {
+          ContactsStore.delete(contact.ID).then(() => {
+            $(`#contact-${contact.ID}`).remove();
+            dialog({
+              message: sprintf( __( '%s was deleted!', 'groundhogg' ), `${contact.data.first_name} ${contact.data.last_name}` )
+            })
+          })
+        }
+      })
+    })
+
+  })
+
   // QuickEdit
   $(() => {
+
+    if (!userHasCap('edit_contacts')) {
+      return
+    }
 
     ContactsStore.itemsFetched(ContactsTable.items)
 

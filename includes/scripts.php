@@ -162,6 +162,7 @@ class Scripts {
 
 		wp_register_script( 'groundhogg-admin-element', GROUNDHOGG_ASSETS_URL . 'js/admin/element' . $dot_min . '.js', [
 			'groundhogg-admin',
+			'groundhogg-admin-formatting',
 			'groundhogg-admin-data',
 			'moment-js',
 			'beautify-html',
@@ -170,6 +171,7 @@ class Scripts {
 
 		wp_register_script( 'groundhogg-admin-search-filters', GROUNDHOGG_ASSETS_URL . 'js/admin/search-filters' . $dot_min . '.js', [
 			'groundhogg-admin-element',
+			'groundhogg-admin-user',
 			'groundhogg-admin-data',
 		], GROUNDHOGG_VERSION );
 
@@ -181,16 +183,21 @@ class Scripts {
 		wp_register_script( 'groundhogg-admin-toolbar', GROUNDHOGG_ASSETS_URL . 'js/admin/admin-bar' . $dot_min . '.js', [
 			'groundhogg-admin-element',
 			'groundhogg-admin-data',
+			'groundhogg-admin-user',
 			'groundhogg-admin-send-broadcast'
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-send-broadcast', GROUNDHOGG_ASSETS_URL . '/js/admin/send-broadcast' . $dot_min . '.js', [
 			'groundhogg-admin',
+			'groundhogg-admin-user',
 			'groundhogg-admin-data',
 			'groundhogg-admin-element',
 			'groundhogg-admin-functions',
 			'groundhogg-admin-search-filters',
 		] );
+
+		wp_register_script( 'groundhogg-admin-user', GROUNDHOGG_ASSETS_URL . '/js/admin/user' . $dot_min . '.js' );
+		wp_register_script( 'groundhogg-admin-formatting', GROUNDHOGG_ASSETS_URL . '/js/admin/formatting' . $dot_min . '.js' );
 
 		wp_register_script( 'groundhogg-admin-functions', GROUNDHOGG_ASSETS_URL . 'js/admin/functions' . $dot_min . '.js', [
 			'jquery',
@@ -350,6 +357,7 @@ class Scripts {
 				'optin_status' => Preferences::get_preference_names(),
 				'owners'       => get_owners(),
 				'current'      => get_request_var( 'filters', [] ),
+				'roles'        => get_editable_roles(),
 			],
 			'managed_page'    => [
 				'root' => managed_page_url()
@@ -358,7 +366,8 @@ class Scripts {
 				'admin' => admin_url(),
 				'home'  => home_url(),
 			],
-			'rawStepTypes'    => Plugin::instance()->step_manager->get_elements()
+			'rawStepTypes'    => Plugin::instance()->step_manager->get_elements(),
+			'currentUser'     => wp_get_current_user()
 		] );
 
 		wp_register_script( 'groundhogg-admin-fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );

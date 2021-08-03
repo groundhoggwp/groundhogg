@@ -545,23 +545,28 @@ class Contacts_Table extends WP_List_Table {
 		$actions = array();
 		$title   = $contact->get_email();
 
-		$actions['inline hide-if-no-js'] = sprintf(
-			'<a href="#" class="editinline" data-id="%d" aria-label="%s">%s</a>',
-			/* translators: %s: title */
-			esc_attr( $contact->get_id() ),
-			esc_attr( sprintf( __( 'Quick edit &#8220;%s&#8221; inline' ), $title ) ),
-			__( 'Quick&nbsp;Edit' )
-		);
+		if ( current_user_can( 'edit_contacts' ) ) {
+
+			$actions['inline hide-if-no-js'] = sprintf(
+				'<a href="#" class="editinline" data-id="%d" aria-label="%s">%s</a>',
+				/* translators: %s: title */
+				esc_attr( $contact->get_id() ),
+				esc_attr( sprintf( __( 'Quick edit &#8220;%s&#8221; inline' ), $title ) ),
+				__( 'Quick&nbsp;Edit' )
+			);
+		}
 
 		$editUrl = admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->get_id() );
 
-		$actions['edit'] = sprintf(
-			'<a href="%s" class="edit" aria-label="%s">%s</a>',
-			/* translators: %s: title */
-			$editUrl,
-			esc_attr( __( 'Edit' ) ),
-			__( 'Edit' )
-		);
+		if ( current_user_can( 'edit_contacts' ) ) {
+			$actions['edit'] = sprintf(
+				'<a href="%s" class="edit" aria-label="%s">%s</a>',
+				/* translators: %s: title */
+				$editUrl,
+				esc_attr( __( 'Edit' ) ),
+				__( 'Edit' )
+			);
+		}
 
 		$status_actions = [];
 
@@ -591,7 +596,13 @@ class Contacts_Table extends WP_List_Table {
 
 		$actions = array_merge( $actions, $status_actions );
 
-		$actions['delete'] = html()->e( 'a', [ 'href' => action_url( 'delete', [ 'contact' => $contact->get_id() ] ) ], __( 'Delete' ) );
+		if ( current_user_can( 'delete_contacts' ) ) {
+			$actions['delete'] = html()->e( 'a', [
+				'data-id' => $contact->get_id(),
+				'class'   => 'delete-contact',
+				'href'    => action_url( 'delete', [ 'contact' => $contact->get_id() ] )
+			], __( 'Delete' ) );
+		}
 
 		return $this->row_actions( apply_filters( 'groundhogg_contact_row_actions', $actions, $contact, $column_name ) );
 	}

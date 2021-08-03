@@ -10,6 +10,7 @@
     andList,
     searchOptionsWidget,
     loadingDots,
+    tooltip,
     bold
   } = Groundhogg.element
 
@@ -29,29 +30,7 @@
     groups: {}
   }
 
-  const formatTime = (date) => {
-    return Intl.DateTimeFormat(Groundhogg.locale, {
-      timeStyle: 'short',
-      // dateStyle: 'medium'
-      timeZone: 'UTC'
-    }).format(new Date(date))
-  }
-
-  const formatDateTime = (date, opts) => {
-    return Intl.DateTimeFormat(Groundhogg.locale, {
-      timeStyle: 'short',
-      dateStyle: 'medium',
-      ...opts
-    }).format(new Date(date))
-  }
-
-  const formatDate = (date) => {
-    return Intl.DateTimeFormat(Groundhogg.locale, {
-      // timeStyle: 'short',
-      dateStyle: 'medium',
-      timeZone: 'UTC'
-    }).format(new Date(date))
-  }
+  const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
 
   const renderFilterView = (filter, filterGroupIndex, filterIndex) => {
 
@@ -360,7 +339,7 @@
           self.filters.splice(group, 1)
         }
 
-        setActiveFilter( false, false )
+        setActiveFilter(false, false)
 
         onChange(self.filters)
 
@@ -452,6 +431,11 @@
             setActiveFilter($(this).data('group'), $(this).data('key'))
             break
         }
+      })
+
+      tooltip('.add-filter', {
+        content: __('Add a filter', 'groundhogg'),
+        position: 'right'
       })
 
       $(`${el} #search-filters-editor`).on('click', function (e) {
@@ -624,6 +608,7 @@
 
   registerFilterGroup('contact', _x('Contact', 'noun referring to a person in the crm', 'groundhogg'))
   registerFilterGroup('location', _x('Contact Location', 'contact is a noun referring to a person', 'groundhogg'))
+  registerFilterGroup('user', __('User', 'groundhogg'))
   registerFilterGroup('activity', _x('Activity', 'noun referring to a persons past activities', 'groundhogg'))
 
   registerFilter('first_name', 'contact', {
@@ -703,7 +688,7 @@
     }
   })
 
-  const { optin_status, owners, countries } = Groundhogg.filters
+  const { optin_status, owners, countries, roles } = Groundhogg.filters
 
   registerFilter('optin_status', 'contact', __('Optin Status', 'groundhogg'), {
     view ({ compare, value }) {
@@ -797,7 +782,7 @@
       })
     },
     defaults: {
-      compare: 'equals',
+      compare: 'in',
       value: []
       /*  value: '',
         value2: ''*/
@@ -927,6 +912,46 @@
       compare: 'equals',
       value: ''
     }
+  })
+
+  registerFilter('is_user', 'user', __('Has User Account', 'groundhogg'), {
+    view () {
+      return __('Has a user account', 'groundhogg')
+    },
+    edit () {
+      // language=html
+      return ''
+    },
+    onMount (filter, updateFilter) {},
+    defaults: {}
+  })
+
+  registerFilter('user_role_is', 'user', __('User role is', 'groundhogg'), {
+    view ({ role = 'subscriber' }) {
+      return sprintf(__('User role is %s', 'groundhogg'), bold( role ? roles[role].name : '' ))
+    },
+    edit ({ role }) {
+
+      // language=html
+      return `${select({
+        id: 'filter-role',
+        name: 'role',
+      }, Object.keys(roles).map(r => ({ text: roles[r].name, value: r })), role)}`
+    },
+    onMount (filter, updateFilter) {
+
+      $('#filter-role').select2({
+        placeholder: __('Select a role', 'groundhogg')
+      }).on('change', function (e) {
+        const $el = $(this)
+        updateFilter({
+          role: $el.val()
+        })
+      })
+    },
+    defaults: {
+      role: 'subscriber'
+    },
   })
 
   registerFilter('country', 'location', __('Country', 'groundhogg'), {

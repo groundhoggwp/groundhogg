@@ -861,6 +861,9 @@ p.error,
 
 .gh-has-tooltip{
 
+  position: relative;
+  box-sizing: border-box;
+
   &:hover{
     .gh-tooltip{
       display: block;
@@ -868,6 +871,7 @@ p.error,
   }
 
   .gh-tooltip {
+    width: max-content;
     display: none;
     position: absolute;
     background-color: $primary-dark;
@@ -877,6 +881,48 @@ p.error,
     padding: 5px 8px;
     border-radius: 5px;
     //position: relative;
+
+    &.right {
+      left: calc(100% + 5px);
+      top: 50%;
+      //left: 50%;
+      transform: translate(0, -50%);
+
+      &:before {
+        position: absolute;
+        content: '';
+        display: inline-block;
+        width: 0;
+        height: 0;
+        border-top: 5px solid transparent;
+        border-right: 5px solid $primary-dark;
+        border-bottom: 5px solid transparent;
+        //border-bottom: 5px solid $primary-dark;
+        transform: translate(0, -50%);
+        top: 50%;
+        left: -5px;
+      }
+    }
+
+    &.top {
+      bottom: calc(100% + 5px);
+      left: 50%;
+      transform: translate(-50%, 0);
+
+      &:before {
+        position: absolute;
+        content: '';
+        display: inline-block;
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-bottom: 5px solid $primary-dark;
+        transform: translate(-50%, 0) rotate(180deg);
+        bottom: -5px;
+        left: 50%;
+      }
+    }
 
     &.bottom {
       top: calc(100% + 5px);
@@ -896,8 +942,6 @@ p.error,
         top: -5px;
         left: 50%;
       }
-
-      transform: translate(-50%, 0);
     }
   }
 }
