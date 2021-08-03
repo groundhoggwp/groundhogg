@@ -481,12 +481,6 @@ class Contacts_Page extends Admin_Page {
 				'target' => '_self',
 				'id'     => 'import_contacts'
 			],
-			[
-				'link'   => $this->get_current_action() === 'view' ? '#' : admin_page_url( 'gh_contacts', [ 'is_searching' => true ] ),
-				'action' => __( 'Advanced Search', 'groundhogg' ),
-				'target' => '_self',
-				'id'     => 'search_contacts',
-			],
 		];
 	}
 

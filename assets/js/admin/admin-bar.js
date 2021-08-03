@@ -41,7 +41,7 @@
 				${input({
 					type: 'search',
 					id: 'quick-search-input',
-					placeholder: 'Search by name, email, or phone...'
+					placeholder: __( 'Search by name or email...', 'groundhogg' )
 				})}
 				<div class="${classPrefix}-results"></div>
 			</div>`
@@ -144,7 +144,7 @@
 
             let moreItems = ContactsStore.getTotalItems() - items.length
             //language=HTML
-            return `<p><a
+            return `<p style="text-align: center"><a
 				href="${adminPageURL('gh_contacts', { s: search })}">${sprintf(_n('See %s more contact', 'See %s more contacts', moreItems), formatNumber(moreItems))}</a>
 			</p>`
           }

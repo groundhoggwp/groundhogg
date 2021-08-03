@@ -102,9 +102,13 @@ span#search-name {
 #search-panel button.enable-filters {
   background: #FFFFFF;
   border: 1px solid #8c8f94;
-  border-radius: 5px;
+  border-radius: 3px;
   padding: 5px;
   cursor: pointer;
+}
+#search-panel button.enable-filters:hover {
+  background: rgba(16, 38, 64, 0.01);
+  border-color: rgba(16, 38, 64, 0.5);
 }
 
 .search-param {

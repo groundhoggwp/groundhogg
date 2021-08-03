@@ -12,12 +12,15 @@
     tooltip,
     loadingDots,
     adminPageURL,
+    bold,
     dialog
   } = Groundhogg.element
   const { emailPicker, searchesPicker } = Groundhogg.pickers
   const { emails: EmailsStore, searches: SearchesStore, contacts: ContactsStore } = Groundhogg.stores
   const { routes, post } = Groundhogg.api
   const { createFilters } = Groundhogg.filters.functions
+  const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
+  const { sprintf, __, _x, _n } = wp.i18n
 
   const SendBroadcast = (selector, {
     email = false,
@@ -68,7 +71,7 @@
 		  <div class="gh-rows-and-columns">
 			  <div class="gh-row">
 				  <div class="gh-col">
-					  <label for="${elPrefix}-email">Which email do you want to send?</label>
+					  <label for="${elPrefix}-email">${__('Which email do you want to send?', 'groundhogg')}</label>
 					  ${select({
 						  name: 'email',
 						  id: `${elPrefix}-email`
@@ -78,7 +81,8 @@
 			  ${state.email_id ? preview() : ''}
 			  <div class="gh-row">
 				  <div class="gh-col">
-					  <button class="gh-next-step gh-button primary" ${state.email_id ? '' : 'disabled'}>Next &rarr;
+					  <button class="gh-next-step gh-button primary" ${state.email_id ? '' : 'disabled'}>
+						  ${__('Next', 'groundhogg')} &rarr;
 					  </button>
 				  </div>
 			  </div>
@@ -93,7 +97,7 @@
         return `
 			<div class="gh-row">
 				<div class="gh-col">
-					<label for="${elPrefix}-date">Set the date and time...</label>
+					<label for="${elPrefix}-date">${__('Set the date and time...', 'groundhogg')}</label>
 					<div class="gh-input-group">
 						${input({
 							id: `${elPrefix}-date`,
@@ -118,7 +122,7 @@
 		  <div class="gh-rows-and-columns">
 			  <div class="gh-row">
 				  <div class="gh-col">
-					  <label for="${elPrefix}-when">When should this email be sent?</label>
+					  <label for="${elPrefix}-when">${__('When should this email be sent?', 'groundhogg')}</label>
 					  <div class="gh-radio-group">
 						  <label>${input({
 							  type: 'radio',
@@ -126,14 +130,14 @@
 							  name: 'gh_send_when',
 							  value: 'now',
 							  checked: state.when === 'now',
-						  })} Now</label>
+						  })} ${__('Now', 'groundhogg')}</label>
 						  <label>${input({
 							  type: 'radio',
 							  name: 'gh_send_when',
 							  className: 'change-when',
 							  value: 'later',
 							  checked: state.when === 'later',
-						  })} Later</label>
+						  })} ${__('Later', 'groundhogg')}</label>
 					  </div>
 
 				  </div>
@@ -142,7 +146,8 @@
 			  <div class="gh-row">
 				  <div class="gh-col">
 					  <button class="gh-next-step gh-button primary"
-					          ${state.when === 'later' && (!state.date || !state.time) ? 'disabled' : ''}>Next &rarr;
+					          ${state.when === 'later' && (!state.date || !state.time) ? 'disabled' : ''}>
+						  ${__('Next', 'groundhogg')} &rarr;
 					  </button>
 				  </div>
 			  </div>`
@@ -150,23 +155,29 @@
 
     const step3 = () => {
 
+      const { total_contacts } = state
+
       const totalAndNext = () => {
-        // language=HTML
+        //language=HTML
         return `
 			<div class="gh-row">
 				<div class="gh-col">
 					<div id="${elPrefix}-total-contacts">
-						<p>Send to <b>${state.total_contacts}</b> contacts</p>
+						<p>
+							${sprintf(_n('Send to %s contact', 'Send to %s contacts', total_contacts, 'groundhogg'), bold(formatNumber(total_contacts)))}
+            </p>
 					</div>
 				</div>
 			</div>
 			<div class="gh-row">
 				<div class="gh-col">
-					<button class="gh-next-step gh-button primary" ${state.total_contacts ? '' : 'disabled'}>Next
+					<button class="gh-next-step gh-button primary" ${total_contacts ? '' : 'disabled'}>
+						${__('Next', 'groundhogg')}
 						&rarr;
 					</button>
 				</div>
 			</div>`
+        // language=HTML
       }
 
       if (state.which === 'from_table') {
@@ -178,7 +189,8 @@
 		  <div class="gh-rows-and-columns">
 			  <div class="gh-row">
 				  <div class="gh-col">
-					  <label for="${elPrefix}-search-which">Select contacts to receive this email...</label>
+					  <label
+						  for="${elPrefix}-search-which">${__('Select contacts to receive this email...', 'groundhogg')}</label>
 					  <div class="gh-radio-group">
 						  <label>${input({
 							  type: 'radio',
@@ -186,14 +198,14 @@
 							  name: 'gh_send_search_which',
 							  value: 'filters',
 							  checked: state.which === 'filters',
-						  })} Search for Contacts</label>
+						  })} ${__('Search for Contacts', 'groundhogg')}</label>
 						  <label>${input({
 							  type: 'radio',
 							  name: 'gh_send_search_which',
 							  className: 'change-search-which',
 							  value: 'searches',
 							  checked: state.which === 'searches',
-						  })} Use a Saved Search</label>
+						  })} ${__('Use a Saved Search', 'groundhogg')}</label>
 					  </div>
 				  </div>
 			  </div>
@@ -203,7 +215,7 @@
 						  ${state.which === 'searches' ? select({
 							  id: `${elPrefix}-search-method-searches`,
 							  name: 'searches',
-							  dataPlaceholder: 'Please select a saved search...'
+							  dataPlaceholder: __('Please select a saved search...', 'groundhogg')
 						  }, SearchesStore.getItems().map(s => ({
 							  text: s.name,
 							  value: s.id
@@ -225,20 +237,22 @@
         time
       } = state
 
+      let review = state.when === 'later'
+        ? _n('Send %1$s to %2$s contact on %3$s', 'Send %1$s to %2$s contacts on %3$s', total_contacts, 'groundhogg')
+        : _n('Send %1$s to %2$s contact <b>immediately</b>.', 'Send %1$s to %2$s contacts <b>immediately</b>', total_contacts, 'groundhogg')
+
       // language=HTML
       return `
 		  <div class="gh-rows-and-columns">
 			  <div class="gh-row">
 				  <div class="gh-col">
-					  <p>Send <b>${email.data.title}</b> to <b>${total_contacts}</b> contacts
-						  ${state.when === 'later' ? `on <b>${moment(`${state.date} ${state.time}`).format('LLLL')}</b>.` : '<b>immediately</b>.'}
-					  </p>
+					  ${sprintf(review, bold(email.data.title), bold(formatNumber(total_contacts)), bold(formatDateTime(date + ' ' + time)))}
 				  </div>
 			  </div>
 			  <div class="gh-row">
 				  <div class="gh-col">
 					  <button id="${elPrefix}-confirm" class="gh-button primary">
-						  ${state.when === 'later' ? 'Confirm and Schedule' : 'Confirm and Send'}
+						  ${state.when === 'later' ? __('Confirm and Schedule', 'groundhogg') : __('Confirm and Send', 'groundhogg')}
 					  </button>
 				  </div>
 			  </div>
@@ -262,10 +276,10 @@
       ],
       showNav: true,
       labels: [
-        'Email',
-        'Schedule',
-        'Contacts',
-        'Review'
+        __('Email', 'groundhogg'),
+        __('Schedule', 'groundhogg'),
+        __('Contacts', 'groundhogg'),
+        __('Review', 'groundhogg')
       ],
       onStepChange: (step, {
         nextStep,
@@ -335,7 +349,7 @@
               }
 
               ContactsStore.count(query).then(total => {
-                $(`#${elPrefix}-total-contacts`).html(`<p>Send to <b>${total}</b> contacts</p>`)
+                $(`#${elPrefix}-total-contacts`).html(`<p>${sprintf(_n('Send to %s contact', 'Send to %s contacts', total, 'groundhogg'), bold(formatNumber(total)))}</p>`)
                 $('.gh-next-step').prop('disabled', total === 0)
                 setState({
                   total_contacts: total
@@ -403,7 +417,7 @@
                 const scheduling = () => {
                   // language=HTML
                   return `
-					  <h2 id="broadcast-progress-header">Scheduling</h2>
+					  <h2 id="broadcast-progress-header">${__('Scheduling', 'groundhogg')}</h2>
 					  <div id="broadcast-progress"></div>`
                 }
 
@@ -422,7 +436,7 @@
                         setTimeout(() => {
                           stopDots()
                           dialog({
-                            message: `Broadcast scheduled!`
+                            message: __('Broadcast scheduled!', 'groundhogg')
                           })
 
                           onScheduled()
@@ -431,7 +445,7 @@
                       }
                     }).catch(() => {
                     errorDialog({
-                      message: 'Something went wrong...'
+                      message: __('Something went wrong...', 'groundhogg')
                     })
                   })
                 }
@@ -439,7 +453,7 @@
                 schedule()
               }).catch(() => {
                 errorDialog({
-                  message: 'Something went wrong...'
+                  message: __('Something went wrong...', 'groundhogg')
                 })
                 setStep(3)
               })

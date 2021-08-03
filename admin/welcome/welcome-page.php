@@ -23,6 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Show a welcome screen which will help users find articles and extensions that will suit their needs.
  *
  * Class Page
+ *
  * @package Groundhogg\Admin\Welcome
  */
 class Welcome_Page extends Admin_Page {
@@ -106,7 +107,10 @@ class Welcome_Page extends Admin_Page {
 			'view_contacts',
 			'groundhogg',
 			[ $this, 'page' ],
-			'dashicons-email-alt',
+			is_white_labeled() ? 'dashicons-email-alt' :
+				'data:image/svg+xml;base64,' . base64_encode( '<svg xmlns="http://www.w3.org/2000/svg" viewBox="11.4 13.2 212.1 237.9">
+  <path fill="#FFF" d="M 22.7 64.4 L 106.1 16.2 C 113.1 12.2 121.8 12.2 128.8 16.2 L 212.2 64.4 C 219.2 68.4 223.5 75.9 223.5 84 L 223.5 180.3 C 223.5 188.4 219.2 195.9 212.2 199.9 L 128.8 248.1 C 121.8 252.1 113.1 252.1 106.1 248.1 L 22.7 200 C 15.7 196 11.4 188.5 11.4 180.4 L 11.4 84 C 11.369 75.91 15.684 68.427 22.7 64.4 Z M 183.5 126 L 117.5 126 L 117.5 149.3 L 143.1 149.3 C 138.964 155.035 133.014 159.206 126.212 161.138 C 102.96 167.743 81.278 146.701 87.184 123.262 C 93.089 99.822 122.154 91.566 139.5 108.4 L 164 84.1 C 142.84 63.066 110.212 58.814 84.368 73.724 C 40.293 99.152 40.273 162.757 84.332 188.213 C 128.391 213.669 183.484 181.884 183.5 131 Z" />
+</svg>' ),
 			2
 
 		);

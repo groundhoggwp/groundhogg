@@ -11,6 +11,7 @@ $primary-dark-30: rgba(16, 38, 64, 0.3);
 $primary-dark-15: rgba(16, 38, 64, 0.15);
 $primary-dark-10: rgba(16, 38, 64, 0.10);
 $primary-dark-2: rgba(16, 38, 64, 0.02);
+$primary-dark-1: rgba(16, 38, 64, 0.01);
 $error-red: rgb(233, 31, 79);
 $error-red-50: rgba(233, 31, 79, 0.5);
 $error-red-10: rgba(233, 31, 79, 0.10);
@@ -140,9 +141,14 @@ span#search-name {
 #search-panel button.enable-filters {
   background: #FFFFFF;
   border: 1px solid #8c8f94;
-  border-radius: 5px;
+  border-radius: 3px;
   padding: 5px;
   cursor: pointer;
+
+  &:hover{
+    background: $primary-dark-1;
+    border-color: $primary-dark-50;
+  }
 }
 
 .search-param {
