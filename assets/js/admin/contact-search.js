@@ -99,7 +99,7 @@
           this.loadingSearch = true
           loadSearch(option.id)
         },
-        noOptions: 'No matching searches...'
+        noOptions: __('No matching searches...', 'groundhogg')
       })
 
     },
@@ -115,10 +115,10 @@
 			<div class="search-filters-wrap">
 				<div id="search-filters"></div>
 				<div class="search-contacts-wrap">
-					<button id="search-contacts" class="button button-primary">Search</button>
+					<button id="search-contacts" class="button button-primary">${__('Search', 'groundhogg')}</button>
 					${!this.currentSearch
-						? '<button id="save-search" class="button button-secondary">Save this search</button>'
-						: `<button id="update-search" class="button button-secondary" ${objectEquals(this.filters, this.currentSearch.query.filters) ? 'disabled' : ''}>Update "${this.currentSearch.name}"</button>`}
+						? `<button id="save-search" class="button button-secondary">${__('Save this search', 'groundhogg')}</button>`
+						: `<button id="update-search" class="button button-secondary" ${objectEquals(this.filters, this.currentSearch.query.filters) ? 'disabled' : ''}>${__('Update', 'groundhogg')} "${this.currentSearch.name}"</button>`}
 				</div>
 			</div>
         `
@@ -127,12 +127,12 @@
       //language=HTML
       return `
 		  <button class="enable-filters white" style="padding-right: 10px"><span
-			  class="dashicons dashicons-filter"></span> ${this.currentSearch ? 'Edit Filters' : 'Filter Contacts'}
+			  class="dashicons dashicons-filter"></span> ${this.currentSearch ? __('Edit Filters', 'groundhogg') : __('Filter Contacts', 'groundhogg')}
 		  </button>
 		  ${this.savedSearchEnabled
 			  ? `<div id="searches-picker"></div>`
 			  : (ContactSearch.searches.length
-					  ? `<button id="load-saved-search" class="has-dashicon button button-secondary"><span class="dashicons dashicons-search"></span> <span class="text">${this.loadingSearch ? 'Loading search' : 'Load saved search'}</span></button>`
+					  ? `<button id="load-saved-search" class="has-dashicon button button-secondary"><span class="dashicons dashicons-search"></span> <span class="text">${this.loadingSearch ? __('Loading search', 'groundhogg') : __('Load saved search', 'groundhogg')}</span></button>`
 					  : ''
 			  )}`
     },
@@ -257,9 +257,9 @@
 			  <h2>Name your search...</h2>
 			  <p>${input({
 				  id: 'search-name',
-				  placeholder: 'My saved search...'
+				  placeholder: __('My saved search...', 'groundhogg')
 			  })}</p>
-			  <button id="save" disabled class="gh-button primary">Save</button>`
+			  <button id="save" disabled class="gh-button primary">${__('Save', 'groundhogg')}</button>`
         })
 
         $('input#search-name').on('change input', (e) => {
@@ -330,7 +330,7 @@
   // More Actions
   $(() => {
 
-    $('.gh-actions').append(`<button type="button" class="more-actions button button-secondary">More Actions</button>`)
+    $('.gh-actions').append(`<button type="button" class="more-actions button button-secondary">${__('More Actions', 'groundhogg')}</button>`)
     $('.more-actions').on('click', (e) => {
 
       const {
@@ -407,7 +407,7 @@
 							</div>
 						</div>
 						${funnel ? steps() : ''}
-						${funnel && step ? `<div class="gh-row"><div class="gh-col"><button class="gh-button primary">Add ${totalContactsFormatted} to <b>${funnel.data.title}</b></button></div></div>` : ''}
+						${funnel && step ? `<div class="gh-row"><div class="gh-col"><button class="gh-button primary">${__('Add', 'groundhogg')} ${totalContactsFormatted} to <b>${funnel.data.title}</b></button></div></div>` : ''}
 					</div>`
               }
 
@@ -461,7 +461,7 @@
             case 'broadcast':
 
               const { close: closeModal } = modal({
-                content: `<h2>Send a broadcast</h2><div id="gh-broadcast-form" style="width: 400px"></div>`
+                content: `<h2>${__('Send a broadcast', 'groundhogg')}</h2><div id="gh-broadcast-form" style="width: 400px"></div>`
               })
 
               Groundhogg.SendBroadcast('#gh-broadcast-form', {
@@ -569,13 +569,13 @@
 							${specialChars(`${contact.data.first_name} ${contact.data.last_name}`)}</h2>
 					</div>
 					<div class="actions">
-						<a class="gh-button secondary" href="${contact.admin}">Edit Full Profile</a>
+						<a class="gh-button secondary" href="${contact.admin}">${__('Edit Full Profile', 'groundhogg')}</a>
 					</div>
 				</div>
 				<div class="contact-quick-edit-fields">
 					<div class="row">
 						<div class="col">
-							<label for="quick-edit-first-name">First Name</label>
+							<label for="quick-edit-first-name">${__('First Name', 'groundhogg')}</label>
 							${input({
 								id: 'quick-edit-first-name',
 								name: 'first_name',
@@ -583,7 +583,7 @@
 							})}
 						</div>
 						<div class="col">
-							<label for="quick-edit-last-name">Last Name</label>
+							<label for="quick-edit-last-name">${__('Last Name', 'groundhogg')}</label>
 							${input({
 								id: 'quick-edit-last-name',
 								name: 'last_name',
@@ -593,7 +593,7 @@
 					</div>
 					<div class="row">
 						<div class="col">
-							<label for="quick-edit-email">Email Address</label>
+							<label for="quick-edit-email">${__('Email Address', 'groundhogg')}</label>
 							${input({
 								type: 'email',
 								name: 'email',
@@ -604,7 +604,7 @@
 						<div class="col">
 							<div class="row phone">
 								<div class="col">
-									<label for="quick-edit-primary-phone">Primary Phone</label>
+									<label for="quick-edit-primary-phone">${__('Primary Phone', 'groundhogg')}</label>
 									${input({
 										type: 'tel',
 										id: 'quick-edit-primary-phone',
@@ -613,7 +613,7 @@
 									})}
 								</div>
 								<div class="primary-phone-ext">
-									<label for="quick-edit-primary-phone-extension">Ext.</label>
+									<label for="quick-edit-primary-phone-extension">${__('Ext.', 'groundhogg')}</label>
 									${input({
 										type: 'number',
 										id: 'quick-edit-primary-phone-extension',
@@ -626,14 +626,14 @@
 					</div>
 					<div class="row">
 						<div class="col">
-							<label for="quick-edit-email">Optin Status</label>
+							<label for="quick-edit-email">${__('Optin Status', 'groundhogg')}</label>
 							${select({
 								id: 'quick-edit-optin-status',
 								name: 'optin_status'
 							}, Groundhogg.filters.optin_status, contact.data.optin_status)}
 						</div>
 						<div class="col">
-							<label for="quick-edit-mobile-phone">Mobile Phone</label>
+							<label for="quick-edit-mobile-phone">${__('Mobile Phone', 'groundhogg')}</label>
 							${input({
 								type: 'tel',
 								id: 'quick-edit-mobile-phone',
@@ -723,7 +723,7 @@
                 contact: contact.ID
               }).then((r) => {
                 dialog({
-                  message: 'Contact updated!'
+                  message: __('Contact updated!', 'groundhogg')
                 })
                 $(`#contact-${contact.ID}`).replaceWith(r.data.row)
               })

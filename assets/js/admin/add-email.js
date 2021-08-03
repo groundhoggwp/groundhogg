@@ -54,8 +54,8 @@
   const EmailTemplatePicker = ({
     selector,
     breadcrumbs: crumbs = [
-      'Emails',
-      'Add New'
+      __('Emails', 'groundhogg'),
+      __('Add New', 'groundhogg')
     ],
     onSelect = (email) => {
       console.log(email)
@@ -76,15 +76,15 @@
       return `
 		  <div class="gh-panel template" tabindex="0">
 			  <div class="subject-and-preview">
-				  <div class="subject-wrap">Subject: <span class="subject">${data.subject}</span></div>
-				  <div class="preview-wrap">Preview: <span class="preview-text">${data.pre_header}</span></div>
+				  <div class="subject-wrap">${__('Subject', 'groundhogg')}: <span class="subject">${data.subject}</span></div>
+				  <div class="preview-wrap">${__('Preview', 'groundhogg')}: <span class="preview-text">${data.pre_header}</span></div>
 			  </div>
 			  <div class="template-preview">
 				  <div class="template-content">
 					  <iframe class="template-frame" data-template="${ID}"></iframe>
 				  </div>
 				  <div class="template-actions">
-					  <button class="gh-button primary select-template" data-template="${ID}">Use Template</button>
+					  <button class="gh-button primary select-template" data-template="${ID}">${__('Use Template', 'groundhogg')}</button>
 				  </div>
 			  </div>
 		  </div>`
@@ -111,8 +111,8 @@
 					  <input type="search" id="search" name="search" placeholder="Search templates" value=""/>
 				  </div>
 				  <div class="template-actions">
-					  <button id="import-button" class="gh-button secondary">Import</button>
-					  <button id="scratch-button" class="gh-button secondary">Start From Scratch</button>
+					  <button id="import-button" class="gh-button secondary">${__('Import', 'groundhogg')}</button>
+					  <button id="scratch-button" class="gh-button secondary">${__('Start From Scratch', 'groundhogg')}</button>
 					  ${afterHeaderActions}
 				  </div>
 			  </div>
@@ -143,7 +143,7 @@
 
         //language=HTML
         return `
-			<div id="template-name"><h2>Name your email</h2>
+			<div id="template-name"><h2>${__('Name your email', 'groundhogg')}</h2>
 				${input({
 					id: 'title-input',
 					placeholder: 'Title',
@@ -153,7 +153,7 @@
 				${primaryButton({
 					id: 'create',
 					className: 'medium bold',
-					text: isCreating ? 'Creating' : 'Creat Email',
+					text: isCreating ? __('Creating', 'groundhogg') : __('Creat Email', 'groundhogg'),
 					disabled: isCreating || !this.newTitle
 				})}
 			</div>`
@@ -229,11 +229,11 @@
 					</div>
 					<div class="template-actions">
 						${primaryButton({
-							text: 'Use this template',
+							text: __('Use this template', 'groundhogg'),
 							id: 'create-from-import',
 							className: 'big bold loud'
 						})}
-						<a href="#" class="cancel action-link">&larr; Cancel</a>
+						<a href="#" class="cancel action-link">&larr; ${__('Cancel', 'groundhogg')}</a>
 					</div>
 				</div>
 			</div>`
@@ -245,7 +245,7 @@
 			  <h1>Import your Email</h1>
 			  <input type="file" id="import-file" name="import" accept=".email,.html"/>
 			  ${this.importError ? `<p class="error">${this.importError}</p>` : ''}
-			  <p><a class="action-link cancel">&larr; Cancel</a></p>
+			  <p><a class="action-link cancel">&larr; ${__('Cancel', 'groundhogg')}</a></p>
 		  </div>`
     },
 
@@ -266,7 +266,7 @@
         const content = e.target.result
 
         if (!content) {
-          this.importError = 'The provided file is not a valid funnel.'
+          this.importError = __('The provided file is not a valid funnel.', 'groundhogg')
           this.mountImport()
           this.importError = ''
           return
@@ -288,7 +288,7 @@
         const template = JSON.parse(e.target.result)
 
         if (!template) {
-          this.importError = 'The provided file is not a valid funnel.'
+          this.importError = __('The provided file is not a valid funnel.', 'groundhogg')
           this.mountImport()
           this.importError = ''
         } else {

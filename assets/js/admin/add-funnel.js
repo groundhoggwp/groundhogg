@@ -91,36 +91,36 @@
       const numActions = steps.filter(({ data }) => data.step_group === 'action').length
       const numBenchmarks = steps.filter(({ data }) => data.step_group === 'benchmark').length
       const pills = [
-        `<span class="pill orange">${numBenchmarks} ${numBenchmarks === 1 ? 'benchmark' : 'benchmarks'}</span>`,
-        `<span class="pill green">${numActions} ${numActions === 1 ? 'action' : 'actions'}</span>`,
-        `<span class="pill">Added ${moment(data.date_created).format('LL')}</span>`
+        `<span class="pill orange">${numBenchmarks} ${numBenchmarks === 1 ? __('benchmark', 'groundhogg') : __('benchmarks', 'groundhogg')}</span>`,
+        `<span class="pill green">${numActions} ${numActions === 1 ? __('action', 'groundhogg') : __('actions', 'groundhogg')}</span>`,
+        `<span class="pill">${__('Added', 'groundhogg')} ${moment(data.date_created).format('LL')}</span>`
         // ...campaigns.map(c => `<span class="pill">${c.data.name}</span>`)
         // canUse ? 'enabled' : 'disabled',
       ]
 
       //language=html
       return `
-		  <div class="gh-panel template ${canUse ? 'enabled' : 'disabled'}" tabindex="0">
+		  <div class="gh-panel template ${canUse ? __('enabled', 'groundhogg') : __('disabled', 'groundhogg') }" tabindex="0">
 			  <div class="template-header">
 				  <h2>${data.title}</h2>
 			  </div>
 			  <div class="inside">
 				  <p>${meta.description || ''}</p>
 				  <p>
-					  <b>Details</b>
+					  <b>${__('Details', 'groundhogg')}</b>
 				  </p>
 				  <p>
 					  ${pills.join('')}
 				  </p>
 				  <p>
-					  <b>Campaigns</b>
+					  <b>${__('Campaigns', 'groundhogg')}</b>
 				  </p>
 				  <p>
 					  ${campaigns.map(c => `<span class="pill">${c.data.name}</span>`).join('')}
 				  </p>
 				  <p class="actions">
 					  ${hasRequiredSteps(steps) ?
-						  `<button data-template="${ID}" class="gh-button primary small select-template">Import</button>` : `<span class="gh-text danger">You do not have the required extensions installed for this template.</span>`}
+						  `<button data-template="${ID}" class="gh-button primary small select-template">Import</button>` : `<span class="gh-text danger">${__('You do not have the required extensions installed for this template.', 'groundhogg')}</span>`}
 				  </p>
 			  </div>
 		  </div>`
@@ -156,8 +156,8 @@
 					  <input type="search" id="search" name="search" placeholder="Search templates" value=""/>
 				  </div>
 				  <div class="template-actions">
-					  <button id="import-button" class="gh-button secondary">Import</button>
-					  <button id="scratch-button" class="gh-button secondary">Start From Scratch</button>
+					  <button id="import-button" class="gh-button secondary">${__('Import', 'groundhogg')}</button>
+					  <button id="scratch-button" class="gh-button secondary">${__('Start From Scratch', 'groundhogg')}</button>
 					  ${afterHeaderActions}
 				  </div>
 			  </div>
@@ -196,7 +196,7 @@
 
         //language=HTML
         return `
-			<div id="template-name"><h2>Name your funnel</h2>
+			<div id="template-name"><h2>${__('Name your funnel', 'groundhogg')}</h2>
 				${input({
 					id: 'title-input',
 					placeholder: 'Title',
@@ -206,7 +206,7 @@
 				${primaryButton({
 					id: 'create',
 					className: 'medium bold',
-					text: isCreating ? 'Importing' : 'Import Funnel',
+					text: isCreating ? __('Importing', 'groundhogg') : __('Import Funnel', 'groundhogg'),
 					disabled: isCreating || !this.newTitle
 				})}
 			</div>`
@@ -270,7 +270,7 @@
         //language=HTML
         return `
 			<div id="import">
-				<h1>Import your Email</h1>
+				<h1>${__('Import your Email', 'groundhogg')}</h1>
 				<div class="template-preview-wrap">
 					<div class="import-template-preview">
 						<iframe id="template-preview"></iframe>
@@ -281,7 +281,7 @@
 							id: 'create-from-import',
 							className: 'big bold loud'
 						})}
-						<a href="#" class="cancel action-link">&larr; Cancel</a>
+						<a href="#" class="cancel action-link">&larr; ${__('Cancel', 'groundhogg')}</a>
 					</div>
 				</div>
 			</div>`
@@ -290,10 +290,10 @@
       //language=HTML
       return `
 		  <div id="import">
-			  <h1>Import your Funnel</h1>
+			  <h1>${__('Import your Funnel', 'groundhogg')}</h1>
 			  <input type="file" id="import-file" name="import" accept=".funnel"/>
 			  ${this.importError ? `<p class="error">${this.importError}</p>` : ''}
-			  <p><a class="action-link cancel">&larr; Cancel</a></p>
+			  <p><a class="action-link cancel">&larr; ${__('Cancel', 'groundhogg')}</a></p>
 		  </div>`
     },
 
@@ -314,7 +314,7 @@
         const content = e.target.result
 
         if (!content) {
-          this.importError = 'The provided file is not a valid funnel.'
+          this.importError = __('The provided file is not a valid funnel.', 'groundhogg')
           this.mountImport()
           this.importError = ''
           return
@@ -336,7 +336,7 @@
         const template = JSON.parse(e.target.result)
 
         if (!template) {
-          this.importError = 'The provided file is not a valid funnel.'
+          this.importError = __('The provided file is not a valid funnel.', 'groundhogg')
           this.mountImport()
           this.importError = ''
         } else {

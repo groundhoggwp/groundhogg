@@ -23,7 +23,7 @@
 
   const Tabs = {
     search_contacts: {
-      tooltip: `Search for contacts`,
+      tooltip: __(`Search for contacts`, 'groundhogg'),
       // language=HTML
       svg: `
 		  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -39,7 +39,7 @@
 				${input({
 					type: 'search',
 					id: 'quick-search-input',
-					placeholder: 'Search by name, email, or phone...'
+					placeholder: __('Search by name, email, or phone...', 'groundhogg')
 				})}
 				<div class="${classPrefix}-results"></div>
 			</div>`
@@ -167,7 +167,7 @@
 			<div class="gh-rows-and-columns">
 				<div class="gh-row">
 					<div class="gh-col">
-						<label for="${subClassPrefix}-first-name">First Name</label>
+						<label for="${subClassPrefix}-first-name">${__('First Name', 'groundhogg')}</label>
 						${input({
 							id: `${subClassPrefix}-first-name`,
 							name: 'first_name',
@@ -175,7 +175,7 @@
 						})}
 					</div>
 					<div class="gh-col">
-						<label for="${subClassPrefix}-last-name">Last Name</label>
+						<label for="${subClassPrefix}-last-name">${__('Last Name', 'groundhogg')}</label>
 						${input({
 							id: `${subClassPrefix}-last-name`,
 							name: 'last_name',
@@ -185,7 +185,7 @@
 				</div>
 				<div class="gh-row">
 					<div class="gh-col">
-						<label for="${subClassPrefix}-email">Email Address</label>
+						<label for="${subClassPrefix}-email">${__('Email Address', 'groundhogg')}</label>
 						${input({
 							id: `${subClassPrefix}-email`,
 							name: 'email',
@@ -196,17 +196,18 @@
 				</div>
 				<div class="gh-row">
 					<div class="gh-col">
-						<label for="${subClassPrefix}-tags">Tags</label>
+						<label for="${subClassPrefix}-tags">${__('Tags', 'groundhogg')}</label>
 						${select({
 							id: `${subClassPrefix}-tags`,
 							multiple: true,
-							dataPlaceholder: 'Type to select tags...'
+							dataPlaceholder: __('Type to select tags...', 'groundhogg')
 						})}
 					</div>
 				</div>
 				<div class="gh-row">
 					<div class="gh-col">
-						<button id="${classPrefix}-quick-add-button" class="gh-button primary">Create Contact</button>
+						<button id="${classPrefix}-quick-add-button" class="gh-button primary">${__('Create Contact', 'groundhogg')}
+            </button>
 					</div>
 				</div>
 			</div>`
@@ -232,7 +233,7 @@
 
           if (!payload.data.email || !isValidEmail(payload.data.email)) {
             errorDialog({
-              message: 'A valid email is required!'
+              message: __('A valid email is required!', 'groundhogg')
             })
             return
           }
