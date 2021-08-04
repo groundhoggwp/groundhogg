@@ -299,11 +299,6 @@ class Contact_Query {
 		 */
 		$this->query_var_defaults = apply_filters( 'groundhogg/contact_query/query_var_defaults', $defaults );
 
-		if ( empty( self::$filters ) ) {
-			self::setup_default_filters();
-			do_action( 'groundhogg/contact_query/register_filters', $this );
-		}
-
 		if ( ! empty( $query ) ) {
 			$this->query( $query );
 		}
@@ -1163,6 +1158,20 @@ class Contact_Query {
 	}
 
 	/**
+	 * Register the filters
+	 */
+	protected function register_filters(){
+
+		if ( ! empty( self::$filters ) ){
+			return;
+		}
+
+		self::setup_default_filters();
+
+		do_action( 'groundhogg/contact_query/register_filters', $this );
+	}
+
+	/**
 	 * Parse the provided filters to form a where clause
 	 *
 	 * @param $filters
@@ -1180,6 +1189,8 @@ class Contact_Query {
 		if ( ! $filters ) {
 			return false;
 		}
+
+		$this->register_filters();
 
 		// Or Group
 		foreach ( $filters as $filter_group ) {
@@ -1380,7 +1391,7 @@ class Contact_Query {
 			'role' => ''
 		] );
 
-		$role = sanitize_text_field( $filter_vars['role']);
+		$role = sanitize_text_field( $filter_vars['role'] );
 
 		return "$query->table_name.user_id IN ( SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = 'wp_capabilities' AND meta_value RLIKE '\"$role\"' )";
 	}
@@ -2067,34 +2078,26 @@ class Contact_Query {
 	 *
 	 * @return string
 	 */
-	public static function generic_number_filter_compare( array $filter_vars, string $column_key ): string {
-		$filter_vars = wp_parse_args( $filter_vars, [
-			'value'   => '',
-			'compare' => '',
-		] );
+	public static function generic_number_compare( $column, $compare, $value ) {
 
-		global $wpdb;
-
-		$value = sanitize_text_field( $filter_vars['value'] );
-
-		switch ( $filter_vars['compare'] ) {
+		switch ( $compare ) {
 			default:
 			case 'equals':
-				return sprintf( "`%s` = %d", $column_key, $value );
+				return sprintf( "%s = %d", $column, $value );
 			case 'not_equals':
-				return sprintf( "`%s` != %d", $column_key, $value );
+				return sprintf( "%s != %d", $column, $value );
 			case 'greater_than':
-				return sprintf( "`%s` > %d", $column_key, $value );
+				return sprintf( "%s > %d", $column, $value );
 			case 'less_than':
-				return sprintf( "`%s` < %d", $column_key, $value );
+				return sprintf( "%s < %d", $column, $value );
 			case 'greater_than_or_equal_to':
-				return sprintf( "`%s` >= %d", $column_key, $value );
+				return sprintf( "%s >= %d", $column, $value );
 			case 'less_than_or_equal_to':
-				return sprintf( "`%s` <= %d", $column_key, $value );
+				return sprintf( "%s <= %d", $column, $value );
 			case 'between_inclusive':
-				return sprintf( "`%s` <> %d", $column_key, $value );
+				return sprintf( "%s <> %d", $column, $value );
 			case 'between_exclusive':
-				return sprintf( "`%s` <= %d", $column_key, $value );
+				return sprintf( "%s <= %d", $column, $value );
 		}
 	}
 

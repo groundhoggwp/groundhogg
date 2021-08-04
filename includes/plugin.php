@@ -337,8 +337,6 @@ class Plugin {
 		new Activity_Handler();
 
 		\Groundhogg_Email_Services::init();
-
-		Contact_Query::setup_default_filters();
 	}
 
 	/**

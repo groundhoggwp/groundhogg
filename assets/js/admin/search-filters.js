@@ -105,7 +105,7 @@
     }
   }
 
-  const Comparisons = {
+  const AllComparisons = {
     equals: _x('Equals', 'comparison', 'groundhogg'),
     not_equals: _x('Not equals', 'comparison', 'groundhogg'),
     contains: _x('Contains', 'comparison', 'groundhogg'),
@@ -122,6 +122,28 @@
     not_empty: _x('Is not empty', 'comparison', 'groundhogg')
   }
 
+  const StringComparisons = {
+    equals: _x('Equals', 'comparison', 'groundhogg'),
+    not_equals: _x('Not equals', 'comparison', 'groundhogg'),
+    contains: _x('Contains', 'comparison', 'groundhogg'),
+    not_contains: _x('Does not contain', 'comparison', 'groundhogg'),
+    starts_with: _x('Starts with', 'comparison', 'groundhogg'),
+    ends_with: _x('Ends with', 'comparison', 'groundhogg'),
+    does_not_start_with: _x('Does not start with', 'comparison', 'groundhogg'),
+    does_not_end_with: _x('Does not end with', 'comparison', 'groundhogg'),
+    empty: _x('Is empty', 'comparison', 'groundhogg'),
+    not_empty: _x('Is not empty', 'comparison', 'groundhogg')
+  }
+
+  const NumericComparisons = {
+    equals: _x('Equals', 'comparison', 'groundhogg'),
+    not_equals: _x('Not equals', 'comparison', 'groundhogg'),
+    less_than: _x('Less than', 'comparison', 'groundhogg'),
+    less_than_or_equal_to: _x('Less than or equal to', 'comparison', 'groundhogg'),
+    greater_than: _x('Greater than', 'comparison', 'groundhogg'),
+    greater_than_or_equal_to: _x('Greater than or equal to', 'comparison', 'groundhogg'),
+  }
+
   const ComparisonsTitleGenerators = {
     equals: (k, v) => sprintf(_x('%1$s equals %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
     not_equals: (k, v) => sprintf(_x('%1$s does not equal %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
@@ -132,7 +154,9 @@
     does_not_start_with: (k, v) => sprintf(_x('%1$s does not start with %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
     does_not_end_with: (k, v) => sprintf(_x('%1$s does not end with %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
     less_than: (k, v) => sprintf(_x('%1$s is less than %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+    less_than_or_equal_to: (k, v) => sprintf(_x('%1$s is less than or equal to %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
     greater_than: (k, v) => sprintf(_x('%1$s is greater than %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+    greater_than_or_equal_to: (k, v) => sprintf(_x('%1$s is greater than or equal to %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
     in: (k, v) => sprintf(_x('%1$s is %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
     not_in: (k, v) => sprintf(_x('%1$s is not %2$s', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
     empty: (k, v) => sprintf(_x('%1$s is empty', '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
@@ -477,10 +501,6 @@
 
   })
 
-  Groundhogg.filters.functions = {
-    createFilters
-  }
-
   const dateRanges = {
     'any': __('At any time', 'groundhogg'),
     '24_hours': __('In the last 24 hours', 'groundhogg'),
@@ -583,7 +603,7 @@
       return `${select({
 		  id: 'filter-compare',
 		  name: 'compare',
-	  }, Comparisons, compare)} ${input({
+	  }, AllComparisons, compare)} ${input({
 		  id: 'filter-value',
 		  name: 'value',
 		  value
@@ -643,7 +663,7 @@
 	  ${select({
 		  id: 'filter-compare',
 		  name: 'compare',
-	  }, Comparisons, compare)} ${input({
+	  }, AllComparisons, compare)} ${input({
 		  id: 'filter-value',
 		  name: 'value',
 		  value
@@ -886,7 +906,7 @@
 			  name: 'compare',
 			  dataGroup: filterIndex,
 			  dataKey: filterIndex,
-		  }, Comparisons, compare)} ${input({
+		  }, AllComparisons, compare)} ${input({
 			  id: 'filter-value',
 			  name: 'value',
 			  dataGroup: filterIndex,
@@ -1438,6 +1458,18 @@
       }
     }
   })
+
+
+
+  Groundhogg.filters.functions = {
+    createFilters,
+    registerFilter,
+    registerFilterGroup,
+    ComparisonsTitleGenerators,
+    AllComparisons,
+    NumericComparisons,
+    StringComparisons,
+  }
 
 })
 (jQuery)
