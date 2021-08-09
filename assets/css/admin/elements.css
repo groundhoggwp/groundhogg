@@ -365,7 +365,7 @@ button.gh-button.loud {
 }
 .gh-modal-overlay {
   position: fixed;
-  background: rgba(0, 70, 153, 0.618);
+  background: rgba(16, 38, 64, 0.5);
   bottom: 0;
   left: 0;
   right: 0;

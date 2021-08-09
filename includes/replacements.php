@@ -479,10 +479,10 @@ class Replacements implements \JsonSerializable {
 			return $content;
 		}
 
-		return $this->tackle_replacements( preg_replace_callback( "/{([^{}]+)}/s", array(
+		return $this->tackle_replacements( preg_replace_callback( "/{([^{}]+)}/s", [
 			$this,
 			'do_replacement'
-		), $content ) );
+		], $content ) );
 	}
 
 	/**

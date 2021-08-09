@@ -66,6 +66,7 @@ class Extension_Upgrader {
 		50123 => 'groundhogg-elastic-email/groundhogg-elastic-email.php',
 		52477 => 'groundhogg-buddyboss/groundhogg-buddyboss.php',
 		93174 => 'groundhogg-helpscout/groundhogg-helpscout.php',
+		98242 => 'groundhogg-givewp/groundhogg-givewp.php',
 	];
 
 	/**

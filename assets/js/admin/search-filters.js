@@ -197,7 +197,7 @@
       //language=HTML
       return `
 		  <div id="search-filters-editor">
-			  ${groups.length > 0 ? `${groups.map(group => `<div class="group">${group}</div>`).join(separator)}
+			  ${groups.length > 0 ? `${groups.map((group, i) => `<div class="group" data-key="${i}">${group}</div>`).join(separator)}
 			  ${separator}` : ''}
 			  <div class="group" data-group="${groups.length}">
 				  ${self.isAddingFilterToGroup === groups.length ? `<div class="add-filter-wrap"></div>` : `<button data-group="${groups.length}" class="add-filter">
@@ -290,7 +290,14 @@
       }
 
       const getFilterSettings = (group, key) => {
-        return self.filters[group][key]
+
+        console.log({
+          group, key
+        })
+
+        return {
+          ...this.filters[group][key]
+        }
       }
 
       const setActiveFilter = (group, filter, addingToGroup = false) => {
@@ -301,7 +308,7 @@
         reMount()
       }
 
-      const addFilter = (opts, group) => {
+      const addFilter = (opts, group, setActive = true) => {
         group = group >= 0 ? group : this.isAddingFilterToGroup
 
         if (self.filters.length === 0) {
@@ -318,7 +325,10 @@
 
         onChange(self.filters)
 
-        setActiveFilter(group, self.filters[group].length - 1)
+
+        if ( setActive ){
+          setActiveFilter(group, self.filters[group].length - 1)
+        }
       }
 
       const updateFilter = (opts, shouldReMount = false) => {
@@ -497,8 +507,42 @@
         }
 
       })
-    }
 
+      $(`${el} .group`).sortable({
+        connectWith: '.group',
+        placeholder: 'filter-placeholder',
+        cancel: '.add-filter',
+        start: (e, ui) => {
+          // ui.placeholder.height(ui.item.height())
+          ui.placeholder.width(ui.item.width())
+        },
+        receive: (e, ui) => {
+
+          console.log({
+            e, ui
+          })
+
+          const filterId = parseInt(ui.item.data('key'))
+          const fromGroupId = parseInt(ui.item.data('group'))
+          const toGroupId = parseInt($(e.target).data('key'))
+
+          console.log({
+            filterId,
+            fromGroupId,
+            toGroupId
+          })
+
+          const tempFilter = getFilterSettings( fromGroupId, filterId )
+
+          deleteFilter(fromGroupId, filterId)
+
+          addFilter(tempFilter, toGroupId, false )
+
+          reMount()
+        },
+        update: (e, ui) => {},
+      }).disableSelection()
+    },
   })
 
   const dateRanges = {
@@ -948,7 +992,7 @@
 
   registerFilter('user_role_is', 'user', __('User role is', 'groundhogg'), {
     view ({ role = 'subscriber' }) {
-      return sprintf(__('User role is %s', 'groundhogg'), bold( role ? roles[role].name : '' ))
+      return sprintf(__('User role is %s', 'groundhogg'), bold(role ? roles[role].name : ''))
     },
     edit ({ role }) {
 
@@ -1459,8 +1503,6 @@
     }
   })
 
-
-
   Groundhogg.filters.functions = {
     createFilters,
     registerFilter,
@@ -1469,6 +1511,10 @@
     AllComparisons,
     NumericComparisons,
     StringComparisons,
+    standardActivityDateOptions,
+    standardActivityDateTitle,
+    standardActivityDateDefaults,
+    standardActivityDateFilterOnMount
   }
 
 })

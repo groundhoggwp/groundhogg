@@ -22,7 +22,12 @@ class Scripts {
 		add_action( 'wp_after_admin_bar_render', [ $this, 'toolbar_scripts' ] );
 	}
 
-	public function toolbar_scripts() {
+	public function toolbar_scripts(){
+
+		if ( is_admin_bar_widget_disabled() ){
+			return;
+		}
+
 		wp_enqueue_script( 'groundhogg-admin-toolbar' );
 		wp_enqueue_style( 'groundhogg-admin-toolbar' );
 	}
@@ -173,6 +178,7 @@ class Scripts {
 			'groundhogg-admin-element',
 			'groundhogg-admin-user',
 			'groundhogg-admin-data',
+			'jquery-ui-sortable'
 		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-admin-contact-search', GROUNDHOGG_ASSETS_URL . 'js/admin/contact-search' . $dot_min . '.js', [
@@ -348,7 +354,7 @@ class Scripts {
 			],
 			'replacements'    => [
 				'groups' => Plugin::instance()->replacements->replacement_code_groups,
-				'codes'  => Plugin::instance()->replacements->replacement_codes
+				'codes'  => Plugin::instance()->replacements->replacement_codes,
 			],
 			'fields'          => [
 				'mappable' => get_mappable_fields()
@@ -358,6 +364,7 @@ class Scripts {
 				'owners'       => get_owners(),
 				'current'      => get_request_var( 'filters', [] ),
 				'roles'        => get_editable_roles(),
+				'countries'    => utils()->location->get_countries_list()
 			],
 			'managed_page'    => [
 				'root' => managed_page_url()
@@ -395,7 +402,6 @@ class Scripts {
 			'groundhogg-admin-element'
 		], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-contact-info-cards', GROUNDHOGG_ASSETS_URL . 'css/admin/info-cards.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
-//        wp_register_style('groundhogg-admin-email-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/email-editor.css', [], GROUNDHOGG_VERSION);
 		wp_register_style( 'groundhogg-admin-email-editor-plain', GROUNDHOGG_ASSETS_URL . 'css/admin/email-editor-plain.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-email-wysiwyg', GROUNDHOGG_ASSETS_URL . 'css/admin/email-wysiwyg-style.css', [], GROUNDHOGG_VERSION ); //todo I think un used
 		wp_register_style( 'groundhogg-admin-email-preview', GROUNDHOGG_ASSETS_URL . 'css/admin/email-preview.css', [], GROUNDHOGG_VERSION );
@@ -409,13 +415,12 @@ class Scripts {
 		wp_register_style( 'groundhogg-admin-simple-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/simple-editor.css', [], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-guided-setup', GROUNDHOGG_ASSETS_URL . 'css/admin/setup.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-help', GROUNDHOGG_ASSETS_URL . 'css/admin/help.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
-		wp_register_style( 'groundhogg-admin-email-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/email-editor.css', [
-			'groundhogg-admin-element',
-		], GROUNDHOGG_VERSION );
+
 		wp_register_style( 'groundhogg-admin-reporting', GROUNDHOGG_ASSETS_URL . 'css/admin/reporting.css', [
 			'groundhogg-admin',
 			'baremetrics-calendar'
 		], GROUNDHOGG_VERSION );
+
 		wp_register_style( 'groundhogg-admin-loader', GROUNDHOGG_ASSETS_URL . 'css/admin/loader.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-toolbar', GROUNDHOGG_ASSETS_URL . 'css/admin/admin-bar.css', [
 			'groundhogg-admin-element',

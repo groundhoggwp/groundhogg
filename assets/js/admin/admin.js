@@ -140,7 +140,8 @@
       },
       (query) => {
         return {
-          search: query.term
+          search: query.term,
+          limit: 50,
         }
       }, ...opts)
   }
@@ -222,7 +223,7 @@
           search: query.term,
           ...queryOpts
         }
-      }, ...opts )
+      }, ...opts)
   }
 
   /**
@@ -249,7 +250,7 @@
           search: query.term,
           ...queryOpts
         }
-      }, ...opts )
+      }, ...opts)
   }
 
   /**

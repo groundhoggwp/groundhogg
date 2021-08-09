@@ -1,3 +1,8 @@
+ul.styled {
+  list-style: disc;
+  padding-left: 20px;
+}
+
 .tablenav .gh-actions .action {
   margin: 1px 8px 0 0;
 }

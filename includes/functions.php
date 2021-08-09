@@ -1370,11 +1370,11 @@ function create_contact_from_user( $user = false, $sync_meta = false ) {
 
 	if ( is_int( $user ) ) {
 		$user = get_userdata( $user );
-	} else if ( $user === false ){
+	} else if ( $user === false ) {
 		$user = wp_get_current_user();
 	}
 
-	if ( ! is_a( $user, '\WP_User' ) ){
+	if ( ! is_a( $user, '\WP_User' ) ) {
 		return false;
 	}
 
@@ -5141,6 +5141,7 @@ function add_tiny_mce_plugin( $plugins ) {
 // register new button in the editor
 function register_mce_button( $buttons ) {
 	array_push( $buttons, 'groundhoggreplacementbtn', 'groundhoggemojibtn' );
+
 //	var_dump( $buttons );
 
 	return $buttons;
@@ -5411,7 +5412,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 		];
 	}
 
-	if ( isset_not_empty( $query, 'date_before' ) || isset_not_empty( $query, 'date_after' ) ){
+	if ( isset_not_empty( $query, 'date_before' ) || isset_not_empty( $query, 'date_after' ) ) {
 
 		$compare = 'between';
 		// between
@@ -5573,4 +5574,13 @@ function get_filters_from_old_query_vars( $query = [] ) {
 
 	// Filters is an array[] so wrap in another array
 	return ! empty( $filters ) ? [ $filters ] : false;
+}
+
+/**
+ * Whether the admin bar widget is enabled or not.
+ *
+ * @return mixed|void
+ */
+function is_admin_bar_widget_disabled() {
+	return apply_filters( 'groundhogg/is_admin_bar_widget_disabled', is_option_enabled( 'gh_is_admin_bar_widget_disabled' ) );
 }

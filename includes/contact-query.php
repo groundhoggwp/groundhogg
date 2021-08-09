@@ -254,7 +254,7 @@ class Contact_Query {
 
 		$defaults = array(
 			'number'                 => - 1,
-			'limit'                  => - 1,
+			'limit'                  => false,
 			'offset'                 => 0,
 			'orderby'                => 'ID',
 			'order'                  => 'DESC',
@@ -372,13 +372,13 @@ class Contact_Query {
 			$this->query_vars = wp_parse_args( $saved_search['query'], $this->query_vars );
 		}
 
+		$this->query_vars = wp_parse_args( $this->query_vars, $this->query_var_defaults );
+
 		// Map "limit" to "number"
 		if ( isset_not_empty( $this->query_vars, 'limit' ) ) {
 			$this->query_vars['number'] = $this->query_vars['limit'];
 			unset( $this->query_vars['limit'] );
 		}
-
-		$this->query_vars = wp_parse_args( $this->query_vars, $this->query_var_defaults );
 
 		// Only show contacts associated with the current owner...
 		if ( ! current_user_can( 'view_all_contacts' ) ) {
@@ -1160,9 +1160,9 @@ class Contact_Query {
 	/**
 	 * Register the filters
 	 */
-	protected function register_filters(){
+	protected function register_filters() {
 
-		if ( ! empty( self::$filters ) ){
+		if ( ! empty( self::$filters ) ) {
 			return;
 		}
 
@@ -1892,9 +1892,9 @@ class Contact_Query {
 	public static function get_before_and_after_from_filter_date_range( $filter_vars, $as_int = true ) {
 
 		$filter_vars = wp_parse_args( $filter_vars, [
-			'date_range' => '24_hours',
-			'after'      => 0,
-			'before'     => 0,
+			'date_range' => 'any',
+			'after'      => 1,
+			'before'     => time(),
 		] );
 
 		$after  = date_as_int( $filter_vars['after'] );
@@ -1902,6 +1902,10 @@ class Contact_Query {
 
 		switch ( $filter_vars['date_range'] ) {
 			default:
+			case 'any':
+				$after  = 1;
+				$before = time();
+				break;
 			case '24_hours':
 				$after  = time() - DAY_IN_SECONDS;
 				$before = time();
@@ -1928,16 +1932,17 @@ class Contact_Query {
 				break;
 			case 'before':
 				$before = date_as_int( $before ) + ( DAY_IN_SECONDS - 1 );
-				$after  = 0;
+				$after  = 1;
 				break;
 			case 'after':
-				$before = 0;
+				$before = time();
 				$after  = date_as_int( $after );
 				break;
 			case 'between':
 				compare_dates( $before, $after );
 				$after  = date_as_int( $after );
 				$before = date_as_int( $before ) + ( DAY_IN_SECONDS - 1 );
+				break;
 		}
 
 		return [

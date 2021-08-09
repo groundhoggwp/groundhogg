@@ -460,7 +460,7 @@ button {
 
   &-overlay {
     position: fixed;
-    background: rgba(darken($primary-blue, 20), .618);
+    background: $primary-dark-50;
     bottom: 0;
     left: 0;
     right: 0;

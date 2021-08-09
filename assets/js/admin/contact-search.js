@@ -85,13 +85,12 @@
       }
 
       this.filtersApp = createFilters('#search-filters', this.filters, handleUpdateFilters)
-      this.initSavedSearches()
       this.mount()
     },
 
     initSavedSearches () {
 
-      this.searchesApp = searchOptionsWidget({
+      searchOptionsWidget({
         selector: '#searches-picker',
         options: SearchesStore.getItems(),
         filterOption: (option, search) => {
@@ -107,7 +106,7 @@
           loadSearch(option.id)
         },
         noOptions: __('No matching searches...', 'groundhogg')
-      })
+      }).mount()
 
     },
 
@@ -125,7 +124,7 @@
 					<button id="search-contacts" class="button button-primary">${__('Search', 'groundhogg')}</button>
 					${!this.currentSearch
 						? `<button id="save-search" class="button button-secondary">${__('Save this search', 'groundhogg')}</button>`
-						: `<button id="update-search" class="button button-secondary" ${objectEquals(this.filters, this.currentSearch.query.filters) ? 'disabled' : ''}>${sprintf(__('Update "%s"', 'groundhogg'), this.currentSearch.name)}</button>`}
+						: `<button id="update-search" class="button button-secondary" ${objectEquals(this.filters, this.currentSearch.query.filters) ? 'disabled' : ''}>${sprintf(__('Update "%s"', 'groundhogg'), this.currentSearch.name)}</button><a class="gh-text danger delete-search">${__('Delete')}</a>`}
 				</div>
 			</div>
         `
@@ -182,7 +181,7 @@
       }
 
       if (this.savedSearchEnabled) {
-        this.searchesApp.mount()
+        this.initSavedSearches()
       }
 
       $('.enable-filters').on('click', function () {
@@ -206,6 +205,22 @@
         } else {
           loadFilters(this.filters)
         }
+      })
+
+      $('.delete-search').on('click', (e) => {
+
+        e.preventDefault()
+
+        dangerConfirmationModal({
+          alert: `<p>${__('Are you sure you want to delete this search')}</p>`,
+          onConfirm: () => {
+            SearchesStore.delete(this.currentSearch.id).then(() => {
+              this.currentSearch = null
+              $('#current-search').remove()
+              this.mount()
+            })
+          }
+        })
       })
 
       $('#update-search').on('click', (e) => {
@@ -390,6 +405,8 @@
                 action: 'bulk_edit',
                 query: {
                   ...ContactQuery,
+                  number: -1,
+                  offset: 0,
                   filters: base64_json_encode(ContactQuery.filters) // base64 json encode it to preserve the filters
                 }
               })
@@ -400,6 +417,8 @@
                 action: 'choose_columns',
                 query: {
                   ...ContactQuery,
+                  number: -1,
+                  offset: 0,
                   filters: base64_json_encode(ContactQuery.filters) // base64 json encode it to preserve the filters
                 }
               })
@@ -634,9 +653,9 @@
         alert: `<p>${sprintf(__('Are you sure you want to delete %s?', 'groundhogg'), bold(`${contact.data.first_name} ${contact.data.last_name}`))}</p>`,
         onConfirm: () => {
           ContactsStore.delete(contact.ID).then(() => {
-            $(`#contact-${contact.ID}`).remove();
+            $(`#contact-${contact.ID}`).remove()
             dialog({
-              message: sprintf( __( '%s was deleted!', 'groundhogg' ), `${contact.data.first_name} ${contact.data.last_name}` )
+              message: sprintf(__('%s was deleted!', 'groundhogg'), `${contact.data.first_name} ${contact.data.last_name}`)
             })
           })
         }

@@ -6,6 +6,12 @@
   color: #FFFFFF;
 }
 
+.filter-placeholder {
+  background: #102640;
+  opacity: 0.2;
+  border-radius: 5px;
+}
+
 #search-filters-editor {
   display: flex;
   flex-direction: column;

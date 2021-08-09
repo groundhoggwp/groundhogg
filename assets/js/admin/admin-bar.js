@@ -41,7 +41,7 @@
 				${input({
 					type: 'search',
 					id: 'quick-search-input',
-					placeholder: __( 'Search by name or email...', 'groundhogg' )
+					placeholder: __('Search by name or email...', 'groundhogg')
 				})}
 				<div class="${classPrefix}-results"></div>
 			</div>`
@@ -194,7 +194,7 @@
 			<div class="gh-rows-and-columns">
 				<div class="gh-row">
 					<div class="gh-col">
-						<label for="${subClassPrefix}-first-name">First Name</label>
+						<label for="${subClassPrefix}-first-name">${__('First Name', 'groundhogg')}</label>
 						${input({
 							id: `${subClassPrefix}-first-name`,
 							name: 'first_name',
@@ -202,7 +202,7 @@
 						})}
 					</div>
 					<div class="gh-col">
-						<label for="${subClassPrefix}-last-name">Last Name</label>
+						<label for="${subClassPrefix}-last-name">${__('Last Name', 'groundhogg')}</label>
 						${input({
 							id: `${subClassPrefix}-last-name`,
 							name: 'last_name',
@@ -212,7 +212,7 @@
 				</div>
 				<div class="gh-row">
 					<div class="gh-col">
-						<label for="${subClassPrefix}-email">Email Address</label>
+						<label for="${subClassPrefix}-email">${__('Email Address', 'groundhogg')}</label>
 						${input({
 							id: `${subClassPrefix}-email`,
 							name: 'email',
@@ -221,19 +221,53 @@
 						})}
 					</div>
 				</div>
-				<div class="gh-row">
-					<div class="gh-col">
-						<label for="${subClassPrefix}-tags">Tags</label>
-						${select({
-							id: `${subClassPrefix}-tags`,
-							multiple: true,
-							dataPlaceholder: 'Type to select tags...'
+				<div class="gh-row phone">
+					<div class="cghol">
+						<label for="quick-edit-primary-phone">${__('Primary Phone', 'groundhogg')}</label>
+						${input({
+							type: 'tel',
+							id: `${subClassPrefix}-primary-phone`,
+							name: 'primary_phone',
+						})}
+					</div>
+					<div class="primary-phone-ext">
+						<label
+							for="quick-edit-primary-phone-extension">${_x('Ext.', 'phone number extension', 'groundhogg')}</label>
+						${input({
+							type: 'number',
+							id: `${subClassPrefix}-primary-phone-ext`,
+							name: 'primary_phone_extension',
 						})}
 					</div>
 				</div>
 				<div class="gh-row">
 					<div class="gh-col">
-						<button id="${classPrefix}-quick-add-button" class="gh-button primary">Create Contact</button>
+						<label for="quick-edit-mobile-phone">${__('Mobile Phone', 'groundhogg')}</label>
+						${input({
+							type: 'tel',
+							id: `${subClassPrefix}-mobile-phone`,
+							name: 'mobile_phone',
+						})}
+					</div>
+				</div>
+				<div class="gh-row">
+					<div class="gh-col">
+						<label for="${subClassPrefix}-tags">${__('Tags', 'groundhogg')}</label>
+						${select({
+							id: `${subClassPrefix}-tags`,
+							multiple: true,
+							dataPlaceholder: __('Type to select tags...', 'groundhogg'),
+							style: {
+								width: '100%'
+							}
+						})}
+					</div>
+				</div>
+				<div class="gh-row">
+					<div class="gh-col">
+						<button id="${classPrefix}-quick-add-button" class="gh-button primary">
+							${__('Create Contact', 'groundhogg')}
+						</button>
 					</div>
 				</div>
 			</div>`
@@ -243,7 +277,8 @@
         const subClassPrefix = `${classPrefix}-quick-add`
 
         let payload = {
-          data: {}
+          data: {},
+          meta: {}
         }
 
         const setPayload = (data) => {
@@ -251,15 +286,13 @@
             ...payload,
             ...data
           }
-
-          console.log(payload)
         }
 
         $(`#${classPrefix}-quick-add-button`).on('click', ({ target }) => {
 
           if (!payload.data.email || !isValidEmail(payload.data.email)) {
             errorDialog({
-              message: 'A valid email is required!'
+              message: __('A valid email is required!', 'groundhogg')
             })
             return
           }
@@ -272,10 +305,25 @@
           })
         })
 
-        $(`#${subClassPrefix}-first-name, #${subClassPrefix}-last-name, #${subClassPrefix}-email`).on('change input', ({ target }) => {
+        $(`
+        #${subClassPrefix}-first-name, 
+        #${subClassPrefix}-last-name, 
+        #${subClassPrefix}-email`).on('change input', ({ target }) => {
           setPayload({
             data: {
               ...payload.data,
+              [target.name]: target.value
+            }
+          })
+        })
+
+        $(`
+        #${subClassPrefix}-primary-phone,
+        #${subClassPrefix}-primary-phone-ext,
+        #${subClassPrefix}-mobile-phone`).on('change input', ({ target }) => {
+          setPayload({
+            meta: {
+              ...payload.meta,
               [target.name]: target.value
             }
           })
