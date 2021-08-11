@@ -580,7 +580,7 @@ class Funnels_Page extends Admin_Page {
 
 		$funnel = new Funnel();
 
-		return $funnel->import( $import );
+		return $funnel->legacy_import( $import );
 	}
 
 	/**

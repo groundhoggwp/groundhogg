@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.8
 Requires PHP: 7.1
-Stable tag: 2.5
+Stable tag: 2.5.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,7 +321,10 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.5 =
+= 2.5.1 (2021-08-11) =
+* HOT FIX Importing funnel causing fatal error.
+
+= 2.5 (2021-08-11) =
 
 For all details in this release [see the roundup on Groundhogg.io](https://www.groundhogg.io/updates/groundhogg-2-5-shows-a-glimpse-of-whats-coming-down-the-pipeline/)
 
