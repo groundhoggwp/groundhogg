@@ -5,7 +5,6 @@ namespace Groundhogg;
 // Exit if accessed directly
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Contacts;
-use phpDocumentor\Reflection\DocBlock\Tags\Deprecated;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
