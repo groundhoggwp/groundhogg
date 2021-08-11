@@ -330,7 +330,8 @@ For all details in this release [see the roundup on Groundhogg.io](https://www.g
 * ADDED Unquantifiable levels of Groundhogg 3.0 preparation.
 * TWEAKED New contact quick editing UI.
 * TWEAKED New broadcast scheduling UI.
-* TWEAKED Bumped minimum support WordPress version to 5.0 from 4.9
+* TWEAKED Bumped minimum supported WordPress version to 5.0 from 4.9
+* TWEAKED Bumped minimum supported PHP version to 7.1 from 5.6
 * FIXED Bug causing license to show as disabled when it's actually active.
 
 = 2.4.7.6 (2021-07-30) =
