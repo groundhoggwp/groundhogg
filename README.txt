@@ -331,6 +331,7 @@ For all details in this release [see the roundup on Groundhogg.io](https://www.g
 * TWEAKED New contact quick editing UI.
 * TWEAKED New broadcast scheduling UI.
 * TWEAKED Bumped minimum support WordPress version to 5.0 from 4.9
+* FIXED Bug causing license to show as disabled when it's actually active.
 
 = 2.4.7.6 (2021-07-30) =
 * FIXED Sales manager unable to edit contacts even though they can see them

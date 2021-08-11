@@ -329,6 +329,7 @@ class Broadcasts_Page extends Admin_Page {
 				'link'   => $this->admin_url( [ 'action' => 'add', 'type' => 'email' ] ),
 				'action' => __( 'Schedule Email Broadcast', 'groundhogg' ),
 				'target' => '_self',
+				'id' => 'gh-schedule-broadcast'
 			]
 		];
 
