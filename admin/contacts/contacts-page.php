@@ -175,6 +175,13 @@ class Contacts_Page extends Admin_Page {
 
 				} else if ( $saved_search = get_url_var( 'saved_search' ) ) {
 					$saved_search = Saved_Searches::instance()->get( $saved_search );
+
+					// If the search does not have filters we need to migrate it
+					if ( ! isset_not_empty( $saved_search['query'], 'filters' ) ){
+						$saved_search['query'] = [
+							'filters' => get_filters_from_old_query_vars( $saved_search['query'] )
+						];
+					}
 				} else {
 					$current_filters = get_filters_from_old_query_vars( get_request_query() );
 				}
