@@ -4626,6 +4626,45 @@ function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 	do_action( 'groundhogg/track_activity', $activity, $contact );
 }
 
+
+/**
+ * Return json response for meta picker.
+ */
+function handle_ajax_user_meta_picker() {
+
+	if ( ! current_user_can( 'edit_users' ) || ! wp_verify_nonce( get_post_var( 'nonce' ), 'meta-picker' ) ) {
+		wp_send_json_error();
+	}
+
+	$search = sanitize_text_field( get_post_var( 'term' ) );
+
+	global $wpdb;
+
+	$keys = $wpdb->get_col(
+		"SELECT DISTINCT meta_key FROM {$wpdb->usermeta} WHERE `meta_key` RLIKE '{$search}' ORDER BY meta_key ASC"
+	);
+
+	$response = array_map( function ( $key ) {
+		return [
+			'id'    => $key,
+			'label' => $key,
+			'value' => $key
+		];
+	}, $keys );
+
+	/**
+	 * Filter the json response for the meta key picker
+	 *
+	 * @param $response array[]
+	 * @param $search   string
+	 */
+	$response = apply_filters( 'groundhogg/handle_ajax_meta_picker', $response, $search );
+
+	wp_send_json( $response );
+}
+
+add_action( 'wp_ajax_user_meta_picker', __NAMESPACE__ . '\handle_ajax_user_meta_picker' );
+
 /**
  * Return json response for meta picker.
  */
@@ -4665,6 +4704,47 @@ function handle_ajax_meta_picker() {
 }
 
 add_action( 'wp_ajax_gh_meta_picker', __NAMESPACE__ . '\handle_ajax_meta_picker' );
+
+/**
+ * Return json response for meta picker.
+ */
+function handle_ajax_meta_value_picker() {
+
+	if ( ! current_user_can( 'edit_contacts' ) || ! wp_verify_nonce( get_post_var( 'nonce' ), 'meta-picker' ) ) {
+		wp_send_json_error();
+	}
+
+	$search = sanitize_text_field( get_post_var( 'term' ) );
+	$meta_key = sanitize_text_field( get_post_var( 'meta_key' ) );
+
+	$table = get_db( 'contactmeta' );
+
+	global $wpdb;
+
+	$keys = $wpdb->get_col(
+		"SELECT DISTINCT meta_value FROM {$table->get_table_name()} WHERE `meta_key` = '{$meta_key}' AND `meta_value` RLIKE '{$search}' ORDER BY meta_value ASC"
+	);
+
+	$response = array_map( function ( $key ) {
+		return [
+			'id'    => $key,
+			'label' => $key,
+			'value' => $key
+		];
+	}, $keys );
+
+	/**
+	 * Filter the json response for the meta key picker
+	 *
+	 * @param $response array[]
+	 * @param $search   string
+	 */
+	$response = apply_filters( 'groundhogg/handle_ajax_meta_value_picker', $response, $search );
+
+	wp_send_json( $response );
+}
+
+add_action( 'wp_ajax_gh_meta_value_picker', __NAMESPACE__ . '\handle_ajax_meta_value_picker' );
 
 /**
  * Current time or time provided

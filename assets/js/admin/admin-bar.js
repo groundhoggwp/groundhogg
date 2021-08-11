@@ -12,7 +12,6 @@
     dialog,
     errorDialog,
     clickedIn,
-    inputWithReplacements,
     icons,
     adminPageURL
   } = Groundhogg.element
@@ -74,27 +73,19 @@
           $(`.${classPrefix}-result`).on('click', (e) => {
 
             if (clickedIn(e, '.email-contact')) {
-              e.stopPropagation()
-              console.log('send-email')
               return
             }
 
             if (clickedIn(e, '.call-primary')) {
-              // e.preventDefault()
-              console.log('call-primary')
               return
             }
 
             if (clickedIn(e, '.call-mobile')) {
-              // e.preventDefault()
-              console.log('call-mobile')
               return
             }
 
             const ID = parseInt(e.currentTarget.dataset.contact)
             const contact = ContactsStore.get(ID)
-
-            console.log(contact)
 
             window.location.href = contact.admin
           })
@@ -114,9 +105,9 @@
 					  <button class="gh-button secondary text icon edit-profile">
 						  ${icons.contact}
 					  </button>
-					  <button data-contact="${item.ID}" class="email-contact gh-button secondary text icon send-email">
+					  <a class="email-contact gh-button secondary text icon send-email" href="mailto:${item.data.email}" target="_blank">
 						  ${icons.email}
-					  </button>
+					  </a>
 					  ${item.meta.primary_phone ? `
 					  <a class="gh-button secondary text icon call-primary" href="tel:${item.meta.primary_phone}">
 						  ${icons.phone}

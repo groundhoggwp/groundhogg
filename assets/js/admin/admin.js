@@ -97,7 +97,29 @@
     })
   }
 
-  function metaPicker (selector) {
+  function userMetaPicker (selector) {
+    return $(selector).autocomplete({
+      source: function (request, response) {
+        $.ajax({
+          url: ajaxurl,
+          method: 'post',
+          dataType: 'json',
+          data: {
+            action: 'user_meta_picker',
+            nonce: nonces._meta_nonce,
+            term: request.term,
+          },
+          success: function (data) {
+            response(data)
+            $(selector).removeClass('ui-autocomplete-loading')
+          },
+        })
+      },
+      minLength: 0,
+    })
+  }
+
+  function metaPicker (selector, ) {
     return $(selector).autocomplete({
       source: function (request, response) {
         $.ajax({
@@ -108,6 +130,29 @@
             action: 'gh_meta_picker',
             nonce: nonces._meta_nonce,
             term: request.term,
+          },
+          success: function (data) {
+            response(data)
+            $(selector).removeClass('ui-autocomplete-loading')
+          },
+        })
+      },
+      minLength: 0,
+    })
+  }
+
+  function metaValuePicker (selector, meta_key) {
+    return $(selector).autocomplete({
+      source: function (request, response) {
+        $.ajax({
+          url: ajaxurl,
+          method: 'post',
+          dataType: 'json',
+          data: {
+            action: 'gh_meta_value_picker',
+            nonce: nonces._meta_nonce,
+            term: request.term,
+            meta_key,
           },
           success: function (data) {
             response(data)
@@ -321,10 +366,12 @@
     apiPicker,
     linkPicker,
     metaPicker,
+    userMetaPicker,
     campaignPicker,
     searchesPicker,
     funnelPicker,
-    broadcastPicker
+    broadcastPicker,
+    metaValuePicker
   }
 
   // Map functions to Groundhogg object.

@@ -14,7 +14,16 @@
     bold
   } = Groundhogg.element
 
-  const { broadcastPicker, funnelPicker, tagPicker, emailPicker, linkPicker } = Groundhogg.pickers
+  const {
+    broadcastPicker,
+    funnelPicker,
+    tagPicker,
+    emailPicker,
+    linkPicker,
+    metaValuePicker,
+    metaPicker,
+    userMetaPicker
+  } = Groundhogg.pickers
 
   const { broadcasts: BroadcastsStore, emails: EmailsStore, tags: TagsStore, funnels: FunnelsStore } = Groundhogg.stores
 
@@ -325,8 +334,7 @@
 
         onChange(self.filters)
 
-
-        if ( setActive ){
+        if (setActive) {
           setActiveFilter(group, self.filters[group].length - 1)
         }
       }
@@ -532,11 +540,11 @@
             toGroupId
           })
 
-          const tempFilter = getFilterSettings( fromGroupId, filterId )
+          const tempFilter = getFilterSettings(fromGroupId, filterId)
 
           deleteFilter(fromGroupId, filterId)
 
-          addFilter(tempFilter, toGroupId, false )
+          addFilter(tempFilter, toGroupId, false)
 
           reMount()
         },
@@ -647,7 +655,7 @@
       return `${select({
 		  id: 'filter-compare',
 		  name: 'compare',
-	  }, AllComparisons, compare)} ${input({
+	  }, StringComparisons, compare)} ${input({
 		  id: 'filter-value',
 		  name: 'value',
 		  value
@@ -672,7 +680,8 @@
 
   registerFilterGroup('contact', _x('Contact', 'noun referring to a person in the crm', 'groundhogg'))
   registerFilterGroup('location', _x('Contact Location', 'contact is a noun referring to a person', 'groundhogg'))
-  registerFilterGroup('user', __('User', 'groundhogg'))
+  registerFilterGroup('company', _x('Contact Company', 'contact is a noun referring to a person', 'groundhogg'))
+  registerFilterGroup('user', __('User'))
   registerFilterGroup('activity', _x('Activity', 'noun referring to a persons past activities', 'groundhogg'))
 
   registerFilter('first_name', 'contact', {
@@ -707,7 +716,7 @@
 	  ${select({
 		  id: 'filter-compare',
 		  name: 'compare',
-	  }, AllComparisons, compare)} ${input({
+	  }, StringComparisons, compare)} ${input({
 		  id: 'filter-value',
 		  name: 'value',
 		  value
@@ -960,8 +969,6 @@
     },
     onMount (filter, updateFilter) {
 
-      const { metaPicker } = Groundhogg.pickers
-
       metaPicker('#filter-meta')
 
       $('#filter-compare, #filter-value, #filter-meta').on('change', function (e) {
@@ -990,7 +997,7 @@
     defaults: {}
   })
 
-  registerFilter('user_role_is', 'user', __('User role is', 'groundhogg'), {
+  registerFilter('user_role_is', 'user', __('User Role', 'groundhogg'), {
     view ({ role = 'subscriber' }) {
       return sprintf(__('User role is %s', 'groundhogg'), bold(role ? roles[role].name : ''))
     },
@@ -1018,6 +1025,52 @@
     },
   })
 
+  registerFilter('user_meta', 'user', __('User Meta', 'groundhogg'), {
+    view ({ meta, compare, value }) {
+      return ComparisonsTitleGenerators[compare](`<b>${meta}</b>`, `<b>"${value}"</b>`)
+    },
+    edit ({ meta, compare, value }, filterGroupIndex, filterIndex) {
+      // language=html
+      return `
+		  ${input({
+			  id: 'filter-meta',
+			  name: 'meta',
+			  className: 'meta-picker',
+			  dataGroup: filterIndex,
+			  dataKey: filterIndex,
+			  value: meta
+		  })}
+		  ${select({
+			  id: 'filter-compare',
+			  name: 'compare',
+			  dataGroup: filterIndex,
+			  dataKey: filterIndex,
+		  }, AllComparisons, compare)} ${input({
+			  id: 'filter-value',
+			  name: 'value',
+			  dataGroup: filterIndex,
+			  dataKey: filterIndex,
+			  value
+		  })}`
+    },
+    onMount (filter, updateFilter) {
+
+      userMetaPicker('#filter-meta')
+
+      $('#filter-compare, #filter-value, #filter-meta').on('change', function (e) {
+        const $el = $(this)
+        const { compare } = updateFilter({
+          [$el.prop('name')]: $el.val()
+        })
+      })
+    },
+    defaults: {
+      meta: '',
+      compare: 'equals',
+      value: ''
+    }
+  })
+
   registerFilter('country', 'location', __('Country', 'groundhogg'), {
     view ({ country }) {
       return sprintf(__('Country is %s', 'groundhogg'), bold(countries[country]))
@@ -1041,6 +1094,105 @@
     },
     defaults: {
       country: '',
+    }
+  })
+
+  registerFilter('region', 'location', __('State/Province', 'groundhogg'), {
+    view ({ region }) {
+      return sprintf(__('State/Province is %s', 'groundhogg'), bold(region))
+    },
+    edit ({ region }) {
+      // language=html
+      return `
+		  ${input({
+			  id: 'filter-region',
+			  name: 'region',
+			  value: region,
+			  autocomplete: 'off',
+			  placeholder: __('Start typing to select a region', 'groundhogg')
+		  })}`
+    },
+    onMount (filter, updateFilter) {
+
+      metaValuePicker('#filter-region', 'region').on('change', function (e) {
+        updateFilter({
+          region: $(e.target).val()
+        })
+      })
+    },
+    defaults: {
+      region: '',
+    }
+  })
+
+  registerFilter('city', 'location', __('City', 'groundhogg'), {
+    view ({ city }) {
+      return sprintf(__('City is %s', 'groundhogg'), bold(city))
+    },
+    edit ({ city }) {
+      // language=html
+      return `
+		  ${input({
+			  id: 'filter-city',
+			  name: 'city',
+			  value: city,
+			  autocomplete: 'off',
+			  placeholder: __('Start typing to select a city', 'groundhogg')
+		  })}`
+    },
+    onMount (filter, updateFilter) {
+
+      metaValuePicker('#filter-city', 'city').on('change', function (e) {
+        updateFilter({
+          city: $(e.target).val()
+        })
+      })
+    },
+    defaults: {
+      city: '',
+    }
+  })
+
+  registerFilter('street_address_1', 'location', __('Street Address 1', 'groundhogg'), {
+    ...BasicTextFilter(__('Street Address 1', 'groundhogg'))
+  })
+
+  registerFilter('street_address_2', 'location', __('Street Address 2', 'groundhogg'), {
+    ...BasicTextFilter(__('Street Address 2', 'groundhogg'))
+  })
+
+  registerFilter('zip_code', 'location', __('Zip/Postal Code', 'groundhogg'), {
+    ...BasicTextFilter(__('Zip/Postal Code', 'groundhogg'))
+  })
+
+  registerFilter('company_name', 'company', __('Company Name', 'groundhogg'), {
+    ...BasicTextFilter(__('Company Name', 'groundhogg')),
+
+    onMount (filter, updateFilter) {
+
+      metaValuePicker('#filter-value', 'company_name')
+
+      $('#filter-compare, #filter-value').on('change', function (e) {
+        const $el = $(this)
+        updateFilter({
+          [$el.prop('name')]: $el.val()
+        })
+      })
+    }
+  })
+
+  registerFilter('job_title', 'company', __('Job Title', 'groundhogg'), {
+    ...BasicTextFilter(__('Job Title', 'groundhogg')),
+    onMount (filter, updateFilter) {
+
+      metaValuePicker('#filter-value', 'job_title')
+
+      $('#filter-compare, #filter-value').on('change', function (e) {
+        const $el = $(this)
+        updateFilter({
+          [$el.prop('name')]: $el.val()
+        })
+      })
     }
   })
 
@@ -1101,7 +1253,7 @@
 
       const emailName = email_id ? EmailsStore.get(email_id).data.title : 'any email'
 
-      prepend = sprintf(link ? __('Clicked %1$s in %2$s', 'groundhogg') : __('Clicked any link in %2$s', 'groundhogg'), `<b>${link}</b>`, `<b>${emailName}</b>`)
+      let prepend = sprintf(link ? __('Clicked %1$s in %2$s', 'groundhogg') : __('Clicked any link in %2$s', 'groundhogg'), `<b>${link}</b>`, `<b>${emailName}</b>`)
 
       return standardActivityDateTitle(prepend, {
         date_range,
@@ -1109,7 +1261,7 @@
         after
       })
     },
-    edit ({ email_id, date_range, before, after }) {
+    edit ({ email_id, link, date_range, before, after }) {
 
       const pickerOptions = email_id ? {
         [email_id]: EmailsStore.get(email_id).data.title
@@ -1126,6 +1278,7 @@
 			  id: 'filter-link',
 			  name: 'link',
 			  autocomplete: 'off',
+			  value: link,
 			  placeholder: __('Start typing to select a link or leave blank for any link', 'groundhogg')
 		  })}
 

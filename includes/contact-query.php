@@ -1328,6 +1328,41 @@ class Contact_Query {
 		);
 
 		self::register_filter(
+			'region',
+			[ self::class, 'filter_region' ]
+		);
+
+		self::register_filter(
+			'city',
+			[ self::class, 'filter_city' ]
+		);
+
+		self::register_filter(
+			'street_address_1',
+			[ self::class, 'filter_street_address_1' ]
+		);
+
+		self::register_filter(
+			'street_address_2',
+			[ self::class, 'filter_street_address_2' ]
+		);
+
+		self::register_filter(
+			'postal_zip',
+			[ self::class, 'filter_postal_zip' ]
+		);
+
+		self::register_filter(
+			'company_name',
+			[ self::class, 'filter_company_name' ]
+		);
+
+		self::register_filter(
+			'job_title',
+			[ self::class, 'filter_job_title' ]
+		);
+
+		self::register_filter(
 			'funnel_history',
 			[ self::class, 'filter_funnel' ]
 		);
@@ -1381,6 +1416,30 @@ class Contact_Query {
 			'user_role_is',
 			[ self::class, 'filter_user_role_is' ]
 		);
+
+		self::register_filter(
+			'user_meta',
+			[ self::class, 'filter_user_meta' ]
+		);
+
+
+	}
+
+	public static function filter_user_meta( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'meta'    => '',
+			'compare' => '',
+			'value'   => ''
+		] );
+
+		global $wpdb;
+
+		$meta_table_name = $wpdb->usermeta;
+		$clause1         = self::generic_text_compare( $meta_table_name . '.meta_key', '=', $filter_vars['meta'] );
+		$clause2         = self::generic_text_compare( $meta_table_name . '.meta_value', $filter_vars['compare'], $filter_vars['value'] );
+
+		return "{$query->table_name}.user_id IN ( select {$meta_table_name}.user_id FROM {$meta_table_name} WHERE {$clause1} AND {$clause2} ) ";
 	}
 
 	public static function filter_user_role_is( $filter_vars, $query ) {
@@ -2003,11 +2062,11 @@ class Contact_Query {
 			'value'      => ''
 		] );
 
-		$meta_table_name = get_db( 'contactmeta' )->table_name;
-		$clause1         = self::generic_text_compare( $meta_table_name . '.meta_key', '=', $filter_vars['phone_type'] . '_phone' );
-		$clause2         = self::generic_text_compare( "{$meta_table_name}.meta_value", $filter_vars['compare'], $filter_vars['value'] );
-
-		return "{$query->table_name}.ID IN ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$clause1} AND {$clause2} ) ";
+		return self::filter_meta( [
+			'meta'    => $filter_vars['phone_type'] . '_phone',
+			'value'   => $filter_vars['value'],
+			'compare' => $filter_vars['compare']
+		], $query );
 	}
 
 	/**
@@ -2021,14 +2080,156 @@ class Contact_Query {
 	public static function filter_country( $filter_vars, $query ) {
 
 		$filter_vars = wp_parse_args( $filter_vars, [
-			'country' => '',
+			'country' => ''
 		] );
 
-		$meta_table_name = get_db( 'contactmeta' )->table_name;
-		$clause1         = self::generic_text_compare( $meta_table_name . '.meta_key', '=', 'country' );
-		$clause2         = self::generic_text_compare( "{$meta_table_name}.meta_value", '=', $filter_vars['country'] );
+		return self::filter_meta( [
+			'meta'    => 'country',
+			'value'   => $filter_vars['country'],
+			'compare' => 'equals'
+		], $query );
+	}
 
-		return "{$query->table_name}.ID IN ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$clause1} AND {$clause2} ) ";
+	/**
+	 * Filter by region
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_region( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'region' => ''
+		] );
+
+		return self::filter_meta( [
+			'meta'    => 'region',
+			'value'   => $filter_vars['region'],
+			'compare' => 'equals'
+		], $query );
+	}
+
+	/**
+	 * Filter by city
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_city( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'city' => ''
+		] );
+
+		return self::filter_meta( [
+			'meta'    => 'city',
+			'value'   => $filter_vars['city'],
+			'compare' => 'equals'
+		], $query );
+	}
+
+	/**
+	 * Filter by city
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_street_address_1( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'value'   => '',
+			'compare' => 'equals',
+		] );
+
+		return self::filter_meta( array_merge( $filter_vars, [
+			'meta' => 'street_address_1'
+		] ), $query );
+	}
+
+	/**
+	 * Filter by city
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_street_address_2( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'value'   => '',
+			'compare' => 'equals',
+		] );
+
+		return self::filter_meta( array_merge( $filter_vars, [
+			'meta' => 'street_address_2'
+		] ), $query );
+	}
+
+	/**
+	 * Filter by city
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_postal_zip( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'value'   => '',
+			'compare' => 'equals',
+		] );
+
+		return self::filter_meta( array_merge( $filter_vars, [
+			'meta' => 'postal_zip'
+		] ), $query );
+	}
+
+	/**
+	 * Filter by city
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_company_name( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'value'   => '',
+			'compare' => 'equals',
+		] );
+
+		return self::filter_meta( array_merge( $filter_vars, [
+			'meta' => 'company_name'
+		] ), $query );
+	}
+
+	/**
+	 * Filter by city
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_job_title( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'value'   => '',
+			'compare' => 'equals',
+		] );
+
+		return self::filter_meta( array_merge( $filter_vars, [
+			'meta' => 'job_title'
+		] ), $query );
 	}
 
 	/**

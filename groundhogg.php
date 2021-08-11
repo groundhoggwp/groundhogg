@@ -3,7 +3,7 @@
  * Plugin Name: Groundhogg
  * Plugin URI:  https://www.groundhogg.io/?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash
  * Description: CRM and marketing automation for WordPress
- * Version: 2.5.beta.4
+ * Version: 2.5
  * Author: Groundhogg Inc.
  * Author URI: https://www.groundhogg.io/?utm_source=wp-plugins&utm_campaign=author-uri&utm_medium=wp-dash
  * Text Domain: groundhogg
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'GROUNDHOGG_VERSION', '2.5.beta.4' );
+define( 'GROUNDHOGG_VERSION', '2.5' );
 define( 'GROUNDHOGG_PREVIOUS_STABLE_VERSION', '2.4.7.5' );
 
 define( 'GROUNDHOGG__FILE__', __FILE__ );
@@ -39,14 +39,17 @@ define( 'GROUNDHOGG_ASSETS_URL', GROUNDHOGG_URL . 'assets/' );
 add_action( 'plugins_loaded', 'groundhogg_load_plugin_textdomain' );
 
 define( 'GROUNDHOGG_TEXT_DOMAIN', 'groundhogg' );
+define( 'GROUNDHOGG_MINIMUM_PHP_VERSION', '5.6' );
+define( 'GROUNDHOGG_MINIMUM_WORDPRESS_VERSION', '5.0' );
 
-if ( ! version_compare( PHP_VERSION, '5.6', '>=' ) ) {
+if ( ! version_compare( PHP_VERSION, GROUNDHOGG_MINIMUM_PHP_VERSION, '>=' ) ) {
 	add_action( 'admin_notices', 'groundhogg_fail_php_version' );
-} elseif ( ! version_compare( get_bloginfo( 'version' ), '4.9', '>=' ) ) {
+} elseif ( ! version_compare( get_bloginfo( 'version' ), GROUNDHOGG_MINIMUM_WORDPRESS_VERSION, '>=' ) ) {
 	add_action( 'admin_notices', 'groundhogg_fail_wp_version' );
 } else {
 	require __DIR__ . '/includes/plugin.php';
 }
+
 
 /**
  * Groundhogg loaded.
@@ -81,7 +84,7 @@ function groundhogg_load_plugin_textdomain() {
  */
 function groundhogg_fail_php_version() {
 	/* translators: %s: PHP version */
-	$message      = sprintf( esc_html__( 'Groundhogg requires PHP version %s+, plugin is currently NOT RUNNING.', 'groundhogg' ), '5.6' );
+	$message      = sprintf( esc_html__( 'Groundhogg requires PHP version %s+, plugin is currently NOT RUNNING.', 'groundhogg' ), GROUNDHOGG_MINIMUM_PHP_VERSION );
 	$html_message = sprintf( '<div class="error">%s</div>', wpautop( $message ) );
 	echo wp_kses_post( $html_message );
 }
@@ -97,7 +100,7 @@ function groundhogg_fail_php_version() {
  */
 function groundhogg_fail_wp_version() {
 	/* translators: %s: WordPress version */
-	$message      = sprintf( esc_html__( 'Groundhogg requires WordPress version %s+. Because you are using an earlier version, the plugin is currently NOT RUNNING.', 'groundhogg' ), '4.9' );
+	$message      = sprintf( esc_html__( 'Groundhogg requires WordPress version %s+. Because you are using an earlier version, the plugin is currently NOT RUNNING.', 'groundhogg' ), GROUNDHOGG_MINIMUM_WORDPRESS_VERSION );
 	$html_message = sprintf( '<div class="error">%s</div>', wpautop( $message ) );
 	echo wp_kses_post( $html_message );
 }
