@@ -39,7 +39,7 @@ define( 'GROUNDHOGG_ASSETS_URL', GROUNDHOGG_URL . 'assets/' );
 add_action( 'plugins_loaded', 'groundhogg_load_plugin_textdomain' );
 
 define( 'GROUNDHOGG_TEXT_DOMAIN', 'groundhogg' );
-define( 'GROUNDHOGG_MINIMUM_PHP_VERSION', '5.6' );
+define( 'GROUNDHOGG_MINIMUM_PHP_VERSION', '7.1' );
 define( 'GROUNDHOGG_MINIMUM_WORDPRESS_VERSION', '5.0' );
 
 if ( ! version_compare( PHP_VERSION, GROUNDHOGG_MINIMUM_PHP_VERSION, '>=' ) ) {
