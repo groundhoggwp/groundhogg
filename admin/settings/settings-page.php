@@ -741,10 +741,24 @@ class Settings_Page extends Admin_Page {
 				'desc'    => _x( 'This will hides the tooltips user see in new installations.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => array(
-					'label' => __( 'Enable' ),
+					'label' => __( 'Hide', 'groundhogg' ),
 					//keep brackets for backwards compat
 					'name'  => 'gh_hide_tooltips',
 					'id'    => 'gh_hide_tooltips',
+					'value' => 'on',
+				),
+			),
+			'gh_is_admin_bar_widget_disabled'                       => array(
+				'id'      => 'gh_is_admin_bar_widget_disabled',
+				'section' => 'misc_info',
+				'label'   => _x( 'Hide Admin Toolbar Widget', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'Hide the Admin Toolbar Widget.', 'settings', 'groundhogg' ),
+				'type'    => 'checkbox',
+				'atts'    => array(
+					'label' => __( 'Hide', 'groundhogg' ),
+					//keep brackets for backwards compat
+					'name'  => 'gh_is_admin_bar_widget_disabled',
+					'id'    => 'gh_is_admin_bar_widget_disabled',
 					'value' => 'on',
 				),
 			),
@@ -1414,7 +1428,7 @@ class Settings_Page extends Admin_Page {
 	public function view() {
 		?>
 		<style>
-            .select2 {
+            td .select2 {
                 max-width: 300px;
             }
 		</style>

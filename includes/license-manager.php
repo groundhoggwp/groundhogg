@@ -440,6 +440,10 @@ class License_Manager {
 	 */
 	public static function verify_license( $item_id, $license = '' ) {
 
+		if ( ! $item_id ){
+			return false;
+		}
+
 		if ( ! $license ) {
 			$license = self::get_license( $item_id );
 		}

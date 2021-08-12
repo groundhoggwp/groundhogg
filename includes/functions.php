@@ -1366,16 +1366,15 @@ function recount_tag_contacts_count() {
  *
  * @return Contact|false|WP_Error the new contact, false on failure, or WP_Error on error
  */
-function create_contact_from_user( $user, $sync_meta = false ) {
+function create_contact_from_user( $user = false, $sync_meta = false ) {
 
 	if ( is_int( $user ) ) {
 		$user = get_userdata( $user );
-		if ( ! $user ) {
-			return false;
-		}
+	} else if ( $user === false ) {
+		$user = wp_get_current_user();
 	}
 
-	if ( ! $user instanceof \WP_User ) {
+	if ( ! is_a( $user, '\WP_User' ) ) {
 		return false;
 	}
 
@@ -1474,16 +1473,20 @@ function create_user_from_contact( $contact, $role = 'subscriber', $notification
 	// Remove this action to avoid looping when creating a the user
 	remove_action( 'user_register', __NAMESPACE__ . '\convert_user_to_contact_when_user_registered' );
 
-	$user_id = wp_insert_user( [
+	// Filter all the user args
+	$new_user_args = apply_filters( 'groundhogg/create_user_from_contact/new_user_args', [
 		'user_pass'     => wp_generate_password(),
 		'user_email'    => $contact->get_email(),
-		'user_login'    => $contact->get_email(),
+		// Filter the user login
+		'user_login'    => apply_filters( 'groundhogg/create_user_from_contact/user_login', $contact->get_email(), $contact ),
 		'user_nicename' => $contact->get_full_name(),
 		'display_name'  => $contact->get_full_name(),
 		'first_name'    => $contact->get_first_name(),
 		'last_name'     => $contact->get_last_name(),
 		'role'          => $role
-	] );
+	], $contact );
+
+	$user_id = wp_insert_user( $new_user_args );
 
 	// May need this action, restore it.
 	add_action( 'user_register', __NAMESPACE__ . '\convert_user_to_contact_when_user_registered' );
@@ -3491,7 +3494,7 @@ function parse_inline_styles( $style ) {
 
 		$rule              = explode( ':', $bit );
 		$attribute         = sanitize_key( $rule[0] );
-		$value             = trim( get_array_var( $rule, 1, '' ) );
+		$value             = trim( $rule[1] );
 		$css[ $attribute ] = $value;
 	}
 
@@ -4623,6 +4626,45 @@ function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 	do_action( 'groundhogg/track_activity', $activity, $contact );
 }
 
+
+/**
+ * Return json response for meta picker.
+ */
+function handle_ajax_user_meta_picker() {
+
+	if ( ! current_user_can( 'edit_users' ) || ! wp_verify_nonce( get_post_var( 'nonce' ), 'meta-picker' ) ) {
+		wp_send_json_error();
+	}
+
+	$search = sanitize_text_field( get_post_var( 'term' ) );
+
+	global $wpdb;
+
+	$keys = $wpdb->get_col(
+		"SELECT DISTINCT meta_key FROM {$wpdb->usermeta} WHERE `meta_key` RLIKE '{$search}' ORDER BY meta_key ASC"
+	);
+
+	$response = array_map( function ( $key ) {
+		return [
+			'id'    => $key,
+			'label' => $key,
+			'value' => $key
+		];
+	}, $keys );
+
+	/**
+	 * Filter the json response for the meta key picker
+	 *
+	 * @param $response array[]
+	 * @param $search   string
+	 */
+	$response = apply_filters( 'groundhogg/handle_ajax_meta_picker', $response, $search );
+
+	wp_send_json( $response );
+}
+
+add_action( 'wp_ajax_user_meta_picker', __NAMESPACE__ . '\handle_ajax_user_meta_picker' );
+
 /**
  * Return json response for meta picker.
  */
@@ -4662,6 +4704,47 @@ function handle_ajax_meta_picker() {
 }
 
 add_action( 'wp_ajax_gh_meta_picker', __NAMESPACE__ . '\handle_ajax_meta_picker' );
+
+/**
+ * Return json response for meta picker.
+ */
+function handle_ajax_meta_value_picker() {
+
+	if ( ! current_user_can( 'edit_contacts' ) || ! wp_verify_nonce( get_post_var( 'nonce' ), 'meta-picker' ) ) {
+		wp_send_json_error();
+	}
+
+	$search = sanitize_text_field( get_post_var( 'term' ) );
+	$meta_key = sanitize_text_field( get_post_var( 'meta_key' ) );
+
+	$table = get_db( 'contactmeta' );
+
+	global $wpdb;
+
+	$keys = $wpdb->get_col(
+		"SELECT DISTINCT meta_value FROM {$table->get_table_name()} WHERE `meta_key` = '{$meta_key}' AND `meta_value` RLIKE '{$search}' ORDER BY meta_value ASC"
+	);
+
+	$response = array_map( function ( $key ) {
+		return [
+			'id'    => $key,
+			'label' => $key,
+			'value' => $key
+		];
+	}, $keys );
+
+	/**
+	 * Filter the json response for the meta key picker
+	 *
+	 * @param $response array[]
+	 * @param $search   string
+	 */
+	$response = apply_filters( 'groundhogg/handle_ajax_meta_value_picker', $response, $search );
+
+	wp_send_json( $response );
+}
+
+add_action( 'wp_ajax_gh_meta_value_picker', __NAMESPACE__ . '\handle_ajax_meta_value_picker' );
 
 /**
  * Current time or time provided
@@ -5141,12 +5224,13 @@ function add_tiny_mce_plugin( $plugins ) {
 	return $plugins;
 }
 
-add_filter( 'mce_external_plugins', __NAMESPACE__ . '\add_tiny_mce_plugin' );
+//add_filter( 'mce_external_plugins', __NAMESPACE__ . '\add_tiny_mce_plugin' );
 
 // register new button in the editor
 function register_mce_button( $buttons ) {
 	array_push( $buttons, 'groundhoggreplacementbtn', 'groundhoggemojibtn' );
-	var_dump( $buttons );
+
+//	var_dump( $buttons );
 
 	return $buttons;
 }
@@ -5254,9 +5338,9 @@ function get_object_relationships( $object, $is_primary = true ) {
  */
 function compare_dates( &$before, &$after ) {
 
-	if ( date_as_int( $after ) < date_as_int( $before ) ) {
+	if ( strtotime( $before ) < strtotime( $after ) ) {
 		return true;
-	} else if ( date_as_int( $after ) > date_as_int( $before ) ) {
+	} else if ( strtotime( $after ) < strtotime( $before ) ) {
 		$temp   = $before;
 		$before = $after;
 		$after  = $temp;
@@ -5293,6 +5377,16 @@ function is_template_site() {
  */
 function enqueue_step_type_assets() {
 	do_action( 'groundhogg_enqueue_step_type_assets' );
+}
+
+/**
+ * Enqueue any step type registration assets
+ */
+function enqueue_filter_assets() {
+
+	wp_enqueue_script( 'groundhogg-admin-search-filters' );
+
+	do_action( 'groundhogg_enqueue_filter_assets' );
 }
 
 /**
@@ -5406,7 +5500,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 		];
 	}
 
-	if ( isset_not_empty( $query, 'date_before' ) || isset_not_empty( $query, 'date_after' ) ){
+	if ( isset_not_empty( $query, 'date_before' ) || isset_not_empty( $query, 'date_after' ) ) {
 
 		$compare = 'between';
 		// between
@@ -5564,6 +5658,17 @@ function get_filters_from_old_query_vars( $query = [] ) {
 		];
 	}
 
+	$filters = apply_filters( 'groundhogg/get_filters_from_old_query_vars', $filters, $query );
+
 	// Filters is an array[] so wrap in another array
 	return ! empty( $filters ) ? [ $filters ] : false;
+}
+
+/**
+ * Whether the admin bar widget is enabled or not.
+ *
+ * @return mixed|void
+ */
+function is_admin_bar_widget_disabled() {
+	return apply_filters( 'groundhogg/is_admin_bar_widget_disabled', is_option_enabled( 'gh_is_admin_bar_widget_disabled' ) );
 }

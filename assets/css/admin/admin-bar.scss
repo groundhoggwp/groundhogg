@@ -91,6 +91,10 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     margin-bottom: 10px;
     display: flex;
     gap: 5px;
+
+    .gh-button{
+      position: relative;
+    }
   }
 
   &-results {
@@ -98,7 +102,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     flex-direction: column;
     gap: 10px;
     max-height: 500px;
-    overflow: auto;
+    //overflow: auto;
     margin-top: 10px;
   }
 
@@ -126,6 +130,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
       gap: 5px;
       justify-content: flex-end;
       visibility: hidden;
+      flex-wrap: wrap;
     }
 
     &:hover {

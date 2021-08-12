@@ -6,6 +6,7 @@ use Groundhogg\Contact_Query;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_cookie;
 use function Groundhogg\get_request_var;
 use function Groundhogg\percentage;
 use function Groundhogg\set_cookie;
@@ -169,6 +170,8 @@ abstract class Base_Report {
 		return $contacts;
 	}
 
+	protected $funnel_cookie_set = false;
+
 	/**
 	 * Get the funnel IDs if available
 	 *
@@ -176,7 +179,11 @@ abstract class Base_Report {
 	 */
 	protected function get_funnel_id() {
 		$funnel_id = absint( get_array_var( get_request_var( 'data', [] ), 'funnel_id' ) );
-		set_cookie( 'gh_reporting_funnel_id', $funnel_id, MINUTE_IN_SECONDS );
+
+		if ( absint( get_cookie( 'gh_reporting_funnel_id' ) ) !== $funnel_id && ! $this->funnel_cookie_set ){
+			set_cookie( 'gh_reporting_funnel_id', $funnel_id, MINUTE_IN_SECONDS );
+			$this->funnel_cookie_set = true;
+		}
 
 		return $funnel_id;
 	}

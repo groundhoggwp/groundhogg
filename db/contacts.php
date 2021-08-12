@@ -253,7 +253,7 @@ class Contacts extends DB {
 	 * @access public
 	 *
 	 * @param string $field id or email
-	 * @param mixed $value The Customer ID or email to search
+	 * @param mixed  $value The Customer ID or email to search
 	 *
 	 * @return mixed          Upon success, an object of the contact. Upon failure, NULL
 	 * @since  2.3
@@ -270,7 +270,7 @@ class Contacts extends DB {
 	/**
 	 * Use contact query calss
 	 *
-	 * @param array $data
+	 * @param array  $data
 	 * @param string $order
 	 *
 	 * @return array|bool|object|null
@@ -307,6 +307,9 @@ class Contacts extends DB {
 		$args           = $this->prepare_contact_query_args( $args );
 		$args['count']  = true;
 		$args['offset'] = 0;
+
+		unset( $args['limit'] );
+		unset( $args['number'] );
 
 		$query   = new Contact_Query( '', $this );
 		$results = $query->query( $args );

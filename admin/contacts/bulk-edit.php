@@ -316,5 +316,5 @@ $count = get_db( 'contacts' )->count( $query );
 
 	<?php do_action( 'groundhogg/admin/contacts/bulk_edit/after' ) ?>
 
-	<?php submit_button( sprintf( _n( 'Edit %d contact', 'Edit %d contacts', $count, 'groundhogg' ), $count ) ); ?>
+	<?php submit_button( sprintf( _n( 'Edit %s contact', 'Edit %s contacts', $count, 'groundhogg' ), number_format_i18n( $count ) ) ); ?>
 </form>

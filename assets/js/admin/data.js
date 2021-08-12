@@ -111,8 +111,10 @@
     primaryKey: 'ID',
     getItemFromResponse: (r) => r.item,
     getItemsFromResponse: (r) => r.items,
+    getTotalItemsFromResponse: (r) => r.total_items,
     items: [],
     item: {},
+    total_items: 0,
     route: route,
 
     /**
@@ -160,7 +162,16 @@
       return true
     },
 
+    getTotalItems () {
+      return this.total_items
+    },
+
     itemsFetched (items) {
+
+      if (!Array.isArray(items)) {
+        return
+      }
+
       this.items = [
         ...items, // new items
         ...this.items.filter(item => !items.find(_item => _item[this.primaryKey] === item[this.primaryKey]))
@@ -169,8 +180,10 @@
 
     async fetchItems (params) {
       return apiGet(this.route, params)
-        .then(r => this.getItemsFromResponse(r))
-        .then(items => {
+        .then(r => {
+          this.total_items = this.getTotalItemsFromResponse(r)
+          return this.getItemsFromResponse(r)
+        }).then(items => {
           this.itemsFetched(items)
           return items
         })
@@ -334,6 +347,14 @@
     campaigns: ObjectStore(Groundhogg.api.routes.v4.campaigns),
     funnels: ObjectStore(Groundhogg.api.routes.v4.funnels, {
 
+      async addContacts ({ query, funnel_id, step_id }, opts = {}) {
+        return apiPost(`${this.route}/${funnel_id}/start`, {
+          query,
+          step_id,
+          funnel_id,
+        }, opts).then(d => d.added)
+      },
+
       async commit (id, data, opts = {}) {
         return apiPost(`${this.route}/${id}/commit`, data, opts)
           .then(r => this.getItemFromResponse(r))
@@ -359,7 +380,7 @@
 
       getFunnelAndStep (funnelId, stepId, checkEdited = false) {
         const funnel = funnelId ? this.items.find(f => f.ID === funnelId) : this.item
-        const step = checkEdited && funnel.meta.edited  ? funnel.meta.edited.steps.find(s => s.ID === stepId) : funnel.steps.find(s => s.ID === stepId)
+        const step = checkEdited && funnel.meta.edited ? funnel.meta.edited.steps.find(s => s.ID === stepId) : funnel.steps.find(s => s.ID === stepId)
         return { funnel, step }
       },
 

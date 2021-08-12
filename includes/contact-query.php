@@ -5,7 +5,6 @@ namespace Groundhogg;
 // Exit if accessed directly
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Contacts;
-use phpDocumentor\Reflection\DocBlock\Tags\Deprecated;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -254,7 +253,7 @@ class Contact_Query {
 
 		$defaults = array(
 			'number'                 => - 1,
-			'limit'                  => - 1,
+			'limit'                  => false,
 			'offset'                 => 0,
 			'orderby'                => 'ID',
 			'order'                  => 'DESC',
@@ -292,22 +291,12 @@ class Contact_Query {
 			'filters'                => []
 		);
 
-		// Only show contacts associated with the current owner...
-		if ( current_user_can( 'view_contacts' ) && ! current_user_can( 'view_all_contacts' ) ) {
-			$defaults['owner'] = get_current_user_id();
-		}
-
 		/**
 		 * Filter the query var defaults
 		 *
 		 * @param $query_var_defaults array
 		 */
 		$this->query_var_defaults = apply_filters( 'groundhogg/contact_query/query_var_defaults', $defaults );
-
-		if ( empty( self::$filters ) ) {
-			self::setup_default_filters();
-			do_action( 'groundhogg/contact_query/register_filters', $this );
-		}
 
 		if ( ! empty( $query ) ) {
 			$this->query( $query );
@@ -382,14 +371,20 @@ class Contact_Query {
 			$this->query_vars = wp_parse_args( $saved_search['query'], $this->query_vars );
 		}
 
+		$this->query_vars = wp_parse_args( $this->query_vars, $this->query_var_defaults );
+
 		// Map "limit" to "number"
 		if ( isset_not_empty( $this->query_vars, 'limit' ) ) {
 			$this->query_vars['number'] = $this->query_vars['limit'];
 			unset( $this->query_vars['limit'] );
 		}
 
-		$this->query_vars = wp_parse_args( $this->query_vars, $this->query_var_defaults );
+		// Only show contacts associated with the current owner...
+		if ( ! current_user_can( 'view_all_contacts' ) ) {
+			$this->query_vars['owner'] = get_current_user_id();
+		}
 
+		// Fix number
 		if ( intval( $this->query_vars['number'] ) < 1 ) {
 			$this->query_vars['number'] = false;
 		}
@@ -1162,6 +1157,20 @@ class Contact_Query {
 	}
 
 	/**
+	 * Register the filters
+	 */
+	protected function register_filters() {
+
+		if ( ! empty( self::$filters ) ) {
+			return;
+		}
+
+		self::setup_default_filters();
+
+		do_action( 'groundhogg/contact_query/register_filters', $this );
+	}
+
+	/**
 	 * Parse the provided filters to form a where clause
 	 *
 	 * @param $filters
@@ -1175,6 +1184,12 @@ class Contact_Query {
 		}
 
 		$or_clauses = [];
+
+		if ( ! $filters ) {
+			return false;
+		}
+
+		$this->register_filters();
 
 		// Or Group
 		foreach ( $filters as $filter_group ) {
@@ -1312,6 +1327,41 @@ class Contact_Query {
 		);
 
 		self::register_filter(
+			'region',
+			[ self::class, 'filter_region' ]
+		);
+
+		self::register_filter(
+			'city',
+			[ self::class, 'filter_city' ]
+		);
+
+		self::register_filter(
+			'street_address_1',
+			[ self::class, 'filter_street_address_1' ]
+		);
+
+		self::register_filter(
+			'street_address_2',
+			[ self::class, 'filter_street_address_2' ]
+		);
+
+		self::register_filter(
+			'postal_zip',
+			[ self::class, 'filter_postal_zip' ]
+		);
+
+		self::register_filter(
+			'company_name',
+			[ self::class, 'filter_company_name' ]
+		);
+
+		self::register_filter(
+			'job_title',
+			[ self::class, 'filter_job_title' ]
+		);
+
+		self::register_filter(
 			'funnel_history',
 			[ self::class, 'filter_funnel' ]
 		);
@@ -1355,6 +1405,63 @@ class Contact_Query {
 			'was_not_active',
 			[ self::class, 'filter_was_not_active' ]
 		);
+
+		self::register_filter(
+			'is_user',
+			[ self::class, 'filter_is_user' ]
+		);
+
+		self::register_filter(
+			'user_role_is',
+			[ self::class, 'filter_user_role_is' ]
+		);
+
+		self::register_filter(
+			'user_meta',
+			[ self::class, 'filter_user_meta' ]
+		);
+
+
+	}
+
+	public static function filter_user_meta( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'meta'    => '',
+			'compare' => '',
+			'value'   => ''
+		] );
+
+		global $wpdb;
+
+		$meta_table_name = $wpdb->usermeta;
+		$clause1         = self::generic_text_compare( $meta_table_name . '.meta_key', '=', $filter_vars['meta'] );
+		$clause2         = self::generic_text_compare( $meta_table_name . '.meta_value', $filter_vars['compare'], $filter_vars['value'] );
+
+		return "{$query->table_name}.user_id IN ( select {$meta_table_name}.user_id FROM {$meta_table_name} WHERE {$clause1} AND {$clause2} ) ";
+	}
+
+	public static function filter_user_role_is( $filter_vars, $query ) {
+
+		global $wpdb;
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'role' => ''
+		] );
+
+		$role = sanitize_text_field( $filter_vars['role'] );
+
+		return "$query->table_name.user_id IN ( SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = 'wp_capabilities' AND meta_value RLIKE '\"$role\"' )";
+	}
+
+	/**
+	 * @param $filter_vars
+	 * @param $query Contact_Query
+	 *
+	 * @return string
+	 */
+	public static function filter_is_user( $filter_vars, $query ) {
+		return "$query->table_name.user_id > 0";
 	}
 
 	/**
@@ -1760,26 +1867,20 @@ class Contact_Query {
 			if ( ! empty( $val ) ) {
 				switch ( $col ) {
 					default:
-						$compare = '=';
+						$subwhere[] = [ 'col' => $col, 'compare' => '=', 'val' => $val ];
 						break;
 					case 'before':
-						$compare = '<=';
-						$col     = 'time';
-						break;
-					case 'referer':
-						$compare = 'RLIKE';
-						$col     = 'referer';
+						$subwhere[] = [ 'col' => 'timestamp', 'compare' => '<=', 'val' => $val ];
 						break;
 					case 'after':
-						$compare = '>=';
-						$col     = 'time';
+						$subwhere[] = [ 'col' => 'timestamp', 'compare' => '>=', 'val' => $val ];
+						break;
+					case 'referer':
+						$subwhere[] = [ 'col' => 'referer', 'compare' => 'RLIKE', 'val' => $val ];
 						break;
 					case 'exclude':
-						continue 2;
 						break;
 				}
-
-				$subwhere[] = [ 'col' => $col, 'val' => $val, 'compare' => $compare ];
 			}
 		}
 
@@ -1849,9 +1950,9 @@ class Contact_Query {
 	public static function get_before_and_after_from_filter_date_range( $filter_vars, $as_int = true ) {
 
 		$filter_vars = wp_parse_args( $filter_vars, [
-			'date_range' => '24_hours',
-			'after'      => 0,
-			'before'     => 0,
+			'date_range' => 'any',
+			'after'      => 1,
+			'before'     => time(),
 		] );
 
 		$after  = date_as_int( $filter_vars['after'] );
@@ -1859,6 +1960,10 @@ class Contact_Query {
 
 		switch ( $filter_vars['date_range'] ) {
 			default:
+			case 'any':
+				$after  = 1;
+				$before = time();
+				break;
 			case '24_hours':
 				$after  = time() - DAY_IN_SECONDS;
 				$before = time();
@@ -1885,16 +1990,17 @@ class Contact_Query {
 				break;
 			case 'before':
 				$before = date_as_int( $before ) + ( DAY_IN_SECONDS - 1 );
-				$after  = 0;
+				$after  = 1;
 				break;
 			case 'after':
-				$before = 0;
+				$before = time();
 				$after  = date_as_int( $after );
 				break;
 			case 'between':
 				compare_dates( $before, $after );
 				$after  = date_as_int( $after );
 				$before = date_as_int( $before ) + ( DAY_IN_SECONDS - 1 );
+				break;
 		}
 
 		return [
@@ -1955,11 +2061,11 @@ class Contact_Query {
 			'value'      => ''
 		] );
 
-		$meta_table_name = get_db( 'contactmeta' )->table_name;
-		$clause1         = self::generic_text_compare( $meta_table_name . '.meta_key', '=', $filter_vars['phone_type'] . '_phone' );
-		$clause2         = self::generic_text_compare( "{$meta_table_name}.meta_value", $filter_vars['compare'], $filter_vars['value'] );
-
-		return "{$query->table_name}.ID IN ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$clause1} AND {$clause2} ) ";
+		return self::filter_meta( [
+			'meta'    => $filter_vars['phone_type'] . '_phone',
+			'value'   => $filter_vars['value'],
+			'compare' => $filter_vars['compare']
+		], $query );
 	}
 
 	/**
@@ -1973,14 +2079,156 @@ class Contact_Query {
 	public static function filter_country( $filter_vars, $query ) {
 
 		$filter_vars = wp_parse_args( $filter_vars, [
-			'country' => '',
+			'country' => ''
 		] );
 
-		$meta_table_name = get_db( 'contactmeta' )->table_name;
-		$clause1         = self::generic_text_compare( $meta_table_name . '.meta_key', '=', 'country' );
-		$clause2         = self::generic_text_compare( "{$meta_table_name}.meta_value", '=', $filter_vars['country'] );
+		return self::filter_meta( [
+			'meta'    => 'country',
+			'value'   => $filter_vars['country'],
+			'compare' => 'equals'
+		], $query );
+	}
 
-		return "{$query->table_name}.ID IN ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$clause1} AND {$clause2} ) ";
+	/**
+	 * Filter by region
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_region( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'region' => ''
+		] );
+
+		return self::filter_meta( [
+			'meta'    => 'region',
+			'value'   => $filter_vars['region'],
+			'compare' => 'equals'
+		], $query );
+	}
+
+	/**
+	 * Filter by city
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_city( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'city' => ''
+		] );
+
+		return self::filter_meta( [
+			'meta'    => 'city',
+			'value'   => $filter_vars['city'],
+			'compare' => 'equals'
+		], $query );
+	}
+
+	/**
+	 * Filter by city
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_street_address_1( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'value'   => '',
+			'compare' => 'equals',
+		] );
+
+		return self::filter_meta( array_merge( $filter_vars, [
+			'meta' => 'street_address_1'
+		] ), $query );
+	}
+
+	/**
+	 * Filter by city
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_street_address_2( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'value'   => '',
+			'compare' => 'equals',
+		] );
+
+		return self::filter_meta( array_merge( $filter_vars, [
+			'meta' => 'street_address_2'
+		] ), $query );
+	}
+
+	/**
+	 * Filter by city
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_postal_zip( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'value'   => '',
+			'compare' => 'equals',
+		] );
+
+		return self::filter_meta( array_merge( $filter_vars, [
+			'meta' => 'postal_zip'
+		] ), $query );
+	}
+
+	/**
+	 * Filter by city
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_company_name( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'value'   => '',
+			'compare' => 'equals',
+		] );
+
+		return self::filter_meta( array_merge( $filter_vars, [
+			'meta' => 'company_name'
+		] ), $query );
+	}
+
+	/**
+	 * Filter by city
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_job_title( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'value'   => '',
+			'compare' => 'equals',
+		] );
+
+		return self::filter_meta( array_merge( $filter_vars, [
+			'meta' => 'job_title'
+		] ), $query );
 	}
 
 	/**
@@ -2035,34 +2283,26 @@ class Contact_Query {
 	 *
 	 * @return string
 	 */
-	public static function generic_number_filter_compare( array $filter_vars, string $column_key ): string {
-		$filter_vars = wp_parse_args( $filter_vars, [
-			'value'   => '',
-			'compare' => '',
-		] );
+	public static function generic_number_compare( $column, $compare, $value ) {
 
-		global $wpdb;
-
-		$value = sanitize_text_field( $filter_vars['value'] );
-
-		switch ( $filter_vars['compare'] ) {
+		switch ( $compare ) {
 			default:
 			case 'equals':
-				return sprintf( "`%s` = %d", $column_key, $value );
+				return sprintf( "%s = %d", $column, $value );
 			case 'not_equals':
-				return sprintf( "`%s` != %d", $column_key, $value );
+				return sprintf( "%s != %d", $column, $value );
 			case 'greater_than':
-				return sprintf( "`%s` > %d", $column_key, $value );
+				return sprintf( "%s > %d", $column, $value );
 			case 'less_than':
-				return sprintf( "`%s` < %d", $column_key, $value );
+				return sprintf( "%s < %d", $column, $value );
 			case 'greater_than_or_equal_to':
-				return sprintf( "`%s` >= %d", $column_key, $value );
+				return sprintf( "%s >= %d", $column, $value );
 			case 'less_than_or_equal_to':
-				return sprintf( "`%s` <= %d", $column_key, $value );
+				return sprintf( "%s <= %d", $column, $value );
 			case 'between_inclusive':
-				return sprintf( "`%s` <> %d", $column_key, $value );
+				return sprintf( "%s <> %d", $column, $value );
 			case 'between_exclusive':
-				return sprintf( "`%s` <= %d", $column_key, $value );
+				return sprintf( "%s <= %d", $column, $value );
 		}
 	}
 

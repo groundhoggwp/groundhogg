@@ -476,8 +476,8 @@ class HTML {
 			'value'       => '',
 			'attributes'  => '',
 			'placeholder' => '',
-			'min'         => 0,
-			'max'         => 999999999,
+//			'min'         => 0,
+//			'max'         => 999999999,
 			'step'        => 1
 		) );
 

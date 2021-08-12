@@ -1,1 +1,0 @@
-const mountedApp = filtersApp.mount('#filters')

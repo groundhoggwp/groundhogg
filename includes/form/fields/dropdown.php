@@ -40,7 +40,7 @@ class Dropdown extends Input {
 
 	/**
 	 * @param string $option
-	 * @param int $tag_id
+	 * @param int    $tag_id
 	 */
 	protected function add_tag_mapping( $option = '', $tag_id = 0 ) {
 		$this->tag_map[ md5( $option ) ] = absint( $tag_id );
@@ -124,7 +124,7 @@ class Dropdown extends Input {
 	 * @param $input
 	 * @param $config
 	 *
-	 * @return string
+	 * @return string|\WP_Error
 	 */
 	public static function validate( $input, $config ) {
 		$options = $config['atts']['options'];
@@ -132,6 +132,10 @@ class Dropdown extends Input {
 		$input = is_array( $input ) ? $input : [ $input ];
 
 		foreach ( $input as $item ) {
+
+			if ( ! $item ) {
+				continue;
+			}
 
 			// Match the input to the options string.
 			if ( strpos( $options, $item ) === false ) {

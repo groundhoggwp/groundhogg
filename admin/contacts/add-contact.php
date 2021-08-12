@@ -95,6 +95,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						'class' => 'input',
 						'id'    => 'primary_phone',
 						'name'  => 'primary_phone',
+						'value' => get_request_var( 'primary_phone' ),
 					] ); ?>
 					<?php _e( 'ext.', 'groundhogg' ) ?>
 					<?php
@@ -102,6 +103,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						'id'    => 'primary_phone_extension',
 						'name'  => 'primary_phone_extension',
 						'class' => 'phone-ext',
+						'value' => get_request_var( 'primary_phone_extension' ),
 					] ); ?>
 				</td>
 			</tr>
@@ -115,6 +117,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						'class' => 'input',
 						'id'    => 'mobile_phone',
 						'name'  => 'mobile_phone',
+						'value' => get_request_var( 'mobile_phone' ),
 					] ); ?>
 				</td>
 			</tr>

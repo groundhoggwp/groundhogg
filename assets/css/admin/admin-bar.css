@@ -53,12 +53,14 @@
   display: flex;
   gap: 5px;
 }
+.groundhogg-toolbar-quick-search-tabs .gh-button {
+  position: relative;
+}
 .groundhogg-toolbar-quick-search-results {
   display: flex;
   flex-direction: column;
   gap: 10px;
   max-height: 500px;
-  overflow: auto;
   margin-top: 10px;
 }
 .groundhogg-toolbar-quick-search-result {
@@ -83,6 +85,7 @@
   gap: 5px;
   justify-content: flex-end;
   visibility: hidden;
+  flex-wrap: wrap;
 }
 .groundhogg-toolbar-quick-search-result:hover {
   background-color: rgba(16, 38, 64, 0.05);

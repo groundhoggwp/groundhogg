@@ -12,12 +12,15 @@
     tooltip,
     loadingDots,
     adminPageURL,
+    bold,
     dialog
   } = Groundhogg.element
   const { emailPicker, searchesPicker } = Groundhogg.pickers
   const { emails: EmailsStore, searches: SearchesStore, contacts: ContactsStore } = Groundhogg.stores
   const { routes, post } = Groundhogg.api
   const { createFilters } = Groundhogg.filters.functions
+  const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
+  const { sprintf, __, _x, _n } = wp.i18n
 
   const SendBroadcast = (selector, {
     email = false,
@@ -78,7 +81,8 @@
 			  ${state.email_id ? preview() : ''}
 			  <div class="gh-row">
 				  <div class="gh-col">
-					  <button class="gh-next-step gh-button primary" ${state.email_id ? '' : 'disabled'}>${__('Next', 'groundhogg')} &rarr;
+					  <button class="gh-next-step gh-button primary" ${state.email_id ? '' : 'disabled'}>
+						  ${__('Next', 'groundhogg')} &rarr;
 					  </button>
 				  </div>
 			  </div>
@@ -142,7 +146,8 @@
 			  <div class="gh-row">
 				  <div class="gh-col">
 					  <button class="gh-next-step gh-button primary"
-					          ${state.when === 'later' && (!state.date || !state.time) ? 'disabled' : ''}>${__('Next', 'groundhogg')} &rarr;
+					          ${state.when === 'later' && (!state.date || !state.time) ? 'disabled' : ''}>
+						  ${__('Next', 'groundhogg')} &rarr;
 					  </button>
 				  </div>
 			  </div>`
@@ -150,23 +155,29 @@
 
     const step3 = () => {
 
+      const { total_contacts } = state
+
       const totalAndNext = () => {
-        // language=HTML
+        //language=HTML
         return `
 			<div class="gh-row">
 				<div class="gh-col">
 					<div id="${elPrefix}-total-contacts">
-						<p>Send to <b>${state.total_contacts}</b> ${__('contacts', 'groundhogg')}</p>
+						<p>
+							${sprintf(_n('Send to %s contact', 'Send to %s contacts', total_contacts, 'groundhogg'), bold(formatNumber(total_contacts)))}
+            </p>
 					</div>
 				</div>
 			</div>
 			<div class="gh-row">
 				<div class="gh-col">
-					<button class="gh-next-step gh-button primary" ${state.total_contacts ? '' : 'disabled'}>${__('Next', 'groundhogg')}
+					<button class="gh-next-step gh-button primary" ${total_contacts ? '' : 'disabled'}>
+						${__('Next', 'groundhogg')}
 						&rarr;
 					</button>
 				</div>
 			</div>`
+        // language=HTML
       }
 
       if (state.which === 'from_table') {
@@ -178,7 +189,8 @@
 		  <div class="gh-rows-and-columns">
 			  <div class="gh-row">
 				  <div class="gh-col">
-					  <label for="${elPrefix}-search-which">${__('Select contacts to receive this email...', 'groundhogg')}</label>
+					  <label
+						  for="${elPrefix}-search-which">${__('Select contacts to receive this email...', 'groundhogg')}</label>
 					  <div class="gh-radio-group">
 						  <label>${input({
 							  type: 'radio',
@@ -202,7 +214,8 @@
 					  <div id="${elPrefix}-search-method">
 						  ${state.which === 'searches' ? select({
 							  id: `${elPrefix}-search-method-searches`,
-							  name: 'searches'
+							  name: 'searches',
+							  dataPlaceholder: __('Please select a saved search...', 'groundhogg')
 						  }, SearchesStore.getItems().map(s => ({
 							  text: s.name,
 							  value: s.id
@@ -224,14 +237,16 @@
         time
       } = state
 
+      let review = state.when === 'later'
+        ? _n('Send %1$s to %2$s contact on %3$s', 'Send %1$s to %2$s contacts on %3$s', total_contacts, 'groundhogg')
+        : _n('Send %1$s to %2$s contact <b>immediately</b>.', 'Send %1$s to %2$s contacts <b>immediately</b>', total_contacts, 'groundhogg')
+
       // language=HTML
       return `
 		  <div class="gh-rows-and-columns">
 			  <div class="gh-row">
 				  <div class="gh-col">
-					  <p>${__('Send', 'groundhogg')} <b>${email.data.title}</b> ${__('to', 'groundhogg')} <b>${total_contacts}</b> ${__('contacts', 'groundhogg')}
-						  ${state.when === 'later' ? `${__('on', 'groundhogg')} <b>${moment(`${state.date} ${state.time}`).format('LLLL')}</b>.` : `<b>${__('immediately', 'groundhogg')}</b>.`}
-					  </p>
+					  ${sprintf(review, bold(email.data.title), bold(formatNumber(total_contacts)), state.when === 'later' ? bold(formatDateTime(date + ' ' + time)) : '')}
 				  </div>
 			  </div>
 			  <div class="gh-row">
@@ -283,6 +298,8 @@
 
             emailPicker(`#${elPrefix}-email`, false, (items) => {EmailsStore.itemsFetched(items)}, {
               status: 'ready'
+            }, {
+              placeholder: 'Select an email to send...'
             }).on('change', ({ target }) => {
               setState({
                 email_id: parseInt(target.value)
@@ -332,7 +349,7 @@
               }
 
               ContactsStore.count(query).then(total => {
-                $(`#${elPrefix}-total-contacts`).html(`<p>${__('Send to', 'groundhogg')} <b>${total}</b> ${__('contacts', 'groundhogg')}</p>`)
+                $(`#${elPrefix}-total-contacts`).html(`<p>${sprintf(_n('Send to %s contact', 'Send to %s contacts', total, 'groundhogg'), bold(formatNumber(total)))}</p>`)
                 $('.gh-next-step').prop('disabled', total === 0)
                 setState({
                   total_contacts: total
@@ -342,7 +359,8 @@
 
             $('.change-search-which').on('change', ({ target }) => {
               setState({
-                which: $(target).val()
+                which: $(target).val(),
+                query: {}
               })
               setStep(2)
             })
@@ -357,7 +375,9 @@
                 updateTotal()
               }).mount()
             } else {
-              searchesPicker(`#${elPrefix}-search-method-searches`, (items) => { SearchesStore.itemsFetched(items)}).on('change', ({ target }) => {
+              searchesPicker(`#${elPrefix}-search-method-searches`, (items) => { SearchesStore.itemsFetched(items)}, {}, {
+                placeholder: 'Select a saved search...'
+              }).on('select2:select', ({ target }) => {
                 setState({
                   query: {
                     saved_search: $(target).val(),
@@ -366,6 +386,8 @@
                 updateTotal()
               })
             }
+
+            updateTotal()
 
             break
 

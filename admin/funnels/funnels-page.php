@@ -24,6 +24,7 @@ use Groundhogg\Contact_Query;
 use Groundhogg\Step;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\last_db_error;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -388,10 +389,6 @@ class Funnels_Page extends Admin_Page {
 		$this->add_notice( esc_attr( 'created' ), _x( 'Funnel created', 'notice', 'groundhogg' ), 'success' );
 
 		$edit_url = admin_url( 'admin.php?page=gh_funnels&action=edit&funnel=' . $funnel_id );
-
-//		if ( is_option_enabled( 'gh_use_builder_version_2' ) ) {
-//			$edit_url = add_query_arg( [ 'version' => '2' ], $edit_url );
-//		}
 
 		return $edit_url;
 

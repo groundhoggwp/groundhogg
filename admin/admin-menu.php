@@ -21,6 +21,7 @@ use Groundhogg\Admin\Tools\Tools_Page;
 use Groundhogg\Admin\User\Admin_User;
 use Groundhogg\Admin\Welcome\Welcome_Page;
 use function Groundhogg\has_premium_features;
+use function Groundhogg\is_admin_bar_widget_disabled;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\is_pro_features_active;
 use function Groundhogg\is_white_labeled;
@@ -53,6 +54,11 @@ class Admin_Menu {
 	 * @param $admin_bar \WP_Admin_Bar
 	 */
 	public function admin_bar( $admin_bar ) {
+
+		if ( is_admin_bar_widget_disabled() ){
+			return;
+		}
+
 		$admin_bar->add_node( [
 			'id'     => 'groundhogg',
 			'title'  => is_white_labeled() ? white_labeled_name() : '<svg height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="11.4 13.2 212.1 237.9">
@@ -140,7 +146,7 @@ class Admin_Menu {
 	/**
 	 * Set the data to the given value
 	 *
-	 * @param $key   string
+	 * @param $key string
 	 * @param $value Admin_Page
 	 */
 	public function __set( $key, $value ) {

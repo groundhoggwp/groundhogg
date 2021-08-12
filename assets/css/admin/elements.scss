@@ -460,7 +460,7 @@ button {
 
   &-overlay {
     position: fixed;
-    background: rgba(darken($primary-blue, 20), .618);
+    background: $primary-dark-50;
     bottom: 0;
     left: 0;
     right: 0;
@@ -859,32 +859,90 @@ p.error,
   }
 }
 
-.gh-tooltip {
-  position: fixed;
-  background-color: $primary-dark;
-  color: #FFFFFF;
-  box-shadow: $box-shadow;
-  z-index: 999999;
-  padding: 5px 8px;
-  border-radius: 5px;
-  //position: relative;
+.gh-has-tooltip{
 
-  &.bottom {
-    &:before {
-      position: absolute;
-      content: '';
-      display: inline-block;
-      width: 0;
-      height: 0;
-      border-left: 5px solid transparent;
-      border-right: 5px solid transparent;
-      border-bottom: 5px solid $primary-dark;
-      transform: translate(-50%, 0);
-      top: -5px;
-      left: 50%;
+  position: relative;
+  box-sizing: border-box;
+
+  &:hover{
+    .gh-tooltip{
+      display: block;
+    }
+  }
+
+  .gh-tooltip {
+    width: max-content;
+    display: none;
+    position: absolute;
+    background-color: $primary-dark;
+    color: #FFFFFF;
+    box-shadow: $box-shadow;
+    z-index: 999999;
+    padding: 5px 8px;
+    border-radius: 5px;
+    //position: relative;
+
+    &.right {
+      left: calc(100% + 5px);
+      top: 50%;
+      //left: 50%;
+      transform: translate(0, -50%);
+
+      &:before {
+        position: absolute;
+        content: '';
+        display: inline-block;
+        width: 0;
+        height: 0;
+        border-top: 5px solid transparent;
+        border-right: 5px solid $primary-dark;
+        border-bottom: 5px solid transparent;
+        //border-bottom: 5px solid $primary-dark;
+        transform: translate(0, -50%);
+        top: 50%;
+        left: -5px;
+      }
     }
 
-    transform: translate(-50%, 0);
+    &.top {
+      bottom: calc(100% + 5px);
+      left: 50%;
+      transform: translate(-50%, 0);
+
+      &:before {
+        position: absolute;
+        content: '';
+        display: inline-block;
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-bottom: 5px solid $primary-dark;
+        transform: translate(-50%, 0) rotate(180deg);
+        bottom: -5px;
+        left: 50%;
+      }
+    }
+
+    &.bottom {
+      top: calc(100% + 5px);
+      left: 50%;
+      transform: translate(-50%, 0);
+
+      &:before {
+        position: absolute;
+        content: '';
+        display: inline-block;
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-bottom: 5px solid $primary-dark;
+        transform: translate(-50%, 0);
+        top: -5px;
+        left: 50%;
+      }
+    }
   }
 }
 

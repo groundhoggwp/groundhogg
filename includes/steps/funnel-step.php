@@ -627,11 +627,13 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 		$steps = [];
 
-		foreach ( $raw_steps as $raw_step ) {
-			$step = new Step( absint( $raw_step->ID ) );
+		if ( $raw_steps ){
+			foreach ( $raw_steps as $raw_step ) {
+				$step = new Step( absint( $raw_step->ID ) );
 
-			if ( $step ) {
-				$steps[] = $step;
+				if ( $step ) {
+					$steps[] = $step;
+				}
 			}
 		}
 

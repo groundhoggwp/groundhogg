@@ -11,7 +11,7 @@ use Groundhogg\Step;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\bulk_jobs;
 use function Groundhogg\do_replacements;
-use function Groundhogg\enqueue_step_type_assets;
+use function Groundhogg\enqueue_filter_assets;
 use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
@@ -136,54 +136,68 @@ class Contacts_Page extends Admin_Page {
 
 		wp_enqueue_style( 'groundhogg-admin' );
 
-		if ( $this->get_current_action() === 'edit' || $this->get_current_action() === 'add' || $this->get_current_action() === 'form' ) {
-			wp_enqueue_style( 'groundhogg-admin-contact-editor' );
-			wp_enqueue_style( 'groundhogg-admin-contact-info-cards' );
-			wp_enqueue_style( 'buttons' );
-			wp_enqueue_style( 'media-views' );
-//			wp_enqueue_style( 'edit' );
-			wp_enqueue_script( 'postbox' );
-			wp_enqueue_script( 'groundhogg-admin-contact-editor' );
-			wp_enqueue_script( 'groundhogg-admin-contact-info-cards' );
-			wp_localize_script( 'groundhogg-admin-contact-editor', 'ContactEditor', [
-				'contact_id'       => absint( get_url_var( 'contact' ) ),
-				'delete_note_text' => __( 'Are you sure you want to delete this note?', 'groundhogg' ),
-				'contact'          => get_contactdata( get_url_var( 'contact' ) )
-			] );
-		} else {
-			wp_enqueue_style( 'select2' );
-			wp_enqueue_script( 'select2' );
-			wp_enqueue_style( 'groundhogg-admin-search-filters' );
-			wp_enqueue_style( 'groundhogg-admin-contact-inline' );
+		switch ( $this->get_current_action() ) {
+			default:
+			case 'bulk_edit':
+				break;
+			case 'edit':
+			case 'add':
+			case 'form':
+				wp_enqueue_style( 'groundhogg-admin-contact-editor' );
+				wp_enqueue_style( 'groundhogg-admin-contact-info-cards' );
+				wp_enqueue_style( 'buttons' );
+				wp_enqueue_style( 'media-views' );
+				wp_enqueue_script( 'postbox' );
+				wp_enqueue_script( 'groundhogg-admin-contact-editor' );
+				wp_enqueue_script( 'groundhogg-admin-contact-info-cards' );
+				wp_localize_script( 'groundhogg-admin-contact-editor', 'ContactEditor', [
+					'contact_id'       => absint( get_url_var( 'contact' ) ),
+					'delete_note_text' => __( 'Are you sure you want to delete this note?', 'groundhogg' ),
+					'contact'          => get_contactdata( get_url_var( 'contact' ) )
+				] );
+				break;
+			case 'view':
+				wp_enqueue_style( 'select2' );
+				wp_enqueue_script( 'select2' );
+				wp_enqueue_style( 'groundhogg-admin-search-filters' );
+				wp_enqueue_style( 'groundhogg-admin-contact-inline' );
 
-			$current_filters = [];
-			$saved_search    = false;
+				$current_filters = [];
+				$saved_search    = false;
 
-			if ( $filters = get_url_var( 'filters' ) ) {
+				if ( $filters = get_url_var( 'filters' ) ) {
 
-				$current_filters = $filters;
+					$current_filters = $filters;
 
-				if ( is_string( $filters ) ) {
-					$current_filters = json_decode( base64_decode( $filters ), true );
+					if ( is_string( $filters ) ) {
+						$current_filters = json_decode( base64_decode( $filters ), true );
+					}
+
+				} else if ( $saved_search = get_url_var( 'saved_search' ) ) {
+					$saved_search = Saved_Searches::instance()->get( $saved_search );
+
+					// If the search does not have filters we need to migrate it
+					if ( ! isset_not_empty( $saved_search['query'], 'filters' ) ){
+						$saved_search['query'] = [
+							'filters' => get_filters_from_old_query_vars( $saved_search['query'] )
+						];
+					}
+				} else {
+					$current_filters = get_filters_from_old_query_vars( get_request_query() );
 				}
 
-			} else if ( $saved_search = get_url_var( 'saved_search' ) ) {
-				$saved_search = Saved_Searches::instance()->get( $saved_search );
-			} else {
-				$current_filters = get_filters_from_old_query_vars( get_request_query() );
-			}
+				enqueue_filter_assets();
 
-			enqueue_step_type_assets();
-
-			// Advanced Search
-			wp_enqueue_script( 'groundhogg-admin-contact-search' );
-			wp_localize_script( 'groundhogg-admin-contact-search', 'ContactSearch', [
-				'url'           => admin_page_url( 'gh_contacts' ),
-				'query'         => get_request_query(),
-				'filters'       => $current_filters,
-				'searches'      => array_values( Saved_Searches::instance()->get_all() ),
-				'currentSearch' => $saved_search
-			] );
+				// Advanced Search
+				wp_enqueue_script( 'groundhogg-admin-contact-search' );
+				wp_localize_script( 'groundhogg-admin-contact-search', 'ContactSearch', [
+					'url'           => admin_page_url( 'gh_contacts' ),
+					'query'         => get_request_query(),
+					'filters'       => $current_filters,
+					'searches'      => array_values( Saved_Searches::instance()->get_all() ),
+					'currentSearch' => $saved_search
+				] );
+				break;
 		}
 	}
 
@@ -450,16 +464,6 @@ class Contacts_Page extends Admin_Page {
 	}
 
 	protected function get_title_actions() {
-//
-//		$search_modal_link = modal_link_url( [
-//			'title'              => __( 'Search Contacts', 'groundhogg' ),
-//			'footer_button_text' => __( 'Search' ),
-//			'source'             => 'search-filters',
-//			'height'             => 500,
-//			'width'              => 900,
-//			'footer'             => 'false',
-//			'preventSave'        => 'true',
-//		] );
 
 		return [
 			[
@@ -493,13 +497,13 @@ class Contacts_Page extends Admin_Page {
 			return new \WP_Error( 'no_email', __( "Please enter a valid email address.", 'groundhogg' ) );
 		}
 
-		$args['first_name'] = sanitize_text_field( get_request_var( 'first_name' ) );
-		$args['last_name']  = sanitize_text_field( get_request_var( 'last_name' ) );
-		$args['owner_id']   = absint( get_request_var( 'owner_id', get_current_user_id() ) );
+		$args['first_name'] = sanitize_text_field( get_post_var( 'first_name' ) );
+		$args['last_name']  = sanitize_text_field( get_post_var( 'last_name' ) );
+		$args['owner_id']   = absint( get_post_var( 'owner_id', get_current_user_id() ) );
 
-		$email = sanitize_email( get_request_var( 'email' ) );
+		$email = sanitize_email( get_post_var( 'email' ) );
 
-		if ( ! Plugin::$instance->dbs->get_db( 'contacts' )->exists( $email ) ) {
+		if ( ! get_db( 'contacts' )->exists( $email ) ) {
 			$args['email'] = $email;
 		} else {
 			return new \WP_Error( 'email_exists', sprintf( _x( 'Sorry, the email %s already belongs to another contact.', 'page_title', 'groundhogg' ), $email ) );
@@ -515,13 +519,14 @@ class Contacts_Page extends Admin_Page {
 			return new \WP_Error( 'db_error', __( 'Could not add contact.', 'groundhogg' ) );
 		}
 
-		$contact->update_meta( 'primary_phone', sanitize_text_field( get_request_var( 'primary_phone' ) ) );
-		$contact->update_meta( 'primary_phone_extension', sanitize_text_field( get_request_var( 'primary_phone_extension' ) ) );
-		$contact->add_note( get_request_var( 'notes' ) );
+		$contact->update_meta( 'mobile_phone', sanitize_text_field( get_post_var( 'mobile_phone' ) ) );
+		$contact->update_meta( 'primary_phone', sanitize_text_field( get_post_var( 'primary_phone' ) ) );
+		$contact->update_meta( 'primary_phone_extension', sanitize_text_field( get_post_var( 'primary_phone_extension' ) ) );
+		$contact->add_note( get_post_var( 'notes' ) );
 
 
 		if ( get_request_var( 'tags' ) ) {
-			$contact->add_tag( get_request_var( 'tags' ) );
+			$contact->add_tag( get_post_var( 'tags' ) );
 		}
 
 		/**
@@ -1241,7 +1246,7 @@ class Contacts_Page extends Admin_Page {
 
 		$contacts_table = new Tables\Contacts_Table();
 
-//		include __DIR__ . '/advanced-search-new.php';
+//		include __DIR__ . '/advanced-search.php';
 
 		$contacts_table->views();
 

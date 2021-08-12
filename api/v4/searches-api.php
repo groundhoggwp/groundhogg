@@ -7,6 +7,7 @@ use Groundhogg\Saved_Searches;
 class Searches_Api extends Base_Api {
 
 	public function register_routes() {
+
 		register_rest_route( self::NAME_SPACE, "/searches", [
 			[
 				'methods'             => \WP_REST_Server::READABLE,
@@ -43,7 +44,7 @@ class Searches_Api extends Base_Api {
 			],
 			[
 				'methods'             => \WP_REST_Server::DELETABLE,
-				'callback'            => [ $this, 'update_single' ],
+				'callback'            => [ $this, 'delete_single' ],
 				'permission_callback' => [ $this, 'delete_permissions_callback' ]
 			],
 		] );
@@ -104,6 +105,20 @@ class Searches_Api extends Base_Api {
 		return self::SUCCESS_RESPONSE( [
 			'item' => Saved_Searches::instance()->get( $search_id )
 		] );
+	}
+
+	/**
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function delete_single( \WP_REST_Request $request ) {
+
+		$search_id = $request->get_param( 'id' );
+
+		Saved_Searches::instance()->delete( $search_id );
+
+		return self::SUCCESS_RESPONSE();
 	}
 
 	/**

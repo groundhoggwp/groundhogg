@@ -82,7 +82,7 @@ class Funnels_Api extends Base_Object_Api {
 
 		// Search for contacts, may contain limit/offset
 		$query_vars = $request->get_param( 'query' );
-		$step_id    = absint( $request->get_param( 'step' ) );
+		$step_id    = absint( $request->get_param( 'step_id' ) );
 
 		$step = $step_id ? new Step( $step_id ) : new Step( $funnel->get_first_action_id() );
 
@@ -99,7 +99,9 @@ class Funnels_Api extends Base_Object_Api {
 			$step->enqueue( $contact );
 		}
 
-		return self::SUCCESS_RESPONSE();
+		return self::SUCCESS_RESPONSE([
+			'added' => count( $contacts )
+		]);
 	}
 
 	/**

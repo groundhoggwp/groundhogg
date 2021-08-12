@@ -435,6 +435,32 @@ class Main_Updater extends Updater {
 	/**
 	 * Refactor notes db
 	 */
+	public function version_2_5() {
+
+		Plugin::instance()->dbs->install_dbs();
+
+		get_db( 'activity' )->update( [
+			'activity_type' => 'login'
+		], [
+			'activity_type' => 'wp_login'
+		] );
+
+		get_db( 'activity' )->update( [
+			'activity_type' => 'logout'
+		], [
+			'activity_type' => 'wp_logout'
+		] );
+
+		// For woocommerce, unable to see admin dashboard
+		wp_roles()->add_cap( 'marketer', 'manage_campaigns' );
+		wp_roles()->add_cap( 'marketer', 'export_funnels' );
+		wp_roles()->add_cap( 'administrator', 'manage_campaigns' );
+		wp_roles()->add_cap( 'administrator', 'export_funnels' );
+	}
+
+	/**
+	 * Refactor notes db
+	 */
 	public function version_3_0() {
 
 		get_db('activity')->update([
@@ -506,6 +532,7 @@ class Main_Updater extends Updater {
 			'2.4.7',
 			'2.4.7.1',
 			'2.4.7.3',
+			'2.5',
 			'3.0',
 		];
 	}
@@ -533,6 +560,7 @@ class Main_Updater extends Updater {
 			'2.4.7',
 			'2.4.7.1',
 			'3.0',
+			'2.5',
 		];
 	}
 
@@ -576,6 +604,7 @@ class Main_Updater extends Updater {
 			'2.4.7'         => __( 'Add new Other Activity tables for arbitrary historical logs.', 'groundhogg' ),
 			'2.4.7.1'       => __( 'Add <code>view_admin_dashboard</code> capability to Sales Representative and Sales Manager', 'groundhogg' ),
 			'2.4.7.3'       => __( 'Fix birthday date formatting.', 'groundhogg' ),
+			'2.5'           => __( 'Add additional capabilities for admins and marketers. Update database tables and replace wp_login activity names in the activity table.', 'groundhogg' ),
 		];
 	}
 }

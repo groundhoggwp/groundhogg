@@ -365,7 +365,7 @@ button.gh-button.loud {
 }
 .gh-modal-overlay {
   position: fixed;
-  background: rgba(0, 70, 153, 0.618);
+  background: rgba(16, 38, 64, 0.5);
   bottom: 0;
   left: 0;
   right: 0;
@@ -676,8 +676,17 @@ p.error,
   background-color: #9ece38;
 }
 
-.gh-tooltip {
-  position: fixed;
+.gh-has-tooltip {
+  position: relative;
+  box-sizing: border-box;
+}
+.gh-has-tooltip:hover .gh-tooltip {
+  display: block;
+}
+.gh-has-tooltip .gh-tooltip {
+  width: max-content;
+  display: none;
+  position: absolute;
   background-color: #102640;
   color: #FFFFFF;
   box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
@@ -685,10 +694,48 @@ p.error,
   padding: 5px 8px;
   border-radius: 5px;
 }
-.gh-tooltip.bottom {
+.gh-has-tooltip .gh-tooltip.right {
+  left: calc(100% + 5px);
+  top: 50%;
+  transform: translate(0, -50%);
+}
+.gh-has-tooltip .gh-tooltip.right:before {
+  position: absolute;
+  content: "";
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-right: 5px solid #102640;
+  border-bottom: 5px solid transparent;
+  transform: translate(0, -50%);
+  top: 50%;
+  left: -5px;
+}
+.gh-has-tooltip .gh-tooltip.top {
+  bottom: calc(100% + 5px);
+  left: 50%;
   transform: translate(-50%, 0);
 }
-.gh-tooltip.bottom:before {
+.gh-has-tooltip .gh-tooltip.top:before {
+  position: absolute;
+  content: "";
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid #102640;
+  transform: translate(-50%, 0) rotate(180deg);
+  bottom: -5px;
+  left: 50%;
+}
+.gh-has-tooltip .gh-tooltip.bottom {
+  top: calc(100% + 5px);
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+.gh-has-tooltip .gh-tooltip.bottom:before {
   position: absolute;
   content: "";
   display: inline-block;

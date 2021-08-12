@@ -201,7 +201,7 @@ class Limits {
 	 */
 	public static function time_likely_to_be_exceeded() {
 
-		if ( ! self::$total_processed_actions || self::get_time_limit() === 0 ) {
+		if ( ! self::$total_processed_actions ) {
 			return false;
 		}
 
@@ -220,13 +220,14 @@ class Limits {
 	 */
 	public static function get_time_limit() {
 
-		$real_time_limit = absint( ini_get( 'max_execution_time' ) );
+		$real_limit = absint( ini_get( 'max_execution_time' ) );
 
-		if ( $real_time_limit === 0 ){
+		// If the real limit is 0 assume 60 seconds
+		if ( $real_limit === 0 ) {
 			return MINUTE_IN_SECONDS;
 		}
 
-		return min( MINUTE_IN_SECONDS, absint( ini_get( 'max_execution_time' ) ) );
+		return min( MINUTE_IN_SECONDS, $real_limit );
 	}
 
 	/**

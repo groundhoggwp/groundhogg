@@ -251,13 +251,13 @@ class Broadcasts_Page extends Admin_Page {
 		 */
 		do_action( 'groundhogg/admin/broadcast/scheduled', $broadcast_id, $meta, $broadcast );
 
-		$this->add_notice( 'review', __( 'Review your broadcast before scheduling!', 'groundhogg' ), 'warning' );
+        $this->add_notice( 'review', __( 'Review your broadcast before scheduling!', 'groundhogg' ), 'warning' );
 
-		return admin_page_url( 'gh_broadcasts', [
-			'action'    => 'preview',
-			'broadcast' => $broadcast_id,
-		] );
-	}
+        return admin_page_url( 'gh_broadcasts', [
+            'action'    => 'preview',
+            'broadcast' => $broadcast_id,
+        ] );
+    }
 
 	/**
 	 * Confirm from the preview page
@@ -329,7 +329,7 @@ class Broadcasts_Page extends Admin_Page {
 				'link'   => $this->admin_url( [ 'action' => 'add', 'type' => 'email' ] ),
 				'action' => __( 'Schedule Email Broadcast', 'groundhogg' ),
 				'target' => '_self',
-				'id'     => 'gh-schedule-broadcast'
+				'id' => 'gh-schedule-broadcast'
 			]
 		];
 
@@ -352,11 +352,11 @@ class Broadcasts_Page extends Admin_Page {
 
 		$this->search_form( __( 'Search Broadcasts', 'groundhogg' ) );
 		$broadcasts_table->views(); ?>
-		<form method="post" class="wp-clearfix">
-			<!-- search form -->
+        <form method="post" class="wp-clearfix">
+            <!-- search form -->
 			<?php $broadcasts_table->prepare_items(); ?>
 			<?php $broadcasts_table->display(); ?>
-		</form>
+        </form>
 
 		<?php
 	}

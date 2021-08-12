@@ -2,10 +2,10 @@
 Contributors: trainingbusinesspros, Groundhogg, Adrian Tobey
 Tags: wordpress crm, marketing automation, crm, email marketing, email automation
 Donate link: https://www.groundhogg.io/pricing/
-Requires at least: 4.9
-Tested up to: 5.7
-Requires PHP: 5.6
-Stable tag: 2.4.7.3
+Requires at least: 5.0
+Tested up to: 5.8
+Requires PHP: 7.1
+Stable tag: 2.5.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -25,9 +25,13 @@ WordPress CRM, Email & Marketing Automation
 
 ## Join 3,000+ Small Businesses in 35+ Countries!
 
-### Never let another lead get away!
+### All new Search Filters enable you to find more business, faster! [August 11th, 2021](https://www.groundhogg.io/updates/groundhoggs-all-new-search-filters-enable-you-to-find-more-business-faster/)
 
-[youtube https://youtu.be/8S-9jhBiHrI]
+[youtube https://youtu.be/shJLAbL-Zxo]
+
+### Groundhogg 2.5 is a preview of what's to come! [August 11th, 2021](https://www.groundhogg.io/updates/groundhogg-2-5-shows-a-glimpse-of-whats-coming-down-the-pipeline/)
+
+[youtube https://youtu.be/25joq7uCfsE]
 
 Groundhogg CRM & Marketing Automation for WordPress can help you dramatically improve how you acquire leads and make more sales!
 
@@ -135,8 +139,9 @@ Here are the tools you can use to launch your funnel, grow your list, and scale 
 
 ### 🕺 Straightforward CRM & Contact Management
 
-* Segmentation with tags
+* Advanced searching and filtering on any data
 * Unlimited CRM custom fields
+* Segmentation with tags
 * Activity and email history
 * Profile pictures
 * Automatic location discovery
@@ -202,15 +207,17 @@ Over **[24+ extensions](https://www.groundhogg.io/downloads/category/add-ons/)**
 * [Extend your CRM with Company Management](https://www.groundhogg.io/downloads/companies/)
 * [Extend your CRM with a Sales Pipeline](https://www.groundhogg.io/downloads/pipeline/)
 * [Extend your CRM with Birthday Automation](https://www.groundhogg.io/downloads/birthdays/)
-* And [many more...]()
+* And [many more...](https://www.groundhogg.io/downloads/)
 
 Over **[30+ integrations](https://www.groundhogg.io/downloads/category/integrations/)** to connect to your favorite WordPress plugins. Integrate with...
 
 * **[Connect LifterLMS to your CRM](https://www.groundhogg.io/best-lifterlms-crm/)** | _[FREE COURSE](https://academy.groundhogg.io/course/course-creator-essentials/)_
 * **[Connect LearnDash to your CRM](https://www.groundhogg.io/best-learndash-crm/)** | _[FREE COURSE](https://academy.groundhogg.io/course/course-creator-essentials/)_
 * **[Connect BuddyBoss to your CRM](https://www.groundhogg.io/best-buddyboss-crm/)** | _[FREE COURSE](https://academy.groundhogg.io/course/essentials-funnels-for-buddyboss/)_
+* **[Connect GiveWP to your CRM](https://www.groundhogg.io/press/nonprofits-can-finally-leverage-their-data-to-collect-more-donations-with-groundhogg-and-givewp/)**
+* **[Connect Easy Digital Downloads to your CRM](https://www.groundhogg.io/best-crm-for-easy-digital-downloads/)**
 * [Connect WooCommerce to your CRM](https://www.groundhogg.io/downloads/woocommerce/)
-* [Connect Easy Digital Downloads to your CRM](https://www.groundhogg.io/best-crm-for-easy-digital-downloads/)
+* [Connect HelpScout to your CRM](https://www.groundhogg.io/downloads/woocommerce/)
 * [Connect Elementor to your CRM](https://www.groundhogg.io/downloads/elementor/)
 * [Connect Amazon Web Services to your CRM](https://www.groundhogg.io/downloads/aws/)
 * [Connect SendGrid to your CRM](https://www.groundhogg.io/downloads/sendgrid-integration/)
@@ -237,6 +244,8 @@ If you'd like a trial of our premium plans, please check out our [$1 sandbox dem
 
 == Screenshots ==
 1. Meet the Groundhogg CRM and Marketing Automation team!
+2. Advanced searching and filtering to segment your contacts.
+3. Admin toolbar widget to search or add contact's anywhere in the admin.
 2. Drag and drop steps in any order to create your sales funnel.
 3. View funnel reports to help optimize your CRM sales process.
 4. Choose from a variety of actions to to communicate with your customers.
@@ -311,6 +320,44 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.5.1.1 (2021-08-11) =
+* HOT FIX Duplicating funnel causing fatal error
+* HOT FIX 2.5 upgrade path should be automatic in the event plugins are installed which are hiding notices.
+
+= 2.5.1 (2021-08-11) =
+* HOT FIX Importing funnel causing fatal error.
+
+= 2.5 (2021-08-11) =
+
+For all details in this release [see the roundup on Groundhogg.io](https://www.groundhogg.io/updates/groundhogg-2-5-shows-a-glimpse-of-whats-coming-down-the-pipeline/)
+
+* ADDED All new contact filtering system replaces the old advanced search filters to give a superior contact searching experience.
+* ADDED New "Groundhogg" widget to the admin bar for contact searching, adding contacts, and scheduling broadcasts.
+* ADDED Unquantifiable levels of Groundhogg 3.0 preparation.
+* TWEAKED New contact quick editing UI.
+* TWEAKED New broadcast scheduling UI.
+* TWEAKED Bumped minimum supported WordPress version to 5.0 from 4.9
+* TWEAKED Bumped minimum supported PHP version to 7.1 from 5.6
+* FIXED Bug causing license to show as disabled when it's actually active.
+
+= 2.4.7.6 (2021-07-30) =
+* FIXED Sales manager unable to edit contacts even though they can see them
+* FIXED Sales representatives able to view and edit other's contacts if using the advanced search tools
+
+= 2.4.7.5 (2021-07-27) =
+* HOT FIX Reverted change to contact query for contact owners.
+
+= 2.4.7.4 (2021-07-27) =
+* ADDED HelpScout integration plugin ID for autoinstall support
+* FIXED Database warnings when adding a new subsite in a multisite install
+* FIXED Event queue not processing if the max_execution_time of a site is 0
+* FIXED Non-critical type warnings
+* FIXED Date field in forms not working
+* FIXED Funnel cookie being set more than once in the reports causing 500 error on some servers
+* FIXED Link to mailhawk.io instead of mailhawk.com
+* FIXED Dropdown field in forms with empty value causing error when not required
+* FIXED mobile phone not saving from contact quick add
 
 = 2.4.7.3 (2021-07-07) =
 * HOT FIX Birthdays being saved in `Y-n-j` format instead of `Y-m-d`. Added migration path prompt to fix formatting for contacts with birthdays

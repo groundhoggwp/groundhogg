@@ -148,7 +148,7 @@ class Broadcasts_Api extends Base_Object_Api {
 
 		$query = $broadcast->get_query();
 
-		$limit    = absint( $request->get_param( 'limit' ) ) ?: 50;
+		$limit    = absint( $request->get_param( 'limit' ) ) ?: 500;
 		$offset   = absint( $broadcast->get_meta( 'num_scheduled' ) ) ?: 0;
 		$in_lt    = (bool) $broadcast->get_meta( 'send_in_local_time' );
 		$send_now = (bool) $broadcast->get_meta( 'send_now' );

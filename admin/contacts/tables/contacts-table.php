@@ -235,6 +235,123 @@ class Contacts_Table extends WP_List_Table {
 	}
 
 	/**
+	 * Outputs the hidden row displayed when inline editing
+	 *
+	 * @global string $mode List table view mode.
+	 */
+	public function inline_edit() {
+
+		$colspan = min( $this->get_column_count(), 7 );
+
+		?>
+		<table style="display: none">
+			<tbody id="inlineedit">
+			<tr id="inline-edit"
+			    class="inline-edit-row inline-edit-row-contact quick-edit-row quick-edit-row-contact inline-edit-contact inline-editor"
+			    style="display: none">
+				<td colspan="<?php echo $colspan ?>" class="colspanchange">
+					<fieldset class="inline-edit-col-left">
+						<legend class="inline-edit-legend"><?php echo __( 'Quick Edit' ); ?></legend>
+						<div class="inline-edit-col">
+							<label>
+								<span class="title"><?php _e( 'Email' ); ?></span>
+								<span class="input-text-wrap"><input type="text" name="email"
+								                                     class="cemail regular-text" value=""/></span>
+							</label>
+							<label>
+								<span class="title"><?php _e( 'First Name', 'groundhogg' ); ?></span>
+								<span class="input-text-wrap"><input type="text" name="first_name"
+								                                     class="cfirst_name regular-text" value=""/></span>
+							</label>
+							<label>
+								<span class="title"><?php _e( 'Last Name', 'groundhogg' ); ?></span>
+								<span class="input-text-wrap"><input type="text" name="last_name"
+								                                     class="clast_name regular-text" value=""/></span>
+							</label>
+							<label>
+								<span class="title"><?php _e( 'Owner', 'groundhogg' ); ?></span>
+								<span class="input-text-wrap">
+                                    <?php $args = array(
+	                                    'id'    => 'owner',
+	                                    'name'  => 'owner',
+	                                    'class' => 'cowner'
+                                    ); ?>
+                                    <?php echo html()->dropdown_owners( $args ); ?>
+                                </span>
+							</label>
+							<label>
+								<span class="title"><?php _e( 'Status', 'groundhogg' ); ?></span>
+								<span class="input-text-wrap">
+                                    <?php echo html()->dropdown( [
+	                                    'id'      => 'optin_status',
+	                                    'name'    => 'optin_status',
+	                                    'options' => Preferences::get_preference_names()
+                                    ] ); ?>
+                                </span>
+							</label>
+						</div>
+					</fieldset>
+					<fieldset class="inline-edit-col-right">
+						<legend class="inline-edit-legend">&nbsp;</legend>
+						<div class="inline-edit-col">
+							<label>
+								<span class="title"><?php _e( 'Primary', 'groundhogg' ); ?></span>
+								<span class="input-text-wrap">
+	                            <?php echo html()->input( [
+		                            'type'  => 'tel',
+		                            'class' => 'input',
+		                            'id'    => 'primary_phone',
+		                            'name'  => 'primary_phone',
+	                            ] ); ?>
+	                            <?php _e( 'ext.', 'groundhogg' ) ?>
+	                            <?php echo html()->number( [
+		                            'id'    => 'primary_phone_extension',
+		                            'name'  => 'primary_phone_extension',
+		                            'class' => 'phone-ext',
+	                            ] ); ?>
+                                </span>
+							</label>
+							<label>
+								<span class="title"><?php _e( 'Mobile', 'groundhogg' ); ?></span>
+								<span class="input-text-wrap">
+								<?php echo html()->input( [
+									'type'  => 'tel',
+									'class' => 'input',
+									'id'    => 'mobile_phone',
+									'name'  => 'mobile_phone',
+								] ); ?>
+                                </span>
+							</label>
+							<label>
+								<span class="title"><?php _e( 'Tags' ); ?></span>
+								<span class="input-text-wrap">
+								<?php echo html()->dropdown( [
+									'id'   => 'tags',
+									'name' => 'tags[]'
+								] ); ?>
+                                </span>
+							</label>
+						</div>
+					</fieldset>
+					<div class="submit inline-edit-save">
+						<button type="button" class="button cancel alignleft"><?php _e( 'Cancel' ); ?></button>
+						<?php wp_nonce_field( 'inlineeditnonce', '_inline_edit' ); ?>
+						<button type="button"
+						        class="button button-primary save alignright"><?php _e( 'Update' ); ?></button>
+						<span class="spinner"></span>
+						<br class="clear"/>
+						<div class="notice notice-error notice-alt inline hidden">
+							<p class="error"></p>
+						</div>
+					</div>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+		<?php
+	}
+
+	/**
 	 * @param $contact Contact
 	 *
 	 * @return string
@@ -242,8 +359,24 @@ class Contacts_Table extends WP_List_Table {
 	protected function column_email( $contact ) {
 
 		$editUrl = admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->get_id() );
+		$html    = '<div id="inline_' . intval( $contact->get_id() ) . '" class="hidden">';
+		$html    .= '  <div class="email">' . esc_html( $contact->get_email() ) . '</div>';
+		$html    .= '  <div class="first_name">' . esc_html( $contact->get_first_name() ) . '</div>';
+		$html    .= '  <div class="last_name">' . esc_html( $contact->get_last_name() ) . '</div>';
+		$html    .= '  <div class="optin_status">' . esc_html( $contact->get_optin_status() ) . '</div>';
+		$html    .= '  <div class="mobile_phone">' . esc_html( $contact->get_mobile_number() ) . '</div>';
+		$html    .= '  <div class="primary_phone">' . esc_html( $contact->get_phone_number() ) . '</div>';
+		$html    .= '  <div class="primary_phone_extension">' . esc_html( $contact->get_phone_extension() ) . '</div>';
+		if ( $contact->get_owner_id() ) {
+			$html .= '  <div class="owner">' . esc_html( $contact->get_owner_id() ) . '</div>';
+		}
+		$html .= '  <div class="tags">' . esc_html( json_encode( $contact->get_tags() ) ) . '</div>';
+		$html .= '  <div class="tags-data">' . esc_html( wp_json_encode( $contact->get_tags_for_select2() ) ) . '</div>';
+		$html .= '</div>';
 
-		$html = "<a class='row-title' href='$editUrl'>" . html()->e( 'img', [
+		$html .= "<strong>";
+
+		$html .= "<a class='row-title' href='$editUrl'>" . html()->e( 'img', [
 				'src'   => $contact->get_profile_picture(),
 				'style' => [
 					'float'        => 'left',
@@ -412,23 +545,28 @@ class Contacts_Table extends WP_List_Table {
 		$actions = array();
 		$title   = $contact->get_email();
 
-		$actions['inline hide-if-no-js'] = sprintf(
-			'<a href="#" class="editinline" data-id="%d" aria-label="%s">%s</a>',
-			/* translators: %s: title */
-			esc_attr( $contact->get_id() ),
-			esc_attr( sprintf( __( 'Quick edit &#8220;%s&#8221; inline' ), $title ) ),
-			__( 'Quick&nbsp;Edit' )
-		);
+		if ( current_user_can( 'edit_contacts' ) ) {
+
+			$actions['inline hide-if-no-js'] = sprintf(
+				'<a href="#" class="editinline" data-id="%d" aria-label="%s">%s</a>',
+				/* translators: %s: title */
+				esc_attr( $contact->get_id() ),
+				esc_attr( sprintf( __( 'Quick edit &#8220;%s&#8221; inline' ), $title ) ),
+				__( 'Quick&nbsp;Edit' )
+			);
+		}
 
 		$editUrl = admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->get_id() );
 
-		$actions['edit'] = sprintf(
-			'<a href="%s" class="edit" aria-label="%s">%s</a>',
-			/* translators: %s: title */
-			$editUrl,
-			esc_attr( __( 'Edit' ) ),
-			__( 'Edit' )
-		);
+		if ( current_user_can( 'edit_contacts' ) ) {
+			$actions['edit'] = sprintf(
+				'<a href="%s" class="edit" aria-label="%s">%s</a>',
+				/* translators: %s: title */
+				$editUrl,
+				esc_attr( __( 'Edit' ) ),
+				__( 'Edit' )
+			);
+		}
 
 		$status_actions = [];
 
@@ -458,7 +596,13 @@ class Contacts_Table extends WP_List_Table {
 
 		$actions = array_merge( $actions, $status_actions );
 
-		$actions['delete'] = html()->e( 'a', [ 'href' => action_url( 'delete', [ 'contact' => $contact->get_id() ] ) ], __( 'Delete' ) );
+		if ( current_user_can( 'delete_contacts' ) ) {
+			$actions['delete'] = html()->e( 'a', [
+				'data-id' => $contact->get_id(),
+				'class'   => 'delete-contact',
+				'href'    => action_url( 'delete', [ 'contact' => $contact->get_id() ] )
+			], __( 'Delete' ) );
+		}
 
 		return $this->row_actions( apply_filters( 'groundhogg_contact_row_actions', $actions, $contact, $column_name ) );
 	}
