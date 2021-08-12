@@ -433,7 +433,7 @@ class Funnels_Page extends Admin_Page {
 			$json = $funnel->export();
 
 			$new_funnel = new Funnel();
-			$id         = $new_funnel->import( $json );
+			$id         = $new_funnel->legacy_import( $json );
 
 			$this->add_notice(
 				esc_attr( 'duplicated' ),
