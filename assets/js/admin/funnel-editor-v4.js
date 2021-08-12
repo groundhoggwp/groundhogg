@@ -1219,7 +1219,7 @@
           Object.values(StepTypes)
             .filter((step) => typeof step === 'object' && step.hasOwnProperty('group'))
             .filter((step) => step.group + 's' === self.activeAddType)
-            .filter((step) => step.name.match(sr) || step.pack.match(sr))
+            .filter((step) => step.name.match(sr))
             .filter((step) => !self.packFilter || step.pack === self.packFilter)
             .map(Editor.htmlTemplates.addStepCard)
             .join('')
@@ -1380,11 +1380,11 @@
         this.htmlTemplates.undoRedoActions()
       )
 
-      const { close: cUndo } = tooltip('.undo', {
+      tooltip('.undo', {
         content: __('Undo')
       })
 
-      const { close: cRedo } = tooltip('.redo', {
+      tooltip('.redo', {
         content: __('Redo')
       })
 

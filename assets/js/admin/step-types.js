@@ -480,6 +480,7 @@
     register (type, opts) {
       this[type] = {
         type: type,
+        pack: 'core',
         ...opts,
       }
     },
@@ -603,6 +604,7 @@
     },
 
     apply_note: {
+      pack: 'core',
       defaults: {
         note_text: '',
       },
@@ -669,6 +671,8 @@
     },
 
     admin_notification: {
+      pack: 'core',
+
       //language=HTML
       svg: `
 		  <svg viewBox="0 0 31 43" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -804,6 +808,8 @@
      * Account created
      */
     account_created: {
+      pack: 'core',
+
       defaults: {
         role: [],
       },
@@ -877,6 +883,8 @@
      * Apply a tag
      */
     apply_tag: {
+      pack: 'core',
+
       defaults: {
         tags: [],
       },
@@ -947,6 +955,8 @@
      * Remove a tag
      */
     remove_tag: {
+      pack: 'core',
+
       defaults: {
         tags: [],
       },
@@ -1012,6 +1022,8 @@
      * When a tag is applied
      */
     tag_applied: {
+      pack: 'core',
+
       defaults: {
         tags: [],
       },
@@ -1096,6 +1108,8 @@
      * When a tag is remvoed
      */
     tag_removed: {
+      pack: 'core',
+
       defaults: {
         tags: [],
       },
@@ -1179,6 +1193,8 @@
     },
 
     delay_timer: {
+      pack: 'core',
+
       defaults: {
         ...delayTimerDefaults,
       },
@@ -1408,6 +1424,8 @@
      * Send email
      */
     send_email: {
+      pack: 'core',
+
       defaults: {
         email_id: null,
       },
@@ -1530,6 +1548,8 @@
     },
 
     link_click: {
+      pack: 'core',
+
       defaults: {
         redirect_to: '',
       },
@@ -1594,6 +1614,8 @@
     },
 
     email_confirmed: {
+      pack: 'core',
+
       //language=HTML
       svg: `
 		  <svg viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1615,6 +1637,8 @@
     },
 
     form_fill: {
+      pack: 'core',
+
       //language=HTML
       svg: `
 		  <svg viewBox="0 0 35 31" fill="none" xmlns="http://www.w3.org/2000/svg">
