@@ -439,8 +439,8 @@ class Scripts {
 				'optin_status' => Preferences::get_preference_names(),
 				'owners'       => get_owners(),
 				'current'      => get_request_var( 'filters', [] ),
-				'roles'        => Plugin::instance()->roles->get_roles_for_select(),
-				'countries'    => utils()->location->get_countries_list(),
+				'roles'        => get_editable_roles(),
+				'countries'    => utils()->location->get_countries_list()
 			],
 			'managed_page'    => [
 				'root' => managed_page_url()
@@ -449,7 +449,8 @@ class Scripts {
 				'admin' => admin_url(),
 				'home'  => home_url(),
 			],
-			'rawStepTypes'    => Plugin::instance()->step_manager->get_elements()
+			'rawStepTypes'    => Plugin::instance()->step_manager->get_elements(),
+			'currentUser'     => wp_get_current_user()
 		] );
 
 		wp_register_script( 'groundhogg-admin-fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );

@@ -519,7 +519,7 @@
       $(`${el} .group`).sortable({
         connectWith: '.group',
         placeholder: 'filter-placeholder',
-        cancel: '.add-filter, .filter-edit-wrap',
+        cancel: '.add-filter, .filter-edit-wrap, .add-filter-wrap',
         start: (e, ui) => {
           // ui.placeholder.height(ui.item.height())
           ui.placeholder.width(ui.item.width())

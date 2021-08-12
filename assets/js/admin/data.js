@@ -130,7 +130,7 @@
       if (this.item[this.primaryKey] === id) {
         item = this.item
       } else {
-        item = this.items.find(item => item[this.primaryKey] === id)
+        item = this.items.find(item => item && item[this.primaryKey] === id)
       }
 
       return item

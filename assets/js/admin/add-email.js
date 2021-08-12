@@ -9,6 +9,8 @@
     frame.src = URL.createObjectURL(blob)
   }
 
+  const { sprintf, __, _x, _n } = wp.i18n
+
   /**
    * Reduce a list of items into groups of arrays of a given length
    *

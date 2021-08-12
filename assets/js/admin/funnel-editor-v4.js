@@ -4,7 +4,8 @@
     tags: TagsStore,
     emails: EmailsStore,
     funnels: FunnelsStore,
-    campaigns: CampaignsStore
+    campaigns: CampaignsStore,
+    contacts: ContactsStore
   } = Groundhogg.stores
 
   const {
@@ -14,12 +15,15 @@
     patch: apiPatch,
     routes
   } = Groundhogg.api
+  const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
 
   const { v4: apiRoutes } = routes
+  const { createFilters } = Groundhogg.filters.functions
 
   const {
     icons,
     improveTinyMCE,
+    buttonToggle,
     dialog,
     confirmationModal,
     dangerConfirmationModal,
@@ -36,6 +40,7 @@
     tooltip,
     toggle,
     savingModal,
+    bold,
     moreMenu,
     clickInsideElement,
   } = Groundhogg.element
@@ -527,11 +532,11 @@
 			${
 				step_group === 'benchmark'
 					? step_order === 1
-					? `<div class="text-helper until-helper"><span class="dashicons dashicons-filter"></span>${_x('Start the funnel when...', 'showing at the top of the step flow', 'groundhogg')}
+						? `<div class="text-helper until-helper"><span class="dashicons dashicons-filter"></span>${_x('Start the funnel when...', 'showing at the top of the step flow', 'groundhogg')}
           </div>`
-					: prevStep && prevStep.data.step_group !== 'benchmark'
-						? `<div class="until-helper text-helper">${_x('Until...', 'before a group of benchmarks in the step flow', 'groundhogg')}</div>`
-						: ''
+						: prevStep && prevStep.data.step_group !== 'benchmark'
+							? `<div class="until-helper text-helper">${_x('Until...', 'before a group of benchmarks in the step flow', 'groundhogg')}</div>`
+							: ''
 					: ''
 			}
 			<div
@@ -567,8 +572,8 @@
 			${
 				step_group === 'benchmark' && nextStep
 					? nextStep.data.step_group === 'benchmark'
-					? `<div class="or-helper text-helper">` + _x('Or...', 'between to benchmarks in the step flow', 'groundhogg') + `</div>`
-					: '<div class="then-helper text-helper">' + _x('Then...', 'before a group of actions in the step flow', 'groundhogg') + '</div>'
+						? `<div class="or-helper text-helper">` + _x('Or...', 'between to benchmarks in the step flow', 'groundhogg') + `</div>`
+						: '<div class="then-helper text-helper">' + _x('Then...', 'before a group of actions in the step flow', 'groundhogg') + '</div>'
 					: ''
 			}
         `
@@ -785,6 +790,80 @@
                 })
 
                 break
+
+              case 'contacts':
+
+                let state = {
+                  method: 'filters',
+                  filters: [],
+                  search: '',
+                  total_contacts: 0,
+                }
+
+                const setState = (s, reRender = false) => {
+                  state = {
+                    ...state,
+                    ...s
+                  }
+
+                  if (reRender) {
+                    setContent(addContactsToFunnel(state))
+                    addContactsOnMount(state)
+                  }
+                }
+
+                const addContactsOnMount = ({ method, filters = [], }) => {
+
+                  const totalContacts = (query) => {
+                    ContactsStore.count(query).then(total => {
+                      setState({
+                        total_contacts: total
+                      })
+                    })
+                  }
+
+                  buttonToggle('#add-contacts', {
+                    active: method,
+                    onSelect: (key) => {
+                      setState({ method: key }, true)
+                    },
+                    options: [
+                      { key: 'filters', label: icons.filter + __('Filters', 'groundhogg') },
+                      { key: 'searches', label: icons.contactSearch + __('Saved Search', 'groundhogg') },
+                    ]
+                  })
+
+                  if (method === 'filters') {
+                    createFilters('#add-via-filters', filters, (filters) => {
+                      setState({
+                        filters
+                      })
+
+                    }).mount()
+                  }
+                }
+
+                const addContactsToFunnel = ({ method, total_contacts }) => {
+                  //language=HTML
+                  return `
+					  <div>
+						  <h2>${__('Add contacts to this funnel', 'groundhogg')}</h2>
+						  <div id="add-contacts"></div>
+						  ${method === 'filters' ? '<div id="add-via-filters"></div>' : ''}
+						  <button class="gh-button primary" ${total_contacts === 0 ? 'disabled' : ''}>
+							  ${sprintf(_n('Add %s contact to funnel', 'Add %s contacts to funnel', 'groundhogg'), bold(formatNumber(total_contacts)))}
+						  </button>
+					  </div>`
+                }
+
+                const { setContent } = modal({
+                  //language=HTML
+                  content: addContactsToFunnel(state)
+                })
+
+                addContactsOnMount(state)
+
+                break
             }
           },
           items: [
@@ -807,6 +886,11 @@
               key: 'reports',
               //language=HTML
               text: `${icons.chart} ${__('Reports', 'groundhogg')}`
+            },
+            {
+              key: 'contacts',
+              //language=HTML
+              text: `${icons.createContact} ${__('Add Contacts', 'groundhogg')}`
             },
             {
               key: 'archive',

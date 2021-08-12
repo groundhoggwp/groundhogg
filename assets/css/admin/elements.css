@@ -221,6 +221,7 @@ button.gh-button.icon {
   padding: 7px;
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 a.gh-button.icon svg,
 button.gh-button.icon svg {
@@ -569,6 +570,14 @@ p.error,
 .gh-dropdown-menu-item:hover {
   background-color: rgba(16, 38, 64, 0.1);
   cursor: pointer;
+}
+.gh-dropdown-menu-item svg {
+  width: 20px;
+  height: 20px;
+}
+
+.gh-button-toggle {
+  display: flex;
 }
 
 .gh-step-nav {

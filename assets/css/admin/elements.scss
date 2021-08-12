@@ -278,6 +278,7 @@ button {
       padding: 7px;
       display: flex;
       align-items: center;
+      gap: 10px;
       //color: $primary-blue;
 
       svg {
@@ -718,7 +719,16 @@ p.error,
       background-color: $primary-dark-10;
       cursor: pointer;
     }
+
+    svg{
+      width: 20px;
+      height: 20px;
+    }
   }
+}
+
+.gh-button-toggle{
+  display: flex;
 }
 
 .gh-step-nav {

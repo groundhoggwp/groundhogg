@@ -1448,6 +1448,32 @@
     $menu.focus()
   }
 
+  const buttonToggle = (el, {
+    options = [],
+    active = '',
+    onSelect = (key) => {}
+  }) => {
+
+    // language=HTML
+    const html = `
+		<div class="gh-button-group">
+			${options.map(({
+				key,
+				label
+			}) => `<button class="gh-button-toggle-item gh-button icon ${key === active ? 'primary' : 'secondary'}" data-key="${key}">${label}</button>`).join('')}
+		</div>`
+
+    const $el = $(el)
+
+    $el.html(html)
+
+    $el.on('click', '.gh-button-toggle-item', (e) => {
+      onSelect(e.target.dataset.key)
+      $el.find('.primary').removeClass('primary').addClass('secondary')
+      $(e.target).addClass('primary').removeClass('secondary')
+    })
+  }
+
   const uniqid = () => {
     return Date.now()
   }
@@ -1499,6 +1525,12 @@
 			<path fill="currentColor"
 			      d="M436 302h-15v-15a15 15 0 00-30 0v15h-15a15 15 0 000 30h15v15a15 15 0 0030 0v-15h15a15 15 0 000-30z"/>
 		</svg>`,
+    // language=html
+    filter: `
+	    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 972 972">
+		    <defs/>
+		    <path fill="currentColor" d="M370.2 459.3a60 60 0 0115.8 40.6v442a30 30 0 0051.1 21.4L560.4 822c16.5-19.8 25.6-29.6 25.6-49.2V500c0-15 5.7-29.5 15.8-40.6L955.6 75.5a45 45 0 00-33-75.5h-873a45 45 0 00-33.2 75.5l353.8 383.8z"/>
+	    </svg>`,
     // language=html
     contactSearch: `
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -1638,7 +1670,8 @@
     tooltip,
     clickedIn,
     ordinal_suffix_of,
-    bold
+    bold,
+    buttonToggle
   }
 
 })(jQuery)

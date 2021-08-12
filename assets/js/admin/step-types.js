@@ -18,6 +18,8 @@
   const {
     tinymceElement,
     mappableFields,
+    bold,
+    uuid,
     orList,
     andList,
     specialChars,
@@ -131,8 +133,8 @@
         fieldMap && fieldMap.hasOwnProperty(id)
           ? fieldMap[id]
           : Groundhogg.fields.mappable.hasOwnProperty(id)
-          ? Groundhogg.fields.mappable[id]
-          : []
+            ? Groundhogg.fields.mappable[id]
+            : []
       )}
 				</td>
 			</tr>`
@@ -1127,7 +1129,8 @@
 		  </svg>`,
 
       title ({ ID, data, meta }) {
-        let { tags, condition } = meta
+        let { tags = [], condition = 'any' } = meta
+
         tags = tags.map((id) => parseInt(id))
 
         if (tags.length >= 4) {
@@ -1153,14 +1156,8 @@
       },
 
       edit ({ ID, data, meta }) {
-        let options = TagsStore.getItems().map((tag) => {
-          return {
-            text: tag.data.tag_name,
-            value: tag.ID,
-          }
-        })
 
-        const { condition } = meta
+        const { condition = 'any', tags = [] } = meta
 
         //language=HTML
         return `
@@ -1179,8 +1176,11 @@
 							id: 'tags',
 							multiple: true,
 						},
-						options,
-						meta.tags.map((id) => parseInt(id))
+						TagsStore.getItems().map((tag) => ({
+							text: tag.data.tag_name,
+							value: tag.ID,
+						})),
+						tags.map((id) => parseInt(id))
 					)}
 				</div>
 			</div>`
@@ -1537,9 +1537,15 @@
       },
       preload ({ export: exported, meta }) {
 
-        if (!exported) {
-          return EmailsStore.fetchItem(meta.email_id)
+        if (!meta.email_id) {
+          return
         }
+
+        if (!exported || !exported.email) {
+          return EmailsStore.fetchItem(parseInt(meta.email_id))
+        }
+
+        console.log(exported)
 
         EmailsStore.itemsFetched([
           exported.email
@@ -1552,6 +1558,7 @@
 
       defaults: {
         redirect_to: '',
+        uuid: uuid()
       },
 
       //language=HTML
@@ -1568,12 +1575,12 @@
           const homeUrl = new URL(Groundhogg.managed_page.root)
 
           if (targetUrl.hostname === homeUrl.hostname) {
-            return `Clicked to <b>${targetUrl.pathname}</b>`
+            return sprintf(__('Clicked to %s', 'groundhogg'), bold(targetUrl.pathname))
           } else {
-            return `Clicked to <b>${targetUrl.hostname}</b>`
+            return sprintf(__('Clicked to %s', 'groundhogg'), bold(targetUrl.hostname))
           }
         } else {
-          return 'Clicked a tracking link'
+          return __('Clicked a tracking link', 'groundhogg')
         }
       },
 
@@ -1582,25 +1589,35 @@
         return `
 			<div class="panel">
 				<div class="row">
-					<label class="row-label" for="copy-this">Copy this link</label>
-					<input type="url" id="copy-this" class="code input regular-text"
-					       value="${
-						       Groundhogg.managed_page.root
-					       }link/click/${'some-value'}" onfocus="this.select()"
-					       readonly>
-					<p class="description">Paste this link in any email or page. Once a contact clicks it the benchmark
-						will be completed and the contact will be redirected to the page set below.</p>
+					<label class="row-label" for="copy-this">${__('Copy this link', 'groundhogg')}</label>
+					${input({
+						type: 'url',
+						id: 'copy-this',
+						className: 'code input regular-text',
+						value: `${Groundhogg.managed_page.root}link/click/${meta.uuid}`,
+						readonly: true,
+						onfocus: 'this.select()',
+						style: {
+							width: '100%'
+						}
+					})}
+					<p class="description">
+						${__('Paste this link in any email or page. Once a contact clicks it the benchmark will be completed and the contact will be redirected to the page set below.', 'groundhogg')}</p>
 				</div>
 				<div class="row">
-					<label class="row-label" for="copy">Then redirect contacts to...</label>
+					<label class="row-label" for="copy">${__('Then redirect contacts to...', 'groundhogg')}</label>
 					${inputWithReplacements({
 						type: 'url',
 						id: 'redirect-to',
 						name: 'redirect_to',
 						className: 'regular-text',
 						value: meta.redirect_to,
+						style: {
+							width: '100%'
+						}
 					})}
-					<p class="description">Upon clicking the tracking link contacts will be redirected to this page.</p>
+					<p class="description">
+						${__('Upon clicking the tracking link contacts will be redirected to this page.', 'groundhogg')}</p>
 				</div>
 			</div>`
       },
