@@ -879,14 +879,14 @@
                   searchesPicker('#add-via-searches', (items) => SearchesStore.itemsFetched(items), {}, {
                     placeholder: __('Select a saved search', 'groundhogg'),
                     data: [
-                      { id: '', text: ''},
-                      ...SearchesStore.getItems().map( s => ({
-                      ...s,
-                      text: s.name,
-                      selected: s.id === search
-                    }))]
+                      { id: '', text: '' },
+                      ...SearchesStore.getItems().map(s => ({
+                        ...s,
+                        text: s.name,
+                        selected: s.id === search
+                      }))]
                   }).on('select2:select', (e) => {
-                    setState( {
+                    setState({
                       search: e.params.data.id
                     })
 
@@ -900,7 +900,7 @@
 
               const addConfirmButton = ({ method, total_contacts, step_id }) => {
                 return button({
-                  text: sprintf(_n('Add %s contact to funnel', 'Add %s contacts to funnel', total_contacts, 'groundhogg'), formatNumber(total_contacts)),
+                  text: sprintf(_n('Add %s contact to funnel', 'Add %1$s contacts to %2$s', total_contacts, 'groundhogg'), bold(formatNumber(total_contacts)), bold(this.funnel.data.title)),
                   disabled: !total_contacts || !step_id,
                   className: 'primary',
                   id: 'add-contacts-to-funnel-confirm'
@@ -1640,7 +1640,12 @@
             self.render()
           }
         }
-      )
+      ).catch((e) => {
+        dialog({
+          type: 'error',
+          message: __('Something went wrong', 'groundhogg')
+        })
+      })
     },
 
     activate () {
@@ -1698,7 +1703,13 @@
           })
         }
       })
-        .then(() => close())
+        .then(() => close()).catch((e) => {
+          close()
+          dialog({
+            type: 'error',
+            message: __('Something went wrong', 'groundhogg')
+          })
+        })
     },
 
     setLastSaved () {
