@@ -1460,7 +1460,7 @@
 			${options.map(({
 				key,
 				label
-			}) => `<button class="gh-button-toggle-item gh-button icon ${key === active ? 'primary' : 'secondary'}" data-key="${key}">${label}</button>`).join('')}
+			}) => `<button class="gh-button-toggle-item small gh-button icon ${key === active ? 'primary' : 'secondary'}" data-key="${key}">${label}</button>`).join('')}
 		</div>`
 
     const $el = $(el)

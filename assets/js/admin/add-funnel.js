@@ -1,8 +1,10 @@
 (function ($, Templates) {
 
-  const { breadcrumbs, select, regexp, modal, input, primaryButton, loadingDots } = Groundhogg.element
+  const { breadcrumbs, select, regexp, modal, input, primaryButton, loadingDots, setFrameContent } = Groundhogg.element
   const { templates, stepTypes } = Templates
   const { post, get, routes } = Groundhogg.api
+  const { __, _x, _n, _nx, sprintf } = wp.i18n
+  const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
 
   /**
    * If all the step types in the given template are active on the current site
@@ -91,16 +93,15 @@
       const numActions = steps.filter(({ data }) => data.step_group === 'action').length
       const numBenchmarks = steps.filter(({ data }) => data.step_group === 'benchmark').length
       const pills = [
-        `<span class="pill orange">${numBenchmarks} ${numBenchmarks === 1 ? __('benchmark', 'groundhogg') : __('benchmarks', 'groundhogg')}</span>`,
-        `<span class="pill green">${numActions} ${numActions === 1 ? __('action', 'groundhogg') : __('actions', 'groundhogg')}</span>`,
-        `<span class="pill">${__('Added', 'groundhogg')} ${moment(data.date_created).format('LL')}</span>`
-        // ...campaigns.map(c => `<span class="pill">${c.data.name}</span>`)
-        // canUse ? 'enabled' : 'disabled',
+        `<span class="pill orange">${sprintf(_n('%d benchmark', '%d benchmarks', numBenchmarks, 'groundhogg'), numBenchmarks)}</span>`,
+        `<span class="pill green">${sprintf(_n('%d action', '%d actions', numBenchmarks, 'groundhogg'), numActions)}</span>`,
+        `<span class="pill">${sprintf(__('Added %s', 'groundhogg'), formatDate(data.date_created))}</span>`
       ]
 
       //language=html
       return `
-		  <div class="gh-panel template ${canUse ? __('enabled', 'groundhogg') : __('disabled', 'groundhogg') }" tabindex="0">
+		  <div class="gh-panel template ${canUse ? __('enabled', 'groundhogg') : __('disabled', 'groundhogg')}"
+		       tabindex="0">
 			  <div class="template-header">
 				  <h2>${data.title}</h2>
 			  </div>
@@ -157,7 +158,9 @@
 				  </div>
 				  <div class="template-actions">
 					  <button id="import-button" class="gh-button secondary">${__('Import', 'groundhogg')}</button>
-					  <button id="scratch-button" class="gh-button secondary">${__('Start From Scratch', 'groundhogg')}</button>
+					  <button id="scratch-button" class="gh-button secondary">
+						  ${__('Start From Scratch', 'groundhogg')}
+					  </button>
 					  ${afterHeaderActions}
 				  </div>
 			  </div>

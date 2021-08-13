@@ -3,6 +3,7 @@
   const {
     tags: TagsStore,
     emails: EmailsStore,
+    funnels: FunnelsStore,
   } = Groundhogg.stores
 
   const {
@@ -1767,6 +1768,45 @@
     },
   }
 
+  const stepTypeSelect = (el, {
+    funnel_id = null,
+    edited = false,
+    selected = null
+  }) => {
+
+    const select2Template = (step) => {
+
+      if (!step.id) {
+        return step.text
+      }
+
+      // const step = .find(s => s.ID === parseInt(opt.id))
+      const { step_type, step_group } = step.data
+      const StepType = StepTypes.getType(step.data.step_type)
+      // language=HTML
+      return $(`
+		  <div class="select2-step ${step_group} ${step_type}">${StepType.svg}
+			  <div class="step-name">${StepType.title(step)}</div>
+		  </div>`)
+    }
+
+    return $(el).select2({
+      width: 'resolve',
+      templateSelection: select2Template,
+      templateResult: select2Template,
+      placeholder: __('Select a step', 'groundhogg'),
+      data: [
+        { id: '', text: ''},
+        ...FunnelsStore.getSteps(funnel_id, edited).map(s => ({
+          ...s,
+          selected: selected === s.ID,
+          id: s.ID,
+          text: s.data.step_title
+        }))]
+    })
+  }
+
+  Groundhogg.stepTypeSelect = stepTypeSelect
   Groundhogg.StepPacks = StepPacks
   Groundhogg.StepTypes = StepTypes
 

@@ -5,8 +5,11 @@
     emails: EmailsStore,
     funnels: FunnelsStore,
     campaigns: CampaignsStore,
-    contacts: ContactsStore
+    contacts: ContactsStore,
+    searches: SearchesStore
   } = Groundhogg.stores
+
+  const { stepTypeSelect } = Groundhogg
 
   const {
     get: apiGet,
@@ -29,6 +32,7 @@
     dangerConfirmationModal,
     loadingModal,
     modal,
+    button,
     select,
     input,
     textarea,
@@ -45,7 +49,7 @@
     clickInsideElement,
   } = Groundhogg.element
 
-  const { campaignPicker, emailPicker } = Groundhogg.pickers
+  const { campaignPicker, emailPicker, searchesPicker } = Groundhogg.pickers
 
   const { StepTypes, StepPacks } = Groundhogg
 
@@ -696,176 +700,259 @@
       })
 
       $doc.on('click', '#more-menu', () => {
-        moreMenu('#more-menu', {
-          onSelect: (key) => {
-            switch (key) {
-              case 'campaigns':
 
-                const campaignContent = () => {
-                  // language=HTML
-                  return `
-					  <div class="manage-campaigns">
-						  <p><b>${__('Add this funnel to one or more campaigns...', 'groundhogg')}</b>
-						  </p>
-						  <p>${select({
-							  id: 'manage-campaigns',
-							  multiple: true
-						  }, this.funnel.campaigns.map(c => ({
-							  text: c.data.name,
-							  value: c.ID
-						  })), this.funnel.campaigns.map(c => c.ID))}</p>
-					  </div>`
+        const handleOnSelect = (key) => {
+          switch (key) {
+            case 'campaigns':
+
+              const campaignContent = () => {
+                // language=HTML
+                return `
+					<div class="manage-campaigns">
+						<p><b>${__('Add this funnel to one or more campaigns...', 'groundhogg')}</b>
+						</p>
+						<p>${select({
+							id: 'manage-campaigns',
+							multiple: true
+						}, this.funnel.campaigns.map(c => ({
+							text: c.data.name,
+							value: c.ID
+						})), this.funnel.campaigns.map(c => c.ID))}</p>
+					</div>`
+              }
+
+              modal({
+                content: campaignContent()
+              })
+
+              campaignPicker('#manage-campaigns', true, (items) => {
+                CampaignsStore.itemsFetched(items)
+              }).on('select2:select', async (e) => {
+                let campaign = e.params.data
+                // its a new campaign
+                if (!CampaignsStore.hasItem(campaign.id)) {
+                  campaign = await CampaignsStore.post({
+                    data: {
+                      name: campaign.id
+                    }
+                  }).then((c) => ({ id: c.ID, name: c.data.name }))
                 }
+                // existing campaign
+                apiPost(`${apiRoutes.funnels}/${this.funnel.ID}/relationships`, {
+                  other_id: campaign.id,
+                  other_type: 'campaign'
+                }).then(r => this.loadFunnel(r.item))
+              }).on('select2:unselect', async (e) => {
+                let campaign = e.params.data
 
-                modal({
-                  content: campaignContent()
-                })
+                // existing campaign
+                apiDelete(`${apiRoutes.funnels}/${this.funnel.ID}/relationships`, {
+                  other_id: campaign.id,
+                  other_type: 'campaign'
+                }).then(r => this.loadFunnel(r.item))
+              })
 
-                campaignPicker('#manage-campaigns', true, (items) => {
-                  CampaignsStore.itemsFetched(items)
-                }).on('select2:select', async (e) => {
-                  let campaign = e.params.data
-                  // its a new campaign
-                  if (!CampaignsStore.hasItem(campaign.id)) {
-                    campaign = await CampaignsStore.post({
-                      data: {
-                        name: campaign.id
-                      }
-                    }).then((c) => ({ id: c.ID, name: c.data.name }))
-                  }
-                  // existing campaign
-                  apiPost(`${apiRoutes.funnels}/${this.funnel.ID}/relationships`, {
-                    other_id: campaign.id,
-                    other_type: 'campaign'
-                  }).then(r => this.loadFunnel(r.item))
-                }).on('select2:unselect', async (e) => {
-                  let campaign = e.params.data
+              break
+            case 'export':
+              window.location.href = this.funnel.links.export
+              break
+            case 'share':
 
-                  // existing campaign
-                  apiDelete(`${apiRoutes.funnels}/${this.funnel.ID}/relationships`, {
-                    other_id: campaign.id,
-                    other_type: 'campaign'
-                  }).then(r => this.loadFunnel(r.item))
-                })
+              break
+            case 'reports':
+              window.location.href = this.funnel.links.report
+              break
+            case 'delete':
 
-                break
-              case 'export':
-                window.location.href = this.funnel.links.export
-                break
-              case 'share':
+              dangerConfirmationModal({
+                //language=HTML
+                alert: `<p><b>${__('Delete this funnel?', 'groundhogg')}</b></p>
+				<p>
+					${__('Any associated events, steps, and reports will also be deleted.', 'groundhogg')}</p>
+				<p>${__('This action cannot be undone. Are you sure?', 'groundhogg')}</p>`,
+                confirmText: __('Delete'),
+                onConfirm: () => {
+                  console.log('yikes')
+                }
+              })
 
-                break
-              case 'reports':
-                window.location.href = this.funnel.links.report
-                break
-              case 'delete':
+              break
+            case 'archive':
 
-                dangerConfirmationModal({
-                  //language=HTML
-                  alert: `<p><b>${__('Delete this funnel?', 'groundhogg')}</b></p>
-				  <p>
-					  ${__('Any associated events, steps, and reports will also be deleted.', 'groundhogg')}</p>
-				  <p>${__('This action cannot be undone. Are you sure?', 'groundhogg')}</p>`,
-                  confirmText: __('Delete'),
+              dangerConfirmationModal({
+                //language=HTML
+                alert: `
+					<p>
+						<b>${_x('Archive this funnel?', 'archive is representing a verb in this phrase', 'groundhogg')}</b>
+					</p>
+					<p>${__('Any active contacts will be removed from the funnel permanently.', 'groundhogg')}</p>
+					<p>${__('The funnel will become un-editable until restored.', 'groundhogg')}</p>`,
+                confirmText: _x('Archive', 'a verb meaning to add an item to an archive', 'groundhogg'),
+                onConfirm: () => {
+                  console.log('yikes')
+                }
+              })
+
+              break
+            case 'contacts':
+
+              if (this.funnel.data.status !== 'active') {
+
+                confirmationModal({
+                  alert: `<p>${__('You can only add contacts to an active funnel. Would you like to activate?', 'groundhogg')}</p>`,
+                  confirmText: __('Launch Funnel', 'groundhogg'),
                   onConfirm: () => {
-                    console.log('yikes')
-                  }
-                })
-
-                break
-              case 'archive':
-
-                dangerConfirmationModal({
-                  //language=HTML
-                  alert: `<p>
-					  <b>${_x('Archive this funnel?', 'archive is representing a verb in this phrase', 'groundhogg')}</b>
-				  </p>
-				  <p>
-					  ${__('Any active contacts will be removed from the funnel permanently.', 'groundhogg')}</p>
-				  <p>${__('The funnel will become un-editable until restored.', 'groundhogg')}</p>`,
-                  confirmText: _x('Archive', 'a verb meaning to add an item to an archive', 'groundhogg'),
-                  onConfirm: () => {
-                    console.log('yikes')
+                    this.activate().then(() => handleOnSelect('contacts'))
                   }
                 })
 
                 break
 
-              case 'contacts':
+              }
 
-                let state = {
-                  method: 'filters',
-                  filters: [],
-                  search: '',
-                  total_contacts: 0,
+              let state = {
+                method: 'filters',
+                filters: [],
+                search: false,
+                step_id: 0,
+                total_contacts: 0,
+              }
+
+              const setState = (s, reRender = false) => {
+                state = {
+                  ...state,
+                  ...s
                 }
 
-                const setState = (s, reRender = false) => {
-                  state = {
-                    ...state,
-                    ...s
-                  }
-
-                  if (reRender) {
-                    setContent(addContactsToFunnel(state))
-                    addContactsOnMount(state)
-                  }
+                if (reRender) {
+                  setContent(addContactsToFunnel(state))
+                  addContactsOnMount(state)
                 }
+              }
 
-                const addContactsOnMount = ({ method, filters = [], }) => {
+              const addContactsOnMount = ({ method, filters = [], search = false }) => {
 
-                  const totalContacts = (query) => {
-                    ContactsStore.count(query).then(total => {
-                      setState({
-                        total_contacts: total
-                      })
+                const totalContacts = (query) => {
+                  ContactsStore.count(query).then(total => {
+                    setState({
+                      total_contacts: total
                     })
-                  }
 
-                  buttonToggle('#add-contacts', {
-                    active: method,
-                    onSelect: (key) => {
-                      setState({ method: key }, true)
-                    },
-                    options: [
-                      { key: 'filters', label: icons.filter + __('Filters', 'groundhogg') },
-                      { key: 'searches', label: icons.contactSearch + __('Saved Search', 'groundhogg') },
-                    ]
+                    $('#add-contacts-to-funnel-confirm').replaceWith(addConfirmButton(state))
+                  })
+                }
+
+                stepTypeSelect('#select-step', {
+                  funnel_id: this.funnel.ID,
+                  edited: false,
+                  selected: state.step_id
+                }).on('select2:select', (e) => {
+                  setState({
+                    step_id: e.params.data.ID,
+                  }, true)
+                })
+
+                buttonToggle('#add-contacts', {
+                  active: method,
+                  onSelect: (key) => {
+                    setState({ method: key }, true)
+                  },
+                  options: [
+                    { key: 'filters', label: icons.filter + __('Filters', 'groundhogg') },
+                    { key: 'searches', label: icons.contactSearch + __('Saved Search', 'groundhogg') },
+                  ]
+                })
+
+                if (method === 'filters') {
+                  createFilters('#add-via-filters', filters, (filters) => {
+                    setState({
+                      filters
+                    })
+
+                    totalContacts({
+                      filters
+                    })
+
+                  }).mount()
+                } else {
+
+                  searchesPicker('#add-via-searches', (items) => SearchesStore.itemsFetched(items), {}, {
+                    placeholder: __('Select a saved search', 'groundhogg'),
+                    data: [
+                      { id: '', text: ''},
+                      ...SearchesStore.getItems().map( s => ({
+                      ...s,
+                      text: s.name,
+                      selected: s.id === search
+                    }))]
+                  }).on('select2:select', (e) => {
+                    setState( {
+                      search: e.params.data.id
+                    })
+
+                    totalContacts({
+                      saved_search: e.params.data.id
+                    })
                   })
 
-                  if (method === 'filters') {
-                    createFilters('#add-via-filters', filters, (filters) => {
-                      setState({
-                        filters
-                      })
-
-                    }).mount()
-                  }
                 }
+              }
 
-                const addContactsToFunnel = ({ method, total_contacts }) => {
-                  //language=HTML
-                  return `
-					  <div>
-						  <h2>${__('Add contacts to this funnel', 'groundhogg')}</h2>
-						  <div id="add-contacts"></div>
-						  ${method === 'filters' ? '<div id="add-via-filters"></div>' : ''}
-						  <button class="gh-button primary" ${total_contacts === 0 ? 'disabled' : ''}>
-							  ${sprintf(_n('Add %s contact to funnel', 'Add %s contacts to funnel', 'groundhogg'), bold(formatNumber(total_contacts)))}
-						  </button>
-					  </div>`
-                }
-
-                const { setContent } = modal({
-                  //language=HTML
-                  content: addContactsToFunnel(state)
+              const addConfirmButton = ({ method, total_contacts, step_id }) => {
+                return button({
+                  text: sprintf(_n('Add %s contact to funnel', 'Add %s contacts to funnel', total_contacts, 'groundhogg'), formatNumber(total_contacts)),
+                  disabled: !total_contacts || !step_id,
+                  className: 'primary',
+                  id: 'add-contacts-to-funnel-confirm'
                 })
+              }
 
-                addContactsOnMount(state)
+              const addContactsToFunnel = ({ method, total_contacts, step_id }) => {
 
-                break
-            }
-          },
+                //language=HTML
+                return `
+					<div style="min-width: 400px; min-height: 100px">
+						<h2>${__('Add contacts to this funnel', 'groundhogg')}</h2>
+						<div class="gh-rows-and-columns">
+							<div class="gh-row">
+								<div class="gh-col">
+									<p>${__('How do you want to select contacts to add?', 'groundhogg')}</p>
+									<div id="add-contacts"></div>
+								</div>
+							</div>
+							<div class="gh-row">
+								<div class="gh-col">
+									${method === 'filters' ? '<div id="add-via-filters"></div>' : '<select id="add-via-searches"></select>'}
+								</div>
+							</div>
+							<div class="gh-row">
+								<div class="gh-col">
+									<p>${__('At what step should they be added?', 'groundhogg')}</p>
+									<select id="select-step"></select>
+								</div>
+							</div>
+							<div class="gh-row">
+								<div class="gh-col">
+									${addConfirmButton({ method, total_contacts, step_id })}
+								</div>
+							</div>
+						</div>
+					</div>`
+              }
+
+              const { setContent } = modal({
+                //language=HTML
+                content: addContactsToFunnel(state)
+              })
+
+              addContactsOnMount(state)
+
+              break
+          }
+        }
+
+        moreMenu('#more-menu', {
+          onSelect: handleOnSelect,
           items: [
             {
               key: 'campaigns',
@@ -1559,7 +1646,7 @@
     activate () {
       const { close } = loadingModal(__('Launching', 'groundhogg'))
 
-      this.update({
+      return this.update({
         data: {
           status: 'active',
         },
@@ -1571,7 +1658,7 @@
     deactivate () {
       const { close } = loadingModal(__('Deactivating', 'groundhogg'))
 
-      this.update({
+      return this.update({
         data: {
           status: 'inactive',
         },
@@ -1595,7 +1682,7 @@
 
       const { close } = savingModal()
 
-      FunnelsStore.commit(this.funnel.ID, {
+      return FunnelsStore.commit(this.funnel.ID, {
         edited: {
           steps: self.funnel.steps,
         },
