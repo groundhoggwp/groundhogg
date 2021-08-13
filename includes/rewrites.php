@@ -211,7 +211,7 @@ class Rewrites {
 					wp_die( 'The requested funnel was not found.', 'Funnel not found.', [ 'status' => 404 ] );
 				}
 
-				$export_string = wp_json_encode( $funnel->get_as_array() );
+				$export_string = wp_json_encode( $funnel->legacy_export() );
 
 				$funnel_export_name = strtolower( preg_replace( '/[^A-z0-9]/', '-', $funnel->get_title() ) );
 

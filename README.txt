@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.8
 Requires PHP: 7.1
-Stable tag: 2.5.2
+Stable tag: 2.5.1.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -320,6 +320,9 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.5.1.2 (2021-08-11) =
+* HOT FIX Funnel exporting in REST API format instead of 2.* importable format
 
 = 2.5.1.1 (2021-08-11) =
 * HOT FIX Duplicating funnel causing fatal error
