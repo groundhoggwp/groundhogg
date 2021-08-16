@@ -458,6 +458,10 @@ class Main_Updater extends Updater {
 		wp_roles()->add_cap( 'administrator', 'export_funnels' );
 	}
 
+	public function version_2_5_1_3() {
+		get_db( 'steps' )->create_table();
+	}
+
 	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
@@ -509,6 +513,7 @@ class Main_Updater extends Updater {
 			'2.4.7.1',
 			'2.4.7.3',
 			'2.5',
+			'2.5.1.3',
 		];
 	}
 
@@ -535,6 +540,7 @@ class Main_Updater extends Updater {
 			'2.4.7',
 			'2.4.7.1',
 			'2.5',
+			'2.5.1.3',
 		];
 	}
 
@@ -579,6 +585,7 @@ class Main_Updater extends Updater {
 			'2.4.7.1'       => __( 'Add <code>view_admin_dashboard</code> capability to Sales Representative and Sales Manager', 'groundhogg' ),
 			'2.4.7.3'       => __( 'Fix birthday date formatting.', 'groundhogg' ),
 			'2.5'           => __( 'Add additional capabilities for admins and marketers. Update database tables and replace wp_login activity names in the activity table.', 'groundhogg' ),
+			'2.5.1.3'       => __( 'Use TINYINT(1) instead of BIT(1)', 'groundhogg' ),
 		];
 	}
 }
