@@ -259,7 +259,7 @@ class Funnels_Page extends Admin_Page {
 				continue;
 			}
 
-			$json = $funnel->export();
+			$json = $funnel->legacy_export();
 
 			$new_funnel = new Funnel();
 			$id         = $new_funnel->legacy_import( $json );
@@ -338,7 +338,7 @@ class Funnels_Page extends Admin_Page {
 			$from_funnel = absint( get_request_var( 'funnel_id' ) );
 			$from_funnel = new Funnel( $from_funnel );
 
-			$json      = $from_funnel->export();
+			$json      = $from_funnel->legacy_export();
 			$funnel_id = $this->import_funnel( $json );
 
 		} else if ( isset( $_FILES['funnel_template'] ) ) {

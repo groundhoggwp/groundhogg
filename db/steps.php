@@ -241,9 +241,7 @@ class Steps extends DB {
 	 * @since   2.1
 	 */
 	public function count( $args = array() ) {
-
 		return count( $this->get_steps( $args ) );
-
 	}
 
 	/**
@@ -266,8 +264,8 @@ class Steps extends DB {
 		step_group varchar(20) NOT NULL,
 		step_status varchar(20) NOT NULL,
 		step_order int unsigned NOT NULL,
-		is_entry BIT(1) NOT NULL,
-		is_conversion BIT(1) NOT NULL,
+		is_entry TINYINT(1) NOT NULL,
+		is_conversion TINYINT(1) NOT NULL,
 		PRIMARY KEY  (ID)
 		) {$this->get_charset_collate()};";
 
