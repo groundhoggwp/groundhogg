@@ -12,15 +12,24 @@
     inputRepeaterWidget,
     textarea,
     isValidEmail,
+    adminPageURL,
     modal,
+    dialog,
     loadingDots,
+    moreMenu,
     objectEquals,
+    toggle,
+    icons,
     codeEditor,
+    confirmationModal,
     savingModal,
+    dangerConfirmationModal,
   } = Groundhogg.element
-  const { post, get, patch, routes } = Groundhogg.api
+  const { post, get, patch, delete: apiDelete, routes } = Groundhogg.api
   const { user_test_email } = Groundhogg
-  const { emails: EmailsStore } = Groundhogg.stores
+  const { emails: EmailsStore, campaigns: CampaignsStore } = Groundhogg.stores
+  const { campaignPicker } = Groundhogg.pickers
+  const { __, _x, _n, _nx, sprintf } = wp.i18n
 
   const setFrameContent = (frame, content) => {
     var blob = new Blob([content], { type: 'text/html; charset=utf-8' })
@@ -110,6 +119,7 @@
 					${this.email.data.status === 'ready' ? `<button id="to-draft" class="gh-button danger text">Back to draft</button>
 					<button id="commit" class="gh-button primary" ${this.hasChanges() ? '' : 'disabled'}>Update</button>` : `<button id="commit" class="gh-button action">Publish</button>`}
 				</div>
+				<button id="email-actions" class="gh-button secondary text icon">${icons.verticalDots}</button>
 				${afterPublishActions}
 			</div>
         `
@@ -180,20 +190,10 @@
 					<div id="email-editor-sidebar-controls" class="gh-button-group">
 						<button id="send-test" class="gh-button secondary">Send test email</button>
 						<button data-device="mobile" class="show-preview gh-button secondary">
-							<svg width="12" height="19" viewBox="0 0 12 19" fill="none"
-							     xmlns="http://www.w3.org/2000/svg">
-								<path
-									d="M8.74288 15.776C9.15709 15.776 9.49288 15.4402 9.49288 15.026C9.49288 14.6117 9.15709 14.276 8.74288 14.276V15.776ZM3.54739 14.276C3.13318 14.276 2.79739 14.6117 2.79739 15.026C2.79739 15.4402 3.13318 15.776 3.54739 15.776V14.276ZM8.74288 1.48749V2.23749V1.48749ZM3.54739 1.48749L3.54739 0.737488L3.54739 1.48749ZM1.23828 15.0259H1.98828H1.23828ZM1.23828 3.94903H0.488281H1.23828ZM8.74286 17.4875V16.7375V17.4875ZM3.54739 17.4875V18.2375V17.4875ZM11.052 15.026L11.802 15.026L11.052 15.026ZM11.052 3.94903L10.302 3.94903L11.052 3.94903ZM8.74288 0.737488L3.54739 0.737488L3.54739 2.23749L8.74288 2.23749V0.737488ZM1.98828 15.0259L1.98828 3.94903H0.488281L0.488281 15.0259H1.98828ZM8.74286 16.7375H3.54739V18.2375H8.74286V16.7375ZM11.802 15.026L11.802 3.94903L10.302 3.94903L10.302 15.026L11.802 15.026ZM8.74286 18.2375C10.4768 18.2375 11.802 16.7538 11.802 15.026L10.302 15.026C10.302 16.0171 9.55949 16.7375 8.74286 16.7375V18.2375ZM8.74288 2.23749C9.55951 2.23749 10.302 2.95789 10.302 3.94903L11.802 3.94903C11.802 2.22123 10.4768 0.737488 8.74288 0.737488V2.23749ZM3.54739 0.737488C1.81345 0.737488 0.488281 2.22123 0.488281 3.94903L1.98828 3.94903C1.98828 2.95788 2.73076 2.23749 3.54739 2.23749L3.54739 0.737488ZM0.488281 15.0259C0.488281 16.7537 1.81345 18.2375 3.54739 18.2375V16.7375C2.73076 16.7375 1.98828 16.0171 1.98828 15.0259H0.488281ZM3.54739 15.776H8.74288V14.276H3.54739V15.776Z"
-									fill="#0075FF"/>
-							</svg>
+							${icons.smartphone}
 						</button>
 						<button data-device="desktop" class="show-preview gh-button secondary">
-							<svg width="18" height="19" viewBox="0 0 18 19" fill="none"
-							     xmlns="http://www.w3.org/2000/svg">
-								<path
-									d="M15.2702 13.7952V13.0452V13.7952ZM2.57008 13.7952V14.5452H2.57008L2.57008 13.7952ZM16.4247 2.71826L17.1747 2.71826L16.4247 2.71826ZM16.4247 12.5644H15.6747H16.4247ZM1.41553 2.71827H0.665527H1.41553ZM1.41553 12.5644H2.16553H1.41553ZM15.2702 1.48749V2.23749H15.2702L15.2702 1.48749ZM2.57008 1.4875L2.57008 0.737501L2.57008 1.4875ZM16.4247 11.4683C16.8389 11.4683 17.1747 11.1325 17.1747 10.7183C17.1747 10.304 16.8389 9.96826 16.4247 9.96826V11.4683ZM1.41553 9.96826C1.00131 9.96826 0.665527 10.304 0.665527 10.7183C0.665527 11.1325 1.00131 11.4683 1.41553 11.4683L1.41553 9.96826ZM12.3838 18.2375C12.798 18.2375 13.1338 17.9017 13.1338 17.4875C13.1338 17.0733 12.798 16.7375 12.3838 16.7375V18.2375ZM5.45646 16.7375C5.04225 16.7375 4.70646 17.0733 4.70646 17.4875C4.70646 17.9017 5.04225 18.2375 5.45646 18.2375V16.7375ZM5.86102 17.4875C5.86102 17.9017 6.19681 18.2375 6.61102 18.2375C7.02523 18.2375 7.36102 17.9017 7.36102 17.4875H5.86102ZM7.36102 13.7952C7.36102 13.381 7.02523 13.0452 6.61102 13.0452C6.19681 13.0452 5.86102 13.381 5.86102 13.7952H7.36102ZM10.4792 17.4875C10.4792 17.9017 10.815 18.2375 11.2292 18.2375C11.6434 18.2375 11.9792 17.9017 11.9792 17.4875H10.4792ZM11.9792 13.7952C11.9792 13.381 11.6434 13.0452 11.2292 13.0452C10.815 13.0452 10.4792 13.381 10.4792 13.7952H11.9792ZM15.2702 13.0452L2.57008 13.0452L2.57008 14.5452L15.2702 14.5452V13.0452ZM15.6747 2.71826L15.6747 12.5644H17.1747L17.1747 2.71826L15.6747 2.71826ZM0.665527 2.71827L0.665528 12.5644H2.16553L2.16553 2.71827H0.665527ZM15.2702 0.737488L2.57008 0.737501L2.57008 2.2375L15.2702 2.23749L15.2702 0.737488ZM17.1747 2.71826C17.1747 1.67019 16.3665 0.737486 15.2702 0.737488L15.2702 2.23749C15.4492 2.23749 15.6747 2.40685 15.6747 2.71826L17.1747 2.71826ZM2.16553 2.71827C2.16553 2.40686 2.39109 2.2375 2.57008 2.2375L2.57008 0.737501C1.47378 0.737502 0.665527 1.67021 0.665527 2.71827H2.16553ZM2.57008 13.0452C2.39109 13.0452 2.16553 12.8758 2.16553 12.5644H0.665528C0.665528 13.6125 1.47378 14.5452 2.57008 14.5452L2.57008 13.0452ZM15.2702 14.5452C16.3665 14.5452 17.1747 13.6125 17.1747 12.5644H15.6747C15.6747 12.8758 15.4492 13.0452 15.2702 13.0452V14.5452ZM16.4247 9.96826H1.41553L1.41553 11.4683H16.4247V9.96826ZM12.3838 16.7375H5.45646V18.2375H12.3838V16.7375ZM7.36102 17.4875V13.7952H5.86102V17.4875H7.36102ZM11.9792 17.4875V13.7952H10.4792V17.4875H11.9792Z"
-									fill="#0075FF"/>
-							</svg>
+							${icons.desktop}
 						</button>
 					</div>
 					<p>
@@ -225,25 +225,13 @@
 							        class="change-alignment gh-button ${
 								        alignment === 'left' ? 'primary' : 'secondary'
 							        }">
-								<svg width="13" height="14" viewBox="0 0 13 14" fill="none"
-								     xmlns="http://www.w3.org/2000/svg">
-									<path
-										d="M0.777832 13.1662H6.4477M0.777832 9.0427H12.1176M0.777832 0.795624H12.1176M0.777832 4.91916H6.4477"
-										stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-										stroke-linejoin="round"/>
-								</svg>
+								${icons.alignLeft}
 							</button>
 							<button id="align-center" data-alignment="center"
 							        class="change-alignment gh-button ${
 								        alignment === 'center' ? 'primary' : 'secondary'
 							        }">
-								<svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-								     xmlns="http://www.w3.org/2000/svg">
-									<path opacity="0.6"
-									      d="M12.5319 9.00262H1.19189M12.5319 0.755951H1.19189M9.95462 13.126H4.28462M9.95462 4.87928H4.28462"
-									      stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-									      stroke-linejoin="round"/>
-								</svg>
+								${icons.alignCenter}
 							</button>
 						</div>
 						<div id="email-editor-sidebar-message_type">
@@ -309,6 +297,18 @@
       return !objectEquals(this.email.data, this.edited.data)
     },
 
+    update (data) {
+      return EmailsStore.patch(this.email.ID, data).then((e) => {
+        this.loadEmail(e)
+        return e
+      }).catch((e) => {
+        dialog({
+          type: 'error',
+          message: __('Something went wrong', 'groundhogg')
+        })
+      })
+    },
+
     commitChanges () {
       if (this.autoSaveTimeout) {
         clearTimeout(this.autoSaveTimeout)
@@ -318,7 +318,7 @@
 
       const { close } = savingModal()
 
-      EmailsStore.patch(this.email.ID, {
+      return EmailsStore.patch(this.email.ID, {
         data: {
           ...this.edited.data,
           status: 'ready',
@@ -335,6 +335,11 @@
         this.mount()
         onCommit(e)
         close()
+      }).catch((e) => {
+        dialog({
+          type: 'error',
+          message: __('Something went wrong', 'groundhogg')
+        })
       })
     },
 
@@ -483,22 +488,284 @@
 
       const headerMounted = () => {
 
+        const handleOnSelect = (key) => {
+          switch (key) {
+            case 'campaigns':
+
+              const campaignContent = () => {
+                // language=HTML
+                return `
+					<div class="manage-campaigns" style="width: 400px">
+						<h2>${__('Add this email to one or more campaigns...', 'groundhogg')}</h2>
+						<p>${select({
+							id: 'manage-campaigns',
+							multiple: true
+						})}</p>
+						<p>
+							${__('Campaigns are a tool to group marketing assets for reporting. Visit the dashboard to see an analytics breakdown by campaign.', 'groundhogg')}</p>
+					</div>`
+              }
+
+              modal({
+                content: campaignContent()
+              })
+
+              campaignPicker('#manage-campaigns', true, (items) => {
+                CampaignsStore.itemsFetched(items)
+              }, {
+                placeholder: __('Select one or more campaigns', 'groundhogg'),
+                width: '100%',
+                data: [
+                  { id: '', text: '' },
+                  ...this.email.campaigns.map(c => ({
+                    ...c,
+                    id: c.ID,
+                    text: c.data.name,
+                    selected: true
+                  }))
+                ]
+              }).on('select2:select', async (e) => {
+                let campaign = e.params.data
+                // its a new campaign
+                if (!CampaignsStore.hasItem(campaign.id)) {
+                  campaign = await CampaignsStore.post({
+                    data: {
+                      name: campaign.id
+                    }
+                  }).then((c) => ({ id: c.ID, name: c.data.name }))
+                }
+                // existing campaign
+                post(`${routes.v4.emails}/${this.email.ID}/relationships`, {
+                  other_id: campaign.id,
+                  other_type: 'campaign'
+                }).then(r => this.loadEmail(r.item))
+              }).on('select2:unselect', async (e) => {
+                let campaign = e.params.data
+
+                // existing campaign
+                apiDelete(`${routes.v4.emails}/${this.email.ID}/relationships`, {
+                  other_id: campaign.id,
+                  other_type: 'campaign'
+                }).then(r => this.loadEmail(r.item))
+              })
+
+              break
+            case 'export':
+              window.location.href = this.email.links.export
+              break
+            case 'share':
+
+              const sharingModalOnMount = () => {
+                $('#sharing-enabled').on('change', ({ target }) => {
+                  this.update({
+                    meta: {
+                      sharing: target.checked ? 'enabled' : 'disabled'
+                    }
+                  }).then(() => {
+                    setShareContent(sharingModalContent())
+                    sharingModalOnMount()
+                  })
+                })
+              }
+
+              const sharingModalContent = () => {
+                if (this.email.meta.sharing !== 'enabled') {
+                  // language=HTML
+                  return `
+					  <div class="share">
+						  <h2>${__('Sharing is not enabled', 'groundhogg')}</h2>
+						  <p>${__('Enable sharing?', 'groundhogg')} ${toggle({
+							  name: 'sharing',
+							  id: 'sharing-enabled',
+							  checked: this.email.meta.sharing === 'enabled',
+							  onLabel: _x('YES', 'toggle switch', 'groundhogg'),
+							  offLabel: _x('NO', 'toggle switch', 'groundhogg'),
+						  })}</p>
+						  <p>
+							  ${__('When sharing is enabled this email can be downloaded via a private link.', 'groundhogg')}</p>
+					  </div>`
+                } else {
+                  // language=HTML
+                  return `
+					  <div class="share">
+						  <h2>${__('Share this email', 'groundhogg')}</h2>
+						  ${input({
+							  type: 'url',
+							  className: 'code full-width',
+							  readonly: true,
+							  value: this.email.links.export,
+							  onfocus: 'this.select()'
+						  })}
+						  <p>
+							  ${__('Anyone with the above link will be able to download a copy of this email.', 'groundhogg')}</p>
+						  <p>${__('Enable sharing?', 'groundhogg')} ${toggle({
+							  name: 'sharing',
+							  id: 'sharing-enabled',
+							  checked: this.email.meta.sharing === 'enabled',
+							  onLabel: _x('YES', 'toggle switch', 'groundhogg'),
+							  offLabel: _x('NO', 'toggle switch', 'groundhogg'),
+						  })}</p>
+					  </div>`
+                }
+              }
+
+              const { setContent: setShareContent } = modal({
+                // language=HTML
+                content: sharingModalContent()
+              })
+
+              sharingModalOnMount()
+
+              break
+            case 'reports':
+              window.location.href = this.email.links.report
+              break
+            case 'delete':
+
+              dangerConfirmationModal({
+                //language=HTML
+                alert: `<p><b>${__('Delete this email?', 'groundhogg')}</b></p>
+				<p>${__('Any associated events and reports will also be deleted.', 'groundhogg')}</p>
+				<p>${__('This action cannot be undone. Are you sure?', 'groundhogg')}</p>`,
+                confirmText: __('Delete'),
+                onConfirm: () => {
+                  EmailsStore.delete( this.email.ID ).then(() => {
+                    dialog({
+                      message: __( 'Email deleted!', 'groundhogg' )
+                    })
+                    window.location.href = adminPageURL( 'gh_emails' )
+                  })
+                }
+              })
+
+              break
+            case 'archive':
+
+              dangerConfirmationModal({
+                //language=HTML
+                alert: `
+					<p>
+						<b>${_x('Archive this funnel?', 'archive is representing a verb in this phrase', 'groundhogg')}</b>
+					</p>
+					<p>
+						${__('Any active contacts will be removed from the funnel permanently. The funnel will become un-editable until restored.', 'groundhogg')}</p>`,
+                confirmText: _x('Archive', 'a verb meaning to add an item to an archive', 'groundhogg'),
+                onConfirm: () => {
+                  this.update({
+                    data: {
+                      status: 'archived'
+                    }
+                  }).then(() => {
+                    dialog({
+                      message: __('Funnel Archived', 'groundhogg')
+                    })
+
+                    window.location.href = adminPageURL('gh_funnels')
+                  })
+                }
+              })
+
+              break
+            case 'send':
+
+              if ( this.email.data.status !== 'ready' ){
+                confirmationModal({
+                  alert: `<p>${__('Before this email can be sent it must be published. Would you like to publish it now?', 'groundhogg')}<p>`,
+                  confirmText: __( 'Publish' ),
+                  onConfirm: () => {
+                    this.commitChanges().then(() => {
+                      handleOnSelect( 'send' )
+                    })
+                  }
+                })
+
+                break;
+              }
+
+              const { close } = modal({
+                content: `<div id="gh-broadcast-form" style="width: 400px"></div>`
+              })
+
+              Groundhogg.SendBroadcast('#gh-broadcast-form', {
+                email: this.email
+              }, {
+                onScheduled: () => {
+                  dialog({
+                    message: __( 'Broadcast scheduled' )
+                  })
+                  close()
+                }
+              })
+              break
+          }
+        }
+
+        $('#email-actions').on('click', (e) => {
+          moreMenu(e.currentTarget, {
+            onSelect: handleOnSelect,
+            items: [
+              {
+                key: 'campaigns',
+                //language=HTML
+                text: `${icons.campaign} ${_x('Campaigns', 'noun meaning collection of marketing materials', 'groundhogg')}`
+              },
+              {
+                key: 'export',
+                //language=HTML
+                text: `${icons.export} ${_x('Export', 'a verb meaning to download', 'groundhogg')}`
+              },
+              {
+                key: 'share',
+                //language=HTML
+                text: `${icons.share} ${_x('Share', 'a verb meaning to share something', 'groundhogg')}`
+              },
+              {
+                key: 'reports',
+                //language=HTML
+                text: `${icons.chart} ${__('Reports', 'groundhogg')}`
+              },
+              {
+                key: 'send',
+                //language=HTML
+                text: `${icons.megaphone} ${__('Send Broadcast', 'groundhogg')}`
+              },
+              {
+                key: 'archive',
+                //language=HTML
+                text: `${icons.folder} <span
+					class="gh-text danger">${_x('Archive', 'a verb meaning to add an item to an archive', 'groundhogg')}</span>`
+              },
+              {
+                key: 'delete',
+                //language=HTML
+                text: `${icons.trash} <span class="gh-text danger">${__('Delete')}</span>`
+              },
+            ]
+          })
+        })
+
         $('#commit').on('click', () => {
           this.commitChanges()
         })
 
         $('#to-draft').on('click', () => {
 
-          const { close } = savingModal()
+          dangerConfirmationModal({
+            alert: `<p>${__('Once in draft mode this email cannot be sent. Are you sure?', 'groundhogg')}</p>`,
+            confirmText: __('Unpublish'),
+            onConfirm: () => {
+              const { close } = savingModal()
 
-          EmailsStore.patch(this.email.ID, {
-            data: {
-              status: 'draft'
+              EmailsStore.patch(this.email.ID, {
+                data: {
+                  status: 'draft'
+                }
+              }).then((e) => {
+                this.loadEmail(e)
+                close()
+                mountHeader()
+              })
             }
-          }).then((e) => {
-            this.loadEmail(e)
-            close()
-            mountHeader()
           })
 
         })
@@ -562,7 +829,7 @@
             built, edited_preview
           } = this.email.context
 
-          setFrameContent($('#preview')[0], edited_preview || built )
+          setFrameContent($('#preview')[0], edited_preview || built)
 
         })
 

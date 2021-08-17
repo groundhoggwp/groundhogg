@@ -371,6 +371,10 @@
     }
   }
 
+  const capitalize = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1)
+  }
+
   const delayTimerName = ({
     delay_amount,
     delay_type,
@@ -449,7 +453,7 @@
       )
     }
 
-    return preview.join(' ')
+    return capitalize(preview.join(' '))
   }
 
   const StepTypes = {
@@ -1766,6 +1770,29 @@
         editor.init()
       },
     },
+
+    restart_funnel: {
+      // language=HTML
+      svg: `
+		  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 374.8 374.8">
+			  <defs/>
+			  <path fill="currentColor"
+				  d="M48.7 267.3a15 15 0 00-19.9-5.3L23 265a15 15 0 00-5.7 21 187 187 0 0029.7 37 15 15 0 0021.8-1l4.3-5a15 15 0 00-1-20.6c-9-8.7-16.8-18.5-23.4-29.2zM166 338.3c-12.5-1-24.8-3.4-36.7-7.3a15 15 0 00-18.7 8.7l-2.4 6.2a15 15 0 009.2 19.7 189.2 189.2 0 0047.5 9.2 15 15 0 0015-14.8v-6.6c.1-8-6-14.6-13.9-15.1zM285.2 312.6a15 15 0 00-20.5-2.6 150.4 150.4 0 01-32.7 18 15 15 0 00-8.7 18.7l2 6.3a15 15 0 0019.8 9.2 186.9 186.9 0 0041.5-22.9 15 15 0 002.8-21.6l-4.2-5.1zM346.1 214.6l-6.5-1.2a15 15 0 00-17.3 11.1c-3 12.3-7.6 24.2-13.5 35.2a15 15 0 005.3 20l5.6 3.4a15 15 0 0021-5.6c7.7-14 13.5-29 17.3-44.6a15 15 0 00-11.9-18.3zM338 170.9h6.7a15 15 0 0014.6-18.6A187.2 187.2 0 00100.7 15.7L89 4a9.8 9.8 0 00-16.2 4L48.6 85a9.8 9.8 0 0012.2 12.2L138 73.2a9.8 9.8 0 004-16.2l-13-13a149.5 149.5 0 01164 49 150.6 150.6 0 0130.3 65.7 15 15 0 0014.7 12.2z"/>
+		  </svg>`,
+      defaults: {
+        method: 'beginning'
+      },
+      title: ({method = 'beginning'}) => {
+
+        switch ( method ){
+          case 'beginning':
+            break;
+          case 'closest_benchmark':
+        }
+
+        return ``
+      }
+    }
   }
 
   const stepTypeSelect = (el, {
@@ -1796,7 +1823,7 @@
       templateResult: select2Template,
       placeholder: __('Select a step', 'groundhogg'),
       data: [
-        { id: '', text: ''},
+        { id: '', text: '' },
         ...FunnelsStore.getSteps(funnel_id, edited).map(s => ({
           ...s,
           selected: selected === s.ID,

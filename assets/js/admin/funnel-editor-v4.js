@@ -41,12 +41,16 @@
     uniqid,
     specialChars,
     regexp,
+    breadcrumbs,
+    adminPageURL,
     tooltip,
     toggle,
+    loadingDots,
     savingModal,
     bold,
     moreMenu,
     clickInsideElement,
+    progressBar,
   } = Groundhogg.element
 
   const { campaignPicker, emailPicker, searchesPicker } = Groundhogg.pickers
@@ -283,14 +287,17 @@
           return input({
             id: 'funnel-title-edit',
             name: 'funnel_title',
-            value: title
+            value: title,
           })
         }
         const titleDisplay = () => {
           return `<span id="title">${specialChars(title)}</span><span class="dashicons dashicons-edit"></span>`
         }
 
-        return `<h1 class="breadcrumbs"><span class="root">${__('Funnels', 'groundhogg')}</span><span class="sep">/</span>${isEditing ? titleEdit() : titleDisplay()}</h1>`
+        return `<h1 class="breadcrumbs">${breadcrumbs([
+          __('Funnels', 'groundhogg'),
+          isEditing ? titleEdit() : titleDisplay()
+        ])}</h1>`
       },
       stepEditPanel (step) {
         const { ID, data, meta } = step
@@ -681,7 +688,7 @@
       $doc.on('blur change keydown', '#funnel-title-edit', function (e) {
         // If the event is key down do nothing if the key wasn't enter
         if (e.type === 'keydown' && e.key !== 'Enter') {
-          self.resizeTitleEdit()
+          $('#funnel-title-edit').width(((e.target.value.length + 1) * 0.8)  + 'ch')
           return
         }
 
@@ -708,9 +715,8 @@
               const campaignContent = () => {
                 // language=HTML
                 return `
-					<div class="manage-campaigns">
-						<p><b>${__('Add this funnel to one or more campaigns...', 'groundhogg')}</b>
-						</p>
+					<div class="manage-campaigns" style="min-width: 400px">
+						<h2>${__('Add this funnel to one or more campaigns...', 'groundhogg')}</h2>
 						<p>${select({
 							id: 'manage-campaigns',
 							multiple: true
@@ -758,6 +764,67 @@
               break
             case 'share':
 
+              const sharingModalOnMount = () => {
+                $('#sharing-enabled').on('change', ({ target }) => {
+                  this.update({
+                    meta: {
+                      sharing: target.checked ? 'enabled' : 'disabled'
+                    }
+                  }, false).then(() => {
+                    setShareContent(sharingModalContent())
+                    sharingModalOnMount()
+                  })
+                })
+              }
+
+              const sharingModalContent = () => {
+                if (this.funnel.meta.sharing !== 'enabled') {
+                  // language=HTML
+                  return `
+					  <div class="share">
+						  <h2>${__('Sharing is not enabled', 'groundhogg')}</h2>
+						  <p>${__('Enable sharing?', 'groundhogg')} ${toggle({
+							  name: 'sharing',
+							  id: 'sharing-enabled',
+							  checked: this.funnel.meta.sharing === 'enabled',
+							  onLabel: _x('YES', 'toggle switch', 'groundhogg'),
+							  offLabel: _x('NO', 'toggle switch', 'groundhogg'),
+						  })}</p>
+						  <p>
+							  ${__('When sharing is enabled this funnel can be downloaded via a private link.', 'groundhogg')}</p>
+					  </div>`
+                } else {
+                  // language=HTML
+                  return `
+					  <div class="share">
+						  <h2>${__('Share this funnel', 'groundhogg')}</h2>
+						  ${input({
+							  type: 'url',
+							  className: 'code full-width',
+							  readonly: true,
+							  value: this.funnel.links.export,
+							  onfocus: 'this.select()'
+						  })}
+						  <p>
+							  ${__('Anyone with the above link will be able to download a copy of this funnel.', 'groundhogg')}</p>
+						  <p>${__('Enable sharing?', 'groundhogg')} ${toggle({
+							  name: 'sharing',
+							  id: 'sharing-enabled',
+							  checked: this.funnel.meta.sharing === 'enabled',
+							  onLabel: _x('YES', 'toggle switch', 'groundhogg'),
+							  offLabel: _x('NO', 'toggle switch', 'groundhogg'),
+						  })}</p>
+					  </div>`
+                }
+              }
+
+              const { setContent: setShareContent } = modal({
+                // language=HTML
+                content: sharingModalContent()
+              })
+
+              sharingModalOnMount()
+
               break
             case 'reports':
               window.location.href = this.funnel.links.report
@@ -785,11 +852,20 @@
 					<p>
 						<b>${_x('Archive this funnel?', 'archive is representing a verb in this phrase', 'groundhogg')}</b>
 					</p>
-					<p>${__('Any active contacts will be removed from the funnel permanently.', 'groundhogg')}</p>
-					<p>${__('The funnel will become un-editable until restored.', 'groundhogg')}</p>`,
+					<p>${__('Any active contacts will be removed from the funnel permanently. The funnel will become un-editable until restored.', 'groundhogg')}</p>`,
                 confirmText: _x('Archive', 'a verb meaning to add an item to an archive', 'groundhogg'),
                 onConfirm: () => {
-                  console.log('yikes')
+                  this.update({
+                    data: {
+                      status: 'archived'
+                    }
+                  }).then(() => {
+                    dialog({
+                      message: __( 'Funnel Archived', 'groundhogg' )
+                    })
+
+                    window.location.href = adminPageURL( 'gh_funnels' )
+                  })
                 }
               })
 
@@ -839,6 +915,7 @@
                     })
 
                     $('#add-contacts-to-funnel-confirm').replaceWith(addConfirmButton(state))
+                    addConfirmListener()
                   })
                 }
 
@@ -894,8 +971,65 @@
                       saved_search: e.params.data.id
                     })
                   })
-
                 }
+
+                const addConfirmListener = () => {
+                  $('#add-contacts-to-funnel-confirm').on('click', () => {
+
+                    const adding = () => {
+                      //language=HTML
+                      return `
+						  <div style="min-width: 400px">
+							  <h2 id="adding-contacts-header">${__('Adding contacts', 'groundhogg')}</h2>
+							  <div id="progress-bar"></div>
+						  </div>`
+                    }
+
+                    setContent(adding())
+
+                    const { stop: stopDots } = loadingDots('#adding-contacts-header')
+                    const { setProgress } = progressBar('#progress-bar')
+
+                    let limit = 500
+                    let offset = 0
+
+                    let { method, total_contacts, step_id, search, filters } = state
+
+                    const scheduleEvents = () => {
+                      FunnelsStore.addContacts({
+                        funnel_id: this.funnel.ID,
+                        step_id: step_id,
+                        query: {
+                          ...method === 'filters' ? { filters } : { saved_search: search },
+                          limit,
+                          offset
+                        }
+                      }).then(() => {
+
+                        limit = Math.min(total_contacts - offset, limit)
+                        offset += limit
+
+                        setProgress(offset / total_contacts)
+
+                        if (offset >= total_contacts) {
+                          closeAddContactsModal()
+                          stopDots()
+                          dialog({
+                            message: sprintf(__('%s contacts added to "%s"'), formatNumber(total_contacts), this.funnel.data.title)
+                          })
+                          return
+                        }
+
+                        scheduleEvents()
+                      })
+                    }
+
+                    scheduleEvents()
+
+                  })
+                }
+
+                addConfirmListener()
               }
 
               const addConfirmButton = ({ method, total_contacts, step_id }) => {
@@ -940,7 +1074,7 @@
 					</div>`
               }
 
-              const { setContent } = modal({
+              const { setContent, close: closeAddContactsModal } = modal({
                 //language=HTML
                 content: addContactsToFunnel(state)
               })
@@ -1537,7 +1671,7 @@
     },
 
     resizeTitleEdit () {
-      $('#funnel-title-edit').width(this.funnel.data.title.length + 1 + 'ch')
+      $('#funnel-title-edit').width(((this.funnel.data.title.length + 1) * 0.8)  + 'ch')
     },
 
     /**
@@ -1635,8 +1769,10 @@
       return FunnelsStore.patch(this.funnel.ID, data).then(
         (item) => {
           self.setLastSaved()
-          if (item && reload) {
+          if (item) {
             self.loadFunnel(item)
+          }
+          if (reload) {
             self.render()
           }
         }

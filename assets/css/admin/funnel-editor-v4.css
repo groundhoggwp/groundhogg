@@ -67,6 +67,10 @@
 #funnel-editor .title-wrap h1 .dashicons {
   color: rgba(16, 38, 64, 0.3);
 }
+#funnel-editor .title-wrap h1 #funnel-title-edit {
+  width: 400px;
+  font-size: 18px;
+}
 #funnel-editor .flow-and-edit {
   display: flex;
   flex-grow: 1;

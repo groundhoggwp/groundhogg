@@ -505,13 +505,13 @@
 
                 $('#add-to-funnel').on('click', () => {
 
-                  let limit = 500
-                  let offset = 0
-
                   setContent(`<h2 id="has-dots">${__('Adding contacts to funnel')}</h2><div id="funnel-progress"></div>`)
 
                   const { stop: stopDots } = loadingDots('#has-dots')
                   const { setProgress } = progressBar('#funnel-progress')
+
+                  let limit = 500
+                  let offset = 0
 
                   const scheduleEvents = () => {
                     FunnelsStore.addContacts({

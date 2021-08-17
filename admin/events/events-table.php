@@ -279,16 +279,18 @@ class Events_Table extends WP_List_Table {
 
 		$view = $this->get_view();
 
-		$count = array(
-			'waiting'   => get_db( 'event_queue' )->count( array( 'status' => 'waiting' ) ),
-			'skipped'   => get_db( 'events' )->count( array( 'status' => 'skipped' ) ),
-			'cancelled' => get_db( 'events' )->count( array( 'status' => 'cancelled' ) ),
-			'completed' => get_db( 'events' )->count( array( 'status' => 'complete' ) ),
-			'failed'    => get_db( 'events' )->count( array( 'status' => 'failed' ) )
-		);
+		$count = [
+			'waiting'   => get_db( 'event_queue' )->count( [ 'status' => Event::WAITING ] ),
+			'paused'    => get_db( 'event_queue' )->count( [ 'status' => Event::PAUSED ] ),
+			'skipped'   => get_db( 'events' )->count( [ 'status' => Event::SKIPPED ] ),
+			'cancelled' => get_db( 'events' )->count( [ 'status' => Event::CANCELLED ] ),
+			'completed' => get_db( 'events' )->count( [ 'status' => Event::COMPLETE ] ),
+			'failed'    => get_db( 'events' )->count( [ 'status' => Event::FAILED ] ),
+		];
 
 		return apply_filters( 'gh_event_views', array(
 			'waiting'   => "<a class='" . ( $view === 'waiting' ? 'current' : '' ) . "' href='" . $base_url . "waiting" . "'>" . _x( 'Waiting', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['waiting'] ) . ')</span>' . "</a>",
+			'paused'    => "<a class='" . ( $view === 'paused' ? 'current' : '' ) . "' href='" . $base_url . "paused" . "'>" . _x( 'Paused', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['paused'] ) . ')</span>' . "</a>",
 			'completed' => "<a class='" . ( $view === 'complete' ? 'current' : '' ) . "' href='" . $base_url . "complete" . "'>" . _x( 'Completed', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['completed'] ) . ')</span>' . "</a>",
 			'skipped'   => "<a class='" . ( $view === 'skipped' ? 'current' : '' ) . "' href='" . $base_url . "skipped" . "'>" . _x( 'Skipped', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['skipped'] ) . ')</span>' . "</a>",
 			'cancelled' => "<a class='" . ( $view === 'cancelled' ? 'current' : '' ) . "' href='" . $base_url . "cancelled" . "'>" . _x( 'Cancelled', 'view', 'groundhogg' ) . ' <span class="count">(' . _nf( $count['cancelled'] ) . ')</span>' . "</a>",
@@ -444,7 +446,7 @@ class Events_Table extends WP_List_Table {
 			'orderby' => $orderby,
 		);
 
-		$this->table = $this->get_view() === Event::WAITING ? 'event_queue' : 'events';
+		$this->table = in_array( $this->get_view(), [ Event::WAITING, Event::PAUSED ] ) ? 'event_queue' : 'events';
 
 		$events = get_db( $this->table )->query( $args );
 		$total  = get_db( $this->table )->count( $args );

@@ -60,6 +60,10 @@ body iframe#preview.desktop {
 #email-editor-header .title-wrap h1 .dashicons {
   color: rgba(16, 38, 64, 0.3);
 }
+#email-editor-header .title-wrap h1 #email-title-edit {
+  width: 400px;
+  font-size: 18px;
+}
 #email-editor-header .actions {
   align-items: center;
   display: flex;

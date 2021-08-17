@@ -62,6 +62,10 @@ class Funnel extends Base_Object_With_Meta {
 		return $this->get_status() === 'active';
 	}
 
+	public function is_sharing_enabled() {
+		return $this->get_meta( 'sharing' ) === 'enabled';
+	}
+
 	/**
 	 * Pause any events in the queue
 	 */
@@ -85,6 +89,30 @@ class Funnel extends Base_Object_With_Meta {
 			'status'     => Event::PAUSED,
 		], [
 			'status' => Event::WAITING
+		] );
+	}
+
+	/**
+	 * Cancel events
+	 */
+	public function cancel_events(){
+		get_db( 'event_queue' )->update( [
+			'funnel_id'  => $this->get_id(),
+			'event_type' => Event::FUNNEL,
+			'status'     => Event::WAITING,
+		], [
+			'status' => Event::CANCELLED
+		] );
+	}
+
+	/**
+	 * Delete events outright
+	 */
+	public function delete_waiting_events(){
+		get_db( 'event_queue' )->delete( [
+			'funnel_id'  => $this->get_id(),
+			'event_type' => Event::FUNNEL,
+			'status'     => Event::WAITING,
 		] );
 	}
 
@@ -213,9 +241,16 @@ class Funnel extends Base_Object_With_Meta {
 			$this->unpause_events();
 		} // Went from active to inactive
 		else if ( $was_active && ! $this->is_active() ) {
-
-			// Pause any waiting events
-			$this->pause_events();
+			switch ( $this->get_status() ){
+				case 'archived':
+					// Cancel events outright
+					$this->cancel_events();
+					break;
+				case 'inactive':
+					// Pause any waiting events
+					$this->pause_events();
+					break;
+			}
 		}
 
 		return $updated;

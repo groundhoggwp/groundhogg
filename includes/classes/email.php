@@ -98,9 +98,9 @@ class Email extends Base_Object_With_Meta {
 	}
 
 //	public function get_id() {
+
 //		return absint( $this->ID );
 //	}
-
 	public function get_subject_line() {
 		return $this->subject;
 	}
@@ -245,6 +245,15 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function is_confirmation_email() {
 		return ( strpos( $this->get_content(), '{confirmation_link}' ) !== false ) || ( strpos( $this->get_content(), '{confirmation_link_raw}' ) !== false );
+	}
+
+	/**
+	 * Whether sharing is enabled
+	 *
+	 * @return bool
+	 */
+	public function is_sharing_enabled() {
+		return $this->get_meta('sharing') === 'enabled';
 	}
 
 	/**
@@ -1101,6 +1110,18 @@ class Email extends Base_Object_With_Meta {
 		];
 	}
 
+	/**
+	 * The export URL
+	 *
+	 * @return string
+	 */
+	public function export_url() {
+		return managed_page_url( sprintf( 'emails/export/%s/', Plugin::$instance->utils->encrypt_decrypt( $this->get_id() ) ) );
+	}
+
+	/**
+	 * @return array
+	 */
 	public function get_as_array() {
 
 		if ( ! get_contactdata() ) {
@@ -1123,6 +1144,15 @@ class Email extends Base_Object_With_Meta {
 				'avatar'         => get_avatar_url( $this->get_from_user_id(), [
 					'size' => 30
 				] )
+			],
+			'campaigns' => $this->get_related_objects( 'campaign' ),
+			'links'     => [
+				'export' => $this->export_url(),
+				'report' => admin_page_url( 'gh_reporting', [
+					'tab'         => 'v3',
+					'currentPage' => 'emails',
+					'params'      => [ 'email' => $this->get_id() ],
+				] ),
 			]
 		] );
 	}
