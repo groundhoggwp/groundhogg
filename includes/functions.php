@@ -1677,7 +1677,7 @@ function after_form_submit_handler( &$contact ) {
 	}
 
 	// Update their location based on the current IP address.
-	if ( apply_filters( 'groundhogg/extrapolate_location', true ) && $contact->update_meta( 'ip_address', utils()->location->get_real_ip() ) ) {
+	if ( apply_filters( 'groundhogg/should_extrapolate_location', true ) && $contact->update_meta( 'ip_address', utils()->location->get_real_ip() ) ) {
 		$contact->extrapolate_location();
 	}
 
