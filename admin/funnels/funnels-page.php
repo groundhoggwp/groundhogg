@@ -748,8 +748,20 @@ class Funnels_Page extends Admin_Page {
 		$step_type = get_request_var( 'step_type' );
 
 		$after_step = new Step( absint( get_request_var( 'after_step' ) ) );
-		$step_order = $after_step->get_order() + 1;
-		$funnel_id  = $after_step->get_funnel_id();
+
+		if ( $after_step->exists() ){
+			$step_order = $after_step->get_order() + 1;
+			$funnel_id  = $after_step->get_funnel_id();
+		} else {
+			$funnel_id  = absint( get_post_var( 'funnel_id' ) );
+			$funnel = new Funnel( $funnel_id );
+
+			if ( ! $funnel->exists() ){
+				wp_send_json_error();
+			}
+
+			$step_order = count( $funnel->get_steps() ) + 1;
+		}
 
 		$elements = Plugin::$instance->step_manager->get_elements();
 
@@ -777,9 +789,10 @@ class Funnels_Page extends Admin_Page {
 		$step->html_v2();
 		$settings = ob_get_clean();
 		$this->send_ajax_response( [
-			'sortable' => $sortable,
-			'settings' => $settings,
-			'id'       => $step->get_id(),
+			'sortable'   => $sortable,
+			'settings'   => $settings,
+			'id'         => $step->get_id(),
+			'after_step' => $after_step
 		] );
 
 		wp_send_json_error();

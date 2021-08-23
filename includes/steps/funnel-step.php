@@ -37,7 +37,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * complete()
  *
- * @see WPGH_Form_Filled for an example.
+ * @see         WPGH_Form_Filled for an example.
  *
  * @package     Elements
  * @subpackage  Elements/Benchmarks
@@ -258,7 +258,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 	/**
 	 * @param string $setting
-	 * @param array $args
+	 * @param array  $args
 	 */
 	protected function add_control( $setting = '', $args = [] ) {
 		$args = wp_parse_args( $args, [
@@ -330,7 +330,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 * Retrieves a setting from the settings array provide by the step meta.
 	 *
 	 * @param string $key
-	 * @param bool $default
+	 * @param bool   $default
 	 *
 	 * @return mixed
 	 */
@@ -367,7 +367,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 * Retrieves a setting from the posted settings when saving.
 	 *
 	 * @param string $key
-	 * @param bool $default
+	 * @param bool   $default
 	 *
 	 * @return mixed
 	 */
@@ -615,6 +615,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 	/**
 	 * Get similar steps which can be used by benchmarks.
+	 *
 	 * @return Step[]
 	 */
 	public function get_like_steps( $query = [] ) {
@@ -626,7 +627,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 		$steps = [];
 
-		if ( $raw_steps ){
+		if ( $raw_steps ) {
 			foreach ( $raw_steps as $raw_step ) {
 				$step = new Step( absint( $raw_step->ID ) );
 
@@ -700,6 +701,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	            'width'              => 600,
 	            'footer'             => 'true',
 	            'preventSave'        => 'true',
+	            'data-step'          => $step->get_id(),
             ] );
             ?>
             </span>
@@ -976,7 +978,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 * Setup args before the action/benchmark is run
 	 *
 	 * @param $contact Contact
-	 * @param $event Event
+	 * @param $event   Event
 	 *
 	 * @return Contact
 	 */
@@ -991,7 +993,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 * Run the action/benchmark
 	 *
 	 * @param $contact Contact
-	 * @param $event Event
+	 * @param $event   Event
 	 *
 	 * @return bool
 	 */
