@@ -1514,15 +1514,15 @@
       const broadcast = BroadcastsStore.get(broadcast_id)
 
       return status === 'complete' ?
-        sprintf(broadcast ? __('Received %1$s on %2$s', 'groundhogg') : __('Will receive a broadcast', 'groundhogg'), `<b>${broadcast.object.data.title}</b>`, `<b>${formatDateTime(broadcast.data.send_time * 1000)}</b>`)
-        : sprintf(broadcast ? __('Will receive %1$s on %2$s', 'groundhogg') : __('Received a broadcast', 'groundhogg'), `<b>${broadcast.object.data.title}</b>`, `<b>${formatDateTime(broadcast.data.send_time * 1000)}</b>`)
+        sprintf(broadcast ? __('Received %1$s on %2$s', 'groundhogg') : __('Will receive a broadcast', 'groundhogg'), `<b>${broadcast.data.title}</b>`, `<b>${formatDateTime(broadcast.data.send_time * 1000)}</b>`)
+        : sprintf(broadcast ? __('Will receive %1$s on %2$s', 'groundhogg') : __('Received a broadcast', 'groundhogg'), `<b>${broadcast.data.title}</b>`, `<b>${formatDateTime(broadcast.data.send_time * 1000)}</b>`)
     },
     edit ({ broadcast_id }) {
 
       return select({
           id: 'filter-broadcast',
           name: 'broadcast_id'
-        }, BroadcastsStore.getItems().map(b => ({ value: b.ID, text: `${b.object.data.title} (${b.date_sent_pretty})` })),
+        }, BroadcastsStore.getItems().map(b => ({ value: b.ID, text: `${b.data.title} (${b.date_sent_pretty})` })),
         broadcast_id)
     },
     onMount (filter, updateFilter) {
@@ -1556,7 +1556,7 @@
 
       const broadcast = BroadcastsStore.get(broadcast_id)
 
-      return sprintf(broadcast ? __('Opened %1$s after %2$s', 'groundhogg') : __('Will receive a broadcast', 'groundhogg'), `<b>${broadcast.object.data.title}</b>`, `<b>${formatDateTime(broadcast.data.send_time * 1000)}</b>`)
+      return sprintf(broadcast ? __('Opened %1$s after %2$s', 'groundhogg') : __('Will receive a broadcast', 'groundhogg'), `<b>${broadcast.data.title}</b>`, `<b>${formatDateTime(broadcast.data.send_time * 1000)}</b>`)
 
     },
     edit ({ broadcast_id }) {
@@ -1564,7 +1564,7 @@
       return select({
           id: 'filter-broadcast',
           name: 'broadcast_id'
-        }, BroadcastsStore.getItems().map(b => ({ value: b.ID, text: `${b.object.data.title} (${b.date_sent_pretty})` })),
+        }, BroadcastsStore.getItems().map(b => ({ value: b.ID, text: `${b.data.title} (${b.date_sent_pretty})` })),
         broadcast_id)
     },
     onMount (filter, updateFilter) {
@@ -1602,10 +1602,10 @@
       const broadcast = BroadcastsStore.get(broadcast_id)
 
       if (broadcast_id && !link) {
-        return sprintf(__('Clicked any link in %1$s after %2$s', 'groundhogg'), bold(broadcast.object.data.title), bold(formatDateTime(broadcast.data.send_time * 1000)))
+        return sprintf(__('Clicked any link in %1$s after %2$s', 'groundhogg'), bold(broadcast.data.title), bold(formatDateTime(broadcast.data.send_time * 1000)))
       }
 
-      return sprintf(__('Clicked %1$s in %2$s after %3$s', 'groundhogg'), bold(link), bold(broadcast.object.data.title), bold(formatDateTime(broadcast.data.send_time * 1000)))
+      return sprintf(__('Clicked %1$s in %2$s after %3$s', 'groundhogg'), bold(link), bold(broadcast.data.title), bold(formatDateTime(broadcast.data.send_time * 1000)))
     },
     edit ({ broadcast_id, link }) {
 
@@ -1616,7 +1616,7 @@
 				  name: 'broadcast_id'
 			  }, BroadcastsStore.getItems().map(b => ({
 				  value: b.ID,
-				  text: `${b.object.data.title} (${b.date_sent_pretty})`
+				  text: `${b.data.title} (${b.date_sent_pretty})`
 			  })),
 			  broadcast_id)}
 
