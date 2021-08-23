@@ -960,7 +960,7 @@
     groups = {},
     filterOption = (option, search) => option.match(regexp(search)),
     renderOption = (option) => option,
-    noOptions = `No options...`,
+    noOptions = __( 'No options...', 'groundhogg' ),
     onSelect = (option) => console.log(option),
     onClose = () => {},
     onOpen = () => {}
@@ -1074,7 +1074,9 @@
       const $options = $(`${selector} .search-options`)
 
       $options.html(this.renderSearchOptions())
+
       $(`${selector} .option`).on('click', function (e) {
+
         const optionId = $(this).data('option')
         const groupId = $(this).data('group')
 
@@ -1137,10 +1139,10 @@
         onClose()
       }
 
-      $(`${selector} input.search-for-options`).on('change input', function (e) {
+      $(`${selector} input.search-for-options`).on('input', function (e) {
         self.search = $(this).val()
-        self.focusedOptionId = false
-        self.previousFocusedOptionId = false
+        self.focusedOptionId = -1
+        self.previousFocusedOptionId = -1
         self.mountOptions()
       }).focus()
 
@@ -1584,6 +1586,20 @@
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="-21 -21 682 682.7">
 			<path fill="currentColor"
 			      d="M274.7 640c-20.1 0-39-7.8-53.1-22L22.2 418.3a75.1 75.1 0 010-106L291 43c27.7-27.7 64.5-43 103.8-43h170.5a75 75 0 0175 75v170c0 39.2-15.3 76-43 103.7L327.7 618.1a74.5 74.5 0 01-53 21.9zm120-590a96 96 0 00-68.3 28.4L57.6 347.7a25 25 0 000 35.3L257 582.7c4.7 4.7 11 7.3 17.7 7.3 6.6 0 13-2.6 17.6-7.3L562 313.4a96 96 0 0028.3-68.4V75a25 25 0 00-25-25zM459 253.8a75 75 0 11.2-150.2 75 75 0 01-.2 150.2zm0-100a25 25 0 100 50 25 25 0 000-50zm0 0"/>
+		</svg>`,
+    // language=HTML
+    groundhogg: `
+		<svg height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="11.4 13.2 212.1 237.9">
+			<linearGradient id="a" x1="35.6" x2="199.3" y1="214" y2="50.4" gradientUnits="userSpaceOnUse">
+				<stop offset="0.3" stop-color="#db851a"/>
+				<stop offset="1" stop-color="#db6f1a"/>
+			</linearGradient>
+			<path fill="url(#a)"
+			      d="M22.7 64.4l83.4-48.2c7-4 15.7-4 22.7 0l83.4 48.2c7 4 11.3 11.5 11.3 19.6v96.3c0 8.1-4.3 15.6-11.3 19.6l-83.4 48.2c-7 4-15.7 4-22.7 0L22.7 200c-7-4-11.3-11.5-11.3-19.6V84a22.5 22.5 0 0111.3-19.6z"/>
+			<path fill="#db5100"
+			      d="M183.5 140.8v4.9A66.1 66.1 0 11164 98.8l-24.5 24.3a31.4 31.4 0 103.6 40.9h-25.6v-23.3h66z"/>
+			<path fill="#fff"
+			      d="M183.5 126.1v4.9A66.1 66.1 0 11164 84.1l-24.5 24.3a31.4 31.4 0 103.6 40.9h-25.6V126h66z"/>
 		</svg>`
 
   }
