@@ -362,7 +362,7 @@
     emailPicker('.gh-email-picker-multiple', true)
     apiPicker('.gh-sms-picker', endpoints.sms, false, false)
     contactPicker('.gh-contact-picker')
-    contactPicker('.gh-contact-picker-multiple', () => {}, {
+    contactPicker('.gh-contact-picker-multiple', (items) => {}, {
       multiple: true
     })
     apiPicker('.gh-benchmark-picker', endpoints.benchmarks, false, false)
@@ -403,7 +403,8 @@
     searchesPicker,
     funnelPicker,
     broadcastPicker,
-    metaValuePicker
+    metaValuePicker,
+    contactPicker,
   }
 
   // Map functions to Groundhogg object.
