@@ -9,6 +9,7 @@ use Groundhogg\Saved_Searches;
 use Groundhogg\Scripts;
 use Groundhogg\Step;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\base64_json_decode;
 use function Groundhogg\bulk_jobs;
 use function Groundhogg\do_replacements;
 use function Groundhogg\enqueue_filter_assets;
@@ -170,7 +171,7 @@ class Contacts_Page extends Admin_Page {
 					$current_filters = $filters;
 
 					if ( is_string( $filters ) ) {
-						$current_filters = json_decode( base64_decode( $filters ), true );
+						$current_filters = base64_json_decode( $filters );
 					}
 
 				} else if ( $saved_search = get_url_var( 'saved_search' ) ) {

@@ -34,8 +34,16 @@
 
   SearchesStore.itemsFetched(ContactSearch.searches)
 
+  function utf8_to_b64( str ) {
+    return window.btoa(unescape(encodeURIComponent( str )));
+  }
+
+  function b64_to_utf8( str ) {
+    return decodeURIComponent(escape(window.atob( str )));
+  }
+
   const base64_json_encode = (stuff) => {
-    return btoa(JSON.stringify(stuff))
+    return utf8_to_b64(JSON.stringify(stuff))
   }
 
   const loadFilters = (filters) => {
