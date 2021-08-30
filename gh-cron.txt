@@ -10,26 +10,17 @@ ignore_user_abort( true );
 
 /* Don't make the request block till we finish, if possible. */
 if ( function_exists( 'fastcgi_finish_request' ) && version_compare( phpversion(), '7.0.16', '>=' ) ) {
-    if ( ! headers_sent() ) {
-        header( 'Expires: Wed, 11 Jan 1984 05:00:00 GMT' );
-        header( 'Cache-Control: no-cache, must-revalidate, max-age=0' );
-    }
+	if ( ! headers_sent() ) {
+		header( 'Expires: Wed, 11 Jan 1984 05:00:00 GMT' );
+		header( 'Cache-Control: no-cache, must-revalidate, max-age=0' );
+	}
 
-    fastcgi_finish_request();
+	fastcgi_finish_request();
 }
 
 if ( ! empty( $_POST ) || defined( 'DOING_AJAX' ) || defined( 'DOING_CRON' ) || defined( 'DOING_GH_CRON' ) ) {
-    die();
+	die();
 }
-
-/**
- * Optional password lock to avoid expensive DDOS attacks
- */
-# define( 'GH_CRON_PASS', 'your_password' );
-#
-# if ( $_GET[ 'pass' ] !== GH_CRON_PASS ){
-#    die();
-# }
 
 /**
  * Tell WordPress we are doing the CRON task.
@@ -47,16 +38,48 @@ define( 'DOING_CRON', true );
  */
 define( 'DOING_GH_CRON', true );
 
+/**
+ * How many concurrent requests you can make, too many might DDOS your server so be careful
+ */
+define( 'GH_MS_CRON_CONCURRENCY', 5 );
+
 if ( ! defined( 'ABSPATH' ) ) {
-    /** Set up WordPress environment */
-    require_once( __DIR__ . '/wp-load.php' );
+	/** Set up WordPress environment */
+	require_once( __DIR__ . '/wp-load.php' );
 }
 
 // Check if Groundhogg is active...
-if ( ! defined( 'GROUNDHOGG_VERSION' ) ){
-    die();
+if ( ! defined( 'GROUNDHOGG_VERSION' ) ) {
+	die();
 }
 
-do_action( 'groundhogg_process_queue' );
+// This makes it so that it is not required to set up individual cron jobs for each subsite.
+if ( is_multisite() && is_main_site() && ! \Groundhogg\get_url_var( 'process_queue' ) ) {
+
+	$requests = [];
+
+	/**
+	 * Build a multi request object (faster and better performance + callbacks) for each sub site
+	 *
+	 * @var $blog WP_Site
+	 */
+	foreach ( get_sites() as $blog ) {
+
+		$request = [
+			'type' => 'GET',
+			'url'  => $blog->siteurl . '/gh-cron.php?process_queue=1',
+		];
+
+		$requests[] = $request;
+	}
+
+	while ( ! empty( $requests ) ) {
+		Requests::request_multiple( array_splice( $requests, 0, GH_MS_CRON_CONCURRENCY ) );
+	}
+
+} // Single site do the cron
+else {
+	do_action( 'groundhogg_process_queue' );
+}
 
 die();
