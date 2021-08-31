@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.8
 Requires PHP: 7.1
-Stable tag: 2.5.2
+Stable tag: 2.5.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -320,6 +320,11 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.5.3 (2021-08-31) =
+* TWEAKED gh-cron.php file when setup on multisite network will automatically ping all the subsites.
+* FIXED Super admin role not respected in JS userHasCap check.
+* FIXED Contacts being added to template sites in WPUltimo when they should not be.
 
 = 2.5.2 (2021-08-23) =
 * ADDED Developer filter `groundhogg/should_convert_user_to_contact_when_user_registered` to prevent adding new users as contacts.

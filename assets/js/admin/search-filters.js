@@ -933,9 +933,12 @@
       tags: []
     },
     preload: ({ tags }) => {
-      return TagsStore.fetchItems({
-        tag_id: tags
-      })
+
+      if (!TagsStore.hasItems(tags)) {
+        return TagsStore.fetchItems({
+          tag_id: tags
+        })
+      }
     }
   })
 

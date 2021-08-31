@@ -463,6 +463,15 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Update the gh-cron file to support subsites.
+	 */
+	public function version_2_5_3() {
+		if ( gh_cron_installed() ) {
+			install_gh_cron_file();
+		}
+	}
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -514,6 +523,7 @@ class Main_Updater extends Updater {
 			'2.4.7.3',
 			'2.5',
 			'2.5.1.3',
+			'2.5.3',
 		];
 	}
 
@@ -541,6 +551,7 @@ class Main_Updater extends Updater {
 			'2.4.7.1',
 			'2.5',
 			'2.5.1.3',
+			'2.5.3',
 		];
 	}
 
@@ -586,6 +597,7 @@ class Main_Updater extends Updater {
 			'2.4.7.3'       => __( 'Fix birthday date formatting.', 'groundhogg' ),
 			'2.5'           => __( 'Add additional capabilities for admins and marketers. Update database tables and replace wp_login activity names in the activity table.', 'groundhogg' ),
 			'2.5.1.3'       => __( 'Use TINYINT(1) instead of BIT(1)', 'groundhogg' ),
+			'2.5.3'         => __( 'Update the gh-cron.php file to support subsites on multisite networks.', 'groundhogg' ),
 		];
 	}
 }
