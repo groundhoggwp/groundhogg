@@ -627,7 +627,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 		$steps = [];
 
-		if ( $raw_steps ){
+		if ( $raw_steps ) {
 			foreach ( $raw_steps as $raw_step ) {
 				$step = new Step( absint( $raw_step->ID ) );
 
@@ -695,6 +695,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	            'width'              => 600,
 	            'footer'             => 'true',
 	            'preventSave'        => 'true',
+	            'data-step'          => $step->get_id(),
             ] );
             ?>
             </span>

@@ -22,9 +22,9 @@ class Scripts {
 		add_action( 'wp_after_admin_bar_render', [ $this, 'toolbar_scripts' ] );
 	}
 
-	public function toolbar_scripts(){
+	public function toolbar_scripts() {
 
-		if ( is_admin_bar_widget_disabled() ){
+		if ( is_admin_bar_widget_disabled() ) {
 			return;
 		}
 
@@ -450,7 +450,9 @@ class Scripts {
 				'home'  => home_url(),
 			],
 			'rawStepTypes'    => Plugin::instance()->step_manager->get_elements(),
-			'currentUser'     => wp_get_current_user()
+			'currentUser'     => wp_get_current_user(),
+			'isMultisite'     => is_multisite(),
+			'isSuperAdmin'    => is_super_admin(),
 		] );
 
 		wp_register_script( 'groundhogg-admin-fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );

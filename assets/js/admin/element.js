@@ -343,10 +343,6 @@
         progress = progress * 100
       }
 
-      if (progress > 100) {
-        progress = 100
-      }
-
       if (progress === 100) {
         $bar.addClass('complete')
       } else {
@@ -511,14 +507,14 @@
   }
 
   const Elements = {
-    toggle ({ id, name, className, value = '1', onLabel = '', offLabel = '', checked }) {
+    toggle ({ id, name, className, value = '1', onLabel = 'on', offLabel = 'off', checked }) {
       //language=HTML
       return `
 		  <label class="gh-switch ${className}">
 			  <input id="${id}" name="${name}" value="${value}" type="checkbox" ${checked ? 'checked' : ''}>
 			  <span class="slider round"></span>
-			  <span class="on">${onLabel || _x('ON', 'toggle switch', 'groundhogg')}</span>
-			  <span class="off">${offLabel || _x('OFF', 'toggle switch', 'groundhogg')}</span>
+			  <span class="on">${onLabel}</span>
+			  <span class="off">${offLabel}</span>
 		  </label>`
     },
     input (props) {
@@ -973,7 +969,7 @@
     groups = {},
     filterOption = (option, search) => option.match(regexp(search)),
     renderOption = (option) => option,
-    noOptions = `No options...`,
+    noOptions = __( 'No options...', 'groundhogg' ),
     onSelect = (option) => console.log(option),
     onClose = () => {},
     onOpen = () => {}
@@ -1150,10 +1146,10 @@
         onClose()
       }
 
-      $(`${selector} input.search-for-options`).on('change input', function (e) {
+      $(`${selector} input.search-for-options`).on('input', function (e) {
         self.search = $(this).val()
-        self.focusedOptionId = false
-        self.previousFocusedOptionId = false
+        self.focusedOptionId = -1
+        self.previousFocusedOptionId = -1
         self.mountOptions()
       }).focus()
 
@@ -1461,32 +1457,6 @@
     $menu.focus()
   }
 
-  const buttonToggle = (el, {
-    options = [],
-    active = '',
-    onSelect = (key) => {}
-  }) => {
-
-    // language=HTML
-    const html = `
-		<div class="gh-button-group">
-			${options.map(({
-				key,
-				label
-			}) => `<button class="gh-button-toggle-item small gh-button icon ${key === active ? 'primary' : 'secondary'}" data-key="${key}">${label}</button>`).join('')}
-		</div>`
-
-    const $el = $(el)
-
-    $el.html(html)
-
-    $el.on('click', '.gh-button-toggle-item', (e) => {
-      onSelect(e.target.dataset.key)
-      $el.find('.primary').removeClass('primary').addClass('secondary')
-      $(e.target).addClass('primary').removeClass('secondary')
-    })
-  }
-
   const uniqid = () => {
     return Date.now()
   }
@@ -1537,13 +1507,6 @@
 			      d="M511 317a105.1 105.1 0 00-183-70.3 225.9 225.9 0 00-34.6-14.3 126 126 0 10-135-.1A224 224 0 0067 287.9 223.5 223.5 0 001 447v50a15 15 0 0015 15h420a15 15 0 0015-15v-50c0-11.3-.9-22.6-2.6-34a105.1 105.1 0 0062.6-96zM130 126a96.1 96.1 0 01192 0 96.1 96.1 0 01-192 0zm291 321v35H31v-35c0-107.5 87.5-195 195-195 29.5 0 58.6 6.8 85.2 19.8a105.1 105.1 0 00108 149.3c1.2 8.7 1.8 17.3 1.8 25.9zm6.7-58.2c-.4 0-.7.2-1.1.3A74.7 74.7 0 01331 317a75 75 0 1196.7 71.8z"/>
 			<path fill="currentColor"
 			      d="M436 302h-15v-15a15 15 0 00-30 0v15h-15a15 15 0 000 30h15v15a15 15 0 0030 0v-15h15a15 15 0 000-30z"/>
-		</svg>`,
-    // language=html
-    filter: `
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 972 972">
-			<defs/>
-			<path fill="currentColor"
-			      d="M370.2 459.3a60 60 0 0115.8 40.6v442a30 30 0 0051.1 21.4L560.4 822c16.5-19.8 25.6-29.6 25.6-49.2V500c0-15 5.7-29.5 15.8-40.6L955.6 75.5a45 45 0 00-33-75.5h-873a45 45 0 00-33.2 75.5l353.8 383.8z"/>
 		</svg>`,
     // language=html
     contactSearch: `
@@ -1630,6 +1593,20 @@
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="-21 -21 682 682.7">
 			<path fill="currentColor"
 			      d="M274.7 640c-20.1 0-39-7.8-53.1-22L22.2 418.3a75.1 75.1 0 010-106L291 43c27.7-27.7 64.5-43 103.8-43h170.5a75 75 0 0175 75v170c0 39.2-15.3 76-43 103.7L327.7 618.1a74.5 74.5 0 01-53 21.9zm120-590a96 96 0 00-68.3 28.4L57.6 347.7a25 25 0 000 35.3L257 582.7c4.7 4.7 11 7.3 17.7 7.3 6.6 0 13-2.6 17.6-7.3L562 313.4a96 96 0 0028.3-68.4V75a25 25 0 00-25-25zM459 253.8a75 75 0 11.2-150.2 75 75 0 01-.2 150.2zm0-100a25 25 0 100 50 25 25 0 000-50zm0 0"/>
+		</svg>`,
+    // language=HTML
+    groundhogg: `
+		<svg height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="11.4 13.2 212.1 237.9">
+			<linearGradient id="a" x1="35.6" x2="199.3" y1="214" y2="50.4" gradientUnits="userSpaceOnUse">
+				<stop offset="0.3" stop-color="#db851a"/>
+				<stop offset="1" stop-color="#db6f1a"/>
+			</linearGradient>
+			<path fill="url(#a)"
+			      d="M22.7 64.4l83.4-48.2c7-4 15.7-4 22.7 0l83.4 48.2c7 4 11.3 11.5 11.3 19.6v96.3c0 8.1-4.3 15.6-11.3 19.6l-83.4 48.2c-7 4-15.7 4-22.7 0L22.7 200c-7-4-11.3-11.5-11.3-19.6V84a22.5 22.5 0 0111.3-19.6z"/>
+			<path fill="#db5100"
+			      d="M183.5 140.8v4.9A66.1 66.1 0 11164 98.8l-24.5 24.3a31.4 31.4 0 103.6 40.9h-25.6v-23.3h66z"/>
+			<path fill="#fff"
+			      d="M183.5 126.1v4.9A66.1 66.1 0 11164 84.1l-24.5 24.3a31.4 31.4 0 103.6 40.9h-25.6V126h66z"/>
 		</svg>`,
     // language=html
     alignLeft: `
@@ -1724,8 +1701,7 @@
     tooltip,
     clickedIn,
     ordinal_suffix_of,
-    bold,
-    buttonToggle
+    bold
   }
 
 })(jQuery)

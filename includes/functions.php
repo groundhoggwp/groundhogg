@@ -1513,14 +1513,28 @@ function create_user_from_contact( $contact, $role = 'subscriber', $notification
 }
 
 /**
- * Provides a global hook not requireing the benchmark anymore.
+ * Provides a global hook not requiring the benchmark anymore.
  *
  * @param $userId int the Id of the user
  */
 function convert_user_to_contact_when_user_registered( $userId ) {
+
 	$user = get_userdata( $userId );
 
 	if ( ! $user || is_wp_error( $user ) ) {
+		return;
+	}
+
+	/**
+	 * Whether the new user should be automatically converted to a contact or not
+	 *
+	 * @param $should bool
+	 * @param $user_id int
+	 * @param $user \WP_User
+	 *
+	 * @return bool
+	 */
+	if ( ! apply_filters( 'groundhogg/should_convert_user_to_contact_when_user_registered', true, $userId, $user ) ){
 		return;
 	}
 
@@ -1657,27 +1671,28 @@ function sanitize_from_name( $name ) {
  * @param $contact Contact
  */
 function after_form_submit_handler( &$contact ) {
+
 	if ( ! $contact instanceof Contact ) {
 		return;
 	}
 
-	if ( $contact->update_meta( 'ip_address', Plugin::$instance->utils->location->get_real_ip() ) ) {
+	// Update their location based on the current IP address.
+	if ( apply_filters( 'groundhogg/should_extrapolate_location', true ) && $contact->update_meta( 'ip_address', utils()->location->get_real_ip() ) ) {
 		$contact->extrapolate_location();
 	}
 
 	if ( ! $contact->get_meta( 'lead_source' ) ) {
-		$contact->update_meta( 'lead_source', Plugin::$instance->tracking->get_leadsource() );
+		$contact->update_meta( 'lead_source', tracking()->get_leadsource() );
 	}
 
 	if ( ! $contact->get_meta( 'source_page' ) ) {
 		$contact->update_meta( 'source_page', wpgh_get_referer() );
 	}
 
+	// If they re-optin we will consider them unconfirmed
 	if ( ! $contact->is_marketable() ) {
 		$contact->change_marketing_preference( Preferences::UNCONFIRMED );
 	}
-
-	$contact->update_meta( 'last_optin', time() );
 
 	/**
 	 * Helper function.

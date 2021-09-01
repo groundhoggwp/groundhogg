@@ -6,9 +6,50 @@ class Plugin_Compatibility {
 
 	public function __construct() {
 //        add_action( 'current_screen', [ $this, 'remove_unwanted_actions_and_filters_from_editors' ], 999 );
+
+		// Material WP
 		add_action( 'admin_enqueue_scripts', [ $this, 'remove_styles_and_scripts_from_editors' ], 999 );
+
+		// MailHawk
 		add_action( 'mailhawk/bounced', [ $this, 'mailhawk_bounced' ], 10, 2 );
+
+		// BuddyBoss
 		add_filter( 'bp_core_wpsignup_redirect', [ $this, 'prevent_buddyboss_redirect' ], 99 );
+
+		// WPUltimo
+		add_filter( 'wu_signup_step_handler_create-account', [ $this, 'prevent_new_user_from_adding_contacts_to_template_site' ], 9 );
+	}
+
+	/**
+	 * WPUltimo will add the new user to the template site and then remove them after the fact, but this will add a new contact
+	 * To the template site which is then copied over. No good! We must remove the action which creates new contacts from registered users.
+	 * Aside: It is not clear how the new user is added to the template site... so we'll be blanket preventing it and add the contact to the main site after the fact.
+	 * Prevent by overriding the original handler with our new one.
+	 *
+	 * @param $handler callable
+	 *
+	 * @return callable
+	 */
+	public function prevent_new_user_from_adding_contacts_to_template_site( $handler ){
+
+		return function () use ( $handler ){
+
+			// Prevent new contacts from being added to the template sites
+			remove_action( 'user_register', [ Plugin::instance()->user_syncing, 'sync_new_user' ] );
+
+			// Add the new user as a contact to the main site.
+			add_action('wp_ultimo_registration', function ( $site_id, $user_id, $transient, $plan ){
+
+				if ( is_main_site() ){
+					create_contact_from_user( $user_id );
+				}
+
+			}, 10, 4 );
+
+			call_user_func( $handler );
+
+		};
+
 	}
 
 	/**

@@ -31,7 +31,7 @@
    * @param tags
    * @param getResults
    * @param getParams
-   * @param select2Opts
+   * @param select2opts
    * @returns {*|define.amd.jQuery}
    */
   function apiPicker (
@@ -40,14 +40,18 @@
     multiple = false,
     tags = false,
     getResults = (d) => d.results,
-    getParams = (p) => p,
-    select2Opts = {}
+    getParams = (q) => ({
+      ...q,
+      search: q.term
+    }),
+    select2opts = {}
   ) {
 
     return $(selector).select2({
       tags: tags,
       multiple: multiple,
       tokenSeparators: ['/', ',', ';'],
+      delay: 100,
       ajax: {
         url: endpoint,
         // delay: 250,
@@ -62,7 +66,7 @@
           }
         },
       },
-      ...select2Opts
+      ...select2opts
     })
   }
 
@@ -119,7 +123,7 @@
     })
   }
 
-  function metaPicker (selector, ) {
+  function metaPicker (selector,) {
     return $(selector).autocomplete({
       source: function (request, response) {
         $.ajax({
@@ -181,6 +185,32 @@
         return data.items.map(item => ({
           id: item.ID,
           text: `${item.data.tag_name}`
+        }))
+      },
+      (query) => {
+        return {
+          search: query.term,
+          limit: 50,
+        }
+      }, ...opts)
+  }
+
+  /**
+   * Api based contact picker
+   *
+   * @param selector
+   * @param onReceiveItems
+   * @param opts
+   */
+  function contactPicker (selector, onReceiveItems = (items) => {}, ...opts) {
+    return apiPicker(selector, gh.api.routes.v4.contacts, false, false,
+      (data) => {
+
+        onReceiveItems(data.items)
+
+        return data.items.map(item => ({
+          id: item.ID,
+          text: `${item.data.first_name} ${item.data.last_name} (${item.data.email})`
         }))
       },
       (query) => {
@@ -331,8 +361,10 @@
     emailPicker('.gh-email-picker', false)
     emailPicker('.gh-email-picker-multiple', true)
     apiPicker('.gh-sms-picker', endpoints.sms, false, false)
-    apiPicker('.gh-contact-picker', endpoints.contacts, false, false)
-    apiPicker('.gh-contact-picker-multiple', endpoints.contacts, true, false)
+    contactPicker('.gh-contact-picker')
+    contactPicker('.gh-contact-picker-multiple', (items) => {}, {
+      multiple: true
+    })
     apiPicker('.gh-benchmark-picker', endpoints.benchmarks, false, false)
     apiPicker('.gh-metakey-picker', endpoints.metakeys, false, false)
     linkPicker('.gh-link-picker')
@@ -371,7 +403,8 @@
     searchesPicker,
     funnelPicker,
     broadcastPicker,
-    metaValuePicker
+    metaValuePicker,
+    contactPicker,
   }
 
   // Map functions to Groundhogg object.
