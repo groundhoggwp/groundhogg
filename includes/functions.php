@@ -2282,7 +2282,7 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 	$contact->update( $args );
 
 	if ( $gdpr_consent ) {
-		$contact->set_gdpr_consent();
+		$contact->set_data_processing_consent();
 	}
 
 	if ( $marketing_consent ) {
@@ -2621,7 +2621,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 	}
 
 	if ( $gdpr_consent ) {
-		$contact->set_gdpr_consent();
+		$contact->set_data_processing_consent();
 	}
 
 	if ( $marketing_consent ) {

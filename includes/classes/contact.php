@@ -611,8 +611,6 @@ class Contact extends Base_Object_With_Meta {
 
 		if ( $updated && $preference_updated ) {
 
-			$this->update_meta( 'preferences_changed', time() );
-
 			/**
 			 * When the preference is updated
 			 *
@@ -1069,72 +1067,145 @@ class Contact extends Base_Object_With_Meta {
 		return true;
 	}
 
-	protected function set_compliance_and_date_meta( $id ) {
-		$this->update_meta( $id, 'yes' );
-		$this->update_meta( "{$id}_date", date_i18n( get_date_time_format() ) );
-	}
-
-	protected function has_compliance_and_date_meta( $id ) {
-		return $this->get_meta( $id ) === 'yes' && $this->get_meta( "{$id}_date" ) !== false;
-	}
-
-	protected function delete_compliance_and_date_meta( $id ) {
-		$this->delete_meta( $id );
-		$this->delete_meta( "{$id}_date" );
-	}
-
 	/**
 	 * Set various forms of GDPR consent
 	 *
 	 * @param string $type
+	 *
+	 * @deprecated 3.0
 	 */
 	public function set_gdpr_consent( $type = 'gdpr' ) {
-		// Either GDPR or MARKETING always
-		$type = $type === 'gdpr' ? 'gdpr' : 'marketing';
 
-		$this->set_compliance_and_date_meta( "{$type}_consent" );
+		_deprecated_function( 'set_gdpr_consent', '3.0', 'set_data_processing_consent' );
 
-		do_action( "groundhogg/contact/added_{$type}_consent", $this );
+		$this->set_data_processing_consent();
+
+		do_action_deprecated( "groundhogg/contact/added_gdpr_consent", [ $this ], '3.0', "groundhogg/contact/added_data_processing_consent" );
+	}
+
+	/**
+	 * Set the data processing consent
+	 */
+	public function set_data_processing_consent() {
+		$this->update( [
+			'data_processing_consent_date' => current_time( 'mysql' )
+		] );
+
+		do_action( "groundhogg/contact/added_data_processing_consent", $this );
 	}
 
 	/**
 	 * Set the marketing consent
 	 */
 	public function set_marketing_consent() {
-		$this->set_gdpr_consent( 'marketing' );
+		$this->update( [
+			'marketing_consent_date' => current_time( 'mysql' )
+		] );
+
+		do_action( "groundhogg/contact/added_marketing_consent", $this );
 	}
 
 	/**
 	 * Revoke various forms of GDPR consent
 	 *
 	 * @param string $type
+	 *
+	 * @deprecated 3.0
 	 */
 	public function revoke_gdpr_consent( $type = 'gdpr' ) {
-		// Either GDPR or MARKETING always
-		$type = $type === 'gdpr' ? 'gdpr' : 'marketing';
 
-		$this->delete_compliance_and_date_meta( "{$type}_consent" );
+		_deprecated_function( 'revoke_gdpr_consent', '3.0', 'revoke_data_processing_consent' );
 
-		do_action( "groundhogg/contact/revoked_{$type}_consent", $this );
+		$this->revoke_data_processing_consent();
+
+		do_action_deprecated( 'groundhogg/contact/revoked_gdpr_consent', [ $this ], '3.0', 'groundhogg/contact/revoked_data_processing_consent' );
+	}
+
+	/**
+	 * Revoke a contacts data processing consent
+	 */
+	public function revoke_data_processing_consent() {
+
+		$this->update( [
+			'data_processing_consent_date' => ''
+		] );
+
+		do_action( "groundhogg/contact/revoked_data_processing_consent", $this );
+	}
+
+	/**
+	 * Revoke a contacts marketing consent
+	 */
+	public function revoke_marketing_consent() {
+
+		$this->update( [
+			'marketing_consent_date' => ''
+		] );
+
+		do_action( "groundhogg/contact/revoked_marketing_consent", $this );
 	}
 
 	/**
 	 * @param string $type
 	 *
 	 * @return bool
+	 * @deprecated 3.0
 	 */
 	public function has_gdpr_consent( $type = 'gdpr' ) {
-		$type = $type === 'gdpr' ? 'gdpr' : 'marketing';
-
-		return $this->has_compliance_and_date_meta( "{$type}_consent" );
+		return $this->has_data_processing_consent();
 	}
 
 	/**
-	 * ahve the contact agree to the terms and conditions
+	 * Has the contact given marketing consent?
+	 *
+	 * @return bool
+	 */
+	public function has_marketing_consent() {
+		$consent_time = strtotime( $this->marketing_consent_date );
+		return apply_filters( 'groundhogg/contact/has_marketing_consent', ! empty( $consent_time ) && $consent_time < time(), $this );
+	}
+
+	/**
+	 * Has the contact given data processing consent?
+	 *
+	 * @return bool
+	 */
+	public function has_data_processing_consent() {
+		$consent_time = strtotime( $this->data_processing_consent_date );
+		return apply_filters( 'groundhogg/contact/has_data_processing_consent', ! empty( $consent_time ) && $consent_time < time(), $this );
+	}
+
+	/**
+	 * Have the contact agree to the terms and conditions
 	 */
 	public function set_terms_agreement() {
-		$this->set_compliance_and_date_meta( 'terms_agreement' );
+		$this->update( [
+			'terms_agreement_date' => current_time( 'mysql' )
+		] );
 
 		do_action( "groundhogg/contact/agreed_to_terms", $this );
+	}
+
+	/**
+	 * Has the contact agreed to the terms and conditions?
+	 *
+	 * @return bool
+	 */
+	public function has_agreed_to_terms(){
+		$consent_time = strtotime( $this->terms_agreement_date );
+		return apply_filters( 'groundhogg/contact/has_agreed_to_terms', ! empty( $consent_time ) && $consent_time < time(), $this );
+	}
+
+	/**
+	 * In the event of a profile erasure request anonymize any data about the contact.
+	 *
+	 * - hash First/Last/Email
+	 * - Change status to 'anonymous'
+	 * - Erase any associated email logs
+	 * -
+	 */
+	public function anonymize() {
+
+
 	}
 }

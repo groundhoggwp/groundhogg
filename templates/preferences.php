@@ -286,15 +286,15 @@ switch ( $action ):
 			$marketing_consent  = get_post_var( 'marketing_consent' );
 
 			if ( $processing_consent !== 'yes' ) {
-				$contact->revoke_gdpr_consent();
+				$contact->revoke_data_processing_consent();
 			} else {
-				$contact->set_gdpr_consent();
+				$contact->set_data_processing_consent();
 			}
 
 			if ( $marketing_consent !== 'yes' ) {
-				$contact->revoke_gdpr_consent( 'marketing' );
+				$contact->revoke_marketing_consent();
 			} else {
-				$contact->set_gdpr_consent( 'marketing' );
+				$contact->set_marketing_consent();
 			}
 
 		}

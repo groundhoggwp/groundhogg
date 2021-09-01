@@ -441,7 +441,7 @@ class Contacts extends DB {
 		optin_status int unsigned NOT NULL,
 		primary_phone varchar(15) NOT NULL,
 		primary_phone_extension varchar(15) NOT NULL,
-		mobile_phone varchar(10) NOT NULL,
+		mobile_phone varchar(15) NOT NULL,
 		ip_address varchar(15) NOT NULL,
 		date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		date_optin_status_changed datetime DEFAULT '0000-00-00 00:00:00' NOxT NULL,

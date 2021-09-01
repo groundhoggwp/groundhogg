@@ -318,7 +318,7 @@ class Submission_Handler extends Supports_Errors {
 		}
 
 		if ( get_post_var( 'gdpr_consent' ) ) {
-			$contact->set_gdpr_consent();
+			$contact->set_data_processing_consent();
 		}
 
 		if ( get_post_var( 'terms_agreement' ) ) {

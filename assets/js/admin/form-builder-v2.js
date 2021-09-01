@@ -333,7 +333,7 @@
       type: 'phoneType',
       edit ({ phone_type = 'primary' }) {
         //language=HTML
-        return `<label for="phone-type">Phone Type</label>
+        return `<label for="phone-type">${_x('Phone Type', 'form field setting', 'groundhogg')}</label>
 		<div class="setting">${select({
 			id: 'phone-type',
 			name: 'phone_type',
@@ -376,6 +376,33 @@
         $('#column-width').on('change', (e) => {
           updateField({
             column_width: e.target.value
+          })
+        })
+      }
+    },
+    fileTypes: {
+      type: 'fileTypes',
+      edit: ({ file_types }) => {
+        // language=HTML
+        return `<div>
+            <label>${_x('Restrict file types', 'groundhogg')}</label>
+            ${select({
+                name: 'file-types',
+                id: 'file-types',
+                multiple: true
+            }, [
+	            { text: 'jpeg', value: 'jpeg' },
+	            { text: 'png', value: 'png' },
+	            { text: 'pdf', value: 'pdf' },
+	            { text: 'doc', value: 'doc' },
+	            { text: 'docx', value: 'docx' },
+            ], file_types )}
+        </div>`
+      },
+      onMount: (field, updateField) => {
+        $('#file-types').select2().on('change', (e) => {
+          updateField({
+            file_types: $(e.target).val()
           })
         })
       }
@@ -768,7 +795,7 @@
       })
     },
     time: {
-      name: 'Time',
+      name: _x( 'Time', 'form field', 'groundhogg' ),
       content: standardMetaContentSettings,
       advanced: standardAdvancedSettings,
       preview: (field) => fieldPreview({
@@ -776,7 +803,26 @@
         type: 'time',
       })
     },
-    file: {},
+    file: {
+      name: _x( 'File', 'form field', 'groundhogg' ),
+      content: [
+        Settings.type.type,
+        Settings.name.type,
+        Settings.required.type,
+        Settings.hideLabel.type,
+        Settings.label.type,
+        Settings.fileTypes.type,
+        Settings.columnWidth.type
+      ],
+      advanced: [
+        Settings.id.type,
+        Settings.className.type
+      ],
+      preview: (field) => fieldPreview({
+        ...field,
+        type: 'file',
+      })
+    },
   }
 
   const Templates = {

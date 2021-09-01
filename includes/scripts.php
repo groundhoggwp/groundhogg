@@ -406,6 +406,7 @@ class Scripts {
 		wp_localize_script( 'groundhogg-admin', 'Groundhogg', [
 			'locale'          => str_replace( '_', '-', get_locale() ),
 			'user_test_email' => get_user_test_email(),
+			'allowed_file_types' => get_allowed_mime_types(),
 			'api'             => [
 				'routes' => [
 					'v3' => [
