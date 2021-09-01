@@ -357,6 +357,23 @@ class Preferences {
 		return Plugin::$instance->settings->get_option( 'confirmation_grace_period', 14 );
 	}
 
+	protected static $min_grace_period_date;
+
+	/**
+	 * Gets the date for which unconfirmed contacts are no longer marketable.
+	 *
+	 * @return false|string
+	 */
+	public static function get_min_grace_period_date(){
+
+		if ( self::$min_grace_period_date ){
+			return self::$min_grace_period_date;
+		}
+
+		self::$min_grace_period_date = Ymd_His( strtotime( sprintf( '%s days ago', get_option( 'gh_confirmation_grace_period', 14 ) ) ) );
+
+		return self::$min_grace_period_date;
+	}
 
 	/**
 	 * Return whether the given contact is within the strict confirmation grace period

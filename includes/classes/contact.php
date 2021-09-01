@@ -297,21 +297,21 @@ class Contact extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_phone_number() {
-		return $this->get_meta( 'primary_phone' );
+		return $this->primary_phone;
 	}
 
 	/**
 	 * @return string
 	 */
 	public function get_mobile_number() {
-		return $this->get_meta( 'mobile_phone' );
+		return $this->mobile_phone;
 	}
 
 	/**
 	 * @return string
 	 */
 	public function get_phone_extension() {
-		return $this->get_meta( 'primary_phone_extension' );
+		return $this->primary_phone_extension;
 	}
 
 	/**
@@ -385,7 +385,38 @@ class Contact extends Base_Object_With_Meta {
 	 * @return bool
 	 */
 	public function is_marketable() {
-		return apply_filters( 'groundhogg/contact/is_marketable', Plugin::instance()->preferences->is_marketable( $this->ID ), $this );
+
+		/* check for strict GDPR settings */
+		if ( is_option_enabled( 'gh_enable_gdpr' ) && is_option_enabled( 'gh_strict_gdpr' ) ) {
+
+		} else {
+
+		}
+
+		switch ( $this->get_optin_status() ) {
+			default:
+			case Preferences::UNCONFIRMED:
+
+				// If strict email confirmation is required check to see if the last optin_status date change is bigger than the min grace period date
+				if ( is_option_enabled( 'gh_strict_confirmation' ) && $this->date_optin_status_changed < Preferences::get_min_grace_period_date() ) {
+					$is_marketable = false;
+				} else {
+					$is_marketable = true;
+				}
+				break;
+			case Preferences::CONFIRMED:
+				$is_marketable = true;
+				break;
+			case Preferences::SPAM;
+			case Preferences::COMPLAINED;
+			case Preferences::HARD_BOUNCE;
+			case Preferences::UNSUBSCRIBED:
+				$is_marketable = false;
+				break;
+		}
+
+
+		return apply_filters( 'groundhogg/contact/is_marketable', $is_marketable, $this );
 	}
 
 	/**

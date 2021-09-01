@@ -511,14 +511,14 @@
   }
 
   const Elements = {
-    toggle ({ id, name, className, value = '1', onLabel = 'on', offLabel = 'off', checked }) {
+    toggle ({ id, name, className, value = '1', onLabel = '', offLabel = '', checked }) {
       //language=HTML
       return `
 		  <label class="gh-switch ${className}">
 			  <input id="${id}" name="${name}" value="${value}" type="checkbox" ${checked ? 'checked' : ''}>
 			  <span class="slider round"></span>
-			  <span class="on">${onLabel}</span>
-			  <span class="off">${offLabel}</span>
+			  <span class="on">${onLabel || _x('ON', 'toggle switch', 'groundhogg')}</span>
+			  <span class="off">${offLabel || _x('OFF', 'toggle switch', 'groundhogg')}</span>
 		  </label>`
     },
     input (props) {
@@ -1665,10 +1665,11 @@
 		</svg>`,
     // language=HTML
     campaign: `
-	    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-		    <defs/>
-		    <path d="M432.7 80.3H303.1v-1A63.3 63.3 0 00240 16H94.3V15a15 15 0 00-30 0v482a15 15 0 0030 0V255h98.5v81.3a15 15 0 0015 15h225a15 15 0 0015-15v-241a15 15 0 00-15-15zM94.3 46.1h145.6a33.2 33.2 0 0133.2 33.2v155c-9.6-6-21-9.4-33.2-9.4H94.3zm145.6 275.2h-17.1V255h17.1a33.2 33.2 0 010 66.4zm177.8 0h-124c6-9.6 9.4-21 9.4-33.2V110.3h114.6z"/>
-	    </svg>`
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+			<defs/>
+			<path
+				d="M432.7 80.3H303.1v-1A63.3 63.3 0 00240 16H94.3V15a15 15 0 00-30 0v482a15 15 0 0030 0V255h98.5v81.3a15 15 0 0015 15h225a15 15 0 0015-15v-241a15 15 0 00-15-15zM94.3 46.1h145.6a33.2 33.2 0 0133.2 33.2v155c-9.6-6-21-9.4-33.2-9.4H94.3zm145.6 275.2h-17.1V255h17.1a33.2 33.2 0 010 66.4zm177.8 0h-124c6-9.6 9.4-21 9.4-33.2V110.3h114.6z"/>
+		</svg>`
 
   }
 

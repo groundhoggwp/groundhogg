@@ -466,24 +466,9 @@ class Main_Updater extends Updater {
 	 * Refactor notes db
 	 */
 	public function version_3_0() {
-
-		get_db('activity')->update([
-			'activity_type' => 'login'
-		], [
-			'activity_type' => 'wp_login'
-		]);
-
-		get_db('activity')->update([
-			'activity_type' => 'logout'
-		], [
-			'activity_type' => 'wp_logout'
-		]);
-
-		// For woocommerce, unable to see admin dashboard
-		wp_roles()->add_cap( 'marketer', 'manage_campaigns' );
-		wp_roles()->add_cap( 'marketer', 'export_funnels' );
-		wp_roles()->add_cap( 'administrator', 'manage_campaigns' );
-		wp_roles()->add_cap( 'administrator', 'export_funnels' );
+		Plugin::instance()->dbs->install_dbs();
+		$this->remember_version_update( '3.0' );
+		Plugin::instance()->bulk_jobs->upgrade_3_0->start();
 	}
 
 	/**
@@ -564,9 +549,9 @@ class Main_Updater extends Updater {
 			'2.3',
 			'2.4.7',
 			'2.4.7.1',
-			'3.0',
 			'2.5',
 			'2.5.1.3',
+			'3.0',
 		];
 	}
 
@@ -612,6 +597,7 @@ class Main_Updater extends Updater {
 			'2.4.7.3'       => __( 'Fix birthday date formatting.', 'groundhogg' ),
 			'2.5'           => __( 'Add additional capabilities for admins and marketers. Update database tables and replace wp_login activity names in the activity table.', 'groundhogg' ),
 			'2.5.1.3'       => __( 'Use TINYINT(1) instead of BIT(1)', 'groundhogg' ),
+			'3.0'           => __( 'Migrate contact meta to main contacts table.', 'groundhogg' ),
 		];
 	}
 }

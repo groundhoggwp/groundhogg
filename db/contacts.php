@@ -97,15 +97,22 @@ class Contacts extends DB {
 	 */
 	public function get_columns() {
 		return [
-			'ID'                        => '%d',
-			'email'                     => '%s',
-			'first_name'                => '%s',
-			'last_name'                 => '%s',
-			'user_id'                   => '%d',
-			'owner_id'                  => '%d',
-			'optin_status'              => '%d',
-			'date_created'              => '%s',
-			'date_optin_status_changed' => '%s',
+			'ID'                           => '%d',
+			'email'                        => '%s',
+			'first_name'                   => '%s',
+			'last_name'                    => '%s',
+			'user_id'                      => '%d',
+			'owner_id'                     => '%d',
+			'primary_phone'                => '%s',
+			'primary_phone_extension'      => '%s',
+			'mobile_phone'                 => '%s',
+			'ip_address'                   => '%s',
+			'optin_status'                 => '%d',
+			'date_created'                 => '%s',
+			'date_optin_status_changed'    => '%s',
+			'data_processing_consent_date' => '%s',
+			'marketing_consent_date'       => '%s',
+			'terms_agreement_date'         => '%s'
 		];
 	}
 
@@ -116,17 +123,24 @@ class Contacts extends DB {
 	 * @since   2.1
 	 */
 	public function get_column_defaults() {
-		return array(
-			'ID'                        => 0,
-			'email'                     => '',
-			'first_name'                => '',
-			'last_name'                 => '',
-			'user_id'                   => 0,
-			'owner_id'                  => get_primary_owner() ? get_primary_owner()->ID : false,
-			'optin_status'              => Preferences::UNCONFIRMED,
-			'date_created'              => current_time( 'mysql' ),
-			'date_optin_status_changed' => current_time( 'mysql' ),
-		);
+		return [
+			'ID'                           => 0,
+			'email'                        => '',
+			'first_name'                   => '',
+			'last_name'                    => '',
+			'user_id'                      => 0,
+			'owner_id'                     => get_primary_owner() ? get_primary_owner()->ID : false,
+			'primary_phone'                => '',
+			'primary_phone_extension'      => '',
+			'mobile_phone'                 => '',
+			'ip_address'                   => '',
+			'optin_status'                 => Preferences::UNCONFIRMED,
+			'date_created'                 => current_time( 'mysql' ),
+			'date_optin_status_changed'    => current_time( 'mysql' ),
+			'terms_agreement_date'         => '',
+			'data_processing_consent_date' => '',
+			'marketing_consent_date'       => ''
+		];
 	}
 
 	/**
@@ -135,20 +149,24 @@ class Contacts extends DB {
 	 * @access  public
 	 * @since   2.1
 	 */
-	public function add( $data = array() ) {
+	public function add( $data = [] ) {
 
 		$args = wp_parse_args(
 			$data,
 			$this->get_column_defaults()
 		);
 
-		if ( empty( $args['email'] ) ) {
+		$args = $this->sanitize_columns( $args );
+
+		// At least 1 contact method is required...
+		if ( ! isset_not_empty( $args, 'email' )
+		     && ! isset_not_empty( $args, 'mobile_phone' )
+		     && ! isset_not_empty( $args, 'primary_phone' ) ) {
 			return false;
 		}
 
-		$args = $this->sanitize_columns( $args );
-
-		if ( $this->exists( $args['email'], 'email' ) ) {
+		// If a contact with the email address already exists.
+		if ( isset_not_empty( $args, 'email' ) && $this->exists( $args['email'], 'email' ) ) {
 
 			// update an existing contact
 			$contact = $this->get_contact_by( 'email', $args['email'] );
@@ -156,9 +174,24 @@ class Contacts extends DB {
 			$contact_id = absint( $contact->ID );
 
 			$this->update( $contact_id, $data );
+
 			$result = $contact_id;
 
-		} else {
+		}
+		// If a contact with the same mobile phone number already exists.
+		// TODO Mobile phone number is not guaranteed unique and can be recycled... so there should be an option or filter for this...
+		else if ( isset_not_empty( $args, 'mobile_phone' ) && $this->exists( $args['mobile_phone'], 'mobile_phone' ) ) {
+
+			// update an existing contact
+			$contact = $this->get_contact_by( 'mobile_phone', $args['mobile_phone'] );
+
+			$contact_id = absint( $contact->ID );
+
+			$this->update( $contact_id, $data );
+
+			$result = $contact_id;
+		} // Otherwise just insert a new contact
+		else {
 			$result = $this->insert( $args );
 		}
 
@@ -183,6 +216,15 @@ class Contacts extends DB {
 			if ( $a_row_id !== $row_id ) {
 				// unset instead of return false;
 				unset( $data['email'] );
+			}
+		}
+		// Check for duplicate mobile phone number
+		// TODO Mobile phone number is not guaranteed unique and can be recycled... so there should be an option or filter for this...
+		else if ( isset_not_empty( $data, 'mobile_phone' ) && $this->exists( $data['mobile_phone'], 'mobile_phone' ) ) {
+			$a_row_id = absint( $this->get_contact_by( 'mobile_phone', $data['mobile_phone'] )->ID );
+			if ( $a_row_id !== $row_id ) {
+				// unset instead of return false;
+				unset( $data['mobile_phone'] );
 			}
 		}
 
@@ -397,13 +439,25 @@ class Contacts extends DB {
 		user_id bigint(20) unsigned NOT NULL,
 		owner_id bigint(20) unsigned NOT NULL,
 		optin_status int unsigned NOT NULL,
+		primary_phone varchar(15) NOT NULL,
+		primary_phone_extension varchar(15) NOT NULL,
+		mobile_phone varchar(10) NOT NULL,
+		ip_address varchar(15) NOT NULL,
 		date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-		date_optin_status_changed datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+		date_optin_status_changed datetime DEFAULT '0000-00-00 00:00:00' NOxT NULL,
+		data_processing_consent_date datetime NOT NULL,
+		marketing_consent_date datetime NOT NULL,
+		terms_agreement_date datetime NOT NULL,
 		PRIMARY KEY (ID),
-		UNIQUE KEY email (email),
+		KEY email (email),
 		KEY user (user_id),
 		KEY owner_id (owner_id),
+		KEY mobile_phone (mobile_phone),
+		KEY primary_phone (primary_phone),
 		KEY optin_status (optin_status),
+		KEY data_processing_consent_date (data_processing_consent_date),
+		KEY marketing_consent_date (marketing_consent_date),
+		KEY terms_agreement_date (terms_agreement_date),
 		KEY date_created (date_created),
 		KEY date_optin_status_changed (date_optin_status_changed)
 		) {$this->get_charset_collate()};";
@@ -437,6 +491,13 @@ class Contacts extends DB {
 				case 'owner_id':
 				case 'user_id':
 					$cols[ $key ] = absint( $val );
+					break;
+				case 'primary_phone':
+				case 'primary_phone_extension':
+				case 'mobile_phone':
+					$cols[ $key ] = preg_replace( '/[^0-9]/', '', $val );
+					break;
+				case 'ip_address':
 					break;
 			}
 

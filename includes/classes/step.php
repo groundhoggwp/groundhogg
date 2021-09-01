@@ -417,6 +417,15 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * Whether this step is an entry point in the funnel
+	 *
+	 * @return bool
+	 */
+	public function is_entry(){
+		return (bool) $this->is_entry;
+	}
+
+	/**
 	 * Whether the step starts a funnel
 	 *
 	 * @return bool
@@ -426,7 +435,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			return false;
 		}
 
-		if ( $this->get_order() === 1 ) {
+		if ( $this->get_order() === 1 || $this->is_entry() ) {
 			return true;
 		}
 

@@ -510,6 +510,10 @@
       return Object.assign({}, this.default, this[type])
     },
 
+    getTitle (step) {
+      return this.getType(step.data.step_type).title(step)
+    },
+
     /**
      * Merge PHP registered step types with JS registered steps
      */
@@ -1380,6 +1384,14 @@
 							: ''
 					}
 				</div>
+          <div class="row">
+              <p>${__( "Run in the contact's timezone?", 'groundhogg' )}
+              ${toggle({
+                  id: 'send_in_timezone',
+                  name: 'send_in_timezone',
+                  checked: send_in_timezone,
+              })}</p>
+          </div>
 			</div>`
       },
 
@@ -1392,6 +1404,12 @@
             })
           )
         }
+
+        $('#send_in_timezone').on('change',(e)=>{
+          updateStepMeta({
+            send_in_timezone: e.target.checked
+          })
+        })
 
         $('.select2')
           .select2({
@@ -1777,20 +1795,71 @@
 		  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 374.8 374.8">
 			  <defs/>
 			  <path fill="currentColor"
-				  d="M48.7 267.3a15 15 0 00-19.9-5.3L23 265a15 15 0 00-5.7 21 187 187 0 0029.7 37 15 15 0 0021.8-1l4.3-5a15 15 0 00-1-20.6c-9-8.7-16.8-18.5-23.4-29.2zM166 338.3c-12.5-1-24.8-3.4-36.7-7.3a15 15 0 00-18.7 8.7l-2.4 6.2a15 15 0 009.2 19.7 189.2 189.2 0 0047.5 9.2 15 15 0 0015-14.8v-6.6c.1-8-6-14.6-13.9-15.1zM285.2 312.6a15 15 0 00-20.5-2.6 150.4 150.4 0 01-32.7 18 15 15 0 00-8.7 18.7l2 6.3a15 15 0 0019.8 9.2 186.9 186.9 0 0041.5-22.9 15 15 0 002.8-21.6l-4.2-5.1zM346.1 214.6l-6.5-1.2a15 15 0 00-17.3 11.1c-3 12.3-7.6 24.2-13.5 35.2a15 15 0 005.3 20l5.6 3.4a15 15 0 0021-5.6c7.7-14 13.5-29 17.3-44.6a15 15 0 00-11.9-18.3zM338 170.9h6.7a15 15 0 0014.6-18.6A187.2 187.2 0 00100.7 15.7L89 4a9.8 9.8 0 00-16.2 4L48.6 85a9.8 9.8 0 0012.2 12.2L138 73.2a9.8 9.8 0 004-16.2l-13-13a149.5 149.5 0 01164 49 150.6 150.6 0 0130.3 65.7 15 15 0 0014.7 12.2z"/>
+			        d="M48.7 267.3a15 15 0 00-19.9-5.3L23 265a15 15 0 00-5.7 21 187 187 0 0029.7 37 15 15 0 0021.8-1l4.3-5a15 15 0 00-1-20.6c-9-8.7-16.8-18.5-23.4-29.2zM166 338.3c-12.5-1-24.8-3.4-36.7-7.3a15 15 0 00-18.7 8.7l-2.4 6.2a15 15 0 009.2 19.7 189.2 189.2 0 0047.5 9.2 15 15 0 0015-14.8v-6.6c.1-8-6-14.6-13.9-15.1zM285.2 312.6a15 15 0 00-20.5-2.6 150.4 150.4 0 01-32.7 18 15 15 0 00-8.7 18.7l2 6.3a15 15 0 0019.8 9.2 186.9 186.9 0 0041.5-22.9 15 15 0 002.8-21.6l-4.2-5.1zM346.1 214.6l-6.5-1.2a15 15 0 00-17.3 11.1c-3 12.3-7.6 24.2-13.5 35.2a15 15 0 005.3 20l5.6 3.4a15 15 0 0021-5.6c7.7-14 13.5-29 17.3-44.6a15 15 0 00-11.9-18.3zM338 170.9h6.7a15 15 0 0014.6-18.6A187.2 187.2 0 00100.7 15.7L89 4a9.8 9.8 0 00-16.2 4L48.6 85a9.8 9.8 0 0012.2 12.2L138 73.2a9.8 9.8 0 004-16.2l-13-13a149.5 149.5 0 01164 49 150.6 150.6 0 0130.3 65.7 15 15 0 0014.7 12.2z"/>
 		  </svg>`,
       defaults: {
         method: 'beginning'
       },
-      title: ({method = 'beginning'}) => {
+      title: ({ meta, data, ID }) => {
 
-        switch ( method ){
+        const { method = 'beginning', step_id = false } = meta
+        const { funnel_id } = data
+
+        switch (method) {
+          default:
           case 'beginning':
-            break;
-          case 'closest_benchmark':
-        }
+            return __('Restart <b>from the beginning</b>', 'groundhogg')
+          case 'selected':
 
-        return ``
+            if (!step_id) {
+              return __('Restart from a specific step', 'groundhogg')
+            }
+
+            return sprintf(__('Restart from %s', 'groundhogg'), StepTypes.getTitle(FunnelsStore.getSteps(funnel_id, true).find(s => s.ID == step_id)))
+        }
+      },
+      edit: ({ meta }) => {
+
+        const { method = 'beginning', step_id = false } = meta
+
+        // language=HTML
+        return `
+			<div class="panel">
+				<div class="row">
+					<label class="row-label">${__('Restart from...', 'groundhogg')}</label>
+					<div class="gh-input-group">
+						${select({
+							id: 'method',
+							name: 'method',
+						}, {
+							beginning: __('From the beginning', 'groundhogg'),
+							selected: __('From a previous step', 'groundhogg'),
+						}, method)}
+						${method === 'selected' ? select({
+							id: 'step_id',
+							name: 'step_id',
+						}, []) : ''}
+					</div>
+				</div>
+			</div>`
+      },
+      onMount: ({ data, meta }, updateStepMeta) => {
+
+        $('#method').on('change', (e) => {
+          updateStepMeta({
+            method: e.target.value
+          }, true)
+        })
+
+        stepTypeSelect('#step_id', {
+          funnel_id: parseInt(data.funnel_id),
+          selected: parseInt(meta.step_id),
+          group: 'action'
+        }).on('select2:select', ({ params }) => {
+          updateStepMeta({
+            step_id: parseInt(params.data.id)
+          })
+        })
       }
     }
   }
@@ -1798,7 +1867,8 @@
   const stepTypeSelect = (el, {
     funnel_id = null,
     edited = false,
-    selected = null
+    selected = null,
+    group = 'any'
   }) => {
 
     const select2Template = (step) => {
@@ -1824,7 +1894,7 @@
       placeholder: __('Select a step', 'groundhogg'),
       data: [
         { id: '', text: '' },
-        ...FunnelsStore.getSteps(funnel_id, edited).map(s => ({
+        ...FunnelsStore.getSteps(funnel_id, edited).filter(s => group === 'any' || s.data.step_group == group).map(s => ({
           ...s,
           selected: selected === s.ID,
           id: s.ID,

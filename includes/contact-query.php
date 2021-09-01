@@ -2061,11 +2061,18 @@ class Contact_Query {
 			'value'      => ''
 		] );
 
-		return self::filter_meta( [
-			'meta'    => $filter_vars['phone_type'] . '_phone',
-			'value'   => $filter_vars['value'],
-			'compare' => $filter_vars['compare']
-		], $query );
+		switch ( $filter_vars['phone_type'] ) {
+			case 'primary':
+			case 'mobile':
+				return self::generic_text_compare( "{$query->table_name}.{$filter_vars['phone_type']}_phone", $filter_vars['compare'], sanitize_phone_number( $filter_vars['value'] ) );
+			default:
+			case 'company':
+				return self::filter_meta( [
+					'meta'    => $filter_vars['phone_type'] . '_phone',
+					'value'   => sanitize_phone_number( $filter_vars['value'] ),
+					'compare' => $filter_vars['compare']
+				], $query );
+		}
 	}
 
 	/**

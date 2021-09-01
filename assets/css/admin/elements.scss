@@ -558,7 +558,7 @@ input.ui-autocomplete-input {
 
   > *:not(:first-child) {
 
-    .select2-selection{
+    .select2-selection {
       border-left: 0 !important;
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
@@ -720,14 +720,14 @@ p.error,
       cursor: pointer;
     }
 
-    svg{
+    svg {
       width: 20px;
       height: 20px;
     }
   }
 }
 
-.gh-button-toggle{
+.gh-button-toggle {
   display: flex;
 }
 
@@ -869,13 +869,13 @@ p.error,
   }
 }
 
-.gh-has-tooltip{
+.gh-has-tooltip {
 
   position: relative;
   box-sizing: border-box;
 
-  &:hover{
-    .gh-tooltip{
+  &:hover {
+    .gh-tooltip {
       display: block;
     }
   }
@@ -1009,8 +1009,8 @@ p.error,
   align-items: center;
 
   svg {
-      width: 25px;
-      height: 25px;
+    width: 25px;
+    height: 25px;
   }
 
   &.benchmark {
@@ -1025,13 +1025,13 @@ p.error,
     }
   }
 
-  .step-name{
+  .step-name {
     overflow: hidden;
     text-overflow: ellipsis;
   }
 }
 
-.select2-container .select2-selection--single{
+.select2-container .select2-selection--single {
   height: auto;
   min-height: 28px;
 }

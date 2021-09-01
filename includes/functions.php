@@ -244,7 +244,7 @@ function is_option_enabled( $option = '' ) {
 	 * @param $enabled bool
 	 * @param $option  string
 	 */
-	return apply_filters( 'groundhogg/io_option_enabled', is_array( $option ) && in_array( 'on', $option ), $option );
+	return apply_filters( 'groundhogg/is_option_enabled', is_array( $option ) && in_array( 'on', $option ), $option );
 }
 
 /**
@@ -2139,8 +2139,12 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 			case 'mobile_phone':
 			case 'primary_phone':
 			case 'primary_phone_extension':
+				$data[ $field ] = sanitize_phone_number( $value );
+				break;
 			case 'company_phone':
 			case 'company_phone_extension':
+				$meta[ $field ] = sanitize_phone_number( $value );
+				break;
 			case 'street_address_1' :
 			case 'street_address_2':
 			case 'city':
@@ -2446,8 +2450,12 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			case 'mobile_phone':
 			case 'primary_phone':
 			case 'primary_phone_extension':
+				$data[ $field ] = sanitize_phone_number( $value );
+				break;
 			case 'company_phone':
 			case 'company_phone_extension':
+				$meta[ $field ] = sanitize_phone_number( $value );
+				break;
 			case 'street_address_1' :
 			case 'street_address_2':
 			case 'city':
@@ -2623,9 +2631,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 	// update meta data
 	if ( ! empty( $meta ) ) {
-		foreach ( $meta as $key => $value ) {
-			$contact->update_meta( $key, $value );
-		}
+		$contact->update_meta( $meta );
 	}
 
 	if ( ! empty( $files ) ) {
@@ -2640,8 +2646,6 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			$contact->copy_file( $url );
 		}
 	}
-
-	$contact->update_meta( 'last_optin', time() );
 
 	/**
 	 * @param $contact Contact the contact record
@@ -3600,6 +3604,38 @@ function mobile_validator() {
 	}
 
 	return $groundhogg_mobile_validator;
+}
+
+/**
+ * Remove anything that isn't a number from the phone number string
+ *
+ * @param $phone
+ *
+ * @return array|string|string[]|null
+ */
+function sanitize_phone_number( $phone ) {
+	return preg_replace( '/[^0-9]/', '', $phone );
+}
+
+/**
+ * Format a phone number for display
+ *
+ * @param $phone
+ *
+ * @return mixed|string
+ */
+function format_phone_number( $phone ) {
+
+	switch ( strlen( $phone ) ) {
+		// Standard US 4164443396 => (416) 444-3396
+		case 10:
+			return sprintf( '(%1$s) %2$s-%3$s', substr( $phone, 0, 3 ), substr( $phone, 3, 3 ), substr( $phone, 6, 4 ) );
+		// Standard US with Country code 14164443396 => +1 (416) 444-3396
+		case 11:
+			return sprintf( '+%4$s (%1$s) %2$s-%3$s', substr( $phone, 1, 3 ), substr( $phone, 4, 3 ), substr( $phone, 7, 4 ), substr( $phone, 0, 1 ) );
+		default:
+			return $phone;
+	}
 }
 
 /**
@@ -4714,7 +4750,7 @@ function handle_ajax_meta_value_picker() {
 		wp_send_json_error();
 	}
 
-	$search = sanitize_text_field( get_post_var( 'term' ) );
+	$search   = sanitize_text_field( get_post_var( 'term' ) );
 	$meta_key = sanitize_text_field( get_post_var( 'meta_key' ) );
 
 	$table = get_db( 'contactmeta' );

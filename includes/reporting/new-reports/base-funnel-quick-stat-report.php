@@ -12,14 +12,14 @@ abstract class Base_Funnel_Quick_Stat_Report extends Base_Quick_Stat_Percent {
 	/**
 	 * The number of contacts which completed a step in the given time frame
 	 *
-	 * @param $step_id
+	 * @param $step_ids int[]
 	 *
 	 * @param int $start
 	 * @param int $end
 	 *
 	 * @return int
 	 */
-	protected function get_num_contacts_by_step( $step_id, $start = 0, $end = 0 ) {
+	protected function get_num_contacts_by_step( $step_ids, $start = 0, $end = 0 ) {
 
 		$start = $start ?: $this->start;
 		$end   = $end ?: $this->end;
@@ -27,7 +27,7 @@ abstract class Base_Funnel_Quick_Stat_Report extends Base_Quick_Stat_Percent {
 		return get_db( 'events' )->count( [
 			'where'  => [
 				'relationship' => "AND",
-				[ 'col' => 'step_id', 'val' => $step_id, 'compare' => '=' ],
+				[ 'col' => 'step_id', 'val' => $step_ids, 'compare' => 'IN' ],
 				[ 'col' => 'status', 'val' => 'complete', 'compare' => '=' ],
 				[ 'col' => 'time', 'val' => $start, 'compare' => '>=' ],
 				[ 'col' => 'time', 'val' => $end, 'compare' => '<=' ],

@@ -32,6 +32,7 @@ use Groundhogg\Plugin;
 use Groundhogg\Contact;
 use Groundhogg\Preferences;
 use function Groundhogg\sanitize_email_header;
+use function Groundhogg\sanitize_phone_number;
 use function Groundhogg\send_email_notification;
 use function Groundhogg\set_request_var;
 use function Groundhogg\validate_tags;
@@ -177,7 +178,7 @@ class Contacts_Page extends Admin_Page {
 					$saved_search = Saved_Searches::instance()->get( $saved_search );
 
 					// If the search does not have filters we need to migrate it
-					if ( ! isset_not_empty( $saved_search['query'], 'filters' ) ){
+					if ( ! isset_not_empty( $saved_search['query'], 'filters' ) ) {
 						$saved_search['query'] = [
 							'filters' => get_filters_from_old_query_vars( $saved_search['query'] )
 						];
@@ -485,32 +486,45 @@ class Contacts_Page extends Admin_Page {
 	 * Create a contact via the admin area
 	 */
 	public function process_add() {
+
 		if ( ! current_user_can( 'add_contacts' ) ) {
 			$this->wp_die_no_access();
 		}
 
 		do_action( 'groundhogg/admin/contacts/add/before' );
 
-		$_POST = wp_unslash( $_POST );
+		$args = [
+			'first_name'              => sanitize_text_field( get_post_var( 'first_name' ) ),
+			'last_name'               => sanitize_text_field( get_post_var( 'last_name' ) ),
+			'email'                   => sanitize_email( get_post_var( 'email' ) ),
+			'owner_id'                => absint( get_post_var( 'owner_id', get_current_user_id() ) ),
+			'user_id'                 => sanitize_text_field( get_post_var( 'mobile_phone' ) ),
+			'primary_phone'           => sanitize_phone_number( get_post_var( 'primary_phone' ) ),
+			'primary_phone_extension' => sanitize_phone_number( get_post_var( 'primary_phone_extension' ) ),
+			'mobile_phone'            => sanitize_phone_number( get_post_var( 'mobile_phone' ) ),
+		];
 
-		if ( ! get_request_var( 'email' ) ) {
-			return new \WP_Error( 'no_email', __( "Please enter a valid email address.", 'groundhogg' ) );
+		// At least 1 contact method is required...
+		if ( ! isset_not_empty( $args, 'email' )
+		     && ! isset_not_empty( $args, 'mobile_phone' )
+		     && ! isset_not_empty( $args, 'primary_phone' ) ) {
+			return new \WP_Error( 'no_contact_method', __( "At least one contact method is required.", 'groundhogg' ) );
 		}
 
-		$args['first_name'] = sanitize_text_field( get_post_var( 'first_name' ) );
-		$args['last_name']  = sanitize_text_field( get_post_var( 'last_name' ) );
-		$args['owner_id']   = absint( get_post_var( 'owner_id', get_current_user_id() ) );
-
-		$email = sanitize_email( get_post_var( 'email' ) );
-
-		if ( ! get_db( 'contacts' )->exists( $email ) ) {
-			$args['email'] = $email;
-		} else {
-			return new \WP_Error( 'email_exists', sprintf( _x( 'Sorry, the email %s already belongs to another contact.', 'page_title', 'groundhogg' ), $email ) );
+		// If an email address is provided
+		if ( isset_not_empty( $args, 'email' ) ) {
+			// Make sure it's valid
+			if ( ! is_email( $args['email'] ) ) {
+				return new \WP_Error( 'invalid_email', __( "Please enter a valid email address.", 'groundhogg' ) );
+			} // Make sure its unique
+			else if ( get_db( 'contacts' )->exists( $args['email'] ) ) {
+				return new \WP_Error( 'email_exists', sprintf( __( 'Sorry, the email %s already belongs to another contact.', 'groundhogg' ), $args['email'] ) );
+			}
 		}
 
-		if ( ! is_email( $email ) ) {
-			return new \WP_Error( 'invalid_email', __( "Please enter a valid email address.", 'groundhogg' ) );
+		// If an email address is provided
+		if ( isset_not_empty( $args, 'mobile_phone' ) && get_db( 'contacts' )->exists( $args['mobile_phone'], 'mobile_phone' ) ) {
+			return new \WP_Error( 'mobile_exists', sprintf( __( 'Sorry, the mobile number %s already belongs to another contact.', 'groundhogg' ), $args['mobile_number'] ) );
 		}
 
 		$contact = new Contact( $args );
@@ -519,11 +533,7 @@ class Contacts_Page extends Admin_Page {
 			return new \WP_Error( 'db_error', __( 'Could not add contact.', 'groundhogg' ) );
 		}
 
-		$contact->update_meta( 'mobile_phone', sanitize_text_field( get_post_var( 'mobile_phone' ) ) );
-		$contact->update_meta( 'primary_phone', sanitize_text_field( get_post_var( 'primary_phone' ) ) );
-		$contact->update_meta( 'primary_phone_extension', sanitize_text_field( get_post_var( 'primary_phone_extension' ) ) );
 		$contact->add_note( get_post_var( 'notes' ) );
-
 
 		if ( get_request_var( 'tags' ) ) {
 			$contact->add_tag( get_post_var( 'tags' ) );
@@ -670,30 +680,30 @@ class Contacts_Page extends Admin_Page {
 			}
 		}
 
-		$args = [];
+		$args = [
+			'first_name'              => sanitize_text_field( get_post_var( 'first_name' ) ),
+			'last_name'               => sanitize_text_field( get_post_var( 'last_name' ) ),
+			'email'                   => sanitize_email( get_post_var( 'email' ) ),
+			'owner_id'                => absint( get_post_var( 'owner_id', get_current_user_id() ) ),
+			'user_id'                 => sanitize_text_field( get_post_var( 'mobile_phone' ) ),
+			'primary_phone'           => sanitize_phone_number( get_post_var( 'primary_phone' ) ),
+			'primary_phone_extension' => sanitize_phone_number( get_post_var( 'primary_phone_extension' ) ),
+			'mobile_phone'            => sanitize_phone_number( get_post_var( 'mobile_phone' ) ),
+		];
 
-		$email = sanitize_email( get_request_var( 'email' ) );
-
-		//check if it's the current email address.
-		if ( $contact->get_email() !== $email ) {
-			if ( ! Plugin::$instance->dbs->get_db( 'contacts' )->exists( $email ) ) {
-				$args['email'] = $email;
-			} else {
-				$this->add_notice( new \WP_Error( 'email_exists', sprintf( _x( 'Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg' ), $email ) ) );
-			}
+		// Check if it's the current email address.
+		if ( $contact->get_email() !== $args['email'] && get_db( 'contacts' )->exists( $args['email'] ) ) {
+			$this->add_notice( new \WP_Error( 'email_exists', sprintf( __( 'Sorry, the email %s already belongs to another contact.', 'groundhogg' ), $args['email'] ) ) );
 		}
 
-		$args['first_name'] = sanitize_text_field( get_request_var( 'first_name' ) );
-		$args['last_name']  = sanitize_text_field( get_request_var( 'last_name' ) );
-		$args['owner_id']   = absint( get_request_var( 'owner_id' ) );
-		$args['user_id']    = absint( get_request_var( 'user', $contact->get_user_id() ) );
+		// Check if the mobile number is already used
+		if ( $contact->mobile_phone !== $args['mobile_phone'] && get_db( 'contacts' )->exists( $args['mobile_phone'], 'mobile_phone' ) ) {
+			$this->add_notice( new \WP_Error( 'mobile_exists', sprintf( __( 'Sorry, the mobile number %s already belongs to another contact.', 'groundhogg' ), $args['mobile_phone'] ) ) );
+		}
 
 		$contact->update( $args );
 
 		$basic_text_fields = [
-			'mobile_phone',
-			'primary_phone',
-			'primary_phone_extension',
 			'company_phone',
 			'company_phone_extension',
 			'company_name',

@@ -205,14 +205,15 @@ class Rewrites {
 				status_header( 200 );
 				nocache_headers();
 
-				$funnel_id = absint( Plugin::$instance->utils->encrypt_decrypt( get_query_var( 'enc_funnel_id' ), 'd' ) );
+				$funnel_id = absint( decrypt( get_query_var( 'enc_funnel_id' ) ) );
 				$funnel    = new Funnel( $funnel_id );
 
 				if ( ! $funnel->exists() ) {
 					wp_die( 'The requested funnel was not found.', 'Funnel not found.', [ 'status' => 404 ] );
 				}
 
-				if ( ! $funnel->is_sharing_enabled() && ! current_user_can( 'export_funnels' ) ){
+				// Non privileged users can export funnels if sharing is enabled.
+				if ( ! $funnel->is_sharing_enabled() && ! current_user_can( 'export_funnels' ) ) {
 					wp_die( 'Sharing is not enabled for this funnel.', 'Sharing disabled.', [ 'status' => 403 ] );
 				}
 
@@ -242,7 +243,7 @@ class Rewrites {
 					wp_die( 'The requested email was not found.', 'Email not found.', [ 'status' => 404 ] );
 				}
 
-				if ( ! $email->is_sharing_enabled() && ! current_user_can( 'export_emails' ) ){
+				if ( ! $email->is_sharing_enabled() && ! current_user_can( 'export_emails' ) ) {
 					wp_die( 'Sharing is not enabled for this email.', 'Sharing disabled.', [ 'status' => 403 ] );
 				}
 
@@ -320,23 +321,23 @@ class Rewrites {
 				break;
 			case 'auto_login':
 
-				$contact = get_contactdata( get_url_var( 'cid' ) );
+				$contact         = get_contactdata( get_url_var( 'cid' ) );
 				$permissions_key = get_permissions_key();
 
 				$target_fallback_page = get_option( 'gh_auto_login_fallback_page', home_url() );
-				$redirect_to = apply_filters( 'groundhogg/auto_login/redirect_to', get_url_var( 'redirect_to', $target_fallback_page ) );
+				$redirect_to          = apply_filters( 'groundhogg/auto_login/redirect_to', get_url_var( 'redirect_to', $target_fallback_page ) );
 
-				if ( ! is_user_logged_in() ){
+				if ( ! is_user_logged_in() ) {
 
 					// If the contact or permissions key is not available, checkout now.
-					if ( ! $contact || ! $permissions_key || ! check_permissions_key( $permissions_key, $contact, 'auto_login' ) ){
+					if ( ! $contact || ! $permissions_key || ! check_permissions_key( $permissions_key, $contact, 'auto_login' ) ) {
 						exit( wp_redirect( $redirect_to ) );
 					}
 
 					$user = $contact->get_userdata();
 
 					// If there is no user account, send to the home page
-					if ( ! $user ){
+					if ( ! $user ) {
 						exit( wp_redirect( $redirect_to ) );
 					}
 

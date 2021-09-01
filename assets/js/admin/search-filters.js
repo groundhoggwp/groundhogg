@@ -933,9 +933,11 @@
       tags: []
     },
     preload: ({ tags }) => {
-      return TagsStore.fetchItems({
-        tag_id: tags
-      })
+      if (!TagsStore.hasItems(tags)) {
+        return TagsStore.fetchItems({
+          tag_id: tags
+        })
+      }
     }
   })
 
@@ -1241,7 +1243,7 @@
       email_id: 0,
     },
     preload: ({ email_id }) => {
-      if (email_id) {
+      if (email_id && !EmailsStore.hasItem(email_id)) {
         return EmailsStore.fetchItem(email_id)
       }
     }
@@ -1311,7 +1313,7 @@
       email_id: 0,
     },
     preload: ({ email_id }) => {
-      if (email_id) {
+      if (email_id && !EmailsStore.hasItem(email_id)) {
         return EmailsStore.fetchItem(email_id)
       }
     }
@@ -1496,7 +1498,7 @@
       ...standardActivityDateDefaults,
     },
     preload: ({ funnel_id }) => {
-      if (funnel_id) {
+      if (funnel_id && !FunnelsStore.hasItem(funnel_id)) {
         return FunnelsStore.fetchItem(funnel_id)
       }
     }
@@ -1541,7 +1543,7 @@
       status: 'complete',
     },
     preload: ({ broadcast_id }) => {
-      if (broadcast_id) {
+      if (broadcast_id && ! BroadcastsStore.hasItem(broadcast_id)) {
         return BroadcastsStore.fetchItem(broadcast_id)
       }
     }
@@ -1582,7 +1584,7 @@
       broadcast_id: 0,
     },
     preload: ({ broadcast_id }) => {
-      if (broadcast_id) {
+      if (broadcast_id && ! BroadcastsStore.hasItem(broadcast_id)) {
         return BroadcastsStore.fetchItem(broadcast_id)
       }
     }
@@ -1650,7 +1652,7 @@
       broadcast_id: 0,
     },
     preload: ({ broadcast_id }) => {
-      if (broadcast_id) {
+      if (broadcast_id && ! BroadcastsStore.hasItem(broadcast_id)) {
         return BroadcastsStore.fetchItem(broadcast_id)
       }
     }

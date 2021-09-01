@@ -6,6 +6,7 @@ use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\array_map_with_keys;
 use function Groundhogg\dashicon_e;
+use function Groundhogg\format_phone_number;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_cookie;
 use function Groundhogg\get_date_time_format;
@@ -86,7 +87,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 			</div>
 			<?php if ( $contact->get_phone_number() ): ?>
 				<div
-					class="phone"><?php dashicon_e( 'phone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_phone_number() ], $contact->get_phone_number() ) ?>
+					class="phone"><?php dashicon_e( 'phone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_phone_number() ], format_phone_number( $contact->get_phone_number() ) ) ?>
 					<?php if ( $contact->get_phone_extension() ): ?>
 						<span
 							class="extension"><?php printf( __( 'ext. %s', 'groundhogg' ), $contact->get_phone_extension() ) ?></span>
@@ -95,7 +96,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 			<?php endif; ?>
 			<?php if ( $contact->get_mobile_number() ): ?>
 				<div class="mobile"><?php dashicon_e( 'smartphone' ); ?>
-					<?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_mobile_number() ], $contact->get_mobile_number() ) ?>
+					<?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_mobile_number() ], format_phone_number( $contact->get_mobile_number() ) ) ?>
 				</div>
 			<?php endif; ?>
 			<?php if ( count( $contact->get_address() ) > 0 ): ?>
@@ -124,8 +125,9 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 				foreach ( array_splice( $tags, 0, 10 ) as $tag ):
 					$tag = new Tag( $tag ) ?><span
 					class="tag"><?php esc_html_e( $tag->get_name() ); ?></span><?php endforeach; ?>
-				<?php if ( count( $tags ) > 0 ):  ?>
-					<a href="javascript:void(0)" id="view-more-tags"><?php printf( __( 'and %s more...', 'groundhogg' ), count( $tags ) ); ?></a>
+				<?php if ( count( $tags ) > 0 ): ?>
+					<a href="javascript:void(0)"
+					   id="view-more-tags"><?php printf( __( 'and %s more...', 'groundhogg' ), count( $tags ) ); ?></a>
 				<?php endif; ?>
 			</span>
 		</div>
@@ -278,7 +280,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'class' => 'input',
 						'id'    => 'primary_phone',
 						'name'  => 'primary_phone',
-						'value' => $contact->get_meta( 'primary_phone' ),
+						'value' => $contact->primary_phone,
 					);
 					echo html()->input( $args ); ?>
 					<?php _e( 'ext.', 'groundhogg' ) ?>
@@ -286,7 +288,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'id'    => 'primary_phone_extension',
 						'name'  => 'primary_phone_extension',
 						'class' => 'phone-ext',
-						'value' => $contact->get_meta( 'primary_phone_extension' ),
+						'value' => $contact->primary_phone_extension,
 					);
 					echo html()->input( $args ); ?>
 				</td>
@@ -300,7 +302,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						'class' => 'input',
 						'id'    => 'mobile_phone',
 						'name'  => 'mobile_phone',
-						'value' => $contact->get_meta( 'mobile_phone' ),
+						'value' => $contact->mobile_phone,
 					);
 					echo html()->input( $args ); ?>
 				</td>
