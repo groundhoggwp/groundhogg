@@ -3,6 +3,7 @@
 namespace Groundhogg;
 
 use Groundhogg\Classes\Activity;
+use Groundhogg\Classes\Page_Visit;
 use Groundhogg\Lib\Mobile\Iso3166;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
@@ -1528,13 +1529,13 @@ function convert_user_to_contact_when_user_registered( $userId ) {
 	/**
 	 * Whether the new user should be automatically converted to a contact or not
 	 *
-	 * @param $should bool
+	 * @param $should  bool
 	 * @param $user_id int
-	 * @param $user \WP_User
+	 * @param $user    \WP_User
 	 *
 	 * @return bool
 	 */
-	if ( ! apply_filters( 'groundhogg/should_convert_user_to_contact_when_user_registered', true, $userId, $user ) ){
+	if ( ! apply_filters( 'groundhogg/should_convert_user_to_contact_when_user_registered', true, $userId, $user ) ) {
 		return;
 	}
 
@@ -1692,6 +1693,27 @@ function after_form_submit_handler( &$contact ) {
 	// If they re-optin we will consider them unconfirmed
 	if ( ! $contact->is_marketable() ) {
 		$contact->change_marketing_preference( Preferences::UNCONFIRMED );
+	}
+
+	// Track any non logged page visits for the new contact
+	$pages_visited = get_cookie( Tracking::PAGE_VISITS_COOKIE );
+
+//	var_dump( $pages_visited );
+//	die();
+
+	if ( ! empty( $pages_visited ) ) {
+		$pages_visited = json_decode( stripslashes( $pages_visited ), true );
+
+//		var_dump( $pages_visited );
+//		die();
+
+		foreach ( $pages_visited['pagesAndTimes'] as $visit ) {
+			if ( ! $visit['tracked'] ) {
+				track_page_visit( $visit[ 'page' ], $contact, [
+					'timestamp' => absint( $visit['time'] )
+				] );
+			}
+		}
 	}
 
 	/**
@@ -4565,6 +4587,38 @@ function fix_nested_p( $content ) {
 }
 
 /**
+ * Track a page visit
+ *
+ * @param       $ref     string a URL
+ * @param       $contact Contact
+ * @param array $override
+ */
+function track_page_visit( $ref, $contact, $override = [] ) {
+	$path     = sanitize_text_field( parse_url( $ref, PHP_URL_PATH ) );
+	$query    = sanitize_text_field( parse_url( $ref, PHP_URL_QUERY ) );
+	$fragment = sanitize_text_field( parse_url( $ref, PHP_URL_FRAGMENT ) );
+
+	$visit = get_db( 'page_visits' )->add( array_merge( [
+		'contact_id' => $contact->get_id(),
+		'path'       => $path,
+		'query'      => $query,
+		'fragment'   => $fragment,
+	], $override ) );
+
+	$visit = new Page_Visit( $visit );
+
+	/**
+	 * Runs when a page visit is tracked
+	 *
+	 * @param $visit   Page_Visit
+	 * @param $contact Contact
+	 */
+	do_action( 'groundhogg/tracking/page_visit', $visit, $contact );
+
+	return $visit;
+}
+
+/**
  * Track activity that happens on site caused by a human.
  * Use the tracking cookie to populate the main arguments.
  *
@@ -4729,7 +4783,7 @@ function handle_ajax_meta_value_picker() {
 		wp_send_json_error();
 	}
 
-	$search = sanitize_text_field( get_post_var( 'term' ) );
+	$search   = sanitize_text_field( get_post_var( 'term' ) );
 	$meta_key = sanitize_text_field( get_post_var( 'meta_key' ) );
 
 	$table = get_db( 'contactmeta' );
@@ -5089,6 +5143,8 @@ function uninstall_groundhogg() {
 	wp_clear_scheduled_hook( Bounce_Checker::ACTION );
 	wp_clear_scheduled_hook( Stats_Collection::ACTION );
 	wp_clear_scheduled_hook( 'groundhogg/sending_service/verify_domain' );
+	wp_clear_scheduled_hook( 'gh_purge_page_visits' );
+	wp_clear_scheduled_hook( 'gh_purge_old_email_logs' );
 
 	//delete api keys from user_meta
 	delete_metadata( 'user', 0, 'wpgh_user_public_key', '', true );
@@ -5678,4 +5734,26 @@ function get_filters_from_old_query_vars( $query = [] ) {
  */
 function is_admin_bar_widget_disabled() {
 	return apply_filters( 'groundhogg/is_admin_bar_widget_disabled', is_option_enabled( 'gh_is_admin_bar_widget_disabled' ) );
+}
+
+/**
+ * Ipplodes a string list surrounded by quotes, useful for SQL queries.
+ *
+ * @param $items
+ *
+ * @return string
+ */
+function implode_in_quotes( $items ) {
+	return implode( ',', array_map( function ( $item ) {
+		return "'$item'";
+	}, $items ) );
+}
+
+/**
+ * Get the current visitors IP address
+ *
+ * @return string
+ */
+function get_current_ip_address() {
+	return utils()->location->get_real_ip();
 }

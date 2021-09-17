@@ -74,6 +74,7 @@ class Manager {
 		$this->event_queue          = new Event_Queue();
 		$this->campaigns            = new Campaigns();
 		$this->object_relationships = new Object_Relationships();
+		$this->page_visits          = new Page_Visits();
 
 		/**
 		 * Runs when the DB Manager is setup and all the standard DBs have been initialized.

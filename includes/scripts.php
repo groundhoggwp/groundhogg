@@ -77,11 +77,12 @@ class Scripts {
 			// This will come from the advanced features plugin
 			'tracked_pages_regex'      => str_replace( '/', '\/', get_option( 'gh_tracked_pages_regex', '' ) ),
 			'base_url'                 => untrailingslashit( home_url() ),
-			'form_impression_endpoint' => rest_url( 'gh/v3/tracking/form-impression/' ),
-			'page_view_endpoint'       => rest_url( 'gh/v3/tracking/page-view/' ),
+			'form_impression_endpoint' => rest_url( 'gh/v4/tracking/forms/' ),
+			'page_view_endpoint'       => rest_url( 'gh/v4/tracking/pages/' ),
 			'form_submission_endpoint' => rest_url( 'gh/v3/forms/submit/' ),
 			'ajaxurl'                  => admin_url( 'admin-ajax.php' ),
 			'_wpnonce'                 => wp_create_nonce( 'wp_rest' ),
+			'_wprest'                  => wp_create_nonce( 'wp_rest' ),
 			'_ghnonce'                 => wp_create_nonce( 'groundhogg_frontend' ),
 			'cookies'                  => [
 				'tracking'         => Tracking::TRACKING_COOKIE,

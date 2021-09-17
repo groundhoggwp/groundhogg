@@ -1199,7 +1199,58 @@
     }
   })
 
-//filter by Email Opened
+  //filter by Email Opened
+  registerFilter('email_received', 'activity', __('Email Received', 'groundhogg'), {
+    view ({ email_id, date_range, before, after }) {
+      const emailName = email_id ? EmailsStore.get(email_id).data.title : 'any email'
+      return standardActivityDateTitle(sprintf(_x('Received %s', '%s is an email', 'groundhogg'), `<b>${emailName}</b>`), {
+        date_range,
+        before,
+        after
+      })
+    },
+    edit ({ email_id, date_range, before, after }) {
+
+      const pickerOptions = email_id ? {
+        [email_id]: EmailsStore.get(email_id).data.title
+      } : {}
+
+      // language=html
+      return `
+		  ${select({
+			  id: 'filter-email',
+			  name: 'email_id',
+		  }, pickerOptions, email_id)}
+
+		  ${standardActivityDateOptions({
+			  date_range, after, before
+		  })}`
+    },
+    onMount (filter, updateFilter) {
+      emailPicker('#filter-email', false, (items) => {
+        EmailsStore.itemsFetched(items)
+      }, {}, {
+        placeholder: __('Please select an email or leave blank for any email', 'groundhogg')
+      }).on('change', (e) => {
+        updateFilter({
+          email_id: parseInt(e.target.value)
+        })
+      })
+
+      standardActivityDateFilterOnMount(filter, updateFilter)
+    },
+    defaults: {
+      ...standardActivityDateDefaults,
+      email_id: 0,
+    },
+    preload: ({ email_id }) => {
+      if (email_id) {
+        return EmailsStore.fetchItem(email_id)
+      }
+    }
+  })
+
+  //filter by Email Opened
   registerFilter('email_opened', 'activity', __('Email Opened', 'groundhogg'), {
     view ({ email_id, date_range, before, after }) {
       const emailName = email_id ? EmailsStore.get(email_id).data.title : 'any email'
@@ -1337,6 +1388,59 @@
     defaults: {
       ...standardActivityDateDefaults,
     }
+  })
+
+  //filter by Email Opened
+  registerFilter('page_visited', 'activity', __('Page Visited', 'groundhogg'), {
+    view ({ link, date_range, before, after }) {
+
+      let prefix;
+
+      if ( link ){
+        const url = new URL( link )
+
+        prefix = sprintf(__('Visited %s', 'groundhogg'), bold(url.pathname ))
+      } else {
+        prefix = __( 'Visited <b>any page</b>', 'groundhogg' )
+      }
+
+      return standardActivityDateTitle(prefix, {
+        date_range,
+        before,
+        after
+      })
+    },
+    edit ({ link, date_range, before, after }) {
+
+      // language=html
+      return `
+
+		  ${input({
+			  id: 'filter-link',
+			  name: 'link',
+			  autocomplete: 'off',
+			  value: link,
+			  placeholder: __('Start typing to select a link or leave blank for any link', 'groundhogg')
+		  })}
+
+		  ${standardActivityDateOptions({
+			  date_range, before, after
+		  })}`
+    },
+    onMount (filter, updateFilter) {
+
+      linkPicker('#filter-link').on('change input blur', ({ target }) => {
+        updateFilter({
+          link: target.value
+        })
+      })
+
+      standardActivityDateFilterOnMount(filter, updateFilter)
+    },
+    defaults: {
+      ...standardActivityDateDefaults,
+      link: '',
+    },
   })
 
 //filter by User Logged In

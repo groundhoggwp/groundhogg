@@ -380,7 +380,7 @@ class Contact_Query {
 		}
 
 		// Only show contacts associated with the current owner...
-		if ( ! current_user_can( 'view_all_contacts' ) ) {
+		if ( current_user_can( 'view_contacts' ) && ! current_user_can( 'view_all_contacts' ) ) {
 			$this->query_vars['owner'] = get_current_user_id();
 		}
 
@@ -491,7 +491,9 @@ class Contact_Query {
 		 * @since 2.8
 		 *
 		 */
-		do_action_ref_array( 'gh_parse_contact_query', array( &$this ) );
+		do_action_ref_array( 'gh_parse_contact_query', [ &$this ] );
+		do_action_ref_array( 'groundhogg/contact_query/parse_query', [ &$this ] );
+
 	}
 
 	/**
@@ -510,12 +512,12 @@ class Contact_Query {
 		/**
 		 * Fires before contacts are retrieved.
 		 *
-		 * @param Contact_Query &$this Current instance of WPGH_Contact_Query, passed by reference.
+		 * @param Contact_Query &$this Current instance of Contact_Query, passed by reference.
 		 *
-		 * @since 2.8
-		 *
+		 * @deprecated
 		 */
-		do_action_ref_array( 'gh_pre_get_contacts', array( &$this ) );
+		do_action_ref_array( 'gh_pre_get_contacts', [ &$this ] );
+		do_action_ref_array( 'groundhogg/contact_query/pre_get_contacts', [ &$this ] );
 
 		// $args can include anything. Only use the args defined in the query_var_defaults to compute the key.
 		$key = md5( serialize( wp_array_slice_assoc( $this->query_vars, array_keys( $this->query_var_defaults ) ) ) );
@@ -762,7 +764,8 @@ class Contact_Query {
 		}
 
 		if ( $this->query_vars['owner'] ) {
-			$where['owner'] = "$this->table_name.owner_id IN ( {$this->query_vars['owner']} )";
+			$this->query_vars['owner'] = wp_parse_id_list( $this->query_vars['owner'] );
+			$where['owner']            = "$this->table_name.owner_id IN ( {$this->query_vars['owner']} )";
 		}
 
 		if ( $this->query_vars['report'] && is_array( $this->query_vars['report'] ) ) {
@@ -921,7 +924,13 @@ class Contact_Query {
 			$where['date_optin_status_changed'] = $date_optin_status_changed_query->get_sql();
 		}
 
-		return $where;
+		/**
+		 * Filter the where clauses
+		 *
+		 * @param $where array
+		 * @param $query Contact_Query
+		 */
+		return apply_filters( 'groundhogg/contact_query/where_clauses', $where, $this );
 	}
 
 	/**
@@ -1382,6 +1391,21 @@ class Contact_Query {
 		);
 
 		self::register_filter(
+			'email_received',
+			[ self::class, 'filter_email_received' ]
+		);
+
+		self::register_filter(
+			'email_opened',
+			[ self::class, 'filter_email_opened' ]
+		);
+
+		self::register_filter(
+			'email_link_clicked',
+			[ self::class, 'filter_email_link_clicked' ]
+		);
+
+		self::register_filter(
 			'logged_in',
 			[ self::class, 'filter_logged_in' ]
 		);
@@ -1421,9 +1445,45 @@ class Contact_Query {
 			[ self::class, 'filter_user_meta' ]
 		);
 
+		self::register_filter(
+			'page_visited',
+			[ self::class, 'filter_page_visited' ]
+		);
 
 	}
 
+	/**
+	 * Filter by page visit history
+	 *
+	 * @param $filter
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_page_visited( $filter, $query ) {
+		$filter_vars = wp_parse_args( $filter, [
+			'link' => '',
+		] );
+
+		$path = parse_url( $filter_vars['link'], PHP_URL_PATH );
+
+		$ba = self::get_before_and_after_from_filter_date_range( $filter_vars );
+
+		if ( ! empty( $path ) ){
+			$ba['path'] = $path;
+		}
+
+		return self::filter_by_page_visits( $ba, $query );
+	}
+
+	/**
+	 * Filter by user meta
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
 	public static function filter_user_meta( $filter_vars, $query ) {
 
 		$filter_vars = wp_parse_args( $filter_vars, [
@@ -1441,6 +1501,14 @@ class Contact_Query {
 		return "{$query->table_name}.user_id IN ( select {$meta_table_name}.user_id FROM {$meta_table_name} WHERE {$clause1} AND {$clause2} ) ";
 	}
 
+	/**
+	 * Filter by user role
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
 	public static function filter_user_role_is( $filter_vars, $query ) {
 
 		global $wpdb;
@@ -1555,6 +1623,78 @@ class Contact_Query {
 	}
 
 	/**
+	 * Filter by email recieved
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_email_received( $filter_vars, $query ) {
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'email_id' => 0,
+		] );
+
+		$before_and_after = self::get_before_and_after_from_filter_date_range( $filter_vars, true );
+
+		$event_query = array_filter( array_merge( [
+			'email_id' => $filter_vars['email_id'],
+			'status'   => Event::COMPLETE,
+		], $before_and_after ) );
+
+		return self::filter_by_events( $event_query, $query );
+	}
+
+	/**
+	 * Email opened
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_email_opened( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'email_id' => 0,
+		] );
+
+		$before_and_after = self::get_before_and_after_from_filter_date_range( $filter_vars, true );
+
+		$event_query = array_filter( array_merge( [
+			'activity_type' => Activity::EMAIL_OPENED,
+			'email_id'      => $filter_vars['email_id'],
+		], $before_and_after ) );
+
+		return self::filter_by_activity( $event_query, $query );
+	}
+
+	/**
+	 * Broadcast link clicked
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_email_link_clicked( $filter_vars, $query ) {
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'email_id' => 0,
+			'link'     => ''
+		] );
+
+		$before_and_after = self::get_before_and_after_from_filter_date_range( $filter_vars, true );
+
+		$event_query = array_filter( array_merge( [
+			'activity_type' => Activity::EMAIL_OPENED,
+			'email_id'      => $filter_vars['email_id'],
+			'referer'       => $filter_vars['link']
+		], $before_and_after ) );
+
+		return self::filter_by_activity( $event_query, $query );
+	}
+
+	/**
 	 * Broadcast link clicked
 	 *
 	 * @param $filter_vars
@@ -1574,6 +1714,7 @@ class Contact_Query {
 			'step_id'       => $filter_vars['broadcast_id'],
 			'referer'       => $filter_vars['link']
 		] );
+
 
 		return self::filter_by_activity( $event_query, $query );
 	}
@@ -1885,6 +2026,53 @@ class Contact_Query {
 		}
 
 		$sql = get_db( 'activity' )->get_sql( [
+			'where'   => $subwhere,
+			'select'  => 'contact_id',
+			'orderby' => false,
+			'order'   => ''
+		] );
+
+		$in = isset_not_empty( $activity_query, 'exclude' ) ? 'NOT IN' : 'IN';
+
+		return "$query->table_name.$query->primary_key $in ( $sql )";
+	}
+
+	/**
+	 * Wrapper function to filter by events easily
+	 *
+	 * @param $activity_query
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_by_page_visits( $activity_query, $query ) {
+
+		$subwhere = [ 'relationship' => 'AND' ];
+
+		$activity_query = wp_parse_args( $activity_query, [
+
+		] );
+
+		foreach ( $activity_query as $col => $val ) {
+
+			if ( ! empty( $val ) ) {
+				switch ( $col ) {
+					default:
+						$subwhere[] = [ 'col' => $col, 'compare' => '=', 'val' => $val ];
+						break;
+					case 'before':
+						$subwhere[] = [ 'col' => 'timestamp', 'compare' => '<=', 'val' => $val ];
+						break;
+					case 'after':
+						$subwhere[] = [ 'col' => 'timestamp', 'compare' => '>=', 'val' => $val ];
+						break;
+					case 'exclude':
+						break;
+				}
+			}
+		}
+
+		$sql = get_db( 'page_visits' )->get_sql( [
 			'where'   => $subwhere,
 			'select'  => 'contact_id',
 			'orderby' => false,

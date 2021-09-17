@@ -28,7 +28,7 @@ class Reports_Api extends Base_Api {
 			[
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => [ $this, 'read_single' ],
-				// 'permissions_callback' => [ $this, 'read_permissions_callback' ],
+				 'permissions_callback' => [ $this, 'read_permissions_callback' ],
 			],
 		] );
 	}

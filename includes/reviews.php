@@ -18,7 +18,7 @@ class Reviews {
 		}
 
 		$message = sprintf(
-			esc_html__( 'Is Groundhogg working for you? Show your appreciation by leaving a %s review! %s | %s | %s', 'groundhogg' ),
+			esc_html__( 'Is Groundhogg working for you? Show your appreciation by leaving a %1$s review! %2$s | %3$s | %4$s', 'groundhogg' ),
 			'&#x2B50;&#x2B50;&#x2B50;&#x2B50;&#x2B50;',
 			html()->e( 'a', [
 				'class' => '',

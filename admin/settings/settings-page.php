@@ -360,6 +360,11 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Misc Settings', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
 			),
+			'page_tracking'             => array(
+				'id'    => 'page_tracking',
+				'title' => _x( 'Page Tracking', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'misc'
+			),
 			'wp_cron'               => [
 				'id'    => 'wp_cron',
 				'title' => _x( 'WP Cron', 'settings_sections', 'groundhogg' ),
@@ -1201,13 +1206,13 @@ class Settings_Page extends Admin_Page {
 				'label'   => _x( 'Enable Email Logging', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'This will have Groundhogg save all emails sent to the database for a period of time. Useful for debugging or verifying someone received an email.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
-				'atts'    => array(
+				'atts'    => [
 					'label' => __( 'Enable' ),
 					//keep brackets for backwards compat
 					'name'  => 'gh_log_emails',
 					'id'    => 'gh_log_emails',
 					'value' => 'on',
-				),
+				],
 			),
 			'gh_email_log_retention'                 => [
 				'id'      => 'gh_email_log_retention',
@@ -1215,41 +1220,41 @@ class Settings_Page extends Admin_Page {
 				'label'   => _x( 'Email Log Retention', 'settings', 'groundhogg' ),
 				'desc'    => sprintf( _x( 'The number of days to retain logged emails. Logs older then <code>%d</code> days will be deleted.', 'settings', 'groundhogg' ), get_option( 'gh_email_log_retention' ) ?: 14 ),
 				'type'    => 'input',
-				'atts'    => array(
+				'atts'    => [
 					'type'        => 'number',
 					'min'         => 0,
 					'class'       => 'input',
 					'name'        => 'gh_email_log_retention',
 					'id'          => 'gh_email_log_retention',
 					'placeholder' => 14,
-				),
+				],
 			],
-			'gh_enable_one_click_unsubscribe'        => array(
+			'gh_enable_one_click_unsubscribe'        => [
 				'id'      => 'gh_enable_one_click_unsubscribe',
 				'section' => 'unsubscribe',
 				'label'   => _x( 'Enable One-Click Unsubscribe', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'When contacts click the unsubscribe link in emails they will be instantly unsubscribed rather than required to unsubscribe in the email preferences area.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
-				'atts'    => array(
+				'atts'    => [
 					'label' => __( 'Enable' ),
 					'name'  => 'gh_enable_one_click_unsubscribe',
 					'id'    => 'gh_enable_one_click_unsubscribe',
 					'value' => 'on',
-				),
-			),
-			'gh_disable_unsubscribe_header'          => array(
+				],
+			],
+			'gh_disable_unsubscribe_header'          => [
 				'id'      => 'gh_disable_unsubscribe_header',
 				'section' => 'unsubscribe',
 				'label'   => _x( 'Disable the Unsubscribe header.', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'The unsubscribe header is recommended for promotional emails and will improve deliverability among large email senders. Disabling it may result in your email going to spam.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
-				'atts'    => array(
+				'atts'    => [
 					'label' => __( 'Disable' ),
 					'name'  => 'gh_disable_unsubscribe_header',
 					'id'    => 'gh_disable_unsubscribe_header',
 					'value' => 'on',
-				),
-			),
+				],
+			],
 			'gh_disable_wp_cron'                     => [
 				'id'      => 'gh_disable_wp_cron',
 				'section' => 'wp_cron',
@@ -1266,7 +1271,35 @@ class Settings_Page extends Admin_Page {
 					'disabled' => defined( 'DISABLE_WP_CRON' ) && ! defined( 'GH_SHOW_DISABLE_WP_CRON_OPTION' ),
 					'checked'  => defined( 'DISABLE_WP_CRON' ),
 				],
-			]
+			],
+			'gh_purge_page_visits'                     => [
+				'id'      => 'gh_purge_page_visits',
+				'section' => 'page_tracking',
+				'label'   => _x( 'Delete Old Page Visit Logs (recommended)', 'settings', 'groundhogg' ),
+				'desc'    => __( 'To preserve storage in the database and overall performance it is recommended to delete old page visit logs.', 'groundhogg' ) ,
+				'type'    => 'checkbox',
+				'atts'    => [
+					'label'    => __( 'Enable' ),
+					'name'     => 'gh_purge_page_visits',
+					'id'       => 'gh_purge_page_visits',
+					'value'    => 'on',
+				],
+			],
+			'gh_page_visits_log_retention'                 => [
+				'id'      => 'gh_page_visits_log_retention',
+				'section' => 'page_tracking',
+				'label'   => _x( 'Log Retention', 'settings', 'groundhogg' ),
+				'desc'    => sprintf( _x( 'The number of days to retain logged page visits. Logs older then <code>%d</code> days will be deleted.', 'settings', 'groundhogg' ), get_option( 'gh_page_visits_log_retention' ) ?: 90 ),
+				'type'    => 'input',
+				'atts'    => [
+					'type'        => 'number',
+					'min'         => 0,
+					'class'       => 'input',
+					'name'        => 'gh_page_visits_log_retention',
+					'id'          => 'gh_page_visits_log_retention',
+					'placeholder' => 90,
+				],
+			],
 		);
 
 		return apply_filters( 'groundhogg/admin/settings/settings', $settings );

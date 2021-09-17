@@ -27,6 +27,7 @@ class Tracking {
 	 */
 	const TRACKING_COOKIE = 'groundhogg-tracking';
 	const LEAD_SOURCE_COOKIE = 'groundhogg-lead-source';
+	const PAGE_VISITS_COOKIE = 'groundhogg-page-visits';
 	const FORM_IMPRESSIONS_COOKIE = 'groundhogg-form-impressions';
 
 	/**
