@@ -1677,43 +1677,9 @@ function after_form_submit_handler( &$contact ) {
 		return;
 	}
 
-	// Update their location based on the current IP address.
-	if ( apply_filters( 'groundhogg/should_extrapolate_location', true ) && $contact->update_meta( 'ip_address', utils()->location->get_real_ip() ) ) {
-		$contact->extrapolate_location();
-	}
-
-	if ( ! $contact->get_meta( 'lead_source' ) ) {
-		$contact->update_meta( 'lead_source', tracking()->get_leadsource() );
-	}
-
-	if ( ! $contact->get_meta( 'source_page' ) ) {
-		$contact->update_meta( 'source_page', wpgh_get_referer() );
-	}
-
 	// If they re-optin we will consider them unconfirmed
 	if ( ! $contact->is_marketable() ) {
 		$contact->change_marketing_preference( Preferences::UNCONFIRMED );
-	}
-
-	// Track any non logged page visits for the new contact
-	$pages_visited = get_cookie( Tracking::PAGE_VISITS_COOKIE );
-
-//	var_dump( $pages_visited );
-//	die();
-
-	if ( ! empty( $pages_visited ) ) {
-		$pages_visited = json_decode( stripslashes( $pages_visited ), true );
-
-//		var_dump( $pages_visited );
-//		die();
-
-		foreach ( $pages_visited['pagesAndTimes'] as $visit ) {
-			if ( ! $visit['tracked'] ) {
-				track_page_visit( $visit[ 'page' ], $contact, [
-					'timestamp' => absint( $visit['time'] )
-				] );
-			}
-		}
 	}
 
 	/**
@@ -1722,6 +1688,76 @@ function after_form_submit_handler( &$contact ) {
 	 * @param $contact Contact
 	 */
 	do_action( 'groundhogg/after_form_submit', $contact );
+}
+
+add_action( 'groundhogg/after_form_submit', __NAMESPACE__ . '\extrapolate_location_after_signup', 9 );
+
+/**
+ * Get the location of a contact record when they signup
+ *
+ * @param $contact Contact
+ */
+function extrapolate_location_after_signup( $contact ) {
+	// Update their location based on the current IP address.
+	if ( apply_filters( 'groundhogg/should_extrapolate_location', true ) && $contact->update_meta( 'ip_address', utils()->location->get_real_ip() ) ) {
+		$contact->extrapolate_location();
+	}
+}
+
+add_action( 'groundhogg/after_form_submit', __NAMESPACE__ . '\save_source_page_after_signup', 9 );
+
+/**
+ * Save the source page if one is not set already
+ *
+ * @param $contact Contact
+ */
+function save_source_page_after_signup( $contact ) {
+	if ( ! $contact->get_meta( 'source_page' ) ) {
+		$contact->update_meta( 'source_page', wpgh_get_referer() );
+	}
+}
+
+add_action( 'groundhogg/after_form_submit', __NAMESPACE__ . '\save_lead_source_after_signup', 9 );
+
+/**
+ * Save the leadsource if one is not set already
+ *
+ * @param $contact Contact
+ */
+function save_lead_source_after_signup( $contact ) {
+	if ( ! $contact->get_meta( 'lead_source' ) ) {
+		$contact->update_meta( 'lead_source', tracking()->get_leadsource() );
+	}
+}
+
+add_action( 'groundhogg/after_form_submit', __NAMESPACE__ . '\track_page_visits_after_signup', 9 );
+
+/**
+ * Track any non-tracked page visits for a contact record when they first sign up
+ *
+ * Do not use to track page visits manually, use track_page_visit instead
+ *
+ * @param $contact Contact
+ */
+function track_page_visits_after_signup( $contact ) {
+
+	// Track any non logged page visits for the new contact
+	$pages_visited = get_cookie( Tracking::PAGE_VISITS_COOKIE );
+
+	if ( ! empty( $pages_visited ) ) {
+		$pages_visited = json_decode( stripslashes( $pages_visited ), true );
+
+		foreach ( $pages_visited['pagesAndTimes'] as $visit ) {
+			if ( ! $visit['tracked'] ) {
+				track_page_visit( $visit['page'], $contact, [
+					'timestamp' => absint( $visit['time'] )
+				] );
+			}
+		}
+	}
+
+	// Delete the cookie and clear the results.
+	delete_cookie( Tracking::PAGE_VISITS_COOKIE );
 }
 
 /**
@@ -5775,6 +5811,6 @@ function collapse_string( $str, $size = 30 ) {
 	$before = ( $size / 2 ) - 1;
 	$after  = ( $size / 2 ) - 2;
 
-	return sprintf( '%s...%s', substr( $str, 0, $before ), substr( $str, -$after, $after ) );
+	return sprintf( '%s...%s', substr( $str, 0, $before ), substr( $str, - $after, $after ) );
 
 }
