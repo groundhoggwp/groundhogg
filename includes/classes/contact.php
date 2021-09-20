@@ -546,7 +546,13 @@ class Contact extends Base_Object_With_Meta {
 	 */
 	public function has_tag( $tag_id_or_name ) {
 		if ( ! is_numeric( $tag_id_or_name ) ) {
-			$tag    = (object) $this->get_tags_db()->get_tag_by( 'tag_slug', sanitize_title( $tag_id_or_name ) );
+			$tag    = $this->get_tags_db()->get_tag_by( 'tag_slug', sanitize_title( $tag_id_or_name ) );
+
+			// Tag does not exist
+			if ( ! $tag ){
+				return false;
+			}
+
 			$tag_id = absint( $tag->tag_id );
 		} else {
 			$tag_id = absint( $tag_id_or_name );
@@ -579,8 +585,6 @@ class Contact extends Base_Object_With_Meta {
 		$updated = parent::update( $data );
 
 		if ( $updated && $preference_updated ) {
-
-			$this->update_meta( 'preferences_changed', time() );
 
 			/**
 			 * When the preference is updated

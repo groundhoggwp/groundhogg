@@ -64,4 +64,8 @@ $cur_date = $page_visit->get_date();
 	</div>
 </div><?php
 
+} else {
+	?>
+<p><?php _e( 'No tracked site activity yet.', 'groundhogg' ); ?></p>
+<?php
 }

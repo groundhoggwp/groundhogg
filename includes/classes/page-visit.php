@@ -69,15 +69,6 @@ class Page_Visit extends Base_Object {
 	 * @return DB
 	 */
 	protected function get_db() {
-		return get_db( 'activity' );
-	}
-
-	/**
-	 * Return a META DB instance associated with items of this type.
-	 *
-	 * @return Meta_DB
-	 */
-	protected function get_meta_db() {
-		return get_db( 'activitymeta' );
+		return get_db( 'page_visits' );
 	}
 }

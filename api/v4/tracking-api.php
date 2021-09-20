@@ -26,9 +26,7 @@ class Tracking_Api extends Base_Api {
 		register_rest_route( self::NAME_SPACE, '/tracking/pages', [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
-				'permission_callback' => function ( WP_REST_Request $request ) {
-					return true; // todo change this
-				},
+				'permission_callback' => '__return_true',
 				'callback'            => [ $this, 'page_view' ],
 			]
 		] );
@@ -36,16 +34,8 @@ class Tracking_Api extends Base_Api {
 		register_rest_route( self::NAME_SPACE, '/tracking/forms', [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
+				'permission_callback' => '__return_true',
 				'callback'            => [ $this, 'form_impression' ],
-				'permission_callback' => function ( WP_REST_Request $request ) {
-					return wp_verify_nonce( $request->get_param( '_ghnonce' ), 'groundhogg_frontend' );
-				},
-				'args'                => [
-					'_ghnonce' => [
-						'description' => 'Need this!',
-						'required'    => true
-					]
-				]
 			]
 		] );
 	}
@@ -117,7 +107,7 @@ class Tracking_Api extends Base_Api {
 
 		if ( ! in_array( $ID, $impressions ) || ! $ip_address ) {
 			get_db( 'form_impressions' )->add( [ 'form_id' => $ID, 'ip_address' => $ip_address ] );
-			do_action( 'groundhogg/api/v3/tracking/form-impression' );
+			do_action( 'groundhogg/api/v4/tracking/form-impression' );
 		}
 
 		return self::SUCCESS_RESPONSE();

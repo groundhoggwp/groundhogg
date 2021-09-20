@@ -321,6 +321,11 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 2.5.4 (2021-09-20) =
+* ADDED All new site activity tracking system! See which pages your contacts visit the most.
+* FIXED PHP notices when creating a new group in BuddyBoss.
+* FIXED Spanish translations causing PHP notice for missing `sprintf` arguments.
+
 = 2.5.3 (2021-08-31) =
 * TWEAKED gh-cron.php file when setup on multisite network will automatically ping all the subsites.
 * FIXED Super admin role not respected in JS userHasCap check.
