@@ -5757,3 +5757,24 @@ function implode_in_quotes( $items ) {
 function get_current_ip_address() {
 	return utils()->location->get_real_ip();
 }
+
+/**
+ * Collapse long strings into shorter ones by replacing the middle with "..."
+ *
+ * @param     $str
+ * @param int $size
+ *
+ * @return mixed|string
+ */
+function collapse_string( $str, $size = 30 ) {
+
+	if ( strlen( $str ) <= $size ) {
+		return $str;
+	}
+
+	$before = ( $size / 2 ) - 1;
+	$after  = ( $size / 2 ) - 2;
+
+	return sprintf( '%s...%s', substr( $str, 0, $before ), substr( $str, -$after, $after ) );
+
+}

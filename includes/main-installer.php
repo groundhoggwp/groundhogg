@@ -54,7 +54,13 @@ class Main_Installer extends Installer {
 		// Store previous updates
 		Plugin::instance()->updater->save_previous_updates_when_installed();
 
-		create_contact_from_user();
+		// Make sure the current user installing is added to the contacts
+		$contact = create_contact_from_user();
+
+		// Make sure their email is auto confirmed.
+		if ( is_a_contact( $contact ) ){
+			$contact->change_marketing_preference( Preferences::CONFIRMED );
+		}
 	}
 
 	public function get_display_name() {

@@ -7,8 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Groundhogg\Classes\Page_Visit;
-use Groundhogg\Contact;
 use Groundhogg\Tracking;
 use function Groundhogg\get_cookie;
 use function Groundhogg\get_current_contact;
@@ -26,7 +24,7 @@ class Tracking_Api extends Base_Api {
 		register_rest_route( self::NAME_SPACE, '/tracking/pages', [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
-				'permission_callback' => '__return_true',
+				'permission_callback' => [ $this, 'is_real_request' ],
 				'callback'            => [ $this, 'page_view' ],
 			]
 		] );
@@ -34,10 +32,34 @@ class Tracking_Api extends Base_Api {
 		register_rest_route( self::NAME_SPACE, '/tracking/forms', [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
-				'permission_callback' => '__return_true',
+				'permission_callback' => [ $this, 'is_real_request' ],
 				'callback'            => [ $this, 'form_impression' ],
 			]
 		] );
+	}
+
+	/**
+	 * Verify that the request is real
+	 *
+	 * @param $request
+	 *
+	 * @return bool
+	 */
+	public function is_real_request( $request ){
+
+		if ( ! class_exists( 'Browser' ) ) {
+			require_once GROUNDHOGG_PATH . 'includes/lib/browser.php';
+		}
+
+		$browser = new \Browser();
+
+		if ( $browser->isRobot() || $browser->isAol() ) {
+			return false;
+		}
+
+		// More checks?
+
+		return true;
 	}
 
 	/**
@@ -48,16 +70,6 @@ class Tracking_Api extends Base_Api {
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
 	public function page_view( WP_REST_Request $request ) {
-
-		if ( ! class_exists( 'Browser' ) ) {
-			require_once GROUNDHOGG_PATH . 'includes/lib/browser.php';
-		}
-
-		$browser = new \Browser();
-
-		if ( $browser->isRobot() || $browser->isAol() ) {
-			return self::ERROR_401( 'looks_like_a_bot', 'Form impressions do not track bots.' );
-		}
 
 		$contact = get_current_contact();
 
@@ -85,15 +97,6 @@ class Tracking_Api extends Base_Api {
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
 	public function form_impression( WP_REST_Request $request ) {
-		if ( ! class_exists( 'Browser' ) ) {
-			require_once GROUNDHOGG_PATH . 'includes/lib/browser.php';
-		}
-
-		$browser = new \Browser();
-
-		if ( $browser->isRobot() || $browser->isAol() ) {
-			return self::ERROR_401( 'looks_like_a_bot', 'Form impressions do not track bots.' );
-		}
 
 		$ID = absint( $request->get_param( 'form_id' ) );
 

@@ -20,6 +20,8 @@ use Groundhogg\Admin\Tags\Tags_Page;
 use Groundhogg\Admin\Tools\Tools_Page;
 use Groundhogg\Admin\User\Admin_User;
 use Groundhogg\Admin\Welcome\Welcome_Page;
+use function Groundhogg\admin_page_url;
+use function Groundhogg\get_contactdata;
 use function Groundhogg\has_premium_features;
 use function Groundhogg\is_admin_bar_widget_disabled;
 use function Groundhogg\is_option_enabled;
@@ -75,6 +77,22 @@ class Admin_Menu {
 				'title' => white_labeled_name()
 			]
 		] );
+
+		if ( get_contactdata() ){
+			$admin_bar->add_node(
+				array(
+					'parent' => 'user-actions',
+					'id'     => 'contact-info',
+					'title'  => __( 'Contact Record' ),
+					'href'   => admin_page_url( 'gh_contacts', [ 'action' => 'edit', 'contact' => get_contactdata()->ID ] ),
+					'meta'   => array(
+						'tabindex' => -1,
+					),
+				)
+			);
+		}
+
+
 	}
 
 	/**
