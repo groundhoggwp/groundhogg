@@ -478,7 +478,7 @@ class Main_Updater extends Updater {
 		Plugin::instance()->dbs->install_dbs();
 
 		update_option( 'gh_purge_page_visits', 'on' );
-		update_option( 'gh_page_visits_log_retention', 30 );
+		update_option( 'gh_page_visits_log_retention', 90 );
 	}
 
 	/**
