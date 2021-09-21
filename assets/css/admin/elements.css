@@ -636,7 +636,7 @@ p.error,
   gap: 10px;
   justify-content: space-between;
 }
-.gh-rows-and-columns .gh-row .gh-col {
+.gh-rows-and-columns .gh-row .gh-col, .gh-rows-and-columns .gh-row .gh-column {
   width: 100%;
 }
 
