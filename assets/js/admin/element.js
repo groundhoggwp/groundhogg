@@ -498,11 +498,18 @@
   }
 
   const Elements = {
-    toggle ({ id, name, className, value = '1', onLabel = 'on', offLabel = 'off', checked }) {
+    toggle ({ id, name, className, value = '1', onLabel = 'on', offLabel = 'off', checked, ...props }) {
       //language=HTML
       return `
 		  <label class="gh-switch ${className}">
-			  <input id="${id}" name="${name}" value="${value}" type="checkbox" ${checked ? 'checked' : ''}>
+			  ${Elements.input({
+				  name,
+				  id,
+				  value,
+				  checked,
+				  ...props,
+				  type: 'checkbox',
+			  })}
 			  <span class="slider round"></span>
 			  <span class="on">${onLabel}</span>
 			  <span class="off">${offLabel}</span>
@@ -960,7 +967,7 @@
     groups = {},
     filterOption = (option, search) => option.match(regexp(search)),
     renderOption = (option) => option,
-    noOptions = __( 'No options...', 'groundhogg' ),
+    noOptions = __('No options...', 'groundhogg'),
     onSelect = (option) => console.log(option),
     onClose = () => {},
     onOpen = () => {}
