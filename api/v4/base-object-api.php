@@ -37,7 +37,7 @@ abstract class Base_Object_Api extends Base_Api {
 	 * Maps the resource to a class based on object type.
 	 * This function can be overridden my child classes to simply return the correct class instead...
 	 *
-	 * @return mixed|string
+	 * @return Base_Object|Base_Object_With_Meta
 	 * @todo make this more intuitive, maybe add a get_object_class func to the data table?
 	 *
 	 */
@@ -140,14 +140,21 @@ abstract class Base_Object_Api extends Base_Api {
 	/**
 	 * Create a new object from data
 	 *
-	 * @param $data
+	 * @param array|int $data
+	 * @param array     $meta
+	 * @param bool      $force whether to force a new object to be created, otherwise it may return one that matches the given data
 	 *
 	 * @return Base_Object | Base_Object_With_Meta
 	 */
-	public function create_new_object( $data, $meta = [] ) {
+	public function create_new_object( $data, $meta = [], $force = false ) {
 		$class_name = $this->get_object_class();
 
-		$object = new $class_name( $data );
+		if ( $force ) {
+			$object = new $class_name;
+			$object->create( $data );
+		} else {
+			$object = new $class_name( $data );
+		}
 
 		if ( method_exists( $class_name, 'update_meta' ) && ! empty( $meta ) ) {
 			$object->update_meta( $meta );
@@ -295,7 +302,7 @@ abstract class Base_Object_Api extends Base_Api {
 			$data = get_array_var( $item, 'data' ) ?: $item;
 			$meta = get_array_var( $item, 'meta' );
 
-			$object = $this->create_new_object( $data, $meta );
+			$object = $this->create_new_object( $data, $meta, $request->has_param( 'force' ) );
 
 			if ( ! $object->exists() ) {
 				continue;
@@ -463,7 +470,7 @@ abstract class Base_Object_Api extends Base_Api {
 		$data = $request->get_param( 'data' );
 		$meta = $request->get_param( 'meta' );
 
-		$object = $this->create_new_object( $data, $meta );
+		$object = $this->create_new_object( $data, $meta, $request->has_param( 'force' ) );
 
 		if ( ! $object->exists() ) {
 
