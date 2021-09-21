@@ -178,8 +178,8 @@
       ]
     },
 
-    async fetchItems (params) {
-      return apiGet(this.route, params)
+    async fetchItems (params, opts = {}) {
+      return apiGet(this.route, params, opts)
         .then(r => {
           this.total_items = this.getTotalItemsFromResponse(r)
           return this.getItemsFromResponse(r)
@@ -189,8 +189,8 @@
         })
     },
 
-    async fetchItem (id) {
-      return apiGet(`${this.route}/${id}`)
+    async fetchItem (id, opts = {}) {
+      return apiGet(`${this.route}/${id}`, opts)
         .then(r => this.getItemFromResponse(r))
         .then(item => {
           this.item = item
