@@ -616,6 +616,19 @@ p.error,
   font-weight: 500;
 }
 
+.gh-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.gh-tags span.gh-tag {
+  background: #f2f2f2;
+  padding: 3px 9px;
+  border-radius: 3px;
+  font-size: 12px;
+  display: inline-block;
+}
+
 .gh-rows-and-columns {
   display: flex;
   flex-direction: column;

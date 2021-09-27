@@ -557,7 +557,7 @@ input.ui-autocomplete-input {
 
   > *:not(:first-child) {
 
-    .select2-selection{
+    .select2-selection {
       border-left: 0 !important;
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
@@ -776,6 +776,22 @@ p.error,
   }
 }
 
+
+.gh-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  span.gh-tag {
+    background: #f2f2f2;
+    padding: 3px 9px;
+    border-radius: 3px;
+    font-size: 12px;
+    display: inline-block;
+  }
+}
+
+
 .gh-rows-and-columns {
   display: flex;
   flex-direction: column;
@@ -799,7 +815,7 @@ p.error,
     gap: 10px;
     justify-content: space-between;
 
-    .gh-col, .gh-column{
+    .gh-col, .gh-column {
       width: 100%;
       //display: flex;
       //flex-direction: column;
@@ -859,13 +875,13 @@ p.error,
   }
 }
 
-.gh-has-tooltip{
+.gh-has-tooltip {
 
   position: relative;
   box-sizing: border-box;
 
-  &:hover{
-    .gh-tooltip{
+  &:hover {
+    .gh-tooltip {
       display: block;
     }
   }
@@ -999,8 +1015,8 @@ p.error,
   align-items: center;
 
   svg {
-      width: 25px;
-      height: 25px;
+    width: 25px;
+    height: 25px;
   }
 
   &.benchmark {
@@ -1015,13 +1031,14 @@ p.error,
     }
   }
 
-  .step-name{
+  .step-name {
     overflow: hidden;
     text-overflow: ellipsis;
   }
 }
 
-.select2-container .select2-selection--single{
+.select2-container .select2-selection--single {
   height: auto;
   min-height: 28px;
 }
+
