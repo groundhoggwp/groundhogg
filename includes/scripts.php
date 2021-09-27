@@ -96,6 +96,11 @@ class Scripts {
 			// Cookies can be disabled form via the settings
 			'unnecessary_cookies_disabled' => is_option_enabled( 'gh_disable_unnecessary_cookies' ),
 			'has_accepted_cookies'         => has_accepted_cookies(),
+
+			//deprecated
+			'ajaxurl'                  => admin_url( 'admin-ajax.php' ),
+			'_wpnonce'                 => wp_create_nonce( 'wp_rest' ),
+			'_ghnonce'                 => wp_create_nonce( 'groundhogg_frontend' ),
 		) );
 
 		wp_enqueue_script( 'groundhogg-frontend' );

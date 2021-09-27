@@ -321,7 +321,6 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-
 = 2.5.4 (2021-09-20) =
 * ADDED All new site activity tracking system! See which pages your contacts visit the most.
 * ADDED Support for cookie consent plugins. Define your consent cookie and value in the settings to trigger tracking and cookies in Groundhogg.
