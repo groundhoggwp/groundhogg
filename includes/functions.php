@@ -233,11 +233,8 @@ function emergency_init_dbs() {
  * @return bool
  */
 function is_option_enabled( $option = '' ) {
-	$option = get_option( $option );
 
-	if ( ! is_array( $option ) && $option ) {
-		return true;
-	}
+	$option = get_option( $option );
 
 	/**
 	 * Whether the option is enabled or not.
@@ -245,7 +242,7 @@ function is_option_enabled( $option = '' ) {
 	 * @param $enabled bool
 	 * @param $option  string
 	 */
-	return apply_filters( 'groundhogg/io_option_enabled', is_array( $option ) && in_array( 'on', $option ), $option );
+	return apply_filters( 'groundhogg/is_option_enabled', ( ! is_array( $option ) && $option ) || ( is_array( $option ) && in_array( 'on', $option ) ), $option );
 }
 
 /**
@@ -1718,6 +1715,38 @@ function save_source_page_after_signup( $contact ) {
 }
 
 add_action( 'groundhogg/after_form_submit', __NAMESPACE__ . '\save_lead_source_after_signup', 9 );
+
+/**
+ * Save the source page if one is not set already
+ *
+ * @param $contact Contact
+ */
+function set_utm_parameters( $contact ) {
+
+	$utm = get_cookie( Tracking::UTM_COOKIE );
+
+	if ( ! $utm ){
+		return;
+	}
+
+	$utm = json_decode( $utm, true );
+
+	if ( empty( $utm ) ){
+		return;
+	}
+
+	// If there is a contact, update their UTM stats to the one provided by the campaign
+	foreach ( $utm as $utm_var => $utm_val ) {
+		if ( ! empty( $utm_val ) ) {
+			$contact->update_meta(
+				$utm_var,
+				sanitize_text_field( $utm_val )
+			);
+		}
+	}
+}
+
+add_action( 'groundhogg/after_form_submit', __NAMESPACE__ . '\set_utm_parameters', 9 );
 
 /**
  * Save the leadsource if one is not set already
@@ -5812,5 +5841,22 @@ function collapse_string( $str, $size = 30 ) {
 	$after  = ( $size / 2 ) - 2;
 
 	return sprintf( '%s...%s', substr( $str, 0, $before ), substr( $str, - $after, $after ) );
+}
 
+/**
+ * Has the current visitor accepted cookies
+ *
+ * @return bool|mixed|void
+ */
+function has_accepted_cookies() {
+
+	// GDPR features are not enabled, so consent is implicit
+	if ( ! Plugin::$instance->preferences->is_gdpr_enabled() ) {
+		return apply_filters( 'groundhogg/has_accepted_cookies', true );
+	}
+
+	$cookie_name  = get_option( 'gh_consent_cookie_name' );
+	$cookie_value = get_option( 'gh_consent_cookie_value' );
+
+	return apply_filters( 'groundhogg/has_accepted_cookies', get_cookie( $cookie_name ) === $cookie_value );
 }

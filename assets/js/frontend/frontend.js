@@ -2,14 +2,19 @@
 
   const {
 
-    cookies_enabled,
+    unnecessary_cookies_disabled,
+    has_accepted_cookies,
+    settings,
     cookies,
-    page_view_endpoint,
-    tracking_enabled,
+    routes,
     base_url,
-    form_impression_endpoint,
-
+    nonces,
   } = gh
+
+  const { tracking } = routes
+  const { _wprest } = nonces
+  const { consent_cookie_name = 'viewed_cookie_policy', consent_cookie_value = 'yes' } = settings
+  const { tracking: tracking_cookie, lead_source, form_impressions, page_visits } = cookies
 
   /**
    * Post data
@@ -24,7 +29,7 @@
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-WP-Nonce': gh._wprest,
+        'X-WP-Nonce': _wprest,
       },
       body: JSON.stringify(data),
       ...opts,
@@ -83,7 +88,7 @@
    * @return {any}
    */
   const getVisitedPages = () => {
-    return JSON.parse(getCookie('groundhogg-page-visits', JSON.stringify(defaultPageTracking)))
+    return JSON.parse(getCookie(page_visits, JSON.stringify(defaultPageTracking)))
   }
 
   /**
@@ -91,6 +96,12 @@
    * @param wasTracked
    */
   const rememberPageVisit = (wasTracked = false) => {
+
+    // Don't set cookie if cookies are disabled
+    if ( unnecessary_cookies_disabled ){
+      return;
+    }
+
     const url = new URL(window.location.href)
 
     const pagesVisited = getVisitedPages()
@@ -102,19 +113,20 @@
       tracked: wasTracked
     })
 
-    setCookie('groundhogg-page-visits', JSON.stringify(pagesVisited), DURATION.HOUR)
+    setCookie(page_visits, JSON.stringify(pagesVisited), DURATION.HOUR)
   }
 
   gh = {
 
     ...gh,
     previousFormImpressions: [],
+    trackingFlag: false,
 
     pageView () {
 
       const url = new URL(window.location.href)
 
-      if (cookies_enabled) {
+      if ( ! unnecessary_cookies_disabled ) {
 
         // Don't run if we recently tracked this page visit
         if (getVisitedPages().pages.includes(url.pathname)) {
@@ -124,7 +136,7 @@
       }
 
       if (this.isLoggedIn || this.hasContactTrackingCookie) {
-        apiPost(page_view_endpoint, {
+        apiPost(tracking + '/pages/', {
           ref: url.href
         })
 
@@ -149,36 +161,77 @@
         return
       }
 
-      apiPost(form_impression_endpoint, {
+      apiPost(tracking + '/forms/', {
         ref: window.location.href,
         form_id: id
       }).then(() => {
         this.previousFormImpressions.push(id)
-        setCookie(cookies.form_impressions, this.previousFormImpressions.join(), 3 * DURATION.DAY)
+        setCookie(form_impressions, this.previousFormImpressions.join(), 3 * DURATION.DAY)
       })
     },
 
     init () {
 
-      this.hasContactTrackingCookie = getCookie(cookies.tracking) !== null
+      this.hasContactTrackingCookie = getCookie(tracking_cookie) !== null
       this.isLoggedIn = document.body.classList.contains('logged-in')
+      this.has_accepted_cookies = has_accepted_cookies
 
-      if (cookies_enabled) {
+      // Cookies have not been accepted yet, quit out
+      if ( ! has_accepted_cookies && ! this.checkCookieConsent() ) {
 
-        var referer = getCookie(cookies.lead_source)
+        // Listen for cookie acceptance
+        document.addEventListener( 'click', () => {
+          setTimeout( () => {
+            this.onCookiesAccept();
+          }, 100 )
+        } );
+
+        return
+      }
+
+      this.doTracking()
+    },
+
+    doTracking () {
+
+      if ( this.initFlag ){
+        return;
+      }
+
+      this.initFlag = true;
+
+      // Set "unnecessary" cookies
+      if (!unnecessary_cookies_disabled) {
+
+        var referer = getCookie(lead_source)
 
         if (!referer) {
-          setCookie(cookies.lead_source, document.referrer, 3 * DURATION.DAY)
+          setCookie(lead_source, document.referrer, 3 * DURATION.DAY)
         }
 
-        this.previousFormImpressions = getCookie(cookies.form_impressions, '').split(',')
+        this.previousFormImpressions = getCookie(form_impressions, '').split(',')
 
         this.logFormImpressions()
       }
 
-      if (tracking_enabled) {
-        this.pageView()
+      this.pageView()
+    },
+
+    onCookiesAccept () {
+
+      if ( this.initFlag ){
+        return;
       }
+
+      this.has_accepted_cookies = this.checkCookieConsent();
+
+      if ( this.has_accepted_cookies ){
+        this.doTracking()
+      }
+    },
+
+    checkCookieConsent(){
+      return getCookie( consent_cookie_name || 'viewed_cookie_policy' ) === ( consent_cookie_value || 'yes' )
     }
   }
 

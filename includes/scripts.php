@@ -72,25 +72,30 @@ class Scripts {
 		] );
 
 		wp_localize_script( 'groundhogg-frontend', 'Groundhogg', array(
-			// Don't run unless pro features is active
-			'tracking_enabled'         => ! is_option_enabled( 'gh_disable_page_view_tracking' ) && is_pro_features_active(),
-			// This will come from the advanced features plugin
-			'tracked_pages_regex'      => str_replace( '/', '\/', get_option( 'gh_tracked_pages_regex', '' ) ),
-			'base_url'                 => untrailingslashit( home_url() ),
-			'form_impression_endpoint' => rest_url( 'gh/v4/tracking/forms/' ),
-			'page_view_endpoint'       => rest_url( 'gh/v4/tracking/pages/' ),
-			'form_submission_endpoint' => rest_url( 'gh/v3/forms/submit/' ),
-			'ajaxurl'                  => admin_url( 'admin-ajax.php' ),
-			'_wpnonce'                 => wp_create_nonce( 'wp_rest' ),
-			'_wprest'                  => wp_create_nonce( 'wp_rest' ),
-			'_ghnonce'                 => wp_create_nonce( 'groundhogg_frontend' ),
-			'cookies'                  => [
+			'base_url'                     => untrailingslashit( home_url() ),
+			'routes'                       => [
+				'tracking' => rest_url( 'gh/v4/tracking' ),
+				'forms'    => rest_url( 'gh/v4/forms' ),
+				'ajax'     => admin_url( 'admin-ajax.php' ),
+			],
+			'nonces'                       => [
+				'_wpnonce' => wp_create_nonce( 'wp_rest' ),
+				'_wprest'  => wp_create_nonce( 'wp_rest' ),
+				'_ghnonce' => wp_create_nonce( 'groundhogg_frontend' ),
+			],
+			'cookies'                      => [
 				'tracking'         => Tracking::TRACKING_COOKIE,
 				'lead_source'      => Tracking::LEAD_SOURCE_COOKIE,
-				'form_impressions' => Tracking::FORM_IMPRESSIONS_COOKIE
+				'form_impressions' => Tracking::FORM_IMPRESSIONS_COOKIE,
+				'page_visits'      => Tracking::PAGE_VISITS_COOKIE,
+			],
+			'settings'                     => [
+				'consent_cookie_name'  => get_option( 'gh_consent_cookie_name', 'viewed_cookie_policy' ),
+				'consent_cookie_value' => get_option( 'gh_consent_cookie_value', 'yes' ),
 			],
 			// Cookies can be disabled form via the settings
-			'cookies_enabled'          => ! is_option_enabled( 'gh_disable_unnecessary_cookies' )
+			'unnecessary_cookies_disabled' => is_option_enabled( 'gh_disable_unnecessary_cookies' ),
+			'has_accepted_cookies'         => has_accepted_cookies(),
 		) );
 
 		wp_enqueue_script( 'groundhogg-frontend' );

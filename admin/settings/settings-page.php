@@ -360,7 +360,7 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Misc Settings', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
 			),
-			'page_tracking'             => array(
+			'page_tracking'         => array(
 				'id'    => 'page_tracking',
 				'title' => _x( 'Page Tracking', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
@@ -390,6 +390,11 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Compliance', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'marketing'
 			),
+			'cookies'               => array(
+				'id'    => 'cookies',
+				'title' => _x( 'Cookies', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'marketing'
+			),
 			'unsubscribe'           => array(
 				'id'    => 'unsubscribe',
 				'title' => _x( 'Unsubscribe Settings', 'settings_sections', 'groundhogg' ),
@@ -417,7 +422,7 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Defaults', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'email'
 			],
-			'footer'             => [
+			'footer'                => [
 				'id'    => 'footer',
 				'title' => _x( 'Footer', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'email'
@@ -758,7 +763,7 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				),
 			),
-			'gh_is_admin_bar_widget_disabled'                       => array(
+			'gh_is_admin_bar_widget_disabled'        => array(
 				'id'      => 'gh_is_admin_bar_widget_disabled',
 				'section' => 'misc_info',
 				'label'   => _x( 'Hide Admin Toolbar Widget', 'settings', 'groundhogg' ),
@@ -851,9 +856,9 @@ class Settings_Page extends Admin_Page {
 			),
 			'gh_disable_unnecessary_cookies'         => array(
 				'id'      => 'gh_disable_unnecessary_cookies',
-				'section' => 'compliance',
+				'section' => 'cookies',
 				'label'   => _x( 'Disable unnecessary cookies', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'This will prevent the <code>groundhogg-lead-source</code> and <code>groundhogg-form-impressions</code> cookies from being set.', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'This will prevent the <code>groundhogg-lead-source</code>, <code>groundhogg-page-visits</code>, and <code>groundhogg-form-impressions</code> cookies from being set.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => array(
 					'label' => __( 'Disable' ),
@@ -863,6 +868,32 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				),
 			),
+			'gh_consent_cookie_name'               => [
+				'id'      => 'gh_consent_cookie_name',
+				'section' => 'cookies',
+				'label'   => _x( 'Consent cookie name', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'The name of the cookie that records consent to allow cookies. This is provided by a third party plugin. This has no effect unless GDPR features are enabled.', 'settings', 'groundhogg' ),
+				'type'    => 'input',
+				'atts'    => [
+					//keep brackets for backwards compat
+					'placeholder' => 'viewed_cookie_policy',
+					'name'        => 'gh_consent_cookie_name',
+					'id'          => 'gh_consent_cookie_name',
+				],
+			],
+			'gh_cookie_consent_cookie_value'               => [
+				'id'      => 'gh_cookie_consent_cookie_value',
+				'section' => 'cookies',
+				'label'   => _x( 'Consent cookie value', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'The value of the consent cookie indicating acceptance to use cookies. This is provided by a third party plugin. This has no effect unless GDPR features are enabled.', 'settings', 'groundhogg' ),
+				'type'    => 'input',
+				'atts'    => [
+					//keep brackets for backwards compat
+					'placeholder' => 'yes',
+					'name'        => 'gh_consent_cookie_value',
+					'id'          => 'gh_consent_cookie_value',
+				],
+			],
 			'gh_recaptcha_site_key'                  => array(
 				'id'      => 'gh_recaptcha_site_key',
 				'section' => 'captcha',
@@ -1272,20 +1303,20 @@ class Settings_Page extends Admin_Page {
 					'checked'  => defined( 'DISABLE_WP_CRON' ),
 				],
 			],
-			'gh_purge_page_visits'                     => [
+			'gh_purge_page_visits'                   => [
 				'id'      => 'gh_purge_page_visits',
 				'section' => 'page_tracking',
 				'label'   => _x( 'Delete Old Page Visit Logs (recommended)', 'settings', 'groundhogg' ),
-				'desc'    => __( 'To preserve storage in the database and overall performance it is recommended to delete old page visit logs.', 'groundhogg' ) ,
+				'desc'    => __( 'To preserve storage in the database and overall performance it is recommended to delete old page visit logs.', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
-					'label'    => __( 'Enable' ),
-					'name'     => 'gh_purge_page_visits',
-					'id'       => 'gh_purge_page_visits',
-					'value'    => 'on',
+					'label' => __( 'Enable' ),
+					'name'  => 'gh_purge_page_visits',
+					'id'    => 'gh_purge_page_visits',
+					'value' => 'on',
 				],
 			],
-			'gh_page_visits_log_retention'                 => [
+			'gh_page_visits_log_retention'           => [
 				'id'      => 'gh_page_visits_log_retention',
 				'section' => 'page_tracking',
 				'label'   => _x( 'Log Retention', 'settings', 'groundhogg' ),
