@@ -914,6 +914,8 @@
 
       tagPicker('#filter-tags', true, (items) => {
         TagsStore.itemsFetched(items)
+      }, {
+        tags: false
       }).on('change', (e) => {
         updateFilter({
           tags: $(e.target).val()
