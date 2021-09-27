@@ -76,7 +76,7 @@ class Funnels_Table extends WP_List_Table {
 		$columns = array(
 			'cb'              => '<input type="checkbox" />', // Render a checkbox instead of text.
 			'title'           => _x( 'Title', 'Column label', 'groundhogg' ),
-			'active_contacts' => _x( 'Active Contacts', 'Column label', 'groundhogg' ),
+			'active_contacts' => _x( 'Waiting Contacts', 'Column label', 'groundhogg' ),
 			'last_updated'    => _x( 'Last Updated', 'Column label', 'groundhogg' ),
 			'date_created'    => _x( 'Date Created', 'Column label', 'groundhogg' ),
 		);
