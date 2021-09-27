@@ -18,17 +18,17 @@ class Reports_Api extends Base_Api {
 	public function register_routes() {
 		register_rest_route( self::NAME_SPACE, '/reports', [
 			[
-				'methods'              => WP_REST_Server::READABLE,
-				'callback'             => [ $this, 'read' ],
-				'permissions_callback' => [ $this, 'read_permissions_callback' ],
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'read' ],
+				'permission_callback' => [ $this, 'read_permissions_callback' ],
 			],
 		] );
 
 		register_rest_route( self::NAME_SPACE, '/reports/(?P<id>\w+)', [
 			[
-				'methods'  => WP_REST_Server::READABLE,
-				'callback' => [ $this, 'read_single' ],
-				 'permissions_callback' => [ $this, 'read_permissions_callback' ],
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'read_single' ],
+				'permission_callback' => [ $this, 'read_permissions_callback' ],
 			],
 		] );
 	}
