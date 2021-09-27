@@ -25,6 +25,7 @@ class Tracking {
 	/**
 	 * This is a cookie that will be in the contact's browser
 	 */
+	const UTM_COOKIE = 'groundhogg-utm';
 	const TRACKING_COOKIE = 'groundhogg-tracking';
 	const LEAD_SOURCE_COOKIE = 'groundhogg-lead-source';
 	const PAGE_VISITS_COOKIE = 'groundhogg-page-visits';
@@ -309,7 +310,7 @@ class Tracking {
 	/**
 	 * Get a param from the tracking cookie.
 	 *
-	 * @param $key
+	 * @param      $key
 	 * @param bool $default
 	 *
 	 * @return bool|mixed
@@ -412,7 +413,7 @@ class Tracking {
 	/**
 	 * @return int
 	 */
-	public function get_current_event_id(){
+	public function get_current_event_id() {
 		return absint( $this->get_tracking_cookie_param( 'event_id' ) );
 	}
 
@@ -520,7 +521,7 @@ class Tracking {
 	 * or just start with a new cookie by calling this function.
 	 *
 	 * @param $contact Contact
-	 * @param $source string
+	 * @param $source  string
 	 */
 	public function start_tracking( $contact, $source = 'manual' ) {
 		if ( ! $contact ) {
@@ -550,7 +551,7 @@ class Tracking {
 	 * Setup the tracking cookie vars for when a user logs in.
 	 *
 	 * @param $user_login string
-	 * @param $user \WP_User
+	 * @param $user       \WP_User
 	 */
 	public function wp_login( $user_login, $user ) {
 		$this->add_tracking_cookie_param( 'user_login', $user_login );
@@ -600,13 +601,10 @@ class Tracking {
 					);
 				}
 			}
-		} else {
-
+		} else if ( ! is_option_enabled( 'gh_disable_unnecessary_cookies' ) && has_accepted_cookies() ) {
 			// Save the UTM stuff as a cookie for future use.
-			set_cookie( 'groundhogg_utm_tacking', wp_json_encode( $utm ), MONTH_IN_SECONDS );
-
+			set_cookie( self::UTM_COOKIE, wp_json_encode( $utm ), DAY_IN_SECONDS );
 		}
-
 	}
 
 	/**
