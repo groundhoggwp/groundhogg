@@ -1,5 +1,13 @@
 (function ($, gh) {
 
+  const {
+    routes,
+    nonces,
+  } = gh
+
+  const { tracking, ajax } = routes
+  const { _wprest, _ghnonce, _wpnonce } = nonces
+
   $.fn.serializeFormJSON = function () {
 
     var o = {}
@@ -29,44 +37,41 @@
 
   $(function () {
     $('form.gh-form.ajax-submit').on('submit', function (e) {
+
       e.preventDefault()
+
+      // Remove any messages
       $('.gh-form-errors-wrapper').remove()
       $('.gh-message-wrapper').remove()
+
       var $form = $(this)
 
-      $form.hideButton()
-
-      // console.log( $form.serializeFormJSON() );
-
-      // var data = $form.serializeFormJSON();
-
       var data = new FormData($form[0])
-      // data._ghnonce = gh._ghnonce;
-      data.append('_ghnonce', gh._ghnonce)
-      // data.form_data = $form.serializeArray();
-      // data.action = 'groundhogg_ajax_form_submit';
 
+      data.append('_ghnonce', _ghnonce)
       data.append('action', 'groundhogg_ajax_form_submit')
 
       //check if google is active
+      let captchaValidated = true
 
-      let captcha_validate = true
-      /**
-       * Code to validate google captcha-v3
-       */
-      if ($('.gh-recaptcha-v3').length) {
-        captcha_validate = false
+      // If this element is present in the form then captcha has not been verified
+      if ($form.find('.gh-recaptcha-v3').length > 0) {
+        captchaValidated = false
       }
 
+      // Captcha has been verified
       if (data.has('g-recaptcha-response')) {
-        captcha_validate = true
+        captchaValidated = true
       }
-      if (captcha_validate) {
+
+      if (captchaValidated) {
+
+        $form.hideButton()
 
         $.ajax({
           method: 'POST',
           // dataType: 'json',
-          url: gh.ajaxurl,
+          url: ajax,
           data: data,
           processData: false,
           contentType: false,
@@ -75,6 +80,8 @@
           enctype: 'multipart/form-data',
           success: function (response) {
             if (response.success == undefined) {
+              console.log(response)
+              $form.showButton()
               return
             }
 
@@ -90,7 +97,9 @@
             $form.showButton()
 
           },
-          error: function () {
+          error: function (e) {
+            console.log(e)
+            $form.showButton()
           }
         })
       }

@@ -4,7 +4,7 @@
         token: false
     };
 
-    function protect_forms(){
+    function protectForms(){
         $( '.gh-recaptcha-v3' ).closest( 'form' ).on( 'submit', function (e) {
 
             if ( mem.token ){
@@ -26,6 +26,6 @@
         } );
     }
 
-    $(protect_forms);
+    $(protectForms);
 
 })(jQuery, ghReCAPTCHA);
