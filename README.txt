@@ -325,6 +325,7 @@ You can purchase a premium plan for access to support and our premium extensions
 = 2.5.4 (2021-09-20) =
 * ADDED All new site activity tracking system! See which pages your contacts visit the most.
 * ADDED Support for cookie consent plugins. Define your consent cookie and value in the settings to trigger tracking and cookies in Groundhogg.
+* ADDED Built-in support for CookieLawInfo plugin.
 * TWEAKED "Active Contacts" to "Waiting Contacts" in funnel list view to avoid confusion.
 * TWEAKED Moved email logging hooks earlier to catch emails sent before the `init` hook.
 * FIXED Forms not submitting if multiple forms on same page with recaptcha v3 enabled.
