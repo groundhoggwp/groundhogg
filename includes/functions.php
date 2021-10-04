@@ -5285,6 +5285,7 @@ function array_map_to_class( &$array, $class ) {
 	foreach ( $array as &$mixed ) {
 		$mixed = new $class( $mixed );
 	}
+	return $array;
 }
 
 /**
