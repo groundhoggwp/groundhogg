@@ -546,10 +546,10 @@ class Contact extends Base_Object_With_Meta {
 	 */
 	public function has_tag( $tag_id_or_name ) {
 		if ( ! is_numeric( $tag_id_or_name ) ) {
-			$tag    = $this->get_tags_db()->get_tag_by( 'tag_slug', sanitize_title( $tag_id_or_name ) );
+			$tag = $this->get_tags_db()->get_tag_by( 'tag_slug', sanitize_title( $tag_id_or_name ) );
 
 			// Tag does not exist
-			if ( ! $tag ){
+			if ( ! $tag ) {
 				return false;
 			}
 
@@ -939,10 +939,11 @@ class Contact extends Base_Object_With_Meta {
 	 * @return array
 	 */
 	public function get_as_array() {
-		$contact             = $this->get_data();
-		$contact['ID']       = $this->get_id();
-		$contact['gravatar'] = $this->get_profile_picture();
-		$contact['age']      = $this->get_age();
+		$contact              = $this->get_data();
+		$contact['ID']        = $this->get_id();
+		$contact['gravatar']  = $this->get_profile_picture();
+		$contact['full_name'] = $this->get_full_name();
+		$contact['age']       = $this->get_age();
 
 		return apply_filters(
 			"groundhogg/{$this->get_object_type()}/get_as_array",
