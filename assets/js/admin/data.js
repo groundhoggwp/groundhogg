@@ -178,6 +178,14 @@
       ]
     },
 
+    find (f = () => {}) {
+      return this.items.find(f)
+    },
+
+    filter (f = () => { }) {
+      return this.items.filter(f)
+    },
+
     async fetchItems (params, opts = {}) {
       return apiGet(this.route, params, opts)
         .then(r => {
@@ -221,6 +229,15 @@
             item
           ])
           return item
+        })
+    },
+
+    async patchMany (items, opts = {}) {
+      return apiPatch(`${this.route}`, items, opts)
+        .then(r => this.getItemsFromResponse(r))
+        .then(items => {
+          this.itemsFetched(items)
+          return items
         })
     },
 
