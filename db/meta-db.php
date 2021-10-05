@@ -111,7 +111,7 @@ abstract class Meta_DB extends DB {
 	public function delete_associated_meta( $where, $formats, $object_table ) {
 		global $wpdb;
 
-		if ( is_numeric( $where ) ) {
+		if ( is_numeric( $where ) ){
 
 			$result = $wpdb->delete( $this->table_name, [ $this->get_object_id_col() => $where ], [ '%d' ] );
 
@@ -161,14 +161,13 @@ abstract class Meta_DB extends DB {
 		if ( false === $object_id ) {
 			return false;
 		}
+		$getted = get_metadata( $this->get_object_type(), $object_id, $meta_key, $single );
 
-		$fetched = get_metadata( 'groundhogg/' . $this->get_object_type(), $object_id, $meta_key, $single );
-
-		if ( $fetched ) {
-			do_action( "groundhogg/meta/{$this->get_object_type()}/get", $object_id, $meta_key, $single, $fetched );
+		if ( $getted ) {
+			do_action( "groundhogg/meta/{$this->get_object_type()}/get", $object_id, $meta_key, $single, $getted );
 		}
 
-		return $fetched;
+		return $getted;
 	}
 
 	/**
@@ -193,7 +192,7 @@ abstract class Meta_DB extends DB {
 			return false;
 		}
 
-		$added = add_metadata( 'groundhogg/' . $this->get_object_type(), $object_id, $meta_key, $meta_value, $unique );
+		$added = add_metadata( $this->get_object_type(), $object_id, $meta_key, $meta_value, $unique );
 
 		if ( $added ) {
 			do_action( "groundhogg/meta/{$this->get_object_type()}/add", $object_id, $meta_key, $meta_value, $unique );
@@ -229,7 +228,7 @@ abstract class Meta_DB extends DB {
 			return false;
 		}
 
-		$updated = update_metadata( 'groundhogg/' . $this->get_object_type(), $object_id, $meta_key, $meta_value, $prev_value );
+		$updated = update_metadata( $this->get_object_type(), $object_id, $meta_key, $meta_value, $prev_value );
 
 		if ( $updated ) {
 			do_action( "groundhogg/meta/{$this->get_object_type()}/update", $object_id, $meta_key, $meta_value, $prev_value );
@@ -264,7 +263,7 @@ abstract class Meta_DB extends DB {
 			return false;
 		}
 
-		$deleted = delete_metadata( 'groundhogg/' . $this->get_object_type(), $object_id, $meta_key, $meta_value );
+		$deleted = delete_metadata( $this->get_object_type(), $object_id, $meta_key, $meta_value );
 
 		if ( $deleted ) {
 			do_action( "groundhogg/meta/{$this->get_object_type()}/delete", $object_id, $meta_key, $meta_value );
@@ -348,7 +347,7 @@ abstract class Meta_DB extends DB {
 	 *
 	 * @param $object_table DB;
 	 */
-	public function _delete_orphaned_meta( $object_table ) {
+	public function _delete_orphaned_meta( $object_table ){
 
 		global $wpdb;
 

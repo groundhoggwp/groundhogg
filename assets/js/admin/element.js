@@ -147,7 +147,7 @@
   const stepNavHandler = (selector, {
     currentStep = 0,
     steps = [],
-    onStepChange = (step) => { console.log(step)},
+    onStepChange = (step) => {console.log(step)},
     showNav = true,
     labels,
   }) => {
