@@ -104,7 +104,7 @@ class Page_Visits extends DB {
 	 * @return string
 	 */
 	public function get_object_type() {
-		return 'impression';
+		return 'page_visit';
 	}
 
 	/**

@@ -643,7 +643,7 @@ abstract class DB {
 	 * @return string
 	 */
 	public function get_cache_group() {
-		return $this->table_name . '/groundhogg/db/' . $this->get_object_type();
+		return  'groundhogg/db/' . $this->get_object_type();
 	}
 
 	/**
