@@ -127,10 +127,10 @@
 
       let item
 
-      if (this.item[this.primaryKey] === id) {
+      if (this.item[this.primaryKey] == id) {
         item = this.item
       } else {
-        item = this.items.find(item => item[this.primaryKey] === id)
+        item = this.items.find(item => item[this.primaryKey] == id)
       }
 
       return item
@@ -141,7 +141,7 @@
     },
 
     hasItem (id) {
-      return this.item[this.primaryKey] === id || this.items.find(item => item[this.primaryKey] === id)
+      return this.item[this.primaryKey] == id || this.items.find(item => item[this.primaryKey] == id)
     },
 
     hasItems (itemIds) {
@@ -153,7 +153,7 @@
       for (let i = 0; i < itemIds.length; i++) {
         const itemId = itemIds[i]
         if (!this.items.find(item => {
-          return item[this.primaryKey] === itemId
+          return item[this.primaryKey] == itemId
         })) {
           return false
         }
@@ -174,7 +174,7 @@
 
       this.items = [
         ...items, // new items
-        ...this.items.filter(item => !items.find(_item => _item[this.primaryKey] === item[this.primaryKey]))
+        ...this.items.filter(item => !items.find(_item => _item[this.primaryKey] == item[this.primaryKey]))
       ]
     },
 
@@ -253,21 +253,58 @@
         })
     },
 
+    async fetchRelationships (id, { other_type }, opts = {}) {
+      return apiDelete(`${this.route}/${id}/relationships`, { other_type }, opts)
+        .then(r => this.getItemFromResponse(r))
+        .then(item => {
+          this.item = item
+          this.itemsFetched([
+            item
+          ])
+          return item
+        })
+    },
+
+    async createRelationship (id, { other_id, other_type }, opts = {}) {
+      return apiPost(`${this.route}/${id}/relationships`, { other_id, other_type }, opts)
+        .then(r => this.getItemFromResponse(r))
+        .then(item => {
+          this.item = item
+          this.itemsFetched([
+            item
+          ])
+          return item
+        })
+    },
+
+    async deleteRelationship (id, { other_id, other_type }, opts = {}) {
+      return apiDelete(`${this.route}/${id}/relationships`, { other_id, other_type }, opts)
+        .then(r => this.getItemFromResponse(r))
+        .then(item => {
+          this.item = item
+          this.itemsFetched([
+            item
+          ])
+          return item
+        })
+    },
+
+
     async delete (id) {
 
-      if (typeof id === 'object') {
+      if (typeof id == 'object') {
         return this.deleteMany(id)
       }
 
       return apiDelete(`${this.route}/${id}`)
         .then(r => {
 
-          if (this.item[this.primaryKey] === id) {
+          if (this.item[this.primaryKey] == id) {
             this.item = {}
           }
 
           this.items = [
-            ...this.items.filter(item => item[this.primaryKey] !== id),
+            ...this.items.filter(item => item[this.primaryKey] != id),
           ]
 
           return r
@@ -323,7 +360,7 @@
 
             self.items = [
               ...r.items, // new items
-              ...self.items.filter(item => !r.items.find(_item => _item[this.primaryKey] === item[this.primaryKey]))
+              ...self.items.filter(item => !r.items.find(_item => _item[this.primaryKey] == item[this.primaryKey]))
             ]
 
             return r.items
@@ -344,7 +381,7 @@
 
           Object.assign(self.items, data.items)
 
-          if (data.items.length === self.limit) {
+          if (data.items.length == self.limit) {
             self.offset += self.limit
             self.preloadTags()
           }
@@ -387,17 +424,17 @@
 
       isStartingStep (funnelId, stepId, checkEdited = false) {
         return !this.getPrecedingSteps(funnelId, stepId, checkEdited)
-          .find(_step => _step.data.step_group === 'action')
+          .find(_step => _step.data.step_group == 'action')
       },
 
       getSteps (funnelId, checkEdited = false) {
-        const funnel = funnelId ? this.items.find(f => f.ID === funnelId) : this.item
+        const funnel = funnelId ? this.items.find(f => f.ID == funnelId) : this.item
         return checkEdited && funnel.meta.edited ? funnel.meta.edited.steps : funnel.steps
       },
 
       getFunnelAndStep (funnelId, stepId, checkEdited = false) {
-        const funnel = funnelId ? this.items.find(f => f.ID === funnelId) : this.item
-        const step = checkEdited && funnel.meta.edited ? funnel.meta.edited.steps.find(s => s.ID === stepId) : funnel.steps.find(s => s.ID === stepId)
+        const funnel = funnelId ? this.items.find(f => f.ID == funnelId) : this.item
+        const step = checkEdited && funnel.meta.edited ? funnel.meta.edited.steps.find(s => s.ID == stepId) : funnel.steps.find(s => s.ID == stepId)
         return { funnel, step }
       },
 
@@ -417,6 +454,7 @@
     }),
     emails: ObjectStore(Groundhogg.api.routes.v4.emails),
     broadcasts: ObjectStore(Groundhogg.api.routes.v4.broadcasts),
+    notes: ObjectStore(Groundhogg.api.routes.v4.notes),
     searches: ObjectStore(Groundhogg.api.routes.v4.searches, {
       primaryKey: 'id'
     }),

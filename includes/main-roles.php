@@ -296,6 +296,18 @@ class Main_Roles extends Roles {
 		return apply_filters( 'groundhogg/roles/caps/funnels', $caps );
 	}
 
+
+	public function get_note_caps() {
+		$caps = array(
+			'add_notes',
+			'delete_notes',
+			'edit_notes',
+			'view_notes'
+		);
+
+		return apply_filters( 'groundhogg/roles/caps/notes', $caps );
+	}
+
 	/**
 	 *
 	 * Events:
@@ -394,7 +406,8 @@ class Main_Roles extends Roles {
 			$this->get_report_caps(),
 			$this->get_other_caps(),
 			$this->get_file_caps(),
-			$this->get_log_caps()
+			$this->get_log_caps(),
+			$this->get_note_caps()
 		);
 
 		return $caps;

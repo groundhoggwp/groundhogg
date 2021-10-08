@@ -373,6 +373,18 @@ class Contact_Query {
 
 		$this->query_vars = wp_parse_args( $this->query_vars, $this->query_var_defaults );
 
+		if ( strlen( $this->query_vars['search'] ) ) {
+			$full_name = split_name( $this->query_vars['search'] );
+
+			if ( $full_name[0] && $full_name[1] ) {
+				$this->query_vars['first_name']         = $full_name[0];
+				$this->query_vars['first_name_compare'] = 'starts_with';
+				$this->query_vars['last_name']          = $full_name[1];
+				$this->query_vars['last_name_compare']  = 'starts_with';
+				unset( $this->query_vars['search'] );
+			}
+		}
+
 		// Map "limit" to "number"
 		if ( isset_not_empty( $this->query_vars, 'limit' ) ) {
 			$this->query_vars['number'] = $this->query_vars['limit'];
@@ -874,6 +886,7 @@ class Contact_Query {
 		}
 
 		if ( strlen( $this->query_vars['search'] ) ) {
+
 			if ( ! empty( $this->query_vars['search_columns'] ) ) {
 				$search_columns = array_map( 'sanitize_key', (array) $this->query_vars['search_columns'] );
 			} else {
@@ -1469,7 +1482,7 @@ class Contact_Query {
 
 		$ba = self::get_before_and_after_from_filter_date_range( $filter_vars );
 
-		if ( ! empty( $path ) ){
+		if ( ! empty( $path ) ) {
 			$ba['path'] = $path;
 		}
 

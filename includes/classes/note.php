@@ -15,4 +15,16 @@ class Note extends Base_Object {
 	protected function get_db() {
 		return get_db( 'notes' );
 	}
+
+	protected function sanitize_columns( $data = [] ) {
+		foreach ( $data as $col => &$val ){
+			switch ( $col ){
+				case 'content':
+					$val = wp_kses_post( $val );
+					break;
+			}
+		}
+
+		return $data;
+	}
 }

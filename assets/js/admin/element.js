@@ -239,26 +239,6 @@
     return parts.map((p, i) => i < parts.length - 1 ? `<span class="part">${p}</span>` : `<span class="base">${p}</span>`).join(`<span class="sep">/</span>`)
   }
 
-  function improveTinyMCE () {
-
-    if (typeof this.flag !== 'undefined') {
-      return
-    }
-
-    $doc.on('tinymce-editor-setup', function (event, editor) {
-      editor.settings.toolbar1 =
-        'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,wp_adv,dfw,groundhoggreplacementbtn,groundhoggemojibtn'
-      editor.settings.toolbar2 =
-        'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help'
-      editor.settings.height = 200
-      editor.on('click', function (ed, e) {
-        $doc.trigger('to_mce')
-      })
-    })
-
-    this.flag = 'improved'
-  }
-
   /**
    * Make a copy of the object
    *
@@ -656,9 +636,29 @@
       }
     )
 
-    tinymce.get(editor_id).on('keyup', function (e) {
+    tinyMCE.get(editor_id).on('keyup', function (e) {
       onChange(tinyMCE.activeEditor.getContent({ format: 'raw' }), tinyMCE.activeEditor.getContent({ format: 'raw' }))
     })
+  }
+
+  function improveTinyMCE () {
+
+    if (typeof this.flag !== 'undefined') {
+      return
+    }
+
+    $doc.on('tinymce-editor-setup', function (event, editor) {
+      editor.settings.toolbar1 =
+        'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,wp_adv,dfw,groundhoggreplacementbtn,groundhoggemojibtn'
+      editor.settings.toolbar2 =
+        'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help'
+      editor.settings.height = 200
+      editor.on('click', function (ed, e) {
+        $doc.trigger('to_mce')
+      })
+    })
+
+    this.flag = 'improved'
   }
 
   const loadingModal = (text = 'Loading') => {
@@ -1472,6 +1472,9 @@
   }
 
   const icons = {
+    note: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <path fill="currentColor" d="M512 334.667V20c0-11.046-8.954-20-20-20H20C8.954 0 0 8.954 0 20v472c0 11.046 8.954 20 20 20h314.667c5.375 0 10.489-2.203 14.145-5.86L506.14 348.811c3.652-3.65 5.86-8.747 5.86-14.144zM40 40h432v274.667H334.667c-11.046 0-20 8.954-20 20V472H40zm403.716 314.667-89.049 89.049v-89.049zM118 177.333c0-11.046 8.954-20 20-20h236c11.046 0 20 8.954 20 20s-8.954 20-20 20H138c-11.046 0-20-8.954-20-20zM138 276c-11.046 0-20-8.954-20-20s8.954-20 20-20h236c11.046 0 20 8.954 20 20s-8.954 20-20 20z"/>
+</svg>`,
     // language=html
     mobile: `
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -1661,7 +1664,7 @@
     tooltip,
     clickedIn,
     ordinal_suffix_of,
-    bold
+    bold,
   }
 
 })(jQuery)

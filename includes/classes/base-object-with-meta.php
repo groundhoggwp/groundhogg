@@ -232,4 +232,39 @@ abstract class Base_Object_With_Meta extends Base_Object {
 			'admin' => $this->admin_link()
 		] );
 	}
+
+	/**
+	 * Duplicate
+	 *
+	 * @param array $overrides
+	 * @param array $meta_overrides
+	 *
+	 * @return Base_Object
+	 */
+	public function duplicate( $overrides = [], $meta_overrides=[] ) {
+
+		$data = $this->data;
+
+		// Remove primary key from array
+		unset( $data[ $this->get_db()->get_primary_key() ] );
+
+		$class = __CLASS__;
+
+		/**
+		 * @var $object Base_Object_With_Meta
+		 */
+		$object = new $class;
+
+		$object->create( array_merge( $data, $overrides ) );
+
+		$object->update_meta( array_merge( $this->meta, $meta_overrides ));
+
+		/**
+		 * @param $new Base_Object_With_Meta the new object
+		 * @param $orig Base_Object_With_Meta the original object
+		 */
+		do_action( "groundhogg/{$this->get_object_type()}/duplicated", $object, $this );
+
+		return $object;
+	}
 }

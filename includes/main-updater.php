@@ -474,11 +474,19 @@ class Main_Updater extends Updater {
 	/**
 	 * New page tracking stuff!
 	 */
-	public function version_2_5_4(){
+	public function version_2_5_4() {
 		Plugin::instance()->dbs->install_dbs();
 
 		update_option( 'gh_purge_page_visits', 'on' );
 		update_option( 'gh_page_visits_log_retention', 90 );
+	}
+
+	/**
+	 * New page tracking stuff!
+	 */
+	public function version_2_5_5() {
+		Plugin::$instance->roles->install_roles_and_caps();
+		get_db( 'notes' )->create_table();
 	}
 
 	/**
@@ -535,6 +543,7 @@ class Main_Updater extends Updater {
 			'2.5.1.3',
 			'2.5.3',
 			'2.5.4',
+			'2.5.5',
 		];
 	}
 
@@ -564,6 +573,7 @@ class Main_Updater extends Updater {
 			'2.5.1.3',
 			'2.5.3',
 			'2.5.4',
+			'2.5.5',
 		];
 	}
 
@@ -611,6 +621,7 @@ class Main_Updater extends Updater {
 			'2.5.1.3'       => __( 'Use TINYINT(1) instead of BIT(1)', 'groundhogg' ),
 			'2.5.3'         => __( 'Update the gh-cron.php file to support subsites on multisite networks.', 'groundhogg' ),
 			'2.5.4'         => __( 'Improve the page tracking flow and track page visits for contacts.', 'groundhogg' ),
+			'2.5.5'         => __( 'Add new caps for notes', 'groundhogg' ),
 		];
 	}
 }

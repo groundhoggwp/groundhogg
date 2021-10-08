@@ -381,6 +381,38 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	}
 
 	/**
+	 * Duplicate an object
+	 *
+	 * @param array $overrides
+	 *
+	 * @return Base_Object
+	 */
+	public function duplicate ( $overrides = [] ) {
+
+		$data = $this->data;
+
+		// Remove primary key from array
+		unset( $data[ $this->get_db()->get_primary_key() ] );
+
+		$class = __CLASS__;
+
+		/**
+		 * @var $object Base_Object
+		 */
+		$object = new $class;
+
+		$object->create( array_merge( $data, $overrides ) );
+
+		/**
+		 * @param $new Base_Object the new object
+		 * @param $orig Base_Object the original object
+		 */
+		do_action( "groundhogg/{$this->get_object_type()}/duplicated", $object, $this );
+
+		return $object;
+	}
+
+	/**
 	 * Sanitize columns when updating the object
 	 *
 	 * @param array $data

@@ -22,6 +22,39 @@
     return $(selector).select2(args)
   }
 
+  $.fn.ghPicker = function ({
+    endpoint,
+    getResults = (r) => r.items,
+    getParams = (q) => ({
+      ...q,
+      search: q.term
+    }),
+    ...rest
+  }) {
+
+    this.select2({
+      tokenSeparators: ['/', ',', ';'],
+      delay: 100,
+      ajax: {
+        url: endpoint,
+        // delay: 250,
+        dataType: 'json',
+        data: getParams,
+        beforeSend: function (xhr) {
+          xhr.setRequestHeader('X-WP-Nonce', nonces._wprest)
+        },
+        processResults: function (data, page) {
+          return {
+            results: getResults(data, page)
+          }
+        },
+      },
+      ...rest
+    })
+
+    return this
+  }
+
   /**
    * This is an API picker!
    *

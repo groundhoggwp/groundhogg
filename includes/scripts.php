@@ -98,9 +98,9 @@ class Scripts {
 			'has_accepted_cookies'         => has_accepted_cookies(),
 
 			//deprecated
-			'ajaxurl'                  => admin_url( 'admin-ajax.php' ),
-			'_wpnonce'                 => wp_create_nonce( 'wp_rest' ),
-			'_ghnonce'                 => wp_create_nonce( 'groundhogg_frontend' ),
+			'ajaxurl'                      => admin_url( 'admin-ajax.php' ),
+			'_wpnonce'                     => wp_create_nonce( 'wp_rest' ),
+			'_ghnonce'                     => wp_create_nonce( 'groundhogg_frontend' ),
 		) );
 
 		wp_enqueue_script( 'groundhogg-frontend' );
@@ -185,6 +185,14 @@ class Scripts {
 			'wp-i18n'
 		], GROUNDHOGG_VERSION );
 
+		wp_register_script( 'groundhogg-admin-components', GROUNDHOGG_ASSETS_URL . 'js/admin/components' . $dot_min . '.js', [
+			'groundhogg-admin-element',
+		], GROUNDHOGG_VERSION );
+
+		wp_register_script( 'groundhogg-admin-properties', GROUNDHOGG_ASSETS_URL . 'js/admin/properties' . $dot_min . '.js', [
+			'groundhogg-admin-element',
+		], GROUNDHOGG_VERSION );
+
 		wp_register_script( 'groundhogg-admin-search-filters', GROUNDHOGG_ASSETS_URL . 'js/admin/search-filters' . $dot_min . '.js', [
 			'groundhogg-admin-element',
 			'groundhogg-admin-user',
@@ -203,6 +211,12 @@ class Scripts {
 			'groundhogg-admin-user',
 			'groundhogg-admin-send-broadcast'
 		], GROUNDHOGG_VERSION, true );
+
+		wp_register_script( 'groundhogg-admin-notes', GROUNDHOGG_ASSETS_URL . 'js/admin/notes' . $dot_min . '.js', [
+			'groundhogg-admin-element',
+			'groundhogg-admin-data',
+			'groundhogg-admin-user',
+		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-admin-send-broadcast', GROUNDHOGG_ASSETS_URL . '/js/admin/send-broadcast' . $dot_min . '.js', [
 			'groundhogg-admin',
@@ -229,7 +243,8 @@ class Scripts {
 
 		wp_register_script( 'groundhogg-admin-contact-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/contact-editor' . $dot_min . '.js', [
 			'jquery',
-			'jquery-ui-sortable'
+			'jquery-ui-sortable',
+			'groundhogg-admin-notes'
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-contact-info-cards', GROUNDHOGG_ASSETS_URL . 'js/admin/info-cards' . $dot_min . '.js', [
@@ -352,6 +367,7 @@ class Scripts {
 					'v4' => [
 						'root'       => rest_url( Base_Api::NAME_SPACE ),
 						'tags'       => rest_url( Base_Api::NAME_SPACE . '/tags' ),
+						'notes'      => rest_url( Base_Api::NAME_SPACE . '/notes' ),
 						'contacts'   => rest_url( Base_Api::NAME_SPACE . '/contacts' ),
 						'emails'     => rest_url( Base_Api::NAME_SPACE . '/emails' ),
 						'funnels'    => rest_url( Base_Api::NAME_SPACE . '/funnels' ),
