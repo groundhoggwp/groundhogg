@@ -54,7 +54,7 @@ h3{
   .property-group-fields{
     grid-gap: 10px;
     display: grid;
-    grid-template-columns: repeat(3,minmax(0,1fr));
+    grid-template-columns: repeat(2,minmax(0,1fr));
 
     .property-field{
       max-width: 100%;
@@ -64,7 +64,12 @@ h3{
         display: block;
       }
 
-      input, select {
+      .checkbox-label {
+        font-weight: 400 !important;
+        display: block;
+      }
+
+      input, select, textarea {
         max-width: 100%;
       }
     }
@@ -570,6 +575,16 @@ button {
   &.gh-dialog-error {
     color: #FFFFFF;
     background-color: $error-red;
+  }
+
+  &.gh-dialog-warning {
+    color: #FFFFFF;
+    background-color: $benchmark-orange;
+  }
+
+  &.gh-dialog-info {
+    color: #FFFFFF;
+    background-color: $primary-dark;
   }
 }
 

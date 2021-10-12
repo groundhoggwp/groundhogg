@@ -265,8 +265,8 @@
         })
     },
 
-    async createRelationship (id, { other_id, other_type }, opts = {}) {
-      return apiPost(`${this.route}/${id}/relationships`, { other_id, other_type }, opts)
+    async createRelationships (id, data, opts = {}) {
+      return apiPost(`${this.route}/${id}/relationships`, data, opts)
         .then(r => this.getItemFromResponse(r))
         .then(item => {
           this.item = item
@@ -277,8 +277,8 @@
         })
     },
 
-    async deleteRelationship (id, { other_id, other_type }, opts = {}) {
-      return apiDelete(`${this.route}/${id}/relationships`, { other_id, other_type }, opts)
+    async deleteRelationships (id, data, opts = {}) {
+      return apiDelete(`${this.route}/${id}/relationships`, data, opts)
         .then(r => this.getItemFromResponse(r))
         .then(item => {
           this.item = item

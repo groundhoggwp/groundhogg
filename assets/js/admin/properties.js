@@ -8,6 +8,7 @@
     modal,
     copyObject,
     input,
+    textarea,
     select,
     tinymceElement,
     moreMenu,
@@ -49,10 +50,30 @@
 			type: 'text'
 		})}`
       },
-      onMount: ({ id }, onChange) => {
+      onMount: ({ id, name }, onChange) => {
         $(`#${id}`).on('change', (e) => {
           onChange({
-            [props.name]: e.target.value
+            [name]: e.target.value
+          })
+        })
+      },
+      edit: () => {
+        return ''
+      },
+      onEditMount: () => {}
+    },
+    textarea: {
+      name: __('Textarea', 'groundhogg'),
+      view: ({ label, ...props }) => {
+        //language=HTML
+        return `<label class="property-label" for="${props.id}">${label}</label>${textarea({
+			...props,
+		})}`
+      },
+      onMount: ({ id, name }, onChange) => {
+        $(`#${id}`).on('change', (e) => {
+          onChange({
+            [name]: e.target.value
           })
         })
       },
@@ -105,24 +126,100 @@
     },
     checkboxes: {
       name: __('Checkboxes', 'groundhogg'),
-      view: () => {},
-      onMount: () => {},
-      edit: () => {},
-      onEditMount: () => {}
+      view: ({ label, id, name, options, value, ...props }) => {
+        //language=HTML
+        return `<label class="property-label">${label}</label>
+		${options.map(opt => `<label class="checkbox-label">${input({
+			type: 'checkbox',
+			value: opt,
+			dataId: id,
+			checked: value.includes(opt)
+		})} ${opt}</label>`).join('')}`
+      },
+      onMount: ({ id, name }, onChange) => {
+        $(`input[type=checkbox][data-id=${id}]`).on('change', e => {
+
+          let checked = []
+
+          $(`input[type=checkbox][data-id=${id}]`).each((i, e) => {
+            if (e.checked) {
+              checked.push(e.value)
+            }
+          })
+
+          onChange({
+            [name]: checked,
+          })
+        })
+      },
+      edit: (field) => {
+
+        const { multiple, blankOption } = field
+
+        //language=HTML
+        return `
+			<div class="gh-rows-and-columns">
+				<div class="gh-row">
+					<div class="gh-col">
+						<label>${__('Options', 'groundhogg')}</label>
+						<div id="property-dropdown-options"></div>
+					</div>
+				</div>
+			</div>
+        `
+      },
+      onEditMount: (field, updateField) => {
+        optionsRepeater({
+          selector: '#property-dropdown-options',
+          options: field.options || [''],
+          onChange: (options) => updateField({ options })
+        })
+      }
     },
 
     radio: {
       name: __('Radio Buttons', 'groundhogg'),
-      view: () => {},
-      onMount: ({ id }, onChange) => {
-
+      view: ({ label, id, name, options, value, ...props }) => {
+        //language=HTML
+        return `<label class="property-label">${label}</label>
+		${options.map(opt => `<label class="checkbox-label">${input({
+			type: 'radio',
+			value: opt,
+			name,
+			checked: value === opt
+		})} ${opt}</label>`).join('')}`
       },
-      edit: () => {},
-      onEditMount: () => {}
+      onMount: ({ id, name }, onChange) => {
+        $(`input[type=radio][name=${name}]`).on('change', e => {
+          onChange({
+            [name]: e.target.value
+          })
+        })
+      },
+      edit: (field) => {
+        //language=HTML
+        return `
+			<div class="gh-rows-and-columns">
+				<div class="gh-row">
+					<div class="gh-col">
+						<label>${__('Options', 'groundhogg')}</label>
+						<div id="property-dropdown-options"></div>
+					</div>
+				</div>
+			</div>
+        `
+      },
+      onEditMount: (field, updateField) => {
+        optionsRepeater({
+          selector: '#property-dropdown-options',
+          options: field.options || [''],
+          onChange: (options) => updateField({ options })
+        })
+      }
     },
     dropdown: {
       name: __('Dropdown', 'groundhogg'),
-      view: ({ label, value, options, blankOption, ...props }) => {
+      view: ({ label, value, options = [], blankOption, ...props }) => {
 
         options = options.map(o => ({ text: o, value: o }))
 
@@ -138,9 +235,11 @@
       onMount: ({ id, multiple, name, ...props }, onChange) => {
         $(`#${id}`).on('change', (e) => {
 
+          console.log(e)
+
           if (multiple) {
             onChange({
-              [name]: e.target.selectedOptions.map(o => o.value)
+              [name]: [...e.target.selectedOptions].map(o => o.value)
             })
           } else {
             onChange({
@@ -200,9 +299,7 @@
           })
         })
       }
-
     }
-
   }
 
   const Templates = {
@@ -234,7 +331,7 @@
 				  </button>
 			  </div>
 			  <div class="property-group-fields">
-				  ${fields.map(f => Templates.field(f)).join('')}
+				  ${fields && fields.length ? fields.map(f => Templates.field(f)).join('') : `<button data-id="${group.id}" class="gh-button secondary property-group-add-field">${__('Add field', 'groundhogg')}</button>`}
 			  </div>
 		  </div>`
     },
@@ -312,7 +409,7 @@
 		  </div>`
     },
 
-    field: ({group, ...field}) => {
+    field: ({ group, ...field }) => {
       //language=HTML
       return `
 		  <div class="property-field" data-group="${group}" data-id="${field.id}">
@@ -393,16 +490,25 @@
         properties.groups = []
       }
 
+      let groupId = uuid()
+
       properties.groups.push({
-        id: uuid(),
+        id: groupId,
         name
       })
 
       onPropertiesUpdated(properties)
 
       mount()
+
+      addOrEditField({
+        type: 'text',
+        name: '',
+        label: '',
+        group: groupId,
+      }, addField)
     }
-    
+
     const addPropertyGroupModal = () => {
       const { close } = modal({
         content: Templates.addPropertyGroup()
@@ -420,6 +526,64 @@
           addGroup(groupName)
         }
       })
+    }
+
+    const addOrEditField = (newField, onDone) => {
+
+      const onAddFieldMount = () => {
+
+        const sanitizeKey = (label) => {
+          return label.toLowerCase().replace(/[^a-z0-9]/g, '_')
+        }
+
+        const updateField = (props, r = false) => {
+          newField = {
+            ...newField,
+            ...props
+          }
+
+          if (r) {
+            setContent(Templates.addField(newField))
+            onAddFieldMount()
+          }
+        }
+
+        $('#property-field-label').on('input change', (e) => {
+          let label = e.target.value
+          let name = sanitizeKey(label)
+
+          updateField({
+            label,
+            name
+          })
+
+          $('#property-field-name').val(name)
+        })
+
+        $('#property-field-name').on('input change', (e) => {
+          updateField({ name: e.target.value })
+        })
+
+        $('#property-field-type').on('change', (e) => {
+          newField.type = e.target.value
+          setContent(Templates.addField(newField))
+          onAddFieldMount()
+          $('#property-field-type').focus()
+        })
+
+        $('#create-property-field').on('click', (e) => {
+          onDone(newField)
+          close()
+        })
+
+        fieldTypes[newField.type].onEditMount(newField, updateField)
+      }
+
+      const { close, setContent } = modal({
+        content: Templates.addField(newField)
+      })
+
+      onAddFieldMount()
     }
 
     const mount = () => {
@@ -468,52 +632,10 @@
             switch (k) {
               case 'edit':
 
-                let newField = {
-                  ...field
-                }
-
-                const onAddFieldMount = () => {
-
-                  const updateField = (props, r = false) => {
-                    newField = {
-                      ...newField,
-                      ...props
-                    }
-
-                    if (r) {
-                      setContent(Templates.addField(newField))
-                      onAddFieldMount()
-                    }
-                  }
-
-                  $('#property-field-label').on('input change', (e) => {
-                    newField.label = e.target.value
-                  })
-
-                  $('#property-field-name').on('input change', (e) => {
-                    newField.name = e.target.value
-                  })
-
-                  $('#property-field-type').on('change', (e) => {
-                    newField.type = e.target.value
-                    setContent(Templates.addField(newField))
-                    onAddFieldMount()
-                    $('#property-field-type').focus()
-                  })
-
-                  $('#create-property-field').on('click', (e) => {
-                    editField(fieldId, newField)
-                    close()
-                  })
-
-                  fieldTypes[newField.type].onEditMount(newField, updateField)
-                }
-
-                const { close, setContent } = modal({
-                  content: Templates.addField(newField)
+                addOrEditField({ ...field }, (field) => {
+                  editField(fieldId, field)
                 })
 
-                onAddFieldMount()
                 break
               case 'delete':
                 dangerConfirmationModal({
@@ -526,6 +648,21 @@
             }
           }
         })
+      })
+
+      $('.property-group-add-field').on('click', (e) => {
+
+        const groupId = e.currentTarget.dataset.id
+
+        let newField = {
+          type: 'text',
+          name: '',
+          label: '',
+          group: groupId,
+        }
+
+        addOrEditField(newField, addField)
+
       })
 
       $('.property-group-more').on('click', (e) => {
@@ -555,7 +692,7 @@
             switch (k) {
               case 'add-group':
                 addPropertyGroupModal()
-                break;
+                break
               case 'add-field':
 
                 let newField = {
@@ -565,48 +702,7 @@
                   group: groupId,
                 }
 
-                const onAddFieldMount = () => {
-
-                  const updateField = (props, r = false) => {
-                    newField = {
-                      ...newField,
-                      ...props
-                    }
-
-                    if (r) {
-                      setContent(Templates.addField(newField))
-                      onAddFieldMount()
-                    }
-                  }
-
-                  $('#property-field-label').on('input change', (e) => {
-                    newField.label = e.target.value
-                  })
-
-                  $('#property-field-name').on('input change', (e) => {
-                    newField.name = e.target.value
-                  })
-
-                  $('#property-field-type').on('change', (e) => {
-                    newField.type = e.target.value
-                    setContent(Templates.addField(newField))
-                    onAddFieldMount()
-                    $('#property-field-type').focus()
-                  })
-
-                  $('#create-property-field').on('click', (e) => {
-                    addField(newField)
-                    close()
-                  })
-
-                  fieldTypes[newField.type].onEditMount(newField, updateField)
-                }
-
-                const { close, setContent } = modal({
-                  content: Templates.addField(newField)
-                })
-
-                onAddFieldMount()
+                addOrEditField(newField, addField)
 
                 break
               case 'rename':

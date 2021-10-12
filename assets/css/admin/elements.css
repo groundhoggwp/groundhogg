@@ -23,7 +23,7 @@ h3.no-margin-top {
 .property-groups .property-group-fields {
   grid-gap: 10px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .property-groups .property-group-fields .property-field {
   max-width: 100%;
@@ -32,7 +32,11 @@ h3.no-margin-top {
   font-weight: 500;
   display: block;
 }
-.property-groups .property-group-fields .property-field input, .property-groups .property-group-fields .property-field select {
+.property-groups .property-group-fields .property-field .checkbox-label {
+  font-weight: 400 !important;
+  display: block;
+}
+.property-groups .property-group-fields .property-field input, .property-groups .property-group-fields .property-field select, .property-groups .property-group-fields .property-field textarea {
   max-width: 100%;
 }
 
@@ -446,6 +450,14 @@ button.gh-button.loud {
 .gh-dialog.gh-dialog-error {
   color: #FFFFFF;
   background-color: #e91f4f;
+}
+.gh-dialog.gh-dialog-warning {
+  color: #FFFFFF;
+  background-color: #f58115;
+}
+.gh-dialog.gh-dialog-info {
+  color: #FFFFFF;
+  background-color: #102640;
 }
 
 .gh-modal {

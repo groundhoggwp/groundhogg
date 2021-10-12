@@ -854,6 +854,7 @@
 
     const stop = () => {
       clearInterval(interval)
+      $el.remove()
     }
 
     const interval = setInterval(() => {

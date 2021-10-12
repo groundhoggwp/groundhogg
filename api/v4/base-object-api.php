@@ -258,17 +258,35 @@ abstract class Base_Object_Api extends Base_Api {
 		register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/relationships", [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'create_single_relationships' ],
+				'callback'            => [ $this, 'create_relationships' ],
 				'permission_callback' => [ $this, 'create_permissions_callback' ]
 			],
 			[
 				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'read_single_relationships' ],
+				'callback'            => [ $this, 'read_relationships' ],
 				'permission_callback' => [ $this, 'read_permissions_callback' ]
 			],
 			[
 				'methods'             => WP_REST_Server::DELETABLE,
-				'callback'            => [ $this, 'delete_single_relationships' ],
+				'callback'            => [ $this, 'delete_relationships' ],
+				'permission_callback' => [ $this, 'delete_permissions_callback' ]
+			],
+		] );
+
+		register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/relationship", [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'create_single_relationship' ],
+				'permission_callback' => [ $this, 'create_permissions_callback' ]
+			],
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'read_relationships' ],
+				'permission_callback' => [ $this, 'read_permissions_callback' ]
+			],
+			[
+				'methods'             => WP_REST_Server::DELETABLE,
+				'callback'            => [ $this, 'delete_single_relationship' ],
 				'permission_callback' => [ $this, 'delete_permissions_callback' ]
 			],
 		] );
@@ -639,13 +657,57 @@ abstract class Base_Object_Api extends Base_Api {
 	}
 
 	/**
+	 * Create many relationships
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function create_relationships( WP_REST_Request $request ) {
+		$primary_key = absint( $request->get_param( $this->get_primary_key() ) );
+
+		$object = $this->create_new_object( $primary_key );
+
+		if ( ! $object->exists() ) {
+			return $this->ERROR_RESOURCE_NOT_FOUND();
+		}
+
+		$other_id   = $request->get_param( 'other_id' );
+		$other_type = $request->get_param( 'other_type' );
+
+		if ( $other_id && $other_type ) {
+			return $this->create_single_relationship( $request );
+		}
+
+		$relationships = $request->get_params();
+
+		foreach ( $relationships as $relationship ) {
+
+			$other_id   = get_array_var( $relationship, 'other_id' );
+			$other_type = get_array_var( $relationship, 'other_type' );
+
+			if ( ! $other_id || ! $other_type ){
+				continue;
+			}
+
+			$other = create_object_from_type( $other_id, $other_type );
+
+			$object->create_relationship( $other );
+		}
+
+		return self::SUCCESS_RESPONSE( [
+			'item' => $object
+		] );
+	}
+
+	/**
 	 * Create a relationship between the given object and another object
 	 *
 	 * @param WP_REST_Request $request
 	 *
 	 * @return WP_Error|WP_REST_Response
 	 */
-	public function create_single_relationships( WP_REST_Request $request ) {
+	public function create_single_relationship( WP_REST_Request $request ) {
 
 		$primary_key = absint( $request->get_param( $this->get_primary_key() ) );
 
@@ -674,7 +736,7 @@ abstract class Base_Object_Api extends Base_Api {
 	 *
 	 * @return WP_Error|WP_REST_Response
 	 */
-	public function read_single_relationships( WP_REST_Request $request ) {
+	public function read_relationships( WP_REST_Request $request ) {
 
 		$primary_key = absint( $request->get_param( $this->get_primary_key() ) );
 
@@ -692,13 +754,57 @@ abstract class Base_Object_Api extends Base_Api {
 	}
 
 	/**
+	 * Delete many relationships
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function delete_relationships( WP_REST_Request $request ) {
+		$primary_key = absint( $request->get_param( $this->get_primary_key() ) );
+
+		$object = $this->create_new_object( $primary_key );
+
+		if ( ! $object->exists() ) {
+			return $this->ERROR_RESOURCE_NOT_FOUND();
+		}
+
+		$other_id   = $request->get_param( 'other_id' );
+		$other_type = $request->get_param( 'other_type' );
+
+		if ( $other_id && $other_type ) {
+			return $this->delete_single_relationship( $request );
+		}
+
+		$relationships = $request->get_params();
+
+		foreach ( $relationships as $relationship ) {
+
+			$other_id   = get_array_var( $relationship, 'other_id' );
+			$other_type = get_array_var( $relationship, 'other_type' );
+
+			if ( ! $other_id || ! $other_type ){
+				continue;
+			}
+
+			$other = create_object_from_type( $other_id, $other_type );
+
+			$object->delete_relationship( $other );
+		}
+
+		return self::SUCCESS_RESPONSE( [
+			'item' => $object
+		] );
+	}
+
+	/**
 	 * Create a relationship between the given object and another object
 	 *
 	 * @param WP_REST_Request $request
 	 *
 	 * @return WP_Error|WP_REST_Response
 	 */
-	public function delete_single_relationships( WP_REST_Request $request ) {
+	public function delete_single_relationship( WP_REST_Request $request ) {
 
 		$primary_key = absint( $request->get_param( $this->get_primary_key() ) );
 

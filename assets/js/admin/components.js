@@ -1,6 +1,6 @@
 ($ => {
 
-  const { modal, errorDialog, select, input, isValidEmail } = Groundhogg.element
+  const { modal, errorDialog, loadingDots, select, uuid, input, isValidEmail } = Groundhogg.element
   const { contacts: ContactsStore } = Groundhogg.stores
   const { tagPicker } = Groundhogg.pickers
   const { sprintf, __, _x, _n } = wp.i18n
@@ -202,11 +202,11 @@
         }
 
         $(target).prop('disabled', true)
-        const { stop } = loadingDots(`#${classPrefix}-quick-add-button`)
+        const { stop } = loadingDots(`#${prefix}-quick-add-button`)
         ContactsStore.post(payload).then(c => {
           stop()
           close()
-          onCreate(item)
+          onCreate(c)
         })
       })
 
@@ -245,9 +245,39 @@
 
   }
 
+  const makeInput = (selector, {
+    inputProps = {},
+    value = '',
+    onChange = () => {},
+    replaceWith = () => {}
+  }) => {
+
+    inputProps = {
+      id: uuid(),
+      value,
+      ...inputProps
+    }
+
+    $(selector).replaceWith(input(inputProps))
+
+    $(`#${inputProps.id}`).focus().on('blur keydown', e => {
+
+      if ( e.type === 'keydown' && e.key !== 'Enter' ){
+        return;
+      }
+
+      value = e.target.value
+      onChange( value )
+
+      $(`#${inputProps.id}`).replaceWith( replaceWith( value ) )
+    })
+
+  }
+
   Groundhogg.components = {
     addContactModal,
-    selectContactModal
+    selectContactModal,
+    makeInput,
   }
 
 })(jQuery)
