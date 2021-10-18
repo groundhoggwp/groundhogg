@@ -46,6 +46,8 @@ h3 {
   min-width: 360px;
 
   .property-group {
+    margin-top: 20px;
+
     .property-group-header {
       display: flex;
       justify-content: space-between;
@@ -155,6 +157,12 @@ h3 {
     }
 
     .note-content {
+
+      img {
+        max-width: 100%;
+        height: auto !important;
+      }
+
       p {
         margin-top: 0;
       }

@@ -139,7 +139,11 @@ class Tags extends DB {
 					$tags[] = $tag->tag_id;
 
 				} else {
-					$tags[] = $this->add( array( 'tag_name' => sanitize_text_field( $tag_id_or_string ) ) );
+
+					// Only add if the current user is allowed to do so.
+					if ( current_user_can( 'add_tags' ) ){
+						$tags[] = $this->add( array( 'tag_name' => sanitize_text_field( $tag_id_or_string ) ) );
+					}
 				}
 			}
 		}

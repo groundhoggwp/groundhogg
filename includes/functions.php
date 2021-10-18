@@ -5502,8 +5502,7 @@ function create_object_from_type( $object, $object_type ) {
  * Whether this site provides templates, if so then the gh/v4/emails READ and gh/v4/funnels READ will be public
  */
 function is_template_site() {
-	// Todo change this
-	return apply_filters( 'groundhogg/is_template_site', true );
+	return apply_filters( 'groundhogg/is_template_site', false );
 }
 
 /**

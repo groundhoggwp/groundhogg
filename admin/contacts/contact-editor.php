@@ -312,11 +312,10 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 			//print_r( $contact->tags );
 
 			$args = array(
-				'id'       => 'tags',
-				'name'     => 'tags[]',
+				'id'   => 'tags',
+				'name' => 'tags[]',
 				'selected' => $contact->get_tags(),
-				'style'    => [ 'min-width' => '600px' ]
-
+				'style'    => [ 'min-width' => '600px' ],
 			);
 			echo html()->tag_picker( $args ); ?>
 			<p class="description"><?php _ex( 'Add new tags by hitting <code>Enter</code> or by typing a <code>,</code>.', 'contact_record', 'groundhogg' ); ?></p>

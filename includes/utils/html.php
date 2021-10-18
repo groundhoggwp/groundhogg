@@ -920,7 +920,7 @@ class HTML {
 			'selected'    => array(),
 			'multiple'    => true,
 			'placeholder' => __( 'Please Select a Tag', 'groundhogg' ),
-			'tags'        => true,
+			'tags'        => current_user_can( 'add_tags' ),
 		) );
 
 		$a['selected'] = wp_parse_id_list( $a['selected'] );

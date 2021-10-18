@@ -210,7 +210,7 @@
    * @param opts
    */
   function tagPicker (selector, multiple = true, onReceiveItems = (items) => {}, ...opts) {
-    return apiPicker(selector, gh.api.routes.v4.tags, multiple, true,
+    return apiPicker(selector, gh.api.routes.v4.tags, multiple, Groundhogg.user.userHasCap( 'add_tags' ),
       (data) => {
 
         onReceiveItems(data.items)

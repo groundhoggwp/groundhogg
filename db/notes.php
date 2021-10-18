@@ -163,4 +163,13 @@ class Notes extends DB {
 		$wpdb->query( "ALTER TABLE {$this->table_name} ADD object_type VARCHAR({$this->get_max_index_length()}) NOT NULL;" );
 		$wpdb->query( "UPDATE {$this->table_name} SET object_type = 'contact' WHERE object_type = ''; " );
 	}
+
+	/**
+	 * Update the note type to the default
+	 */
+	public function update_2_5_5(){
+		global $wpdb;
+
+		$wpdb->query( "UPDATE $this->table_name SET type = 'note' WHERE type = ''" );
+	}
 }

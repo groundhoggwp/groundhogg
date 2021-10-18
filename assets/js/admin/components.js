@@ -378,7 +378,7 @@
 
       addMediaToBasicTinyMCE()
 
-      tinymceElement('send-email-content', {
+      let editor = tinymceElement('send-email-content', {
         quicktags: false,
         tinymce: {
           height: 300,
@@ -404,7 +404,10 @@
         $(target).text(__('Sending', 'groundhogg')).prop('disabled', true)
         const { stop } = loadingDots(target)
 
-        post(`${routes.v4.emails}/send`, email).then((r) => {
+        post(`${routes.v4.emails}/send`, {
+          ...email,
+          content: editor.getContent({ format: 'raw' })
+        }).then((r) => {
 
           stop()
           $(target).text(__('Send', 'groundhogg')).prop('disabled', false)

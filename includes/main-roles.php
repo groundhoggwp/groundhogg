@@ -172,10 +172,15 @@ class Main_Roles extends Roles {
 					break;
 				}
 
-				// Most common methods for comparing
-				if ( ( method_exists( $object, 'get_owner_id' ) && $object->get_owner_id() !== $user_id )
-				     || ( method_exists( $object, 'get_user_id' ) && $object->get_user_id() !== $user_id ) ) {
-					$caps[] = $action . '_others_' . $object_type . 's';
+				switch ( $object_type ) {
+					case 'note':
+					case 'contact':
+					default:
+						// Most common methods for comparing
+						if ( ( method_exists( $object, 'get_owner_id' ) && $object->get_owner_id() !== $user_id ) ) {
+							$caps[] = $action . '_others_' . $object_type . 's';
+						}
+						break;
 				}
 
 				break;
@@ -243,7 +248,6 @@ class Main_Roles extends Roles {
 			'import_contacts',
 			'export_contacts',
 			'send_emails',
-			'view_events',
 			'manage_tags',
 			'download_contact_files',
 			'view_others_notes',

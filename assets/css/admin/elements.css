@@ -18,6 +18,9 @@ h3.no-margin-top {
 .property-groups {
   min-width: 360px;
 }
+.property-groups .property-group {
+  margin-top: 20px;
+}
 .property-groups .property-group .property-group-header {
   display: flex;
   justify-content: space-between;
@@ -100,6 +103,10 @@ h3.no-margin-top {
   color: rgba(16, 38, 64, 0.3);
   align-items: center;
   justify-content: space-between;
+}
+.notes-widget .note .note-content img {
+  max-width: 100%;
+  height: auto !important;
 }
 .notes-widget .note .note-content p {
   margin-top: 0;

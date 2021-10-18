@@ -486,7 +486,9 @@ class Main_Updater extends Updater {
 	 */
 	public function version_2_5_5() {
 		Plugin::$instance->roles->install_roles_and_caps();
+		get_role( 'sales_rep' )->remove_cap( 'view_events' );
 		get_db( 'notes' )->create_table();
+		get_db('notes')->update_2_5_5();
 	}
 
 	/**

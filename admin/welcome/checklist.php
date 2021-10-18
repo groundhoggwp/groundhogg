@@ -52,7 +52,7 @@ $checklist_items = [
 		'description' => __( "It looks like you have existing users in your site, let's sync them with your contacts so you can send them email.", 'groundhogg' ),
 		'completed'   => count_users()['total_users'] <= get_db( 'contacts' )->count(),
 		'fix'         => admin_page_url( 'gh_tools', [ 'tab' => 'sync_create_users' ] ),
-		'cap'         => 'import_contacts'
+		'cap'         => 'add_users'
 	],
 	[
 		'title'       => __( 'Import Your List Of Contacts', 'groundhogg' ),

@@ -1,7 +1,15 @@
 (($) => {
 
   const { notes: NotesStore } = Groundhogg.stores
-  const { icons, select, tinymceElement,addMediaToBasicTinyMCE, moreMenu, tooltip, dangerConfirmationModal } = Groundhogg.element
+  const {
+    icons,
+    select,
+    tinymceElement,
+    addMediaToBasicTinyMCE,
+    moreMenu,
+    tooltip,
+    dangerConfirmationModal
+  } = Groundhogg.element
   const { post, get, patch, routes, ajax } = Groundhogg.api
   const { userHasCap } = Groundhogg.user
   const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
@@ -36,7 +44,7 @@
 			  </div>
 			  <div class="notes">
 				  ${adding ? templates.addNote() : ``}
-				  ${notes.sort( (a,b) => b.data.timestamp - a.data.timestamp ).map(n => editing == n.ID ? templates.editNote(n) : templates.note(n)).join('')}
+				  ${notes.sort((a, b) => b.data.timestamp - a.data.timestamp).map(n => editing == n.ID ? templates.editNote(n) : templates.note(n)).join('')}
 			  </div>
 		  </div>`
     },
@@ -88,18 +96,18 @@
             let username
 
             if (!user) {
-              username = __( 'Unknown' )
-            } else{
+              username = __('Unknown')
+            } else {
               username = user.ID == Groundhogg.currentUser.ID ? __('me') : user.data.display_name
             }
 
-            return sprintf(__('Added by %s %s ago', 'groundhogg'), username, note.locale.time_diff )
+            return sprintf(__('Added by %s %s ago', 'groundhogg'), username, note.locale.time_diff)
 
           default:
           case 'system':
-            return sprintf(__('Added by %s %s ago', 'groundhogg'), __('System'), note.locale.time_diff )
+            return sprintf(__('Added by %s %s ago', 'groundhogg'), __('System'), note.locale.time_diff)
           case 'funnel':
-            return sprintf(__('Added by %s %s ago', 'groundhogg'), __('Funnel'), note.locale.time_diff )
+            return sprintf(__('Added by %s %s ago', 'groundhogg'), __('Funnel'), note.locale.time_diff)
         }
       }
 
@@ -192,8 +200,8 @@
         addNote()
       })
 
-      if ( ! userHasCap( 'add_notes' ) ){
-        $('.note-add').remove();
+      if (!userHasCap('add_notes')) {
+        $('.note-add').remove()
       }
 
       tooltip(`${selector} .note-add`, {
@@ -212,7 +220,7 @@
 
         addMediaToBasicTinyMCE()
 
-        tinymceElement('add-note-editor', {
+        let editor = tinymceElement('add-note-editor', {
           quicktags: false,
         }, (content) => {
           newNote.content = content
@@ -231,7 +239,10 @@
           state.adding = false
           state.editing = false
 
-          NotesStore.post({ data: newNote }).then(() => {
+          NotesStore.post({ data: {
+            ...newNote,
+              content: editor.getContent({ format: 'raw' })
+            } }).then(() => {
             render()
           })
         })
@@ -244,7 +255,7 @@
           type: editedNote.data.type,
         }
 
-        tinymceElement('edit-note-editor', {
+        let editor = tinymceElement('edit-note-editor', {
           quicktags: false,
         }, (content) => {
           updateNote.content = content
@@ -262,7 +273,12 @@
         $(`${selector} .save`).on('click', () => {
           state.adding = false
 
-          NotesStore.patch(state.editing, { data: updateNote }).then(() => {
+          NotesStore.patch(state.editing, {
+            data: {
+              ...updateNote,
+              content: editor.getContent({ format: 'raw' })
+            }
+          }).then(() => {
             state.editing = false
             render()
           })

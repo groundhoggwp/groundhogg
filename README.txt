@@ -327,6 +327,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * ADDED Data store methods for manipulating object relationships
 * ADDED Groundwork for merging various data types including contacts for an upcoming update
 * TWEAKED the benchmark complete method is now compatible with an array of contacts
+* TWEAKED Ground up rethink of permissions makes sales rep and sales manager roles more stable and secure
 
 = 2.5.4.2 (2021-10-05) =
 * HOT FIX Revert meta cache change

@@ -637,8 +637,10 @@
     )
 
     tinyMCE.get(editor_id).on('keyup', function (e) {
-      onChange(tinyMCE.activeEditor.getContent({ format: 'raw' }), tinyMCE.activeEditor.getContent({ format: 'raw' }))
+      onChange(tinyMCE.activeEditor.getContent({ format: 'raw' }))
     })
+
+    return tinyMCE.get(editor_id)
   }
 
   function addMediaToBasicTinyMCE () {
