@@ -117,7 +117,7 @@ class Imports_Table extends WP_List_Table {
 	/**
 	 * Get default column value.
 	 *
-	 * @param object $import A singular item (one full row's worth of data).
+	 * @param object $import      A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 *
 	 * @return string Text or HTML to be placed inside the column <td>.
@@ -154,6 +154,7 @@ class Imports_Table extends WP_List_Table {
 
 	/**
 	 * Prepares the list of items for displaying.
+	 *
 	 * @global $wpdb \wpdb
 	 * @uses $this->_column_headers
 	 * @uses $this->items
@@ -242,9 +243,9 @@ class Imports_Table extends WP_List_Table {
 	/**
 	 * Generates and displays row action rule.
 	 *
-	 * @param array $import Contact being acted upon.
+	 * @param array  $import      Contact being acted upon.
 	 * @param string $column_name Current column name.
-	 * @param string $primary Primary column name.
+	 * @param string $primary     Primary column name.
 	 *
 	 * @return string Row steps output for posts.
 	 */
@@ -255,21 +256,35 @@ class Imports_Table extends WP_List_Table {
 
 		$actions = array();
 
-		$actions['import'] = sprintf(
-			'<a href="%s" class="edit" aria-label="%s">%s</a>',
-			/* translators: %s: title */
-			admin_url( 'admin.php?page=gh_tools&tab=import&action=map&import=' . $import['file'] ),
-			esc_attr( 'Import' ),
-			__( 'Import' )
-		);
+		if ( current_user_can( 'import_contacts' ) ) {
+			$actions['import'] = sprintf(
+				'<a href="%s" class="edit" aria-label="%s">%s</a>',
+				/* translators: %s: title */
+				admin_url( 'admin.php?page=gh_tools&tab=import&action=map&import=' . $import['file'] ),
+				esc_attr( 'Import' ),
+				__( 'Import' )
+			);
+		}
 
-		$actions['delete'] = sprintf(
-			'<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-			wp_nonce_url( admin_url( 'admin.php?page=gh_tools&tab=import&action=delete&import=' . $import['file'] ) ),
-			/* translators: %s: title */
-			esc_attr( 'Delete Permanently' ),
-			__( 'Delete Import' )
-		);
+		if ( current_user_can( 'download_imports' ) ) {
+			$actions['import'] = sprintf(
+				'<a href="%s" class="edit" aria-label="%s">%s</a>',
+				/* translators: %s: title */
+				admin_url( 'admin.php?page=gh_tools&tab=import&action=map&import=' . $import['file'] ),
+				esc_attr( 'Import' ),
+				__( 'Import' )
+			);
+		}
+
+		if ( current_user_can( 'delete_files' ) ) {
+			$actions['delete'] = sprintf(
+				'<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
+				wp_nonce_url( admin_url( 'admin.php?page=gh_tools&tab=import&action=delete&import=' . $import['file'] ) ),
+				/* translators: %s: title */
+				esc_attr( 'Delete Permanently' ),
+				__( 'Delete Import' )
+			);
+		}
 
 		return $this->row_actions( $actions );
 	}

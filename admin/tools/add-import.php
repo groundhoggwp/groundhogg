@@ -31,9 +31,12 @@ do_action( 'groundhogg/import/form/before' );
 			<button class="button-primary" name="import_file_button"
 			        value="import"><?php _ex( 'Import Contacts', 'action', 'groundhogg' ); ?></button>
 		</form>
-		<p class="description" style="text-align: center"><a
-				href="<?php echo admin_url( 'admin.php?page=gh_tools&tab=import' ); ?>">&larr;&nbsp;<?php _e( 'Import from existing file.' ); ?></a>
-		</p>
+
+		<?php if ( current_user_can( 'view_previous_imports' ) ): ?>
+			<p class="description" style="text-align: center"><a
+					href="<?php echo admin_url( 'admin.php?page=gh_tools&tab=import' ); ?>">&larr;&nbsp;<?php _e( 'Import from existing file.' ); ?></a>
+			</p>
+		<?php endif; ?>
 	</div>
 	<?php do_action( 'groundhogg/import/form/after' ); ?>
 <?php

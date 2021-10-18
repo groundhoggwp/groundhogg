@@ -72,7 +72,16 @@
 
           $(`.${classPrefix}-result`).on('click', (e) => {
 
+            const ID = parseInt(e.currentTarget.dataset.contact)
+            const contact = ContactsStore.get(ID)
+
+
             if (clickedIn(e, '.email-contact')) {
+
+              e.preventDefault();
+
+              window.location.href = contact.admin + '&send_email=true'
+
               return
             }
 
@@ -83,9 +92,6 @@
             if (clickedIn(e, '.call-mobile')) {
               return
             }
-
-            const ID = parseInt(e.currentTarget.dataset.contact)
-            const contact = ContactsStore.get(ID)
 
             window.location.href = contact.admin
           })
@@ -105,7 +111,7 @@
 					  <button class="gh-button secondary text icon edit-profile">
 						  ${icons.contact}
 					  </button>
-					  <a class="email-contact gh-button secondary text icon send-email" href="mailto:${item.data.email}" target="_blank">
+					  <a class="email-contact gh-button secondary text icon send-email" href="mailto:${item.data.email}" data-id=${item.ID} target="_blank">
 						  ${icons.email}
 					  </a>
 					  ${item.meta.primary_phone ? `

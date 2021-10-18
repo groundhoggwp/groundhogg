@@ -209,6 +209,10 @@
         })
     },
 
+    async create (...args) {
+      return this.post(...args)
+    },
+
     async post (data, opts = {}) {
       return apiPost(this.route, data, opts)
         .then(r => this.getItemFromResponse(r))
@@ -218,6 +222,19 @@
           ])
           return item
         })
+    },
+
+    async postMany (data, opts = {}) {
+      return apiPost(this.route, data, opts)
+        .then(r => this.getItemsFromResponse(r))
+        .then(items => {
+          this.itemsFetched(items)
+          return items
+        })
+    },
+
+    async update (...args) {
+      return this.patch(...args)
     },
 
     async patch (id, data, opts = {}) {
@@ -238,6 +255,18 @@
         .then(items => {
           this.itemsFetched(items)
           return items
+        })
+    },
+
+    async duplicate (id, data, opts = {}) {
+      return apiPost(`${this.route}/${id}/duplicate`, data, opts)
+        .then(r => this.getItemFromResponse(r))
+        .then(item => {
+          this.item = item
+          this.itemsFetched([
+            item
+          ])
+          return item
         })
     },
 
@@ -288,7 +317,6 @@
           return item
         })
     },
-
 
     async delete (id) {
 

@@ -321,6 +321,13 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 2.5.5 (2021-10-05) =
+* ADDED More JS components for use in 3.0 and the pipeline extension
+* ADDED Custom properties component for creating custom properties for various data types on the fly
+* ADDED Data store methods for manipulating object relationships
+* ADDED Groundwork for merging various data types including contacts for an upcoming update
+* TWEAKED the benchmark complete method is now compatible with an array of contacts
+
 = 2.5.4.2 (2021-10-05) =
 * HOT FIX Revert meta cache change
 

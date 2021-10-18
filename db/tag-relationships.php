@@ -2,6 +2,7 @@
 
 namespace Groundhogg\DB;
 
+use Groundhogg\Base_Object;
 use function Groundhogg\get_db;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -74,10 +75,10 @@ class Tag_Relationships extends DB {
 	 * @since   2.1
 	 */
 	public function get_columns() {
-		return array(
+		return [
 			'tag_id'     => '%d',
 			'contact_id' => '%d',
-		);
+		];
 	}
 
 	/**

@@ -1,7 +1,7 @@
 (($) => {
 
   const { notes: NotesStore } = Groundhogg.stores
-  const { icons, select, tinymceElement, moreMenu, tooltip, dangerConfirmationModal } = Groundhogg.element
+  const { icons, select, tinymceElement,addMediaToBasicTinyMCE, moreMenu, tooltip, dangerConfirmationModal } = Groundhogg.element
   const { post, get, patch, routes, ajax } = Groundhogg.api
   const { userHasCap } = Groundhogg.user
   const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
@@ -36,7 +36,7 @@
 			  </div>
 			  <div class="notes">
 				  ${adding ? templates.addNote() : ``}
-				  ${notes.map(n => editing == n.ID ? templates.editNote(n) : templates.note(n)).join('')}
+				  ${notes.sort( (a,b) => b.data.timestamp - a.data.timestamp ).map(n => editing == n.ID ? templates.editNote(n) : templates.note(n)).join('')}
 			  </div>
 		  </div>`
     },
@@ -80,6 +80,29 @@
 
       const { content, type, context, user_id, date_created, timestamp } = note.data
 
+      const addedBy = () => {
+
+        switch (context) {
+          case 'user':
+            let user = Groundhogg.filters.owners.find(o => o.ID == user_id)
+            let username
+
+            if (!user) {
+              username = __( 'Unknown' )
+            } else{
+              username = user.ID == Groundhogg.currentUser.ID ? __('me') : user.data.display_name
+            }
+
+            return sprintf(__('Added by %s %s ago', 'groundhogg'), username, note.locale.time_diff )
+
+          default:
+          case 'system':
+            return sprintf(__('Added by %s %s ago', 'groundhogg'), __('System'), note.locale.time_diff )
+          case 'funnel':
+            return sprintf(__('Added by %s %s ago', 'groundhogg'), __('Funnel'), note.locale.time_diff )
+        }
+      }
+
       // language=HTML
       return `
 		  <div class="note">
@@ -88,7 +111,7 @@
 			  </div>
 			  <div style="width: 100%">
 				  <div class="note-header">
-					  ${sprintf(__('%s by %s', 'groundhogg'), date_created, user_id)}
+					  ${addedBy()}
 					  <div class="actions">
 						  <button class="gh-button text icon secondary note-more" data-id="${note.ID}">
 							  ${icons.verticalDots}
@@ -108,7 +131,7 @@
   const Notes = (selector, {
     object_type = '',
     object_id = 0,
-    title = __( 'Notes', 'groundhogg' ),
+    title = __('Notes', 'groundhogg'),
   }) => {
 
     let state = {
@@ -122,10 +145,10 @@
 
       wp.editor.remove('edit-note-editor')
       wp.editor.remove('add-note-editor')
-      
+
       const notes = NotesStore
         .filter(({ data }) => data.object_type == object_type && data.object_id == object_id)
-        .sort( (a,b) => b.data.timestamp - a.data.timestamp )
+        .sort((a, b) => b.data.timestamp - a.data.timestamp)
 
       $el.html(templates.notes(notes, state.adding, state.editing, title))
       onMount()
@@ -169,6 +192,10 @@
         addNote()
       })
 
+      if ( ! userHasCap( 'add_notes' ) ){
+        $('.note-add').remove();
+      }
+
       tooltip(`${selector} .note-add`, {
         content: __('Add Note', 'groundhogg'),
         position: 'left'
@@ -182,6 +209,8 @@
           content: '',
           type: 'note',
         }
+
+        addMediaToBasicTinyMCE()
 
         tinymceElement('add-note-editor', {
           quicktags: false,
@@ -208,7 +237,7 @@
         })
       } else if (state.editing) {
 
-        const editedNote = NotesStore.get( state.editing )
+        const editedNote = NotesStore.get(state.editing)
 
         const updateNote = {
           content: editedNote.data.content,
@@ -243,20 +272,22 @@
       $(`${selector} .note-more`).on('click', (e) => {
 
         const curNote = parseInt(e.currentTarget.dataset.id)
+        const note = () => NotesStore.get(curNote)
+        const belongsToMe = () => note().data.user_id == Groundhogg.currentUser.ID
 
         moreMenu(e.currentTarget, {
           items: [
             {
               key: 'edit',
-              cap: 'edit_notes',
+              cap: belongsToMe() ? 'edit_notes' : 'edit_others_notes',
               text: __('Edit')
             },
             {
               key: 'delete',
-              cap: 'delete_notes',
+              cap: belongsToMe() ? 'delete_notes' : 'delete_others_notes',
               text: `<span class="gh-text danger">${__('Delete')}</span>`
             }
-          ],
+          ].filter(i => userHasCap(i.cap)),
           onSelect: (k) => {
             switch (k) {
               case 'edit':
@@ -278,7 +309,7 @@
       })
     }
 
-    if ( ! NotesStore.filter( n => n.data.object_type == object_type && n.data.object_id == object_id ).length ){
+    if (!NotesStore.filter(n => n.data.object_type == object_type && n.data.object_id == object_id).length) {
       NotesStore.fetchItems({
         query: {
           object_id,

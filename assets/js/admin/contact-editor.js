@@ -1,5 +1,7 @@
 (function ($, editor) {
 
+  const { currentUser, filters } = Groundhogg
+
   $.extend(editor, {
 
     init: function () {
@@ -8,7 +10,32 @@
         object_id: editor.contact.ID,
         object_type: 'contact',
         title: '',
-      } )
+      })
+
+      const sendEmail = () => {
+        let { contact } = editor
+
+        let email = {
+          to: [contact.data.email],
+          from_email: currentUser.data.user_email,
+          from_name: currentUser.data.display_name,
+        }
+
+        if (currentUser.ID != contact.data.owner_id) {
+          email.cc = [filters.owners.find(u => u.ID = contact.data.owner_id).data.user_email]
+        }
+
+        Groundhogg.components.emailModal(email)
+      }
+
+      $('#send-email').on('click', e => {
+        e.preventDefault()
+        sendEmail()
+      })
+
+      if (window.location.href.match(/send_email=true/)) {
+        sendEmail()
+      }
 
       $('#meta-table').click(function (e) {
         if ($(e.target).closest('.deletemeta').length) {
@@ -50,12 +77,12 @@
 
       })
 
-      $('#view-more-tags').on('click', function (e){
+      $('#view-more-tags').on('click', function (e) {
         e.preventDefault()
 
-        $(this).parent().html( editor.contact.tags.map( tag => {
-          return `<span class="tag">${tag.data.tag_name}</span>`;
-        } ).join('' ) );
+        $(this).parent().html(editor.contact.tags.map(tag => {
+          return `<span class="tag">${tag.data.tag_name}</span>`
+        }).join(''))
       })
     }
   })

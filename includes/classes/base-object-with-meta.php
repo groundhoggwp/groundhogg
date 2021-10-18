@@ -247,8 +247,10 @@ abstract class Base_Object_With_Meta extends Base_Object {
 
 		// Remove primary key from array
 		unset( $data[ $this->get_db()->get_primary_key() ] );
+		// Remove date key
+		unset( $data[ $this->get_db()->get_date_key() ] );
 
-		$class = __CLASS__;
+		$class = get_class( $this );
 
 		/**
 		 * @var $object Base_Object_With_Meta

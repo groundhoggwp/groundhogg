@@ -25,6 +25,19 @@ abstract class Roles {
 	 */
 	public function __construct() {
 		add_action( 'groundhogg/activated', [ $this, 'install_roles_and_caps' ] );
+		add_filter( 'map_meta_cap', [ $this, 'map_meta_cap' ], 10, 4 );
+	}
+
+	/**
+	 * Map cap to primitive
+	 *
+	 * @param $caps    array
+	 * @param $cap     string
+	 * @param $user_id int
+	 * @param $args    array
+	 */
+	public function map_meta_cap( $caps, $cap, $user_id, $args ) {
+		return $caps;
 	}
 
 	public function install_roles_and_caps() {
@@ -171,7 +184,6 @@ abstract class Roles {
 	 * @return mixed
 	 */
 	abstract protected function get_admin_cap_check();
-
 
 	/**
 	 * Whether the custom roles have been installed

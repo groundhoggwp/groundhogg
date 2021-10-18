@@ -28,12 +28,17 @@ function get_current_contact() {
 /**
  * Wrapper function for Utils function.
  *
- * @param $contact_id_or_email
+ * @param $contact_id_or_email mixed
  * @param $by_user_id
  *
  * @return false|Contact
  */
 function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
+
+	// We already have a contact
+	if ( is_a_contact( $contact_id_or_email ) ){
+		return $contact_id_or_email;
+	}
 
 	static $cache = [];
 

@@ -444,4 +444,46 @@
   gh.nonces = nonces
   gh.endpoints = endpoints
 
+
+  if ( ! gh.functions ){
+    gh.functions = {}
+  }
+
+  /**
+   * Set a cookie
+   *
+   * @param cname
+   * @param cvalue
+   * @param duration in seconds
+   */
+  gh.functions.setCookie = (cname, cvalue, duration) => {
+    var d = new Date()
+    d.setTime(d.getTime() + (duration * 1000))
+    var expires = 'expires=' + d.toUTCString()
+    document.cookie = cname + '=' + cvalue + ';' + expires + ';path=/'
+  }
+
+  /**
+   * Retrieve a cookie
+   *
+   * @param cname name of the cookie
+   * @param none default value
+   * @returns {string|null}
+   */
+  gh.functions.getCookie = (cname, none = null) => {
+    var name = cname + '='
+    var ca = document.cookie.split(';')
+    for (var i = 0; i < ca.length; i++) {
+      var c = ca[i]
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1)
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length)
+      }
+    }
+    return none
+  }
+
+
 })(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)

@@ -2,6 +2,13 @@ h3.no-margin-top {
   margin-top: 0;
 }
 
+.align-right-space-between {
+  display: flex !important;
+  justify-content: flex-end;
+  gap: 10px;
+  align-items: center;
+}
+
 .space-between {
   display: flex !important;
   justify-content: space-between;
@@ -19,6 +26,12 @@ h3.no-margin-top {
 .property-groups .property-group .property-group-header h3 {
   margin-top: 0;
   font-size: 16px;
+}
+.property-groups .property-group .property-group-header .property-group-more {
+  visibility: hidden;
+}
+.property-groups .property-group:hover .property-group-more {
+  visibility: visible;
 }
 .property-groups .property-group-fields {
   grid-gap: 10px;
@@ -473,6 +486,35 @@ button.gh-button.loud {
   top: 0;
   box-sizing: border-box;
 }
+.gh-modal.send-email {
+  bottom: 0;
+  top: auto;
+  right: 20px;
+  left: auto;
+  height: fit-content;
+  width: 500px;
+}
+.gh-modal.send-email .gh-modal-dialog {
+  height: fit-content;
+  width: 100%;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.gh-modal.send-email .gh-modal-dialog .gh-row {
+  align-items: center;
+}
+.gh-modal.send-email .gh-modal-dialog .select2 select2-container, .gh-modal.send-email .gh-modal-dialog .select2 .select2-selection {
+  border: none !important;
+  outline: none !important;
+}
+.gh-modal.mini {
+  right: auto;
+  bottom: auto;
+  width: fit-content;
+}
+.gh-modal.mini .gh-modal-dialog {
+  padding: 22px;
+}
 .gh-modal h2 {
   margin-top: 0;
 }
@@ -501,7 +543,7 @@ button.gh-button.loud {
   position: relative;
   padding: 30px;
   max-width: 80vw;
-  max-height: calc( 92vh - 64px );
+  max-height: calc(92vh - 64px);
   overflow: auto;
 }
 .gh-modal-dialog.no-padding {

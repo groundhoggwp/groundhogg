@@ -641,6 +641,23 @@
     })
   }
 
+  function addMediaToBasicTinyMCE () {
+
+    if (typeof this.flag !== 'undefined') {
+      return
+    }
+
+    $doc.on('tinymce-editor-setup', function (event, editor) {
+      editor.settings.toolbar1 =
+        'bold,italic,bullist,numlist,alignleft,aligncenter,alignright,link,wp_add_media'
+      editor.on('click', function (ed, e) {
+        $doc.trigger('to_mce')
+      })
+    })
+
+    this.flag = 'improved'
+  }
+
   function improveTinyMCE () {
 
     if (typeof this.flag !== 'undefined') {
@@ -649,7 +666,7 @@
 
     $doc.on('tinymce-editor-setup', function (event, editor) {
       editor.settings.toolbar1 =
-        'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,wp_adv,dfw,groundhoggreplacementbtn,groundhoggemojibtn'
+        'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,wp_adv,wp_add_media,dfw'
       editor.settings.toolbar2 =
         'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help'
       editor.settings.height = 200
@@ -696,6 +713,7 @@
    * @param confirmText
    * @param closeText
    * @param onConfirm
+   * @param onCancel
    * @param onClose
    * @param confirmButtonType
    * @param cancelButtonType
@@ -706,11 +724,14 @@
     confirmText = _x('Confirm', 'verb', 'groundhogg'),
     closeText = __('Cancel', 'groundhogg'),
     onConfirm = () => {},
+    onCancel = () => {},
     onClose = () => {},
     confirmButtonType = 'primary',
     cancelButtonType = 'danger text',
     buttonSize = 'medium',
   }) => {
+
+    let confirmed = false
 
     //language=html
     const content = `
@@ -729,13 +750,22 @@
 			</button>
 		</div>`
 
+    const handleClose = () => {
+      if (!confirmed) {
+        onCancel()
+      }
+
+      onClose()
+    }
+
     const { close, $modal } = modal({
       content,
-      onClose,
+      onClose: handleClose,
       dialogClasses: 'gh-modal-confirmation'
     })
 
     const confirm = () => {
+      confirmed = true
       onConfirm()
       close()
     }
@@ -764,23 +794,24 @@
    * (function) confirmCallBack Called when "confirm" button is clicked.
    *
    * @param (object) options Config options to overwrite defaults.
+   * @param selector
    */
-  const modal = ({
+  const miniModal = (selector, {
     content = '',
+    onSetContent = () => {},
     onClose = () => {},
-    canClose = true,
     onOpen = () => {},
-    dialogClasses = ''
+    dialogClasses = '',
+    closeOnFocusout = true,
   }) => {
 
     //language=html
     const html = `
-		<div class="gh-modal">
-			<div class="gh-modal-overlay"></div>
+		<div class="gh-modal mini gh-panel" tabindex="0">
 			<div class="gh-modal-dialog ${dialogClasses}">
-				${canClose ? `	<button type="button" class="dashicon-button gh-modal-button-close-top gh-modal-button-close">
+				<button type="button" class="dashicon-button gh-modal-button-close-top gh-modal-button-close">
 					<span class="dashicons dashicons-no-alt"></span>
-				</button>` : ''}
+				</button>
 				<div class="gh-modal-dialog-content">
 					${content}
 				</div>
@@ -801,14 +832,117 @@
 
     const setContent = (content) => {
       $modal.find('.gh-modal-dialog-content').html(content)
+      onSetContent()
     }
 
-    $('body').append($modal).addClass('modal-open')
+    const $el = $(selector)
+
+    $('body').append($modal)
+
+    const {
+      left,
+      right,
+      top,
+      bottom
+    } = $el[0].getBoundingClientRect()
+
+    $modal.css({
+      top: Math.min(bottom, window.innerHeight - $modal.height() - 20) + 'px',
+      left: (right - $modal.outerWidth()) + 'px'
+    })
 
     onOpen()
 
+    $modal.find('.gh-modal-button-close').on('click', handleClose)
+
+    if (closeOnFocusout) {
+      $modal.on('focusout', (e) => {
+
+        if (!e.relatedTarget || !clickedIn(e.relatedTarget, '.gh-modal.mini')) {
+          handleClose()
+        }
+      })
+    }
+
+    $modal.focus()
+
+    return {
+      $modal,
+      close,
+      setContent
+    }
+  }
+  /**
+   * Custom modal appended to the body.
+   *
+   * options:
+   * (bool) isConfirmation Shows confirmation button if true.
+   * (bool) closeOnOverlayClick Close the modal when the background overlay is clicked.
+   * (bool) showCloseButton Show the close button at the top of the modal.
+   * (string) messageHtml Html to be showed at the top of the modal.
+   * (function) confirmCallBack Called when "confirm" button is clicked.
+   *
+   * @param (object) options Config options to overwrite defaults.
+   */
+  const modal = ({
+    content = '',
+    onSetContent = () => {},
+    onClose = () => {},
+    beforeClose = () => true,
+    canClose = true,
+    onOpen = () => {},
+    className = '',
+    dialogClasses = '',
+    overlay = true,
+    disableScrolling = true
+  }) => {
+
+    //language=html
+    const html = `
+		<div class="gh-modal ${className}">
+			${overlay ? `<div class="gh-modal-overlay"></div>` : ''}
+			<div class="gh-modal-dialog ${dialogClasses}">
+				${canClose ? `	<button type="button" class="dashicon-button gh-modal-button-close-top gh-modal-button-close">
+					<span class="dashicons dashicons-no-alt"></span>
+				</button>` : ''}
+				<div class="gh-modal-dialog-content">
+					${content}
+				</div>
+			</div>
+		</div>`
+
+    const $modal = $(html)
+
+    const close = () => {
+
+      if (!beforeClose(close)) {
+        return
+      }
+
+      $modal.remove()
+
+      if (disableScrolling) {
+        $('body').removeClass('modal-open')
+      }
+
+      onClose()
+    }
+
+    const handleClose = () => {
+      close()
+    }
+
+    const setContent = (content) => {
+      $modal.find('.gh-modal-dialog-content').html(content)
+      onSetContent()
+    }
+
+    $('body').append($modal).addClass(disableScrolling ? 'modal-open' : '')
+
+    onOpen({ close, setContent })
+
     if (canClose) {
-      $('.gh-modal-overlay, .gh-modal-button-close').on('click', handleClose)
+      $modal.find('.gh-modal-overlay, .gh-modal-button-close').on('click', handleClose)
     }
 
     return {
@@ -945,7 +1079,7 @@
    * @return {Boolean}
    */
   function clickInsideElement (e, selector) {
-    var el = e.srcElement || e.target
+    var el = e.tagName ? e : e.srcElement || e.target
 
     if (el && el.matches(selector)) {
       return el
@@ -1417,7 +1551,7 @@
     // language=HTML
     const menu = `
 		<div role="menu" class="gh-dropdown-menu" tabindex="0">
-			${items.map(({
+			${items.filter(i => i && true).map(({
 				key,
 				text
 			}) => `<div class="gh-dropdown-menu-item" data-key="${key}">${text}</div>`).join('')}
@@ -1637,6 +1771,7 @@
     clickInsideElement,
     searchOptionsWidget,
     tinymceElement,
+    addMediaToBasicTinyMCE,
     isValidEmail,
     loadingModal,
     savingModal,
@@ -1644,6 +1779,7 @@
     dangerConfirmationModal,
     uuid,
     modal,
+    miniModal,
     setFrameContent,
     copyObject,
     loadingDots,

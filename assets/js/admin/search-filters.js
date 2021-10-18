@@ -225,6 +225,16 @@
       }
     },
 
+    setFilters (filters) {
+      this.filters = filters
+      this.preload()
+    },
+
+    clearFilters () {
+      this.filters = []
+      this.mount()
+    },
+
     mount () {
       $(el).html(this.render())
       this.eventHandlers()
@@ -332,7 +342,7 @@
           ...opts
         })
 
-        onChange(self.filters)
+        // onChange(self.filters)
 
         if (setActive) {
           setActiveFilter(group, self.filters[group].length - 1)
@@ -377,7 +387,7 @@
         self.filters[group].splice(key, 1)
 
         // If the group is empty, remove it as well
-        if (self.filters.length > 1 && self.filters[group].length === 0) {
+        if (self.filters.length > 0 && self.filters[group].length === 0) {
           self.filters.splice(group, 1)
         }
 
@@ -553,7 +563,7 @@
     },
   })
 
-  const dateRanges = {
+  const pastDateRanges = {
     'any': __('At any time', 'groundhogg'),
     '24_hours': __('In the last 24 hours', 'groundhogg'),
     '7_days': __('In the last 7 days', 'groundhogg'),
@@ -561,6 +571,19 @@
     '60_days': __('In the last 60 days', 'groundhogg'),
     '90_days': __('In the last 90 days', 'groundhogg'),
     '365_days': __('In the last 365 days', 'groundhogg'),
+    'before': __('Before', 'groundhogg'),
+    'after': __('After', 'groundhogg'),
+    'between': __('Between', 'groundhogg'),
+  }
+
+  const futureDateRanges = {
+    'any': __('At any time', 'groundhogg'),
+    '24_hours': __('In the next 24 hours', 'groundhogg'),
+    '7_days': __('In the next 7 days', 'groundhogg'),
+    '30_days': __('In the next 30 days', 'groundhogg'),
+    '60_days': __('In the next 60 days', 'groundhogg'),
+    '90_days': __('In the next 90 days', 'groundhogg'),
+    '365_days': __('In the next 365 days', 'groundhogg'),
     'before': __('Before', 'groundhogg'),
     'after': __('After', 'groundhogg'),
     'between': __('Between', 'groundhogg'),
@@ -600,11 +623,13 @@
     })
   }
 
-  const standardActivityDateTitle = (prepend, { date_range, before, after }) => {
+  const standardActivityDateTitle = (prepend, { date_range, before, after, future=false }) => {
+
+    let ranges = future ? futureDateRanges : pastDateRanges
 
     switch (date_range) {
       default:
-        return `${prepend} ${dateRanges[date_range].toLowerCase()}`
+        return `${prepend} ${ranges[date_range].toLowerCase()}`
       case 'between':
         return `${prepend} ${sprintf(_x('between %1$s and %2$s', 'where %1 and %2 are dates', 'groundhogg'), `<b>${formatDate(after)}</b>`, `<b>${formatDate(before)}</b>`)}`
       case 'before':
@@ -620,12 +645,12 @@
     after: ''
   }
 
-  const standardActivityDateOptions = ({ date_range = '24_hours', after = '', before = '' }) => {
+  const standardActivityDateOptions = ({ date_range = '24_hours', after = '', before = '', future=false }) => {
 
     return ` ${select({
       id: 'filter-date-range',
       name: 'date_range'
-    }, dateRanges, date_range)}
+    }, future ? futureDateRanges : pastDateRanges, date_range)}
 
 		  ${input({
       type: 'date',

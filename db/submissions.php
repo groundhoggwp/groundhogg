@@ -2,6 +2,8 @@
 
 namespace Groundhogg\DB;
 
+use Groundhogg\Contact;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -61,7 +63,31 @@ class Submissions extends DB {
 	 */
 	protected function add_additional_actions() {
 		add_action( 'groundhogg/db/post_delete/contact', [ $this, 'contact_deleted' ] );
+		add_action( 'groundhogg/contact/merged', [ $this, 'contact_merged' ], 10, 2 );
 		parent::add_additional_actions();
+	}
+
+	/**
+	 * @param $orig Contact
+	 * @param $other Contact
+	 */
+	public function contact_merged( $orig, $other ) {
+		$this->update( [
+			'contact_id' => $other->get_id()
+		], [
+			'contact_id' => $orig->get_id()
+		] );
+	}
+
+	/**
+	 * Delete events for a contact that was just deleted...
+	 *
+	 * @param $id
+	 *
+	 * @return false|int
+	 */
+	public function contact_deleted( $id ) {
+		return $this->bulk_delete( [ 'contact_id' => $id ] );
 	}
 
 	/**
@@ -112,17 +138,6 @@ class Submissions extends DB {
 		}
 
 		return $this->insert( $args );
-	}
-
-	/**
-	 * Delete events for a contact that was just deleted...
-	 *
-	 * @param $id
-	 *
-	 * @return false|int
-	 */
-	public function contact_deleted( $id ) {
-		return $this->bulk_delete( array( 'contact_id' => $id ) );
 	}
 
 	/**

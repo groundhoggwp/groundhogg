@@ -1,7 +1,20 @@
 ($ => {
 
-  const { modal, errorDialog, loadingDots, select, uuid, input, isValidEmail } = Groundhogg.element
+  const {
+    modal,
+    errorDialog,
+    loadingDots,
+    select,
+    uuid,
+    addMediaToBasicTinyMCE,
+    tinymceElement,
+    input,
+    dialog,
+    isValidEmail,
+    textarea
+  } = Groundhogg.element
   const { contacts: ContactsStore } = Groundhogg.stores
+  const { post, routes } = Groundhogg.api
   const { tagPicker } = Groundhogg.pickers
   const { sprintf, __, _x, _n } = wp.i18n
   const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
@@ -174,11 +187,7 @@
 			</div>`
     }
 
-    const { close, setContent } = modal({
-      content: form()
-    })
-
-    const onMount = () => {
+    const onMount = ({ close, setContent }) => {
 
       let payload = {
         data: {},
@@ -241,7 +250,198 @@
       })
     }
 
-    onMount()
+    return modal({
+      content: form(),
+      onOpen: onMount
+    })
+
+  }
+
+  const emailModal = (props) => {
+
+    const email = {
+      to: [],
+      from_name: '',
+      from_email: '',
+      cc: [],
+      bcc: [],
+      subject: '',
+      content: '',
+      ...props
+    }
+
+    let showCc = email.cc.length > 0
+    let showBcc = email.bcc.length > 0
+
+    const template = () => {
+      //language=HTML
+      return `
+		  <div class="gh-rows-and-columns">
+			  <div class="gh-row">
+				  <label>${__('To:')}</label>
+				  <div class="gh-col">
+					  <select id="recipients"></select>
+				  </div>
+				  ${!showCc ? `<a id="send-email-cc" href="#">${__('Cc')}</a>` : ''}
+				  ${!showBcc ? `<a id="send-email-bcc" href="#">${__('Bcc')}</a>` : ''}
+			  </div>
+			  ${showCc ? `<div class="gh-row">
+				  <label>${__('Cc:')}</label>
+				  <div class="gh-col">
+					  <select id="cc"></select>
+				  </div>
+			  </div>` : ''}
+			  ${showBcc ? `<div class="gh-row">
+				  <label>${__('Bcc:')}</label>
+				  <div class="gh-col">
+					  <select id="bcc"></select>
+				  </div>
+			  </div>` : ''}
+			  <div class="gh-row">
+				  <div class="gh-col">
+					  ${input({
+						  placeholder: __('Subject line...'),
+						  id: 'send-email-subject',
+						  value: email.subject
+					  })}
+				  </div>
+			  </div>
+			  <div class="gh-row">
+				  <div class="gh-col">
+					  ${textarea({
+						  id: 'send-email-content',
+						  value: email.subject
+					  })}
+				  </div>
+			  </div>
+			  <div class="gh-row">
+				  <div class="gh-col align-right-space-between">
+					  <button class="gh-button danger text" id="discard-draft">${__('Discard')}</button>
+					  <button class="gh-button primary" id="send-email-commit">${__('Send')}</button>
+				  </div>
+			  </div>
+		  </div>`
+    }
+
+    const onMount = ({ close, setContent }) => {
+
+      const reMount = () => {
+        wp.editor.remove('send-email-content')
+        setContent(template())
+        onMount({ close, setContent })
+      }
+
+      const selectChange = (e, name) => {
+        email[name] = $(e.target).val()
+      }
+
+      $('#recipients').ghPicker({
+        endpoint: ContactsStore.route,
+        getResults: r => r.items.map(c => ({ text: c.data.email, id: c.data.email })),
+        getParams: q => ({ ...q, email: q.term, email_compare: 'starts_with' }),
+        data: email.to.map(i => ({ id: i, text: i, selected: true })),
+        tags: true,
+        multiple: true,
+        width: '100%',
+        placeholder: __('Recipients'),
+      }).on('change', e => selectChange(e, 'to'))
+
+      $('#cc').ghPicker({
+        endpoint: ContactsStore.route,
+        getResults: r => r.items.map(c => ({ text: c.data.email, id: c.data.email })),
+        getParams: q => ({ ...q, email: q.term, email_compare: 'starts_with' }),
+        data: email.cc.map(i => ({ id: i, text: i, selected: true })),
+        tags: true,
+        multiple: true,
+        width: '100%',
+        placeholder: __('Cc'),
+      }).on('change', e => selectChange(e, 'cc'))
+
+      $('#bcc').select2({
+        data: [...email.bcc.map(i => ({
+          id: i,
+          text: i,
+          selected: true
+        })),
+          ...Groundhogg.filters.owners
+            .filter(u => !email.bcc.includes(u.data.user_email))
+            .map(u => ({ text: u.data.user_email, id: u.data.user_email }))],
+        tags: true,
+        multiple: true,
+        width: '100%',
+        placeholder: __('Bcc'),
+      }).on('change', e => selectChange(e, 'bcc'))
+
+      $('#send-email-subject').on('change', (e) => {
+        email.subject = e.target.value
+      }).focus()
+
+      addMediaToBasicTinyMCE()
+
+      tinymceElement('send-email-content', {
+        quicktags: false,
+        tinymce: {
+          height: 300,
+        }
+      }, (content) => {
+        email.content = content
+      })
+
+      $('#send-email-cc').on('click', () => {
+        showCc = true
+        reMount()
+      })
+
+      $('#send-email-bcc').on('click', () => {
+        showBcc = true
+        reMount()
+      })
+
+      $('#discard-draft').on('click', close )
+
+      $('#send-email-commit').on('click', ({ target }) => {
+
+        $(target).text(__('Sending', 'groundhogg')).prop('disabled', true)
+        const { stop } = loadingDots(target)
+
+        post(`${routes.v4.emails}/send`, email).then((r) => {
+
+          stop()
+          $(target).text(__('Send', 'groundhogg')).prop('disabled', false)
+
+          if (r.status !== 'success') {
+
+            console.log(r)
+
+            dialog({
+              message: r.message,
+              type: 'error'
+            })
+
+            return
+          }
+
+          dialog({
+            message: __('Message sent!', 'groundhogg')
+          })
+
+          close()
+        })
+      })
+
+    }
+
+    return modal({
+      content: template(),
+      onOpen: onMount,
+      onClose: () => {
+        wp.editor.remove('send-email-content')
+      },
+      overlay: false,
+      className: 'send-email',
+      dialogClasses: 'gh-panel',
+      disableScrolling: false
+    })
 
   }
 
@@ -262,14 +462,14 @@
 
     $(`#${inputProps.id}`).focus().on('blur keydown', e => {
 
-      if ( e.type === 'keydown' && e.key !== 'Enter' ){
-        return;
+      if (e.type === 'keydown' && e.key !== 'Enter') {
+        return
       }
 
       value = e.target.value
-      onChange( value )
+      onChange(value)
 
-      $(`#${inputProps.id}`).replaceWith( replaceWith( value ) )
+      $(`#${inputProps.id}`).replaceWith(replaceWith(value))
     })
 
   }
@@ -278,6 +478,7 @@
     addContactModal,
     selectContactModal,
     makeInput,
+    emailModal,
   }
 
 })(jQuery)

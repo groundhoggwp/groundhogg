@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Classes\Note;
 use Groundhogg\DB\DB;
 use JsonSerializable;
 use Serializable;
@@ -131,9 +132,28 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 * @return bool
 	 */
 	public function delete() {
+
+		$id = $this->get_id();
+
+		/**
+		 * Fires before the object deleted...
+		 *
+		 * @param int         $object_id the ID of the object
+		 * @param mixed[]     $data      just to make it compatible with the other crud actions
+		 * @param Base_Object $object    the object class
+		 */
+		do_action( "groundhogg/{$this->get_object_type()}/pre_delete", $this->get_id(), $this->data, $this );
+
 		if ( $this->get_db()->delete( $this->get_id() ) ) {
 			unset( $this->data );
 			unset( $this->ID );
+
+			/**
+			 * Fires after the object deleted...
+			 *
+			 * @param int         $object_id the ID of the object
+			 */
+			do_action( "groundhogg/{$this->get_object_type()}/post_delete", $id );
 
 			return true;
 		}
@@ -387,14 +407,14 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 *
 	 * @return Base_Object
 	 */
-	public function duplicate ( $overrides = [] ) {
+	public function duplicate( $overrides = [] ) {
 
 		$data = $this->data;
 
 		// Remove primary key from array
 		unset( $data[ $this->get_db()->get_primary_key() ] );
 
-		$class = __CLASS__;
+		$class = get_class( $this );
 
 		/**
 		 * @var $object Base_Object
@@ -404,12 +424,50 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		$object->create( array_merge( $data, $overrides ) );
 
 		/**
-		 * @param $new Base_Object the new object
+		 * @param $new  Base_Object the new object
 		 * @param $orig Base_Object the original object
 		 */
 		do_action( "groundhogg/{$this->get_object_type()}/duplicated", $object, $this );
 
 		return $object;
+	}
+
+	/**
+	 * Merge one object with another
+	 *
+	 * @param $other Base_Object
+	 */
+	public function merge( $other ){
+
+		// Dont merge with itself
+		// Dont merge with objects of a different type
+		if ( $other->get_id() === $this->get_id() || $other->get_object_type() !== $this->get_object_type() ){
+			return false;
+		}
+
+		/**
+		 * Before an object is merged
+		 *
+		 * @param Base_Object $original
+		 * @param Base_Object $other
+		 */
+		do_action( "groundhogg/{$this->get_object_type()}/pre_merge", $this, $other );
+
+		// Update the date
+		$this->update( array_merge( array_filter( $this->data ), array_filter( $other->data ) ) );
+
+		/**
+		 * When an object is merged
+		 * 
+		 * @param Base_Object $original
+		 * @param Base_Object $other
+		 */
+		do_action( "groundhogg/{$this->get_object_type()}/merged", $this, $other );
+
+		// Delete the other as it is no longer relevant
+		$other->delete();
+
+		return true;
 	}
 
 	/**
@@ -620,5 +678,48 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			'secondary_object_id'   => $other->get_id(),
 			'secondary_object_type' => $other->get_object_type(),
 		] );
+	}
+
+	/**
+	 * Adds notes to the contact
+	 *
+	 * @param String   $note
+	 * @param string   $context
+	 * @param bool|int $user_id
+	 *
+	 * @return $note
+	 */
+	public function add_note( $note, $context = 'system', $user_id = false ) {
+		if ( ! is_string( $note ) && ! is_array( $note ) ) {
+			return false;
+		}
+
+		if ( is_string( $note ) ) {
+			$note_data = [
+				'object_id'   => $this->get_id(),
+				'object_type' => $this->get_object_type(),
+				'context'     => $context,
+				'content'     => wp_kses_post( $note ),
+				'user_id'     => $user_id ?: get_current_user_id(),
+			];
+
+			if ( $context == 'user' && ! $user_id ) {
+				$note_data['user_id'] = get_current_user_id();
+			}
+
+			$note = new Note( $note_data );
+
+			do_action( "groundhogg/{$this->get_object_type()}/note/added", $this->ID, $note, $this );
+		} else if ( is_array( $note ) ) {
+			// imported note
+			$note_data = array_merge( $note, [
+				'object_id'   => $this->get_id(),
+				'object_type' => $this->get_object_type(),
+			] );
+
+			$note = new Note( $note_data );
+		}
+
+		return $note;
 	}
 }

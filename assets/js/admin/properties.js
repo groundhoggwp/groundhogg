@@ -312,23 +312,27 @@
 		  </button>`
     },
 
-    groups: ({ groups, fields = [] }) => {
+    groups: ({ groups, fields = [] }, editable) => {
       //language=HTML
       return `
 		  <div class="property-groups">
-			  ${groups.map(g => Templates.group(g, fields.filter(f => f.group == g.id)))}
+			  ${groups.map(g => Templates.group(g, fields.filter(f => f.group == g.id), editable)).join('')}
 		  </div>`
     },
 
-    group: (group, fields = []) => {
+    group: (group, fields = [], editable) => {
+
+      console.log(editable)
+
       //language=HTML
       return `
 		  <div class="property-group">
 			  <div class="property-group-header">
-				  <h3>${specialChars(group.name)}</h3>
+				  <h3 data-id="${group.id}">${specialChars(group.name)}</h3>
+				  ${editable ? `
 				  <button class="gh-button text icon secondary property-group-more" data-id="${group.id}">
 					  ${icons.verticalDots}
-				  </button>
+				  </button>` : ''}
 			  </div>
 			  <div class="property-group-fields">
 				  ${fields && fields.length ? fields.map(f => Templates.field(f)).join('') : `<button data-id="${group.id}" class="gh-button secondary property-group-add-field">${__('Add field', 'groundhogg')}</button>`}
@@ -349,6 +353,25 @@
 					  placeholder: __('New property group name', 'groundhogg')
 				  })}
 				  <button class="gh-button primary" id="create-property-group">${__('Create Group', 'groundhogg')}
+				  </button>
+			  </div>
+		  </div>`
+    },
+
+    renamePropertyGroup: (name) => {
+
+      //language=HTML
+      return `
+		  <div class="property-group">
+			  <h3 class="no-margin-top">${__('Rename property group')}</h3>
+			  <div class="gh-input-group">
+				  ${input({
+					  id: 'property-group-name',
+					  name: 'property_group_name',
+					  value: name,
+					  placeholder: __('Property group name', 'groundhogg')
+				  })}
+				  <button class="gh-button primary" id="create-property-group">${__('Rename Group', 'groundhogg')}
 				  </button>
 			  </div>
 		  </div>`
@@ -427,6 +450,7 @@
     values = {}, // usually just the object meta
     onPropertiesUpdated = (properties) => {},
     onChange = (properties) => {},
+    canEdit = () => true
   }) => {
 
     properties = copyObject(properties)
@@ -484,6 +508,27 @@
       mount()
     }
 
+    const editGroup = (groupId, group) => {
+
+      properties.groups = [
+        ...properties.groups.map(g => g.id === groupId ? { ...g, ...group } : g)
+      ]
+
+      onPropertiesUpdated(properties)
+
+      mount()
+    }
+
+    const moveGroup = (groupId, direction = 'down') => {
+      let group = properties.groups.find(g => g.id == groupId)
+      let index = properties.groups.findIndex(g => g.id == groupId)
+      properties.groups.splice(index, 1)
+      properties.groups.splice(direction === 'down' ? index + 1 : index - 1, 0, group)
+
+      onPropertiesUpdated(properties)
+      mount()
+    }
+
     const addGroup = (name) => {
 
       if (!properties.groups) {
@@ -524,6 +569,28 @@
         if (groupName.length) {
           close()
           addGroup(groupName)
+        }
+      })
+    }
+
+    const renamePropertyGroupModal = (groupId) => {
+
+      let groupName = properties.groups.find(g => g.id == groupId).name
+
+      const { close } = modal({
+        content: Templates.renamePropertyGroup(groupName)
+      })
+
+      $('#property-group-name').on('change input', (e) => {
+        groupName = e.target.value
+      })
+
+      $('#create-property-group').on('click', (e) => {
+        if (groupName.length) {
+          close()
+          editGroup(groupId, {
+            name: groupName
+          })
         }
       })
     }
@@ -589,6 +656,11 @@
     const mount = () => {
 
       if (!properties || !properties.groups || !properties.groups.length) {
+
+        if (!canEdit()) {
+          return
+        }
+
         $(selector).html(Templates.noProperties())
         $('#add-custom-property').on('click', (e) => {
           addPropertyGroupModal()
@@ -599,7 +671,10 @@
       $(selector).html(Templates.groups({
         ...properties,
         fields: properties.fields.map(f => ({ ...f, value: values[f.name] || '' }))
-      }))
+      }, canEdit()))
+
+      console.log(canEdit())
+
       onMount()
     }
 
@@ -612,6 +687,11 @@
       })
 
       $('.property-field').on('dblclick', (e) => {
+
+        if (!canEdit()) {
+          return
+        }
+
         moreMenu(e.currentTarget, {
           items: [
             {
@@ -652,6 +732,10 @@
 
       $('.property-group-add-field').on('click', (e) => {
 
+        if (!canEdit()) {
+          return
+        }
+
         const groupId = e.currentTarget.dataset.id
 
         let newField = {
@@ -668,21 +752,30 @@
       $('.property-group-more').on('click', (e) => {
 
         const groupId = e.currentTarget.dataset.id
+        let index = properties.groups.findIndex(g => g.id == groupId)
 
         moreMenu(e.currentTarget, {
           items: [
             {
               key: 'add-field',
-              text: __('Add Field')
+              text: __('Add Field', 'groundhogg')
             },
             {
               key: 'add-group',
-              text: __('Add Group')
+              text: __('Add Group', 'groundhogg')
             },
             {
               key: 'rename',
               text: __('Rename')
             },
+            index !== 0 ? {
+              key: 'move_up',
+              text: __('Move up', 'groundhogg')
+            } : null,
+            index < properties.groups.length - 1 ? {
+              key: 'move_down',
+              text: __('Move down', 'groundhogg')
+            } : null,
             {
               key: 'delete',
               text: `<span class="gh-text danger">${__('Delete')}</span>`
@@ -690,6 +783,12 @@
           ],
           onSelect: (k) => {
             switch (k) {
+              case 'move_up':
+                moveGroup( groupId, 'up' )
+                break
+              case 'move_down':
+                moveGroup( groupId, 'down' )
+                break
               case 'add-group':
                 addPropertyGroupModal()
                 break
@@ -706,7 +805,7 @@
 
                 break
               case 'rename':
-
+                renamePropertyGroupModal(groupId)
                 break
               case 'delete':
 

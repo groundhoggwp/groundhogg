@@ -23,7 +23,7 @@ if ( ! $contact || ! $contact->exists() ) {
 }
 
 // The current user cannot edit this contact because they are not the owner
-if ( ! current_user_can( 'view_all_contacts' ) && $contact->get_owner_id() !== get_current_user_id() ) {
+if ( ! current_user_can( 'view_contact', $contact ) ) {
 	wp_die( _x( 'You are not the owner of this contact.', 'contact_record', 'groundhogg' ) );
 }
 

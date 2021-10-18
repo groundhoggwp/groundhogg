@@ -3,6 +3,7 @@
 namespace Groundhogg\Api\V4;
 
 use Groundhogg\Contact;
+use Groundhogg\Supports_Errors;
 use function Groundhogg\get_contactdata;
 use WP_Error;
 use WP_REST_Response;
@@ -19,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Renders API returns as a JSON
  */
-abstract class Base_Api {
+abstract class Base_Api extends Supports_Errors {
 
 	const NAME_SPACE = 'gh/v4';
 

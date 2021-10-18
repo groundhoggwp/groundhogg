@@ -392,9 +392,9 @@ class Contact_Query {
 		}
 
 		// Only show contacts associated with the current owner...
-		if ( current_user_can( 'view_contacts' ) && ! current_user_can( 'view_all_contacts' ) ) {
+//		if ( current_user_can( 'view_contacts' ) && ! current_user_can( 'view_others_contacts' ) ) {
 			$this->query_vars['owner'] = get_current_user_id();
-		}
+//		}
 
 		// Fix number
 		if ( intval( $this->query_vars['number'] ) < 1 ) {
@@ -776,7 +776,7 @@ class Contact_Query {
 		}
 
 		if ( $this->query_vars['owner'] ) {
-			$this->query_vars['owner'] = wp_parse_id_list( $this->query_vars['owner'] );
+			$this->query_vars['owner'] = implode( ',', wp_parse_id_list( $this->query_vars['owner'] ) );
 			$where['owner']            = "$this->table_name.owner_id IN ( {$this->query_vars['owner']} )";
 		}
 
@@ -2105,7 +2105,11 @@ class Contact_Query {
 	 *
 	 * @return string
 	 */
-	public static function standard_activity_filter_clause( $filter_vars, $as_int = false ) {
+	public static function standard_activity_filter_clause( $filter_vars, $as_int = false, $future = false ) {
+
+		if ( $future ) {
+			return self::future_standard_activity_filter_clause( $filter_vars, $as_int );
+		}
 
 		$filter_vars = wp_parse_args( $filter_vars, [
 			'date_range' => '24_hours',
@@ -2143,12 +2147,59 @@ class Contact_Query {
 	/**
 	 * Build a standard date filter clause
 	 *
+	 * @param       $filter_vars
+	 * @param false $as_int
+	 *
+	 * @return string
+	 */
+	public static function future_standard_activity_filter_clause( $filter_vars, $as_int = false, $future = false ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'date_range' => '24_hours',
+		] );
+
+		$before_and_after = self::get_future_before_and_after_from_filter_date_range( $filter_vars, true );
+
+		$before = $before_and_after['before'];
+		$after  = $before_and_after['after'];
+
+		switch ( $filter_vars['date_range'] ) {
+			default:
+			case 'after':
+				$clause = $as_int ? sprintf( "> %d", $after ) : sprintf( "> '%s'", Ymd_His( $after ) );
+				break;
+			case '24_hours':
+			case '7_days':
+			case '30_days':
+			case '60_days':
+			case '90_days':
+			case '365_days':
+			case 'before':
+				$clause = $as_int ? sprintf( "< %d", $before ) : sprintf( "< '%s'", Ymd_His( $before ) );
+				break;
+			case 'between':
+				$clause = $as_int
+					? sprintf( "BETWEEN %d AND %d", $after, $before )
+					: sprintf( "BETWEEN '%s' AND '%s'", Ymd_His( $after ), Ymd_His( $before ) );
+				break;
+		}
+
+		return $clause;
+	}
+
+	/**
+	 * Build a standard date filter clause
+	 *
 	 * @param array $filter_vars
 	 * @param bool  $as_int
 	 *
 	 * @return array
 	 */
-	public static function get_before_and_after_from_filter_date_range( $filter_vars, $as_int = true ) {
+	public static function get_before_and_after_from_filter_date_range( $filter_vars, $as_int = true, $future = false ) {
+
+		if ( $future ) {
+			return self::get_future_before_and_after_from_filter_date_range( $filter_vars, $as_int );
+		}
 
 		$filter_vars = wp_parse_args( $filter_vars, [
 			'date_range' => 'any',
@@ -2195,6 +2246,76 @@ class Contact_Query {
 				break;
 			case 'after':
 				$before = time();
+				$after  = date_as_int( $after );
+				break;
+			case 'between':
+				compare_dates( $before, $after );
+				$after  = date_as_int( $after );
+				$before = date_as_int( $before ) + ( DAY_IN_SECONDS - 1 );
+				break;
+		}
+
+		return [
+			'before' => $as_int ? $before : Ymd_His( $before ),
+			'after'  => $as_int ? $after : Ymd_His( $after )
+		];
+	}
+
+	/**
+	 * Build a standard date filter clause
+	 *
+	 * @param array $filter_vars
+	 * @param bool  $as_int
+	 *
+	 * @return array
+	 */
+	public static function get_future_before_and_after_from_filter_date_range( $filter_vars, $as_int = true ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'date_range' => 'any',
+			'after'      => 1,
+			'before'     => time(),
+		] );
+
+		$after  = date_as_int( $filter_vars['after'] );
+		$before = date_as_int( $filter_vars['before'] );
+
+		switch ( $filter_vars['date_range'] ) {
+			default:
+			case 'any':
+				$after  = 1;
+				$before = time() * 2;
+				break;
+			case '24_hours':
+				$after  = time();
+				$before = time() + DAY_IN_SECONDS;
+				break;
+			case '7_days':
+				$after  = time();
+				$before = time() + ( 7 * DAY_IN_SECONDS );
+				break;
+			case '30_days':
+				$after  = time();
+				$before = time() + ( 30 * DAY_IN_SECONDS );
+				break;
+			case '60_days':
+				$after  = time();
+				$before = time() + ( 60 * DAY_IN_SECONDS );
+				break;
+			case '90_days':
+				$after  = time();
+				$before = time() + ( 90 * DAY_IN_SECONDS );
+				break;
+			case '365_days':
+				$after  = time();
+				$before = time() + ( 365 * DAY_IN_SECONDS );
+				break;
+			case 'before':
+				$before = date_as_int( $before ) + ( DAY_IN_SECONDS - 1 );
+				$after  = 1;
+				break;
+			case 'after':
+				$before = time() * 2;
 				$after  = date_as_int( $after );
 				break;
 			case 'between':

@@ -31,17 +31,17 @@ class Contacts_Api extends Base_Object_Api {
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'create_tags' ],
-				'permission_callback' => [ $this, 'update_permissions_callback' ]
+				'permission_callback' => [ $this, 'update_single_permissions_callback' ]
 			],
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'read_tags' ],
-				'permission_callback' => [ $this, 'update_permissions_callback' ]
+				'permission_callback' => [ $this, 'update_single_permissions_callback' ]
 			],
 			[
 				'methods'             => WP_REST_Server::DELETABLE,
 				'callback'            => [ $this, 'delete_tags' ],
-				'permission_callback' => [ $this, 'update_permissions_callback' ]
+				'permission_callback' => [ $this, 'update_single_permissions_callback' ]
 			],
 		] );
 
@@ -67,7 +67,7 @@ class Contacts_Api extends Base_Object_Api {
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'merge' ],
-				'permission_callback' => [ $this, 'update_permissions_callback' ]
+				'permission_callback' => [ $this, 'update_single_permissions_callback' ]
 			],
 		] );
 
@@ -75,7 +75,7 @@ class Contacts_Api extends Base_Object_Api {
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'admin_table_row' ],
-				'permission_callback' => [ $this, 'read_permissions_callback' ]
+				'permission_callback' => [ $this, 'read_single_permissions_callback' ]
 			],
 		] );
 	}
@@ -230,6 +230,10 @@ class Contacts_Api extends Base_Object_Api {
 					continue;
 				}
 
+				if ( ! current_user_can( 'edit_contact', $contact ) ){
+					return self::ERROR_401();
+				}
+
 				$data        = get_array_var( $item, 'data', [] );
 				$meta        = get_array_var( $item, 'meta', [] );
 				$add_tags    = get_array_var( $item, 'add_tags', get_array_var( $item, 'apply_tags', [] ) );
@@ -274,6 +278,10 @@ class Contacts_Api extends Base_Object_Api {
 		 * @var $contact Contact
 		 */
 		foreach ( $contacts as $contact ) {
+
+			if ( ! current_user_can( 'edit_contact', $contact ) ){
+				return self::ERROR_401();
+			}
 
 			// get the email address
 			$email_address = get_array_var( $data, 'email' );
@@ -352,6 +360,10 @@ class Contacts_Api extends Base_Object_Api {
 			return self::ERROR_CONTACT_NOT_FOUND();
 		}
 
+		if ( ! current_user_can( 'edit_contact', $contact ) ){
+			return self::ERROR_401();
+		}
+
 		$data        = $request->get_param( 'data' );
 		$meta        = $request->get_param( 'meta' );
 		$add_tags    = $request->get_param( 'add_tags' ) ?: $request->get_param( 'apply_tags' );
@@ -392,6 +404,10 @@ class Contacts_Api extends Base_Object_Api {
 			return self::ERROR_CONTACT_NOT_FOUND();
 		}
 
+		if ( ! current_user_can( 'edit_contact', $contact ) ){
+			return self::ERROR_401();
+		}
+
 		$tags = $request->get_json_params();
 
 		$contact->apply_tag( $tags );
@@ -413,6 +429,10 @@ class Contacts_Api extends Base_Object_Api {
 
 		if ( ! is_a_contact( $contact ) ) {
 			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		if ( ! current_user_can( 'view_contact', $contact ) ){
+			return self::ERROR_401();
 		}
 
 		return self::SUCCESS_RESPONSE( [ 'tags' => $contact->get_tags() ] );
@@ -445,6 +465,10 @@ class Contacts_Api extends Base_Object_Api {
 			return self::ERROR_CONTACT_NOT_FOUND();
 		}
 
+		if ( ! current_user_can( 'edit_contact', $contact ) ){
+			return self::ERROR_401();
+		}
+
 		$tags = $request->get_json_params();
 
 		$contact->remove_tag( $tags );
@@ -460,7 +484,6 @@ class Contacts_Api extends Base_Object_Api {
 	 * @return WP_Error|WP_REST_Response
 	 */
 	public function create_files( WP_REST_Request $request ) {
-
 
 		$ID = absint( $request->get_param( 'ID' ) );
 
@@ -565,6 +588,10 @@ class Contacts_Api extends Base_Object_Api {
 			return self::ERROR_CONTACT_NOT_FOUND();
 		}
 
+		if ( ! current_user_can( 'edit_contact', $contact ) ){
+			return self::ERROR_401();
+		}
+
 		$others = $request->get_json_params();
 
 		foreach ( $others as $other ) {
@@ -572,6 +599,25 @@ class Contacts_Api extends Base_Object_Api {
 		}
 
 		return $contact;
+	}
+
+	/**
+	 * protect delete endpoint
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return bool|WP_Error
+	 */
+	public function delete_single_permissions_callback( WP_REST_Request $request ) {
+
+		$contact = $this->get_object_from_request( $request );
+
+		if ( ! $contact->exists() ){
+			return self::ERROR_404();
+		}
+
+		return current_user_can( 'delete_contact', $contact );
+
 	}
 
 	/**
@@ -661,10 +707,14 @@ class Contacts_Api extends Base_Object_Api {
 	 *
 	 * @param WP_REST_Request $request
 	 *
-	 * @return WP_REST_Response
+	 * @return WP_Error|WP_REST_Response
 	 */
 	public function admin_table_row( WP_REST_Request $request ) {
 		$contact = get_contactdata( $request->get_param( 'contact' ) );
+
+		if ( ! current_user_can( 'view_contact', $contact ) ){
+			return self::ERROR_401();
+		}
 
 		$contactTable = new Contacts_Table;
 

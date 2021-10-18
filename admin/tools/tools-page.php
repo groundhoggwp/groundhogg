@@ -181,7 +181,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 			[
 				'name' => __( 'Sync or Create Users' ),
 				'slug' => 'sync_create_users',
-				'cap'  => 'import_contacts'
+				'cap'  => 'create_users'
 			],
 			[
 				'name' => __( 'Bulk Delete', 'groundhogg' ),
@@ -294,6 +294,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	####### SYNC TAB FUNCTIONS #########
 
 	public function sync_create_users_view() {
+
 		?>
 		<div class="tools-left">
 			<div class="gh-tools-wrap">
@@ -386,6 +387,11 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 * Sync all the users and contacts
 	 */
 	public function process_sync_create_users_bulk_sync() {
+
+		if ( ! current_user_can( 'edit_users' ) ) {
+			$this->wp_die_no_access();
+		}
+
 		if ( get_request_var( 'sync_user_meta' ) ) {
 			set_transient( 'gh_sync_user_meta', true, HOUR_IN_SECONDS );
 		}
@@ -423,6 +429,12 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 * Imports tab view
 	 */
 	public function import_view() {
+
+		if ( ! current_user_can( 'view_previous_imports' ) ){
+			$this->import_add();
+			return;
+		}
+
 		if ( ! class_exists( 'WPGH_Imports_Table' ) ) {
 			require_once __DIR__ . '/imports-table.php';
 		}
@@ -588,6 +600,11 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 * @return int delete the files
 	 */
 	public function process_import_delete() {
+
+		if ( ! current_user_can( 'delete_imports' ) ) {
+			$this->wp_die_no_access();
+		}
+
 		$files = $this->get_items();
 
 		foreach ( $files as $file_name ) {
@@ -608,6 +625,12 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 * Exports tab view
 	 */
 	public function export_view() {
+
+		if ( ! current_user_can( 'view_previous_exports' ) ){
+			$this->export_add();
+			return;
+		}
+
 		if ( ! class_exists( 'Exports_Table' ) ) {
 			require_once __DIR__ . '/exports-table.php';
 		}
@@ -618,6 +641,10 @@ class Tools_Page extends Tabbed_Admin_Page {
 			<?php $table->display(); ?>
 		</form>
 		<?php
+	}
+
+	public function export_add(){
+		// todo
 	}
 
 	/**
@@ -784,6 +811,11 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 * @return int delete the files
 	 */
 	public function process_export_delete() {
+
+		if ( ! current_user_can( 'delete_exports' ) ) {
+			$this->wp_die_no_access();
+		}
+
 		$files = $this->get_items();
 
 		foreach ( $files as $file_name ) {
@@ -1261,7 +1293,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	/**
 	 * Misc view
 	 */
-	public function misc_view(){
+	public function misc_view() {
 		include __DIR__ . '/misc.php';
 	}
 

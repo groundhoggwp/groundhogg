@@ -3,6 +3,7 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use Groundhogg\Contact;
 use Groundhogg\Plugin;
 use function Groundhogg\get_current_ip_address;
 use function Groundhogg\get_db;
@@ -69,6 +70,38 @@ class Page_Visits extends DB {
 		$compare_date      = time() - ( $retention_in_days * DAY_IN_SECONDS );
 
 		$wpdb->query( "DELETE from {$this->table_name} WHERE timestamp <= $compare_date" );
+	}
+
+	/**
+	 * Clean up DB events when this happens.
+	 */
+	protected function add_additional_actions() {
+		add_action( 'groundhogg/db/post_delete/contact', [ $this, 'contact_deleted' ] );
+		add_action( 'groundhogg/contact/merged', [ $this, 'contact_merged' ], 10, 2 );
+		parent::add_additional_actions();
+	}
+
+	/**
+	 * @param $orig Contact
+	 * @param $other Contact
+	 */
+	public function contact_merged( $orig, $other ) {
+		$this->update( [
+			'contact_id' => $other->get_id()
+		], [
+			'contact_id' => $orig->get_id()
+		] );
+	}
+
+	/**
+	 * Delete events for a contact that was just deleted...
+	 *
+	 * @param $id
+	 *
+	 * @return false|int
+	 */
+	public function contact_deleted( $id ) {
+		return $this->bulk_delete( [ 'contact_id' => $id ] );
 	}
 
 	/**
