@@ -235,8 +235,6 @@
       onMount: ({ id, multiple, name, ...props }, onChange) => {
         $(`#${id}`).on('change', (e) => {
 
-          console.log(e)
-
           if (multiple) {
             onChange({
               [name]: [...e.target.selectedOptions].map(o => o.value)
@@ -321,8 +319,6 @@
     },
 
     group: (group, fields = [], editable) => {
-
-      console.log(editable)
 
       //language=HTML
       return `
@@ -672,8 +668,6 @@
         ...properties,
         fields: properties.fields.map(f => ({ ...f, value: values[f.name] || '' }))
       }, canEdit()))
-
-      console.log(canEdit())
 
       onMount()
     }
