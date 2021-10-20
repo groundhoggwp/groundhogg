@@ -360,6 +360,11 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Misc Settings', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
 			),
+			'experimental'             => array(
+				'id'    => 'experimental',
+				'title' => _x( 'Experimental', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'misc'
+			),
 			'page_tracking'         => array(
 				'id'    => 'page_tracking',
 				'title' => _x( 'Page Tracking', 'settings_sections', 'groundhogg' ),
@@ -633,7 +638,7 @@ class Settings_Page extends Admin_Page {
 			),
 			'gh_enable_experimental_features'        => array(
 				'id'      => 'gh_enable_experimental_features',
-				'section' => 'misc_info',
+				'section' => 'experimental',
 				'label'   => _x( 'Enable experimental features.', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'This will enabled experimental features in Groundhogg and various extensions.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
@@ -647,8 +652,8 @@ class Settings_Page extends Admin_Page {
 			),
 			'gh_get_beta_versions'                   => array(
 				'id'      => 'gh_get_beta_versions',
-				'section' => 'misc_info',
-				'label'   => _x( 'Get updates for pre-release versions of extensions!', 'settings', 'groundhogg' ),
+				'section' => 'experimental',
+				'label'   => _x( 'Get updates for beta versions of extensions!', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'This will show automatic updates or extensions which may have experimental features.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => array(
