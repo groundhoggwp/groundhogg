@@ -623,7 +623,7 @@
     })
   }
 
-  const standardActivityDateTitle = (prepend, { date_range, before, after, future=false }) => {
+  const standardActivityDateTitle = (prepend, { date_range, before, after, future = false }) => {
 
     let ranges = future ? futureDateRanges : pastDateRanges
 
@@ -642,10 +642,70 @@
   const standardActivityDateDefaults = {
     date_range: 'any',
     before: '',
-    after: ''
+    after: '',
+    count: 1
   }
 
-  const standardActivityDateOptions = ({ date_range = '24_hours', after = '', before = '', future=false }) => {
+  const filterCountDefaults = {
+    count: 1,
+    count_compare: 'greater_than_or_equal_to'
+  }
+
+  const filterCount = ({ count, count_compare }) => {
+    //language=HTML
+    return `
+		<div class="space-between" style="gap: 10px">
+			<div class="gh-input-group">
+				${select({
+					id: 'filter-count-compare',
+					name: 'count_compare',
+				}, {
+					equals: _x('Exactly', 'comparison', 'groundhogg'),
+					less_than: _x('Less than', 'comparison', 'groundhogg'),
+					greater_than: _x('More than', 'comparison', 'groundhogg'),
+					less_than_or_equal_to: _x('At most', 'comparison', 'groundhogg'),
+					greater_than_or_equal_to: _x('At least', 'comparison', 'groundhogg'),
+
+				}, count_compare)}
+				${input({
+					type: 'number',
+					id: 'filter-count',
+					name: 'count',
+					autocomplete: 'off',
+					value: count,
+					placeholder: 1,
+					style: {
+						width: '100px'
+					}
+				})}
+			</div>
+			<span class="gh-text">
+			  ${__('Times')}
+          </span>
+		</div>`
+  }
+
+  const filterCountOnMount = (updateFilter) => {
+    $('#filter-count,#filter-count-compare').on('change', (e) => {
+      updateFilter({
+        [e.target.name]: e.target.value
+      })
+    })
+  }
+
+  const filterCountComparisons = {
+    equals: (v) => sprintf(_n('%s time', '%s times', parseInt(v), 'groundhogg'), v),
+    less_than: (v) => sprintf(_n('less than %s time', 'less than %s times', parseInt(v), 'groundhogg'), v),
+    less_than_or_equal_to: (v) => sprintf(_n('at most %s time', 'at most %s times', parseInt(v), 'groundhogg'), v),
+    greater_than: (v) => sprintf(_n('more than %s time', 'more than %s times', parseInt(v), 'groundhogg'), v),
+    greater_than_or_equal_to: (v) => sprintf(_n('at least %s time', 'at least %s time', parseInt(v), 'groundhogg'), v),
+  }
+
+  const filterCountTitle = (title, { count = 1, count_compare = 'equals' }) => {
+    return title + ' ' + filterCountComparisons[count_compare](count)
+  }
+
+  const standardActivityDateOptions = ({ date_range = '24_hours', after = '', before = '', future = false }) => {
 
     return ` ${select({
       id: 'filter-date-range',
@@ -1228,15 +1288,15 @@
 
   //filter by Email Opened
   registerFilter('email_received', 'activity', __('Email Received', 'groundhogg'), {
-    view ({ email_id, date_range, before, after }) {
+    view ({ email_id, ...rest }) {
       const emailName = email_id ? EmailsStore.get(email_id).data.title : 'any email'
-      return standardActivityDateTitle(sprintf(_x('Received %s', '%s is an email', 'groundhogg'), `<b>${emailName}</b>`), {
-        date_range,
-        before,
-        after
-      })
+
+      let prefix = sprintf(_x('Received %s', '%s is an email', 'groundhogg'), `<b>${emailName}</b>`)
+      prefix = filterCountTitle(prefix, rest)
+
+      return standardActivityDateTitle(prefix, rest)
     },
-    edit ({ email_id, date_range, before, after }) {
+    edit ({ email_id, ...rest }) {
 
       const pickerOptions = email_id ? {
         [email_id]: EmailsStore.get(email_id).data.title
@@ -1248,10 +1308,10 @@
 			  id: 'filter-email',
 			  name: 'email_id',
 		  }, pickerOptions, email_id)}
+		  
+		  ${filterCount(rest)}
 
-		  ${standardActivityDateOptions({
-			  date_range, after, before
-		  })}`
+		  ${standardActivityDateOptions(rest)}`
     },
     onMount (filter, updateFilter) {
       emailPicker('#filter-email', false, (items) => {
@@ -1264,10 +1324,13 @@
         })
       })
 
+      filterCountOnMount(updateFilter)
+
       standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
       ...standardActivityDateDefaults,
+      ...filterCountDefaults,
       email_id: 0,
     },
     preload: ({ email_id }) => {
@@ -1279,15 +1342,16 @@
 
   //filter by Email Opened
   registerFilter('email_opened', 'activity', __('Email Opened', 'groundhogg'), {
-    view ({ email_id, date_range, before, after }) {
+    view ({ email_id, ...rest }) {
       const emailName = email_id ? EmailsStore.get(email_id).data.title : 'any email'
-      return standardActivityDateTitle(sprintf(_x('Opened %s', '%s is an email', 'groundhogg'), `<b>${emailName}</b>`), {
-        date_range,
-        before,
-        after
-      })
+
+      let prefix = sprintf(_x('Opened %s', '%s is an email', 'groundhogg'), `<b>${emailName}</b>`)
+
+      prefix = filterCountTitle(prefix, rest)
+
+      return standardActivityDateTitle(prefix, rest)
     },
-    edit ({ email_id, date_range, before, after }) {
+    edit ({ email_id, ...rest }) {
 
       const pickerOptions = email_id ? {
         [email_id]: EmailsStore.get(email_id).data.title
@@ -1300,9 +1364,9 @@
 			  name: 'email_id',
 		  }, pickerOptions, email_id)}
 
-		  ${standardActivityDateOptions({
-			  date_range, after, before
-		  })}`
+		  ${filterCount(rest)}
+
+		  ${standardActivityDateOptions(rest)}`
     },
     onMount (filter, updateFilter) {
       emailPicker('#filter-email', false, (items) => {
@@ -1315,10 +1379,13 @@
         })
       })
 
+      filterCountOnMount(updateFilter)
+
       standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
       ...standardActivityDateDefaults,
+      ...filterCountDefaults,
       email_id: 0,
     },
     preload: ({ email_id }) => {
@@ -1330,19 +1397,17 @@
 
 //filter by Email Opened
   registerFilter('email_link_clicked', 'activity', __('Email Link Clicked', 'groundhogg'), {
-    view ({ email_id, link, date_range, before, after }) {
+    view ({ email_id, link, ...rest }) {
 
       const emailName = email_id ? EmailsStore.get(email_id).data.title : 'any email'
 
       let prepend = sprintf(link ? __('Clicked %1$s in %2$s', 'groundhogg') : __('Clicked any link in %2$s', 'groundhogg'), `<b>${link}</b>`, `<b>${emailName}</b>`)
 
-      return standardActivityDateTitle(prepend, {
-        date_range,
-        before,
-        after
-      })
+      prepend = filterCountTitle(prepend, rest)
+
+      return standardActivityDateTitle(prepend, rest)
     },
-    edit ({ email_id, link, date_range, before, after }) {
+    edit ({ email_id, link, ...rest }) {
 
       const pickerOptions = email_id ? {
         [email_id]: EmailsStore.get(email_id).data.title
@@ -1363,9 +1428,9 @@
 			  placeholder: __('Start typing to select a link or leave blank for any link', 'groundhogg')
 		  })}
 
-		  ${standardActivityDateOptions({
-			  date_range, before, after
-		  })}`
+		  ${filterCount(rest)}
+
+		  ${standardActivityDateOptions(rest)}`
     },
     onMount (filter, updateFilter) {
       emailPicker('#filter-email', false, (items) => {
@@ -1384,10 +1449,13 @@
         })
       })
 
+      filterCountOnMount(updateFilter)
+
       standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
       ...standardActivityDateDefaults,
+      ...filterCountDefaults,
       link: '',
       email_id: 0,
     },
@@ -1399,15 +1467,11 @@
   })
 
   registerFilter('confirmed_email', 'activity', __('Confirmed Email Address', 'groundhogg'), {
-    view ({ date_range, before, after }) {
-      return standardActivityDateTitle(`<b>${__('Confirmed Email Address', 'groundhogg')}</b>`, {
-        date_range,
-        before,
-        after
-      })
+    view (filter) {
+      return standardActivityDateTitle(`<b>${__('Confirmed Email Address', 'groundhogg')}</b>`, filter)
     },
-    edit ({ date_range, before, after }) {
-      return standardActivityDateOptions({ date_range, before, after })
+    edit (filter) {
+      return standardActivityDateOptions(filter)
     },
     onMount (filter, updateFilter) {
       standardActivityDateFilterOnMount(filter, updateFilter)
@@ -1419,25 +1483,23 @@
 
   //filter by Email Opened
   registerFilter('page_visited', 'activity', __('Page Visited', 'groundhogg'), {
-    view ({ link, date_range, before, after }) {
+    view ({ link, ...rest }) {
 
-      let prefix;
+      let prefix
 
-      if ( link ){
-        const url = new URL( link )
+      if (link) {
+        const url = new URL(link)
 
-        prefix = sprintf(__('Visited %s', 'groundhogg'), bold(url.pathname ))
+        prefix = sprintf(__('Visited %s', 'groundhogg'), bold(url.pathname))
       } else {
-        prefix = __( 'Visited <b>any page</b>', 'groundhogg' )
+        prefix = __('Visited <b>any page</b>', 'groundhogg')
       }
 
-      return standardActivityDateTitle(prefix, {
-        date_range,
-        before,
-        after
-      })
+      prefix = filterCountTitle(prefix, rest)
+
+      return standardActivityDateTitle(prefix, rest)
     },
-    edit ({ link, date_range, before, after }) {
+    edit ({ link, ...rest }) {
 
       // language=html
       return `
@@ -1450,9 +1512,9 @@
 			  placeholder: __('Start typing to select a link or leave blank for any link', 'groundhogg')
 		  })}
 
-		  ${standardActivityDateOptions({
-			  date_range, before, after
-		  })}`
+		  ${filterCount(rest)}
+
+		  ${standardActivityDateOptions(rest)}`
     },
     onMount (filter, updateFilter) {
 
@@ -1462,68 +1524,80 @@
         })
       })
 
+      filterCountOnMount(updateFilter)
+
       standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
       ...standardActivityDateDefaults,
+      ...filterCountDefaults,
       link: '',
     },
   })
 
 //filter by User Logged In
   registerFilter('logged_in', 'activity', __('Logged In', 'groundhogg'), {
-    view ({ date_range, before, after }) {
-      return standardActivityDateTitle(`<b>${__('Logged in', 'groundhogg')}</b>`, { date_range, before, after })
+    view (filter) {
+
+      let prefix = filterCountTitle(`<b>${__('Logged in', 'groundhogg')}</b>`, filter)
+
+      return standardActivityDateTitle(prefix, filter)
     },
-    edit ({ date_range, before, after }) {
-      return standardActivityDateOptions({ date_range, before, after })
+    edit (filter) {
+      return filterCount(filter) + standardActivityDateOptions(filter)
     },
     onMount (filter, updateFilter) {
+      filterCountOnMount(updateFilter)
       standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
       ...standardActivityDateDefaults,
+      ...filterCountDefaults,
     }
   })
 
   registerFilter('logged_out', 'activity', __('Logged Out', 'groundhogg'), {
-    view ({ date_range, before, after }) {
-      return standardActivityDateTitle(`<b>${__('Logged out', 'groundhogg')}</b>`, { date_range, before, after })
+    view (filter) {
+      return standardActivityDateTitle(filterCountTitle(`<b>${__('Logged out', 'groundhogg')}</b>`, filter), filter)
     },
-    edit ({ date_range, before, after }) {
-      return standardActivityDateOptions({ date_range, before, after })
+    edit (filter) {
+      return filterCount(filter) + standardActivityDateOptions(filter)
     },
     onMount (filter, updateFilter) {
+      filterCountOnMount(updateFilter)
       standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
+      ...filterCountDefaults,
       ...standardActivityDateDefaults,
     }
   })
 
 //filter by User Not Logged In
   registerFilter('not_logged_in', 'activity', __('Has Not Logged In', 'groundhogg'), {
-    view ({ date_range, before, after }) {
-      return standardActivityDateTitle(`<b>${__('Has not logged in', 'groundhogg')}</b>`, { date_range, before, after })
+    view (filter) {
+      return standardActivityDateTitle(filterCountTitle(`<b>${__('Has not logged in', 'groundhogg')}</b>`, filter), filter)
     },
-    edit ({ date_range, before, after }) {
-      return standardActivityDateOptions({ date_range, before, after })
+    edit (filter) {
+      return filterCount(filter) + standardActivityDateOptions(filter)
     },
     onMount (filter, updateFilter) {
+      filterCountOnMount(updateFilter)
       standardActivityDateFilterOnMount(filter, updateFilter)
     },
     defaults: {
+      ...filterCountDefaults,
       ...standardActivityDateDefaults,
     }
   })
 
 //filter by User Was Active
   registerFilter('was_active', 'activity', __('Was Active', 'groundhogg'), {
-    view ({ date_range, before, after }) {
-      return standardActivityDateTitle(`<b>${__('Was active', 'groundhogg')}</b>`, { date_range, before, after })
+    view (filter) {
+      return standardActivityDateTitle(`<b>${__('Was active', 'groundhogg')}</b>`, filter)
     },
-    edit ({ date_range, before, after }) {
-      return standardActivityDateOptions({ date_range, before, after })
+    edit (filter) {
+      return standardActivityDateOptions(filter)
     },
     onMount (filter, updateFilter) {
       standardActivityDateFilterOnMount(filter, updateFilter)
@@ -1535,11 +1609,11 @@
 
 //filter By User Was Not Active
   registerFilter('was_not_active', 'activity', __('Was Inactive', 'groundhogg'), {
-    view ({ date_range, before, after }) {
-      return standardActivityDateTitle(`<b>${__('Was inactive', 'groundhogg')}</b>`, { date_range, before, after })
+    view (filter) {
+      return standardActivityDateTitle(`<b>${__('Was inactive', 'groundhogg')}</b>`, filter)
     },
-    edit ({ date_range, before, after }) {
-      return standardActivityDateOptions({ date_range, before, after })
+    edit (filter) {
+      return standardActivityDateOptions(filter)
     },
     onMount (filter, updateFilter) {
       standardActivityDateFilterOnMount(filter, updateFilter)

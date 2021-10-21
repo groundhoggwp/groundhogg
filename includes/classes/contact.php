@@ -435,6 +435,8 @@ class Contact extends Base_Object_With_Meta {
 
 		$tags = apply_filters( 'groundhogg/contacts/add_tag/before', $this->get_tags_db()->validate( $tags ) );
 
+		$tags_applied = [];
+
 		foreach ( $tags as $tag_id ) {
 
 			if ( ! $this->has_tag( $tag_id ) ) {
@@ -445,11 +447,31 @@ class Contact extends Base_Object_With_Meta {
 
 				// No ID so check for int 0
 				if ( $result === 0 ) {
+
+					$tags_applied[] = $tag_id;
+
+					/**
+					 * When a tag relationship is created
+					 *
+					 * @param $contact Contact
+					 * @param $tag_id int
+					 */
 					do_action( 'groundhogg/contact/tag_applied', $this, $tag_id );
 				}
 
 			}
 
+		}
+
+		if ( ! empty( $tags_applied ) ){
+
+			/**
+			 * Similar to groundhogg/contact/tag_applied but passes all the tags as an array if multiple tags were passed
+			 *
+			 * @param $contact Contact
+			 * @param $tag_ids int[]
+			 */
+			do_action( 'groundhogg/contact/tags_applied', $this, $tags_applied );
 		}
 
 		return true;
@@ -475,6 +497,8 @@ class Contact extends Base_Object_With_Meta {
 
 		$tags = apply_filters( 'groundhogg/contacts/remove_tag/before', $this->get_tags_db()->validate( $tags ) );
 
+		$tags_removed = [];
+
 		foreach ( $tags as $tag_id ) {
 
 			if ( $this->has_tag( $tag_id ) ) {
@@ -484,11 +508,29 @@ class Contact extends Base_Object_With_Meta {
 				$result = $this->get_tag_rel_db()->delete( [ 'tag_id' => $tag_id, 'contact_id' => $this->ID ] );
 
 				if ( $result ) {
+
+					$tags_removed[] = $tag_id;
+
+					/**
+					 * When a tag relationship is removed
+					 *
+					 * @param $contact Contact
+					 * @param $tag_id int
+					 */
 					do_action( 'groundhogg/contact/tag_removed', $this, $tag_id );
 				}
-
 			}
+		}
 
+		if ( ! empty( $tags_removed ) ){
+
+			/**
+			 * Similar to groundhogg/contact/tag_removed but passes all the tags as an array if multiple tags were passed
+			 *
+			 * @param $contact Contact
+			 * @param $tag_ids int[]
+			 */
+			do_action( 'groundhogg/contact/tags_removed', $this, $tags_removed );
 		}
 
 		return true;

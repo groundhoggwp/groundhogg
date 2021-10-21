@@ -2138,6 +2138,12 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 		$contact = get_contactdata( $contact );
 	}
 
+	do_action_ref_array( 'groundhogg/update_contact_with_map/before', [
+		$contact
+		&$fields,
+		&$map
+	] );
+
 	if ( empty( $map ) ) {
 		$keys = array_keys( $fields );
 		$map  = array_combine( $keys, $keys );

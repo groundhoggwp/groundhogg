@@ -702,6 +702,10 @@ button {
     max-height: calc(92vh - 64px);
     overflow: auto;
 
+    &.overflow-visible{
+      overflow: visible;
+    }
+
     &.no-padding {
       padding: 0;
     }

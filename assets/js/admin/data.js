@@ -339,6 +339,14 @@
         })
     },
 
+    async count (params) {
+      return apiGet(`${this.route}`, {
+        count: true,
+        ...params,
+      })
+        .then(r => r.total_items)
+    },
+
     async deleteMany (query) {
       return apiDelete(`${this.route}`, query)
         .then(r => this.getItemsFromResponse(r))
@@ -417,15 +425,7 @@
         })
       },
     }),
-    contacts: ObjectStore(Groundhogg.api.routes.v4.contacts, {
-      async count (params) {
-        return apiGet(`${this.route}`, {
-          count: true,
-          ...params,
-        })
-          .then(r => r.total_items)
-      }
-    }),
+    contacts: ObjectStore(Groundhogg.api.routes.v4.contacts),
     campaigns: ObjectStore(Groundhogg.api.routes.v4.campaigns),
     funnels: ObjectStore(Groundhogg.api.routes.v4.funnels, {
 

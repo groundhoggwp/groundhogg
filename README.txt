@@ -326,6 +326,7 @@ You can purchase a premium plan for access to support and our premium extensions
 * ADDED Custom properties component for creating custom properties for various data types on the fly
 * ADDED Data store methods for manipulating object relationships
 * ADDED Groundwork for merging various data types including contacts for an upcoming update
+* ADDED Many activity based filters such as Email Opened now support filtering by the number of times a contact has done that action.
 * TWEAKED the benchmark complete method is now compatible with an array of contacts
 * TWEAKED Ground up rethink of permissions makes sales rep and sales manager roles more stable and secure
 

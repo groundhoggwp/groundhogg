@@ -553,6 +553,9 @@ button.gh-button.loud {
   max-height: calc(92vh - 64px);
   overflow: auto;
 }
+.gh-modal-dialog.overflow-visible {
+  overflow: visible;
+}
 .gh-modal-dialog.no-padding {
   padding: 0;
 }
