@@ -419,16 +419,18 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * Add a list of tags or a single tag top the contact
 	 *
-	 * @param $tag_id_or_array array|int
+	 * @param $tag_id_or_array array|int|Tag
 	 *
 	 * @return bool
 	 */
 	public function add_tag( $tag_id_or_array ) {
 
 		if ( ! is_array( $tag_id_or_array ) ) {
-			$tags = explode( ',', $tag_id_or_array );
+			$tags = wp_parse_id_list( $tag_id_or_array );
 		} else if ( is_array( $tag_id_or_array ) ) {
 			$tags = $tag_id_or_array;
+		} else if ( is_a( $tag_id_or_array, Tag::class ) ) {
+			$tags = [ $tag_id_or_array->get_id() ];
 		} else {
 			return false;
 		}
@@ -437,7 +439,9 @@ class Contact extends Base_Object_With_Meta {
 
 		$tags_applied = [];
 
-		foreach ( $tags as $tag_id ) {
+		foreach ( $tags as $tag ) {
+
+			$tag_id = is_a( $tag, Tag::class ) ? $tag->get_id() : $tag;
 
 			if ( ! $this->has_tag( $tag_id ) ) {
 
@@ -482,15 +486,18 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * Remove a single tag or several tag from the contact
 	 *
-	 * @param $tag_id_or_array
+	 * @param $tag_id_or_array array|int|Tag
 	 *
 	 * @return bool
 	 */
 	public function remove_tag( $tag_id_or_array ) {
+
 		if ( ! is_array( $tag_id_or_array ) ) {
-			$tags = explode( ',', $tag_id_or_array );
+			$tags = wp_parse_id_list( $tag_id_or_array );
 		} else if ( is_array( $tag_id_or_array ) ) {
 			$tags = $tag_id_or_array;
+		} else if ( is_a( $tag_id_or_array, Tag::class ) ) {
+			$tags = [ $tag_id_or_array->get_id() ];
 		} else {
 			return false;
 		}
@@ -499,7 +506,9 @@ class Contact extends Base_Object_With_Meta {
 
 		$tags_removed = [];
 
-		foreach ( $tags as $tag_id ) {
+		foreach ( $tags as $tag ) {
+
+			$tag_id = is_a( $tag, Tag::class ) ? $tag->get_id() : $tag;
 
 			if ( $this->has_tag( $tag_id ) ) {
 
@@ -539,12 +548,15 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * return whether the contact has a specific tag
 	 *
-	 * @param int|string $tag_id_or_name the ID or name or the tag
+	 * @param int|string|Tag $tag_id_or_name the ID or name or the tag
 	 *
 	 * @return bool
 	 */
 	public function has_tag( $tag_id_or_name ) {
-		if ( ! is_numeric( $tag_id_or_name ) ) {
+
+		if ( is_a( $tag_id_or_name, Tag::class ) ){
+			$tag_id = $tag_id_or_name->get_id();
+		} else if ( ! is_numeric( $tag_id_or_name ) ) {
 			$tag = $this->get_tags_db()->get_tag_by( 'tag_slug', sanitize_title( $tag_id_or_name ) );
 
 			// Tag does not exist

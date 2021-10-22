@@ -698,7 +698,7 @@
     less_than: (v) => sprintf(_n('less than %s time', 'less than %s times', parseInt(v), 'groundhogg'), v),
     less_than_or_equal_to: (v) => sprintf(_n('at most %s time', 'at most %s times', parseInt(v), 'groundhogg'), v),
     greater_than: (v) => sprintf(_n('more than %s time', 'more than %s times', parseInt(v), 'groundhogg'), v),
-    greater_than_or_equal_to: (v) => sprintf(_n('at least %s time', 'at least %s time', parseInt(v), 'groundhogg'), v),
+    greater_than_or_equal_to: (v) => sprintf(_n('at least %s time', 'at least %s times', parseInt(v), 'groundhogg'), v),
   }
 
   const filterCountTitle = (title, { count = 1, count_compare = 'equals' }) => {

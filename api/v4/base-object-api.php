@@ -647,8 +647,8 @@ abstract class Base_Object_Api extends Base_Api {
 			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
-		$data = $request->get_param( 'data' );
-		$meta = $request->get_param( 'meta' );
+		$data = $request->get_param( 'data' ) ?: [];
+		$meta = $request->get_param( 'meta' ) ?: [];
 
 		// If the current object supports meta data...
 		if ( method_exists( $object, 'update_meta' ) ) {
