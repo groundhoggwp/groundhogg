@@ -37,7 +37,7 @@ add_filter( 'retrieve_password_message', __NAMESPACE__ . '\fix_html_pw_reset_lin
 function sender_email( $original_email_address ) {
 
 	// Might not be set.
-	if ( ! isset_not_empty( $_SERVER, 'SERVER_NAME' ) ) {
+	if ( ! isset_not_empty( $_SERVER, 'SERVER_NAME' ) && ! empty( $original_email_address ) ) {
 		return $original_email_address;
 	}
 
@@ -51,7 +51,7 @@ function sender_email( $original_email_address ) {
 	$from_email = 'wordpress@' . $sitename;
 
 	if ( $original_email_address === $from_email ) {
-		$new_email_address = Plugin::$instance->settings->get_option( 'override_from_email', $original_email_address );
+		$new_email_address = get_option( 'gh_override_from_email', $original_email_address );
 
 		if ( ! empty( $new_email_address ) ) {
 			$original_email_address = $new_email_address;
@@ -71,7 +71,7 @@ function sender_email( $original_email_address ) {
 function sender_name( $original_email_from ) {
 
 	if ( $original_email_from === 'WordPress' ) {
-		$new_email_from = Plugin::$instance->settings->get_option( 'override_from_name', $original_email_from );
+		$new_email_from = get_option( 'gh_override_from_name', $original_email_from );
 
 		if ( ! empty( $new_email_from ) ) {
 			$original_email_from = $new_email_from;

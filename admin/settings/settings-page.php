@@ -360,6 +360,16 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Misc Settings', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
 			),
+			'experimental'             => array(
+				'id'    => 'experimental',
+				'title' => _x( 'Experimental', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'misc'
+			),
+			'page_tracking'         => array(
+				'id'    => 'page_tracking',
+				'title' => _x( 'Page Tracking', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'misc'
+			),
 			'wp_cron'               => [
 				'id'    => 'wp_cron',
 				'title' => _x( 'WP Cron', 'settings_sections', 'groundhogg' ),
@@ -383,6 +393,11 @@ class Settings_Page extends Admin_Page {
 			'compliance'            => array(
 				'id'    => 'compliance',
 				'title' => _x( 'Compliance', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'marketing'
+			),
+			'cookies'               => array(
+				'id'    => 'cookies',
+				'title' => _x( 'Cookies', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'marketing'
 			),
 			'unsubscribe'           => array(
@@ -412,7 +427,7 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Defaults', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'email'
 			],
-			'footer'             => [
+			'footer'                => [
 				'id'    => 'footer',
 				'title' => _x( 'Footer', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'email'
@@ -618,7 +633,7 @@ class Settings_Page extends Admin_Page {
 			),
 			'gh_enable_experimental_features'        => array(
 				'id'      => 'gh_enable_experimental_features',
-				'section' => 'misc_info',
+				'section' => 'experimental',
 				'label'   => _x( 'Enable experimental features.', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'This will enabled experimental features in Groundhogg and various extensions.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
@@ -632,8 +647,8 @@ class Settings_Page extends Admin_Page {
 			),
 			'gh_get_beta_versions'                   => array(
 				'id'      => 'gh_get_beta_versions',
-				'section' => 'misc_info',
-				'label'   => _x( 'Get updates for pre-release versions of extensions!', 'settings', 'groundhogg' ),
+				'section' => 'experimental',
+				'label'   => _x( 'Get updates for beta versions of extensions!', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'This will show automatic updates or extensions which may have experimental features.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => array(
@@ -748,7 +763,7 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				),
 			),
-			'gh_is_admin_bar_widget_disabled'                       => array(
+			'gh_is_admin_bar_widget_disabled'        => array(
 				'id'      => 'gh_is_admin_bar_widget_disabled',
 				'section' => 'misc_info',
 				'label'   => _x( 'Hide Admin Toolbar Widget', 'settings', 'groundhogg' ),
@@ -841,9 +856,9 @@ class Settings_Page extends Admin_Page {
 			),
 			'gh_disable_unnecessary_cookies'         => array(
 				'id'      => 'gh_disable_unnecessary_cookies',
-				'section' => 'compliance',
+				'section' => 'cookies',
 				'label'   => _x( 'Disable unnecessary cookies', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'This will prevent the <code>groundhogg-lead-source</code> and <code>groundhogg-form-impressions</code> cookies from being set.', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'This will prevent the <code>groundhogg-lead-source</code>, <code>groundhogg-page-visits</code>, and <code>groundhogg-form-impressions</code> cookies from being set.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => array(
 					'label' => __( 'Disable' ),
@@ -853,6 +868,32 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				),
 			),
+			'gh_consent_cookie_name'               => [
+				'id'      => 'gh_consent_cookie_name',
+				'section' => 'cookies',
+				'label'   => _x( 'Consent cookie name', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'The name of the cookie that records consent to allow cookies. This is provided by a third party plugin. This has no effect unless GDPR features are enabled.', 'settings', 'groundhogg' ),
+				'type'    => 'input',
+				'atts'    => [
+					//keep brackets for backwards compat
+					'placeholder' => 'viewed_cookie_policy',
+					'name'        => 'gh_consent_cookie_name',
+					'id'          => 'gh_consent_cookie_name',
+				],
+			],
+			'gh_cookie_consent_cookie_value'               => [
+				'id'      => 'gh_cookie_consent_cookie_value',
+				'section' => 'cookies',
+				'label'   => _x( 'Consent cookie value', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'The value of the consent cookie indicating acceptance to use cookies. This is provided by a third party plugin. This has no effect unless GDPR features are enabled.', 'settings', 'groundhogg' ),
+				'type'    => 'input',
+				'atts'    => [
+					//keep brackets for backwards compat
+					'placeholder' => 'yes',
+					'name'        => 'gh_consent_cookie_value',
+					'id'          => 'gh_consent_cookie_value',
+				],
+			],
 			'gh_recaptcha_site_key'                  => array(
 				'id'      => 'gh_recaptcha_site_key',
 				'section' => 'captcha',
@@ -1172,13 +1213,13 @@ class Settings_Page extends Admin_Page {
 				'label'   => _x( 'Enable Email Logging', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'This will have Groundhogg save all emails sent to the database for a period of time. Useful for debugging or verifying someone received an email.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
-				'atts'    => array(
+				'atts'    => [
 					'label' => __( 'Enable' ),
 					//keep brackets for backwards compat
 					'name'  => 'gh_log_emails',
 					'id'    => 'gh_log_emails',
 					'value' => 'on',
-				),
+				],
 			),
 			'gh_email_log_retention'                 => [
 				'id'      => 'gh_email_log_retention',
@@ -1186,41 +1227,41 @@ class Settings_Page extends Admin_Page {
 				'label'   => _x( 'Email Log Retention', 'settings', 'groundhogg' ),
 				'desc'    => sprintf( _x( 'The number of days to retain logged emails. Logs older then <code>%d</code> days will be deleted.', 'settings', 'groundhogg' ), get_option( 'gh_email_log_retention' ) ?: 14 ),
 				'type'    => 'input',
-				'atts'    => array(
+				'atts'    => [
 					'type'        => 'number',
 					'min'         => 0,
 					'class'       => 'input',
 					'name'        => 'gh_email_log_retention',
 					'id'          => 'gh_email_log_retention',
 					'placeholder' => 14,
-				),
+				],
 			],
-			'gh_enable_one_click_unsubscribe'        => array(
+			'gh_enable_one_click_unsubscribe'        => [
 				'id'      => 'gh_enable_one_click_unsubscribe',
 				'section' => 'unsubscribe',
 				'label'   => _x( 'Enable One-Click Unsubscribe', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'When contacts click the unsubscribe link in emails they will be instantly unsubscribed rather than required to unsubscribe in the email preferences area.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
-				'atts'    => array(
+				'atts'    => [
 					'label' => __( 'Enable' ),
 					'name'  => 'gh_enable_one_click_unsubscribe',
 					'id'    => 'gh_enable_one_click_unsubscribe',
 					'value' => 'on',
-				),
-			),
-			'gh_disable_unsubscribe_header'          => array(
+				],
+			],
+			'gh_disable_unsubscribe_header'          => [
 				'id'      => 'gh_disable_unsubscribe_header',
 				'section' => 'unsubscribe',
 				'label'   => _x( 'Disable the Unsubscribe header.', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'The unsubscribe header is recommended for promotional emails and will improve deliverability among large email senders. Disabling it may result in your email going to spam.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
-				'atts'    => array(
+				'atts'    => [
 					'label' => __( 'Disable' ),
 					'name'  => 'gh_disable_unsubscribe_header',
 					'id'    => 'gh_disable_unsubscribe_header',
 					'value' => 'on',
-				),
-			),
+				],
+			],
 			'gh_disable_wp_cron'                     => [
 				'id'      => 'gh_disable_wp_cron',
 				'section' => 'wp_cron',
@@ -1237,7 +1278,35 @@ class Settings_Page extends Admin_Page {
 					'disabled' => defined( 'DISABLE_WP_CRON' ) && ! defined( 'GH_SHOW_DISABLE_WP_CRON_OPTION' ),
 					'checked'  => defined( 'DISABLE_WP_CRON' ),
 				],
-			]
+			],
+			'gh_purge_page_visits'                   => [
+				'id'      => 'gh_purge_page_visits',
+				'section' => 'page_tracking',
+				'label'   => _x( 'Delete Old Page Visit Logs (recommended)', 'settings', 'groundhogg' ),
+				'desc'    => __( 'To preserve storage in the database and overall performance it is recommended to delete old page visit logs.', 'groundhogg' ),
+				'type'    => 'checkbox',
+				'atts'    => [
+					'label' => __( 'Enable' ),
+					'name'  => 'gh_purge_page_visits',
+					'id'    => 'gh_purge_page_visits',
+					'value' => 'on',
+				],
+			],
+			'gh_page_visits_log_retention'           => [
+				'id'      => 'gh_page_visits_log_retention',
+				'section' => 'page_tracking',
+				'label'   => _x( 'Log Retention', 'settings', 'groundhogg' ),
+				'desc'    => sprintf( _x( 'The number of days to retain logged page visits. Logs older then <code>%d</code> days will be deleted.', 'settings', 'groundhogg' ), get_option( 'gh_page_visits_log_retention' ) ?: 90 ),
+				'type'    => 'input',
+				'atts'    => [
+					'type'        => 'number',
+					'min'         => 0,
+					'class'       => 'input',
+					'name'        => 'gh_page_visits_log_retention',
+					'id'          => 'gh_page_visits_log_retention',
+					'placeholder' => 90,
+				],
+			],
 		);
 
 		return apply_filters( 'groundhogg/admin/settings/settings', $settings );

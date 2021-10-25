@@ -127,10 +127,10 @@
 
       let item
 
-      if (this.item && this.item[this.primaryKey] === id) {
+      if (this.item[this.primaryKey] == id) {
         item = this.item
       } else {
-        item = this.items.find(item => item && item[this.primaryKey] === id)
+        item = this.items.find(item => item[this.primaryKey] == id)
       }
 
       return item
@@ -141,7 +141,7 @@
     },
 
     hasItem (id) {
-      return this.item[this.primaryKey] === id || this.items.find(item => item[this.primaryKey] === id)
+      return this.item[this.primaryKey] == id || this.items.find(item => item[this.primaryKey] == id)
     },
 
     hasItems (itemIds) {
@@ -153,7 +153,7 @@
       for (let i = 0; i < itemIds.length; i++) {
         const itemId = itemIds[i]
         if (!this.items.find(item => {
-          return item[this.primaryKey] === itemId
+          return item[this.primaryKey] == itemId
         })) {
           return false
         }
@@ -172,16 +172,22 @@
         return
       }
 
-      console.log(items)
-
       this.items = [
         ...items, // new items
-        ...this.items.filter(item => !items.find(_item => _item[this.primaryKey] === item[this.primaryKey]))
+        ...this.items.filter(item => !items.find(_item => _item[this.primaryKey] == item[this.primaryKey]))
       ]
     },
 
-    async fetchItems (params) {
-      return apiGet(this.route, params)
+    find (f = () => {}) {
+      return this.items.find(f)
+    },
+
+    filter (f = () => { }) {
+      return this.items.filter(f)
+    },
+
+    async fetchItems (params, opts = {}) {
+      return apiGet(this.route, params, opts)
         .then(r => {
           this.total_items = this.getTotalItemsFromResponse(r)
           return this.getItemsFromResponse(r)
@@ -191,8 +197,8 @@
         })
     },
 
-    async fetchItem (id) {
-      return apiGet(`${this.route}/${id}`)
+    async fetchItem (id, opts = {}) {
+      return apiGet(`${this.route}/${id}`, opts)
         .then(r => this.getItemFromResponse(r))
         .then(item => {
           this.item = item
@@ -201,6 +207,10 @@
           ])
           return item
         })
+    },
+
+    async create (...args) {
+      return this.post(...args)
     },
 
     async post (data, opts = {}) {
@@ -214,8 +224,42 @@
         })
     },
 
+    async postMany (data, opts = {}) {
+      return apiPost(this.route, data, opts)
+        .then(r => this.getItemsFromResponse(r))
+        .then(items => {
+          this.itemsFetched(items)
+          return items
+        })
+    },
+
+    async update (...args) {
+      return this.patch(...args)
+    },
+
     async patch (id, data, opts = {}) {
       return apiPatch(`${this.route}/${id}`, data, opts)
+        .then(r => this.getItemFromResponse(r))
+        .then(item => {
+          this.item = item
+          this.itemsFetched([
+            item
+          ])
+          return item
+        })
+    },
+
+    async patchMany (items, opts = {}) {
+      return apiPatch(`${this.route}`, items, opts)
+        .then(r => this.getItemsFromResponse(r))
+        .then(items => {
+          this.itemsFetched(items)
+          return items
+        })
+    },
+
+    async duplicate (id, data, opts = {}) {
+      return apiPost(`${this.route}/${id}/duplicate`, data, opts)
         .then(r => this.getItemFromResponse(r))
         .then(item => {
           this.item = item
@@ -238,25 +282,69 @@
         })
     },
 
+    async fetchRelationships (id, { other_type }, opts = {}) {
+      return apiDelete(`${this.route}/${id}/relationships`, { other_type }, opts)
+        .then(r => this.getItemFromResponse(r))
+        .then(item => {
+          this.item = item
+          this.itemsFetched([
+            item
+          ])
+          return item
+        })
+    },
+
+    async createRelationships (id, data, opts = {}) {
+      return apiPost(`${this.route}/${id}/relationships`, data, opts)
+        .then(r => this.getItemFromResponse(r))
+        .then(item => {
+          this.item = item
+          this.itemsFetched([
+            item
+          ])
+          return item
+        })
+    },
+
+    async deleteRelationships (id, data, opts = {}) {
+      return apiDelete(`${this.route}/${id}/relationships`, data, opts)
+        .then(r => this.getItemFromResponse(r))
+        .then(item => {
+          this.item = item
+          this.itemsFetched([
+            item
+          ])
+          return item
+        })
+    },
+
     async delete (id) {
 
-      if (typeof id === 'object') {
+      if (typeof id == 'object') {
         return this.deleteMany(id)
       }
 
       return apiDelete(`${this.route}/${id}`)
         .then(r => {
 
-          if (this.item[this.primaryKey] === id) {
+          if (this.item[this.primaryKey] == id) {
             this.item = {}
           }
 
           this.items = [
-            ...this.items.filter(item => item[this.primaryKey] !== id),
+            ...this.items.filter(item => item[this.primaryKey] != id),
           ]
 
           return r
         })
+    },
+
+    async count (params) {
+      return apiGet(`${this.route}`, {
+        count: true,
+        ...params,
+      })
+        .then(r => r.total_items)
     },
 
     async deleteMany (query) {
@@ -308,7 +396,7 @@
 
             self.items = [
               ...r.items, // new items
-              ...self.items.filter(item => !r.items.find(_item => _item[this.primaryKey] === item[this.primaryKey]))
+              ...self.items.filter(item => !r.items.find(_item => _item[this.primaryKey] == item[this.primaryKey]))
             ]
 
             return r.items
@@ -329,7 +417,7 @@
 
           Object.assign(self.items, data.items)
 
-          if (data.items.length === self.limit) {
+          if (data.items.length == self.limit) {
             self.offset += self.limit
             self.preloadTags()
           }
@@ -337,15 +425,7 @@
         })
       },
     }),
-    contacts: ObjectStore(Groundhogg.api.routes.v4.contacts, {
-      async count (params) {
-        return apiGet(`${this.route}`, {
-          count: true,
-          ...params,
-        })
-          .then(r => r.total_items)
-      }
-    }),
+    contacts: ObjectStore(Groundhogg.api.routes.v4.contacts),
     campaigns: ObjectStore(Groundhogg.api.routes.v4.campaigns),
     funnels: ObjectStore(Groundhogg.api.routes.v4.funnels, {
 
@@ -372,17 +452,17 @@
 
       isStartingStep (funnelId, stepId, checkEdited = false) {
         return !this.getPrecedingSteps(funnelId, stepId, checkEdited)
-          .find(_step => _step.data.step_group === 'action')
+          .find(_step => _step.data.step_group == 'action')
       },
 
       getSteps (funnelId, checkEdited = false) {
-        const funnel = funnelId ? this.items.find(f => f.ID === funnelId) : this.item
+        const funnel = funnelId ? this.items.find(f => f.ID == funnelId) : this.item
         return checkEdited && funnel.meta.edited ? funnel.meta.edited.steps : funnel.steps
       },
 
       getFunnelAndStep (funnelId, stepId, checkEdited = false) {
-        const funnel = funnelId ? this.items.find(f => f.ID === funnelId) : this.item
-        const step = checkEdited && funnel.meta.edited ? funnel.meta.edited.steps.find(s => s.ID === stepId) : funnel.steps.find(s => s.ID === stepId)
+        const funnel = funnelId ? this.items.find(f => f.ID == funnelId) : this.item
+        const step = checkEdited && funnel.meta.edited ? funnel.meta.edited.steps.find(s => s.ID == stepId) : funnel.steps.find(s => s.ID == stepId)
         return { funnel, step }
       },
 
@@ -402,6 +482,7 @@
     }),
     emails: ObjectStore(Groundhogg.api.routes.v4.emails),
     broadcasts: ObjectStore(Groundhogg.api.routes.v4.broadcasts),
+    notes: ObjectStore(Groundhogg.api.routes.v4.notes),
     searches: ObjectStore(Groundhogg.api.routes.v4.searches, {
       primaryKey: 'id'
     }),

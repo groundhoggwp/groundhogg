@@ -222,16 +222,23 @@ class Bounce_Checker {
 
 		$domain = \get_option( 'gh_bounce_inbox_host', $domain );
 
-
 		$port = \get_option( 'gh_bounce_inbox_port', 993 );
 
 		$hostname = sprintf( '{%s:%d/imap/ssl/novalidate-cert}INBOX', $domain, $port );
 
+		if ( ! function_exists( 'imap_open' ) ) {
+			return;
+		}
+
 		/* try to connect */
-		$inbox = @\imap_open( $hostname, $this->inbox, $this->password, OP_READONLY );
+		try {
+			$inbox = @\imap_open( $hostname, $this->inbox, $this->password, OP_READONLY );
+		} catch ( \Exception $e ) {
+			return;
+		}
 
 		if ( ! $inbox ) {
-			return;
+			return ;
 		}
 
 		/* grab emails, for now assume these messages go unread */

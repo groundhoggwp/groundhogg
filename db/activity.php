@@ -3,6 +3,7 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use Groundhogg\Base_Object;
 use function Groundhogg\generate_referer_hash;
 use function Groundhogg\isset_not_empty;
 
@@ -57,8 +58,24 @@ class Activity extends DB {
 	 */
 	protected function add_additional_actions() {
 		add_action( 'groundhogg/db/post_delete/contact', [ $this, 'contact_deleted' ] );
+		add_action( "groundhogg/contact/merged", [ $this, 'contact_merged' ], 10, 2 );
 //		add_action( 'groundhogg/db/post_delete/funnel', [ $this, 'funnel_deleted' ] );
 //		add_action( 'groundhogg/db/post_delete/step', [ $this, 'step_deleted' ] );
+	}
+
+	/**
+	 * When two objects are merged
+	 * Change all of "other's" associations to "orig"
+	 *
+	 * @param $orig  Base_Object
+	 * @param $other Base_Object
+	 */
+	public function contact_merged( $orig, $other ) {
+		$this->update( [
+			'object_id' => $other->get_id()
+		], [
+			'object_id' => $orig->get_id()
+		] );
 	}
 
 	/**
@@ -133,7 +150,7 @@ class Activity extends DB {
 	}
 
 	/**
-	 * @param int $row_id
+	 * @param int   $row_id
 	 * @param array $data
 	 * @param array $where
 	 *

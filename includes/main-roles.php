@@ -117,6 +117,79 @@ class Main_Roles extends Roles {
 	}
 
 	/**
+	 * Map caps to primitives
+	 *
+	 * @param array  $caps
+	 * @param string $cap
+	 * @param int    $user_id
+	 * @param array  $args
+	 *
+	 * @return array
+	 */
+	public function map_meta_cap( $caps, $cap, $user_id, $args ) {
+
+		switch ( $cap ) {
+			case 'download_imports':
+			case 'download_exports':
+			case 'delete_imports':
+			case 'delete_exports':
+
+				$parts = explode( '_', $cap );
+
+				$caps = [
+					'view_previous_' . $parts[1],
+					$parts[0] . '_files',
+				];
+
+				break;
+
+				break;
+			case 'edit_contact':
+			case 'view_contact':
+			case 'delete_contact':
+			case 'edit_note':
+			case 'view_note':
+			case 'delete_note':
+
+				$caps = [];
+
+				$parts       = explode( '_', $cap );
+				$action      = $parts[0];
+				$object_type = $parts[1];
+
+				$caps[] = $action . '_' . $object_type . 's';
+
+				$object = $args[0];
+
+				// didn't pass the full object
+				if ( ! method_exists( $object, 'get_id' ) ) {
+					$object = create_object_from_type( $object, $object_type );
+				}
+
+				// Not a real object
+				if ( ! $object->exists() ) {
+					$caps[] = 'do_not_allow';
+					break;
+				}
+
+				switch ( $object_type ) {
+					case 'note':
+					case 'contact':
+					default:
+						// Most common methods for comparing
+						if ( ( method_exists( $object, 'get_owner_id' ) && $object->get_owner_id() !== $user_id ) ) {
+							$caps[] = $action . '_others_' . $object_type . 's';
+						}
+						break;
+				}
+
+				break;
+		}
+
+		return $caps;
+	}
+
+	/**
 	 * Return all GH Caps
 	 *
 	 * @return array
@@ -141,16 +214,24 @@ class Main_Roles extends Roles {
 	 */
 	public function get_sales_manager_caps() {
 		return [
-			'edit_contacts',
 			'add_contacts',
+			'edit_contacts',
+			'edit_others_contacts',
 			'view_contacts',
-			'view_all_contacts',
+			'view_others_contacts',
 			'import_contacts',
 			'export_contacts',
 			'send_emails',
 			'view_events',
 			'manage_tags',
-			'download_contact_files'
+			'download_contact_files',
+			'add_notes',
+			'view_others_notes',
+			'edit_others_notes',
+			'delete_others_notes',
+			'delete_notes',
+			'edit_notes',
+			'view_notes'
 		];
 	}
 
@@ -164,13 +245,16 @@ class Main_Roles extends Roles {
 			'edit_contacts',
 			'add_contacts',
 			'view_contacts',
-			'view_own_contacts',
 			'import_contacts',
 			'export_contacts',
 			'send_emails',
-			'view_events',
 			'manage_tags',
-			'download_contact_files'
+			'download_contact_files',
+			'view_others_notes',
+			'add_notes',
+			'delete_notes',
+			'edit_notes',
+			'view_notes'
 		];
 	}
 
@@ -194,12 +278,14 @@ class Main_Roles extends Roles {
 	public function get_contact_caps() {
 		$caps = array(
 			'add_contacts',
-			'delete_contacts',
 			'edit_contacts',
+			'edit_others_contacts',
 			'view_contacts',
-			'view_all_contacts',
+			'view_others_contacts',
+			'delete_contacts',
+			'delete_others_contacts',
 			'import_contacts',
-			'export_contacts'
+			'export_contacts',
 		);
 
 		return apply_filters( 'groundhogg/roles/caps/contacts', $caps );
@@ -298,6 +384,21 @@ class Main_Roles extends Roles {
 		return apply_filters( 'groundhogg/roles/caps/funnels', $caps );
 	}
 
+
+	public function get_note_caps() {
+		$caps = array(
+			'add_notes',
+			'delete_notes',
+			'edit_notes',
+			'view_notes',
+			'delete_others_notes',
+			'edit_others_notes',
+			'view_others_notes'
+		);
+
+		return apply_filters( 'groundhogg/roles/caps/notes', $caps );
+	}
+
 	/**
 	 *
 	 * Events:
@@ -328,6 +429,9 @@ class Main_Roles extends Roles {
 	public function get_file_caps() {
 		return [
 			'download_files',
+			'delete_files',
+			'view_previous_imports',
+			'view_previous_exports',
 			'download_contact_files',
 		];
 	}
@@ -376,6 +480,7 @@ class Main_Roles extends Roles {
 		$caps = array(
 			'perform_bulk_actions',
 			'manage_gh_licenses',
+			'edit_custom_properties',
 			'manage_campaigns',
 		);
 
@@ -397,7 +502,8 @@ class Main_Roles extends Roles {
 			$this->get_report_caps(),
 			$this->get_other_caps(),
 			$this->get_file_caps(),
-			$this->get_log_caps()
+			$this->get_log_caps(),
+			$this->get_note_caps()
 		);
 
 		return $caps;
@@ -427,6 +533,6 @@ class Main_Roles extends Roles {
 	 * @return mixed
 	 */
 	protected function get_admin_cap_check() {
-		return 'view_all_contacts';
+		return 'view_contacts';
 	}
 }

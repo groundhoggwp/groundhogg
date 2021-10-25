@@ -71,16 +71,8 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 			<div class="full-name"><?php dashicon_e( 'admin-users' ); ?><?php echo $contact->get_full_name(); ?></div>
 			<div class="email">
 				<?php dashicon_e( 'email' ); ?><?php echo html()->e( 'a', [
-					'class' => 'trigger-popup',
-					'href'  => modal_link_url( [
-						'title'              => __( 'Send Email', 'groundhogg' ),
-						'footer_button_text' => __( 'Save Changes' ),
-						'source'             => 'email-form-wrap',
-						'height'             => 600,
-						'width'              => 500,
-						'footer'             => 'false',
-						'preventSave'        => 'true',
-					] )
+					'id'   => 'send-email',
+					'href' => 'mailto:' . $contact->get_email(),
 				], $contact->get_email() ) ?>
 				<span
 					class="status <?php echo $contact->is_marketable() ? 'green' : 'red'; ?>"><?php echo Preferences::get_preference_pretty_name( $contact->get_optin_status() ); ?></span>
@@ -321,11 +313,10 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 			//print_r( $contact->tags );
 
 			$args = array(
-				'id'       => 'tags',
-				'name'     => 'tags[]',
+				'id'   => 'tags',
+				'name' => 'tags[]',
 				'selected' => $contact->get_tags(),
-				'style'    => [ 'min-width' => '600px' ]
-
+				'style'    => [ 'min-width' => '600px' ],
 			);
 			echo html()->tag_picker( $args ); ?>
 			<p class="description"><?php _ex( 'Add new tags by hitting <code>Enter</code> or by typing a <code>,</code>.', 'contact_record', 'groundhogg' ); ?></p>

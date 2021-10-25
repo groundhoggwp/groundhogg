@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.8
 Requires PHP: 7.1
-Stable tag: 2.5.3
+Stable tag: 2.5.4.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -320,6 +320,33 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.5.5 (2021-10-05) =
+* ADDED More JS components for use in 3.0 and the pipeline extension
+* ADDED Custom properties component for creating custom properties for various data types on the fly
+* ADDED Data store methods for manipulating object relationships
+* ADDED Groundwork for merging various data types including contacts for an upcoming update
+* ADDED Many activity based filters such as Email Opened now support filtering by the number of times a contact has done that action.
+* TWEAKED the benchmark complete method is now compatible with an array of contacts
+* TWEAKED Ground up rethink of permissions makes sales rep and sales manager roles more stable and secure
+
+= 2.5.4.2 (2021-10-05) =
+* HOT FIX Revert meta cache change
+
+= 2.5.4.1 (2021-10-05) =
+* TWEAKED Changed base object cache group format from `{$table_name}/groundhogg/db/{$object_type}` to `groundhogg/db/{$object_type}`
+* TWEAKED Changed object meta cache group format from `{$object_type}_meta` to `groundhogg/{$object_type}_meta`
+
+= 2.5.4 (2021-09-20) =
+* ADDED All new site activity tracking system! See which pages your contacts visit the most.
+* ADDED Support for cookie consent plugins. Define your consent cookie and value in the settings to trigger tracking and cookies in Groundhogg.
+* ADDED Built-in support for CookieLawInfo plugin.
+* TWEAKED "Active Contacts" to "Waiting Contacts" in funnel list view to avoid confusion.
+* TWEAKED Moved email logging hooks earlier to catch emails sent before the `init` hook.
+* FIXED Forms not submitting if multiple forms on same page with recaptcha v3 enabled.
+* FIXED PHP notice caused by invalid permission callback for API
+* FIXED PHP notices when creating a new group in BuddyBoss.
+* FIXED Spanish translations causing PHP notice for missing `sprintf` arguments.
 
 = 2.5.3 (2021-08-31) =
 * TWEAKED gh-cron.php file when setup on multisite network will automatically ping all the subsites.

@@ -18,6 +18,27 @@ class Plugin_Compatibility {
 
 		// WPUltimo
 		add_filter( 'wu_signup_step_handler_create-account', [ $this, 'prevent_new_user_from_adding_contacts_to_template_site' ], 9 );
+
+		// Cookie Law Info
+		add_filter( 'groundhogg/has_accepted_cookies', [ $this, 'cookie_law_info_plugin' ] );
+
+	}
+
+	/**
+	 * Detect cookie law info and handle the has_accepted_cookies
+	 * https://wordpress.org/plugins/cookie-law-info/
+	 *
+	 * @param $accepted
+	 *
+	 * @return bool|mixed
+	 */
+	public function cookie_law_info_plugin( $accepted ){
+
+		if ( ! defined( 'CLI_LATEST_VERSION_NUMBER' ) ){
+			return $accepted;
+		}
+
+		return get_cookie( 'viewed_cookie_policy' ) === 'yes';
 	}
 
 	/**

@@ -61,7 +61,7 @@ abstract class Table extends \WP_List_Table {
 	 */
 	protected function create_view( $view, $param, $display, $count = 0 ) {
 
-		$is_active = is_string( $param ) ? get_request_var( $param ) === $view : get_request_query() === $param;
+		$is_active = is_string( $param ) ? $this->get_view() === $view : get_request_query() === $param;
 
 		return html()->e( 'a',
 			[
@@ -212,7 +212,7 @@ abstract class Table extends \WP_List_Table {
 		$order    = get_url_var( 'order', 'DESC' );
 		$orderby  = get_url_var( 'orderby', $this->get_db()->get_primary_key() );
 
-		$query = array_merge( get_request_query(), [
+		$query = array_merge( $this->get_default_query(), get_request_query(), [
 			'limit'   => $per_page,
 			'offset'  => $offset,
 			'order'   => $order,

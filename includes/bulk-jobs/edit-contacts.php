@@ -67,6 +67,8 @@ class Edit_Contacts extends Bulk_Job {
 
 		// Update the contact
 		update_contact_with_map( $contact, $this->edits );
+
+		do_action( 'groundhogg/edit_contacts/updated', $contact);
 	}
 
 	/**
@@ -75,6 +77,9 @@ class Edit_Contacts extends Bulk_Job {
 	 * @return void
 	 */
 	protected function pre_loop() {
+
+		do_action( 'groundhogg/edit_contacts/pre_loop' );
+
 		$this->edits = get_transient( 'gh_bulk_edit_fields' );
 		$this->query = get_transient( 'gh_bulk_edit_query' );
 	}
@@ -85,6 +90,7 @@ class Edit_Contacts extends Bulk_Job {
 	 * @return void
 	 */
 	protected function post_loop() {
+		do_action( 'groundhogg/edit_contacts/post_loop' );
 	}
 
 	/**

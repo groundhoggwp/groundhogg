@@ -156,7 +156,7 @@
   const stepNavHandler = (selector, {
     currentStep = 0,
     steps = [],
-    onStepChange = (step) => { console.log(step)},
+    onStepChange = (step) => {console.log(step)},
     showNav = true,
     labels,
   }) => {
@@ -246,26 +246,6 @@
 
   const breadcrumbs = (parts) => {
     return parts.map((p, i) => i < parts.length - 1 ? `<span class="part">${p}</span>` : `<span class="base">${p}</span>`).join(`<span class="sep">/</span>`)
-  }
-
-  function improveTinyMCE () {
-
-    if (typeof this.flag !== 'undefined') {
-      return
-    }
-
-    $doc.on('tinymce-editor-setup', function (event, editor) {
-      editor.settings.toolbar1 =
-        'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,wp_adv,dfw,groundhoggreplacementbtn,groundhoggemojibtn'
-      editor.settings.toolbar2 =
-        'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help'
-      editor.settings.height = 200
-      editor.on('click', function (ed, e) {
-        $doc.trigger('to_mce')
-      })
-    })
-
-    this.flag = 'improved'
   }
 
   /**
@@ -507,11 +487,18 @@
   }
 
   const Elements = {
-    toggle ({ id, name, className, value = '1', onLabel = 'on', offLabel = 'off', checked }) {
+    toggle ({ id, name, className, value = '1', onLabel = 'on', offLabel = 'off', checked, ...props }) {
       //language=HTML
       return `
 		  <label class="gh-switch ${className}">
-			  <input id="${id}" name="${name}" value="${value}" type="checkbox" ${checked ? 'checked' : ''}>
+			  ${Elements.input({
+				  name,
+				  id,
+				  value,
+				  checked,
+				  ...props,
+				  type: 'checkbox',
+			  })}
 			  <span class="slider round"></span>
 			  <span class="on">${onLabel}</span>
 			  <span class="off">${offLabel}</span>
@@ -658,9 +645,48 @@
       }
     )
 
-    tinymce.get(editor_id).on('keyup', function (e) {
-      onChange(tinyMCE.activeEditor.getContent({ format: 'raw' }), tinyMCE.activeEditor.getContent({ format: 'raw' }))
+    tinyMCE.get(editor_id).on('keyup', function (e) {
+      onChange(tinyMCE.activeEditor.getContent({ format: 'raw' }))
     })
+
+    return tinyMCE.get(editor_id)
+  }
+
+  function addMediaToBasicTinyMCE () {
+
+    if (typeof this.flag !== 'undefined') {
+      return
+    }
+
+    $doc.on('tinymce-editor-setup', function (event, editor) {
+      editor.settings.toolbar1 =
+        'bold,italic,bullist,numlist,alignleft,aligncenter,alignright,link,wp_add_media'
+      editor.on('click', function (ed, e) {
+        $doc.trigger('to_mce')
+      })
+    })
+
+    this.flag = 'improved'
+  }
+
+  function improveTinyMCE () {
+
+    if (typeof this.flag !== 'undefined') {
+      return
+    }
+
+    $doc.on('tinymce-editor-setup', function (event, editor) {
+      editor.settings.toolbar1 =
+        'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,wp_adv,wp_add_media,dfw'
+      editor.settings.toolbar2 =
+        'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help'
+      editor.settings.height = 200
+      editor.on('click', function (ed, e) {
+        $doc.trigger('to_mce')
+      })
+    })
+
+    this.flag = 'improved'
   }
 
   const loadingModal = (text = 'Loading') => {
@@ -698,6 +724,7 @@
    * @param confirmText
    * @param closeText
    * @param onConfirm
+   * @param onCancel
    * @param onClose
    * @param confirmButtonType
    * @param cancelButtonType
@@ -708,11 +735,14 @@
     confirmText = _x('Confirm', 'verb', 'groundhogg'),
     closeText = __('Cancel', 'groundhogg'),
     onConfirm = () => {},
+    onCancel = () => {},
     onClose = () => {},
     confirmButtonType = 'primary',
     cancelButtonType = 'danger text',
     buttonSize = 'medium',
   }) => {
+
+    let confirmed = false
 
     //language=html
     const content = `
@@ -731,13 +761,22 @@
 			</button>
 		</div>`
 
+    const handleClose = () => {
+      if (!confirmed) {
+        onCancel()
+      }
+
+      onClose()
+    }
+
     const { close, $modal } = modal({
       content,
-      onClose,
+      onClose: handleClose,
       dialogClasses: 'gh-modal-confirmation'
     })
 
     const confirm = () => {
+      confirmed = true
       onConfirm()
       close()
     }
@@ -766,23 +805,24 @@
    * (function) confirmCallBack Called when "confirm" button is clicked.
    *
    * @param (object) options Config options to overwrite defaults.
+   * @param selector
    */
-  const modal = ({
+  const miniModal = (selector, {
     content = '',
+    onSetContent = () => {},
     onClose = () => {},
-    canClose = true,
     onOpen = () => {},
-    dialogClasses = ''
+    dialogClasses = '',
+    closeOnFocusout = true,
   }) => {
 
     //language=html
     const html = `
-		<div class="gh-modal">
-			<div class="gh-modal-overlay"></div>
+		<div class="gh-modal mini gh-panel" tabindex="0">
 			<div class="gh-modal-dialog ${dialogClasses}">
-				${canClose ? `	<button type="button" class="dashicon-button gh-modal-button-close-top gh-modal-button-close">
+				<button type="button" class="dashicon-button gh-modal-button-close-top gh-modal-button-close">
 					<span class="dashicons dashicons-no-alt"></span>
-				</button>` : ''}
+				</button>
 				<div class="gh-modal-dialog-content">
 					${content}
 				</div>
@@ -803,14 +843,117 @@
 
     const setContent = (content) => {
       $modal.find('.gh-modal-dialog-content').html(content)
+      onSetContent()
     }
 
-    $('body').append($modal).addClass('modal-open')
+    const $el = $(selector)
+
+    $('body').append($modal)
+
+    const {
+      left,
+      right,
+      top,
+      bottom
+    } = $el[0].getBoundingClientRect()
+
+    $modal.css({
+      top: Math.min(bottom, window.innerHeight - $modal.height() - 20) + 'px',
+      left: (right - $modal.outerWidth()) + 'px'
+    })
 
     onOpen()
 
+    $modal.find('.gh-modal-button-close').on('click', handleClose)
+
+    if (closeOnFocusout) {
+      $modal.on('focusout', (e) => {
+
+        if (!e.relatedTarget || !clickedIn(e.relatedTarget, '.gh-modal.mini')) {
+          handleClose()
+        }
+      })
+    }
+
+    $modal.focus()
+
+    return {
+      $modal,
+      close,
+      setContent
+    }
+  }
+  /**
+   * Custom modal appended to the body.
+   *
+   * options:
+   * (bool) isConfirmation Shows confirmation button if true.
+   * (bool) closeOnOverlayClick Close the modal when the background overlay is clicked.
+   * (bool) showCloseButton Show the close button at the top of the modal.
+   * (string) messageHtml Html to be showed at the top of the modal.
+   * (function) confirmCallBack Called when "confirm" button is clicked.
+   *
+   * @param (object) options Config options to overwrite defaults.
+   */
+  const modal = ({
+    content = '',
+    onSetContent = () => {},
+    onClose = () => {},
+    beforeClose = () => true,
+    canClose = true,
+    onOpen = () => {},
+    className = '',
+    dialogClasses = '',
+    overlay = true,
+    disableScrolling = true
+  }) => {
+
+    //language=html
+    const html = `
+		<div class="gh-modal ${className}">
+			${overlay ? `<div class="gh-modal-overlay"></div>` : ''}
+			<div class="gh-modal-dialog ${dialogClasses}">
+				${canClose ? `	<button type="button" class="dashicon-button gh-modal-button-close-top gh-modal-button-close">
+					<span class="dashicons dashicons-no-alt"></span>
+				</button>` : ''}
+				<div class="gh-modal-dialog-content">
+					${content}
+				</div>
+			</div>
+		</div>`
+
+    const $modal = $(html)
+
+    const close = () => {
+
+      if (!beforeClose(close)) {
+        return
+      }
+
+      $modal.remove()
+
+      if (disableScrolling) {
+        $('body').removeClass('modal-open')
+      }
+
+      onClose()
+    }
+
+    const handleClose = () => {
+      close()
+    }
+
+    const setContent = (content) => {
+      $modal.find('.gh-modal-dialog-content').html(content)
+      onSetContent()
+    }
+
+    $('body').append($modal).addClass(disableScrolling ? 'modal-open' : '')
+
+    onOpen({ close, setContent })
+
     if (canClose) {
-      $('.gh-modal-overlay, .gh-modal-button-close').on('click', handleClose)
+      $modal.find('.gh-modal-overlay, .gh-modal-button-close').on('click', handleClose)
     }
 
     return {
@@ -856,6 +999,7 @@
 
     const stop = () => {
       clearInterval(interval)
+      $el.remove()
     }
 
     const interval = setInterval(() => {
@@ -946,7 +1090,7 @@
    * @return {Boolean}
    */
   function clickInsideElement (e, selector) {
-    var el = e.srcElement || e.target
+    var el = e.tagName ? e : e.srcElement || e.target
 
     if (el && el.matches(selector)) {
       return el
@@ -1416,7 +1560,7 @@
     // language=HTML
     const menu = `
 		<div role="menu" class="gh-dropdown-menu" tabindex="0">
-			${items.map(({
+			${items.filter(i => i && true).map(({
 				key,
 				text
 			}) => `<div class="gh-dropdown-menu-item" data-key="${key}">${text}</div>`).join('')}
@@ -1472,6 +1616,9 @@
   }
 
   const icons = {
+    note: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <path fill="currentColor" d="M512 334.667V20c0-11.046-8.954-20-20-20H20C8.954 0 0 8.954 0 20v472c0 11.046 8.954 20 20 20h314.667c5.375 0 10.489-2.203 14.145-5.86L506.14 348.811c3.652-3.65 5.86-8.747 5.86-14.144zM40 40h432v274.667H334.667c-11.046 0-20 8.954-20 20V472H40zm403.716 314.667-89.049 89.049v-89.049zM118 177.333c0-11.046 8.954-20 20-20h236c11.046 0 20 8.954 20 20s-8.954 20-20 20H138c-11.046 0-20-8.954-20-20zM138 276c-11.046 0-20-8.954-20-20s8.954-20 20-20h236c11.046 0 20 8.954 20 20s-8.954 20-20 20z"/>
+</svg>`,
     // language=html
     mobile: `
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -1695,6 +1842,7 @@
     clickInsideElement,
     searchOptionsWidget,
     tinymceElement,
+    addMediaToBasicTinyMCE,
     isValidEmail,
     loadingModal,
     savingModal,
@@ -1702,6 +1850,7 @@
     dangerConfirmationModal,
     uuid,
     modal,
+    miniModal,
     setFrameContent,
     copyObject,
     loadingDots,

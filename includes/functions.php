@@ -3,6 +3,7 @@
 namespace Groundhogg;
 
 use Groundhogg\Classes\Activity;
+use Groundhogg\Classes\Page_Visit;
 use Groundhogg\Lib\Mobile\Iso3166;
 use Groundhogg\Lib\Mobile\Mobile_Validator;
 use Groundhogg\Queue\Event_Queue;
@@ -27,14 +28,14 @@ function get_current_contact() {
 /**
  * Wrapper function for Utils function.
  *
- * @param $contact_id_or_email
+ * @param $contact_id_or_email mixed
  * @param $by_user_id
  *
  * @return false|Contact
  */
 function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 
-	// Gave us a contact, send it back.
+	// We already have a contact
 	if ( is_a_contact( $contact_id_or_email ) ){
 		return $contact_id_or_email;
 	}
@@ -237,11 +238,8 @@ function emergency_init_dbs() {
  * @return bool
  */
 function is_option_enabled( $option = '' ) {
-	$option = get_option( $option );
 
-	if ( ! is_array( $option ) && $option ) {
-		return true;
-	}
+	$option = get_option( $option );
 
 	/**
 	 * Whether the option is enabled or not.
@@ -249,7 +247,7 @@ function is_option_enabled( $option = '' ) {
 	 * @param $enabled bool
 	 * @param $option  string
 	 */
-	return apply_filters( 'groundhogg/is_option_enabled', is_array( $option ) && in_array( 'on', $option ), $option );
+	return apply_filters( 'groundhogg/is_option_enabled', ( ! is_array( $option ) && $option ) || ( is_array( $option ) && in_array( 'on', $option ) ), $option );
 }
 
 /**
@@ -1681,20 +1679,7 @@ function after_form_submit_handler( &$contact ) {
 		return;
 	}
 
-	// Update their location based on the current IP address.
-	if ( apply_filters( 'groundhogg/should_extrapolate_location', true ) && $contact->update_meta( 'ip_address', utils()->location->get_real_ip() ) ) {
-		$contact->extrapolate_location();
-	}
-
-	if ( ! $contact->get_meta( 'lead_source' ) ) {
-		$contact->update_meta( 'lead_source', tracking()->get_leadsource() );
-	}
-
-	if ( ! $contact->get_meta( 'source_page' ) ) {
-		$contact->update_meta( 'source_page', wpgh_get_referer() );
-	}
-
-	// If they re-optin we consider them unconfirmed
+	// If they re-optin we will consider them unconfirmed
 	if ( ! $contact->is_marketable() ) {
 		$contact->change_marketing_preference( Preferences::UNCONFIRMED );
 	}
@@ -1707,6 +1692,108 @@ function after_form_submit_handler( &$contact ) {
 	 * @param $contact Contact
 	 */
 	do_action( 'groundhogg/after_form_submit', $contact );
+}
+
+add_action( 'groundhogg/after_form_submit', __NAMESPACE__ . '\extrapolate_location_after_signup', 9 );
+
+/**
+ * Get the location of a contact record when they signup
+ *
+ * @param $contact Contact
+ */
+function extrapolate_location_after_signup( $contact ) {
+	// Update their location based on the current IP address.
+	if ( apply_filters( 'groundhogg/should_extrapolate_location', true ) && $contact->update_meta( 'ip_address', utils()->location->get_real_ip() ) ) {
+		$contact->extrapolate_location();
+	}
+}
+
+add_action( 'groundhogg/after_form_submit', __NAMESPACE__ . '\save_source_page_after_signup', 9 );
+
+/**
+ * Save the source page if one is not set already
+ *
+ * @param $contact Contact
+ */
+function save_source_page_after_signup( $contact ) {
+	if ( ! $contact->get_meta( 'source_page' ) ) {
+		$contact->update_meta( 'source_page', wpgh_get_referer() );
+	}
+}
+
+add_action( 'groundhogg/after_form_submit', __NAMESPACE__ . '\save_lead_source_after_signup', 9 );
+
+/**
+ * Save the source page if one is not set already
+ *
+ * @param $contact Contact
+ */
+function set_utm_parameters( $contact ) {
+
+	$utm = get_cookie( Tracking::UTM_COOKIE );
+
+	if ( ! $utm ){
+		return;
+	}
+
+	$utm = json_decode( $utm, true );
+
+	if ( empty( $utm ) ){
+		return;
+	}
+
+	// If there is a contact, update their UTM stats to the one provided by the campaign
+	foreach ( $utm as $utm_var => $utm_val ) {
+		if ( ! empty( $utm_val ) ) {
+			$contact->update_meta(
+				$utm_var,
+				sanitize_text_field( $utm_val )
+			);
+		}
+	}
+}
+
+add_action( 'groundhogg/after_form_submit', __NAMESPACE__ . '\set_utm_parameters', 9 );
+
+/**
+ * Save the leadsource if one is not set already
+ *
+ * @param $contact Contact
+ */
+function save_lead_source_after_signup( $contact ) {
+	if ( ! $contact->get_meta( 'lead_source' ) ) {
+		$contact->update_meta( 'lead_source', tracking()->get_leadsource() );
+	}
+}
+
+add_action( 'groundhogg/after_form_submit', __NAMESPACE__ . '\track_page_visits_after_signup', 9 );
+
+/**
+ * Track any non-tracked page visits for a contact record when they first sign up
+ *
+ * Do not use to track page visits manually, use track_page_visit instead
+ *
+ * @param $contact Contact
+ */
+function track_page_visits_after_signup( $contact ) {
+
+	// Track any non logged page visits for the new contact
+	$pages_visited = get_cookie( Tracking::PAGE_VISITS_COOKIE );
+
+	if ( ! empty( $pages_visited ) ) {
+		$pages_visited = json_decode( stripslashes( $pages_visited ), true );
+
+		foreach ( $pages_visited['pagesAndTimes'] as $visit ) {
+			if ( ! $visit['tracked'] ) {
+				track_page_visit( $visit['page'], $contact, [
+					'timestamp' => absint( $visit['time'] )
+				] );
+			}
+		}
+	}
+
+	// Delete the cookie and clear the results.
+	delete_cookie( Tracking::PAGE_VISITS_COOKIE );
 }
 
 /**
@@ -2053,6 +2140,12 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 		$contact = get_contactdata( $contact );
 	}
 
+	do_action_ref_array( 'groundhogg/update_contact_with_map/before', [
+		$contact
+		&$fields,
+		&$map
+	] );
+
 	if ( empty( $map ) ) {
 		$keys = array_keys( $fields );
 		$map  = array_combine( $keys, $keys );
@@ -2124,7 +2217,13 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 				$args[ $field ] = date( 'Y-m-d H:i:s', strtotime( $value ) );
 				break;
 			case 'optin_status':
-				$args[ $field ] = Preferences::sanitize( $value );
+
+				// Will default to unconfirmed
+				if ( ! is_numeric( $value ) ) {
+					$value = Preferences::string_to_preference( $value );
+				}
+
+				$args[ $field ] = absint( $value );
 				break;
 			case 'user_id':
 			case 'owner_id':
@@ -2155,12 +2254,8 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 			case 'mobile_phone':
 			case 'primary_phone':
 			case 'primary_phone_extension':
-				$data[ $field ] = sanitize_phone_number( $value );
-				break;
 			case 'company_phone':
 			case 'company_phone_extension':
-				$meta[ $field ] = sanitize_phone_number( $value );
-				break;
 			case 'street_address_1' :
 			case 'street_address_2':
 			case 'city':
@@ -2283,7 +2378,7 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 	$contact->update( $args );
 
 	if ( $gdpr_consent ) {
-		$contact->set_data_processing_consent();
+		$contact->set_gdpr_consent();
 	}
 
 	if ( $marketing_consent ) {
@@ -2429,7 +2524,13 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				$args[ $field ] = date( 'Y-m-d H:i:s', strtotime( $value ) );
 				break;
 			case 'optin_status':
-				$args[ $field ] = Preferences::sanitize( $value );
+
+				// Will default to unconfirmed
+				if ( ! is_numeric( $value ) ) {
+					$value = Preferences::string_to_preference( $value );
+				}
+
+				$args[ $field ] = absint( $value );
 				break;
 			case 'user_id':
 			case 'owner_id':
@@ -2460,12 +2561,8 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			case 'mobile_phone':
 			case 'primary_phone':
 			case 'primary_phone_extension':
-				$data[ $field ] = sanitize_phone_number( $value );
-				break;
 			case 'company_phone':
 			case 'company_phone_extension':
-				$meta[ $field ] = sanitize_phone_number( $value );
-				break;
 			case 'street_address_1' :
 			case 'street_address_2':
 			case 'city':
@@ -2616,7 +2713,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 	}
 
 	if ( $gdpr_consent ) {
-		$contact->set_data_processing_consent();
+		$contact->set_gdpr_consent();
 	}
 
 	if ( $marketing_consent ) {
@@ -2641,7 +2738,9 @@ function generate_contact_with_map( $fields, $map = [] ) {
 
 	// update meta data
 	if ( ! empty( $meta ) ) {
-		$contact->update_meta( $meta );
+		foreach ( $meta as $key => $value ) {
+			$contact->update_meta( $key, $value );
+		}
 	}
 
 	if ( ! empty( $files ) ) {
@@ -2656,6 +2755,8 @@ function generate_contact_with_map( $fields, $map = [] ) {
 			$contact->copy_file( $url );
 		}
 	}
+
+	$contact->update_meta( 'last_optin', time() );
 
 	/**
 	 * @param $contact Contact the contact record
@@ -3617,38 +3718,6 @@ function mobile_validator() {
 }
 
 /**
- * Remove anything that isn't a number from the phone number string
- *
- * @param $phone
- *
- * @return array|string|string[]|null
- */
-function sanitize_phone_number( $phone ) {
-	return preg_replace( '/[^0-9]/', '', $phone );
-}
-
-/**
- * Format a phone number for display
- *
- * @param $phone
- *
- * @return mixed|string
- */
-function format_phone_number( $phone ) {
-
-	switch ( strlen( $phone ) ) {
-		// Standard US 4164443396 => (416) 444-3396
-		case 10:
-			return sprintf( '(%1$s) %2$s-%3$s', substr( $phone, 0, 3 ), substr( $phone, 3, 3 ), substr( $phone, 6, 4 ) );
-		// Standard US with Country code 14164443396 => +1 (416) 444-3396
-		case 11:
-			return sprintf( '+%4$s (%1$s) %2$s-%3$s', substr( $phone, 1, 3 ), substr( $phone, 4, 3 ), substr( $phone, 7, 4 ), substr( $phone, 0, 1 ) );
-		default:
-			return $phone;
-	}
-}
-
-/**
  * Validate a mobile number
  *
  * @param        $number       string
@@ -4596,6 +4665,38 @@ function fix_nested_p( $content ) {
 }
 
 /**
+ * Track a page visit
+ *
+ * @param       $ref     string a URL
+ * @param       $contact Contact
+ * @param array $override
+ */
+function track_page_visit( $ref, $contact, $override = [] ) {
+	$path     = sanitize_text_field( parse_url( $ref, PHP_URL_PATH ) );
+	$query    = sanitize_text_field( parse_url( $ref, PHP_URL_QUERY ) );
+	$fragment = sanitize_text_field( parse_url( $ref, PHP_URL_FRAGMENT ) );
+
+	$visit = get_db( 'page_visits' )->add( array_merge( [
+		'contact_id' => $contact->get_id(),
+		'path'       => $path,
+		'query'      => $query,
+		'fragment'   => $fragment,
+	], $override ) );
+
+	$visit = new Page_Visit( $visit );
+
+	/**
+	 * Runs when a page visit is tracked
+	 *
+	 * @param $visit   Page_Visit
+	 * @param $contact Contact
+	 */
+	do_action( 'groundhogg/tracking/page_visit', $visit, $contact );
+
+	return $visit;
+}
+
+/**
  * Track activity that happens on site caused by a human.
  * Use the tracking cookie to populate the main arguments.
  *
@@ -4949,7 +5050,7 @@ function sanitize_object_meta( $meta_value, $meta_key = '', $object_type = '' ) 
 
 /**
  * Check if the email address is in use
- * You can pass a contact record to double-check against the current contact as well.
+ * You can pass a contact record to double check against the current contact as well.
  *
  * @param string       $email_address
  * @param bool|Contact $current_contact
@@ -5120,6 +5221,8 @@ function uninstall_groundhogg() {
 	wp_clear_scheduled_hook( Bounce_Checker::ACTION );
 	wp_clear_scheduled_hook( Stats_Collection::ACTION );
 	wp_clear_scheduled_hook( 'groundhogg/sending_service/verify_domain' );
+	wp_clear_scheduled_hook( 'gh_purge_page_visits' );
+	wp_clear_scheduled_hook( 'gh_purge_old_email_logs' );
 
 	//delete api keys from user_meta
 	delete_metadata( 'user', 0, 'wpgh_user_public_key', '', true );
@@ -5414,8 +5517,7 @@ function create_object_from_type( $object, $object_type ) {
  * Whether this site provides templates, if so then the gh/v4/emails READ and gh/v4/funnels READ will be public
  */
 function is_template_site() {
-	// Todo change this
-	return apply_filters( 'groundhogg/is_template_site', true );
+	return apply_filters( 'groundhogg/is_template_site', false );
 }
 
 /**
@@ -5482,7 +5584,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 		$filters[] = [
 			'type'    => 'optin_status',
 			'compare' => 'in',
-			'value'   => Preferences::sanitize( ensure_array( $query['optin_status'] ) )
+			'value'   => ensure_array( $query['optin_status'] )
 		];
 	}
 
@@ -5491,7 +5593,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 		$filters[] = [
 			'type'    => 'optin_status',
 			'compare' => 'not_in',
-			'value'   => Preferences::sanitize( ensure_array( $query['optin_status_exclude'] ) )
+			'value'   => wp_parse_id_list( ensure_array( $query['optin_status_exclude'] ) )
 		];
 	}
 
@@ -5739,4 +5841,64 @@ function implode_in_quotes( $items ) {
 	return implode( ',', array_map( function ( $item ) {
 		return "'$item'";
 	}, $items ) );
+}
+
+/**
+ * Ipplodes a string list surrounded by quotes, useful for SQL queries.
+ *
+ * @param $items
+ *
+ * @return string
+ */
+function implode_in_quotes( $items ) {
+	return implode( ',', array_map( function ( $item ) {
+		return "'$item'";
+	}, $items ) );
+}
+
+/**
+ * Get the current visitors IP address
+ *
+ * @return string
+ */
+function get_current_ip_address() {
+	return utils()->location->get_real_ip();
+}
+
+/**
+ * Collapse long strings into shorter ones by replacing the middle with "..."
+ *
+ * @param     $str
+ * @param int $size
+ *
+ * @return mixed|string
+ */
+function collapse_string( $str, $size = 30 ) {
+
+	if ( strlen( $str ) <= $size ) {
+		return $str;
+	}
+
+	$before = ( $size / 2 ) - 1;
+	$after  = ( $size / 2 ) - 2;
+
+	return sprintf( '%s...%s', substr( $str, 0, $before ), substr( $str, - $after, $after ) );
+}
+
+/**
+ * Has the current visitor accepted cookies
+ *
+ * @return bool|mixed|void
+ */
+function has_accepted_cookies() {
+
+	// GDPR features are not enabled, so consent is implicit
+	if ( ! Plugin::$instance->preferences->is_gdpr_enabled() ) {
+		return apply_filters( 'groundhogg/has_accepted_cookies', true );
+	}
+
+	$cookie_name  = get_option( 'gh_consent_cookie_name' );
+	$cookie_value = get_option( 'gh_consent_cookie_value' );
+
+	return apply_filters( 'groundhogg/has_accepted_cookies', get_cookie( $cookie_name ) === $cookie_value );
 }

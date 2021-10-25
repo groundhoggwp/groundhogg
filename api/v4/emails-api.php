@@ -28,7 +28,7 @@ class Emails_Api extends Base_Object_Api {
 		$key   = $this->get_primary_key();
 		$route = $this->get_route();
 
-		register_rest_route( self::NAME_SPACE, "emails/send/", [
+		register_rest_route( self::NAME_SPACE, "emails/send", [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'send_email' ],
@@ -96,7 +96,7 @@ class Emails_Api extends Base_Object_Api {
 	 * @param $error
 	 */
 	public function handle_wp_mail_error( $error ) {
-		wp_send_json_error( $error );
+		$this->add_error( $error );
 	}
 
 	/**
@@ -108,18 +108,42 @@ class Emails_Api extends Base_Object_Api {
 	 */
 	public function send_email( \WP_REST_Request $request ) {
 
-		$to         = sanitize_email( $request->get_param( 'to' ) );
+		$to  = array_map( 'sanitize_email', $request->get_param( 'to' ) ?: [] );
+		$cc  = array_map( 'sanitize_email', $request->get_param( 'cc' ) ?: [] );
+		$bcc = array_map( 'sanitize_email', $request->get_param( 'bcc' ) ?: [] );
+
+		if ( empty( $to ) && empty( $cc ) && empty( $bcc ) ) {
+			return self::ERROR_401( 'no_recipients', 'No recipients were defined.' );
+		}
+
 		$from_email = sanitize_email( $request->get_param( 'from_email' ) ) ?: get_default_from_email();
-		$from_name  = sanitize_email( $request->get_param( 'from_name' ) ) ?: get_default_from_name();
-		$content    = email_kses( $request->get_param( 'content' ) );
-		$subject    = sanitize_text_field( $request->get_param( 'subject' ) );
-		$type       = sanitize_text_field( $request->get_param( 'type' ) ?: 'marketing' );
+		$from_name  = sanitize_text_field( $request->get_param( 'from_name' ) ) ?: get_default_from_name();
+
+		$content = email_kses( $request->get_param( 'content' ) );
+		$subject = sanitize_text_field( $request->get_param( 'subject' ) );
+
+		$type = sanitize_text_field( $request->get_param( 'type' ) ?: 'wordpress' );
+
+		$headers = [
+			'Content-Type: text/html',
+			sprintf( "From: %s <%s>", $from_name, $from_email ),
+		];
+
+		if ( ! empty( $cc ) ) {
+			$headers[] = 'Cc: ' . implode( ',', $cc );
+		}
+
+		if ( ! empty( $bcc ) ) {
+			$headers[] = 'Bcc: ' . implode( ',', $bcc );
+		}
 
 		add_action( 'wp_mail_failed', [ $this, 'handle_wp_mail_error' ] );
 
-		$result = \Groundhogg_Email_Services::send_type( $type, $to, $subject, $content, [
-			sprintf( "From: %s <%s>", $from_name, $from_email )
-		] );
+		$result = \Groundhogg_Email_Services::send_type( $type, $to, $subject, $content, $headers );
+
+		if ( $this->has_errors() ) {
+			return $this->get_last_error();
+		}
 
 		if ( ! $result ) {
 			return self::ERROR_500();

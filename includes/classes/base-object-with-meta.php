@@ -105,8 +105,6 @@ abstract class Base_Object_With_Meta extends Base_Object {
 
 		$meta = $this->get_meta_db()->get_meta( $this->get_id() );
 
-//        var_dump( $meta );
-
 		if ( ! $meta ) {
 			return [];
 		}
@@ -180,15 +178,18 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	 *
 	 * @return mixed
 	 */
-	public function add_meta( $key, $value ) {
+	public function add_meta( $key, $value = false ) {
+
 		if ( is_array( $key ) && ! $value ) {
+
+			$added = true;
+
 			foreach ( $key as $meta_key => $meta_value ) {
-				if ( ! $this->add_meta( $meta_key, $meta_value ) ) {
-					return false;
-				}
+				$added = $this->add_meta( $meta_key, $meta_value ) && $added;
 			}
 
-			return true;
+			return $added;
+
 		} else if ( $this->get_meta_db()->add_meta( $this->get_id(), $key, $value ) ) {
 			$this->meta[ $key ] = $value;
 
@@ -231,5 +232,42 @@ abstract class Base_Object_With_Meta extends Base_Object {
 			'meta'  => $this->meta,
 			'admin' => $this->admin_link()
 		] );
+	}
+
+	/**
+	 * Duplicate
+	 *
+	 * @param array $overrides
+	 * @param array $meta_overrides
+	 *
+	 * @return Base_Object
+	 */
+	public function duplicate( $overrides = [], $meta_overrides = [] ) {
+
+		$data = $this->data;
+		$meta = $this->meta;
+
+		// Remove primary key from array
+		unset( $data[ $this->get_db()->get_primary_key() ] );
+		// Remove date key
+		unset( $data[ $this->get_db()->get_date_key() ] );
+
+		$class = get_class( $this );
+
+		/**
+		 * @var $object Base_Object_With_Meta
+		 */
+		$object = new $class;
+
+		$object->create( array_merge( $data, $overrides ) );
+		$object->update_meta( array_merge( $meta, $meta_overrides ) );
+
+		/**
+		 * @param $new  Base_Object_With_Meta the new object
+		 * @param $orig Base_Object_With_Meta the original object
+		 */
+		do_action( "groundhogg/{$this->get_object_type()}/duplicated", $object, $this );
+
+		return $object;
 	}
 }

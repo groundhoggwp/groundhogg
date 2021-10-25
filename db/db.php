@@ -9,6 +9,7 @@ use Groundhogg\DB_Object;
 use Groundhogg\DB_Object_With_Meta;
 use Groundhogg\Plugin;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_db;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\isset_not_empty;
 
@@ -125,6 +126,9 @@ abstract class DB {
 	 */
 	public function get_table_name() {
 		return $this->table_name;
+	}
+
+	protected function add_additional_actions() {
 	}
 
 	/**
@@ -668,7 +672,7 @@ abstract class DB {
 	 * @return string
 	 */
 	public function get_cache_group() {
-		return $this->table_name . '/groundhogg/db/' . $this->get_object_type();
+		return 'groundhogg/db/' . $this->get_object_type();
 	}
 
 	/**
@@ -923,6 +927,14 @@ abstract class DB {
 				case 'after':
 					$where[] = [ 'col' => $this->get_date_key(), 'val' => $val, 'compare' => '>=' ];
 					break;
+				case 'related' :
+					$relationships = get_db( 'object_relationships' );
+					$where[]       = [
+						'col'     => $this->get_primary_key(),
+						'compare' => 'IN',
+						'val'     => sprintf( "SELECT primary_object_id FROM {$relationships->table_name} WHERE secondary_object_id = %d AND secondary_object_type = '%s'", $val['ID'], $val['type'] )
+					];
+					break;
 				case 'count':
 					$query_vars['func'] = 'count';
 					break;
@@ -1168,38 +1180,79 @@ abstract class DB {
 
 					$value = $condition['val'];
 
-					if ( is_array( $value ) ) {
-						$condition['compare'] = in_array( $condition['compare'], [
-							'IN',
-							'NOT IN'
-						] ) ? $condition['compare'] : 'IN';
-						$value                = map_deep( $value, 'sanitize_text_field' );
+					switch ( $condition['compare'] ) {
+						default:
+						case '=':
+						case '!=':
+						case '>':
+						case '>=':
+						case '<':
+						case '<=':
+						case '<>':
+						case 'LIKE':
+						case 'RLIKE':
+							if ( is_array( $value ) ) {
+								$condition['compare'] = in_array( $condition['compare'], [
+									'IN',
+									'NOT IN'
+								] ) ? $condition['compare'] : 'IN';
+								$value                = map_deep( $value, 'sanitize_text_field' );
 
-						$value = map_deep( $value, function ( $i ) {
+								$value = map_deep( $value, function ( $i ) {
 
-							$i = esc_sql( $i );
+									$i = esc_sql( $i );
 
-							if ( is_numeric( $i ) ) {
-								return absint( $i );
-							} else if ( is_string( $i ) ) {
-								return "'{$i}'";
+									if ( is_numeric( $i ) ) {
+										return absint( $i );
+									} else if ( is_string( $i ) ) {
+										return "'{$i}'";
+									}
+
+									return false;
+								} );
+
+								$value = sprintf( "(%s)", implode( ',', $value ) );
+
+								$clause[] = "{$condition[ 'col' ]} {$condition['compare']} {$value}";
+
+							} else {
+
+								if ( is_numeric( $value ) ) {
+									$clause[] = $wpdb->prepare( "{$condition[ 'col' ]} {$condition[ 'compare' ]} %d", $value );
+								} else {
+									$clause[] = $wpdb->prepare( "{$condition[ 'col' ]} {$condition[ 'compare' ]} %s", $value );
+								}
+
 							}
 
-							return false;
-						} );
+							break;
+						case 'IN':
+						case 'NOT IN':
 
-						$value = sprintf( "(%s)", implode( ',', $value ) );
+							if ( is_array( $value ) ) {
 
-						$clause[] = "{$condition[ 'col' ]} {$condition['compare']} {$value}";
+								$value = map_deep( $value, 'sanitize_text_field' );
 
-					} else {
+								$value = map_deep( $value, function ( $i ) {
 
-						if ( is_numeric( $value ) ) {
-							$clause[] = $wpdb->prepare( "{$condition[ 'col' ]} {$condition[ 'compare' ]} %d", $value );
-						} else {
-							$clause[] = $wpdb->prepare( "{$condition[ 'col' ]} {$condition[ 'compare' ]} %s", $value );
-						}
+									$i = esc_sql( $i );
 
+									if ( is_numeric( $i ) ) {
+										return absint( $i );
+									} else if ( is_string( $i ) ) {
+										return "'{$i}'";
+									}
+
+									return false;
+								} );
+
+								$value = implode( ',', $value );
+							}
+
+							$clause[] = "{$condition[ 'col' ]} {$condition['compare']} ({$value})";
+
+
+							break;
 					}
 
 				}

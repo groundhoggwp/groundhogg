@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Bulk_Jobs;
 
+use Groundhogg\Contact;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_db;
@@ -102,6 +103,13 @@ class Import_Contacts extends Bulk_Job {
 		if ( is_a_contact( $contact ) ) {
 			$contact->apply_tag( $this->import_tags );
 		}
+
+		/**
+		 * Whenever a contact is imported
+		 *
+		 * @param $contact Contact
+		 */
+		do_action( 'groundhogg/contact/imported', $contact );
 	}
 
 	/**
@@ -126,6 +134,7 @@ class Import_Contacts extends Bulk_Job {
 			$this->field_map['marketing_consent'] = 'marketing_consent';
 		}
 
+		do_action( 'groundhogg/import_contacts/pre_loop' );
 	}
 
 	/**
@@ -134,6 +143,7 @@ class Import_Contacts extends Bulk_Job {
 	 * @return void
 	 */
 	protected function post_loop() {
+		do_action( 'groundhogg/import_contacts/post_loop' );
 	}
 
 	/**
@@ -147,6 +157,8 @@ class Import_Contacts extends Bulk_Job {
 		Plugin::$instance->settings->delete_transient( 'gh_import_compliance' );
 
 		recount_tag_contacts_count();
+
+		do_action( 'groundhogg/import_contacts/clean_up' );
 	}
 
 	/**

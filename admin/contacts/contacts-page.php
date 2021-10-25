@@ -83,9 +83,6 @@ class Contacts_Page extends Admin_Page {
 		new Info_Cards();
 
 		add_action( 'wp_ajax_groundhogg_contact_table_row', [ $this, 'ajax_contact_table_row' ] );
-		add_action( 'wp_ajax_groundhogg_edit_notes', [ $this, 'edit_note_ajax' ] );
-		add_action( 'wp_ajax_groundhogg_delete_notes', [ $this, 'delete_note_ajax' ] );
-		add_action( 'wp_ajax_groundhogg_add_notes', [ $this, 'add_note_ajax' ] );
 		add_action( 'wp_ajax_groundhogg_get_contacts_table', [ $this, 'ajax_get_table' ] );
 		add_action( 'wp_ajax_nopriv_groundhogg_get_contacts_table', [ $this, 'ajax_get_table' ] );
 	}
@@ -153,6 +150,9 @@ class Contacts_Page extends Admin_Page {
 				break;
 			case 'add':
 			case 'form':
+				wp_enqueue_editor();
+				wp_enqueue_media();
+
 				wp_enqueue_style( 'groundhogg-admin-contact-editor' );
 				wp_enqueue_style( 'groundhogg-admin-contact-info-cards' );
 				wp_enqueue_style( 'buttons' );
@@ -167,6 +167,7 @@ class Contacts_Page extends Admin_Page {
 				] );
 				break;
 			case 'view':
+
 				wp_enqueue_style( 'select2' );
 				wp_enqueue_script( 'select2' );
 				wp_enqueue_style( 'groundhogg-admin-search-filters' );
@@ -475,20 +476,27 @@ class Contacts_Page extends Admin_Page {
 
 	protected function get_title_actions() {
 
-		return [
-			[
+		$actions = [];
+
+		if ( current_user_can( 'add_contacts' ) ) {
+			$actions[] = [
 				'link'   => $this->admin_url( [ 'action' => 'add' ] ),
 				'action' => __( 'Add New', 'groundhogg' ),
 				'target' => '_self',
 				'id'     => '',
-			],
-			[
+			];
+		}
+
+		if ( current_user_can( 'import_contacts' ) ) {
+			$actions[] = [
 				'link'   => admin_page_url( 'gh_tools', [ 'tab' => 'import', 'action' => 'add' ] ),
 				'action' => __( 'Import', 'groundhogg' ),
 				'target' => '_self',
 				'id'     => 'import_contacts'
-			],
-		];
+			];
+		}
+
+		return $actions;
 	}
 
 	/**
@@ -636,9 +644,6 @@ class Contacts_Page extends Admin_Page {
 	 * Update the contact via the admin screen
 	 */
 	public function process_edit() {
-		if ( ! current_user_can( 'edit_contacts' ) ) {
-			$this->wp_die_no_access();
-		}
 
 		$id = absint( get_request_var( 'contact' ) );
 
@@ -647,6 +652,10 @@ class Contacts_Page extends Admin_Page {
 		}
 
 		$contact = get_contactdata( $id );
+
+		if ( ! current_user_can( 'edit_contact', $contact ) ) {
+			$this->wp_die_no_access();
+		}
 
 		//this meta data will not be deleted.
 
@@ -853,7 +862,12 @@ class Contacts_Page extends Admin_Page {
 		}
 
 		foreach ( $this->get_items() as $id ) {
-			if ( ! Plugin::$instance->dbs->get_db( 'contacts' )->delete( $id ) ) {
+
+			if ( ! current_user_can( 'delete_contact', $id ) ) {
+				$this->wp_die_no_access();
+			}
+
+			if ( ! get_db( 'contacts' )->delete( $id ) ) {
 				return new \WP_Error( 'unable_to_delete_contact', "Something went wrong while deleting the contact." );
 			}
 		}
@@ -882,6 +896,10 @@ class Contacts_Page extends Admin_Page {
 		foreach ( $this->get_items() as $id ) {
 			$contact = get_contactdata( $id );
 
+			if ( ! current_user_can( 'edit_contact', $contact ) ) {
+				$this->wp_die_no_access();
+			}
+
 			// Don't re-subscribe contacts already confirmed
 			if ( $contact->get_optin_status() === Preferences::CONFIRMED && $status === Preferences::UNCONFIRMED ) {
 				continue;
@@ -899,7 +917,6 @@ class Contacts_Page extends Admin_Page {
 					update_option( 'blacklist_keys', $blacklist );
 				}
 			}
-
 
 			do_action( "groundhogg/admin/contacts/{$status}", $contact );
 		}
@@ -967,83 +984,6 @@ class Contacts_Page extends Admin_Page {
 	}
 
 	/**
-	 * Edit a note...
-	 */
-	public function edit_note_ajax() {
-
-		if ( ! wp_doing_ajax() ) {
-			return;
-		} else if ( ! current_user_can( 'edit_contacts' ) ) {
-			wp_send_json_error();
-		}
-
-		$note_id = absint( get_request_var( 'note_id' ) );
-		$content = sanitize_textarea_field( get_request_var( 'note' ) );
-		$note    = new Note( $note_id );
-		$note->update( [
-			'timestamp' => time(),
-			'content'   => $content,
-			'context'   => 'user',
-			'user_id'   => get_current_user_id(),
-		] );
-
-		ob_start();
-		include __DIR__ . '/note.php';
-		$html = ob_get_clean();
-
-		wp_send_json_success( [
-			'note' => $html,
-		] );
-	}
-
-	/**
-	 * Add a new note
-	 */
-	public function add_note_ajax() {
-
-		if ( ! wp_doing_ajax() ) {
-			return;
-		} else if ( ! current_user_can( 'edit_contacts' ) ) {
-			wp_send_json_error();
-		}
-
-		$note       = sanitize_textarea_field( get_post_var( 'note' ) );
-		$contact_id = absint( get_post_var( 'contact' ) );
-
-		$contact = get_contactdata( $contact_id );
-
-		$note = $contact->add_note( $note, 'user', get_current_user_id() );
-
-		ob_start();
-		include __DIR__ . '/note.php';
-		$html = ob_get_clean();
-
-		wp_send_json_success( [
-			'note' => $html,
-		] );
-	}
-
-
-	public function delete_note_ajax() {
-
-		if ( ! wp_doing_ajax() ) {
-			return;
-		}
-		if ( ! current_user_can( 'edit_contacts' ) ) {
-			wp_send_json_error();
-		}
-
-		$note_id = absint( get_request_var( 'note_id' ) );
-
-		get_db( 'notes' )->delete( $note_id );
-
-		wp_send_json_success( [
-			'msg' => __( 'Note deleted successfully.', 'groundhogg' )
-		] );
-	}
-
-
-	/**
 	 * Save the contact during inline edit
 	 */
 	public function ajax_contact_table_row() {
@@ -1057,6 +997,10 @@ class Contacts_Page extends Admin_Page {
 		}
 
 		$contact = get_contactdata( get_post_var( 'contact' ) );
+
+		if ( ! current_user_can( 'view_contact', $contact ) ) {
+			wp_send_json_error();
+		}
 
 		$contactTable = new Tables\Contacts_Table;
 
@@ -1103,107 +1047,6 @@ class Contacts_Page extends Admin_Page {
 		// Return to contact edit screen.
 		return admin_page_url( 'gh_contacts', [ 'action' => 'edit', 'contact' => $contact->get_id() ] );
 
-	}
-
-	/**
-	 * Save the search
-	 */
-	public function process_save_this_search() {
-		if ( ! current_user_can( 'view_contacts' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		if ( get_url_var( 'is_searching' ) !== 'on' ) {
-			return new \WP_Error( 'error', __( 'Invalid search' ) );
-		}
-
-		$name     = sanitize_text_field( get_post_var( 'saved_search_name' ) );
-		$query_id = uniqid( sanitize_title( $name ) . '-' );
-		$query    = get_request_query();
-
-		Saved_Searches::instance()->add( $query_id, [
-			'name'  => $name,
-			'id'    => $query_id,
-			'query' => $query,
-		] );
-
-		$this->add_notice( 'saved', __( 'Search saved!', 'groundhogg' ) );
-
-		// stay on page...
-
-		return admin_page_url( 'gh_contacts', $query );
-	}
-
-	/**
-	 * Save the search
-	 */
-	public function process_update_this_search() {
-		if ( ! current_user_can( 'view_contacts' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		$search_id    = get_url_var( 'saved_search_id' );
-		$saved_search = $search_id ? Saved_Searches::instance()->get( $search_id ) : false;
-
-		if ( get_url_var( 'is_searching' ) !== 'on' || ! $saved_search ) {
-			return new \WP_Error( 'error', __( 'Invalid search' ) );
-		}
-
-		$query = get_request_query();
-
-		Saved_Searches::instance()->update( $search_id, [
-			'query' => $query,
-		] );
-
-		$this->add_notice( 'saved', __( 'Search saved!', 'groundhogg' ) );
-
-		// stay on page...
-
-		return admin_page_url( 'gh_contacts', $query );
-	}
-
-	/**
-	 * Load the search!
-	 *
-	 * @return string|\WP_Error
-	 */
-	public function process_load_search() {
-		if ( ! current_user_can( 'view_contacts' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		$search_id = sanitize_text_field( get_post_var( 'saved_search' ) );
-
-		$search = Saved_Searches::instance()->get( $search_id );
-
-		if ( ! $search ) {
-			return new \WP_Error( 'error', __( 'Invalid search' ) );
-		}
-
-		$query                    = $search['query'];
-		$query['saved_search_id'] = $search_id;
-
-		return admin_page_url( 'gh_contacts', $query );
-	}
-
-	/**
-	 * Delete the current search
-	 *
-	 * @return bool
-	 */
-	public function process_delete_search() {
-
-		if ( ! current_user_can( 'view_contacts' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		$search_id = sanitize_text_field( get_post_var( 'saved_search' ) );
-
-		Saved_Searches::instance()->delete( $search_id );
-
-		$this->add_notice( 'deleted', __( 'Search deleted!', 'groundhogg' ) );
-
-		return true;
 	}
 
 	/**
@@ -1336,6 +1179,7 @@ class Contacts_Page extends Admin_Page {
 		if ( ! current_user_can( 'view_contacts' ) ) {
 			$this->wp_die_no_access();
 		}
+
 		include __DIR__ . '/edit.php';
 	}
 

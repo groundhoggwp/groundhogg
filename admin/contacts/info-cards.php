@@ -75,9 +75,13 @@ class Info_Cards {
 			include __DIR__ . '/cards/files.php';
 		}, 100, 'download_contact_files' );
 
-		self::register( 'email', __( 'Send Email', 'groundhogg' ), function ( $contact ) {
-			include __DIR__ . '/cards/email.php';
-		}, 100, 'send_emails' );
+//		self::register( 'email', __( 'Send Email', 'groundhogg' ), function ( $contact ) {
+//			include __DIR__ . '/cards/email.php';
+//		}, 100, 'send_emails' );
+
+		self::register( 'page_visits', __( 'Page Visits', 'groundhogg' ), function ( $contact ) {
+			include __DIR__ . '/cards/page-visits.php';
+		}, 100, 'view_contacts' );
 
 //		self::register( 'email_activity', __( 'Email Activity', 'groundhogg' ), function ( $contact ) {
 //			include __DIR__ . '/cards/email-activity.php';

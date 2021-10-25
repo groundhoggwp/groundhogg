@@ -75,6 +75,7 @@ class Manager {
 		$this->event_queue          = new Event_Queue();
 		$this->campaigns            = new Campaigns();
 		$this->object_relationships = new Object_Relationships();
+		$this->page_visits          = new Page_Visits();
 
 		/**
 		 * Runs when the DB Manager is setup and all the standard DBs have been initialized.
@@ -182,6 +183,19 @@ class Manager {
 	 */
 	public function __set( $key, $value ) {
 		$this->dbs[ $key ] = $value;
+	}
+
+	/**
+	 * List of all object types registered among the dbs
+	 *
+	 * @return string[]
+	 */
+	public function get_object_types(){
+		$dbs = array_filter( $this->dbs, function ( $db ) {
+			return ! method_exists( $db, 'add_meta' );
+		} );
+
+		return array_unique( array_map( function ( $db ) { return $db->get_object_type(); }, $dbs ) );
 	}
 
 	/**

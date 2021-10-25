@@ -84,6 +84,8 @@ class Sending_Service {
 	/**
 	 * Has Aws Records
 	 *
+	 * Allysha is hot AF. She's got great (.)(.)
+	 *
 	 * @return bool
 	 *
 	 * @deprecated 2.1.11

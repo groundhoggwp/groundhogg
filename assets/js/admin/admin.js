@@ -22,6 +22,39 @@
     return $(selector).select2(args)
   }
 
+  $.fn.ghPicker = function ({
+    endpoint,
+    getResults = (r) => r.items,
+    getParams = (q) => ({
+      ...q,
+      search: q.term
+    }),
+    ...rest
+  }) {
+
+    this.select2({
+      tokenSeparators: ['/', ',', ';'],
+      delay: 100,
+      ajax: {
+        url: endpoint,
+        // delay: 250,
+        dataType: 'json',
+        data: getParams,
+        beforeSend: function (xhr) {
+          xhr.setRequestHeader('X-WP-Nonce', nonces._wprest)
+        },
+        processResults: function (data, page) {
+          return {
+            results: getResults(data, page)
+          }
+        },
+      },
+      ...rest
+    })
+
+    return this
+  }
+
   /**
    * This is an API picker!
    *
@@ -177,7 +210,7 @@
    * @param opts
    */
   function tagPicker (selector, multiple = true, onReceiveItems = (items) => {}, ...opts) {
-    return apiPicker(selector, gh.api.routes.v4.tags, multiple, true,
+    return apiPicker(selector, gh.api.routes.v4.tags, multiple, Groundhogg.user.userHasCap( 'add_tags' ),
       (data) => {
 
         onReceiveItems(data.items)
@@ -410,5 +443,47 @@
   // Map functions to Groundhogg object.
   gh.nonces = nonces
   gh.endpoints = endpoints
+
+
+  if ( ! gh.functions ){
+    gh.functions = {}
+  }
+
+  /**
+   * Set a cookie
+   *
+   * @param cname
+   * @param cvalue
+   * @param duration in seconds
+   */
+  gh.functions.setCookie = (cname, cvalue, duration) => {
+    var d = new Date()
+    d.setTime(d.getTime() + (duration * 1000))
+    var expires = 'expires=' + d.toUTCString()
+    document.cookie = cname + '=' + cvalue + ';' + expires + ';path=/'
+  }
+
+  /**
+   * Retrieve a cookie
+   *
+   * @param cname name of the cookie
+   * @param none default value
+   * @returns {string|null}
+   */
+  gh.functions.getCookie = (cname, none = null) => {
+    var name = cname + '='
+    var ca = document.cookie.split(';')
+    for (var i = 0; i < ca.length; i++) {
+      var c = ca[i]
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1)
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length)
+      }
+    }
+    return none
+  }
+
 
 })(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)

@@ -394,7 +394,7 @@
         },
         {
           key: 'funnel',
-          cap: 'edit_contacts',
+          cap: 'view_funnels',
           text: sprintf(__('Add %s contacts to a funnel', 'groundhogg'), totalContactsFormatted)
         },
         {

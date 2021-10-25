@@ -1,8 +1,41 @@
 (function ($, editor) {
 
+  const { currentUser, filters } = Groundhogg
+
   $.extend(editor, {
 
     init: function () {
+
+      Groundhogg.noteEditor('#gh-notes', {
+        object_id: editor.contact.ID,
+        object_type: 'contact',
+        title: '',
+      })
+
+      const sendEmail = () => {
+        let { contact } = editor
+
+        let email = {
+          to: [contact.data.email],
+          from_email: currentUser.data.user_email,
+          from_name: currentUser.data.display_name,
+        }
+
+        if (currentUser.ID != contact.data.owner_id) {
+          email.cc = [filters.owners.find(u => u.ID = contact.data.owner_id).data.user_email]
+        }
+
+        Groundhogg.components.emailModal(email)
+      }
+
+      $('#send-email').on('click', e => {
+        e.preventDefault()
+        sendEmail()
+      })
+
+      if (window.location.href.match(/send_email=true/)) {
+        sendEmail()
+      }
 
       $('#meta-table').click(function (e) {
         if ($(e.target).closest('.deletemeta').length) {
@@ -44,139 +77,15 @@
 
       })
 
-      $(document).on('click', '.edit-notes', function (e) {
-        var $note = get_note(e.target)
-        $note.find('.gh-note-view').hide()
-        $note.find(' .edited-note-text').height($note.find('.gh-note-view').height())
-        $note.find('.gh-note-edit').show()
-      })
-
-      $(document).on('click', '.cancel-note-edit', function (e) {
-        var $note = get_note(e.target)
-        $note.find('.gh-note-edit').hide()
-        $note.find('.gh-note-view').show()
-      })
-
-      $(document).on('click', '.save-note', function (e) {
-        var $note = get_note(e.target)
-        var note_id = $note.attr('id')
-        save_note(note_id)
-      })
-
-      $(document).on('click', '.delete-note', function (e) {
-        var $note = get_note(e.target)
-        var note_id = $note.attr('id')
-        delete_note(note_id)
-      })
-
-      $('#add-note').click(function (event) {
-        add_note()
-      })
-
-      $('#view-more-tags').on('click', function (e){
+      $('#view-more-tags').on('click', function (e) {
         e.preventDefault()
 
-        $(this).parent().html( editor.contact.tags.map( tag => {
-          return `<span class="tag">${tag.data.tag_name}</span>`;
-        } ).join('' ) );
+        $(this).parent().html(editor.contact.tags.map(tag => {
+          return `<span class="tag">${tag.data.tag_name}</span>`
+        }).join(''))
       })
     }
   })
-
-  /**
-   * Add a new note
-   */
-  function add_note () {
-
-    var $newNote = $('#add-new-note')
-    var $notes = $('#gh-notes')
-
-    adminAjaxRequest(
-      {
-        action: 'groundhogg_add_notes',
-        note: $newNote.val(),
-        contact: editor.contact_id
-      },
-      function callback (response) {
-        // Handler
-        if (response.success) {
-          $newNote.val('')
-          $notes.prepend(response.data.note)
-        } else {
-          alert(response.data)
-        }
-      }
-    )
-  }
-
-  /**
-   * Save the edited note...
-   *
-   * @param note_id
-   */
-  function save_note (note_id) {
-
-    var $note = $('#' + note_id)
-    var new_note_text = $note.find('.edited-note-text').val()
-    showSpinner()
-
-    adminAjaxRequest(
-      {
-        action: 'groundhogg_edit_notes',
-        note: new_note_text,
-        note_id: note_id
-      },
-      function callback (response) {
-        // Handler
-        hideSpinner()
-        if (response.success) {
-          $note.replaceWith(response.data.note)
-        } else {
-          alert(response.data)
-        }
-      }
-    )
-  }
-
-  /**
-   * Delete a note
-   *
-   * @param note_id
-   */
-  function delete_note (note_id) {
-
-    if (!confirm(editor.delete_note_text)) {
-      return
-    }
-
-    var $note = $('#' + note_id)
-
-    adminAjaxRequest(
-      {
-        action: 'groundhogg_delete_notes',
-        note_id: note_id
-      },
-      function callback (response) {
-        // Handler
-        if (response.success) {
-          $note.remove()
-        } else {
-          alert(response.data)
-        }
-      }
-    )
-  }
-
-  /**
-   *
-   * Get the note
-   *
-   * @param e
-   * @returns {any | Element | jQuery}
-   */
-  function get_note (e) {
-    return $(e).closest('.gh-note')
-  }
 
   $(function () {
     editor.init()

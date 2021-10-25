@@ -20,6 +20,12 @@ class Email_Logger {
 	 * Email_Logger constructor.
 	 */
 	public function __construct() {
+
+		// Do last
+		add_action( 'phpmailer_init', [ $this, 'phpmailer_init_callback' ], 99 );
+		// Do first
+		add_action( 'wp_mail_failed', [ $this, 'wp_mail_failed_callback' ], 1 );
+
 		add_action( 'init', [ $this, 'init' ] );
 	}
 
@@ -31,15 +37,13 @@ class Email_Logger {
 	 * Lazy load the initial actions so we can check that email logging is enabled.
 	 */
 	public function init() {
+
 		if ( self::is_enabled() ) {
-			// Do last
-			add_action( 'phpmailer_init', [ $this, 'phpmailer_init_callback' ], 99 );
-			// Do first
-			add_action( 'wp_mail_failed', [ $this, 'wp_mail_failed_callback' ], 1 );
 
 			$this->setup_cron();
 
 			add_action( 'gh_purge_old_email_logs', [ $this, 'purge_old_logs' ] );
+
 		}
 	}
 
@@ -90,6 +94,10 @@ class Email_Logger {
 	 * @param $phpmailer \PHPMailer
 	 */
 	public function phpmailer_init_callback( $phpmailer ) {
+
+		if ( ! self::is_enabled() ){
+			return;
+		}
 
 		self::clear();
 
@@ -149,7 +157,7 @@ class Email_Logger {
 	 */
 	public function wp_mail_failed_callback( $error ) {
 
-		if ( ! is_wp_error( $error ) || ! self::$log_item ) {
+		if ( ! self::is_enabled() || ! is_wp_error( $error ) || ! self::$log_item ) {
 			return;
 		}
 

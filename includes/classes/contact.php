@@ -434,49 +434,6 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * Adds nots to the contact
-	 *
-	 * @param String   $note
-	 * @param string   $context
-	 * @param bool|int $user_id
-	 *
-	 * @return $note
-	 */
-	public function add_note( $note, $context = 'system', $user_id = false ) {
-		if ( ! is_string( $note ) && ! is_array( $note ) ) {
-			return false;
-		}
-
-		if ( is_string( $note ) ) {
-			$note_data = [
-				'object_id'   => $this->get_id(),
-				'object_type' => $this->get_object_type(),
-				'context'     => $context,
-				'content'     => wp_kses_post( $note ),
-				'user_id'     => $user_id ?: get_current_user_id(),
-			];
-
-			if ( $context == 'user' && ! $user_id ) {
-				$note_data['user_id'] = get_current_user_id();
-			}
-
-			$note = new Note( $note_data );
-
-			do_action( 'groundhogg/contact/note/added', $this->ID, $note, $this );
-		} else if ( is_array( $note ) ) {
-			// imported note
-			$note_data = array_merge( $note, [
-				'object_id'   => $this->get_id(),
-				'object_type' => $this->get_object_type(),
-			] );
-
-			$note = new Note( $note_data );
-		}
-
-		return $note;
-	}
-
-	/**
 	 * get the contact's notes
 	 *
 	 * @return Note[]
@@ -507,23 +464,29 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * Add a list of tags or a single tag top the contact
 	 *
-	 * @param $tag_id_or_array array|int
+	 * @param $tag_id_or_array array|int|Tag
 	 *
 	 * @return bool
 	 */
 	public function add_tag( $tag_id_or_array ) {
 
 		if ( ! is_array( $tag_id_or_array ) ) {
-			$tags = explode( ',', $tag_id_or_array );
+			$tags = wp_parse_id_list( $tag_id_or_array );
 		} else if ( is_array( $tag_id_or_array ) ) {
 			$tags = $tag_id_or_array;
+		} else if ( is_a( $tag_id_or_array, Tag::class ) ) {
+			$tags = [ $tag_id_or_array->get_id() ];
 		} else {
 			return false;
 		}
 
 		$tags = apply_filters( 'groundhogg/contacts/add_tag/before', $this->get_tags_db()->validate( $tags ) );
 
-		foreach ( $tags as $tag_id ) {
+		$tags_applied = [];
+
+		foreach ( $tags as $tag ) {
+
+			$tag_id = is_a( $tag, Tag::class ) ? $tag->get_id() : $tag;
 
 			if ( ! $this->has_tag( $tag_id ) ) {
 
@@ -533,11 +496,31 @@ class Contact extends Base_Object_With_Meta {
 
 				// No ID so check for int 0
 				if ( $result === 0 ) {
+
+					$tags_applied[] = $tag_id;
+
+					/**
+					 * When a tag relationship is created
+					 *
+					 * @param $contact Contact
+					 * @param $tag_id int
+					 */
 					do_action( 'groundhogg/contact/tag_applied', $this, $tag_id );
 				}
 
 			}
 
+		}
+
+		if ( ! empty( $tags_applied ) ){
+
+			/**
+			 * Similar to groundhogg/contact/tag_applied but passes all the tags as an array if multiple tags were passed
+			 *
+			 * @param $contact Contact
+			 * @param $tag_ids int[]
+			 */
+			do_action( 'groundhogg/contact/tags_applied', $this, $tags_applied );
 		}
 
 		return true;
@@ -547,22 +530,29 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * Remove a single tag or several tag from the contact
 	 *
-	 * @param $tag_id_or_array
+	 * @param $tag_id_or_array array|int|Tag
 	 *
 	 * @return bool
 	 */
 	public function remove_tag( $tag_id_or_array ) {
+
 		if ( ! is_array( $tag_id_or_array ) ) {
-			$tags = explode( ',', $tag_id_or_array );
+			$tags = wp_parse_id_list( $tag_id_or_array );
 		} else if ( is_array( $tag_id_or_array ) ) {
 			$tags = $tag_id_or_array;
+		} else if ( is_a( $tag_id_or_array, Tag::class ) ) {
+			$tags = [ $tag_id_or_array->get_id() ];
 		} else {
 			return false;
 		}
 
 		$tags = apply_filters( 'groundhogg/contacts/remove_tag/before', $this->get_tags_db()->validate( $tags ) );
 
-		foreach ( $tags as $tag_id ) {
+		$tags_removed = [];
+
+		foreach ( $tags as $tag ) {
+
+			$tag_id = is_a( $tag, Tag::class ) ? $tag->get_id() : $tag;
 
 			if ( $this->has_tag( $tag_id ) ) {
 
@@ -571,11 +561,29 @@ class Contact extends Base_Object_With_Meta {
 				$result = $this->get_tag_rel_db()->delete( [ 'tag_id' => $tag_id, 'contact_id' => $this->ID ] );
 
 				if ( $result ) {
+
+					$tags_removed[] = $tag_id;
+
+					/**
+					 * When a tag relationship is removed
+					 *
+					 * @param $contact Contact
+					 * @param $tag_id int
+					 */
 					do_action( 'groundhogg/contact/tag_removed', $this, $tag_id );
 				}
-
 			}
+		}
 
+		if ( ! empty( $tags_removed ) ){
+
+			/**
+			 * Similar to groundhogg/contact/tag_removed but passes all the tags as an array if multiple tags were passed
+			 *
+			 * @param $contact Contact
+			 * @param $tag_ids int[]
+			 */
+			do_action( 'groundhogg/contact/tags_removed', $this, $tags_removed );
 		}
 
 		return true;
@@ -585,13 +593,22 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * return whether the contact has a specific tag
 	 *
-	 * @param int|string $tag_id_or_name the ID or name or the tag
+	 * @param int|string|Tag $tag_id_or_name the ID or name or the tag
 	 *
 	 * @return bool
 	 */
 	public function has_tag( $tag_id_or_name ) {
-		if ( ! is_numeric( $tag_id_or_name ) ) {
-			$tag    = (object) $this->get_tags_db()->get_tag_by( 'tag_slug', sanitize_title( $tag_id_or_name ) );
+
+		if ( is_a( $tag_id_or_name, Tag::class ) ){
+			$tag_id = $tag_id_or_name->get_id();
+		} else if ( ! is_numeric( $tag_id_or_name ) ) {
+			$tag = $this->get_tags_db()->get_tag_by( 'tag_slug', sanitize_title( $tag_id_or_name ) );
+
+			// Tag does not exist
+			if ( ! $tag ) {
+				return false;
+			}
+
 			$tag_id = absint( $tag->tag_id );
 		} else {
 			$tag_id = absint( $tag_id_or_name );
@@ -976,10 +993,11 @@ class Contact extends Base_Object_With_Meta {
 	 * @return array
 	 */
 	public function get_as_array() {
-		$contact             = $this->get_data();
-		$contact['ID']       = $this->get_id();
-		$contact['gravatar'] = $this->get_profile_picture();
-		$contact['age']      = $this->get_age();
+		$contact              = $this->get_data();
+		$contact['ID']        = $this->get_id();
+		$contact['gravatar']  = $this->get_profile_picture();
+		$contact['full_name'] = $this->get_full_name();
+		$contact['age']       = $this->get_age();
 
 		return apply_filters(
 			"groundhogg/{$this->get_object_type()}/get_as_array",

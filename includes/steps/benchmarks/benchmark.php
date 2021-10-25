@@ -4,6 +4,7 @@ namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
 use Groundhogg\Event;
+use function Groundhogg\is_a_contact;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Steps\Funnel_Step;
 
@@ -32,7 +33,7 @@ abstract class Benchmark extends Funnel_Step {
 	 * Add arbitrary data
 	 *
 	 * @param string $key
-	 * @param int $data
+	 * @param int    $data
 	 */
 	protected function add_data( $key = '', $data = 0 ) {
 		$this->data[ $key ] = $data;
@@ -42,7 +43,7 @@ abstract class Benchmark extends Funnel_Step {
 	 * Get arbitrary data.
 	 *
 	 * @param string $key
-	 * @param bool $default
+	 * @param bool   $default
 	 *
 	 * @return bool|mixed
 	 */
@@ -101,18 +102,24 @@ abstract class Benchmark extends Funnel_Step {
 
 			$this->set_current_step( $step );
 
-			$contact = $this->get_the_contact();
+			$contacts = $this->get_the_contact();
 
-			if ( is_wp_error( $contact ) || ! $contact ) {
-				continue;
+			if ( ! is_array( $contacts ) && is_a_contact( $contacts ) ) {
+				$contacts = [ $contacts ];
 			}
 
-			$this->set_current_contact( $contact );
+			foreach ( $contacts as $contact ) {
+				if ( is_wp_error( $contact ) || ! is_a_contact( $contact ) ) {
+					continue;
+				}
 
-			if ( $this->can_complete_step() && $step->can_complete( $this->get_current_contact() ) ) {
+				$this->set_current_contact( $contact );
 
-				$step->enqueue( $this->get_current_contact() );
+				if ( $this->can_complete_step() && $step->can_complete( $this->get_current_contact() ) ) {
 
+					$step->enqueue( $this->get_current_contact() );
+
+				}
 			}
 
 		}
@@ -130,7 +137,7 @@ abstract class Benchmark extends Funnel_Step {
 	 * Process the tag applied step...
 	 *
 	 * @param $contact Contact
-	 * @param $event Event
+	 * @param $event   Event
 	 *
 	 * @return true
 	 */
