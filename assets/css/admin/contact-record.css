@@ -1,0 +1,20 @@
+#wpcontent {
+  background-color: #F6F9FB;
+  padding-left: 0;
+}
+
+.fixed-full-height {
+  height: calc( 100vh - 32px );
+  position: fixed;
+}
+
+#contact-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+/*# sourceMappingURL=contact-record.css.map */
