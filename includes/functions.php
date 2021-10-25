@@ -34,6 +34,11 @@ function get_current_contact() {
  */
 function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 
+	// Gave us a contact, send it back.
+	if ( is_a_contact( $contact_id_or_email ) ){
+		return $contact_id_or_email;
+	}
+
 	static $cache = [];
 
 	$cache_key = is_numeric( $contact_id_or_email ) ? $contact_id_or_email . ':' . $by_user_id : $contact_id_or_email;
@@ -1528,13 +1533,13 @@ function convert_user_to_contact_when_user_registered( $userId ) {
 	/**
 	 * Whether the new user should be automatically converted to a contact or not
 	 *
-	 * @param $should bool
+	 * @param $should  bool
 	 * @param $user_id int
-	 * @param $user \WP_User
+	 * @param $user    \WP_User
 	 *
 	 * @return bool
 	 */
-	if ( ! apply_filters( 'groundhogg/should_convert_user_to_contact_when_user_registered', true, $userId, $user ) ){
+	if ( ! apply_filters( 'groundhogg/should_convert_user_to_contact_when_user_registered', true, $userId, $user ) ) {
 		return;
 	}
 
@@ -1689,10 +1694,12 @@ function after_form_submit_handler( &$contact ) {
 		$contact->update_meta( 'source_page', wpgh_get_referer() );
 	}
 
-	// If they re-optin we will consider them unconfirmed
+	// If they re-optin we consider them unconfirmed
 	if ( ! $contact->is_marketable() ) {
 		$contact->change_marketing_preference( Preferences::UNCONFIRMED );
 	}
+
+	$contact->set_last_optin_date();
 
 	/**
 	 * Helper function.
@@ -2117,13 +2124,7 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 				$args[ $field ] = date( 'Y-m-d H:i:s', strtotime( $value ) );
 				break;
 			case 'optin_status':
-
-				// Will default to unconfirmed
-				if ( ! is_numeric( $value ) ) {
-					$value = Preferences::string_to_preference( $value );
-				}
-
-				$args[ $field ] = absint( $value );
+				$args[ $field ] = Preferences::sanitize( $value );
 				break;
 			case 'user_id':
 			case 'owner_id':
@@ -2428,13 +2429,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				$args[ $field ] = date( 'Y-m-d H:i:s', strtotime( $value ) );
 				break;
 			case 'optin_status':
-
-				// Will default to unconfirmed
-				if ( ! is_numeric( $value ) ) {
-					$value = Preferences::string_to_preference( $value );
-				}
-
-				$args[ $field ] = absint( $value );
+				$args[ $field ] = Preferences::sanitize( $value );
 				break;
 			case 'user_id':
 			case 'owner_id':
@@ -4954,7 +4949,7 @@ function sanitize_object_meta( $meta_value, $meta_key = '', $object_type = '' ) 
 
 /**
  * Check if the email address is in use
- * You can pass a contact record to double check against the current contact as well.
+ * You can pass a contact record to double-check against the current contact as well.
  *
  * @param string       $email_address
  * @param bool|Contact $current_contact
@@ -5487,7 +5482,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 		$filters[] = [
 			'type'    => 'optin_status',
 			'compare' => 'in',
-			'value'   => ensure_array( $query['optin_status'] )
+			'value'   => Preferences::sanitize( ensure_array( $query['optin_status'] ) )
 		];
 	}
 
@@ -5496,7 +5491,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 		$filters[] = [
 			'type'    => 'optin_status',
 			'compare' => 'not_in',
-			'value'   => wp_parse_id_list( ensure_array( $query['optin_status_exclude'] ) )
+			'value'   => Preferences::sanitize( ensure_array( $query['optin_status_exclude'] ) )
 		];
 	}
 
@@ -5722,4 +5717,26 @@ function get_filters_from_old_query_vars( $query = [] ) {
  */
 function is_admin_bar_widget_disabled() {
 	return apply_filters( 'groundhogg/is_admin_bar_widget_disabled', is_option_enabled( 'gh_is_admin_bar_widget_disabled' ) );
+}
+
+/**
+ * Whether the mobile phone number should be treated as unique
+ *
+ * @return bool
+ */
+function is_mobile_phone_unique() {
+	return apply_filters( 'groundhogg/is_mobile_phone_unique', is_option_enabled( 'gh_mobile_is_unique' ) );
+}
+
+/**
+ * Ipplodes a string list surrounded by quotes, useful for SQL queries.
+ *
+ * @param $items
+ *
+ * @return string
+ */
+function implode_in_quotes( $items ) {
+	return implode( ',', array_map( function ( $item ) {
+		return "'$item'";
+	}, $items ) );
 }

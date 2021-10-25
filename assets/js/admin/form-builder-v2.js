@@ -384,7 +384,7 @@
       type: 'fileTypes',
       edit: ({ file_types }) => {
         // language=HTML
-        return `<div>
+        return `<div class="setting">
             <label>${_x('Restrict file types', 'groundhogg')}</label>
             ${select({
                 name: 'file-types',

@@ -70,6 +70,7 @@ class Upgrade_3_0_Contacts extends Bulk_Job {
 			'terms_agreement_date'         => $contact->get_meta( 'terms_agreement_date' ),
 			'data_processing_consent_date' => $contact->get_meta( 'gdpr_consent_date' ),
 			'marketing_consent_date'       => $contact->get_meta( 'marketing_consent_date' ),
+			'date_last_optin'              => $contact->date_optin_status_changed,
 		];
 
 		$contact->update( $args );

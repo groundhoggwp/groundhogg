@@ -3,15 +3,29 @@
 namespace Groundhogg;
 
 class Preferences {
+
 	// Optin Statuses
-	const UNCONFIRMED = 1;
-	const CONFIRMED = 2;
-	const UNSUBSCRIBED = 3;
-	const WEEKLY = 4;
-	const MONTHLY = 5;
-	const HARD_BOUNCE = 6;
-	const SPAM = 7;
-	const COMPLAINED = 8;
+	const UNCONFIRMED = 'unconfirmed';
+	const CONFIRMED = 'confirmed';
+	const UNSUBSCRIBED = 'unsubscribed';
+	const HARD_BOUNCE = 'bounced';
+	const SPAM = 'spam';
+	const COMPLAINED = 'complained';
+
+	/**
+	 * No longer in use
+	 *
+	 * @deprecated
+	 */
+	const WEEKLY = 'weekly';
+
+	/**
+	 * No longer in use
+	 *
+	 * @deprecated
+	 */
+	const MONTHLY = 'monthly';
+
 
 	public function __construct() {
 		add_action( 'init', [ $this, 'add_rewrite_rules' ] );
@@ -19,39 +33,6 @@ class Preferences {
 
 		// Do last so precedence is given to Groundhogg
 		add_filter( 'template_include', [ $this, 'template_include' ], 99 );
-//		add_action( 'groundhogg/tracking/email/click', [ $this, 'set_temp_preferences_permissions_cookie' ] );
-	}
-
-	/**
-	 * If the current state of things allows a user to change their email preferences...
-	 *
-	 * @return bool
-	 */
-	public function current_contact_can_modify_preferences(){
-
-		$permissions_hash = get_cookie( 'gh-preferences-permission' );
-
-		if ( ! $permissions_hash ){
-			return false;
-		}
-
-		$tracking = Plugin::$instance->tracking;
-
-		// get the current state of things...
-		$parts = array_filter( [
-			$tracking->get_current_contact_id(),
-			$tracking->get_current_email_id(),
-			$tracking->get_current_funnel_id(),
-			$tracking->get_current_event() ? $tracking->get_current_event()->get_id() : false,
-		] );
-
-		$value = wp_hash( encrypt( implode( '|', $parts ) ) );
-
-		if ( $value !== $permissions_hash ){
-			return false;
-		}
-
-		return true;
 	}
 
 	/**
@@ -132,54 +113,82 @@ class Preferences {
 	 * @param $id_or_email int|string the contact in question
 	 *
 	 * @return bool|string
+	 * @todo update for refactored statuses and consent
+	 *
 	 */
 	public function get_optin_status_text( $id_or_email ) {
-		$contact = get_contactdata( $id_or_email );
 
-		if ( ! $contact ) {
-			return _x( 'No Contact', 'notice', 'groundhogg' );
+		if ( ! is_a_contact( $id_or_email ) ) {
+			$contact = get_contactdata( $id_or_email );
+		} else {
+			$contact = $id_or_email;
 		}
 
-		if ( $this->is_gdpr_enabled() && $this->is_gdpr_strict() ) {
+		if ( ! $contact ) {
+			return false;
+		}
 
-			if ( ! $contact->has_gdpr_consent() || ! $contact->has_gdpr_consent( 'marketing' )  ) {
-				return _x( 'This contact has not agreed to receive email marketing from you.', 'optin_status', 'groundhogg' );
+		// Did not provide GDPR consent or has revoked it
+		if ( $this->is_gdpr_enabled() && $this->is_gdpr_strict() && ( ! $contact->has_data_processing_consent() || ! $contact->has_marketing_consent() ) ) {
+			$text = __( 'This contact has not agreed to receive email marketing from you.', 'groundhogg' );
+		} // Is unconfirmed and outside the confirmation grace period
+		else if ( $this->is_confirmation_strict() && $contact->get_optin_status() === Preferences::UNCONFIRMED && strtotime( $contact->date_last_optin ) < strtotime( self::get_min_grace_period_date() ) ) {
+			$text = __( 'Unconfirmed. <b>This contact will not receive emails</b>, they are passed the email confirmation grace period.', 'groundhogg' );
+		} else {
+			switch ( $contact->get_optin_status() ) {
+				default:
+				case self::UNCONFIRMED:
+
+					$text = _x( 'Unconfirmed. They will receive marketing.', 'optin_status', 'groundhogg' );
+					break;
+				case self::CONFIRMED:
+					$text = _x( 'Confirmed. They will receive marketing.', 'optin_status', 'groundhogg' );
+					break;
+				case self::UNSUBSCRIBED:
+					$text = _x( 'Unsubscribed. They will not receive marketing.', 'optin_status', 'groundhogg' );
+					break;
+				case self::HARD_BOUNCE:
+					$text = _x( 'This email address bounced, they will not receive marketing.', 'optin_status', 'groundhogg' );
+					break;
+				case self::SPAM:
+					$text = _x( 'This contact was marked as spam. They will not receive marketing.', 'optin_status', 'groundhogg' );
+					break;
+				case self::COMPLAINED:
+					$text = _x( 'This contact complained about your emails. They will not receive marketing.', 'optin_status', 'groundhogg' );
+					break;
 			}
 		}
 
-		switch ( $contact->get_optin_status() ) {
-			default:
-			case self::UNCONFIRMED:
-				if ( $this->is_confirmation_strict() ) {
-					if ( ! $this->is_in_grace_period( $contact->ID ) ) {
-						return _x( 'Unconfirmed. This contact will not receive emails, they are passed the email confirmation grace period.', 'optin_status', 'groundhogg' );
-					}
-				}
+		/**
+		 * Filter the optin status description
+		 *
+		 * @param $text    string
+		 * @param $contact Contact
+		 */
+		return apply_filters( 'groundhogg/preferences/optin_status_description', $text, $contact );
+	}
 
-				return _x( 'Unconfirmed. They will receive marketing.', 'optin_status', 'groundhogg' );
-				break;
-			case self::CONFIRMED:
-				return _x( 'Confirmed. They will receive marketing.', 'optin_status', 'groundhogg' );
-				break;
-			case self::UNSUBSCRIBED:
-				return _x( 'Unsubscribed. They will not receive marketing.', 'optin_status', 'groundhogg' );
-				break;
-			case self::WEEKLY:
-				return _x( 'This contact will only receive marketing weekly.', 'optin_status', 'groundhogg' );
-				break;
-			case self::MONTHLY:
-				return _x( 'This contact will only receive marketing monthly.', 'optin_status', 'groundhogg' );
-				break;
-			case self::HARD_BOUNCE:
-				return _x( 'This email address bounced, they will not receive marketing.', 'optin_status', 'groundhogg' );
-				break;
-			case self::SPAM:
-				return _x( 'This contact was marked as spam. They will not receive marketing.', 'optin_status', 'groundhogg' );
-				break;
-			case self::COMPLAINED:
-				return _x( 'This contact complained about your emails. They will not receive marketing.', 'optin_status', 'groundhogg' );
-				break;
+	/**
+	 * Return whether the contact is marketable or not.
+	 *
+	 * @return bool
+	 *
+	 * @deprecated 3.0 Moved to be part of the Contact class itself
+	 *
+	 */
+	public function is_marketable( $contact ) {
+
+		_deprecated_function( 'Preferences::is_marketable', '3.0', 'Contact::is_marketable' );
+
+		if ( ! is_a_contact( $contact ) ){
+			$contact = get_contactdata( $contact );
 		}
+
+		if ( ! $contact ) {
+			return  false;
+		}
+
+		return $contact->is_marketable();
 	}
 
 	/**
@@ -192,8 +201,6 @@ class Preferences {
 			self::UNCONFIRMED  => _x( 'Unconfirmed', 'optin_status', 'groundhogg' ),
 			self::CONFIRMED    => _x( 'Confirmed', 'optin_status', 'groundhogg' ),
 			self::UNSUBSCRIBED => _x( 'Unsubscribed', 'optin_status', 'groundhogg' ),
-			self::WEEKLY       => _x( 'Subscribed Weekly', 'optin_status', 'groundhogg' ),
-			self::MONTHLY      => _x( 'Subscribed Monthly', 'optin_status', 'groundhogg' ),
 			self::HARD_BOUNCE  => _x( 'Bounced', 'optin_status', 'groundhogg' ),
 			self::SPAM         => _x( 'Spam', 'optin_status', 'groundhogg' ),
 			self::COMPLAINED   => _x( 'Complained', 'optin_status', 'groundhogg' ),
@@ -205,11 +212,11 @@ class Preferences {
 	 *
 	 * @param string $string a string representation of a preference
 	 *
-	 * @return int
+	 * @return string
 	 */
 	public static function string_to_preference( $string ) {
 
-		if ( ! is_string( $string ) ){
+		if ( ! is_string( $string ) ) {
 			return self::UNCONFIRMED;
 		}
 
@@ -220,14 +227,16 @@ class Preferences {
 			'confirmed'    => self::CONFIRMED,
 			'unsubscribe'  => self::UNSUBSCRIBED,
 			'unsubscribed' => self::UNSUBSCRIBED,
-			'weekly'       => self::WEEKLY,
-			'monthly'      => self::MONTHLY,
+			'weekly'       => self::CONFIRMED,
+			'monthly'      => self::CONFIRMED,
 			'hard_bounce'  => self::HARD_BOUNCE,
 			'bounce'       => self::HARD_BOUNCE,
 			'bounced'      => self::HARD_BOUNCE,
 			'complain'     => self::COMPLAINED,
 			'complaint'    => self::COMPLAINED,
 			'complained'   => self::COMPLAINED,
+			'spam'         => self::SPAM,
+			'spammed'      => self::SPAM,
 		];
 
 		return get_array_var( $string_map, $string, self::UNCONFIRMED );
@@ -247,13 +256,54 @@ class Preferences {
 	/**
 	 * ensure that the provided preference is valid
 	 *
-	 * @param $preference
-	 * @param false $old_preference
+	 * @param int|string|array $preference
+	 * @param bool             $old_preference
+	 * @param mixed            $default
 	 *
-	 * @return false|int|mixed
+	 * @return false|string|array
 	 */
-	public static function sanitize( $preference, $old_preference = false ){
-		return self::is_valid( absint( $preference ) ) ? absint( $preference ) : ( $old_preference ?: self::UNCONFIRMED );
+	public static function sanitize( $preference, $old_preference = false, $default = self::UNCONFIRMED ) {
+
+		// If an array is passed (which often happens) return an array of sanitized values.
+		if ( is_array( $preference ) ) {
+			return array_map( [ self::class, 'sanitize' ], $preference );
+		}
+
+		if ( is_numeric( $preference ) ) {
+			$preference = self::int_to_string( $preference );
+		}
+
+		if ( is_numeric( $old_preference ) ) {
+			$old_preference = self::int_to_string( $old_preference );
+		}
+
+		// monthly/weekly might have been passed, change it to confirmed.
+		$preference = self::string_to_preference( $preference );
+
+		return self::is_valid( $preference ) ? $preference : ( $old_preference ?: $default );
+	}
+
+	/**
+	 * Since refactoring the preferences we want to make everything backwards compatible
+	 * So we can use the function to map the preferences to the correct string if an int was provided.
+	 *
+	 * @param $int
+	 *
+	 * @return string
+	 */
+	public static function int_to_string( $int ) {
+		$old_preferences_to_new = [
+			1 => self::UNCONFIRMED,
+			2 => self::CONFIRMED,
+			3 => self::UNSUBSCRIBED,
+			4 => self::CONFIRMED,
+			5 => self::CONFIRMED,
+			6 => self::HARD_BOUNCE,
+			7 => self::SPAM,
+			8 => self::COMPLAINED,
+		];
+
+		return get_array_var( $old_preferences_to_new, absint( $int ) );
 	}
 
 	/**
@@ -263,62 +313,8 @@ class Preferences {
 	 *
 	 * @return bool
 	 */
-	public static function is_valid( $preference ){
+	public static function is_valid( $preference ) {
 		return in_array( $preference, array_keys( self::get_preference_names() ) );
-	}
-
-	/**
-	 * Return whether the contact is marketable or not.
-	 *
-	 * @return bool
-	 */
-	public function is_marketable( $id_or_email ) {
-		$contact = get_contactdata( $id_or_email );
-
-		if ( ! $contact ) {
-			return _x( 'No Contact', 'notice', 'groundhogg' );
-		}
-
-		/* check for strict GDPR settings */
-		if ( $this->is_gdpr_enabled() && $this->is_gdpr_strict() ) {
-
-			if ( ! $contact->has_gdpr_consent() || ! $contact->has_gdpr_consent( 'marketing' ) ) {
-				return false;
-			}
-		}
-
-		switch ( $contact->get_optin_status() ) {
-			default:
-			case self::UNCONFIRMED:
-				/* check for grace period if necessary */
-				if ( $this->is_confirmation_strict() ) {
-					if ( ! $this->is_in_grace_period( $contact->ID ) ) {
-						return false;
-					}
-				}
-
-				return true;
-				break;
-			case self::CONFIRMED:
-				return true;
-				break;
-			case self::SPAM;
-			case self::COMPLAINED;
-			case self::HARD_BOUNCE;
-			case self::UNSUBSCRIBED:
-				return false;
-				break;
-			case self::WEEKLY:
-				$last_sent = $contact->get_meta( 'last_sent' );
-
-				return ( time() - absint( $last_sent ) ) > 7 * 24 * HOUR_IN_SECONDS;
-				break;
-			case self::MONTHLY:
-				$last_sent = $contact->get_meta( 'last_sent' );
-
-				return ( time() - absint( $last_sent ) ) > 30 * 24 * HOUR_IN_SECONDS;
-				break;
-		}
 	}
 
 	/**
@@ -364,9 +360,9 @@ class Preferences {
 	 *
 	 * @return false|string
 	 */
-	public static function get_min_grace_period_date(){
+	public static function get_min_grace_period_date() {
 
-		if ( self::$min_grace_period_date ){
+		if ( self::$min_grace_period_date ) {
 			return self::$min_grace_period_date;
 		}
 
@@ -381,8 +377,12 @@ class Preferences {
 	 * @param $id_or_email
 	 *
 	 * @return bool
+	 *
+	 * @deprecated 3.0
 	 */
 	public function is_in_grace_period( $id_or_email ) {
+
+		_deprecated_function( 'is_in_grace_period', '3.0' );
 
 		$contact = get_contactdata( $id_or_email );
 

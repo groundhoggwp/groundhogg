@@ -150,10 +150,9 @@ class Contact extends Base_Object_With_Meta {
 		$this->user  = get_userdata( $this->get_user_id() );
 		$this->owner = get_userdata( $this->get_owner_id() );
 
-		$this->ID           = absint( $this->ID );
-		$this->user_id      = absint( $this->user_id );
-		$this->owner_id     = absint( $this->owner_id );
-		$this->optin_status = absint( $this->optin_status );
+		$this->ID       = absint( $this->ID );
+		$this->user_id  = absint( $this->user_id );
+		$this->owner_id = absint( $this->owner_id );
 	}
 
 	/**
@@ -213,7 +212,6 @@ class Contact extends Base_Object_With_Meta {
 		return $this->get_notes();
 	}
 
-
 	/**
 	 * Get the contact's email address
 	 *
@@ -223,13 +221,14 @@ class Contact extends Base_Object_With_Meta {
 		return strtolower( $this->email );
 	}
 
+
 	/**
 	 * Gets the contact's optin status
 	 *
-	 * @return int
+	 * @return string
 	 */
 	public function get_optin_status() {
-		return absint( $this->optin_status );
+		return $this->optin_status;
 	}
 
 	/**
@@ -386,24 +385,34 @@ class Contact extends Base_Object_With_Meta {
 	 */
 	public function is_marketable() {
 
-		/* check for strict GDPR settings */
-		if ( is_option_enabled( 'gh_enable_gdpr' ) && is_option_enabled( 'gh_strict_gdpr' ) ) {
+		// Check for strict GDPR settings
+		if ( Plugin::instance()->preferences->is_gdpr_strict() && ( ! $this->has_marketing_consent() || ! $this->has_data_processing_consent() ) ) {
 
-		} else {
+			/**
+			 * Whether the contact is marketable
+			 *
+			 * @param $is_marketable bool
+			 * @param $contact       Contact
+			 */
+			return apply_filters( 'groundhogg/contact/is_marketable', false, $this );
+		}
 
+		if ( Plugin::instance()->preferences->is_confirmation_strict()
+		     && $this->get_optin_status() === Preferences::UNCONFIRMED
+		     && strtotime( $this->date_last_optin ) < strtotime( Preferences::get_min_grace_period_date() ) ) {
+
+			/**
+			 * Whether the contact is marketable
+			 *
+			 * @param $is_marketable bool
+			 * @param $contact       Contact
+			 */
+			return apply_filters( 'groundhogg/contact/is_marketable', false, $this );
 		}
 
 		switch ( $this->get_optin_status() ) {
 			default:
 			case Preferences::UNCONFIRMED:
-
-				// If strict email confirmation is required check to see if the last optin_status date change is bigger than the min grace period date
-				if ( is_option_enabled( 'gh_strict_confirmation' ) && $this->date_optin_status_changed < Preferences::get_min_grace_period_date() ) {
-					$is_marketable = false;
-				} else {
-					$is_marketable = true;
-				}
-				break;
 			case Preferences::CONFIRMED:
 				$is_marketable = true;
 				break;
@@ -415,7 +424,12 @@ class Contact extends Base_Object_With_Meta {
 				break;
 		}
 
-
+		/**
+		 * Whether the contact is marketable
+		 *
+		 * @param $is_marketable bool
+		 * @param $contact       Contact
+		 */
 		return apply_filters( 'groundhogg/contact/is_marketable', $is_marketable, $this );
 	}
 
@@ -530,7 +544,6 @@ class Contact extends Base_Object_With_Meta {
 
 	}
 
-
 	/**
 	 * Remove a single tag or several tag from the contact
 	 *
@@ -568,6 +581,7 @@ class Contact extends Base_Object_With_Meta {
 		return true;
 	}
 
+
 	/**
 	 * return whether the contact has a specific tag
 	 *
@@ -596,7 +610,7 @@ class Contact extends Base_Object_With_Meta {
 	public function update( $data = [] ) {
 
 		$preference_updated = false;
-		$old_preference     = $this->get_optin_status();
+		$old_preference     = $this->optin_status;
 		$new_preference     = Preferences::sanitize( get_array_var( $data, 'optin_status' ), $old_preference );
 
 		if ( $old_preference !== $new_preference ) {
@@ -614,10 +628,10 @@ class Contact extends Base_Object_With_Meta {
 			/**
 			 * When the preference is updated
 			 *
-			 * @param $id int
-			 * @param $new_preference
-			 * @param $old_preference
-			 * @param $contact
+			 * @param $id             int
+			 * @param $new_preference string
+			 * @param $old_preference string
+			 * @param $contact        Contact
 			 */
 			do_action( 'groundhogg/contact/preferences/updated', $this->ID, $new_preference, $old_preference, $this );
 
@@ -626,10 +640,10 @@ class Contact extends Base_Object_With_Meta {
 				/**
 				 * When the contact is unsubscribed
 				 *
-				 * @param $id int
-				 * @param $new_preference
-				 * @param $old_preference
-				 * @param $contact
+				 * @param $id             int
+				 * @param $new_preference string
+				 * @param $old_preference string
+				 * @param $contact        Contact
 				 */
 				do_action( 'groundhogg/contact/preferences/unsubscribed', $this->ID, $new_preference, $old_preference, $this );
 			}
@@ -870,7 +884,6 @@ class Contact extends Base_Object_With_Meta {
 		return $result;
 	}
 
-
 	/**
 	 * Get the basename of the path
 	 *
@@ -957,7 +970,6 @@ class Contact extends Base_Object_With_Meta {
 		return absint( $age_in_years );
 	}
 
-
 	/**
 	 * Get the contact data as an array.
 	 *
@@ -984,6 +996,7 @@ class Contact extends Base_Object_With_Meta {
 		);
 	}
 
+
 	/**
 	 * Output a contact. Just give the full name & email
 	 *
@@ -1001,23 +1014,77 @@ class Contact extends Base_Object_With_Meta {
 		return $this->get_meta( 'job_title' );
 	}
 
-//	protected function sanitize_columns( $data = [] ) {
-//
-//		map_func_to_attr( $data, 'first_name', 'sanitize_text_field' );
-//		map_func_to_attr( $data, 'last_name', 'sanitize_text_field' );
-//		map_func_to_attr( $data, 'email', 'sanitize_email' );
-//		map_func_to_attr( $data, 'optin_status', 'sanitize_text_field' );
-//		map_func_to_attr( $data, 'owner_id', 'absint' );
-//		map_func_to_attr( $data, 'user_id', 'absint' );
-//		map_func_to_attr( $data, 'date_created', function ( $date ) {
-//			return convert_to_mysql_date( $date );
-//		} );
-//		map_func_to_attr( $data, 'date_optin_status_changed', function ( $date ) {
-//			return convert_to_mysql_date( $date );
-//		} );
-//
-//		return $data;
-//	}
+	/**
+	 * Arbitrary function to add contact methods.
+	 *
+	 * @param        $type
+	 * @param        $method
+	 * @param string $status
+	 * @param string $extra
+	 */
+	public function add_contact_method( $type, $method, $status = 'secondary', $extra = '' ) {
+		if ( ! $type || ! $method ) {
+			return;
+		}
+
+		// Add the new email address
+		get_db( 'contact_methods' )->add( [
+			'contact_id' => $this->get_id(),
+			'type'       => $type,
+			'status'     => $status,
+			'method'     => $method,
+			'extra'      => $extra
+		] );
+	}
+
+	/**
+	 * Add additional email addresses to the contact
+	 *
+	 * @param string $email_address
+	 * @param string $status secondary or something else...
+	 */
+	public function add_email_address( $email_address, $status = 'secondary' ) {
+
+		// Check if the email address is currently in use by another contact...
+		if ( ! $email_address || ! is_email( $email_address ) ) {
+			return;
+		}
+
+		$this->add_contact_method( 'email_address', $email_address, $status );
+	}
+
+	/**
+	 * Add additional primary phone numbers
+	 *
+	 * @param string $tel
+	 * @param string $ext
+	 * @param string $status
+	 */
+	public function add_primary_phone_number( $tel, $ext = '', $status = 'secondary' ) {
+
+		// Check if the email address is currently in use by another contact...
+		if ( ! $tel ) {
+			return;
+		}
+
+		$this->add_contact_method( 'primary_phone', sanitize_phone_number( $tel ), $status, $ext );
+	}
+
+	/**
+	 * Add additional mobile phone numbers to this contact
+	 *
+	 * @param        $tel
+	 * @param string $status
+	 */
+	public function add_mobile_phone_number( $tel, $status = 'secondary' ) {
+
+		// Check if the email address is currently in use by another contact...
+		if ( ! $tel ) {
+			return;
+		}
+
+		$this->add_contact_method( 'mobile_phone', sanitize_phone_number( $tel ), $status );
+	}
 
 	/**
 	 * Merge $other into $this
@@ -1035,18 +1102,19 @@ class Contact extends Base_Object_With_Meta {
 	public function merge( $other ) {
 
 		$other = get_contactdata( $other );
+
 		if ( ! is_a_contact( $other ) ) {
 			return false;
 		}
 
-		$data = array_merge( $other->data, $this->data );
-		$this->update( $data );
+		// Update the main data, $this is always preferred
+		$this->update( array_merge( $other->data, $this->data ) );
 
-		// May use this later...
-		$this->update_meta( 'previous_merge_data', $other->data );
-		$uploads_dir = $this->get_uploads_folder();
+		// Move over any meta data, $this is always preferred
+		$this->update_meta( array_merge( $other->meta, $this->meta ) );
 
 		// Move any files to this contacts uploads folder.
+		$uploads_dir = $this->get_uploads_folder();
 		foreach ( $other->get_files() as $file ) {
 			$file_path = $file['file_path'];
 			$file_name = $file['file_name'];
@@ -1054,14 +1122,22 @@ class Contact extends Base_Object_With_Meta {
 			rename( $file_path, $uploads_dir['path'] . '/' . $file_name );
 		}
 
+		// Keep $other's contact methods on file with the merged contact
+		$this->add_email_address( $other->get_email() );
+		$this->add_mobile_phone_number( $other->get_mobile_number() );
+		$this->add_primary_phone_number( $other->get_phone_number(), $other->get_phone_extension() );
+		// Any secondary contact methods will be auto assigned to $this by the table itself.
+
 		/**
 		 * Fires before the $other is permanently deleted.
+		 * This is useful for any relevant tables to do an update and swap out the IDs
 		 *
 		 * @param $primary Contact
 		 * @param $other   Contact
 		 */
 		do_action( 'groundhogg/contact/merge', $this, $other );
 
+		// Goodbye...
 		$other->delete();
 
 		return true;
@@ -1076,7 +1152,7 @@ class Contact extends Base_Object_With_Meta {
 	 */
 	public function set_gdpr_consent( $type = 'gdpr' ) {
 
-		_deprecated_function( 'set_gdpr_consent', '3.0', 'set_data_processing_consent' );
+		_deprecated_function( __METHOD__, '3.0', __CLASS__ . '::set_data_processing_consent()' );
 
 		$this->set_data_processing_consent();
 
@@ -1114,7 +1190,7 @@ class Contact extends Base_Object_With_Meta {
 	 */
 	public function revoke_gdpr_consent( $type = 'gdpr' ) {
 
-		_deprecated_function( 'revoke_gdpr_consent', '3.0', 'revoke_data_processing_consent' );
+		_deprecated_function( __METHOD__, '3.0', __CLASS__ . '::revoke_data_processing_consent()' );
 
 		$this->revoke_data_processing_consent();
 
@@ -1152,6 +1228,9 @@ class Contact extends Base_Object_With_Meta {
 	 * @deprecated 3.0
 	 */
 	public function has_gdpr_consent( $type = 'gdpr' ) {
+
+		_deprecated_function( __METHOD__, '3.0', __CLASS__ . '::has_data_processing_consent()' );
+
 		return $this->has_data_processing_consent();
 	}
 
@@ -1162,6 +1241,7 @@ class Contact extends Base_Object_With_Meta {
 	 */
 	public function has_marketing_consent() {
 		$consent_time = strtotime( $this->marketing_consent_date );
+
 		return apply_filters( 'groundhogg/contact/has_marketing_consent', ! empty( $consent_time ) && $consent_time < time(), $this );
 	}
 
@@ -1172,6 +1252,7 @@ class Contact extends Base_Object_With_Meta {
 	 */
 	public function has_data_processing_consent() {
 		$consent_time = strtotime( $this->data_processing_consent_date );
+
 		return apply_filters( 'groundhogg/contact/has_data_processing_consent', ! empty( $consent_time ) && $consent_time < time(), $this );
 	}
 
@@ -1191,9 +1272,19 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @return bool
 	 */
-	public function has_agreed_to_terms(){
+	public function has_agreed_to_terms() {
 		$consent_time = strtotime( $this->terms_agreement_date );
+
 		return apply_filters( 'groundhogg/contact/has_agreed_to_terms', ! empty( $consent_time ) && $consent_time < time(), $this );
+	}
+
+	/**
+	 * Updates the contact with the most recent optin date.
+	 */
+	public function set_last_optin_date() {
+		$this->update( [
+			'date_last_optin' => current_time( 'mysql' )
+		] );
 	}
 
 	/**

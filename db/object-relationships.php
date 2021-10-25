@@ -2,6 +2,8 @@
 
 namespace Groundhogg\DB;
 
+use Groundhogg\Contact;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -61,6 +63,7 @@ class Object_Relationships extends DB {
 	 */
 	protected function add_additional_actions() {
 		add_action( 'groundhogg/db/post_delete', [ $this, 'object_deleted' ], 10, 4 );
+		add_action( 'groundhogg/contact/merge', [ $this, 'contacts_merged' ], 10, 2 );
 		parent::add_additional_actions();
 	}
 
@@ -78,6 +81,29 @@ class Object_Relationships extends DB {
 			] );
 		}
 
+	}
+
+	/**
+	 * Change other's contact_id to primary's contact_id
+	 *
+	 * @param $primary Contact
+	 * @param $other   Contact
+	 */
+	public function contact_merged( $primary, $other ) {
+
+		$this->update( [
+			'primary_object_id'   => $other->get_id(),
+			'primary_object_type' => 'contact'
+		], [
+			'primary_object_id' => $primary->get_id()
+		] );
+
+		$this->update( [
+			'secondary_object_id'   => $other->get_id(),
+			'secondary_object_type' => 'contact'
+		], [
+			'secondary_object_id' => $primary->get_id()
+		] );
 	}
 
 	/**

@@ -68,6 +68,23 @@ class Tag_Relationships extends DB {
 	}
 
 	/**
+	 *
+	 *
+	 * @param \Groundhogg\Contact $primary
+	 * @param \Groundhogg\Contact $other
+	 */
+	public function contact_merged( $primary, $other ) {
+
+		$diff = array_diff( $other->get_tag_ids());//todo
+
+		$this->update([
+			'contact_id' => $other->get_id()
+		], [
+			'contact_id' => $primary->get_id()
+		]);
+	}
+
+	/**
 	 * Get columns and formats
 	 *
 	 * @access  public

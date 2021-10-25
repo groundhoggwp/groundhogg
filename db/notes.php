@@ -3,6 +3,8 @@
 
 namespace Groundhogg\DB;
 
+use Groundhogg\Contact;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -92,13 +94,33 @@ class Notes extends DB {
 		update_option( $this->table_name . '_db_version', $this->version );
 	}
 
+	protected function add_additional_actions() {
+		add_action( 'groundhogg/contact/merge', [ $this, 'contacts_merged' ], 10, 2 );
+	}
+
+	/**
+	 * Change other's contact_id to primary's contact_id
+	 *
+	 * @param $primary Contact
+	 * @param $other   Contact
+	 */
+	public function contact_merged( $primary, $other ) {
+
+		$this->update( [
+			'object_id'   => $other->get_id(),
+			'object_type' => 'contact'
+		], [
+			'object_id' => $primary->get_id()
+		] );
+	}
+
 	/**
 	 * Rename gh_contactnotes to gh_notes
 	 * change contact_id to object_id
 	 * Add new object_type column
 	 * Set the object type to contact because up to this point all notes where for contacts.
 	 */
-	public function update_2_4_6(){
+	public function update_2_4_6() {
 
 		global $wpdb;
 

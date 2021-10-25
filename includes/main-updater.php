@@ -476,8 +476,10 @@ class Main_Updater extends Updater {
 	 */
 	public function version_3_0() {
 		Plugin::instance()->dbs->install_dbs();
+		get_db( 'contacts' )->version_3_0_refactor_optin_status();
 		$this->remember_version_update( '3.0' );
 		Plugin::instance()->bulk_jobs->upgrade_3_0->start();
+
 	}
 
 	/**

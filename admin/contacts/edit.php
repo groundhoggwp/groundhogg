@@ -28,11 +28,4 @@ if ( ! current_user_can( 'view_all_contacts' ) && $contact->get_owner_id() !== g
 }
 
 ?>
-<div class="contact-record">
-	<div class="contact-editor-wrap">
-		<?php include __DIR__ . '/contact-editor.php'; ?>
-	</div>
-	<div class="contact-info-cards">
-		<?php Info_Cards::display( $contact ); ?>
-	</div>
-</div>
+<div id="app"></div>

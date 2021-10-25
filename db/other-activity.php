@@ -3,8 +3,7 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
-use function Groundhogg\generate_referer_hash;
-use function Groundhogg\isset_not_empty;
+use Groundhogg\Contact;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -51,12 +50,6 @@ class Other_Activity extends DB {
 		return '2.1';
 	}
 
-	/**
-	 * Listen for deletions for other objects since we don't want to hold clutter for previous things
-	 * to keep the DB small.
-	 */
-	protected function add_additional_actions() {
-	}
 
 	/**
 	 * Get the object type we're inserting/updateing/deleting.
@@ -101,6 +94,27 @@ class Other_Activity extends DB {
 
 	public function get_date_key() {
 		return 'timestamp';
+	}
+
+
+	protected function add_additional_actions() {
+		add_action( 'groundhogg/contact/merge', [ $this, 'contacts_merged' ], 10, 2 );
+	}
+
+	/**
+	 * Change other's contact_id to primary's contact_id
+	 *
+	 * @param $primary Contact
+	 * @param $other   Contact
+	 */
+	public function contact_merged( $primary, $other ) {
+
+		$this->update( [
+			'object_id'   => $other->get_id(),
+			'object_type' => 'contact'
+		], [
+			'object_id' => $primary->get_id()
+		] );
 	}
 
 	/**

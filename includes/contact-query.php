@@ -288,7 +288,8 @@ class Contact_Query {
 			'date_query'             => null,
 			'count'                  => false,
 			'no_found_rows'          => true,
-			'filters'                => []
+			'filters'                => [],
+			'is_marketable'          => null,
 		);
 
 		/**
@@ -741,22 +742,22 @@ class Contact_Query {
 
 		if ( $this->query_vars['optin_status'] !== 'any' ) {
 
-			if ( is_array( $this->query_vars['optin_status'] ) ) {
-				$this->query_vars['optin_status'] = implode( ',', wp_parse_id_list( $this->query_vars['optin_status'] ) );
-			} else {
-				$this->query_vars['optin_status'] = absint( $this->query_vars['optin_status'] );
+			if ( ! is_array( $this->query_vars['optin_status'] ) ) {
+				$this->query_vars['optin_status'] = [ $this->query_vars['optin_status'] ];
 			}
+
+			$this->query_vars['optin_status'] = implode_in_quotes( Preferences::sanitize( $this->query_vars['optin_status'] ) );
 
 			$where['optin_status'] = "$this->table_name.optin_status IN ( {$this->query_vars['optin_status']} )";
 		}
 
 		if ( $this->query_vars['optin_status_exclude'] !== false ) {
 
-			if ( is_array( $this->query_vars['optin_status_exclude'] ) ) {
-				$this->query_vars['optin_status_exclude'] = implode( ',', wp_parse_id_list( $this->query_vars['optin_status_exclude'] ) );
-			} else {
-				$this->query_vars['optin_status_exclude'] = absint( $this->query_vars['optin_status_exclude'] );
+			if ( ! is_array( $this->query_vars['optin_status_exclude'] ) ) {
+				$this->query_vars['optin_status_exclude'] = [ $this->query_vars['optin_status_exclude'] ];
 			}
+
+			$this->query_vars['optin_status_exclude'] = implode_in_quotes( Preferences::sanitize( $this->query_vars['optin_status_exclude'] ) );
 
 			$where['optin_status_exclude'] = "$this->table_name.optin_status NOT IN ( {$this->query_vars['optin_status_exclude']} )";
 		}
@@ -921,6 +922,61 @@ class Contact_Query {
 			$where['date_optin_status_changed'] = $date_optin_status_changed_query->get_sql();
 		}
 
+		if ( $this->query_vars['is_marketable'] === true ) {
+
+			$clause = [];
+
+			// If GDPR strict is enabled check for both forms of GDPR compliance
+			if ( Plugin::instance()->preferences->is_gdpr_strict() ) {
+				$clause[] = "({$this->table_name}.marketing_consent_date != '' AND {$this->table_name}.data_processing_consent_date != '')";
+			}
+
+			// If confirmation is required check the last optin date against the grace period term
+			if ( Plugin::instance()->preferences->is_confirmation_strict() ) {
+				$clause[] = sprintf( '(( %4$s.optin_status = \'%1$s\' AND %4$s.date_last_optin >= \'%2$s\' ) OR ( %4$s.optin_status = \'%3$s\' ))',
+					Preferences::UNCONFIRMED,
+					Preferences::get_min_grace_period_date(),
+					Preferences::CONFIRMED,
+					$this->table_name
+				);
+			} // Otherwise all unconfirmed and confirmed are marketable
+			else {
+				$clause[] = sprintf( "{$this->table_name}.optin_status IN (%s)", implode_in_quotes( [
+					Preferences::UNCONFIRMED,
+					Preferences::CONFIRMED
+				] ) );
+			}
+
+			$where['is_marketable'] = implode( ' AND ', $clause );
+
+		} else if ( $this->query_vars['is_marketable'] === false ) {
+
+			$clause = [];
+
+			// Any statuses that are not confirmed or unconfirmed...
+			$clause[] = sprintf( "{$this->table_name}.optin_status NOT IN (%s)", implode_in_quotes( [
+				Preferences::UNCONFIRMED,
+				Preferences::CONFIRMED
+			] ) );
+
+			// If GDPR strict is enabled check for both forms of GDPR compliance
+			if ( Plugin::instance()->preferences->is_gdpr_strict() ) {
+				$clause[] = "({$this->table_name}.marketing_consent_date = '' OR {$this->table_name}.data_processing_consent_date = '')";
+			}
+
+			// If confirmation is required check the last optin date against the grace period term
+			if ( Plugin::instance()->preferences->is_confirmation_strict() ) {
+				$clause[] = sprintf( '( %3$s.optin_status = \'%1$s\' AND %3$s.date_last_optin < \'%2$s\')',
+					Preferences::UNCONFIRMED,
+					Preferences::get_min_grace_period_date(),
+					$this->table_name
+				);
+			}
+
+			$where['is_not_marketable'] = implode( ' OR ', $clause );
+
+		}
+
 		return $where;
 	}
 
@@ -930,7 +986,6 @@ class Contact_Query {
 	 * @access protected
 	 * @return string SQL orderby segment.
 	 * @since  2.8
-	 *
 	 */
 	protected function construct_request_orderby() {
 		if ( in_array( $this->query_vars['orderby'], array( 'none', array(), false ), true ) ) {
@@ -1421,9 +1476,92 @@ class Contact_Query {
 			[ self::class, 'filter_user_meta' ]
 		);
 
+		self::register_filter(
+			'is_marketable',
+			[ self::class, 'filter_is_marketable' ]
+		);
 
 	}
 
+	/**
+	 * Filter based on whether the contact is marketable or not.
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return false|string
+	 */
+	public static function filter_is_marketable( $filter_vars, $query ) {
+
+		$filter_vars = wp_parse_args( $filter_vars, [
+			'value' => 'yes'
+		] );
+
+		if ( $filter_vars['value'] == 'yes' ) {
+
+			$clause = [];
+
+			// If GDPR strict is enabled check for both forms of GDPR compliance
+			if ( Plugin::instance()->preferences->is_gdpr_strict() ) {
+				$clause[] = "({$query->table_name}.marketing_consent_date != '' AND {$query->table_name}.data_processing_consent_date != '')";
+			}
+
+			// If confirmation is required check the last optin date against the grace period term
+			if ( Plugin::instance()->preferences->is_confirmation_strict() ) {
+				$clause[] = sprintf( '(( %4$s.optin_status = \'%1$s\' AND %4$s.date_last_optin >= \'%2$s\' ) OR ( %4$s.optin_status = \'%3$s\' ))',
+					Preferences::UNCONFIRMED,
+					Preferences::get_min_grace_period_date(),
+					Preferences::CONFIRMED,
+					$query->table_name
+				);
+			} // Otherwise all unconfirmed and confirmed are marketable
+			else {
+				$clause[] = sprintf( "{$query->table_name}.optin_status IN (%s)", implode_in_quotes( [
+					Preferences::UNCONFIRMED,
+					Preferences::CONFIRMED
+				] ) );
+			}
+
+			return implode( ' AND ', $clause );
+
+		} else if ( $filter_vars['value'] == 'no' ) {
+
+			$clause = [];
+
+			// Any statuses that are not confirmed or unconfirmed...
+			$clause[] = sprintf( "{$query->table_name}.optin_status NOT IN (%s)", implode_in_quotes( [
+				Preferences::UNCONFIRMED,
+				Preferences::CONFIRMED
+			] ) );
+
+			// If GDPR strict is enabled check for both forms of GDPR compliance
+			if ( Plugin::instance()->preferences->is_gdpr_strict() ) {
+				$clause[] = "({$query->table_name}.marketing_consent_date = '' OR {$query->table_name}.data_processing_consent_date = '')";
+			}
+
+			// If confirmation is required check the last optin date against the grace period term
+			if ( Plugin::instance()->preferences->is_confirmation_strict() ) {
+				$clause[] = sprintf( '( %3$s.optin_status = \'%1$s\' AND %3$s.date_last_optin < \'%2$s\')',
+					Preferences::UNCONFIRMED,
+					Preferences::get_min_grace_period_date(),
+					$query->table_name
+				);
+			}
+
+			return implode( ' OR ', $clause );
+		}
+
+		return false;
+	}
+
+	/**
+	 * Filter based on user meta data
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
 	public static function filter_user_meta( $filter_vars, $query ) {
 
 		$filter_vars = wp_parse_args( $filter_vars, [
@@ -1696,16 +1834,14 @@ class Contact_Query {
 			'value'   => []
 		] );
 
-		$optin_statuses = array_filter( $filter_vars['value'], function ( $status ) {
-			return Preferences::is_valid( $status );
-		} );
+		$optin_statuses = Preferences::sanitize( $filter_vars['value'] );
 
 		switch ( $filter_vars['compare'] ) {
 			default:
 			case 'in':
-				return sprintf( "{$query->table_name}.optin_status IN ( %s )", implode( ',', $optin_statuses ) );
+				return sprintf( "{$query->table_name}.optin_status IN ( %s )", implode_in_quotes( $optin_statuses ) );
 			case 'not_in':
-				return sprintf( "{$query->table_name}.optin_status NOT IN ( %s )", implode( ',', $optin_statuses ) );
+				return sprintf( "{$query->table_name}.optin_status NOT IN ( %s )", implode_in_quotes( $optin_statuses ) );
 		}
 
 	}
@@ -2241,8 +2377,9 @@ class Contact_Query {
 	/**
 	 * Generic filter for text comparison
 	 *
-	 * @param $filter_vars array
-	 * @param $column_key  string
+	 * @param $column  string
+	 * @param $compare string
+	 * @param $value   mixed
 	 *
 	 * @return string
 	 */
@@ -2250,7 +2387,7 @@ class Contact_Query {
 
 		global $wpdb;
 
-		$value = sanitize_text_field( $value );
+		$value = esc_sql( sanitize_text_field( $value ) );
 
 		switch ( $compare ) {
 			default:
@@ -2317,21 +2454,11 @@ class Contact_Query {
 	 * Handle the first name filter args
 	 *
 	 * @param $filter_vars array
+	 * @param $query
 	 *
 	 * @return string
 	 */
 	public static function contact_generic_text_filter_compare( array $filter_vars, $query ): string {
 		return self::generic_text_compare( $query->table_name . '.' . $filter_vars['type'], $filter_vars['compare'], $filter_vars['value'] );
-	}
-
-	/**
-	 * Handle the first name filter args
-	 *
-	 * @param $filter_vars array
-	 *
-	 * @return string
-	 */
-	public static function contact_generic_number_filter_compare( array $filter_vars ): string {
-		return self::generic_number_filter_compare( $filter_vars, $filter_vars['type'] );
 	}
 }

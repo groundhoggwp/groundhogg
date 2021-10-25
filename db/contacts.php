@@ -5,6 +5,7 @@ namespace Groundhogg\DB;
 // Exit if accessed directly
 use Groundhogg\Preferences;
 use function Groundhogg\get_primary_owner;
+use function Groundhogg\is_mobile_phone_unique;
 use function Groundhogg\isset_not_empty;
 use Groundhogg\Contact_Query;
 
@@ -107,8 +108,9 @@ class Contacts extends DB {
 			'primary_phone_extension'      => '%s',
 			'mobile_phone'                 => '%s',
 			'ip_address'                   => '%s',
-			'optin_status'                 => '%d',
+			'optin_status'                 => '%s',
 			'date_created'                 => '%s',
+			'date_last_optin'              => '%s',
 			'date_optin_status_changed'    => '%s',
 			'data_processing_consent_date' => '%s',
 			'marketing_consent_date'       => '%s',
@@ -136,6 +138,7 @@ class Contacts extends DB {
 			'ip_address'                   => '',
 			'optin_status'                 => Preferences::UNCONFIRMED,
 			'date_created'                 => current_time( 'mysql' ),
+			'date_last_optin'              => current_time( 'mysql' ),
 			'date_optin_status_changed'    => current_time( 'mysql' ),
 			'terms_agreement_date'         => '',
 			'data_processing_consent_date' => '',
@@ -177,10 +180,8 @@ class Contacts extends DB {
 
 			$result = $contact_id;
 
-		}
-		// If a contact with the same mobile phone number already exists.
-		// TODO Mobile phone number is not guaranteed unique and can be recycled... so there should be an option or filter for this...
-		else if ( isset_not_empty( $args, 'mobile_phone' ) && $this->exists( $args['mobile_phone'], 'mobile_phone' ) ) {
+		} // If a contact with the same mobile phone number already exists.
+		else if ( is_mobile_phone_unique() && isset_not_empty( $args, 'mobile_phone' ) && $this->exists( $args['mobile_phone'], 'mobile_phone' ) ) {
 
 			// update an existing contact
 			$contact = $this->get_contact_by( 'mobile_phone', $args['mobile_phone'] );
@@ -217,10 +218,8 @@ class Contacts extends DB {
 				// unset instead of return false;
 				unset( $data['email'] );
 			}
-		}
-		// Check for duplicate mobile phone number
-		// TODO Mobile phone number is not guaranteed unique and can be recycled... so there should be an option or filter for this...
-		else if ( isset_not_empty( $data, 'mobile_phone' ) && $this->exists( $data['mobile_phone'], 'mobile_phone' ) ) {
+		} // Check for duplicate mobile phone number
+		else if ( is_mobile_phone_unique() && isset_not_empty( $data, 'mobile_phone' ) && $this->exists( $data['mobile_phone'], 'mobile_phone' ) ) {
 			$a_row_id = absint( $this->get_contact_by( 'mobile_phone', $data['mobile_phone'] )->ID );
 			if ( $a_row_id !== $row_id ) {
 				// unset instead of return false;
@@ -438,13 +437,14 @@ class Contacts extends DB {
 		last_name mediumtext NOT NULL,
 		user_id bigint(20) unsigned NOT NULL,
 		owner_id bigint(20) unsigned NOT NULL,
-		optin_status int unsigned NOT NULL,
+		optin_status varchar(20) NOT NULL,
 		primary_phone varchar(15) NOT NULL,
 		primary_phone_extension varchar(15) NOT NULL,
 		mobile_phone varchar(15) NOT NULL,
 		ip_address varchar(15) NOT NULL,
 		date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-		date_optin_status_changed datetime DEFAULT '0000-00-00 00:00:00' NOxT NULL,
+		date_optin_status_changed datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+		date_last_optin datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		data_processing_consent_date datetime NOT NULL,
 		marketing_consent_date datetime NOT NULL,
 		terms_agreement_date datetime NOT NULL,
@@ -459,12 +459,32 @@ class Contacts extends DB {
 		KEY marketing_consent_date (marketing_consent_date),
 		KEY terms_agreement_date (terms_agreement_date),
 		KEY date_created (date_created),
+		KEY date_last_optin (date_last_optin),
 		KEY date_optin_status_changed (date_optin_status_changed)
 		) {$this->get_charset_collate()};";
 
 		dbDelta( $sql );
 
 		update_option( $this->table_name . '_db_version', $this->version );
+	}
+
+	/**
+	 * Refactor the optin statuses to stings and not ints.
+	 */
+	public function version_3_0_refactor_optin_status() {
+
+		global $wpdb;
+
+		$wpdb->query( "ALTER TABLE $this->table_name MODIFY COLUMN optin_status varchar(20) NOT NULL;" );
+
+		$this->update( [ 'optin_status' => 1 ], [ 'optin_status' => Preferences::UNCONFIRMED ] );
+		$this->update( [ 'optin_status' => 2 ], [ 'optin_status' => Preferences::CONFIRMED ] );
+		$this->update( [ 'optin_status' => 3 ], [ 'optin_status' => Preferences::UNSUBSCRIBED ] );
+		$this->update( [ 'optin_status' => 4 ], [ 'optin_status' => Preferences::CONFIRMED ] ); // Weekly
+		$this->update( [ 'optin_status' => 5 ], [ 'optin_status' => Preferences::CONFIRMED ] ); // Monthly
+		$this->update( [ 'optin_status' => 6 ], [ 'optin_status' => Preferences::HARD_BOUNCE ] );
+		$this->update( [ 'optin_status' => 7 ], [ 'optin_status' => Preferences::SPAM ] );
+		$this->update( [ 'optin_status' => 8 ], [ 'optin_status' => Preferences::COMPLAINED ] );
 	}
 
 	/**
@@ -488,6 +508,8 @@ class Contacts extends DB {
 					$cols[ $key ] = strtolower( sanitize_email( $val ) );
 					break;
 				case 'optin_status':
+					$cols[ $key ] = Preferences::sanitize( $val );
+					break;
 				case 'owner_id':
 				case 'user_id':
 					$cols[ $key ] = absint( $val );

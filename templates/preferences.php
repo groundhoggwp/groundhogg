@@ -396,12 +396,6 @@ switch ( $action ):
 				case 'confirm':
 					$redirect = managed_page_url( 'preferences/confirm/' );
 					break;
-				case 'weekly':
-					$contact->change_marketing_preference( Preferences::WEEKLY );
-					break;
-				case 'monthly':
-					$contact->change_marketing_preference( Preferences::MONTHLY );
-					break;
 				case 'gdpr_delete':
 
 					$contact->unsubscribe();
@@ -426,8 +420,8 @@ switch ( $action ):
 
 		$preferences = [
 			'confirm'     => _x( 'I love this company, you can communicate with me whenever you feel like.', 'preferences', 'groundhogg' ),
-			'weekly'      => _x( "It's getting a bit much. Communicate with me weekly.", 'preferences', 'groundhogg' ),
-			'monthly'     => _x( 'Distance makes the heart grow fonder. Communicate with me monthly.', 'preferences', 'groundhogg' ),
+//			'weekly'      => _x( "It's getting a bit much. Communicate with me weekly.", 'preferences', 'groundhogg' ),
+//			'monthly'     => _x( 'Distance makes the heart grow fonder. Communicate with me monthly.', 'preferences', 'groundhogg' ),
 			'unsubscribe' => _x( 'I no longer wish to receive any form of communication. Unsubscribe me!', 'preferences', 'groundhogg' )
 		];
 

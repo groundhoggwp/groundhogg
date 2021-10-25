@@ -1092,30 +1092,6 @@ class Settings_Page extends Admin_Page {
 					'class' => 'gh-single-tag-picker'
 				),
 			],
-			'gh_monthly_tag'                         => [
-				'id'      => 'gh_monthly_tag',
-				'section' => 'optin_status_tags',
-				'label'   => _x( 'Subscribed Monthly Tag', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'All contacts which have requested monthly emails will have this tag.', 'settings', 'groundhogg' ),
-				'type'    => 'tag_picker',
-				'atts'    => array(
-					'name'  => 'gh_monthly_tag',
-					'id'    => 'gh_monthly_tag',
-					'class' => 'gh-single-tag-picker'
-				),
-			],
-			'gh_weekly_tag'                          => [
-				'id'      => 'gh_weekly_tag',
-				'section' => 'optin_status_tags',
-				'label'   => _x( 'Subscribed Weekly Tag', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'All contacts which have requested weekly emails will have this tag.', 'settings', 'groundhogg' ),
-				'type'    => 'tag_picker',
-				'atts'    => array(
-					'name'  => 'gh_weekly_tag',
-					'id'    => 'gh_weekly_tag',
-					'class' => 'gh-single-tag-picker'
-				),
-			],
 			'gh_marketable_tag'                      => [
 				'id'      => 'gh_marketable_tag',
 				'section' => 'optin_status_tags',

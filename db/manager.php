@@ -56,6 +56,7 @@ class Manager {
 		$this->broadcastmeta        = new Broadcast_Meta();
 		$this->contactmeta          = new Contact_Meta();
 		$this->contacts             = new Contacts();
+		$this->contact_methods      = new Contact_Methods();
 		$this->emailmeta            = new Email_Meta();
 		$this->emails               = new Emails();
 		$this->events               = new Events();

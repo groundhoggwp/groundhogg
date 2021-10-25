@@ -127,7 +127,7 @@
 
       let item
 
-      if (this.item[this.primaryKey] === id) {
+      if (this.item && this.item[this.primaryKey] === id) {
         item = this.item
       } else {
         item = this.items.find(item => item && item[this.primaryKey] === id)
@@ -171,6 +171,8 @@
       if (!Array.isArray(items)) {
         return
       }
+
+      console.log(items)
 
       this.items = [
         ...items, // new items

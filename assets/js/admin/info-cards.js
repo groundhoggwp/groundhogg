@@ -1,125 +1,145 @@
 (function ($) {
 
-  function init () {
-    $('.info-cards-wrap .meta-box-sortables').sortable({
-      placeholder: 'sortable-placeholder',
-      // connectWith: '.ui-sortable',
-      handle: '.hndle',
-      // axis: 'y',
-      start: function (e, ui) {
-        ui.helper.css('left',
-          (ui.item.parent().width() - ui.item.width()) / 2)
-        ui.placeholder.height(ui.item.height())
-        ui.placeholder.width(ui.item.width())
-      },
-      stop: saveInfoCardOrder
-    })
+  const { uuid, loadingDots } = Groundhogg.element
 
-    $(document).on('click', '.info-cards-wrap button.handlediv', function (e) {
-      $(this).closest('.info-card').toggleClass('closed')
-      saveInfoCardOrder()
-    })
+  const InfoCard = (id = uuid(), {
+    title = () => {},
+    content = () => {},
+    onMount = () => {},
+    preload = () => {},
+    isOpen = true,
+    priority = 10
+  }) => ({
+    id,
+    title,
+    content,
+    onMount,
+    isOpen,
+    priority,
+    preload,
 
-    $(document).on('click', '.info-cards-wrap button.handle-order-higher', function (e) {
-      $(this).closest('.info-card').insertBefore($(this).closest('.info-card').prev())
-      saveInfoCardOrder()
-    })
+    render (item) {
 
-    $(document).on('click', '.info-cards-wrap button.handle-order-lower', function (e) {
-      $(this).closest('.info-card').insertAfter($(this).closest('.info-card').next())
-      saveInfoCardOrder()
-    })
+      const {
+        id,
+        title,
+        content,
+        isOpen
+      } = this
 
-    $(document).on('click', '.expand-all', function (e) {
-      $('.info-card').removeClass('closed')
-      saveInfoCardOrder()
-    })
+      //language=HTML
+      return `
+		  <div id="${id}" class="gh-info-card ${isOpen ? 'open' : 'closed'}">
+			  <div class="gh-info-card-header">
+				  <button class="gh-info-card-toggle"></button>
+				  <div class="gh-info-card-title">
+					  ${title(item)}
+				  </div>
+			  </div>
+			  <div class="gh-info-card-content">
+				  ${content(item)}
+			  </div>
+		  </div>`
 
-    $(document).on('click', '.collapse-all', function (e) {
-      $('.info-card').addClass('closed')
-      saveInfoCardOrder()
-    })
+    },
+    mount ($el, item) {
 
-    $(document).on('click', '.view-cards', function (e) {
-      $('.info-card-views').toggleClass('hidden')
-    })
-
-    $(document).on('change', '.hide-card', function (e) {
-      var $checkbox = $(this)
-      if ($checkbox.is(':checked')) {
-        $('.info-card#' + $checkbox.val()).removeClass('hidden')
+      if ($el.find(`#${this.id}`).length) {
+        $el.find(`#${this.id}`).replaceWith(this.render(item))
       } else {
-        $('.info-card#' + $checkbox.val()).addClass('hidden')
+        $el.append(this.render(item))
       }
 
-      saveInfoCardOrder()
-    })
-  }
-
-  /**
-   * Add a new note
-   */
-  function saveInfoCardOrder () {
-
-    var $cards = $('.info-cards-wrap .info-card')
-    var cardOrder = []
-    $cards.each(function (i, card) {
-      cardOrder.push({
-        id: card.id,
-        open: !$(card).hasClass('closed'),
-        hidden: $(card).hasClass('hidden'),
-      })
-    })
-
-    adminAjaxRequest(
-      {
-        action: 'groundhogg_save_card_order',
-        cardOrder: cardOrder
-      }
-    )
-  }
-
-  $(document).on('click', '.ic-section-header', function () {
-    $(this).closest('.ic-section').toggleClass('open')
-  })
-
-  $(document).on('tinymce-editor-setup', function (event, editor) {
-    editor.settings.toolbar1 = 'bold,italic,underline,blockquote,strikethrough,bullist,numlist,alignleft,aligncenter,alignright,undo,redo,link' //Teeny -fullscreen
-    editor.settings.height = 200
-    editor.on('click', function (ed, e) {
-      $(document).trigger('to_mce')
-    })
-  })
-
-  function renderEmailEditor () {
-
-    setTimeout(function () {
-
-      wp.editor.initialize(
-        'email_content',
-        {
-          tinymce: true,
-          // quicktags: true
+      $(`#${this.id} .gh-info-card-header`).on('click', (e) => {
+        if ($(`#${this.id}`).is('.closed')) {
+          this.open($el, item)
+        } else {
+          this.close($el, item)
         }
-      )
-    }, 50)
-  }
+      })
 
-  function destroyEmailEditor () {
-    wp.editor.remove(
-      'email_content'
-    )
-  }
+      this.onMount()
+    },
 
-  $(function () {
-    renderEmailEditor()
+    open (...args) {
+      this.isOpen = true
 
-    $(document).on('GroundhoggModalContentPulled', destroyEmailEditor)
-    $(document).on('GroundhoggModalContentPulled', renderEmailEditor)
-    $(document).on('GroundhoggModalContentPushed', destroyEmailEditor)
-    $(document).on('GroundhoggModalContentPushed', renderEmailEditor)
+      this.mount(...args)
+    },
 
-    init()
+    close (...args) {
+      this.isOpen = false
+
+      this.mount(...args)
+    }
   })
+
+  const InfoCardProvider = ({
+    cards = []
+  }) => ({
+
+    cards,
+
+    preload (item) {
+      const promises = []
+
+      this.cards.forEach(card => {
+
+        let p = card.preload(item)
+
+        if (!p) {
+          return
+        }
+
+        // multiple promises
+        if (Array.isArray(p) && p.length > 0) {
+          promises.push(...p)
+
+        }
+        // Just the one promise
+        else {
+          promises.push(p)
+        }
+      })
+
+      return Promise.all(promises)
+    },
+
+    async mount (el, item) {
+
+      await this.preload(item)
+
+      const $el = $(el)
+
+      $el.addClass('gh-info-card-provider')
+      $el.html('')
+
+      this.cards.sort((a, b) => a.priority - b.priority).forEach(card => card.mount($el, item))
+
+      console.log(this.cards)
+
+      $el.sortable({
+        placeholder: 'gh-info-card-provider',
+        start: (e, ui) => {
+          ui.placeholder.height(ui.item.height())
+          ui.placeholder.width(ui.item.width())
+        },
+        update: (e, ui) => {
+
+        },
+      }).disableSelection()
+    },
+
+    registerCard (card) {
+      this.cards.push(card)
+    },
+
+  })
+
+  Groundhogg.utils = {
+    ...Groundhogg.utils,
+    InfoCard,
+    InfoCardProvider,
+  }
 
 })(jQuery)

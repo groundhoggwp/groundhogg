@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin\Contacts;
 
+use Groundhogg\Preferences;
 use Groundhogg\Saved_Searches;
 use function Groundhogg\action_input;
 use function Groundhogg\get_db;
@@ -122,17 +123,17 @@ $saved_search = $search_id ? Saved_Searches::instance()->get( $search_id ) : fal
 				'id'       => 'optin_status_advanced',
 				'class'    => 'gh-select2',
 				'options'  => [
-					1 => __( 'Unconfirmed', 'groundhogg' ),
-					2 => __( 'Confirmed', 'groundhogg' ),
-					3 => __( 'Unsubscribed', 'groundhogg' ),
-					4 => __( 'Weekly', 'groundhogg' ),
-					5 => __( 'Monthly', 'groundhogg' ),
-					6 => __( 'Bounced', 'groundhogg' ),
-					7 => __( 'Spam', 'groundhogg' ),
-					8 => __( 'Complained', 'groundhogg' ),
+					Preferences::UNCONFIRMED  => __( 'Unconfirmed', 'groundhogg' ),
+					Preferences::CONFIRMED    => __( 'Confirmed', 'groundhogg' ),
+					Preferences::UNSUBSCRIBED => __( 'Unsubscribed', 'groundhogg' ),
+//					4 => __( 'Weekly', 'groundhogg' ),
+//					5 => __( 'Monthly', 'groundhogg' ),
+					Preferences::HARD_BOUNCE  => __( 'Bounced', 'groundhogg' ),
+					Preferences::SPAM         => __( 'Spam', 'groundhogg' ),
+					Preferences::COMPLAINED   => __( 'Complained', 'groundhogg' ),
 				],
 				'multiple' => true,
-				'selected' => wp_parse_id_list( get_url_var( 'optin_status' ) ),
+				'selected' => Preferences::sanitize( get_url_var( 'optin_status' ) ),
 			] ), 'p' );
 
 			?>

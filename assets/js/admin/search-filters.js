@@ -806,6 +806,40 @@
     }
   })
 
+
+  registerFilter('is_marketable', 'contact', __('Marketability', 'groundhogg'), {
+    view ({ value }) {
+      return value === 'yes' ? __( 'Is marketable', 'groundhogg' ) : __( 'Is not marketable' )
+    },
+    edit ({ value }) {
+
+      // language=html
+      return `
+		  ${select({
+          id: 'filter-value',
+          name: 'value',
+        },
+        [
+	        { value: 'yes', text: 'Is marketable' },
+	        { value: 'no', text: 'Is not marketable' },
+        ],
+        value
+      )} `
+    },
+    onMount (filter, updateFilter) {
+      $('#filter-value').on('change', function (e) {
+        const $el = $(this)
+        // console.log($el.val())
+        updateFilter({
+          [$el.prop('name')]: $el.val()
+        })
+      })
+    },
+    defaults: {
+      value: 'yes'
+    }
+  })
+
   const userDisplay = (user) => {
     return `${user.data.user_login} (${user.data.user_email})`
   }

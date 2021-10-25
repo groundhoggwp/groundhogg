@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Groundhogg\Admin\Contacts\Tables\Contacts_Table;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
+use Groundhogg\Preferences;
 use function Groundhogg\array_map_keys;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
@@ -565,13 +566,21 @@ class Contacts_Api extends Base_Object_Api {
 			return self::ERROR_CONTACT_NOT_FOUND();
 		}
 
-		$others = $request->get_json_params();
+		$others = $request->get_params();
+
+		if ( empty( $others ) ){
+			return self::ERROR_401( 'missing', 'No additional contacts were provided to merge.' );
+		}
+
+		if ( ! is_array( $others ) ){
+			$others = [ $others ];
+		}
 
 		foreach ( $others as $other ) {
 			$contact->merge( $other );
 		}
 
-		return $contact;
+		return self::SUCCESS_RESPONSE( [ 'item' => $contact ] );
 	}
 
 	/**

@@ -138,7 +138,7 @@ class Tag_Mapping extends Bulk_Job {
 	public function apply_tags_to_contact_from_changed_roles( $user_id, $role, $old_roles ) {
 
 		// Exit if installing because the tables would not have yet been installed...
-		if ( wp_installing() ){
+		if ( wp_installing() ) {
 			return;
 		}
 
@@ -264,14 +264,6 @@ class Tag_Mapping extends Bulk_Job {
 				'tag_name'        => 'Complained',
 				'tag_description' => 'This tag is applied to anyone whose optin status is complained.',
 			],
-			'gh_monthly_tag'        => [
-				'tag_name'        => 'Subscribed (Monthly)',
-				'tag_description' => 'This tag is applied to anyone whose receives emails monthly.',
-			],
-			'gh_weekly_tag'         => [
-				'tag_name'        => 'Subscribed (Weekly)',
-				'tag_description' => 'This tag is applied to anyone who receives emails weekly.',
-			],
 			'gh_marketable_tag'     => [
 				'tag_name'        => 'Marketable',
 				'tag_description' => 'This tag is applied to anyone whose optin status is marketable.',
@@ -315,8 +307,6 @@ class Tag_Mapping extends Bulk_Job {
 				Preferences::SPAM         => get_option( 'gh_spammed_tag', false ),
 				Preferences::HARD_BOUNCE  => get_option( 'gh_bounced_tag', false ),
 				Preferences::COMPLAINED   => get_option( 'gh_complained_tag', false ),
-				Preferences::WEEKLY       => get_option( 'gh_weekly_tag', false ),
-				Preferences::MONTHLY      => get_option( 'gh_monthly_tag', false ),
 				self::MARKETABLE          => get_option( 'gh_marketable_tag', false ),
 				self::NON_MARKETABLE      => get_option( 'gh_non_marketable_tag', false ),
 			];
@@ -460,12 +450,7 @@ class Tag_Mapping extends Bulk_Job {
 			// Check for unmarketable error code.
 			$event->get_last_error()->get_error_code() === 'non_marketable'
 			// Check if contact currently has marketable tag
-			&& $event->get_contact()->has_tag( $marketable_tag )
-			// Ignore monthly or weekly preferences
-			&& ! in_array( $event->get_contact()->get_optin_status(), [
-				Preferences::WEEKLY,
-				Preferences::MONTHLY
-			] ) ) {
+			&& $event->get_contact()->has_tag( $marketable_tag ) ) {
 			$event->get_contact()->remove_tag( $marketable_tag );
 			$event->get_contact()->apply_tag( $non_marketable_tag );
 		}

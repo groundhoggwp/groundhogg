@@ -218,6 +218,25 @@ button {
       }
     }
 
+    &.tertiary {
+      background: $primary-dark;
+
+      &.text {
+        background-color: transparent;
+        color: $primary-dark;
+      }
+
+      &:hover:not(:disabled) {
+        background: lighten($primary-dark, 10);
+
+        &.text {
+          background-color: $primary-dark-10;
+          color: $primary-dark;
+        }
+      }
+    }
+
+
     &.secondary {
       border: 1px solid $primary-blue-60;
       background: #FFFFFF;

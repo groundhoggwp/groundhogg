@@ -586,7 +586,7 @@
               break
             case 'delete':
 
-              let number = 100
+              let number = 500
               let deleted = 0
 
               const deleteContacts = (onDelete, onComplete) => {

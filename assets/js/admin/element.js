@@ -969,7 +969,7 @@
     groups = {},
     filterOption = (option, search) => option.match(regexp(search)),
     renderOption = (option) => option,
-    noOptions = __( 'No options...', 'groundhogg' ),
+    noOptions = __('No options...', 'groundhogg'),
     onSelect = (option) => console.log(option),
     onClose = () => {},
     onOpen = () => {}
@@ -1650,6 +1650,28 @@
 
   }
 
+  const infoCard = ({
+    id = '',
+    title = '',
+    content = `<p>${__('No content provided.', 'groundhogg')}</p>`,
+    isOpen = true
+  }) => {
+
+    //language=HTML
+    return `
+		<div id="${id}" class="gh-info-card ${isOpen ? 'open' : 'closed'}">
+			<div class="gh-info-card-header">
+				<button class="gh-info-card-toggle"></button>
+				<div class="gh-info-card-title">
+					${title}
+				</div>
+			</div>
+			<div class="gh-info-card-content">
+				${content}
+			</div>
+		</div>`
+  }
+
   const bold = (text) => {
     return `<b>${text}</b>`
   }
@@ -1701,7 +1723,8 @@
     tooltip,
     clickedIn,
     ordinal_suffix_of,
-    bold
+    bold,
+    infoCard
   }
 
 })(jQuery)

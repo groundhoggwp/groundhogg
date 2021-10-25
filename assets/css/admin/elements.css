@@ -162,6 +162,24 @@ button.gh-button.primary:hover:not(:disabled).text {
   background-color: rgba(0, 117, 255, 0.1);
   color: #0075ff;
 }
+a.gh-button.tertiary,
+button.gh-button.tertiary {
+  background: #102640;
+}
+a.gh-button.tertiary.text,
+button.gh-button.tertiary.text {
+  background-color: transparent;
+  color: #102640;
+}
+a.gh-button.tertiary:hover:not(:disabled),
+button.gh-button.tertiary:hover:not(:disabled) {
+  background: #1a3e69;
+}
+a.gh-button.tertiary:hover:not(:disabled).text,
+button.gh-button.tertiary:hover:not(:disabled).text {
+  background-color: rgba(16, 38, 64, 0.1);
+  color: #102640;
+}
 a.gh-button.secondary,
 button.gh-button.secondary {
   border: 1px solid rgba(0, 117, 255, 0.6);
