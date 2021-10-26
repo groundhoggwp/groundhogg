@@ -675,6 +675,13 @@ p.error,
   border-right-width: 0;
   border-radius: 0;
 }
+.gh-input-repeater .gh-input-repeater-row span.handle {
+  border-bottom: 1px solid #8c8f94;
+  border-radius: 0;
+  padding: 6px;
+  border-top-width: 0;
+  background-color: #FFFFFF;
+}
 .gh-input-repeater .gh-input-repeater-row button {
   border: 1px solid #8c8f94;
   border-radius: 0;
@@ -683,6 +690,9 @@ p.error,
 }
 .gh-input-repeater .gh-input-repeater-row:first-child > input:first-child {
   border-top-left-radius: 4px;
+}
+.gh-input-repeater .gh-input-repeater-row:first-child span.handle {
+  border-top: 1px solid #8c8f94;
 }
 .gh-input-repeater .gh-input-repeater-row:first-child button {
   border-top-width: 1px;

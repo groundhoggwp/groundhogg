@@ -1391,6 +1391,7 @@
     selector = '',
     rows = [],
     cellProps = [],
+    sortable = false,
     cellCallbacks = [],
     onMount = () => {},
     onChange = (rows) => {
@@ -1428,6 +1429,25 @@
         onChange(this.rows)
       })
 
+      if (sortable) {
+        $(`${selector} .gh-input-repeater`).sortable({
+          handle: '.handle',
+          update: (e, ui) => {
+
+            let $row = $(ui.item)
+            let oldIndex = parseInt( $row.data('row') )
+            let curIndex = $row.index()
+
+            let row = this.rows[oldIndex]
+
+            this.rows.splice( oldIndex, 1 )
+            this.rows.splice( curIndex, 0, row )
+
+            this.mount()
+          }
+        })
+      }
+
       onMount()
     },
 
@@ -1436,13 +1456,15 @@
       const renderRow = (row, rowIndex) => {
         //language=HTML
         return `
-			<div class="gh-input-repeater-row">
+			<div class="gh-input-repeater-row" data-row="${rowIndex}">
 				${row.map((cell, cellIndex) => cellCallbacks[cellIndex]({
 					...cellProps[cellIndex],
 					value: cell,
 					dataRow: rowIndex,
 					dataCell: cellIndex,
 				})).join('')}
+				${ sortable ? `<span class="handle" data-row="${rowIndex}"><span
+					class="dashicons dashicons-move"></span></span>` : '' }
 				<button class="gh-button dashicon remove-row" data-row="${rowIndex}"><span
 					class="dashicons dashicons-no-alt"></span></button>
 			</div>`

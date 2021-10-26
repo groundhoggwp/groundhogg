@@ -853,6 +853,14 @@ p.error,
       }
     }
 
+    span.handle{
+      border-bottom: 1px solid #8c8f94;
+      border-radius: 0;
+      padding: 6px;
+      border-top-width: 0;
+      background-color: #FFFFFF;
+    }
+
     button {
       border: 1px solid #8c8f94;
       border-radius: 0;
@@ -863,6 +871,10 @@ p.error,
     &:first-child {
       > input:first-child {
         border-top-left-radius: 4px;
+      }
+
+      span.handle{
+        border-top: 1px solid #8c8f94;
       }
 
       button {
