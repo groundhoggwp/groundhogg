@@ -96,6 +96,11 @@ h3 {
 }
 
 #search-results {
+
+  width: 440px;
+  height: 500px;
+  overflow-y: auto;
+
   img {
     width: 25px;
     border-radius: 4px;
@@ -111,8 +116,20 @@ h3 {
     padding: 8px;
   }
 
+  th:first-child, td:first-child {
+    padding-left: 20px;
+  }
+
   tr:nth-child(even) {
     background-color: $primary-dark-5;
+  }
+
+  tr {
+    cursor: pointer;
+
+    &:hover{
+      background-color: $primary-blue-2;
+    }
   }
 }
 
@@ -719,6 +736,14 @@ button {
 
       p:first-child {
         margin-top: 0;
+      }
+    }
+
+    #search-form{
+      padding: 30px 20px;
+
+      input{
+        width: 100%;
       }
     }
   }
