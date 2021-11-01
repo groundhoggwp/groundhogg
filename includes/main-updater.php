@@ -623,7 +623,7 @@ class Main_Updater extends Updater {
 			'2.5.1.3'       => __( 'Use TINYINT(1) instead of BIT(1)', 'groundhogg' ),
 			'2.5.3'         => __( 'Update the gh-cron.php file to support subsites on multisite networks.', 'groundhogg' ),
 			'2.5.4'         => __( 'Improve the page tracking flow and track page visits for contacts.', 'groundhogg' ),
-			'2.5.5'         => __( 'Add new caps for notes', 'groundhogg' ),
+			'2.5.5'         => __( 'Add new caps and permissions for notes and sales representatives.', 'groundhogg' ),
 		];
 	}
 }

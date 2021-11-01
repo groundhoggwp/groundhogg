@@ -680,20 +680,30 @@
     this.flag = 'improved'
   }
 
-  const loadingModal = (text = 'Loading') => {
+  /**
+   *
+   * @param text
+   * @param props
+   * @return {{setContent: setContent, $modal: (*|jQuery|HTMLElement), close: close}}
+   */
+  const loadingModal = (text = 'Loading', props = {} ) => {
 
     let stop = () => {}
+    const { onOpen = () => {}, onClose = () => {}} = props
 
     return modal({
       content: `<h1>${text}</h1>`,
       canClose: false,
       dialogClasses: 'gh-modal-loading',
-      onOpen: () => {
+      ...props,
+      onOpen: (args) => {
         stop = loadingDots('.gh-modal h1').stop
+        onOpen(args)
       },
-      onClose: () => {
+      onClose: (args) => {
         stop()
-      }
+        onClose(args)
+      },
     })
   }
 

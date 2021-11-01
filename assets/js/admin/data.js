@@ -213,6 +213,10 @@
       return this.post(...args)
     },
 
+    async createMany (...args) {
+      return this.postMany(...args)
+    },
+
     async post (data, opts = {}) {
       return apiPost(this.route, data, opts)
         .then(r => this.getItemFromResponse(r))
