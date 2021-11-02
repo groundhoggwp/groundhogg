@@ -526,6 +526,17 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Alias for plural of tags...
+	 *
+	 * @param $maybe_tags
+	 *
+	 * @return bool
+	 */
+	public function has_tags( $maybe_tags ){
+		return $this->has_tag( $maybe_tags );
+	}
+
+	/**
 	 * return whether the contact has a specific tag
 	 *
 	 * @param mixed $tag_id_or_name the ID or name or the tag or an array of tags
