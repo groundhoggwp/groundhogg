@@ -8,6 +8,13 @@
 }
 
 #funnel-editor {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 32px;
+  right: 0;
+  left: 160px;
+  bottom: 0;
   /* Control panel */
   /* context menu */
 }
@@ -27,8 +34,6 @@
   min-height: 50px;
   display: flex;
   align-items: center;
-  position: sticky;
-  top: 32px;
   z-index: 999;
 }
 #funnel-editor .editor-header .header-stuff {
@@ -75,6 +80,7 @@
   display: flex;
   flex-grow: 1;
   min-height: 400px;
+  height: 100%;
 }
 #funnel-editor .step-flow {
   display: flex;
@@ -107,6 +113,7 @@
   justify-content: flex-start;
   align-items: center;
   align-content: center;
+  overflow: auto;
 }
 #funnel-editor .step-flow .steps .action {
   margin: 0 15px;
@@ -116,12 +123,12 @@
 }
 #funnel-editor .step-flow .add-new-step-wrapper {
   background: #F6F9FB;
+  position: absolute;
   bottom: 0;
+  right: 0;
+  left: 0;
   margin-top: auto;
   padding: 10px 0;
-  position: -webkit-sticky;
-  /* Safari */
-  position: sticky;
   text-align: center;
   z-index: 100;
 }
@@ -227,6 +234,7 @@
   box-sizing: border-box;
   border-radius: 5px;
   padding: 10px;
+  flex-shrink: 0;
   min-height: 52px;
   cursor: pointer;
 }
@@ -488,13 +496,6 @@
 #funnel-editor .add-step p {
   text-align: center;
 }
-#funnel-editor #control-panel .step-add,
-#funnel-editor #control-panel .step-edit {
-  position: sticky;
-  top: 100px;
-  height: calc(100vh - 100px);
-  overflow: auto;
-}
 #funnel-editor #control-panel .panel {
   background: #FFFFFF;
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
@@ -512,6 +513,9 @@
 }
 #funnel-editor #control-panel .row:not(:last-child) {
   margin-bottom: 20px;
+}
+#funnel-editor #control-panel .needs-overflow {
+  overflow: auto;
 }
 #funnel-editor #control-panel .row.with-columns {
   gap: 20px;

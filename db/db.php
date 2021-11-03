@@ -128,9 +128,6 @@ abstract class DB {
 		return $this->table_name;
 	}
 
-	protected function add_additional_actions() {
-	}
-
 	/**
 	 * Check if the site is global multisite enabled
 	 *

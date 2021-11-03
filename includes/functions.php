@@ -5844,19 +5844,6 @@ function implode_in_quotes( $items ) {
 }
 
 /**
- * Ipplodes a string list surrounded by quotes, useful for SQL queries.
- *
- * @param $items
- *
- * @return string
- */
-function implode_in_quotes( $items ) {
-	return implode( ',', array_map( function ( $item ) {
-		return "'$item'";
-	}, $items ) );
-}
-
-/**
  * Get the current visitors IP address
  *
  * @return string
