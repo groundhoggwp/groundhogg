@@ -470,23 +470,13 @@ class Contact extends Base_Object_With_Meta {
 	 */
 	public function add_tag( $tag_id_or_array ) {
 
-		if ( ! is_array( $tag_id_or_array ) ) {
-			$tags = wp_parse_id_list( $tag_id_or_array );
-		} else if ( is_array( $tag_id_or_array ) ) {
-			$tags = $tag_id_or_array;
-		} else if ( is_a( $tag_id_or_array, Tag::class ) ) {
-			$tags = [ $tag_id_or_array->get_id() ];
-		} else {
-			return false;
-		}
+		$tags = parse_tag_list( $tag_id_or_array );
 
-		$tags = apply_filters( 'groundhogg/contacts/add_tag/before', $this->get_tags_db()->validate( $tags ) );
+		$tags = apply_filters( 'groundhogg/contacts/add_tag/before', $tags );
 
 		$tags_applied = [];
 
-		foreach ( $tags as $tag ) {
-
-			$tag_id = is_a( $tag, Tag::class ) ? $tag->get_id() : $tag;
+		foreach ( $tags as $tag_id ) {
 
 			if ( ! $this->has_tag( $tag_id ) ) {
 
@@ -503,7 +493,7 @@ class Contact extends Base_Object_With_Meta {
 					 * When a tag relationship is created
 					 *
 					 * @param $contact Contact
-					 * @param $tag_id int
+					 * @param $tag_id  int
 					 */
 					do_action( 'groundhogg/contact/tag_applied', $this, $tag_id );
 				}
@@ -512,7 +502,7 @@ class Contact extends Base_Object_With_Meta {
 
 		}
 
-		if ( ! empty( $tags_applied ) ){
+		if ( ! empty( $tags_applied ) ) {
 
 			/**
 			 * Similar to groundhogg/contact/tag_applied but passes all the tags as an array if multiple tags were passed
@@ -528,7 +518,7 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * Remove a single tag or several tag from the contact
+	 * Remove a single tag or several tags from the contact
 	 *
 	 * @param $tag_id_or_array array|int|Tag
 	 *
@@ -536,23 +526,13 @@ class Contact extends Base_Object_With_Meta {
 	 */
 	public function remove_tag( $tag_id_or_array ) {
 
-		if ( ! is_array( $tag_id_or_array ) ) {
-			$tags = wp_parse_id_list( $tag_id_or_array );
-		} else if ( is_array( $tag_id_or_array ) ) {
-			$tags = $tag_id_or_array;
-		} else if ( is_a( $tag_id_or_array, Tag::class ) ) {
-			$tags = [ $tag_id_or_array->get_id() ];
-		} else {
-			return false;
-		}
+		$tags = parse_tag_list( $tag_id_or_array );
 
-		$tags = apply_filters( 'groundhogg/contacts/remove_tag/before', $this->get_tags_db()->validate( $tags ) );
+		$tags = apply_filters( 'groundhogg/contacts/remove_tag/before', $tags );
 
 		$tags_removed = [];
 
-		foreach ( $tags as $tag ) {
-
-			$tag_id = is_a( $tag, Tag::class ) ? $tag->get_id() : $tag;
+		foreach ( $tags as $tag_id ) {
 
 			if ( $this->has_tag( $tag_id ) ) {
 
@@ -568,14 +548,14 @@ class Contact extends Base_Object_With_Meta {
 					 * When a tag relationship is removed
 					 *
 					 * @param $contact Contact
-					 * @param $tag_id int
+					 * @param $tag_id  int
 					 */
 					do_action( 'groundhogg/contact/tag_removed', $this, $tag_id );
 				}
 			}
 		}
 
-		if ( ! empty( $tags_removed ) ){
+		if ( ! empty( $tags_removed ) ) {
 
 			/**
 			 * Similar to groundhogg/contact/tag_removed but passes all the tags as an array if multiple tags were passed
@@ -591,30 +571,29 @@ class Contact extends Base_Object_With_Meta {
 
 
 	/**
+	 * Alias for plural of tags...
+	 *
+	 * @param $maybe_tags
+	 *
+	 * @return bool
+	 */
+	public function has_tags( $maybe_tags ){
+		return $this->has_tag( $maybe_tags );
+	}
+
+	/**
 	 * return whether the contact has a specific tag
 	 *
-	 * @param int|string|Tag $tag_id_or_name the ID or name or the tag
+	 * @param mixed $tag_id_or_name the ID or name or the tag or an array of tags
 	 *
 	 * @return bool
 	 */
 	public function has_tag( $tag_id_or_name ) {
 
-		if ( is_a( $tag_id_or_name, Tag::class ) ){
-			$tag_id = $tag_id_or_name->get_id();
-		} else if ( ! is_numeric( $tag_id_or_name ) ) {
-			$tag = $this->get_tags_db()->get_tag_by( 'tag_slug', sanitize_title( $tag_id_or_name ) );
+		$tags = parse_tag_list( $tag_id_or_name );
 
-			// Tag does not exist
-			if ( ! $tag ) {
-				return false;
-			}
-
-			$tag_id = absint( $tag->tag_id );
-		} else {
-			$tag_id = absint( $tag_id_or_name );
-		}
-
-		return in_array( $tag_id, $this->tags );
+		// If the count of the passed tags is the same as the intersection of the tags then the contact has all the tags
+		return count( array_intersect( $this->tags, $tags ) ) === count( $tags );
 	}
 
 	/**

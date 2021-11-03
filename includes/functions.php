@@ -36,7 +36,7 @@ function get_current_contact() {
 function get_contactdata( $contact_id_or_email = false, $by_user_id = false ) {
 
 	// We already have a contact
-	if ( is_a_contact( $contact_id_or_email ) ){
+	if ( is_a_contact( $contact_id_or_email ) ) {
 		return $contact_id_or_email;
 	}
 
@@ -1732,13 +1732,13 @@ function set_utm_parameters( $contact ) {
 
 	$utm = get_cookie( Tracking::UTM_COOKIE );
 
-	if ( ! $utm ){
+	if ( ! $utm ) {
 		return;
 	}
 
 	$utm = json_decode( $utm, true );
 
-	if ( empty( $utm ) ){
+	if ( empty( $utm ) ) {
 		return;
 	}
 
@@ -2136,12 +2136,14 @@ function get_mappable_fields( $extra = [] ) {
  */
 function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 
-	if ( ! is_a_contact( $contact ) && ( is_int( $contact ) || is_email( $contact ) ) ) {
-		$contact = get_contactdata( $contact );
+	$contact = get_contactdata( $contact );
+
+	if ( ! is_a_contact( $contact ) ) {
+		return false;
 	}
 
 	do_action_ref_array( 'groundhogg/update_contact_with_map/before', [
-		$contact
+		&$contact,
 		&$fields,
 		&$map
 	] );
@@ -5293,9 +5295,16 @@ function get_default_field_label( $field = '' ) {
  *
  * @param $array
  * @param $class
+ *
+ * @return mixed[]
  */
 function array_map_to_class( &$array, $class ) {
 	foreach ( $array as &$mixed ) {
+
+		if ( is_a( $mixed, $class ) ) {
+			continue;
+		}
+
 		$mixed = new $class( $mixed );
 	}
 
@@ -5888,4 +5897,97 @@ function has_accepted_cookies() {
 	$cookie_value = get_option( 'gh_consent_cookie_value' );
 
 	return apply_filters( 'groundhogg/has_accepted_cookies', get_cookie( $cookie_name ) === $cookie_value );
+}
+
+/**
+ * Calls a method of each on each item
+ *
+ * @param $array  mixed[]
+ * @param $method callable
+ *
+ * @return array|false[]
+ */
+function array_map_to_method( $array, $method ) {
+	return array_map( function ( $item ) use ( $method ) {
+
+		if ( method_exists( $item, $method ) ) {
+			return call_user_func( [ $item, $method ] );
+		}
+
+		return false;
+	}, $array );
+}
+
+/**
+ * Take a list of stuff that may or may not be tag Ids
+ * and return a list of those Ids or tag objects
+ *
+ * Things which can be passed
+ *
+ * Tag[]
+ * int[]
+ * string[]: ['16', '22', '96']
+ * string[]: ['my-tag', 'another-tag', 'third-tag']
+ * string[]: ['My Tag', 'Another Tag', 'Third Tag']
+ * Tag
+ * int
+ * string: '16,22,96,41'
+ * string: 'my-tag',
+ * string: 'My tag'
+ *
+ * @param mixed  $maybe_tags stuff that might be tags
+ * @param string $as         accepts ID | slug | name
+ *
+ * @return false|mixed[]
+ */
+function parse_tag_list( $maybe_tags, $as = 'ID' ) {
+
+	if ( is_array( $maybe_tags ) ) {
+
+		$tags = array_map( function ( $maybe_tag ) {
+
+			if ( is_a( $maybe_tag, Tag::class ) ) {
+				return $maybe_tag;
+			}
+
+			if ( is_numeric( $maybe_tag ) ) {
+				return new Tag( $maybe_tag );
+			}
+
+			return new Tag( sanitize_title( $maybe_tag ), 'tag_slug' );
+
+		}, $maybe_tags );
+
+	} else if ( is_a( $maybe_tags, Tag::class ) ) {
+		$tags = [ $maybe_tags ];
+	} else if ( is_numeric( $maybe_tags ) ) {
+		$tags = [ new Tag( $maybe_tags ) ];
+	} else if ( is_string( $maybe_tags ) ) {
+		// it's a comma separated list
+		if ( strpos( $maybe_tags, ',' ) !== false ) {
+			$tags = parse_tag_list( wp_parse_list( $maybe_tags ) );
+		} else {
+			// Assume slug
+			$tags = [ new Tag( sanitize_title( $maybe_tags ), 'tag_slug' ) ];
+		}
+
+	} else {
+		return false;
+	}
+
+	$tags = array_filter( $tags, function ( $tag ) {
+		return $tag->exists();
+	} );
+
+	switch ( $as ) {
+		case 'ID':
+			return array_map_to_method( $tags, 'get_id' );
+		case 'slug':
+			return array_map_to_method( $tags, 'get_slug' );
+		case 'name':
+			return array_map_to_method( $tags, 'get_name' );
+		default:
+		case 'tags':
+			return $tags;
+	}
 }

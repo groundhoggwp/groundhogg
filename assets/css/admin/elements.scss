@@ -96,6 +96,11 @@ h3 {
 }
 
 #search-results {
+
+  width: 440px;
+  height: 500px;
+  overflow-y: auto;
+
   img {
     width: 25px;
     border-radius: 4px;
@@ -111,8 +116,20 @@ h3 {
     padding: 8px;
   }
 
+  th:first-child, td:first-child {
+    padding-left: 20px;
+  }
+
   tr:nth-child(even) {
     background-color: $primary-dark-5;
+  }
+
+  tr {
+    cursor: pointer;
+
+    &:hover{
+      background-color: $primary-blue-2;
+    }
   }
 }
 
@@ -741,6 +758,14 @@ button {
         margin-top: 0;
       }
     }
+
+    #search-form{
+      padding: 30px 20px;
+
+      input{
+        width: 100%;
+      }
+    }
   }
 
   &-button-close-top {
@@ -873,6 +898,14 @@ p.error,
       }
     }
 
+    span.handle{
+      border-bottom: 1px solid #8c8f94;
+      border-radius: 0;
+      padding: 6px;
+      border-top-width: 0;
+      background-color: #FFFFFF;
+    }
+
     button {
       border: 1px solid #8c8f94;
       border-radius: 0;
@@ -883,6 +916,10 @@ p.error,
     &:first-child {
       > input:first-child {
         border-top-left-radius: 4px;
+      }
+
+      span.handle{
+        border-top: 1px solid #8c8f94;
       }
 
       button {

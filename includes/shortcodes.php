@@ -69,7 +69,7 @@ class Shortcodes {
 	/**
 	 * Mere contact replacements into page content with this shortcode.
 	 *
-	 * @param $atts array should be empty
+	 * @param        $atts    array should be empty
 	 * @param string $content the content to perform the merge fields
 	 *
 	 * @return string the updated content,.
@@ -102,7 +102,7 @@ class Shortcodes {
 	/**
 	 * Output content if and only if the current visitor is a contact.
 	 *
-	 * @param $atts []
+	 * @param        $atts []
 	 * @param string $content
 	 *
 	 * @return string
@@ -120,7 +120,7 @@ class Shortcodes {
 	/**
 	 * Output content if and only if the current visitor is NOT a contact
 	 *
-	 * @param $atts
+	 * @param        $atts
 	 * @param string $content
 	 *
 	 * @return string
@@ -138,7 +138,7 @@ class Shortcodes {
 	/**
 	 * Return the content if and only if the contact does have given tags
 	 *
-	 * @param $atts
+	 * @param        $atts
 	 * @param string $content
 	 *
 	 * @return string
@@ -161,14 +161,12 @@ class Shortcodes {
 
 		switch ( $a['has'] ) {
 			case 'all':
-				foreach ( $tags as $tag ) {
-					if ( ! $contact->has_tag( $tag ) ) {
-						return '';
-					}
+
+				if ( ! $contact->has_tags( $tags ) ) {
+					return '';
 				}
 
 				return do_shortcode( $content );
-				break;
 			case 'one':
 			case 'any':
 			case 'single':
@@ -180,8 +178,6 @@ class Shortcodes {
 				}
 
 				return '';
-
-				break;
 			default:
 				return '';
 		}
@@ -190,7 +186,7 @@ class Shortcodes {
 	/**
 	 * Return content if and only if the contact does not have the given tags
 	 *
-	 * @param $atts
+	 * @param        $atts
 	 * @param string $content
 	 *
 	 * @return string
@@ -208,20 +204,17 @@ class Shortcodes {
 		$contact = get_current_contact();
 
 		// If there is no contact, they defs don't have the tag!
-		if ( ! is_a_contact( $contact ) ){
+		if ( ! is_a_contact( $contact ) ) {
 			return do_shortcode( $content );
 		}
 
 		switch ( $a['needs'] ) {
 			case 'all':
-				foreach ( $tags as $tag ) {
-					if ( $contact->has_tag( $tag ) ) {
-						return '';
-					}
+				if ( ! $contact->has_tags( $tags ) ){
+					return '';
 				}
 
 				return do_shortcode( $content );
-				break;
 			case 'one':
 			case 'single':
 			case 'any':
@@ -233,7 +226,6 @@ class Shortcodes {
 				}
 
 				return '';
-				break;
 			default:
 				return do_shortcode( $content );
 		}

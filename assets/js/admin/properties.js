@@ -14,6 +14,7 @@
     moreMenu,
     tooltip,
     inputRepeaterWidget,
+    confirmationModal,
     dangerConfirmationModal,
     toggle,
   } = Groundhogg.element
@@ -46,9 +47,9 @@
       view: ({ label, ...props }) => {
         //language=HTML
         return `<label class="property-label" for="${props.id}">${label}</label>${input({
-          ...props,
-          type: 'text'
-        })}`
+			...props,
+			type: 'text'
+		})}`
       },
       onMount: ({ id, name }, onChange) => {
         $(`#${id}`).on('change', (e) => {
@@ -67,8 +68,8 @@
       view: ({ label, ...props }) => {
         //language=HTML
         return `<label class="property-label" for="${props.id}">${label}</label>${textarea({
-          ...props,
-        })}`
+			...props,
+		})}`
       },
       onMount: ({ id, name }, onChange) => {
         $(`#${id}`).on('change', (e) => {
@@ -87,9 +88,9 @@
       view: ({ label, ...props }) => {
         //language=HTML
         return `<label class="property-label" for="${props.id}">${label}</label>${input({
-          ...props,
-          type: 'number',
-        })}`
+			...props,
+			type: 'number',
+		})}`
       },
       onMount: ({ id, name }, onChange) => {
         $(`#${id}`).on('change', (e) => {
@@ -108,9 +109,9 @@
       view: ({ label, ...props }) => {
         //language=HTML
         return `<label class="property-label" for="${props.id}">${label}</label>${input({
-          ...props,
-          type: 'date',
-        })}`
+			...props,
+			type: 'date',
+		})}`
       },
       onMount: ({ id, name }, onChange) => {
         $(`#${id}`).on('change', (e) => {
@@ -219,18 +220,16 @@
     },
     dropdown: {
       name: __('Dropdown', 'groundhogg'),
-      view: ({ label, value, options = [], blankOption, ...props }) => {
+      view: ({ label, value, options = [], ...props }) => {
 
         options = options.map(o => ({ text: o, value: o }))
 
-        if (blankOption) {
-          options.unshift({ text: __('Select...'), value: '' })
-        }
+        options.unshift({ text: __('Select...'), value: '' })
 
         //language=HTML
         return `<label class="property-label" for="${props.id}">${label}</label>${select({
-          ...props,
-        }, options, value)}`
+			...props,
+		}, options, value)}`
       },
       onMount: ({ id, multiple, name, ...props }, onChange) => {
         $(`#${id}`).on('change', (e) => {
@@ -248,7 +247,7 @@
       },
       edit: (field) => {
 
-        const { multiple, blankOption } = field
+        const { multiple } = field
 
         //language=HTML
         return `
@@ -262,17 +261,9 @@
 				<div class="gh-row">
 					<div class="gh-col">
 						<label class="space-between">${__('Allow multiple selections?', 'groundhogg')} ${toggle({
-          id: 'allow-multiple',
-          checked: multiple
-        })} </label>
-					</div>
-				</div>
-				<div class="gh-row">
-					<div class="gh-col">
-						<label class="space-between">${__('Insert blank option?', 'groundhogg')} ${toggle({
-          id: 'blank-option',
-          checked: blankOption
-        })} </label>
+							id: 'allow-multiple',
+							checked: multiple
+						})} </label>
 					</div>
 				</div>
 			</div>
@@ -288,12 +279,6 @@
         $('#allow-multiple').on('change', (e) => {
           updateField({
             multiple: e.target.checked
-          })
-        })
-
-        $('#blank-option').on('change', (e) => {
-          updateField({
-            blankOption: e.target.checked
           })
         })
       }
@@ -344,10 +329,10 @@
 			  <h3 class="no-margin-top">${__('Add property group')}</h3>
 			  <div class="gh-input-group">
 				  ${input({
-        id: 'property-group-name',
-        name: 'property_group_name',
-        placeholder: __('New property group name', 'groundhogg')
-      })}
+					  id: 'property-group-name',
+					  name: 'property_group_name',
+					  placeholder: __('New property group name', 'groundhogg')
+				  })}
 				  <button class="gh-button primary" id="create-property-group">${__('Create Group', 'groundhogg')}
 				  </button>
 			  </div>
@@ -362,11 +347,11 @@
 			  <h3 class="no-margin-top">${__('Rename property group')}</h3>
 			  <div class="gh-input-group">
 				  ${input({
-        id: 'property-group-name',
-        name: 'property_group_name',
-        value: name,
-        placeholder: __('Property group name', 'groundhogg')
-      })}
+					  id: 'property-group-name',
+					  name: 'property_group_name',
+					  value: name,
+					  placeholder: __('Property group name', 'groundhogg')
+				  })}
 				  <button class="gh-button primary" id="create-property-group">${__('Rename Group', 'groundhogg')}
 				  </button>
 			  </div>
@@ -450,6 +435,7 @@
   }) => {
 
     properties = copyObject(properties)
+    values = copyObject(values)
 
     const removeGroup = (id) => {
 
@@ -683,6 +669,12 @@
 
       fields.forEach(f => {
         fieldTypes[f.type].onMount(f, (props) => {
+
+          values = {
+            ...values,
+            ...props
+          }
+
           onChange(props)
         })
       })
@@ -766,6 +758,10 @@
               text: __('Add Group', 'groundhogg')
             },
             {
+              key: 'edit-fields',
+              text: __('Edit Fields', 'groundhogg')
+            },
+            {
               key: 'rename',
               text: __('Rename')
             },
@@ -784,6 +780,15 @@
           ],
           onSelect: (k) => {
             switch (k) {
+              case 'edit-fields':
+
+                confirmationModal({
+                  alert: `<p>${__('Double click a field to edit it!', 'groundhogg')}</p>`,
+                  confirmText: __('Got it!', 'groundhogg'),
+                  closeText: ''
+                })
+
+                break
               case 'move_up':
                 moveGroup(groupId, 'up')
                 break

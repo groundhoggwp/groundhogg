@@ -103,6 +103,9 @@
 #search-filters-editor .filter select {
   vertical-align: initial;
 }
+#search-filters-editor .filter select#filter-count-compare {
+  width: fit-content;
+}
 #search-filters-editor .filter.filter-view {
   padding: 5px 8px;
   background: #FFFFFF;

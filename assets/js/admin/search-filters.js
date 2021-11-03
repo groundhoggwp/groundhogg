@@ -235,6 +235,18 @@
       this.mount()
     },
 
+    toString() {
+      return this.filters.map( group => group.map( filter => {
+
+        if (!Filters.has(filter.type)) {
+          return ''
+        }
+
+        return Filters.types[filter.type].view(filter)
+
+      } ).join( ' and ' ) ).join( ' or ' )
+    },
+
     mount () {
       $(el).html(this.render())
       this.eventHandlers()

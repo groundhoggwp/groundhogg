@@ -399,8 +399,6 @@ abstract class Base_Object_Api extends Base_Api {
 		$total = $this->get_db_table()->count( $query );
 		$items = $this->get_db_table()->query( $query );
 
-//		wp_send_json_success( last_db_query() );
-
 		$items = array_map( [ $this, 'map_raw_object_to_class' ], $items );
 
 		return self::SUCCESS_RESPONSE( [

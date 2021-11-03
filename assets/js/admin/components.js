@@ -45,13 +45,14 @@
     }
 
     const { close, setContent } = modal({
-      content: form()
+      content: form(),
+      dialogClasses: 'no-padding'
     })
 
     const renderResult = (contact) => {
       // language=HTML
       return `
-		  <tr>
+		  <tr data-id="${contact.ID}">
 			  <td><img src="${contact.data.gravatar}" alt="${contact.data.full_name}"></td>
 			  <td><b>${contact.data.full_name}</b><br/>${contact.data.email}</td>
 			  <td>
@@ -60,14 +61,39 @@
 		  </tr>`
     }
 
+    const noResults = () => {
+      // language=HTML
+      return `
+		  <tr>
+          <td colspan="3"><p>${__('No contacts match that search...', 'groundhogg')}</p></td>
+		  </tr>`
+    }
+
     const onMount = () => {
 
       const setSearchResults = (results) => {
+
+        if ( ! results.length ){
+          $('#search-results table tbody').html(noResults())
+          return
+        }
+
         $('#search-results table tbody').html(results.map(r => renderResult(r)).join(''))
 
-        $('.select-contact').on('click', (e) => {
+        $('#search-results tr, .select-contact').on('click', (e) => {
           close()
           onSelect(ContactsStore.get(parseInt(e.currentTarget.dataset.id)))
+        })
+      }
+
+      const getResults = () => {
+        ContactsStore.fetchItems({
+          search,
+          exclude,
+          limit: 10
+        }).then(items => {
+          results = items
+          setSearchResults(results)
         })
       }
 
@@ -80,18 +106,17 @@
 
         setTimeout(() => {
 
-          ContactsStore.fetchItems({
-            search,
-            exclude,
-            limit: 10
-          }).then(items => {
-            results = items
-            setSearchResults(results)
-          })
+          getResults()
 
         })
 
-      })
+      }).focus()
+
+      if ( ContactsStore.hasItems() ){
+        setSearchResults( ContactsStore.getItems() )
+      } else {
+        getResults()
+      }
 
     }
 

@@ -56,6 +56,11 @@ h3.no-margin-top {
   max-width: 100%;
 }
 
+#search-results {
+  width: 440px;
+  height: 500px;
+  overflow-y: auto;
+}
 #search-results img {
   width: 25px;
   border-radius: 4px;
@@ -68,8 +73,17 @@ h3.no-margin-top {
   text-align: left;
   padding: 8px;
 }
+#search-results th:first-child, #search-results td:first-child {
+  padding-left: 20px;
+}
 #search-results tr:nth-child(even) {
   background-color: rgba(16, 38, 64, 0.05);
+}
+#search-results tr {
+  cursor: pointer;
+}
+#search-results tr:hover {
+  background-color: rgba(0, 117, 255, 0.02);
 }
 
 .notes-widget .notes-header {
@@ -586,6 +600,12 @@ button.gh-button.loud {
 .gh-modal-dialog-alert p:first-child {
   margin-top: 0;
 }
+.gh-modal-dialog #search-form {
+  padding: 30px 20px;
+}
+.gh-modal-dialog #search-form input {
+  width: 100%;
+}
 .gh-modal-button-close-top {
   position: absolute;
   right: 3px;
@@ -694,6 +714,13 @@ p.error,
   border-right-width: 0;
   border-radius: 0;
 }
+.gh-input-repeater .gh-input-repeater-row span.handle {
+  border-bottom: 1px solid #8c8f94;
+  border-radius: 0;
+  padding: 6px;
+  border-top-width: 0;
+  background-color: #FFFFFF;
+}
 .gh-input-repeater .gh-input-repeater-row button {
   border: 1px solid #8c8f94;
   border-radius: 0;
@@ -702,6 +729,9 @@ p.error,
 }
 .gh-input-repeater .gh-input-repeater-row:first-child > input:first-child {
   border-top-left-radius: 4px;
+}
+.gh-input-repeater .gh-input-repeater-row:first-child span.handle {
+  border-top: 1px solid #8c8f94;
 }
 .gh-input-repeater .gh-input-repeater-row:first-child button {
   border-top-width: 1px;

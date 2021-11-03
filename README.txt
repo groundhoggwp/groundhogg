@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.8
 Requires PHP: 7.1
-Stable tag: 2.5.4.2
+Stable tag: 2.5.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -321,14 +321,20 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.5.5 (2021-10-05) =
+= 2.5.5 (2021-11-02) =
 * ADDED More JS components for use in 3.0 and the pipeline extension
 * ADDED Custom properties component for creating custom properties for various data types on the fly
 * ADDED Data store methods for manipulating object relationships
 * ADDED Groundwork for merging various data types including contacts for an upcoming update
-* ADDED Many activity based filters such as Email Opened now support filtering by the number of times a contact has done that action.
+* ADDED Groundwork for duplicating various data types like funnels and emails via the API
+* ADDED Many activity based filters such as Email Opened now support filtering by the number of times a contact has done that activity.
+* ADDED new magic `parse_tags_list()` function which takes a bunch of random input and returns a list of tags
+* IMPROVED the notes widget which now supports "note type" for calls, meetings, and emails
+* IMPROVED Ground up rethink of permissions makes sales rep and sales manager roles more stable and secure
 * TWEAKED the benchmark complete method is now compatible with an array of contacts
-* TWEAKED Ground up rethink of permissions makes sales rep and sales manager roles more stable and secure
+* TWEAKED `Contact::has_tag()` now accepts an array of tags and has alias `Contact::has_tags()`
+* REMOVED Send email info card, replaced with new email modal widget
+* FIXED Various bugs and gotchas
 
 = 2.5.4.2 (2021-10-05) =
 * HOT FIX Revert meta cache change
