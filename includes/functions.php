@@ -5706,7 +5706,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 
 			case Event::BROADCAST:
 				$filters[] = [
-					'type'         => 'received_broadcast',
+					'type'         => 'broadcast_received',
 					'status'       => $events_query['status'],
 					'broadcast_id' => absint( get_array_var( $events_query, 'step_id' ) ),
 				];
