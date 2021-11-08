@@ -35,6 +35,9 @@
 .gh-info-card-provider .gh-info-card .gh-info-card-content {
   padding: 0 12px 12px 12px;
 }
+.gh-info-card-provider .gh-info-card .gh-info-card-content * {
+  font-size: 14px;
+}
 .gh-info-card-provider .gh-info-card.open .gh-info-card-content {
   display: block;
 }

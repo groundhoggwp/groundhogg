@@ -269,7 +269,8 @@ class Scripts {
 			'groundhogg-admin-functions',
 			'groundhogg-admin-emojis-picker',
 			'groundhogg-admin-user',
-			'groundhogg-admin-info-cards'
+			'groundhogg-admin-info-cards',
+			'groundhogg-admin-notes'
 
 		], GROUNDHOGG_VERSION, true );
 

@@ -141,6 +141,8 @@ class Contacts_Page extends Admin_Page {
 				break;
 			case 'edit':
 
+				wp_enqueue_editor();
+				wp_enqueue_media();
 				wp_enqueue_style( 'groundhogg-admin-contact-record' );
 				wp_enqueue_script( 'groundhogg-admin-contact-record' );
 				wp_localize_script( 'groundhogg-admin-contact-record', 'GroundhoggContact', [

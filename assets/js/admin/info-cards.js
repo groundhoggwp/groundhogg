@@ -8,6 +8,7 @@
     onMount = () => {},
     preload = () => {},
     isOpen = true,
+    state = {},
     priority = 10
   }) => ({
     id,
@@ -17,6 +18,7 @@
     isOpen,
     priority,
     preload,
+    state,
 
     render (item) {
 
@@ -33,16 +35,25 @@
 			  <div class="gh-info-card-header">
 				  <button class="gh-info-card-toggle"></button>
 				  <div class="gh-info-card-title">
-					  ${title(item)}
+					  ${title(item, this.state)}
 				  </div>
 			  </div>
 			  <div class="gh-info-card-content">
-				  ${content(item)}
+				  ${content(item, this.state)}
 			  </div>
 		  </div>`
 
     },
     mount ($el, item) {
+
+      const setState = (state) => {
+        this.state = {
+          ...this.state,
+          ...state
+        }
+
+        this.mount($el, item)
+      }
 
       if ($el.find(`#${this.id}`).length) {
         $el.find(`#${this.id}`).replaceWith(this.render(item))
@@ -58,7 +69,7 @@
         }
       })
 
-      this.onMount()
+      this.onMount(item, this.state, setState)
     },
 
     open (...args) {
@@ -119,6 +130,7 @@
       console.log(this.cards)
 
       $el.sortable({
+        handle: '.gh-info-card-header',
         placeholder: 'gh-info-card-provider',
         start: (e, ui) => {
           ui.placeholder.height(ui.item.height())
@@ -127,11 +139,11 @@
         update: (e, ui) => {
 
         },
-      }).disableSelection()
+      })
     },
 
-    registerCard (card) {
-      this.cards.push(card)
+    registerCard (id, card) {
+      this.cards.push( InfoCard( id, card ) )
     },
 
   })

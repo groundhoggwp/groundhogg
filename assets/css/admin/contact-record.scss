@@ -28,16 +28,43 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   padding-left: 0;
 }
 
+#screen-meta-links{
+  display: none;
+}
+
 .fixed-full-height{
   height: calc( 100vh - 32px );
   position: fixed;
 }
 
-#contact-actions{
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 10px;
+#contact-stuff{
+  gap: 20px;
+  padding: 20px;
+  align-items: flex-start;
+
+  #general-details, #info-cards{
+    width: 25%;
+  }
+
+  #main-stuff{
+    width: 50%;
+  }
+
+  .avatar{
+    display: block;
+    border-radius: 10px;
+    margin: 20px auto;
+  }
+
+  .full-name, .email-address{
+    font-size: 16px;
+    text-align: center;
+  }
+
+  .contact-actions{
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 10px;
+  }
 }

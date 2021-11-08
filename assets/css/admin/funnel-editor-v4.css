@@ -2,6 +2,10 @@
   margin-top: 20px;
 }
 
+#wpfooter {
+  display: none;
+}
+
 #wpcontent {
   background-color: #F6F9FB;
   padding-left: 0;
@@ -514,7 +518,7 @@
 #funnel-editor #control-panel .row:not(:last-child) {
   margin-bottom: 20px;
 }
-#funnel-editor #control-panel .needs-overflow {
+#funnel-editor #control-panel {
   overflow: auto;
 }
 #funnel-editor #control-panel .row.with-columns {

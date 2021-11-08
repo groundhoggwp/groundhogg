@@ -58,13 +58,13 @@ h3 {
         font-size: 16px;
       }
 
-      .property-group-more{
+      .property-group-more {
         visibility: hidden;
       }
     }
 
-    &:hover{
-      .property-group-more{
+    &:hover {
+      .property-group-more {
         visibility: visible;
       }
     }
@@ -127,7 +127,7 @@ h3 {
   tr {
     cursor: pointer;
 
-    &:hover{
+    &:hover {
       background-color: $primary-blue-2;
     }
   }
@@ -679,12 +679,12 @@ button {
       border-bottom-right-radius: 0;
       border-bottom-left-radius: 0;
 
-      .gh-row{
+      .gh-row {
         align-items: center;
       }
 
       .select2 {
-        select2-container, .select2-selection{
+        select2-container, .select2-selection {
           border: none !important;
           outline: none !important;
         }
@@ -739,7 +739,7 @@ button {
     max-height: calc(92vh - 64px);
     overflow: auto;
 
-    &.overflow-visible{
+    &.overflow-visible {
       overflow: visible;
     }
 
@@ -759,10 +759,10 @@ button {
       }
     }
 
-    #search-form{
+    #search-form {
       padding: 30px 20px;
 
-      input{
+      input {
         width: 100%;
       }
     }
@@ -898,7 +898,7 @@ p.error,
       }
     }
 
-    span.handle{
+    span.handle {
       border-bottom: 1px solid #8c8f94;
       border-radius: 0;
       padding: 6px;
@@ -918,7 +918,7 @@ p.error,
         border-top-left-radius: 4px;
       }
 
-      span.handle{
+      span.handle {
         border-top: 1px solid #8c8f94;
       }
 
@@ -1353,3 +1353,36 @@ p.error,
   min-height: 28px;
 }
 
+.gh-tabs-provider {
+
+  .gh-tabs {
+    border-bottom: 1px solid $primary-dark-15;
+    padding: 10px 10px 0 10px;
+
+    .gh-tab {
+      display: inline-block;
+      cursor: pointer;
+      padding: 8px 20px;
+      border-width: 1px 1px 0 1px;
+      border-style: solid;
+      border-color: $primary-dark-15;
+      background: $primary-dark-5;
+      font-weight: 500;
+      font-size: 16px;
+
+      &:not(:first-child) {
+        margin-left: 5px;
+      }
+
+      &.current {
+        background: #FFFFFF;
+        margin-bottom: -1px;
+        border-bottom: 1px solid #FFFFFF;
+      }
+    }
+  }
+
+  .gh-tab-content {
+    padding: 20px;
+  }
+}

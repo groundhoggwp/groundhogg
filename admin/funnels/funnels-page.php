@@ -158,6 +158,7 @@ class Funnels_Page extends Admin_Page {
 				$funnel = new Funnel( get_url_var( 'funnel' ) );
 
 				wp_enqueue_editor();
+				wp_enqueue_media();
 				wp_enqueue_code_editor([
 					'type' => 'text/html'
 				]);

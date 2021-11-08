@@ -3,18 +3,40 @@
   padding-left: 0;
 }
 
+#screen-meta-links {
+  display: none;
+}
+
 .fixed-full-height {
   height: calc( 100vh - 32px );
   position: fixed;
 }
 
-#contact-actions {
+#contact-stuff {
+  gap: 20px;
+  padding: 20px;
+  align-items: flex-start;
+}
+#contact-stuff #general-details, #contact-stuff #info-cards {
+  width: 25%;
+}
+#contact-stuff #main-stuff {
+  width: 50%;
+}
+#contact-stuff .avatar {
+  display: block;
+  border-radius: 10px;
+  margin: 20px auto;
+}
+#contact-stuff .full-name, #contact-stuff .email-address {
+  font-size: 16px;
+  text-align: center;
+}
+#contact-stuff .contact-actions {
   display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
   justify-content: center;
-  margin-bottom: 10px;
+  gap: 10px;
+  margin: 10px;
 }
 
 /*# sourceMappingURL=contact-record.css.map */

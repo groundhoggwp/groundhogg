@@ -1157,8 +1157,6 @@
         }
       )
 
-      improveTinyMCE()
-
       StepTypes.setup()
       // self.initStepFlowContextMenu()
       this.preloadFunnel()

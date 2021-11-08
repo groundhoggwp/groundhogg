@@ -18,6 +18,7 @@
 
   const {
     tinymceElement,
+    addMediaToBasicTinyMCE,
     mappableFields,
     bold,
     uuid,
@@ -657,11 +658,13 @@
       onMount (step, updateStepMeta) {
         let saveTimer
 
+        addMediaToBasicTinyMCE()
+
         tinymceElement(
           'note_text',
           {
             tinymce: true,
-            quicktags: true,
+            // quicktags: true,
           },
           (content) => {
             // Reset timer.
@@ -789,11 +792,13 @@
 
         let saveTimer
 
+        addMediaToBasicTinyMCE()
+
         tinymceElement(
           'note_text',
           {
             tinymce: true,
-            quicktags: true,
+            // quicktags: true,
           },
           (content) => {
             // console.log(content)
@@ -1815,7 +1820,7 @@
               return __('Restart from a specific step', 'groundhogg')
             }
 
-            return sprintf(__('Restart from %s', 'groundhogg'), StepTypes.getTitle(FunnelsStore.getSteps(funnel_id, true).find(s => s.ID == step_id)))
+            return sprintf(__('Restart from "%s"', 'groundhogg'), StepTypes.getTitle(FunnelsStore.getSteps(funnel_id, true).find(s => s.ID == step_id)))
         }
       },
       edit: ({ meta }) => {

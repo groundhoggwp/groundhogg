@@ -1072,4 +1072,31 @@ p.error,
   min-height: 28px;
 }
 
+.gh-tabs-provider .gh-tabs {
+  border-bottom: 1px solid rgba(16, 38, 64, 0.15);
+  padding: 10px 10px 0 10px;
+}
+.gh-tabs-provider .gh-tabs .gh-tab {
+  display: inline-block;
+  cursor: pointer;
+  padding: 8px 20px;
+  border-width: 1px 1px 0 1px;
+  border-style: solid;
+  border-color: rgba(16, 38, 64, 0.15);
+  background: rgba(16, 38, 64, 0.05);
+  font-weight: 500;
+  font-size: 16px;
+}
+.gh-tabs-provider .gh-tabs .gh-tab:not(:first-child) {
+  margin-left: 5px;
+}
+.gh-tabs-provider .gh-tabs .gh-tab.current {
+  background: #FFFFFF;
+  margin-bottom: -1px;
+  border-bottom: 1px solid #FFFFFF;
+}
+.gh-tabs-provider .gh-tab-content {
+  padding: 20px;
+}
+
 /*# sourceMappingURL=elements.css.map */

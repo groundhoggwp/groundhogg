@@ -695,10 +695,10 @@
    * @param props
    * @return {{setContent: setContent, $modal: (*|jQuery|HTMLElement), close: close}}
    */
-  const loadingModal = (text = 'Loading', props = {} ) => {
+  const loadingModal = (text = 'Loading', props = {}) => {
 
     let stop = () => {}
-    const { onOpen = () => {}, onClose = () => {}} = props
+    const { onOpen = () => {}, onClose = () => {} } = props
 
     return modal({
       content: `<h1>${text}</h1>`,
@@ -1452,13 +1452,13 @@
           update: (e, ui) => {
 
             let $row = $(ui.item)
-            let oldIndex = parseInt( $row.data('row') )
+            let oldIndex = parseInt($row.data('row'))
             let curIndex = $row.index()
 
             let row = this.rows[oldIndex]
 
-            this.rows.splice( oldIndex, 1 )
-            this.rows.splice( curIndex, 0, row )
+            this.rows.splice(oldIndex, 1)
+            this.rows.splice(curIndex, 0, row)
 
             this.mount()
           }
@@ -1480,8 +1480,8 @@
 					dataRow: rowIndex,
 					dataCell: cellIndex,
 				})).join('')}
-				${ sortable ? `<span class="handle" data-row="${rowIndex}"><span
-					class="dashicons dashicons-move"></span></span>` : '' }
+				${sortable ? `<span class="handle" data-row="${rowIndex}"><span
+					class="dashicons dashicons-move"></span></span>` : ''}
 				<button class="gh-button dashicon remove-row" data-row="${rowIndex}"><span
 					class="dashicons dashicons-no-alt"></span></button>
 			</div>`
@@ -1855,6 +1855,61 @@
     return `<b>${text}</b>`
   }
 
+  const tabs = (selector, {
+    tabs = [],
+    curTab = '',
+    onMount = (curTab) => {},
+    onTabbed = (newTab) => {},
+  }) => {
+
+    const $el = $(selector)
+
+    if (!curTab) {
+      curTab = tabs[0].id
+    }
+
+    curTab = tabs.find(t => t.id == curTab)
+
+    const render = () => {
+      //language=HTML
+      return `
+		  <div class="gh-tabs-provider">
+			  <div class="gh-tabs">
+				  ${tabs.map(t => `<span class="gh-tab ${curTab.id == t.id ? 'current' : ''}" data-tab="${t.id}">${t.name}</span>`).join('')}
+			  </div>
+			  <div class="gh-tab-content">
+				  ${curTab.content()}
+			  </div>
+		  </div>`
+    }
+
+    const mount = () => {
+
+      $el.html(render())
+
+      curTab.onMount()
+      onMount(curTab.id)
+
+      $el.find('.gh-tab').on('click', (e) => {
+
+        let clickedTab = e.currentTarget.dataset.tab
+
+        if ( clickedTab == curTab.id ){
+          return;
+        }
+
+        curTab = tabs.find(t => t.id == clickedTab)
+
+        mount()
+
+        onTabbed(curTab.id)
+      })
+    }
+
+    mount()
+
+  }
+
   Groundhogg.element = {
     icons,
     ...Elements,
@@ -1905,6 +1960,7 @@
     clickedIn,
     ordinal_suffix_of,
     bold,
+    tabs,
     infoCard
   }
 
