@@ -73,6 +73,10 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
             * {
                 font-size: 14px
             }
+
+            a {
+                text-decoration: none;
+            }
         }
 
         &.open {

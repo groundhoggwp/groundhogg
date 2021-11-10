@@ -28,43 +28,84 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   padding-left: 0;
 }
 
-#screen-meta-links{
+#screen-meta-links {
   display: none;
 }
 
-.fixed-full-height{
-  height: calc( 100vh - 32px );
+.fixed-full-height {
+  height: calc(100vh - 32px);
   position: fixed;
 }
 
-#contact-stuff{
+#info-cards {
+  h2.additional {
+    padding-left: 20px;
+  }
+}
+
+#contact-stuff {
   gap: 20px;
   padding: 20px;
   align-items: flex-start;
 
-  #general-details, #info-cards{
+  #general-details, #info-cards {
     width: 25%;
   }
 
-  #main-stuff{
+  #main-stuff {
     width: 50%;
   }
 
-  .avatar{
+  .avatar {
     display: block;
     border-radius: 10px;
     margin: 20px auto;
   }
 
-  .full-name, .email-address{
+  .full-name, .email-address {
     font-size: 16px;
     text-align: center;
   }
 
-  .contact-actions{
+  .contact-actions {
     display: flex;
     justify-content: center;
     gap: 10px;
     margin: 10px;
+  }
+}
+
+#activity-timeline {
+
+  margin-left: 15px;
+  border-left: 2px solid $primary-dark-50;
+
+  li.activity-item {
+    position: relative;
+    margin-left: 20px;
+
+    &:not(:last-child) {
+      margin-bottom: 25px;
+    }
+
+    .activity-icon {
+
+      position: absolute;
+      left: -34px;
+
+      height: 25px;
+      width: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 25px;
+      background: $benchmark-orange;
+      color: #FFFFFF;
+
+      svg {
+        width: 15px;
+        height: 15px;
+      }
+    }
   }
 }

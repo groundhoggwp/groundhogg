@@ -8,8 +8,12 @@
 }
 
 .fixed-full-height {
-  height: calc( 100vh - 32px );
+  height: calc(100vh - 32px);
   position: fixed;
+}
+
+#info-cards h2.additional {
+  padding-left: 20px;
 }
 
 #contact-stuff {
@@ -37,6 +41,34 @@
   justify-content: center;
   gap: 10px;
   margin: 10px;
+}
+
+#activity-timeline {
+  margin-left: 15px;
+  border-left: 2px solid rgba(16, 38, 64, 0.5);
+}
+#activity-timeline li.activity-item {
+  position: relative;
+  margin-left: 20px;
+}
+#activity-timeline li.activity-item:not(:last-child) {
+  margin-bottom: 25px;
+}
+#activity-timeline li.activity-item .activity-icon {
+  position: absolute;
+  left: -34px;
+  height: 25px;
+  width: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 25px;
+  background: #f58115;
+  color: #FFFFFF;
+}
+#activity-timeline li.activity-item .activity-icon svg {
+  width: 15px;
+  height: 15px;
 }
 
 /*# sourceMappingURL=contact-record.css.map */

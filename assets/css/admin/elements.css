@@ -220,11 +220,41 @@ span.gh-text.danger {
   color: #e91f4f;
 }
 
+.gh-panel-tabs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.gh-panel-tabs .tab {
+  background-color: rgba(16, 38, 64, 0.1);
+  padding: 10px 20px;
+  border-radius: 2px 2px 0 0;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.gh-panel-tabs .tab:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: -1;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+}
+.gh-panel-tabs .tab.current {
+  background: #FFFFFF;
+}
+
 .gh-panel {
   background: #FFFFFF;
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
   /*margin: 20px;*/
   border-radius: 5px;
+}
+.gh-panel.has-tabs {
+  border-top-left-radius: 0;
 }
 .gh-panel .inside {
   padding: 20px;

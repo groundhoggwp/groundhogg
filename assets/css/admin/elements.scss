@@ -307,11 +307,45 @@ span.gh-text {
   }
 }
 
+.gh-panel-tabs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .tab{
+    background-color: $primary-dark-10;
+    padding: 10px 20px;
+    border-radius: 2px 2px 0 0;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+
+    &:after{
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: -1;
+      box-shadow: $box-shadow
+    }
+
+    &.current {
+      background: #FFFFFF;
+    }
+  }
+}
+
 .gh-panel {
   background: #FFFFFF;
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
   /*margin: 20px;*/
   border-radius: 5px;
+
+  &.has-tabs{
+    border-top-left-radius: 0;
+  }
 
   .inside {
     padding: 20px;

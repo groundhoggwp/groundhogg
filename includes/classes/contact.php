@@ -984,7 +984,7 @@ class Contact extends Base_Object_With_Meta {
 				'ID'    => $this->get_id(),
 				'data'  => $contact,
 				'meta'  => $this->get_meta(),
-				'tags'  => $this->get_tags( true ),
+				'tags'  => array_values( $this->get_tags( true ) ),
 				'files' => $this->get_files(),
 				'user'  => $this->user,
 				'notes' => $this->get_notes(),

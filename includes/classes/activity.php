@@ -6,6 +6,7 @@ use Groundhogg\Base_Object;
 use Groundhogg\Base_Object_With_Meta;
 use Groundhogg\DB\DB;
 use Groundhogg\DB\Meta_DB;
+use Groundhogg\Email;
 use function Groundhogg\get_db;
 
 class Activity extends Base_Object_With_Meta {
@@ -48,6 +49,29 @@ class Activity extends Base_Object_With_Meta {
 	 */
 	protected function get_db() {
 		return get_db( 'activity' );
+	}
+
+	/**
+	 * Add helper stuff to activity
+	 *
+	 * @return array
+	 */
+	public function get_as_array() {
+		$array = parent::get_as_array();
+
+		$array['locale'] = [
+			'diff_time' => human_time_diff( $this->get_timestamp(), time() )
+		];
+
+		switch ( $this->activity_type ) {
+			case 'email_opened':
+			case 'email_link_click':
+				return array_merge( $array, [
+					'email' => new Email( $this->email_id )
+				] );
+			default:
+				return $array;
+		}
 	}
 
 	/**

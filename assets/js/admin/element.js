@@ -1857,6 +1857,9 @@
 
   const tabs = (selector, {
     tabs = [],
+    tabClassName = 'gh-tab',
+    tabWrapClassName = 'gh-tabs',
+    contentClassName = 'gh-tab-content',
     curTab = '',
     onMount = (curTab) => {},
     onTabbed = (newTab) => {},
@@ -1874,10 +1877,10 @@
       //language=HTML
       return `
 		  <div class="gh-tabs-provider">
-			  <div class="gh-tabs">
-				  ${tabs.map(t => `<span class="gh-tab ${curTab.id == t.id ? 'current' : ''}" data-tab="${t.id}">${t.name}</span>`).join('')}
+			  <div class="${tabWrapClassName}">
+				  ${tabs.map(t => `<span class="${tabClassName} ${curTab.id == t.id ? 'current' : ''}" data-tab="${t.id}">${t.name}</span>`).join('')}
 			  </div>
-			  <div class="gh-tab-content">
+			  <div class="${contentClassName}">
 				  ${curTab.content()}
 			  </div>
 		  </div>`
@@ -1890,12 +1893,14 @@
       curTab.onMount()
       onMount(curTab.id)
 
-      $el.find('.gh-tab').on('click', (e) => {
+      let tabSelector = tabClassName.split(' ').map(c => `.${c}`).join('')
+
+      $el.find(tabSelector).on('click', (e) => {
 
         let clickedTab = e.currentTarget.dataset.tab
 
-        if ( clickedTab == curTab.id ){
-          return;
+        if (clickedTab == curTab.id) {
+          return
         }
 
         curTab = tabs.find(t => t.id == clickedTab)
@@ -1908,6 +1913,25 @@
 
     mount()
 
+  }
+
+  const savingButtonOnClick = (selector, onClick) => {
+
+    const $btn = $(selector)
+
+    const handleClick = (e) => {
+      $btn.prop('disabled', true)
+      const { stop } = loadingDots(e.currentTarget)
+
+      const releaseButton = () => {
+        stop()
+        $btn.prop('disabled', false)
+      }
+
+      onClick(releaseButton)
+    }
+
+    $btn.on('click', handleClick)
   }
 
   Groundhogg.element = {
@@ -1961,7 +1985,8 @@
     ordinal_suffix_of,
     bold,
     tabs,
-    infoCard
+    infoCard,
+    savingButtonOnClick
   }
 
 })(jQuery)

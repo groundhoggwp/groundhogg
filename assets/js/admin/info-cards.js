@@ -20,7 +20,7 @@
     preload,
     state,
 
-    render (item) {
+    render (args) {
 
       const {
         id,
@@ -35,16 +35,16 @@
 			  <div class="gh-info-card-header">
 				  <button class="gh-info-card-toggle"></button>
 				  <div class="gh-info-card-title">
-					  ${title(item, this.state)}
+					  ${title(args, this.state)}
 				  </div>
 			  </div>
 			  <div class="gh-info-card-content">
-				  ${content(item, this.state)}
+				  ${content(args, this.state)}
 			  </div>
 		  </div>`
 
     },
-    mount ($el, item) {
+    mount ($el, args) {
 
       const setState = (state) => {
         this.state = {
@@ -52,24 +52,24 @@
           ...state
         }
 
-        this.mount($el, item)
+        this.mount($el, args)
       }
 
       if ($el.find(`#${this.id}`).length) {
-        $el.find(`#${this.id}`).replaceWith(this.render(item))
+        $el.find(`#${this.id}`).replaceWith(this.render(args))
       } else {
-        $el.append(this.render(item))
+        $el.append(this.render(args))
       }
 
       $(`#${this.id} .gh-info-card-header`).on('click', (e) => {
         if ($(`#${this.id}`).is('.closed')) {
-          this.open($el, item)
+          this.open($el, args)
         } else {
-          this.close($el, item)
+          this.close($el, args)
         }
       })
 
-      this.onMount(item, this.state, setState)
+      this.onMount(args, this.state, setState)
     },
 
     open (...args) {
@@ -91,12 +91,12 @@
 
     cards,
 
-    preload (item) {
+    preload (args) {
       const promises = []
 
       this.cards.forEach(card => {
 
-        let p = card.preload(item)
+        let p = card.preload(args)
 
         if (!p) {
           return
@@ -116,16 +116,16 @@
       return Promise.all(promises)
     },
 
-    async mount (el, item) {
+    async mount (el, args) {
 
-      await this.preload(item)
+      await this.preload(args)
 
       const $el = $(el)
 
       $el.addClass('gh-info-card-provider')
       $el.html('')
 
-      this.cards.sort((a, b) => a.priority - b.priority).forEach(card => card.mount($el, item))
+      this.cards.sort((a, b) => a.priority - b.priority).forEach(card => card.mount($el, args))
 
       console.log(this.cards)
 
