@@ -75,10 +75,15 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   }
 }
 
+#activity-here{
+  overflow: auto;
+  max-height: 800px;
+}
+
 #activity-timeline {
 
   margin-left: 15px;
-  border-left: 2px solid $primary-dark-50;
+  border-left: 2px solid $primary-dark-30;
 
   li.activity-item {
     position: relative;
@@ -86,6 +91,14 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
     &:not(:last-child) {
       margin-bottom: 25px;
+    }
+
+    .activity-info{
+      font-size: 15px;
+    }
+
+    .diff-time{
+      color: $primary-dark-50;
     }
 
     .activity-icon {
@@ -98,9 +111,19 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 25px;
-      background: $benchmark-orange;
+      border-radius: 4px;
+      background: $primary-blue;
       color: #FFFFFF;
+
+      &.benchmark{
+        background: $benchmark-orange;
+        border-radius: 4px;
+      }
+
+      &.broadcast,
+      &.action{
+        background: $action-green;
+      }
 
       svg {
         width: 15px;

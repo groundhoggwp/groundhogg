@@ -35,6 +35,7 @@
     tags: TagsStore,
     funnels: FunnelsStore,
     activity: ActivityStore,
+    broadcasts: BroadcastsStore,
     events: EventsStore,
     emails: EmailsStore
   } = Groundhogg.stores
@@ -455,21 +456,21 @@
 
     types: {
       wp_login: {
-        icon: icons.email,
+        icon: icons.login,
         render: ({ email }) => {
           return __('Logged in', 'groundhogg')
         },
         preload: () => {}
       },
       wp_logout: {
-        icon: icons.email,
+        icon: icons.logout,
         render: ({ email }) => {
           return __('Logged out', 'groundhogg')
         },
         preload: () => {}
       },
       email_opened: {
-        icon: icons.email,
+        icon: icons.open_email,
         render: ({ email }) => {
           return sprintf(__('Opened %s', 'groundhogg'), bold(email.data.title))
         },
@@ -478,9 +479,12 @@
         }
       },
       email_link_click: {
-        icon: icons.email,
+        icon: icons.link_click,
         render: ({ email, data }) => {
-          return sprintf(__('Clicked %s in %s', 'groundhogg'), bold(data.referer), bold(email.data.title))
+          return sprintf(__('Clicked %s in %s', 'groundhogg'), el('a', {
+            target: '_blank',
+            href: data.referer,
+          }, bold(data.referer)), bold(email.data.title))
         },
         preload: ({ email }) => {
           EmailsStore.itemsFetched([email])
@@ -490,17 +494,44 @@
 
     renderActivity (activity) {
 
-      if (activity.type === 'event') {
+      if (activity.type === 'event' && activity.data.event_type == 1) {
 
-
+        let { step } = activity
 
         // language=HTML
         return `
 			<li class="activity-item">
-				<div class="activity-icon">${type.icon}</div>
+				<div class="activity-icon ${step.data.step_group}">${StepTypes.getType(step.data.step_type).svg}</div>
 				<div class="activity-rendered">
 					<div class="activity-info">
-						${type.render(activity)}
+						<div class="space-between" style="gap: 20px">
+							<span>${sprintf(step.data.step_group === 'action' ? __('Completed action: %s', 'groundhogg') : __('Completed benchmark: %s', 'groundhogg'), StepTypes.getType(step.data.step_type).title(step))}</span>
+							<button class="gh-button secondary icon text small event-more" data-event="${activity.ID}">
+								${icons.verticalDots}
+							</button>
+						</div>
+					</div>
+					<div class="diff-time">
+						${sprintf(__('%s ago', 'groundhogg'), activity.locale.diff_time)}
+					</div>
+				</div>
+			</li>`
+      }
+
+      if (activity.type === 'event' && activity.data.event_type == 2) {
+
+        // language=HTML
+        return `
+			<li class="activity-item">
+				<div class="activity-icon broadcast">${icons.megaphone}</div>
+				<div class="activity-rendered">
+					<div class="activity-info">
+						<div class="space-between" style="gap: 20px">
+							<span>${sprintf(__('Received broadcast: %s', 'groundhogg'), bold(activity.broadcast.object.data.title))}</span>
+							<button class="gh-button secondary icon text small event-more" data-event="${activity.ID}">
+								${icons.verticalDots}
+							</button>
+						</div>
 					</div>
 					<div class="diff-time">
 						${sprintf(__('%s ago', 'groundhogg'), activity.locale.diff_time)}
@@ -536,6 +567,31 @@
 
     },
 
+    onMount () {
+
+      $('.event-more').on('click', (e) => {
+
+        let eventId = e.currentTarget.dataset.event
+        const event = EventsStore.get(eventId)
+
+        moreMenu(e.currentTarget, {
+          items: [
+            {
+              key: 'run_again',
+              text: __('Run Again')
+            }
+          ],
+          onSelect: (key) => {
+            switch (key) {
+              case 'run_again':
+
+                break
+            }
+          }
+        })
+      })
+    },
+
     mount (selector, activities) {
 
       const $el = $(selector)
@@ -550,13 +606,21 @@
 
       let promises = [
         ...activities
-        .filter( a => a.type === 'activity' )
-        .map(a => this.types[a.data.activity_type].preload(a)),
-        StepTypes.preloadSteps( activities.filter( a => a.type === 'event' ).map() )
+          .filter(a => a.type === 'activity')
+          .map(a => this.types[a.data.activity_type].preload(a)),
+        // Funnel Events
+        ...activities
+          .filter(a => a.type === 'event' && a.data.event_type == 1)
+          .map(a => StepTypes.getType(a.step.step_type).preload(a.step)),
+        // Broadcast Events
+        ...activities
+          .filter(a => a.type === 'event' && a.data.event_type == 2)
+          .map(a => BroadcastsStore.itemsFetched([a.broadcast])),
       ]
 
       Promise.all(promises).then(() => {
         $el.html(this.render(activities))
+        this.onMount()
       })
 
     }
@@ -767,14 +831,14 @@
                   ...ActivityStore.getItems().map(a => ({
                     ...a,
                     type: 'activity',
-                    time: a.data.timestamp
+                    time: parseInt(a.data.timestamp)
                   })),
                   ...EventsStore.getItems().map(e => ({
                     ...e,
                     type: 'event',
-                    time: e.data.time
+                    time: parseInt(e.data.time) + parseFloat(e.data.micro_time)
                   }))
-                ].sort((a, b) => a.time - b.time)
+                ].sort((a, b) => b.time - a.time)
 
                 ActivityTimeline.mount('#activity-here', allActivities)
 

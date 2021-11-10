@@ -1851,7 +1851,7 @@ class Contact_Query {
 		$before_and_after = self::get_before_and_after_from_filter_date_range( $filter_vars, true );
 
 		$event_query = array_filter( array_merge( [
-			'activity_type' => Activity::EMAIL_OPENED,
+			'activity_type' => Activity::EMAIL_CLICKED,
 			'email_id'      => $filter_vars['email_id'],
 			'referer'       => $filter_vars['link'],
 			'count'         => absint( get_array_var( $filter_vars, 'count', 1 ) ),

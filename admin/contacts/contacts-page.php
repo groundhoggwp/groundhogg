@@ -13,6 +13,7 @@ use function Groundhogg\base64_json_decode;
 use function Groundhogg\bulk_jobs;
 use function Groundhogg\do_replacements;
 use function Groundhogg\enqueue_filter_assets;
+use function Groundhogg\enqueue_step_type_assets;
 use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
@@ -143,6 +144,7 @@ class Contacts_Page extends Admin_Page {
 
 				wp_enqueue_editor();
 				wp_enqueue_media();
+				enqueue_step_type_assets();
 				wp_enqueue_style( 'groundhogg-admin-contact-record' );
 				wp_enqueue_script( 'groundhogg-admin-contact-record' );
 				wp_localize_script( 'groundhogg-admin-contact-record', 'GroundhoggContact', [

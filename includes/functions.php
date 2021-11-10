@@ -5533,6 +5533,9 @@ function is_template_site() {
  * Enqueue any step type registration assets
  */
 function enqueue_step_type_assets() {
+
+	wp_enqueue_script( 'groundhogg-funnel-step-types' );
+
 	do_action( 'groundhogg_enqueue_step_type_assets' );
 }
 

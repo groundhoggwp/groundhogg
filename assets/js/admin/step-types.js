@@ -842,13 +842,13 @@
 
       // Title
       title ({ ID, data, meta }) {
-        const roles = this.context.roles
+        const roles = Groundhogg.filters.roles
 
         if (meta.role && meta.role.length === 1) {
-          return sprintf(__('%s is created', 'groundhogg'), `<b>${roles[meta.role[0]]}</b>`)
+          return sprintf(__('%s is created', 'groundhogg'), `<b>${roles[meta.role[0]]?.name}</b>`)
         } else if (meta.role && meta.role.length > 1) {
           return sprintf(__('%s is created', 'groundhogg'), orList(
-            meta.role.map((role) => `<b>${roles[role]}</b>`)
+            meta.role.map((role) => `<b>${roles[role]?.name}</b>`)
           ))
         } else {
           return __('A <b>new user</b> is created', 'groundhogg')
@@ -857,7 +857,7 @@
 
       // Edit
       edit ({ ID, data, meta }) {
-        let roles = this.context.roles
+        let roles = Groundhogg.filters.roles
 
         //language=HTML
         return `

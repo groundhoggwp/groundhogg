@@ -546,6 +546,9 @@ class Event extends Base_Object {
 					'step' => $this->get_step()
 				] );
 			case Event::BROADCAST:
+				return array_merge( $array, [
+					'broadcast' => $this->get_step()
+				] );
 			case Event::EMAIL_NOTIFICATION:
 				return array_merge( $array, [
 					'email' => $this->get_step()

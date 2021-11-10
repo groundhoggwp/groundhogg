@@ -43,9 +43,14 @@
   margin: 10px;
 }
 
+#activity-here {
+  overflow: auto;
+  max-height: 800px;
+}
+
 #activity-timeline {
   margin-left: 15px;
-  border-left: 2px solid rgba(16, 38, 64, 0.5);
+  border-left: 2px solid rgba(16, 38, 64, 0.3);
 }
 #activity-timeline li.activity-item {
   position: relative;
@@ -53,6 +58,12 @@
 }
 #activity-timeline li.activity-item:not(:last-child) {
   margin-bottom: 25px;
+}
+#activity-timeline li.activity-item .activity-info {
+  font-size: 15px;
+}
+#activity-timeline li.activity-item .diff-time {
+  color: rgba(16, 38, 64, 0.5);
 }
 #activity-timeline li.activity-item .activity-icon {
   position: absolute;
@@ -62,9 +73,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 25px;
-  background: #f58115;
+  border-radius: 4px;
+  background: #0075ff;
   color: #FFFFFF;
+}
+#activity-timeline li.activity-item .activity-icon.benchmark {
+  background: #f58115;
+  border-radius: 4px;
+}
+#activity-timeline li.activity-item .activity-icon.broadcast, #activity-timeline li.activity-item .activity-icon.action {
+  background: #9ece38;
 }
 #activity-timeline li.activity-item .activity-icon svg {
   width: 15px;

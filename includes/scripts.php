@@ -546,7 +546,7 @@ class Scripts {
 			'groundhogg-admin',
 			'groundhogg-admin-element',
 			'groundhogg-admin-layout',
-			'groundhogg-admin-info-cards'
+			'groundhogg-admin-info-cards',
 		], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-element', GROUNDHOGG_ASSETS_URL . 'css/admin/elements.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-layout', GROUNDHOGG_ASSETS_URL . 'css/admin/layout.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
