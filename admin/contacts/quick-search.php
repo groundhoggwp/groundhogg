@@ -7,6 +7,7 @@ use function Groundhogg\action_input;
 use function Groundhogg\get_db;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
+use function Groundhogg\maybe_change_space_to_plus_in_email;
 
 ?>
 <div class="wp-clearfix"></div>
@@ -29,7 +30,7 @@ if ( $saved_search = get_url_var( 'saved_search' ) ) :
 				'name'        => 's',
 				'placeholder' => __( 'Name or Email', 'groundhogg' ),
 				'class'       => 'input',
-				'value'       => sanitize_text_field( get_url_var( 's' ) )
+				'value'       => maybe_change_space_to_plus_in_email( sanitize_text_field( get_url_var( 's' ) ) )
 			] ) ?>
 			<?php echo html()->submit( [
 				'text' => 'Search'

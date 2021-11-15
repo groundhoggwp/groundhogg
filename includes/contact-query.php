@@ -776,8 +776,8 @@ class Contact_Query {
 		}
 
 		if ( $this->query_vars['owner'] ) {
-			$this->query_vars['owner'] = implode( ',', wp_parse_id_list( $this->query_vars['owner'] ) );
-			$where['owner']            = "$this->table_name.owner_id IN ( {$this->query_vars['owner']} )";
+			$owner_clause   = implode( ',', wp_parse_id_list( $this->query_vars['owner'] ) );
+			$where['owner'] = "$this->table_name.owner_id IN ( {$owner_clause} )";
 		}
 
 		if ( $this->query_vars['report'] && is_array( $this->query_vars['report'] ) ) {
@@ -909,7 +909,7 @@ class Contact_Query {
 		if ( strlen( $this->query_vars['email'] ) || strlen( $this->query_vars['email_compare'] ) ) {
 			$where['email'] = self::generic_text_compare( "{$this->table_name}.email",
 				$this->query_vars['email_compare'],
-				$this->query_vars['email'] );
+				str_replace( ' ', '+', $this->query_vars['email'] ) );
 		}
 
 
@@ -1046,6 +1046,8 @@ class Contact_Query {
 	 */
 	protected function get_search_sql( $string, $columns ) {
 		global $wpdb;
+
+		$string = maybe_change_space_to_plus_in_email( $string );
 
 		if ( false !== strpos( $string, '**' ) ) {
 			$like = str_replace( '**', '%', $string );
@@ -1667,9 +1669,9 @@ class Contact_Query {
 		$before_and_after = self::get_before_and_after_from_filter_date_range( $filter_vars, true );
 
 		$event_query = array_filter( array_merge( [
-			'email_id' => $filter_vars['email_id'],
-			'status'   => Event::COMPLETE,
-			'count'    => absint( get_array_var( $filter_vars, 'count', 1 ) ),
+			'email_id'      => $filter_vars['email_id'],
+			'status'        => Event::COMPLETE,
+			'count'         => absint( get_array_var( $filter_vars, 'count', 1 ) ),
 			'count_compare' => get_array_var( $filter_vars, 'count_compare', 'greater_than_or_equal_to' ),
 		], $before_and_after ) );
 
@@ -1797,11 +1799,11 @@ class Contact_Query {
 		] );
 
 		$event_query = array_filter( [
-			'event_type' => Event::BROADCAST,
-			'funnel_id'  => Broadcast::FUNNEL_ID,
-			'step_id'    => $filter_vars['broadcast_id'],
-			'status'     => $filter_vars['status'],
-			'count'      => absint( get_array_var( $filter_vars, 'count', 1 ) ),
+			'event_type'    => Event::BROADCAST,
+			'funnel_id'     => Broadcast::FUNNEL_ID,
+			'step_id'       => $filter_vars['broadcast_id'],
+			'status'        => $filter_vars['status'],
+			'count'         => absint( get_array_var( $filter_vars, 'count', 1 ) ),
 			'count_compare' => get_array_var( $filter_vars, 'count_compare', 'greater_than_or_equal_to' ),
 		] );
 
@@ -2629,9 +2631,9 @@ class Contact_Query {
 			case 'not_equals':
 				return sprintf( "%s != '%s'", $column, $value );
 			case 'contains':
-				return sprintf( "%s RLIKE '%s'", $column, $value );
+				return sprintf( "%s LIKE '%s'", $column, '%' . $wpdb->esc_like( $value ) . '%' );
 			case 'not_contains':
-				return sprintf( "%s NOT RLIKE '%s'", $column, $value );
+				return sprintf( "%s NOT LIKE '%s'", $column, '%' . $wpdb->esc_like( $value ) . '%' );
 			case 'begins_with':
 			case 'starts_with':
 				return sprintf( "%s LIKE '%s'", $column, $wpdb->esc_like( $value ) . '%' );
@@ -2689,6 +2691,11 @@ class Contact_Query {
 	 * @return string
 	 */
 	public static function contact_generic_text_filter_compare( array $filter_vars, $query ): string {
+
+		if ( $filter_vars[ 'type' ] === 'email' ){
+			$filter_vars['value'] = str_replace( ' ', '+', $filter_vars[ 'value' ] );
+		}
+
 		return self::generic_text_compare( $query->table_name . '.' . $filter_vars['type'], $filter_vars['compare'], $filter_vars['value'] );
 	}
 

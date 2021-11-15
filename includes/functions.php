@@ -15,6 +15,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * If an email address is provided but a space is in place of a plus then swap out the space for a plus
+ *
+ * @param $str string
+ */
+function maybe_change_space_to_plus_in_email( $str ){
+
+	// No space, quit
+	if ( strpos( $str, ' ' ) === false ){
+		return $str;
+	}
+
+	// replace the space with a plus and run is_email
+	$maybe_email = str_replace( ' ', '+', $str );
+
+	if ( is_email( $maybe_email ) ){
+		return $maybe_email;
+	}
+
+	return $str;
+}
+
 
 /**
  * Wrapper function
@@ -5534,6 +5556,7 @@ function enqueue_step_type_assets() {
 function enqueue_filter_assets() {
 
 	wp_enqueue_script( 'groundhogg-admin-search-filters' );
+	wp_enqueue_style( 'groundhogg-admin-search-filters' );
 
 	do_action( 'groundhogg_enqueue_filter_assets' );
 }
