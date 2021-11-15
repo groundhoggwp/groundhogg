@@ -164,6 +164,10 @@ class Scripts {
 		wp_register_script( 'moment-js', GROUNDHOGG_ASSETS_URL . 'lib/calendar/js/moment.min.js' );
 		wp_register_script( 'baremetrics-calendar', GROUNDHOGG_ASSETS_URL . 'lib/calendar/js/Calendar.min.js' );
 
+		wp_register_script( 'groundhogg-admin-user', GROUNDHOGG_ASSETS_URL . '/js/admin/user' . $dot_min . '.js', [
+			'groundhogg-admin'
+		] );
+
 		wp_register_script( 'groundhogg-admin-functions', GROUNDHOGG_ASSETS_URL . 'js/admin/functions' . $dot_min . '.js', [
 			'jquery',
 		], GROUNDHOGG_VERSION, true );
@@ -173,7 +177,7 @@ class Scripts {
 			'jquery',
 			'select2',
 			'jquery-ui-autocomplete',
-			'groundhogg-admin-functions'
+			'groundhogg-admin-functions',
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-data', GROUNDHOGG_ASSETS_URL . 'js/admin/data' . $dot_min . '.js', [
@@ -233,7 +237,6 @@ class Scripts {
 			'groundhogg-admin-search-filters',
 		] );
 
-		wp_register_script( 'groundhogg-admin-user', GROUNDHOGG_ASSETS_URL . '/js/admin/user' . $dot_min . '.js' );
 		wp_register_script( 'groundhogg-admin-formatting', GROUNDHOGG_ASSETS_URL . '/js/admin/formatting' . $dot_min . '.js' );
 
 		wp_register_script( 'groundhogg-admin-color', GROUNDHOGG_ASSETS_URL . 'js/admin/color-picker' . $dot_min . '.js', [
@@ -276,6 +279,8 @@ class Scripts {
 		wp_register_script( 'groundhogg-admin-funnel-editor-v2', GROUNDHOGG_ASSETS_URL . 'js/admin/funnel-editor-v3' . $dot_min . '.js', [
 			'jquery',
 			'groundhogg-admin-functions',
+			'groundhogg-admin',
+			'groundhogg-admin-user',
 			'sticky-sidebar'
 		], GROUNDHOGG_VERSION, true );
 
@@ -354,58 +359,58 @@ class Scripts {
 			'_ajax_linking_nonce' => wp_create_nonce( 'internal-linking' ),
 		] );
 
-		wp_add_inline_script( 'groundhogg-admin', 'var Groundhogg = '. wp_json_encode( [
-			'locale'          => str_replace( '_', '-', get_locale() ),
-			'user_test_email' => get_user_test_email(),
-			'api'             => [
-				'routes' => [
-					'v3' => [
-						'tags'     => rest_url( 'gh/v3/tags?select2=true' ),
-						'emails'   => rest_url( 'gh/v3/emails?select2=true&status[]=ready&status[]=draft' ),
-						'sms'      => rest_url( 'gh/v3/sms?select2=true' ),
-						'contacts' => rest_url( 'gh/v3/contacts?select2=true' ),
-					],
-					'v4' => [
-						'root'       => rest_url( Base_Api::NAME_SPACE ),
-						'tags'       => rest_url( Base_Api::NAME_SPACE . '/tags' ),
-						'notes'      => rest_url( Base_Api::NAME_SPACE . '/notes' ),
-						'contacts'   => rest_url( Base_Api::NAME_SPACE . '/contacts' ),
-						'emails'     => rest_url( Base_Api::NAME_SPACE . '/emails' ),
-						'funnels'    => rest_url( Base_Api::NAME_SPACE . '/funnels' ),
-						'steps'      => rest_url( Base_Api::NAME_SPACE . '/steps' ),
-						'searches'   => rest_url( Base_Api::NAME_SPACE . '/searches' ),
-						'reports'    => rest_url( Base_Api::NAME_SPACE . '/reports' ),
-						'campaigns'  => rest_url( Base_Api::NAME_SPACE . '/campaigns' ),
-						'broadcasts' => rest_url( Base_Api::NAME_SPACE . '/broadcasts' )
+		wp_add_inline_script( 'groundhogg-admin', 'var Groundhogg = ' . wp_json_encode( [
+				'locale'          => str_replace( '_', '-', get_locale() ),
+				'user_test_email' => get_user_test_email(),
+				'api'             => [
+					'routes' => [
+						'v3' => [
+							'tags'     => rest_url( 'gh/v3/tags?select2=true' ),
+							'emails'   => rest_url( 'gh/v3/emails?select2=true&status[]=ready&status[]=draft' ),
+							'sms'      => rest_url( 'gh/v3/sms?select2=true' ),
+							'contacts' => rest_url( 'gh/v3/contacts?select2=true' ),
+						],
+						'v4' => [
+							'root'       => rest_url( Base_Api::NAME_SPACE ),
+							'tags'       => rest_url( Base_Api::NAME_SPACE . '/tags' ),
+							'notes'      => rest_url( Base_Api::NAME_SPACE . '/notes' ),
+							'contacts'   => rest_url( Base_Api::NAME_SPACE . '/contacts' ),
+							'emails'     => rest_url( Base_Api::NAME_SPACE . '/emails' ),
+							'funnels'    => rest_url( Base_Api::NAME_SPACE . '/funnels' ),
+							'steps'      => rest_url( Base_Api::NAME_SPACE . '/steps' ),
+							'searches'   => rest_url( Base_Api::NAME_SPACE . '/searches' ),
+							'reports'    => rest_url( Base_Api::NAME_SPACE . '/reports' ),
+							'campaigns'  => rest_url( Base_Api::NAME_SPACE . '/campaigns' ),
+							'broadcasts' => rest_url( Base_Api::NAME_SPACE . '/broadcasts' )
+						]
 					]
-				]
-			],
-			'replacements'    => [
-				'groups' => Plugin::instance()->replacements->replacement_code_groups,
-				'codes'  => Plugin::instance()->replacements->replacement_codes,
-			],
-			'fields'          => [
-				'mappable' => get_mappable_fields()
-			],
-			'filters'         => [
-				'optin_status' => Preferences::get_preference_names(),
-				'owners'       => get_owners(),
-				'current'      => get_request_var( 'filters', [] ),
-				'roles'        => get_editable_roles(),
-				'countries'    => utils()->location->get_countries_list()
-			],
-			'managed_page'    => [
-				'root' => managed_page_url()
-			],
-			'url'             => [
-				'admin' => admin_url(),
-				'home'  => home_url(),
-			],
-			'rawStepTypes'    => Plugin::instance()->step_manager->get_elements(),
-			'currentUser'     => wp_get_current_user(),
-			'isMultisite'     => is_multisite(),
-			'isSuperAdmin'    => is_super_admin(),
-		] ), 'before' );
+				],
+				'replacements'    => [
+					'groups' => Plugin::instance()->replacements->replacement_code_groups,
+					'codes'  => Plugin::instance()->replacements->replacement_codes,
+				],
+				'fields'          => [
+					'mappable' => get_mappable_fields()
+				],
+				'filters'         => [
+					'optin_status' => Preferences::get_preference_names(),
+					'owners'       => get_owners(),
+					'current'      => get_request_var( 'filters', [] ),
+					'roles'        => get_editable_roles(),
+					'countries'    => utils()->location->get_countries_list()
+				],
+				'managed_page'    => [
+					'root' => managed_page_url()
+				],
+				'url'             => [
+					'admin' => admin_url(),
+					'home'  => home_url(),
+				],
+				'rawStepTypes'    => Plugin::instance()->step_manager->get_elements(),
+				'currentUser'     => wp_get_current_user(),
+				'isMultisite'     => is_multisite(),
+				'isSuperAdmin'    => is_super_admin(),
+			] ), 'before' );
 
 		wp_register_script( 'groundhogg-admin-fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
 
