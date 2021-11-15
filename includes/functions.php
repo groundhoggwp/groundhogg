@@ -20,17 +20,17 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @param $str string
  */
-function maybe_change_space_to_plus_in_email( $str ){
+function maybe_change_space_to_plus_in_email( $str ) {
 
 	// No space, quit
-	if ( strpos( $str, ' ' ) === false ){
+	if ( strpos( $str, ' ' ) === false ) {
 		return $str;
 	}
 
 	// replace the space with a plus and run is_email
 	$maybe_email = str_replace( ' ', '+', $str );
 
-	if ( is_email( $maybe_email ) ){
+	if ( is_email( $maybe_email ) ) {
 		return $maybe_email;
 	}
 
@@ -3478,9 +3478,7 @@ function file_access_url( $path, $download = false ) {
 	$url = managed_page_url( 'uploads/' . ltrim( $path, '/' ) );
 
 	// WP Engine file download links do not work if forward slash is not present.
-	if ( ! is_wpengine() ) {
-		$url = untrailingslashit( $url );
-	}
+	$url = trailingslashit( $url );
 
 	if ( $download ) {
 		$url = add_query_arg( [ 'download' => true ], $url );
