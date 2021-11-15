@@ -656,6 +656,11 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 * @param $other Base_Object
 	 */
 	public function create_relationship( $other ) {
+
+		if ( ! is_object( $other ) || ! method_exists( $other, 'get_id' ) ){
+			return false;
+		}
+
 		return $this->get_rel_db()->add( [
 			'primary_object_id'     => $this->get_id(),
 			'primary_object_type'   => $this->get_object_type(),
@@ -672,6 +677,11 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 * @return false|int
 	 */
 	public function delete_relationship( $other ) {
+
+		if ( ! is_object( $other ) || ! method_exists( $other, 'get_id' ) ){
+			return false;
+		}
+
 		return $this->get_rel_db()->delete( [
 			'primary_object_id'     => $this->get_id(),
 			'primary_object_type'   => $this->get_object_type(),
