@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.8
 Requires PHP: 7.1
-Stable tag: 2.5.5
+Stable tag: 2.5.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -320,6 +320,19 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.5.6 (2021-11-18) =
+* ADDED `{birthday}` replacement code
+* ADDED MySQL and DB details to system report
+* ADDED `\Groundhogg\Contact::has_tags()` alias method
+* ADDED `groundhogg/admin/tags/table/sortable_columns` for sortable tags column
+* TWEAKED Clicking "broadcast" in the emails page now takes you to the newer UI of the broadcast tool rather than the old one
+* TWEAKED Enforce InnoDB engine is used for `wp_gh_object_relationships` due to long key names
+* FIXED NGINX systems having a hard time downloading contact files because of missing `/` at the end of the path
+* FIXED Tag pickers, email pickers, broadcast scheduler, and search filters not working or un-styled when the toolbar widget is disabled
+* FIXED "AND" logic for `[gh_does_not_have_tags]` shortcode
+* FIXED invalid timeout delay for contact picker component
+* FIXED Edge case handling for usage of "+" in emails
 
 = 2.5.5 (2021-11-02) =
 * ADDED More JS components for use in 3.0 and the pipeline extension
