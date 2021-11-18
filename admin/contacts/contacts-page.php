@@ -145,6 +145,7 @@ class Contacts_Page extends Admin_Page {
 				wp_enqueue_media();
 
 				wp_enqueue_style( 'groundhogg-admin-contact-editor' );
+				wp_enqueue_style( 'groundhogg-admin-element' );
 				wp_enqueue_style( 'groundhogg-admin-contact-info-cards' );
 				wp_enqueue_style( 'buttons' );
 				wp_enqueue_style( 'media-views' );
@@ -161,8 +162,8 @@ class Contacts_Page extends Admin_Page {
 
 				wp_enqueue_style( 'select2' );
 				wp_enqueue_script( 'select2' );
-				wp_enqueue_style( 'groundhogg-admin-search-filters' );
 				wp_enqueue_style( 'groundhogg-admin-contact-inline' );
+				enqueue_filter_assets();
 
 				$current_filters = [];
 				$saved_search    = false;
@@ -187,8 +188,6 @@ class Contacts_Page extends Admin_Page {
 				} else {
 					$current_filters = get_filters_from_old_query_vars( get_request_query() );
 				}
-
-				enqueue_filter_assets();
 
 				// Advanced Search
 				wp_enqueue_script( 'groundhogg-admin-contact-search' );
