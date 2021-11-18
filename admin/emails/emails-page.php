@@ -83,6 +83,7 @@ class Emails_Page extends Admin_Page {
 	}
 
 	public function scripts() {
+
 		if ( in_array( $this->get_current_action(), [ 'add', 'edit' ] ) ) {
 
 			wp_enqueue_style( 'groundhogg-admin-email-editor-plain' );
@@ -106,6 +107,8 @@ class Emails_Page extends Admin_Page {
 			wp_enqueue_script( 'groundhogg-admin-email-preview' );
 
 		}
+
+//		enqueue_broadcast_assets();
 
 		remove_editor_styles();
 
@@ -160,8 +163,9 @@ class Emails_Page extends Admin_Page {
 				'target' => '_self',
 			],
 			[
-				'link'   => Plugin::$instance->admin->get_page( 'broadcasts' )->admin_url( $broadcast_args ),
+				'link'   => Groundhogg\admin_page_url( 'gh_broadcasts', $broadcast_args ),
 				'action' => __( 'Broadcast', 'groundhogg' ),
+				'id' => 'gh-schedule-broadcast',
 				'target' => '_self',
 			],
 			[

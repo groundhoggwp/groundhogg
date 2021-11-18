@@ -5548,6 +5548,14 @@ function enqueue_step_type_assets() {
 	do_action( 'groundhogg_enqueue_step_type_assets' );
 }
 
+function enqueue_broadcast_assets() {
+	wp_enqueue_script( 'groundhogg-admin-send-broadcast' );
+	wp_enqueue_style( 'groundhogg-admin-element' );
+	enqueue_filter_assets();
+
+	do_action( 'groundhogg_enqueue_broadcast_assets' );
+}
+
 /**
  * Enqueue any step type registration assets
  */

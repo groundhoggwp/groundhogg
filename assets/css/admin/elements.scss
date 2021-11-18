@@ -312,6 +312,18 @@ span.gh-text {
   &.danger {
     color: $error-red;
   }
+
+  &.md {
+    font-size: 15px;
+  }
+
+  &.sm {
+    font-size: 13px;
+  }
+
+  &.lg {
+    font-size: 18px;
+  }
 }
 
 .gh-panel {
@@ -1330,4 +1342,3 @@ p.error,
   height: auto;
   min-height: 28px;
 }
-

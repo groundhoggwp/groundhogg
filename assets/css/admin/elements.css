@@ -226,6 +226,18 @@ svg.danger,
 span.gh-text.danger {
   color: #e91f4f;
 }
+svg.md,
+span.gh-text.md {
+  font-size: 15px;
+}
+svg.sm,
+span.gh-text.sm {
+  font-size: 13px;
+}
+svg.lg,
+span.gh-text.lg {
+  font-size: 18px;
+}
 
 .gh-panel {
   background: #FFFFFF;
