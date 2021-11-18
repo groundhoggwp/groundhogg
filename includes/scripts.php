@@ -164,9 +164,6 @@ class Scripts {
 		wp_register_script( 'moment-js', GROUNDHOGG_ASSETS_URL . 'lib/calendar/js/moment.min.js' );
 		wp_register_script( 'baremetrics-calendar', GROUNDHOGG_ASSETS_URL . 'lib/calendar/js/Calendar.min.js' );
 
-		wp_register_script( 'groundhogg-admin-user', GROUNDHOGG_ASSETS_URL . '/js/admin/user' . $dot_min . '.js', [
-			'groundhogg-admin'
-		] );
 
 		wp_register_script( 'groundhogg-admin-functions', GROUNDHOGG_ASSETS_URL . 'js/admin/functions' . $dot_min . '.js', [
 			'jquery',
@@ -204,7 +201,6 @@ class Scripts {
 
 		wp_register_script( 'groundhogg-admin-search-filters', GROUNDHOGG_ASSETS_URL . 'js/admin/search-filters' . $dot_min . '.js', [
 			'groundhogg-admin-element',
-			'groundhogg-admin-user',
 			'groundhogg-admin-data',
 			'jquery-ui-sortable'
 		], GROUNDHOGG_VERSION );
@@ -218,19 +214,16 @@ class Scripts {
 			'groundhogg-admin-element',
 			'groundhogg-admin-components',
 			'groundhogg-admin-data',
-			'groundhogg-admin-user',
 			'groundhogg-admin-send-broadcast'
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-notes', GROUNDHOGG_ASSETS_URL . 'js/admin/notes' . $dot_min . '.js', [
 			'groundhogg-admin-element',
 			'groundhogg-admin-data',
-			'groundhogg-admin-user',
 		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-admin-send-broadcast', GROUNDHOGG_ASSETS_URL . '/js/admin/send-broadcast' . $dot_min . '.js', [
 			'groundhogg-admin',
-			'groundhogg-admin-user',
 			'groundhogg-admin-data',
 			'groundhogg-admin-element',
 			'groundhogg-admin-functions',
@@ -280,7 +273,6 @@ class Scripts {
 			'jquery',
 			'groundhogg-admin-functions',
 			'groundhogg-admin',
-			'groundhogg-admin-user',
 			'sticky-sidebar'
 		], GROUNDHOGG_VERSION, true );
 
