@@ -83,7 +83,6 @@ class Contacts_Page extends Admin_Page {
 
 		add_action( 'wp_ajax_groundhogg_contact_table_row', [ $this, 'ajax_contact_table_row' ] );
 		add_action( 'wp_ajax_groundhogg_get_contacts_table', [ $this, 'ajax_get_table' ] );
-		add_action( 'wp_ajax_nopriv_groundhogg_get_contacts_table', [ $this, 'ajax_get_table' ] );
 	}
 
 	/**
@@ -473,7 +472,7 @@ class Contacts_Page extends Admin_Page {
 				'link'   => $this->admin_url( [ 'action' => 'add' ] ),
 				'action' => __( 'Add New', 'groundhogg' ),
 				'target' => '_self',
-				'id'     => '',
+				'id'     => 'quick-add',
 			];
 		}
 

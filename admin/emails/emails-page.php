@@ -145,6 +145,7 @@ class Emails_Page extends Admin_Page {
 	 * @return array|array[]
 	 */
 	protected function get_title_actions() {
+
 		$broadcast_args = [ 'action' => 'add', 'type' => 'email' ];
 		$reporting_args = [ 'tab' => 'email' ];
 
@@ -165,7 +166,6 @@ class Emails_Page extends Admin_Page {
 			[
 				'link'   => Groundhogg\admin_page_url( 'gh_broadcasts', $broadcast_args ),
 				'action' => __( 'Broadcast', 'groundhogg' ),
-				'id' => 'gh-schedule-broadcast',
 				'target' => '_self',
 			],
 			[

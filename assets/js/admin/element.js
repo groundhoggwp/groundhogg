@@ -686,10 +686,10 @@
    * @param props
    * @return {{setContent: setContent, $modal: (*|jQuery|HTMLElement), close: close}}
    */
-  const loadingModal = (text = 'Loading', props = {} ) => {
+  const loadingModal = (text = 'Loading', props = {}) => {
 
     let stop = () => {}
-    const { onOpen = () => {}, onClose = () => {}} = props
+    const { onOpen = () => {}, onClose = () => {} } = props
 
     return modal({
       content: `<h1>${text}</h1>`,
@@ -911,7 +911,7 @@
 
     //language=html
     const html = `
-		<div class="gh-modal ${className}">
+		<div class="gh-modal ${className} ${disableScrolling ? 'disabled-scrolling' : '' }">
 			${overlay ? `<div class="gh-modal-overlay"></div>` : ''}
 			<div class="gh-modal-dialog ${dialogClasses}">
 				${canClose ? `	<button type="button" class="dashicon-button gh-modal-button-close-top gh-modal-button-close">
@@ -933,7 +933,8 @@
 
       $modal.remove()
 
-      if (disableScrolling) {
+      // If this modal was disabling scrolling and no other modals exist that also disable scroll.
+      if (disableScrolling && $('.gh-modal.disabled-scrolling').length === 0 ) {
         $('body').removeClass('modal-open')
       }
 
@@ -1445,13 +1446,13 @@
           update: (e, ui) => {
 
             let $row = $(ui.item)
-            let oldIndex = parseInt( $row.data('row') )
+            let oldIndex = parseInt($row.data('row'))
             let curIndex = $row.index()
 
             let row = this.rows[oldIndex]
 
-            this.rows.splice( oldIndex, 1 )
-            this.rows.splice( curIndex, 0, row )
+            this.rows.splice(oldIndex, 1)
+            this.rows.splice(curIndex, 0, row)
 
             this.mount()
           }
@@ -1473,8 +1474,8 @@
 					dataRow: rowIndex,
 					dataCell: cellIndex,
 				})).join('')}
-				${ sortable ? `<span class="handle" data-row="${rowIndex}"><span
-					class="dashicons dashicons-move"></span></span>` : '' }
+				${sortable ? `<span class="handle" data-row="${rowIndex}"><span
+					class="dashicons dashicons-move"></span></span>` : ''}
 				<button class="gh-button dashicon remove-row" data-row="${rowIndex}"><span
 					class="dashicons dashicons-no-alt"></span></button>
 			</div>`

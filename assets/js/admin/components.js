@@ -7,17 +7,20 @@
     select,
     uuid,
     addMediaToBasicTinyMCE,
+    specialChars,
     tinymceElement,
     input,
     dialog,
     isValidEmail,
-    textarea
+    textarea,
+
   } = Groundhogg.element
-  const { contacts: ContactsStore } = Groundhogg.stores
+  const { contacts: ContactsStore, tags: TagsStore } = Groundhogg.stores
   const { post, routes } = Groundhogg.api
   const { tagPicker } = Groundhogg.pickers
   const { sprintf, __, _x, _n } = wp.i18n
   const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
+  const { currentUser } = Groundhogg
 
   const selectContactModal = ({
     onSelect = () => {},
@@ -65,7 +68,7 @@
       // language=HTML
       return `
 		  <tr>
-          <td colspan="3"><p>${__('No contacts match that search...', 'groundhogg')}</p></td>
+			  <td colspan="3"><p>${__('No contacts match that search...', 'groundhogg')}</p></td>
 		  </tr>`
     }
 
@@ -73,7 +76,7 @@
 
       const setSearchResults = (results) => {
 
-        if ( ! results.length ){
+        if (!results.length) {
           $('#search-results table tbody').html(noResults())
           return
         }
@@ -108,12 +111,12 @@
 
           getResults()
 
-        }, 1000 )
+        }, 1000)
 
       }).focus()
 
-      if ( ContactsStore.hasItems() ){
-        setSearchResults( ContactsStore.getItems() )
+      if (ContactsStore.hasItems()) {
+        setSearchResults(ContactsStore.getItems())
       } else {
         getResults()
       }
@@ -124,98 +127,337 @@
 
   }
 
+  const quickEditContactModal = ({
+    contact,
+    prefix = 'quick-edit',
+    onEdit = (contact) => {}
+  }) => {
+
+    if (contact && contact.tags) {
+      TagsStore.itemsFetched(contact.tags)
+    }
+
+    const getContact = () => {
+      return ContactsStore.get(contact.ID)
+    }
+
+    const quickEdit = (contact) => {
+
+      // language=HTML
+      return `
+		  <div class="contact-quick-edit" tabindex="0">
+			  <div class="contact-quick-edit-header">
+				  <div class="avatar-and-name">
+					  <img height="50" width="50" src="${contact.data.gravatar}" alt="avatar"/>
+					  <h2 class="contact-name">
+						  ${specialChars(`${contact.data.first_name} ${contact.data.last_name}`)}</h2>
+				  </div>
+				  <div class="actions">
+					  <a class="gh-button secondary"
+					     href="${contact.admin}">${__('Edit Full Profile', 'groundhogg')}</a>
+				  </div>
+			  </div>
+			  <div class="contact-quick-edit-fields">
+				  <div class="row">
+					  <div class="col">
+						  <label for="${prefix}-first-name">${__('First Name', 'groundhogg')}</label>
+						  ${input({
+							  id: `${prefix}-first-name`,
+							  name: 'first_name',
+							  value: contact.data.first_name,
+						  })}
+					  </div>
+					  <div class="col">
+						  <label for="${prefix}-last-name">${__('Last Name', 'groundhogg')}</label>
+						  ${input({
+							  id: `${prefix}-last-name`,
+							  name: 'last_name',
+							  value: contact.data.last_name,
+						  })}
+					  </div>
+				  </div>
+				  <div class="row">
+					  <div class="col">
+						  <label for="${prefix}-email">${__('Email Address', 'groundhogg')}</label>
+						  ${input({
+							  type: 'email',
+							  name: 'email',
+							  id: `${prefix}-email`,
+							  value: contact.data.email
+						  })}
+					  </div>
+					  <div class="col">
+						  <div class="row phone">
+							  <div class="col">
+								  <label for="${prefix}-primary-phone">${__('Primary Phone', 'groundhogg')}</label>
+								  ${input({
+									  type: 'tel',
+									  id: `${prefix}-primary-phone`,
+									  name: 'primary_phone',
+									  value: contact.meta.primary_phone
+								  })}
+							  </div>
+							  <div class="primary-phone-ext">
+								  <label
+									  for="${prefix}-primary-phone-extension">${_x('Ext.', 'phone number extension', 'groundhogg')}</label>
+								  ${input({
+									  type: 'number',
+									  id: `${prefix}-primary-phone-extension`,
+									  name: 'primary_phone_extension',
+									  value: contact.meta.primary_phone_extension
+								  })}
+							  </div>
+						  </div>
+					  </div>
+				  </div>
+				  <div class="row">
+					  <div class="col">
+						  <label for="${prefix}-email">${__('Optin Status', 'groundhogg')}</label>
+						  ${select({
+							  id: `${prefix}-optin-status`,
+							  name: 'optin_status'
+						  }, Groundhogg.filters.optin_status, contact.data.optin_status)}
+					  </div>
+					  <div class="col">
+						  <label for="${prefix}-mobile-phone">${__('Mobile Phone', 'groundhogg')}</label>
+						  ${input({
+							  type: 'tel',
+							  id: `${prefix}-mobile-phone`,
+							  name: 'mobile_phone',
+							  value: contact.meta.mobile_phone
+						  })}
+					  </div>
+				  </div>
+				  <div class="row">
+					  <div class="col">
+						  <label for="${prefix}-owner">${__('Owner', 'noun the contact owner', 'groundhogg')}</label>
+						  ${select({
+							  id: `${prefix}-owner`,
+							  name: 'owner_id'
+						  }, Groundhogg.filters.owners.map(u => ({
+							  text: u.data.user_email,
+							  value: u.ID
+						  })), contact.data.owner_id)}
+					  </div>
+					  <div class="col">
+						  <label for="${prefix}-tags">${__('Tags', 'groundhogg')}</label>
+						  ${select({
+							  id: `${prefix}-tags`,
+							  multiple: true
+						  })}
+					  </div>
+				  </div>
+			  </div>
+			  <div class="align-right-space-between" style="margin-top: 20px">
+				  <button class="gh-button text danger" id="${prefix}-cancel">${__('Cancel', 'groundhogg')}</button>
+				  <button class="gh-button primary" id="${prefix}-save">${__('Save Changes', 'groundhogg')}</button>
+			  </div>
+		  </div>`
+    }
+
+    const quickEditMounted = ({ close, setContent }) => {
+
+      let payload
+
+      const clearPayload = () => {
+        payload = {
+          data: {},
+          meta: {},
+          add_tags: [],
+          remove_tags: []
+        }
+      }
+
+      clearPayload()
+
+      const updateContact = (data) => {
+
+        payload = {
+          ...data,
+          data: {
+            ...payload.data,
+            ...data.data
+          },
+          meta: {
+            ...payload.meta,
+            ...data.meta
+          },
+        }
+
+        console.log(payload)
+      }
+
+      const $quickEdit = $('.contact-quick-edit')
+
+      $quickEdit.focus()
+
+      $(`#${prefix}-save`).on('click', (e) => {
+
+        const $btn = $(e.target)
+
+        $btn.prop('disabled', true)
+        $btn.text(__('Saving', 'groundhogg'))
+        const { stop } = loadingDots(`#${prefix}-save`)
+
+        ContactsStore.patch(contact.ID, payload).then(c => {
+          stop()
+          clearPayload()
+          onEdit(c)
+
+          setContent(quickEdit(getContact()))
+          quickEditMounted({ close, setContent })
+        })
+
+      })
+
+      $(`#${prefix}-cancel`).on('click', (e) => {
+        clearPayload()
+        close()
+      })
+
+      tagPicker(`#${prefix}-tags`, true, (items) => {TagsStore.itemsFetched(items)}, {
+        data: getContact().tags.map(t => ({ id: t.ID, text: t.data.tag_name, selected: true }))
+      }).on('select2:unselect', (e) => {
+
+        updateContact({
+          add_tags: payload.add_tags.filter(tId => tId != e.params.data.id),
+          remove_tags: [
+            ...payload.remove_tags,
+            parseInt(e.params.data.id)
+          ]
+        })
+      }).on('select2:select', (e) => {
+
+        updateContact({
+          add_tags: [
+            ...payload.add_tags,
+            parseInt(e.params.data.id)
+          ].filter(tId => !getContact().tags.find(t => t.ID == tId)),
+          remove_tags: payload.remove_tags.filter(tId => tId != e.params.data.id)
+        })
+      })
+
+      $(`#${prefix}-first-name, #${prefix}-last-name, #${prefix}-email, #${prefix}-optin-status, #${prefix}-owner`).on('change', (e) => {
+        updateContact({
+          data: {
+            [e.target.name]: e.target.value
+          }
+        })
+      })
+
+      $(`#${prefix}-primary-phone, #${prefix}-primary-phone-extension, #${prefix}-mobile-phone`).on('change', (e) => {
+        updateContact({
+          meta: {
+            [e.target.name]: e.target.value
+          }
+        })
+      })
+    }
+
+    const { close, setContent } = modal({
+      content: quickEdit(getContact()),
+      onOpen: quickEditMounted
+    })
+  }
+
   const addContactModal = ({
     prefix = 'quick-add',
     onCreate = () => {}
   }) => {
 
     const form = () => {
-      return `	<div class="gh-rows-and-columns">
-				<div class="gh-row">
-					<div class="gh-col">
-						<label for="${prefix}-first-name">${__('First Name', 'groundhogg')}</label>
-						${input({
-        id: `${prefix}-first-name`,
-        name: 'first_name',
-        placeholder: 'John'
-      })}
-					</div>
-					<div class="gh-col">
-						<label for="${prefix}-last-name">${__('Last Name', 'groundhogg')}</label>
-						${input({
-        id: `${prefix}-last-name`,
-        name: 'last_name',
-        placeholder: 'Doe'
-      })}
-					</div>
-				</div>
-				<div class="gh-row">
-					<div class="gh-col">
-						<label for="${prefix}-email">${__('Email Address', 'groundhogg')}</label>
-						${input({
-        id: `${prefix}-email`,
-        name: 'email',
-        placeholder: 'john@example.com',
-        required: true,
-      })}
-					</div>
-				</div>
-				<div class="gh-row phone">
-					<div class="cghol">
-						<label for="quick-edit-primary-phone">${__('Primary Phone', 'groundhogg')}</label>
-						${input({
-        type: 'tel',
-        id: `${prefix}-primary-phone`,
-        name: 'primary_phone',
-      })}
-					</div>
-					<div class="primary-phone-ext">
-						<label
-							for="quick-edit-primary-phone-extension">${_x('Ext.', 'phone number extension', 'groundhogg')}</label>
-						${input({
-        type: 'number',
-        id: `${prefix}-primary-phone-ext`,
-        name: 'primary_phone_extension',
-      })}
-					</div>
-				</div>
-				<div class="gh-row">
-					<div class="gh-col">
-						<label for="quick-edit-mobile-phone">${__('Mobile Phone', 'groundhogg')}</label>
-						${input({
-        type: 'tel',
-        id: `${prefix}-mobile-phone`,
-        name: 'mobile_phone',
-      })}
-					</div>
-				</div>
-				<div class="gh-row">
-					<div class="gh-col">
-						<label for="${prefix}-tags">${__('Tags', 'groundhogg')}</label>
-						${select({
-        id: `${prefix}-tags`,
-        multiple: true,
-        dataPlaceholder: __('Type to select tags...', 'groundhogg'),
-        style: {
-          width: '100%'
-        }
-      })}
-					</div>
-				</div>
-				<div class="gh-row">
-					<div class="gh-col">
-						<button id="${prefix}-create" class="gh-button primary">
-							${__('Create Contact', 'groundhogg')}
-						</button>
-					</div>
-				</div>
-			</div>`
+      // language=HTML
+      return `
+		  <h3 class="no-margin-top">${__('Add Contact', 'groundhogg')}</h3>
+		  <div class="gh-rows-and-columns">
+			  <div class="gh-row">
+				  <div class="gh-col">
+					  <label for="${prefix}-first-name">${__('First Name', 'groundhogg')}</label>
+					  ${input({
+						  id: `${prefix}-first-name`,
+						  name: 'first_name',
+						  placeholder: 'John'
+					  })}
+				  </div>
+				  <div class="gh-col">
+					  <label for="${prefix}-last-name">${__('Last Name', 'groundhogg')}</label>
+					  ${input({
+						  id: `${prefix}-last-name`,
+						  name: 'last_name',
+						  placeholder: 'Doe'
+					  })}
+				  </div>
+			  </div>
+			  <div class="gh-row">
+				  <div class="gh-col">
+					  <label for="${prefix}-email">${__('Email Address', 'groundhogg')}</label>
+					  ${input({
+						  id: `${prefix}-email`,
+						  name: 'email',
+						  placeholder: 'john@example.com',
+						  required: true,
+					  })}
+				  </div>
+			  </div>
+			  <div class="gh-row phone">
+				  <div class="gh-col">
+					  <label for="${prefix}-primary-phone">${__('Primary Phone', 'groundhogg')}</label>
+					  ${input({
+						  type: 'tel',
+						  id: `${prefix}-primary-phone`,
+						  name: 'primary_phone',
+					  })}
+				  </div>
+				  <div class="primary-phone-ext">
+					  <label
+						  for="${prefix}-primary-phone-extension">${_x('Ext.', 'phone number extension', 'groundhogg')}</label>
+					  ${input({
+						  type: 'number',
+						  id: `${prefix}-primary-phone-ext`,
+						  name: 'primary_phone_extension',
+					  })}
+				  </div>
+			  </div>
+			  <div class="gh-row">
+				  <div class="gh-col">
+					  <label for="${prefix}-mobile-phone">${__('Mobile Phone', 'groundhogg')}</label>
+					  ${input({
+						  type: 'tel',
+						  id: `${prefix}-mobile-phone`,
+						  name: 'mobile_phone',
+					  })}
+				  </div>
+			  </div>
+			  <div class="gh-row">
+				  <div class="gh-col">
+					  <label for="${prefix}-tags">${__('Tags', 'groundhogg')}</label>
+					  ${select({
+						  id: `${prefix}-tags`,
+						  multiple: true,
+						  dataPlaceholder: __('Type to select tags...', 'groundhogg'),
+						  style: {
+							  width: '100%'
+						  }
+					  })}
+				  </div>
+			  </div>
+			  <div class="align-right-space-between">
+				  <button class="gh-button text danger" id="${prefix}-cancel">
+              ${__('Cancel', 'groundhogg')}
+          </button>
+				  <button id="${prefix}-create" class="gh-button primary">
+					  ${__('Create Contact', 'groundhogg')}
+				  </button>
+			  </div>
+		  </div>`
     }
 
     const onMount = ({ close, setContent }) => {
 
       let payload = {
-        data: {},
+        data: {
+          owner_id: currentUser.ID
+        },
         meta: {}
       }
 
@@ -225,6 +467,8 @@
           ...data
         }
       }
+
+      $(`#${prefix}-cancel` ).on('click', close )
 
       $(`#${prefix}-create`).on('click', ({ target }) => {
 
@@ -422,7 +666,7 @@
         reMount()
       })
 
-      $('#discard-draft').on('click', close )
+      $('#discard-draft').on('click', close)
 
       $('#send-email-commit').on('click', ({ target }) => {
 
@@ -505,6 +749,7 @@
   Groundhogg.components = {
     addContactModal,
     selectContactModal,
+    quickEditContactModal,
     makeInput,
     emailModal,
   }

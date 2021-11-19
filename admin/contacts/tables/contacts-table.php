@@ -68,7 +68,7 @@ class Contacts_Table extends WP_List_Table {
 			'singular' => 'contact',     // Singular name of the listed records.
 			'plural'   => 'contacts',    // Plural name of the listed records.
 			'ajax'     => true,       // Does this table support ajax?
-			'screen'   => wp_doing_ajax() ? 'admin_ajax' : null
+			'screen'   => 'groundhogg_page_gh_contacts'
 		) );
 
 		$columns  = $this->get_columns();

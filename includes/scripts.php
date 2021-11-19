@@ -207,7 +207,8 @@ class Scripts {
 
 		wp_register_script( 'groundhogg-admin-contact-search', GROUNDHOGG_ASSETS_URL . 'js/admin/contact-search' . $dot_min . '.js', [
 			'groundhogg-admin-search-filters',
-			'groundhogg-admin-send-broadcast'
+			'groundhogg-admin-send-broadcast',
+			'groundhogg-admin-components'
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-toolbar', GROUNDHOGG_ASSETS_URL . 'js/admin/admin-bar' . $dot_min . '.js', [
@@ -402,6 +403,7 @@ class Scripts {
 				'currentUser'     => wp_get_current_user(),
 				'isMultisite'     => is_multisite(),
 				'isSuperAdmin'    => is_super_admin(),
+				'screen'          => get_current_screen()
 			] ), 'before' );
 
 		wp_register_script( 'groundhogg-admin-fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
