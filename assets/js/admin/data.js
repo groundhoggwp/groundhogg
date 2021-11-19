@@ -140,6 +140,10 @@
       return this.items
     },
 
+    has ( id ){
+      return this.hasItem( id )
+    },
+
     hasItem (id) {
       return this.item[this.primaryKey] == id || this.items.find(item => item[this.primaryKey] == id)
     },
