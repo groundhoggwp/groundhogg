@@ -3,6 +3,7 @@
 namespace Groundhogg\Form\Fields;
 
 use Groundhogg\Form\Form;
+use Groundhogg\Step;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
 use Groundhogg\Plugin;
@@ -24,13 +25,16 @@ abstract class Input extends Field {
 	/**
 	 * @param $form Form
 	 * @param $html string
+	 * @param $step Step
 	 *
 	 * @return string
 	 */
 	public static function save_config( $html, $form ) {
 		$config = self::$configurations[ $form->get_id() ];
 
-		get_db( 'stepmeta' )->update_meta( $form->get_id(), 'config', $config );
+		if ( $config ){
+			$form->step->update_meta( 'config', $config );
+		}
 
 		return $html;
 	}

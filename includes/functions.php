@@ -5950,7 +5950,7 @@ function array_map_to_method( $array, $method ) {
  * @param mixed  $maybe_tags stuff that might be tags
  * @param string $as         accepts ID | slug | name
  *
- * @return false|mixed[]
+ * @return mixed[]
  */
 function parse_tag_list( $maybe_tags, $as = 'ID' ) {
 
@@ -5984,7 +5984,8 @@ function parse_tag_list( $maybe_tags, $as = 'ID' ) {
 		}
 
 	} else {
-		return false;
+		// Return an empty array instead...
+		return [];
 	}
 
 	$tags = array_filter( $tags, function ( $tag ) {

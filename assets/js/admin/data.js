@@ -433,6 +433,7 @@
         })
       },
     }),
+    forms: ObjectStore(Groundhogg.api.routes.v4.forms),
     contacts: ObjectStore(Groundhogg.api.routes.v4.contacts),
     campaigns: ObjectStore(Groundhogg.api.routes.v4.campaigns),
     funnels: ObjectStore(Groundhogg.api.routes.v4.funnels, {

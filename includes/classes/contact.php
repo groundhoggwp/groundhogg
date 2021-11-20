@@ -541,11 +541,16 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @param mixed $tag_id_or_name the ID or name or the tag or an array of tags
 	 *
-	 * @return bool
+	 * @return bool true if the contact has the tag, false if they don't or no tag valid tag is passed in the first place
 	 */
 	public function has_tag( $tag_id_or_name ) {
 
 		$tags = parse_tag_list( $tag_id_or_name );
+
+		// If no tag is passed return false
+		if ( empty( $tags ) ){
+			return false;
+		}
 
 		// If the count of the passed tags is the same as the intersection of the tags then the contact has all the tags
 		return count( array_intersect( $this->tags, $tags ) ) === count( $tags );

@@ -368,6 +368,7 @@ class Scripts {
 							'tags'       => rest_url( Base_Api::NAME_SPACE . '/tags' ),
 							'notes'      => rest_url( Base_Api::NAME_SPACE . '/notes' ),
 							'contacts'   => rest_url( Base_Api::NAME_SPACE . '/contacts' ),
+							'forms'      => rest_url( Base_Api::NAME_SPACE . '/forms' ),
 							'emails'     => rest_url( Base_Api::NAME_SPACE . '/emails' ),
 							'funnels'    => rest_url( Base_Api::NAME_SPACE . '/funnels' ),
 							'steps'      => rest_url( Base_Api::NAME_SPACE . '/steps' ),

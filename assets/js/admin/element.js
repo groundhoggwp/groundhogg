@@ -911,7 +911,7 @@
 
     //language=html
     const html = `
-		<div class="gh-modal ${className} ${disableScrolling ? 'disabled-scrolling' : '' }">
+		<div class="gh-modal ${className} ${disableScrolling ? 'disabled-scrolling' : ''}">
 			${overlay ? `<div class="gh-modal-overlay"></div>` : ''}
 			<div class="gh-modal-dialog ${dialogClasses}">
 				${canClose ? `	<button type="button" class="dashicon-button gh-modal-button-close-top gh-modal-button-close">
@@ -934,7 +934,7 @@
       $modal.remove()
 
       // If this modal was disabling scrolling and no other modals exist that also disable scroll.
-      if (disableScrolling && $('.gh-modal.disabled-scrolling').length === 0 ) {
+      if (disableScrolling && $('.gh-modal.disabled-scrolling').length === 0) {
         $('body').removeClass('modal-open')
       }
 
@@ -1642,6 +1642,16 @@
   }
 
   const icons = {
+    // language=html
+    form: `
+		<svg viewBox="0 0 35 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path
+				d="M1.5 29.802a.25.25 0 01-.25-.25v-6a.25.25 0 01.25-.25h32a.25.25 0 01.25.25v6a.25.25 0 01-.25.25h-32z"
+				fill="currentColor" stroke="currentColor" stroke-width="1.5"/>
+			<path
+				d="M1.5 7.733a.25.25 0 01-.25-.25v-6a.25.25 0 01.25-.25h32a.25.25 0 01.25.25v6a.25.25 0 01-.25.25h-32zm0 11a.25.25 0 01-.25-.25v-6a.25.25 0 01.25-.25h32a.25.25 0 01.25.25v6a.25.25 0 01-.25.25h-32z"
+				stroke="currentColor" stroke-width="1.5"/>
+		</svg>`,
     note: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <path fill="currentColor" d="M512 334.667V20c0-11.046-8.954-20-20-20H20C8.954 0 0 8.954 0 20v472c0 11.046 8.954 20 20 20h314.667c5.375 0 10.489-2.203 14.145-5.86L506.14 348.811c3.652-3.65 5.86-8.747 5.86-14.144zM40 40h432v274.667H334.667c-11.046 0-20 8.954-20 20V472H40zm403.716 314.667-89.049 89.049v-89.049zM118 177.333c0-11.046 8.954-20 20-20h236c11.046 0 20 8.954 20 20s-8.954 20-20 20H138c-11.046 0-20-8.954-20-20zM138 276c-11.046 0-20-8.954-20-20s8.954-20 20-20h236c11.046 0 20 8.954 20 20s-8.954 20-20 20z"/>
 </svg>`,

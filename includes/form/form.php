@@ -42,10 +42,10 @@ use function Groundhogg\managed_page_url;
  * Date: 2019-05-10
  * Time: 9:51 AM
  */
-class Form {
+class Form implements \JsonSerializable {
 
+	public $step;
 	protected $attributes = [];
-	protected $step;
 	protected $uniqid;
 
 	/**
@@ -61,6 +61,7 @@ class Form {
 		$this->uniqid = uniqid( 'form_' );
 		$this->init_fields();
 	}
+
 
 	/**
 	 * @return int
@@ -317,4 +318,16 @@ class Form {
 		return $this->shortcode();
 	}
 
+	public function jsonSerialize() {
+		return [
+			'ID'            => $this->get_id(),
+			'name'          => $this->step->get_title(),
+			'rendered'      => $this->shortcode(),
+			'embed_methods' => [
+				'html'   => $this->get_html_embed_code(),
+				'iframe' => $this->get_iframe_embed_code(),
+				'url'    => $this->get_submission_url()
+			]
+		];
+	}
 }

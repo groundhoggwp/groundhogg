@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.8
 Requires PHP: 7.1
-Stable tag: 2.5.6
+Stable tag: 2.5.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -320,6 +320,13 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.5.7 (2021-11-19) =
+* TWEAKED Adding a new contact from the contacts screen uses the quick-add component
+* TWEAKED Made contact quick edit a global component so it can be used on other screens
+* TWEAKED Contact quick edit uses a save/cancel button instead of auto-saving for consistency with other components
+* FIXED Contact columns showing in incorrect order after editing via quick edit
+* FIXED Stacked modals which disable scrolling will only enable scrolling once the last modal is closed
 
 = 2.5.6 (2021-11-18) =
 * ADDED `{birthday}` replacement code

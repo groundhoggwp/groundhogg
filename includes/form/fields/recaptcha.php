@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Form\Fields;
 
+use Groundhogg\Form\Submission_Handler;
 use Groundhogg\Plugin;
 use function Groundhogg\get_array_var;
 
@@ -91,6 +92,12 @@ class Recaptcha extends Input {
 	 * @return \WP_Error|true
 	 */
 	public static function validate( $input, $config ) {
+
+		// unnecessary for admin submissions.
+		if ( Plugin::instance()->submission_handler->is_admin_submission() ) {
+			return true;
+		}
+
 		$file_name = sprintf(
 			"https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s",
 			Plugin::$instance->settings->get_option( 'gh_recaptcha_secret_key' ),

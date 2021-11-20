@@ -374,7 +374,8 @@ button {
     }
   }
 
-  &.gh-button {
+  &.gh-button,
+  &.gh-submit{
 
     text-decoration: none;
     white-space: nowrap;
@@ -391,6 +392,10 @@ button {
       cursor: initial;
     }
 
+    &.no-border {
+      border: none !important;
+    }
+
     &.action {
       background: $action-green;
 
@@ -399,6 +404,7 @@ button {
       }
     }
 
+    &#gh-submit,
     &.primary {
       background: $primary-blue;
 
@@ -465,6 +471,10 @@ button {
       color: $primary-dark;
       background-color: #FFF;
       padding: 4px 5px;
+
+      &.filled {
+        background: $primary-dark-10;
+      }
 
       &:hover {
         background-color: $primary-dark-10;
@@ -737,6 +747,18 @@ button {
     max-width: 80vw;
     max-height: calc(92vh - 64px);
     overflow: auto;
+
+    .gh-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 8px 20px;
+
+      h3{
+        margin: 0;
+      }
+    }
 
     &.overflow-visible{
       overflow: visible;
@@ -1402,4 +1424,113 @@ p.error,
     }
 
   }
+}
+
+.gh-form-wrapper * {
+  box-sizing: border-box;
+}
+
+ul.gh-form-errors{
+  padding-left: 20px;
+  margin: 0;
+}
+
+.gh-input{
+  outline: none;
+  width: 100%;
+}
+
+.gh-form-field {
+  margin: 10px 0;
+  white-space: normal;
+}
+
+.gh-form-wrapper label{
+  cursor: pointer;
+  vertical-align: baseline;
+}
+
+.gh-form-wrapper .gh-input{
+  height: auto;
+}
+
+.gh-form-row {
+  white-space: nowrap;
+}
+
+.gh-form-column {
+  display: inline-block;
+  float: left;
+  clear: none;
+  white-space: normal;
+}
+
+.gh-form-column {
+  padding-right: 10px;
+}
+
+.gh-form-wrapper input[type=file].gh-file-uploader{
+  width: 100%;
+  margin: auto;
+  padding: 30px;
+  box-sizing: border-box;
+  background: #f1f1f1;
+  border: 2px dashed #e5e5e5;
+  text-align: center;
+}
+
+/*.gh-form-column:nth-last-child(2){*/
+/*padding-right: 0;*/
+/*}*/
+
+.gh-form-edit-link {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  transition: 0.4s;
+}
+
+.gh-form-wrapper:hover .gh-form-edit-link {
+  visibility: visible;
+  background: #FFFFFF;
+  opacity: 1;
+  padding: 5px;
+  transition: 0.4s;
+}
+
+.gh-form-column:last-child{
+  padding-right: 0;
+}
+
+#gdpr-checkboxes-wrap label {
+  display: block;
+}
+
+.gh-form-column.col-1-of-1{width: 100%;}
+.gh-form-column.col-1-of-2{width: 50%}
+.gh-form-column.col-1-of-3{width: 33.33%}
+.gh-form-column.col-1-of-4{width: 25%;}
+.gh-form-column.col-2-of-3{width: 66.66%;}
+.gh-form-column.col-3-of-4{width: 75%;}
+
+/*  GO FULL WIDTH BELOW 480 PIXELS */
+@media only screen and (max-width: 480px) {
+  .gh-form-row {white-space: normal;}
+  .gh-form-column.col-1-of-1{width: 100%;}
+  .gh-form-column.col-1-of-2{width: 100%;}
+  .gh-form-column.col-1-of-3{width: 100%;}
+  .gh-form-column.col-1-of-4{width: 100%;}
+  .gh-form-column.col-2-of-3{width: 100%;}
+  .gh-form-column.col-3-of-4{width: 100%;}
+  .gh-form-column {
+    padding-right: 0;
+  }
+
+}
+
+/*.clearfix{clear: both}*/
+.clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
 }
