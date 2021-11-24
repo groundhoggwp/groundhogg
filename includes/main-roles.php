@@ -453,6 +453,26 @@ class Main_Roles extends Roles {
 	}
 
 	/**
+	 * Activity
+	 *  - View Reports
+	 *  - Export Reports
+	 *
+	 * Get caps related to managing reporting
+	 *
+	 * @return array
+	 */
+	public function get_activity_caps() {
+		$caps = array(
+			'add_activity',
+			'view_activity',
+			'edit_activity',
+			'delete_activity',
+		);
+
+		return apply_filters( 'groundhogg/roles/caps/reporting', $caps );
+	}
+
+	/**
 	 * Get unrelated extra caps...
 	 *
 	 * @return string[]
@@ -500,7 +520,8 @@ class Main_Roles extends Roles {
 			$this->get_other_caps(),
 			$this->get_file_caps(),
 			$this->get_log_caps(),
-			$this->get_note_caps()
+			$this->get_note_caps(),
+			$this->get_activity_caps(),
 		);
 
 		return $caps;
