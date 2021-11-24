@@ -1,13 +1,14 @@
 $primary-blue: #0075FF;
 $primary-dark: #102640;
 $error-red: #E91F4F;
-$secondary-purple: #6C19AD;
+$secondary-purple: rgba(108, 25, 173, 1);
+$secondary-purple-50: rgba(108, 25, 173, 0.5);
 $alert-yellow: #FFEE58;
 $benchmark-orange: #F58115;
 $action-green: #9ECE38;
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
-#search-loading-dots-pill{
+#search-loading-dots-pill {
   display: inline-block;
   background: $secondary-purple;
   border-radius: 5px;
@@ -15,11 +16,33 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   color: #FFFFFF;
 }
 
-.filter-placeholder{
+.filter-placeholder {
   background: $primary-dark;
   opacity: 0.2;
   border-radius: 5px;
 }
+
+.include-filters-wrap, .exclude-filters-wrap {
+  border: 1px solid #AE85CF;
+  border-radius: 5px;
+  padding: 20px 10px 10px 10px;
+  position: relative;
+
+  &:not(:last-child) {
+    margin-bottom: 20px;
+  }
+
+  .include-block, .exclude-block {
+    position: absolute;
+    background: #AE85CF;
+    border-radius: 5px;
+    left: 10px;
+    top: -10px;
+    padding: 1px 5px;
+    color: #FFFFFF;
+  }
+}
+
 
 #search-filters-editor {
 
@@ -60,11 +83,11 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     border: none;
     cursor: pointer;
 
-    &.add-filter{
+    &.add-filter {
       padding: 5px;
     }
 
-    &.white{
+    &.white {
       //padding: 5px 8px;
       background: #FFFFFF;
       border: 1px solid #8c8f94;
@@ -86,7 +109,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
       border-radius: 5px;
       box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
 
-      &.mount-from-bottom{
+      &.mount-from-bottom {
         bottom: 0;
       }
 
@@ -114,7 +137,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
           padding-left: 10px;
           cursor: pointer;
 
-          &:hover{
+          &:hover {
             background: #0d79e5;
             color: #FFFFFF;
           }
@@ -130,7 +153,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     select {
       vertical-align: initial;
 
-      &#filter-count-compare{
+      &#filter-count-compare {
         width: fit-content;
       }
     }
@@ -143,7 +166,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
       cursor: pointer;
 
       &:hover,
-      &:focus{
+      &:focus {
         background: #f9f9f9;
       }
     }
@@ -170,7 +193,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
           flex-direction: column;
           gap: 5px;
 
-          .regular-text{
+          .regular-text {
             width: auto;
           }
         }

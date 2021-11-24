@@ -164,28 +164,43 @@ class Contacts_Page extends Admin_Page {
 				wp_enqueue_style( 'groundhogg-admin-contact-inline' );
 				enqueue_filter_assets();
 
-				$current_filters = [];
-				$saved_search    = false;
+				$filter_query = [
+					'filters' => [],
+					'exclude_filters' => []
+				];
 
 				if ( $filters = get_url_var( 'filters' ) ) {
 
-					$current_filters = $filters;
+					$filter_query['filters'] = $filters;
 
 					if ( is_string( $filters ) ) {
-						$current_filters = base64_json_decode( $filters );
+						$filter_query['filters'] = base64_json_decode( $filters );
 					}
 
-				} else if ( $saved_search = get_url_var( 'saved_search' ) ) {
+				}
+
+				if ( $exclude_filters = get_url_var( 'exclude_filters' ) ) {
+
+					$filter_query['exclude_filters'] = $exclude_filters;
+
+					if ( is_string( $exclude_filters ) ) {
+						$filter_query['exclude_filters'] = base64_json_decode( $exclude_filters );
+					}
+				}
+
+				if ( $saved_search = get_url_var( 'saved_search' ) ) {
 					$saved_search = Saved_Searches::instance()->get( $saved_search );
 
 					// If the search does not have filters we need to migrate it
-					if ( ! isset_not_empty( $saved_search['query'], 'filters' ) ) {
-						$saved_search['query'] = [
-							'filters' => get_filters_from_old_query_vars( $saved_search['query'] )
-						];
-					}
-				} else {
-					$current_filters = get_filters_from_old_query_vars( get_request_query() );
+//					if ( ! isset_not_empty( $saved_search['query'], 'filters' ) ) {
+//						$saved_search['query'] = [
+//							'filters' => get_filters_from_old_query_vars( $saved_search['query'] )
+//						];
+//					}
+				}
+
+				if ( empty( $filter_query['filters']) && empty( $filter_query['exclude_filters'] ) ){
+					$filter_query['filters'] = get_filters_from_old_query_vars( get_request_query() );
 				}
 
 				// Advanced Search
@@ -193,7 +208,7 @@ class Contacts_Page extends Admin_Page {
 				wp_localize_script( 'groundhogg-admin-contact-search', 'ContactSearch', [
 					'url'           => admin_page_url( 'gh_contacts' ),
 					'query'         => get_request_query(),
-					'filters'       => $current_filters,
+					'filter_query'  => $filter_query,
 					'searches'      => array_values( Saved_Searches::instance()->get_all() ),
 					'currentSearch' => $saved_search
 				] );

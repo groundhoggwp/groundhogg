@@ -10,6 +10,7 @@
     loadingDots,
     copyObject,
     objectEquals,
+    toggle,
     moreMenu,
     select,
     dangerConfirmationModal,
@@ -38,65 +39,115 @@
 
   SearchesStore.itemsFetched(ContactSearch.searches)
 
-  function utf8_to_b64( str ) {
-    return window.btoa(unescape(encodeURIComponent( str )));
+  function utf8_to_b64 (str) {
+    return window.btoa(unescape(encodeURIComponent(str)))
   }
 
-  function b64_to_utf8( str ) {
-    return decodeURIComponent(escape(window.atob( str )));
+  function b64_to_utf8 (str) {
+    return decodeURIComponent(escape(window.atob(str)))
   }
 
   const base64_json_encode = (stuff) => {
     return utf8_to_b64(JSON.stringify(stuff))
   }
 
-  const loadFilters = (filters) => {
-    window.location.href = ContactSearch.url + '&filters=' + base64_json_encode(filters)
+  const loadFilters = (query) => {
+    window.location.href = ContactSearch.url + '&' + query
   }
 
   const loadSearch = (search) => {
     window.location.href = ContactSearch.url + '&saved_search=' + search
   }
 
+  let abortHandler
+
   const SearchApp = {
 
     filtersEnabled: false,
+    excludeEnabled: false,
     savedSearchEnabled: false,
-    filters: [],
+    query: {
+      filters: [],
+      exclude_filters: [],
+    },
     filtersApp: null,
+    excludeFiltersApp: null,
     searchesApp: null,
     currentSearch: null,
 
+    getContacts() {
+
+      if (abortHandler) {
+        abortHandler.abort()
+      }
+
+      abortHandler = new AbortController()
+      const { signal } = abortHandler
+
+      ContactsStore.count({
+        filters: base64_json_encode(this.query.filters),
+        exclude_filters: base64_json_encode( this.excludeEnabled ? this.query.exclude_filters : [] )
+      }, {
+        signal
+      }).then(total => {
+        $('#search-contacts').html(sprintf(_n('Show %s contact', 'Show %s contacts', total, 'groundhogg'), formatNumber(total)))
+      })
+    },
+
     init () {
 
-      const handleUpdateFilters = (filters) => {
-        this.filters = filters
-        getContacts(filters)
-
-        // console.log(this.filters, this.currentSearch.query.filters)
+      const onUpdate = () => {
+        this.getContacts()
 
         if (this.currentSearch) {
-          if (objectEquals(this.filters, this.currentSearch.query.filters)) {
+          if (objectEquals(this.query, this.currentSearch.query)) {
             $('#update-search').prop('disabled', true)
           } else {
             $('#update-search').prop('disabled', false)
           }
         }
-
       }
 
-      this.filters = ContactSearch.filters || []
-      if (this.filters && this.filters.length > 0) {
+      const handleUpdateExcludeFilters = (filters) => {
+
+        this.query.exclude_filters = filters
+
+        onUpdate()
+      }
+
+      const handleUpdateFilters = (filters) => {
+        this.query.filters = filters
+
+        onUpdate()
+      }
+
+      this.query = ContactSearch.filter_query || []
+
+      if (this.query.filters.length || this.query.exclude_filters.length) {
+
         this.filtersEnabled = true
+
+        if (this.query.exclude_filters.length) {
+          this.excludeEnabled = true
+        }
+
         $('.contact-quick-search').hide()
+
       } else if (ContactSearch.currentSearch) {
+
         this.currentSearch = copyObject(ContactSearch.currentSearch)
-        if (this.currentSearch.query.filters) {
-          this.filters = copyObject(this.currentSearch.query.filters, [])
+
+        if (this.currentSearch.query) {
+          this.query = copyObject(this.currentSearch.query, {})
+
+          if ( this.query.exclude_filters.length ){
+            this.excludeEnabled = true
+          }
         }
       }
 
-      this.filtersApp = createFilters('#search-filters', this.filters, handleUpdateFilters)
+      this.filtersApp = createFilters('#search-filters', this.query.filters, handleUpdateFilters)
+      this.excludeFiltersApp = createFilters('#exclude-filters', this.query.exclude_filters, handleUpdateExcludeFilters)
       this.mount()
     },
 
@@ -131,12 +182,26 @@
 				<button class="enable-filters white"><span class="dashicons dashicons-filter"></button>
 			</div>
 			<div class="search-filters-wrap">
+				${this.excludeEnabled ? `<div class="include-filters-wrap"><div class="include-block">${__('Include')}</div>` : ''}
 				<div id="search-filters"></div>
-				<div class="search-contacts-wrap">
-					<button id="search-contacts" class="button button-primary">${__('Search', 'groundhogg')}</button>
-					${!this.currentSearch
-						? `<button id="save-search" class="button button-secondary">${__('Save this search', 'groundhogg')}</button>`
-						: `<button id="update-search" class="button button-secondary" ${objectEquals(this.filters, this.currentSearch.query.filters) ? 'disabled' : ''}>${sprintf(__('Update "%s"', 'groundhogg'), this.currentSearch.name)}</button><a class="gh-text danger delete-search">${__('Delete')}</a>`}
+				${this.excludeEnabled ? `</div><div class="exclude-filters-wrap"><div class="exclude-block">${__('Exclude')}</div><div id="exclude-filters"></div></div>` : ''}
+				<div class="space-between">
+					<div class="align-left-space-between">
+						<span>${__('Show exclude filters', 'groundhogg')}</span>
+						${toggle({
+							id: 'enable-exclude',
+							name: 'enable_exclude',
+							checked: this.excludeEnabled
+						})}
+					</div>
+					<div class="align-right-space-between">
+						<button id="search-contacts" class="button button-primary">${__('Search', 'groundhogg')}
+						</button>
+						${!this.currentSearch
+							? `<button id="save-search" class="button button-secondary">${__('Save this search', 'groundhogg')}</button>`
+							: `<button id="update-search" class="button button-secondary" ${objectEquals(this.query.filters, this.currentSearch.query.filters) && ( ! this.excludeEnabled || objectEquals(this.query.exclude_filters, this.currentSearch.query.exclude_filters) ) ? 'disabled' : ''}>${sprintf(__('Update "%s"', 'groundhogg'), this.currentSearch.name)}</button><a class="gh-text danger delete-search">${__('Delete')}</a>`}
+					</div>
+
 				</div>
 			</div>
         `
@@ -185,11 +250,17 @@
       }
 
       if (this.filtersEnabled) {
+
         this.filtersApp.init()
+
         tooltip('.enable-filters', {
           content: __('Turn off filters', 'groundhogg'),
           position: 'top'
         })
+
+        if (this.excludeEnabled) {
+          this.excludeFiltersApp.init()
+        }
       }
 
       if (this.savedSearchEnabled) {
@@ -209,13 +280,28 @@
         loadingDots('#load-saved-search span.text')
       }
 
+      $('#enable-exclude').on('change', (e) => {
+        this.excludeEnabled = e.target.checked
+        remount()
+        this.getContacts()
+      })
+
       $('#search-contacts').on('click', (e) => {
         $(e.target).html('Searching').prop('disabled', true)
         loadingDots('#search-contacts')
-        if (this.currentSearch && objectEquals(this.filters, this.currentSearch.query.filters)) {
+        if (this.currentSearch
+          && objectEquals(this.query.filters, this.currentSearch.query.filters)
+          && objectEquals( this.currentSearch.query.exclude_filters, this.excludeEnabled ? this.query.exclude_filters: [] ) ) {
           loadSearch(this.currentSearch.id)
         } else {
-          loadFilters(this.filters)
+
+          let query = `filters=${base64_json_encode(this.query.filters)}`
+
+          if (this.excludeEnabled) {
+            query += `&exclude_filters=${base64_json_encode(this.query.exclude_filters)}`
+          }
+
+          loadFilters(query)
         }
       })
 
@@ -244,7 +330,8 @@
 
         SearchesStore.patch(this.currentSearch.id, {
           query: {
-            filters: this.filters
+            filters: this.query.filters,
+            exclude_filters: this.excludeEnabled ? this.query.exclude_filters : []
           }
         }).then(search => {
 
@@ -325,7 +412,8 @@
           SearchesStore.post({
             name: this.newSearchName,
             query: {
-              filters: this.filters
+              filters: this.query.filters,
+              exclude_filters: this.excludeEnabled ? this.query.exclude_filters : []
             }
           }).then(search => {
 
@@ -340,26 +428,6 @@
         })
       })
     }
-  }
-
-  let abortHandler
-
-  const getContacts = (filters) => {
-
-    if (abortHandler) {
-      abortHandler.abort()
-    }
-
-    abortHandler = new AbortController()
-    const { signal } = abortHandler
-
-    ContactsStore.count({
-      filters: base64_json_encode(filters)
-    }, {
-      signal
-    }).then(total => {
-      $('#search-contacts').html(sprintf(_n('Show %s contact', 'Show %s contacts', total, 'groundhogg'), formatNumber(total)))
-    })
   }
 
   $(function () {
@@ -679,7 +747,7 @@
   // QuickEdit
   $(() => {
 
-    if ( userHasCap( 'add_contacts' ) ){
+    if (userHasCap('add_contacts')) {
       $('#quick-add').on('click', (e) => {
         e.preventDefault()
 
@@ -716,7 +784,7 @@
       quickEditContactModal({
 
         contact,
-        onEdit: ( contact ) => {
+        onEdit: (contact) => {
 
           ajax({
             action: 'groundhogg_contact_table_row',

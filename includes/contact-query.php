@@ -252,6 +252,7 @@ class Contact_Query {
 		$this->cache_group = $this->gh_db_contacts->get_cache_group();
 
 		$defaults = array(
+			'select'                 => '*',
 			'number'                 => - 1,
 			'limit'                  => false,
 			'offset'                 => 0,
@@ -288,7 +289,8 @@ class Contact_Query {
 			'date_query'             => null,
 			'count'                  => false,
 			'no_found_rows'          => true,
-			'filters'                => []
+			'filters'                => [],
+			'exclude_filters'        => []
 		);
 
 		/**
@@ -331,6 +333,21 @@ class Contact_Query {
 		}
 
 		return $items;
+	}
+
+	/**
+	 * Retreive the SQL statement instead of the actual items
+	 *
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public function get_sql( $query ) {
+		$this->query_vars = wp_parse_args( $query );
+		$this->parse_query();
+		$this->generate_request();
+
+		return $this->request;
 	}
 
 	/**
@@ -577,17 +594,7 @@ class Contact_Query {
 		return $this->items;
 	}
 
-	/**
-	 * Runs a database query to retrieve contacts.
-	 *
-	 * @access protected
-	 * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
-	 * @since  2.8
-	 *
-	 * @global \wpdb $wpdb WordPress database abstraction object.
-	 *
-	 */
-	protected function query_items() {
+	protected function generate_request() {
 		global $wpdb;
 
 		$fields = $this->construct_request_fields();
@@ -637,10 +644,25 @@ class Contact_Query {
 		$this->sql_clauses = apply_filters( 'groundhogg/contact_query/query_items/sql_clauses', $this->sql_clauses, $this->query_vars, $this );
 
 		$this->request = "{$this->sql_clauses['select']} {$this->sql_clauses['from']} {$this->sql_clauses['where']} {$this->sql_clauses['groupby']} {$this->sql_clauses['orderby']} {$this->sql_clauses['limits']}";
+	}
 
-		$results = $wpdb->get_results( $this->request );
+	/**
+	 * Runs a database query to retrieve contacts.
+	 *
+	 * @access protected
+	 * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
+	 * @since  2.8
+	 *
+	 * @global \wpdb $wpdb WordPress database abstraction object.
+	 *
+	 */
+	protected function query_items() {
 
-		return $results;
+		global $wpdb;
+
+		$this->generate_request();
+
+		return $wpdb->get_results( $this->request );
 	}
 
 	/**
@@ -683,7 +705,7 @@ class Contact_Query {
 			return "COUNT($this->table_name.$this->primary_key) AS count";
 		}
 
-		return "$this->table_name.*";
+		return "$this->table_name.{$this->query_vars['select']}";
 	}
 
 	/**
@@ -929,6 +951,24 @@ class Contact_Query {
 			$filters = $this->parse_filters( $this->query_vars['filters'] );
 			if ( ! empty( $filters ) ) {
 				$where['filters'] = $filters;
+			}
+		}
+
+		if ( ! empty( $this->query_vars['exclude_filters'] ) ) {
+
+			if ( ! is_array(  $this->query_vars['exclude_filters'] ) ) {
+				$exclude_filters = base64_json_decode(  $this->query_vars['exclude_filters'] );
+			}
+
+			if ( ! empty( $exclude_filters ) ){
+				$query = new Contact_Query();
+				$sql   = $query->get_sql( [
+					'filters' => $exclude_filters,
+					'select'  => 'ID',
+					'orderby' => 'none'
+				] );
+
+				$where['exclude_filters'] = "{$this->table_name}.ID NOT IN ( $sql )";
 			}
 		}
 
@@ -1201,7 +1241,7 @@ class Contact_Query {
 	 *
 	 * @return string
 	 */
-	protected function parse_filters( $filters ): string {
+	protected function parse_filters( $filters, $exclude = false ): string {
 
 		if ( ! is_array( $filters ) ) {
 			$filters = base64_json_decode( $filters );
@@ -2692,8 +2732,8 @@ class Contact_Query {
 	 */
 	public static function contact_generic_text_filter_compare( array $filter_vars, $query ): string {
 
-		if ( $filter_vars[ 'type' ] === 'email' ){
-			$filter_vars['value'] = str_replace( ' ', '+', $filter_vars[ 'value' ] );
+		if ( $filter_vars['type'] === 'email' ) {
+			$filter_vars['value'] = str_replace( ' ', '+', $filter_vars['value'] );
 		}
 
 		return self::generic_text_compare( $query->table_name . '.' . $filter_vars['type'], $filter_vars['compare'], $filter_vars['value'] );

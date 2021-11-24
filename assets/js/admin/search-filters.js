@@ -539,28 +539,18 @@
       })
 
       $(`${el} .group`).sortable({
-        connectWith: '.group',
+        connectWith:`${el} .group`,
         placeholder: 'filter-placeholder',
-        cancel: '.add-filter-wrap, .filter-edit-wrap',
+        cancel: '.add-filter, .add-filter-wrap, .filter-edit-wrap',
         start: (e, ui) => {
           // ui.placeholder.height(ui.item.height())
           ui.placeholder.width(ui.item.width())
         },
         receive: (e, ui) => {
 
-          console.log({
-            e, ui
-          })
-
           const filterId = parseInt(ui.item.data('key'))
           const fromGroupId = parseInt(ui.item.data('group'))
           const toGroupId = parseInt($(e.target).data('key'))
-
-          console.log({
-            filterId,
-            fromGroupId,
-            toGroupId
-          })
 
           const tempFilter = getFilterSettings(fromGroupId, filterId)
 

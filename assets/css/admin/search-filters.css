@@ -1,6 +1,6 @@
 #search-loading-dots-pill {
   display: inline-block;
-  background: #6C19AD;
+  background: #6c19ad;
   border-radius: 5px;
   padding: 1px 5px;
   color: #FFFFFF;
@@ -12,6 +12,25 @@
   border-radius: 5px;
 }
 
+.include-filters-wrap, .exclude-filters-wrap {
+  border: 1px solid #AE85CF;
+  border-radius: 5px;
+  padding: 20px 10px 10px 10px;
+  position: relative;
+}
+.include-filters-wrap:not(:last-child), .exclude-filters-wrap:not(:last-child) {
+  margin-bottom: 20px;
+}
+.include-filters-wrap .include-block, .include-filters-wrap .exclude-block, .exclude-filters-wrap .include-block, .exclude-filters-wrap .exclude-block {
+  position: absolute;
+  background: #AE85CF;
+  border-radius: 5px;
+  left: 10px;
+  top: -10px;
+  padding: 1px 5px;
+  color: #FFFFFF;
+}
+
 #search-filters-editor {
   display: flex;
   flex-direction: column;
@@ -20,14 +39,14 @@
 #search-filters-editor .or-separator {
   /*border: 1px solid #cccccc;*/
   height: 1px;
-  background: #6C19AD;
+  background: #6c19ad;
   position: relative;
   margin: 15px 0;
 }
 #search-filters-editor .or-separator .or-circle {
   display: inline-block;
   position: absolute;
-  background: #6C19AD;
+  background: #6c19ad;
   border-radius: 5px;
   left: 10px;
   top: -10px;
