@@ -4735,7 +4735,6 @@ function track_live_activity( $type, $details = [] ) {
 
 	$args = [
 		'funnel_id'  => tracking()->get_current_funnel_id(),
-		'contact_id' => tracking()->get_current_contact_id(),
 		'email_id'   => tracking()->get_current_email_id(),
 		'event_id'   => tracking()->get_current_event() ? tracking()->get_current_event()->get_id() : false,
 		'referer'    => tracking()->get_leadsource(),
@@ -4755,6 +4754,8 @@ function track_live_activity( $type, $details = [] ) {
  */
 function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 
+	$contact = get_contactdata( $contact );
+
 	// If there is not one available, skip
 	if ( ! is_a_contact( $contact ) ) {
 		return;
@@ -4764,10 +4765,11 @@ function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 	$defaults = [
 		'activity_type' => $type,
 		'timestamp'     => time(),
+		'contact_id'    => $contact->get_id()
 	];
 
 	// Merge overrides with args
-	$args = wp_parse_args( $defaults, $args );
+	$args = wp_parse_args( $args, $defaults );
 	$args = apply_filters( 'groundhogg/track_live_activity/args', $args, $contact );
 
 	// Add the activity to the DB
@@ -5839,7 +5841,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 	$filters = apply_filters( 'groundhogg/get_filters_from_old_query_vars', $filters, $query );
 
 	// Filters is an array[] so wrap in another array
-	return ! empty( $filters ) ? [ $filters ] : false;
+	return ! empty( $filters ) ? [ $filters ] : [];
 }
 
 /**
