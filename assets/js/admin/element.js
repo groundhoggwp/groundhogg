@@ -109,6 +109,10 @@
 
     const $el = $(selector)
 
+    if ($el.hasClass('gh-has-tooltip')) {
+      return
+    }
+
     // language=HTML
     const $tip = $(`
 		<div class="gh-tooltip ${position}">
