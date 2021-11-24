@@ -75,7 +75,7 @@
     searchesApp: null,
     currentSearch: null,
 
-    getContacts() {
+    getContacts () {
 
       if (abortHandler) {
         abortHandler.abort()
@@ -86,7 +86,7 @@
 
       ContactsStore.count({
         filters: base64_json_encode(this.query.filters),
-        exclude_filters: base64_json_encode( this.excludeEnabled ? this.query.exclude_filters : [] )
+        exclude_filters: base64_json_encode(this.excludeEnabled ? this.query.exclude_filters : [])
       }, {
         signal
       }).then(total => {
@@ -140,7 +140,7 @@
         if (this.currentSearch.query) {
           this.query = copyObject(this.currentSearch.query, {})
 
-          if ( this.query.exclude_filters.length ){
+          if (this.query.exclude_filters.length) {
             this.excludeEnabled = true
           }
         }
@@ -199,7 +199,7 @@
 						</button>
 						${!this.currentSearch
 							? `<button id="save-search" class="button button-secondary">${__('Save this search', 'groundhogg')}</button>`
-							: `<button id="update-search" class="button button-secondary" ${objectEquals(this.query.filters, this.currentSearch.query.filters) && ( ! this.excludeEnabled || objectEquals(this.query.exclude_filters, this.currentSearch.query.exclude_filters) ) ? 'disabled' : ''}>${sprintf(__('Update "%s"', 'groundhogg'), this.currentSearch.name)}</button><a class="gh-text danger delete-search">${__('Delete')}</a>`}
+							: `<button id="update-search" class="button button-secondary" ${objectEquals(this.query.filters, this.currentSearch.query.filters) && (!this.excludeEnabled || objectEquals(this.query.exclude_filters, this.currentSearch.query.exclude_filters)) ? 'disabled' : ''}>${sprintf(__('Update "%s"', 'groundhogg'), this.currentSearch.name)}</button><a class="gh-text danger delete-search">${__('Delete')}</a>`}
 					</div>
 
 				</div>
@@ -291,7 +291,7 @@
         loadingDots('#search-contacts')
         if (this.currentSearch
           && objectEquals(this.query.filters, this.currentSearch.query.filters)
-          && objectEquals( this.currentSearch.query.exclude_filters, this.excludeEnabled ? this.query.exclude_filters: [] ) ) {
+          && objectEquals(this.currentSearch.query.exclude_filters, this.excludeEnabled ? this.query.exclude_filters : [])) {
           loadSearch(this.currentSearch.id)
         } else {
 
@@ -802,5 +802,19 @@
     })
 
   })
+
+  const marketableTooltips = () => {
+    tooltip('.pill.marketable', {
+      content: __('Will receive marketing', 'groundhogg'),
+      position: 'right'
+    })
+
+    tooltip('.pill.unmarketable', {
+      content: __('Will <b>not</b> receive marketing', 'groundhogg'),
+      position: 'right'
+    })
+  }
+
+  $(marketableTooltips)
 
 })(jQuery)

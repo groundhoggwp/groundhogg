@@ -82,11 +82,7 @@ class Broadcasts_Api extends Base_Object_Api {
 		$meta['is_transactional'] = $is_transactional;
 
 		if ( ! $is_transactional ) {
-			$query['optin_status_exclude'] = [
-				Preferences::SPAM,
-				Preferences::HARD_BOUNCE,
-				Preferences::COMPLAINED
-			];
+			$query['marketable'] = true;
 		}
 
 		$num_contacts = get_db( 'contacts' )->count( $query );

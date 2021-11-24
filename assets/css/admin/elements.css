@@ -217,9 +217,14 @@ a.action-link {
 }
 .pill.green {
   background: rgba(158, 206, 56, 0.5);
+  color: #334310;
 }
 .pill.red {
   background: rgba(233, 31, 79, 0.5);
+  color: #4e0818;
+}
+.pill.sm {
+  font-size: 13px;
 }
 
 svg.danger,

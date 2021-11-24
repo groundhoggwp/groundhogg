@@ -300,10 +300,16 @@ a.action-link {
 
   &.green {
     background: $action-green-50;
+    color: darken( $action-green, 35 );
   }
 
   &.red {
     background: $error-red-50;
+    color: darken( $error-red, 35 )
+  }
+
+  &.sm {
+    font-size: 13px;
   }
 }
 

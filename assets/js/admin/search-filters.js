@@ -49,8 +49,8 @@
 
     //language=HTML
     return `
-		<div class="filter filter-view" data-key="${filterIndex}" data-group="${filterGroupIndex}" tabindex="0">
-			${Filters.types[filter.type].view(filter, filterGroupIndex, filterIndex)}
+		<div class="filter filter-view space-between" data-key="${filterIndex}" data-group="${filterGroupIndex}" tabindex="0">
+			<span class="text">${Filters.types[filter.type].view(filter, filterGroupIndex, filterIndex)}</span>
 			<button class="delete-filter"><span class="dashicons dashicons-no-alt"></span></button>
 		</div>`
   }
@@ -235,8 +235,8 @@
       this.mount()
     },
 
-    toString() {
-      return this.filters.map( group => group.map( filter => {
+    toString () {
+      return this.filters.map(group => group.map(filter => {
 
         if (!Filters.has(filter.type)) {
           return ''
@@ -244,7 +244,7 @@
 
         return Filters.types[filter.type].view(filter)
 
-      } ).join( ' and ' ) ).join( ' or ' )
+      }).join(' and ')).join(' or ')
     },
 
     mount () {
@@ -539,7 +539,7 @@
       })
 
       $(`${el} .group`).sortable({
-        connectWith:`${el} .group`,
+        connectWith: `${el} .group`,
         placeholder: 'filter-placeholder',
         cancel: '.add-filter, .add-filter-wrap, .filter-edit-wrap',
         start: (e, ui) => {
@@ -890,6 +890,36 @@
     defaults: {
       compare: 'in',
       value: []
+    }
+  })
+
+  registerFilter('is_marketable', 'contact', __('Marketable', 'groundhogg'), {
+    view ({ marketable }) {
+      return marketable === 'yes' ? __('Is marketable', 'groundhogg') : __('Is not marketable', 'groundhogg')
+    },
+    edit ({ marketable }) {
+
+      // language=html
+      return `
+		  ${select({
+			  id: 'filter-marketable',
+			  name: 'marketable',
+		  }, {
+			  yes: _x('Yes', 'comparison, groundhogg'),
+			  no: _x('No', 'comparison', 'groundhogg')
+		  }, marketable)}`
+    },
+    onMount (filter, updateFilter) {
+      $('#filter-marketable').on('change', function (e) {
+        const $el = $(this)
+        // console.log($el.val())
+        updateFilter({
+          [$el.prop('name')]: $el.val()
+        })
+      })
+    },
+    defaults: {
+      marketable: 'yes',
     }
   })
 
@@ -1310,7 +1340,7 @@
 			  id: 'filter-email',
 			  name: 'email_id',
 		  }, pickerOptions, email_id)}
-		  
+
 		  ${filterCount(rest)}
 
 		  ${standardActivityDateOptions(rest)}`

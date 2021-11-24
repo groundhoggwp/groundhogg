@@ -106,14 +106,14 @@ class Contact_Query {
 	 * @since  2.8
 	 * @var    array
 	 */
-	protected $sql_clauses = array(
+	protected $sql_clauses = [
 		'select'  => '',
 		'from'    => '',
-		'where'   => array(),
+		'where'   => [],
 		'groupby' => '',
 		'orderby' => '',
 		'limits'  => '',
-	);
+	];
 
 	/**
 	 * Metadata query clauses.
@@ -271,6 +271,7 @@ class Contact_Query {
 			'tag_query'              => [],
 			'optin_status'           => 'any',
 			'optin_status_exclude'   => false,
+			'marketable'             => 'any',
 			'owner'                  => 0,
 			'report'                 => false,
 			'activity'               => false,
@@ -766,6 +767,12 @@ class Contact_Query {
 			$where['users_include'] = "$this->table_name.user_id IN ( $users_include_ids )";
 		}
 
+		if ( $this->query_vars['marketable'] !== 'any' ) {
+			$where['marketable'] = self::filter_marketability( [
+				'marketable' => $this->query_vars['marketable'] ? 'yes' : 'no'
+			], $this );
+		}
+
 		if ( ! empty( $this->query_vars['users_exclude'] ) ) {
 			$users_exclude_ids      = implode( ',', wp_parse_id_list( $this->query_vars['users_exclude'] ) );
 			$where['users_exclude'] = "$this->table_name.user_id NOT IN ( $users_exclude_ids )";
@@ -956,11 +963,11 @@ class Contact_Query {
 
 		if ( ! empty( $this->query_vars['exclude_filters'] ) ) {
 
-			if ( ! is_array(  $this->query_vars['exclude_filters'] ) ) {
-				$exclude_filters = base64_json_decode(  $this->query_vars['exclude_filters'] );
+			if ( ! is_array( $this->query_vars['exclude_filters'] ) ) {
+				$exclude_filters = base64_json_decode( $this->query_vars['exclude_filters'] );
 			}
 
-			if ( ! empty( $exclude_filters ) ){
+			if ( ! empty( $exclude_filters ) ) {
 				$query = new Contact_Query();
 				$sql   = $query->get_sql( [
 					'filters' => $exclude_filters,
@@ -1368,6 +1375,11 @@ class Contact_Query {
 		self::register_filter(
 			'optin_status',
 			[ self::class, 'filter_optin_status' ]
+		);
+
+		self::register_filter(
+			'is_marketable',
+			[ self::class, 'filter_marketability' ]
 		);
 
 		self::register_filter(
@@ -1904,6 +1916,77 @@ class Contact_Query {
 				return sprintf( "{$query->table_name}.owner_id NOT IN ( %s )", implode( ',', $owners ) );
 		}
 	}
+
+	/**
+	 * Whether a contact is marketable or not
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_marketability( $filter_vars, $query ) {
+
+		switch ( $filter_vars['marketable'] ) {
+			default:
+			case 'yes':
+
+				if ( Plugin::instance()->preferences->is_confirmation_strict() ) {
+					$clause = sprintf( "( $query->table_name.optin_status = %s OR ( $query->table_name.optin_status = %s AND $query->table_name.date_created >= '%s') )", Preferences::CONFIRMED, Preferences::UNCONFIRMED, Ymd_His( time() - ( Plugin::instance()->preferences->get_grace_period() * DAY_IN_SECONDS ) ) );
+				} else {
+					$clause = sprintf( "$query->table_name.optin_status IN (%s)", implode( ',', [
+						Preferences::CONFIRMED,
+						Preferences::UNCONFIRMED,
+					] ) );
+				}
+
+				if ( Plugin::instance()->preferences->is_gdpr_strict() ) {
+					$clause .= " AND " . self::filter_meta( [
+							'meta'    => 'gdpr_consent',
+							'compare' => '=',
+							'value'   => 'yes'
+						], $query );
+
+					$clause .= " AND " . self::filter_meta( [
+							'meta'    => 'marketing_consent',
+							'compare' => '=',
+							'value'   => 'yes'
+						], $query );
+				}
+
+				return $clause;
+
+			case 'no':
+
+				$clause = sprintf( "$query->table_name.optin_status IN (%s)", implode( ',', [
+					Preferences::COMPLAINED,
+					Preferences::UNSUBSCRIBED,
+					Preferences::SPAM,
+					Preferences::HARD_BOUNCE,
+				] ) );
+
+				if ( Plugin::instance()->preferences->is_confirmation_strict() ) {
+					$clause .= sprintf( " OR $query->table_name.optin_status = %s AND $query->table_name.date_created < '%s') )", Preferences::UNCONFIRMED, Ymd_His( time() - ( Plugin::instance()->preferences->get_grace_period() * DAY_IN_SECONDS ) ) );
+				}
+
+				if ( Plugin::instance()->preferences->is_gdpr_strict() ) {
+					$clause .= " OR " . str_replace( "{$query->table_name}.ID IN", "{$query->table_name}.ID NOT IN", self::filter_meta( [
+							'meta'    => 'gdpr_consent',
+							'compare' => '=',
+							'value'   => 'yes'
+						], $query ) );
+
+					$clause .= " OR " . str_replace( "{$query->table_name}.ID IN", "{$query->table_name}.ID NOT IN", self::filter_meta( [
+							'meta'    => 'marketing_consent',
+							'compare' => '=',
+							'value'   => 'yes'
+						], $query ) );
+				}
+
+				return $clause;
+		}
+	}
+
 
 	/**
 	 * Filter by optin status

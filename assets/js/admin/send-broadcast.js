@@ -350,7 +350,7 @@
 
               const query = {
                 ...state.query,
-                optin_status: [1, 2, 4, 6]
+                marketable: true
               }
 
               ContactsStore.count(query).then(total => {

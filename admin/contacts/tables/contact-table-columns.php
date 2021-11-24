@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Contacts\Tables;
 
 use Groundhogg\Contact;
 use Groundhogg\Plugin;
+use Groundhogg\Preferences;
 use Groundhogg\Tag;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\get_array_var;
@@ -152,6 +153,11 @@ class Contact_Table_Columns {
 	 */
 	public function register_core_columns() {
 
+		self::register( 'status', __( 'Status', 'groundhogg' ), [
+			self::class,
+			'column_optin_status'
+		], 'optin_status', 9 );
+
 		// Core columns
 		self::register( 'first_name', __( 'First Name', 'groundhogg' ), [
 			self::class,
@@ -178,6 +184,17 @@ class Contact_Table_Columns {
 	}
 
 	# =============== COLUMN CALLBACKS FOR CORE COLUMNS =============== #
+
+	/**
+	 * @param $contact Contact
+	 *
+	 * @return void
+	 */
+	protected static function column_optin_status( $contact ) {
+		?>
+		<span class="pill sm <?php echo $contact->is_marketable() ? 'green marketable' : 'red unmarketable' ?>"><?php echo Preferences::get_preference_pretty_name( $contact->get_optin_status() )?></span>
+		<?php
+	}
 
 	/**
 	 * @param $contact Contact

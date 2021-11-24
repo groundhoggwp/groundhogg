@@ -359,22 +359,8 @@ class Contacts_Table extends WP_List_Table {
 	protected function column_email( $contact ) {
 
 		$editUrl = admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->get_id() );
-		$html    = '<div id="inline_' . intval( $contact->get_id() ) . '" class="hidden">';
-		$html    .= '  <div class="email">' . esc_html( $contact->get_email() ) . '</div>';
-		$html    .= '  <div class="first_name">' . esc_html( $contact->get_first_name() ) . '</div>';
-		$html    .= '  <div class="last_name">' . esc_html( $contact->get_last_name() ) . '</div>';
-		$html    .= '  <div class="optin_status">' . esc_html( $contact->get_optin_status() ) . '</div>';
-		$html    .= '  <div class="mobile_phone">' . esc_html( $contact->get_mobile_number() ) . '</div>';
-		$html    .= '  <div class="primary_phone">' . esc_html( $contact->get_phone_number() ) . '</div>';
-		$html    .= '  <div class="primary_phone_extension">' . esc_html( $contact->get_phone_extension() ) . '</div>';
-		if ( $contact->get_owner_id() ) {
-			$html .= '  <div class="owner">' . esc_html( $contact->get_owner_id() ) . '</div>';
-		}
-		$html .= '  <div class="tags">' . esc_html( json_encode( $contact->get_tags() ) ) . '</div>';
-		$html .= '  <div class="tags-data">' . esc_html( wp_json_encode( $contact->get_tags_for_select2() ) ) . '</div>';
-		$html .= '</div>';
 
-		$html .= "<strong>";
+		$html = "<strong>";
 
 		$html .= "<a class='row-title' href='$editUrl'>" . html()->e( 'img', [
 				'src'   => $contact->get_profile_picture(),
@@ -384,11 +370,6 @@ class Contacts_Table extends WP_List_Table {
 				],
 				'width' => 40
 			] ) . esc_html( $contact->get_email() ) . "</a>";
-
-		if ( ! get_request_var( 'optin_status' ) ) {
-
-			$html .= " &#x2014; " . "<span class='post-state'>(" . Preferences::get_preference_pretty_name( $contact->get_optin_status() ) . ")</span>";
-		}
 
 		$html .= "</strong>";
 
@@ -435,6 +416,8 @@ class Contacts_Table extends WP_List_Table {
 	protected function get_bulk_actions() {
 
 		$actions = array(
+			'__bulk_edit' => _x( 'Edit', 'List table bulk action', 'groundhogg' ),
+			'__export'    => _x( 'Export', 'List table bulk action', 'groundhogg' ),
 			'delete'      => _x( 'Delete', 'List table bulk action', 'groundhogg' ),
 			'spam'        => _x( 'Spam', 'List table bulk action', 'groundhogg' ),
 			'resubscribe' => _x( 'Re-subscribe', 'List table bulk action', 'groundhogg' ),

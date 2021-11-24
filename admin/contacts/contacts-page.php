@@ -165,7 +165,7 @@ class Contacts_Page extends Admin_Page {
 				enqueue_filter_assets();
 
 				$filter_query = [
-					'filters' => [],
+					'filters'         => [],
 					'exclude_filters' => []
 				];
 
@@ -199,7 +199,7 @@ class Contacts_Page extends Admin_Page {
 //					}
 				}
 
-				if ( empty( $filter_query['filters']) && empty( $filter_query['exclude_filters'] ) ){
+				if ( empty( $filter_query['filters'] ) && empty( $filter_query['exclude_filters'] ) ) {
 					$filter_query['filters'] = get_filters_from_old_query_vars( get_request_query() );
 				}
 
@@ -1125,6 +1125,33 @@ class Contacts_Page extends Admin_Page {
 		}
 
 		include __DIR__ . '/bulk-edit.php';
+	}
+
+	function process___export() {
+		if ( ! current_user_can( 'export_contacts' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		return admin_page_url( 'gh_tools', [
+			'tab'    => 'export',
+			'action' => 'choose_columns',
+			'query'  => [
+				'include' => implode( ',', $this->get_items() )
+			]
+		] );
+	}
+
+	function process___bulk_edit() {
+		if ( ! current_user_can( 'edit_contacts' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		return admin_page_url( 'gh_contacts', [
+			'action' => 'bulk_edit',
+			'query'  => [
+				'include' => implode( ',', $this->get_items() )
+			]
+		] );
 	}
 
 	function process_bulk_edit() {
