@@ -123,6 +123,8 @@ if ( $custom_text ): ?>
                 </td>
             </tr>
         </table>
+<?php if ( ! \Groundhogg\is_option_enabled( 'gh_disable_open_tracking' ) ): ?>
         <img alt="" style="visibility: hidden" width="0" height="0" src="<?php echo esc_url( apply_filters( 'groundhogg/email_template/open_tracking_link', '' ) ); ?>">
+<?php endif; ?>
     </body>
 </html>
