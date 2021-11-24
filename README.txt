@@ -321,10 +321,17 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
-= 2.5.7 (2021-11-19) =
-* TWEAKED Adding a new contact from the contacts screen uses the quick-add component
+= 2.5.7 (2021-11-24) =
+* ADDED New status column in contact table for ordering and better marketability visibility
+* ADDED New "Marketable" search filter makes it easier to determine marketable contacts based on current compliance settings.
+* ADDED Use internal forms as part of the quick add component
+* ADDED Optional exclude filters in contact search for even more advanced segmentation
+* ADDED Settings to blanket disable click tracking and open tracking
 * TWEAKED Made contact quick edit a global component so it can be used on other screens
+* TWEAKED Adding a new contact from the contacts screen uses the quick-add component
 * TWEAKED Contact quick edit uses a save/cancel button instead of auto-saving for consistency with other components
+* FIXED Activity capabilities not added to user
+* FIXED Tags in the contact REST response not always coming back as an array
 * FIXED Contact columns showing in incorrect order after editing via quick edit
 * FIXED Stacked modals which disable scrolling will only enable scrolling once the last modal is closed
 
