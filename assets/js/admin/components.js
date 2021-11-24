@@ -12,6 +12,7 @@
     input,
     icons,
     dialog,
+    tooltip,
     isValidEmail,
     textarea,
 
@@ -517,6 +518,15 @@
         onMount({ close, setContent })
       }
 
+      tooltip( '.use-quick-add', {
+        content: __( 'Use quick-add form', 'groundhogg' )
+      } )
+
+      tooltip( '.use-form', {
+        content: __( 'Use internal form', 'groundhogg' )
+      } )
+
+
       $('.use-form').on('click', (e) => {
 
         method = 'form'
@@ -638,8 +648,8 @@
                     message: __('Form submitted!'),
                   })
 
-                  onCreate( r.data.contact )
                   close()
+                  onCreate( r.data.contact )
                 }
 
               },
