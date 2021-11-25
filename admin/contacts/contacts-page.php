@@ -193,11 +193,11 @@ class Contacts_Page extends Admin_Page {
 					$saved_search = Saved_Searches::instance()->get( $saved_search );
 
 					// If the search does not have filters we need to migrate it
-//					if ( ! isset_not_empty( $saved_search['query'], 'filters' ) ) {
-//						$saved_search['query'] = [
-//							'filters' => get_filters_from_old_query_vars( $saved_search['query'] )
-//						];
-//					}
+					if ( ! isset_not_empty( $saved_search['query'], 'filters' ) ) {
+						$saved_search['query'] = [
+							'filters' => get_filters_from_old_query_vars( $saved_search['query'] )
+						];
+					}
 				}
 
 				if ( empty( $filter_query['filters'] ) && empty( $filter_query['exclude_filters'] ) ) {

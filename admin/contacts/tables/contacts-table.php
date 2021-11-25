@@ -6,6 +6,7 @@ use function Groundhogg\_nf;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\array_map_with_keys;
+use function Groundhogg\base64_json_decode;
 use function Groundhogg\current_user_is;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_date_time_format;
@@ -103,7 +104,11 @@ class Contacts_Table extends WP_List_Table {
 		$query = get_request_query();
 
 		if ( isset_not_empty( $query, 'filters' ) && is_string( $query['filters'] ) ) {
-			$query['filters'] = json_decode( base64_decode( $query['filters'] ), true );
+			$query['filters'] = base64_json_decode( $query['filters'] );
+		}
+
+		if ( isset_not_empty( $query, 'exclude_filters' ) && is_string( $query['exclude_filters'] ) ) {
+			$query['exclude_filters'] = base64_json_decode( $query['exclude_filters'] );
 		}
 
 		$full_name = split_name( $search );

@@ -140,7 +140,7 @@
         if (this.currentSearch.query) {
           this.query = copyObject(this.currentSearch.query, {})
 
-          if (this.query.exclude_filters.length) {
+          if ( 'exclude_filters' in this.query && this.query.exclude_filters.length) {
             this.excludeEnabled = true
           }
         }

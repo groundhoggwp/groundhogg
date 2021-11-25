@@ -287,8 +287,6 @@
             ...data.meta
           },
         }
-
-        console.log(payload)
       }
 
       const $quickEdit = $('.contact-quick-edit')
@@ -929,8 +927,6 @@
           $(target).text(__('Send', 'groundhogg')).prop('disabled', false)
 
           if (r.status !== 'success') {
-
-            console.log(r)
 
             dialog({
               message: r.message,

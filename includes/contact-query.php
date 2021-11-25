@@ -963,7 +963,9 @@ class Contact_Query {
 
 		if ( ! empty( $this->query_vars['exclude_filters'] ) ) {
 
-			if ( ! is_array( $this->query_vars['exclude_filters'] ) ) {
+			$exclude_filters  = $this->query_vars['exclude_filters'];
+
+			if ( ! is_array( $exclude_filters ) ) {
 				$exclude_filters = base64_json_decode( $this->query_vars['exclude_filters'] );
 			}
 
