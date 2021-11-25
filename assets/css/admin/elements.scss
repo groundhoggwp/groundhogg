@@ -1374,35 +1374,14 @@ p.error,
 .contact-quick-edit {
   width: 500px;
 
-  &-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-
-    //background-color: $primary-dark-2;
-    .avatar-and-name {
-      display: flex;
-      gap: 20px;
-
-      img {
-        border-radius: 5px;
-      }
-
-      .edit-name {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-
-        input {
-          width: 100%;
-        }
-      }
+  .gh-header {
+    img {
+      border-radius: 5px;
     }
   }
 
   &-fields {
-    margin-top: 40px;
+    margin-top: 50px;
     display: flex;
     flex-direction: column;
     gap: 20px;

@@ -532,7 +532,7 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @return bool
 	 */
-	public function has_tags( $maybe_tags ){
+	public function has_tags( $maybe_tags ) {
 		return $this->has_tag( $maybe_tags );
 	}
 
@@ -548,7 +548,7 @@ class Contact extends Base_Object_With_Meta {
 		$tags = parse_tag_list( $tag_id_or_name );
 
 		// If no tag is passed return false
-		if ( empty( $tags ) ){
+		if ( empty( $tags ) ) {
 			return false;
 		}
 
@@ -1039,8 +1039,8 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	protected function set_compliance_and_date_meta( $id ) {
-		$this->update_meta( $id, 'yes' );
-		$this->update_meta( "{$id}_date", date_i18n( get_date_time_format() ) );
+		parent::update_meta( $id, 'yes' );
+		parent::update_meta( "{$id}_date", date_i18n( get_date_time_format() ) );
 	}
 
 	protected function has_compliance_and_date_meta( $id ) {
@@ -1105,5 +1105,68 @@ class Contact extends Base_Object_With_Meta {
 		$this->set_compliance_and_date_meta( 'terms_agreement' );
 
 		do_action( "groundhogg/contact/agreed_to_terms", $this );
+	}
+
+	/**
+	 * Handle meta keys with special meaning
+	 *
+	 * @param string|array $key
+	 * @param false $value
+	 *
+	 * @return bool
+	 */
+	public function handle_special_meta_keys( $key, $value=false ){
+
+		if ( ! is_string( $key ) ){
+			return false;
+		}
+
+		switch ( $key ) {
+			case 'data_consent':
+			case 'gdpr_consent':
+
+				if ( ! $value ) {
+					$this->revoke_gdpr_consent();
+				} else {
+					$this->set_gdpr_consent();
+				}
+
+				return true;
+			case 'marketing_consent':
+				if ( ! $value ) {
+					$this->revoke_gdpr_consent( 'marketing' );
+				} else {
+					$this->set_marketing_consent();
+				}
+
+				return true;
+			case 'terms_agreement':
+
+				if ( $value ) {
+					$this->set_terms_agreement();
+				}
+
+				return true;
+		}
+
+		return false;
+	}
+
+	public function add_meta( $key, $value = false ) {
+
+		if ( $this->handle_special_meta_keys( $key, $value ) ){
+			return true;
+		}
+
+		return parent::add_meta( $key, $value );
+	}
+
+	public function update_meta( $key, $value = false ) {
+
+		if ( $this->handle_special_meta_keys( $key, $value ) ){
+			return true;
+		}
+
+		return parent::update_meta( $key, $value );
 	}
 }

@@ -767,39 +767,37 @@
       })
     }
 
-    if (!userHasCap('edit_contacts')) {
-      return
-    }
+    if (userHasCap('edit_contacts')) {
+      ContactsStore.itemsFetched(ContactsTable.items)
 
-    ContactsStore.itemsFetched(ContactsTable.items)
+      $(document).on('click', '.editinline', (e) => {
 
-    $(document).on('click', '.editinline', (e) => {
+        e.preventDefault()
 
-      e.preventDefault()
+        const ID = parseInt(e.currentTarget.dataset.id)
 
-      const ID = parseInt(e.currentTarget.dataset.id)
+        const contact = ContactsStore.get(ID)
 
-      const contact = ContactsStore.get(ID)
+        quickEditContactModal({
 
-      quickEditContactModal({
+          contact,
+          onEdit: (contact) => {
 
-        contact,
-        onEdit: (contact) => {
-
-          ajax({
-            action: 'groundhogg_contact_table_row',
-            contact: contact.ID
-          }).then((r) => {
-            dialog({
-              message: __('Contact updated!', 'groundhogg')
+            ajax({
+              action: 'groundhogg_contact_table_row',
+              contact: contact.ID
+            }).then((r) => {
+              dialog({
+                message: __('Contact updated!', 'groundhogg')
+              })
+              $(`#contact-${contact.ID}`).replaceWith(r.data.row)
             })
-            $(`#contact-${contact.ID}`).replaceWith(r.data.row)
-          })
 
-        }
+          }
+        })
+
       })
-
-    })
+    }
 
   })
 

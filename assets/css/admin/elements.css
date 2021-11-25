@@ -1126,29 +1126,11 @@ p.error,
 .contact-quick-edit {
   width: 500px;
 }
-.contact-quick-edit-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-}
-.contact-quick-edit-header .avatar-and-name {
-  display: flex;
-  gap: 20px;
-}
-.contact-quick-edit-header .avatar-and-name img {
+.contact-quick-edit .gh-header img {
   border-radius: 5px;
 }
-.contact-quick-edit-header .avatar-and-name .edit-name {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-}
-.contact-quick-edit-header .avatar-and-name .edit-name input {
-  width: 100%;
-}
 .contact-quick-edit-fields {
-  margin-top: 40px;
+  margin-top: 50px;
   display: flex;
   flex-direction: column;
   gap: 20px;

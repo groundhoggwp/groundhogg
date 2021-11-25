@@ -16,6 +16,8 @@
     adminPageURL
   } = Groundhogg.element
 
+  const { quickAddForm } = Groundhogg.components
+
   const { userHasCap } = Groundhogg.user
   const { sprintf, __, _x, _n } = wp.i18n
   const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
@@ -184,153 +186,20 @@
       svg: icons.createContact,
       view: () => {
 
-        const subClassPrefix = `${classPrefix}-quick-add`
-
         // language=HTML
         return `
-			<div class="gh-rows-and-columns">
-				<div class="gh-row">
-					<div class="gh-col">
-						<label for="${subClassPrefix}-first-name">${__('First Name', 'groundhogg')}</label>
-						${input({
-							id: `${subClassPrefix}-first-name`,
-							name: 'first_name',
-							placeholder: 'John'
-						})}
-					</div>
-					<div class="gh-col">
-						<label for="${subClassPrefix}-last-name">${__('Last Name', 'groundhogg')}</label>
-						${input({
-							id: `${subClassPrefix}-last-name`,
-							name: 'last_name',
-							placeholder: 'Doe'
-						})}
-					</div>
-				</div>
-				<div class="gh-row">
-					<div class="gh-col">
-						<label for="${subClassPrefix}-email">${__('Email Address', 'groundhogg')}</label>
-						${input({
-							id: `${subClassPrefix}-email`,
-							name: 'email',
-							placeholder: 'john@example.com',
-							required: true,
-						})}
-					</div>
-				</div>
-				<div class="gh-row phone">
-					<div class="cghol">
-						<label for="quick-edit-primary-phone">${__('Primary Phone', 'groundhogg')}</label>
-						${input({
-							type: 'tel',
-							id: `${subClassPrefix}-primary-phone`,
-							name: 'primary_phone',
-						})}
-					</div>
-					<div class="primary-phone-ext">
-						<label
-							for="quick-edit-primary-phone-extension">${_x('Ext.', 'phone number extension', 'groundhogg')}</label>
-						${input({
-							type: 'number',
-							id: `${subClassPrefix}-primary-phone-ext`,
-							name: 'primary_phone_extension',
-						})}
-					</div>
-				</div>
-				<div class="gh-row">
-					<div class="gh-col">
-						<label for="quick-edit-mobile-phone">${__('Mobile Phone', 'groundhogg')}</label>
-						${input({
-							type: 'tel',
-							id: `${subClassPrefix}-mobile-phone`,
-							name: 'mobile_phone',
-						})}
-					</div>
-				</div>
-				<div class="gh-row">
-					<div class="gh-col">
-						<label for="${subClassPrefix}-tags">${__('Tags', 'groundhogg')}</label>
-						${select({
-							id: `${subClassPrefix}-tags`,
-							multiple: true,
-							dataPlaceholder: __('Type to select tags...', 'groundhogg'),
-							style: {
-								width: '100%'
-							}
-						})}
-					</div>
-				</div>
-				<div class="gh-row">
-					<div class="gh-col">
-						<button id="${classPrefix}-quick-add-button" class="gh-button primary">
-							${__('Create Contact', 'groundhogg')}
-						</button>
-					</div>
-				</div>
+			<div id="admin-quick-add">
+				
 			</div>`
       },
       onMount: () => {
 
-        const subClassPrefix = `${classPrefix}-quick-add`
-
-        let payload = {
-          data: {},
-          meta: {}
-        }
-
-        const setPayload = (data) => {
-          payload = {
-            ...payload,
-            ...data
-          }
-        }
-
-        $(`#${classPrefix}-quick-add-button`).on('click', ({ target }) => {
-
-          if (!payload.data.email || !isValidEmail(payload.data.email)) {
-            errorDialog({
-              message: __('A valid email is required!', 'groundhogg')
-            })
-            return
-          }
-
-          $(target).prop('disabled', true)
-          const { stop } = loadingDots(`#${classPrefix}-quick-add-button`)
-          ContactsStore.post(payload).then(c => {
-            stop()
+        quickAddForm( '#admin-quick-add', {
+          prefix: 'admin-quick-add',
+          onCreate: (c) => {
             window.location.href = c.admin
-          })
-        })
-
-        $(`
-        #${subClassPrefix}-first-name, 
-        #${subClassPrefix}-last-name, 
-        #${subClassPrefix}-email`).on('change input', ({ target }) => {
-          setPayload({
-            data: {
-              ...payload.data,
-              [target.name]: target.value
-            }
-          })
-        })
-
-        $(`
-        #${subClassPrefix}-primary-phone,
-        #${subClassPrefix}-primary-phone-ext,
-        #${subClassPrefix}-mobile-phone`).on('change input', ({ target }) => {
-          setPayload({
-            meta: {
-              ...payload.meta,
-              [target.name]: target.value
-            }
-          })
-        })
-
-        tagPicker(`#${subClassPrefix}-tags`).on('change', ({ target }) => {
-          setPayload({
-            tags: $(target).val()
-          })
-        })
+          }
+        } )
 
       }
     },

@@ -132,6 +132,8 @@ class Contacts_Page extends Admin_Page {
 	public function scripts() {
 
 		wp_enqueue_style( 'groundhogg-admin' );
+		wp_enqueue_style( 'groundhogg-admin-element' );
+		wp_enqueue_script( 'groundhogg-admin-components' );
 
 		switch ( $this->get_current_action() ) {
 			default:
@@ -144,7 +146,6 @@ class Contacts_Page extends Admin_Page {
 				wp_enqueue_media();
 
 				wp_enqueue_style( 'groundhogg-admin-contact-editor' );
-				wp_enqueue_style( 'groundhogg-admin-element' );
 				wp_enqueue_style( 'groundhogg-admin-contact-info-cards' );
 				wp_enqueue_style( 'buttons' );
 				wp_enqueue_style( 'media-views' );
@@ -445,7 +446,6 @@ class Contacts_Page extends Admin_Page {
 		switch ( $this->get_current_action() ) {
 			case 'add':
 				return _ex( 'Add Contact', 'page_title', 'groundhogg' );
-				break;
 			case 'edit':
 				$contacts = $this->get_items();
 				$contact  = get_contactdata( array_shift( $contacts ) ); //todo check
@@ -454,8 +454,6 @@ class Contacts_Page extends Admin_Page {
 				} else {
 					return _ex( 'Oops!', 'page_title', 'groundhogg' );
 				}
-
-				break;
 			case 'form':
 
 				if ( key_exists( 'contact', $_GET ) ) {
@@ -467,18 +465,22 @@ class Contacts_Page extends Admin_Page {
 					return _ex( 'Submit Form', 'page_title', 'groundhogg' );
 				}
 
-				break;
 			case 'search':
 				return _ex( 'Search Contacts', 'page_title', 'groundhogg' );
-				break;
+
 			case 'view':
+			case 'bulk_edit':
+				return __( 'Bulk Edit Contacts', 'groundhogg' );
 			default:
 				return _ex( 'Contacts', 'page_title', 'groundhogg' );
-				break;
 		}
 	}
 
 	protected function get_title_actions() {
+
+		if ( $this->get_current_action() == 'bulk_edit' ) {
+			return [];
+		}
 
 		$actions = [];
 

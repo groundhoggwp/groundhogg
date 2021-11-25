@@ -482,13 +482,20 @@ class Main_Updater extends Updater {
 	}
 
 	/**
-	 * New page tracking stuff!
+	 * Notes
 	 */
 	public function version_2_5_5() {
 		Plugin::$instance->roles->install_roles_and_caps();
 		get_role( 'sales_rep' )->remove_cap( 'view_events' );
 		get_db( 'notes' )->create_table();
 		get_db('notes')->update_2_5_5();
+	}
+
+	/**
+	 * Activity Caps
+	 */
+	public function version_2_5_7() {
+		Plugin::$instance->roles->install_roles_and_caps();
 	}
 
 	/**
@@ -546,6 +553,7 @@ class Main_Updater extends Updater {
 			'2.5.3',
 			'2.5.4',
 			'2.5.5',
+			'2.5.7',
 		];
 	}
 
@@ -576,6 +584,7 @@ class Main_Updater extends Updater {
 			'2.5.3',
 			'2.5.4',
 			'2.5.5',
+			'2.5.7',
 		];
 	}
 
@@ -624,6 +633,7 @@ class Main_Updater extends Updater {
 			'2.5.3'         => __( 'Update the gh-cron.php file to support subsites on multisite networks.', 'groundhogg' ),
 			'2.5.4'         => __( 'Improve the page tracking flow and track page visits for contacts.', 'groundhogg' ),
 			'2.5.5'         => __( 'Add new caps and permissions for notes and sales representatives.', 'groundhogg' ),
+			'2.5.7'         => __( 'Add new caps and permissions activity REST endpoints.', 'groundhogg' ),
 		];
 	}
 }
