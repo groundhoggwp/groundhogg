@@ -521,7 +521,7 @@ class Main_Roles extends Roles {
 			$this->get_file_caps(),
 			$this->get_log_caps(),
 			$this->get_note_caps(),
-			$this->get_activity_caps(),
+			$this->get_activity_caps()
 		);
 
 		return $caps;
