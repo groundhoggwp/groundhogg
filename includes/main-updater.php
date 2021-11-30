@@ -488,7 +488,7 @@ class Main_Updater extends Updater {
 		Plugin::$instance->roles->install_roles_and_caps();
 		get_role( 'sales_rep' )->remove_cap( 'view_events' );
 		get_db( 'notes' )->create_table();
-		get_db('notes')->update_2_5_5();
+		get_db( 'notes' )->update_2_5_5();
 	}
 
 	/**
@@ -496,6 +496,24 @@ class Main_Updater extends Updater {
 	 */
 	public function version_2_5_7() {
 		Plugin::$instance->roles->install_roles_and_caps();
+	}
+
+	/**
+	 * Activity Caps
+	 */
+	public function version_2_5_7_4() {
+
+		// Contacts with this birthday only got it probably because of a bug
+		get_db( 'contactmeta' )->delete( [
+			'meta_key'   => 'birthday',
+			'meta_value' => '1970-01-01'
+		] );
+
+		// Contacts with this birthday only got it probably because of a bug
+		get_db( 'contactmeta' )->delete( [
+			'meta_key'   => 'birthday',
+			'meta_value' => '1999-11-30'
+		] );
 	}
 
 	/**
@@ -554,6 +572,7 @@ class Main_Updater extends Updater {
 			'2.5.4',
 			'2.5.5',
 			'2.5.7',
+			'2.5.7.4',
 		];
 	}
 
@@ -634,6 +653,7 @@ class Main_Updater extends Updater {
 			'2.5.4'         => __( 'Improve the page tracking flow and track page visits for contacts.', 'groundhogg' ),
 			'2.5.5'         => __( 'Add new caps and permissions for notes and sales representatives.', 'groundhogg' ),
 			'2.5.7'         => __( 'Add new caps and permissions activity REST endpoints.', 'groundhogg' ),
+			'2.5.7.4'       => __( 'Reset birthdays of contacts with dates <b>1970-01-01</b> and <b>1999-11-30</b> because of import bug.', 'groundhogg' ),
 		];
 	}
 }

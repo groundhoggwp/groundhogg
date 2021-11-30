@@ -963,7 +963,7 @@ class Contact_Query {
 
 		if ( ! empty( $this->query_vars['exclude_filters'] ) ) {
 
-			$exclude_filters  = $this->query_vars['exclude_filters'];
+			$exclude_filters = $this->query_vars['exclude_filters'];
 
 			if ( ! is_array( $exclude_filters ) ) {
 				$exclude_filters = base64_json_decode( $this->query_vars['exclude_filters'] );
@@ -1367,6 +1367,11 @@ class Contact_Query {
 		self::register_filter(
 			'date_created',
 			[ self::class, 'filter_date_created' ]
+		);
+
+		self::register_filter(
+			'birthday',
+			[ self::class, 'filter_birthday' ]
 		);
 
 		self::register_filter(
@@ -2522,6 +2527,23 @@ class Contact_Query {
 		$clause = self::standard_activity_filter_clause( $filter_vars );
 
 		return "{$query->table_name}.date_created $clause";
+	}
+
+	/**
+	 * @param $filter_vars
+	 * @param $query Contact_Query
+	 *
+	 * @return string
+	 */
+	public static function filter_birthday( $filter_vars, $query ) {
+
+		$clause = self::standard_activity_filter_clause( $filter_vars );
+
+		$meta_table_name = get_db( 'contactmeta' )->table_name;
+
+		$year = date('Y');
+
+		return "{$query->table_name}.ID IN ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$meta_table_name}.meta_key = 'birthday' AND CONCAT( '$year', SUBSTRING( {$meta_table_name}.meta_value, 5 ) ) {$clause} ) ";
 	}
 
 	/**

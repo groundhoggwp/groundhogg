@@ -829,7 +829,23 @@
 
   // registerFilter('primary_phone', 'contact', {}, 'Primary Phone')
   // registerFilter('mobile_phone', 'contact', {}, 'Mobile Phone')
-  // registerFilter('birthday', 'contact', {}, 'Birthday')
+
+  registerFilter('birthday', 'contact', __('Birthday', 'groundhogg'), {
+    view (filter) {
+      //language=HTMl
+      return standardActivityDateTitle('<b>Birthday is</b>', filter)
+    },
+    edit (filter) {
+      // language=html
+      return standardActivityDateOptions(filter)
+    },
+    onMount (filter, updateFilter) {
+      standardActivityDateFilterOnMount(filter, updateFilter)
+    },
+    defaults: {
+      ...standardActivityDateDefaults
+    }
+  })
 
   registerFilter('date_created', 'contact', __('Date Created', 'groundhogg'), {
     view (filter) {

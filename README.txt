@@ -322,8 +322,11 @@ You can purchase a premium plan for access to support and our premium extensions
 == Changelog ==
 
 = 2.5.7.4 (2021-11-30) =
-* FIXED Invalid nonce error when submitting forms.
-* FIXED UI bug cant see button when adding contacts to funnels from the contacts screen.
+* ADDED Birthday search filter
+* FIXED Invalid nonce error when submitting forms
+* FIXED UI bug cant see button when adding contacts to funnels from the contacts screen
+* FIXED When importing contacts with birthdays, if no birthday is provided default to empty value instead of date
+* FIXED Reset birthdays which have probably been set as a result of a bug, buggy dates are `1970-01-01` and `1999-11-30`
 
 = 2.5.7.3 (2021-11-26) =
 * FIXED PHP parse error
