@@ -653,7 +653,7 @@ class Main_Updater extends Updater {
 			'2.5.4'         => __( 'Improve the page tracking flow and track page visits for contacts.', 'groundhogg' ),
 			'2.5.5'         => __( 'Add new caps and permissions for notes and sales representatives.', 'groundhogg' ),
 			'2.5.7'         => __( 'Add new caps and permissions activity REST endpoints.', 'groundhogg' ),
-			'2.5.7.4'       => __( 'Reset birthdays of contacts with dates <b>1970-01-01</b> and <b>1999-11-30</b> because of import bug.', 'groundhogg' ),
+			'2.5.7.4'       => __( 'Reset birthdays of contacts with dates 1970-01-01 and 1999-11-30 because of import bug.', 'groundhogg' ),
 		];
 	}
 }
