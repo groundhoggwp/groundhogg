@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.8
 Requires PHP: 7.1
-Stable tag: 2.5.7.3
+Stable tag: 2.5.7.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -320,6 +320,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.5.7.4 (2021-11-30) =
+* FIXED Invalid nonce error when submitting forms.
+* FIXED UI bug cant see button when adding contacts to funnels from the contacts screen.
 
 = 2.5.7.3 (2021-11-26) =
 * FIXED PHP parse error

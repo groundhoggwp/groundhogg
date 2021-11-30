@@ -519,10 +519,7 @@
 							  ${select({
 								  id: 'select-step',
 								  name: 'step'
-							  }, funnel.steps.sort((a, b) => a.data.step_order - b.data.step_order).map(s => ({
-								  value: s.ID,
-								  text: `${s.data.step_title} (${Groundhogg.rawStepTypes[s.data.step_type].name})`
-							  })), step && step.ID)}
+							  })}
 						  </div>
 					  </div>`
                 }
@@ -565,16 +562,24 @@
                   FunnelsStore.itemsFetched(items)
                 }, {
                   status: 'active'
+                }, {
+                  placeholder: __( 'Select a funnel...', 'groundhogg' ),
                 }).on('change', ({ target }) => {
                   funnel = FunnelsStore.get(parseInt($(target).val()))
 
-                  step = false
+                  step = funnel.steps.find( s => s.data.step_order == 1)
                   setContent(addToFunnel())
                   mounted()
 
                 })
 
                 $('#select-step').select2({
+                  placeholder: __( 'Select a step...', 'groundhogg' ),
+                  data: funnel.steps.sort((a, b) => a.data.step_order - b.data.step_order).map(s => ({
+                    id: s.ID,
+                    text: `${s.data.step_title} (${Groundhogg.rawStepTypes[s.data.step_type].name})`,
+                    selected: s.ID == step.ID,
+                  }))
                   // templateSelection: template,
                   // templateResult: template
                 }).on('change', ({ target }) => {

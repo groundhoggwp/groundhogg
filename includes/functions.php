@@ -2379,10 +2379,17 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 				break;
 			case 'birthday':
 
+				if ( empty( $value ) ) {
+					$meta['birthday'] = '';
+					break;
+				}
+
 				if ( is_string( $value ) ) {
 					$meta['birthday'] = Ymd( strtotime( $value ) );
-				} else if ( is_array( $value ) ) {
+					break;
+				}
 
+				if ( is_array( $value ) ) {
 					$year  = absint( $value['year'] );
 					$month = absint( $value['month'] );
 					$day   = absint( $value['day'] );
@@ -2675,10 +2682,18 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				}
 				break;
 			case 'birthday':
+
+				if ( empty( $value ) ) {
+					$meta['birthday'] = '';
+					break;
+				}
+
 				if ( is_string( $value ) ) {
 					$meta['birthday'] = Ymd( strtotime( $value ) );
-				} else if ( is_array( $value ) ) {
+					break;
+				}
 
+				if ( is_array( $value ) ) {
 					$year  = absint( $value['year'] );
 					$month = absint( $value['month'] );
 					$day   = absint( $value['day'] );
@@ -2687,6 +2702,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 						mktime( 0, 0, 0, $month, $day, $year )
 					);
 				}
+
 				break;
 		}
 
@@ -4734,10 +4750,10 @@ function track_live_activity( $type, $details = [] ) {
 	}
 
 	$args = [
-		'funnel_id'  => tracking()->get_current_funnel_id(),
-		'email_id'   => tracking()->get_current_email_id(),
-		'event_id'   => tracking()->get_current_event() ? tracking()->get_current_event()->get_id() : false,
-		'referer'    => tracking()->get_leadsource(),
+		'funnel_id' => tracking()->get_current_funnel_id(),
+		'email_id'  => tracking()->get_current_email_id(),
+		'event_id'  => tracking()->get_current_event() ? tracking()->get_current_event()->get_id() : false,
+		'referer'   => tracking()->get_leadsource(),
 	];
 
 	track_activity( $contact, $type, $args, $details );
@@ -5951,14 +5967,15 @@ function array_map_to_method( $array, $method ) {
  *
  * @param mixed  $maybe_tags stuff that might be tags
  * @param string $as         accepts ID | slug | name
+ * @param bool   $create     whether to create a new tag if the given one does not exist.
  *
  * @return mixed[]
  */
-function parse_tag_list( $maybe_tags, $as = 'ID' ) {
+function parse_tag_list( $maybe_tags, $as = 'ID', $create = true ) {
 
 	if ( is_array( $maybe_tags ) ) {
 
-		$tags = array_map( function ( $maybe_tag ) {
+		$tags = array_map( function ( $maybe_tag ) use ( $create ) {
 
 			if ( is_a( $maybe_tag, Tag::class ) ) {
 				return $maybe_tag;
@@ -5966,6 +5983,14 @@ function parse_tag_list( $maybe_tags, $as = 'ID' ) {
 
 			if ( is_numeric( $maybe_tag ) ) {
 				return new Tag( $maybe_tag );
+			}
+
+			// This will create a new tag if it doesn't exist already :)
+			if ( $create ) {
+				return new Tag( [
+					'tag_name' => $maybe_tag,
+					'tag_slug' => sanitize_title( $maybe_tag )
+				] );
 			}
 
 			return new Tag( sanitize_title( $maybe_tag ), 'tag_slug' );
@@ -5981,8 +6006,14 @@ function parse_tag_list( $maybe_tags, $as = 'ID' ) {
 		if ( strpos( $maybe_tags, ',' ) !== false ) {
 			$tags = parse_tag_list( wp_parse_list( $maybe_tags ) );
 		} else {
-			// Assume slug
-			$tags = [ new Tag( sanitize_title( $maybe_tags ), 'tag_slug' ) ];
+
+			// if create is true, use the query and create method, otherwise use the slug
+			$tags = [
+				$create ? new Tag( [
+					'tag_name' => $maybe_tags,
+					'tag_slug' => sanitize_title( $maybe_tags )
+				] ) : new Tag( sanitize_title( $maybe_tags ), 'tag_slug' )
+			];
 		}
 
 	} else {

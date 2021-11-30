@@ -102,12 +102,6 @@ class Submission_Handler extends Supports_Errors {
 
 	public function setup() {
 
-		if ( ! wp_verify_nonce( get_request_var( '_ghnonce' ), 'groundhogg_frontend' ) && ! current_user_can( 'add_contacts' ) ){
-			$this->add_error( 'invalid_nonce', __( "Nonce verification failed.", 'groundhogg' ) );
-
-			return;
-		}
-
 		// Set the form ID
 		$this->form_id = absint( get_request_var( 'gh_submit_form' ) );
 
@@ -121,8 +115,6 @@ class Submission_Handler extends Supports_Errors {
 
 		// Set a step
 		$this->step = new Step( $this->get_form_id() );
-
-//		wp_send_json( $this->step );
 
 		if ( ! $this->step ) {
 			$this->add_error( 'invalid_form', __( "This form does not exist.", 'groundhogg' ) );
