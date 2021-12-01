@@ -308,6 +308,19 @@
 
           setContent(quickEdit(getContact()))
           quickEditMounted({ close, setContent })
+        }).catch( e => {
+
+          stop()
+          clearPayload()
+          setContent(quickEdit(getContact()))
+          quickEditMounted({ close, setContent })
+
+          console.log( e )
+
+          dialog({
+            type: 'error',
+            message: e.message
+          })
         })
 
       })

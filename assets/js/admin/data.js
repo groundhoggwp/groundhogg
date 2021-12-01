@@ -1,5 +1,12 @@
 (function ($) {
 
+  function ApiError (message) {
+    this.name="ApiError"
+    this.message = message
+  }
+
+  ApiError.prototype = Error.prototype
+
   /**
    * Fetch stuff from the API
    * @param route
@@ -15,7 +22,14 @@
       ...opts
     })
 
-    return response.json()
+    let json = await response.json()
+
+    if (!response.ok) {
+      console.log(json)
+      throw new ApiError(json.message)
+    }
+
+    return json
   }
 
   /**
@@ -36,7 +50,73 @@
       body: JSON.stringify(data),
       ...opts,
     })
-    return response.json()
+
+    let json = await response.json()
+
+    if (!response.ok) {
+      console.log(json)
+      throw new ApiError(json.message)
+    }
+
+    return json
+  }
+
+  /**
+   * Post data
+   *
+   * @param url
+   * @param data
+   * @param opts
+   * @returns {Promise<any>}
+   */
+  async function apiPatch (url = '', data = {}, opts = {}) {
+    const response = await fetch(url, {
+      ...opts,
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-WP-Nonce': Groundhogg.nonces._wprest,
+      },
+      body: JSON.stringify(data)
+    })
+
+    let json = await response.json()
+
+    if (!response.ok) {
+      console.log(json)
+      throw new ApiError(json.message)
+    }
+
+    return json
+  }
+
+  /**
+   * Post data
+   *
+   * @param url
+   * @param data
+   * @param opts
+   * @returns {Promise<any>}
+   */
+  async function apiDelete (url = '', data = {}, opts = {}) {
+    const response = await fetch(url, {
+      ...opts,
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-WP-Nonce': Groundhogg.nonces._wprest,
+      },
+      body: JSON.stringify(data)
+    })
+
+    let json = await response.json()
+
+    if (!response.ok) {
+      console.log(json)
+      throw new ApiError(json.message)
+    }
+
+    return json
   }
 
   /**
@@ -62,48 +142,7 @@
       body: fData,
       ...opts,
     })
-    return response.json()
-  }
 
-  /**
-   * Post data
-   *
-   * @param url
-   * @param data
-   * @param opts
-   * @returns {Promise<any>}
-   */
-  async function apiPatch (url = '', data = {}, opts = {}) {
-    const response = await fetch(url, {
-      ...opts,
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-WP-Nonce': Groundhogg.nonces._wprest,
-      },
-      body: JSON.stringify(data)
-    })
-    return response.json()
-  }
-
-  /**
-   * Post data
-   *
-   * @param url
-   * @param data
-   * @param opts
-   * @returns {Promise<any>}
-   */
-  async function apiDelete (url = '', data = {}, opts = {}) {
-    const response = await fetch(url, {
-      ...opts,
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-WP-Nonce': Groundhogg.nonces._wprest,
-      },
-      body: JSON.stringify(data)
-    })
     return response.json()
   }
 
@@ -140,8 +179,8 @@
       return this.items
     },
 
-    has ( id ){
-      return this.hasItem( id )
+    has (id) {
+      return this.hasItem(id)
     },
 
     hasItem (id) {

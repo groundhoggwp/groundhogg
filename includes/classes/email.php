@@ -244,7 +244,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return bool
 	 */
 	public function is_confirmation_email() {
-		return ( strpos( $this->get_content(), '{confirmation_link}' ) !== false ) || ( strpos( $this->get_content(), '{confirmation_link_raw}' ) !== false );
+		return strpos( $this->get_content(), 'confirmation_link' ) !== false;
 	}
 
 	/**
