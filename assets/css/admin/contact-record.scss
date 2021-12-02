@@ -83,7 +83,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 #activity-timeline {
 
   margin-left: 15px;
-  border-left: 2px solid $primary-dark-30;
+  border-left: 2px solid $primary-dark-10;
 
   li.activity-item {
     position: relative;
@@ -97,11 +97,23 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
       font-size: 15px;
     }
 
+    .event-extra,
     .diff-time{
       color: $primary-dark-50;
     }
 
-    .activity-icon {
+    .activity-icon.wp_fusion{
+      position: absolute;
+      left: -34px;
+
+      height: 25px;
+      width: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .activity-icon:not(.wp_fusion) {
 
       position: absolute;
       left: -34px;

@@ -566,8 +566,11 @@ class Scripts {
 			'groundhogg-admin-templates',
 			'groundhogg-loader',
 		], GROUNDHOGG_VERSION );
-		wp_register_style( 'groundhogg-admin-email-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/email-editor.css', [
+		wp_register_style( 'groundhogg-admin-email-block-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/email-builder.css', [
 			'groundhogg-admin-element',
+			'groundhogg-admin-components',
+		], GROUNDHOGG_VERSION );wp_register_style( 'groundhogg-admin-email-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/email-editor.css', [
+			'groundhogg-admin-email-block-editor',
 		], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-form-builder', GROUNDHOGG_ASSETS_URL . 'css/admin/form-builder.css', [
 			'groundhogg-form'

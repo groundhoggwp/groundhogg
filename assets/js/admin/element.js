@@ -1848,7 +1848,8 @@
 			<path
 				fill="currentColor"
 				d="M448 24H224a40 40 0 0 0-40 40v32a24 24 0 0 0 48 0V72h208v368H232v-24a24 24 0 0 0-48 0v32a40 40 0 0 0 40 40h224a40 40 0 0 0 40-40V64a40 40 0 0 0-40-40z"/>
-		</svg>`, //language=HTML
+		</svg>`,
+    //language=HTML
     logout: `
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
 			<path
@@ -1857,6 +1858,27 @@
 			<path
 				fill="currentColor"
 				d="M304 392a24 24 0 0 0-24 24v24H72V72h208v24a24 24 0 0 0 48 0V64a40 40 0 0 0-40-40H64a40 40 0 0 0-40 40v384a40 40 0 0 0 40 40h224a40 40 0 0 0 40-40v-32a24 24 0 0 0-24-24z"/>
+		</svg>`,
+  //language=HTML
+    wp_fusion: `
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 39">
+			<g id="Landing-Page" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+				<g id="Landing-Page-(Type-Outlined)" transform="translate(-115 -38)">
+					<g id="Section---Splash" transform="translate(106 -602)">
+						<g id="Logo-(Larger)" transform="translate(9 639.05)">
+							<g id="Mark" transform="translate(0 .5)">
+								<path d="M8 .5h30v30a8 8 0 0 1-8 8H0v-30a8 8 0 0 1 8-8Z" id="BG" fill="#E55B10"/>
+								<path
+									d="M31 15.5a1.5 1.5 0 0 1-1.5 1.5l-12-.001V29a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5V15a1.5 1.5 0 0 1 .719-1.28A1.5 1.5 0 0 1 15.5 13h14a1.5 1.5 0 0 1 1.5 1.5v1Z"
+									id="Path" fill="#FFF"/>
+								<path
+									d="M8 23a1.5 1.5 0 0 1 1.5-1.5l12 .001V9.5A1.5 1.5 0 0 1 23 8h1a1.5 1.5 0 0 1 1.5 1.5v14a1.5 1.5 0 0 1-.719 1.28 1.5 1.5 0 0 1-1.281.72h-14A1.5 1.5 0 0 1 8 24v-1Z"
+									fill="#FFF"/>
+							</g>
+						</g>
+					</g>
+				</g>
+			</g>
 		</svg>`,
 
   }

@@ -455,6 +455,14 @@
   const ActivityTimeline = {
 
     types: {
+      wp_fusion: {
+        icon: icons.wp_fusion,
+        render: ({ data, meta }) => {
+          const { event_name, event_value } = meta
+          return `${event_name}: <code>${event_value}</code>`
+        },
+        preload: () => {}
+      },
       wp_login: {
         icon: icons.login,
         render: ({ email }) => {
@@ -511,6 +519,9 @@
 							</button>
 						</div>
 					</div>
+					<div class="event-extra">
+						${sprintf( __( 'in funnel %s', 'groundhogg' ), FunnelsStore.get(step.data.funnel_id).data.title )}
+					</div>
 					<div class="diff-time">
 						${sprintf(__('%s ago', 'groundhogg'), activity.locale.diff_time)}
 					</div>
@@ -544,8 +555,8 @@
 
       // language=HTML
       return `
-		  <li class="activity-item">
-			  <div class="activity-icon">${type.icon}</div>
+		  <li class="activity-item ${activity.data.activity_type} activity">
+			  <div class="activity-icon ${activity.data.activity_type}">${type.icon}</div>
 			  <div class="activity-rendered">
 				  <div class="activity-info">
 					  ${type.render(activity)}
@@ -612,6 +623,19 @@
         ...activities
           .filter(a => a.type === 'event' && a.data.event_type == 1)
           .map(a => StepTypes.getType(a.step.step_type).preload(a.step)),
+        // Funnels
+        FunnelsStore.fetchItems({
+          ID: activities
+            .filter(a => a.type === 'event' && a.data.event_type == 1)
+            .reduce((arr, e) => {
+
+              if (!arr.includes(e.data.funnel_id)) {
+                arr.push(e.data.funnel_id)
+              }
+
+              return arr
+            }, [])
+        }),
         // Broadcast Events
         ...activities
           .filter(a => a.type === 'event' && a.data.event_type == 2)

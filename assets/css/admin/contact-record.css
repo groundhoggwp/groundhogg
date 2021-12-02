@@ -50,7 +50,7 @@
 
 #activity-timeline {
   margin-left: 15px;
-  border-left: 2px solid rgba(16, 38, 64, 0.3);
+  border-left: 2px solid rgba(16, 38, 64, 0.1);
 }
 #activity-timeline li.activity-item {
   position: relative;
@@ -62,10 +62,20 @@
 #activity-timeline li.activity-item .activity-info {
   font-size: 15px;
 }
+#activity-timeline li.activity-item .event-extra,
 #activity-timeline li.activity-item .diff-time {
   color: rgba(16, 38, 64, 0.5);
 }
-#activity-timeline li.activity-item .activity-icon {
+#activity-timeline li.activity-item .activity-icon.wp_fusion {
+  position: absolute;
+  left: -34px;
+  height: 25px;
+  width: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#activity-timeline li.activity-item .activity-icon:not(.wp_fusion) {
   position: absolute;
   left: -34px;
   height: 25px;
@@ -77,14 +87,14 @@
   background: #0075ff;
   color: #FFFFFF;
 }
-#activity-timeline li.activity-item .activity-icon.benchmark {
+#activity-timeline li.activity-item .activity-icon:not(.wp_fusion).benchmark {
   background: #f58115;
   border-radius: 4px;
 }
-#activity-timeline li.activity-item .activity-icon.broadcast, #activity-timeline li.activity-item .activity-icon.action {
+#activity-timeline li.activity-item .activity-icon:not(.wp_fusion).broadcast, #activity-timeline li.activity-item .activity-icon:not(.wp_fusion).action {
   background: #9ece38;
 }
-#activity-timeline li.activity-item .activity-icon svg {
+#activity-timeline li.activity-item .activity-icon:not(.wp_fusion) svg {
   width: 15px;
   height: 15px;
 }

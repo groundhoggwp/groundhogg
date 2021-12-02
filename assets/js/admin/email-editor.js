@@ -994,4 +994,6 @@
   })
 
   Groundhogg.EmailEditor = EmailEditor
+
+  
 })(jQuery)

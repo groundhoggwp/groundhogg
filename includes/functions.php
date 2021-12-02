@@ -4733,9 +4733,11 @@ function track_live_activity( $type, $details = [] ) {
  * @param string  $type    string, an activity identifier
  * @param array   $args    the details for the activity
  * @param array   $details details about that activity
- * @param Contact $contact the contact to track
+ * @param Contact|string|int $contact the contact to track
  */
 function track_activity( $contact, $type = '', $args = [], $details = [] ) {
+
+	$contact = get_contactdata( $contact );
 
 	// If there is not one available, skip
 	if ( ! is_a_contact( $contact ) ) {
@@ -4746,10 +4748,11 @@ function track_activity( $contact, $type = '', $args = [], $details = [] ) {
 	$defaults = [
 		'activity_type' => $type,
 		'timestamp'     => time(),
+		'contact_id'    => $contact->get_id()
 	];
 
 	// Merge overrides with args
-	$args = wp_parse_args( $defaults, $args );
+	$args = wp_parse_args( $args, $defaults );
 	$args = apply_filters( 'groundhogg/track_live_activity/args', $args, $contact );
 
 	// Add the activity to the DB
