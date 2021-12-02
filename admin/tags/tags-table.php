@@ -74,7 +74,7 @@ class Tags_Table extends WP_List_Table {
 			'contact_count'   => array( 'contact_count', false ),
 		);
 
-		return $sortable_columns;
+		return apply_filters( 'groundhogg/admin/tags/table/sortable_columns', $sortable_columns );
 	}
 
 	protected function extra_tablenav( $which ) {

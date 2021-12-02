@@ -35,6 +35,13 @@ h3 {
   align-items: center;
 }
 
+.align-left-space-between {
+  display: flex !important;
+  justify-content: flex-start;
+  gap: 10px;
+  align-items: center;
+}
+
 .space-between {
   display: flex !important;
   justify-content: space-between;
@@ -58,13 +65,13 @@ h3 {
         font-size: 16px;
       }
 
-      .property-group-more {
+      .property-group-more{
         visibility: hidden;
       }
     }
 
-    &:hover {
-      .property-group-more {
+    &:hover{
+      .property-group-more{
         visibility: visible;
       }
     }
@@ -127,7 +134,7 @@ h3 {
   tr {
     cursor: pointer;
 
-    &:hover {
+    &:hover{
       background-color: $primary-blue-2;
     }
   }
@@ -293,10 +300,16 @@ a.action-link {
 
   &.green {
     background: $action-green-50;
+    color: darken( $action-green, 35 );
   }
 
   &.red {
     background: $error-red-50;
+    color: darken( $error-red, 35 )
+  }
+
+  &.sm {
+    font-size: 13px;
   }
 }
 
@@ -304,6 +317,18 @@ svg,
 span.gh-text {
   &.danger {
     color: $error-red;
+  }
+
+  &.md {
+    font-size: 15px;
+  }
+
+  &.sm {
+    font-size: 13px;
+  }
+
+  &.lg {
+    font-size: 18px;
   }
 }
 
@@ -389,7 +414,8 @@ button {
     }
   }
 
-  &.gh-button {
+  &.gh-button,
+  &.gh-submit{
 
     text-decoration: none;
     white-space: nowrap;
@@ -406,6 +432,10 @@ button {
       cursor: initial;
     }
 
+    &.no-border {
+      border: none !important;
+    }
+
     &.action {
       background: $action-green;
 
@@ -414,6 +444,7 @@ button {
       }
     }
 
+    &#gh-submit,
     &.primary {
       background: $primary-blue;
 
@@ -499,6 +530,10 @@ button {
       color: $primary-dark;
       background-color: #FFF;
       padding: 4px 5px;
+
+      &.filled {
+        background: $primary-dark-10;
+      }
 
       &:hover {
         background-color: $primary-dark-10;
@@ -713,12 +748,12 @@ button {
       border-bottom-right-radius: 0;
       border-bottom-left-radius: 0;
 
-      .gh-row {
+      .gh-row{
         align-items: center;
       }
 
       .select2 {
-        select2-container, .select2-selection {
+        select2-container, .select2-selection{
           border: none !important;
           outline: none !important;
         }
@@ -773,7 +808,19 @@ button {
     max-height: calc(92vh - 64px);
     overflow: auto;
 
-    &.overflow-visible {
+    .gh-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 8px 20px;
+
+      h3{
+        margin: 0;
+      }
+    }
+
+    &.overflow-visible{
       overflow: visible;
     }
 
@@ -793,10 +840,10 @@ button {
       }
     }
 
-    #search-form {
+    #search-form{
       padding: 30px 20px;
 
-      input {
+      input{
         width: 100%;
       }
     }
@@ -932,7 +979,7 @@ p.error,
       }
     }
 
-    span.handle {
+    span.handle{
       border-bottom: 1px solid #8c8f94;
       border-radius: 0;
       padding: 6px;
@@ -952,7 +999,7 @@ p.error,
         border-top-left-radius: 4px;
       }
 
-      span.handle {
+      span.handle{
         border-top: 1px solid #8c8f94;
       }
 
@@ -1032,16 +1079,7 @@ p.error,
       background-color: $primary-dark-10;
       cursor: pointer;
     }
-
-    svg {
-      width: 20px;
-      height: 20px;
-    }
   }
-}
-
-.gh-button-toggle {
-  display: flex;
 }
 
 .gh-step-nav {
@@ -1419,4 +1457,153 @@ p.error,
   .gh-tab-content {
     padding: 20px;
   }
+}
+
+.contact-quick-edit {
+  width: 500px;
+
+  .gh-header {
+    img {
+      border-radius: 5px;
+    }
+  }
+
+  &-fields {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .row {
+      display: flex;
+      gap: 20px;
+
+      &.phone {
+        gap: 5px;
+      }
+
+      .primary-phone-ext {
+        width: 120px;
+      }
+
+      .col {
+        width: 100%;
+
+        input, select {
+          max-width: 100%;
+          width: 100%;
+        }
+      }
+    }
+
+  }
+}
+
+.gh-form-wrapper * {
+  box-sizing: border-box;
+}
+
+ul.gh-form-errors{
+  padding-left: 20px;
+  margin: 0;
+}
+
+.gh-input{
+  outline: none;
+  width: 100%;
+}
+
+.gh-form-field {
+  margin: 10px 0;
+  white-space: normal;
+}
+
+.gh-form-wrapper label{
+  cursor: pointer;
+  vertical-align: baseline;
+}
+
+.gh-form-wrapper .gh-input{
+  height: auto;
+}
+
+.gh-form-row {
+  white-space: nowrap;
+}
+
+.gh-form-column {
+  display: inline-block;
+  float: left;
+  clear: none;
+  white-space: normal;
+}
+
+.gh-form-column {
+  padding-right: 10px;
+}
+
+.gh-form-wrapper input[type=file].gh-file-uploader{
+  width: 100%;
+  margin: auto;
+  padding: 30px;
+  box-sizing: border-box;
+  background: #f1f1f1;
+  border: 2px dashed #e5e5e5;
+  text-align: center;
+}
+
+/*.gh-form-column:nth-last-child(2){*/
+/*padding-right: 0;*/
+/*}*/
+
+.gh-form-edit-link {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  transition: 0.4s;
+}
+
+.gh-form-wrapper:hover .gh-form-edit-link {
+  visibility: visible;
+  background: #FFFFFF;
+  opacity: 1;
+  padding: 5px;
+  transition: 0.4s;
+}
+
+.gh-form-column:last-child{
+  padding-right: 0;
+}
+
+#gdpr-checkboxes-wrap label {
+  display: block;
+}
+
+.gh-form-column.col-1-of-1{width: 100%;}
+.gh-form-column.col-1-of-2{width: 50%}
+.gh-form-column.col-1-of-3{width: 33.33%}
+.gh-form-column.col-1-of-4{width: 25%;}
+.gh-form-column.col-2-of-3{width: 66.66%;}
+.gh-form-column.col-3-of-4{width: 75%;}
+
+/*  GO FULL WIDTH BELOW 480 PIXELS */
+@media only screen and (max-width: 480px) {
+  .gh-form-row {white-space: normal;}
+  .gh-form-column.col-1-of-1{width: 100%;}
+  .gh-form-column.col-1-of-2{width: 100%;}
+  .gh-form-column.col-1-of-3{width: 100%;}
+  .gh-form-column.col-1-of-4{width: 100%;}
+  .gh-form-column.col-2-of-3{width: 100%;}
+  .gh-form-column.col-3-of-4{width: 100%;}
+  .gh-form-column {
+    padding-right: 0;
+  }
+
+}
+
+/*.clearfix{clear: both}*/
+.clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
 }

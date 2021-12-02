@@ -360,7 +360,7 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Misc Settings', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
 			),
-			'experimental'             => array(
+			'experimental'          => array(
 				'id'    => 'experimental',
 				'title' => _x( 'Experimental', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
@@ -868,7 +868,7 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				),
 			),
-			'gh_consent_cookie_name'               => [
+			'gh_consent_cookie_name'                 => [
 				'id'      => 'gh_consent_cookie_name',
 				'section' => 'cookies',
 				'label'   => _x( 'Consent cookie name', 'settings', 'groundhogg' ),
@@ -881,7 +881,7 @@ class Settings_Page extends Admin_Page {
 					'id'          => 'gh_consent_cookie_name',
 				],
 			],
-			'gh_cookie_consent_cookie_value'               => [
+			'gh_cookie_consent_cookie_value'         => [
 				'id'      => 'gh_cookie_consent_cookie_value',
 				'section' => 'cookies',
 				'label'   => _x( 'Consent cookie value', 'settings', 'groundhogg' ),
@@ -1156,6 +1156,34 @@ class Settings_Page extends Admin_Page {
 					'id'    => 'gh_non_marketable_tag',
 					'class' => 'gh-single-tag-picker'
 				),
+			],
+			'gh_disable_click_tracking'              => [
+				'id'      => 'gh_disable_click_tracking',
+				'section' => 'tracking',
+				'label'   => _x( 'Disable Email Link Click Tracking', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'Disable all link click tracking in emails.', 'settings', 'groundhogg' ),
+				'type'    => 'checkbox',
+				'atts'    => [
+					'label' => __( 'Disable' ),
+					//keep brackets for backwards compat
+					'name'  => 'gh_disable_click_tracking',
+					'id'    => 'gh_disable_click_tracking',
+					'value' => 'on',
+				],
+			],
+			'gh_disable_open_tracking'              => [
+				'id'      => 'gh_disable_open_tracking',
+				'section' => 'tracking',
+				'label'   => _x( 'Disable Email Open Tracking', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'Disable all email open tracking.', 'settings', 'groundhogg' ),
+				'type'    => 'checkbox',
+				'atts'    => [
+					'label' => __( 'Disable' ),
+					//keep brackets for backwards compat
+					'name'  => 'gh_disable_open_tracking',
+					'id'    => 'gh_disable_open_tracking',
+					'value' => 'on',
+				],
 			],
 			'gh_url_tracking_exclusions'             => [
 				'id'      => 'gh_url_tracking_exclusions',

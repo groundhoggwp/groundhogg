@@ -10,6 +10,7 @@
     loadingDots,
     copyObject,
     objectEquals,
+    toggle,
     moreMenu,
     select,
     dangerConfirmationModal,
@@ -21,6 +22,10 @@
     tooltip,
     adminPageURL
   } = Groundhogg.element
+  const {
+    quickEditContactModal,
+    addContactModal,
+  } = Groundhogg.components
   const { post, get, patch, routes, ajax } = Groundhogg.api
   const { searches: SearchesStore, contacts: ContactsStore, tags: TagsStore, funnels: FunnelsStore } = Groundhogg.stores
   const { tagPicker, funnelPicker } = Groundhogg.pickers
@@ -34,65 +39,115 @@
 
   SearchesStore.itemsFetched(ContactSearch.searches)
 
-  function utf8_to_b64( str ) {
-    return window.btoa(unescape(encodeURIComponent( str )));
+  function utf8_to_b64 (str) {
+    return window.btoa(unescape(encodeURIComponent(str)))
   }
 
-  function b64_to_utf8( str ) {
-    return decodeURIComponent(escape(window.atob( str )));
+  function b64_to_utf8 (str) {
+    return decodeURIComponent(escape(window.atob(str)))
   }
 
   const base64_json_encode = (stuff) => {
     return utf8_to_b64(JSON.stringify(stuff))
   }
 
-  const loadFilters = (filters) => {
-    window.location.href = ContactSearch.url + '&filters=' + base64_json_encode(filters)
+  const loadFilters = (query) => {
+    window.location.href = ContactSearch.url + '&' + query
   }
 
   const loadSearch = (search) => {
     window.location.href = ContactSearch.url + '&saved_search=' + search
   }
 
+  let abortHandler
+
   const SearchApp = {
 
     filtersEnabled: false,
+    excludeEnabled: false,
     savedSearchEnabled: false,
-    filters: [],
+    query: {
+      filters: [],
+      exclude_filters: [],
+    },
     filtersApp: null,
+    excludeFiltersApp: null,
     searchesApp: null,
     currentSearch: null,
 
+    getContacts () {
+
+      if (abortHandler) {
+        abortHandler.abort()
+      }
+
+      abortHandler = new AbortController()
+      const { signal } = abortHandler
+
+      ContactsStore.count({
+        filters: base64_json_encode(this.query.filters),
+        exclude_filters: base64_json_encode(this.excludeEnabled ? this.query.exclude_filters : [])
+      }, {
+        signal
+      }).then(total => {
+        $('#search-contacts').html(sprintf(_n('Show %s contact', 'Show %s contacts', total, 'groundhogg'), formatNumber(total)))
+      })
+    },
+
     init () {
 
-      const handleUpdateFilters = (filters) => {
-        this.filters = filters
-        getContacts(filters)
-
-        // console.log(this.filters, this.currentSearch.query.filters)
+      const onUpdate = () => {
+        this.getContacts()
 
         if (this.currentSearch) {
-          if (objectEquals(this.filters, this.currentSearch.query.filters)) {
+          if (objectEquals(this.query, this.currentSearch.query)) {
             $('#update-search').prop('disabled', true)
           } else {
             $('#update-search').prop('disabled', false)
           }
         }
-
       }
 
-      this.filters = ContactSearch.filters || []
-      if (this.filters && this.filters.length > 0) {
+      const handleUpdateExcludeFilters = (filters) => {
+
+        this.query.exclude_filters = filters
+
+        onUpdate()
+      }
+
+      const handleUpdateFilters = (filters) => {
+        this.query.filters = filters
+
+        onUpdate()
+      }
+
+      this.query = ContactSearch.filter_query || []
+
+      if (this.query.filters.length || this.query.exclude_filters.length) {
+
         this.filtersEnabled = true
+
+        if (this.query.exclude_filters.length) {
+          this.excludeEnabled = true
+        }
+
         $('.contact-quick-search').hide()
+
       } else if (ContactSearch.currentSearch) {
+
         this.currentSearch = copyObject(ContactSearch.currentSearch)
-        if (this.currentSearch.query.filters) {
-          this.filters = copyObject(this.currentSearch.query.filters, [])
+
+        if (this.currentSearch.query) {
+          this.query = copyObject(this.currentSearch.query, {})
+
+          if ( 'exclude_filters' in this.query && this.query.exclude_filters.length) {
+            this.excludeEnabled = true
+          }
         }
       }
 
-      this.filtersApp = createFilters('#search-filters', this.filters, handleUpdateFilters)
+      this.filtersApp = createFilters('#search-filters', this.query.filters, handleUpdateFilters)
+      this.excludeFiltersApp = createFilters('#exclude-filters', this.query.exclude_filters, handleUpdateExcludeFilters)
       this.mount()
     },
 
@@ -127,12 +182,26 @@
 				<button class="enable-filters white"><span class="dashicons dashicons-filter"></button>
 			</div>
 			<div class="search-filters-wrap">
+				${this.excludeEnabled ? `<div class="include-filters-wrap"><div class="include-block">${__('Include')}</div>` : ''}
 				<div id="search-filters"></div>
-				<div class="search-contacts-wrap">
-					<button id="search-contacts" class="button button-primary">${__('Search', 'groundhogg')}</button>
-					${!this.currentSearch
-						? `<button id="save-search" class="button button-secondary">${__('Save this search', 'groundhogg')}</button>`
-						: `<button id="update-search" class="button button-secondary" ${objectEquals(this.filters, this.currentSearch.query.filters) ? 'disabled' : ''}>${sprintf(__('Update "%s"', 'groundhogg'), this.currentSearch.name)}</button><a class="gh-text danger delete-search">${__('Delete')}</a>`}
+				${this.excludeEnabled ? `</div><div class="exclude-filters-wrap"><div class="exclude-block">${__('Exclude')}</div><div id="exclude-filters"></div></div>` : ''}
+				<div class="space-between">
+					<div class="align-left-space-between">
+						<span>${__('Show exclude filters', 'groundhogg')}</span>
+						${toggle({
+							id: 'enable-exclude',
+							name: 'enable_exclude',
+							checked: this.excludeEnabled
+						})}
+					</div>
+					<div class="align-right-space-between">
+						<button id="search-contacts" class="button button-primary">${__('Search', 'groundhogg')}
+						</button>
+						${!this.currentSearch
+							? `<button id="save-search" class="button button-secondary">${__('Save this search', 'groundhogg')}</button>`
+							: `<button id="update-search" class="button button-secondary" ${objectEquals(this.query.filters, this.currentSearch.query.filters) && (!this.excludeEnabled || objectEquals(this.query.exclude_filters, this.currentSearch.query.exclude_filters)) ? 'disabled' : ''}>${sprintf(__('Update "%s"', 'groundhogg'), this.currentSearch.name)}</button><a class="gh-text danger delete-search">${__('Delete')}</a>`}
+					</div>
+
 				</div>
 			</div>
         `
@@ -181,11 +250,17 @@
       }
 
       if (this.filtersEnabled) {
+
         this.filtersApp.init()
+
         tooltip('.enable-filters', {
           content: __('Turn off filters', 'groundhogg'),
           position: 'top'
         })
+
+        if (this.excludeEnabled) {
+          this.excludeFiltersApp.init()
+        }
       }
 
       if (this.savedSearchEnabled) {
@@ -205,13 +280,28 @@
         loadingDots('#load-saved-search span.text')
       }
 
+      $('#enable-exclude').on('change', (e) => {
+        this.excludeEnabled = e.target.checked
+        remount()
+        this.getContacts()
+      })
+
       $('#search-contacts').on('click', (e) => {
         $(e.target).html('Searching').prop('disabled', true)
         loadingDots('#search-contacts')
-        if (this.currentSearch && objectEquals(this.filters, this.currentSearch.query.filters)) {
+        if (this.currentSearch
+          && objectEquals(this.query.filters, this.currentSearch.query.filters)
+          && objectEquals(this.currentSearch.query.exclude_filters, this.excludeEnabled ? this.query.exclude_filters : [])) {
           loadSearch(this.currentSearch.id)
         } else {
-          loadFilters(this.filters)
+
+          let query = `filters=${base64_json_encode(this.query.filters)}`
+
+          if (this.excludeEnabled) {
+            query += `&exclude_filters=${base64_json_encode(this.query.exclude_filters)}`
+          }
+
+          loadFilters(query)
         }
       })
 
@@ -240,7 +330,8 @@
 
         SearchesStore.patch(this.currentSearch.id, {
           query: {
-            filters: this.filters
+            filters: this.query.filters,
+            exclude_filters: this.excludeEnabled ? this.query.exclude_filters : []
           }
         }).then(search => {
 
@@ -321,7 +412,8 @@
           SearchesStore.post({
             name: this.newSearchName,
             query: {
-              filters: this.filters
+              filters: this.query.filters,
+              exclude_filters: this.excludeEnabled ? this.query.exclude_filters : []
             }
           }).then(search => {
 
@@ -336,26 +428,6 @@
         })
       })
     }
-  }
-
-  let abortHandler
-
-  const getContacts = (filters) => {
-
-    if (abortHandler) {
-      abortHandler.abort()
-    }
-
-    abortHandler = new AbortController()
-    const { signal } = abortHandler
-
-    ContactsStore.count({
-      filters: base64_json_encode(filters)
-    }, {
-      signal
-    }).then(total => {
-      $('#search-contacts').html(sprintf(_n('Show %s contact', 'Show %s contacts', total, 'groundhogg'), formatNumber(total)))
-    })
   }
 
   $(function () {
@@ -447,10 +519,7 @@
 							  ${select({
 								  id: 'select-step',
 								  name: 'step'
-							  }, funnel.steps.sort((a, b) => a.data.step_order - b.data.step_order).map(s => ({
-								  value: s.ID,
-								  text: `${s.data.step_title} (${Groundhogg.rawStepTypes[s.data.step_type].name})`
-							  })), step && step.ID)}
+							  })}
 						  </div>
 					  </div>`
                 }
@@ -493,16 +562,24 @@
                   FunnelsStore.itemsFetched(items)
                 }, {
                   status: 'active'
+                }, {
+                  placeholder: __( 'Select a funnel...', 'groundhogg' ),
                 }).on('change', ({ target }) => {
                   funnel = FunnelsStore.get(parseInt($(target).val()))
 
-                  step = false
+                  step = funnel.steps.find( s => s.data.step_order == 1)
                   setContent(addToFunnel())
                   mounted()
 
                 })
 
                 $('#select-step').select2({
+                  placeholder: __( 'Select a step...', 'groundhogg' ),
+                  data: funnel.steps.sort((a, b) => a.data.step_order - b.data.step_order).map(s => ({
+                    id: s.ID,
+                    text: `${s.data.step_title} (${Groundhogg.rawStepTypes[s.data.step_type].name})`,
+                    selected: s.ID == step.ID,
+                  }))
                   // templateSelection: template,
                   // templateResult: template
                 }).on('change', ({ target }) => {
@@ -675,239 +752,72 @@
   // QuickEdit
   $(() => {
 
-    if (!userHasCap('edit_contacts')) {
-      return
+    if (userHasCap('add_contacts')) {
+      $('#quick-add').on('click', (e) => {
+        e.preventDefault()
+
+        addContactModal({
+          onCreate: (c) => {
+            ajax({
+              action: 'groundhogg_contact_table_row',
+              contact: c.ID
+            }).then((r) => {
+              dialog({
+                message: __('Contact created!', 'groundhogg')
+              })
+              $('.wp-list-table.contacts tbody').prepend(r.data.row)
+            })
+          }
+        })
+      })
     }
 
-    ContactsStore.itemsFetched(ContactsTable.items)
+    if (userHasCap('edit_contacts')) {
+      ContactsStore.itemsFetched(ContactsTable.items)
 
-    $(document).on('click', '.editinline', (e) => {
+      $(document).on('click', '.editinline', (e) => {
 
-      e.preventDefault()
+        e.preventDefault()
 
-      const ID = parseInt(e.currentTarget.dataset.id)
+        const ID = parseInt(e.currentTarget.dataset.id)
 
-      const contact = ContactsStore.get(ID)
+        const contact = ContactsStore.get(ID)
 
-      if (contact && contact.tags) {
-        TagsStore.itemsFetched(contact.tags)
-      }
+        quickEditContactModal({
 
-      const quickEdit = (editingName = false) => {
+          contact,
+          onEdit: (contact) => {
 
-        // language=HTML
-        return `
-			<div class="contact-quick-edit" tabindex="0">
-				<div class="contact-quick-edit-header">
-					<div class="avatar-and-name">
-						<img height="50" width="50" src="${contact.data.gravatar}" alt="avatar"/>
-						<h2 class="contact-name">
-							${specialChars(`${contact.data.first_name} ${contact.data.last_name}`)}</h2>
-					</div>
-					<div class="actions">
-						<a class="gh-button secondary"
-						   href="${contact.admin}">${__('Edit Full Profile', 'groundhogg')}</a>
-					</div>
-				</div>
-				<div class="contact-quick-edit-fields">
-					<div class="row">
-						<div class="col">
-							<label for="quick-edit-first-name">${__('First Name', 'groundhogg')}</label>
-							${input({
-								id: 'quick-edit-first-name',
-								name: 'first_name',
-								value: contact.data.first_name,
-							})}
-						</div>
-						<div class="col">
-							<label for="quick-edit-last-name">${__('Last Name', 'groundhogg')}</label>
-							${input({
-								id: 'quick-edit-last-name',
-								name: 'last_name',
-								value: contact.data.last_name,
-							})}
-						</div>
-					</div>
-					<div class="row">
-						<div class="col">
-							<label for="quick-edit-email">${__('Email Address', 'groundhogg')}</label>
-							${input({
-								type: 'email',
-								name: 'email',
-								id: 'quick-edit-email',
-								value: contact.data.email
-							})}
-						</div>
-						<div class="col">
-							<div class="row phone">
-								<div class="col">
-									<label for="quick-edit-primary-phone">${__('Primary Phone', 'groundhogg')}</label>
-									${input({
-										type: 'tel',
-										id: 'quick-edit-primary-phone',
-										name: 'primary_phone',
-										value: contact.meta.primary_phone
-									})}
-								</div>
-								<div class="primary-phone-ext">
-									<label
-										for="quick-edit-primary-phone-extension">${_x('Ext.', 'phone number extension', 'groundhogg')}</label>
-									${input({
-										type: 'number',
-										id: 'quick-edit-primary-phone-extension',
-										name: 'primary_phone_extension',
-										value: contact.meta.primary_phone_extension
-									})}
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col">
-							<label for="quick-edit-email">${__('Optin Status', 'groundhogg')}</label>
-							${select({
-								id: 'quick-edit-optin-status',
-								name: 'optin_status'
-							}, Groundhogg.filters.optin_status, contact.data.optin_status)}
-						</div>
-						<div class="col">
-							<label for="quick-edit-mobile-phone">${__('Mobile Phone', 'groundhogg')}</label>
-							${input({
-								type: 'tel',
-								id: 'quick-edit-mobile-phone',
-								name: 'mobile_phone',
-								value: contact.meta.mobile_phone
-							})}
-						</div>
-					</div>
-					<div class="row">
-						<div class="col">
-							<label for="quick-edit-email">${__('Owner', 'noun the contact owner', 'groundhogg')}</label>
-							${select({
-								id: 'quick-edit-owner',
-								name: 'owner_id'
-							}, Groundhogg.filters.owners.map(u => ({
-								text: u.data.user_email,
-								value: u.ID
-							})), contact.data.owner_id)}
-						</div>
-						<div class="col">
-							<label for="quick-edit-tags">${__('Tags', 'groundhogg')}</label>
-							${select({
-								id: 'quick-edit-tags',
-								multiple: true
-							}, TagsStore.getItems().map(t => ({
-								value: t.ID,
-								text: t.data.tag_name
-							})), contact.tags.map(t => t.ID))}
-						</div>
-					</div>
-				</div>
-			</div>`
-      }
-
-      const { close, setContent } = modal({
-        content: quickEdit(),
-      })
-
-      const quickEditMounted = () => {
-
-        let payload
-
-        const clearPayload = () => {
-          payload = {
-            data: {},
-            meta: {},
-            add_tags: [],
-            remove_tags: []
-          }
-        }
-
-        clearPayload()
-
-        const mergePayload = (data) => {
-          for (const dataKey in data) {
-            if (data.hasOwnProperty(dataKey)) {
-
-              if (Array.isArray(data[dataKey])) {
-                payload[dataKey] = [
-                  ...payload[dataKey],
-                  ...data[dataKey]
-                ]
-              } else {
-                payload[dataKey] = {
-                  ...payload[dataKey],
-                  ...data[dataKey]
-                }
-              }
-            }
-          }
-        }
-
-        let timeout
-
-        const updateContact = (data) => {
-
-          mergePayload(data)
-
-          if (timeout) {
-            clearTimeout(timeout)
-          }
-
-          timeout = setTimeout(() => {
-            ContactsStore.patch(contact.ID, payload).then(() => {
-              ajax({
-                action: 'groundhogg_contact_table_row',
-                contact: contact.ID
-              }).then((r) => {
-                dialog({
-                  message: __('Contact updated!', 'groundhogg')
-                })
-                $(`#contact-${contact.ID}`).replaceWith(r.data.row)
+            ajax({
+              action: 'groundhogg_contact_table_row',
+              contact: contact.ID
+            }).then((r) => {
+              dialog({
+                message: __('Contact updated!', 'groundhogg')
               })
+              $(`#contact-${contact.ID}`).replaceWith(r.data.row)
             })
-            clearPayload()
-          }, 2000)
-        }
 
-        const $quickEdit = $('.contact-quick-edit')
-
-        $quickEdit.focus()
-
-        tagPicker('#quick-edit-tags', true, (items) => {TagsStore.itemsFetched(items)}).on('select2:unselect', (e) => {
-          updateContact({
-            remove_tags: [
-              e.params.data.id
-            ]
-          })
-        }).on('select2:select', (e) => {
-          updateContact({
-            add_tags: [
-              e.params.data.id
-            ]
-          })
+          }
         })
 
-        $('#quick-edit-first-name,#quick-edit-last-name,#quick-edit-email,#quick-edit-optin-status,#quick-edit-owner').on('change', (e) => {
-          updateContact({
-            data: {
-              [e.target.name]: e.target.value
-            }
-          })
-        })
-
-        $('#quick-edit-primary-phone,#quick-edit-primary-phone-extension,#quick-edit-mobile-phone').on('change', (e) => {
-          updateContact({
-            meta: {
-              [e.target.name]: e.target.value
-            }
-          })
-        })
-      }
-
-      quickEditMounted()
-    })
+      })
+    }
 
   })
+
+  const marketableTooltips = () => {
+    tooltip('.pill.marketable', {
+      content: __('Will receive marketing', 'groundhogg'),
+      position: 'right'
+    })
+
+    tooltip('.pill.unmarketable', {
+      content: __('Will <b>not</b> receive marketing', 'groundhogg'),
+      position: 'right'
+    })
+  }
+
+  $(marketableTooltips)
 
 })(jQuery)

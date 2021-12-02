@@ -72,7 +72,7 @@ class Submission_Handler extends Supports_Errors {
 			return;
 		}
 
-		if ( wp_doing_ajax() && wp_verify_nonce( get_request_var( '_ghnonce' ), 'groundhogg_frontend' ) ) {
+		if ( wp_doing_ajax() ) {
 			add_action( 'wp_ajax_groundhogg_ajax_form_submit', [ $this, 'setup' ] );
 			add_action( 'wp_ajax_groundhogg_ajax_form_submit', [ $this, 'ajax_handler' ] );
 			add_action( 'wp_ajax_nopriv_groundhogg_ajax_form_submit', [ $this, 'setup' ] );
@@ -91,11 +91,17 @@ class Submission_Handler extends Supports_Errors {
 
 	public function ajax_handler() {
 		if ( $this->has_errors() ) {
+
+			if ( $this->is_admin_submission() ){
+				wp_send_json_error( $this->get_last_error() );
+			}
+
 			wp_send_json_error( [ 'errors' => $this->get_errors(), 'html' => form_errors() ] );
 		}
 	}
 
 	public function setup() {
+
 		// Set the form ID
 		$this->form_id = absint( get_request_var( 'gh_submit_form' ) );
 
@@ -393,13 +399,23 @@ class Submission_Handler extends Supports_Errors {
 
 			if ( $this->is_ajax_request() ) {
 
+				if ( $this->is_admin_submission() ){
+					do_action( 'groundhogg/form/submission_handler/admin_submission', $submission, $contact, $this );
+
+					wp_send_json_success( [
+						'contact' => $contact
+					] );
+				}
+
 				$success_message = do_replacements( $this->step->get_meta( 'success_message' ), $contact->get_id() );
 
 				if ( ! $success_message ) {
 					$success_message = __( 'Your submission has been received!', 'groundhogg' );
 				}
 
-				wp_send_json_success( [ 'message' => $success_message, ] );
+				wp_send_json_success( [
+					'message' => $success_message
+				] );
 
 			} else if ( $this->is_admin_submission() ) {
 
@@ -429,7 +445,7 @@ class Submission_Handler extends Supports_Errors {
 	}
 
 	public function is_admin_submission() {
-		return is_admin() && current_user_can( 'edit_contacts' );
+		return is_admin() && current_user_can( 'add_contacts' );
 	}
 
 	public function get_posted_data( $key = false, $default = false ) {

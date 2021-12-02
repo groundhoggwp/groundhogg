@@ -156,7 +156,7 @@ class Object_Relationships extends DB {
 		PRIMARY KEY (primary_object_id,primary_object_type,secondary_object_id,secondary_object_type),
 		KEY primary_object (primary_object_id,primary_object_type),
 		KEY secondary_object (secondary_object_id,secondary_object_type)
-		) {$this->get_charset_collate()};";
+		) {$this->get_charset_collate()} ENGINE=InnoDB;";
 
 		dbDelta( $sql );
 

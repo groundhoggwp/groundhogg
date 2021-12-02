@@ -106,14 +106,14 @@ class Contact_Query {
 	 * @since  2.8
 	 * @var    array
 	 */
-	protected $sql_clauses = array(
+	protected $sql_clauses = [
 		'select'  => '',
 		'from'    => '',
-		'where'   => array(),
+		'where'   => [],
 		'groupby' => '',
 		'orderby' => '',
 		'limits'  => '',
-	);
+	];
 
 	/**
 	 * Metadata query clauses.
@@ -252,6 +252,7 @@ class Contact_Query {
 		$this->cache_group = $this->gh_db_contacts->get_cache_group();
 
 		$defaults = array(
+			'select'                 => '*',
 			'number'                 => - 1,
 			'limit'                  => false,
 			'offset'                 => 0,
@@ -270,6 +271,7 @@ class Contact_Query {
 			'tag_query'              => [],
 			'optin_status'           => 'any',
 			'optin_status_exclude'   => false,
+			'marketable'             => 'any',
 			'owner'                  => 0,
 			'report'                 => false,
 			'activity'               => false,
@@ -289,6 +291,7 @@ class Contact_Query {
 			'count'                  => false,
 			'no_found_rows'          => true,
 			'filters'                => [],
+			'exclude_filters'        => [],
 			'is_marketable'          => null,
 		);
 
@@ -332,6 +335,21 @@ class Contact_Query {
 		}
 
 		return $items;
+	}
+
+	/**
+	 * Retreive the SQL statement instead of the actual items
+	 *
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public function get_sql( $query ) {
+		$this->query_vars = wp_parse_args( $query );
+		$this->parse_query();
+		$this->generate_request();
+
+		return $this->request;
 	}
 
 	/**
@@ -578,17 +596,7 @@ class Contact_Query {
 		return $this->items;
 	}
 
-	/**
-	 * Runs a database query to retrieve contacts.
-	 *
-	 * @access protected
-	 * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
-	 * @since  2.8
-	 *
-	 * @global \wpdb $wpdb WordPress database abstraction object.
-	 *
-	 */
-	protected function query_items() {
+	protected function generate_request() {
 		global $wpdb;
 
 		$fields = $this->construct_request_fields();
@@ -638,10 +646,25 @@ class Contact_Query {
 		$this->sql_clauses = apply_filters( 'groundhogg/contact_query/query_items/sql_clauses', $this->sql_clauses, $this->query_vars, $this );
 
 		$this->request = "{$this->sql_clauses['select']} {$this->sql_clauses['from']} {$this->sql_clauses['where']} {$this->sql_clauses['groupby']} {$this->sql_clauses['orderby']} {$this->sql_clauses['limits']}";
+	}
 
-		$results = $wpdb->get_results( $this->request );
+	/**
+	 * Runs a database query to retrieve contacts.
+	 *
+	 * @access protected
+	 * @return array|int List of contacts, or number of contacts when 'count' is passed as a query var.
+	 * @since  2.8
+	 *
+	 * @global \wpdb $wpdb WordPress database abstraction object.
+	 *
+	 */
+	protected function query_items() {
 
-		return $results;
+		global $wpdb;
+
+		$this->generate_request();
+
+		return $wpdb->get_results( $this->request );
 	}
 
 	/**
@@ -684,7 +707,7 @@ class Contact_Query {
 			return "COUNT($this->table_name.$this->primary_key) AS count";
 		}
 
-		return "$this->table_name.*";
+		return "$this->table_name.{$this->query_vars['select']}";
 	}
 
 	/**
@@ -745,6 +768,12 @@ class Contact_Query {
 			$where['users_include'] = "$this->table_name.user_id IN ( $users_include_ids )";
 		}
 
+		if ( $this->query_vars['marketable'] !== 'any' ) {
+			$where['marketable'] = self::filter_marketability( [
+				'marketable' => $this->query_vars['marketable'] ? 'yes' : 'no'
+			], $this );
+		}
+
 		if ( ! empty( $this->query_vars['users_exclude'] ) ) {
 			$users_exclude_ids      = implode( ',', wp_parse_id_list( $this->query_vars['users_exclude'] ) );
 			$where['users_exclude'] = "$this->table_name.user_id NOT IN ( $users_exclude_ids )";
@@ -777,8 +806,8 @@ class Contact_Query {
 		}
 
 		if ( $this->query_vars['owner'] ) {
-			$this->query_vars['owner'] = implode( ',', wp_parse_id_list( $this->query_vars['owner'] ) );
-			$where['owner']            = "$this->table_name.owner_id IN ( {$this->query_vars['owner']} )";
+			$owner_clause   = implode( ',', wp_parse_id_list( $this->query_vars['owner'] ) );
+			$where['owner'] = "$this->table_name.owner_id IN ( {$owner_clause} )";
 		}
 
 		if ( $this->query_vars['report'] && is_array( $this->query_vars['report'] ) ) {
@@ -910,7 +939,7 @@ class Contact_Query {
 		if ( strlen( $this->query_vars['email'] ) || strlen( $this->query_vars['email_compare'] ) ) {
 			$where['email'] = self::generic_text_compare( "{$this->table_name}.email",
 				$this->query_vars['email_compare'],
-				$this->query_vars['email'] );
+				str_replace( ' ', '+', $this->query_vars['email'] ) );
 		}
 
 
@@ -930,6 +959,26 @@ class Contact_Query {
 			$filters = $this->parse_filters( $this->query_vars['filters'] );
 			if ( ! empty( $filters ) ) {
 				$where['filters'] = $filters;
+			}
+		}
+
+		if ( ! empty( $this->query_vars['exclude_filters'] ) ) {
+
+			$exclude_filters = $this->query_vars['exclude_filters'];
+
+			if ( ! is_array( $exclude_filters ) ) {
+				$exclude_filters = base64_json_decode( $this->query_vars['exclude_filters'] );
+			}
+
+			if ( ! empty( $exclude_filters ) ) {
+				$query = new Contact_Query();
+				$sql   = $query->get_sql( [
+					'filters' => $exclude_filters,
+					'select'  => 'ID',
+					'orderby' => 'none'
+				] );
+
+				$where['exclude_filters'] = "{$this->table_name}.ID NOT IN ( $sql )";
 			}
 		}
 
@@ -1103,6 +1152,8 @@ class Contact_Query {
 	protected function get_search_sql( $string, $columns ) {
 		global $wpdb;
 
+		$string = maybe_change_space_to_plus_in_email( $string );
+
 		if ( false !== strpos( $string, '**' ) ) {
 			$like = str_replace( '**', '%', $string );
 		} else if ( false !== strpos( $string, '*' ) ) {
@@ -1255,7 +1306,7 @@ class Contact_Query {
 	 *
 	 * @return string
 	 */
-	protected function parse_filters( $filters ): string {
+	protected function parse_filters( $filters, $exclude = false ): string {
 
 		if ( ! is_array( $filters ) ) {
 			$filters = base64_json_decode( $filters );
@@ -1375,6 +1426,11 @@ class Contact_Query {
 		);
 
 		self::register_filter(
+			'birthday',
+			[ self::class, 'filter_birthday' ]
+		);
+
+		self::register_filter(
 			'tags',
 			[ self::class, 'filter_tags' ]
 		);
@@ -1382,6 +1438,11 @@ class Contact_Query {
 		self::register_filter(
 			'optin_status',
 			[ self::class, 'filter_optin_status' ]
+		);
+
+		self::register_filter(
+			'is_marketable',
+			[ self::class, 'filter_marketability' ]
 		);
 
 		self::register_filter(
@@ -1799,9 +1860,9 @@ class Contact_Query {
 		$before_and_after = self::get_before_and_after_from_filter_date_range( $filter_vars, true );
 
 		$event_query = array_filter( array_merge( [
-			'email_id' => $filter_vars['email_id'],
-			'status'   => Event::COMPLETE,
-			'count'    => absint( get_array_var( $filter_vars, 'count', 1 ) ),
+			'email_id'      => $filter_vars['email_id'],
+			'status'        => Event::COMPLETE,
+			'count'         => absint( get_array_var( $filter_vars, 'count', 1 ) ),
 			'count_compare' => get_array_var( $filter_vars, 'count_compare', 'greater_than_or_equal_to' ),
 		], $before_and_after ) );
 
@@ -1851,7 +1912,7 @@ class Contact_Query {
 		$before_and_after = self::get_before_and_after_from_filter_date_range( $filter_vars, true );
 
 		$event_query = array_filter( array_merge( [
-			'activity_type' => Activity::EMAIL_CLICKED,
+			'activity_type' => Activity::EMAIL_OPENED,
 			'email_id'      => $filter_vars['email_id'],
 			'referer'       => $filter_vars['link'],
 			'count'         => absint( get_array_var( $filter_vars, 'count', 1 ) ),
@@ -1929,11 +1990,11 @@ class Contact_Query {
 		] );
 
 		$event_query = array_filter( [
-			'event_type' => Event::BROADCAST,
-			'funnel_id'  => Broadcast::FUNNEL_ID,
-			'step_id'    => $filter_vars['broadcast_id'],
-			'status'     => $filter_vars['status'],
-			'count'      => absint( get_array_var( $filter_vars, 'count', 1 ) ),
+			'event_type'    => Event::BROADCAST,
+			'funnel_id'     => Broadcast::FUNNEL_ID,
+			'step_id'       => $filter_vars['broadcast_id'],
+			'status'        => $filter_vars['status'],
+			'count'         => absint( get_array_var( $filter_vars, 'count', 1 ) ),
 			'count_compare' => get_array_var( $filter_vars, 'count_compare', 'greater_than_or_equal_to' ),
 		] );
 
@@ -1994,6 +2055,77 @@ class Contact_Query {
 				return sprintf( "{$query->table_name}.owner_id NOT IN ( %s )", implode( ',', $owners ) );
 		}
 	}
+
+	/**
+	 * Whether a contact is marketable or not
+	 *
+	 * @param $filter_vars
+	 * @param $query
+	 *
+	 * @return string
+	 */
+	public static function filter_marketability( $filter_vars, $query ) {
+
+		switch ( $filter_vars['marketable'] ) {
+			default:
+			case 'yes':
+
+				if ( Plugin::instance()->preferences->is_confirmation_strict() ) {
+					$clause = sprintf( "( $query->table_name.optin_status = %s OR ( $query->table_name.optin_status = %s AND $query->table_name.date_created >= '%s') )", Preferences::CONFIRMED, Preferences::UNCONFIRMED, Ymd_His( time() - ( Plugin::instance()->preferences->get_grace_period() * DAY_IN_SECONDS ) ) );
+				} else {
+					$clause = sprintf( "$query->table_name.optin_status IN (%s)", implode( ',', [
+						Preferences::CONFIRMED,
+						Preferences::UNCONFIRMED,
+					] ) );
+				}
+
+				if ( Plugin::instance()->preferences->is_gdpr_strict() ) {
+					$clause .= " AND " . self::filter_meta( [
+							'meta'    => 'gdpr_consent',
+							'compare' => '=',
+							'value'   => 'yes'
+						], $query );
+
+					$clause .= " AND " . self::filter_meta( [
+							'meta'    => 'marketing_consent',
+							'compare' => '=',
+							'value'   => 'yes'
+						], $query );
+				}
+
+				return $clause;
+
+			case 'no':
+
+				$clause = sprintf( "$query->table_name.optin_status IN (%s)", implode( ',', [
+					Preferences::COMPLAINED,
+					Preferences::UNSUBSCRIBED,
+					Preferences::SPAM,
+					Preferences::HARD_BOUNCE,
+				] ) );
+
+				if ( Plugin::instance()->preferences->is_confirmation_strict() ) {
+					$clause .= sprintf( " OR $query->table_name.optin_status = %s AND $query->table_name.date_created < '%s') )", Preferences::UNCONFIRMED, Ymd_His( time() - ( Plugin::instance()->preferences->get_grace_period() * DAY_IN_SECONDS ) ) );
+				}
+
+				if ( Plugin::instance()->preferences->is_gdpr_strict() ) {
+					$clause .= " OR " . str_replace( "{$query->table_name}.ID IN", "{$query->table_name}.ID NOT IN", self::filter_meta( [
+							'meta'    => 'gdpr_consent',
+							'compare' => '=',
+							'value'   => 'yes'
+						], $query ) );
+
+					$clause .= " OR " . str_replace( "{$query->table_name}.ID IN", "{$query->table_name}.ID NOT IN", self::filter_meta( [
+							'meta'    => 'marketing_consent',
+							'compare' => '=',
+							'value'   => 'yes'
+						], $query ) );
+				}
+
+				return $clause;
+		}
+	}
+
 
 	/**
 	 * Filter by optin status
@@ -2535,6 +2667,23 @@ class Contact_Query {
 	 *
 	 * @return string
 	 */
+	public static function filter_birthday( $filter_vars, $query ) {
+
+		$clause = self::standard_activity_filter_clause( $filter_vars );
+
+		$meta_table_name = get_db( 'contactmeta' )->table_name;
+
+		$year = date('Y');
+
+		return "{$query->table_name}.ID IN ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$meta_table_name}.meta_key = 'birthday' AND CONCAT( '$year', SUBSTRING( {$meta_table_name}.meta_value, 5 ) ) {$clause} ) ";
+	}
+
+	/**
+	 * @param $filter_vars
+	 * @param $query Contact_Query
+	 *
+	 * @return string
+	 */
 	public static function filter_meta( $filter_vars, $query ) {
 
 		$filter_vars = wp_parse_args( $filter_vars, [
@@ -2761,9 +2910,9 @@ class Contact_Query {
 			case 'not_equals':
 				return sprintf( "%s != '%s'", $column, $value );
 			case 'contains':
-				return sprintf( "%s RLIKE '%s'", $column, $value );
+				return sprintf( "%s LIKE '%s'", $column, '%' . $wpdb->esc_like( $value ) . '%' );
 			case 'not_contains':
-				return sprintf( "%s NOT RLIKE '%s'", $column, $value );
+				return sprintf( "%s NOT LIKE '%s'", $column, '%' . $wpdb->esc_like( $value ) . '%' );
 			case 'begins_with':
 			case 'starts_with':
 				return sprintf( "%s LIKE '%s'", $column, $wpdb->esc_like( $value ) . '%' );
@@ -2821,6 +2970,11 @@ class Contact_Query {
 	 * @return string
 	 */
 	public static function contact_generic_text_filter_compare( array $filter_vars, $query ): string {
+
+		if ( $filter_vars['type'] === 'email' ) {
+			$filter_vars['value'] = str_replace( ' ', '+', $filter_vars['value'] );
+		}
+
 		return self::generic_text_compare( $query->table_name . '.' . $filter_vars['type'], $filter_vars['compare'], $filter_vars['value'] );
 	}
 

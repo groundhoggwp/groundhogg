@@ -173,7 +173,7 @@ class Scripts {
 			'jquery',
 			'select2',
 			'jquery-ui-autocomplete',
-			'groundhogg-admin-functions'
+			'groundhogg-admin-functions',
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-data', GROUNDHOGG_ASSETS_URL . 'js/admin/data' . $dot_min . '.js', [
@@ -200,21 +200,20 @@ class Scripts {
 
 		wp_register_script( 'groundhogg-admin-search-filters', GROUNDHOGG_ASSETS_URL . 'js/admin/search-filters' . $dot_min . '.js', [
 			'groundhogg-admin-element',
-			'groundhogg-admin-user',
 			'groundhogg-admin-data',
 			'jquery-ui-sortable'
 		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-admin-contact-search', GROUNDHOGG_ASSETS_URL . 'js/admin/contact-search' . $dot_min . '.js', [
 			'groundhogg-admin-search-filters',
-			'groundhogg-admin-send-broadcast'
+			'groundhogg-admin-send-broadcast',
+			'groundhogg-admin-components'
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-toolbar', GROUNDHOGG_ASSETS_URL . 'js/admin/admin-bar' . $dot_min . '.js', [
 			'groundhogg-admin-element',
 			'groundhogg-admin-components',
 			'groundhogg-admin-data',
-			'groundhogg-admin-user',
 			'groundhogg-admin-send-broadcast'
 		], GROUNDHOGG_VERSION, true );
 
@@ -225,12 +224,10 @@ class Scripts {
 		wp_register_script( 'groundhogg-admin-notes', GROUNDHOGG_ASSETS_URL . 'js/admin/notes' . $dot_min . '.js', [
 			'groundhogg-admin-element',
 			'groundhogg-admin-data',
-			'groundhogg-admin-user',
 		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-admin-send-broadcast', GROUNDHOGG_ASSETS_URL . '/js/admin/send-broadcast' . $dot_min . '.js', [
 			'groundhogg-admin',
-			'groundhogg-admin-user',
 			'groundhogg-admin-data',
 			'groundhogg-admin-element',
 			'groundhogg-admin-functions',
@@ -245,7 +242,6 @@ class Scripts {
 
 		wp_localize_script( 'groundhogg-admin-emojis-picker', 'Emojis', json_decode( file_get_contents( GROUNDHOGG_ASSETS_PATH . 'lib/emojis.json' ), true ) );
 
-		wp_register_script( 'groundhogg-admin-user', GROUNDHOGG_ASSETS_URL . '/js/admin/user' . $dot_min . '.js' );
 		wp_register_script( 'groundhogg-admin-formatting', GROUNDHOGG_ASSETS_URL . '/js/admin/formatting' . $dot_min . '.js' );
 
 		wp_register_script( 'groundhogg-admin-color', GROUNDHOGG_ASSETS_URL . 'js/admin/color-picker' . $dot_min . '.js', [

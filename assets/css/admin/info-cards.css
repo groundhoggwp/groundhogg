@@ -225,12 +225,10 @@ div.info-card.postbox {
   color: #aaaaaa;
 }
 
-.basic-details .red,
 .ic-section-content .red {
   color: #a00;
 }
 
-.basic-details .green,
 .ic-section-content .green {
   color: #218838;
 }

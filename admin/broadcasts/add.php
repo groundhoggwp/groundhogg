@@ -2,6 +2,7 @@
 namespace Groundhogg\Admin\Broadcasts;
 
 use Groundhogg\Contact_Query;
+use Groundhogg\Email;
 use Groundhogg\Saved_Searches;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
@@ -33,6 +34,20 @@ wp_enqueue_script( 'jquery-ui-datepicker' );
 wp_enqueue_style( 'jquery-ui' );
 
 $type = isset( $_REQUEST['type'] ) && $_REQUEST['type'] === 'sms' ? 'sms' : 'email';
+
+if ( $type === 'email' ): ?>
+<script>
+	const GroundhoggNewBroadcast = <?php echo wp_json_encode( [
+		'email' => isset_not_empty( $_GET, 'email' ) ? new Email( get_url_var( 'email' )  ) : false,
+	] ); ?>
+</script>
+<div class="gh-panel" style="width: 500px; margin: 20px 0;">
+	<div id="gh-broadcast-form-inline" class="inside"></div>
+</div>
+<?php
+
+else:
+
 ?>
 <form name="edittag" id="edittag" method="post" action="">
 	<?php wp_nonce_field(); ?>
@@ -214,7 +229,7 @@ $type = isset( $_REQUEST['type'] ) && $_REQUEST['type'] === 'sms' ? 'sms' : 'ema
 						'required'   => false,
 					) ); ?>
                 </div>
-                <p class="description"><?php _e( 'If checked, this email will be sent at the specified time in their local timezone. If the time has already passed the email will be scheduled for the following day.', 'groundhogg' ); ?></p>
+                <p class="description"><?php _e( 'If checked, this broadcast will be sent at the specified time in their local timezone. If the time has already passed the email will be scheduled for the following day.', 'groundhogg' ); ?></p>
             </td>
         </tr>
         </tbody>
@@ -223,3 +238,4 @@ $type = isset( $_REQUEST['type'] ) && $_REQUEST['type'] === 'sms' ? 'sms' : 'ema
 		<?php submit_button( _x( 'Schedule Broadcast', 'action', 'groundhogg' ), 'primary', 'update', false ); ?>
     </div>
 </form>
+<?php endif;

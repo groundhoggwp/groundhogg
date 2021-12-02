@@ -49,8 +49,8 @@
 
     //language=HTML
     return `
-		<div class="filter filter-view" data-key="${filterIndex}" data-group="${filterGroupIndex}" tabindex="0">
-			${Filters.types[filter.type].view(filter, filterGroupIndex, filterIndex)}
+		<div class="filter filter-view space-between" data-key="${filterIndex}" data-group="${filterGroupIndex}" tabindex="0">
+			<span class="text">${Filters.types[filter.type].view(filter, filterGroupIndex, filterIndex)}</span>
 			<button class="delete-filter"><span class="dashicons dashicons-no-alt"></span></button>
 		</div>`
   }
@@ -235,8 +235,8 @@
       this.mount()
     },
 
-    toString() {
-      return this.filters.map( group => group.map( filter => {
+    toString () {
+      return this.filters.map(group => group.map(filter => {
 
         if (!Filters.has(filter.type)) {
           return ''
@@ -244,7 +244,7 @@
 
         return Filters.types[filter.type].view(filter)
 
-      } ).join( ' and ' ) ).join( ' or ' )
+      }).join(' and ')).join(' or ')
     },
 
     mount () {
@@ -539,28 +539,18 @@
       })
 
       $(`${el} .group`).sortable({
-        connectWith: '.group',
+        connectWith: `${el} .group`,
         placeholder: 'filter-placeholder',
-        cancel: '.add-filter-wrap, .filter-edit-wrap',
+        cancel: '.add-filter, .add-filter-wrap, .filter-edit-wrap',
         start: (e, ui) => {
           // ui.placeholder.height(ui.item.height())
           ui.placeholder.width(ui.item.width())
         },
         receive: (e, ui) => {
 
-          console.log({
-            e, ui
-          })
-
           const filterId = parseInt(ui.item.data('key'))
           const fromGroupId = parseInt(ui.item.data('group'))
           const toGroupId = parseInt($(e.target).data('key'))
-
-          console.log({
-            filterId,
-            fromGroupId,
-            toGroupId
-          })
 
           const tempFilter = getFilterSettings(fromGroupId, filterId)
 
@@ -839,7 +829,23 @@
 
   // registerFilter('primary_phone', 'contact', {}, 'Primary Phone')
   // registerFilter('mobile_phone', 'contact', {}, 'Mobile Phone')
-  // registerFilter('birthday', 'contact', {}, 'Birthday')
+
+  registerFilter('birthday', 'contact', __('Birthday', 'groundhogg'), {
+    view (filter) {
+      //language=HTMl
+      return standardActivityDateTitle('<b>Birthday is</b>', filter)
+    },
+    edit (filter) {
+      // language=html
+      return standardActivityDateOptions(filter)
+    },
+    onMount (filter, updateFilter) {
+      standardActivityDateFilterOnMount(filter, updateFilter)
+    },
+    defaults: {
+      ...standardActivityDateDefaults
+    }
+  })
 
   registerFilter('date_created', 'contact', __('Date Created', 'groundhogg'), {
     view (filter) {
@@ -903,28 +909,24 @@
     }
   })
 
-
-  registerFilter('is_marketable', 'contact', __('Marketability', 'groundhogg'), {
-    view ({ value }) {
-      return value === 'yes' ? __( 'Is marketable', 'groundhogg' ) : __( 'Is not marketable' )
+  registerFilter('is_marketable', 'contact', __('Marketable', 'groundhogg'), {
+    view ({ marketable }) {
+      return marketable === 'yes' ? __('Is marketable', 'groundhogg') : __('Is not marketable', 'groundhogg')
     },
-    edit ({ value }) {
+    edit ({ marketable }) {
 
       // language=html
       return `
 		  ${select({
-          id: 'filter-value',
-          name: 'value',
-        },
-        [
-	        { value: 'yes', text: 'Is marketable' },
-	        { value: 'no', text: 'Is not marketable' },
-        ],
-        value
-      )} `
+			  id: 'filter-marketable',
+			  name: 'marketable',
+		  }, {
+			  yes: _x('Yes', 'comparison, groundhogg'),
+			  no: _x('No', 'comparison', 'groundhogg')
+		  }, marketable)}`
     },
     onMount (filter, updateFilter) {
-      $('#filter-value').on('change', function (e) {
+      $('#filter-marketable').on('change', function (e) {
         const $el = $(this)
         // console.log($el.val())
         updateFilter({
@@ -933,7 +935,7 @@
       })
     },
     defaults: {
-      value: 'yes'
+      marketable: 'yes',
     }
   })
 
@@ -1066,6 +1068,7 @@
       tags: []
     },
     preload: ({ tags }) => {
+
       if (!TagsStore.hasItems(tags)) {
         return TagsStore.fetchItems({
           tag_id: tags
@@ -1353,7 +1356,7 @@
 			  id: 'filter-email',
 			  name: 'email_id',
 		  }, pickerOptions, email_id)}
-		  
+
 		  ${filterCount(rest)}
 
 		  ${standardActivityDateOptions(rest)}`
@@ -1434,7 +1437,7 @@
       email_id: 0,
     },
     preload: ({ email_id }) => {
-      if (email_id && !EmailsStore.hasItem(email_id)) {
+      if (email_id) {
         return EmailsStore.fetchItem(email_id)
       }
     }
@@ -1505,7 +1508,7 @@
       email_id: 0,
     },
     preload: ({ email_id }) => {
-      if (email_id && !EmailsStore.hasItem(email_id)) {
+      if (email_id) {
         return EmailsStore.fetchItem(email_id)
       }
     }
@@ -1749,7 +1752,7 @@
       ...standardActivityDateDefaults,
     },
     preload: ({ funnel_id }) => {
-      if (funnel_id && !FunnelsStore.hasItem(funnel_id)) {
+      if (funnel_id) {
         return FunnelsStore.fetchItem(funnel_id)
       }
     }
@@ -1767,15 +1770,15 @@
       const broadcast = BroadcastsStore.get(broadcast_id)
 
       return status === 'complete' ?
-        sprintf(broadcast ? __('Received %1$s on %2$s', 'groundhogg') : __('Will receive a broadcast', 'groundhogg'), `<b>${broadcast.data.title}</b>`, `<b>${formatDateTime(broadcast.data.send_time * 1000)}</b>`)
-        : sprintf(broadcast ? __('Will receive %1$s on %2$s', 'groundhogg') : __('Received a broadcast', 'groundhogg'), `<b>${broadcast.data.title}</b>`, `<b>${formatDateTime(broadcast.data.send_time * 1000)}</b>`)
+        sprintf(broadcast ? __('Received %1$s on %2$s', 'groundhogg') : __('Will receive a broadcast', 'groundhogg'), `<b>${broadcast.object.data.title}</b>`, `<b>${formatDateTime(broadcast.data.send_time * 1000)}</b>`)
+        : sprintf(broadcast ? __('Will receive %1$s on %2$s', 'groundhogg') : __('Received a broadcast', 'groundhogg'), `<b>${broadcast.object.data.title}</b>`, `<b>${formatDateTime(broadcast.data.send_time * 1000)}</b>`)
     },
     edit ({ broadcast_id }) {
 
       return select({
           id: 'filter-broadcast',
           name: 'broadcast_id'
-        }, BroadcastsStore.getItems().map(b => ({ value: b.ID, text: `${b.data.title} (${b.date_sent_pretty})` })),
+        }, BroadcastsStore.getItems().map(b => ({ value: b.ID, text: `${b.object.data.title} (${b.date_sent_pretty})` })),
         broadcast_id)
     },
     onMount (filter, updateFilter) {
@@ -1794,7 +1797,7 @@
       status: 'complete',
     },
     preload: ({ broadcast_id }) => {
-      if (broadcast_id && ! BroadcastsStore.hasItem(broadcast_id)) {
+      if (broadcast_id) {
         return BroadcastsStore.fetchItem(broadcast_id)
       }
     }
@@ -1809,7 +1812,7 @@
 
       const broadcast = BroadcastsStore.get(broadcast_id)
 
-      return sprintf(broadcast ? __('Opened %1$s after %2$s', 'groundhogg') : __('Will receive a broadcast', 'groundhogg'), `<b>${broadcast.data.title}</b>`, `<b>${formatDateTime(broadcast.data.send_time * 1000)}</b>`)
+      return sprintf(broadcast ? __('Opened %1$s after %2$s', 'groundhogg') : __('Will receive a broadcast', 'groundhogg'), `<b>${broadcast.object.data.title}</b>`, `<b>${formatDateTime(broadcast.data.send_time * 1000)}</b>`)
 
     },
     edit ({ broadcast_id }) {
@@ -1817,7 +1820,7 @@
       return select({
           id: 'filter-broadcast',
           name: 'broadcast_id'
-        }, BroadcastsStore.getItems().map(b => ({ value: b.ID, text: `${b.data.title} (${b.date_sent_pretty})` })),
+        }, BroadcastsStore.getItems().map(b => ({ value: b.ID, text: `${b.object.data.title} (${b.date_sent_pretty})` })),
         broadcast_id)
     },
     onMount (filter, updateFilter) {
@@ -1835,7 +1838,7 @@
       broadcast_id: 0,
     },
     preload: ({ broadcast_id }) => {
-      if (broadcast_id && ! BroadcastsStore.hasItem(broadcast_id)) {
+      if (broadcast_id) {
         return BroadcastsStore.fetchItem(broadcast_id)
       }
     }
@@ -1855,10 +1858,10 @@
       const broadcast = BroadcastsStore.get(broadcast_id)
 
       if (broadcast_id && !link) {
-        return sprintf(__('Clicked any link in %1$s after %2$s', 'groundhogg'), bold(broadcast.data.title), bold(formatDateTime(broadcast.data.send_time * 1000)))
+        return sprintf(__('Clicked any link in %1$s after %2$s', 'groundhogg'), bold(broadcast.object.data.title), bold(formatDateTime(broadcast.data.send_time * 1000)))
       }
 
-      return sprintf(__('Clicked %1$s in %2$s after %3$s', 'groundhogg'), bold(link), bold(broadcast.data.title), bold(formatDateTime(broadcast.data.send_time * 1000)))
+      return sprintf(__('Clicked %1$s in %2$s after %3$s', 'groundhogg'), bold(link), bold(broadcast.object.data.title), bold(formatDateTime(broadcast.data.send_time * 1000)))
     },
     edit ({ broadcast_id, link }) {
 
@@ -1869,7 +1872,7 @@
 				  name: 'broadcast_id'
 			  }, BroadcastsStore.getItems().map(b => ({
 				  value: b.ID,
-				  text: `${b.data.title} (${b.date_sent_pretty})`
+				  text: `${b.object.data.title} (${b.date_sent_pretty})`
 			  })),
 			  broadcast_id)}
 
@@ -1903,7 +1906,7 @@
       broadcast_id: 0,
     },
     preload: ({ broadcast_id }) => {
-      if (broadcast_id && ! BroadcastsStore.hasItem(broadcast_id)) {
+      if (broadcast_id) {
         return BroadcastsStore.fetchItem(broadcast_id)
       }
     }

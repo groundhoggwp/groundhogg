@@ -15,6 +15,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+?>
+<script>
+  (($) => {
+
+    $('#quick-add').on('click', (e) => {
+      e.preventDefault()
+
+      Groundhogg.components.addContactModal({
+        onCreate: (c) => {
+          window.location.href = c.admin
+        }
+      })
+    })
+  })(jQuery)
+</script>
+<?php
+
 $id = absint( get_request_var( 'contact' ) );
 
 $contact = get_contactdata( $id );

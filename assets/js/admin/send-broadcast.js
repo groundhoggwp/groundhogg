@@ -33,6 +33,8 @@
       email_id: email ? email.ID : false,
       when: 'now',
       which: 'filters',
+      date: moment().format('YYYY-MM-DD'),
+      time: '09:00:00',
       query: {},
       total_contacts: 0,
       ...rest
@@ -53,18 +55,24 @@
       EmailsStore.itemsFetched([email])
     }
 
-    const step1 = () => {
+    const preview = () => {
 
-      const preview = () => {
+      // language=HTML
+      return `
+		  <div class="gh-row">
+			  <div class="gh-col">
+				  <iframe id="${elPrefix}-email-preview"></iframe>
+			  </div>
+		  </div>`
+    }
 
-        // language=HTML
-        return `
-			<div class="gh-row">
-				<div class="gh-col">
-					<iframe id="${elPrefix}-email-preview"></iframe>
-				</div>
-			</div>`
+    const showFrame = () => {
+      if (state.email_id) {
+        setFrameContent($(`#${elPrefix}-email-preview`)[0], EmailsStore.get(state.email_id).context.built)
       }
+    }
+
+    const step1 = () => {
 
       // language=HTML
       return `
@@ -165,7 +173,7 @@
 					<div id="${elPrefix}-total-contacts">
 						<p>
 							${sprintf(_n('Send to %s contact', 'Send to %s contacts', total_contacts, 'groundhogg'), bold(formatNumber(total_contacts)))}
-            </p>
+						</p>
 					</div>
 				</div>
 			</div>
@@ -190,7 +198,7 @@
 			  <div class="gh-row">
 				  <div class="gh-col">
 					  <label
-						  for="${elPrefix}-search-which">${__('Select contacts to receive this email...', 'groundhogg')}</label>
+						  for="${elPrefix}-search-which"><b>${__('Select contacts to receive this email...', 'groundhogg')}</b></label>
 					  <div class="gh-radio-group">
 						  <label>${input({
 							  type: 'radio',
@@ -246,9 +254,12 @@
 		  <div class="gh-rows-and-columns">
 			  <div class="gh-row">
 				  <div class="gh-col">
-					  ${sprintf(review, bold(email.data.title), bold(formatNumber(total_contacts)), state.when === 'later' ? bold(formatDateTime(date + ' ' + time)) : '')}
+              <span class="gh-text md">
+                  ${sprintf(review, bold(email.data.title), bold(formatNumber(total_contacts)), state.when === 'later' ? bold(formatDateTime(date + ' ' + time)) : '')}
+              </span>
 				  </div>
 			  </div>
+			  ${state.email_id ? preview() : ''}
 			  <div class="gh-row">
 				  <div class="gh-col">
 					  <button id="${elPrefix}-confirm" class="gh-button primary">
@@ -289,12 +300,6 @@
 
         switch (step) {
           case 0:
-
-            const showFrame = () => {
-              if (state.email_id) {
-                setFrameContent($(`#${elPrefix}-email-preview`)[0], EmailsStore.get(state.email_id).context.built)
-              }
-            }
 
             emailPicker(`#${elPrefix}-email`, false, (items) => {EmailsStore.itemsFetched(items)}, {
               status: 'ready'
@@ -345,7 +350,7 @@
 
               const query = {
                 ...state.query,
-                optin_status: [1, 2, 4, 6]
+                marketable: true
               }
 
               ContactsStore.count(query).then(total => {
@@ -392,6 +397,8 @@
             break
 
           case 3:
+
+            showFrame()
 
             $(`#${elPrefix}-confirm`).on('click', () => {
 
@@ -472,10 +479,12 @@
   Groundhogg.SendBroadcast = SendBroadcast
 
   $(() => {
+
     $('#gh-schedule-broadcast').on('click', (e) => {
       e.preventDefault()
 
       const { close } = modal({
+        dialogClasses: 'overflow-visible',
         content: `<div id="gh-broadcast-form" style="width: 400px"></div>`
       })
 
@@ -485,6 +494,17 @@
         }
       })
     })
+
+    if (typeof GroundhoggNewBroadcast !== 'undefined') {
+
+      SendBroadcast('#gh-broadcast-form-inline', {
+        email: GroundhoggNewBroadcast.email
+      }, {
+        onScheduled: () => {
+          window.location.href = adminPageURL('gh_broadcasts', { status: 'scheduled' })
+        }
+      })
+    }
   })
 
 })(jQuery)

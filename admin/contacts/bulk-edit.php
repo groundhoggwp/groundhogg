@@ -133,7 +133,9 @@ $count = get_db( 'contacts' )->count( $query );
 					$months[ $i ] = date_i18n( "F", $timestamp );
 				}
 
-				echo html()->e( 'span', [], [
+				echo html()->e( 'div', [
+					'class' => 'gh-input-group'
+				], [
 					// Year
 					html()->dropdown( [
 						'name'        => 'birthday[year]',
@@ -141,7 +143,6 @@ $count = get_db( 'contacts' )->count( $query );
 						'options'     => $years,
 						'multiple'    => false,
 						'option_none' => __( 'Year', 'groundhogg' ),
-						'class'       => 'gh-input'
 					] ),
 					html()->dropdown( [
 						'name'        => 'birthday[month]',
@@ -149,7 +150,6 @@ $count = get_db( 'contacts' )->count( $query );
 						'options'     => $months,
 						'multiple'    => false,
 						'option_none' => __( 'Month', 'groundhogg' ),
-						'class'       => 'gh-input'
 					] ),
 					html()->dropdown( [
 						'name'        => 'birthday[day]',
@@ -157,7 +157,6 @@ $count = get_db( 'contacts' )->count( $query );
 						'options'     => $days,
 						'multiple'    => false,
 						'option_none' => __( 'Day', 'groundhogg' ),
-						'class'       => 'gh-input'
 					] ),
 				] );
 

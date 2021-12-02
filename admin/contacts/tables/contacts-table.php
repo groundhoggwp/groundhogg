@@ -6,6 +6,7 @@ use function Groundhogg\_nf;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\array_map_with_keys;
+use function Groundhogg\base64_json_decode;
 use function Groundhogg\current_user_is;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_date_time_format;
@@ -68,7 +69,7 @@ class Contacts_Table extends WP_List_Table {
 			'singular' => 'contact',     // Singular name of the listed records.
 			'plural'   => 'contacts',    // Plural name of the listed records.
 			'ajax'     => true,       // Does this table support ajax?
-			'screen'   => wp_doing_ajax() ? 'admin_ajax' : null
+			'screen'   => 'groundhogg_page_gh_contacts'
 		) );
 
 		$columns  = $this->get_columns();
@@ -103,7 +104,11 @@ class Contacts_Table extends WP_List_Table {
 		$query = get_request_query();
 
 		if ( isset_not_empty( $query, 'filters' ) && is_string( $query['filters'] ) ) {
-			$query['filters'] = json_decode( base64_decode( $query['filters'] ), true );
+			$query['filters'] = base64_json_decode( $query['filters'] );
+		}
+
+		if ( isset_not_empty( $query, 'exclude_filters' ) && is_string( $query['exclude_filters'] ) ) {
+			$query['exclude_filters'] = base64_json_decode( $query['exclude_filters'] );
 		}
 
 		$full_name = split_name( $search );
@@ -360,9 +365,7 @@ class Contacts_Table extends WP_List_Table {
 
 		$editUrl = admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->get_id() );
 
-		$html = '';
-
-		$html .= "<strong>";
+		$html = "<strong>";
 
 		$html .= "<a class='row-title' href='$editUrl'>" . html()->e( 'img', [
 				'src'   => $contact->get_profile_picture(),
@@ -372,11 +375,6 @@ class Contacts_Table extends WP_List_Table {
 				],
 				'width' => 40
 			] ) . esc_html( $contact->get_email() ) . "</a>";
-
-		if ( ! get_request_var( 'optin_status' ) ) {
-
-			$html .= " &#x2014; " . "<span class='post-state'>(" . Preferences::get_preference_pretty_name( $contact->get_optin_status() ) . ")</span>";
-		}
 
 		$html .= "</strong>";
 
@@ -423,6 +421,8 @@ class Contacts_Table extends WP_List_Table {
 	protected function get_bulk_actions() {
 
 		$actions = array(
+			'__bulk_edit' => _x( 'Edit', 'List table bulk action', 'groundhogg' ),
+			'__export'    => _x( 'Export', 'List table bulk action', 'groundhogg' ),
 			'delete'      => _x( 'Delete', 'List table bulk action', 'groundhogg' ),
 			'spam'        => _x( 'Spam', 'List table bulk action', 'groundhogg' ),
 			'resubscribe' => _x( 'Re-subscribe', 'List table bulk action', 'groundhogg' ),

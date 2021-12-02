@@ -15,6 +15,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * If an email address is provided but a space is in place of a plus then swap out the space for a plus
+ *
+ * @param $str string
+ */
+function maybe_change_space_to_plus_in_email( $str ) {
+
+	// No space, quit
+	if ( strpos( $str, ' ' ) === false ) {
+		return $str;
+	}
+
+	// replace the space with a plus and run is_email
+	$maybe_email = str_replace( ' ', '+', $str );
+
+	if ( is_email( $maybe_email ) ) {
+		return $maybe_email;
+	}
+
+	return $str;
+}
+
 
 /**
  * Wrapper function
@@ -2359,10 +2381,17 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 				break;
 			case 'birthday':
 
+				if ( empty( $value ) ) {
+					$meta['birthday'] = '';
+					break;
+				}
+
 				if ( is_string( $value ) ) {
 					$meta['birthday'] = Ymd( strtotime( $value ) );
-				} else if ( is_array( $value ) ) {
+					break;
+				}
 
+				if ( is_array( $value ) ) {
 					$year  = absint( $value['year'] );
 					$month = absint( $value['month'] );
 					$day   = absint( $value['day'] );
@@ -2655,10 +2684,18 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				}
 				break;
 			case 'birthday':
+
+				if ( empty( $value ) ) {
+					$meta['birthday'] = '';
+					break;
+				}
+
 				if ( is_string( $value ) ) {
 					$meta['birthday'] = Ymd( strtotime( $value ) );
-				} else if ( is_array( $value ) ) {
+					break;
+				}
 
+				if ( is_array( $value ) ) {
 					$year  = absint( $value['year'] );
 					$month = absint( $value['month'] );
 					$day   = absint( $value['day'] );
@@ -2667,6 +2704,7 @@ function generate_contact_with_map( $fields, $map = [] ) {
 						mktime( 0, 0, 0, $month, $day, $year )
 					);
 				}
+
 				break;
 		}
 
@@ -3458,9 +3496,7 @@ function file_access_url( $path, $download = false ) {
 	$url = managed_page_url( 'uploads/' . ltrim( $path, '/' ) );
 
 	// WP Engine file download links do not work if forward slash is not present.
-	if ( ! is_wpengine() ) {
-		$url = untrailingslashit( $url );
-	}
+	$url = trailingslashit( $url );
 
 	if ( $download ) {
 		$url = add_query_arg( [ 'download' => true ], $url );
@@ -4716,11 +4752,10 @@ function track_live_activity( $type, $details = [] ) {
 	}
 
 	$args = [
-		'funnel_id'  => tracking()->get_current_funnel_id(),
-		'contact_id' => tracking()->get_current_contact_id(),
-		'email_id'   => tracking()->get_current_email_id(),
-		'event_id'   => tracking()->get_current_event() ? tracking()->get_current_event()->get_id() : false,
-		'referer'    => tracking()->get_leadsource(),
+		'funnel_id' => tracking()->get_current_funnel_id(),
+		'email_id'  => tracking()->get_current_email_id(),
+		'event_id'  => tracking()->get_current_event() ? tracking()->get_current_event()->get_id() : false,
+		'referer'   => tracking()->get_leadsource(),
 	];
 
 	track_activity( $contact, $type, $args, $details );
@@ -5542,12 +5577,21 @@ function enqueue_step_type_assets() {
 	do_action( 'groundhogg_enqueue_step_type_assets' );
 }
 
+function enqueue_broadcast_assets() {
+	wp_enqueue_script( 'groundhogg-admin-send-broadcast' );
+	wp_enqueue_style( 'groundhogg-admin-element' );
+	enqueue_filter_assets();
+
+	do_action( 'groundhogg_enqueue_broadcast_assets' );
+}
+
 /**
  * Enqueue any step type registration assets
  */
 function enqueue_filter_assets() {
 
 	wp_enqueue_script( 'groundhogg-admin-search-filters' );
+	wp_enqueue_style( 'groundhogg-admin-search-filters' );
 
 	do_action( 'groundhogg_enqueue_filter_assets' );
 }
@@ -5720,7 +5764,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 
 			case Event::BROADCAST:
 				$filters[] = [
-					'type'         => 'received_broadcast',
+					'type'         => 'broadcast_received',
 					'status'       => $events_query['status'],
 					'broadcast_id' => absint( get_array_var( $events_query, 'step_id' ) ),
 				];
@@ -5824,7 +5868,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 	$filters = apply_filters( 'groundhogg/get_filters_from_old_query_vars', $filters, $query );
 
 	// Filters is an array[] so wrap in another array
-	return ! empty( $filters ) ? [ $filters ] : false;
+	return ! empty( $filters ) ? [ $filters ] : [];
 }
 
 /**
@@ -5943,14 +5987,15 @@ function array_map_to_method( $array, $method ) {
  *
  * @param mixed  $maybe_tags stuff that might be tags
  * @param string $as         accepts ID | slug | name
+ * @param bool   $create     whether to create a new tag if the given one does not exist.
  *
- * @return false|mixed[]
+ * @return mixed[]
  */
-function parse_tag_list( $maybe_tags, $as = 'ID' ) {
+function parse_tag_list( $maybe_tags, $as = 'ID', $create = true ) {
 
 	if ( is_array( $maybe_tags ) ) {
 
-		$tags = array_map( function ( $maybe_tag ) {
+		$tags = array_map( function ( $maybe_tag ) use ( $create ) {
 
 			if ( is_a( $maybe_tag, Tag::class ) ) {
 				return $maybe_tag;
@@ -5958,6 +6003,14 @@ function parse_tag_list( $maybe_tags, $as = 'ID' ) {
 
 			if ( is_numeric( $maybe_tag ) ) {
 				return new Tag( $maybe_tag );
+			}
+
+			// This will create a new tag if it doesn't exist already :)
+			if ( $create ) {
+				return new Tag( [
+					'tag_name' => $maybe_tag,
+					'tag_slug' => sanitize_title( $maybe_tag )
+				] );
 			}
 
 			return new Tag( sanitize_title( $maybe_tag ), 'tag_slug' );
@@ -5973,12 +6026,19 @@ function parse_tag_list( $maybe_tags, $as = 'ID' ) {
 		if ( strpos( $maybe_tags, ',' ) !== false ) {
 			$tags = parse_tag_list( wp_parse_list( $maybe_tags ) );
 		} else {
-			// Assume slug
-			$tags = [ new Tag( sanitize_title( $maybe_tags ), 'tag_slug' ) ];
+
+			// if create is true, use the query and create method, otherwise use the slug
+			$tags = [
+				$create ? new Tag( [
+					'tag_name' => $maybe_tags,
+					'tag_slug' => sanitize_title( $maybe_tags )
+				] ) : new Tag( sanitize_title( $maybe_tags ), 'tag_slug' )
+			];
 		}
 
 	} else {
-		return false;
+		// Return an empty array instead...
+		return [];
 	}
 
 	$tags = array_filter( $tags, function ( $tag ) {

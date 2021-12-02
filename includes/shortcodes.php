@@ -149,9 +149,7 @@ class Shortcodes {
 			'has'  => 'all'
 		), $atts );
 
-		$tags = explode( ',', $a['tags'] );
-		$tags = array_map( 'trim', $tags );
-		$tags = array_map( 'intval', $tags );
+		$tags = wp_parse_id_list( $a['tags'] );
 
 		$contact = get_current_contact();
 
@@ -197,9 +195,7 @@ class Shortcodes {
 			'needs' => 'all'
 		), $atts );
 
-		$tags = explode( ',', $a['tags'] );
-		$tags = array_map( 'trim', $tags );
-		$tags = array_map( 'intval', $tags );
+		$tags = wp_parse_id_list( $a['tags'] );
 
 		$contact = get_current_contact();
 
@@ -210,7 +206,7 @@ class Shortcodes {
 
 		switch ( $a['needs'] ) {
 			case 'all':
-				if ( ! $contact->has_tags( $tags ) ){
+				if ( $contact->has_tags( $tags ) ) {
 					return '';
 				}
 

@@ -176,8 +176,14 @@ function groundhogg_tools_sysinfo_get() {
 
 	$return = apply_filters( 'groundhogg_sysinfo_after_webserver_config', $return );
 
+	$return .= "\n" . '-- MySQL Configuration' . "\n\n";
+	$return .= 'MySQL Version:            ' . $wpdb->db_version() . "\n";
+	$return .= 'Collation:            ' . $wpdb->collate . "\n";
+	$return .= 'Charset:              ' . $wpdb->charset . "\n";
+
 	// PHP configs... now we're getting to the important stuff
 	$return .= "\n" . '-- PHP Configuration' . "\n\n";
+	$return .= 'PHP Version:              ' . PHP_VERSION . "\n";
 	$return .= 'Memory Limit:             ' . ini_get( 'memory_limit' ) . "\n";
 	$return .= 'Upload Max Size:          ' . ini_get( 'upload_max_filesize' ) . "\n";
 	$return .= 'Post Max Size:            ' . ini_get( 'post_max_size' ) . "\n";
@@ -393,6 +399,7 @@ add_action( 'admin_init', 'groundhogg_tools_sysinfo_download' );
 
 /**
  * Enable safe mode which disables all active plugins
+ *
  * @return bool
  */
 function groundhogg_enable_safe_mode() {
@@ -426,6 +433,7 @@ function groundhogg_enable_safe_mode() {
 
 /**
  * Restore WP from safe mode
+ *
  * @return bool
  */
 function groundhogg_disable_safe_mode() {

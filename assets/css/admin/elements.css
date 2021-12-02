@@ -9,6 +9,13 @@ h3.no-margin-top {
   align-items: center;
 }
 
+.align-left-space-between {
+  display: flex !important;
+  justify-content: flex-start;
+  gap: 10px;
+  align-items: center;
+}
+
 .space-between {
   display: flex !important;
   justify-content: space-between;
@@ -210,41 +217,31 @@ a.action-link {
 }
 .pill.green {
   background: rgba(158, 206, 56, 0.5);
+  color: #334310;
 }
 .pill.red {
   background: rgba(233, 31, 79, 0.5);
+  color: #4e0818;
+}
+.pill.sm {
+  font-size: 13px;
 }
 
 svg.danger,
 span.gh-text.danger {
   color: #e91f4f;
 }
-
-.gh-panel-tabs {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+svg.md,
+span.gh-text.md {
+  font-size: 15px;
 }
-.gh-panel-tabs .tab {
-  background-color: rgba(16, 38, 64, 0.1);
-  padding: 10px 20px;
-  border-radius: 2px 2px 0 0;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
+svg.sm,
+span.gh-text.sm {
+  font-size: 13px;
 }
-.gh-panel-tabs .tab:after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: -1;
-  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
-}
-.gh-panel-tabs .tab.current {
-  background: #FFFFFF;
+svg.lg,
+span.gh-text.lg {
+  font-size: 18px;
 }
 
 .gh-panel {
@@ -252,9 +249,6 @@ span.gh-text.danger {
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
   /*margin: 20px;*/
   border-radius: 5px;
-}
-.gh-panel.has-tabs {
-  border-top-left-radius: 0;
 }
 .gh-panel .inside {
   padding: 20px;
@@ -288,8 +282,9 @@ button.dashicon-button:disabled {
   opacity: 0.5;
   cursor: initial;
 }
-a.gh-button,
-button.gh-button {
+a.gh-button, a.gh-submit,
+button.gh-button,
+button.gh-submit {
   text-decoration: none;
   white-space: nowrap;
   border: none;
@@ -299,147 +294,171 @@ button.gh-button {
   font-size: 16px;
   font-weight: 400;
 }
-a.gh-button:disabled,
-button.gh-button:disabled {
+a.gh-button:disabled, a.gh-submit:disabled,
+button.gh-button:disabled,
+button.gh-submit:disabled {
   opacity: 0.5;
   cursor: initial;
 }
-a.gh-button.action,
-button.gh-button.action {
+a.gh-button.no-border, a.gh-submit.no-border,
+button.gh-button.no-border,
+button.gh-submit.no-border {
+  border: none !important;
+}
+a.gh-button.action, a.gh-submit.action,
+button.gh-button.action,
+button.gh-submit.action {
   background: #9ece38;
 }
-a.gh-button.action:hover:not(:disabled),
-button.gh-button.action:hover:not(:disabled) {
+a.gh-button.action:hover:not(:disabled), a.gh-submit.action:hover:not(:disabled),
+button.gh-button.action:hover:not(:disabled),
+button.gh-submit.action:hover:not(:disabled) {
   background: #80a92a;
 }
-a.gh-button.primary,
-button.gh-button.primary {
+a.gh-button#gh-submit, a.gh-button.primary, a.gh-submit#gh-submit, a.gh-submit.primary,
+button.gh-button#gh-submit,
+button.gh-button.primary,
+button.gh-submit#gh-submit,
+button.gh-submit.primary {
   background: #0075ff;
 }
-a.gh-button.primary.text,
-button.gh-button.primary.text {
+a.gh-button#gh-submit.text, a.gh-button.primary.text, a.gh-submit#gh-submit.text, a.gh-submit.primary.text,
+button.gh-button#gh-submit.text,
+button.gh-button.primary.text,
+button.gh-submit#gh-submit.text,
+button.gh-submit.primary.text {
   background-color: transparent;
   color: #0075ff;
 }
-a.gh-button.primary:hover:not(:disabled),
-button.gh-button.primary:hover:not(:disabled) {
+a.gh-button#gh-submit:hover:not(:disabled), a.gh-button.primary:hover:not(:disabled), a.gh-submit#gh-submit:hover:not(:disabled), a.gh-submit.primary:hover:not(:disabled),
+button.gh-button#gh-submit:hover:not(:disabled),
+button.gh-button.primary:hover:not(:disabled),
+button.gh-submit#gh-submit:hover:not(:disabled),
+button.gh-submit.primary:hover:not(:disabled) {
   background: #005ecc;
 }
-a.gh-button.primary:hover:not(:disabled).text,
-button.gh-button.primary:hover:not(:disabled).text {
+a.gh-button#gh-submit:hover:not(:disabled).text, a.gh-button.primary:hover:not(:disabled).text, a.gh-submit#gh-submit:hover:not(:disabled).text, a.gh-submit.primary:hover:not(:disabled).text,
+button.gh-button#gh-submit:hover:not(:disabled).text,
+button.gh-button.primary:hover:not(:disabled).text,
+button.gh-submit#gh-submit:hover:not(:disabled).text,
+button.gh-submit.primary:hover:not(:disabled).text {
   background-color: rgba(0, 117, 255, 0.1);
   color: #0075ff;
 }
-a.gh-button.tertiary,
-button.gh-button.tertiary {
-  background: #102640;
-}
-a.gh-button.tertiary.text,
-button.gh-button.tertiary.text {
-  background-color: transparent;
-  color: #102640;
-}
-a.gh-button.tertiary:hover:not(:disabled),
-button.gh-button.tertiary:hover:not(:disabled) {
-  background: #1a3e69;
-}
-a.gh-button.tertiary:hover:not(:disabled).text,
-button.gh-button.tertiary:hover:not(:disabled).text {
-  background-color: rgba(16, 38, 64, 0.1);
-  color: #102640;
-}
-a.gh-button.secondary,
-button.gh-button.secondary {
+a.gh-button.secondary, a.gh-submit.secondary,
+button.gh-button.secondary,
+button.gh-submit.secondary {
   border: 1px solid rgba(0, 117, 255, 0.6);
   background: #FFFFFF;
   color: #0075ff;
   padding: 5px 10px;
 }
-a.gh-button.secondary.text,
-button.gh-button.secondary.text {
+a.gh-button.secondary.text, a.gh-submit.secondary.text,
+button.gh-button.secondary.text,
+button.gh-submit.secondary.text {
   border: none;
   background: transparent;
   color: #102640;
 }
-a.gh-button.secondary:hover:not(:disabled),
-button.gh-button.secondary:hover:not(:disabled) {
+a.gh-button.secondary:hover:not(:disabled), a.gh-submit.secondary:hover:not(:disabled),
+button.gh-button.secondary:hover:not(:disabled),
+button.gh-submit.secondary:hover:not(:disabled) {
   color: #005ecc;
   border-color: #0075ff;
   background-color: rgba(0, 117, 255, 0.02);
 }
-a.gh-button.secondary:hover:not(:disabled).text,
-button.gh-button.secondary:hover:not(:disabled).text {
+a.gh-button.secondary:hover:not(:disabled).text, a.gh-submit.secondary:hover:not(:disabled).text,
+button.gh-button.secondary:hover:not(:disabled).text,
+button.gh-submit.secondary:hover:not(:disabled).text {
   border: none;
   background: rgba(16, 38, 64, 0.1);
   color: #102640;
 }
-a.gh-button.danger,
-button.gh-button.danger {
+a.gh-button.danger, a.gh-submit.danger,
+button.gh-button.danger,
+button.gh-submit.danger {
   background: #e91f4f;
 }
-a.gh-button.danger.text,
-button.gh-button.danger.text {
+a.gh-button.danger.text, a.gh-submit.danger.text,
+button.gh-button.danger.text,
+button.gh-submit.danger.text {
   color: #e91f4f;
   background-color: transparent;
 }
-a.gh-button.danger:hover:not(:disabled),
-button.gh-button.danger:hover:not(:disabled) {
+a.gh-button.danger:hover:not(:disabled), a.gh-submit.danger:hover:not(:disabled),
+button.gh-button.danger:hover:not(:disabled),
+button.gh-submit.danger:hover:not(:disabled) {
   background: #c2133d;
 }
-a.gh-button.danger:hover:not(:disabled).text,
-button.gh-button.danger:hover:not(:disabled).text {
+a.gh-button.danger:hover:not(:disabled).text, a.gh-submit.danger:hover:not(:disabled).text,
+button.gh-button.danger:hover:not(:disabled).text,
+button.gh-submit.danger:hover:not(:disabled).text {
   color: #e91f4f;
   background-color: rgba(233, 31, 79, 0.1);
 }
-a.gh-button.dashicon,
-button.gh-button.dashicon {
+a.gh-button.dashicon, a.gh-submit.dashicon,
+button.gh-button.dashicon,
+button.gh-submit.dashicon {
   border: 1px solid rgba(16, 38, 64, 0.5);
   color: #102640;
   background-color: #FFF;
   padding: 4px 5px;
 }
-a.gh-button.dashicon:hover,
-button.gh-button.dashicon:hover {
+a.gh-button.dashicon.filled, a.gh-submit.dashicon.filled,
+button.gh-button.dashicon.filled,
+button.gh-submit.dashicon.filled {
+  background: rgba(16, 38, 64, 0.1);
+}
+a.gh-button.dashicon:hover, a.gh-submit.dashicon:hover,
+button.gh-button.dashicon:hover,
+button.gh-submit.dashicon:hover {
   background-color: rgba(16, 38, 64, 0.1);
 }
-a.gh-button.icon,
-button.gh-button.icon {
+a.gh-button.icon, a.gh-submit.icon,
+button.gh-button.icon,
+button.gh-submit.icon {
   padding: 7px;
   display: flex;
   align-items: center;
-  gap: 10px;
 }
-a.gh-button.icon svg,
-button.gh-button.icon svg {
+a.gh-button.icon svg, a.gh-submit.icon svg,
+button.gh-button.icon svg,
+button.gh-submit.icon svg {
   width: 20px;
   height: 20px;
 }
-a.gh-button.icon.small svg,
-button.gh-button.icon.small svg {
+a.gh-button.icon.small svg, a.gh-submit.icon.small svg,
+button.gh-button.icon.small svg,
+button.gh-submit.icon.small svg {
   width: 14px;
   height: 14px;
 }
-a.gh-button.big,
-button.gh-button.big {
+a.gh-button.big, a.gh-submit.big,
+button.gh-button.big,
+button.gh-submit.big {
   font-size: 24px;
   padding: 15px 32px;
 }
-a.gh-button.medium,
-button.gh-button.medium {
+a.gh-button.medium, a.gh-submit.medium,
+button.gh-button.medium,
+button.gh-submit.medium {
   font-size: 18px;
   padding: 11px 22px;
 }
-a.gh-button.small,
-button.gh-button.small {
+a.gh-button.small, a.gh-submit.small,
+button.gh-button.small,
+button.gh-submit.small {
   font-size: 14px;
   padding: 4px 6px;
 }
-a.gh-button.bold,
-button.gh-button.bold {
+a.gh-button.bold, a.gh-submit.bold,
+button.gh-button.bold,
+button.gh-submit.bold {
   font-weight: 700;
 }
-a.gh-button.loud,
-button.gh-button.loud {
+a.gh-button.loud, a.gh-submit.loud,
+button.gh-button.loud,
+button.gh-submit.loud {
   text-transform: uppercase;
 }
 
@@ -615,6 +634,16 @@ button.gh-button.loud {
   max-width: 80vw;
   max-height: calc(92vh - 64px);
   overflow: auto;
+}
+.gh-modal-dialog .gh-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 8px 20px;
+}
+.gh-modal-dialog .gh-header h3 {
+  margin: 0;
 }
 .gh-modal-dialog.overflow-visible {
   overflow: visible;
@@ -820,14 +849,6 @@ p.error,
 .gh-dropdown-menu-item:hover {
   background-color: rgba(16, 38, 64, 0.1);
   cursor: pointer;
-}
-.gh-dropdown-menu-item svg {
-  width: 20px;
-  height: 20px;
-}
-
-.gh-button-toggle {
-  display: flex;
 }
 
 .gh-step-nav {
@@ -1102,31 +1123,178 @@ p.error,
   min-height: 28px;
 }
 
-.gh-tabs-provider .gh-tabs {
-  border-bottom: 1px solid rgba(16, 38, 64, 0.15);
-  padding: 10px 10px 0 10px;
+.contact-quick-edit {
+  width: 500px;
 }
-.gh-tabs-provider .gh-tabs .gh-tab {
-  display: inline-block;
+.contact-quick-edit .gh-header img {
+  border-radius: 5px;
+}
+.contact-quick-edit-fields {
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.contact-quick-edit-fields .row {
+  display: flex;
+  gap: 20px;
+}
+.contact-quick-edit-fields .row.phone {
+  gap: 5px;
+}
+.contact-quick-edit-fields .row .primary-phone-ext {
+  width: 120px;
+}
+.contact-quick-edit-fields .row .col {
+  width: 100%;
+}
+.contact-quick-edit-fields .row .col input, .contact-quick-edit-fields .row .col select {
+  max-width: 100%;
+  width: 100%;
+}
+
+.gh-form-wrapper * {
+  box-sizing: border-box;
+}
+
+ul.gh-form-errors {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.gh-input {
+  outline: none;
+  width: 100%;
+}
+
+.gh-form-field {
+  margin: 10px 0;
+  white-space: normal;
+}
+
+.gh-form-wrapper label {
   cursor: pointer;
-  padding: 8px 20px;
-  border-width: 1px 1px 0 1px;
-  border-style: solid;
-  border-color: rgba(16, 38, 64, 0.15);
-  background: rgba(16, 38, 64, 0.05);
-  font-weight: 500;
-  font-size: 16px;
+  vertical-align: baseline;
 }
-.gh-tabs-provider .gh-tabs .gh-tab:not(:first-child) {
-  margin-left: 5px;
+
+.gh-form-wrapper .gh-input {
+  height: auto;
 }
-.gh-tabs-provider .gh-tabs .gh-tab.current {
+
+.gh-form-row {
+  white-space: nowrap;
+}
+
+.gh-form-column {
+  display: inline-block;
+  float: left;
+  clear: none;
+  white-space: normal;
+}
+
+.gh-form-column {
+  padding-right: 10px;
+}
+
+.gh-form-wrapper input[type=file].gh-file-uploader {
+  width: 100%;
+  margin: auto;
+  padding: 30px;
+  box-sizing: border-box;
+  background: #f1f1f1;
+  border: 2px dashed #e5e5e5;
+  text-align: center;
+}
+
+/*.gh-form-column:nth-last-child(2){*/
+/*padding-right: 0;*/
+/*}*/
+.gh-form-edit-link {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  transition: 0.4s;
+}
+
+.gh-form-wrapper:hover .gh-form-edit-link {
+  visibility: visible;
   background: #FFFFFF;
-  margin-bottom: -1px;
-  border-bottom: 1px solid #FFFFFF;
+  opacity: 1;
+  padding: 5px;
+  transition: 0.4s;
 }
-.gh-tabs-provider .gh-tab-content {
-  padding: 20px;
+
+.gh-form-column:last-child {
+  padding-right: 0;
+}
+
+#gdpr-checkboxes-wrap label {
+  display: block;
+}
+
+.gh-form-column.col-1-of-1 {
+  width: 100%;
+}
+
+.gh-form-column.col-1-of-2 {
+  width: 50%;
+}
+
+.gh-form-column.col-1-of-3 {
+  width: 33.33%;
+}
+
+.gh-form-column.col-1-of-4 {
+  width: 25%;
+}
+
+.gh-form-column.col-2-of-3 {
+  width: 66.66%;
+}
+
+.gh-form-column.col-3-of-4 {
+  width: 75%;
+}
+
+/*  GO FULL WIDTH BELOW 480 PIXELS */
+@media only screen and (max-width: 480px) {
+  .gh-form-row {
+    white-space: normal;
+  }
+
+  .gh-form-column.col-1-of-1 {
+    width: 100%;
+  }
+
+  .gh-form-column.col-1-of-2 {
+    width: 100%;
+  }
+
+  .gh-form-column.col-1-of-3 {
+    width: 100%;
+  }
+
+  .gh-form-column.col-1-of-4 {
+    width: 100%;
+  }
+
+  .gh-form-column.col-2-of-3 {
+    width: 100%;
+  }
+
+  .gh-form-column.col-3-of-4 {
+    width: 100%;
+  }
+
+  .gh-form-column {
+    padding-right: 0;
+  }
+}
+/*.clearfix{clear: both}*/
+.clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
 }
 
 /*# sourceMappingURL=elements.css.map */

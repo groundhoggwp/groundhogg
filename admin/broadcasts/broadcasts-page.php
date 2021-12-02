@@ -10,6 +10,8 @@ use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 use Groundhogg\Saved_Searches;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\enqueue_broadcast_assets;
+use function Groundhogg\enqueue_filter_assets;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
@@ -60,6 +62,8 @@ class Broadcasts_Page extends Admin_Page {
 		wp_enqueue_style( 'groundhogg-admin' );
 		wp_enqueue_style( 'groundhogg-admin-email-preview' );
 		wp_enqueue_script( 'groundhogg-admin-email-preview' );
+
+		enqueue_broadcast_assets();
 	}
 
 	public function get_priority() {
@@ -251,13 +255,13 @@ class Broadcasts_Page extends Admin_Page {
 		 */
 		do_action( 'groundhogg/admin/broadcast/scheduled', $broadcast_id, $meta, $broadcast );
 
-        $this->add_notice( 'review', __( 'Review your broadcast before scheduling!', 'groundhogg' ), 'warning' );
+		$this->add_notice( 'review', __( 'Review your broadcast before scheduling!', 'groundhogg' ), 'warning' );
 
-        return admin_page_url( 'gh_broadcasts', [
-            'action'    => 'preview',
-            'broadcast' => $broadcast_id,
-        ] );
-    }
+		return admin_page_url( 'gh_broadcasts', [
+			'action'    => 'preview',
+			'broadcast' => $broadcast_id,
+		] );
+	}
 
 	/**
 	 * Confirm from the preview page
@@ -324,14 +328,17 @@ class Broadcasts_Page extends Admin_Page {
 	 * @return array|array[]
 	 */
 	protected function get_title_actions() {
-		$actions = [
-			[
+
+		$actions = [];
+
+		if ( $this->get_current_action() !== 'add' ) {
+			$actions[] = [
 				'link'   => $this->admin_url( [ 'action' => 'add', 'type' => 'email' ] ),
 				'action' => __( 'Schedule Email Broadcast', 'groundhogg' ),
 				'target' => '_self',
-				'id' => 'gh-schedule-broadcast'
-			]
-		];
+				'id'     => 'gh-schedule-broadcast'
+			];
+		}
 
 		if ( is_sms_plugin_active() ) {
 			$actions[] = [
@@ -352,11 +359,11 @@ class Broadcasts_Page extends Admin_Page {
 
 		$this->search_form( __( 'Search Broadcasts', 'groundhogg' ) );
 		$broadcasts_table->views(); ?>
-        <form method="post" class="wp-clearfix">
-            <!-- search form -->
+		<form method="post" class="wp-clearfix">
+			<!-- search form -->
 			<?php $broadcasts_table->prepare_items(); ?>
 			<?php $broadcasts_table->display(); ?>
-        </form>
+		</form>
 
 		<?php
 	}

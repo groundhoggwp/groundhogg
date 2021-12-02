@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Contacts\Tables;
 
 use Groundhogg\Contact;
 use Groundhogg\Plugin;
+use Groundhogg\Preferences;
 use Groundhogg\Tag;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\get_array_var;
@@ -152,15 +153,20 @@ class Contact_Table_Columns {
 	 */
 	public function register_core_columns() {
 
+		self::register( 'status', __( 'Status', 'groundhogg' ), [
+			self::class,
+			'column_optin_status'
+		], 'optin_status', 1 );
+
 		// Core columns
 		self::register( 'first_name', __( 'First Name', 'groundhogg' ), [
 			self::class,
 			'column_first_name'
-		], 'first_name', 9 );
+		], 'first_name', 2 );
 		self::register( 'last_name', __( 'Last Name', 'groundhogg' ), [
 			self::class,
 			'column_last_name'
-		], 'last_name', 9 );
+		], 'last_name', 3 );
 		self::register( 'user_id', __( 'Username', 'groundhogg' ), [ self::class, 'column_user_id' ], 'user_id', 10 );
 		self::register( 'owner_id', __( 'Owner', 'groundhogg' ), [ self::class, 'column_owner_id' ], 'owner_id', 10 );
 		self::register( 'tel_numbers', __( 'Phone', 'groundhogg' ), [ self::class, 'column_tel_numbers' ], false, 10 );
@@ -170,14 +176,25 @@ class Contact_Table_Columns {
 		], 'date_created', 10 );
 
 		// Other Columns
-		self::register( 'tags_col', __( 'Tags' ), [ self::class, 'column_tags' ] );
-		self::register( 'address', __( 'Location' ), [ self::class, 'column_location' ] );
-		self::register( 'birthday', __( 'Birthday' ), [ self::class, 'column_birthday' ] );
+		self::register( 'tags_col', __( 'Tags' ), [ self::class, 'column_tags' ], false, 11 );
+		self::register( 'address', __( 'Location' ), [ self::class, 'column_location' ], false,11 );
+		self::register( 'birthday', __( 'Birthday' ), [ self::class, 'column_birthday' ], false, 11 );
 
 		do_action( 'groundhogg/admin/contacts/register_table_columns', $this );
 	}
 
 	# =============== COLUMN CALLBACKS FOR CORE COLUMNS =============== #
+
+	/**
+	 * @param $contact Contact
+	 *
+	 * @return void
+	 */
+	protected static function column_optin_status( $contact ) {
+		?>
+		<span class="pill sm <?php echo $contact->is_marketable() ? 'green marketable' : 'red unmarketable' ?>"><?php echo Preferences::get_preference_pretty_name( $contact->get_optin_status() )?></span>
+		<?php
+	}
 
 	/**
 	 * @param $contact Contact

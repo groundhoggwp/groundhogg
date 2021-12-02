@@ -104,7 +104,7 @@ abstract class Benchmark extends Funnel_Step {
 
 			$contacts = $this->get_the_contact();
 
-			if ( ! is_array( $contacts ) && is_a_contact( $contacts ) ) {
+			if ( ! is_array( $contacts ) ) {
 				$contacts = [ $contacts ];
 			}
 

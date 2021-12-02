@@ -182,6 +182,13 @@ class Replacements implements \JsonSerializable {
 				'name'        => __( 'Address', 'groundhogg' ),
 				'description' => _x( 'The contact\'s company address.', 'replacement', 'groundhogg' ),
 			],
+			[
+				'code'        => 'birthday',
+				'group'       => 'contact',
+				'callback'    => [ $this, 'replacement_birthday' ],
+				'name'        => __( 'Birthday', 'groundhogg' ),
+				'description' => _x( 'The contact\'s birthday.', 'replacement', 'groundhogg' ),
+			],
 //			[
 //				'code'        => 'notes',
 //				'callback'    => [ $this, 'replacement_notes' ],
@@ -686,6 +693,9 @@ class Replacements implements \JsonSerializable {
 		return $return;
 	}
 
+	function replacement_birthday() {
+		return $this->get_current_contact()->get_meta( 'birthday' );
+	}
 
 	/**
 	 * Return the contact meta

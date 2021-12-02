@@ -75,7 +75,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 					'href' => 'mailto:' . $contact->get_email(),
 				], $contact->get_email() ) ?>
 				<span
-					class="status <?php echo $contact->is_marketable() ? 'green' : 'red'; ?>"><?php echo Preferences::get_preference_pretty_name( $contact->get_optin_status() ); ?></span>
+					class="pill <?php echo $contact->is_marketable() ? 'green' : 'red'; ?>"><?php echo Preferences::get_preference_pretty_name( $contact->get_optin_status() ); ?></span>
 			</div>
 			<?php if ( $contact->get_phone_number() ): ?>
 				<div
@@ -313,8 +313,8 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 			//print_r( $contact->tags );
 
 			$args = array(
-				'id'   => 'tags',
-				'name' => 'tags[]',
+				'id'       => 'tags',
+				'name'     => 'tags[]',
 				'selected' => $contact->get_tags(),
 				'style'    => [ 'min-width' => '600px' ],
 			);
@@ -328,7 +328,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 			<tbody>
 			<tr>
 				<th><?php echo _x( 'Birthday', 'contact_record', 'groundhogg' ) ?></th>
-				<td><?php
+				<td class="align-left-space-between"><?php
 
 					$years  = array_reverse( range( date( 'Y' ) - 100, date( 'Y' ) ) );
 					$years  = array_combine( $years, $years );
@@ -348,7 +348,9 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						$birthday_parts = explode( '-', $birthday );
 					}
 
-					echo html()->e( 'span', [], [
+					echo html()->e( 'div', [
+						'class' => 'gh-input-group',
+					], [
 						// Year
 						html()->dropdown( [
 							'name'        => 'birthday[year]',
@@ -357,7 +359,6 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 							'multiple'    => false,
 							'option_none' => __( 'Year', 'groundhogg' ),
 							'selected'    => get_array_var( $birthday_parts, 0 ),
-							'class'       => 'gh-input'
 						] ),
 						html()->dropdown( [
 							'name'        => 'birthday[month]',
@@ -366,7 +367,6 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 							'multiple'    => false,
 							'option_none' => __( 'Month', 'groundhogg' ),
 							'selected'    => get_array_var( $birthday_parts, 1 ),
-							'class'       => 'gh-input'
 						] ),
 						html()->dropdown( [
 							'name'        => 'birthday[day]',
@@ -375,7 +375,6 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 							'multiple'    => false,
 							'option_none' => __( 'Day', 'groundhogg' ),
 							'selected'    => get_array_var( $birthday_parts, 2 ),
-							'class'       => 'gh-input'
 						] ),
 					] );
 

@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.8
 Requires PHP: 7.1
-Stable tag: 2.5.5
+Stable tag: 2.5.7.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -320,6 +320,47 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.5.7.4 (2021-11-30) =
+* ADDED Birthday search filter
+* FIXED Invalid nonce error when submitting forms
+* FIXED UI bug cant see button when adding contacts to funnels from the contacts screen
+* FIXED When importing contacts with birthdays, if no birthday is provided default to empty value instead of date
+* FIXED Reset birthdays which have probably been set as a result of a bug, buggy dates are `1970-01-01` and `1999-11-30`
+
+= 2.5.7.3 (2021-11-26) =
+* FIXED PHP parse error
+
+= 2.5.7.1 (2021-11-25) =
+* FIXED Saved searches with exclude filters not working.
+* FIXED Saved searches pre-exclude filters causing JS error.
+
+= 2.5.7 (2021-11-24) =
+* ADDED New status column in contact table for ordering and better marketability visibility
+* ADDED New "Marketable" search filter makes it easier to determine marketable contacts based on current compliance settings.
+* ADDED Use internal forms as part of the quick add component
+* ADDED Optional exclude filters in contact search for even more advanced segmentation
+* ADDED Settings to blanket disable click tracking and open tracking
+* TWEAKED Made contact quick edit a global component so it can be used on other screens
+* TWEAKED Adding a new contact from the contacts screen uses the quick-add component
+* TWEAKED Contact quick edit uses a save/cancel button instead of auto-saving for consistency with other components
+* FIXED Activity capabilities not added to user
+* FIXED Tags in the contact REST response not always coming back as an array
+* FIXED Contact columns showing in incorrect order after editing via quick edit
+* FIXED Stacked modals which disable scrolling will only enable scrolling once the last modal is closed
+
+= 2.5.6 (2021-11-18) =
+* ADDED `{birthday}` replacement code
+* ADDED MySQL and DB details to system report
+* ADDED `\Groundhogg\Contact::has_tags()` alias method
+* ADDED `groundhogg/admin/tags/table/sortable_columns` for sortable tags column
+* TWEAKED Clicking "broadcast" in the emails page now takes you to the newer UI of the broadcast tool rather than the old one
+* TWEAKED Enforce InnoDB engine is used for `wp_gh_object_relationships` due to long key names
+* FIXED NGINX systems having a hard time downloading contact files because of missing `/` at the end of the path
+* FIXED Tag pickers, email pickers, broadcast scheduler, and search filters not working or un-styled when the toolbar widget is disabled
+* FIXED "AND" logic for `[gh_does_not_have_tags]` shortcode
+* FIXED invalid timeout delay for contact picker component
+* FIXED Edge case handling for usage of "+" in emails
 
 = 2.5.5 (2021-11-02) =
 * ADDED More JS components for use in 3.0 and the pipeline extension
