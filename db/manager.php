@@ -75,6 +75,7 @@ class Manager {
 		$this->campaigns            = new Campaigns();
 		$this->object_relationships = new Object_Relationships();
 		$this->page_visits          = new Page_Visits();
+		$this->log                  = new Log();
 
 		/**
 		 * Runs when the DB Manager is setup and all the standard DBs have been initialized.
@@ -189,12 +190,14 @@ class Manager {
 	 *
 	 * @return string[]
 	 */
-	public function get_object_types(){
+	public function get_object_types() {
 		$dbs = array_filter( $this->dbs, function ( $db ) {
 			return ! method_exists( $db, 'add_meta' );
 		} );
 
-		return array_unique( array_map( function ( $db ) { return $db->get_object_type(); }, $dbs ) );
+		return array_unique( array_map( function ( $db ) {
+			return $db->get_object_type();
+		}, $dbs ) );
 	}
 
 	/**

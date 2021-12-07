@@ -6037,3 +6037,20 @@ function parse_tag_list( $maybe_tags, $as = 'ID', $create = true ) {
 			return $tags;
 	}
 }
+
+/**
+ * Add a new log entry
+ *
+ * @param        $event
+ * @param string $name
+ * @param string $value
+ *
+ * @return void
+ */
+function log( $event, $name = '', $value = '' ) {
+	get_db( 'log' )->add( [
+		'event' => sanitize_key( $event ),
+		'name'  => sanitize_text_field( $name ),
+		'value' => sanitize_text_field( $value )
+	] );
+}
