@@ -75,7 +75,7 @@ class Manager {
 		$this->campaigns            = new Campaigns();
 		$this->object_relationships = new Object_Relationships();
 		$this->page_visits          = new Page_Visits();
-		$this->log                  = new Log();
+		$this->logs                 = new Logs();
 
 		/**
 		 * Runs when the DB Manager is setup and all the standard DBs have been initialized.

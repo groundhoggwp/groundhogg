@@ -4,7 +4,7 @@ namespace Groundhogg\DB;
 
 use function Groundhogg\Ymd_His;
 
-class Log extends DB {
+class Logs extends DB {
 
 
 	public function get_db_suffix() {

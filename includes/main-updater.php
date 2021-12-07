@@ -517,6 +517,13 @@ class Main_Updater extends Updater {
 	}
 
 	/**
+	 * Install the logs table
+	 */
+	public function version_2_5_7_5(){
+		get_db( 'logs' )->create_table();
+	}
+
+	/**
 	 * A unique name for the updater to avoid conflicts
 	 *
 	 * @return string
@@ -573,6 +580,7 @@ class Main_Updater extends Updater {
 			'2.5.5',
 			'2.5.7',
 			'2.5.7.4',
+			'2.5.7.5',
 		];
 	}
 
@@ -604,6 +612,7 @@ class Main_Updater extends Updater {
 			'2.5.4',
 			'2.5.5',
 			'2.5.7',
+			'2.5.7.5',
 		];
 	}
 
@@ -654,6 +663,7 @@ class Main_Updater extends Updater {
 			'2.5.5'         => __( 'Add new caps and permissions for notes and sales representatives.', 'groundhogg' ),
 			'2.5.7'         => __( 'Add new caps and permissions activity REST endpoints.', 'groundhogg' ),
 			'2.5.7.4'       => __( 'Reset birthdays of contacts with dates 1970-01-01 and 1999-11-30 because of import bug.', 'groundhogg' ),
+			'2.5.7.5'       => __( 'Install the debug logs table.', 'groundhogg' ),
 		];
 	}
 }

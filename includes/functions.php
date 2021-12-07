@@ -6048,7 +6048,7 @@ function parse_tag_list( $maybe_tags, $as = 'ID', $create = true ) {
  * @return void
  */
 function log( $event, $name = '', $value = '' ) {
-	get_db( 'log' )->add( [
+	get_db( 'logs' )->add( [
 		'event' => sanitize_key( $event ),
 		'name'  => sanitize_text_field( $name ),
 		'value' => sanitize_text_field( $value )

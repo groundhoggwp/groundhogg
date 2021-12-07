@@ -100,6 +100,11 @@ abstract class Benchmark extends Funnel_Step {
 
 		foreach ( $steps as $step ) {
 
+			// Skip inactive steps
+			if ( ! $step->is_active() ){
+				continue;
+			}
+
 			$this->set_current_step( $step );
 
 			$contacts = $this->get_the_contact();
