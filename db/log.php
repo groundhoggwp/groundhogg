@@ -70,6 +70,7 @@ class Log extends DB {
 		event varchar({$this->get_max_index_length()}) NOT NULL,
 		name text NOT NULL,
 		value text NOT NULL,
+		date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		PRIMARY KEY (ID),
 		KEY date_created (date_created)
 		) {$this->get_charset_collate()};";
