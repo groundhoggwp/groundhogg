@@ -11,6 +11,7 @@ use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\maybe_implode_in_quotes;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -1161,28 +1162,14 @@ abstract class DB {
 						case 'LIKE':
 						case 'RLIKE':
 							if ( is_array( $value ) ) {
-								$condition['compare'] = in_array( $condition['compare'], [
+								$compare = in_array( $condition['compare'], [
 									'IN',
 									'NOT IN'
 								] ) ? $condition['compare'] : 'IN';
-								$value                = map_deep( $value, 'sanitize_text_field' );
 
-								$value = map_deep( $value, function ( $i ) {
-
-									$i = esc_sql( $i );
-
-									if ( is_numeric( $i ) ) {
-										return absint( $i );
-									} else if ( is_string( $i ) ) {
-										return "'{$i}'";
-									}
-
-									return false;
-								} );
-
-								$value = sprintf( "(%s)", implode( ',', $value ) );
-
-								$clause[] = "{$condition[ 'col' ]} {$condition['compare']} {$value}";
+								$value    = map_deep( $value, 'sanitize_text_field' );
+								$value    = sprintf( "(%s)", maybe_implode_in_quotes( $value ) );
+								$clause[] = "{$condition[ 'col' ]} {$compare} {$value}";
 
 							} else {
 

@@ -5870,7 +5870,7 @@ function is_admin_bar_widget_disabled() {
 }
 
 /**
- * Ipplodes a string list surrounded by quotes, useful for SQL queries.
+ * Implodes a string list surrounded by quotes, useful for SQL queries.
  *
  * @param $items
  *
@@ -5878,7 +5878,29 @@ function is_admin_bar_widget_disabled() {
  */
 function implode_in_quotes( $items ) {
 	return implode( ',', array_map( function ( $item ) {
+		$item = esc_sql( $item );
 		return "'$item'";
+	}, $items ) );
+}
+
+/**
+ * Same as implode in quotes but will handle integers differently
+ *
+ * @param $items
+ *
+ * @return string
+ */
+function maybe_implode_in_quotes( $items ){
+	return implode( ',', array_map( function ( $i ) {
+		$i = esc_sql( $i );
+
+		if ( is_numeric( $i ) ) {
+			return intval( $i );
+		} else if ( is_string( $i ) ) {
+			return "'{$i}'";
+		}
+
+		return $i;
 	}, $items ) );
 }
 

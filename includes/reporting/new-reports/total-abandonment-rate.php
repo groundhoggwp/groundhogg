@@ -19,10 +19,9 @@ class Total_Abandonment_Rate extends Base_Funnel_Quick_Stat_Report {
 	protected function query( $start, $end ) {
 
 		$conversion_step        = $this->get_funnel()->get_conversion_step_id();
-		$first_step             = $this->get_funnel()->get_first_step_id();
 		$num_contacts_converted = $this->get_num_contacts_by_step( $conversion_step, $start, $end );
 
-		return $this->get_num_contacts_by_step( $first_step, $start, $end ) - $num_contacts_converted;
+		return $this->get_num_contacts_by_step( $this->get_funnel()->get_starting_step_ids(), $start, $end ) - $num_contacts_converted;
 
 	}
 
@@ -37,7 +36,7 @@ class Total_Abandonment_Rate extends Base_Funnel_Quick_Stat_Report {
 	 * @return mixed
 	 */
 	protected function query_vs( $start, $end ) {
-		return $this->get_num_contacts_by_step( $this->get_funnel()->get_first_step_id(), $start, $end );
+		return $this->get_num_contacts_by_step( $this->get_funnel()->get_starting_step_ids(), $start, $end );
 	}
 
 	/**

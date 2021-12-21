@@ -58,11 +58,10 @@ class Total_Funnel_Conversion_Rate extends Base_Quick_Stat_Percent {
 		$funnel = new Funnel( $this->get_funnel_id() );
 		$cquery = new Contact_Query();
 
-		return $cquery->query( [
-			'count'  => true,
+		return $cquery->count( [
 			'report' => [
 				'funnel_id' => $funnel->get_id(),
-				'step_id'   => $funnel->get_first_step_id(),
+				'step_id'   => $funnel->get_starting_step_ids(),
 				'start'     => $start,
 				'end'       => $end,
 				'status'    => Event::COMPLETE

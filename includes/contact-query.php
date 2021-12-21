@@ -834,6 +834,10 @@ class Contact_Query {
 						default:
 							$compare = '=';
 							break;
+						case 'step_id':
+							$compare = 'IN';
+							$val     = is_array( $val ) ? $val : [ $val ];
+							break;
 						case 'before':
 							$compare = '<=';
 							$col     = 'time';
@@ -2541,7 +2545,7 @@ class Contact_Query {
 
 		$meta_table_name = get_db( 'contactmeta' )->table_name;
 
-		$year = date('Y');
+		$year = date( 'Y' );
 
 		return "{$query->table_name}.ID IN ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$meta_table_name}.meta_key = 'birthday' AND CONCAT( '$year', SUBSTRING( {$meta_table_name}.meta_value, 5 ) ) {$clause} ) ";
 	}

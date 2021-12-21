@@ -268,6 +268,14 @@ class Funnel extends Base_Object_With_Meta {
 		return array_shift( $actions );
 	}
 
+	/**
+	 * @return array
+	 */
+	public function get_starting_step_ids(){
+		return get_object_ids( array_filter( $this->get_steps(), function ( $step ){
+			return $step->is_starting();
+		} ) );
+	}
 
 	/**
 	 * Get the step IDs associate with this funnel
