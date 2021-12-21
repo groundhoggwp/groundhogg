@@ -7,6 +7,7 @@ use function Groundhogg\admin_page_url;
 use function Groundhogg\get_url_var;
 use function Groundhogg\gh_cron_installed;
 use function Groundhogg\html;
+use function Groundhogg\is_white_labeled;
 use function Groundhogg\white_labeled_name;
 
 function create_cron_job_instructions() {
@@ -202,10 +203,12 @@ switch ( $step ):
 				<?php if ( $cron_jobs_active ): ?>
 					<p>
 						🎉 <?php _e( "Yay! You have successfully configured your cron jobs! That wasn't so hard was it?", 'groundhogg' ); ?></p>
-					<?php html()->e( 'a', [
-						'href'  => admin_page_url( 'groundhogg' ),
-						'class' => 'button button-primary'
-					], __( 'Finish', 'groundhogg' ), false, true ); ?>
+					<?php if ( ! is_white_labeled() ){
+						html()->e( 'a', [
+							'href'  => admin_page_url( 'groundhogg' ),
+							'class' => 'button button-primary'
+						], __( 'Finish', 'groundhogg' ), false, true );
+					} ?>
 				<?php else: ?>
 					<p><?php _e( "Uh oh... one or more of your cron jobs could not be verified. Please re-check your setup and click the button below to re-verify.", 'groundhogg' ); ?></p>
 					<?php
