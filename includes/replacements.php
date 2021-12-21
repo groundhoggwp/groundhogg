@@ -332,6 +332,14 @@ class Replacements implements \JsonSerializable {
 				'description' => _x( 'Insert all the files in a contact\'s file box.', 'replacement', 'groundhogg' ),
 			],
 			[
+				'code'        => 'GET',
+				'group'       => 'other',
+				'callback'    => [ $this, 'replacement_get_params' ],
+				'name'        => __( '$_GET', 'groundhogg' ),
+				'default_args' => 'url_param',
+				'description' => _x( 'Retrieve something from the URL query string. Only works on the frontend.', 'replacement', 'groundhogg' ),
+			],
+			[
 				'code'        => 'groundhogg_day_quote',
 				'group'       => 'other',
 				'name'        => __( 'Groundhog Day Quote', 'groundhogg' ),
@@ -763,6 +771,17 @@ class Replacements implements \JsonSerializable {
 		}
 
 		return print_r( $rep, true );
+	}
+
+	/**
+	 * Get something from $_GET
+	 *
+	 * @param $key
+	 *
+	 * @return mixed
+	 */
+	public function replacement_get_params( $key ){
+		return get_url_var( $key );
 	}
 
 
