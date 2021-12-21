@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.8
 Requires PHP: 7.1
-Stable tag: 2.5.7.4
+Stable tag: 2.5.7.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -320,6 +320,12 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.5.7.5 (2021-12-21) =
+* ADDED New $_GET `{GET.url_param}` replacement code for frontend usage in `[ghr]` shortcodes and in forms.
+* ADDED logs table for debugging. Not hooked up to anything yet but I'm sure it will be useful in the future.
+* TWEAKED Adjacent starting benchmarks now count towards the conversion rate of a funnel instead of just the first one.
+* TWEAKED Hide the finish link during cron setup for White label installs.
 
 = 2.5.7.4 (2021-11-30) =
 * ADDED Birthday search filter
