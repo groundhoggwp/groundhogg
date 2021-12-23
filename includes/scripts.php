@@ -160,10 +160,10 @@ class Scripts {
 		wp_deregister_script( 'chart-js' );
 		wp_register_script( 'chart-js', GROUNDHOGG_ASSETS_URL . 'lib/chart/Chart.bundle.min.js' );
 
-		wp_register_script( 'moment-js', GROUNDHOGG_ASSETS_URL . 'lib/calendar/js/moment.min.js' );
+//		wp_register_script( 'moment-js', GROUNDHOGG_ASSETS_URL . 'lib/calendar/js/moment.min.js' );
 
 		wp_register_script( 'baremetrics-calendar', GROUNDHOGG_ASSETS_URL . 'lib/calendar/js/Calendar.min.js', [
-			'moment-js'
+			'moment'
 		] );
 
 		wp_register_script( 'groundhogg-admin-functions', GROUNDHOGG_ASSETS_URL . 'js/admin/functions' . $dot_min . '.js', [
@@ -229,6 +229,7 @@ class Scripts {
 			'groundhogg-admin-element',
 			'groundhogg-admin-functions',
 			'groundhogg-admin-search-filters',
+			'moment'
 		] );
 
 		wp_register_script( 'groundhogg-admin-formatting', GROUNDHOGG_ASSETS_URL . '/js/admin/formatting' . $dot_min . '.js' );
@@ -327,6 +328,7 @@ class Scripts {
 			'jquery',
 			'chart-js',
 			'baremetrics-calendar',
+			'moment',
 			'groundhogg-admin'
 		], GROUNDHOGG_VERSION, true );
 
