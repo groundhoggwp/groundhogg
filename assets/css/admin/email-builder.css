@@ -1,0 +1,222 @@
+.alignleft {
+  margin-right: 10px;
+}
+
+.alignright {
+  margin-left: 10px;
+}
+
+#email-block-editor {
+  display: flex;
+  max-height: calc(100vh - 132px);
+}
+#email-block-editor * {
+  box-sizing: border-box;
+}
+#email-block-editor #blocks-panel {
+  padding: 0 20px;
+}
+#email-block-editor .block-wrap .block-name {
+  text-align: center;
+  font-weight: 300;
+}
+#email-block-editor .block-wrap:not(:last-child) {
+  margin-bottom: 10px;
+}
+#email-block-editor .block {
+  height: 60px;
+  width: 60px;
+  padding: 10px;
+  border-radius: 5px;
+  background: #FFFFFF;
+  cursor: grab;
+  margin-bottom: 5px;
+}
+#email-block-editor .block .icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#email-block-editor .block .icon svg {
+  height: 100%;
+  width: 100%;
+}
+#email-block-editor #content {
+  width: 100%;
+  background: #FFFFFF;
+  overflow: auto;
+}
+#email-block-editor #content #builder-content {
+  max-width: 640px;
+}
+#email-block-editor #content #builder-content.center {
+  margin: auto;
+}
+#email-block-editor #content #builder-content img {
+  max-width: 100%;
+}
+#email-block-editor #content #builder-content .block-placeholder {
+  background-color: rgba(0, 117, 255, 0.5);
+  border-radius: 2px;
+  width: 100%;
+  height: 5px;
+  margin: 15px 0;
+  box-sizing: border-box;
+}
+#email-block-editor #content #builder-content .builder-block {
+  position: relative;
+  padding: 5px;
+}
+#email-block-editor #content #builder-content .builder-block[data-type=image] .ui-wrapper {
+  display: inline-block;
+}
+#email-block-editor #content #builder-content .builder-block .block-toolbar {
+  display: none;
+}
+#email-block-editor #content #builder-content .builder-block .maybe-edit-text {
+  position: relative;
+}
+#email-block-editor #content #builder-content .builder-block .maybe-edit-text button.edit-text-content {
+  display: none;
+}
+#email-block-editor #content #builder-content .builder-block .maybe-edit-text:hover button.edit-text-content {
+  display: inline-block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+#email-block-editor #content #builder-content .builder-block .email-button {
+  display: inline-block;
+}
+#email-block-editor #content #builder-content .builder-block .email-columns td {
+  padding: 0 5px;
+}
+#email-block-editor #content #builder-content .builder-block .email-columns td:first-child {
+  padding-left: 0;
+}
+#email-block-editor #content #builder-content .builder-block .email-columns td:last-child {
+  padding-right: 0;
+}
+#email-block-editor #content #builder-content .builder-block img {
+  display: inline-block;
+}
+#email-block-editor #content #builder-content .builder-block .column.empty {
+  background-color: rgba(16, 38, 64, 0.05);
+  border-radius: 5px;
+  padding: 20px;
+}
+#email-block-editor #content #builder-content .builder-block:hover {
+  outline: 2px solid #c8c8c8;
+}
+#email-block-editor #content #builder-content .builder-block:hover > .block-toolbar {
+  display: flex;
+  position: absolute;
+  right: 50%;
+  transform: translateX(50%);
+  left: auto;
+  top: -22px;
+  background-color: #c8c8c8;
+  border-radius: 5px 5px 0 0;
+  z-index: 99;
+}
+#email-block-editor #content #builder-content .builder-block.is-editing {
+  outline: 2px solid #0075ff;
+}
+#email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar {
+  display: flex;
+  position: absolute;
+  transform: translateX(50%);
+  right: 50%;
+  left: auto;
+  top: -22px;
+  background-color: #0075ff;
+  border-radius: 5px 5px 0 0;
+  z-index: 99;
+}
+#email-block-editor #controls-panel {
+  width: 400px;
+  padding: 0 10px;
+}
+#email-block-editor #controls-panel h3 {
+  padding-left: 10px;
+}
+#email-block-editor #controls-panel .control-group:not(:last-child) {
+  margin-bottom: 20px;
+}
+#email-block-editor #controls-panel .control-group .control-group-header {
+  padding: 10px;
+  cursor: pointer;
+}
+#email-block-editor #controls-panel .control-group .control-group-header h4.control-group-name {
+  margin: 0;
+  font-size: 16px;
+}
+#email-block-editor #controls-panel .control-group.closed .controls {
+  display: none;
+}
+#email-block-editor #controls-panel .control-group.closed .control-group-header span {
+  transform: rotate(180deg);
+}
+#email-block-editor #controls-panel .control-group .controls {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#email-block-editor #controls-panel .control-group .controls label {
+  font-weight: 500;
+}
+#email-block-editor #controls-panel .control-group .controls .layouts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-auto-rows: 1fr;
+  gap: 10px 10px;
+  grid-auto-flow: row;
+  grid-template-areas: ". ." ". .";
+}
+#email-block-editor #controls-panel .control-group .controls .layout-choice {
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+}
+#email-block-editor #controls-panel .control-group .controls .layout-choice:hover {
+  background-color: rgba(0, 117, 255, 0.2);
+}
+#email-block-editor #controls-panel .control-group .controls .layout-choice.selected {
+  background-color: rgba(0, 117, 255, 0.5);
+}
+#email-block-editor #controls-panel .control-group .controls .layout-choice svg {
+  width: 100%;
+}
+#email-block-editor #controls-panel .control-input {
+  max-width: 75px;
+}
+#email-block-editor #controls-panel .wp-picker-container.wp-picker-active {
+  position: relative;
+}
+#email-block-editor #controls-panel .wp-picker-container.wp-picker-active .wp-picker-holder,
+#email-block-editor #controls-panel .wp-picker-container.wp-picker-active .wp-picker-input-wrap {
+  position: absolute;
+  z-index: 99;
+  right: 0;
+  top: 30px;
+}
+#email-block-editor #controls-panel .wp-picker-container.wp-picker-active .wp-picker-input-wrap {
+  display: flex;
+  box-sizing: border-box;
+  width: 202px;
+  background-color: #FFFFFF;
+  border: 1px solid #dcdcde;
+  border-bottom: none;
+  padding: 6px;
+}
+#email-block-editor #controls-panel .wp-picker-container.wp-picker-active .wp-picker-holder {
+  top: 65px;
+}
+#email-block-editor #controls-panel .wp-picker-container.wp-picker-active .wp-picker-holder .iris-picker {
+  border-top: none;
+}
+
+/*# sourceMappingURL=email-builder.css.map */
