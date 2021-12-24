@@ -58,12 +58,21 @@ body {
   }
 }
 
+#wpfooter{
+  display: none;
+}
 
 #email-editor {
 
+  position: fixed;
+  left: 160px;
+  top: 32px;
+  bottom: 0;
+  right: 0;
+
   input[type=text],
   select {
-    width: 100%;
+    max-width: 100%;
   }
 
   .email-editor-p {
@@ -115,12 +124,6 @@ body {
       gap: 10px;
       justify-content: space-between;
     }
-  }
-
-  &-body {
-    display: flex;
-    gap: $margin;
-    padding: 0 20px;
   }
 
   &-main {

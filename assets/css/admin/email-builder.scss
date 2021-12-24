@@ -1,0 +1,314 @@
+$primary-blue: rgb(0, 117, 255);
+$primary-blue-60: rgba(0, 117, 255, 0.60);
+$primary-blue-50: rgba(0, 117, 255, 0.50);
+$primary-blue-20: rgba(0, 117, 255, 0.20);
+$primary-blue-10: rgba(0, 117, 255, 0.10);
+$primary-blue-7: rgba(0, 117, 255, 0.07);
+$primary-blue-2: rgba(0, 117, 255, 0.02);
+$primary-dark: rgb(16, 38, 64);
+$primary-dark-50: rgba(16, 38, 64, 0.5);
+$primary-dark-30: rgba(16, 38, 64, 0.3);
+$primary-dark-15: rgba(16, 38, 64, 0.15);
+$primary-dark-10: rgba(16, 38, 64, 0.10);
+$primary-dark-5: rgba(16, 38, 64, 0.05);
+$error-red: rgb(233, 31, 79);
+$error-red-50: rgba(233, 31, 79, 0.5);
+$error-red-10: rgba(233, 31, 79, 0.10);
+$secondary-purple: rgb(108, 25, 173);
+$alert-yellow: rgb(255, 238, 88);
+$benchmark-orange: rgb(245, 129, 21);
+$benchmark-orange-50: rgba(245, 129, 21, 0.50);
+$action-green: rgb(158, 206, 56);
+$action-green-50: rgba(158, 206, 56, 0.5);
+$box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+
+.alignleft{
+  margin-right: 10px;
+}
+
+.alignright{
+  margin-left: 10px;
+}
+
+#email-block-editor {
+  display: flex;
+  max-height: calc(100vh - 132px);
+
+  *{
+    box-sizing: border-box;
+  }
+
+  #blocks-panel {
+    padding: 0 20px;
+  }
+
+  .block-wrap{
+    .block-name {
+      text-align: center;
+      font-weight: 300;
+    }
+    &:not(:last-child) {
+      margin-bottom: 10px;
+    }
+  }
+
+
+
+  .block {
+    height: 60px;
+    width: 60px;
+    padding: 10px;
+    border-radius: 5px;
+    background: #FFFFFF;
+    cursor: grab;
+    margin-bottom: 5px;
+
+    .icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      svg {
+        height: 100%;
+        width: 100%;
+      }
+    }
+  }
+
+  #content {
+    width: 100%;
+    background: #FFFFFF;
+    overflow: auto;
+
+    #builder-content {
+
+      &.center{
+        margin: auto;
+      }
+
+      max-width: 640px;
+
+      img{
+        max-width: 100%;
+      }
+
+      .block-placeholder {
+        background-color: $primary-blue-50;
+        border-radius: 2px;
+        width: 100%;
+        height: 5px;
+        margin: 15px 0;
+        box-sizing: border-box;
+      }
+
+      .builder-block {
+        position: relative;
+        padding: 5px;
+
+        &[data-type="image"] .ui-wrapper {
+          display: inline-block;
+        }
+
+        .block-toolbar {
+          display: none;
+        }
+
+        .maybe-edit-text{
+          position: relative;
+          button.edit-text-content{
+            display: none;
+          }
+          &:hover button.edit-text-content{
+            display: inline-block;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translateX(-50%) translateY(-50%);
+          }
+        }
+
+        .email-button {
+          display: inline-block;
+        }
+
+        .email-columns {
+
+          td {
+            padding: 0 5px;
+            //text-align: left;
+
+            &:first-child{
+              padding-left: 0;
+            }
+
+            &:last-child{
+              padding-right: 0;
+            }
+          }
+
+        }
+
+
+
+        img {
+          display: inline-block;
+        }
+
+        .column.empty {
+          background-color: $primary-dark-5;
+          border-radius: 5px;
+          padding: 20px;
+        }
+
+        &:hover {
+          //transition: 0.4s;
+          outline: 2px solid rgb(200,200,200);
+
+          > .block-toolbar {
+            display: flex;
+            position: absolute;
+            right: 50%;
+            transform: translateX(50%);
+            left: auto;
+            top: -22px;
+            background-color: rgb(200,200,200);
+            border-radius: 5px 5px 0 0;
+            z-index: 99;
+          }
+        }
+
+        &.is-editing {
+          //transition: 0.4s;
+          outline: 2px solid $primary-blue;
+
+          > .block-toolbar {
+            display: flex;
+            position: absolute;
+            transform: translateX(50%);
+            right: 50%;
+            left: auto;
+            top: -22px;
+            background-color: $primary-blue;
+            border-radius: 5px 5px 0 0;
+            z-index: 99;
+          }
+        }
+      }
+    }
+  }
+
+  #controls-panel {
+    width: 400px;
+    padding: 0 10px;
+
+    h3{
+      padding-left: 10px;
+    }
+
+    .control-group {
+
+      &:not(:last-child) {
+        margin-bottom: 20px;
+      }
+
+      .control-group-header {
+        padding: 10px;
+        cursor: pointer;
+
+        h4.control-group-name {
+          margin: 0;
+          font-size: 16px;
+        }
+      }
+
+      &.closed {
+        .controls {
+          display: none;
+        }
+
+        .control-group-header span {
+          transform: rotate(180deg);
+        }
+      }
+
+      .controls {
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        label{
+          font-weight: 500;
+        }
+
+        .layouts {  display: grid;
+          grid-template-columns: 1fr 1fr;
+          grid-template-rows: 1fr 1fr;
+          grid-auto-rows: 1fr;
+          gap: 10px 10px;
+          grid-auto-flow: row;
+          grid-template-areas:
+    ". ."
+    ". .";
+        }
+
+
+        .layout-choice{
+
+          &:hover{
+            background-color: $primary-blue-20;
+          }
+
+          &.selected{
+            background-color: $primary-blue-50;
+          }
+
+          border: none;
+          padding: 10px;
+          border-radius: 5px;
+
+          svg{
+            width: 100%;
+          }
+        }
+      }
+    }
+
+    .control-input {
+      max-width: 75px;
+    }
+
+    .wp-picker-container.wp-picker-active {
+      position: relative;
+
+      .wp-picker-holder,
+      .wp-picker-input-wrap {
+        position: absolute;
+        z-index: 99;
+        right: 0;
+        top: 30px;
+      }
+
+      .wp-picker-input-wrap{
+        display: flex;
+        box-sizing: border-box;
+        width: 202px;
+        background-color: #FFFFFF;
+        border: 1px solid #dcdcde;
+        border-bottom: none;
+        padding: 6px;
+      }
+
+      .wp-picker-holder {
+        top: 65px;
+
+        .iris-picker{
+          border-top: none;
+        }
+      }
+
+
+    }
+
+  }
+}

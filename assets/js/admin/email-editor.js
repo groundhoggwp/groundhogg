@@ -14,6 +14,7 @@
     isValidEmail,
     adminPageURL,
     modal,
+    tooltip,
     dialog,
     loadingDots,
     moreMenu,
@@ -67,20 +68,7 @@
 					${this.components.header.call(this)}
 				</div>
 				<div id="email-editor-body">
-					<div id="email-editor-main">
-						<div id="email-editor-content">
-							${this.components.content.call(this)}
-						</div>
-						<div id="email-editor-content-editor">
-							${this.components.contentEditor.call(this)}
-						</div>
-						<div id="email-editor-advanced">
-							${this.components.controls.call(this)}
-						</div>
-					</div>
-					<div id="email-editor-sidebar">
-						${this.components.sidebar.call(this)}
-					</div>
+
 				</div>
 			</div>
         `
@@ -170,87 +158,6 @@
 			</div>`
       },
 
-      sidebar () {
-        const message_typeOptions = {
-          marketing: 'Marketing',
-          transactional: 'Transactional',
-        }
-
-        const {
-          reply_to_override = '',
-          alignment = 'left',
-          from_user = 0,
-          message_type = 'marketing',
-        } = this.edited.meta
-
-        // language=HTML
-        return `
-			<div class="gh-panel">
-				<div class="inside">
-					<div id="email-editor-sidebar-controls" class="gh-button-group">
-						<button id="send-test" class="gh-button secondary">Send test email</button>
-						<button data-device="mobile" class="show-preview gh-button secondary">
-							${icons.smartphone}
-						</button>
-						<button data-device="desktop" class="show-preview gh-button secondary">
-							${icons.desktop}
-						</button>
-					</div>
-					<p>
-						<label class="">Send this email from:</label>
-						${select(
-							{
-								id: 'from-user',
-								name: 'from_user',
-							},
-							Groundhogg.filters.owners.map((owner) => ({
-								text: owner.data.user_email,
-								value: owner.ID,
-							})),
-							from_user
-						)}
-					</p>
-					<p>
-						<label class="">Replies are sent to:</label>
-						${input({
-							id: 'reply-to',
-							name: 'reply_to_override',
-							value: reply_to_override,
-						})}
-					</p>
-					<div id="email-editor-sidebar-options">
-						<div>
-							<label class="">Alignment:</label>
-							<button id="align-left" data-alignment="left"
-							        class="change-alignment gh-button ${
-								        alignment === 'left' ? 'primary' : 'secondary'
-							        }">
-								${icons.alignLeft}
-							</button>
-							<button id="align-center" data-alignment="center"
-							        class="change-alignment gh-button ${
-								        alignment === 'center' ? 'primary' : 'secondary'
-							        }">
-								${icons.alignCenter}
-							</button>
-						</div>
-						<div id="email-editor-sidebar-message_type">
-							<label class="">Messaging type:</label>
-							${select(
-								{
-									id: 'message-type',
-									name: 'message_type',
-								},
-								message_typeOptions,
-								message_type
-							)}
-						</div>
-					</div>
-				</div>
-			</div>
-        `
-      },
-
       controls () {
         // language=HTML
         return `
@@ -267,7 +174,6 @@
     abortController: null,
 
     autoSaveChanges () {
-      this.saveUndoState()
 
       if (this.autoSaveTimeout) {
         clearTimeout(this.autoSaveTimeout)
@@ -294,7 +200,22 @@
     },
 
     hasChanges () {
-      return !objectEquals(this.email.data, this.edited.data)
+
+      const ignoreProps = ['status']
+
+      for (let prop in this.edited.data) {
+
+        // ignore these keys
+        if (ignoreProps.includes(prop)) {
+          continue
+        }
+
+        if (this.email.data[prop] !== this.edited.data[prop]) {
+          return true
+        }
+      }
+
+      return false
     },
 
     update (data) {
@@ -310,13 +231,15 @@
     },
 
     commitChanges () {
+
       if (this.autoSaveTimeout) {
         clearTimeout(this.autoSaveTimeout)
       } else if (this.abortController) {
         this.abortController.abort()
       }
 
-      const { close } = savingModal()
+      $('#commit').text(__('Updating', 'groundhogg')).prop('disabled', true)
+      const { stop } = loadingDots('#commit')
 
       return EmailsStore.patch(this.email.ID, {
         data: {
@@ -334,7 +257,10 @@
         this.loadEmail(e)
         this.mount()
         onCommit(e)
-        close()
+        stop()
+        dialog({
+          message: __('Email updated!', 'groundhogg')
+        })
       }).catch((e) => {
         dialog({
           type: 'error',
@@ -344,15 +270,22 @@
     },
 
     updateEmailData (newData) {
+      this.updateEmail(newData, {})
+    },
+
+    updateEmailMeta (newMeta) {
+      this.updateEmail({}, newMeta)
+    },
+
+    updateEmail (newData = {}, newMeta = {}) {
+
+      this.saveUndoState()
+
       this.edited.data = {
         ...this.edited.data,
         ...newData,
       }
 
-      this.autoSaveChanges()
-    },
-
-    updateEmailMeta (newMeta) {
       this.edited.meta = {
         ...this.edited.meta,
         ...newMeta,
@@ -368,7 +301,6 @@
     },
 
     mount () {
-      improveTinyMCE()
 
       if (this.mounted) {
         this.demount()
@@ -381,9 +313,18 @@
       this.onMount()
     },
 
-    loadEmail (email) {
-      // console.log(email)
+    remount () {
+      if (this.mounted) {
+        this.demount()
+      }
 
+      this.mounted = true
+
+      this.$el.html(this.render())
+      this.onMount()
+    },
+
+    loadEmail (email) {
       this.email = copyObject(email)
 
       if (email.meta.edited) {
@@ -430,13 +371,6 @@
             handleContentOnChange
           )
         }
-
-        $('#subject, #preview-text').on('change', (e) => {
-          this.updateEmailData({
-            [e.target.name]: e.target.value,
-          })
-          mountHeader()
-        })
 
         const getHeadersArray = () => {
           const { custom_headers = {} } = this.edited.meta
@@ -629,11 +563,11 @@
 				<p>${__('This action cannot be undone. Are you sure?', 'groundhogg')}</p>`,
                 confirmText: __('Delete'),
                 onConfirm: () => {
-                  EmailsStore.delete( this.email.ID ).then(() => {
+                  EmailsStore.delete(this.email.ID).then(() => {
                     dialog({
-                      message: __( 'Email deleted!', 'groundhogg' )
+                      message: __('Email deleted!', 'groundhogg')
                     })
-                    window.location.href = adminPageURL( 'gh_emails' )
+                    window.location.href = adminPageURL('gh_emails')
                   })
                 }
               })
@@ -668,18 +602,18 @@
               break
             case 'send':
 
-              if ( this.email.data.status !== 'ready' ){
+              if (this.email.data.status !== 'ready') {
                 confirmationModal({
                   alert: `<p>${__('Before this email can be sent it must be published. Would you like to publish it now?', 'groundhogg')}<p>`,
-                  confirmText: __( 'Publish' ),
+                  confirmText: __('Publish'),
                   onConfirm: () => {
                     this.commitChanges().then(() => {
-                      handleOnSelect( 'send' )
+                      handleOnSelect('send')
                     })
                   }
                 })
 
-                break;
+                break
               }
 
               const { close } = modal({
@@ -691,7 +625,7 @@
               }, {
                 onScheduled: () => {
                   dialog({
-                    message: __( 'Broadcast scheduled' )
+                    message: __('Broadcast scheduled')
                   })
                   close()
                 }
@@ -775,9 +709,19 @@
           $('.undo-and-redo .undo').focus()
         })
 
+        tooltip('.undo-and-redo .undo', {
+          content: __('Undo'),
+          position: 'bottom'
+        })
+
         $('.undo-and-redo .redo').on('click', (e) => {
           this.redo()
           $('.undo-and-redo .redo').focus()
+        })
+
+        tooltip('.undo-and-redo .redo', {
+          content: __('Redo'),
+          position: 'bottom'
         })
 
         if (!this.isEditingTitle) {
@@ -810,122 +754,220 @@
         onHeaderMount()
       }
 
-      const mountSidebar = () => {
-        $('#email-editor-sidebar').html(this.components.sidebar.call(this))
-        sidebarMount()
-      }
-
-      const sidebarMount = () => {
-
-        $('.show-preview').on('click', (e) => {
-
-          const device = e.currentTarget.dataset.device
-
-          modal({
-            content: `<iframe id="preview" class="${device}"></div>`
+      Groundhogg.EmailBlockEditor('#email-editor-body', {
+        email: this.edited,
+        scrollDepth: this.scrollDepth,
+        onScroll: (y) => { this.scrollDepth = y },
+        onMount: () => {
+          $('#subject, #preview-text').on('change', (e) => {
+            this.updateEmailData({
+              [e.target.name]: e.target.value,
+            })
+            mountHeader()
           })
+        },
+        emailControls: () => {
+          const message_typeOptions = {
+            marketing: __('Marketing', 'groundhogg'),
+            transactional: __('Transactional', 'groundhogg'),
+          }
 
           const {
-            built, edited_preview
-          } = this.email.context
+            reply_to_override = '',
+            alignment = 'left',
+            from_user = 0,
+            message_type = 'marketing',
+          } = this.edited.meta
 
-          setFrameContent($('#preview')[0], edited_preview || built)
+          // language=HTML
+          return `
+			  <div class="gh-panel">
+				  <div class="inside">
+					  <div id="email-editor-sidebar-controls" class="gh-button-group">
+						  <button id="send-test" class="gh-button secondary">${__('Send test email', 'groundhogg')}
+						  </button>
+						  <button data-device="mobile" class="show-preview gh-button secondary">
+							  ${icons.smartphone}
+						  </button>
+						  <button data-device="desktop" class="show-preview gh-button secondary">
+							  ${icons.desktop}
+						  </button>
+					  </div>
+					  <p>
+						  <label class="">${__('Send this email from:', 'groundhogg')}</label>
+						  ${select(
+							  {
+								  id: 'from-user',
+								  name: 'from_user',
+							  },
+							  Groundhogg.filters.owners.map((owner) => ({
+								  text: owner.data.user_email,
+								  value: owner.ID,
+							  })),
+							  from_user
+						  )}
+					  </p>
+					  <p>
+						  <label class="">${__('Replies are sent to:', 'grounhogg')}</label>
+						  ${input({
+							  id: 'reply-to',
+							  className: 'full-width',
+							  name: 'reply_to_override',
+							  value: reply_to_override,
+						  })}
+					  </p>
+					  <div id="email-editor-sidebar-options">
+						  <div>
+							  <label class="">${__('Alignment:', 'groundhogg')}</label>
+							  <button id="align-left" data-alignment="left"
+							          class="change-alignment gh-button ${
+								          alignment === 'left' ? 'primary' : 'secondary'
+							          }">
+								  ${icons.alignLeft}
+							  </button>
+							  <button id="align-center" data-alignment="center"
+							          class="change-alignment gh-button ${
+								          alignment === 'center' ? 'primary' : 'secondary'
+							          }">
+								  ${icons.alignCenter}
+							  </button>
+						  </div>
+						  <div id="email-editor-sidebar-message_type">
+							  <label class="">${__('Message type:')}</label>
+							  ${select(
+								  {
+									  id: 'message-type',
+									  name: 'message_type',
+								  },
+								  message_typeOptions,
+								  message_type
+							  )}
+						  </div>
+					  </div>
+				  </div>
+			  </div>
+          `
+        },
+        emailControlsOnMount: () => {
+          $('.show-preview').on('click', (e) => {
 
-        })
+            const device = e.currentTarget.dataset.device
 
-        $('#from-user')
-          .select2()
-          .on('change', (e) => {
-            this.updateEmailData({
-              from_user: e.target.value,
+            modal({
+              dialogClasses: 'no-padding',
+              content: `<iframe id="preview" class="${device}"></div>`
             })
-            mountHeader()
+
+            const {
+              built, edited_preview
+            } = this.email.context
+
+            setFrameContent($('#preview')[0], edited_preview || built)
+
           })
 
-        $('#message-type').on('change', (e) => {
-          this.updateEmailMeta({
-            message_type: e.target.value,
-          })
-          mountHeader()
-        })
+          $('#from-user')
+            .select2()
+            .on('change', (e) => {
+              this.updateEmailData({
+                from_user: parseInt(e.target.value),
+              })
+              mountHeader()
+            })
 
-        $('#reply-to').autocomplete({
-          change: (e) => {
+          $('#message-type').on('change', (e) => {
             this.updateEmailMeta({
-              reply_to_override: e.target.value,
+              message_type: e.target.value,
             })
             mountHeader()
-          },
-          source: [
-            '{owner_email}',
-            ...Groundhogg.filters.owners.map((u) => u.data.user_email),
-          ],
-        })
-
-        $('.change-alignment').on('click', (e) => {
-          this.updateEmailMeta({
-            alignment: e.currentTarget.dataset.alignment,
-          })
-          mountHeader()
-          mountSidebar()
-          $('#' + e.currentTarget.id).focus()
-        })
-
-        $('#send-test').on('click', (e) => {
-          if (!this.testEmailAddress) {
-            this.testEmailAddress = user_test_email
-          }
-
-          const modalContent = (isSending = false) => {
-            //language=HTML
-            return `<h2>Send a test email to the following address...</h2>
-			<div class="test-email-address-wrap">
-				${input({
-					type: 'email',
-					id: 'email-address',
-					name: 'email-address',
-					placeholder: 'Your email...',
-					disabled: isSending,
-					value: this.testEmailAddress,
-				})}
-				<button id="initiate-test" class="gh-button primary" ${
-					isSending ? 'disabled' : ''
-				}>
-					<span>${isSending ? 'Sending' : 'Send'}</span>
-				</button>
-			</div>`
-          }
-
-          const { $modal, close: closeModal, setContent } = modal({
-            content: modalContent(),
           })
 
-          $('#email-address').autocomplete({
-            source: Groundhogg.filters.owners.map((u) => u.data.user_email),
+          $('#reply-to').autocomplete({
             change: (e) => {
-              this.testEmailAddress = e.target.value
+              this.updateEmailMeta({
+                reply_to_override: e.target.value,
+              })
               mountHeader()
             },
+            source: [
+              '{owner_email}',
+              ...Groundhogg.filters.owners.map((u) => u.data.user_email),
+            ],
           })
 
-          $('#initiate-test').on('click', () => {
-            setContent(modalContent(true))
-            const { stop: stopDots } = loadingDots('#initiate-test')
+          $('.change-alignment').on('click', (e) => {
+            this.updateEmailMeta({
+              alignment: e.currentTarget.dataset.alignment,
+            })
+            this.remount()
+            $('#' + e.currentTarget.id).focus()
+          })
 
-            post(`${routes.v4.emails}/${this.email.ID}/test`, {
-              to: this.testEmailAddress,
-              edited: this.edited,
-            }).then((r) => {
-              stopDots()
-              setContent(`<p>Test sent to <b>${this.testEmailAddress}</b></p>`)
-              setTimeout(closeModal, 2000)
+          $('#send-test').on('click', (e) => {
+            if (!this.testEmailAddress) {
+              this.testEmailAddress = user_test_email
+            }
+
+            const modalContent = (isSending = false) => {
+              //language=HTML
+              return `<h2>Send a test email to the following address...</h2>
+			  <div class="test-email-address-wrap">
+				  ${input({
+					  type: 'email',
+					  id: 'email-address',
+					  name: 'email-address',
+					  placeholder: 'Your email...',
+					  disabled: isSending,
+					  value: this.testEmailAddress,
+				  })}
+				  <button id="initiate-test" class="gh-button primary" ${
+					  isSending ? 'disabled' : ''
+				  }>
+					  <span>${isSending ? 'Sending' : 'Send'}</span>
+				  </button>
+			  </div>`
+            }
+
+            const { $modal, close: closeModal, setContent } = modal({
+              content: modalContent(),
+            })
+
+            $('#email-address').autocomplete({
+              source: Groundhogg.filters.owners.map((u) => u.data.user_email),
+              change: (e) => {
+                this.testEmailAddress = e.target.value
+                mountHeader()
+              },
+            })
+
+            $('#initiate-test').on('click', () => {
+              setContent(modalContent(true))
+              const { stop: stopDots } = loadingDots('#initiate-test')
+
+              post(`${routes.v4.emails}/${this.email.ID}/test`, {
+                to: this.testEmailAddress,
+                edited: this.edited,
+              }).then((r) => {
+                stopDots()
+                setContent(`<p>Test sent to <b>${this.testEmailAddress}</b></p>`)
+                setTimeout(closeModal, 2000)
+              })
             })
           })
-        })
-      }
+        },
+        onChange: ({ css, html, blocks }) => {
 
-      mainContentMount()
-      sidebarMount()
+          this.updateEmail({
+            content: html
+          }, {
+            css,
+            blocks
+          })
+
+          mountHeader()
+        }
+      }).init()
+
       headerMounted()
     },
 
@@ -955,7 +997,15 @@
      * Saves the current state of the funnel for an undo slot
      */
     saveUndoState () {
+      this.clearRedoStates()
       this.undoStates.push(this.currentState())
+    },
+
+    /**
+     * Clear redo states
+     */
+    clearRedoStates () {
+      this.redoStates = []
     },
 
     /**
@@ -972,7 +1022,7 @@
 
       Object.assign(this, lastState)
 
-      this.mount()
+      this.remount()
     },
 
     /**
@@ -989,11 +1039,10 @@
 
       Object.assign(this, lastState)
 
-      this.mount()
+      this.remount()
     },
   })
 
   Groundhogg.EmailEditor = EmailEditor
 
-  
 })(jQuery)

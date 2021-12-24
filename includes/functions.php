@@ -3647,7 +3647,7 @@ function parse_inline_styles( $style ) {
 
 		$rule              = explode( ':', $bit );
 		$attribute         = sanitize_key( $rule[0] );
-		$value             = trim( $rule[1] );
+		$value             = trim( get_array_var( $rule, 1 ) );
 		$css[ $attribute ] = $value;
 	}
 
@@ -4765,9 +4765,9 @@ function track_live_activity( $type, $details = [] ) {
  * Log an activity conducted by the contact while they are performing actions on the site.
  * Uses the cookie details for reporting.
  *
- * @param string  $type    string, an activity identifier
- * @param array   $args    the details for the activity
- * @param array   $details details about that activity
+ * @param string             $type    string, an activity identifier
+ * @param array              $args    the details for the activity
+ * @param array              $details details about that activity
  * @param Contact|string|int $contact the contact to track
  */
 function track_activity( $contact, $type = '', $args = [], $details = [] ) {

@@ -91,6 +91,7 @@ class Emails_Page extends Admin_Page {
 				break;
 			case 'edit':
 				wp_enqueue_editor();
+				wp_enqueue_media();
 				wp_enqueue_code_editor( [
 					'type' => 'text/html'
 				] );

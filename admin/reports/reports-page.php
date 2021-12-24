@@ -111,8 +111,6 @@ class Reports_Page extends Tabbed_Admin_Page {
 			'dates'   => $dates
 		] );
 
-		// for compatibility
-		wp_deregister_script( 'moment' );
 	}
 
 	protected function get_reports_per_tab() {

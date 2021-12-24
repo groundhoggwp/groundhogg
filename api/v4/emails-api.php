@@ -4,10 +4,12 @@ namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
 use Groundhogg\Contact;
+use Groundhogg\Dynamic_Block_Handler;
 use Groundhogg\Email;
 use Groundhogg\Event;
 use Groundhogg\Plugin;
 use WP_REST_Server;
+use function Groundhogg\do_replacements;
 use function Groundhogg\email_kses;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_default_from_email;
@@ -50,6 +52,26 @@ class Emails_Api extends Base_Object_Api {
 				'callback'            => [ $this, 'sent_test' ],
 				'permission_callback' => [ $this, 'send_permissions_callback' ]
 			],
+		] );
+
+		register_rest_route( self::NAME_SPACE, "/{$route}/blocks/(?P<block_type>\w+)/", [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'render_block' ],
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
+			],
+		] );
+	}
+
+	public function render_block( \WP_REST_Request $request ) {
+
+		$block = $request->get_param( 'block_type' );
+		$props = $request->get_param( 'props' );
+
+		$html = Dynamic_Block_Handler::instance()->render_block( $block, $props );
+
+		return self::SUCCESS_RESPONSE( [
+			'html' => $html
 		] );
 	}
 
@@ -115,6 +137,8 @@ class Emails_Api extends Base_Object_Api {
 		if ( empty( $to ) && empty( $cc ) && empty( $bcc ) ) {
 			return self::ERROR_401( 'no_recipients', 'No recipients were defined.' );
 		}
+
+		// todo add replacements support
 
 		$from_email = sanitize_email( $request->get_param( 'from_email' ) ) ?: get_default_from_email();
 		$from_name  = sanitize_text_field( $request->get_param( 'from_name' ) ) ?: get_default_from_name();

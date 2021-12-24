@@ -1,14 +1,14 @@
 <?php
 
 ?>
-<div id="email-editor"></div>
+<div id="email-app"></div>
 <script>
   (function($){
 
     $(function(){
 
       Groundhogg.EmailEditor({
-        selector: '#email-editor',
+        selector: '#email-app',
         email: GroundhoggEmail,
         onChange: ( email ) => {
           // console.log( email )

@@ -244,11 +244,41 @@ span.gh-text.lg {
   font-size: 18px;
 }
 
+.gh-panel-tabs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.gh-panel-tabs .tab {
+  background-color: rgba(16, 38, 64, 0.1);
+  padding: 10px 20px;
+  border-radius: 2px 2px 0 0;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.gh-panel-tabs .tab:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: -1;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+}
+.gh-panel-tabs .tab.current {
+  background: #FFFFFF;
+}
+
 .gh-panel {
   background: #FFFFFF;
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
   /*margin: 20px;*/
   border-radius: 5px;
+}
+.gh-panel.has-tabs {
+  border-top-left-radius: 0;
 }
 .gh-panel .inside {
   padding: 20px;
@@ -345,6 +375,28 @@ button.gh-submit.primary:hover:not(:disabled).text {
   background-color: rgba(0, 117, 255, 0.1);
   color: #0075ff;
 }
+a.gh-button.tertiary, a.gh-submit.tertiary,
+button.gh-button.tertiary,
+button.gh-submit.tertiary {
+  background: #102640;
+}
+a.gh-button.tertiary.text, a.gh-submit.tertiary.text,
+button.gh-button.tertiary.text,
+button.gh-submit.tertiary.text {
+  background-color: transparent;
+  color: #102640;
+}
+a.gh-button.tertiary:hover:not(:disabled), a.gh-submit.tertiary:hover:not(:disabled),
+button.gh-button.tertiary:hover:not(:disabled),
+button.gh-submit.tertiary:hover:not(:disabled) {
+  background: #1a3e69;
+}
+a.gh-button.tertiary:hover:not(:disabled).text, a.gh-submit.tertiary:hover:not(:disabled).text,
+button.gh-button.tertiary:hover:not(:disabled).text,
+button.gh-submit.tertiary:hover:not(:disabled).text {
+  background-color: rgba(16, 38, 64, 0.1);
+  color: #102640;
+}
 a.gh-button.secondary, a.gh-submit.secondary,
 button.gh-button.secondary,
 button.gh-submit.secondary {
@@ -420,6 +472,7 @@ button.gh-submit.icon {
   padding: 7px;
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 a.gh-button.icon svg, a.gh-submit.icon svg,
 button.gh-button.icon svg,
@@ -1121,6 +1174,33 @@ p.error,
 .select2-container .select2-selection--single {
   height: auto;
   min-height: 28px;
+}
+
+.gh-tabs-provider .gh-tabs {
+  border-bottom: 1px solid rgba(16, 38, 64, 0.15);
+  padding: 10px 10px 0 10px;
+}
+.gh-tabs-provider .gh-tabs .gh-tab {
+  display: inline-block;
+  cursor: pointer;
+  padding: 8px 20px;
+  border-width: 1px 1px 0 1px;
+  border-style: solid;
+  border-color: rgba(16, 38, 64, 0.15);
+  background: rgba(16, 38, 64, 0.05);
+  font-weight: 500;
+  font-size: 16px;
+}
+.gh-tabs-provider .gh-tabs .gh-tab:not(:first-child) {
+  margin-left: 5px;
+}
+.gh-tabs-provider .gh-tabs .gh-tab.current {
+  background: #FFFFFF;
+  margin-bottom: -1px;
+  border-bottom: 1px solid #FFFFFF;
+}
+.gh-tabs-provider .gh-tab-content {
+  padding: 20px;
 }
 
 .contact-quick-edit {
