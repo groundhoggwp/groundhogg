@@ -54,10 +54,8 @@ function tool_tip_title () {
             end: moment(),
           }, {
             label: 'Last 3 months',
-            start: moment(this.latest_date).
-              subtract(3, 'month').
-              startOf('month'),
-            end: moment(this.latest_date).subtract(1, 'month').endOf('month'),
+            start: moment().subtract(3, 'month').startOf('month'),
+            end: moment().subtract(1, 'month').endOf('month'),
           }, {
             label: 'This year',
             start: moment().startOf('year'),
@@ -110,8 +108,12 @@ function tool_tip_title () {
 
       self.showLoader()
 
-      var start = moment(calendar.start_date).format('LL'),
-        end = moment(calendar.end_date).format('LL')
+      console.log(calendar)
+
+      var start = calendar.start_date.format('YYYY-MM-DD'),
+        end = calendar.end_date.format('YYYY-MM-DD')
+
+      console.log({start,end})
 
       $.ajax({
         type: 'post',
