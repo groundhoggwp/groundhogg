@@ -2366,9 +2366,9 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 				break;
 			case 'time_zone':
 				$zones = Plugin::$instance->utils->location->get_time_zones();
-				$code  = array_search( $value, $zones );
-				if ( $code ) {
-					$meta[ $field ] = $code;
+				// valid timezone
+				if ( key_exists( $value, $zones ) ) {
+					$meta[ $field ] = $value;
 				}
 				break;
 			case 'ip_address':
@@ -2670,9 +2670,9 @@ function generate_contact_with_map( $fields, $map = [] ) {
 				break;
 			case 'time_zone':
 				$zones = Plugin::$instance->utils->location->get_time_zones();
-				$code  = array_search( $value, $zones );
-				if ( $code ) {
-					$meta[ $field ] = $code;
+				// valid timezone
+				if ( key_exists( $value, $zones ) ) {
+					$meta[ $field ] = $value;
 				}
 				break;
 			case 'ip_address':

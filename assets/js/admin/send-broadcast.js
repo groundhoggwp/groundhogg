@@ -13,6 +13,7 @@
     loadingDots,
     adminPageURL,
     bold,
+    toggle,
     dialog
   } = Groundhogg.element
   const { emailPicker, searchesPicker } = Groundhogg.pickers
@@ -79,7 +80,8 @@
 		  <div class="gh-rows-and-columns">
 			  <div class="gh-row">
 				  <div class="gh-col">
-					  <label for="${elPrefix}-email">${__('Which email do you want to send?', 'groundhogg')}</label>
+					  <label
+						  for="${elPrefix}-email"><b>${__('Which email do you want to send?', 'groundhogg')}</b></label>
 					  ${select({
 						  name: 'email',
 						  id: `${elPrefix}-email`
@@ -105,7 +107,7 @@
         return `
 			<div class="gh-row">
 				<div class="gh-col">
-					<label for="${elPrefix}-date">${__('Set the date and time...', 'groundhogg')}</label>
+					<label for="${elPrefix}-date"><b>${__('Set the date and time...', 'groundhogg')}</b></label>
 					<div class="gh-input-group">
 						${input({
 							id: `${elPrefix}-date`,
@@ -122,6 +124,17 @@
 						})}
 					</div>
 				</div>
+			</div>
+			<div class="gh-row">
+				<div class="gh-col">
+					<label>${__('Send in the contact\'s local time?', 'groundhogg')} ${toggle({
+						onLabel: __('Yes'),
+						offLabel: __('No'),
+						id: `${elPrefix}-local-time`,
+						name: 'send_in_local_time',
+						checked: state.send_in_local_time
+					})}</label>
+				</div>
 			</div>`
       }
 
@@ -130,7 +143,8 @@
 		  <div class="gh-rows-and-columns">
 			  <div class="gh-row">
 				  <div class="gh-col">
-					  <label for="${elPrefix}-when">${__('When should this email be sent?', 'groundhogg')}</label>
+					  <label
+						  for="${elPrefix}-when"><b>${__('When should this email be sent?', 'groundhogg')}</b></label>
 					  <div class="gh-radio-group">
 						  <label>${input({
 							  type: 'radio',
@@ -343,6 +357,11 @@
               setState({ time: target.value })
               updateButton()
             })
+
+            $(`#${elPrefix}-local-time`).on('change', ({ target }) => {
+              setState({ send_in_local_time: target.checked })
+            })
+
             break
           case 2:
 
@@ -400,7 +419,9 @@
 
             showFrame()
 
-            $(`#${elPrefix}-confirm`).on('click', () => {
+            $(`#${elPrefix}-confirm`).on('click', ({ currentTarget }) => {
+
+              $(currentTarget).prop('disabled', true)
 
               const {
                 query = {},

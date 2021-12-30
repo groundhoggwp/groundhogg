@@ -5,7 +5,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
 Tested up to: 5.8
 Requires PHP: 7.1
-Stable tag: 2.5.7.7
+Stable tag: 2.5.7.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -320,6 +320,10 @@ Well, that's up to you! We'll never say Groundhogg is better than anyone, but it
 You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
 
 == Changelog ==
+
+= 2.5.7.8 (2021-12-30) =
+* FIXED "Send in local time" option missing for broadcasts.
+* FIXED Time zone mapping not working during bulk edit or importing contacts.
 
 = 2.5.7.7 (2021-12-24) =
 * FIXED Reports now showing correct data after switching moment distribution.
