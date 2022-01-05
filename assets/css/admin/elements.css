@@ -621,9 +621,8 @@ button.gh-submit.loud {
 }
 .gh-modal-loading {
   width: 200px;
-}
-.gh-modal-loading h1 {
-  text-align: center;
+  border-radius: 30px;
+  background: transparent !important;
 }
 .gh-modal-dialog {
   box-sizing: border-box;

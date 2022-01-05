@@ -13,6 +13,8 @@ function tool_tip_title () {
 }
 
 ( function (reporting, $, nonces) {
+  
+  const { loadingModal } = Groundhogg.element
 
   $.extend(reporting, {
 
@@ -106,14 +108,10 @@ function tool_tip_title () {
 
       var self = this
 
-      self.showLoader()
-
-      console.log(calendar)
+      let { close } = loadingModal()
 
       var start = calendar.start_date.format('YYYY-MM-DD'),
         end = calendar.end_date.format('YYYY-MM-DD')
-
-      console.log({start,end})
 
       $.ajax({
         type: 'post',
@@ -130,7 +128,9 @@ function tool_tip_title () {
 
           self.data = json.data.reports
           self.renderReports()
-          self.hideLoader()
+
+          close()
+
           $('.wrap').removeClass('blurred')
 
         },
@@ -335,17 +335,7 @@ function tool_tip_title () {
       }
 
       $report.html(html)
-    },
-
-    showLoader: function () {
-      $('.gh-loader-overlay').show()
-      $('.gh-loader').show()
-    },
-
-    hideLoader: function () {
-      $('.gh-loader-overlay').hide()
-      $('.gh-loader').hide()
-    },
+    }
 
   })
 

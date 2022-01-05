@@ -329,7 +329,8 @@ class Scripts {
 			'chart-js',
 			'baremetrics-calendar',
 			'moment',
-			'groundhogg-admin'
+			'groundhogg-admin',
+			'groundhogg-admin-element'
 		], GROUNDHOGG_VERSION, true );
 
 		wp_enqueue_script( 'groundhogg-admin-functions' );
@@ -356,6 +357,9 @@ class Scripts {
 		wp_add_inline_script( 'groundhogg-admin', 'var Groundhogg = ' . wp_json_encode( [
 				'locale'          => str_replace( '_', '-', get_locale() ),
 				'user_test_email' => get_user_test_email(),
+				'assets'          => [
+					'spinner' => is_white_labeled() ? GROUNDHOGG_ASSETS_URL . 'images/loading-gears.svg' : GROUNDHOGG_ASSETS_URL . 'images/groundhogg-spinner.svg',
+				],
 				'api'             => [
 					'routes' => [
 						'v3' => [
@@ -449,7 +453,8 @@ class Scripts {
 
 		wp_register_style( 'groundhogg-admin-reporting', GROUNDHOGG_ASSETS_URL . 'css/admin/reporting.css', [
 			'groundhogg-admin',
-			'baremetrics-calendar'
+			'baremetrics-calendar',
+			'groundhogg-admin-element'
 		], GROUNDHOGG_VERSION );
 
 		wp_register_style( 'groundhogg-admin-loader', GROUNDHOGG_ASSETS_URL . 'css/admin/loader.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );

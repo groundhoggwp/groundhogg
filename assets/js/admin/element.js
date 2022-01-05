@@ -692,22 +692,12 @@
    */
   const loadingModal = (text = 'Loading', props = {}) => {
 
-    let stop = () => {}
-    const { onOpen = () => {}, onClose = () => {} } = props
-
     return modal({
-      content: `<h1>${text}</h1>`,
+      content: `<object
+    data="${Groundhogg.assets.spinner}" type="image/svg+xml" width="100%"/>`,
       canClose: false,
       dialogClasses: 'gh-modal-loading',
       ...props,
-      onOpen: (args) => {
-        stop = loadingDots('.gh-modal h1').stop
-        onOpen(args)
-      },
-      onClose: (args) => {
-        stop()
-        onClose(args)
-      },
     })
   }
 

@@ -257,6 +257,9 @@ class Tracking {
 						break;
 					case 'click':
 						$this->doing_click = true;
+
+						$this->build_tracking_cookie();
+
 						$this->email_link_clicked( $target_url );
 						break;
 				}
@@ -264,7 +267,6 @@ class Tracking {
 				break;
 		}
 
-		$this->build_tracking_cookie();
 		die();
 	}
 
@@ -496,7 +498,7 @@ class Tracking {
 		}
 
 		$enc_cookie   = $_COOKIE[ self::TRACKING_COOKIE ];
-		$dec_cookie   = Plugin::$instance->utils->encrypt_decrypt( $enc_cookie, 'd' );
+		$dec_cookie   = decrypt( $enc_cookie );
 		$cookie_vars  = json_decode( $dec_cookie, true );
 		$cookie_vars  = apply_filters( 'groundhogg/tracking/get_cookie_vars', $cookie_vars );
 		$this->cookie = $cookie_vars;
@@ -509,7 +511,7 @@ class Tracking {
 		$cookie_vars = apply_filters( 'groundhogg/tracking/set_cookie_vars', $this->cookie );
 
 		$cookie = wp_json_encode( $cookie_vars );
-		$cookie = Plugin::$instance->utils->encrypt_decrypt( $cookie, 'e' );
+		$cookie = encrypt( $cookie );
 
 		$expiry = apply_filters( 'groundhogg/tracking/cookie_expiry', self::COOKIE_EXPIRY ) * DAY_IN_SECONDS;
 
