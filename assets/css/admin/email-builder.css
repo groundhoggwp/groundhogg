@@ -32,6 +32,9 @@
   cursor: grab;
   margin-bottom: 5px;
 }
+#email-block-editor .block.dragging {
+  cursor: grabbing;
+}
 #email-block-editor .block .icon {
   display: flex;
   align-items: center;
@@ -70,9 +73,6 @@
 #email-block-editor #content #builder-content .builder-block[data-type=image] .ui-wrapper {
   display: inline-block;
 }
-#email-block-editor #content #builder-content .builder-block .block-toolbar {
-  display: none;
-}
 #email-block-editor #content #builder-content .builder-block .maybe-edit-text {
   position: relative;
 }
@@ -106,11 +106,8 @@
   border-radius: 5px;
   padding: 20px;
 }
-#email-block-editor #content #builder-content .builder-block:hover {
-  outline: 2px solid #c8c8c8;
-}
-#email-block-editor #content #builder-content .builder-block:hover > .block-toolbar {
-  display: flex;
+#email-block-editor #content #builder-content .builder-block .block-toolbar {
+  display: none;
   position: absolute;
   right: 50%;
   transform: translateX(50%);
@@ -120,19 +117,22 @@
   border-radius: 5px 5px 0 0;
   z-index: 99;
 }
+#email-block-editor #content #builder-content .builder-block .block-toolbar .move-block {
+  cursor: grab;
+}
+#email-block-editor #content #builder-content .builder-block:hover {
+  outline: 2px solid #c8c8c8;
+}
+#email-block-editor #content #builder-content .builder-block:hover > .block-toolbar {
+  display: flex;
+  background-color: #c8c8c8;
+}
 #email-block-editor #content #builder-content .builder-block.is-editing {
   outline: 2px solid #0075ff;
 }
 #email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar {
   display: flex;
-  position: absolute;
-  transform: translateX(50%);
-  right: 50%;
-  left: auto;
-  top: -22px;
   background-color: #0075ff;
-  border-radius: 5px 5px 0 0;
-  z-index: 99;
 }
 #email-block-editor #controls-panel {
   width: 400px;

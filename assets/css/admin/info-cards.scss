@@ -29,6 +29,12 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
     .gh-info-card {
 
+        &.ui-sortable-helper{
+            .move{
+                cursor: grabbing !important;
+            }
+        }
+
         border-top: 1px solid $primary-dark-15;
         background: #FFFFFF;
 
@@ -36,7 +42,33 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
             border-bottom: 1px solid $primary-dark-15;
         }
 
+        &:hover{
+            .gh-info-card-header {
+                .actions{
+                    visibility: visible;
+                }
+            }
+        }
+
         .gh-info-card-header {
+
+            .actions{
+                visibility: hidden;
+
+                flex-grow: 1;
+                padding-right: 10px;
+
+                .move{
+                    cursor: grab;
+
+                    svg {
+                        height: 20px;
+                        width: 20px;
+                    }
+
+                    color: $primary-dark-50
+                }
+            }
 
             display: flex;
             gap: 10px;

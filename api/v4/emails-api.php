@@ -61,8 +61,39 @@ class Emails_Api extends Base_Object_Api {
 				'permission_callback' => [ $this, 'update_permissions_callback' ]
 			],
 		] );
+
+		register_rest_route( self::NAME_SPACE, "/{$route}/generate-alt-body/", [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'generate_alt_body' ],
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
+			],
+		] );
 	}
 
+	/**
+	 * Generate alt body based on given HTML content
+	 *
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function generate_alt_body( \WP_REST_Request $request ) {
+
+		$content = $request->get_param( 'content' );
+
+		return self::SUCCESS_RESPONSE( [
+			'alt_body' => wp_strip_all_tags( $content, false )
+		] );
+	}
+
+	/**
+	 * Render a dynamic block
+	 *
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return \WP_REST_Response
+	 */
 	public function render_block( \WP_REST_Request $request ) {
 
 		$block = $request->get_param( 'block_type' );

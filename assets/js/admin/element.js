@@ -458,6 +458,11 @@
 
         switch (attr) {
           case 'font-size':
+          case 'height':
+          case 'width':
+          case 'margin':
+          case 'padding':
+          case 'margin-top':
             if (isNumeric(val)) {
               val += 'px'
             }
@@ -1674,6 +1679,7 @@
   }
 
   const icons = {
+    drag: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle fill="currentColor" cx="8" cy="4" r="2"/><circle fill="currentColor" cx="8" cy="12" r="2"/><circle fill="currentColor" cx="8" cy="20" r="2"/><circle fill="currentColor" cx="16" cy="4" r="2"/><circle fill="currentColor" cx="16" cy="12" r="2"/><circle fill="currentColor" cx="16" cy="20" r="2"/></svg>`,
     // language=html
     image: `
 	    <svg xmlns="http://www.w3.org/2000/svg" style="enable-background:new 0 0 550.801 550.8" xml:space="preserve"

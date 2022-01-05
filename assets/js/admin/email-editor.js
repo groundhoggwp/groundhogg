@@ -775,8 +775,9 @@
           const {
             reply_to_override = '',
             alignment = 'left',
-            from_user = 0,
             message_type = 'marketing',
+            alt_body = '',
+            use_custom_alt_body = false
           } = this.edited.meta
 
           // language=HTML
@@ -795,17 +796,10 @@
 					  </div>
 					  <p>
 						  <label class="">${__('Send this email from:', 'groundhogg')}</label>
-						  ${select(
-							  {
-								  id: 'from-user',
-								  name: 'from_user',
-							  },
-							  Groundhogg.filters.owners.map((owner) => ({
-								  text: owner.data.user_email,
-								  value: owner.ID,
-							  })),
-							  from_user
-						  )}
+						  ${select({
+							  id: 'from-user',
+							  name: 'from_user',
+						  })}
 					  </p>
 					  <p>
 						  <label class="">${__('Replies are sent to:', 'grounhogg')}</label>
@@ -846,6 +840,20 @@
 					  </div>
 				  </div>
 			  </div>
+			  <div class="gh-panel" style="margin-top: 20px">
+				  <div class="inside">
+					  <div class="space-between">
+						  <label>${__('Send a plain text version', 'groundhogg')}</label>
+						  ${toggle({
+							  id: 'toggle-plain-text',
+							  onLabel: __('Yes'),
+							  offLabel: __('No'),
+							  checked: use_custom_alt_body
+						  })}
+					  </div>
+					  ${use_custom_alt_body ? `<button class="gh-button secondary" id="edit-plain-text">${__('Edit plain text version')}</button>` : ''}
+				  </div>
+			  </div>
           `
         },
         emailControlsOnMount: () => {
@@ -866,14 +874,77 @@
 
           })
 
-          $('#from-user')
-            .select2()
-            .on('change', (e) => {
-              this.updateEmailData({
-                from_user: parseInt(e.target.value),
-              })
-              mountHeader()
+          $('#toggle-plain-text').on('change', (e) => {
+            this.updateEmailMeta({
+              use_custom_alt_body: e.target.checked,
             })
+            this.remount()
+          })
+
+          $('#edit-plain-text').on('click', (e) => {
+
+            const altBodyEditor = () => {
+              // language=HTML
+              return `
+				  <div class="space-between">
+					  <h3>${__('Edit plain text version', 'groundhogg')}</h3>
+              <button class="gh-button secondary" id="generate-alt-body">${__('Generate', 'groundhogg')}</button>
+				  </div>
+				  ${textarea({
+                value: this.edited.meta.alt_body || '',
+                id: 'plain-text-copy',
+                style: {
+                  width: 500,
+                  height: 500
+                }
+              })}`
+            }
+
+            modal({
+              // language=HTML
+              content: altBodyEditor(),
+              onOpen: ({setContent}) => {
+
+                $('#generate-alt-body').on('click', () => {
+
+                  post( `${routes.v4.emails}/generate-alt-body`, {
+                    content: this.edited.data.content
+                  } ).then( ({alt_body}) => {
+                    this.updateEmailMeta({
+                      alt_body
+                    })
+                    setContent(altBodyEditor())
+
+                  } )
+                })
+
+                $('#plain-text-copy').on('change input', (e) => {
+                  this.updateEmailMeta({
+                    alt_body: e.target.value
+                  })
+                })
+
+              }
+            })
+          })
+
+          const {
+            from_user = 0,
+          } = this.edited.data
+
+          $('#from-user')
+            .select2({
+              data: Groundhogg.filters.owners.map((owner) => ({
+                text: owner.data.user_email,
+                id: owner.ID,
+                selected: owner.ID == from_user
+              }))
+            }).on('change', (e) => {
+            this.updateEmailData({
+              from_user: parseInt(e.target.value),
+            })
+            mountHeader()
+          })
 
           $('#message-type').on('change', (e) => {
             this.updateEmailMeta({

@@ -6,14 +6,33 @@
   border-top: 1px solid rgba(16, 38, 64, 0.15);
   background: #FFFFFF;
 }
+.gh-info-card-provider .gh-info-card.ui-sortable-helper .move {
+  cursor: grabbing !important;
+}
 .gh-info-card-provider .gh-info-card:last-child {
   border-bottom: 1px solid rgba(16, 38, 64, 0.15);
+}
+.gh-info-card-provider .gh-info-card:hover .gh-info-card-header .actions {
+  visibility: visible;
 }
 .gh-info-card-provider .gh-info-card .gh-info-card-header {
   display: flex;
   gap: 10px;
   align-items: center;
   cursor: pointer;
+}
+.gh-info-card-provider .gh-info-card .gh-info-card-header .actions {
+  visibility: hidden;
+  flex-grow: 1;
+  padding-right: 10px;
+}
+.gh-info-card-provider .gh-info-card .gh-info-card-header .actions .move {
+  cursor: grab;
+  color: rgba(16, 38, 64, 0.5);
+}
+.gh-info-card-provider .gh-info-card .gh-info-card-header .actions .move svg {
+  height: 20px;
+  width: 20px;
 }
 .gh-info-card-provider .gh-info-card .gh-info-card-header .gh-info-card-title {
   font-weight: 500;
@@ -225,10 +244,12 @@ div.info-card.postbox {
   color: #aaaaaa;
 }
 
+.basic-details .red,
 .ic-section-content .red {
   color: #a00;
 }
 
+.basic-details .green,
 .ic-section-content .green {
   color: #218838;
 }

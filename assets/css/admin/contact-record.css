@@ -30,11 +30,9 @@
 #contact-stuff .avatar {
   display: block;
   border-radius: 10px;
-  margin: 20px auto;
 }
 #contact-stuff .full-name, #contact-stuff .email-address {
   font-size: 16px;
-  text-align: center;
 }
 #contact-stuff .contact-actions {
   display: flex;

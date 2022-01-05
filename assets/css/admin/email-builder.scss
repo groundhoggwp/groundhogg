@@ -52,8 +52,6 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     }
   }
 
-
-
   .block {
     height: 60px;
     width: 60px;
@@ -62,6 +60,10 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     background: #FFFFFF;
     cursor: grab;
     margin-bottom: 5px;
+
+    &.dragging{
+      cursor: grabbing;
+    }
 
     .icon {
       display: flex;
@@ -107,10 +109,6 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
         &[data-type="image"] .ui-wrapper {
           display: inline-block;
-        }
-
-        .block-toolbar {
-          display: none;
         }
 
         .maybe-edit-text{
@@ -160,20 +158,29 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
           padding: 20px;
         }
 
+        .block-toolbar {
+          display: none;
+          position: absolute;
+          right: 50%;
+          transform: translateX(50%);
+          left: auto;
+          top: -22px;
+          background-color: rgb(200,200,200);
+          border-radius: 5px 5px 0 0;
+          z-index: 99;
+
+          .move-block{
+            cursor: grab;
+          }
+        }
+
         &:hover {
           //transition: 0.4s;
           outline: 2px solid rgb(200,200,200);
 
           > .block-toolbar {
             display: flex;
-            position: absolute;
-            right: 50%;
-            transform: translateX(50%);
-            left: auto;
-            top: -22px;
             background-color: rgb(200,200,200);
-            border-radius: 5px 5px 0 0;
-            z-index: 99;
           }
         }
 
@@ -183,14 +190,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
           > .block-toolbar {
             display: flex;
-            position: absolute;
-            transform: translateX(50%);
-            right: 50%;
-            left: auto;
-            top: -22px;
             background-color: $primary-blue;
-            border-radius: 5px 5px 0 0;
-            z-index: 99;
           }
         }
       }

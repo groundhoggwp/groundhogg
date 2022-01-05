@@ -1,24 +1,20 @@
 (function ($) {
 
-  const { uuid, loadingDots } = Groundhogg.element
+  const { uuid, icons } = Groundhogg.element
 
   const InfoCard = (id = uuid(), {
     title = () => {},
     content = () => {},
     onMount = () => {},
     preload = () => {},
-    isOpen = true,
-    state = {},
     priority = 10
   }) => ({
     id,
     title,
     content,
     onMount,
-    isOpen,
     priority,
     preload,
-    state,
 
     render (args) {
 
@@ -26,8 +22,11 @@
         id,
         title,
         content,
-        isOpen
       } = this
+
+      const {
+        isOpen
+      } = args
 
       //language=HTML
       return `
@@ -37,59 +36,28 @@
 				  <div class="gh-info-card-title">
 					  ${title(args, this.state)}
 				  </div>
+				  <div class="align-right-space-between actions">
+              <div class="move">${icons.drag}</div>
+				  </div>
 			  </div>
 			  <div class="gh-info-card-content">
-				  ${content(args, this.state)}
+				  ${content(args)}
 			  </div>
 		  </div>`
 
     },
-    mount ($el, args) {
-
-      const setState = (state) => {
-        this.state = {
-          ...this.state,
-          ...state
-        }
-
-        this.mount($el, args)
-      }
-
-      if ($el.find(`#${this.id}`).length) {
-        $el.find(`#${this.id}`).replaceWith(this.render(args))
-      } else {
-        $el.append(this.render(args))
-      }
-
-      $(`#${this.id} .gh-info-card-header`).on('click', (e) => {
-        if ($(`#${this.id}`).is('.closed')) {
-          this.open($el, args)
-        } else {
-          this.close($el, args)
-        }
-      })
-
-      this.onMount(args, this.state, setState)
-    },
-
-    open (...args) {
-      this.isOpen = true
-
-      this.mount(...args)
-    },
-
-    close (...args) {
-      this.isOpen = false
-
-      this.mount(...args)
-    }
   })
 
   const InfoCardProvider = ({
-    cards = []
+    cards = [],
+    order = [],
+    openState = {},
+    onUpdate = ({order,openState}) => { console.log({order,openState}) },
   }) => ({
 
     cards,
+    order,
+    openState,
 
     preload (args) {
       const promises = []
@@ -123,27 +91,52 @@
       const $el = $(el)
 
       $el.addClass('gh-info-card-provider')
-      $el.html('')
+      $el.html( this.cards.sort((a, b) => a.priority - b.priority).map(card => card.render({
+          isOpen: this.openState[card.id] || false,
+          ...args
+        })).join(''))
 
-      this.cards.sort((a, b) => a.priority - b.priority).forEach(card => card.mount($el, args))
-
-      console.log(this.cards)
+      $el.find('.gh-info-card-header').on('click', (e) => {
+        let id = $(e.target).closest('.gh-info-card').attr('id')
+        this.openState[id] = ! this.openState[id];
+        this.updated()
+        this.mount()
+      })
 
       $el.sortable({
-        handle: '.gh-info-card-header',
+        handle: '.gh-info-card-header .move',
         placeholder: 'gh-info-card-provider',
         start: (e, ui) => {
           ui.placeholder.height(ui.item.height())
           ui.placeholder.width(ui.item.width())
         },
         update: (e, ui) => {
-
+          this.updated()
         },
+      })
+
+      this.cards.forEach( card => {
+        card.onMount(args)
+      })
+    },
+
+    updated(){
+      let cards = $('.gh-info-card')
+
+      let order = cards.toArray().map( e => e.id )
+
+      let openState = {}
+
+      cards.each( (i,e) => openState[e.id] = e.classList.contains('open') )
+
+      onUpdate({
+        order,
+        openState
       })
     },
 
     registerCard (id, card) {
-      this.cards.push( InfoCard( id, card ) )
+      this.cards.push(InfoCard(id, card))
     },
 
   })

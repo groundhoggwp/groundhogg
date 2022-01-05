@@ -1,6 +1,5 @@
 (($) => {
 
-  const { notes: NotesStore } = Groundhogg.stores
   const {
     uuid,
     specialChars,
@@ -10,16 +9,12 @@
     input,
     textarea,
     select,
-    tinymceElement,
     moreMenu,
-    tooltip,
     inputRepeaterWidget,
     confirmationModal,
     dangerConfirmationModal,
     toggle,
   } = Groundhogg.element
-  const { post, get, patch, routes, ajax } = Groundhogg.api
-  const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
   const { sprintf, __, _x, _n } = wp.i18n
 
   const optionsRepeater = ({

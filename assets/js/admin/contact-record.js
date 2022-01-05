@@ -82,7 +82,7 @@
     title: () => {
       return __('Contact info', 'groundhogg')
     },
-    content: ({ getContact }, { editing = false }) => {
+    content: ({ getContact }) => {
 
       const { first_name, last_name, email = '' } = getContact().data
       const { primary_phone = '', primary_phone_extension = '', mobile_phone = '' } = getContact().meta
@@ -153,7 +153,7 @@
       // language = HTML
       return !editing ? view() : edit()
     },
-    onMount: ({ getContact, updateContact }, { editing = false }, setState) => {
+    onMount: ({ getContact, updateContact }) => {
 
       if (!editing) {
         $('#edit-contact-info').on('click', () => setState({ editing: true }))
@@ -402,23 +402,7 @@
     title: ({ data }) => {
       return __('WordPress User', 'groundhogg')
     },
-    content: (contact, { editing = false }) => {
-
-      const view = () => {
-
-        // language=HTML
-        return ``
-      }
-
-      const edit = () => {
-
-        // language=HTML
-        return ``
-      }
-
-      // language = HTML
-      return !editing ? view() : edit()
-    },
+    content: () => '',
     onMount: (contact) => {
     },
     preload: (contact) => {}
@@ -428,23 +412,7 @@
     title: ({ data }) => {
       return __('Page Visits', 'groundhogg')
     },
-    content: (contact, { editing = false }) => {
-
-      const view = () => {
-
-        // language=HTML
-        return ``
-      }
-
-      const edit = () => {
-
-        // language=HTML
-        return ``
-      }
-
-      // language = HTML
-      return !editing ? view() : edit()
-    },
+    content: () => '',
     onMount: (contact) => {
     },
     preload: (contact) => {}
@@ -520,7 +488,7 @@
 						</div>
 					</div>
 					<div class="event-extra">
-						${sprintf( __( 'in funnel %s', 'groundhogg' ), FunnelsStore.get(step.data.funnel_id).data.title )}
+						${sprintf(__('in funnel %s', 'groundhogg'), FunnelsStore.get(step.data.funnel_id).data.title)}
 					</div>
 					<div class="diff-time">
 						${sprintf(__('%s ago', 'groundhogg'), activity.locale.diff_time)}
@@ -732,16 +700,24 @@
 
       const viewBasicDetails = () => {
         // language=HTML
-        return `<img class="avatar" width="100" height="100" alt="profile picture"
-		             src="${contact.data.gravatar}"/>
-		<div class="full-name">${contact.data.full_name}</div>
-		<div class="email-address">${contact.data.email}</div>
-		<div class="contact-actions">
-			<button class="gh-button secondary text icon">${icons.email}</button>
-			<button class="gh-button secondary text icon">${icons.phone}</button>
-			<button class="gh-button secondary text icon">${icons.note}</button>
-			<button class="gh-button secondary text icon">${icons.verticalDots}</button>
-		</div>`
+        return `
+			<div class="align-left-space-between" style="margin: 10px">
+				<img class="avatar" width="100" height="100" alt="profile picture"
+				     src="${contact.data.gravatar}"/>
+				<div class="name-admin-email">
+					<div class=""></div>
+					<h1 class="full-name">${contact.data.full_name}</h1>
+					<div class="email-address">${contact.data.email}</div>
+					<div class="primary-phone">${contact.data.primary_phone}</div>
+					<div class="mobile-phone">${contact.data.mobile_phone}</div>
+				</div>
+			</div>
+			<div class="contact-actions">
+				<button class="gh-button secondary text icon">${icons.email}</button>
+				<button class="gh-button secondary text icon">${icons.phone}</button>
+				<button class="gh-button secondary text icon">${icons.note}</button>
+				<button class="gh-button secondary text icon">${icons.verticalDots}</button>
+			</div>`
       }
 
       // language=HTML
@@ -871,10 +847,14 @@
             }
           },
           {
-            id: 'emails',
-            name: __('Emails', 'groundhogg'),
+            id: 'inbox',
+            name: __('Inbox', 'groundhogg'),
             content: () => {
-              return `<div id="emails-here" class="inside"></div>`
+              // language=HTML
+              return `
+				  <div id="emails-here" class="inside">
+					  <p>${__('We are working on this feature right now. Coming soon!', 'groundhogg')}</p>
+				  </div>`
             },
             onMount: () => {
 
