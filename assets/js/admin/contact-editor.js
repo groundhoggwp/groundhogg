@@ -21,8 +21,8 @@
           from_name: currentUser.data.display_name,
         }
 
-        if (currentUser.ID != contact.data.owner_id) {
-          email.cc = [filters.owners.find(u => u.ID = contact.data.owner_id).data.user_email]
+        if (contact.data.owner_id && currentUser.ID != contact.data.owner_id) {
+          email.cc = [filters.owners.find(u => u.ID == contact.data.owner_id).data.user_email]
         }
 
         Groundhogg.components.emailModal(email)

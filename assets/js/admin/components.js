@@ -308,14 +308,14 @@
 
           setContent(quickEdit(getContact()))
           quickEditMounted({ close, setContent })
-        }).catch( e => {
+        }).catch(e => {
 
           stop()
           clearPayload()
           setContent(quickEdit(getContact()))
           quickEditMounted({ close, setContent })
 
-          console.log( e )
+          console.log(e)
 
           dialog({
             type: 'error',
@@ -805,6 +805,12 @@
       return `
 		  <div class="gh-rows-and-columns">
 			  <div class="gh-row">
+				  <label>${__('From:')}</label>
+				  <div class="gh-col">
+					  <select id="from"></select>
+				  </div>
+			  </div>
+			  <div class="gh-row">
 				  <label>${__('To:')}</label>
 				  <div class="gh-col">
 					  <select id="recipients"></select>
@@ -884,6 +890,22 @@
         placeholder: __('Cc'),
       }).on('change', e => selectChange(e, 'cc'))
 
+      $('#from').select2({
+        data: Groundhogg.filters.owners.map(u => ({
+          id: u.ID,
+          text: `${u.data.display_name} <${u.data.user_email}>`,
+          selected: u.data.user_email === email.from_email
+        })),
+        width: '100%',
+        placeholder: __('From'),
+      }).on('change', e => {
+
+        let u = Groundhogg.filters.owners.find(u => u.ID == $(e.target).val())
+
+        email['from_email'] = u.data.user_email
+        email['from_name'] = u.data.display_name
+      })
+
       $('#bcc').select2({
         data: [...email.bcc.map(i => ({
           id: i,
@@ -931,13 +953,17 @@
         $(target).text(__('Sending', 'groundhogg')).prop('disabled', true)
         const { stop } = loadingDots(target)
 
+        const release = () => {
+          stop()
+          $(target).text(__('Send', 'groundhogg')).prop('disabled', false)
+        }
+
         post(`${routes.v4.emails}/send`, {
           ...email,
           content: editor.getContent({ format: 'raw' })
         }).then((r) => {
 
-          stop()
-          $(target).text(__('Send', 'groundhogg')).prop('disabled', false)
+          release()
 
           if (r.status !== 'success') {
 
@@ -954,6 +980,14 @@
           })
 
           close()
+        }).catch(e => {
+
+          release()
+
+          dialog({
+            message: e.message,
+            type: 'error'
+          })
         })
       })
 
