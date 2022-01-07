@@ -123,6 +123,15 @@
     $el.append($tip)
   }
 
+  const el = (tag, atts = {}, content = '', closing = false) => {
+
+    if (!content && closing) {
+      return `<${tag} ${objectToProps(atts)}/>`
+    }
+
+    return `<${tag} ${objectToProps(atts)}>${Array.isArray(content) ? content.join('') : content}</${tag}>`
+  }
+
   const stepNav = ({
     labels,
     currentStep,
@@ -434,12 +443,33 @@
     }).join('')
   }
 
+  function isNumeric (n) {
+    return !isNaN(parseFloat(n)) && isFinite(n)
+  }
+
   const objectToStyle = (object) => {
     const props = []
 
     for (const prop in object) {
       if (object.hasOwnProperty(prop)) {
-        props.push(`${kebabize(prop)}:${specialChars(object[prop])}`)
+
+        let attr = kebabize(prop)
+        let val = specialChars(object[prop])
+
+        switch (attr) {
+          case 'font-size':
+          case 'height':
+          case 'width':
+          case 'margin':
+          case 'padding':
+          case 'margin-top':
+            if (isNumeric(val)) {
+              val += 'px'
+            }
+            break
+        }
+
+        props.push(`${attr}:${val}`)
       }
     }
 
@@ -640,7 +670,7 @@
       }
     )
 
-    tinyMCE.get(editor_id).on('keyup', function (e) {
+    tinyMCE.get(editor_id).on('keyup keydown mouseup', function (e) {
       onChange(tinyMCE.activeEditor.getContent({ format: 'raw' }))
     })
 
@@ -664,7 +694,11 @@
     this.flag = 'improved'
   }
 
-  function improveTinyMCE () {
+  function improveTinyMCE (settings = {}) {
+
+    const {
+      height = 200
+    } = settings
 
     if (typeof this.flag !== 'undefined') {
       return
@@ -675,7 +709,7 @@
         'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,spellchecker,wp_adv,wp_add_media,dfw'
       editor.settings.toolbar2 =
         'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help'
-      editor.settings.height = 200
+      editor.settings.height = height
       editor.on('click', function (ed, e) {
         $doc.trigger('to_mce')
       })
@@ -693,12 +727,19 @@
   const loadingModal = (text = 'Loading', props = {}) => {
 
     return modal({
-      content: `<object
-    data="${Groundhogg.assets.spinner}" type="image/svg+xml" width="100%"/>`,
+      content: spinner(),
       canClose: false,
       dialogClasses: 'gh-modal-loading',
       ...props,
     })
+  }
+
+  const spinner = () => {
+    // language=HTML
+    return `
+		<div class="gh-spinner-wrap">
+			<object class="gh-spinner" data="${Groundhogg.assets.spinner}" type="image/svg+xml" width="100" height="100"/>
+		</div>`
   }
 
   const savingModal = () => {
@@ -897,6 +938,7 @@
     beforeClose = () => true,
     canClose = true,
     onOpen = () => {},
+    width = false,
     className = '',
     dialogClasses = '',
     overlay = true,
@@ -907,7 +949,7 @@
     const html = `
 		<div class="gh-modal ${className} ${disableScrolling ? 'disabled-scrolling' : ''}">
 			${overlay ? `<div class="gh-modal-overlay"></div>` : ''}
-			<div class="gh-modal-dialog ${dialogClasses}">
+			<div class="gh-modal-dialog ${dialogClasses}" style="width: ${width ? width + 'px' : 'fit-content'}">
 				${canClose ? `	<button type="button" class="dashicon-button gh-modal-button-close-top gh-modal-button-close">
 					<span class="dashicons dashicons-no-alt"></span>
 				</button>` : ''}
@@ -1110,12 +1152,14 @@
     filterOption = (option, search) => option.match(regexp(search)),
     renderOption = (option) => option,
     noOptions = __('No options...', 'groundhogg'),
-    onSelect = (option) => console.log(option),
+    onSelect = (option) => {},
+    onInput = (search) => {},
     onClose = () => {},
     onOpen = () => {}
   }) => ({
     selector,
     options,
+    onInput,
     filterOption,
     renderOption,
     onClose,
@@ -1148,7 +1192,7 @@
 		  </div>`
     },
     getOptions () {
-      return options.filter((option, i) => {
+      return this.options.filter((option, i) => {
         if (this.search) {
           return filterOption(option, this.search)
         }
@@ -1288,11 +1332,12 @@
         onClose()
       }
 
-      $(`${selector} input.search-for-options`).on('input', function (e) {
-        self.search = $(this).val()
-        self.focusedOptionId = -1
-        self.previousFocusedOptionId = -1
-        self.mountOptions()
+      $(`${selector} input.search-for-options`).on('input', (e) => {
+        this.search = $(e.target).val()
+        this.focusedOptionId = -1
+        this.previousFocusedOptionId = -1
+        onInput(this.search, this)
+        this.mountOptions()
       }).focus()
 
       // if current Y position (relative to window) + height > height of window
@@ -1636,6 +1681,31 @@
   }
 
   const icons = {
+    drag: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle fill="currentColor" cx="8" cy="4" r="2"/><circle fill="currentColor" cx="8" cy="12" r="2"/><circle fill="currentColor" cx="8" cy="20" r="2"/><circle fill="currentColor" cx="16" cy="4" r="2"/><circle fill="currentColor" cx="16" cy="12" r="2"/><circle fill="currentColor" cx="16" cy="20" r="2"/></svg>`,
+    // language=html
+    image: `
+		<svg xmlns="http://www.w3.org/2000/svg" style="enable-background:new 0 0 550.801 550.8" xml:space="preserve"
+		     viewBox="0 0 550.801 550.8">
+          <path fill="currentColor"
+                d="M515.828 61.201H34.972C15.659 61.201 0 76.859 0 96.172V454.63c0 19.312 15.659 34.97 34.972 34.97h480.856c19.314 0 34.973-15.658 34.973-34.971V96.172c0-19.313-15.658-34.971-34.973-34.971zm0 34.971V350.51l-68.92-62.66c-10.359-9.416-26.289-9.04-36.186.866l-69.752 69.741-137.532-164.278c-10.396-12.415-29.438-12.537-39.99-.271L34.972 343.219V96.172h480.856zm-148.627 91.8c0-26.561 21.523-48.086 48.084-48.086 26.562 0 48.086 21.525 48.086 48.086s-21.523 48.085-48.086 48.085c-26.56.001-48.084-21.524-48.084-48.085z"/></svg>`,
+
+    // language=html
+    duplicate: `
+		<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+			<g data-name="Layer 2">
+				<path fill="currentColor"
+				      d="M3.625 23h9.75A2.629 2.629 0 0 0 16 20.375V7.625A2.629 2.629 0 0 0 13.375 5h-9.75A2.629 2.629 0 0 0 1 7.625v12.75A2.629 2.629 0 0 0 3.625 23zM3 7.625A.625.625 0 0 1 3.625 7h9.75a.625.625 0 0 1 .625.625v12.75a.625.625 0 0 1-.625.625h-9.75A.625.625 0 0 1 3 20.375z"/>
+				<path fill="currentColor"
+				      d="M20.37 1h-9.74a2.629 2.629 0 0 0-2.421 1.61 1 1 0 1 0 1.842.78.63.63 0 0 1 .579-.39h9.74a.631.631 0 0 1 .63.63v12.74a.631.631 0 0 1-.63.63H18a1 1 0 0 0 0 2h2.37A2.633 2.633 0 0 0 23 16.37V3.63A2.633 2.633 0 0 0 20.37 1z"/>
+			</g>
+		</svg>`,
+    // language=html
+    move: `
+		<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+			<path fill="currentColor"
+			      d="m60.958 33.398-8.489 8.818A2.029 2.029 0 0 1 49 40.817v-3.8L37 37v11.982l3.817.017a2.029 2.029 0 0 1 1.4 3.47l-8.819 8.488a2.01 2.01 0 0 1-2.796 0l-8.818-8.489A2.029 2.029 0 0 1 23.183 49h3.8l.015-12H15.017L15 40.817a2.029 2.029 0 0 1-3.47 1.4l-8.488-8.819a2.01 2.01 0 0 1 0-2.796l8.489-8.818A2.029 2.029 0 0 1 15 23.183v3.8l12 .015V15.017L23.183 15a2.029 2.029 0 0 1-1.4-3.47l8.819-8.488a2.008 2.008 0 0 1 2.796 0l8.818 8.489A2.029 2.029 0 0 1 40.817 15h-3.8L37 27h11.982L49 23.183a2.03 2.03 0 0 1 3.47-1.4l8.488 8.819a2.01 2.01 0 0 1 0 2.796z"
+			      data-name="11 Move"/>
+		</svg>`,
     // language=html
     form: `
 		<svg viewBox="0 0 35 31" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1784,7 +1854,116 @@
 			      d="M183.5 140.8v4.9A66.1 66.1 0 11164 98.8l-24.5 24.3a31.4 31.4 0 103.6 40.9h-25.6v-23.3h66z"/>
 			<path fill="#fff"
 			      d="M183.5 126.1v4.9A66.1 66.1 0 11164 84.1l-24.5 24.3a31.4 31.4 0 103.6 40.9h-25.6V126h66z"/>
-		</svg>`
+		</svg>`,
+    // language=html
+    alignLeft: `
+		<svg width="13" height="14" viewBox="0 0 13 14" fill="none"
+		     xmlns="http://www.w3.org/2000/svg">
+			<path
+				d="M0.777832 13.1662H6.4477M0.777832 9.0427H12.1176M0.777832 0.795624H12.1176M0.777832 4.91916H6.4477"
+				stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+				stroke-linejoin="round"/>
+		</svg>`,
+    // language=html
+    alignCenter: `
+		<svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+		     xmlns="http://www.w3.org/2000/svg">
+			<path opacity="0.6"
+			      d="M12.5319 9.00262H1.19189M12.5319 0.755951H1.19189M9.95462 13.126H4.28462M9.95462 4.87928H4.28462"
+			      stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+			      stroke-linejoin="round"/>
+		</svg>`,
+    // language=html
+    alignRight: `
+		<svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+		     xmlns="http://www.w3.org/2000/svg">
+			<path opacity="0.6"
+			      d="M12.5319 9.00262H1.19189M12.5319 0.755951H1.19189M9.95462 13.126H4.28462M9.95462 4.87928H4.28462"
+			      stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+			      stroke-linejoin="round"/>
+		</svg>`,
+    // language=HTML
+    smartphone: `
+		<svg width="12" height="19" viewBox="0 0 12 19" fill="none"
+		     xmlns="http://www.w3.org/2000/svg">
+			<path
+				d="M8.74288 15.776C9.15709 15.776 9.49288 15.4402 9.49288 15.026C9.49288 14.6117 9.15709 14.276 8.74288 14.276V15.776ZM3.54739 14.276C3.13318 14.276 2.79739 14.6117 2.79739 15.026C2.79739 15.4402 3.13318 15.776 3.54739 15.776V14.276ZM8.74288 1.48749V2.23749V1.48749ZM3.54739 1.48749L3.54739 0.737488L3.54739 1.48749ZM1.23828 15.0259H1.98828H1.23828ZM1.23828 3.94903H0.488281H1.23828ZM8.74286 17.4875V16.7375V17.4875ZM3.54739 17.4875V18.2375V17.4875ZM11.052 15.026L11.802 15.026L11.052 15.026ZM11.052 3.94903L10.302 3.94903L11.052 3.94903ZM8.74288 0.737488L3.54739 0.737488L3.54739 2.23749L8.74288 2.23749V0.737488ZM1.98828 15.0259L1.98828 3.94903H0.488281L0.488281 15.0259H1.98828ZM8.74286 16.7375H3.54739V18.2375H8.74286V16.7375ZM11.802 15.026L11.802 3.94903L10.302 3.94903L10.302 15.026L11.802 15.026ZM8.74286 18.2375C10.4768 18.2375 11.802 16.7538 11.802 15.026L10.302 15.026C10.302 16.0171 9.55949 16.7375 8.74286 16.7375V18.2375ZM8.74288 2.23749C9.55951 2.23749 10.302 2.95789 10.302 3.94903L11.802 3.94903C11.802 2.22123 10.4768 0.737488 8.74288 0.737488V2.23749ZM3.54739 0.737488C1.81345 0.737488 0.488281 2.22123 0.488281 3.94903L1.98828 3.94903C1.98828 2.95788 2.73076 2.23749 3.54739 2.23749L3.54739 0.737488ZM0.488281 15.0259C0.488281 16.7537 1.81345 18.2375 3.54739 18.2375V16.7375C2.73076 16.7375 1.98828 16.0171 1.98828 15.0259H0.488281ZM3.54739 15.776H8.74288V14.276H3.54739V15.776Z"
+				fill="#0075FF"/>
+		</svg>`,
+
+    // language=HTML
+    desktop: `
+		<svg width="18" height="19" viewBox="0 0 18 19" fill="none"
+		     xmlns="http://www.w3.org/2000/svg">
+			<path
+				d="M15.2702 13.7952V13.0452V13.7952ZM2.57008 13.7952V14.5452H2.57008L2.57008 13.7952ZM16.4247 2.71826L17.1747 2.71826L16.4247 2.71826ZM16.4247 12.5644H15.6747H16.4247ZM1.41553 2.71827H0.665527H1.41553ZM1.41553 12.5644H2.16553H1.41553ZM15.2702 1.48749V2.23749H15.2702L15.2702 1.48749ZM2.57008 1.4875L2.57008 0.737501L2.57008 1.4875ZM16.4247 11.4683C16.8389 11.4683 17.1747 11.1325 17.1747 10.7183C17.1747 10.304 16.8389 9.96826 16.4247 9.96826V11.4683ZM1.41553 9.96826C1.00131 9.96826 0.665527 10.304 0.665527 10.7183C0.665527 11.1325 1.00131 11.4683 1.41553 11.4683L1.41553 9.96826ZM12.3838 18.2375C12.798 18.2375 13.1338 17.9017 13.1338 17.4875C13.1338 17.0733 12.798 16.7375 12.3838 16.7375V18.2375ZM5.45646 16.7375C5.04225 16.7375 4.70646 17.0733 4.70646 17.4875C4.70646 17.9017 5.04225 18.2375 5.45646 18.2375V16.7375ZM5.86102 17.4875C5.86102 17.9017 6.19681 18.2375 6.61102 18.2375C7.02523 18.2375 7.36102 17.9017 7.36102 17.4875H5.86102ZM7.36102 13.7952C7.36102 13.381 7.02523 13.0452 6.61102 13.0452C6.19681 13.0452 5.86102 13.381 5.86102 13.7952H7.36102ZM10.4792 17.4875C10.4792 17.9017 10.815 18.2375 11.2292 18.2375C11.6434 18.2375 11.9792 17.9017 11.9792 17.4875H10.4792ZM11.9792 13.7952C11.9792 13.381 11.6434 13.0452 11.2292 13.0452C10.815 13.0452 10.4792 13.381 10.4792 13.7952H11.9792ZM15.2702 13.0452L2.57008 13.0452L2.57008 14.5452L15.2702 14.5452V13.0452ZM15.6747 2.71826L15.6747 12.5644H17.1747L17.1747 2.71826L15.6747 2.71826ZM0.665527 2.71827L0.665528 12.5644H2.16553L2.16553 2.71827H0.665527ZM15.2702 0.737488L2.57008 0.737501L2.57008 2.2375L15.2702 2.23749L15.2702 0.737488ZM17.1747 2.71826C17.1747 1.67019 16.3665 0.737486 15.2702 0.737488L15.2702 2.23749C15.4492 2.23749 15.6747 2.40685 15.6747 2.71826L17.1747 2.71826ZM2.16553 2.71827C2.16553 2.40686 2.39109 2.2375 2.57008 2.2375L2.57008 0.737501C1.47378 0.737502 0.665527 1.67021 0.665527 2.71827H2.16553ZM2.57008 13.0452C2.39109 13.0452 2.16553 12.8758 2.16553 12.5644H0.665528C0.665528 13.6125 1.47378 14.5452 2.57008 14.5452L2.57008 13.0452ZM15.2702 14.5452C16.3665 14.5452 17.1747 13.6125 17.1747 12.5644H15.6747C15.6747 12.8758 15.4492 13.0452 15.2702 13.0452V14.5452ZM16.4247 9.96826H1.41553L1.41553 11.4683H16.4247V9.96826ZM12.3838 16.7375H5.45646V18.2375H12.3838V16.7375ZM7.36102 17.4875V13.7952H5.86102V17.4875H7.36102ZM11.9792 17.4875V13.7952H10.4792V17.4875H11.9792Z"
+				fill="#0075FF"/>
+		</svg>`,
+    // language=HTML
+    campaign: `
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+			<defs/>
+			<path
+				d="M432.7 80.3H303.1v-1A63.3 63.3 0 00240 16H94.3V15a15 15 0 00-30 0v482a15 15 0 0030 0V255h98.5v81.3a15 15 0 0015 15h225a15 15 0 0015-15v-241a15 15 0 00-15-15zM94.3 46.1h145.6a33.2 33.2 0 0133.2 33.2v155c-9.6-6-21-9.4-33.2-9.4H94.3zm145.6 275.2h-17.1V255h17.1a33.2 33.2 0 010 66.4zm177.8 0h-124c6-9.6 9.4-21 9.4-33.2V110.3h114.6z"/>
+		</svg>`,
+    //language=HTML
+    open_email: `
+		<svg viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path
+				d="M3.334 10.017l-.447-.894a1 1 0 00-.553.894h1zm28.333 0h1a1 1 0 00-.553-.894l-.447.894zM17.501 2.934l.447-.895-.447-.223-.448.223.448.895zm0 14.166l-.448.895.448.224.447-.224-.447-.895zm13.166 11.75H4.334v2h26.333v-2zm0-18.833v18.834h2V10.017h-2zM4.334 28.851V10.017h-2v18.834h2zm-.553-17.94l14.167-7.083-.895-1.789L2.887 9.123l.894 1.789zm13.272-7.083l14.167 7.084.895-1.79L17.947 2.04l-.895 1.79zM31.22 9.123l-14.167 7.083.895 1.789 14.166-7.083-.894-1.79zm-13.272 7.083L3.78 9.123l-.894 1.789 14.166 7.083.895-1.789zM4.334 28.851h-2a2 2 0 002 2v-2zm26.333 2a2 2 0 002-2h-2v2z"
+				fill="currentColor"/>
+		</svg>`,
+    //language=HTML
+    link_click: `
+		<svg viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M8.594 4.671v22.305l5.329-5.219 3.525 8.607 3.278-1.23-3.688-8.718h7.14L8.593 4.67z"
+			      stroke="currentColor" stroke-width="2"/>
+		</svg>`,
+    //language=HTML
+    login: `
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+			<path
+				fill="currentColor"
+				d="M260.52 329.539a24 24 0 0 0 33.941 33.941l90.51-90.51a24 24 0 0 0 0-33.941l-90.51-90.509a24 24 0 0 0-33.941 0 24 24 0 0 0 0 33.941L310.059 232H48a24 24 0 0 0-24 24 24 24 0 0 0 24 24h262.059z"/>
+			<path
+				fill="currentColor"
+				d="M448 24H224a40 40 0 0 0-40 40v32a24 24 0 0 0 48 0V72h208v368H232v-24a24 24 0 0 0-48 0v32a40 40 0 0 0 40 40h224a40 40 0 0 0 40-40V64a40 40 0 0 0-40-40z"/>
+		</svg>`,
+    //language=HTML
+    logout: `
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+			<path
+				fill="currentColor"
+				d="m480.971 239.029-90.51-90.509a24 24 0 0 0-33.942 0 24 24 0 0 0 0 33.941L406.059 232H144a24 24 0 0 0-24 24 24 24 0 0 0 24 24h262.059l-49.54 49.539a24 24 0 0 0 33.942 33.941l90.51-90.51a24 24 0 0 0 0-33.941z"/>
+			<path
+				fill="currentColor"
+				d="M304 392a24 24 0 0 0-24 24v24H72V72h208v24a24 24 0 0 0 48 0V64a40 40 0 0 0-40-40H64a40 40 0 0 0-40 40v384a40 40 0 0 0 40 40h224a40 40 0 0 0 40-40v-32a24 24 0 0 0-24-24z"/>
+		</svg>`,
+    //language=HTML
+    wp_fusion: `
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 39">
+			<g id="Landing-Page" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+				<g id="Landing-Page-(Type-Outlined)" transform="translate(-115 -38)">
+					<g id="Section---Splash" transform="translate(106 -602)">
+						<g id="Logo-(Larger)" transform="translate(9 639.05)">
+							<g id="Mark" transform="translate(0 .5)">
+								<path d="M8 .5h30v30a8 8 0 0 1-8 8H0v-30a8 8 0 0 1 8-8Z" id="BG" fill="#E55B10"/>
+								<path
+									d="M31 15.5a1.5 1.5 0 0 1-1.5 1.5l-12-.001V29a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5V15a1.5 1.5 0 0 1 .719-1.28A1.5 1.5 0 0 1 15.5 13h14a1.5 1.5 0 0 1 1.5 1.5v1Z"
+									id="Path" fill="#FFF"/>
+								<path
+									d="M8 23a1.5 1.5 0 0 1 1.5-1.5l12 .001V9.5A1.5 1.5 0 0 1 23 8h1a1.5 1.5 0 0 1 1.5 1.5v14a1.5 1.5 0 0 1-.719 1.28 1.5 1.5 0 0 1-1.281.72h-14A1.5 1.5 0 0 1 8 24v-1Z"
+									fill="#FFF"/>
+							</g>
+						</g>
+					</g>
+				</g>
+			</g>
+		</svg>`,
+    //language=HTML
+    funnel: `
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512"
+		     xml:space="preserve"><path fill="currentColor" d="M509.978 23.47A15.013 15.013 0 0 0 497 16H15a15.014 15.014 0 0 0-12.979 7.471 15.01 15.01 0 0 0-.043 14.97L50.153 121h411.694l48.175-82.559a15.012 15.012 0 0 0-.044-14.971zM127.295 256l42.856 75h171.698l42.856-75zM67.295 151l42.858 75h291.694l42.858-75zM181 361v120c0 8.291 6.709 15 15 15h120c8.291 0 15-6.709 15-15V361H181z"/></svg>`
 
   }
 
@@ -1841,6 +2020,7 @@
     clickedIn,
     ordinal_suffix_of,
     bold,
+    spinner,
   }
 
 })(jQuery)

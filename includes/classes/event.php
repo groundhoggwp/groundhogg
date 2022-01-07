@@ -533,5 +533,30 @@ class Event extends Base_Object {
 		return $update;
 	}
 
+	public function get_as_array() {
+		$array = parent::get_as_array();
+
+		$array['locale'] = [
+			'diff_time' => human_time_diff( $this->get_time(), time() )
+		];
+
+		switch ( $this->get_event_type() ) {
+			case Event::FUNNEL:
+				return array_merge( $array, [
+					'step' => $this->get_step()
+				] );
+			case Event::BROADCAST:
+				return array_merge( $array, [
+					'broadcast' => $this->get_step()
+				] );
+			case Event::EMAIL_NOTIFICATION:
+				return array_merge( $array, [
+					'email' => $this->get_step()
+				] );
+			default:
+				return $array;
+		}
+	}
+
 
 }

@@ -641,6 +641,30 @@
     }
   }
 
+  const standardActivityDateOptions = ({ date_range = '24_hours', after = '', before = '', future = false }) => {
+
+    return ` ${select({
+      id: 'filter-date-range',
+      name: 'date_range'
+    }, future ? futureDateRanges : pastDateRanges, date_range)}
+
+		  ${input({
+      type: 'date',
+      value: after.split(' ')[0],
+      id: 'filter-after',
+      className: `date ${['between', 'after'].includes(date_range) ? '' : 'hidden'}`,
+      name: 'after'
+    })}
+
+		  ${input({
+      type: 'date',
+      value: before.split(' ')[0],
+      id: 'filter-before',
+      className: `value ${['between', 'before'].includes(date_range) ? '' : 'hidden'}`,
+      name: 'before'
+    })}`
+  }
+
   const standardActivityDateDefaults = {
     date_range: 'any',
     before: '',
@@ -707,29 +731,7 @@
     return title + ' ' + filterCountComparisons[count_compare](count)
   }
 
-  const standardActivityDateOptions = ({ date_range = '24_hours', after = '', before = '', future = false }) => {
 
-    return ` ${select({
-      id: 'filter-date-range',
-      name: 'date_range'
-    }, future ? futureDateRanges : pastDateRanges, date_range)}
-
-		  ${input({
-      type: 'date',
-      value: after.split(' ')[0],
-      id: 'filter-after',
-      className: `date ${['between', 'after'].includes(date_range) ? '' : 'hidden'}`,
-      name: 'after'
-    })}
-
-		  ${input({
-      type: 'date',
-      value: before.split(' ')[0],
-      id: 'filter-before',
-      className: `value ${['between', 'before'].includes(date_range) ? '' : 'hidden'}`,
-      name: 'before'
-    })}`
-  }
 
 //  REGISTER ALL FILTERS HERE
   const BasicTextFilter = (name) => ({

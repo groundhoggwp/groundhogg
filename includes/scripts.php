@@ -244,6 +244,9 @@ class Scripts {
 			'jquery-ui-sortable',
 			'groundhogg-admin-notes',
 			'groundhogg-admin-components',
+			'groundhogg-admin-properties',
+			'groundhogg-admin',
+			'groundhogg-admin-data'
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-contact-info-cards', GROUNDHOGG_ASSETS_URL . 'js/admin/info-cards' . $dot_min . '.js', [
@@ -371,6 +374,8 @@ class Scripts {
 						'v4' => [
 							'root'       => rest_url( Base_Api::NAME_SPACE ),
 							'tags'       => rest_url( Base_Api::NAME_SPACE . '/tags' ),
+							'activity'   => rest_url( Base_Api::NAME_SPACE . '/activity' ),
+							'events'     => rest_url( Base_Api::NAME_SPACE . '/events' ),
 							'notes'      => rest_url( Base_Api::NAME_SPACE . '/notes' ),
 							'contacts'   => rest_url( Base_Api::NAME_SPACE . '/contacts' ),
 							'forms'      => rest_url( Base_Api::NAME_SPACE . '/forms' ),
@@ -380,7 +385,8 @@ class Scripts {
 							'searches'   => rest_url( Base_Api::NAME_SPACE . '/searches' ),
 							'reports'    => rest_url( Base_Api::NAME_SPACE . '/reports' ),
 							'campaigns'  => rest_url( Base_Api::NAME_SPACE . '/campaigns' ),
-							'broadcasts' => rest_url( Base_Api::NAME_SPACE . '/broadcasts' )
+							'broadcasts' => rest_url( Base_Api::NAME_SPACE . '/broadcasts' ),
+							'options'    => rest_url( Base_Api::NAME_SPACE . '/options' )
 						]
 					]
 				],
@@ -408,6 +414,7 @@ class Scripts {
 				'rawStepTypes'    => Plugin::instance()->step_manager->get_elements(),
 				'currentUser'     => wp_get_current_user(),
 				'isMultisite'     => is_multisite(),
+				'isWhiteLabeled'  => is_white_labeled(),
 				'isSuperAdmin'    => is_super_admin(),
 				'screen'          => get_current_screen()
 			] ), 'before' );

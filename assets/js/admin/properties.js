@@ -648,6 +648,9 @@
 
         $(selector).html(Templates.noProperties())
         $('#add-custom-property').on('click', (e) => {
+
+          e.preventDefault()
+
           addPropertyGroupModal()
         })
         return

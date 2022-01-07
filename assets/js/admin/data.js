@@ -187,7 +187,7 @@
       return this.item[this.primaryKey] == id || this.items.find(item => item[this.primaryKey] == id)
     },
 
-    hasItems (itemIds) {
+    hasItems (itemIds=false) {
 
       if (!itemIds) {
         return this.items.length > 0
@@ -474,6 +474,8 @@
     }),
     forms: ObjectStore(Groundhogg.api.routes.v4.forms),
     contacts: ObjectStore(Groundhogg.api.routes.v4.contacts),
+    events: ObjectStore(Groundhogg.api.routes.v4.events),
+    activity: ObjectStore(Groundhogg.api.routes.v4.activity),
     campaigns: ObjectStore(Groundhogg.api.routes.v4.campaigns),
     funnels: ObjectStore(Groundhogg.api.routes.v4.funnels, {
 

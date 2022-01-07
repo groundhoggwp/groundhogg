@@ -54,6 +54,7 @@ class API_V4_HANDLER {
 		$this->campaings_api   = new Campaigns_Api();
 		$this->tracking_api    = new Tracking_Api();
 		$this->forms           = new Forms_Api();
+		$this->options         = new Options_Api();
 	}
 
 	/**

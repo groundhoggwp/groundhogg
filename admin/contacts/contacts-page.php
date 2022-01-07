@@ -153,9 +153,15 @@ class Contacts_Page extends Admin_Page {
 				wp_enqueue_script( 'groundhogg-admin-contact-editor' );
 				wp_enqueue_script( 'groundhogg-admin-contact-info-cards' );
 				wp_localize_script( 'groundhogg-admin-contact-editor', 'ContactEditor', [
-					'contact_id'       => absint( get_url_var( 'contact' ) ),
-					'delete_note_text' => __( 'Are you sure you want to delete this note?', 'groundhogg' ),
-					'contact'          => get_contactdata( get_url_var( 'contact' ) )
+					'contact_id'                   => absint( get_url_var( 'contact' ) ),
+					'delete_note_text'             => __( 'Are you sure you want to delete this note?', 'groundhogg' ),
+					'contact'                      => get_contactdata( get_url_var( 'contact' ) ),
+					'meta_exclusions'              => $this->get_meta_key_exclusions(),
+					'gh_contact_custom_properties' => get_option( 'gh_contact_custom_properties', [
+						'tabs'   => [],
+						'groups' => [],
+						'fields' => []
+					] )
 				] );
 				break;
 			case 'view':

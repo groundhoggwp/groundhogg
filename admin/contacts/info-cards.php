@@ -67,9 +67,9 @@ class Info_Cards {
 			include __DIR__ . '/cards/user.php';
 		}, 100, 'edit_users' );
 
-		self::register( 'notes', __( 'Notes', 'groundhogg' ), function ( $contact ) {
-			include __DIR__ . '/cards/notes.php';
-		} );
+//		self::register( 'notes', __( 'Notes', 'groundhogg' ), function ( $contact ) {
+//			include __DIR__ . '/cards/notes.php';
+//		} );
 
 		self::register( 'files', __( 'Files', 'groundhogg' ), function ( $contact ) {
 			include __DIR__ . '/cards/files.php';
@@ -226,8 +226,8 @@ class Info_Cards {
 
 			?>
 			<div id="<?php esc_attr_e( $id ); ?>"
-			     class="postbox info-card <?php esc_attr_e( $id ); ?> <?php esc_attr_e( ! $open ? 'closed' : '' ); ?> <?php esc_attr_e( $hidden ? 'hidden' : '' ); ?>">
-				<div class="postbox-header">
+			     class="postbox gh-panel info-card <?php esc_attr_e( $id ); ?> <?php esc_attr_e( ! $open ? 'closed' : '' ); ?> <?php esc_attr_e( $hidden ? 'hidden' : '' ); ?>">
+				<div class="gh-panel-header postbox-header">
 					<h2 class="hndle"><?php echo $title; ?></h2>
 					<div class="handle-actions hide-if-no-js">
 						<button type="button" class="handle-order-higher" aria-disabled="false"
@@ -272,7 +272,7 @@ class Info_Cards {
 	public static function display( $contact ) {
 		?>
 		<div class="info-cards-wrap">
-			<div class="info-card-actions postbox">
+			<div class="info-card-actions postbox gh-panel">
 				<div class="inside">
 					<a class="expand-all"
 					   href="javascript:void(0)"><?php _e( 'Expand All', 'groundhogg' ); ?><?php dashicon_e( 'arrow-up' ); ?></a>

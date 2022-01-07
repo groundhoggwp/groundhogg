@@ -797,6 +797,11 @@
       ...props
     }
 
+    // Modal is already open
+    if ( $( '.gh-modal.send-email' ).length ){
+      return;
+    }
+
     let showCc = email.cc.length > 0
     let showBcc = email.bcc.length > 0
 

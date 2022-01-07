@@ -2,11 +2,33 @@ h3.no-margin-top {
   margin-top: 0;
 }
 
+.gh-spinner-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+}
+.gh-spinner-wrap object.gh-spinner {
+  max-width: 100px;
+}
+
+.align-center-space-between {
+  display: flex !important;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+}
+.align-center-space-between.align-top {
+  align-items: flex-start;
+}
+
 .align-right-space-between {
   display: flex !important;
   justify-content: flex-end;
   gap: 10px;
   align-items: center;
+}
+.align-right-space-between.align-top {
+  align-items: flex-start;
 }
 
 .align-left-space-between {
@@ -15,11 +37,17 @@ h3.no-margin-top {
   gap: 10px;
   align-items: center;
 }
+.align-left-space-between.align-top {
+  align-items: flex-start;
+}
 
 .space-between {
   display: flex !important;
   justify-content: space-between;
   align-items: center;
+}
+.space-between.align-top {
+  align-items: flex-start;
 }
 
 .property-groups {
@@ -63,6 +91,10 @@ h3.no-margin-top {
   max-width: 100%;
 }
 
+body.groundhogg_page_gh_contacts {
+  background-color: #F6F9FB;
+}
+
 #search-results {
   width: 440px;
   height: 500px;
@@ -91,6 +123,38 @@ h3.no-margin-top {
 }
 #search-results tr:hover {
   background-color: rgba(0, 117, 255, 0.02);
+}
+
+h2.nav-tab-wrapper.gh {
+  border-bottom: 0;
+  padding-top: 0;
+}
+h2.nav-tab-wrapper.gh .nav-tab {
+  border-radius: 3px 3px 0 0;
+  border: none;
+  margin-left: 0;
+  margin-right: 5px;
+}
+h2.nav-tab-wrapper.gh .nav-tab.nav-tab-active {
+  border: none;
+  background-color: #FFFFFF;
+}
+h2.nav-tab-wrapper.gh button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  border-radius: 3px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin: 4px 0;
+}
+h2.nav-tab-wrapper.gh button:hover {
+  background-color: rgba(16, 38, 64, 0.05);
+}
+h2.nav-tab-wrapper.gh button .dashicons {
+  margin: 0;
 }
 
 .notes-widget .notes-header {
@@ -204,7 +268,6 @@ a.action-link {
 .pill {
   background: rgba(0, 117, 255, 0.07);
   border-radius: 5px;
-  margin: 0 5px 5px 0;
   display: inline-block;
   padding: 3px 8px;
   color: #102640;
@@ -231,6 +294,10 @@ svg.danger,
 span.gh-text.danger {
   color: #e91f4f;
 }
+svg.green,
+span.gh-text.green {
+  color: #9ece38;
+}
 svg.md,
 span.gh-text.md {
   font-size: 15px;
@@ -249,9 +316,14 @@ span.gh-text.lg {
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
   /*margin: 20px;*/
   border-radius: 5px;
+  border: none;
+}
+.gh-panel.top-left-square {
+  border-top-left-radius: 0;
 }
 .gh-panel .inside {
   padding: 20px;
+  margin-top: 0;
 }
 
 .wp-core-ui select {
@@ -484,7 +556,6 @@ button.gh-submit.loud {
   border: 1px solid #8c8f94;
   display: flex;
   flex-direction: column;
-  gap: 5px;
   background: #FFFFFF;
   border-radius: 5px;
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
@@ -503,6 +574,7 @@ button.gh-submit.loud {
   justify-content: space-between;
   border-bottom: 1px solid #8c8f94;
   gap: 20px;
+  margin-bottom: 0;
 }
 .search-options-widget-wrap .search-options-widget .header button.close {
   padding: 0;
@@ -527,6 +599,9 @@ button.gh-submit.loud {
 }
 .search-options-widget-wrap .search-options-widget .search-options .option {
   cursor: pointer;
+  border-radius: 3px;
+  padding: 2px 5px;
+  margin: 0;
 }
 .search-options-widget-wrap .search-options-widget .search-options .option.focused, .search-options-widget-wrap .search-options-widget .search-options .option:hover {
   background: #0075ff;
@@ -900,12 +975,42 @@ p.error,
   flex-wrap: wrap;
   gap: 10px;
 }
+.gh-tags button.add-tag {
+  padding-left: 3px;
+  padding-right: 3px;
+  border-radius: 3px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.gh-tags button.add-tag:hover {
+  background-color: rgba(16, 38, 64, 0.05);
+}
+.gh-tags button.add-tag .dashicons {
+  margin: 0;
+}
 .gh-tags span.gh-tag {
   background: #f2f2f2;
   padding: 3px 9px;
   border-radius: 3px;
   font-size: 12px;
   display: inline-block;
+}
+.gh-tags span.gh-tag.remove {
+  background: rgba(233, 31, 79, 0.5);
+  color: #4e0818;
+}
+.gh-tags span.gh-tag.adding {
+  background: rgba(158, 206, 56, 0.5);
+  color: #334310;
+}
+.gh-tags span.gh-tag .dashicons {
+  margin-right: -6px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+.gh-tags span.gh-tag .dashicons:hover {
+  background-color: rgba(16, 38, 64, 0.05);
 }
 
 .gh-rows-and-columns {
@@ -985,6 +1090,8 @@ p.error,
   z-index: 999999;
   padding: 5px 8px;
   border-radius: 5px;
+  font-size: 13px;
+  font-weight: normal;
 }
 .gh-has-tooltip .gh-tooltip.right {
   left: calc(100% + 5px);

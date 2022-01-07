@@ -10,6 +10,29 @@ namespace Groundhogg;
  */
 
 /**
+ * Swap out the sanitization callback
+ *
+ * @param $callback callable
+ * @param $option string
+ * @param $value mixed
+ */
+function filter_option_sanitize_callback( $callback, $option, $value ){
+
+	switch ( $option ){
+		case 'gh_contact_custom_properties':
+			// todo implement proper sanitization here
+			return function ( $props ) {
+				return $props;
+			};
+	}
+
+	return $callback;
+
+}
+
+add_filter( 'groundhogg/api/v4/options_sanitize_callback', __NAMESPACE__ . '\filter_option_sanitize_callback', 10, 3 );
+
+/**
  * GHSS doesn't link the <pwlink> format so we have to fix it by removing the gl & lt
  *
  * @param $message
