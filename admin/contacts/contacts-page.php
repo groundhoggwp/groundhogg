@@ -81,6 +81,7 @@ class Contacts_Page extends Admin_Page {
 		new Contact_Table_Columns();
 		new Info_Cards();
 
+		add_action( 'wp_ajax_groundhogg_edit_contact', [ $this, 'ajax_edit_contact' ] );
 		add_action( 'wp_ajax_groundhogg_contact_table_row', [ $this, 'ajax_contact_table_row' ] );
 		add_action( 'wp_ajax_groundhogg_get_contacts_table', [ $this, 'ajax_get_table' ] );
 	}
@@ -644,6 +645,27 @@ class Contacts_Page extends Admin_Page {
 	}
 
 	/**
+	 * Update the contact via ajax for backwards compatibility with custom extensions
+	 */
+	public function ajax_edit_contact() {
+
+		if ( ! doing_action() ) {
+			return;
+		}
+
+		$id = absint( get_request_var( 'contact' ) );
+
+		$this->process_edit();
+
+		$this->remove_notice( 'updated' );
+
+		wp_send_json_success( [
+			'contact' => new Contact( $id )
+		] );
+
+	}
+
+	/**
 	 * Update the contact via the admin screen
 	 */
 	public function process_edit() {
@@ -658,47 +680,6 @@ class Contacts_Page extends Admin_Page {
 
 		if ( ! current_user_can( 'edit_contact', $contact ) ) {
 			$this->wp_die_no_access();
-		}
-
-		//this meta data will not be deleted.
-
-		$posted_meta = get_request_var( 'meta' );
-
-		// Handle Meta ADD/DELETE
-		if ( $posted_meta ) {
-
-			$posted_meta_keys = array_keys( $posted_meta );
-			$stored_meta_keys = array_keys( $contact->get_meta() );
-			$exclude_keys     = $this->get_meta_key_exclusions();
-
-			$editable_meta  = array_diff( $stored_meta_keys, $exclude_keys );
-			$deletable_meta = array_diff( $editable_meta, $posted_meta_keys );
-
-			foreach ( $editable_meta as $key ) {
-
-				$value = sanitize_text_field( get_array_var( $posted_meta, $key ) );
-
-				// Ignore serialized data
-				if ( $value !== 'SERIALIZED DATA' ) {
-					$contact->update_meta( $key, $value );
-				}
-
-			}
-
-			foreach ( $deletable_meta as $key ) {
-				$contact->delete_meta( $key );
-			}
-		}
-
-		$new_meta_keys = get_request_var( 'newmetakey', [] );
-		$new_meta_vals = get_request_var( 'newmetavalue', [] );
-
-		foreach ( $new_meta_keys as $i => $new_meta_key ) {
-			if ( strpos( $new_meta_vals[ $i ], PHP_EOL ) !== false ) {
-				$contact->update_meta( sanitize_key( $new_meta_key ), sanitize_textarea_field( $new_meta_vals[ $i ] ) );
-			} else {
-				$contact->update_meta( sanitize_key( $new_meta_key ), sanitize_text_field( $new_meta_vals[ $i ] ) );
-			}
 		}
 
 		$args = [];
@@ -787,45 +768,6 @@ class Contacts_Page extends Admin_Page {
 			}
 		}
 
-		// Process any tag adds/removals.
-		if ( get_post_var( 'tags', [] ) ) {
-
-			$tags = validate_tags( get_request_var( 'tags', [] ) );
-
-			$cur_tags = $contact->get_tags();
-			$new_tags = $tags;
-
-			$delete_tags = array_diff( $cur_tags, $new_tags );
-			if ( ! empty( $delete_tags ) ) {
-				$contact->remove_tag( $delete_tags );
-			}
-
-			$add_tags = array_diff( $new_tags, $cur_tags );
-			if ( ! empty( $add_tags ) ) {
-				$result = $contact->add_tag( $add_tags );
-				if ( ! $result ) {
-					return new \WP_Error( 'bad-tag', __( 'Hmm, looks like we could not add the new tags...', 'groundhogg' ) );
-				}
-			}
-		} else {
-			// If the tags array is empty all tags were deleted.
-			$contact->remove_tag( $contact->get_tags() );
-		}
-
-		if ( isset( $_POST['send_email'] ) && isset( $_POST['email_id'] ) && current_user_can( 'send_emails' ) ) {
-			$mail_id = intval( $_POST['email_id'] );
-			if ( send_email_notification( $mail_id, $contact->get_id() ) ) {
-				$this->add_notice( 'email_queued', _x( 'The email has been added to the queue and will send shortly.', 'notice', 'groundhogg' ) );
-			}
-		}
-
-		if ( isset( $_POST['start_funnel'] ) && isset( $_POST['add_contacts_to_funnel_step_picker'] ) && current_user_can( 'edit_contacts' ) ) {
-			$step = new Step( intval( $_POST['add_contacts_to_funnel_step_picker'] ) );
-			if ( $step->exists() && $step->enqueue( $contact ) ) {
-				$this->add_notice( 'started', _x( "Contact added to funnel.", 'notice', 'groundhogg' ), 'info' );
-			}
-		}
-
 		if ( ! empty( $_FILES['files'] ) ) {
 			$files = normalize_files( $_FILES['files'] );
 			foreach ( $files as $file_key => $file ) {
@@ -839,15 +781,6 @@ class Contacts_Page extends Admin_Page {
 		}
 
 		do_action( 'groundhogg/admin/contact/save', $contact->get_id(), $contact );
-
-		if ( get_request_var( 'switch_form' ) ) {
-			wp_safe_redirect( $this->admin_url( [
-				'action'  => 'form',
-				'contact' => $contact->get_id(),
-				'form'    => get_request_var( 'manual_form_submission' ),
-			] ) );
-			die();
-		}
 
 		$this->add_notice( 'update', _x( "Contact updated!", 'notice', 'groundhogg' ), 'success' );
 
@@ -1050,55 +983,6 @@ class Contacts_Page extends Admin_Page {
 		// Return to contact edit screen.
 		return admin_page_url( 'gh_contacts', [ 'action' => 'edit', 'contact' => $contact->get_id() ] );
 
-	}
-
-	/**
-	 * Send a 1 off personal email
-	 *
-	 * @return string
-	 */
-	public function process_send_personal_email() {
-
-		$contact = get_contactdata( get_url_var( 'contact' ) );
-
-		if ( ! is_a_contact( $contact ) || ! current_user_can( 'send_emails' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		$subject   = do_replacements( sanitize_text_field( get_post_var( 'subject' ) ) );
-		$from_user = get_userdata( absint( get_post_var( 'from_user', $contact->get_owner_id() ) ) );
-		$from      = sprintf( '%s <%s>', $from_user->display_name, $from_user->user_email );
-		$cc        = do_replacements( sanitize_email_header( get_post_var( 'cc' ), 'cc' ), $contact );
-		$bcc       = do_replacements( sanitize_email_header( get_post_var( 'bcc' ), 'bcc' ), $contact );
-		$content   = do_replacements( wpautop( kses_wrapper( get_post_var( 'email_content' ) ) ), $contact );
-
-		$headers = [
-			'From: ' . $from,
-			'Content-Type: text/html',
-		];
-
-		if ( ! empty( $cc ) ) {
-			$headers[] = 'Cc: ' . $cc;
-		}
-
-		if ( ! empty( $bcc ) ) {
-			$headers[] = 'Bcc: ' . $bcc;
-		}
-
-		add_action( 'wp_mail_failed', [ $this, 'catch_personal_email_error' ] );
-
-		if ( \Groundhogg_Email_Services::send_wordpress( $contact->get_email(), $subject, $content, $headers ) ) {
-			$this->add_notice( 'sent', __( 'Email sent!', 'groundhogg' ) );
-		}
-
-		return $this->admin_url( [
-			'action'  => 'edit',
-			'contact' => $contact->get_id()
-		] );
-	}
-
-	public function catch_personal_email_error( $error ) {
-		$this->add_notice( $error );
 	}
 
 	/**

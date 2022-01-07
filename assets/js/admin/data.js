@@ -1,7 +1,7 @@
 (function ($) {
 
   function ApiError (message) {
-    this.name="ApiError"
+    this.name = 'ApiError'
     this.message = message
   }
 
@@ -128,18 +128,22 @@
    */
   async function adminAjax (data = {}, opts = {}) {
 
-    const fData = new FormData()
+    if (!data instanceof FormData) {
+      const fData = new FormData()
 
-    for (const key in data) {
-      if (data.hasOwnProperty(key)) {
-        fData.append(key, data[key])
+      for (const key in data) {
+        if (data.hasOwnProperty(key)) {
+          fData.append(key, data[key])
+        }
       }
+
+      data = fData
     }
 
     const response = await fetch(ajaxurl, {
       method: 'POST',
       credentials: 'same-origin',
-      body: fData,
+      body: data,
       ...opts,
     })
 
@@ -187,7 +191,7 @@
       return this.item[this.primaryKey] == id || this.items.find(item => item[this.primaryKey] == id)
     },
 
-    hasItems (itemIds=false) {
+    hasItems (itemIds = false) {
 
       if (!itemIds) {
         return this.items.length > 0
@@ -319,6 +323,18 @@
 
     async patchMeta (id, data, opts = {}) {
       return apiPatch(`${this.route}/${id}/meta`, data, opts)
+        .then(r => this.getItemFromResponse(r))
+        .then(item => {
+          this.item = item
+          this.itemsFetched([
+            item
+          ])
+          return item
+        })
+    },
+
+    async deleteMeta (id, data, opts = {}) {
+      return apiDelete(`${this.route}/${id}/meta`, data, opts)
         .then(r => this.getItemFromResponse(r))
         .then(item => {
           this.item = item
@@ -475,6 +491,7 @@
     forms: ObjectStore(Groundhogg.api.routes.v4.forms),
     contacts: ObjectStore(Groundhogg.api.routes.v4.contacts),
     events: ObjectStore(Groundhogg.api.routes.v4.events),
+    page_visits: ObjectStore(Groundhogg.api.routes.v4.page_visits),
     activity: ObjectStore(Groundhogg.api.routes.v4.activity),
     campaigns: ObjectStore(Groundhogg.api.routes.v4.campaigns),
     funnels: ObjectStore(Groundhogg.api.routes.v4.funnels, {

@@ -71,4 +71,14 @@ class Page_Visit extends Base_Object {
 	protected function get_db() {
 		return get_db( 'page_visits' );
 	}
+
+	public function get_as_array() {
+		$array = parent::get_as_array();
+
+		$array['locale'] = [
+			'diff_time' => human_time_diff( $this->get_timestamp(), time() )
+		];
+
+		return $array;
+	}
 }

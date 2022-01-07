@@ -1,3 +1,7 @@
+.wp-heading-inline, .page-title-action, #screen-meta-links {
+  display: none !important;
+}
+
 .contact-record {
   display: flex;
   margin-top: 10px;
@@ -75,6 +79,9 @@ a.change-status.complained:hover {
   border-radius: 3px;
 }
 
+.two-columns {
+  gap: 20px !important;
+}
 .two-columns > * {
   width: 100%;
   display: flex;
@@ -240,7 +247,13 @@ code.meta-replacement-code {
 
 #activity-here {
   overflow: auto;
-  max-height: 800px;
+}
+
+.property-field > .property-label {
+  margin-bottom: 5px;
+}
+.property-field > * {
+  width: 100%;
 }
 
 #activity-timeline {
@@ -284,6 +297,9 @@ code.meta-replacement-code {
   border-radius: 4px;
   background: #0075ff;
   color: #FFFFFF;
+}
+#activity-timeline li.activity-item .activity-icon:not(.wp_fusion).page-visit {
+  background: #102640;
 }
 #activity-timeline li.activity-item .activity-icon:not(.wp_fusion).benchmark {
   background: #f58115;

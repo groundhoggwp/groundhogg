@@ -22,6 +22,10 @@ $action-green: rgb(158, 206, 56);
 $action-green-50: rgba(158, 206, 56, 0.5);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
+.wp-heading-inline, .page-title-action, #screen-meta-links {
+  display: none !important;
+}
+
 .contact-record {
   display: flex;
   margin-top: 10px;
@@ -108,6 +112,9 @@ a.change-status.complained:hover {
 }
 
 .two-columns {
+
+  gap: 20px !important;
+
   > * {
     width: 100%;
     display: flex;
@@ -141,11 +148,11 @@ a.change-status.complained:hover {
   width: 20em;
 }
 
-#primary-contact-stuff{
+#primary-contact-stuff {
   flex-basis: 440px;
   flex-shrink: 0;
 
-  .compliance-table{
+  .compliance-table {
 
     width: 100%;
 
@@ -159,7 +166,7 @@ a.change-status.complained:hover {
     }
   }
 
-  .tab-content-wrapper:not(.active){
+  .tab-content-wrapper:not(.active) {
     display: none;
   }
 }
@@ -280,9 +287,20 @@ code.meta-replacement-code {
   color: #aaa;
 }
 
-#activity-here{
+#activity-here {
   overflow: auto;
-  max-height: 800px;
+  //max-height: 800px;
+}
+
+.property-field {
+
+  > .property-label{
+    margin-bottom: 5px;
+  }
+
+  > * {
+    width: 100%;
+  }
 }
 
 #activity-timeline {
@@ -298,20 +316,20 @@ code.meta-replacement-code {
       margin-bottom: 25px;
     }
 
-    .activity-info{
+    .activity-info {
       font-size: 15px;
     }
 
     .event-extra,
-    .diff-time{
+    .diff-time {
       color: $primary-dark-50;
     }
 
-    .activity-rendered.gh-panel{
+    .activity-rendered.gh-panel {
       padding: 5px 10px;
     }
 
-    .activity-icon.wp_fusion{
+    .activity-icon.wp_fusion {
       position: absolute;
       left: -34px;
 
@@ -336,13 +354,17 @@ code.meta-replacement-code {
       background: $primary-blue;
       color: #FFFFFF;
 
-      &.benchmark{
+      &.page-visit{
+        background: $primary-dark;
+      }
+
+      &.benchmark {
         background: $benchmark-orange;
         border-radius: 4px;
       }
 
       &.broadcast,
-      &.action{
+      &.action {
         background: $action-green;
       }
 
@@ -354,6 +376,6 @@ code.meta-replacement-code {
   }
 }
 
-#secondary-tabs{
+#secondary-tabs {
   flex-grow: 0;
 }

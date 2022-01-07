@@ -35,14 +35,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 /* Auto link the account before we see the create account form. */
 $contact->auto_link_account();
 
-$tabs = array(
+$tabs = [
 	'general' => _x( 'General', 'contact_record_tab', 'groundhogg' ),
-);
+];
 
 $tabs = apply_filters( 'groundhogg/admin/contact/record/tabs', $tabs );
-
-$tabs['meta_data'] = _x( 'Meta', 'contact_record_tab', 'groundhogg' );
-
 $tabs = apply_filters( 'groundhogg/admin/contact/record/tabs_after', $tabs );
 
 $cookie_tab = str_replace( 'tab_', '', get_cookie( 'gh_contact_tab', 'general' ) );
@@ -121,7 +118,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 			</div>
 		</div>
 		<div id="primary-tabs-wrap">
-			<form method="post" class="" enctype="multipart/form-data">
+			<form id="primary-form" method="post" enctype="multipart/form-data">
 				<?php wp_nonce_field( 'edit' ); ?>
 
 				<?php do_action( 'groundhogg/contact/record/nav/before', $contact ); ?>
@@ -445,19 +442,10 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 						<?php endif; ?>
 						</tbody>
 					</table>
+					<p>
+						<button class="gh-button primary" id="save-primary"><?php _e( 'Save Changes' ) ?></button>
+					</p>
 
-					<?php
-				}
-
-				add_action( 'groundhogg/admin/contact/record/tab/meta_data', __NAMESPACE__ . '\contact_record_section_custom_meta' );
-
-				/**
-				 * @param $contact Contact
-				 */
-				function contact_record_section_custom_meta( $contact ) {
-					?>
-					<!-- META -->
-					<div id="meta-here"></div>
 					<?php
 				}
 
@@ -480,13 +468,6 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 				endforeach;
 
 				?>
-
-				<?php echo html()->input( array(
-					'type' => 'hidden',
-					'name' => 'active_tab',
-					'id'   => 'active-tab'
-				) ); ?>
-
 			</form>
 		</div>
 	</div>

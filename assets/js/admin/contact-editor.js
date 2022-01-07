@@ -13,7 +13,10 @@
     bold,
     modal,
     uuid,
+    dangerConfirmationModal,
+    adminPageUrl,
     moreMenu,
+    loadingDots,
     spinner,
     dialog
   } = Groundhogg.element
@@ -27,6 +30,7 @@
     activity: ActivityStore,
     funnels: FunnelsStore,
     broadcasts: BroadcastsStore,
+    page_visits: PageVisitsStore,
   } = Groundhogg.stores
 
   const { post, get, patch, routes, ajax } = Groundhogg.api
@@ -37,6 +41,10 @@
 
   const getContact = () => {
     return ContactsStore.get(contact.ID)
+  }
+
+  const sanitizeKey = (label) => {
+    return label.toLowerCase().replace(/[^a-z0-9]/g, '_')
   }
 
   const sendEmail = () => {
@@ -61,15 +69,52 @@
     // language = HTML
     let actions = `
     <button id="action-send-email" class="gh-button secondary text icon">${icons.email}</button>
-				<button class="gh-button secondary text icon">${icons.phone}</button>
-				<button class="gh-button secondary text icon">${icons.note}</button>
-				<button class="gh-button secondary text icon">${icons.verticalDots}</button>`
+				${getContact().meta.primary_phone ? `<a id="call-primary" class="gh-button secondary text icon" href="tel:${getContact().meta.primary_phone}">${icons.phone}</a>` : ''}
+				${getContact().meta.mobile_phone ? `<a id="call-mobile" class="gh-button secondary text icon" href="tel:${getContact().meta.mobile_phone}">${icons.smartphone}</a>` : ''}
+				<button id="contact-more" class="gh-button secondary text icon">${icons.verticalDots}</button>`
 
     $('#contact-more-actions').html(actions)
 
     tooltip('#action-send-email', {
       content: __('Send email', 'groundhogg')
     })
+    tooltip('#call-primary', {
+      content: __('Call', 'groundhogg')
+    })
+    tooltip('#call-mobile', {
+      content: __('Call mobile', 'groundhogg')
+    })
+    tooltip('#contact-more', {
+      content: __('More actions', 'groundhogg')
+    })
+
+    $('#contact-more').on('click', e => moreMenu(e.target, {
+      items: [
+        {
+          key: 'delete',
+          cap: 'delete_contacts',
+          text: `<span class="gh-text danger">${__('Delete')}</span>`
+        }
+      ],
+      onSelect: k => {
+        switch (k) {
+          case 'delete':
+            dangerConfirmationModal({
+              confirmText: __('Delete'),
+              alert: `<p>${sprintf(__('Are you sure you want to delete %s?', 'groundhogg'), bold(getContact().data.full_name))}</p>`,
+              onConfirm: () => {
+                ContactsStore.delete(contact.ID).then(() => {
+                  dialog({
+                    message: sprintf(__('%s was deleted!', 'groundhogg'), getContact().data.full_name)
+                  })
+                  window.location.href = adminPageUrl('gh_contacts')
+                })
+              }
+            })
+        }
+      }
+    }))
+
     $('#action-send-email').on('click', sendEmail)
 
   }
@@ -123,6 +168,22 @@
     },
 
     renderActivity (activity) {
+
+      if (activity.type === 'page_visit') {
+        // language=HTML
+        return `
+			<li class="activity-item">
+				<div class="activity-icon page-visit">${icons.link_click}</div>
+				<div class="activity-rendered gh-panel">
+					<div class="activity-info">
+						${sprintf(__('Visited %s', 'groundhogg'), `<a href="${activity.data.path}" target="_blank">${bold(activity.data.path)}</a>`)}
+					</div>
+					<div class="diff-time">
+						${sprintf(__('%s ago', 'groundhogg'), activity.locale.diff_time)}
+					</div>
+				</div>
+			</li>`
+      }
 
       // Funnel Event
       if (activity.type === 'event' && activity.data.event_type == 1) {
@@ -231,10 +292,10 @@
       const $el = $(selector)
 
       // Only show supported activities
-      activities = activities.filter(a => a.type === 'event' || a.data.activity_type in this.types)
+      activities = activities.filter(a => a.type === 'event' || a.type === 'page_visit' || a.data.activity_type in this.types)
 
       if (!activities.length) {
-        $el.html(`<p>${__('No tracked activity yet', 'groundhogg')}</p>`)
+        $el.html(`<div class="align-center-space-between" style="margin: 20px"><span class="pill orange">${__('No activity found.', 'groundhogg')}</span></div>`)
         return
       }
 
@@ -291,17 +352,17 @@
 				  <div class="inside">
 					  <div class="align-left-space-between">
 						  <div class="order-by">
-							  <label id="activity-orderby">${__('Order by')}</label><br/>
+							  <label for="activity-order"><b>${__('Order by')}</b></label><br/>
 							  ${select({
-								  id: 'activity-orderby',
-								  name: 'orderby',
+								  id: 'activity-order',
+								  name: 'order',
 							  }, {
-								  asc: __('Newest first'),
-								  desc: __('Oldest first'),
-							  }, '')}
+								  desc: __('Newest first'),
+								  asc: __('Oldest first'),
+							  }, 'desc')}
 						  </div>
 						  <div class="filter-by">
-							  <label for="filter-by">${__('Filter by')}</label><br/>
+							  <label for="filter-by"><b>${__('Filter by')}</b></label><br/>
 							  ${select({
 								  id: 'filter-by',
 								  name: 'filter',
@@ -309,8 +370,8 @@
 								  all: __('All Activity', 'groundhogg'),
 								  funnel: __('Funnel Activity', 'groundhogg'),
 								  email: __('Email Activity', 'groundhogg'),
-								  wp_fusion: __('WPFusion Activity', 'groundhogg'),
 								  web: __('Web Activity', 'groundhogg'),
+								  wp_fusion: __('WPFusion Activity', 'groundhogg'),
 							  }, '')}
 						  </div>
 						  <div class="filter-by hidden">
@@ -335,6 +396,44 @@
         },
         onMount: () => {
 
+          let order = 'desc'
+          let filter = 'all'
+
+          $('#activity-order').on('change', (e) => {
+            order = e.target.value
+            fetchActivity()
+          })
+
+          $('#filter-by').on('change', (e) => {
+            filter = e.target.value
+            loadTimeline()
+          })
+
+          const fetchActivity = () => {
+            Promise.all([
+              ActivityStore.fetchItems({
+                contact_id: contact.ID,
+                limit: 50,
+                order,
+                orderby: 'timestamp'
+              }),
+              EventsStore.fetchItems({
+                contact_id: contact.ID,
+                limit: 50,
+                orderby: 'time',
+                order
+              }),
+              PageVisitsStore.fetchItems({
+                contact_id: contact.ID,
+                limit: 50,
+                orderby: 'timestamp',
+                order
+              })
+            ]).then(() => {
+              loadTimeline()
+            })
+          }
+
           const loadTimeline = () => {
             let allActivities = [
               ...ActivityStore.getItems().map(a => ({
@@ -346,10 +445,32 @@
                 ...e,
                 type: 'event',
                 time: parseInt(e.data.time) + parseFloat(e.data.micro_time)
+              })),
+              ...PageVisitsStore.getItems().map(v => ({
+                ...v,
+                type: 'page_visit',
+                time: parseInt(v.data.timestamp)
               }))
-            ].sort((a, b) => b.time - a.time)
+            ].sort((a, b) => order === 'desc' ? b.time - a.time : a.time - b.time)
+
+            switch (filter) {
+              case 'funnel':
+                allActivities = allActivities.filter(a => a.type === 'event' && a.data.event_type == 1)
+                break
+              case 'email':
+                allActivities = allActivities.filter(a => a.data.email_id > 0)
+                break
+              case 'web':
+                allActivities = allActivities.filter(a => a.type === 'page_visit')
+                break
+              case 'wp_fusion':
+                allActivities = allActivities.filter(a => a.type === 'activity' && a.data.activity_type === 'wp_fusion')
+                break
+            }
 
             ActivityTimeline.mount('#activity-here', allActivities)
+
+            $('#activity-here').css({maxHeight: $('#primary-contact-stuff').height()})
           }
 
           if (ActivityStore.hasItems() || EventsStore.hasItems()) {
@@ -357,20 +478,7 @@
             return
           }
 
-          Promise.all([
-            ActivityStore.fetchItems({
-              contact_id: contact.ID,
-              limit: 50
-            }),
-            EventsStore.fetchItems({
-              contact_id: contact.ID,
-              limit: 50,
-              orderby: 'time',
-              order: 'DESC'
-            })
-          ]).then(() => {
-            loadTimeline()
-          })
+          fetchActivity()
         }
       },
       {
@@ -446,39 +554,35 @@
 
   }
 
-  const manageMeta = () => {
+  const handleFormSubmit = () => {
 
-    const mount = () => {
-      onMount()
-    }
+    $('#primary-form').on('submit', e => {
+      e.preventDefault()
 
-    const onMount = () => {
+      const $btn = $('#save-primary')
 
-      inputRepeaterWidget({
-        selector: '#meta-here',
-        rows: Object.keys(getContact().meta).filter(k => !meta_exclusions.includes(k)).map(k => ([k, getContact().meta[k]])),
-        cellProps: [{
-          className: 'meta-key',
-          readonly: true
-        }, {}],
-        cellCallbacks: [input, input],
-        onMount: () => {
+      let { stop } = loadingDots('#save-primary')
+      $btn.prop('disabled', true)
 
-          $('.meta-key').each((i, el) => {
-            let $el = $(el)
-            if (!$el.val()) {
-              $el.prop('readonly', false)
-            }
-          })
+      let data = new FormData(e.currentTarget)
 
-        },
-        onChange: (rows) => {
-          console.log(rows)
-        }
-      }).mount()
-    }
+      data.append('action', 'groundhogg_edit_contact')
+      data.append('contact', getContact().ID)
 
-    mount()
+      ajax(data).then(r => {
+
+        ContactsStore.itemsFetched([r.data.contact])
+
+        $btn.prop('disabled', false)
+        stop()
+
+        dialog({
+          message: __('Changes saved!')
+        })
+
+      })
+
+    })
 
   }
 
@@ -486,13 +590,43 @@
 
     let activeTab = 'general'
 
-    let tabState = gh_contact_custom_properties || {
+    let customTabState = gh_contact_custom_properties || {
       tabs: [],
       groups: [],
       fields: []
     }
 
     let timeout
+    let metaChanges = {}
+    let deleteKeys = []
+
+    const commitMetaChanges = () => {
+
+      let { stop } = loadingDots('#save-meta')
+      $('#save-meta').prop('disabled', true)
+
+      Promise.all([
+        ContactsStore.patchMeta(getContact().ID, metaChanges),
+        ContactsStore.deleteMeta(getContact().ID, deleteKeys)
+      ]).then(() => {
+
+        metaChanges = {}
+        deleteKeys = []
+
+        stop()
+        mount()
+        dialog({
+          message: __('Changes saved!')
+        })
+      })
+    }
+
+    const cancelMetaChanges = () => {
+      metaChanges = {}
+      deleteKeys = []
+
+      mount()
+    }
 
     const updateTabState = () => {
 
@@ -502,7 +636,7 @@
 
       timeout = setTimeout(() => {
         patch(routes.v4.options, {
-          gh_contact_custom_properties: tabState
+          gh_contact_custom_properties: customTabState
         }).then(() => {
           dialog({
             message: __('Changes saved!', 'groundhogg')
@@ -528,9 +662,11 @@
     })
 
     const mount = () => {
+      $('#primary-contact-stuff .edit-meta').remove()
       $('#primary-contact-stuff .custom-tab').remove()
       $('#primary-contact-stuff .tab-more').remove()
-      $(tabState.tabs.map(({
+      $(`<a href="#" id="edit-meta" class="nav-tab edit-meta ${'edit-meta' === activeTab ? ' nav-tab-active' : ''}">${__('Meta', 'groundhogg')}</a>`).insertAfter('#general')
+      $(customTabState.tabs.map(({
         id,
         name
       }) => `<a href="#" id="${id}" class="nav-tab custom-tab${id === activeTab ? ' nav-tab-active' : ''}">${name}</a>`).join('')).insertBefore('#tab-actions')
@@ -543,24 +679,125 @@
       $(`#primary-contact-stuff [data-tab-content="${activeTab}"]`).addClass('active')
 
       // If the current tab is a custom tab
-      if (tabState.tabs.find(t => t.id === activeTab)) {
+      if (customTabState.tabs.find(t => t.id === activeTab)) {
 
-        $(`<div class="tab-content-wrapper custom-tab gh-panel top-left-square active" data-tab-content="${activeTab}">
-					<div class="inside">
-						<div id="custom-fields-here">
-						</div>
+        // language=HTML
+        let customTabUi = `
+			<div class="tab-content-wrapper custom-tab gh-panel top-left-square active" data-tab-content="${activeTab}">
+				<div class="inside">
+					<div id="custom-fields-here">
 					</div>
-				</div>`).insertAfter('#primary-contact-stuff form')
+					<p>
+						<button id="save-meta" class="gh-button primary">${__('Save Changes')}</button>
+						<button id="cancel-meta-changes" class="gh-button danger text">${__('Cancel')}</button>
+					</p>
+				</div>
+			</div>`
+
+        $(customTabUi).insertAfter('#primary-contact-stuff form')
         $(`<button class="gh-button tab-more secondary text icon">${icons.verticalDots}</button>`).insertAfter('#add-tab')
 
+        $('#save-meta').on('click', commitMetaChanges)
+        $('#cancel-meta-changes').on('click', cancelMetaChanges)
+
+        $('.tab-more').on('click', e => {
+          e.preventDefault()
+
+          moreMenu(e.currentTarget, {
+            items: [
+              {
+                key: 'rename',
+                cap: 'manage_options',
+                text: __('Rename')
+              },
+              {
+                key: 'delete',
+                cap: 'manage_options',
+                text: `<span class="gh-text danger">${__('Delete')}</span>`
+              }
+            ],
+            onSelect: k => {
+
+              switch (k) {
+
+                case 'delete':
+
+                  dangerConfirmationModal({
+                    confirmText: __('Delete'),
+                    alert: `<p>${sprintf(__('Are you sure you want to delete %s?', 'groundhogg'), bold(customTabState.tabs.find(t => t.id === activeTab).name))}</p>`,
+                    onConfirm: () => {
+                      // Groups belonging to this tab
+                      let groups = customTabState.groups.filter(g => g.tab === activeTab)
+                      // Fields belonging to the groups of this tab
+                      let fields = customTabState.fields.filter(f => groups.find(g => g.id === f.group)).map(f => f.id)
+
+                      customTabState.tabs = customTabState.tabs.filter(t => t.id !== activeTab)
+                      customTabState.groups = customTabState.groups.filter(g => g.tab !== activeTab)
+                      customTabState.fields = customTabState.fields.filter(f => !fields.includes(f.id))
+
+                      updateTabState()
+                      activeTab = 'general'
+                      mount()
+                    }
+                  })
+
+                  break
+
+                case 'rename':
+                  modal({
+                    // language=HTML
+                    content: `
+						<div>
+							<h2>${__('Rename tab', 'groundhogg')}</h2>
+							<div class="align-left-space-between">
+								${input({
+									id: 'tab-name',
+									value: customTabState.tabs.find(t => t.id === activeTab).name,
+									placeholder: __('Tab name', 'groundhogg')
+								})}
+								<button id="update-tab" class="gh-button primary">
+									${__('Save')}
+								</button>
+							</div>
+						</div>`,
+                    onOpen: ({ close }) => {
+
+                      let tabName
+
+                      $('#tab-name').on('change input', (e) => {
+                        tabName = e.target.value
+                      }).focus()
+
+                      $('#update-tab').on('click', () => {
+
+                        customTabState.tabs.find(t => t.id === activeTab).name = tabName
+
+                        updateTabState()
+
+                        mount()
+                        close()
+
+                      })
+
+                    }
+                  })
+                  break
+
+              }
+
+            }
+          })
+        })
+
         // Groups belonging to this tab
-        let groups = tabState.groups.filter(g => g.tab === activeTab)
+        let groups = customTabState.groups.filter(g => g.tab === activeTab)
         // Fields belonging to the groups of this tab
-        let fields = tabState.fields.filter(f => groups.find(g => g.id === f.group))
+        let fields = customTabState.fields.filter(f => groups.find(g => g.id === f.group))
 
         propertiesEditor('#custom-fields-here', {
           values: {
             ...getContact().meta,
+            ...metaChanges
           },
           properties: {
             groups,
@@ -568,33 +805,103 @@
           },
           onPropertiesUpdated: ({ groups = [], fields = [] }) => {
 
-            tabState.groups = [
+            customTabState.groups = [
               ...groups.map(g => ({ ...g, tab: activeTab })), // new items
-              ...tabState.groups.filter(group => !groups.find(_group => _group.id == group.id))
+              ...customTabState.groups.filter(group => !groups.find(_group => _group.id == group.id))
             ]
 
-            tabState.fields = [
+            customTabState.fields = [
               ...fields, // new items
-              ...tabState.fields.filter(field => !fields.find(_field => _field.id == field.id))
+              ...customTabState.fields.filter(field => !fields.find(_field => _field.id == field.id))
             ]
 
             updateTabState()
 
           },
-          onChange: () => {},
+          onChange: (meta) => {
+            metaChanges = {
+              ...metaChanges,
+              ...meta
+            }
+          },
           canEdit: () => {
             return userHasCap('edit_contacts')
           }
 
         })
 
-      } else {
+      } else if (activeTab === 'edit-meta') {
 
+        // language=HTML
+        let metaUi = `
+			<div class="tab-content-wrapper edit-meta gh-panel top-left-square active" data-tab-content="${activeTab}">
+				<div class="inside">
+					<div id="meta-here">
+					</div>
+					<p>
+						<button id="save-meta" class="gh-button primary">${__('Save Changes')}</button>
+						<button id="cancel-meta-changes" class="gh-button danger text">${__('Cancel')}</button>
+					</p>
+				</div>
+			</div>`
+
+        $(metaUi).insertAfter('#primary-contact-stuff form')
+        $('#cancel-meta-changes').on('click', cancelMetaChanges)
+
+        let combinedMeta = {
+          ...getContact().meta,
+          ...metaChanges
+        }
+
+        inputRepeaterWidget({
+          selector: '#meta-here',
+          rows: Object.keys(combinedMeta).filter(k => !meta_exclusions.includes(k)).map(k => ([k, combinedMeta[k]])).map(([k, v]) => ([k, ['array', 'object'].includes(typeof v) ? 'SERIALIZED DATA' : v])),
+          cellProps: [{
+            className: 'meta-key',
+            readonly: true
+          }, {}],
+          cellCallbacks: [input, input],
+          onMount: () => {
+
+            $(`[value="SERIALIZED DATA"]`).prop('readonly', true)
+
+            $('.meta-key').each((i, el) => {
+              let $el = $(el)
+              if (!$el.val()) {
+                $el.prop('readonly', false)
+              }
+            }).on('input', (e) => {
+              let key = sanitizeKey(e.target.value)
+              $(e.target).val(key)
+            })
+          },
+          onChange: (rows) => {
+            rows.forEach(([key, value]) => {
+
+              if (!key) {
+                return
+              }
+
+              metaChanges[key] = value
+            })
+          },
+          onRemove: ([key, value]) => {
+
+            if (!key) {
+              return
+            }
+
+            deleteKeys.push(key)
+            delete metaChanges[key]
+          }
+        }).mount()
+
+        $('#save-meta').on('click', commitMetaChanges)
       }
 
     }
 
-    $('.nav-tab-wrapper.primary').append(`<div id="tab-actions" class="space-between"><button id="add-tab"><span class="dashicons dashicons-plus-alt2"></span></button></div>`)
+    $('.nav-tab-wrapper.primary').append(`<div id="tab-actions" class="space-between"><button type="button" id="add-tab"><span class="dashicons dashicons-plus-alt2"></span></button></div>`)
     $('#add-tab').on('click', (e) => {
       e.preventDefault()
 
@@ -625,7 +932,7 @@
 
             let id = uuid()
 
-            tabState.tabs.push({
+            customTabState.tabs.push({
               id,
               name: tabName
             })
@@ -734,7 +1041,7 @@
         let widget = searchOptionsWidget({
           selector: '.add-tag',
           noOptions: __('No tags found...', 'groundhogg'),
-          options: TagsStore.items.filter(t => !getContact().tags.map(_t => _t.ID).includes(t.ID)),
+          options: TagsStore.items.filter(t => !getContact().tags.map(_t => _t.ID).includes(t.ID) && !addTags.includes(t.ID)),
           filterOption: ({ data }, search) => data.tag_name.match(regexp(search)),
           renderOption: ({ data }) => data.tag_name,
           onClose: () => {
@@ -780,9 +1087,9 @@
 
     init () {
 
+      handleFormSubmit()
       contactMoreActions()
       manageTags()
-      manageMeta()
       managePrimaryTabs()
       otherContactStuff()
 
