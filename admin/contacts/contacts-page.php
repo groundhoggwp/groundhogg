@@ -573,6 +573,8 @@ class Contacts_Page extends Admin_Page {
 
 	public function get_meta_key_exclusions() {
 		return apply_filters( 'groundhogg/admin/contacts/exclude_meta_list', [
+			'alternate_emails',
+			'alternate_phones',
 			'birthday',
 			'birthday_month',
 			'birthday_day',

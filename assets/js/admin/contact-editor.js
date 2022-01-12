@@ -43,6 +43,8 @@
 
   ContactsStore.itemsFetched([contact])
 
+  let files = []
+
   const getContact = () => {
     return ContactsStore.get(contact.ID)
   }
@@ -691,7 +693,6 @@
         },
         onMount: () => {
 
-          let files = []
           let selectedFiles = []
 
           let fileSearch = ''
@@ -829,10 +830,15 @@
             })
           })
 
-          ContactsStore.fetchFiles(contact.ID).then(_files => {
-            files = _files
-            mount()
-          })
+          if ( ! files.length ){
+            ContactsStore.fetchFiles(contact.ID).then(_files => {
+              files = _files
+              mount()
+            })
+          }
+
+          mount()
+
         }
       },
       {
@@ -1195,9 +1201,11 @@
           ...metaChanges
         }
 
+        let { alternate_emails = [], alternate_phones = [] } = getContact().meta
+
         inputRepeaterWidget({
           selector: '#contact-phones-here',
-          rows: [],
+          rows: alternate_phones,
           cellProps: [{
             type: 'email',
             options: {
@@ -1211,19 +1219,15 @@
           }],
           cellCallbacks: [select, input],
           onMount: () => {
-
           },
           onChange: (rows) => {
-
+            metaChanges.alternate_phones = rows
           },
-          onRemove: ([key, value]) => {
-
-          }
         }).mount()
 
         inputRepeaterWidget({
           selector: '#contact-emails-here',
-          rows: [],
+          rows: alternate_emails.map( e => [e]),
           cellProps: [{
             type: 'email',
             className: 'alternate-email-address',
@@ -1231,14 +1235,10 @@
           }],
           cellCallbacks: [input],
           onMount: () => {
-            $(`<button class="make-primary">${'P'}</button>`).insertAfter('.alternate-email-address')
           },
           onChange: (rows) => {
-
+            metaChanges.alternate_emails = rows.map( r => r[0] )
           },
-          onRemove: ([key, value]) => {
-
-          }
         }).mount()
 
         inputRepeaterWidget({
