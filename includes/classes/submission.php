@@ -85,9 +85,24 @@ class Submission extends Base_Object_With_Meta {
 		$array = is_array( $array ) ? $array : [ $array ];
 
 		foreach ( $array as $item => $value ) {
-
 			$this->add_meta( $item, $value );
-
 		}
+	}
+
+	/**
+	 * Modify return
+	 *
+	 * @return array
+	 */
+	public function get_as_array() {
+		$array = parent::get_as_array();
+
+		$array['data']['time'] = convert_to_utc_0( date_as_int( $this->get_date_created() ) );
+		$array['form']         = new Step( $this->get_form_id() );
+		$array['locale']       = [
+			'diff_time' => human_time_diff( $array['data']['time'], time() )
+		];
+
+		return $array;
 	}
 }

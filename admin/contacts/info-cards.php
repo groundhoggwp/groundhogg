@@ -71,9 +71,9 @@ class Info_Cards {
 //			include __DIR__ . '/cards/notes.php';
 //		} );
 
-		self::register( 'files', __( 'Files', 'groundhogg' ), function ( $contact ) {
-			include __DIR__ . '/cards/files.php';
-		}, 100, 'download_contact_files' );
+//		self::register( 'files', __( 'Files', 'groundhogg' ), function ( $contact ) {
+//			include __DIR__ . '/cards/files.php';
+//		}, 100, 'download_contact_files' );
 
 //		self::register( 'email', __( 'Send Email', 'groundhogg' ), function ( $contact ) {
 //			include __DIR__ . '/cards/email.php';

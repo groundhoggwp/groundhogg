@@ -92,29 +92,28 @@
       }
 
       const getResults = () => {
-        ContactsStore.fetchItems({
-          search,
-          exclude,
-          limit: 10
-        }).then(items => {
-          results = items
-          setSearchResults(results)
-        })
-      }
-
-      $('#contact-search').on('input change', (e) => {
-        search = e.target.value
 
         if (timeout) {
           clearTimeout(timeout)
         }
 
-        setTimeout(() => {
+        timeout = setTimeout(() => {
 
-          getResults()
+          ContactsStore.fetchItems({
+            search,
+            exclude,
+            limit: 10
+          }).then(items => {
+            results = items
+            setSearchResults(results)
+          })
 
         }, 1000)
+      }
 
+      $('#contact-search').on('input change', (e) => {
+        search = e.target.value
+        getResults()
       }).focus()
 
       if (ContactsStore.hasItems()) {
@@ -798,8 +797,8 @@
     }
 
     // Modal is already open
-    if ( $( '.gh-modal.send-email' ).length ){
-      return;
+    if ($('.gh-modal.send-email').length) {
+      return
     }
 
     let showCc = email.cc.length > 0
@@ -1041,6 +1040,146 @@
 
   }
 
+  const fileUploader = ({
+    action = '',
+    nonce = '',
+    fileName = 'file-upload',
+    beforeUpload = () => {},
+    onUpload = () => {},
+  }) => {
+    return modal({
+      // language=HTML
+      dialogClasses: 'gh-media-uploader',
+      content: `
+		  <input id="upload-file-input" type="file" name="files[]" class="hidden" multiple>
+		  <div class="droppable-handler">
+			  <h2>${__('Drag files to upload')}</h2>
+			  <button class="gh-button primary" id="select-files">${__('Select Files')}</button>
+		  </div>
+      <div id="uploading-files"></div>
+      <div id="uploaded-files"></div>
+      `,
+      onOpen: () => {
+
+        let file = null
+        let filesToUpload = []
+        let filesUploaded = []
+        let uploading = false
+
+        const pushFiles = () => {
+
+          renderUploadingFiles()
+
+          file = filesToUpload.pop()
+
+          if (!file) {
+
+            uploading = false
+
+            return
+          }
+
+          uploading = true
+
+          let fd = new FormData()
+
+          fd.append(fileName, file, file.name)
+          fd.append('_wpnonce', nonce)
+          fd.append('action', action)
+
+          beforeUpload(fd)
+
+          setTimeout( () => {
+
+            fetch(ajaxurl, {
+              method: 'POST',
+              credentials: 'same-origin',
+              body: fd,
+            }).then(r => {
+
+              if (!r.ok) {
+
+                dialog({
+                  message: __( 'Something when wrong...' ),
+                  type: 'error'
+                })
+
+                return
+              }
+
+              return r.json()
+            }).then(r => {
+
+              if (!r.success) {
+                dialog({
+                  message: r.data[0].message,
+                  type: 'error'
+                })
+
+                pushFiles()
+
+                return
+              }
+
+              onUpload( r, file )
+
+              filesUploaded.unshift( file )
+
+              renderUploadedFiles()
+
+              pushFiles()
+
+            })
+
+          }, 2000 )
+        }
+
+        const renderUploadingFiles = () => {
+          $( '#uploading-files' ).html( filesToUpload.map( f => `<div class="file"><span class="hourglass">⌛</span> ${f.name}</div>` ) )
+        }
+
+        const renderUploadedFiles = () => {
+          $( '#uploaded-files' ).html( filesUploaded.map( f => `<div class="file">✅ ${f.name}</div>` ) )
+        }
+
+        const addFiles = (files) => {
+          filesToUpload.push(...files)
+
+          if (!uploading) {
+            pushFiles()
+          }
+        }
+
+        const $input = $('#upload-file-input')
+
+        $input.on('change', (e) => {
+          addFiles(e.target.files)
+        })
+
+        $('#select-files').on('click', (e) => {
+          e.preventDefault()
+          $input.click()
+        })
+
+        const $droppable = $('.droppable-handler')
+
+        $droppable.on('dragover', (e) => {
+          e.preventDefault()
+          $droppable.addClass('dragover')
+        }).on('dragleave', (e) => {
+          $droppable.removeClass('dragover')
+        }).on('drop', e => {
+          e.preventDefault()
+          $droppable.removeClass('dragover')
+
+          let { dataTransfer } = e.originalEvent
+
+          addFiles(dataTransfer.files)
+        })
+      }
+    })
+  }
+
   Groundhogg.components = {
     addContactModal,
     quickAddForm,
@@ -1048,6 +1187,7 @@
     quickEditContactModal,
     makeInput,
     emailModal,
+    fileUploader,
   }
 
 })(jQuery)

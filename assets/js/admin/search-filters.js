@@ -1914,6 +1914,253 @@
     }
   })
 
+  const { tabs, fields, groups } = Groundhogg.filters.gh_contact_custom_properties
+
+  const filterFactory = {
+    text: (f) => ({
+      view ({ field, compare, value }) {
+        return ComparisonsTitleGenerators[compare](`<b>${fields[field].label}</b>`, `<b>"${value}"</b>`)
+      },
+      edit ({ compare, value }) {
+        // language=html
+        return `
+			${select({
+          id: 'filter-compare',
+          name: 'compare',
+        }, StringComparisons, compare)} ${input({
+          id: 'filter-value',
+          name: 'value',
+          value
+        })}`
+      },
+      onMount (filter, updateFilter) {
+
+        $('#filter-compare, #filter-value').on('change', function (e) {
+          const $el = $(this)
+          updateFilter({
+            [$el.prop('name')]: $el.val()
+          })
+        })
+      },
+      defaults: {
+        field: f.id,
+        meta: f.name,
+        compare: 'equals',
+        value: ''
+      }
+    }),
+    textarea: (f) => ({
+      ...filterFactory.text(f)
+    }),
+    number: (f) => ({
+      view ({ field, compare, value }) {
+        return ComparisonsTitleGenerators[compare](`<b>${fields[field].label}</b>`, `<b>"${value}"</b>`)
+      },
+      edit ({ compare, value }) {
+        // language=html
+        return `
+			${select({
+          id: 'filter-compare',
+          name: 'compare',
+        }, NumericComparisons, compare)} ${input({
+          id: 'filter-value',
+          name: 'value',
+          value
+        })}`
+      },
+      onMount (filter, updateFilter) {
+
+        $('#filter-compare, #filter-value').on('change', function (e) {
+          const $el = $(this)
+          updateFilter({
+            [$el.prop('name')]: $el.val()
+          })
+        })
+      },
+      defaults: {
+        field: f.id,
+        meta: f.name,
+        compare: 'equals',
+        value: ''
+      }
+    }),
+    date: (f) => ({
+      view ({ field, ...rest }) {
+        //language=HTMl
+        return standardActivityDateTitle(`<b>${fields[field].label}</b>`, rest)
+      },
+      edit (filter) {
+        // language=html
+        return standardActivityDateOptions(filter)
+      },
+      onMount (filter, updateFilter) {
+        standardActivityDateFilterOnMount(filter, updateFilter)
+      },
+      defaults: {
+        ...standardActivityDateDefaults,
+        field: f.id,
+        meta: f.name
+      }
+    }),
+    radio: (f) => ({
+      view: ({ options, compare }) => {
+        return ComparisonsTitleGenerators[compare](`<b>${f.label}</b>`, orList(options.map(o => bold(o))))
+      },
+      edit: ({ field, options, compare }) => {
+        // language=HTML
+        return `${select({
+          id: 'filter-compare',
+          name: 'compare'
+        }, {
+          in: _x('Is one of', 'comparison, groundhogg'),
+          not_in: _x('Is not one of', 'comparison', 'groundhogg')
+        }, compare)} ${select({
+          id: 'filter-options',
+          name: 'options',
+          multiple: true,
+        }, f.options.map(o => ({ value: o, text: o })), options)}`
+      },
+      onMount: ({ field, options }, updateFilter) => {
+
+        $('#filter-compare').on('change', (e) => {
+          updateFilter({
+            compare: $(e.target).val()
+          })
+        })
+
+        $('#filter-options').select2({
+          multiple: true,
+        }).on('change', (e) => {
+          updateFilter({
+            options: $(e.target).val()
+          })
+        })
+      },
+      defaults: {
+        field: f.id,
+        meta: f.name,
+        compare: 'in',
+        options: []
+      }
+    }),
+    dropdown: (f) => ({
+      view: ({ options, compare }) => {
+        if ( ComparisonsTitleGenerators[compare] ){
+          return ComparisonsTitleGenerators[compare](`<b>${f.label}</b>`, orList(options.map(o => bold(o))))
+        }
+
+        return moreComparisonTitles[compare](`<b>${f.label}</b>`, options )
+      },
+      edit: ({ field, options, compare }) => {
+        // language=HTML
+        return `${select({
+          id: 'filter-compare',
+          name: 'compare'
+        }, ! f.multiple ? {
+          in: _x('Is one of', 'comparison, groundhogg'),
+          not_in: _x('Is not one of', 'comparison', 'groundhogg')
+        } : {
+          all_in: __( 'Has all selected' ),
+          all_not_in: __( 'Does not have all selected' ),
+        }, compare)} ${select({
+          id: 'filter-options',
+          name: 'options',
+          multiple: true,
+        }, f.options.map(o => ({ value: o, text: o })), options)}`
+      },
+      onMount: ({ field, options }, updateFilter) => {
+
+        $('#filter-compare').on('change', (e) => {
+          updateFilter({
+            compare: $(e.target).val()
+          })
+        })
+
+        $('#filter-options').select2({
+          multiple: true,
+        }).on('change', (e) => {
+          updateFilter({
+            options: $(e.target).val()
+          })
+        })
+      },
+      defaults: {
+        field: f.id,
+        meta: f.name,
+        compare: f.multiple ? 'all_in' : 'in',
+        options: []
+      }
+    }),
+    checkboxes: (f) => ({
+      view: ({ options, compare }) => {
+        return moreComparisonTitles[compare](bold(f.label), options)
+      },
+      edit: ({ field, options, compare }) => {
+        // language=HTML
+        return `${select({
+          id: 'filter-compare',
+          name: 'compare'
+        }, {
+          all_checked: __('Is Checked', 'groundhogg-better-meta'),
+          not_checked: __('Is Not Checked', 'groundhogg-better-meta'),
+        }, compare)} ${select({
+          id: 'filter-options',
+          name: 'options',
+          multiple: true,
+        }, f.options.map(o => ({ value: o, text: o })), options)}`
+      },
+      onMount: ({ field, options }, updateFilter) => {
+
+        $('#filter-compare').on('change', (e) => {
+          updateFilter({
+            compare: $(e.target).val()
+          })
+        })
+
+        $('#filter-options').select2({
+          multiple: true,
+        }).on('change', (e) => {
+          updateFilter({
+            options: $(e.target).val()
+          })
+        })
+      },
+      defaults: {
+        field: f.id,
+        meta: f.name,
+        compare: 'all_checked',
+        options: []
+      }
+    }),
+  }
+
+  const moreComparisonTitles = {
+    all_checked: (prefix, options) => sprintf(__('%2$s is checked for %1$s', 'groundhogg-better-meta'), prefix, andList(options.map(b => bold(b)))),
+    not_checked: (prefix, options) => sprintf(__('%2$s is not checked for %1$s', 'groundhogg-better-meta'), prefix, andList(options.map(b => bold(b)))),
+    all_in: (prefix, options) => sprintf(__('%2$s is selected for %1$s', 'groundhogg-better-meta'), prefix, andList(options.map(b => bold(b)))),
+    all_not_in: (prefix, options) => sprintf(__('%2$s is not selected for %1$s', 'groundhogg-better-meta'), prefix, andList(options.map(b => bold(b))))
+  }
+
+  Object.values(tabs).forEach(t => {
+
+    Object.values(groups).filter(f => f.tab === t.id).forEach(s => {
+
+      let groupId = `${t.id}-${s.id}`
+
+      registerFilterGroup(groupId, `${t.name}: ${s.name}`)
+
+      Object.values(fields).filter(f => f.group === s.id).forEach(f => {
+
+        if ( f.type in filterFactory ){
+          registerFilter(f.id, groupId, f.label, filterFactory[f.type](f))
+        }
+
+      })
+
+    })
+
+  })
+
   Groundhogg.filters.functions = {
     createFilters,
     registerFilter,

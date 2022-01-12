@@ -233,11 +233,11 @@ class Plugin {
 	 *
 	 * Ensures only one instance of the plugin class is loaded or can be loaded.
 	 *
+	 * @return Plugin An instance of the class.
 	 * @since  1.0.0
 	 * @access public
 	 * @static
 	 *
-	 * @return Plugin An instance of the class.
 	 */
 	public static function instance() {
 		if ( is_null( self::$instance ) ) {
@@ -306,7 +306,7 @@ class Plugin {
 		$this->bulk_jobs    = new Bulk_Job_Manager();
 		$this->reporting    = new Reporting();
 
-		$this->bounce_checker   = new Bounce_Checker();
+		$this->bounce_checker = new Bounce_Checker();
 //		$this->sending_service  = new Sending_Service();
 		$this->proxy_service    = new Proxy_Service();
 		$this->stats_collection = new Stats_Collection();
@@ -398,6 +398,7 @@ class Plugin {
 		require __DIR__ . '/functions.php';
 		require __DIR__ . '/filters.php';
 		require __DIR__ . '/tools.php';
+		require __DIR__ . '/better-meta-compat.php';
 	}
 }
 

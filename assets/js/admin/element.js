@@ -538,7 +538,14 @@
 
       return `<input ${objectToProps(props)}/>`
     },
-    select (props, options, selected) {
+    select (_props, _options, _selected) {
+
+      let { options = _options, selected = _selected, value, ...props } = _props
+
+      if ( value && ! selected ){
+        selected = value
+      }
+
       return `<select ${objectToProps(props)}>${createOptions(options, selected)}</select>`
     },
     option: function (value, text, selected) {

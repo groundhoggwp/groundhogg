@@ -542,6 +542,25 @@ function decrypt( $data ) {
 	return Plugin::$instance->utils->encrypt_decrypt( $data, 'd' );
 }
 
+/**
+ * Find an item in an array based on a predicate
+ *
+ * @param $array     array
+ * @param $predicate callable
+ *
+ * @return mixed|false if item is not found return false
+ */
+function array_find( array $array, callable $predicate ){
+
+	foreach ( $array as $item ){
+		if ( call_user_func( $predicate, $item ) ){
+			return $item;
+		}
+	}
+
+	return false;
+}
+
 
 /**
  * Get a variable from an array or default if it doesn't exist.
@@ -6075,4 +6094,13 @@ function log( $event, $name = '', $value = '' ) {
 		'name'  => sanitize_text_field( $name ),
 		'value' => sanitize_text_field( $value )
 	] );
+}
+
+/**
+ * Whether WP FUsion is active or not
+ *
+ * @return bool
+ */
+function is_wp_fusion_active(){
+	return defined( 'WP_FUSION_VERSION' );
 }

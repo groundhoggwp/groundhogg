@@ -3,6 +3,8 @@
 namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
+use Groundhogg\Submission;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -16,6 +18,10 @@ class Submissions_Api extends Base_Object_Api {
 	 */
 	public function get_db_table_name() {
 		return 'submissions';
+	}
+
+	protected function get_object_class() {
+		return Submission::class;
 	}
 
 	/**

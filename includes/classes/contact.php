@@ -33,7 +33,7 @@ class Contact extends Base_Object_With_Meta {
 	 *
 	 * @var int[]
 	 */
-	protected $tags;
+	protected $tags = [];
 
 	/**
 	 * An instance of the WP User
@@ -547,8 +547,8 @@ class Contact extends Base_Object_With_Meta {
 
 		$tags = parse_tag_list( $tag_id_or_name );
 
-		// If no tag is passed return false
-		if ( empty( $tags ) ) {
+		// If no tag is passed or the contact has no tags return false
+		if ( empty( $tags ) || empty( $this->tags ) ) {
 			return false;
 		}
 
@@ -883,7 +883,7 @@ class Contact extends Base_Object_With_Meta {
 					'file_name'     => $filename,
 					'file_path'     => $filepath,
 					'file_url'      => file_access_url( '/uploads/' . $this->get_upload_folder_basename() . '/' . $filename ),
-					'date_uploaded' => filectime( $filepath ),
+					'date_modified' => date_i18n( get_date_time_format(), convert_to_local_time( filectime( $filepath ) ) ),
 				];
 
 				$data[] = $file;

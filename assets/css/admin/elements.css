@@ -46,6 +46,21 @@ h3.no-margin-top {
   justify-content: space-between;
   align-items: center;
 }
+.space-between.align-right {
+  justify-content: flex-end;
+}
+.space-between.align-left {
+  justify-content: flex-start;
+}
+.space-between.gap-20 {
+  gap: 20px;
+}
+.space-between.gap-10 {
+  gap: 10px;
+}
+.space-between.no-gap {
+  gap: 0;
+}
 .space-between.align-top {
   align-items: flex-start;
 }
@@ -271,6 +286,10 @@ a.action-link {
   display: inline-block;
   padding: 3px 8px;
   color: #102640;
+}
+.pill.yellow {
+  background: rgba(255, 238, 88, 0.5);
+  color: #3f3800;
 }
 .pill.orange {
   background: rgba(245, 129, 21, 0.5);
@@ -829,6 +848,7 @@ p.error,
 .gh-input-repeater .gh-input-repeater-row {
   display: flex;
 }
+.gh-input-repeater .gh-input-repeater-row select,
 .gh-input-repeater .gh-input-repeater-row input {
   width: 100%;
   border-right: none;
@@ -839,6 +859,7 @@ p.error,
 .gh-input-repeater .gh-input-repeater-row .input-wrap {
   width: 100%;
 }
+.gh-input-repeater .gh-input-repeater-row .input-wrap > select,
 .gh-input-repeater .gh-input-repeater-row .input-wrap > input {
   border-radius: 0;
   border-right-width: 1px;
@@ -860,6 +881,7 @@ p.error,
   padding: 6px;
   border-top-width: 0;
 }
+.gh-input-repeater .gh-input-repeater-row:first-child > select:first-child,
 .gh-input-repeater .gh-input-repeater-row:first-child > input:first-child {
   border-top-left-radius: 4px;
 }
@@ -875,6 +897,7 @@ p.error,
 .gh-input-repeater .gh-input-repeater-row:not(:first-child) * {
   border-top-width: 0;
 }
+.gh-input-repeater .gh-input-repeater-row:nth-last-child(2) > select:first-child,
 .gh-input-repeater .gh-input-repeater-row:nth-last-child(2) > input:first-child {
   border-bottom-left-radius: 4px;
 }
@@ -1401,6 +1424,20 @@ ul.gh-form-errors {
   content: "";
   display: table;
   clear: both;
+}
+
+.gh-media-uploader .droppable-handler {
+  width: 500px;
+  border: dashed 5px rgba(16, 38, 64, 0.5);
+  text-align: center;
+  padding: 40px;
+}
+.gh-media-uploader .droppable-handler.dragover {
+  border-color: #0075ff;
+  background: rgba(0, 117, 255, 0.2);
+}
+.gh-media-uploader #uploading-files {
+  margin-top: 10px;
 }
 
 /*# sourceMappingURL=elements.css.map */

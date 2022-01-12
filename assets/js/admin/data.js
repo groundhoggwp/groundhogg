@@ -345,16 +345,9 @@
         })
     },
 
-    async fetchRelationships (id, { other_type }, opts = {}) {
-      return apiDelete(`${this.route}/${id}/relationships`, { other_type }, opts)
-        .then(r => this.getItemFromResponse(r))
-        .then(item => {
-          this.item = item
-          this.itemsFetched([
-            item
-          ])
-          return item
-        })
+    async fetchRelationships (id, { other_type, ...rest }, opts = {}) {
+      return apiGet(`${this.route}/${id}/relationships`, { other_type, ...rest }, opts)
+        .then(r => this.getItemsFromResponse(r))
     },
 
     async createRelationships (id, data, opts = {}) {
@@ -489,11 +482,17 @@
       },
     }),
     forms: ObjectStore(Groundhogg.api.routes.v4.forms),
-    contacts: ObjectStore(Groundhogg.api.routes.v4.contacts),
+    contacts: ObjectStore(Groundhogg.api.routes.v4.contacts, {
+      async fetchFiles (id, opts = {}) {
+        return apiGet(`${this.route}/${id}/files`, {}, opts)
+          .then(r => this.getItemsFromResponse(r))
+      },
+    }),
     events: ObjectStore(Groundhogg.api.routes.v4.events),
     page_visits: ObjectStore(Groundhogg.api.routes.v4.page_visits),
     activity: ObjectStore(Groundhogg.api.routes.v4.activity),
     campaigns: ObjectStore(Groundhogg.api.routes.v4.campaigns),
+    submissions: ObjectStore(Groundhogg.api.routes.v4.submissions),
     funnels: ObjectStore(Groundhogg.api.routes.v4.funnels, {
 
       async addContacts ({ query, funnel_id, step_id }, opts = {}) {

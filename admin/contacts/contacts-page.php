@@ -81,6 +81,7 @@ class Contacts_Page extends Admin_Page {
 		new Contact_Table_Columns();
 		new Info_Cards();
 
+		add_action( 'wp_ajax_groundhogg_contact_upload_file', [ $this, 'ajax_upload_file' ] );
 		add_action( 'wp_ajax_groundhogg_edit_contact', [ $this, 'ajax_edit_contact' ] );
 		add_action( 'wp_ajax_groundhogg_contact_table_row', [ $this, 'ajax_contact_table_row' ] );
 		add_action( 'wp_ajax_groundhogg_get_contacts_table', [ $this, 'ajax_get_table' ] );
@@ -608,6 +609,26 @@ class Contacts_Page extends Admin_Page {
 			'country_name',
 			'region_code',
 		] );
+	}
+
+	public function ajax_upload_file(){
+
+		$id = absint( get_post_var( 'contact' ) );
+		$contact = get_contactdata( $id );
+
+		$file = $_FILES['file-upload'];
+
+		if ( ! get_array_var( $file, 'error' ) ) {
+			$e = $contact->upload_file( $file );
+
+			if ( is_wp_error( $e ) ) {
+				wp_send_json_error( $e );
+			}
+		}
+
+		wp_send_json_success([
+			'files' => $contact->get_files()
+		]);
 	}
 
 	/**

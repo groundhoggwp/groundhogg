@@ -1243,8 +1243,109 @@ class Contact_Query {
 		}
 
 		self::setup_default_filters();
+		$this->setup_custom_field_filters();
 
 		do_action( 'groundhogg/contact_query/register_filters', $this );
+	}
+
+	protected function setup_custom_field_filters() {
+
+		$fields = Contact_Properties::instance()->get_fields();
+
+		foreach ( $fields as $field ) {
+			self::register_filter( $field['id'], [ $this, 'handler_filter' ] );
+		}
+
+	}
+
+	/**
+	 * @param $filter_vars
+	 * @param $query Contact_Query
+	 *
+	 * @return false|mixed
+	 */
+	public function handler_filter( $filter_vars, $query ) {
+
+		$field_id = $filter_vars['type'];
+
+		$field = Contact_Properties::instance()->get_field( $field_id );
+
+		// Use most recent available key?
+		$filter_vars['meta'] = $field['name'];
+
+		$meta_table_name = get_db( 'contactmeta' )->table_name;
+
+		switch ( $field['type'] ) {
+			case 'text':
+			case 'textarea':
+			case 'number':
+				return self::filter_meta( $filter_vars, $query );
+			case 'date':
+				$clause1 = self::generic_text_compare( $meta_table_name . '.meta_key', '=', $filter_vars['meta'] );
+				$clause2 = $meta_table_name . '.meta_value ' . self::standard_activity_filter_clause( $filter_vars );
+
+				return "{$query->table_name}.ID IN ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$clause1} AND {$clause2} ) ";
+
+			case 'radio':
+
+				return self::meta_in( $filter_vars, $query );
+
+			case 'checkboxes':
+
+				return self::meta_all_in( $filter_vars, $query );
+
+			case 'dropdown':
+
+				if ( isset_not_empty( $field, 'multiple' ) ) {
+					return self::meta_all_in( $filter_vars, $query );
+				} else {
+					return self::meta_in( $filter_vars, $query );
+				}
+		}
+
+		return false;
+	}
+
+	public static function meta_in( $filter_vars, $query ) {
+
+		$meta_table_name = get_db( 'contactmeta' )->table_name;
+
+		$clause1 = self::generic_text_compare( $meta_table_name . '.meta_key', '=', $filter_vars['meta'] );
+		$opts    = implode( ',', array_map( function ( $opt ) {
+			return "'$opt'";
+		}, $filter_vars['options'] ) );
+
+		$clause2 = "$meta_table_name.meta_value IN ($opts)";
+
+		$in = $filter_vars['compare'] === 'in' ? 'IN' : 'NOT IN';
+
+		return "{$query->table_name}.ID $in ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$clause1} AND {$clause2} ) ";
+
+	}
+
+	public static function meta_all_in( $filter_vars, $query ) {
+
+		$meta_table_name = get_db( 'contactmeta' )->table_name;
+
+		$key_clause = self::generic_text_compare( $meta_table_name . '.meta_key', '=', $filter_vars['meta'] );
+		$opt_clause = implode( ' AND ', array_map( function ( $opt ) use ( $meta_table_name, $filter_vars ) {
+			return "$meta_table_name.meta_value RLIKE '\"$opt\"'";
+		}, $filter_vars['options'] ) );
+
+		switch ( $filter_vars['compare'] ) {
+			default:
+			case 'all_checked':
+			case 'all_in':
+				$in = 'IN';
+				break;
+			case 'not_checked':
+			case 'all_not_in':
+				$in = 'NOT IN';
+				break;
+		}
+
+		return "{$query->table_name}.ID $in ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$key_clause} AND {$opt_clause} ) ";
+
 	}
 
 	/**
