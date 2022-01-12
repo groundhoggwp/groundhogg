@@ -37,7 +37,7 @@
     submissions: SubmissionsStore,
   } = Groundhogg.stores
 
-  const { post, get, patch, routes, ajax } = Groundhogg.api
+  const { post, delete: _delete, get, patch, routes, ajax } = Groundhogg.api
 
   const { sprintf, __, _x, _n } = wp.i18n
 
@@ -679,8 +679,9 @@
 					  <button id="upload-file" class="gh-button secondary">${__('Upload Files')}</button>
 				  </div>
 				  <div id="bulk-actions" class="hidden inside" style="padding-top: 0">
-              <button id="bulk-delete-files" class="gh-button danger icon"><span class="dashicons dashicons-trash"></span></button>
-          </div>
+					  <button id="bulk-delete-files" class="gh-button danger icon"><span
+						  class="dashicons dashicons-trash"></span></button>
+				  </div>
 				  <table class="wp-list-table widefat striped" style="border: none">
 					  <thead></thead>
 					  <tbody id="files-here">
@@ -691,8 +692,23 @@
         onMount: () => {
 
           let files = []
+          let selectedFiles = []
 
           let fileSearch = ''
+
+          $('#bulk-delete-files').on('click', () => {
+            dangerConfirmationModal({
+              confirmText: __('Delete'),
+              alert: `<p>${sprintf(_n('Are you sure you want to delete %d file?', 'Are you sure you want to delete %d files?', selectedFiles.length, 'groundhogg'), selectedFiles.length)}</p>`,
+              onConfirm: () => {
+                _delete( `${routes.v4.contacts}/${contact.ID}/files`, selectedFiles ).then( ({items}) => {
+                  selectedFiles = []
+                  files = items
+                  mount()
+                } )
+              }
+            })
+          })
 
           $('#search-files').on('input change', e => {
             fileSearch = e.target.value
@@ -719,7 +735,11 @@
 					                              target="_blank">${file.file_name}</a></td>
 					<td>${file.date_modified}</td>
 					<td>
-						<button class="gh-button secondary text icon">${icons.verticalDots}</button>
+						<div class="space-between align-right">
+							<button data-file="${file.file_name}" class="file-more gh-button secondary text icon">
+								${icons.verticalDots}
+							</button>
+						</div>
 					</td>
 				</tr>`
           }
@@ -732,22 +752,62 @@
 
           const onMount = () => {
 
-            let selectedFiles = []
-            
-            
             const maybeShowBulkActions = () => {
-              if ( selectedFiles.length ){
-                $('#bulk-actions').removeClass( 'hidden' )
+              if (selectedFiles.length) {
+                $('#bulk-actions').removeClass('hidden')
               } else {
-                $('#bulk-actions').addClass( 'hidden' )
+                $('#bulk-actions').addClass('hidden')
               }
             }
 
+            $('.file-more').on('click', e => {
+
+              let _file = e.currentTarget.dataset.file
+
+              moreMenu(e.currentTarget, {
+
+                items: [
+                  {
+                    key: 'download',
+                    text: __('Download'),
+                  },
+                  {
+                    key: 'delete',
+                    text: `<span class="gh-text danger">${__('Delete')}</span>`,
+                  }
+                ],
+                onSelect: k => {
+                  switch (k) {
+                    case 'download':
+                      window.open( files.find( f => f.file_name === _file ).file_url, '_blank').focus()
+                      break
+                    case 'delete':
+
+                      dangerConfirmationModal({
+                        confirmText: __('Delete'),
+                        alert: `<p>${sprintf(__('Are you sure you want to delete %s?', 'groundhogg'), _file)}</p>`,
+                        onConfirm: () => {
+                          _delete( `${routes.v4.contacts}/${contact.ID}/files`, [
+                            _file
+                          ] ).then( ({items}) => {
+                            selectedFiles = []
+                            files = items
+                            mount()
+                          } )
+                        }
+                      })
+
+                      break
+                  }
+                }
+              })
+            })
+
             $('.file-toggle').on('change', e => {
-              if ( e.target.checked ){
-                selectedFiles.push( e.target.value )
+              if (e.target.checked) {
+                selectedFiles.push(e.target.value)
               } else {
-                selectedFiles.splice( selectedFiles.indexOf( e.target.value ), 1 )
+                selectedFiles.splice(selectedFiles.indexOf(e.target.value), 1)
               }
               maybeShowBulkActions()
             })
@@ -762,7 +822,8 @@
               nonce: '',
               beforeUpload: (fd) => fd.append('contact', contact.ID),
               onUpload: (json, file) => {
-                files = json.files
+                // console.log( json )
+                files = json.data.files
                 mount()
               }
             })
@@ -1116,7 +1177,7 @@
 					<div id="contact-emails-here"></div>
 					<p><b>${__('Phone Numbers', 'groundhogg')}</b></p>
 					<div id="contact-phones-here"></div>
-					<h2>${__('Mata')}</h2>
+					<h2>${__('Meta')}</h2>
 					<div id="meta-here">
 					</div>
 					<p>
