@@ -22,11 +22,15 @@ class Contact_Properties {
 	protected $all;
 
 	public function __construct() {
-		$all_data     = get_option( $this->option_name, [] );
-		$this->all = $all_data;
-		$this->fields = $all_data['fields'];
-		$this->tabs   = $all_data['tabs'];
-		$this->groups = $all_data['groups'];
+		$all_data     = get_option( $this->option_name );
+		$this->all    = $all_data ?: [
+			'fields' => [],
+			'tabs'   => [],
+			'groups' => [],
+		];
+		$this->fields = $all_data['fields'] ?: [];
+		$this->tabs   = $all_data['tabs'] ?: [];
+		$this->groups = $all_data['groups'] ?: [];
 	}
 
 	/**
@@ -50,7 +54,7 @@ class Contact_Properties {
 		return self::$instance;
 	}
 
-	public function get_all(){
+	public function get_all() {
 		return $this->all;
 	}
 
@@ -75,7 +79,7 @@ class Contact_Properties {
 			$this->fields = [];
 		}
 
-		$field = array_find( $this->fields, function ( $f ) use ( $id ){
+		$field = array_find( $this->fields, function ( $f ) use ( $id ) {
 			return $f['id'] === $id;
 		} );
 
