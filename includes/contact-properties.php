@@ -28,9 +28,9 @@ class Contact_Properties {
 			'tabs'   => [],
 			'groups' => [],
 		];
-		$this->fields = $all_data['fields'] ?: [];
-		$this->tabs   = $all_data['tabs'] ?: [];
-		$this->groups = $all_data['groups'] ?: [];
+		$this->fields = $this->all['fields'] ?: [];
+		$this->tabs   = $this->all['tabs'] ?: [];
+		$this->groups = $this->all['groups'] ?: [];
 	}
 
 	/**

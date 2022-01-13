@@ -2033,6 +2033,7 @@
     ordinal_suffix_of,
     bold,
     spinner,
+    el,
     isNumeric,
   }
 
