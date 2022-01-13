@@ -77,20 +77,7 @@ class Page_Visits extends DB {
 	 */
 	protected function add_additional_actions() {
 		add_action( 'groundhogg/db/post_delete/contact', [ $this, 'contact_deleted' ] );
-		add_action( 'groundhogg/contact/merged', [ $this, 'contact_merged' ], 10, 2 );
 		parent::add_additional_actions();
-	}
-
-	/**
-	 * @param $orig Contact
-	 * @param $other Contact
-	 */
-	public function contact_merged( $orig, $other ) {
-		$this->update( [
-			'contact_id' => $other->get_id()
-		], [
-			'contact_id' => $orig->get_id()
-		] );
 	}
 
 	/**

@@ -4,6 +4,7 @@ namespace Groundhogg\DB;
 
 // Exit if accessed directly
 use Groundhogg\Base_Object;
+use Groundhogg\Contact;
 use Groundhogg\DB_Object;
 use Groundhogg\DB_Object_With_Meta;
 use Groundhogg\Plugin;
@@ -94,6 +95,29 @@ abstract class DB {
 
 		// If the blog is switched, re-render the table name to provide the correct table name.
 		add_action( 'switch_blog', [ $this, 'render_table_name' ] );
+
+		// Special handler for merging contacts!
+		add_action( 'groundhogg/contact/merged', [ $this, 'contact_merged' ], 10, 2 );
+	}
+
+	/**
+	 * When a contact is merged handle this by default
+	 *
+	 * @param $contact Contact
+	 * @param $other   Contact
+	 */
+	public function contact_merged( $contact, $other ) {
+
+		// Has contact_id but is not a meta table because that is done in code.
+		if ( key_exists( 'contact_id', $this->get_columns() ) && ! key_exists( 'meta_id', $this->get_columns() ) ) {
+			$this->update( [
+				'contact_id' => $other->get_id(),
+			],
+				[
+					'contact_id' => $contact->get_id()
+				] );
+		}
+
 	}
 
 	/**

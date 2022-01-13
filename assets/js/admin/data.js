@@ -128,7 +128,7 @@
    */
   async function adminAjax (data = {}, opts = {}) {
 
-    if (!data instanceof FormData) {
+    if (! ( data instanceof FormData )) {
       const fData = new FormData()
 
       for (const key in data) {

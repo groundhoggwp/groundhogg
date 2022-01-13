@@ -99,6 +99,22 @@ class Other_Activity extends DB {
 		);
 	}
 
+	/**
+	 * @param \Groundhogg\Contact $contact
+	 * @param \Groundhogg\Contact $other
+	 */
+	public function contact_merged( $contact, $other ) {
+
+		$this->update([
+			'object_id' => $other->get_id(),
+			'object_type' => 'contact',
+		], [
+			'object_id' => $contact->get_id(),
+			'object_type' => 'contact',
+		]);
+
+	}
+
 	public function get_date_key() {
 		return 'timestamp';
 	}

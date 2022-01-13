@@ -17,6 +17,7 @@
     modal,
     uuid,
     dangerConfirmationModal,
+    confirmationModal,
     adminPageUrl,
     moreMenu,
     loadingDots,
@@ -38,6 +39,7 @@
   } = Groundhogg.stores
 
   const { post, delete: _delete, get, patch, routes, ajax } = Groundhogg.api
+  const { selectContactModal } = Groundhogg.components
 
   const { sprintf, __, _x, _n } = wp.i18n
 
@@ -212,6 +214,11 @@
     $('#contact-more').on('click', e => moreMenu(e.target, {
       items: [
         {
+          key: 'merge',
+          cap: 'delete_contacts',
+          text: __('Merge')
+        },
+        {
           key: 'delete',
           cap: 'delete_contacts',
           text: `<span class="gh-text danger">${__('Delete')}</span>`
@@ -219,6 +226,27 @@
       ],
       onSelect: k => {
         switch (k) {
+          case 'merge':
+
+            selectContactModal({
+              onSelect: (_contact) => {
+
+                confirmationModal({
+                  confirmText: __('Merge'),
+                  width: 500,
+                  // language=HTML
+                  alert: `<p>
+					  ${sprintf(__('Are you sure you want to merge %1$s with %2$s? This action cannot be undone.', 'groundhogg'), bold(_contact.data.full_name), bold(getContact().data.full_name))}</p>
+                  <p><a href="https://help.groundhogg.io/article/540-merging-contacts" target="_blank">${__('What happens when contacts are merged?', 'groundhogg')}</a></p>`,
+                  onConfirm: () => {
+
+                  }
+                })
+
+              }
+            })
+
+            break
           case 'delete':
             dangerConfirmationModal({
               confirmText: __('Delete'),
@@ -702,11 +730,11 @@
               confirmText: __('Delete'),
               alert: `<p>${sprintf(_n('Are you sure you want to delete %d file?', 'Are you sure you want to delete %d files?', selectedFiles.length, 'groundhogg'), selectedFiles.length)}</p>`,
               onConfirm: () => {
-                _delete( `${routes.v4.contacts}/${contact.ID}/files`, selectedFiles ).then( ({items}) => {
+                _delete(`${routes.v4.contacts}/${contact.ID}/files`, selectedFiles).then(({ items }) => {
                   selectedFiles = []
                   files = items
                   mount()
-                } )
+                })
               }
             })
           })
@@ -729,15 +757,15 @@
 						type: 'checkbox',
 						name: 'select[]',
 						className: 'file-toggle',
-						value: file.file_name
+						value: file.name
 					})}
 					</th>
-					<td class="column-primary"><a class="row-title" href="${file.file_url}"
-					                              target="_blank">${file.file_name}</a></td>
+					<td class="column-primary"><a class="row-title" href="${file.url}"
+					                              target="_blank">${file.name}</a></td>
 					<td>${file.date_modified}</td>
 					<td>
 						<div class="space-between align-right">
-							<button data-file="${file.file_name}" class="file-more gh-button secondary text icon">
+							<button data-file="${file.name}" class="file-more gh-button secondary text icon">
 								${icons.verticalDots}
 							</button>
 						</div>
@@ -747,7 +775,7 @@
 
           const mount = () => {
 
-            $('#files-here').html(files.filter(f => !fileSearch || f.file_name.match(regexp(fileSearch))).map(f => renderFile(f)).join(''))
+            $('#files-here').html(files.filter(f => !fileSearch || f.name.match(regexp(fileSearch))).map(f => renderFile(f)).join(''))
             onMount()
           }
 
@@ -780,7 +808,7 @@
                 onSelect: k => {
                   switch (k) {
                     case 'download':
-                      window.open( files.find( f => f.file_name === _file ).file_url, '_blank').focus()
+                      window.open(files.find(f => f.name === _file).url, '_blank').focus()
                       break
                     case 'delete':
 
@@ -788,13 +816,13 @@
                         confirmText: __('Delete'),
                         alert: `<p>${sprintf(__('Are you sure you want to delete %s?', 'groundhogg'), _file)}</p>`,
                         onConfirm: () => {
-                          _delete( `${routes.v4.contacts}/${contact.ID}/files`, [
+                          _delete(`${routes.v4.contacts}/${contact.ID}/files`, [
                             _file
-                          ] ).then( ({items}) => {
+                          ]).then(({ items }) => {
                             selectedFiles = []
                             files = items
                             mount()
-                          } )
+                          })
                         }
                       })
 
@@ -830,7 +858,7 @@
             })
           })
 
-          if ( ! files.length ){
+          if (!files.length) {
             ContactsStore.fetchFiles(contact.ID).then(_files => {
               files = _files
               mount()
@@ -1227,7 +1255,7 @@
 
         inputRepeaterWidget({
           selector: '#contact-emails-here',
-          rows: alternate_emails.map( e => [e]),
+          rows: alternate_emails.map(e => [e]),
           cellProps: [{
             type: 'email',
             className: 'alternate-email-address',
@@ -1237,7 +1265,7 @@
           onMount: () => {
           },
           onChange: (rows) => {
-            metaChanges.alternate_emails = rows.map( r => r[0] )
+            metaChanges.alternate_emails = rows.map(r => r[0])
           },
         }).mount()
 

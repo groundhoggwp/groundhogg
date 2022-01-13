@@ -880,9 +880,9 @@ class Contact extends Base_Object_With_Meta {
 			foreach ( $scanned_directory as $filename ) {
 				$filepath = $uploads_dir['path'] . '/' . $filename;
 				$file     = [
-					'file_name'     => $filename,
-					'file_path'     => $filepath,
-					'file_url'      => file_access_url( '/uploads/' . $this->get_upload_folder_basename() . '/' . $filename ),
+					'name'     => $filename,
+					'path'     => $filepath,
+					'url'      => file_access_url( '/uploads/' . $this->get_upload_folder_basename() . '/' . $filename ),
 					'date_modified' => date_i18n( get_date_time_format(), convert_to_local_time( filectime( $filepath ) ) ),
 				];
 
@@ -902,8 +902,8 @@ class Contact extends Base_Object_With_Meta {
 	public function delete_file( $file_name ) {
 		$file_name = basename( $file_name );
 		foreach ( $this->get_files() as $file ) {
-			if ( $file_name === $file['file_name'] ) {
-				unlink( $file['file_path'] );
+			if ( $file_name === $file['name'] ) {
+				unlink( $file['path'] );
 			}
 		}
 	}
@@ -1006,32 +1006,55 @@ class Contact extends Base_Object_With_Meta {
 	public function merge( $other ) {
 
 		$other = get_contactdata( $other );
-		if ( ! is_a_contact( $other ) ) {
+
+		// Don't merge with itself
+		// Don't merge with objects of a different type
+		if ( ! is_a_contact( $other ) || $other->get_id() === $this->get_id() || $other->get_object_type() !== $this->get_object_type() ){
 			return false;
 		}
 
-		$data = array_merge( $other->data, $this->data );
-		$this->update( $data );
+		/**
+		 * Before an object is merged
+		 *
+		 * @param Base_Object $original
+		 * @param Base_Object $other
+		 */
+		do_action( "groundhogg/contact/pre_merge", $this, $other );
 
-		// May use this later...
-		$this->update_meta( 'previous_merge_data', $other->data );
+		// Update the date
+		$this->update( array_merge( array_filter( $other->data ), array_filter( $this->data ) ) );
+
+		// Update the meta
+		$this->update_meta( array_merge( array_filter( $other->meta ), array_filter( $this->meta ) ) );
+
 		$uploads_dir = $this->get_uploads_folder();
 
 		// Move any files to this contacts uploads folder.
 		foreach ( $other->get_files() as $file ) {
-			$file_path = $file['file_path'];
-			$file_name = $file['file_name'];
+			$file_path = $file['path'];
+			$file_name = $file['name'];
 
 			rename( $file_path, $uploads_dir['path'] . '/' . $file_name );
 		}
 
 		/**
-		 * Fires before the $other is permanently deleted.
+		 * When an object is merged
 		 *
-		 * @param $primary Contact
-		 * @param $other   Contact
+		 * Handles
+		 * - Activity
+		 * - Other Activity
+		 * - Page Visits
+		 * - Events
+		 * - Notes
+		 * - Submissions
+		 * - Tag Relationships
+		 * - Object Relationships
+		 * - Permissions Keys
+		 *
+		 * @param Base_Object $original
+		 * @param Base_Object $other
 		 */
-		do_action( 'groundhogg/contact/merge', $this, $other );
+		do_action( "groundhogg/contact/merged", $this, $other );
 
 		$other->delete();
 

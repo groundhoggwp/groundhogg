@@ -81,6 +81,30 @@ class Object_Relationships extends DB {
 	}
 
 	/**
+	 * update the secondary and primary based on non-existing relationships
+	 *
+	 * @param \Groundhogg\Contact $contact
+	 * @param \Groundhogg\Contact $other
+	 */
+	public function contact_merged( $contact, $other ) {
+
+		global $wpdb;
+
+		// update primary
+		$wpdb->query( "UPDATE $this->table_name SET primary_object_id = $contact->ID WHERE 
+primary_object_type = 'contact' AND primary_object_id = $other->ID AND (secondary_object_id,secondary_object_type) NOT IN (
+    SELECT secondary_object_id,secondary_object_type FROM $this->table WHERE primary_object_id = $contact->ID AND primary_object_type = 'contact'
+) " );
+
+		// Update Secondary
+		$wpdb->query( "UPDATE $this->table_name SET secondary_object_id = $contact->ID WHERE 
+secondary_object_type = 'contact' AND secondary_object_id = $other->ID AND (primary_object_id,primary_object_type) NOT IN (
+    SELECT primary_object_id,primary_object_type FROM $this->table WHERE secondary_object_id = $contact->ID AND secondary_object_type = 'contact'
+) " );
+
+	}
+
+	/**
 	 * Get columns and formats
 	 *
 	 * @access  public

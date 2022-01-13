@@ -772,6 +772,7 @@
    * @param confirmButtonType
    * @param cancelButtonType
    * @param buttonSize
+   * @param rest
    */
   const confirmationModal = ({
     alert = '',
@@ -783,6 +784,7 @@
     confirmButtonType = 'primary',
     cancelButtonType = 'danger text',
     buttonSize = 'medium',
+    ...rest
   }) => {
 
     let confirmed = false
@@ -815,7 +817,8 @@
     const { close, $modal } = modal({
       content,
       onClose: handleClose,
-      dialogClasses: 'gh-modal-confirmation'
+      dialogClasses: 'gh-modal-confirmation',
+      ...rest
     })
 
     const confirm = () => {

@@ -3,6 +3,7 @@
 namespace Groundhogg\DB;
 
 use Groundhogg\Base_Object;
+use Groundhogg\Contact;
 use function Groundhogg\get_db;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -119,7 +120,9 @@ class Tag_Relationships extends DB {
 	/**
 	 * A tag was delete, delete all tag relationships
 	 *
-	 * @param $tag_id
+	 * @param $where
+	 * @param $formats
+	 * @param $table
 	 *
 	 * @return bool
 	 */
@@ -133,9 +136,30 @@ class Tag_Relationships extends DB {
 	}
 
 	/**
+	 * A contact was merged
+	 *
+	 * Update the relationship to the new contact only where the contact does
+	 * not already have that relationship to avoid collisions
+	 *
+	 * @param $contact Contact
+	 * @param $other Contact
+	 */
+	public function contact_merged( $contact, $other ) {
+
+		global $wpdb;
+
+		$tag_ids = implode( ',', $contact->get_tag_ids() );
+
+		$wpdb->query( "UPDATE $this->table_name SET contact_id = $contact->ID WHERE contact_id = $other->ID AND tag_id NOT IN ($tag_ids)" );
+
+	}
+
+	/**
 	 * A contact was deleted, delete all tag relationships
 	 *
-	 * @param $contact_id
+	 * @param $where
+	 * @param $formats
+	 * @param $table
 	 *
 	 * @return bool
 	 */
