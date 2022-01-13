@@ -11,9 +11,11 @@
     searchOptionsWidget,
     input,
     select,
+    isNumeric,
     textarea,
     icons,
     bold,
+    loadingModal,
     modal,
     uuid,
     dangerConfirmationModal,
@@ -239,6 +241,14 @@
 					  ${sprintf(__('Are you sure you want to merge %1$s with %2$s? This action cannot be undone.', 'groundhogg'), bold(_contact.data.full_name), bold(getContact().data.full_name))}</p>
                   <p><a href="https://help.groundhogg.io/article/540-merging-contacts" target="_blank">${__('What happens when contacts are merged?', 'groundhogg')}</a></p>`,
                   onConfirm: () => {
+
+                    loadingModal()
+
+                    post( `${ContactsStore.route}/${contact.ID}/merge`, [
+                      _contact.ID
+                    ] ).then( () => {
+                      location.reload()
+                    })
 
                   }
                 })
@@ -1462,6 +1472,21 @@
           noOptions: __('No tags found...', 'groundhogg'),
           options: TagsStore.items.filter(t => !getContact().tags.map(_t => _t.ID).includes(t.ID) && !addTags.includes(t.ID)),
           filterOption: ({ data }, search) => data.tag_name.match(regexp(search)),
+          filterOptions: ( opts, search ) => {
+            if ( ! search ){
+              return opts
+            }
+
+            return [
+              {
+                ID: search,
+                data: {
+                  tag_name: `Add "${search}"`,
+                }
+              },
+              ...opts
+            ]
+          },
           renderOption: ({ data }) => data.tag_name,
           onClose: () => {
             isAdding = false
@@ -1483,7 +1508,23 @@
             }, 1500)
 
           },
-          onSelect: ({ ID }) => {
+          onSelect: (tag) => {
+
+            let { ID } = tag
+
+            // Created a new tag
+            if ( ! isNumeric(ID) ){
+              TagsStore.post({
+                data: {
+                  tag_name: ID
+                }
+              }).then( t => {
+                addTags.push(t.ID)
+                mount()
+              })
+              return;
+            }
+
             addTags.push(ID)
           },
           onOpen: () => {

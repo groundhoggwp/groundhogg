@@ -880,9 +880,9 @@ class Contact extends Base_Object_With_Meta {
 			foreach ( $scanned_directory as $filename ) {
 				$filepath = $uploads_dir['path'] . '/' . $filename;
 				$file     = [
-					'name'     => $filename,
-					'path'     => $filepath,
-					'url'      => file_access_url( '/uploads/' . $this->get_upload_folder_basename() . '/' . $filename ),
+					'name'          => $filename,
+					'path'          => $filepath,
+					'url'           => file_access_url( '/uploads/' . $this->get_upload_folder_basename() . '/' . $filename ),
 					'date_modified' => date_i18n( get_date_time_format(), convert_to_local_time( filectime( $filepath ) ) ),
 				];
 
@@ -1009,7 +1009,7 @@ class Contact extends Base_Object_With_Meta {
 
 		// Don't merge with itself
 		// Don't merge with objects of a different type
-		if ( ! is_a_contact( $other ) || $other->get_id() === $this->get_id() || $other->get_object_type() !== $this->get_object_type() ){
+		if ( ! is_a_contact( $other ) || $other->get_id() === $this->get_id() || $other->get_object_type() !== $this->get_object_type() ) {
 			return false;
 		}
 
@@ -1020,6 +1020,26 @@ class Contact extends Base_Object_With_Meta {
 		 * @param Base_Object $other
 		 */
 		do_action( "groundhogg/contact/pre_merge", $this, $other );
+
+		// handle additional email addresses
+		$additional_emails   = $this->get_meta( 'alternate_emails' ) ?: [];
+		$additional_emails[] = $other->get_email();
+		$additional_emails   = array_merge( $additional_emails, $other->get_meta( 'alternate_emails' ) ?: [] );
+		$this->update_meta( 'alternate_emails', array_unique( $additional_emails ) );
+
+		// Handle additional phone numbers
+		$additional_phones   = $this->get_meta( 'alternate_phones' ) ?: [];
+		$additional_phones[] = [ 'mobile', $this->get_mobile_number() ];
+		$additional_phones[] = [ 'home', $this->get_phone_number() ];
+		$additional_phones[] = [ 'business', $this->get_meta( 'company_phone' ) ];
+		$additional_phones   = array_merge( $additional_phones, $other->get_meta( 'alternate_phones' ) ?: [] );
+		$additional_phones   = array_filter( $additional_phones, function ( $r ) {
+			return ! empty( $r[1] );
+		} );
+		$additional_phones   = array_unique_cb( $additional_phones, function ( $r ) {
+			return $r[1];
+		} );
+		$this->update_meta( 'alternate_phones', $additional_phones );
 
 		// Update the date
 		$this->update( array_merge( array_filter( $other->data ), array_filter( $this->data ) ) );
@@ -1134,13 +1154,13 @@ class Contact extends Base_Object_With_Meta {
 	 * Handle meta keys with special meaning
 	 *
 	 * @param string|array $key
-	 * @param false $value
+	 * @param false        $value
 	 *
 	 * @return bool
 	 */
-	public function handle_special_meta_keys( $key, $value=false ){
+	public function handle_special_meta_keys( $key, $value = false ) {
 
-		if ( ! is_string( $key ) ){
+		if ( ! is_string( $key ) ) {
 			return false;
 		}
 
@@ -1177,7 +1197,7 @@ class Contact extends Base_Object_With_Meta {
 
 	public function add_meta( $key, $value = false ) {
 
-		if ( $this->handle_special_meta_keys( $key, $value ) ){
+		if ( $this->handle_special_meta_keys( $key, $value ) ) {
 			return true;
 		}
 
@@ -1186,7 +1206,7 @@ class Contact extends Base_Object_With_Meta {
 
 	public function update_meta( $key, $value = false ) {
 
-		if ( $this->handle_special_meta_keys( $key, $value ) ){
+		if ( $this->handle_special_meta_keys( $key, $value ) ) {
 			return true;
 		}
 

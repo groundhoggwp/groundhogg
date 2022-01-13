@@ -5203,6 +5203,32 @@ function array_map_keys( array $array, callable $callback ): array {
 }
 
 /**
+ * Returns unqiue items based on a predicate
+ *
+ * @param $array array
+ * @param $callback callable
+ *
+ * @return array
+ */
+function array_unique_cb( $array, $callback ){
+
+	$seen = [];
+
+	return array_filter( $array, function ($item) use ($seen, $callback){
+
+		$__item = call_user_func( $callback, $item );
+
+		if ( in_array( $__item, $seen ) ){
+			return false;
+		}
+
+		$seen[] = $__item;
+
+		return true;
+	});
+}
+
+/**
  * Sanitize any type email header
  *
  * @param $header_value

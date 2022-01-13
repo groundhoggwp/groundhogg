@@ -9,10 +9,13 @@
     addMediaToBasicTinyMCE,
     specialChars,
     tinymceElement,
+    searchOptionsWidget,
     input,
+    isNumeric,
     icons,
     dialog,
     tooltip,
+    regexp,
     isValidEmail,
     textarea,
 
@@ -125,6 +128,162 @@
     }
 
     onMount()
+
+  }
+
+  const betterTagPicker = ( el, {
+    selected = [],
+    onChange = ( changes ) => {
+
+    }
+  }) => {
+
+    const $el = $(el)
+
+    let isAdding = false
+    let removeTags = []
+    let addTags = []
+
+    const template = () => {
+      // language=HTML
+      return `
+		  <div class="gh-tags" style="margin-bottom: 10px">
+			  ${selected.map(tag => `<span class="gh-tag${removeTags.includes(tag.ID) ? ' remove' : ''}">${tag.data.tag_name} <span data-id="${tag.ID}" class="remove-tag dashicons dashicons-no-alt"></span></span>`).join('')}
+			  ${addTags.map(id => TagsStore.get(id)).map(tag => `<span class="gh-tag adding">${tag.data.tag_name} <span data-id="${tag.ID}" class="remove-adding-tag dashicons dashicons-no-alt"></span></span>`).join('')}
+			  <${isAdding ? 'div' : 'button'} class="add-tag">
+				  <span class="dashicons dashicons-plus-alt2"></span>
+			  </${isAdding ? 'div' : 'button'}>
+		  </div>`
+    }
+
+    const mount = () => {
+      $el.html(template())
+      onMount()
+    }
+    
+    const informChanges = () => {
+      onChange({
+        removeTags,
+        addTags
+      })
+    }
+
+    const onMount = () => {
+
+      tooltip('.add-tag', {
+        content: __('Add a tag', 'groundhogg')
+      })
+
+      $('.gh-tag .remove-tag').on('click', (e) => {
+        let tagId = parseInt(e.currentTarget.dataset.id)
+
+        if (removeTags.includes(tagId)) {
+          removeTags.splice(removeTags.indexOf(tagId), 1)
+        } else {
+          removeTags.push(tagId)
+        }
+        
+        informChanges()
+
+        mount()
+      })
+
+      $('.gh-tag .remove-adding-tag').on('click', (e) => {
+        let tagId = parseInt(e.currentTarget.dataset.id)
+
+        if (addTags.includes(tagId)) {
+          addTags.splice(addTags.indexOf(tagId), 1)
+        }
+
+        informChanges()
+
+        mount()
+      })
+
+      $('.add-tag').on('click', (e) => {
+        isAdding = true
+        mount()
+      })
+
+      if (isAdding) {
+
+        let timeout
+
+        let widget = searchOptionsWidget({
+          selector: '.add-tag',
+          noOptions: __('No tags found...', 'groundhogg'),
+          options: TagsStore.items.filter(t => !selected.map(_t => _t.ID).includes(t.ID) && !addTags.includes(t.ID)),
+          filterOption: ({ data }, search) => data.tag_name.match(regexp(search)),
+          filterOptions: ( opts, search ) => {
+            if ( ! search ){
+              return opts
+            }
+
+            return [
+              {
+                ID: search,
+                data: {
+                  tag_name: `Add "${search}"`,
+                }
+              },
+              ...opts
+            ]
+          },
+          renderOption: ({ data }) => data.tag_name,
+          onClose: () => {
+            isAdding = false
+            mount()
+          },
+          onInput: (search, widget) => {
+
+            if (timeout) {
+              clearTimeout(timeout)
+            }
+
+            timeout = setTimeout(() => {
+              TagsStore.fetchItems({
+                search
+              }).then(() => {
+                widget.options = TagsStore.items.filter(t => !selected.map(_t => _t.ID).includes(t.ID))
+                widget.mountOptions()
+              })
+            }, 1500)
+
+          },
+          onSelect: (tag) => {
+
+            let { ID } = tag
+
+            // Created a new tag
+            if ( ! isNumeric(ID) ){
+              TagsStore.post({
+                data: {
+                  tag_name: ID
+                }
+              }).then( t => {
+                addTags.push(t.ID)
+                informChanges()
+                mount()
+              })
+              return;
+            }
+
+            addTags.push(ID)
+            informChanges()
+          },
+          onOpen: () => {
+          }
+        })
+
+        widget.mount()
+      }
+
+    }
+
+    TagsStore.fetchItems()
+    TagsStore.itemsFetched(selected)
+
+    mount()
 
   }
 
@@ -244,10 +403,7 @@
 					  </div>
 					  <div class="col">
 						  <label for="${prefix}-tags">${__('Tags', 'groundhogg')}</label>
-						  ${select({
-							  id: `${prefix}-tags`,
-							  multiple: true
-						  })}
+						  <div id="${prefix}-tags-here"></div>
 					  </div>
 				  </div>
 			  </div>
@@ -329,26 +485,14 @@
         close()
       })
 
-      tagPicker(`#${prefix}-tags`, true, (items) => {TagsStore.itemsFetched(items)}, {
-        data: getContact().tags.map(t => ({ id: t.ID, text: t.data.tag_name, selected: true }))
-      }).on('select2:unselect', (e) => {
-
-        updateContact({
-          add_tags: payload.add_tags.filter(tId => tId != e.params.data.id),
-          remove_tags: [
-            ...payload.remove_tags,
-            parseInt(e.params.data.id)
-          ]
-        })
-      }).on('select2:select', (e) => {
-
-        updateContact({
-          add_tags: [
-            ...payload.add_tags,
-            parseInt(e.params.data.id)
-          ].filter(tId => !getContact().tags.find(t => t.ID == tId)),
-          remove_tags: payload.remove_tags.filter(tId => tId != e.params.data.id)
-        })
+      betterTagPicker(`#${prefix}-tags-here`, {
+        selected: getContact().tags,
+        onChange: ({addTags, removeTags}) => {
+          updateContact({
+            add_tags: addTags,
+            remove_tags: removeTags,
+          })
+        }
       })
 
       $(`#${prefix}-first-name, #${prefix}-last-name, #${prefix}-email, #${prefix}-optin-status, #${prefix}-owner`).on('change', (e) => {
@@ -369,6 +513,7 @@
     }
 
     const { close, setContent } = modal({
+      dialogClasses: 'overflow-visible',
       content: quickEdit(getContact()),
       onOpen: quickEditMounted
     })
@@ -463,14 +608,7 @@
 				  </div>
 				  <div class="gh-col">
 					  <label for="${prefix}-tags">${__('Tags', 'groundhogg')}</label>
-					  ${select({
-						  id: `${prefix}-tags`,
-						  multiple: true,
-						  dataPlaceholder: __('Type to select tags...', 'groundhogg'),
-						  style: {
-							  width: '100%'
-						  }
-					  })}
+					  <div id="${prefix}-tags-here"></div>
 				  </div>
 			  </div>
 			  <div class="gh-row">
@@ -586,11 +724,14 @@
       })
     })
 
-    tagPicker(`#${prefix}-tags`).on('change', ({ target }) => {
-      setPayload({
-        tags: $(target).val()
-      })
-    })
+    betterTagPicker( `   #${prefix}-tags-here`, {
+      selected: [],
+      onChange: ({addTags}) => {
+        setPayload({
+          add_tags: addTags
+        })
+      }
+    } )
 
   }
 
@@ -777,6 +918,7 @@
     }
 
     return modal({
+      dialogClasses: 'overflow-visible',
       content: form(),
       onOpen: onMount
     })

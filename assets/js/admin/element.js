@@ -1165,7 +1165,8 @@
     onSelect = (option) => {},
     onInput = (search) => {},
     onClose = () => {},
-    onOpen = () => {}
+    onOpen = () => {},
+    filterOptions = (opts, search) => opts
   }) => ({
     selector,
     options,
@@ -1202,13 +1203,13 @@
 		  </div>`
     },
     getOptions () {
-      return this.options.filter((option, i) => {
+      return filterOptions( this.options.filter((option, i) => {
         if (this.search) {
           return filterOption(option, this.search)
         }
 
         return true
-      })
+      }), this.search )
     },
     hasGroups () {
       return Object.keys(groups).length > 0
@@ -1280,8 +1281,8 @@
 
       $(`${selector} .option`).on('click', function (e) {
 
-        const optionId = $(this).data('option')
-        const groupId = $(this).data('group')
+        const optionId = parseInt( $(this).data('option') )
+        const groupId = parseInt( $(this).data('group') )
 
         self.selectOption(optionId, groupId)
       })
@@ -1398,7 +1399,7 @@
             e.preventDefault()
 
             const $focused = $(`${selector} .option.focused`)
-            this.selectOption($focused.data('option'), $focused.data('group'))
+            this.selectOption(parseInt($focused.data('option')), parseInt($focused.data('group')))
 
             break
         }
@@ -2032,6 +2033,7 @@
     ordinal_suffix_of,
     bold,
     spinner,
+    isNumeric,
   }
 
 })(jQuery)
