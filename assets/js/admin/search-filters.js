@@ -41,6 +41,21 @@
 
   const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
 
+  const renderFilterBroken = (filter, filterGroupIndex, filterIndex) => {
+
+    if (!Filters.has(filter.type)) {
+      return ''
+    }
+
+    //language=HTML
+    return `
+		<div class="filter filter-view filter-broken space-between" data-key="${filterIndex}"
+		     data-group="${filterGroupIndex}" tabindex="0">
+			<span class="text">${sprintf(__('This %s filter is corrupted', 'groundhogg'), bold( Filters.types[filter.type].name ))}</span>
+			<button class="delete-filter"><span class="dashicons dashicons-no-alt"></span></button>
+		</div>`
+  }
+
   const renderFilterView = (filter, filterGroupIndex, filterIndex) => {
 
     if (!Filters.has(filter.type)) {
@@ -49,7 +64,8 @@
 
     //language=HTML
     return `
-		<div class="filter filter-view space-between" data-key="${filterIndex}" data-group="${filterGroupIndex}" tabindex="0">
+		<div class="filter filter-view space-between" data-key="${filterIndex}" data-group="${filterGroupIndex}"
+		     tabindex="0">
 			<span class="text">${Filters.types[filter.type].view(filter, filterGroupIndex, filterIndex)}</span>
 			<button class="delete-filter"><span class="dashicons dashicons-no-alt"></span></button>
 		</div>`
@@ -193,7 +209,11 @@
       this.filters.forEach((filterGroup, j) => {
         const filters = []
         filterGroup.forEach((filter, k) => {
-          filters.push(self.currentGroup === j && self.currentFilter === k ? renderFilterEdit(this.usingTempFilters ? this.tempFilterSettings : filter, j, k) : renderFilterView(filter, j, k))
+          try {
+            filters.push(self.currentGroup === j && self.currentFilter === k ? renderFilterEdit(this.usingTempFilters ? this.tempFilterSettings : filter, j, k) : renderFilterView(filter, j, k))
+          } catch (e) {
+            filters.push( renderFilterBroken(filter, j, k) );
+          }
         })
         filters.push(self.isAddingFilterToGroup === j ? `<div class="add-filter-wrap"></div>` : `<button data-group="${j}" class="add-filter">
 				  <span class="dashicons dashicons-plus-alt2"></span>
@@ -294,7 +314,9 @@
       const { stop: stopDots } = loadingDots('#search-loading-dots')
 
       if (promises.length > 0) {
-        await Promise.all(promises)
+        await Promise.all(promises).catch(e => {
+          // Nothing
+        })
       }
 
       stopDots()
@@ -731,8 +753,6 @@
     return title + ' ' + filterCountComparisons[count_compare](count)
   }
 
-
-
 //  REGISTER ALL FILTERS HERE
   const BasicTextFilter = (name) => ({
     name,
@@ -1004,7 +1024,7 @@
         return 'tags'
       }
 
-      tags = tags.map( t => TagsStore.get( parseInt(t) ) ).filter(Boolean)
+      tags = tags.map(t => TagsStore.get(parseInt(t))).filter(Boolean)
 
       const tagNames = tags.map(t =>
         `<b>${t.data.tag_name}</b>`)
@@ -1014,7 +1034,7 @@
     },
     edit ({ tags, compare, compare2 }) {
 
-      tags = tags.map( t => TagsStore.get( parseInt(t) ) ).filter(Boolean)
+      tags = tags.map(t => TagsStore.get(parseInt(t))).filter(Boolean)
 
       // language=html
       return `${select({
@@ -1044,7 +1064,7 @@
 		  tags.map(t => ({
 			  value: t.ID,
 			  text: t.data.tag_name
-		  })), tags.map( t => t.ID )
+		  })), tags.map(t => t.ID)
 	  )}`
     },
     onMount (filter, updateFilter) {
@@ -1927,13 +1947,13 @@
         // language=html
         return `
 			${select({
-          id: 'filter-compare',
-          name: 'compare',
-        }, StringComparisons, compare)} ${input({
-          id: 'filter-value',
-          name: 'value',
-          value
-        })}`
+				id: 'filter-compare',
+				name: 'compare',
+			}, StringComparisons, compare)} ${input({
+				id: 'filter-value',
+				name: 'value',
+				value
+			})}`
       },
       onMount (filter, updateFilter) {
 
@@ -1962,13 +1982,13 @@
         // language=html
         return `
 			${select({
-          id: 'filter-compare',
-          name: 'compare',
-        }, NumericComparisons, compare)} ${input({
-          id: 'filter-value',
-          name: 'value',
-          value
-        })}`
+				id: 'filter-compare',
+				name: 'compare',
+			}, NumericComparisons, compare)} ${input({
+				id: 'filter-value',
+				name: 'value',
+				value
+			})}`
       },
       onMount (filter, updateFilter) {
 
@@ -2011,16 +2031,16 @@
       edit: ({ field, options, compare }) => {
         // language=HTML
         return `${select({
-          id: 'filter-compare',
-          name: 'compare'
-        }, {
-          in: _x('Is one of', 'comparison, groundhogg'),
-          not_in: _x('Is not one of', 'comparison', 'groundhogg')
-        }, compare)} ${select({
-          id: 'filter-options',
-          name: 'options',
-          multiple: true,
-        }, f.options.map(o => ({ value: o, text: o })), options)}`
+			id: 'filter-compare',
+			name: 'compare'
+		}, {
+			in: _x('Is one of', 'comparison, groundhogg'),
+			not_in: _x('Is not one of', 'comparison', 'groundhogg')
+		}, compare)} ${select({
+			id: 'filter-options',
+			name: 'options',
+			multiple: true,
+		}, f.options.map(o => ({ value: o, text: o })), options)}`
       },
       onMount: ({ field, options }, updateFilter) => {
 
@@ -2047,28 +2067,28 @@
     }),
     dropdown: (f) => ({
       view: ({ options, compare }) => {
-        if ( ComparisonsTitleGenerators[compare] ){
+        if (ComparisonsTitleGenerators[compare]) {
           return ComparisonsTitleGenerators[compare](`<b>${f.label}</b>`, orList(options.map(o => bold(o))))
         }
 
-        return moreComparisonTitles[compare](`<b>${f.label}</b>`, options )
+        return moreComparisonTitles[compare](`<b>${f.label}</b>`, options)
       },
       edit: ({ field, options, compare }) => {
         // language=HTML
         return `${select({
-          id: 'filter-compare',
-          name: 'compare'
-        }, ! f.multiple ? {
-          in: _x('Is one of', 'comparison, groundhogg'),
-          not_in: _x('Is not one of', 'comparison', 'groundhogg')
-        } : {
-          all_in: __( 'Has all selected' ),
-          all_not_in: __( 'Does not have all selected' ),
-        }, compare)} ${select({
-          id: 'filter-options',
-          name: 'options',
-          multiple: true,
-        }, f.options.map(o => ({ value: o, text: o })), options)}`
+			id: 'filter-compare',
+			name: 'compare'
+		}, !f.multiple ? {
+			in: _x('Is one of', 'comparison, groundhogg'),
+			not_in: _x('Is not one of', 'comparison', 'groundhogg')
+		} : {
+			all_in: __('Has all selected'),
+			all_not_in: __('Does not have all selected'),
+		}, compare)} ${select({
+			id: 'filter-options',
+			name: 'options',
+			multiple: true,
+		}, f.options.map(o => ({ value: o, text: o })), options)}`
       },
       onMount: ({ field, options }, updateFilter) => {
 
@@ -2100,16 +2120,16 @@
       edit: ({ field, options, compare }) => {
         // language=HTML
         return `${select({
-          id: 'filter-compare',
-          name: 'compare'
-        }, {
-          all_checked: __('Is Checked', 'groundhogg-better-meta'),
-          not_checked: __('Is Not Checked', 'groundhogg-better-meta'),
-        }, compare)} ${select({
-          id: 'filter-options',
-          name: 'options',
-          multiple: true,
-        }, f.options.map(o => ({ value: o, text: o })), options)}`
+			id: 'filter-compare',
+			name: 'compare'
+		}, {
+			all_checked: __('Is Checked', 'groundhogg-better-meta'),
+			not_checked: __('Is Not Checked', 'groundhogg-better-meta'),
+		}, compare)} ${select({
+			id: 'filter-options',
+			name: 'options',
+			multiple: true,
+		}, f.options.map(o => ({ value: o, text: o })), options)}`
       },
       onMount: ({ field, options }, updateFilter) => {
 
@@ -2153,7 +2173,7 @@
 
       Object.values(fields).filter(f => f.group === s.id).forEach(f => {
 
-        if ( f.type in filterFactory ){
+        if (f.type in filterFactory) {
           registerFilter(f.id, groupId, f.label, filterFactory[f.type](f))
         }
 

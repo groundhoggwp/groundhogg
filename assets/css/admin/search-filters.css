@@ -135,6 +135,10 @@
 #search-filters-editor .filter.filter-view:hover, #search-filters-editor .filter.filter-view:focus {
   background: #f9f9f9;
 }
+#search-filters-editor .filter.filter-view.filter-broken {
+  border-color: #E91F4F;
+  background: rgba(233, 31, 79, 0.1);
+}
 #search-filters-editor .filter.filter-edit-wrap {
   position: relative;
   min-width: 200px;

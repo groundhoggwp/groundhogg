@@ -1,6 +1,7 @@
 $primary-blue: #0075FF;
 $primary-dark: #102640;
 $error-red: #E91F4F;
+$error-red-10: rgba(233, 31, 79, 0.10);
 $secondary-purple: rgba(108, 25, 173, 1);
 $secondary-purple-50: rgba(108, 25, 173, 0.5);
 $alert-yellow: #FFEE58;
@@ -168,6 +169,11 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
       &:hover,
       &:focus {
         background: #f9f9f9;
+      }
+
+      &.filter-broken{
+        border-color: $error-red;
+        background: $error-red-10;
       }
     }
 
