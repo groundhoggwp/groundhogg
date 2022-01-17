@@ -446,6 +446,12 @@ class Settings_Page extends Admin_Page {
 					<div id="email-logging"></div><?php
 				}
 			),
+//			'imap'               => array(
+//				'id'       => 'imap',
+//				'title'    => _x( 'Email Imap', 'settings_sections', 'groundhogg' ),
+//				'tab'      => 'email',
+//				'callback' => [ Plugin::$instance->imap_inbox, 'test_connection_ui' ],
+//			),
 			'bounces'               => array(
 				'id'       => 'bounces',
 				'title'    => _x( 'Email Bounces', 'settings_sections', 'groundhogg' ),
@@ -950,6 +956,57 @@ class Settings_Page extends Admin_Page {
 					'max'         => 1,
 					'step'        => '0.1',
 					'placeholder' => '0.5'
+				),
+			),
+			'gh_imap_inbox_address'                        => array(
+				'id'      => 'gh_imap_inbox_address',
+				'section' => 'imap',
+				'label'   => _x( 'IMAP Inbox', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'This is the inbox which emails and replies will be sent to.', 'settings', 'groundhogg' ),
+				'type'    => 'input',
+				'atts'    => array(
+					'type'        => 'email',
+					'name'        => 'gh_imap_inbox_address',
+					'id'          => 'gh_imap_inbox_address',
+					'placeholder' => 'replies@' . ( ( substr( $_SERVER['SERVER_NAME'], 0, 4 ) == 'www.' ) ? substr( $_SERVER['SERVER_NAME'], 4 ) : $_SERVER['SERVER_NAME'] ),
+				),
+			),
+			'gh_imap_inbox_password'               => array(
+				'id'      => 'gh_imap_inbox_password',
+				'section' => 'imap',
+				'type'    => 'input',
+				'label'   => _x( 'IMAP Inbox Password', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'This password to access the inbox.', 'settings', 'groundhogg' ),
+				'atts'    => array(
+					'type' => 'password',
+					'name' => 'gh_imap_inbox_password',
+					'id'   => 'gh_imap_inbox_password',
+				),
+			),
+			'gh_imap_inbox_host'                   => array(
+				'id'      => 'gh_imap_inbox_host',
+				'section' => 'imap',
+				'label'   => _x( 'Mail Server', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'This is the domain your email inbox is hosted. Most likely mail.yourdomain.com', 'settings', 'groundhogg' ),
+				'type'    => 'input',
+				'atts'    => array(
+					'type'        => 'text',
+					'name'        => 'gh_imap_inbox_host',
+					'id'          => 'gh_imap_inbox_host',
+					'placeholder' => 'mail.' . ( ( substr( $_SERVER['SERVER_NAME'], 0, 4 ) == 'www.' ) ? substr( $_SERVER['SERVER_NAME'], 4 ) : $_SERVER['SERVER_NAME'] ),
+				),
+			),
+			'gh_imap_inbox_port'                   => array(
+				'id'      => 'gh_imap_inbox_port',
+				'section' => 'imap',
+				'label'   => _x( 'IMAP Port', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'Most IMAP ports are 993.', 'settings', 'groundhogg' ),
+				'type'    => 'input',
+				'atts'    => array(
+					'type'        => 'number',
+					'name'        => 'gh_imap_inbox_port',
+					'id'          => 'gh_imap_inbox_port',
+					'placeholder' => 993,
 				),
 			),
 			'gh_bounce_inbox'                        => array(

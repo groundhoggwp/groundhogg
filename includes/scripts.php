@@ -376,6 +376,7 @@ class Scripts {
 							'tags'        => rest_url( Base_Api::NAME_SPACE . '/tags' ),
 							'activity'    => rest_url( Base_Api::NAME_SPACE . '/activity' ),
 							'events'      => rest_url( Base_Api::NAME_SPACE . '/events' ),
+							'event_queue' => rest_url( Base_Api::NAME_SPACE . '/event_queue' ),
 							'notes'       => rest_url( Base_Api::NAME_SPACE . '/notes' ),
 							'contacts'    => rest_url( Base_Api::NAME_SPACE . '/contacts' ),
 							'forms'       => rest_url( Base_Api::NAME_SPACE . '/forms' ),

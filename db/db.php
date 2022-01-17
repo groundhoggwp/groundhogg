@@ -897,17 +897,7 @@ abstract class DB {
 			switch ( $key ) {
 				case 's':
 				case 'search':
-
-					$search = [ 'relationship' => 'OR' ];
-
-					foreach ( $this->get_columns() as $column => $type ) {
-						if ( $type === '%s' ) {
-							$search[] = [ 'col' => $column, 'val' => $val, 'compare' => 'RLIKE' ];
-						}
-					}
-
-					$where[] = $search;
-
+					$query_vars['search'] = $val;
 					break;
 				case 'include':
 					$where[] = [ 'col' => $this->get_primary_key(), 'val' => $val, 'compare' => 'IN' ];
@@ -1046,7 +1036,7 @@ abstract class DB {
 
 			foreach ( $this->get_columns() as $column => $type ) {
 				if ( $type === '%s' ) {
-					$search[] = [ 'col' => $column, 'val' => esc_sql( $query_vars['search'] ), 'compare' => 'RLIKE' ];
+					$search[] = [ 'col' => $column, 'val' => '%' . esc_sql( $query_vars['search'] ) . '%', 'compare' => 'LIKE' ];
 				}
 			}
 
@@ -1144,7 +1134,7 @@ abstract class DB {
 
 			} else if ( isset_not_empty( $condition, 'relationship' ) ) {
 
-				$clause[] = $this->build_advanced_where_statement( $condition );
+				$clause[] = '(' . $this->build_advanced_where_statement( $condition ) . ')';
 
 			} else {
 
@@ -1174,6 +1164,10 @@ abstract class DB {
 
 					$value = $condition['val'];
 
+					if ( is_array( $value ) && ! in_array( $condition['compare'], [ 'IN', 'NOT IN' ] ) ) {
+						$condition['compare'] = 'IN';
+					}
+
 					switch ( $condition['compare'] ) {
 						default:
 						case '=':
@@ -1184,25 +1178,19 @@ abstract class DB {
 						case '<=':
 						case '<>':
 						case 'LIKE':
-						case 'RLIKE':
-							if ( is_array( $value ) ) {
-								$compare = in_array( $condition['compare'], [
-									'IN',
-									'NOT IN'
-								] ) ? $condition['compare'] : 'IN';
-
-								$value    = map_deep( $value, 'sanitize_text_field' );
-								$value    = sprintf( "(%s)", maybe_implode_in_quotes( $value ) );
-								$clause[] = "{$condition[ 'col' ]} {$compare} {$value}";
-
+							if ( is_numeric( $value ) ) {
+								$clause[] = $wpdb->prepare( "{$condition[ 'col' ]} {$condition[ 'compare' ]} %d", $value );
 							} else {
+								$clause[] = $wpdb->prepare( "{$condition[ 'col' ]} {$condition[ 'compare' ]} %s", $value );
+							}
+							break;
+						case 'RLIKE':
 
-								if ( is_numeric( $value ) ) {
-									$clause[] = $wpdb->prepare( "{$condition[ 'col' ]} {$condition[ 'compare' ]} %d", $value );
-								} else {
-									$clause[] = $wpdb->prepare( "{$condition[ 'col' ]} {$condition[ 'compare' ]} %s", $value );
-								}
-
+							if ( is_numeric( $value ) ) {
+								$clause[] = $wpdb->prepare( "{$condition[ 'col' ]} {$condition[ 'compare' ]} %d", $value );
+							} else {
+								$value = preg_quote( $value );
+								$clause[] = "{$condition[ 'col' ]} {$condition[ 'compare' ]} '$value'";
 							}
 
 							break;
@@ -1213,20 +1201,8 @@ abstract class DB {
 
 								$value = map_deep( $value, 'sanitize_text_field' );
 
-								$value = map_deep( $value, function ( $i ) {
-
-									$i = esc_sql( $i );
-
-									if ( is_numeric( $i ) ) {
-										return absint( $i );
-									} else if ( is_string( $i ) ) {
-										return "'{$i}'";
-									}
-
-									return false;
-								} );
-
-								$value = implode( ',', $value );
+								$value = map_deep( $value, 'esc_sql' );
+								$value = maybe_implode_in_quotes( $value );
 							}
 
 							$clause[] = "{$condition[ 'col' ]} {$condition['compare']} ({$value})";

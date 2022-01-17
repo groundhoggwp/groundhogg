@@ -18,6 +18,7 @@
     regexp,
     isValidEmail,
     textarea,
+    spinner,
 
   } = Groundhogg.element
   const { contacts: ContactsStore, tags: TagsStore, forms: FormsStore } = Groundhogg.stores
@@ -47,7 +48,11 @@
 		  </div>
 		  <div id="search-results">
 			  <table>
-				  <tbody></tbody>
+				  <tbody>
+				  <tr>
+					  <td>${spinner()}</td>
+				  </tr>
+				  </tbody>
 			  </table>
 		  </div>`
     }
@@ -119,8 +124,10 @@
         getResults()
       }).focus()
 
-      if (ContactsStore.hasItems()) {
-        setSearchResults(ContactsStore.getItems())
+      let results = ContactsStore.getItems().filter(c => !exclude.includes(c.ID))
+
+      if (results.length) {
+        setSearchResults(results)
       } else {
         getResults()
       }
@@ -131,9 +138,9 @@
 
   }
 
-  const betterTagPicker = ( el, {
+  const betterTagPicker = (el, {
     selected = [],
-    onChange = ( changes ) => {
+    onChange = (changes) => {
 
     }
   }) => {
@@ -160,7 +167,7 @@
       $el.html(template())
       onMount()
     }
-    
+
     const informChanges = () => {
       onChange({
         removeTags,
@@ -182,7 +189,7 @@
         } else {
           removeTags.push(tagId)
         }
-        
+
         informChanges()
 
         mount()
@@ -201,21 +208,14 @@
       })
 
       $('.add-tag').on('click', (e) => {
-        isAdding = true
-        mount()
-      })
-
-      if (isAdding) {
-
-        let timeout
-
-        let widget = searchOptionsWidget({
-          selector: '.add-tag',
+        searchOptionsWidget({
+          target: e.currentTarget,
+          position: 'fixed',
           noOptions: __('No tags found...', 'groundhogg'),
           options: TagsStore.items.filter(t => !selected.map(_t => _t.ID).includes(t.ID) && !addTags.includes(t.ID)),
           filterOption: ({ data }, search) => data.tag_name.match(regexp(search)),
-          filterOptions: ( opts, search ) => {
-            if ( ! search ){
+          filterOptions: (opts, search) => {
+            if (!search) {
               return opts
             }
 
@@ -255,17 +255,17 @@
             let { ID } = tag
 
             // Created a new tag
-            if ( ! isNumeric(ID) ){
+            if (!isNumeric(ID)) {
               TagsStore.post({
                 data: {
                   tag_name: ID
                 }
-              }).then( t => {
+              }).then(t => {
                 addTags.push(t.ID)
                 informChanges()
                 mount()
               })
-              return;
+              return
             }
 
             addTags.push(ID)
@@ -273,10 +273,8 @@
           },
           onOpen: () => {
           }
-        })
-
-        widget.mount()
-      }
+        }).mount()
+      })
 
     }
 
@@ -319,9 +317,9 @@
 						  class="dashicons dashicons-no-alt"></span></button>
 				  </div>
 			  </div>
-			  <div class="contact-quick-edit-fields">
-				  <div class="row">
-					  <div class="col">
+			  <div class="contact-quick-edit-fields gh-rows-and-columns">
+				  <div class="gh-row">
+					  <div class="gh-col">
 						  <label for="${prefix}-first-name">${__('First Name', 'groundhogg')}</label>
 						  ${input({
 							  id: `${prefix}-first-name`,
@@ -329,7 +327,7 @@
 							  value: contact.data.first_name,
 						  })}
 					  </div>
-					  <div class="col">
+					  <div class="gh-col">
 						  <label for="${prefix}-last-name">${__('Last Name', 'groundhogg')}</label>
 						  ${input({
 							  id: `${prefix}-last-name`,
@@ -338,8 +336,8 @@
 						  })}
 					  </div>
 				  </div>
-				  <div class="row">
-					  <div class="col">
+				  <div class="gh-row">
+					  <div class="gh-col">
 						  <label for="${prefix}-email">${__('Email Address', 'groundhogg')}</label>
 						  ${input({
 							  type: 'email',
@@ -348,9 +346,9 @@
 							  value: contact.data.email
 						  })}
 					  </div>
-					  <div class="col">
-						  <div class="row phone">
-							  <div class="col">
+					  <div class="gh-col">
+						  <div class="gh-row phone">
+							  <div class="gh-col">
 								  <label for="${prefix}-primary-phone">${__('Primary Phone', 'groundhogg')}</label>
 								  ${input({
 									  type: 'tel',
@@ -372,15 +370,15 @@
 						  </div>
 					  </div>
 				  </div>
-				  <div class="row">
-					  <div class="col">
+				  <div class="gh-row">
+					  <div class="gh-col">
 						  <label for="${prefix}-email">${__('Optin Status', 'groundhogg')}</label>
 						  ${select({
 							  id: `${prefix}-optin-status`,
 							  name: 'optin_status'
 						  }, Groundhogg.filters.optin_status, contact.data.optin_status)}
 					  </div>
-					  <div class="col">
+					  <div class="gh-col">
 						  <label for="${prefix}-mobile-phone">${__('Mobile Phone', 'groundhogg')}</label>
 						  ${input({
 							  type: 'tel',
@@ -390,8 +388,8 @@
 						  })}
 					  </div>
 				  </div>
-				  <div class="row">
-					  <div class="col">
+				  <div class="gh-row">
+					  <div class="gh-col">
 						  <label for="${prefix}-owner">${__('Owner', 'noun the contact owner', 'groundhogg')}</label>
 						  ${select({
 							  id: `${prefix}-owner`,
@@ -401,7 +399,10 @@
 							  value: u.ID
 						  })), contact.data.owner_id)}
 					  </div>
-					  <div class="col">
+					  <div class="gh-col"></div>
+				  </div>
+				  <div class="gh-row">
+					  <div class="gh-col">
 						  <label for="${prefix}-tags">${__('Tags', 'groundhogg')}</label>
 						  <div id="${prefix}-tags-here"></div>
 					  </div>
@@ -487,7 +488,7 @@
 
       betterTagPicker(`#${prefix}-tags-here`, {
         selected: getContact().tags,
-        onChange: ({addTags, removeTags}) => {
+        onChange: ({ addTags, removeTags }) => {
           updateContact({
             add_tags: addTags,
             remove_tags: removeTags,
@@ -513,7 +514,7 @@
     }
 
     const { close, setContent } = modal({
-      dialogClasses: 'overflow-visible',
+      // dialogClasses: 'overflow-visible',
       content: quickEdit(getContact()),
       onOpen: quickEditMounted
     })
@@ -724,14 +725,14 @@
       })
     })
 
-    betterTagPicker( `   #${prefix}-tags-here`, {
+    betterTagPicker(`   #${prefix}-tags-here`, {
       selected: [],
-      onChange: ({addTags}) => {
+      onChange: ({ addTags }) => {
         setPayload({
           add_tags: addTags
         })
       }
-    } )
+    })
 
   }
 
@@ -918,7 +919,7 @@
     }
 
     return modal({
-      dialogClasses: 'overflow-visible',
+      // dialogClasses: 'overflow-visible',
       content: form(),
       onOpen: onMount
     })
@@ -1231,7 +1232,7 @@
 
           beforeUpload(fd)
 
-          setTimeout( () => {
+          setTimeout(() => {
 
             fetch(ajaxurl, {
               method: 'POST',
@@ -1242,7 +1243,7 @@
               if (!r.ok) {
 
                 dialog({
-                  message: __( 'Something when wrong...' ),
+                  message: __('Something when wrong...'),
                   type: 'error'
                 })
 
@@ -1263,9 +1264,9 @@
                 return
               }
 
-              onUpload( r, file )
+              onUpload(r, file)
 
-              filesUploaded.unshift( file )
+              filesUploaded.unshift(file)
 
               renderUploadedFiles()
 
@@ -1273,15 +1274,15 @@
 
             })
 
-          }, 2000 )
+          }, 2000)
         }
 
         const renderUploadingFiles = () => {
-          $( '#uploading-files' ).html( filesToUpload.map( f => `<div class="file"><span class="hourglass">⌛</span> ${f.name}</div>` ) )
+          $('#uploading-files').html(filesToUpload.map(f => `<div class="file"><span class="hourglass">⌛</span> ${f.name}</div>`))
         }
 
         const renderUploadedFiles = () => {
-          $( '#uploaded-files' ).html( filesUploaded.map( f => `<div class="file">✅ ${f.name}</div>` ) )
+          $('#uploaded-files').html(filesUploaded.map(f => `<div class="file">✅ ${f.name}</div>`))
         }
 
         const addFiles = (files) => {

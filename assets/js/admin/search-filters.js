@@ -1004,15 +1004,17 @@
         return 'tags'
       }
 
-      const tagNames = tags.map(id =>
-        `<b>${TagsStore.get(parseInt(id)).data.tag_name}</b>`)
+      tags = tags.map( t => TagsStore.get( parseInt(t) ) ).filter(Boolean)
+
+      const tagNames = tags.map(t =>
+        `<b>${t.data.tag_name}</b>`)
       const func = compare2 === 'any' ? orList : andList
 
       return ComparisonsTitleGenerators[compare](`<b>${_x('Tags', 'noun referring to contact segments', 'groundhogg')}</b>`, func(tagNames))
     },
     edit ({ tags, compare, compare2 }) {
 
-      tags = tags.map(id => parseInt(id))
+      tags = tags.map( t => TagsStore.get( parseInt(t) ) ).filter(Boolean)
 
       // language=html
       return `${select({
@@ -1039,10 +1041,10 @@
 			  multiple: true,
 		  }
 		  ,
-		  tags.map(id => ({
-			  value: id,
-			  text: TagsStore.get(id).data.tag_name
-		  })), tags
+		  tags.map(t => ({
+			  value: t.ID,
+			  text: t.data.tag_name
+		  })), tags.map( t => t.ID )
 	  )}`
     },
     onMount (filter, updateFilter) {

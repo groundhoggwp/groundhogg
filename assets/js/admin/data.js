@@ -489,6 +489,7 @@
       },
     }),
     events: ObjectStore(Groundhogg.api.routes.v4.events),
+    event_queue: ObjectStore(Groundhogg.api.routes.v4.event_queue),
     page_visits: ObjectStore(Groundhogg.api.routes.v4.page_visits),
     activity: ObjectStore(Groundhogg.api.routes.v4.activity),
     campaigns: ObjectStore(Groundhogg.api.routes.v4.campaigns),

@@ -1107,7 +1107,11 @@
    * @returns {RegExp}
    */
   const regexp = (str) => {
-    return new RegExp(str, 'i')
+    return new RegExp(escapeRegex(str), 'i')
+  }
+
+  function escapeRegex(string) {
+    return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
   }
 
   if (!Element.prototype.matches) {
@@ -1281,8 +1285,8 @@
 
       $(`${selector} .option`).on('click', function (e) {
 
-        const optionId = parseInt( $(this).data('option') )
-        const groupId = parseInt( $(this).data('group') )
+        const optionId = parseInt($(this).data('option'))
+        const groupId = $(this).data('group')
 
         self.selectOption(optionId, groupId)
       })
@@ -1399,7 +1403,7 @@
             e.preventDefault()
 
             const $focused = $(`${selector} .option.focused`)
-            this.selectOption(parseInt($focused.data('option')), parseInt($focused.data('group')))
+            this.selectOption(parseInt($focused.data('option')), $focused.data('group'))
 
             break
         }

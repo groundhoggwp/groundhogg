@@ -70,6 +70,7 @@ class Autoloader {
 		'Reports'                           => 'includes/reporting/reports.php',
 		'Email'                             => 'includes/classes/email.php',
 		'Event'                             => 'includes/classes/event.php',
+		'Event_Queue_Item'                  => 'includes/classes/event-queue-item.php',
 		'Tag'                               => 'includes/classes/tag.php',
 		'Broadcast'                         => 'includes/classes/broadcast.php',
 		'Funnel'                            => 'includes/classes/funnel.php',

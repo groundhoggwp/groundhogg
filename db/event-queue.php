@@ -5,6 +5,7 @@ namespace Groundhogg\DB;
 // Exit if accessed directly
 use Groundhogg\Contact;
 use Groundhogg\Event;
+use Groundhogg\Event_Queue_Item;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 
@@ -273,5 +274,9 @@ class Event_Queue extends DB {
 		dbDelta( $sql );
 
 		update_option( $this->table_name . '_db_version', $this->version );
+	}
+
+	public function create_object( $object ) {
+		return new Event_Queue_Item( $object );
 	}
 }

@@ -86,8 +86,6 @@ class Tracking {
 	 * Look at the current URL and depending on that setup the vars and enqueue the appropriate elements if any
 	 */
 	public function __construct() {
-		//Actions when cookie should be destroyed
-		add_action( 'groundhogg/preferences/erase_profile', [ $this, 'stop_tracking' ] );
 
 		// Actions which build the tracking cookie.
 		add_action( 'wp_login', [ $this, 'wp_login' ], 10, 2 );
@@ -246,7 +244,7 @@ class Tracking {
 		$this->add_tracking_cookie_param( 'source', $tracking_via );
 		$this->add_tracking_cookie_param( 'action', $tracking_action );
 
-		apply_filters( 'groundhogg/tracking/target_url', $target_url );
+		$target_url = apply_filters( 'groundhogg/tracking/target_url', $target_url );
 
 		switch ( $tracking_via ) {
 			case 'email':
@@ -513,7 +511,7 @@ class Tracking {
 		$cookie = wp_json_encode( $cookie_vars );
 		$cookie = encrypt( $cookie );
 
-		$expiry = apply_filters( 'groundhogg/tracking/cookie_expiry', self::COOKIE_EXPIRY ) * DAY_IN_SECONDS;
+		$expiry = apply_filters( 'groundhogg/tracking/cookie_expiry', self::COOKIE_EXPIRY * DAY_IN_SECONDS );
 
 		return set_cookie( self::TRACKING_COOKIE, $cookie, $expiry );
 	}
@@ -538,15 +536,6 @@ class Tracking {
 
 		// Rebuild the cookie.
 		$this->build_tracking_cookie();
-	}
-
-	/**
-	 * Delete the current tracking cookie.
-	 */
-	public function stop_tracking() {
-		if ( isset( $_COOKIE[ self::TRACKING_COOKIE ] ) ) {
-			delete_cookie( self::TRACKING_COOKIE );
-		}
 	}
 
 	/**
@@ -681,11 +670,11 @@ class Tracking {
 		 * If the event is not found, don't show an error
 		 * Just keep moving them to the desired page.
 		 *
-		 * Event Ids can go missing for a variety of reason, its unreasonable to assume the data wil remain integral
+		 * Event Ids can go missing for a variety of reason, it's unreasonable to assume the data wil remain integral
 		 * always.
 		 */
 		if ( ! $event || ! $event->exists() ) {
-			wp_redirect( $target );
+			wp_redirect( $target, 301 );
 
 			return;
 		}
@@ -705,7 +694,7 @@ class Tracking {
 		if ( get_db( 'activity' )->add( $args ) ) {
 			do_action( 'groundhogg/tracking/email/click', $this );
 
-			wp_redirect( $target );
+			wp_redirect( $target, 301 );
 
 			return;
 		}

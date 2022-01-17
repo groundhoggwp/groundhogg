@@ -198,13 +198,13 @@ class Tags_Table extends WP_List_Table {
 		$order    = strtoupper( get_url_var( 'order', 'DESC' ) );
 		$orderby  = get_url_var( 'orderby', 'tag_id' );
 
-		$args = array(
+		$args = [
 			'search'  => $search,
 			'limit'   => $per_page,
 			'offset'  => $offset,
 			'order'   => $order,
 			'orderby' => $orderby,
-		);
+		];
 
 		$items = get_db( 'tags' )->query( $args );
 		$total = get_db( 'tags' )->count( $args );

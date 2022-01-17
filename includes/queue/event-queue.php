@@ -12,6 +12,9 @@ use Groundhogg\Plugin;
 use Groundhogg\Step;
 use Groundhogg\Supports_Errors;
 use function Groundhogg\gh_cron_installed;
+use function Groundhogg\gh_doing_cron;
+use function Groundhogg\is_event_queue_processing;
+use function Groundhogg\track_wp_cron_ping;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -85,12 +88,30 @@ class Event_Queue extends Supports_Errors {
 		add_action( self::WP_CRON_HOOK, [ $this, 'run_queue' ] );
 
 		// no need if gh-cron.php is installed.
-		if ( ! gh_cron_installed() ) {
-			add_action( 'init', [ $this, 'setup_cron_jobs' ] );
-		}
-
+		add_action( 'init', [ $this, 'setup_cron_jobs' ] );
 		add_action( 'init', [ $this, 'init' ] );
 
+		add_action( 'heartbeat_tick', [ $this, 'heartbeat' ], 99 );
+		add_action( 'heartbeat_nopriv_tick', [ $this, 'heartbeat' ], 99 );
+
+	}
+
+	/**
+	 * If the cron job fil is not installed also execute events during the heartbeat.
+	 */
+	public function heartbeat() {
+
+		// If the cron file is installed and the queue is processing do not do heartbeat
+		if ( is_event_queue_processing() && gh_cron_installed() ){
+			return;
+		}
+
+		// set max time limit to 15 seconds
+		add_filter( 'groundhogg/event_queue/max_time_limit', function () {
+			return 15;
+		} );
+
+		do_action( self::WP_CRON_HOOK );
 	}
 
 	public function init() {
@@ -134,10 +155,13 @@ class Event_Queue extends Supports_Errors {
 	 * @since 1.0.20.1 Added notice to check if there is something wrong with the cron system.
 	 */
 	public function setup_cron_jobs() {
-		if ( ! gh_cron_installed() && ! wp_next_scheduled( self::WP_CRON_HOOK ) ) {
-			wp_schedule_event( time(), apply_filters( 'groundhogg/event_queue/queue_interval', self::WP_CRON_INTERVAL ), self::WP_CRON_HOOK );
+
+		// cron job already exists
+		if ( wp_next_scheduled( self::WP_CRON_HOOK ) ){
+			return;
 		}
 
+		wp_schedule_event( time(), apply_filters( 'groundhogg/event_queue/queue_interval', self::WP_CRON_INTERVAL ), self::WP_CRON_HOOK );
 	}
 
 	/**
@@ -165,6 +189,11 @@ class Event_Queue extends Supports_Errors {
 	 */
 	public function run_queue() {
 
+		// Don't run during wp-cron.php if gh-cron.php is working
+		if ( wp_doing_cron() && ! gh_doing_cron() && is_event_queue_processing() && gh_cron_installed() ){
+			return 0;
+		}
+
 		// Let's make sure we are not over doing it.
 		if ( ! $this->is_enabled() ) {
 			return 0;
@@ -175,7 +204,7 @@ class Event_Queue extends Supports_Errors {
 		Limits::start();
 
 		Limits::raise_memory_limit();
-		Limits::raise_time_limit( MINUTE_IN_SECONDS );
+		Limits::raise_time_limit( apply_filters( 'groundhogg/event_queue/max_time_limit', MINUTE_IN_SECONDS ) );
 
 		$this->cleanup_unprocessed_events();
 

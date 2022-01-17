@@ -15,9 +15,6 @@ use function Groundhogg\gh_cron_installed;
 use function Groundhogg\html;
 use function Groundhogg\modal_link_url;
 
-$gh_cron_setup = time() - get_option( 'gh_cron_last_ping' ) <= MINUTE_IN_SECONDS;
-$wp_cron_setup = time() - get_option( 'wp_cron_last_ping' ) <= 15 * MINUTE_IN_SECONDS;
-
 // MailHawk is installed but not connected -> redirect to the mailhawk connect page
 if ( function_exists( 'mailhawk_is_connected' ) && ! mailhawk_is_connected() ):
 	$smtp_fix_link = admin_page_url( 'mailhawk' );
@@ -33,13 +30,6 @@ else:
 endif;
 
 $checklist_items = [
-	[
-		'title'       => __( 'Configure Cron Jobs', 'groundhogg' ),
-		'description' => __( 'This is a best practice and will improve the performance of your site.', 'groundhogg' ),
-		'completed'   => apply_filters( 'groundhogg/cron/verified', $gh_cron_setup && $wp_cron_setup && gh_cron_installed() && defined( 'DISABLE_WP_CRON' ) ),
-		'fix'         => admin_page_url( 'gh_tools', [ 'tab' => 'cron' ] ),
-		'cap'         => 'manage_options'
-	],
 	[
 		'title'       => __( 'Integrate An SMTP Service', 'groundhogg' ),
 		'description' => __( "You need a proper SMTP service to ensure your email reaches the inbox. We recommend <a href='https://mailhawk.io'>MailHawk!</a>", 'groundhogg' ),
@@ -92,6 +82,13 @@ $checklist_items = [
 			'preventSave'        => 'true',
 		] ),
 		'cap'         => 'edit_funnels'
+	],
+	[
+		'title'       => __( 'Configure Cron Jobs', 'groundhogg' ),
+		'description' => __( 'This is an optional best practice and will improve the performance of your site.', 'groundhogg' ),
+		'completed'   => gh_cron_installed() && \Groundhogg\is_event_queue_processing() && apply_filters( 'groundhogg/cron/verified', true ),
+		'fix'         => admin_page_url( 'gh_tools', [ 'tab' => 'cron' ] ),
+		'cap'         => 'manage_options'
 	],
 ];
 

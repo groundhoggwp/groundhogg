@@ -1546,32 +1546,6 @@ p.error,
 
   &-fields {
     margin-top: 50px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-
-    .row {
-      display: flex;
-      gap: 20px;
-
-      &.phone {
-        gap: 5px;
-      }
-
-      .primary-phone-ext {
-        width: 120px;
-      }
-
-      .col {
-        width: 100%;
-
-        input, select {
-          max-width: 100%;
-          width: 100%;
-        }
-      }
-    }
-
   }
 }
 

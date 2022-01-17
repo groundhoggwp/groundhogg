@@ -8,6 +8,7 @@
     tooltip,
     regexp,
     inputRepeaterWidget,
+    el,
     searchOptionsWidget,
     input,
     select,
@@ -30,6 +31,7 @@
   const { userHasCap } = Groundhogg.user
   const {
     events: EventsStore,
+    event_queue: EventQueue,
     tags: TagsStore,
     contacts: ContactsStore,
     emails: EmailsStore,
@@ -231,6 +233,7 @@
           case 'merge':
 
             selectContactModal({
+              exclude: [ contact.ID ],
               onSelect: (_contact) => {
 
                 confirmationModal({
@@ -239,14 +242,15 @@
                   // language=HTML
                   alert: `<p>
 					  ${sprintf(__('Are you sure you want to merge %1$s with %2$s? This action cannot be undone.', 'groundhogg'), bold(_contact.data.full_name), bold(getContact().data.full_name))}</p>
-                  <p><a href="https://help.groundhogg.io/article/540-merging-contacts" target="_blank">${__('What happens when contacts are merged?', 'groundhogg')}</a></p>`,
+				  <p><a href="https://help.groundhogg.io/article/540-merging-contacts"
+				        target="_blank">${__('What happens when contacts are merged?', 'groundhogg')}</a></p>`,
                   onConfirm: () => {
 
                     loadingModal()
 
-                    post( `${ContactsStore.route}/${contact.ID}/merge`, [
+                    post(`${ContactsStore.route}/${contact.ID}/megrge`, [
                       _contact.ID
-                    ] ).then( () => {
+                    ]).then(() => {
                       location.reload()
                     })
 
@@ -279,6 +283,15 @@
   }
 
   const ActivityTimeline = {
+
+    addType: (type, opts) => {
+      this.types[type] = {
+        icon: '',
+        render: () => '',
+        preload: () => {},
+        ...opts
+      }
+    },
 
     types: {
       wp_fusion: {
@@ -329,13 +342,15 @@
     renderActivity (activity) {
 
       if (activity.type === 'submission') {
+
+        let funnel = FunnelsStore.get(activity.form.data.funnel_id)
         // language=HTML
         return `
 			<li class="activity-item">
 				<div class="activity-icon submission">${icons.form}</div>
 				<div class="activity-rendered gh-panel">
 					<div class="activity-info">
-						${sprintf(__('Submitted form %s in funnel %s', 'groundhogg'), bold(activity.form.data.step_title), bold(FunnelsStore.get(activity.form.data.funnel_id).data.title))}
+						${sprintf(__('Submitted form %s in funnel %s', 'groundhogg'), bold(activity.form.data.step_title), el( 'a', { href: funnel.admin, target: '_blank' }, bold(funnel.data.title)))}
 						<p>
 							${textarea({
 								className: 'full-width code',
@@ -369,30 +384,35 @@
 
       if (activity.type === 'event') {
 
-        let { step } = activity
+        let { step, pending = false } = activity
 
         switch (parseInt(activity.data.event_type)) {
           case 1:
+
+            let funnel = FunnelsStore.get(step.data.funnel_id)
+
             // language=HTML
             return `
 				<li class="activity-item">
 					<div class="activity-icon ${step.data.step_group}">${icons.funnel}</div>
-					<div class="activity-rendered gh-panel">
-						<div class="activity-info">
-							<div class="space-between" style="gap: 20px">
-								<span>${sprintf(step.data.step_group === 'action' ? __('Completed action: %s', 'groundhogg') : __('Completed benchmark: %s', 'groundhogg'), bold(step.data.step_title))}</span>
-								<button class="gh-button secondary icon text small event-more"
-								        data-event="${activity.ID}">
-									${icons.verticalDots}
-								</button>
+					<div class="activity-rendered gh-panel space-between">
+						<div>
+							<div class="activity-info">
+								<span>${sprintf(step.data.step_group === 'action' ? (pending ? __('Pending action: %s | %s', 'groundhogg') : __('Completed action: %s | %s', 'groundhogg')) : (pending ? __('Pending benchmark: %s | %s', 'groundhogg') : __('Completed benchmark: %s | %s', 'groundhogg')), bold(step.data.step_title), Groundhogg.rawStepTypes[step.data.step_type].name)}</span>
+							</div>
+							<div class="event-extra">
+								${sprintf(__('in funnel %s', 'groundhogg'), el('a', {
+									href: funnel.admin
+								}, funnel.data.title))}
+							</div>
+							<div class="diff-time">
+								${sprintf(pending ? (Math.floor(Date.now() / 1000) > activity.time ? __('Running now...', 'groundhogg') : (__('Runs in %s', 'groundhogg'))) : __('%s ago', 'groundhogg'), activity.locale.diff_time)}
 							</div>
 						</div>
-						<div class="event-extra">
-							${sprintf(__('in funnel %s', 'groundhogg'), FunnelsStore.get(step.data.funnel_id).data.title)}
-						</div>
-						<div class="diff-time">
-							${sprintf(__('%s ago', 'groundhogg'), activity.locale.diff_time)}
-						</div>
+						<button class="gh-button secondary icon text event-${pending ? 'queue-' : ''}more"
+						        data-event="${activity.ID}">
+							${icons.verticalDots}
+						</button>
 					</div>
 				</li>`
           case 2:
@@ -400,19 +420,19 @@
             return `
 				<li class="activity-item">
 					<div class="activity-icon broadcast">${icons.megaphone}</div>
-					<div class="activity-rendered gh-panel">
-						<div class="activity-info">
-							<div class="space-between" style="gap: 20px">
-								<span>${sprintf(__('Received broadcast: %s', 'groundhogg'), bold(activity.broadcast.object.data.title))}</span>
-								<button class="gh-button secondary icon text small event-more"
-								        data-event="${activity.ID}">
-									${icons.verticalDots}
-								</button>
+					<div class="activity-rendered gh-panel space-between">
+						<div>
+							<div class="activity-info">
+								<span>${sprintf(pending ? __('Will receive broadcast: %s', 'groundhogg') : __('Received broadcast: %s', 'groundhogg'), bold(activity.broadcast.object.data.title))}</span>
+							</div>
+							<div class="diff-time">
+								${sprintf(pending ? (Math.floor(Date.now() / 1000) > activity.time ? __('Running now...', 'groundhogg') : (__('Runs in %s', 'groundhogg'))) : __('%s ago', 'groundhogg'), activity.locale.diff_time)}
 							</div>
 						</div>
-						<div class="diff-time">
-							${sprintf(__('%s ago', 'groundhogg'), activity.locale.diff_time)}
-						</div>
+						<button class="gh-button secondary icon text event-${pending ? 'queue-' : ''}more"
+						        data-event="${activity.ID}">
+							${icons.verticalDots}
+						</button>
 					</div>
 				</li>`
         }
@@ -424,7 +444,7 @@
 
       // language=HTML
       return `
-		  <li class="activity-item ${activity.data.activity_type} activity">
+		  <li class="activity-item ${activity.data.activity_type} activity" tabindex="0">
 			  <div class="activity-icon ${activity.data.activity_type}">${type.icon}</div>
 			  <div class="activity-rendered gh-panel">
 				  <div class="activity-info">
@@ -449,6 +469,51 @@
 
     onMount () {
 
+      $('.event-queue-more').on('click', (e) => {
+
+        let eventId = e.currentTarget.dataset.event
+        const event = EventQueue.get(eventId)
+
+        moreMenu(e.currentTarget, {
+          items: [
+            {
+              key: 'execute',
+              text: __('Run Now')
+            },
+            {
+              key: 'cancel',
+              text: `<span class="gh-text danger">${__('Cancel')}</span>`
+            }
+          ],
+          onSelect: (key) => {
+            switch (key) {
+              case 'cancel':
+
+                patch(`${EventQueue.route}/${event.ID}/cancel`).then(() => {
+                  EventQueue.items.splice(EventQueue.items.findIndex(e => e.ID === event.ID), 1)
+                  dialog({
+                    message: __('Event cancelled', 'groundhogg')
+                  })
+                  this.needsRefresh()
+                })
+
+                break
+
+              case 'execute':
+
+                patch(`${EventQueue.route}/${event.ID}/execute`).then(() => {
+                  dialog({
+                    message: __('Event rescheduled', 'groundhogg')
+                  })
+                  this.needsRefresh()
+                })
+
+                break
+            }
+          }
+        })
+      })
+
       $('.event-more').on('click', (e) => {
 
         let eventId = e.currentTarget.dataset.event
@@ -457,13 +522,20 @@
         moreMenu(e.currentTarget, {
           items: [
             {
-              key: 'run_again',
+              key: 'execute',
               text: __('Run Again')
             }
           ],
           onSelect: (key) => {
             switch (key) {
-              case 'run_again':
+              case 'execute':
+
+                patch(`${EventsStore.route}/${event.ID}/execute`).then(() => {
+                  dialog({
+                    message: __('Event rescheduled', 'groundhogg')
+                  })
+                  this.needsRefresh()
+                })
 
                 break
             }
@@ -472,7 +544,11 @@
       })
     },
 
-    mount (selector, activities) {
+    mount (selector, activities, {
+      needsRefresh = () => {}
+    }) {
+
+      this.needsRefresh = needsRefresh
 
       const $el = $(selector)
 
@@ -616,6 +692,14 @@
               }),
               EventsStore.fetchItems({
                 contact_id: contact.ID,
+                status: 'complete',
+                limit: 50,
+                orderby: 'time',
+                order
+              }),
+              EventQueue.fetchItems({
+                contact_id: contact.ID,
+                status: 'waiting',
                 limit: 50,
                 orderby: 'time',
                 order
@@ -647,6 +731,12 @@
                 type: 'event',
                 time: parseInt(e.data.time) + parseFloat(e.data.micro_time)
               })),
+              ...EventQueue.getItems().map(e => ({
+                ...e,
+                type: 'event',
+                pending: true,
+                time: parseInt(e.data.time) + parseFloat(e.data.micro_time)
+              })),
               ...PageVisitsStore.getItems().map(v => ({
                 ...v,
                 type: 'page_visit',
@@ -672,12 +762,21 @@
                 break
             }
 
-            ActivityTimeline.mount('#activity-here', allActivities)
+            ActivityTimeline.mount('#activity-here', allActivities, {
+              needsRefresh: () => {
+                fetchActivity()
+              }
+            })
 
             $('#activity-here').css({ maxHeight: $('#primary-contact-stuff').height() })
           }
 
-          if (ActivityStore.hasItems() || EventsStore.hasItems() || PageVisitsStore.hasItems() || SubmissionsStore.hasItems()) {
+          if (ActivityStore.hasItems()
+            || EventsStore.hasItems()
+            || EventQueue.hasItems()
+            || PageVisitsStore.hasItems()
+            || SubmissionsStore.hasItems()
+          ) {
             loadTimeline()
             return
           }
@@ -894,7 +993,13 @@
 				  </div>
 			  </div>`
         },
-        onMount: () => {}
+        onMount: () => {
+
+          // get( `${ContactsStore.route}/${contact.ID}/inbox`).then( r => {
+          //   console.log(r)
+          // } )
+
+        }
       }
     ]
 
@@ -1472,8 +1577,8 @@
           noOptions: __('No tags found...', 'groundhogg'),
           options: TagsStore.items.filter(t => !getContact().tags.map(_t => _t.ID).includes(t.ID) && !addTags.includes(t.ID)),
           filterOption: ({ data }, search) => data.tag_name.match(regexp(search)),
-          filterOptions: ( opts, search ) => {
-            if ( ! search ){
+          filterOptions: (opts, search) => {
+            if (!search) {
               return opts
             }
 
@@ -1513,16 +1618,16 @@
             let { ID } = tag
 
             // Created a new tag
-            if ( ! isNumeric(ID) ){
+            if (!isNumeric(ID)) {
               TagsStore.post({
                 data: {
                   tag_name: ID
                 }
-              }).then( t => {
+              }).then(t => {
                 addTags.push(t.ID)
                 mount()
               })
-              return;
+              return
             }
 
             addTags.push(ID)
@@ -1571,5 +1676,7 @@
   $(function () {
     editor.init()
   })
+
+  Groundhogg.ActivityTimeline = ActivityTimeline
 
 })(jQuery, ContactEditor)

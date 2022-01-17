@@ -613,9 +613,9 @@ class Contacts_Page extends Admin_Page {
 		] );
 	}
 
-	public function ajax_upload_file(){
+	public function ajax_upload_file() {
 
-		$id = absint( get_post_var( 'contact' ) );
+		$id      = absint( get_post_var( 'contact' ) );
 		$contact = get_contactdata( $id );
 
 		$file = $_FILES['file-upload'];
@@ -628,9 +628,9 @@ class Contacts_Page extends Admin_Page {
 			}
 		}
 
-		wp_send_json_success([
+		wp_send_json_success( [
 			'files' => $contact->get_files()
-		]);
+		] );
 	}
 
 	/**
@@ -718,10 +718,11 @@ class Contacts_Page extends Admin_Page {
 			}
 		}
 
-		$args['first_name'] = sanitize_text_field( get_request_var( 'first_name' ) );
-		$args['last_name']  = sanitize_text_field( get_request_var( 'last_name' ) );
-		$args['owner_id']   = absint( get_request_var( 'owner_id' ) );
-		$args['user_id']    = absint( get_request_var( 'user', $contact->get_user_id() ) );
+		$args['first_name']   = sanitize_text_field( get_request_var( 'first_name' ) );
+		$args['last_name']    = sanitize_text_field( get_request_var( 'last_name' ) );
+		$args['owner_id']     = absint( get_request_var( 'owner_id' ) );
+		$args['user_id']      = absint( get_request_var( 'user', $contact->get_user_id() ) );
+		$args['optin_status'] = Preferences::sanitize( get_request_var( 'optin_status' ), $contact->get_optin_status() );
 
 		$contact->update( $args );
 

@@ -69,7 +69,7 @@ $cron_jobs_active = array_reduce( $cron_jobs, function ( $carry, $cron_job ) {
 	return $carry && $cron_job['active'];
 }, true );
 
-if ( apply_filters( 'groundhogg/cron/verified', $cron_jobs_active && gh_cron_installed() && defined( 'DISABLE_WP_CRON' ) ) ) {
+if ( apply_filters( 'groundhogg/cron/verified', $cron_jobs_active && gh_cron_installed() ) ) {
 	$step = 'verify';
 }
 

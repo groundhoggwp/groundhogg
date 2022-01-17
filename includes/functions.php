@@ -5028,10 +5028,19 @@ function extrapolate_wp_mail_plugin() {
 }
 
 /**
+ * Doing gh-cron.php
+ *
+ * @return bool
+ */
+function gh_doing_cron(){
+	return defined( 'DOING_GH_CRON' ) && DOING_GH_CRON;
+}
+
+/**
  * Tracks pings to the wp-cron.php file
  */
 function track_wp_cron_ping() {
-	if ( defined( 'DOING_CRON' ) && DOING_CRON && ( ! defined( 'DOING_GH_CRON' ) || ! DOING_GH_CRON ) ) {
+	if ( wp_doing_cron() && ! gh_doing_cron() ) {
 		update_option( 'wp_cron_last_ping', time() );
 	}
 }
@@ -5046,6 +5055,16 @@ function track_gh_cron_ping() {
 }
 
 add_action( 'groundhogg_process_queue', __NAMESPACE__ . '\track_gh_cron_ping', 9 );
+
+/**
+ * Whether the queue is processing every single minute
+ *
+ * @return mixed|void
+ */
+function is_event_queue_processing(){
+	$gh_cron_setup = time() - get_option( 'gh_cron_last_ping' ) <= MINUTE_IN_SECONDS;
+	return apply_filters( 'groundhogg/cron_is_working', $gh_cron_setup );
+}
 
 /**
  * Takes a string or int and returns a mysql friendly date

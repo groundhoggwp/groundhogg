@@ -309,6 +309,13 @@ code.meta-replacement-code {
   border-left: 2px solid $primary-dark-10;
 
   li.activity-item {
+
+    &:not(:hover,:active,:focus){
+      .event-more,.event-queue-more{
+        display: none;
+      }
+    }
+
     position: relative;
     margin-left: 20px;
 
@@ -318,6 +325,7 @@ code.meta-replacement-code {
 
     .activity-info {
       font-size: 15px;
+      margin-bottom: 4px;
     }
 
     .event-extra,

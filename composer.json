@@ -10,10 +10,10 @@
     }
   ],
   "require": {
-    "phpunit/phpunit": "7.5.20",
     "ext-json": "*",
     "ext-mysqli": "*",
     "ext-imap": "*",
-    "ext-openssl": "*"
+    "ext-openssl": "*",
+    "webklex/php-imap": "2.7.2"
   }
 }

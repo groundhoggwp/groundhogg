@@ -93,6 +93,10 @@ class Event extends Base_Object {
 		return get_db( $this->db_name );
 	}
 
+	public function is_complete() {
+		return $this->get_status() === self::COMPLETE;
+	}
+
 	/**
 	 * A string to represent the object type
 	 *

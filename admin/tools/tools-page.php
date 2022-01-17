@@ -1075,15 +1075,10 @@ class Tools_Page extends Tabbed_Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		if ( ! install_gh_cron_file() || wp_unschedule_hook( Event_Queue::WP_CRON_HOOK ) === false ) {
+		if ( ! install_gh_cron_file() ) {
 			return new \WP_Error( 'error', __( 'Unable to install gh-cron.php file. Please install is manually.', 'groundhogg' ) );
 		} else {
 			$this->add_notice( 'success', __( 'Installed gh-cron.php successfully!', 'groundhogg' ) );
-		}
-
-		// Disable WP Cron if not already disabled.
-		if ( ! defined( 'DISABLE_WP_CRON' ) ) {
-			update_option( 'gh_disable_wp_cron', 'on' );
 		}
 
 		return false;

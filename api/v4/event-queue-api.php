@@ -2,7 +2,72 @@
 
 namespace Groundhogg\Api\V4;
 
-class Event_Queue_Api extends Base_Object_Api{
+use Groundhogg\Event_Queue_Item;
+
+class Event_Queue_Api extends Events_Api {
+
+	public function register_routes() {
+		parent::register_routes();
+
+		$route = $this->get_route();
+		$key   = $this->get_primary_key();
+
+		register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/cancel", [
+			[
+				'methods'             => \WP_REST_Server::EDITABLE,
+				'callback'            => [ $this, 'cancel' ],
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
+			],
+		] );
+	}
+
+	/**
+	 * Change the execution tie of an event to the present
+	 *
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return \WP_Error|\WP_REST_Response
+	 */
+	public function execute( \WP_REST_Request $request ){
+
+		$primary_key = absint( $request->get_param( $this->get_primary_key() ) );
+
+		$object = new Event_Queue_Item( $primary_key );
+
+		if ( ! $object->exists() ) {
+			return $this->ERROR_RESOURCE_NOT_FOUND();
+		}
+
+		$object->update([
+			'time' => time()
+		]);
+
+		return self::SUCCESS_RESPONSE( [ 'item' => $object ] );
+
+	}
+
+	/**
+	 * Cancel a pending event
+	 *
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return \WP_Error|\WP_REST_Response
+	 */
+	public function cancel( \WP_REST_Request $request ){
+
+		$primary_key = absint( $request->get_param( $this->get_primary_key() ) );
+
+		$object = new Event_Queue_Item( $primary_key );
+
+		if ( ! $object->exists() ) {
+			return $this->ERROR_RESOURCE_NOT_FOUND();
+		}
+
+		$object->cancel();
+
+		return self::SUCCESS_RESPONSE( [ 'item' => $object ] );
+
+	}
 
 	/**
 	 * The name of the table resource to use
@@ -13,39 +78,7 @@ class Event_Queue_Api extends Base_Object_Api{
 		return 'event_queue';
 	}
 
-	/**
-	 * Permissions callback for read
-	 *
-	 * @return bool
-	 */
-	public function read_permissions_callback() {
-		return current_user_can( 'view_events' );
-	}
-
-	/**
-	 * Permissions callback for update
-	 *
-	 * @return mixed
-	 */
-	public function update_permissions_callback() {
-		return current_user_can( 'edit_events' );
-	}
-
-	/**
-	 * Permissions callback for create
-	 *
-	 * @return mixed
-	 */
-	public function create_permissions_callback() {
-		return current_user_can( 'add_events' );
-	}
-
-	/**
-	 * Permissions callback for delete
-	 *
-	 * @return mixed
-	 */
-	public function delete_permissions_callback() {
-		return current_user_can( 'delete_events' );
+	public function get_object_class() {
+		return Event_Queue_Item::class;
 	}
 }

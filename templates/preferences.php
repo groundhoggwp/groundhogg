@@ -169,7 +169,6 @@ if ( $permissions_key && ( $enc_identity = get_url_var( 'identity' ) ) ) {
 	// If the identity passed is valid and we can validate the permissions key we're good!
 	if ( is_a_contact( $contact ) && check_permissions_key( $permissions_key, $contact, 'preferences' ) ) {
 		tracking()->start_tracking( $contact );
-		wp_redirect( managed_page_url( 'preferences/manage' ) );
 	}
 }
 
@@ -179,7 +178,7 @@ $action  = get_query_var( 'action', 'profile' );
 if ( ! is_ignore_user_tracking_precedence_enabled() ) {
 	// If the user takes precedence of the tracking cookie
 	// => The current user is logged in
-	// => the pk is validk
+	// => the pk is valid
 	$can_edit_preferences = is_user_logged_in() || check_permissions_key( $permissions_key, $contact, 'preferences' );
 } else {
 	// if the contact takes precedence over the tracking cookie

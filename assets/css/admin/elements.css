@@ -1260,26 +1260,6 @@ p.error,
 }
 .contact-quick-edit-fields {
   margin-top: 50px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-.contact-quick-edit-fields .row {
-  display: flex;
-  gap: 20px;
-}
-.contact-quick-edit-fields .row.phone {
-  gap: 5px;
-}
-.contact-quick-edit-fields .row .primary-phone-ext {
-  width: 120px;
-}
-.contact-quick-edit-fields .row .col {
-  width: 100%;
-}
-.contact-quick-edit-fields .row .col input, .contact-quick-edit-fields .row .col select {
-  max-width: 100%;
-  width: 100%;
 }
 
 .gh-form-wrapper * {

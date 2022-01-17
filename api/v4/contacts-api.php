@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Groundhogg\Admin\Contacts\Tables\Contacts_Table;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
+use Groundhogg\Plugin;
 use function Groundhogg\array_map_keys;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
@@ -68,6 +69,14 @@ class Contacts_Api extends Base_Object_Api {
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'merge' ],
 				'permission_callback' => [ $this, 'update_single_permissions_callback' ]
+			],
+		] );
+
+		register_rest_route( self::NAME_SPACE, '/contacts/(?P<ID>\d+)/inbox', [
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'read_inbox' ],
+				'permission_callback' => [ $this, 'read_single_permissions_callback' ]
 			],
 		] );
 
@@ -230,7 +239,7 @@ class Contacts_Api extends Base_Object_Api {
 					continue;
 				}
 
-				if ( ! current_user_can( 'edit_contact', $contact ) ){
+				if ( ! current_user_can( 'edit_contact', $contact ) ) {
 					return self::ERROR_401();
 				}
 
@@ -279,7 +288,7 @@ class Contacts_Api extends Base_Object_Api {
 		 */
 		foreach ( $contacts as $contact ) {
 
-			if ( ! current_user_can( 'edit_contact', $contact ) ){
+			if ( ! current_user_can( 'edit_contact', $contact ) ) {
 				return self::ERROR_401();
 			}
 
@@ -360,7 +369,7 @@ class Contacts_Api extends Base_Object_Api {
 			return self::ERROR_CONTACT_NOT_FOUND();
 		}
 
-		if ( ! current_user_can( 'edit_contact', $contact ) ){
+		if ( ! current_user_can( 'edit_contact', $contact ) ) {
 			return self::ERROR_401();
 		}
 
@@ -404,7 +413,7 @@ class Contacts_Api extends Base_Object_Api {
 			return self::ERROR_CONTACT_NOT_FOUND();
 		}
 
-		if ( ! current_user_can( 'edit_contact', $contact ) ){
+		if ( ! current_user_can( 'edit_contact', $contact ) ) {
 			return self::ERROR_401();
 		}
 
@@ -431,7 +440,7 @@ class Contacts_Api extends Base_Object_Api {
 			return self::ERROR_CONTACT_NOT_FOUND();
 		}
 
-		if ( ! current_user_can( 'view_contact', $contact ) ){
+		if ( ! current_user_can( 'view_contact', $contact ) ) {
 			return self::ERROR_401();
 		}
 
@@ -465,7 +474,7 @@ class Contacts_Api extends Base_Object_Api {
 			return self::ERROR_CONTACT_NOT_FOUND();
 		}
 
-		if ( ! current_user_can( 'edit_contact', $contact ) ){
+		if ( ! current_user_can( 'edit_contact', $contact ) ) {
 			return self::ERROR_401();
 		}
 
@@ -588,7 +597,7 @@ class Contacts_Api extends Base_Object_Api {
 			return self::ERROR_CONTACT_NOT_FOUND();
 		}
 
-		if ( ! current_user_can( 'edit_contact', $contact ) ){
+		if ( ! current_user_can( 'edit_contact', $contact ) ) {
 			return self::ERROR_401();
 		}
 
@@ -599,6 +608,23 @@ class Contacts_Api extends Base_Object_Api {
 		}
 
 		return $contact;
+	}
+
+	public function read_inbox( WP_REST_Request $request ) {
+
+		$ID = absint( $request->get_param( 'ID' ) );
+
+		$contact = get_contactdata( $ID );
+
+		if ( ! is_a_contact( $contact ) ) {
+			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		$msgs = Plugin::instance()->imap_inbox->fetch( $contact );
+
+		return self::SUCCESS_RESPONSE( [
+			'messages' => $msgs,
+		] );
 	}
 
 	/**
@@ -612,7 +638,7 @@ class Contacts_Api extends Base_Object_Api {
 
 		$contact = $this->get_object_from_request( $request );
 
-		if ( ! $contact->exists() ){
+		if ( ! $contact->exists() ) {
 			return self::ERROR_404();
 		}
 
@@ -712,7 +738,7 @@ class Contacts_Api extends Base_Object_Api {
 	public function admin_table_row( WP_REST_Request $request ) {
 		$contact = get_contactdata( $request->get_param( 'contact' ) );
 
-		if ( ! current_user_can( 'view_contact', $contact ) ){
+		if ( ! current_user_can( 'view_contact', $contact ) ) {
 			return self::ERROR_401();
 		}
 

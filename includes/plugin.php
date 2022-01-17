@@ -175,6 +175,11 @@ class Plugin {
 	public $bounce_checker;
 
 	/**
+	 * @var Imap_Inbox
+	 */
+	public $imap_inbox;
+
+	/**
 	 * @var Step_Manager
 	 */
 	public $step_manager;
@@ -307,6 +312,7 @@ class Plugin {
 		$this->reporting    = new Reporting();
 
 		$this->bounce_checker = new Bounce_Checker();
+//		$this->imap_inbox     = new Imap_Inbox();
 //		$this->sending_service  = new Sending_Service();
 		$this->proxy_service    = new Proxy_Service();
 		$this->stats_collection = new Stats_Collection();
@@ -357,6 +363,7 @@ class Plugin {
 	 */
 	private function register_autoloader() {
 		require __DIR__ . '/autoloader.php';
+//		require __DIR__ . '/../vendor/autoload.php';
 //		require __DIR__ . '/overrides.php';
 
 		Autoloader::run();
