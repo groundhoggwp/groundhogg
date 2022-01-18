@@ -233,7 +233,7 @@
           case 'merge':
 
             selectContactModal({
-              exclude: [ contact.ID ],
+              exclude: [contact.ID],
               onSelect: (_contact) => {
 
                 confirmationModal({
@@ -350,7 +350,10 @@
 				<div class="activity-icon submission">${icons.form}</div>
 				<div class="activity-rendered gh-panel">
 					<div class="activity-info">
-						${sprintf(__('Submitted form %s in funnel %s', 'groundhogg'), bold(activity.form.data.step_title), el( 'a', { href: funnel.admin, target: '_blank' }, bold(funnel.data.title)))}
+						${sprintf(__('Submitted form %s in funnel %s', 'groundhogg'), bold(activity.form.data.step_title), el('a', {
+							href: funnel.admin,
+							target: '_blank'
+						}, bold(funnel.data.title)))}
 						<p>
 							${textarea({
 								className: 'full-width code',
@@ -1003,9 +1006,9 @@
       }
     ]
 
-    if (Groundhogg.isWhiteLabeled) {
+    // if (Groundhogg.isWhiteLabeled) {
       tabs.splice(tabs.findIndex(t => t.id === 'inbox'), 1)
-    }
+    // }
 
     const template = () => {
       // language=HTML
@@ -1055,6 +1058,8 @@
       data.append('contact', getContact().ID)
 
       ajax(data).then(r => {
+
+        $('.gh-panel.contact-details .inside').replaceWith(r.data.details)
 
         ContactsStore.itemsFetched([r.data.contact])
 
@@ -1354,7 +1359,7 @@
             options: {
               mobile: __('Mobile'),
               home: __('Home'),
-              business: __('Business'),
+              work: __('Work'),
             }
           }, {
             type: 'tel',
@@ -1494,6 +1499,10 @@
     let isAdding = false
     let removeTags = []
     let addTags = []
+
+    $('.tags-panel').on('click', '.handlediv', (e) => {
+      $('.tags-panel').toggleClass('closed')
+    })
 
     const template = () => {
       // language=HTML
@@ -1666,10 +1675,6 @@
       if (window.location.href.match(/send_email=true/)) {
         sendEmail()
       }
-
-      $('.create-user-account').click(function () {
-        $('#create-user-form').submit()
-      })
     }
   })
 

@@ -451,7 +451,44 @@ span.gh-text {
   }
 
   .gh-panel-header {
-    //border: none;
+
+    border-bottom: 1px solid $primary-dark-10;
+    display: flex;
+    justify-content: space-between;
+
+    h2.hndle {
+      justify-content: left;
+
+      .dashicons {
+        font-size: 14px;
+        height: 14px;
+        width: 14px;
+        margin-right: 10px;
+      }
+
+      font-size: 14px;
+      padding: 8px 12px;
+      margin: 0;
+    }
+
+    .toggle-indicator::before{
+      content: "\f142";
+      display: inline-block;
+      font: normal 20px/1 dashicons;
+      speak: never;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-decoration: none;
+    }
+
+  }
+
+  &.closed {
+    .gh-panel-header {
+      .toggle-indicator::before{
+        content: "\f140";
+      }
+    }
   }
 
   .inside {

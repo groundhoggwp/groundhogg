@@ -40,18 +40,6 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   flex: 0 0 300px;
 }
 
-.contact-details {
-
-  .tags {
-    .tag {
-      .dashicons {
-        margin: 0;
-      }
-    }
-  }
-
-}
-
 .contact-details .location .dashicons {
   float: left;
 }
@@ -125,7 +113,16 @@ a.change-status.complained:hover {
 
 .basic-details {
 
-  flex-shrink: 0;
+  .email {
+    p.marketable-reason{
+      padding-left: 30px;
+      font-size: 12px;
+      color: $error-red;
+      margin-top: 0;
+    }
+  }
+
+  //flex-shrink: 0;
 
   .details {
     margin: 0 0 10px 2px;

@@ -16,10 +16,6 @@
   flex: 0 0 300px;
 }
 
-.contact-details .tags .tag .dashicons {
-  margin: 0;
-}
-
 .contact-details .location .dashicons {
   float: left;
 }
@@ -89,8 +85,11 @@ a.change-status.complained:hover {
   gap: 20px;
 }
 
-.basic-details {
-  flex-shrink: 0;
+.basic-details .email p.marketable-reason {
+  padding-left: 30px;
+  font-size: 12px;
+  color: #e91f4f;
+  margin-top: 0;
 }
 .basic-details .details {
   margin: 0 0 10px 2px;

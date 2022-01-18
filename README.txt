@@ -321,6 +321,26 @@ You can purchase a premium plan for access to support and our premium extensions
 
 == Changelog ==
 
+= 2.6 =
+* NEW UI for the contact record
+  * Condensed design to fit more on the screen, less scrolling.
+  * Custom field management is now FREE and part of Groundhogg core!
+  * Additional contact methods including email addresses and phone numbers
+  * Improved tag picker is very user friendly
+  * Activity timeline shows all events and activity in order
+  * Improved file box management
+  * Notes get more space
+  * Edits are saved via the API, no page reloading!
+  * Custom tabs are backwards compatible.
+ * ADDED Contact merging!
+ * TWEAKED when a form is submitting via AJAX and is in an iframe, the iframe will be resized to show any messages.
+ * TWEAKED all jQuery removed from the form ajax submission script.
+ * TWEAKED all jQuery removed from the fullframe script.
+ * FIXED Search filters which may have been saved, and then settings get corrupted will show a "corrupted filter" notice instead of crashing, which you'll be able to delete.
+ * FIXED fullframe.js conflicting with the forms iframe script causing console errors.
+ * FIXED fullframe.js made to be compatible with plugins which optimize iframes and
+ * REMOVED Company/Business details in favour of adding them to the Companies addon since these fields are usually unused unless the companies addon is installed.
+
 = 2.5.7.9 (2022-01-05) =
 * ADDED From address select in the send email widget for contacts
 * TWEAKED New Groundhogg themed loading spinner! (Gears if white labeled)

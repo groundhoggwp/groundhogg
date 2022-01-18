@@ -48,72 +48,25 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 <div class="align-left-space-between align-top two-columns">
 	<div id="primary-contact-stuff">
 		<div class="gh-panel contact-details">
-			<div class="inside align-left-space-between align-top">
-				<!-- Photo -->
-				<div class="contact-picture">
-					<?php echo html()->e( 'img', [
-						'class'  => 'profile-picture',
-						'title'  => __( 'Profile Picture' ),
-						'width'  => 100,
-						'height' => 100,
-						'src'    => $contact->get_profile_picture()
-					] ); ?>
-				</div>
-				<div class="basic-details">
-					<!-- FIRST -->
-					<div
-						class="full-name"><?php dashicon_e( 'admin-users' ); ?><?php echo $contact->get_full_name(); ?></div>
-					<div class="email">
-						<?php dashicon_e( 'email' ); ?><?php echo html()->e( 'a', [
-							'id'   => 'send-email',
-							'href' => 'mailto:' . $contact->get_email(),
-						], $contact->get_email() ) ?>
-						<span
-							class="pill <?php echo $contact->is_marketable() ? 'green' : 'red'; ?>"><?php echo Preferences::get_preference_pretty_name( $contact->get_optin_status() ); ?></span>
-					</div>
-					<?php if ( $contact->get_phone_number() || $contact->get_mobile_number() ): ?>
-
-						<div class="align-left-space-between">
-							<?php if ( $contact->get_phone_number() ): ?>
-								<div
-									class="phone"><?php dashicon_e( 'phone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_phone_number() ], $contact->get_phone_number() ) ?>
-									<?php if ( $contact->get_phone_extension() ): ?>
-										<span
-											class="extension"><?php printf( __( 'ext. %s', 'groundhogg' ), $contact->get_phone_extension() ) ?></span>
-									<?php endif; ?>
-								</div>
-							<?php endif; ?>
-							<?php if ( $contact->get_mobile_number() ): ?>
-								<div
-									class="mobile"><?php dashicon_e( 'smartphone' ); ?><?php echo html()->e( 'a', [ 'href' => 'tel:' . $contact->get_mobile_number() ], $contact->get_mobile_number() ) ?>
-								</div>
-							<?php endif; ?>
-						</div>
-					<?php endif; ?>
-					<?php if ( count( $contact->get_address() ) > 0 ): ?>
-						<div class="location" title="<?php esc_attr_e( 'Location', 'groundhogg' ); ?>">
-							<?php dashicon_e( 'admin-site' ); ?>
-							<div class="address">
-								<?php echo html()->e( 'a', [
-									'href'   => 'https://www.google.com/maps/place/' . implode( ',+', $contact->get_address() ),
-									'target' => '_blank'
-								], implode( ', ', $contact->get_address() ) ) ?>
-							</div>
-						</div>
-					<?php endif; ?>
-					<div class="localtime" title="<?php esc_attr_e( 'Local time', 'groundhogg' ); ?>">
-						<?php dashicon_e( 'clock' ); ?><?php echo date_i18n( get_date_time_format(), $contact->get_local_time() ) ?>
-					</div>
-					<?php do_action( 'groundhogg/admin/contact/basic_details', $contact ); ?>
-				</div>
-			</div>
+			<?php include __DIR__ . '/details-card.php'; ?>
 			<div id="contact-more-actions" class="align-center-space-between" style="padding-bottom: 20px">
 
 			</div>
 		</div>
-		<div class="gh-panel">
-			<div class="align-left-space-between align-top inside"
-			     title="<?php esc_attr_e( 'Tags' ); ?>"><?php dashicon_e( 'tag' ); ?>
+		<div class="postbox gh-panel tags-panel">
+			<div class="postbox-header gh-panel-header">
+				<h2 class="hndle"><?php dashicon_e( 'tag' ); ?><?php _e( 'Tags' ); ?></h2>
+				<div class="handle-actions hide-if-no-js">
+					<button type="button" class="handlediv" aria-expanded="true">
+                                <span class="screen-reader-text">
+	                                <?php _e( 'Toggle tags box', 'groundhogg' ) ?>
+                                </span>
+						<span class="toggle-indicator" aria-hidden="true"></span>
+					</button>
+				</div>
+			</div>
+			<div class="inside"
+			     title="<?php esc_attr_e( 'Tags' ); ?>">
 				<div id="tags-here"></div>
 			</div>
 		</div>
@@ -474,16 +427,4 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 	<div id="other-contact-stuff">
 	</div>
 </div>
-
-<?php if ( ! $contact->get_userdata() ): ?>
-	<form id="create-user-form" action="<?php echo admin_url( 'user-new.php' ); ?>" method="post">
-		<input type="hidden" name="createuser" value="1">
-		<input type="hidden" name="first_name" value="<?php esc_attr_e( $contact->get_first_name() ); ?>">
-		<input type="hidden" name="last_name" value="<?php esc_attr_e( $contact->get_last_name() ); ?>">
-		<input type="hidden" name="email" value="<?php esc_attr_e( $contact->get_email() ); ?>">
-		<input type="hidden" name="user_login" value="<?php esc_attr_e( $contact->get_email() ); ?>">
-	</form>
-<?php endif;
-
-do_action( 'groundhogg/contact/record/after', $contact );
-?>
+<?php do_action( 'groundhogg/contact/record/after', $contact ); ?>

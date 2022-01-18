@@ -147,6 +147,8 @@ class Contacts_Page extends Admin_Page {
 				wp_enqueue_editor();
 				wp_enqueue_media();
 
+				$contact = get_contactdata( get_url_var( 'contact' ) );
+
 				wp_enqueue_style( 'groundhogg-admin-contact-editor' );
 				wp_enqueue_style( 'groundhogg-admin-contact-info-cards' );
 				wp_enqueue_style( 'buttons' );
@@ -155,15 +157,19 @@ class Contacts_Page extends Admin_Page {
 				wp_enqueue_script( 'groundhogg-admin-contact-editor' );
 				wp_enqueue_script( 'groundhogg-admin-contact-info-cards' );
 				wp_localize_script( 'groundhogg-admin-contact-editor', 'ContactEditor', [
-					'contact_id'                   => absint( get_url_var( 'contact' ) ),
+					'contact_id'                   => $contact->get_id(),
 					'delete_note_text'             => __( 'Are you sure you want to delete this note?', 'groundhogg' ),
-					'contact'                      => get_contactdata( get_url_var( 'contact' ) ),
+					'contact'                      => $contact,
 					'meta_exclusions'              => $this->get_meta_key_exclusions(),
 					'gh_contact_custom_properties' => get_option( 'gh_contact_custom_properties', [
 						'tabs'   => [],
 						'groups' => [],
 						'fields' => []
-					] )
+					] ),
+					'marketable' => $contact->is_marketable(),
+					'i18n' => [
+						'marketable_reason' => Plugin::instance()->preferences->get_optin_status_text( $contact )
+					],
 				] );
 				break;
 			case 'view':
@@ -249,202 +255,7 @@ class Contacts_Page extends Admin_Page {
 	/* help bar */
 
 	public function help() {
-		$screen = get_current_screen();
 
-		$screen->add_help_tab(
-			array(
-				'id'      => 'gh_overview',
-				'title'   => __( 'Overview' ),
-				'content' => '<p>' . __( "This is where you can manage and view your contacts. Click the quick edit to quickly change contact details.", 'groundhogg' ) . '</p>'
-			)
-		);
-
-		$screen->add_help_tab(
-			array(
-				'id'      => 'gh_edit',
-				'title'   => __( 'Editing' ),
-				'content' => '<p>' . __( "While editing a contact you can modify any of their personal information. There are several points of interest...", 'groundhogg' ) . '</p>'
-				             . '<ul> '
-				             . '<li>' . __( 'Manually unsubscribe a contact by checking the "mark as unsubscribed" button.', 'groundhogg' ) . '</li>'
-				             . '<li>' . __( 'Make sure your in compliance by ensuring the terms of agreement and GDPR consent are both checked under the compliance section.', 'groundhogg' ) . '</li>'
-				             . '<li>' . __( 'View the origin of the contact by looking at the lead source field.', 'groundhogg' ) . '</li>'
-				             . '<li>' . __( 'Add or remove custom information about the contact by enabling the "Edit Meta" section. Each meta also includes a replacement code to include it in an email.', 'groundhogg' ) . '</li>'
-				             . '<li>' . __( 'Re-run or cancel events for this contact by viewing the "Upcoming Events" or "Recent History" Section', 'groundhogg' ) . '</li>'
-				             . '<li>' . __( 'Monitor their engagement by looking in the "Recent Email History" section.', 'groundhogg' ) . '</li>'
-				             . '</ul>'
-			)
-		);
-	}
-
-	public function get_pointers_view() {
-		return [
-			[
-				'id'        => 'export_contacts',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '.export-contacts',
-				'title'     => 'Export Your Contacts',
-				'show_next' => true,
-				'content'   => 'You can export your whole list, or part of you list by clicking this button. IT will always export the current query.',
-				'position'  => [
-					'edge'  => 'left', //top, bottom, left, right
-					'align' => 'middle' //top, bottom, left, right, middle
-				]
-			],
-			[
-				'id'        => 'filter_contacts',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '.subsubsub',
-				'title'     => 'Filter Contacts',
-				'show_next' => true,
-				'content'   => 'You can quickly see which of you contacts can be marketed to and which cannot by filtering them here.',
-				'position'  => [
-					'edge'  => 'top', //top, bottom, left, right
-					'align' => 'middle' //top, bottom, left, right, middle
-				]
-			],
-			[
-				'id'        => 'search_contacts',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '#search_contacts',
-				'title'     => 'Search Contacts',
-				'show_next' => true,
-				'content'   => 'Search for contacts that meet more detailed criteria.',
-				'position'  => [
-					'edge'  => 'top', //top, bottom, left, right
-					'align' => 'left' //top, bottom, left, right, middle
-				]
-			],
-			[
-				'id'        => 'import_contacts',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '#import_contacts',
-				'title'     => 'Import Contacts',
-				'show_next' => false,
-				'content'   => 'Have a list already? Import them now!',
-				'position'  => [
-					'edge'  => 'top', //top, bottom, left, right
-					'align' => 'left' //top, bottom, left, right, middle
-				]
-			]
-		];
-	}
-
-	public function get_pointers_add() {
-		return [
-			[
-				'id'        => 'add_contacts',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '.nav-tab-wrapper a:last-child',
-				'title'     => 'Add New Contacts',
-				'show_next' => true,
-				'content'   => 'You can use our standard form to add new contacts or you can use any of your web forms.',
-				'position'  => [
-					'edge'  => 'left', //top, bottom, left, right
-					'align' => 'middle' //top, bottom, left, right, middle
-				]
-			],
-			[
-				'id'        => 'select_form',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '#form-submit-link',
-				'title'     => 'Choose A Form',
-				'show_next' => false,
-				'content'   => 'You can add a contact based on any form in any funnel. Select your form from the dropdown and click "Change Form"',
-				'position'  => [
-					'edge'  => 'top', //top, bottom, left, right
-					'align' => 'left' //top, bottom, left, right, middle
-				]
-			],
-		];
-	}
-
-	public function get_pointers_edit() {
-		return [
-			[
-				'id'        => 'contact_tab_general',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '#tab_general',
-				'title'     => 'General Information',
-				'show_next' => true,
-				'content'   => "This is where you'll find basic information about the contact, including and contact information.",
-				'position'  => [
-					'edge'  => 'left', //top, bottom, left, right
-					'align' => 'middle' //top, bottom, left, right, middle
-				]
-			],
-			[
-				'id'        => 'contact_tab_meta_data',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '#tab_meta_data',
-				'title'     => 'Custom Information',
-				'show_next' => true,
-				'content'   => "This is where you'll find any custom information about a contact.",
-				'position'  => [
-					'edge'  => 'top', //top, bottom, left, right
-					'align' => 'left' //top, bottom, left, right, middle
-				]
-			],
-			[
-				'id'        => 'contact_tab_segmentation',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '#tab_segmentation',
-				'title'     => 'Segmentation',
-				'show_next' => true,
-				'content'   => "This is where you can add or remove tags. Also where you can see where the contact came from.",
-				'position'  => [
-					'edge'  => 'top', //top, bottom, left, right
-					'align' => 'left' //top, bottom, left, right, middle
-				]
-			],
-			[
-				'id'        => 'contact_tab_notes',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '#tab_notes',
-				'title'     => 'Notes',
-				'show_next' => true,
-				'content'   => "Keep things you'd like to remember about contacts in their notes section.",
-				'position'  => [
-					'edge'  => 'left', //top, bottom, left, right
-					'align' => 'middle' //top, bottom, left, right, middle
-				]
-			],
-			[
-				'id'        => 'contact_tab_files',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '#tab_files',
-				'title'     => 'Files',
-				'show_next' => true,
-				'content'   => "Upload any files you'd like to keep associated with the contact.",
-				'position'  => [
-					'edge'  => 'left', //top, bottom, left, right
-					'align' => 'middle' //top, bottom, left, right, middle
-				]
-			],
-			[
-				'id'        => 'contact_tab_actions',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '#tab_actions',
-				'title'     => 'Actions',
-				'show_next' => true,
-				'content'   => "Send emails, texts, or submit internal forms from this tab.",
-				'position'  => [
-					'edge'  => 'left', //top, bottom, left, right
-					'align' => 'middle' //top, bottom, left, right, middle
-				]
-			],
-			[
-				'id'        => 'contact_tab_activity',
-				'screen'    => $this->get_screen_id(),
-				'target'    => '#tab_activity',
-				'title'     => 'Activity',
-				'show_next' => false,
-				'content'   => "View any activity the contact was involved with.",
-				'position'  => [
-					'edge'  => 'left', //top, bottom, left, right
-					'align' => 'middle' //top, bottom, left, right, middle
-				]
-			],
-		];
 	}
 
 	/**
@@ -680,12 +491,18 @@ class Contacts_Page extends Admin_Page {
 
 		$this->process_edit();
 
-		$this->remove_notice( 'updated' );
+		$contact = new Contact( $id );
+
+		ob_start();
+
+		include __DIR__ . '/details-card.php';
+
+		$details = ob_get_clean();
 
 		wp_send_json_success( [
-			'contact' => new Contact( $id )
+			'contact' => $contact,
+			'details' => $details,
 		] );
-
 	}
 
 	/**
@@ -806,7 +623,9 @@ class Contacts_Page extends Admin_Page {
 
 		do_action( 'groundhogg/admin/contact/save', $contact->get_id(), $contact );
 
-		$this->add_notice( 'update', _x( "Contact updated!", 'notice', 'groundhogg' ), 'success' );
+		if ( ! wp_doing_ajax() ){
+			$this->add_notice( 'update', _x( "Contact updated!", 'notice', 'groundhogg' ), 'success' );
+		}
 
 		return true;
 	}
