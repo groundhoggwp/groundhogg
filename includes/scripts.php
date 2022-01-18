@@ -53,7 +53,7 @@ class Scripts {
 			'groundhogg-frontend'
 		], GROUNDHOGG_VERSION, true );
 
-		wp_register_script( 'fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
+		wp_register_script( 'fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $dot_min . '.js', [], GROUNDHOGG_VERSION, true );
 
 		$google_recaptcha_api_url = 'https://www.google.com/recaptcha/api.js';
 		$site_key                 = get_option( 'gh_recaptcha_site_key' );

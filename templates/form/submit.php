@@ -12,6 +12,10 @@ $form_id = get_query_var( 'form_id' );
 $form = new Form( [ 'id' => $form_id ] );
 $step = new Step( $form_id );
 
+add_action( 'wp_head', function (){
+	wp_dequeue_script('fullframe');
+}, 99 ) ;
+
 add_action( 'wp_head', function(){
     ?>
     <style>

@@ -14,8 +14,8 @@ $form_id = get_query_var( 'form_id' );
 
 $step = new Step( $form_id );
 
-if ( ! $step ){
-    wp_die( 'No form found...' );
+if ( ! $step ) {
+	wp_die( 'No form found...' );
 }
 
 $title = $step->get_title();
@@ -33,27 +33,49 @@ nocache_headers();
 ?><!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>
-    <base target="_parent">
-    <meta charset="<?php bloginfo( 'charset' ); ?>">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="profile" href="http://gmpg.org/xfn/11">
-    <title><?php echo $title; ?></title>
-    <?php wp_head(); ?>
-    <script>
-        window.addEventListener('message', function (event) {
-            if ( typeof event.data.action !== "undefined" && event.data.action === "getFrameSize") {
-                var body = document.body, html = document.documentElement;
-                var height = Math.max(body.scrollHeight, body.offsetHeight,
-                    html.clientHeight, html.scrollHeight, html.offsetHeight);
-                var width = '100%';
-                event.source.postMessage({ height: height, width: width, id:event.data.id }, "*");
-            }
-        });
-    </script>
+	<base target="_parent">
+	<meta charset="<?php bloginfo( 'charset' ); ?>">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="profile" href="http://gmpg.org/xfn/11">
+	<title><?php echo $title; ?></title>
+	<?php wp_head(); ?>
+	<script>
+
+      let source = ''
+      let formId = 0
+
+      const postResizeData = () => {
+        let body = document.body, html = document.documentElement
+        let height = Math.max(body.scrollHeight, body.offsetHeight,
+          html.clientHeight, html.scrollHeight, html.offsetHeight)
+        let width = '100%'
+
+        source.postMessage({ height: height, width: width, id: formId }, '*')
+      }
+
+      window.addEventListener('message', function (event) {
+        if (typeof event.data.action !== 'undefined' && event.data.action === 'getFrameSize') {
+
+          source = event.source
+          formId = event.data.id
+
+          postResizeData()
+        }
+      })
+
+      window.addEventListener('load', () => {
+        ['submit', 'reset'].forEach( evt => {
+          document.querySelector('form.gh-form').addEventListener(evt, () => {
+            console.log('this worked')
+            postResizeData()
+          })
+        })
+      })
+	</script>
 </head>
 <body class="groundhogg-form-body" style="padding: 20px">
 <div id="main">
-    <?php echo do_shortcode( $shortcode ); ?>
+	<?php echo do_shortcode( $shortcode ); ?>
 </div>
 <?php
 wp_footer();

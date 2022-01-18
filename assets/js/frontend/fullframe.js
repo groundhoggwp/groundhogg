@@ -1,37 +1,4 @@
-(function ($) {
-
-  var matched, browser
-
-  $.uaMatch = function (ua) {
-    ua = ua.toLowerCase()
-
-    var match = /(chrome)[ \/]([\w.]+)/.exec(ua) ||
-      /(webkit)[ \/]([\w.]+)/.exec(ua) ||
-      /(opera)(?:.*version|)[ \/]([\w.]+)/.exec(ua) ||
-      /(msie) ([\w.]+)/.exec(ua) ||
-      ua.indexOf('compatible') < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua) ||
-      []
-
-    return {
-      browser: match[1] || '',
-      version: match[2] || '0'
-    }
-  }
-
-  matched = $.uaMatch(navigator.userAgent)
-  browser = {}
-
-  if (matched.browser) {
-    browser[matched.browser] = true
-    browser.version = matched.version
-  }
-
-  // Chrome is Webkit, but Webkit is also Safari.
-  if (browser.chrome) {
-    browser.webkit = true
-  } else if (browser.webkit) {
-    browser.safari = true
-  }
+(function () {
 
   const isSameOrigin = (destination) => {
     const origin = new URL(window.location)
@@ -41,10 +8,17 @@
   }
 
   function initAllFrames () {
-    $('iframe').on('load', function (e) {
-      if (isSameOrigin(this.src)) {
-        this.height = this.contentWindow.document.body.offsetHeight
-        this.style.height = this.contentWindow.document.body.offsetHeight + 'px'
+
+    document.querySelectorAll('iframe:not(.gh-from-iframe)').forEach((frame, i) => {
+
+      let src = frame.src || frame.dataset.src
+
+      // Check if the URL contains the GH managed page
+      if (src && src.match(/\/gh\//) && isSameOrigin(src)) {
+        frame.id = `gh-frame-${i}`
+        frame.classList.add('gh')
+        frame.style.height = frame.contentWindow.document.body.offsetHeight + 'px'
+        frame.style.height = frame.contentWindow.document.body.offsetHeight + 'px'
       }
     })
   }
@@ -58,12 +32,9 @@
   }
 
   function resizeAllFrames () {
-    $('iframe').each(function (i) {
-      var $iframe = $(this)
-      $iframe.attr('id', 'frame-' + (i + 1))
-      if (isSameOrigin($iframe.attr('src'))) {
-        this.contentWindow.postMessage({ action: 'getFrameSize', id: $iframe.attr('id') }, '*')
-      }
+    // inited frames will have the gh class
+    document.querySelectorAll('iframe.gh').forEach((frame, i) => {
+      frame.contentWindow.postMessage({ action: 'getFrameSize', id: frame.id }, '*')
     })
   }
 
@@ -74,20 +45,18 @@
 
   function resizeFrame (data) {
     if (data.height) {
-      var f = $('#' + data.id)
-      if (f) {
-        f.height(data.height)
-        f.width(data.width)
+      let frame = document.getElementById(data.id)
+      if (frame) {
+        frame.style.height = data.height + 'px'
+        frame.style.width = data.width + 'px'
       }
     }
   }
 
+  addEvent('load', initAllFrames)
   addEvent('message', receiveMessage)
   addEvent('resize', resizeAllFrames)
-  addEvent('load', resizeAllFrames)
-
-  $(initAllFrames)
 
   window.fullFrame = initAllFrames
 
-})(jQuery)
+})()

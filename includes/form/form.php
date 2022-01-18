@@ -159,6 +159,10 @@ class Form implements \JsonSerializable {
 		return managed_page_url( sprintf( 'forms/%s/submit/', urlencode( encrypt( $this->get_id() ) ) ) );
 	}
 
+	public function get_hosted_url() {
+		return managed_page_url( sprintf( 'forms/%s/', urlencode( encrypt( $this->get_id() ) ) ) );
+	}
+
 	protected function get_honey_pot_code() {
 		// Honey Pot validation.
 		$honeypot = html()->input( [
