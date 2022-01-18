@@ -5,7 +5,7 @@
     i18n
   } = gh
 
-  const { _wprest, _ghnonce, _wpnonce } = nonces
+  const { _ghnonce } = nonces
   const { adminAjax } = gh
 
   const loadingDots = (el) => {
@@ -52,6 +52,8 @@
         submitText = btn.innerHTML
         btn.innerHTML = i18n.submitting
         let { stop } = loadingDots(btn)
+
+        form.parentNode.querySelectorAll('.gh-message-wrapper').forEach( el => el.remove() )
 
         let fd = new FormData(form)
         fd.append('_ghnonce', _ghnonce)
