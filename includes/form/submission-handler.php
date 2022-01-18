@@ -92,7 +92,7 @@ class Submission_Handler extends Supports_Errors {
 	public function ajax_handler() {
 		if ( $this->has_errors() ) {
 
-			if ( $this->is_admin_submission() ){
+			if ( $this->is_admin_submission() ) {
 				wp_send_json_error( $this->get_last_error() );
 			}
 
@@ -399,7 +399,7 @@ class Submission_Handler extends Supports_Errors {
 
 			if ( $this->is_ajax_request() ) {
 
-				if ( $this->is_admin_submission() ){
+				if ( $this->is_admin_submission() ) {
 					do_action( 'groundhogg/form/submission_handler/admin_submission', $submission, $contact, $this );
 
 					wp_send_json_success( [
@@ -445,7 +445,8 @@ class Submission_Handler extends Supports_Errors {
 	}
 
 	public function is_admin_submission() {
-		return is_admin() && current_user_can( 'add_contacts' );
+		// _ghnonce is not present in the event of a backend sumission
+		return is_admin() && current_user_can( 'add_contacts' ) && ! get_post_var( '_ghnonce' );
 	}
 
 	public function get_posted_data( $key = false, $default = false ) {

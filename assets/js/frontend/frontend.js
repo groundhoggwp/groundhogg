@@ -11,7 +11,7 @@
     nonces,
   } = gh
 
-  const { tracking } = routes
+  const { tracking, ajax } = routes
   const { _wprest } = nonces
   const { consent_cookie_name = 'viewed_cookie_policy', consent_cookie_value = 'yes' } = settings
   const { tracking: tracking_cookie, lead_source, form_impressions, page_visits } = cookies
@@ -34,6 +34,37 @@
       body: JSON.stringify(data),
       ...opts,
     }).then(r => r.json())
+  }
+
+  /**
+   * Post data
+   *
+   * @param data
+   * @param opts
+   * @returns {Promise<any>}
+   */
+  async function adminAjax (data = {}, opts = {}) {
+
+    if (! ( data instanceof FormData )) {
+      const fData = new FormData()
+
+      for (const key in data) {
+        if (data.hasOwnProperty(key)) {
+          fData.append(key, data[key])
+        }
+      }
+
+      data = fData
+    }
+
+    const response = await fetch(ajax, {
+      method: 'POST',
+      credentials: 'same-origin',
+      body: data,
+      ...opts,
+    })
+
+    return response.json()
   }
 
   const DURATION = {
@@ -238,6 +269,9 @@
   window.addEventListener('load', () => {
     gh.init()
   })
+  
+  Groundhogg.adminAjax = adminAjax
+  Groundhogg.apiPost = apiPost
 
 })(Groundhogg)
 

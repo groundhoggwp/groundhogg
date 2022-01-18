@@ -49,7 +49,6 @@ class Scripts {
 
 		wp_register_script( 'groundhogg-frontend', GROUNDHOGG_ASSETS_URL . 'js/frontend/frontend' . $dot_min . '.js', [], GROUNDHOGG_VERSION, true );
 		wp_register_script( 'groundhogg-ajax-form', GROUNDHOGG_ASSETS_URL . 'js/frontend/ajax-form' . $dot_min . '.js', [
-			'jquery',
 			'groundhogg-frontend'
 		], GROUNDHOGG_VERSION, true );
 
@@ -73,6 +72,9 @@ class Scripts {
 
 		wp_localize_script( 'groundhogg-frontend', 'Groundhogg', array(
 			'base_url'                     => untrailingslashit( home_url() ),
+			'i18n'                         => [
+				'submitting' => __( 'Submitting', 'groundhogg' )
+			],
 			'routes'                       => [
 				'tracking' => rest_url( 'gh/v4/tracking' ),
 				'forms'    => rest_url( 'gh/v4/forms' ),

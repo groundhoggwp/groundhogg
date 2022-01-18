@@ -1,110 +1,119 @@
-(function ($, gh) {
+(function (gh) {
 
   const {
-    routes,
     nonces,
+    i18n
   } = gh
 
-  const { tracking, ajax } = routes
   const { _wprest, _ghnonce, _wpnonce } = nonces
+  const { adminAjax } = gh
 
-  $.fn.serializeFormJSON = function () {
+  const loadingDots = (el) => {
 
-    var o = {}
-    var a = this.serializeArray()
-    $.each(a, function () {
-      if (o[this.name]) {
-        if (!o[this.name].push) {
-          o[this.name] = [o[this.name]]
-        }
-        o[this.name].push(this.value || '')
+    let dotsHolder = document.createElement('span')
+    dotsHolder.classList.add('loading-dots')
+
+    el.appendChild(dotsHolder)
+
+    const stop = () => {
+      clearInterval(interval)
+      dotsHolder.remove()
+    }
+
+    const interval = setInterval(() => {
+      if (dotsHolder.innerText.length >= 3) {
+        dotsHolder.innerText = '.'
       } else {
-        o[this.name] = this.value || ''
+        dotsHolder.innerText(dotsHolder.innerText + '.')
       }
-    })
-    return o
+    }, 500)
+
+    return {
+      stop
+    }
   }
 
-  $.fn.hideButton = function () {
-    var $button = this.find('.gh-submit-button').hide()
-    $button.before('<div class="gh-loader" style="font-size: 10px;margin: 20px"></div>')
+  function insertAfter(newNode, referenceNode) {
+    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
   }
 
-  $.fn.showButton = function () {
-    var $button = this.find('.gh-submit-button').show()
-    $('.gh-loader').remove()
-  }
+  let ajaxFinEvt = new CustomEvent( 'ajaxfinished' )
 
-  $(function () {
-    $('form.gh-form.ajax-submit').on('submit', function (e) {
+  const handleAjaxForms = () => {
 
-      e.preventDefault()
+    document.querySelectorAll('form.gh-form.ajax-submit').forEach(__form => {
 
-      // Remove any messages
-      $('.gh-form-errors-wrapper').remove()
-      $('.gh-message-wrapper').remove()
+      __form.addEventListener('submit', e => {
 
-      var $form = $(this)
+        e.preventDefault()
 
-      var data = new FormData($form[0])
+        let form = e.currentTarget
+        let submitText = ''
 
-      data.append('_ghnonce', _ghnonce)
-      data.append('action', 'groundhogg_ajax_form_submit')
+        let btn = form.querySelector('button[type="submit"]')
 
-      //check if google is active
-      let captchaValidated = true
+        btn.disabled = true
+        submitText = btn.innerHTML
+        let { stop } = loadingDots(btn)
 
-      // If this element is present in the form then captcha has not been verified
-      if ($form.find('.gh-recaptcha-v3').length > 0) {
-        captchaValidated = false
-      }
+        let fd = new FormData(form)
+        fd.append('_ghnonce', _ghnonce)
+        fd.append('action', 'groundhogg_ajax_form_submit')
 
-      // Captcha has been verified
-      if (data.has('g-recaptcha-response')) {
-        captchaValidated = true
-      }
+        //check if google is active
+        let captchaValidated = true
 
-      if (captchaValidated) {
+        // If this element is present in the form then captcha has not been verified
+        if (form.querySelectorAll('.gh-recaptcha-v3').length > 0) {
+          captchaValidated = false
+        }
 
-        $form.hideButton()
+        // Captcha has been verified
+        if (fd.has('g-recaptcha-response')) {
+          captchaValidated = true
+        }
 
-        $.ajax({
-          method: 'POST',
-          // dataType: 'json',
-          url: ajax,
-          data: data,
-          processData: false,
-          contentType: false,
-          cache: false,
-          timeout: 600000,
-          enctype: 'multipart/form-data',
-          success: function (response) {
-            if (response.success == undefined) {
-              console.log(response)
-              $form.showButton()
+        if (captchaValidated) {
+          adminAjax(fd).then(r => {
+
+            stop()
+            btn.innerHTML = submitText
+
+            if (r.success === undefined) {
               return
             }
 
-            if (response.success) {
+            if (r.success) {
 
-              $form.after('<div class="gh-message-wrapper gh-form-success-wrapper">' + response.data.message + '</div>')
-              $form.trigger('reset')
+              let msg = document.createElement('div')
+              msg.innerHTML = r.data.message
+              msg.classList.add( ...['gh-message-wrapper', 'gh-form-success-wrapper'])
+
+              form.parentNode.appendChild(msg)
+
+              form.reset()
 
             } else {
-              $form.before(response.data.html)
+
+              let msg = document.createElement('div')
+              msg.innerHTML = r.data.html
+
+              form.parentNode.insertBefore( msg.firstChild, form)
+
             }
 
-            $form.showButton()
+            form.dispatchEvent( ajaxFinEvt )
 
-          },
-          error: function (e) {
-            console.log(e)
-            $form.showButton()
-          }
-        })
-      }
+          }).catch(e => {
+            alert(e.message)
+          })
+        }
+
+      })
 
     })
-  })
+  }
 
-})(jQuery, Groundhogg)
+  window.addEventListener('load', handleAjaxForms)
+
+})(Groundhogg)

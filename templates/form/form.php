@@ -64,7 +64,7 @@ nocache_headers();
       })
 
       window.addEventListener('load', () => {
-        ['submit', 'reset'].forEach( evt => {
+        ['submit', 'reset', 'ajaxfinished'].forEach( evt => {
           document.querySelector('form.gh-form').addEventListener(evt, () => {
             console.log('this worked')
             postResizeData()
