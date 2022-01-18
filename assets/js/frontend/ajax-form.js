@@ -24,17 +24,13 @@
       if (dotsHolder.innerText.length >= 3) {
         dotsHolder.innerText = '.'
       } else {
-        dotsHolder.innerText(dotsHolder.innerText + '.')
+        dotsHolder.innerText = dotsHolder.innerText + '.'
       }
     }, 500)
 
     return {
       stop
     }
-  }
-
-  function insertAfter(newNode, referenceNode) {
-    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
   }
 
   let ajaxFinEvt = new CustomEvent( 'ajaxfinished' )
@@ -54,6 +50,7 @@
 
         btn.disabled = true
         submitText = btn.innerHTML
+        btn.innerHTML = i18n.submitting
         let { stop } = loadingDots(btn)
 
         let fd = new FormData(form)
@@ -78,6 +75,7 @@
 
             stop()
             btn.innerHTML = submitText
+            btn.disabled = false
 
             if (r.success === undefined) {
               return
