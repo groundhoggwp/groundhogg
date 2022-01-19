@@ -67,15 +67,13 @@ abstract class Extension {
 	 * Extension constructor.
 	 */
 	public function __construct() {
-		if ( $this->dependent_plugins_are_installed() ) {
 
-			$this->register_autoloader();
+		$this->register_autoloader();
 
-			if ( ! did_action( 'groundhogg/init/v2' ) ) {
-				add_action( 'groundhogg/init/v2', [ $this, 'init' ] );
-			} else {
-				$this->init();
-			}
+		if ( ! did_action( 'groundhogg/init/v2' ) ) {
+			add_action( 'groundhogg/init/v2', [ $this, 'init' ] );
+		} else {
+			$this->init();
 		}
 
 		// Add to main list
@@ -179,6 +177,10 @@ abstract class Extension {
 	 * @return void
 	 */
 	public function init() {
+
+		if ( ! $this->dependent_plugins_are_installed() ){
+			return;
+		}
 
 		$this->includes();
 
