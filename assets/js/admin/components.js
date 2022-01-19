@@ -140,6 +140,8 @@
 
   const betterTagPicker = (el, {
     selected = [],
+    removeTags = [],
+    addTags = [],
     onChange = (changes) => {
 
     }
@@ -147,9 +149,7 @@
 
     const $el = $(el)
 
-    let isAdding = false
-    let removeTags = []
-    let addTags = []
+    let timeout
 
     const template = () => {
       // language=HTML
@@ -157,9 +157,9 @@
 		  <div class="gh-tags" style="margin-bottom: 10px">
 			  ${selected.map(tag => `<span class="gh-tag${removeTags.includes(tag.ID) ? ' remove' : ''}">${tag.data.tag_name} <span data-id="${tag.ID}" class="remove-tag dashicons dashicons-no-alt"></span></span>`).join('')}
 			  ${addTags.map(id => TagsStore.get(id)).map(tag => `<span class="gh-tag adding">${tag.data.tag_name} <span data-id="${tag.ID}" class="remove-adding-tag dashicons dashicons-no-alt"></span></span>`).join('')}
-			  <${isAdding ? 'div' : 'button'} class="add-tag">
+			  <button class="add-tag">
 				  <span class="dashicons dashicons-plus-alt2"></span>
-			  </${isAdding ? 'div' : 'button'}>
+			  </button>
 		  </div>`
     }
 
@@ -231,7 +231,6 @@
           },
           renderOption: ({ data }) => data.tag_name,
           onClose: () => {
-            isAdding = false
             mount()
           },
           onInput: (search, widget) => {
@@ -1325,6 +1324,7 @@
 
   Groundhogg.components = {
     addContactModal,
+    betterTagPicker,
     quickAddForm,
     selectContactModal,
     quickEditContactModal,

@@ -43,7 +43,7 @@
   } = Groundhogg.stores
 
   const { post, delete: _delete, get, patch, routes, ajax } = Groundhogg.api
-  const { selectContactModal } = Groundhogg.components
+  const { selectContactModal, betterTagPicker } = Groundhogg.components
 
   const { sprintf, __, _x, _n } = wp.i18n
 
@@ -1496,7 +1496,6 @@
 
   const manageTags = () => {
 
-    let isAdding = false
     let removeTags = []
     let addTags = []
 
@@ -1507,14 +1506,17 @@
     const template = () => {
       // language=HTML
       return `
-		  <div class="gh-tags" style="margin-bottom: 10px">
-			  ${getContact().tags.map(tag => `<span class="gh-tag${removeTags.includes(tag.ID) ? ' remove' : ''}">${tag.data.tag_name} <span data-id="${tag.ID}" class="remove-tag dashicons dashicons-no-alt"></span></span>`).join('')}
-			  ${addTags.map(id => TagsStore.get(id)).map(tag => `<span class="gh-tag adding">${tag.data.tag_name} <span data-id="${tag.ID}" class="remove-adding-tag dashicons dashicons-no-alt"></span></span>`).join('')}
-			  <${isAdding ? 'div' : 'button'} class="add-tag">
-				  <span class="dashicons dashicons-plus-alt2"></span>
-			  </${isAdding ? 'div' : 'button'}>
+		  <div id="gh-better-tag-picker">
 		  </div>
-		  ${removeTags.length || addTags.length ? `<div class="align-right-space-between"><button id="cancel-tag-changes" class="gh-button danger text">${__('Cancel')}</button><button id="save-tag-changes" class="gh-button primary">${__('Save')}</button></div>` : ''}`
+		  <div class="tag-change-actions hidden"><button id="cancel-tag-changes" class="gh-button danger text">${__('Cancel')}</button><button id="save-tag-changes" class="gh-button primary">${__('Save')}</button></div>`
+    }
+    
+    const maybeShowTagChangeActions = () => {
+      if ( removeTags.length || addTags.length ){
+        $('.tag-change-actions').addClass('align-right-space-between')
+      } else {
+        $('.tag-change-actions').removeClass('align-right-space-between')
+      }
     }
 
     const mount = () => {
@@ -1524,30 +1526,13 @@
 
     const onMount = () => {
 
-      tooltip('.add-tag', {
-        content: __('Add a tag', 'groundhogg')
-      })
-
-      $('.gh-tag .remove-tag').on('click', (e) => {
-        let tagId = parseInt(e.currentTarget.dataset.id)
-
-        if (removeTags.includes(tagId)) {
-          removeTags.splice(removeTags.indexOf(tagId), 1)
-        } else {
-          removeTags.push(tagId)
+      betterTagPicker('#gh-better-tag-picker', {
+        selected: getContact().tags,
+        onChange: ({ addTags: _addTags, removeTags: _removeTags }) => {
+          removeTags = _removeTags
+          addTags = _addTags
+          maybeShowTagChangeActions()
         }
-
-        mount()
-      })
-
-      $('.gh-tag .remove-adding-tag').on('click', (e) => {
-        let tagId = parseInt(e.currentTarget.dataset.id)
-
-        if (addTags.includes(tagId)) {
-          addTags.splice(addTags.indexOf(tagId), 1)
-        }
-
-        mount()
       })
 
       $('#save-tag-changes').on('click', () => {
@@ -1560,7 +1545,6 @@
           })
           addTags = []
           removeTags = []
-          isAdding = false
           mount()
         })
       })
@@ -1568,85 +1552,8 @@
       $('#cancel-tag-changes').on('click', () => {
         addTags = []
         removeTags = []
-        isAdding = false
         mount()
       })
-
-      $('.add-tag').on('click', (e) => {
-        isAdding = true
-        mount()
-      })
-
-      if (isAdding) {
-
-        let timeout
-
-        let widget = searchOptionsWidget({
-          selector: '.add-tag',
-          noOptions: __('No tags found...', 'groundhogg'),
-          options: TagsStore.items.filter(t => !getContact().tags.map(_t => _t.ID).includes(t.ID) && !addTags.includes(t.ID)),
-          filterOption: ({ data }, search) => data.tag_name.match(regexp(search)),
-          filterOptions: (opts, search) => {
-            if (!search) {
-              return opts
-            }
-
-            return [
-              {
-                ID: search,
-                data: {
-                  tag_name: `Add "${search}"`,
-                }
-              },
-              ...opts
-            ]
-          },
-          renderOption: ({ data }) => data.tag_name,
-          onClose: () => {
-            isAdding = false
-            mount()
-          },
-          onInput: (search, widget) => {
-
-            if (timeout) {
-              clearTimeout(timeout)
-            }
-
-            timeout = setTimeout(() => {
-              TagsStore.fetchItems({
-                search
-              }).then(() => {
-                widget.options = TagsStore.items.filter(t => !getContact().tags.map(_t => _t.ID).includes(t.ID))
-                widget.mountOptions()
-              })
-            }, 1500)
-
-          },
-          onSelect: (tag) => {
-
-            let { ID } = tag
-
-            // Created a new tag
-            if (!isNumeric(ID)) {
-              TagsStore.post({
-                data: {
-                  tag_name: ID
-                }
-              }).then(t => {
-                addTags.push(t.ID)
-                mount()
-              })
-              return
-            }
-
-            addTags.push(ID)
-          },
-          onOpen: () => {
-          }
-        })
-
-        widget.mount()
-      }
 
     }
 
