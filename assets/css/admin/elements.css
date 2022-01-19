@@ -293,7 +293,8 @@ a.action-link {
   color: #3f3800;
 }
 .pill.orange {
-  background: rgba(245, 129, 21, 0.5);
+  background: rgba(245, 129, 21, 0.25);
+  color: #542a04;
 }
 .pill.blue {
   background: rgba(0, 117, 255, 0.5);
@@ -311,22 +312,32 @@ a.action-link {
 }
 
 svg.danger,
+p.gh-text.danger,
 span.gh-text.danger {
   color: #e91f4f;
 }
+svg.warning,
+p.gh-text.warning,
+span.gh-text.warning {
+  color: #f58115;
+}
 svg.green,
+p.gh-text.green,
 span.gh-text.green {
   color: #9ece38;
 }
 svg.md,
+p.gh-text.md,
 span.gh-text.md {
   font-size: 15px;
 }
 svg.sm,
+p.gh-text.sm,
 span.gh-text.sm {
   font-size: 13px;
 }
 svg.lg,
+p.gh-text.lg,
 span.gh-text.lg {
   font-size: 18px;
 }

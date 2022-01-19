@@ -550,10 +550,10 @@ function decrypt( $data ) {
  *
  * @return mixed|false if item is not found return false
  */
-function array_find( array $array, callable $predicate ){
+function array_find( array $array, callable $predicate ) {
 
-	foreach ( $array as $item ){
-		if ( call_user_func( $predicate, $item ) ){
+	foreach ( $array as $item ) {
+		if ( call_user_func( $predicate, $item ) ) {
 			return $item;
 		}
 	}
@@ -5032,7 +5032,7 @@ function extrapolate_wp_mail_plugin() {
  *
  * @return bool
  */
-function gh_doing_cron(){
+function gh_doing_cron() {
 	return defined( 'DOING_GH_CRON' ) && DOING_GH_CRON;
 }
 
@@ -5061,8 +5061,9 @@ add_action( 'groundhogg_process_queue', __NAMESPACE__ . '\track_gh_cron_ping', 9
  *
  * @return mixed|void
  */
-function is_event_queue_processing(){
+function is_event_queue_processing() {
 	$gh_cron_setup = time() - get_option( 'gh_cron_last_ping' ) <= MINUTE_IN_SECONDS;
+
 	return apply_filters( 'groundhogg/cron_is_working', $gh_cron_setup );
 }
 
@@ -5224,27 +5225,27 @@ function array_map_keys( array $array, callable $callback ): array {
 /**
  * Returns unqiue items based on a predicate
  *
- * @param $array array
+ * @param $array    array
  * @param $callback callable
  *
  * @return array
  */
-function array_unique_cb( $array, $callback ){
+function array_unique_cb( $array, $callback ) {
 
 	$seen = [];
 
-	return array_filter( $array, function ($item) use ($seen, $callback){
+	return array_filter( $array, function ( $item ) use ( $seen, $callback ) {
 
 		$__item = call_user_func( $callback, $item );
 
-		if ( in_array( $__item, $seen ) ){
+		if ( in_array( $__item, $seen ) ) {
 			return false;
 		}
 
 		$seen[] = $__item;
 
 		return true;
-	});
+	} );
 }
 
 /**
@@ -5851,7 +5852,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
 			default:
 				break;
 			case 'email_link_click':
-				if ( $activity_query['funnel_id'] == 1 ) {
+				if ( get_array_var( $activity_query, 'funnel_id' ) == Broadcast::FUNNEL_ID ) {
 					$filters[] = [
 						'type'         => 'broadcast_link_clicked',
 						'broadcast_id' => absint( $activity_query['step_id'] ),
@@ -5859,17 +5860,18 @@ function get_filters_from_old_query_vars( $query = [] ) {
 					];
 				} else {
 					$filters[] = [
-						'type'     => 'email_link_clicked',
-						'email_id' => absint( $activity_query['email_id'] ),
-						'link'     => get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) ),
-						'after'    => Ymd_His( absint( get_array_var( $activity_query, 'after' ) ) ),
-						'before'   => Ymd_His( absint( get_array_var( $activity_query, 'before' ) ) )
+						'type'       => 'email_link_clicked',
+						'email_id'   => absint( $activity_query['email_id'] ),
+						'link'       => get_referer_from_referer_hash( get_array_var( $activity_query, 'referer_hash' ) ),
+						'after'      => Ymd_His( absint( get_array_var( $activity_query, 'after' ) ) ),
+						'before'     => Ymd_His( absint( get_array_var( $activity_query, 'before' ) ) ),
+						'date_range' => 'between',
 					];
 				}
 				break;
 			case 'email_opened':
 
-				if ( $activity_query['funnel_id'] == 1 ) {
+				if ( get_array_var( $activity_query, 'funnel_id' ) == Broadcast::FUNNEL_ID ) {
 
 					$filters[] = [
 						'type'         => 'broadcast_opened',
@@ -5881,7 +5883,8 @@ function get_filters_from_old_query_vars( $query = [] ) {
 						'type'     => 'email_opened',
 						'email_id' => absint( $activity_query['email_id'] ),
 						'after'    => Ymd_His( absint( get_array_var( $activity_query, 'after' ) ) ),
-						'before'   => Ymd_His( absint( get_array_var( $activity_query, 'before' ) ) )
+						'before'   => Ymd_His( absint( get_array_var( $activity_query, 'before' ) ) ),
+						'date_range' => 'between',
 					];
 				}
 
@@ -5943,6 +5946,7 @@ function is_admin_bar_widget_disabled() {
 function implode_in_quotes( $items ) {
 	return implode( ',', array_map( function ( $item ) {
 		$item = esc_sql( $item );
+
 		return "'$item'";
 	}, $items ) );
 }
@@ -5954,7 +5958,7 @@ function implode_in_quotes( $items ) {
  *
  * @return string
  */
-function maybe_implode_in_quotes( $items ){
+function maybe_implode_in_quotes( $items ) {
 	return implode( ',', array_map( function ( $i ) {
 		$i = esc_sql( $i );
 
@@ -6146,6 +6150,6 @@ function log( $event, $name = '', $value = '' ) {
  *
  * @return bool
  */
-function is_wp_fusion_active(){
+function is_wp_fusion_active() {
 	return defined( 'WP_FUSION_VERSION' );
 }

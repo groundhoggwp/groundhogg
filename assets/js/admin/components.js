@@ -154,7 +154,7 @@
     const template = () => {
       // language=HTML
       return `
-		  <div class="gh-tags" style="margin-bottom: 10px">
+		  <div class="gh-tags">
 			  ${selected.map(tag => `<span class="gh-tag${removeTags.includes(tag.ID) ? ' remove' : ''}">${tag.data.tag_name} <span data-id="${tag.ID}" class="remove-tag dashicons dashicons-no-alt"></span></span>`).join('')}
 			  ${addTags.map(id => TagsStore.get(id)).map(tag => `<span class="gh-tag adding">${tag.data.tag_name} <span data-id="${tag.ID}" class="remove-adding-tag dashicons dashicons-no-alt"></span></span>`).join('')}
 			  <button class="add-tag">

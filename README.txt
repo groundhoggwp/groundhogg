@@ -325,14 +325,15 @@ You can purchase a premium plan for access to support and our premium extensions
 * NEW UI for the contact record
   * Condensed design to fit more on the screen, less scrolling.
   * Custom field management is now FREE and part of Groundhogg core!
-  * Additional contact methods including email addresses and phone numbers
-  * Improved tag picker is very user friendly
-  * Activity timeline shows all events and activity in order
-  * Improved file box management
-  * Notes get more space
+  * Additional contact methods including email addresses and phone numbers.
+  * Improved tag picker is very user friendly.
+  * Activity timeline shows all events and activity in order.
+  * Improved file box management.
+  * Notes get more space and support media.
   * Edits are saved via the API, no page reloading!
   * Custom tabs are backwards compatible.
  * ADDED Contact merging!
+ * ADDED When adding a contact via the admin you can opt them into GDPR requirements.
  * TWEAKED when a form is submitting via AJAX and is in an iframe, the iframe will be resized to show any messages.
  * TWEAKED all jQuery removed from the form ajax submission script.
  * TWEAKED all jQuery removed from the fullframe script.

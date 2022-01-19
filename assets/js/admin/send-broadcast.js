@@ -446,6 +446,7 @@
                   // language=HTML
                   return `
 					  <h2 id="broadcast-progress-header">${__('Scheduling', 'groundhogg')}</h2>
+            <p class="pill orange"><b>${ __( 'Do not close this window while the broadcast is scheduling!', 'groundhogg' ) }</b></p>
 					  <div id="broadcast-progress"></div>`
                 }
 

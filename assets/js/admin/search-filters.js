@@ -212,6 +212,7 @@
           try {
             filters.push(self.currentGroup === j && self.currentFilter === k ? renderFilterEdit(this.usingTempFilters ? this.tempFilterSettings : filter, j, k) : renderFilterView(filter, j, k))
           } catch (e) {
+            console.log(e)
             filters.push( renderFilterBroken(filter, j, k) );
           }
         })
@@ -653,7 +654,7 @@
 
     switch (date_range) {
       default:
-        return `${prepend} ${ranges[date_range].toLowerCase()}`
+        return `${prepend} ${ranges[date_range] ? ranges[date_range].toLowerCase() : ''}`
       case 'between':
         return `${prepend} ${sprintf(_x('between %1$s and %2$s', 'where %1 and %2 are dates', 'groundhogg'), `<b>${formatDate(after)}</b>`, `<b>${formatDate(before)}</b>`)}`
       case 'before':
@@ -1473,7 +1474,11 @@
 
       const emailName = email_id ? EmailsStore.get(email_id).data.title : 'any email'
 
-      let prepend = sprintf(link ? __('Clicked %1$s in %2$s', 'groundhogg') : __('Clicked any link in %2$s', 'groundhogg'), `<b>${link}</b>`, `<b>${emailName}</b>`)
+      const maybeTruncateLink = ( link ) => {
+        return link.length > 50 ? `${link.substring(0, 47)}...` : link
+      }
+
+      let prepend = sprintf(link ? __('Clicked %1$s in %2$s', 'groundhogg') : __('Clicked any link in %2$s', 'groundhogg'), `<b class="link" title="${link}">${maybeTruncateLink(link)}</b>`, `<b>${emailName}</b>`)
 
       prepend = filterCountTitle(prepend, rest)
 

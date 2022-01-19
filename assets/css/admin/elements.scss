@@ -19,6 +19,7 @@ $alert-yellow-50: rgba(255, 238, 88, 0.50);
 $alert-yellow: rgb(255, 238, 88);
 $benchmark-orange: rgb(245, 129, 21);
 $benchmark-orange-50: rgba(245, 129, 21, 0.50);
+$benchmark-orange-25: rgba(245, 129, 21, 0.25);
 $action-green: rgb(158, 206, 56);
 $action-green-50: rgba(158, 206, 56, 0.5);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
@@ -394,7 +395,8 @@ a.action-link {
   }
 
   &.orange {
-    background: $benchmark-orange-50;
+    background: $benchmark-orange-25;
+    color: darken(  $benchmark-orange, 35 );
   }
 
   &.blue {
@@ -417,10 +419,16 @@ a.action-link {
 }
 
 svg,
+p.gh-text,
 span.gh-text {
   &.danger {
     color: $error-red;
   }
+
+  &.warning {
+    color: $benchmark-orange;
+  }
+
 
   &.green {
     color: $action-green;
