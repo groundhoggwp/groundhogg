@@ -248,12 +248,11 @@
 
                     loadingModal()
 
-                    post(`${ContactsStore.route}/${contact.ID}/megrge`, [
+                    post(`${ContactsStore.route}/${contact.ID}/merge`, [
                       _contact.ID
                     ]).then(() => {
                       location.reload()
                     })
-
                   }
                 })
 
