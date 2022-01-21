@@ -464,7 +464,13 @@
       // language=HTML
       return `
 		  <ul id="activity-timeline">
-			  ${activities.map(a => this.renderActivity(a)).join('')}
+			  ${activities.map(a => {
+				  try {
+					  return this.renderActivity(a)
+				  } catch (e) {
+					  return ''
+				  }
+			  }).join('')}
 		  </ul>`
 
     },
@@ -1006,7 +1012,7 @@
     ]
 
     // if (Groundhogg.isWhiteLabeled) {
-      tabs.splice(tabs.findIndex(t => t.id === 'inbox'), 1)
+    tabs.splice(tabs.findIndex(t => t.id === 'inbox'), 1)
     // }
 
     const template = () => {
@@ -1507,11 +1513,14 @@
       return `
 		  <div id="gh-better-tag-picker">
 		  </div>
-		  <div class="tag-change-actions hidden" style="margin-top: 10px"><button id="cancel-tag-changes" class="gh-button danger text">${__('Cancel')}</button><button id="save-tag-changes" class="gh-button primary">${__('Save')}</button></div>`
+		  <div class="tag-change-actions hidden" style="margin-top: 10px">
+			  <button id="cancel-tag-changes" class="gh-button danger text">${__('Cancel')}</button>
+			  <button id="save-tag-changes" class="gh-button primary">${__('Save')}</button>
+		  </div>`
     }
-    
+
     const maybeShowTagChangeActions = () => {
-      if ( removeTags.length || addTags.length ){
+      if (removeTags.length || addTags.length) {
         $('.tag-change-actions').addClass('align-right-space-between')
       } else {
         $('.tag-change-actions').removeClass('align-right-space-between')

@@ -181,8 +181,10 @@
       var self = this
       var forms = document.querySelectorAll('.gh-form')
       forms.forEach(function (form, i) {
-        var fId = form.querySelector('input[name="gh_submit_form"]').value
-        self.formImpression(fId)
+        var field = form.querySelector('input[name="gh_submit_form"]')
+        if (field){
+          self.formImpression(field.value)
+        }
       })
     },
 
