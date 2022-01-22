@@ -178,7 +178,7 @@ abstract class Extension {
 	 */
 	public function init() {
 
-		if ( ! $this->dependent_plugins_are_installed() ){
+		if ( ! $this->dependent_plugins_are_installed() ) {
 			return;
 		}
 
@@ -567,7 +567,8 @@ abstract class Extension {
 		$content .= html()->input( [
 			'placeholder' => __( 'License', 'groundhogg' ),
 			'name'        => "license[{$this->get_download_id()}]",
-			'value'       => $this->get_license_key()
+			'value'       => $this->get_license_key(),
+			'type'        => $this->get_license_key() ? 'password' : 'text'
 		] );
 
 		if ( $this->get_license_key() ) {

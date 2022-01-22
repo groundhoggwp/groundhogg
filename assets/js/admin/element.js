@@ -1307,6 +1307,25 @@
         if (offset < $options.scrollTop())
           $options.scrollTop(offset)
       }
+
+      this.repositionFixed()
+    },
+    repositionFixed () {
+
+      if ( position !== 'fixed' || ! this.$widget ){
+        return
+      }
+
+      const {
+        left, top, right, bottom
+      } = target.getBoundingClientRect()
+
+      this.$widget.css({
+        top: top + this.$widget.outerHeight() > window.innerHeight ? 'initial' : top,
+        bottom: top + this.$widget.outerHeight() > window.innerHeight ? 5 : 'initial',
+        right: left + this.$widget.outerWidth() > window.innerWidth ? 5 : 'initial',
+        left: left + this.$widget.outerWidth() > window.innerWidth ? 'initial' : left
+      })
     },
     mount () {
       var self = this
@@ -1320,19 +1339,13 @@
           this.mountOptions()
           break
         case 'fixed':
-          const {
-            left, top, right, bottom
-          } = target.getBoundingClientRect()
+
           const $picker = $(self.render())
           $('body').append($picker)
           this.mountOptions()
           const $widget = $picker.find('.search-options-widget')
-          $widget.css({
-            top: top + $widget.outerHeight() > window.innerHeight ? 'initial' : top,
-            bottom: top + $widget.outerHeight() > window.innerHeight ? 5 : 'initial',
-            right: left + $widget.outerWidth() > window.innerWidth ? 5 : 'initial',
-            left: left + $widget.outerWidth() > window.innerWidth ? 'initial' : left
-          })
+          this.$widget = $widget
+          this.repositionFixed()
           break
       }
 
