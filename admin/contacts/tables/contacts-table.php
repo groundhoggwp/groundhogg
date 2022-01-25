@@ -75,9 +75,6 @@ class Contacts_Table extends WP_List_Table {
 		$columns  = $this->get_columns();
 		$hidden   = get_hidden_columns( 'groundhogg_page_gh_contacts' );
 		$sortable = $this->get_sortable_columns();
-
-		new Contact_Table_Actions();
-
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 	}
 
@@ -602,8 +599,6 @@ class Contacts_Table extends WP_List_Table {
 		?>
 		<div class="alignleft gh-actions">
 		<?php
-
-//		Contact_Table_Actions::do_contact_actions( $this->query, $this->get_pagination_arg( 'total_items' ), $this );
 
 		do_action( 'groundhogg/admin/contacts/table/extra_tablenav', $this );
 

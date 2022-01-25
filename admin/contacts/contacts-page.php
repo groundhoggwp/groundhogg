@@ -495,7 +495,7 @@ class Contacts_Page extends Admin_Page {
 
 		ob_start();
 
-		include __DIR__ . '/details-card.php';
+		include __DIR__ . '/parts/details-card.php';
 
 		$details = ob_get_clean();
 
@@ -842,7 +842,7 @@ class Contacts_Page extends Admin_Page {
 
 		$contacts_table->views();
 
-		include __DIR__ . '/quick-search.php';
+		include __DIR__ . '/parts/quick-search.php';
 
 		?>
 		<form method="post" id="contacts-table-form">
@@ -859,7 +859,7 @@ class Contacts_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		include __DIR__ . '/bulk-edit.php';
+		include __DIR__ . '/parts/bulk-edit.php';
 	}
 
 	function process___export() {
@@ -926,7 +926,7 @@ class Contacts_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		include __DIR__ . '/edit.php';
+		include __DIR__ . '/parts/edit.php';
 	}
 
 	/**
@@ -936,13 +936,13 @@ class Contacts_Page extends Admin_Page {
 		if ( ! current_user_can( 'add_contacts' ) ) {
 			$this->wp_die_no_access();
 		}
-		include __DIR__ . '/add-contact.php';
+		include __DIR__ . '/parts/add-contact.php';
 	}
 
 	public function form() {
 		if ( ! current_user_can( 'edit_contacts' ) ) {
 			$this->wp_die_no_access();
 		}
-		include __DIR__ . '/form-admin-submit.php';
+		include __DIR__ . '/parts/form-admin-submit.php';
 	}
 }
