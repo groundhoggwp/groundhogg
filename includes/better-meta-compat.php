@@ -292,6 +292,17 @@ function add_custom_property_replacements( $replacements ) {
 				$custom_field['label'],
 				$group['id']
 			);
+
+			// For backwards compatibility with ugly replacement codes.
+			$replacements->add(
+				$custom_field['id'],
+				function ( $contact_id, $name ) {
+					return display_custom_field( $name, $contact_id, false );
+				},
+			);
+
+			// Hide ugly replacement codes from the UI
+			$replacements->make_hidden($custom_field['id']);
 		}
 	}
 }

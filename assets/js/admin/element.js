@@ -1444,7 +1444,8 @@
         widget = searchOptionsWidget({
           target: e.target.closest('.replacements-picker-start'),
           position: 'fixed',
-          options: Object.values(codes),
+          // filter out hidden codes
+          options: Object.values(codes).filter( r => ! r.hidden ),
           groups,
           filterOption: ({ name, code }, search) => name.match(regexp(search)) || code.match(regexp(search)),
           renderOption: (option) => option.name,

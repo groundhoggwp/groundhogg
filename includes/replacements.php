@@ -332,12 +332,12 @@ class Replacements implements \JsonSerializable {
 				'description' => _x( 'Insert all the files in a contact\'s file box.', 'replacement', 'groundhogg' ),
 			],
 			[
-				'code'        => 'GET',
-				'group'       => 'other',
-				'callback'    => [ $this, 'replacement_get_params' ],
-				'name'        => __( '$_GET', 'groundhogg' ),
+				'code'         => 'GET',
+				'group'        => 'other',
+				'callback'     => [ $this, 'replacement_get_params' ],
+				'name'         => __( '$_GET', 'groundhogg' ),
 				'default_args' => 'url_param',
-				'description' => _x( 'Retrieve something from the URL query string. Only works on the frontend.', 'replacement', 'groundhogg' ),
+				'description'  => _x( 'Retrieve something from the URL query string. Only works on the frontend.', 'replacement', 'groundhogg' ),
 			],
 			[
 				'code'        => 'groundhogg_day_quote',
@@ -382,20 +382,31 @@ class Replacements implements \JsonSerializable {
 		}
 
 		if ( is_callable( $callback ) ) {
-			$this->replacement_codes[ $code ] = array(
+			$this->replacement_codes[ $code ] = [
 				'code'        => $code,
 				'callback'    => $callback,
 				'name'        => $name ?: $code,
 				'group'       => $group,
 				'description' => $description,
-				'insert'      => ! empty( $default_args ) ? sprintf( '{%s.%s}', $code, $default_args ) : sprintf( '{%s}', $code )
-			);
+				'insert'      => ! empty( $default_args ) ? sprintf( '{%s.%s}', $code, $default_args ) : sprintf( '{%s}', $code ),
+				'hidden'      => false,
+			];
 
 			return true;
 		}
 
 		return false;
 
+	}
+
+	/**
+	 * Hide a replacement code from view
+	 * Useful for making replacement codes backwards compatible without showing it in the UI
+	 *
+	 * @param $id
+	 */
+	function make_hidden( $id ) {
+		$this->replacement_codes[ $id ]['hidden'] = true;
 	}
 
 	/**
@@ -487,14 +498,16 @@ class Replacements implements \JsonSerializable {
 	 */
 	public function tackle_replacements( $content ) {
 
-		if ( ! preg_match( '/{([^{}]+)}/', $content ) ) {
+		$pattern = '/{([^{}\n]+)}/';
+
+		if ( ! preg_match( $pattern, $content ) ) {
 			return $content;
 		} // Check if there is at least one tag added
 		else if ( empty( $this->replacement_codes ) || ! is_array( $this->replacement_codes ) ) {
 			return $content;
 		}
 
-		return $this->tackle_replacements( preg_replace_callback( "/{([^{}]+)}/s", [
+		return $this->tackle_replacements( preg_replace_callback( $pattern . 's', [
 			$this,
 			'do_replacement'
 		], $content ) );
@@ -621,7 +634,13 @@ class Replacements implements \JsonSerializable {
 				</thead>
 				<tbody>
 
-				<?php foreach ( $codes as $code => $replacement ): ?>
+				<?php foreach ( $codes as $code => $replacement ):
+
+					if ( $replacement['hidden'] ) {
+						continue;
+					}
+
+					?>
 					<tr>
 						<td><?php _e( get_array_var( $replacement, 'name' ) ); ?></td>
 						<td>
@@ -671,7 +690,7 @@ class Replacements implements \JsonSerializable {
 		 */
 		foreach ( $this->replacement_code_groups as $group => $name ) {
 			$options[ $name ] = array_map_with_keys( array_map_keys( array_filter( $this->replacement_codes, function ( $atts ) use ( $group ) {
-				return $atts['group'] === $group;
+				return $atts['group'] === $group && ! $atts['hidden'];
 			} ), function ( $code, $atts ) {
 				return get_array_var( $atts, 'insert', '{' . $code . '}' );
 			} ), function ( $atts, $code ) {
@@ -780,7 +799,7 @@ class Replacements implements \JsonSerializable {
 	 *
 	 * @return mixed
 	 */
-	public function replacement_get_params( $key ){
+	public function replacement_get_params( $key ) {
 		return get_url_var( $key );
 	}
 
