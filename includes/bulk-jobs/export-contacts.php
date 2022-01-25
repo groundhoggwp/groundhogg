@@ -113,7 +113,7 @@ class Export_Contacts extends Bulk_Job {
 		$headers     = get_transient( 'gh_export_headers' );
 		$header_type = get_transient( 'gh_export_header_type' );
 
-		$file_name = Plugin::$instance->settings->get_transient( 'gh_export_file' );
+		$file_name = get_transient( 'gh_export_file' );
 
 		$fp = false;
 
@@ -129,13 +129,9 @@ class Export_Contacts extends Bulk_Job {
 			//write the headers to the export.
 			$fp = fopen( $file_path, "w" );
 
-			if ( $header_type === 'pretty' ) {
-				$file_headers = array_map( function ( $header ) {
-					return export_header_pretty_name( $header );
-				}, $headers );
-			} else {
-				$file_headers = $headers;
-			}
+			$file_headers = array_map( function ( $header ) use ( $header_type ) {
+				return export_header_pretty_name( $header, $header_type );
+			}, $headers );
 
 			fputcsv( $fp, $file_headers );
 		}

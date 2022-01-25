@@ -5,11 +5,13 @@ namespace Groundhogg\Admin\Tools;
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Bulk_Jobs\Create_Users;
 use Groundhogg\Bulk_Jobs\Delete_Contacts;
+use Groundhogg\Contact_Properties;
 use Groundhogg\Extension_Upgrader;
 use Groundhogg\License_Manager;
 use Groundhogg\Queue\Event_Queue;
 use function Groundhogg\action_input;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\export_header_pretty_name;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\get_exportable_fields;
@@ -430,8 +432,9 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	public function import_view() {
 
-		if ( ! current_user_can( 'view_previous_imports' ) ){
+		if ( ! current_user_can( 'view_previous_imports' ) ) {
 			$this->import_add();
+
 			return;
 		}
 
@@ -626,8 +629,9 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	public function export_view() {
 
-		if ( ! current_user_can( 'view_previous_exports' ) ){
+		if ( ! current_user_can( 'view_previous_exports' ) ) {
 			$this->export_add();
+
 			return;
 		}
 
@@ -643,7 +647,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 		<?php
 	}
 
-	public function export_add(){
+	public function export_add() {
 		// todo
 	}
 
@@ -661,7 +665,8 @@ class Tools_Page extends Tabbed_Admin_Page {
 		$count = get_db( 'contacts' )->count( $query_args );
 
 		$default_exportable_fields = get_exportable_fields();
-		$meta_keys                 = array_diff( array_values( Plugin::$instance->dbs->get_db( 'contactmeta' )->get_keys() ), array_keys( $default_exportable_fields ) );
+		$custom_properties         = array_map( function ($f) { return $f['name']; }, Contact_Properties::instance()->get_fields() );
+		$meta_keys                 = array_diff( array_values( get_db( 'contactmeta' )->get_keys() ), array_keys( $default_exportable_fields ), $custom_properties );
 
 		?>
 		<p><?php _e( "Select which information you want to appear in your CSV file.", 'groundhogg' ); ?></p>
@@ -676,7 +681,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 			], [
 				[
 					'class' => 'check-column',
-					'name'  => "<input type='checkbox' value='1' checked class='select-all-basic'>",
+					'name'  => "<input type='checkbox' value='1' checked class='select-all'>",
 					'tag'   => 'td'
 				],
 				__( 'Pretty Name', 'groundhogg' ),
@@ -697,6 +702,46 @@ class Tools_Page extends Tabbed_Admin_Page {
 				];
 			} ) );
 
+			$tabs = Contact_Properties::instance()->get_tabs();
+
+			foreach ( $tabs as $tab ):
+
+				?><h2><?php esc_html_e( $tab['name'] ); ?></h2><?php
+
+				$groups = Contact_Properties::instance()->get_groups( $tab['id'] );
+
+				foreach ( $groups as $group ):
+					?><h4><?php esc_html_e( $group['name'] ); ?></h4><?php
+
+					html()->list_table( [
+						'class' => 'export-table'
+					], [
+						[
+							'class' => 'check-column',
+							'name'  => "<input type='checkbox' value='1' class='select-all'>",
+							'tag'   => 'td'
+						],
+						__( 'Pretty Name', 'groundhogg' ),
+						__( 'Field ID', 'groundhogg' ),
+					], array_map( function ( $field ) {
+						return [
+							html()->checkbox( [
+								'label'   => '',
+								'type'    => 'checkbox',
+								'name'    => 'headers[' . $field['id'] . ']',
+								'id'      => 'header_' . $field['name'],
+								'class'   => 'meta header',
+								'value'   => '1',
+								'checked' => false,
+							] ),
+							esc_html( $field['label'] ),
+							'<code>' . esc_html( $field['name'] ) . '</code>'
+						];
+					}, Contact_Properties::instance()->get_fields( $group['id'] ) ) );
+				endforeach;
+
+			endforeach;
+
 			?>
 
 			<?php if ( ! empty( $meta_keys ) ): ?>
@@ -709,7 +754,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 				], [
 					[
 						'class' => 'check-column',
-						'name'  => "<input type='checkbox' value='1' class='select-all-meta'>",
+						'name'  => "<input type='checkbox' value='1' class='select-all'>",
 						'tag'   => 'td'
 					],
 					__( 'Pretty Name', 'groundhogg' ),
@@ -760,19 +805,14 @@ class Tools_Page extends Tabbed_Admin_Page {
 		<script>
           (function ($) {
 
-            $('.select-all-meta').on('change', function (e) {
-              if ($(this).is(':checked')) {
-                $('input.meta.header').prop('checked', true)
-              } else {
-                $('input.meta.header').prop('checked', false)
-              }
-            })
+            $('.select-all').on('change', function (e) {
 
-            $('.select-all-basic').on('change', function (e) {
+              let $checks = $(e.target).closest('table').find('input')
+
               if ($(this).is(':checked')) {
-                $('input.basic.header').prop('checked', true)
+                $checks.prop('checked', true)
               } else {
-                $('input.basic.header').prop('checked', false)
+                $checks.prop('checked', false)
               }
             })
 
@@ -795,10 +835,10 @@ class Tools_Page extends Tabbed_Admin_Page {
 			return new WP_Error( 'error', 'Please choose columns to export.' );
 		}
 
-//		$headers = map_deep( $headers );
+		$header_type = sanitize_text_field( get_post_var( 'header_type', 'basic' ) );
 
 		set_transient( 'gh_export_headers', $headers, DAY_IN_SECONDS );
-		set_transient( 'gh_export_header_type', sanitize_text_field( get_post_var( 'header_type' ) ), DAY_IN_SECONDS );
+		set_transient( 'gh_export_header_type', $header_type, DAY_IN_SECONDS );
 
 		Plugin::$instance->bulk_jobs->export_contacts->start( [
 			'query' => $query,

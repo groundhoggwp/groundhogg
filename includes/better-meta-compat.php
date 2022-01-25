@@ -29,16 +29,12 @@ function sanitize_custom_field( $value, $field_id ) {
 		case 'text':
 		case 'radio':
 			return sanitize_text_field( $value );
-			break;
 		case 'textarea':
 			return sanitize_textarea_field( $value );
-			break;
 		case 'number':
 			return intval( $value );
-			break;
 		case 'date':
 			return date( 'Y-m-d', strtotime( $value ) );
-			break;
 		case 'dropdown':
 		case 'checkboxes':
 			if ( is_array( $value ) ) {
@@ -46,7 +42,6 @@ function sanitize_custom_field( $value, $field_id ) {
 			} else {
 				return sanitize_text_field( $value );
 			}
-			break;
 	endswitch;
 
 	return '';
@@ -62,13 +57,13 @@ function sanitize_custom_field( $value, $field_id ) {
  *
  * @return array|false|int|mixed|string
  */
-function display_custom_field( $field_id, $contact, $echo = true ) {
+function display_custom_field( $id_or_name, $contact, $echo = true ) {
 
 	// Field object was passed...
-	if ( is_array( $field_id ) && isset( $field_id['type'] ) ) {
+	if ( is_array( $id_or_name ) && isset( $field_id['type'] ) ) {
 		$field = $field_id;
 	} else {
-		$field = Contact_Properties::instance()->get_field( $field_id );
+		$field = Contact_Properties::instance()->get_field( $id_or_name );
 	}
 
 	// Change from int to Contact
@@ -133,19 +128,28 @@ function get_field_meta_key( $field_id ) {
  */
 function add_custom_fields_to_mappable_fields( $fields = [] ) {
 
-	$custom_fields = Contact_Properties::instance()->get_fields();
+	$groups = Contact_Properties::instance()->get_groups();
 
-	if ( empty( $custom_fields ) ) {
+	if ( empty( $groups ) ) {
 		return $fields;
 	}
 
-	$group = [];
+	foreach ( $groups as $group ) {
 
-	foreach ( $custom_fields as $custom_field ) {
-		$group[ $custom_field['id'] ] = '__' . $custom_field['label'];
+		$_group = [];
+
+		$tab = Contact_Properties::instance()->get_group_tab( $group['id'] );
+
+	    $group_name = sprintf( '%s: %s', $tab['name'], $group['name'] );
+
+		$custom_fields = Contact_Properties::instance()->get_fields( $group['id'] );
+
+		foreach ( $custom_fields as $custom_field ) {
+			$_group[ $custom_field['id'] ] = $custom_field['label'];
+		}
+
+		$fields[ $group_name ] = $_group;
 	}
-
-	$fields[ __( 'Custom Fields', 'groundhogg-better-meta' ) ] = $group;
 
 	return $fields;
 
@@ -214,29 +218,28 @@ add_action( 'groundhogg/generate_contact_with_map/default', __NAMESPACE__ . '\ma
 add_action( 'groundhogg/update_contact_with_map/default', __NAMESPACE__ . '\map_custom_fields_to_meta', 10, 7 );
 
 /**
- * Add the custom fields to the mappable fields API
+ * Filter the column name for the custom property
  *
- * @param array $fields
- *
- * @return array
+ * @param $header string
+ * @param $id     string
+ * @param $type   string
  */
-function add_custom_fields_to_exportable_fields( $fields = [] ) {
+function export_custom_property_header( $header, $id, $type ) {
 
-	$custom_fields = Contact_Properties::instance()->get_fields();
+	$field = Contact_Properties::instance()->get_field( $id );
 
-	if ( empty( $custom_fields ) ) {
-		return $fields;
+	if ( ! $field ) {
+		return $header;
 	}
 
-	foreach ( $custom_fields as $custom_field ) {
-		$fields[ $custom_field['id'] ] = $custom_field['label'];
+	if ( $type === 'basic' ) {
+		return $field['name'];
 	}
 
-	return $fields;
-
+	return $field['label'];
 }
 
-add_filter( 'groundhogg/exportable_fields', __NAMESPACE__ . '\add_custom_fields_to_exportable_fields' );
+add_filter( 'groundhogg/export_header_name', __NAMESPACE__ . '\export_custom_property_header', 10, 3 );
 
 /**
  * Filter an exported args and ensure the field is properly exported.
@@ -259,36 +262,41 @@ function export_custom_property( $return, $contact, $field_id ) {
 
 add_filter( 'groundhogg/export_field', __NAMESPACE__ . '\export_custom_property', 10, 3 );
 
-add_action( 'groundhogg/replacements/init', __NAMESPACE__ . '\add_custom_property_replacements' );
 
 /**
  * @param \Groundhogg\Replacements $replacements
  */
 function add_custom_property_replacements( $replacements ) {
 
-	$custom_fields = Contact_Properties::instance()->get_fields();
+	$groups = Contact_Properties::instance()->get_groups();
 
-	if ( empty( $custom_fields ) ) {
+	if ( empty( $groups ) ) {
 		return;
 	}
 
-	$replacements->add_group( 'custom_meta', __( 'Custom Fields', 'groundhogg-better-meta' ) );
+	foreach ( $groups as $group ) {
 
-	foreach ( $custom_fields as $custom_field ) {
-		$replacements->add(
-			$custom_field['id'],
-			function ( $contact_id, $code ) {
-				return display_custom_field( $code, $contact_id, false );
-			},
-			'',
-			$custom_field['label'],
-			'custom_meta'
-		);
+		$tab = Contact_Properties::instance()->get_group_tab( $group['id'] );
+
+		$replacements->add_group( $group['id'], sprintf( '%s: %s', $tab['name'], $group['name'] ) );
+
+		$custom_fields = Contact_Properties::instance()->get_fields( $group['id'] );
+
+		foreach ( $custom_fields as $custom_field ) {
+			$replacements->add(
+				$custom_field['name'],
+				function ( $contact_id, $name ) {
+					return display_custom_field( $name, $contact_id, false );
+				},
+				'',
+				$custom_field['label'],
+				$group['id']
+			);
+		}
 	}
-
 }
 
-add_action( 'groundhogg/admin/contacts/register_table_columns', __NAMESPACE__ . '\register_contact_property_table_columns' );
+add_action( 'groundhogg/replacements/init', __NAMESPACE__ . '\add_custom_property_replacements' );
 
 /**
  * Register Custom Columns for Custom Fields
@@ -308,3 +316,6 @@ function register_contact_property_table_columns( $columns ) {
 		$columns::register( $custom_field['id'], $custom_field['label'], $callback, false, 100 + $i );
 	}
 }
+
+add_action( 'groundhogg/admin/contacts/register_table_columns', __NAMESPACE__ . '\register_contact_property_table_columns' );
+

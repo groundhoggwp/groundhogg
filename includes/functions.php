@@ -1991,18 +1991,25 @@ function get_items_from_csv( $file_path = '', $delimiter = false ) {
  *
  * @return mixed|string
  */
-function export_header_pretty_name( $key = '' ) {
+function export_header_pretty_name( $header = '', $type = 'basic' ) {
 	static $keys;
 
 	if ( empty( $keys ) ) {
 		$keys = get_exportable_fields();
 	}
 
-	if ( isset_not_empty( $keys, $key ) ) {
-		return $keys[ $key ];
+	$key = $header;
+
+	if ( $type === 'pretty' ){
+
+		if ( isset_not_empty( $keys, $header ) ) {
+			return $keys[ $header ];
+		}
+
+		$header = key_to_words( $header );
 	}
 
-	return key_to_words( $key );
+	return apply_filters( 'groundhogg/export_header_name', $header, $key, $type );
 }
 
 /**
@@ -2077,6 +2084,9 @@ function export_field( $contact, $field = '' ) {
 	$return = '';
 
 	switch ( $field ) {
+		case 'full_name':
+			$return = $contact->get_full_name();
+			break;
 		default:
 			$return = $contact->$field;
 			break;
@@ -5880,10 +5890,10 @@ function get_filters_from_old_query_vars( $query = [] ) {
 
 				} else {
 					$filters[] = [
-						'type'     => 'email_opened',
-						'email_id' => absint( $activity_query['email_id'] ),
-						'after'    => Ymd_His( absint( get_array_var( $activity_query, 'after' ) ) ),
-						'before'   => Ymd_His( absint( get_array_var( $activity_query, 'before' ) ) ),
+						'type'       => 'email_opened',
+						'email_id'   => absint( $activity_query['email_id'] ),
+						'after'      => Ymd_His( absint( get_array_var( $activity_query, 'after' ) ) ),
+						'before'     => Ymd_His( absint( get_array_var( $activity_query, 'before' ) ) ),
 						'date_range' => 'between',
 					];
 				}
