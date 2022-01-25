@@ -342,12 +342,33 @@ span.gh-text.lg {
   font-size: 18px;
 }
 
+.avatars img.avatar {
+  width: 20px;
+  border-radius: 50%;
+}
+.avatars img.avatar:not(:first-child) {
+  margin-left: -3px;
+}
+
 .gh-panel {
   background: #FFFFFF;
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
   /*margin: 20px;*/
   border-radius: 5px;
   border: none;
+}
+.gh-panel a {
+  text-decoration: none;
+}
+.gh-panel a:hover {
+  text-decoration: underline;
+}
+.gh-panel.outlined {
+  box-shadow: none;
+  border: 1px solid rgba(16, 38, 64, 0.15);
+}
+.gh-panel.outlined:not(:last-child) {
+  margin-bottom: 10px;
 }
 .gh-panel.top-left-square {
   border-top-left-radius: 0;
@@ -357,13 +378,13 @@ span.gh-text.lg {
   display: flex;
   justify-content: space-between;
 }
-.gh-panel .gh-panel-header h2.hndle {
+.gh-panel .gh-panel-header h2 {
   justify-content: left;
   font-size: 14px;
   padding: 8px 12px;
   margin: 0;
 }
-.gh-panel .gh-panel-header h2.hndle .dashicons {
+.gh-panel .gh-panel-header h2 .dashicons {
   font-size: 14px;
   height: 14px;
   width: 14px;
@@ -384,6 +405,7 @@ span.gh-text.lg {
 .gh-panel .inside {
   padding: 20px;
   margin-top: 0;
+  margin-bottom: 0;
 }
 
 .wp-core-ui select {
