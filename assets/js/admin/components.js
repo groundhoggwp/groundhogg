@@ -287,7 +287,9 @@
   const quickEditContactModal = ({
     contact,
     prefix = 'quick-edit',
-    onEdit = (contact) => {}
+    onEdit = (contact) => {},
+    additionalFields = () => '',
+    additionalFieldsOnMount = () => {}
   }) => {
 
     if (contact && contact.tags) {
@@ -406,6 +408,7 @@
 						  <div id="${prefix}-tags-here"></div>
 					  </div>
 				  </div>
+				  ${additionalFields({prefix, contact})}
 			  </div>
 			  <div class="align-right-space-between" style="margin-top: 20px">
 				  <button class="gh-button text danger ${prefix}-cancel">${__('Cancel', 'groundhogg')}</button>
@@ -510,6 +513,8 @@
           }
         })
       })
+
+      additionalFieldsOnMount({ prefix, contact, setPayload: updateContact, getPayload: () => payload })
     }
 
     const { close, setContent } = modal({
@@ -521,7 +526,9 @@
 
   const quickAddForm = (selector, {
     prefix = 'quick-add',
-    onCreate = () => {}
+    onCreate = () => {},
+    additionalFields = ({ prefix }) => '',
+    additionalFieldsOnMount = () => {}
   }) => {
 
     const quickAddForm = () => {
@@ -606,11 +613,15 @@
 						  value: u.ID
 					  })))}
 				  </div>
+				  <div class="gh-col"></div>
+			  </div>
+			  <div class="gh-row">
 				  <div class="gh-col">
 					  <label for="${prefix}-tags">${__('Tags', 'groundhogg')}</label>
 					  <div id="${prefix}-tags-here"></div>
 				  </div>
 			  </div>
+			  ${additionalFields({ prefix })}
 			  <div class="gh-row">
 				  <div class="gh-col">
 					  <div>
@@ -655,23 +666,27 @@
 
     $(selector).html(quickAddForm())
 
-    let payload = {
+    let _payload = {
       data: {
         owner_id: currentUser.ID
       },
       meta: {}
     }
 
+    const getPayload = () => {
+      return _payload
+    }
+
     const setPayload = (data) => {
-      payload = {
-        ...payload,
+      _payload = {
+        ..._payload,
         ...data
       }
     }
 
     $(`#${prefix}-create`).on('click', ({ target }) => {
 
-      if (!payload.data.email || !isValidEmail(payload.data.email)) {
+      if (!_payload.data.email || !isValidEmail(_payload.data.email)) {
         errorDialog({
           message: __('A valid email is required!', 'groundhogg')
         })
@@ -680,7 +695,7 @@
 
       $(target).prop('disabled', true)
       const { stop } = loadingDots(`#${prefix}-quick-add-button`)
-      ContactsStore.post(payload).then(c => {
+      ContactsStore.post(_payload).then(c => {
         stop()
         onCreate(c)
       })
@@ -694,7 +709,7 @@
     #${prefix}-email`).on('change input', ({ target }) => {
       setPayload({
         data: {
-          ...payload.data,
+          ..._payload.data,
           [target.name]: target.value
         }
       })
@@ -706,7 +721,7 @@
     #${prefix}-mobile-phone`).on('change input', ({ target }) => {
       setPayload({
         meta: {
-          ...payload.meta,
+          ..._payload.meta,
           [target.name]: target.value
         }
       })
@@ -718,7 +733,7 @@
     #${prefix}-marketing-consent`).on('change', ({ target }) => {
       setPayload({
         meta: {
-          ...payload.meta,
+          ..._payload.meta,
           [target.name]: target.checked
         }
       })
@@ -728,8 +743,145 @@
       selected: [],
       onChange: ({ addTags }) => {
         setPayload({
-          add_tags: addTags
+          tags: addTags
         })
+      }
+    })
+
+    additionalFieldsOnMount({ prefix, setPayload, getPayload })
+
+  }
+
+  const internalForm = ({
+    contact = false,
+    onSubmit = () => {}
+  }) => {
+
+    let selectedForm
+
+    const ui = () => {
+      //language=HTML
+      return `
+			<div class="gh-rows-and-columns">
+				<div class="gh-row">
+					<div class="gh-col">
+						<label for="select-form">${__('Select a form', 'groundhogg')}</label>
+						${select({
+        id: `select-form`,
+        name: 'select_form',
+      })}
+					</div>
+				</div>
+			</div>
+			<div style="margin-top: 20px">
+				${selectedForm ? selectedForm.rendered : ''}
+			</div>`
+    }
+
+    return modal({
+      width: 500,
+      content: ui(),
+      dialogClasses: 'internal-form-wrap',
+      onOpen: ({ setContent, close }) => {
+
+        const reMount = () => {
+          setContent(ui())
+          onMount()
+        }
+
+        const onMount = () => {
+          $(`#select-form`).ghPicker({
+            endpoint: FormsStore.route,
+            width: '100%',
+            placeholder: __('Type to search...', 'groundhogg'),
+            data: FormsStore.getItems().map(f => ({
+              id: f.ID,
+              text: f.name,
+              selected: selectedForm && f.ID == selectedForm.ID
+            })),
+            getParams: (q) => ({
+              ...q,
+              search: q.term,
+              active: true,
+              contact: contact.ID
+            }),
+            getResults: ({ items }) => {
+              FormsStore.itemsFetched(items)
+              return items.map(f => ({ id: f.ID, text: f.name }))
+            }
+          }).on('select2:select', (e) => {
+            selectedForm = FormsStore.get(e.params.data.id)
+            reMount()
+          })
+
+          if (selectedForm) {
+            $('.internal-form-wrap form.gh-form').on('submit', (e) => {
+
+              e.preventDefault()
+
+              var $form = $(e.currentTarget)
+
+              let $btn = $form.find('#gh-submit')
+              let origTxt = $btn.text()
+
+              $btn.prop('disabled', true)
+              $btn.text(__('Submitting', 'groundhogg'))
+              const { stop } = loadingDots('.quick-add-wrap form.gh-form #gh-submit')
+              var data = new FormData($form[0])
+
+              data.append('action', 'groundhogg_ajax_form_submit')
+
+              $.ajax({
+                method: 'POST',
+                // dataType: 'json',
+                url: ajaxurl,
+                data: data,
+                processData: false,
+                contentType: false,
+                cache: false,
+                timeout: 600000,
+                enctype: 'multipart/form-data',
+                success: (r) => {
+
+                  stop()
+                  $btn.prop('disabled', false)
+                  $btn.text(origTxt)
+
+                  if (!r.success) {
+
+                    dialog({
+                      message: r.data[0].message,
+                      type: 'error'
+                    })
+
+                  } else {
+                    dialog({
+                      message: __('Form submitted!'),
+                    })
+
+                    close()
+
+                    ContactsStore.itemsFetched([
+                      r.data.contact
+                    ])
+
+                    onSubmit(r.data.contact)
+                  }
+
+                },
+                error: (e) => {
+                  dialog({
+                    message: __('Something went wrong...', 'groundhogg'),
+                    type: 'error'
+                  })
+                }
+              })
+
+            })
+          }
+        }
+
+        onMount()
       }
     })
 
@@ -737,7 +889,9 @@
 
   const addContactModal = ({
     prefix = 'quick-add',
-    onCreate = () => {}
+    onCreate = () => {},
+    additionalFields = () => '',
+    additionalFieldsOnMount = () => {}
   }) => {
 
     let method = 'quick-add'
@@ -823,6 +977,8 @@
 
         quickAddForm(`#${prefix}-quick-add-form`, {
           prefix,
+          additionalFields,
+          additionalFieldsOnMount,
           onCreate: (c) => {
             close()
             onCreate(c)
@@ -839,6 +995,11 @@
             text: f.name,
             selected: selectedForm && f.ID == selectedForm.ID
           })),
+          getParams: (q) => ({
+            ...q,
+            search: q.term,
+            active: true,
+          }),
           getResults: ({ items }) => {
             FormsStore.itemsFetched(items)
             return items.map(f => ({ id: f.ID, text: f.name }))
@@ -1324,6 +1485,7 @@
 
   Groundhogg.components = {
     addContactModal,
+    internalForm,
     betterTagPicker,
     quickAddForm,
     selectContactModal,

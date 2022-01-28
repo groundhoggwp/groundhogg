@@ -21,7 +21,7 @@
     uuid,
     dangerConfirmationModal,
     confirmationModal,
-    adminPageUrl,
+    adminPageURL,
     moreMenu,
     loadingDots,
     spinner,
@@ -43,13 +43,19 @@
   } = Groundhogg.stores
 
   const { post, delete: _delete, get, patch, routes, ajax } = Groundhogg.api
-  const { selectContactModal, betterTagPicker } = Groundhogg.components
+  const {
+    selectContactModal, betterTagPicker, internalForm,
+  } = Groundhogg.components
 
   const { sprintf, __, _x, _n } = wp.i18n
 
   ContactsStore.itemsFetched([contact])
 
   let files = []
+
+  const activityUpdated = () => {
+    window.dispatchEvent(new Event('activityupdated'))
+  }
 
   const getContact = () => {
     return ContactsStore.get(contact.ID)
@@ -84,6 +90,7 @@
 				${getContact().meta.primary_phone ? `<a id="call-primary" class="gh-button secondary text icon" href="tel:${getContact().meta.primary_phone}">${icons.phone}</a>` : ''}
 				${getContact().meta.mobile_phone ? `<a id="call-mobile" class="gh-button secondary text icon" href="tel:${getContact().meta.mobile_phone}">${icons.smartphone}</a>` : ''}
 				<button id="add-to-funnel" class="gh-button secondary text icon">${icons.funnel}</button>
+				<button id="internal-form" class="gh-button secondary text icon">${icons.form}</button>
 				<button id="contact-more" class="gh-button secondary text icon">${icons.verticalDots}</button>`
 
     $('#contact-more-actions').html(actions)
@@ -97,11 +104,23 @@
     tooltip('#call-mobile', {
       content: __('Call Mobile', 'groundhogg')
     })
+    tooltip('#internal-form', {
+      content: __('Submit Internal Form', 'groundhogg')
+    })
     tooltip('#contact-more', {
       content: __('More Actions', 'groundhogg')
     })
     tooltip('#add-to-funnel', {
       content: __('Add to Funnel', 'groundhogg')
+    })
+
+    $('#internal-form').on('click', e => {
+      internalForm({
+        contact: getContact(),
+        onSubmit: () => {
+          activityUpdated()
+        }
+      })
     })
 
     $('#add-to-funnel').on('click', e => {
@@ -269,7 +288,7 @@
                   dialog({
                     message: sprintf(__('%s was deleted!', 'groundhogg'), contact.data.full_name)
                   })
-                  window.location.href = adminPageUrl('gh_contacts')
+                  window.open(adminPageURL('gh_contacts'), '_self')
                 })
               }
             })
@@ -327,10 +346,15 @@
       email_link_click: {
         icon: icons.link_click,
         render: ({ email, data }) => {
+
+          const maybeTruncateLink = (link) => {
+            return link.length > 50 ? `${link.substring(0, 47)}...` : link
+          }
+
           return sprintf(__('Clicked %s in %s', 'groundhogg'), el('a', {
             target: '_blank',
             href: data.referer,
-          }, bold(data.referer)), bold(email.data.title))
+          }, bold(maybeTruncateLink(data.referer))), bold(email.data.title))
         },
         preload: ({ email }) => {
           EmailsStore.itemsFetched([email])
@@ -625,7 +649,7 @@
           return `
 			  <div class="gh-panel top-left-square">
 				  <div class="inside">
-					  <div class="align-left-space-between">
+					  <div class="display-flex gap-10 align-bottom">
 						  <div class="order-by">
 							  <label for="activity-order"><b>${__('Order by')}</b></label><br/>
 							  ${select({
@@ -649,19 +673,8 @@
 								  ...isWPFusionActive ? { wp_fusion: __('WPFusion Activity', 'groundhogg') } : {},
 							  }, '')}
 						  </div>
-						  <div class="filter-by hidden">
-							  <label>${__('Date Range')}</label><br/>
-							  <div class="gh-input-group">
-								  ${input({
-									  type: 'date',
-									  className: 'small'
-								  })}
-								  ${input({
-									  type: 'date',
-									  className: 'small'
-								  })}
-							  </div>
-						  </div>
+						  <button id="refresh-timeline" class="gh-button secondary text icon"><span
+							  class="dashicons dashicons-update-alt"></span></button>
 					  </div>
 				  </div>
 			  </div>
@@ -674,6 +687,20 @@
           let order = 'desc'
           let filter = 'all'
 
+          $('#refresh-timeline').on('click', e => {
+
+            $(e.currentTarget).find('.dashicons').addClass('spinning')
+
+            fetchActivity().then(() => {
+              $(e.currentTarget).find('.dashicons').removeClass('spinning')
+            })
+          })
+
+          tooltip('#refresh-timeline', {
+            content: __('Refresh'),
+            position: 'right'
+          })
+
           $('#activity-order').on('change', (e) => {
             order = e.target.value
             fetchActivity()
@@ -685,7 +712,7 @@
           })
 
           const fetchActivity = () => {
-            Promise.all([
+            return Promise.all([
               SubmissionsStore.fetchItems({
                 contact_id: contact.ID,
                 limit: 50,
@@ -1327,6 +1354,11 @@
 
       } else if (activeTab === 'edit-meta') {
 
+        let combinedMeta = {
+          ...getContact().meta,
+          ...metaChanges
+        }
+
         // language=HTML
         let metaUi = `
 			<div class="tab-content-wrapper edit-meta gh-panel top-left-square active" data-tab-content="${activeTab}">
@@ -1348,11 +1380,6 @@
 
         $(metaUi).insertAfter('#primary-contact-stuff form')
         $('#cancel-meta-changes').on('click', cancelMetaChanges)
-
-        let combinedMeta = {
-          ...getContact().meta,
-          ...metaChanges
-        }
 
         let { alternate_emails = [], alternate_phones = [] } = getContact().meta
 

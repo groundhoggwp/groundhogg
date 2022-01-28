@@ -163,6 +163,10 @@ class Form implements \JsonSerializable {
 		return managed_page_url( sprintf( 'forms/%s/', urlencode( encrypt( $this->get_id() ) ) ) );
 	}
 
+	public function is_active() {
+		return $this->step->is_active();
+	}
+
 	protected function get_honey_pot_code() {
 		// Honey Pot validation.
 		$honeypot = html()->input( [

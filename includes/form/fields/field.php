@@ -84,7 +84,7 @@ abstract class Field {
 	 * @return bool
 	 */
 	public function should_auto_populate() {
-		return ( is_admin() && current_user_can( 'edit_contacts' ) && key_exists( 'contact', $_GET ) );
+		return current_user_can( 'edit_contacts' ) && key_exists( 'contact', $_GET );
 	}
 
 	/**
