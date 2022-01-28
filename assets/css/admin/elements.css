@@ -42,6 +42,43 @@ h3.no-margin-top {
   align-items: flex-start;
 }
 
+.display-flex {
+  display: flex;
+}
+.display-flex.flex-end {
+  justify-content: flex-end;
+}
+.display-flex.flex-start {
+  justify-content: flex-start;
+}
+.display-flex.center {
+  justify-content: center;
+}
+.display-flex.space-between {
+  justify-content: space-between;
+}
+.display-flex.stretch {
+  align-items: stretch;
+}
+.display-flex.gap-10 {
+  gap: 10px;
+}
+.display-flex.gap-20 {
+  gap: 10px;
+}
+.display-flex.align-center {
+  align-items: center;
+}
+.display-flex.align-top {
+  align-items: flex-start;
+}
+.display-flex.align-bottom {
+  align-items: flex-end;
+}
+.display-flex.column {
+  flex-direction: column;
+}
+
 .space-between {
   display: flex !important;
   justify-content: space-between;
@@ -52,6 +89,9 @@ h3.no-margin-top {
 }
 .space-between.align-left {
   justify-content: flex-start;
+}
+.space-between.align-center {
+  justify-content: center;
 }
 .space-between.gap-20 {
   gap: 20px;
@@ -107,7 +147,7 @@ h3.no-margin-top {
   max-width: 100%;
 }
 
-body.groundhogg_page_gh_contacts {
+body.groundhogg-admin-page {
   background-color: #F6F9FB;
 }
 
@@ -139,6 +179,25 @@ body.groundhogg_page_gh_contacts {
 }
 #search-results tr:hover {
   background-color: rgba(0, 117, 255, 0.02);
+}
+
+.groundhogg-admin-page h2.nav-tab-wrapper {
+  border-bottom: 1px solid rgba(16, 38, 64, 0.15);
+  padding-top: 0;
+}
+.groundhogg-admin-page h2.nav-tab-wrapper .nav-tab {
+  border-radius: 3px 3px 0 0;
+  border: 1px solid #D3DAE0;
+  border-bottom: none;
+  background-color: #D3DAE0;
+  margin-left: 0;
+  margin-right: 5px;
+}
+.groundhogg-admin-page h2.nav-tab-wrapper .nav-tab.nav-tab-active {
+  border: 1px solid rgba(16, 38, 64, 0.15);
+  background: #F6F9FB;
+  border-bottom: 1px solid #F6F9FB;
+  margin-bottom: -1px;
 }
 
 h2.nav-tab-wrapper.gh {
@@ -1485,6 +1544,29 @@ ul.gh-form-errors {
 
 .text-align.right {
   text-align: right;
+}
+
+.spinning {
+  -webkit-animation: spinning 4s linear infinite;
+  -moz-animation: spinning 4s linear infinite;
+  animation: spinning 4s linear infinite;
+}
+
+@-moz-keyframes spinning {
+  100% {
+    -moz-transform: rotate(360deg);
+  }
+}
+@-webkit-keyframes spinning {
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+@keyframes spinning {
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
 }
 
 /*# sourceMappingURL=elements.css.map */

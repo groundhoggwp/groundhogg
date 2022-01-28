@@ -23,6 +23,7 @@ $benchmark-orange-25: rgba(245, 129, 21, 0.25);
 $action-green: rgb(158, 206, 56);
 $action-green-50: rgba(158, 206, 56, 0.5);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+$background-color: #F6F9FB;
 
 h3 {
   &.no-margin-top {
@@ -74,6 +75,56 @@ h3 {
   }
 }
 
+.display-flex{
+
+  display: flex;
+
+  &.flex-end {
+    justify-content: flex-end;
+  }
+
+  &.flex-start {
+    justify-content: flex-start;
+  }
+
+  &.center {
+    justify-content: center;
+  }
+
+  &.space-between {
+    justify-content: space-between;
+  }
+
+  &.stretch {
+    align-items: stretch;
+  }
+
+  &.gap-10 {
+    gap: 10px;
+  }
+
+  &.gap-20 {
+    gap: 10px;
+  }
+
+  &.align-center{
+    align-items: center;
+  }
+
+  &.align-top{
+    align-items: flex-start;
+  }
+
+  &.align-bottom{
+    align-items: flex-end;
+  }
+
+  &.column {
+    flex-direction: column;
+  }
+
+}
+
 .space-between {
   display: flex !important;
   justify-content: space-between;
@@ -85,6 +136,10 @@ h3 {
 
   &.align-left {
     justify-content: flex-start;
+  }
+
+  &.align-center {
+    justify-content: center;
   }
 
   &.gap-20 {
@@ -158,7 +213,7 @@ h3 {
   }
 }
 
-body.groundhogg_page_gh_contacts {
+body.groundhogg-admin-page {
   background-color: #F6F9FB;
 }
 
@@ -196,6 +251,31 @@ body.groundhogg_page_gh_contacts {
 
     &:hover {
       background-color: $primary-blue-2;
+    }
+  }
+}
+
+.groundhogg-admin-page{
+  h2.nav-tab-wrapper{
+    border-bottom: 1px solid $primary-dark-15;
+    padding-top: 0;
+
+    .nav-tab {
+      border-radius: 3px 3px 0 0;
+      border: 1px solid #D3DAE0;
+      border-bottom: none;
+      //border: none;
+      background-color: #D3DAE0;
+
+      margin-left: 0;
+      margin-right: 5px;
+
+      &.nav-tab-active {
+        border: 1px solid $primary-dark-15;
+        background: $background-color;
+        border-bottom: 1px solid $background-color;
+        margin-bottom: -1px;
+      }
     }
   }
 }
@@ -1788,3 +1868,12 @@ ul.gh-form-errors {
     text-align: right;
   }
 }
+
+.spinning {
+  -webkit-animation:spinning 4s linear infinite;
+  -moz-animation:spinning 4s linear infinite;
+  animation:spinning 4s linear infinite;
+}
+@-moz-keyframes spinning { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spinning { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spinning { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }

@@ -22,6 +22,7 @@ use Groundhogg\Admin\User\Admin_User;
 use Groundhogg\Admin\Welcome\Welcome_Page;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_contactdata;
+use function Groundhogg\get_url_var;
 use function Groundhogg\has_premium_features;
 use function Groundhogg\is_admin_bar_widget_disabled;
 use function Groundhogg\is_option_enabled;
@@ -34,6 +35,7 @@ use function Groundhogg\white_labeled_name;
  * Admin Manager to manage databases in Groundhogg
  *
  * Class Manager
+ *
  * @package Groundhogg\Admin
  */
 class Admin_Menu {
@@ -49,6 +51,22 @@ class Admin_Menu {
 	public function __construct() {
 		add_action( 'init', [ $this, 'init_admin' ] );
 		add_action( 'admin_bar_menu', [ $this, 'admin_bar' ], 999 );
+		add_filter( 'admin_body_class', [ $this, 'admin_body_class' ] );
+	}
+
+	public function admin_body_class( $class ) {
+
+		$current_page = get_url_var( 'page' );
+
+		if ( ! $current_page ){
+			return $class;
+		}
+
+		if ( preg_match( '/^gh_/', $current_page ) || $current_page === 'groundhogg' ){
+			$class .= ' groundhogg-admin-page';
+		}
+
+		return $class;
 	}
 
 	/**
@@ -56,7 +74,7 @@ class Admin_Menu {
 	 */
 	public function admin_bar( $admin_bar ) {
 
-		if ( is_admin_bar_widget_disabled() ){
+		if ( is_admin_bar_widget_disabled() ) {
 			return;
 		}
 
@@ -78,15 +96,17 @@ class Admin_Menu {
 			]
 		] );
 
-		if ( get_contactdata() ){
+		if ( get_contactdata() ) {
 			$admin_bar->add_node(
 				array(
 					'parent' => 'user-actions',
 					'id'     => 'contact-info',
 					'title'  => __( 'Contact Record' ),
-					'href'   => admin_page_url( 'gh_contacts', [ 'action' => 'edit', 'contact' => get_contactdata()->ID ] ),
+					'href'   => admin_page_url( 'gh_contacts', [ 'action'  => 'edit',
+					                                             'contact' => get_contactdata()->ID
+					] ),
 					'meta'   => array(
-						'tabindex' => -1,
+						'tabindex' => - 1,
 					),
 				)
 			);
@@ -163,7 +183,7 @@ class Admin_Menu {
 	/**
 	 * Set the data to the given value
 	 *
-	 * @param $key string
+	 * @param $key   string
 	 * @param $value Admin_Page
 	 */
 	public function __set( $key, $value ) {
