@@ -142,12 +142,18 @@ class Contacts_Page extends Admin_Page {
 			case 'bulk_edit':
 				break;
 			case 'edit':
-			case 'add':
-			case 'form':
 				wp_enqueue_editor();
 				wp_enqueue_media();
 
 				$contact = get_contactdata( get_url_var( 'contact' ) );
+
+				if ( ! $contact ){
+					$this->add_notice( new \WP_Error( 'error', sprintf( __('Contact with ID %d does not exist'), get_url_var( 'contact' ) ) ) );
+					?>
+					<script>window.open( '<?php echo admin_page_url( 'gh_contacts' ); ?>', '_self')</script>
+					<?php
+					die();
+				}
 
 				wp_enqueue_style( 'groundhogg-admin-contact-editor' );
 				wp_enqueue_style( 'groundhogg-admin-contact-info-cards' );
@@ -411,16 +417,19 @@ class Contacts_Page extends Admin_Page {
 			'country',
 			'notes',
 			'files',
-			'company_name',
-			'company_address',
-			'company_phone',
-			'company_phone_extension',
-			'job_title',
 			'ip_address',
 			'last_optin',
 			'last_sent',
 			'country_name',
 			'region_code',
+
+//			Moved to companies addon
+//			'company_name',
+//			'company_address',
+//			'company_department',
+//			'company_phone',
+//			'company_phone_extension',
+//			'job_title',
 		] );
 	}
 
@@ -547,11 +556,6 @@ class Contacts_Page extends Admin_Page {
 			'mobile_phone',
 			'primary_phone',
 			'primary_phone_extension',
-			'company_phone',
-			'company_phone_extension',
-			'company_name',
-			'job_title',
-			'company_address',
 			'street_address_1',
 			'street_address_2',
 			'city',
@@ -562,6 +566,13 @@ class Contacts_Page extends Admin_Page {
 			'source_page',
 			'ip_address',
 			'time_zone',
+
+			// Moved to companies addon
+//			'company_phone',
+//			'company_phone_extension',
+//			'company_name',
+//			'job_title',
+//			'company_address',
 		];
 
 		$basic_text_fields = apply_filters( 'groundhogg/contact/update/basic_fields', $basic_text_fields, $contact );
