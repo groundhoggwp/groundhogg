@@ -2,6 +2,9 @@
 
 namespace Groundhogg\Api\V4;
 
+use function Groundhogg\array_map_keys;
+use function Groundhogg\array_map_with_keys;
+
 class Options_Api extends Base_Api{
 
 	public function register_routes() {
@@ -66,7 +69,13 @@ class Options_Api extends Base_Api{
 			update_option( sanitize_key( $option ), call_user_func( $sanitize_func, $value ) );
 		}
 
-		return self::SUCCESS_RESPONSE();
+		$options = array_map_with_keys( $options, function ( $v, $opt ){
+			return get_option( $opt );
+		} );
+
+		return self::SUCCESS_RESPONSE([
+			'items' => $options
+		]);
 	}
 
 	/**
@@ -100,10 +109,11 @@ class Options_Api extends Base_Api{
 	 */
 	public function read( \WP_REST_Request $request ){
 
-		$options = $request->get_params();
+		$options = array_keys( $request->get_params() );
+		$options = array_combine( $options, $options );
 
 		return self::SUCCESS_RESPONSE([
-			'options' => array_map( function ( $option ) { return get_option( $option ); }, $options )
+			'items' => array_map_with_keys( $options,  function ( $v, $opt ) { return get_option( $opt ); } )
 		]);
 	}
 }
