@@ -165,6 +165,10 @@ abstract class Extension {
 		return true;
 	}
 
+	public static function installed( $id ) {
+		return in_array( $id, self::$extension_ids );
+	}
+
 	public function dependencies_missing_notice() {
 		$message      = sprintf( esc_html__( '%s is missing required plugins to be active: %s', 'groundhogg' ), $this->get_display_name(), implode( ', ', $this->get_dependent_plugins() ) );
 		$html_message = sprintf( '<div class="notice notice-error">%s</div>', wpautop( $message ) );
