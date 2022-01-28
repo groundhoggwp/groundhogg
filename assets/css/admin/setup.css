@@ -1,111 +1,75 @@
-.setup-footer-nav{
-    text-align: center;
+#wpcontent {
+  padding: 0;
 }
 
-.setup-footer-nav a {
-    font-size: 14px;
-    text-decoration: none;
+#wpfooter {
+  display: none;
 }
 
-.step-nav{
-    text-align: center;
+#more-details-content {
+  padding: 20px;
+}
+#more-details-content figure {
+  margin-left: 0;
+  margin-right: 0;
+}
+#more-details-content img {
+  max-width: 100%;
+}
+#more-details-content h2 {
+  margin-top: 1em;
+}
+#more-details-content ul {
+  list-style: disc;
+  padding-left: 20px;
 }
 
-.setup-wrap .inside{
-    padding: 10px 30px 20px 30px;
+.thumbnail {
+  max-width: 100%;
 }
 
-.postbox .description p{
-    font-size: 16px;
-    margin-bottom: 25px;
+#guided-setup {
+  width: 600px;
+  margin: auto;
+  padding: 60px 0;
+}
+#guided-setup h1 {
+  margin-top: 0;
+}
+#guided-setup p, #guided-setup label, #guided-setup ul {
+  font-size: 16px;
+}
+#guided-setup ul {
+  list-style: disc;
+  padding-left: 20px;
+}
+#guided-setup .step .logo {
+  width: 400px;
+  margin: auto;
+  margin-bottom: 40px;
+}
+#guided-setup .step > .gh-panel > .inside {
+  padding: 40px;
+}
+#guided-setup .step input.input {
+  font-size: 16px;
+  padding: 4px 12px;
+}
+#guided-setup #services .download.gh-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+#guided-setup #services .download.gh-panel img {
+  width: 180px;
+  border-radius: 4px;
+}
+#guided-setup #services .download.gh-panel .plugin-actions {
+  border-top: 1px solid rgba(16, 38, 64, 0.1);
+  padding: 20px;
+}
+#guided-setup #services .download.gh-panel h2 {
+  margin-top: 0;
 }
 
-.postbox h3 {
-    font-size: 24px;
-}
-
-#wpbody .step-nav .big-button {
-    font-size: 18px;
-    font-weight: 600;
-    position: relative;
-    height: auto;
-    padding-left: 42px;
-}
-
-#pricing-button,
-#enabled-tracking-button{
-    padding-left: 42px !important;
-}
-
-.big-button .dashicons{
-    position: absolute;
-    font-size: 24px;
-    top: 13px;
-    left: 10px;
-    width: auto;
-    height: auto;
-}
-
-@-moz-keyframes spin {
-    from { -moz-transform: rotate(0deg); }
-    to { -moz-transform: rotate(360deg); }
-}
-@-webkit-keyframes spin {
-    from { -webkit-transform: rotate(0deg); }
-    to { -webkit-transform: rotate(360deg); }
-}
-@keyframes spin {
-    from {transform:rotate(0deg);}
-    to {transform:rotate(360deg);}
-}
-
-.big-button.spin .dashicons{
-    animation: spin;
-    animation-duration: 2s;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear;
-}
-
-/* EMAIL STEP */
-
-.email_info img.thumbnail {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    width: 175px;
-    border-radius: 5px;
-}
-
-.email_info .inside .postbox h3.extension-title,
-.email_info .inside .postbox p.extension-description{
-    margin-left: 225px;
-    margin-right: 20px;
-}
-
-.email_info .inside .postbox{
-    position: relative;
-}
-
-.postbox .card-top{
-    min-height: 135px;
-}
-
-.postbox .install-actions{
-    clear: both;
-    padding: 12px 20px;
-    background-color: #fafafa;
-    border-top: 1px solid #ddd;
-    overflow: hidden;
-}
-
-.quiet-install{
-    display: inline-block;
-}
-
-.more-details{
-    float: right;
-}
-
-.email_info hr{
-    display: none;
-}
+/*# sourceMappingURL=setup.css.map */
