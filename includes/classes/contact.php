@@ -972,24 +972,6 @@ class Contact extends Base_Object_With_Meta {
 		return $this->get_meta( 'job_title' );
 	}
 
-//	protected function sanitize_columns( $data = [] ) {
-//
-//		map_func_to_attr( $data, 'first_name', 'sanitize_text_field' );
-//		map_func_to_attr( $data, 'last_name', 'sanitize_text_field' );
-//		map_func_to_attr( $data, 'email', 'sanitize_email' );
-//		map_func_to_attr( $data, 'optin_status', 'sanitize_text_field' );
-//		map_func_to_attr( $data, 'owner_id', 'absint' );
-//		map_func_to_attr( $data, 'user_id', 'absint' );
-//		map_func_to_attr( $data, 'date_created', function ( $date ) {
-//			return convert_to_mysql_date( $date );
-//		} );
-//		map_func_to_attr( $data, 'date_optin_status_changed', function ( $date ) {
-//			return convert_to_mysql_date( $date );
-//		} );
-//
-//		return $data;
-//	}
-
 	/**
 	 * Merge $other into $this
 	 * - Fills out missing info in $this from $other
