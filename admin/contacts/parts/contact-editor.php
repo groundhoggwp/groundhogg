@@ -159,24 +159,28 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 								<div class="gh-row">
 									<div class="gh-col">
 										<label
-											for="primary_phone"><?php _e( 'Primary Phone', 'groundhogg' ) ?></label>
-										<?php echo html()->input( [
-											'type'  => 'tel',
-											'class' => 'input',
-											'id'    => 'primary_phone',
-											'name'  => 'primary_phone',
-											'value' => $contact->get_meta( 'primary_phone' ),
-										] ); ?>
-									</div>
-									<div class="smaller">
-										<label
-											for="primary_phone_extension"><?php _e( 'Ext.', 'groundhogg' ) ?></label>
-										<?php echo html()->input( [
-											'id'    => 'primary_phone_extension',
-											'name'  => 'primary_phone_extension',
-											'class' => 'phone-ext',
-											'value' => $contact->get_meta( 'primary_phone_extension' ),
-										] ); ?>
+											for="primary_phone"><?php _e( 'Primary Phone & Ext.', 'groundhogg' ) ?></label>
+										<div class="gh-input-group">
+											<?php echo html()->input( [
+												'type'  => 'tel',
+												'class' => 'input',
+												'id'    => 'primary_phone',
+												'name'  => 'primary_phone',
+												'value' => $contact->get_meta( 'primary_phone' ),
+												'placeholder' => __( '+1 (555) 555-5555', 'groundhogg' )
+
+											] ); ?>
+											<?php echo html()->input( [
+												'id'    => 'primary_phone_extension',
+												'name'  => 'primary_phone_extension',
+												'class' => 'phone-ext',
+												'value' => $contact->get_meta( 'primary_phone_extension' ),
+												'style'       => [
+													'width' => '60px'
+												],
+												'placeholder' => __( '1234', 'groundhogg' )
+											] ); ?>
+										</div>
 									</div>
 								</div>
 							</div>
