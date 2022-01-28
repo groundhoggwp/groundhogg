@@ -177,7 +177,8 @@ function groundhogg_tools_sysinfo_get() {
 	$return = apply_filters( 'groundhogg_sysinfo_after_webserver_config', $return );
 
 	$return .= "\n" . '-- MySQL Configuration' . "\n\n";
-	$return .= 'MySQL Version:            ' . $wpdb->db_version() . "\n";
+	$return .= 'MySQL Version:        ' . $wpdb->db_version() . "\n";
+	$return .= 'Engines:              ' . implode( ',', wp_list_pluck( $wpdb->get_results( 'SHOW ENGINES;' ), 'Engine' ) ) . "\n";
 	$return .= 'Collation:            ' . $wpdb->collate . "\n";
 	$return .= 'Charset:              ' . $wpdb->charset . "\n";
 
