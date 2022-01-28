@@ -128,7 +128,7 @@
    */
   async function adminAjax (data = {}, opts = {}) {
 
-    if (! ( data instanceof FormData )) {
+    if (!(data instanceof FormData)) {
       const fData = new FormData()
 
       for (const key in data) {
@@ -428,6 +428,89 @@
   Groundhogg.api.ajax = adminAjax
 
   Groundhogg.stores = {
+
+    options: {
+
+      items: {},
+      route: Groundhogg.api.routes.v4.options,
+
+      get (opt, _default = false) {
+
+        if ( Array.isArray( opt ) ){
+
+          let opts = {}
+
+          opt.forEach( _opt => opts[_opt] = this.items[_opt] )
+
+          return opts
+
+        }
+
+        return this.items[opt] ? this.items[opt] : _default
+      },
+
+      fetch (data = [], opts = {}) {
+
+        let req = {}
+
+        data.forEach( opt => req[opt] = 1)
+
+        return apiGet(this.route, req, opts)
+          .then(r => {
+
+            this.items = {
+              ...this.items,
+              ...r.items
+            }
+
+            return r.items
+
+          })
+      },
+
+      post (data = {}, opts = {}) {
+
+        return apiPatch(this.route, data, opts)
+          .then(r => {
+
+            this.items = {
+              ...this.items,
+              ...r.items
+            }
+
+            return r.items
+
+          })
+      },
+
+      patch (data = {}, opts = {}) {
+
+        return apiPatch(this.route, data, opts)
+          .then(r => {
+
+            this.items = {
+              ...this.items,
+              ...r.items
+            }
+
+            return r.items
+
+          })
+      },
+
+      delete (data = {}, opts = {}) {
+
+        return apiDelete(this.route, data, opts)
+          .then(r => {
+
+            data.forEach(opt => {
+              delete this.items[opt]
+            })
+
+          })
+      },
+
+    },
 
     tags: ObjectStore(Groundhogg.api.routes.v4.tags, {
 
