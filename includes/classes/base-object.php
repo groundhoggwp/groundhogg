@@ -151,7 +151,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 			/**
 			 * Fires after the object deleted...
 			 *
-			 * @param int         $object_id the ID of the object
+			 * @param int $object_id the ID of the object
 			 */
 			do_action( "groundhogg/{$this->get_object_type()}/post_delete", $id );
 
@@ -437,11 +437,11 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 *
 	 * @param $other Base_Object
 	 */
-	public function merge( $other ){
+	public function merge( $other ) {
 
 		// Dont merge with itself
 		// Dont merge with objects of a different type
-		if ( $other->get_id() === $this->get_id() || $other->get_object_type() !== $this->get_object_type() ){
+		if ( $other->get_id() === $this->get_id() || $other->get_object_type() !== $this->get_object_type() ) {
 			return false;
 		}
 
@@ -458,7 +458,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
 		/**
 		 * When an object is merged
-		 * 
+		 *
 		 * @param Base_Object $original
 		 * @param Base_Object $other
 		 */
@@ -636,57 +636,70 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 * Get any objects related to this object
 	 *
 	 * @param false $secondary_type
+	 * @param bool  $is_primary
+	 *
+	 * @return array|DB_Object[]|DB_Object_With_Meta[]
 	 */
-	public function get_related_objects( $secondary_type = false ) {
+	public function get_related_objects( $secondary_type = false, $is_primary = true ) {
 
 		$relationships = $this->get_rel_db()->query( array_filter( [
-			'primary_object_id'     => $this->get_id(),
-			'primary_object_type'   => $this->get_object_type(),
-			'secondary_object_type' => $secondary_type
+			$is_primary ? 'primary_object_id' : 'secondary_object_id'     => $this->get_id(),
+			$is_primary ? 'primary_object_type' : 'secondary_object_type' => $this->get_object_type(),
+			$is_primary ? 'secondary_object_type' : 'primary_object_type' => $secondary_type
 		] ) );
 
-		return array_map( function ( $rel ) {
-			return create_object_from_type( $rel->secondary_object_id, $rel->secondary_object_type );
+		return array_map( function ( $rel ) use ( $is_primary ) {
+
+			if ( $is_primary ){
+				return create_object_from_type( $rel->secondary_object_id, $rel->secondary_object_type );
+			} else {
+				return create_object_from_type( $rel->primary_object_id, $rel->primary_object_type );
+			}
+
 		}, $relationships );
 	}
 
 	/**
 	 * Create a relationship between this object and another object
 	 *
-	 * @param $other Base_Object
+	 * @param      $other Base_Object
+	 * @param bool $is_primary
+	 *
+	 * @return false|int
 	 */
-	public function create_relationship( $other ) {
+	public function create_relationship( $other, $is_primary = true ) {
 
-		if ( ! is_object( $other ) || ! method_exists( $other, 'get_id' ) ){
+		if ( ! is_object( $other ) || ! method_exists( $other, 'get_id' ) ) {
 			return false;
 		}
 
 		return $this->get_rel_db()->add( [
-			'primary_object_id'     => $this->get_id(),
-			'primary_object_type'   => $this->get_object_type(),
-			'secondary_object_id'   => $other->get_id(),
-			'secondary_object_type' => $other->get_object_type(),
+			$is_primary ? 'primary_object_id' : 'secondary_object_id'     => $this->get_id(),
+			$is_primary ? 'primary_object_type' : 'secondary_object_type' => $this->get_object_type(),
+			$is_primary ? 'secondary_object_id' : 'primary_object_id'     => $other->get_id(),
+			$is_primary ? 'secondary_object_type' : 'primary_object_type' => $other->get_object_type(),
 		] );
 	}
 
 	/**
 	 * Delete a relationship between this object and another object
 	 *
-	 * @param $other Base_Object
+	 * @param      $other Base_Object
+	 * @param bool $is_primary
 	 *
 	 * @return false|int
 	 */
-	public function delete_relationship( $other ) {
+	public function delete_relationship( $other, $is_primary = true ) {
 
-		if ( ! is_object( $other ) || ! method_exists( $other, 'get_id' ) ){
+		if ( ! is_object( $other ) || ! method_exists( $other, 'get_id' ) ) {
 			return false;
 		}
 
 		return $this->get_rel_db()->delete( [
-			'primary_object_id'     => $this->get_id(),
-			'primary_object_type'   => $this->get_object_type(),
-			'secondary_object_id'   => $other->get_id(),
-			'secondary_object_type' => $other->get_object_type(),
+			$is_primary ? 'primary_object_id' : 'secondary_object_id'     => $this->get_id(),
+			$is_primary ? 'primary_object_type' : 'secondary_object_type' => $this->get_object_type(),
+			$is_primary ? 'secondary_object_id' : 'primary_object_id'     => $other->get_id(),
+			$is_primary ? 'secondary_object_type' : 'primary_object_type' => $other->get_object_type(),
 		] );
 	}
 
