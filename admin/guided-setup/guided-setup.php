@@ -16,11 +16,15 @@ use Groundhogg\Admin\Guided_Setup\Steps\Start;
 use Groundhogg\Admin\Guided_Setup\Steps\Step;
 use Groundhogg\Admin\Guided_Setup\Steps\Sync_Users;
 use Groundhogg\Admin\Guided_Setup\Steps\Tracking;
+use Groundhogg\Extension;
+use Groundhogg\License_Manager;
 use function Groundhogg\dashicon;
 use function Groundhogg\floating_phil;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use Groundhogg\Plugin;
+use function Groundhogg\remote_post_json;
 use function Groundhogg\show_groundhogg_branding;
 
 /**
@@ -42,14 +46,64 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Guided_Setup extends Admin_Page {
 
-	protected $steps = [];
-
 	/**
 	 * Add Ajax actions...
 	 *
 	 * @return void
 	 */
 	protected function add_ajax_actions() {
+		add_action( 'wp_ajax_gh_guided_setup_subscribe', [ $this, 'subscribe_to_newsletter' ] );
+		add_action( 'wp_ajax_gh_guided_setup_telemetry', [ $this, 'optin_to_telemetry' ] );
+		add_action( 'wp_ajax_gh_guided_setup_license', [ $this, 'check_license' ] );
+	}
+
+	/**
+	 * Checks the provided license to see if it's valid
+	 */
+	public function check_license() {
+
+		$response = remote_post_json( 'https://www.groundhogg.io/wp-json/edd/all-access/', [
+			'license_key' => get_post_var( 'license' )
+		] );
+
+		if ( is_wp_error( $response ) ) {
+			wp_send_json_error( $response );
+		}
+
+		wp_send_json_success();
+	}
+
+	/**
+	 * Optin the contact to telemetry
+	 */
+	public function optin_to_telemetry() {
+		// Add to telemetry
+		$response = Plugin::$instance->stats_collection->optin( get_post_var( 'marketing', false ) );
+
+		if ( is_wp_error( $response ) ) {
+			wp_send_json_error( $response );
+		}
+
+		wp_send_json_success();
+	}
+
+	/**
+	 * Subscribe the contact to the newsletter
+	 */
+	public function subscribe_to_newsletter() {
+
+		$email = get_post_var( 'email' );
+		$name  = wp_get_current_user()->display_name;
+
+		// Add to list
+		$response = remote_post_json( 'https://www.groundhogg.io/wp-json/gh/v3/webhook-listener?auth_token=NCM39k3&step_id=1641', [
+			'email' => $email,
+			'name'  => $name
+		] );
+
+		wp_send_json_success( [
+			'response' => $response
+		] );
 	}
 
 	public function screen_options() {
@@ -61,20 +115,6 @@ class Guided_Setup extends Admin_Page {
 	 * @return void
 	 */
 	protected function add_additional_actions() {
-		$this->init_steps();
-	}
-
-	public function init_steps() {
-		$steps   = [];
-		$steps[] = new Start();
-		$steps[] = new Business_Info();
-		$steps[] = new Compliance();
-		$steps[] = new Email();
-		$steps[] = new Tracking();
-		$steps[] = new Premium();
-		$steps[] = new Finished();
-
-		$this->steps = $steps;
 	}
 
 	/**
@@ -155,31 +195,57 @@ class Guided_Setup extends Admin_Page {
 	 */
 	public function page() {
 		?>
-        <div class="wrap">
-		<?php if ( show_groundhogg_branding() ):
-			floating_phil();
-		endif; ?>
-        <form action="" method="post" id="poststuff">
-			<?php wp_nonce_field(); ?>
-            <div style="max-width: 600px;margin: auto;">
-				<?php $this->get_current_step()->view(); ?>
-            </div>
-			<?php
-			?></form>
-        </div><?php
+		<div id="guided-setup">
+
+		</div><?php
 	}
 
 	/**
 	 * Enqueue any scripts
 	 */
 	public function scripts() {
+
+		$integrations_installed = [
+			210    => function_exists( 'WC' ),
+			52477  => defined( 'BP_VERSION' ),
+			28364  => defined( 'AFFILIATEWP_VERSION' ),
+			251    => defined( 'WPCF7_VERSION' ),
+			216    => defined( 'EDD_VERSION' ),
+			22198  => defined( 'ELEMENTOR_VERSION' ),
+			1350   => function_exists( 'load_formidable_forms' ),
+			1342   => defined( 'FORMINATOR_VERSION' ),
+			98242  => defined( 'GIVE_VERSION' ),
+			219    => class_exists( 'GFCommon' ),
+			15028  => defined( 'LEARNDASH_VERSION' ),
+			15036  => defined( 'LLMS_PLUGIN_FILE' ),
+			101745 => defined( 'MEPR_VERSION' ),
+			1358   => defined( 'NF_PLUGIN_DIR' ),
+			16538  => defined( 'TUTOR_VERSION' ),
+			23534  => defined( 'FLUENTFORM' ),
+			777    => defined( 'SIMPLE_PAY_VERSION' ),
+			1595   => defined( 'WPFORMS_VERSION' ),
+		];
+
+		$integrations = License_Manager::get_store_products( [ 'category' => 'integrations' ] )->products;
+		$integrations = array_values( array_filter( $integrations, function ( $integration ) use ( $integrations_installed ) {
+			return get_array_var( $integrations_installed, $integration->info->id ) && ! Extension::installed( $integration->info->id );
+		} ) );
+
+		$smtp_services = License_Manager::get_store_products( [ 'tag' => 'sending-service' ] )->products;
+
 		wp_enqueue_style( 'groundhogg-admin' );
 		wp_enqueue_style( 'groundhogg-admin' );
 		wp_enqueue_style( 'groundhogg-admin-guided-setup' );
 		wp_enqueue_script( 'groundhogg-admin-guided-setup' );
-		wp_localize_script( 'groundhogg-admin-guided-setup', 'GroundhoggSetupObject', [
-			'saving_text' => dashicon( 'admin-generic' ) . __( 'Working...', 'groundhogg' ),
-		] );
+
+		$setup = [
+			'smtpProducts'           => $smtp_services,
+			'integrations'           => $integrations,
+			'mailhawkInstalled'      => defined( 'MAILHAWK_VERSION' ),
+			'install_mailhawk_nonce' => wp_create_nonce( 'install_mailhawk' ),
+		];
+
+		wp_add_inline_script( 'groundhogg-admin-guided-setup', 'var GroundhoggGuidedSetup = ' . wp_json_encode( $setup ) );
 	}
 
 	/**
