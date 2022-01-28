@@ -99,9 +99,15 @@ class Forms_Api extends Base_Api {
 			return new Form( [ 'id' => $form->ID ] );
 		}, $items );
 
+		if ( $request->get_param('active') ){
+			$items = array_filter( $items, function ( $form ){
+				return $form->is_active();
+			} );
+		}
+
 		return self::SUCCESS_RESPONSE( [
 			'total_items' => $total,
-			'items'       => $items
+			'items'       => array_values( $items )
 		] );
 	}
 
