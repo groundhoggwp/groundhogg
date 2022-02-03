@@ -742,6 +742,8 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 			endforeach;
 
+			do_action( 'groundhogg/admin/tools/export' );
+
 			?>
 
 			<?php if ( ! empty( $meta_keys ) ): ?>
