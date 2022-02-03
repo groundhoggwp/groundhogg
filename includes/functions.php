@@ -800,6 +800,10 @@ function search_and_replace_domain( $string ) {
 function array_to_atts( $atts ) {
 	$tag = '';
 
+	if ( ! is_array( $atts ) ) {
+		return '';
+	}
+
 	foreach ( $atts as $key => $value ) {
 
 		if ( empty( $value ) ) {
@@ -2000,7 +2004,7 @@ function export_header_pretty_name( $header = '', $type = 'basic' ) {
 
 	$key = $header;
 
-	if ( $type === 'pretty' ){
+	if ( $type === 'pretty' ) {
 
 		if ( isset_not_empty( $keys, $header ) ) {
 			return $keys[ $header ];
@@ -2036,33 +2040,35 @@ function get_exportable_fields( $extra = [] ) {
 		'mobile_phone'              => __( 'Mobile Phone Number', 'groundhogg' ),
 		'primary_phone'             => __( 'Primary Phone Number', 'groundhogg' ),
 		'primary_phone_extension'   => __( 'Primary Phone Number Extension', 'groundhogg' ),
-		'company_phone'             => __( 'Company Phone Number', 'groundhogg' ),
-		'company_phone_extension'   => __( 'Company Phone Number Extension', 'groundhogg' ),
 		'street_address_1'          => __( 'Street Address 1', 'groundhogg' ),
 		'street_address_2'          => __( 'Street Address 2', 'groundhogg' ),
 		'city'                      => __( 'City', 'groundhogg' ),
 		'postal_zip'                => __( 'Postal/Zip', 'groundhogg' ),
 		'region'                    => __( 'Province/State/Region', 'groundhogg' ),
 		'country'                   => __( 'Country', 'groundhogg' ),
-		'company_name'              => __( 'Company Name', 'groundhogg' ),
-		'company_address'           => __( 'Full Company Address', 'groundhogg' ),
-		'job_title'                 => __( 'Job Title', 'groundhogg' ),
-		'time_zone'                 => __( 'Time Zone', 'groundhogg' ),
-		'ip_address'                => __( 'IP Address', 'groundhogg' ),
-		'lead_source'               => __( 'Lead Source', 'groundhogg' ),
-		'source_page'               => __( 'Source Page', 'groundhogg' ),
-		'terms_agreement'           => __( 'Terms Agreement', 'groundhogg' ),
-		'gdpr_consent'              => __( 'Data Processing Consent', 'groundhogg' ),
-		'gdpr_consent_date'         => __( 'Data Processing Consent Data', 'groundhogg' ),
-		'marketing_consent'         => __( 'Marketing Consent', 'groundhogg' ),
-		'marketing_consent_date'    => __( 'Marketing Consent Date', 'groundhogg' ),
-		'notes'                     => __( 'Notes', 'groundhogg' ),
-		'tags'                      => __( 'Tags', 'groundhogg' ),
-		'utm_campaign'              => __( 'UTM Campaign', 'groundhogg' ),
-		'utm_content'               => __( 'UTM Content', 'groundhogg' ),
-		'utm_medium'                => __( 'UTM Medium', 'groundhogg' ),
-		'utm_term'                  => __( 'UTM Term', 'groundhogg' ),
-		'utm_source'                => __( 'UTM Source', 'groundhogg' ),
+
+//		'company_name'              => __( 'Company Name', 'groundhogg' ),
+//		'company_address'           => __( 'Full Company Address', 'groundhogg' ),
+//		'company_phone'             => __( 'Company Phone Number', 'groundhogg' ),
+//		'company_phone_extension'   => __( 'Company Phone Number Extension', 'groundhogg' ),
+//		'job_title'                 => __( 'Job Title', 'groundhogg' ),
+
+		'time_zone'              => __( 'Time Zone', 'groundhogg' ),
+		'ip_address'             => __( 'IP Address', 'groundhogg' ),
+		'lead_source'            => __( 'Lead Source', 'groundhogg' ),
+		'source_page'            => __( 'Source Page', 'groundhogg' ),
+		'terms_agreement'        => __( 'Terms Agreement', 'groundhogg' ),
+		'gdpr_consent'           => __( 'Data Processing Consent', 'groundhogg' ),
+		'gdpr_consent_date'      => __( 'Data Processing Consent Data', 'groundhogg' ),
+		'marketing_consent'      => __( 'Marketing Consent', 'groundhogg' ),
+		'marketing_consent_date' => __( 'Marketing Consent Date', 'groundhogg' ),
+		'notes'                  => __( 'Notes', 'groundhogg' ),
+		'tags'                   => __( 'Tags', 'groundhogg' ),
+		'utm_campaign'           => __( 'UTM Campaign', 'groundhogg' ),
+		'utm_content'            => __( 'UTM Content', 'groundhogg' ),
+		'utm_medium'             => __( 'UTM Medium', 'groundhogg' ),
+		'utm_term'               => __( 'UTM Term', 'groundhogg' ),
+		'utm_source'             => __( 'UTM Source', 'groundhogg' ),
 	];
 
 	$fields = array_merge( $defaults, $extra );
@@ -2139,33 +2145,35 @@ function get_mappable_fields( $extra = [] ) {
 		'mobile_phone'              => __( 'Mobile Phone Number', 'groundhogg' ),
 		'primary_phone'             => __( 'Primary Phone Number', 'groundhogg' ),
 		'primary_phone_extension'   => __( 'Primary Phone Number Extension', 'groundhogg' ),
-		'company_phone'             => __( 'Company Phone Number', 'groundhogg' ),
-		'company_phone_extension'   => __( 'Company Phone Number Extension', 'groundhogg' ),
 		'street_address_1'          => __( 'Street Address 1', 'groundhogg' ),
 		'street_address_2'          => __( 'Street Address 2', 'groundhogg' ),
 		'city'                      => __( 'City', 'groundhogg' ),
 		'postal_zip'                => __( 'Postal/Zip', 'groundhogg' ),
 		'region'                    => __( 'Province/State/Region', 'groundhogg' ),
 		'country'                   => __( 'Country', 'groundhogg' ),
-		'company_name'              => __( 'Company Name', 'groundhogg' ),
-		'company_address'           => __( 'Full Company Address', 'groundhogg' ),
-		'job_title'                 => __( 'Job Title', 'groundhogg' ),
-		'time_zone'                 => __( 'Time Zone', 'groundhogg' ),
-		'ip_address'                => __( 'IP Address', 'groundhogg' ),
-		'lead_source'               => __( 'Lead Source', 'groundhogg' ),
-		'source_page'               => __( 'Source Page', 'groundhogg' ),
-		'terms_agreement'           => __( 'Terms Agreement', 'groundhogg' ),
-		'gdpr_consent'              => __( 'Data Processing Consent', 'groundhogg' ),
-		'marketing_consent'         => __( 'Marketing Consent', 'groundhogg' ),
-		'notes'                     => __( 'Add To Notes', 'groundhogg' ),
-		'tags'                      => __( 'Apply Value as Tag', 'groundhogg' ),
-		'meta'                      => __( 'Add as Custom Meta', 'groundhogg' ),
-		'copy_file'                 => __( 'Add as File', 'groundhogg' ),
-		'utm_campaign'              => __( 'UTM Campaign', 'groundhogg' ),
-		'utm_content'               => __( 'UTM Content', 'groundhogg' ),
-		'utm_medium'                => __( 'UTM Medium', 'groundhogg' ),
-		'utm_term'                  => __( 'UTM Term', 'groundhogg' ),
-		'utm_source'                => __( 'UTM Source', 'groundhogg' ),
+
+//		'company_phone'             => __( 'Company Phone Number', 'groundhogg' ),
+//		'company_phone_extension'   => __( 'Company Phone Number Extension', 'groundhogg' ),
+//		'company_name'              => __( 'Company Name', 'groundhogg' ),
+//		'company_address'           => __( 'Full Company Address', 'groundhogg' ),
+//		'job_title'                 => __( 'Job Title', 'groundhogg' ),
+
+		'time_zone'         => __( 'Time Zone', 'groundhogg' ),
+		'ip_address'        => __( 'IP Address', 'groundhogg' ),
+		'lead_source'       => __( 'Lead Source', 'groundhogg' ),
+		'source_page'       => __( 'Source Page', 'groundhogg' ),
+		'terms_agreement'   => __( 'Terms Agreement', 'groundhogg' ),
+		'gdpr_consent'      => __( 'Data Processing Consent', 'groundhogg' ),
+		'marketing_consent' => __( 'Marketing Consent', 'groundhogg' ),
+		'notes'             => __( 'Add To Notes', 'groundhogg' ),
+		'tags'              => __( 'Apply Value as Tag', 'groundhogg' ),
+		'meta'              => __( 'Add as Custom Meta', 'groundhogg' ),
+		'copy_file'         => __( 'Add as File', 'groundhogg' ),
+		'utm_campaign'      => __( 'UTM Campaign', 'groundhogg' ),
+		'utm_content'       => __( 'UTM Content', 'groundhogg' ),
+		'utm_medium'        => __( 'UTM Medium', 'groundhogg' ),
+		'utm_term'          => __( 'UTM Term', 'groundhogg' ),
+		'utm_source'        => __( 'UTM Source', 'groundhogg' ),
 	];
 
 	$fields = array_merge( $defaults, $extra );
@@ -2305,16 +2313,18 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 			case 'mobile_phone':
 			case 'primary_phone':
 			case 'primary_phone_extension':
-			case 'company_phone':
-			case 'company_phone_extension':
 			case 'street_address_1' :
 			case 'street_address_2':
 			case 'city':
 			case 'postal_zip':
 			case 'region':
-			case 'company_name':
-			case 'company_address':
-			case 'job_title':
+
+//			case 'company_name':
+//			case 'company_address':
+//			case 'company_phone':
+//			case 'company_phone_extension':
+//			case 'job_title':
+
 			case 'lead_source':
 			case 'source_page':
 			case 'utm_campaign':
@@ -2422,6 +2432,11 @@ function update_contact_with_map( $contact, array $fields, array $map = [] ) {
 					$year  = absint( $value['year'] );
 					$month = absint( $value['month'] );
 					$day   = absint( $value['day'] );
+
+					// Not a complete birthday?
+					if ( ! $year || ! $month || ! $day ) {
+						break;
+					}
 
 					$meta['birthday'] = Ymd(
 						mktime( 0, 0, 0, $month, $day, $year )
@@ -2726,6 +2741,11 @@ function generate_contact_with_map( $fields, $map = [] ) {
 					$year  = absint( $value['year'] );
 					$month = absint( $value['month'] );
 					$day   = absint( $value['day'] );
+
+					// not a complete birthday?
+					if ( ! $year || ! $month || ! $day ) {
+						break;
+					}
 
 					$meta['birthday'] = Ymd(
 						mktime( 0, 0, 0, $month, $day, $year )
@@ -3959,7 +3979,7 @@ function is_pro_features_active() {
  * @return bool
  */
 function has_premium_features() {
-	return defined( 'GROUNDHOGG_HELPER_VERSION' ) || defined( 'GROUNDHOGG_PRO_VERSION' );
+	return defined( 'GROUNDHOGG_HELPER_VERSION' ) || defined( 'GROUNDHOGG_PRO_VERSION' ) || get_option( 'gh_master_license' ) !== false;
 }
 
 add_action( 'admin_menu', function () {
@@ -6162,4 +6182,43 @@ function log( $event, $name = '', $value = '' ) {
  */
 function is_wp_fusion_active() {
 	return defined( 'WP_FUSION_VERSION' );
+}
+
+/**
+ * Get the hostname of an email address
+ *
+ * @param $email string
+ *
+ * @return false|mixed|string
+ */
+function get_email_address_hostname( $email ) {
+
+	if ( ! is_email( $email ) ) {
+		return false;
+	}
+
+	$parts = explode( '@', $email );
+
+	return $parts[1];
+}
+
+/**
+ * If the given email is from a free inbox provider
+ *
+ * @param $email string
+ */
+function is_free_email_provider( $email ) {
+
+	if ( ! is_email( $email ) ) {
+		return false;
+	}
+
+	static $providers = [];
+
+	// initialize providers
+	if ( $providers ) {
+		$providers = json_decode( file_get_contents( GROUNDHOGG_ASSETS_PATH . 'lib/free-email-providers.json' ), true );
+	}
+
+	return apply_filters( 'groundhogg/is_free_email_provider', in_array( get_email_address_hostname( $email ), $providers ) );
 }
