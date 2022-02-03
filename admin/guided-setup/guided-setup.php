@@ -62,13 +62,17 @@ class Guided_Setup extends Admin_Page {
 	 */
 	public function check_license() {
 
+		$license = sanitize_text_field( get_post_var( 'license' ) );
+
 		$response = remote_post_json( 'https://www.groundhogg.io/wp-json/edd/all-access/', [
-			'license_key' => get_post_var( 'license' )
+			'license_key' => $license
 		] );
 
 		if ( is_wp_error( $response ) ) {
 			wp_send_json_error( $response );
 		}
+
+		update_option( 'gh_master_license', $license );
 
 		wp_send_json_success();
 	}

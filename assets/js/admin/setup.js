@@ -3,6 +3,7 @@
   const {
     input,
     toggle,
+    spinner,
     icons,
     loadingDots,
     adminPageURL,
@@ -284,10 +285,10 @@
 						<div class="gh-col">
 							<p>${__('Do you market to people in these areas?', 'groundhogg')}</p>
 							<div class="display-flex" style="gap:30px">
-								<label>${input({ type: 'checkbox', id: 'canada' })} ${__('Canada')}</label>
-								<label>${input({ type: 'checkbox', id: 'eu' })} ${__('European Union')}</label>
+								<label>${input({ type: 'checkbox', id: 'canada' })} ${__('Canada', 'groundhogg')}</label>
+								<label>${input({ type: 'checkbox', id: 'eu' })} ${__('European Union', 'groundhogg')}</label>
 								<label>${input({ type: 'checkbox', id: 'california' })}
-									${__('California (United States)')}</label>
+									${__('California (United States)', 'groundhogg')}</label>
 							</div>
 						</div>
 					</div>
@@ -295,7 +296,7 @@
 						<div class="gh-col">
 							<p>${__('Is your business registered within the European Union?', 'groundhogg')}</p>
 							<div class="display-flex" style="gap:30px">
-								<label>${input({ type: 'checkbox', id: 'in-eu' })} ${__('Yes')}</label>
+								<label>${input({ type: 'checkbox', id: 'in-eu' })} ${__('Yes', 'groundhogg')}</label>
 							</div>
 						</div>
 					</div>
@@ -436,7 +437,7 @@
 						id: 'license',
 						value: Options.get('gh_master_license'),
 					})}
-					<button id="activate" class="gh-button primary medium">${__('Activate')}</button>
+					<button id="activate" class="gh-button primary medium">${__('Activate', 'groundhogg')}</button>
 				</div>
 				<div class="space-between align-center" style="margin-top: 40px">
 					<button id="skip" class="gh-button secondary text">
@@ -503,24 +504,24 @@
 				  <p>
 					  ${__('You can help improve Groundhogg by enabling anonymous telemetry. This will occasionally send us data about Groundhogg and how you use it. We use this data to improve feature, fix bugs, and create new products.', 'groundhogg')}</p>
 				  <div class="inside display-flex column align-center gap-20">
-					  <button id="optin" class="gh-button primary medium"><b>${__('Yes, I\'m In!')}</b></button>
+					  <button id="optin" class="gh-button primary medium"><b>${__('Yes, I\'m In!', 'groundhogg')}</b></button>
 				  </div>
 				  <p><b>${__('What information is shared?', 'groundhogg')}</b></p>
 				  <ul>
-					  <li>${__('Your name and email address.')}</li>
-					  <li>${__('Total number of contacts')}</li>
-					  <li>${__('Number of emails sent over time')}</li>
-					  <li>${__('Number of active funnels')}</li>
-					  <li>${__('Statistics such as open rate and click through rate')}</li>
-					  <li>${__('Error messages and plugin failures')}</li>
-					  <li>${__('System info such as WordPress version and language')}</li>
-					  <li>${__('Installed plugins')}</li>
+					  <li>${__('Your name and email address.', 'groundhogg')}</li>
+					  <li>${__('Total number of contacts', 'groundhogg')}</li>
+					  <li>${__('Number of emails sent over time', 'groundhogg')}</li>
+					  <li>${__('Number of active funnels', 'groundhogg')}</li>
+					  <li>${__('Statistics such as open rate and click through rate', 'groundhogg')}</li>
+					  <li>${__('Error messages and plugin failures', 'groundhogg')}</li>
+					  <li>${__('System info such as WordPress version and language', 'groundhogg')}</li>
+					  <li>${__('Installed plugins', 'groundhogg')}</li>
 				  </ul>
 				  <p><b>${__('What information is <b>NOT</b> shared?', 'groundhogg')}</b></p>
 				  <ul>
-					  <li>${__('Any personally identifiable information about your users or contacts')}</li>
-					  <li>${__('Any site content such as emails or posts')}</li>
-					  <li>${__('Passwords, usernames, or any data that might impact security')}</li>
+					  <li>${__('Any personally identifiable information about your users or contacts', 'groundhogg')}</li>
+					  <li>${__('Any site content such as emails or posts', 'groundhogg')}</li>
+					  <li>${__('Passwords, usernames, or any data that might impact security', 'groundhogg')}</li>
 				  </ul>
 				  <p>🔒
 					  <i>${__('We do not sell or share any of your information with third party vendors.', 'groundhogg')}</i>
@@ -545,24 +546,24 @@
 				<div class="inside display-flex column align-center gap-20">
 					<label>${input({ type: 'checkbox', id: 'marketing', checked: true })}
 						${__('Add me to the email list.', 'groundhogg')}</label>
-					<button id="optin" class="gh-button primary medium"><b>${__('Yes, I want 15% OFF')}</b></button>
+					<button id="optin" class="gh-button primary medium"><b>${__('Yes, I want 15% OFF', 'groundhogg')}</b></button>
 				</div>
 				<p><b>${__('What information is shared?', 'groundhogg')}</b></p>
 				<ul>
-					<li>${__('Your name and email address.')}</li>
-					<li>${__('Total number of contacts')}</li>
-					<li>${__('Number of emails sent over time')}</li>
-					<li>${__('Number of active funnels')}</li>
-					<li>${__('Statistics such as open rate and click through rate')}</li>
-					<li>${__('Error messages and plugin failures')}</li>
-					<li>${__('System info such as WordPress version and language')}</li>
-					<li>${__('Installed plugins')}</li>
+					<li>${__('Your name and email address.', 'groundhogg')}</li>
+					<li>${__('Total number of contacts', 'groundhogg')}</li>
+					<li>${__('Number of emails sent over time', 'groundhogg')}</li>
+					<li>${__('Number of active funnels', 'groundhogg')}</li>
+					<li>${__('Statistics such as open rate and click through rate', 'groundhogg')}</li>
+					<li>${__('Error messages and plugin failures', 'groundhogg')}</li>
+					<li>${__('System info such as WordPress version and language', 'groundhogg')}</li>
+					<li>${__('Installed plugins', 'groundhogg')}</li>
 				</ul>
 				<p><b>${__('What information is <b>NOT</b> shared?', 'groundhogg')}</b></p>
 				<ul>
-					<li>${__('Any personally identifiable information about your users or contacts')}</li>
-					<li>${__('Any site content such as emails or posts')}</li>
-					<li>${__('Passwords, usernames, or any data that might impact security')}</li>
+					<li>${__('Any personally identifiable information about your users or contacts', 'groundhogg')}</li>
+					<li>${__('Any site content such as emails or posts', 'groundhogg')}</li>
+					<li>${__('Passwords, usernames, or any data that might impact security', 'groundhogg')}</li>
 				</ul>
 				<p>🔒
 					<i>${__('We do not sell or share any of your information with third party vendors.', 'groundhogg')}</i>
@@ -630,12 +631,12 @@
 				</div>
 				<p><b>${__('Why go PRO?', 'groundhogg')}</b></p>
 				<ul>
-					<li>${__('Flat-rate pricing. <i>Your bill will never increase as you grow.</i>')}</li>
-					<li>${__('Grandfather pricing guarantee. If our price goes up, your bill won\'t!')}</li>
-					<li>${__('Instant access to 45+ addons and integrations to boost your marketing and sales.')}</li>
-					<li>${__('Access to premium our support desk for high level intervention.')}</li>
-					<li>${__('Can\'t renew? All your extensions will still work!')}</li>
-					<li>${__('Annual billing.')}</li>
+					<li>${__('Flat-rate pricing. <i>Your bill will never increase as you grow.</i>', 'groundhogg')}</li>
+					<li>${__('Grandfather pricing guarantee. If our price goes up, your bill won\'t!', 'groundhogg')}</li>
+					<li>${__('Instant access to 45+ addons and integrations to boost your marketing and sales.', 'groundhogg')}</li>
+					<li>${__('Access to premium our support desk for high level intervention.', 'groundhogg')}</li>
+					<li>${__('Can\'t renew? All your extensions will still work!', 'groundhogg')}</li>
+					<li>${__('Annual billing.', 'groundhogg')}</li>
 				</ul>
 				<div class="space-between align-center" style="margin-top: 40px">
 					<button id="skip" class="gh-button secondary text">${__('I\'ll do this later', 'groundhogg')}
@@ -688,12 +689,12 @@
 				</div>
 				<p><b>${__('Why use an MailHawk?', 'groundhogg')}</b></p>
 				<ul>
-					<li>${__('Simple & transparent pricing!')}</li>
-					<li>${__('Works with Groundhogg and all your other WordPress plugins.')}</li>
-					<li>${__('Email bounce handling.')}</li>
-					<li>${__('No hidden fees!')}</li>
+					<li>${__('Simple & transparent pricing!', 'groundhogg')}</li>
+					<li>${__('Works with Groundhogg and all your other WordPress plugins.', 'groundhogg')}</li>
+					<li>${__('Email bounce handling.', 'groundhogg')}</li>
+					<li>${__('No hidden fees!', 'groundhogg')}</li>
 				</ul>
-				<p><i>${__('MailHawk is a service owned and operated by Groundhogg Inc.')}</i></p>
+				<p><i>${__('MailHawk is a service owned and operated by Groundhogg Inc.', 'groundhogg')}</i></p>
 				<div class="space-between align-center" style="margin-top: 40px">
 					<button id="skip" class="gh-button secondary text">
 						${__('I don\'t need this service right now.', 'groundhogg')}
@@ -753,10 +754,10 @@
 				</div>
 				<p><b>${__('Why use an official SMTP Service?', 'groundhogg')}</b></p>
 				<ul>
-					<li>${__('Better deliverability!')}</li>
-					<li>${__('Support and email troubleshooting!')}</li>
-					<li>${__('Configure multiple SMTP services.')}</li>
-					<li>${__('Email bounce handling.')}</li>
+					<li>${__('Better deliverability!', 'groundhogg')}</li>
+					<li>${__('Support and email troubleshooting!', 'groundhogg')}</li>
+					<li>${__('Configure multiple SMTP services.', 'groundhogg')}</li>
+					<li>${__('Email bounce handling.', 'groundhogg')}</li>
 				</ul>
 				<div class="space-between align-center" style=" margin-top: 40px">
 					<button id="skip" class="gh-button secondary text">${__('I\'ll set this up later', 'groundhogg')}
@@ -806,18 +807,18 @@
 					${__('Stay up to date on the latest changes & improvements, courses, articles, deals and promotions available to the Groundhogg community by subscribing!', 'groundhogg')}</p>
 				<div class="display-flex gap-10 inside stretch space-between">
 					${input({
-						placeholder: __('Your best email address'),
+						placeholder: __('Your best email address', 'groundhogg'),
 						id: 'email',
 						value: currentUser.data.user_email,
 					})}
-					<button id="subscribe" class="gh-button primary medium">${__('Subscribe')}</button>
+					<button id="subscribe" class="gh-button primary medium">${__('Subscribe', 'groundhogg')}</button>
 				</div>
 				<p><b>${__('Why subscribe?', 'groundhogg')}</b></p>
 				<ul>
-					<li>${__('First to know about events, articles, deals, promotions and more!')}</li>
-					<li>${__('Tailored onboarding experience.')}</li>
-					<li>${__('Unsubscribe anytime.')}</li>
-					<li>${__('🔒 Groundhogg does not sell or share your data with third party vendors.')}</li>
+					<li>${__('First to know about events, articles, deals, promotions and more!', 'groundhogg')}</li>
+					<li>${__('Tailored onboarding experience.', 'groundhogg')}</li>
+					<li>${__('Unsubscribe anytime.', 'groundhogg')}</li>
+					<li>${__('🔒 Groundhogg does not sell or share your data with third party vendors.', 'groundhogg')}</li>
 				</ul>
 				<div class="space-between align-center" style=" margin-top: 40px">
 					<button id="skip" class="gh-button secondary text">
@@ -865,33 +866,33 @@
 					${__('Ways you can participate with, learn from, and support other like-minded business owners and entrepreneurs.', 'groundhogg')}</p>
 				<div class="display-flex gap-20 space-between">
 					<div>
-						<h2>${__('Follow us on Twitter')}</h2>
+						<h2>${__('Follow us on Twitter', 'groundhogg')}</h2>
 						<p>${__('For fast updates and notifications.', 'groundhogg')}</p>
 					</div>
 					<button data-link="https://twitter.com/groundhoggwp"
 					        class="social gh-button space-between gap-10 secondary medium"><span
-						class="dashicons dashicons-twitter"></span>${__('Follow')}
+						class="dashicons dashicons-twitter"></span>${__('Follow', 'groundhogg')}
 					</button>
 				</div>
 				<div class="display-flex gap-20 space-between">
 					<div>
-						<h2>${__('Join the Facebook Support Group')}</h2>
+						<h2>${__('Join the Facebook Support Group', 'groundhogg')}</h2>
 						<p>${__('To get support and guidance for all things Groundhogg.', 'groundhogg')}</p>
 					</div>
 					<button data-link="https://facebook.com/groups/groundhoggwp"
 					        class="social gh-button space-between gap-10 secondary medium"><span
-						class="dashicons dashicons-facebook"></span>${__('Join')}
+						class="dashicons dashicons-facebook"></span>${__('Join', 'groundhogg')}
 					</button>
 				</div>
 				<div class="display-flex gap-20 space-between">
 					<div>
-						<h2>${__('Subscribe to our YouTube channel')}</h2>
+						<h2>${__('Subscribe to our YouTube channel', 'groundhogg')}</h2>
 						<p>
 							${__('For tutorials, opinions, and strategies guaranteed to help you launch, grow, and scale.', 'groundhogg')}</p>
 					</div>
 					<button data-link="https://www.youtube.com/groundhogg"
 					        class="social gh-button space-between gap-10 secondary medium"><span
-						class="dashicons dashicons-youtube"></span>${__('Subscribe')}
+						class="dashicons dashicons-youtube"></span>${__('Subscribe', 'groundhogg')}
 					</button>
 				</div>
 				<div class="space-between align-center" style=" margin-top: 40px">
@@ -925,7 +926,7 @@
 					${sprintf(__('Congrats %s, you\'re all set to use Groundhogg. Here are some next steps for you so you can start leveraging Groundhogg.', 'groundhogg'), currentUser.data.display_name)}</p>
 				${installedMailhawk ? `<div class="display-flex gap-20 space-between">
 					<div>
-						<h2>${__('Configure Mailhawk')}</h2>
+						<h2>${__('Configure Mailhawk', 'groundhogg')}</h2>
 						<p>
 							${__('Complete the MailHawk setup process so you can start sending better email!.', 'groundhogg')}</p>
 					</div>
@@ -934,7 +935,7 @@
 				</div>` : ''}
 				<div class="display-flex gap-20 space-between">
 					<div>
-						<h2>${__('Register for Groundhogg Academy')}</h2>
+						<h2>${__('Register for Groundhogg Academy', 'groundhogg')}</h2>
 						<p>
 							${__('<b>FREE</b> courses to help you get started with Groundhogg and implement real-world marketing strategies.', 'groundhogg')}</p>
 					</div>
@@ -943,10 +944,21 @@
 						class="dashicons dashicons-welcome-learn-more"></span>${__('Register FREE')}
 					</button>
 				</div>
-				${isLicensed ? '' : `
+				${isLicensed ? `
 				<div class="display-flex gap-20 space-between">
 					<div>
-						<h2>${__('Sign up for PRO')}</h2>
+						<h2>${__('Install your Premium Features', 'groundhogg')}</h2>
+						<p>
+							${__('Download the extension manager to install your premium features and integrations.', 'groundhogg')}</p>
+					</div>
+					<button data-target="_blank" data-link="https://www.groundhogg.io/account/all-access-downloads/?utm_source=plugin&utm_medium=button&utm_campaign=guided_setup&utm_content=next-steps" class="link gh-button space-between gap-10 secondary medium"><span class="dashicons dashicons-download"></span>${__('Install!')}</button>
+				</div>
+				<div class="display-flex center">
+					${optedIntoTelementry ? `<p class="pill green">${__('Use code <b>IFOUND15OFF</b> to save 15% off your first year!', 'groundhogg')}</p>` : ''}
+				</div>` : `
+				<div class="display-flex gap-20 space-between">
+					<div>
+						<h2>${__('Sign up for PRO', 'groundhogg')}</h2>
 						<p>
 							${__('Instant access to 45+ addons and integrations to help you maximize your marketing and sales.', 'groundhogg')}</p>
 					</div>
@@ -1054,6 +1066,9 @@
 
   $(() => {
 
+    $('#guided-setup').html(spinner())
+
+
     // preload options
     Options.fetch([
       'gh_business_name',
@@ -1070,6 +1085,8 @@
       'gh_override_from_email',
       'blogname'
     ]).then(() => {
+      isLicensed = Options.get('gh_master_license') != false
+
       mount()
     })
 
