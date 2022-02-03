@@ -10,6 +10,7 @@ use function Groundhogg\isset_not_empty;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 use Groundhogg\Tag;
+use function Groundhogg\parse_tag_list;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -192,7 +193,7 @@ class Tag_Removed extends Benchmark {
 
 		$removed_tag = $this->get_data( 'tag_id' );
 
-		$tags      = wp_parse_id_list( $this->get_setting( 'tags' ) );
+		$tags      = parse_tag_list( $this->get_setting( 'tags' ) );
 		$condition = $this->get_setting( 'condition', 'any' );
 
 		switch ( $condition ) {
