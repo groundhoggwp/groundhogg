@@ -660,6 +660,25 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	}
 
 	/**
+	 * @param      $other
+	 * @param bool $is_primary
+	 *
+	 * @return false|int
+	 */
+	public function is_related( $other, $is_primary = true ){
+		if ( ! is_object( $other ) || ! method_exists( $other, 'get_id' ) ) {
+			return false;
+		}
+
+		return $this->get_rel_db()->exists( [
+			$is_primary ? 'primary_object_id' : 'secondary_object_id'     => $this->get_id(),
+			$is_primary ? 'primary_object_type' : 'secondary_object_type' => $this->get_object_type(),
+			$is_primary ? 'secondary_object_id' : 'primary_object_id'     => $other->get_id(),
+			$is_primary ? 'secondary_object_type' : 'primary_object_type' => $other->get_object_type(),
+		] );
+	}
+
+	/**
 	 * Create a relationship between this object and another object
 	 *
 	 * @param      $other Base_Object
