@@ -1540,16 +1540,6 @@ class Contact_Query {
 		);
 
 		self::register_filter(
-			'company_name',
-			[ self::class, 'filter_company_name' ]
-		);
-
-		self::register_filter(
-			'job_title',
-			[ self::class, 'filter_job_title' ]
-		);
-
-		self::register_filter(
 			'funnel_history',
 			[ self::class, 'filter_funnel' ]
 		);

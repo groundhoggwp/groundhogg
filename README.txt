@@ -3,9 +3,9 @@ Contributors: trainingbusinesspros, Groundhogg, Adrian Tobey
 Tags: wordpress crm, marketing automation, crm, email marketing, email automation
 Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.0
-Tested up to: 5.8
+Tested up to: 5.9
 Requires PHP: 7.1
-Stable tag: 2.5.7.9
+Stable tag: 2.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -324,7 +324,7 @@ You can purchase a premium plan for access to support and our premium extensions
 = 2.6 =
 * NEW UI for the contact record
   * Condensed design to fit more on the screen, less scrolling.
-  * Custom field management is now FREE and part of Groundhogg core!
+  * Custom field management is now FREE and part of Groundhogg core! _If you have created custom fields previously with the Custom Field Management addon you will have to update the addon and the custom fields will be refactored._
   * Additional contact methods including email addresses and phone numbers.
   * Improved tag picker is very user friendly.
   * Activity timeline shows all events and activity in order.
@@ -339,7 +339,8 @@ You can purchase a premium plan for access to support and our premium extensions
  * TWEAKED all jQuery removed from the fullframe script.
  * FIXED Search filters which may have been saved, and then settings get corrupted will show a "corrupted filter" notice instead of crashing, which you'll be able to delete.
  * FIXED fullframe.js conflicting with the forms iframe script causing console errors.
- * FIXED fullframe.js made to be compatible with plugins which optimize iframes and
+ * FIXED fullframe.js made to be compatible with plugins which optimize iframes.
+ * FIXED Replacement code regex will not span multiple lines.
  * REMOVED Company/Business details in favour of adding them to the Companies addon since these fields are usually unused unless the companies addon is installed.
 
 = 2.5.7.9 (2022-01-05) =

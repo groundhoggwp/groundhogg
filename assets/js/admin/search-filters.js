@@ -790,7 +790,6 @@
 
   registerFilterGroup('contact', _x('Contact', 'noun referring to a person in the crm', 'groundhogg'))
   registerFilterGroup('location', _x('Contact Location', 'contact is a noun referring to a person', 'groundhogg'))
-  registerFilterGroup('company', _x('Contact Company', 'contact is a noun referring to a person', 'groundhogg'))
   registerFilterGroup('user', __('User'))
   registerFilterGroup('activity', _x('Activity', 'noun referring to a persons past activities', 'groundhogg'))
 
@@ -1326,37 +1325,6 @@
 
   registerFilter('zip_code', 'location', __('Zip/Postal Code', 'groundhogg'), {
     ...BasicTextFilter(__('Zip/Postal Code', 'groundhogg'))
-  })
-
-  registerFilter('company_name', 'company', __('Company Name', 'groundhogg'), {
-    ...BasicTextFilter(__('Company Name', 'groundhogg')),
-
-    onMount (filter, updateFilter) {
-
-      metaValuePicker('#filter-value', 'company_name')
-
-      $('#filter-compare, #filter-value').on('change', function (e) {
-        const $el = $(this)
-        updateFilter({
-          [$el.prop('name')]: $el.val()
-        })
-      })
-    }
-  })
-
-  registerFilter('job_title', 'company', __('Job Title', 'groundhogg'), {
-    ...BasicTextFilter(__('Job Title', 'groundhogg')),
-    onMount (filter, updateFilter) {
-
-      metaValuePicker('#filter-value', 'job_title')
-
-      $('#filter-compare, #filter-value').on('change', function (e) {
-        const $el = $(this)
-        updateFilter({
-          [$el.prop('name')]: $el.val()
-        })
-      })
-    }
   })
 
   //filter by Email Opened
@@ -2199,7 +2167,8 @@
     standardActivityDateOptions,
     standardActivityDateTitle,
     standardActivityDateDefaults,
-    standardActivityDateFilterOnMount
+    standardActivityDateFilterOnMount,
+    BasicTextFilter
   }
 
 })
