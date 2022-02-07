@@ -68,7 +68,6 @@ class Replacements implements \JsonSerializable {
 			'contact'    => __( 'Contact', 'groundhogg' ),
 			'user'       => __( 'WP User', 'groundhogg' ),
 			'owner'      => __( 'Contact Owner', 'groundhogg' ),
-			'company'    => __( 'Contact Company', 'groundhogg' ),
 			'site'       => __( 'Site', 'groundhogg' ),
 			'compliance' => __( 'Compliance', 'groundhogg' ),
 			'other'      => __( 'Other', 'groundhogg' ),
@@ -160,27 +159,6 @@ class Replacements implements \JsonSerializable {
 				'callback'    => [ $this, 'replacement_address' ],
 				'name'        => __( 'Full Address', 'groundhogg' ),
 				'description' => _x( 'The contact\'s full address.', 'replacement', 'groundhogg' ),
-			],
-			[
-				'code'        => 'company_name',
-				'group'       => 'company',
-				'callback'    => [ $this, 'replacement_company_name' ],
-				'name'        => __( 'Company Name', 'groundhogg' ),
-				'description' => _x( 'The contact\'s company name.', 'replacement', 'groundhogg' ),
-			],
-			[
-				'code'        => 'job_title',
-				'group'       => 'company',
-				'callback'    => [ $this, 'replacement_job_title' ],
-				'name'        => __( 'Job Title', 'groundhogg' ),
-				'description' => _x( 'The contact\'s job title.', 'replacement', 'groundhogg' ),
-			],
-			[
-				'code'        => 'company_address',
-				'group'       => 'company',
-				'callback'    => [ $this, 'replacement_company_address' ],
-				'name'        => __( 'Address', 'groundhogg' ),
-				'description' => _x( 'The contact\'s company address.', 'replacement', 'groundhogg' ),
 			],
 			[
 				'code'        => 'birthday',
@@ -924,27 +902,6 @@ class Replacements implements \JsonSerializable {
 
 	}
 
-	/**
-	 * Get the company name of a contact
-	 *
-	 * @param $contact_id
-	 *
-	 * @return mixed
-	 */
-	function replacement_company_name( $contact_id ) {
-		return $this->get_current_contact()->get_meta( 'company_name' );
-	}
-
-	/**
-	 * Get the company address of a contact
-	 *
-	 * @param $contact_id
-	 *
-	 * @return mixed
-	 */
-	function replacement_company_address( $contact_id ) {
-		return $this->get_current_contact()->get_meta( 'company_address' );
-	}
 
 	/**
 	 * Get the contact notes
@@ -967,16 +924,6 @@ class Replacements implements \JsonSerializable {
 		return $return;
 	}
 
-	/**
-	 * Get the job title of a contact
-	 *
-	 * @param $contact_id
-	 *
-	 * @return mixed
-	 */
-	function replacement_job_title( $contact_id ) {
-		return $this->get_current_contact()->get_meta( 'job_title' );
-	}
 
 	/**
 	 * Return back the email address of the contact owner.
