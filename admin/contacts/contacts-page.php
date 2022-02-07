@@ -411,6 +411,8 @@ class Contacts_Page extends Admin_Page {
 			'street_address_1',
 			'street_address_2',
 			'time_zone',
+			'times_logged_in',
+			'user_login',
 			'city',
 			'postal_zip',
 			'region',
@@ -422,6 +424,7 @@ class Contacts_Page extends Admin_Page {
 			'last_sent',
 			'country_name',
 			'region_code',
+			'locale',
 
 //			Moved to companies addon
 //			'company_name',
@@ -566,6 +569,7 @@ class Contacts_Page extends Admin_Page {
 			'source_page',
 			'ip_address',
 			'time_zone',
+			'locale',
 
 			// Moved to companies addon
 //			'company_phone',

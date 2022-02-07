@@ -102,7 +102,7 @@ class Event_Queue extends Supports_Errors {
 	public function heartbeat() {
 
 		// If the cron file is installed and the queue is processing do not do heartbeat
-		if ( is_event_queue_processing() && gh_cron_installed() ){
+		if ( is_event_queue_processing() && gh_cron_installed() ) {
 			return;
 		}
 
@@ -157,7 +157,7 @@ class Event_Queue extends Supports_Errors {
 	public function setup_cron_jobs() {
 
 		// cron job already exists
-		if ( wp_next_scheduled( self::WP_CRON_HOOK ) ){
+		if ( wp_next_scheduled( self::WP_CRON_HOOK ) ) {
 			return;
 		}
 
@@ -190,7 +190,7 @@ class Event_Queue extends Supports_Errors {
 	public function run_queue() {
 
 		// Don't run during wp-cron.php if gh-cron.php is working
-		if ( wp_doing_cron() && ! gh_doing_cron() && is_event_queue_processing() && gh_cron_installed() ){
+		if ( wp_doing_cron() && ! gh_doing_cron() && is_event_queue_processing() && gh_cron_installed() ) {
 			return 0;
 		}
 
@@ -296,6 +296,11 @@ class Event_Queue extends Supports_Errors {
 
 			$this->set_current_contact( $contact );
 
+			// maybe switch the locale if multilingual?
+			if ( $contact->get_locale() !== get_locale() ) {
+				switch_to_locale( $contact->get_locale() );
+			}
+
 			if ( ! is_wp_error( $event->run() ) ) {
 
 				if ( $event->is_funnel_event() ) {
@@ -311,6 +316,10 @@ class Event_Queue extends Supports_Errors {
 				if ( $event->has_errors() ) {
 					$this->add_error( $event->get_last_error() );
 				}
+			}
+
+			if ( is_locale_switched() ) {
+				restore_current_locale();
 			}
 
 			$processed_event_ids[] = $event_id;

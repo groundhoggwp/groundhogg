@@ -1497,6 +1497,9 @@ function create_contact_from_user( $user = false, $sync_meta = false ) {
 
 	}
 
+	// Update the locale of the contact
+	$contact->set_locale( $user->locale );
+
 	/**
 	 * Runs after the contact is created from the create user function
 	 *
@@ -1531,7 +1534,8 @@ function create_user_from_contact( $contact, $role = 'subscriber', $notification
 		'display_name'  => $contact->get_full_name(),
 		'first_name'    => $contact->get_first_name(),
 		'last_name'     => $contact->get_last_name(),
-		'role'          => $role
+		'role'          => $role,
+		'locale'        => $contact->get_locale()
 	], $contact );
 
 	$user_id = wp_insert_user( $new_user_args );

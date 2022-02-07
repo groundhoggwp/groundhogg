@@ -356,6 +356,17 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 								] ); ?>
 							</div>
 						</div>
+						<div class="gh-row">
+							<div class="gh-col">
+								<label
+									for="ip_address"><?php _e( 'Locale', 'groundhogg' ) ?></label>
+								<?php wp_dropdown_languages([
+									'selected' => $contact->get_locale()
+								]) ?>
+							</div>
+							<div class="gh-col">
+							</div>
+						</div>
 					</div>
 					<!-- SEGMENTATION AND LEADSOURCE -->
 					<h2><?php _ex( 'Source', 'contact_record', 'groundhogg' ); ?></h2>
