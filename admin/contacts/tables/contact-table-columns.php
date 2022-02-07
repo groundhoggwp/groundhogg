@@ -6,6 +6,7 @@ use Groundhogg\Contact;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 use Groundhogg\Tag;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_post_var;
@@ -229,7 +230,7 @@ class Contact_Table_Columns {
 	 * @return void
 	 */
 	protected static function column_owner_id( $contact ) {
-		echo ! empty( $contact->get_owner_id() ) ? '<a href="' . admin_url( 'admin.php?page=gh_contacts&owner=' . $contact->get_owner_id() ) . '">' . $contact->get_ownerdata()->user_login . '</a>' : '&#x2014;';
+		echo $contact->owner_id ? '<a href="' . admin_page_url( 'gh_contacts', [ 'owner' => $contact->owner_id ] ) . '">' . $contact->get_ownerdata()->display_name . '</a>' : '&#x2014;';
 	}
 
 	/**
