@@ -1946,13 +1946,13 @@ function get_csv_delimiter( $file_path ) {
 /**
  * Get a list of items from a file path, if file does not exist of there are no items return an empty array.
  *
- * @param string $file_path
- *
- * @param bool   $delimiter
+ * @param string $file_path   path to the CSV file
+ * @param bool   $delimiter   the file delimiter, if false it will guess
+ * @param bool   $associative whether to return the results as an associative array or regular array
  *
  * @return array
  */
-function get_items_from_csv( $file_path = '', $delimiter = false ) {
+function get_items_from_csv( $file_path = '', $delimiter = false, $associative = true ) {
 
 	if ( ! file_exists( $file_path ) ) {
 		return [];
@@ -1963,33 +1963,55 @@ function get_items_from_csv( $file_path = '', $delimiter = false ) {
 		$delimiter = get_csv_delimiter( $file_path ) ?: ',';
 	}
 
-	$header       = null;
-	$header_count = 0;
 	$data         = array();
 
-	if ( ( $handle = fopen( $file_path, 'r' ) ) !== false ) {
-		while ( ( $row = fgetcsv( $handle, 0, $delimiter ) ) !== false ) {
-			if ( ! $header ) {
-				$header       = $row;
-				$header_count = count( $header );
-			} else {
+	if ( $associative ){
 
-				if ( count( $row ) > $header_count ) {
+		$header       = null;
+		$header_count = 0;
 
-					$row = array_slice( $row, 0, $header_count );
-				} else if ( count( $row ) < $header_count ) {
+		if ( ( $handle = fopen( $file_path, 'r' ) ) !== false ) {
+			while ( ( $row = fgetcsv( $handle, 0, $delimiter ) ) !== false ) {
+				if ( ! $header ) {
+					$header       = $row;
+					$header_count = count( $header );
+				} else {
 
-					$row = array_pad( $row, $header_count, '' );
+					if ( count( $row ) > $header_count ) {
+
+						$row = array_slice( $row, 0, $header_count );
+					} else if ( count( $row ) < $header_count ) {
+
+						$row = array_pad( $row, $header_count, '' );
+					}
+
+					$data[] = array_combine( $header, $row );
+				}
+			}
+
+			fclose( $handle );
+		}
+	} else {
+		if ( ( $handle = fopen( $file_path, 'r' ) ) !== false ) {
+
+			while ( ( $row = fgetcsv( $handle, 0, $delimiter ) ) !== false ) {
+
+				if ( empty( $row ) ){
+					continue;
 				}
 
-				$data[] = array_combine( $header, $row );
+				if ( count( $row ) === 1 && empty ( $row[0])){
+					continue;
+				}
+
+				$data[] = $row;
 			}
+
+			fclose( $handle );
 		}
-		fclose( $handle );
 	}
 
 	return $data;
-
 }
 
 /**
