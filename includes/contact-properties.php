@@ -2,8 +2,6 @@
 
 namespace Groundhogg;
 
-use function Groundhogg\array_find;
-
 class Contact_Properties {
 
 	protected $option_name = 'gh_contact_custom_properties';
@@ -38,20 +36,22 @@ class Contact_Properties {
 	 *
 	 * Ensures only one instance of the plugin class is loaded or can be loaded.
 	 *
-	 * @return Contact_Properties
 	 * @since  1.0.0
 	 * @access public
 	 * @static
 	 *
+	 * @return Contact_Properties
 	 */
 	public static function instance() {
 
-		if ( is_null( self::$instance ) ) {
+		$class = get_called_class();
 
-			self::$instance = new Contact_Properties();
+		if ( is_null( $class::$instance ) ) {
+
+			$class::$instance = new $class();
 		}
 
-		return self::$instance;
+		return $class::$instance;
 	}
 
 	public function get_all() {
