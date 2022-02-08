@@ -650,7 +650,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 
 		return array_map( function ( $rel ) use ( $is_primary ) {
 
-			if ( $is_primary ){
+			if ( $is_primary ) {
 				return create_object_from_type( $rel->secondary_object_id, $rel->secondary_object_type );
 			} else {
 				return create_object_from_type( $rel->primary_object_id, $rel->primary_object_type );
@@ -665,8 +665,8 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 *
 	 * @return false|int
 	 */
-	public function is_related( $other, $is_primary = true ){
-		if ( ! is_object( $other ) || ! method_exists( $other, 'get_id' ) ) {
+	public function is_related( $other, $is_primary = true ) {
+		if ( ! is_object( $other ) || ! method_exists( $other, 'exists' ) || ! $this->exists() || ! $other->exists() ) {
 			return false;
 		}
 
@@ -688,7 +688,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 */
 	public function create_relationship( $other, $is_primary = true ) {
 
-		if ( ! is_object( $other ) || ! method_exists( $other, 'get_id' ) ) {
+		if ( ! is_object( $other ) || ! method_exists( $other, 'exists' ) || ! $this->exists() || ! $other->exists() ) {
 			return false;
 		}
 
@@ -710,7 +710,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 */
 	public function delete_relationship( $other, $is_primary = true ) {
 
-		if ( ! is_object( $other ) || ! method_exists( $other, 'get_id' ) ) {
+		if ( ! is_object( $other ) || ! method_exists( $other, 'exists' ) || ! $this->exists() || ! $other->exists() ) {
 			return false;
 		}
 
