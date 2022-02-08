@@ -762,19 +762,17 @@
     const ui = () => {
       //language=HTML
       return `
-			<div class="gh-rows-and-columns">
-				<div class="gh-row">
-					<div class="gh-col">
-						<label for="select-form">${__('Select a form', 'groundhogg')}</label>
-						${select({
-        id: `select-form`,
-        name: 'select_form',
-      })}
-					</div>
-				</div>
-			</div>
-			<div style="margin-top: 20px">
-				${selectedForm ? selectedForm.rendered : ''}
+      <div class="gh-header">
+          <div class="display-flex gap-20 full-width">
+	          ${select({
+		          id: `select-form`,
+		          name: 'select_form',
+	          })}
+              <button id="cancel" class="gh-button secondary text icon"><span class="dashicons dashicons-no-alt"></span></button>
+          </div>
+      </div>
+			<div style="margin-top: 50px">
+				${selectedForm ? selectedForm.rendered : `<p>${__('Select a form using the dropdown', 'groundhogg')}</p>`}
 			</div>`
     }
 
@@ -790,10 +788,11 @@
         }
 
         const onMount = () => {
+          $('#cancel').on('click', () => close() )
           $(`#select-form`).ghPicker({
             endpoint: FormsStore.route,
             width: '100%',
-            placeholder: __('Type to search...', 'groundhogg'),
+            placeholder: __('Type to select a form...', 'groundhogg'),
             data: FormsStore.getItems().map(f => ({
               id: f.ID,
               text: f.name,
@@ -808,7 +807,7 @@
             getResults: ({ items }) => {
               FormsStore.itemsFetched(items)
               return items.map(f => ({ id: f.ID, text: f.name }))
-            }
+            },
           }).on('select2:select', (e) => {
             selectedForm = FormsStore.get(e.params.data.id)
             reMount()
@@ -1346,15 +1345,25 @@
   const fileUploader = ({
     action = '',
     nonce = '',
+    accept = '',
+    multiple = true,
     fileName = 'file-upload',
     beforeUpload = () => {},
     onUpload = () => {},
   }) => {
     return modal({
       // language=HTML
+      width: 600,
       dialogClasses: 'gh-media-uploader',
       content: `
-		  <input id="upload-file-input" type="file" name="files[]" class="hidden" multiple>
+		  ${input({
+        type: 'file',
+        id: 'upload-file-input',
+        name: 'files' + ( multiple ? '[]' : ''),
+        className: 'hidden',
+        accept,
+        multiple,
+      })}
 		  <div class="droppable-handler">
 			  <h2>${__('Drag files to upload')}</h2>
 			  <button class="gh-button primary" id="select-files">${__('Select Files')}</button>
@@ -1362,7 +1371,7 @@
       <div id="uploading-files"></div>
       <div id="uploaded-files"></div>
       `,
-      onOpen: () => {
+      onOpen: ({close}) => {
 
         let file = null
         let filesToUpload = []

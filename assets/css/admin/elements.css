@@ -64,7 +64,7 @@ h3.no-margin-top {
   gap: 10px;
 }
 .display-flex.gap-20 {
-  gap: 10px;
+  gap: 20px;
 }
 .display-flex.align-center {
   align-items: center;
@@ -512,6 +512,28 @@ button.gh-button:disabled,
 button.gh-submit:disabled {
   opacity: 0.5;
   cursor: initial;
+}
+a.gh-button.dropdown, a.gh-submit.dropdown,
+button.gh-button.dropdown,
+button.gh-submit.dropdown {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid rgba(16, 38, 64, 0.5);
+  background: #FFFFFF;
+  color: #102640;
+  padding: 5px 10px;
+}
+a.gh-button.dropdown::after, a.gh-submit.dropdown::after,
+button.gh-button.dropdown::after,
+button.gh-submit.dropdown::after {
+  content: "";
+  display: inline-block;
+  font: normal 20px/1 dashicons;
+  speak: never;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-decoration: none;
 }
 a.gh-button.no-border, a.gh-submit.no-border,
 button.gh-button.no-border,
@@ -1529,7 +1551,6 @@ ul.gh-form-errors {
 }
 
 .gh-media-uploader .droppable-handler {
-  width: 500px;
   border: dashed 5px rgba(16, 38, 64, 0.5);
   text-align: center;
   padding: 40px;

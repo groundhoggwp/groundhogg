@@ -725,6 +725,29 @@
     this.flag = 'improved'
   }
 
+  const progressModal = ({
+    beforeProgress = () => '',
+    afterProgress = () => '',
+    onOpen = () => {},
+    ...rest
+  }) => {
+    
+    return modal({
+      canClose: false,
+      width: 500,
+      content: `
+${beforeProgress()}
+<div id="progress-modal"></div>
+${afterProgress()}`,
+      onOpen: ({setContent, close}) => {
+        const { setProgress } = progressBar('#progress-modal')
+        onOpen({setContent, setProgress, close})
+      },
+      ...rest
+    })
+
+  }
+  
   /**
    *
    * @param text
@@ -1010,6 +1033,24 @@
       close,
       setContent
     }
+  }
+  
+  const wpErrorDialog = ( error, props ) => {
+
+    let message
+
+    if ( Array.isArray( error ) ){
+      message = error[0].message
+    }
+
+    if ( typeof error === 'object' && error.message ){
+      message = error.message
+    }
+
+    return errorDialog({
+      message,
+      ...props
+    })
   }
 
   const errorDialog = (props) => {
@@ -2272,6 +2313,7 @@
     stepNav,
     stepNavHandler,
     progressBar,
+    progressModal,
     tooltip,
     clickedIn,
     ordinal_suffix_of,

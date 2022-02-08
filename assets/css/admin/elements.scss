@@ -104,7 +104,7 @@ h3 {
   }
 
   &.gap-20 {
-    gap: 10px;
+    gap: 20px;
   }
 
   &.align-center{
@@ -668,6 +668,28 @@ button {
     &:disabled {
       opacity: 0.5;
       cursor: initial;
+    }
+
+    &.dropdown {
+
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+
+      border: 1px solid $primary-dark-50;
+      background: #FFFFFF;
+      color: $primary-dark;
+      padding: 5px 10px;
+
+      &::after{
+        content: "\f140";
+        display: inline-block;
+        font: normal 20px/1 dashicons;
+        speak: never;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-decoration: none;
+      }
     }
 
     &.no-border {
@@ -1846,7 +1868,6 @@ ul.gh-form-errors {
 
 .gh-media-uploader {
   .droppable-handler {
-    width: 500px;
     //margin: 20px;
     border: dashed 5px $primary-dark-50;
     text-align: center;
